@@ -123,7 +123,7 @@ define	DUMMY			finit		# any procedure will do
 # the process type (connected, detached, or host) and identify the process
 # standard i/o channels and device driver to be used.
 
-procedure iraf_main (a_cmd, a_inchan, a_outchan, a_errchan,
+int procedure iraf_main (a_cmd, a_inchan, a_outchan, a_errchan,
 	a_driver, a_devtype, prtype, bkgfile, jobcode, sys_runtask, onentry)
 
 char	a_cmd[ARB]		# command to be executed or null string
@@ -142,7 +142,7 @@ bool	networking
 int	inchan, outchan, errchan, driver, devtype
 char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
-int	jumpbuf[LEN_JUMPBUF], status, state, interpret, i
+int	jumpbuf[LEN_JUMPBUF], status, errstat, state, interpret, i
 long	save_time[2]
 pointer	sp
 
@@ -167,10 +167,11 @@ begin
 	# The following initialization code is executed upon process
 	# startup only.
 
+	errstat = OK
 	state = STARTUP
 	call zsvjmp (jumpbuf, status)
 	if (status != OK)
-	    call sys_panic (0, "fatal error during process startup")
+	    call sys_panic (EA_FATAL, "fatal error during process startup")
 
 	# Install the standard exception handlers, but if we are a connected
 	# subprocess do not enable interrupts until process startup has
@@ -231,9 +232,11 @@ begin
 	call zsvjmp (jumpbuf, status)
 
 	if (status != OK) {
+	    errstat = status
+
 	    # Give up if error occurs during shutdown.
 	    if (state == SHUTDOWN)
-		call sys_panic (0, "fatal error during process shutdown")
+		call sys_panic (errstat, "fatal error during process shutdown")
 
 	    # Tell error handling package that an error restart is in
 	    # progress (necessary to avoid recursion).
@@ -364,6 +367,7 @@ begin
 	    # by the preprocessor in place of the TASK statement) to search
 	    # the dictionary and run the named task.
 
+	    errstat = OK
 	    if (sys_runtask (taskname,cmd,arglist_offset,interactive) == ERR) {
 		call flush (STDOUT)
 		call sprintf (cmd, SZ_CMDBUF,
@@ -417,6 +421,9 @@ shutdown_
 
 	call xonexit (OK)
 	call fio_cleanup (OK)
+	call clclose()
+
+	return (errstat)
 end
 
 

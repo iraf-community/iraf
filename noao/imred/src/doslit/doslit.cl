@@ -14,7 +14,7 @@ string	standards = ""		{prompt="List of standard star spectra\n"}
 
 string	readnoise = "rdnoise"	{prompt="Read out noise sigma (photons)"}
 string	gain = "gain"		{prompt="Photon gain (photons/data number)"}
-int	dispaxis = ")_.dispaxis"  {prompt="Dispersion axis (1=along lines, 2=along columns)"}
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 real	width = 5.		{prompt="Width of profiles (pixels)\n"}
 
 bool	dispcor = yes		{prompt="Dispersion correct spectra?"}
@@ -38,15 +38,15 @@ begin
 	obj = mktemp ("tmp$iraf") 
 	arc = mktemp ("tmp$iraf")
 	std = mktemp ("tmp$iraf")
-	sgetspec (objects, arcs, standards, obj, arc, std)
+	sgetspec (objects, arcs, arctable, standards, obj, arc, std)
 
 	apslitproc.readnoise = readnoise
 	apslitproc.gain = gain
-	apslitproc.dispaxis = dispaxis
 	apslitproc.width = width
 	apslitproc.t_width = width
 	apslitproc.radius = width
 	apslitproc.clean = clean
+	sproc.datamax = datamax
 
 	sproc (obj, arc, arctable, std, dispcor, extcor, fluxcal,
 	    resize, clean, splot, redo, update, quicklook, batch, listonly)

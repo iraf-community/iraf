@@ -77,13 +77,8 @@ begin
 	    ft_func = locpr (cgauss1d)
 	    ft_dfunc = locpr (cdgauss1d)
 	} else if (RV_FITFUNC(rv) == LORENTZIAN) {
-	    if (DBG_OTHER(rv) == YES) {
-	        ft_func = locpr (lorentz_old)
-	        ft_dfunc = locpr (dlorentz_old)
-	    } else {
-	        ft_func = locpr (lorentz)
-	        ft_dfunc = locpr (dlorentz)
-	    }
+	    ft_func = locpr (lorentz)
+	    ft_dfunc = locpr (dlorentz)
 	}
 
 	# Now iterate the fit.
@@ -123,6 +118,11 @@ begin
 	    do i = 1, npts {
 	        distance = abs (c[2] - xcf[ledge+i-1])
 	        Memr[w+i-1] = fit_weight (distance, width, RV_WEIGHTS(rv))
+                #if (DEBUG(rv)) {
+                #   call d_printf (DBG_FD(rv),"\tx=%g y=%g dist=%g weight=%g\n")
+                #       call pargr(xcf[ledge+i-1]) ; call pargr(ycf[ledge+i-1]) 
+                #       call pargr (distance) ; call pargr(Memr[w+i-1])
+                #}
 	    }
 
 	    # Initialize the NLFIT routines and do the fitting.
@@ -161,6 +161,7 @@ begin
              RV_ERRCODE(rv) = ERR_FIT
              call aclrr (c, NPARS)
              call aclrr (sigmac, NPARS)
+	     call sfree (sp)
              return
 	}
 	niter = j

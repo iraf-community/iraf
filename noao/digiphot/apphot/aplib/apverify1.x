@@ -68,38 +68,6 @@ begin
 end
 
 
-# AP_VTHRESHOLD -- Verify the full detection threshold.
-
-real procedure ap_vthreshold (ap)
-
-pointer	ap		# pointer to the apphot structure
-
-real	threshold
-int	scan(), nscan()
-real	apstatr()
-
-begin
-	# Confirm the threshold parameter.
-	call printf (
-	"Detection threshold in counts above background (%g) (CR or value): ")
-	    call pargr (apstatr (ap, THRESHOLD))
-	call flush (STDOUT)
-	if (scan() == EOF)
-	    threshold = apstatr (ap, THRESHOLD)
-	else {
-	    call gargr (threshold)
-	    if (nscan () != 1)
-	        threshold = apstatr (ap, THRESHOLD)
-	}
-
-	call printf ("\tNew detection threshold: %g counts\n")
-	    call pargr (threshold)
-	call apsetr (ap, THRESHOLD, threshold)
-
-	return (threshold)
-end
-
-
 # AP_VDATAMIN-- Verify the minimum good data value.
 
 real procedure ap_vdatamin (ap)
@@ -273,14 +241,17 @@ real procedure ap_vcthreshold (ap)
 
 pointer	ap		# pointer to the apphot structure
 
-real	cthreshold
+real	skysigma, cthreshold
 int	scan(), nscan()
 real	apstatr()
 
 begin
+	# Get the sky sigma.
+	skysigma = apstatr (ap, SKYSIGMA)
+
 	# Print the old centering threshold.
 	call printf (
-	"Centering threshold in counts above background (%g) (CR or value): ")
+	"Centering threshold in sigma above data minimum (%g) (CR or value): ")
 	    call pargr (apstatr (ap, CTHRESHOLD))
 	call flush (STDOUT)
 
@@ -295,8 +266,12 @@ begin
 
 	# Print the new centering threshold.
 	call apsetr (ap, CTHRESHOLD, cthreshold) 
-	call printf ("\tNew centering threshold: %g counts\n")
+	call printf ("\tNew centering threshold: %g skysigma  %g counts\n")
 	    call pargr (cthreshold)
+	if (IS_INDEFR(skysigma))
+	    call pargr (INDEFR)
+	else
+	    call pargr (cthreshold * skysigma)
 
 	return (cthreshold)
 end
@@ -566,6 +541,7 @@ begin
 	}
 
 	call apsets (ap, APERTS, str)
+	call sfree (sp)
 end
 
 

@@ -94,6 +94,7 @@ begin
 	    gio = GP_GIO(gp)
 	    call gswind (gio, GP_WSTART(gp), GP_WEND(gp), ymin, ymax)
 	    call glabax (gio, "Composite Points vs Wavelength", "", "")
+	    call gseti (gio, G_PLCOLOR, GP_CMARK(gp))
 	    do i = 0, nwaves-1
 	        call gmark (gio, Memr[waves+i], Memr[sens+i], GM_VEBAR,
 		    1., -Memr[errors+i])

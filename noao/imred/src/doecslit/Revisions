@@ -1,0 +1,25 @@
+.help revisions Dec94 noao.imred.src.doecslit
+.nf
+doecslit$sgetspec.cl
+doecslit$doecslit.cl
+    The arc table will now be checked for arc spectra. (5/1/95, Valdes)
+
+doecslit$sparams.par
+doecslit$sdoarcs.cl
+doecslit$sarcrefs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+doecslit$sproc.cl
+doecslit$sbatch.cl
+doecslit$sfluxcal.cl
+doecslit$sproc.par
+doecslit$sbatch.par
+doecslit$sfluxcal.par
+    SETAIRMASS and SETJD are only called if the required keywords are
+    present.  Errors from missing airmass or JD are then reported from
+    the task that actually uses them.  (12/31/94, Valdes)
+
+doecslit$sgetspec.cl
+doecslit$sgetspec.par
+    Added warning and query for missing CCDPROC keyword.  (12/31/94, Valdes)
+.endhelp

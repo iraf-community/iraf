@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools -lcurfit -lbev"
+	$set	LIBS = "-lxtools -lcurfit -lbev -lgsurfit"
 
 	$update	libpkg.a
 	$omake	x_utilities.x
@@ -39,6 +39,7 @@ libpkg.a:
 	t_detab.x	
 	t_entab.x	
 	t_polyfit.x	<fset.h>
+	t_surfit.x	<imhdr.h> <error.h> <math/gsurfit.h>
 	t_translit.x	<chars.h> <ctype.h> <pattern.h> <fset.h>
 	ucase.x	
 	urand.x	

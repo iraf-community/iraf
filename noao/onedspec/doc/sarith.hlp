@@ -1,4 +1,4 @@
-.help sarith Mar92 noao.onedspec
+.help sarith Mar93 noao.onedspec
 .ih
 NAME
 sarith -- Spectrum arithmetic
@@ -77,8 +77,16 @@ optional step size may be given by 'x' followed by a number.
 See \fBxtools.ranges\fR for more information.  If the first character
 is "!" then the apertures/beams not in the list are selected.  Note
 that a "!" in either of the lists complements the intersection of the
-two lists.  For longslit input spectra the aperture numbers and beam
-numbers select the lines or columns to be extracted.
+two lists.
+For longslit input spectra the aperture numbers
+selects the lines or columns to be extracted.  For 3D Fabry-Perot
+spectra the aperture numbers select the first spatial axis.
+.le
+.ls bands = ""
+List of bands in 3D multispec.
+For 3D spatial spectra the band parameter applies to the second
+spatial axis.
+The null list selects all bands.  The syntax is as described above.
 .le
 .ls apmodulus = 0
 Modulus to be applied to the input aperture numbers before matching against
@@ -297,14 +305,15 @@ dimensional spectra.  One dimensional spectra may be stored in
 individual one dimensional images or as lines in two (or three)
 dimensional images.  The one dimensional spectra are identified by
 an aperture number, which must be unique within an image, and a beam number.
-Two dimensional long slit spectra are treated, for the purpose of this
-task, as a collection of spectra with dispersion either along the image
-lines or columns as specified by the DISPAXIS image header parameter
-or the \fIdispaxis\fR package parameter.  The aperture number and beam
-number are defined by the line or column.  A number of adjacent
-lines or columns, specified by the \fInsum\fR package parameter, will be summed
-to form an aperture spectrum.  If number is odd then the
-aperture number refers to the middle and if it is even it refers to the
+Two dimensional long slit and three dimensional Fabry-Perot spectra are
+treated, for the purpose of this
+task, as a collection of spectra with dispersion either along any axis
+specified by the DISPAXIS image header parameter
+or the \fIdispaxis\fR package parameter.  The aperture and band
+parameters specify a spatial position.  A number of adjacent
+lines, columns, and bands, specified by the \fInsum\fR package parameter,
+will be summed to form an aperture spectrum.  If number is odd then the
+aperture/band number refers to the middle and if it is even it refers to the
 lower of the two middle lines or columns.
 
 In the case of many spectra each stored in separate one dimensional
@@ -347,14 +356,14 @@ as in the original spectrum.  The reinterpolation is done in either
 linear or log-linear dispersion.  The non-linear dispersion functions
 are interpolated to a linear dispersion.
 
-Using \fBsarith\fR with long slit images provides a quick and simple type of
-extraction as opposed to using the \fBapextract\fR package.  When summing
-it is often desired to start each aperture after the number of lines
-summed.  To do this specify a step size in the aperture list.  For example
-to extract columns 3 to 23 summing every 5 columns you would use an
-aperture list of "3-23x5" and an \fInsum\fR of 5.  If you do not use the
-step in the aperture list you would extract the sum of columns 1 to 5, then
-columns 2 to 6, and so on.
+Using \fBsarith\fR with long slit and Fabry-Perot images provides a quick
+and simple type of extraction as opposed to using the \fBapextract\fR
+package.  When summing it is often desired to start each aperture after the
+number of lines summed.  To do this specify a step size in the aperture/band
+list.  For example to extract columns 3 to 23 summing every 5 columns you
+would use an aperture list of "3-23x5" and an \fInsum\fR of 5.  If you do
+not use the step in the aperture list you would extract the sum of columns
+1 to 5, then columns 2 to 6, and so on.
 
 In the special case of subapertures extracted by \fBapextract\fR, related
 apertures are numbered using a modulus; for example apertures
@@ -487,7 +496,7 @@ with matching apertures:
 by the central spectrum:
 
 .nf
-	cl> nsum = 10
+	cl> nsum = "10"
 	cl> sarith longslit copy "" longslit.ms aper=5-500x10
 	longslit[5]  -->  longslit.ms[5]
 	longslit[15]  -->  longslit.ms[15]
@@ -533,6 +542,12 @@ by the central spectrum:
 .fi
 .ih
 REVISIONS
+.ls SARITH V2.10.3
+Additional support for 3D multispec/equispec or spatial spectra has been
+added.  The "bands" parameter allows selecting specific bands and
+the onedspec output format creates separate images for each selected
+aperture and band.
+.le
 .ls SARITH V2.10
 This task is new.
 .le

@@ -17,7 +17,12 @@ string	function = "spline3"	{prompt="Fitting function",
 int	order = 20		{prompt="Fitting function order", min=1}
 
 begin
+	string	imtype
 	file	log1, log2, flat2d, flatec, resp
+	int	i, n
+
+	imtype = "." // envget ("imtype")
+	n = strlen (imtype)
 
 	flat2d = flat
 	resp = response
@@ -26,10 +31,10 @@ begin
 	    error (1, "No flat field defined")
 	if (flat2d != "") {
 	    i = strlen (flat2d)
-	    if (i > 4 && substr (flat2d, i-3, i) == ".imh")
-		flat2d = substr (flat2d, 1, i-4)
+	    if (i > n && substr (flat2d, i-n+1, i) == imtype)
+		flat2d = substr (flat2d, 1, i-n)
 	    flatec = flat2d // ".ec"
-	    if (!access (flat2d // ".imh"))
+	    if (!access (flat2d // imtype))
 		error (1, "Flat field spectrum not found - " // flat2d)
 	}
 
@@ -74,7 +79,7 @@ begin
 		low_reject=0., high_reject=0., niterate=1, grow=0.,
 		graphics="stdgraph")
 	    sarith (flatec, "/", resp, resp, w1=INDEF, w2=INDEF, apertures="",
-		beams="", apmodulus=0, reverse=no, ignoreaps=yes,
+		bands="", beams="", apmodulus=0, reverse=no, ignoreaps=yes,
 		format="multispec", renumber=no, offset=0, clobber=yes,
 		merge=no, errval=0, verbose=no)
 	    imdelete (flatec, verify=no)

@@ -52,8 +52,10 @@ begin
 	repeat {
 
 	    # Get next line from file
-	    if (io_getline (fd, Memc[line], MAX_CONT * SZ_LINE) == EOF)
+	    if (io_getline (fd, Memc[line], MAX_CONT * SZ_LINE) == EOF) {
+		call sfree (sp)
 		return (EOF)
+	    }
 
 	    #if (clgetb ("debug.iocode")) {
 		#call eprintf ("[%s]\n") 

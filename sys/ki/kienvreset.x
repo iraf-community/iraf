@@ -9,17 +9,27 @@ include	"ki.h"
 
 procedure ki_envreset (name, value)
 
-char	name[ARB]		# name of environment variable
-char	value[ARB]		# value of environment variable
+char	name[ARB]		#I name of environment variable
+char	value[ARB]		#I value of environment variable
 
-int	node, junk
 pointer	sp, buf, op
+int	node, junk, ch
 int	gstrcpy(), ki_send()
+bool	streq()
+
 include	"kii.com"
 include	"kinode.com"
 define	quit_ 91
 
 begin
+	# Do not propagate the host-specific iraf definitions "iraf", "host",
+	# and "tmp" over the network.
+
+	ch = name[1]
+	if (ch == 'i' || ch == 'h' || ch == 't')
+	    if (streq(name,"iraf") || streq(name,"host") || streq(name,"tmp"))
+		return
+
 	call smark (sp)
 	call salloc (buf, SZ_COMMAND, TY_CHAR)
 

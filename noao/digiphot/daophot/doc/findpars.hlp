@@ -1,0 +1,142 @@
+.help findpars Dec92 noao.digiphot.findpars
+.ih
+NAME
+findpars -- edit the object detection parameters
+.ih
+USAGE
+findpars
+.ih
+PARAMETERS
+.ls threshold = 4.0 (sigma)
+The object detection threshold above local background in units of
+\fIdatapars.sigma\fR.
+.le
+.ls nsigma = 1.5
+The semi-major axis of the Gaussian convolution kernel used
+to computed the density enhancement and mean density images, in Gaussian sigma,
+where gsigma = min (2.0, 0.42466 * \fInsigma\fR * \fIdatapars.fwhmpsf\fR /
+\fIdatapars.scale\fR) pixels.
+.le
+.ls ratio = 1.0
+The ratio of the sigma of the Gaussian convolution kernel along the minor axis
+direction to the sigma along the major axis direction.
+\fIRatio\fR defaults to 1.0 in which case the image is convolved with a circular
+Gaussian.
+.le
+.ls theta = 0.0
+The position of the major axis of the elliptical Gaussian. \fITheta\fR is
+measured counter-clockwise from the x axis.
+.le
+.ls sharplo = .2, sharphi = 1.0
+\fISharplo\fR and \fIsharphi\fR are numerical cutoffs on the image sharpness
+statistic, designed to eliminate
+brightness maxima which are due to bad pixels, rather than to
+astronomical objects.
+.le
+.ls roundlo = -1.0 roundhi = 1.0
+\fIRoundlo\fR and \fIroundhi\fR are numerical cutoffs on the image roundness
+statistic designed to eliminate
+brightess maxima which are due to bad rows or columns, rather
+than to astronomical objects.
+.le
+.ls mkdetections = no
+Mark the positions of the detected objects on the displayed image ?
+This option does
+not currently work on images displayed on the image display, but does work
+if a contour plot is substituted for the displayed image.
+.le
+
+.ih
+DESCRIPTION
+
+The  object detection algorithm  parameters  control  the  action  of  the 
+detection algorithm.   The  default  parameter values  have  been chosen 
+to give reasonable results in the majority of  cases.
+Note   that   some of  the  detection parameters  scale  with  two 
+quantities which are data dependent, the full-width half-maxima of
+the image point spread function 
+and  the  standard deviation of the background pixels.  Both of these
+quantities are parameters in the DATAPARS task.
+
+In the first step of the detection process, the detection algorithm
+computes a linear
+function of the brightness values in an 
+elliptical array of pixels within a semi-major axis of
+max (2.0, .42466 * nsigma * \fIdatapars.fwhmpsf\fR / \fIdatapars.scale\fR)
+pixels of
+the pixel of interest. The equivalent mathematical operation
+is a convolution of the original data with a truncated, lowered 
+elliptical Gaussian function, specified by \fIdatapars.fwhmpsf\fR,
+\fIratio\fR and \fItheta\fR and  computed
+in such a way as to be the mathematical equivalent of fitting a Gaussian
+stellar profile to the image data by least-squares. The coefficients of the
+linear function sum to zero so that the overall bias level (local sky)
+cancels out exactly. Since the function is
+symmetric about a single pixel, a smooth gradient in the sky brightness
+also cancels exactly. Therefore the user does not have to specify an
+absolute brightness threshold.
+
+After the convolution step the detection algorithm goes through the convolved
+data looking
+for local maxima in the brightness enhancements, which are greater
+than \fIthreshold\fR * \fIdatapars.sigma\fR above background and brighter
+than any neighboring pixels which are within the bounds of the
+convolution kernel. As the algorithm finds
+potential candidates it computes a couple of shape characteristics. The
+limits on these parameters \fIroundlo\fR, \fIroundhi\fR, \fIsharplo\fR,
+\fIsharphi\fR are set to
+weed out bad pixels and brightess enhancements that are elongated in x and y.
+
+Finally the approximate x and y centroids of the the detected objects are
+computed. A rough magnitude relative to \fIthreshold\fR * \fIdatapars.sigma\fR
+is computed
+and the object is added to the output file.
+
+.ih
+EXAMPLES
+
+1. List the object detection parameters.
+
+.nf
+	da> lpar findpars
+.fi
+
+2. Edit the object detection parameters.
+
+.nf
+	da> findpars
+.fi
+
+3. Edit the FINDPARS parameters from within the DAOFIND task.
+
+.nf
+	da> epar daofind
+
+	    ... edit a few daofind parameters
+
+	    ... move to the findpars parameter and type :e
+
+	    ... edit the findpars parameter and type:q
+
+	    ... finish editing the daofind parameters and type ^Z
+.fi
+
+4. Save the current FINDPARS parameter set in a text file fndnite1.par.
+This can also be done from inside a higher level task as in the previous
+example.
+
+.nf
+	da> findpars
+
+	    ... edit the parameters
+
+	    ... type ":w fndnite1.par" from within epar
+.fi
+
+.ih
+BUGS
+daofind
+
+.ih
+SEE ALSO
+.endhelp

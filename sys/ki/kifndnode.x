@@ -12,7 +12,7 @@ char	alias[ARB]		# alias to search for
 int	node, i
 char	first_char
 bool	streq()
-int	ki_gethosts(), envfind(), and()
+int	ki_gethosts(), ki_mapname(), and()
 include	"kinode.com"
 
 begin
@@ -22,7 +22,7 @@ begin
 		return (NULL)
 
 	# Map possible logical node name.
-	if (envfind (alias, n_nodename, SZ_ALIAS) <= 0)
+	if (ki_mapname (alias, n_nodename, SZ_ALIAS) <= 0)
 	    call strcpy (alias, n_nodename, SZ_ALIAS)
 
 	# Search the node descriptor table for a node with the given alias.

@@ -22,9 +22,9 @@ begin
 	        call strcpy (image[j], image[j-3], maxchar)
 	    else if (k > 0)
 	        call strcpy (image[k], image[k-3], maxchar)
-	    i = strmatch (image, ".??h[")
-	    j = strmatch (image, ".qp[")
-	    k = strmatch (image, ".pl[")
+	    i = strmatch (image, ".??h[") - 1
+	    j = strmatch (image, ".qp[") - 1
+	    k = strmatch (image, ".pl[") - 1
 	    if (i > 0)
 	        call strcpy (image[i], image[i-4], maxchar)
 	    else if (j > 0)

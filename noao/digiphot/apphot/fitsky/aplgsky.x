@@ -1,24 +1,26 @@
+include <mach.h>
 include "../lib/fitsky.h"
 
-define	SFRACTION	.20		# Lucy smoothing length
 define	TOL		0.001		# Fitting tolerance
 
 # AP_LGSKY -- Procedure to fit the peak and width of the histogram using
 # repeated convolutions and a triangle function.
 
-int procedure ap_lgsky (skypix, coords, nskypix, snx, sny,
-    k1, hwidth, binsize, smooth, k2, rgrow, maxiter, sky_mode, sky_sigma,
-    sky_skew, nsky, nsky_reject)
+int procedure ap_lgsky (skypix, coords, wgt, index, nskypix, snx, sny, k1,
+	hwidth, binsize, smooth, losigma, hisigma, rgrow, maxiter, sky_mode,
+	sky_sigma, sky_skew, nsky, nsky_reject)
 
 real	skypix[ARB]		# array of sky pixels
-int	coords[ARB]		# array of coordinates
+int	coords[ARB]		# array of coordinates of region growing
+real	wgt[ARB]		# array of weights for rejection
+int	index[ARB]		# array of sort indices
 int	nskypix			# the number of sky pixels
 int	snx, sny		# the maximum dimensions of sky raster
 real	k1			# extent of the histogram in skysigma
 real	hwidth			# width of histogram
 real	binsize			# the size of the histogram in sky sigma
 int	smooth			# smooth the histogram before fitting
-real	k2			# rejection criterion for histogram
+real	losigma, hisigma	# upper and lower sigma rejection limits
 real	rgrow			# region growing radius in pixels
 int	maxiter			# maximum number of rejection cycles
 real	sky_mode		# computed sky value
@@ -27,12 +29,13 @@ real	sky_skew		# skew of sky pixels
 int	nsky			# number of sky pixels used in fit
 int	nsky_reject		# number of sky pixels rejected
 
-double 	sumpx, sumsqpx, sumcbpx
+double 	dsky, sumpx, sumsqpx, sumcbpx
 int	nreject, nbins, nker, i, j, iter
-pointer	sp, hgm, shgm, wgt
-real	hmin, hmax, dh, locut, hicut, sky_mean, center
-int	ap_grow_hist2(), aphgmr(), aptopt()
-real	apmapr()
+pointer	sp, hgm, shgm
+real	dmin, dmax, hmin, hmax, dh, locut, hicut, sky_mean, center, cut
+real	sky_zero
+int	ap_grow_hist2(), aphigmr(), aptopt()
+real	ap_asumr(), apmedr(), apmapr()
 
 begin
 	# Initialize.
@@ -45,28 +48,33 @@ begin
 	    return (AP_NOSKYAREA)
 
 	# Compute a first guess for the parameters.
-	call apfmoments (skypix, nskypix, sumpx, sumsqpx, sumcbpx, sky_mean,
-	    sky_sigma, sky_skew)
+	sky_zero = ap_asumr (skypix, index, nskypix) / nskypix
+	call ap_ialimr (skypix, index, nskypix, dmin, dmax)
+	call apfimoments (skypix, index, nskypix, sky_zero, sumpx, sumsqpx,
+	    sumcbpx, sky_mean, sky_sigma, sky_skew)
+	sky_mean = apmedr (skypix, index, nskypix)
+	sky_mean = max (dmin, min (sky_mean, dmax))
 
 	# Compute the width and bin size of histogram.
-	if (! IS_INDEFR(hwidth)) {
+	if (! IS_INDEFR(hwidth) && hwidth > 0.0) {
 	    hmin = sky_mean - k1 * hwidth
 	    hmax = sky_mean + k1 * hwidth
 	    dh = binsize * hwidth
 	} else {
-	    hmin = sky_mean - k1 * sky_sigma
-	    hmax = sky_mean + k1 * sky_sigma
-	    dh = binsize * sky_sigma
+	    cut = min (sky_mean - dmin, dmax - sky_mean, k1 * sky_sigma)
+	    hmin = sky_mean - cut
+	    hmax = sky_mean + cut
+	    dh = binsize * cut / k1
 	}
 
-	# Compute the number of histogram bins and width of the smoothing
+	# Compute the number of histogram bins and the resolution.
 	# filter.
 	if (dh <= 0.0) {
 	    nbins = 1
-	    nker = 1
+	    dh = 0.0
 	} else {
-	    nbins = 2 * int ((hmax - sky_mean) / dh) + 1
-	    nker = 2 * int (SFRACTION * (hmax - sky_mean) / dh) + 1
+	    nbins = 2 * nint ((hmax - sky_mean) / dh) + 1
+	    dh  = (hmax - hmin) / (nbins - 1)
 	}
 
 	# Test for a valid histogram.
@@ -82,43 +90,48 @@ begin
 	call smark (sp)
 	call salloc (hgm, nbins, TY_REAL)
 	call salloc (shgm, nbins, TY_REAL)
-	call salloc (wgt, nskypix, TY_REAL)
 
 	# Accumulate the histogram.
 	call aclrr (Memr[hgm], nbins)
-	call amovkr (1.0, Memr[wgt], nskypix)
-	nsky_reject = nsky_reject + aphgmr (skypix, Memr[wgt], nskypix,
+	nsky_reject = nsky_reject + aphigmr (skypix, wgt, index, nskypix,
 	    Memr[hgm], nbins, hmin, hmax)
 	nsky = nskypix - nsky_reject
 
 	# Perform the initial rejection.
 	if (nsky_reject > 0) {
 	    do i = 1, nskypix {
-	        if (Memr[wgt+i-1] <= 0.0) {
-		    sumpx = sumpx - skypix[i]
-		    sumsqpx = sumsqpx - skypix[i] ** 2
-		    sumcbpx = sumcbpx - skypix[i] ** 3
+	        if (wgt[index[i]] <= 0.0) {
+		    dsky = skypix[index[i]] - sky_zero
+		    sumpx = sumpx - dsky
+		    sumsqpx = sumsqpx - dsky ** 2
+		    sumcbpx = sumcbpx - dsky ** 3
 		}
 	    }
-	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_mean, sky_sigma,
-	        sky_skew)
+	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_zero,
+	        sky_mean, sky_sigma, sky_skew)
 	}
 
 	# Fit the peak of the histogram.
-	center = apmapr (sky_mean, hmin, hmax, 1.0, real (nbins))
+	center = apmapr ((hmin + hmax) / 2.0, hmin + 0.5 * dh,
+	    hmax + 0.5 * dh, 1.0, real (nbins))
 	if (smooth == YES) {
-	    call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
+	    nker = max (1, nint (sky_sigma / dh))
+	    #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
+	    call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    iter =  aptopt (Memr[shgm], nbins, center, sky_sigma / dh,
 	        TOL, maxiter, NO)
 	} else
 	    iter = aptopt (Memr[hgm], nbins, center, sky_sigma / dh, TOL,
 	        maxiter, NO)
-	sky_mode = apmapr (center, 1.0, real (nbins), hmin, hmax)
+	sky_mode = apmapr (center, 1.0, real (nbins), hmin + 0.5 * dh,
+	    hmax + 0.5 * dh)
+	sky_mode = max (dmin, min (sky_mode, dmax))
 	if (iter < 0) {
 	    call sfree (sp)
 	    return (AP_SKY_NOCONVERGE)
 	}
-	if (k2 <= 0.0 || sky_sigma <= dh || maxiter < 1) {
+	if ((IS_INDEFR(losigma) && IS_INDEFR(hisigma)) || (sky_sigma <= dh) ||
+	    (maxiter < 1)) {
 	    call sfree (sp)
 	    return (AP_OK)
 	}
@@ -127,22 +140,28 @@ begin
 	do i = 1, maxiter {
 
 	    # Compute new histogram limits.
-	    locut = sky_mode - k2 * sky_sigma
-	    hicut = sky_mode + k2 * sky_sigma
+	    if (IS_INDEFR(losigma))
+		locut = -MAX_REAL
+	    else
+	        locut = sky_mode - losigma * sky_sigma
+	    if (IS_INDEFR(hisigma))
+		hicut = MAX_REAL
+	    else
+	        hicut = sky_mode + hisigma * sky_sigma
 
 	    # Detect and reject the pixels.
 	    nreject = 0
 	    do j = 1, nskypix {
-		if (skypix[j] >= locut && skypix[j] <= hicut)
+		if (skypix[index[j]] >= locut && skypix[index[j]] <= hicut)
 		    next
 		if (rgrow > 0.0)
 		    nreject = nreject + ap_grow_hist2 (skypix, coords,
-			Memr[wgt], nskypix, j, snx, sny, Memr[hgm], nbins,
-			hmin, hmax, rgrow, sumpx, sumsqpx, sumcbpx)
-		else if (Memr[wgt+j-1] > 0.0) {
-		    call ap_hgmsub2 (Memr[hgm], nbins, hmin, hmax, skypix[j],
-		        sumpx, sumsqpx, sumcbpx)
-		    Memr[wgt+j-1] = 0.0
+			wgt, nskypix, sky_zero, index[j], snx, sny, Memr[hgm],
+			nbins, hmin, hmax, rgrow, sumpx, sumsqpx, sumcbpx)
+		else if (wgt[index[j]] > 0.0) {
+		    call ap_hgmsub2 (Memr[hgm], nbins, hmin, hmax,
+		        skypix[index[j]], sky_zero, sumpx, sumsqpx, sumcbpx)
+		    wgt[index[j]] = 0.0
 		    nreject = nreject + 1
 		}
 	    }
@@ -154,20 +173,24 @@ begin
 	    nsky = nskypix - nsky_reject 
 	    if (nsky <= 0)
 		break
-	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_mean, sky_sigma,
-	        sky_skew)
+	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_zero,
+	        sky_mean, sky_sigma, sky_skew)
 	    if (sky_sigma <= dh)
 		break
 
 	    # Refit the sky.
 	    if (smooth == YES) {
-	        call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
+		nker = max (1, nint (sky_sigma / dh))
+	        #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
+	        call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    	iter = aptopt (Memr[shgm], nbins, center, sky_sigma / dh,
 		    TOL, maxiter, NO)
 	    } else
 	    	iter = aptopt (Memr[hgm], nbins, center, sky_sigma / dh,
 		    TOL, maxiter, NO)
-	    sky_mode = apmapr (center, 1.0, real (nbins), hmin, hmax)
+	    sky_mode = apmapr (center, 1.0, real (nbins), hmin + 0.5 * dh,
+	        hmax + 0.5 * dh)
+	    sky_mode = max (dmin, min (sky_mode, dmax))
 	    if (iter < 0) 
 		break
 	}

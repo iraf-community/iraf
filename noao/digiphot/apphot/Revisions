@@ -1,5 +1,333 @@
 .help revisions Jun88 noao.digiphot.apphot
 .nf
+apphot/aplib/apwres1.x
+apphot/daofind/apfind.x
+    Fixed a serious bug in the daofind centering code which resulted
+    in incorrect fractional pixel corrections being computed. This error
+    can most easily be detected by plotting the histogram of the fractional
+    pixel corrections for an image with a large number of detected objects.
+    The histogram will be modulated with "peaks" around the .33 and .66
+    fractional pixel values.
+
+    This bug is also present in the standalone version of daophot ii. User
+    should obtain a new version of daophot ii from Peter Stetson.
+
+    Added a new roundness statistic to daofind. This statistic is sensitive
+    to objects which are elongated in directions other than x and y.
+
+    Davis, March 15, 1996
+
+apphot/center/apcenter.x
+apphot/fitpsf/apfitpsf.x
+apphot/fitsky/apsky.x
+apphot/phot/apphot.x
+apphot/phot/apqphot.x
+apphot/polyphot/apyphot.x
+apphot/radprof/apradprof.x
+apphot/wphot/apwphot.x
+    The new m keystroke command was doing exactly the same thing as the n
+    keystroke command due to a confusion of the key and colonkey variables.
+
+    Davis, Feb 12, 1996
+
+apphot/doc/centerpars.hlp
+apphot/center/mkpkg
+apphot/center/apfitcen.x
+apphot/center/aprefitcen.x
+apphot/center/apcplot.x
+apphot/aputil/apgtools.x
+    Modified the centering algorithm code to recognize 3 separate cases:
+    1) cthreshold = 0.0 invokes the default thresholding technique for
+    each algorithm, 2) cthreshold = +val sets the threshold to  some
+    value above (below) the local data minimum (maximum), 3) cthreshold=INDEF
+    or undefined turns off all thresholding. This change does not
+    change the default behavior of the code.
+
+    Changed the definition of local data minimum from the minimum pixel
+    in the centering box to the minimum median value for each row in the
+    centering box. This gives a value much closer to the background values
+    and protects against very low valued pixels in the centering box defining
+    the thresholding level.
+
+    Davis, Sept 29, 1995
+
+
+apphot/fitsky/apskybuf.x
+    Changed the misleading error return code from AP_SKY_OUTOFBOUNDS to
+    AP_NSKY_TOO_SMALL in the case when all the sky  are out of the good
+    data range.
+    
+    Davis, June 22, 1995
+
+apphot/daofind/apfind.x
+    Added a check to avoid a divide by zero error in the code which computes
+    the x and y positions of the detected objects. The divide by zero error
+    can occur when the datamin value is too high for the image and there
+    are not enough points to accurately compute the new x and y position.
+
+    Davis, June 19, 1995
+
+apphot/aplib/mkpkg
+apphot/aplib/apwres1.x
+apphot/aplib/apwres2.x
+apphot/aplib/apwres3.x
+apphot/aplib/apwres4.x
+apphot/doc/phot.hlp
+apphot/doc/polyphot.hlp
+apphot/doc/qphot.hlp
+apphot/doc/radprof.hlp
+apphot/doc/wphot.hlp
+    Added a FLUX column to the output of the PHOT, POLYPHOT, QPHOT, RADPROF,
+    and WPHOT tasks and updated the appropriate help pages.
+
+    Davis, Nov 14, 1994
+
+apphot/daofind/apfdstars.x
+apphot/daofind/apbfdfind.x
+    Added a missing check for an INDEF value of sigma that could cause
+    a floating point overflow in daofind when run from the APPHOT package
+    with the default parameters.
+
+    Davis, Oct 20, 1994
+
+apphot/aplib/apwres2.x
+    Added a check to make sure that the OTIME and IFILTER fields do not
+    overflow the 23 character space allotted for them in the output file.
+
+    Davis, Oct 12, 1994
+
+apphot/center/t_center.x
+apphot/daofind/t_daofind.x
+apphot/fitpsf/t_fitpsf.x
+apphot/fitsky/t_fitsky.x
+apphot/phot/t_phot.x
+apphot/phot/t_qphot.x
+apphot/polyphot/t_polymark.x
+apphot/polyphot/t_polyphot.x
+apphot/radprof/t_radprof.x
+apphot/wphot/t_wphot.x
+    Fixed a bug in the default input and output file naming code which was
+    causing the directory specifications to be stripped from the names.
+
+    Davis, Oct 4, 1994
+
+
+apphot/phot/apphot.x
+apphot/phot/apqphot.x
+apphot/wphot/apwphot.x
+apphot/polyphot/apyphot.x
+apphot/radprof/apradprof.x
+apphot/phot/phot.key
+apphot/phot/qphot.key
+apphot/wphot/wphot.key
+apphot/polyphot/polyphot.key
+apphot/radprof/radprof.key
+apphot/doc/phot.hlp
+apphot/doc/qphot.hlp
+apphot/doc/wphot.hlp
+apphot/doc/polyphot.hlp
+apphot/doc/radprof.hlp
+    Added a new keystroke command 'a' to the phot, qphot, wphot, polyphot
+    and radprof commands. The a keystroke command compute a sky value
+    by averaging several sky values sampled in different regions of the
+    image. Basically it is a loop over the the t keystroke command.
+    The sky value in each region is computed using the current algorithm
+    and geometry and the individual sky, sky sigma and sky skew values
+    are averaged to produce a final sky, sigma and skew, whereas the
+    number of sky pixels and number of rejected sky pixels are summed.
+    The a keystroke command is intended for use with the p and o keystroke
+    commands to produce an offset sky measurement capability.
+
+    Davis, Feb 10, 1994
+
+
+apphot/fitpsf/apsffit.x
+apphot/fitpsf/apsfrefit.x
+apphot/aplib/apwres4.x
+    1. Modified the fitpsf task fitting routines so that the  parameter and
+    parameter error arrays are initialized to INDEF, instead of being left
+    with the values from the previous fit, in the case that the
+    fitting box is entirely off the image or that that there are too few
+    pixels in the fitting box to fit the model psf. 
+    2. Modified the output formatting routines to print the errors in 
+    the fitted rsigma (function=radgauss), xsigma and ysigma (function=
+    elgauss), and rgyrat and ellip (function=moments) to three decimal
+    places instead of two.
+
+    Davis, Jan 17, 1994
+
+apphot/center/t_center.x
+apphot/fitpsf/t_fitpsf.x
+apphot/fitsky/t_fitsky.x
+apphot/phot/t_phot.x
+apphot/polyphot/t_polyphot.x
+apphot/phot/t_qphot.x
+apphot/phot/t_radprof.x
+apphot/wphot/t_wphot.x
+    If the number of input images was greater than one, the number of output
+    files exactly equal to one, and the input coordinate file for the image
+    did not contain any decodable coordinates the coordinate file rather
+    than the empty output file is deleted. This was ocurring because the
+    output file was not being correctly stored each time through the image
+    loop and empty output files are deleted by the apphot tasks.
+
+    Davis, Dec 31, 1993
+
+apphot/fitsky/aprefitsky.x
+    The SCALE parameter in the call to ap_crossor was incorrectly
+    dereferenced as AP_SCALE(sky) instead of AP_SCALE(ap).
+
+    Davis, Sep 13, 1993
+
+apphot/aplib/apinpars2.x
+    The shiclip parameter, default = 0.0, was incorrectly being set to the
+    value of the sloclip parameter at startup time.
+
+    Davis, Sep 9, 1993
+
+apphot/center/aprefitcen.x
+    The CMAXITER parameter was incorrectly referenced in the call to
+    the ap_lgctr1d routine inside the routine aprefitcenter.
+    This centering routine is not often used, and the bug is trigggered
+    only if an object is recentered using different algorithm parameters
+    but the same image data, something only likely to occur in interactive
+    mode.
+
+    Davis, Sep 6, 1993
+
+apphot/center/apcencolon.x
+    The arugument cmdstr in the routine apcentercolon was declared as
+    "char cmdstr" instead of "char cmdstr[ARB]. This has not caused any
+    errors in the code but is poor style.
+
+    Davis, Sep 6, 1993
+
+apphot/phot/apgqppars.x
+apphot/doc/qphot.hlp
+apphot/fitskypars.par
+apphot/doc/fitskypars.hlp
+    Changed the default sky fitting algorithm for the qphot and phot tasks from
+    "mode" to "centroid" with histogram smoothing, to minimize problems
+    with data taken at low light levels which have poorly sampled
+    histograms.
+
+    Davis, Aug 14, 1993
+
+
+apphot$
+    The sky fitting routines were revised. Two new parameters, ploclip and
+    phiclip, which define the percentage of  pixels to clip on the low
+    and high sides of the sky pixel distribution were added to fitskypars. The
+    fitskypars parameter skreject was split into two parameters
+    sloreject and shireject which define the low and high side rejection
+    parameters respectively. For the mean, median, and mode algorithms
+    the first rejection cut is now made below sky - min (smax - sky, sky - smin,
+    sloreject * skysigma) and above sky + min (smax - sky, sky - smin, 
+    shireject * skysigma) where sky is the first estimate of the mean, median,
+    and median of the sky pixels respectively, instead of below and above the
+    skreject rejection limits alone. The median is computed using
+    the average of 5% of the pixels around the median instead of 10 pixels.
+    All the histogram dependent algorithms: histplot, centroid, gauss,
+    crosscor, ofilt now use the median of the sky pixels as the center
+    of the histogram, and define the extent of the
+    histogram in a manner similar to that used for the first cut in
+    the mean, median, and mode algorithms. The sigma parameter is
+    no longer used to define the extent and binsize of the sky histogram.
+    Instead the computed sky sigma is used.
+
+    Added m and n keys to the apphot tasks. These keys operate in the same
+    way as the :m and :n keys which have no arguments.
+
+    Added the o key to the apphot tasks. This behaves in the same way
+    as the p key but outputs the results to the output results file.
+
+    Davis, Feb 24, 1993
+
+apphot/aputil/apgflags.x
+    Removed this routine which was not being used and referenced gio.h from
+    the apphot library.
+
+    Davis, Feb 11, 1993
+
+apphot/daofind
+
+    Added the findpars pset to the daofind task and removed the parameter
+    threshold from datapars to findpars. All the detection algorithm
+    parameters moved to findpars.
+
+    Changed the name of the output convolved image to starmap. Added
+    an option to output the best fit sky image skymap.
+
+    Davis, Sept 17, 1992
+
+apphot$
+    Modified all tasks (daofind, center, fitpsf, fitsky, phot, polymark,
+    polyphot, qphot, radprof, and wphot) that were designed to draw marks
+    on the image display to use the imd kernel. All graphics
+    drawing commands are done with portable gio calls. A temporary routine
+    which uses the imd interface to fetch the display device viewport and
+    window is called each time a new image is mapped. A warning message
+    is issued if the image is not loaded in the display and the default
+    full frame viewport is used.  All display drawing is done to the
+    current frame, even if the current frame is not the frame containing
+    the image. The imd kernel does not support the gflush command so
+    a gframe command is used instead. This can create a messy metacode
+    file but is a reasonable approximation for interactive use. 
+
+    Davis, Sep 2, 1992
+
+apphot$phot/apphotcolon.x
+apphot$phot/apqcolon.x
+apphot$radprof/aprpcolon.x
+apphot$wphot/apwpcolon.x
+apphot$wphot/aptmeasure.x
+apphot$wphot/apgmeasure.x
+apphot$aplib/apverify1.x
+apphot$daofind/apfcolon.x
+apphot$fitpsf/apppsf.x
+apphot$fitpsf/apsfcolon.x
+apphot$polyphot/apycolon.x
+    Added some missing sfree statements.
+
+    Davis, Sep 2, 1992
+
+apphot$fitsky/aplgsky,x
+    The test "if (ier != AP_OK)" was being made instead of the proper test
+    "if (iter < 0)". The local variable ier was never defined or used which 
+    tripped a bug in the DEC fortran compiler.
+		
+    Davis, August 3, 1992
+
+apphot$datapars.par
+apphot$centerpars.par
+apphot$doc/datapars.hlp
+apphot$doc/centerpars.hlp
+apphot$lib/noisedef.h
+apphot$lib/noise.h
+apphot$lib/centerdef.h
+apphot$lib/center.h
+apphot$center/apcinit.x
+apphot$center/apcencolon.x
+apphot$center/apcshow.x
+apphot$center/apcconfirm.x
+apphot$center/apcplot.x
+apphot$center/apfitcen.x
+apphot$center/refitcen.x
+apphot$aplib/apinit.x
+apphot$aplib/apnscolon.x
+apphot$aplib/apnshow.x
+apphot$aplib/apinpars.x
+apphot$aplib/apoutpars.x
+apphot$aplib/aprcursor1.x
+apphot$aplib/apverify1.x
+apphot$aplib/apset2.x
+apphot$aplib/apstat2.x
+apphot$aplib/apwparam1.x
+    Changed the units of the cthreshold parameter to sigma and moved it
+    to the centerpars parameter set.
+
+    Davis, July 7, 1992
+
 apphot$center/t_center.x
 apphot$fitpsf/t_fitpsf.x
 apphot$fitsky/t_fitsky.x

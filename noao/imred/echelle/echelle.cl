@@ -30,8 +30,10 @@ task	continuum,
 	refspectra,
 	sarith,
 	scombine,
+	sflip,
 	slist,
 	specplot,
+	specshift,
 	splot		= "onedspec$x_onedspec.e"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"

@@ -29,16 +29,7 @@ Epoch of coordinates keyword. (Value in Years).
 .le
 .ls date_obs = "DATE-OBS"
 Date of observation keyword.  Format for this field should be
-mm/dd/yy, delimited by either a '-' or a '/'.
-.le
-.ls w0 = "W0"
-Starting wavelength keyword. (Value in Angstroms, or log10 of 
-wavelength in angstroms).
-.le
-.ls wpc = "WPC"
-Wavelength per channel keyword. (Value in Angstroms, or log10 of 
-wavelength increment in
-angstroms).
+dd/mm/yy, delimited by either a '-' or a '/'.
 .le
 
 .ce 

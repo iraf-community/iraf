@@ -31,3 +31,7 @@ ccdproc.niterate = 1
 ccdproc.low_reject = 3
 ccdproc.high_reject = 3
 ccdproc.grow = 1
+
+flatcombine.reject = "crreject"
+flatcombine.rdnoise= "rdnoise"
+flatcombine.gain="gain"

@@ -12,7 +12,7 @@ pointer	rinfile				#I Template input list pointer
 
 pointer	sp, fd, rim
 int	ntemps, naps, tcount, apcount, stat
-bool	written
+bool	init_hdr, written
 
 int	imtrgetim(), next_spec(), next_ap(), get_spec()
 int	rv_data_check()
@@ -31,17 +31,9 @@ begin
 	ntemps = RV_NTEMPS(rv)
 	naps = NUMAPS(rv)
 
-	fd = RV_TXFD(rv)			# Set up output
-	if (fd != NULL) {
-            call rv_param (rv, fd, "fxcor")
-            call rv_tempcodes (rv, fd)
-	    call rv_prdeltav (rv, fd)
-	    call fprintf (fd, "# \n")
-	    call rv_hdr (rv, fd)
-	}
-
 	RV_APNUM(rv) = 1
 	RV_IMNUM(rv) = 1
+	init_hdr = true
 	repeat {				# For each of the object spectra
 
 	    # For each aperture in the list
@@ -57,13 +49,13 @@ begin
 	        do tcount = 1, ntemps {	
 
 		    # Check the data before continuing
+		    RV_TEMPNUM(rv) = tcount
 		    if (rv_data_check(rv) != OK)
 			break
 
 		    # Reset some parameters
 		    call reset_errcom (rv)
 
-		    RV_TEMPNUM(rv) = tcount
 		    #REFCONT(rv) = NO
 	            if ((RV_CONTINUUM(rv) == TEMP_ONLY || 
 			RV_CONTINUUM(rv) == BOTH) && REFCONT(rv) == NO)
@@ -71,6 +63,19 @@ begin
 
 		    # Jump right into it and get the correlation
 		    call rv_batch_xcor (rv, tcount, apcount, YES, YES, YES)
+
+		    # Initialize the output header file.
+		    if (init_hdr) {
+		        fd = RV_TXFD(rv)			
+		        if (fd != NULL) {
+            	    	    call rv_param (rv, fd, "fxcor")
+            	    	    call rv_tempcodes (rv, fd)
+	    	    	    call rv_prdeltav (rv, fd)
+	    	    	    call fprintf (fd, "# \n")
+	    	    	    call rv_hdr (rv, fd)
+		        }
+			init_hdr = false
+		    }
 
 write_	            call rv_imtitle (RIMAGE(rv), TEMPNAME(rv), SZ_FNAME)
 		    if (RV_VERBOSE(rv) == OF_SHORT || 
@@ -80,6 +85,8 @@ write_	            call rv_imtitle (RIMAGE(rv), TEMPNAME(rv), SZ_FNAME)
 			call rv_verbose_fit (rv, RV_VBFD(rv))
 		 	call rv_write_long (rv, fd)
 	 	    }
+        	    if (RV_IMUPDATE(rv) == YES) 	# update image header
+            	        call rv_imupdate (rv)
 	            call rv_eplot (rv, RV_MGP(rv))
 		    written = TRUE
 	            RV_RECORD(rv) = RV_RECORD(rv) + 1
@@ -190,7 +197,7 @@ begin
 	}
 
 	# Jump right into it and get the correlation
-        if (do_comp == YES)
+	if (do_comp == YES)
 	    call rv_fftcorr (rv, NO)
 
 	# Compute window center and size

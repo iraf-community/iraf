@@ -1,5 +1,5 @@
 line,i,h,INDEF,,,"Default dispersion line"
-nsum,i,h,10,,,"Number of dispersion lines to sum"
+nsum,i,h,10,,,"Number of dispersion lines to sum or median"
 order,s,h,"decreasing","increasing|decreasing",,"Order of apertures"
 extras,b,h,no,,,"Extract sky, sigma, etc.?
 
@@ -18,6 +18,11 @@ t_niterate,i,h,1,0,,"Trace rejection iterations"
 t_low,r,h,3.,0.,,"Trace lower rejection sigma"
 t_high,r,h,3.,0.,,"Trace upper rejection sigma
 
+-- SCATTERED LIGHT PARAMETERS --"
+buffer,r,h,1.,0.,,Buffer distance from apertures
+apscat1,pset,h,"",,,Fitting parameters across the dispersion
+apscat2,pset,h,"",,,"Fitting parameters along the dispersion
+
 -- APERTURE EXTRACTION PARAMETERS --"
 weights,s,h,"none","none|variance",,Extraction weights (none|variance)
 pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting algorithm (fit1d|fit2d)
@@ -31,6 +36,7 @@ f_function,s,h,"spline3",spline3|legendre|chebyshev|spline1,,"Fitting function"
 f_order,i,h,10,1,,"Fitting function order
 
 -- ARC DISPERSION FUNCTION PARAMETERS --"
+threshold,r,h,10.,0.,,"Minimum line contrast threshold"
 coordlist,f,h,linelists$idhenear.dat,,,"Line list"
 match,r,h,10.,,,"Line list matching limit in Angstroms"
 fwidth,r,h,4.,,,"Arc line widths in pixels"

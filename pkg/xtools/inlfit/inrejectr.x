@@ -20,7 +20,7 @@ int	wtflag				# Type of weighting
 
 int	i, nreject, newreject, niter
 real	low, high, grow
-pointer	rejpts
+pointer	sp, wts1, rejpts
 
 int	in_geti()
 real	in_getr()
@@ -33,6 +33,10 @@ begin
 #	    call pargi (nl)
 #	    call pargi (npts)
 #	    call pargi (nvars)
+
+	call smark (sp)
+	call salloc (wts1, npts, TY_REAL)
+	call amovr (w, Memr[wts1], npts)
 
 	# Get number of reject iterations, and return if they
 	# are less than one.
@@ -54,12 +58,15 @@ begin
 	        high, grow, nreject, newreject)
 
 	    # Refit if there are new rejected points.
-	    if (newreject != 0)
+	    if (newreject != 0) {
+	        call amovr (Memr[wts1], w, npts)
 		call in_refitr (in, nl, x, y, w, npts, nvars, wtflag)
-	    else
+	    } else
 		break
 	}
 
 	# Update number of rejected points.
 	call in_puti (in, INLNREJPTS, nreject + newreject)
+
+	call sfree (sp)
 end

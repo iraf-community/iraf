@@ -1,5 +1,5 @@
 include	<mach.h>
-include	"../shdr.h"
+include	<smw.h>
 include "icombine.h"
 
 
@@ -23,7 +23,7 @@ int	npts			# Number of points per output line
 
 int	i, ctor()
 real	r
-pointer	sp, rn, g
+pointer	sp, nm
 errchk	ic_scale
 
 include	"icombine.com"
@@ -57,25 +57,36 @@ begin
 	# Set rejection algorithm specific parameters
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
-	    call salloc (rn, nimages, TY_REAL)
-	    call salloc (g, nimages, TY_REAL)
+	    call salloc (nm, 3*nimages, TY_REAL)
 	    i = 1
-	    if (ctor (Memc[rdnoise], i, r) > 0)
-		call amovkr (r, Memr[rn], nimages)
-	    else {
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
 		do i = 1, nimages
-		    Memr[rn+i-1] = RA(sh[i])
+		    Memr[nm+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nm+3*(i-1)] = RA(sh[i])
 	    }
 	    i = 1
 	    if (ctor (Memc[gain], i, r) > 0) {
-		call amovkr (r, Memr[g], nimages)
-		do i = 1, nimages
-		    Memr[rn+i-1] = (Memr[rn+i-1] / r) ** 2
+		do i = 1, nimages {
+		    Memr[nm+3*(i-1)+1] = r
+		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		}
 	    } else {
 		do i = 1, nimages {
 		    r = DEC(sh[i])
-		    Memr[g+i-1] = r
-		    Memr[rn+i-1] = (Memr[rn+i-1] / r) ** 2
+		    Memr[nm+3*(i-1)+1] = r
+		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nm+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = UT(sh[i])
+		    Memr[nm+3*(i-1)+2] = r
 		}
 	    }
 	    if (!keepids) {
@@ -83,7 +94,9 @@ begin
 		    keepids = true
 		else {
 		    do i = 2, nimages {
-			if (Memr[rn+i-1]!=Memr[rn] || Memr[g+i-1]!=Memr[g]) {
+			if (Memr[nm+3*(i-1)] != Memr[nm] ||
+			    Memr[nm+3*(i-1)+1] != Memr[nm+1] ||
+			    Memr[nm+3*(i-1)+2] != Memr[nm+2]) {
 			    keepids = true
 			    break
 			}
@@ -118,11 +131,11 @@ begin
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
 	    if (mclip)
-		call ic_mccdclipr (d, id, n, scales, zeros, Memr[rn],
-		    Memr[g], nimages, npts, Memr[SY(shout)])
+		call ic_mccdclipr (d, id, n, scales, zeros, Memr[nm],
+		    nimages, npts, Memr[SY(shout)])
 	    else
-		call ic_accdclipr (d, id, n, scales, zeros, Memr[rn],
-		    Memr[g], npts, Memr[SY(shout)])
+		call ic_accdclipr (d, id, n, scales, zeros, Memr[nm],
+		    nimages, npts, Memr[SY(shout)])
 	case MINMAX:
 	    call ic_mmr (d, id, n, npts)
 	case PCLIP:

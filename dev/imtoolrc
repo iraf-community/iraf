@@ -33,7 +33,7 @@
 23  1  256 1520		# imt23|imt2df2 2D-Frutti
 24  1  512 1520		# imt24|imt2df5 2D-Frutti
 25  1  960 1520		# imt25|imt2df9 2D-Frutti
-26  1  512  800		# imt26|imtcryo Cryogenic Camera
+26  1 1232  400		# imt26|imtcryo Cryogenic Camera
 27  1 3104  348		# imt27|imtgcam Gold Camera with Ford chip
 28  1  976 3040		# imt28|imt2df9x3 2D-Frutti 
 29  1  800  256         # imt29|imtgong Gong Cache Monitor
@@ -44,6 +44,7 @@
 34  1 1056 1024		# imt34|imtt1ka
 35  1 2080 2048		# imt35|imts2ka|imtt2ka|imtt2kb
 36  1 3104 1024		# imt36|imtf3ka|imtfo3k
+37  1 1232  800		# imt37|imtf1ka
 
 # User added formats.  (start with #64)
 # (add here)

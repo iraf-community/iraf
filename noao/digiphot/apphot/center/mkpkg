@@ -26,7 +26,7 @@ libpkg.a:
 	apcplot.x	../lib/apphot.h		../lib/apphotdef.h	\
 			../lib/center.h		../lib/centerdef.h	\
 			../lib/noise.h		<gset.h>		\
-			<pkg/gtools.h>
+			<pkg/gtools.h>		<mach.h>
 	apcpshow.x	../lib/center.h		../lib/display.h
 	apcshow.x	../lib/display.h
 	apcsnratio.x	../lib/center.h		../lib/noise.h          \

@@ -11,7 +11,7 @@ pointer ap			# pointer to apphot structure
 pointer	im			# pointer to IRAF image
 int	cl			# starlist file descriptor
 int	sd			# sky file descriptor
-pointer	out			# pointer to spool file
+int	out			# output file descriptor
 int	id, ld			# sequence and list numbers
 int	gd			# pointer to stdgraph stream
 pointer	mgd			# pointer to graphics metacode file
@@ -65,7 +65,7 @@ begin
 		if (gid != NULL)
 		    call apmark (ap, gid, NO, apstati (ap, MKSKY), NO)
 	    }
-	    call apsplot(ap, id, ier, mgd, YES)
+	    call ap_splot(ap, id, mgd, YES)
 	    if (id == 1)
 	        call ap_param (ap, out, "fitsky")
 	    call ap_pssky (ap, out, id, ild, ier)
@@ -78,7 +78,8 @@ begin
 
 	    # print query
 	    if (stdin == YES) {
-		call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+		call printf (
+		    "Type object x and y coordinates (^D or ^Z to end): ")
 		call flush (STDOUT)
 	    } 
 	}

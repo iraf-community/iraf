@@ -45,7 +45,7 @@ begin
 	do j = 1, ndim {
 	    v = ltv_2[j]
 	    do i = 1, ndim
-		v = v + ltm[i,j] * -ltv_1[i]
+		v = v + ltm[i,j] * (-ltv_1[i])
 	    Memd[ltv+j-1] = v
 	}
 
@@ -101,7 +101,8 @@ begin
 	    do i = 1, ndim {
 		v = 0
 		do k = 1, ndim
-		    v = v + o_ltm[ax[k],ax[j]] * ltm[i,k]
+		    # v = v + o_ltm[ax[k],ax[j]] * ltm[i,k]
+		    v = v + ltm[k,j] * o_ltm[ax[i],ax[k]]
 		n_ltm[ax[i],ax[j]] = v
 	    }
 

@@ -1,4 +1,4 @@
-.help sensfunc Mar92 noao.onedspec
+.help sensfunc Mar93 noao.onedspec
 .ih
 NAME
 sensfunc -- Determine sensitivity and extinction functions
@@ -7,10 +7,10 @@ USAGE
 sensfunc standards sensitivity
 .ih
 PARAMETERS
-.ls standards
+.ls standards = "std"
 Input standard star data file created by the task \fBstandard\fR.
 .le
-.ls sensitivity
+.ls sensitivity = "sens"
 Output sensitivity function image name or rootname.  Generally each
 aperture results in an independent sensitivity function with the
 aperture number appended to the rootname.  If the parameter \fIignoreaps\fR
@@ -96,6 +96,12 @@ Symbols used to mark included, deleted, and added data respectively.
 The available mark types are point, box, plus, cross, diamond, hline
 (horizontal line), vline (vertical line), hebar (horizontal error bar),
 vebar (vertical error bar), and circle.
+.le
+.ls colors = "2 1 3 4"
+Colors to use for "lines", "marks", "deleted" data, and "added" data.
+The colors associated with the numbers is graphics device dependent.
+For example in XGTERM they are defined by resources while on other
+devices that don't support colors only one color will appear.
 .le
 .ls cursor = ""
 Graphics cursor input list.  If not specified as a file then standard
@@ -307,7 +313,9 @@ residual in the mean sensitivity
 and error \fIin the mean\fR but uses the input data in the fitting.
 The 's' command shifts the data so that the mean sensitivity of each
 star is the same as the star with the greatest mean sensitivity.
-This compensates for variable grey extinction due to clouds.
+This compensates for variable grey extinction due to clouds.  Note
+that delete points are excluded from the shift calculation and a
+deleted star will not be used as the star of greatest sensitivity.
 Another useful command is 'o' to recover the original data.  This cancels
 all changes made due to shifting, extinction corrections, deleting points,
 creating composite points, etc.
@@ -390,6 +398,12 @@ commands an optional output file may be given to record the information.
 .fi
 .ih
 REVISIONS
+.ls SENSFUNC V2.10.3+
+Deleted points and stars are now ignored from the grey shift calculation.
+.le
+.ls SENSFUNC V2.10.3
+A color parameter was added for graphics terminals supporting color.
+.le
 .ls SENSFUNC V2.10
 The latitude parameter has been replaced by the observatory parameter.
 The 'i' flux calibrated graph type now shows flux in linear scaling 

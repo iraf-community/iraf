@@ -24,6 +24,7 @@ begin
 	if (!IS_INDEF(y2))
 	    WCS_WY2(w) = y2
 
+	WCS_FLAGS(w) = or (WCS_FLAGS(w), WF_DEFINED)
 	GP_WCSSTATE(gp) = MODIFIED
 	call gpl_reset()
 end

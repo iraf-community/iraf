@@ -38,11 +38,11 @@ begin
 
 	# Check for a legal operation.
 	if (RV_DCFLAG(rv) == -1 || RV_PIXCORR(rv) == YES) {
-            vobs = INDEF
-	    vcor = INDEF
-	    RV_VREL(rv) = INDEF
-            RV_HJD(rv) = INDEF
-	    RV_MJD_OBS(rv) = INDEF
+            vobs = INDEFD
+	    vcor = INDEFD
+	    RV_VREL(rv) = INDEFR
+            RV_HJD(rv) = INDEFD
+	    RV_MJD_OBS(rv) = INDEFD
 	    return (OK)
 	}
 
@@ -61,17 +61,25 @@ begin
 	# Compute the heliocentric correction for the reference star
 	stat = rv_gposinfo (rv, imr, NO, ra, dec, ep, ut, day, month, year) 
 	if (stat != OK) {			# Error reading header
-	    if (RV_DCFLAG(rv) == -1)
-		RV_VREL(rv) = INDEF
-	    else
-		RV_VREL(rv) = real (rv_shift2vel(rv,shift))
-            vobs = INDEF
-	    vcor = INDEF
-            RV_HJD(rv) = INDEF
-	    RV_MJD_OBS(rv) = INDEF
+            if (RV_DCFLAG(rv) == -1) {
+                RV_VREL(rv) = INDEFR
+                RV_PRINTZ(rv) = NO
+            } else {
+                RV_VREL(rv) = real (rv_shift2vel(rv,shift))
+                if (abs(RV_VREL(rv)/C) >= RV_ZTHRESH(rv))
+                    RV_PRINTZ(rv) = YES
+                else
+                    RV_PRINTZ(rv) = NO
+            }
+            vobs = INDEFD
+	    vcor = INDEFD
+            RV_HJD(rv) = INDEFD
+	    RV_MJD_OBS(rv) = INDEFD
+	    call imunmap (imo);
+	    call imunmap (imr);
 	    return (ERR_RVCOR)
 	}
-	call rv_correct (rv, imr, ra, dec, ep, year, month, day, ut, jd, rhjd, 
+	call rv_corr (rv, imr, ra, dec, ep, year, month, day, ut, jd, rhjd, 
 	    vrot, vbary, vorb, vsol)
 	ref_rvcor = vrot + vbary + vorb		# Computed Helio RV correction
 	ref_rvobs = ref_rvknown - ref_rvcor	# Observed RV of standard
@@ -88,7 +96,7 @@ begin
 
         # Compute the wavelength/velocity shift
 	if (RV_DCFLAG(rv) == -1)
-	    RV_VREL(rv) = INDEF
+	    RV_VREL(rv) = INDEFR
 	else
 	    RV_VREL(rv) = real (rv_shift2vel(rv,shift))
         vobs = ((1 + ref_rvobs/C) * (10**(dwpc * dshift)) - 1) * C
@@ -102,9 +110,12 @@ begin
 	}
 
 	# Now correct observed velocity
-	if (rv_gposinfo(rv, imo, YES, ra, dec, ep,ut,day,month,year)==ERR_RVCOR)
+	if (rv_gposinfo(rv,imo,YES,ra,dec,ep,ut,day,month,year)==ERR_RVCOR) {
+	    call imunmap (imo);
+	    call imunmap (imr);
 	    return (ERR_RVCOR)
-	call rv_correct (rv, imo, ra, dec, ep, year, month, day, ut, jd, hjd, 
+	}
+	call rv_corr (rv, imo, ra, dec, ep, year, month, day, ut, jd, hjd, 
 	    vrot, vbary, vorb, vsol)
 
 	# Apply the corrections (+ vsol for correction to LSR)
@@ -124,9 +135,9 @@ begin
 	  call d_printf(DBG_FD(rv), "\tshift,w0,wpc=%.4g,%.6g,%.6g\n")
 		call pargr(shift);  call pargr(RV_RW0(rv))
 		call pargr(RV_RWPC(rv))
-	  call d_printf(DBG_FD(rv), "\tow0,rw0,dv,w0shif=%.6g,%.6g,%.4g,%.4g\n")
-		call pargr (RV_OW0(rv));    call pargr(RV_RW0(rv))
-		call pargd (delta_vel);     call pargr (RV_W0_SHIFT(rv))
+	  call d_printf(DBG_FD(rv), "\tow0,rw0,dv=%.6g,%.6g,%.6g\n")
+		call pargr(RV_OW0(rv));    call pargr(RV_RW0(rv));
+		call pargd(delta_vel)
 	  call d_printf(DBG_FD(rv), 
 		"\tvrel,ref_rvcor,ref_rvobs=%.4f,%.4f,%.4f\n")
 		    call pargr (RV_VREL(rv));	call pargd (ref_rvcor)
@@ -138,7 +149,7 @@ begin
 
 	# Miscellaneous info cleanup
 	RV_HJD(rv) = hjd			# Object HJD
-	RV_MJD_OBS(rv) = jd - 2440000.5d0	# Object MJD-OBS
+	RV_MJD_OBS(rv) = jd - 2400000.5d0	# Object MJD-OBS
 
 	call imunmap (imo)			# Free image pointers
 	call imunmap (imr)
@@ -234,7 +245,7 @@ begin
 	    dxp = dex (RV_RWPC(rv) * shift) - 1.0d0
 	    vel = SPEED_OF_LIGHT * dxp
 	} else if (RV_DCFLAG(rv) == -1)
-	    vel = INDEF
+	    vel = INDEFD
 
 	return (vel)
 end
@@ -258,7 +269,7 @@ begin
 	    shift = log10 (vel / C + 1) / double (RV_RWPC(rv))
 
 	} else if (RV_DCFLAG(rv) == -1)
-	    shift = INDEF
+	    shift = INDEFR
 
 	return (shift)
 end
@@ -266,7 +277,7 @@ end
 
 # RV_CORRECT - Compute the radial velocity corrections.
 
-procedure rv_correct (rv, im, ra, dec, ep, year, month, day, ut, jd, hjd, vrot, 
+procedure rv_corr (rv, im, ra, dec, ep, year, month, day, ut, jd, hjd, vrot, 
     vbary, vorb, vsol)
 
 pointer	rv				#I RV struct pointer
@@ -360,7 +371,7 @@ begin
 	    return (ERR_RVCOR)
 	}
 	if (month > 12) {
-	    call rv_err_comment (rv, "ERROR: Error: Date format is dd/mm/yy.", 
+	    call rv_err_comment (rv, "ERROR: Date format should be dd/mm/yy.", 
 		"")
 	    return (ERR_RVCOR)
 	}

@@ -28,7 +28,7 @@ begin
 	# the pixel list for successive ranges of pixels of constant nonzero
 	# value, where each range is described as follows:
 
-	pv = px_src[xs]		# pixel value of current range
+	pv = max(0,px_src[xs])	# pixel value of current range
 	x1 = xs			# start index of current range
 	iz = xs			# start index of range of zeros
 	hi = 1			# current high value
@@ -37,7 +37,7 @@ begin
 	do ip = xs, xe {
 	    if (ip < xe) {
 		# Get the next pixel value, loop again if same as previous one.
-		nv = px_src[ip+1]
+		nv = max (0, px_src[ip+1])
 		if (nv == pv)
 		    next
 
@@ -66,13 +66,13 @@ begin
 		    # Output IH or DH instruction?
 		    hi = pv
 		    if (abs(dv) > I_DATAMAX) {
-			ll_dst[op] = M_SH + and (pv, I_DATAMAX)
+			ll_dst[op] = M_SH + and (int(pv), I_DATAMAX)
 			op = op + 1
 			ll_dst[op] = pv / I_SHIFT
 			op = op + 1
 		    } else {
 			if (dv < 0)
-			    ll_dst[op] = M_DH + -dv
+			    ll_dst[op] = M_DH + (-dv)
 			else
 			    ll_dst[op] = M_IH + dv
 			op = op + 1

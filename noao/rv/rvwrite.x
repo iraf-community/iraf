@@ -55,22 +55,22 @@ end
 
 # Define the parameter keyword strings in Km/s units.
 
-define	RV_NSTR1S "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tVFWHM%62tVHELIO%72tVERR\n"
-define	RV_USTR1S "#U name%13timage%29tdays%44tpixel%53tkm/s%62tkm/s%72tkm/s\n"
+define	RV_NSTR1S "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tFWHM%62tVHELIO%72tVERR\n"
+define	RV_USTR1S "#U name%13timage%29tdays%44tpixel%53t    %62tkm/s%72tkm/s\n"
 define	RV_WSTR1S "%-11.11s%13t%-10.10s%24t%.2s%29t%-9.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-9.4f%72t%-7.3f\n"
 
-define  RV_NSTR1V "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tVFWHM%81tTDR%88tVOBS%98tVREL%109tVHELIO%120tVERR\n"
-define  RV_USTR1V "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73tkm/s%88tkm/s%98tkm/s%109tkm/s%120tkm/s\n"
+define  RV_NSTR1V "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tFWHM%81tTDR%88tVOBS%98tVREL%109tVHELIO%120tVERR\n"
+define  RV_USTR1V "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73t    %88tkm/s%98tkm/s%109tkm/s%120tkm/s\n"
 define  RV_WSTR1V "%-15.15s  %-10s %.2s   %-9.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-9.4f %-9.4f  %-9.4f  %-7.3f\n"
 
 # Now define the parameter keyword strings in terms of redshift Z values.
 
-define	RV_NSTR1SZ "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tVFWHM%62tZHELIO%72tVERR\n"
-define	RV_USTR1SZ "#U name%13timage%29tdays%44tpixel%53tkm/s%62tz%72tkm/s\n"
+define	RV_NSTR1SZ "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tFWHM%62tZHELIO%72tVERR\n"
+define	RV_USTR1SZ "#U name%13timage%29tdays%44tpixel%53t    %62tz%72tkm/s\n"
 define	RV_WSTR1SZ "%-11.11s%13t%-10.10s%24t%.2s%29t%-9.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-7.6f%72t%-7.3f\n"
 
-define  RV_NSTR1VZ "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tVFWHM%81tTDR%88tZOBS%98tZREL%109tZHELIO%120tVERR\n"
-define  RV_USTR1VZ "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73tkm/s%88tz%98tz%109tz%120tkm/s\n"
+define  RV_NSTR1VZ "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tFWHM%81tTDR%88tZOBS%98tZREL%109tZHELIO%120tVERR\n"
+define  RV_USTR1VZ "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73t    %88tz%98tz%109tz%120tkm/s\n"
 define  RV_WSTR1VZ "%-15.15s  %-10s %.2s   %-9.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-7.6f    %-7.6f     %-7.6f    %-7.3f\n"
 
 
@@ -115,9 +115,18 @@ begin
 	                call pargd (RV_VOBS(rv))
 	                call pargd (RV_VCOR(rv))
 		    } else {
-	                call pargd (RV_VREL(rv)/C)
-	                call pargd (RV_VOBS(rv)/C)
-	                call pargd (RV_VCOR(rv)/C)
+			if (IS_INDEFD(RV_VREL(rv)))
+	                    call pargd (INDEFD)
+			else
+	                    call pargd (RV_VREL(rv)/C)
+			if (IS_INDEFD(RV_VOBS(rv)))
+	                    call pargd (INDEFD)
+			else
+	                    call pargd (RV_VOBS(rv)/C)
+			if (IS_INDEFD(RV_VCOR(rv)))
+	                    call pargd (INDEFD)
+			else
+	                    call pargd (RV_VCOR(rv)/C)
 		    }
 	            call pargd (RV_ERROR(rv))
 	} else {
@@ -173,7 +182,7 @@ begin
 		        call pargstr (IMAGE(rv))
 		        #call pargi (RV_TEMPCODE(rv))
 		        call pargstr (tc)
-		        if (DBL_VHELIO(rv,i) != INDEF && RV_HJD(rv) > 0)
+		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0)
 		            call pargd (RV_HJD(rv)-2440000.0)
 		        else
 		            call pargr (INDEF)
@@ -183,8 +192,12 @@ begin
 		        if (RV_DCFLAG(rv) != -1) {
 			    if (RV_PRINTZ(rv) == NO)
 		                call pargr (DBL_VHELIO(rv,i))
-			    else
-		                call pargd (DBL_VHELIO(rv,i)/C)
+			    else {
+				if (IS_INDEFD(DBL_VHELIO(rv,i)))
+		                    call pargd (INDEFD)
+				else
+		                    call pargd (DBL_VHELIO(rv,i)/C)
+			    }
 		        } else
 		            call pargr (INDEFR)
 		        call pargr (DBL_VERR(rv,i))
@@ -199,7 +212,7 @@ begin
 	            call pargstr (IMAGE(rv))
 	            #call pargi (RV_TEMPCODE(rv))
 	            call pargstr (tc)
-	            if (RV_VCOR(rv) != INDEF && RV_ERRCODE(rv) == OK && 
+	            if (!IS_INDEFD(RV_VCOR(rv)) && RV_ERRCODE(rv) == OK && 
 		        RV_HJD(rv) > 0.)
 	                    call pargd (RV_HJD(rv)-2440000.0)
 	            else
@@ -207,11 +220,18 @@ begin
 	            call pargi (RV_APNUM(rv))
 		    if (RV_ERRCODE(rv) == OK) {
 	                call pargr (RV_SHIFT(rv))
-	                call pargr (RV_DISP(rv))
+			if (!IS_INDEFR(RV_DISP(rv)))
+	                    call pargr (RV_DISP(rv))
+			else
+	                    call pargr (RV_FWHM(rv))
 		        if (RV_PRINTZ(rv) == NO)
 	                    call pargd (RV_VCOR(rv))
-		        else
-	                    call pargd (RV_VCOR(rv)/C)
+		        else {
+			    if (IS_INDEFD(RV_VCOR(rv)))
+	                        call pargd (INDEFD)
+			    else
+	                        call pargd (RV_VCOR(rv)/C)
+			}
 	                call pargd (RV_ERROR(rv))
 		    } else {
 	                call pargr (INDEF)
@@ -234,7 +254,7 @@ int	fd					#I File descriptor
 
 pointer	sp, cp
 int	i, nshifts
-double	rv_shift2vel()
+double	vrel, rv_shift2vel()
 real	wpc
 char	tc[3]
 
@@ -271,7 +291,7 @@ begin
 	    	        call pargstr (OBJNAME(rv))
 	    	        call pargstr (IMAGE(rv))
 	    	        call pargstr (tc)
-		        if (DBL_VHELIO(rv,i) != INDEF && RV_HJD(rv) > 0.0)
+		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0.0)
 	    	            call pargd (RV_HJD(rv)-2440000.0)
 		        else
 	    	            call pargr (INDEF)
@@ -287,9 +307,19 @@ begin
 	    	                call pargd (rv_shift2vel(rv,DBL_SHIFT(rv,i)))
 	    	                call pargr (DBL_VHELIO(rv,i))
 			    } else {
-	    	                call pargd (DBL_VOBS(rv,i)/C)
-	    	                call pargd (rv_shift2vel(rv,DBL_SHIFT(rv,i))/C)
-	    	                call pargd (DBL_VHELIO(rv,i)/C)
+				if (IS_INDEFD(DBL_VOBS(rv,i)))
+				    call pargd (INDEFD)
+				else
+	    	                    call pargd (DBL_VOBS(rv,i)/C)
+				vrel = rv_shift2vel (rv,DBL_SHIFT(rv,i)) / C
+				if (IS_INDEFD(vrel)) 
+				    call pargd (INDEFD)
+				else
+	    	                    call pargd (vrel)
+				if (IS_INDEFD(DBL_VHELIO(rv,i)))
+				    call pargd (INDEFD)
+				else
+	    	                    call pargd (DBL_VHELIO(rv,i)/C)
 			    }
 		        } else {
 	    	            call pargr (INDEFR)
@@ -308,7 +338,7 @@ begin
 	            call pargstr (IMAGE(rv))
 	            #call pargi (RV_TEMPCODE(rv))
 	            call pargstr (tc)
-		    if (!IS_INDEF(RV_VCOR(rv)) && RV_ERRCODE(rv) == OK &&
+		    if (!IS_INDEFD(RV_VCOR(rv)) && RV_ERRCODE(rv) == OK &&
 		        RV_HJD(rv) > 0.0)
 	                    call pargd (RV_HJD(rv)-2440000.0)
 		    else
@@ -318,16 +348,28 @@ begin
 		    if (RV_ERRCODE(rv) == OK) {
 	                call pargr (RV_SHIFT(rv))
 	                call pargr (RV_HEIGHT(rv))
-	                call pargr (RV_DISP(rv))
+			if (!IS_INDEFR(RV_DISP(rv)))
+	                    call pargr (RV_DISP(rv))
+	                else
+	                    call pargr (RV_FWHM(rv))
 	                call pargr (RV_R(rv))
 		        if (RV_PRINTZ(rv) == NO) {
 	                    call pargd (RV_VOBS(rv))
 	                    call pargr (RV_VREL(rv))
 	                    call pargd (RV_VCOR(rv))
 		        } else {
-	                    call pargd (RV_VOBS(rv)/C)
-	                    call pargd (RV_VREL(rv)/C)
-	                    call pargd (RV_VCOR(rv)/C)
+			    if (IS_INDEFD(RV_VOBS(rv)))
+				call pargd (INDEFD)
+			    else
+	                        call pargd (RV_VOBS(rv)/C)
+			    if (IS_INDEFD(RV_VREL(rv)))
+				call pargd (INDEFD)
+			    else
+	                        call pargd (RV_VREL(rv)/C)
+			    if (IS_INDEFD(RV_VCOR(rv)))
+				call pargd (INDEFD)
+			    else
+	                        call pargd (RV_VCOR(rv)/C)
 		        }
 	                call pargd (RV_ERROR(rv))
 		    } else {
@@ -521,7 +563,10 @@ begin
 	call fprintf (fd, "#  Velocity Dispersion = %-.2f Km/sec/pixel     ")
 	    call pargr (RV_DELTAV(rv))
 	call fprintf (fd, "Rebinned WPC = %-.6g\n")
-	    call pargr (RV_OWPC(rv))
+	    if (RV_DCFLAG(rv) != -1)
+	        call pargr (RV_OWPC(rv))
+	    else
+	        call pargr (INDEFR)
 	call flush (fd)
 end
 

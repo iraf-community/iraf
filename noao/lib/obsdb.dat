@@ -6,7 +6,7 @@
 observatory = "kpno"
 	name = "Kitt Peak National Observatory"
 	longitude = 111:36.0
-	latitude = 31:58.8
+	latitude = 31:57.8
 	altitude = 2120.
 	timezone = 7
 
@@ -29,7 +29,7 @@ observatory = "lick"
 	longitude = 121:38.2
 	latitude = 37:20.6
 	altitude = 1290
-	timezone = 6
+	timezone = 8
 
 observatory = "mmto"
 	name = "Multiple Mirror Telescope Observatory"
@@ -53,10 +53,11 @@ observatory = "cfht"
 	timezone = 10
 
 observatory = "lapalma"
-	name = "Roque de los Mucachos, La Palma"
+	name = "Roque de los Muchachos, La Palma"
 	longitude = 17:52.8
 	latitude = 28:45.5
 	altitude = 2327
+	timezone = 0
 
 observatory = "mso"
         name = "Mt. Stromlo Observatory"
@@ -72,10 +73,102 @@ observatory = "sso"
         altitude = 1149
         timezone = -10
 
-observatory = "aat"
+observatory = "aao"
         name = "Anglo-Australian Observatory"
         longitude = 210:56:2.09
         latitude = -31:16:37.34
         altitude = 1164
         timezone = -10
 
+observatory = "mcdonald"
+	name = "McDonald Observatory"
+	longitude = 104.0216667
+	latitude = 30.6716667
+	altitude = 2075
+	timezone = 6
+
+observatory = "lco"
+        name = "Las Campanas Observatory"
+        longitude = 70:42.1
+        latitude = -29:0.2
+        altitude = 2282
+        timezone = 4
+
+# Submitted by Alan Koski 1/13/93
+observatory = "mtbigelow"
+        name = "Catalina Observatory: 61 inch telescope"
+        longitude = 110:43.9
+        latitude = 32:25.0
+        altitude = 2510.
+        timezone = 7
+
+# Revised by Daniel Durand 2/23/93
+observatory = "dao"
+	name = "Dominion Astrophysical Observatory"
+	longitude = 123:25.0
+	latitude = 48:31.3
+	altitude = 229
+	timezone = 8
+
+# Submitted by Patrick Vielle 5/4/93
+observatory = "spm"
+        name = "Observatorio Astronomico Nacional, San Pedro Martir"
+        longitude = 115:29:13
+        latitude = 31:01:45
+        altitude = 2830
+        timezone = 7
+
+# Submitted by Patrick Vielle 5/4/93
+observatory = "tona"
+        name = "Observatorio Astronomico Nacional, Tonantzintla"
+        longitude = 98:18:50
+        latitude = 19:01:58
+        timezone = 8
+
+# Submitted by Don Hamilton 8/18/93
+observatory = "Palomar"
+        name = "The Hale Telescope"
+        longitude = 116:51:46.80
+        latitude = 33:21:21.6
+        altitude = 1706.
+        timezone = 8
+
+# Submitted by Pat Seitzer 10/31/93
+observatory = "mdm"
+        name = "Michigan-Dartmouth-MIT Observatory"
+        longitude = 111:37.0
+        latitude = 31:57.0
+        altitude = 1938.5
+        timezone = 7
+
+# Submitted by Ignacio Ferrin 9/1/94
+observatory = "NOV"
+        name = "National Observatory of Venezuela"
+        longitude = 70:52.0
+        latitude = 8:47.4
+        altitude = 3610
+        timezone = 4
+
+# Submitted by Alan Welty 10/28/94
+observatory = "bmo"
+	name = "Black Moshannon Observatory"
+	longitude = 78:00.3
+	latitude = 40:55.3
+	altitude = 738
+	timezone = 5
+
+# Submitted by Biwei JIANG 11/28/95
+observatory = "BAO"
+	name = "Beijing XingLong Observatory"
+	longitude = 242:25.5
+	latitude = 40:23.6
+	altitude = 950.
+	timezone = -8
+
+# From Astronomical Almanac 1996
+observatory = "keck"
+	name = "W. M. Keck Observatory
+	longitude = 155:28.7
+	latitude = 19:49.7
+	altitude = 4160
+	timezone = 10

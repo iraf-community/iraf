@@ -36,8 +36,9 @@ begin
 	    return
 
 	call mfree (SR_SRANGE(ssp), TY_REAL)
-	call mfree (SR_SRANGE(ssp), TY_REAL)
+	call mfree (SR_ERANGE(ssp), TY_REAL)
 	call mfree (SR_NPSAMP(ssp), TY_INT)
+	SR_COUNT(ssp) = 0
 	
 	call mfree (ssp, TY_STRUCT)
 end
@@ -81,18 +82,20 @@ begin
 
 		call sscan (Memc[buf])
 		if (j == 1) {
-	    	    repeat {			# skip ahead to next number
-		      ip = ip + 1
-	    	    } until (IS_DIGIT(s[ip]) || s[ip] == EOS)
 		    call gargr (SRANGE(ssp,rcount))
+	    	    repeat {			# skip ahead to next number
+		        ip = ip + 1
+	    	    } until (IS_DIGIT(s[ip]) || s[ip] == EOS)
 
 		} else if (j == 2)
 		    call gargr (ERANGE(ssp,rcount))
 	    }
 
-	    repeat {				# skip ahead to delimeter
-	      ip = ip + 1
-	    } until (IS_DIGIT(s[ip]) || s[ip] == EOS)
+	    if (s[ip] != EOS) {
+	        repeat {			# skip ahead to delimeter
+	            ip = ip + 1
+	        } until (IS_DIGIT(s[ip]) || s[ip] == EOS)
+	    }
 	    if (s[ip] == EOS)
 		break
 	}
@@ -111,8 +114,7 @@ begin
 	}
 
 	if (SR_UNITS(ssp) == ERR) {
-	    call rv_errmsg (
-		"Unable to determine range units in range string.")
+	    call rv_errmsg ("Unable to determine range units in range string.")
 	    call sfree (sp)
 	    return (ERR)
 	}
@@ -176,13 +178,15 @@ pointer	gp					#I GIO pointer
 pointer	rv
 double	dex()
 real	left, right
-int	i
+int	i, gstati()
 
 begin
 	if (SR_COUNT(ssp) == ALL_SPECTRUM || gp == NULL)
 	    return
 
 	rv = SR_PARENT(ssp)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR)
+	   call gseti (gp, G_PLCOLOR, C_GREEN)
 	do i = 1, SR_COUNT(ssp) {
 	    left  = SRANGE(ssp,i)
 	    right = ERANGE(ssp,i)
@@ -201,6 +205,8 @@ begin
 	        call mark_range (gp, left, right)
 	    }
 	}
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR)
+	   call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 end
 
 
@@ -215,9 +221,11 @@ begin
 	if (gp == NULL)
 	    return
 
-	call gseti (gp, G_PLTYPE, 0)
+	call gseti (gp, G_PLTYPE, GL_CLEAR)
+	call gseti (gp, G_PLCOLOR, C_BACKGROUND)
 	call rv_mark_regions (ssp, gp)
-	call gseti (gp, G_PLTYPE, 1) 
+	call gseti (gp, G_PLTYPE, GL_SOLID) 
+	call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 end
 
 
@@ -372,7 +380,7 @@ begin
 	        	r = real (dex(SR_W0(ssp)+(ERANGE(ssp,i)-1)*SR_WPC(ssp)))
 		} else {
 		    l = SRANGE(ssp,i)
-		    r = SRANGE(ssp,i)
+		    r = ERANGE(ssp,i)
 		}
 		call erase_range (gp, l, r)
 		if (i == SR_COUNT(ssp)) {
@@ -428,9 +436,9 @@ begin
 	if (gp == NULL)
 	    return
 
-	call gseti (gp, G_PLTYPE, 0)
+	call gseti (gp, G_PLCOLOR, C_BACKGROUND)
 	call mark_range (gp, left, right)
-	call gseti (gp, G_PLTYPE, 1) 
+	call gseti (gp, G_PLCOLOR, C_FOREGROUND) 
 end
 
 

@@ -15,6 +15,7 @@ libos.a:
 	$set XFLAGS = "-c $(HSI_XF)"
 
 	"as$zsvjmp.s"
+	#"as$enbint.s"
 
 	# Do not put zmain.o in the library if it is linked explicitly as a .o
 	# on the host machine.  Having it in the library prevents use of the
@@ -42,6 +43,7 @@ libos.a:
 	zfiobf.c	<libc/kernel.h> <libc/spp.h>
 	zfioks.c	<libc/kernel.h> <libc/spp.h>
 	zfiolp.c	<libc/kernel.h> <libc/spp.h>
+	zfiond.c	<libc/kernel.h> <libc/spp.h>
 	zfiomt.c	<libc/kernel.h> <libc/spp.h>
 	zfiopl.c	<libc/kernel.h> <libc/spp.h>
 	zfiopr.c	<libc/kernel.h> <libc/spp.h>

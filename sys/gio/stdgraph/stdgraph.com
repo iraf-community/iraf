@@ -12,6 +12,10 @@ pointer	g_pbtty				# script graphcap, playback mode
 int	g_nopen				# open count for the kernel
 int	g_active			# workstation is open for graphics i/o
 int	g_enable			# graphics is enabled
+int	g_message			# message mode (output text)
+pointer	g_msgbuf			# message buffer (input text)
+int	g_msgbuflen			# allocated size of message buffer
+int	g_msglen			# amount of data in message
 int	g_keycol			# used to show keys in playback mode
 int	g_keyline			# used to show keys in playback mode
 pointer	g_xy				# pointer to coord encoding string
@@ -35,7 +39,8 @@ char	g_lox[TEK_XRES]			# 	"		"
 char	g_loy[TEK_YRES]			# 	"		"
 
 common	/stgcom/ g_sg, g_tty, g_term, g_pbtty, g_nopen, g_active, g_enable,
-	g_keycol, g_keyline, g_xy, g_stream, g_in, g_out, g_ucaseout,
-	g_xres, g_yres, g_dxres, g_dyres, g_dx, g_dy, g_x1, g_y1, g_x2, g_y2,
-	g_lastx, g_lasty, g_hardchar, g_cursor, g_reg, g_mem, g_device,
-	g_pbdevice, g_hixy, g_lox, g_loy
+	g_message, g_msgbuf, g_msgbuflen, g_msglen,
+	g_keycol, g_keyline, g_xy, g_stream, g_in, g_out,
+	g_ucaseout, g_xres, g_yres, g_dxres, g_dyres, g_dx, g_dy, g_x1,
+	g_y1, g_x2, g_y2, g_lastx, g_lasty, g_hardchar, g_cursor, g_reg,
+	g_mem, g_device, g_pbdevice, g_hixy, g_lox, g_loy

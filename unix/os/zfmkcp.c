@@ -12,8 +12,11 @@
 #include <iraf.h>
 
 /* ZFMKCP -- Make a null length copy of a file.  The new file inherits all
- * attributes of the original file except file owner (the copy belongs to
- * the owner of the process which called us) and the file size (0).
+ * attributes of the original file except the file owner (the copy belongs to
+ * the owner of the process which called us), the file size (this will be 0
+ * after the zfmkcp), and the owner write permission bit (the new file has
+ * to be writable by the owner to be useful).
+ *
  * Since file protection is implemented by special techniques on UNIX,
  * we must take special measures to pass the file protection attribute to
  * the new copy.
@@ -39,7 +42,7 @@ XINT	*status;
 
 	/* Create new file using mode bits from the existing file.
 	 */
-	if ((fd = creat ((char *)new_osfn, mode)) == ERR) {
+	if ((fd = creat ((char *)new_osfn, mode | 0600)) == ERR) {
 	    *status = XERR;
 	    return;
 	} else

@@ -38,7 +38,6 @@ begin
 	        call pt_xdump (fd, Memc[fields], Memc[expr], headers,
 		    parameters)
 	    call close (fd)
-	    call printf ("\n")
 	}
 
 	call clpcls (list)

@@ -55,10 +55,10 @@ begin
 	if (input == "photfiles") {
 
 	    tfilter = "IFILTER"
-	    tfields = "ITIME,XAIRMASS" // "," // fields 
+	    tfields = "ITIME,XAIRMASS,OTIME" // "," // fields 
 	    tbkeycol (tlist, "IMAGE," // tfilter // "," // tfields)
 	    pdump (tlist, "IMAGE," // tfilter // "," // tfields, 
-		headers=no, parameters=yes)                           |
+		"yes", headers=no, parameters=yes)                           |
 	    system.sort ("STDIN", column=0, ignore_white=no,
 		    numeric_sort=no, reverse_sort=no)                 |
 	    unique ("STDIN", > tfile1)

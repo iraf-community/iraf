@@ -13,7 +13,7 @@ pointer	list			# Image list
 pointer	observatory		# Default observatory
 int	verbose			# Verbose?
 
-int	cmd, ival, clgwrd(), btoi(), imtgetim(), obsgeti()
+int	cmd, clgwrd(), btoi(), imtgetim()
 pointer	sp, image, obs, im, imtopenp(), obsvopen(), immap()
 bool	new, header, clgetb()
 double	dval, obsgetd()
@@ -48,9 +48,9 @@ begin
 		iferr (dval = obsgetd (obs, "altitude"))
 		    dval = INDEFD
 		call clputd ("altitude", dval) 
-		iferr (ival = obsgeti (obs, "timezone"))
-		    ival = INDEFI
-		call clputi ("timezone", ival) 
+		iferr (dval = obsgetd (obs, "timezone"))
+		    dval = INDEFD
+		call clputd ("timezone", dval) 
 		call obsclose (obs)
 	    }
 

@@ -18,7 +18,8 @@ C     BLOCKDATA CONBD
       COMMON /CONRE1/ IOFFP      ,SPVAL
       COMMON /CONRE2/ IX         ,IY         ,IDX  ,IDY ,
      1                IS         ,ISS        ,NP         ,CV ,
-     2                INX(8)     ,INY(8)     ,IR(20000)    ,NR
+     2                INX(8)     ,INY(8)     ,IR(80000)    ,NR
+c +noao: dimension of stline ir array increased from 20000 to 80000 6-93
       COMMON /CONRE4/ ISIZEL     ,ISIZEM     ,ISIZEP     ,NREP,
      1                NCRT       ,ILAB       ,NULBLL     ,IOFFD,
      2                EXT        ,IOFFM      ,ISOLID     ,NLA,
@@ -84,8 +85,9 @@ C    1         0 ,    1 ,    1 ,    1 ,    0 ,   -1 ,   -1 ,   -1 /
       INY(8) = -1
 C     DATA NR/500/
 c +noao: dimension of stline array increased from 500 to 5000 6March87
-c +noao: dimension of stline array increased from 500 to 20000 Jan90
-      NR     = 20000
+c +noao: dimension of stline array increased from 5000 to 20000 Jan90
+c +noao: dimension of stline array increased from 20000 to 80000 6-93
+      NR     = 80000
 C     DATA IRECMJ,IRECMN,IRECTX/ 1 ,   1 ,   1/
 c +noao: value of irecmj changed so major divisions are high intensity
       IRECMJ = 2 

@@ -1,8 +1,10 @@
 	airmass - Compute the airmass at a given elevation above the horizon
+       asthedit - Astronomical header editor
        asttimes - Compute UT, Julian day, epoch, and siderial time
-	ccdtime	- Compute time required to observe star of given magnitude
+	ccdtime - Compute time, magnitude, and signal-to-noise for CCDs
        galactic - Convert ra, dec to galactic coordinates
        gratings - Compute and print grating parameters
+       keywpars - Translate the image header keywords used in ASTUTIL package
 	    pdm - Find periods in light curves by Phase Dispersion Minimization
 	precess - Precess a list of astronomical coordinates
       rvcorrect - Compute radial velocity corrections

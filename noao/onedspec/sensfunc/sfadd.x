@@ -87,6 +87,7 @@ begin
 	# Mark the added point on all graphs.
 	for (wc = 1; GP_GRAPHS(gp,wc) != EOS; wc=wc+1) {
 	    call gseti (GP_GIO(gp), G_WCS, wc)
+	    call gseti (GP_GIO(gp), G_PLCOLOR, GP_CADD(gp))
 	    switch (GP_GRAPHS(gp,wc)) {
 	    case 's':
  		call gmark (GP_GIO(gp), wave, sen, GP_MADD(gp), GP_SZMARK(gp),

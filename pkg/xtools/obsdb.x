@@ -80,7 +80,7 @@ define	SZ_OBSVAL	79		# Size of observatory value string
 define	OBSVAL		Memc[P2C($1)]	# Observatory value string
 
 
-# OBSOPEN -- Open observatory database and store the requested obervatory
+# OBSOPEN -- Open observatory database and store the requested observatory
 # information in symbol table.
 
 pointer procedure obsopen (observatory)
@@ -94,7 +94,7 @@ begin
 end
 
 
-# OBSVOPEN -- Open observatory database and store the requested obervatory
+# OBSVOPEN -- Open observatory database and store the requested observatory
 # information in symbol table.
 
 pointer procedure obsvopen (observatory, verbose)
@@ -278,7 +278,6 @@ pointer	sym		# Symbol table pointer
 
 bool	streq()
 pointer	sp, str, stfind(), stenter()
-int	clgeti()
 double	clgetd()
 
 begin
@@ -313,8 +312,8 @@ begin
 		call pargd (clgetd (Memc[str]))
 	} else if (streq (param, "timezone")) {
 	    sym = stenter (obs, param, SYMLEN)
-	    call sprintf (OBSVAL(sym), SZ_OBSVAL, "%d")
-		call pargi (clgeti (Memc[str]))
+	    call sprintf (OBSVAL(sym), SZ_OBSVAL, "%g")
+		call pargd (clgetd (Memc[str]))
 	}
 
 	call sfree (sp)

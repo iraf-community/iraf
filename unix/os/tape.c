@@ -23,8 +23,9 @@
  *	bsf [n]				backspace N filemarks
  *	fsr [n]				forward space N records
  *	bsr [n]				backspace N records
- *	r [n [bufsize]]			read N records
- *	w [n [bufsize]]			write N records
+ *	read [n [bufsize]]		read N records
+ *	write [n [bufsize]]		write N records
+ *	seek [offset[bkm]]              seek (b=block#, k=x1024, m=x1024*1024)
  *	weof				write end of file
  *
  *	s[tatus]			print tape status (device dependent)
@@ -53,8 +54,8 @@
 
 #define	SZ_COMMAND	512
 #define SZ_FNAME	256
-#define SZ_IOBUF	65535
-#define NREAD		65535
+#define SZ_IOBUF	262144
+#define NREAD		64512
 #define	NWRITE		1024
 #define	EOS		'\0'
 
@@ -139,7 +140,7 @@ quit:		if (in != stdin)
 	    } else if (!strcmp (token, "?") || !strcmp (token, "help")) {
 		phelp();
 		continue;
-	    } else if (!strncmp (token, "status", 1)) {
+	    } else if (!strncmp (token, "status", 2)) {
 		pstatus();
 		continue;
 	    } else if (!strncmp (token, "verbose", 3)) {
@@ -198,7 +199,7 @@ quit:		if (in != stdin)
 		}
 
 		/* Open device. */
-		if ((tape = open (mtdev, 
+		if ((tape = open (mtdev, t_acmode =
 		    ((token=gettok()) && *token == 'w') ? 2 : 0)) == -1) {
 		    sprintf (lbuf, "cannot open device %s\n", mtdev);
 		    output (lbuf);
@@ -288,6 +289,49 @@ quit:		if (in != stdin)
 		}
 
 		continue;
+
+	    } else if (!strncmp (token, "seek", 2)) {
+		char *ip;
+		int fwd, bak, i;
+
+		if (token = gettok()) {
+		    ip = token;
+		    fwd = bak = 0;
+		    if (*ip == '-') {
+			bak++;
+			ip++;
+		    } else if (*ip == '+') {
+			fwd++;
+			ip++;
+		    }
+
+		    for (i=0;  isdigit(*ip);  ip++)
+			i = i * 10 + (*ip - '0');
+
+		    switch (*ip) {
+		    case 'b':
+			i *= rbufsz;
+			break;
+		    case 'k':
+			i *= 1024;
+			break;
+		    case 'm':
+			i *= (1024*1024);
+			break;
+		    }
+
+		    if (fwd)
+			status = lseek (tape, (long)i, 1);
+		    else if (bak)
+			status = lseek (tape, -(long)i, 1);
+		    else
+			status = lseek (tape, (long)i, 0);
+		    pstatus();
+
+		} else {
+		    status = lseek (tape, 0, 1);
+		    pstatus();
+		}
 
 	    } else
 		output ("unrecognized command\n");

@@ -177,12 +177,14 @@ begin
 	w1 = w - 3 * sigma
 	w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
 	call gseti (gfd, G_PLTYPE, 2)
+	call gseti (gfd, G_PLCOLOR, 2)
 	call gamove (gfd, w1, w2)
 	for (; w1 <= w+3*sigma; w1=w1+0.1*sigma) {
 	    w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
 	    call gadraw (gfd, w1, w2)
 	}
 	call gseti (gfd, G_PLTYPE, 1)
+	call gseti (gfd, G_PLCOLOR, 1)
 
 	# Save fit parameters
 	if (ng == 0) {

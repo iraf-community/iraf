@@ -14,14 +14,10 @@ define	IMAX	1.1		# Maximum intensity value for plot
 
 # AP_RPPLOT -- Procedure to plot the radial profile.
 
-procedure ap_rpplot (ap, sid, cier, sier, pier, rier, gd, makeplots)
+procedure ap_rpplot (ap, sid, gd, makeplots)
 
 pointer	ap		# pointer to the apphot structure
 int	sid		# output file id number (not used)
-int	cier		# centering error code
-int	sier		# sky fitting error code
-int	pier		# photometry error code
-int	rier		# radprof error code
 pointer	gd		# pointer to the plot stream
 int	makeplots	# make plots on the screen ?
 
@@ -66,15 +62,14 @@ begin
 	gt = ap_gtinit (AP_IMNAME(ap), apstatr (ap, XCENTER), apstatr (ap,
 	    YCENTER))
 	call gclear (gd)
-	call ap_rpset (gd, gt, ap, cier, sier, pier, rier, rmin, rmax,
-	    IMIN, IMAX)
+	call ap_rpset (gd, gt, ap, rmin, rmax, IMIN, IMAX)
 	call ap_rpannotate (gd, ap, rmin, rmax, IMIN, IMAX)
 
-	# Plot the intensity aand total intensity.
+	# Plot the intensity and total intensity.
 	call ap_plothist (gd, gt, Memr[AP_RPDIST(rprof)],
-	    Memr[AP_INTENSITY(rprof)], nrpts, GL_SOLID)
+	    Memr[AP_INTENSITY(rprof)], nrpts, "line", GL_SOLID)
 	call ap_plothist (gd, gt, Memr[AP_RPDIST(rprof)],
-	    Memr[AP_TINTENSITY(rprof)], nrpts, GL_DOTDASH)
+	    Memr[AP_TINTENSITY(rprof)], nrpts, "line", GL_DOTDASH)
 
 	# Plot the points.
 	call gswind (gd, rmin, rmax, (IMIN * inorm), (IMAX * inorm))
@@ -93,15 +88,11 @@ end
 # AP_RPSET -- Procedure to set up the parameters for the radial profile
 # plot.
 
-procedure ap_rpset (gd, gt, ap, cier, sier, pier, rier, xmin, xmax, ymin, ymax)
+procedure ap_rpset (gd, gt, ap, xmin, xmax, ymin, ymax)
 
 pointer	gd		# graphics stream
 pointer	gt		# gtools pointer
 pointer	ap		# apphot pointer
-int	cier		# centering error code (not used)
-int	sier		# sky fitting error code (not used)
-int	pier		# photometry error code (not used)
-int	rier		# profile fitting error code (not used)
 real	xmin, xmax	# minimum and maximum radial distance
 real	ymin, ymax	# minimum and maximum of the y axis
 

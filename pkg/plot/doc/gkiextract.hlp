@@ -37,6 +37,9 @@ those files requested by the user and write them to file "new_mc_file".
 
     cl> gkiextract mc_file 1-99 ver+ > new_mc_file
 .ih
+BUGS
+A maximum of 8192 plots in a single metacode file may be processed.
+.ih
 SEE ALSO
 gkidir
 .endhelp

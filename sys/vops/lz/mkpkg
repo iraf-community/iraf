@@ -233,6 +233,13 @@ libvops.a:
 	aselr.x	
 	asels.x	
 	aselx.x	
+	aselkc.x	
+	aselkd.x	
+	aselki.x	
+	aselkl.x	
+	aselkr.x	
+	aselks.x	
+	aselkx.x	
 	asokc.x	
 	asokd.x	
 	asoki.x	

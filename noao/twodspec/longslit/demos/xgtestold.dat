@@ -1,0 +1,93 @@
+\O=NOAO/IRAF V2.10EXPORT valdes@puppis Thu 09:50:51 04-Feb-93
+\T=xgtermc
+\G=xgtermc
+imred\n
+bias\n
+sections\sdemoobj,demostd,demoarc1,demoarc2\s>\sdemolist\n
+colbias\sdemoflat,@demolist\sdemoflat,@demolist\sbias=[100,*]\strim=[20:80,*]\n
+\n
+:*'3,\r f\scheb\r
+f*'3,\r
+q*'3,\r
+N\n
+bye\n
+bye\n
+response\sdemoflat\sdemoflat[20:40,*]\sdemoflat\n
+\n
+k*'3,\r
+q*'3,\r
+imarith\s@demolist\s/\sdemoflat\s@demolist\n
+illum\sdemostd\sdemoillum\sbins=1\n
+\n
+q*'3,\r
+\n
+:*'3,\r sample\s5:24,36:55\r
+:*'3,\r f\scheb\r
+:*'3,\r o\s3\r
+f*'3,\r
+q*'3,\r
+imarith\s@demolist\s/\sdemoillum\s@demolist\n
+iden\sdemoarc1\ssec="mid\scol"\n
+m*)4)\r 5015\r
+m;$4)\r 7281\r
+l*'3,\r
+f*'3,\r
+d$<5!\r
+d/9&5\r
+f*'3,\r
+l*'3,\r
+q*'3,\r
+q*'3,\r
+\n
+reid\sdemoarc1\sdemoarc1,demoarc2\ssec="mid\scol"\sv+\n
+iden\sdemostd\ssec="mid\sline"\n
+m0\s4"\r 50\r
+q0\s4"\r
+\n
+reid\sdemostd\sdemostd\ssec="mid\sline"\sv+\n
+fitcoords\scombine+\sfitname=demoarcfit\n
+demoarc1,demoarc2\n
+\n
+y*'3,\r
+x*'3,\r
+r*'3,\r
+q*'3,\r
+\n
+fitcoords\n
+demostd\n
+\n
+y*'3,\r
+x*'3,\r
+r*'3,\r
+q*'3,\r
+\n
+transform\slogfiles=STDOUT,demologfile\n
+demoobj,demostd\n
+demoobj,demostd\n
+demoarcfit,demostd\n
+background\sdemoobj,demostd\sdemoobj,demostd\n
+256\r
+:*'3,\r sample\s5:24,36:55\r
+:*'3,\r nav\s-20\r
+f*'3,\r
+q*'3,\r
+\r
+256\r
+q*'3,\r
+\r
+nsum=7\n
+setairmass\sdemoobj,demostd\n
+standard\sdemostd\sdemostdfile\sap=31\n
+hz14\n
+n\n
+sensfunc\sdemostdfile\sdemosens\slogfile=demologfile\n
+\n
+q*'3,\r
+calibrate\sdemoobj,demostd\sdemoobj,demostd\ssens=demosens\n
+splot\sdemostd,demoobj\n
+31\n
+y*'3,\r hz14\r
+q*'3,\r
+o*'3,\r
+#*'3,\r 1\r
+q*'3,\r

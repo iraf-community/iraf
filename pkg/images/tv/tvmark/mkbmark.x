@@ -81,6 +81,8 @@ begin
 	    call gargr (y)
 	    if (nscan() < 2)
 		next
+	    if (IS_INDEFR(x) || IS_INDEFR(y))
+		next
 	    call gargwrd (Memc[label], SZ_LINE)
 	    call iw_im2fb (iw, x, y, fx, fy)
 

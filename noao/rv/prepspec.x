@@ -36,14 +36,23 @@ begin
 	else if (ishift < 0)
 	    call error (0, "Negative shift found preparing spectrum.")
 
+	if (DEBUG(rv)) {
+	    call d_printf (DBG_FD(rv), "prep_spec:\n\t")
+	    call d_printf (DBG_FD(rv), "ishift=%d np=%d dnp=%d fnp=%d\n")
+		call pargi (ishift); call pargi(npts)
+		call pargi (datanpts); call pargi(fftnpts)
+	}
+
 	# Get things started.
 	call aclrr (Memr[tform], fftnpts)
-	call amovr (Memr[data], Memr[tform+ishift], npts)
+	#call amovr (Memr[data], Memr[tform+ishift], npts)
+	call amovr (Memr[data], Memr[tform+ishift], datanpts)
 
 	# Generate size dependent parameters.
-	if (SR_COUNT(ssp) != ALL_SPECTRUM && apodize == YES)
-	    call prep_samples (rv, ssp, Memr[tform+ishift], npts, apodize)
-	else {
+	if (SR_COUNT(ssp) != ALL_SPECTRUM && apodize == YES) {
+	    #call prep_samples (rv, ssp, Memr[tform+ishift], npts, apodize)
+	    call prep_samples (rv, ssp, Memr[tform], npts, apodize)
+	} else {
 	    num = datanpts
 	    if (apodize == YES) {
 	        call fft_cosbel (Memr[tform+ishift], num, FORWARD, 
@@ -85,14 +94,20 @@ int	i, j, k, np, left, right
 
 begin
 	left = 1
-	if (SR_UNITS(ssp) == PIXELS)
+	if (SR_UNITS(ssp) == PIXELS) {
 	    #right = nint (SRANGE(ssp,1) - RV_GLOB_W1(rv) + 1)
 	    right = SRANGE(ssp,1) - RV_GLOB_W1(rv) + 1
-	else {
+	} else {
 	    right = nint ((log10(SRANGE(ssp,1)) - RV_GLOB_W1(rv)) / 
 		RV_OWPC(rv)) + 1
 	}
 	do i = 1, SR_COUNT(ssp)+1 {
+	    if (DEBUG(rv)) {
+		call d_printf (DBG_FD(rv), "\tl=%g r=%g -- s=%g e=%g\n")
+		    call pargi (left) ; call pargi (right)
+		    call pargr (SRANGE(ssp,i)) ; call pargR (ERANGE(ssp,i))
+	    }
+
 	    k = 1
 	    j = left
 	    np = right - left + 1
@@ -104,18 +119,18 @@ begin
 	    if (i == SR_COUNT(ssp)+1) 
 	    	return
 
-	    if (SR_UNITS(ssp) == PIXELS)
+	    if (SR_UNITS(ssp) == PIXELS) {
 	        #left = nint ((ERANGE(ssp,i) - RV_GLOB_W1(rv) + 1) + 1)
 	        left = (ERANGE(ssp,i) - RV_GLOB_W1(rv) + 1) + 1
-	    else {
+	    } else {
 	        left = nint ((log10(ERANGE(ssp,i)) - RV_GLOB_W1(rv)) / 
 		    RV_OWPC(rv)) + 1
 	    }
 	    if (apodize == YES)
 	        call fft_cosbel (data[right], left-right+1, -1, RV_APODIZE(rv))
-	    if (i == SR_COUNT(ssp))
+	    if (i == SR_COUNT(ssp)) {
 		right = npts
-	    else {
+	    } else {
 		if (SR_UNITS(ssp) == PIXELS) {
 	    	    right = SRANGE(ssp,i+1) - RV_GLOB_W1(rv) + 1
 		} else {

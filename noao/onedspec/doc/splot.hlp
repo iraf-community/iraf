@@ -1,4 +1,4 @@
-.help splot Mar92 noao.onedspec
+.help splot Feb94 noao.onedspec
 .ih
 NAME
 splot -- plot and analyze spectra
@@ -10,7 +10,10 @@ PARAMETERS
 .ls images
 List of images (spectra) to plot.  If the image is 2D or 3D the line
 and band parameters are used.  Successive images are plotted
-following each 'q' cursor command.
+following each 'q' cursor command.  One may use an image section
+to select a desired column, line, or band but the full image will
+be in memory and any updates to the spectrum will be part of the
+full image.
 .le
 .ls line, band
 The image line/aperture and band to plot in two or three dimensional
@@ -21,28 +24,36 @@ line parameter specifies a line or column.  Note that if
 the line and band parameters are specified on the command line it will not
 be possible to change them interactively.
 .le
-.ls units = "angstroms"
+.ls units = ""
 Dispersion coordinate units for the plot.  If the spectra have known units,
 currently this is generally Angstroms, the units may be converted
-to other units for plotting as specified by this parameter.  The units
+to other units for plotting as specified by this task parameter.
+If this parameter is the null string and the world coordinate system
+attribute "units_display" is defined then that will
+be used.  If both this task parameters and "units_display" are not
+given then the spectrum dispersion units will be used.
+The units
 may also be changed interactively.  See the units section of the
 \fBpackage\fR help for a further description and available units.
 .le
-.ls options = "auto" [auto,zero,xydraw,histogram,nosysid,wcreset]
-A list of zero or more, possibly abbreviated, options.  The currently
-defined options are "auto", "zero", "xydraw", "histogram", "nosysid" and
-"wreset".  Option "auto" automatically replots the graph whenever changes
+.ls options = "auto" [auto,zero,xydraw,histogram,nosysid,wcreset,flip,overplot]
+A list of zero or more, possibly abbreviated, options.  The options can
+also be toggled with colon commands.  The currently defined options are
+"auto", "zero", "xydraw", "histogram", "nosysid", "wreset", "flip", and
+"overplot".  Option "auto" automatically replots the graph whenever changes
 are made.  Otherwise the graph is replotted with keystrokes 'c' or 'r'.
 Option "zero" makes the initial minimum y of the graphs occur at zero.
-Otherwise the limits are set automatically from the range of the data
-or the \fIymin\fR parameter.
-Option "xydraw" changes the 'x' draw key to use both x and y cursor values
-for drawing rather than the nearest pixel value for the y value.  Option
-"histogram" plots the spectra in a histogram style rather than connecting
-the pixel centers.  Option "nosysid" excludes the system banner from the
-graph title.  Option "wreset" reset the graph limits to those specified
-by the \fIxmin, xmax, ymin, ymax\fR parameters whenever a new spectrum
-is plotted.  The options may be queried and changed interactively.
+Otherwise the limits are set automatically from the range of the data or
+the \fIymin\fR parameter.  Option "xydraw" changes the 'x' draw key to use
+both x and y cursor values for drawing rather than the nearest pixel value
+for the y value.  Option "histogram" plots the spectra in a histogram style
+rather than connecting the pixel centers.  Option "nosysid" excludes the
+system banner from the graph title.  Option "wreset" resets the graph
+limits to those specified by the \fIxmin, xmax, ymin, ymax\fR parameters
+whenever a new spectrum is plotted.  The "flip" option selects that
+initially the spectra be plotted with decreasing wavelengths.  The options
+may be queried and changed interactively.  The "overplot" options overplots
+all graphs and a screen erase only occurs with the redraw key.
 .le
 .ls xmin = INDEF, xmax = INDEF, ymin = INDEF, ymax = INDEF
 The default limits for the initial graph.  If INDEF then the limit is
@@ -62,6 +73,22 @@ name.
 .ls cursor = ""
 Graphics cursor input.  When null the standard cursor is used otherwise
 the specified file is used.
+.le
+
+The following parameters are used for error estimates in the 'd',
+'k', and 'e' key measurements.  See the ERROR ESTIMATES section for a
+discussion of the error estimates.
+.ls sigma0 = INDEF, invgain = INDEF
+The pixel sigmas are modeled by the formula:
+
+.nf
+    sigma**2 = sigma0**2 + invgain * I
+.fi
+
+where I is the pixel value and "**2" means the square of the quantity.  If
+either parameter is specified as INDEF or with a value less than zero then
+no sigma estimates are made and so no error estimates for the measured
+parameters are made.
 .le
 
 The following parameters are for the interactive curve fitting function
@@ -134,20 +161,21 @@ When adding or multiplying by a constant ('p' or 'm' keys in the 'f' mode)
 the parameter is used to get the constant.
 .le
 .ls wavelength
-This parameter is used to get a wavelength value during deblending or
-when changing the wavelength coordinates.
+This parameter is used to get a dispersion coordinate value during deblending or
+when changing the dispersion coordinates with 'u'.
 .le
 .ls linelist
 During deblending this parameter is used to get a list of line positions
 and widths.
 .le
 .ls wstart, wend, dw
-In response to 'p' (convert to a linear wavelength scale) these parameter
+In response to 'p' (convert to a linear wavelength scale) these parameters
 specify the starting wavelength, ending wavelength, and wavelength per pixel.
 .le
 .ls boxsize
 In response to 's' (smooth) this parameter specifies the box size in pixels
-to be used for the boxcar smooth
+to be used for the boxcar smooth.  The value must be odd.  If an even
+value is specified the next larger odd value is actually used.
 .le
 .ih
 DESCRIPTION
@@ -235,10 +263,10 @@ spectrum and cancels any effects of the 'a', 'z', and 'w' keys.  The 'r'
 key is used to redraw the spectrum with the current windowing.
 .le
 .ls d
-Mark two continuum points and fit (deblend) multiple gaussian line profiles.
+Mark two continuum points and fit (deblend) multiple Gaussian line profiles.
 The center, continuum at the center, core intensity, integrated flux,
 equivalent width, sigma, and FWHM for each profile are printed and saved
-in the log file.  See 'k' for fitting a single gaussian profile and
+in the log file.  See 'k' for fitting a single Gaussian profile and
 '-' to subtract the fitted profiles.
 .le
 .ls e
@@ -308,9 +336,9 @@ Get another spectrum. The current spectrum is replaced by the new spectrum.
 The aperture/line and band are queried is necessary.
 .le
 .ls h
-Measure equivalent widths assuming a gaussian profile with the width
-measured at a specified point.  Note that this is not a gaussian fit (see
-'k' to fit a gaussian)!  The gaussian profile determined here may be
+Measure equivalent widths assuming a Gaussian profile with the width
+measured at a specified point.  Note that this is not a Gaussian fit (see
+'k' to fit a Gaussian)!  The Gaussian profile determined here may be
 subtracted with the '-' key.  A second cursor key is requested with one of
 the following values:
 .ls a
@@ -346,10 +374,10 @@ name is queried and overwriting must be confirmed.
 Set the value of the nearest pixel to the x cursor to the y cursor position.
 .le
 .ls k
-Mark two continuum points and fit a single gaussian line profile.
+Mark two continuum points and fit a single Gaussian line profile.
 The center, continuum at the center, core intensity, integrated flux,
 equivalent width, sigma, and FWHM are printed and saved in the log file.
-See 'd' for fitting multiple gaussian profiles and '-' to subtract the
+See 'd' for fitting multiple Gaussian profiles and '-' to subtract the
 fit.
 .le
 .ls l
@@ -367,12 +395,15 @@ to be flux calibrated in flux per unit wavelength (f-lambda).  See also 'l'.
 .ls o
 Set overplot flag.  The next plot will overplot the current plot.
 Normally this key is immediately followed by one of 'g', '#', '%', '(', or ')'.
+The ":overplot" colon command and overplot parameter option may be
+used to set overplotting to be permanently on.
 .le
 .ls p
 Define a linear wavelength scale.  The user is queried for a starting
-wavelength and an ending wavelength.  If the either (though not both)
+wavelength and an ending wavelength.  If either (though not both)
 are specified as INDEF a dispersion is queried for and used to compute
-an endpoint.
+an endpoint.  A wavelength scale set this way will be used for
+other spectra which are not dispersion corrected.
 .le
 .ls q
 Quit and go on to next input spectrum.  After the last spectrum exit.
@@ -412,9 +443,13 @@ Quit and don't do any fitting.  The spectrum is not modified.
 .le
 .le
 .ls u
-Define a linear wavelength scale by marking and identifying two
-features in the spectrum; i.e. mark two points with the cursor and
-specified the wavelengths of those points.
+Adjust the user coordinate scale.  There are three options, 'd' mark a
+position with the cursor and doppler shift it to a specified value,
+'z' mark a position with the cursor and zeropoint shift it to a specified
+value, or 'l' mark two postions and enter two values to define a linear
+(in wavelength) dispersion scale.  The units used for input are those
+currently displayed.  A wavelength scale set this way will be used for
+other spectra which are not dispersion corrected.
 .le
 .ls v
 Toggle to a velocity scale using the position of the cursor as the
@@ -438,9 +473,11 @@ Zoom the graph by a factor of 2 in x.
 .le
 .ls (
 In multiaperture spectra go to the spectrum in the preceding image line.
+If there is only one line go to the spectrum in the preceding band.
 .le
-.ls (
+.ls )
 In multiaperture spectra go to the spectrum in the following image line.
+If there is only one line go to the spectrum in the following band.
 .le
 .ls #
 Get a different line in multiaperture spectra or two dimensional images.
@@ -453,8 +490,8 @@ Get a different band in a three dimensional image.
 Switch between physical pixel coordinates and world (dispersion) coordinates.
 .le
 .ls -4 -
-Subtract the fits generated by the 'd' (deblend), 'k' (single gaussian fit),
-and 'h' (gaussian of specified width).  The region to be subtracted is
+Subtract the fits generated by the 'd' (deblend), 'k' (single Gaussian fit),
+and 'h' (Gaussian of specified width).  The region to be subtracted is
 marked with two cursor positions.
 .le
 .ls -4 ','
@@ -511,6 +548,12 @@ Enable/disable system ID option
 .le
 .ls :wreset [yes|no]
 Enable/disable window reset for new spectra option
+.le
+.ls :flip [yes|no]
+Enable/disable the flipped coordinates option
+.le
+.ls :overplot [yes|no]
+Enable/disable the permanent overplot option
 .le
 .ih
 GAUSSIAN PROFILE FITTING AND DEBLENDING
@@ -662,7 +705,7 @@ y level with the data using linear interpolation between pixels.  The
 one-sided measurements use the half-width on the appropriate side and
 the two-sided measurments use the full-width.
 
-The adopted gaussian line profile is drawn over the spectrum and the
+The adopted Gaussian line profile is drawn over the spectrum and the
 horizontal and vertical lines show the measured line width and the depth of
 the line center from the continuum.  This model may also be subtracted
 from the spectrum using the '-' key.
@@ -695,11 +738,59 @@ flux will not be in the usual units but will be A-ergs/cm2/sec/hz.
 For flux in wavelength units, ergs/cm2/sec/A the integrated flux
 will be correct; i.e. ergs/cm2/sec.
 .ih
+ERROR ESTIMATES
+The deblending ('d'), Gaussian fitting ('k'), and profile integration and
+equivalent width ('e') functions provide error estimates for the measured
+parameters.  This requires a model for the pixel sigmas.  Currently this
+model is based on a Poisson statistics model of the data.  The model
+parameters are a constant Gaussian sigma and an "inverse gain" as specified
+by the parameters \fIsigma0\fR and \fIinvgain\fR.  These parameters are
+used to compute the pixel value sigma from the following formula:
+
+.nf
+    sigma**2 = sigma0**2 + invgain * I
+.fi
+
+where I is the pixel value and "**2" means the square of the quantity.
+
+If either the constant sigma or the inverse gain are specified as INDEF or
+with values less than zero then no noise model is applied and no error
+estimates are computed.  Note that for processed spectra this noise model
+will not generally be the same as the detector readout noise and gain.
+These parameters would need to be estimated in some way using the statistics
+of the spectrum.  The use of an inverse gain rather than a direct gain
+was choosed to allow a value of zero for this parameters.  This provides
+a model with constant uncertainties.
+
+The direct profile integration error estimates are computed by error
+propagation assuming independent pixel sigmas.  Also it is assumed that the
+marked linear background has no errors.  The error estimates are one sigma
+estimates.  They are given in the log output (which may also be view
+without exiting the program using the :show command) below the value to
+which they apply and in parenthesis.
+
+The deblending and Gaussian fit error estimates are computed by
+Monte-Carlo simulation.  The model is fit to the data (using the
+sigmas) and this model is used to describe the noise-free spectrum.
+One hundred simulations are created in which random Gaussian noise is
+added to the noise-free spectrum based on the pixel sigmas from the
+noise model.  The model fitting is done for each simulation and
+the absolute deviation of each fitted parameter to model parameter
+is recorded.  The error estimate for the each parameter is then
+the absolute deviation containing 68.3% of the parameter estimates.
+This corresponds to one sigma if the distribution of parameter
+estimates is Gaussian though this method does not assume this.
+
+The Monte-Carlo technique automatically includes all effects of
+parameter correlations and does not depend on any approximations.
+However the computation of the errors does take a significant
+amount of time.
+.ih
 UNITS
-The dispersion units capability of \fBsplot\fR allows specifying
-the units with the \fIunits\fR parameter and interactively changing the
-units with the ":units" command.  In addition the 'v' key allows plotting
-in velocity units with the zero point velocity defined by the cursor
+The dispersion units capability of \fBsplot\fR allows specifying the
+units with the \fIunits\fR parameter and interactively changing the units
+with the ":units" command.  In addition the 'v' key allows plotting in
+velocity units with the zero point velocity defined by the cursor
 position.
 
 The units are specified by strings having a unit type from the list below
@@ -712,6 +803,7 @@ recognized standard scientific abbreviations such as mm for millimeter.
 
 .nf
 	   angstroms - Wavelength in Angstroms
+	  nanometers - Wavelength in nanometers
 	millimicrons - Wavelength in millimicrons
 	     microns - Wavelength in microns
 	 millimeters - Wavelength in millimeters
@@ -798,6 +890,36 @@ which has the default cursor file given above and default device of "stdplot".
 of cursor commands.
 .ih
 REVISIONS
+.ls SPLOT V2.11
+The 'u' key now allows three ways to adjust the dispersion scale.  The
+old method of setting a linear dispersion scale is retained as well
+as adding a doppler and zeropoint adjustment.  The coordinates are
+input in the currently displayed units.
+
+If a wavelength scale is set with either 'p' or 'u' then any other
+spectra which are not dispersion corrected will adopt this wavelength
+scale.
+
+The '(' and ')' keys cycle through bands if there is only one spectrum.
+
+A new option, "flip", has been added to the options parameter to select
+that the spectra are plotted in decreasing wavelength.
+
+A new options "overplot" has been added to the options parameters and
+colon commands to permanently set overplotting.  This allows quickly
+overplotting many spectra.
+
+This task will now write out the current display units in the "units_display"
+WCS attribute.  The default task units have been changed to "" to allow
+picking up the "units_display" units if defined.
+
+The deblending and Gaussian fitting code now subsamples the profile by
+a factor of 3 and fits the data pixels to the sum of the three
+subsamples.  This accounts for finite sampling of the data.
+
+Error estimates are provided for the deblending ('d'), Gaussian fitting
+('k'), and profile integration ('e') results.
+.le
 .ls SPLOT V2.10
 This is a new version with a significant number of changes.  In addition to
 the task changes the other general changes to the spectroscopy packages
@@ -816,12 +938,12 @@ consolidating, or elimination of keys.  One needs to check the run time '?'
 help or the help to determine the key changes.
 
 Deblending may now use any number of components and simultaneous fitting of
-a linear background.  A new simplified version of gaussian fitting for a
+a linear background.  A new simplified version of Gaussian fitting for a
 single line has been added in the 'k' key.  The old 'k', 'h', and 'v'
 equivalent width commands are all part of the single 'h' command using a
-second key to select a specific option.  The gaussian line model from these
+second key to select a specific option.  The Gaussian line model from these
 modes may now be subtracted from the spectrum in the same way as the
-gaussian fitting.  The one-sided options, in particular, are interesting in
+Gaussian fitting.  The one-sided options, in particular, are interesting in
 this regard as a new capability.
 
 The arithmetic functions between two spectra are now done in wavelength
@@ -836,7 +958,7 @@ Control over the graph window (plotting limits) is better integrated so
 that redrawing, zooming, shifting, and the GTOOLS window commands all work
 well together.  The new 'c' key resets the window to the full spectrum
 allowing the 'r' redraw key to redraw the current window to clean up
-overplots from the gaussian fits or spectrum editing.
+overplots from the Gaussian fits or spectrum editing.
 
 The dispersion units may now be selected and changed to be from hertz to
 Mev and the log or inverse (for wave numbers) of units taken.  As part of
@@ -849,7 +971,7 @@ slit spectra.  New keys allow selecting apertures, lines, columns, and
 bands as well as quickly scrolling through the lines in multiaperture
 spectra.  Overplotting is also more general and consistent with other tasks
 by using the 'o' key to toggle the next plot to be overplotted.  Overplots,
-including those of the gaussian line models, are now done in a different
+including those of the Gaussian line models, are now done in a different
 line type.
 
 There are new colon commands to change the dispersion axis and summing

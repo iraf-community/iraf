@@ -42,12 +42,14 @@ define	KW_ZERO		21
 # are commands that do something, others set options, and still others show
 # the status of the program.
 
-int procedure grc_command (rc, stream, opstr, x, y)
+int procedure grc_command (rc, stream, sx, sy, raster, rx, ry, opstr)
 
-pointer	rc			# rcursor descriptor
-int	stream			# graphics stream
-char	opstr[ARB]		# options string excluding the leading ":.".
-real	x, y			# screen coords of cursor
+pointer	rc			#I rcursor descriptor
+int	stream			#I graphics stream
+real	sx, sy			#I screen coords of cursor
+int	raster			#I raster number
+real	rx, ry			#I raster coords of cursor
+char	opstr[ARB]		#I options string excluding the leading ":.".
 
 pointer	tr, p_tr, sp, fname, lbuf, tty
 bool	clobber, fullframe, auto_gflush
@@ -244,7 +246,8 @@ begin
 
 	    case KW_VIEWPORT:
 		# Set the viewport in world coordinates.
-		call grc_viewport (tr, stream, opstr, ip, x, y)
+		call grc_viewport (tr, stream,
+		    sx, sy, raster, rx, ry, opstr, ip)
 
 	    case KW_WRITE:
 		# Save the contents of the frame buffer in a file.
@@ -482,13 +485,15 @@ end
 # of the viewport given by the user into NDC coordinates and set the work-
 # station transformation.
 
-procedure grc_viewport (tr, stream, opstr, ip, sx, sy)
+procedure grc_viewport (tr, stream, sx, sy, raster, rx, ry, opstr, ip)
 
-pointer	tr			# giotr descriptor
-int	stream			# graphics stream
-char	opstr[ARB]		# command string
-int	ip			# input pointer
-real	sx, sy			# screen coordinates of cursor
+pointer	tr			#I giotr descriptor
+int	stream			#I graphics stream
+real	sx, sy			#I screen coordinates of cursor
+int	raster			#I raster number
+real	rx, ry			#I raster coordinates of cursor
+char	opstr[ARB]		#I command string
+int	ip			#I input pointer
 
 pointer	w
 int	i, wcs
@@ -498,7 +503,7 @@ int	ctor()
 
 begin
 	# Select a WCS.  We are not otherwise interested in the cursor value.
-	call grc_scrtowcs (stream, sx, sy, wx, wy, wcs)
+	call grc_scrtowcs (stream, sx, sy, raster, rx, ry, wx, wy, wcs)
 	w = TR_WCSPTR(tr,wcs)
 	call grc_settran (w, ct)
 

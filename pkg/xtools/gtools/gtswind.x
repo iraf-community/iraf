@@ -46,8 +46,19 @@ begin
 	    else
 		ymax = GT_YMAX(gt)
 
+	    if (GT_XFLIP(gt) == YES) {
+		dx = xmin
+		xmin = xmax
+		xmax = dx
+	    }
+	    if (GT_YFLIP(gt) == YES) {
+		dy = ymin
+		ymin = ymax
+		ymax = dy
+	    }
+
 	    if (GT_TRANSPOSE(gt) == NO)
-	        call gswind (gp, xmin, xmax, ymin, ymax)
+		call gswind (gp, xmin, xmax, ymin, ymax)
 	    else
 	        call gswind (gp, ymin, ymax, xmin, xmax)
 	}

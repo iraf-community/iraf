@@ -23,15 +23,13 @@ procedure refopen ()
 
 bool	clgetb()
 real	clgetr()
-pointer	stopen()
-int	fd, btoi(), clpopnu(), clgfil(), open(), decode_ranges(), nowhite()
+pointer	rng_open(), stopen()
+int	fd, btoi(), clpopnu(), clgfil(), open(), nowhite()
 errchk	open()
 
 include	"refspectra.com"
 
 begin
-	call malloc (aps, 3*NRANGES, TY_INT)
-	call malloc (raps, 3*NRANGES, TY_INT)
 	call malloc (sort, SZ_FNAME, TY_CHAR)
 	call malloc (group, SZ_FNAME, TY_CHAR)
 
@@ -45,10 +43,10 @@ begin
 
 	# Get other parameters
 	call clgstr ("apertures", Memc[sort], SZ_FNAME)
-	if (decode_ranges (Memc[sort], Memi[aps], NRANGES, fd) == ERR)
+	iferr (aps = rng_open (Memc[sort], INDEF, INDEF, INDEF))
 	    call error (0, "Bad aperture list")
 	call clgstr ("refaps", Memc[sort], SZ_FNAME)
-	if (decode_ranges (Memc[sort], Memi[raps], NRANGES, fd) == ERR)
+	iferr (raps = rng_open (Memc[sort], INDEF, INDEF, INDEF))
 	    call error (0, "Bad reference aperture list")
 	call clgstr ("sort", Memc[sort], SZ_FNAME)
 	call clgstr ("group", Memc[group], SZ_FNAME)
@@ -71,12 +69,12 @@ procedure refclose ()
 include	"refspectra.com"
 
 begin
-	call mfree (aps, TY_INT)
-	call mfree (raps, TY_INT)
 	call mfree (sort, TY_CHAR)
 	call mfree (group, TY_CHAR)
 	call clpcls (logfiles)
 	call stclose (stp)
+	call rng_close (raps)
+	call rng_close (aps)
 end
 
 
@@ -174,7 +172,7 @@ int	ap		# Spectrum aperture number (returned)
 double	val		# Spectrum sort value (returned)
 pointer	gval		# Spectrum group value (returned)
 
-bool	clgetb(), is_in_range()
+bool	clgetb(), rng_elementi()
 pointer	ref1, ref2
 errchk	refgspec
 
@@ -185,24 +183,26 @@ define	err_	99
 begin
 	# Get the spectrum from the symbol table.
 	iferr (call refgspec (spec, ap, val, gval, ref1, ref2)) {
-	    call refmsgs (NO_SPEC, spec, ap, "", "")
+	    call refmsgs (NO_SPEC, spec, "", "", "", ap, 0, "")
 	    goto err_
 	}
 
 	# Check if it has a previous reference spectrum.  Override if desired.
 	if (Memc[ref1] != EOS) {
 	    if (!clgetb ("override")) {
-		call refmsgs (DEF_REFSPEC, spec, ap, Memc[ref1], Memc[ref2])
+		call refmsgs (DEF_REFSPEC, spec, Memc[ref1], "", "", ap, 0,
+		    Memc[ref2])
 	       goto err_
 	    } else {
-		call refmsgs (OVR_REFSPEC, spec, ap, Memc[ref1], Memc[ref2])
+		call refmsgs (OVR_REFSPEC, spec, Memc[ref1], "", "", ap, 0,
+		    Memc[ref2])
 	    }
 	}
 	
 	# Check aperture numbers.
 	if (aps != NULL) {
-	    if (!is_in_range (Memi[aps], ap)) {
-	        call refmsgs (BAD_AP, spec, ap, "", "")
+	    if (!rng_elementi (aps, ap)) {
+	        call refmsgs (BAD_AP, spec, "", "", "", ap, 0, "")
 	        goto err_
 	    }
 	}
@@ -230,7 +230,7 @@ int	ap		# Spectrum aperture number (returned)
 double	val		# Spectrum sort value (returned)
 pointer	gval		# Spectrum group value (returned)
 
-bool	strne(), is_in_range()
+bool	strne(), rng_elementi()
 pointer	ref1, ref2
 errchk	refgspec
 
@@ -241,20 +241,20 @@ define	err_	99
 begin
 	# Get spectrum from symbol table.
 	iferr (call refgspec (spec, ap, val, gval, ref1, ref2)) {
-	    call refmsgs (NO_REF, spec, ap, "", "")
+	    call refmsgs (NO_REF, spec, "", "", "", ap, 0, "")
 	    goto err_
 	}
 
 	# Check if spectrum is a reference spectrum.
 	if (strne (spec, Memc[ref1])) {
-	    call refmsgs (NOT_REFSPEC, spec, ap, "", "")
+	    call refmsgs (NOT_REFSPEC, spec, "", "", "", ap, 0, "")
 	    goto err_
 	}
 	
 	# Check aperture numbers.
 	if (raps != NULL) {
-	    if (!is_in_range (Memi[raps], ap)) {
-	        call refmsgs (BAD_REFAP, spec, ap, "", "")
+	    if (!rng_elementi (raps, ap)) {
+	        call refmsgs (BAD_REFAP, spec, "", "", "", ap, 0, "")
 	        goto err_
 	    }
 	}

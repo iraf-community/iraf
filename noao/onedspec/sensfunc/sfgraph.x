@@ -22,7 +22,10 @@ int	nextn			# Number of values in extinction table
 pointer	ecv			# Residual extinction curve.
 
 int	i, image, ngraphs, strlen()
+real	fa[8]
 pointer	sp, id, gio
+
+data	fa/0.,1.,1.,0.,0.,0.,1.,1./
 
 begin
 	# Clear the graphs, write the title, and set the viewports based on
@@ -34,8 +37,8 @@ begin
 
 	gio = GP_GIO(gp)
 	call gclear (gio)
-	call gtext (gio, 0.5, 1., Memc[id], "h=c,v=t,f=b")
-	call gtext (gio, 0.5, 0.97, GP_TITLE(gp), "h=c,v=t,f=b")
+	call gseti (gio, G_FACOLOR, 0)
+	call gseti (gio, G_NMINOR, 0)
 	ngraphs = strlen (GP_GRAPHS(gp,1))
 	switch (ngraphs) {
 	case 1:
@@ -71,8 +74,6 @@ begin
 	    GP_SZMARK(gp) = .01
 	    GP_SZMDEL(gp) = .01
 	}
-	do i = 1, ngraphs
-	    call gseti (gio, G_NMINOR, 0)
 
 	# For each graph select the viewport and call a procedure to make
 	# the graph.
@@ -80,6 +81,8 @@ begin
 	image = 0
 	for (i = 1; GP_GRAPHS(gp,i) != EOS; i = i + 1) {
 	    call gseti (gio, G_WCS, i)
+	    if (i > 1)
+		call gfill (gio, fa, fa[5], 4, GF_SOLID)
 	    switch (GP_GRAPHS(gp,i)) {
 	    case 'a', 's', 'r':
 		call sf_data (stds, nstds, GP_GRAPHS(gp,i))
@@ -100,6 +103,10 @@ begin
 	    }
 	}
 
+	call gseti (gio, G_WCS, 0)
+	call gtext (gio, 0.5, 1., Memc[id], "h=c,v=t,f=b")
+	call gtext (gio, 0.5, 0.97, GP_TITLE(gp), "h=c,v=t,f=b")
+
 	call sfree (sp)
 end
 
@@ -113,7 +120,7 @@ pointer	stds[nstds]		# Standard star data
 int	nstds			# Number of standard stars
 char	graph			# Graph type
 
-int	i, j, n, mark, mdel
+int	i, j, n, mark, mdel, cdel, color
 real	szmark, szmdel, ymin, ymax, y1, y2
 pointer	x, y, w, gio
 
@@ -156,24 +163,31 @@ begin
 
 	# Plot the data with appropriate mark types and sizes.
 	mdel = GP_MDEL(gp)
+	cdel = GP_CDEL(gp)
 	szmdel = GP_SZMDEL(gp)
 	szmark = GP_SZMARK(gp)
 	do i = 1, nstds {
 	    if (STD_FLAG(stds[i]) != SF_INCLUDE)
 		next
-	    if (i != nstds-1)
+	    if (i != nstds-1) {
 		mark = GP_MARK(gp)
-	    else
+		color = GP_CMARK(gp)
+	    } else {
 		mark = GP_MADD(gp)
+		color = GP_CADD(gp)
+	    }
 	    n = STD_NWAVES(stds[i])
 	    x = STD_X(stds[i]) - 1
 	    y = STD_Y(stds[i]) - 1
 	    w = STD_WTS(stds[i]) - 1
 	    do j = 1, n {
-		if (Memr[w+j] == 0.)
+		if (Memr[w+j] == 0.) {
+		    call gseti (gio, G_PLCOLOR, cdel)
 		    call gmark (gio, Memr[x+j], Memr[y+j], mdel, szmdel, szmdel)
-		else
+		} else {
+		    call gseti (gio, G_PLCOLOR, color)
 	            call gmark (gio, Memr[x+j], Memr[y+j], mark, szmark, szmark)
+		}
 	    }
 	}
 end
@@ -229,9 +243,11 @@ begin
 
 	# Draw the axes and title and extinction curves.
 	call glabax (gio, "Extinction vs Wavelength", "", "")
+	call gseti (gio, G_PLCOLOR, GP_PLCOLOR(gp))
 	call gvline (gio, Memr[ext], NCURVE, xmin, xmax)
 	if (ecv != NULL) {
 	    call gseti (gio, G_PLTYPE, 2)
+	    call gseti (gio, G_PLCOLOR, GP_PLCOLOR(gp)+1)
 	    call gvline (gio, Memr[extnew], NCURVE, xmin, xmax)
 	    call gseti (gio, G_PLTYPE, 1)
 	}
@@ -253,6 +269,7 @@ pointer	gio
 
 begin
 	gio = GP_GIO(gp)
+	call gseti (gio, G_PLCOLOR, GP_PLCOLOR(gp))
 
 	# Only plot on sensitivity curve graph types.
 	for (j = 1; GP_GRAPHS(gp,j) != EOS; j = j + 1) {

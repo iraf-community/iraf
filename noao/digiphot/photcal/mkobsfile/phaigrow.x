@@ -93,8 +93,9 @@ begin
 	newgraph = NO
 
 	# Print the status report.
-	call ph_aeprint (agr, IMT_IMNAME(symbol), rap[1,IMT_OFFSET(symbol)],
-	    naperts, smallap, largeap, fitok, newfit)
+	call ph_aeprint (agr, IMT_IMNAME(symbol), IMT_RO(symbol),
+	    rap[1,IMT_OFFSET(symbol)], naperts, smallap, largeap, fitok,
+	    newfit)
 
 	# Allocate the rejection array
 	call malloc (inap, ndata, TY_INT)
@@ -134,6 +135,8 @@ begin
 		newfit = NO
 		newimage = YES
 		newgraph = YES
+		isymbol = 1
+		symbol = Memi[sym+isymbol-1]
 		
 
 	    # Print out the id of a particular object
@@ -147,7 +150,7 @@ begin
 
 	    # Write the answer for the current image.
 	    case 'w':
-		call ph_aeprint (agr, IMT_IMNAME(symbol),
+		call ph_aeprint (agr, IMT_IMNAME(symbol), IMT_RO(symbol),
 		    rap[1,IMT_OFFSET(symbol)], naperts, smallap, largeap,
 		    fitok, newfit)
 
@@ -185,36 +188,41 @@ begin
 	    # Graph the resdiduals from the adopted model as a function of
 	    # aperture.
 	    case 'r':
-		if (fitok == YES && graphtype != AGR_ARESIDUALS) {
+		if (fitok == YES && ! IS_INDEFR(IMT_RO(symbol)) &&
+		    graphtype != AGR_ARESIDUALS) {
 		    graphtype = AGR_ARESIDUALS
 		    newgraph = YES
 		}
 
-	    # Graph the residuals for the adopted model as a function of
+	    # Graph the residuals from the adopted model as a function of
 	    # magnitude.
 	    case 'b':
-		if (fitok == YES && graphtype != AGR_BRESIDUALS) {
+		if (fitok == YES && ! IS_INDEFR(IMT_RO(symbol)) &&
+		    graphtype != AGR_BRESIDUALS) {
 		    graphtype = AGR_BRESIDUALS
 		    newgraph = YES
 		}
 
 	    # Graph the residuals as a fucntion of x.
 	    case 'x':
-		if (fitok == YES && graphtype != AGR_XRESIDUALS) {
+		if (fitok == YES && ! IS_INDEFR(IMT_RO(symbol)) &&
+		    graphtype != AGR_XRESIDUALS) {
 		    graphtype = AGR_XRESIDUALS
 		    newgraph = YES
 		}
 
 	    # Graph the residuals as a function of y.
 	    case 'y':
-		if (fitok == YES && graphtype != AGR_YRESIDUALS) {
+		if (fitok == YES && ! IS_INDEFR(IMT_RO(symbol)) &&
+		    graphtype != AGR_YRESIDUALS) {
 		    graphtype = AGR_YRESIDUALS
 		    newgraph = YES
 		}
 
 	    # Graph the cumulative aperture correction.
 	    case 'a':
-		if (graphtype != AGR_CUMULATIVE) {
+		if (fitok == YES && ! IS_INDEFR(IMT_RO(symbol)) &&
+		    graphtype != AGR_CUMULATIVE) {
 		    graphtype = AGR_CUMULATIVE
 		    newgraph = YES
 		}
@@ -299,7 +307,7 @@ begin
 			mag[1,IMT_OFFSET(symbol)], naperts,
 			IMT_NENTRIES(symbol), fitok)
 		}
-		call ph_aeprint (agr, IMT_IMNAME(symbol),
+		call ph_aeprint (agr, IMT_IMNAME(symbol), IMT_RO(symbol),
 		    rap[1,IMT_OFFSET(symbol)], naperts, smallap, largeap,
 		    fitok, newfit)
 		newgraph = NO
@@ -311,9 +319,13 @@ begin
 	# Fit the seeing radii and the cog model parameters.
 	if (fitok == NO) {
 	    call printf ("Error: The cog model fit did not converge\n")
-	    if (logfd != NULL)
+	    if (logfd != NULL) {
+		call ph_ishow (logfd, params, lterms)
+	        call ph_pshow (logfd, agr, lterms)
+	        call ph_rshow (logfd, imtable)
 	        call fprintf (logfd,
 		    "Error: The cog model fit did not converge\n")
+	    }
 	} else {
 	    if (newfit == YES) {
 	        call printf ("Warning: The cog model fit is out-of-date\n")
@@ -327,10 +339,9 @@ begin
 	        call ph_rshow (logfd, imtable)
 	    }
 	    call ph_aeval (imtable, agr, apcat, magfd, logfd, mgd, id, x, y,
-	        nap, rap, mag, merr, naperts, smallap, largeap)
-	    if (logfd != NULL) {
+	        Memi[inap], rap, mag, merr, naperts, smallap, largeap)
+	    if (logfd != NULL)
 		call ph_tfshow (logfd, agr, naperts)
-	    }
 	}
 
 	# Free memory required for fitting.
@@ -378,10 +389,10 @@ begin
 	dr = rmax - rmin
 	rmin = rmin - 0.1 * dr
 	rmax = rmax + 0.1 * dr
-	mmin = MAX_REAL
-	mmax = -MAX_REAL
 
 	# Compute the data window in y.
+	mmin = MAX_REAL
+	mmax = -MAX_REAL
 	do i = 1, npts {
 	    do j = 2, nap[i] {
 		if (mag[j,i] < mmin)
@@ -390,9 +401,14 @@ begin
 		    mmax = mag[j,i]
 	    }
 	}
-	dm = mmax - mmin
-	mmin = mmin - 0.1 * dm
-	mmax = mmax + 0.1 * dm
+	if (mmin > mmax) {
+	    mmin = -0.1
+	    mmax = 0.1
+	} else {
+	    dm = mmax - mmin
+	    mmin = mmin - 0.1 * dm
+	    mmax = mmax + 0.1 * dm
+	}
 
 	# Clear the screen and set the data window.
 	call gclear (gd)
@@ -406,12 +422,12 @@ begin
 	    call pargstr (image)
 	    call pargr (r0)
 	    call pargr (xairmass)
-	    if (fitok == YES)
+	    if (fitok == YES && ! IS_INDEFR(r0))
 	        call pargr (sqrt (ph_achi (Memr[AGR_WR(agr)],
 		    Memr[AGR_RESID(agr)], Memr[AGR_RESSQ(agr)], naperts)))
 	    else
 		call pargr (INDEFR)
-	if (fitok == YES) {
+	if (fitok == YES && ! IS_INDEFR(r0))  {
 	    call sprintf (Memc[title+strlen(Memc[title])],
 	        2 * SZ_LINE - strlen (Memc[title]),
 	        "\nDashed line: theoretical cog   ")
@@ -430,7 +446,7 @@ begin
 	}
 
 	# Plot the theoretical and adopt models.
-	if (fitok == YES) {
+	if (fitok == YES && ! IS_INDEFR(r0)) {
 	    call gseti (gd, G_PLTYPE, GL_DASHED)
 	    call gpline (gd, Memr[AGR_RBAR(agr)+1], Memr[AGR_THEO(agr)+1],
 		naperts - 1)
@@ -444,7 +460,7 @@ begin
 end
 
 
-# PH_GAIMRES -- Graph the residuals from the adopted model  for a particular
+# PH_GAIMRES -- Graph the residuals from the adopted model for a particular
 # image.
 
 procedure ph_gaimres (gd, agr, image, r0, xairmass, inap, nap, rap, mag,
@@ -491,9 +507,14 @@ begin
 	    if (ddmax > dmax)
 		dmax = ddmax
 	}
-	dd = dmax - dmin
-	dmin = dmin - 0.1 * dd
-	dmax = dmax + 0.1 * dd
+	if (dmin > dmax) {
+	    dmin = -0.1
+	    dmax = 0.1
+	} else {
+	    dd = dmax - dmin
+	    dmin = dmin - 0.1 * dd
+	    dmax = dmax + 0.1 * dd
+	}
 
 	call gclear (gd)
 	call gswind (gd, rmin, rmax, dmin, dmax)
@@ -520,13 +541,11 @@ begin
 		    Memr[diff+inap[i]], nap[i] - inap[i], GM_CROSS, 2.0, 2.0)
 	}
 
-	if (fitok == YES) {
-	    call gseti (gd, G_PLTYPE, GL_SOLID)
-	    call gamove (gd, rmin, 0.0)
-	    call gadraw (gd, rmax, 0.0)
-	    call gpline (gd, Memr[AGR_RBAR(agr)+1], Memr[AGR_AVE(agr)+1],
-		naperts - 1)
-	}
+	call gseti (gd, G_PLTYPE, GL_SOLID)
+	call gamove (gd, rmin, 0.0)
+	call gadraw (gd, rmax, 0.0)
+	call gpline (gd, Memr[AGR_RBAR(agr)+1], Memr[AGR_AVE(agr)+1],
+	    naperts - 1)
 
 	call gflush (gd)
 	call sfree (sp)
@@ -572,9 +591,14 @@ begin
 	    if (mag[1,i] > rmax)
 		rmax = mag[1,i]
 	}
-	dr = rmax - rmin
-	rmin = rmin - 0.1 * dr
-	rmax = rmax + 0.1 * dr
+	if (rmin > rmax) {
+	    rmin = -0.1
+	    rmax = 0.1
+	} else {
+	    dr = rmax - rmin
+	    rmin = rmin - 0.1 * dr
+	    rmax = rmax + 0.1 * dr
+	}
 
 	dmin = MAX_REAL
 	dmax = -MAX_REAL
@@ -587,9 +611,14 @@ begin
 	    if (ddmax > dmax)
 		dmax = ddmax
 	}
-	dd = dmax - dmin
-	dmin = dmin - 0.1 * dd
-	dmax = dmax + 0.1 * dd
+	if (dmin > dmax) {
+	    dmin = -0.1
+	    dmax = 0.1
+	} else {
+	    dd = dmax - dmin
+	    dmin = dmin - 0.1 * dd
+	    dmax = dmax + 0.1 * dd
+	}
 
 	call gclear (gd)
 	call gswind (gd, rmin, rmax, dmin, dmax)
@@ -615,11 +644,9 @@ begin
 	        call gmark (gd, mag[1,i], Memr[diff+j-1], GM_CROSS, 2.0, 2.0)
 	}
 
-	if (fitok == YES) {
-	    call gseti (gd, G_PLTYPE, GL_SOLID)
-	    call gamove (gd, rmin, 0.0)
-	    call gadraw (gd, rmax, 0.0)
-	}
+	call gseti (gd, G_PLTYPE, GL_SOLID)
+	call gamove (gd, rmin, 0.0)
+	call gadraw (gd, rmax, 0.0)
 
 	call gflush (gd)
 	call sfree (sp)
@@ -674,9 +701,14 @@ begin
 	    if (ddmax > dmax)
 		dmax = ddmax
 	}
-	dd = dmax - dmin
-	dmin = dmin - 0.1 * dd
-	dmax = dmax + 0.1 * dd
+	if (dmin > dmax) {
+	    dmin = -0.1
+	    dmax = 0.1
+	} else {
+	    dd = dmax - dmin
+	    dmin = dmin - 0.1 * dd
+	    dmax = dmax + 0.1 * dd
+	}
 
 	# Initialize the plot.
 	call gclear (gd)
@@ -703,11 +735,9 @@ begin
 	        call gmark (gd, x[i], Memr[diff+j-1], GM_CROSS, 2.0, 2.0)
 	}
 
-	if (fitok == YES) {
-	    call gseti (gd, G_PLTYPE, GL_SOLID)
-	    call gamove (gd, xmin, 0.0)
-	    call gadraw (gd, xmax, 0.0)
-	}
+	call gseti (gd, G_PLTYPE, GL_SOLID)
+	call gamove (gd, xmin, 0.0)
+	call gadraw (gd, xmax, 0.0)
 
 	call gflush (gd)
 	call sfree (sp)
@@ -762,9 +792,14 @@ begin
 	    if (ddmax > dmax)
 		dmax = ddmax
 	}
-	dd = dmax - dmin
-	dmin = dmin - 0.1 * dd
-	dmax = dmax + 0.1 * dd
+	if (dmin > dmax) {
+	    dmin = -0.1
+	    dmax = 0.1
+	} else {
+	    dd = dmax - dmin
+	    dmin = dmin - 0.1 * dd
+	    dmax = dmax + 0.1 * dd
+	}
 
 	# Initialize the plot.
 	call gclear (gd)
@@ -791,11 +826,9 @@ begin
 	        call gmark (gd, y[i], Memr[diff+j-1], GM_CROSS, 2.0, 2.0)
 	}
 
-	if (fitok == YES) {
-	    call gseti (gd, G_PLTYPE, GL_SOLID)
-	    call gamove (gd, ymin, 0.0)
-	    call gadraw (gd, ymax, 0.0)
-	}
+	call gseti (gd, G_PLTYPE, GL_SOLID)
+	call gamove (gd, ymin, 0.0)
+	call gadraw (gd, ymax, 0.0)
 
 	call gflush (gd)
 	call sfree (sp)
@@ -851,15 +884,13 @@ begin
 	}
 
 	# Compute the model.
-	if (fitok == YES) {
-	    call aclrr (Memr[ctheo], naperts + 1)
-	    call aclrr (Memr[cadopt], naperts + 1)
-	    call aclrr (Memr[caderr], naperts + 1)
-	    do i = largeap, 2, -1 {
-	        Memr[ctheo+i-1] = Memr[AGR_THEO(agr)+i-1] + Memr[ctheo+i]
-	        Memr[cadopt+i-1] = Memr[AGR_ADOPT(agr)+i-1] + Memr[cadopt+i]
-	        Memr[caderr+i-1] = Memr[AGR_WADO(agr)+i-1] ** 2 + Memr[caderr+i]
-	    }
+	call aclrr (Memr[ctheo], naperts + 1)
+	call aclrr (Memr[cadopt], naperts + 1)
+	call aclrr (Memr[caderr], naperts + 1)
+	do i = largeap, 2, -1 {
+	    Memr[ctheo+i-1] = Memr[AGR_THEO(agr)+i-1] + Memr[ctheo+i]
+	    Memr[cadopt+i-1] = Memr[AGR_ADOPT(agr)+i-1] + Memr[cadopt+i]
+	    Memr[caderr+i-1] = Memr[AGR_WADO(agr)+i-1] ** 2 + Memr[caderr+i]
 	}
 
 	# Set the x data window.
@@ -876,18 +907,6 @@ begin
 	    dmin = ddmin
 	if (ddmax > dmax)
 	    dmax = ddmax
-	if (fitok == NO) {
-	    call alimr (Memr[ctheo+1], naperts - 1, ddmin, ddmax)
-	    if (ddmin < dmin)
-	        dmin = ddmin
-	    if (ddmax > dmax)
-	        dmax = ddmax
-	    call alimr (Memr[cadopt+1], naperts - 1, ddmin, ddmax)
-	    if (ddmin < dmin)
-	        dmin = ddmin
-	    if (ddmax > dmax)
-	        dmax = ddmax
-	}
 	dd = dmax - dmin
 	dmin = dmin - 0.1 * dd
 	dmax = dmax + 0.1 * dd
@@ -902,17 +921,12 @@ begin
 	    call pargstr (image)
 	    call pargr (r0)
 	    call pargr (xairmass)
-	    if (fitok == YES)
-	        call pargr (sqrt (ph_achi (Memr[AGR_WR(agr)],
-		    Memr[AGR_RESID(agr)], Memr[AGR_RESSQ(agr)], naperts)))
-	    else
-		call pargr (INDEFR)
-	if (fitok == YES) {
-	    call sprintf (Memc[title+strlen(Memc[title])], 2 * SZ_LINE -
-	        strlen (Memc[title]), "\nDashed line: theoretical apcor  ")
-	    call sprintf (Memc[title+strlen(Memc[title])], 2 * SZ_LINE -
-	        strlen (Memc[title]), "Solid line: adopted apcor")
-	}
+	    call pargr (sqrt (ph_achi (Memr[AGR_WR(agr)], Memr[AGR_RESID(agr)],
+	        Memr[AGR_RESSQ(agr)], naperts)))
+	call sprintf (Memc[title+strlen(Memc[title])], 2 * SZ_LINE -
+	    strlen (Memc[title]), "\nDashed line: theoretical apcor  ")
+	call sprintf (Memc[title+strlen(Memc[title])], 2 * SZ_LINE -
+	    strlen (Memc[title]), "Solid line: adopted apcor")
 	call glabax (gd, Memc[title], "Aperture Radius", "Aperture Correction")
 
 	# Draw the data.
@@ -953,12 +967,10 @@ begin
 	}
 
 	# Draw the model.
-	if (fitok == YES) {
-	    call gseti (gd, G_PLTYPE, GL_DASHED)
-	    call gpline (gd, rap, Memr[ctheo+1], naperts)
-	    call gseti (gd, G_PLTYPE, GL_SOLID)
-	    call gpline (gd, rap, Memr[cadopt+1], naperts)
-	}
+	call gseti (gd, G_PLTYPE, GL_DASHED)
+	call gpline (gd, rap, Memr[ctheo+1], naperts)
+	call gseti (gd, G_PLTYPE, GL_SOLID)
+	call gpline (gd, rap, Memr[cadopt+1], naperts)
 
 	call gflush (gd)
 	call sfree (sp)
@@ -1357,11 +1369,12 @@ end
 
 # PH_AEPRINT -- Print the appropriate error message under the plot.
 
-procedure ph_aeprint (agr, image, rap, naperts, smallap, largeap, fitok,
+procedure ph_aeprint (agr, image, r0, rap, naperts, smallap, largeap, fitok,
 	newfit)
 
 pointer	agr		# pointer to the fitting structure
 char	image[ARB]	# the image name
+real	r0		# the seing rdius
 real	rap[ARB]	# the lists of aperture radii
 int	naperts		# the number of aperture radii
 int	smallap		# the index of the small aperture radius
@@ -1374,8 +1387,11 @@ begin
 	    call printf ("Error: The cog model fit did not converge\n")
 	} else if (newfit == YES) {
 	    call printf ("Warning: The cog model fit is out-of-date\n")
+	} else if (IS_INDEFR(r0)) {
+	    call printf ("Warning: Unable to fit RO for image %s\n")
+		call pargstr (image)
 	} else {
-	    call ph_papcor (STDOUT, image, rap, Memr[AGR_ADOPT(agr)],
+	    call ph_papcor (STDOUT, image, r0, rap, Memr[AGR_ADOPT(agr)],
 	        Memr[AGR_WADO(agr)], naperts, smallap, largeap)
 	}
 end

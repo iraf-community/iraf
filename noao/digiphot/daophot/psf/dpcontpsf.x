@@ -1,11 +1,3 @@
-define	DUMMY		6
-define	XCEN	        0.5
-define	YCEN		0.52
-define	EDGE1		0.1
-define	EDGE2		0.93
-define	SZ_LABEL	10
-define	SZ_FMT		20
-
 include	<error.h>
 include	<mach.h>
 include	<gset.h>
@@ -15,8 +7,17 @@ include	<fset.h>
 include "../lib/daophotdef.h"
 include "../lib/psfdef.h"
 
-# DP_CONTPSF -- Produce a contour plot a subrasteer containing a prospective
-# PSF star or PSF star minus the fitted Gaussian.
+define	DUMMY		6
+define	XCEN	        0.5
+define	YCEN		0.52
+define	EDGE1		0.1
+define	EDGE2		0.93
+define	SZ_LABEL	10
+define	SZ_FMT		20
+
+# DP_CONTPSF -- Draw a contour plot of a data subraster containing. The
+# data floor and ceiling are set by the user, but the contour interval
+# is chosen by the routine.
 
 procedure dp_contpsf (dao, subras, ncols, nlines, title, gp)
 
@@ -30,7 +31,7 @@ bool	perimeter
 char	system_id[SZ_LINE], label[SZ_LINE]
 int	epa, status, old_onint, tcojmp[LEN_JUMPBUF]
 int	wkid, nset, ncontours, dashpat, nhi
-pointer	sp, temp, psf, psfpl
+pointer	sp, temp, psf
 real	interval, floor, ceiling, zero, finc, ybot
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 real	first_col, last_col, first_row, last_row
@@ -49,17 +50,18 @@ common  /conre4/ isizel, isizem , isizep, nrep, ncrt, ilab, nulbll,
 common  /noaolb/ hold
 
 begin
+	# Get the pointer to the DAOPHOT PSF fitting substructure.
+	psf = DP_PSF (dao)
+
 	# First of all, intialize conrec's block data before altering any
 	# parameters in common.
 	first = 1
 	call conbd
 
 	# Set local variables.
-	psf = DP_PSF (dao)
-	psfpl = DP_PSFPLOT (psf)
 	zero	= 0.0
-	floor	= DP_CFLOOR (psfpl)
-	ceiling	= DP_CCEIL (psfpl)
+	floor	= DP_CFLOOR (psf)
+	ceiling	= DP_CCEILING (psf)
 	nhi	= -1
 	dashpat	= 528
 
@@ -91,7 +93,7 @@ begin
 	} else
 	    finc = - abs (ncontours)
 
-	# Make a copy of the image and contour this
+	# Make a copy of the data and do the contouring on this.
 	call smark (sp)
 	call salloc (temp, ncols * nlines, TY_REAL)
 	call amovr (subras, Memr[temp], nlines * ncols)

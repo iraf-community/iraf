@@ -33,7 +33,7 @@ int	isimage, npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, hist_type
 pointer im, tx, sp, hgm, hgmr, buf, input, str, v
 real	z1, z2, dz, z1temp, z2temp, zstart
 
-bool	clgetb(), fp_equalr()
+bool	streq(), clgetb(), fp_equalr()
 int	clgeti(), clgwrd(), open(), ph_gdata(), imgnlr(), imgnli()
 pointer	immap()
 real	clgetr()
@@ -47,16 +47,22 @@ begin
 
 	# Get the image name.
 	call clgstr ("input", Memc[input], SZ_LINE)
-	iferr {
-	    im = immap (Memc[input], READ_ONLY, 0)
-	} then {
+	if (streq (Memc[input], "STDIN")) {
 	    isimage = NO
 	    tx = open (Memc[input], READ_ONLY, TEXT_FILE)
 	    npix = ph_gdata (tx, buf, SZ_HISTBUF)
 	} else {
-	    isimage = YES
-	    npix = IM_LEN(im,1)
-	    call amovkl (long(1), Meml[v], IM_MAXDIM)
+	    iferr {
+	        im = immap (Memc[input], READ_ONLY, 0)
+	    } then {
+	        isimage = NO
+	        tx = open (Memc[input], READ_ONLY, TEXT_FILE)
+	        npix = ph_gdata (tx, buf, SZ_HISTBUF)
+	    } else {
+	        isimage = YES
+	        npix = IM_LEN(im,1)
+	        call amovkl (long(1), Meml[v], IM_MAXDIM)
+	    }
 	}
 
 	# Get histogram range.
@@ -82,12 +88,14 @@ begin
 	    dz = z1;  z1 = z2;  z2 = dz
 	}
 
-	# Get default histogram resolution.
+	# Get the default histogram resolution.
 	dz = clgetr ("binwidth")
 	if (IS_INDEFR(dz)) {
 	    nbins = clgeti ("nbins")
 	} else {
 	    nbins = nint ((z2 - z1) / dz)
+	    if ((z1 + nbins * dz) < z2)
+		nbins = nbins + 1
 	    z2 = z1 + nbins * dz
 	}
 	z1i = nint (z1)

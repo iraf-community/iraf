@@ -48,14 +48,8 @@ begin
 
 	if (interactive == YES) {
 	    gp = gopen (device, NEW_FILE, STDGRAPH)
-
-	    call gt_setr (gt, GTXMIN, real (xmin))
-	    call gt_setr (gt, GTXMAX, real (xmax))
-	     
 	    call icg_fitr (ic, gp, "cursor", gt, cv, x, y, wts, nvalues)
-
 	    call gclose (gp)
-
 	} else 
 	    # Do fit non-interactively
 	    call ic_fitr (ic, cv, x, y, wts, nvalues, YES, YES, YES, YES)
@@ -245,14 +239,8 @@ begin
 
 	if (interactive == YES) {
 	    gp = gopen (device, NEW_FILE, STDGRAPH)
-
-	    call gt_setr (gt, GTXMIN, real (xmin))
-	    call gt_setr (gt, GTXMAX, real (xmax))
-	     
 	    call icg_fitd (ic, gp, "cursor", gt, cv, x, y, wts, nvalues)
-
 	    call gclose (gp)
-
 	} else 
 	    # Do fit non-interactively
 	    call ic_fitd (ic, cv, x, y, wts, nvalues, YES, YES, YES, YES)

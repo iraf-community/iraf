@@ -23,7 +23,7 @@ begin
 	    print ("generating new quick-reference file " // fname // "...")
 	    if (access (fname))
 		delete (fname, verify-)
-	    help ("[a-z]*.") |& match ("-") | sort(ignore+) | uniq ( > fname)
+	    help ("[a-z]*.") |& match ("-") | sort(ignore+) | unique ( > fname)
 	    references.quickref = fname
 	    references.usequick = yes
 
@@ -40,7 +40,7 @@ begin
 		match (pattern, quick)
 	    else {
 		print ("searching the help database...")
-		help ("[a-z]*.") |& match ("-") | sort(ignore+) | uniq |
+		help ("[a-z]*.") |& match ("-") | sort(ignore+) | unique |
 		    match (pattern)
 	    }
 	}

@@ -1,71 +1,35 @@
 include <mach.h>
 include	<imhdr.h>
-include "../lib/daophot.h"
 include "../lib/daophotdef.h"
+include "../lib/apseldef.h"
 include "../lib/nstardef.h"
-include "../lib/apsel.h"
-
-define	CUT_FACTOR	   0.999998    # the pixel cutoff radius in fitrad ** 2
-define	PEAK_ERR_NUMB	   0.027       # amplitude of flat/bias error
-define	MINSEP		   2.773       # min separation in gsigma for merging
-define	NITER_MAX	   12          # iteration limit for difficult stars
-define	NITER_MED	   8           # iteration limit for moderate stars
-define	NITER_MIN	   4	       # iteration limit for easy stars
-define	WCRIT_INIT	   400.0       # initial max value of N/S squared
-define	WCRIT_MAX	   0.25	       # max N/S squared for difficult stars
-define	WCRIT_MED	   0.4444444   # max N/S squared for moderate stars 
-define	WCRIT_MIN	   1.0         # max N/S squared for easy stars
-define	INTERP_ERR	   0.0075      # amplitude of interp error
-define	FRACTION_MINSEP    0.14	       # min sep in MINSEP*gsigma for merging
-define	NCORE_SIGMASQ	   36.0	       # max gsigma-sq for sharpness
-define	MAX_NSIGMA	   20.0        # max relative error in chi
-define 	MIN_NPIX	   4	       # min pixels per star for fit
-define	CHI_NORM	   1.2533      # sqrt (PI / 2.0)
-define	MIN_SUMWT	   3.0	       # min value for radial weight sum
-define	MAX_NEW_ERRMAG	   0.05        # 1st convergence check on magnitude
-define	MAX_NEW_RELBRIGHT  0.001       # 2nd convergence check on magnitude
-define	MAX_PIXERR	   0.01        # 1st convergence check on x/y positions
-define	MAX_CENTROIDERR	   0.1         # 2nd convergence check on x/y positions
-define	SIGN_CHECK	   -1.0e-37    # check for change of sign
-define	MAX_DELTA_FAINTER  0.84        # max permitted brightness decrease
-define	MAX_DELTA_BRIGHTER 5.25        # max permitted brightness increase
-define	MAX_DELTA_PIX	   0.4         # max +/- change in x/y positions
-define	MAX_PIX_INCREMENT  0.001       # test for nearness to edge of image
-define	MIN_REL_BRIGHT	   1.0e-5      # min relative brightness
-define	MIN_ITER	   4           # min number of iterations
-define	MIN_FAINT	   0.25        # min N/S
 
 
+# DP_NSTARFIT -- Fit the stellar group.
 
-# DP_NSTARFIT -- Do most of the actual work for the fiting proceduree of 
-# NSTAR
-
-int procedure dp_nstarfit (dao, im, nin_group, mean_sky, cdimen, chiold,
-	clip, converge, iter)
+int procedure dp_nstarfit (dao, im, nin_group, mean_sky, cdimen, iter,
+	converge)
 
 pointer	dao			# pointer to the daophot structure
 pointer im			# pointer to the input image
 int	nin_group		# original group size
 real	mean_sky		# the mean sky for the group
 int	cdimen			# dimensions of the coefficient matrix
-real	chiold			# old chi square
-bool	clip			# clip the fit?
-bool	converge		# did the fit converge
 int	iter			# the current iteration
+bool	converge		# did the fit converge ?
 
-bool 	refit
-int	i, j, k, xpix, ypix, group_size, nterm, tifaint, ifaint, flag, ncols
-int	ixmin, ixmax, iymin, iymax, ifxmin, ifxmax, ifymin, ifymax, mindex
-pointer	psffit, nstar, subim, ypixel, pixel, apsel
+bool 	clip, refit
+int	i, j, k, xpix, ypix, group_size, nterm, ncols, mindex, ifaint, tifaint
+int	ntmin, ixmin, ixmax, iymin, iymax, ifxmin, ifxmax, ifymin, ifymax, flag
+pointer	apsel, psffit, nstar, subim, ypixel, pixel
+real	fitradsq, cutoff, psfradsq, sepcrit, sepmin, perr, peakerr, sky_value
+real	read_noise, mingdata, maxgdata, chigrp, wcrit, xmin, xmax, ymin, ymax
+real	datum, sumres, grpwt, xtemp, ytemp, weight, ds, pred_pixval, sigmasq
+real	relerr, dswt, faint, tfaint, noise
 
-real	mingdata, maxgdata, peakerr, minsep, fitradsq, psfradsq, cutoff
-real	xmin, xmax, ymin, ymax,	datum, ds, dswt, read_noise
-real	weight, sumres, grpwt, pred_pixval, relerr, sigma, sigmasq, faint
-real	tfaint, wcrit, xtemp, ytemp
-
-bool	dp_nstmerge(), dp_ntomit(), dp_ntmin()
+bool	dp_nstmerge(), dp_ntomit(), dp_ntmin(), dp_ncheckc()
 pointer imgs2r()
-real	dp_ntsubtract()
+real	dp_ntskyval(), dp_ntsubtract()
 
 begin
 	# Define the daophot pointers.
@@ -76,25 +40,67 @@ begin
 	# Set up some daophot constants. At some point these will be computed
 	# when the NSTAR task is started up instead of at the beginning of
 	# each group fit. For the moment it is convenient and not too
-	# costly to compute them here.
+	# costly to compute them here. Also initialize the fit.
 
-	fitradsq = DP_FITRAD (dao) ** 2
-	psfradsq = DP_PSFRAD(dao) ** 2
-	cutoff = CUT_FACTOR * fitradsq
+	if (iter == 1) {
+
+	    # Compute the fitting and psf radii.
+	    fitradsq = DP_FITRAD (dao) ** 2
+	    psfradsq = DP_PSFRAD(dao) ** 2
+	    cutoff = CUT_FACTOR * fitradsq
+
+	    # Compute the merging parameters.
+	    if (IS_INDEFR(DP_MERGERAD(dao))) {
+	        sepcrit = 2.0 * (Memr[DP_PSFPARS(psffit)] ** 2 +
+	            Memr[DP_PSFPARS(psffit)+1] ** 2)
+	        sepmin = min (1.0, FRACTION_MINSEP * sepcrit)
+	    } else {
+		sepcrit = DP_MERGERAD(dao) ** 2
+	        sepmin = min (1.0, FRACTION_MINSEP * sepcrit)
+	    }
+
+	    # Compute the noise parameters.
+	    read_noise = (DP_READNOISE(dao) / DP_PHOTADU(dao)) ** 2
+	    perr = 0.01 * DP_FLATERR(dao)
+	    peakerr = 0.01 * DP_PROFERR(dao) / (Memr[DP_PSFPARS(psffit)] *
+	        Memr[DP_PSFPARS(psffit)+1])
+
+	    # Compute the minimum and maximum good pixel values.
+	    if (IS_INDEFR(DP_MINGDATA(dao)))
+	        mingdata = -MAX_REAL
+	    else
+	        mingdata = DP_MINGDATA(dao)
+	    if (IS_INDEFR(DP_MAXGDATA(dao)))
+	        maxgdata = MAX_REAL
+	    else
+	        maxgdata = DP_MAXGDATA(dao)
+
+	    # Initialize the fit.
+	    chigrp = 1.0
+	    clip = false
+	    if (DP_RECENTER(dao) == YES) {
+	        nterm = 3 * nin_group
+		ntmin = 3
+	    } else {
+	        nterm = nin_group
+		ntmin = 1
+	    }
+	    if (DP_FITSKY(dao) == YES) {
+		nterm = nterm + 1
+		ntmin = ntmin + 1
+	    }
+	    call aclrr (Memr[DP_NXOLD(nstar)], nterm) 
+	    call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
+	}
+
+	# Start a new iteration.
 	group_size = nin_group
-	nterm = 3 * group_size
-	peakerr = PEAK_ERR_NUMB / (DP_PSFSIGX(psffit) *
-	    DP_PSFSIGY(psffit)) ** 2
-	read_noise = (DP_READ_NOISE(dao) / DP_PHOT_ADC(dao)) ** 2
-	minsep = MINSEP * (DP_PSFSIGX(psffit) ** 2 + DP_PSFSIGY(psffit) ** 2)
-	if (IS_INDEFR(DP_MINGDATA(dao)))
-	    mingdata = -MAX_REAL
+	if (DP_RECENTER(dao) == YES)
+	    nterm = 3 * group_size
 	else
-	    mingdata = DP_MINGDATA(dao)
-	if (IS_INDEFR(DP_MAXGDATA(dao)))
-	    maxgdata = MAX_REAL
-	else
-	    maxgdata = DP_MAXGDATA(dao)
+	    nterm = group_size
+	if (DP_FITSKY(dao) == YES)
+	    nterm = nterm + 1
 
 	# Begin fitting the current group of stars.
 	repeat {
@@ -102,67 +108,80 @@ begin
 	    # Initialize the convergence criteria.
 	    converge = false
 
-	    # Check to see if any two stars have merged. 
-	    if (group_size < 1) {
+	    # Check that there is at least 1 star in the group.
+	    if (group_size < 1)
 	        return (group_size)
 
-	    } else {
+	    # Set up the critical error for star rejection.
+	    if (iter >= NITER_MAX)
+	        wcrit = WCRIT_MAX
+	    else if (iter >= NITER_MED)
+	        wcrit = WCRIT_MED
+	    else if (iter >= NITER_MIN)
+	        wcrit = WCRIT_MIN
+	    else
+	        wcrit = MAX_REAL
 
-	        # Set up the critical magnitude S/N ratio for star rejection.
-	        if (iter >= NITER_MAX)
-	            wcrit = WCRIT_MAX
-	        else if (iter >= NITER_MED)
-	            wcrit = WCRIT_MED
-	        else if (iter >= NITER_MIN)
-	            wcrit = WCRIT_MIN
-	        else
-	            wcrit = WCRIT_INIT
+	    # Set the sky fitting derivative.
+	    if (DP_FITSKY(dao) == YES)
+	        Memr[DP_NX(nstar)+nterm-1] = -1.0
 
-	        # Initialize arrays.
-	        call aclrr (Memr[DP_APCHI(apsel)], group_size)
-	        call aclrr (Memr[DP_SUMWT(nstar)], group_size)
-	        call aclrr (Memr[DP_NUMER(nstar)], group_size)
-	        call aclrr (Memr[DP_DENOM(nstar)], group_size)
-	        call alimr (Memr[DP_APXCEN(apsel)], group_size, xmin, xmax) 
-	        call alimr (Memr[DP_APYCEN(apsel)], group_size, ymin, ymax) 
+	    # Initialize arrays.
+	    call aclrr (Memr[DP_APCHI(apsel)], group_size)
+	    call aclrr (Memr[DP_NSUMWT(nstar)], group_size)
+	    call aclrr (Memr[DP_NNUMER(nstar)], group_size)
+	    call aclrr (Memr[DP_NDENOM(nstar)], group_size)
+	    call amovki (NSTERR_OK, Memi[DP_NIER(nstar)], group_size)
 
-		# Check to see whether any two stars are within the critical
-		# difference from each other.
+	    # Compute the minimum and maximum x and y values.
+	    call alimr (Memr[DP_APXCEN(apsel)], group_size, xmin, xmax) 
+	    call alimr (Memr[DP_APYCEN(apsel)], group_size, ymin, ymax) 
 
-	        if ((group_size > 1) && dp_nstmerge (Memr[DP_APXCEN(apsel)],
-		    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-		    Memr[DP_APERR(apsel)], group_size, minsep, wcrit,
-		    i, j, k)) {
+	    # Check to see whether any two stars are within the critical
+	    # difference from each other.
 
-		    # Compute the new centroid and brightness.
-		    call dp_nstcen (Memr[DP_APXCEN(apsel)],
-		        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)], i, j, k)
+	    if ((group_size > 1) && dp_nstmerge (Memr[DP_APXCEN(apsel)],
+		Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
+		Memr[DP_APERR(apsel)], group_size, sepcrit, sepmin, wcrit,
+		i, j, k)) {
 
-		    # Print out verbose comments.
-		    if (DP_VERBOSE (dao) == YES)  {
-		        call printf (
-			    "\tStar %-5d has merged with star %-5d\n")
-		            call pargi (Memi[DP_APID(apsel)+k-1])
-		            call pargi (Memi[DP_APID(apsel)+i-1])
-		    }
+		# Compute the new centroid and brightness.
+		call dp_nstcen (Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+		    Memr[DP_APMAG(apsel)], i, j, k)
 
-		    # Now remove the k-th star from the group.
-		    call dp_remove (k, group_size, Memi[DP_APID(apsel)],
-		        Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
-		        Memr[DP_APMAG(apsel)], Memr[DP_APMSKY(apsel)])
+		# Print out verbose comments.
+		if (DP_VERBOSE (dao) == YES)  {
+		    call printf ("\tStar %-5d has merged with star %-5d\n")
+		        call pargi (Memi[DP_APID(apsel)+k-1])
+		        call pargi (Memi[DP_APID(apsel)+i-1])
+		}
 
-		    # After deleting a star, resize the matrix, release all of
-		    # the clamps and back up the iteration counter.
+		# Recompute the mean sky.
+		if ((DP_FITSKY(dao) == NO) && (DP_GROUPSKY(dao) == YES))
+		    mean_sky = (mean_sky * group_size -
+		        Memr[DP_APMSKY(apsel)+k-1]) / (group_size - 1)
 
+		# Now remove the k-th star from the group.
+		call dp_remove (k, group_size, Memi[DP_APID(apsel)],
+		    Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+		    Memr[DP_APMAG(apsel)], Memr[DP_APMSKY(apsel)],
+		    Memi[DP_NIER(nstar)], NSTERR_MERGE)
+
+		# After deleting a star, resize the matrix, release all of
+		# the clamps and back up the iteration counter.
+
+		if (DP_RECENTER(dao) == YES)
 		    nterm = 3 * group_size
-		    clip = false
-		    call aclrr (Memr[DP_XOLD(nstar)], nterm)
-		    call amovkr (1.0, Memr[DP_XCLAMP(nstar)], nterm)
-		    iter = max (1, iter - 1)
-		    next
-	        }
-
-	    }	   		
+		else
+		    nterm = group_size
+		if (DP_FITSKY(dao) == YES)
+		    nterm = nterm + 1
+		clip = false
+		call aclrr (Memr[DP_NXOLD(nstar)], nterm)
+		call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
+		iter = max (1, iter - 1)
+		next
+	    }
 
 	    # Now we can proceed with the iteration. If this is the first
 	    # iteration read in the subraster. Determine the size of the
@@ -191,9 +210,9 @@ begin
 
 	    # Zero the normal matrix and the vector of residuals.
 
-	    call aclrr (Memr[DP_V(nstar)], nterm)
-	    call aclrr (Memr[DP_C(nstar)], cdimen * cdimen)
-	    call aclri (Memi[DP_NPIX(nstar)], group_size)
+	    call aclrr (Memr[DP_NV(nstar)], nterm)
+	    call aclrr (Memr[DP_NC(nstar)], cdimen * cdimen)
+	    call aclri (Memi[DP_NNPIX(nstar)], group_size)
 
 	    sumres = 0.0
 	    grpwt = 0.0
@@ -224,13 +243,22 @@ begin
 		    # of pixels within one fitting radius of each star.
 
 		    if (dp_ntomit (Memr[DP_APXCEN(apsel)],
-		        Memr[DP_APYCEN(apsel)], Memr[DP_RPIXSQ(nstar)],
-			Memi[DP_SKIP(nstar)], Memi[DP_NPIX(nstar)],
-			group_size, xtemp, ytemp, cutoff))
+		        Memr[DP_APYCEN(apsel)], Memr[DP_NRPIXSQ(nstar)],
+			Memi[DP_NSKIP(nstar)], group_size, xtemp, ytemp,
+			cutoff))
 		        next
 
+		    if ((DP_FITSKY(dao) == NO) && (DP_GROUPSKY(dao) == NO)) {
+			sky_value = dp_ntskyval (Memr[DP_APMSKY(apsel)],
+			    Memi[DP_NSKIP(nstar)], group_size)
+			if (IS_INDEFR(sky_value))
+			    sky_value = mean_sky
+		    } else
+			sky_value = mean_sky
+
 		    # Subtract the mean sky from the pixel.
-		    ds = datum - mean_sky
+		    #ds = datum - mean_sky
+		    ds = datum - sky_value
 
 		    # Now loop over the stars and subtract from this pixel
 		    # the light contribution from each star within one psf
@@ -268,11 +296,11 @@ begin
 		    # just sensible weighting. Three is a crude attempt
 		    # at making the solution more robust against bad pixels.
 
-		    weight = dp_ntsubtract (psffit, Memr[DP_APXCEN(apsel)],
-		        Memr[DP_APYCEN(apsel)], Memr[DP_RPIXSQ(nstar)],
-		        Memr[DP_APMAG(apsel)], Memi[DP_SKIP(nstar)],
-		        Memr[DP_X(nstar)], group_size, xtemp, ytemp, ds,
-			DP_VARPSF(dao), psfradsq, fitradsq)
+		    weight = dp_ntsubtract (dao, Memr[DP_APXCEN(apsel)],
+		        Memr[DP_APYCEN(apsel)], Memr[DP_NRPIXSQ(nstar)],
+		        Memr[DP_APMAG(apsel)], Memi[DP_NSKIP(nstar)],
+		        Memr[DP_NX(nstar)], group_size, xtemp, ytemp, ds,
+			psfradsq, fitradsq, DP_RECENTER(dao))
 
 		    # At this point the vector X contains the first
 		    # derivative of the condition equation, for the pixel
@@ -304,30 +332,22 @@ begin
 		    # this point.
 
 		    pred_pixval = max (0.0, datum - ds)
-		    sigmasq = pred_pixval / DP_PHOT_ADC (dao) + read_noise + 
-		        (INTERP_ERR * pred_pixval) ** 2 + (peakerr *
-		        (pred_pixval - mean_sky)) ** 2
+		    if ((pred_pixval > maxgdata) && (iter >= 4))
+			next
+
+		    #sigmasq = pred_pixval / DP_PHOTADU (dao) + read_noise + 
+		        #(perr * pred_pixval) ** 2 + (peakerr *
+		        #(pred_pixval - mean_sky)) ** 2
+		    sigmasq = pred_pixval / DP_PHOTADU (dao) + read_noise + 
+		        (perr * pred_pixval) ** 2 + (peakerr *
+		        (pred_pixval - sky_value)) ** 2
 		    relerr = abs (ds) / sqrt (sigmasq)
-
-		    # If this pixel has a MAX_NSIGMA error then reject it out of
-		    # hand if clipping is enabled.
-
-		    if (clip && (relerr > (MAX_NSIGMA * chiold)))
-		        next
 
 		    # Add this residual into the weighted sum of the
 		    # absolute relative residuals.
 
 		    sumres = sumres + relerr * weight
 		    grpwt = grpwt + weight
-
-		    # The following value is the model predicted value of the
-		    # intensity at this point.
-
-		    pred_pixval = max (0.0, datum - mean_sky) + mean_sky
-		    sigma = pred_pixval / DP_PHOT_ADC (dao) + read_noise +
-		        (INTERP_ERR * pred_pixval) ** 2 + (peakerr *
-		        (pred_pixval - mean_sky)) ** 2
 
 		    # Add into the accumulating sums of the weighted 
 		    # absolute relative residuals and of the image sharpness
@@ -339,11 +359,12 @@ begin
 		    # million to the index.
 
 		    call dp_acsharp (Memr[DP_APXCEN(apsel)],
-		        Memr[DP_APYCEN(apsel)], Memi[DP_SKIP(nstar)],
-			Memr[DP_NUMER(nstar)], Memr[DP_DENOM(nstar)],
-			Memr[DP_SUMWT(nstar)], Memr[DP_APCHI(apsel)],
-			group_size, xtemp, ytemp, DP_PSFSIGX(psffit),
-			DP_PSFSIGY(psffit), ds, sigma, relerr, weight)
+		        Memr[DP_APYCEN(apsel)], Memi[DP_NSKIP(nstar)],
+			Memi[DP_NNPIX(nstar)], Memr[DP_NNUMER(nstar)],
+			Memr[DP_NDENOM(nstar)], Memr[DP_NSUMWT(nstar)],
+			Memr[DP_APCHI(apsel)], group_size, xtemp, ytemp,
+			Memr[DP_PSFPARS(psffit)], Memr[DP_PSFPARS(psffit)+1],
+			ds, sigmasq, relerr, weight)
 
 		    # If clipping is in effect, reduce the weight of a bad
 		    # pixel. A pixel having a residual of 2.5 sigma gets
@@ -352,13 +373,15 @@ begin
 
 		    weight = weight / sigmasq
 		    if (clip) 
-		        weight = weight / (1.0 + (0.4 * relerr / chiold) ** 8)
+		        weight = weight / (1.0 + (relerr / (DP_CLIPRANGE(dao) *
+			    chigrp)) ** DP_CLIPEXP(dao))
 		    dswt = ds * weight
 
 		    # Work this pixel into the normal matrix.
-		    call dp_mataccum (Memr[DP_X(nstar)], Memr[DP_C(nstar)],
-		        cdimen, Memr[DP_V(nstar)],  Memi[DP_SKIP(nstar)],
-		        group_size, weight, dswt)
+		    call dp_mataccum (Memr[DP_NX(nstar)], Memi[DP_NSKIP(nstar)],
+		        group_size, Memr[DP_NC(nstar)], Memr[DP_NV(nstar)],
+			cdimen, nterm, weight, dswt, DP_RECENTER(dao),
+			DP_FITSKY(dao))
 
 	        }
 
@@ -370,15 +393,16 @@ begin
 
 	    refit = dp_ntmin (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-	        Memr[DP_APMSKY(apsel)], Memi[DP_NPIX(nstar)], group_size,
-	        nterm, DP_VERBOSE(dao))
+	        Memr[DP_APMSKY(apsel)], Memi[DP_NNPIX(nstar)],
+		Memi[DP_NIER(nstar)], group_size, nterm, DP_RECENTER(dao),
+		DP_FITSKY(dao), DP_GROUPSKY(dao), mean_sky, DP_VERBOSE(dao))
 	    if (group_size < 1)
 	        return (group_size)
 	    if (refit)
 	        next
 
 	    # Reflect the normal matrix across the diagonal.
-	    call dp_mreflect (Memr[DP_C(nstar)], cdimen, nterm)
+	    call dp_mreflect (Memr[DP_NC(nstar)], cdimen, nterm)
 
 	    # Compute the robust estimate of the standard deviation of the
 	    # residuals for the group as a whole, and for each star. This
@@ -400,10 +424,10 @@ begin
 	    # toward unity. So, just take the weighted average of CHIOLD and 
 	    # unity, with weights GRPWT - 3 and 1, respectively.
 
-	    if (grpwt > MIN_SUMWT) {
-	        chiold = CHI_NORM * sumres * sqrt (1.0 / (grpwt * (grpwt -
-	            MIN_SUMWT)))
-	        chiold = ((grpwt - MIN_SUMWT) * chiold + MIN_SUMWT) / grpwt
+	    if (grpwt > ntmin) {
+	        chigrp = CHI_NORM * sumres * sqrt (1.0 / (grpwt * (grpwt -
+	            ntmin)))
+	        chigrp = ((grpwt - ntmin) * chigrp + ntmin) / grpwt
 	    }
 
 	    # CHIOLD has been pulled toward its expected value of unity to
@@ -413,21 +437,44 @@ begin
 	    # now. Later on, if the number of stars in the group is 
 	    # greated than one, CHI will be nudged toward the group average.
 	    # In order to work optimally, of course, this requires that	
-	    # the # of photons / ADC, the READ NOISE and the other noise
+	    # the # of photons / ADU, the READNOISE and the other noise
 	    # contributors are properly specified.
 
-	    call dp_ntchi (Memr[DP_SUMWT(nstar)], Memr[DP_APCHI(apsel)],
-	        group_size, chiold)
+	    call dp_ntchi (Memr[DP_NSUMWT(nstar)], Memr[DP_APCHI(apsel)],
+	        group_size, ntmin, chigrp, grpwt)
 
-	    # Invert the matrix and solve.
-	    call invers (Memr[DP_C(nstar)], cdimen, nterm, flag)
-	    call mvmul (Memr[DP_C(nstar)], cdimen, nterm, Memr[DP_V(nstar)],
-	        Memr[DP_X(nstar)])
+	    # Invert the matrix.
+	    call invers (Memr[DP_NC(nstar)], cdimen, nterm, flag)
+
+	    # Check for a singular matrix.
+	    refit = dp_ncheckc (Memr[DP_NC(nstar)], cdimen, nterm,
+		Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
+		Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
+		Memr[DP_APMSKY(apsel)], Memi[DP_NIER(nstar)], group_size,
+		DP_RECENTER(dao), DP_FITSKY(dao), DP_GROUPSKY(dao), mean_sky,
+		DP_VERBOSE(dao)) 
+	    if (group_size < 1)
+	        return (group_size)
+	    if (refit)
+	        next
+
+	    # Solve for position and scale factor increments.
+	    call mvmul (Memr[DP_NC(nstar)], cdimen, nterm, Memr[DP_NV(nstar)],
+	        Memr[DP_NX(nstar)])
 
 	    if (iter <= 1)
 	        refit = true
 	    else
 	        refit = false
+
+	    # Fit the sky.
+	    if (DP_FITSKY(dao) == YES) {
+	        noise = sqrt (abs (mean_sky / DP_PHOTADU(dao)) + read_noise)
+	        mean_sky = mean_sky - max (-3.0 * noise,
+		    min (Memr[DP_NX(nstar)+nterm-1], 3.0 * noise))
+		if (abs (Memr[DP_NX(nstar)+nterm-1]) > (1.0e-4 * mean_sky))
+		    refit = true
+	    }
 
 	    # In the beginning, the brightness of each star will be permitted
 	    # to change by no more than 2 magnitudes per iteration, and the x,y
@@ -439,12 +486,9 @@ begin
 
 	    call dp_ntclamp (Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
 	        Memr[DP_APMAG(apsel)], Memr[DP_APERR(apsel)],
-	        Memr[DP_APSHARP(apsel)], Memr[DP_APCHI(apsel)],
-	        Memr[DP_NUMER(nstar)], Memr[DP_DENOM(nstar)], group_size,
-	        DP_PSFSIGX(psffit), DP_PSFSIGY(psffit), DP_PSFHEIGHT(psffit),
-		Memr[DP_C(nstar)], cdimen, Memr[DP_X(nstar)],
-	        Memr[DP_XOLD(nstar)], Memr[DP_XCLAMP(nstar)], chiold, clip,
-		refit)
+	        Memr[DP_NSUMWT(nstar)], group_size, Memr[DP_NC(nstar)], cdimen,
+		Memr[DP_NX(nstar)], Memr[DP_NXOLD(nstar)],
+		Memr[DP_NXCLAMP(nstar)], DP_RECENTER(dao), clip, refit)
 
 	    # Check whether the estimated centroid of the any star has
 	    # moved so far out of the limits of the picture that it has fewer
@@ -452,14 +496,20 @@ begin
 
 	    call dp_ntcentroid (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-	        Memr[DP_APMSKY(apsel)], group_size, int (IM_LEN(im,1)),
-	        int (IM_LEN(im,2)), fitradsq, refit, DP_VERBOSE(dao))
+	        Memr[DP_APMSKY(apsel)], Memi[DP_NIER(nstar)], group_size,
+		ixmin, ixmax, iymin, iymax, fitradsq, DP_FITSKY(dao),
+		DP_GROUPSKY(dao), mean_sky, refit, DP_VERBOSE(dao))
 
 	    if (group_size < 1)
 	        return (group_size)
 
-	    # Update matrix dimensions
-	    nterm = 3 * group_size
+	    # Update matrix dimensions.
+	    if (DP_RECENTER(dao) == YES)
+	        nterm = 3 * group_size
+	    else
+		nterm = group_size
+	    if (DP_FITSKY(dao) == YES)
+		nterm = nterm + 1
 
 	    # Now check whether any of the stars is too faint (more than 12.5
 	    # magnitudes fainter than the PSF star). If several stars are too
@@ -477,6 +527,7 @@ begin
 	    # of them, and faint is the relative brightness of the
 	    # faintest of them.
 
+	    # No very faint star was detected.
 	    if (tifaint <= 0) {
 
 	        # If the solution has not converged and if the number of
@@ -501,6 +552,7 @@ begin
 		    return (group_size)
 	    }
 
+	    # Reject the appropriate star.
 	    if ((tifaint > 0) || (faint >= MIN_FAINT)) {
 
 	        # Either (a) the solution thinks it has not converged
@@ -515,17 +567,29 @@ begin
 		        call pargi (Memi[DP_APID(apsel)+mindex-1])
 	        }
 
+		if ((DP_FITSKY(dao) == NO) && (DP_GROUPSKY(dao) == YES) &&
+		    (group_size > 1))
+		    mean_sky = (mean_sky * group_size -
+		        Memr[DP_APMSKY(apsel)+max(tifaint,ifaint)-1]) /
+			    (group_size - 1)
+
 	        call dp_remove (max (tifaint, ifaint), group_size,
 	            Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 		    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-		    Memr[DP_APMSKY(apsel)])
+		    Memr[DP_APMSKY(apsel)], Memi[DP_NIER(nstar)],
+		    NSTERR_FAINT)
 
 	        if (group_size < 1)
 		    return (group_size)
 
-	        nterm = 3 * group_size
-	        call aclrr (Memr[DP_XOLD(nstar)], nterm)
-	        call amovkr (1.0, Memr[DP_XCLAMP(nstar)], nterm)
+		if (DP_RECENTER(dao) == YES)
+	            nterm = 3 * group_size
+		else
+		    nterm = group_size
+		if (DP_FITSKY(dao) == YES)
+		    nterm = nterm + 1
+	        call aclrr (Memr[DP_NXOLD(nstar)], nterm)
+	        call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
 	        clip = false
 	        iter = max (1, iter - 1)
 	        next
@@ -534,16 +598,17 @@ begin
 	    # Solution has either converged or gone to the maximum number
 	    # of iterations.
 
-	    if ((iter < DP_MAXITER (dao)) && (! clip)) {
+	    if ((iter < DP_MAXITER(dao)) && (! clip)) {
 
 	        # The first convergence milestone has been reached. Turn on the
 	        # clipper, loosen the clamps and keep on going.
 
-	        clip = true
+		if (DP_CLIPEXP(dao) > 0)
+	            clip = true
 	        converge = false
-	        call aclrr (Memr[DP_XOLD(nstar)], nterm)
-	        call amaxkr (Memr[DP_XCLAMP(nstar)], MIN_FAINT,
-	            Memr[DP_XCLAMP(nstar)], nterm)
+	        call aclrr (Memr[DP_NXOLD(nstar)], nterm)
+	        call amaxkr (Memr[DP_NXCLAMP(nstar)], 0.25,
+	            Memr[DP_NXCLAMP(nstar)], nterm)
 	        return (group_size)
 	    }
 
@@ -557,37 +622,36 @@ end
 
 # DP_NSTMERGE -- Decide whether two stars in a group should merge.
 
-bool procedure dp_nstmerge (xcen, ycen, mag, magerr, group_size, minsep, wcrit,
-	i, j, k)
+bool procedure dp_nstmerge (xcen, ycen, mag, magerr, group_size, sepcrit,
+	sepmin, wcrit, i, j, k)
 
 real	xcen[ARB]		# array of x centers	
 real	ycen[ARB]		# array of y centers	
 real	mag[ARB]		# array of magnitudes
-real	magerr[ARB]		# array of magnitude centers
+real	magerr[ARB]		# array of magnitude errors
 int	group_size		# group size
-real	minsep			# minimum separation
-real	wcrit			# critical size
+real	sepcrit			# the critical separation squared
+real	sepmin			# the minimum separation
+real	wcrit			# critical error for rejection
 int	i, j, k			# output indices
 
-real	separation, fminsep
+real	separation
 
 begin
-	fminsep = FRACTION_MINSEP * minsep
 	do i = 1, group_size {
   	    do j = 1,  i - 1 {
 
 		# Compute the separation.
 	        separation = (xcen[j] - xcen[i]) ** 2 +
 		    (ycen[j] - ycen[i]) ** 2
-		if (separation > minsep)
+		if (separation > sepcrit)
 		    next
 
 		# Find the fainter of the two stars.
 		k = j
 		if (mag[i] < mag[j]) 
 		    k = i
-		if ((separation <  fminsep) || ((magerr[k] /
-		    mag[k]) ** 2 > wcrit))
+		if ((separation <  sepmin) || ((magerr[k] / mag[k])  > wcrit))
 		        return (true)
 	    }
 	}
@@ -607,7 +671,7 @@ int	i, j, k			# array indices
 
 begin
 	# Now eliminate the fainter of the two stars. The k-th
-	# star is now the fainters of the two, the i-th the
+	# star is now the fainter of the two, the i-th the
 	# brighter.
 
         if (mag[i] < mag[j])
@@ -629,17 +693,15 @@ end
 # DP_NTOMIT -- Check whether a pixel is within one fitting radius of another
 # star. 
 
-bool procedure dp_ntomit (xcen, ycen, rpixsq, skip, npix, group_size,
-	fx, fy, cutoff)
+bool procedure dp_ntomit (xcen, ycen, rpixsq, skip, group_size, fx, fy, cutoff)
 
 real	xcen[ARB]		# array of x centers
 real	ycen[ARB]		# array of y centers
-real	rpixsq[ARB]		# radii squared
-int	skip[ARB]		# skip array
-int	npix[ARB]		# number of pixels
-int	group_size		# maximum group size
+real	rpixsq[ARB]		# array of distances squared
+int	skip[ARB]		# array of skip values
+int	group_size		# the group size
 real	fx, fy			# pixel position in image
-real	cutoff			# factor * fitting radius squared
+real	cutoff			# radius cuttoff for pixel inclusion
 
 bool	omit
 int	i
@@ -652,7 +714,6 @@ begin
 	    if (rpixsq[i] > cutoff)
 		next
 	    skip[i] = NO
-	    npix[i] = npix[i] + 1
 	    omit = false
 	}	 
 
@@ -660,53 +721,90 @@ begin
 end
 
 
+# DP_NTSKYVAL -- Compute the average sky value to use for a particular
+# pixel by averaging the sky values of all stars for which the
+# pixel is within one fitting radius.
+
+real procedure dp_ntskyval (sky, skip, nstar)
+
+real	sky[ARB]		# array of sky values
+int	skip[ARB]		# array of skip values
+int	nstar			# the number of stars
+
+int	i, npts
+real	sum
+
+begin
+	sum = 0.0
+	npts = 0
+	do i = 1, nstar {
+	    if (skip[i] == YES)
+		next
+	    sum = sum + sky[i]
+	    npts = npts + 1
+	}
+	if (npts <= 0)
+	    return (INDEFR)
+	else
+	    return (sum / npts)
+end
+
+
 # DP_NTSUBTRACT -- Procedure to subtract the contribution of a particular
 # pixel from a particular star.
 
-real procedure dp_ntsubtract (psffit, xcen, ycen, rpixsq, mag, skip, x,
-	group_size, fx, fy, ds, varpsf, psfradsq, fitradsq)
+real procedure dp_ntsubtract (dao, xcen, ycen, rpixsq, mag, skip, x,
+	group_size, fx, fy, ds, psfradsq, fitradsq, recenter)
 
-pointer	psffit			# pointer to psf structure
-real	xcen[ARB]		# pointer to x centers array
-real	ycen[ARB]		# pointer to y centers array
-real	rpixsq[ARB]		# array of pixel differences
-real	mag[ARB]		# magnitudes array
-int	skip[ARB]		# skip pixel array
-real	x[ARB]			# x accumulate array
+pointer	dao			# pointer to the daophot structure
+real	xcen[ARB]		# array of x centers
+real	ycen[ARB]		# array of y centers
+real	rpixsq[ARB]		# array of distances squared
+real	mag[ARB]		# array of magnitudes
+int	skip[ARB]		# array of skip values
+real	x[ARB]			# x accumulation vector array
 int	group_size		# size of the group
 real	fx, fy			# center of pixel in image
 real	ds			# pixel value
-int	varpsf			# variable psf
 real	psfradsq		# psf radius squared
 real	fitradsq		# fit radius squared
+int	recenter		# recenter the coordinates
 
 int	i, i3, k
+pointer	psffit
 real	weight, dx, dy, deltax, deltay, val, dvdx, dvdy, rsq
-real	dp_evalpsf()
+real	dp_usepsf()
 
 begin
+	psffit = DP_PSFFIT(dao)
+
 	weight = 0.0
 	do i = 1, group_size {
-	    if (rpixsq[i] > psfradsq)
+	    if (rpixsq[i] >= psfradsq)
 		next
 	    dx = fx - xcen[i]
 	    dy = fy - ycen[i]
-	    deltax = xcen[i] - DP_XPSF(psffit)
-	    deltay = ycen[i] - DP_YPSF(psffit)
-	    val = dp_evalpsf (dx, dy, psffit, deltax, deltay, varpsf,
-	        dvdx, dvdy)
+	    deltax = (xcen[i] - 1.0) / DP_PSFX(psffit) - 1.0
+	    deltay = (ycen[i] - 1.0) / DP_PSFY(psffit) - 1.0
+	    val = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
+	        DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
+		Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+		DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit), deltax, deltay,
+		dvdx, dvdy)
 	    ds = ds - mag[i] * val
-	    rsq = rpixsq[i] / fitradsq
 	    if (skip[i] == YES)
 		next
+	    rsq = rpixsq[i] / fitradsq
 	    weight = max (weight, 5.0 / (5.0 + rsq / (1.0 - rsq)))
-	    skip[i] = NO
-	    i3 = 3 * i
-	    k = i3 - 2
-	    x[k] = -val
-	    k = i3 - 1
-	    x[k] = mag[i] * dvdx
-	    x[i3] = mag[i] * dvdy
+	    if (recenter == YES) {
+	        i3 = 3 * i
+	        k = i3 - 2
+	        x[k] = -val
+	        k = i3 - 1
+	        x[k] = -mag[i] * dvdx
+	        x[i3] = -mag[i] * dvdy
+	    } else
+		x[i] = -val
 	}
 
 	return (weight)
@@ -717,23 +815,24 @@ end
 # relative residuals and the image sharpness parameter for each of the
 # stars.
 
-procedure dp_acsharp (xcen, ycen, skip, numer, denom, sumwt, chi, group_size,
-	fx, fy, sigmax, sigmay, ds, sigma, relerr, weight)
+procedure dp_acsharp (xcen, ycen, skip, npix, numer, denom, sumwt, chi,
+	group_size, fx, fy, fwhmx, fwhmy, ds, sigmasq, relerr, weight)
 
 real	xcen[ARB]		# array of object x centers
 real	ycen[ARB]		# array of object y centers
-int	skip[ARB]		# skip pixel array
+int	skip[ARB]		# array of skip values
+int	npix[ARB]		# array of numbers of pixels
 real	numer[ARB]		# numerator array
 real	denom[ARB]		# denominator array
 real	sumwt[ARB]		# array of summed weights
 real	chi[ARB]		# array of chis
 int	group_size		# group size paramter.
 real	fx, fy			# position of data in image
-real	sigmax, sigmay		# gaussian core widths in x and y
-real	ds			# data residual
-real	sigma			# sigma array
-real	relerr			# relative error
-real	weight			# weight
+real	fwhmx, fwhmy		# gaussian core widths in x and y
+real	ds			# the data residual
+real	sigmasq			# the sigma squared
+real	relerr			# the relative error
+real	weight			# the weight
 
 int	i
 real	rhosq, dfdsig
@@ -744,56 +843,81 @@ begin
 	    if (skip[i] == YES)
 		next
 
+	    # Accumulate the number of pixels, chi and sum of the weights.
+	    npix[i] = npix[i] + 1
+	    chi[i] = chi[i] + relerr * weight
+	    sumwt[i] = sumwt[i] + weight
+
 	    # Include in the sharpness index only those pixels
 	    # within NCORE_SIGMASQ of the centroid of the
 	    # object. (This saves time and floating underflows
 	    # by excluding pixels which contribute very little
 	    # to the index.
 
-	    chi[i] = chi[i] + relerr * weight
-	    sumwt[i] = sumwt[i] + weight
-	    rhosq = ((xcen[i] - fx) / sigmax) ** 2 + ((ycen[i] - fy) /
-	        sigmay) ** 2
+	    rhosq = ((xcen[i] - fx) / fwhmx) ** 2 + ((ycen[i] - fy) /
+	        fwhmy) ** 2
 	    if (rhosq > NCORE_SIGMASQ)
 		next
-
-	    rhosq = 0.5 * rhosq
+	    rhosq = 0.6931472 * rhosq
 	    dfdsig = exp (-rhosq) * (rhosq - 1.0)
-	    numer[i] = numer[i] + dfdsig * ds / sigma
-	    denom[i] = denom[i] + (dfdsig ** 2) / sigma
+	    numer[i] = numer[i] + dfdsig * ds / sigmasq
+	    denom[i] = denom[i] + (dfdsig ** 2) / sigmasq
 	}			
 end
 
 
 # DP_MATACCUM -- Procedure to accumulate the data into the matrices.
 
-procedure dp_mataccum (x, c, cdimen, v, skip, group_size, weight, dswt)
+procedure dp_mataccum (x, skip, group_size, c, v, cdimen, nterm, weight, dswt,
+	recenter, fitsky)
 
 real	x[ARB]			# x array
-real	c[cdimen,ARB]		# coefficient matrix
-int	cdimen			# dimensions of the coefficient matrix
-real	v[ARB]			# vector array
 int	skip[ARB]		# skip vector
 int	group_size		# size of the group
+real	c[cdimen,ARB]		# coefficient matrix
+real	v[ARB]			# vector array
+int	cdimen			# dimensions of the coefficient matrix
+int	nterm			# the number of terms
 real	weight			# weight
 real	dswt			# data weight
+int	recenter		# recenter the coordinates
+int	fitsky			# fit the sky value
 
 int	i, i3, i3m2, k, j, l
 
 begin
+	if (fitsky == YES) {
+	    c[nterm,nterm] = c[nterm,nterm] + weight
+	    v[nterm] = v[nterm] - dswt
+	}
+
 	do i = 1, group_size {
 	    if (skip[i] == YES)
 		next
-	    i3 = i * 3
-	    i3m2 = i3 - 2
-	    do k = i3m2, i3
-		v[k] = v[k] + x[k] * dswt
-	    do j = 1, i {
-		if (skip[j] == YES)
-		    next
-		do k = i3m2, i3 {
-		    do l = 3 * j - 2, min (k, 3 * j)
-			c[k,l] = c[k,l] + x[k] * x[l] * weight
+	    if (recenter == YES) {
+	        i3 = i * 3
+	        i3m2 = i3 - 2
+	        do k = i3m2, i3 {
+		    if (fitsky == YES)
+			c[nterm,k] = c[nterm,k] - x[k] * weight
+		    v[k] = v[k] + x[k] * dswt
+		}
+	        do j = 1, i {
+		    if (skip[j] == YES)
+		        next
+		    do k = i3m2, i3 {
+		        do l = 3 * j - 2, min (k, 3 * j)
+			    c[k,l] = c[k,l] + x[k] * x[l] * weight
+		    }
+	        }
+	    } else {
+		v[i] = v[i] + x[i] * dswt
+		if (fitsky == YES)
+			c[nterm,i] = c[nterm,i] - x[i] * weight
+		do j = 1, i {
+		    if (skip[j] == YES)
+		        next
+		    c[i,j] = c[i,j] + x[i] * x[j] * weight
 		}
 	    }
 	}
@@ -803,17 +927,22 @@ end
 # DP_NTMIN -- Make sure that every star in the group has at least 
 # MIN_NPIX pixels within one fitting radius.
 
-bool procedure dp_ntmin (ids, xcen, ycen, mag, nsky, npix, group_size, nterm,
-	verbose)
+bool procedure dp_ntmin (ids, xcen, ycen, mag, sky, npix, nier, group_size,
+	nterm, recenter, fitsky, groupsky, mean_sky, verbose)
 
-int	ids[ARB]		# integer ids
+int	ids[ARB]		# array of ids
 real	xcen[ARB]		# array of x centers
 real	ycen[ARB]		# array of y centers
 real	mag[ARB]		# array of magnitudes
-real	nsky[ARB]		# array of skys
-int	npix[ARB]		# number of pixels
+real	sky[ARB]		# array of sky values
+int	npix[ARB]		# array of pixel numbers
+int	nier[ARB]		# array of error codes
 int	group_size		# size of the group
 int	nterm			# number of terms
+int	recenter		# recenter the objects
+int	fitsky			# fit the sky value
+int	groupsky		# use group sky value
+real	mean_sky		# the current mean sky value
 int	verbose			# verbose flag
 
 bool	redo
@@ -823,17 +952,25 @@ begin
 	redo = false
 	do i = 1, group_size {
 	    if (npix[i] >= MIN_NPIX)
-		next
+	        next
 	    redo = true
 	    if (verbose == YES) {
 		call printf (
 		    "\tStar %-5d has been deleted: too few good pixels\n")
 		    call pargi (ids[i])
 	    }
-	    call dp_remove (i, group_size, ids, xcen, ycen, mag, nsky)
+	    if ((fitsky == NO) && (groupsky == YES) && (group_size > 1))
+		mean_sky = (mean_sky * group_size - sky[i]) / (group_size - 1)
+	    call dp_remove (i, group_size, ids, xcen, ycen, mag, sky,
+		nier, NSTERR_NOPIX)
 	    if (group_size <= 0)
 		return (redo)
-	    nterm = 3 * group_size
+	    if (recenter == YES)
+	        nterm = 3 * group_size
+	    else
+		nterm = group_size
+	    if (fitsky == YES)
+		nterm = nterm + 1
 	}
 
 	return (redo)
@@ -861,103 +998,134 @@ end
 
 # DP_NTCHI -- Compute the chi value for each star.
 
-procedure dp_ntchi (sumwt, chi, group_size, chiold)
+procedure dp_ntchi (sumwt, chi, group_size, ntmin, chigrp, grpwt)
 
 real	sumwt[ARB]		# sum of the weights
 real	chi[ARB]		# the chis:wq
 int	group_size		# size of the group
-real	chiold			# value of old chi
+int	ntmin			# minimum number of points
+real	chigrp			# the group chi
+real	grpwt			# the group weight
 
 int	i
 
 begin
 	do i = 1, group_size {
-	    if (sumwt[i] > MIN_SUMWT) {
-		chi[i] = CHI_NORM * chi[i] * sqrt (1.0 / ((sumwt[i] -
-		    MIN_SUMWT) * sumwt[i]))
-		chi[i] = ((sumwt[i] - MIN_SUMWT) * chi[i] + MIN_SUMWT) /
+	    if (sumwt[i] > ntmin) {
+		chi[i] = CHI_NORM * chi[i] / sqrt ((sumwt[i] - ntmin) *
+		    sumwt[i])
+		sumwt[i] = ((sumwt[i] - ntmin) * chi[i] + MIN_SUMWT) /
 		    sumwt[i]
-	    } else 
-		chi[i] = chiold
+	    } else { 
+		chi[i] = chigrp
+		sumwt[i] = grpwt
+	    }
 	}
+end
+
+
+# DP_NCHECKC -- Check the inverted matrix for singularity.
+
+bool procedure dp_ncheckc (c, cdimen, nterm, ids, xcen, ycen, mag, sky,
+	nier, group_size, recenter, fitsky, groupsky, mean_sky, verbose)
+
+real	c[cdimen,ARB]		# coefficient matrix
+int	cdimen			# dimension of the c matrix
+int	nterm			# number of terms
+int	ids[ARB]		# array of ids
+real	xcen[ARB]		# array of x centers
+real	ycen[ARB]		# array of y centers
+real	mag[ARB]		# array of magnitudes
+real	sky[ARB]		# array of sky values
+int	nier[ARB]		# array of error codes
+int	group_size		# size of the group
+int	recenter		# recenter the objects
+int	fitsky			# fit the sky value
+int	groupsky		# use group sky value
+real	mean_sky		# the current mean sky value
+int	verbose			# verbose flag
+
+bool	redo
+int	j, starno, i
+
+begin
+	redo = false
+	do j = 1, nterm {
+	    if (c[j,j] > 0.0)
+		next
+	    redo = true
+	    if ((j == nterm) && (fitsky == YES))
+		starno = 0
+	    else if (recenter == YES)
+		starno = (j + 2) / 3
+	    else
+		starno = j
+	    if (starno == 0) {
+		if (verbose == YES) {
+		    do i = 1, group_size {
+		        call printf (
+			    "\tStar %-5d has been deleted: singular matrix\n")
+			    call pargi (ids[i])
+		    }
+		}
+		call amovki (NSTERR_SINGULAR, nier, group_size)
+		group_size = 0
+	    } else {
+		if (verbose == YES) {
+		    call printf (
+			"\tStar %-5d has been deleted: singular matrix\n")
+			call pargi (ids[starno])
+		}
+		if ((fitsky == NO) && (groupsky == YES) && (group_size > 1))
+		    mean_sky = (mean_sky * group_size - sky[starno]) /
+			(group_size - 1)
+		call dp_remove (starno, group_size, ids, xcen, ycen, mag,
+		    sky, nier, NSTERR_SINGULAR)
+	    }
+	    if (group_size <= 0)
+		return (redo)
+	    if (recenter == YES)
+		nterm = 3 * group_size
+	    else
+		nterm = group_size
+	    if (fitsky == YES)
+		nterm = nterm + 1
+	}
+
+	return (redo)
 end
 
 
 # DP_NTCLAMP -- Restrict the amount the solution can vary on each iteration.
 
-procedure dp_ntclamp (xcen, ycen, mag, magerr, sharp, chi, numer, denom,
-	group_size, sigmax, sigmay, height, c, cdimen, x, xold, clamp,
-	chiold, clip, redo)
+procedure dp_ntclamp (xcen, ycen, mag, magerr, sumwt, group_size, c, cdimen,
+	x, xold, clamp, recenter, clip, redo)
 
 real	xcen[ARB]		# x centers array
 real	ycen[ARB]		# y centers array
 real	mag[ARB]		# magnitude array
 real	magerr[ARB]		# magnitude errors array
-real	sharp[ARB]		# array of sharpness parameters
-real	chi[ARB]		# array of chi squared values
-real	numer[ARB]		# array of numerators
-real	denom[ARB]		# array of denominatores
+real	sumwt[ARB]		# array of weight sums
 int	group_size		# size of the group
-real	sigmax, sigmay		# gaussian core widths in x and y
-real	height			# gaussian height
 real	c[cdimen, ARB]		# coefficient matrix
 int	cdimen			# dimensions of c
 real	x[ARB]			# x vector
 real	xold[ARB]		# old x vector
 real	clamp[ARB]		# clamp on solution matrix
-real	chiold			# old value of chi
+int	recenter		# recenter the objects
 bool	clip			# clip the matrix
 bool	redo			# redo the solution
 
 int	i, l, j, k
+real	df
 
 begin
 	do i = 1, group_size {
 
-	    sharp[i] = 2.0 * sigmax * sigmay * numer[i] /
-		       (mag[i] * height * denom[i])
-	    l = 3 * i
-	    k = l - 1
-	    j = l - 2
-
-	    # There are two milestones in the convergence process: the fits
-	    # proceed normally until each star's magnitude changes by less
-	    # than its standard error or MAX_NEW_ERRMAG magnitudes, whichever
-	    # is greater, and its x and y centroids change by less than 0.1 
-	    # pixel. At this point the least squares begins to reject any 
-	    # pixel with a residual greater than 20 sigma and begins to 
-	    # apply the down-weighting of other pixels with large residuals
-	    # as described above. The fits then continue until each star's
-	    # magnitude changes by less than MAX (MAX_NEW_ERRMAG * std. error,
-	    # MAX_NEW_RELBRIGHT magnitude), ad its centroids change by
-	    # less than MAX_PIXERR pixel.
-
-	    if (! redo)  {
-	        if (clip) {
-		    if (abs (x[j]) > max (MAX_NEW_ERRMAG * chi[i] *
-		        sqrt (c[j,j]), MAX_NEW_RELBRIGHT * mag[i]))
-		        redo = true
-		    else if (max (abs(x[k]), abs(x[l])) > MAX_PIXERR)
-		        redo = true
-	        } else {
-		    if (abs (x[j]) > max (chi[i] * sqrt (c[j,j]),
-		        MAX_NEW_ERRMAG * mag[i]))
-		        redo = true
-		    else if (max (abs (x[k]), abs (x[l])) > MAX_CENTROIDERR)
-		        redo = true
-	        }
-	    }
 
 	    # If any correction has changed sign since the last
 	    # iteration, reduce the maximum permissible change by
 	    # a factor of two.
-
-	    if ((xold[j] * x[j] / mag[i] ** 2) < SIGN_CHECK) 
-		clamp[j] = 0.5 * clamp[j]
-	    if ((xold[k] * x[k]) < SIGN_CHECK)
-		clamp[k] = 0.5 * clamp[k]
-	    if ((xold[l] * x[l]) < SIGN_CHECK)
-		clamp[l] = 0.5 * clamp[l]
 
 	    # Note that the sign of the correction is such that it
 	    # must be SUBTRACTED from the current value of the 
@@ -969,20 +1137,80 @@ begin
 	    # (the star should be fainter) a change of 1 magnitude
 	    # is a change of 60%.
 
-	    mag[i] = mag[i] - x[j] / (1.0 + max (x[j] / (MAX_DELTA_FAINTER *
-	        mag[i]), -x[j] / (MAX_DELTA_BRIGHTER * mag[i])) / clamp[j])
-	    xcen[i] = xcen[i] - x[k] / (1.0 + abs(x[k]) / (clamp[k] *
-	        MAX_DELTA_PIX))
-	    ycen[i] = ycen[i] - x[l] / (1.0 + abs(x[l]) / (clamp[l] *
-	        MAX_DELTA_PIX))
+	    if (recenter == YES) {
 
-	    xold[j] = x[j]
-	    xold[k] = x[k]
-	    xold[l] = x[l]
+	        l = 3 * i
+	        k = l - 1
+	        j = l - 2
 
-	    # Drive the magnitude error toward the expected value.
-	    magerr[i] = c[j,j] * (group_size * chi[i] ** 2 + (group_size - 1) *
-	        chiold ** 2) / (2.0 * group_size - 1.0)
+	        if ((xold[j] * x[j]) < 0.0) 
+		    clamp[j] = 0.5 * clamp[j]
+	        mag[i] = mag[i] - x[j] / (1.0 + max (x[j] /
+		    (MAX_DELTA_FAINTER * mag[i]), -x[j] / (MAX_DELTA_BRIGHTER *
+		    mag[i])) / clamp[j])
+	        xold[j] = x[j]
+
+	        if ((xold[k] * x[k]) < 0.0)
+		    clamp[k] = 0.5 * clamp[k]
+	        if ((xold[l] * x[l]) < 0.0)
+		    clamp[l] = 0.5 * clamp[l]
+	        xcen[i] = xcen[i] - x[k] / (1.0 + abs(x[k]) / (clamp[k] *
+	            MAX_DELTA_PIX))
+	        ycen[i] = ycen[i] - x[l] / (1.0 + abs(x[l]) / (clamp[l] *
+	            MAX_DELTA_PIX))
+	        xold[k] = x[k]
+	        xold[l] = x[l]
+	        magerr[i] =sumwt[i] *  sqrt (c[j,j])
+
+	    } else {
+
+	        if ((xold[i] * x[i]) < 0.0) 
+		    clamp[i] = 0.5 * clamp[i]
+	        mag[i] = mag[i] - x[i] / (1.0 + max (x[i] /
+		    (MAX_DELTA_FAINTER * mag[i]), -x[i] / (MAX_DELTA_BRIGHTER *
+		    mag[i])) / clamp[i])
+	        xold[i] = x[i]
+	        magerr[i] =sumwt[i] *  sqrt (c[i,i])
+	    }
+
+
+	    # There are two milestones in the convergence process: the fits
+	    # proceed normally until each star's magnitude changes by less
+	    # than its standard error or MAX_NEW_ERRMAG magnitudes, whichever
+	    # is greater, and its x and y centroids change by less than 0.02 
+	    # pixel. At this point the least squares begins to apply
+	    # down-weighting of pixels with large residuals as described
+	    # above.  The fits then continue until each star's
+	    # magnitude changes by less than MAX (MAX_NEW_ERRMAG * std. error,
+	    # MAX_NEW_RELBRIGHT2 magnitude), ad its centroids change by
+	    # less than 0.002 pixel.
+
+	    if (redo)
+		next
+
+	    if (clip) {
+		if (abs (x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
+		        MAX_NEW_RELBRIGHT2 * mag[i])) {
+		    redo = true
+		} else if (recenter == YES) {
+		    df = (MAX_NEW_ERRMAG * sumwt[i]) ** 2
+		    if (x[k] ** 2 > max (df * c[k,k], MAX_PIXERR2))
+			redo = true
+		    else if (x[l] ** 2 > max (df * c[l,l], MAX_PIXERR2))
+			redo = true
+		}
+	    } else {
+		if (abs (x[j]) > max (magerr[i], MAX_NEW_RELBRIGHT1 *
+		        mag[i])) {
+		    redo = true
+		} else if (recenter == YES) {
+		    df = sumwt[i] ** 2
+		    if (x[k] ** 2 > max (df * c[k,k], MAX_PIXERR1))
+			redo = true
+		    else if (x[l] ** 2 > max (df * c[l,l], MAX_PIXERR1))
+			redo = true
+		}
+	    }
 	}
 end
 
@@ -990,17 +1218,23 @@ end
 # DP_NTCENTROID -- Check the new centroids to see if they have moved too
 # far off the edge of the image.
 
-procedure dp_ntcentroid (ids, xcen, ycen, mag, nsky, group_size, ncols, nlines,
-	fitradsq, redo, verbose)
+procedure dp_ntcentroid (ids, xcen, ycen, mag, sky, nier, group_size, ixmin,
+	ixmax, iymin, iymax, fitradsq, fitsky, groupsky, mean_sky, redo,
+	verbose)
 
 int	ids[ARB]			# array of ids
 real	xcen[ARB]			# array of x centers
 real	ycen[ARB]			# array of y centers
 real	mag[ARB]			# array of magnitudes
-real	nsky[ARB]			# array of sky value
+real	sky[ARB]			# array of sky values
+int	nier[ARB]			# array of error codes
 int	group_size			# size of the group
-int	ncols, nlines			# size of the image
+int	ixmin,ixmax			# subraster x limits
+int	iymin,iymax			# subraster y limits
 real	fitradsq			# fit radius squared
+int	fitsky				# fit the sky value
+int	groupsky			# use the group sky value
+real	mean_sky			# the mean sky value
 bool	redo				# redo fit
 int	verbose				# verbose mode
 
@@ -1018,22 +1252,27 @@ begin
 	    # y, then DX or DY is its distance from the center of the edge 
 	    # pixel; otherwise DX and DY are zero.
 
-	    dx = max (1.0 - xcen[i], xcen[i] - ncols, 0.0)
-	    dy = max (1.0 - ycen[i], ycen[i] - nlines, 0.0)
+	    dx = max (ixmin - xcen[i], xcen[i] - ixmax, 0.0)
+	    dy = max (iymin - ycen[i], ycen[i] - iymax, 0.0)
 	    if ((dx <= MAX_PIX_INCREMENT) && (dy <= MAX_PIX_INCREMENT))
 		    next
 	    if (((dx + 1.0) ** 2 + (dy + 1.0) ** 2) < fitradsq)
 		next
 
-	    # Print a warning message about the deleted star.
-
+	    # Print a warning message about the star.
 	    if (verbose == YES) {
 		call printf (
 		"\tStar %-5d has been deleted: new center too far off image\n")
 		    call pargi (i)
 	    }
 
-	    call dp_remove (i, group_size, ids, xcen, ycen, mag, nsky)
+	    # Adjust the sky.
+	    if ((fitsky == NO) && (groupsky == YES) && (group_size > 1))
+		mean_sky = (mean_sky * group_size - sky[i]) / (group_size - 1)
+
+	    # Delete it.
+	    call dp_remove (i, group_size, ids, xcen, ycen, mag, sky, nier,
+	        NSTERR_OFFIMAGE)
 	    if (group_size < 1)
 		break
 	    redo = true
@@ -1084,7 +1323,7 @@ begin
 	faint = 0.0
 	ifaint = 0
 	do i = 1, group_size {
-	    weight = magerr[i] / mag[i] ** 2
+	    weight = magerr[i] / mag[i]
 	    if (weight < faint)
 		next
 	    faint = weight
@@ -1094,38 +1333,47 @@ end
 
 
 # DP_REMOVE -- Remove the i-th star from the list of stars in the current
-# group.
+# group by moving it to the end of the group.
 
-procedure dp_remove (i, nstar, ids, xcen, ycen, mag, sky)
+procedure dp_remove (i, nstar, ids, xcen, ycen, mag, sky, nier, pier)
 
-int	i, nstar
-int	ids[ARB]
-real	xcen[ARB]
-real	ycen[ARB]
-real	mag[ARB]
-real	sky[ARB]
+int	i			# the star to be removed
+int	nstar			# the number of stars in the group
+int	ids[ARB]		# the array of star ids
+real	xcen[ARB]		# the array of star x positions
+real	ycen[ARB]		# the array of star y positions
+real	mag[ARB]		# the array of magnitudes
+real	sky[ARB]		# the array of sky values.
+int	nier[ARB]		# array of error codes
+int	pier			# error code for deleted star
 
-int	ihold
+int	ihold, phold
 real	xhold, yhold, shold, mhold
 
 begin
+	nier[i] = pier
 	if (i != nstar) {
+
 	    ihold = ids[i]
 	    xhold = xcen[i]
 	    yhold = ycen[i]
 	    shold = sky[i]
 	    mhold = mag[i]
+	    phold = nier[i]
+
 	    ids[i] = ids[nstar]
 	    xcen[i] = xcen[nstar]
 	    ycen[i] = ycen[nstar]
  	    sky[i] = sky[nstar]
 	    mag[i] = mag[nstar]
+	    nier[i] = nier[nstar]
+
 	    ids[nstar] = ihold
 	    xcen[nstar] = xhold
 	    ycen[nstar] = yhold
 	    sky[nstar] = shold
 	    mag[nstar] = mhold
+	    nier[nstar] = phold
 	}
-
 	nstar = nstar - 1
 end

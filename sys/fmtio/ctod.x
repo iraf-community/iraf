@@ -30,7 +30,7 @@ Lexical form of a sexagesimal number:
 	D :==	[0-9]		numeric digit
 	E :==	[eEdD]		exponent symbol
 
-	({D}*:)+(".")?{D}*({E}("+"|"-")?{D}+)?
+	({D}*:)+{D}*(".")?{D}*({E}("+"|"-")?{D}+)?
 
 The format for sexagesimal numbers is fairly permissive.  Any number of
 colon fields are permitted, with any number of digits (including zero) in

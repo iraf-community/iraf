@@ -34,9 +34,11 @@ begin
 		j2 = n1 / 2
 		do i = 1, npts {
 		    k = i - 1
-		    if (even)
-			median[i] = (Memr[d[j1]+k] + Memr[d[j2]+k]) / 2.
-		    else
+		    if (even) {
+			val1 = Memr[d[j1]+k]
+			val2 = Memr[d[j2]+k]
+			median[i] = (val1 + val2) / 2.
+		    } else
 			median[i] = Memr[d[j1]+k]
 		}
 	    } else {
@@ -47,7 +49,9 @@ begin
 			j1 = n1 / 2 + 1
 			if (mod (n1, 2) == 0) {
 			    j2 = n1 / 2
-			    median[i] = (Memr[d[j1]+k] + Memr[d[j2]+k]) / 2.
+			    val1 = Memr[d[j1]+k]
+			    val2 = Memr[d[j2]+k]
+			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Memr[d[j1]+k]
 		    } else
@@ -57,7 +61,7 @@ begin
 	    return
 	}
 
-	# Repeatedly eliminate the extreme values until there are three
+	# Repeatedly exchange the extreme values until there are three
 	# or fewer pixels.
 
 	do i = 1, npts {
@@ -82,16 +86,24 @@ begin
 		if (j1 < j3 && j2 < j3) {
 		    Memr[d[j1]+k] = val3
 		    Memr[d[j2]+k] = Memr[d[j3]+k]
+		    Memr[d[j3]+k] = val1
+		    Memr[d[n1]+k] = val2
 		} else if (j1 < j3) {
-		    if (j2 == j3)
+		    if (j2 == j3) {
 			Memr[d[j1]+k] = val3
-		    else
+			Memr[d[n1]+k] = val1
+		    } else {
 			Memr[d[j1]+k] = Memr[d[j3]+k]
+			Memr[d[j3]+k] = val1
+		    }
 		} else if (j2 < j3) {
-		    if (j1 == j3)
+		    if (j1 == j3) {
 			Memr[d[j2]+k] = val3
-		    else
+			Memr[d[n1]+k] = val2
+		    } else {
 			Memr[d[j2]+k] = Memr[d[j3]+k]
+			Memr[d[j3]+k] = val2
+		    }
 		}
 		n1 = n1 - 2
 	    }
@@ -115,9 +127,11 @@ begin
 		    else			# bac
 		        median[i] = val1
 	        }
-	    } else if (n1 == 2)
-		median[i] = (Memr[d[1]+k] + Memr[d[2]+k]) / 2
-	    else if (n1 == 1)
+	    } else if (n1 == 2) {
+		val1 = Memr[d[1]+k]
+		val2 = Memr[d[2]+k]
+		median[i] = (val1 + val2) / 2
+	    } else if (n1 == 1)
 		median[i] = Memr[d[1]+k]
 	    else
 		median[i] = blank

@@ -57,7 +57,6 @@ define AXIS 3B			# transform all axes in any MWCS call
 
 # Some useful graphics definitions and defaults
 
-define IMAGE_GRAPHICS_DEVICE "imd"  # default image graphics device 
 define NDC_WCS		0	    # the base graphics WCS
 define POLE_MARK_SHAPE	4           # the pole mark is a cross
 define POLE_MARK_SIZE	3.0         # the half-size of the cross

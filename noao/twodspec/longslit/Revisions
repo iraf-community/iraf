@@ -1,5 +1,81 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+longslit.cl
+longslit.men
+    Added the new SFLIP task to the package.  (7/18/94, Valdes)
+
+transform/t_transform.x
+    The last interval of the inversion surface could be distorted by the
+    limitation of the inversion coordinats to be within the input image.
+    This limit was removed (with the out of bounds checking taking place
+    later).  (9/19/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+transform/fcgetcoords.x
+transform/t_transform.x
+    Modified to allow transposed axes.  (5/14/93, Valdes)
+
+getdaxis.x	+
+response.x
+illumination.x
+extinction.x
+fluxcalib.x
+transform/t_transform.x
+    Access to the dispersion axis is now through the routine get_daxis.  This
+    routine checks for transposed images.  (5/14/93, Valdes)
+
+longslit.men
+longslit.par
+longslit.cl
+standard.par +
+sensfunc.par +
+calibrate.par +
+identify.par -
+reidentify.par
+demos$test.cl
+demos$xgtest.dat +
+demos$gtest.dat -
+demos$xtest.dat -
+    1.  Added commonly used tasks from the ONEDSPEC package.
+    2.  Added additional package paraemters required by the ONEDSPEC tasks.
+    3.  Modified the test playback for the new package and XGTERM.
+    4.  Removed playbacks for XTERM and GTERM.
+    (2/12/93, Valdes)
+
+transform/fcgetcoords.x
+    If the combine option is used and the images do not all have the same
+    fit axis then a segmentation error would occur because of a mistake
+    in where the MWCS and IMIO pointers are closed.  This was fixed
+    and a warning message added.  (12/7/92, Valdes)
+
+transform/fcgetcoords.x
+    Features with INDEF user values are now excluded.
+    (11/11/92, Valdes)
+
+transform/t_transform.x
+    Added DCLOG1 keyword.  This goes along with the changes in DISPCOR
+    to allow multiple dispersion corrections.  (10/19/92, Valdes)
+
+fluxcalib.x
+    Loosened the wavelength limit checks so that an warning is only given
+    if the image wavelengths extend outside the calibration wavelengths
+    by more than a half pixel.  (9/10/92, Valdes)
+
+demos/* +
+longslit.cl
+longslit.men
+    Added a demos task with a test playback.  (7/24/92, Valdes)
+
+=======
+V2.10.2
+=======
+
+=======
+V2.10.1
+=======
 
 =======
 V2.10.0

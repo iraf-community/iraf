@@ -24,7 +24,7 @@ int	stid			# output file sequence number
 int	interactive		# interactive mode
 
 int	wcs, key, ltid, newlist
-int	newskybuf, newsky, newcenterbuf, newcenter, newmagbuf, newmag
+int	newimage, newskybuf, newsky, newcenterbuf, newcenter, newmagbuf, newmag
 int	colonkey, prev_num, req_num, ip, oid
 int	cier, sier, pier
 pointer	sp, cmd
@@ -33,7 +33,7 @@ real	wx, wy, xlist, ylist
 bool	fp_equalr()
 int	clgcur(), apfitsky(), aprefitsky(), apfitcenter(), aprefitcenter()
 int	ap_wmag(), ap_wremag(), apgscur(), ctoi(), apstati(), apgqverify()
-int	apgtverify(), apnew()
+int	apgtverify(), apnew(), ap_avsky()
 real	apstatr()
 
 begin
@@ -46,22 +46,18 @@ begin
 	Memc[cmd] = EOS
 
 	# Initialize the fitting parameters.
-	newcenterbuf = YES
-	newcenter = YES
-	newskybuf = YES
-	newsky = YES
-	newmagbuf = YES
-	newmag = YES
-	cier = AP_OK
-	sier = AP_OK
-	pier = AP_OK
+	newimage = NO
+	newcenterbuf = YES; newcenter = YES
+	newskybuf = YES; newsky = YES
+	newmagbuf = YES; newmag = YES
+	cier = AP_OK; sier = AP_OK; pier = AP_OK
 
 	# Initialize the sequence numbering.
 	newlist = NO
 	ltid = 0
 
 	# Loop over the coordinate file.
-	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
+	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 
 	    # Store the current cursor coordinates.
@@ -70,12 +66,9 @@ begin
 
 	    # Test to see if the cursor moved.
 	    if (apnew (ap, wx, wy, xlist, ylist, newlist) == YES) {
-		newcenterbuf = YES
-		newcenter = YES
-		newskybuf = YES
-		newsky = YES
-		newmagbuf = YES
-		newmag = YES
+		newcenterbuf = YES; newcenter = YES
+		newskybuf = YES; newsky = YES
+		newmagbuf = YES; newmag = YES
 	    }
 
 	    # Store previous cursor coordinates.
@@ -104,7 +97,7 @@ begin
 
 	    # Print out the help page(s).
 	    case '?':
-		if (id != NULL)
+		if ((id != NULL) && (id == gd))
 		    call gpagefile (id, HELPFILE, "")
 		else if (interactive == YES)
 		    call pagefile (HELPFILE, "[space=morehelp,q=quit,?=help]")
@@ -117,6 +110,58 @@ begin
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\7\n")
 
+	    # Get, measure next object from the list.
+	    case 'm', 'n':
+		if (cl != NULL) {
+		    prev_num = ltid
+		    req_num = ltid + 1
+		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+		        ltid) != EOF) {
+		    	newlist = YES
+			if (key == 'm') {
+		    	    newcenterbuf = YES; newcenter = YES
+		    	    newskybuf = YES; newsky = YES
+		    	    newmagbuf = YES; newmag = YES
+			} else {
+		    	    cier = apfitcenter (ap, im, xlist, ylist)
+		    	    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
+			        apstatr (ap, YCENTER), sd, gd)
+		    	    pier = ap_wmag (ap, im, apstatr (ap, XCENTER),
+			        apstatr (ap, YCENTER), apstati (ap,
+			        POSITIVE), apstatr (ap, SKY_MODE),
+			        apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+
+			    if (id != NULL) {
+			        call apmark (ap, id, apstati (ap, MKCENTER),
+				    apstati (ap, MKSKY), apstati (ap,
+				    MKAPERT))
+				if (id == gd)
+				    call gflush (id)
+				else
+				    call gframe (id)
+			    }
+			    call ap_pplot (ap, im, stid, gd, apstati (ap,
+			        RADPLOTS))
+			    if (interactive == YES)
+		    	        call ap_qpmag (ap, cier, sier, pier)
+
+		    	    if (stid == 1)
+			        call ap_param (ap, out, "wphot")
+		            call ap_pmag (ap, out, stid, ltid, cier, sier,
+			        pier)
+			    call ap_pplot (ap, im, stid, mgd, YES)
+		    	    stid = stid + 1
+		    	    newcenterbuf = NO; newcenter = NO
+		    	    newskybuf = NO; newsky = NO
+		    	    newmagbuf = NO; newmag = NO
+			}
+
+		    } else if (interactive == YES)
+			call printf (
+			    "End of coordinate list, use r key to rewind\7\n")
+		} else if (interactive == YES)
+		    call printf ("No coordinate list\n")
+
 	    # Process the remainder of the list.
 	    case 'l':
 		if (cl != NULL) {
@@ -125,6 +170,12 @@ begin
 		    call ap_bwphot (ap, im, cl, sd, out, stid, ltid, gd, mgd,
 		        id, YES)
 		    ltid = ltid + stid - oid + 1
+		    if (id != NULL) {
+		        if (id == gd)
+			    call gflush (id)
+		        else
+			    call gframe (id)
+		    }
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\7\n")
 
@@ -134,42 +185,13 @@ begin
 		    ;
 		colonkey = Memc[cmd+ip-1]
 		switch (colonkey) {
-		case 'm':
-
-		    # Show/set a phot parameters.
-		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
-		        call ap_wpcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-			    newcenterbuf, newcenter, newskybuf, newsky,
-			    newmagbuf, newmag)
-
-		    # Fetch the nth object from the list.
-		    } else if (cl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        if (apgscur (cl, id, xlist, ylist, prev_num,
-			    req_num, ltid) != EOF) {
-		    	    newlist = YES
-			    newcenterbuf = YES
-			    newcenter = YES
-			    newskybuf = YES
-			    newsky = YES
-			    newmagbuf = YES
-			    newmag = YES
-			} else if (interactive == YES)
-			    call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
-		    } else if (interactive == YES)
-		        call printf ("No coordinate list\n")
-
-		case 'n':
+		case 'm', 'n':
 
 		    # Show/set a phot parameter.
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 		        call ap_wpcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-			    newcenterbuf, newcenter, newskybuf, newsky,
-			    newmagbuf, newmag)
+			    newimage, newcenterbuf, newcenter, newskybuf,
+			    newsky, newmagbuf, newmag)
 
 		    # Measure the nth object in the list.
 		    } else if (cl != NULL) {
@@ -181,33 +203,43 @@ begin
 		        if (apgscur (cl, id, xlist, ylist, prev_num,
 			    req_num, ltid) != EOF) {
 		    	    newlist = YES
-		    	    cier = apfitcenter (ap, im, xlist, ylist)
-		    	    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
-			        apstatr (ap, YCENTER), sd, gd)
-		    	    pier = ap_wmag (ap, im, apstatr (ap, XCENTER),
-			        apstatr (ap, YCENTER), apstati (ap, POSITIVE),
-				apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
-				apstati (ap, NSKY))
+			    if (colonkey == 'm') {
+		    	        newcenterbuf = YES; newcenter = YES
+		    	        newskybuf = YES; newsky = YES
+		    	        newmagbuf = YES; newmag = YES
+			    } else {
+		    	        cier = apfitcenter (ap, im, xlist, ylist)
+		    	        sier = apfitsky (ap, im, apstatr (ap, XCENTER),
+			            apstatr (ap, YCENTER), sd, gd)
+		    	        pier = ap_wmag (ap, im, apstatr (ap, XCENTER),
+			            apstatr (ap, YCENTER), apstati (ap,
+				    POSITIVE), apstatr (ap, SKY_MODE),
+				    apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 
-			    call apmark (ap, id, apstati (ap, MKCENTER),
-				apstati (ap, MKSKY), apstati (ap, MKAPERT))
-			    call appplot (ap, im, stid, cier, sier, pier, gd,
-			        apstati (ap, RADPLOTS))
-			    if (interactive == YES)
-		    	        call ap_qpmag (ap, cier, sier, pier)
+			        if (id != NULL) {
+			            call apmark (ap, id, apstati (ap, MKCENTER),
+				        apstati (ap, MKSKY), apstati (ap,
+					MKAPERT))
+				    if (id == gd)
+				        call gflush (id)
+				    else
+				        call gframe (id)
+			        }
+			        call ap_pplot (ap, im, stid, gd, apstati (ap,
+				    RADPLOTS))
+			        if (interactive == YES)
+		    	            call ap_qpmag (ap, cier, sier, pier)
 
-		    	    if (stid == 1)
-				call ap_param (ap, out, "wphot")
-		            call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
-			    call appplot (ap, im, stid, cier, sier, pier, mgd,
-			        YES)
-		    	    stid = stid + 1
-		    	    newcenterbuf = NO
-			    newcenter = NO
-		    	    newskybuf = NO
-			    newsky = NO
-		    	    newmagbuf = NO
-			    newmag = NO
+		    	        if (stid == 1)
+				    call ap_param (ap, out, "wphot")
+		                call ap_pmag (ap, out, stid, ltid, cier, sier,
+				    pier)
+			        call ap_pplot (ap, im, stid, mgd, YES)
+		    	        stid = stid + 1
+		    	        newcenterbuf = NO; newcenter = NO
+		    	        newskybuf = NO; newsky = NO
+		    	        newmagbuf = NO; newmag = NO
+			    }
 
 			} else if (interactive == YES)
 			    call printf (
@@ -219,8 +251,15 @@ begin
 		# Show/set a phot parameter.
 		default:
 		    call ap_wpcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-		        newcenterbuf, newcenter, newskybuf, newsky, newmagbuf,
-			newmag)
+		        newimage, newcenterbuf, newcenter, newskybuf, newsky,
+			newmagbuf, newmag)
+		}
+
+		# Reestablish the image viewport and window.
+		if ((newimage == YES) && (id != NULL) && (id != gd)) {
+		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
+		    call ap_gswv (id, Memc[cmd], im, 4)
+		    newimage = NO
 		}
 
 	    # Save the current parameters in the pset files.
@@ -255,12 +294,17 @@ begin
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
 		    cier = aprefitcenter (ap, cier)
-		call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
-		call apcplot (ap, stid, cier, gd, apstati (ap, RADPLOTS))
+		if (id != NULL) {
+		    call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
+		call ap_cplot (ap, stid, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qcenter (ap, cier)
-		newcenterbuf = NO
-		newcenter = NO
+		newcenterbuf = NO; newcenter = NO
 
 	    # Fit the sky around the cursor position.
 	    case 't':
@@ -270,12 +314,25 @@ begin
 		    sier = apfitsky (ap, im, wx, wy, sd, gd)
 	        else if (newsky == YES)
 		    sier = aprefitsky (ap, gd)
-		call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
-		call apsplot (ap, stid, sier, gd, apstati (ap, RADPLOTS))
+		if (id != NULL) {
+		    call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
+		call ap_splot (ap, stid, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qspsky (ap, sier)
-		newskybuf = NO
-		newsky = NO
+		newskybuf = NO; newsky = NO
+
+	    # Compute the average of several sky measurements around
+            # different cursor postions.
+            case 'a':
+                sier = ap_avsky (ap, im, stid, sd, id, gd, interactive)
+                if (interactive == YES)
+                    call ap_qaspsky (ap, sier)
+                newskybuf = NO; newsky = NO
 
 	     # Fit the sky around the current center position. 
 	     case 's':
@@ -286,30 +343,56 @@ begin
 		        apstatr (ap, YCENTER), sd, gd)
 		else if (newsky == YES)
 		    sier = aprefitsky (ap, gd)
-		call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
-		call apsplot (ap, stid, sier, gd, apstati (ap, RADPLOTS))
+		if (id != NULL) {
+		    call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
+		call ap_splot (ap, stid, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qspsky (ap, sier)
-		newskybuf = NO
-		newsky = NO
+		newskybuf = NO; newsky = NO
 
 	    # Compute magnitudes around the cursor position using the current
 	    # sky.
 	    case 'p':
-	        if (newmagbuf == YES || ! fp_equalr (wx,
+		if (newcenterbuf == YES)
+		    cier = apfitcenter (ap, im, wx, wy)
+		else if (newcenter == YES)
+		    cier = aprefitcenter (ap, cier)
+	        if (newmagbuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
 		    apstatr (ap, PXCUR)) || ! fp_equalr (apstatr (ap,
-		    PYCUR), wy))
-		    pier = ap_wmag (ap, im, wx, wy, apstati (ap, POSITIVE),
-		    apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
-		    apstati (ap, NSKY))
+		    PYCUR), apstatr (ap, YCENTER)))
+		    pier = ap_wmag (ap, im, apstatr (ap, XCENTER),
+		        apstatr (ap, YCENTER), apstati (ap, POSITIVE),
+		        apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
+		        apstati (ap, NSKY))
 		else
 		    pier = ap_wremag (ap, apstati (ap, POSITIVE), apstatr (ap,
 		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
-		call apmark (ap, id, NO, NO, apstati (ap, MKAPERT))
+		if (id != NULL) {
+		    call apmark (ap, id, NO, NO, apstati (ap, MKAPERT))
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
 		if (interactive == YES)
 		    call ap_qpmag (ap, cier, sier, pier)
-		newmagbuf = NO
-		newmag = NO
+		newcenterbuf = NO; newcenter = NO
+		newmagbuf = NO; newmag = NO
+		if (key == 'o') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "wphot")
+		    if (newlist == YES)
+		        call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
+		    else
+		        call ap_pmag (ap, out, stid, 0, cier, sier, pier)
+		    call ap_pplot (ap, im, stid, mgd, YES)
+		    stid = stid + 1
+		}
 
 	    # Compute the center, sky, and magnitudes and save the results.
 	    case 'f', ' ':
@@ -335,10 +418,15 @@ begin
 		    pier = ap_wremag (ap, apstati (ap, POSITIVE), apstatr (ap,
 		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 
-		call apmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
-		    MKSKY), apstati (ap, MKAPERT))
-		call appplot (ap, im, stid, cier, sier, pier, gd, apstati (ap,
-		    RADPLOTS))
+		if (id != NULL) {
+		    call apmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
+		        MKSKY), apstati (ap, MKAPERT))
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
+		call ap_pplot (ap, im, stid, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qpmag (ap, cier, sier, pier)
 
@@ -353,7 +441,7 @@ begin
 		        call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
 		    else
 		        call ap_pmag (ap, out, stid, 0, cier, sier, pier)
-		    call appplot (ap, im, stid, cier, sier, pier, mgd, YES)
+		    call ap_pplot (ap, im, stid, mgd, YES)
 		    stid = stid + 1
 		}
 

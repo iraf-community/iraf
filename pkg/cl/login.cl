@@ -1,6 +1,8 @@
 # LOGIN.CL -- User login file for the IRAF command language.
 
-logver	= "IRAF V2.10BETA February 1992"
+# Identify login.cl version (checked in images.cl).
+if (defpar ("logver"))
+    logver = "IRAF V2.10EXPORT April 1992 revision 1"
 
 set	home		= "cl$"
 set	imdir		= "uparm$"
@@ -8,19 +10,7 @@ set	uparm		= "home$uparm/"
 set	userid		= "CLTEST"
 
 # Set the terminal type.
-if (envget("TERM") == "sun") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to gterm..."
-    stty gterm
-} else if (envget("TERM") == "xterm") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xterm..."
-    stty xterm nl=54
-} else {
-    if (!access (".hushiraf"))
-	print "setting terminal type to vt100 nl=50..."
-    stty vt100 nl=50
-}
+stty xterm nl=44
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
@@ -30,8 +20,9 @@ if (envget("TERM") == "sun") {
 #set	stdplot		= lw
 #set	clobber		= no
 #set	filewait	= yes
-#set	cmbuflen	= 256000
-#set	min_lenuserarea	= 20000
+#set	cmbuflen	= 512000
+#set	min_lenuserarea	= 24000
+#set	imtype		= "imh"
 
 # IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
 # enable remote image display.
@@ -46,14 +37,12 @@ showtype = yes
 # be used to call FORTRAN programs from IRAF.
 
 package user
-if (access ("home$loginuser.cl")) cl < "home$loginuser.cl"
-;
 
-task	$adb $bc $cal $cat $comm $cp $csh $date $df $diff	= "$foreign"
-task	$du $find $finger $ftp $grep $lpq $ls $mail $make	= "$foreign"
+task	$adb $bc $cal $cat $comm $cp $csh $date $dbx $df $diff	= "$foreign"
+task	$du $find $finger $ftp $grep $lpq $lprm $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
-task	$rwho $sh $spell $sps $strings $su $telnet $top		= "$foreign"
-task	$touch $vi $w $wc $less $rusers $sync			= "$foreign"
+task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
+task	$touch $vi $emacs $w $wc $less $rusers $sync $pwd $gdb	= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
@@ -62,29 +51,41 @@ task	$fc = ("$" // envget("iraf") // "unix/hlib/fc.csh" //
 task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 task	$cls = "$clear;ls"
-keep;	clpackage
+
+if (access ("home$loginuser.cl"))
+    cl < "home$loginuser.cl"
+;
+
+keep;   clpackage
 
 prcache directory
-cache	directory page type help
+cache   directory page type help
 
 # Print the message of the day.
 if (access (".hushiraf"))
     menus = no
 else {
-    #clear; type hlib$motd
+    clear; type hlib$motd
 }
 
-# Delete any old MTIO lock files or display WCS (do NOT delete this).
-delete uparm$mt*.lok,uparm$*.wcs verify-
+# Delete any old MTIO lock (magtape position) files.
+if (deftask ("mtclean"))
+    mtclean
+else
+    delete uparm$mt?.lok,uparm$*.wcs verify-
 
 # List any packages you want loaded at login time, ONE PER LINE.
-dataio		# data conversions, import export
-images		# general image operators
-lists		# list processing
-plot		# graphics tasks
-proto		# prototype or ad hoc tasks
-tv		# image display
-utilities	# miscellaneous utilities
-#noao		# optical astronomy packages
+images          # general image operators
+plot            # graphics tasks
+dataio          # data conversions, import export
+lists           # list processing
+
+# The if(deftask...) is needed for V2.9 compatibility.
+if (deftask ("proto"))
+    proto       # prototype or ad hoc tasks
+
+tv              # image display
+utilities       # miscellaneous utilities
+noao            # optical astronomy packages
 
 keep

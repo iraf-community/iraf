@@ -20,7 +20,7 @@ libpkg.a:
 	xyconvolve.x	<error.h> <imhdr.h> <imset.h>
 	aboxcar.x
 	fmd_buf.x
-	med_buf.x
+	med_buf.x	<imhdr.h>
 	med_sort.x
 	fmd_hist.x
 	fmd_maxmin.x	<mach.h> <imhdr.h> <imset.h>

@@ -111,9 +111,8 @@ begin
 		j = 1
 		if (ctoi (Memc[str], j, rval1) == 0)
 		    call error (1, "Range syntax error")
-		rval2 = rval1
 		if (ctoi (Memc[str], j, rval2) == 0)
-		    ;
+		    rval2 = rval1
 	    }
 
 	    # Check limits.

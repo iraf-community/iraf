@@ -51,6 +51,7 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 define	IEEE_SWAP	IEEE_SWAP8
 define	BSWAP		bswap8
 define	NSWAP		8
+define	IOFF		1	# MACHDEP (normally 1, 2 on e.g. Intel)
 
 
 # IEEVPAK -- Convert an array in the native floating point format into an
@@ -65,7 +66,7 @@ int	nelem			#I number of floating point numbers
 int	i
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	if (mapout == NO) {
@@ -104,7 +105,7 @@ int	ival[2]
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	if (IEEE_SWAP == YES) {
@@ -112,7 +113,7 @@ begin
 	    if (mapin != NO)
 		do i = 1, nelem {
 		    fval = native[i]
-	            if (and (ival[1], NaNmask) == NaNmask) {
+	            if (and (ival[IOFF], NaNmask) == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    }
@@ -123,7 +124,7 @@ begin
 	    else {
 		do i = 1, nelem {
 		    fval = ieee[i]
-	            if (and (ival[1], NaNmask) == NaNmask) {
+	            if (and (ival[IOFF], NaNmask) == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    } else
@@ -142,7 +143,7 @@ double	x			#U datum to be converted
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	if (mapout != NO)
@@ -167,14 +168,14 @@ int	ival[2]
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	if (IEEE_SWAP == YES)
 	    call BSWAP (x, 1, x, 1, NSWAP)
 	if (mapin != NO) {
 	    fval = x
-	    if (and (ival[1], NaNmask) == NaNmask) {
+	    if (and (ival[IOFF], NaNmask) == NaNmask) {
 	        x = native_NaN
 		nin = nin + 1
 	    }
@@ -194,7 +195,7 @@ double	x			#I native value which will replace NaN
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	native_NaN = x
@@ -212,7 +213,7 @@ double	x			#O native value which will replace NaN
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	x = native_NaN
@@ -229,7 +230,7 @@ int	o_nout				#O number of NaN values output
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	o_nin = nin
@@ -243,7 +244,7 @@ procedure ieezstatd ()
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	nin = 0
@@ -271,7 +272,7 @@ int	outval				#I enable NaN mapping for output?
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
-common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	mapin = inval

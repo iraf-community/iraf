@@ -24,8 +24,8 @@ include "pdm.h"
 procedure pdm_ranperm (inarray, inuse, outarray, outinuse, numpts, seed)
 
 int	numpts			# number of points in the data
-real	inarray[numpts]		# data to be permuted
-real	outarray[numpts]	# output permuted data to this array
+double	inarray[numpts]		# data to be permuted
+double	outarray[numpts]	# output permuted data to this array
 int	inuse[numpts]		# the PDM in-use array
 int	outinuse[numpts]	# output scrambled in-use array
 long	seed			# a seed for the random number generator

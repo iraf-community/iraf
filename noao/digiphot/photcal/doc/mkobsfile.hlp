@@ -1,4 +1,4 @@
-.help mkobsfile Aug91 noao.digiphot.photcal
+.help mkobsfile Apr94 noao.digiphot.photcal
 .ih
 NAME
 mkobsfile -- prepare  a single observations file from a list of APPHOT/DAOPHOT
@@ -40,33 +40,38 @@ The format of \fIimsets\fR is described in detail below.
 .le
 .ls obsparams = ""
 The name of an optional text file containing the filter ids, exposure times,
-and airmasses for each image whose values are either not stored or incorrectly
-stored in \fIphotfiles\fR.
+airmasses, and times of observation for each image whose values are
+either not stored or incorrectly stored in \fIphotfiles\fR.
 If \fIobsparams\fR is the standard input "STDIN", MKOBSFILE prompts the user
-for the correct filter id,  exposure time and airmass for each image in
-each image set.
+for the correct filter id,  exposure time, airmass, and time of observation
+for each image in each image set.
 Otherwise the observing parameters for each image are assumed to be
 listed in \fIobsparams\fR, 1 image per line, with the image
-name in column 1 and the filter ids, exposure times, and airmasses
-in the columns defined by \fIobscolumns\fR.
+name in column 1 and the filter ids, exposure times, airmasses,
+and times of observation in the columns defined by \fIobscolumns\fR.
 The image names must match those in \fIimsets\fR.
 Images which have no
 entries in \fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
 .le
-.ls obscolumns = "2 3 4"
+.ls obscolumns = "2 3 4 5"
 The list of numbers separated by commas or whitespace specifying which columns
-in \fIobsparams\fR contain the correct filter ids, expsoure times, and
-airmasses respectively.
+in \fIobsparams\fR contain the correct filter ids, expsoure times, 
+airmasses, and times ob observation respectively.
 The number 0 may be used as a place holder in
 the \fIobscolumns\fR string. For example, to correct only the \fIphotfiles\fR
-airmass values, \fIobscolumns\fR should be set to "0 0 column", where
+airmass values, \fIobscolumns\fR should be set to "0 0 column 0", where
 column is the airmass column number. The default
 value of \fIobscolumns\fR corresponds to the format of the default
 \fIobsparams\fR file produced by MKIMSETS.
 .le
+.ls minmagerr = 0.001
+The error that will be assigned to a non-INDEF valued magnitude measurement
+if the recorded error is less than \fIminmagerr\fR.
+.le
 .ls shifts = "STDIN"
 The name of the text file specifying the x-y shifts to be  added
-to the x-y positions of all objects in an image before position matching. 
+to the x-y positions of all objects in an image before position matching (the
+original x's and y's are retained in the output). 
 If \fIshifts\fR is the standard input "STDIN", MKOBSFILE prompts the
 user  for the correct x and y shift for each image in each image set.
 Otherwise the shifts are assumed to be listed in \fIshifts\fR,
@@ -138,11 +143,12 @@ OF A CROWDED STAR FIELD.
 MKOBSFILE performs
 the following functions: 1) extracts the quantities
 image name, x and y position, exposure time, filter id,
-airmass, magnitude and magnitude error from \fIphotfiles\fR,
+airmass, time of observation, magnitude and magnitude
+error from \fIphotfiles\fR,
 2) corrects erroneous or missing values of the filter id, exposure time,
-and airmass in \fIphotfiles\fR, 3) associates each field with one
-or more sets of images
-of that field taken through different filters, 
+airmass, and time of observation in \fIphotfiles\fR, 3) associates each
+field with one or more sets of images of that field taken through
+different filters, 
 4) matches individual objects within a given image set by order of occurrence
 or x-y position
 and, 5) assigns a unique name to each object in each field.
@@ -167,14 +173,14 @@ observations is large the user should consider using MKIMSETS and
 MKNOBSFILE to create their observations file.
 The format of \fIimsets\fR is described in detail below.
 
-Values of the filter ids , exposure times,  and airmasses
-which are missing or incorrect in \fIphotfiles\fR,
+Values of the filter ids , exposure times,  airmasses, and times of
+observation which are missing or incorrect in \fIphotfiles\fR,
 can be corrected by reading the correct values from the columns
 \fIobscolumns\fR in the file
 \fIobsparams\fR.  The format of \fIobsparams\fR is described in detail below.
 If \fIobsparams\fR is the standard input "STDIN" then MKOBSFILE will
-prompt the user for the filter ids, exposure times and airmasses
-for each image in each image set.
+prompt the user for the filter ids, exposure times, airmasses, and times of
+observation for each image in each image set.
 
 MKOBSFILE matchs the objects in different images within the same observation
 either
@@ -258,29 +264,30 @@ listed in columns 2, 3 and 4 respectively.
 THE OBSPARAMS FILE
 
 The file \fIobsparams\fR lists the correct filter ids, exposure times,
-and airmasses for each image,
+airmasses, and times of observation for each image,
 1 image per line, with the image name in column 1, and the remaining
 quantities in the columns specified by \fIobscolumns\fR.
 The images names must correspond to those in \fIimsets\fR.
 
 A sample corrections file \fIobsparams\fR for the previous set of
 UBV M92 observations is shown below.
-The filter ids, exposure times, and airmasses  for all the images
-were correctly read into \fIphotfiles\fR
-from the image headers with the exception of the filter id, exposure time, and
-airmass for the V frame of "M92M".
-The correct filter id, exposure time, and airmass is supplied in
-\fIobsparams\fR  with \fIobscolumns\fR set to "2 3 4" as follows.
+The filter ids, exposure times, airmasses, and times of observation
+for all the images were correctly read into \fIphotfiles\fR
+from the image headers with the exception of the filter id, exposure time,
+airmass, and time of observation for the V frame of "M92M".
+The correct filter id, exposure time, airmass, and time of observation
+is supplied in \fIobsparams\fR  with \fIobscolumns\fR set to "2 3 4 5"
+as follows.
 
 .nf
-	m92vm    3 300 1.256
+	m92vm    3 300 1.256 03:14:20.4
 .fi
 
 Zero can be used as a place holder in \fIobscolumns\fR as in the
 following example where
 the user wants to correct only the exposure time and the airmass but
-leave the filter id alone. In this case \fIobscolumns\fR is set to "0 2 3"
-and \fIobsparams\fR looks as follows.
+leave the filter id and time of observation alone. In this
+case \fIobscolumns\fR is set to "0 2 3 0" and \fIobsparams\fR looks as follows.
 
 .nf
 	m92vm    300 1.256
@@ -343,47 +350,47 @@ to executing MKOBSFILE or by using the contents of the \fIobsparams\fR
 file, and so are not included in \fIobservations\fR.
 
 .nf
-	# FIELD   FILTER   AIRMASS  X     Y     MAG   MERR
+	# FIELD   FILTER  OTIME   AIRMASS  X     Y     MAG   MERR
 
-	  M92L-1  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  M92L-2  1        .        .     .     .     .
-	  *       2        .        .     .     .     .   
-	  *       3        .        .     .     .     .
+	  M92L-1  1       .       .        .     .     .     .
+	  *       2       .       .        .     .     .     .
+	  *       3       .       .        .     .     .     .
+	  M92L-2  1       .       .        .     .     .     .
+	  *       2       .       .        .     .     .     .   
+	  *       3       .       .        .     .     .     .
 	  .
 	  .
 	  .
-	  M92L-N  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  ...................................................
-	  M92M-1  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  M92M-2  1        .        .     .     .     .
-	  *       2        .        .     .     .     .   
-	  *       3        .        .     .     .     .
+	  M92L-N  1       .       .        .     .     .     .
+	  *       2       .       .        .     .     .     .
+	  *       3       .       .        .     .     .     .
+	  .......................................................
+	  M92M-1  1       .       .        .     .     .     .
+	  *       2       .       .        .     .     .     .
+	  *       3       .       .        .     .     .     .
+	  M92M-2  1       .       .        .     .     .     .
+	  *       2       .       .        .     .     .     .   
+	  *       3       .       .        .     .     .     .
 	  .
 	  .
 	  .
-	  M92M-N  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  ...................................................
-	  M92S-1  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  M92S-2  1        .        .     .     .     .
-	  *       2        .        .     .     .     .   
-	  *       3        .        .     .     .     .
+	  M92M-N  1       .        .        .     .     .     .
+	  *       2       .        .        .     .     .     .
+	  *       3       .        .        .     .     .     .
+	  ........................................................
+	  M92S-1  1       .        .        .     .     .     .
+	  *       2       .        .        .     .     .     .
+	  *       3       .        .        .     .     .     .
+	  M92S-2  1       .        .        .     .     .     .
+	  *       2       .        .        .     .     .     .   
+	  *       3       .        .        .     .     .     .
 	  .
 	  .
 	  .
-	  M92S-N  1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  ...................................................
+	  M92S-N  1       .        .        .     .     .     .
+	  *       2       .        .        .     .     .     .
+	  *       3       .        .        .     .     .     .
+	  ........................................................
 .fi
 
 The accompanying format description file has the following
@@ -394,23 +401,26 @@ format.
 
 observations
 
-X1            3              # airmass in filter 1
-x1            4              # x coordinate in filter 1
-y1            5              # y coordinate in filter 1
-m1            6              # instrumental magnitude in filter 1
-error(m1)     7              # magnitude error in filter 1
+T1            3              # the time of observation in filter 1
+X1            4              # airmass in filter 1
+x1            5              # x coordinate in filter 1
+y1            6              # y coordinate in filter 1
+m1            7              # instrumental magnitude in filter 1
+error(m1)     8              # magnitude error in filter 1
 
-X2            9              # airmass in filter 2
-x2            10             # x coordinate in filter 2
-y2            11             # y coordinate in filter 2
-m2            12             # instrumental magnitude in filter 2
-error(m2)     13             # magnitude error in filter 2
+T2            10             # the time of observation in filter 2
+X2            11             # airmass in filter 2
+x2            12             # x coordinate in filter 2
+y2            13             # y coordinate in filter 2
+m2            14             # instrumental magnitude in filter 2
+error(m2)     15             # magnitude error in filter 2
 
-X3            15             # airmass in filter 3
-x3            16             # x coordinate in filter 3
-y3            17             # y coordinate in filter 3
-m3            18             # instrumental magnitude in filter 3
-error(m3)     19             # magnitude error in filter 3
+T3            17             # time of observation in filter 3
+X3            18             # airmass in filter 3
+x3            19             # x coordinate in filter 3
+y3            20             # y coordinate in filter 3
+m3            21             # instrumental magnitude in filter 3
+error(m3)     22             # magnitude error in filter 3
 .fi
 
 .ih
@@ -463,10 +473,10 @@ in the globular cluster field plus a few extraneous objects.
 Position matching is required, but since the filter to filter shifts are
 small no x-y offsets are required for position matching.
 Since these objects are standard stars, aperture corrections are not 
-required.  The user forgot to define the filter id, exposure time, and
-airmass image header keyword parameters
+required.  The user forgot to define the filter id, exposure time,
+airmass, and time of observation image header keyword parameters
 inside DAOPHOT,  so the magnitudes are not normalized for exposure time,
-and the airmasses and filter ids are incorrect.
+and the airmasses, filter ids, and times of observation are incorrect.
 
 .nf
 	ph> assemble the following information
@@ -476,7 +486,7 @@ and the airmasses and filter ids are incorrect.
 	    ... the filter id, exposure time, and airmass of each image
 
 	ph> mkobsfile gcl*.mag.* "1,2,3" gcl.obs obsparams="STDIN"\
-	    obcolumns="0 2" shifts="" apercors="" tolerance=5.0
+	    obcolumns="2 3 4 5" shifts="" apercors="" tolerance=5.0
 
 	    ... mkobsfile prompts the user for a field name and an image
 	        name corresponding to each filter as above
@@ -485,8 +495,8 @@ and the airmasses and filter ids are incorrect.
 		set entry
 
 	    ... mkobsfile prompts the user for the correct filter id,
-	        exposure time, and airmass for each image in each image
-		set
+	        exposure time, airmass, and time of observation for each
+		image in each image set
 	    ... the end-of-file character <EOF> typed in response to the
 	        query for the next set of corrections terminates image
 		corrections entry

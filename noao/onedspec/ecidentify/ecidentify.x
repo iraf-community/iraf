@@ -1,7 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 include	<gset.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 define	HELP		"noao$onedspec/ecidentify/ecidentify.key"
@@ -525,7 +525,9 @@ newkey_
 	# Free image data and MWCS
 	call mfree (EC_PIXDATA(ec), TY_DOUBLE)
 	call mfree (EC_FITDATA(ec), TY_DOUBLE)
-	call mw_close (MW(EC_SH(ec)))
+	call smw_close (MW(EC_SH(ec)))
+	do i = 1, EC_NLINES(ec)
+	    MW(SH(ec,i)) = NULL
 
 	# If a new image was specified by a colon command don't return.
 	if (newimage[1] != EOS) {

@@ -15,7 +15,7 @@ fittrace,b,h,yes,,,Fit traced points interactively?
 fit,b,h,yes,,,"Fit apertures?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,10,1,,Number of dispersion lines to sum
+nsum,i,h,10,,,Number of dispersion lines to sum or median
 threshold,r,h,10.,,,"Division threshold for ratio fit
 "
 background,s,h,"none","none|average|median|minimum|fit",,Background to subtract

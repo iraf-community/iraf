@@ -71,7 +71,6 @@ names will be "card101", "card102" and "card103" respectively, instead of
 
 .ih
 DESCRIPTION
-
 Multiple cardimage files are read from disk or tape.
 If only the magtape device is specified,
 a list of file numbers is requested.  In the latter case, output files
@@ -80,34 +79,33 @@ whitespace is trimmed from each line.
 
 .ih
 EXAMPLES
-
-Convert a set of ASCII cardimage files on magnetic tape to IRAF text files,
+1. Convert a set of ASCII cardimage files on magnetic tape to IRAF text files,
 replacing blanks with tabs and blanks, and trimming whitespace from
 the ends of lines.
 
 	cl> rcardimage mtb1600 1-999 textfiles
 
-Convert a set of ASCII cardimage files on disk to IRAF test files.
+2. Convert a set of ASCII cardimage files on disk to IRAF test files.
 
 	cl> rcard card* 1 textfiles
 
-Convert a set of EBCDIC cardimage files on magnetic tape to IRAF text files,
+3. Convert a set of EBCDIC cardimage files on magnetic tape to IRAF text files,
 trimming whitespace from the ends of lines but leaving embedded blanks
 unchanged.
 
 	cl> rcardimage mtb1600 1-999 textfile en- ebc+
 
-Convert  an odd-blocked (81 bytes per card) rcardimage file on tape to an IRAF
-text file by using reblock to write the file to disk and pad the cards
+4. Convert  an odd-blocked (81 bytes per card) rcardimage file on tape to an
+IRAF text file by using reblock to write the file to disk and pad the cards
 with blanks, followed by rcardimage to convert the file to an IRAF textfile.
 
-	cl> reblock mta[1] cardimage inrecord=81 outrecord=82 padchar=" "
+	cl> reblock mta[1] cardimage inrecord=81 outrecord=82 \
+	    padchar=" "
 
 	cl> rcardimage cardimage 1 textfile card_length=82
 
 .ih
 BUGS
-
 Due to portability considerations The card length in bytes must fill an
 integral number of IRAF characters.  On most machines this means that the
 length of the card must be an even number of bytes .  The task should be
@@ -116,4 +114,7 @@ to read odd blocked card image files.
 
 The size of the output text file lines is currently restricted to 161
 or fewer characters.
+.ih
+SEE ALSO
+wcardimage
 .endhelp

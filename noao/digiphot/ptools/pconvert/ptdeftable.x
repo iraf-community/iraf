@@ -228,6 +228,7 @@ begin
 	}
 
 	# Create the table.
+	call tbpset (td, TBL_MAXPAR, KY_NPKEYS(key))
 	call tbtcre (td)
 
 	# Free the space
@@ -340,7 +341,7 @@ begin
 		while (get_next_number (Memi[rangeset], nelems) != EOF) {
 		    if (nelems < 1 || nelems > Memi[KY_NELEMS(key)+index-1])
 			break
-		    call sprintf (Memc[colname], SZ_COLNAME, "%s\[%d]")
+		    call sprintf (Memc[colname], SZ_COLNAME, "%s[%d]")
 			call pargstr (Memc[kname])
 			call pargi (nelems)
 		    call tbcfnd (td, Memc[colname], columns[ncols+1], 1)
@@ -348,11 +349,11 @@ begin
 			call eprintf ("Column %s not found\n")
 			    call pargstr (Memc[colname])
 		    } else {
-		        ncols = ncols + 1
 		        Memi[KY_SELECT(key)+ncols] = index
 		        Memi[KY_ELEM_SELECT(key)+ncols] = nelems
 		        Memi[KY_LEN_SELECT(key)+ncols] = pt_kstati (key,
 		            Memc[kname], KY_LENGTH)
+		        ncols = ncols + 1
 		    }
 
 		}

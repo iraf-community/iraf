@@ -1,17 +1,17 @@
-define	DUMMY	6
-
-include	<error.h>
+include	<fset.h>
 include	<mach.h>
+include	<error.h>
 include	<gset.h>
 include	<config.h>
 include	<xwhen.h>
-include	<fset.h>
 include "../lib/daophotdef.h"
 include "../lib/psfdef.h"
 
-# DP_SURFPSF -- Draw a perspective view of an image section.  The altitude
-# and azimuth of the viewing angle are variable.  Floor and ceiling
-# constraints may be applied to the image data before plotting if desired.
+define	DUMMY	6
+
+# DP_SURFPSF -- Draw a perspective view of a subraster with a given altitude
+# and azimuth of the viewing angle.  Floor and ceiling constraints may be
+# applied to the data before plotting.
 
 procedure dp_surfpsf (dao, subras, ncols, nlines, title, gd)
 
@@ -23,7 +23,7 @@ pointer	gd				# pointer to graphics stream
 
 char	sysidstr[SZ_LINE]
 int	first, wkid, epa, status, old_onint, tsujmp[LEN_JUMPBUF]
-pointer	sp, temp, work, psf, psfpl
+pointer	sp, temp, work, psf
 real	angh, angv, imcols, imlines, floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
 extern	dp_sonint()
@@ -32,32 +32,30 @@ common  /noaovp/ vpx1, vpx2, vpy1, vpy2
 common  /frstfg/ first
 
 begin
-	# First initialize surface common blocks before changing any parameters.
+	# Get the psf fitting substructure pointer.
+	psf = DP_PSF(dao)
+
+	# Initialize surface common blocks before changing any parameters.
 	first = 1
 	call srfabd ()
 
-	# Set the daophot structures.
-	psf = DP_PSF (dao)
-	psfpl = DP_PSFPLOT (psf)
-
-	# Set local variables
-	angh = DP_MANGH (psfpl)
-	angv = DP_MANGV (psfpl)
-	floor = DP_MFLOOR (psfpl)
-	ceiling = DP_MCEILING (psfpl)
+	# Set local variables.
+	angh = DP_MANGH (psf)
+	angv = DP_MANGV (psf)
+	floor = DP_MFLOOR (psf)
+	ceiling = DP_MCEILING (psf)
 	floor = min (floor, ceiling)
 	ceiling = max (floor, ceiling)
 
-	# Allow room for axes and labels
+	# Allow room for axes and labels.
 	vpx1 = 0.10
 	vpx2 = 0.90
 	vpy1 = 0.10
 	vpy2 = 0.90
 
+	# Make a copy of the subraster so we can subtract the zero level.
 	imcols = real (ncols)
 	imlines = real (nlines)
-
-	# Make a copy of the subraster so we can subtract the zero level.
 	call smark (sp)
 	call salloc (temp, ncols * nlines, TY_REAL)
 	call amovr (subras, Memr[temp], nlines * ncols)
@@ -65,7 +63,7 @@ begin
 	# Allocate the working storage needed by EZSRFC.
 	call malloc (work, 2 * ncols * nlines + ncols + nlines, TY_REAL)
 
-	# Take floor and ceiling if enabled (nonzero).
+	# Take off floor and ceiling if enabled (nonzero).
 	call dp_slimits (Memr[temp], ncols, nlines, floor, ceiling)
 
 	# Set up the titles and the viewport.
@@ -102,7 +100,6 @@ begin
 	call gclks ()
 	call mfree (work, TY_REAL)
 	call sfree (sp)
-
 end
 
 

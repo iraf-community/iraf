@@ -30,7 +30,7 @@ define	T_OFFCAP	215		# struct offset to caplist field
 define	MAX_CAPS	100		# maximum capabilities
 define	MAX_COORDS	7		# maximum coords for ttysubi
 define	SZ_CTRLSTR	50		# buffer size for control strings
-define	LEN_DEFTTY	(256+512)	# initial length of tty structure
+define	LEN_DEFTTY	(256+1024)	# initial length of tty structure
 
 define	T_LEN		Memi[$1]	# length of tty structure
 define	T_OP		Memi[$1+1]	# offset into caplist

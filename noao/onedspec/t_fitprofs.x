@@ -1,16 +1,19 @@
 include	<error.h>
 include	<imhdr.h>
-include	<imset.h>
+include	<smw.h>
 include	<gset.h>
-include	"shdr.h"
 
-# Fit types
+# Fit types.
 define	FITTYPES "|fixed|single|all|"
 
-# Output image options
+# Output image options.
 define	OPTIONS	"|difference|fit|"
 define	DIFF		1
 define	FIT		2
+
+# Monte-Carlo errors
+define	MC_SAMPLE		50
+define	MC_SIGMA		34
  
 # T_FITPROFS -- Fit image profiles.
  
@@ -18,12 +21,16 @@ procedure t_fitprofs()
  
 int	inlist			# List of input spectra
 pointer	aps			# Aperture list
+pointer	bands			# Band list
 
 pointer	pos, sig		# Fitting region and initial components
 real	sigma			# Default sigma
 int	fitbkg			# Fit background?
 int	fitpos			# Position fit flag (1=fixed, 2=single, 3=all)
 int	fitsig			# Sigma fit flag (1=fixed, 2=single, 3=all)
+
+real	sigma0			# Constant noise
+real	invgain			# Inverse gain
 
 pointer	components		# List of components
 bool	verbose			# Verbose?
@@ -37,29 +44,27 @@ bool	merge			# Merge with existing images?
 real	x, s
 bool	complement
 int	i, ng, nalloc
-pointer	sp, input, output
+pointer	sp, input, output, ptr
  
 real	clgetr()
 bool	clgetb()
-int	clgeti(), clgwrd(), clscan()
+int	clgwrd(), clscan()
 int	imtopenp(), imtgetim(), imtlen()
 int	open(), fscan(), nscan()
-int	decode_ranges(), nowhite(), btoi()
+int	nowhite(), btoi()
+pointer	rng_open()
 errchk	open
  
 begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 300, TY_INT)
-	call salloc (components, 300, TY_INT)
  
+	# Get parameters.
 	inlist = imtopenp ("input")
 	outlist = imtopenp ("output")
 	if (imtlen (outlist) > 1 && imtlen (outlist) != imtlen (inlist))
 	    call error (1, "Input and output image lists do not make sense")
-
-	call shdr_2d (NULL, clgeti ("dispaxis"), clgeti ("nsum"))
 
 	verbose = clgetb ("verbose")
 	call clgstr ("logfile", Memc[output], SZ_FNAME)
@@ -80,6 +85,12 @@ begin
 	sigma = clgetr ("sigma")
 	clobber = clgetb ("clobber")
 	merge = clgetb ("merge")
+        sigma0 = clgetr ("sigma0")
+        invgain = clgetr ("invgain")
+	if (IS_INDEF(sigma0) || IS_INDEF(invgain) || sigma0<0. || invgain<0.) {
+	    sigma0 = INDEF
+	    invgain = INDEF
+	}
 
 	# Get the initial positions/sigmas.
 	call clgstr ("positions", Memc[input], SZ_FNAME)
@@ -128,30 +139,38 @@ begin
 	    if (nscan() < 2)
 		Memr[sig+ng+1] = Memr[sig+ng]
  
-	# Decode range string and set complement if needed.
+	# Decode range strings and set complement if needed.
+	complement = false
 	call clgstr ("lines", Memc[input], SZ_FNAME)
-	if (Memc[input] == '!') {
+	ptr = input
+	if (Memc[ptr] == '!') {
 	    complement = true
-	    if (decode_ranges (Memc[input+1], Memi[aps], 100, i) == ERR)
-	        call error (1, "Bad aperture/record list")
-	} else {
-	    complement = false
-	    if (decode_ranges (Memc[input], Memi[aps], 100, i) == ERR)
-	        call error (1, "Bad lines/column/aperture list")
+	    ptr = ptr + 1
 	}
+	iferr (aps = rng_open (Memc[ptr], INDEF, INDEF, INDEF))
+	    call error (1, "Bad lines/column/aperture list")
+
+	call clgstr ("bands", Memc[input], SZ_FNAME)
+	ptr = input
+	if (Memc[ptr] == '!') {
+	    complement = true
+	    ptr = ptr + 1
+	}
+	iferr (bands = rng_open (Memc[ptr], INDEF, INDEF, INDEF))
+	    call error (1, "Bad band list")
 
 	# Decode components.
 	call clgstr ("components", Memc[input], SZ_FNAME)
-	if (decode_ranges (Memc[input], Memi[components], 100, i) == ERR)
+	iferr (components = rng_open (Memc[input], INDEF, INDEF, INDEF))
 	    call error (1, "Bad component list")
 
 	while (imtgetim (inlist, Memc[input], SZ_FNAME) != EOF) {
 	    if (imtgetim (outlist, Memc[output], SZ_FNAME) == EOF)
 		Memc[output] = EOS
 
-	    call fp_ms (Memc[input], Memi[aps], complement,
+	    call fp_ms (Memc[input], aps, bands, complement,
 		Memr[pos], Memr[sig], ng, fitbkg,fitpos, fitsig,
-		Memi[components], verbose, log, plot, Memc[output],
+		sigma0, invgain, components, verbose, log, plot, Memc[output],
 		option, clobber,merge)
 	}
  
@@ -159,22 +178,26 @@ begin
 	    call close (log)
 	if (plot != NULL)
 	    call close (plot)
+	call rng_close (aps)
+	call rng_close (bands)
+	call rng_close (components)
 	call imtclose (inlist)
 	call imtclose (outlist)
 	call mfree (pos, TY_REAL)
 	call mfree (sig, TY_REAL)
-	call shdr_2d (NULL, 0, 0)
 	call sfree (sp)
 end
 
  
 # FP_MS -- Handle I/O and call fitting procedure.
 
-procedure fp_ms (input, aps, complement, pos, sig, ng, fitbkg, fitpos, fitsig,
-	components, verbose, log, plot, output, option, clobber,merge)
+procedure fp_ms (input, aps, bands, complement, pos, sig, ng,
+	fitbkg, fitpos, fitsig, sigma0, invgain, components, verbose, log, plot,
+	output, option, clobber,merge)
 
 char	input[ARB]		# Input image
-int	aps[ARB]		# Apertures
+pointer	aps			# Apertures
+pointer	bands			# Bands
 bool	complement		# Complement aperture selection
 
 real	pos[ng], sig[ng]	# Positions and sigmas of initial profiles
@@ -183,7 +206,10 @@ int	fitbkg			# Background fit?
 int	fitpos			# Position fit flag (1=fixed, 2=single, 3=all)
 int	fitsig			# Sigma fit flag (1=fixed, 2=single, 3=all)
 
-int	components[ARB]		# Output Component list
+real	sigma0			# Constant noise
+real	invgain			# Inverse gain
+
+pointer	components		# Output Component list
 bool	verbose			# Verbose output?
 int	log			# Log file descriptor
 int	plot			# Plot file descriptor
@@ -192,323 +218,329 @@ int	option			# Output image option
 bool	clobber			# Clobber existing image?
 bool	merge			# Merge with existing image?
 
-real	a, b
-double	w1, dw, z, aplow, aphigh
+real	aplow[2], aphigh[2]
+double	a, b, w1, wb, dw, z, p1, p2, p3
 bool	select
-int	i, j, k, l, p, ap, beam, dtype, nw, ninaps, noutaps, naps, last
-int	axis[2]
-pointer	ptr, in, out, tmp, mwin, mwout, sh, ct
-pointer	sp, str, key, temp, ltm, ltv, coeff, outaps
+int	i, j, k, l, ap, beam, dtype, nw, ninaps, noutaps, nbands, naps, last
+int	mwoutdim, axis[3]
+pointer	ptr, in, out, tmp, mwin, mwout, sh, shout
+pointer	sp, str, key, temp, ltm1, ltv1, ltm2, ltv2, coeff, outaps
 pointer	model
 
-real	mw_c1tranr()
+double	shdr_lw()
 int	imaccess(), imgnfn()
-bool	streq(), strne(), is_in_range(), fp_equalr()
-pointer	imofnlu()
-pointer	immap(), smw_openim(), mw_open(), mw_sctran(), imgl2r(), impl2r()
-errchk	immap, smw_openim, mw_open, shdr_open, imunmap, imgstr, imgl2r, impl2r
+bool	streq(), strne(), rng_elementi(), fp_equald()
+pointer	smw_openim(), mw_open()
+pointer	immap(), imgl3r(), impl3r(), imofnlu()
+errchk	immap, smw_openim, mw_open, shdr_open, imunmap, imgstr, imgl3r, impl3r
 errchk	imdelete
-data	axis/1,2/
+data	axis/1,2,3/
 
 begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (key, SZ_LINE, TY_CHAR)
 	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call salloc (ltm, 3*3, TY_REAL)
-	call salloc (ltv, 3, TY_REAL)
+	call salloc (ltm1, 3*3, TY_DOUBLE)
+	call salloc (ltv1, 3, TY_DOUBLE)
+	call salloc (ltm2, 3*3, TY_DOUBLE)
+	call salloc (ltv2, 3, TY_DOUBLE)
 	coeff = NULL
 
-	in = NULL
-	out = NULL
-	tmp = NULL
-	mwin = NULL
-	mwout = NULL
+	# Initialize.
+	in = NULL; out = NULL; tmp = NULL
+	mwin = NULL; mwout = NULL
 	sh = NULL
-	ninaps = 0
-	noutaps = 0
+	ninaps = 0; noutaps = 0; nbands = 0
 
 	iferr {
-	    # Check for existing output image and abort if clobber is not set.
-	    if (output[1] != EOS && imaccess (output, READ_ONLY) == YES) {
-	        if (!clobber) {
-		    call sprintf (Memc[str], SZ_LINE,
-		        "Output spectrum %s already exists")
-		        call pargstr (output)
-		    call error (1, Memc[str])
-	        } else if (merge) {
-		    # Merging when the input and output are the same is nop.
-		    if (streq (input, output)) {
-			call sfree (sp)
-			return
-		    }
+	# Check for existing output image and abort if clobber is not set.
+	if (output[1] != EOS && imaccess (output, READ_ONLY) == YES) {
+	    if (!clobber) {
+		call sprintf (Memc[str], SZ_LINE,
+		    "Output spectrum %s already exists")
+		    call pargstr (output)
+		call error (1, Memc[str])
+	    } else if (merge) {
+		# Merging when the input and output are the same is a nop.
+		if (streq (input, output)) {
+		    call sfree (sp)
+		    return
+		}
 
-		    # Open the output and check the type.
-		    ptr = immap (output, READ_ONLY, 0); out = ptr
-		    ptr = smw_openim (out); mwout = ptr
-		    call shdr_open (out, mwout, 1, 1, INDEFI, SHHDR, sh)
-		    if (FORMAT(sh) != MULTISPEC) {
-			call sprintf (Memc[str], SZ_LINE, "%s - Wrong format")
-			    call pargstr (output)
-			call error (1, Memc[str])
-		    }
+		# Open the output and check the type.
+		ptr = immap (output, READ_ONLY, 0); out = ptr
+		ptr = smw_openim (out); mwout = ptr
+                if (SMW_FORMAT(mwout) == SMW_ND) {
+                    call sprintf (Memc[str], SZ_LINE, "%s - Wrong format")
+                        call pargstr (output)
+                    call error (1, Memc[str])
+                }
 
-		    # Determine existing apertures and renumber them if needed
-		    noutaps = IM_LEN(out,2)
-		    call salloc (outaps, noutaps, TY_INT)
-		    do i = 1, IM_LEN(out,2) {
-			call shdr_open (out, mwout, i, 1, INDEFI, SHHDR, sh)
-			Memi[outaps+i-1] = AP(sh)
-		    }
-	        }
-	        call mktemp ("temp", Memc[temp], SZ_FNAME)
-	    } else
-		call strcpy (output, Memc[temp], SZ_FNAME)
- 
-	    # Open the input and determine the number of final output
-	    # apertures in order to set the output dimensions.
+		# Determine existing apertures.
+		noutaps = SMW_NSPEC(mwout)
+		nbands = SMW_NBANDS(mwout)
+		call salloc (outaps, noutaps, TY_INT)
+		do i = 1, noutaps {
+		    call shdr_open (out, mwout, i, 1, INDEFI, SHHDR, sh)
+		    Memi[outaps+i-1] = AP(sh)
+		}
+	    }
+	    call mktemp ("temp", Memc[temp], SZ_FNAME)
+	} else
+	    call strcpy (output, Memc[temp], SZ_FNAME)
 
-	    ptr = immap (input, READ_ONLY, 0); in = ptr
-	    ptr = smw_openim (in); mwin = ptr
-	    call shdr_open (in, mwin, 1, 1, INDEFI, SHHDR, sh)
+	# Open the input and determine the number of final output
+	# apertures in order to set the output dimensions.
 
-	    naps = noutaps
-	    do i = 1, IM_LEN(in,AAXIS(sh)) {
-		call shdr_open (in, mwin, i, 1, INDEFI, SHHDR, sh)
-		ap = AP(sh)
-		select = is_in_range (aps, ap)
-		if ((complement && select) || (!complement && !select))
+	ptr = immap (input, READ_ONLY, 0); in = ptr
+	ptr = smw_openim (in); mwin = ptr
+
+	naps = noutaps
+
+	j = 1
+	if (SMW_FORMAT(mwin) != SMW_ND) {
+	    j = 0
+	    do i = 1, SMW_NBANDS(mwin) {
+		select = rng_elementi (bands, i)
+		if (!select)
 		    next
+		j = j + 1
+	    }
+	    if (j == 0)
+		call error (1, "No bands selected in image")
+	}
+	nbands = max (j, nbands)
+
+	do i = 1, SMW_NSPEC(mwin) {
+	    call shdr_open (in, mwin, i, 1, INDEFI, SHHDR, sh)
+	    ap = AP(sh)
+	    if (SMW_FORMAT(mwin) == SMW_ND) {
+		call smw_mw (mwin, i, 1, ptr, j, k)
+		select = rng_elementi (aps, j) && rng_elementi (bands, k)
+	    } else
+		select = rng_elementi (aps, ap)
+
+	    if ((complement && select) || (!complement && !select))
+		next
+	    for (j=0; j<noutaps && Memi[outaps+j]!=ap; j=j+1)
+		;
+	    if (j == noutaps)
+		naps = naps + 1
+	    ninaps = ninaps + 1
+	}
+	if (ninaps == 0) {
+	    call sprintf (Memc[str], SZ_LINE, "No apertures selected in %s")
+		call pargstr (input)
+	    call error (1, Memc[str])
+	}
+
+	# Set the output spectrum.  For merging with an existing output
+	# copy to a temporary spectrum with size set appropriately.
+	# For a new output setup copy the input header, reset the
+	# physical line mapping, and clear all dispersion parameters.
+	
+	if (out != NULL) {
+	    ptr = immap (Memc[temp], NEW_COPY, out); tmp = ptr
+	    if (IM_PIXTYPE(tmp) != TY_DOUBLE)
+		IM_PIXTYPE(tmp) = TY_REAL
+
+	    IM_LEN(tmp,1) = max (SMW_LLEN(mwin,1), IM_LEN(out,1))
+	    IM_LEN(tmp,2) = naps
+	    IM_LEN(tmp,3) = max (nbands, IM_LEN(out,3))
+	    if (nbands > 1)
+		IM_NDIM(tmp) = 3
+	    else if (naps > 1)
+		IM_NDIM(tmp) = 2
+	    else
+		IM_NDIM(tmp) = 1
+
+	    do j = 1, IM_LEN(out,3)
+		do i = 1, IM_LEN(out,2) {
+		    ptr = impl3r (tmp, i, j)
+		    call aclrr (Memr[ptr], IM_LEN(tmp,1))
+		    call amovr (Memr[imgl3r(out,i,j)], Memr[ptr], IM_LEN(out,1))
+		}
+	    do j = 1, IM_LEN(out,3)
+		do i = IM_LEN(out,2)+1, IM_LEN(tmp,2) {
+		    ptr = impl3r (tmp, i, j)
+		    call aclrr (Memr[ptr], IM_LEN(tmp,1))
+		}
+	    do j = IM_LEN(out,3)+1, nbands
+		do i = 1, IM_LEN(tmp,2) {
+		    ptr = impl3r (tmp, i, j)
+		    call aclrr (Memr[ptr], IM_LEN(tmp,1))
+		}
+	    call imunmap (out)
+	    out = tmp
+	    tmp = NULL
+	} else if (Memc[temp] != EOS) {
+	    ptr = immap (Memc[temp], NEW_COPY, in); out = ptr
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
+
+	    # Set header
+	    IM_LEN(out,1) = SMW_LLEN(mwin,1)
+	    IM_LEN(out,2) = naps
+	    IM_LEN(out,3) = nbands
+	    if (nbands > 1)
+		IM_NDIM(out) = 3
+	    else if (naps > 1)
+		IM_NDIM(out) = 2
+	    else
+		IM_NDIM(out) = 1
+	    mwoutdim = IM_NDIM(out)
+
+	    j = imofnlu (out, "DISPAXIS,APID*,BANDID*")
+	    while (imgnfn (j, Memc[key], SZ_LINE) != EOF)
+		call imdelf (out, Memc[key])
+	    call imcfnl (j)
+
+	    i = SMW_PDIM(mwin)
+	    j = SMW_PAXIS(mwin,1)
+
+	    ptr = mw_open (NULL, mwoutdim); mwout = ptr
+	    call mw_newsystem (mwout, "equispec", mwoutdim)
+	    call mw_swtype (mwout, axis, mwoutdim, "linear", "")
+	    if (LABEL(sh) != EOS)
+		call mw_swattrs (mwout, 1, "label", LABEL(sh))
+	    if (UNITS(sh) != EOS)
+		call mw_swattrs (mwout, 1, "units", UNITS(sh))
+
+	    call mw_gltermd (SMW_MW(mwin,0), Memd[ltm1], Memd[ltv1], i)
+            call mw_gltermd (mwout, Memd[ltm2], Memd[ltv2], mwoutdim)
+            Memd[ltv2] = Memd[ltv1+(j-1)]
+            Memd[ltm2] = Memd[ltm1+(i+1)*(j-1)]
+	    call mw_sltermd (mwout, Memd[ltm2], Memd[ltv2], mwoutdim)
+	    call smw_open (mwout, NULL, out)
+	}
+
+	if (out != NULL) {
+	    # Check dispersion function compatibility
+	    # Nonlinear functions can be copied to different physical
+	    # coordinate system though the linear dispersion can be
+	    # modified.
+
+	    call mw_gltermd (SMW_MW(mwout,0), Memd[ltm2], Memd[ltv2], mwoutdim)
+	    a = Memd[ltv2]
+	    b = Memd[ltm2]
+	    if (DC(sh) == DCFUNC) {
+		i = SMW_PDIM(mwin)
+		j = SMW_PAXIS(mwin,1)
+
+		call mw_gltermd (SMW_MW(mwin,0), Memd[ltm1], Memd[ltv1], i)
+		Memd[ltv1] = Memd[ltv1+(j-1)]
+		Memd[ltm1] = Memd[ltm1+(i+1)*(j-1)]
+	       if (!fp_equald (a,Memd[ltv1]) || !fp_equald (b,Memd[ltm1])) {
+		    call error (1,
+		"Physical basis for nonlinear dispersion functions don't match")
+		}
+	    }
+	}
+
+	# Now do the actual fitting
+	call salloc (model, SMW_LLEN(mwin,1), TY_REAL)
+	last = noutaps
+	do i = 1, SMW_NSPEC(mwin) {
+	    call shdr_open (in, mwin, i, 1, INDEFI, SHHDR, sh)
+
+	    # Check apertures.
+	    ap = AP(sh)
+	    if (SMW_FORMAT(mwin) == SMW_ND) {
+		call smw_mw (mwin, i, 1, ptr, j, k)
+		select = rng_elementi (aps, j) && rng_elementi (bands, k)
+	    } else
+		select = rng_elementi (aps, ap)
+
+	    if ((complement && select) || (!complement && !select))
+		next
+
+	    call fp_title (sh, Memc[str], verbose, log)
+
+	    call shdr_open (in, mwin, i, 1, INDEFI, SHDATA, sh)
+	    if (SN(sh) < SMW_LLEN(mwin,1))
+		call aclrr (Memr[model], SMW_LLEN(mwin,1))
+	    iferr (call fp_fit (sh, Memr[SX(sh)], Memr[SY(sh)], SN(sh),
+		pos, sig, ng, fitbkg, fitpos, fitsig, sigma0, invgain,
+		components, verbose, log, plot, Memc[str], Memr[model])) {
+		call erract (EA_WARN)
+	    }
+
+	    if (out != NULL) {
 		for (j=0; j<noutaps && Memi[outaps+j]!=ap; j=j+1)
 		    ;
-		if (j == noutaps)
-		    naps = naps + 1
-		ninaps = ninaps + 1
-	    }
-	    if (ninaps == 0) {
-		call sprintf (Memc[str], SZ_LINE, "No apertures selected in %s")
-		    call pargstr (input)
-		call error (1, Memc[str])
-	    }
 
-	    # Set the output spectrum.  For merging with an existing output
-	    # copy to a temporary spectrum with size set appropriately.
-	    # For a new output setup copy the input header, reset the
-	    # physical line mapping, and clear all dispersion parameters.
-	    
-	    if (out != NULL) {
-		ptr = immap (Memc[temp], NEW_COPY, out); tmp = ptr
-		ptr = smw_openim (out); mwout = ptr
-
-		IM_NDIM(tmp) = 2
-		IM_LEN(tmp,1) = max (IM_LEN(in,DAXIS(sh)), IM_LEN(out,1))
-		IM_LEN(tmp,2) = naps
-		do i = 1, IM_LEN(out,2)
-		    call amovr (Memr[imgl2r(out,i)], Memr[impl2r(tmp,i)],
-			IM_LEN(out,1))
-		call imunmap (out)
-		out = tmp
-		tmp = NULL
-	    } else if (Memc[temp] != EOS) {
-		ptr = immap (Memc[temp], NEW_COPY, in); out = ptr
-
-		# Set header
-		IM_LEN(out,1) = IM_LEN(in,DAXIS(sh))
-		IM_LEN(out,2) = naps
-		if (IM_LEN(out,2) == 1)
-		    IM_NDIM(out) = 1
-		else
-		    IM_NDIM(out) = 2
-
-		i = imofnlu (out, "DISPAXIS,APID*")
-		while (imgnfn (i, Memc[key], SZ_LINE) != EOF)
-		    call imdelf (out, Memc[key])
-		call imcfnl (i)
-
-		# Set WCS preserving the input phys coordinates for wavelength
-		ptr = mw_open (NULL, 2); mwout = ptr
-		call mw_newsystem (mwout, "multispec", 2)
-		call mw_swtype (mwout, axis, 2, "multispec", "")
-		if (LABEL(sh) != EOS)
-		    call mw_swattrs (mwout, 1, "label", LABEL(sh))
-		if (UNITS(sh) != EOS)
-		    call mw_swattrs (mwout, 1, "units", UNITS(sh))
-		call aclrr (Memr[ltv], 3)
-		call aclrr (Memr[ltm], 3*3)
-		call mw_gltermr (mwin, Memr[ltm], Memr[ltv], PNDIM(sh))
-		if (DAXIS(sh) == 2) {
-		    Memr[ltv] = Memr[ltv+1]
-		    Memr[ltm] = Memr[ltm+PNDIM(sh)+1]
+		# Set output logical and physical lines
+		if (j < noutaps)
+		    l = j + 1
+		else {
+		    l = last + 1
+		    last = l
 		}
-		Memr[ltv+1] = 0.
-		Memr[ltm+1] = 0.
-		Memr[ltm+3] = 1.
-		call mw_sltermr (mwout, Memr[ltm], Memr[ltv], 2)
-	    }
 
-	    if (out != NULL) {
-		# Check dispersion function compatibility
-		# Nonlinear functions can be copied to different physical
-		# coordinate system though the linear dispersion can be
-		# modified.
+		# Copy and adjust dispersion info
+		call smw_gwattrs (mwin, i, 1, AP(sh), beam,
+		    dtype, w1, dw, nw, z, aplow, aphigh, coeff)
 
-		call mw_gltermr (mwout,Memr[ltm],Memr[ltv], 2)
-		a = Memr[ltv]
-		b = Memr[ltm]
-		if (DC(sh) == DCFUNC) {
-		    call mw_gltermr (mwin, Memr[ltm], Memr[ltv], PNDIM(sh))
-		    if (DAXIS(sh) == 2) {
-			Memr[ltv] = Memr[ltv+1]
-			Memr[ltm] = Memr[ltm+PNDIM(sh)+1]
-		    }
-		   if (!fp_equalr(a,Memr[ltv])||!fp_equalr(b,Memr[ltm])) {
-			call error (1,
-	    "Physical basis for nonlinear dispersion functions don't match")
-		    }
+		w1 = shdr_lw (sh, 1D0)
+		wb = shdr_lw (sh, double (SN(sh)))
+		p1 = (NP1(sh) - a) / b
+		p2 = (NP2(sh) - a) / b
+		p3 = (IM_LEN(out,1) - a) / b
+		nw = nint (min (max (p1 ,p3), max (p1 ,p2))) + NP1(sh) - 1
+		if (p1 != p2)
+		    dw = (wb - w1) / (p2 - p1) * (1 + z)
+		w1 = w1 * (1 + z) - (p1 - 1) * dw
+
+		call smw_swattrs (mwout, l, 1, ap, beam, dtype,
+		    w1, dw, nw, z, aplow, aphigh, Memc[coeff])
+
+		# Copy titles
+		call smw_sapid (mwout, l, 1, TITLE(sh))
+		if (Memc[SID(sh,1)] != EOS)
+		    call imastr (out, "BANDID1", Memc[SID(sh,1)])
+
+		# Copy the data
+		switch (option) {
+		case DIFF:
+		    call asubr (Memr[SY(sh)], Memr[model],
+			Memr[impl3r(out,l,1)+NP1(sh)-1], SN(sh))
+		case FIT:
+		    call amovr (Memr[model], Memr[impl3r(out,l,1)+NP1(sh)-1],
+			SN(sh))
 		}
-		ct = mw_sctran (mwout, "logical", "physical", 2)
-	    }
 
-	    # Now do the actual fitting
-	    call salloc (model, IM_LEN(in,1), TY_REAL)
-	    last = noutaps
-	    do i = 1, IM_LEN(in,AAXIS(sh)) {
-		call shdr_open (in, mwin, i, 1, INDEFI, SHHDR, sh)
-
-		# Check apertures.
-		ap = AP(sh)
-		select = is_in_range (aps, ap)
-		if ((complement && select) || (!complement && !select))
-		    next
-
-		call fp_title (sh, Memc[str], verbose, log)
-
-		call shdr_open (in, mwin, i, 1, INDEFI, SHDATA, sh)
-		if (SN(sh) < IM_LEN(in,1))
-		    call aclrr (Memr[model], IM_LEN(in,1))
-		iferr (call fp_fit (sh, Memr[SX(sh)], Memr[SY(sh)], SN(sh),
-		    pos, sig, ng, fitbkg, fitpos, fitsig, components,
-		    verbose, log, plot, Memc[str], Memr[model])) {
-		    call erract (EA_WARN)
-		    #next
-	        }
-
-		if (out != NULL) {
-		    for (j=0; j<noutaps && Memi[outaps+j]!=ap; j=j+1)
-			;
-
-		    # Set output logical and physical lines
-		    if (j < noutaps)
-			l = j + 1
-		    else {
-			l = last + 1
-			last = l
-		    }
-		    p = nint (mw_c1tranr (ct, real(l)))
-
-		    # Copy and adjust dispersion info
-		    switch (FORMAT(sh)) {
-		    case MULTISPEC:
-			call shdr_gwattrs (mwin, PINDEX1(sh), ap, beam,
-			    dtype, w1, dw, nw, z, aplow, aphigh, coeff)
-			j = nint ((1. - a) / b)
-			k = nint ((SN(sh) - a) / b)
-			nw = min (min (j ,k) + IM_LEN(out,1), max (j ,k))
-			if (dtype == DCLOG) {
-			    dw = log10 (W1(sh) / W0(sh)) / (k - j)
-			    w1 = log10 (W0(sh) / (1 - z)) - (j - 1) * dw
-			} else {
-			    dw = (W1(sh) - W0(sh)) / (k - j) / (1 - z)
-			    w1 = W0(sh) / (1 - z) - (j - 1) * dw
-			}
-			call shdr_swattrs (mwout, p, ap, beam, dtype,
-			    w1, dw, nw, z, aplow, aphigh, Memc[coeff])
-		    case TWODSPEC:
-			j = nint ((1. - a) / b)
-			k = nint ((SN(sh) - a) / b)
-			nw = min (min (j ,k) + IM_LEN(out,1), max (j ,k))
-			if (dtype == DCLOG) {
-			    dw = log10 (W1(sh)/ W0(sh)) / (k - j)
-			    w1 = log10 (W0(sh)) - (j - 1) * dw
-			} else {
-			    dw = (W1(sh) - W0(sh)) / (k - j)
-			    w1 = W0(sh) - (j - 1) * dw
-			}
-
-			call sprintf (Memc[key], SZ_LINE, "spec%d")
-			    call pargi (p)
-			call sprintf (Memc[str], SZ_LINE,
-			    "%d %d %d %g %g %d %g %g %g")
-			    call pargi (ap)
-			    call pargi (BEAM(sh))
-			    call pargd (w1)
-			    call pargd (dw)
-			    call pargi (nw)
-			    call pargr (0.)
-			    call pargr (APLOW(sh))
-			    call pargr (APHIGH(sh))
-			call mw_swattrs (mwout, 2, Memc[key], Memc[str])
-		    }
-
-		    # Copy titles
-		    if (strne (IM_TITLE(out), TITLE(sh))) {
-			call sprintf (Memc[key], SZ_LINE, "APID%d")
-			    call pargi (p)
-			call imastr (out, Memc[key], TITLE(sh))
-		    }
-
-		    # Copy the data
-		    switch (option) {
-		    case DIFF:
-		        call asubr (Memr[SY(sh)], Memr[model],
-			    Memr[impl2r(out,l)], SN(sh))
-		    case FIT:
-		        call amovr (Memr[model], Memr[impl2r(out,l)], SN(sh))
-		    }
-
-		    # Verify copy
-		    if (verbose) {
-			if (FORMAT(sh) == TWODSPEC) {
-			    if (DAXIS(sh) == 1)
-				call printf (
-				    "%s: Lines %d - %d  -->  %s: Ap %d\n")
-			    else {
-				call printf (
-				    "%s: Columns %d - %d  -->  %s: Ap %d\n")
-				call pargstr (input)
-				call pargi (nint(APLOW(sh)))
-				call pargi (nint(APHIGH(sh)))
-				call pargstr (output)
-				call pargi (ap)
-			    }
-			} else {
-			    call printf ("%s: Ap %d  -->  %s: Ap %d\n")
-				call pargstr (input)
-				call pargi (ap)
-				call pargstr (output)
-				call pargi (ap)
-			}
-			call flush (STDOUT)
-		    }
+		# Verify copy
+		if (verbose) {
+		    call shdr_open (out, mwout, l, 1, INDEFI, SHHDR, shout)
+		    call printf ("%s%s(%d)  -->  %s%s(%s)\n")
+			call pargstr (IMNAME(sh))
+			call pargstr (IMSEC(sh))
+			call pargi (AP(sh))
+			call pargstr (IMNAME(shout))
+			call pargstr (IMSEC(shout))
+			call pargi (AP(shout))
+		    call flush (STDOUT)
 		}
 	    }
+	}
 
-	    call mw_close (mwin)
-	    call imunmap (in)
-	    if (out != NULL) {
-		call smw_saveim (mwout, out)
-		call mw_close (mwout)
-		call imunmap (out)
-		if (strne (Memc[temp], output)) {
-		    call imdelete (output)
-		    call imrename (Memc[temp], output)
-		}
+	call smw_close (MW(sh))
+	call imunmap (in)
+	if (out != NULL) {
+	    call smw_saveim (mwout, out)
+	    call smw_close (MW(shout))
+	    call imunmap (out)
+	    if (strne (Memc[temp], output)) {
+		call imdelete (output)
+		call imrename (Memc[temp], output)
 	    }
+	}
 	} then {
 	    if (mwout != NULL)
-		call mw_close (mwout)
+		call smw_close (MW(shout))
 	    if (mwin != NULL)
-		call mw_close (mwin)
+		call smw_close (MW(sh))
 	    if (tmp != NULL)
 	        call imunmap (tmp)
 	    if (out != NULL)
@@ -518,6 +550,7 @@ begin
 	    call erract (EA_WARN)
 	}
     
+	call shdr_close (shout)
 	call shdr_close (sh)
 	call mfree (coeff, TY_CHAR)
 	call sfree (sp)
@@ -529,7 +562,7 @@ define	SQ2PI	2.5066283
 # FP_FIT -- Fit profile functions
 
 procedure fp_fit (sh, x, y, n, pos, sig, ng, fitbkg, fitpos, fitsig,
-	components, verbose, log, plot, title, model)
+	sigma0, invgain, components, verbose, log, plot, title, mod)
 
 pointer	sh			# Spectrum data structure
 real	x[n]			# Coordinates
@@ -544,19 +577,27 @@ int	fitbkg			# Fit background?
 int	fitpos			# Fit position (1=fixed, 2=single, 3=all)
 int	fitsig			# Fit sigma flag (1=fixed, 2=single, 3=all)
 
-int	components[ARB]		# Component list
+real	sigma0			# Constant noise
+real	invgain			# Inverse gain
+
+pointer	components		# Component list
 bool	verbose			# Output to STDOUT?
 int	log			# Log file descriptor
 int	plot			# Plot file descriptor
 char	title[ARB]		# Plot title
-real	model[n]		# Model
+real	mod[n]			# Model
 
-int	i, j, k, i1, i2, nfit
-real	xc, x1, x2, y1, y2, dy, z1, dz, w, z, scale
+int	i, j, k, i1, i2, nfit, nsub
+long	seed
+real	xc, x1, x2, dx, y1, y2, dy, z1, dz, w, z, scale, sscale
 real	height, flux, cont, sigma, eqw, chisq
-pointer	sp, str, xd, yd, xg, yg, sg
+real	flux1, cont1, eqw1, wyc1, slope1
+bool	doerr
+pointer	sp, str, xd, yd, sd, xg, yg, sg, yd1, xg1, yg1, sg1
+pointer	ym, conte, xge, yge, sge, fluxe, eqwe
 pointer	gp, gopen()
-bool	is_in_range()
+bool	rng_elementi()
+real	model(), gasdev(), asumr()
 double	shdr_lw(), shdr_wl
 errchk	dofit
 
@@ -571,7 +612,7 @@ begin
 	i2 = i
 	nfit = i2 - i1 + 1
 	if (nfit < 3) {
-	    call aclrr (model, n)
+	    call aclrr (mod, n)
 	    call error (1, "Too few data points in fitting region")
 	}
 	x1 = shdr_lw (sh, double(i1))
@@ -582,6 +623,7 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (xd, nfit, TY_REAL)
 	call salloc (yd, nfit, TY_REAL)
+	call salloc (sd, nfit, TY_REAL)
 	call salloc (xg, ng, TY_REAL)
 	call salloc (yg, ng, TY_REAL)
 	call salloc (sg, ng, TY_REAL)
@@ -595,33 +637,119 @@ begin
 	    y2 = y[i2]
 	dy = (y2 - y1) / (x2 - x1)
 	scale = 0.
+	doerr = !IS_INDEF(sigma0)
 	do i = i1, i2 {
 	    Memr[xd+i-i1] = x[i]
 	    Memr[yd+i-i1] = y[i] - (y1 + dy * (x[i]-x1))
+	    if (y[i] <= 0.)
+		doerr = false
 	    scale = max (scale, abs (Memr[yd+i-i1]))
 	}
+	if (doerr) {
+	    do i = i1, i2
+		Memr[sd+i-i1] = sqrt (sigma0 ** 2 + invgain * y[i])
+	    sscale = asumr (Memr[sd], nfit) / nfit
+	} else {
+	    call amovkr (1., Memr[sd], nfit)
+	    sscale = 1.
+	}
 	call adivkr (Memr[yd], scale, Memr[yd], nfit)
+	call adivkr (Memr[sd], sscale, Memr[sd], nfit)
+	y1 = y1 / scale
+	dy = dy / scale
 
 	# Setup initial estimates.
 	do i = 1, ng {
-	    j = max (1, min (nfit, nint (shdr_wl (sh, double(pos[i])))))
+	    j = max (1, min (nfit, nint (shdr_wl (sh, double(pos[i])))-i1+1))
 	    Memr[xg+i-1] = pos[i]
-	    Memr[yg+i-1] = Memr[yd+j-i1]
+	    Memr[yg+i-1] = Memr[yd+j-1]
 	    Memr[sg+i-1] = sig[i]
 	}
 	z1 = 0.
 	dz = 0.
-	call dofit (fitbkg, fitpos, fitsig, Memr[xd], Memr[yd], nfit,
-	    z1, dz, Memr[xg], Memr[yg], Memr[sg], ng, chisq)
+	dx = (x[n] - x[1]) / (n - 1)
+	nsub = 3
+	call dofit (fitbkg, fitpos, 3, fitsig, Memr[xd], Memr[yd], Memr[sd],
+	    nfit, dx, nsub, z1, dz, Memr[xg], Memr[yg], Memr[sg], ng, chisq)
+
+	# Compute Monte-Carlo errors.
+	if (doerr) {
+	    call salloc (yd1, nfit, TY_REAL)
+	    call salloc (ym, nfit, TY_REAL)
+	    call salloc (xg1, ng, TY_REAL)
+	    call salloc (yg1, ng, TY_REAL)
+	    call salloc (sg1, ng, TY_REAL)
+	    call salloc (conte, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (xge, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (yge, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (sge, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (fluxe, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (eqwe, MC_SAMPLE*ng, TY_REAL)
+	    do i = 1, nfit {
+		w = Memr[xd+i-1]
+		Memr[ym+i-1] = model (w, dx, nsub, Memr[xg], Memr[yg],
+		    Memr[sg], ng)
+	    }
+	    seed = 1
+	    do i = 0, MC_SAMPLE-1 {
+		do j = 1, nfit
+		    Memr[yd1+j-1] = Memr[ym+j-1] +
+			sscale / scale * Memr[sd+j-1] * gasdev (seed)
+		wyc1 = z1
+		slope1 = dz
+		call amovr (Memr[xg], Memr[xg1], ng)
+		call amovr (Memr[yg], Memr[yg1], ng)
+		call amovr (Memr[sg], Memr[sg1], ng)
+		call dofit (fitbkg, fitpos, 3, fitsig, Memr[xd],
+		    Memr[yd1], Memr[sd], nfit, dx, nsub, wyc1, slope1,
+		    Memr[xg1], Memr[yg1], Memr[sg1], ng, chisq)
+
+		do j = 0, ng-1 {
+		    cont = y1 + z1 + (dy + dz) * Memr[xg+j] - dy * x1
+		    cont1 = y1 + wyc1 + (dy + slope1) * Memr[xg+j] - dy * x1
+		    flux = Memr[sg+j] * Memr[yg+j] * SQ2PI
+		    flux1 = Memr[sg1+j] * Memr[yg1+j] * SQ2PI
+		    if (cont > 0. && cont1 > 0.) {
+			eqw = -flux / cont
+			eqw1 = -flux1 / cont1
+		    } else {
+			eqw = 0.
+			eqw1 = 0.
+		    }
+		    Memr[conte+j*MC_SAMPLE+i] = abs (cont1 - cont)
+		    Memr[xge+j*MC_SAMPLE+i] = abs (Memr[xg1+j] - Memr[xg+j])
+		    Memr[yge+j*MC_SAMPLE+i] = abs (Memr[yg1+j] - Memr[yg+j])
+		    Memr[sge+j*MC_SAMPLE+i] = abs (Memr[sg1+j] - Memr[sg+j])
+		    Memr[fluxe+j*MC_SAMPLE+i] = abs (flux1 - flux)
+		    Memr[eqwe+j*MC_SAMPLE+i] = abs (eqw1 - eqw)
+		}
+	    }
+	    do j = 0, ng-1 {
+		call asrtr (Memr[conte+j*MC_SAMPLE], Memr[conte+j*MC_SAMPLE],
+		    MC_SAMPLE)
+		call asrtr (Memr[xge+j*MC_SAMPLE], Memr[xge+j*MC_SAMPLE],
+		    MC_SAMPLE)
+		call asrtr (Memr[yge+j*MC_SAMPLE], Memr[yge+j*MC_SAMPLE],
+		    MC_SAMPLE)
+		call asrtr (Memr[sge+j*MC_SAMPLE], Memr[sge+j*MC_SAMPLE],
+		    MC_SAMPLE)
+		call asrtr (Memr[fluxe+j*MC_SAMPLE], Memr[fluxe+j*MC_SAMPLE],
+		    MC_SAMPLE)
+		call asrtr (Memr[eqwe+j*MC_SAMPLE], Memr[eqwe+j*MC_SAMPLE],
+		    MC_SAMPLE)
+	    }
+	    call amulkr (Memr[conte], scale, Memr[conte], MC_SAMPLE*ng)
+	    call amulkr (Memr[yge], scale, Memr[yge], MC_SAMPLE*ng)
+	    call amulkr (Memr[fluxe], scale, Memr[fluxe], MC_SAMPLE*ng)
+	}
+
 	call amulkr (Memr[yg], scale, Memr[yg], ng)
-	z1 = z1 * scale
-	dz = dz * scale
-	y1 = y1 + z1 + dz * x1
-	dy = dy + dz
+	y1 = (y1 + z1 + dz * x1) * scale
+	dy = (dy + dz) * scale
 
 	# Log computed values
 	call sprintf (Memc[str], SZ_LINE,
-	    "# Nfit=%d, background=%b, positions=%s, sigmas=%s, RMS=%g\n")
+	    "# Nfit=%d, background=%b, positions=%s, sigmas=%s\n")
 	    call pargi (ng)
 	    call pargi (fitbkg)
 	    if (fitpos == 1)
@@ -636,7 +764,6 @@ begin
 		call pargstr ("single")
 	    else
 		call pargstr ("all")
-	    call pargr (scale * sqrt (chisq / ng))
 	if (log != NULL)
 	    call fprintf (log, Memc[str])
 	if (verbose)
@@ -654,7 +781,7 @@ begin
 	if (verbose)
 	    call printf (Memc[str])
 	do i = 1, ng {
-	    if (!is_in_range (components, i))
+	    if (!rng_elementi (components, i))
 		next
 	    xc = Memr[xg+i-1]
 	    cont = y1 + dy * (xc - x1)
@@ -678,12 +805,27 @@ begin
 		call fprintf (log, Memc[str])
 	    if (verbose)
 		call printf (Memc[str])
+	    if (doerr) {
+		call sprintf (Memc[str], SZ_LINE,
+		" (%7.7g) (%7.7g) (%7.6g) (%7.4g) (%7.6g) (%7.4g) (%7.4g)\n")
+		    call pargr (Memr[xge+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[conte+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[fluxe+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[eqwe+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[yge+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[sge+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (2.355 * Memr[sge+(i-1)*MC_SAMPLE+MC_SIGMA])
+		if (log != NULL)
+		    call fprintf (log, Memc[str])
+		if (verbose)
+		    call printf (Memc[str])
+	    }
 	}
 
 	# Compute model.
-	call aclrr (model, n)
+	call aclrr (mod, n)
 	do i = 1, ng {
-	    if (!is_in_range (components, i))
+	    if (!rng_elementi (components, i))
 		next
 	    xc = Memr[xg+i-1]
 	    height = Memr[yg+i-1]
@@ -691,7 +833,7 @@ begin
 	    do j = 1, n {
 	       z = 0.5 * ((x[j] - xc) / sigma) ** 2
 	       if (z < 5)
-		   model[j] = model[j] + height * exp (-z)
+		   mod[j] = mod[j] + height * exp (-z)
 	    }
 	}
 
@@ -699,10 +841,10 @@ begin
 	if (plot != NULL) {
 	    gp = gopen ("stdvdm", NEW_FILE, plot)
 	    call gascale (gp, y[i1], nfit, 2)
-	    call asubr (y[i1], model[i1], Memr[yd], nfit)
+	    call asubr (y[i1], mod[i1], Memr[yd], nfit)
 	    call grscale (gp, Memr[yd], nfit, 2)
 	    do i = i1, i2
-		Memr[yd+i-i1] = model[i] + y1 + dy * (x[i] - x1)
+		Memr[yd+i-i1] = mod[i] + y1 + dy * (x[i] - x1)
 	    call grscale (gp, Memr[yd], nfit, 2)
 	    call gswind (gp, x1, x2, INDEF, INDEF)
 	    call glabax (gp, title, "", "")
@@ -712,11 +854,11 @@ begin
 	    call gpline (gp, Memr[xd], Memr[yd], nfit)
 	    call gline (gp, x1, y1, x2, y1+dy*(x2-x1))
 	    call gseti (gp, G_PLTYPE, 3)
-	    call asubr (y[i1], model[i1], Memr[yd], nfit)
+	    call asubr (y[i1], mod[i1], Memr[yd], nfit)
 	    call gpline (gp, Memr[xd], Memr[yd], nfit)
 	    call gseti (gp, G_PLTYPE, 4)
 	    do i = 1, ng {
-		if (!is_in_range (components, i))
+		if (!rng_elementi (components, i))
 		    next
 		xc = Memr[xg+i-1]
 		height = Memr[yg+i-1]
@@ -753,29 +895,26 @@ char	str[SZ_LINE]		# Title string
 bool	verbose			# Verbose?
 int	log			# Log file descriptor
 
-pointer	sp, time
+pointer	sp, time, smw
 long	clktime()
 
 begin
 	# Select title format.
-	switch (FORMAT(sh)) {
-	case MULTISPEC:
-	    call sprintf (str, SZ_LINE, "%s - Ap %d: %s")
-		call pargstr (SPECTRUM(sh))
-		call pargi (AP(sh))
-		call pargstr (TITLE(sh))
-	case ONEDSPEC:
-	    call sprintf (str, SZ_LINE, "%s: %s")
-		call pargstr (SPECTRUM(sh))
-		call pargstr (TITLE(sh))
-	case TWODSPEC:
-	    if (DAXIS(sh) == 1)
+	smw = MW(sh)
+	switch (SMW_FORMAT(smw)) {
+	case SMW_ND:
+	    if (SMW_LAXIS(smw,1) == 1)
 		call sprintf (str, SZ_LINE, "%s[*,%d:%d]: %s")
 	    else
 		call sprintf (str, SZ_LINE, "%s[%d:%d,*]: %s")
-		call pargstr (SPECTRUM(sh))
-		call pargi (nint (APLOW(sh)))
-		call pargi (nint (APHIGH(sh)))
+		call pargstr (IMNAME(sh))
+		call pargi (nint (APLOW(sh,1)))
+		call pargi (nint (APHIGH(sh,1)))
+		call pargstr (TITLE(sh))
+	case SMW_ES, SMW_MS:
+	    call sprintf (str, SZ_LINE, "%s - Ap %d: %s")
+		call pargstr (IMNAME(sh))
+		call pargi (AP(sh))
 		call pargstr (TITLE(sh))
 	}
 

@@ -214,7 +214,7 @@ begin
 
 	caplist = coerce (tty + T_OFFCAP, TY_STRUCT, TY_CHAR)
 	op = caplist + T_OP(tty) - 1
-	otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR)
+	otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR) - 1
 
 	# We are already positioned to the start of the caplist.
 	Memc[op] = ':'
@@ -259,7 +259,7 @@ begin
 		T_LEN(tty) = T_LEN(tty) + T_MEMINCR
 		call realloc (tty, T_LEN(tty), TY_STRUCT)
 		op = caplist + T_OP(tty) - 1
-		otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR)
+		otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR) - 1
 	    }
 	}
 

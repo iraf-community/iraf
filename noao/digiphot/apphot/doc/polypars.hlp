@@ -1,7 +1,7 @@
-.help polypars May88 noao.digiphot.apphot
+.help polypars Dec92 noao.digiphot.apphot
 .ih
 NAME
-polypars -- edit the polygon photometry parameters
+polypars -- edit the polygonal aperture photometry parameters
 .ih
 USAGE
 polypars
@@ -20,13 +20,13 @@ If the \fImkpolygon\fR switch is enabled polygons are marked on the screen.
 .ih
 EXAMPLES
 
-1. List the POLYPHOT photometry parameters.
+1. List the polygonal aperture photometry parameters.
 
 .nf
 	ap> lpar polypars
 .fi
 
-2. Edit the POLYPHOT photometry parameters.
+2. Edit the polygonal aperture photometry parameters.
 
 .nf
 	ap> polypars

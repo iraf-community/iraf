@@ -17,6 +17,7 @@ define	APFLAT		11
 define	APMASK		12
 define	APSCRIPT	13
 define	APSLITPROC	14
+define	APNOISE		15
 
 
 # APEXTRACT TASK ENTRY POINTS
@@ -94,6 +95,11 @@ begin
 	call apall (APSLITPROC)
 end
 
+procedure t_apnoise ()
+begin
+	call apall (APNOISE)
+end
+
 
 # APALL -- Master aperture definition and extraction procedure.
 
@@ -112,6 +118,7 @@ bool	norm			# Normalize spectra?
 bool	flat			# Flatten spectra?
 bool	scat			# Subtract scattered light?
 bool	mask			# Aperture mask?
+bool	noise			# Noise calculation?
 
 int	input			# List of input spectra
 int	refs			# List of reference spectra
@@ -125,6 +132,7 @@ int	nsum			# Lines to sum
 pointer	aps			# Pointer to array of aperture pointers
 int	naps			# Number of apertures
 
+char	nullstr[1]
 int	i, j
 pointer	sp, image, output, reference, profiles, str, str1
 
@@ -132,7 +140,9 @@ bool	clgetb(), apgetb(), streq(), ap_answer(), apgans(), apgansb()
 int	imtopenp(), clgeti(), ap_getim(), ap_dbaccess(), strncmp()
 
 errchk	ap_dbacess, ap_dbread, ap_find, ap_recenter, ap_resize, ap_edit
-errchk	ap_trace, ap_extract, ap_scatter, ap_mask
+errchk	ap_trace, ap_plot, ap_extract, ap_scatter, ap_mask
+
+data	nullstr /0,0/
 
 begin
 	# Allocate memory for the apertures, filenames, and strings.
@@ -158,6 +168,8 @@ begin
 	    call apopset ("apscript")
 	case APSLITPROC:
 	    call apopset ("apslitproc")
+	case APNOISE:
+	    call apopset ("apnoise1")
 	default:
 	    call apopset ("apparams")
 	}
@@ -192,6 +204,8 @@ begin
 	    scatout = imtopenp ("scatter")
 	    profs = imtopenp ("profiles")
 	    call apgstr ("format", Memc[format], SZ_LINE)
+	case APNOISE:
+	    call strcpy ("noise", Memc[format], SZ_LINE)
 	}
 
 	trace = false
@@ -201,6 +215,7 @@ begin
 	flat = false
 	scat = false
 	mask = false
+	noise = false
 
 	if (apgetb ("initialize")) {
 	    find = clgetb ("find")
@@ -210,7 +225,7 @@ begin
 
 	    switch (ltask) {
 	    case APTRACE, APSUM, APALL, APFIT, APNORM,
-		APFLAT, APSCAT, APMASK, APSCRIPT, APSLITPROC:
+		APFLAT, APSCAT, APMASK, APSCRIPT, APSLITPROC, APNOISE:
 	        trace = clgetb ("trace")
 	    }
 
@@ -233,10 +248,12 @@ begin
 		if (extract && scat)
 		    call error (1,
 		    "APSCRIPT: Can't combine scattered light and extraction")
+	    case APNOISE:
+		noise = true
 	    }
 
 	    call ap_init (find, recenter, resize, edit, trace, extract, fit,
-	        norm, flat, scat, mask)
+	        norm, flat, scat, mask, noise)
 	} else {
 	    find = apgans ("ansfind")
 	    recenter = apgans ("ansrecenter")
@@ -245,7 +262,7 @@ begin
 
 	    switch (ltask) {
 	    case APTRACE, APSUM, APALL, APFIT, APNORM,
-		APFLAT, APSCAT, APMASK, APSCRIPT, APSLITPROC:
+		APFLAT, APSCAT, APMASK, APSCRIPT, APSLITPROC, APNOISE:
 	        trace = apgans ("anstrace")
 	    }
 
@@ -287,7 +304,7 @@ begin
 
 	    # Get apertures.
 	    call appstr ("ansdbwrite1", "no")
-	    if (streq (Memc[reference], "") ||
+	    if (streq (Memc[reference], nullstr) ||
 		streq (Memc[reference], Memc[image])) {
 		if (clgetb ("verbose"))
 		    call printf ("Searching aperture database ...\n")
@@ -390,7 +407,7 @@ begin
 	                call pargstr (Memc[image])
 		    if (ap_answer ("ansfit", Memc[str])) {
 	                call ap_extract (Memc[image], Memc[output],
-			    Memc[format], "", Memi[aps], naps)
+			    Memc[format], nullstr, Memi[aps], naps)
 		    }
 		}
 
@@ -409,7 +426,7 @@ begin
 			} else
 			    call appstr ("ansfitspec1", "NO")
 	                call ap_extract (Memc[image], Memc[output],
-			    Memc[format], "", Memi[aps], naps)
+			    Memc[format], nullstr, Memi[aps], naps)
 		    }
 		}
 
@@ -428,7 +445,7 @@ begin
 			} else
 			    call appstr ("ansfitspec1", "NO")
 	                call ap_extract (Memc[image], Memc[output],
-			    Memc[format], "", Memi[aps], naps)
+			    Memc[format], nullstr, Memi[aps], naps)
 		    }
 		}
  
@@ -436,12 +453,13 @@ begin
 		if (scat) {
 		    if (ap_getim (scatout, Memc[str1], SZ_LINE) == EOF)
 		        Memc[str1] = EOS
-		    if (Memc[output] == EOS) {
+		    if (Memc[output] == EOS ||
+			streq (Memc[image], Memc[output])) {
 		        call mktemp ("tmp", Memc[str], SZ_LINE)
-	                call ap_scatter (Memc[image], Memc[output],
+	                call ap_scatter (Memc[image], Memc[str],
 			    Memc[str1], Memi[aps], naps, line)
 		        call imdelete (Memc[image])
-		        call imrename (Memc[output], Memc[image])
+		        call imrename (Memc[str], Memc[image])
 		    } else
 	                call ap_scatter (Memc[image], Memc[output],
 			    Memc[str1], Memi[aps], naps, line)
@@ -450,6 +468,11 @@ begin
 		# Make a aperture mask.
 		if (mask)
 		    call ap_mask (Memc[image], Memc[output], Memi[aps], naps)
+
+		# Fit noise.
+		if (noise)
+		    call ap_extract (Memc[image], nullstr,
+			Memc[format], nullstr, Memi[aps], naps)
 
 	    } then
 		call erract (EA_WARN)
@@ -482,10 +505,10 @@ end
 
 
 procedure ap_init (find, recenter, resize, edit, trace, extract, fit,
-	norm, flat, scat, mask)
+	norm, flat, scat, mask, noise)
 
 bool	find, recenter, resize, edit, trace
-bool	extract, fit, norm, flat, scat, mask
+bool	extract, fit, norm, flat, scat, mask, noise
 
 pointer	sp, str
 bool	clgetb()
@@ -526,11 +549,14 @@ begin
 	}
 	if (scat) {
 	    call appans ("ansscat", scat, scat)
+            call appans ("anssmooth", clgetb ("smooth"), clgetb ("smooth"))
             call appans ("ansfitscatter", clgetb ("fitscatter"), false)
-            call appans ("anssmooth", clgetb ("smooth"), false)
+            call appans ("ansfitsmooth", clgetb ("fitsmooth"), false)
 	}
 	if (mask)
 	    call appans ("ansmask", mask, mask)
+	if (noise)
+            call appstr ("ansreview1", "NO")
 
 	if (extract || fit || norm || flat) {
 	    if (clgetb ("interactive"))

@@ -466,6 +466,7 @@ begin
 	    }
 	}
 
+	call sfree (sp)
 	return (ncols)
 end
 

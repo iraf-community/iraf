@@ -48,18 +48,18 @@ begin
 		YBS(yb))
 
 	case SF_SPLINE3:
-	    czptr = SF_COEFF(sf) - 1 + lefty + leftx * SF_NYCOEFF(sf)
 	    call sf_b1spline3 (x, SF_NXPIECES(sf), -SF_XMIN(sf),
 	        SF_XSPACING(sf), XBS(xb), leftx)
 	    call sf_b1spline3 (y, SF_NYPIECES(sf), -SF_YMIN(sf),
 	        SF_YSPACING(sf), YBS(yb), lefty)
+	    czptr = SF_COEFF(sf) - 1 + lefty + leftx * SF_NYCOEFF(sf)
 
 	case SF_SPLINE1:
-	    czptr = SF_COEFF(sf) - 1 + lefty + leftx * SF_NYCOEFF(sf)
 	    call sf_b1spline1 (x, SF_NXPIECES(sf), -SF_XMIN(sf),
 	        SF_XSPACING(sf), XBS(xb), leftx)
 	    call sf_b1spline1 (y, SF_NYPIECES(sf), -SF_YMIN(sf),
 	        SF_YSPACING(sf), YBS(yb), lefty)
+	    czptr = SF_COEFF(sf) - 1 + lefty + leftx * SF_NYCOEFF(sf)
 	}
 
 	# initialize accumulator

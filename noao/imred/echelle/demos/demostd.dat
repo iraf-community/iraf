@@ -29,7 +29,6 @@
     INSTRUME= 'test              '  /  instrument
     APERTURE= '250micron slit    '  /  aperture
     TVFILT  = '4-96              '  /  tv filter
-    DISPAXIS= '2                 '  /  dispersion axis
     GRATPOS =               4624.3  /  grating position
     TRIM    = 'Nov 26  5:44 Trim data section is [23:60,2:1023]'
     OVERSCAN= 'Nov 26  5:44 Overscan section is [103:133,2:1023] with mean=611.1

@@ -141,14 +141,14 @@ int	i, j, nright, nleft
 
 begin
 	# INDEFR points cannot be local maxima.
-	if (data[index] == INDEFR)
-	    return (FALSE)
+	if (IS_INDEFR (data[index]))
+	    return (false)
 
 	# Find the left and right indices where data values change and the
 	# number of points with the same value.  Ignore INDEFR points.
 	nleft = 0
 	for (i = index - 1; i >= 1; i = i - 1) {
-	    if (data[i] != INDEFR) {
+	    if (!IS_INDEFR (data[i])) {
 		if (data[i] != data[index])
 		    break
 		nleft = nleft + 1
@@ -156,7 +156,7 @@ begin
 	}
 	nright = 0
 	for (j = index + 1; i <= npoints; j = j + 1) {
-	    if (data[j] != INDEFR) {
+	    if (!IS_INDEFR (data[j])) {
 		if (data[j] != data[index])
 		    break
 		nright = nright + 1
@@ -227,7 +227,7 @@ begin
 	    call printf ("  Peak cutoff threshold = %g.\n")
 		call pargr (lcut)
 	    do i = 1, npoints {
-		if (y[i] == INDEFR) {
+		if (IS_INDEFR (y[i])) {
 		    j = x[i]
 		    call printf (
 			"  Peak at column %d with value %g below threshold.\n")
@@ -240,7 +240,7 @@ begin
 	# Determine the number of acceptable peaks & resort the x and y arrays.
 	nthreshold = 0
 	do i = 1, npoints {
-	    if (y[i] == INDEFR)
+	    if (IS_INDEFR (y[i]))
 		next
 	    nthreshold = nthreshold + 1
 	    x[nthreshold] = x[i]
@@ -282,11 +282,11 @@ begin
 	# peaks are marked by setting their positions to INDEFR.
 	nisolated = 0
 	do i = 1, npoints {
-	    if (x[rank[i]] == INDEFR)
+	    if (IS_INDEFR (x[rank[i]]))
 		next
 	    nisolated = nisolated + 1
 	    do j = i + 1, npoints {
-		if (x[rank[j]] == INDEFR)
+		if (IS_INDEFR (x[rank[j]]))
 		    next
 		if (abs (x[rank[i]] - x[rank[j]]) < separation) {
 		    if (debug) {
@@ -339,7 +339,7 @@ begin
 	if (nmax < npoints) {
 	    npeaks = 0
 	    do i = 1, npoints {
-	        if (x[rank[i]] == INDEFR)
+	        if (IS_INDEFR (x[rank[i]]))
 		    next
 	        npeaks = npeaks + 1
 	        if (npeaks > nmax) {
@@ -359,7 +359,7 @@ begin
 	# Eliminate INDEFR points and determine the number of spectra found.
 	npeaks = 0
 	do i = 1, npoints {
-	    if (x[i] == INDEFR)
+	    if (IS_INDEFR (x[i]))
 		next
 	    npeaks = npeaks + 1
 	    x[npeaks] = x[i]
@@ -384,9 +384,9 @@ common	/sort/ y
 
 begin
 	# INDEFR points are considered to be smallest possible values.
-	if (Memr[y - 1 + index1] == INDEFR)
+	if (IS_INDEFR (Memr[y - 1 + index1]))
 	    return (1)
-	else if (Memr[y - 1 + index2] == INDEFR)
+	else if (IS_INDEFR (Memr[y - 1 + index2]))
 	    return (-1)
 	else if (Memr[y - 1 + index1] < Memr[y - 1 + index2])
 	    return (1)

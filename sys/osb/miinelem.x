@@ -16,5 +16,5 @@ int	nbits
 
 begin
 	nbits = abs (mii_type)
-	return ((nchars * SZB_CHAR * NBITS_BYTE + nbits-1) / nbits)
+	return ((nchars * SZB_CHAR * NBITS_BYTE) / nbits)
 end

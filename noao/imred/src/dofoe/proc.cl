@@ -41,6 +41,8 @@ bool	update			{prompt="Update spectra if cal data changes?"}
 bool	batch			{prompt="Extract objects in batch?"}
 bool	listonly		{prompt="List steps but don't process?\n"}
 
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
+
 bool	newaps, newresp, newdisp, newarcs, dobatch
 
 string	anssplot = "yes"	{prompt="Splot spectrum?", mode="q",
@@ -49,13 +51,14 @@ string	anssplot = "yes"	{prompt="Splot spectrum?", mode="q",
 struct	*fd1, *fd2
 
 begin
+	string	imtype, ectype
 	string	arcref, spec, arc
 	string	arcrefec, specec, arcec, response
 	string	temp1, temp2, done
 	string	str1, objs, arcrefs, log1, log2
 	bool	reextract, extract, scat, disp, disperr, log
 	bool	splot1, splot2
-	int	i, j, nspec
+	int	i, j, n, nspec
 
 	# Call a separate task to do the listing to minimize the size of
 	# this script and improve it's readability.
@@ -66,6 +69,10 @@ begin
 		redo, update)
 	    bye
 	}
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	# Get query parameter.
 	objs = objects
@@ -116,10 +123,11 @@ begin
 	# desired.
 
 	i = strlen (apref)
-	if (i > 4 && substr (apref, i-3, i) == ".imh")
-	    apref = substr (apref, 1, i-4)
+	if (i > n && substr (apref, i-n+1, i) == imtype)
+	    apref = substr (apref, 1, i-n)
 
 	# Initialize
+	apscript.saturation = INDEF
 	apscript.references = apref
 	apscript.profiles = ""
 	apscript.nfind = naps
@@ -134,7 +142,7 @@ begin
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
-	    if (!access (apref // ".imh"))
+	    if (!access (apref // imtype))
 		error (1, "Aperture reference spectrum not found - " // apref)
 	    print ("Set reference apertures for ", apref) | tee (log1)
 	    if (access (database // "/ap" // apref))
@@ -171,8 +179,8 @@ begin
 	# scattered light functions parameters are correctly set.
 
 	i = strlen (flat)
-	if (i > 4 && substr (flat, i-3, i) == ".imh")
-	    flat = substr (flat, 1, i-4)
+	if (i > n && substr (flat, i-n+1, i) == imtype)
+	    flat = substr (flat, 1, i-n)
 
 	if (flat != "")
 	    spec = flat
@@ -201,13 +209,13 @@ begin
 	if (flat != "") {
 	    response = flat // "norm.ec"
 	    reextract = redo || (update && newaps)
-	    if (reextract || !access (response // ".imh") || (update && scat)) {
+	    if (reextract || !access (response // imtype) || (update && scat)) {
 	        print ("Create response function ", response) | tee (log1)
 
-	        if (access (response // ".imh"))
+	        if (access (response // imtype))
 		    imdelete (response, verify=no)
-	        if (access (flat //".ec.imh"))
-		    imdelete (flat//".ec.imh", verify=no)
+	        if (access (flat //ectype))
+		    imdelete (flat//ectype, verify=no)
 
 	        response (flat, apref, response, recenter=recenter,
 		    edit=edit, trace=trace, clean=clean, fitflat=fitflat,
@@ -224,19 +232,18 @@ begin
 	# by the task ARCREFS.
 
 	if (dispcor) {
-	    hselect (arcs, "$I,ctype1", yes, >temp1)
-	    #sections (arcs, option="fullname", >temp1)
-	    fd1 = temp1; s1 = ""
-	    i = fscan (fd1, arcref, str1)
-	    if (i < 1 || (i == 2 && s1 == "MULTISPE"))
+	    hselect (arcs, "$I", yes, >temp1)
+	    fd1 = temp1
+	    i = fscan (fd1, arcref)
+	    if (i < 1)
 		error (1, "No reference arcs")
 	    fd1 = ""; delete (temp1, verify=no)
 	    i = strlen (arcref)
-	    if (i > 4 && substr (arcref, i-3, i) == ".imh")
-	        arcref = substr (arcref, 1, i-4)
-	    if (!access (arcref // ".imh"))
+	    if (i > n && substr (arcref, i-n+1, i) == imtype)
+	        arcref = substr (arcref, 1, i-n)
+	    if (!access (arcref // imtype))
 		error (1, "Arc reference spectrum not found - " // arcref)
-	    arcrefec = arcref // ".ec.imh"
+	    arcrefec = arcref // ectype
 	    reextract = redo || (update && newaps)
 	    if (reextract && access (arcrefec))
 	        imdelete (arcrefec, verify=no)
@@ -247,15 +254,12 @@ begin
 	# Now we are ready to process the object spectra.
 
 	reextract = redo || (update && (newaps || newresp || newdisp))
-	hselect (objs, "$I,ctype1", yes, > temp1)
-	#sections (objs, option="fullname", > temp1)
+	hselect (objs, "$I", yes, > temp1)
 	fd1 = temp1
-	while (fscan (fd1, spec, str1) != EOF) {
-	    if (nscan() == 2 && s1 == "MULTISPE")
-		next
+	while (fscan (fd1, spec) != EOF) {
 	    i = strlen (spec)
-	    if (i > 4 && substr (spec, i-3, i) == ".imh")
-		spec = substr (spec, 1, i-4)
+	    if (i > n && substr (spec, i-n+1, i) == imtype)
+		spec = substr (spec, 1, i-n)
 	    
 	    # Check if previously done; i.e. arc.
 	    if (access (done)) {
@@ -267,11 +271,11 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec) | tee (log1)
 		next
 	    }
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    # Determine required operations from the flags and image header.
 	    scat = no
@@ -334,7 +338,7 @@ begin
 		    outtype="effective", exposure="exptime",
 		    observatory=observatory, show=no, update=yes,
 		    override=yes, >> log1)
-		apscript (spec)
+		apscript (spec, saturation=datamax)
 		if (response != "")
 		    imarith (specec, "/", response, specec)
 	    }
@@ -343,8 +347,7 @@ begin
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    hselect (arcs, "$I,ctype1", yes, >temp2)
-	    	    #sections (arcs, option="fullname", >temp2)
+	    	    sections (arcs, option="fullname", >temp2)
 		    setjd ("@"//temp2, observatory=observatory, date="date-obs",
 			time="ut", exposure="exptime", jd="jd", hjd="",
 			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
@@ -353,13 +356,13 @@ begin
 			outtype="effective", exposure="exptime",
 			observatory=observatory, show=no, update=yes,
 			override=yes, >> log1)
+		    delete (temp2, verify=no)
+		    hselect (arcs, "$I", yes, >temp2)
 	    	    fd2 = temp2
-	    	    while (fscan (fd2, arc, str1) != EOF) {
-			if (nscan() == 2 && s1 == "MULTISPE")
-			    next
+	    	    while (fscan (fd2, arc) != EOF) {
 	        	i = strlen (arc)
-	        	if (i > 4 && substr (arc, i-3, i) == ".imh")
-	            	    arc = substr (arc, 1, i-4)
+	        	if (i > n && substr (arc, i-n+1, i) == imtype)
+	            	    arc = substr (arc, 1, i-n)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "henear", add=yes, verify=no,
@@ -391,7 +394,7 @@ begin
 		} else {
 	            print ("Dispersion correct ", spec) | tee (log1)
 		    dispcor (specec, "", linearize=params.linearize,
-			database=database, table=arcref//".ec.imh",
+			database=database, table=arcref//ectype,
 			w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF,
 			log=params.log, samedisp=no, flux=params.flux,
 			global=no, ignoreaps=no, confirm=no, listonly=no,
@@ -428,6 +431,7 @@ begin
 batch:
 	flprcache
 	batch.objects = objs
+	batch.datamax = datamax
 	batch.response = response
 	batch.arcs = arcs
 	batch.arcref = arcref

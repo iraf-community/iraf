@@ -1,6 +1,7 @@
    istable - Is a file a table or text database file ?
-   pappend - Concatenate a list of apphot/daophot databases
+   pconcat - Concatenate a list of apphot/daophot databases
   pconvert - Convert from an apphot/daophot text to tables database
+     pcalc - Do arithmetic on a list of apphot/daophot tables databases
      pdump - Print selected columns of a list of  daophot/apphot databases
  prenumber - Renumber a list of apphot/daophot databases
   pexamine - Interactively examine and edit an apphot/daophot database
@@ -8,13 +9,15 @@
      psort - Sort a list of apphot/daophot databases
     pttest - Run basic tests on the ptools package tasks
 
-   tbappend - Concatenate a list of apphot/daophot tables databases
+   tbconcat - Concatenate a list of apphot/daophot tables databases
+     tbcalc - Do arithmetic on a list of apphot/daophot tables databases
      tbdump - Print selected columns of a list of tables databases
  tbrenumber - Renumber a list of  apphot/daophot tables databases
    tbselect - Select records from a list of apphot/daophot tables databases
      tbsort - Sort a list of apphot/daophot tables databases
 
-   txappend - Concatenate a list of apphot/daophot text databases
+   txconcat - Concatenate a list of apphot/daophot text databases
+     txcalc - Do arithmetic on a list of apphot/daophot text databases
      txdump - Print selected columns of a list of apphot/daophot text databases
  txrenumber - Renumber a list of apphot/daophot text databases
    txselect - Select records from a list of apphot/daophot text databases

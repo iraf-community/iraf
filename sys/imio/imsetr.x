@@ -45,9 +45,9 @@ begin
 	case IM_RLIO:
 	    # Enable/disable range list i/o (for image masks).
 	    if (int (value) == YES)
-		IM_PLFLAGS(im) = or (IM_PLFLAGS, PL_RLIO)
+		IM_PLFLAGS(im) = or (IM_PLFLAGS(im), PL_RLIO)
 	    else
-		IM_PLFLAGS(im) = and (IM_PLFLAGS, not(PL_RLIO))
+		IM_PLFLAGS(im) = and (IM_PLFLAGS(im), not(PL_RLIO))
 
 	case IM_NBUFS:
 	    # Free any existing input buffers.

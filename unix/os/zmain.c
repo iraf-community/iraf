@@ -43,6 +43,7 @@ char	*getenv();
  *	-C			debug -c (IPC) protocol from a terminal
  *	-c			connected subprocess
  *	-d bkgfile		detached subprocess
+ *	-h			host process (default)
  *	-w			permit writing into shared image (debugging)
  */
 main (argc, argv)
@@ -54,7 +55,7 @@ char	*argv[];
 	XINT	driver;			/* EPA i/o chan device driver	*/
 	XINT	devtype;		/* device type (text or binary)	*/
 	XINT	jobcode;		/* bkg jobcode, if detached pr	*/
-	int	len_irafcmd, nchars;
+	int	errstat, len_irafcmd, nchars;
 	XCHAR	*irafcmd;
 	char	*ip;
 
@@ -80,18 +81,18 @@ char	*argv[];
 	 * read from stdin.
 	 */
 
-        /* Default if no -cCd process type flags. */
+        /* Default if no arguments (same as -h, or host process). */
 	prtype = PR_HOST;
 	ZLOCPR (ZGETTY, &driver);
 	devtype = TEXT_FILE;
 
 	if (arg < argc) {
-	    if (strncmp (argv[arg], "-C", 2) == 0) {
+	    if (strcmp (argv[arg], "-C") == 0) {
 		ipc_isatty = 1;
 		arg++;
 		goto ipc_;
 
-	    } else if (strncmp (argv[arg], "-c", 2) == 0) {
+	    } else if (strcmp (argv[arg], "-c") == 0) {
 		/* Disable SIGINT so that child process does not die when the
 		 * parent process is interrupted.  Parent sends SIGTERM to
 		 * interrupt a child process.
@@ -114,7 +115,7 @@ ipc_:
 		ZLOCPR (ZARDPR, &driver);
 		devtype = BINARY_FILE;
 
-	    } else if (strncmp (argv[arg], "-d", 2) == 0) {
+	    } else if (strcmp (argv[arg], "-d") == 0) {
 		signal (SIGINT,  SIG_IGN);
 		signal (SIGTSTP, SIG_IGN);
 		arg++;
@@ -128,7 +129,11 @@ ipc_:
 		 * root menu].
 		 */
 		jobcode = getpid();
+#ifdef SYSV
+		setpgrp ();
+#else
 		setpgrp (0, jobcode);
+#endif
 
 		freopen ("/dev/null", "r", stdin);
 		prtype = PR_DETACHED;
@@ -141,10 +146,9 @@ ipc_:
 		strcpy ((char *)osfn_bkgfile, argv[arg]);
 		arg++;
 
-	    } else if (argv[arg][0] == '-') {
-		fprintf (stderr,
-		    "usage: task [-c | -C | -d bkgfile] [irafcmd...]");
-		exit (1);
+	    } else if (strcmp (argv[arg], "-h") == 0) {
+		/* Default case. */
+		arg++;
 	    }
 	}
 
@@ -181,7 +185,7 @@ ipc_:
 	 * OK when the main returns.  The process can return an error status
 	 * code only in the event of a panic.
 	 */
-	IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
+	errstat = IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
 	    &driver, &devtype, &prtype, osfn_bkgfile, &jobcode, SYSRUK,ONENTRY);
 
 	/* Normal process shutdown.  Our only action is to delete the bkgfile
@@ -190,5 +194,5 @@ ipc_:
 	if (prtype == PR_DETACHED)
 	    unlink ((char *)osfn_bkgfile);
 
-	exit (XOK);
+	_exit (errstat);
 }

@@ -5,9 +5,27 @@ begin
 
 	artdata
 
-	if (!(access ("Bdemoobj.imh") || access ("Bdemoobj.hhh"))) {
-	    print ("Creating example demoobj ...")
-	    mkechelle ("Bdemoobj", yes, ncols=100, nlines=256, norders=21,
+	if (!access ("Bdemoflat." // envget ("imtype"))) {
+	    print ("Creating example demoflat ...")
+	    mkechelle ("Bdemoflat", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoobj.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="slit", width=20., scattered=10., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=20000., temperature=5700., lines="",
+		nrandom=0, peak=5.0, sigma=0.1, seed=2, >& "dev$null")
+	    mknoise ("Bdemoflat", output="", ncols=512, nlines=512, title="",
+		header="", background=0., gain=1., rdnoise=10., poisson=no,
+		seed=5, cosrays="", ncosrays=0, energy=30000., radius=0.5,
+		ar=1., pa=0., comments=no)
+	}
+
+	if (!access ("Bdemoobj1." // envget ("imtype"))) {
+	    print ("Creating example demoobj1 ...")
+	    mkechelle ("Bdemoobj1", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
 		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
@@ -17,7 +35,7 @@ begin
 		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
 		rv=0., z=no, continuum=500., temperature=7700., lines="",
 		nrandom=100, peak=-0.2, sigma=0.3, seed=1, >& "dev$null")
-	    mkechelle ("Bdemoobj", yes, ncols=100, nlines=256, norders=21,
+	    mkechelle ("Bdemoobj1", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
 		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
@@ -27,13 +45,41 @@ begin
 		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
 		rv=0., z=no, continuum=200., temperature=5700., lines="",
 		nrandom=20, peak=5.0, sigma=0.1, seed=2, >& "dev$null")
-	    mknoise ("Bdemoobj", output="", ncols=512, nlines=512, title="",
+	    mknoise ("Bdemoobj1", output="", ncols=512, nlines=512, title="",
 		header="", background=0., gain=1., rdnoise=10., poisson=yes,
 		seed=1, cosrays="", ncosrays=0, energy=30000., radius=0.5,
 		ar=1., pa=0., comments=no)
 	}
 
-	if (!(access ("Bdemostd.imh") || access ("Bdemostd.hhh"))) {
+	if (!access ("Bdemoobj2." // envget ("imtype"))) {
+	    print ("Creating example demoobj2 ...")
+	    mkechelle ("Bdemoobj2", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoobj.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=10., z=no, continuum=500., temperature=7700., lines="",
+		nrandom=100, peak=-0.2, sigma=0.3, seed=1, >& "dev$null")
+	    mkechelle ("Bdemoobj2", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoobj.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="slit", width=20., scattered=10., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=200., temperature=5700., lines="",
+		nrandom=20, peak=5.0, sigma=0.1, seed=2, >& "dev$null")
+	    mknoise ("Bdemoobj2", output="", ncols=512, nlines=512, title="",
+		header="", background=0., gain=1., rdnoise=10., poisson=yes,
+		seed=4, cosrays="", ncosrays=0, energy=30000., radius=0.5,
+		ar=1., pa=0., comments=no)
+	}
+
+	if (!access ("Bdemostd." // envget ("imtype"))) {
 	    print ("Creating example demostd ...")
 	    mkechelle ("Bdemostd", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
@@ -61,7 +107,7 @@ begin
 		ar=1., pa=0., comments=no)
 	}
 
-	if (!(access ("Bdemoarc.imh") || access ("Bdemoarc.hhh"))) {
+	if (!access ("Bdemoarc." // envget ("imtype"))) {
 	    print ("Creating example demoarc ...")
 	    mkechelle ("Bdemoarc", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",

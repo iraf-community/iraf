@@ -11,6 +11,6 @@ libpkg.a:
 	ftref.x		"../lib/parser.h" <error.h>
 	fttrneq.x	<pkg/inlfit.h> <math/nlfit.h> <error.h> \
 			<pkg/xtanswer.h> "../lib/parser.h" "../lib/fitparams.h" 
-	ftweights.x	"../lib/parser.h"
+	ftweights.x	"../lib/preval.h" "../lib/parser.h"
 	t_fitparams.x	"../lib/parser.h" "../lib/fitparams.h"
 	;

@@ -1,4 +1,4 @@
-.help center1d Mar87 xtools
+.help center1d May93 xtools
 .ih
 NAME
 center1d -- One dimensional centering
@@ -40,7 +40,9 @@ Centering radius or error limit about the initial guess.
 .le
 .ls threshold
 Minimum difference between the maximum and minimum pixel value in the
-region around the initial guess allowed for detecting a feature.
+region around the initial guess allowed for detecting a feature.  For
+data which is all positive and the type is emission then the
+threshold is also used as an absolute cutoff.
 .le
 .ih
 DESCRIPTION

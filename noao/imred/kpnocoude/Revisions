@@ -1,0 +1,9 @@
+.help revisions Dec94 noao.imred.kpnocoude
+.nf
+kpnocoude$kpnocoude.cl
+kpnocoude$kpnocoude.men
+    1. Added background, illumination, response, apflatten, apnormalize.
+    2. Renamed fiber response task to "fibresponse".
+    (12/29/94, Valdes)
+
+.endhelp

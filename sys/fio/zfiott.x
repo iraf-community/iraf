@@ -56,6 +56,7 @@ int	nchars, ch, i
 int	ztt_lowercase(), ztt_query(), gstrcpy(), and()
 include	"zfiott.com"
 define	nextline_ 91
+define	again_ 92
 
 begin
 	# Set raw mode if reading a single character.
@@ -124,17 +125,31 @@ nextline_
 
 	} else {
 	    # Read from the terminal.
-	    call zgetty (fd, buf, maxch, status)
+again_	    call zgetty (fd, buf, maxch, status)
 
-	    # Some terminals set the parity bit, which may not be masked by the
-	    # OS terminal driver in raw mode.  Make sure that the parity bits
-	    # are cleared.
+	    if (status > 0) {
+		# Some terminals set the parity bit, which may not be masked
+		# by the OS terminal driver in raw mode.  Make sure that the
+		# parity bits are cleared.
 
-	    if (tty_rawmode && status > 0)
-		do i = 1, status {
-		    ch = buf[i]
-		    buf[i] = and (ch, 177B)
-		}
+		if (tty_rawmode)
+		    do i = 1, status {
+			ch = buf[i]
+			buf[i] = and (ch, 177B)
+		    }
+
+		# Filter the input if a filter has been posted and the filter
+		# key is seen as the first character of the input data block.
+		# The filter edits the input buffer and returns the number of
+		# input characters left in the buffer after applying the filter.
+
+		if (tty_filter != 0)
+		    if (buf[1] == tty_filter_key) {
+			call zcall4 (tty_filter, fd, buf, maxch, status)
+			if (status == 0)
+			    goto again_
+		    }
+	    }
 	}
 
 	# Log the input string if input logging is in effect.
@@ -506,6 +521,7 @@ begin
 	if (op > obuf) {
 	    output ('\n')
 	    call zputtx (chan, Memc[obuf], op-obuf, status)
+	    call zflstx (chan, status)
 	}
 
 	call sfree (sp)
@@ -987,6 +1003,8 @@ begin
 	    tty_verify     = false
 	    tty_passthru   = false
 	    tty_delay      = PBDELAY
+	    tty_filter     = NULL
+	    tty_filter_key = 0
 
 	    call strcpy (IOFILE,  tty_iofile,  SZ_FNAME)
 	    call strcpy (INFILE,  tty_infile,  SZ_FNAME)
@@ -1038,6 +1056,11 @@ begin
 	    tty_verify = itob (value)
 	case TT_PBDELAY:
 	    tty_delay = value
+
+	case TT_FILTER:
+	    tty_filter = value
+	case TT_FILTERKEY:
+	    tty_filter_key = value
 
 	default:
 	    # (ignore)
@@ -1091,6 +1114,10 @@ begin
 	    lvalue = btoi (tty_verify)
 	case TT_PBDELAY:
 	    lvalue = tty_delay
+	case TT_FILTER:
+	    lvalue = tty_filter
+	case TT_FILTERKEY:
+	    lvalue = tty_filter_key
 	default:
 	    call zsttty (fd, param, lvalue)
 	}

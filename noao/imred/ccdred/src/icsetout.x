@@ -1,4 +1,5 @@
 include	<imhdr.h>
+include <mwset.h>
 
 # IC_SETOUT -- Set output image size and offsets of input images.
 
@@ -10,10 +11,11 @@ int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
 int	i, j, ndim, a, b, amin, bmax, fd
+int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 real	val
 bool	reloff, streq()
-pointer	sp, fname
-int	open(), fscan(), nscan(), strncmp()
+pointer	sp, fname, mw, mw_openim()
+int	open(), fscan(), nscan(), strncmp(), mw_stati()
 errchk	open
 
 include	"icombine.com"
@@ -62,7 +64,7 @@ begin
 		fd = open (Memc[fname], READ_ONLY, TEXT_FILE)
 		do i = 1, nimages {
 newscan_	    if (fscan (fd) == EOF)
-			call error (1, "ICOMBINE: Offset list too short")
+			call error (1, "IMCOMBINE: Offset list too short")
 		    call gargwrd (Memc[fname], SZ_FNAME)
 		    if (Memc[fname] == '#') {
 			call gargwrd (Memc[fname], SZ_FNAME)
@@ -79,7 +81,7 @@ newscan_	    if (fscan (fd) == EOF)
 			offsets[i,j] = nint (val)
 		    }
 		    if (nscan() < ndim)
-			call error (1, "ICOMBINE: Error in offset list")
+			call error (1, "IMCOMBINE: Error in offset list")
 		}
 		call close (fd)
 	    }
@@ -94,7 +96,7 @@ newscan_	    if (fscan (fd) == EOF)
 	    do i = 2, nimages {
 		a = offsets[i,j]
 		b = IM_LEN(in[i],j) + a
-		if (a != amin || b != bmax)
+		if (a != amin || b != bmax || !reloff)
 		    aligned = false
 		amin = min (a, amin)
 		bmax = max (b, bmax)
@@ -105,6 +107,27 @@ newscan_	    if (fscan (fd) == EOF)
 		    offsets[i,j] = offsets[i,j] - amin
 		IM_LEN(out[1],j) = IM_LEN(out[1],j) - amin
 	    }
+	}
+
+	if (project) {
+	    # Update the WCS for the dimensional reduction.
+	    mw = mw_openim (in[1])
+	    i = mw_stati (mw, MW_NPHYSDIM)
+	    call mw_gaxmap (mw, axno, axval, i)
+	    do j = 1, i {
+		if (axno[j] <= ndim) {
+		    next
+		} else if (axno[j] > ndim+1) {
+		    axno[j] = axno[j] - 1
+		} else {
+		    axno[j] = 0
+		    axval[j] = 0
+		}
+	    }
+	    call mw_saxmap (mw, axno, axval, i)
+
+	    call mw_savim (mw, out)
+	    call mw_close (mw)
 	}
 
 	call sfree (sp)

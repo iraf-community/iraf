@@ -49,13 +49,13 @@ begin
 
 	call addcard_i (fd, "NP2", NP2(ids), "Right plot limit")
 
-	if (UT(ids) == INDEFI)
+	if (IS_INDEFI (UT(ids)))
 	    value = INDEFR
 	else
 	    value = real (UT(ids) / 3600.)
 	call addcard_time (fd, "UT", value, "Universal time")
 
-	if (ST(ids) == INDEFI)
+	if (IS_INDEFI (ST(ids)))
 	    value = INDEFR
 	else
 	    value = real (ST(ids)/ 3600.)

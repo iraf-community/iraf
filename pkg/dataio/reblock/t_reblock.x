@@ -21,12 +21,13 @@ char	padchar[SZ_PADCHAR]	# character for padding blocks and records
 bool	verbose			# print messages ?
 
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME], cval
-int	nfiles, file_number, file_cnt, range[2 * MAX_RANGES + 1]
+int	inlist, outlist, len_inlist, len_outlist, file_number, file_cnt
+int	range[2 * MAX_RANGES + 1]
 int	outparam[LEN_OUTPARAM], offset, ip
 
 bool	clgetb()
-int	fstati(), mtfile(), mtneedfileno(), decode_ranges()
-int	btoi(), clgeti(), get_next_number(), cctoc()
+int	fstati(), mtfile(), mtneedfileno(), fntopnb(), fntlenb(), fntgfnb()
+int	decode_ranges(), btoi(), clgeti(), get_next_number(), cctoc()
 include "reblock.com"
 
 begin
@@ -40,23 +41,32 @@ begin
 
 	# Get the input file names.
 	if (mtfile (infiles) == YES) {
+	    inlist = NULL
 	    intape = YES
 	    if (mtneedfileno (infiles) == YES)
 	        call clgstr ("file_list", file_list, SZ_LINE)
 	    else
 		call strcpy ("1", file_list, SZ_LINE)
 	} else {
+	    inlist = fntopnb (infiles, NO)
+	    len_inlist = fntlenb (inlist)
 	    intape = NO
-	    call strcpy ("1", file_list, SZ_LINE)
+	    if (len_inlist > 0) {
+		call sprintf (file_list, SZ_LINE, "1-%d")
+		    call pargi (len_inlist)
+	    } else
+	        call strcpy ("0", file_list, SZ_LINE)
 	}
 
 	# Decode the tape file number list.
-	if (decode_ranges (file_list, range, MAX_RANGES, nfiles) == ERR)
+	if (decode_ranges (file_list, range, MAX_RANGES, len_inlist) == ERR)
 	    call error (0, "Illegal file number list.")
 	offset = clgeti ("offset")
 
 	# Get the output file names.
 	if (mtfile (outfiles) == YES) {
+	    outlist = NULL
+	    len_outlist = len_inlist
 	    outtape = YES
 	    if (mtneedfileno (outfiles) == YES) {
 	        if (! clgetb ("newtape"))
@@ -65,8 +75,15 @@ begin
 		    call mtfname (outfiles, 1, out_fname, SZ_FNAME)
 	    } else
 		call strcpy (outfiles, out_fname, SZ_FNAME)
-	} else
+	} else {
+	    outlist = fntopnb (outfiles, NO)
+	    len_outlist = fntlenb (outlist)
 	    outtape = NO
+	}
+	if ((len_inlist > 1) && (len_outlist != 1) &&
+	    (len_outlist != len_inlist))
+	    call error (0,
+	        "The number of input and output files is not equal")
 
 	# Get the block and record sizes.
         szb_outblock = clgeti ("outblock")
@@ -127,21 +144,22 @@ begin
 		    call mtfname (infiles, file_number, in_fname, SZ_FNAME)
 		else
 	            call strcpy (infiles, in_fname, SZ_FNAME)
-	    } else
-	        call strcpy (infiles, in_fname, SZ_FNAME)
+	    } else if (fntgfnb (inlist, in_fname, SZ_FNAME) != EOF)
+		;
 
 	    # Construct the output file name.
 	    if (outtape == NO) {
-		if (nfiles > 1) {
+		if (len_inlist > 1 && len_outlist == 1) {
 		    call sprintf (out_fname[1], SZ_FNAME, "%s%03d")
-			call pargstr (outfiles)
-			call pargi (file_number + offset)
-		} else
-	            call strcpy (outfiles, out_fname, SZ_FNAME)
-	    } else {
-		if (file_cnt == 2)
-		    call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
-	    }
+		        call pargstr (outfiles)
+		    if (intape == YES)
+		        call pargi (file_number + offset)
+		    else
+		        call pargi (file_cnt)
+	        } else if (fntgfnb (outlist, out_fname, SZ_FNAME) != EOF)
+		    ;
+	    } else if (file_cnt == 2)
+		call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
 
 	    iferr {
 
@@ -184,4 +202,9 @@ begin
 		file_cnt = file_cnt + 1
             }
 	}
+
+	if (inlist != NULL)
+	    call fntclsb (inlist)
+	if (outlist != NULL)
+	    call fntclsb (outlist)
 end

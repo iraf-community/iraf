@@ -5,8 +5,8 @@ photfile,f,a,default,,,"Photometry file (default: image.mag.?)"
 psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
 groupfile,f,a,"default",,,"Output group file (default: image.grp.?)"
 datapars,pset,h,"",,,Data dependent parameters
-daopars,pset,h,"",,,Daophot fitting parameters
-verbose,b,h,no,,,Print messages
-verify,b,h,yes,,,Verify critical GROUP parameters
-update,b,h,no,,,Update critical GROUP parameters
+daopars,pset,h,"",,,Psf fitting parameters
+verbose,b,h,)_.verbose,,,Print group messages?
+verify,b,h,)_.verify,,,Verify critical group parameters?
+update,b,h,)_.update,,,Update critical group parameters?
 mode,s,h,'ql'

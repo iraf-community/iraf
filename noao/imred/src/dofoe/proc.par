@@ -24,6 +24,7 @@ update,b,a,,,,"Update spectra if cal data changes?"
 batch,b,a,,,,"Extract objects in batch?"
 listonly,b,a,,,,"List steps but don\'t process?
 "
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
 newaps,b,h,,,,
 newresp,b,h,,,,
 newdisp,b,h,,,,
@@ -32,4 +33,4 @@ dobatch,b,h,,,,
 anssplot,s,q,"yes",no|yes|NO|YES,,"Splot spectrum?"
 fd1,*struct,h,"",,,
 fd2,*struct,h,"",,,
-mode,s,h,"q",,,
+mode,s,h,"ql",,,

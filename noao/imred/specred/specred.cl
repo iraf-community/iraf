@@ -19,7 +19,7 @@ task	dofibers	= "specred$dofibers.cl"
 task	params		= "specred$params.par"
 
 task	proc		= "srcfibers$proc.cl"
-task	response	= "srcfibers$response.cl"
+task	fibresponse	= "srcfibers$fibresponse.cl"
 task	arcrefs		= "srcfibers$arcrefs.cl"
 task	doarcs		= "srcfibers$doarcs.cl"
 task	skysub		= "srcfibers$skysub.cl"
@@ -46,8 +46,10 @@ task	calibrate,
 	scombine,
 	sensfunc,
 	sfit,
+	sflip,
 	slist,
 	specplot,
+	specshift,
 	splot,
 	standard	= "onedspec$x_onedspec.e"
 task	bplot		= "onedspec$bplot.cl"
@@ -76,6 +78,11 @@ task	apdefault	= "apextract$apdefault.par"
 task	apscat1		= "apextract$apscat1.par"
 task	apscat2		= "apextract$apscat2.par"
 
+# Longslit tasks
+task	illumination,
+	response	= "twodspec$longslit/x_longslit.e"
+task	background	= "generic$background.cl"
+
 # Astutil tasks
 task	setairmass,
 	setjd		= "astutil$x_astutil.e"
@@ -83,6 +90,6 @@ task	setairmass,
 # Hide tasks from the user
 hidetask apparams, apall1, apfit1, apflat1, apnorm1, apscat1, apscat2, dispcor1
 hidetask sparams, params
-hidetask apscript, proc, batch, arcrefs, doarcs, getspec, listonly, response
+hidetask apscript, proc, batch, arcrefs, doarcs, getspec, listonly, fibresponse
 
 clbye

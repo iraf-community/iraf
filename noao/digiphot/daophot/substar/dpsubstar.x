@@ -1,26 +1,26 @@
 include <mach.h>
 include	<imhdr.h>
-include "../lib/apsel.h"
-include "../lib/daophot.h"
 include "../lib/daophotdef.h"
+include "../lib/apseldef.h"
 
-define	EXPAND	4
+define	EXPAND	8
 
 # DP_SUBSTAR -- Subtract the scaled and shifted PSF from the data
 
-procedure dp_substar (dao, psf_tp, inim, outim)
+procedure dp_substar (dao, inim, exfd, ex_text, outim)
 
 pointer	dao			# pointer to the DAOPHOT structure
-int	psf_tp			# pointer to PSF image
 pointer	inim			# pointer to the input image
+int	exfd			# exclude file descriptor
+bool	ex_text			# text or table exclude file
 pointer	outim			# pointer to the output image
 
 int	i, id, line1, line2, nline_buf, x1, x2, y1, y2
-int	lowy, highy, offset, nstars
+int	lowy, highy, offset, nstars, ier
 pointer	apsel, psffit, buf, sp, index
-real	x, y, xpsf, ypsf, xfrom_psf, yfrom_psf, mag
-real	radius, psfradsq, rel_bright, mingdata, maxgdata
-real	imgetr()
+real	pradius, psfradsq, x, y, dxfrom_psf, dyfrom_psf, mag
+real	rel_bright, maxgdata
+int	dp_restars()
 
 begin
 	# Get the daophot pointers.
@@ -28,55 +28,63 @@ begin
 	psffit = DP_PSFFIT (dao)
 
 	# Exit gracefully if there are no stars.
-	if (DP_APNUM(apsel) <= 0) {
-	    call printf ("The number of stars in the photometry list is %d\n")
-		call pargi (DP_APNUM(apsel))
-	    return
+	#if (DP_APNUM(apsel) <= 0) {
+	    #call printf ("The number of stars in the photometry list is %d\n")
+		#call pargi (DP_APNUM(apsel))
+	    #return
+	#}
+
+	# Check for stars to be excluded.
+	if (exfd != NULL) {
+	    if (dp_restars (dao, exfd, ex_text) <= 0)
+		;
 	}
 
-	# Get some memory
-	call smark (sp)
-	call salloc (index, DP_APNUM (apsel), TY_INT)
-	 
 	# Compute the size of subraster to read from the PSF image.
-	radius = DP_PSFRAD(dao)
-	psfradsq = radius * radius
-	xpsf = imgetr (psf_tp, "XPSF")
-	ypsf = imgetr (psf_tp, "YPSF")
-	if (IS_INDEFR (DP_MINGDATA(dao)))
-	    mingdata = -MAX_REAL
+	if (DP_PSFSIZE(dao) == 0)
+	    pradius = DP_PSFRAD(dao)
 	else
-	    mingdata = DP_MINGDATA(dao)
+	    pradius = (real (DP_PSFSIZE(psffit) - 1) / 2.0 - 1.0) / 2.0
+	psfradsq = pradius * pradius
+
+	# Set the maximum good bad limit.
 	if (IS_INDEFR (DP_MAXGDATA(dao)))
 	    maxgdata = MAX_REAL
 	else
 	    maxgdata = DP_MAXGDATA(dao)
 
-	# Sort the photometry on increasing Y. Index points to the
-	# appropriate x and magnitudes.
-	call quick (Memr[DP_APYCEN (apsel)], DP_APNUM (apsel), Memi[index])
+	# Get some working memory.
+	call smark (sp)
+	call salloc (index, DP_APNUM (apsel), TY_INT)
+	 
+	# Sort the photometry on increasing Y.
+	if (DP_APNUM(apsel) > 0)
+	    call quick (Memr[DP_APYCEN(apsel)], DP_APNUM(apsel), Memi[index],
+	        ier)
 
 	# Initialize the boundary of the buffer.
 	buf = NULL
 	line1 = 0
 	line2 = 0
-	nline_buf = EXPAND * radius
+	nline_buf = EXPAND * pradius
 
 	nstars = 0
 	do i = 1, DP_APNUM (apsel) {
 
+	    # Get the data for the next star.
 	    offset = Memi[index+i-1] - 1
 	    x = Memr[DP_APXCEN(apsel)+offset]
 	    y = Memr[DP_APYCEN(apsel)+i-1]
 	    id = Memi[DP_APID(apsel)+offset]
 	    mag = Memr[DP_APMAG (apsel)+offset]
-	    xfrom_psf = x - xpsf
-	    yfrom_psf = y - ypsf
+	    dxfrom_psf = (x - 1.0) / DP_PSFX(psffit) - 1.0
+	    dyfrom_psf = (y - 1.0) / DP_PSFY(psffit) - 1.0
 
+	    # Reject star is the magnitude is INDEF.
 	    if (IS_INDEFR(x) || IS_INDEFR(y) || IS_INDEFR(mag)) {
 	        if (DP_VERBOSE(dao) == YES) {
 	            call printf (
-		        "REJECTING  - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
+		    "REJECTING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 	   	        call pargi (id)
 		        call pargr (x)
 		        call pargr (y)
@@ -85,6 +93,7 @@ begin
 		next
 	    }
 	    
+	    # Print out the verbose message.
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf (
 		    "SUBTRACTING - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
@@ -94,45 +103,37 @@ begin
 		    call pargr (mag)
  	    }
 
-	    # Determine boundaries of the subraster and make sure that
-	    # this piece of data is available. Update the buffer if
-	    # appropriate.
-
-	    lowy = max (1, int (y - radius) - 1)
-	    highy = min (int (y + radius) + 1, IM_LEN (inim, 2))
+	    # Determine the range of lines required.
+	    lowy = max (1, int (y - pradius) + 1)
+	    highy = min (IM_LEN (inim, 2), int (y + pradius))
 	    if (highy > line2) {
-		line1 = max (1, lowy - 1)
-		line2 = line1 + nline_buf
-		line2 = min (line2, IM_LEN (inim, 2))
-		call dp_mgbufl2r (inim, outim, line1, line2, buf, false)
+		line1 = max (1, lowy)
+		line2 = min (line1 + nline_buf, IM_LEN (inim, 2))
+		call dp_gimbufr (inim, outim, line1, line2, buf, false)
 	    }
 
 	    # Change coordinates to reference frame of buffer.
 	    y = y - line1 + 1.0
-	    y1 = y - radius - 1
-	    y2 = y + radius + 1
-	    x1 = x - radius - 1
-	    x2 = x + radius + 1
-
-	    x1 = max (1, x1)
-	    x2 = min (IM_LEN (inim, 1), x2)
-	    y1 = max (1, y1)
-	    y2 = min (line2 - line1 + 1, y2)
+	    y1 = max (1, int (y - pradius) + 1)
+	    y2 = min (line2 - line1 + 1, int (y + pradius))
+	    x1 = max (1, int (x - pradius) + 1)
+	    x2 = min (IM_LEN (inim, 1), int (x + pradius))
 
 	    # Computee the relative brightness.
 	    rel_bright = DAO_RELBRIGHT (psffit, mag)
 
 	    # Subtract this star.
-	    call dp_sstar (Memr[buf], int (IM_LEN(inim, 1)), nline_buf, x1, x2,
-	        y1, y2, x, y, psfradsq, rel_bright, psffit, xfrom_psf,
-		yfrom_psf, DP_VARPSF(dao), mingdata, maxgdata)
+	    call dp_sstar (dao, Memr[buf], int (IM_LEN(inim,1)), nline_buf,
+	        x1, x2, y1, y2, x, y, psfradsq, rel_bright, dxfrom_psf,
+		dyfrom_psf, maxgdata)
 
 	    nstars = nstars + 1
 	}
 
 	# Flush the remaining lines in the image buffer.
-	call dp_mgbufl2r (inim, outim, y1, y2, buf, true)
+	call dp_gimbufr (inim, outim, y1, y2, buf, true)
 
+	# Summarize data on the number of stars subtracted.
 	if (DP_VERBOSE(dao) == YES) {
 	    call printf (
 	        "\nA total of %d stars were subtracted out of a possible %d\n")
@@ -147,26 +148,26 @@ end
 
 # DP_SSTAR -- Subtract the star from the image.
 
-procedure dp_sstar (data, nx, ny, x1, x2, y1, y2, xstar, ystar, psfradsq,
-	rel_bright, psffit, xfrom_psf, yfrom_psf, varpsf, mingdata, maxgdata)
+procedure dp_sstar (dao, data, nx, ny, x1, x2, y1, y2, xstar, ystar, psfradsq,
+	rel_bright, dxfrom_psf, dyfrom_psf, maxgdata)
 
+pointer	dao				# pointer to the daophot structure
 real	data[nx,ny]			# sata buffer
 int	nx, ny				# size of buffer
 int	x1, x2, y1, y2			# area of interest
 real	xstar, ystar			# position of star to subtract
 real	psfradsq			# PSF radius ** 2
 real	rel_bright			# relative brightness of star
-pointer	psffit				# pointer to PSF structurer
-real	xfrom_psf, yfrom_psf		# not currently used
-int	varpsf				# variable psf
-real	mingdata			# minimum good data (not used)
+real	dxfrom_psf, dyfrom_psf		# not currently used
 real	maxgdata			# maximum good data
 
 int	ix, iy
-real	dx, dy, dxsq, dysq, radsq, value, dvdx, dvdy
-real	dp_evalpsf()
+pointer	psffit
+real	dx, dy, dxsq, dysq, radsq, dvdx, dvdy
+real	dp_usepsf()
 
 begin
+	psffit = DP_PSFFIT(dao)
 	do iy = y1, y2 {
             dy = real (iy) - ystar
 	    dysq = dy * dy
@@ -176,11 +177,17 @@ begin
 	        dx = real (ix) - xstar
 		dxsq = dx * dx
 		radsq = dxsq + dysq
-		if (radsq <= psfradsq) {
-		    value = rel_bright * dp_evalpsf (dx, dy, psffit,
-		        xfrom_psf, yfrom_psf, varpsf, dvdx, dvdy)
-		    data[ix,iy] = data[ix,iy] - value
+		if (radsq >= psfradsq) {
+		    if (dx > 0.0)
+			break
+		    next
 		}
+		data[ix,iy] = data[ix,iy] - rel_bright *
+		    dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
+		    DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
+		    Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+		    DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
+		    dxfrom_psf, dyfrom_psf, dvdx, dvdy)
 	    }
 	}
 end

@@ -26,7 +26,11 @@ int	i, ncoeff
 pointer	sp, coeff, sfx, sfn, ptr1, ptr2, ptr3
 
 bool	fpequal$t()
+$if (datatype == r)
 int	gsgeti()
+$else
+int	dgsgeti()
+$endif
 
 begin
 	# test for NULL surface
@@ -34,7 +38,11 @@ begin
 	    sf3 = NULL
 	    return
 	} else if (sf1 == NULL) {
+$if (datatype == r)
 	    ncoeff = gsgeti (sf2, GSNSAVE)
+$else
+	    ncoeff = dgsgeti (sf2, GSNSAVE)
+$endif
 	    call smark (sp)
 	    $if (datatype == r)
 	    call salloc (coeff, ncoeff, TY_REAL)

@@ -2,27 +2,27 @@
 
 include	"../icombine.h"
 
-define	MINCLIP		3	# Mininum number of images for algorithm
+define	MINCLIP		2	# Mininum number of images for algorithm
 
 
 # IC_ACCDCLIP -- Reject pixels using CCD noise parameters about the average
 
-procedure ic_accdclips (d, m, n, scales, zeros, rn, g, npts, average)
+procedure ic_accdclips (d, m, n, scales, zeros, nm, nimages, npts, average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image id pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
-real	scales[ARB]		# Scales
-real	zeros[ARB]		# Zeros
-real	rn[ARB]			# Read noise squared in DN
-real	g[ARB]			# Gain
+real	scales[nimages]		# Scales
+real	zeros[nimages]		# Zeros
+real	nm[3,nimages]		# Noise model parameters
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-int	i, j, k, l, n1, n2
+int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
-pointer	dp, mp1, mp2
+pointer	sp, resid, dp1, dp2, mp1, mp2
 
 include	"../icombine.com"
 
@@ -30,7 +30,12 @@ begin
 	# If there are no pixels go on to the combining.  Since the unweighted
 	# average is computed here possibly skip the combining later.
 
-	if (dflag == D_NONE) {
+	# There must be at least max (1, nkeep) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	} else if (dowts || combine != AVERAGE)
@@ -38,21 +43,33 @@ begin
 	else
 	    docombine = false
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
 	# just two pixels.  The rejections are iterated and the average
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
-	    if (n1 < 2) {
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
+	    if (n1 <= max (MINCLIP-1, maxkeep)) {
 		if (!docombine) {
-		    if (n1 == 1)
-			average[i] = Mems[d[1]+k]
-		    else
+		    if (n1 == 0)
 			average[i] = blank
+		    else {
+			sum = Mems[d[1]+k]
+			do j = 2, n1
+			    sum = sum + Mems[d[j]+k]
+			average[i] = sum / n1
+		    }
 		}
 		next
 	    }
@@ -88,25 +105,25 @@ begin
 		n2 = n1
 		if (doscale1) {
 		    for (j=1; j<=n1; j=j+1) {
-			dp = d[j] + k
+			dp1 = d[j] + k
 			mp1 = m[j] + k
 
 			l = Memi[mp1]
 			s = scales[l]
-			d1 = max (zero, s * (a - zeros[l]))
-			s = sqrt (rn[l] + d1 / g[l]) / s
+			d1 = max (zero, s * (a + zeros[l]))
+			s = sqrt (nm[1,l] + d1/nm[2,l] + (d1*nm[3,l])**2) / s
 
-			d1 = Mems[dp]
+			d1 = Mems[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Mems[dp] = Mems[d[n1]+k]
-				if (grow > 0) {
-				    mp2 = m[n1] + k
-				    Memi[mp1] = Memi[mp2]
-				    Memi[mp2] = l
-				} else
-				    Memi[mp1] = Memi[m[n1]+k]
+				dp2 = d[n1] + k
+				Mems[dp1] = Mems[dp2]
+				Mems[dp2] = d1
+				mp2 = m[n1] + k
+				Memi[mp1] = Memi[mp2]
+				Memi[mp2] = l
 				j = j - 1
 			    }
 			    sum = sum - d1
@@ -114,28 +131,31 @@ begin
 			}
 		    }
 		} else {
-		    if (!keepids)
-			s = sqrt (rn[1] + max (zero, a) / g[1])
+		    if (!keepids) {
+			s = max (zero, a)
+			s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+		    }
 		    for (j=1; j<=n1; j=j+1) {
 			if (keepids) {
 			    l = Memi[m[j]+k]
-			    s = sqrt (rn[l] + max (zero, a) / g[l])
+			    s = max (zero, a)
+			    s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			}
-			dp = d[j] + k
-			d1 = Mems[dp]
+			dp1 = d[j] + k
+			d1 = Mems[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Mems[dp] = Mems[d[n1]+k]
+				dp2 = d[n1] + k
+				Mems[dp1] = Mems[dp2]
+				Mems[dp2] = d1
 				if (keepids) {
-				    if (grow > 0) {
-					mp1 = m[j] + k
-					mp2 = m[n1] + k
-					l = Memi[mp1]
-					Memi[mp1] = Memi[mp2]
-					Memi[mp2] = l
-				    } else
-					Memi[m[j]+k] = Memi[m[n1]+k]
+				    mp1 = m[j] + k
+				    mp2 = m[n1] + k
+				    l = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = l
 				}
 				j = j - 1
 			    }
@@ -144,7 +164,74 @@ begin
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < 3)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    if (n1 < maxkeep) {
+		nk = maxkeep
+		if (doscale1) {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			mp1 = m[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Mems[dp1]
+				    Mems[dp1] = Mems[dp2]
+				    Mems[dp2] = d1
+				    mp2 = m[l] + k
+				    s = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = s
+				}
+			    }
+			}
+			sum = sum + Mems[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		} else {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Mems[dp1]
+				    Mems[dp1] = Mems[dp2]
+				    Mems[dp2] = d1
+				    if (keepids) {
+					mp1 = m[j] + k
+					mp2 = m[l] + k
+					s = Memi[mp1]
+					Memi[mp1] = Memi[mp2]
+					Memi[mp2] = s
+				    }
+				}
+			    }
+			}
+			sum = sum + Mems[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		}
+	    }
 
 	    n[i] = n1
 	    if (!docombine)
@@ -156,51 +243,63 @@ begin
 
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
+
+	call sfree (sp)
 end
 
 
 # IC_CCDCLIP -- Reject pixels using CCD noise parameters about the median
 
-procedure ic_mccdclips (d, m, n, scales, zeros, rn, g, nimages, npts, median)
+procedure ic_mccdclips (d, m, n, scales, zeros, nm, nimages, npts, median)
 
 pointer	d[nimages]		# Data pointers
 pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
-real	rn[nimages]		# Read noise squared in DN
-real	g[nimages]		# Gain
+real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh
+int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
-pointer	mp1, mp2
+pointer	sp, resid, mp1, mp2
 real	med, zero
 data	zero /0.0/
 
 include	"../icombine.com"
 
 begin
-	# There must be at  least MINCLIP pixels.
-	if (nimages < MINCLIP || dflag == D_NONE) {
+	# There must be at least max (MINCLIP, nkeep+1) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	}
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# Compute median and sigma and iteratively clip.
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
 	    nl = 1
 	    nh = n1
 
@@ -216,63 +315,100 @@ begin
 		} else
 		    med = Mems[d[n3]+k]
 
-		if (n1 >= MINCLIP) {
+		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
 			for (; nl <= n2; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (med - Mems[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
-			    l = Memi[m[nl]+k]
+			    l = Memi[m[nh]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (Mems[d[nh]+k] - med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    } else {
-			if (!keepids)
-			    s = sqrt (rn[1] + max (zero, med) / g[1])
+			if (!keepids) {
+			    s = max (zero, med)
+			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+			}
 			for (; nl <= n2; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (med - Mems[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    if (keepids) {
 				l = Memi[m[nh]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (Mems[d[nh]+k] -  med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < MINCLIP)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    while (n1 < maxkeep) {
+		if (nl == 1)
+		    nh = nh + 1
+		else if (nh == n[i])
+		    nl = nl - 1
+		else {
+		    r = Memr[resid+nl-1]
+		    s = Memr[resid+nh+1]
+		    if (r < s) {
+			nl = nl - 1
+			r = r + TOL
+			if (s <= r)
+			    nh = nh + 1
+			if (nl > 1) {
+			    if (Memr[resid+nl-1] <= r)
+				nl = nl - 1
+			}
+		    } else {
+			nh = nh + 1
+			s = s + TOL
+			if (r <= s)
+			    nl = nl - 1
+			if (nh < n2) {
+			    if (Memr[resid+nh+1] <= s)
+				nh = nh + 1
+			}
+		    }
+		}
+		n1 = nh - nl + 1
+	    }
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (combine == MEDIAN)
-		median[i] = med
 	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
-		j = n1 + 1
+		j = max (nl, n1 + 1)
 		if (keepids) {
-		    do l = 1, nl-1 {
+		    do l = 1, min (n1, nl-1) {
 			Mems[d[l]+k] = Mems[d[j]+k]
 			if (grow > 0) {
 			    mp1 = m[l] + k
@@ -285,50 +421,54 @@ begin
 			j = j + 1
 		    }
 		} else {
-		    do l = 1, nl - 1 {
+		    do l = 1, min (n1, nl - 1) {
 			Mems[d[l]+k] = Mems[d[j]+k]
 			j = j + 1
 		    }
 		}
 	    }
+
+	    if (combine == MEDIAN)
+		median[i] = med
 	}
 
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
 
-	# Signal that the median is computed here
+	# Flag that the median is computed.
 	if (combine == MEDIAN)
 	    docombine = false
 	else
 	    docombine = true
+
+	call sfree (sp)
 end
 
 # IC_ACCDCLIP -- Reject pixels using CCD noise parameters about the average
 
-procedure ic_accdclipi (d, m, n, scales, zeros, rn, g, npts, average)
+procedure ic_accdclipi (d, m, n, scales, zeros, nm, nimages, npts, average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image id pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
-real	scales[ARB]		# Scales
-real	zeros[ARB]		# Zeros
-real	rn[ARB]			# Read noise squared in DN
-real	g[ARB]			# Gain
+real	scales[nimages]		# Scales
+real	zeros[nimages]		# Zeros
+real	nm[3,nimages]		# Noise model parameters
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-int	i, j, k, l, n1, n2
+int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
-pointer	dp, mp1, mp2
+pointer	sp, resid, dp1, dp2, mp1, mp2
 
 include	"../icombine.com"
 
@@ -336,7 +476,12 @@ begin
 	# If there are no pixels go on to the combining.  Since the unweighted
 	# average is computed here possibly skip the combining later.
 
-	if (dflag == D_NONE) {
+	# There must be at least max (1, nkeep) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	} else if (dowts || combine != AVERAGE)
@@ -344,21 +489,33 @@ begin
 	else
 	    docombine = false
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
 	# just two pixels.  The rejections are iterated and the average
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
-	    if (n1 < 2) {
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
+	    if (n1 <= max (MINCLIP-1, maxkeep)) {
 		if (!docombine) {
-		    if (n1 == 1)
-			average[i] = Memi[d[1]+k]
-		    else
+		    if (n1 == 0)
 			average[i] = blank
+		    else {
+			sum = Memi[d[1]+k]
+			do j = 2, n1
+			    sum = sum + Memi[d[j]+k]
+			average[i] = sum / n1
+		    }
 		}
 		next
 	    }
@@ -394,25 +551,25 @@ begin
 		n2 = n1
 		if (doscale1) {
 		    for (j=1; j<=n1; j=j+1) {
-			dp = d[j] + k
+			dp1 = d[j] + k
 			mp1 = m[j] + k
 
 			l = Memi[mp1]
 			s = scales[l]
-			d1 = max (zero, s * (a - zeros[l]))
-			s = sqrt (rn[l] + d1 / g[l]) / s
+			d1 = max (zero, s * (a + zeros[l]))
+			s = sqrt (nm[1,l] + d1/nm[2,l] + (d1*nm[3,l])**2) / s
 
-			d1 = Memi[dp]
+			d1 = Memi[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memi[dp] = Memi[d[n1]+k]
-				if (grow > 0) {
-				    mp2 = m[n1] + k
-				    Memi[mp1] = Memi[mp2]
-				    Memi[mp2] = l
-				} else
-				    Memi[mp1] = Memi[m[n1]+k]
+				dp2 = d[n1] + k
+				Memi[dp1] = Memi[dp2]
+				Memi[dp2] = d1
+				mp2 = m[n1] + k
+				Memi[mp1] = Memi[mp2]
+				Memi[mp2] = l
 				j = j - 1
 			    }
 			    sum = sum - d1
@@ -420,28 +577,31 @@ begin
 			}
 		    }
 		} else {
-		    if (!keepids)
-			s = sqrt (rn[1] + max (zero, a) / g[1])
+		    if (!keepids) {
+			s = max (zero, a)
+			s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+		    }
 		    for (j=1; j<=n1; j=j+1) {
 			if (keepids) {
 			    l = Memi[m[j]+k]
-			    s = sqrt (rn[l] + max (zero, a) / g[l])
+			    s = max (zero, a)
+			    s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			}
-			dp = d[j] + k
-			d1 = Memi[dp]
+			dp1 = d[j] + k
+			d1 = Memi[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memi[dp] = Memi[d[n1]+k]
+				dp2 = d[n1] + k
+				Memi[dp1] = Memi[dp2]
+				Memi[dp2] = d1
 				if (keepids) {
-				    if (grow > 0) {
-					mp1 = m[j] + k
-					mp2 = m[n1] + k
-					l = Memi[mp1]
-					Memi[mp1] = Memi[mp2]
-					Memi[mp2] = l
-				    } else
-					Memi[m[j]+k] = Memi[m[n1]+k]
+				    mp1 = m[j] + k
+				    mp2 = m[n1] + k
+				    l = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = l
 				}
 				j = j - 1
 			    }
@@ -450,7 +610,74 @@ begin
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < 3)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    if (n1 < maxkeep) {
+		nk = maxkeep
+		if (doscale1) {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			mp1 = m[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memi[dp1]
+				    Memi[dp1] = Memi[dp2]
+				    Memi[dp2] = d1
+				    mp2 = m[l] + k
+				    s = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = s
+				}
+			    }
+			}
+			sum = sum + Memi[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		} else {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memi[dp1]
+				    Memi[dp1] = Memi[dp2]
+				    Memi[dp2] = d1
+				    if (keepids) {
+					mp1 = m[j] + k
+					mp2 = m[l] + k
+					s = Memi[mp1]
+					Memi[mp1] = Memi[mp2]
+					Memi[mp2] = s
+				    }
+				}
+			    }
+			}
+			sum = sum + Memi[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		}
+	    }
 
 	    n[i] = n1
 	    if (!docombine)
@@ -462,51 +689,63 @@ begin
 
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
+
+	call sfree (sp)
 end
 
 
 # IC_CCDCLIP -- Reject pixels using CCD noise parameters about the median
 
-procedure ic_mccdclipi (d, m, n, scales, zeros, rn, g, nimages, npts, median)
+procedure ic_mccdclipi (d, m, n, scales, zeros, nm, nimages, npts, median)
 
 pointer	d[nimages]		# Data pointers
 pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
-real	rn[nimages]		# Read noise squared in DN
-real	g[nimages]		# Gain
+real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh
+int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
-pointer	mp1, mp2
+pointer	sp, resid, mp1, mp2
 real	med, zero
 data	zero /0.0/
 
 include	"../icombine.com"
 
 begin
-	# There must be at  least MINCLIP pixels.
-	if (nimages < MINCLIP || dflag == D_NONE) {
+	# There must be at least max (MINCLIP, nkeep+1) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	}
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# Compute median and sigma and iteratively clip.
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
 	    nl = 1
 	    nh = n1
 
@@ -522,63 +761,100 @@ begin
 		} else
 		    med = Memi[d[n3]+k]
 
-		if (n1 >= MINCLIP) {
+		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
 			for (; nl <= n2; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (med - Memi[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
-			    l = Memi[m[nl]+k]
+			    l = Memi[m[nh]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (Memi[d[nh]+k] - med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    } else {
-			if (!keepids)
-			    s = sqrt (rn[1] + max (zero, med) / g[1])
+			if (!keepids) {
+			    s = max (zero, med)
+			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+			}
 			for (; nl <= n2; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (med - Memi[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    if (keepids) {
 				l = Memi[m[nh]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (Memi[d[nh]+k] -  med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < MINCLIP)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    while (n1 < maxkeep) {
+		if (nl == 1)
+		    nh = nh + 1
+		else if (nh == n[i])
+		    nl = nl - 1
+		else {
+		    r = Memr[resid+nl-1]
+		    s = Memr[resid+nh+1]
+		    if (r < s) {
+			nl = nl - 1
+			r = r + TOL
+			if (s <= r)
+			    nh = nh + 1
+			if (nl > 1) {
+			    if (Memr[resid+nl-1] <= r)
+				nl = nl - 1
+			}
+		    } else {
+			nh = nh + 1
+			s = s + TOL
+			if (r <= s)
+			    nl = nl - 1
+			if (nh < n2) {
+			    if (Memr[resid+nh+1] <= s)
+				nh = nh + 1
+			}
+		    }
+		}
+		n1 = nh - nl + 1
+	    }
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (combine == MEDIAN)
-		median[i] = med
 	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
-		j = n1 + 1
+		j = max (nl, n1 + 1)
 		if (keepids) {
-		    do l = 1, nl-1 {
+		    do l = 1, min (n1, nl-1) {
 			Memi[d[l]+k] = Memi[d[j]+k]
 			if (grow > 0) {
 			    mp1 = m[l] + k
@@ -591,50 +867,54 @@ begin
 			j = j + 1
 		    }
 		} else {
-		    do l = 1, nl - 1 {
+		    do l = 1, min (n1, nl - 1) {
 			Memi[d[l]+k] = Memi[d[j]+k]
 			j = j + 1
 		    }
 		}
 	    }
+
+	    if (combine == MEDIAN)
+		median[i] = med
 	}
 
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
 
-	# Signal that the median is computed here
+	# Flag that the median is computed.
 	if (combine == MEDIAN)
 	    docombine = false
 	else
 	    docombine = true
+
+	call sfree (sp)
 end
 
 # IC_ACCDCLIP -- Reject pixels using CCD noise parameters about the average
 
-procedure ic_accdclipr (d, m, n, scales, zeros, rn, g, npts, average)
+procedure ic_accdclipr (d, m, n, scales, zeros, nm, nimages, npts, average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image id pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
-real	scales[ARB]		# Scales
-real	zeros[ARB]		# Zeros
-real	rn[ARB]			# Read noise squared in DN
-real	g[ARB]			# Gain
+real	scales[nimages]		# Scales
+real	zeros[nimages]		# Zeros
+real	nm[3,nimages]		# Noise model parameters
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-int	i, j, k, l, n1, n2
+int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
-pointer	dp, mp1, mp2
+pointer	sp, resid, dp1, dp2, mp1, mp2
 
 include	"../icombine.com"
 
@@ -642,7 +922,12 @@ begin
 	# If there are no pixels go on to the combining.  Since the unweighted
 	# average is computed here possibly skip the combining later.
 
-	if (dflag == D_NONE) {
+	# There must be at least max (1, nkeep) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	} else if (dowts || combine != AVERAGE)
@@ -650,21 +935,33 @@ begin
 	else
 	    docombine = false
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
 	# just two pixels.  The rejections are iterated and the average
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
-	    if (n1 < 2) {
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
+	    if (n1 <= max (MINCLIP-1, maxkeep)) {
 		if (!docombine) {
-		    if (n1 == 1)
-			average[i] = Memr[d[1]+k]
-		    else
+		    if (n1 == 0)
 			average[i] = blank
+		    else {
+			sum = Memr[d[1]+k]
+			do j = 2, n1
+			    sum = sum + Memr[d[j]+k]
+			average[i] = sum / n1
+		    }
 		}
 		next
 	    }
@@ -700,25 +997,25 @@ begin
 		n2 = n1
 		if (doscale1) {
 		    for (j=1; j<=n1; j=j+1) {
-			dp = d[j] + k
+			dp1 = d[j] + k
 			mp1 = m[j] + k
 
 			l = Memi[mp1]
 			s = scales[l]
-			d1 = max (zero, s * (a - zeros[l]))
-			s = sqrt (rn[l] + d1 / g[l]) / s
+			d1 = max (zero, s * (a + zeros[l]))
+			s = sqrt (nm[1,l] + d1/nm[2,l] + (d1*nm[3,l])**2) / s
 
-			d1 = Memr[dp]
+			d1 = Memr[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memr[dp] = Memr[d[n1]+k]
-				if (grow > 0) {
-				    mp2 = m[n1] + k
-				    Memi[mp1] = Memi[mp2]
-				    Memi[mp2] = l
-				} else
-				    Memi[mp1] = Memi[m[n1]+k]
+				dp2 = d[n1] + k
+				Memr[dp1] = Memr[dp2]
+				Memr[dp2] = d1
+				mp2 = m[n1] + k
+				Memi[mp1] = Memi[mp2]
+				Memi[mp2] = l
 				j = j - 1
 			    }
 			    sum = sum - d1
@@ -726,28 +1023,31 @@ begin
 			}
 		    }
 		} else {
-		    if (!keepids)
-			s = sqrt (rn[1] + max (zero, a) / g[1])
+		    if (!keepids) {
+			s = max (zero, a)
+			s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+		    }
 		    for (j=1; j<=n1; j=j+1) {
 			if (keepids) {
 			    l = Memi[m[j]+k]
-			    s = sqrt (rn[l] + max (zero, a) / g[l])
+			    s = max (zero, a)
+			    s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			}
-			dp = d[j] + k
-			d1 = Memr[dp]
+			dp1 = d[j] + k
+			d1 = Memr[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memr[dp] = Memr[d[n1]+k]
+				dp2 = d[n1] + k
+				Memr[dp1] = Memr[dp2]
+				Memr[dp2] = d1
 				if (keepids) {
-				    if (grow > 0) {
-					mp1 = m[j] + k
-					mp2 = m[n1] + k
-					l = Memi[mp1]
-					Memi[mp1] = Memi[mp2]
-					Memi[mp2] = l
-				    } else
-					Memi[m[j]+k] = Memi[m[n1]+k]
+				    mp1 = m[j] + k
+				    mp2 = m[n1] + k
+				    l = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = l
 				}
 				j = j - 1
 			    }
@@ -756,7 +1056,74 @@ begin
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < 3)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    if (n1 < maxkeep) {
+		nk = maxkeep
+		if (doscale1) {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			mp1 = m[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memr[dp1]
+				    Memr[dp1] = Memr[dp2]
+				    Memr[dp2] = d1
+				    mp2 = m[l] + k
+				    s = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = s
+				}
+			    }
+			}
+			sum = sum + Memr[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		} else {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memr[dp1]
+				    Memr[dp1] = Memr[dp2]
+				    Memr[dp2] = d1
+				    if (keepids) {
+					mp1 = m[j] + k
+					mp2 = m[l] + k
+					s = Memi[mp1]
+					Memi[mp1] = Memi[mp2]
+					Memi[mp2] = s
+				    }
+				}
+			    }
+			}
+			sum = sum + Memr[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		}
+	    }
 
 	    n[i] = n1
 	    if (!docombine)
@@ -768,51 +1135,63 @@ begin
 
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
+
+	call sfree (sp)
 end
 
 
 # IC_CCDCLIP -- Reject pixels using CCD noise parameters about the median
 
-procedure ic_mccdclipr (d, m, n, scales, zeros, rn, g, nimages, npts, median)
+procedure ic_mccdclipr (d, m, n, scales, zeros, nm, nimages, npts, median)
 
 pointer	d[nimages]		# Data pointers
 pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
-real	rn[nimages]		# Read noise squared in DN
-real	g[nimages]		# Gain
+real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh
+int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
-pointer	mp1, mp2
+pointer	sp, resid, mp1, mp2
 real	med, zero
 data	zero /0.0/
 
 include	"../icombine.com"
 
 begin
-	# There must be at  least MINCLIP pixels.
-	if (nimages < MINCLIP || dflag == D_NONE) {
+	# There must be at least max (MINCLIP, nkeep+1) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	}
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# Compute median and sigma and iteratively clip.
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
 	    nl = 1
 	    nh = n1
 
@@ -828,63 +1207,100 @@ begin
 		} else
 		    med = Memr[d[n3]+k]
 
-		if (n1 >= MINCLIP) {
+		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
 			for (; nl <= n2; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (med - Memr[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
-			    l = Memi[m[nl]+k]
+			    l = Memi[m[nh]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (Memr[d[nh]+k] - med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    } else {
-			if (!keepids)
-			    s = sqrt (rn[1] + max (zero, med) / g[1])
+			if (!keepids) {
+			    s = max (zero, med)
+			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+			}
 			for (; nl <= n2; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (med - Memr[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    if (keepids) {
 				l = Memi[m[nh]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (Memr[d[nh]+k] -  med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < MINCLIP)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    while (n1 < maxkeep) {
+		if (nl == 1)
+		    nh = nh + 1
+		else if (nh == n[i])
+		    nl = nl - 1
+		else {
+		    r = Memr[resid+nl-1]
+		    s = Memr[resid+nh+1]
+		    if (r < s) {
+			nl = nl - 1
+			r = r + TOL
+			if (s <= r)
+			    nh = nh + 1
+			if (nl > 1) {
+			    if (Memr[resid+nl-1] <= r)
+				nl = nl - 1
+			}
+		    } else {
+			nh = nh + 1
+			s = s + TOL
+			if (r <= s)
+			    nl = nl - 1
+			if (nh < n2) {
+			    if (Memr[resid+nh+1] <= s)
+				nh = nh + 1
+			}
+		    }
+		}
+		n1 = nh - nl + 1
+	    }
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (combine == MEDIAN)
-		median[i] = med
 	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
-		j = n1 + 1
+		j = max (nl, n1 + 1)
 		if (keepids) {
-		    do l = 1, nl-1 {
+		    do l = 1, min (n1, nl-1) {
 			Memr[d[l]+k] = Memr[d[j]+k]
 			if (grow > 0) {
 			    mp1 = m[l] + k
@@ -897,50 +1313,54 @@ begin
 			j = j + 1
 		    }
 		} else {
-		    do l = 1, nl - 1 {
+		    do l = 1, min (n1, nl - 1) {
 			Memr[d[l]+k] = Memr[d[j]+k]
 			j = j + 1
 		    }
 		}
 	    }
+
+	    if (combine == MEDIAN)
+		median[i] = med
 	}
 
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
 
-	# Signal that the median is computed here
+	# Flag that the median is computed.
 	if (combine == MEDIAN)
 	    docombine = false
 	else
 	    docombine = true
+
+	call sfree (sp)
 end
 
 # IC_ACCDCLIP -- Reject pixels using CCD noise parameters about the average
 
-procedure ic_accdclipd (d, m, n, scales, zeros, rn, g, npts, average)
+procedure ic_accdclipd (d, m, n, scales, zeros, nm, nimages, npts, average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image id pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
-real	scales[ARB]		# Scales
-real	zeros[ARB]		# Zeros
-real	rn[ARB]			# Read noise squared in DN
-real	g[ARB]			# Gain
+real	scales[nimages]		# Scales
+real	zeros[nimages]		# Zeros
+real	nm[3,nimages]		# Noise model parameters
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	average[npts]		# Average
 
-int	i, j, k, l, n1, n2
+int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 double	d1, low, high, sum, a, s, r, zero
 data	zero /0.0D0/
-pointer	dp, mp1, mp2
+pointer	sp, resid, dp1, dp2, mp1, mp2
 
 include	"../icombine.com"
 
@@ -948,7 +1368,12 @@ begin
 	# If there are no pixels go on to the combining.  Since the unweighted
 	# average is computed here possibly skip the combining later.
 
-	if (dflag == D_NONE) {
+	# There must be at least max (1, nkeep) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	} else if (dowts || combine != AVERAGE)
@@ -956,21 +1381,33 @@ begin
 	else
 	    docombine = false
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
 	# just two pixels.  The rejections are iterated and the average
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
-	    if (n1 < 2) {
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
+	    if (n1 <= max (MINCLIP-1, maxkeep)) {
 		if (!docombine) {
-		    if (n1 == 1)
-			average[i] = Memd[d[1]+k]
-		    else
+		    if (n1 == 0)
 			average[i] = blank
+		    else {
+			sum = Memd[d[1]+k]
+			do j = 2, n1
+			    sum = sum + Memd[d[j]+k]
+			average[i] = sum / n1
+		    }
 		}
 		next
 	    }
@@ -1006,25 +1443,25 @@ begin
 		n2 = n1
 		if (doscale1) {
 		    for (j=1; j<=n1; j=j+1) {
-			dp = d[j] + k
+			dp1 = d[j] + k
 			mp1 = m[j] + k
 
 			l = Memi[mp1]
 			s = scales[l]
-			d1 = max (zero, s * (a - zeros[l]))
-			s = sqrt (rn[l] + d1 / g[l]) / s
+			d1 = max (zero, s * (a + zeros[l]))
+			s = sqrt (nm[1,l] + d1/nm[2,l] + (d1*nm[3,l])**2) / s
 
-			d1 = Memd[dp]
+			d1 = Memd[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memd[dp] = Memd[d[n1]+k]
-				if (grow > 0) {
-				    mp2 = m[n1] + k
-				    Memi[mp1] = Memi[mp2]
-				    Memi[mp2] = l
-				} else
-				    Memi[mp1] = Memi[m[n1]+k]
+				dp2 = d[n1] + k
+				Memd[dp1] = Memd[dp2]
+				Memd[dp2] = d1
+				mp2 = m[n1] + k
+				Memi[mp1] = Memi[mp2]
+				Memi[mp2] = l
 				j = j - 1
 			    }
 			    sum = sum - d1
@@ -1032,28 +1469,31 @@ begin
 			}
 		    }
 		} else {
-		    if (!keepids)
-			s = sqrt (rn[1] + max (zero, a) / g[1])
+		    if (!keepids) {
+			s = max (zero, a)
+			s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+		    }
 		    for (j=1; j<=n1; j=j+1) {
 			if (keepids) {
 			    l = Memi[m[j]+k]
-			    s = sqrt (rn[l] + max (zero, a) / g[l])
+			    s = max (zero, a)
+			    s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			}
-			dp = d[j] + k
-			d1 = Memd[dp]
+			dp1 = d[j] + k
+			d1 = Memd[dp1]
 			r = (d1 - a) / s
 			if (r < -lsigma || r > hsigma) {
+			    Memr[resid+n1] = abs(r)
 			    if (j < n1) {
-				Memd[dp] = Memd[d[n1]+k]
+				dp2 = d[n1] + k
+				Memd[dp1] = Memd[dp2]
+				Memd[dp2] = d1
 				if (keepids) {
-				    if (grow > 0) {
-					mp1 = m[j] + k
-					mp2 = m[n1] + k
-					l = Memi[mp1]
-					Memi[mp1] = Memi[mp2]
-					Memi[mp2] = l
-				    } else
-					Memi[m[j]+k] = Memi[m[n1]+k]
+				    mp1 = m[j] + k
+				    mp2 = m[n1] + k
+				    l = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = l
 				}
 				j = j - 1
 			    }
@@ -1062,7 +1502,74 @@ begin
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < 3)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    if (n1 < maxkeep) {
+		nk = maxkeep
+		if (doscale1) {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			mp1 = m[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memd[dp1]
+				    Memd[dp1] = Memd[dp2]
+				    Memd[dp2] = d1
+				    mp2 = m[l] + k
+				    s = Memi[mp1]
+				    Memi[mp1] = Memi[mp2]
+				    Memi[mp2] = s
+				}
+			    }
+			}
+			sum = sum + Memd[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		} else {
+		    for (j=n1+1; j<=nk; j=j+1) {
+			dp1 = d[j] + k
+			r = Memr[resid+j]
+			jj = 0
+			do l = j+1, n2 {
+			    s = Memr[resid+l]
+			    if (s < r + TOL) {
+				if (s > r - TOL)
+				    jj = jj + 1
+				else {
+				    jj = 0
+				    Memr[resid+l] = r
+				    r = s
+				    dp2 = d[l] + k
+				    d1 = Memd[dp1]
+				    Memd[dp1] = Memd[dp2]
+				    Memd[dp2] = d1
+				    if (keepids) {
+					mp1 = m[j] + k
+					mp2 = m[l] + k
+					s = Memi[mp1]
+					Memi[mp1] = Memi[mp2]
+					Memi[mp2] = s
+				    }
+				}
+			    }
+			}
+			sum = sum + Memd[dp1]
+			n1 = n1 + 1
+			nk = max (nk, j+jj)
+		    }
+		}
+	    }
 
 	    n[i] = n1
 	    if (!docombine)
@@ -1074,51 +1581,63 @@ begin
 
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
+
+	call sfree (sp)
 end
 
 
 # IC_CCDCLIP -- Reject pixels using CCD noise parameters about the median
 
-procedure ic_mccdclipd (d, m, n, scales, zeros, rn, g, nimages, npts, median)
+procedure ic_mccdclipd (d, m, n, scales, zeros, nm, nimages, npts, median)
 
 pointer	d[nimages]		# Data pointers
 pointer	m[nimages]		# Image id pointers
 int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
-real	rn[nimages]		# Read noise squared in DN
-real	g[nimages]		# Gain
+real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	median[npts]		# Median
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh
+int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
-pointer	mp1, mp2
+pointer	sp, resid, mp1, mp2
 double	med, zero
 data	zero /0.0D0/
 
 include	"../icombine.com"
 
 begin
-	# There must be at  least MINCLIP pixels.
-	if (nimages < MINCLIP || dflag == D_NONE) {
+	# There must be at least max (MINCLIP, nkeep+1) pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	}
 
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
+
 	# Compute median and sigma and iteratively clip.
+	nin = n[1]
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
 	    nl = 1
 	    nh = n1
 
@@ -1134,63 +1653,100 @@ begin
 		} else
 		    med = Memd[d[n3]+k]
 
-		if (n1 >= MINCLIP) {
+		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
 			for (; nl <= n2; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (med - Memd[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
-			    l = Memi[m[nl]+k]
+			    l = Memi[m[nh]+k]
 			    s = scales[l]
-			    r = max (zero, s * (med - zeros[l]))
-			    s = sqrt (rn[l] + r / g[l]) / s
+			    r = max (zero, s * (med + zeros[l]))
+			    s = sqrt (nm[1,l] + r/nm[2,l] + (r*nm[3,l])**2) / s
 			    r = (Memd[d[nh]+k] - med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    } else {
-			if (!keepids)
-			    s = sqrt (rn[1] + max (zero, med) / g[1])
+			if (!keepids) {
+			    s = max (zero, med)
+			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
+			}
 			for (; nl <= n2; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (med - Memd[d[nl]+k]) / s
 			    if (r <= lsigma)
 				break
+			    Memr[resid+nl] = r
 			    n1 = n1 - 1
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    if (keepids) {
 				l = Memi[m[nh]+k]
-				s = sqrt (rn[l] + max (zero, med) / g[l])
+				s = max (zero, med)
+				s = sqrt (nm[1,l] + s/nm[2,l] + (s*nm[3,l])**2)
 			    }
 			    r = (Memd[d[nh]+k] -  med) / s
 			    if (r <= hsigma)
 				break
+			    Memr[resid+nh] = r
 			    n1 = n1 - 1
 			}
 		    }
 		}
-	    } until (n1 == n2 || n1 < MINCLIP)
+	    } until (n1 == n2 || n1 < max (MINCLIP, maxkeep+1))
+
+	    while (n1 < maxkeep) {
+		if (nl == 1)
+		    nh = nh + 1
+		else if (nh == n[i])
+		    nl = nl - 1
+		else {
+		    r = Memr[resid+nl-1]
+		    s = Memr[resid+nh+1]
+		    if (r < s) {
+			nl = nl - 1
+			r = r + TOL
+			if (s <= r)
+			    nh = nh + 1
+			if (nl > 1) {
+			    if (Memr[resid+nl-1] <= r)
+				nl = nl - 1
+			}
+		    } else {
+			nh = nh + 1
+			s = s + TOL
+			if (r <= s)
+			    nl = nl - 1
+			if (nh < n2) {
+			    if (Memr[resid+nh+1] <= s)
+				nh = nh + 1
+			}
+		    }
+		}
+		n1 = nh - nl + 1
+	    }
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (combine == MEDIAN)
-		median[i] = med
 	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
-		j = n1 + 1
+		j = max (nl, n1 + 1)
 		if (keepids) {
-		    do l = 1, nl-1 {
+		    do l = 1, min (n1, nl-1) {
 			Memd[d[l]+k] = Memd[d[j]+k]
 			if (grow > 0) {
 			    mp1 = m[l] + k
@@ -1203,29 +1759,33 @@ begin
 			j = j + 1
 		    }
 		} else {
-		    do l = 1, nl - 1 {
+		    do l = 1, min (n1, nl - 1) {
 			Memd[d[l]+k] = Memd[d[j]+k]
 			j = j + 1
 		    }
 		}
 	    }
+
+	    if (combine == MEDIAN)
+		median[i] = med
 	}
 
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
 
-	# Signal that the median is computed here
+	# Flag that the median is computed.
 	if (combine == MEDIAN)
 	    docombine = false
 	else
 	    docombine = true
+
+	call sfree (sp)
 end
 

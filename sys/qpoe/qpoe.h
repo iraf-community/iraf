@@ -4,6 +4,7 @@
 define	DEF_BLOCKFACTOR	1		# default block factor for image matrix
 define	DEF_BUCKETLEN	1024		# def nevents per bucket
 define	DEF_FMMAXLFILES 128		# def maxlfile per datafile
+define	DEF_FMMAXPTPAGES 256		# def maxptpages per datafile
 define	DEF_FMPAGESIZE	512		# def datafile page size
 define	DEF_FMCACHESIZE 8		# def buffer cache size
 define	DEF_STINDEXLEN	100		# def symtab hash index len
@@ -53,18 +54,19 @@ define	QP_EXLSCALE	Memi[$1+13]	# QPEX scale nranges to LUT bins
 define	QP_SZPBBUF	Memi[$1+14]	# size of pushback buffer for macros
 define	QP_BUCKETLEN	Memi[$1+15]	# QPIO event file bucket size
 define	QP_FMMAXLFILES	Memi[$1+16]	# FMIO maxlfiles
-define	QP_FMPAGESIZE	Memi[$1+17]	# FMIO pagesize
-define	QP_FMCACHESIZE	Memi[$1+18]	# FMIO buffer cache size
-define	QP_STINDEXLEN	Memi[$1+19]	# SYMTAB hash index length
-define	QP_STSTABLEN	Memi[$1+20]	# SYMTAB stab len (start)
-define	QP_STSBUFSIZE	Memi[$1+21]	# SYMTAB sbuf size (start)
-define	QP_STOFFSET	Memi[$1+22]	# lfile offset of stored symbol table
-define	QP_MODIFIED	Memi[$1+23]	# QPOE descriptor has been modified
-define	QP_DEBUG	Memi[$1+24]	# global debug level (debug messages)
-define	QP_BLOCK	Memi[$1+25]	# default blocking factor for QPIO
-define	QP_OPTBUFSIZE	Memi[$1+26]	# optimum buffer size for IMIO/QPF/FIO
-define	QP_NODEFFILT	Memi[$1+27]	# disable use of default filter
-define	QP_NODEFMASK	Memi[$1+28]	# disable use of default mask
+define	QP_FMMAXPTPAGES	Memi[$1+17]	# FMIO maxptpages
+define	QP_FMPAGESIZE	Memi[$1+18]	# FMIO pagesize
+define	QP_FMCACHESIZE	Memi[$1+19]	# FMIO buffer cache size
+define	QP_STINDEXLEN	Memi[$1+20]	# SYMTAB hash index length
+define	QP_STSTABLEN	Memi[$1+21]	# SYMTAB stab len (start)
+define	QP_STSBUFSIZE	Memi[$1+22]	# SYMTAB sbuf size (start)
+define	QP_STOFFSET	Memi[$1+23]	# lfile offset of stored symbol table
+define	QP_MODIFIED	Memi[$1+24]	# QPOE descriptor has been modified
+define	QP_DEBUG	Memi[$1+25]	# global debug level (debug messages)
+define	QP_BLOCK	Memi[$1+26]	# default blocking factor for QPIO
+define	QP_OPTBUFSIZE	Memi[$1+27]	# optimum buffer size for IMIO/QPF/FIO
+define	QP_NODEFFILT	Memi[$1+28]	# disable use of default filter
+define	QP_NODEFMASK	Memi[$1+29]	# disable use of default mask
 define	QP_DFNAME	Memc[P2C($1+30)] # QPOE filename (for messages)
 
 # Symbol descriptor.

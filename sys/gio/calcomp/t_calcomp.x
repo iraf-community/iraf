@@ -61,10 +61,10 @@ begin
 
 	    # scale precedence: calcomp.par->metacode->graphcap->compile_time
 	    g_xtask_scale = clgetr ("xscale")
-	    if (g_xtask_scale != INDEF) 
+	    if (!IS_INDEF (g_xtask_scale))
 		g_xndcto_p = g_xtask_scale
 	    g_ytask_scale = clgetr ("yscale")
-	    if (g_ytask_scale != INDEF)
+	    if (!IS_INDEF (g_ytask_scale))
 		g_yndcto_p = g_ytask_scale
 
 	    # Get the quality parameter for the text generator.

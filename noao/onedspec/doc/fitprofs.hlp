@@ -20,10 +20,13 @@ format.  The default empty list, "", selects all vectors in the images.
 The syntax is a list of comma separated numbers or ranges, where a range
 is a pair of hyphen separated numbers.
 .le
+.ls bands = ""
+List of bands for 3D images.  The empty list, "", selects all bands.
+.le
 .ls dispaxis = ")_.dispaxis", nsum = ")_.nsum"
-Parameters for defining vectors in 2D images.  The
-dispersion axis is 1 for line vectors and 2 for column vectors.
-A DISPAXIS parameter in the image header has precedence over the
+Parameters for defining vectors in 2D and 3D images.  The
+dispersion axis is 1 for line vectors, 2 for column vectors, and 3 for band
+vectors.  A DISPAXIS parameter in the image header has precedence over the
 \fIdispaxis\fR parameter.  The default values defer to the package
 parameters of the same name.
 .le
@@ -42,7 +45,7 @@ format consists of lines with one or two whitespace separated numbers.
 Comments and any additional columns are ignored.  The positions and
 widths are specified in the coordinate units of the image, usually
 wavelength for dispersion corrected spectra and pixels otherwise.  The
-width is interpreted as a sigma for gaussian profile fitting.
+width is interpreted as a sigma for Gaussian profile fitting.
 .le
 .ls background = ""
 Initial or fixed linear background defined by the region
@@ -56,8 +59,8 @@ specified.
 Default profile width or sigma.  This value is used for the initial/fixed
 width when a value is not specified in the position file.
 .le
-.ls function = "function"
-Profile function to be fit.  Currently the only choice is "gaussian" for
+.ls function = "gaussian"
+Profile function to be fit.  Currently the only choice is "Gaussian" for
 Gaussian profiles though additional functions may be added in future.
 .le
 .ls fitbackground = yes
@@ -75,6 +78,22 @@ positions.
 Profile width fitting option.  This may be "fixed" to fix all widths at their
 initial values, "single" to fit a single scale factor to the initial
 widths of the profiles, or "all" to independently fit all the widths.
+.le
+
+The following parameters are used for error estimates in the 'd',
+'k', and 'e' key measurements.  See the ERROR ESTIMATES section for a
+discussion of the error estimates.
+.ls sigma0 = INDEF, invgain = INDEF
+The pixel sigmas are modeled by the formula:
+
+.nf
+    sigma**2 = sigma0**2 + invgain * I
+.fi
+
+where I is the pixel value and "**2" means the square of the quantity.  If
+either parameter is specified as INDEF or with a value less than zero then
+no sigma estimates are made and so no error estimates for the measured
+parameters is made.
 .le
 
 The following parameters determine the output of the task.
@@ -175,7 +194,7 @@ spectral lines but others apply to any image data.  The quantities are
 the profile center, the background or continuum at the center of the
 profile, the integral or flux of the profile (which is negative for
 profiles below the background), the equivalent width, the profile peak
-amplitude or core value, and the gaussian sigma and full width at half
+amplitude or core value, and the Gaussian sigma and full width at half
 maximum.
 
 Summary plots are recored in a plotfile (if specified).  The plots
@@ -186,6 +205,45 @@ task \fBgkimosaic\fR as well as other tasks which interpret GKI metacode.
 The final output consists of images in the same format as the input.
 The images  may be of the total fit (sum of profiles without background)
 or of the difference (residuals) of the data minus the model.
+.ih
+ERROR ESTIMATES
+Error estimates may be computed for the fitted parameters.
+This requires a model for the pixel sigmas.  Currently this
+model is based on a Poisson statistics model of the data.  The model
+parameters are a constant Gaussian sigma and an "inverse gain" as specified
+by the parameters \fIsigma0\fR and \fIinvgain\fR.  These parameters are
+used to compute the pixel value sigma from the following formula:
+
+.nf
+    sigma**2 = sigma0**2 + invgain * I
+.fi
+
+where I is the pixel value and "**2" means the square of the quantity.
+
+If either the constant sigma or the inverse gain are specified as INDEF or
+with values less than zero then no noise model is applied and no error
+estimates are computed.  Note that for processed spectra this noise model
+will not generally be the same as the detector readout noise and gain.
+These parameters would need to be estimated in some way using the statistics
+of the spectrum.  The use of an inverse gain rather than a direct gain
+was choosed to allow a value of zero for this parameters.  This provides
+a model with constant uncertainties.
+
+The error estimates are computed by Monte-Carlo simulation.  The model is
+fit to the data (using the sigmas) and this model is used to describe the
+noise-free spectrum.  One hundred simulations are created in which random
+Gaussian noise is added to the noise-free spectrum based on the pixel
+sigmas from the noise model.  The model fitting is done for each simulation
+and the absolute deviation of each fitted parameter to model parameter is
+recorded.  The error estimate for the each parameter is then the absolute
+deviation containing 68.3% of the parameter estimates.  This corresponds to
+one sigma if the distribution of parameter estimates is Gaussian though
+this method does not assume this.
+
+The Monte-Carlo technique automatically includes all effects of
+parameter correlations and does not depend on any approximations.
+However the computation of the errors does take a significant
+amount of time.
 .ih
 EXAMPLES
 1.  The following example creates an artificial spectrum and fits it.
@@ -222,6 +280,9 @@ It requires the \fBartdata\fR and \fBproto\fR packages be loaded.
 .fi
 .ih
 REVISIONS
+.ls FITPROFS V2.11
+Error estimates based on a simple noise model are now computed.
+.le
 .ls FITPROFS V2.10
 This task is new.
 .le

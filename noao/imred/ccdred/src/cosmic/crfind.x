@@ -173,7 +173,7 @@ begin
 
 	    # Add pixel to cosmic ray list.
 	    flux = 100. * flux
-	    call cr_add (cr, col+i4-1, line, flux, flux/p, replace)
+	    call cr_add (cr, col+i4-1, line, flux, flux/p, 0., replace, 0)
 	    i4 = i7
 	}
 end
@@ -298,7 +298,7 @@ begin
 
 	    # Add pixel to cosmic ray list.
 	    flux = 100. * flux
-	    call cr_add (cr, col+i3-1, line, flux, flux/p, replace)
+	    call cr_add (cr, col+i3-1, line, flux, flux/p, 0., replace, 0)
 	    i3 = i5
 	}
 end

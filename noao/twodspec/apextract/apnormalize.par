@@ -15,7 +15,7 @@ normalize,b,h,yes,,,Normalize spectra?
 fitspec,b,h,yes,,,"Fit normalization spectra interactively?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,10,1,,Number of dispersion lines to sum
+nsum,i,h,10,,,Number of dispersion lines to sum or median
 cennorm,b,h,no,,,Normalize to the aperture center?
 threshold,r,h,10.,,,"Threshold for normalization spectra
 "

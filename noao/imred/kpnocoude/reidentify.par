@@ -9,15 +9,15 @@ override,b,h,no,,,Override previous solutions?
 refit,b,h,yes,,,"Refit coordinate function?
 "
 trace,b,h,no,,,Trace reference image?
-step,i,h,10,,,Step for tracing an image
-nsum,i,h,10,,,Number of lines or columns to sum
-shift,r,h,0.,,,Shift to add to reference features
+step,s,h,"10",,,Step in lines/columns/bands for tracing an image
+nsum,s,h,"10",,,Number of lines/columns/bands to sum
+shift,s,h,"0.",,,Shift to add to reference features
 nlost,i,h,3,0,,"Maximum number of features which may be lost
 "
 cradius,r,h,5.,,,Centering radius
 threshold,r,h,10.,0.,,Feature threshold for centering
 addfeatures,b,h,no,,,Add features from a line list?
-coordlist,f,h,linelists$thorium.dat,,,User coordinate list
+coordlist,f,h,linelists$thar.dat,,,User coordinate list
 match,r,h,0.2,,,Coordinate list matching limit in user units
 maxfeatures,i,h,100,,,Maximum number of features for automatic identification
 minsep,r,h,4.,0.,,"Minimum pixel separation

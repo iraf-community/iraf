@@ -41,7 +41,6 @@ unsigned integers.
 .le
 .ih
 DESCRIPTION
-
 By default mtexamine determines the record structure of all files
 on a magnetic tape or a single disk file.
 Selected files can be dumped by setting the file_list parameter.
@@ -55,21 +54,20 @@ to be one IRAF file io block which is usually some multiple of the machine
 block size.
 .ih
 EXAMPLES
-
-Determine the record structure of a magnetic tape and send the result to
+1. Determine the record structure of a magnetic tape and send the result to
 the file tapedump.
 
 .nf
 	cl> mtexamine mtb1600 > tapedump
 .fi
 
-Dump the third tape file in octal bytes on the standard output.
+2. Dump the third tape file in octal bytes on the standard output.
 
 .nf
 	cl> mtexamine mtb1600[3] du+
 .fi
 
-Dump the contents of the fifth record of the third tape file in ASCII
+3. Dump the contents of the fifth record of the third tape file in ASCII
 characters on the standard output.
 
 .nf
@@ -77,8 +75,10 @@ characters on the standard output.
 .fi
 .ih
 BUGS
-
 The IRAF magtape i/o routines do not permit data beyond a double EOF
 to be accessed. Therefore mtexamine cannot be used to examine tapes with
 embedded double EOFs.
+.ih
+SEE ALSO
+rewind, allocate
 .endhelp

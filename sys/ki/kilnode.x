@@ -10,7 +10,7 @@ char	node[ARB]		# node name
 
 int	ch, i
 bool	streq()
-int	envfind()
+int	ki_mapname()
 include	"kinode.com"
 
 begin
@@ -27,7 +27,7 @@ begin
 	    # referenced node is the same.
 
 	    # Map possible logical node name.
-	    if (envfind (node, n_nodename, SZ_ALIAS) <= 0)
+	    if (ki_mapname (node, n_nodename, SZ_ALIAS) <= 0)
 		call strcpy (node, n_nodename, SZ_ALIAS)
 
 	    ch = n_nodename[1]

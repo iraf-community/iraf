@@ -34,7 +34,6 @@ verbose,b,h,)_.verbose,,,"Verbose output?
 
 # DEFAULT APERTURE PARAMETERS
 "
-dispaxis,i,h,,1,2,"Dispersion axis (1=along lines, 2=along columns)"
 lower,r,h,)params.lower,,,>params.lower
 upper,r,h,)params.upper,,,>params.upper
 apidtable,s,h,"",,,"Aperture ID table (optional)
@@ -107,14 +106,14 @@ weights,s,h,)params.weights,,,>params.weights
 pfit,s,h,)params.pfit,,,>params.pfit
 clean,b,h,,,,Detect and replace bad pixels?
 nclean,r,h,0.5,,,Maximum number of pixels to clean
-niterate,i,h,2,0,,Number of profile fitting iterations
+niterate,i,h,5,0,,Number of profile fitting iterations
 saturation,r,h,INDEF,,,Saturation level
 readnoise,s,h,,,,Read out noise sigma (photons)
 gain,s,h,,,,Photon gain (photons/data number)
 lsigma,r,h,)params.lsigma,,,>params.lsigma
 usigma,r,h,)params.usigma,,,>params.usigma
-polysep,r,h,0.6,0.1,1,Marsh algorithm polynomial spacing
-polyorder,i,h,6,1,,Marsh algorithm polynomial order
+polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,1,1,,"Number of subapertures per aperture
 
 # ANSWER PARAMETERS

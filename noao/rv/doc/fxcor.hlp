@@ -1,4 +1,4 @@
-.help fxcor Jan92 noao.rv
+.help fxcor Mar93 noao.rv
 .ih
 NAME
 fxcor -- compute radial velocities via Fourier cross correlation
@@ -167,18 +167,8 @@ Center of the peak search window specified in pixel lags if no dispersion
 information is present, or specified in Km/s if dispersion information is
 present.  If set to the default INDEF, the maximum peak in the cross-correlation
 function will be fit by default.  If set to other than INDEF, the maximum peak 
-within a window centered on either the expected peak velocity or relative
-velocity of \fIwincenter\fR Km/s and 
-two times \fIwindow\fR Km/s wide will be used.  If present in the image
-header, the template velocity will be used to compute the relative position of
-the window.  For example, if both the object and template have a velocity of
-10,000 km/sec, the relative shift of the peak will be about zero.  If the
-template
-header includes the template velocity, the window will be correctly centered
-on the expected velocity of 10,000 Km/sec (at zero shift), otherwise the 
-window will be 
-centered on relative velocity of 10,000 km/s which is off the peak.
-Note that this parameter can be used to constrain
+within a window centered on \fIwincenter\fR and two times \fIwindow\fR 
+lags wide will be used.  Note that this parameter can be used to constrain
 the velocities computed to a certain range in non-interactive mode.
 .le
 
@@ -191,13 +181,12 @@ if a write operation is performed.  Tabular text output will have a ".txt"
 suffix appended to the \fIoutput\fR name, a verbose description of each fit
 will have ".log" suffix appended and will be written only if the \fIverbose\fR
 parameter is set, and the graphics metacode file will be appended with 
-a ".gki" suffix. (NOTE: Template image names will be trucated to the last
-30 chars in the template code strings.  Object image names are printed in full
-in the output table which may disrupt the column headings.
-Object names are similarly truncated to 15 characters.)  
-If a relative velocity is calculated with a
-redshift of more than the package parameter \fIz_threshold\fR, output will be 
-redshift z values rather than velocities in Km/s.
+a ".gki" suffix. (NOTE: Image names will be truncated to 10 characters in the
+output file because of space considerations.  Verbose output logs will
+truncate the image names to 24 characters.  Object names are similarly
+truncated to 15 characters.  If a relative velocity is calculated with a
+redshift of more than 0.2, output will be redshift z values rather than
+velocities in Km/s.)
 .le
 .ls verbose = "long"
 Set level of verbosity and types of files to create.  The \fIverbose\fR
@@ -281,6 +270,12 @@ the \fIkeywpars\fR named pset.
 
 .ce
 RV PACKAGE PARAMETERS
+.ls dispaxis = 1,  nsum = 1
+Parameters for defining vectors in 2D images.  The
+dispersion axis is 1 for line vectors and 2 for column vectors.
+A DISPAXIS parameter in the image header has precedence over the
+\fIdispaxis\fR parameter. 
+.le
 .ls z_threshold = 0.2
 Redshift value at which the output logs switch from printing velocities in 
 units of Km/s to redshift z values.
@@ -296,6 +291,25 @@ algorithm.
 Interpolator used when rebinning the data to a log-linear dispersion.   See 
 the section on interpolation for more information.  Possible choices are
 "nearest", "linear", "poly3", "poly5", "spline3", and "sinc".
+.le
+.ls line_color = 1
+Color index of overlay plotting vectors.  This parameter has no effect on
+devices which do not support color vectors.
+.le
+.ls text_color = 1
+Color index of plot text annotation.  This parameter has no effect on
+devices which do not support color vectors.
+.le
+.ls observatory = "observatory"
+Observatory at which the spectra were obtained if not specified in the
+image header by the keyword OBSERVAT.  This parameter is used by several
+tasks in the package through parameter redirection so this parameter may be
+used to affect all these tasks at the same time.  The observatory may be
+one of the observatories in the observatory database, "observatory" to
+select the observatory defined by the environment variable "observatory" or
+the parameter \fBobservatory.observatory\fR, or "obspars" to select the
+current parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
 .le
 
 .ih
@@ -530,7 +544,8 @@ In addition, a sample regions (if selected) for the correlation are marked
 on the bottom of both plots.  To select a new sample region, use the 's'
 keystroke to select the endpoints of the region.  An 's' keystroke on the
 top plot will select a sample region for the object spectrum, and an 's' on
-the bottom plot will select a template sample.  The regions may be selected
+the bottom plot will select a template sample, using the 'b' keystroke will
+select both samples simultaneously.  The regions may be selected
 explicity by using the ":osample" and ":rsample" commands, and selected
 sample regions may be cleared entirely using the (e.g.) ":osample *" command,
 or individual regions may be unselected by putting the cursor within the
@@ -799,7 +814,7 @@ VELOCITY COMPUTATION ALGORITHM
 Up to three velocities are computed by the task depending on the completeness
 of the images headers and the presence of dispersion information.  If only
 dispersion information is present, a relative velocity, VREL, and an error
-will be computed.  If a full header is present (see the \fIrvkeywords\fR
+will be computed.  If a full header is present (see the \fIkeywpars\fR
 help page), an observed and heliocentric velocity (VOBS and VHELIO
 respectively) will be computed.
 
@@ -808,7 +823,7 @@ In short form, here are the equations:
 
     ref_rvobs = catalogue_vel_of_template - H(temp) # obs. vel. of temp.
     VREL = C * (10 ** (wpc * shift) - 1.)	    # relative vel.
-    VOBS = ((1 + ref_rvobs/C) * vrel		    # observed vel.
+    VOBS = ((1+ref_rvobs/C)*(10**(wpc*shift)-1) * C # observed vel.
     VHELIO = VOBS + H(object)			    # heliocentric vel.
 
 .fi
@@ -816,10 +831,16 @@ where H() is the heliocentric correction for that observation.  The equation
 used for the relative velocity is derived from the standard (1+z), and the
 VOBS equation reflects that the observed velocty is the product of (1+z)
 values for the object and template (this allows for high redshift templates
-to be used).
+to be used).  The date,
+time, and position of each spectrum is found from the image header via the
+keywords defined in \fIkeywpars\fR.  In the case of the time the task first
+looks for a keyword defining the UT mid-point of the observation 
+(\fIkeywpars.utmiddle\fR).  If that is not found then the mid-point UT 
+is computed from the exposure time (\fIkeywpars.exptime\fR) and UT of 
+observation (\fIkeywpars.ut\fR) keywords.
 
 The keyword added to the template header (as defined by the
-"vhelio" parameter in the KEYWPARS pset) should be the catalogue velocity 
+"vhelio" parameter in the \fIkeywpars\fR pset) should be the catalogue velocity 
 of the template.  Since the observation of the template has a slightly
 different heliocentric correction, this is subtracted from the template
 heliocentric velocity so that the \fIobserved\fR velocity of the template 
@@ -947,6 +968,7 @@ See \fBicfit\fR.
 SPECTRUM MODE COMMANDS
 .nf
 ?  Print list of cursor key and colon commands
+b  Select sample regions for both spectra
 d  Print velocity difference between two cursor positions
 f  Enter Fourier mode
 i  Display original input spectra
@@ -1067,10 +1089,10 @@ EXAMPLES
 TIME REQUIREMENTS
 Cross correlation of two 800 pixel spectra requires approximately 4-5 seconds
 on a SparcStation 1 if both spectra require continuum subtraction.  The
-actual correlation and peak fitting without continuum subtraction requires 
-less than 2 seconds.
+actual correlation without continuum subtraction requires less than 2 seconds.
 
 .ih
 SEE ALSO
-continpars, filtpars, observatory, keywpars, center1d, dispcor, stsdas.fourier
+continpars, filtpars, observatory, keywpars, onedspec.specwcs, center1d, 
+dispcor, stsdas.fourier
 .endhelp

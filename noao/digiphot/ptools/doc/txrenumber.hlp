@@ -1,4 +1,4 @@
-.help txrenumber Aug91 noao.digiphot.ptools
+.help txrenumber May93 noao.digiphot.ptools
 .ih
 NAME
 txrenumber -- renumber a list of APPHOT/DAOPHOT text database
@@ -9,6 +9,11 @@ txrenumber textfiles
 PARAMETERS
 .ls textfiles
 The APPHOT/DAOPHOT text database to be renumbered.
+.le
+.ls idoffset = 0
+An integer offset  to be added to the id numbers of the stars in
+the output renumbered photometry file. If idoffset is > 0, the output
+id numbers will run from 1 + idoffset to N + idoffset instead of from 1 to N.
 .le
 .ls id = "ID"
 The name of the keyword whose value is the sequence number of the object in
@@ -22,18 +27,26 @@ TXRENUMBER is a simple task which accepts an APPHOT/DAOPHOT text
 database file and renumbers all the objects in the file beginning
 with 1 and ending with the number of objects in the file.
 The renumber operation is performed in place. The original
-values of the  \fIid\fR field are replaced by numbers 1 through N
+values of the  \fIid\fR field are replaced by numbers 1 + idoffset
+through N + idoffset
 where N is the total number of objects in the list.
 A renumber operation is typically performed after another
-list operation such as TXAPPEND or TXSORT.
+list operation such as TXCONCAT or TXSORT.
 
 .ih
 EXAMPLES
 
-1. Renumber the stars in a concatenated file produced by TXAPPEND.
+1. Renumber the stars in a concatenated file produced by TXCONCAT.
 
 .nf
    pt> txrenumber m92rall.mag.1
+.fi
+
+2. Renumber a PHOT photometry file of extra stars so as to ensure the
+stars' id numbers are  greater than 4000.
+
+.nf
+    pt> txrenumber m92r.mag.extra idoffset=4000
 .fi
 
 .ih

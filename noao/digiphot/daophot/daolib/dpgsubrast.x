@@ -1,7 +1,7 @@
 include <imhdr.h>
 
-# DP_GSUBRAST -- Extract a sub-raster around a specified position
-# such that all pixels within the specified radius are included.
+# DP_GSUBRAST -- Extract a sub-raster around a specified position such that
+# all pixels within the specified radius are included.
 
 pointer	procedure dp_gsubrast (im, x, y, radius, lowx, lowy, nxpix, nypix)
 
@@ -15,8 +15,8 @@ pointer	imgs2r()
 
 begin
 	# Determine the boundaries of the area.
-	lowx = int (x - radius) - 1
-	lowy = int (y - radius) - 1
+	lowx = int (x - radius) + 1
+	lowy = int (y - radius) + 1
 	lowx = max (1, lowx)
 	lowy = max (1, lowy)
 	

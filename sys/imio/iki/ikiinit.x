@@ -43,9 +43,5 @@ begin
 	call iki_lddriver (plf_open, plf_close, plf_null, plf_updhdr,
 	    plf_access, plf_copy, plf_delete, plf_rename, 0)
 
-	# Load the PLIO mask image mini-kernel (PLF - not a full kernel).
-	call iki_lddriver (plf_open, plf_close, plf_null, plf_updhdr,
-	    plf_access, plf_copy, plf_delete, plf_rename)
-
 	first_time = false
 end

@@ -74,7 +74,7 @@ c
 36    p(i,l+1)=((2.*fl-1.)*cosine*p(i,l)-(fl-1.)*p(i,l-1))/fl
 40    continue
 c
-c accumulate matrices alpha and beta
+c accumulate matrices alpha and beta
 c
 51    do 54 j=1,nterms
       beta(j)=0.

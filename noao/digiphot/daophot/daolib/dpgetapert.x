@@ -1,8 +1,7 @@
 include	<tbset.h>
 include "../../lib/ptkeysdef.h"
-include	"../lib/apsel.h"
-include	"../lib/daophot.h"
 include	"../lib/daophotdef.h"
+include	"../lib/apseldef.h"
 
 # DP_GETAPERT -- Read the aperture photometry results. Works with
 # either the "old" APPHOT files or the new ST Tables.
@@ -36,10 +35,82 @@ begin
 	else
 	    nstars = dp_gtabphot (apd, apsel, max_nstars)
 
-	# Reallocate if necessary.
+	# Reallocate to save space if appropopriate.
 	if (nstars < max_nstars)
 	    call dp_rmemapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
 	        nstars)
+end
+
+
+# DP_MEMAPSEL -- Procedure to allocate memory for the apselect strucuture.
+
+procedure dp_memapsel (dao, fields, nfields, max_nstars)
+
+pointer	dao		# pointer to the daophot strucuture
+int	fields[ARB]	# array of fields
+int	nfields		# number of fields to allocate space for
+int	max_nstars	# maximum number of stars
+
+int	i
+pointer	apsel
+
+begin
+	apsel = DP_APSEL(dao)
+
+	# Allocate space for results.
+	do i = 1, nfields {
+	    switch (fields[i]) {
+	    case DP_PAPID:
+	        if (DP_APID(apsel) != NULL)
+	            call mfree (DP_APID(apsel), TY_INT)
+	        call malloc (DP_APID(apsel), max_nstars, TY_INT)
+
+	    case DP_PAPXCEN:
+	        if (DP_APXCEN(apsel) != NULL)
+	            call mfree (DP_APXCEN(apsel), TY_REAL)
+	        call malloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPYCEN:
+	        if (DP_APYCEN(apsel) != NULL)
+	            call mfree (DP_APYCEN(apsel), TY_REAL)
+	        call malloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPSKY:
+	        if (DP_APMSKY(apsel) != NULL)
+	            call mfree (DP_APMSKY(apsel), TY_REAL)
+	        call malloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPMAG1:
+		if (DP_APMAG(apsel) != NULL)
+	    	    call mfree (DP_APMAG(apsel), TY_REAL)
+		call malloc (DP_APMAG(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPGROUP:
+		if (DP_APGROUP(apsel) != NULL)
+	    	    call mfree (DP_APGROUP(apsel), TY_INT)
+		#call malloc (DP_APGROUP(apsel), max_nstars, TY_INT)
+
+	    case DP_PAPMERR1:
+		if (DP_APERR(apsel) != NULL)
+	    	    call mfree (DP_APERR(apsel), TY_REAL)
+		call malloc (DP_APERR(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPNITER:
+		if (DP_APNITER(apsel) != NULL)
+	    	    call mfree (DP_APNITER(apsel), TY_INT)
+		#call malloc (DP_APNITER(apsel), max_nstars, TY_INT)
+
+	    case DP_PAPCHI:
+		if (DP_APCHI(apsel) != NULL)
+	    	    call mfree (DP_APCHI(apsel), TY_REAL)
+		call malloc (DP_APCHI(apsel), max_nstars, TY_REAL)
+
+	    case DP_PAPSHARP:
+		if (DP_APSHARP(apsel) != NULL)
+	    	    call mfree (DP_APSHARP(apsel), TY_REAL)
+		call malloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
+	    }
+	}
 end
 
 
@@ -47,7 +118,7 @@ end
 
 int procedure  dp_goldap (apd, apsel, max_nstars)
 
-pointer	apd		# pointer to the input file descriptor
+int	apd		# the input file descriptor
 pointer	apsel		# pointer to the apsel structure
 int	max_nstars	# maximum number of stars
 
@@ -76,7 +147,6 @@ begin
 		break
 	    nstars = nstars + 1
 	}
-
 	DP_APNUM(apsel) = nstars
 
 	# Free the keyword structure.
@@ -128,7 +198,7 @@ begin
 
 	call tbcfnd (tp, SKY, skypt, 1)
 	if (skypt == NULL)
-	    call tbcfnd (tp, APSKY, skypt, 1)
+	    call tbcfnd (tp, SKY, skypt, 1)
 	if (skypt == NULL)
 	    call printf ("Error reading SKY.\n")
 
@@ -162,6 +232,49 @@ begin
 end
 
 
+# DP_RMEMAPSEL -- Procedure to reallocate memory for the apselect strucuture.
+
+procedure dp_rmemapsel (dao, fields, nfields, max_nstars)
+
+pointer	dao		# pointer to the daophot strucuture
+int	fields[ARB]	# integer fields
+int	nfields		# number of fields
+int	max_nstars	# maximum number of stars
+
+int	i
+pointer	apsel
+
+begin
+	# Reallocate space for results.
+	apsel = DP_APSEL(dao)
+
+	do i = 1,  nfields {
+	    switch (fields[i]) {
+	    case DP_PAPID:
+	        call realloc (DP_APID(apsel), max_nstars, TY_INT)
+	    case DP_PAPXCEN:
+	        call realloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
+	    case DP_PAPYCEN:
+	        call realloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
+	    case DP_PAPSKY:
+	        call realloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
+	    case DP_PAPGROUP:
+		#call realloc (DP_APGROUP(apsel), max_nstars, TY_INT)
+	    case DP_PAPMAG1:
+	        call realloc (DP_APMAG(apsel), max_nstars, TY_REAL)
+	    case DP_PAPMERR1:
+	        call realloc (DP_APERR(apsel), max_nstars, TY_REAL)
+	    case DP_PAPNITER:
+	        #call realloc (DP_APNITER(apsel), max_nstars, TY_INT)
+	    case DP_PAPSHARP:
+	        call realloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
+	    case DP_PAPCHI:
+	        call realloc (DP_APCHI(apsel), max_nstars, TY_REAL)
+	    }
+	}
+end
+
+
 # DP_GAPPSF -- Set up the structures necessary for retrieving the
 # aperture phtometery results needed for the PSF task.
 
@@ -190,9 +303,7 @@ begin
 	            call pargstr (YCENTER)
 	    case DP_PAPSKY:
 		call sprintf (sel_fields[strlen(sel_fields)+1], SZ_LINE, "%s ")
-	            call pargstr (APSKY)
-		#call sprintf (sel_fields[strlen(sel_fields)+1], SZ_LINE, "%s ")
-	            #call pargstr (SKY)
+	            call pargstr (SKY)
 	    case DP_PAPMAG1:
 		call sprintf (sel_fields[strlen(sel_fields)+1], SZ_LINE, "%s ")
 	            call pargstr (APMAG)
@@ -204,8 +315,7 @@ begin
 end
 
 
-# DP_APSEL -- Procedure to select records from a text file in pseudo list
-# format.
+# DP_APSEL -- Select records from an apphot/daophot text file.
 
 int procedure dp_apsel (key, fd, fields, indices, id, x, y, sky, mag)
 
@@ -311,7 +421,7 @@ begin
 end
 
 
-# DP_GETAP  -- Procedure to move selected APPHOT results into arrays
+# DP_GETAP  -- Decode the selected daophot/apphot values.
 
 procedure dp_getap (key, indices, id, x, y, sky, mag)
 
@@ -324,8 +434,8 @@ real	sky		# sky value
 real	mag		# magnitude
 
 int	i, index, elem, maxch, kip, ip
-int	ctoi()
-int	ctor()
+int	ctoi(), ctor()
+char	buffer[SZ_LINE]
 
 begin
 	do i = 1, KY_NSELECT(key) {
@@ -336,23 +446,27 @@ begin
 	    maxch = Memi[KY_LEN_SELECT(key)+i-1]
 	    kip = Memi[KY_PTRS(key)+index-1] + (elem - 1) * maxch
 
+	    # Extract the appropriate field.
+	    call amovc (Memc[kip], buffer, maxch)
+	    buffer[maxch+1] = EOS
+
 	    # Decode the output value.
 	    ip = 1
 	    switch (indices[i]) {
 	    case DP_PAPID: 
-		if (ctoi (Memc[kip], ip, id) <= 0)
+		if (ctoi (buffer, ip, id) <= 0)
 		    id = 0
 	    case DP_PAPXCEN:
-		if (ctor (Memc[kip], ip, x) <= 0)
+		if (ctor (buffer, ip, x) <= 0)
 		    x = INDEFR
 	    case DP_PAPYCEN:
-		if (ctor (Memc[kip], ip, y) <= 0)
+		if (ctor (buffer, ip, y) <= 0)
 		    y = INDEFR
 	    case DP_PAPSKY:
-	        if (ctor (Memc[kip], ip, sky) <= 0)
+	        if (ctor (buffer, ip, sky) <= 0)
 		    sky = INDEFR
 	    case DP_PAPMAG1:
-		if (ctor (Memc[kip], ip, mag) <= 0)
+		if (ctor (buffer, ip, mag) <= 0)
 		    mag = INDEFR
 	    default:
 		call printf ("Error reading the APPHOT results.\n")
@@ -361,116 +475,3 @@ begin
 	}
 end
 
-# DP_MEMAPSEL -- Procedure to allocate memory for the apselect strucuture.
-
-procedure dp_memapsel (dao, fields, nfields, max_nstars)
-
-pointer	dao		# pointer to the daophot strucuture
-int	fields[ARB]	# array of fields
-int	nfields		# number of fields to allocate space for
-int	max_nstars	# maximum number of stars
-
-int	i
-pointer	apsel
-
-begin
-	apsel = DP_APSEL(dao)
-
-	# Allocate space for results.
-	do i = 1, nfields {
-	    switch (fields[i]) {
-	    case DP_PAPID:
-	        if (DP_APID(apsel) != NULL)
-	            call mfree (DP_APID(apsel), TY_INT)
-	        call malloc (DP_APID(apsel), max_nstars, TY_INT)
-
-	    case DP_PAPXCEN:
-	        if (DP_APXCEN(apsel) != NULL)
-	            call mfree (DP_APXCEN(apsel), TY_REAL)
-	        call malloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPYCEN:
-	        if (DP_APYCEN(apsel) != NULL)
-	            call mfree (DP_APYCEN(apsel), TY_REAL)
-	        call malloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPSKY:
-	        if (DP_APMSKY(apsel) != NULL)
-	            call mfree (DP_APMSKY(apsel), TY_REAL)
-	        call malloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPMAG1:
-		if (DP_APMAG(apsel) != NULL)
-	    	    call mfree (DP_APMAG(apsel), TY_REAL)
-		call malloc (DP_APMAG(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPGROUP:
-		if (DP_APGROUP(apsel) != NULL)
-	    	    call mfree (DP_APGROUP(apsel), TY_INT)
-		#call malloc (DP_APGROUP(apsel), max_nstars, TY_INT)
-
-	    case DP_PAPMERR1:
-		if (DP_APERR(apsel) != NULL)
-	    	    call mfree (DP_APERR(apsel), TY_REAL)
-		call malloc (DP_APERR(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPNITER:
-		if (DP_APNITER(apsel) != NULL)
-	    	    call mfree (DP_APNITER(apsel), TY_INT)
-		#call malloc (DP_APNITER(apsel), max_nstars, TY_INT)
-
-	    case DP_PAPCHI:
-		if (DP_APCHI(apsel) != NULL)
-	    	    call mfree (DP_APCHI(apsel), TY_REAL)
-		call malloc (DP_APCHI(apsel), max_nstars, TY_REAL)
-
-	    case DP_PAPSHARP:
-		if (DP_APSHARP(apsel) != NULL)
-	    	    call mfree (DP_APSHARP(apsel), TY_REAL)
-		call malloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
-	    }
-	}
-end
-
-
-# DP_RMEMAPSEL -- Procedure to reallocate memory for the apselect strucuture.
-
-procedure dp_rmemapsel (dao, fields, nfields, max_nstars)
-
-pointer	dao		# pointer to the daophot strucuture
-int	fields[ARB]	# integer fields
-int	nfields		# number of fields
-int	max_nstars	# maximum number of stars
-
-int	i
-pointer	apsel
-
-begin
-	# Reallocate space for results.
-	apsel = DP_APSEL(dao)
-
-	do i = 1,  nfields {
-	    switch (fields[i]) {
-	    case DP_PAPID:
-	        call realloc (DP_APID(apsel), max_nstars, TY_INT)
-	    case DP_PAPXCEN:
-	        call realloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
-	    case DP_PAPYCEN:
-	        call realloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
-	    case DP_PAPSKY:
-	        call realloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
-	    case DP_PAPGROUP:
-		#call realloc (DP_APGROUP(apsel), max_nstars, TY_INT)
-	    case DP_PAPMAG1:
-	        call realloc (DP_APMAG(apsel), max_nstars, TY_REAL)
-	    case DP_PAPMERR1:
-	        call realloc (DP_APERR(apsel), max_nstars, TY_REAL)
-	    case DP_PAPNITER:
-	        #call realloc (DP_APNITER(apsel), max_nstars, TY_INT)
-	    case DP_PAPSHARP:
-	        call realloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
-	    case DP_PAPCHI:
-	        call realloc (DP_APCHI(apsel), max_nstars, TY_REAL)
-	    }
-	}
-end

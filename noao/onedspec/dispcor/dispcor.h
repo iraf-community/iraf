@@ -1,14 +1,14 @@
 # Aperture data structure
 
-define	LEN_AP	1+($1*16)			# Length of data structure
-define	PL	Memi[$1+($2-1)*16+1]		# Physical line number
-define	AP	Memi[$1+($2-1)*16+2]		# Aperture number
-define	BM	Memi[$1+($2-1)*16+3]		# Beam number
-define	DT	Memi[$1+($2-1)*16+4]		# Dispersion type
-define	NW	Memi[$1+($2-1)*16+5]		# Number of pixels in spectrum
-define	W1	Memd[P2D($1+($2-1)*16+6)]	# Wavelength of first pixel
-define	W2	Memd[P2D($1+($2-1)*16+8)]	# Wavelength of last pixel
-define	DW	Memd[P2D($1+($2-1)*16+10)]	# Wavelength interval per pixel
-define	Z	Memd[P2D($1+($2-1)*16+12)]	# Redshift
-define	LW	Memd[P2D($1+($2-1)*16+14)]	# Aperture lower limit
-define	UP	Memd[P2D($1+($2-1)*16+16)]	# Aperture upper limit
+define	LEN_AP	($1*20)				# Length of DC data structure
+define	DC_PL	Memi[$1+($2-1)*20+1]		# Physical line number
+define	DC_AP	Memi[$1+($2-1)*20+2]		# Aperture number
+define	DC_BM	Memi[$1+($2-1)*20+3]		# Beam number
+define	DC_DT	Memi[$1+($2-1)*20+4]		# Dispersion type
+define	DC_NW	Memi[$1+($2-1)*20+5]		# Number of pixels in spectrum
+define	DC_W1	Memd[P2D($1+($2-1)*20+6)]	# Wavelength of first pixel
+define	DC_W2	Memd[P2D($1+($2-1)*20+8)]	# Wavelength of last pixel
+define	DC_DW	Memd[P2D($1+($2-1)*20+10)]	# Wavelength interval per pixel
+define	DC_Z	Memd[P2D($1+($2-1)*20+12)]	# Redshift
+define	DC_LW	Memr[$1+($2-1)*20+14]		# Aperture lower limit
+define	DC_UP	Memr[$1+($2-1)*20+16]		# Aperture upper limit

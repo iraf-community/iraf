@@ -33,7 +33,7 @@ begin
 	    } else if (istable.text) {
 		txsort (inname, col, ascend=ascend)
 	    } else {
-		print ("Cannot run SORT on file: " // inname)
+		print ("Cannot run PSORT on file: " // inname)
 	    }
 	}
 	inlist = ""

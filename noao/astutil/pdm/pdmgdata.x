@@ -52,24 +52,27 @@ begin
 	        if (n == 0) {
 		    buflen = SZ_BUF
 		    iferr {
-		        call calloc (PDM_XP(pdmp), buflen, TY_REAL)
-		        call calloc (PDM_DYP(pdmp), buflen, TY_REAL)
-		        call calloc (PDM_ODYP(pdmp), buflen, TY_REAL)
+		        call calloc (PDM_XP(pdmp), buflen, TY_DOUBLE)
+		        call calloc (PDM_DYP(pdmp), buflen, TY_DOUBLE)
+		        call calloc (PDM_ODYP(pdmp), buflen, TY_DOUBLE)
 		        call calloc (PDM_INUSEP(pdmp), buflen, TY_INT)
+		        call calloc (PDM_ERRP(pdmp), buflen, TY_REAL)
 		    } then
 		        call erract (EA_FATAL)
 	        } else if (n + 1 > buflen) {
 		    buflen = buflen + SZ_BUF
-		    call realloc (PDM_XP(pdmp), buflen, TY_REAL)
-		    call realloc (PDM_DYP(pdmp), buflen, TY_REAL)
-		    call realloc (PDM_ODYP(pdmp), buflen, TY_REAL)
+		    call realloc (PDM_XP(pdmp), buflen, TY_DOUBLE)
+		    call realloc (PDM_DYP(pdmp), buflen, TY_DOUBLE)
+		    call realloc (PDM_ODYP(pdmp), buflen, TY_DOUBLE)
 		    call realloc (PDM_INUSEP(pdmp), buflen, TY_INT)
+		    call realloc (PDM_ERRP(pdmp), buflen, TY_REAL)
 	        }
 
 		# Read data from the file, put it in the data structure.
 	        call sscan (Memc[ip])
-	        call gargr (PDM_X(pdmp,n+1))
-	        call gargr (PDM_ODY(pdmp,n+1))
+	        call gargd (PDM_X(pdmp,n+1))
+	        call gargd (PDM_ODY(pdmp,n+1))
+	        call gargr (PDM_ERR(pdmp,n+1))
 	        PDM_INUSE(pdmp,n+1) = 1
 	        PDM_DY(pdmp,n+1) = PDM_ODY(pdmp,n+1)
 
@@ -88,7 +91,7 @@ begin
 		        call pargstr (Memc[lbuf])
 		    next
 	        case 1:
-		    if (ncols == 2) {
+		    if (ncols >= 2) {
 		        call eprintf ("only one arg; %s, line %d: %s\n")
 		            call pargstr (Memc[nextfile])
 		            call pargi (lineno)
@@ -97,8 +100,23 @@ begin
 		    } else {
 		        PDM_ODY(pdmp,n+1) = PDM_X(pdmp,n+1)
 		        PDM_DY(pdmp,n+1) = PDM_X(pdmp,n+1)
-		        PDM_X(pdmp,n+1) = n + 1.0
+		        PDM_X(pdmp,n+1) = n + 1.0d+0
+			PDM_ERR(pdmp,n+1) = 0.0
 		    }
+		case 2:
+		    if (ncols == 3) {
+			call eprintf ("only two args; %s, line %d: %s\n")
+			    call pargstr (Memc[nextfile])
+			    call pargi (lineno)
+			    call pargstr (Memc[lbuf])
+			next
+		    } else {
+		        PDM_ODY(pdmp,n+1) = PDM_ODY(pdmp,n+1)
+		        PDM_DY(pdmp,n+1) = PDM_ODY(pdmp,n+1)
+		        PDM_X(pdmp,n+1) = PDM_X(pdmp,n+1)
+			PDM_ERR(pdmp,n+1) = 0.0
+		    }
+
 	        }
 
 	        n = n + 1
@@ -106,10 +124,11 @@ begin
 	    call close (fd)
 	}
 
-	call realloc (PDM_XP(pdmp), n, TY_REAL)
-	call realloc (PDM_DYP(pdmp), n, TY_REAL)
-	call realloc (PDM_ODYP(pdmp), n, TY_REAL)
+	call realloc (PDM_XP(pdmp), n, TY_DOUBLE)
+	call realloc (PDM_DYP(pdmp), n, TY_DOUBLE)
+	call realloc (PDM_ODYP(pdmp), n, TY_DOUBLE)
 	call realloc (PDM_INUSEP(pdmp), n, TY_INT)
+	call realloc (PDM_ERRP(pdmp), n, TY_REAL)
 
 	call fntclsb (list)
 	call sfree (sp)

@@ -7,9 +7,10 @@ include	"stdgraph.h"
 
 procedure stg_getcursor (cursor)
 
-int	cursor			# cursor to be read or 0
-int	cur
-int	x, y, key
+int	cursor			#I cursor to be read or 0
+
+int	cur, cn
+int	key, sx, sy, raster, rx, ry
 include	"stdgraph.com"
 
 begin
@@ -32,20 +33,20 @@ begin
 
 	# Restore the software cursor position before reading?
 	if (SG_UPDCURSOR(g_sg) == YES) {
-	    x = SG_CURSOR_X(g_sg)
-	    y = SG_CURSOR_Y(g_sg)
-	    if (x != 0 && y != 0)
-		call stg_setcursor (x, y, cur)
+	    sx = SG_CURSOR_X(g_sg)
+	    sy = SG_CURSOR_Y(g_sg)
+	    if (sx != 0 && sy != 0)
+		call stg_setcursor (sx, sy, cur)
 	}
 
 	# Physically read the cursor and return value to caller.
-	call stg_readcursor (cur, x, y, key)
-	call gki_retcursorvalue (g_stream, x, y, key, cur)
+	call stg_readcursor (cur, cn, key, sx, sy, raster, rx, ry)
+	call gki_retcursorvalue (g_stream, cn, key, sx, sy, raster, rx, ry)
 	call flush (g_stream)
 
 	# Save the new position of the cursor for next time.
 	if (SG_UPDCURSOR(g_sg) == YES) {
-	    SG_CURSOR_X(g_sg) = x
-	    SG_CURSOR_Y(g_sg) = y
+	    SG_CURSOR_X(g_sg) = sx
+	    SG_CURSOR_Y(g_sg) = sy
 	}
 end

@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #define	import_kernel
 #define	import_knames
@@ -106,6 +108,14 @@ XINT	*pid;
 	if (*pid == 0) {
 	    /* New, child process.  Make child think the pipe is its stdin/out.
 	     */
+	    struct rlimit rlim;
+	    int maxfd;
+
+	    if (getrlimit (RLIMIT_NOFILE, &rlim))
+		maxfd = MAXOFILES;
+	    else
+		maxfd = rlim.rlim_cur;
+
 	    close (pin[0]);
 	    close (pout[1]);
 	    close (0);  dup (pout[0]);  close (pout[0]);
@@ -122,7 +132,7 @@ XINT	*pid;
 	     * do not expect to inherit any file descriptors other than
 	     * stdin, stdout, and stderr.
 	     */
-	    for (fd=3;  fd < getdtablesize();  fd++)
+	    for (fd=3;  fd < maxfd;  fd++)
 		fcntl (fd, F_SETFD, 1);
 
 	    /* Exec the new process.  Will not return if successful.
@@ -201,8 +211,13 @@ XLONG	*loffset;		/* not used */
 {
 	register char *op;
 	register int fd, nbytes;
-	int	sigmask_save, record_length, status;
+	int	record_length, status;
 	short	temp;
+#ifdef SOLARIS
+	sigset_t sigmask_save, set;
+#else
+	int	sigmask_save;
+#endif
 
 	fd = *chan;
 	op = (char *)buf;
@@ -273,7 +288,14 @@ XLONG	*loffset;		/* not used */
 	 * entire record.  This is implemented as a critical section to
 	 * prevent corruption of the IPC protocol when an interrupt occurs.
 	 */
+#ifdef SOLARIS
+	sigemptyset (&set);
+	sigaddset (&set, SIGINT);
+	sigaddset (&set, SIGTERM);
+	sigprocmask (SIG_BLOCK, &set, &sigmask_save);
+#else
 	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
+#endif
 
 	while (nbytes > 0)
 	    switch (status = read (fd, op, nbytes)) {
@@ -305,7 +327,11 @@ XLONG	*loffset;		/* not used */
 	    if (read (fd, &temp, 1) <= 0)
 		break;
 reenab_:
+#ifdef SOLARIS
+	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
+#else
 	sigsetmask (sigmask_save);
+#endif
 }
 
 
@@ -320,7 +346,11 @@ XLONG	*loffset;
 {
 	register int fd;
 	short	temp;
+#ifdef SOLARIS
+	sigset_t sigmask_save, set;
+#else
 	int	sigmask_save;
+#endif
 
 	fd = *chan;
 
@@ -343,7 +373,14 @@ XLONG	*loffset;
 
 	/* Write IPC block header.
 	 */
+#ifdef SOLARIS
+	sigemptyset (&set);
+	sigaddset (&set, SIGINT);
+	sigaddset (&set, SIGTERM);
+	sigprocmask (SIG_BLOCK, &set, &sigmask_save);
+#else
 	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
+#endif
 
 	temp = IPC_MAGIC;
 	write (fd, &temp, 2);
@@ -360,7 +397,11 @@ XLONG	*loffset;
 	if (ipc_out > 0)
 	    write (ipc_out, (char *)buf, (int)*nbytes);
 
+#ifdef SOLARIS
+	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
+#else
 	sigsetmask (sigmask_save);
+#endif
 
 	if (debug_ipc) {
 	    fprintf (stderr, "[%d] wrote %d bytes to IPC channel %d:\n",

@@ -17,10 +17,12 @@ task center,
      wphot	= "apphot$x_apphot.e"
 
 task centerpars = "apphot$centerpars.par"
-task fitskypars = "apphot$fitskypars.par"
 task datapars   = "apphot$datapars.par"
+task findpars	= "apphot$findpars.par"
+task fitskypars = "apphot$fitskypars.par"
 task photpars   = "apphot$photpars.par"
 task polypars   = "apphot$polypars.par"
+
 task aptest	= "apphot$aptest.cl"
 
 # PTOOLS tasks

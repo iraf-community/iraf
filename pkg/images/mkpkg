@@ -11,7 +11,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-liminterp -lxtools -lcurfit -lsurfit -lgsurfit"
+	$set	LIBS = "-liminterp -lxtools -lcurfit -lsurfit -lnlfit -lgsurfit -lncar -lgks"
 
 	$update	libpkg.a
 	$omake	x_images.x

@@ -1071,8 +1071,9 @@ real	yrot		# rotation of point on y axis
 
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
-real	xrange, yrange, xmaxmin, ymaxmin
-real	a, b, c, d, ratio, num, denom
+real	xxrange, xyrange, xxmaxmin, xymaxmin
+real	yxrange, yyrange, yxmaxmin, yymaxmin
+real	a, b, c, d
 
 bool	fp_equalr()
 int	gsgeti()
@@ -1094,114 +1095,70 @@ begin
 
 	# get the data range
 	if (gsgeti (sx, GSTYPE) != GS_POLYNOMIAL) {
-	    xrange = (gsgetr (sx, GSXMAX) - gsgetr (sx, GSXMIN)) / 2.0
-	    xmaxmin = - (gsgetr (sx, GSXMAX) + gsgetr (sx, GSXMIN)) / 2.0
-	    yrange = (gsgetr (sx, GSYMAX) - gsgetr (sx, GSYMIN)) / 2.0
-	    ymaxmin = - (gsgetr (sx, GSYMAX) + gsgetr (sx, GSYMIN)) / 2.0
+	    xxrange = (gsgetr (sx, GSXMAX) - gsgetr (sx, GSXMIN)) / 2.0
+	    xxmaxmin = - (gsgetr (sx, GSXMAX) + gsgetr (sx, GSXMIN)) / 2.0
+	    xyrange = (gsgetr (sx, GSYMAX) - gsgetr (sx, GSYMIN)) / 2.0
+	    xymaxmin = - (gsgetr (sx, GSYMAX) + gsgetr (sx, GSYMIN)) / 2.0
 	} else {
-	    xrange = 1.0
-	    xmaxmin = 0.0
-	    yrange = 1.0
-	    ymaxmin = 0.0
+	    xxrange = 1.0
+	    xxmaxmin = 0.0
+	    xyrange = 1.0
+	    xymaxmin = 0.0
+	}
+	if (gsgeti (sy, GSTYPE) != GS_POLYNOMIAL) {
+	    yxrange = (gsgetr (sy, GSXMAX) - gsgetr (sy, GSXMIN)) / 2.0
+	    yxmaxmin = - (gsgetr (sy, GSXMAX) + gsgetr (sy, GSXMIN)) / 2.0
+	    yyrange = (gsgetr (sy, GSYMAX) - gsgetr (sy, GSYMIN)) / 2.0
+	    yymaxmin = - (gsgetr (sy, GSYMAX) + gsgetr (sy, GSYMIN)) / 2.0
+	} else {
+	    yxrange = 1.0
+	    yxmaxmin = 0.0
+	    yyrange = 1.0
+	    yymaxmin = 0.0
 	}
 
 	# get the shifts
-	xshift = Memr[xcoeff] + Memr[xcoeff+1] * xmaxmin / xrange +
-	    Memr[xcoeff+2] * ymaxmin / yrange
-	yshift = Memr[ycoeff] + Memr[ycoeff+1] * xmaxmin / xrange +
-	    Memr[ycoeff+2] * ymaxmin / yrange
+	xshift = Memr[xcoeff] + Memr[xcoeff+1] * xxmaxmin / xxrange +
+	    Memr[xcoeff+2] * xymaxmin / xyrange
+	yshift = Memr[ycoeff] + Memr[ycoeff+1] * yxmaxmin / yxrange +
+	    Memr[ycoeff+2] * yymaxmin / yyrange
 
-	# get the rotation and scaling parameters and correct for normalization
-	if (nxxcoeff > 1)
-	    a = Memr[xcoeff+1] / xrange
-	else
-	    a = 0.
-	if (nxycoeff > 1)
-	    b = Memr[xcoeff+nxxcoeff] / yrange
-	else
-	    b = 0.
-	if (nyxcoeff > 1)
-	    c = Memr[ycoeff+1] / xrange
-	else
-	    c = 0.
-	if (nyycoeff > 1)
-	    d = Memr[ycoeff+nyxcoeff] / yrange
-	else
-	    d = 0.
+        # Get the rotation and scaling parameters and correct for normalization.
+        if (nxxcoeff > 1)
+            a = Memr[xcoeff+1] / xxrange
+        else
+            a = 0.0
+        if (nxycoeff > 1)
+            b = Memr[xcoeff+nxxcoeff] / xyrange
+        else
+            b = 0.0
+        if (nyxcoeff > 1)
+            c = Memr[ycoeff+1] / yxrange
+        else
+            c = 0.0
+        if (nyycoeff > 1)
+            d = Memr[ycoeff+nyxcoeff] / yyrange
+        else
+            d = 0.0
 
-	# compute the ratio of the y scale factor to the x scale factor
-	if (fp_equalr (b, d) || fp_equalr (b, -d) || fp_equalr (a, c) ||
-	    fp_equalr (a, -c)) {
-	    if (fp_equalr (b, 0.0) || fp_equalr (d, 0.0))
-		ratio = 0.0
-	    else if (fp_equalr (a, 0.0) || fp_equalr (c, 0.0))
-		ratio = INDEFR
-	    else
-		ratio = abs (b / a)
-	} else {
-	    ratio = (b - d) * (b + d) / (c - a) / (c + a)
-	    if (ratio < 0.0)
-		ratio = abs (b / a)
-	    else
-		ratio = sqrt (ratio)
-	}
+        # Get the magnification factors.
+        xscale = sqrt (a * a + c * c)
+        yscale = sqrt (b * b + d * d)
 
-	# get the rotation angle
-	if (fp_equalr (a, 0.0)) {
-	    if (b > 0.0)
-		xrot = 90.0
-	    else
-		xrot = 270.0
-	} else if (fp_equalr (b, 0.0)) {
-	    if (a > 0.0)
-	        xrot = 0.0
-	    else
-		xrot = 180.0
-	} else {
-	    xrot = RADTODEG (atan (b / a / ratio))
-	    if (a < 0.0)
-		xrot = xrot + 180.0
-	    else if (b < 0.0)
-		xrot = xrot + 360.0
-	    if (xrot < 0.0 || xrot >= 360.0 || fp_equalr (xrot, 360.0))
-		xrot = 0.0
-	}
+        # Get the x and y axes rotation factors.
+        if (fp_equalr (a, 0.0) && fp_equalr (c, 0.0))
+            xrot = 0.0
+        else
+            xrot = RADTODEG (atan2 (-c, a))
+        if (xrot < 0.0)
+            xrot = xrot + 360.0
 
-	if (fp_equalr (d, 0.0)) {
-	    if (c < 0.0)
-		yrot = 90.0
-	    else
-		yrot = 270.0
-	} else if (fp_equalr (c, 0.0)) {
-	    if (d > 0.0)
-	        yrot = 0.0
-	    else
-		yrot = 180.0
-	} else {
-	    yrot = RADTODEG (atan (-c * ratio / d))
-	    if (d < 0.0)
-		yrot = yrot + 180.0
-	    else if (c > 0.0)
-		yrot = yrot + 360.0
-	    if (yrot < 0.0 || yrot >= 360.0 || fp_equalr (yrot, 360.0))
-		yrot = 0.0
-	}
-
-	# solve for x scale
-	num = a ** 2 + c ** 2
-	denom = cos (DEGTORAD (xrot)) ** 2 + sin (DEGTORAD (yrot)) ** 2
-	if (fp_equalr (num, 0.0) || fp_equalr (denom, 0.0))
-	    xscale = 0.0
-	else
-	    xscale = sqrt (num / denom)
-
-	# solve for y scale
-	num = b ** 2 + d ** 2
-	denom = sin (DEGTORAD (xrot)) ** 2 + cos (DEGTORAD (yrot)) ** 2
-	if (fp_equalr (num, 0.0) || fp_equalr (denom, 0.0))
-	    yscale = 0.0
-	else
-	    yscale = sqrt (num / denom)
+        if (fp_equalr (b, 0.0) && fp_equalr (d, 0.0))
+            yrot = 0.0
+        else
+            yrot = RADTODEG (atan2 (b, d))
+        if (yrot < 0.0)
+            yrot = yrot + 360.0
 
 	call sfree (sp)
 end
@@ -1223,8 +1180,9 @@ double	yrot		# rotation of point on y axis
 
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
-double	xrange, yrange, xmaxmin, ymaxmin
-double	a, b, c, d, ratio, num, denom
+double	xxrange, xyrange, xxmaxmin, xymaxmin
+double	yxrange, yyrange, yxmaxmin, yymaxmin
+double	a, b, c, d
 
 bool	fp_equald()
 int	dgsgeti()
@@ -1246,114 +1204,70 @@ begin
 
 	# get the data range
 	if (dgsgeti (sx, GSTYPE) != GS_POLYNOMIAL) {
-	    xrange = (dgsgetd (sx, GSXMAX) - dgsgetd (sx, GSXMIN)) / 2.0d0
-	    xmaxmin = - (dgsgetd (sx, GSXMAX) + dgsgetd (sx, GSXMIN)) / 2.0d0
-	    yrange = (dgsgetd (sx, GSYMAX) - dgsgetd (sx, GSYMIN)) / 2.0d0
-	    ymaxmin = (dgsgetd (sx, GSYMAX) + dgsgetd (sx, GSYMIN)) / 2.0d0
+	    xxrange = (dgsgetd (sx, GSXMAX) - dgsgetd (sx, GSXMIN)) / 2.0d0
+	    xxmaxmin = - (dgsgetd (sx, GSXMAX) + dgsgetd (sx, GSXMIN)) / 2.0d0
+	    xyrange = (dgsgetd (sx, GSYMAX) - dgsgetd (sx, GSYMIN)) / 2.0d0
+	    xymaxmin = (dgsgetd (sx, GSYMAX) + dgsgetd (sx, GSYMIN)) / 2.0d0
 	} else {
-	    xrange = 1.0d0
-	    xmaxmin = 0.0d0
-	    yrange = 1.0d0
-	    ymaxmin = 0.0d0
+	    xxrange = 1.0d0
+	    xxmaxmin = 0.0d0
+	    xyrange = 1.0d0
+	    xymaxmin = 0.0d0
+	}
+	if (dgsgeti (sy, GSTYPE) != GS_POLYNOMIAL) {
+	    yxrange = (dgsgetd (sx, GSXMAX) - dgsgetd (sx, GSXMIN)) / 2.0d0
+	    yxmaxmin = - (dgsgetd (sx, GSXMAX) + dgsgetd (sx, GSXMIN)) / 2.0d0
+	    yyrange = (dgsgetd (sx, GSYMAX) - dgsgetd (sx, GSYMIN)) / 2.0d0
+	    yymaxmin = (dgsgetd (sx, GSYMAX) + dgsgetd (sx, GSYMIN)) / 2.0d0
+	} else {
+	    yxrange = 1.0d0
+	    yxmaxmin = 0.0d0
+	    yyrange = 1.0d0
+	    yymaxmin = 0.0d0
 	}
 
 	# get the shifts
-	xshift = Memd[xcoeff] + Memd[xcoeff+1] * xmaxmin / xrange -
-	    Memd[xcoeff+2] * ymaxmin / yrange
-	yshift = Memd[ycoeff] + Memd[ycoeff+1] * xmaxmin / xrange -
-	    Memd[ycoeff+2] * ymaxmin / yrange
+	xshift = Memd[xcoeff] + Memd[xcoeff+1] * xxmaxmin / xxrange -
+	    Memd[xcoeff+2] * xymaxmin / xyrange
+	yshift = Memd[ycoeff] + Memd[ycoeff+1] * yxmaxmin / yxrange -
+	    Memd[ycoeff+2] * yymaxmin / yyrange
 
-	# get the rotation and scaling parameters and correct for normalization
-	if (nxxcoeff > 1)
-	    a = Memd[xcoeff+1] / xrange
-	else
-	    a = 0.0d0
-	if (nxycoeff > 1)
-	    b = Memd[xcoeff+nxxcoeff] / yrange
-	else
-	    b = 0.0d0
-	if (nyxcoeff > 1)
-	    c = Memd[ycoeff+1] / xrange
-	else
-	    c = 0.0d0
-	if (nyycoeff > 1)
-	    d = Memd[ycoeff+nyxcoeff] / yrange
-	else
-	    d = 0.0d0
+        # Get the rotation and scaling parameters and correct for normalization.
+        if (nxxcoeff > 1)
+            a = Memd[xcoeff+1] / xxrange
+        else
+            a = 0.0d0
+        if (nxycoeff > 1)
+            b = Memd[xcoeff+nxxcoeff] / xyrange
+        else
+            b = 0.0d0
+        if (nyxcoeff > 1)
+            c = Memd[ycoeff+1] / yxrange
+        else
+            c = 0.0d0
+        if (nyycoeff > 1)
+            d = Memd[ycoeff+nyxcoeff] / yyrange
+        else
+            d = 0.0d0
 
-	# compute the ratio of the y scale factor to the x scale factor
-	if (fp_equald (b, d) || fp_equald (b, -d) || fp_equald (a, c) ||
-	    fp_equald (a, -c)) {
-	    if (fp_equald (b, 0.0d0) || fp_equald (d, 0.0d0))
-		ratio = 0.0d0
-	    else if (fp_equald (a, 0.0d0) || fp_equald (c, 0.0d0))
-		ratio = INDEFD
-	    else
-		ratio = abs (b / a)
-	} else {
-	    ratio = (b - d) * (b + d) / (c - a) / (c + a)
-	    if (ratio < 0.0d0)
-		ratio = abs (b / a)
-	    else
-		ratio = sqrt (ratio)
-	}
+        # Get the magnification factors.
+        xscale = sqrt (a * a + c * c)
+        yscale = sqrt (b * b + d * d)
 
-	# get the rotation angle
-	if (fp_equald (a, 0.0d0)) {
-	    if (b > 0.0d0)
-		xrot = 90.0d0
-	    else
-		xrot = 270.0d0
-	} else if (fp_equald (b, 0.0d0)) {
-	    if (a > 0.0d0)
-	        xrot = 0.0d0
-	    else
-		xrot = 180.0d0
-	} else {
-	    xrot = RADTODEG (atan (b / a / ratio))
-	    if (a < 0.0d0)
-		xrot = xrot + 180.0d0
-	    else if (b < 0.0d0)
-		xrot = xrot + 360.0d0
-	    if (xrot < 0.0d0 || xrot >= 360.0d0 || fp_equald (xrot, 360.0d0))
-		xrot = 0.0d0
-	}
+        # Get the x and y axes rotation factors.
+        if (fp_equald (a, 0.0d0) && fp_equald (c, 0.0d0))
+            xrot = 0.0d0
+        else
+            xrot = RADTODEG (atan2 (-c, a))
+        if (xrot < 0.0d0)
+            xrot = xrot + 360.0d0
 
-	if (fp_equald (d, 0.0d0)) {
-	    if (c < 0.0d0)
-		yrot = 90.0d0
-	    else
-		yrot = 270.0d0
-	} else if (fp_equald (c, 0.0d0)) {
-	    if (d > 0.0d0)
-	        yrot = 0.0d0
-	    else
-		yrot = 180.0d0
-	} else {
-	    yrot = RADTODEG (atan (-c * ratio / d))
-	    if (d < 0.0d0)
-		yrot = yrot + 180.0d0
-	    else if (c > 0.0d0)
-		yrot = yrot + 360.0d0
-	    if (yrot < 0.0d0 || yrot >= 360.0d0 || fp_equald (yrot, 360.0d0))
-		yrot = 0.0d0
-	}
-
-	# solve for x scale
-	num = a ** 2 + c ** 2
-	denom = cos (DEGTORAD (xrot)) ** 2 + sin (DEGTORAD (yrot)) ** 2
-	if (fp_equald (num, 0.0d0) || fp_equald (denom, 0.0d0))
-	    xscale = 0.0d0
-	else
-	    xscale = sqrt (num / denom)
-
-	# solve for y scale
-	num = b ** 2 + d ** 2
-	denom = sin (DEGTORAD (xrot)) ** 2 + cos (DEGTORAD (yrot)) ** 2
-	if (fp_equald (num, 0.0d0) || fp_equald (denom, 0.0d0))
-	    yscale = 0.0d0
-	else
-	    yscale = sqrt (num / denom)
+        if (fp_equald (b, 0.0d0) && fp_equald (d, 0.0d0))
+            yrot = 0.0d0
+        else
+            yrot = RADTODEG (atan2 (b, d))
+        if (yrot < 0.0d0)
+            yrot = yrot + 360.0d0
 
 	call sfree (sp)
 end
@@ -1390,8 +1304,8 @@ begin
 
 	# calculate coefficients
 	Memr[xcoeff+GS_SAVECOEFF+1] =  xscale * cosx
-	Memr[xcoeff+GS_SAVECOEFF+2] =  yscale * sinx
-	Memr[ycoeff+GS_SAVECOEFF+1] = -xscale * siny
+	Memr[xcoeff+GS_SAVECOEFF+2] =  yscale * siny
+	Memr[ycoeff+GS_SAVECOEFF+1] = -xscale * sinx
 	Memr[ycoeff+GS_SAVECOEFF+2] =  yscale * cosy
 
 	# normalize coefficients for non polynomial functions
@@ -1453,8 +1367,8 @@ begin
 
 	# calculate coefficients
 	Memd[xcoeff+GS_SAVECOEFF+1] =  xscale * cosx
-	Memd[xcoeff+GS_SAVECOEFF+2] =  yscale * sinx
-	Memd[ycoeff+GS_SAVECOEFF+1] = -xscale * siny
+	Memd[xcoeff+GS_SAVECOEFF+2] =  yscale * siny
+	Memd[ycoeff+GS_SAVECOEFF+1] = -xscale * sinx
 	Memd[ycoeff+GS_SAVECOEFF+2] =  yscale * cosy
 
 	# normalize coefficients for non polynomial functions

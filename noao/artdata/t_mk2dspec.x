@@ -210,6 +210,8 @@ begin
 		    k2 = pend + 0.5
 		    x1 = (pstart - pos) / pstep + pcen[ptype] + 1
 		    x2 = (k1 + 0.5 - pos) / pstep + pcen[ptype] + 1
+		    x1 = max (1., x1)
+		    x2 = max (1., x2)
 		    Memr[data+k1] = Memr[data+k1] + peak * asigrl (asi, x1, x2)
 
 		    dx = 1 / pstep
@@ -229,7 +231,7 @@ begin
 		call strcpy ("# ", Memc[comment], LEN_COMMENT)
 		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
 		call mkh_comment (out, Memc[comment])
-		call mkh_comment (out, "begin\tmk2dspec")
+		call mkh_comment (out, "begin        mk2dspec")
 		call mkh_comment1 (out, "models", 's')
 
 		fd = open (Memc[models], READ_ONLY, TEXT_FILE)

@@ -10,7 +10,7 @@ define	MKT_MSI		Memi[$1+1]	# MSI interpolation pointer
 define	MKT_NXM		Memi[$1+2]	# Number of X points in model
 define	MKT_NYM		Memi[$1+3]	# Number of Y points in model
 define	MKT_F		Memr[$1+4]	# Fraction of total flux in profile
-define	MKT_SCALE	Memi[$1+5]	# Radius scale
+define	MKT_SCALE	Memr[$1+5]	# Radius scale
 
 define	MKT_NALLOC	Memi[$1+6]	# Allocated space for saved templates
 define	MKT_N		Memi[$1+7]	# Number of saved templates
@@ -694,7 +694,7 @@ int	nprof1			# Number of output points
 real	radius			# Radius of profile
 int	nsub			# Maximum subsampling
 
-int	i, j, k, k1, k2, dx
+int	i, j, k, k1, k2, l, dx
 real	scale, dy, val
 
 int	debug, open()
@@ -724,9 +724,12 @@ begin
 		    val = dy * j
 		else
 		    val = k * sqrt (1. + (dy * j / k) ** 2)
-		val = prof[nint (scale * val + 1)] / NY
-		do k = k1, k2
-		    prof1[k] = prof1[k] + val
+		l = nint (scale * val + 1)
+		if (l > nprof)
+		    next
+		val = prof[l] / NY
+		do l = k1, k2
+		    prof1[l] = prof1[l] + val
 	    }
 	}
 

@@ -34,7 +34,7 @@ begin
 	    call anegr (Memr[cbuf], Memr[cbuf], nx * ny)
 	    call aaddkr (Memr[cbuf], datamax, Memr[cbuf], nx * ny)
 	}
-	ier = ap_mctr1d (Memr[cbuf], nx, ny, xcenter, ycenter, junk, junk)
+	ier = ap_mctr1d (Memr[cbuf], nx, ny, 1.0, xcenter, ycenter, junk, junk)
 
 	# Compute the center in image coordinates.
 	if (IS_INDEFR(xcenter))

@@ -109,16 +109,17 @@ define	PS_EXLSCALE	Memi[$1+5]	# QPEX scale nranges to LUT bins
 define	PS_SZPBBUF	Memi[$1+6]	# size of pushback buffer for macros
 define	PS_BUCKETLEN	Memi[$1+7]	# QPIO event file bucket size
 define	PS_FMMAXLFILES	Memi[$1+8]	# FMIO maxlfiles
-define	PS_FMPAGESIZE	Memi[$1+9]	# FMIO pagesize
-define	PS_FMCACHESIZE	Memi[$1+10]	# FMIO buffer cache size
-define	PS_STINDEXLEN	Memi[$1+11]	# SYMTAB hash index length
-define	PS_STSTABLEN	Memi[$1+12]	# SYMTAB stab len (start)
-define	PS_STSBUFSIZE	Memi[$1+13]	# SYMTAB sbuf size (start)
-define	PS_NODEFFILT	Memi[$1+14]	# Disable use of default filter
-define	PS_NODEFMASK	Memi[$1+15]	# Disable use of default mask
-define	PS_BLOCK	Memi[$1+16]	# QPIO blocking factor
-define	PS_DEBUG	Memi[$1+17]	# debug level
-define	PS_OPTBUFSIZE	Memi[$1+18]	# QPIO/QPF FIO optimum buffer size 
+define	PS_FMMAXPTPAGES	Memi[$1+9]	# FMIO maxptpages (page table pages)
+define	PS_FMPAGESIZE	Memi[$1+10]	# FMIO pagesize
+define	PS_FMCACHESIZE	Memi[$1+11]	# FMIO buffer cache size
+define	PS_STINDEXLEN	Memi[$1+12]	# SYMTAB hash index length
+define	PS_STSTABLEN	Memi[$1+13]	# SYMTAB stab len (start)
+define	PS_STSBUFSIZE	Memi[$1+14]	# SYMTAB sbuf size (start)
+define	PS_NODEFFILT	Memi[$1+15]	# Disable use of default filter
+define	PS_NODEFMASK	Memi[$1+16]	# Disable use of default mask
+define	PS_BLOCK	Memi[$1+17]	# QPIO blocking factor
+define	PS_DEBUG	Memi[$1+18]	# debug level
+define	PS_OPTBUFSIZE	Memi[$1+19]	# QPIO/QPF FIO optimum buffer size 
 
 # Handy macros.
 define	IS_PUNCT	(IS_WHITE($1)||($1)==','||($1)=='\n')
@@ -359,23 +360,32 @@ int	fd			#I input stream
 int	flags			#I scan flags
 
 int	ch
-int	symarg, junk, i
 bool	is_define, is_set
+int	symarg, junk, buflen, i
 pointer	sp, mname, mvbuf, sym, st, op, otop
 
 bool	streq()
 int	qm_getc(), stpstr()
 pointer	stfind(), stenter()
-errchk	qm_getc, qm_setparam, stenter, stpstr
+errchk	qm_getc, qm_setparam, stenter, stpstr, malloc, realloc
 define	next_ 91
 
 begin
 	call smark (sp)
 	call salloc (mname, SZ_MNAME, TY_CHAR)
-	call salloc (mvbuf, SZ_MVBUF, TY_CHAR)
+	call malloc (mvbuf, SZ_MVBUF, TY_CHAR)
 
 	st = QM_ST(qm)
 	junk = qm_getc (NULL, ch)
+
+	# The following can only be set true in set statements, so we must
+	# initialize the values before processing the file.
+
+	sym = stfind (st, PSETKW)
+	if (sym != NULL) {
+	    PS_NODEFFILT(sym) = NO
+	    PS_NODEFMASK(sym) = NO
+	}
 
 	# Each loop processes one newline delimited statement from the
 	# input stream.  The qm_getc function deals with continuation,
@@ -446,14 +456,14 @@ next_
 	    # Get value string.  Check for the presence of any symbolic
 	    # arguments of the form $N in the process.
 
-	    otop = mvbuf + SZ_MVBUF - 1
-	    op = mvbuf
 	    symarg = 0
+	    buflen = SZ_MVBUF
+	    op = mvbuf
 
 	    Memc[op] = ch
 	    op = op + 1
 
-	    while (qm_getc (fd, ch) != EOF)
+	    while (qm_getc (fd, ch) != EOF) {
 		if (ch == '\n')
 		    break
 		else {
@@ -462,8 +472,14 @@ next_
 			if (op > mvbuf)
 			    if (Memc[op-1] == '$')
 				symarg = max (symarg, TO_INTEG(ch))
-		    op = min (otop, op + 1)
+		    op = op + 1
+		    if (op - mvbuf == buflen) {
+			call realloc (mvbuf, buflen + SZ_MVBUF, TY_CHAR)
+			op = mvbuf + buflen
+			buflen = buflen + SZ_MVBUF
+		    }
 		}
+	    }
 	    Memc[op] = EOS
 
 	    # Process SET statements.
@@ -493,6 +509,7 @@ next_
 		S_FLAGS(sym) = 0
 	}
 
+	call mfree (mvbuf, TY_CHAR)
 	call sfree (sp)
 end
 
@@ -544,6 +561,8 @@ begin
 	    PS_STINDEXLEN(ps) = value
 	else if (streq (param[pp], "maxlfiles"))
 	    PS_FMMAXLFILES(ps) = value
+	else if (streq (param[pp], "maxptpages"))
+	    PS_FMMAXPTPAGES(ps) = value
 	else if (streq (param[pp], "pagesize"))
 	    PS_FMPAGESIZE(ps) = value
 	else if (streq (param[pp], "sbufsize"))
@@ -613,6 +632,7 @@ begin
 	# Datafile parameters.
 	QP_BUCKETLEN(qp) = qm_setpar (PS_BUCKETLEN(ps), DEF_BUCKETLEN)
 	QP_FMMAXLFILES(qp) = qm_setpar (PS_FMMAXLFILES(ps), DEF_FMMAXLFILES)
+	QP_FMMAXPTPAGES(qp) = qm_setpar (PS_FMMAXPTPAGES(ps), DEF_FMMAXPTPAGES)
 	QP_FMPAGESIZE(qp) = qm_setpar (PS_FMPAGESIZE(ps), DEF_FMPAGESIZE)
 	QP_STINDEXLEN(qp) = qm_setpar (PS_STINDEXLEN(ps), DEF_STINDEXLEN)
 	QP_STSTABLEN(qp) = qm_setpar (PS_STSTABLEN(ps), DEF_STSTABLEN)
@@ -676,6 +696,7 @@ begin
 	# Datafile parameters.
 	if (PS_BUCKETLEN(ps) != 0)	QP_BUCKETLEN(qp) = PS_BUCKETLEN(ps)
 	if (PS_FMMAXLFILES(ps) != 0)	QP_FMMAXLFILES(qp) = PS_FMMAXLFILES(ps)
+	if (PS_FMMAXPTPAGES(ps) != 0)	QP_FMMAXPTPAGES(qp)= PS_FMMAXPTPAGES(ps)
 	if (PS_FMPAGESIZE(ps) != 0)	QP_FMPAGESIZE(qp) = PS_FMPAGESIZE(ps)
 	if (PS_STINDEXLEN(ps) != 0)	QP_STINDEXLEN(qp) = PS_STINDEXLEN(ps)
 	if (PS_STSTABLEN(ps) != 0)	QP_STSTABLEN(qp) = PS_STSTABLEN(ps)

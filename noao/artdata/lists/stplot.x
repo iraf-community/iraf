@@ -396,6 +396,7 @@ int	npts		# number of points
 
 int	i
 pointer	sp, sizes, par1, par2, title
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -448,8 +449,11 @@ begin
 	call gt_labax (gd, gt)
 
 	# Plot.
-	call amapr (mag, Memr[sizes], npts, ST_MAXMAG(st), ST_MINMAG(st),
-	    1.0, 4.0)
+	if (fp_equalr (ST_MAXMAG(st), ST_MINMAG(st)))
+	    call amovkr (2.0, Memr[sizes], npts)
+	else
+	    call amapr (mag, Memr[sizes], npts, ST_MAXMAG(st), ST_MINMAG(st),
+		1.0, 4.0)
 	call gt_sets (gt, GTTYPE, "mark")
 	call gt_sets (gt, GTMARK, "box")
 	do i = 1, npts
@@ -478,6 +482,7 @@ int	npts		# number of points
 int	i
 pointer	sp, par1, par2, title, xsizes
 real	amin, amax
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -531,7 +536,10 @@ begin
 
 	# Compute the marksizes.
 	call alimr (axis, npts, amin, amax)
-	call amapr (axis, Memr[xsizes], npts, amin, amax, 1.0, 4.0)
+	if (fp_equalr (amin, amax))
+	    call amovkr (2.0, Memr[xsizes], npts)
+	else
+	    call amapr (axis, Memr[xsizes], npts, amin, amax, 1.0, 4.0)
 
 	#call amulr (axis, round, Memr[ysizes], npts)
 	#call alimr (Memr[ysizes], npts, amin, amax)

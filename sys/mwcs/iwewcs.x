@@ -171,14 +171,10 @@ samperr_		call eprintf (
 		theta = DEGTORAD(IW_CROTA(iw))
 		ax1 = raax
 		ax2 = decax
-		IW_CD(iw,ax1,ax1) = IW_CDELT(iw,ax1) * cos(theta)
-		IW_CD(iw,ax1,ax2) = abs(IW_CDELT(iw,ax2)) * sin(theta)
-		IW_CD(iw,ax2,ax1) = -abs(IW_CDELT(iw,ax1)) * sin(theta)
-		IW_CD(iw,ax2,ax2) = IW_CDELT(iw,ax2) * cos(theta)
-		if (IW_CDELT(iw,ax1) < 0)
-		    IW_CD(iw,ax1,ax2) = -IW_CD(iw,ax1,ax2)
-		if (IW_CDELT(iw,ax2) < 0)
-		    IW_CD(iw,ax2,ax1) = -IW_CD(iw,ax2,ax1)
+		IW_CD(iw,ax1,ax1) =  IW_CDELT(iw,ax1) * cos(theta)
+		IW_CD(iw,ax1,ax2) =  IW_CDELT(iw,ax1) * sin(theta)
+		IW_CD(iw,ax2,ax1) = -IW_CDELT(iw,ax2) * sin(theta)
+		IW_CD(iw,ax2,ax2) =  IW_CDELT(iw,ax2) * cos(theta)
 	    }
 	}
 

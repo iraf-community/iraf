@@ -5,58 +5,37 @@ define	SCANTYPES	"|shortscan|longscan|"
 define	SHORTSCAN	1	# Short scan accumulation, normal readout
 define	LONGSCAN	2	# Long scan continuous readout
 
-# SCANCOR -- Create a scan flat from an unscanned flat field.
+# SCANCOR -- Create a scanned image from an unscanned image.
 
-procedure scancor (input)
+procedure scancor (input, output, nscan, minreplace)
 
 char	input[ARB]		# Input image
-int	scantype		# Type of scan format
+char	output[ARB]		# Output image (must be new image)
 int	nscan			# Number of scan lines
+real	minreplace		# Minmum value of output
+
+int	scantype		# Type of scan format
 int	readaxis		# Readout axis
 
-int	clgwrd(), clgeti()
-bool	clgetb(), ccdflag()
-pointer	sp, output, str, in, out, immap()
-errchk	immap, ccddelete
+int	clgwrd()
+pointer	sp, str, in, out, immap()
+errchk	immap
 
 begin
-	# Check if this operation is desired.
-	if (!clgetb ("scancor"))
-	    return
-
-	# Check if this operation has been done.  Unfortunately this requires
-	# mapping the image.
-
-	in = immap (input, READ_ONLY, 0)
-	if (ccdflag (in, "scancor")) {
-	    call imunmap (in)
-	    return
-	}
-
-	if (clgetb ("noproc")) {
-	    call eprintf (
-		"  [TO BE DONE] Convert %s to scan mode calibration\n")
-		call pargstr (input)
-	    call imunmap (in)
-	    return
-	}
-
 	call smark (sp)
-	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Determine readout axis and create the temporary output image.
 	scantype = clgwrd ("scantype", Memc[str], SZ_LINE, SCANTYPES)
 	readaxis = clgwrd ("readaxis", Memc[str], SZ_LINE, "|lines|columns|")
-	nscan = clgeti ("nscan")
 
-	call mktemp ("tmp", Memc[output], SZ_FNAME)
-	call set_output (in, out, Memc[output])
+	# Make the output scanned image.
+	in = immap (input, READ_ONLY, 0)
+	call set_output (in, out, output)
 
-	# Make the output scan flat.
 	switch (scantype) {
 	case SHORTSCAN:
-	    call shortscan (in, out, nscan, readaxis)
+	    call shortscan (in, out, nscan, minreplace, readaxis)
 	case LONGSCAN:
 	    call longscan (in, out, readaxis)
 	}
@@ -65,37 +44,44 @@ begin
 	switch (scantype) {
 	case SHORTSCAN:
 	    call sprintf (Memc[str], SZ_LINE,
-		"Converted to shortscan with nscan=%d")
+		"Converted to shortscan from %s with nscan=%d")
+	    call pargstr (input)
 	    call pargi (nscan)
+	    call hdmputi (out, "nscanrow", nscan)
 	case LONGSCAN:
-	    call sprintf (Memc[str], SZ_LINE, "Converted to longscan format")
+	    call sprintf (Memc[str], SZ_LINE, "Converted to longscan from %s")
+	    call pargstr (input)
 	}
 	call timelog (Memc[str], SZ_LINE)
-	call ccdlog (in, Memc[str])
+	call ccdlog (out, Memc[str])
 	call hdmpstr (out, "scancor", Memc[str])
 
-	# Replace the input image by the output image.
 	call imunmap (in)
 	call imunmap (out)
-	call ccddelete (input)
-	call imrename (Memc[output], input)
 
 	call sfree (sp)
 end
 
 
-# SHORTSCAN -- Make a shortscan mode flat field image by using a moving average.
+# SHORTSCAN -- Make a shortscan mode image by using a moving average.
+#
+# NOTE!! The value of nscan used here is increased by 1 because the
+# current information in the image header is actually the number of
+# scan steps and NOT the number of rows.
 
-procedure shortscan (in, out, nscan, readaxis)
+procedure shortscan (in, out, nscan, minreplace, readaxis)
 
 pointer	in		# Input image
 pointer	out		# Output image
 int	nscan		# Number of lines scanned before readout
+real	minreplace	# Minimum output value
 int	readaxis	# Readout axis
 
+bool	replace
 real	nscanr, sum, mean, asumr()
 int	i, j, k, l, len1, len2, nc, nl, nscani, c1, c2, cs, l1, l2, ls
-pointer	sp, str, bufs, datain, data, imgl2r(), impl2r()
+pointer	sp, str, bufs, datain, dataout, data, imgl2r(), impl2r()
+long	clktime()
 errchk	malloc, calloc
 
 begin
@@ -122,10 +108,11 @@ begin
 	do i = 1, l1 - 1
 	    call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)], len1)
 
+	replace = !IS_INDEF(minreplace)
 	mean = 0.
 	switch (readaxis) {
 	case 1:
-	    nscani = max (1, min (nscan, nl))
+	    nscani = max (1, min (nscan, nl) + 1)
 	    nscanr = nscani
 	    call imseti (in, IM_NBUFS, nscani)
 	    call malloc (bufs, nscani, TY_INT)
@@ -138,14 +125,18 @@ begin
 	    while (j <= nscani) {
 		i = j + l1 - 1
 		datain = imgl2r (in, i)
-		call amovr (Memr[datain], Memr[impl2r(out,i)], len1)
+		if (nc < len1)
+		    call amovr (Memr[datain], Memr[impl2r(out,i)], len1)
 		datain = datain + c1 - 1
 		Memi[bufs+mod(j,nscani)] = datain
 	        call aaddr (Memr[data], Memr[datain], Memr[data], nc)
 	        j = j + 1
 	    }
-	    call adivkr (Memr[data], nscanr, Memr[impl2r(out,l+l1-1)+c1-1], nc)
-	    mean = mean + asumr (Memr[data], nc) / nscanr
+	    dataout = impl2r (out, l+l1-1) + c1 - 1
+	    call adivkr (Memr[data], nscanr, Memr[dataout], nc)
+	    if (replace)
+		call amaxkr (Memr[dataout], minreplace, Memr[dataout], nc)
+	    mean = mean + asumr (Memr[dataout], nc)
 	    l = l + 1
 
 	    # Moving average
@@ -154,13 +145,17 @@ begin
 	        call asubr (Memr[data], Memr[datain], Memr[data], nc)
 		i = j + l1 - 1
 		datain = imgl2r (in, i)
-		call amovr (Memr[datain], Memr[impl2r(out,i)], len1)
+		if (nc < len1)
+		    call amovr (Memr[datain], Memr[impl2r(out,i)], len1)
 		datain = datain + c1 - 1
 		Memi[bufs+mod(j,nscani)] = datain
 	        call aaddr (Memr[data], Memr[datain], Memr[data], nc)
-	        call adivkr (Memr[data], nscanr,
-		    Memr[impl2r(out,l+l1-1)+c1-1], nc)
-	        mean = mean + asumr (Memr[data], nc) / nscanr
+		dataout = impl2r (out, l+l1-1) + c1 - 1
+		call adivkr (Memr[data], nscanr, Memr[dataout], nc)
+		if (replace)
+		    call amaxkr (Memr[dataout], minreplace, Memr[dataout], nc)
+		mean = mean + asumr (Memr[dataout], nc)
+
 	        j = j + 1
 	        k = k + 1
 	        l = l + 1
@@ -170,9 +165,12 @@ begin
 	    while (l <= nl) {
 		datain = Memi[bufs+mod(k,nscani)]
 	        call asubr (Memr[data], Memr[datain], Memr[data], nc)
-	        call adivkr (Memr[data], nscanr,
-		    Memr[impl2r(out,l+l1-1)+c1-1], nc)
-	        mean = mean + asumr (Memr[data], nc) / nscanr
+		dataout = impl2r (out, l+l1-1) + c1 - 1
+		call adivkr (Memr[data], nscanr, Memr[dataout], nc)
+		if (replace)
+		    call amaxkr (Memr[dataout], minreplace, Memr[dataout], nc)
+		mean = mean + asumr (Memr[dataout], nc)
+
 	        k = k + 1
 	        l = l + 1
 	    }
@@ -181,7 +179,7 @@ begin
 	    call mfree (data, TY_REAL)
 
 	case 2:
-	    nscani = max (1, min (nscan, nc))
+	    nscani = max (1, min (nscan, nc) + 1)
 	    nscanr = nscani
 	    do i = 1, nl {
 	        datain = imgl2r (in, i + l1 - 1)
@@ -200,15 +198,21 @@ begin
 		    sum = sum + Memr[datain+j]
 		    j = j + 1
 		}
-		Memr[data] = sum / nscani
-		mean = mean + sum
+		if (replace)
+		    Memr[data] = max (minreplace, sum / nscani)
+		else
+		    Memr[data] = sum / nscani
+		mean = mean + Memr[data]
 		l = l + 1
 
 		# Moving average
 		while (j < nl) {
 		    sum = sum + Memr[datain+j] - Memr[datain+k]
-		    Memr[data+l] = sum / nscani
-		    mean = mean + sum
+		    if (replace)
+			Memr[data+l] = max (minreplace, sum / nscani)
+		    else
+			Memr[data+l] = sum / nscani
+		    mean = mean + Memr[data+l]
 		    j = j + 1
 		    k = k + 1
 		    l = l + 1
@@ -217,8 +221,11 @@ begin
 		# Ramp down
 		while (l < nl) {
 		    sum = sum - Memr[datain+k]
-		    Memr[data+l] = sum / nscani
-		    mean = mean + sum
+		    if (replace)
+			Memr[data+l] = max (minreplace, sum / nscani)
+		    else
+			Memr[data+l] = sum / nscani
+		    mean = mean + Memr[data+l]
 		    k = k + 1
 		    l = l + 1
 		}
@@ -231,6 +238,7 @@ begin
 
 	mean = mean / nc / nl
 	call hdmputr (out, "ccdmean", mean)
+	call hdmputi (out, "ccdmeant", int (clktime (long (0))))
 
 	call sfree (sp)
 end
@@ -248,6 +256,7 @@ int	readaxis	# Readout axis
 int	i, nc, nl, c1, c2, cs, l1, l2, ls
 int	in_c1, in_c2, in_l1, in_l2, ccd_c1, ccd_c2, ccd_l1, ccd_l2
 real	mean, asumr()
+long	clktime()
 pointer	sp, str, data, imgl2r(), impl2r(), imps2r()
 
 begin
@@ -325,6 +334,7 @@ begin
 	}
 
 	call hdmputr (out, "ccdmean", mean)
+	call hdmputi (out, "ccdmeant", int (clktime (long (0))))
 
 	call sfree (sp)
 end

@@ -67,7 +67,7 @@ begin
 	j = 0
 	if (npeaks == naps && !shift) {
 	    do i = 1, naps {
-	        if (!is_in_range (Memi[ranges], i))
+	        if (!is_in_range (Memi[ranges], AP_ID(aps[i])))
 		    next
 	        center = AP_CEN(aps[i], apaxis) +
 		    cveval (AP_CV(aps[i]), real (line))
@@ -83,7 +83,7 @@ begin
 	    call salloc (peaks, naps, TY_REAL)
 	    call salloc (deltas, naps, TY_REAL)
 	    do i = 1, naps {
-	        if (!is_in_range (Memi[ranges], i))
+	        if (!is_in_range (Memi[ranges], AP_ID(aps[i])))
 		    next
 	        center = AP_CEN(aps[i], apaxis) +
 		    cveval (AP_CV(aps[i]), real (line))

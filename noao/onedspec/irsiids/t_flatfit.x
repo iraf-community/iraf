@@ -141,7 +141,7 @@ begin
 			expo = 1
 
 	    # Add spectrum into accumulator
-	    if (Memi[bstat+beam] == INDEFI) {
+	    if (IS_INDEFI (Memi[bstat+beam])) {
 	        Memi[npts+beam] = IM_LEN (im,1)
 	        call salloc (Memi[accum+beam], Memi[npts+beam], TY_REAL)
 	        call aclrr (Memr[Memi[accum+beam]], Memi[npts+beam])
@@ -169,7 +169,7 @@ begin
 	# Review all apertures containing data and perform fits.
 	# Act interactively if desired
 	do i = 0, MAX_NR_BEAMS-1 {
-	    if (Memi[bstat+i] != INDEFI) {
+	    if (!IS_INDEFI (Memi[bstat+i])) {
 		call fit_spec (Memr[Memi[accum+i]], Memi[npts+i], Memr[esum+i],
 		    interact, function, order, niter, lower, upper, ngrow,
 		    div_min, i)

@@ -13,10 +13,10 @@ int	out		# pointer to the output file descriptor
 int	stid		# output file sequence number
 
 pointer	sp, cstr, sstr, pwstr, aperts
-real	fwhmpsf, capert, cthreshold, annulus, dannulus, skysigma
+real	fwhmpsf, capert, annulus, dannulus, skysigma
 real	datamin, datamax
 int	apstati()
-real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vcthreshold(), ap_vsigma()
+real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vsigma()
 real	ap_vannulus(), ap_vdannulus(), ap_vdatamin(), ap_vdatamax()
 
 begin
@@ -42,14 +42,10 @@ begin
 	    # Confirm the centering box.
 	    capert = 2.0 * ap_vcapert (ap)
 
-	    # Confirm the centering threshold parameter.
-	    cthreshold = ap_vcthreshold (ap)
-
 	} else {
 
 	    fwhmpsf = apstatr (ap, FWHMPSF)
 	    capert = 2.0 * apstatr (ap, CAPERT)
-	    cthreshold = apstatr (ap, CTHRESHOLD)
 	}
 
 	# Confirm the sky fitting algorithm.
@@ -60,11 +56,17 @@ begin
 
 	    # Confirm the sky annulus parameter.
 	    annulus = ap_vannulus (ap)
-
 	    # Confirm the width of the sky annulus.
 	    dannulus = ap_vdannulus (ap)
 
+	} else if (apstati (ap, SKYFUNCTION) == AP_CONSTANT) {
+
+	    skysigma = ap_vsigma (ap)
+	    annulus = apstatr (ap, ANNULUS)
+	    dannulus = apstatr (ap, DANNULUS)
+
 	} else {
+
 	    annulus = apstatr (ap, ANNULUS)
 	    dannulus = apstatr (ap, DANNULUS)
 	}
@@ -86,29 +88,27 @@ begin
 
 	# Update the database file.
 	if (out != NULL && stid > 1) {
-	    call ap_sparam (out, KY_CSTRING, Memc[cstr], UN_CSTRING,
+	    call ap_sparam (out, KY_CSTRING, Memc[cstr], UN_CALGORITHM,
 		"centering algorithm")
-	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_FWHMPSF,
+	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_ASCALEUNIT,
 	        "full width half maximum of the psf")
-	    call ap_rparam (out, KY_CAPERT, capert, UN_CAPERT,
+	    call ap_rparam (out, KY_CAPERT, capert, UN_CSCALEUNIT,
 	        "centering box width")
-	    call ap_sparam (out, KY_SSTRING, Memc[sstr], UN_SSTRING,
+	    call ap_sparam (out, KY_SSTRING, Memc[sstr], UN_SALGORITHM,
 		"sky fitting algorithm")
-	    call ap_rparam (out, KY_ANNULUS, annulus, UN_ANNULUS,
+	    call ap_rparam (out, KY_ANNULUS, annulus, UN_SSCALEUNIT,
 	        "inner radius of the sky annulus")
-	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_DANNULUS,
+	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_SSCALEUNIT,
 	        "width of the sky annulus")
-	    call ap_rparam (out, KY_CTHRESHOLD, cthreshold, UN_CTHRESHOLD,
-	        "threshold for centering")
-	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
+	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_NCOUNTS,
 	        "standard deviation of 1 sky pixel")
-	    call ap_sparam (out, KY_PWSTRING, Memc[pwstr], UN_PWSTRING,
+	    call ap_sparam (out, KY_PWSTRING, Memc[pwstr], UN_PMODEL,
 		"photometric weighting function")
-	    call ap_sparam (out, KY_APERTS, Memc[aperts], UN_APERTS,
+	    call ap_sparam (out, KY_APERTS, Memc[aperts], UN_PSCALEUNIT,
 		"list of apertures")
-	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_ACOUNTS,
 	        "minimum good data value")
-	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_ACOUNTS,
 	        "maximum good data value")
 	}
 

@@ -18,11 +18,10 @@ extras,b,h,yes,,,"Extract sky, sigma, etc.?"
 review,b,h,yes,,,"Review extractions?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,10,1,,"Number of dispersion lines to sum
+nsum,i,h,10,,,"Number of dispersion lines to sum or median
 
 # DEFAULT APERTURE PARAMETERS
 "
-dispaxis,i,h,2,1,2,"Dispersion axis (1=along lines, 2=along columns)"
 lower,r,h,-5,,,Lower aperture limit relative to center
 upper,r,h,5,,,Upper aperture limit relative to center
 apidtable,s,h,"",,,"Aperture ID table (optional)

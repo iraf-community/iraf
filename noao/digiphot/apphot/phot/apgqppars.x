@@ -33,13 +33,16 @@ begin
 
 	# Open the apphot structure.
 	if (naperts <= 0.0)
-	    call appinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus,
-	        dannulus, 0.0, 1, AP_PWCONSTANT, 1.0, AP_NPOISSON) 
+	    call appinit (ap, AP_CENTROID1D, cbox, AP_CENTROID, annulus,
+	        dannulus, 0.0, 1, AP_PWCONSTANT, 2.5, AP_NPOISSON) 
 	else
-	    call appinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus, dannulus,
-	        Memr[aperts], naperts, AP_PWCONSTANT, 1.0, AP_NPOISSON) 
+	    call appinit (ap, AP_CENTROID1D, cbox, AP_CENTROID, annulus,
+	        dannulus, Memr[aperts], naperts, AP_PWCONSTANT, 2.5,
+		AP_NPOISSON) 
 
 	# Set remaining parameters.
+	call apseti (ap, SMOOTH, YES)
+
 	if (naperts > 0)
 	    call apsets (ap, APSTRING, Memc[apstr])
 	call apsetr (ap, ZMAG, clgetr ("zmag"))
@@ -62,9 +65,9 @@ begin
 	call apsetr (ap, EPADU, clgetr ("epadu"))
 
 	# Print the display parameters.
-	call apseti (ap, MKCENTER, btoi (false))
-	call apseti (ap, MKSKY, btoi (false))
-	call apseti (ap, MKAPERT, btoi (false))
+	call apseti (ap, MKCENTER, btoi (true))
+	call apseti (ap, MKSKY, btoi (true))
+	call apseti (ap, MKAPERT, btoi (true))
 	call apseti (ap, RADPLOTS, btoi (clgetb ("radplots")))
 
 	# Close the pset files.

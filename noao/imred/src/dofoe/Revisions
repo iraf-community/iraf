@@ -1,0 +1,13 @@
+.help revisions Jan95 noao.imred.src.dofoe
+.nf
+dofoe$params.par
+dofoe$arcrefs.cl
+dofoe$doarcs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+dofoe$proc.cl
+dofoe$batch.cl
+dofoe$listonly.cl
+    The test for extracted spectra based on the system keyword was failing
+    and so it was removed.  (1/16/95, Valdes)
+.endhelp

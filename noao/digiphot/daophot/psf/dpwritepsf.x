@@ -1,87 +1,44 @@
 include <time.h>
-include <fset.h>
-include <imset.h>
 include <imhdr.h>
-include <math.h>
 include	"../lib/daophotdef.h"
+include	"../lib/apseldef.h"
 include	"../lib/psfdef.h"
 
 # DP_WRITEPSF -- Write out the PSF into an IRAF image. 
 
-int procedure	dp_writepsf (dao, im, psfim)
+procedure dp_writepsf (dao, psfim)
 
 pointer	dao			# pointer to the daophot structure
-pointer	im			# pointer to the input image
-pointer	psfim			# pointer to the output psfim
-
-pointer	psffit, sp, temp, str
-real	dx, dy
-int	dp_wrtlut()
+pointer	psfim			# pointer to the output psf image
 
 begin
-	# Allocate some working space.
-	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR) 
+	# Check that the psfimage is open.
+	if (psfim == NULL)
+	    return
 
-	# Get pointers to other PSF structures.
-	psffit = DP_PSFFIT(dao)
+	# Write out the id and fitting parameters.
+	call dp_widpars (dao, psfim)
 
-	# If the PSF image has already been written into and the PSF
-	# changes size delete the old image and remap it.
+	# Write out the psf function definition parameters.
+	call dp_wfuncpars (dao, psfim) 
 
-	# Set the parameters of the output PSF image.
-	if (DP_VARPSF(dao) == YES)
-	    IM_NDIM(psfim) = 3
-	else
-	    IM_NDIM(psfim) = 2
-	IM_LEN (psfim,1) = DP_PSFSIZE (psffit)
-	IM_LEN (psfim,2) = DP_PSFSIZE (psffit)
-	if (DP_VARPSF(dao) == YES)
-	    IM_LEN(psfim,3) = 3
-	IM_PIXTYPE(psfim) = TY_REAL
-	call sprintf (IM_TITLE(psfim), SZ_IMTITLE, "PSF for image: %s")
-	    call pargstr (IM_HDRFILE(im))
+	# Write out the list of PSF stars.
+	call dp_wstars (dao, psfim)
 
 	# Write out the lookup table.
-	if (dp_wrtlut (dao, psfim, dx, dy) == ERR) {
-	    call sfree (sp)
-	    return (ERR)
-	}
-
-	# Add information about fitting parameters.
-	call imaddr (psfim, "SCALE", DP_SCALE(dao))
-	call imaddr (psfim, "PSFRAD", DP_SPSFRAD (dao))
-	call imaddr (psfim, "FITRAD", DP_SFITRAD(dao))
-	call imaddr (psfim, "DATAMIN", DP_MINGDATA(dao))
-	call imaddr (psfim, "DATAMAX", DP_MAXGDATA(dao))
-	call imaddr (psfim, "GAIN", DP_PHOT_ADC(dao))
-	call imaddr (psfim, "READNOISE", DP_READ_NOISE(dao))
-
-	# Add information about the PSF fitting parameters to the PSF header.
-	call imaddr (psfim, "PSFMAG", DP_PSFMAG (psffit))
-	call imaddr (psfim, "XPSF", DP_XPSF(psffit))
-	call imaddr (psfim, "YPSF", DP_YPSF(psffit))
-
-	# Add the parameters of the Gaussian fit to the PSF image header.
-	call imaddr (psfim, "HEIGHT", DP_PSFHEIGHT(psffit))
-	call imaddr (psfim, "XOFFSET", DP_PSFDXCEN(psffit))
-	call imaddr (psfim, "YOFFSET", DP_PSFDYCEN(psffit))
-	call imaddr (psfim, "SIGMAX", DP_PSFSIGX(psffit))
-	call imaddr (psfim, "SIGMAY", DP_PSFSIGY(psffit))
-
-	return (OK)
+	call dp_wlt (dao, psfim)
 end
 
 
-# DP_HEADPARS -- Add miscellaneous parameters to the header of the PSF image.
+# DP_WIDPARS -- Add the id and fitting parameters to the PSF image header
 
-procedure dp_headpars (im, dao)
+procedure dp_widpars (dao, psfim)
 
-pointer	im			# image descriptor
 pointer	dao			# pointer to the daophot structure
+pointer	psfim			# the psf image descriptor
 
 pointer	sp, outstr, date, time
+bool	itob()
 int	envfind()
 
 begin
@@ -91,194 +48,212 @@ begin
 	call salloc (date, SZ_DATE, TY_CHAR)
 	call salloc (time, SZ_DATE, TY_CHAR)
 
-	# Write out the IRAF and system id.
+	# Record IRAF version, user, host, date, time, package and task.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
-	    call strcpy ("NOAO/IRAF", Memc[outstr], SZ_LINE)
+	    call strcpy ("IRAF", Memc[outstr], SZ_LINE)
 	call dp_rmwhite (Memc[outstr], Memc[outstr], SZ_LINE)
-	call imastr (im, "IRAF", Memc[outstr])
+	call imastr (psfim, "IRAF", Memc[outstr])
+	call gethost (Memc[outstr], SZ_LINE)
+	call imastr (psfim, "HOST", Memc[outstr])
 	if (envfind ("userid", Memc[outstr], SZ_LINE) <= 0)
 	    Memc[outstr] = EOS
-	call imastr (im, "USER", Memc[outstr])
-	call gethost (Memc[outstr], SZ_LINE)
-	call imastr (im, "HOST", Memc[outstr])
-
-	# Write out the date.
+	call imastr (psfim, "USER", Memc[outstr])
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call imastr (im, "DATE", Memc[date])
-	call imastr (im, "TIME", Memc[time])
+	call imastr (psfim, "DATE", Memc[date])
+	call imastr (psfim, "TIME", Memc[time])
 
-	# Write out the package and task description. Other parameters may
-	# be added in the future.
-	call imastr (im, "PACKAGE", "daophot")
-	call imastr (im, "TASK", "psf")
+	# Write out the package, task, and input/output file names.
+	call imastr (psfim, "PACKAGE", "daophot")
+	call imastr (psfim, "TASK", "psf")
+	call imastr (psfim, "IMAGE", DP_INIMAGE(dao))
+	call imastr (psfim, "PHOTFILE", DP_INPHOTFILE(dao))
+	call imastr (psfim, "PSTFILE", DP_COORDS(dao))
+	call imastr (psfim, "PSFIMAGE", DP_PSFIMAGE(dao))
+	call imastr (psfim, "OPSTFILE", DP_OUTREJFILE(dao))
+	call imastr (psfim, "GRPSFILE", DP_OUTPHOTFILE(dao))
 
-	# Write out the file names.
-	call imastr (im, "IMAGE", DP_IMNAME(dao))
-	call imastr (im, "APFILE", DP_APFILE(dao))
-	call imastr (im, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call imastr (im, "GRPSFILE", DP_GRPSFFILE(dao))
+	# Add information about fitting parameters.
+	call imaddr (psfim, "SCALE", DP_SCALE(dao))
+	call imaddr (psfim, "PSFRAD", DP_SPSFRAD (dao))
+	call imaddr (psfim, "FITRAD", DP_SFITRAD(dao))
+	call imaddr (psfim, "DATAMIN", DP_MINGDATA(dao))
+	call imaddr (psfim, "DATAMAX", DP_MAXGDATA(dao))
+	call imaddi (psfim, "NCLEAN", DP_NCLEAN(dao))
+	call imaddb (psfim, "USESAT", itob (DP_SATURATED(dao)))
 
-	call sfree(sp)
+	# Define the image title.
+	call sprintf (IM_TITLE(psfim), SZ_IMTITLE, "PSF for image: %s")
+	    call pargstr (DP_INIMAGE(dao))
+
+	call sfree (sp)
 end
 
 
-# DP_WRTLUT -- Write out the PSF lookup table to the output PSF image.
+# DP_WFUNCPARS -- Write out the the parameters of the PSF function
+# to the PSF image.
 
-int procedure dp_wrtlut (dao, im, dx, dy)
+procedure dp_wfuncpars (dao, psfim)
 
-pointer	dao			# pointer to DAO Structure
-pointer	im			# image descriptor
-real	dx, dy			# psf position offsets
+pointer	dao			# pointer to the daophot structure
+pointer	psfim			# image descriptor
 
-int	ncols
-long	v[IM_MAXDIM]
-pointer	psf, psffit, psflut, psfmatrix, buf
-real	coeff[3]
-pointer	impnlr()
-
-begin
-	psffit = DP_PSFFIT (dao)
-	psf = DP_PSF (dao)
-	ncols = DP_PSFSIZE (psffit)
-	psfmatrix = DP_PSFMATRIX (psf)
-	psflut = DP_PSFLUT(psffit)
-
-	# If the lookup table is undefined return an error.
-	if (psfmatrix == NULL || psflut == NULL)
-	    return (ERR)
-
-	# Set the offsets.
-	call dp_xyoff (Memr[DP_PSFMATRIX(psf)], coeff, SZ_PSFMATRIX,
-	    dx,  dy)
-
-	# Normalize and copy the lookup table into the PSF image.
-	if (DP_VARPSF(dao) == YES) {
-	    call dp_3dlut (dao, Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
-		DP_PSFSIZE(psffit), Memr[DP_PSFMATRIX(psf)], coeff)
-	    call amovkl (long(1), v, IM_MAXDIM)
-	    while (impnlr (im, buf, v) != EOF) {
-	        call amovr (Memr[psflut], Memr[buf], ncols)
-	        psflut = psflut + ncols
-	    }
-	} else {
-	    call amovkl (long(1), v, IM_MAXDIM)
-	    while (impnlr (im, buf, v) != EOF) {
-	        call amovr (Memr[psflut], Memr[buf], ncols)
-	        call adivkr (Memr[buf], Memr[psfmatrix], Memr[buf], ncols)
-	        psflut = psflut + ncols
-	    }
-	}
-
-	return (OK)
-end
-
-
-
-# DP_3DLUT -- Procedure to compute the 3d look up table.
-
-procedure dp_3dlut (dao, psflut, nxpsf, nypsf, matrix, coeff)
-
-pointer	dao			    # the daophot pointer
-real	psflut[nxpsf,nypsf,3]	    # the lookup table
-int	nxpsf, nypsf		    # dimensions of the lut
-real	matrix[3,3]		    # maxtrix
-real	coeff[3]		    # coefficient array
-
-int	i, j, k, l, status
-pointer	psffit
-real	x, y, sigx, sigy, p, erfx, erfy, z[3]
-real	erf()
+int	i
+pointer	sp, str, psffit
+bool	itob()
 
 begin
 	psffit = DP_PSFFIT(dao)
 
-	call invers (matrix, SZ_PSFMATRIX, SZ_PSFMATRIX, status)
+	call imastr (psfim, "FUNCTION", DP_FUNCTION(dao))
+	call imaddr (psfim, "PSFX", DP_PSFX(psffit))
+	call imaddr (psfim, "PSFY", DP_PSFY(psffit))
+	call imaddr (psfim, "PSFHEIGHT", DP_PSFHEIGHT(psffit))
+	call imaddr (psfim, "PSFMAG", DP_PSFMAG (psffit))
 
-	do j = 1, nypsf {
-	    do i = 1, nxpsf {
-		do k = 1, 3 {
-		    z[k] = 0.0
-		    do l = 1, 3
-			z[k] = z[k] + matrix[k,l] * psflut[i,j,l]
-		}
-		do k = 1, 3
-		    psflut[i,j,k] = z[k]
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
+	switch (DP_PSFUNCTION(psffit)) {
+	case FCTN_MOFFAT25:
+	    call imaddi (psfim, "NPARS", DP_PSFNPARS(psffit)+1)
+	    do i = 1, DP_PSFNPARS(psffit) {
+	        call sprintf (Memc[str], SZ_FNAME, "PAR%d")
+		    call pargi (i)
+	        call imaddr (psfim, Memc[str], Memr[DP_PSFPARS(psffit)+i-1])
+	    }
+	    call sprintf (Memc[str], SZ_FNAME, "PAR%d")
+		call pargi (DP_PSFNPARS(psffit)+1)
+	    call imaddr (psfim, Memc[str], 2.5)
+	case FCTN_MOFFAT15:
+	    call imaddi (psfim, "NPARS", DP_PSFNPARS(psffit)+1)
+	    do i = 1, DP_PSFNPARS(psffit) {
+	        call sprintf (Memc[str], SZ_FNAME, "PAR%d")
+		    call pargi (i)
+	        call imaddr (psfim, Memc[str], Memr[DP_PSFPARS(psffit)+i-1])
+	    }
+	    call sprintf (Memc[str], SZ_FNAME, "PAR%d")
+		call pargi (DP_PSFNPARS(psffit)+1)
+	    call imaddr (psfim, Memc[str], 1.5)
+	default:
+	    call imaddi (psfim, "NPARS", DP_PSFNPARS(psffit))
+	    do i = 1, DP_PSFNPARS(psffit) {
+	        call sprintf (Memc[str], SZ_FNAME, "PAR%d")
+		    call pargi (i)
+	        call imaddr (psfim, Memc[str], Memr[DP_PSFPARS(psffit)+i-1])
 	    }
 	}
 
-	x = real (nxpsf + 1) / 2. + DP_PSFDXCEN(psffit)
-	y = real (nypsf + 1) / 2. + DP_PSFDYCEN(psffit)
-	sigx = 2.0 * DP_PSFSIGX(psffit)
-	sigy = 2.0 * DP_PSFSIGY(psffit)
+	call imaddi (psfim, "VARORDER", DP_VARORDER(dao))
+	call imaddb (psfim, "FEXPAND", itob (DP_FEXPAND(dao)))
 
-	do k = 2, 3 {
-	    p = 0.0
-	    do j = 1, nypsf {
-		do i = 1, nxpsf
-		    p = p + psflut[i,j,k]
-	    }
-	    p = p / (TWOPI * sigx * sigy)
-
-	    do j = 1, nypsf {
-	        erfy = erf (real (j), y, sigy, DP_PSFDHDYC(psffit),
-		    DP_PSFDHDSY(psffit))
-	        do i = 1, nxpsf {
-	            erfx = erf (real (i), x, sigx, DP_PSFDHDXC(psffit),
-		        DP_PSFDHDSX(psffit))
-		    psflut[i,j,1] = psflut[i,j,1] + coeff[k] * p * erfx *
-			erfy
-		    psflut[i,j,k] = psflut[i,j,k] - p * erfx * erfy
-	        }
-	    }
-	}
+	call sfree (sp)
 end
 
 
-# DP_XYOFF -- Compute the x and y offsets.
+# DP_WSTARS -- Write out the PSF star list to the PSF image.
 
-procedure dp_xyoff (matrix, coeff, n, dx, dy)
+procedure dp_wstars (dao, psfim)
 
-real	matrix[n,n]			# matrix
-real	coeff[n]			# coefficient array
-int	n				# dimensions of matrix
-real	dx, dy				# x and y offsets
+pointer	dao			# pointer to the daophot descriptor
+pointer	psfim			# the psfimage descriptor
+
+int	i
+pointer	apsel, psf, sp, str
 
 begin
-	coeff[2] = matrix[1,2] / matrix[1,1]
-	coeff[3] = matrix[1,3] / matrix[1,1]
-	dx = coeff[2]
-	dy = coeff[3]
+	apsel = DP_APSEL(dao)
+	psf = DP_PSF(dao)
+
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
+	# Write out the number of PSF stars.
+	call sprintf (Memc[str], SZ_FNAME, "NPSFSTAR")
+	call imaddi (psfim, Memc[str], DP_PNUM(psf))
+
+	# Write out the ids of all the PSF stars.
+	do i = 1, DP_PNUM(psf) {
+
+	    call sprintf (Memc[str], SZ_FNAME, "ID%d")
+	        call pargi (i)
+	    call imaddi (psfim, Memc[str], Memi[DP_APID(apsel)+i-1])
+
+	    call sprintf (Memc[str], SZ_FNAME, "X%d")
+	        call pargi (i)
+	    call imaddr (psfim, Memc[str], Memr[DP_APXCEN(apsel)+i-1]) 
+
+	    call sprintf (Memc[str], SZ_FNAME, "Y%d")
+	        call pargi (i)
+	    call imaddr (psfim, Memc[str], Memr[DP_APYCEN(apsel)+i-1]) 
+
+	    call sprintf (Memc[str], SZ_FNAME, "MAG%d")
+	        call pargi (i)
+	    call imaddr (psfim, Memc[str], Memr[DP_APMAG(apsel)+i-1]) 
+	}
+
+	call sfree (sp)
 end
 
 
-# DP_RMPSF -- Delete the psf image and psf group file.
+# DP_WLT -- Write out the PSF lookup table to the output PSF image.
 
-procedure dp_rmpsf (dao, psfim, psfgr)
+procedure dp_wlt (dao, psfim)
 
-pointer	dao			# pointer to the daophot structure
-pointer	psfim			# pointer to the psf image
-pointer	psfgr			# pointer to the psf group image
+pointer	dao			# pointer to DAO Structure
+pointer	psfim			# image descriptor
 
-pointer	sp, temp
+int	nexp
+pointer	psffit
+
+begin
+	psffit = DP_PSFFIT(dao)
+	nexp = DP_NVLTABLE(psffit) + DP_NFEXTABLE(psffit)
+
+	IM_PIXTYPE(psfim) = TY_REAL
+	if (nexp == 0) {
+	    IM_NDIM(psfim) = 0
+	} else if (nexp == 1) {
+	    IM_NDIM(psfim) = 2
+	    IM_LEN(psfim,1) = DP_PSFSIZE(psffit)
+	    IM_LEN(psfim,2) = DP_PSFSIZE(psffit)
+	} else {
+	    IM_NDIM(psfim) = 3
+	    IM_LEN(psfim,1) = DP_PSFSIZE(psffit)
+	    IM_LEN(psfim,2) = DP_PSFSIZE(psffit)
+	    IM_LEN(psfim,3) = nexp
+	}
+
+	if (nexp > 0)
+	    call dp_wltim (psfim, Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+	        DP_PSFSIZE(psffit), nexp) 
+end
+
+
+# DP_WLTIM -- Write the lookup tables into the image pixels.
+
+procedure dp_wltim (psfim, psflut, nxlut, nylut, nexp)
+
+pointer	psfim			# image descriptor
+real	psflut[nexp,nxlut,ARB]	# the psf lookup table
+int	nxlut, nylut,nexp	# the dimensions of the psf look-up table
+
+int	i, j, k
+pointer	sp, v, buf
+int	impnlr()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
-	if (DP_TEXT(dao) == YES) {
-	    call fstats (psfgr, F_FILENAME, Memc[temp], SZ_FNAME)
-	    call close (psfgr)
-	} else {
-	    call tbtnam (psfgr, Memc[temp], SZ_FNAME)
-	    call tbtclo (psfgr)
+	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	do k = 1, nexp {
+	    do j = 1, nylut {
+		if (impnlr (psfim, buf, Meml[v]) == EOF)
+		    ;
+		do i = 1, nxlut
+		    Memr[buf+i-1] = psflut[k,i,j]
+	    }
 	}
-	call delete (Memc[temp])
-	psfgr = NULL
-
-	call strcpy (IM_HDRFILE(psfim), Memc[temp], SZ_FNAME)
-	call imunmap (psfim)
-	call imdelete (Memc[temp])
-	psfim = NULL
 
 	call sfree (sp)
 end

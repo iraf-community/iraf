@@ -33,7 +33,7 @@ bool	peak
 pointer	im, imdata, title
 pointer	sp, x, wts, apdef, gp, gt, ic_gt, cv, str, output, profiles, ids
 
-int	gt_gcur(), apgwrd(), ctor(), scan(), nscan()
+int	gt_gcur(), apgwrd(), scan(), nscan()
 real	cveval(), ap_center()
 bool	ap_answer()
 pointer	gt_init()
@@ -124,12 +124,12 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 			call ap_getdata (image, line, nsum, im, imdata, npts,
 			    apaxis, title)
 			call gt_sets (gt, GTPARAMS, Memc[title])
-			call ap_free (apdef)
-			call ap_default (im, INDEFI, 1, apaxis, INDEFR,
-			    real (line), apdef)
 			newdata = NO
 			newgraph = YES
 		    }
+		    call ap_free (apdef)
+		    call ap_default (im, INDEFI, 1, apaxis, INDEFR,
+			real (line), apdef)
 		}
 
 	    case '.': # Select current aperture.  This has been done already.
@@ -170,38 +170,20 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 		call gt_sets (ic_gt, GTTITLE, Memc[str])
 
 		if (AP_IC(Memi[aps+current-1]) == NULL)
-		    call ap_icset (apdef, 0., 0., Memi[aps+current-1])
+		    call ap_icset (apdef, Memi[aps+current-1], npts)
 
 		call icg_fit (AP_IC(Memi[aps+current-1]), gp, "gcur",
 		    ic_gt, cv, Memr[x], Memr[imdata], Memr[wts], npts)
 		call cvfree (cv)
 
-	        # Set background min and max based on sample regions.
-	        wx = low
-	        wy = high
-		call ic_gstr (AP_IC(Memi[aps+current-1]), "sample",
-		    Memc[str], SZ_LINE)
-	        for (i=str; Memc[i]!=EOS; i=i+1)
-		    if (Memc[i] == ':')
-		        Memc[i] = ','
-	        for (i=1; Memc[str+i-1]!=EOS; i=i+1)
-	            if (ctor (Memc[str], i, low) > 0) {
-		        wx = min (wx, low)
-		        wy = max (wy, low)
-		        i = i - 1
-	            }
-	        if (wx > wy) {
-		    wx = -npts
-		    wy = npts
-	        }
-	        call ic_putr (AP_IC(Memi[aps+current-1]), "xmin", wx)
-	        call ic_putr (AP_IC(Memi[aps+current-1]), "xmax", wy)
+		# Set background limits
+		call ap_icset (Memi[aps+current-1], Memi[aps+current-1], npts)
 
 		if ((naps > 1) && (all == YES))
 		   do i = 1, naps
 		       if (i != current)
-			   call ap_icset (Memi[aps+current-1], 0., 0.,
-			       Memi[aps+i-1])
+			   call ap_icset (Memi[aps+current-1],
+			       Memi[aps+i-1], npts)
 		newgraph = YES
 
 	    case 'c': # Center current aperture or all apertures.
@@ -253,6 +235,10 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 		call apgstr ("e_output", Memc[output], SZ_FNAME)
 		call apgstr ("e_profiles", Memc[profiles], SZ_FNAME)
 	        call apgstr ("format", Memc[str], SZ_LINE)
+		call appstr ("ansreview", "yes")
+		call appstr ("ansreview1", "yes")
+		call appstr ("ansclobber", "yes")
+		call appstr ("ansclobber1", "yes")
 		if (all == NO)
 	            call ap_extract (image, Memc[output],
 			Memc[str], Memc[profiles], Memi[aps+current-1], 1)
@@ -397,6 +383,8 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 			1 - AP_CEN(Memi[aps+naps-1], dispaxis)
 		    AP_HIGH(Memi[aps+naps-1], dispaxis) = IM_LEN(im, dispaxis) -
 			AP_CEN(Memi[aps+naps-1], dispaxis)
+
+		    call ap_icset (Memi[aps+naps-1], Memi[aps+naps-1], npts)
 
 		    current = naps
 		    i = apgwrd ("order", cmd, SZ_LINE, ORDER)

@@ -6,31 +6,31 @@ $checkin  libpkg.a ../
 $exit
 
 libpkg.a:
-	anshdr.x	../shdr.h <time.h>
+	anshdr.x	<smw.h> <time.h>
 	autoexp.x	<gset.h> <pkg/gtools.h>
 	avgsnr.x	
-	conflam.x	../shdr.h <error.h>
-	confnu.x	../shdr.h <error.h>
+	conflam.x	<smw.h> <error.h>
+	confnu.x	<smw.h> <error.h>
 	deblend.x	<error.h> <gset.h> <mach.h>
 	eqwidth.x	
 	eqwidthcp.x	<gset.h>
-	fixx.x		../shdr.h
+	fixx.x		<smw.h>
 	flatten.x	<pkg/gtools.h>
 	fudgept.x	
 	fudgex.x	
-	getimage.x	<error.h> <imhdr.h> <pkg/gtools.h> ../shdr.h
+	getimage.x	<smw.h> <error.h> <imhdr.h> <pkg/gtools.h>
 	gfit.x		<error.h> <gset.h> <mach.h>
-	mktitle.x	../shdr.h ../units.h <imhdr.h> <pkg/gtools.h>
-	plotstd.x	../shdr.h <error.h> <gset.h>
+	mktitle.x	<smw.h> <units.h> <imhdr.h> <pkg/gtools.h>
+	plotstd.x	<smw.h> <error.h> <gset.h>
 	replot.x	<gset.h>
 	smooth.x	
-	splot.x		../units.h <error.h> <gset.h> <imhdr.h>\
-			<pkg/gtools.h> ../shdr.h
-	splotcolon.x	../shdr.h ../units.h <error.h> <pkg/gtools.h>
-	splotfun.x	../shdr.h <mach.h>
-	spwcs.x	
+	spdeblend.x	<error.h> <gset.h>
+	splot.x		<smw.h> <units.h> <error.h> <gset.h> <imhdr.h>\
+			<pkg/gtools.h>
+	splotcolon.x	<smw.h> <units.h> <error.h> <pkg/gtools.h> <ctype.h>
+	splotfun.x	<smw.h> <mach.h>
 	stshelp.x	<error.h>
 	sumflux.x	
-	usercoord.x	../shdr.h
-	wrspect.x	../shdr.h <error.h> <imhdr.h>
+	usercoord.x	<smw.h> <units.h> <error.h>
+	wrspect.x	<smw.h> <error.h> <imhdr.h> <imio.h>
 	;

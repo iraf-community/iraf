@@ -1,5 +1,6 @@
 # ONEDSPEC package.
 
+$call	smw
 $call	relink
 $exit
 
@@ -11,12 +12,22 @@ update:
 relink:
 	$update	libpkg.a
 	$omake	x_onedspec.x
-	$link	x_onedspec.o libpkg.a\
+	$link	x_onedspec.o libpkg.a -lsmw\
 		-lxtools -lcurfit -lgsurfit -liminterp -lllsq -o xx_onedspec.e
 	;
 
 install:
 	$move	xx_onedspec.e noaobin$x_onedspec.e
+	;
+
+smw:
+	$checkout libsmw.a noaolib$
+	$update libsmw.a
+	$checkin libsmw.a noaolib$
+	;
+
+libsmw.a:
+	@smw
 	;
 
 libpkg.a:
@@ -33,25 +44,25 @@ libpkg.a:
 	getcalib.x	<error.h> <ctype.h>
 	getextn.x	<error.h>
 	odropenp.x	<ctype.h>
-	onedinterp.x	<math/iminterp.h>
-	shdr.x		shdr.h <error.h> <imset.h> <mwset.h> <imhdr.h>
-	smw.x		<imio.h> <mwset.h> <imhdr.h>
-	t_calibrate.x	<error.h> <imhdr.h> <math/iminterp.h> shdr.h
-	t_deredden.x	<error.h> <imhdr.h> shdr.h
-	t_dopcor.x	<error.h> <imhdr.h> shdr.h
-	t_fitprofs.x	shdr.h <error.h> <gset.h> <imhdr.h> <imset.h> <time.h>
+	t_calibrate.x	<smw.h> <error.h> <imhdr.h> <math/iminterp.h>
+	t_deredden.x	<smw.h> <error.h> <imhdr.h>
+	t_dopcor.x	<smw.h> <error.h> <imhdr.h>
+	t_fitprofs.x	<smw.h> <error.h> <gset.h> <imhdr.h> <imset.h> <time.h>
 	t_lcalib.x	<ctype.h>
 	t_mkspec.x	<imhdr.h>
 	t_names.x	
-	t_sapertures.x	<error.h> <imhdr.h>
-	t_sarith.x	shdr.h <error.h> <imhdr.h> <mach.h>
-	t_sfit.x	<error.h> <imhdr.h> shdr.h <math/curfit.h>\
+	t_rstext.x
+	t_sapertures.x	<smw.h> <error.h> <imhdr.h>
+	t_sarith.x	<smw.h> <error.h> <imhdr.h> <mach.h>
+	t_sbands.x	<smw.h> <error.h>
+	t_sfit.x	<smw.h> <error.h> <imhdr.h> <math/curfit.h>\
 			<pkg/gtools.h> <pkg/rg.h>
+	t_sflip.x	<smw.h> <error.h> <imhdr.h>
 	t_sinterp.x	<imhdr.h> <math/curfit.h>
-	t_slist.x	<error.h> <fset.h> <imhdr.h> shdr.h
-	t_specplot.x	shdr.h specplot.h units.h <error.h> <gset.h>\
+	t_slist.x	<smw.h> <error.h> <fset.h> <imhdr.h>
+	t_specplot.x	<smw.h> specplot.h <units.h> <error.h> <gset.h>\
 			<imhdr.h> <mach.h> <pkg/gtools.h>
-	t_standard.x	<error.h> <gset.h> <imhdr.h> <mach.h> <pkg/gtools.h>\
-			shdr.h
-	units.x		units.h <error.h>
+	t_specshift.x	<smw.h> <error.h>
+	t_standard.x	<smw.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
+			<pkg/gtools.h>
 	;

@@ -46,8 +46,9 @@ be used in recentering the spectra.  A value of INDEF selects the middle of the
 image.
 .le
 .ls nsum = 1
-Number of dispersion lines to be summed.  The lines are taken around the
-specified dispersion line.
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value takes a sum
+and a negative values selects a median.
 .le
 .ls apertures = ""
 List of apertures to be recentered.

@@ -80,7 +80,7 @@ pointer	rv				#I RV struct pointer
 
 pointer	gp, sp, cmd, filt
 int	wcs, key
-int	npts, ofnpts, rfnpts
+int	ofnpts, rfnpts
 real	x, y
 char	ckey
 bool	prompt
@@ -99,7 +99,6 @@ begin
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Nab some pointers.
-	npts = RV_NPTS(rv)
 	ofnpts = fft_pow2 (RV_NPTS(rv))
 	rfnpts = fft_pow2 (RV_RNPTS(rv))
 	gp = RV_GP(rv)
@@ -484,7 +483,9 @@ begin
 	}
 
 	# Now plot the filter function.
+	call gseti (gp, G_PLCOLOR, C_RED)
 	call gvline (gp, Memr[filt], int(fnpts/RVP_FFT_ZOOM(rv)), startp, endp)
+	call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 
 	call sfree (sp)
 end
@@ -538,13 +539,14 @@ begin
 	    else
 		call strcpy ("|G(k)|", Memc[ylbl], SZ_FNAME)
 
-	    # Do the plot title
-	    call gseti (gp, G_WCS, 3)
-	    call gsview (gp, 0.115, 0.95, 0.125, 0.845)
+	    # Draw the top axis labels
+	    startp = 0.0
+	    endp = (real(fnpts) / RVP_FFT_ZOOM(rv)) / (2. * real(fnpts))
+	    call gseti (gp, G_WCS, 1)
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.8)
 	    call gswind (gp, startp, endp, y1, y2)
-	    call gseti (gp, G_XDRAWAXES, 0)
-	    call gseti (gp, G_YDRAWAXES, 0)
-	    call glabax (gp, Memc[title], "", "")
+	    call gseti (gp, G_XDRAWAXES, 2)
+	    call glabax (gp, "", "", Memc[ylbl])
 
 	    # Draw the bottom axis labels
 	    startp = 1.0
@@ -556,29 +558,31 @@ begin
 	    call gseti (gp, G_YDRAWAXES, 3)
 	    call glabax (gp, "", "Wavenumber", Memc[ylbl])
 
-	    # Draw the top axis labels
-	    startp = 0.0
-	    endp = (real(fnpts) / RVP_FFT_ZOOM(rv)) / (2. * real(fnpts))
-	    call gseti (gp, G_WCS, 1)
-	    call gsview (gp, 0.115, 0.95, 0.125, 0.8)
+	    # Do the plot title
+	    call gseti (gp, G_WCS, 3)
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.845)
 	    call gswind (gp, startp, endp, y1, y2)
-	    call gseti (gp, G_XDRAWAXES, 2)
-	    call glabax (gp, "", "", Memc[ylbl])
+	    call gseti (gp, G_XDRAWAXES, 0)
+	    call gseti (gp, G_YDRAWAXES, 0)
+	    call glabax (gp, Memc[title], "", "")
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.8)
 
 	    call gvline (gp, Memr[rfft], int(fnpts/RVP_FFT_ZOOM(rv)), 
 		startp, endp)
 
 	    # Lastly, annotate ther plot so we know what we're looking at.
 	    call gctran (gp, 0.73, 0.73, x1, y1, 0, 1)
-	    call gtext (gp, x1, y1, "Object FFT", "f=b")
+	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
+	    call gtext (gp, x1, y1, "Object FFT", "")
 	    call gctran (gp, 0.73, 0.69, x1, y1, 0, 1)
             if (RV_FILTER(rv) == BOTH || RV_FILTER(rv) == OBJ_ONLY) {
 	        call fft_fltoverlay (rv, gp, fnpts*2, y2)
                 if (RVP_WHEN(rv) == BEFORE)
-                    call gtext (gp, x1, y1, "Before Filter", "f=b")
+                    call gtext (gp, x1, y1, "Before Filter", "")
                 else 
-                    call gtext (gp, x1, y1, "After Filter", "f=b")
+                    call gtext (gp, x1, y1, "After Filter", "")
             }
+	    call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 	    call gseti (gp, G_XDRAWAXES, 3)		# reset gio flags
  
 	} else if (flag == SPLIT_PLOT) {
@@ -638,10 +642,8 @@ begin
 	    call gctran (gp, x, y, x, y, wcs, 1)
 	    call gctran (gp, x, y, xx, yy, 1, 0)
 	}
-	if (yy > 0.5)
-	    fnpts = fft_pow2 (RV_NPTS(rv)) / 2
-	else
-	    fnpts = fft_pow2 (RV_RNPTS(rv)) / 2
+
+	fnpts = fft_pow2 (max(RV_NPTS(rv),RV_RNPTS(rv))) / 2
 	if (xx < x1 || xx > x2) {		# outside plot window
 	    call printf ("Period trend in the data = INDEF.")
 	    return
@@ -651,7 +653,6 @@ begin
 		"Period trend in the data = %.2f pixels (K = %d, f = %.3f).")
 		    call pargr (period)
 		    call pargi (int(x))
-		    #call pargr (1./x)
 		    call pargr (x/real(fnpts))
 	} 
 end
@@ -707,14 +708,6 @@ begin
             else
                 call strcpy ("|G(k)|", Memc[ylbl], SZ_FNAME)
 
-            # Do the plot title
-            call gseti (gp, G_WCS, 3)
-            call gsview (gp, 0.115, 0.95, 0.125, 0.845)   
-            call gswind (gp, startp, endp, y1, y2)
-            call gseti (gp, G_XDRAWAXES, 0)
-            call gseti (gp, G_YDRAWAXES, 0)
-            call glabax (gp, Memc[title], "", "")
- 
             # Draw the bottom axis labels
             startp = 1.0
             endp = real(fnpts) / RVP_FFT_ZOOM(rv)
@@ -734,20 +727,31 @@ begin
             call gseti (gp, G_XDRAWAXES, 2)
             call glabax (gp, "", "", Memc[ylbl])
 
+            # Do the plot title
+            call gseti (gp, G_WCS, 3)
+            call gsview (gp, 0.115, 0.95, 0.125, 0.845)   
+            call gswind (gp, startp, endp, y1, y2)
+            call gseti (gp, G_XDRAWAXES, 0)
+            call gseti (gp, G_YDRAWAXES, 0)
+            call glabax (gp, Memc[title], "", "")
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.8)
+ 
 	    call gvline (gp, Memr[rfft], int(fnpts/RVP_FFT_ZOOM(rv)), 
 		startp, endp)
 
 	    # Lastly, annotate the plot so we know what we're looking at.
 	    call gctran (gp, 0.73, 0.73, x1, y1, 0, 1)
-	    call gtext (gp, x1, y1, "Object PS", "f=b")
+	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
+	    call gtext (gp, x1, y1, "Object PS", "")
 	    call gctran (gp, 0.73, 0.69, x1, y1, 0, 1)
             if (RV_FILTER(rv) == BOTH || RV_FILTER(rv) == OBJ_ONLY) {
 	        call fft_fltoverlay (rv, gp, fnpts*2, y2)
                 if (RVP_WHEN(rv) == BEFORE)
-                    call gtext (gp, x1, y1, "Before Filter", "f=b")
+                    call gtext (gp, x1, y1, "Before Filter", "")
                 else 
-                    call gtext (gp, x1, y1, "After Filter", "f=b")
+                    call gtext (gp, x1, y1, "After Filter", "")
             }
+	    call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 	    call gseti (gp, G_XDRAWAXES, 3)		# reset gio flags
 
 	} else if (flag == SPLIT_PLOT) {

@@ -1,7 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 include	<fset.h>
-include "shdr.h"
+include	<smw.h>
 
 
 # T_SLIST --  Lists header information from MULTISPEC format header
@@ -15,15 +15,14 @@ int	long_header		# Long header?
 int	i
 pointer	sp, image, im, mw, sh, ptr
 
-bool	clgetb(), is_in_range()
-int	 imtopenp(), imtgetim(), btoi(), decode_ranges()
-pointer	immap(), smw_openim()
+bool	clgetb(), rng_elementi()
+int	 imtopenp(), imtgetim(), btoi()
+pointer	rng_open(), immap(), smw_openim()
 errchk	immap, smw_openim, shdr_open
 
 begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 300, TY_INT)
 
 	# Parameters
 	list = imtopenp ("images")
@@ -32,7 +31,7 @@ begin
 
 	# Initialize
 	call fseti (STDOUT, F_FLUSHNL, YES)
-	if (decode_ranges (Memc[image], Memi[aps], 100, i) == ERR)
+	iferr (aps = rng_open (Memc[image], INDEF, INDEF, INDEF))
 	    call error (0, "Bad range specification")
 
 	# Loop over all input images.
@@ -42,10 +41,12 @@ begin
 		mw = NULL
 		ptr = immap (Memc[image], READ_ONLY, 0); im = ptr
 		ptr = smw_openim (im); mw = ptr
+		#if (SMW_FORMAT(mw) != SMW_ES && SMW_FORMAT(mw) != SMW_MS)
+		#    call error (1, "Invalid spectrum format")
 		call shdr_open (im, mw, 1, 1, INDEFI, SHHDR, sh)
 	    } then {
 		if (mw != NULL)
-		    call mw_close (mw)
+		    call smw_close (mw)
 		if (im != NULL)
 		    call imunmap (im)
 		call erract (EA_WARN)
@@ -54,7 +55,7 @@ begin
 
 	    if (long_header == YES) {
 		call printf ("%s: %s\n")
-		    call pargstr (SPECTRUM(sh))
+		    call pargstr (IMNAME(sh))
 		    call pargstr (IM_TITLE(im))
 		call printf (
 		    "    EXPTIME = %.2f%24tUT = %0.1h%44tST = %0.1h\n")
@@ -68,12 +69,12 @@ begin
 		    call pargr (HA(sh))
 		    call pargr (AM(sh))
 	    }
-	    do i = 1, IM_LEN(im, AAXIS(sh)) {
+	    do i = 1, IM_LEN(im, SMW_LAXIS(MW(sh),2)) {
 		call shdr_open (im, mw, i, 1, INDEFI, SHHDR, sh)
-		if (!is_in_range (Memi[aps], AP(sh)))
+		if (!rng_elementi (aps, AP(sh)))
 		    next
 		if (long_header == NO)
-		    call printf (SPECTRUM(sh))
+		    call printf (IMNAME(sh))
 		else
 		    call printf ("   ")
 		call printf (" %d %d %d %d %g %g %d %s\n")
@@ -87,12 +88,13 @@ begin
 			call pargstr (TITLE(sh))
 	    }
 
-	    call mw_close (mw)
+	    call smw_close (MW(sh))
 	    call imunmap (im)
 	}
 
 	# Free space
 	call shdr_close (sh)
+	call rng_close (aps)
 	call imtclose (list)
 	call sfree (sp)
 end

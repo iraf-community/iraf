@@ -336,6 +336,19 @@ begin
 			call id_label (cmd, Memi[ID_LABEL(id)+ID_CURRENT(id)-1])
 		    }
 		}
+	    case 'v':	# Modify weight
+		if (ID_NFEATURES(id) < 1)
+		    goto beep_
+		call printf ("Weight (%d): ")
+		    call pargd (WTS(id,ID_CURRENT(id)))
+		call flush (STDOUT)
+		if (scan() != EOF) {
+		    call gargi (i)
+		    if (nscan() > 0) {
+			WTS(id,ID_CURRENT(id)) = i
+			ID_NEWFEATURES(id) = YES
+		    }
+		}
 	    case 'w':	# Window graph
 		call gt_window (ID_GT(id), ID_GP(id), "cursor", ID_NEWGRAPH(id))
 	    case 'y':	# Find peaks

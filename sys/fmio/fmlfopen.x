@@ -43,7 +43,7 @@ begin
 	# Activate the descriptor?
 	if (LF_PAGEMAP(lf) == NULL) {
 	    LF_PMLEN(lf) = DEF_PMLEN
-	    if (kmalloc (LF_PAGEMAP(lf), DEF_PMLEN, TY_SHORT) == ERR)
+	    if (kmalloc (LF_PAGEMAP(lf), DEF_PMLEN, TY_INT) == ERR)
 		goto err_
 
 	    pm = LF_PAGEMAP(lf)
@@ -56,11 +56,11 @@ begin
 		    np = np + 1
 		    if (np > LF_PMLEN(lf)) {
 			LF_PMLEN(lf) = (np+INC_PMLEN-1) / INC_PMLEN * INC_PMLEN
-			if (krealloc (pm, LF_PMLEN(lf), TY_SHORT) == ERR)
+			if (krealloc (pm, LF_PMLEN(lf), TY_INT) == ERR)
 			    goto err_
 			LF_PAGEMAP(lf) = pm
 		    }
-		    Mems[pm+np-1] = i
+		    Memi[pm+np-1] = i
 		}
 
 	    LF_NPAGES(lf) = np

@@ -14,14 +14,10 @@ if (envget("TERM") == "sun") {
     if (!access (".hushiraf"))
 	print "setting terminal type to gterm..."
     stty gterm
-} else if (envget("TERM") == "xterm") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xterm..."
-    stty xterm nl=44
 } else {
     if (!access (".hushiraf"))
-	print "setting terminal type to gterm..."
-    stty gterm
+	print "setting terminal type to xgterm..."
+    stty xgterm
 }
 
 # Uncomment and edit to change the defaults.

@@ -1,5 +1,98 @@
 .help revisions Jun88 images.tv
 .nf
+images$tv/imedit/t_imedit.x
+images$doc/imedit.hlp
+    The 'j', 'k', 'n', and 'u' keys were added to those recorded in the
+    logfile.  (4/11/95, Valdes)
+
+images$doc/imexamine.hlp
+    Fixed a typo in the equation for ellipticity.  (4/10/95, Valdes)
+
+images$tv/imexamine/iejimexam.x
+    Fixed a pointer addressing error found by Zarate.  (2/16/95, Valdes)
+
+images$tv/imexamine/iecolon.x
+images$tv/doc/imexamine.imh
+lib$src/imexamine.key
+    1.	The "label" parameter was incorrectly attributed to the surface plot
+	instead of the contour plot.
+    2.  The "axes" parameter for the surface plot was missing in the code
+	though noted in the help.
+    3.	Updated the help and key file to show the label parameter belongs
+	to the e plot and to show the axes parameter.
+    (11/8/94, Valdes)
+
+images$tv/tvmark/mkmark.x
+    Replaced a seek to EOF call with a flush call in the the tvmark task add
+    object procedure. On SunOS systems the seek to EOF was apparently forcing
+    the flush while on Solaris systems it was not, resulting in the added
+    objects never being written to the coordinate file.
+    (10/3/94, Davis)
+
+images$tv/imexamine/ierimexam.x
+    World coordinates printed in the 'r' profile graph are now formated.
+    (8/2/94, Valdes)
+
+images$tv/wcslab/wcslab.x
+    Fixed an initialization bug in wcslab that was causing the axis labels
+    of the plot to be drawn incorrectly the first time wcslab was run. 
+    This was only a bug under 2.10.3
+    (26/7/94 Davis)
+
+images$tv/imexamine/iestatistics.x
+    Changed the statistics routine to compute quantities in double precision.
+    (3/10/93, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/doc/imexamine.hlp
+    The simple gaussian fitting was inadequate and gave biased answers.
+    Replaced this algorithm with NLFIT version.  It is still just a two
+    parameter fit with the center and sky being determined and then fixed
+    as before.  (3/2/93, Valdes)
+
+images$tv/wcslab/wcslab.h
+images$tv/wcslab/wcs_desc.h
+images$tv/wcslab/wcslab.x
+images$tv/wcslab/wlwcslab.x
+    Removed a dependency on the file gio.h from the wcslab task.
+		(2/11/93 LED)
+
+images$tv/wcslab/wcs_desc.h
+images$tv/wcslab/wcslab.h
+images$tv/wcslab/wcslab.x
+images$tv/wcslab/wlwcslab.x
+    Removed several dependences on the file gio.h which were no longer
+    required. There is still one remaining dependency. (2/11/93, Davis)
+
+images$tv/wcslab/wcslab.x
+    Fixed a bug in the axis mapping code in wcslab which was causing the
+    task to fail in some circumstances if the input image was a section
+    of a higher dimensioned parent image. (1/28/93, Davis)
+
+=======
+V2.10.2
+=======
+
+images$imexamine/iejimexam.x
+    Changed aint to nint.  (8/10/92, Valdes)
+
+images$imexamine/iegdata.x
+    For some reason (typo?) the test for out-of-bounds pixels was such that
+    a single column or line at the edge of the image was considered out of
+    bounds.  The >= test was changed to >.  (7/31/92, Valdes)
+
+=======
+V2.10.1
+=======
+
+=======
+V2.10.0
+=======
+
+=======
+V2.10
+=======
+
 images$*imexam.par
 images$imexamine/*
 images$doc/imexamine.e

@@ -1,7 +1,8 @@
 include	"qpf.h"
 
 # QPF_WFILTER -- Record the QPIO filter used to generate an image as a series
-# of FITS cards in the image header.
+# of FITS cards in the image header.  Note: excessively long filters are
+# truncated to avoid overfilling the image header.
 
 procedure qpf_wfilter (qpf, im)
 
@@ -25,6 +26,13 @@ begin
 
 	# Get the filter as as string from QPIO.
 	nchars = qpio_getfilter (io, Memc[bp], SZ_MAXFILTER)
+
+	# If the filter is longer than our string buffer, write a "..." at
+	# the end of the filter to indicate that it is being truncated.
+
+	if (nchars == SZ_MAXFILTER)
+	    call strcpy ("...", Memc[bp+nchars-3], 3)
+
 	index = 1
 	ip = bp
 

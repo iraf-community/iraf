@@ -16,10 +16,11 @@ int	decpl			# number of decimal places or precision
 int	a_fmt, fmt		# format type (feghm)
 int	width			# field width
 
-int	op
+bool	neg
 double	val
-long	lval
-int	dtoc3(), ltoc(), gstrcpy()
+int	op, round, h, m, s, f, v, i
+int	dtoc3(), ltoc()
+
 define	output {outstr[op]=$1;op=op+1;if(op>maxch)goto retry_}
 define	retry_ 91
 
@@ -49,34 +50,73 @@ retry_
 	else
 	    val = dval
 
-	if (val < 0.0D0 && long(val) == 0)
-	    op = gstrcpy ("-0", outstr, maxch) + 1
-	else
-	    op = ltoc (long(val), outstr, maxch) + 1
-	output (':')						# "+/-nnn:..."
+	# Working with a positive number simplifies things.
+	neg = (val < 0.0)
+	if (neg)
+	    val = -val
 
-	val = abs (val)
-	val = val - long (val)					# abs fraction
+	# Decompose number into HMS or MS.
+	h = 0
+	if (fmt == FMT_HMS) {
+	    h = int(val);  val = (val - h) * 60.0
+	}
+	m = int(val);  val = (val - m) * 60.0
+	s = int(val);  val = (val - s)
 
-	if (fmt == FMT_HMS) {					# "...nn:..."
-	    val = val * 60.0D0
-	    lval = long (val)
-	    if (lval < 10)
-		output ('0')
-	    op = op + ltoc (lval, outstr[op], maxch-op+1)
-	    output (':')
-	    val = val - lval
+	# Round the fractional seconds field and carry if the rounded value
+	# is greater than 60.  This has to be done explicitly due to the
+	# "base 60" sexagesimal arithmetic.
+
+	round = (10.0 ** decpl)
+	f = int (val * round + 0.5)
+	while (f >= round) {
+	    f = f - round
+	    s = s + 1
+	}
+	while (s >= 60) {
+	    s = s - 60
+	    m = m + 1
+	}
+	while (m >= 60) {
+	    m = m - 60
+	    h = h + 1
 	}
 
-	val = val * 60.0D0					# "...nn.nnn"
-	lval = long (val)
-	if (lval < 10)
-	    output ('0')
+	# Format the output string.
+	op = 1
+	if (neg)
+	    output ('-')
 
-	if (decpl <= 0)						# no decimal?
-	    op = op + ltoc (lval, outstr[op], maxch-op+1)
+	# Output the first field, which is the hours field for HMS format,
+	# or the minutes field for MS format.
+
+	if (fmt == FMT_HMS)
+	    v = h
 	else
-	    op = op + dtoc3 (val, outstr[op], maxch-op+1, decpl, FMT_FIXED, ARB)
+	    v = h * 60 + m
+	op = op + ltoc (v, outstr[op], maxch-op+1)
+	output (':')
+
+	# Output the minutes field in HMS format.
+	if (fmt == FMT_HMS) {
+	    output (TO_DIGIT (m / 10))
+	    output (TO_DIGIT (mod (m, 10)))
+	    output (':')
+	}
+
+	# Output the seconds field.
+	output (TO_DIGIT (s / 10))
+	output (TO_DIGIT (mod (s, 10)))
+
+	# Output the fraction, if any.
+	if (decpl > 0) {
+	    output ('.')
+	    do i = 1, decpl {
+		round = round / 10
+		output (TO_DIGIT (f / round))
+		f = mod (f, round)
+	    }
+	}
 
 	# If the HMS format does not fit, go try a more compact format.
 	if (op-1 > abs(width) || op > maxch) {
@@ -84,5 +124,6 @@ retry_
 	    goto retry_
 	}
 
+	outstr[op] = EOS
 	return (op-1)
 end

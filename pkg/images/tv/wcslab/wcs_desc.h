@@ -99,12 +99,6 @@ define WL_AXIS_FLIP              Memi[$1+22]
 # TRUE if the labels should always be printed in full form.
 define WL_ALWAYS_FULL_LABEL      Memi[$1+23]
 
-# True if cursor interaction is required.
-define WL_INTERACTIVE            Memi[$1+24]
-
-# True if using an image display.
-define WL_IS_IMAGE_DISPLAY       Memi[$1+25]
-
 # TRUE if the grid labels should rotate with the grid lines.
 define WL_LABEL_ROTATE           Memi[$1+26]
 

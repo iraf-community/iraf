@@ -61,7 +61,11 @@ int	pid;
 	register struct proctable *pr;
 	int	waitpid, error_code;
 	struct	proctable *pr_findpid();
+#ifdef SOLARIS
+	int	exit_status;
+#else
 	union	wait exit_status;
+#endif
 
 	/* Lookup process in table.  Return ERR if there is no entry.
 	 */
@@ -90,7 +94,11 @@ int	pid;
 		    /* The integer argument to exit() is returned in the
 		     * wait struct defined in <sys/wait.h>.
 		     */
+#ifdef SOLARIS
+		    error_code = WEXITSTATUS(exit_status);
+#else
 		    error_code = exit_status.w_T.w_Retcode;
+#endif
 		    pr->pr_exit_status = error_code ? error_code : XOK;
 
 		    if (waitpid == pid) {

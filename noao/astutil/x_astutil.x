@@ -1,6 +1,7 @@
 # Process definition of the ASTUTIL package.
 
 task	airmass	    = t_airmass,
+	asthedit    = t_asthedit,
 	asttimes    = t_asttimes,
 	ccdtime	    = t_ccdtime,
 	galactic    = t_galactic,

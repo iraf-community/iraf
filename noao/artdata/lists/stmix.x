@@ -53,7 +53,7 @@ begin
 	    else {
 		s = sin (HALFPI * urand (seed))
 		round[i] = sqrt (s**2 * .99 + .01)
-		mag[i] = mag[i] + alpha * (1 / max (1., s) - 1) / 9.
+		mag[i] = mag[i] + alpha * (1 / max (0.1, s) - 1) / 9.
 	    }
 	}
 

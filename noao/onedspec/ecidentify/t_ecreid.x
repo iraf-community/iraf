@@ -1,5 +1,5 @@
 include	<error.h>
-include "../shdr.h"
+include <smw.h>
 include	"ecidentify.h"
 
 # T_ECREIDENTIFY -- Reidentify echelle features starting from reference.
@@ -168,7 +168,9 @@ begin
 	        call close (fd)
 	    }
 
-	    call mw_close (MW(EC_SH(ec)))
+	    call smw_close (MW(EC_SH(ec)))
+	    do i = 1, EC_NLINES(ec)
+		MW(SH(ec,i)) = NULL
 	}
 
 	call dgsfree (EC_ECF(ec))

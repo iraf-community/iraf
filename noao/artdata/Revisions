@@ -1,5 +1,124 @@
 .help revisions Jan90 noao.artdata
 .nf
+artdata$t_mk1dspec.x
+    Fixed two type mismatches in min/max calls.  (12/31/94, Valdes)
+
+artdata$lists/stmix.x
+    The calculation of absorption in spiral models was not working and
+    so no absorption effect was being added as described in the help.
+    This has been fixed.  (10/29/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine can still have a problem in that the tan function
+    can return a very large number triggering either an overflow in
+    the evaluation of em or in the int truncation of em as addressed
+    below.  A test is now made on the value of the tan function.
+    (9/14/94, Valdes)
+
+artdata$mknoise.par
+artdata$doc/mknoise.hlp
+    The help was inconsistent with the task in that any background specified
+    is added to both new and existing images.  The discussion of subtracting
+    the background in existing images was wrong.  The "background" parameter
+    was moved in the par file from the NEW IMAGE section.
+    (7/1/94, Valdes)
+
+artdata$mktemplates.x
+    The structure parameter MKT_SCALE was incorrectly defined as an
+    integer resulting in the output scales of the "expdisk" and "devauc"
+    objects to be incorrect (see bug log 226).  (9/17/93, Valdes)
+
+artdata$t_mkpattern.x
+    Fixed bug in indexing.  This bug was most noticible with the checkerboard
+    and a larger size which showed the first square was too small by 1.
+    (9/2/93, Valdes)
+
+artdata$mkexamples/longslit.cl
+artdata$mkexamples/lsgal.cl +
+artdata$twodspec.men
+     Added an example,lsgal, of an extended longslit galaxy spectrum.
+     (8/21/93, Valdes)
+
+artdata$numrecipes.x
+    The POIDEV routine from Numerical Recipes can try to coerce a large
+    floating point number to an integer which can cause an exception.
+    If the value is 100 or greater a Gaussian deviate is now returned.
+    (8/11/93, Valdes)
+
+=============
+V2.10.3. beta
+=============
+
+artdata$t_mkobjects.x
+artdata$t_mknoise.x
+    The min/max data values are computed and set in the output image.
+    (4/16/93, Valdes)
+
+artdata$mkexamples
+    1.  The MKEXAMPLES task now provides multiple menus.
+    2.  The spectrum examples have been organized by type.
+    3.  New spectrum examples have been added.
+    4.  The echelle and onedspec examples use the oseed to set the number
+	of orders/apertures.
+    (3/17/93, Valdes)
+
+artdata$t_mkechelle.x
+artdata$t_mk1dspec.x
+artdata$mk1dspec.par
+artdata$doc/t_mk1dspec.hlp
+mkpkg
+    1.  Modified to use SMW WCS routines.
+    2.  The mk1dspec.format parameter was eliminated.
+    (3/17/93, Valdes)
+
+artdata$mkheader.x
+    Added a double type to mkh_comment1.  (3/17/93, Valdes)
+
+artdata$mkobjects.x
+artdata$doc/mkobjects.hlp
+    Changed the behavior of xoffset and yoffset to be the offset after
+    distance scaling to allow having a fixed origin.  (3/16/93, Valdes)
+
+artdata$lists/stplot.x
+    When there is only one object or when all objects have the same value
+    then the symbol size scaling with amapr gave a floating operand error.
+    A check has been added for this.  (3/16/93, Valdes)
+
+artdata$t_mkechelle.x
+    The method of generating random lines was incorrect.  This showed up
+    when trying to make the same set of random lines with a different
+    velocity.  (3/1/93, Valdes)
+
+ardata$t_mkobjects.x
+ardata$t_mknoise.x
+ardata$t_mkechelle.x
+ardata$t_mk2dspec.x
+ardata$t_mk1dspec.x
+ardata$mkheader.x
+    Replaced use of '\t' in the comment with spaces. (11/12/92, Valdes)
+
+artdata$mktemplates.x
+    In mkt_binprof there was no check that the central subpixels were
+    within the profile.  For very small objects this could lead to
+    out of bounds references in the prof array.  A check on this was
+    added.  (10/30/92, Valdes)
+
+artdata$t_mk2dspec.x
+artdata$t_mkechelle.x
+    Add a limit check to prevent integration of a pixel outside the profile
+    interpolation function.   (8/14/92, Valdes)
+
+artdata$t_mkechelle.x
+    Changed a "** 1.5" to a combination of square root and an integer
+    third power.  (8/10/92, Valdes)
+
+=======
+V2.10.2
+=======
+=======
+=======
+V2.10.1
+=======
 =======
 V2.10.0
 =======

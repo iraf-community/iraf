@@ -59,9 +59,9 @@ bool	long_format
 bool	user_fields
 
 int	hi, i
-pointer	im, sp, ctime, mtime, ldim, pdim, hgm, title, lbuf, ip
-int	access(), gstrcpy(), stropen(), getline(), strlen(), stridxs()
-pointer	immap()
+pointer	im, sp, ctime, mtime, ldim, pdim, hgm, title, lbuf, ip, lp
+int	gstrcpy(), stropen(), getline(), strlen(), stridxs()
+pointer	immap(), imgl1r()
 errchk	im_fmt_dimensions, immap, access, stropen, getline
 define	done_ 91
 
@@ -139,12 +139,14 @@ begin
 	    call pargstr (Memc[ctime])			# times
 	    call pargstr (Memc[mtime])
 
-	call fprintf (fd, "%4wPixel file '%s' %s\n")
+	iferr (lp = imgl1r (im))
+	    call strcpy ("[NO PIXEL FILE]", Memc[lbuf], SZ_LINE)
+	else
+	    call strcpy ("[ok]", Memc[lbuf], SZ_LINE)
+
+	call fprintf (fd, "%4wPixel file \"%s\" %s\n")
 	    call pargstr (IM_PIXFILE(im))
-	    if (access (IM_PIXFILE(im), 0, 0) == YES)
-		call pargstr ("[ok]")
-	    else
-		call pargstr ("[NO PIXEL FILE]")
+	    call pargstr (Memc[lbuf])
 
 	# Print the history records.
 	if (strlen (IM_HISTORY(im)) > 1) {

@@ -1,18 +1,18 @@
-.help substar Aug91 noao.digiphot.daophot
+.help substar Dec92 noao.digiphot.daophot
 .ih
 NAME
 substar -- subtract photometry results from an image using a shifted and
 scaled PSF
 .ih
 USAGE
-substar image photfile psfimage subimage
+substar image photfile exfile psfimage subimage
 .ih
 PARAMETERS
 .ls image
 The list of images from which to subtract the scaled and shifted PSF.
 .le
 .ls photfile
-The list of files, or directory, containing the input photometry.
+The list of photometry files, or directory, containing the input photometry.
 If photfile is "default", "dir$default", or a directory specification,
 SUBSTAR will look for a file called image.nst.? where the question
 mark stands for the highest existing version number.
@@ -20,7 +20,19 @@ Otherwise \fIphotfile\fR must specify one photometry file for each
 image in \fIimage\fR.
 \fIPhotfile\fR is usually the output of the NSTAR task but may also
 be the output of the PEAK and ALLSTAR tasks or even the PHOT task.
-\fIphotfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
+\fIPhotfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
+.le
+.ls exfile
+The list of photometry files containing the ids of stars to be excluded
+from the subtraction process. If exfile is "default", "dir$default",
+or a directory specification, SUBSTAR will look for a file called
+image.pst.? where the ? mark stands for the highest existing version
+number.
+Otherwise \fIexfile\fR must specify one exclude file for each
+image in \fIimage\fR.
+\fIExfile\fR is usually the output of the PSTSELECT task but may also
+be the output of the PEAK, NSTAR and ALLSTAR tasks or even the PHOT task.
+\fIExfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
 .le
 .ls psfimage
 The list of images, or the directory, containing the PSF computed by the
@@ -49,13 +61,13 @@ The name of the file containing the DAOPHOT fitting parameters.
 if \fIdaopars\fR is null ("") then the default file in the user's
 uparm directory is used.
 .le
-.ls verbose = no
-Print messages about the progress of the task?
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task? \fIVerbose\fR
 .le
-.ls verify = yes
+.ls verify = ")_.verify"
 Verify critical SUBSTAR task algorithm parameters before task execution?
 .le
-.ls update = no
+.ls update = ")_update"
 Update critical SUBSTAR task algorithm parameters if \fIverify\fR is "yes"?
 .le
 .ih
@@ -70,6 +82,11 @@ output image \fIsubimage\fR.
 The input photometry list can be the output from of the PEAK, NSTAR
 or ALLSTAR tasks or even the PHOT task although most people
 would not want to use the PHOT output for this purpose.
+
+Selected stars may be ommitted from the subtraction by supplying
+their ids in the file \fIexfile\fR. \fIExfile\fR is normally the output
+the PSTSELECT task and is used to tell SUBSTAR to subtract 
+the PSF star neighbours, but not the PSF stars themselves.
 
 The SUBSTAR task is most commonly used to check on the quality of the
 PSF fitting produced by PEAK and NSTAR, to search for non-stellar
@@ -86,7 +103,7 @@ image n4147 using the PSF stored in image n4147.psf.1. The subtracted image
 will be named n4147.sub.1.
 
 .nf
-	da> substar n4147 n4147.nst.1 n4147.psf.1 default verb+ verify+
+	da> substar n4147 n4147.nst.1 "" n4147.psf.1 default verb+ verify+
 .fi
 
 2. Rerun the example above, submitting the task to the background and
@@ -94,7 +111,7 @@ saving all the verbose results in a file called nstar.out. Remember to turn
 off the verify switch.
 
 .nf
-	da> substar n4147 n4147.nst.1 n4147.psf.1 default verb+ verify- \
+	da> substar n4147 n4147.nst.1 "" n4147.psf.1 default verb+ verify- \
 	    > nstar.out &
 .fi
 

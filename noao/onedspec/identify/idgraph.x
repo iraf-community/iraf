@@ -1,6 +1,6 @@
 include	<gset.h>
 include	<pkg/gtools.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"identify.h"
 
 # ID_GRAPH -- Graph image vector in which features are to be identified.
@@ -32,7 +32,7 @@ pointer	sh, x, y
 
 begin
 	sh = ID_SH(id)
-	x = SX(sh)
+	call malloc (x, SN(sh), TY_REAL)
 	y = SY(sh)
 	n = SN(sh)
 
@@ -50,6 +50,8 @@ begin
 
 	do i = 1, ID_NFEATURES(id)
 	    call id_mark (id, i)
+
+	call mfree (x, TY_REAL)
 end
 
 
@@ -65,7 +67,7 @@ pointer	sh, x, y
 
 begin
 	sh = ID_SH(id)
-	x = SX(sh)
+	call malloc (x, SN(sh), TY_REAL)
 	y = SY(sh)
 	n = SN(sh)
 
@@ -98,4 +100,6 @@ begin
 
 	do i = 1, ID_NFEATURES(id)
 	    call id_mark (id, i)
+
+	call mfree (x, TY_REAL)
 end

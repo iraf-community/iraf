@@ -1,0 +1,14 @@
+# Declare the Porter unpublished UBVRI photometry catalog variables
+
+catalog
+
+V           2	# V magnitude
+error(V)    3	# error in V
+UB          4	# (U-B) color
+error(UB)   5	# error in (U-B)
+BV          6   # (B-V) color
+error(BV)   7	# error in (B-V)
+VR          8	# (V-R) color
+error(VR)   9	# error in (V-R)
+RI          10	# (R-I) color
+error(RI)   11  # error in (R-I)

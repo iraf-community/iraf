@@ -202,13 +202,13 @@ begin
 	    # Compute scale in units of window coords per data pixel required
 	    # to scale image to fit window.
 
-	    xscale = xsize / max (1, (ncols  - 1))
-	    yscale = ysize / max (1, (nlines - 1))
+	    xmag = ((IM_LEN(ds,1) - 1) * xsize) / max (1, (ncols  - 1))
+	    ymag = ((IM_LEN(ds,2) - 1) * ysize) / max (1, (nlines - 1))
 
-	    if (xscale < yscale)
-		yscale = xscale
+	    if (xmag > ymag)
+		xmag = ymag
 	    else
-		xscale = yscale
+		ymag = xmag
 
 	} else {
 	    # Compute scale required to provide image magnification ratios
@@ -218,9 +218,10 @@ begin
 
 	    xmag = clgetr ("xmag")
 	    ymag = clgetr ("ymag")
-	    xscale = 1.0 / ((IM_LEN(ds,1) - 1) / xmag)
-	    yscale = 1.0 / ((IM_LEN(ds,2) - 1) / ymag)
 	}
+
+	xscale = 1.0 / ((IM_LEN(ds,1) - 1) / xmag)
+	yscale = 1.0 / ((IM_LEN(ds,2) - 1) / ymag)
 
 	# Set device window limits in normalized device coordinates.
 	# World coord system 0 is used for the device window.
@@ -276,7 +277,7 @@ begin
 	W_ZS(w) = z1
 	W_ZE(w) = z2
 
-	call printf ("z1 = %g, z2 = %g\n")
+	call printf ("z1=%g z2=%g\n")
 	    call pargr (z1)
 	    call pargr (z2)
 	call flush (STDOUT)

@@ -2,6 +2,7 @@
 
 include	<syserr.h>
 include	<error.h>
+include	<ctype.h>
 
 define	SZ_NUMBUF	6
 
@@ -19,7 +20,7 @@ procedure xer_send_error_statement_to_cl (errcode)
 
 int	errcode
 char	numbuf[SZ_NUMBUF]
-int	junk, itoc()
+int	ip, junk, itoc()
 include	"error.com"
 
 begin
@@ -34,7 +35,13 @@ begin
 	call xerpstr ("ERROR (")
 	call xerpstr (numbuf)
 	call xerpstr (", \"")
-	call xerpstr (xermsg)
+
+	# Output error message string, omitting characters like newline or
+	# quote which could cause syntax problems.
+
+	for (ip=1;  xermsg[ip] != EOS;  ip=ip+1)
+	    if (IS_PRINT (xermsg[ip]) && xermsg[ip] != '"')
+		call xerputc (xermsg[ip])
 
 	# Ring terminal bell if unexpected error (anything other than
 	# a keyboard interrupt).

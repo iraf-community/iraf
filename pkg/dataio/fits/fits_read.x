@@ -143,7 +143,7 @@ procedure  rft_scan_file (fd, fits, im, fe)
 int	fd			# the FITS file descriptor
 pointer	fits			# pointer to the FITS descriptor
 pointer	im			# pointer to the output image
-real	fe			# maximum file size in MB fro scan mode
+real	fe			# maximum file size in Kb for scan mode
 
 int	i, szbuf
 pointer	sp, buf
@@ -152,7 +152,7 @@ int	fstati(), read()
 errchk	read
 
 begin
-	# Compute the file size in MB and return if it is bigger than fe.
+	# Compute the file size in Kb and return if it is bigger than fe.
 	file_size = 1.0
 	do i = 1, IM_NDIM(im)
 	    file_size = file_size * IM_LEN(im,i)

@@ -10,7 +10,7 @@ procedure pdm_statistics (pdmp)
 pointer	pdmp			# pointer to PDM data structure
 
 int	npt, i, j
-real	var, sumx2, sum
+double	var, sumx2, sum
 
 begin
 	npt = PDM_NPT(pdmp)
@@ -29,7 +29,7 @@ begin
 	}
 
 	if (j != 1)
-	    var = (sumx2 - sum**2/real(j))/real(j - 1)	    # Variance.
+	    var = (sumx2 - sum**2/double(j))/double(j - 1)    # Variance.
 
 	# Put these two values in the data structure.
 	PDM_SUMSQ(pdmp) = sumx2

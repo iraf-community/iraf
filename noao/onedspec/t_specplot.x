@@ -3,15 +3,14 @@ include	<error.h>
 include	<gset.h>
 include	<mach.h>
 include	<pkg/gtools.h>
-include	"shdr.h"
-include	"units.h"
+include	<smw.h>
+include	<units.h>
 include	"specplot.h"
 
 # Define the help information.
 define	HELP		"noao$onedspec/specplot.key"
 define	PROMPT		"specplot options"
 
-define	NRANGES		100		# Maximum number of aperture ranges
  
 # T_SPECPLOT -- Plot multiple spectra in a variety of formats and layouts.
 # The spectra may be individually scaled and offset in intensity, shifted
@@ -27,6 +26,7 @@ pointer	list			# List of input spectra
 real	step			# Initial separation step
 int	labels			# Labeling mode
 real	fraction		# Fraction of minimum step
+bool	yscale			# Draw y scale?
 
 int	i, j, n, fd, nspec, wcs, key, redraw
 real	wx, wy, wx1, wy1, wx2, wy2
@@ -54,6 +54,8 @@ begin
 	nspec = 0
 	list = imtopenp ("spectra")
 	call clgstr ("units", Memc[units], SZ_LINE)
+	if (nowhite (Memc[units], Memc[units], SZ_LINE) == 0)
+	    call strcpy ("display", Memc[units], SZ_LINE)
 	while (imtgetim (list, Memc[cmd], SZ_FNAME) != EOF) {
 	    iferr (call sp_gdata (Memc[cmd], Memc[units], i, sps, nspec))
 		call erract (EA_WARN)
@@ -121,8 +123,9 @@ begin
 	call gt_setr (gt, GTYMIN, wx)
 	wx = clgetr ("ymax")
 	call gt_setr (gt, GTYMAX, wx)
-	if (!clgetb ("yscale"))
-	    call gseti (gp, G_YDRAWTICKS, NO)
+	yscale = clgetb ("yscale")
+	#if (!scale)
+	#    call gseti (gp, G_YDRAWTICKS, NO)
 
 	# Draw the graph on the first pass and then read the cursor.
 	key = 'r'
@@ -167,7 +170,7 @@ begin
 
 		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
 		sp = Memi[sps+i-1]
-	    	call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp), YES, gp, gt)
 	    	call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 		call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp), SP_Y(SP))
 		call sp_delete (i, sps, nspec)
@@ -252,7 +255,8 @@ begin
 		    switch (key) {
 		    case 's':
 			if (wy != SP_OFFSET(sp)) {
-	    	            call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	            call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+				YES, gp, gt)
 	    		    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp),
 				SP_NPTS(sp))
 			    call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp),
@@ -260,14 +264,16 @@ begin
 			    SP_SCALE(sp) = SP_SCALE(sp) *
 				(wy1 - SP_OFFSET(sp)) / (wy - SP_OFFSET(sp))
 		            call sp_scale (sp, 1, step)
-	    	            call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    	            call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+				NO, gp, gt)
 	    		    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp),
 				SP_NPTS(sp))
 			    wy = wy1
 			}
 		    case 't':
 			if (wy != SP_OFFSET(sp)) {
-	    	            call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	            call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+				YES, gp, gt)
 	    		    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp),
 				SP_NPTS(sp))
 			    call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp),
@@ -279,14 +285,16 @@ begin
 			    SP_SCALE(sp) = SP_SCALE(sp) *
 				(wy1 - SP_OFFSET(sp)) / (wy - SP_OFFSET(sp))
 		            call sp_scale (sp, 1, step)
-	    	            call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    	            call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+				NO, gp, gt)
 	    		    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp),
 				SP_NPTS(sp))
 			    wx = wx1
 			    wy = wy1
 			}
 		    case 'x':
-	    	        call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    YES, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp), SP_Y(SP))
 			if (UN_CLASS(UN(SP_SH(sp))) == UN_VEL)
@@ -294,20 +302,24 @@ begin
 			else
 			    SP_XSCALE(sp) = SP_XSCALE(sp) * wx1 / wx
 		        call sp_scale (sp, 1, step)
-	    	        call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    NO, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			wx = wx1
 		    case 'y':
-	    	        call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    YES, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp), SP_Y(SP))
 			SP_OFFSET(sp) = SP_OFFSET(sp) + wy1 - wy
 		        call sp_scale (sp, 1, step)
-	    	        call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    NO, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			wy = wy1
 		    case 'z':
-	    	        call sp_ptype (SP_PTYPE(sp), YES, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    YES, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			call gline (gp, SP_X(sp), SP_Y(sp), SP_X(sp), SP_Y(SP))
 			if (UN_CLASS(UN(SP_SH(sp))) == UN_VEL)
@@ -316,7 +328,8 @@ begin
 			    SP_XSCALE(sp) = SP_XSCALE(sp) * wx1 / wx
 			SP_OFFSET(sp) = SP_OFFSET(sp) + wy1 - wy
 		        call sp_scale (sp, 1, step)
-	    	        call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    	        call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp),
+			    NO, gp, gt)
 	    		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 			wx = wx1
 			wy = wy1
@@ -328,7 +341,7 @@ begin
 			    call gt_sets (gt, GTPARAMS, Memc[cmd])
 			} else
 			    call gt_sets (gt, GTPARAMS, "")
-			call sp_plot (gp, gt, Memi[sps], nspec)
+			call sp_plot (gp, gt, Memi[sps], nspec, yscale)
 		    case 'q':
 			break
 		    }
@@ -470,7 +483,7 @@ begin
 		    call gt_sets (gt, GTPARAMS, Memc[cmd])
 		} else
 		    call gt_sets (gt, GTPARAMS, "")
-		call sp_plot (gp, gt, Memi[sps], nspec)
+		call sp_plot (gp, gt, Memi[sps], nspec, yscale)
 		redraw = NO
 	    }
 nospec_
@@ -603,12 +616,13 @@ end
 # SP_PLOT -- Determine the range of all the data and then make a plot with
 # specified labels.  The GTOOLS procedures are used to allow user adjustment.
 
-procedure sp_plot (gp, gt, sps, nspec)
+procedure sp_plot (gp, gt, sps, nspec, yscale)
 
 pointer	gp		# GIO pointer
 pointer	gt		# GTOOLS pointer
 pointer	sps[ARB]	# Spectrum structures
 int	nspec		# Number of spectra
+bool	yscale		# Draw Y scale?
 
 int	i
 real	x, y, xmin, xmax, ymin, ymax
@@ -638,7 +652,10 @@ begin
 	}
 
 	# Draw the axes with GTOOLS limits override.
-	call gframe (gp)
+	#call gframe (gp)
+	call gclear (gp)
+	if (!yscale)
+	    call gseti (gp, G_YDRAWTICKS, NO)
 	call gswind (gp, xmin, xmax, ymin, ymax)
 	call gt_swind (gp, gt)
 	call gt_labax (gp, gt)
@@ -650,7 +667,7 @@ begin
 
 	do i = 1, nspec {
 	    sp = sps[i]
-	    call sp_ptype (SP_PTYPE(sp), NO, gp, gt)
+	    call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp), NO, gp, gt)
 	    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
 	    x = SP_XLPOS(sp) * xmax + xmin
 	    y = SP_YLPOS(sp) * ymax + SP_MEAN(sp)
@@ -661,9 +678,10 @@ end
 
 # SP_PTYPE -- Decode the plotting type and set the GTOOLS structure.
 
-procedure sp_ptype (ptype, erase, gp, gt)
+procedure sp_ptype (ptype, color, erase, gp, gt)
 
 char	ptype[ARB]		# Plotting type string
+int	color			# Color
 int	erase			# Erase plot?
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
@@ -694,6 +712,7 @@ begin
 	    else
 		call gseti (gp, G_PMLTYPE, 1)
 	}
+	call gt_seti (gt, GTCOLOR, color)
 
 	call sfree (sp)
 end
@@ -701,7 +720,7 @@ end
 
 # List of colon commands.
 define	CMDS "|show|vshow|step|fraction|move|shift|w0|wpc|velocity|redshift\
-		|offset|scale|xlpos|ylpos|label|ulabel|ptype|units|"
+		|offset|scale|xlpos|ylpos|label|ulabel|ptype|units|color|"
 
 define	SHOW		1	# Show
 define	VSHOW		2	# Verbose show
@@ -721,6 +740,7 @@ define	LABEL		15	# Type of labels
 define	ULABEL		16	# User label
 define	PTYPE		17	# Plot type
 define	UNITS		18	# Plot units
+define	COLOR		19	# Color
 
 # SP_COLON -- Interpret colon commands.
 
@@ -761,6 +781,7 @@ begin
 	# If an index number is given find the appropriate element and print
 	# an error if the spectrum index is not defined.
 	i = stridxs ("[", Memc[cmd])
+	j = 0
 	if (i > 0) {
 	    Memc[cmd+i-1] = EOS
 	    current = 0
@@ -778,6 +799,7 @@ begin
 		    return
 		}
 	    }
+	    j = current
 	}
 
 	# Parse the command.  Print the command if unknown.
@@ -1344,6 +1366,8 @@ begin
 	    call gargstr (Memc[cmd], SZ_LINE)
 	    iferr {
 		do i = 1, nspec {
+		    if (j > 0 && i != j)
+			next
 		    sp = sps[i]
 		    sh = SP_SH(sp) 
 		    call un_changer (UN(sh), Memc[cmd], Memr[SX(sh)],
@@ -1358,11 +1382,36 @@ begin
 			call strcpy (Memc[cmd], units, SZ_FNAME)
 			call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
 			call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
-			redraw = YES
 		    }
+		    redraw = YES
 		}
 	    } then
 		call erract (EA_WARN)
+	case COLOR: # Set or show color
+	    call gargi (j)
+	    if (current > 0) {
+		sp = sps[current]
+	        if (nscan() == 1) {
+		    call printf ("color[%d] %d")
+			call pargi (SP_INDEX(sp))
+			call pargi (SP_COLOR(sp))
+		} else {
+		    SP_COLOR(sp) = j
+		}
+	    } else {
+		if (nscan() == 1) {
+		    call printf ("color:")
+		    do i = 1, nspec {
+			sp = sps[i]
+			call printf (" %d=%d")
+			    call pargi (SP_INDEX(sp))
+			    call pargi (SP_COLOR(sp))
+		    }
+		} else {
+		    do i = 1, nspec
+			SP_COLOR(sps[i]) = j
+		}
+	    }
 	default: # Print unknown command
 	    call printf ("Unknown command: %s\007")
 		call pargstr (cmdstr)
@@ -1390,20 +1439,17 @@ real	offset			# Default intensity offset
 real	xlpos, ylpos		# Default position of labels
 char	ptype[SP_SZPTYPE]	# Default plot type
 
-int	i, j
-pointer	sp, im, mw, sh, stack, aps, bands, str
+int	i, j, k, l
+pointer	sp, im, mw, sh, stack, aps, bands, str, ptr
 
-int	decode_ranges()
-bool	is_in_range()
+bool	rng_elementi()
 real	clgetr(), asumr()
-pointer	immap(), smw_openim()
+pointer	immap(), smw_openim(), rng_open()
 
 errchk	immap, smw_openim
 
 begin
 	call smark (stack)
-	call salloc (aps, 3*NRANGES, TY_INT)
-	call salloc (bands, 15, TY_INT)
 	call salloc (str, SZ_LINE, TY_CHAR)
  
 	# Map the image and return an error if this fails.
@@ -1420,10 +1466,10 @@ begin
 	}
 
 	call clgstr ("apertures", Memc[str], SZ_LINE)
-	if (decode_ranges (Memc[str], Memi[aps], NRANGES, i) == ERR)
+	iferr (aps = rng_open (Memc[str], INDEF, INDEF, INDEF))
 	    call error (0, "Bad aperture/record list")
 	call clgstr ("bands", Memc[str], SZ_LINE)
-	if (decode_ranges (Memc[str], Memi[bands], 5, i) == ERR)
+	iferr (bands = rng_open (Memc[str], INDEF, INDEF, INDEF))
 	    call error (0, "Bad band list")
 
 	# For each line in the image, allocate memory for the spectrum
@@ -1431,15 +1477,22 @@ begin
 	# set the structure parameters, and add the structure to the
 	# array of structures.
 
-	do i = 1, IM_LEN(im,2) {
-	    do j = 1, IM_LEN(im,3) {
-		if (!is_in_range (Memi[bands], j))
+	do j = 1, SMW_NBANDS(mw) {
+	    if (SMW_FORMAT(mw) != SMW_ND)
+		if (!rng_elementi (bands, j))
 		    next
+	    do i = 1, SMW_NSPEC(mw) {
+		if (SMW_FORMAT(mw) == SMW_ND) {
+		    call smw_mw (mw, i, j, ptr, k, l)
+		    if (!rng_elementi (aps, k) || !rng_elementi (bands, l))
+			next
+		} else {
+		    call shdr_open (im, mw, i, j, INDEFI, SHHDR, sh)
+		    if (!rng_elementi (aps, AP(sh)))
+			next
+		}
 		call shdr_open (im, mw, i, j, INDEFI, SHDATA, sh)
-		if (!is_in_range (Memi[aps], AP(sh)))
-		    next
-		iferr (call un_changer (UN(sh), units, Memr[SX(sh)], SN(sh),
-		    YES))
+		iferr (call shdr_units (sh, units))
 		    ;
 
 	        call sp_alloc (sp, sh)
@@ -1456,18 +1509,12 @@ begin
 	        SP_OFFSET(sp) = offset
 	        SP_XLPOS(sp) = xlpos
 	        SP_YLPOS(sp) = ylpos
+		SP_COLOR(sp) = 1
 
-	        if (IM_LEN(im,3) > 1) {
-	            call sprintf (SP_IMNAME(sp), SP_SZNAME, "%s[%d,%d]")
-	    	    call pargstr (SPECTRUM(sh))
-	    	    call pargi (AP(sh))
-		    call pargi (INDEX2(sh))
-	        } else if (IM_LEN(im,2) > 1) {
-	            call sprintf (SP_IMNAME(sp), SP_SZNAME, "%s[%d]")
-	    	    call pargstr (SPECTRUM(sh))
-	    	    call pargi (AP(sh))
-	        } else
-	            call strcpy (SPECTRUM(sh), SP_IMNAME(sp), SP_SZNAME)
+		call sprintf (SP_IMNAME(sp), SP_SZNAME, "%s%s(%d)")
+		    call pargstr (IMNAME(sh))
+		    call pargstr (IMSEC(sh))
+		    call pargi (AP(sh))
 		call strcpy (TITLE(sh), SP_IMTITLE(sp), SP_SZTITLE)
 	        call strcpy (ptype, SP_PTYPE(sp), SP_SZPTYPE)
 	        SP_ULABEL(sp) = EOS
@@ -1477,9 +1524,11 @@ begin
 	}
 
 	# Close the image.
-	call imunmap (im)
-	call mw_close (mw)
 	call shdr_close (sh)
+	call rng_close (bands)
+	call rng_close (aps)
+	call smw_close (mw)
+	call imunmap (im)
  
 	call sfree (stack)
 end
@@ -1600,7 +1649,7 @@ end
 
 
 # SP_ALLOC -- Allocate memory for a spectrum structure with given number of
-# data points.
+# data points.  The MWCS is not used.
 
 procedure sp_alloc (sp, sh)
 
@@ -1611,7 +1660,9 @@ begin
 	call calloc (sp, SP_LEN, TY_STRUCT)
 	call calloc (SP_PX(sp), SN(sh), TY_REAL)
 	call calloc (SP_PY(sp), SN(sh), TY_REAL)
+
 	call shdr_copy (sh, SP_SH(sp), NO)
+	MW(SP_SH(sp)) = NULL
 end
 
 

@@ -1,4 +1,4 @@
-.help photpars Aug91 noao.digiphot.daophot
+.help photpars Dec92 noao.digiphot.daophot
 .ih
 NAME
 photpars -- edit the photometry parameters
@@ -19,8 +19,11 @@ In addition a ranges syntax of the form ap1:apN:apstep is supported.
 .le
 .ls zmag = 25.00
 The zero point offset for the magnitude scale. Note that this value
-has been chosen for compatability with the original DAOPHOT and
+has been chosen for compatibility with the original DAOPHOT and
 is one magnitude less than the default value in the APPHOT package.
+.le
+.ls mkapert = no
+Mark the photometry apertures on the displayed image ?
 .le
 
 .ih
@@ -38,7 +41,7 @@ scale is determined by \fIzmag\fR.
 is specified in units of the half width at half maximum of the points
 spread function the aperture which maximizes the signal to noise once
 chosen will work well on images of different seeing and noise
-charactersitics.
+characteristics.
 
 .ih
 EXAMPLES

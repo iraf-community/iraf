@@ -7,13 +7,17 @@ include	"icombine.h"
 
 # IC_LOG -- Output log information is a log file has been specfied.
 
-procedure ic_log (in, out, ncombine, exptime, mode, median, mean, scales,
-	zeros, wts, offsets, nimages, dozero, nout, expname, exposure)
+procedure ic_log (in, out, ncombine, exptime, sname, zname, wname,
+	mode, median, mean, scales, zeros, wts, offsets, nimages,
+	dozero, nout, expname, exposure)
 
 pointer	in[nimages]		# Input images
 pointer	out[3]			# Output images
 int	ncombine[nimages]	# Number of previous combined images
 real	exptime[nimages]	# Exposure times
+char	sname[ARB]		# Scale name
+char	zname[ARB]		# Zero name
+char	wname[ARB]		# Weight name
 real	mode[nimages]		# Modes
 real	median[nimages]		# Medians
 real	mean[nimages]		# Means
@@ -30,7 +34,8 @@ real	exposure		# Output exposure
 int	i, j, ctor()
 real	rval, imgetr()
 long	clktime()
-bool	prncombine, prexptime, prmode, prmedian, prmean, prmask, prrdn, prgain
+bool	prncombine, prexptime, prmode, prmedian, prmean, prmask
+bool	prrdn, prgain, prsn
 pointer	sp, fname
 errchk	imgetr
 
@@ -42,7 +47,7 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_LINE, TY_CHAR)
 
 	# Time stamp the log and print parameter information.
 
@@ -51,47 +56,62 @@ begin
 	    call pargstr (Memc[fname])
 	switch (combine) {
 	case  AVERAGE:
-	    call fprintf (logfd, "  combine = average\n")
+	    call fprintf (logfd, "  combine = average, ")
 	case  MEDIAN:
-	    call fprintf (logfd, "  combine = median\n")
+	    call fprintf (logfd, "  combine = median, ")
 	}
+	call fprintf (logfd, "scale = %s, zero = %s, weight = %s\n")
+	    call pargstr (sname)
+	    call pargstr (zname)
+	    call pargstr (wname)
+
 	switch (reject) {
 	case MINMAX:
 	    call fprintf (logfd, "  reject = minmax, nlow = %d, nhigh = %d\n")
 		call pargi (nint (flow * nimages))
 		call pargi (nint (fhigh * nimages))
 	case CCDCLIP:
-	    call fprintf (logfd,
-		"  reject = ccdclip, mclip = %b, rdnoise = %s, gain = %s\n")
+	    call fprintf (logfd, "  reject = ccdclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd,
+	    "  rdnoise = %s, gain = %s, snoise = %s, sigma = %g, hsigma = %g\n")
 		call pargstr (Memc[rdnoise])
 		call pargstr (Memc[gain])
-	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
+		call pargstr (Memc[snoise])
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case CRREJECT:
 	    call fprintf (logfd,
-	    "  reject = crreject, mclip = %b, rdnoise = %s, gain = %s, hsigma = %g\n")
+		"  reject = crreject, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd,
+		"  rdnoise = %s, gain = %s, snoise = %s, hsigma = %g\n")
 		call pargstr (Memc[rdnoise])
 		call pargstr (Memc[gain])
+		call pargstr (Memc[snoise])
 		call pargr (hsigma)
 	case PCLIP:
-	    call fprintf (logfd,
-	    "  reject = pclip, pclip = %g, lsigma = %g, hsigma = %g\n")
+	    call fprintf (logfd, "  reject = pclip, nkeep = %d\n")
+		call pargi (nkeep)
+	    call fprintf (logfd, "  pclip = %g, lsigma = %g, hsigma = %g\n")
 		call pargr (pclip)
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case SIGCLIP:
-	    call fprintf (logfd,
-		"  reject = sigclip, mclip = %b, lsigma = %g, hsigma = %g\n")
+	    call fprintf (logfd, "  reject = sigclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case AVSIGCLIP:
 	    call fprintf (logfd,
-		"  reject = avsigclip, mclip = %b, lsigma = %g, hsigma = %g\n")
+		"  reject = avsigclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
 		call pargr (lsigma)
 		call pargr (hsigma)
 	}
@@ -114,7 +134,7 @@ begin
 	}
 	call fprintf (logfd, "  blank = %g\n")
 	    call pargr (blank)
-	call clgstr ("statsec", Memc[fname], SZ_FNAME)
+	call clgstr ("statsec", Memc[fname], SZ_LINE)
 	if (Memc[fname] != EOS) {
 	    call fprintf (logfd, "  statsec = %s\n")
 		call pargstr (Memc[fname])
@@ -149,6 +169,7 @@ begin
 	prmask = false
 	prrdn = false
 	prgain = false
+	prsn = false
 	do i = 1, nimages {
 	    if (ncombine[i] != ncombine[1])
 		prncombine = true
@@ -169,6 +190,9 @@ begin
 		j = 1
 		if (ctor (Memc[gain], j, rval) == 0)
 		    prgain = true
+		j = 1
+		if (ctor (Memc[snoise], j, rval) == 0)
+		    prsn = true
 	    }
 	}
 
@@ -183,15 +207,15 @@ begin
 		call pargstr ("Exp")
 	}
 	if (prmode) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Mode")
 	}
 	if (prmedian) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Median")
 	}
 	if (prmean) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Mean")
 	}
 	if (prrdn) {
@@ -202,12 +226,16 @@ begin
 	    call fprintf (logfd, " %6s")
 		call pargstr ("Gain")
 	}
+	if (prsn) {
+	    call fprintf (logfd, " %6s")
+		call pargstr ("Snoise")
+	}
 	if (doscale) {
 	    call fprintf (logfd, " %6s")
 		call pargstr ("Scale")
 	}
 	if (dozero) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Zero")
 	}
 	if (dowts) {
@@ -225,7 +253,7 @@ begin
 	call fprintf (logfd, "\n")
 
 	do i = 1, nimages {
-	    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+	    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_LINE)
 	    if (project) {
 		call fprintf (logfd, "  %16s[%3d]")
 		    call pargstr (Memc[fname])
@@ -243,15 +271,15 @@ begin
 		    call pargr (exptime[i])
 	    }
 	    if (prmode) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (mode[i])
 	    }
 	    if (prmedian) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (median[i])
 	    }
 	    if (prmean) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (mean[i])
 	    }
 	    if (prrdn) {
@@ -264,12 +292,17 @@ begin
 		call fprintf (logfd, " %6g")
 		    call pargr (rval)
 	    }
+	    if (prsn) {
+		rval = imgetr (in[i], Memc[snoise])
+		call fprintf (logfd, " %6g")
+		    call pargr (rval)
+	    }
 	    if (doscale) {
 		call fprintf (logfd, " %6.3f")
 		    call pargr (1./scales[i])
 	    }
 	    if (dozero) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (-zeros[i])
 	    }
 	    if (dowts) {
@@ -288,7 +321,7 @@ begin
 		}
 	    }
 	    if (prmask && Memi[pms+i-1] != NULL) {
-		call imgstr (in[i], "BPM", Memc[fname], SZ_FNAME)
+		call imgstr (in[i], "BPM", Memc[fname], SZ_LINE)
 		call fprintf (logfd, " %s")
 		    call pargstr (Memc[fname])
 	    }
@@ -296,7 +329,7 @@ begin
 	}
 
 	# Log information about the output images.
-	call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+ 	call imgstr (out[1], "TEMPNAME", Memc[fname], SZ_LINE)
 	call fprintf (logfd, "\n  Output image = %s, ncombine = %d")
 	    call pargstr (Memc[fname])
 	    call pargi (nout)
@@ -308,13 +341,13 @@ begin
 	call fprintf (logfd, "\n")
 
 	if (out[2] != NULL) {
-	    call imstats (out[2], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+	    call imgstr (out[2], "TEMPNAME", Memc[fname], SZ_LINE)
 	    call fprintf (logfd, "  Pixel list image = %s\n")
 		call pargstr (Memc[fname])
 	}
 
 	if (out[3] != NULL) {
-	    call imstats (out[3], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+	    call imgstr (out[3], "TEMPNAME", Memc[fname], SZ_LINE)
 	    call fprintf (logfd, "  Sigma image = %s\n")
 		call pargstr (Memc[fname])
 	}

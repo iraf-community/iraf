@@ -1,4 +1,4 @@
-.help iralign Jan90 noao.nproto
+.help iralign Sep93 noao.nproto
 .ih
 NAME
 iralign -- align the elements of the mosaiced image
@@ -8,65 +8,70 @@ iralign input output database coords
 .ih
 PARAMETERS
 .ls input
-The mosaiced image to be aligned. This image must have been produced by
-the IRMOSAIC task and have an accompanying database file specified by
-\fIdatabase\fR.
+The mosaiced image written by IRMOSAIC.
 .le
 .ls output
-The aligned image produced by IRALIGN.
+The output aligned image.
 .le
 .ls database
-The database file from the IRMOSAIC task.
+The database file written by IRMOSAIC.
 .le
 .ls coords
 If \fIalignment\fR = "coords", then \fBcoords\fR is
-a text file listing the coordinates of objects in the input
-image one object per line in the following
-format: 1) the x and y coordinates of the object in the first subraster
-2) the x and y coordinates of the same object in the second subraster
-3) the x and y coordinates of the next object in the first subraster
+a text file containing the x and y coordinates, measured in the input
+mosaiced image, of reference objects common
+to adjacent subrasters in the input mosaiced
+image. The reference coordinates are written with the following format:
+line 1) the x and y coordinates of an object in the any subraster,
+line 2) the x and y coordinates of the same object in any adjacent subraster,
+line 3) the x and y coordinates of another object in the any subraster,
+line 4) the x and y coordinates of the same object in any adjacent subraster,
 etc.
-If \fIalignment\fR = "file", then \fBcoords\fR is a text file listing
+If \fIalignment\fR = "file", then \fBcoords\fR is a text file containing
 the x and y shifts in columns 1 and 2 respectively,
-of each input subraster relative to the reference subraster. The
-most common use of this option is to make fine adjustments by hand
-to the output of IRALIGN by editing the computed shifts slightly and rerunning
+of each subraster relative to the reference subraster, in the order
+in which the subrasters were written into the mosaiced input image.
+This option can be used to make fine adjustments to the output aligned image
+by manually editing the computed shifts and rerunning
 IRALIGN with the new shifts.
 .le
 .ls xshift
-The x shift in pixel units used if \fIalignment\fR = "shifts".
+The x shift in pixels used if \fIalignment\fR = "shifts".
 .le
 .ls yshift
-The y shift in pixel units used if \fIalignment\fR = "shifts".
+The y shift in pixels used if \fIalignment\fR = "shifts".
 .le
 .ls alignment = "coords"
 The method of aligning the subraster.
 .ls coords
-The x and y positions of the marker points are listed in a file in the
-format specified by the \fIcoords\fR parameter.
+The x and y positions of the reference points common to adjacent subrasters
+in the input mosaiced image are listed in a text file as described
+under the help for the  \fIcoords\fR parameter.
 .le
 .ls shifts
-The x and y shifts of a subraster with respect to its neighbour are
+The x and y shifts of each subraster with respect to its neighbour are
 set to \fIxshift\fR and \fIyshift\fR.
 .le
 .ls file
 The x and y  shifts of each input subraster with respect to the
-reference subraster image are listed by the \fIcoords\fR parameter.
+reference subraster image are listed in a text file as described
+under the help for the \fIcoords\fR parameter.
 .le
 .le
 .ls nxrsub = INDEF, ls nyrsub = INDEF
 The column and row index of the reference subraster.
-This will default to the central subraster.
+The default reference subraster is the central subraster.
 .le
 .ls xref = 0, yref = 0
-The x and y offset of the destination in the output image of the reference
-subraster. By default the reference subraster occupies the same position in
+The x and y offset of the reference
+subraster in the output aligned image.
+By default the reference subraster occupies the same position in
 the output image that it does in the input image.
 .le
 .ls trimlimits = "[1:1,1:1]"
 The number of columns or rows to trim off each edge of each input subraster
-before inserting it in the output image in section notation. The default is
-to trim 1 column or line at each edge.
+before inserting it in the output image, specified in image section notation.
+The default action is to trim 1 column or line at each edge of the subraster.
 .le
 .ls nimcols = INDEF, nimlines = INDEF
 The number of columns and lines in the output image. The defaults are  the
@@ -74,7 +79,7 @@ number of columns and lines in the input image.
 .le
 .ls oval = INDEF
 The value of undefined pixels in the output image. The default is the value
-in the database file from IRMOSAIC.
+stored in the database file written by IRMOSAIC.
 .le
 .ls interpolant = linear
 The type of interpolant used to shift the subrasters. The options are:
@@ -99,36 +104,61 @@ Print messages on the terminal describing the progress of the task?
 .le
 .ih
 DESCRIPTION
-IRALIGN takes the mosaiced image \fIinput\fR, the database file \fIdatabase\fR
-generated by IRMOSAIC, and a list of coordinates \fIcoords\fR and computes
-an output image \fIoutput\fR in which all the individual subrasters are aligned.
+IRALIGN takes the mosaiced image \fIinput\fR and database
+\fIdatabase\fR files
+written by IRMOSAIC, and a list of reference object
+coordinates \fIcoords\fR created by the user, and writes
+an output image \fIoutput\fR in which all the subrasters are aligned
+with respect to a reference subraster.
+
 If \fIalignment\fR = "coords", IRALIGN accumulates the relative shifts
-between adjacent subrasters from the data in \fIcoords\fR
+between adjacent subrasters defined by the the data in \fIcoords\fR,
 into a total shift for each subraster with respect to the reference subraster.
-Shifts which do not correspond to adjacent subrasters are ignored.
-For subrasters which have no direct shift information,
-IRALIGN makes a best guess at the x and y shift
-based on the shifts of nearby subrasters
-which do have direct shift information.  If the x and y shifts
+Relative shifts defined for non-adjacent subrasters are ignored.
+For those subrasters which have no relative shift information,
+IRALIGN makes a best guess at the relative x and y shifts
+based on the relative x andy shifts of nearby subrasters
+which do have relative shift information.  If the x and y shifts
 are sufficiently uniform over the whole input image the user may set
-\fIalignment\fR to  "shifts" and supply values of \fIxshift\fR and \fIyshift\fR.
-Alternatively the shifts may be read from the  file \fIcoords\fR
+\fIalignment\fR to  "shifts" and supply values for
+\fIxshift\fR and \fIyshift\fR.
+Alternatively the total shifts may be read directly from the  file \fIcoords\fR
 if \fIalignment\fR = "file".
 
-Coordinate lists may be generated interactively on the Sun workstations
-using the IRAF imtool facility and centered using the APPHOT CENTER
-and APSELECT tasks.
+Coordinate lists for the \fIalignment\fR = "coords" option,
+may be generated interactively using the RIMCURSOR, 
+or APPHOT package CENTER and APSELECT tasks. For example a coordinate list
+written by RIMCURSOR for a 
+4 by 4 mosaic of 51 by 51 pixel square images containing a single
+reference object common to all the subrasters might look like the following.
+
+.nf
+41.3   42.6     1 \40 	# coordinates of ref object in subraster 1
+62.0   38.5	1 \40   # coordinates of ref object in subraster 2
+41.3   42.6     1 \40   # coordinates of ref object in subraster 1
+38.1   95.8     1 \40   # coordinates of ref object in subraster 3
+62.0   38.5     1 \40   # coordinates of ref object in subraster 2
+70.3   89.0     1 \40   # coordinates of ref object in subraster 4
+38.1   95.8     1 \40   # coordinates of ref object in subraster 3
+70.3   89.0     1 \40   # coordinates of ref object in subraster 4
+.fi
+
+In this example subrasters 1 and 2 are in the lower-left and
+lower-right hand corners of
+the mosaiced image respectively, while subrasters 3 and 4 are in the
+upper-left and upper- right hand corner of the mosaiced image.
+Any number of reference objects may be used.
 
 The subrasters are inserted into the output image using the
 interpolation scheme defined by
 \fIinterpolant\fR, and aligned with reference to the subraster defined
 by \fInxrsub\fR and \fInyrsub\fR, using the shifts defined by
-the coordinates in the file \fIcoords\fR or defined by \fIxshift\fR and
+the data in the file \fIcoords\fR or defined by \fIxshift\fR and
 \fIyshift\fR. Subrasters are inserted into the output image in the order
 they were placed in the original mosaic with pixels in the most recently
 placed subrasters replacing those in earlier placed ones in the overlap regions.
 Undefined pixels in the output image
-are given the value \fIoval\fR. The position of the reference subraster
+are assigned the value \fIoval\fR. The position of the reference subraster
 in the output image may be adjusted by setting the offset parameters
 \fIxref\fR and \fIyref\fR. The edges of each subraster may be trimmed
 before insertion into the output image by setting the \fItrimlimits\fR
@@ -144,7 +174,7 @@ EXAMPLES
 	nyrsub=5
 .fi
 
-2. Align an 8 by 8 mosaic as 1 above but shift the position of the
+2. Align an 8 by 8 mosaic as in example 1 above but shift the position of the
 reference subraster in the output image by 2 pixels in x and 3 pixels
 in y.
 
@@ -154,7 +184,7 @@ in y.
 .fi
 
 3. Align an 8 by 8 mosaic as 1 above but trim 2 rows and columns off
-of each input image before inserting into the output image.
+of each input subraster before inserting it into the output image.
 
 .nf
     pr> iralign mosaic mosaic.al mosaic.db coords nxrsub=6 \
@@ -163,7 +193,7 @@ of each input image before inserting into the output image.
 
 4. Rerun the above example saving the verbose output in a file. Use the 
 PROTO package FIELDS task to select the xshift, yshift and intensity
-shift fields, edit the shifts slightly and rerun iralign with the
+shift fields, edit the shifts manually and rerun IRALIGN with the
 new shifts.
 
 .nf
@@ -176,7 +206,7 @@ new shifts.
 
 	... make whatever changes are desired
 
-    pr> iralign mosaic mosaic.al mosaic.db shifts2 align=file \
+    pr> iralign mosaic mosaic.al.2 mosaic.db shifts2 align=file \
 	nxrsub=6 nyrsub=5 trimlimits="[2:2,2:2]"
 .fi
 

@@ -214,8 +214,9 @@ begin
 		    call fprintf (cl, "%g %g\n")
 			call pargr (wx)
 			call pargr (wy)
+		    call flush (cl)
 		    ltid = ltid + 1
-		    call seek (cl, EOF)
+		    #call seek (cl, EOF)
 
 		    # Mark the object.
 		    call mk_onemark (mk, im, iw, wx, wy, oxlist, oylist,

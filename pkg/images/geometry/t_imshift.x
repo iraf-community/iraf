@@ -5,8 +5,9 @@ include <imhdr.h>
 include <imset.h>
 include <math/iminterp.h>
 
-define	NMARGIN		3	# number of boundary pixels required	
 define	NYOUT		16	# number of lines output at once
+define	NMARGIN		3	# number of boundary pixels required
+define	NMARGIN_SPLINE3	16	# number of spline boundary pixels required	
 
 
 # T_IMSHIFT -- Shift a 2-D image by an arbitrary amount in X and Y, using
@@ -231,7 +232,7 @@ begin
 		    call error (5, wrerr)
 		call amovi (Memi[buf1], Memi[buf2], ncols)
 	    }
-	case TY_LONG:
+	case TY_USHORT, TY_LONG:
 	    do i = 1, nlines {
 	        if (impnll (im2, buf2, v) == EOF)
 		    call error (5, wrerr)
@@ -293,7 +294,7 @@ int	interp_type	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
 
-int	lout1, lout2, nyout
+int	lout1, lout2, nyout, nxymargin
 int	cin1, cin2, nxin, lin1, lin2, nyin, i
 int	ncols, nlines, nbpix, fstline, lstline
 real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
@@ -324,7 +325,11 @@ begin
 	}
 
 	# Set boundary extension parameters.
-	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + NMARGIN
+	if (interp_type == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
+	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + nxymargin
 	call imseti (im1, IM_NBNDRYPIX, nbpix)
 	call imseti (im1, IM_TYBNDRY, boundary_type)
 	if (boundary_type == BT_CONSTANT)
@@ -342,11 +347,11 @@ begin
 	# Define the x interpolation coordinates.
 	dx = abs (xshft - int (xshft))
 	if (fp_equalr (dx, 0.0))
-	    deltax = NMARGIN
+	    deltax = nxymargin
 	else if (xshft > 0.)
-	    deltax = 1. - dx + NMARGIN
+	    deltax = 1. - dx + nxymargin
 	else
-	    deltax = dx + NMARGIN
+	    deltax = dx + nxymargin
 
 	do i = 1, ncols
 	    Memr[x+i-1] = i + deltax
@@ -354,21 +359,21 @@ begin
 	# Define the y interpolation coordinates.
 	dy = abs (yshft - int (yshft))
 	if (fp_equalr (dy, 0.0))
-	    deltay = NMARGIN
+	    deltay = nxymargin
 	else if (yshft > 0.)
-	    deltay = 1. - dy +  NMARGIN
+	    deltay = 1. - dy + nxymargin
 	else
-	    deltay = dy + NMARGIN
+	    deltay = dy + nxymargin
 	do i = 1, NYOUT
 	    Memr[y+i-1] = i + deltay
 
 	# Define column ranges in the input image.
-	cx = 1. - NMARGIN - xshft
+	cx = 1. - nxymargin - xshft
 	if ((cx <= 0.) &&  (! fp_equalr (dx, 0.0)))
 	    cin1 = int (cx) - 1
 	else
 	    cin1 = int (cx)
-	cin2 = ncols - xshft + NMARGIN + 1
+	cin2 = ncols - xshft + nxymargin + 1
 	nxin = cin2 - cin1 + 1
 
 	# Loop over output sections.
@@ -379,12 +384,12 @@ begin
 	    nyout = lout2 - lout1 + 1
 
 	    # Define correspoding range of input lines.
-	    ly = lout1 - NMARGIN - yshft
+	    ly = lout1 - nxymargin - yshft
 	    if ((ly <= 0) && (! fp_equalr (dy, 0.0)))
 	        lin1 = int (ly) - 1
 	    else
 		lin1 = int (ly)
-	    lin2 = lout2 - yshft + NMARGIN + 1
+	    lin2 = lout2 - yshft + nxymargin + 1
 	    nyin = lin2 - lin1 + 1
 
 	    # Get appropriate input section and calculate the coefficients.

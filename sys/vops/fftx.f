@@ -17,7 +17,7 @@ c the subroutine is called as subroutine fft842 (in,n,x,y).
 c the integer n (a power of 2), the n real location array x, and
 c the n real location array y must be supplied to the subroutine.
 c
-      dimension x(2), y(2), l(15)
+      dimension x(*), y(*), l(15)
       common /con2/ pi2, p7
       equivalence (l15,l(1)), (l14,l(2)), (l13,l(3)), (l12,l(4)),
      *    (l11,l(5)), (l10,l(6)), (l9,l(7)), (l8,l(8)), (l7,l(9)),

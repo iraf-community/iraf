@@ -207,7 +207,7 @@ begin
 	        call pargd (INDEFD)
 	    } else {
 	        call pargd (RV_HJD(rv))
-	        call pargd (RV_MJD_OBS(rv) + 2440000.0d0)
+	        call pargd (RV_MJD_OBS(rv))
 	    }
 	call fprintf (fd, "\tObject sample used in correlation = `%s'\n")
 	    call pargstr (Memc[orange])
@@ -338,7 +338,7 @@ begin
 		call pargr (COEFF(rv,2))
 		call pargr (ECOEFF(rv,2))
 	    if (RV_FITFUNC(rv) == GAUSSIAN)
-	        call fprintf (fd, "\t\tc[3] = %8.4f  +/- %6.4f%65t# Sigma\n")
+	        call fprintf (fd, "\t\tc[3] = %8.4f  +/- %6.4f%65t# Sigma^2\n")
 	    else
 	        call fprintf (fd, "\t\tc[3] = %8.4f  +/- %6.4f%65t# FWHM\n")
 		    call pargr (COEFF(rv,3))

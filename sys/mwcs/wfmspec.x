@@ -101,7 +101,8 @@ pointer	ct, mw
 int	sz_atval, naps, ip, i
 pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff
 int	strlen(), ctoi(), ctod()
-double	dval, wf_msp_eval()
+double	x, dval, wf_msp_eval()
+errchk	malloc, realloc
 
 begin
 	# Get pointers.
@@ -177,7 +178,7 @@ begin
 	}
 
 	if (naps <= 0)
-	    call error (1, "WFMSPEC: No aperture information")
+	    call error (2, "WFMSPEC: No aperture information")
 
 	call realloc (aps, naps, TY_INT) 
 	call realloc (dtype, naps, TY_INT) 
@@ -209,9 +210,10 @@ begin
 		    next
 		if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
 		    coeff = Memi[FC_COEFF(fc)+i]
-		    Memd[crval+i] = 1
-		    Memd[cdelt+i] = wf_msp_eval (Memd[coeff], double (2.)) -
-			wf_msp_eval (Memd[coeff], double (1.))
+		    x = Memi[FC_NPTS(fc)+i]
+		    Memd[crval+i] = x
+		    Memd[cdelt+i] = wf_msp_eval (Memd[coeff], x) -
+			wf_msp_eval (Memd[coeff], x - 1)
 		}
 	    }
 	    FC_X(fc) = crval
@@ -265,23 +267,23 @@ double	din, wf_msp_eval()
 begin
 	i = nint (in[2]) - 1
 	if (i < 0 || i >= FC_NAPS(fc))
-	    call error (1, "WFMSPEC: Coordinate out of bounds")
+	    call error (3, "WFMSPEC: Coordinate out of bounds")
 	if (Memi[FC_NPTS(fc)+i] == 0)
-	    call error (1, "WFMSPEC: No dispersion function")
+	    call error (4, "WFMSPEC: No dispersion function")
 
 	if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
 	    coeff = Memi[FC_COEFF(fc)+i]
 	    out[2] = Memi[FC_APS(fc)+i]
-	    out[1] = wf_msp_eval (Memd[coeff], in[1]) / Memd[FC_Z(fc)+i]
+	    out[1] = wf_msp_eval (Memd[coeff], in[1])
 	} else {
 	    din = max (0.5D0, min (double (Memi[FC_NPTS(fc)+i]+0.5), in[1]))
 	    out[2] = Memi[FC_APS(fc)+i]
-	    out[1] = (Memd[FC_CRVAL(fc)+i] + Memd[FC_CDELT(fc)+i] * (din - 1)) /
-		Memd[FC_Z(fc)+i]
+	    out[1] = Memd[FC_CRVAL(fc)+i] + Memd[FC_CDELT(fc)+i] * (din - 1)
 	    if (Memi[FC_DTYPE(fc)+i] == LOG)
 		out[1] = 10. ** out[1]
 	}
 
+	out[1] = out[1] / Memd[FC_Z(fc)+i]
 end
 
 
@@ -295,7 +297,8 @@ double	out[2]			#O value of WCS at that point
 
 int	i
 pointer	coeff
-double	din, dinmin, wf_msp_evali()
+double	din, dinmin
+double	wf_msp_evali()
 
 begin
 	out[2] = 1
@@ -310,20 +313,18 @@ begin
 
 	i = nint (out[2]) - 1
 	if (i < 0 || i >= FC_NAPS(fc))
-	    call error (1, "WFMSPEC: Coordinate out of bounds")
+	    call error (5, "WFMSPEC: Coordinate out of bounds")
 	if (Memi[FC_NPTS(fc)+i] == 0)
-	    call error (1, "WFMSPEC: No dispersion function")
+	    call error (6, "WFMSPEC: No dispersion function")
 
+	din = in[1] * Memd[FC_Z(fc)+i]
 	if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
 	    coeff = Memi[FC_COEFF(fc)+i]
-	    din = in[1] * Memd[FC_Z(fc)+i]
 	    out[1] = wf_msp_evali (Memd[coeff], din, Memd[FC_X(fc)+i],
 		Memd[FC_DYDX(fc)+i])
 	} else {
 	    if (Memi[FC_DTYPE(fc)+i] == LOG)
-		din = log10 (in[1]) * Memd[FC_Z(fc)+i]
-	    else
-		din = in[1] * Memd[FC_Z(fc)+i]
+		din = log10 (in[1])
 	    out[1] = (din-Memd[FC_CRVAL(fc)+i]) / Memd[FC_CDELT(fc)+i] + 1
 	    out[1] = max (0.5D0, min (double(Memi[FC_NPTS(fc)+i]+0.5), out[1]))
 	}
@@ -340,6 +341,7 @@ double	xmin, xmax		#I x limits
 
 double	dval, temp
 int	ncoeff, type, order, ip, i
+errchk	malloc, realloc
 double	wf_msp_eval()
 int	ctod()
 
@@ -480,7 +482,7 @@ begin
 		j = j + 7 + order
 	    case PIXEL:
 		i = max (1, min (int (xval), order-1))
-		x = max (0D0, min (1D0, xval-i))
+		x = xval - i
 		y = y + (1 - x) * coeff[j+3+i] + x * coeff[j+4+i]
 		j = j + 4 + order
 	    case SAMPLE:
@@ -491,7 +493,6 @@ begin
 		    ;
 		coeff[j+4] = i
 		x = (xval - coeff[i]) / (coeff[i+2] - coeff[i])
-		x = max (0D0, min (1D0, x)) 
 		y = y + (1 - x) * coeff[i+1] + x * coeff[i+3]
 		j = j + 5 + order
 	    }
@@ -512,7 +513,7 @@ double	x			#U last physical coordinate
 double	dydx			#U last coordinate derivative
 
 int     i
-double  yval, y1, dx, dy
+double  xval, yval, y1, dx, dy
 double  wf_msp_eval()
 bool	fp_equald()
 
@@ -534,7 +535,7 @@ begin
 		else
 		    dy = wf_msp_eval (coeff, x+1.) - y1
 	    }
-	    if (!fp_equald (dy, 0D0))
+	    if (!fp_equald (dy, 0.0D0))
 		dydx = dy
             dx = (yval - y1) / dydx
             x = x + dx
@@ -543,7 +544,32 @@ begin
                 break
         }
 
+	if (i > NIT) {
+	    xval = (coeff[2] + coeff[3]) / 2.
+	    yval = abs (wf_msp_eval (coeff, xval) - y)
+	    dx = (coeff[3] - coeff[2]) / 18.
+	    while (dx > DX) {
+		for (x=max (coeff[2],xval-9*dx); x<=min (coeff[3],xval+9*dx);
+		    x=x+dx) {
+		    dy = abs (wf_msp_eval (coeff, x) - y)
+		    if (dy < yval) {
+			xval = x
+			yval = dy
+		    }
+		}
+		dx = dx / 10.
+	    }
+	    x = xval
+	    if (x + 1 < coeff[3])
+		dy = wf_msp_eval (coeff, x+1.) - wf_msp_eval (coeff, x)
+	    else
+		dy = wf_msp_eval (coeff, x) - wf_msp_eval (coeff, x-1.)
+	    if (!fp_equald (dy, 0.0D0))
+		dydx = dy
+	}
+		
 	yval = int (x)
 	x = yval + nint ((x-yval) / DX) * DX
+
 	return (x)
 end

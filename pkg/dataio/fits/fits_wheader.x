@@ -264,11 +264,25 @@ errchk	wft_set_scale
 
 begin
 	switch (PIXTYPE(im)) {
-	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	case TY_SHORT, TY_INT, TY_LONG:
 	    if (data_bitpix > fits_bitpix) {
 		scale = YES
 		call wft_set_scale (fits_bitpix, irafmin, irafmax, tapemin, 
 		    tapemax, bscale, bzero)
+	    } else {
+		scale = NO
+		bscale = 1.0d0
+		bzero = 0.0d0
+	    }
+	case TY_USHORT:
+	    if (data_bitpix > fits_bitpix) {
+		scale = YES
+		call wft_set_scale (fits_bitpix, irafmin, irafmax, tapemin, 
+		    tapemax, bscale, bzero)
+	    } else if (data_bitpix == fits_bitpix) {
+		scale = YES
+		bscale = 1.0d0
+		bzero = 3.2768d4
 	    } else {
 		scale = NO
 		bscale = 1.0d0

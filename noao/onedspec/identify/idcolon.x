@@ -1,6 +1,6 @@
 include	<gset.h>
 include	<error.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"identify.h"
 
 # List of colon commands.
@@ -36,7 +36,7 @@ char	newimage[ARB]		# New image name
 int	prfeature		# Print current feature on status line
 
 char	cmd[SZ_LINE]
-int	i, ncmd, ival
+int	i, ncmd, ival[2]
 real	rval[2]
 pointer	im
 
@@ -93,14 +93,19 @@ begin
 		}
 	    }
 	case NSUM: # :nsum - set number of lines or columns to sum in image
-	    call gargi (ival)
+	    call gargi (ival[1])
 	    if (nscan() == 1) {
-	        call printf ("nsum %d\n")
-		    call pargi (ID_NSUM(id))
+	        call printf ("nsum %d %d\n")
+		    call pargi (ID_NSUM(id,1))
+		    call pargi (ID_NSUM(id,2))
 		prfeature = NO
 	    } else {
-		ID_NSUM(id) = ival
-		call shdr_2d (NULL, DAXISP(ID_SH(id)), ID_NSUM(id))
+		ID_NSUM(id,1) = ival[1]
+		call gargi (ival[2])
+		if (nscan() == 3)
+		    ID_NSUM(id,2) = ival[2]
+		call smw_daxis (NULL, NULL, SMW_PAXIS(MW(ID_SH(id)),1),
+		    ID_NSUM(id,1), ID_NSUM(id,2))
 	    }
 	case DATABASE: # :database - set database
 	    call gargwrd (cmd, SZ_LINE)
@@ -117,11 +122,15 @@ begin
 	    iferr {
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO, YES)
+		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			NO, YES)
 	        else {
-		    call gargi (ival)
-		    if (nscan() == 2)
-			ival = ID_AP(id)
+		    call gargi (ival[1])
+		    if (nscan() < 3)
+			ival[1] = ID_AP(id,1)
+		    call gargi (ival[2])
+		    if (nscan() < 4)
+			ival[2] = ID_AP(id,2)
 		    call id_dbread (id, cmd, ival, NO, YES)
 		}
 	    } then
@@ -129,14 +138,18 @@ begin
 	case WRITE: # :write - write database entry
 	    prfeature = NO
 	    iferr {
-		ival = ID_AP(id)
+		ival[1] = ID_AP(id,1)
+		ival[2] = ID_AP(id,2)
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
 		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ival, YES)
 	        else {
-		    call gargi (ival)
-		    if (nscan() == 2)
-			ival = ID_AP(id)
+		    call gargi (ival[1])
+		    if (nscan() < 3)
+			ival[1] = ID_AP(id,1)
+		    call gargi (ival[2])
+		    if (nscan() < 4)
+			ival[2] = ID_AP(id,2)
 		    call id_dbwrite (id, cmd, ival, YES)
 		}
 	    } then
@@ -146,11 +159,15 @@ begin
 	    iferr {
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), YES, YES)
+		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			YES, YES)
 	        else {
-		    call gargi (ival)
-		    if (nscan() == 2)
-			ival = ID_AP(id)
+		    call gargi (ival[1])
+		    if (nscan() < 3)
+			ival[1] = ID_AP(id,1)
+		    call gargi (ival[2])
+		    if (nscan() < 4)
+			ival[2] = ID_AP(id,2)
 		    call id_dbread (id, cmd, ival, YES, YES)
 		}
 	    } then
@@ -175,13 +192,13 @@ begin
 	    } else
 		ID_MATCH(id) = rval[1]
 	case MAXFEATURES: # :maxfeatures - set max num features for auto find
-	    call gargi (ival)
+	    call gargi (ival[1])
 	    if (nscan() == 1) {
 	        call printf ("maxfeatures %d\n")
 		    call pargi (ID_MAXFEATURES(id))
 		prfeature = NO
 	    } else
-		ID_MAXFEATURES(id) = ival
+		ID_MAXFEATURES(id) = ival[1]
 	case MINSEP: # :minsep - set minimum feature separation allowed
 	    call gargr (rval[1])
 	    if (nscan() == 1) {
@@ -210,7 +227,7 @@ begin
 		case 3:
 		    call printf ("labels pixel\n")
 		case 4:
-		    call printf ("labels coords\n")
+		    call printf ("labels coord\n")
 		case 5:
 		    call printf ("labels user\n")
 		case 6:

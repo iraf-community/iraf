@@ -1,5 +1,6 @@
 # Make the ASTUTIL package.
 
+$call	asttools
 $call	relink
 $exit
 
@@ -9,7 +10,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools -lcurfit -lbev"
+	$set	LIBS = "-lasttools -lxtools -lcurfit -lbev"
 
 	$update	libpkg.a
 	$omake	x_astutil.x
@@ -20,18 +21,29 @@ install:
 	$move	xx_astutil.e noaobin$x_astutil.e
 	;
 
-libpkg.a:
+asttools:
+	$checkout libasttools.a noaolib$
+	$update	libasttools.a
+	$checkin libasttools.a noaolib$
+	;
+
+libasttools.a:
 	@asttools
+	;
+
+libpkg.a:
 	@pdm
 
 	airmass.x	
-	ccdtime.x	
+	ccddb.x
 	galactic.x	<fset.h>
 	precess.x	<fset.h>
+	t_asthedit.x	<error.h> <evvexpr.h> <ctype.h> <chars.h> <lexnum.h>
+	t_asttimes.x	<error.h>
+	t_ccdtime.x	
 	t_gratings.x	<error.h> <math.h>
+	t_obs.x
+	t_rvcorrect.x	rvcorrect.com <error.h>
 	t_setairmass.x	<imhdr.h> <error.h>
 	t_setjd.x	<error.h> <imhdr.h> <ctype.h>
-	t_asttimes.x	<error.h>
-	t_rvcorrect.x	rvcorrect.com <error.h>
-	t_obs.x
 	;

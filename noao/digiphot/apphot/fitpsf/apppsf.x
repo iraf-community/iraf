@@ -50,7 +50,7 @@ begin
 	switch (AP_PSFUNCTION(psf)) {
 	case AP_RADGAUSS:
 	    call printf (
-	    "%s x: %0.2f y: %0.2f sg: %0.3f a: %0.2f s: %0.2f e: %s\n") 
+	    "%s  %8.2f %8.2f  %6.3f %8g %8g  %s\n") 
 		call pargstr (Memc[imname])
 		call pargr (Memr[AP_PPARS(psf)+1])
 		call pargr (Memr[AP_PPARS(psf)+2])
@@ -62,13 +62,13 @@ begin
 		else
 		    call pargstr ("ok")
 	case AP_ELLGAUSS:
-	    call printf ("%s x: %0.2f y: %0.2f xsg: %0.3f ysg: %0.3f ")
+	    call printf ("%s  %8.2f %8.2f  %6.3f %6.3f  ")
 		call pargstr (Memc[imname])
 		call pargr (Memr[AP_PPARS(psf)+1])
 		call pargr (Memr[AP_PPARS(psf)+2])
 		call pargr (Memr[AP_PPARS(psf)+3])
 		call pargr (Memr[AP_PPARS(psf)+4])
-	    call printf ("pa: %0.1f a: %0.2f s: %0.2f e: %s\n")
+	    call printf ("%6.1f %8g %8g  %s\n")
 		call pargr (Memr[AP_PPARS(psf)+5])
 		call pargr (Memr[AP_PPARS(psf)])
 		call pargr (Memr[AP_PPARS(psf)+6])
@@ -77,13 +77,13 @@ begin
 		else
 		    call pargstr ("ok")
 	case AP_MOMENTS:
-	    call printf ("%s x: %0.2f y: %0.2f rg: %0.3f el: %0.3f ")
+	    call printf ("%s  %8.2f %8.2f  %6.3f %6.3f ")
 		call pargstr (Memc[imname])
 		call pargr (Memr[AP_PPARS(psf)+1])
 		call pargr (Memr[AP_PPARS(psf)+2])
 		call pargr (Memr[AP_PPARS(psf)+3])
 		call pargr (Memr[AP_PPARS(psf)+4])
-	    call printf ("pa: %0.1f a: %0.2f s: %0.2f e: %s\n")
+	    call printf ("%6.1f  %8g %8g  %s\n")
 		call pargr (Memr[AP_PPARS(psf)+5])
 		call pargr (Memr[AP_PPARS(psf)])
 		call pargr (Memr[AP_PPARS(psf)+6])
@@ -92,6 +92,8 @@ begin
 		else
 		    call pargstr ("ok")
 	}
+
+	call sfree (sp)
 end
 
 

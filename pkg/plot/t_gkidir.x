@@ -88,7 +88,7 @@ begin
 	    if (op_code == GKI_MFTITLE) {
 		# No need to look at gtext commands any more - found a title.
 		seek_text = NO
-		nchars_max = min (Mems[gki + GKI_MFTITLE_N - 1], SZ_TEXT)
+		nchars_max = min (int(Mems[gki+GKI_MFTITLE_N-1]), SZ_TEXT)
 		call achtsc (Mems[gki+GKI_MFTITLE_T-1], tx_string, nchars_max)
 		tx_string[nchars_max+1] = EOS
 	    }

@@ -66,18 +66,17 @@ begin
 
 	case VCORRELATION_PLOT:
 	    call sp_vcorrelation (rv, title, xlbl, ylbl, x1, x2)
-	    if (where == BOTTOM) {
-		do i = 1, npts 
-		    Memr[xdata+i-1] = real (rv_shift2vel(rv,WRKPIXX(rv,i)))
-	        fnpts = npts
-	    } 
 	    if (RV_DCFLAG(rv) == -1 && (dtype == SUMMARY_PLOT ||
 		dtype == BINARY_PLOT)) {
 		    x1 = RV_WINL(rv) - RV_WINDOW(rv)
 		    x2 = RV_WINR(rv) + RV_WINDOW(rv)
 		    fnpts = RV_CCFNPTS(rv)
 		    call amovr (WRKPIXX(rv,1), Memr[xdata], fnpts)
-	    }
+	    } else if (where == BOTTOM) {
+		do i = 1, npts 
+		    Memr[xdata+i-1] = real (rv_shift2vel(rv,WRKPIXX(rv,i)))
+	        fnpts = npts
+	    } 
 
 	case FOURIER_PLOT:
 	    call sp_fourier (rv, dtype, where, rinpt, pldata, title, 
@@ -231,9 +230,11 @@ begin
 		}
 
 		if (dtype == SUMMARY_PLOT || dtype == BINARY_PLOT) {
+		    call sp_color_viewport (gp)
 	            call glabax (gp, "", xlbl, ylbl) 
 
 		} else if (RV_DCFLAG(rv) == -1) {
+		    call sp_color_viewport (gp)
 	            call glabax (gp, title, xlbl, ylbl) 
 
 		} else {
@@ -244,6 +245,7 @@ begin
 		    call gswind (gp, v1, v2, y1, y2)
 		    call gseti (gp, G_YDRAWAXES, 0)
 		    call gseti (gp, G_XDRAWAXES, 2)
+		    call sp_color_viewport (gp)
 		    call glabax (gp, "", "", "") 	# Draw top axis
 
 		    call gseti (gp, G_WCS, 2)		# Draw bottom labels
@@ -260,10 +262,12 @@ begin
 	    call gseti (gp, G_LABELTICKS, NO)		# Set attributes
 	    call gseti (gp, G_DRAWTICKS, NO)
 
-	    if (where==TOP) 				# Do the label
+	    if (where==TOP) { 				# Do the label
 	        call glabax (gp, title, "", "")
-	    else if (where == MIDDLE) 
+	    } else if (where == MIDDLE) {
+		call sp_color_viewport (gp)
 		call glabax (gp, "", "", "") 
+	    }
 
 	    call gseti (gp, G_LABELTICKS, YES)	# Restore attributes
 	    call gseti (gp, G_DRAWTICKS, YES)
@@ -271,13 +275,6 @@ begin
 	} else if (pltype == FOURIER_PLOT || pltype == PS_PLOT || 
 	    pltype == FILTER_PLOT) {
 	      if (where==TOP) { 			# Do the label
-		call gseti (gp, G_WCS, 4)		# Do the plot title
-		call gswind (gp, x1, x2, y1, y2)
-	        call gsview (gp, 0.115, 0.95, 0.51, 0.91)
-		call gseti (gp, G_XDRAWAXES, 0)
-		call gseti (gp, G_YDRAWAXES, 0)
-	        call glabax (gp, title, "", "")
-
 		call gseti (gp, G_WCS, 1)		# Do the top axis
 		call gswind (gp, x1, x2, y1, y2)
 	        call gsview (gp, 0.115, 0.95, 0.51, 0.865)
@@ -285,6 +282,14 @@ begin
 		call gseti (gp, G_XDRAWTICKS, 2)
 		call gseti (gp, G_YDRAWAXES, 0)
 	        call glabax (gp, "", "", "")
+
+		call gseti (gp, G_WCS, 4)		# Do the plot title
+		call gswind (gp, x1, x2, y1, y2)
+	        #call gsview (gp, 0.115, 0.95, 0.51, 0.865)
+	        call gsview (gp, 0.115, 0.95, 0.51, 0.91)
+		call gseti (gp, G_XDRAWAXES, 0)
+		call gseti (gp, G_YDRAWAXES, 0)
+	        call glabax (gp, title, "", "")
 
 	  	call gseti (gp, G_WCS, 2)		# Remainder of top plot
 		call gseti (gp, G_YDRAWAXES, 3)
@@ -306,6 +311,7 @@ begin
 		call gseti (gp, G_XLABELTICKS, YES)
 		call gseti (gp, G_XDRAWAXES, 1)
 
+		call sp_color_viewport (gp)
 	        call glabax (gp, "", xlbl, ylbl)
 
 		call gseti (gp, G_XDRAWAXES, 2)		# Draw top boundary
@@ -332,11 +338,14 @@ begin
 	    } else if (where == BOTTOM) {
 		call gseti (gp, G_XLABELTICKS, YES)
 		call gseti (gp, G_XDRAWAXES, 3)
+		call sp_color_viewport (gp)
 	        call glabax (gp, "", xlbl, ylbl)
 	    }
 
-	} else
+	} else {
+	    call sp_color_viewport (gp)
 	    call glabax (gp, title, xlbl, ylbl)
+	}
 
 	call gflush (gp)
 end
@@ -371,23 +380,28 @@ begin
 	    right = RV_WINR(rv)
 	    switch (where) {
 	    case TOP:
-		call gseti (gp, G_PLTYPE, 2)
+		call gseti (gp, G_PLTYPE, GL_DASHED)
+		call gseti (gp, G_PLCOLOR, C_RED)
 		call gline (gp, left, y1, left, y2)
 		call gline (gp, right, y1, right, y2)
-		call gseti (gp, G_PLTYPE, 1)
+		call gseti (gp, G_PLTYPE, GL_SOLID)
+		call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 	    	call gline (gp, x1, 0.0, x2, 0.0) 		# Zero level
 	    case MIDDLE:
 		# Actual plot window
-		call gseti (gp, G_PLTYPE, 2)
+		call gseti (gp, G_PLTYPE, GL_DASHED)
+		#call gseti (gp, G_PLCOLOR, C_RED)
 		call gline (gp, real(left-RV_WINDOW(rv)), y1, 
 		    		real(left-RV_WINDOW(rv)), y2)
 		call gline (gp, real(right+RV_WINDOW(rv)), y1, 
 		    		real(right+RV_WINDOW(rv)), y2)
 		# Parameter plot window
-		call gseti (gp, G_PLTYPE, 3)
+		call gseti (gp, G_PLTYPE, GL_DOTTED)
+		call gseti (gp, G_PLCOLOR, C_RED)
 		call gline (gp, left, y1, left, y2)
 		call gline (gp, right, y1, right, y2)
-		call gseti (gp, G_PLTYPE, 1)
+		call gseti (gp, G_PLTYPE, GL_SOLID)
+		call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 	    	call gline (gp, x1, 0.0, x2, 0.0) 		# Zero level
 	    case BOTTOM:
 	        call gseti (gp, G_WCS, 2)
@@ -396,7 +410,9 @@ begin
 	                call gpmark (gp, xdata[RV_ISTART(rv)], 
 			    pldata[RV_ISTART(rv)], pnpts, 4, 2., 2.)
 	 		call rv_draw_fit (rv, gp, NO)
+			call gseti (gp, G_PLCOLOR, C_GREEN)
 	 	        call rv_draw_background (rv, gp)
+			call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 		    } else {
 			i = DBL_I1(rv)
 	                call gpmark (gp, xdata[i], pldata[i], DBL_NFITP(rv), 
@@ -461,6 +477,7 @@ real	l, r
 int	i
 
 begin
+	call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
 	switch (pltype) {
 	case FOURIER_PLOT, PS_PLOT:
 	    if (dtype == OBJECT_SPECTRUM) {
@@ -483,23 +500,23 @@ begin
 	    if (RV_WHERE(rv) == TOP) {
 	        call gctran (gp, 0.73, 0.8, x1, y1, 0, 2)
 		if (pltype == FOURIER_PLOT)
-	            call gtext (gp, x1, y1, "Object FFT", "f=b")
+	            call gtext (gp, x1, y1, "Object FFT", "")
 		else
-	            call gtext (gp, x1, y1, "Object PS", "f=b")
+	            call gtext (gp, x1, y1, "Object PS", "")
 	        call gctran (gp, 0.73, 0.77, x1, y1, 0, 1)
 	    } else if (RV_WHERE(rv) == BOTTOM) {
 	        call gctran (gp, 0.73, 0.43, x1, y1, 0, 1)
 		if (pltype == FOURIER_PLOT)
-	            call gtext (gp, x1, y1, "Template FFT", "f=b") 
+	            call gtext (gp, x1, y1, "Template FFT", "") 
 		else
-	            call gtext (gp, x1, y1, "Template PS", "f=b")
+	            call gtext (gp, x1, y1, "Template PS", "")
 	        call gctran (gp, 0.73, 0.4, x1, y1, 0, 1)
 	    }
 	    if (RV_FILTER(rv) == BOTH || RV_FILTER(rv) == OBJ_ONLY) {
 	        if (RVP_WHEN(rv) == BEFORE)
-	            call gtext (gp, x1, y1, "Before Filter", "f=b")
+	            call gtext (gp, x1, y1, "Before Filter", "")
 	        else
-	            call gtext (gp, x1, y1, "After Filter", "f=b")
+	            call gtext (gp, x1, y1, "After Filter", "")
 	    }
 
 	case NORM_PLOT, SPECTRUM_PLOT, PREPARED_PLOT, FILTER_PLOT:
@@ -508,48 +525,51 @@ begin
 		switch (pltype) {
 		case NORM_PLOT:
 		    if (dtype == OBJECT_SPECTRUM)
-	                call gtext (gp, x1, y1, "Norm. Object", "f=b")
+	                call gtext (gp, x1, y1, "Norm. Object", "")
 		    else
-	                call gtext (gp, x1, y1, "Norm. Template", "f=b")
+	                call gtext (gp, x1, y1, "Norm. Template", "")
 		case SPECTRUM_PLOT:
 		    if (dtype == OBJECT_SPECTRUM)
-	               call gtext (gp, x1, y1, "Orig. Object", "f=b")
+	               call gtext (gp, x1, y1, "Orig. Object", "")
 		    else
-	               call gtext (gp, x1, y1, "Orig. Template", "f=b")
+	               call gtext (gp, x1, y1, "Orig. Template", "")
 		case PREPARED_PLOT:
-	            call gtext (gp, x1, y1, "Prepared Object", "f=b")
+	            call gtext (gp, x1, y1, "Prepared Object", "")
 		case FILTER_PLOT:
-	            call gtext (gp, x1, y1, "Filtered Object", "f=b")
+	            call gtext (gp, x1, y1, "Filtered Object", "")
 		}
 	    } else if (RV_WHERE(rv) == BOTTOM) {
 	        call gctran (gp, 0.7, 0.175, x1, y1, 0, 1)
 		switch (pltype) {
 		case NORM_PLOT:
 		    if (dtype == OBJECT_SPECTRUM)
-	                call gtext (gp, x1, y1, "Norm. Object", "f=b")
+	                call gtext (gp, x1, y1, "Norm. Object", "")
 		    else
-	                call gtext (gp, x1, y1, "Norm. Template", "f=b")
+	                call gtext (gp, x1, y1, "Norm. Template", "")
 		case SPECTRUM_PLOT:
 		    if (dtype == OBJECT_SPECTRUM)
-	               call gtext (gp, x1, y1, "Orig. Object", "f=b")
+	               call gtext (gp, x1, y1, "Orig. Object", "")
 		    else
-	               call gtext (gp, x1, y1, "Orig. Template", "f=b")
+	               call gtext (gp, x1, y1, "Orig. Template", "")
 		case PREPARED_PLOT: 
-		    call gtext (gp, x1, y1, "Prepared Temp.", "f=b")
+		    call gtext (gp, x1, y1, "Prepared Temp.", "")
 		case FILTER_PLOT:
 		    if (dtype == OBJECT_SPECTRUM)
-	                call gtext (gp, x1, y1, "Filtered Object", "f=b")
+	                call gtext (gp, x1, y1, "Filtered Object", "")
 		    else if (dtype == REFER_SPECTRUM)
-	                call gtext (gp, x1, y1, "Filtered Temp.", "f=b")
+	                call gtext (gp, x1, y1, "Filtered Temp.", "")
 		}
 	    }
 	    if (dtype != SUMMARY_PLOT) {
-		if (RV_WHERE(rv) == TOP)
-	 	    call rv_mark_regions (RV_OSAMPLE(rv), gp)
-		else
-	 	    call rv_mark_regions (RV_RSAMPLE(rv), gp)
+		if (pltype != PREPARED_PLOT) {
+		    if (RV_WHERE(rv) == TOP)
+	 	        call rv_mark_regions (RV_OSAMPLE(rv), gp)
+		    else
+	 	        call rv_mark_regions (RV_RSAMPLE(rv), gp)
+		}
 	    } else if (dtype == SUMMARY_PLOT && RV_WHERE(rv) == TOP) {
 		if (SR_COUNT(RV_OSAMPLE(rv)) != ALL_SPECTRUM) {
+		    call gseti (gp, G_PLCOLOR, C_GREEN)
 		    do i = 1, SR_COUNT(RV_OSAMPLE(rv)) {
             		l = SRANGE(RV_OSAMPLE(rv),i)
             		r = ERANGE(RV_OSAMPLE(rv),i)
@@ -560,6 +580,7 @@ begin
             		}
 	 	        call mark_range (gp, l, r)
 		    }
+		    call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 		}
 	    }
 	
@@ -567,8 +588,36 @@ begin
 	    # Write the text
 	    call gsview (gp, 0.05, 0.97, 0.30, 0.9)
 	    call gswind (gp, 0.08, 0.97, 0.30, 0.9)
+	    call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 	    call gtext (gp, 0.075, 0.45, "Correlation\000", "p=d")
 	}
+	call gseti (gp, G_TXCOLOR, C_FOREGROUND)
+end
+
+
+# SP_COLOR_VIEWPORT - Fill the specified viewport with the current background
+# color.  For color terminals such as XGterm the background color is only
+# drawn in the first graph on the screen.
+
+procedure sp_color_viewport (gp)
+
+pointer	gp					#I graphics pointer
+
+real	x1, x2, y1, y2, xv[5], yv[5]
+
+begin
+	# Get the current viewport boundaries.
+	call ggwind (gp, x1, x2, y1, y2)
+
+	# Fill the polygon vector and color the area.
+        xv[1] = x1;  yv[1] = y1
+        xv[2] = x2;  yv[2] = y1
+        xv[3] = x2;  yv[3] = y2
+        xv[4] = x1;  yv[4] = y2
+        xv[5] = x1;  yv[5] = y1
+        call gseti (gp, G_FACOLOR, 0)
+        call gfill (gp, xv, yv, 4, GF_SOLID)
+	call gflush (gp)
 end
 
 
@@ -596,6 +645,8 @@ begin
 	    if (pltype == PREPARED_PLOT) {
                 i = int ((RV_GLOB_W2(rv) - RV_GLOB_W1(rv)) / RV_OWPC(rv) + 1)
 	        x2 = fft_pow2 (i)
+		if (RV_RW0(rv) > RV_OW2(rv) || RV_OW0(rv) > RV_RW2(rv))
+	    	    x2 = x2 * 2
 	    } else
 		x2 = real (fnpts)
 	    for (i=int(x2); i>=1; i=i-1)
@@ -751,7 +802,7 @@ begin
 	    call strcpy ("Frequency", Memc[x_lbl], SZ_FNAME)
 	    x1 = 0.0
 	    x2 = (real (fnpts) / RVP_FFT_ZOOM(rv)) / (2. * real (fnpts))
-	    x2 = real (fnpts) / RVP_FFT_ZOOM(rv)
+	    #x2 = real (fnpts) / RVP_FFT_ZOOM(rv)
 	case BOTTOM:
 	    call strcpy ("Wavenumber", Memc[x_lbl], SZ_FNAME)
 	    x1 = 1.

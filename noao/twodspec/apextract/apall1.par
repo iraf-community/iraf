@@ -8,7 +8,6 @@ verbose,b,h,)_.verbose,,,"Verbose output?
 
 # DEFAULT APERTURE PARAMETERS
 "
-dispaxis,i,h,)apall.dispaxis,,,>apall.dispaxis
 lower,r,h,)apall.lower,,,>apall.lower
 upper,r,h,)apall.upper,,,>apall.upper
 apidtable,s,h,)apall.apidtable,,,">apall.apidtable
@@ -77,17 +76,17 @@ t_grow,r,h,)apall.t_grow,,,">apall.t_grow
 background,s,h,)apall.background,,,>apall.background
 skybox,i,h,)apall.skybox,,,>apall.skybox
 weights,s,h,)apall.weights,,,>apall.weights
-pfit,s,h,)apall.pfit,,,>apall.pfiT
+pfit,s,h,)apall.pfit,,,>apall.pfit
 clean,b,h,)apall.clean,,,>apall.clean
 nclean,r,h,0.5,,,Maximum number of pixels to clean
-niterate,i,h,2,0,,Number of profile fitting iterations
+niterate,i,h,5,0,,Number of profile fitting iterations
 saturation,r,h,)apall.saturation,,,>apall.saturation
 readnoise,s,h,)apall.readnoise,,,>apall.readnoise
 gain,s,h,)apall.gain,,,>apall.gain
 lsigma,r,h,)apall.lsigma,,,>apall.lsigma
 usigma,r,h,)apall.usigma,,,>apall.usigma
-polysep,r,h,0.6,0.1,1,Marsh algorithm polynomial spacing
-polyorder,i,h,6,1,,Marsh algorithm polynomial order
+polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,)apall.nsubaps,,,">apall.nsubaps
 
 # ANSWER PARAMETERS

@@ -320,24 +320,43 @@ end
 
 procedure t_daytime()
 
-int fd, nchars
-int ndopen(), read()
-char line[SZ_LINE]
+int	fd, nchars, ip
+char	hostname[SZ_FNAME]
+char	line[SZ_LINE], netpath[SZ_LINE]
+int	ndopen(), read(), strlen()
 
 begin
-	iferr (fd = ndopen("inet:daytime",READ_WRITE))
+	# Open the daytime service on the named host or the local host.
+	call clgstr ("host", hostname, SZ_FNAME)
+	if (strlen(hostname) > 0) {
+	    call sprintf (netpath, SZ_LINE, "inet:daytime:%s")
+		call pargstr (hostname)
+	    iferr (fd = ndopen (netpath, READ_WRITE)) {
+		call printf ("cannot access host\n")
+		return
+	    }
+	} else {
+	    iferr (fd = ndopen("inet:daytime",READ_WRITE))
 		call printf("fail 1\n")
-	iferr (fd = ndopen("inet:daytime:localhost",READ_WRITE))
+	    iferr (fd = ndopen("inet:daytime:localhost",READ_WRITE))
 		call printf("fail 2\n")
+	}
 
-	call fseti(fd, F_CANCEL, OK)
+	# Read and print the daytime text.
+	call fseti (fd, F_CANCEL, OK)
 	nchars = read (fd, line, SZ_LINE)
 	if (nchars > 0) {
 	    call strupk (line, line, SZ_LINE)
-	    call putline (STDOUT, line)
+	    for (ip=1;  line[ip] != EOS;  ip=ip+1)
+		if (line[ip] == '\n') {
+		    line[ip] = EOS
+		    break
+		}
+	    call printf ("%s\n")
+		call pargstr (line)
 	}
 
-	call close(fd)
+	call close (fd)
 end
 
 

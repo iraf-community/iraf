@@ -12,8 +12,8 @@ include  defs
    character ngetch
 
    integer i
-   external index
-   integer index
+#  external index
+#  integer index
 
 #  string digits "0123456789abcdefghijklmnopqrstuvwxyz"
 

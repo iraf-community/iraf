@@ -6,11 +6,11 @@
 #define import_stdio
 #include <iraf.h>
 
+#include "config.h"
 #include "operand.h"
 #include "mem.h"
 #include "grammar.h"
 #include "opcodes.h"
-#include "config.h"
 #include "param.h"
 #include "task.h"
 
@@ -27,6 +27,7 @@
 
 extern	char *nullstr;
 extern	int cldebug;
+extern	int cltrace;
 static	dd_f();
 
 
@@ -35,127 +36,156 @@ static	dd_f();
  * instructions.  Done directly.
  */
 d_stack (locpc, ss)
-register unsigned locpc;
+register int locpc;
 int ss;
 {
 	register struct codeentry *cep;
-	int opcode;
-	int errs;
-
-	errs = 0;
+	int n, opcode, errs = 0;
+	
 	do {
-		cep = coderef (locpc);
-		eprintf ("%6d: ", locpc);
-		opcode = cep->c_opcode;
+	    cep = coderef (locpc);
+	    opcode = cep->c_opcode;
 
-		switch (opcode) {
-		case ABSARGSET:	 eprintf ("absargset"); goto string;
-		case ADDASSIGN:	 eprintf ("addassign"); goto string;
-		case ASSIGN:	 eprintf ("assign\t"); goto string;
-		case CALL:	 eprintf ("call\t"); goto string;
-		case CATASSIGN:	 eprintf ("catassign"); goto string;
-		case DIVASSIGN:	 eprintf ("divassign"); goto string;
-		case GSREDIR:	 eprintf ("gsredir"); goto string;
-		case INDIRABSSET: eprintf ("indirabsset"); goto string;
-		case INSPECT:	 eprintf ("inspect\t"); goto string;
-		case INTRINSIC:	 eprintf ("intrinsic"); goto string;
-		case MULASSIGN:	 eprintf ("mulassign"); goto string;
-		case OSESC:	 eprintf ("os_escape"); goto string;
-		case PUSHPARAM:	 eprintf ("pushparam"); goto string;
-		case SUBASSIGN:	 eprintf ("subassign"); goto string;
-		case SWOFF:	 eprintf ("swoff\t"); goto string;
-		case SWON:	 eprintf ("swon"); goto string;
-string:
-			eprintf ("\t%s\n", (char *)&cep->c_args);
-			break;
+	    if ((n = d_instr (stderr, "", locpc)) <= 0) {
+		errs++;
+		locpc += 2;
+	    } else
+		locpc += n;
 
-		case PUSHCONST:	eprintf ("pushconst"); goto op;
-op:
-			{   struct operand *op;
-
-			    op = (struct operand *) &cep->c_args;
-			    eprintf ("\t");
-			    if ((op->o_type & OT_BASIC) == OT_STRING)
-				eprintf ("`");
-			    fprop (stderr, op);
-			    if ((op->o_type & OT_BASIC) == OT_STRING)
-				eprintf ("'");
-			    eprintf ("\n");
-			}
-			break;
-
-		case ADD:	 eprintf ("add\n"); break;
-		case ADDPIPE:	 eprintf ("addpipe\n"); break;
-		case ALLAPPEND:	 eprintf ("allappend\n"); break;
-		case ALLREDIR:	 eprintf ("allredir\n"); break;
-		case AND:	 eprintf ("and\n"); break;
-		case APPENDOUT:	 eprintf ("append\n"); break;
-		case CHSIGN:	 eprintf ("chsign\n"); break;
-		case CONCAT:	 eprintf ("concat\n"); break;
-		case DEFAULT:    eprintf ("default\n"); break;
-		case DIV:	 eprintf ("div\n"); break;
-		case END:	 eprintf ("end\n"); break;
-		case EQ:	 eprintf ("eq\n"); break;
-		case EXEC:	 eprintf ("exec\n"); break;
-		case FSCAN:	 eprintf ("fscan\n"); break;
-		case FSCANF:	 eprintf ("fscanf\n"); break;
-		case GE:	 eprintf ("ge\n"); break;
-		case GETPIPE:	 eprintf ("getpipe\n"); break;
-		case GT:	 eprintf ("gt\n"); break;
-		case IMMED:	 eprintf ("immed\n"); break;
-		case LE:	 eprintf ("le\n"); break;
-		case LT:	 eprintf ("lt\n"); break;
-		case MUL:	 eprintf ("mul\n"); break;
-		case NE:	 eprintf ("ne\n"); break;
-		case NOT:	 eprintf ("not\n"); break;
-		case OR:	 eprintf ("or\n"); break;
-		case POW:	 eprintf ("pow\n"); break;
-		case PRINT:	 eprintf ("print\n"); break;
-		case REDIR:	 eprintf ("redir\n"); break;
-		case REDIRIN:	 eprintf ("redirin\n"); break;
-		case RETURN:	 eprintf ("return\n"); break;
-		case SCAN:	 eprintf ("scan\n"); break;
-		case SCANF:	 eprintf ("scanf\n"); break;
-		case SUB:	 eprintf ("sub\n"); break;
-		case SWITCH:     eprintf ("switch\n"); break;
-
-		case BIFF:	 eprintf ("biff\t"); goto offset;
-		case GOTO:	 eprintf ("goto\t"); goto offset;
-offset:
-		    /* print offset with sign, - or +, in all cases	*/
-		    if ((int)cep->c_args <= 0)
-			goto oneint;	/* pick up sign there	*/
-		    else
-			eprintf ("\t+%d\n", cep->c_args);
-		    break;
-
-		case CASE:       eprintf ("case\n"); goto oneint;
-		case INDIRPOSSET: eprintf ("indirposset"); goto oneint;
-		case POSARGSET:	 eprintf ("posargset"); goto oneint;
-		case RMPIPES:	 eprintf ("rmpipes\t"); goto oneint;
-oneint:
-		    eprintf ("\t%d\n", cep->c_args);
-		    break;
-
-		/* no longer used; keep in case needed for later expansion.
-		case CLTASK:	 eprintf ("cltask\t"); goto twoint;
-		case CLXFER:	 eprintf ("xfer\t"); goto twoint;
-		case CLXMIT:	 eprintf ("xmit\t"); goto twoint;
-twoint:
-		    eprintf ("\t%d, %d\n", cep->c_args, *(&cep->c_args+1));
-		    break;
-		 */
-
-		default:
-		    eprintf ("bad opcode, %d, at pc %d\n", opcode, locpc);
-		    errs++;
-		}
-
-		locpc += cep->c_length;
-		if (ss > 0 && --ss == 0)	/* ss > 0 done first!	*/
-		    errs = 100;			/* simulate end		*/
+	    if (ss > 0 && --ss == 0)		/* ss > 0 done first!	*/
+		errs = 100;			/* simulate end		*/
 
 	} while (opcode != END && errs < 10);
+}
+
+
+/* D_INSTR -- Decode a single instruction on the output file.  The length of
+ * the instruction in memel is returned as the function value.
+ */
+d_instr (fp, prefix, locpc)
+FILE *fp;
+char *prefix;
+register int locpc;
+{
+	register struct codeentry *cep;
+	int opcode, extra=0;
+
+	cep = coderef (locpc);
+	opcode = cep->c_opcode;
+
+	fprintf (fp, "%s%6d+%d: ", prefix, locpc, cep->c_length);
+
+	switch (opcode) {
+	case ABSARGSET:   fprintf (fp, "absargset"); goto string;
+	case ADDASSIGN:   fprintf (fp, "addassign"); goto string;
+	case ASSIGN:	  fprintf (fp, "assign"); goto string;
+	case CALL:	  fprintf (fp, "call\t"); goto string;
+	case CATASSIGN:	  fprintf (fp, "catassign"); goto string;
+	case DIVASSIGN:	  fprintf (fp, "divassign"); goto string;
+	case GSREDIR:	  fprintf (fp, "gsredir"); goto string;
+	case INDIRABSSET: fprintf (fp, "indirabsset"); goto string;
+	case INSPECT:	  fprintf (fp, "inspect\t"); goto string;
+	case INTRINSIC:	  fprintf (fp, "intrinsic"); goto string;
+	case MULASSIGN:	  fprintf (fp, "mulassign"); goto string;
+	case OSESC:	  fprintf (fp, "os_escape"); goto string;
+	case PUSHPARAM:	  fprintf (fp, "pushparam"); goto string;
+	case SUBASSIGN:	  fprintf (fp, "subassign"); goto string;
+	case SWOFF:	  fprintf (fp, "swoff\t"); goto string;
+	case SWON:	  fprintf (fp, "swon"); goto string;
+string:
+	    fprintf (fp, "\t%s\n", (char *)&cep->c_args);
+	    break;
+
+	case PUSHCONST:	  fprintf (fp, "pushconst"); goto op;
+op:
+	    {   struct operand *op;
+
+		op = (struct operand *) &cep->c_args;
+		fprintf (fp, "\t");
+		if ((op->o_type & OT_BASIC) == OT_STRING)
+		    fprintf (fp, "`");
+		fprop (stderr, op);
+		if ((op->o_type & OT_BASIC) == OT_STRING)
+		    fprintf (fp, "'");
+		fprintf (fp, "\n");
+	    }
+	    break;
+
+	case ADD:	  fprintf (fp, "add\n"); break;
+	case ADDPIPE:	  fprintf (fp, "addpipe\n"); break;
+	case ALLAPPEND:	  fprintf (fp, "allappend\n"); break;
+	case ALLREDIR:	  fprintf (fp, "allredir\n"); break;
+	case AND:	  fprintf (fp, "and\n"); break;
+	case APPENDOUT:	  fprintf (fp, "append\n"); break;
+	case CHSIGN:	  fprintf (fp, "chsign\n"); break;
+	case CONCAT:	  fprintf (fp, "concat\n"); break;
+	case DEFAULT:     fprintf (fp, "default\n"); break;
+	case DIV:	  fprintf (fp, "div\n"); break;
+	case END:	  fprintf (fp, "end\n"); break;
+	case EQ:	  fprintf (fp, "eq\n"); break;
+	case EXEC:	  fprintf (fp, "exec\n"); break;
+	case FSCAN:	  fprintf (fp, "fscan\n"); break;
+	case FSCANF:	  fprintf (fp, "fscanf\n"); break;
+	case GE:	  fprintf (fp, "ge\n"); break;
+	case GETPIPE:	  fprintf (fp, "getpipe\n"); break;
+	case GT:	  fprintf (fp, "gt\n"); break;
+	case IMMED:	  fprintf (fp, "immed\n"); break;
+	case LE:	  fprintf (fp, "le\n"); break;
+	case LT:	  fprintf (fp, "lt\n"); break;
+	case MUL:	  fprintf (fp, "mul\n"); break;
+	case NE:	  fprintf (fp, "ne\n"); break;
+	case NOT:	  fprintf (fp, "not\n"); break;
+	case OR:	  fprintf (fp, "or\n"); break;
+	case POW:	  fprintf (fp, "pow\n"); break;
+	case PRINT:	  fprintf (fp, "print\n"); break;
+	case REDIR:	  fprintf (fp, "redir\n"); break;
+	case REDIRIN:	  fprintf (fp, "redirin\n"); break;
+	case RETURN:	  fprintf (fp, "return\n"); break;
+	case SCAN:	  fprintf (fp, "scan\n"); break;
+	case SCANF:	  fprintf (fp, "scanf\n"); break;
+	case SUB:	  fprintf (fp, "sub\n"); break;
+	case SWITCH:      fprintf (fp, "switch\n"); break;
+
+	case BIFF:	  fprintf (fp, "biff\t"); goto offset;
+	case GOTO:	  fprintf (fp, "goto\t"); goto offset;
+offset:
+	    /* Print offset with sign, - or +, in all cases. */
+	    if ((int)cep->c_args <= 0)
+		goto oneint;	/* pick up sign there	*/
+	    else
+		 fprintf (fp, "\t+%d\n", cep->c_args);
+	    break;
+
+	case CASE:        fprintf (fp, "case\n"); goto oneint;
+	case INDIRPOSSET: fprintf (fp, "indirposset"); goto oneint;
+	case POSARGSET:	  fprintf (fp, "posargset"); goto oneint;
+	case RMPIPES:	  fprintf (fp, "rmpipes\t"); goto oneint;
+oneint:
+	    fprintf (fp, "\t%d\n", cep->c_args);
+	    break;
+
+	/* Used for arrays. */
+	case PUSHINDEX:   fprintf (fp, "pushindex"); goto oneint;
+	case INDXINCR:    fprintf (fp, "indxincr");
+	    /* Output two jump offsets. */
+	     fprintf (fp, "\t%d, %d\t", cep->c_args, *(&cep->c_args+1));
+
+	    /* Output array index ranges: {beg, end} * N. */
+	    {   memel *ip = (memel *) &cep->c_args;
+		int i, n = (int)ip[2];
+		for (ip += 2, i=0;  i < n;  i++)
+		    fprintf (fp, "%d:%d ", (int)*ip++, (int)*ip++);
+		fprintf (fp, "\n");
+		extra = 2*n + 1;
+	    }
+	    break;
+
+	default:
+	    fprintf (fp, "bad opcode, %d, at pc %d\n", opcode, locpc);
+	    return (-1);
+	}
+
+	return (cep->c_length + extra);
 }
 
 
@@ -329,6 +359,14 @@ d_off()
 	cldebug = 0;
 }
 
+/* Enable/disable instruction tracing.
+ */
+d_trace (value)
+int value;
+{
+	cltrace = value;
+}
+
 
 /* Dump operand stack until underflow occurs.
  */
@@ -339,5 +377,62 @@ e_dumpop()
 	forever {
 	    o = popop();
 	    oprop (&o);
+	}
+}
+
+
+/* Format a multiline exec-task message string for debug output.
+ */
+d_fmtmsg (fp, prefix, message, width)
+FILE *fp;
+char *prefix;
+char *message;
+int width;
+{
+	register char *ip, *op, *cp;
+	char lbuf[SZ_COMMAND], obuf[SZ_COMMAND];
+	int len_prefix, nchars;
+
+	len_prefix = strlen (prefix);
+
+	for (ip=message, op=obuf;  *ip;  ) {
+	    /* Get next message line. */
+	    for (cp=lbuf, nchars=0;  *cp++ = *ip;  ip++, nchars++) {
+		if (*ip == '\\' && *(ip+1) == '\n') {
+		    *cp++ = 'n';
+		    nchars += 2;
+		    ip += 2;
+		    break;
+		} else if (*ip == '\n') {
+		    *(cp-1) = '\\';
+		    *cp++ = 'n';
+		    nchars += 2;
+		    ip++;
+		    break;
+		}
+	    }
+	    *cp++ = '\0';
+
+	    /* Flush output line if it is full. */
+	    if (len_prefix + op-obuf + nchars > width)
+		if (op > obuf) {
+		    *op++ = '\0';
+		    fprintf (fp, "%s%s\n", prefix, obuf);
+		    op = obuf;
+		} else {
+		    fprintf (fp, "%s%s\n", prefix, lbuf);
+		    op = obuf;
+		    continue;
+		}
+
+	    /* Copy line to output buffer. */
+	    for (cp=lbuf;  *cp;  )
+		*op++ = *cp++;
+	}
+
+	/* Flush anything left in output buffer. */
+	if (op > obuf) {
+	    *op++ = '\0';
+	    fprintf (fp, "%s%s\n", prefix, obuf);
 	}
 }

@@ -24,7 +24,7 @@ real	u1, u2, v1, v2, x1, x2, y1, y2, rval
 
 int	apfitcenter(), apfitsky(), apwmag(), apstati(), clgcur(), ap_showplot()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_cdannulus()
-real	ap_csigma(), ap_ccthresh(), ap_crgrow(), ap_crclean(), ap_crclip()
+real	ap_csigma(), ap_crgrow(), ap_crclean(), ap_crclip()
 real	ap_cdatamin(), ap_cdatamax()
 
 begin
@@ -52,7 +52,8 @@ begin
 
 	call printf (
 	 "Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 
@@ -62,8 +63,6 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 	    case 'f':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	    case 'h':
-	        rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 's':
 	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'l':
@@ -122,6 +121,6 @@ begin
 	    pier = apwmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 		YCENTER), apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
 		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
-	call appplot (ap, im, 0, cier, sier, pier, gd, apstati (ap, RADPLOTS))
+	call ap_pplot (ap, im, 0, gd, apstati (ap, RADPLOTS))
 	call ap_qpmag (ap, cier, sier, pier)
 end

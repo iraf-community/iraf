@@ -22,7 +22,7 @@ pointer	ccd			# CCD structure pointer
 
 int	i, first, last, navg, npts
 int	nc, nl, c1, c2, l1, l2
-pointer	sp, str, image, buf, x, overscan
+pointer	sp, str, errstr, buf, x, overscan
 
 real	asumr()
 bool	clgetb(), ccdflag()
@@ -34,6 +34,11 @@ begin
 	if (!clgetb ("overscan") || ccdflag (IN_IM(ccd), "overscan"))
 	    return
 
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (errstr, SZ_LINE, TY_CHAR)
+	call imstats (IN_IM(ccd), IM_IMAGENAME, Memc[str], SZ_LINE)
+
 	# Check bias section.
 	nc = IM_LEN(IN_IM(ccd),1)
 	nl = IM_LEN(IN_IM(ccd),2)
@@ -42,20 +47,19 @@ begin
 	l1 = BIAS_L1(ccd)
 	l2 = BIAS_L2(ccd)
 	if ((c1 < 1) || (c2 > nc) || (l1 < 1) || (l2 > nl)) {
-	    call smark (sp)
-	    call salloc (str, SZ_LINE, TY_CHAR)
-	    call salloc (image, SZ_LINE, TY_CHAR)
-	    call imstats (IN_IM(ccd), IM_IMAGENAME, Memc[image], SZ_FNAME)
-	    call sprintf (Memc[str], SZ_LINE,
+	    call sprintf (Memc[errstr], SZ_LINE,
 		"Error in bias section: image=%s[%d,%d], biassec=[%d:%d,%d:%d]")
-		call pargstr (Memc[image])
+		call pargstr (Memc[str])
 		call pargi (nc)
 		call pargi (nl)
 		call pargi (c1)
 		call pargi (c2)
 		call pargi (l1)
 		call pargi (l2)
-	    call error (0, Memc[str])
+	    call error (0, Memc[errstr])
+	}
+	if ((c1 == 1) && (c2 == nc) && (l1 == 1) && (l2 == nl)) {
+	    call error (0, "Bias section not specified or given as full image")
 	}
 
 	# If no processing is desired then print overscan strip and return.
@@ -65,12 +69,9 @@ begin
 		call pargi (c2)
 		call pargi (l1)
 		call pargi (l2)
+		call sfree (sp)
 		return
 	}
-
-	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call imstats (IN_IM(ccd), IM_IMAGENAME, Memc[str], SZ_LINE)
 
 	# Determine the overscan section parameters. The readout axis
 	# determines the type of overscan.  The step sizes are ignored.

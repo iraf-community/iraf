@@ -22,9 +22,9 @@ char	diskfile[SZ_LINE]
 int	filerange[2 * MAX_RANGES + 1]
 int	nfiles, filenumber, recsize, listin
 
-bool	clgetb(), mtneedfileno()
+bool	clgetb()
 int	decode_ranges(), get_next_number(), mscan()
-int	fntopnb(), clgfil()
+int	fntopnb(), clgfil(), mtneedfileno()
 int	mtfile()
 errchk	mscan
 

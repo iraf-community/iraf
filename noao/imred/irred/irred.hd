@@ -2,5 +2,6 @@
 
 $doc = "./doc/"
 
+irlincor	hlp=doc$irlincor.hlp,	src=t_irlincor.x
 mosproc		hlp=doc$mosproc.hlp,	src=mosproc.cl
 revisions	sys=Revisions

@@ -165,10 +165,16 @@ lexicon()
 	 */
 	while (ch = input())
 	    if (ch == ' ' || ch == '\t') {
-		if (lexcol > 0)
+space:		if (lexcol > 0)
 		    lhs = 0;
 		if (inarglist)
 		    newarg++;
+	    } else if (ch == '\\') {
+		if ((ch = input()) != '\n') {
+		    unput (ch);
+		    break;
+		} else
+		    goto space;
 	    } else
 		break;
 	

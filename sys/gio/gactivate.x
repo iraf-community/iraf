@@ -14,8 +14,9 @@ procedure gactivate (gp, flags)
 pointer	gp			# graphics descriptor
 int	flags			# AW_ bit flags; zero if no flags
 
-pointer	w
 int	junk, fd
+pointer	w, sp, devname
+
 extern	zardbf()
 int	fstati(), grdwcs(), and(), locpr()
 errchk	gki_openws, gki_getwcs, gki_reactivatews
@@ -30,12 +31,27 @@ begin
 	    return
 	}
 
+	call smark (sp)
+	call salloc (devname, SZ_PATHNAME, TY_CHAR)
+
 	fd = GP_FD(gp)
 
 	# Physically open and activate the workstation.  NOTE - the flags
 	# argument is currently ignored; this should be fixed at some point.
+	# The UI specification file name, if any, is passed as part of the
+	# logical device specification (a bit of a kludge, but it avoids
+	# changing the GKI datastream prototcol and hence obsoleting all the
+	# old graphics kernels).
 
-	call gki_openws (fd, GP_DEVNAME(gp), GP_ACMODE(gp))
+	if (GP_UIFNAME(gp) != EOS) {
+	    # gki_openws device = devname,uifname.
+	    call sprintf (Memc[devname], SZ_PATHNAME, "%s,%s")
+		call pargstr (GP_DEVNAME(gp))
+		call pargstr (GP_UIFNAME(gp))
+	} else
+	    call strcpy (GP_DEVNAME(gp), Memc[devname], SZ_PATHNAME)
+
+	call gki_openws (fd, Memc[devname], GP_ACMODE(gp))
 
 	# If the device is being opened in APPEND mode retrieve the WCS
 	# from either the GIO code in the CL process (if talking to a
@@ -52,4 +68,5 @@ begin
 	}
 
 	GP_GFLAGS(gp) = GP_GFLAGS(gp) + (GF_WSOPEN+GF_WSACTIVE)
+	call sfree (sp)
 end

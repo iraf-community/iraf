@@ -294,3 +294,134 @@ begin
 	else 
 	    return (0)
 end
+
+
+# PH_5R2ISORT -- Vector quicksort on the first and second indices arrays,
+# where the second index is used to resolve ambiguities in the first index.
+# An additional 5 input arrays are sorted as well.
+
+procedure ph_5r3isort (findex, sindex, i1, d1, d2, d3, d4, d5, naperts, npix)
+
+int	findex[ARB]		# first index array which is sorted on
+int	sindex[ARB]		# second index array which is sorted on
+int	i1[ARB]			# the 3 integer array
+real	d1[ARB]			# the first input data array
+real	d2[ARB]			# the second input data array
+real	d3[naperts,ARB]		# the third input data array
+real	d4[naperts,ARB]		# the fourth input data array
+real	d5[naperts,ARB]		# the fifth input data array
+int	naperts			# number of apertures
+int	npix			# number of pixels
+
+int	fpivot, spivot, tempi
+int	i, j, k, l,p, lv[LOGPTR], uv[LOGPTR]
+real	tempr
+int	ph_2aicompare()
+define	swapi {tempi=$1;$1=$2;$2=tempi}
+define	swapr {tempr=$1;$1=$2;$2=tempr}
+
+begin
+	lv[1] = 1
+	uv[1] = npix
+	p = 1
+
+	while (p > 0) {
+	    if (lv[p] >= uv[p])			# only one elem in this subset
+		p = p - 1			# pop stack
+	    else {
+		# Dummy do loop to trigger the Fortran optimizer.
+		do p = p, ARB {
+		    i = lv[p] - 1
+		    j = uv[p]
+
+		    # Select as the pivot the element at the center of the
+		    # array, to avoid quadratic behavior on an already sorted
+		    # array.
+
+		    k = (lv[p] + uv[p]) / 2
+		    swapi (findex[j], findex[k])
+		    swapi (sindex[j], sindex[k])
+		    swapi (i1[j], i1[k]) 
+		    swapr (d1[j], d1[k])
+		    swapr (d2[j], d2[k])
+		    do  l = 1, naperts {
+		        swapr (d3[l,j], d3[l,k])
+		        swapr (d4[l,j], d4[l,k])
+		        swapr (d5[l,j], d5[l,k])
+		    }
+		    fpivot = findex[j]			 # pivot line
+		    spivot = sindex[j]
+
+		    while (i < j) {
+			for (i=i+1; ph_2aicompare (findex[i], sindex[i], fpivot,
+			    spivot) < 0; i=i+1)
+			    ;
+			for (j=j-1;  j > i;  j=j-1)
+			    if (ph_2aicompare (findex[j], sindex[j], fpivot,
+			        spivot) <= 0)
+				break
+			if (i < j) {                     # switch elements
+			    swapi (sindex[i], sindex[j])
+			    swapi (findex[i], findex[j]) # interchange elements
+			    swapi (i1[i], i1[j])
+			    swapr (d1[i], d1[j])
+			    swapr (d2[i], d2[j])
+		    	    do  l = 1, naperts {
+			        swapr (d3[l,i], d3[l,j])
+			        swapr (d4[l,i], d5[l,j])
+			        swapr (d5[l,i], d5[l,j])
+			    }
+			}
+		    }
+
+		    j = uv[p]			   # move pivot to position i
+		    swapi (sindex[i], sindex[j])
+		    swapi (findex[i], findex[j])   # interchange elements
+		    swapi (i1[i], i1[j])
+		    swapr (d1[i], d1[j])
+		    swapr (d2[i], d2[j])
+		    do  l = 1, naperts {
+		        swapr (d3[l,i], d3[l,j])
+		        swapr (d4[l,i], d4[l,j])
+		        swapr (d5[l,i], d5[l,j])
+		    }
+
+		    if (i-lv[p] < uv[p] - i) {	# stack so shorter done first
+			lv[p+1] = lv[p]
+			uv[p+1] = i - 1
+			lv[p] = i + 1
+		    } else {
+			lv[p+1] = i + 1
+			uv[p+1] = uv[p]
+			uv[p] = i - 1
+		    }
+
+		    break
+		}
+		p = p + 1			# push onto stack
+	    }
+	}
+end
+
+
+# PH_2AICOMPARE -- Comparison routine for PH_5R3ISORT.
+
+int procedure ph_2aicompare (findex, sindex, fpivot, spivot)
+
+int	findex		# the first index value
+int	sindex		# the second index value
+int	fpivot		# the first pivot value
+int	spivot		# the second pivot value
+
+begin
+	if (findex < fpivot)
+	    return (-1)
+	else if (findex > fpivot)
+	    return (1)
+	else if (sindex < spivot)
+	    return (-1)
+	else if (sindex > spivot)
+	    return (1)
+	else 
+	    return (0)
+end

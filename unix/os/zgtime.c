@@ -25,11 +25,25 @@ XLONG	*cpu_time;				/* milliseconds */
 	struct	tms t;
 	long	time();
 	time_t	gmt_to_lst();
+	long	cpu, clkfreq;
+
+#ifdef LINUX
+	clkfreq = CLK_TCK;
+#else
+	clkfreq = CLKFREQ;
+#endif
 
 	times (&t);
 	*clock_time = gmt_to_lst ((time_t)time(0));
 
-	/* Eliminate floating computation for the Alliant:
+	/* We don't want any floating point in the kernel code so do the
+	 * following computation using integer arithment, taking care to
+	 * avoid integer overflow (unless unavoidable) or loss of precision.
 	 */
-	*cpu_time = (t.tms_utime + t.tms_cutime) * 1000 / HZ;
+	cpu = (t.tms_utime + t.tms_cutime);
+
+	if (cpu > MAX_LONG/1000)
+	    *cpu_time = cpu / clkfreq * 1000;
+	else
+	    *cpu_time = cpu * 1000 / clkfreq;
 }

@@ -14,8 +14,8 @@ int	nextn		# Number of extinction table values
 pointer	ecv		# Residual extinction curve
 
 int	i, j, n, nwaves
-real	w, s, fit, ext, dext, cveval()
-double	sum, sum2
+real	w, fit, ext, dext, cveval()
+double	sum, sum2, s
 pointer	sp, waves, sens, xp, yp, zp
 
 begin

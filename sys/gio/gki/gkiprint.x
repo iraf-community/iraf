@@ -512,7 +512,8 @@ begin
 
 	if (stream != NULL)
 	    iferr {
-		call gki_retcursorvalue (stream, 0, 0, EOF, 1)
+		# gki_retcursorvalue (stream, cn, key, sx, sy, rn, rx, ry)
+		call gki_retcursorvalue (stream, 0, EOF, 0, 0, 0, 0, 0)
 		call flush (stream)
 	    } then
 		;

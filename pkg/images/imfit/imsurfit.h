@@ -38,6 +38,3 @@ define	BORDER		4
 define	SECTIONS	5
 define	CIRCLE		6
 define	INVCIRCLE	7
-
-# miscellaneous
-define	MAX_NRANGES	100

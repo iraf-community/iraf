@@ -1,0 +1,23 @@
+# Sample transformation section for the Porter UBVRI system
+
+transformation
+
+fit   u1=0.0, u2=0.65, u3=0.000
+const u4=0.0
+UFIT : mU = (UB + BV + V) + u1 + u2 * XU + u3 * UB + u4 * UB * XU
+
+fit   b1=0.0, b2=0.35, b3=0.000
+const b4=0.0
+BFIT : mB = (BV + V) + b1 + b2 * XB + b3 * BV + b4 * BV * XB
+
+fit   v1=0.0, v2=0.17, v3=0.000
+const v4=0.0
+VFIT : mV = V + v1 + v2 * XV + v3 * BV + v4 * BV * XV
+
+fit   r1=0.0, r2=0.08, r3=0.000
+const r4=0.0
+RFIT : mR = (V - VR)  + r1 + r2 * XR + r3 * VR + r4 * VR * XR
+
+fit   i1=0.0, i2=0.03, i3=0.000
+const i4=0.0
+IFIT : mI = (V - VR - RI) + i1 + i2 * XI + i3 * RI + i4 * RI * XI

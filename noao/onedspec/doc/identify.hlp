@@ -1,4 +1,4 @@
-.help identify Mar92 noao.onedspec
+.help identify Mar93 noao.onedspec
 .ih
 NAME
 identify -- Identify features in one dimensional image vectors
@@ -13,15 +13,23 @@ List of images in which to identify features and fit coordinate functions.
 .ls section = "middle line"
 If an image is not one dimensional or given as a one dimensional image
 section then the image section given by this parameter is used.  The
-section is used to define the initial vector and the direction (columns
-or lines) of the image vectors to be fit.  The image is still considered
-to be two dimensional and it is possible to change columns or lines
+section is used to define the initial vector and the direction (columns,
+lines, or "z") of the image vectors to be fit.  The image is still considered
+to be two or three dimensional and it is possible to change the data vector
 within the program.
 
 The section parameter may be specified directly as an image section or
-in one of the following forms: "line #", "column #", "# line", or "#
-column" where # may be a line or column number or one of the special
-strings "middle" or "last".  Abbreviations are allowed though beware
+in one of the following forms
+
+.nf
+line|column|x|y|z first|middle|last|# [first|middle|last|#]]
+first|middle|last|# [first|middle|last|#] line|column|x|y|z
+.fi
+
+where each field can be one of the strings separated by | except for #
+which is an integer number.  The field in [] is a second designator
+which is used with 3D data.  See the example section for examples of
+this syntax.  Abbreviations are allowed though beware
 that 'l' is not a sufficient abbreviation.
 .le
 .ls database = "database"
@@ -36,8 +44,14 @@ Some standard line lists are available in the directory "linelists$":
 	cl> page linelists$README
 .fi
 .le
-.ls nsum = 10
-Number of lines or columns to be summed when the image is two dimensional.
+.ls nsum = "10"
+Number of lines, columns, or bands across the designated vector axis to be
+summed when the image is a two or three dimensional spatial spectrum.
+It does not apply to multispec format spectra.  If the image is three
+dimensional an optional second number can be specified for the higher
+dimensional axis  (the first number applies to the lower axis number and
+the second to the higher axis number).  If a second number is not specified
+the first number is used for both axes.
 .le
 .ls match = 5.
 The maximum difference for a match between the feature coordinate function
@@ -101,7 +115,7 @@ rejected regardless of their residuals.
 
 The following parameters control the input and output.
 .ls autowrite = no
-Automatically write or update the database.  If no then attempting to
+Automatically write or update the database?  If no then attempting to
 exit the program if the feature data and fit have been modified results
 in a query.  If yes exiting the program automatically updates the database.
 .le
@@ -142,10 +156,10 @@ not changed.
 (I)nitialize (delete features and coordinate fit).
 .le
 .ls j
-Go to the preceding line or column in a 2D or multispec image.
+Go to the preceding line, column, or band in a 2D/3D or multispec image.
 .le
 .ls k
-Go to the next line or column in a 2D or multispec image.
+Go to the next line, column, or band in a 2D/3D or multispec image.
 .le
 .ls l
 (L)ocate features in the coordinate list.  A coordinate function must be
@@ -160,7 +174,8 @@ estimate.
 Move the cursor or zoom window to the (n)ext feature (same as +).
 .le
 .ls o
-Go to the specified line or column in a 2D or multispec image.
+Go to the specified line, column, or band in a 2D/3D or multispec image.
+For 3D images two numbers are specified.
 .le
 .ls p
 (P)an to the original window after (z)ooming on a feature.
@@ -185,6 +200,9 @@ is \fInot\fR recentered.  This is used to mark an arbitrary position.
 .ls u
 Enter a new (u)ser coordinate for the current feature.
 When (m)arking a new feature the user coordinate is also requested.
+.ls v
+Modify the fitting weight of the current feature.  The weights are
+integers with the lowest weight being the default of 1.
 .le
 .ls w
 (W)indow the graph.  A window prompt is given and a number of windowing
@@ -251,10 +269,10 @@ Set or show the feature width in pixels.
 Set a new image or show the current image.
 .le
 .ls :labels value
-Set or show the feature label type (none, index, pixel, coords, user, or both).
+Set or show the feature label type (none, index, pixel, coord, user, or both).
 None produces no labeling, index labels the features sequentially in order
 of pixel position, pixel labels the features by their pixel coordinates,
-coords labels the features by their user coordinates (such as wavelength),
+coord labels the features by their user coordinates (such as wavelength),
 user labels the features by the user or line list supplied string, and
 both labels the features by both the user coordinates and user strings.
 .le
@@ -297,18 +315,18 @@ user coordinates may be determined from the identified features.  A
 user coordinate list may be defined to automatically identify additional
 features.  This task is used to measure positions of features,
 determine dispersion solutions for spectra, and to identify features in
-two dimensional images for mapping a two dimensional coordinate
-transformation.
+two and three dimensional images for mapping a two or three dimensional
+coordinate transformation.
 
 Each image in the input list is considered in turn.  If the image is
 not one dimensional or a one dimensional section of an image
 then the image section given by the parameter
-\fIsection\fR is used.  This parameter may be specified in several ways
-as described in the parameter section.  The image section is used to
-select a starting vector and image axis.
+\fIsection\fR is used.  This parameter may be specified in several ways as
+described in the parameter and examples sections.  The image section is used
+to select a starting vector and image axis.
 
 If the image is not one dimensional or in multispec format then the number
-of lines or columns given by the parameter \fInsum\fR are summed.
+of lines, columns, or bands given by the parameter \fInsum\fR are summed.
 The one dimensional image vector is graphed.  The initial feature list and
 coordinate function are read from the database if an entry exists.  The
 features are marked on the graph.  The image coordinates are in pixels
@@ -350,7 +368,8 @@ and '-' are used.  The '.' selects the feature nearest the cursor, the
 'n' and '+' select the next feature, and the '-' selects the previous
 feature relative to the current feature in the feature list as ordered
 by pixel coordinate.  These keys are useful when redefining the user
-coordinate with the 'u' key and when examining features in zoom mode.
+coordinate with the 'u' key, changing the fitting weight of a feature
+with 'v', and when examining features in zoom mode.
 
 If two or more features are identified spanning the range of the
 data or if a coordinate function is defined then the 'l' key may be
@@ -398,7 +417,7 @@ This is only an approximate correction for shifts in the raw spectra
 since these shifts are in pixels and the coordinate function should
 also be appropriately shifted.
 
-Features may be delete with the key 'd'.  All features are deleted
+Features may be deleted with the key 'd'.  All features are deleted
 when the 'a' key immediately precedes the delete key.  Deleting the
 features does not delete the coordinate function.  Features deleted in the
 curve fitting package also are removed from the feature list upon
@@ -464,27 +483,144 @@ simple text files.  The text files have names beginning with 'id' followed
 by the entry name, usually the name of the image.  The database text files
 consist of a number of records.  A record begins with a line starting with the
 keyword "begin".  The rest of the line is the record identifier.  Records
-read and written by \fBecidentify\fR have "identify" as the first word of the
+read and written by \fBidentify\fR have "identify" as the first word of the
 identifier.  Following this is a name which may be specified following the
 ":read" or ":write" commands.  If no name is specified then the image name
 is used.  For 1D spectra the database entry includes the aperture number
 and so to read a solution from a aperture different than the current image
-and aperture number must be specified.  For 2D images the entry name
+and aperture number must be specified.  For 2D/3D images the entry name
 has the 1D image section which is what is specified to read the entry.
 The lines following the record identifier contain
 the feature information and dispersion function coefficients.
+
+The dispersion function is saved in the database as a series of
+coefficients.  The section containing the coefficients starts with the
+keyword "coefficients" and the number of coefficients.
+
+The first four coefficients define the type of function, the order
+or number of spline pieces, and the range of the independent variable
+(the line or column coordinate along the dispersion).  The first
+coefficient is the function type code with values:
+
+.nf
+	Code	Type
+	   1	Chebyshev polynomial
+	   2	Legendre polynomial
+	   3	Cubic spline
+	   4	Linear spline
+.fi
+
+The second coefficient is the order (actually the number of terms) of
+the polynomial or the number of pieces in the spline.
+
+The next two coefficients are the range of the independent variable over
+which the function is defined.  These values are used to normalize the
+input variable to the range -1 to 1 in the polynomial functions.  If the
+independent variable is x and the normalized variable is n, then
+
+.nf
+	n = (2 * x - (xmax + xmin)) / (xmax - xmin)
+.fi
+
+where xmin and xmax are the two coefficients.
+
+The spline functions divide the range into the specified number of
+pieces.  A spline coordinate s and the nearest integer below s,
+denoted as j, are defined by
+
+.nf
+	s = (x - xmin) / (xmax - xmin) * npieces
+	j = integer part of s
+.fi
+
+where npieces are the number of pieces.
+
+The remaining coefficients are those for the appropriate function.
+The number of coefficients is either the same as the function order
+for the polynomials, npieces+1 for the linear spline, or npieces + 3
+for the cubic spline.
+
+1. Chebyshev Polynomial
+
+The polynomial can be expressed as the sum
+
+.nf
+	y = sum from i=1 to order {c_i * z_i}
+.fi
+
+where the the c_i are the coefficients and the z_i are defined
+interatively as:
+
+.nf
+	z_1 = 1
+	z_2 = n
+	z_i = 2 * n * z_{i-1} - z_{i-2}
+.fi
+
+2. Legendre Polynomial
+
+The polynomial can be expressed as the sum
+
+.nf
+	y = sum from i=1 to order {c_i * z_i}
+.fi
+
+where the the c_i are the coefficients and the z_i are defined
+interatively as:
+
+.nf
+	z_1 = 1
+	z_2 = n
+	z_i = ((2*i-3) * n * z_{i-1} - (i-2) * z_{i-2}) / (i-1)
+.fi
+
+3. Linear Spline
+
+The linear spline is evaluated as
+
+.nf
+	y = c_j * a + c_{j+1} * b
+.fi
+
+where j is as defined earlier and a and b are fractional difference
+between s and the nearest integers above and below
+
+.nf
+	a = (j + 1) - s
+	b = s - j
+.fi
+
+4.  Cubic Spline
+
+The cubic spline is evaluated as
+
+.nf
+	y = sum from i=0 to 3 {c_{i+j} * z_i}
+.fi
+
+where j is as defined earlier.  The term z_i are computed from
+a and b, as defined earlier, as follows
+
+.nf
+	z_0 = a**3
+	z_1 = 1 + 3 * a * (1 + a * b)
+	z_2 = 1 + 3 * b * (1 + a * b)
+	z_3 = b**3
+.fi
 .ih
 EXAMPLES
-Because this task is interactive and has many possible applications
+1.  Because this task is interactive and has many possible applications
 it is difficult to provide actual examples.  Instead some uses of the task
 are described.
 
-1.  For defining distortions in the slit dimension as a function of
+.ls o
+For defining distortions in the slit dimension as a function of
 wavelength the positions of objects are marked at some wavelength.
 The task \fBreidentify\fR is then used to trace the features to other
 wavelengths.
-
-2.  For determining dispersion solutions in a one dimensional
+.le
+.ls o
+For determining dispersion solutions in a one dimensional
 spectrum an arc calibration is used.  Three emission features are marked
 and the (l)ocate key is used to find additional features from a
 coordinate list of arc lines.  The dispersion solution is fit interactively
@@ -492,13 +628,71 @@ and badly determined or misidentified lines are deleted.  The
 solution may be written to the database or transfered to the object
 spectrum by reading the object image and deleting all the features.
 Deleting the features does not delete the coordinate function.
+.le
+.ls o
+For determining a two or three dimensional coordinate transformation the a
+dispersion solution is determined at one slit position in a long slit arc
+spectrum or one spatial position in a Fabry-Perot spectrum as in the
+previous example.  The features are then traced to other positions with the
+task \fBreidentify\fR.
+.le
 
-3.  For determining a two dimensional coordinate transformation the
-a dispersion solution is determined at one slit position in an arc spectrum
-as in the previous example.  The features are then traced to other
-slit positions with the task \fBreidentify\fR.
+2.  For images which are two or three dimensional it is necessary to
+specify the image axis for the data vector and the number of pixels at each
+point across the vector direction to sum.  One way specify a vector is to
+use an image section to define a vector.  For example, to select column
+20:
+
+.nf
+    cl> identify obj[20,*]
+.fi
+
+The alternative is to use the section parameter.  Below are some examples
+of the section parameter syntax for an image "im2d" which is 100x200
+and "im3d" which is 100x200x50.  On the left is the section string syntax
+and on the right is the image section
+
+.nf
+    Section parameter |  Image section      |  Description
+    ------------------|---------------------|---------------------
+    first line        |  im2d[*,1]          |  First image line
+    middle column     |  im2d[50,*]         |  Middle image column
+    last z            |  im3d[100,200,*]    |  Last image z vector
+    middle last y     |  im3d[50,*,50]      |  Image y vector
+    line 20           |  im2d[*,20]         |  Line 20
+    column 20         |  im2d[20,*]         |  Column 20
+    x 20              |  im2d[*,20]         |  Line 20
+    y 20              |  im2d[20,*]         |  Column 20
+    y 20 30           |  im2d[20,*,30]      |  Column 20
+    z 20 30	      |  im3d[20,30,*]      |  Image z vector
+    x middle          |  im3d[*,100,25]     |  Middle of image
+    y middle          |  im3d[50,*,25]      |  Middle of image
+    z middle          |  im3d[50,100,*]     |  Middle of image
+.fi
+
+The most common usage should be "middle line", "middle column" or "middle z".
+
+The summing factors apply to the axes across the specified vector.  For
+3D images there may be one or two values.  The following shows which axes
+are summed, the second and third columns, when the vector axis is that shown
+in the first column.
+
+.nf
+    Vector axis       |   Sum axis in 2D    |  Sum axes in 3D
+    ------------------|---------------------|--------------------
+         1            |         2           |      2 3                 
+         2            |         1           |      1 3                 
+         3            |         -           |      1 2                 
+.fi
+
 .ih
 REVISIONS
+.ls IDENTIFY V2.10.3
+The section and nsum parameter syntax was extended to apply to 3D
+images.  The previous values and defaults may still be used.
+
+The 'v' key was added to allow assigning weights to features.
+.le
 .ls IDENTIFY V2.10
 The principle revision is to allow multiple aperture images and long slit
 spectra to be treated as a unit.  New keystrokes allow jumping or scrolling

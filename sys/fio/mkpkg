@@ -86,6 +86,7 @@ libsys.a:
 	getlline.x	
 	glongline.x	
 	mktemp.x	
+	ndopen.x
 	note.x		<config.h> <fio.com> <fio.h>
 	nowhite.x	<ctype.h>
 	nullfile.x	<config.h> <fio.h>

@@ -17,10 +17,12 @@ define	LABELOFFSET	1.5		# offset to tick label in ticklen units
 # routine not intended to be competitive with GLABAX.  We draw a box around
 # the edge of the screen, find and label the ticks within the plotting area.
 
-procedure grc_axes (stream, sx, sy)
+procedure grc_axes (stream, sx, sy, raster, rx, ry)
 
-int	stream			# graphics stream
-real	sx, sy			# screen coords of cursor
+int	stream			#I graphics stream
+real	sx, sy			#I screen coords of cursor
+int	raster			#I raster number
+real	rx, ry			#I raster coords of cursor
 
 char	tickformat[SZ_TICKFORMAT], ticklabel[SZ_TICKLABEL]
 pointer tr, w, ap, save_op
@@ -42,7 +44,7 @@ begin
 	lw_save = PL_WIDTH(ap);	PL_WIDTH(ap) = 2.0
 
 	# Select a WCS.
-	call grc_scrtowcs (stream, sx, sy, x1, y1, wcs)
+	call grc_scrtowcs (stream, sx, sy, raster, rx, ry, x1, y1, wcs)
 	w = TR_WCSPTR(tr,wcs)
 
 	# Get the coordinates of the axes corners and the tick parameters.

@@ -18,8 +18,8 @@ pointer	ncoords				# Number of coordinate points
 char	labels[SZ_LINE,IGSPARAMS]	# Axis labels
 
 char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME]
-int	i, j, rec, index, offset, nfeatures
-real	value
+int	i, j, rec, index, nfeatures
+real	value, ltm[2,2], ltv[2]
 pointer	dt, im, mw, ct, x, y, user
 
 int	fc_getim(), dtgeti(), dtscan()
@@ -72,7 +72,10 @@ begin
 
 		if (j != axis) {
 		    call imunmap (im)
-		    next
+		    call eprintf (
+       "Warning: Fit axes don't agree for combine option.  Ignoring %s.\n")
+		       call pargstr (image1)
+		    break
 		}
 
 		# Set the WCS to convert the feature positions from
@@ -80,6 +83,14 @@ begin
 		# to "logical" coordinates currently used by TRANSFORM.
 
 		mw = mw_openim (im)
+		call mw_gltermr (mw, ltm, ltv, 2)
+		if (ltm[1,1] == 0. && ltm[2,2] == 0.) {
+		    ltm[1,1] = ltm[2,1]
+		    ltm[2,1] = 0.
+		    ltm[2,2] = ltm[1,2]
+		    ltm[1,2] = 0.
+		    call mw_sltermr (mw, ltm, ltv, 2)
+		}
 		ct = mw_sctran (mw, "physical", "logical", 1)
 
 		# Allocate memory for the feature information and read
@@ -87,39 +98,38 @@ begin
 
 		nfeatures = dtgeti (dt, rec, "features")
 		if (x == NULL) {
-		    ncoords = nfeatures
-		    call malloc (x, ncoords, TY_REAL)
-		    call malloc (y, ncoords, TY_REAL)
-		    call malloc (user, ncoords, TY_REAL)
+		    call malloc (x, nfeatures, TY_REAL)
+		    call malloc (y, nfeatures, TY_REAL)
+		    call malloc (user, nfeatures, TY_REAL)
 		} else {
-		    ncoords = ncoords + nfeatures
-		    call realloc (x, ncoords, TY_REAL)
-		    call realloc (y, ncoords, TY_REAL)
-		    call realloc (user, ncoords, TY_REAL)
+		    call realloc (x, ncoords+nfeatures, TY_REAL)
+		    call realloc (y, ncoords+nfeatures, TY_REAL)
+		    call realloc (user, ncoords+nfeatures, TY_REAL)
 		}
 
 		do i = 1, nfeatures {
-		    offset = ncoords - nfeatures + i - 1
 		    j = dtscan (dt)
 		    call gargr (value)
 		    switch (axis) {
 		    case 1:
-			Memr[x+offset] = mw_c1tranr (ct, value)
-			Memr[y+offset] = index
+			Memr[x+ncoords] = mw_c1tranr (ct, value)
+			Memr[y+ncoords] = index
 		    case 2:
-			Memr[x+offset] = index
-			Memr[y+offset] = mw_c1tranr (ct, value)
+			Memr[x+ncoords] = index
+			Memr[y+ncoords] = mw_c1tranr (ct, value)
 		    }
 		    call gargr (value)
 		    call gargr (value)
-		    if (!IS_INDEF (value))
-			Memr[user+offset] = value
+		    if (!IS_INDEF (value)) {
+			Memr[user+ncoords] = value
+			ncoords = ncoords + 1
+		    }
 		}
+		call mw_close (mw)
+		call imunmap (im)
 	    }
 
 	    # Finish up
-	    call mw_close (mw)
-	    call imunmap (im)
 	    call dtunmap (dt)
 	}
 

@@ -6,7 +6,8 @@ idfilters,s,a,"",,,The list of filter ids
 imsets,f,a,"",,,The image set file
 observations,f,a,"",,,The output observations file
 obsparams,f,h,"",,,The input observing parameters files
-obscolumns,s,h,"2 3 4",,The format of obsparams
+obscolumns,s,h,"2 3 4 5",,The format of obsparams
+minmagerr,r,h,0.001,0.0,,The minimum magnitude error
 shifts,f,h,"",,,The x and y coordinate shifts file
 apercors,f,h,"",,,The aperture corrections file
 normtime,b,h,no,,,Normalize the exposure times ?

@@ -230,7 +230,7 @@ int	i, pixel
 int	exp, mantissa
 real	tbl[255]
 int	bitupk(), and(), not()
-include	"pow.inc"
+include	"../pow.inc"
 
 begin
 	do i=1, nvalues {	

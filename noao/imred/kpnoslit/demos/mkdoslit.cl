@@ -1,6 +1,9 @@
 # Create demo data if needed.
 
 artdata
+mkexample ("longslit", "demoflat", oseed=4,  nseed=1,
+    errors=no, verbose=yes, list=no)
+mkheader ("demoflat", "demos$demoflat.dat", append=no, verbose=no)
 mkexample ("longslit", "demoarc1", oseed=5,  nseed=1,
     errors=no, verbose=yes, list=no)
 mkheader ("demoarc1", "demos$demoarc1.dat", append=no, verbose=no)

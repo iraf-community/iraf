@@ -35,6 +35,7 @@ begin
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
 	call cal_open (NULL)
+	call ccd_open (0)
 
 	# Process each image.
 	while (imtgetim (listin, Memc[input], SZ_FNAME) != EOF) {
@@ -90,7 +91,7 @@ begin
 	    call free_proc (ccd)
 
 	    # Do special processing.
-	    call mkillumination (Memc[input], Memc[output], YES)
+	    call mkillumination (Memc[input], Memc[output], YES, YES)
 	    if (!streq (Memc[input], Memc[output]))
 		call ccdcopy (Memc[input], Memc[output])
 	}
@@ -100,5 +101,6 @@ begin
 	call imtclose (listin)
 	call imtclose (listout)
 	call cal_close ()
+	call ccd_close ()
 	call sfree (sp)
 end

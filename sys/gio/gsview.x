@@ -19,6 +19,7 @@ begin
 	WCS_SY1(w) = y1
 	WCS_SY2(w) = y2
 
+	WCS_FLAGS(w) = or (WCS_FLAGS(w), WF_DEFINED)
 	GP_WCSSTATE(gp) = MODIFIED
 	call gpl_reset()
 end

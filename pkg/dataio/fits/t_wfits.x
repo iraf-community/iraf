@@ -21,7 +21,7 @@ bool	clgetb()
 double	clgetd()
 int	imtopen(), imtlen (), wft_get_bitpix(), clgeti(), imtgetim()
 int	mtfile(), btoi(), fstati(), fntlenb(), fntgfnb(), mtneedfileno()
-int	wft_blkfac()
+int	wft_blkfac(), fntrfnb(), strlen()
 pointer	fntopnb()
 
 include "wfits.com"
@@ -121,12 +121,13 @@ begin
 		    if (fntgfnb (flist, out_fname, SZ_FNAME) == EOF)
 			 call error (0, "Error reading output file name")
 		} else {
+		    if (fntrfnb (flist, 1, out_fname, SZ_FNAME) == EOF)
+                        call strcpy (fits_files, out_fname, SZ_FNAME)
 		    if (nimages > 1) {
-		        call sprintf (out_fname[1], SZ_FNAME, "%s%04d")
-			    call pargstr (fits_files)
+		        call sprintf (out_fname[strlen(out_fname)+1],
+			    SZ_FNAME, "%04d")
 			    call pargi (file_number)
-		    } else
-		        call strcpy (fits_files, out_fname, SZ_FNAME)
+		    }
 	        }
 	    }
 

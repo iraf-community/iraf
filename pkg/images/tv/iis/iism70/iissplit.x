@@ -20,7 +20,7 @@ short	coord[2]
 include "iis.com"
 
 begin
-	len = min ( n, 2)
+	len = min (int(n), 2)
 	if ( len < 1) {
 	    data[1] = IDS_EOD
 	    return

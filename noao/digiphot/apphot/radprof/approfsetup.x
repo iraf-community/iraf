@@ -24,7 +24,7 @@ real	u1, u2, v1, v2, x1, x2, y1, y2
 int	apfitcenter(), clgcur(), apfitsky(), ap_frprof(), apstati()
 int	ap_showplot()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_cdannulus()
-real	ap_ccthresh(), ap_crprof(), ap_crpstep(), ap_cdatamin()
+real	ap_crprof(), ap_crpstep(), ap_cdatamin()
 real	ap_cdatamax(), ap_crgrow(), ap_crclip(), ap_crclean(), ap_csigma()
 
 begin
@@ -48,7 +48,8 @@ begin
 	call salloc (cmd, SZ_LINE, TY_CHAR)
         call printf (
         "Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 
@@ -58,8 +59,6 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 	    case 'f':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	    case 'h':
-	        rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 's':
 	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'l':
@@ -119,7 +118,6 @@ begin
 	    NULL, gd)
 	rier = ap_frprof (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 	    pier)
-	call ap_rpplot (ap, 0, cier, sier, pier, rier, gd, apstati (ap,
-	    RADPLOTS))
+	call ap_rpplot (ap, 0, gd, apstati (ap, RADPLOTS))
 	call ap_qprprof (ap, cier, sier, pier, rier)
 end

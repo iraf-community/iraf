@@ -1,4 +1,4 @@
-.help centerpars May89 noao.digiphot.apphot
+.help centerpars Dec92 noao.digiphot.apphot
 .ih
 NAME
 centerpars -- edit the centering algorithm parameters
@@ -8,8 +8,9 @@ centerpars
 .ih
 PARAMETERS
 .ls calgorithm = "centroid"
-The centering algorithm to be employed. The "gauss" and "ofilter" options
-depend critically on an accurate estimate of the fwhmpsf parameter in the
+The centering algorithm to be employed.
+The "gauss" and "ofilter" options
+depend critically on the estimate of the fwhmpsf parameter in the
 DATAPARS task.
 The centering options are:
 .ls none
@@ -37,23 +38,31 @@ the marginal distributions in x and y.
 .ls cbox = 5.0  (scale units)
 The width of the subraster used for object centering in units of the
 scale parameter. Cbox needs to be big enough to include a reasonable
-number of pixels  for center determination but not so large as to include
+number of pixels  for center determination but not so large so as to include
 a lot of noise.
+.le
+.ls cthreshold = 0.0 (sigma units)
+Points cthreshold * sigma counts above (emission features) or below
+(absorption features) the estimated data minimum or maximum values respectively
+are used for centering.
+APPHOT users should leave this value at 0.0 which invokes the appropriate
+default thresholding technique for each centering algorithm. Setting cthreshold
+to INDEF turns off thresholding altogether for all the centering algorithms.
+.le
+.ls minsnratio = 1.0
+The minimum signal to noise ratio for object centering. If
+the estimated signal to noise ratio is less than this number the
+computed center will be returned with an error flag.
+.le
+.ls cmaxiter = 10
+The maximum number of iterations performed by the centering algorithm.
+All the centering algorithms use this parameter.
 .le
 .ls maxshift = 1.0  (scale units)
 The maximum permissible shift of the center with respect to the initial
 coordinates in units of the scale parameter.
 If the shift produced by the centering algorithm is
 larger than this, the computed center is returned with an error flag.
-.le
-.ls minsnratio = 1.0
-The minimum signal to noise ratio for object centering. If
-the estimated signal to noise ratio is less than this number the
-computed center will be returned with an error estimate.
-.le
-.ls cmaxiter = 10
-The maximum number of iterations performed by the centering algorithm.
-All the centering algorithms use this parameter.
 .le
 .ls clean = no
 A switch to determine whether or not symmetry-cleaning is to
@@ -69,12 +78,11 @@ The clipping radius for the symmetry-clean algorithm in units of
 the scale parameter.
 .le
 .ls kclean = 3.0  (sigma)
-The number of standard sky deviations for the symmetry-clean algorithm.
+The number of sky background standard deviations for the symmetry-clean
+algorithm.
 .le
 .ls mkcenter = no
-Mark the fitted object centers on the default display device. At present
-this option is only supported if the display device is set to "stdgraph"
-as in the case for example of running off a contour plot.
+Mark the fitted object centers on the displayed image?
 .le
 .ih
 DESCRIPTION
@@ -87,7 +95,6 @@ Note that many of the centering parameters scale with two quantities which
 are data dependent, the scale of the image,
 \fIscale\fR, and the standard deviation of the sky pixels \fIsigma\fR.
 Both of these quantities are parameters in the DATAPARS task.
-The data dependent parameter \fIchtreshold\fR is also stored here.
 
 Using an initial position and \fIscale\fR supplied by the user,
 a subraster of data
@@ -109,33 +116,41 @@ center is used as the center of symmetry.  Pixels which are inside the
 cleaning radius are not edited.
 Pairs of pixels in the cleaning region, r > \fIrclean / scale\fR
 and r <= \fIrclip / scale\fR
-and diammetrically opposed about the center of symmetry are tested for
+and diametrically opposed about the center of symmetry are tested for
 equality.  If the difference between the pixels
-is greater than kclean * sigma, the larger value is replaced by the smaller.
-In the cleaning region the sigma is determined by the
+is greater than \fIkclean * sigma\fR, the larger value is replaced by the
+smaller.  In the cleaning region the sigma is determined by the
 noise model assumed for the data.
 Pairs of pixels in the clipping region, r > \fIrclip / scale\fR
 are tested in the same manner
 as those in the cleaning region. However the sigma employed is the sigma
-of the sky background. APPHOT users are recommended to leave clean
+of the sky background. APPHOT users should leave clean
 set to "no".
 
+New centers are computed using the centering algorithm specified by
+\fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and points
+that are some threshold above (below) an estimate of the local minimum
+(maximum). 
+Values for \fIcthreshold\fR of 0.0, a positive number, and INDEF
+invoke the default thresholding algorithm, a threshold equal to the
+local minimum (maximum) plus  (minus) \fIdatapars.sigma * cthreshold\fR,
+and a threshold exaclty equal to the local minimum (maximum) respectively.
 Next the signal to noise ratio of the subraster is estimated. 
 If the SNR < \fIminsnratio\fR, the new center is still computed but an error
 flag is associated with that object.
 
-New centers are computed using the centering algorithm specified by
-\fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and points
-that are \fIdatapars.cthreshold\fR above the local minimum.
 The default algorithm is \fIcentroid\fR. This centering algorithm
 computes the marginal distributions in x and y of the extracted subraster.
 The intensity weighted mean and mean error of the x and y marginal
-distributions are computed using only points in the marginal array above
-the minimum data pixel plus a threshold value which is either the mean
-or \fIcthreshold\fR if cthreshold is greater than zero.
-This algorithm is similar to that used in MPC (Mountain Photometry Code).
+distributions are computed using only points in the marginal array
+above (below) the minimum (maximum) data pixel plus (minus) a threshold value
+which is either the mean, \fIdatapars.sigma * cthreshold\fR above (below) 
+the local minimum (maximum) if \fIcthreshold\fR is greater than zero, or
+zero above (below) the local minimum (maximum) if \fIcthreshold\fR is
+INDEF.
+This algorithm is similar to that used in KPNO MPC (Mountain Photometry Code).
 Note that this is the only centering algorithm for which the choice of
-\fIdatapars.fwhmpsf\fR is not crucial.
+\fIdatapars.fwhmpsf\fR is not critical.
 The centering algorithm \fIgauss\fR computes the new
 centers by fitting a 1D Gaussian function to the marginal distributions
 in x and y using a fixed \fIdatapars.fwhmpsf\fR.
@@ -143,12 +158,13 @@ Initial guesses for the fit parameters are made from the data
 values. The routines then iterate until a best fit solution is achieved.
 The final choice \fIofilter\fR employs a variation of the optimal filtering
 technique in which the profile is simulated by a triangle function of
-width \fIdatapars.fwhmpsf\fR.
-Detailed descriptions of all the centering algorithms
+width \fIdatapars.fwhmpsf\fR. The default thresholding algorithm for
+all centering algorithms other than "centroid" is no thresholding.
+More detailed descriptions of all the centering algorithms
 can be found in the APPHOT specifications document.
 
 If the computed shift
-in either coordinate < \fImaxshift\fR / \fIscale\fR, the new center is
+in either coordinate > \fImaxshift\fR / \fIscale\fR, the new center is
 returned but an error flag is set.
 
 .ih
@@ -174,14 +190,14 @@ EXAMPLES
 
 	... move to the centerpars parameter and type :e
 
-	... edit the centerpars parameters and type :q
+	... edit the centerpars parameters and type :wq
 
-	... finish editing the phot parameters and type ^Z
+	... finish editing the phot parameters and type :wq
 .fi
 
 4. Save the current CENTERPARS parameter set in a text file ctrnite1.par.
 This can also be done from inside a higher level task as in the
-above example.
+previous example.
 
 .nf
     da> centerpars

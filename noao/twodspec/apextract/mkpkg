@@ -36,8 +36,8 @@ libpkg.a:
 	apedit.x	apertures.h <gset.h> <imhdr.h> <mach.h> <pkg/gtools.h>
 	apextract.x	apertures.h <error.h> <imhdr.h> <mach.h>\
 			<math/iminterp.h> <pkg/gtools.h>
-	apfind.x	apertures.h <imhdr.h>
-	apfindnew.x	apertures.h
+	apfind.x	apertures.h <imhdr.h> <mach.h>
+	apfindnew.x	apertures.h <mach.h>
 	apfit.x		apertures.h <imhdr.h> <imset.h> <pkg/gtools.h>
 	apgetdata.x	<imhdr.h>
 	apgetim.x	
@@ -50,7 +50,9 @@ libpkg.a:
 	apinfo.x	apertures.h
 	apio.x		<time.h>
 	apmask.x	apertures.h <imhdr.h> <pmset.h>
+	apmw.x		<error.h> <imhdr.h> <mwset.h>
 	apnearest.x	apertures.h <mach.h>
+	apnoise.x	apertures.h <gset.h> <pkg/gtools.h>
 	apparams.x	
 	appars.x	<math/iminterp.h>
 	apprint.x	apertures.h

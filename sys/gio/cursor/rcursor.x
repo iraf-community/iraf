@@ -51,20 +51,20 @@ char	outstr[ARB]		# encoded cursor value (output)
 int	maxch
 
 bool	cminit
+int	xroam[9], yroam[9]
 pointer	rc, tr, sp, lbuf, ip
 char	charcon[SZ_CHARCON], ch
-int	index, junk, key, nukey, last_zoom, i, wcs, ppos, ucasein
-real	x, y, xw, yw, dx, dy, xc, yc
-real	x1, x2, y1, y2, v[10]
+real	x1, x2, y1, y2, xt, yt, v[10]
 real	lx1, lx2, ly1, ly2, aspect_ratio
-int	xroam[9], yroam[9]
+real	x, y, rx, ry, xw, yw, dx, dy, xc, yc
+int	junk, key, nukey, last_zoom, i, wcs, ppos, ucasein, raster
 
 bool	ttygetb()
 pointer	grc_open()
-int	strlen(), stridxs()
-int	envfind(), ctocc(), oscmd(), gtr_readcursor(), stg_readtty()
+int	envfind(), ctocc(), oscmd(), gtr_readcursor(), grc_readtty()
 int	grc_cursor(), grc_command(), grc_selectwcs(), grc_mapkey(), ttstati()
 real	ttygetr()
+
 data	xroam /1,0,-1,1,0,-1,1,0,-1/
 data	yroam /1,1,1,0,0,0,-1,-1,-1/
 data	rc /NULL/
@@ -73,7 +73,7 @@ define	coloncmd_ 92
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
 
 	# Allocate and initialize the RCURSOR descriptor.
 	if (rc == NULL) {
@@ -89,11 +89,11 @@ begin
 	# only done once.
 
 	if (cminit) {
-	    if (envfind ("cminit", Memc[lbuf], SZ_LINE) > 0) {
+	    if (envfind ("cminit", Memc[lbuf], SZ_COMMAND) > 0) {
 		ip = lbuf
 		while (IS_WHITE(Memc[ip]) || Memc[ip] == '.')
 		    ip = ip + 1
-		junk = grc_command (rc, stream, Memc[ip], 0., 0.)
+		junk = grc_command (rc, stream, 0.,0.,0,0.,0., Memc[ip])
 	    }
 	    cminit = false
 	}
@@ -118,7 +118,7 @@ begin
 	# Enter cursor mode loop.  The loop terminates when a non cursor mode
 	# keystroke is typed.
 
-	while (grc_cursor (rc, stream, x, y, key, ppos) != EOF) {
+	while (grc_cursor (rc, stream, key,x,y, raster,rx,ry, ppos) != EOF) {
 	    Memc[lbuf] = EOS
 
 	    # As a rule, no processing is performed on escaped keys.  The only
@@ -130,7 +130,7 @@ begin
 	    # be intercepted by cursor mode when ucasein mode is in effect.
 
 	    if (key == '\\') {
-		junk = gtr_readcursor (stream, x, y, key)
+		junk = gtr_readcursor (stream, key, x, y, raster, rx, ry)
 		if (ucasein == YES && IS_UPPER(key))
 		    key = TO_LOWER (key)
 		break
@@ -152,7 +152,7 @@ begin
 		xw = (x2 - x1) / 2.
 		yw = (y2 - y1) / 2.
 		call gtr_ptran (stream, xc-xw, xc+xw, yc-yw, yc+yw)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call grc_restorecurpos (stream, xc, yc)
 
 	    case 'Z':
@@ -162,7 +162,7 @@ begin
 		xw = (x2 - x1) * X_ZOOMFACTOR / 2.
 		yw = (y2 - y1) * Y_ZOOMFACTOR / 2.
 		call gtr_ptran (stream, xc-xw, xc+xw, yc-yw, yc+yw)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call grc_restorecurpos (stream, xc, yc)
 		last_zoom = 3
 
@@ -172,7 +172,7 @@ begin
 		call gtr_gtran (stream, x1, x2, y1, y2)
 		xw = (x2 - x1) * X_ZOOMFACTOR / 2.
 		call gtr_ptran (stream, xc-xw, xc+xw, y1, y2)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call grc_restorecurpos (stream, xc, yc)
 		last_zoom = 1
 
@@ -182,7 +182,7 @@ begin
 		call gtr_gtran (stream, x1, x2, y1, y2)
 		yw = (y2 - y1) * Y_ZOOMFACTOR / 2.
 		call gtr_ptran (stream, x1, x2, yc-yw, yc+yw)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call grc_restorecurpos (stream, xc, yc)
 		last_zoom = 2
 
@@ -193,7 +193,7 @@ begin
 		call grc_scrtondc (x, y, xc, yc)
 		call gtr_gtran (stream, lx1, lx2, ly1, ly2)
 		call gtr_ptran (stream, lx1, lx2, ly1,  yc)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call gtr_writecursor (stream, x, 0.5)
 		last_zoom = 'E'
 
@@ -204,7 +204,7 @@ begin
 		call grc_scrtondc (x, y, xc, yc)
 		call gtr_gtran (stream, lx1, lx2, ly1, ly2)
 		call gtr_ptran (stream, lx1, lx2,  yc, ly2)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call gtr_writecursor (stream, x, 0.5)
 		last_zoom = 'E'
 
@@ -215,8 +215,13 @@ begin
 		call gtr_gtran (stream, lx1, lx2, ly1, ly2)
 		call grc_scrtondc (x, y, x1, y1)
 		call grc_message (stream, "again:")
-		junk = grc_cursor (rc, stream, x2, y2, junk, ppos)
+		junk = grc_cursor (rc, stream, key,x2,y2, raster,rx,ry, ppos)
 		call grc_scrtondc (x2, y2, x2, y2)
+
+		if (x1 > x2)
+		    { xt = x2;  x2 = x1;  x1 = xt }
+		if (y1 > y2)
+		    { yt = y2;  y2 = y1;  y1 = yt }
 
 		if (abs (x1 - x2) < .01)
 		    call gtr_ptran (stream, lx1, lx2, y1, y2)
@@ -225,7 +230,7 @@ begin
 		else
 		    call gtr_ptran (stream, x1, x2, y1, y2)
 
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call gtr_writecursor (stream, 0.5, 0.5)
 		last_zoom = 'E'
 
@@ -251,7 +256,7 @@ begin
 		    call gtr_ptran (stream, x1, x2, y1, y2)
 		}
 
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		call grc_restorecurpos (stream, xc, yc)
 
 	    case 'W':
@@ -259,44 +264,38 @@ begin
 		# transformations.
 
 		call grc_scrtondc (x, y, xc, yc)
-		TR_WCS(tr) = grc_selectwcs (tr, xc, yc)
+		TR_WCS(tr) = grc_selectwcs (tr, raster, xc, yc)
 
 	    case 'C':
 		# Running tally of cursor position.
-		if (ppos == NO) {
-		    call grc_pcursor (stream, x, y)
-		    ppos = YES
-		} else {
-		    call grc_message (stream, "\n\n")
-		    ppos = NO
-		}
+		#if (ppos == NO) {
+		#    call grc_pcursor (stream, x, y, raster, rx, ry)
+		#    ppos = YES
+		#} else {
+		#    call grc_message (stream, "\n\n")
+		#    ppos = NO
+		#}
+
+		call grc_pcursor (stream, x, y, raster, rx, ry)
 
 	    case 'D':
 		# Draw a line by marking the endpoints.
 		call grc_scrtondc (x, y, v[1], v[2])
 		call grc_message (stream, "again:")
-		junk = grc_cursor (rc, stream, x2, y2, junk, ppos)
+		junk = grc_cursor (rc, stream, key,x2,y2, raster,rx,ry, ppos)
 		call grc_scrtondc (x2, y2, v[3], v[4])
 		call grc_polyline (stream, v, 2)
 
 	    case 'T':
 		# Draw a text string.
-		call stg_putline (STDERR, "text: ")
-		junk = stg_readtty (STDIN, Memc[lbuf], SZ_LINE)
-		index = stridxs ("\n", Memc[lbuf])
-		if (index > 0)
-		    Memc[lbuf+index-1] = EOS
-		if (strlen (Memc[lbuf]) == 0) {
-		    call grc_message (stream, "\n\n")
+		if (grc_readtty (stream, "text: ", Memc[lbuf], SZ_COMMAND) <= 0)
 		    next
-		}
-
 		call grc_scrtondc (x, y, xc, yc)
 		call grc_text (stream, xc, yc, Memc[lbuf])
 
 	    case 'A':
 		# Draw and label the axes of the viewport.
-		call grc_axes (stream, x, y)
+		call grc_axes (stream, x, y, raster, rx, ry)
 
 	    case 'B':
 		# Backup one instruction in the frame buffer.
@@ -308,17 +307,17 @@ begin
 
 	    case 'R':
 		# Redraw the screen.
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 
 	    case '0':
 		# Reset and redraw.
 		call gtr_ptran (stream, 0., 1., 0., 1.)
 		call gtr_writecursor (stream, .5, .5)
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 
 	    case '5':
 		# Redraw (null roam request).
-		call grc_redraw (rc, stream, x, y)
+		call grc_redraw (rc, stream, x, y, raster, rx, ry)
 
 	    case '1','2','3','4','6','7','8','9':
 		# Roam.
@@ -328,21 +327,15 @@ begin
 		    dx = (x2 - x1) * X_ROAM * xroam[i]
 		    dy = (y2 - y1) * Y_ROAM * yroam[i]
 		    call gtr_ptran (stream, x1+dx, x2+dx, y1+dy, y2+dy)
-		    call grc_redraw (rc, stream, x, y)
+		    call grc_redraw (rc, stream, x, y, raster, rx, ry)
 		}
 
 	    case ':':
 		# Enter a colon command string and terminate cursor mode.
 
-		call stg_putline (STDERR, ":")
-		junk = stg_readtty (STDIN, Memc[lbuf], SZ_LINE)
-		index = stridxs ("\n", Memc[lbuf])
-		if (index > 0)
-		    Memc[lbuf+index-1] = EOS
-		if (strlen (Memc[lbuf]) == 0) {
-		    call grc_message (stream, "\n\n")
+		# Get the string value.
+		if (grc_readtty (stream, ":", Memc[lbuf], SZ_COMMAND) <= 0)
 		    next
-		}
 
 		# All cursor mode commands must begin with a ".".  An osescape
 		# begins with an "!".
@@ -360,7 +353,8 @@ coloncmd_
 		    last_zoom = 'E'
 
 		    TR_WAITPAGE(tr) = NO
-		    if (grc_command (rc, stream, Memc[lbuf+1], x, y) == EOF) {
+		    if (grc_command (rc, stream, x, y, raster, rx, ry,
+			    Memc[lbuf+1]) == EOF) {
 			key = EOF
 			goto done_
 		    }
@@ -376,7 +370,7 @@ coloncmd_
 		# set the plotter device, else the default stdplot device
 		# will be used.
 
-		call strcpy (".snap", Memc[lbuf], SZ_LINE)
+		call strcpy (".snap", Memc[lbuf], SZ_COMMAND)
 		goto coloncmd_
 
 	    default:
@@ -418,7 +412,7 @@ done_
 		ch = char (key)
 		junk = ctocc (ch, charcon, SZ_CHARCON)
 	    }
-	    call grc_scrtowcs (stream, x, y, xc, yc, wcs)
+	    call grc_scrtowcs (stream, x, y, raster, rx, ry, xc, yc, wcs)
 
 	    call sprintf (outstr, maxch, "%g %g %d %s %s\n")
 		call pargr (xc)
@@ -446,13 +440,15 @@ end
 # algorithm (manual control) uses the F and V keys to directly control the step
 # size.
 
-int procedure grc_cursor (rc, stream, x, y, key, ppos)
+int procedure grc_cursor (rc, stream, key, x, y, raster, rx, ry, ppos)
 
-pointer	rc			# rcursor descriptor
-int	stream			# graphics stream
-real	x, y			# cursor coordinates (output)
-int	key			# keystroke typed (output)
-int	ppos			# print cursor position flag
+pointer	rc			#I rcursor descriptor
+int	stream			#I graphics stream
+int	key			#O keystroke typed
+real	x, y			#O cursor screen coordinates
+int	raster			#O raster number
+real	rx, ry			#O cursor raster coordinates
+int	ppos			#I print cursor position flag
 
 int	speed
 int	xdir, ydir, nukey
@@ -470,7 +466,7 @@ begin
 	ydir  = 0
 	speed = 0
 
-	while (gtr_readcursor (stream, x, y, key) != EOF) {
+	while (gtr_readcursor (stream, key, x, y, raster, rx, ry) != EOF) {
 	    if (grc_mapkey (rc, key, nukey) == NULL)
 		break
 
@@ -560,7 +556,7 @@ begin
 
 	    # Print the cursor position.
 	    if (ppos == YES)
-		call grc_pcursor (stream, x, y)
+		call grc_pcursor (stream, x, y, raster, rx, ry)
 	}
 
 	return (key)
@@ -574,12 +570,12 @@ end
 
 int procedure grc_mapkey (rc, key, nukey)
 
-pointer	rc			# rcursor descriptor
-int	key			# raw key value
-int	nukey			# mapped key value
+pointer	rc			#I rcursor descriptor
+int	key			#U raw key value
+int	nukey			#O mapped key value
 
 begin
-	nukey = key
+	nukey = max(1, min(MAX_KEYS, key))
 	if (RC_CASE(rc) == NO && IS_LOWER(nukey))
 	    nukey = TO_UPPER(nukey)
 
@@ -611,6 +607,40 @@ begin
 end
 
 
+# GRC_READTTY -- Read from the terminal via the graphics kernel.  If the
+# kernel already has message data buffered we merely return that data,
+# otherwise we issue the prompt given and interactively read the data.
+
+int procedure grc_readtty (stream, prompt, obuf, maxch)
+
+int	stream			#I graphics stream
+char	prompt[ARB]		#I prompt, if read is interactive
+char	obuf[ARB]		#O output buffer
+int	maxch			#I max chars out
+
+bool	issue_prompt
+int	nchars, index
+int	stg_msglen(), stg_readtty()
+int	stridxs(), strlen()
+
+begin
+	issue_prompt = (stg_msglen(STDIN) <= 0)
+	if (issue_prompt)
+	    call stg_putline (STDERR, prompt)
+
+	nchars = stg_readtty (STDIN, obuf, maxch)
+	index = stridxs ("\n", obuf)
+	if (index > 0)
+	    obuf[index] = EOS
+	nchars = strlen (obuf)
+
+	if (issue_prompt && nchars == 0)
+	    call grc_message (stream, "\n\n")
+
+	return (nchars)
+end
+
+
 # GRC_MESSAGE -- Write a message on the status line at the bottom of the
 # screen.  If the string is not newline terminated the terminal is left in
 # status line text mode.  To clear the status line and force the terminal
@@ -629,10 +659,12 @@ end
 # GRC_PCURSOR -- Convert the cursor position in screen coordinates to world
 # coordinates and print on the standard output.
 
-procedure grc_pcursor (stream, x, y)
+procedure grc_pcursor (stream, sx, sy, raster, rx, ry)
 
-int	stream			# graphics stream
-real	x, y			# screen coords of cursor
+int	stream			#I graphics stream
+real	sx, sy			#I screen coords of cursor
+int	raster			#I raster number
+real	rx, ry			#I raster coords of cursor
 
 int	wcs
 real	xc, yc
@@ -642,11 +674,14 @@ begin
 	call smark (sp)
 	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
-	call grc_scrtowcs (stream, x, y, xc, yc, wcs)
-	call sprintf (Memc[lbuf], SZ_LINE, "%10g %10g\n")
-	    call pargr (xc)
-	    call pargr (yc)
-	call stg_putline (STDERR, Memc[lbuf])
+	call grc_scrtowcs (stream, sx, sy, raster, rx, ry, xc, yc, wcs)
+	if (abs(xc) > 1 && abs(xc) < 10000 && abs(yc) > 1 && abs(yc) < 10000)
+	    call sprintf (Memc[lbuf], SZ_LINE, "%10.3f %10.3f  \n")
+	else
+	    call sprintf (Memc[lbuf], SZ_LINE, "%12.7g %12.7g  \n")
+	call pargr (xc)
+	call pargr (yc)
 
+	call stg_putline (STDERR, Memc[lbuf])
 	call sfree (sp)
 end

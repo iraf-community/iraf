@@ -4,7 +4,7 @@ include	<imset.h>
 include	<pkg/gtools.h>
 include	"apertures.h"
  
-define	MAXBUF	(512*100)		# Buffer size for column access
+define	MAXBUF	500000		# Buffer size (number of reals) for col access
  
  
 # AP_SCATTER -- Fit and subtract the scattered light from between the apertures.
@@ -13,13 +13,12 @@ define	MAXBUF	(512*100)		# Buffer size for column access
 # be fit are selected from between the apertures (which includes a buffer
 # distance).  The fitting is done using the ICFIT package.  If not smoothing
 # along the dispersion write the scattered light subtracted output directly
-# thus minimizing I/O.  If smoothing write the fits to the output.  During
-# the smoothing process this image is converted to the scattered light
-# subtracted image.  The scattered light image is only created after the
-# output image by subtracting the input from the output.  Things are done
-# in this order since the output is always produced but the scattered light
-# image is often not produced.
- 
+# thus minimizing I/O.  If smoothing save the fits in memory.  During the
+# smoothing process the fits are evaluated at each point along the dispersion
+# and then fit to the create the scattered light subtracted output image.  A
+# scattered light image is only created after the output image by subtracting
+# the input from the output.
+
 procedure ap_scatter (input, output, scatter, aps, naps, line)
  
 char	input[SZ_FNAME]		# Input image
@@ -30,8 +29,8 @@ int	naps			# Number of apertures
 int	line			# Line to be edited
  
 bool	smooth
-int	i, aaxis, daxis, npts, nlines, nscatter, outmode
-pointer	sp, str, in, out, scat, cv, gp, indata, outdata, col, x, y, w 
+int	i, aaxis, daxis, npts, nlines, nscatter, nscatter1, new
+pointer	sp, str, in, out, scat, cv, cvs, gp, indata, outdata, col, x, y, w 
 pointer	ic1, ic2, ic3, gt1, gt2
 data	ic3/NULL/
 
@@ -73,6 +72,7 @@ begin
 	}
 	smooth = apgansb ("anssmooth")
 
+	# Initialize the ICFIT pointers.
 	if (ic1 == NULL || ic3 == NULL) {
 	    call ic_open (ic1)
 	    call clgstr ("apscat1.function", Memc[str], SZ_LINE)
@@ -113,13 +113,14 @@ begin
 	    call erract (EA_WARN)
 	    return
 	}
-	outmode = NEW_COPY
-	iferr (out = immap (output, outmode, in)) {
+	iferr (out = immap (output, NEW_COPY, in)) {
 	    call imunmap (in)
 	    call sfree (sp)
 	    call erract (EA_WARN)
 	    return
 	}
+	if (IM_PIXTYPE(out) != TY_DOUBLE)
+	    IM_PIXTYPE(out) = TY_REAL
  
 	# Allocate memory for curve fitting.
 	call ap_sort (i, aps, naps, 1)
@@ -147,17 +148,19 @@ begin
 	    else
 		i = line
 	    indata = NULL
-	    while (ap_gline (ic1, gt1, in, aaxis, aaxis, i, indata) != EOF) {
+	    while (ap_gline (ic1, gt1, NULL, in, aaxis, aaxis, i, indata) !=
+		EOF) {
 	        call ap_gscatter1 (aps, naps, i, Memr[indata], npts,
 		    Memr[x], Memr[y], Memr[w], nscatter)
 	        call icg_fit (ic1, gp, "gcur", gt1, cv, Memr[x], Memr[y],
 		    Memr[w], nscatter)
 	    }
+	    call cvfree (cv)
 	}
  
 	# Loop through the input image and create an output image.
 	# To minimize I/O if not smoothing write the final image
-	# directly otherwise write the fit.  AP_SMOOTH will then
+	# directly otherwise save the fit.  AP_SMOOTH will then
 	# smooth along the dispersion and compute the scattered
 	# light subtracted image.
  
@@ -167,25 +170,47 @@ begin
 	    call flush (STDOUT)
 	}
  
-	i = 0
-	while (ap_gdata (in, out, outmode, aaxis, MAXBUF, i, indata,
-	    outdata) != EOF) {
-	    call ap_gscatter1 (aps, naps, i, Memr[indata], npts, Memr[x],
-		Memr[y], Memr[w], nscatter)
-	    call ic_fit (ic1, cv, Memr[x], Memr[y], Memr[w], nscatter,
-		YES, YES, YES, YES)
-	    call cvvector (cv, Memr[col], Memr[outdata], npts)
-	    if (!smooth)
-	        call asubr (Memr[indata], Memr[outdata], Memr[outdata], npts)
+	if (!smooth) {
+	    nscatter = 0
+	    i = 0
+	    while (ap_gdata (in, out, NULL, aaxis, MAXBUF, i,
+		indata, outdata) != EOF) {
+		call ap_gscatter1 (aps, naps, i, Memr[indata], npts, Memr[x],
+		    Memr[y], Memr[w], nscatter1)
+		if (nscatter != nscatter1)
+		    new = YES
+		else
+		    new = NO
+		nscatter = nscatter1
+		call ic_fit (ic1, cv, Memr[x], Memr[y], Memr[w], nscatter,
+		    new, YES, new, new)
+		call cvvector (cv, Memr[col], Memr[outdata], npts)
+		call asubr (Memr[indata], Memr[outdata], Memr[outdata], npts)
+	    }
+	    call cvfree (cv)
+	} else {
+	    call salloc (cvs, nlines, TY_POINTER)
+	    call amovki (NULL, Memi[cvs], nlines)
+
+	    new = YES
+	    i = 0
+	    while (ap_gdata (in, NULL, NULL, aaxis, MAXBUF, i,
+		indata, outdata) != EOF) {
+		call ap_gscatter1 (aps, naps, i, Memr[indata], npts, Memr[x],
+		    Memr[y], Memr[w], nscatter)
+		call ic_fit (ic1, Memi[cvs+i-1], Memr[x], Memr[y], Memr[w],
+		    nscatter, new, YES, new, new)
+	    }
+     
+	    # Smooth and subtract along the dispersion.
+	    call ap_smooth (in, out, aaxis, daxis, aps, naps, ic2, gt2, cvs)
+	    do i = 1, nlines
+		call cvfree (Memi[cvs+i-1])
 	}
- 
+
 	call imastr (out, "apscatter", "Scattered light subtracted")
-	call imunmap (in)
 	call imunmap (out)
-	call cvfree (cv)
- 
-	# Smooth along the dispersion.
-	call ap_smooth (input, output, aps, naps, ic2, gt2)
+	call imunmap (in)
  
 	# If a scattered light image is desired compute it from the difference
 	# of the input and output images.
@@ -194,6 +219,8 @@ begin
 	    in = immap (input, READ_ONLY, 0)
 	    out = immap (output, READ_ONLY, 0)
 	    ifnoerr (scat = immap (scatter, NEW_COPY, in)) {
+		if (IM_PIXTYPE(scat) != TY_DOUBLE)
+		    IM_PIXTYPE(scat) = TY_REAL
 		npts = IM_LEN(in,1)
 		nlines = IM_LEN(in,2)
 		do i = 1, nlines
@@ -215,6 +242,8 @@ begin
 	call sfree (sp)
 end
 
+
+# SCAT_FREE -- Free scattered light memory.
 
 procedure scat_free ()
 
@@ -270,31 +299,26 @@ end
 # image is used both as input of the cross dispersion fits and as output
 # of the scattered light subtracted image.
  
-procedure ap_smooth (input, output, aps, naps, ic, gt)
+procedure ap_smooth (in, out, aaxis, daxis, aps, naps, ic, gt, cvs)
  
-char	input[SZ_FNAME]		# Input image
-char	output[SZ_FNAME]	# Output image
+pointer	in			# Input IMIO pointer
+pointer	out			# Output IMIO pointer
+int	aaxis, daxis		# Aperture and dispersion axes
 pointer	aps[ARB]		# Apertures
 int	naps			# Number of apertures
 pointer	ic			# ICFIT pointer
 pointer	gt			# GTOOLS pointer
+pointer	cvs			# CURFIT pointers
  
-int	i, aaxis, daxis, npts, nlines, outmode, new
-pointer	in, out, cv, gp, indata, outdata, x, w 
+int	i, npts, nlines, new
+pointer	cv, gp, indata, outdata, x, w 
+
 int	ap_gline(), ap_gdata()
 bool	clgetb(), apgansb()
-pointer	immap(), ap_immap()
  
 begin
 	if (!apgansb ("anssmooth"))
 	    return
- 
-	# Map the images.  There is no reason to expect errors.
-	# The output image is both read and written.
- 
-	in = ap_immap (input, aaxis, daxis)
-	outmode = READ_WRITE
-	out = immap (output, outmode, 0)
  
 	# Allocate memory for curve fitting.
 	npts = IM_LEN (in, daxis)
@@ -317,11 +341,13 @@ begin
  
 	    i = nlines / 2
 	    outdata = NULL
-	    while (ap_gline (ic, gt, out, daxis, aaxis, i, outdata) != EOF) {
+	    while (ap_gline (ic, gt, cvs, out, daxis, aaxis, i, outdata) !=
+		EOF) {
 	        call icg_fit (ic, gp, "gcur", gt, cv, Memr[x],
 		    Memr[outdata], Memr[w], npts)
 		call amovkr (1., Memr[w], npts)
 	    }
+	    call mfree (outdata, TY_REAL)
 	}
  
 	# Loop through the input image and create an output image.
@@ -333,17 +359,14 @@ begin
 	# Use the new flag to optimize the fitting.
 	new = YES
 	i = 0
-	while (ap_gdata (in, out, outmode, daxis, MAXBUF, i, indata,
-	    outdata) != EOF) {
+	while (ap_gdata (in, out, cvs, daxis, MAXBUF, i,
+	    indata, outdata) != EOF) {
 	    call ic_fit (ic, cv, Memr[x], Memr[outdata], Memr[w], npts,
 		new, YES, new, new)
 	    call cvvector (cv, Memr[x], Memr[outdata], npts)
 	    call asubr (Memr[indata], Memr[outdata], Memr[outdata], npts)
 	    new = NO
 	}
- 
-	call imunmap (in)
-	call imunmap (out)
 	call cvfree (cv)
 end
  
@@ -402,20 +425,20 @@ end
 # AP_GDATA -- Get the next line of image data.  Return EOF at end.
 # This task optimizes column access if needed.  It assumes sequential access.
  
-int procedure ap_gdata (in, out, outmode, axis, maxbuf, index, indata, outdata)
+int procedure ap_gdata (in, out, cvs, axis, maxbuf, index, indata, outdata)
  
 pointer	in			# Input IMIO pointer
-pointer	out			# Output IMIO pointer
-int	outmode			# Mode of output image (NEW_COPY|READ_WRITE)
+pointer	out			# Output IMIO pointer (NULL if no output)
+pointer	cvs			# CURFIT pointers
 int	axis			# Image axis
-int	maxbuf			# Maximum buffer size for column axis
+int	maxbuf			# Maximum buffer size chars for column axis
 int	index			# Last line (input), current line (returned)
 pointer	indata			# Input data pointer
 pointer	outdata			# Output data pointer
  
-int	i, last_index, col1, col2, nc, ncols, nlines, ncols_block
-pointer	inbuf, outbuf, buf, ptr
-pointer	imgl2r(), impl2r(), imgs2r(), imps2r()
+real	val, cveval()
+int	i, last_index, col1, col2, nc, nd, ncols, nlines, ncols_block
+pointer	inbuf, outbuf, ptr, imgl2r(), impl2r(), imgs2r(), imps2r()
  
 begin
 	# Increment to the next image vector.
@@ -431,30 +454,34 @@ begin
  
 	    switch (axis) {
 	    case 1:
+		nd = ncols
 		last_index = nlines
 	    case 2:
+		nd = nlines
 		last_index = ncols
-	        ncols_block = max (1, min (ncols, maxbuf / nlines))
+	        ncols_block =
+		    max (1, min (ncols, maxbuf / nlines))
 		col2 = 0
  
 	        call malloc (indata, nlines, TY_REAL)
-	        call malloc (outdata, nlines, TY_REAL)
+		if (out != NULL)
+		    call malloc (outdata, nlines, TY_REAL)
 	    }
 	}
  
 	# Finish up if the last vector has been done.
 	if (index > last_index) {
 	    if (axis == 2) {
-	        ptr = outbuf + index - 1 - col1
-	        do i = 1, nlines {
-		    Memr[ptr] = Memr[outdata+i-1]
-		    ptr = ptr + nc
-	        }
- 
 	        call mfree (indata, TY_REAL)
-	        call mfree (outdata, TY_REAL)
+		if (out != NULL) {
+		    ptr = outbuf + index - 1 - col1
+		    do i = 1, nlines {
+			Memr[ptr] = Memr[outdata+i-1]
+			ptr = ptr + nc
+		    }
+		    call mfree (outdata, TY_REAL)
+		}
 	    }
- 
 	    index = 0
 	    return (EOF)
 	}
@@ -463,26 +490,25 @@ begin
 	switch (axis) {
 	case 1:
 	    indata = imgl2r (in, index)
-	    outdata = impl2r (out, index)
-	    if (outmode == READ_WRITE)
-	        call amovr (Memr[imgl2r(out,index)], Memr[outdata], ncols)
+	    if (out != NULL)
+		outdata = impl2r (out, index)
 	case 2:
-	    if (index > 1) {
-		ptr = outbuf + index - 1 - col1
-		do i = 1, nlines {
-		    Memr[ptr] = Memr[outdata+i-1]
-		    ptr = ptr + nc
+	    if (out != NULL)
+		if (index > 1) {
+		    ptr = outbuf + index - 1 - col1
+		    do i = 1, nlines {
+			Memr[ptr] = Memr[outdata+i-1]
+			ptr = ptr + nc
+		    }
 		}
-	    }
  
 	    if (index > col2) {
 		col1 = col2 + 1
 		col2 = min (ncols, col1 + ncols_block - 1)
 		nc = col2 - col1 + 1
 		inbuf = imgs2r (in, col1, col2, 1, nlines)
-		outbuf = imps2r (out, col1, col2, 1, nlines)
-		if (outmode == READ_WRITE)
-		    buf = imgs2r (out, col1, col2, 1, nlines)
+		if (out != NULL)
+		    outbuf = imps2r (out, col1, col2, 1, nlines)
 	    }
  
 	    ptr = inbuf + index - col1
@@ -490,13 +516,11 @@ begin
 		Memr[indata+i-1] = Memr[ptr]
 		ptr = ptr + nc
 	    }
-	    if (outmode == READ_WRITE) {
-		ptr = buf + index - col1
-	        do i = 1, nlines {
-		    Memr[outdata+i-1] = Memr[ptr]
-		    ptr = ptr + nc
-		}
-	    }
+	}
+	if (cvs != NULL) {
+	    val = index
+	    do i = 1, nd
+		Memr[outdata+i-1] = cveval (Memi[cvs+i-1], val)
 	}
  
 	return (index)
@@ -513,18 +537,19 @@ define	BUFFER	4		# Buffer distance
 # when the user enters EOF or CR.  The out of bounds
 # requests are silently limited to the nearest edge.
  
-int procedure ap_gline (ic, gt, im, axis, aaxis, line, data)
+int procedure ap_gline (ic, gt, cvs, im, axis, aaxis, line, data)
  
 pointer	ic			# ICFIT pointer
 pointer	gt			# GTOOLS pointer
+pointer	cvs			# CURFIT pointers
 pointer	im			# IMIO pointer
 int	axis			# Image axis
 int	aaxis			# Aperture axis
 int	line			# Line to get
 pointer	data			# Image data
  
-real	rval, clgetr()
-int	stat, cmd, ival, strdic(), scan(), nscan()
+real	rval, clgetr(), cveval()
+int	i, stat, cmd, ival, strdic(), scan(), nscan()
 pointer	sp, name, str, imgl2r(), imgs2r()
  
 begin
@@ -606,7 +631,15 @@ begin
 		    call pargstr (IM_TITLE(im))
 		call gt_sets (gt, GTTITLE, Memc[str])
 		call ic_pstr (ic, "xlabel", "Column")
-		data = imgl2r (im, line)
+		if (axis == aaxis)
+		    data = imgl2r (im, line)
+		else {
+		    if (data == NULL)
+			call malloc (data, IM_LEN(im,1), TY_REAL)
+		    rval = line
+		    do i = 1, IM_LEN(im,1)
+			Memr[data+i-1] = cveval (Memi[cvs+i-1], rval)
+		}
 	    case 2:
 		call sprintf (Memc[str], SZ_LINE, "%s: Fit column %d\n%s")
 		    call pargstr (Memc[name])
@@ -614,7 +647,15 @@ begin
 		    call pargstr (IM_TITLE(im))
 		call gt_sets (gt, GTTITLE, Memc[str])
 		call ic_pstr (ic, "xlabel", "Line")
-		data = imgs2r (im, line, line, 1, IM_LEN(im,2))
+		if (axis == aaxis)
+		    data = imgs2r (im, line, line, 1, IM_LEN(im,2))
+		else {
+		    if (data == NULL)
+			call malloc (data, IM_LEN(im,2), TY_REAL)
+		    rval = line
+		    do i = 1, IM_LEN(im,2)
+			Memr[data+i-1] = cveval (Memi[cvs+i-1], rval)
+		}
 	    }
 	}
  

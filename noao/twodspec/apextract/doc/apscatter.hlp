@@ -80,8 +80,9 @@ at the end of the image) used in finding, recentering, resizing,
 and editing operations.  For tracing this is the starting line and
 the same number of lines are summed at each tracing point.  This is
 also the initial line for interactive fitting of the scattered light.
-A line of
-INDEF selects the middle of the image along the dispersion axis.
+A line of INDEF selects the middle of the image along the dispersion
+axis.  A positive nsum takes a sum and a negative value selects a
+median except that tracing always uses a sum.
 .le
 
 .ls buffer = 1.
@@ -95,7 +96,7 @@ parameter set.  See below for additional information.
 .le
 .ls apscat2 = ""
 Fitting parameters along the dispersion.  This references an additional
-set of parameters for the ICFIT package.  The default is the "apscat1"
+set of parameters for the ICFIT package.  The default is the "apscat2"
 parameter set.  See below for additional information.
 .le
 .ih

@@ -1,5 +1,44 @@
 .help revisions Jun88 pkg.xtools.gtools
 .nf
+lib$pkg/gtools.h
+pkg$xtools/gtools/gtools.h
+pkg$xtools/gtools/gtget.x
+pkg$xtools/gtools/gtset.x
+pkg$xtools/gtools/gtwindow.x
+pkg$xtools/gtools/gtcopy.x
+pkg$xtools/gtools/gtinit.x
+pkg$xtools/gtools/gtswind.x
+pkg$xtools/gtools/gtcolon.x
+pkg$xtools/gtools/gtascale.x
+    Two new parameters, GTXFLIP and GTYFLIP, were added.  These boolean
+    parameters can be set to flip vectors plotted with the gtools
+    functions.  In the gt_window functions flips are now done using
+    these new parameters rather than explicitly setting the plot
+    limits.  Previously this meant that any use of the flip would
+    not allow autoscaling; that is a new graph with different limits
+    would only cover the fixed limits.  It also mean that the 'a'
+    window function would reset the flip.  (12/8/93, Valdes)
+
+pkg$xtools/gtools/gtplot.x
+    The gio color marks are drawn using the G_PLCOLOR rather than G_PMCOLOR
+    so the code was change to work appropriately. (11/11/93, Valdes)
+
+===========
+V2.10.3Beta
+===========
+
+pgk$xtools/gtools/gtools.hlp
+pgk$xtools/gtools/gtinit.x
+pgk$xtools/gtools/gtcolon.x
+pgk$xtools/gtools/Revisions
+pgk$xtools/gtools/gtvplot.x
+pgk$xtools/gtools/gtset.x
+pgk$xtools/gtools/gtplot.x
+pgk$xtools/gtools/gtget.x
+pgk$xtools/gtools/gtcopy.x
+pgk$xtools/gtools/gtools.h
+    Added color option.  (10/29/92, Valdes)
+
 pkg$xtools/gtools/gtcolon.x
     The :/parameters case was resetting the subtitle string.
     (12/28/90, Valdes, diagnosed by Jeff Munn)

@@ -4,7 +4,7 @@ include <mach.h>
 include <imhdr.h>
 include <imset.h>
 
-# FMD_BOX -- Median filter an image
+# FMD_BOX -- Median filter an image.
 
 procedure fmd_box (im1, im2, boundary, constant)
 
@@ -22,19 +22,19 @@ errchk	impl2r, fmd_buf, fmd_boxset, fmd_boxfilter
 include "fmedian.com"
 
 begin
-	# set image boundary extension parameters
+	# Set the image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)
 	call imseti (im1, IM_NBNDRYPIX, max (xbox / 2, ybox / 2))
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
-	# allocate space for the histogram and zero
+	# Allocate space for the histogram and zero.
 	call calloc (hst, hmax - hmin + 1, TY_SHORT)
 
-	# check for 1D images
+	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
 	    ybox = 1
 
-	# set quantization parameters
+	# Set quantization parameters.
 	if (!IS_INDEF(z1))
 	    zmin = z1
 	if (!IS_INDEF(z2))
@@ -44,49 +44,50 @@ begin
 	else
 	    map = YES
 
-	# initialize input image buffer
+	# Initialize input image buffer.
 	inbuf = NULL
 	col1 = 1 - xbox / 2
 	col2 = IM_LEN(im1, 1) + xbox / 2 
 	ncols = col2 - col1 + 1
 
-	# generate the output image line by line
+	# Generate the output image line by line.
 	do line = 1, IM_LEN(im2, 2) {
 
-	    # define the range of lines to read
+	    # Define the range of lines to read.
 	    line1 = line - ybox / 2
 	    line2 = line + ybox / 2
 	    nlines = line2 - line1 + 1
 
-	    # read in the appropriate range of image lines
+	    # Read in the appropriate range of image lines.
 	    call fmd_buf (im1, col1, col2, line1, line2, inbuf, map,
 	        zmin, zmax, real (hmin), real (hmax))
 
-	    # set up median filter array for each line scanned
+	    # Set up median filter array for each line scanned.
 	    call fmd_boxset (Memi[inbuf], ncols, nlines, Mems[hst],
 		hmax - hmin + 1, line)
 
-	    # get output image line
+	    # Get output image line.
 	    outbuf = impl2r (im2, line)
 	    if (outbuf == EOF)
 		call error (0, "Error writing output image.")
 
-	    # median filter the image line
+	    # Median filter the image line.
 	    call fmd_boxfilter (Memi[inbuf], ncols, nlines, Memr[outbuf],
 		int (IM_LEN(im2, 1)), Mems[hst], hmax - hmin + 1, line)
 
-	    # recover original data range
+	    # Recover original data range.
 	    if (unmap == YES && map == YES)
 		call amapr (Memr[outbuf], Memr[outbuf], int (IM_LEN(im2,1)),
 		    real (hmin), real (hmax), zmin, zmax)
 	}
 
-	# free space
+	# Free space.
 	call mfree (hst, TY_SHORT)
 	call mfree (inbuf, TY_INT)
 end
 
-# FMD_BOXSET -- Set up median array for the beginning of each image line
+
+# FMD_BOXSET -- Set up median array for the beginning of each image line.
 
 procedure fmd_boxset (data, nx, ny, hist, nbins, line)
 
@@ -106,13 +107,13 @@ int	amedi()
 include "fmedian.com"
 
 begin
-	# Initialize
+	# Initialize.
 	if (line == 1)  {
 
 	    call smark (sp)
 	    call salloc (filter, xbox * ybox, TY_INT)
 
-	    # Load filter
+	    # Load filter.
 	    index = 0
 	    do j = 1, ybox {
 		do i = 1, xbox {
@@ -121,13 +122,13 @@ begin
 		}
 	    }
 
-	    # Load histogram
+	    # Load histogram.
 	    call fmd_ashgmi (Memi[filter], xbox * ybox, hist, nbins, hmin, hmax)
 
-	    # Calculate the current median
+	    # Calculate the current median.
 	    median = amedi (Memi[filter], xbox * ybox)
 
-	    # Calculate the number less than the current median
+	    # Calculate the number less than the current median.
 	    nltmedian = 0
 	    do i = 1, xbox * ybox {
 		if (Memi[filter+i-1] < median)
@@ -140,7 +141,7 @@ begin
 
 	} else {
 
-	    # Add new points
+	    # Add new points.
 	    if (mod (line, 2) == 0) {
 	        do i = nx - xbox + 1, nx {
 		    index = data[i, ny] - hmin + 1
@@ -157,7 +158,7 @@ begin
 	        }
 	    }
 
-	    # Calculate the new current median
+	    # Calculate the new current median.
 	    if (nltmedian > nmedian) {
 		do i = 1, nbins {
 		    median = median - 1
@@ -177,7 +178,8 @@ begin
 	}
 end
 
-# FMD_BOXFILTER -- Median filter a single image line
+
+# FMD_BOXFILTER -- Median filter a single image line.
 
 procedure fmd_boxfilter (data, nx, ny, medline, ncols, hist, nbins, line)
 
@@ -198,7 +200,8 @@ begin
 	    call fmd_rev_filter (data, nx, ny, medline, ncols, hist, nbins)
 end
 
-# FMD_FORWARD_FILTER -- Run the median window forward
+
+# FMD_FORWARD_FILTER -- Run the median window forward.
 
 procedure fmd_forward_filter (data, nx, ny, medline, ncols, hist, nbins)
 
@@ -214,14 +217,14 @@ int	i, j, dindex, hindex
 include	"fmedian.com"
 
 begin
-	# Calculate the medians for a line
+	# Calculate the medians for a line.
 	dindex = 1
 	do i = 1, ncols - 1 {
 
-	    # Set median
+	    # Set median.
 	    medline[i] = median
 
-	    # Delete points
+	    # Delete points.
 	    do j = 1, ybox {
 		hindex = data[dindex,j] - hmin + 1
 		hist[hindex] = hist[hindex] - 1
@@ -229,7 +232,7 @@ begin
 		    nltmedian = nltmedian - 1
 	    }
 
-	    # Add points
+	    # Add points.
 	    do j = 1, ybox {
 		hindex = data[dindex+xbox,j] - hmin + 1
 		hist[hindex] = hist[hindex] + 1
@@ -237,7 +240,7 @@ begin
 		    nltmedian = nltmedian + 1
 	    }
 
-	    # Calculate the new current median
+	    # Calculate the new current median.
 	    if (nltmedian > nmedian) {
 		do j = 1, nbins {
 		    median = median - 1
@@ -258,10 +261,10 @@ begin
 
 	}
 
-	# Set the last median
+	# Set the last median.
 	medline[ncols] = median
 
-	# Delete the points from the last row
+	# Delete the points from the last row.
 	do i = nx - xbox + 1, nx {
 	    hindex = data[i,1] - hmin + 1
 	    hist[hindex] = hist[hindex] - 1
@@ -270,7 +273,8 @@ begin
 	}
 end
 
-# FMD_REV_FILTER -- Median filter the line in the reverse direction
+
+# FMD_REV_FILTER -- Median filter the line in the reverse direction.
 
 procedure fmd_rev_filter (data, nx, ny, medline, ncols, hist, nbins)
 
@@ -286,14 +290,14 @@ int	i, j, dindex, hindex
 include "fmedian.com"
 
 begin
-	# Calculate the medians for a line
+	# Calculate the medians for a line.
 	dindex = nx
 	do i = ncols, 2, -1 {
 
-	    # Set median
+	    # Set median.
 	    medline[i] = median
 
-	    # Delete points
+	    # Delete points.
 	    do j = 1, ybox {
 		hindex = data[dindex,j] - hmin + 1
 		hist[hindex] = hist[hindex] - 1
@@ -301,7 +305,7 @@ begin
 		    nltmedian = nltmedian - 1
 	    }
 
-	    # Add points
+	    # Add points.
 	    do j = 1, ybox {
 		hindex = data[dindex-xbox,j] - hmin + 1
 		hist[hindex] = hist[hindex] + 1
@@ -309,7 +313,7 @@ begin
 		    nltmedian = nltmedian + 1
 	    }
 
-	    # Calculate the new current median
+	    # Calculate the new current median.
 	    if (nltmedian > nmedian) {
 		do j = 1, nbins {
 		    median = median - 1
@@ -330,10 +334,10 @@ begin
 
 	}
 
-	# Set the last median
+	# Set the last median.
 	medline[1] = median
 
-	# Delete the points from the last row
+	# Delete the points from the last row.
 	do i = 1, xbox {
 	    hindex = data[i,1] - hmin + 1
 	    hist[hindex] = hist[hindex] - 1

@@ -10,7 +10,7 @@ double	dval
 
 begin
 	stat = clglpd (param, dval)
-	if (dval == INDEFD)
+	if (IS_INDEFD (dval))
 	    ival = INDEFI
 	else
 	    ival = int (dval)

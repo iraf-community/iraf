@@ -91,6 +91,10 @@ begin
 		break
 	    }
 
+	    # Quit if the lambda parameter goes to zero.
+	    if (NL_LAMBDA(nl) <= 0.0)
+		break
+
 	    # Check the number of iterations.
 	    if ((NL_ITER(nl) >= miniter) && (NL_ITER(nl) >= NL_ITMAX(nl)))
 		break
@@ -115,7 +119,7 @@ begin
 	    }
 
 	    # Get ready for next iteration.
-	    NL_REFSQ(nl) = NL_SUMSQ(nl)
+	    NL_REFSQ(nl) = min (NL_OLDSQ(nl), NL_SUMSQ(nl))
 	}
 
 	NL_SCATTER(nl) = NL_SCATTER(nl) + scatter
@@ -152,7 +156,10 @@ begin
 	    Memr[errors])
 
 	# Estimate the scatter.
-	scatter = real(0.5) * variance * (chisqr - real(1.0)) / chisqr
+	if (chisqr <= real(0.0) || variance <= real(0.0))
+	    scatter = real (0.0)
+	else
+	    scatter = real(0.5) * variance * (chisqr - real(1.0)) / chisqr
 
 	call sfree (sp)
 

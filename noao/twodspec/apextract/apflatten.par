@@ -15,7 +15,7 @@ flatten,b,h,yes,,,Flatten spectra?
 fitspec,b,h,yes,,,"Fit normalization spectra interactively?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,10,1,,Number of dispersion lines to sum
+nsum,i,h,10,,,Number of dispersion lines to sum or median
 threshold,r,h,10.,,,"Threshold for flattening spectra
 "
 background,s,h,"none","none|average|median|minimum|fit",,Background to subtract

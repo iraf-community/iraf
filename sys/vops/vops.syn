@@ -77,6 +77,7 @@
 	  arlt[_silrdx] (a, npix, floor, newval)
 	  argt[_silrdx] (a, npix, ceil, newval)
 	  asel[csilrdx] (a, b, c, sel, npix)
+	 aselk[csilrdx] (a, b, c, sel, npix)
 	  asok[csilrdx] (a, npix, ksel)
 	  asqr[_silrdx] (a, b, npix, errfcn)
 	  asrt[csilrdx] (a, b, npix)

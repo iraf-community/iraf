@@ -1,4 +1,4 @@
-.help dohydra Feb92 noao.imred.hydra
+.help dohydra Feb93 noao.imred.hydra
 .ih
 NAME
 dohydra -- Hydra and Nessie data reduction task
@@ -7,7 +7,8 @@ USAGE
 dohydra objects
 .ih
 SUMMARY
-The \fBdohydra\fR reduction task is specialized for the extraction, flat
+The \fBdohydra\fR reduction task is specialized for scattered light
+subtraction, extraction, flat
 fielding, fiber throughput correction, wavelength calibration, and sky
 subtraction of \fIHydra\fR and \fINessie\fR fiber spectra.  It is a
 command language script which collects and combines the functions and
@@ -83,12 +84,17 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .le
-.ls dispaxis = ")_.dispaxis" (apextract)
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+.ls datamax = INDEF (apsum.saturation)
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the flat field or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .le
 .ls fibers = 97 (apfind)
 Number of fibers.  This number is used during the automatic definition of
@@ -140,6 +146,15 @@ numbers are not extracted.  Note it is valid to identify sky fibers as both
 object and sky.
 .le
 
+.ls scattered = no (apscatter)
+Smooth and subtracted scattered light from the object and flat field
+images.  This operation consists of fitting independent smooth functions
+across the dispersion using data outside the fiber apertures and then
+smoothing the individual fits along the dispersion.  The initial
+flat field, or if none is given the aperture reference image, are
+done interactively to allow setting the fitting parameters.  All
+subsequent subtractions use the same fitting parameters.
+.le
 .ls fitflat = yes (flat1d)
 Fit the composite flat field spectrum by a smooth function and divide each
 flat field spectrum by this function?  This operation removes the average
@@ -150,7 +165,8 @@ avoid modifying the object fluxes.
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
 implies variance weighted extraction and requires reasonably good values
-for the readout noise and gain.
+for the readout noise and gain.  In addition the datamax parameters
+can be useful.
 .le
 .ls dispcor = yes
 Dispersion correct spectra?  Depending on the \fIparams.linearize\fR
@@ -206,6 +222,13 @@ is not allowed.  The parameters are described below.
 
 Package parameters are those which generally apply to all task in the
 package.  This is also true of \fBdohydra\fR.
+.ls dispaxis = 2
+Default dispersion axis.  The dispersion axis is 1 for dispersion
+running along image lines and 2 for dispersion running along image
+columns.  If the image header parameter DISPAXIS is defined it has
+precedence over this parameter.  The default value defers to the
+package parameter of the same name.
+.le
 .ls observatory = "observatory"
 Observatory at which the spectra were obtained if not specified in the
 image header by the keyword OBSERVAT.  For Hydra data the image headers
@@ -304,6 +327,24 @@ Default number of rejection iterations and rejection sigma thresholds.
 .le
 
 .ce
+-- SCATTERED LIGHT PARAMETERS --
+.ls buffer = 1. (apscatter)
+Buffer distance from the aperture edges to be excluded in selecting the
+scattered light pixels to be used.
+.le
+.ls apscat1 = "" (apscatter)
+Fitting parameters across the dispersion.  This references an additional
+set of parameters for the ICFIT package.  The default is the "apscat1"
+parameter set.
+.le
+.ls apscat2 = "" (apscatter)
+Fitting parameters along the dispersion.  This references an additional
+set of parameters for the ICFIT package.  The default is the "apscat2"
+parameter set.
+.le
+
+.ce
+
 -- APERTURE EXTRACTION PARAMETERS --
 .ls weights = "none" (apsum)
 Type of extraction weighting.  Note that if the \fIclean\fR parameter is
@@ -349,6 +390,10 @@ order specifying the number of pieces.
 
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
+.ls threshold = 10. (identify/reidentify)
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.le
 .ls coordlist = "linelists$idhenear.dat" (identify)
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
@@ -497,6 +542,12 @@ or scale by the mode, median, or mean.  This should not be necessary if the
 flat field and throughput corrections have been properly made. 
 .le
 .ih
+ENVIRONMENT PARAMETERS
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".
+.ih
 DESCRIPTION
 The \fBdohydra\fR reduction task is specialized for the extraction, flat
 fielding, fiber throughput correction, wavelength calibration, and sky
@@ -532,6 +583,10 @@ Hydra since there are many variations possible.
 .ls 6 [1]
 The images are first processed with \fBccdproc\fR for overscan,
 bias, and dark corrections.
+The \fBdofiber\fR task will abort if the image header keyword CCDRPOC,
+which is added by \fBccdproc\fR, is missing.  If the data is processed outside
+of the IRAF \fBccdred\fR package then a dummy CCDPROC keyword should be
+added to the image headers; say with \fBhedit\fR.
 .le
 .ls [2]
 Set the \fBdohydra\fR parameters with \fBeparam\fR.  Specify the object
@@ -578,6 +633,27 @@ response will quit the interactive fitting.  To exit the interactive
 fitting type 'q'.
 .le
 .ls [6]
+If scattered light subtraction is to be done the flat field image is
+used to define the scattered light fitting parameters interactively.
+If one is not specified then the aperture reference image is used for
+this purpose.
+
+There are two queries for the interactive fitting.  A graph of the
+data between the defined reference apertures separated by a specified
+buffer distance is first shown.  The function order and type may be
+adjusted.  After quiting with 'q' the user has the option of changing
+the buffer value and returning to the fitting, changing the image line
+or column to check if the fit parameters are satisfactory at other points,
+or to quit and accept the fit parameters.  After fitting all points
+across the dispersion another graph showing the scattered light from
+the individual fits is shown and the smoothing parameters along the
+dispersion may be adjusted.  Upon quiting with 'q' you have the option
+of checking other cuts parallel to the dispersion or quiting and finishing
+the scattered light function smoothing and subtraction.
+
+If there is a throughput image then this is corrected for scattered light
+noninteractively using the previous fitting parameters.
+.ls [7]
 If flat fielding is to be done the flat field spectra are extracted.  The
 average spectrum over all fibers is determined and a function is fit
 interactively (exit with 'q').  This function is generally of sufficiently
@@ -591,7 +667,7 @@ throughput correction.  The final response spectra are normalized to a unit
 mean over all fibers.  The relative average throughput for each fiber is
 recorded in the log and possibly printed to the terminal.
 .le
-.ls [7]
+.ls [8]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The middle fiber is used to identify the arc lines and define
 the dispersion function using the task \fBidentify\fR.  Identify a few arc
@@ -600,34 +676,40 @@ automatically add additional lines and fit the dispersion function.  Check
 the quality of the dispersion function fit with 'f'.  When satisfied exit
 with 'q'.
 .le
-.ls [8]
+.ls [9]
 The remaining fibers are automatically reidentified.  You have the option
 to review the line identifications and dispersion function for each fiber
 and interactively add or delete arc lines and change fitting parameters.
 This can be done selectively, such as when the reported RMS increases
 significantly.
 .le
-.ls [9]
+.ls [10]
 If the spectra are to be resampled to a linear dispersion system
 (which will be the same for all spectra) default dispersion parameters
 are printed and you are allowed to adjust these as desired.
 .le
-.ls [10]
-The object spectra are now automatically extracted, flat fielded,
-and dispersion corrected.
-.le
 .ls [11]
+The object spectra are now automatically scattered light subtracted,
+ extracted, flat fielded, and dispersion corrected.
+.le
+.ls [12]
 When sky subtracting, the individual sky spectra may be reviewed and some
 spectra eliminated using the 'd' key.  The last deleted spectrum may be
 recovered with the 'e' key.  After exiting the review with 'q' you are
 asked for the combining option.  The type of combining is dictated by the
 number of sky fibers.
 .le
-.ls [12]
+.ls [13]
 The option to examine the final spectra with \fBsplot\fR may be given.
 To exit type 'q'.
 .le
-.ls [13]
+.ls [14]
+If scattered light is subtracted from the input data a copy of the
+original image is made by appending "noscat" to the image name.
+If the data are reprocessed with the \fIredo\fR flag the original
+image will be used again to allow modification of the scattered
+light parameters.
+
 The final spectra will have the same name as the original 2D images
 with a ".ms" extension added.  The flat field and arc spectra will
 also have part of the aperture identification table name added to
@@ -638,9 +720,18 @@ but with different aperture definitions.
 \fBSpectra and Data Files\fR
 
 The basic input consists of Hydra or Nessie object and
-calibration spectra stored as IRAF images.  The raw CCD images must
-be processed to remove overscan, bias, and dark count effects.  This
-is generally done using the \fBccdred\fR package.  Flat fielding is
+calibration spectra stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must
+be processed to remove overscan, bias, and dark count effects.
+This is generally done using the \fBccdred\fR package.
+The \fBdohydra\fR task will abort if the image header keyword CCDPROC,
+which is added by \fBccdproc\fR, is missing.  If the data processed outside
+of the IRAF \fBccdred\fR package then a dummy CCDPROC keyword should be
+added to the image headers; say with \fBhedit\fR.
+Flat fielding is
 generally not done at this stage but as part of \fBdohydra\fR.
 If flat fielding is done as part of the basic CCD processing then
 a flattened flat field, blank sky observation, or throughput file
@@ -703,7 +794,11 @@ images.
 \fBPackage Parameters\fR
 
 The \fBhydra\fR package parameters set parameters affecting all the
-tasks in the package.  The observatory parameter is only required
+tasks in the package.
+The dispersion axis parameter defines the image axis along which the
+dispersion runs.  This is used if the image header doesn't define the
+dispersion axis with the DISPAXIS keyword.
+The observatory parameter is only required
 for data taken with fiber instruments other than Hydra or Nessie.
 The spectrum interpolation type might be changed to "sinc" but
 with the cautions given in \fBonedspec.package\fR.
@@ -757,6 +852,10 @@ fibers will remain in the extracted spectra but will not be sky
 subtracted.
 
 The next set of parameters select the processing steps and options.  The
+scattered light option allows fitting and subtracting a scattered light
+surface from the input object and flat field.  If there is significant
+scattered light which is not subtracted the fiber throughput correction
+will not be accurate.  The
 flat fitting option allows fitting and removing the overall shape of the
 flat field spectra while preserving the pixel-to-pixel response
 corrections.  This is useful for maintaining the approximate object count
@@ -845,7 +944,8 @@ parameter.
 \fBExtraction\fR
 
 The identification of the spectra in the two dimensional images and their
-extraction to one dimensional spectra in multispec format is accomplished
+scattered light subtraction and extraction to one dimensional spectra
+in multispec format is accomplished
 using the tasks from the \fBapextract\fR package.  The first parameters
 through \fInsubaps\fR control the extractions.
 
@@ -943,6 +1043,48 @@ desired to subdivide the fiber profiles into subapertures prior to
 dispersion correction.  After dispersion correction the subapertures are
 then added together.  The purpose of this is to correct for wavelength
 shifts across a fiber.
+
+\fBScattered Light Subtraction\fR
+
+Scattered light may be subtracted from the input two dimensional image as
+the first step.  This is done using the algorithm described in
+\fBapscatter\fR.  This can be important if there is significant scattered
+light since the flat field/throughput correction will otherwise be
+incorrect.  The algorithm consists of fitting a function to the data
+outside the defined apertures by a specified \fIbuffer\fR at each line or
+column across the dispersion.  The function fitting parameters are the same
+at each line.  Because the fitted functions are independent at each line or
+column a second set of one dimensional functions are fit parallel to the
+dispersion using the evaluated fit values from the cross-dispersion step.
+This produces a smooth scattered light surface which is finally subtracted
+from the input image.  Again the function fitting parameters are the
+same at each line or column though they may be different than the parameters
+used to fit across the dispersion.
+
+The first time the task is run with a particular flat field (or aperture
+reference image if no flat field is used) the scattered light fitting
+parameters are set interactively using that image.  The interactive step
+selects a particular line or column upon which the fitting is done
+interactively with the \fBicfit\fR commands.  A query is first issued
+which allows skipping this interactive stage.  Note that the interactive
+fitting is only for defining the fitting functions and orders.  When
+the graphical \fBicfit\fR fitting is exited (with 'q') there is a second prompt
+allowing you to change the buffer distance (in the first cross-dispersion
+stage) from the apertures, change the line/column, or finally quit.
+
+The initial fitting parameters and the final set parameters are recorded
+in the \fBapscat1\fR and \fBapscat2\fR hidden parameter sets.  These
+parameters are then used automatically for every subsequent image
+which is scattered light corrected.
+
+The scattered light subtraction modifies the input 2D images.  To preserve
+the original data a copy of the original image is made with the same
+root name and the word "noscat" appended.  The scattered light subtracted
+images will have the header keyword "APSCATTE" which is how the task
+avoids repeating the scattered light subtraction during any reprocessing.
+However if the \fIredo\fR option is selected the scattered light subtraction
+will also be redone by first restoring the "noscat" images to the original
+input names.
 
 \fBFlat Field and Fiber Throughput Corrections\fR
 
@@ -1352,6 +1494,16 @@ Image line/aperture to plot (1:) (1):
 <Look at spectra and change apertures with # key>
 <Exit with 'q'>
 .fi
+.ih
+REVISIONS
+.ls DOHYDRA V2.10.3
+The usual output WCS format is "equispec".  The image format type to be
+processed is selected with the \fIimtype\fR environment parameter.  The
+dispersion axis parameter is now a package parameter.  Images will only
+be processed if the have the CCDPROC keyword.  A \fIdatamax\fR parameter
+has been added to help improve cosmic ray rejection.  A scattered
+light subtraction processing option has been added.
+.le
 .ih
 SEE ALSO
 apedit, apfind, approfiles, aprecenter, apresize, apsum, aptrace, apvariance,

@@ -29,11 +29,12 @@ begin
 	    Memc[ksection], SZ_FNAME,
 	    Memc[section], SZ_FNAME, cl_index, cl_size)
 
-	# If an image section or cluster index was specified we must actually
-	# attempt to open the image to determine if it exists, otherwise just
+	# If an image section, kernel section, or cluster index was specified
+	# we must actually attempt to open the image to determine if the
+	# object specified by the full notation exists, otherwise we can just
 	# call the IKI access function to determine if the cluster exists.
 
-	if (Memc[section] != EOS || cl_index > 0) {
+	if (Memc[section] != EOS || Memc[ksection] != EOS || cl_index > 0) {
 	    mode = acmode
 	    if (acmode == 0)
 		mode = READ_ONLY

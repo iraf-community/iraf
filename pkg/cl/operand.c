@@ -6,8 +6,8 @@
 #define import_stdio
 #include <iraf.h>
 
-#include "errs.h"
 #include "config.h"
+#include "errs.h"
 #include "operand.h"
 #include "param.h"
 #include "grammar.h"
@@ -315,7 +315,8 @@ int	type;
 	    while (*s == ' ' || *s == '\t')
 		s++;
 
-	if (!strcmp (indefstr, s) || !strcmp (indeflc, s)) {
+	if (type != OT_STRING && 
+		!strcmp (indefstr, s) || !strcmp (indeflc, s)) {
 	    setopindef (&o);
 	    return (o);
 	}

@@ -1,15 +1,15 @@
 include "../lib/apphot.h"
 include "../lib/noise.h"
-include "../lib/display.h"
 include "../lib/center.h"
 include "../lib/fitsky.h"
 include "../lib/phot.h"
 include "../lib/radprof.h"
+include "../lib/display.h"
 
 # AP_RPCOLON -- Show/set radprof parameters.
 
-procedure ap_rpcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
-	newcenter, newskybuf, newsky, newbuf, newfit)
+procedure ap_rpcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage,
+    newcenterbuf, newcenter, newskybuf, newsky, newbuf, newfit)
 
 pointer	ap				# pointer to the apphot structure
 pointer	im				# pointer to iraf image
@@ -18,6 +18,7 @@ int	out				# output file descriptor
 int	stid				# output file sequence number
 int	ltid				# coord list sequence number
 char	cmdstr[ARB]			# command string
+int	newimage			# new image 
 int	newcenterbuf, newcenter		# new sky fit
 int	newskybuf, newsky		# new sky buffer
 int	newbuf, newfit			# new aperture
@@ -48,14 +49,121 @@ begin
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PCMDS) != 0)
 	    call apmagcolon (ap, out, stid, cmdstr, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
-	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
-	        newcenter, newskybuf, newsky, newbuf, newfit)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage,
+	        newcenterbuf, newcenter, newskybuf, newsky, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
 	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newbuf, newfit)
 	else
 	    call ap_rpimcolon (ap, cmdstr)
 
+	call sfree (sp)
+end
+
+
+# AP_PROFCOLON -- Procedure to display and modify radprof parameters.
+
+procedure ap_profcolon (ap, out, stid, cmdstr, newbuf, newfit)
+
+pointer	ap		# pointer to apphot structure
+int	out		# output file descriptor
+int	stid		# output file number
+char	cmdstr[ARB]	# command string
+int	newbuf		# new aperture buffers
+int	newfit		# compute new magnitudes
+
+int	ival, ncmd
+pointer	sp, cmd
+real	rval
+int	strdic(), nscan(), apstati()
+real	apstatr()
+
+begin
+	# Get the command.
+	call smark (sp)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+
+	call sscan (cmdstr)
+	call gargwrd (Memc[cmd], SZ_LINE)
+	if (Memc[cmd] == EOS) {
+	    call sfree (sp)
+	    return
+	}
+
+	# Process the colon command.
+	ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE, RPCMDS)
+	switch (ncmd) {
+	case RCMD_RADIUS:
+	    call gargr (rval)
+	    if (nscan() == 1) {
+		call printf ("%s = %g %s\n")
+		    call pargstr (KY_RPRADIUS)
+		    call pargr (apstatr (ap, RPRADIUS))
+		    call pargstr (UN_RSCALEUNIT)
+	    } else {
+		call apsetr (ap, RPRADIUS, rval)
+		if (stid > 1)
+		    call ap_rparam (out, KY_RPRADIUS, rval, UN_RSCALEUNIT,
+			"fitting radius")
+		newbuf = YES; newfit = YES
+	    }
+	case RCMD_STEPSIZE:
+	    call gargr (rval)
+	    if (nscan() == 1) {
+		call printf ("%s = %g %s\n")
+		    call pargstr (KY_RPSTEP)
+		    call pargr (apstatr (ap, RPSTEP))
+		    call pargstr (UN_RSCALEUNIT)
+	    } else {
+		call apsetr (ap, RPSTEP, rval)
+		if (stid > 1)
+		    call ap_rparam (out, KY_RPSTEP, rval, UN_RSCALEUNIT,
+			"step size in radius")
+		newfit = YES
+	    }
+	case RCMD_ORDER:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("%s = %d\n")
+		    call pargstr (KY_RPORDER)
+		    call pargi (apstati (ap, RPORDER))
+	    } else {
+		call apseti (ap, RPORDER, ival)
+		if (stid > 1)
+		    call ap_iparam (out, KY_RPORDER, ival, UN_RNUMBER,
+			"maximum number of rejection cycels")
+		newfit = YES
+	    }
+	case RCMD_KREJECT:
+	    call gargr (rval)
+	    if (nscan() == 1) {
+		call printf ("%s = %g %s\n")
+		    call pargstr (KY_RPKSIGMA)
+		    call pargr (apstatr (ap, RPKSIGMA))
+		    call pargstr (UN_RSIGMA)
+	    } else {
+		call apsetr (ap, RPKSIGMA, rval)
+		if (stid > 1)
+		    call ap_rparam (out, KY_RPKSIGMA, rval, UN_RSIGMA,
+			"k-sigma rejection criteron")
+		newfit = YES
+	    }
+	case RCMD_NREJECT:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("%s = %d\n")
+		    call pargstr (KY_RPNREJECT)
+		    call pargi (apstati (ap, RPNREJECT))
+	    } else {
+		call apseti (ap, RPNREJECT, ival)
+		if (stid > 1)
+		    call ap_iparam (out, KY_RPNREJECT, ival, UN_RNUMBER,
+			"maximum number of rejection cycles")
+		newfit = YES
+	    }
+	default:
+	    call printf ("Unknown or ambiguous colon command\7\n")
+	}
 	call sfree (sp)
 end
 

@@ -29,6 +29,7 @@ libpkg.a:
 	airmass.x	<math.h>
 	extinction.x	<error.h> <imhdr.h>
 	fluxcalib.x	<error.h> <imhdr.h> <math/iminterp.h>
+	getdaxis.x
 	illumination.x	<error.h> <imhdr.h> <math/iminterp.h> <pkg/gtools.h>\
 			<pkg/rg.h> <pkg/xtanswer.h>
 	ilsetbins.x	<gset.h> <imhdr.h> <pkg/gtools.h> <pkg/rg.h>\

@@ -18,9 +18,6 @@ delete\sDemo*\sv-\n\{%V-\}
 setinstrument\sdemo\sreview-\n\{		# Set instrument parameters...\}
 lpar\sartobs\n\{				# List observing parameters...\}
 artobs\sobs001\s0.\szero\n\{%15000		# Observe zero level images...\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs001\s1\szscale-\n\{%V-\}
-;\n\{%V-\}
 artobs\sobs002\s0.\szero\n\{%V-\}
 artobs\sobs003\s0.\szero\n\{%V-\}
 artobs\sobs004\s0.\szero\n\{%V-\}
@@ -28,16 +25,10 @@ artobs\sobs005\s0.\szero\n\{%V-\}
 \n\{%V-\}
 artobs.skyrate=0\n\{			# Observe a long dark count...\}
 artobs\sobs006\s1000.\sdark\n\{%V-\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs006\s1\szscale-\n\{%V-\}
-;\n\{%V-\}
 \n\{%V-\}
 artobs.filter="V"\n\{			# Observe V flat fields...\}
 artobs.skyrate=2000\n\{%V-\}
 artobs\sobs007\s1.\sflat\n\{%V-\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs007\s1\szscale-\n\{%V-\}
-;\n\{%V-\}
 artobs\sobs008\s1.\sflat\n\{%V-\}
 artobs\sobs009\s1.\sflat\n\{%V-\}
 artobs\sobs010\s1.\sflat\n\{%V-\}
@@ -56,9 +47,6 @@ artobs\sobs018\s3.\sflat\n\{%V-\}
 artobs.filter="V"\n\{			# Observe objects...\}
 artobs.skyrate=100\n\{%V-\}
 artobs\sobs019\s10.\sobject\simdata=dev$pix\n\{%V-\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs019\s1\szscale-\n\{%V-\}
-;\n\{%V-\}
 artobs\sobs020\s20.\sobject\simdata=dev$pix\n\{%V-\}
 artobs.filter="B"\n\{%V-\}
 artobs\sobs021\s30.\sobject\simdata=dev$pix\n\{%V-\}
@@ -66,9 +54,6 @@ artobs\sobs022\s40.\sobject\simdata=dev$pix\n\{%V-\}
 \n\{%V-\}
 lpar\ssubsection\n\{			# Subsection readout parameters...\}
 subsection\sobs023\sobs019\n\{%5000		# Readout a subsection of the CCD...\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs023\s1\szscale-\n\{%V-\}
-;\n\{%V-\}
 dir\n\{					# Check directory of observations...\}
 clear\n\{%10000				# Continue...\}
 \n\{%15000
@@ -182,9 +167,6 @@ NO\n\{%V-\}
     and of pixel datatype real.  The CCDSEC parameter identifies the relation
     of the image to the actual CCD pixels of the detector...\}
 \n\{%V-\}
-if\s(deftask\s("display")\s==\syes)\n\{%V-\}
-\s\s\s\sdisplay\sobs022\s1\szscale+\n\{%V-\}
-;\n\{%V-\}
 ccdlist\sobs*.??h\sccdtype=object\n\{		# List short CCD status...\}
 ccdlist\sobs023\sl+\n\{%5000			# List long CCD status...\}
 imhead\sobs023\sl+\n\{%5000			# List object image header...\}

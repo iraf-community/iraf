@@ -127,14 +127,14 @@ int	new;			/* new file			*/
  * is done when VOS filename mapping is in use to avoid linking in a lot of
  * objects that will never be used, since the HSI does not use networking.
  */
-KI_GETHOSTS() { return (0); };
-KI_SEND(){};
-KI_RECEIVE(){};
+KI_GETHOSTS() { return (0); }
+KI_SEND(){}
+KI_RECEIVE(){}
 #endif
 
 #ifdef SUNOS4
 /* Stub out the following too, since there is no floating point in the HSI. */
-ieee_flags(){};
-ieee_handler(){};
-abrupt_underflow_(){};
+ieee_flags(){}
+ieee_handler(){}
+abrupt_underflow_(){}
 #endif

@@ -6,14 +6,16 @@ $checkin libpkg.a ".."
 $exit
 
 libpkg.a:
-	dppeakphot.x	<imhdr.h>		../lib/apsel.h              \
-			../lib/daophotdef.h	<tbset.h>
-	dppkconfirm.x	../lib/daophot.h
-	dppkfit.x	../lib/daophot.h	../lib/daophotdef.h         \
-			<mach.h>		"pfit.com"
-	dppkwrite.x
-	dprrphot.x
-	dptpkinit.x	../lib/apsel.h
-	t_peak.x	<fset.h>		 <gset.h>                   \
-			../lib/daophotdef.h     ../lib/daophot.h
+	dpmempk.x	../lib/daophotdef.h	../lib/peakdef.h
+	dppeakphot.x	<imhdr.h>		<tbset.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/peakdef.h
+	dppkconfirm.x
+	dppkfit.x	<mach.h>                ../lib/daophotdef.h         \
+			../lib/peakdef.h
+	dppkwrite.x	<tbset.h>		<time.h>		    \
+			../lib/daophotdef.h     ../lib/apseldef.h           \
+			../lib/peakdef.h
+	dprrphot.x      ../lib/apseldef.h
+	t_peak.x	<fset.h>		../lib/daophotdef.h
 	;

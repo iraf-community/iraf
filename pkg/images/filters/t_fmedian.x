@@ -3,7 +3,7 @@
 include <mach.h>
 include <error.h>
 
-# T_FMEDIAN -- Median filter an list of images in x and y
+# T_FMEDIAN -- Median filter a list of images in x and y.
 
 procedure t_fmedian()
 
@@ -30,11 +30,11 @@ errchk	fmd_box
 include "fmedian.com"
 
 begin
-	# get task parameters
+	# Get the task parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
 	call clgstr ("output", imtlist2, SZ_FNAME)
 
-	# window sizes converted to nearest odd integer
+	# The window sizes are converted to the nearest odd integer.
 	xwindow = clgeti ("xwindow")
 	if (mod (xwindow, 2) == 0)
 	    xbox = xwindow + 1
@@ -47,18 +47,19 @@ begin
 	else
 	    ybox = ywindow
 
-	# get quantization parameters
+	# Get the quantization parameters.
 	z1 = clgetr ("zmin")
 	z2 = clgetr ("zmax")
 	hmin = clgeti ("hmin")
 	hmax = clgeti ("hmax")
 	unmap = btoi (clgetb ("unmap"))
 
-	# get boundary extension parameters
+	# Get the boundary extension parameters.
 	boundary = clgwrd ("boundary", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	constant = clgetr ("constant")
 
+	# Open the input and output image lists.
 	list1 = imtopen (imtlist1)
 	list2 = imtopen (imtlist2)
 	if (imtlen (list1) != imtlen (list2)) {
@@ -67,7 +68,7 @@ begin
 	    call error (0, "Number of input and output images not the same.")
 	}
 
-	# do each set of input and output images
+	# Median filter each set of input and output images.
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
@@ -76,12 +77,12 @@ begin
 	    im1 = immap (image1, READ_ONLY, 0)
 	    im2 = immap (image2, NEW_COPY, im1)
 
-	    # find input image max and min if necessary
+	    # Find input image max and min if necessary.
 	    if (IS_INDEF(z1) || IS_INDEF(z2)) 
 	        call fmd_maxmin (im1, xbox, ybox, boundary, constant, zmin,
 		    zmax)
 
-	    # median process an image
+	    # Median filter the image.
 	    iferr {
 		call fmd_box (im1, im2, boundary, constant)
 	    } then {

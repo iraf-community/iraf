@@ -25,8 +25,6 @@ here are as follows.
 		      cmd_exptime (rv)
 			cmd_epoch (rv)
 		     cmd_date_obs (rv)
-			   cmd_w0 (rv)	
-			  cmd_wpc (rv)	
 			  cmd_hjd (rv)	
 		      cmd_mjd_obs (rv)	
 			 cmd_vobs (rv)	
@@ -49,8 +47,6 @@ define	DEF_UT		"UT"			# UT of observation
 define	DEF_UTMID	"UTMIDDLE"		# UT middle of observation 
 define	DEF_EPOCH	"EPOCH"			# Epoch of observation 
 define	DEF_DATE_OBS	"DATE-OBS"		# Date of observation 
-define	DEF_W0		"W0"			# Starting wavelength 
-define	DEF_WPC		"WPC"			# Wavelength per channel 
 define	DEF_HJD		"HJD"			# Heliocentric Julian date
 define	DEF_MJD_OBS	"MJD-OBS"		# Modified Julian Date
 define	DEF_VOBS	"VOBS"			# Observed radial velocity 
@@ -113,8 +109,6 @@ begin
 	call clgpset (fp, "exptime", KW_EXPTIME(rv), LEN_KEYWEL)
 	call clgpset (fp, "epoch", KW_EPOCH(rv), LEN_KEYWEL)
 	call clgpset (fp, "date_obs", KW_DATE_OBS(rv), LEN_KEYWEL)
-	call clgpset (fp, "w0", KW_W0(rv), LEN_KEYWEL)
-	call clgpset (fp, "wpc", KW_WPC(rv), LEN_KEYWEL)
 	call clgpset (fp, "hjd", KW_HJD(rv), LEN_KEYWEL)
 	call clgpset (fp, "mjd_obs", KW_MJD_OBS(rv), LEN_KEYWEL)
 	call clgpset (fp, "vobs", KW_VOBS(rv), LEN_KEYWEL)
@@ -146,8 +140,6 @@ begin
 	call clppset (fp, "exptime", KW_EXPTIME(rv))
 	call clppset (fp, "epoch", KW_EPOCH(rv))
 	call clppset (fp, "date_obs", KW_DATE_OBS(rv))
-	call clppset (fp, "w0", KW_W0(rv))
-	call clppset (fp, "wpc", KW_WPC(rv))
 	call clppset (fp, "hjd", KW_HJD(rv))
 	call clppset (fp, "mjd_obs", KW_MJD_OBS(rv))
 	call clppset (fp, "vobs", KW_VOBS(rv))
@@ -174,8 +166,6 @@ begin
 	call strcpy (DEF_EXPTIME, KW_EXPTIME(rv), LEN_KEYWEL)
 	call strcpy (DEF_EPOCH, KW_EPOCH(rv), LEN_KEYWEL)
 	call strcpy (DEF_DATE_OBS, KW_DATE_OBS(rv), LEN_KEYWEL)
-	call strcpy (DEF_W0, KW_W0(rv), LEN_KEYWEL)
-	call strcpy (DEF_WPC, KW_WPC(rv), LEN_KEYWEL)
 	call strcpy (DEF_HJD, KW_HJD(rv), LEN_KEYWEL)
 	call strcpy (DEF_MJD_OBS, KW_MJD_OBS(rv), LEN_KEYWEL)
 	call strcpy (DEF_VOBS, KW_VOBS(rv), LEN_KEYWEL)
@@ -214,10 +204,6 @@ begin
 	    call pargstr (KW_EPOCH(rv))
 	call fprintf (fd, "DATE-OBS keyword%30t= '%s'\n")
 	    call pargstr (KW_DATE_OBS(rv))
-	call fprintf (fd, "W0 keyword%30t= '%s'\n")
-	    call pargstr (KW_W0(rv))
-	call fprintf (fd, "WPC keyword%30t= '%s'\n")
-	    call pargstr (KW_WPC(rv))
 	call fprintf (fd, "VHJD keyword%30t= '%s'\n")
 	    call pargstr (KW_HJD(rv))
 	call fprintf (fd, "MJD_OBS keyword%30t= '%s'\n")
@@ -285,14 +271,6 @@ begin
 	case KEY_DATE_OBS:
 	    # Date of observation keyword
 	    call cmd_date_obs (rv)
-
-	case KEY_W0:	
-	    # Starting wavelength keyword
-	    call cmd_w0 (rv)
-
-	case KEY_WPC:	
-	    # Wavelength increment keyword
-	    call cmd_wpc (rv)
 
 	case KEY_HJD:	
 	    # Heliocentric Julian Date Keyword
@@ -497,54 +475,6 @@ begin
 end
 
 
-# CMD_W0 - Set/Show the W0 image header keyword.
-
-procedure cmd_w0 (rv)	
-
-pointer	rv					#I RV struct pointer
-
-pointer	sp, buf
-
-begin
-	call smark (sp)
-	call salloc (buf, LEN_KEYWEL, TY_CHAR)
-
-	call gargstr (Memc[buf], LEN_KEYWEL)
-	if (Memc[buf] != EOS) {
-	    call strcpy (Memc[buf+1], KW_W0(rv), LEN_KEYWEL)
-	} else {
-	    call printf ("W0 keyword = '%s'")
-	    	call pargstr (KW_W0(rv))
-	}
-
-	call sfree (sp)
-end
-
-
-# CMD_WPC - Set/Show the WPC image header keyword.
-
-procedure cmd_wpc (rv)	
-
-pointer	rv					#I RV struct pointer
-
-pointer	sp, buf
-
-begin
-	call smark (sp)
-	call salloc (buf, LEN_KEYWEL, TY_CHAR)
-
-	call gargstr (Memc[buf], LEN_KEYWEL)
-	if (Memc[buf] != EOS) {
-	    call strcpy (Memc[buf+1], KW_WPC(rv), LEN_KEYWEL)
-	} else {
-	    call printf ("WPC keyword = '%s'")
-	    	call pargstr (KW_WPC(rv))
-	}
-
-	call sfree (sp)
-end
-
-
 # CMD_HJD - Set/Show the HJD image header keyword.
 
 procedure cmd_hjd (rv)	
@@ -711,4 +641,3 @@ begin
 
 	call sfree (sp)
 end
-

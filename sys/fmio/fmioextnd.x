@@ -62,7 +62,7 @@ begin
             # Increase the size of the lfile pagemap if necessary.
             if (l2 > LF_PMLEN(lf)) {
                 LF_PMLEN(lf) = (l2 + INC_PMLEN-1) / INC_PMLEN * INC_PMLEN
-                if (krealloc (LF_PAGEMAP(lf), LF_PMLEN(lf), TY_SHORT) == ERR)
+                if (krealloc (LF_PAGEMAP(lf), LF_PMLEN(lf), TY_INT) == ERR)
 		    return (ERR)
                 pm = LF_PAGEMAP(lf)
             }
@@ -70,7 +70,7 @@ begin
             # Add the pages to the lfile page table.
             LF_NPAGES(lf) = l2
             do i = l1, l2
-                Mems[pm+i-1] = p1 + i - l1
+                Memi[pm+i-1] = p1 + i - l1
         }
 
 	# Update the FTE for lfile zero (the page table file).

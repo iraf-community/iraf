@@ -19,4 +19,5 @@ install:
 
 libpkg.a:
 	mktags.x
+	memchk.x
 	;

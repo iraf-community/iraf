@@ -11,13 +11,13 @@ PARAMETERS
 Image with previously identified features to be used as features reference for
 other images.  If there are multiple apertures, lines, or columns in the
 image a master reference is defined by the \fIsection\fR parameter.
-The other apertures, lines, or columns selected by \fIstep\fR are
-reidentified if needed.
+The other apertures in multispec images or other lines, or columns
+(selected by \fIstep\fR) are reidentified as needed.
 .le
 .ls images
 List of images in which the features in the reference image are to be
-reidentified.  In two dimensional images the reidentifications are
-done by matching apertures, lines, or columns with those in the reference
+reidentified.  In two and three dimensional images the reidentifications are
+done by matching apertures, lines, columns, or bands with those in the reference
 image.
 .le
 .ls interactive = no
@@ -28,17 +28,25 @@ user may chose to enter the interactive \fBidentify\fR task.
 .le
 .ls section = "middle line"
 If the reference image is not one dimensional or given as a one dimensional
-image section then this this parameter selects a master reference.  The
-master reference is used when reidentifying other vectors in the reference
-image or when other images contain apertures not present in the reference
-image.  For two dimensional images this parameter also sets the direction
-(columns or lines) of the image vectors to be reidentified.
+image section then this parameter selects the master reference image
+vector.  The master reference is used when reidentifying other vectors in
+the reference image or when other images contain apertures not present in
+the reference image.  This parameter also defines the direction
+(columns, lines, or z) of the image vectors to be reidentified.
 
-The section parameter may be specified directly as an image section or in
-one of the following forms: "line #", "column #", "# line", or "# column"
-where # may be a line or column number or one of the special strings
-"middle" or "last".  Abbreviations are allowed though beware that 'l' is
-not a sufficient abbreviation.
+The section parameter may be specified directly as an image section or
+in one of the following forms
+
+.nf
+line|column|x|y|z first|middle|last|# [first|middle|last|#]]
+first|middle|last|# [first|middle|last|#] line|column|x|y|z
+.fi
+
+where each field can be one of the strings separated by | except for #
+which is an integer number.  The field in [] is a second designator which
+is used with 3D data.  See the example section for \fBidentify\fR for
+examples of this syntax.  Abbreviations are allowed though beware that 'l'
+is not a sufficient abbreviation.
 .le
 .ls newaps = yes
 Reidentify new apertures in the images which are not in the reference
@@ -67,37 +75,48 @@ form of the coordinate function.
 The following parameters are used for selecting and reidentifying additional
 lines, columns, or apertures in two dimensional formats.
 .ls trace = no
-There are two methods for defining additional reference lines or columns in
-two dimensional format images as selected by the \fIstep\fR parameter.
-When \fItrace\fR is no the master reference line or column is used for each
-new reference vector.  When this parameter is yes then as the
-reidentifications step across the image the last reidentified features are
-used as the reference.  This "tracing" is useful if there is a coherent
-shift in the features such as with long slit spectra.  However, any
-features lost during the tracing will be lost for all subsequent lines or
-columns while not using tracing always starts with the initial set of
+There are two methods for defining additional reference lines, columns, or
+bands in two and three dimensional format images as selected by the
+\fIstep\fR parameter.  When \fItrace\fR is no the master reference line or
+column is used for each new reference vector.  When this parameter is yes
+then as the reidentifications step across the image the last reidentified
+features are used as the reference.  This "tracing" is useful if there is a
+coherent shift in the features such as with long slit spectra.  However,
+any features lost during the tracing will be lost for all subsequent lines
+or columns while not using tracing always starts with the initial set of
 reference features.
 .le
-.ls step = 10
-The step from the reference line or column used for selecting and/or
-reidentifying additional lines or columns in a two dimensional reference
-image.  For multiaperture images the step is typically 1 while for long
-slit images the step is large enough to map any significant changes in the
-feature positions.  If the step is zero then only the reference line or
-column is used.
+.ls step = "10"
+The step from the reference line, column, or band used for selecting and/or
+reidentifying additional lines, columns, or bands in a two or three
+dimensional reference image.  For three dimensional images there may be two
+numbers to allow independent steps along different axes.  If the step is
+zero then only the reference aperture, line, column, or band is used.  For
+multiaperture images if the step is zero then only the requested aperture
+is reidentified and if it is non-zero (the value does not matter) then all
+spectra are reidentified.  For long slit or Fabry-Perot images the step is
+used to sample the image and the step should be large enough to map any
+significant changes in the feature positions.
 .le
-.ls nsum = 10
-The number of lines or columns to be summed in two dimensional images
-before reidentifying the features.  This parameter does not apply to
-multiaperture images.
+.ls nsum = "10"
+Number of lines, columns, or bands across the designated vector axis to be
+summed when the image is a two or three dimensional spatial spectrum.
+It does not apply to multispec format spectra.  If the image is three
+dimensional an optional second number can be specified for the higher
+dimensional axis  (the first number applies to the lower axis number and
+the second to the higher axis number).  If a second number is not specified
+the first number is used for both axes.  This parameter is not used for
+multispec type images.
 .le
-.ls shift = 0
+.ls shift = "0"
 Shift in user coordinates to be added to the reference features before
-centering when stepping to other lines or columns in the reference
+centering when stepping to other lines, columns, or bands in the reference
 image.  Generally no shift is used by setting the value to zero.
 The shift is used as a slope with positive values increasing towards
 larger line or column numbers.  This parameter is not used for
 reidentifications from the reference image to other images.
+If the image is three dimensional then two numbers may be specified
+for the two axes.
 .le
 .ls nlost = 0
 When reidentifying features by tracing, if the number of features not found
@@ -182,42 +201,43 @@ cursor is read.
 DESCRIPTION
 Features identified in vectors from a reference image are reidentified in
 other images and the results recorded in the database.  If the images are
-two dimensional or multiaperture format and a \fIstep\fR greater than zero
-is specified then additional vectors (lines/columns/apertures) in the
+two or three dimensional or multiaperture format and a \fIstep\fR greater
+than zero is specified then additional vectors (lines/columns/bands) in the
 reference image will be reidentified from the initial master reference
 vector (as defined by an image section or \fIsection\fR parameter) provided
 they have not been reidentified previously or the \fIoverride\fR flag is
-set.  For multiple aperture spectra images, called multiaperture, the step
-size is typically 1; i.e. reidentify features in all spectra.  For two
-dimensional images, such as long slit spectra, the step should be large
+set.  For multiple aperture spectra images, called multiaperture, a step
+size of zero means don't reidentify any other aperture and any other step
+size reidentifies all apertures.  For two and three dimensional images,
+such as long slit and Fabry-Perot spectra, the step(s) should be large
 enough to minimize execution time and storage requirements but small enough
 to follow shifts in the features (see the discussion below on tracing).
-The set of references identification is applied to other images in the same
-lines, columns, or apertures.  In multiaperture images the same apertures
-are matched in the reference image regardless of actual line order; i.e.
-the apertures need not be in the same order or even have all apertures
-present.
+The set of reference identifications is applied to other images in the same
+lines, columns, bands, or apertures.  In multiaperture images the same
+apertures are matched in the reference image regardless of actual line
+order; i.e.  the apertures need not be in the same order or even have all
+apertures present.
 
 The reidentification of other features in other reference image vectors
 may be done in two ways selected by the parameter \fItrace\fR.  If not
 tracing, the initial reference vector is applied to the other selected
 vectors.  If tracing, the reidentifications are made with respect to the
 last set of identifications as successive steps away from the reference
-vector are made.  The tracing method is appropriate for two dimensional
-images, such as long slit spectra, in which the positions of features
-traced vary smoothly.  This allows following large displacements from
-the initial reference by using suitably small steps.  It has the
-disadvantage that features lost during the reidentifications will not
-propagate (unless the \fIaddfeatures\fR option is used).  By not
-tracing, the original set of features is used for every other vector in
-the reference image.
+vector are made.  The tracing method is appropriate for two and three
+dimensional spatial images, such as long slit and Fabry-Perot spectra, in
+which the positions of features traced vary smoothly.  This allows
+following large displacements from the initial reference by using suitably
+small steps.  It has the disadvantage that features lost during the
+reidentifications will not propagate (unless the \fIaddfeatures\fR option
+is used).  By not tracing, the original set of features is used for every
+other vector in the reference image.
 
 When reidentifying other vectors in the reference image the parameter
-\fBshift\fR may be used to add a shift to the features positions
-before recentering.  The shift is added to lines or columns greater
-than the current line or column and subtracted if less.  If tracing
-the shift is same from step to step while if not tracing the
-shift is added to the shift from the previous step.  Thus, in both
+\fBshift\fR may be used to add a shift(s) to the features positions
+before recentering.  The shift is added to lines, columns, or bands, greater
+than the current line, column, or band and subtracted if less.  If tracing
+the shifts are the same from step to step while if not tracing the
+shifts are added to the shifts from the previous step.  Thus, in both
 cases an approximation of a slope is used.  This allows large
 slopes in the features to be followed even when not tracing but the 
 shift value must be predetermined.
@@ -229,7 +249,7 @@ when a feature is not found, may be useful for tracing features
 which disappear before reaching the limits of the image.
 
 When reidentifying features in other images, the reference
-features are those from the same aperture, line, or column of the
+features are those from the same aperture, line, column, or band of the
 reference image.  However, if the \fInewaps\fR parameter is set
 apertures in multiaperture spectra which are not in the reference
 image may be reidentified against the master reference aperture and
@@ -250,8 +270,8 @@ data (say if data values are very small due to a calibration or
 normalization operation) is the most common source of problems in using
 this task.
 
-In two dimensional images, though not multiaperture images, the
-number of lines or columns given by the parameter \fInsum\fR are summed
+In two and three dimensional images, though not multiaperture images, the
+number of lines, columns, or bands given by the parameter \fInsum\fR are summed
 to form the one dimensional image vector in which the features are
 identified.  This increases the accuracy for reidentifying weak
 features.
@@ -349,6 +369,13 @@ purpose of making a distortion correction:
 .fi
 .ih
 REVISIONS
+.ls REIDENTIFY V2.10.3
+The section, nsum, step, and shift parameter syntax was extended to apply to 3D
+images.  The previous values and defaults may still be used.
+
+For multiaperture data a step of zero selects only the reference aperture
+to be reidentified and any other step selects reidentifying all apertures.
+.le
 .ls REIDENTIFY V2.10
 This task is a new version with many new features.  The new features
 include an interactive options for reviewing identifications, iterative

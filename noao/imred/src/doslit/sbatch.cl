@@ -5,6 +5,7 @@
 procedure sbatch ()
 
 file	objects		{prompt="List of object spectra"}
+real	datamax 	{prompt="Max data value / cosmic ray threshold"}
 file	arcs1		{prompt="List of arc spectra"}
 file	arcref1		{prompt="Arc reference for dispersion solution"}
 string	arcrefs		{prompt="Arc references\n"}
@@ -20,14 +21,16 @@ bool	fluxcal1	{prompt="Flux calibrate spectra?"}
 
 bool	newdisp, newsens, newarcs
 
-struct	*fd1, *fd2
+struct	*fd1, *fd2, *fd3
 
 begin
 	file	temp, spec, specms, arc, arcms
 	bool	reextract, extract, disp, ext, flux, log
-	string	str1
+	string	imtype, mstype, str1, str2, str3, str4
 	int	i
 
+	imtype = "." // envget ("imtype")
+	mstype = ".ms" // imtype
 	temp = mktemp ("tmp$iraf")
 
 	reextract = redo || (update && newdisp)
@@ -43,11 +46,11 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec, >> logfile)
 		next
 	    }
-	    specms = spec // ".ms.imh"
+	    specms = spec // mstype
 
 	    extract = no
 	    disp = no
@@ -89,32 +92,47 @@ begin
 		if (access (specms))
 		    imdelete (specms, verify=no)
 		print ("Extract object spectrum ", spec, >> logfile)
-		setjd (spec, observatory=observatory, date="date-obs",
-		    time="ut", exposure="exptime", jd="jd", hjd="",
-		    ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-		    >> logfile)
-	        setairmass (spec, intype="beginning",
-		    outtype="effective", exposure="exptime",
-		    observatory=observatory, show=no, update=yes,
-		    override=yes, >> logfile)
-		apslitproc (spec, verbose=no)
+		hselect (spec, "date-obs,ut,exptime", yes, > temp)
+		hselect (spec, "ra,dec,epoch,st", yes, >> temp)
+		fd2 = temp
+		if (fscan (fd2, str1, str2, str3) == 3) {
+		    setjd (spec, observatory=observatory, date="date-obs",
+			time="ut", exposure="exptime", jd="jd", hjd="",
+			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+			>> logfile)
+		    if (fscan (fd2, str1, str2, str3, str4) == 4)
+			setairmass (spec, intype="beginning",
+			    outtype="effective", exposure="exptime",
+			    observatory=observatory, show=no, update=yes,
+			    override=yes, >> logfile)
+		}
+		fd2 = ""; delete (temp, verify=no)
+		apslitproc (spec, saturation=datamax, verbose=no)
 	    }
 
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    setjd ("@"//arcs1, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> logfile)
-	    	    setairmass ("@"//arcs1, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> logfile)
 	    	    fd2 = arcs1
-	    	    while (fscan (fd2, arc) != EOF)
+	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp)
+			fd3 = temp
+			if (fscan (fd3, str1, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory,
+				date="date-obs", time="ut", exposure="exptime",
+				jd="jd", hjd="", ljd="ljd", utdate=yes,
+				uttime=yes, listonly=no, >> logfile)
+			    if (fscan (fd3, str1, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no,
+				    update=yes, override=yes, >> logfile)
+			}
+			fd3 = ""; delete (temp, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
+		    }
 	    	    fd2 = ""
 		    newarcs = no
 		}
@@ -139,7 +157,7 @@ begin
 		else {
 	            print ("Dispersion correct ", spec, >> logfile)
 		    dispcor (specms, "", linearize=sparams.linearize,
-			database=database, table=arcref1//".ms.imh",
+			database=database, table=arcref1//mstype,
 			w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF,
 			log=sparams.log, flux=sparams.flux, samedisp=no,
 			global=no, ignoreaps=no, confirm=no, listonly=no,

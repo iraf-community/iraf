@@ -67,10 +67,10 @@ the parameter \fImaxchars\fR may be used to truncate long lines.  This
 can be important because many IRAF tasks read files a line at a time
 with a fixed sized line buffer.  Also other tasks and host programs
 (for example UNIX/vi) have line limits as well.  If an input line
-exceeds these limits incorrect results may occur.  The current IRAF
-limit is 161 characters and so the default for the maximum number of
-output characters is set at this value.  One may chose to go beyond
-this limit.
+exceeds these limits incorrect results may occur.  The IRAF limit is 
+SZ_LINE characters (see hlib$iraf.h) and so the default for the maximum 
+number of output characters is set at the current value.  One may 
+chose to go beyond this limit.
 
 If the input files do not all have the same number of lines then there
 are two courses of action.  If the \fIshortest\fR parameter is set

@@ -24,6 +24,7 @@
 #define	ZARDGD		zardgd_
 #define	ZARDKS		zardks_
 #define	ZARDLP		zardlp_
+#define	ZARDND          zardnd_
 #define	ZARDPL		zardpl_
 #define	ZARDPR		zardpr_
 #define	ZARDSF		zardsf_
@@ -31,6 +32,7 @@
 #define	ZAWRGD		zawrgd_
 #define	ZAWRKS		zawrks_
 #define	ZAWRLP		zawrlp_
+#define	ZAWRND          zawrnd_
 #define	ZAWRPL		zawrpl_
 #define	ZAWRPR		zawrpr_
 #define	ZAWRSF		zawrsf_
@@ -39,6 +41,7 @@
 #define	ZAWTGD		zawtgd_
 #define	ZAWTKS		zawtks_
 #define	ZAWTLP		zawtlp_
+#define	ZAWTND          zawtnd_
 #define	ZAWTPL		zawtpl_
 #define	ZAWTPR		zawtpr_
 #define	ZAWTSF		zawtsf_
@@ -59,6 +62,7 @@
 #define	ZCLSGD		zclsgd_
 #define	ZCLSKS		zclsks_
 #define	ZCLSLP		zclslp_
+#define	ZCLSND          zclsnd_
 #define	ZCLSPL		zclspl_
 #define	ZCLSSF		zclssf_
 #define	ZCLSTX		zclstx_
@@ -99,6 +103,7 @@
 #define	ZGFDIR		zgfdir_
 #define	ZGHOST		zghost_
 #define	ZGTENV		zgtenv_
+#define	ZGTIME		zgtime_
 #define	ZGTPID		zgtpid_
 #define	ZINTPR		zintpr_
 #define	ZLOCPR		zlocpr_
@@ -115,6 +120,7 @@
 #define	ZOPNGD		zopngd_
 #define	ZOPNKS		zopnks_
 #define	ZOPNLP		zopnlp_
+#define	ZOPNND          zopnnd_
 #define	ZOPNPL		zopnpl_
 #define	ZOPNSF		zopnsf_
 #define	ZOPNTX		zopntx_
@@ -130,6 +136,7 @@
 #define	ZSTTGD		zsttgd_
 #define	ZSTTKS		zsttks_
 #define	ZSTTLP		zsttlp_
+#define	ZSTTND          zsttnd_
 #define	ZSTTPL		zsttpl_
 #define	ZSTTPR		zsttpr_
 #define	ZSTTSF		zsttsf_
@@ -145,12 +152,12 @@
 #define	ZZRDMT		zzrdmt_
 #define	ZZRWMT		zzrwmt_
 #define	ZZSETK		zzsetk_
-#define	ZZSTOP		zzstop_
 #define	ZZSTMT		zzstmt_
+#define	ZZSTOP		zzstop_
 #define	ZZSTRT		zzstrt_
 #define	ZZWRMT		zzwrmt_
 #define	ZZWTMT		zzwtmt_
-#define ZGTIME		zgtime_
+
 
 
 /* If KNET name mapping is enabled selected machine level kernel names are
@@ -161,10 +168,16 @@
 
 #ifndef NOKNET
 
+#define	zardnd_	kardnd_
+#define	zawrnd_	kawrnd_
+#define	zawtnt_	kawtnd_
+#define	zclsnd_	kclsnd_
 #define	zfchdr_ kfchdr_
 #define	zfgcwd_ kfgcwd_
 #define	zfpath_ kfpath_
 #define	zfsubd_ kfsubd_
+#define	zopnnd_	kopnnd_
+#define	zsttnd_	ksttnd_
 #define zardbf_	kardbf_
 #define zardlp_	kardlp_
 #define zardpl_	kardpl_
@@ -234,8 +247,10 @@
 #define zzopmt_	kzopmt_
 #define zzrdmt_	kzrdmt_
 #define zzrwmt_	kzrwmt_
+#define zzstmt_	kzstmt_
 #define zzwrmt_	kzwrmt_
 #define zzwtmt_	kzwtmt_
+
 
 #endif
 

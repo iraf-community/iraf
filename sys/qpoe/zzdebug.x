@@ -36,7 +36,7 @@ task	parsei		= t_parsei,	# parse integer range list
 	clear		= t_clear	# clear the screen
 
 define	SZ_EXPR		256
-define	SZ_OBUF		1024
+define	SZ_OBUF		128000
 define	SZ_TBUF		8
 define	MAX_EVENTS	8192
 define	SZ_RLBUF	512

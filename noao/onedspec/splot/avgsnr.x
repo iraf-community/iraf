@@ -1,11 +1,12 @@
 # AVGSNR -- Compute average value and signal-to-noise in region
 
-procedure avgsnr (sh, wx1, wy1, y, n)
+procedure avgsnr (sh, wx1, wy1, y, n, fd1, fd2)
 
 pointer	sh
 real	wx1, wy1
 real	y[n]
 int	n
+int	fd1, fd2
 
 char	command[SZ_FNAME]
 real	wx2, wy2
@@ -52,8 +53,20 @@ begin
 	}
 
 	# Print out
-	call printf ("avg: %10.4g  rms: %10.4g   snr: %8.2f")
+	call printf ("avg: %10.4g  rms: %10.4g   snr: %8.2f\n")
 	    call pargr (avg)
 	    call pargr (rms)
 	    call pargr (snr)
+	if (fd1 != NULL) {
+	    call fprintf (fd1, "avg: %10.4g  rms: %10.4g   snr: %8.2f\n")
+		call pargr (avg)
+		call pargr (rms)
+		call pargr (snr)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, "avg: %10.4g  rms: %10.4g   snr: %8.2f\n")
+		call pargr (avg)
+		call pargr (rms)
+		call pargr (snr)
+	}
 end

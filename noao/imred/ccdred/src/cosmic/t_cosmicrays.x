@@ -2,6 +2,8 @@ include	<error.h>
 include <imhdr.h>
 include <imset.h>
 include	<math/gsurfit.h>
+include	<gset.h>
+include	<pkg/gtools.h>
 include	"crlist.h"
 
 # T_COSMICRAYS -- Detect and remove cosmic rays in images.
@@ -20,19 +22,21 @@ real	threshold		# Detection threshold
 real	fluxratio		# Luminosity boundary for stars
 int	npasses			# Number of cleaning passes
 int	szwin			# Size of detection window
+bool	train			# Use training objects?
+pointer	savefile		# Save file for training objects
 bool	interactive		# Examine cosmic ray parameters?
 char	ans			# Answer to interactive query
 
 int	nc, nl, c, c1, c2, l, l1, l2, szhwin, szwin2
 int	i, j, k, m, ncr, ncrlast, nreplaced, flag
-pointer	sp, input, output, badpix, str, im, in, out
-pointer	x, y, z, w, sf1, sf2, cr, data, ptr,
+pointer	sp, input, output, badpix, str, gp, gt, im, in, out
+pointer	x, y, z, w, sf1, sf2, cr, data, ptr
 
 bool	clgetb(), ccdflag(), streq(), strne()
 char	clgetc()
 int	imtopenp(), imtlen(), imtgetim(), clpopnu(), clgfil(), clgeti()
 real	clgetr()
-pointer	immap(), impl2r(), imgs2r()
+pointer	immap(), impl2r(), imgs2r(), gopen(), gt_init()
 errchk	immap, impl2r, imgs2r
 errchk	cr_find, cr_examine, cr_replace, cr_plot, cr_badpix
 
@@ -41,6 +45,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (badpix, SZ_FNAME, TY_CHAR)
+	call salloc (savefile, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the task parameters.  Check that the number of output images
@@ -59,9 +64,25 @@ begin
 	fluxratio = clgetr ("fluxratio")
 	npasses = clgeti ("npasses")
 	szwin = clgeti ("window")
+	train = clgetb ("train")
+	call clgstr ("savefile", Memc[savefile], SZ_FNAME)
 	interactive = clgetb ("interactive")
 	call clpstr ("answer", "yes")
 	ans = 'y'
+
+	# Set up the graphics.
+	call clgstr ("graphics", Memc[str], SZ_LINE)
+	if (interactive) {
+	    gp = gopen (Memc[str], NEW_FILE+AW_DEFER, STDGRAPH)
+	    gt = gt_init()
+	    call gt_sets (gt, GTTYPE, "mark")
+	    call gt_sets (gt, GTXTRAN, "log")
+	    call gt_setr (gt, GTXMIN, 10.)
+	    call gt_setr (gt, GTYMIN, 0.)
+	    call gt_sets (gt, GTTITLE, "Parameters of cosmic rays candidates")
+	    call gt_sets (gt, GTXLABEL, "Flux")
+	    call gt_sets (gt, GTYLABEL, "Flux Ratio")
+	}
 
 	# Use image header translation file.
 	call clgstr ("instrument", Memc[input], SZ_FNAME)
@@ -102,7 +123,7 @@ begin
 	    k = k + 1
 	}
 	do i = 2, szwin-1 {
-	    do j = 2+1, szwin-1 {
+	    do j = 2, szwin-1 {
 	        Memr[x+k] = j
 	        Memr[y+k] = i
 	        k = k + 1
@@ -200,6 +221,10 @@ begin
 		        c2-c1+1, szwin, c1, l,
 		        sf1, sf2, Memr[x], Memr[y], Memr[z], Memr[w])
 	        }
+		if (interactive && train) {
+		    call cr_train (cr, gp, gt, in, fluxratio, Memc[savefile])
+		    train = false
+		}
 	        call cr_flags (cr, fluxratio)
 
 		# If desired examine the cosmic ray list interactively.
@@ -211,11 +236,13 @@ begin
 		        ans = clgetc ("answer")
 		    }
 		    if ((ans == 'Y') || (ans == 'y'))
-	                call cr_examine (cr, in, fluxratio)
+	                call cr_examine (cr, gp, gt, in, fluxratio, 'r')
 	        }
 
 		# Now replace the selected cosmic rays in the output image.
 
+		call imflush (out)
+		call imseti (out, IM_ADVICE, RANDOM)
 	        call cr_replace (cr, ncrlast, out, nreplaced)
 
 		# Do additional passes through the data.  We work in place
@@ -307,6 +334,10 @@ begin
 	    }
 	}
 
+	if (interactive) {
+	    call gt_free (gt)
+	    call gclose (gp)
+	}
 	call imtclose (list1)
 	call imtclose (list2)
 	call clpcls (list3)

@@ -1,8 +1,8 @@
-# DP_RPARAM -- Procedure to encode a real daophot parameter.
+# DP_RPARAM -- Encode a daophot real parameter.
 
 procedure dp_rparam (out, keyword, value, units, comments)
 
-pointer	out		# output file descriptor
+int	out		# output file descriptor
 char	keyword[ARB]	# keyword string
 real	value		# parameter value
 char	units[ARB]	# units string
@@ -23,11 +23,11 @@ begin
 end
 
 
-# DP_IPARAM -- Procedure to encode an daophot integer parameter.
+# DP_IPARAM -- Encode a daophot integer parameter.
 
 procedure dp_iparam (out, keyword, value, units, comments)
 
-pointer	out		# output file descriptor
+int	out		# output file descriptor
 char	keyword[ARB]	# keyword string
 int	value		# parameter value
 char	units[ARB]	# units string
@@ -48,11 +48,11 @@ begin
 end
 
 
-# DP_BPARAM -- Procedure to encode an daophot boolean parameter.
+# DP_BPARAM -- Encode a daophot boolean parameter.
 
 procedure dp_bparam (out, keyword, value, units, comments)
 
-pointer	out		# output file descriptor
+int	out		# output file descriptor
 char	keyword[ARB]	# keyword string
 bool	value		# parameter value
 char	units[ARB]	# units string
@@ -73,11 +73,11 @@ begin
 end
 
 
-# DP_SPARAM -- Procedure to encode an daophot string parameter.
+# DP_SPARAM -- Encode a daophot string parameter.
 
 procedure dp_sparam (out, keyword, value, units, comments)
 
-pointer	out		# output file descriptor
+int	out		# output file descriptor
 char	keyword[ARB]	# keyword string
 char	value[ARB]	# parameter value
 char	units[ARB]	# units string

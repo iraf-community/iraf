@@ -67,8 +67,8 @@ begin
 	} else 
 	    call rv_batch (rv, infile, rinfile)
 
-error_	call imtclose (infile)				# close list pointers
-	call imtclose (rinfile)
+error_	call imtclose (RV_OBJECTS(rv))			# close list pointers
+	call imtclose (RV_TEMPLATES(rv))
 	call rv_close (rv)				# free the structure
 	call flush (STDOUT)
 	call sfree (sp)
@@ -195,8 +195,8 @@ errchk	samp_open
 
 begin	
 	call smark (sp)
-	call salloc (buf1, SZ_LINE, TY_CHAR)
-	call salloc (buf2, SZ_LINE, TY_CHAR)
+	call salloc (buf1, SZ_LINE, TY_CHAR); call aclrs (Memc[buf1], SZ_LINE)
+	call salloc (buf2, SZ_LINE, TY_CHAR); call aclrs (Memc[buf2], SZ_LINE)
 
 	call clgstr("osample", Memc[buf1], SZ_LINE)
 	call clgstr("rsample", Memc[buf2], SZ_LINE)
@@ -208,6 +208,7 @@ begin
 	SR_IMTYPE(RV_OSAMPLE(rv)) = OBJECT_SPECTRUM
 	SR_MODIFY(RV_OSAMPLE(rv)) = NO
 	SR_PARENT(RV_OSAMPLE(rv)) = rv
+	SR_COUNT(RV_OSAMPLE(rv)) = 0
         if (streq(Memc[buf1],"") || streq(Memc[buf1]," ")) {
             call error (0, "`osample' parameter specified as a NULL string") 
 	} else if (streq(Memc[buf1], "*")) {
@@ -225,6 +226,7 @@ begin
 	SR_IMTYPE(RV_RSAMPLE(rv)) = REFER_SPECTRUM
 	SR_MODIFY(RV_RSAMPLE(rv)) = NO
 	SR_PARENT(RV_RSAMPLE(rv)) = rv
+	SR_COUNT(RV_RSAMPLE(rv)) = 0
         if (streq(Memc[buf2],"") || streq(Memc[buf2]," ")) {
             call error (0, "`rsample' parameter specified as a NULL string") 
 	} else if (streq(Memc[buf2], "*")) {
@@ -271,8 +273,9 @@ begin
 	}
 
 	# Now read in the first OBJECT spectrum.
-	if (rv_getim (rv, Memc[fname], OBJECT_SPECTRUM) == ERR_READ)
-	    goto error_
+	if (rv_getim (rv, Memc[fname], OBJECT_SPECTRUM, INDEF, INDEF, 
+	    INDEFI) == ERR_READ)
+	        goto error_
 
 	# Read in the template data.
 	# First get all of the template spectra.

@@ -1,7 +1,8 @@
 input,s,a,,,,List of input images
 lines,s,h,"",,,List of lines/columns/apertures
+bands,s,h,"",,,Bands in 3D image
 dispaxis,i,h,)_.dispaxis,,,"Image axis for 2D images"
-nsum,i,h,)_.nsum,,,"Number of lines/columns to sum for 2D images
+nsum,s,h,)_.nsum,,,"Number of lines/columns to sum for 2D images
 "
 region,s,h,,,,Fitting region
 positions,f,h,,,,File of positions/sigmas
@@ -11,6 +12,9 @@ function,s,h,"gaussian","gaussian",,Fitting function
 fitbackground,b,h,yes,,,Fit background?
 fitpositions,s,h,"all","fixed|single|all",,Fit positions
 fitsigmas,s,h,"all","fixed|single|all",,"Fit sigmas
+"
+sigma0,r,h,INDEF,,,"Constant gaussian noise term (INDEF for no errors)"
+invgain,r,h,INDEF,,,"Inverse gain term (INDEF for no errors)
 "
 components,s,h,"",,,Components to output
 verbose,b,h,yes,,,Standard output?

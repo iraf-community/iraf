@@ -1,19 +1,21 @@
+include <error.h>
 include	<mach.h>
-include	"../shdr.h"
+include	<smw.h>
 
 # Function Mode for STEK
 
 # FUN_DO -- Branch and execute proper function
 
-procedure fun_do (key, sh1, y, n)
+procedure fun_do (key, sh1, y, n, w0, wpc)
 
 int	key
 pointer	sh1
 real	y[n]
 int	n
+double	w0, wpc
 
 char	spec2[SZ_FNAME]
-int	i, nline, nband, strlen()
+int	i, nline, nband, nap, strlen()
 real	const, clgetr()
 pointer	im, mw, sh2
 bool	wave_scl
@@ -82,8 +84,12 @@ begin
 	    wave_scl = true
 	    nline = 0
 	    nband = 0
-	    call getimage (spec2, nline, nband, wave_scl, "angstroms",
-		im, mw, sh2, NULL)
+	    nap = 0
+	    im = NULL
+	    mw = NULL
+	    sh2 = NULL
+	    call getimage (spec2, nline, nband, nap, wave_scl, w0, wpc,
+		"angstroms", im, mw, sh2, NULL)
 	    call shdr_rebin (sh2, sh1)
 	    switch (key) {
 	    case '+':
@@ -100,7 +106,7 @@ begin
 		    y[i] = y[i] / Memr[SY(sh2)+i-1]
 	    }
 	    call shdr_close (sh2)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 
 	# Redraw

@@ -228,7 +228,7 @@ begin
 	ip = 1
 	nsdig = 0
 	nchar = gctod (linebuf, ip, dval)
-	if (nchar == 0 || dval == INDEFD)
+	if (nchar == 0 || IS_INDEFD(dval))
 	    return (nchar)
 
 	# Skip leading white space.
@@ -262,12 +262,12 @@ double	xtemp, ytemp
 
 begin
 	# Subtract off current origin:
-	if (x == INDEFD)
+	if (IS_INDEFD (x))
 	    xt = INDEFD
 	else {
 	    xt = x - X1(tr)
 	}
-	if (y == INDEFD)
+	if (IS_INDEFD (y))
 	    yt = INDEFD
 	else {
 	    yt = y - Y1(tr)
@@ -275,13 +275,13 @@ begin
 
 	# Scale and rotate coordinates:
 	if (THETA(tr) == 0) {
-	    if (xt != INDEFD)
+	    if (!IS_INDEFD (xt))
 		xt = xt * XSCALE(tr) + X2(tr)
-	    if (yt != INDEFD)
+	    if (!IS_INDEFD (yt))
 		yt = yt * YSCALE(tr) + Y2(tr)
 	    return
 
-	} else if (xt == INDEFD || yt == INDEFD) {
+	} else if (IS_INDEFD(xt) || IS_INDEFD(yt)) {
 	    # Non-zero angle and either coordinate indefinite results in
 	    # both transformed coordinates = INDEFD
 	    xt = INDEFD

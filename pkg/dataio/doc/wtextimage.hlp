@@ -1,4 +1,4 @@
-.help wtextimage Mar87 dataio
+.help wtextimage Oct93 dataio
 .ih
 NAME
 wtextimage -- convert an IRAF image to a text file
@@ -21,6 +21,10 @@ the pixels written to the text file.  When \fIheader = no\fR, only
 pixels values are converted; no header information is included in the
 output.
 .le
+.ls pixels = yes
+This parameter determines whether or not to write the pixels to the
+text file.  This can be set to no to only write out the header.
+.le
 .ls format = ""
 Output format for each pixel.  If not set by the user, the appropriate output 
 pixel format is determined by the image data type.
@@ -38,15 +42,14 @@ must not exceed 322 characters.  (Note that tasks \fIrtextimage\fR and
 .le
 .ih
 DESCRIPTION
-IRAF images are converted to text files with procedure \fBwtextimage\fR.  
-The text file written consists of an optional header followed by the pixel
-values.  The pixels are output in FITS order, that is, the leftmost subscript 
-varies most rapidly.  The image header is written in the "keyword = value  / 
-comment" format of FITS.  
+IRAF images are converted to text files with procedure \fBwtextimage\fR.
+The text file written consists of an optional header optionally followed by
+the pixel values.  The pixels are output in FITS order, that is, the
+leftmost subscript varies most rapidly.  The image header is written in the
+"keyword = value  / comment" format of FITS.
 .ih
 EXAMPLES
-
-Write a text file from an image section of dev$pix.  The default maximum
+1. Write a text file from an image section of dev$pix.  The default maximum
 linelength of 80 is used; an output format is specified.  The header portion 
 of the output text is as follows:
 .ls
@@ -80,18 +83,18 @@ COMMENT = 'ngc 4147 b 1800'
 F1POS   =                    2  / filter bolt I position
 F2POS   =                    0  / filter bolt II position
 END     
+.fi
+.le
                                                                                 
-Write a series of text files from the IRAF images having root name
+2. Write a series of text files from the IRAF images having root name
 "reduced".  One text file is written for each image. 
 
     cl> wtext reduced.* txt 
-.fi
-.le
 .ih
 TIME REQUIREMENTS
 It takes almost 10 cpu minutes to convert a 512 square image of real pixels.
 A 512 square image of integer pixels takes about 3 cpu minutes.
 .ih
 SEE ALSO
-wcardimage, rtextimage
+wcardimage, rtextimage, noao.onedspec.wspectext
 .endhelp

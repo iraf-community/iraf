@@ -20,12 +20,13 @@ define	GM_DOUBLE	2	# computation type is double
 procedure t_geomap ()
 
 char	output[SZ_FNAME]		# output file
-real	xmin, xmax, ymin, ymax		# minimum and maximum reference values
+double	xmin, xmax, ymin, ymax		# minimum and maximum reference values
 int	function			# fitting function
 int	xxorder, xyorder, xxterms	# x fit fitting parameters
 int	yxorder, yyorder, yxterms	# y fit fitting parameters
 real	reject				# number of sigma of rejection
 int	calctype			# data type of computation
+bool	verbose				# verbose mode
 bool	interactive			# interactive graphics
 char	device[SZ_FNAME]		# graphics device
 
@@ -34,9 +35,11 @@ int	nfiles
 pointer	list, in, out, fit, gd
 
 bool	clgetb()
+double	clgetd()
 int	clgeti(), btoi(), clgwrd(), clplen()
 pointer	clpopni(), clgfil(), dtmap(), gopen(), open()
 real	clgetr()
+
 
 begin
 	# get input data file(s)
@@ -48,10 +51,10 @@ begin
 	out = dtmap (output, APPEND)
 
 	# minimum and maximum reference values
-	xmin = clgetr ("xmin")
-	xmax = clgetr ("xmax")
-	ymin = clgetr ("ymin")
-	ymax = clgetr ("ymax")
+	xmin = clgetd ("xmin")
+	xmax = clgetd ("xmax")
+	ymin = clgetd ("ymin")
+	ymax = clgetd ("ymax")
 
 	# surface fitting parameters
 	function = clgwrd ("function", str, SZ_LINE,
@@ -66,6 +69,7 @@ begin
 	calctype = clgwrd ("calctype", str, SZ_LINE, ",real,double,")
 
 	# graphics parameters
+	verbose = clgetb ("verbose")
 	interactive = clgetb ("interactive")
 	call clgstr ("graphics", device, SZ_FNAME)
 
@@ -93,12 +97,15 @@ begin
 
 	    iferr { 
 		if (calctype == GM_REAL)
-	            call geomap (in, out, fit, gd, xmin, xmax, ymin, ymax)
+	            call geomap (in, out, fit, gd, real(xmin), real(xmax),
+		        real(ymin), real(ymax), verbose)
 		else
-		    call geomapd (in, out, fit, gd, xmin, xmax, ymin, ymax)
+		    call geomapd (in, out, fit, gd, xmin, xmax, ymin, ymax,
+			verbose)
 	    } then {
-		call eprintf ("Cannot process coordinate list: %s\n")
+		call eprintf ("Error fitting coordinate list: %s\n\t")
 		    call pargstr (in_name)
+		call flush (STDERR)
 		call erract (EA_WARN)
 	    }
 
@@ -115,7 +122,7 @@ end
 
 # GEOMAP -- Procedure to calculate the coordinate transformations
 
-procedure geomap (in, out, fit, gd, xmin, xmax, ymin, ymax)
+procedure geomap (in, out, fit, gd, xmin, xmax, ymin, ymax, verbose)
 
 pointer	in			# pointer to input file
 pointer	out			# pointer to output file
@@ -123,6 +130,7 @@ pointer	fit			# pointer to fit parameters
 pointer	gd			# graphics stream pointer
 real	xmin, xmax		# max and min xref values
 real	ymin, ymax		# max and min yref values
+bool	verbose			# verbose mode
 
 int	npts
 pointer	sp, str, xref, yref, xin, yin, wts
@@ -130,16 +138,17 @@ pointer	sx1, sy1, sx2, sy2
 
 int	geo_npts(), geo_getpts()
 real	asumr()
+errchk	geofit(), geomgfit()
 
 begin
 	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# if no data proceed to next file
 	npts = geo_npts (in)
 	if (npts == 0) {
-	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
-	    call eprintf ("File: %s is empty.\n")
+	    call eprintf ("Coordinate list: %s is empty.\n")
 		call pargstr (Memc[str])
 	    call sfree (sp)
 	    return
@@ -156,9 +165,8 @@ begin
 	npts = geo_getpts (in, Memr[xref], Memr[yref], Memr[xin], Memr[yin],
 	    xmin, xmax, ymin, ymax)
 	if (npts == 0) {
-	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
-	    call eprintf ("File: %s has no data in range.\n")
+	    call eprintf ("Coordinate list: %s has no data in range.\n")
 		call pargstr (Memc[str])
 	    call sfree (sp)
 	    return
@@ -176,7 +184,7 @@ begin
 	    call alimr (Memr[xref], npts, GM_XMIN(fit), GM_XMAX(fit))
 	    if (! IS_INDEFR(xmin))
 		GM_XMIN(fit) = xmin
-	    if (! IS_INDEF(ymax))
+	    if (! IS_INDEFR(xmax))
 		GM_XMAX(fit) = xmax
 	} else {
 	    GM_XMIN(fit) = xmin
@@ -203,12 +211,21 @@ begin
 	sy2 = NULL
 
 	# fit the data
-	if (gd != NULL)
+	if (gd != NULL) {
 	    call geomgfit (gd, fit, sx1, sy1, sx2, sy2, Memr[xref],
 	        Memr[yref], Memr[xin], Memr[yin], Memr[wts], npts)
-	else
+	} else {
+	    if (verbose) {
+	        call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
+	        call printf ("Coordinate list: %s\n\t")
+		    call pargstr (Memc[str])
+		call flush (STDOUT)
+	    }
 	    call geofit (fit, sx1, sy1, sx2, sy2, Memr[xref], Memr[yref],
-		Memr[xin], Memr[yin], Memr[wts], npts)
+		Memr[xin], Memr[yin], Memr[wts], npts, verbose)
+	    if (verbose)
+		call flush (STDOUT)
+	}
 
 	# output data
 	call geomout (fit, out, sx1, sy1, sx2, sy2)
@@ -220,32 +237,34 @@ end
 
 # GEOMAPD -- Procedure to calculate the coordinate transformations
 
-procedure geomapd (in, out, fit, gd, xmin, xmax, ymin, ymax)
+procedure geomapd (in, out, fit, gd, xmin, xmax, ymin, ymax, verbose)
 
 pointer	in			# pointer to input file
 pointer	out			# pointer to output file
 pointer	fit			# pointer to fit parameters
 pointer	gd			# graphics stream pointer
-real	xmin, xmax		# max and min xref values
-real	ymin, ymax		# max and min yref values
+double	xmin, xmax		# max and min xref values
+double	ymin, ymax		# max and min yref values
+bool	verbose			# verbose mode
 
 int	npts
-double	mintemp, maxtemp, dxmin, dxmax, dymin, dymax
+double	mintemp, maxtemp
 pointer	sp, str, xref, yref, xin, yin, wts
 pointer	sx1, sy1, sx2, sy2
 
 int	geo_npts(), geo_getptsd()
 double	asumd()
+errchk	geofitd(), geomgfitd()
 
 begin
 	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# if no data proceed to next file
 	npts = geo_npts (in)
 	if (npts == 0) {
-	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
-	    call eprintf ("File: %s is empty.\n")
+	    call eprintf ("Coordinate list: %s is empty.\n")
 		call pargstr (Memc[str])
 	    call sfree (sp)
 	    return
@@ -258,31 +277,12 @@ begin
 	call salloc (yin, npts, TY_DOUBLE)
 	call salloc (wts, npts, TY_DOUBLE)
 
-	# check for INDEF min and max values
-	if (IS_INDEFR(xmin))
-	    dxmin = INDEFD
-	else
-	    dxmin = xmin
-	if (IS_INDEFR(xmax))
-	    dxmax = INDEFD
-	else
-	    dxmax = xmax
-	if (IS_INDEFR(ymin))
-	    dymin = INDEFD
-	else
-	    dymin = ymin
-	if (IS_INDEFR(ymax))
-	    dymax = INDEFD
-	else
-	    dymax = ymax
-
 	# read in data and check that data is in range
 	npts = geo_getptsd (in, Memd[xref], Memd[yref], Memd[xin], Memd[yin],
-	    dxmin, dxmax, dymin, dymax)
+	    xmin, xmax, ymin, ymax)
 	if (npts == 0) {
-	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
-	    call eprintf ("File: %s has no data in range.\n")
+	    call eprintf ("Coordinate list: %s has no data in range.\n")
 		call pargstr (Memc[str])
 	    call sfree (sp)
 	    return
@@ -296,31 +296,35 @@ begin
 	call amovkd (1.0d0, Memd[wts], npts)
 
 	# determine x max and min
-	if (IS_INDEFD(dxmin) || IS_INDEFD(dxmax)) {
+	if (IS_INDEFD(xmin) || IS_INDEFD(xmax)) {
 	    call alimd (Memd[xref], npts, mintemp, maxtemp)
-	    GM_XMIN(fit) = mintemp
-	    GM_XMAX(fit) = maxtemp
-	    if (! IS_INDEFR(xmin))
-		GM_XMIN(fit) = dxmin
-	    if (! IS_INDEF(ymax))
-		GM_XMAX(fit) = dxmax
+	    if (! IS_INDEFD(xmin))
+		GM_XMIN(fit) = xmin
+	    else
+		GM_XMIN(fit) = mintemp
+	    if (! IS_INDEFD(xmax))
+		GM_XMAX(fit) = xmax
+	    else
+		GM_XMAX(fit) = maxtemp
 	} else {
-	    GM_XMIN(fit) = dxmin
-	    GM_XMAX(fit) = dxmax
+	    GM_XMIN(fit) = xmin
+	    GM_XMAX(fit) = xmax
 	}
 
 	# determine y max and min
-	if (IS_INDEFD(dymin) || IS_INDEFD(dymax)) {
+	if (IS_INDEFD(ymin) || IS_INDEFD(ymax)) {
 	    call alimd (Memd[yref], npts, mintemp, maxtemp)
-	    GM_YMIN(fit) = mintemp
-	    GM_YMAX(fit) = maxtemp
-	    if (! IS_INDEFD(dymin))
-		GM_YMIN(fit) = dymin
-	    if (! IS_INDEFD(dymax))
-		GM_YMAX(fit) = dymax
+	    if (! IS_INDEFD(ymin))
+		GM_YMIN(fit) = ymin
+	    else
+		GM_YMIN(fit) = mintemp
+	    if (! IS_INDEFD(ymax))
+		GM_YMAX(fit) = ymax
+	    else
+		GM_YMAX(fit) = maxtemp
 	} else {
-	    GM_YMIN(fit) = dymin
-	    GM_YMAX(fit) = dymax
+	    GM_YMIN(fit) = ymin
+	    GM_YMAX(fit) = ymax
 	}
 
 
@@ -331,12 +335,21 @@ begin
 	sy2 = NULL
 
 	# fit the data
-	if (gd != NULL)
+	if (gd != NULL) {
 	    call geomgfitd (gd, fit, sx1, sy1, sx2, sy2, Memd[xref],
 	        Memd[yref], Memd[xin], Memd[yin], Memd[wts], npts)
-	else
+	} else {
+	    if (verbose) {
+	        call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
+	        call printf ("Coordinate list: %s\n\t")
+		    call pargstr (Memc[str])
+		call flush (STDOUT)
+	    }
 	    call geofitd (fit, sx1, sy1, sx2, sy2, Memd[xref], Memd[yref],
-		Memd[xin], Memd[yin], Memd[wts], npts)
+		Memd[xin], Memd[yin], Memd[wts], npts, verbose)
+	    if (verbose)
+		call flush (STDOUT)
+	}
 
 	# output data
 	call geomoutd (fit, out, sx1, sy1, sx2, sy2)
@@ -523,7 +536,7 @@ begin
 	    call pargr (yrot)
 
 	# rebuild the linear coefficients
-	call geomkcof (sx1, sy1, xscale, yscale, xrot, yrot)
+	#call geomkcof (sx1, sy1, xscale, yscale, xrot, yrot)
 
 	# allocate memory for linear coefficients
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
@@ -626,7 +639,7 @@ begin
 	    call pargd (yrot)
 
 	# rebuild the linear coefficients
-	call geomkcofd (sx1, sy1, xscale, yscale, xrot, yrot)
+	#call geomkcofd (sx1, sy1, xscale, yscale, xrot, yrot)
 
 	# allocate memory for linear coefficients
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))

@@ -8,7 +8,11 @@ include	"../icombine.h"
 # of included pixels.  The pixels rejected here are given zero ids
 # to avoid growing of the pixels rejected here.  The unweighted average
 # can be updated but any rejected pixels requires the median to be
-# recomputed.
+# recomputed.  When the number of pixels at a grow point reaches nkeep 
+# no further pixels are rejected.  Note that the rejection order is not
+# based on the magnitude of the residuals and so a grow from a weakly
+# rejected image pixel may take precedence over a grow from a strongly
+# rejected image pixel.
 
 procedure ic_growr (d, m, n, nimages, npts, average)
 
@@ -19,7 +23,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-int	i1, i2, j1, j2, k1, k2, l, is, ie, n2
+int	i1, i2, j1, j2, k1, k2, l, is, ie, n2, maxkeep
 pointer	mp1, mp2
 
 include	"../icombine.com"
@@ -44,6 +48,12 @@ begin
 			next
 		    k2 = i2 - 1
 		    n2 = n[i2]
+		    if (nkeep < 0)
+			maxkeep = max (0, n2 + nkeep)
+		    else
+			maxkeep = min (n2, nkeep)
+		    if (n2 <= maxkeep)
+			next
 		    do j2 = 1, n2 {
 			mp1 = m[j2] + k2
 			if (Memi[mp1] == l) {

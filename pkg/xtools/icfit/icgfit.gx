@@ -337,6 +337,50 @@ begin
 	    case 'w':  # Window graph
 		call gt_window (gt, gp, cursor, newgraph)
 
+	    case 'v': # Reset the value of the weight.
+		if (x1 == NULL) {
+		    i = icg_nearest$t (ic, gp, gt, cv, x, y, n, wx, wy)
+
+		    if (i != 0) {
+			call printf ("weight = (%g) ")
+			    call parg$t (wts[i])
+			call flush (STDOUT)
+			if (scan() != EOF) {
+			    call garg$t (px1)
+			    if (nscan() == 1) {
+				if (!IS_$INDEF (px1)) {
+				    wts[i] = px1
+				    IC_NEWWTS(ic) = YES
+				}
+			    }
+			}
+		    }
+		} else {
+		    i = icg_nearest$t (ic, gp, gt, cv, Mem$t[x1], Mem$t[y1], n,
+			wx, wy)
+
+		    if (i != 0) {
+			call printf ("weight = (%g) ")
+			    call parg$t (Mem$t[w1+i-1])
+			call flush (STDOUT)
+			if (scan() != EOF) {
+			    call garg$t (px1)
+			    if (nscan() == 1) {
+				if (!IS_$INDEF (px1)) {
+				    j = icg_nearest$t (ic, gp, gt, cv, x, y, n,
+					wx, wy)
+				    if (j != 0)
+					if (x[j] == Mem$t[x1+i-1] &&
+					    y[j] == Mem$t[y1+i-1])
+					    wts[j] = px1
+				    Mem$t[w1+i-1] = px1
+				    IC_NEWWTS(ic) = YES
+				}
+			    }
+			}
+		    }
+		}
+
 	    case 'x': # Reset the value of the x point.
 		if (x1 == NULL) {
 		    i = icg_nearest$t (ic, gp, gt, cv, x, y, n, wx, wy)
@@ -466,6 +510,8 @@ begin
 	    call mfree (x1, TY_PIXEL)
 	    call mfree (y1, TY_PIXEL)
 	    call mfree (w1, TY_PIXEL)
+	    if (IC_WTSFIT(ic) == NULL)
+		IC_NFIT(ic) = npts
 	}
 	call mfree (userwts, TY_PIXEL)
 	call sfree (sp)

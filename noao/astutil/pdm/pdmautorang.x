@@ -11,7 +11,7 @@ int procedure pdm_autorang (pdmp)
 pointer pdmp			# PDM structure pointer
 
 int	npt, i, nrng
-real	sumsq, sum, var, sd, maxdif, meansep, rbegin, rend
+double	sumsq, sum, var, sd, maxdif, meansep, rbegin, rend
 int	rngstrt
 pointer	sep, command, sp
 
@@ -25,16 +25,16 @@ begin
 	# separation of the data points.  (time intervals)
 	# Allocate an array of separations and fill it.
 
-	call salloc (sep, npt-1, TY_REAL)
+	call salloc (sep, npt-1, TY_DOUBLE)
 	do i = 1, npt-1 {
-	    Memr[sep+i-1] = PDM_X(pdmp,i+1) - PDM_X(pdmp,i)
+	    Memd[sep+i-1] = PDM_X(pdmp,i+1) - PDM_X(pdmp,i)
 	}
 
 	sumsq = 0.0
 	sum = 0.0
 	for (i=1; i<=(npt-1); i=i+1) {
-	    sumsq = sumsq + Memr[sep+i-1]**2	# Sum of squares.
-	    sum = sum + Memr[sep+i-1]
+	    sumsq = sumsq + Memd[sep+i-1]**2	# Sum of squares.
+	    sum = sum + Memd[sep+i-1]
 	}
 	if (npt != 1) {
 	    var = (sumsq - sum**2/npt)/(npt - 1)	# Variance.
@@ -43,7 +43,7 @@ begin
 
 	# Mean separation, maximum time diff.
 	if (npt != 1) {
-	    meansep = (PDM_X(pdmp,npt) - PDM_X(pdmp,1)) / real(npt-1)
+	    meansep = (PDM_X(pdmp,npt) - PDM_X(pdmp,1)) / double(npt-1)
 	    maxdif = meansep + sd * PDM_NSIGMA(pdmp)
 	}
 
@@ -55,7 +55,7 @@ begin
 	rngstrt = 1
 	PDM_SAMPLE(pdmp) = EOS
 	do i = 1, npt - 1 {
-	    if (Memr[sep+i-1] > maxdif) {
+	    if (Memd[sep+i-1] > maxdif) {
 		nrng = nrng + 1
 		if (nrng > MAX_RANGES) {
 		    call sfree (sp)
@@ -74,8 +74,8 @@ begin
 
 		# Sprintf range info at end of string.
 		call sprintf (Memc[command], SZ_LINE, " %g:%g")
-		    call pargr (rbegin)
-		    call pargr (rend)
+		    call pargd (rbegin)
+		    call pargd (rend)
 		call strcat (Memc[command], PDM_SAMPLE(pdmp), SZ_LINE)
 	    }
 	}
@@ -87,8 +87,8 @@ begin
 
 	    # Sprintf range info at end of string.
 	    call sprintf (Memc[command], SZ_LINE, " %g:%g")
-		call pargr (rbegin)
-		call pargr (rend)
+		call pargd (rbegin)
+		call pargd (rend)
 	    call strcat (Memc[command], PDM_SAMPLE(pdmp), SZ_LINE)
 	}
 

@@ -8,10 +8,10 @@ include "pdm.h"
 procedure pdm_ampep (pdmp, period)
 
 pointer	pdmp			# PDM structure pointer
-real	period			# period for which to calculate
+double	period			# period for which to calculate
 
 int	i, isave
-real	npt, ymin, ymax
+double	npt, ymin, ymax
 errchk	pdm_phase
 
 begin
@@ -20,8 +20,8 @@ begin
 	# Find the maximum and minimum values in the data.
 	# The difference is the amplitude.
 
-	ymax = -MAX_REAL
-	ymin = MAX_REAL
+	ymax = -MAX_DOUBLE
+	ymin = MAX_DOUBLE
 	do i = 1, npt {
 	    if (PDM_INUSE(pdmp,i) == 0)
 		next

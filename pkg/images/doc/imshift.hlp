@@ -24,7 +24,7 @@ file name is supplied each input image is shifted by \fIxshift\fR and
 with the x and y shift in columns 1 and 2 respectively. The number of
 shifts in the file must equal the number of input images.
 .le
-.ls interpolant_type = "linear"
+.ls interp_type = "linear"
 The choices are the following.
 .ls nearest
 Nearest neighbour.

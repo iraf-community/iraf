@@ -29,9 +29,15 @@ apple7|lw7|tops|	:tc=sapple7:
 apple8|lw8|		:tc=sapple8:
 lw9|			:tc=sapple9:
 lw10|			:tc=sapple10:
+lw14|                   :tc=sapple14:
+lw15|lwcloset|		:tc=sapple15:
+lw16|			:tc=sapple16:
+lw19|			:tc=sapple19:
+lw20|			:tc=sapple20:
+lwti|ti|		:tc=slwti:
 vmsprint|vmslp|		:tc=svprint:
 hplj|			:tc=uhplj:
-lpr|			:tc=glpr:
+lpr|lp|			:tc=glpr:
 enscript|		:tc=genscript:
 
 # AOSVS temporary entries
@@ -98,8 +104,10 @@ lw7p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw7 $F; rm $F; }:
 lw9p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw9 $F; rm $F; }:
-lw10p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+lw10p2|two landscape pages via enscript to lw10:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw10 $F; rm $F; }:
+lw16p2|two landscape pages via enscript to lw16:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw16 $F; rm $F; }:
 
 
 
@@ -122,7 +130,7 @@ genscript|Postscript printed via enscript program to default printer:\
 # SUN printers.
 simga|Imagen laser printer, print node:co#80:li#60:os:pt:ta^I:\
 	:DD=lpnode!imagen,/tmp/isfXXXXXX,!{ imprint -n $F; rm $F; }:
-simgd|VMS/draco imagen:co#80:li#64:os:pt:ta^I:\
+simgd|VMS/vela imagen:co#80:li#64:os:pt:ta^I:\
 	:DD=lpnode!imagen,/tmp/isfXXXXXX,!{ lpr -Pvmsimp $F; rm $F; }:
 sver|versatec printer plotter:co#132:li#64:am:\
 	:DD=lpnode!versatec,/tmp/vsfXXXXXX,!{ lpr -Pversatec $F; rm $F; }:
@@ -155,16 +163,34 @@ sapple9|Apple laser writer on Aquila:co#80:li#66:os:pt:ta^I:\
 sapple10|SPARCprinter on Solitaire:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw10 $F; rm $F; }:
+sapple14|Printer on Helios:\
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw14 $F; rm $F; }:
+sapple15|QMS-PS printer in PC "closet":\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw15 $F; rm $F; }:
+sapple16|HP LaserJet 4M 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw16 $F; rm $F; }:
+sapple19|HP LaserJet 4M 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw19 $F; rm $F; }:
+sapple20|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw20 $F; rm $F; }:
+slwti|TI Turbo laser printer on lepus, via SLIP:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!ps,/tmp/ptiXXXXXX,!{ lpr -Pti $F; rm $F; }:
 svprint|standard VMS host printer from a UNIX node:co#128:li#60:\
 	:DD=vmsprint,/tmp/vsfXXXXXX,!{ lpr -Pvmslp $F; rm $F; }:
 
 # VMS printers.
 vimga|VMS interface to imagen 240:tc=uimga:
-vimgd|VMS/draco imagen:DD=draco!imagen:tc=uimga:
+vimgd|VMS cluster imagen:DD=imagen:tc=uimga:
 vver|versatec printer plotter:co#132:li#64:am:\
-	:DD=draco!versatec:
+	:DD=versatec:
 vvup|upstairs versatec:co#132:li#64:am:\
-	:DD=draco!vup:
+	:DD=vup:
 vapple1|Apple laser writer on the SUN (Available to VMS):\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw1 $F; rm $F; }:
@@ -180,9 +206,24 @@ vapple4|Apple laser writer on the SUN (Available to VMS):\
 vapple5|Apple laser writer on the SUN (Available to VMS):\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw5 $F; rm $F; }:
+vapple6|Apple laser writer on the SUN (Available to VMS):\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw6 $F; rm $F; }:
 vapple7|Apple laser writer on the SUN (Available to VMS):\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw7 $F; rm $F; }:
+vapple8|Apple laser writer on the SUN (Available to VMS):\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw8 $F; rm $F; }:
+vapple9|Apple laser writer on the SUN (Available to VMS):\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw9 $F; rm $F; }:
+vapple10|Apple laser writer on the SUN (Available to VMS):\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apl,/tmp/asfXXXXXX,!{ lpr -Plw10 $F; rm $F; }:
+vlwti|TI Turbo laser printer on lepus, via SLIP:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!ps,/tmp/ptiXXXXXX,!{ lpr -Pti $F; rm $F; }:
 
 # Generic VMS printer queue.
 vvprint|standard VMS host printer:co#128:li#60:\
@@ -254,6 +295,12 @@ vi603dg|Visual 603 in DG D211 emulation mode:\
 dg4010pc|PC emulator for Data General plus 4010 graphics:\
 	:gd:li#24:cl=^L:tc=vi500dg:
 
+Xg|xgterm|XGterm graphics terminal emulator for the X window system:\
+	:gd=xgterm:qs=\E[18t:wh=\E\[8;%H;%Wt:tc=xterm:
+Xc|xgtermc|XGterm with color enabled:\
+	:gd=xgtermc:qs=\E[18t:wh=\E\[8;%H;%Wt:tc=xterm:
+xa|oldgterm|XGterm graphics terminal emulator for old versions of IRAF:\
+	:gd=gterm:qs=\E[18t:wh=\E\[8;%H;%Wt:tc=xterm:
 Ga|gterm24|:li#24:qs@:gd=gterm:tc=sun:
 Gb|gterm34|:li#34:qs@:gd=gterm:tc=sun:
 Gc|gterm40|:li#40:qs@:gd=gterm:tc=sun:
@@ -413,6 +460,39 @@ wyse75rv|wyse 75 reverse video:\
 	:ve=\E[?5h:\
 	:tc=vt100:
 
+#
+#       Termcap entry for MS Kermit 3.0 in VT320 mode
+# 02/24/90      Glen Overby <overby@plains.nodak.edu>
+#               Written from scratch using MS Kermit 3.0 and termcap(5).
+#
+kermit|kermvga|kermvgane|kermitne|kermit320|kermit320core:\
+        :co#80:li#24:cr=^M:bl=^G:\
+	:le=^H:nd=\E[C:up=\E[A:do=^J:LE=\E[%dD:ND=\E[%dC:UP=\E[%dA:do=\E[%dB:\
+        :sf=\ED:sr=\EM:nw=\EE:\
+        :cm=\E[%i%d;%dH:ch=\E[%dG:cv=\E[%dd:ho=\E[H:\
+        :ce=\E[0K:cd=\E[0J:cl=\E[H\E[0J:\
+        :al=\E[L:dl=\E[M:AL=\E[%dL:DL=\E[%dL:cs=\E[%i%d;%dr:\
+        :im=\E[4h:ei=\E[4l:ip#1:mi:dc=\E[P:DC=\E[%dP:\
+        :so=\E[7m:se=\E[27m:\
+        :us=\E[4m:ue=\E[24m:mb=\E[5m:md=\E[1m:mr=\E[7m:me=\E[0m:\
+        :ms:vi=\E[25h:ve=\E[25m:ta=^I:it#8:pb#2400:sc=\E7:rc=\E8:\
+        :hs:es:.ts=\E7\E[25;%dH\E[2K:.fs=\E8:\
+        :ts=\E[2$~\E[1$}\E[%dG\E[1K:fs=\E[0$}:ds=\E[1$~:xo:\
+        :is=Kermit 320\n\E[2;4;l\E[12h\E[?4;6;\
+                7l\E[?25h\E[4i\E[?4i\E[0m\E[r\E[1$~:\
+	:rs=\E[!p\E[2;4;l\E[12h\E[?3;4;5;6;7l\E[?25h\E[4i\E[?4i\E[0m\E[r\E[1$~:\
+        :ps=\E[0i:pf=\E[4i:po=\E[5i:\
+        :kl=\E[D:kr=\E[C:ku=\E[A:kd=\E[B:\
+        :k0=\EOP:k1=\EOQ:k2=\EOR:k3=\EOS:gd:
+
+ka|kermit320-am:\
+        :am:\
+        :is=Kermit 320\n\E[2;4;l\E[12h\E[?4;\
+                6l\E[?7;25h\E[4i\E[?4i\E[0m\E[r\E[1$~:\
+	:rs=\E[!p\E[2;4;l\E[12h\E[?3;4;5;6l\E[?7;25h\E[4i\E[?4i\E[0m\E[r\E[1$~:\
+        :tc=kermit320:
+
+#
 la|adm3a|3a|lsi adm3a:\
 	:am:bs:cm=\E=%+ %+ :cl=1^Z:co#80:ho=^^:li#24:ma=^K^P:nd=^L:up=^K:
 h2|2621|hp2621|hp2621a|hp2621p|2621|2621a|2621p|hp 2621:\

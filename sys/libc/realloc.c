@@ -18,7 +18,7 @@ unsigned newsize;
 	XINT	nchars = (newsize + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	XINT	ptr, dtype = TY_CHAR;
 
-	ptr = Memcptr (buf);
+	ptr = buf ? Memcptr(buf) : NULL;
 	iferr (REALLOC (&ptr, &nchars, &dtype))
 	    return (NULL);
 	else

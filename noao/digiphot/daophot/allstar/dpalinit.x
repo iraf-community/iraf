@@ -1,5 +1,6 @@
 include <mach.h>
 include	<imhdr.h>
+include <math.h>
 include "../lib/daophotdef.h"
 include	"../lib/allstardef.h"
 
@@ -13,7 +14,7 @@ pointer	im				# input image decriptor
 
 int	ncol
 pointer	sp, v1, v2, v3, allstar, wtim, dataim, line1, line2, line3
-real	rdnoise, ro32k, mingdata, maxgdata
+real	rdnoise, mingdata, maxgdata
 int	imgnlr(), impnlr()
 
 begin
@@ -27,8 +28,7 @@ begin
 	allstar = DP_ALLSTAR (dao)
 
 	# Define some useful constants.
-	rdnoise = (DP_READ_NOISE(dao) / DP_PHOT_ADC(dao)) ** 2
-	ro32k = RO32K 
+	rdnoise = (DP_READNOISE(dao) / DP_PHOTADU(dao)) ** 2
 	if (IS_INDEFR(DP_MINGDATA(dao)))
 	    mingdata = -MAX_REAL
 	else
@@ -58,11 +58,11 @@ begin
 	    # Initialize the weights image.
 	    if (DP_CACHE(allstar, A_WEIGHT) == YES) {
 		call dp_wtvector (Memr[line1], Memr[wtim], ncol, mingdata,
-		    maxgdata, rdnoise, ro32k, DP_PHOT_ADC(dao))
+		    maxgdata, rdnoise)
 		wtim = wtim + ncol
 	    } else if (impnlr (wtim, line3, Meml[v3]) != EOF) {
 		call dp_wtvector (Memr[line1], Memr[line3], ncol, mingdata,
-		    maxgdata, rdnoise, ro32k, DP_PHOT_ADC(dao))
+		    maxgdata, rdnoise)
 	    }
 
 	}
@@ -77,16 +77,9 @@ begin
 end
 
 
-define 	MAGIC 	0.0075		# amplitude of the interpolation error
+# DP_WTVECTOR -- Compute the initial weights for a vector of input data.
 
-# DP_WTVECTOR -- Compute the weights for a vector of input data. The scaling
-# constant is a hangover from the days when the weights were stored in a
-# short integer array to save space and should someday be removed after
-# carefull checking through the code for unforeseen dynamic range side
-# affects. The compute weight includes the effects of readout noise,
-# Poisson statistics and interpolation error.
-
-procedure dp_wtvector (a, b, ncols, mingdata, maxgdata, rnoisesq, ro32k, gain)
+procedure dp_wtvector (a, b, ncols, mingdata, maxgdata, rnoisesq)
 
 real	a[ARB]			# input array
 real	b[ARB]			# output array
@@ -94,24 +87,15 @@ int	ncols			# number of points
 real	mingdata		# minimum good data value
 real	maxgdata		# maximum good data value
 real	rnoisesq		# read noise squared in adu
-real	ro32k			# scaling constant
-real	gain			# gain in electrons per adu
 
 int	i
-real	dwt
 
 begin
 	do i = 1, ncols {
-	    if (a[i] < mingdata || a[i] > maxgdata) {
-		b[i] = INDEFR
-	    } else {
-		dwt = max (0.0, a[i])
-		dwt = rnoisesq + dwt / gain + (MAGIC * dwt) ** 2
-		if (dwt <= 0.0)
-		    b[i] = INDEFR
-		else
-		    b[i] = ro32k / dwt
-	    }
+	    if (a[i] < mingdata || a[i] > maxgdata)
+		b[i] = -MAX_REAL
+	    else
+		b[i] = rnoisesq
 	}
 end
 
@@ -127,7 +111,7 @@ define	INIT_REL_BRIGHT		0.003
 procedure dp_alzero (dao, mag, nstars)
 
 pointer	dao			# pointer to the daophot strucuture
-real	mag[ARB]		# pointer to the magnitude array
+real	mag[ARB]		# the magnitude array
 int	nstars			# number of stars
 
 int	i
@@ -156,8 +140,8 @@ end
 # radius pixels of each other. The duplicate stars are moved to the end of
 # the star list and the number of stars is recomputed.
 
-procedure dp_strip (id, x, y, mag, sky, skip, nstar, sepradius, ncol, nline,
-	fitradius, verbose)
+procedure dp_strip (id, x, y, mag, sky, skip, aier, nstar, sepradsq, ncol,
+	nline, fitradius, verbose)
 
 int	id[ARB]			# array of star ids
 real	x[ARB]			# array of star x values
@@ -165,16 +149,17 @@ real	y[ARB]			# array of star y values
 real	mag[ARB]		# array of star magnitudes
 real	sky[ARB]		# array of star sky values
 int	skip[ARB]		# array of fit/nofit indicators
+int	aier[ARB]		# array of error codes
 int	nstar			# number of stars (may change)
-real	sepradius		# separation radius
+real	sepradsq		# separation radius squared
 int	ncol			# number of columns in the image
 int	nline			# number of columns in the image
 real	fitradius		# the fitting radius
 int	verbose			# print error messages ?
 
-int	i, j
+int	i, j, ier, ahold
 pointer	sp, index, idhold
-real	dx, dy, sepradsq, xhold, yhold, maghold, skyhold
+real	seprad, dx, dy, xhold, yhold, maghold, skyhold
 
 begin
 	# Duplicate stars are impossible.
@@ -185,13 +170,8 @@ begin
 	call smark (sp)
 	call salloc (index, nstar, TY_INT)
 
-	# Initialize the fit/nofit flags.
-	sepradsq = sepradius * sepradius
-	do i = 1, nstar
-	    skip[i] = NO
-
 	# Sort the data in y.
-	call quick (y, nstar, Memi[index])
+	call quick (y, nstar, Memi[index], ier)
 
 	# Rectify the remaining arrays.
 	call dp_irectify (id, Memi[index], nstar)
@@ -200,47 +180,53 @@ begin
 	call dp_rectify (sky, Memi[index], nstar)
 
 	# Determine whether any stars are close to star i.
+	seprad = sqrt (sepradsq)
 	do i = 1, nstar - 1 {
 
-	    # Star has already been rejected.
+	    # This star was rejected on a previous loop.
 	    if (skip[i] == YES)
 		next
 
 	    # Reject if star has an INDEF valued position or is off image.
 	    if (IS_INDEFR(x[i]) || IS_INDEFR(y[i])) {
-		skip[i] = YES
 		mag[i] = INDEFR
+		skip[i] = YES
+		aier[i] = ALLERR_OFFIMAGE
 		if (verbose == YES)
 		    call printf (
 		        "REJECTING: Star %d has an undefined x or y value\n")
 			call pargi (id[i])
 	    } else if ((int (x[i] - fitradius) + 1) > ncol) {
-		skip[i] = YES
 		mag[i] = INDEFR
+		skip[i] = YES
+		aier[i] = ALLERR_OFFIMAGE
 		if (verbose == YES)
 		    call printf ("REJECTING: Star %d is outside the image\n")
 			call pargi (id[i])
 	    } else if (int (x[i] + fitradius) < 1) {
-		skip[i] = YES
 		mag[i] = INDEFR
+		skip[i] = YES
+		aier[i] = ALLERR_OFFIMAGE
 		if (verbose == YES)
 		    call printf ("REJECTING: Star %d is outside the image\n")
 			call pargi (id[i])
 	    } else if ((int (y[i] - fitradius) + 1) > nline) {
-		skip[i] = YES
 		mag[i] = INDEFR
+		skip[i] = YES
+		aier[i] = ALLERR_OFFIMAGE
 		if (verbose == YES)
 		    call printf ("REJECTING: Star %d is outside the image\n")
 			call pargi (id[i])
 	    } else if (int (y[i] + fitradius) < 1) {
-		skip[i] = YES
 		mag[i] = INDEFR
+		skip[i] = YES
+		aier[i] = ALLERR_OFFIMAGE
 		if (verbose == YES)
 		    call printf ("REJECTING: Star %d is outside the image\n")
 			call pargi (id[i])
 	    }
 
-	    # This star was rejected.
+	    # This star was rejected on this loop. 
 	    if (skip[i] == YES)
 		next
 
@@ -253,36 +239,41 @@ begin
 
 		# Test for INDEF.
 	        if (IS_INDEFR(x[j]) || IS_INDEFR(y[j])) {
-		    skip[j] = YES
 		    mag[j] = INDEF
+		    skip[j] = YES
+		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
 		        call printf (
 		    	"REJECTING: Star %d has an undefined x or y value\n")
 			    call pargi (id[j])
 	        } else if ((int (x[j] - fitradius) + 1) > ncol) {
-		    skip[j] = YES
 		    mag[j] = INDEFR
+		    skip[j] = YES
+		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
 		        call printf (
 			    "REJECTING: Star %d is outside the image\n")
 			    call pargi (id[j])
 	        } else if (int (x[j] + fitradius) < 1) {
-		    skip[j] = YES
 		    mag[j] = INDEFR
+		    skip[j] = YES
+		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
 		        call printf (
 			    "REJECTING: Star %d is outside the image\n")
 			    call pargi (id[j])
 	        } else if ((int (y[j] - fitradius) + 1) > nline) {
-		    skip[j] = YES
 		    mag[j] = INDEFR
+		    skip[j] = YES
+		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
 		        call printf (
 			    "REJECTING: Star %d is outside the image\n")
 			    call pargi (id[j])
 	        } else if (int (y[j] + fitradius) < 1) {
-		    skip[j] = YES
 		    mag[j] = INDEFR
+		    skip[j] = YES
+		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
 		        call printf (
 			    "REJECTING: Star %d is outside the image\n")
@@ -295,18 +286,19 @@ begin
 
 		# Test for proximity.
 		dy = y[j] - y[i]
-		if (dy > sepradius)
+		if (dy > seprad)
 		    break
 		dx = x[j] - x[i]
-		if (abs (dx) > sepradius)
+		if (abs (dx) > seprad)
 		    next
 		if ((dx * dx + dy * dy) > sepradsq)
 		    next
 
 		# Set the magnitude of the star to INDEF and skip.
 		if (mag[j] <= mag[i]) {
-		    skip[j] = YES
 		    mag[j] = INDEFR
+		    skip[j] = YES
+		    aier[j] = ALLERR_MERGE
 		    if (verbose == YES) {
 		        call printf (
 			    "REJECTING: Star %d has merged with star %d\n")
@@ -314,8 +306,9 @@ begin
 		            call pargi (id[i])
 		    }
 		} else {
-		    skip[i] = YES
 		    mag[i] = INDEFR
+		    skip[i] = YES
+		    aier[i] = ALLERR_MERGE
 		    if (verbose == YES) {
 		        call printf (
 			    "REJECTING: Star %d has merged with star %d\n")
@@ -330,24 +323,25 @@ begin
 	# Remove the duplicate stars.
 	for (i = 1; i <= nstar; i = i + 1) {
 
-	    # Remove skipped stars from the end of the list.
-	    while ((skip[nstar] == YES) && (nstar >= 1))
+	    # Redefine the number of stars by removing skipped stars from
+	    # the end of the star list.
+	    while (nstar >= 1) {
+		if (skip[nstar] == NO)
+		    break
 		nstar = nstar - 1
-
-	    # Quit the loop if no good stars are left.
+	    }
 	    if (i > nstar)
 		break
-
-	    # Place the rejected star at the end of the list.
-
 	    if (skip[i] == NO)
 		next
 
+	    # Switch the rejected star with the one at the end of the list.
 	    idhold = id[i]
 	    xhold = x[i]
 	    yhold = y[i]
 	    maghold = mag[i]
 	    skyhold = sky[i]
+	    ahold = aier[i]
 
 	    id[i] = id[nstar]
 	    x[i] = x[nstar]
@@ -355,6 +349,7 @@ begin
 	    mag[i] = mag[nstar]
 	    sky[i] = sky[nstar]
 	    skip[i] = NO
+	    aier[i] = aier[nstar]
 
 	    id[nstar] = idhold
 	    x[nstar] = xhold
@@ -362,6 +357,7 @@ begin
 	    mag[nstar] = maghold
 	    sky[nstar] = skyhold
 	    skip[nstar] = YES
+	    aier[nstar] = ahold
 
 	    nstar = nstar - 1
 	}
@@ -370,213 +366,280 @@ begin
 end
 
 
-# DP_WTINIT -- Initialize the weight array for all the unfitted stars.
+# DP_WSTINIT -- Initialize the weight and scratch arrays / images.
 
-procedure dp_wtinit (dao, im, xcen, ycen, last, nstar, x1, x2, y1, y2)
-
-pointer	dao			# pointer to the daophot structure
-pointer	im			# pointer to the input image
-real	xcen[ARB]		# the array of star x centers
-real	ycen[ARB]		# the array of star y centers
-int	last[ARB]		# pointer to the grouping array
-int	nstar			# the number of stars
-int	x1, x2			# the star list column limits in x and y
-int	y1, y2			# the star list line limits in x and y
-
-int	i, j, l, ncol, npix, lx1, lx2, ly1, ly2, gstar, lstar, star1, star2
-pointer allstar, wtim, wtbuf, ibuf, obuf
-real	radius
-int	dp_laststar()
-pointer	imps2r(), imgs2r()
-
-begin
-	# Define the allstar pointer.
-	allstar = DP_ALLSTAR(dao)
-
-	# Set up some constants.
-	ncol = IM_LEN(im,1)
-	npix = x2 - x1 + 1
-	radius = DP_FITRAD(dao)
-
-	# Get the data.
-	wtim = DP_WEIGHTS(allstar)
-
-	if (DP_CACHE(allstar,A_WEIGHT) == YES) {
-
-	    # Set the weights in the region of interest to be negative.
-	    wtbuf  = wtim + (y1 - 1) * ncol
-	    do j = y1, y2 {
-		do i = x1, x2 {
-		    if (! IS_INDEFR(Memr[wtbuf+i-1]))
-		        Memr[wtbuf+i-1] = - abs (Memr[wtbuf+i-1])
-		}
-		wtbuf = wtbuf + ncol
-	    }
-
-	    # Set the weights of the unfitted stars to be negative.
-	    do l = 1, nstar {
-	        call dp_glim (xcen[l], ycen[l], radius, x1, x2, y1, y2,
-		    lx1, lx2, ly1, ly2)
-	        wtbuf = wtim + (ly1 - 1) * ncol
-		do j = ly1, ly2 {
-		    do i = lx1, lx2 {
-		        if (! IS_INDEF(Memr[wtbuf+i-1]))
-			    Memr[wtbuf+i-1] = abs (Memr[wtbuf+i-1])
-		    }
-		    wtbuf = wtbuf + ncol
-		}
-	    }
-
-	} else {
-
-	    # Begin searching on the first group.
-	    gstar = 1
-
-	    # Loop over the lines in the region of interest.
-	    do j = y1, y2 {
-
-		# Set the weights in the line of interest to be negative.
-		obuf = imps2r (wtim, x1, x2, j, j)
-		ibuf = imgs2r (wtim, x1, x2, j, j)
-		do i = 1, npix {
-		    if (! IS_INDEFR(Memr[ibuf+i-1]))
-		        Memr[obuf+i-1] = - abs (Memr[ibuf+i-1])
-		}
-
-		# Initialize the star pointers.
-		star1 = nstar + 1
-		star2 = 0
-
-		# Loop over the groups,  deciding whether any overlap the
-		# line of interest.
-		for (l = gstar; l <= nstar; l = lstar + 1) {
-		    lstar = dp_laststar (last, l, nstar)
-		    ly1 = max (y1, min (y2, int (ycen[l]- radius) + 1))
-		    ly2 = max (y1, min (y2, int (ycen[lstar]+radius))) 
-		    if (ly2 < j) {
-			gstar = lstar + 1
-		    } else if (ly1 > j) {
-			break
-		    } else {
-			star1 = min (star1, l)
-			star2 = max (star2, lstar)
-		    }
-		}
-
-		# Test the star pointers.
-		if (star2 < star1)
-		    next
-
-		# Set the appropriate regions around the stars to be positive.
-		do l = star1, star2 {
-		    call dp_glim (xcen[l], ycen[l], radius, x1, x2, y1, y2,
-		        lx1, lx2, ly1, ly2)
-		    if (j < ly1 || j > ly2)
-			next
-		    do i = lx1 - x1 + 1, lx2 - x1 + 1 {
-			if (! IS_INDEFR(Memr[obuf+i-1]))
-			    Memr[obuf+i-1] = abs (Memr[obuf+i-1])
-		    }
-		}
-
-	    }
-
-	    call imflush (wtim)
-	}
-end
-
-
-# DP_STINIT -- Initialize the scratch image.
-
-procedure dp_stinit (dao, im, xcen, ycen, mag, last, nstar, x1, x2, y1, y2)
+procedure dp_wstinit (dao, im, xcen, ycen, mag, nstar, radius, x1, x2, y1, y2)
 
 pointer	dao				# pointer to the daophot structure
 pointer	im				# pointer to the input image
 real	xcen[ARB]			# the x centers array
 real	ycen[ARB]			# the y centers array
 real	mag[ARB]			# the magnitude array
-int	last[ARB]			# the group definition array
 int	nstar				# the number of stars
+real	radius				# radius for subraction
 int	x1, x2				# column limits
 int	y1, y2				# line limits
 
-int	i, j, l, ncol, npix, gstar, star1, star2, lstar, lx1, lx2, ly1, ly2
-pointer psffit, allstar, databuf, subtbuf, wtbuf
-real	psfrad, psfradsq
-int	dp_laststar()
+int	j, l, ncol, npix, nl, ns, lx, mx
+pointer psffit, allstar, databuf, wtbuf, owtbuf, subtbuf
+real	rsq, psfradius, psfradsq, x, y, dy, dysq, deltax, deltay
 pointer	imgs2r(), imps2r()
 
 begin
-	# Set up some constants
+	# Set up some pointers.
 	psffit = DP_PSFFIT(dao)
 	allstar = DP_ALLSTAR(dao)
+
+	# Set up some constants.
 	ncol = IM_LEN(im,1)
 	npix = x2 - x1 + 1
-	psfrad = DP_PSFRAD(dao)
-	psfradsq = psfrad * psfrad
+	rsq = radius ** 2
+	if (DP_PSFSIZE(psffit) == 0)
+	    psfradius = DP_PSFRAD(dao)
+	else
+	    psfradius = (real (DP_PSFSIZE(psffit) - 1) / 2.0 - 1.0) / 2.0
+	psfradsq = psfradius * psfradius
 
 	# Begin the search of the groups at the first group.
-	gstar = 1
+	ns = 0
+	nl = 0
 
+	ns = 0
 	do j = y1, y2 {
 
 	    # Get the data.
-	    if (DP_CACHE(allstar,A_SUBT) == YES)
-		subtbuf = DP_SUBT(allstar) + (j - 1) * ncol + x1 - 1
-	    else
-		subtbuf = imps2r (DP_SUBT(allstar), x1, x2, j, j)
-	    if (DP_CACHE(allstar,A_WEIGHT) == YES)
-		wtbuf = DP_WEIGHTS(allstar) + (j - 1) * ncol + x1 - 1
-	    else
-		wtbuf = imgs2r (DP_WEIGHTS(allstar), x1, x2, j, j)
 	    if (DP_CACHE(allstar,A_DCOPY) == YES)
 		databuf = DP_DATA(allstar) + (j - 1) * ncol + x1 - 1
 	    else
 		databuf = imgs2r (DP_DATA(allstar), x1, x2, j, j)
-
-	    # Initialize the scratch image.
-	    do i = 1, npix {
-		if (IS_INDEFR(Memr[wtbuf+i-1]) || Memr[wtbuf+i-1] <= 0.0)
-		    Memr[subtbuf+i-1] = 0.0
-		else
-		    Memr[subtbuf+i-1] = Memr[databuf+i-1]
+	    if (DP_CACHE(allstar,A_WEIGHT) == YES) {
+		wtbuf = DP_WEIGHTS(allstar) + (j - 1) * ncol + x1 - 1
+		owtbuf = wtbuf
+	    } else {
+		owtbuf = imps2r (DP_WEIGHTS(allstar), x1, x2, j, j)
+		wtbuf = imgs2r (DP_WEIGHTS(allstar), x1, x2, j, j)
 	    }
+	    if (DP_CACHE(allstar,A_SUBT) == YES)
+		subtbuf = DP_SUBT(allstar) + (j - 1) * ncol + x1 - 1
+	    else
+		subtbuf = imps2r (DP_SUBT(allstar), x1, x2, j, j)
 
-	    # Initialize the star pointers.
-	    star1 = nstar + 1
-	    star2 = 0
+	    # Set all the weights in the working array negative.
+	    call aabsr (Memr[wtbuf], Memr[owtbuf], npix)
+	    call anegr (Memr[owtbuf], Memr[owtbuf], npix)
 
-	    # Decide whether any of the groups overlap the line of interest.
-	    for (l = gstar; l <= nstar; l = lstar + 1) {
-		lstar = dp_laststar (last, l, nstar)
-		ly1 = max (y1, min (y2, int (ycen[l] - psfrad) + 1))
-		ly2 = max (y1, min (y2, int (ycen[lstar] + psfrad)))
-		if (ly2 < j) {
-		    gstar = lstar + 1
-		} else if (ly1 > j) {
-		    break
-		} else {
-		    star1 = min (star1, l)
-		    star2 = max (star2, lstar)
-		}
-	    }
+	    # Set the y coordinate.
+	    y = real (j)
 
-	    # Test the star pointers.
-	    if (star2 < star1)
-		next
+	    # Initialize the weight and scratch arrays.
 
-	    do l = star1, star2 {
-		call dp_glim (xcen[l], ycen[l], psfrad, x1, x2, y1, y2,
-		    lx1, lx2, ly1, ly2)
-		if (j < ly1 || j > ly2)
+	    # Find all the points within one working radius of each star.
+	    # Set all the sigmas positive again and copy them from DATA
+	    # to SUBT.
+	    do l = ns + 1, nstar {
+		dy = y - ycen[l] 
+		if (dy > radius) {
+		    ns = l
 		    next
-		call dp_alsubstar (Memr[wtbuf], npix, 1, x1, j, Memr[subtbuf],
-		    npix, 1, x1, j, lx1, j, lx2 - lx1 + 1, 1, xcen[l],
-		    ycen[l], mag[l], DP_VARPSF(dao), psfradsq, psffit)
+		} else if (dy < -radius)
+		    break 
+		dysq = dy ** 2
+		lx = max (x1, min (x2, int (xcen[l] - radius) + 1))
+		mx = max (x1, min (x2, int (xcen[l] + radius)))
+		x = xcen[l] - lx + 1.0
+		lx = lx - x1 + 1
+		mx = mx - x1 + 1
+		call dp_wstvector (x, Memr[databuf+lx-1], Memr[owtbuf+lx-1],
+		    Memr[subtbuf+lx-1], mx - lx + 1, dysq, rsq, -MAX_REAL)
 	    }
 
+	    do l = nl + 1, nstar {
+		dy = y - ycen[l] 
+		if (dy > psfradius) {
+		    nl = l
+		    next
+		} else if (dy < -psfradius)
+		    break 
+		dysq = dy ** 2
+		lx = max (x1, min (x2, int (xcen[l] - psfradius) + 1))
+		mx = max (x1, min (x2, int (xcen[l] + psfradius)))
+		x = xcen[l] - lx + 1.0
+		lx = lx - x1 + 1
+		mx = mx - x1 + 1
+		deltax = (xcen[l] - 1.0) / DP_PSFX(psffit) - 1.0
+		deltay = (ycen[l] - 1.0) / DP_PSFY(psffit) - 1.0
+		call dp_alsubstar (psffit, x, dy, deltax, deltay, mag[l],
+		    Memr[subtbuf+lx-1], Memr[owtbuf+lx-1], mx - lx + 1, dysq,
+		    psfradsq)
+	    }
 	}
 
+	if (DP_CACHE(allstar,A_WEIGHT) == NO)
+	    call imflush (DP_WEIGHTS(allstar))
 	if (DP_CACHE(allstar,A_SUBT) == NO)
 	    call imflush (DP_SUBT(allstar))
+end
+
+
+# DP_WSTVECTOR -- Set the weight and scratch vector
+
+procedure dp_wstvector (xcen, data, weight, subt, npix, dysq, rsq, badwt)
+
+real	xcen			# x coordinate of center
+real	data[ARB]		# the data array
+real	weight[ARB]		# the weight array
+real	subt[ARB]		# the subtracted array array
+int	npix			# the number of pixels
+real	dysq			# the y distance squared
+real	rsq			# the inclusion radius squared
+real	badwt			# badwt value
+
+int	i
+real	dx
+
+begin
+	do i = 1, npix {
+	    dx = (real (i) - xcen)
+	    if ((dx ** 2 + dysq) <= rsq) {
+		if (weight[i] <= badwt)
+		    next
+		weight[i] = abs (weight[i])
+		subt[i] = data[i]
+	    } else if (dx >= 0.0)
+		break
+	}
+end
+
+
+# DP_ALSUBSTAR -- The subtraction vector.
+
+procedure dp_alsubstar (psffit, xcen, dy, deltax, deltay, mag, subt, weight,
+	npix, dysq, psfradsq)
+
+pointer	psffit			# pointer to the psf fitting structure
+real	xcen			# x coordinate of center
+real	dy			# y offset from psf center
+real	deltax			# x distance from psf position
+real	deltay			# y distance from psf position
+real	mag			# the magnitude of the star
+real	subt[ARB]		# the subtracted array array
+real	weight[ARB]		# the weight array
+int	npix			# the number of pixels
+real	dysq			# the y distance squared
+real	psfradsq		# the inclusion radius squared
+
+int	i
+real	dx, dvdxc, dvdyc
+real	dp_usepsf()
+
+begin
+	do i = 1, npix {
+	    if (weight[i] < 0.0)
+		next
+	    dx = real (i) - xcen
+	    if ((dx ** 2 + dysq) < psfradsq) {
+		subt[i] = subt[i] - mag * dp_usepsf (DP_PSFUNCTION(psffit),
+		    dx, dy, DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
+		    Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+		    DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit), deltax, deltay,
+		    dvdxc, dvdyc)
+	    } else if (dx > 0.0)
+		break
+	}
+end
+
+
+# DP_ALSKY -- Recompute the sky values.
+
+procedure dp_alsky (dao, im, xcen, ycen, sky, nstar, x1, x2, y1, y2, rinsky,
+	routsky, minnsky, badwt)
+
+pointer	dao			# pointer to the daophot structure
+int	im			# the input image pointer
+real	xcen[ARB]		# x coordinates
+real	ycen[ARB]		# y coordinates
+real	sky[ARB]		# sky values
+int	nstar			# number of stars
+int	x1, x2			# coordinate limits
+int	y1, y2			# coordinate limits
+real	rinsky			# inner radius of the sky annulus
+real	routsky			# outer radius of the sky annulus
+int	minnsky			# minimum number of sky pixels
+real	badwt			# the bad weight value
+
+int	istar, i, j, ncols, lenskybuf, lx, mx, ly, my, line1, line2, nsky, ier
+pointer	allstar, sub, psub, wgt, pwgt, skyvals, index
+real	risq, rosq, dannulus, dysq, dx, rsq
+pointer	dp_gst(), dp_gwt()
+
+begin
+	# Get the allstar pointer.
+	allstar = DP_ALLSTAR(dao)
+
+	# Define some constants
+	ncols = IM_LEN(im,1)
+	risq = rinsky ** 2 
+	rosq = routsky ** 2
+	dannulus = routsky - rinsky
+
+	# Allcoate some working memory.
+	lenskybuf = PI * (2.0 * rinsky + dannulus + 1.0) * (dannulus + 0.5)
+	call malloc (skyvals, lenskybuf, TY_REAL)
+	call malloc (index, lenskybuf, TY_INT)
+
+	# Accumulate the sky buffer.
+	do istar = 1, nstar {
+
+	    # Get the data.
+	    lx = max (x1, min (x2, int (xcen[istar] - routsky) + 1))
+	    mx = max (x1, min (x2, int (xcen[istar] + routsky)))
+	    ly = max (y1, min (y2, int (ycen[istar] - routsky) + 1))
+	    my = max (y1, min (y2, int (ycen[istar] + routsky)))
+	    line1 = ly
+	    line2 = my
+	    sub = dp_gst (dao, im, line1, line2, READ_ONLY, NO)
+	    wgt = dp_gwt (dao, im, line1, line2, READ_ONLY, NO)
+
+	    nsky = 0
+	    psub = sub + (ly - DP_SYOFF(allstar)) * ncols 
+	    pwgt = wgt + (ly - DP_WYOFF(allstar)) * ncols
+	    do j = ly, my {
+		dysq = (real (j) - ycen[istar]) ** 2
+		do i = lx, mx {
+		    dx = (real (i) - xcen[istar])
+		    rsq = dx ** 2 + dysq
+		    if (rsq > rosq) {
+			if (dx > 0.0)
+			    break
+			else 
+			    next
+		    }
+		    if (rsq < risq)
+			next
+		    if (Memr[pwgt+i-1] <= badwt)
+			next
+		    Memr[skyvals+nsky] = Memr[psub+i-1]
+		    nsky = nsky + 1
+		}
+		psub = psub + ncols
+		pwgt = pwgt + ncols
+	    }
+
+	    # Compute the new sky value.
+	    if (nsky > minnsky) {
+	        call quick (Memr[skyvals], nsky, Memi[index], ier)
+	        j = nint (0.2 * nsky)
+	        dx = 0.0
+	        do i = (nsky + 1) / 2 - j, (nsky / 2) + j + 1
+		    dx = dx + Memr[skyvals+i-1]
+	        sky[istar] = dx / real ((nsky / 2) + 2 * j + 2 -
+		    (nsky + 1) / 2) 
+	    }
+	}
+
+
+	call mfree (skyvals, TY_REAL)
+	call mfree (index, TY_INT)
+	sub = dp_gst (dao, im, line1, line2, READ_ONLY, YES)
+	wgt = dp_gwt (dao, im, line1, line2, READ_ONLY, YES)
 end

@@ -1,6 +1,17 @@
 .help revisions Jun88 noao.imred.bias
 .nf
 noao$imred/bias/colbias.x
+noao$imred/bias/linebias.x
+noao$imred/bias/doc/colbias.hlp
+noao$imred/bias/doc/linebias.hlp
+    The output pixel type is now changed to real rather than preserving
+    the input pixel type.  (3/2/93, Valdes)
+
+=======
+V2.10.2
+=======
+
+noao$imred/bias/colbias.x
     Valdes, January 6, 1990
     The graphics device parameter was being ignored and "stdgraph" always
     opened.

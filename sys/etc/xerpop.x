@@ -34,3 +34,22 @@ begin
 
 	return (error_status)
 end
+
+
+# XERPOPI -- Integer version of XERPOP.
+
+int procedure xerpopi()
+
+bool	error_status
+include	"error.com"
+
+begin
+	nhandlers = nhandlers - 1
+	error_status = xerflg
+	xerflg = false
+
+	if (error_status)
+	    return (1)
+	else
+	    return (0)
+end

@@ -45,13 +45,15 @@ begin
 	    # Reaccumulate the residuals and increment lambda.
 	    NL_SUMSQ(nl) = nlresid$t (nl, x, z, w, npts, nvars)
 	    #if (NL_OLDSQ(nl) > (NL_SUMSQ(nl) + NL_TOL(nl) * NL_SUMSQ(nl))) {
-	    if (NL_OLDSQ(nl) > NL_SUMSQ(nl)) {
+	    if (NL_OLDSQ(nl) >= NL_SUMSQ(nl)) {
 		call amov$t (TRY(NL_TRY(nl)), PARAM(NL_PARAM(nl)),
 		    NL_NPARAMS(nl))
 		NL_LAMBDA(nl) = PIXEL (0.10) * NL_LAMBDA(nl)
 		break
 	    } else
-	        NL_LAMBDA(nl) = PIXEL (10.0) * NL_LAMBDA(nl)
+	        NL_LAMBDA(nl) = min (PIXEL(LAMBDAMAX),
+		    PIXEL (10.0) * NL_LAMBDA(nl))
 
-	} until (NL_LAMBDA(nl) > LAMBDAMAX)
+	} until (NL_LAMBDA(nl) <= PIXEL(0.0) ||
+	    NL_LAMBDA(nl) >= PIXEL(LAMBDAMAX))
 end

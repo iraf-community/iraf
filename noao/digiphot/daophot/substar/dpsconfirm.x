@@ -1,5 +1,3 @@
-include "../lib/daophot.h"
-
 # DP_SCONFIRM -- Procedure to confirm the critical substar parameters.
 
 procedure dp_sconfirm (dao)

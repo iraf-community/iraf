@@ -1,0 +1,22 @@
+# Parameters for rvidlines task.
+
+images,s,a,,,,Images containing features to be identified
+section,s,h,"middle line",,,Section to apply to two dimensional images
+database,f,h,database,,,Database in which to record feature data
+coordlist,f,h,,,,User coordinate list
+nsum,s,h,"10",,,Number of lines/columns/bands to sum in 2D images
+match,r,h,10.,,,Coordinate list matching limit in user units
+maxfeatures,i,h,50,,,Maximum number of features for automatic identification
+zwidth,r,h,100.,,,Zoom graph width in user units
+
+ftype,s,h,"absorption","emission|absorption|gemission|gabsorption",,Feature type
+fwidth,r,h,4.,,,Feature width in pixels
+cradius,r,h,5.,,,Centering radius in pixels
+threshold,r,h,0.,0.,,Feature threshold for centering
+minsep,r,h,2.,0.,,Minimum pixel separation
+
+logfile,s,h,"logfile",,,Log file
+autowrite,b,h,no,,,"Automatically write to logfile and database"
+keywpars,pset,h,"",,,Header keyword translation pset
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

@@ -379,7 +379,7 @@ FILE	*out;
  * 7 byte encoding scheme.
  */
 xy_point (out, x, y, flag)
-int	out;			/* output file */
+FILE	*out;			/* output file */
 register int x, y;		/* coords to move to */
 int	flag;			/* move or draw? */
 {
@@ -425,7 +425,7 @@ int	flag;			/* move or draw? */
  * stroke command to Postscript to draw the buffered points.
  */
 xy_flush (out)
-int	out;
+FILE	*out;
 {
 	if (npts > 0) {
 	    if (fourbyte)
@@ -491,7 +491,7 @@ int	val;			/* device line width 		*/
 /* TEXTOUT -- Output lines of text to a file.
  */
 textout (out, text)
-int	out;			/* output file */
+FILE	*out;			/* output file */
 char	*text[];		/* array of lines of text */
 {
 	register char **lp;

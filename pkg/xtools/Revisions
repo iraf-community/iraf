@@ -1,5 +1,73 @@
 .help revisions Jun88 pkg.xtools
 .nf
+xtools$obsdb.x
+    Changed the "timezone" parameter to be a double instead of an integer.
+    There are non-integer timezones such as India.  (12/29/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine can still have a problem in that the tan function
+    can return a very large number triggering either an overflow in
+    the evaluation of em or in the int truncation of em as addressed
+    below.  A test is now made on the value of the tan function.
+    (9/14/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine from Numerical Recipes can try to coerce a large
+    floating point number to an integer which can cause an exception.
+    If the value is 100 or greater a Gaussian deviate is now returned.
+    (8/11/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+xtools$center1d.x
+    For EMISSION features the threshold is applied as an absolute threshold
+    if the minimum data value is above zero and as a threshold relative to the
+    minimum data value if the minimum data value is below zero.  Without
+    this change centering would fail if the data was all below zero.
+    (5/5/93, Valdes)
+
+xtools$obsdb.x
+    Fixed a couple of typos in comments.  No code changes.  (4/28/93, Valdes)
+
+xtools$rngranges.x
+    Yet another ranges package.  This ranges package allows real number
+    ranges (including negative values) and @ lists.  It is an object
+    oriented package using a pointer.
+
+    RNG_OPEN     -- Open a range string.  Return a pointer to the ranges.
+    RNG_CLOSE    -- Close range structure.
+    RNG_INDEX    -- Get ith range element.  Return EOF if index is out of range.
+    RNG_NEAREST  -- Get nearest range index and value to input value.
+		     Return the difference.
+    RNG_INRANGER -- Check if real value is within a range.
+    RNG_INRANGEI -- Check if integer value is within a range.
+    RNG_ELEMENTR -- Check if real value is an element.
+    RNG_ELEMENTI -- Check if integer value is an element.
+    RNG_ADD      -- Add a range.
+    RNG_ERROR    -- Set error flag and free memory.
+    (2/16/93, Valdes)
+
+xtools$center1d.x
+    If the initial center was more than three pixels from the true center
+    the interation would stop prematurely because of the dxcheck criterion.
+    Changed dxabs to be the full dx rather than the the limit of 1 pixel
+    per interation.  This allows the interation to step as often as
+    it needs in one pixel steps until the dx estimate begins to become
+    small.  It still preserves the checks for flipping back and forth
+    about the center and for a maximum number of times the dxabs
+    is greater than the previous minimum dxabs = dxlast.
+    (9/22/92, Valdes)
+
+=======
+V2.10.2
+=======
+
+=======
+V2.10.1
+=======
+
 lib$pkx/dttext.h
 pkg$xtools/dttext.x
     Added a new routine, dtremap, which allows keeping the database

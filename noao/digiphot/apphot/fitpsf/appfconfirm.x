@@ -11,9 +11,9 @@ int	out		# the output file descriptor
 int	stid		# the output file sequence number
 
 pointer	sp, str
-real	fwhmpsf, psfapert, threshold, datamin, datamax
+real	fwhmpsf, psfapert, datamin, datamax
 int	apstati()
-real	apstatr(), ap_vfwhmpsf(), ap_vthreshold(), ap_vpsfapert()
+real	apstatr(), ap_vfwhmpsf(), ap_vpsfapert()
 real	ap_vdatamin(), ap_vdatamax()
 
 begin
@@ -34,12 +34,6 @@ begin
 	# Confirm the fitting box.
 	psfapert = 2.0 * ap_vpsfapert (ap)
 
-	# Confirm the threshold parameter.
-	if (apstati (ap, PSFUNCTION) == AP_MOMENTS)
-	    threshold = ap_vthreshold (ap)
-	else
-	    threshold = apstatr (ap, THRESHOLD)
-
 	# Confirm the good data minimum and maximum values.
 	datamin = ap_vdatamin (ap)
 	datamax = ap_vdatamax (ap)
@@ -48,17 +42,15 @@ begin
 
 	# Update the database file.
 	if (out != NULL && stid > 1) {
-	    call ap_sparam (out, KY_PSFSTRING, Memc[str], UN_PSFSTRING,
+	    call ap_sparam (out, KY_PSFSTRING, Memc[str], UN_PSFMODEL,
 		"psf fitting function")
-	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_FWHMPSF,
+	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_ASCALEUNIT,
 	        "full width half maximum of the psf")
-	    call ap_rparam (out, KY_PSFAPERT, psfapert, UN_PSFAPERT,
+	    call ap_rparam (out, KY_PSFAPERT, psfapert, UN_PSFSCALEUNIT,
 	        "width of fitting box")
-	    call ap_rparam (out, KY_THRESHOLD, threshold, UN_THRESHOLD,
-	        "threshold")
-	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_ACOUNTS,
 	        "minimum good data value")
-	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_ACOUNTS,
 	        "maximum good data value")
 	}
 

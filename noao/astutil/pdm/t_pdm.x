@@ -1,6 +1,7 @@
-include <mach.h>
+
 include <ctype.h>
 include <error.h>
+include <mach.h>
 include "pdm.h"
 
 # PDM -- Phase Dispersion Minimization.  Find periodicities in light
@@ -33,26 +34,28 @@ begin
 	pdmp = pdm_open (device, batchfile, metafile, interactive)
 
 	# Clio to get more parameters.
-	PDM_PMIN(pdmp) = clgetr ("minp")
-	call clputr ("minp", PDM_PMIN(pdmp))
-	if (PDM_PMIN(pdmp) > EPSILONR)
-	    PDM_FMAX(pdmp) = 1./PDM_PMIN(pdmp)
+	PDM_PMIN(pdmp) = double(clgetr ("minp"))
+	call clputr ("minp", real(PDM_PMIN(pdmp)))
+	if (PDM_PMIN(pdmp) > EPSILOND)
+	    PDM_FMAX(pdmp) = 1.0d+0/PDM_PMIN(pdmp)
 	else
-	    PDM_FMAX(pdmp) = 0.0
-	PDM_PMAX(pdmp) = clgetr ("maxp")
-	call clputr ("maxp", PDM_PMAX(pdmp))
-	if (PDM_PMAX(pdmp) > EPSILONR)
-	    PDM_FMIN(pdmp) = 1./PDM_PMAX(pdmp)
+	    PDM_FMAX(pdmp) = 0.0d+0
+	PDM_PMAX(pdmp) = double(clgetr ("maxp"))
+	call clputr ("maxp", real(PDM_PMAX(pdmp)))
+	if (PDM_PMAX(pdmp) > EPSILOND)
+	    PDM_FMIN(pdmp) = 1.0d+0/PDM_PMAX(pdmp)
 	else
-	    PDM_FMIN(pdmp) = 0.0
+	    PDM_FMIN(pdmp) = 0.0d+0
 	PDM_NTHPT(pdmp) = clgeti ("ntheta")
 	autoranges = clgetb ("autoranges")
-	PDM_NSIGMA(pdmp) = clgeti ("nsigma")
+	PDM_NSIGMA(pdmp) = double(clgetr ("nsigma"))
 	PDM_DEBUG(pdmp) = clgetb ("debug")
 	PDM_PLUSPOINT(pdmp) = clgeti ("pluspoint")
 
 	# Read in the data.
 	PDM_NPT(pdmp) = pdm_gdata (pdmp, infile)
+
+#	PDM_DEBUG(pdmp) = false
 
 	# If the autoranges flag is set, call the autorange subroutine.
 	if (autoranges)

@@ -1,13 +1,58 @@
-# DP_REGROUP -- Group stars into physical associations based on proximity.
+# DP_ALSORT -- Sort the stars on the y coordinate.
 
-procedure dp_regroup (id, x, y, mag, sky, dxold, dyold, xclamp, yclamp, nstar,
-	radius, last)
+procedure dp_alsort (id, x, y, mag, sky, sumwt, dxold, dyold, xclamp, yclamp,
+	nstar)
 
 int	id[ARB]			# array if star ids
 real	x[ARB]			# array of star x values
 real	y[ARB]			# array of y values
 real	mag[ARB]		# array of star magnitudes
 real	sky[ARB]		# array of star sky values
+real	sumwt[ARB]		# array of weighted sums
+real	dxold[ARB]		# the previous star x array
+real	dyold[ARB]		# the previous star y array
+real	xclamp[ARB]		# the x array clamps
+real	yclamp[ARB]		# the y array clamps
+int	nstar			# the number of stars
+
+int	ier
+pointer	sp, index
+
+begin
+	# Allocate some working memory.
+	call smark (sp)
+	call salloc (index, nstar, TY_INT)
+
+	# Sort the star list on y.
+	call quick (y, nstar, Memi[index], ier)
+
+	# Recitfy the remaining arrays.
+	call dp_irectify (id, Memi[index], nstar)
+	call dp_rectify (x, Memi[index], nstar)
+	call dp_rectify (mag, Memi[index], nstar)
+	call dp_rectify (sky, Memi[index], nstar)
+	call dp_rectify (sumwt, Memi[index], nstar)
+	call dp_rectify (dxold, Memi[index], nstar)
+	call dp_rectify (dyold, Memi[index], nstar)
+	call dp_rectify (xclamp, Memi[index], nstar)
+	call dp_rectify (yclamp, Memi[index], nstar)
+
+	# Release memory.
+	call sfree (sp)
+end
+
+
+# DP_REGROUP -- Group stars into physical associations based on proximity.
+
+procedure dp_regroup (id, x, y, mag, sky, chi, dxold, dyold, xclamp, yclamp,
+	nstar, radius, last)
+
+int	id[ARB]			# array if star ids
+real	x[ARB]			# array of star x values
+real	y[ARB]			# array of y values
+real	mag[ARB]		# array of star magnitudes
+real	sky[ARB]		# array of star sky values
+real	chi[ARB]		# array of chis
 real	dxold[ARB]		# the previous star x array
 real	dyold[ARB]		# the previous star y array
 real	xclamp[ARB]		# the x array clamps
@@ -16,7 +61,7 @@ int	nstar			# the number of stars
 real	radius			# the fitting radius
 int	last[ARB]		# the last array (NO or YES for last star)
 
-int	itop, itest, j, k, i
+int	itop, itest, j, k, i, ier
 pointer sp, index
 real	critrad, critradsq, xtest, ytest, dx, dy
 
@@ -36,7 +81,7 @@ begin
 	critradsq = critrad * critrad
 
 	# Sort the star list on y and rectify the accompanying x array.
-	call quick (y, nstar, Memi[index])
+	call quick (y, nstar, Memi[index], ier)
 	call dp_rectify (x, Memi[index], nstar)
 
 	# At this point the stars are in a stack NSTAR stars long. The
@@ -133,10 +178,13 @@ begin
 	call dp_irectify (id, Memi[index], nstar)
    	call dp_rectify (mag, Memi[index], nstar)
 	call dp_rectify (sky, Memi[index], nstar)
+	call dp_rectify (chi, Memi[index], nstar)
 	call dp_rectify (dxold, Memi[index], nstar)
 	call dp_rectify (dyold, Memi[index], nstar)
 	call dp_rectify (xclamp, Memi[index], nstar)
 	call dp_rectify (yclamp, Memi[index], nstar)
+
+	call sfree (sp)
 end
 
 

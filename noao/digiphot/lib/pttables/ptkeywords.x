@@ -119,7 +119,7 @@ char	line[ARB]	# line to be decoded
 int	nchars		# number of characters in the line
 
 int	index, onstore
-long	optr, lshift
+long	optr
 pointer	sp, id, keyword, equals, value, units, format, temp 
 int	nscan(), strdic()
 
@@ -136,10 +136,8 @@ begin
 	    call realloc (KY_NELEMS(key), KY_NSTORE(key), TY_INT)
 	    call aclri (Memi[KY_NELEMS(key)+onstore], KY_NSTORE(key) - onstore)
 	    call realloc (KY_PTRS(key), KY_NSTORE(key), TY_INT)
-	    Memi[KY_PTRS(key)] = KY_VALUES(key)
-	    lshift = KY_VALUES(key) - optr
-	    call aaddki (Memi[KY_PTRS(key)], lshift, Memi[KY_PTRS(key)],
-	        onstore)
+	    call aaddki (Memi[KY_PTRS(key)], KY_VALUES(key) - optr,
+	        Memi[KY_PTRS(key)], onstore)
 	    call amovki (NULL, Memi[KY_PTRS(key)+onstore], KY_NSTORE(key) -
 	        onstore)
 	    call realloc (KY_TYPES(key), KY_NSTORE(key), TY_INT)
@@ -472,7 +470,7 @@ begin
 		    call pargi (maxels)
 	    return (Memi[KY_TYPES(key)+index-1])
 	} else
-	    call error (0, "Unknown keyword")
+	    call error (0, "Unknown keyword in expression")
 end
 
 
@@ -506,7 +504,7 @@ begin
 	    else
 	        return (true)
 	} else
-	    return (false)
+	    call error (0, "Unknown boolean keyword in expression")
 end
 
 
@@ -541,7 +539,7 @@ begin
 	    else
 		return (ival)
 	} else
-	    call error (0, "Unknown integer parameter")
+	    call error (0, "Unknown integer keyword in expression")
 end
 
 
@@ -577,7 +575,7 @@ begin
 	    else
 		return (rval)
 	} else
-	    call error (0, "Unknown real parameter")
+	    call error (0, "Unknown real keyword in expression")
 end
 
 
@@ -613,5 +611,5 @@ begin
 		;
 	    call strcpy (Memc[ptr], str, min (nk, maxch))
 	} else
-	    call error (0, "Unknown string parameter")
+	    call error (0, "Unknown string keyword in expression")
 end

@@ -44,9 +44,10 @@ tundefined:
 libpkg.a:
 	@allstar
 	@addstar
+	@daoedit
 	@daolib
 	@group
-	@grpselect
+	@select
 	@nstar
 	@peak
 	@psf

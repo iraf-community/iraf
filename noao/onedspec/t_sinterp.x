@@ -128,8 +128,11 @@ begin
 		    Memr[pix+i-1] = y
 		}
 
-		call imaddr (im, "W0", x1)
-		call imaddr (im, "WPC", dx)
+		call imaddr (im, "CRVAL1", x1)
+		call imaddr (im, "CDELT1", dx)
+		call imaddr (im, "CD1_1", dx)
+		call imaddr (im, "CRPIX1", 1.)
+		call imaddi (im, "DC-FLAG", 0)
 
 		call imunmap (im)
 	    } else {

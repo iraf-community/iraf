@@ -15,7 +15,7 @@ real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 
 int	 maxpix, npix, nx, ny, wcs, key
-pointer	gt, sp, pix, coords, r, cmd
+pointer	gt, sp, pix, coords, index, r, cmd
 real	gwx, gwy, xcenter, ycenter, xc, yc, radius, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
 
@@ -47,6 +47,7 @@ begin
 	# Allocate temporary space.
 	call smark (sp)
 	call salloc (coords, maxpix, TY_INT)
+	call salloc (index, maxpix, TY_INT)
 	call salloc (pix, maxpix, TY_REAL)
 	call salloc (r, maxpix, TY_REAL)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
@@ -63,6 +64,7 @@ begin
 	    call sfree (sp)
 	    return
 	}
+	call ap_index (Memi[index], npix)
 
 	# Store old viewport and window coordinates.
 	call ggview (gd, u1, u2, v1, v2)
@@ -73,7 +75,7 @@ begin
 	gt = ap_gtinit (Memc[cmd], xcenter, ycenter)
 
 	# Compute the radius values.
-	call ap_xytor (Memi[coords], Memr[r], npix, xc, yc, nx)
+	call ap_xytor (Memi[coords], Memi[index], Memr[r], npix, xc, yc, nx)
 	call alimr (Memr[r], npix, rmin, rmax)
 	call alimr (Memr[pix], npix, imin, imax)
 
@@ -84,7 +86,7 @@ begin
 
 	# Go into cursor mode.
 	call printf ("Waiting for cursor mode command: [:.help=help,q=quit]")
-	while (clgcur ("cursor", gwx, gwy, wcs, key, Memc[cmd], SZ_LINE) !=
+	while (clgcur ("gcommands", gwx, gwy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 	    if (key == 'q')
 		break

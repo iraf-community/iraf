@@ -7,8 +7,8 @@
 #define import_ctype
 #include <iraf.h>
 
-#include "clmodes.h"
 #include "config.h"
+#include "clmodes.h"
 #include "construct.h"
 #include "operand.h"
 #include "param.h"
@@ -80,7 +80,7 @@ struct param *pp;
 	 */
 	if (pp != NULL)
 	    if (pp->p_mode & M_LOCAL) {
-		if (opundef (&(pp->p_valo)) || opindef (&(pp->p_valo) ) )
+		if (opundef (&(pp->p_valo)))
 		    cl_error (E_UERR, localerr, pp->p_name);
 		return (0);
 	    }

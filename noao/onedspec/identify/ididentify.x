@@ -1,7 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 include	<gset.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"identify.h"
 
 define	HELP		"noao$onedspec/identify/identify.key"
@@ -23,7 +23,7 @@ int	wcs, key
 char	cmd[SZ_LINE]
 
 char	newimage[SZ_FNAME]
-int	i, j, last, all, prfeature, nfeatures1, npeaks, newline
+int	i, j, last, all, prfeature, nfeatures1, npeaks, newline[2]
 bool	answer
 double	pix, fit, user, shift, pix_shift, z_shift
 pointer	peaks, label
@@ -54,7 +54,7 @@ newim_
 
 	# Get the database entry for the image if it exists.
 	iferr {
-	    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO, YES)
+	    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO, YES)
 	    ID_NEWDBENTRY(id) = NO
 	} then
 	    if ((ID_NFEATURES(id) > 0) || (ID_CV(id) != NULL))
@@ -78,7 +78,8 @@ newim_
 	all = 0
 	last = ID_CURRENT(id)
 	newimage[1] = EOS
-	newline = ID_LINE(id)
+	newline[1] = ID_LINE(id,1)
+	newline[2] = ID_LINE(id,2)
 	ID_REFIT(id) = NO
 	ID_NEWFEATURES(id) = NO
 	ID_NEWCV(id) = NO
@@ -148,7 +149,7 @@ newim_
 			call id_mark (id, ID_CURRENT(id))
 		        ID_NEWFEATURES(id) = YES
 		    } else {
-			call printf ("Centering failed")
+			call printf ("Centering failed\n")
 			prfeature = NO
 		    }
 		}
@@ -183,13 +184,21 @@ newim_
 		ID_NEWFEATURES(id) = YES
 		ID_NEWGRAPH(id) = YES
 	    case 'j':	# Go to previous line
-		newline = ID_LINE(id) - ID_NSUM(id)
-		if (newline < 1)
-		    newline = newline + ID_MAXLINE(id)
+		newline[1] = ID_LINE(id,1) - ID_NSUM(id,1)
+		if (newline[1] < 1) {
+		    newline[1] = newline[1] + ID_MAXLINE(id,1)
+		    newline[2] = ID_LINE(id,2) - ID_NSUM(id,2)
+		    if (newline[2] < 1)
+			newline[2] = newline[2] + ID_MAXLINE(id,2)
+		}
 	    case 'k':	# Go to next line
-		newline = ID_LINE(id) + ID_NSUM(id)
-		if (newline > ID_MAXLINE(id))
-		    newline = newline - ID_MAXLINE(id)
+		newline[1] = ID_LINE(id,1) + ID_NSUM(id,1)
+		if (newline[1] > ID_MAXLINE(id,1)) {
+		    newline[1] = newline[1] - ID_MAXLINE(id,1)
+		    newline[2] = ID_LINE(id,2) + ID_NSUM(id,2)
+		    if (newline[2] > ID_MAXLINE(id,2))
+			newline[2] = newline[2] - ID_MAXLINE(id,2)
+		}
 	    case 'l':	# Find features from line list
 		if (ID_NFEATURES(id) >= 2)
 		    call id_dofit (id, NO)
@@ -244,15 +253,22 @@ newim_
 		    }
 		}
 	    case 'o':	# Go to a specified line
-		call printf ("Line/Column (%d): ")
-		    call pargi (ID_LINE(id))
+		call printf ("Line/Column/Band (%d %d): ")
+		    call pargi (ID_LINE(id,1))
+		    call pargi (ID_LINE(id,2))
 		    call flush (STDOUT)
 		if (scan() != EOF) {
 		    call gargi (j)
 		    if (nscan() == 1) {
-			if (j < 1 || j > ID_MAXLINE(id))
+			if (j < 1 || j > ID_MAXLINE(id,1))
 			    goto beep_
-			newline = j
+			newline[1] = j
+			call gargi (j)
+			if (nscan() == 2) {
+			    if (j < 1 || j > ID_MAXLINE(id,2))
+				goto beep_
+			    newline[2] = j
+			}
 		    }
 		}
 	    case 'p':	# Switch to pan mode
@@ -290,7 +306,7 @@ newim_
 		prfeature = NO
 
 		if (ID_NFEATURES(id) < 1) {
-		    call printf ("User coordinate shift=%5f")
+		    call printf ("User coordinate shift=%5f\n")
 			call pargd (shift)
 		    ID_SHIFT(id) = ID_SHIFT(id) + shift
 		    goto newkey_
@@ -334,7 +350,7 @@ newim_
 		if (ID_NFEATURES(id) < 1) {
 		    call printf ("User coordinate shift=%5f")
 			call pargd (shift)
-		    call printf (", No features found during recentering")
+		    call printf (", No features found during recentering\n")
 		    ID_SHIFT(id) = ID_SHIFT(id) + shift
 		    goto newkey_
 		}
@@ -349,7 +365,7 @@ newim_
 		    call pargi (ID_NFEATURES(id))
 		    call pargi (nfeatures1)
 		call printf (
-		    ", pixel shift=%.2f, user shift=%5f, z=%7.3g, rms=%5g")
+		    ", pixel shift=%.2f, user shift=%5f, z=%7.3g, rms=%5g\n")
 		    call pargd (pix_shift / ID_NFEATURES(id))
 		    call pargd (pix - ID_SHIFT(id))
 		    call pargd (z_shift / ID_NFEATURES(id))
@@ -391,6 +407,19 @@ newim_
 			call gargd (user)
 			call gargstr (cmd, SZ_LINE)
 			call id_label (cmd, Memi[ID_LABEL(id)+ID_CURRENT(id)-1])
+		    }
+		}
+	    case 'v':	# Modify weight
+		if (ID_NFEATURES(id) < 1)
+		    goto beep_
+		call printf ("Weight (%d): ")
+		    call pargd (WTS(id,ID_CURRENT(id)))
+		call flush (STDOUT)
+		if (scan() != EOF) {
+		    call gargi (i)
+		    if (nscan() > 0) {
+			WTS(id,ID_CURRENT(id)) = i
+			ID_NEWFEATURES(id) = YES
 		    }
 		}
 	    case 'w':	# Window graph
@@ -446,13 +475,15 @@ newkey_
 		break
 
 	    # If a new line, save features and set new line.
-	    if (newline != ID_LINE(id)) {
-		call id_saveid (id, ID_LINE(id))
-		ID_LINE(id) = newline
+	    if (newline[1] != ID_LINE(id,1) || newline[2] != ID_LINE(id,2)) {
+		call id_saveid (id, ID_LINE(id,1))
+		ID_LINE(id,1) = newline[1]
+		ID_LINE(id,2) = newline[2]
 		call id_gdata (id)
 		if (id_gid (id, newline) == EOF) {
 		    iferr {
-		        call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id),NO,NO)
+		        call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			    NO, NO)
 		        ID_NEWDBENTRY(id) = NO
 			ID_NEWFEATURES(id) = NO
 		    } then
@@ -497,7 +528,7 @@ newkey_
 		    
 		call gscur (ID_GP(id), real (FIT(id,ID_CURRENT(id))), wy)
 		if (errcode() == OK && prfeature == YES) {
-	            call printf ("%10.2f %10.8g %10.8g %s")
+	            call printf ("%10.2f %10.8g %10.8g %s\n")
 		        call pargd (PIX(id,ID_CURRENT(id)))
 		        call pargd (FIT(id,ID_CURRENT(id)))
 		        call pargd (USER(id,ID_CURRENT(id)))
@@ -537,14 +568,17 @@ newkey_
 	            call gargb (answer)
 	    }
 	    if (answer) {
-		newline = ID_LINE(id)
+		newline[1] = ID_LINE(id,1)
+		newline[2] = ID_LINE(id,2)
 		if (ID_NEWDBENTRY(id) == YES)
-	            call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+	            call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
 		for (i = 0; i < ID_NID(id); i = i + 1) {
 	    	    j = Memi[ID_ID(id)+i]
-	    	    if (ID_NEWDBENTRY(j) == YES && ID_LINE(j) != newline) {
-			j =id_gid (id, ID_LINE(j))
-	            	call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+	    	    if (ID_NEWDBENTRY(j) == YES &&
+			(ID_LINE(j,1)!=newline[1]||ID_LINE(j,2)!=newline[2])) {
+			j =id_gid (id, ID_LINE(j,1))
+	            	call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			    NO)
 		    }
 		}
 	    }
@@ -557,7 +591,7 @@ newkey_
 	call mfree (ID_FITDATA(id), TY_DOUBLE)
 	call id_free1 (id)
 
-	call mw_close (MW(ID_SH(id)))
+	call smw_close (MW(ID_SH(id)))
 	call imunmap (IM(ID_SH(id)))
 	call shdr_close (ID_SH(id))
 

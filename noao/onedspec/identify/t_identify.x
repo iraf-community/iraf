@@ -6,7 +6,7 @@ include	"identify.h"
 
 procedure t_identify ()
 
-int	list, clgeti(), clgwrd(), imtopenp(), imtgetim()
+int	list, clscan(), clgeti(), clgwrd(), nscan(), imtopenp(), imtgetim()
 real	clgetr()
 pointer	sp, str, id, gt_init()
 
@@ -19,7 +19,16 @@ begin
 
 	# Get task parameters.
 	list = imtopenp ("images")
-	ID_NSUM(id) = clgeti ("nsum")
+	if (clscan ("nsum") != EOF) {
+	    call gargi (ID_NSUM(id,1))
+	    call gargi (ID_NSUM(id,2))
+	    if (nscan() == 0)
+		call error (1, "Error in 'nsum' parameter")
+	    if (nscan() == 1)
+		ID_NSUM(id,2) = ID_NSUM(id,1)
+	    ID_NSUM(id,1) = max (1, ID_NSUM(id,1))
+	    ID_NSUM(id,2) = max (1, ID_NSUM(id,2))
+	}
 	ID_MAXFEATURES(id) = clgeti ("maxfeatures")
 	ID_MINSEP(id) = clgetr ("minsep")
 	ID_MATCH(id) = clgetr ("match")
@@ -65,13 +74,11 @@ begin
 	call id_mapll (id)
 
 	# Expand the image template and identify features in each image.
-	while (imtgetim (list, Memc[ID_IMAGE(id)], SZ_FNAME) != EOF) {
-	    call id_noextn (Memc[ID_IMAGE(id)])
+	while (imtgetim (list, Memc[ID_IMAGE(id)], SZ_FNAME) != EOF)
 	    call id_identify (id)
-	}
 
 	# Finish up.
-	call shdr_2d (NULL, 0, 0)
+	call smw_daxis (NULL, NULL, 0, 0, 0)
 	call id_free (id)
 	call imtclose (list)
 	call sfree (sp)

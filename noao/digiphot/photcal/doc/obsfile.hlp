@@ -1,4 +1,4 @@
-.help obsfile Aug91 noao.digiphot.photcal
+.help obsfile Apr94 noao.digiphot.photcal
 .ih
 NAME
 obsfile -- prepare an observations file from a list of user created 
@@ -10,16 +10,16 @@ obsfile photfiles incolumns idfilters imsets observations
 PARAMETERS
 .ls photfiles
 A list of text files containing the image names or an image id,
-x-y positions, magnitudes, magnitude errors, airmasses, filter ids, and
-exposure times of all the measured objects. \fIPhotfiles\fR are assumed
-to be the output of the user's own
+x-y positions, magnitudes, magnitude errors, airmasses, filter ids,
+exposure times, and time of observation of all the measured objects.
+\fIPhotfiles\fR are assumed to be the output of the user's own
 digital photometry program. All the files in the list must have the
 format specified by \fIincolumns\fR.
 .le
 .ls incolumns
-A list of eight numbers separated by commas or whitespace specifying
+A list of nine numbers separated by commas or whitespace specifying
 which columns in \fIphotfiles\fR contain the following fields: the image name
-or id, x coordinate, y coordinate, filter id, exposure time, airmass,
+or id, x coordinate, y coordinate, filter id, exposure time, airmass, time of observation,
 instrumental magnitude, and magnitude error, respectively.  
 .le
 .ls idfilters
@@ -45,34 +45,34 @@ The output observations file suitable for input to FITPARAMS or
 EVALFIT/INVERTFIT.
 .le
 .ls obsparams = ""
-The name of an optional text file containing the correct filter ids,
-exposure times,
-and airmasses for each image whose values are either undefined or incorrectly
-stored in \fIphotfiles\fR.
-The observing parameters for each image are listed in the file
-\fIobsparams\fR,
-1 image per line with the image
-name in column 1 and the filter ids, exposure times, and airmasses
-in columns \fIobscolumns\fR.
-The image names must match those in
+The name of an optional text file containing the correct filter ids, exposure times,
+airmasses, and time of observations for each image whose values are either undefined or
+incorrectly stored in \fIphotfiles\fR.  The observing parameters for each image are
+listed in the file \fIobsparams\fR, 1 image per line with the image
+name in column 1 and the filter ids, exposure times, airmasses, and times of observation
+listed in columns \fIobscolumns\fR.  The image names must match those in
 \fIimsets\fR. Images which have no
 entries in \fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
 .le
-.ls obscolumns = "2 3 4"
+.ls obscolumns = "2 3 4 5"
 The list of numbers separated by commas or whitespace specifying which columns
 in the text file \fIobsparams\fR contain the correct filter ids, 
-exposure times, and airmasses respectively.
+exposure times, airmasses, and times of observation respectively.
 The number 0 can be used as a place holder in the \fIobscolumns\fR string.
 For example, to correct only  the \fIphotfiles\fR airmass
-values, \fIobscolumns\fR should be set to "0 0 column", where column is
+values, \fIobscolumns\fR should be set to "0 0 column 0", where column is
 the airmass column number.
 The default value of \fIobscolumns\fR corresponds to
 the format of the default \fIobsparams\fR file produced by MKIMSETS.
 .le
+.ls minmagerr = 0.001
+The error that will be assigned to a non-INDEF valued magnitude
+measurement whose recorded error is less than \fIminmagerr\fR.
+.le
 .ls shifts = ""
 The name of the text file specifying the x and y shifts to be ADDED
 to the x-y positions of all objects in an image before position matching
-and output to \fIobservations\fR. 
+(the original x's and y's are retained in the output). 
 Shifts are listed for each image, 1 image per line with
 the name of the image in column 1, followed by the x and y shifts
 in columns 2 and 3 respectively. Image names must match those in 
@@ -133,23 +133,25 @@ files format.
 
 OBSFILE performs the following functions: 1) extracts the quantities
 image name or image id, x and y position, filter id, exposure time, airmass,
-magnitude, and magnitude error from
+time of observation, magnitude, and magnitude error from
 \fIphotfiles\fR, 2) corrects any erroneous or missing values of filter id,
-exposure time, and airmass in \fIphotfiles\fR,  3) associates each 
+exposure time, airmass, or time of observation in \fIphotfiles\fR,  3) associates each 
 field with one or more sets of images of that
 field taken through different filters 4) matches individual objects within
 a given observation by order of occurence or x-y position, and
 5) assigns a unique name to each object in each field.
 
 The parameter \fIincolumns\fR describes the format of \fIphotfiles\fR.
-\fIIncolumns\fR is a list of eight numbers separated by commas or whitespace
+\fIIncolumns\fR is a list of nine numbers separated by commas or whitespace
 which specify the columns containing the following fields: the
 image name or id,
 the x coordinate, the y coordinate, the filter id, the exposure time, 
-the airmass, the instrumental magnitude and the magnitude error. For example
-if \fIincolumns\fR is "1 2 3 6 8 7 4 5", the image name is assumed to
+the airmass, the time of observation the instrumental magnitude and the magnitude error.
+For example
+if \fIincolumns\fR is "1 2 3 6 8 7 9 4 5", the image name is assumed to
 be in column 1, the x and y positions in columns 2 and 3, the filter id,
-exposure time, and airmass in columns 6, 8 and 7, and the instrumental
+exposure time, airmass, and time of observation in columns 6, 8, 7 and 9,
+and the instrumental
 magnitude and magnitude error in columns 4 and 5. The image names must
 match those in \fIimsets\fR or the corresponding input data is skipped.
 The columns image name, x coordinate, y coordinate, and magnitude
@@ -167,6 +169,8 @@ If there is no filter id column in \fIphotfiles\fR the value in
 will be written to the appropriate column in \fIobservations\fR. 
 If there is no exposure time column in \fIphotfiles\fR the value in
 \fIobspararms\fR if any, or a value of one will be assumed.
+If there is no time of observation time column in \fIphotfiles\fR the value in
+\fIobspararms\fR if any, or a value of INDEF will be assumed.
 
 The image set file \fIimsets\fR assigns a name to each field.
 For fields containing only a single standard star this name should
@@ -188,7 +192,7 @@ in \fIimsets\fR by hand. If the number of observations is large, a
 separate task MKIMSETS is available to assist users in preparing
 \fIimsets\fR.
 
-Values of the filter ids, exposure times, and airmasses
+Values of the filter ids, exposure times, airmasses, and times of observation,
 which are undefined or incorrect in \fIphotfiles\fR,
 can be corrected by reading values listed in the columns \fIobscolumns\fR
 in the file \fIobsparams\fR. The format of \fIobsparams\fR is described
@@ -286,21 +290,21 @@ THE OBSPARAMS FILE
 
 A sample corrections file \fIobsparams\fR for the previous set of
 UBV standards observations is shown below.
-The filter ids, exposure times, and airmasses for all the images were
+The filter ids, exposure times, airmasses, and times of observation for all the images were
 correctly read
 from the image headers with the exception of the filter id, exposure time,
 and airmass for the first  "STD2" V frame.
-The correct filter id, exposure time, and airmass is supplied
-in \fIobsparams\fR  and \fIobscolumns\fR is set to "2 3 4"
+The correct filter id, exposure time, airmass, and time of observation, is supplied
+in \fIobsparams\fR  and \fIobscolumns\fR is set to "2 3 4 5"
 
 .nf
-	nite006    3 8 1.256
+	nite006    3 8 1.256 14:30:02.3
 .fi
 
 Zero can be used as a place holder in \fIobscolumns\fR,
 as in the following example where
 the user only wants to correct the exposure time and the airmass and
-leave the filter id alone. In this case \fIobscolumns\fR is "0 2 3"
+leave the filter id alone. In this case \fIobscolumns\fR is "0 2 3 0"
 and \fIobsparams\fR looks as follows.
 
 .nf
@@ -365,31 +369,31 @@ prior to running OBSFILE or by OBSFILE itself,
 and so are not included in \fIobservations\fR.
 
 .nf
-	# FIELD   FILTER   AIRMASS  X     Y     MAG   MERR
+	# FIELD   FILTER   OTIME  AIRMASS  X     Y     MAG   MERR
 
-	  STD1    1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  STD1    1        .        .     .     .     .
-	  *       2        .        .     .     .     .   
-	  *       3        .        .     .     .     .
-	  STD2    1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  STD2    1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  ...................................................
-	  STD7    INDEF    INDEF    INDEF INDEF INDEF INDEF
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  ...................................................
-	  STD14   1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
-	  STD15   1        .        .     .     .     .
-	  *       2        .        .     .     .     .
-	  *       3        .        .     .     .     .
+	  STD1    1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
+	  STD1    1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .   
+	  *       3        .      .        .     .     .     .
+	  STD2    1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
+	  STD2    1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
+	  ........................................................
+	  STD7    INDEF    INDEF  INDEF    INDEF INDEF INDEF INDEF
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
+	  .......................................................
+	  STD14   1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
+	  STD15   1        .      .        .     .     .     .
+	  *       2        .      .        .     .     .     .
+	  *       3        .      .        .     .     .     .
 .fi
 
 The accompanying format description file has the following form.
@@ -400,22 +404,25 @@ The accompanying format description file has the following form.
 observations
 
 X1            3              # airmass in filter 1
-x1            4              # x coordinate in filter 1
-y1            5              # y coordinate in filter 1
-m1            6              # instrumental magnitude in filter 1
-error(m1)     7              # magnitude error in filter 1
+T1            4              # time of observation in filter 1
+x1            5              # x coordinate in filter 1
+y1            6              # y coordinate in filter 1
+m1            7              # instrumental magnitude in filter 1
+error(m1)     8              # magnitude error in filter 1
 
-X2            9              # airmass in filter 2
-x2            10             # x coordinate in filter 2
-y2            11             # y coordinate in filter 2
-m2            12             # instrumental magnitude in filter 2
-error(m2)     13             # magnitude error in filter 2
+X2            10             # airmass in filter 2
+T2            11             # time of observation in filter 2
+x2            12             # x coordinate in filter 2
+y2            13             # y coordinate in filter 2
+m2            14             # instrumental magnitude in filter 2
+error(m2)     15             # magnitude error in filter 2
 
-X3            15             # airmass in filter 3
-x3            16             # x coordinate in filter 3
-y3            17             # y coordinate in filter 3
-m3            18             # instrumental magnitude in filter 3
-error(m3)     19             # magnitude error in filter 3
+X3            16             # airmass in filter 3
+T3            17             # time of observation in filter 3
+x3            18             # x coordinate in filter 3
+y3            19             # y coordinate in filter 3
+m3            20             # instrumental magnitude in filter 3
+error(m3)     21             # magnitude error in filter 3
 .fi
 
 .ih
@@ -427,7 +434,9 @@ for input to FITPARAMS. A sample of the file illustrating the format
 is shown below.
 Since there is only one star per field, position matching is not necessary.
 The magnitudes have already been normalized to unit exposure time by the
-user's program, and the filter ids and airmasses are correct.
+user's program, and the filter ids and airmasses are correct. However the
+observing time column is missing and represented by a zero in the incolumns
+parameters.
 
 .nf
 	ph> head magsfile
@@ -452,7 +461,7 @@ user's program, and the filter ids and airmasses are correct.
 	    ..... .....  .....  .....
 	    ..... .....  .....  .....
 
-	ph> obsfile magsfile "1 2 3 6 8 7 4 5" "U,B,V" fields standards.obs\
+	ph> obsfile magsfile "1 2 3 6 8 7 0 4 5" "U,B,V" fields standards.obs\
 	    tol=0.0
 
 	    ... create the observations file
@@ -491,7 +500,7 @@ were not measured in all filters position matching is necessary.
 
 	    m92 : m92u  m92b  m92v
 
-	ph> obsfile m92umags,m92bmags,m92vmags "1 2 3 6 8 7 4 5" "U,B,V"\
+	ph> obsfile m92umags,m92bmags,m92vmags "1 2 3 6 8 7 0 4 5" "U,B,V"\
 	    fields standards.obs tolerance=8.0
 
 .fi

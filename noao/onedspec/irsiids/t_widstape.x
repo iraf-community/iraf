@@ -1,7 +1,7 @@
 include	<mach.h>
 include	<error.h>
 include	<imhdr.h>
-include "../shdr.h"
+include <smw.h>
 
 define	SZ_IDSTITLE	64		# Length of IDSOUT title
 define	SZ_CARD		80		# Columns on a card
@@ -89,14 +89,14 @@ begin
 		}
 
 		call printf ("copied - [%s]: %s\n")
-		call pargstr (SPECTRUM(sh))
+		call pargstr (IMNAME(sh))
 		call pargstr (TITLE(sh))
 		call flush (STDOUT)
 	    } then
 		call erract (EA_WARN)
 
 	    if (mw != NULL)
-		call mw_close (mw)
+		call smw_close (mw)
 	    if (im != NULL)
 		call imunmap (im)
 	}
@@ -229,7 +229,7 @@ begin
 		call pargi (FC(sh))
 		call pargi (co)
 		call pargstr ("IRF")
-		call pargi (TYPE(sh))
+		call pargi (OFLAG(sh))
 		call pargr (ha)
 		call pargr (airmass)
 

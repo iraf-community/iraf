@@ -1,9 +1,80 @@
 .help revisions Nov90 noao.imred.src.fibers
 .nf
-imred$src/fibers/*
+srcfibers$proc.cl
+srcfibers$fibresponse.cl
+    1.  Need to add check for the throughput being a file rather than
+	an image when checking whether to apply a scattered light
+	correction.
+    2.	Removed a warning message when using a throughput file containing
+    	fiber values which are not in the flat field (for example, if a fiber
+    	is broken).
+    (1/25/95, Valdes)
+
+srcfibers$params.par
+srcfibers$doarcs.cl
+srcfibers$arcrefs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+srcfibers$response.cl -> imred$src/fibers/fibresponse.cl
+srcfibers$response.par -> imred$src/fibers/fibresponse.par
+srcfibers$proc.par
+    Changed the fiber response task name from "response" to "fibresponse"
+    to avoid conflict with longslit.response.  (12/31/94, Valdes)
+
+srcfibers$proc.cl
+    The check for arcs2 = " " was done incorrectly.  (9/12/94, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+srcfibers$doarcs.cl
+    A check was needed on whether the arc spectra were extracted during
+    the current execution to avoid reextracting the same arc multiple
+    times during a "redo" or the initial time.  In both those cases
+    the rextract flag is set causing spectra to be reextracted if they
+    exist.  Previously doarcs could not tell if the arc exists because
+    of a previous run or during the current run with the same arc
+    used multiple times.  (5/18/94, Valdes)
+
+===========
+V2.10.3beta
+===========
+
+srcfibers$skysub.cl
+imred$specred/doc/skysub.hlp
+    1.  The combine option was being ignored.
+    2.  The help did not mention the reject option and was otherwised
+	out of date.
+    (3/31/94, Valdes)
+
+srcfibers$proc.cl
+    The scattered light correction is now queried for all images and may
+    be turned off with NO.  (9/1/93, Valdes)
+
+===========
+V2.10.3beta
+===========
+
+srcfibers$arcrefs.cl
+     MOdified to use shift=INDEF in REIDENTIFY.
+     (2/18/93, Valdes)
+
+srcfibers$*.cl
+     Modified to use the "imtype" environment variable to define the
+     extension type.
+     (2/18/93, Valdes)
+
+=======
+V2.10.2
+=======
+
+srcfibers$proc.cl
+     The aperture reference is redone when a new aperture ID file is seen.
+     (1/11/93, Valdes)
+
+srcfibers$*
      Updated for new ONEDSPEC.  (7/24/91, Valdes)
 
-imred$src/fibers/*
+srcfibers$*
      All occurrences of latitude replaced by observatory as required by
      recent changes to setairmass, etc.  (11/20/90, Valdes)
 .endhelp

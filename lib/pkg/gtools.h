@@ -24,9 +24,12 @@ define	GTYBUF		17	# Autoscaling buffer factor
 define	GTTYPE		18	# Graph type
 define	GTMARK		19	# Mark type
 define	GTLINE		20	# Line type
+define	GTCOLOR		23	# Color
+define	GTXFLIP		24	# Flip X axis
+define	GTYFLIP		25	# Flip X axis
 define	GTTRANSPOSE	21	# Transpose X and Y axes?
 
-define	LEN_GT		23	# Length of graphics tools extension
+define	LEN_GT		26	# Length of graphics tools extension
 
 define	GT_XMIN		Memr[$1+GTXMIN]
 define	GT_XMAX		Memr[$1+GTXMAX]	
@@ -50,7 +53,10 @@ define	GT_YBUF		Memr[$1+GTYBUF]
 define	GT_TYPE		Memi[$1+GTTYPE]
 define	GT_MARK		Memi[$1+GTMARK]
 define	GT_LINE		Memi[$1+GTLINE]
+define	GT_COLOR	Memi[$1+GTCOLOR]
+define	GT_XFLIP	Memi[$1+GTXFLIP]
+define	GT_YFLIP	Memi[$1+GTYFLIP]
 define	GT_TRANSPOSE	Memi[$1+GTTRANSPOSE]
 
-define	GTTYPES		"|mark|line|"
+define	GTTYPES		"|mark|line|histogram"
 define	GTMARKS	"|point|box|plus|cross|diamond|hline|vline|hebar|vebar|circle|"

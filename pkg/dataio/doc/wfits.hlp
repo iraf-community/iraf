@@ -104,7 +104,6 @@ values of the data.
 .le
 .ih
 DESCRIPTION
-
 IRAF data is read from disk and written to the specified destination,
 either disk or magnetic tape. The FITS header may optionally be printed
 on the standard output as either a full listing or a short description,
@@ -120,8 +119,7 @@ will be converted directly to FITS integers or floating point values
 with possible loss of precision.
 .ih
 EXAMPLES
-
-Convert a series of IRAF image files to FITS image files on a blank
+1. Convert a series of IRAF image files to FITS image files on a blank
 magnetic tape, allowing wfits to select the appropriate bitpix
 and scaling parameters.
 
@@ -129,7 +127,7 @@ and scaling parameters.
 	cl> wfits iraf_file* mtb1600[1]
 .fi
 
-Convert a series of IRAF image files to FITS image files on disk,
+2. Convert a series of IRAF image files to FITS image files on disk,
 allowing wfits to select the appropriate bitpix and scaling parameters.
 In the first case the images specified by the template are written
 to fits001, fits002 etc. In the second case the list of input images
@@ -142,41 +140,41 @@ files specified one per line in the text file fitslist.
 	cl> wfits @imlist @fitslist
 .fi
 
-Convert an IRAF image file to a 32 bits per pixel FITS file with no
+3. Convert an IRAF image file to a 32 bits per pixel FITS file with no
 scaling and append to a tape already containing data.
 
 .nf
 	cl> wfits iraf_file mtb1600[EOT] bi=32 sc-
 .fi
 
-Convert an IRAF image to a 16 bit FITS image on disk, specifying
+4. Convert an IRAF image to a 16 bit FITS image on disk, specifying
 bscale and bzero.
 
 .nf
 	cl> wfits iraf_file fits_file bi=16 au- bs=4.0 bz=0.0
 .fi
 
-Print the FITS headers on the standard output.
+5. Print the FITS headers on the standard output.
 
 .nf
 	cl> wfits iraf_file* ma-
 .fi
 
-Create a disk file called headers containing the FITS headers for a set
+6. Create a disk file called headers containing the FITS headers for a set
 of IRAF image files.
 
 .nf
 	cl> wfits iraf_file* ma- > headers
 .fi
 
-Write a FITS tape with 14400 bytes per record (5 2880 FITS records per
+7. Write a FITS tape with 14400 bytes per record (5 2880 FITS records per
 tape block) on a 9-track tape.
 
 .nf
 	cl> wfits images* mtb[1] block=5
 .fi
 
-Write a FITS Exabyte tape with a blocking factor of 1 (1 2880 FITS record
+8. Write a FITS Exabyte tape with a blocking factor of 1 (1 2880 FITS record
 per block). Note that wfits will normally by default write a 28000 (
 10 2880 FITS logical records per block) byte record.
 
@@ -185,7 +183,6 @@ per block). Note that wfits will normally by default write a 28000 (
 .fi
 .ih
 BUGS
-
 WFITS does not attempt to recover from write errors. When an error is
 detected, WFITS issues an error message and attempts to write a double
 EOF at the end of the last good record. In this case the last file on
@@ -204,4 +201,5 @@ error messages being issued and at worst result in tape runaway depending
 on the driver.
 .ih
 SEE ALSO
+rfits, reblock
 .endhelp

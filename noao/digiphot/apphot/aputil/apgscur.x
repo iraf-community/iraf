@@ -6,7 +6,7 @@ include <fset.h>
 
 int procedure apgscur (sl, gd, xcur, ycur, prev_num, req_num, num)
 
-pointer	sl		# pointer to text file containing cursor coords
+int	sl		# coordinate file descriptor
 pointer	gd		# pointer to graphics stream
 real	xcur, ycur	# x cur and y cur
 int	prev_num	# previous number

@@ -152,35 +152,31 @@ real	e[len_table]		# Extinction values
 int	len_table		# Length of extinction table
 
 char	field[SZ_FIELD]
-int	dispaxis, npix, i, flag, dcflag
+int	laxis, paxis, npix, i, flag, dcflag
 real	crval, cdelt, crpix, airmass, wavelen, extval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	sp, ext, pix1, pix2
 
-int	imgeti(), clgeti(), imgnlr(), impnlr()
+int	imgeti(), imgnlr(), impnlr()
 real	imgetr(), img_airmass()
-errchk	imgeti(), imgetr(), img_airmass()
+errchk	get_daxis, imgeti, imgetr, img_airmass
 
 begin
 	# Determine the dispersion axis and linear coordinates.
-
-	iferr (dispaxis = imgeti(im1, "dispaxis")) {
-	    dispaxis = clgeti ("dispaxis")
-	    call imaddi (im1, "dispaxis", dispaxis)
-	}
+	call get_daxis (im1, laxis, paxis)
 
 	call sprintf (field, SZ_FIELD, "crval%d")
-	    call pargi (dispaxis)
+	    call pargi (laxis)
 	crval = imgetr (im1, field)
 	call sprintf (field, SZ_FIELD, "crpix%d")
-	    call pargi (dispaxis)
+	    call pargi (laxis)
 	crpix = imgetr (im1, field)
 	call sprintf (field, SZ_FIELD, "cdelt%d")
-	    call pargi (dispaxis)
+	    call pargi (laxis)
 	iferr (cdelt = imgetr (im1, field)) {
 	    call sprintf (field, SZ_FIELD, "cd%d_%d")
-	        call pargi (dispaxis)
-	        call pargi (dispaxis)
+	        call pargi (laxis)
+	        call pargi (laxis)
 	    cdelt = imgetr (im1, field)
 	}
 	dcflag = imgeti (im1, "dc-flag")
@@ -191,7 +187,7 @@ begin
 
 	# Determine the extinction values at each pixel.
 
-	npix = IM_LEN (im1, dispaxis)
+	npix = IM_LEN (im1, laxis)
 	call smark (sp)
 	call salloc (ext, npix, TY_REAL)
 
@@ -210,11 +206,11 @@ begin
 	call amovkl (long (1), v2, IM_MAXDIM)
 	while ((imgnlr(im1, pix1, v1) != EOF) &&
 	    (impnlr(im2, pix2, v2) != EOF)) {
-	    switch (dispaxis) {
+	    switch (laxis) {
 	    case 1:
 		call amulr (Memr[pix1], Memr[ext], Memr[pix2], IM_LEN (im1, 1))
 	    default:
-		extval = Memr[ext+v1[dispaxis]-2]
+		extval = Memr[ext+v1[laxis]-2]
 		call amulkr (Memr[pix1], extval, Memr[pix2], IM_LEN (im1, 1))
 	    }
 	}

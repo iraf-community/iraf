@@ -6,7 +6,7 @@ include	"gks.h"
 # GCAS -- Cell array.  Output a cell array to the specified output device
 # area.  This version of GCA intended for input color array of type short.
 
-procedure gca (px, py, qx, qy, dimx, dimy, ncs, nrs, dx, dy, colia)
+procedure gcas (px, py, qx, qy, dimx, dimy, ncs, nrs, dx, dy, colia)
 
 real	px, py, qx, qy		# Two points (P, Q) in world coordinates
 int	dx, dy			# Number of columns, number of rows 

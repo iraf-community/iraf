@@ -5,7 +5,7 @@ procedure phelp (template)
 string	template		{prompt="module name template"}
 
 bool	file_template=no	{prompt="print help file"}
-bool	all=no			{prompt="find all modules matching template"}
+bool	all=yes			{prompt="find all modules matching template"}
 string	parameter="all"		{prompt="parameter for which help is desired"}
 string	section="all"		{prompt="section for which help is desired"}
 string	option="help"		{prompt="type of help desired"}

@@ -141,9 +141,11 @@ begin
 	    }
 
 	    # Log the output.
-	    if (verbose == YES)
+	    if (verbose == YES) {
 	        call bs_log (Memc[image1], Memc[imtemp], mean, median, mode,
 		    bzero, bscale, upper, lower)
+		call flush (STDOUT)
+	    }
 
 	    # Scale the image.
 	    call bs_scale (inim, outim, bzero, bscale)

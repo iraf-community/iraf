@@ -49,8 +49,8 @@ int	i, ii, ixc, j, jj, jyc, ijunk, jjunk
 real	mindat, maxdat, rclip2, r2, ksigma 
 
 begin
-	# Return if indef valued sigma.
-	if (IS_INDEFR(skysigma))
+	# Return if indef valued sigma or sigma <= 0.
+	if (IS_INDEFR(skysigma) || (skysigma <= 0.0))
 	    return
 
 	# Find the maximum pixel in the subarray and treat this point as

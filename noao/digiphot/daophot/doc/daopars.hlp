@@ -1,4 +1,4 @@
-.help daopars Aug91 noao.digiphot.daophot
+.help daopars Feb96 noao.digiphot.daophot
 .ih
 NAME
 daopars -- edit the daophot fitting parameters
@@ -7,103 +7,220 @@ USAGE
 daopars
 .ih
 PARAMETERS
-.ls varpsf = no
-Is the PSF constant or does it vary across the image? The \fIvarpsf\fR
-parameter is used by the PSF task to determine what type of PSF will
-be computed. The variable
-PSF option models small, smooth and linear changes of the PSF across the image.
-Large numbers of stars spanning the region of interest
-are necessary to compute an accurate model.
-Users should only select the variable psf option if they are certain their
-data conforms to the above model; they are prepared to spend considerable
-time computing a good PSF; they are willing to invest the extra
-computation time necessary to fit a variable PSF model to the stars.
-The value of \fIvarpsf\fR in DAOPARS will be overridden by the value
-stored in the PSF itself.
+.ls function = "gauss"
+The functional form of the analytic component of the PSF model computed
+by the DAOPHOT task PSF. The better this function
+matches the true PSF, especially in the cores of the stars,
+the smaller the interpolation errors will be. The choices are the following.
+
+.ls gauss
+An elliptical Gaussian function aligned along the x and y axes of the
+input image.
 .le
-.ls psfrad = 11.0 (scale units)
-The radius of the circle in scale units within which the PSF is defined.
-\fIPsfrad\fR should be somewhat larger than the radius at which the
-intensity of the brightest star of interest fades into the noise.
-\fIPsfrad\fR can never be larger than the value with which the
-PSF was computed but may be smaller, in which case the value stored in
-the PSF image header is overridden.
-If the subtracted images of bright stars are surrounded
-by bright halos \fIpsfrad\fR was too small. On the other hand a value of
-\fIpsfrad\fR which is too large will uselessly consume CPU time
-as the speed of the fitting process can be strong function of the psf
-radius.
+.ls moffat15
+An elliptical Moffat function with a beta parameter of 1.5.
 .le
-.ls fitrad = 2.5 (scale units)
-The fitting radius in scale units. Only pixels within the fitting radius of
-the center of a star will
-contribute to the fit computed by the PEAK, NSTAR and ALLSTAR tasks.
-For most images the fitting radius
-should be approximately equal to the FWHM of the PSF. Under severely
-crowded conditions a somewhat smaller value may be chosen in order to improve
-the fit. If the PSF is variable on the other hand,
-it may be necessary to increase the fitting radius to achieve a good fit.
+.ls moffat25
+An elliptical Moffat function with a beta parameter of 2.5.
 .le
-.ls matchrad = 1.5 (scale units)
+.ls lorentz
+An elliptical Lorentzian function with beta parameter of 1.0.
+.le
+.ls penny1
+A Gaussian core with Lorentzian wings model, where the Gaussian core may be
+tilted, but the Lorentzian wings are elongated along the x or y axes.
+The Lorentzian wings have a beta parameter of 1.0
+.le
+.ls penny2
+A Gaussian core with Lorentzian wings model, where the Gaussian core and
+Lorentizian wings may be tilted in different directions.
+The Lorentzian wings have a beta parameter of 1.0
+.le
+.ls auto
+The PSF task computes the analytic PSF model using each of the previous
+six analytic model PSFs in turn and selects the one that gives the smallest
+standard deviation for the fit.
+.le
+.ls func1,func2,...
+The PSF task computes the analytic PSF model using any subset
+of the six previously defined functions in turn, and selects the one
+that gives the smallest standard deviations for the fit, e.g.
+"gauss,moffat25,penny1". 
+.le
+
+In general "gauss" is the best and most efficient choice for a
+well-sampled ground-based image, "lorentz" is best for ST images, and 
+"moffat15" or "moffat25" is best for under-sampled
+ground-based images. 
+.le
+.ls varorder = 0
+The order of variability of the PSF model computed by the DAOPHOT PSF task.
+\fIVarorder\fR
+determines the number of look-up tables containing the deviations of the
+true PSF from the analytic model PSF defined by \fIfunction\fR.
+.ls "-1"    
+Only the analytic function specified by \fIfunction\fR is used to compute
+the model PSF. The model PSF is constant over the image.
+.le
+.ls "0"   
+The analytic function and one look-up table are used to compute the
+model PSF. The model PSF is constant over the image.
+.le
+.ls "1"    
+The analytic function and three look-up tables are used to compute the
+model PSF. The model PSF is linearly variable over the image,
+with terms proportional to 1, x and y.
+.le
+.ls "2"    
+The analytic function and six look-up tables are used to compute the
+model PSF. The model PSF is quadratically variable over the image,
+with terms proportional to 1, x, y, x**2, xy, y**2.
+.le
+.le
+.ls nclean = 0
+The number of additional iterations used in the PSF task to compute the PSF
+look-up tables.
+If \fInclean\fR is > 0, stars which contribute deviant residuals to
+the PSF look-up tables in the first iteration, will have these residuals
+down-weighted in succeeding iterations.
+.le
+.ls saturated = no
+Use saturated stars to improve the signal-to-noise in the wings of the
+model PSF computed by the PSF task. This parameter should only be set to
+"yes" where there are too few high signal-to-noise unsaturated stars
+in the image to compute a reasonable model for the stellar profile wings.
+.le
+.ls matchrad = 3.0 (scale units)
 The tolerance in scale units for matching the stellar x and y centroids in the
 photometry file with the image cursor position. \fIMatchrad\fR is currently
 used by the PSF task to match stars shown on the image
 display with stars in the photometry list.
 .le
-.ls critoverlap = 1.0
-The ratio of the model intensity of a brighter star computed from
-the scaled PSF at a distance of one fitting radius from the center
-of the fainter star to the expected random error computed from the
-readout noise, gain and value of the PSF. The critical overlap
-parameter is used to group stars. In general if a small value such
-as .1 divides all the stars in an image into groups less than
-\fImaxgroup\fR, then the expected random errors will determine
-the accuracy of the photometry. On the other hand if a value of
-crtitcal overlap much greater than one is required to divide up the
-stars crowding errors will dominate random errors. If a value of 1
-is sufficient then crowding and random errors are roughly equivalent.
+.ls psfrad = 11.0 (scale units)
+The radius of the circle in scale units within which the PSF is defined.
+\fIPsfrad\fR should be a pixel or two larger than the radius at which the
+intensity of the brightest star of interest fades into the noise.
+\fIPsfrad\fR can never be larger than the value with which the
+PSF was computed but may be smaller, in which case the value stored in
+the PSF image header is overridden.
 .le
-.ls maxiter = 50
+.ls fitrad = 3.0 (scale units)
+The fitting radius in scale units. Only pixels within the fitting radius of
+the center of a star will
+contribute to the fits computed by the PEAK, NSTAR and ALLSTAR tasks.
+For most images the fitting radius
+should be approximately equal to the FWHM of the PSF. Under severely
+crowded conditions or if the sky is being fit in the least-squares sense
+a somewhat smaller value may be chosen in order to improve
+the fit. If the PSF is variable, the FWHM is very small, or sky fitting
+is enabled in PEAK and NSTAR on the other hand,
+it may be necessary to increase the fitting radius to achieve a good fit.
+.le
+.ls recenter = yes (peak, nstar, and allstar)
+Compute new positions as well as magnitudes for all the stars in the
+input photometry list?
+.le
+.ls fitsky = no (peak, nstar, and allstar)
+Compute new sky values for the stars in the input list (peak, nstar, allstar).
+If \fIfitsky\fR = "no", the PEAK, NSTAR,
+and ALLSTAR tasks compute a group sky value by combining
+the sky values of the stars in the group.
+If \fIfitsky\fR = "yes", PEAK and NSTAR fit the group sky simultaneously
+with the positions and magnitudes.
+In the ALLSTAR task new sky values for each star
+are computed every third iteration by subtracting off the best current fit
+for the star and recomputing the sky using pixels in the region
+defined by \fIsannulus\fR and \fIwsannulus\fR. The new group sky value is
+the average of these new individual values.
+.le
+.ls groupsky = yes (nstar and allstar)
+If \fIgroupsky\fR is "yes",  then the sky value for every pixel which
+contributes to the fit is identical and equal to the mean of the sky
+values of all the stars in the group.
+If \fIgroupsky\fR is "no",  then the sky value for every pixel which
+contributes to the fit is equal to the mean of the sky
+values of all the stars in the group for which that pixel is within 
+one fitting radius.
+.le
+.ls sannulus = 0.0 (scale units, allstar)
+The inner radius of the sky annulus used by ALLSTAR to recompute the sky 
+value.
+.le
+.ls wsannulus = 11 (scale units, allstar)
+The width of the sky annulus used by ALLSTAR to recompute the sky 
+value.
+.le
+.ls flaterr=0.75 (percent, peak, nstar, allstar)
+The image flat-fielding error in percent used to compute the predicted
+errors of the fit.
+.le
+.ls proferr = 5.0 (percent, peak, nstar, allstar)
+The profile or interpolation fitting error in percent used to compute
+the predicted errors of the fit.
+.le
+.ls maxiter = 50 (peak, nstar, allstar)
 The maximum number of times that the PSF fitting tasks PEAK, NSTAR
 and ALLSTAR will iterate on the fit before giving up.
 .le
-.ls maxgroup = 60
-The maximum numbers of stars that the multiple star fitting tasks
-NSTAR and ALLSTAR will fit simultaneously. NSTAR will simply refuse
-to fit any groups large than \fImaxgroup\fR and set all the
-output magnitudes of these stars to INDEF. ALLSTAR dynmacally regroups the stars
-until the group is either \fImaxgroup\fR or smaller in size or becomes too
-dense to
-fit, in which case the magnitudes of unfitted stars are also set to INDEF.
-.le
-.ls maxnstar = 3000
-The maximum number of stars which PEAK and ALLSTAR will process.
-This should be set to a value somewhat larger than the
-number of stars in the input photometry file.
-.le
-.ls recenter = yes (allstar only)
-Compute new positions as well as magnitudes for all the stars in the
-list.  PEAK and ALLSTAR always recompute new centers.
-.le
-.ls cliprange = 2.5, clipexp = 6.0 (allstar only)
-The parameters of the weighting scheme in ALLSTAR used to resist bad data
-by dynamically
+.ls cliprange = 2.5, clipexp = 6.0 (peak, nstar, allstar)
+The parameters of the down-weighting scheme in the fitting code
+used to resist bad data by dynamically
 reweighting bad pixels. For \fIclipexp\fR greater than 1 a
 residual small compared to \fIcliprange\fR standard deviations
 does not have its weight materially altered, one with exactly \fIcliprange\fR
 standard deviations is given precisely half its normal weight, and
 for large residuals the weight falls off as the standard deviation
 to the minus \fIclipexp\fR power. For normal applications it is
-strongly recommended that the user leave these numbers alone.
+recommended that the user leave these numbers alone.
+.le
+.ls critnsratio = 1.0 (group)
+The ratio of the model intensity of a brighter star computed from
+the scaled PSF at a distance of one fitting radius from the center
+of the fainter star to the expected random error computed from the
+readout noise, gain and value of the PSF. The critical signal-to-noise ratio
+parameter is used to group stars. In general if a small value such
+as .1 divides all the stars in an image into groups less than
+\fImaxgroup\fR, then the expected random errors will determine
+the accuracy of the photometry. On the other hand if a value of
+crtitcal overlap much greater than one is required to divide up the
+stars, crowding errors will dominate random errors. If a value of 1
+is sufficient then crowding and random errors are roughly equivalent.
+.le
+.ls mergerad = INDEF (scale units, nstar, allstar)
+The critical separation in scale units between two objects for an
+object merger to be considered. Objects with separations > mergerad will
+not be merged; faint objects with separations <= mergerad will be considered
+for merging. The default value of mergerad is sqrt (2 *(PAR1**2 + PAR2**2)),
+where PAR1 and PAR2 are the half-width at half-maximum along the major and
+minor axes of the psf model. Merging can be turned off altogether by setting
+mergerad to 0.0.
+.le
+.ls maxnstar = 3000 (psf, allstar, substar)
+The maximum number of stars which PSF, PEAK, ALLSTAR and SUBSTAR
+will process.
+This should be set to a value somewhat larger than the
+number of stars in the input photometry file.
+.le
+.ls maxgroup = 60 (nstar, allstar)
+The maximum numbers of stars that the multiple star fitting tasks
+NSTAR and ALLSTAR will fit simultaneously. NSTAR will simply refuse
+to fit any groups large than \fImaxgroup\fR and set all the
+output magnitudes of these stars to INDEF. ALLSTAR dynamically regroups
+the stars
+until the group is either \fImaxgroup\fR or smaller in size or becomes too
+dense to
+fit, in which case the faintest stars are rejected until the group is small
+enough to fit.
 .le
 
 .ih
 DESCRIPTION
 
-DAOPARS is a simple parameter set which stores the DAOPHOT fitting parameters
-required by all the DAOPHOT tasks which compute or fit the PSF.
-Typing DAOPARS on the terminal will invoke the EPAR parameter editing
-task. The DAOPARS parameters may be edited from within an EPAR command
+DAOPARS is a parameter set task which stores the DAOPHOT parameters
+required by all the DAOPHOT tasks which compute the PSF or fit stars
+to the PSF.
+Typing DAOPARS on the terminal invokes the EPAR parameter editing
+task. The DAOPARS parameters may also be edited from within an EPAR command
 to any task such as PSF which references them. These parameters may also
 be changed on the command line in the usual manner during invocation of any
 task which uses them.
@@ -113,7 +230,76 @@ the data being reduced by simply invoking the :w command from within the
 EPAR task. If the user then sets the value of the \fIdaopars\fR parameter
 in say the PSF task to the name of the file containing the stored
 parameter set, the stored parameters will be used instead of the
-default set in the user's uparam directory.
+default set in the user's uparm directory.
+
+.ih
+ALGORITHMS
+
+The functional forms of the analytic PSF functions are as follows. The
+A is simply an amplitude or normalization constant The Pn are parameters
+which are fit during the PSF generation process.
+
+.nf
+	z = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2
+	gauss = A * exp (-0.5 * z)
+
+	z = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2 + x * y * p3
+	moffat15 = A / (1 + z) ** 1.5
+	moffat15 = A / (1 + z) ** 2.5
+
+	z = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2 + x * y * p3
+	lorentz = A / (1.0 + z)
+
+	z = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2
+	e = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2 + x * y * p4
+	penny1 = A * ((1 - p3) / (1.0 + z) + p3 * exp (-0.693*e))
+
+	z = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2 + p5 * x * y
+	e = x ** 2 / p1 ** 2 + y ** 2 / p2 ** 2 + x * y * p4
+	penny2 = A * ((1 - p3) / (1.0 + z) + p3 * exp (-0.693*e))
+.fi
+
+
+The predicted errors in the the DAOPHOT photometry are computed per
+pixel as follows, where terms 1, 2, 3, and 4 represent the readout
+noise, the poisson noise, the flat-fielding error, and the interpolation
+error respectively. The quantities readnoise, epadu, I, M, p1, and p2
+are the readout noise in electrons, the gain in electrons per ADU,
+the pixel intensity in ADU, the PSF model intensity in ADU, the FWHM
+in x, and the FWHM in y both in pixels.
+
+.nf
+	error = sqrt (term1 + term2 + term3 + term4)  (ADU)
+	term1 = (readnoise / epadu) ** 2
+	term2 = I / epadu 
+	term3 = (.01 * flaterr * I) ** 2
+	term4 = (.01 * proferr * M / p1 / p2) ** 2
+.fi
+
+The radial weighting function employed by all the PSF fitting tasks is
+the following, where dx and dy are the distance of the pixel from the
+centroid of the star being fit.
+
+.nf
+	wtr = 5.0 / (5.0 + rsq / (1.0 - rsq))
+	rsq = (dx ** 2 + dy ** 2) / fitrad ** 2
+.fi
+
+The weight assigned each pixel in the fit then becomes the following.
+
+.nf
+	wtp = wtr / error ** 2 
+.fi
+
+After a few iterations and if clipexp > 0, a clipping scheme to reject bad
+data is enabled.  The weights of the pixels are recomputed as follows.
+Pixels having a residual of cliprange sigma will have their weight reduced
+by half.
+
+.nf
+	wt = wtp / (1.0 + (residual / error / chiold /
+	     cliprange) ** clipexp)
+.fi
 
 .ih
 EXAMPLES

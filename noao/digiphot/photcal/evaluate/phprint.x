@@ -26,7 +26,7 @@ begin
 	    if (len_plist >= max_len_plist)
 		break
 	    sym = pr_getsym (Memc[pname])
-	    if (sym == INDEFI)
+	    if (IS_INDEFI(sym))
 		next
 	    switch (pr_gsymi (sym, PSYMTYPE)) {
 	    case PTY_CATVAR:

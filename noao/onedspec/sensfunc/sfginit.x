@@ -41,12 +41,18 @@ begin
 	else
 	    call strcpy ("sr", GP_GRAPHS(gp,1), SF_NGRAPHS)
 
-	# Set the starting mark types.
+	# Set the starting mark types and colors.
 	GP_MARK(gp) = GM_PLUS
 	GP_MDEL(gp) = GM_CROSS
 	GP_MADD(gp) = GM_BOX
+	GP_PLCOLOR(gp) = 2
+	GP_CMARK(gp) = 1
+	GP_CDEL(gp) = 3
+	GP_CADD(gp) = 4
 	call clgstr ("marks", Memc[str], SZ_FNAME)
 	call sf_marks (gp, Memc[str])
+	call clgstr ("colors", Memc[str], SZ_FNAME)
+	call sf_colors (gp, Memc[str])
 
 	# Set flux limits
 	GP_FMIN(gp) = INDEF

@@ -18,7 +18,7 @@ extras,b,h,no,,,"Extract sky, sigma, etc.?"
 review,b,h,yes,,,"Review extractions?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,10,1,,"Number of dispersion lines to sum
+nsum,i,h,10,,,"Number of dispersion lines to sum or median
 "
 background,s,h,"none",,,Background to subtract (none|average|fit)
 weights,s,h,"none","none|variance",,Extraction weights (none|variance)

@@ -4,7 +4,6 @@
 #define import_spp
 #define import_libc
 #define import_stdio
-#define	import_varargs
 #include <iraf.h>
 
 #include "config.h"
@@ -24,20 +23,8 @@ extern	char *eofstr;
 extern	char *indefstr;
 extern	char *indeflc;
 
+#define	MAXARGS 32
 static	int nscan_val=0;	/* value returned by NSCAN intrinsic	*/
-
-#define	SZ_ARGBUF	512
-#define	AP_START	256
-
-/* The following must agree with libc$scanf.c. */
-#define SCAN_STRING     0
-struct _input {
-        int     i_type;                 /* file input if !0, else str   */
-        union {
-        FILE    *fp;                    /* file pointer if file         */
-        char    *ip;                    /* char pointer if string       */
-        } u;
-};
 
 
 /* SCAN -- Perform the bulk of the scan,fscan intrinsic functions to do
@@ -95,12 +82,14 @@ char	*source;
 	    /* Get source name from first operand (FSCAN call)
 	     */
 	    o = popop();
-	    makelower (o.o_val.v_s);
-	    if (!strcmp (o.o_val.v_s, "stdin")) {
+	    if (!strcmp (o.o_val.v_s, "stdin") ||
+		!strcmp (o.o_val.v_s, "STDIN")) {
+
 		if (fgets (buf, SZ_LINE, currentask->t_stdin) == NULL)
 		    eoftst++;
 		else
 		    lentst (buf);
+
 	    } else {
 		breakout (o.o_val.v_s, &pk, &t, &p, &f);
 		pp = paramsrch (pk, t, p);
@@ -137,11 +126,11 @@ char	*source;
 
 	while (nargs-- > 0) {		/* get each destination name	*/
 	    o = popop();
-	    makelower (o.o_val.v_s);
 
-	    if (!strcmp (o.o_val.v_s, "stdout"))
+	    if (!strcmp (o.o_val.v_s, "stdout") ||
+		!strcmp (o.o_val.v_s, "STDOUT")) {
 		pp = NULL;
-	    else {
+	    } else {
 		breakout (o.o_val.v_s, &pk, &t, &p, &f);
 		field = *f;
 		pp = paramsrch (pk, t, p);	/* never returns NULL	*/
@@ -210,15 +199,12 @@ char	*format;
 int	nargs;
 char	*input;
 {
-	char	argbuf[SZ_ARGBUF];
-	char	buf[SZ_LINE];
+	int	nscan_val, eoftst, n;
 	char	*pk, *t, *p, *f;
 	struct	operand o, pv;
+	char	buf[SZ_LINE];
+	char	*v[MAXARGS];
 	struct	param *pp;
-	struct	_input in;
-	int	nscan_val, eoftst;
-	va_list	ap_start;
-	va_list	ap;
 
 	eoftst = 0;
 
@@ -238,12 +224,15 @@ char	*input;
 	    /* Get source name from first operand (FSCANF).
 	     */
 	    o = popop();
-	    makelower (o.o_val.v_s);
-	    if (!strcmp (o.o_val.v_s, "stdin")) {
+
+	    if (!strcmp (o.o_val.v_s, "stdin") ||
+		!strcmp (o.o_val.v_s, "STDIN")) {
+
 		if (fgets (buf, SZ_LINE, currentask->t_stdin) == NULL)
 		    eoftst++;
 		else
 		    lentst (buf);
+
 	    } else {
 		breakout (o.o_val.v_s, &pk, &t, &p, &f);
 		pp = paramsrch (pk, t, p);
@@ -278,13 +267,9 @@ char	*input;
 	 * the scanf call.  Each argument pointer points directly to the
 	 * stored parameter value in the parameter descriptor.
 	 */
-	ap = (va_list) &argbuf[AP_START];
-	ap_start = ap;
-
-	while (nargs-- > 0) {
+	for (n=0;  --nargs >= 0;  n++) {
 	    /* Stacked operand is parameter name. */
 	    o = popop();
-	    makelower (o.o_val.v_s);
 	    breakout (o.o_val.v_s, &pk, &t, &p, &f);
 	    pp = paramsrch (pk, t, p);
 
@@ -296,22 +281,22 @@ char	*input;
 	    case OT_BOOL:
 		o = makeop ("yes", OT_BOOL);  pushop (&o);
 		paramset (pp, FN_VALUE);
-		va_arg(ap, int *) = &pp->p_valo.o_val.v_i;
+		v[n] = (char *) &pp->p_valo.o_val.v_i;
 		break;
 	    case OT_INT:
 		o = makeop ("0", OT_INT);  pushop (&o);
 		paramset (pp, FN_VALUE);
-		va_arg(ap, int *) = &pp->p_valo.o_val.v_i;
+		v[n] = (char *) &pp->p_valo.o_val.v_i;
 		break;
 	    case OT_REAL:
 		o = makeop ("0", OT_REAL);  pushop (&o);
 		paramset (pp, FN_VALUE);
-		va_arg(ap, double *) = &pp->p_valo.o_val.v_r;
+		v[n] = (char *) &pp->p_valo.o_val.v_r;
 		break;
 	    case OT_STRING:
 		o = makeop ("", OT_STRING);  pushop (&o);
 		paramset (pp, FN_VALUE);
-		va_arg(ap, char *) = pp->p_valo.o_val.v_s;
+		v[n] = (char *) pp->p_valo.o_val.v_s;
 		break;
 	    default:
 		cl_error (E_UERR, "scanf: cannot scan into %s\n", o.o_val.v_s);
@@ -319,8 +304,11 @@ char	*input;
 	}
 
 	/* Perform the scan. */
-	in.i_type = SCAN_STRING;  in.u.ip = buf;
-	nscan_val = u_doscan (&in, format, &ap_start);
+	nscan_val = sscanf (buf, format,
+	    v[ 0], v[ 1], v[ 2], v[ 3], v[ 4], v[ 5], v[ 6], v[ 7],
+	    v[ 8], v[ 9], v[10], v[11], v[12], v[13], v[14], v[15],
+	    v[16], v[17], v[18], v[19], v[20], v[21], v[22], v[23],
+	    v[24], v[25], v[26], v[27], v[28], v[29], v[30], v[31]);
 
 	o.o_type = OT_INT;
 	o.o_val.v_i = nscan_val;

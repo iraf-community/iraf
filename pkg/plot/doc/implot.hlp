@@ -1,4 +1,4 @@
-.help implot Aug91 plot
+.help implot Feb94 plot
 .ih
 NAME
 implot -- plot lines and columns of images
@@ -43,6 +43,12 @@ In addition to these three reserved WCS names, the name of any user WCS
 defined for the reference image may be given.  A user world coordinate system
 may be any linear or nonlinear world system.
 .le
+.ls step = 0
+Step size for stepping through lines or columns in an image with the
+'j' and 'k' keys.  If zero or INDEF the step defaults to ~10% of the
+image axis length.  This parameter may be changed interactively with
+a colon command.
+.le
 .ih
 DESCRIPTION
 Implot is an interactive, cursor driven task for examining images by plotting
@@ -69,9 +75,11 @@ documented elsewhere.
 	k		move up within image (moving section)
 	l		plot a line
 	o		overplot next vector
+	p		measure profile (mark region and bkg with 2 pos)
 	q		quit
 	s		print statistics on a region
 	w		change world coordinate system
+	/		scroll status line
 	<space>		print coordinates and pixel value
 .fi
 .ke
@@ -106,7 +114,10 @@ The 'j' and 'k' commands are used to step through an image in either the
 upward (k) or downward (j) directions, relative to the current line or
 column plot.  Each new vector is plotted in place of the previous one
 without clearing the screen, making it easy to compare successive vectors.
+The step between vectors may be defined by a task parameter and
+changed by a colon command.
 
+There are three keys which print various quantities of interest.
 The space bar key will read the cursor position, find the nearest pixel,
 and report the image line and column, the coordinate along the current
 axis, and the pixel value.  The line and column are in logical pixels
@@ -115,6 +126,25 @@ coordinates are in the selected world coordinate system and printed
 in the current coordinate format.  If the selected world coordinate
 system is "logical" then the coordinate will be the same as the line
 or column.
+
+The 's' key requires two cursor positions and then computes statistics of
+the region.  The values are the median, mean, sigma, sum, and number of
+pixels.  The 'p' key also requires two cursor positions with the x
+positions defining a region and the y positions defining a linear
+background.  Within the defined region the peak departure from the
+background (either above or below the background) is found and the full
+width at half maximum of this peak is measured.  The linear background, the
+peak position and distance from the background and the widths at half the
+peak value are overplotted on the data.  In addition to the profile
+quantities the moments of the background subtracted data are measured.  The
+moments computed are the centroid, the integral (or flux), the width, and
+the normalized asymmetry.  The width reported is the square root of the
+second central moment multiplied by 2.35482.  For a gaussian profile this
+corresponds to the full width at half maximum which can be compared with
+the direct measure of the profile width.  The normalized asymmetry is the
+third central moment divided by the 3/2 power of the second central
+moment.  The various measurements are printed on the status line.  There
+are multiple lines of results which are scrolled using the '/' key.
 
 In addition to the single keystroke commands, the following : escape
 commands are provided:
@@ -190,5 +220,5 @@ columns to be plotted.  This capability will be added when the image display
 is interfaced to GIO (the IRAF graphics subsystem).
 .ih
 SEE ALSO
-cursor
+imexamine, cursor
 .endhelp

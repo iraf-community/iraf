@@ -6,9 +6,9 @@
 #define import_stdio
 #include <iraf.h>
 
+#include "config.h"
 #include "mem.h"
 #include "operand.h"
-#include "config.h"
 #include "param.h"
 #include "task.h"
 #include "errs.h"
@@ -33,7 +33,7 @@
  *   valid topcs and topos always satisfy: 0 <= topos < topcs < STACKSIZ.
  */
 
-unsigned int stack[STACKSIZ];	/* control and operand stack combined	*/
+memel stack[STACKSIZ];		/* control and operand stack combined	*/
 int topcs = STACKSIZ;		/* index of last cstack; grows downward	*/
 int topos = -1;			/* index of last ostack; grows upward	*/
 int basos = -1;			/* lowest legal index of operand stack	*/
@@ -45,7 +45,7 @@ int basos = -1;			/* lowest legal index of operand stack	*/
  * to avoid having the compiler temporaries interfere with task frames.
  */
 push (v)
-unsigned int v;
+memel v;
 {
 	if (topcs - 1 > topos)
 	    stack[--topcs] = v;
@@ -72,10 +72,10 @@ pop ()
  * of the stack untouched.
  */
 ppush (p)
-register unsigned int	p;
+register memel p;
 
 {
-	register unsigned int	q;
+	register memel	q;
 
 	q = pop();
 	push(p);
@@ -110,7 +110,7 @@ pushop (op)
 struct operand *op;
 {
 	if (topos + OPSIZ+1 < topcs) {
-	    unsigned	lasttopos = topos;
+	    int		lasttopos = topos;
 	    struct	operand *dest;
 
 	    dest = (struct operand *) &stack[topos+1];
@@ -161,7 +161,7 @@ popop ()
  * index of new task frame so that we don't get confused by temporaries
  * left on the stack by the parser if error occurs during parsing.
  */
-unsigned int last_task_frame;				/* for error recovery */
+int last_task_frame;				/* for error recovery */
 
 struct task *
 pushtask ()

@@ -62,8 +62,6 @@
       integer c
       integer ngetch
       integer i
-      external index
-      integer index
 c     integer digits(37)
 c     data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
 c    *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d

@@ -59,8 +59,13 @@ PKCHAR	*errmsg;		/* packed error message string		*/
 	/* Terminate process with a core dump if the debug_sig flag is set.
 	 */
 	if (debug_sig) {
+#ifdef LINUX
+	    signal (SIGABRT, SIG_DFL);
+	    kill (getpid(), SIGABRT);
+#else
 	    signal (SIGEMT, SIG_DFL);
 	    kill (getpid(), SIGEMT);
+#endif
 	} else
 	    _exit ((int)*errcode);
 }

@@ -11,11 +11,11 @@ int procedure aprefitsky (ap, gd)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to graphics stream
 
-int	ier
+int	ier, nclip, nsky, ilo, ihi
 pointer	sky, nse, gt
 int	ap_mode(), ap_centroid(), ap_histplot(), ap_median()
 int	ap_radplot(), ap_gauss(), ap_lgsky(), ap_crosscor()
-int	ap_mean()
+int	ap_mean(), ap_clip()
 pointer	ap_gtinit()
 
 begin
@@ -34,43 +34,128 @@ begin
 
 	case AP_MEAN:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_mean (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_K2(sky),
-		AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SNREJECT(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	case AP_MEDIAN:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call apqsort (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_median (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        Memi[AP_INDEX(sky)], AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky),
-		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SNREJECT(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_MODE:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call apqsort (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_mode (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        Memi[AP_INDEX(sky)], AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky),
-		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SNREJECT(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	case AP_CENTROID:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_centroid (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_K1(sky),
-		AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky), AP_K2(sky),
-		AP_RGROW(sky) * AP_SCALE(ap), AP_SMAXITER(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)+ilo-1], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_K1(sky), INDEFR,
+		AP_BINSIZE(sky), AP_SMOOTH(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SMAXITER(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	case AP_CONSTANT:
@@ -88,65 +173,172 @@ begin
 
 	case AP_RADPLOT:
 
+	    # Check the status of the graphics stream.
 	    if (gd == NULL)
 		return (AP_NOGRAPHICS)
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    call gactivate (gd, 0)
 	    gt = ap_gtinit (AP_IMNAME(ap), AP_SXCUR(sky), AP_SYCUR(sky))
 	    ier = ap_radplot (gd, gt, Memr[AP_SKYPIX(sky)],
-	        Memi[AP_COORDS(sky)], AP_NSKYPIX(sky), AP_SXC(sky),
-		AP_SYC(sky), AP_SNX(sky), AP_SNY(sky), AP_SCALE(ap), AP_K2(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	        Memi[AP_COORDS(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SXC(sky), AP_SYC(sky), AP_SNX(sky), AP_SNY(sky),
+		AP_SCALE(ap), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
 	    call ap_gtfree (gt)
 	    call gdeactivate (gd, 0)
+
 	    return (ier)
 
 	case AP_HISTPLOT:
 
+	    # Check the status of the graphics stream.
 	    if (gd == NULL)
 		return (AP_NOGRAPHICS)
-	    call gactivate (gd, 0)
+
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
+	    #call gactivate (gd, 0)
 	    gt = ap_gtinit (AP_IMNAME(ap), AP_SXCUR(sky), AP_SYCUR(sky))
-	    ier = ap_histplot (gd, gt, Memr[AP_SKYPIX(sky)], AP_NSKYPIX(sky),
-	        AP_K1(sky), AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky),
+	    ier = ap_histplot (gd, gt, Memr[AP_SKYPIX(sky)],
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_K1(sky), INDEFR, AP_BINSIZE(sky), AP_SMOOTH(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))	
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
 	    call ap_gtfree (gt)
-	    call gdeactivate (gd, 0)
+	    #call gdeactivate (gd, 0)
+
 	    return (ier)
 
 	case AP_OFILT:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_lgsky (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_K1(sky),
-		AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky), AP_K2(sky),
-		AP_RGROW(sky) * AP_SCALE(ap), AP_SMAXITER(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_K1(sky), INDEFR,
+		AP_BINSIZE(sky), AP_SMOOTH(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SMAXITER(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	case AP_GAUSS:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_gauss (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_SMAXITER(sky),
-		AP_K1(sky), AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky),
-		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_SMAXITER(sky),
+		AP_K1(sky), INDEFR, AP_BINSIZE(sky), AP_SMOOTH(sky),
+		AP_SLOREJECT(sky), AP_SHIREJECT(sky), AP_RGROW(sky) *
+		AP_SCALE(ap), AP_SNREJECT(sky), AP_SKY_MODE(sky),
+		AP_SKY_SIG(sky), AP_SKY_SKEW(sky), AP_NSKY(sky),
+		AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	case AP_CROSSCOR:
 
+	    # Initialize the weights.
+	    call amovkr (1.0, Memr[AP_SWGT(sky)], AP_NSKYPIX(sky))
+
+	    # Clip the data.
+	    if (AP_SLOCLIP(sky) > 0.0 || AP_SHICLIP(sky) > 0.0) {
+		nclip = ap_clip (Memr[AP_SKYPIX(sky)], Memi[AP_INDEX(sky)],
+		    AP_NSKYPIX(sky), AP_SLOCLIP(sky), AP_SHICLIP(sky), ilo,
+		    ihi)
+		if (nclip >= AP_NSKYPIX(sky))
+		    return (AP_NSKY_TOO_SMALL)
+		nsky = AP_NSKYPIX(sky) - nclip
+	    } else {
+		nclip = 0
+		call ap_index (Memi[AP_INDEX(sky)], AP_NSKYPIX(sky))
+		ilo = 1
+		nsky = AP_NSKYPIX(sky) 
+	    }
+
 	    ier = ap_crosscor (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
-	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_K1(sky),
-		AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky), AP_K2(sky),
-		AP_RGROW(sky) * AP_SCALE(sky), AP_SMAXITER(sky),
-		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
-		AP_NSKY(sky), AP_NSKY_REJECT(sky))
-	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
+		AP_SNX(sky), AP_SNY(sky), AP_K1(sky), INDEFR,
+		AP_BINSIZE(sky), AP_SMOOTH(sky), AP_SLOREJECT(sky),
+		AP_SHIREJECT(sky), AP_RGROW(sky) * AP_SCALE(ap),
+		AP_SMAXITER(sky), AP_SKY_MODE(sky), AP_SKY_SIG(sky),
+		AP_SKY_SKEW(sky), AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
+	        AP_NSKY_REJECT(sky) 
+
 	    return (ier)
 
 	default:

@@ -1,0 +1,210 @@
+From davis Tue May 18 15:09:59 1993
+Received: by tucana.tuc.noao.edu (4.1/SAG.tucana.12)
+        id AA26431; Tue, 18 May 93 15:09:56 MST; for sites
+Date: Tue, 18 May 93 15:09:56 MST
+From: davis (Lindsey Davis)
+Message-Id: <9305182209.AA26431@tucana.tuc.noao.edu>
+To: belkine@mesiob.obspm.circe.fr
+Subject: RE: geomap
+Cc: sites
+
+
+
+Igor,
+
+    The following is a copy of a mail message I sent to another user who made
+the same request regarding geomap. I hope this is of use to you.
+
+
+                                           Lindsey Davis
+
+###############################################################################
+
+
+    Jeannette forwarded your request for a detailed description of the
+geomap output format to me. This format was originally intended to be
+for the internal use of geomap only, but the following should help you
+decode it.
+
+    1. For simple linear geometric transformations you will see the
+following two entries in the fit record. Surface1 describes the linear
+portion of the fit; surface2 describes the residual distortion map
+which is always 0 for linear fits.
+
+        surface1        11
+            surface(xfit) surface(yfit)    (surface type 1=cheb, 2=leg, 3=poly)
+            xxorder(xfit) yxorder(yfit)    (always 2)
+            xyorder(xfit) yyorder(yfit)    (always 2)
+            xxterms(xfit) yxterms(yfit)    (always 0)
+            xmin(xfit)   xmin(yfit)        (geomap input or data)
+            xmax(xfit)   xmax(yfit)        (geomap input or data)
+            ymin(xfit)   ymin(yfit)        (geomap input or data)
+            ymax(xfit)   ymax(yfit)        (geomap input or data)
+            a            d
+            b            e
+            c            f
+        surface2        0
+
+This above describes the following linear surfaces.
+
+        xfit = a + b * x + c * y  (polynomial)
+        yfit = d + e * x + f * y
+
+        xfit = a + b * xnorm + c * ynorm  (chebyshev)
+        yfit = d + e * xnorm + f * ynorm
+
+        xfit = a + b * xnorm + c * ynorm  (legendre)
+        yfit = d + e * xnorm + f * ynorm
+
+        xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+        ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+Xnorm and ynorm are the input x and y values normalized between -1.0
+and 1.0.
+
+
+
+
+      2. For a higher order fit, say xorder=4 yorder=4 and xterms=yes,
+the format is more complicated.  The second surface is computed by fitting
+the higher order surface to the residuals of the first fit. The geomap
+output will look something like the following.
+
+        surface1        11
+            surface(xfit) surface(yfit)    (surface type 1=cheb, 2=leg, 3=poly)
+            xxorder(xfit) yxorder(yfit)    (always 2)
+            xyorder(xfit) yyorder(yfit)    (always 2)
+            xxterms(xfit) yxterms(yfit)    (always 0)
+            xmin(xfit)   xmin(yfit)        (geomap input or data)
+            xmax(xfit)   xmax(yfit)        (geomap input or data)
+            ymin(xfit)   ymin(yfit)        (geomap input or data)
+            ymax(xfit)   ymax(yfit)        (geomap input or data)
+            a            d
+            b            e
+            c            f
+        surface2        24
+            surface(xfit) surface(yfit)    (surface type 1=cheb, 2=leg, 3=poly)
+            xxorder(xfit) yxorder(yfit)    (4)
+            xyorder(xfit) yyorder(yfit)    (4)
+            xxterms(xfit) yxterms(yfit)    (1 in this case)
+            xmin(xfit)   xmin(yfit)        (geomap input or data)
+            xmax(xfit)   xmax(yfit)        (geomap input or data)
+            ymin(xfit)   ymin(yfit)        (geomap input or data)
+            ymax(xfit)   ymax(yfit)        (geomap input or data)
+            C00(xfit)    C00(yfit)
+            C10(xfit)    C10(yfit)
+            C20(xfit)    C20(yfit)
+            C30(xfit)    C30(yfit)
+            C01(xfit)    C01(yfit)
+            C11(xfit)    C11(yfit)
+            C21(xfit)    C21(yfit)
+            C31(xfit)    C31(yfit)
+            C02(xfit)    C02(yfit)
+            C12(xfit)    C12(yfit)
+            C22(xfit)    C22(yfit)
+            C32(xfit)    C32(yfit)
+            C03(xfit)    C03(yfit)
+            C13(xfit)    C13(yfit)
+            C23(xfit)    C23(yfit)
+            C33(xfit)    C33(yfit)
+
+
+where the Cmn are the coefficients of the polynomials Pmn, and the Pmn
+are defined as follows
+
+            Pmn = x ** m * y ** n    (polynomial)
+
+            Pmn = Pm(xnorm) * Pn(ynorm)     (chebyshev)
+
+                P0(xnorm) = 1.0
+                P1(xnorm) = xnorm
+                Pm+1(xnorm) = 2.0 * xnorm * Pm(xnorm) - Pm-1(xnorm)
+                xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+
+                P0(ynorm) = 1.0
+                P1(ynorm) = ynorm
+                Pn+1(ynorm) = 2.0 * ynorm * Pn(ynorm) - Pn-1(ynorm)
+                ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+            Pmn = Pm(xnorm) * Pn(ynorm)     (legendgre)
+
+                P0(xnorm) = 1.0
+                P1(xnorm) = xnorm
+                Pm+1(xnorm) = ((2m + 1) * xnorm * Pm(xnorm) - m * Pm-1(xnorm))/
+                              (m + 1)
+                xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+
+                P0(ynorm) = 1.0
+                P1(ynorm) = ynorm
+                Pn+1(ynorm) = ((2n + 1) * ynorm * Pn(ynorm) - n * Pn-1(ynorm))/
+                              (n + 1)
+                ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+
+Hopefully I have copied this all down correctly. The main points to remember
+is that the mangitudes of the coefficients reflect both the function type
+(polynomial, chebyshev, or legendre) and the normalization (xmin, xmax,
+ymin, ymax).
+
+    Hope this helps you out and write back if you have more questions.
+
+                                             Lindsey Davis
+
+=======================================
+
+# <Date>
+begin	<name>
+	task fitcoords
+	axis	1	# Axis of fitted value
+	surface	24	# The number of following parameters/coefficients
+            surface	# surface type 1=chebyshev, 2=legendre
+            xorder	# X order
+            yorder	# Y order
+            xterms	# Cross terms?  0=no, 1=yes (always 1 for fitcoords)
+            xmin	# Minimum x value in fit - usually 1
+            xmax	# Maximum x value in fit - usually image dimension
+            ymin	# Minimum y value in fit - usually 1
+            ymax	# Maximum y value in fit - usually image dimension
+            C00		# Coefficients (shown for xorder=4 and yorder=4)
+            C10
+            C20
+            C30
+            C01
+            C11
+            C21
+            C31
+            C02
+            C12
+            C22
+            C32
+            C03
+            C13
+            C23
+            C33
+
+
+The fit is a sum of the form:
+
+	fit = sum(m=0 to xorder-1) sum(n=0 to yorder-1) {Cmn*Pm(x')*Pn(y')}
+
+where the cross-terms may or may not be included depending on the xterms
+parameter.  Cross-terms are always used in FITCOORDS.
+
+The coefficients are defined in terms of normalized independent variables
+in the range -1 to 1.  If x and y are actual values then the normalized
+variables, x' and y', are defined using the data range parameters as:
+
+	x' = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	y' = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+The Pi(z), where z is either x' or y', are defined iteratively as follows:
+
+	# Chebyshev
+	P0(z) = 1.0
+	P1(z) = z
+	Pi+1(z) = 2.0 * z * Pi(z) - Pi-1(z)
+
+	# Legendre
+	P0(z) = 1.0
+	P1(z) = z
+	Pi+1(z) = ((2i + 1) * z * Pi(z) - i * Pi-1(z)) / (i + 1)

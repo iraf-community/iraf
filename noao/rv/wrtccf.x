@@ -109,7 +109,7 @@ begin
 	call imastr (im, "object", IMAGE(rv))
 	call imastr (im, "template", RIMAGE(rv))
 	call imaddi (im, "npts", RV_CCFNPTS(rv))
-	if (RV_AXIS(rv) == VELOCITY) {
+	if (RV_DCFLAG(rv) != -1) {
 	    call imaddr (im, "crval1", 
 		real(rv_shift2vel(rv,real(-(RV_CCFNPTS(rv)/2)))))
 	    call imaddr (im, "cdelt1", RV_DELTAV(rv))
@@ -157,14 +157,13 @@ begin
 	call salloc (x, npts, TY_REAL)
 
 	# Sret up X-axis
-	switch (RV_AXIS(rv)) {
-	case VELOCITY:
+	if (RV_DCFLAG(rv) != -1) {
 	    i = - (RV_CCFNPTS(rv) / 2)
 	    do j = 1, npts {
 		Memr[x+j-1] = real (rv_shift2vel(rv,real(i)))
 		i = i + 1
 	    }
-	case LAG:
+	} else {
 	    i = - (RV_CCFNPTS(rv) / 2)
 	    do j = 1, npts {
 		Memr[x+j-1] = real (i)

@@ -946,4 +946,3 @@ Wyatt, W.F., 1985, "The  CfA  System  for  Digital  Correlations"   in
 Detailed Manual Pages
 .PP
 	The individual manual pages for these tasks follow this document.
-

@@ -1,6 +1,7 @@
 	generic - Preprocess a generic source file
      hdbexamine - Examine a help database
 	  lroff - Lroff (line-roff) text formatter
+	 memchk - Process a memdbg mem.log file for errors
        mkhelpdb - Make (compile) a help database
       mkmanpage - Make a manual page
 	  mkpkg - Make or update an object library or package

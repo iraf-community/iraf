@@ -25,15 +25,16 @@ procedure giotr (stream)
 int	stream			# graphics stream
 
 pointer	tr, gki
-int	mode, xint, status, junk, nwords, jmpbuf[LEN_JUMPBUF]
+int	jmpbuf[LEN_JUMPBUF], fn
+int	mode, xint, status, junk, nwords
 common	/gtrvex/ jmpbuf
 
-extern	giotr_onint()
 pointer	gtr_init(), coerce()
+extern	giotr_onint(), gtr_delete()
 int	gtr_fetch_next_instruction(), locpr()
 errchk	gtr_init, gtr_fetch_next_instruction, gki_write
-include	"gtr.com"
 data	status /OK/, xint /NULL/
+include	"gtr.com"
 
 begin
 	tr = gtr_init (stream)
@@ -70,9 +71,15 @@ begin
 		    else
 			call gki_write (stream, Mems[gki])
 
-		    if (gki > TR_FRAMEBUF(tr))
-			if (Mems[gki+GKI_OPENWS_M-1] != APPEND)
-			    call gtr_frame (tr, TR_IP(tr), stream)
+		    # gtr_control does not call gki_escape so always do this.
+		    call gki_escape (stream, GKI_OPENWS, 0, 0)
+
+		    # Discard frame buffer contents up to and including the
+		    # openws instruction, so that it will only be executed
+		    # once.
+
+		    if (Mems[gki+GKI_OPENWS_M-1] == NEW_FILE)
+			call gtr_frame (tr, TR_IP(tr), stream)
 		}
 
 	    case GKI_CLOSEWS, GKI_DEACTIVATEWS, GKI_REACTIVATEWS:
@@ -81,12 +88,27 @@ begin
 		# to avoid unnecessary mode switching of the terminal.
 		;
 
-	    case GKI_CANCEL, GKI_CLEAR:
+	    case GKI_CANCEL:
+		# Cancel any buffered graphics data.
+		call gki_write (stream, Mems[gki])
+		call gtr_frame (tr, TR_IP(tr), stream)
+
+	    case GKI_FLUSH, GKI_GETCURSOR, GKI_GETCELLARRAY:
+		# Do not buffer these instructions.
+		call gki_write (stream, Mems[gki])
+		call gtr_delete (tr, gki)
+
+	    case GKI_CLEAR:
+		# Clear is special because it initializes things.
 		if (status != OK) {
 		    call gki_reactivatews (stream, 0)
 		    status = OK
 		}
+		# Execute the instruction.
 		call gki_write (stream, Mems[gki])
+		call gki_escape (stream, GKI_CLEAR, 0, 0)
+
+		# Discard frame buffer contents up to and including the clear.
 		call gtr_frame (tr, TR_IP(tr), stream)
 
 	    case GKI_SETWCS:
@@ -95,6 +117,24 @@ begin
 		call amovs (Mems[gki+GKI_SETWCS_WCS-1],
 		    Mems[coerce (TR_WCSPTR(tr,1), TY_STRUCT, TY_SHORT)],
 		    min (nwords, LEN_WCS * MAX_WCS * SZ_STRUCT / SZ_SHORT))
+
+	    case GKI_ESCAPE:
+		if (status == OK) {
+		    fn = Mems[gki+GKI_ESCAPE_FN-1]
+
+		    # Execute the escape instruction.
+		    if (wstranset == YES) {
+			call sge_wstran (fn, Mems[gki+GKI_ESCAPE_DC-1],
+			    vx1,vy1, vx2,vy2)
+		    } else
+			call gki_write (stream, Mems[gki])
+
+		    # Allow the kernel escape handling code to preserve,
+		    # delete, or edit the instruction.
+
+		    call sge_spoolesc (tr, gki, fn, Mems[gki+GKI_ESCAPE_DC-1],
+			TR_FRAMEBUF(tr), TR_OP(tr), locpr(gtr_delete))
+		}
 
 	    default:
 		if (status == OK)

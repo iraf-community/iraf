@@ -5,10 +5,10 @@ IF NEW IMAGE"
 title,s,h,"",,,"Title of image"
 ncols,i,h,512,1,,"Number of columns"
 nlines,i,h,512,1,,"Number of lines"
-header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
-background,r,h,0.,0.,,"Default background and Poisson background
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file
 
 NOISE PARAMETERS"
+background,r,h,0.,0.,,"Default background and Poisson background"
 gain,r,h,1.,1.e-9,,"Gain (electrons/DN)"
 rdnoise,r,h,0.,0.,,"Read noise (electrons)"
 poisson,b,h,no,,,"Add Poisson noise?"

@@ -104,7 +104,7 @@ begin
 			expo = 1
 
 	    # Add spectrum into accumulator
-	    if (Memi[bstat[object]+beam] == INDEFI) {
+	    if (IS_INDEFI (Memi[bstat[object]+beam])) {
 	        Memi[npts[object]+beam] = IM_LEN (im,1)
 	        call salloc (Memi[accum[object]+beam], IM_LEN(im,1), TY_REAL)
 	        call aclrr (Memr[Memi[accum[object]+beam]], IM_LEN(im,1))
@@ -136,7 +136,7 @@ begin
 	# Review all apertures containing data and write sums
 	do i = 0, MAX_NR_BEAMS-1
 	    do j = 1, 2
-	    if (Memi[bstat[j]+i] != INDEFI) {
+	    if (!IS_INDEFI (Memi[bstat[j]+i])) {
 		call wrt_spec (Memc[Memi[images+i]], Memr[Memi[accum[j]+i]],
 		    Memr[esum[j]+i], Memc[ofile], start_rec,
 		    Memc[Memi[title[j]+i]], Memi[npts[j]+i], i, j)

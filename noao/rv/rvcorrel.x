@@ -78,17 +78,46 @@ real	eps
 real	sqrt(), assqr()
 
 begin
-	ix = x + 0.5
-	do i = 1, cnpts {
-	    j = 1 + mod ((2*(cnpts+ix)-i-1), cnpts)
-	    if (j <= cnpts && j >= 1)
-	        anti[i] = (cor[i] - cor[j]) #/ 2.
-	    else
-	        anti[i] = 0.0
-	}
+	if (DBG_OTHER(rv) == 0) {
+	    ix = x + (cnpts/2. + 1) + 0.5 
+	    do i = 1, cnpts {
+	        j = 1 + mod ((2*(cnpts+ix)-i-1), cnpts)
+	        if (j <= cnpts && j >= 1)
+	            anti[i] = cor[i] - cor[j]
+	        else
+	            anti[i] = 0.0
+	    }
 
-	# This is the sigma(a) in the Tonry&Davis paper (Eqn. 20)
-	sigmaa = sqrt (assqr(anti,cnpts) / (2*cnpts))
+	    # This is the sigma(a) in the Tonry&Davis paper (Eqn. 20)
+	    sigmaa = sqrt (assqr(anti,cnpts) / (2*cnpts))
+
+	} else if (DBG_OTHER(rv) > 0) {
+	    ix = x + 0.5
+	    do i = 1, cnpts {
+	        j = 1 + mod ((2*(cnpts+ix)-i-1), cnpts)
+	        if (j <= cnpts && j >= 1)
+	            anti[i] = (cor[i] - cor[j])
+	        else
+	            anti[i] = 0.0
+	    }
+
+	    # This is the sigma(a) in the Tonry&Davis paper (Eqn. 20)
+	    sigmaa = sqrt (assqr(anti,cnpts) / (2*cnpts))
+
+	} else if (DBG_OTHER(rv) == -1) {
+	    ix = x + 0.5
+	    do i = 1, cnpts {
+	        j = 1 + mod ((2*(cnpts+ix)-i), cnpts)
+	        if (j <= cnpts && j >= 1)
+	            anti[i] = (cor[i] - cor[j])
+	        else
+	            anti[i] = 0.0
+	    }
+
+	    # This is the sigma(a) in the Tonry&Davis paper (Eqn. 20)
+	    sigmaa = sqrt (assqr(anti,cnpts) / (2*cnpts))
+
+	}
 	
 	# This is the ratio of true peak height to height of average peak in CCF
 	r = h / (SQRTOF2 * sigmaa)				# Eqn. 23
@@ -101,9 +130,11 @@ begin
 
 	if (DBG_DEBUG(rv) == YES) {
 	    call d_printf (DBG_FD(rv), "rv_antisym:\n\t")
-	    call d_printf (DBG_FD(rv), "sig=%g w=%g h=%g R=%g eps=%g : %g\n")
-		call pargr(sigmaa) ; call pargr(width) ; call pargr(h)
-		call pargr(r) ; call pargr(eps) ; call pargr(RV_DELTAV(rv))
+	    call d_printf (DBG_FD(rv), 
+		     "ix=%d x=%g sig=%g w=%g h=%g R=%g eps=%g => %g k/s\n")
+		call pargi (ix) ; call pargr(x) ; call pargr(sigmaa)
+		call pargr(width) ; call pargr(h) ; call pargr(r)
+		call pargr(eps) ; call pargr(RV_DELTAV(rv))
 	}
 end
 
@@ -113,7 +144,7 @@ end
 
 procedure rv_normalize (data, npts)
 
-real	data[npts]		#U Data
+real	data[ARB]		#U Data
 int	npts			#I Number of points
 
 real	rms, assqr()

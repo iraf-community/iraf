@@ -1,0 +1,12 @@
+input,s,a,,,,Input spectra
+output,s,a,,,,Output spectra
+units,s,a,,,,Output dispersion units
+error,r,h,0.01,1E-6,,Maximum output coordinate error in pixels
+linearize,b,h,no,,,Resample the output to linear dispersion intervals?
+verbose,b,h,yes,,,"Print log of transformations?
+
+# AIR/VACUUM CONVERSION"
+air,s,h,"none","none|air2vac|vac2air",,Air-vacuum conversion?
+t,r,h,15.,,,Temperture in degrees C
+p,r,h,760,,,Pressure in mmHg
+f,r,h,4,,,Water vapour pressure in mmHg

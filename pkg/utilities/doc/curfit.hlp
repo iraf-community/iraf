@@ -32,6 +32,7 @@ The weight w = 1.0 / y. This option can be used for both list and image data.
 .le
 .ls instrumental
 The user supplies the sigmay for each point and w = 1.0 / sigmay ** 2.
+This option may be used for list input only.
 .le
 .le
 .ls interactive = yes
@@ -86,7 +87,7 @@ in x and are not explicitly sorted by \fIcurfit\fR.
 
 If the input is from a list the user may specify a set of weights,
 \fBweighting\fR = user or a set of errors, \fBweighting\fR =
-instrumental. An additional weighting option \fBweighting\fR = instrumental
+instrumental. An additional weighting option \fBweighting\fR = statistical
 can be used for both list and image data. The default is \fBweighting\fR =
 uniform.
 

@@ -72,7 +72,7 @@ begin
 	    sigma = 0.
 	    npts = 0
 	    do i = 1, len_line {
-		if ((model[i] > 0.) && (data[i] != INDEFR)) {
+		if ((model[i] > 0.) && (!IS_INDEFR (data[i]))) {
 		    sigma = sigma + (data[i] - model[i]) ** 2
 		    npts = npts + 1
 		}
@@ -89,7 +89,7 @@ begin
 	    do i = 1, len_line {
 		if (n_total == nmax)
 		    break
-		if ((model[i] <= 0.) || (data[i] == INDEFR))
+		if ((model[i] <= 0.) || (IS_INDEFR (data[i])))
 		    next
 
 		# Determine deviant pixels.
@@ -126,8 +126,9 @@ begin
 	# Replace deviant or INDEF pixels by model values.
 	# Even if no cleaning was done there may have been some INDEF points
 	# in the input data line.
+
 	do i = 1, len_line {
-	    if (data[i] == INDEFR)
+	    if (IS_INDEFR (data[i]))
 		data[i] = model[i]
 	}
 
@@ -216,7 +217,7 @@ begin
 	        xc = ranges[spectrum, X_START] + i
 	        if ((xc < 1) || (xc > len_line))
 		    next
-	        if (data[xc] == INDEFR)
+	        if (IS_INDEFR (data[xc]))
 		    next
 		j = i + 1
 	        if (profiles[j, spectrum, I0_INDEX] <= 0)
@@ -232,7 +233,7 @@ begin
 	        xc = ranges[spectrum, X_START] + i
 	        if ((xc < 1) || (xc > len_line))
 		    next
-	        if (data[xc] == INDEFR)
+	        if (IS_INDEFR (data[xc]))
 		    next
 		j = i + 1
 	        if (profiles[j, spectrum, I0_INDEX] <= 0)

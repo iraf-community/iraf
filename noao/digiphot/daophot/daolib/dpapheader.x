@@ -1,4 +1,5 @@
-# DP_APHEADER -- Procedure to dump apphot header.
+# DP_APHEADER -- Copy the text database column headers to another file.
+# Consider placing this simple routine in the pttables library at some point.
 
 procedure dp_apheader (in, out)
 
@@ -26,7 +27,8 @@ begin
 end
 
 
-# DP_APBANNER -- Procedure to copy the apphot banner.
+# DP_APBANNER -- Copy the text database keyword definitions to another file.
+# Consider placing this simple routine in the pttables library at some point.
 
 
 procedure dp_apbanner (in, out)
@@ -48,7 +50,6 @@ begin
 		next
 	    call putline (out, Memc[line])
 	}
-
 	call seek (in, BOF)
 
 	call sfree (sp)

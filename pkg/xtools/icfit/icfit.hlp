@@ -73,6 +73,9 @@ Initialize the sample to include all data points.
 .ls u
 Undelete the data point nearest the cursor which was previously deleted.
 .le
+.ls v
+Change the fitting weight of the point nearest the cursor.
+.le
 .ls w
 Set the graph window (range along each axis to be graphed).  This is a
 \fBgtools\fR option which prints the prompt "window:".  The set of cursor

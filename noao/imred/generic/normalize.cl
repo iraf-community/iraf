@@ -55,6 +55,8 @@
 
 	        imarith (input, "/", mean, input, pixtype="real",
 		    calctype="real")
+		hedit (input, "ccdmean", 1., add=yes, verify=no, show=no,
+		    update=yes)
 	    } else
 		print ("  WARNING: Cannot normalize ", input, ".")
 	}

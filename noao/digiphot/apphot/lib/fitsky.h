@@ -32,72 +32,95 @@ define	AP_BADPARAMS		212	# Non-physical parameters
 
 # sky fitting parameters (# 201 - 300)
 
-define	ANNULUS		201
-define	DANNULUS	202
-define	SKYFUNCTION	203
-define	K1		204
-define	K2		205
-define	SMAXITER	206
-define	BINSIZE		207
-define	SMOOTH		208
-define	RGROW		209
-define	SKY_BACKGROUND	210
-define	SKY_MODE	211
-define	SKY_SIGMA	212
-define	SKY_SKEW	213
-define	NSKY		214
-define	NSKY_REJECT	215
-define	SNREJECT	216
-define	SXCUR		217
-define	SYCUR		218
-define	SSTRING		219
+define	SKYFUNCTION	201
+define	ANNULUS		202
+define	DANNULUS	203
+define	SKY_BACKGROUND	204
+define	K1		205
+define	BINSIZE		206
+define	SMOOTH		207
+define	SMAXITER	208
+define	SLOCLIP		209
+define	SHICLIP		210
+define	SNREJECT	211
+define	SLOREJECT	212
+define	SHIREJECT	213
+define	RGROW		214
+define	SKY_MODE	215
+define	SKY_SIGMA	216
+define	SKY_SKEW	217
+define	NSKY		218
+define	NSKY_REJECT	219
+define	SXCUR		220
+define	SYCUR		221
+define	SSTRING		222
 
 # define sky fitting keywords
 
+define	KY_SSTRING		"salgorithm"
 define	KY_ANNULUS		"annulus"
 define	KY_DANNULUS		"dannulus"
-define	KY_SSTRING		"salgorithm"
+define	KY_SKY_BACKGROUND	"skyvalue"
 define	KY_K1			"khist"
-define	KY_K2			"skreject"
-define	KY_SNREJECT		"snreject"
-define	KY_SMAXITER		"smaxiter"
 define	KY_BINSIZE		"binsize"
 define	KY_SMOOTH		"smooth"
+define	KY_SMAXITER		"smaxiter"
+define	KY_SLOCLIP		"sloclip"
+define	KY_SHICLIP		"shiclip"
+define	KY_SNREJECT		"snreject"
+define	KY_SLOREJECT		"sloreject"
+define	KY_SHIREJECT		"shireject"
 define	KY_RGROW		"rgrow"
-define	KY_SKY_BACKGROUND	"skyvalue"
 
 # define sky fitting units strings
 
-define	UN_ANNULUS		"scaleunit"
-define	UN_DANNULUS		"scaleunit"
-define	UN_SSTRING		"algorithm"
-define	UN_K1			"sigma"
-define	UN_K2			"sigma"
-define	UN_SNREJECT		"number"
-define	UN_SMAXITER		"number"
-define	UN_BINSIZE		"sigma"
-define	UN_SMOOTH		"switch"
-define	UN_RGROW		"scaleunit"
-define	UN_SKY_BACKGROUND	"counts"
+#define	UN_SSTRING		"algorithm"
+#define	UN_ANNULUS		"scaleunit"
+#define	UN_DANNULUS		"scaleunit"
+#define	UN_SKY_BACKGROUND	"counts"
+#define	UN_K1			"sigma"
+#define	UN_BINSIZE		"sigma"
+#define	UN_SMOOTH		"switch"
+#define	UN_SMAXITER		"number"
+#define	UN_SLOCLIP		"percent"
+#define	UN_SHICLIP		"percent"
+#define	UN_SNREJECT		"number"
+#define	UN_SLOREJECT		"sigma"
+#define	UN_SHIREJECT		"sigma"
+#define	UN_RGROW		"scaleunit"
+
+define	UN_SALGORITHM		"algorithm"
+define	UN_SSCALEUNIT		"scaleunit"
+define	UN_SSIGMA		"sigma"
+define	UN_SNUMBER		"number"
+define	UN_SPERCENT		"percent"
+define	UN_SCOUNTS		"counts"
+define	UN_SSWITCH		"switch"
 
 # fitsky string definitions
 
 define	SSHOWARGS	"|data|sky|"
-define	SFUNCS		"|constant|mode|centroid|file|histplot|median|radplot|gauss|ofilter|crosscor|mean|"
-define	SCMDS		"|annulus|dannulus|salgorithm|khist|skreject|smaxiter|binsize|smooth|rgrow|snreject|skyvalue|mksky|"
+define	SFUNCS		"|constant|mode|centroid|file|histplot|median|\
+radplot|gauss|ofilter|crosscor|mean|"
+define	SCMDS		"|annulus|dannulus|salgorithm|khist|sloreject|\
+shireject|smaxiter|binsize|smooth|rgrow|snreject|skyvalue|mksky|sloclip|\
+shiclip|"
 
 define	SCMD_ANNULUS		1
 define	SCMD_DANNULUS		2
 define	SCMD_SALGORITHM 	3
 define	SCMD_KHIST		4
-define	SCMD_SKREJECT		5
-define	SCMD_SMAXITER		6
-define	SCMD_BINSIZE		7
-define	SCMD_SMOOTH		8
-define	SCMD_RGROW		9
-define	SCMD_SNREJECT		10
-define	SCMD_SKYVALUE 		11
-define	SCMD_MKSKY		12
+define	SCMD_SLOREJECT		5
+define	SCMD_SHIREJECT		6
+define	SCMD_SMAXITER		7
+define	SCMD_BINSIZE		8
+define	SCMD_SMOOTH		9
+define	SCMD_RGROW		10
+define	SCMD_SNREJECT		11
+define	SCMD_SKYVALUE 		12
+define	SCMD_MKSKY		13
+define	SCMD_SLOCLIP		14
+define	SCMD_SHICLIP		15
 
 define	SCMD_DATA		1
 define	SCMD_SKY		2

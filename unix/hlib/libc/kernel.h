@@ -9,8 +9,6 @@
 #define	NOKNET			/* no networking desired in kernel	*/
 #endif
 
-typedef	int  (*PFI)();		/* for signal handlers */
-
 /* Tunable kernel parameters.  All buffer sizes are in units of bytes.
  * Buffer lengths are in units of whatever the buffer contains.
  */
@@ -18,9 +16,9 @@ typedef	int  (*PFI)();		/* for signal handlers */
 #define	FILE_MODEBITS	0666	/* protection bits for new files	*/
 #define	MAXOFILES	64	/* maximum open files (see <stdio.h>)	*/
 #define	MAXPROCS	20	/* maximum subprocesses per process	*/
-#define	SZ_DEFWORKSET	512000	/* default working set size, bytes	*/
-#define	SZ_MAXWORKSET	8192000	/* maximum working set (max physmem)	*/
-#define	HZ		60	/* clock frequency (see zgtime.c)	*/
+#define	SZ_DEFWORKSET	8388608	/* default working set size, bytes	*/
+#define	SZ_MAXWORKSET	268435456 /* maximum working set (max physmem)	*/
+#define	CLKFREQ		60	/* clock frequency (see zgtime.c)	*/
 
 #define TX_OPTBUFSIZE	SZ_LINE	/* optimum buffer size for text file	*/
 #define TX_MAXBUFSIZE	0	/* maximum buffer size for text file	*/
@@ -32,6 +30,8 @@ typedef	int  (*PFI)();		/* for signal handlers */
 #define	KS_MAXBUFSIZE	0	/* maximum buffer size for KS i/o	*/
 #define	PR_OPTBUFSIZE	4096	/* optimal buffer size for IPC i/o	*/
 #define	PR_MAXBUFSIZE	4096	/* maximum buffer size for IPC i/o	*/
+#define	ND_OPTBUFSIZE	4096	/* optimal buffer size for ND i/o	*/
+#define	ND_MAXBUFSIZE	4096	/* maximum buffer size for ND i/o	*/
 #define PL_OPTBUFSIZE	1024	/* optimum buffer size for plotter	*/
 #define PL_MAXBUFSIZE	0	/* maximum buffer size for plotter	*/
 #define LP_OPTBUFSIZE	1024	/* optimum buffer size for line printer	*/
@@ -41,7 +41,6 @@ typedef	int  (*PFI)();		/* for signal handlers */
  */
 #define	ADDR_TO_LOC(addr)	(((int)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
 #define	LOC_TO_ADDR(loc,type)	((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
-
 
 /* Kernel file descriptor for accessing UNIX files.  A static array ZFD of
  * descriptor structures is used, indexed by UNIX file descriptor numbers
@@ -54,17 +53,7 @@ struct fiodes {
 	int	nbytes;			/* last nbytes r|w		*/
 	int	io_flags;		/* fcntl flags			*/
 	short	flags;			/* access mode flags		*/
-#ifdef SYSV
-#define MAXCC	8
-#define _STDF_INIT	0,0,0, 0,0,0,0,0,0,0,0
-	short	tc_iflag;		/* saved SysV tty state		*/
-	short	tc_oflag;
-	short	tc_lflag;
-	char	tc_cc[MAXCC];
-#else
-#define _STDF_INIT	0
-	short	sg_flags;		/* save space for stty flags	*/
-#endif
+	char	*port;			/* tty port if tty		*/
 };
 extern	struct fiodes zfd[];		/* array of descriptors		*/
 
@@ -73,6 +62,9 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	KF_NOSTTY	04		/* stty,gtty calls illegal	*/
 #define	KF_NDELAY	010		/* nonblocking reads		*/
 #define	TTYNAME		"/dev/tty"	/* user terminal (for ZFIOTY)	*/
+#define U_STDIN		"unix-stdin"	/* special filename for stdin	*/
+#define U_STDOUT	"unix-stdout"	/* special filename for stdout	*/
+#define U_STDERR	"unix-stderr"	/* special filename for stderr	*/
 #define	LEN_RAWCMD	5		/* nchars in rawcmd string	*/
 #define RAWOFF		"\033-rAw"	/* turn raw mode off		*/
 #define RAWON		"\033+rAw"	/* turn raw mode on		*/
@@ -80,10 +72,28 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
 #define	STDIO_FILES {			/* initialization of stdio	*/\
-	stdin,  0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT,\
-	stdout, 0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT,\
-	stderr, 0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT\
+	stdin,  0L, 0L, 0, 0, KF_NOSEEK, NULL,\
+	stdout, 0L, 0L, 0, 0, KF_NOSEEK, NULL,\
+	stderr, 0L, 0L, 0, 0, KF_NOSEEK, NULL\
 }
+
+#ifdef AUX
+#define SIGFUNC sigfunc_t
+#else
+#ifdef SOLARIS
+typedef	void  (*SIGFUNC)();
+#else
+typedef	int  (*SIGFUNC)();
+#endif
+#endif
+
+typedef	void  (*PFV)();
+typedef	int  (*PFI)();
+
+#ifdef SOLARIS
+#define bzero(a,n)	memset(a,0,n)
+#define bcopy(a,b,n)	memmove(b,a,n)
+#endif
 
 extern	char *irafpath();
 

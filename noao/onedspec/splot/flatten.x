@@ -15,7 +15,7 @@ real	wx, z
 int	i, key
 pointer	sp, str, w, gt2, ic, cv
 
-bool	clgetb(), fp_equalr()
+bool	clgetb()
 real 	clgetr(), ic_getr(), cveval()
 int	clgeti(), ic_geti(), btoi(), clgcur()
 errchk	icg_fit
@@ -67,7 +67,7 @@ begin
 		case '/':
 		    do i = 1, n {
 			z = cveval (cv, x[i])
-			if (fp_equalr (z, 0.))
+			if (abs (z) < 1e-30)
 			    y[i] = 1.
 			else
 			    y[i] = y[i] / z

@@ -1,8 +1,11 @@
 # PDM -- Make the Phase Dispersion Minimization package.
 
-$checkout libpkg.a ../
-$update   libpkg.a
-$checkin  libpkg.a ../
+update:
+	$checkout libpkg.a ../
+	$update   libpkg.a
+	$checkin  libpkg.a ../
+	;
+
 
 libpkg.a:
 	pdmalltheta.x	pdm.h <ctype.h> <error.h> <mach.h>
@@ -32,5 +35,6 @@ libpkg.a:
 	pdmthetaran.x	pdm.h <ctype.h> <error.h> <mach.h> <pkg/rg.h>
 	pdmtplot.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
 	pdmundelete.x	pdm.h <ctype.h> <error.h> <gset.h> <mach.h>
-	t_pdm.x		pdm.h <ctype.h> <error.h> <mach.h>
+	t_pdm.x         pdm.h <ctype.h> <error.h> <mach.h>
 	;
+

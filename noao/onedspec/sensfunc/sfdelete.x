@@ -13,13 +13,14 @@ int	key			# Delete point, star, or wavelength
 int	istd			# Index of standard star
 int	ipt			# Index of point
 
-int	i, j, n, wcs, mark, mdel, stridx()
+int	i, j, n, wcs, mark, mdel, cdel, stridx()
 real	wave, szmark, szmdel
 pointer	x, y, z, w, gio
 
 begin
 	gio = GP_GIO(gp)
 	mdel = GP_MDEL(gp)
+	cdel = GP_CDEL(gp)
 	szmdel = GP_SZMDEL(gp)
 	szmark = GP_SZMARK(gp)
 
@@ -42,6 +43,7 @@ begin
 		call gseti (gio, G_PMLTYPE, 0)
 	        call gmark (gio, Memr[x], Memr[y], mark, szmark, szmark)
 		call gseti (gio, G_PMLTYPE, 1)
+		call gseti (gio, G_PLCOLOR, cdel)
 	        call gmark (gio, Memr[x], Memr[y], mdel, szmdel, szmdel)
 	    case 's':
 		if (istd != nstds-1)
@@ -57,6 +59,7 @@ begin
 		        call gseti (gio, G_PMLTYPE, 0)
 	                call gmark (gio, Memr[x], Memr[y], mark, szmark, szmark)
 		        call gseti (gio, G_PMLTYPE, 1)
+			call gseti (gio, G_PLCOLOR, cdel)
 	                call gmark (gio, Memr[x], Memr[y], mdel, szmdel, szmdel)
 		    }
 		    x = x + 1
@@ -83,6 +86,7 @@ begin
 	                    call gmark (gio, Memr[x], Memr[y], mark, szmark,
 				    szmark)
 		            call gseti (gio, G_PMLTYPE, 1)
+			    call gseti (gio, G_PLCOLOR, cdel)
 	                    call gmark (gio, Memr[x], Memr[y], mdel, szmdel,
 				szmdel)
 		        }

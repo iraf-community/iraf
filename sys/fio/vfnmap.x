@@ -354,9 +354,11 @@ begin
 
 	if (vfnmap (vfd, osfn, maxch) == ERR) {
 	    # Long filename but no entry found in database; nothing to delete.
+	    call sfree (sp)
 	    return (ERR)
 	} else if (V_LONGROOT(vfd) == NO) {
 	    # Short filename; nothing to delete but it is not an error.
+	    call sfree (sp)
 	    return (OK)
 	}
 

@@ -18,7 +18,6 @@ libpkg.a:
 	apwmag.x	<mach.h>		../lib/apphotdef.h     \
 			../lib/noisedef.h	../lib/photdef.h       \
 			../lib/phot.h
-	apwmagcolon.x	../lib/display.h	../lib/phot.h
 	apgmeasure.x	../lib/apphot.h		../lib/fitsky.h        \
 			../lib/center.h		../lib/noise.h
 	aptmeasure.x	../lib/apphot.h		../lib/fitsky.h        \

@@ -1,7 +1,7 @@
 include	<gset.h>
 include	<math/curfit.h>
 include	"sensfunc.h"
-include	"../shdr.h"
+include	<smw.h>
 
 
 # SF_IMAGE -- Graph fluxed image data and possible standard flux points.
@@ -45,7 +45,7 @@ begin
 	# Get the spectrum and sky subtract if necessary.
 	sh = GP_SHDR(gp,wc)
 	if (sh != NULL) {
-	    if (streq (Memc[GP_IMAGES(gp,wc)], SPECTRUM(sh))) {
+	    if (streq (Memc[GP_IMAGES(gp,wc)], IMNAME(sh))) {
 		if (GP_LOG(gp) == log[wc])
 		    goto plot_
 		else
@@ -67,7 +67,7 @@ begin
 	# Check for dispersion correction
 	if (DC(sh) == DCNO) {
 	    call shdr_close (sh)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 	    GP_SHDR(gp,wc) = NULL
 	    call sfree (sp)
@@ -84,7 +84,7 @@ begin
 	    call shdr_rebin (skysh, sh)
 	    call asubr (Memr[SY(sh)], Memr[SY(skysh)], Memr[SY(sh)], SN(sh))
 	    call shdr_close (skysh)
-	    call mw_close (skymw)
+	    call smw_close (skymw)
 	    call imunmap (skyim)
 	}
 
@@ -162,9 +162,9 @@ begin
 	log[wc] = GP_LOG(gp)
 
 	# Save the spectrum for future redraw.
-	GP_SHDR(gp,wc) = sh
-	call mw_close (mw)
+	call smw_close (MW(sh))
 	call imunmap (im)
+	GP_SHDR(gp,wc) = sh
 
 plot_
 	# Plot scaled graph.
@@ -205,6 +205,7 @@ plot_
 	call gascale (gio, Memr[SY(sh)], SN(sh), 2)
 	call gswind (gio, INDEF, INDEF, smin, smax)
 	call glabax (gio, Memc[str], "", "")
+	call gseti (gio, G_PLCOLOR, GP_PLCOLOR(gp))
 	call gpline (gio, Memr[SX(sh)], Memr[SY(sh)], SN(sh))
 
 	call sfree (sp)
@@ -217,6 +218,8 @@ plot_
 	    x = STD_WAVES(stds[i])
 	    y = STD_FLUXES(stds[i])
 	    z = STD_DWAVES(stds[i])
+	    call gseti (gio, G_PMLTYPE, 1)
+	    call gseti (gio, G_PLCOLOR, GP_CMARK(gp))
 	    if (IS_INDEFI(scale[wc])) {
 	        do j = 0, n-1
 		    call gmark (gio, Memr[x+j], log10 (Memr[y+j]), GM_HEBAR,

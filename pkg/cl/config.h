@@ -13,9 +13,11 @@
  *   dictionary, a fatal error.  We have a static sized dictionary until
  *   this can be fixed.
  */
-#define	STACKSIZ	32000
-#define	DICTSIZE	128000
+#define	STACKSIZ	64000
+#define	DICTSIZE	256000
 #define	MEMINCR		1024
+
+typedef unsigned long memel;	/* type for dictionary, stack, etc.	*/
 
 /* History and command block buffer dimensions.  The command block buffer
  * must be at least one line in size, and should be large enough to hold

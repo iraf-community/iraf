@@ -4,9 +4,9 @@
 #include "ratdef.h"
 
 FILE	*_fdtofile[10] = {
-		&_iob[0],	/* standard input */
-		&_iob[1],	/* standard output */
-		&_iob[2]	/* error output */
+		stdin,		/* standard input */
+		stdout,		/* standard output */
+		stderr		/* error output */
 	};
 
 /*

@@ -16,14 +16,14 @@ pointer	display			# pointer to display device name
 pointer	graphics		# pointer to the graphics device
 
 int	limlist, lplist, lclist, stat, pl, cl, root, pid, cid
-pointer	sp, cfname, pfname
-pointer	imlist, plist, clist, im, py, id, gd
+int	imlist, plist, clist
+pointer	sp, cfname, pfname, im, py, id, gd
 
 bool	streq()
 int	imtlen(), clplen(), imtgetim(), clgfil(), strncmp(), strlen()
-int	fnldir(), ap_mkpylist()
-pointer	imtopenp(), clpopnu(), gopen(), open(), immap()
-errchk	gopen
+int	fnldir(), ap_mkpylist(), imtopenp(), clpopnu(), open()
+pointer	gopen(), immap()
+errchk	gopen()
 
 begin
 	# Allocate working space.
@@ -63,8 +63,7 @@ begin
 	    call error (0, "Imcompatible image and polygons file list lengths")
 	}
 
-	# Open the graphics and display devices.
-	call clgstr ("display", Memc[display], SZ_FNAME)
+	# Open the graphics device.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
 	if (Memc[graphics] == EOS)
 	    gd = NULL
@@ -76,6 +75,9 @@ begin
 		gd = NULL
 	    }
 	}
+
+	# Open the display device.
+	call clgstr ("display", Memc[display], SZ_FNAME)
 	if (Memc[display] == EOS)
 	    id = NULL
 	 else if (streq (Memc[display], Memc[graphics])) {
@@ -100,23 +102,24 @@ begin
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (py, IMNAME, Memc[image])
 
+	    # Establish the image display viewport and window.
+	    if ((id != NULL) && (id != gd))
+		call ap_gswv (id, Memc[image], im, 4)
+
 	    # Set the polygon file name.
 	    if (lplist == 0)
 		pl = NULL
 	    else {
 	        stat = clgfil (plist, Memc[polygons], SZ_FNAME)
-		if (stat != EOF)
-		    root = fnldir (Memc[polygons], Memc[pfname], SZ_FNAME)
+		root = fnldir (Memc[polygons], Memc[pfname], SZ_FNAME)
 		if (strncmp ("default", Memc[polygons+root], 7) == 0 || root ==
 		    strlen (Memc[polygons])) {
-		    call apoutname (Memc[image], "", "ver", Memc[pfname],
-		        SZ_FNAME)
-		    pl = open (Memc[pfname], NEW_FILE, TEXT_FILE)
+		    call apoutname (Memc[image], Memc[pfname], "ver",
+		        Memc[pfname], SZ_FNAME)
 		    lplist = limlist
-		} else if (stat != EOF) {
+		} else if (stat != EOF)
 		    call strcpy (Memc[polygons], Memc[pfname], SZ_FNAME)
-		    pl = open (Memc[pfname], NEW_FILE, TEXT_FILE)
-		}
+		pl = open (Memc[pfname], NEW_FILE, TEXT_FILE)
 		call close (pl)
 		pl = open (Memc[pfname], READ_WRITE, TEXT_FILE)
 	    }
@@ -127,18 +130,15 @@ begin
 		cl = NULL
 	    else {
 	        stat = clgfil (clist, Memc[coords], SZ_FNAME)
-		if (stat != EOF)
-		    root = fnldir (Memc[coords], Memc[cfname], SZ_FNAME)
+		root = fnldir (Memc[coords], Memc[cfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
 		    strlen (Memc[coords])) {
-		    call apoutname (Memc[image], "", "coo", Memc[cfname],
-		        SZ_FNAME)
-		    cl = open (Memc[cfname], NEW_FILE, TEXT_FILE)
+		    call apoutname (Memc[image], Memc[cfname], "coo",
+		        Memc[cfname], SZ_FNAME)
 		    lclist = limlist
-		} else if (stat != EOF) {
+		} else if (stat != EOF)
 		    call strcpy (Memc[coords], Memc[cfname], SZ_FNAME)
-		    cl = open (Memc[cfname], NEW_FILE, TEXT_FILE)
-		}
+		cl = open (Memc[cfname], NEW_FILE, TEXT_FILE)
 		call close (cl)
 		cl = open (Memc[cfname], READ_WRITE, TEXT_FILE)
 	    }
@@ -170,12 +170,20 @@ begin
 		break
 	}
 
-	# Close plot files.
-	if (id != NULL)
+	# Close the graphics and image display devices.
+	if (id == gd && id != NULL)
 	    call gclose (id)
+	else {
+	    if (gd != NULL)
+		call gclose (gd)
+	    if (id != NULL)
+		call gclose (id)
+	}
 
-	# Close image, coord and shift lists.
+	# Free the polymark structure.
 	call ap_ymkfree (py)
+
+	# Close image, polygon, and coordinate lists.
 	call imtclose (imlist)
 	call clpcls (plist)
 	call clpcls (clist)

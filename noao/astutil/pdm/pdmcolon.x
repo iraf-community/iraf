@@ -32,12 +32,12 @@ pointer	pdmp				# PDM structure pointer
 char	cmdstr[ARB]			# Command string
 int	ptype				# plot type
 char	infile[SZ_FNAME]		# input file name
-real	period				# current working period
+double	period				# current working period
 bool	flip				# flip the y-axis scale
 
 int	nscan(), strdic()
 int	itemp, i
-real	temp, p1, signif, pdm_signif()
+double	temp, p1, signif, pdm_signif()
 bool	verbose
 pointer	cmd, sp
 errchk	pdm_signif, pdm_ampep, pdm_phase
@@ -83,68 +83,68 @@ begin
 	    }
 	case PMIN:
 	    # List or set minimum period.
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2) {
 		# Set the period minimum in structure.
 		PDM_PMIN(pdmp) = temp
-		if (temp >= EPSILONR)
-		    PDM_FMAX(pdmp) = 1./temp
+		if (temp >= EPSILOND)
+		    PDM_FMAX(pdmp) = 1.0d+0/temp
 		# Save this minp out to the parameter.
-		call clputr ("minp", temp)
+		call clputd ("minp", temp)
 	    } else {
 		# Print out the period minimum from the structure.
 		call printf ("Current minimum period = %g\n")
-		    call pargr (PDM_PMIN(pdmp))
+		    call pargd (PDM_PMIN(pdmp))
 		call flush (STDOUT)
 	    }
 	case PMAX:
 	    # List or set maximum period.
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2) {
 		# Set the period maximum in structure.
 		PDM_PMAX(pdmp) = temp
-		if (temp >= EPSILONR)
-		    PDM_FMIN(pdmp) = 1./temp
+		if (temp >= EPSILOND)
+		    PDM_FMIN(pdmp) = 1.0d+0/temp
 		# Save this minp out to the parameter.
-		call clputr ("maxp", temp)
+		call clputd ("maxp", temp)
 	    } else {
 		# Print out the period maximum from the structure.
 		call printf ("Current maximum period = %g\n")
-		    call pargr (PDM_PMAX(pdmp))
+		    call pargd (PDM_PMAX(pdmp))
 		call flush (STDOUT)
 	    }
 	case FMIN:
 	    # List or set minimum frequency.
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2) {
 		# Set the frequency minimum in structure.
 		PDM_FMIN(pdmp) = temp
-		if (temp >= EPSILONR)
-		    PDM_PMAX(pdmp) = 1./temp
+		if (temp >= EPSILOND)
+		    PDM_PMAX(pdmp) = 1.0d+0/temp
 		# Save this minp out to the parameter.
-		if (temp >= EPSILONR)
-		    call clputr ("maxp", 1./temp)
+		if (temp >= EPSILOND)
+		    call clputd ("maxp", 1.0d+0/temp)
 	    } else {
 		# Print out the frequency minimum from the structure.
 		call printf ("Current minimum frequency = %g\n")
-		    call pargr (PDM_FMIN(pdmp))
+		    call pargd (PDM_FMIN(pdmp))
 		call flush (STDOUT)
 	    }
 	case FMAX:
 	    # List or set maximum frequency.
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2) {
 		# Set the frequency maximum in structure.
 		PDM_FMAX(pdmp) = temp
-		if (temp >= EPSILONR)
-		    PDM_PMIN(pdmp) = 1./temp
+		if (temp >= EPSILOND)
+		    PDM_PMIN(pdmp) = 1.0d+0/temp
 		# Save this minp out to the parameter.
-		if (temp >= EPSILONR)
-		    call clputr ("minp", 1./temp)
+		if (temp >= EPSILOND)
+		    call clputd ("minp", 1.0d+0/temp)
 	    } else {
 		# Print out the frequency maximum from the structure.
 		call printf ("Current maximum frequency = %g\n")
-		    call pargr (PDM_FMAX(pdmp))
+		    call pargd (PDM_FMAX(pdmp))
 		call flush (STDOUT)
 	    }
 	case NTHETA:
@@ -171,24 +171,24 @@ begin
 		    call pargstr (PDM_SAMPLE(pdmp))
 	    } else {
 		if (ptype == DATAPLOT) {
-		    call rg_gxmarkr (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
+		    call rg_gxmarkd (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
 			PDM_X(pdmp,1), PDM_NPT(pdmp), 0)
 		}
 		call strcpy (Memc[cmd], PDM_SAMPLE(pdmp), SZ_LINE)
 		if (ptype == DATAPLOT) {
-		    call rg_gxmarkr (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
+		    call rg_gxmarkd (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
 			PDM_X(pdmp,1), PDM_NPT(pdmp), 1)
 		}
 	    }
 	case SIGNIF:
 	    # Calculate the significance of theta at period.
 	    p1 = 0.0
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2)		# User entered a period.
 		p1 = temp
 	    else {
 		# Use remembered period.
-		if (PDM_MINR(pdmp) >= EPSILONR)
+		if (PDM_MINR(pdmp) >= EPSILOND)
 		    p1 = PDM_MINR(pdmp)
 		else {
 		    call printf ("No remembered minimum period. \007\n")
@@ -196,23 +196,23 @@ begin
 		}
 	    }
 	    # Calculate significance at cursor x position (per).
-	    if (p1 >= EPSILONR) {
+	    if (p1 >= EPSILOND) {
 	        signif = pdm_signif (pdmp, p1)
 	        # Print at bottom of screen.
 	        call printf ("Significance at period %g = %g\n")
-		    call pargr (p1)
-		    call pargr (signif)
+		    call pargd (p1)
+		    call pargd (signif)
 	        call flush (STDOUT)
 	    }
 	case AMPEP:
 	    # Calculate the amplitude and epoch for the data.
 	    p1 = 0.0
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2)		# User entered a period.
 		p1 = temp
 	    else {
 		# Use remembered period.
-		if (PDM_MINR(pdmp) >= EPSILONR)
+		if (PDM_MINR(pdmp) >= EPSILOND)
 		    p1 = PDM_MINR(pdmp)
 		else {
 		    call printf ("No remembered minimum period. \007\n")
@@ -220,18 +220,18 @@ begin
 		}
 	    }
 	    # Calculate ampl & epoch at p1.
-	    if (p1 >= EPSILONR) {
+	    if (p1 >= EPSILOND) {
 	        call pdm_ampep (pdmp, p1)
 	        # Print at bottom of screen.
 	        call printf("amplitude of data at period %g = %g, epoch = %g\n")
-		    call pargr (p1)
-		    call pargr (PDM_AMPL(pdmp))
-		    call pargr (PDM_EPOCH(pdmp))
+		    call pargd (p1)
+		    call pargd (PDM_AMPL(pdmp))
+		    call pargd (PDM_EPOCH(pdmp))
 	        call flush (STDOUT)
 	    }
 	case PHASE:
 	    # Phase curve plot.
-	    call gargr (temp)
+	    call gargd (temp)
 	    if (nscan() == 2) {
 		# Calculate the phase curve, then make the plot.
 		call pdm_ampep (pdmp, temp)
@@ -240,7 +240,7 @@ begin
 		period = temp
 	    } else {
 		# Use remembered period.
-		if (PDM_MINR(pdmp) >= EPSILONR) {
+		if (PDM_MINR(pdmp) >= EPSILOND) {
 		    call pdm_ampep (pdmp, PDM_MINR(pdmp))
 		    call pdm_phase(pdmp, PDM_MINR(pdmp), PDM_EPOCH(pdmp))
 		    call pdm_pplot (pdmp, PDM_MINR(pdmp), infile, flip)
@@ -268,7 +268,7 @@ begin
 	case ALLDATA:
 	    # Initialize the sample string and erase from the graph.
 	    if (ptype == DATAPLOT) {
-		call rg_gxmarkr (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
+		call rg_gxmarkd (PDM_GP(pdmp), PDM_SAMPLE(pdmp),
 		    PDM_X(pdmp,1), PDM_NPT(pdmp), 0)
 	    }
 	    call strcpy ("*", PDM_SAMPLE(pdmp), SZ_LINE)
@@ -287,4 +287,6 @@ begin
 	    call printf ("v/show minp/f maxp/f ntheta sample ")
 	    call printf ("signif ampep phase unreject all/origdata\n")
 	}
+
+	call sfree (sp)
 end

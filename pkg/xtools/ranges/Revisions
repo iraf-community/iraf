@@ -1,6 +1,9 @@
 .help revisions Jun88 pkg.xtools.ranges
 .nf
 xtools$ranges/rgranges.x
+    The range parsing would fail for single numbers.  (4/29/94, Valdes)
+
+xtools$ranges/rgranges.x
 xtools$ranges/rgxranges.gx
     Added @file capability.  Rewrote the parsing logic.  (10/9/91, Valdes)
 

@@ -56,6 +56,7 @@ begin
 	    call syserr (SYS_GSCALE)
 	}
 
+	WCS_FLAGS(w) = or (WCS_FLAGS(w), WF_DEFINED)
 	GP_WCSSTATE(gp) = MODIFIED
 	call gpl_reset()
 end

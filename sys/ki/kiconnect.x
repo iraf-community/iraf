@@ -24,13 +24,16 @@ int procedure ki_connect (rname)
 
 char	rname[ARB]		# packed resource name, e.g., a filename
 
+pointer	sp, sbuf, op
 char	alias[SZ_ALIAS]
-int	node, delim, junk
-int	strlen()
+int	node, delim, junk, nlookup
 int	ki_findnode(), ki_openks(), ki_gnode(), ki_gethosts()
+int	strlen(), gstrcpy()
+
 include	"kinode.com"
 include	"kichan.com"
 include	"kii.com"
+define	again_ 91
 
 begin
 	# Read dev$hosts if it has not already been read.
@@ -50,7 +53,8 @@ begin
 	# on a remote node.
 
 	call strupk (rname, p_sbuf, SZ_SBUF)
-
+	nlookup = 0
+again_
 	if (ki_gnode (p_sbuf, alias, delim) == LOCAL) {
 	    p_arg[1] = delim + 1
 	    return (NULL)
@@ -64,6 +68,32 @@ begin
 	node = ki_findnode (alias)
 	if (node == n_local)
 	    node = NULL
+	else if (n_server[1,node] == '@') {
+	    # The node entry is a route to another node.  This is an entry
+	    # such as "node : @foo!node".  We replace the "node" prefix in
+	    # rname by whatever is to the right of the @, and repeat the
+	    # host lookup.  In the example this would have the effect of
+	    # changing the "node!object" reference to "foo!node!object" and
+	    # hence routing traffic for node "node" through node "foo".  
+	    # This is often done when a node is not directly reachable on
+	    # the local network.
+
+	    call smark (sp)
+	    call salloc (sbuf, SZ_SBUF, TY_CHAR)
+
+	    op = sbuf + gstrcpy (n_server[2,node], Memc[sbuf], SZ_SBUF)
+	    Memc[op] = '!';  op = op + 1
+	    call strcpy (p_sbuf[delim+1], Memc[op], SZ_SBUF-(op-sbuf))
+	    call strcpy (Memc[sbuf], p_sbuf, SZ_SBUF)
+
+	    call sfree (sp)
+
+	    nlookup = nlookup + 1
+	    if (nlookup > MAX_INDIRECT)
+		node = NULL
+	    else
+		goto again_
+	}
 
 	# Initialize the remainder of the packet descriptor variables dealing
 	# with the resource name.  The node alias is left in the string buffer

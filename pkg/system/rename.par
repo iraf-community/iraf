@@ -1,3 +1,3 @@
 files,s,a,,,,list of files to be renamed
 newname,s,a,,,,new file name or field name
-field,s,h,root,,,filename field to be modified (root or extn)
+field,s,h,all,"|all|root|extn|",,filename field to be modified (all|root|extn)

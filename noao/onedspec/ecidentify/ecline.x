@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_LINE -- Get line corresponding to aperture.
@@ -11,7 +11,7 @@ int	ap		# Aperture
 int	i
 
 begin
-	if (ap == INDEFI)
+	if (IS_INDEFI (ap))
 	    return (INDEFI)
 
 	do i = 1, EC_NLINES(ec)

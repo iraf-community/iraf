@@ -1,92 +1,102 @@
-include	"../shdr.h"
+include	<error.h>
+include	<smw.h>
+include <units.h>
 
-# USER_COORD -- Compute user coordinate from two marked lines or CL parameters
-#               Assumes a linear dispersion
+# USERCOORD -- Set user coordinates
 
-procedure user_coord (sh, wave_scl, x, n, w1)
+procedure usercoord (sh, key, w1, u1, w2, u2)
 
 pointer	sh
-bool	wave_scl
-real	x[n]
-int	n
-real	w1
+int	key
+double	w1, u1, w2, u2
 
-int	i, wc, key
-real	w2, u1, u2, xjunk, x1, x2, dx
-char	command[SZ_FNAME]
-
-int	clgcur()
-real	clgetr()
-errchk	un_ctranr
+int	i, format, ap, beam, dtype, nw
+double	shift, wa, wb, ua, ub, w0, dw, z, smw_c1trand()
+real	aplow[2], aphigh[2]
+pointer	coeff, smw, mw, ct, smw_sctran()
+errchk	smw_sctran
 
 begin
-	x1 = x[1]
-	x2 = x[n]
-	dx = (x2 - x1) / (n - 1)
-
-	if (IS_INDEF(w1)) {
-	    call clputr ("wstart", x1)
-	    call clputr ("wend", x2)
-	    call clputr ("dw", dx)
-
-	    x1 = clgetr ("wstart")
-	    x2 = clgetr ("wend")
-	    if (IS_INDEF(x1)) {
-		dx = clgetr ("dw")
-		x1 = x2 - (n-1) * dx
-	    } else if (IS_INDEF(x2)) {
-		dx = clgetr ("dw")
-		x2 = x1 + (n-1) * dx
-	    } else
-		dx = (x2-x1) / (n-1)
-	} else {
-	    # Get user coord for  first point
-	    call clputr ("wavelength", w1)
-	    if (wave_scl)
-    #	    w1 = (w1 - W0(sh)) / WP(sh) + 1
-		w1 = (w1 - x1) / dx + 1
-	    call printf ("pixel 1:%7.2f ")
-		call pargr (w1)
-	    call flush (STDOUT)
-	    u1 = clgetr ("wavelength")
-
-	    # Get second point
-	    call printf ("u again")
-	    call flush (STDOUT)
-	    i = clgcur ("cursor", w2, xjunk, wc, key, command, SZ_FNAME)
-	    call clputr ("wavelength", w2)
-	    if ((wave_scl) && !IS_INDEF (W0(sh)) && !IS_INDEF (WP(sh)))
-    #	    w2 = (w2 - W0(sh)) / WP(sh) + 1
-		w2 = (w2 - x1) / dx + 1
-
-	    if (w2 == w1) {
-		call printf ("cursor was not moved")
-		call flush (STDOUT)
-		return
-	    }
-
-	    call printf ("pixel 2:%7.2f ")
-		call pargr (w2)
-	    call flush (STDOUT)
-	    u2 = clgetr ("wavelength")
-
-	    # Compute dispersion and starting wavelength
-	    dx = (u2 - u1) / (w2 - w1)
-	    x1 = u1 - (w1-1) * dx
-	    x2 = x1 + (n-1) * dx
-	}
+	coeff = NULL
+	smw = MW(sh)
+	mw = SMW_MW(smw,0)
+	format = SMW_FORMAT(smw)
 
 	iferr {
-	    call un_ctranr (UN(sh), MWUN(sh), x1, W0(sh), 1)
-	    call un_ctranr (UN(sh), MWUN(sh), x2, W1(sh), 1)
-	} then
-	    ;
-	WP(sh) = (W1(sh) - W0(sh)) / n
-	DC(sh) = DCLINEAR
-	CTLW(sh) = NULL
-	CTWL(sh) = NULL
-	wave_scl = true
+	    call un_ctrand (UN(sh), MWUN(sh), w1, wa, 1)
+	    call un_ctrand (UN(sh), MWUN(sh), u1, ua, 1)
 
-	do i = 1, n
-	    x[i] = x1 + (i - 1) * dx
+	    call smw_gwattrs (MW(sh), APINDEX(sh), LINDEX(sh,2),
+		ap, beam, dtype, w0, dw, nw, z, aplow, aphigh, coeff)
+
+	    switch (key) {
+	    case 'd':
+		wa = wa * (1 + z)
+		switch (UN_CLASS(MWUN(sh))) {
+		case UN_WAVE:
+		    z = (wa - ua) / ua
+		case UN_FREQ, UN_ENERGY:
+		    z = (ua - wa) / wa
+		default:
+		    call error (1, "Inappropriate coordinate units")
+		}
+	    case 'z':
+		shift = ua - wa
+		w0 = w0 + shift
+		if (dtype == 2)
+		    call sshift1 (shift, coeff)
+	    case 'l':
+		call un_ctrand (UN(sh), MWUN(sh), w2, wb, 1)
+		call un_ctrand (UN(sh), MWUN(sh), u2, ub, 1)
+
+		switch (format) {
+		case SMW_ND:
+		    i = 2 ** (SMW_PAXIS(smw,1) - 1)
+		    ct = smw_sctran (smw, "world", "physical", i)
+		    if (dtype == DCLOG) {
+			wa = log10 (wa)
+			wb = log10 (wb)
+		    }
+		    wa = smw_c1trand (ct, wa)
+		    wb = smw_c1trand (ct, wb)
+		case SMW_ES, SMW_MS:
+		    ct = smw_sctran (smw, "world", "physical", 3)
+		    if (dtype == DCLOG) {
+			wa = log10 (wa)
+			wb = log10 (wb)
+		    }
+		    call smw_c2trand (ct, wa, double (ap), wa, shift)
+		    call smw_c2trand (ct, wb, double (ap), wb, shift)
+		}
+		call smw_ctfree (ct)
+
+		dw = (ub - ua) / (wb - wa)
+		w0 = ua - (wa - 1) * dw
+		dtype = 0
+		if (UNITS(sh) == EOS) {
+		    call mw_swattrs (mw, SMW_PAXIS(smw,1),
+			"label", "Wavelength")
+		    call mw_swattrs (mw, SMW_PAXIS(smw,1),
+			"units", "angstroms")
+		}
+	    default:
+		call error (1, "Unknown correction")
+	    }
+
+	    call smw_swattrs (smw, LINDEX(sh,1), 1, ap, beam, dtype, w0,
+		dw, nw, z, aplow, aphigh, Memc[coeff])
+	    if (smw != MW(sh)) {
+		CTLW1(sh) = NULL
+		CTWL1(sh) = NULL
+		MW(sh) = smw
+	    }
+
+	    DC(sh) = dtype
+	    call shdr_system (sh, "world")
+	    if (UN_CLASS(UN(sh)) == UN_UNKNOWN)
+		call un_copy (MWUN(sh), UN(sh))
+	} then
+	    call erract (EA_WARN)
+
+	call mfree (coeff, TY_CHAR)
 end

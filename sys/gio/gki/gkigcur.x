@@ -18,21 +18,36 @@ include	<gki.h>
 #        coordinates.   The  cursor  attributes  are  returned   in   the 
 #        following format:
 #
-#                BOI GKI_CURSORVALUE L CN POS KEY
+#                BOI GKI_CURSORVALUE L CN KEY SX SY RN RX RY
 #
 #        where
 #
-#                L(i)            4 = 1 + 2 + 1
+#                L(i)            10
 #                CN(i)           cursor number
-#                POS(r)          NDC coordinates of cursor
 #                KEY(i)          keystroke value (>= 0 or EOF)
+#                SX(i)           NDC X screen coordinate of cursor
+#                SY(i)           NDC Y screen coordinate of cursor
+#                RN(i)           raster number or zero
+#                RX(i)           NDC X raster coordinate of cursor
+#                RY(i)           NDC Y raster coordinate of cursor
+#
+# The screen or display window coordinates SX and SY of the cursor are
+# returned for all devices.  Only some devices support multiple rasters.
+# If the device supports rasters and the cursor is in a rasters when read, the
+# rasters number and rasters coordinates are returned in RN,RX,RY.  This is in
+# addition to the screen coordinates SX,SY.  If rasters coordinates are not
+# returned, the rasters number will be set to zero and RX,RY will be the same
+# as SX,SY.
 
-procedure gki_getcursor (fd, x, y, key, cursor)
+procedure gki_getcursor (fd, cursor, cn, key, sx, sy, raster, rx, ry)
 
-int	fd			# output file
-int	x, y			# cursor coordinates (output)
-int	key			# keystroke value or EOF (output)
-int	cursor			# cursor to be read
+int	fd			#I output file
+int	cursor			#I cursor to be read
+int	cn			#O cursor number actually read
+int	key			#O keystroke value or EOF
+int	sx, sy			#O screen coordinates of cursor
+int	raster			#O raster number
+int	rx, ry			#O raster coordinates of cursor
 
 int	epa
 int	nchars, read()
@@ -57,7 +72,6 @@ begin
 
 	} else {
 	    # Write cursor read instruction to the kernel.
-
 	    gki[GKI_GETCURSOR_CN] = cursor
 	    call write (gk_fd[fd], gki, GKI_GETCURSOR_LEN * SZ_SHORT)
 
@@ -73,16 +87,19 @@ begin
 	}
 
 	# Read and decode the cursor value instruction.
-
 	nchars = GKI_CURSORVALUE_LEN * SZ_SHORT
 	if (read (fd, cur, nchars) < nchars)
 	    key = EOF
 	else if (cur[1] != BOI || cur[2] != GKI_CURSORVALUE)
 	    call syserr (SYS_GGCUR)
 	else {
-	    x   = cur[GKI_CURSORVALUE_POS]
-	    y   = cur[GKI_CURSORVALUE_POS+1]
-	    key = cur[GKI_CURSORVALUE_KEY]
+	    cn     = cur[GKI_CURSORVALUE_CN]
+	    key    = cur[GKI_CURSORVALUE_KEY]
+	    sx     = cur[GKI_CURSORVALUE_SX]
+	    sy     = cur[GKI_CURSORVALUE_SY]
+	    raster = cur[GKI_CURSORVALUE_RN]
+	    rx     = cur[GKI_CURSORVALUE_RX]
+	    ry     = cur[GKI_CURSORVALUE_RY]
 	}
 
 	call fseti (fd, F_CANCEL, OK)

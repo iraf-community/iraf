@@ -40,6 +40,7 @@ define	XSHIFT		116
 define	YSHIFT		117
 define	CSTRING		118
 define	CDATALIMIT	119
+define	CTHRESHOLD	120
 
 # center keywords
 
@@ -52,24 +53,32 @@ define	KY_RCLEAN	"rclean"
 define	KY_RCLIP	"rclip"
 define	KY_SIGMACLEAN	"kclean"
 define	KY_CMAXITER	"cmaxiter"
+define	KY_CTHRESHOLD	"cthreshold"
 
 # center unit strings
 
-define	UN_CAPERT	"scaleunit"
-define	UN_CSTRING	"algorithm"
-define	UN_MINSNRATIO	"number"
-define	UN_MAXSHIFT	"scaleunit"
-define	UN_CLEAN	"switch"
-define	UN_RCLEAN	"scaleunit"
-define	UN_RCLIP	"scaleunit"
-define	UN_SIGMACLEAN	"sigma"
-define	UN_CMAXITER	"number"
+#define	UN_CAPERT	"scaleunit"
+#define	UN_CSTRING	"algorithm"
+#define	UN_MINSNRATIO	"number"
+#define	UN_MAXSHIFT	"scaleunit"
+#define	UN_CLEAN	"switch"
+#define	UN_RCLEAN	"scaleunit"
+#define	UN_RCLIP	"scaleunit"
+#define	UN_SIGMACLEAN	"sigma"
+#define	UN_CMAXITER	"number"
+#define	UN_CTHRESHOLD	"sigma"
+
+define	UN_CSCALEUNIT	"scaleunit"
+define	UN_CNUMBER	"number"
+define	UN_CSIGMA	"sigma"
+define	UN_CSWITCH	"switch"
+define	UN_CALGORITHM	"algorithm"
 
 # center string commands
 
 define	CSHOWARGS	"|data|center|"
 define	CFUNCS		"|centroid|gauss|none|ofilter|"
-define	CCMDS		"|cboxwidth|calgorithm|maxshift|minsnratio|cmaxiter|clean|rclean|rclip|kclean|mkcenter|"
+define	CCMDS		"|cboxwidth|calgorithm|maxshift|minsnratio|cmaxiter|clean|rclean|rclip|kclean|mkcenter|cthreshold|"
 
 define	CCMD_CBOXWIDTH		1
 define	CCMD_CALGORITHM		2
@@ -81,6 +90,7 @@ define	CCMD_RCLEAN		7
 define	CCMD_RCLIP		8
 define	CCMD_KCLEAN		9
 define	CCMD_MKCENTER		10
+define	CCMD_CTHRESHOLD		11
 
 define	CCMD_DATA		1
 define	CCMD_CENTER		2

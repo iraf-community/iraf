@@ -17,7 +17,7 @@
 .sp .5v
 .in -2
 ..
-.ND April 1992
+.ND February 1993
 .TL
 Guide to the Coude Three Fiber Reduction Task DO3FIBER
 .AU
@@ -28,7 +28,8 @@ IRAF Group - Central Computer Services
 .DY
 
 .AB
-The \fBdo3fiber\fR reduction task is specialized for the extraction, flat
+The \fBdo3fiber\fR reduction task is specialized for scattered light
+subtraction, extraction, flat
 fielding, and wavelength calibration of multifiber data in which some
 fibers are used to take object spectra and other fibers are used to
 take simultaneous arc spectra.  A three fiber instrument of this
@@ -46,7 +47,8 @@ this type of multifiber data.
 .NH
 Introduction
 .LP
-The \fBdo3fiber\fR reduction task is specialized for the extraction, flat
+The \fBdo3fiber\fR reduction task is specialized for scattered light
+subtraction, extraction, flat
 fielding, and wavelength calibration of multifiber data in which some
 fibers are used to take object spectra and other fibers are used to
 take simultaneous arc spectra.  A three fiber instrument of this
@@ -82,6 +84,10 @@ Usage Outline
 .IP [1] 6
 The images are first processed with \fBccdproc\fR for overscan,
 bias, and dark corrections.
+The \fBdo3fibers\fR task will abort if the image header keyword CCDPROC,
+which is added by \fBccdproc\fR, is missing.  If the data processed outside
+of the IRAF \fBccdred\fR package then a dummy CCDPROC keyword should be
+added to the image headers; say with \fBhedit\fR.
 .IP [2]
 Set the \fBdo3fiber\fR parameters with \fBeparam\fR.  Specify the object
 images to be processed, the flat field image as the aperture reference and
@@ -114,6 +120,27 @@ adjust the fitting parameters.  Not all fibers need be examined and the "NO"
 response will quit the interactive fitting.  To exit the interactive
 fitting type 'q'.
 .IP [7]
+If scattered light subtraction is to be done the flat field image is
+used to define the scattered light fitting parameters interactively.
+If one is not specified then the aperture reference image is used for
+this purpose.
+
+There are two queries for the interactive fitting.  A graph of the
+data between the defined reference apertures separated by a specified
+buffer distance is first shown.  The function order and type may be
+adjusted.  After quiting with 'q' the user has the option of changing
+the buffer value and returning to the fitting, changing the image line
+or column to check if the fit parameters are satisfactory at other points,
+or to quit and accept the fit parameters.  After fitting all points
+across the dispersion another graph showing the scattered light from
+the individual fits is shown and the smoothing parameters along the
+dispersion may be adjusted.  Upon quiting with 'q' you have the option
+of checking other cuts parallel to the dispersion or quiting and finishing
+the scattered light function smoothing and subtraction.
+
+If there is a throughput image then this is corrected for scattered light
+noninteractively using the previous fitting parameters.
+.IP [8]
 If flat fielding is to be done the flat field spectra are extracted.  The
 average spectrum over all fibers is determined and a function is fit
 interactively (exit with 'q').  This function is generally of sufficiently
@@ -121,7 +148,7 @@ high order that the overall shape is well fit.  This function is then used
 to normalize the individual flat field spectra.
 The final response spectra are normalized to a unit
 mean over all fibers.
-.IP [8]
+.IP [9]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The middle fiber is used to identify the arc lines and define
 the dispersion function using the task \fBidentify\fR.  Identify a few arc
@@ -129,19 +156,20 @@ lines with 'm' and use the 'l' line list identification command to
 automatically add additional lines and fit the dispersion function.  Check
 the quality of the dispersion function fit with 'f'.  When satisfied exit
 with 'q'.
-.IP [9]
+.IP [10]
 The remaining fibers are automatically reidentified.  You have the option
 to review the line identifications and dispersion function for each fiber
 and interactively add or delete arc lines and change fitting parameters.
 This can be done selectively, such as when the reported RMS increases
 significantly.
-.IP [10]
+.IP [11]
 If the spectra are to be resampled to a linear dispersion system
 (which will be the same for all spectra) default dispersion parameters
 are printed and you are allowed to adjust these as desired.
-.IP [11]
-The object spectra are now automatically extracted, flat fielded,
-and dispersion corrected.  The reference apertures are first assigned
+.IP [12]
+The object spectra are now automatically scattered light subtracted,
+ extracted, flat fielded, and dispersion corrected.
+The reference apertures are first assigned
 to the object spectra.  If the \f(CWrecenter\fR option is set the apertures
 will have a shift applied based on recentering the fiber profiles.
 If the \f(CWedit\fR option is set you may review and modify
@@ -149,20 +177,35 @@ the aperture definitions interactively.  Any new
 arcs assigned to the object images are automatically extracted and
 dispersion functions determined.  A zero point wavelength correction
 is computed from the arc fiber spectra and applied to the object spectrum.
-.IP [12]
+.IP [13]
 The option to examine the final spectra with \fBsplot\fR may be given.
 To exit type 'q'.
-.IP [13]
+.IP [14]
+If scattered light is subtracted from the input data a copy of the
+original image is made by appending "noscat" to the image name.
+If the data are reprocessed with the \fIredo\fR flag the original
+image will be used again to allow modification of the scattered
+light parameters.
+
 The final spectra will have the same name as the original 2D images
 with a ".ms" extension added.
 .NH
 Spectra and Data Files
 .LP
 The basic input consists of multifiber object and calibration spectra
-stored as IRAF images.  There are two types of calibration images.  These
+stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+There are two types of calibration images.  These
 are flat fields and comparison lamp arc spectra.  The raw CCD images must
 be processed to remove overscan, bias, and dark count effects.  This is
-generally done using the \fBccdred\fR package.  Flat fielding is generally
+generally done using the \fBccdred\fR package.
+The \fBdo3fiber\fR task will abort if the image header keyword CCDPROC,
+which is added by \fBccdproc\fR, is missing.  If the data processed outside
+of the IRAF \fBccdred\fR package then a dummy CCDPROC keyword should be
+added to the image headers; say with \fBhedit\fR.
+Flat fielding is generally
 not done at this stage but as part of \fBdo3fiber\fR.  If for some reason
 the flat field or calibration arc spectra have separate exposures through
 different fibers they may be simply added.
@@ -256,12 +299,13 @@ objects =               List of object spectra
 .V1
 (readnoi=      RDNOISE) Read out noise sigma (photons)
 (gain   =         GAIN) Photon gain (photons/data number)
-(dispaxi=  )_.dispaxis) Dispersion axis (1=along lines, 2=along columns)
+(datamax=        INDEF) Max data value / cosmic ray threshold
 (fibers =            3) Number of fibers
 (width  =           6.) Width of profiles (pixels)
 (objaps =            2) Object apertures
 (arcaps =          1,3) Arc apertures
 
+(scatter=           no) Subtract scattered light?
 (fitflat=          yes) Fit and ratio flat field spectrum?
 (recente=          yes) Recenter object apertures?
 (edit   =           no) Edit/review object apertures?
@@ -303,6 +347,10 @@ by these aperture numbers as specified by the \f(CWobjaps\fR and
 fibers in the sequence arc fiber, object fiber, and arc fiber.
 .LP
 The next set of parameters select the processing steps and options.  The
+scattered light option allows fitting and subtracting a scattered light
+surface from the input object and flat field.  If there is significant
+scattered light which is not subtracted the fiber throughput correction
+will not be accurate.  The
 flat fitting option allows fitting and removing the overall shape of the
 flat field spectra while preserving the pixel-to-pixel response
 corrections.  This is useful for maintaining the approximate object count
@@ -423,6 +471,14 @@ PACKAGE = kpnocoude
 .KE
 .KS
 .V1
+                        -- SCATTERED LIGHT PARAMETERS --
+(buffer =           1.) Buffer distance from apertures
+(apscat1=             ) Fitting parameters across the dispersion
+(apscat2=             ) Fitting parameters along the dispersion
+
+.KE
+.KS
+.V1
                         -- APERTURE EXTRACTION PARAMETERS --
 (weights=         none) Extraction weights (none|variance)
 (pfit   =        fit1d) Profile fitting algorithm (fit1d|fit2d)
@@ -511,7 +567,7 @@ queries of that kind.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-\fBdispaxis\fR parameter if not defined in the image header.  The default
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
 line or column for finding the orders and the number of image lines or
 columns to sum are set by the \f(CWline\fR and \f(CWnsum\fR parameters.  A line
 of INDEF (the default) selects the middle of the image.  The automatic
@@ -541,6 +597,48 @@ For optimal extraction and cleaning to work it is recommended that the
 \f(CWfitflat\fR option be used.  For further discussion of cleaning and
 variance weighted extraction see \fBapvariance\fR and \fBapprofiles\fR as
 well as  \fBapsum\fR.
+.NH 2
+Scattered Light Subtraction
+.LP
+Scattered light may be subtracted from the input two dimensional image as
+the first step.  This is done using the algorithm described in
+\fBapscatter\fR.  This can be important if there is significant scattered
+light since the flat field/throughput correction will otherwise be
+incorrect.  The algorithm consists of fitting a function to the data
+outside the defined apertures by a specified \fIbuffer\fR at each line or
+column across the dispersion.  The function fitting parameters are the same
+at each line.  Because the fitted functions are independent at each line or
+column a second set of one dimensional functions are fit parallel to the
+dispersion using the evaluated fit values from the cross-dispersion step.
+This produces a smooth scattered light surface which is finally subtracted
+from the input image.  Again the function fitting parameters are the
+same at each line or column though they may be different than the parameters
+used to fit across the dispersion.
+.LP
+The first time the task is run with a particular flat field (or aperture
+reference image if no flat field is used) the scattered light fitting
+parameters are set interactively using that image.  The interactive step
+selects a particular line or column upon which the fitting is done
+interactively with the \fBicfit\fR commands.  A query is first issued
+which allows skipping this interactive stage.  Note that the interactive
+fitting is only for defining the fitting functions and orders.  When
+the graphical \fBicfit\fR fitting is exited (with 'q') there is a second prompt
+allowing you to change the buffer distance (in the first cross-dispersion
+stage) from the apertures, change the line/column, or finally quit.
+.LP
+The initial fitting parameters and the final set parameters are recorded
+in the \fBapscat1\fR and \fBapscat2\fR hidden parameter sets.  These
+parameters are then used automatically for every subsequent image
+which is scattered light corrected.
+.LP
+The scattered light subtraction modifies the input 2D images.  To preserve
+the original data a copy of the original image is made with the same
+root name and the word "noscat" appended.  The scattered light subtracted
+images will have the header keyword "APSCATTE" which is how the task
+avoids repeating the scattered light subtraction during any reprocessing.
+However if the \fIredo\fR option is selected the scattered light subtraction
+will also be redone by first restoring the "noscat" images to the original
+input names.
 .NH 2
 Flat Field Correction
 .LP
@@ -823,13 +921,18 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .LE
-dispaxis = ")_.dispaxis" (apextract)
+datamax = INDEF (apsum.saturation)
 .LS
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the flat field or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .LE
 fibers = 3 (apfind)
 .LS
@@ -849,6 +952,16 @@ identify arc apertures for wavelength calibration and object apertures
 for the final results.
 .LE
 
+scattered = no (apscatter)
+.LS
+Smooth and subtracted scattered light from the object and flat field
+images.  This operation consists of fitting independent smooth functions
+across the dispersion using data outside the fiber apertures and then
+smoothing the individual fits along the dispersion.  The initial
+flat field, or if none is given the aperture reference image, are
+done interactively to allow setting the fitting parameters.  All
+subsequent subtractions use the same fitting parameters.
+.LE
 fitflat = yes (flat1d)
 .LS
 Fit the composite flat field spectrum by a smooth function and divide each
@@ -871,7 +984,8 @@ clean = no (apsum)
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
 implies variance weighted extraction and requires reasonably good values
-for the readout noise and gain.
+for the readout noise and gain.  In addition the datamax parameters
+can be useful.
 .LE
 dispcor = yes
 .LS
@@ -1036,6 +1150,27 @@ Default number of rejection iterations and rejection sigma thresholds.
 .LE
 
 .ce
+-- SCATTERED LIGHT PARAMETERS --
+
+buffer = 1. (apscatter)
+.LS
+Buffer distance from the aperture edges to be excluded in selecting the
+scattered light pixels to be used.
+.LE
+apscat1 = "" (apscatter)
+.LS
+Fitting parameters across the dispersion.  This references an additional
+set of parameters for the ICFIT package.  The default is the "apscat1"
+parameter set.
+.LE
+apscat2 = "" (apscatter)
+.LS
+Fitting parameters along the dispersion.  This references an additional
+set of parameters for the ICFIT package.  The default is the "apscat2"
+parameter set.
+.LE
+
+.ce
 -- APERTURE EXTRACTION PARAMETERS --
 
 weights = "none" (apsum)
@@ -1093,6 +1228,11 @@ order specifying the number of pieces.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
+threshold = 10. (identify/reidentify)
+.LS
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.LE
 coordlist = "linelists$idhenear.dat" (identify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
@@ -1237,3 +1377,11 @@ wavelength coordinate.  If \f(CWyes\fR the input spectrum is integrated
 over the extent of each output pixel.  This is slower than
 simple interpolation.
 .LE
+
+.ce
+ENVIRONMENT PARAMETERS
+.LP
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".

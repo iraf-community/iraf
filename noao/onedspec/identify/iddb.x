@@ -1,6 +1,6 @@
 include	<imset.h>
 include	<math/curfit.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"identify.h"
 
 # ID_DBREAD -- Read features data from the database.
@@ -9,7 +9,7 @@ procedure id_dbread (id, name, ap, add, verbose)
 
 pointer	id				# ID pointer
 char	name[SZ_LINE]			# Image name
-int	ap				# Aperture number
+int	ap[2]				# Aperture number
 int	add				# Add features?
 int	verbose				# Verbose flag
 
@@ -18,7 +18,6 @@ int	i, j, k, ncoeffs, rec
 pointer	dt, sp, coeffs, line, str, sh
 
 int	dtgeti(), dcvstati(), dtlocate(), dtscan(), nscan()
-bool	streq()
 real	dtgetr()
 double	dcvstatd()
 
@@ -32,33 +31,13 @@ begin
 	call imgcluster (name, Memc[line+2], SZ_LINE)
 	call dtremap (ID_DT(id), Memc[ID_DATABASE(id)], Memc[line], READ_ONLY)
 
-	dt = ID_DT(id)
-	sh = ID_SH(id)
-	switch (FORMAT(sh)) {
-	case MULTISPEC:
-	    call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, " - Ap %d")
-		call pargi (ap)
-	default:
-	    # Set image section.
-	    Memc[ID_SECTION(id)] = EOS
-	    if (streq (name, Memc[ID_IMAGE(id)]) && NDIM(sh) > 1) {
-	        switch (DAXIS(sh)) {
-	        case 1:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[*,%d]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        case 2:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[%d,*]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        }
-	    }
-	}
-
+	call id_dbsection (id, name, ap, Memc[ID_SECTION(id)], SZ_FNAME)
 	call sprintf (Memc[line], SZ_LINE, "identify %s%s")
 	    call pargstr (name)
 	    call pargstr (Memc[ID_SECTION(id)])
 
+	dt = ID_DT(id)
+	sh = ID_SH(id)
 	iferr (rec = dtlocate (dt, Memc[line])) {
 	    call salloc (str, SZ_LINE, TY_CHAR)
 	    call sprintf (Memc[str], SZ_LINE, "Entry not found: %s")
@@ -111,11 +90,11 @@ begin
 	    }
 
 	} else {
-	    if (FORMAT(sh) == MULTISPEC) {
-		iferr (APLOW(sh) = dtgetr (dt, rec, "aplow"))
-		    APLOW(sh) = INDEF
-		iferr (APHIGH(sh) = dtgetr (dt, rec, "aphigh"))
-		    APHIGH(sh) = INDEF
+	    if (SMW_FORMAT(MW(sh)) == SMW_ES || SMW_FORMAT(MW(sh)) == SMW_MS) {
+		iferr (APLOW(sh,1) = dtgetr (dt, rec, "aplow"))
+		    APLOW(sh,1) = INDEF
+		iferr (APHIGH(sh,1) = dtgetr (dt, rec, "aphigh"))
+		    APHIGH(sh,1) = INDEF
 	    }
 
 	    do i = 1, ID_NFEATURES(id)
@@ -227,14 +206,13 @@ procedure id_dbwrite (id, name, ap, verbose)
 
 pointer	id				# ID pointer
 char	name[ARB]			# Image name
-int	ap				# Aperture number
+int	ap[2]				# Aperture number
 int	verbose				# Verbose flag
 
 int	i, ncoeffs
 pointer	dt, sp, coeffs, root, sh, im
 
 int	dcvstati(), ic_geti()
-bool	streq()
 real	ic_getr()
 
 errchk	dtremap
@@ -247,30 +225,10 @@ begin
 	call imgcluster (name, Memc[root+2], SZ_FNAME)
 	call dtremap (ID_DT(id), Memc[ID_DATABASE(id)], Memc[root], APPEND)
 
-	dt = ID_DT(id)
+	call id_dbsection (id, name, ap, Memc[ID_SECTION(id)], SZ_FNAME)
+
 	sh = ID_SH(id)
-	switch (FORMAT(sh)) {
-	case 1:
-            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, " - Ap %d")
-		call pargi (ap)
-	default:
-	    # Set image section.
-	    Memc[ID_SECTION(id)] = EOS
-	    if (streq (name, Memc[ID_IMAGE(id)]) && NDIM(sh) > 1) {
-	        switch (DAXIS(sh)) {
-	        case 1:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[*,%d]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        case 2:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[%d,*]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        }
-	    }
-
-	}
-
+	dt = ID_DT(id)
 	call dtptime (dt)
 	call dtput (dt, "begin\tidentify %s%s\n")
 	    call pargstr (name)
@@ -281,13 +239,13 @@ begin
 	call dtput (dt, "\timage\t%s%s\n")
 	    call pargstr (Memc[ID_IMAGE(id)])
 	    call pargstr (Memc[ID_SECTION(id)])
-	if (FORMAT(sh) == MULTISPEC) {
+	if (SMW_FORMAT(MW(sh)) == SMW_ES || SMW_FORMAT(MW(sh)) == SMW_MS) {
 	    call dtput (dt, "\taperture\t%d\n")
-		call pargi (ID_AP(id))
+		call pargi (ID_AP(id,1))
 	    call dtput (dt, "\taplow\t%g\n")
-		call pargr (APLOW(sh))
+		call pargr (APLOW(sh,1))
 	    call dtput (dt, "\taphigh\t%g\n")
-		call pargr (APHIGH(sh))
+		call pargr (APHIGH(sh,1))
 	}
 
 	call dtput (dt, "\tfeatures\t%d\n")
@@ -374,13 +332,12 @@ int procedure id_dbcheck (id, name, ap)
 
 pointer	id				# ID pointer
 char	name[SZ_LINE]			# Image name
-int	ap				# Aperture number
+int	ap[2]				# Aperture number
 
 int	rec, stat
-pointer	dt, sh, sp, line, sec
+pointer	sp, line, sec
 
 int	dtlocate()
-bool	streq()
 
 errchk	dtremap(), dtlocate()
 
@@ -399,38 +356,69 @@ begin
 	    }
 	}
 
-	dt = ID_DT(id)
-	sh = ID_SH(id)
-	switch (FORMAT(sh)) {
-	case MULTISPEC:
-	    call sprintf (Memc[sec], SZ_FNAME, " - Ap %d")
-		call pargi (ap)
-	default:
-	    # Set image section.
-	    Memc[sec] = EOS
-	    if (streq (name, Memc[ID_IMAGE(id)]) && NDIM(sh) > 1) {
-	        switch (DAXIS(sh)) {
-	        case 1:
-	            call sprintf (Memc[sec], SZ_FNAME, "[*,%d]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        case 2:
-	            call sprintf (Memc[sec], SZ_FNAME, "[%d,*]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ap)
-	        }
-	    }
-	}
-
+	call id_dbsection (id, name, ap, Memc[sec], SZ_LINE)
 	call sprintf (Memc[line], SZ_LINE, "identify %s%s")
 	    call pargstr (name)
 	    call pargstr (Memc[sec])
 
-	iferr (rec = dtlocate (dt, Memc[line]))
+	iferr (rec = dtlocate (ID_DT(id), Memc[line]))
 	    stat = NO
 	else
 	    stat = YES
 
 	call sfree (sp)
 	return (stat)
+end
+
+
+# ID_DBSECTION -- Make the IDENTIFY section.
+
+procedure id_dbsection (id, name, ap, section, sz_section)
+
+pointer	id				#I ID pointer
+char	name[SZ_LINE]			#I Image name
+int	ap[2]				#I Aperture number
+char	section[sz_section]		#O IDENTIFY section
+int	sz_section			#I Size of section string
+
+pointer	sh, smw
+bool	streq()
+
+begin
+	sh = ID_SH(id)
+	smw = MW(sh)
+
+	switch (SMW_FORMAT(smw)) {
+	case SMW_ND:
+	    section[1] = EOS
+	    if (streq (name, Memc[ID_IMAGE(id)])) {
+		switch (SMW_LDIM(smw)) {
+		case 2:
+		    switch (SMW_LAXIS(smw,1)) {
+		    case 1:
+			call sprintf (section, sz_section, "[*,%d]")
+		    case 2:
+			call sprintf (section, sz_section, "[%d,*]")
+		    }
+		    #call pargi (LINDEX(sh,1))
+		    call pargi (ap[1])
+		case 3:
+		    switch (SMW_LAXIS(smw,1)) {
+		    case 1:
+			call sprintf (section, sz_section, "[*,%d,%d]")
+		    case 2:
+			call sprintf (section, sz_section, "[%d,*,%d]")
+		    case 3:
+			call sprintf (section, sz_section, "[%d,%d,*]")
+		    }
+		    #call pargi (LINDEX(sh,1))
+		    #call pargi (LINDEX(sh,2))
+		    call pargi (ap[1])
+		    call pargi (ap[2])
+		}
+	    }
+	case SMW_ES, SMW_MS:
+	    call sprintf (section, sz_section, " - Ap %d")
+		call pargi (ap[1])
+	}
 end

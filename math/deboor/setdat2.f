@@ -1,4 +1,4 @@
-      subroutine setdat(icount)
+      subroutine setdt2(icount)
 c  from  * a practical guide to splines *  by c. de boor
 c  to be called in main program  l 2 m a i n .
 c     this routine is set up to provide the specific data for example 3

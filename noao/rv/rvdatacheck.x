@@ -27,30 +27,16 @@ begin
 	    RV_OWPC(rv) = 1.
 	}
 
-	# Check dispersion info.  First see if the WPC is the same.
-	if (abs(RV_OWPC(rv)-RV_RWPC(rv)) >= 1.e-7 && RV_DCFLAG(rv) != -1) {
-	    if (force_rebin(rv) != OK) {
-		if (RV_INTERACTIVE(rv) == YES) {
-	            call rv_errmsg (
-		        "Data cannot be put on same WPC dispersion.")
-		}
-	        call rv_err_comment (rv,
-		    "Data cannot be put on same WPC dispersion.", "")
-	        return (ERR_CORREL)
+	# Check/reset dispersion info.
+	if (force_rebin (rv) != OK) {
+	    if (RV_INTERACTIVE(rv) == YES) {
+		call rv_errmsg (
+		    "Data cannot be put on same WPC dispersion.")
 	    }
-	} #else {
- 	    # If the WPC is the same, check to see if the starting wavelength
-	    # is the same.  Should probably also check to see if difference is
-	    # an even multiple of wpc.
-#            if (abs(RV_OW0(rv)-RV_RW0(rv)) >= 1.e-7 && RV_DCFLAG(rv) != -1) {
-#	        if (force_rebin(rv) != OK) {
-#		    if (RV_INTERACTIVE(rv) == YES) 
-#	                call rv_errmsg ( "Data cannot be rebinned..")
-#	            call rv_err_comment (rv, "Data cannot be rebinned..", "")
-#	            return (ERR_CORREL)
-#		}
-#	    }
-#	}
+	    call rv_err_comment (rv,
+		"Data cannot be put on same WPC dispersion.", "")
+	    return (ERR_CORREL)
+	}
 
 	# Check the filter specifications
 	switch (RV_FILTER(rv)) {

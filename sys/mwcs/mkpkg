@@ -30,6 +30,7 @@ zzdebug.e:
 	;
 
 libex.a:
+	# $set xflags = "$(xflags) -qfx"
 	$ifeq (USE_GENERIC, yes)  $call generic  $endif
 	@gen
 

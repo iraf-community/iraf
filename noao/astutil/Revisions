@@ -1,5 +1,90 @@
 .help revisions Jun88 noao.astutil
 .nf
+astutil$t_obs.x
+astutil$t_asttimes.x
+astutil$observatory.par
+    Modified to allow non-integer timezones.  (12/29/94, Valdes)
+
+astutil$t_setjd.x
+    Added an extra digit to the printed output to give times to a second.
+    (6/4/94, Valdes)
+
+astutil$t_asthedit.x
+    Modified this to use the evvexpr package rather than the evexpr package
+    since the former includes double precision datatypes necessary to
+    maintain precision on some astronomical quantities.  (4/22/94, Valdes)
+
+astutil$ccddb.x
+astutil$doc/ccdtime.hlp
+    1.	The code would not work with database entries containing whitespace.
+    2.	The help was not correct in describing how the number of pixels used
+	in the photometry is calculated from the seeing FWHM.
+    (4/5/94, Valdes)
+
+astutil$t_ccdtime.x
+    Modified CCDTIME to use a plate scale instead of the f/ratio and to
+    include an airmass term.  (10/23/93, Valdes)
+
+astutil$mkpkg
+astutil$asttools/mkpkg
+    The ASTTOOLS routines are now an NOAO package library which can be
+    referenced as -lasttools.  (8/19/93, Valdes)
+
+astutil$t_ccdtime.x	+
+astutil$ccddb.x		+
+astutil$ccdtime.x	-
+astutil$ccdtime.par
+astutil$doc/ccdtime.hlp
+astutil$astutil.men
+astutil$mkpkg
+    Revised CCDTIME to use a telescope/filter/detector database and to
+    compute and print additional information.  (8/16/93, Valdes)
+
+astutil$t_asttimes.x
+    1.	The times are now always printed in the proper 24 hour interval.
+    2.	Also the fix to asttimes.x fixes incorrect values produced around
+	the new year.
+    3.  The header parameter also suppress printing the observatory info.
+	(5/27/93, Valdes)
+
+astutil$asttools/asttimes.x
+    The epoch was changed from day of the year divided by 365.25 to the
+    precise J2000 Julian epoch definition.  This also has the effect
+    of fixing incorrect values of JD and LMST around the new year.
+    (5/27/93, Valdes)
+
+astutil$t_rvcorrect.x
+astutil$keywpars.par		+
+astutil$doc/keywpars.hlp	+
+    Added a pset KEYWPARS which is a duplicate of the RV package version,
+    updated the RVCORRECT task to make use of this instead of using hard-
+    wired image header keywords.  Previously it was possible that the astutil
+    version of RVCORRECT would compute a heliocentric correction different
+    from what was found by the RV package when working from image headers.
+    Eventually other tasks should be modified to make use of this pset.
+    (5/12/93, MJF)
+
+astutil$t_asthedit.x
+astutil$asthedit.par
+astutil$doc/asthedit.hlp
+astutil$x_astutil.x
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    ASTHEDIT is a new task which edits image headers of astronomical images.
+    In includes functions for airmass, astronomical times, precession, etc.
+    (3/30/93, Valdes)
+
+astutil$t_rvcorrect.x
+    A typo in the clgstr call in the rvc_images procedure resulted in the
+    input observatory name being truncated at 2 characters.  Instead
+    of TY_CHAR for the lenght of the string it needs to be SZ_FNAME.
+    (2/1/93, Valdes)
+
+=======
+V2.10.2
+=======
+
 astutil$astutil.par
 astutil$asttimes.par
 astutil$rvcorrect.par

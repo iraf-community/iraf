@@ -1,5 +1,109 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
+ptools$tbdump.cl
+    If the input file was an ST binary table file and the expression parameter
+    was not equal to "yes", the intermediate tables file was not being deleted
+    when the tbdump and pdump tasks terminated. The problem was due to the
+    ".tab" extension that was added to the tables name but not sensed by
+    the delete command. I switched the delete command to a tdelete command
+    and everything worked fine.
+
+    (Davis, Nov 2, 1995)
+
+ptools/pexamine/pexmine.h
+ptools/pexamine/ptcolon.x
+    The rinner and router colon commands were incorrectly coded as rin and
+    rout colon commands in the pexamine.h file. The :router command was also
+    incorrectly writing back its results into the rinner parameter.
+
+    (Davis, May 1, 1995)
+
+ptools/ptutils/t_tbcrename.x
+ptools/ptutils/t_tbkeycol.x
+    Add several new checks for input text files to avoid a problem with
+    a text file being opened as a binary table. This problem prably appeared
+    when tables was modified to support simple text files (tables 1.3.3 for
+    sure, proably 1.3.2 as well, not sure before that).
+
+    (Davis, March 21, 1995)
+
+ptools/tbconcat.cl
+    Add a test for the existence of the ttools.keypar.silent parameter
+    for backwards compatability between tables 1.3.3 and 1.3.2.
+
+    (Davis, Feb 25, 1994)
+
+ptools/pexamine/ptplot.x
+    An off the end of the array computation error in the routine pt_hplot
+    was causing an invalid floating point operation on the Dec Alpha when
+    the user tried to plot the histogram of an array,
+
+    (Davis, Feb 23, 1994)
+
+
+ptools/pdump.cl
+    A reference was being made to a tdump task parameter outside of the
+    loop for processing ST binary tables files causing an "unknown task
+    tdump" error for users which do not have the tables package defined.
+
+    (Davis, Dec 20, 1994)
+
+ptools/pconvert/ptdeftable.x
+    Modified the pconvert task so that header space is preallocated rather
+    than added as needed. This significantly speeds up the task performance
+    by decreasing the number of disk writes required. This change was
+    made in response to a suggestion from PHil Hodge at ST.
+
+    (Davis, Feb 2, 1994)
+
+ptools/pconvert/ptdeftable.x
+    The pconvert task was refusing to append data to existing tables with
+    multi-valued columns, e.g. MAG[1] etc.
+
+    (Davis, July 27 1993)
+
+
+ptools/txtools/t_txcalc.x
+ptools/txtools/ptxcalc.x
+ptools/tbcalc.cl
+ptools/pcalc.cl
+ptools/doc/pcalc.hlp
+ptools/doc/tbcalc.hlp
+ptools/doc/txcalc.hlp
+    Added the tasks txcalc, tbcalc, and pcalc to the ptools package.
+    This tasks perform arithmetic operations on the fields or columns
+    of photometry files written with apphot or daophot tasks.
+
+    (Davis, May 31 1993)
+
+ptools/pexamine
+    Fixed numerous small bugs in the pexamine task including: 1)
+    unclear error messages if the default x-y or histogram plot columns could
+    not be found on task startup 2) initialization bug that could cause
+    the output edited catalog to be written incorrectly on the
+    second or higher run of pexamine, 3) added a 5% buffer around all
+    the plots so the user can see the plotted data better, 4) added
+    the standard deviation of the sky to the standard apphot columns, 5)
+    a misleading error message in the colon command to change the
+    default histogram column.
+
+    (Davis, May 22 1993)
+
+ptools/ptutils/t_istable.x
+    Modified the istable task, which is called by the pconcat, pdump,
+    prenumber, pselect, and psort script tasks so that it could deal
+    correctly with the fact that legal tables files might be text files.
+
+    (Davis, May 12 1993)
+
+ptools/pdump.cl
+ptools/pttest.cl
+ptools/tbdump.cl
+ptools/tbrenumber.cl
+    Added an expression parameter to the pdump task.
+
+    (Davis, Feb 25, 1993)
+
 ptools/tbrenumber.cl
 ptools/prenumber.cl
     Modified the tbrenumber and prenumber scripts so they can use 

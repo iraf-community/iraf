@@ -7,20 +7,16 @@ $exit
 
 libpkg.a:
 	dpggroup.x	"../../lib/ptkeysdef.h"	../lib/daophotdef.h	  \
-			../lib/apsel.h
+			../lib/apseldef.h
 	dpmemnstar.x	../lib/daophotdef.h	../lib/nstardef.h
-	dpnconfirm.x	../lib/daophot.h
-	dpnstar.x	<imhdr.h>		../lib/daophot.h          \
-			../lib/daophotdef.h	../lib/nstardef.h         \
-			<tbset.h>		../lib/apsel.h
-	dpnstarfit.x	<imhdr.h>		../lib/daophot.h          \
-			../lib/daophotdef.h	../lib/nstardef.h         \
-			../lib/apsel.h
-	dpnstzero.x	<imhdr.h>		<mach.h>                  \
-			../lib/daophotdef.h
+	dpnconfirm.x	../lib/daophotdef.h
+	dpnstar.x	<imhdr.h>		<tbset.h>                 \
+			<mach.h>                ../lib/daophotdef.h       \
+			../lib/apseldef.h       ../lib/nstardef.h
+	dpnstarfit.x	<imhdr.h>		../lib/daophotdef.h       \
+			../lib/apseldef.h	../lib/nstardef.h
 	dpntwrite.x	<tbset.h>		<time.h>		  \
-			../lib/apsel.h		../lib/daophotdef.h       \
+			../lib/daophotdef.h	../lib/apseldef.h         \
 			../lib/nstardef.h
-	t_nstar.x	<fset.h>		 ../lib/daophotdef.h      \
-			../lib/daophot.h
+	t_nstar.x	<fset.h>		 ../lib/daophotdef.h
 	;

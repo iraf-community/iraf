@@ -642,16 +642,18 @@ error(UB)	7	# error in U-B color
 
 observation
 
-v		2	# v instrumental magnitude
-error(v)	3	# error in v instrumental magnitude
-Xv		4	# airmass of v observation
-b	 	6	# b instrumental magnitude
-error(b) 	7	# error in b instrumental magnitude
-Xb		8	# airmass of b observation
-u	 	10	# u instrumental magnitude
-error(u) 	11	# error in u instrumental magnitude
-Xu	        12	# airmass of u observation		
-
+ut1             3       # ut time of filter 1 observation
+X1              4       # airmass of filter 1 observation
+m1              7       # filter 1 instrumental magnitude
+error(m1)       8       # error in filter 1 instrumental magnitude
+ut2             10      # ut time of filter 2 observation
+X2              11      # airmass of filter 2 observation
+m2              14      # filter 2 instrumental magnitude
+error(m2)       15      # error in filter 2 instrumental magnitude
+ut3             17      # ut time of filter 3 observation
+X3              18      # airmass of filter 3 observation
+m3              19      # filter 3 instrumental magnitude
+error(m3)       20      # error in filter 3 instrumental magnitude
 
 transformation
 

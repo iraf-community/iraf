@@ -75,7 +75,7 @@ begin
 	case SAMPLE:
 	    # sample: List or set the sample points.
 
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 	        call printf ("sample = %s\n")
 		    call pargstr (Memc[IC_SAMPLE(ic)])
@@ -99,7 +99,7 @@ begin
 	case FUNCTION:
 	    # function: List or set the fitting function.
 
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 		call printf ("function = %s\n")
 		    call ic_gstr (ic, "function", cmd, SZ_LINE)
@@ -182,7 +182,7 @@ begin
 	    # verbose show:  Show the values of the fitting parameters. 
 	    # The terminal is paged using the gtools paging procedure. 
 
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 		call gdeactivate (gp, AW_CLEAR)
 		call ic_vshowd (ic, "STDOUT", cv, x, y, wts, npts, gt)
@@ -197,7 +197,7 @@ begin
 	    # transform: List or set the transformation type.  This
 	    # option applies to HDTOI procedures only.
 
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 		call printf ("transform = %s\n")
 		    call ic_gstr (ic, "transform", cmd, SZ_LINE)
@@ -228,7 +228,7 @@ begin
 	case FOG:
 	    # fog: DTOI ONLY - change or reset the value of the fog level
 
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 		call printf ("fog = %g\n")
 		    call pargr (IC_FOG(ic))
@@ -259,7 +259,7 @@ begin
 
 	case EBARS:
 	    # [HV]BAR marker can indicate either errors or weights
-	    call gargstr (cmd, SZ_LINE)
+	    call gargwrd (cmd, SZ_LINE)
 	    if (cmd[1] == EOS) {
 		if (IC_EBARS(ic) == EB_WTS)
 		    call printf ("ebars = Weights\n")

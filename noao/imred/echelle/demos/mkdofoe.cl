@@ -5,12 +5,12 @@ begin
 
 	artdata
 
-	if (!(access ("demoobj.imh") || access ("demoobj.hhh"))) {
+	if (!access ("demoobj." // envget ("imtype"))) {
 	    print ("Creating example demoobj ...")
 	    mkechelle ("demoobj", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
-		comments=yes, xc=50, yc=50.1, pixsize=0.027,
+		comments=no, xc=50, yc=50.1, pixsize=0.027,
 		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -20,7 +20,7 @@ begin
 	    mkechelle ("demoobj", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
-		comments=yes, xc=60, yc=51.6, pixsize=0.027,
+		comments=no, xc=60, yc=51.6, pixsize=0.027,
 		profile="gaussian", width=4., scattered=0., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -31,15 +31,15 @@ begin
 	    mknoise ("demoobj", output="", ncols=512, nlines=512, title="",
 		header="", background=0., gain=1., rdnoise=10., poisson=yes,
 		seed=1, cosrays="", ncosrays=0, energy=30000., radius=0.5,
-		ar=1., pa=0., comments=yes)
+		ar=1., pa=0., comments=no)
 	}
 
-	if (!(access ("demoflat.imh") || access ("demoflat.hhh"))) {
+	if (!access ("demoflat." // envget ("imtype"))) {
 	    print ("Creating example demoflat ...")
 	    mkechelle ("demoflat", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
-		comments=yes, xc=50, yc=50.2, pixsize=0.027,
+		comments=no, xc=50, yc=50.2, pixsize=0.027,
 		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -49,7 +49,7 @@ begin
 	    mkechelle ("demoflat", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoobj.dat", list=no, make=yes,
-		comments=yes, xc=60, yc=51.7, pixsize=0.027,
+		comments=no, xc=60, yc=51.7, pixsize=0.027,
 		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -59,15 +59,15 @@ begin
 	    mknoise ("demoflat", output="", ncols=512, nlines=512, title="",
 		header="", background=0., gain=1., rdnoise=10., poisson=yes,
 		seed=2, cosrays="", ncosrays=0, energy=30000., radius=0.5,
-		ar=1., pa=0., comments=yes)
+		ar=1., pa=0., comments=no)
 	}
 
-	if (!(access ("demoarc.imh") || access ("demoarc.hhh"))) {
+	if (!access ("demoarc." // envget ("imtype"))) {
 	    print ("Creating example demoarc ...")
 	    mkechelle ("demoarc", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoarc.dat", list=no, make=yes,
-		comments=yes, xc=50, yc=50, pixsize=0.027,
+		comments=no, xc=50, yc=50, pixsize=0.027,
 		profile="gaussian", width=4., scattered=0., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -78,7 +78,7 @@ begin
 	    mkechelle ("demoarc", yes, ncols=100, nlines=256, norders=21,
 		title="Artificial Echelle Spectrum",
 		header="demos$demoarc.dat", list=no, make=yes,
-		comments=yes, xc=60, yc=51.5, pixsize=0.027,
+		comments=no, xc=60, yc=51.5, pixsize=0.027,
 		profile="gaussian", width=4., scattered=0., f=590., gmm=31.6,
 		blaze=63., theta=69., order=112, wavelength=5007.49,
 		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
@@ -89,6 +89,6 @@ begin
 	    mknoise ("demoarc", output="", ncols=512, nlines=512, title="",
 		header="", background=0., gain=1., rdnoise=10., poisson=yes,
 		seed=3, cosrays="", ncosrays=0, energy=30000., radius=0.5,
-		ar=1., pa=0., comments=yes)
+		ar=1., pa=0., comments=no)
 	}
 end

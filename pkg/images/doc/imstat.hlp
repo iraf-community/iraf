@@ -65,7 +65,7 @@ Only the quantities selected by the fields parameter are actually computed.
 .fi
 
 The midpoint and mode are computed in two passes through the image. In the
-first pass the standard deviation of the pixels is calculate and used
+first pass the standard deviation of the pixels is calculated and used
 with the \fIbinwidth\fR parameter to compute the resolution of the data
 histogram. The midpoint is estimated by integrating the histogram and
 computing by interpolation the data value at which exactly half the

@@ -128,14 +128,16 @@ is a list of column and line positions (x,y) then the command executed
 at each position is given by this parameter.  This should be one of
 the aperture type editing commands, the statistics command, or the
 surface plotting command.  Two keystroke commands would obviously 
-be incorrect.
+be incorrect.  \fIThis parameter is ignored in "fixpix" mode\fR.
 .le
 .ls fixpix = no
 Fixpix style input?  This type of input consists of rectangular regions
 specified by lines giving the starting and ending column and starting
 and ending line.  This is the same input used by \fBfixpix\fR and in
 the \fBccdred\fR package.  The feature to refer to "untrimmed" images
-in the latter package is not available in this task.
+in the latter package is not available in this task.  When selected
+the editing consists of interpolation across the narrowest dimension
+of the region and the default key is ignored.
 .le
 .ih
 DESCRIPTION
@@ -415,7 +417,12 @@ EXAMPLES
 	cl> imedit raw* %raw%ed%* cursor=fixpix fixpix+ display-
 .fi
 .ih
-NOTES
+REVISIONS
+.ls IMEDIT V2.10.4
+The 'u', 'j', 'k', and 'n' keys were added to those recorded in the
+log file.
+.le
+.ls IMEDIT V2.8
 This task is a first version of what will be an evolving task.
 Additional features and options will be added as they are suggested.
 It is also a prototype using a very limited display interface; execution
@@ -439,6 +446,7 @@ the application to this sophisticated package) mean that the
 surface plots are always scaled to the range of the data and that
 it is not possible to label the graph or use the graphics cursor to
 point at features for the task.
+.le
 .ih
 SEE ALSO
 ccdred.instruments proto.fixpix

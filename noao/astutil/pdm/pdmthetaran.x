@@ -7,26 +7,26 @@ include "pdm.h"
 # PDMTHETARAN -- This program is a copy of pdmtheta but can be used on
 # scrambled data.
 
-real procedure pdm_thetaran (pdmp, y, inuse, rg, period)
+double procedure pdm_thetaran (pdmp, y, inuse, rg, period)
 
 pointer	pdmp			# pointer to PDM data structure
 pointer	y			# pointer to abcissas
 pointer	inuse			# pointer to PDM in-use array 
 pointer	rg			# pointer to ranges structure
-real	period			# period to calculate theta for
+double	period			# period to calculate theta for
 
 int	i, j, k, l
-real	sumx2_adj, s2
+double	sumx2_adj, s2
 int	ndof, bins, segst, segend
 bool	bin10
-real	theta
+double	theta
 pointer	sumbin, numbin, sp
 errchk	binemran
 
 begin
 	# Allocate bin storage.
 	call smark (sp)
-	call salloc (sumbin, 10, TY_REAL)
+	call salloc (sumbin, 10, TY_DOUBLE)
 	call salloc (numbin, 10, TY_INT)
 
 	s2 = 0
@@ -62,7 +62,7 @@ begin
 	        if (PDM_DEBUG(pdmp)) {
 		    call printf ("bin = %d, sum = %g, npts = %d\n")
 		        call pargi (j)
-		        call pargr (Memr[sumbin+j-1])
+		        call pargd (Memd[sumbin+j-1])
 		        call pargi (Memi[numbin+j-1])
 	        }
 	    }
@@ -72,11 +72,11 @@ begin
 	        k = numbin+j
 	        l = sumbin+j
 	        if (Memi[k] == 1)
-		    sumx2_adj = sumx2_adj - Memr[l]*Memr[l]
+		    sumx2_adj = sumx2_adj - Memd[l]*Memd[l]
 	        else if (Memi[k] != 0) {
 		    bins = bins + 1
 		    ndof = ndof + Memi[k] - 1
-		    s2 = s2 + real((Memr[l]*Memr[l])/Memi[k])
+		    s2 = s2 + double((Memd[l]*Memd[l])/Memi[k])
 	        }
 	    }
 	}
@@ -84,14 +84,14 @@ begin
 	# If debug print info.
 	if (PDM_DEBUG(pdmp)) {
 	    call printf ("sumx2 = %g, s2 = %g, ndof = %d, var = %g\n")
-		call pargr (sumx2_adj)
-		call pargr (s2)
+		call pargd (sumx2_adj)
+		call pargd (s2)
 		call pargi (ndof)
-		call pargr (PDM_DVAR(pdmp))
+		call pargd (PDM_DVAR(pdmp))
 	}
 
 	# Calculate theta.
-	theta = (sumx2_adj - s2)/(real(ndof) * PDM_DVAR(pdmp))
+	theta = (sumx2_adj - s2)/(double(ndof) * PDM_DVAR(pdmp))
 
 	call sfree (sp)
 	return (theta)
@@ -102,7 +102,7 @@ end
 
 procedure binemran (incper, bin10, x, y, segst, segend, inuse, sumbin, numbin)
 
-real	incper
+double	incper
 bool	bin10
 pointer	x
 pointer	y
@@ -111,33 +111,33 @@ int	segst, segend
 pointer	sumbin, numbin
 
 int	bin1, bin2, j, k, l
-real	p, phase, p0
+double	p, phase, p0
 
 begin
 	do j = 1, 10 {
 	    Memi[numbin+j-1] = 0
-	    Memr[sumbin+j-1] = 0.0
+	    Memd[sumbin+j-1] = 0.0
 	}
 
-	p0 = Memr[x]
+	p0 = Memd[x]
 	do j = segst, segend {
 	    if (Memi[inuse+j-1] == 0)
 		next
-	    p = (Memr[x+j-1] - p0)/incper
-	    phase = real(p - int(p))
+	    p = (Memd[x+j-1] - p0)/incper
+	    phase = double(p - int(p))
 	    if (bin10) {
-		bin1 = mod(int(10.*phase+0.5), 10)
+		bin1 = mod(int(10.*phase+0.5d+0), 10)
 	    } else {
-		bin1 = 2 * int(5. * phase) + 1
-		bin2 = 2 * (mod(int(5. * phase + 0.5), 5))
+		bin1 = 2 * int(5.0d+0 * phase) + 1
+		bin2 = 2 * (mod(int(5.0d+0 * phase + 0.5d+0), 5))
 		k = numbin+bin2
 		l = sumbin+bin2
 		Memi[k] = Memi[k] + 1
-		Memr[l] = Memr[l] + Memr[y+j-1]
+		Memd[l] = Memd[l] + Memd[y+j-1]
 	    }
 	    k = numbin+bin1
 	    l = sumbin+bin1
 	    Memi[k] = Memi[k] + 1
-	    Memr[l] = Memr[l] + Memr[y+j-1]
+	    Memd[l] = Memd[l] + Memd[y+j-1]
 	}
 end

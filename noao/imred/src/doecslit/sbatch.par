@@ -1,5 +1,6 @@
-objects,s,h,,,,"Object spectra"
-arcs,s,h,,,,"List of arc spectra"
+objects,f,h,"",,,"Object spectra"
+datamax,r,h,,,,"Max data value / cosmic ray threshold"
+arcs,f,h,"",,,"List of arc spectra"
 arcref,f,h,"",,,"Arc reference for dispersion solution"
 arcrefs,s,h,,,,"Arc references
 "
@@ -19,4 +20,5 @@ newsens,b,h,,,,
 newarcs,b,h,,,,
 fd1,*struct,h,"",,,
 fd2,*struct,h,"",,,
-mode,s,h,"q",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

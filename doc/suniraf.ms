@@ -452,7 +452,7 @@ commands.
 Similarly, to restore the NOAO package sparc binaries:
 .XS
 % cd $iraf/noao/bin.sparc
-% cat /\fIpath\fP/nb.sos4.spc/ib.* | uncompress | tar -xpf -
+% cat /\fIpath\fP/nb.sos4.spc/nb.* | uncompress | tar -xpf -
 .XE
 This process is repeated for each architecture.  For example, a central
 IRAF distribution installed on a server machine with both Sun-3 and Sun-4

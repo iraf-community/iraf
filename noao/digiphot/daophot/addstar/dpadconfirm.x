@@ -1,5 +1,3 @@
-include "../lib/daophot.h"
-
 # DP_ADCONFIRM -- Confirm the critical ADDSTAR parameters.
 
 procedure dp_adconfirm (dao)

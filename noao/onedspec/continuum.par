@@ -1,6 +1,7 @@
 input,s,a,,,,Input images
 output,s,a,,,,Output images
 lines,s,h,"*",,,Image lines to be fit
+bands,s,h,"1",,,Image bands to be fit
 type,s,h,"ratio","data|fit|difference|ratio",,Type of output
 replace,b,h,no,,,Replace rejected points by fit?
 wavescale,b,h,yes,,,Scale the X axis with wavelength?

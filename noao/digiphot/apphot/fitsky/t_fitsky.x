@@ -19,12 +19,13 @@ int	update		# update the critical parameter
 int	verbose		# verbose mode
 
 int	sid, lid, limlist, lclist, lolist, out, cl, pfd, root, stat
-pointer	sp, outfname, cname, ap, im, mgd, gd, id, imlist, clist, olist
+int	imlist, clist, olist
+pointer	sp, outfname, cname, ap, im, mgd, gd, id
 
 bool	clgetb(), streq()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
-int	strlen(), apsky()
-pointer	imtopenp(), clpopnu(), immap(), open(), gopen()
+int	strlen(), apsky(), imtopenp(), clpopnu(), open()
+pointer	immap(), gopen()
 errchk	gopen
 
 begin
@@ -66,11 +67,11 @@ begin
 	    call error (0, "Imcompatible image and output list lengths")
 	}
 
-	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
+	call clgstr ("icommands.p_filename", Memc[cname], SZ_FNAME)
 	if (Memc[cname] != EOS)
 	    interactive = NO
-	else if (lclist == 0)
-	    interactive = YES
+	#else if (lclist == 0)
+	    #interactive = YES
 	else
 	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
@@ -85,10 +86,11 @@ begin
 		call ap_pspars (ap)
 	}
 
-	# Open plot files.
+	# Get the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
 	call clgstr ("display", Memc[display], SZ_FNAME)
-	call clgstr ("plotfile", Memc[plotfile], SZ_FNAME)
+
+	# Open plot files.
 	if (interactive == YES) {
 	    if (Memc[graphics] == EOS)
 	        gd = NULL
@@ -119,6 +121,8 @@ begin
 	    id = NULL
 	}
 
+	# Open the plot metacode file.
+	call clgstr ("plotfile", Memc[plotfile], SZ_FNAME)
 	if (Memc[plotfile] == EOS)
 	    pfd = NULL
 	else
@@ -141,6 +145,8 @@ begin
 	    call ap_otime (im, ap)
 	    call ap_airmass (im, ap)
 	    call ap_filter (im, ap)
+	    if ((id != NULL) && (id != gd))
+		call ap_gswv (id, Memc[image], im, 4)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -149,25 +155,20 @@ begin
 	    if (lclist <= 0) {
 		cl = NULL
 		call strcpy ("", Memc[outfname], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
-		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
-		    lclist = limlist
-		} else
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
-	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {
+		stat = clgfil (clist, Memc[coords], SZ_FNAME)
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
 		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
+		    call ap_inname (Memc[image], Memc[outfname], "coo",
+		        Memc[outfname], SZ_FNAME)
+		    lclist = limlist
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else if (stat != EOF) {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call apstats (ap, CLNAME, Memc[outfname], SZ_FNAME)
 		    call seek (cl, BOF)
 		}
 	    }
@@ -184,18 +185,18 @@ begin
 		call strcpy ("", Memc[outfname], SZ_FNAME)
 	    } else {
 	        stat = clgfil (olist, Memc[output], SZ_FNAME)
-		if (stat != EOF)
-		    root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
+		root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[output+root], 7) == 0 || root ==
 		    strlen (Memc[output])) {
-		    call apoutname (Memc[image], "", "sky", Memc[outfname],
-		        SZ_FNAME)
+		    call apoutname (Memc[image], Memc[outfname], "sky",
+		        Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    lolist = limlist
 		} else if (stat != EOF) {
 		    call strcpy (Memc[output], Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-		}
+		} else
+		    call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 	    }
 	    call apsets (ap, OUTNAME, Memc[outfname])
 
@@ -221,16 +222,15 @@ begin
 	    }
 	    if (out != NULL && lolist != 1) {
 		call close (out)
-		if (sid <= 1)
+		if (sid <= 1) {
+		    call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 		    call delete (Memc[outfname])
+		}
 		sid = 1
 	    }
 	    if (stat == YES)
 		break
 	}
-
-	# Free sky fitting structure
-	call apsfree (ap)
 
 	# If only one coordinate file for a list of images close.
 	if (cl != NULL && lclist == 1)
@@ -239,8 +239,10 @@ begin
 	# If only one output file for a list of images close.
 	if (out != NULL && lolist == 1) {
 	    call close (out)
-	    if (sid <= 1)
+	    if (sid <= 1) {
+		call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 		call delete (Memc[outfname])
+	    }
 	}
 
 	# Close up plot files.
@@ -257,9 +259,13 @@ begin
 	if (pfd != NULL)
 	    call close (pfd)
 
+	# Free sky fitting structure
+	call apsfree (ap)
+
 	# Close up lists.
 	call imtclose (imlist)
 	call clpcls (clist)
 	call clpcls (olist)
+
 	call sfree (sp)
 end

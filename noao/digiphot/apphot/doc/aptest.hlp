@@ -1,4 +1,4 @@
-.help aptest Mar90 noao.digiphot.apphot
+.help aptest Dec92 noao.digiphot.apphot
 .ih
 NAME
 aptest -- run basic tests on the apphot package tasks
@@ -13,13 +13,14 @@ format in the APPHOT package test directory. If the image already exists
 APTEST will exit with a warning message.
 .le
 .ls aplogfile = ""
-The name of the output log file. By default all the output is logged in a file
+The name of the output log file. By default all the text output is logged
+in a file
 called \fIimname.log"\fR. If the log file already exists APTEST will
 exit with a warning message.
 .le
 .ls applotfile = ""
-The name of the output log file. By default all the output is logged in a file
-called \fIimname.plot"\fR. If the plot file already exists APTEST will
+The name of the output log file. By default all the plot output is logged in
+a file called \fIimname.plot"\fR. If the plot file already exists APTEST will
 exit with a warning message.
 .le
 .ih
@@ -36,6 +37,7 @@ metacode file \fIapplotfile\fR.
 EXAMPLES
 
 1. Check to see that all the APPHOT tasks are functioning correctly.
+
 .nf
 	ap> apphot
 

@@ -28,15 +28,19 @@ file	done
 file	log1
 file	log2
 
-struct	*fd1, *fd2
+struct	*fd1, *fd2, *fd3
 
 begin
-	string	spec, specec, arc, str1, str2
+	string	imtype, ectype
+	string	spec, specec, arc, str1, str2, str3, str4
 	file	temp1, temp2
 	int	i, j
 	bool	reextract, log, scat
 	str1 = ""
 	str2 = ""
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
 
 	temp1 = mktemp ("tmp$iraf")
 	temp2 = mktemp ("tmp$iraf")
@@ -49,7 +53,7 @@ begin
 
         fd1 = stds
         while (fscan (fd1, spec) != EOF) {
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    scat = no
 	    if (scattered) {
@@ -69,14 +73,21 @@ begin
 		}
 
 	        print ("Extract standard star spectrum ", spec) | tee (log1)
-		setjd (spec, observatory=observatory, date="date-obs",
-		    time="ut", exposure="exptime", jd="jd", hjd="",
-		    ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-		    >> log1)
-	        setairmass (spec, intype="beginning",
-		    outtype="effective", exposure="exptime",
-		    observatory=observatory, show=no, update=yes,
-		    override=yes, >> log1)
+		hselect (spec, "date-obs,ut,exptime", yes, > temp1)
+		hselect (spec, "ra,dec,epoch,st", yes, >> temp1)
+		fd2 = temp1
+		if (fscan (fd2, str1, str2, str3) == 3) {
+		    setjd (spec, observatory=observatory, date="date-obs",
+			time="ut", exposure="exptime", jd="jd", hjd="",
+			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+			>> log1)
+		    if (fscan (fd2, str1, str2, str3, str4) == 4)
+			setairmass (spec, intype="beginning",
+			    outtype="effective", exposure="exptime",
+			    observatory=observatory, show=no, update=yes,
+			    override=yes, >> log1)
+		}
+		fd2 = ""; delete (temp1, verify=no)
 		apslitproc (spec)
 	    }
 
@@ -87,18 +98,26 @@ begin
 	    if (j < 1) {
 		# Fix arc headers if necessary.
 		if (sproc.newarcs) {
-		    setjd ("@"//arcs, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> log1)
-	    	    setairmass ("@"//arcs, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> log1)
 	    	    fd2 = arcs
-	    	    while (fscan (fd2, arc) != EOF)
+	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp1)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp1)
+			fd3 = temp1
+			if (fscan (fd3, str1, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory,
+				date="date-obs", time="ut", exposure="exptime",
+				jd="jd", hjd="", ljd="ljd", utdate=yes,
+				uttime=yes, listonly=no, >> log1)
+			    if (fscan (fd3, str1, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no,
+				    update=yes, override=yes, >> log1)
+			}
+			fd3 = ""; delete (temp1, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
+		    }
 	    	    fd2 = ""
 		    sproc.newarcs = no
 		}
@@ -124,7 +143,7 @@ begin
 		} else {
 	            print ("Dispersion correct ", spec) | tee (log1)
 		    dispcor (specec, "", linearize=sparams.linearize,
-			database=database, table=arcref//".ec.imh",
+			database=database, table=arcref//ectype,
 			w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF, log=sparams.log,
 			flux=sparams.flux, global=no, ignoreaps=no, confirm=no,
 			listonly=no, logfile=logfile)
@@ -148,13 +167,13 @@ begin
         }
         fd1 = ""
 
-        sections ("sens.????.imh", option="nolist")
+        sections ("sens.????"//imtype, option="nolist")
         if (sproc.newsens || sections.nimages == 0) {
 	    if (!access ("std")) {
 	        print ("No standard star data") | tee (log1)
 	        sproc.fluxcal1 = no
 	    } else {
-	        imdelete ("sens.????.imh", verify=no)
+	        imdelete ("sens.????"//imtype, verify=no)
                 print ("Compute sensitivity function") | tee (log1)
                 sensfunc ("std", "sens", apertures="", ignoreaps=no,
 		    logfile=logfile, extinction=extinction,

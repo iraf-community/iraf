@@ -9,7 +9,7 @@ double	dval, clgetd()
 
 begin
 	dval = clgetd (param)
-	if (dval == INDEFD)
+	if (IS_INDEFD (dval))
 	    return (INDEFI)
 	else
 	    return (int(dval))

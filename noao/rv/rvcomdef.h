@@ -3,11 +3,12 @@
 # RVXCOR Colon Commands
 define	RVX_KEYWORDS	"|apertures|apnum|apodize|autowrite|autodraw|background\
 			 |ccftype|comment|continuum|correction|deltav|disp\
-			 |filter|function|height|imupdate|maxwidth|minwidth\
-			 |n!|next!|objects|output|osample|p!|peak|pixcorr\
-			 |previous!|printz|rebin|results|rsample|show|templates\
-			 |tempvel|tnum|unlearn|update|version|verbose|wccf\
-			 |weights|width|wincenter|window|ymin|ymax|"
+			 |filter|function|height|imupdate|line_color\
+			 |maxwidth|minwidth|n!|next!|objects|output|osample\
+			 |p!|peak|pixcorr|previous!|printz|rebin|results\
+			 |rsample|show|templates|tempvel|text_color|tnum\
+			 |unlearn|update|version|verbose|wccf|weights|width\
+			 |wincenter|window|ymin|ymax|"
 
 define	RVX_APERTURES		1	# List of apertures to process
 define	RVX_APNUM		2	# Specific aperture to process
@@ -25,36 +26,38 @@ define	RVX_FILTER		13	# Which spectra to filter
 define	RVX_FUNCTION		14	# CCF peak fitting function
 define	RVX_HEIGHT		15	# CCF peak fit height
 define	RVX_IMUPDATE		16	# Update image with results?
-define	RVX_MAXWIDTH		17	# Min fitting width
-define	RVX_MINWIDTH		18	# Max fitting width
-define	RVX_NBANG		19	# Explicit next command
-define	RVX_NEXT		20	# Explicit next command
-define	RVX_OBJECTS		21	# Reset object list
-define	RVX_OUTPUT		22	# Rename output logfile
-define	RVX_OSAMPLE		23	# Regions to correlate
-define	RVX_PBANG		24	# Explicit previous command
-define	RVX_PEAK		25	# Peak height flag
-define	RVX_PIXCORR		26	# Pixel-correlation only flag
-define	RVX_PREVIOUS		27	# Explicit previous command
-define	RVX_PRINTZ		28	# Toggle output of Z values
-define	RVX_REBIN		29	# Set/Show rebin param
-define	RVX_RESULTS		30	# Page a logfile of results
-define	RVX_RSAMPLE		31	# Regions to correlate
-define	RVX_SHOW		32	# Show current parameter settings
-define	RVX_TEMPLATES		33	# Reset template list
-define	RVX_TEMPVEL		34	# Reset template list
-define	RVX_TNUM		35	# Skip to specifi template number
-define	RVX_UNLEARN		36	# Unlearn task parameters
-define	RVX_UPDATE		37	# Update task parameters
-define	RVX_VERSION		38	# Update task parameters
-define	RVX_VERBOSE		39	# Verbose output flag
-define	RVX_WCCF		40	# Write CCF to text|image
-define	RVX_WEIGHTS		41	# Fitting weights
-define	RVX_WIDTH		42	# Fitting width about peak
-define	RVX_WINCENTER		43	# Peak window center
-define	RVX_WINDOW		44	# Size of window
-define	RVX_YMIN		45	# Bottom of ccf plot
-define	RVX_YMAX		46	# Top of ccf plot
+define	RVX_LINECOLOR		17	# Set/Show overlay vector color
+define	RVX_MAXWIDTH		18	# Min fitting width
+define	RVX_MINWIDTH		19	# Max fitting width
+define	RVX_NBANG		20	# Explicit next command
+define	RVX_NEXT		21	# Explicit next command
+define	RVX_OBJECTS		22	# Reset object list
+define	RVX_OUTPUT		23	# Rename output logfile
+define	RVX_OSAMPLE		24	# Regions to correlate
+define	RVX_PBANG		25	# Explicit previous command
+define	RVX_PEAK		26	# Peak height flag
+define	RVX_PIXCORR		27	# Pixel-correlation only flag
+define	RVX_PREVIOUS		28	# Explicit previous command
+define	RVX_PRINTZ		29	# Toggle output of Z values
+define	RVX_REBIN		30	# Set/Show rebin param
+define	RVX_RESULTS		31	# Page a logfile of results
+define	RVX_RSAMPLE		32	# Regions to correlate
+define	RVX_SHOW		33	# Show current parameter settings
+define	RVX_TEMPLATES		34	# Reset template list
+define	RVX_TEMPVEL		35	# Reset template list
+define	RVX_TEXTCOLOR		36	# Set/Show greaphics text color
+define	RVX_TNUM		37	# Skip to specifi template number
+define	RVX_UNLEARN		38	# Unlearn task parameters
+define	RVX_UPDATE		39	# Update task parameters
+define	RVX_VERSION		40	# Update task parameters
+define	RVX_VERBOSE		41	# Verbose output flag
+define	RVX_WCCF		42	# Write CCF to text|image
+define	RVX_WEIGHTS		43	# Fitting weights
+define	RVX_WIDTH		44	# Fitting width about peak
+define	RVX_WINCENTER		45	# Peak window center
+define	RVX_WINDOW		46	# Size of window
+define	RVX_YMIN		47	# Bottom of ccf plot
+define	RVX_YMAX		48	# Top of ccf plot
 
 
 ################################################################################
@@ -83,8 +86,8 @@ define	CNT_NITERATE		9	# Number of rejection iterations
 define	CNT_GROW		10	# Rejection growing radius
 
 # Keywords translation parameters
-define  KEY_KEYWORDS  	"|ra|dec|ut|utmiddle|exptime|epoch|date_obs|w0\
-			 |wpc|hjd|mjd_obs|vobs|vrel|vhelio|vlsr|vsun|"
+define  KEY_KEYWORDS  	"|ra|dec|ut|utmiddle|exptime|epoch|date_obs\
+			 |hjd|mjd_obs|vobs|vrel|vhelio|vlsr|vsun|"
 
 define	KEY_RA			1	# Right ascension keyword
 define	KEY_DEC			2	# Declination keyword
@@ -93,15 +96,13 @@ define	KEY_UTMID		4	# Universal time of observation keyword
 define	KEY_EXPTIME		5	# Frame exposure time keyword
 define	KEY_EPOCH		6	# Epoch of observation keyword
 define	KEY_DATE_OBS		7	# Date of observation keyword
-define	KEY_W0			8	# Starting wavelength keyword
-define	KEY_WPC			9	# Wavelength increment keyword
-define	KEY_HJD			10	# Heliocentric Julian Date Keyword
-define	KEY_MJD_OBS		11	# Modified Julian Data Keyword
-define	KEY_VOBS		12	# Observed RV keyword
-define	KEY_VREL		13	# Relative RV keyword
-define	KEY_VHELIO		14	# Heliocentric RV keyword
-define	KEY_VLSR		15	# LSR RV keyword
-define	KEY_VSUN		16	# Solar motion keyword
+define	KEY_HJD			8	# Heliocentric Julian Date Keyword
+define	KEY_MJD_OBS		9	# Modified Julian Data Keyword
+define	KEY_VOBS		10	# Observed RV keyword
+define	KEY_VREL		11	# Relative RV keyword
+define	KEY_VHELIO		12	# Heliocentric RV keyword
+define	KEY_VLSR		13	# LSR RV keyword
+define	KEY_VSUN		14	# Solar motion keyword
 
 # Filter parameters
 define  FILT_KEYWORDS	"|f_type|cuton|cutoff|fullon|fulloff|"

@@ -1,4 +1,4 @@
-.help package Jun87 noao.imred
+.help package Dec93 noao.imred
 .ih
 NAME
 ccdred -- CCD image reduction package
@@ -9,12 +9,17 @@ ccdred
 PARAMETERS
 .ls pixeltype = "real real"
 Output pixel datatype and calculation datatype.  When images are processed
-or created the output pixel datatype is determined by this parameter.
-The allowed types are "short" for short integer, and "real" for real
-floating point.  Note that if short input images are processed into
-real images the disk space required will generally increase.
-The calculation datatypes are also short and real with a default of
-real if none is specified.
+or created the output pixel datatype is determined by this parameter if the
+specified datatype is of equal or higher precision otherwise the input
+image datatype is preserved.  For example if the output datatype is
+specified as "input" then input images which are "short" or "ushort" will
+be output as integer but any real datatype input images will remain real.
+The allowed types and order of precision are "short", "ushort", "int",
+"long", "real", or "double", for short signed integer, short unsigned
+integer, integer, long integers, and real or double floating point.  Note
+that if short input images are processed into real images the disk space
+required will generally increase.  The calculation datatypes may only be
+short and real with a default of real if none is specified.
 .le
 .ls verbose = no
 Print log information to the standard output?
@@ -23,8 +28,8 @@ Print log information to the standard output?
 Text log file.  If no filename is specified then no log file is kept.
 .le
 .ls plotfile = ""
-Log metacode plot file for the overscan bias vector fits.  If
-no filename is specified then no metacode plot file is kept.
+Log metacode plot file for the overscan bias vector fits.  If no filename
+is specified then no metacode plot file is kept.
 .le
 .ls backup = ""
 Backup prefix for backup images.  If no prefix is specified then no backup
@@ -32,7 +37,8 @@ images are kept when processing.  If specified then the the backup image
 has the specified prefix.
 .le
 .ls instrument = ""
-CCD instrument translation file.  This is usually set with \fBsetinstrument\fR.
+CCD instrument translation file.  This is usually set with
+\fBsetinstrument\fR.
 .le
 .ls ssfile = "subsets"
 Subset translation file used to define the subset identifier.  See
@@ -50,15 +56,15 @@ Package version.
 .ih
 DESCRIPTION
 The CCD reduction package is loaded when this command is entered.  The
-package contains parameters which affect the operation of the tasks
-it defines.  When images are processed or new image are created the
-output pixel datatype is that specified by the parameter \fBpixeltype\fR.
-Note that CCD processing replaces the original image by the processed
-image so the pixel type of the CCD images may change during processing.
-It is unlikely that real images will be processed to short images but
-the reverse is quite likely.  Processing images from short to real
-pixel datatypes will generally increase the amount of disk space
-required (a factor of 2 on most computers).
+package contains parameters which affect the operation of the tasks it
+defines.  When images are processed or new image are created the output
+pixel datatype is that specified by the parameter \fBpixeltype\fR.  Note
+that CCD processing replaces the original image by the processed image so
+the pixel type of the CCD images may change during processing.  The output
+pixel type is not allowed to change to a lower precision but it is common
+for input short images to be processed to real images.  Processing images
+from short to real pixel datatypes will generally increase the amount of
+disk space required (a factor of 2 on most computers).
 
 The tasks produce log output which may be printed on the standard
 output (the terminal unless redirected) and appended to a file.  The
@@ -94,5 +100,5 @@ image will be "origccd001".  The prefix may be a directory but it must
 end with '/' or '$' (for logical directories).
 .ih
 SEE ALSO
-instruments, setinstrument, subsets
+ccdproc, instruments, setinstrument, subsets
 .endhelp

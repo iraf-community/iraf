@@ -58,7 +58,7 @@ end
 procedure ap_rphdr (ap, out)
 
 pointer	ap		# apphot descriptor
-pointer	out		# output file descriptor
+int	out		# output file descriptor
 
 begin
 	if (out == NULL)
@@ -94,14 +94,13 @@ begin
 
 	# Print quick summary of radprof results on the standard output.
 	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
-	call printf ("%s x: %0.2f y: %0.2f s: %0.2f fwhm: %0.2f ")
+	call printf ("%s  %8.2f %8.2f  %8g %5.2f  ")
 	    call pargstr (Memc[imname])
 	    call pargr (apstatr (ap, RPXCUR))
 	    call pargr (apstatr (ap, RPYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, RPFWHM) / apstatr (ap, SCALE))
-
-	call printf ("mag: %0.2f err: %s\n")
+	call printf ("%7.3f  %s\n")
 	    call pargr (Memr[AP_MAGS(phot)+AP_NAPERTS(phot)-1])
 	if (cier != AP_OK || sier != AP_OK || pier != AP_OK || rier != AP_OK)
 	    call pargstr ("err")

@@ -29,12 +29,53 @@ The band or plane of a three dimensional image to be plotted in each image.
 Output graphics device.  This may be one of "stdgraph", "stdplot",
 "stdvdm", or the actual device name.
 .le
-.ls cursor = "onedspec$gcurval"
+.ls cursor = "onedspec$gcurval.dat"
 File(s) containing cursor commands for the SPLOT task.
 The files will be cycled sequentially.  If there is more than one file
 usually the number of files will agree with the number of apertures
 for each image since otherwise different cursor/aperture pairings will
 occur.  The default is a file containing only the (q)uit command.
+.le
+
+The following parameters are used in response to particular keystrokes.
+In \fBsplot\fR they are query parameters but in \fBbplot\fR they are hidden
+parameters.
+.ls next_image = ""
+In response to 'g' (get next image) this parameter specifies the image.
+.le
+.ls new_image = ""
+In response to 'i' (write current spectrum) this parameter specifies the
+name of a new image to create or existing image to overwrite.
+.le
+.ls overwrite = yes
+Overwrite an existing output image?  If set to yes it is possible to write
+back into the input spectrum or to some other existing image.  Otherwise
+the user is queried again for a new image name.
+.le
+.ls spec2 = ""
+When adding, subtracting, multiplying, or dividing by a second spectrum
+('+', '-', '*', '/' keys in the 'f' mode) this parameter is used to get
+the name of the second spectrum.
+.le
+.ls constant = 0.
+When adding or multiplying by a constant ('p' or 'm' keys in the 'f' mode)
+the parameter is used to get the constant.
+.le
+.ls wavelength = 0.
+This parameter is used to get a dispersion coordinate value during deblending or
+when changing the dispersion coordinates with 'u'.
+.le
+.ls linelist = ""
+During deblending this parameter is used to get a list of line positions
+and widths.
+.le
+.ls wstart = 0., wend = 0., dw = 0.
+In response to 'p' (convert to a linear wavelength scale) these parameter
+specify the starting wavelength, ending wavelength, and wavelength per pixel.
+.le
+.ls boxsize = 2
+In response to 's' (smooth) this parameter specifies the box size in pixels
+to be used for the boxcar smooth
 .le
 .ih
 DESCRIPTION
@@ -119,6 +160,10 @@ individual cursor file names, for instance:
 that are in one to one correspondence with the range of apertures.
 .ih
 REVISIONS
+.ls BPLOT V2.10.3
+The query parameters from SPLOT were added as hidden parameters in BPLOT
+to allow use of those keys in a batch way.
+.le
 .ls BPLOT V2.10
 The \fIapertures\fR and \fIband\fR parameters been added to select
 apertures from multiple spectra and long slit images, and bands from 3D

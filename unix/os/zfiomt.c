@@ -4,10 +4,25 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
-#include <sys/mtio.h>
 #include <sys/errno.h>
 #include <ctype.h>
 #include <pwd.h>
+
+#ifdef _AIX
+#include <sys/tape.h>
+#define	MTIOCTOP	STIOCTOP
+#define	MTBSF		STRSF
+#define	MTBSR		STRSR
+#define	MTFSF		STFSF
+#define	MTFSR		STFSR
+#define	MTREW		STREW
+#define	MTWEOF		STWEOF
+#define	mtop		stop
+#define	mt_op		st_op
+#define	mt_count	st_count
+#else
+#include <sys/mtio.h>
+#endif
 
 /* Define if status logging to sockets is desired. */
 #define TCPIP
@@ -59,11 +74,13 @@
  *	so    s     none	status output device file or socket
  *
  *	bo    b     no		BSF positions to BOF
+ *	ce    b     no		ignore close status on CLRO
+ *	eo    b     no		do not write double EOT on CLWO (VMS)
  *	fc    b     no		device does a FSF on CLRO
  *	ir    b     no		treat all read errors as EOF
  *	mf    b     no		enable multifile FSF for forward positioning
  *	nb    b     no		device cannot backspace
- *	nf    b     no		rewind and space forward to backspace file
+ *	nf    b/i   no/0	rewind and space forward to backspace file
  *	np    b     no		disable all positioning ioctls
  *	ow    b     no		backspace and overwrite EOT at append
  *	re    b     no		read at EOT returns ERR
@@ -108,7 +125,7 @@
  * with a negative file number and the driver will rewind to reestablish a
  * known position.
  *
- * The devpos structure (struct mtpos) has the following fields:
+ * The devpos structure (struct _mtpos) has the following fields:
  *
  *	int	filno		file number
  *	int	recno		record number
@@ -155,7 +172,7 @@ typedef unsigned int U_int;
 /* Tape position information (must agree with client struct).  This is input
  * by the client at open time and is only modified locally by the driver.
  */
-struct mtpos {
+struct _mtpos {
 	int	filno;			/* current file (1=first) */
 	int	recno;			/* current record (1=first) */
 	int	nfiles;			/* number of files on tape */
@@ -179,6 +196,7 @@ struct mtdev {
 	int	tapesize;		/* tape capacity (Kb) */
 	int	eofsize;		/* filemark size, bytes */
 	int	gapsize;		/* interrecord gap size, bytes */
+	int	maxbsf;			/* BSF vs rewind-FSF threshold */
 	char	density[SZ_FNAME];	/* tape density, bpi */
 	char	devtype[SZ_FNAME];	/* drive type */
 	char	tapetype[SZ_FNAME];	/* tape type */
@@ -202,7 +220,7 @@ struct mtdesc {
 	int	mtbsr, mtfsr;		/* BSR,FSR ioctl codes */
 	int	mtbsf, mtfsf;		/* BSF,FSF ioctl codes */
 	U_int	mtioctop;		/* MTIOCTOP code */
-	struct	mtpos mtpos;		/* position information */
+	struct	_mtpos mtpos;		/* position information */
 	struct	mtdev mtdev;		/* drive type information */
 	char	iodev[SZ_FNAME];	/* i/o device */
 	char	nr_device[SZ_FNAME];	/* no-rewind-on-close device */
@@ -215,55 +233,59 @@ struct mtdesc {
 #define	P_BO	 3		/* BSF positions to BOF */
 #define	P_BR	 4		/* MTBSR */
 #define	P_BS	 5		/* block size */
-#define	P_CT	 6		/* MTIOCTOP */
-#define	P_DN	 7		/* density */
-#define	P_DT	 8		/* drive type id string */
-#define	P_DV	 9		/* no rewind device */
-#define	P_FC	10		/* device does FSF on close readonly */
-#define	P_FF	11		/* MTFSF */
-#define	P_FR	12		/* MTFSR */
-#define	P_FS	13		/* filemark size, Kb */
-#define	P_IR	14		/* map read errors to EOF */
-#define	P_MF	15		/* enable multifile FSF for fwd positioning */
-#define	P_MR	16		/* max record (i/o transfer) size */
-#define	P_NB	17		/* backspace not allowed */
-#define	P_NF	18		/* rewind and space forward to posn back */
-#define	P_NP	19		/* disable file positioning */
-#define	P_OR	20		/* optimum record size */
-#define	P_OW	21		/* optimize EOT (9tk drives) */
-#define	P_RD	22		/* rewind device */
-#define	P_RE	23		/* read at EOT returns ERR */
-#define	P_RF	24		/* use record skip ioctls to skip filemarks */
-#define	P_RI	25		/* MTREW */
-#define	P_RO	26		/* rewind on every open to define position */
-#define	P_RR	27		/* rewind after close-readonly */
-#define	P_RS	28		/* interrecord gap size, bytes */
-#define	P_SE	29		/* BSF needed after read at EOT */
-#define	P_SK	30		/* skip record forward after read error */
-#define	P_SO	31		/* status output device or socket */
-#define	P_TS	32		/* tape size, Mb */
-#define	P_TT	33		/* tape type id string */
-#define	P_UE	34		/* force update of EOT (search for EOT) */
-#define	P_WC	35		/* open-write/close creates dummy EOT */
+#define	P_CE	 6		/* ignore close status on CLRO */
+#define	P_CT	 7		/* MTIOCTOP */
+#define	P_DN	 8		/* density */
+#define	P_DT	 9		/* drive type id string */
+#define	P_DV	10		/* no rewind device */
+#define	P_EO	11		/* do not write double EOT on CLWO (VMS) */
+#define	P_FC	12		/* device does FSF on close readonly */
+#define	P_FF	13		/* MTFSF */
+#define	P_FR	14		/* MTFSR */
+#define	P_FS	15		/* filemark size, Kb */
+#define	P_IR	16		/* map read errors to EOF */
+#define	P_MF	17		/* enable multifile FSF for fwd positioning */
+#define	P_MR	18		/* max record (i/o transfer) size */
+#define	P_NB	19		/* backspace not allowed */
+#define	P_NF	20		/* rewind and space forward to posn back */
+#define	P_NP	21		/* disable file positioning */
+#define	P_OR	22		/* optimum record size */
+#define	P_OW	23		/* optimize EOT (9tk drives) */
+#define	P_RD	24		/* rewind device */
+#define	P_RE	25		/* read at EOT returns ERR */
+#define	P_RF	26		/* use record skip ioctls to skip filemarks */
+#define	P_RI	27		/* MTREW */
+#define	P_RO	28		/* rewind on every open to define position */
+#define	P_RR	29		/* rewind after close-readonly */
+#define	P_RS	30		/* interrecord gap size, bytes */
+#define	P_SE	31		/* BSF needed after read at EOT */
+#define	P_SK	32		/* skip record forward after read error */
+#define	P_SO	33		/* status output device or socket */
+#define	P_TS	34		/* tape size, Mb */
+#define	P_TT	35		/* tape type id string */
+#define	P_UE	36		/* force update of EOT (search for EOT) */
+#define	P_WC	37		/* open-write/close creates dummy EOT */
 
 /* Tapecap device characteristic bitflags. */
-#define	BO	0000001		/* BSF positions to BOF */
-#define	FC	0000002		/* defines does a FSF on CLRO */
-#define	IR	0000004		/* treat all read errors as EOF */
-#define	MF	0000010		/* enable multifile FSF for fwd positioning */
-#define	NB	0000020		/* device cannot backspace */
-#define	NF	0000040		/* rewind and space forward to position back */
-#define	NP	0000100		/* disable file positioning */
-#define	OW	0000200		/* backspace and overwrite at append */
-#define	RD	0000400		/* rewind-on-close device specified */
-#define	RE	0001000		/* read at EOT can signal error */
-#define	RF	0002000		/* use BSR,FSR to space over filemarks */
-#define	RO	0004000		/* rewind on every open to define position */
-#define	RR	0010000		/* rewind after close-readonly */
-#define	SE	0020000		/* read at EOT leaves past tape mark */
-#define	SK	0040000		/* skip record forward after a read error */
-#define	UE	0100000		/* force update of EOT (search for EOT) */
-#define	WC	0200000		/* CLWR at EOF writes null file */
+#define	BO	00000001	/* BSF positions to BOF */
+#define	CE	00000002	/* ignore close status on CLRO */
+#define	EO	00000004	/* do not write double EOT on CLWO (VMS) */
+#define	FC	00000010	/* defines does a FSF on CLRO */
+#define	IR	00000020	/* treat all read errors as EOF */
+#define	MF	00000040	/* enable multifile FSF for fwd positioning */
+#define	NB	00000100	/* device cannot backspace */
+#define	NF	00000200	/* rewind and space forward to position back */
+#define	NP	00000400	/* disable file positioning */
+#define	OW	00001000	/* backspace and overwrite at append */
+#define	RD	00002000	/* rewind-on-close device specified */
+#define	RE	00004000	/* read at EOT can signal error */
+#define	RF	00010000	/* use BSR,FSR to space over filemarks */
+#define	RO	00020000	/* rewind on every open to define position */
+#define	RR	00040000	/* rewind after close-readonly */
+#define	SE	00100000	/* read at EOT leaves past tape mark */
+#define	SK	00200000	/* skip record forward after a read error */
+#define	UE	00400000	/* force update of EOT (search for EOT) */
+#define	WC	01000000	/* CLWR at EOF writes null file */
 
 /* Device characteristic codes. */
 #define	PNAME(a,b)	((((int)(a))<<8)+(int)(b))
@@ -280,10 +302,12 @@ static struct mtchar {
 	{ PNAME('b','o'), P_BO, BO, 0 },
 	{ PNAME('b','r'), P_BR, 0, 0 },
 	{ PNAME('b','s'), P_BS, 0, 0 },
+	{ PNAME('c','e'), P_CE, CE, 0 },
 	{ PNAME('c','t'), P_CT, 0, 0 },
 	{ PNAME('d','n'), P_DN, 0, 0 },
 	{ PNAME('d','t'), P_DT, 0, 0 },
 	{ PNAME('d','v'), P_DV, 0, 0 },
+	{ PNAME('e','o'), P_EO, EO, 0 },
 	{ PNAME('f','c'), P_FC, FC, 0 },
 	{ PNAME('f','f'), P_FF, 0, 0 },
 	{ PNAME('f','r'), P_FR, 0, 0 },
@@ -334,11 +358,11 @@ XINT	*chan;		/* OS channel of opened file */
 {
 	register int fd;
 	register struct	mtdesc *mp;
-	struct	mtpos *pp;
+	struct	_mtpos *pp;
 
 	/* Open the main device descriptor. */
 	mp = zmtdesc ((char *)device, *acmode, (char *)devcap,
-	    (struct mtpos *)devpos);
+	    (struct _mtpos *)devpos);
 	if (mp == NULL) {
 	    *chan = XERR;
 	    return;
@@ -466,7 +490,7 @@ XINT	*o_status;
 {
 	register int fd;
 	register struct mtdesc *mp;
-	register struct mtpos *pp;
+	register struct _mtpos *pp;
 	int	status, eof_seen, eor_seen, eot_seen;
 
 	/* Since open files are closed during error recovery and an interrupt
@@ -505,11 +529,15 @@ XINT	*o_status;
 
 	    /* Close device. */
 	    status = zmtclose (fd);
+	    if (mp->flags & CE)
+		status = 0;
 
 	    /* On some SysV systems closing a tape opened RO causes a skip
-	     * forward to BOF of the next file on the tape.
+	     * forward to BOF of the next file on the tape.  This does not
+	     * occur though when the device is closed after reading EOF on
+	     * a file.
 	     */
-	    if (mp->flags & FC)
+	    if ((mp->flags & FC) && pp->recno > 1)
 		eof_seen = 1;
 
 	} else if (pp->recno > 1) {
@@ -597,7 +625,7 @@ XINT	*o_status;
 	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
 	zmtfls (mp);
 
-	*((struct mtpos *)devpos) = *pp;
+	*((struct _mtpos *)devpos) = *pp;
 	*o_status = status ? XERR : XOK;
 	zmtfree (mp);
 }
@@ -617,7 +645,7 @@ XLONG	*offset;		/* fixed block devices only */
 {
 	register int fd = *chan, mb = (int)*maxbytes;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct mtpos *pp = &mp->mtpos;
+	register struct _mtpos *pp = &mp->mtpos;
 	int	status;
 
 	if (mp->mtdev.blksize && (mb % mp->mtdev.blksize)) {
@@ -728,7 +756,7 @@ XINT	*o_status;
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct mtpos *pp = &mp->mtpos;
+	register struct _mtpos *pp = &mp->mtpos;
 	register int flags = mp->flags;
 	int	status, eof_seen, eor_seen, eot_seen;
 
@@ -804,7 +832,7 @@ XINT	*o_status;
 	    zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
 	}
 
-	*((struct mtpos *)devpos) = *pp;
+	*((struct _mtpos *)devpos) = *pp;
 	*o_status = (status < 0) ? XERR : status;
 	zmtfls (mp);
 }
@@ -819,7 +847,7 @@ XLONG   *lvalue;
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct mtpos *pp = &mp->mtpos;
+	register struct _mtpos *pp = &mp->mtpos;
 
         switch (*param) {
         case FSTT_BLKSIZE:
@@ -867,7 +895,7 @@ XINT	*o_status;
 	int	status;
 
 	/* Open the main device descriptor. */
-	mp = zmtdesc ((char *)device, READ_ONLY, (struct mtpos *)devcap, NULL);
+	mp = zmtdesc ((char *)device, READ_ONLY, (struct _mtpos *)devcap, NULL);
 	if (mp == NULL) {
 	    *o_status = ERR;
 	    return;
@@ -1029,7 +1057,7 @@ zmtdesc (device, acmode, devcap, devpos)
 char	*device;		/* host device to be used for i/o */
 int	acmode;			/* iraf file access mode code */
 char	*devcap;		/* tapecap entry for device */
-struct	mtpos *devpos;		/* device position info (or NULL ptr) */
+struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 {
 	register struct mtdesc *mp;
 	register struct mtdev *dp;
@@ -1156,6 +1184,7 @@ struct	mtpos *devpos;		/* device position info (or NULL ptr) */
 			case P_BS:  dp->blksize = n;	break;
 			case P_FS:  dp->eofsize = n;	break;
 			case P_MR:  dp->maxrec = n;	break;
+			case P_NF:  dp->maxbsf = n;	break;
 			case P_OR:  dp->optrec = n;	break;
 			case P_RS:  dp->gapsize = n;	break;
 			case P_TS:  dp->tapesize = n;	break;
@@ -1202,7 +1231,7 @@ zmtfpos (mp, newfile)
 register struct mtdesc *mp;
 int	newfile;		/* file we want to position to */
 {
-	register struct mtpos *pp = &mp->mtpos;
+	register struct _mtpos *pp = &mp->mtpos;
 	register int flags = mp->flags;
 	int	oldfile, oldrec, maxrec;
 	char	*buf = NULL;
@@ -1228,8 +1257,11 @@ int	newfile;		/* file we want to position to */
 	}
 	zmtfls (mp);
 
-	/* Don't do anything if already positioned to desired file. */
-	if (newfile == oldfile && oldrec == 1)
+	/* Don't do anything if already positioned to desired file and no
+	 * further positioning is necessary.
+	 */
+	if (newfile == oldfile && oldrec == 1 && (!(flags & OW) ||
+	    newfile < pp->nfiles + 1 || mp->acmode == READ_ONLY))
 	    return (newfile);
 
 	/* It is necessary to move the tape.  Open the device if it has
@@ -1245,11 +1277,17 @@ int	newfile;		/* file we want to position to */
 
 	} else if (newfile <= oldfile && newfile > 0) {
 	    /* Backspace to the desired file. */
-	    if ((flags & NB) || ((flags & NF) && newfile != oldfile)) {
-		/* Device cannot backspace; must rewind and space forward. */
+	    if ((flags & NB) ||
+	       ((flags & NF) && oldfile - newfile > mp->mtdev.maxbsf)) {
+
+		/* Device cannot backspace or is slow to backspace; must
+		 * rewind and space forward.
+		 */
 		if (zmtrew(fd) < 0)
 		    return (ERR);
 		oldfile = oldrec = 1;
+		zmtdbg1 (mp, "file = %d", oldfile);
+		zmtfls (mp);
 		goto fwd;
 	    } else if (flags & BO) {
 		/* BSF positions to BOF. */
@@ -1263,9 +1301,13 @@ int	newfile;		/* file we want to position to */
 		    return (ERR);
 	    }
 
-	} else if (newfile < 0 && (pp->nfiles > 0 && oldfile == pp->nfiles+1)) {
+	} else if (newfile < 0 && !(flags & UE) &&
+	    (pp->nfiles > 0 && oldfile == pp->nfiles+1)) {
+
+	    /* Already at EOT. */
 	    newfile = oldfile;
-	    /* already at EOT */
+	    if ((flags & OW) && mp->acmode == WRITE_ONLY)
+		goto oweot;
 
 	} else {
 	    /* Space forward to desired file or EOT.
@@ -1285,6 +1327,10 @@ fwd:
 	    if (newfile > oldfile && (flags & MF)) {
 		if (zmtfsf (fd, newfile - oldfile) < 0)
 		    return (ERR);
+
+		oldfile = newfile;
+		if ((flags & OW) && mp->acmode == WRITE_ONLY)
+		    goto oweot;
 		else
 		    goto done;
 	    }
@@ -1349,7 +1395,7 @@ fwd:
 				goto err;
 			}
 		    }
-
+oweot:
 		    /* On some devices, e.g., 1/2 inch reel tape, the space
 		     * between the two filemarks marking EOT can be large and
 		     * we can get more data on the tape if we back up over the
@@ -1358,7 +1404,9 @@ fwd:
 		     * before the second one.  The OW (overwrite) capability
 		     * enables this.
 		     */
-		    if (flags & OW && !(flags & NB)) {
+		    if ((flags & OW) && !(flags & NB) &&
+			mp->acmode == WRITE_ONLY) {
+
 			if (flags & RF) {
 			    status = zmtbsr (fd, 1);
 			    status = (zmtfsr (fd, 1) < 0) ? ERR : status;
@@ -1385,6 +1433,8 @@ err:			free (buf);
 
 		oldfile++;
 		oldrec = 1;
+		zmtdbg1 (mp, "file = %d", oldfile);
+		zmtfls (mp);
 	    }
 
 	    /* Set newfile to the file we actually ended up positioned to. */
@@ -1539,7 +1589,7 @@ int	nrecords;
  */
 
 #ifdef TCPIP
-static	PFI sigpipe = NULL;
+static	SIGFUNC sigpipe = NULL;
 static	int nsockets = 0;
 static	int s_port[MAXDEV];
 static	FILE *s_fp[MAXDEV];
@@ -1574,7 +1624,7 @@ struct	mtdesc *mp;
 	 */
         if (mp->mtdev.statusout) {
 	    if (nsockets > 0 && !sigpipe)
-		sigpipe = (PFI) signal (SIGPIPE, SIG_IGN);
+		sigpipe = (SIGFUNC) signal (SIGPIPE, SIG_IGN);
 	    return;
 	}
 
@@ -1657,7 +1707,7 @@ struct	mtdesc *mp;
 	/* Ignore signal generated if server goes away unexpectedly. */
 	nsockets++;
 	if (!sigpipe)
-	    sigpipe = (PFI) signal (SIGPIPE, SIG_IGN);
+	    sigpipe = signal (SIGPIPE, SIG_IGN);
 
 	mp->mtdev.statusout = fp;
 	zmtdbg1 (mp, "iodev = %s", mp->iodev);
@@ -1702,7 +1752,7 @@ struct	mtdesc *mp;
 #else
 		signal (SIGPIPE, sigpipe);
 #endif
-		sigpipe = NULL;
+		sigpipe = (SIGFUNC) NULL;
 		nsockets = 0;
 	    }
 	}

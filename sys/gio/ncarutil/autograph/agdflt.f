@@ -57,7 +57,10 @@ C type character.
 C
       COMMON /AGOCHP/ CHS1,CHS2
 C
-      CHARACTER*504 CHS1,CHS2
+c+noao
+c     CHARACTER*504 CHS1,CHS2
+      CHARACTER*500 CHS1,CHS2
+c-noao
 C
 C The following common blocks contain variables which are required for
 C the character-storage-and-retrieval scheme of AUTOGRAPH.

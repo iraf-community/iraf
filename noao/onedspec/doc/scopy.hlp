@@ -1,4 +1,4 @@
-.help scopy Mar92 noao.onedspec
+.help scopy Mar93 noao.onedspec
 .ih
 NAME
 scopy -- Select and copy spectra
@@ -41,8 +41,15 @@ optional step size may be given by 'x' followed by a number.
 See \fBxtools.ranges\fR for more information.  If the first character
 is "!" then the apertures/beams not in the list are selected.  Note
 that a "!" in either of the lists complements the intersection of the
-two lists.  For longslit input spectra the aperture numbers and beam
-numbers select the lines or columns to be extracted.
+two lists.  For longslit input spectra the aperture numbers
+selects the lines or columns to be extracted.  For 3D Fabry-Perot
+spectra the aperture numbers select the first spatial axis.
+.le
+.ls bands = ""
+List of bands in 3D multispec.
+For 3D spatial spectra the band parameter applies to the second
+spatial axis.
+The null list selects all bands.  The syntax is as described above.
 .le
 .ls apmodulus = 0
 Modulus to be applied to the input aperture numbers before matching against
@@ -101,14 +108,16 @@ Print a record of each aperture copied?
 DESCRIPTION
 \fBScopy\fR selects regions of spectra from an input list of spectral
 images and copies them to output images.  This task can be used to extract
-aperture spectra from long slit images and to select, reorganize, merge,
-renumber, pack, and unpack spectra in many ways.  Below is a list of some
-of the uses and many examples are given in the EXAMPLES section.
+aperture spectra from long slit and Fabry-Perot images and to select,
+reorganize, merge, renumber, pack, and unpack spectra in many ways.  Below
+is a list of some of the uses and many examples are given in the EXAMPLES
+section.
 
 .nf
    o Pack many spectra into individual images into a single image
    o Unpack images with multiple spectra into separate images
    o Extract a set of lines or columns from long slit spectra
+   o Extract a set of spatial positions from Fabry-Perot spectra
    o Extract specific wavelength regions
    o Select a subset of spectra to create a new image
    o Merge a subset of spectra into an existing image
@@ -124,14 +133,15 @@ dimensional spectra.  One dimensional spectra may be stored in
 individual one dimensional images or as lines in two (or three)
 dimensional images.  The one dimensional spectra are identified by
 an aperture number, which must be unique within an image, and a beam number.
-Two dimensional long slit spectra are treated, for the purpose of this
-task, as a collection of spectra with dispersion either along the image
-lines or columns as specified by the DISPAXIS image header parameter
-or the \fIdispaxis\fR package parameter.  The aperture number and beam
-number are defined by the line or column.  A number of adjacent
-lines or columns, specified by the \fInsum\fR package parameter, will be summed
-to form an aperture spectrum.  If the number is odd then the
-aperture number refers to the middle and if it is even it refers to the
+Two dimensional long slit and three dimensional Fabry-Perot spectra are
+treated, for the purpose of this
+task, as a collection of spectra with dispersion either along any axis
+specified by the DISPAXIS image header parameter
+or the \fIdispaxis\fR package parameter.  The aperture and band
+parameters specify a spatial position.  A number of adjacent
+lines, columns, and bands, specified by the \fInsum\fR package parameter,
+will be summed to form an aperture spectrum.  If number is odd then the
+aperture/band number refers to the middle and if it is even it refers to the
 lower of the two middle lines or columns.
 
 In the case of many spectra each stored in separate one dimensional
@@ -174,11 +184,11 @@ as in the original spectrum.  The reinterpolation is done in either
 linear or log-linear dispersion.  The non-linear dispersion functions
 are interpolated to a linear dispersion.
 
-Using \fBscopy\fR with long slit images provides a quick and simple type of
-extraction as opposed to using the \fBapextract\fR package.  When summing
-it is often desired to start each aperture after the number of lines
-summed.  To do this specify a step size in the aperture list.  For example
-to extract columns 3 to 23 summing every 5 columns you would use an
+Using \fBscopy\fR with long slit or Fabry-Perot images provides a quick and
+simple type of extraction as opposed to using the \fBapextract\fR package.
+When summing it is often desired to start each aperture after the number of
+lines summed.  To do this specify a step size in the aperture/band list.  For
+example to extract columns 3 to 23 summing every 5 columns you would use an
 aperture list of "3-23x5" and an \fInsum\fR of 5.  If you do not use the
 step in the aperture list you would extract the sum of columns 1 to 5, then
 columns 2 to 6, and so on.
@@ -255,8 +265,8 @@ EXAMPLES
 Because there are so many possiblities there are many examples.  To
 help find examples close to those of interest they are divided into
 three sections; examples involving standard multispec images only, examples
-with onedspec format images, and examples with long slit images.
-In the examples the verbose flag is set to yes and the output is
+with onedspec format images, and examples with long slit and Fabry-Perot
+images.  In the examples the verbose flag is set to yes and the output is
 shown.
 
 I.   MULTISPEC IMAGES
@@ -422,7 +432,7 @@ II.  ONEDSPEC IMAGES
 III. LONG SLIT IMAGES
 
 To define the dispersion axis either the image header parameter DISPAXIS
-must be set (using HEDIT for example) or a the task \fIdispaxis\fR
+must be set (using HEDIT for example) or a the package \fIdispaxis\fR
 parameter must be set.  In these examples the output is the default
 multispec format.
 
@@ -445,7 +455,7 @@ multispec format.
 .fi
 
 3.  To extract the sum of 10 columns centered on column 250 from a set
-of images:
+of 2D images:
 
 .nf
 	cl> nsum = 10
@@ -457,7 +467,7 @@ of images:
 .fi
 
 4.  To extract the sum of 10 columns centered on column 250 from a set of
-images and merge them into a single, renumbered output image:
+2D images and merge them into a single, renumbered output image:
 
 .nf
 	cl> nsum = 10
@@ -467,12 +477,56 @@ images and merge them into a single, renumbered output image:
 	longslit3[250]  -->  c250[3]
 	...
 .fi
+
+IV. FABRY-PEROT IMAGES
+
+To define the dispersion axis either the image header parameter DISPAXIS
+must be set (using HEDIT for example) or a the package \fIdispaxis\fR
+parameter must be set.  In these examples the output is the default
+multispec format.
+
+1.  To extract a spectrum from the spatial position (250,250) where
+dispaxis=3:
+
+.nf
+	cl> scopy fp1 a250 aperture=250 band=250
+	longslit1[250]  -->  a250[250]
+.fi
+
+2.  To sum and extract every set of 10 lines and bands (dispaxis=1):
+
+.nf
+	cl> nsum = "10"
+	cl> scopy fp1 sum10 apertures=5-500x10 bands=5-500x10
+	longslit1[5]  -->  sum10[5]
+	longslit1[15]  -->  sum10[15]
+	longslit1[25]  -->  sum10[25]
+	...
+.fi
+
+3.  To extract the sum of 10 columns and 20 lines centered on column 250 and
+line 100 from a set of 3D images with dispaxis=3:
+
+.nf
+	cl> nsum = "10 20"
+	cl> scopy longslit* %longslit%c250.%* aperture=250 band=100
+	longslit1[250]  -->  c250.1[250]
+	longslit2[250]  -->  c250.2[250]
+	longslit3[250]  -->  c250.3[250]
+	...
+.fi
 .ih
 REVISIONS
+.ls SCOPY V2.10.3
+Additional support for 3D multispec/equispec or spatial spectra has been
+added.  The "bands" parameter allows selecting specific bands and
+the onedspec output format creates separate images for each selected
+aperture and band.
+.le
 .ls SCOPY V2.10
 This task is new.
 .le
 .ih
 SEE ALSO
-ranges, sarith, imcopy, dispcor
+ranges, sarith, imcopy, dispcor, specshift
 .endhelp

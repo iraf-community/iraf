@@ -17,7 +17,7 @@
 .sp .5v
 .in -2
 ..
-.ND April 1992
+.ND February 1993
 .TL
 Guide to the Slit Spectra Reduction Task DOECSLIT
 .AU
@@ -175,7 +175,11 @@ with a ".ec" extension added.
 Spectra and Data Files
 .LP
 The basic input consists of echelle slit object, standard star, and arc
-calibration spectra stored as IRAF images.  The raw CCD images must be
+calibration spectra stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must be
 processed to remove overscan, bias, dark count, and flat field effects.
 This is generally done using the \fBccdred\fR package.  Flat fields which
 are not contaminated by low counts between the apertures may be prepared
@@ -296,7 +300,7 @@ objects =               List of object spectra
 
 (readnoi=           0.) Read out noise sigma (photons)
 (gain   =           1.) Photon gain (photons/data number)
-(dispaxi=  )_.dispaxis) Dispersion axis (1=along lines, 2=along columns)
+(datamax=        INDEF) Max data value / cosmic ray threshold
 (norders=           10) Number of orders
 (width  =           5.) Width of profiles (pixels)
 
@@ -513,7 +517,7 @@ PACKAGE = echelle
 (usigma =           3.) Upper rejection threshold
 
                                 -- ARC DISPERSION FUNCTION PARAMETERS --
-(coordli= linelist$thorium.dat) Line list
+(coordli= linelist$thar.dat) Line list
 (match  =           1.) Line list matching limit in Angstroms
 (fwidth =           4.) Arc line widths in pixels
 (cradius=          10.) Centering radius in pixels
@@ -612,7 +616,7 @@ retrace each observation.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBsparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-\fBdispaxis\fR parameter if not defined in the image header.  The default
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
 line or column for finding the object position on the slit and the number
 of image lines or columns to sum are set by the \f(CWline\fR and \f(CWnsum\fR
 parameters.  A line of INDEF (the default) selects the middle of the
@@ -981,13 +985,18 @@ photon Poisson statistics and the data number statistics.  Image header
 keywords (case insensitive) may be specified to obtain the values from the
 image header.
 .LE
-dispaxis = ")_.dispaxis" (apextract)
+datamax = INDEF (apsum.saturation)
 .LS
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the standard star or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .LE
 norders = 10 (apfind)
 .LS
@@ -1023,7 +1032,8 @@ clean = no (apsum)
 .LS
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
-implies variance weighted extraction.
+implies variance weighted extraction.  In addition the datamax parameters
+can be useful.
 .LE
 trace = yes (non-quicklook mode only) (aptrace)
 .LS
@@ -1222,7 +1232,12 @@ estimated sigma of a pixel, for cleaning.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
-coordlist = "linelist$thorium.dat" (ecidentify)
+threshold = 10. (identify/reidentify)
+.LS
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.LE
+coordlist = "linelist$thar.dat" (ecidentify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelist$".
@@ -1393,6 +1408,14 @@ the calibrated spectrum will be in units of F-nu.
 .ce
 PACKAGE PARAMETERS
 
+dispaxis = 2
+.LS
+Default dispersion axis.  The dispersion axis is 1 for dispersion
+running along image lines and 2 for dispersion running along image
+columns.  If the image header parameter DISPAXIS is defined it has
+precedence over this parameter.  The default value defers to the
+package parameter of the same name.
+.LE
 extinction = "onedstds$kpnoextinct.dat" (standard, sensfunc, calibrate)
 .LS
 Extinction file for a site.  There are two extinction files in the
@@ -1446,3 +1469,11 @@ If specified metacode plots are recorded in this file for later review.
 Since plot information can become large this should be used only if
 really desired.
 .LE
+
+.ce
+ENVIRONMENT PARAMETERS
+.LP
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".

@@ -1,82 +1,81 @@
-# ERF -- Numerically integrate a Gaussian function from xin-0.5 to xin+0.5
-# using Simpson's 1/3 rule. Also provide a first derivative of the integral
-# with respect to x0 and beta. The Gaussian function is shown below.
+define	NGL	4
+
+# DAOERF -- Numerically integrate a Gaussian function from xin-0.5 to xin+0.5
+# using 4 point Gauss-Legendre integration. Beta is the half-width at
+# half-maximum which is equal to 1.17741 * sigma. The Gaussian function is
+# shown below.
 #
 #      erf = exp (-0.5 *((x - x0) / beta) ** 2))
 #
-# The number of intervals required to end up with an error less than alpha
-# is greater than
+#                          or
 #
-#      fourth root of ((4th derivative of erf w.r.t. x) / (180. * alpha))
+#      erf = exp (-0.6931472 * [(x - xo) / beta] ** 2)
 #
-# Here alpha = 0.00005. N, the number of intervals, must be an even number
-# since the number of nodes, which equals the number of intervals plus one,
-# must be odd.
+# Also provide the first derivative of the integral with respect to xo and beta.
 
-real procedure erf (xin, x0, beta, dfdx0, dfdbet)
+real procedure daoerf (xin, x0, beta, dfdx0, dfdbet)
 
 real	xin		# the input value
 real	x0		# position of Gaussian peak
-real	beta		# width of the Gaussian
+real	beta		# sigma of the Gaussian
 real	dfdx0		# derivative of Gaussian wrt x0
 real	dfdbet		# derivative of Gaussian wrt beta
 
-int	i, n
-real	betasq, x, f, dx, deltax, dxsq, erfval, fwt
+int	i, npt
+real	betasq, deltax, erfval, xsq, f, x, wf
+real	dx[NGL,NGL], wt[NGL,NGL]
+data	dx / 0.0,         0.0,        0.0,        0.0,
+            -0.28867513,  0.28867513, 0.0,        0.0,
+	    -0.38729833,  0.0,        0.38729833, 0.0,
+            -0.43056816, -0.16999052, 0.16999052, 0.43056816 /
+data	wt / 1.0,         0.0,        0.0,        0.0,
+	     0.5,         0.5,        0.0,        0.0,
+	     0.27777778,  0.44444444, 0.27777778, 0.0,
+             0.17392742,  0.32607258, 0.32607258, 0.17392742 /
 
 begin
 	# Compute some constants.
 	betasq = beta ** 2
+	deltax = xin - x0
 
-	# Estimate the number of intervals required by evaluating the fourth
-	# derivative of the Gaussian at xin.
+	# Initialize.
+	erfval = 0.0
+	dfdx0 = 0.0
+	dfdbet = 0.0
 
-	x = ((xin - x0) / beta) ** 2
-	f = exp (-0.5 * x)
-	n = max (2, int (3.247 * ((f * abs (x * (x - 6.) + 3. )) ** 0.25) /
-	    beta) + 1)
-	if (mod (n, 2) != 0)
-	    n = n + 1
-	dx = 1. / real (n)
+	xsq = deltax ** 2
+	f = xsq / betasq
+	if (f > 34.0)
+	    return (erfval)
 
-	# Star with the lower endpoint.
-
-	deltax = xin - x0 - 0.5
-	dxsq = deltax ** 2
-	f = exp (-0.5 * dxsq / betasq)
-	erfval = f
-	dfdx0 = f * deltax
-	dfdbet = f * dxsq
-
-	# Now include the end points of each subinterval except the last one.
-	# If it is an add-numbered subinterval, weight = 4. If even, weight
-	# = 2.0.
-
-	do i = 1, n - 1 {
-	    deltax = deltax + dx
-	    dxsq = deltax ** 2
-	    f = exp (-0.5 * dxsq / betasq)
-	    fwt = f * 2. * real (1 + mod (i, 2))
-	    erfval = erfval + fwt
-	    dfdx0 = dfdx0 + deltax * fwt
-	    dfdbet = dfdbet + dxsq * fwt
+	f = exp (-0.6931472 * f)
+	if (f >= 0.046) {
+	    npt = 4
+	} else if (f >= 0.0022) {
+	    npt = 3
+	} else if (f >= 0.0001) {
+	    npt = 2
+	} else if (f >= 1.0e-10) {
+	    erfval = f
+	    dfdx0 = 1.3862944 * deltax * f / betasq
+	    dfdbet = 1.3862944 * xsq * f / (betasq * beta)
+	    return (erfval)
+	} else {
+	    return (erfval)
 	}
 
-	# Now add the upper end point (weight = 1.0) and multiply by dx/3.
+	do i = 1, npt {
+	    x = deltax + dx[i,npt]
+	    xsq = x ** 2
+	    f = exp (-0.6931472 * xsq / betasq)
+	    wf = wt[i,npt] * f
+	    erfval = erfval + wf
+	    dfdx0 = dfdx0 + x * wf
+	    dfdbet = dfdbet + xsq * wf
+	}
 
-	deltax = deltax + dx
-	dxsq = deltax ** 2
-	f = exp (-0.5 * dxsq / betasq)
-	dx = dx / 3.
-	erfval = dx * (erfval + f)
-	if (erfval < 1.e-19)
-	    erfval = 0.0
-	dfdx0 = dx * (dfdx0 + deltax * f) / betasq
-	if (abs (dfdx0) < 1.e-19)
-	    dfdx0 = 0.0
-	dfdbet = dx * (dfdbet + f * dxsq) / (betasq * beta)
-	if (abs (dfdbet) < 1.e-19)
-	    dfdbet = 0.0
+	dfdx0 = 1.3862944 * dfdx0 / betasq
+	dfdbet = 1.3862944 * dfdbet / (betasq * beta)
 
 	return (erfval)
 end

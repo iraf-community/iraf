@@ -22,7 +22,7 @@ task	do3fiber	= "kpnocoude$do3fiber.cl"
 task	params		= "kpnocoude$params.par"
 
 task	proc		= "srcfibers$proc.cl"
-task	response	= "srcfibers$response.cl"
+task	fibresponse	= "srcfibers$fibresponse.cl"
 task	arcrefs		= "srcfibers$arcrefs.cl"
 task	doarcs		= "srcfibers$doarcs.cl"
 task	skysub		= "srcfibers$skysub.cl"
@@ -32,7 +32,7 @@ task	listonly	= "srcfibers$listonly.cl"
 task	mkfibers	= "srcfibers$mkfibers.cl"
 task	apscript	= "srcfibers$x_apextract.e"
 
-task	msresp1d	= "msred$msresp1d.cl"
+task	msresp1d	= "specred$msresp1d.cl"
 
 # Onedspec tasks
 task	continuum,
@@ -43,8 +43,10 @@ task	continuum,
 	sapertures,
 	sarith,
 	scombine,
+	sflip,
 	slist,
 	specplot,
+	specshift,
 	splot		= "onedspec$x_onedspec.e"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
@@ -61,6 +63,8 @@ task	calibrate,
 task	apall,
 	apedit,
 	apfind,
+	apflatten,
+	apnormalize,
 	aprecenter,
 	apresize,
 	apsum,
@@ -68,6 +72,13 @@ task	apall,
 task	apdefault	= "apextract$apdefault.par"
 task	apparams	= "apextract$apparams.par"
 task	apall1		= "apextract$apall1.par"
+task	apflat1		= "apextract$apflat1.par"
+task	apnorm1		= "apextract$apnorm1.par"
+
+# Longslit tasks
+task	illumination,
+	response	= "twodspec$longslit/x_longslit.e"
+task	background	= "generic$background.cl"
 
 # Astutil tasks
 task	setairmass,
@@ -77,8 +88,8 @@ task	setairmass,
 task	demos		= "demos$demos.cl"
 
 # Hide tasks from the user
-hidetask apparams, apall1, dispcor1, sparams
+hidetask apparams, apall1, apflat1, apnorm1, dispcor1, sparams
 hidetask mkfibers, params
-hidetask apscript, proc, batch, arcrefs, doarcs, getspec, listonly, response
+hidetask apscript, proc, batch, arcrefs, doarcs, getspec, listonly, fibresponse
 
 clbye

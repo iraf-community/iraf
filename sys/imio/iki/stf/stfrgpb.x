@@ -21,11 +21,11 @@ int	group			# group to be accessed
 int	acmode			# image access mode
 real	datamin, datamax	# min,max pixel values from GPB
 
-#int	i
-#char	pname[SZ_KEYWORD]
-
-long	offset
-bool	newgroup
+real	rval
+double	dval
+short	sval
+long	lval, offset
+bool	bval, newgroup
 pointer	sp, stf, gpb, lbuf, pp
 int	pfd, pn, sz_param, sz_gpb
 errchk	imaddb, imadds, imaddl, imaddr, imaddd, imastr
@@ -132,16 +132,20 @@ begin
 	    if (acmode != NEW_COPY || imaccf (im, P_PTYPE(pp)) == NO) {
 		switch (P_SPPTYPE(pp)) {
 		case TY_BOOL:
-		    call imaddb (im, P_PTYPE(pp), Memc[gpb+offset])
-		# changed case for int to short and long--dlb 11/3/87
+		    call amovc (Memc[gpb+offset], bval, SZ_BOOL)
+		    call imaddb (im, P_PTYPE(pp), bval)
 		case TY_SHORT:
-		    call imadds (im, P_PTYPE(pp), Memc[gpb+offset])
+		    call amovc (Memc[gpb+offset], sval, SZ_SHORT)
+		    call imadds (im, P_PTYPE(pp), sval)
 		case TY_LONG:
-		    call imaddl (im, P_PTYPE(pp), Memc[gpb+offset])
+		    call amovc (Memc[gpb+offset], lval, SZ_LONG)
+		    call imaddl (im, P_PTYPE(pp), lval)
 		case TY_REAL:
-		    call imaddr (im, P_PTYPE(pp), Memc[gpb+offset])
+		    call amovc (Memc[gpb+offset], rval, SZ_REAL)
+		    call imaddr (im, P_PTYPE(pp), rval)
 		case TY_DOUBLE:
-		    call imaddd (im, P_PTYPE(pp), Memc[gpb+offset])
+		    call amovc (Memc[gpb+offset], dval, SZ_DOUBLE)
+		    call imaddd (im, P_PTYPE(pp), dval)
 		case TY_CHAR:
 		    call chrupk (Memc[gpb+offset], 1, Memc[lbuf], 1, P_LEN(pp))
 		    Memc[lbuf+P_LEN(pp)] = EOS
@@ -153,21 +157,6 @@ begin
 
 	    offset = offset + sz_param
 	}
-
-	# If writing to a new element of a group format image, in which case
-	# the GPB has been zeroed, provide the default pixel WCS.
-
-#	if (newgroup)
-#	    do i = 1, IM_NDIM(im) {
-#		call sprintf (pname, SZ_KEYWORD, "CTYPE%d")
-#		    call pargi (i)
-#		call impstr (im, pname, "PIXEL")
-#
-#		call sprintf (pname,  SZ_KEYWORD, "CD%d_%d")
-#		    call pargi (i)
-#		    call pargi (i)
-#		call imputd (im, pname, 1.0D0)
-#	    }
 
 minmax_
 	# Return DATAMIN, DATAMAX.  This is done by searching the user area so

@@ -14,7 +14,7 @@ real	wx, wy		# object coordinates
 
 int	ier, fier
 pointer	psf, nse
-real	datamin, datamax, dmin, dmax
+real	datamin, datamax, dmin, dmax, threshold
 int	apfbuf(), apsfradgauss(), apsfelgauss(), apsfmoments()
 
 begin
@@ -23,6 +23,8 @@ begin
 	nse = AP_NOISE(ap)
 	AP_PFXCUR(psf) = wx
 	AP_PFYCUR(psf) = wy
+	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf))
+	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf))
 
 	# Fetch the buffer of pixels.
 	ier = apfbuf (ap, im, wx, wy)
@@ -71,15 +73,16 @@ begin
 	        dmin, dmax)
 	    dmin = max (dmin, datamin)
 	    dmax = min (dmax, datamax)
+	    threshold = 0.0
 
 	    if (AP_POSITIVE(ap) == YES)
 	        fier = apsfmoments (Memr[AP_PSFPIX(psf)], AP_PNX(psf),
-		    AP_PNY(psf), dmin + AP_THRESHOLD(nse), dmax,
+		    AP_PNY(psf), dmin + threshold, dmax,
 		    AP_POSITIVE(ap), Memr[AP_PPARS(psf)], Memr[AP_PPERRS(psf)],
 		    AP_PSFNPARS(psf))
 	    else
 	        fier = apsfmoments (Memr[AP_PSFPIX(psf)], AP_PNX(psf),
-		    AP_PNY(psf), dmax - AP_THRESHOLD(nse), dmin,
+		    AP_PNY(psf), dmax - threshold, dmin,
 		    AP_POSITIVE(ap), Memr[AP_PPARS(psf)],
 		    Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
 

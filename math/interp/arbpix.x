@@ -35,7 +35,7 @@ begin
 	# count bad points
 	badnc = 0
 	do i = 1,n
-	    if(datain[i] == INDEF)
+	    if (IS_INDEFR (datain[i]))
 		badnc = badnc + 1
 
 	# return if all bad or all good
@@ -44,7 +44,7 @@ begin
 
 	
 	# find first good point
-	for (ka = 1; datain[ka] == INDEF; ka = ka + 1)
+	for (ka = 1;  IS_INDEFR (datain[ka]);  ka = ka + 1)
 	    ;
 
 	# bad points below first good point are set at first value
@@ -52,7 +52,7 @@ begin
 	    dataout[k] = datain[ka]
 	
 	# find last good point
-	for (kb = n; datain[kb] == INDEF; kb = kb - 1)
+	for (kb = n;  IS_INDEFR (datain[kb]);  kb = kb - 1)
 	    ;
 
 	# bad points beyond last good point get set at last value
@@ -61,7 +61,7 @@ begin
 
 	# load the other points interpolating the bad points as needed
 	do k = ka, kb {
-	    if (datain[k] != INDEF)		# good point
+	    if (!IS_INDEFR (datain[k]))		# good point
 		dataout[k] = datain[k]
 
 	    else 		# bad point -- generate interpolated value
@@ -91,8 +91,8 @@ begin
 	#    using static storage - i.e. the old internal values survive.
 	# This avoids reloading of temporary arrays if
 	#    there are consequetive bad points.
-	if (y[k-1] != INDEF) { 
 
+	if (!IS_INDEFR (y[k-1])) {
 	    # set number of good points needed on each side of bad point
 	    switch (terptype) {
 	    case IT_NEAREST :
@@ -110,13 +110,13 @@ begin
 	    # search down
 	    pd = 0
 	    for (j = k-1; j >= 1 && pd < pns; j = j-1)
-		if (y[j] != INDEF)
+		if (!IS_INDEFR (y[j]))
 		    pd = pd + 1
 
 	    # load temp. arrays for values below our indef.
 	    tk = 0
 	    for(jj = j + 1; jj < k; jj = jj + 1)
-		if (y[jj] != INDEF) {
+		if (!IS_INDEFR (y[jj])) {
 		    tk = tk + 1
 		    td[tk] = y[jj]
 		    tx[tk] = jj
@@ -125,7 +125,7 @@ begin
 	     # search and load up from indef.
 	     pu = 0
 	     for (j = k + 1; j <= n && pu < pns; j = j + 1)
-		if (y[j] != INDEF) {
+		if (!IS_INDEFR (y[j])) {
 		     pu = pu + 1
 		     tk = tk + 1
 		     td[tk] = y[j]

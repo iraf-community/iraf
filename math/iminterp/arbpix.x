@@ -30,7 +30,7 @@ begin
 	# Count bad points.
 	badnc = 0
 	do i = 1, npts
-	    if (IS_INDEF(datain[i]))
+	    if (IS_INDEFR(datain[i]))
 		badnc = badnc + 1
 
 	# Return an array of INDEFS if all points bad.
@@ -53,7 +53,7 @@ begin
 	}
 	
 	# Find the first good point.
-	for (ka = 1; datain[ka] == INDEFR; ka = ka + 1)
+	for (ka = 1; IS_INDEFR (datain[ka]); ka = ka + 1)
 	    ;
 
 	# Bad points below first good point are set at first good value.
@@ -61,7 +61,7 @@ begin
 	    dataout[k] = datain[ka]
 	
 	# Find last good point.
-	for (kb = npts; datain[kb] == INDEFR; kb = kb - 1)
+	for (kb = npts; IS_INDEFR (datain[kb]); kb = kb - 1)
 	    ;
 
 	# Bad points beyond last good point get set at good last value.
@@ -71,7 +71,7 @@ begin
 	# Load the other points interpolating the bad points as needed.
 	do k = ka, kb {
 
-	    if (IS_INDEF(datain[k]))
+	    if (IS_INDEFR(datain[k]))
 		dataout[k] = ii_badpix (datain[ka], kb - ka + 1, k - ka + 1,
 		    interp_type)
 	    else
@@ -102,7 +102,7 @@ begin
 
 	# The following test is done to improve speed.
 
-	if (! IS_INDEF(datain[index-1])) { 
+	if (! IS_INDEFR(datain[index-1])) { 
 
 	    # Set number of good points needed on each side of bad point.
 	    switch (interp_type) {
@@ -121,13 +121,13 @@ begin
 	    # Search down.
 	    pdown = 0
 	    for (j = index - 1; j >= 1 && pdown < ngood; j = j - 1)
-		if (! IS_INDEF(datain[j]))
+		if (! IS_INDEFR(datain[j]))
 		    pdown = pdown + 1
 
 	    # Load temporary arrays for values below our INDEF.
 	    npts = 0
 	    for(jj = j + 1; jj < index; jj = jj + 1)
-		if (! IS_INDEF(datain[jj])) {
+		if (! IS_INDEFR(datain[jj])) {
 		    npts = npts + 1
 		    tempdata[npts] = datain[jj]
 		    tempx[npts] = jj
@@ -136,7 +136,7 @@ begin
 	     # Search and load up from INDEF.
 	     pup = 0
 	     for (j = index + 1; j <= npix && pup < ngood; j = j + 1)
-		if (! IS_INDEF(datain[j])) {
+		if (! IS_INDEFR(datain[j])) {
 		     pup = pup + 1
 		     npts = npts + 1
 		     tempdata[npts] = datain[j]
@@ -239,7 +239,7 @@ real	w1, u1, v1, u1a, v1a
 begin
 	do i = 1, npts {
 
-	    if (! IS_INDEF(datain[i])) {
+	    if (! IS_INDEFR(datain[i])) {
 		dataout[i] = datain[i]
 		next
 	    }
@@ -269,7 +269,7 @@ begin
 		k = xc - j
 		if (k >= 1) {
 		    d = datain[k]
-		    if (! IS_INDEF(d)) {
+		    if (! IS_INDEFR(d)) {
 			z = 1. / (min_bdx + j)
 			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
 			z = 1. / (-min_bdx + j)
@@ -281,7 +281,7 @@ begin
 		k = xc + j
 		if (k <= npts) {
 		    d = datain[k]
-		    if (! IS_INDEF(d)) {
+		    if (! IS_INDEFR(d)) {
 			z = 1. / (min_bdx - j)
 			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
 			z = 1. / (-min_bdx - j)
@@ -301,7 +301,7 @@ begin
 		    k = xc - j
 		    if (k >= 1) {
 			d = datain[k]
-			if (!IS_INDEF(d)) {
+			if (!IS_INDEFR(d)) {
 			    dataout[i] = d
 			    break
 			}
@@ -309,7 +309,7 @@ begin
 		    k = xc + j
 		    if (k <= npts) {
 			d = datain[k]
-			if (!IS_INDEF(d)) {
+			if (!IS_INDEFR(d)) {
 			    dataout[i] = d
 			    break
 			}

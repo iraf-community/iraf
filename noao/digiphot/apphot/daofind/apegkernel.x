@@ -1,8 +1,7 @@
-
 include <math.h>
+include "../lib/find.h"
 
-define	FWHM_TO_SIGMA	0.42467
-define	RMIN		2.01
+# Set up the gaussian fitting structure. 
 
 # AP_EGPARAMS -- Calculate the parameters of the elliptical Gaussian needed
 # to compute the kernel.
@@ -39,117 +38,95 @@ begin
 	    } else
 		call error (0, "AP_EGPARAMS: Cannot make 1D Gaussian.")
 	    f = nsigma ** 2 / 2.
-	    nx = 2. * sigma * nsigma * abs (cost) + 1.
-	    ny = 2. * sigma * nsigma * abs (sint) + 1.
+	    nx = 2 * int (max (sigma * nsigma * abs (cost), RMIN)) + 1
+	    ny = 2 * int (max (sigma * nsigma * abs (sint), RMIN)) + 1
 	} else {
 	    a = cost ** 2 / sx2 + sint ** 2 / sy2
 	    b = 2. * (1.0 / sx2 - 1.0 / sy2) * cost * sint
 	    c = sint ** 2 / sx2 + cost ** 2 / sy2
 	    discrim = b ** 2 - 4. * a * c
 	    f = nsigma ** 2 / 2.
-	    nx = 2. * sqrt (-8. * c * f / discrim) + 1.
-	    ny = 2. * sqrt (-8. * a * f / discrim) + 1.
+	    nx = 2 * int (max (sqrt (-8. * c * f / discrim), RMIN)) + 1
+	    ny = 2 * int (max (sqrt (-8. * a * f / discrim), RMIN)) + 1
 	}
-
-	# Correct the f factor if necessary
-
-	# Force the kernel to the nearest odd integer.
-	nx = max (5, nx)
-	if (mod (nx, 2) == 0)
-	    nx = nx + 1
-	ny = max (5, ny)
-	if (mod (ny, 2) == 0)
-	    ny = ny + 1
 end
 
 
 # AP_EGKERNEL -- Compute the elliptical Gaussian kernel.
 
-real procedure ap_egkernel (kernel, skip, nx, ny, a, b, c, f)
+real procedure ap_egkernel (gkernel, ngkernel, dkernel, skip, nx, ny, gsums, a,
+	b, c, f)
 
-real	kernel[nx,ny]		# Gaussian kernel
-int	skip[nx,ny]		# Skip subraster
-int	nx, ny			# dimensions of the kernel
-real	a, b, c, f		# Ellipse parameters
+real	gkernel[nx,ny]		# output Gaussian amplitude kernel
+real	ngkernel[nx,ny]		# output normalized Gaussian amplitude kernel
+real	dkernel[nx,ny]		# output Gaussian sky kernel
+int	skip[nx,ny]		# output skip subraster
+int	nx, ny			# input dimensions of the kernel
+real	gsums[ARB]		# output array of gsums
+real	a, b, c, f		# ellipse parameters
 
-int	i, j, x0, y0, x, y, npts
-real	rjsq, rsq, sumk, sumksq, relerr
+int	i, j, x0, y0, x, y
+real	npts, rjsq, rsq, relerr,ef
 
 begin
 	# Initialize.
 	x0 = nx / 2 + 1
 	y0 = ny / 2 + 1
-	sumk = 0.0
-	sumksq = 0.0
-	npts = 0
+	gsums[GAUSS_SUMG] = 0.0
+	gsums[GAUSS_SUMGSQ] = 0.0
+	npts = 0.0
 
-	# Compute the kernel.
+	# Compute the kernel and principal sums.
 	do j = 1, ny {
 	    y = j - y0
 	    rjsq = y ** 2
 	    do i = 1, nx {
 		x = i - x0
 		rsq = sqrt (x ** 2 + rjsq)
-		kernel[i,j] = 0.5 * (a * x ** 2 + c * y ** 2 + b * x * y)
-		if (kernel[i,j] <= f || rsq < RMIN) {
-		    kernel[i,j] = exp (-kernel[i,j])
-		    sumk = sumk + kernel[i,j]
-		    sumksq = sumksq + kernel[i,j] ** 2
+		ef = 0.5 * (a * x ** 2 + c * y ** 2 + b * x * y)
+		gkernel[i,j] = exp (-1.0 * ef)
+		if (ef <= f || rsq <= RMIN) {
+		    #gkernel[i,j] = exp (-ef)
+		    ngkernel[i,j] = gkernel[i,j]
+		    dkernel[i,j] = 1.0
+		    gsums[GAUSS_SUMG] = gsums[GAUSS_SUMG] + gkernel[i,j]
+		    gsums[GAUSS_SUMGSQ] = gsums[GAUSS_SUMGSQ] +
+		        gkernel[i,j] ** 2
 		    skip[i,j] = NO
-		    npts = npts + 1
+		    npts = npts + 1.0
 		} else {
-		    kernel[i,j] = 0.0
+		    #gkernel[i,j] = 0.0
+		    ngkernel[i,j] = 0.0
+		    dkernel[i,j] = 0.0
 		    skip[i,j] = YES
 		}
 	    }
 	}
 
-	# Normalize the kernel.
-	sumksq = sumksq - sumk ** 2 / npts
-	sumk = sumk / npts
-	relerr = 0.0
+	# Store the remaining sums.
+	gsums[GAUSS_PIXELS] = npts
+	gsums[GAUSS_DENOM] = gsums[GAUSS_SUMGSQ] - gsums[GAUSS_SUMG] ** 2 /
+	    npts
+	gsums[GAUSS_SGOP] = gsums[GAUSS_SUMG] / npts
+
+	# Normalize the amplitude kernel.
 	do j = 1, ny {
-	    do i = 1, nx {
-		if (skip[i,j] == NO) {
-		    kernel[i,j] = (kernel[i,j] - sumk) / sumksq
-		    relerr = relerr + kernel[i,j] ** 2
-		}
+	     do i = 1, nx {
+	        if (skip[i,j] == NO)
+		    ngkernel[i,j] = (gkernel[i,j] - gsums[GAUSS_SGOP]) /
+			gsums[GAUSS_DENOM]
 	    }
 	}
 
-	return (sqrt (relerr))
-end
-
-
-# AP_GKERNEL -- Compute the 1D Gaussian convolution kernel.
-
-procedure ap_gkernel (ker1, nbox, fwhmpsf)
-
-real	ker1[nbox]		# 1-D kernel
-int	nbox			# dimensions of kernel
-real	fwhmpsf			# fwhmpsf Gaussian
-
-int	j, middle, jsq
-real	sumk1, sumk1sq, sigsq
-
-begin
-	# Define constants and zero the accumulators.
-	sigsq = (FWHM_TO_SIGMA * fwhmpsf) ** 2
-	sumk1 = 0.0
-	sumk1sq = 0.0
-	middle = nbox / 2 + 1
-
-	# Compute the 1D kernel.
-	do j = 1, nbox {
-	    jsq = (j - middle) ** 2
-	    ker1[j] = exp (-0.5 * jsq / sigsq)
-	    sumk1 = sumk1 + ker1[j]
-	    sumk1sq = sumk1sq + ker1[j] ** 2
+	# Normalize the sky kernel
+	do j = 1, ny {
+	    do i = 1, nx {
+		if (skip[i,j] == NO)
+		    dkernel[i,j] = dkernel[i,j] / npts
+	    }
 	}
 
-	# Normalize the kernel.
-	sumk1sq = sumk1sq - sumk1 ** 2 / nbox
-	sumk1 = sumk1 / nbox
-	do j = 1, nbox
-	    ker1[j] = (ker1[j] - sumk1) / sumk1sq
+	relerr = 1.0 / gsums[GAUSS_DENOM]
+
+	return (sqrt (relerr))
 end

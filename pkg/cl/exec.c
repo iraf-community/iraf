@@ -7,8 +7,8 @@
 #define import_xwhen
 #include <iraf.h>
 
-#include "clmodes.h"
 #include "config.h"
+#include "clmodes.h"
 #include "mem.h"
 #include "opcodes.h"
 #include "operand.h"
@@ -23,6 +23,7 @@
  */
 
 extern int cldebug;
+extern int cltrace;
 
 #define	SZ_STARTUPMSG	4000	/* cmd sent to subprocess to run task	*/
 #define	BINDIR		"bin$"	/* where installed executables go	*/	
@@ -55,9 +56,15 @@ run ()
 	register struct codeentry *cp;
 	register int opcode;
 
+	if (cltrace)
+	    eprintf ("\t----- task %s -----\n",
+		currentask->t_ltp->lt_lname, pc);
+
 	do {
 	    cp = coderef (pc);
 	    opcode = cp->c_opcode;
+	    if (cltrace)
+		d_instr (stderr, "\t", pc);
 	    if (cldebug)
 		eprintf ("run: pc = %d, opcode = %d\n", pc, opcode);
 	    pc += cp->c_length;
@@ -219,9 +226,11 @@ char	*name;
 	} else if (ltflags & LT_CL) {
 	    /* Or, not assign: preserve T_PKGCL and T_CLEOF flags if set. */
 	    flags |= T_CL;
-	} else if (ltflags & LT_STDINB) {
+	}
+
+	if (ltflags & LT_STDINB)
 	    flags |= T_STDINB;
-	} else if (ltflags & LT_STDOUTB)
+	if (ltflags & LT_STDOUTB)
 	    flags |= T_STDOUTB;
 
 	newtask->t_flags = flags;
@@ -282,6 +291,10 @@ execnewtask ()
 
 	    if (cldebug)
 		eprintf ("execnewtask: calling new task@%x\n", newtask);
+	    if (cltrace)
+		eprintf ("\t----- exec %s %s -----\n",
+		    (newtask->t_flags & T_FOREIGN) ? "foreign" : "builtin",
+		    newtask->t_ltp->lt_lname);
 
 	    (*newtask->t_ltp->lt_f)();
 	    oneof();		/* proceed as though this task saw eof	  */
@@ -302,6 +315,8 @@ execnewtask ()
 	if (newtask->t_flags & T_CL) {
 	    if (cldebug)
 		eprintf ("execnewtask: new task is the CL\n");
+	    if (cltrace)
+		eprintf ("\t----- exec cl -----\n");
 
 	    /* Call set_clio to set the command input and output streams
 	     * t_in and t_out for a cl() or package_name() command.
@@ -406,6 +421,10 @@ execnewtask ()
 	    newtask->t_out = newtask->t_stdout;
 
 	} else if (newtask->t_flags & T_SCRIPT) {
+	    if (cltrace)
+		eprintf ("\t----- exec script %s (%s) -----\n",
+		    newtask->t_ltp->lt_lname, newtask->t_ltp->lt_pname);
+
 	    newtask->t_in = fopen (newtask->t_ltp->lt_pname, "r");
 	    if (newtask->t_in == NULL)
 		cl_error (E_UERR|E_P, "can not open script file `%s'",
@@ -426,7 +445,9 @@ execnewtask ()
 	     */
 	    mk_startupmsg (newtask, startup_msg, SZ_STARTUPMSG);
 	    timeit = (newtask->t_flags & T_TIMEIT) != 0;
-
+	    if (cltrace)
+		eprintf ("\t----- exec external task %s -----\n",
+		    newtask->t_ltp->lt_lname);
 	    newtask->t_pid = pr_connect (
 		findexe (newtask->t_ltp->lt_pkp, newtask->t_ltp->lt_pname),
 		startup_msg,
@@ -904,7 +925,7 @@ register struct task *tp;
 restor (tp)
 struct task *tp;
 {
-	unsigned *topdp;
+	memel *topdp;
 	register struct ltask *ltp;
 	register struct package *pkp;
 	register struct param *pp;
@@ -940,7 +961,7 @@ struct task *tp;
 	 *   the new topd.
 	 */
 	for (pkp = reference (package, pachead);  pkp;  pkp = pkp->pk_npk)
-	    if ((unsigned)pkp < (unsigned)topdp) {
+	    if ((memel)pkp < (memel)topdp) {
 		pachead = dereference (pkp);
 		break;
 	    }
@@ -949,11 +970,11 @@ struct task *tp;
 
 	for (;  pkp;  pkp = pkp->pk_npk) {
 	    for (ltp = pkp->pk_ltp; ltp; ltp = ltp->lt_nlt)
-		if ((unsigned)ltp < (unsigned)topdp) {
+		if ((memel)ltp < (memel)topdp) {
 		    pkp->pk_ltp = ltp;
 		    break;
 		}
-	    if ((unsigned)pkp->pk_ltp >= (unsigned)topdp)
+	    if ((memel)pkp->pk_ltp >= (memel)topdp)
 		/* All ltasks in this package were above topd */
 		pkp->pk_ltp = NULL;
 	}
@@ -974,7 +995,7 @@ struct task *tp;
 	    /* Lob off any pfiles above new topd.  Go through their
 	     * params, updating if necessary and closing any lists.
 	     */
-	    if ((unsigned)pfp < (unsigned)topdp) {
+	    if ((memel)pfp < (memel)topdp) {
 		parhead = dereference (pfp);
 		break;
 	    }
@@ -997,13 +1018,13 @@ struct task *tp;
 	 * to an existing incore pfile, e.g., in a declaration.
 	 */
 	for (;  pfp;  pfp = pfp->pf_npf) {
-	    if ((unsigned)(pfp->pf_lastpp) < (unsigned)topdp)
+	    if ((memel)(pfp->pf_lastpp) < (memel)topdp)
 		continue;		/* quick check */
 	    last_pp = NULL;
 	    n = 0;
 
 	    for (pp = pfp->pf_pp;  pp != NULL;  pp = pp->p_np) {
-		if ((unsigned)pp >= (unsigned)topdp) {
+		if ((memel)pp >= (memel)topdp) {
 		    if (cldebug)
 			fprintf (stderr, "chop pfile for task %s at param %s\n",
 			    pfp->pf_ltp->lt_lname, last_pp->p_name);

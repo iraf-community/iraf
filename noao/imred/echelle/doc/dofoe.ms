@@ -17,7 +17,7 @@
 .sp .5v
 .in -2
 ..
-.ND April 1992
+.ND February 1993
 .TL
 Guide to the Fiber Optic Echelle Reduction Task DOFOE
 .AU
@@ -156,7 +156,11 @@ with a ".ec" extension added.
 Spectra and Data Files
 .LP
 The basic input consists of dual fiber FOE object and calibration spectra
-stored as IRAF images.  The raw CCD images must be processed to remove
+stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must be processed to remove
 overscan, bias, and dark count effects.  This is generally done using the
 \fBccdred\fR package.  Flat fielding is generally not done at this stage
 but as part of \fBdofoe\fR.  The calibration spectra are
@@ -255,7 +259,7 @@ objects =               List of object spectra
 .V1
 (readnoi=           0.) Read out noise sigma (photons)
 (gain   =           1.) Photon gain (photons/data number)
-(dispaxi=  )_.dispaxis) Dispersion axis (1=along lines, 2=along columns)
+(datamax=        INDEF) Max data value / cosmic ray threshold
 (norders=           12) Number of orders
 (width  =           4.) Width of profiles (pixels)
 (arcaps =          2x2) Arc apertures
@@ -446,7 +450,7 @@ PACKAGE = echelle
 .KS
 .V1
                         -- ARC DISPERSION FUNCTION PARAMETERS --
-(coordli= linelist$thorium.dat) Line list
+(coordli= linelist$thar.dat) Line list
 (match  =           1.) Line list matching limit in Angstroms
 (fwidth =           4.) Arc line widths in pixels
 (cradius=           4.) Centering radius in pixels
@@ -526,7 +530,7 @@ further queries and so are used to eliminate further queries of that kind.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-\fBdispaxis\fR parameter if not defined in the image header.  The default
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
 line or column for finding the orders and the number of image lines or
 columns to sum are set by the \f(CWline\fR and \f(CWnsum\fR parameters.  A line
 of INDEF (the default) selects the middle of the image.  The automatic
@@ -885,13 +889,18 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .LE
-dispaxis = ")_.dispaxis" (apextract)
+datamax = INDEF (apsum.saturation)
 .LS
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the flat field or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .LE
 norders = 12 (apfind)
 .LS
@@ -945,7 +954,8 @@ clean = yes (apsum)
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
 implies variance weighted extraction and requires reasonably good values
-for the readout noise and gain.
+for the readout noise and gain.  In addition the datamax parameters
+can be useful.
 .LE
 dispcor = yes
 .LS
@@ -1209,7 +1219,12 @@ order specifying the number of pieces.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
-coordlist = "linelist$thorium.dat" (ecidentify)
+threshold = 10. (identify/reidentify)
+.LS
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.LE
+coordlist = "linelist$thar.dat" (ecidentify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelist$".
@@ -1346,3 +1361,11 @@ wavelength coordinate.  If \f(CWyes\fR the input spectrum is integrated
 over the extent of each output pixel.  This is slower than
 simple interpolation.
 .LE
+
+.ce
+ENVIRONMENT PARAMETERS
+.LP
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".

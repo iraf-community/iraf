@@ -6,6 +6,7 @@ define	LEN_CENSTRUCT		(30 + SZ_FNAME + 1)
 
 define	AP_CENTERFUNCTION   Memi[$1]	# Centering algorithm
 define	AP_CAPERT	    Memr[$1+1]	# Centering box half-width
+define	AP_CTHRESHOLD	    Memr[$1+2]  # Threshold above cdatalimit
 define	AP_MAXSHIFT	    Memr[$1+3]	# Maximum center shift
 define	AP_MINSNRATIO	    Memr[$1+4]	# Minimum s/n ratio 
 define	AP_CLEAN	    Memi[$1+5]	# Clean before centering
@@ -43,9 +44,10 @@ define	AP_CSTRING	    Memc[P2C($1+28)]# centering algorithm id
 
 define	DEF_CENTERFUNCTION	AP_CENTROID1D
 define	DEF_CAPERT		2.5
-define	DEF_MAXSHIFT		1.0
+define	DEF_CTHRESHOLD		0.0
 define	DEF_MINSNRATIO		1.0
 define	DEF_CMAXITER		10
+define	DEF_MAXSHIFT		1.0
 define	DEF_CLEAN		NO
 define	DEF_RCLEAN		1.0
 define	DEF_RCLIP		2.0

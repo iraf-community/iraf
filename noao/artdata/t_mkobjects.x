@@ -1,6 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 include	<math.h>
+include	<mach.h>
 
 define	LEN_UA		20000			# Maximum user header
 define	LEN_COMMENT	70			# Maximum comment length
@@ -41,12 +42,12 @@ real	m0				# Magnitude zero point
 long	seed				# Random number seed
 
 int	nobjects, save
-real	x, y, z, r, ar, pa
+real	x, y, z, r, ar, pa, dmin, dmax
 
 bool	new, bsave, cmmts, fcmmts
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
 pointer	sp, input, output, fname, type, star, comment, rbuf, pbuf
-pointer	in, out, buf, lines, newlines, obj, ptr1, ptr2
+pointer	in, out, buf, obuf, lines, newlines, obj, ptr1, ptr2
 pointer	mko, mkt
 
 long	clgetl(), clktime()
@@ -162,6 +163,8 @@ begin
 	    }
 	    nc = IM_LEN(in,1)
 	    nl = IM_LEN(in,2)
+	    IM_MIN(out) = MAX_REAL
+	    IM_MAX(out) = -MAX_REAL
 
 	    # Read the object list.
 	    call malloc (mko, LEN_MKO, TY_STRUCT)
@@ -186,8 +189,8 @@ begin
 		call gargr (ar)
 		call gargr (pa)
 		call gargb (bsave)
-		x = (x + xo) / distance
-		y = (y + yo) / distance
+		x = xo + x / distance
+		y = yo + y / distance
 		if (x < 1 || x > nc || y < 1 || y > nl)
 		    next
 		if (nobjects == 0) {
@@ -248,22 +251,30 @@ begin
 
 		if (new) {
 		    do i = 1, nl {
-			ptr2 = impl2r (out, i)
+			obuf = impl2r (out, i)
 			if (background == 0.)
-			    call aclrr (Memr[ptr2], nc)
+			    call aclrr (Memr[obuf], nc)
 			else
-			    call amovkr (background, Memr[ptr2], nc)
+			    call amovkr (background, Memr[obuf], nc)
 			if (poisson)
-			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
+			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0., gain,
 				pbuf, ranbuf, ipbuf, seed)
 			if (rdnoise > 0.)
-			    call mkrnoise (Memr[ptr2], nc, rdnoise,
+			    call mkrnoise (Memr[obuf], nc, rdnoise,
 				rbuf, ranbuf, irbuf, seed)
+			call alimr (Memr[obuf], nc, dmin, dmax)
+			IM_MIN(out) = min (IM_MIN(out), dmin)
+			IM_MAX(out) = max (IM_MAX(out), dmax)
 		    }
 		} else if (in != out) {
-		    do i = 1, nl
-			call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)],
+		    do i = 1, nl {
+			obuf = impl2r (out, i)
+			call amovr (Memr[imgl2r(in,i)], Memr[obuf],
 			    IM_LEN(in,1))
+			call alimr (Memr[obuf], nc, dmin, dmax)
+			IM_MIN(out) = min (IM_MIN(out), dmin)
+			IM_MAX(out) = max (IM_MAX(out), dmax)
+		    }
 		}
 
 		# Add comment history of task parameters.
@@ -271,7 +282,7 @@ begin
 		    call strcpy ("# ", Memc[comment], LEN_COMMENT)
 		    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
 		    call mkh_comment (out, Memc[comment])
-		    call mkh_comment (out, "begin\tmkobjects")
+		    call mkh_comment (out, "begin        mkobjects")
 		    call mkh_comment (out, Memc[comment])
 		    call mkh_comment1 (out, "background", 'r')
 		    call mkh_comment1 (out, "xoffset", 'r')
@@ -285,6 +296,7 @@ begin
 		    call mkh_comment1 (out, "seed", 'i')
 		}
 
+		IM_LIMTIME(out) = IM_MTIME(out) + 1
 		if (in != out)
 		    call imunmap (in)
 		call imunmap (out)
@@ -357,8 +369,11 @@ begin
 		    j = mod (l, nlines)
 		    if (l != Memi[lines+j]) {
 			ptr2 = buf + j * nc
-			call amovr (Memr[ptr2],
-			    Memr[impl2r(out, Memi[lines+j])], nc)
+			obuf = impl2r (out, Memi[lines+j])
+			call amovr (Memr[ptr2], Memr[obuf], nc)
+			call alimr (Memr[obuf], nc, dmin, dmax)
+			IM_MIN(out) = min (IM_MIN(out), dmin)
+			IM_MAX(out) = max (IM_MAX(out), dmax)
 			Memi[lines+j] = l
 			if (Memi[newlines+l-1] == NO)
 			    call amovr (Memr[imgl2r(out,l)], Memr[ptr2], nc)
@@ -405,31 +420,42 @@ begin
 			    call mkrnoise (Memr[ptr2], nc, rdnoise,
 				rbuf, ranbuf, irbuf, seed)
 		    }
-		    call amovr (Memr[ptr2], Memr[impl2r(out,l)], nc) 
+		    obuf = impl2r (out, l)
+		    call amovr (Memr[ptr2], Memr[obuf], nc) 
+		    call alimr (Memr[obuf], nc, dmin, dmax)
+		    IM_MIN(out) = min (IM_MIN(out), dmin)
+		    IM_MAX(out) = max (IM_MAX(out), dmax)
 		}
 	    } else {
 		do i = 1, nlines {
 		    j = mod (i, nlines) 
 		    ptr2 = buf + j * nc
 		    l = Memi[lines+j]
-		    call amovr (Memr[ptr2], Memr[impl2r(out,l)], nc) 
+		    obuf = impl2r (out, l)
+		    call amovr (Memr[ptr2], Memr[obuf], nc) 
+		    call alimr (Memr[obuf], nc, dmin, dmax)
+		    IM_MIN(out) = min (IM_MIN(out), dmin)
+		    IM_MAX(out) = max (IM_MAX(out), dmax)
 		}
 
 		if (new) {
 		    call imflush (out)
 		    do i = 1, nl {
-			ptr2 = impl2r (out, i)
+			obuf = impl2r (out, i)
 			ptr1 = imgl2r (out, i)
 			if (background == 0.)
-			    call amovr (Memr[ptr1], Memr[ptr2], nc)
+			    call amovr (Memr[ptr1], Memr[obuf], nc)
 			else
-			    call aaddkr (Memr[ptr1], background, Memr[ptr2], nc)
+			    call aaddkr (Memr[ptr1], background, Memr[obuf], nc)
 			if (poisson)
-			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
+			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0., gain,
 				pbuf, ranbuf, ipbuf, seed)
 			if (rdnoise > 0.)
-			    call mkrnoise (Memr[ptr2], nc, rdnoise,
+			    call mkrnoise (Memr[obuf], nc, rdnoise,
 				rbuf, ranbuf, irbuf, seed)
+			call alimr (Memr[obuf], nc, dmin, dmax)
+			IM_MIN(out) = min (IM_MIN(out), dmin)
+			IM_MAX(out) = max (IM_MAX(out), dmax)
 		    }
 		}
 	    }
@@ -458,8 +484,8 @@ begin
 		call strcpy ("# ", Memc[comment], LEN_COMMENT)
 		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
 		call mkh_comment (out, Memc[comment])
-		call mkh_comment (out, "begin\tmkobjects")
-		call sprintf (Memc[comment], LEN_COMMENT, "\t%s%24t%s")
+		call mkh_comment (out, "begin        mkobjects")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%s")
 		    call pargstr ("objects")
 		    call pargstr (Memc[fname])
 		call mkh_comment (out, Memc[comment])
@@ -494,6 +520,7 @@ begin
 		}
 	    }
 
+	    IM_LIMTIME(out) = IM_MTIME(out) + 1
 	    if (in != out)
 		call imunmap (in)
 	    call imunmap (out)

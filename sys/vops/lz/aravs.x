@@ -18,7 +18,7 @@ int	npix, ngpix, old_ngpix, awvgs()
 begin
 	lcut = -MAX_REAL				# no rejection to start
 	hcut =  MAX_REAL
-	ngpix = 0
+	ngpix = MAX_INT
 
 	# Iteratively compute mean, sigma and reject outliers until no
 	# more pixels are rejected, or until there are no more pixels.
@@ -38,7 +38,7 @@ begin
 	    lcut = mean - deviation			# compute window
 	    hcut = mean + deviation
 
-	} until (old_ngpix == ngpix)
+	} until (ngpix >= old_ngpix)
 
 	return (ngpix)
 end

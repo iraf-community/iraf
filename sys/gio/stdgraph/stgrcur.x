@@ -10,7 +10,7 @@ include	<fset.h>
 include	<gki.h>
 include	"stdgraph.h"
 
-define	MAX_LENCUR	15
+define	MAX_LENCUR	17
 define	MAX_KEYLINES	30
 define	KEYSIZE		1
 define	QUIT		'q'
@@ -53,11 +53,14 @@ define	GO		'g'
 # instruction and read the logged cursor position; the physical cursor is
 # never turned on.
 
-procedure stg_readcursor (cursor, x, y, key)
+procedure stg_readcursor (cursor, cn, key, sx, sy, raster, rx, ry)
 
-int	cursor		# cursor to be read
-int	x, y		# cursor position in GKI coords (output)
-int	key		# key value (output)
+int	cursor		#I cursor to be read
+int	cn		#O cursor which was read
+int	key		#O keystroke which terminated cursor read
+int	sx, sy		#O screen coordinates of cursor in GKI units
+int	raster		#O raster number
+int	rx, ry		#O raster coordinates of cursor in GKI units
 
 short	texts[4]
 char	textc[4], ch
@@ -76,7 +79,8 @@ begin
 	playback_mode = (ttstati (STDIN, TT_PLAYBACK) == YES)
 
 	if (!playback_mode) {
-	    call stg_rdcursor (g_tty, cursor, x, y, key, YES)
+	    call stg_rdcursor (g_tty, cursor, YES,
+		cn, key, sx, sy, raster, rx, ry)
 	    return
 	}
 
@@ -117,7 +121,8 @@ begin
 	call ttseti (STDIN, TT_PBDELAY, 0)
 
 	# Read the logged cursor position with RC disabled.
-	call stg_rdcursor (g_pbtty, cursor, x, y, key, NO)
+	call stg_rdcursor (g_pbtty, cursor, NO,
+	    cn, key, sx, sy, raster, rx, ry)
 
 	# Determine if verify mode is set for this cursor read.  This must
 	# be done after the call to stg_rdcursor to permit processing of
@@ -166,14 +171,14 @@ begin
 	# Echo the logged keystroke at the position of the cursor.  This may
 	# not always be readable, but at least it marks the cursor position.
 
-	call stg_text (x, y, texts, nchars)
+	call stg_text (sx, sy, texts, nchars)
 
 	if (pbverify_mode) {
 	    # Issue a WC to set the cursor position, and perform a normal
 	    # cursor read in passthru mode, discarding the return value.
 
-	    call stg_setcursor (x, y, cursor)
-	    call stg_rdcursor (g_tty, cursor, i, j, k, YES)
+	    call stg_setcursor (sx, sy, cursor)
+	    call stg_rdcursor (g_tty, cursor, YES, i, i, j, k, i, j, k)
 
 	    # User wants to terminate playback mode?
 	    if (k == QUIT || k == INTCHAR) {
@@ -208,20 +213,23 @@ end
 # instruction to the terminal, so that the routine does only input from the
 # logical device.
 
-procedure stg_rdcursor (tty, cursor, x, y, key, output_rc)
+procedure stg_rdcursor (tty, cursor, output_rc, cn, key, sx,sy, raster, rx,ry)
 
-pointer	tty		# graphcap descriptor
-int	cursor		# cursor to be read
-int	x, y		# cursor position in GKI coords (output)
-int	key		# key value (output)
-int	output_rc	# output the RC instruction
+pointer	tty		#I graphcap descriptor
+int	cursor		#I cursor to be read
+int	output_rc	#I flag to output the RC instruction
+int	cn		#O cursor which was read
+int	key		#O keystroke which terminated cursor read
+int	sx, sy		#O cursor screen position in GKI coords
+int	raster		#O raster number
+int	rx, ry		#O cursor raster position in GKI coords
 
-pointer	decodecur, delimcur, pattern, patbuf, sp
-int	len_pattern, len_curval, ip, op, i1, i2
+pointer	decodecur, delimcur, pattern, patbuf, sp, otop
+int	len_pattern, len_curval, sv_iomode, nchars, ip, op, i1, i2, ch
 
-char	getc()
+int	getci()
 bool	ttygetb()
-int	ttygets(), ttygeti(), gstrcpy(), gpatmatch(), patmake()
+int	ttygets(), ttygeti(), gstrcpy(), gpatmatch(), patmake(), fstati()
 include	"stdgraph.com"
 define	quit_ 91
 
@@ -269,7 +277,9 @@ begin
 
 	# Set raw mode on the input file (the graphics terminal).
 	call flush (STDOUT); call flush (STDERR)
-	call fseti (g_in, F_RAW, YES)
+	sv_iomode = fstati (g_in, F_IOMODE)
+	if (sv_iomode != IO_RAW)
+	    call fseti (g_in, F_IOMODE, IO_RAW)
 
 	repeat {
 	    # Initiate a cursor read.
@@ -288,13 +298,14 @@ begin
 	    # in the event that hardware cursor mode is accidentally cleared.
 
 	    for (op=1;  op <= MAX_LENCUR;  op=op+1) {
-		key = getc (g_in, g_mem[op])
+		g_mem[op] = getci (g_in, key)
 		g_mem[op+1] = EOS
 
 		if (key == EOF) {
 		    # Turn off raw input mode and return EOF.
 		    key = EOF
-		    call fseti (g_in, F_RAW, NO)
+		    if (sv_iomode != IO_RAW)
+			call fseti (g_in, F_IOMODE, sv_iomode)
 		    goto quit_
 
 		} else if (len_pattern > 0) {
@@ -333,9 +344,6 @@ begin
 
 	} until (op >= abs(len_curval) || len_curval == 0)
 
-	# Turn off raw input mode.
-	call fseti (g_in, F_RAW, NO)
-
 	# Decode the cursor value string and return the position and key
 	# as output values.  Return the cursor position in GKI coordinates.
 	# If extra characters were typed, e.g., before the cursor was turned
@@ -344,11 +352,61 @@ begin
 	# and still get a valid read.
 
 	g_reg[E_IOP] = ip
+	call aclri (g_reg, 7)
 	call stg_encode (Memc[decodecur], g_mem, g_reg)
 
-	x   = nint ((g_reg[1] - g_x1) / g_dx)
-	y   = nint ((g_reg[2] - g_y1) / g_dy)
-	key = (g_reg[3])
+	# Multiple cursors are not implemented yet so just echo input.
+	cn  = cursor
+
+	# Standard cursor value.
+	sx  = nint ((g_reg[1] - g_x1) / g_dx)
+	sy  = nint ((g_reg[2] - g_y1) / g_dy)
+	key = g_reg[3]
+
+	# Only some devices return the following fields.  Note that FX,FY
+	# are returned by stg_encode in GKI coordinates.
+
+	nchars = g_reg[4]
+	raster = g_reg[5]
+	if (raster == 0) {
+	    rx = sx
+	    ry = sy
+	} else {
+	    rx = g_reg[6]
+	    ry = g_reg[7]
+	}
+
+	# If the NCHARS field is nonzero then a data block of length nchars
+	# follows the cursor value struct returned by the terminal.  Read this
+	# into the g_msgbuf message buffer.  The client makes a subsequent
+	# call to stg_readtty to access this data, otherwise it is discarded
+	# in the next cursor read.
+
+	if (nchars > 0) {
+	    if (nchars > g_msgbuflen) {
+		g_msgbuflen = (nchars + SZ_MSGBUF - 1) / SZ_MSGBUF * SZ_MSGBUF
+		call realloc (g_msgbuf, g_msgbuflen, TY_CHAR)
+	    }
+
+	    # We should encode this data transfer in a way that permits
+	    # detection and recovery from lost data.  For the moment, the
+	    # following assumes that nchars of data will actually be received.
+
+	    op = g_msgbuf
+	    otop = g_msgbuf + nchars
+	    while (op < otop && getci (g_in, ch) != EOF) {
+		Memc[op] = ch
+	        op = op + 1
+	    }
+	    g_msglen = op - g_msgbuf
+	    Memc[op] = EOS
+
+	} else
+	    g_msglen = 0
+
+	# Turn off raw input mode.
+	if (sv_iomode != IO_RAW)
+	    call fseti (g_in, F_IOMODE, sv_iomode)
 
 	# Return EOF if any EOF character (e.g., <ctrl/z> or <ctrl/d>) or the
 	# interrupt character is typed.

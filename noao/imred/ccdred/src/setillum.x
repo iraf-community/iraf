@@ -15,12 +15,14 @@ procedure set_illum (ccd)
 pointer	ccd			# CCD structure
 
 int	nc, nl, c1, c2, cs, l1, l2, ls, data_c1, ccd_c1, data_l1, ccd_l1
+long	time
 pointer	sp, str, image, im
 
 bool	clgetb(), ccdflag()
+long	hdmgeti()
 real	hdmgetr()
 pointer	ccd_cache()
-errchk	cal_image, ccd_cache, ccdproc, hdmgetr
+errchk	cal_image, ccd_cache, ccdproc, hdmgetr, hdmgeti
 
 begin
 	# Check if the user wants this operation or if it has been done.
@@ -32,7 +34,7 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the illumcor correction image.
-	call cal_image (IN_IM(ccd), ILLUM, Memc[image], SZ_FNAME)
+	call cal_image (IN_IM(ccd), ILLUM, 1, Memc[image], SZ_FNAME)
 
 	# If no processing is desired print illumination image name and return.
 	if (clgetb ("noproc")) {
@@ -51,7 +53,11 @@ begin
 	}
 
 	# If no mean value for the scale factor compute it.
-	iferr (ILLUMSCALE(ccd) = hdmgetr (im, "ccdmean")) {
+	iferr (ILLUMSCALE(ccd) = hdmgetr (im, "ccdmean"))
+	    ILLUMSCALE(ccd) = INDEF
+	iferr (time = hdmgeti (im, "ccdmeant"))
+	    time = IM_MTIME(im)
+	if (IS_INDEF(ILLUMSCALE(ccd)) || time < IM_MTIME(im)) {
 	    call ccd_flush (im)
 	    call ccdmean (Memc[image])
 	    im = ccd_cache (Memc[image], ILLUM)

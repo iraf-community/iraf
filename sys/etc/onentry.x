@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<knet.h>
+include	<error.h>
 include	<clset.h>
 include	<fset.h>
 
@@ -47,7 +48,7 @@ begin
 	    call strpak (bkgfile, osfn, SZ_FNAME)
 	    call zopntx (osfn, READ_ONLY, chan)
 	    if (chan == ERR)
-		call sys_panic (0, "Cannot open bkgfile")
+		call sys_panic (EA_FATAL, "Cannot open bkgfile")
 	    call zlocpr (zgettx, loc_zgettx)
 
 	    do i = 1, NFD {

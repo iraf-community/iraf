@@ -78,7 +78,7 @@ begin
 	    call refnoextn (Memc[image])
 	    sym = stfind (stp, Memc[image])
 	    if (sym == NULL) {
-		call refmsgs (NO_REFSPEC, Memc[image], 0, "", "")
+		call refmsgs (NO_REFSPEC, Memc[image], "", "", "", 0, 0, "")
 		next
 	    }
 

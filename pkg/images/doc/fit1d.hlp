@@ -35,6 +35,10 @@ The ratio of the image and fit.
 Axis along which the one dimensional fitting is done.  Axis 1 corresponds
 to fitting the image lines and axis 2 corresponds to fitting the columns.
 .le
+.ls interactive = yes
+If \fBinteractive\fR is set to yes, a plot of the fit is drawn and the
+cursor is available for interactively examining and adjusting the fit.
+.le
 .ls sample = "*"
 Lines or columns to be used in the fits.
 .le

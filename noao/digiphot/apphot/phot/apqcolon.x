@@ -8,8 +8,8 @@ include "../lib/phot.h"
 
 # APQCOLON -- Procedure to display and edit the quick photometry parameters.
 
-procedure apqcolon (ap, im, cl, out, stid, ltid, cmdstr, newcbuf, newcenter,
-	newsbuf, newsky, newmagbuf, newmag)
+procedure apqcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage, newcbuf,
+	newcenter, newsbuf, newsky, newmagbuf, newmag)
 
 pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the iraf image
@@ -18,12 +18,13 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 int	ltid		# coordinate file sequence number
 char	cmdstr[ARB]	# command string
-int	newcbuf		# new centering buffers
-int	newcenter	# compute new center
-int	newsbuf		# new sky fitting buffers
-int	newsky		# compute new sky
-int	newmagbuf	# new aperture buffers
-int	newmag		# compute new magnitudes
+int	newimage	# new image ?
+int	newcbuf		# new centering buffers ?
+int	newcenter	# compute new center ?
+int	newsbuf		# new sky fitting buffers ?
+int	newsky		# compute new sky ?
+int	newmagbuf	# new aperture buffers ?
+int	newmag		# compute new magnitudes ?
 
 bool	bval
 int	ip, ncmd
@@ -45,8 +46,10 @@ begin
 	# Get the command.
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
-	if (Memc[cmd] == EOS)
+	if (Memc[cmd] == EOS) {
+	    call sfree (sp)
 	    return
+	}
 
 	# Process the command
 	ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE, QCMDS)
@@ -66,7 +69,7 @@ begin
 	    } else {
 		call apsetr (ap, CAPERT, rval / 2.0)
 		if (stid > 1)
-		    call ap_rparam (out, KY_CAPERT, rval, UN_CAPERT,
+		    call ap_rparam (out, KY_CAPERT, rval, UN_CSCALEUNIT,
 			"width of the centering box")
 		newcbuf = YES
 		newcenter = YES
@@ -82,7 +85,7 @@ begin
 	    } else {
 		call apsetr (ap, ANNULUS, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_ANNULUS, rval, UN_ANNULUS,
+		    call ap_rparam (out, KY_ANNULUS, rval, UN_SSCALEUNIT,
 			"inner radius of the sky annulus")
 		newsbuf = YES
 		newsky = YES
@@ -98,7 +101,7 @@ begin
 	    } else {
 		call apsetr (ap, DANNULUS, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_DANNULUS, rval, UN_DANNULUS,
+		    call ap_rparam (out, KY_DANNULUS, rval, UN_SSCALEUNIT,
 			"width of the sky annulus")
 		newsbuf = YES
 		newsky = YES
@@ -115,7 +118,7 @@ begin
 	    } else {
 		call apsets (ap, APERTS, Memc[cmd])
 		if (stid > 1)
-		    call ap_sparam (out, KY_APERTS, Memc[cmd], UN_APERTS,
+		    call ap_sparam (out, KY_APERTS, Memc[cmd], UN_PSCALEUNIT,
 			"list of aperture radii")
 		newmag = YES
 		newmagbuf = YES
@@ -130,7 +133,7 @@ begin
 	    } else {
 		call apsetr (ap, ZMAG, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_ZMAG, rval, UN_ZMAG,
+		    call ap_rparam (out, KY_ZMAG, rval, UN_PZMAG,
 			"zero point of magnitude scale")
 		newmag = YES
 	    }
@@ -144,7 +147,7 @@ begin
 	    } else {
 		call apsetr (ap, EPADU, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_EPADU, rval, UN_EPADU, "gain")
+		    call ap_rparam (out, KY_EPADU, rval, UN_NEPADU, "gain")
 		newmag = YES
 	    }
 
@@ -164,7 +167,7 @@ begin
 		    call ap_itime (im, ap)
 		if (stid > 1)
 		    call ap_sparam (out, KY_EXPOSURE, Memc[str],
-		        UN_EXPOSURE, "exposure time keyword")
+		        UN_AKEYWORD, "exposure time keyword")
 	    }
 
 	case QCMD_AIRMASS:
@@ -183,7 +186,7 @@ begin
 		    call ap_airmass (im, ap)
 		if (stid > 1)
 		    call ap_sparam (out, KY_AIRMASS, Memc[str],
-		        UN_AIRMASS, "airmass keyword")
+		        UN_AKEYWORD, "airmass keyword")
 	    }
 
 	case QCMD_FILTER:
@@ -202,7 +205,7 @@ begin
 		    call ap_filter (im, ap)
 		if (stid > 1)
 		    call ap_sparam (out, KY_FILTER, Memc[str],
-		        UN_FILTER, "filter keyword")
+		        UN_AKEYWORD, "filter keyword")
 	    }
 
 	case QCMD_OBSTIME:
@@ -221,7 +224,7 @@ begin
 		    call ap_otime (im, ap)
 		if (stid > 1)
 		    call ap_sparam (out, KY_OBSTIME, Memc[str],
-		        UN_OBSTIME, "filter keyword")
+		        UN_AKEYWORD, "filter keyword")
 	    }
 
 	case QCMD_RADPLOTS:
@@ -260,6 +263,7 @@ begin
 		    call ap_rdnoise (im, ap)
 		    call ap_airmass (im, ap)
 		    call ap_filter (im, ap)
+		    newimage = YES
 		    newcbuf = YES; newcenter = YES
 		    newsbuf = YES; newsky = YES
 		    newmagbuf = YES; newmag = YES

@@ -1,8 +1,6 @@
 include <mach.h>
-include	<imhdr.h>
-include	"../lib/apsel.h"
-include	"../lib/daophot.h"
 include "../lib/daophotdef.h"
+include	"../lib/apseldef.h"
 
 define	EPS_OVERLAP		(1.0e-10)
 
@@ -13,20 +11,19 @@ procedure dp_mkgroup (dao, im, grp)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to input image
-pointer	grp			# pointer to the output group file
+int	grp			# the output file descriptor
 
 bool	overlap
-int	curr_star, first_unknown, first_ingrp, nin_currgrp, maxgroup
-int	curr_point, crit_point, i
-pointer	sp, psffit, apsel, index, group_size, number
-real	bright_mag, read_noise, fitradsq, psf_effrad, critsep, critsep_sq
-real	xcurr, ycurr, xcurr_frompsf, ycurr_frompsf, magcurr, skycurr
-real	magcrit, skycrit, xcrit_frompsf, ycrit_frompsf
+int	i, maxgroup, curr_star, first_unknown, first_ingrp, nin_currgrp
+int	curr_point, crit_point, ier
+pointer	psffit, apsel, index, group_size, number
+real	fradius, critovlap, bright_mag, read_noise, fitradsq, critsep
+real	critsep_sq, xcurr, ycurr, dxcurr_frompsf, dycurr_frompsf, magcurr
+real	skycurr, magcrit, skycrit, dxcrit_frompsf, dycrit_frompsf
 real	deltax, deltay, radsq, rel_bright, radius, ratio, stand_err, dvdx, dvdy
-real	critovlap
 
 bool 	dp_gchkstar()
-real	dp_evalpsf()
+real	dp_usepsf()
 
 begin
 	# Get the daophot pointers.
@@ -37,25 +34,29 @@ begin
 	if (DP_APNUM(apsel) <= 0)
 	    return
 
-	# Get some working memory.
-	call smark (sp)
-	call salloc (index, DP_APNUM(apsel), TY_INT)
-	call salloc (group_size, DP_APNUM(apsel), TY_INT)
-	call salloc (number, DP_APNUM(apsel), TY_INT)
+	# Store the original fitting radius.
+	fradius = DP_FITRAD(dao)
+	DP_FITRAD(dao) = min (DP_FITRAD(dao), DP_PSFRAD(dao))
+	DP_SFITRAD(dao) = DP_FITRAD(dao) * DP_SCALE(dao)
 
-	# Initialize the group buffers.
+	# Get some working memory.
+	call malloc (index, DP_APNUM(apsel), TY_INT)
+	call malloc (group_size, DP_APNUM(apsel), TY_INT)
+	call malloc (number, DP_APNUM(apsel), TY_INT)
+
+	# Initialize the group information.
 	call aclri (Memi[index], DP_APNUM(apsel))
 	call aclri (Memi[group_size], DP_APNUM(apsel))
 	call aclri (Memi[number], DP_APNUM(apsel))
 
-	# Check for INDEF results.
+	# Check for INDEF results and fix them up..
 	call dp_gpfix (dao, im, bright_mag)
 
 	# Sort the stars into order of increasing y value.  The star ID's, X,
 	# MAG and SKY values are still in the order in which they were read
 	# in. INDEX points to the proper value, i.e. Y (i) and X (index(i)).
 
-	call quick (Memr[DP_APYCEN(apsel)], DP_APNUM(apsel), Memi[index])
+	call quick (Memr[DP_APYCEN(apsel)], DP_APNUM(apsel), Memi[index], ier)
 
 	# Bright_mag is the apparent magnitude of the brightest star
 	# in the input file. If this is INDEF then set to the PSFMAG.
@@ -65,30 +66,34 @@ begin
 	else
 	    bright_mag = 1.0
 
-	# Smooth the PSF. This routine has been removed. Note that
-	# this routine did not exist in the previous version.
+	# Smooth the PSF.
+	if ((DP_NVLTABLE(psffit) + DP_NFEXTABLE(psffit)) > 0)
+	    call dp_smpsf (dao)
 
 	# Define some important constants in terms of the daophot parameters.
 
-	critovlap = DP_CRITOVLAP(dao) * DP_CRITOVLAP(dao)
-	read_noise = (DP_READ_NOISE (dao) / DP_PHOT_ADC(dao)) ** 2
+	critovlap = DP_CRITSNRATIO(dao) * DP_CRITSNRATIO(dao)
+	read_noise = (DP_READNOISE (dao) / DP_PHOTADU(dao)) ** 2
 	fitradsq = (DP_FITRAD(dao) + 1) * (DP_FITRAD(dao) + 1)
 
-	# Define the critical separation.
+	## Note that the definition of firadsq has been changed in this
+	## version of group. This has been done so that the grouping
+	## algorithm defaults to the one used by ALLSTAR in the case that
+	## the critoverlap parameter is very large.
+	## fitradsq = (2.0 * DP_FITRAD(dao)) * (2.0 * DP_FITRAD(dao))
 
-	psf_effrad = min (DP_PSFRAD(dao), 0.5 * (0.5 *
-	    real (DP_PSFSIZE(psffit) - 7) - 1.0))
-	critsep = psf_effrad + DP_FITRAD(dao) + 1
+	# Define the critical separation.
+	critsep = DP_PSFRAD(dao) + DP_FITRAD(dao) + 1.0
 	critsep_sq = critsep * critsep
 
 	# Now we search the list for stars lying within one critical
 	# separation of each other. The stars are currently in a stack
 	# DP_APNUM(apsel) stars long.  FIRST_INGRP points to the first star
 	# in the current group and starts out, of course, with the
-	# value 1.  CURR_STAR will point to the position in the stack
+	# value CURR_STAR.  CURR_STAR will point to the position in the stack
 	# occupied by the star which is currently the center of a circle 
 	# of radius equal to the critical radius, within which we are
-	# looking for other stars. CURR_STAR also starts out with a value of
+	# looking for other stars. CURR_STAR starts out with a value of
 	# 1. FIRST_UNKNOWN points to the top position in the stack of the
 	# stars which have not yet been assigned to groups. FIRST_UNKNOWN
 	# starts out with the value 2.  Each time through, the program goes
@@ -111,36 +116,28 @@ begin
 
 	# Initialize.
 	maxgroup = 0
+	curr_star = 1
 	first_unknown = 1
 
 	# Loop through the list of stars.
-	curr_star = 1
 	while (curr_star <= DP_APNUM(apsel)) {
 
 	    # Initialize for the next group.
-	    nin_currgrp = 1
 	    first_ingrp = curr_star
+	    nin_currgrp = 1
 	    first_unknown = first_unknown + 1
 
 	    # Begin defining a group.
-	    for (; curr_star < first_unknown; curr_star = curr_star + 1) {
+	    while (curr_star < first_unknown) {
 
-		# Define the index to the current star.
+		# Get the parameters of the current star.
 		curr_point = Memi[index+curr_star-1]
-
-		# Get the position of the current star.
 		xcurr = Memr[DP_APXCEN(apsel)+curr_point-1]
 		ycurr = Memr[DP_APYCEN(apsel)+curr_star-1]
-
-		# Define its distance from the psf star.
-		xcurr_frompsf = xcurr - DP_XPSF(psffit)
-		ycurr_frompsf = ycurr - DP_YPSF(psffit)
-
-		# Get its magnitude and sky value.
+		dxcurr_frompsf = (xcurr - 1.0) / DP_PSFX(psffit) - 1.0
+		dycurr_frompsf = (ycurr - 1.0) / DP_PSFY(psffit) - 1.0
 		magcurr = Memr[DP_APMAG(apsel)+curr_point-1]
 		skycurr = Memr[DP_APMSKY(apsel)+curr_point-1]
-
-		# Get the relative brightness.
 		if (IS_INDEFR(magcurr))
 		    magcurr = bright_mag
 		else if (abs (DAO_MAGCHECK(psffit, magcurr)) > (MAX_EXPONENTR -
@@ -159,14 +156,14 @@ begin
 
 		    overlap = dp_gchkstar (Memr[DP_APXCEN(apsel)], 
 		        Memr[DP_APYCEN(apsel)], Memi[index], i, xcurr, ycurr,
-			critsep_sq, radsq, deltax, deltay)
+			critsep_sq, deltax, deltay, radsq)
 
 		    # Break from the do loop if we are beyond the the critical
 		    # separation.
 
-		    if (deltay > critsep_sq)
+		    if (deltay > critsep)
 			break
-		    else if (! overlap)
+		    if (! overlap)
 			next
 
 		    # Define the characteristics of the unknown star.
@@ -174,10 +171,10 @@ begin
 		    crit_point = Memi[index+i-1]
 		    magcrit = Memr[DP_APMAG(apsel)+crit_point-1]
 		    skycrit = Memr[DP_APMSKY(apsel)+crit_point-1]
-		    xcrit_frompsf = Memr[DP_APXCEN(apsel)+crit_point-1] -
-			DP_XPSF(psffit)
-		    ycrit_frompsf = Memr[DP_APYCEN(apsel)+i-1] -
-		        DP_YPSF(psffit)
+		    dxcrit_frompsf = (Memr[DP_APXCEN(apsel)+crit_point-1] -
+			1.0) / DP_PSFX(psffit) - 1.0
+		    dycrit_frompsf = (Memr[DP_APYCEN(apsel)+i-1] - 1.0) /
+		        DP_PSFY(psffit) - 1.0
 
 		    # Check to see if stars overlap critically.
 
@@ -206,23 +203,31 @@ begin
 			# Determine which star is brighter.
 
 			if (magcurr > rel_bright) {
-			    rel_bright = magcurr * dp_evalpsf (deltax,
-				deltay, psffit, xcurr_frompsf, ycurr_frompsf,
-				DP_VARPSF(dao), dvdx, dvdy)
+			    rel_bright = magcurr *
+			        dp_usepsf (DP_PSFUNCTION(psffit), deltax,
+				deltay, DP_PSFHEIGHT(psffit),
+				Memr[DP_PSFPARS(psffit)],
+				Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+				DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
+				dxcurr_frompsf, dycurr_frompsf, dvdx, dvdy)
 			} else {
-			    rel_bright = rel_bright * dp_evalpsf (-deltax,
-			        -deltay, psffit, xcrit_frompsf, ycrit_frompsf,
-				DP_VARPSF(dao), dvdx, dvdy)
+			    rel_bright = rel_bright *
+			        dp_usepsf (DP_PSFUNCTION(psffit), -deltax,
+			        -deltay, DP_PSFHEIGHT(psffit),
+				Memr[DP_PSFPARS(psffit)],
+				Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+				DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
+				dxcrit_frompsf, dycrit_frompsf, dvdx, dvdy)
 			}
 
 			# Do the stars overlap ?
 
 			if (! IS_INDEFR(skycurr) && ! IS_INDEFR(skycrit)) {
 			    stand_err = read_noise + 0.5 * (skycurr +
-			        skycrit) / DP_PHOT_ADC(dao)
+			        skycrit) / DP_PHOTADU(dao)
 			    if ((rel_bright * rel_bright) >= (stand_err *
 			        critovlap))
-			    overlap = true
+			        overlap = true
 			}
 		    }   
 				
@@ -231,11 +236,13 @@ begin
 
 		    if (overlap) {
 			nin_currgrp = nin_currgrp + 1
-			call dp_swap2 (i, first_unknown, Memi[index], 
+			call dp_gswap2 (i, first_unknown, Memi[index], 
 			    Memr[DP_APYCEN(apsel)])
 			first_unknown = first_unknown + 1
 		    }
 		}
+
+		curr_star = curr_star + 1
 	    }
 
 	    # Check for maximum group size.
@@ -257,14 +264,20 @@ begin
 	call dp_wrtgroup (dao, grp, Memi[number], Memi[index],
 	    Memi[group_size], maxgroup)
 
-	call sfree(sp)
+	call mfree (number, TY_INT)
+	call mfree (index, TY_INT)
+	call mfree (group_size, TY_INT)
+
+	# Restore the original fitting radius.
+	DP_FITRAD(dao) = fradius
+	DP_SFITRAD(dao) = DP_FITRAD(dao) * DP_SCALE(dao)
 end
 
 
-# DP_SWAP2 -- Interchange two stars in the photometry list and then shift
+# DP_GSWAP2 -- Interchange two stars in the photometry list and then shift
 # the list.
 
-procedure dp_swap2 (star1, star2, index, y)
+procedure dp_gswap2 (star1, star2, index, y)
 
 int	star1, star2		# the two star numbers to interchange
 int	index[ARB]		# the index array
@@ -292,8 +305,8 @@ end
 # DP_GCHKSTR -- Check to see if the unknown stars star is within one critical
 # separation of the current star.
 
-bool	procedure dp_gchkstar (x, y, index, i, xcurr, ycurr, crit, radsq,
-	deltax, deltay)
+bool	procedure dp_gchkstar (x, y, index, i, xcurr, ycurr, crit, deltax,
+	deltay, radsq)
 
 real	x[ARB]			# array of x positions
 real	y[ARB]			# array of y positions
@@ -302,19 +315,17 @@ int	i			# position of test star in stack
 real	xcurr			# x position of current star
 real	ycurr			# y position of current star
 real	crit 			# critical radius squared
-real	radsq			# separation squared
 real	deltax			# output difference in x
 real	deltay			# output difference in y
+real	radsq			# separation squared
 
 begin
 	# Initialize the deltas.
-
 	deltax = MAX_REAL
 	deltay = MAX_REAL
 
 	# Check to see if star is within a critical radius. Reject the
 	# star if any of the positions are INDEF.
-
 	if (IS_INDEFR(xcurr) || IS_INDEFR(ycurr)) {
 	    return (false)
 	} else if (IS_INDEFR(y[i]) || IS_INDEFR(x[index[i]])) {
@@ -339,20 +350,17 @@ pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
 real	bright_mag		# apparent magnitude of the brightest star
 
-int	i, j, k, lowx, lowy, nxpix, nypix
-pointer psffit, apsel, subim, pixel
-real 	fitrad, fitradsq, mingdata, maxgdata
-real	x, y, sky, mag, dx, dy, radsq, xfrom_psf, yfrom_psf
-real	denom, numer, pixval, dvdx, dvdy, value, weight, ratio
+int	i, lowx, lowy, nxpix, nypix
+pointer apsel, subim
+real 	fitrad, fitradsq, mingdata, maxgdata, x, y, sky, mag
 
 bool	fp_equalr()
 pointer	dp_gsubrast()
-real	dp_evalpsf()
+real	dp_gaccum()
 
 begin
 	# Get pointers to the daophot structures.
 	apsel = DP_APSEL (dao)
-	psffit = DP_PSFFIT(dao)
 	
 	# Initialize.
 	fitrad = DP_FITRAD(dao)
@@ -390,47 +398,18 @@ begin
 
 		# Get subraster around star position. If the subraster
 		# cannot be extracted leave the magnitude as INDEF.
-
 		subim = dp_gsubrast (im, x, y, fitrad, lowx, lowy, nxpix,
 		    nypix)
 		if (subim == NULL) 
 		    next
 
-		# Compute the distance from the psf star.
-		xfrom_psf = x - DP_XPSF(psffit)
-		yfrom_psf = y - DP_YPSF(psffit)
-
 		# Estimate the value of the PSF.
-		denom = 0.
-		numer = 0.
-		pixel = subim - 1
-		do k = 1, nypix {
-		    do j = 1, nxpix {
+		mag = dp_gaccum (dao, Memr[subim], nxpix, nypix, lowx, lowy,
+		    x, y,  sky, fitradsq, mingdata, maxgdata)
 
-			dx = real (lowx + j - 1) - x
-			dy = real (lowy + k - 1) - y
-			radsq = dx * dx + dy * dy
-			pixel = pixel + 1
-			pixval = Memr[pixel]
+		if (! IS_INDEFR(mag))
+		    Memr[DP_APMAG(apsel)+i-1] = mag
 
-			if ((radsq >= fitradsq) || (pixval <  mingdata) ||
-			    (pixval > maxgdata))
-			    next
-			value = dp_evalpsf (dx, dy, psffit, xfrom_psf,
-			        yfrom_psf, DP_VARPSF(dao), dvdx, dvdy)
-			radsq = radsq / fitradsq
-			weight = 5. / (5. + radsq / (1.0 - radsq))
-			numer = numer + weight * value * (pixval - sky)
-			denom = denom + weight * value * value
-		    }
-		}
-
-		if (! fp_equalr (denom, 0.0)) {
-		    ratio = numer / denom
-		    if (ratio > 0.0)
-		        Memr[DP_APMAG(apsel)+i-1] = DP_PSFMAG(psffit) -
-			    2.5 * log10 (ratio)
-		}
 
 	    } else if (mag < bright_mag)
 		bright_mag = mag
@@ -438,4 +417,63 @@ begin
 
 	if (fp_equalr (bright_mag, MAX_REAL))
 	    bright_mag = INDEFR
+end
+
+
+# DP_GACCUM -- Accumulate the model counts.
+
+real procedure dp_gaccum (dao, subim, nxpix, nypix, lowx, lowy, x, y, sky,
+	fitradsq, mingdata, maxgdata)
+
+pointer	dao			# pointer to the daophot structure
+real	subim[nxpix,nypix]	# the input data subraster
+int	nxpix, nypix		# the dimensions of the data subraster
+int	lowx, lowy		# the lower left corner of the subraster
+real	x, y			# the coordinates of the star
+real	sky			# the sky value of the star
+real	fitradsq		# the fitting radius of the star
+real	mingdata, maxgdata	# the minimum and maximum good data values
+
+int	k, j
+pointer	psffit
+real	mag, dxfrom_psf, dyfrom_psf, numer, denom, dx, dy, radsq, dvdx, dvdy
+real	weight, value
+real	dp_usepsf()
+
+begin
+	psffit = DP_PSFFIT(dao)
+
+	# Compute the distance from the psf star.
+	dxfrom_psf = (x - 1.0) / DP_PSFX(psffit) - 1.0
+	dyfrom_psf = (y - 1.0) / DP_PSFY(psffit) - 1.0
+
+	denom = 0.
+	numer = 0.
+	mag = INDEFR
+	do k = 1, nypix {
+	    do j = 1, nxpix {
+
+		dx = real (lowx + j - 1) - x
+		dy = real (lowy + k - 1) - y
+		radsq = dx * dx + dy * dy
+		if ((radsq >= fitradsq) || (subim[j,k] <  mingdata) ||
+		    (subim[j,k] > maxgdata))
+		    next
+
+		value = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
+		    DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
+		    Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
+		    DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
+		    dxfrom_psf, dyfrom_psf, dvdx, dvdy)
+		radsq = radsq / fitradsq
+		weight = 5. / (5. + radsq / (1.0 - radsq))
+		numer = numer + weight * value * (subim[j,k] - sky)
+		denom = denom + weight * value * value
+	    }
+	}
+
+	if (denom > 0.0 && numer > 0.0)
+	    mag = DP_PSFMAG(psffit) - 2.5 * log10 (numer / denom)
+
+	return (mag)
 end

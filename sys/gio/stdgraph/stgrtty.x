@@ -16,11 +16,11 @@ include	"stdgraph.h"
 
 int procedure stg_readtty (fd, obuf, maxch)
 
-int	fd			# input stream	[NOT USED]
-char	obuf[ARB]		# output buffer
-int	maxch			# max chars to read
+int	fd			#I input stream	[NOT USED]
+char	obuf[ARB]		#O output buffer
+int	maxch			#I max chars to read
 
-int	op, ch
+int	nchars, op, ch
 int	read(), getci(), fstati()
 include	"stdgraph.com"
 errchk	read, getci, ttyctrl
@@ -33,6 +33,16 @@ begin
 	if (g_active == NO) {
 	    # Workstation in normal text mode; normal text input.
 	    return (read (STDIN, obuf, maxch))
+
+	} else if (g_msglen > 0) {
+	    # The message data has already been transmitted and resides in
+	    # the message buffer.
+
+	    nchars = min (maxch, g_msglen)
+	    call amovc (Memc[g_msgbuf], obuf, nchars)
+	    obuf[nchars+1] = EOS
+	    g_msglen = 0
+	    return (nchars)
 
 	} else {
 	    # Workstation is activated; read status line in raw mode.
@@ -104,11 +114,24 @@ end
 
 int procedure stg_getline (fd, obuf)
 
-int	fd			# input file
-char	obuf[SZ_LINE]		# output buffer
+int	fd			#I input file
+char	obuf[SZ_LINE]		#O output buffer
 
 int	stg_readtty()
 
 begin
 	return (stg_readtty (fd, obuf, SZ_LINE))
+end
+
+
+# STG_MSGLEN -- This routine is called to determine if there is any message
+# data buffered in the kernel, to be returned in the next call to stg_readtty.
+
+int procedure stg_msglen (fd)
+
+int	fd			#I input file
+include	"stdgraph.com"
+
+begin
+	return (g_msglen)
 end

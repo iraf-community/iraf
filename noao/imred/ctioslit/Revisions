@@ -1,0 +1,8 @@
+.help revisions Dec94 noao.imred.ctioslit
+.nf
+ctioslit/ctioslit.cl
+ctioslit/ctioslit.men
+    Added background, illumination, response, apflatten, apnormalize.
+    (12/29/94, Valdes)
+
+.endhelp

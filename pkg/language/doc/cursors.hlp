@@ -1,4 +1,4 @@
-.help cursors Apr87 language
+.help cursors May93 language
 .ih
 NAME
 cursors -- cursor control for graphics and image display devices
@@ -148,7 +148,7 @@ typing ":.help"):
 .nf
     A 			draw and label the axes of current viewport
     B			backup over last instruction in frame buffer
-    C			print the cursor position as it moves
+    C			print the cursor position
     D 			draw a line by marking the endpoints
     E			expand plot by setting window corners
     F			set fast cursor (for HJKL)
@@ -187,7 +187,7 @@ terminated and the cursor value reported.
     :.axes[+-]		    draw axes of viewport whenever screen is redrawn
     :.case[+-]		    enable case sensitivity for keystrokes
     :.clear		    clear alpha memory (e.g, this text)
-    :.cursor n		    select cursor (0=normal,1=crosshair,2=lightpen)
+    :.cursor n		    select cursor
     :.gflush		    flush plotter output
     :.help		    print help text for cursor mode
     :.init		    initialize the graphics system
@@ -343,10 +343,8 @@ see which digit to use.
 .nh 2
 Reporting and Marking the Cursor Position
 
-    If you wish to know the world (data) coordinates of a point on
-the screen, issue the command "C".  Then, every time you move the cursor
-with HJKL, the world coordinates at each new position will be reported
-on the lower left line of the screen.
+    To print the current cursor position in world coordinates without
+exiting cursor mode use the `C' keystroke.
 
 If the cursor mode option ":.markcur+" is set, the position of the cursor
 will be marked with a small plus sign when time cursor mode exits,

@@ -14,7 +14,7 @@ procedure t_rtextimage ()
 char	output[SZ_FNAME], text_file[SZ_FNAME], temp[SZ_FNAME]
 char	out_fname[SZ_FNAME]
 pointer	im
-int	header, nskip, nfiles, ntext, format, data_type, tf, i, input
+int	header, pixels, nskip, nfiles, ntext, format, data_type, tf, i, input
 int	fd_dim, junk, ndim, ip
 
 bool	clgetb()
@@ -31,6 +31,7 @@ begin
 	# Get hidden parameters from cl. 
 	data_type = get_data_type (clgetc ("otype"))
 	header = btoi (clgetb ("header"))
+	pixels = btoi (clgetb ("pixels"))
 	if (header == NO)
 	    nskip = clgeti ("nskip")
 
@@ -95,7 +96,7 @@ begin
 	    # message if an error occurs.  Processing continues to the next
 	    # file in the input list.
 
-	    iferr (call rt_convert_pixels (tf, im, format))
+	    iferr (call rt_convert_pixels (tf, im, format, pixels))
 		call erract (EA_WARN)
 
 	    call imunmap (im)

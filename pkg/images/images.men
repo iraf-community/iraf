@@ -18,6 +18,7 @@
 	imdebug - Image debugging package (currently undocumented)
        imdelete - Delete a list of images
        imdivide - Image division with zero checking and rescaling
+	 imexpr - Evaluate a general image expression
          imgets - Return the value of an image parameter as a string
        imheader - Print an image header
     imhistogram - Compute image histogram
@@ -42,3 +43,4 @@
        sections - Expand an image template on the standard output
      shiftlines - Shift image lines
              tv - Image display load and control package
+      xregister - Register 1-D or 2-D images using x-correlation techniques

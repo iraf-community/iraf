@@ -14,11 +14,13 @@ pointer	ap		# pointer to the apphot structure
 int	ier
 pointer	psf, nse
 int	apsfradgauss(), apsfelgauss(), apsfmoments()
-real	datamin, datamax, dmin, dmax
+real	datamin, datamax, dmin, dmax, threshold
 
 begin
 	psf = AP_PPSF(ap)
 	nse = AP_NOISE(ap)
+	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf))
+	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf))
 
 	# Compute the minimum and maximum good data value.
 	if (IS_INDEFR(AP_DATAMIN(ap)))
@@ -66,15 +68,16 @@ begin
 		dmin, dmax)
 	    dmin = max (dmin, datamin)
 	    dmax = min (dmax, datamax)
+	    threshold = 0.0
 
 	    if (AP_POSITIVE(ap) == YES)
 	        ier = apsfmoments (Memr[AP_PSFPIX(psf)], AP_PNX(psf),
-		    AP_PNY(psf), dmin + AP_THRESHOLD(nse), dmax,
+		    AP_PNY(psf), dmin + threshold, dmax,
 		    AP_POSITIVE(ap), Memr[AP_PPARS(psf)],
 		    Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
 	    else 
 	        ier = apsfmoments (Memr[AP_PSFPIX(psf)], AP_PNX(psf),
-		    AP_PNY(psf), dmax + AP_THRESHOLD(nse), dmin,
+		    AP_PNY(psf), dmax + threshold, dmin,
 		    AP_POSITIVE(ap), Memr[AP_PPARS(psf)],
 		    Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
 

@@ -1,4 +1,5 @@
 objects,s,h,,,,"Object spectra"
+datamax,r,h,,,,"Max data value / cosmic ray threshold"
 response,f,h,"",,,"Response spectrum"
 arcs1,s,h,,,,"List of arc spectra"
 arcs2,s,h,,,,"List of shift arc spectra"
@@ -19,6 +20,7 @@ done,f,h,"",,,"File of spectra already done"
 logfile,f,h,"",,,"Logfile"
 redo,b,h,,,,"Redo operations?"
 update,b,h,,,,"Update spectra?"
+scattered,b,h,,,,"Subtracted scattered light?"
 arcap,b,h,,,,"Use object apertures for arcs?"
 dispcor,b,h,,,,"Dispersion correct spectra?"
 savearcs,b,h,,,,"Save internal arcs?"
@@ -31,4 +33,5 @@ newdisp,b,h,,,,
 newarcs,b,h,,,,
 fd1,*struct,h,"",,,
 fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
 mode,s,h,"ql",,,

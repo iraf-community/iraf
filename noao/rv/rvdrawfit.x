@@ -85,11 +85,15 @@ begin
 	    }
 	}
 
-	if (gstati(gp, G_PLTYPE) != 0)
-    	    call gseti (gp, G_PLTYPE, 2)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    call gseti (gp, G_PLTYPE, GL_DASHED)
+    	    call gseti (gp, G_PLCOLOR, RV_LINECOLOR(rv))
+	}
 	call gpline (gp, Memr[pltx], Memr[plty], pltnpts)
-	if (gstati(gp, G_PLTYPE) != 0)
-    	    call gseti (gp, G_PLTYPE, 1)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    call gseti (gp, G_PLTYPE, GL_SOLID)
+    	    call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+	}
 
 	call gflush (gp)
 	call sfree (sp)
@@ -134,21 +138,38 @@ begin
 	if (RV_FITDONE(rv) == YES) {
 	    # Mark the background level
 	    if (IS_INDEF(RV_BACKGROUND(rv))) {
-	  	if (gstati(gp, G_PLTYPE) != 0)
-    	    	    call gseti (gp, G_PLTYPE, 2)
+	  	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    	    call gseti (gp, G_PLTYPE, GL_DASHED)
+    	    	    call gseti (gp, G_PLCOLOR, C_GREEN)
+		}
 		call gline (gp, left, COEFF(rv,4), right, COEFF(rv,4))
-	  	if (gstati(gp, G_PLTYPE) != 0)
-    	            call gseti (gp, G_PLTYPE, 1)
+	  	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	            call gseti (gp, G_PLTYPE, GL_SOLID)
+    	    	    call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+		}
 	    } else {
-		call gline (gp, left, RV_BACKGROUND(rv), 
-		    right, RV_BACKGROUND(rv))
+	  	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    	    call gseti (gp, G_PLTYPE, GL_DASHED)
+    	    	    call gseti (gp, G_PLCOLOR, C_GREEN)
+		}
+		call gline (gp, left, RV_BACKGROUND(rv), right, 
+		    RV_BACKGROUND(rv))
+	  	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	            call gseti (gp, G_PLTYPE, GL_SOLID)
+    	    	    call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+		}
 	    }
 	
-    	} else if (!IS_INDEF(RV_BACKGROUND(rv)))
+    	} else if (!IS_INDEF(RV_BACKGROUND(rv))) {
+    	    #call gseti (gp, G_PLCOLOR, C_GREEN)
 	    call gline (gp, left, RV_BACKGROUND(rv), left, RV_BACKGROUND(rv))
+    	    #call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 
-	else
+	} else {
+    	    #call gseti (gp, G_PLCOLOR, C_GREEN)
 	    call gline (gp, left, 0.0, right, 0.0)
+    	    #call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+	}
 end
 
 
@@ -179,8 +200,12 @@ begin
 
 	# First set the line and polymarker types to be black.
 	call gseti (gp, G_WCS, 2)
-	call gseti (gp, G_PLTYPE, 0)
-	call gseti (gp, G_PMLTYPE, 0)
+	call gseti (gp, G_PLCOLOR, C_BACKGROUND)
+	call gseti (gp, G_PLTYPE, GL_CLEAR)
+	call gseti (gp, G_PMLTYPE, GL_CLEAR)
+
+	# Erase the computed CCF.
+	call rv_draw_fit (rv, gp, NO)
 
 	# Erase the points being used in the fit.
 	call gpmark (gp, WRKPIXX(rv,ledge), WRKPIXY(rv,ledge), npts, 4, 2., 2.)
@@ -200,7 +225,7 @@ begin
 	}
 
 	# Erase the computed CCF.
-	call rv_draw_fit (rv, gp, NO)
+	#call rv_draw_fit (rv, gp, NO)
 
 	# Just in case, let's also erase the residuals.
 	if (RV_RESDONE(rv) == YES) {
@@ -209,8 +234,9 @@ begin
 	}
 
 	# Now redraw the ccf, with a little on each end to cover up the slop.
-	call gseti (gp, G_PLTYPE, 1)
-	call gseti (gp, G_PMLTYPE, 1)
+	call gseti (gp, G_PLTYPE, GL_SOLID)
+	call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+	call gseti (gp, G_PMLTYPE, GL_SOLID)
 	call gpline (gp, WRKPIXX(rv,max(1,ledge-4)), WRKPIXY(rv,max(1,ledge-4)),
 	    min(npts+8,RV_CCFNPTS(rv)))
 	call gflush (gp)
@@ -282,8 +308,10 @@ begin
 	i1 = DBL_I1(rv)
 	x1 = WRKPIXX(rv,1)
 	npts = DBL_NFITP(rv)
-	if (gstati(gp, G_PLTYPE) != 0)
-    	    call gseti (gp, G_PLTYPE, 2)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    call gseti (gp, G_PLTYPE, GL_DASHED)
+    	    call gseti (gp, G_PLCOLOR, RV_LINECOLOR(rv))
+	}
 	do i = 1, npts-1 {
 	    do j = 1, nsub {
 	        offset = ((i-1)*nsub+j)-1
@@ -304,8 +332,8 @@ begin
 	    }
 	    call gflush (gp)
 	}
-	if (gstati(gp, G_PLTYPE) != 0)
-    	    call gseti (gp, G_PLTYPE, 1)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR)
+    	    call gseti (gp, G_PLTYPE, GL_SOLID)
 
 	# Draw the background to the screen.
 	y1 = DBL_Y1(rv)
@@ -320,5 +348,9 @@ begin
 	    x2 = DBL_X2(rv)
 	}
 	call gline (gp, x1, y1, x2, y2)
+	if (gstati(gp, G_PLTYPE) != GL_CLEAR) {
+    	    call gseti (gp, G_PLTYPE, GL_SOLID)
+    	    call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+	}
 	call gflush (gp)
 end

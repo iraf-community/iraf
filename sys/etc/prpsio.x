@@ -54,7 +54,7 @@ int	stream, pr, in, record_type, rq, iotype
 int	pseudofile, destfd, destpr, destination, ps, flags
 bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
-int	filbuf(), read(), strncmp()
+int	filbuf(), read(), strncmp(), fstati()
 int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
@@ -209,10 +209,13 @@ begin
 # call eprintf ("___giotr, %d chars\n")
 # call pargi (nchars)
 
-			# call fseti (destfd, F_CANCEL, OK)
+			# Call GIOTR to process the graphics data.  Any data
+			# to be returned to the client is spooled in the
+			# graphics stream to be read by a subsequent XFER.
+
+			call fseti (destfd, F_CANCEL, OK)
 			call zcall1 (epa_giotr, destfd)
-# call eprintf ("   giotr completed, fiobuf=%d\n")
-# call pargi (iop[destfd] - bufptr[destfd])
+			call seek (destfd, BOFL)
 
 		    } else {
 			# Binary transfer.
@@ -407,28 +410,52 @@ begin
 		    # to be operated upon by gtr_control is passed as the first
 		    # integer word of the data block.
 
+		    # Read pseudofile number.
 		    iotype = 0
 		    if (read (in, ps, SZ_INT) < SZ_INT)
 			call syserr (SYS_PRIPCSYNTAX)
-		    nchars = nchars - SZ_INT
 
+		    # Read data block.
+		    nchars = nchars - SZ_INT
 		    if (read (in, Memc[ip], nchars) < nchars)
 			call syserr (SYS_PRIPCSYNTAX)
 
-		    # If the graphics stream has been redirected into a file
-		    # discard the control directive.
-		    # if (abs(pr_pstofd[pr,ps]) == ps)
+		    # Call gtr_control to process the control directives.
+		    iferr (call zcall3 (epa_control,ps,Memc[ip],pr_pid[pr]))
+			call erract (EA_WARN)
 
-		    # Let's try letting the PSIO controller decide whether
-		    # or not to discard the control directive.
+		    # When writing to a graphics subkernel gtr_control may
+		    # leave graphics metacode spooled in the graphics stream
+		    # which we need to pass on to the subkernel.  This is
+		    # done by pushing an XMIT on the psio control stack to
+		    # cause the subkernel process to be polled to see if it
+		    # wants the spooled data.
 
-		    # p_fd = abs (pr_pstofd[pr,ps])
-		    # if (!(p_fd >= FIRST_FD && p_fd <= LAST_FD))
+		    nchars = fstati (ps, F_FILESIZE)
+		    if (nchars > 0) {
+			destination = abs(pr_pstofd[pr,ps])
+			if (destination > KSHIFT) {
+			    destfd = mod (destination, KSHIFT)
+			    destpr = destination / KSHIFT
+			} else {
+			    destfd = destination
+			    destpr = 0
+			}
 
-			iferr {
-			    call zcall3 (epa_control,ps,Memc[ip],pr_pid[pr])
-			} then
-			    call erract (EA_WARN)
+			if (destpr != 0) {
+			    call seek (destfd, BOFL)
+
+			    push (pr)
+			    push (in)
+			    push (destfd)
+			    push (stream)
+			    push (XMIT)
+
+			    pr = destpr
+			    in = pr_infd[pr]
+			    stream = destfd
+			}
+		    }
 
 		case OSCMD:
 		    # OS escape directive.  There are portability problems

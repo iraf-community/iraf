@@ -6,7 +6,7 @@ $checkin  libex.a lib$
 $exit
 
 libex.a:
-	#$set XFLAGS = "$(XFLAGS) -f -g"
+	#$set XFLAGS = "$(XFLAGS) -qfx"
 	#$set XFLAGS = "$(XFLAGS) -/pg"
 
 	stfaccess.x	stf.h

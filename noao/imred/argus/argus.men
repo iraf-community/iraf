@@ -21,8 +21,10 @@
           scopy - Select and copy apertures in different spectral formats
      setairmass - Compute effective airmass and middle UT for an exposure
           setjd - Compute and set Julian dates in images
+	  sflip - Flip data and/or dispersion coordinates in spectra
           slist - List spectrum header parameters
        specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
           splot - Preliminary spectral plot/analysis
 
         doargus - Process ARGUS spectra

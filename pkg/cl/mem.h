@@ -20,9 +20,9 @@
  * same size, in particular that (char *) is the same size as (unsigned *).
  */
 
-#define	BPI	(sizeof (int))
+#define	BPI	(sizeof (memel))
 #define	btoi(x)	((int)((((x)+BPI-1)/BPI))) /* avoid promotion to unsigned */
-#define dtoi(x) ( (int) (sizeof (double) )/ (sizeof (int) )*x )
+#define dtoi(x) ((int)(sizeof(double))/(sizeof(memel))*x)
 
 /* the dictionary starts at the top of the system break and grows as needed.
  * if this is hard to do on your os, declare it as a genuine array and
@@ -30,7 +30,8 @@
  *   in compile.c. see machdep.c.
  */
 
-extern unsigned *dictionary;	/* base of the dictionary; never moves	*/
+
+extern memel *dictionary;    /* base of the dictionary; never moves */
 
 /* ----------
  * convert a dictionary index into a structure pointer.
@@ -58,11 +59,11 @@ extern unsigned *dictionary;	/* base of the dictionary; never moves	*/
  * envhead:                "                        environment.
  */
 
-extern unsigned maxd;
-extern unsigned topd;
-extern unsigned pachead;
-extern unsigned parhead;
-extern unsigned envhead;
+extern int maxd;
+extern int topd;
+extern int pachead;
+extern int parhead;
+extern int envhead;
 
 /* ----------
  * these are indices into the stack defined in stack.c.
@@ -81,11 +82,11 @@ extern unsigned envhead;
  *	operand stack.
  */
 
-extern unsigned stack[];	/* space for the stacks			*/
+extern memel stack[];		/* space for the stacks			*/
 extern int topcs;		/* top of control stack			*/
 extern int topos;		/* top of operand stack			*/
 extern int basos;		/* base of operand stack		*/
-extern unsigned pc;		/* program counter			*/
+extern int pc;			/* program counter			*/
 
 /* ----------
  * reference a codeentry in stack at x.

@@ -253,5 +253,5 @@ performing.
 
 .ih
 SEE ALSO
-imshift, magnify, rotate, imlintran, geotran, geomap
+imshift, magnify, rotate, imlintran, geomap, register
 .endhelp

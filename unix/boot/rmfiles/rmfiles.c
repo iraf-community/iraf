@@ -16,6 +16,8 @@ int	verbose;		/* print names of deleted files		*/
 int	execute;		/* permission to delete files		*/
 int	debug;			/* print debugging info			*/
 
+extern	char *vfn2osfn();
+
 
 /*
  * RMFILES -- Delete all files with the listed extensions in the listed

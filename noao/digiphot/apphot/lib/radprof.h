@@ -36,11 +36,15 @@ define	KY_RPNREJECT	"nreject"
 
 # define radprof units
 
-define	UN_RPRADIUS	"scaleunit"
-define	UN_RPSTEP	"scaleunit"
-define	UN_RPORDER	"number"
-define	UN_RPKSIGMA	"sigma"
-define	UN_RPNREJECT	"number"
+#define	UN_RPRADIUS	"scaleunit"
+#define	UN_RPSTEP	"scaleunit"
+#define	UN_RPORDER	"number"
+#define	UN_RPKSIGMA	"sigma"
+#define	UN_RPNREJECT	"number"
+
+define	UN_RSCALEUNIT	"scaleunit"
+define	UN_RNUMBER	"number"
+define	UN_RSIGMA	"sigma"
 
 # radprof strings
 

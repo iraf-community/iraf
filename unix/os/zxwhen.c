@@ -3,10 +3,7 @@
 
 #include <stdio.h>
 #include <signal.h>
-
-#ifdef mips
-#include <mips/fpu.h>
-#endif
+#include <fpu_control.h>
 
 #define import_spp
 #define	import_kernel
@@ -14,13 +11,58 @@
 #define import_xwhen
 #include <iraf.h>
 
+/* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
+ * customized for LINUX.
+ */
+
 /* Set the following nonzero to cause process termination with a core dump
  * when the first signal occurs.
  */
-int	debug_sig = 0;
+int debug_sig = 0;
+static int fpstatus();
 
 /* The following definition has intimate knowledge of the STDIO structures. */
-#define	fcancel(fp)	((fp)->_cnt=(fp)->_bufsiz,(fp)->_ptr=(fp)->_base)
+#define	fcancel(fp)	( \
+    (fp)->_IO_read_ptr = (fp)->_IO_read_end = (fp)->_IO_read_base,\
+    (fp)->_IO_write_ptr = (fp)->_IO_write_end = (fp)->_IO_write_base)
+
+/* x86 Traps.
+ */
+#define HWX_BASE		10
+
+#define	X86_DIVIDE_ERROR	10
+#define	X86_DEBUG		11
+#define	X86_NMI_INT		12
+#define	X86_BREAKPOINT		13
+#define	X86_INTO		14
+#define	X86_BOUND		15
+#define	X86_INVALID_OPCODE	16
+#define	X86_DEVICE_NOTAVAIL	17
+#define	X86_DOUBLE_FAULT	18
+#define	X86_SEGMENT_OVERRUN	19
+#define	X86_INVALID_TSS		20
+#define	X86_SEGMENT_NOTPRESENT	21
+#define	X86_STACK_FAULT		22
+#define	X86_GPE			23
+#define	X86_PAGE_FAULT		24
+#define	X86_RESERVED_EX15	25
+#define	X86_FPE			26
+#define	X86_ALIGNMENT_CHECK	27
+#define	X86_MACHINE_CHECK	28
+
+
+/* x86 FPU hardware exceptions.
+ */
+#define	FPE_FPA_ERROR		30
+#define	FPE_INTDIV_TRAP		31
+#define	FPE_INTOVF_TRAP		32
+#define	FPE_FLTOPERR_TRAP	33
+#define	FPE_FLTDEN_TRAP		34
+#define	FPE_FLTDIV_TRAP		35
+#define	FPE_FLTOVF_TRAP		36
+#define	FPE_FLTUND_TRAP		37
+#define	FPE_FLTINEX_TRAP	38
+#define	FPE_FLTSTK_TRAP		39
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -76,7 +118,7 @@ struct osexc unix_exception[] = {
 	X_INT,		"interrupt",
 	NULL,		"quit",
 	X_ACV,		"illegal instruction",
-	X_ARITH,	"trace trap",
+	NULL,		"trace trap",
 	X_ACV,		"IOT",
 	X_ACV,		"EMT",
 	X_ARITH,	"FPE",
@@ -87,6 +129,7 @@ struct osexc unix_exception[] = {
 	X_IPC,		"write to pipe with no reader",
 	NULL,		"alarm clock",
 	X_INT,		"software terminate (interrupt)",
+	X_ARITH,	"STKFLT",
 	EOMAP,		""
 };
 
@@ -101,113 +144,38 @@ struct	_hwx {
 };
 
 struct	_hwx hwx_exception[] = {
-#ifdef vax
-	ILL_RESAD_FAULT,	"reserved addressing fault",
-	ILL_PRIVIN_FAULT,	"privileged instruction fault",
-	ILL_RESOP_FAULT,	"reserved operand fault",
-#endif vax
-#ifdef mc68000
-	ILL_ILLINSTR_FAULT,	"illegal instruction fault",
-	ILL_PRIVVIO_FAULT,	"privilege violation fault",
-	ILL_COPROCERR_FAULT,	"[coprocessor protocol error fault]",
-	ILL_TRAP1_FAULT,	"trap #1 fault",
-	ILL_TRAP2_FAULT,	"trap #2 fault",
-	ILL_TRAP3_FAULT,	"trap #3 fault",
-	ILL_TRAP4_FAULT,	"trap #4 fault",
-	ILL_TRAP5_FAULT,	"trap #5 fault",
-	ILL_TRAP6_FAULT,	"trap #6 fault",
-	ILL_TRAP7_FAULT,	"trap #7 fault",
-	ILL_TRAP8_FAULT,	"trap #8 fault",
-	ILL_TRAP9_FAULT,	"trap #9 fault",
-	ILL_TRAP10_FAULT,	"trap #10 fault",
-	ILL_TRAP11_FAULT,	"trap #11 fault",
-	ILL_TRAP12_FAULT,	"trap #12 fault",
-	ILL_TRAP13_FAULT,	"trap #13 fault",
-	ILL_TRAP14_FAULT,	"trap #14 fault",
-#endif mc68000
-#ifdef sparc
-	ILL_STACK,		"bad stack",
-	ILL_ILLINSTR_FAULT,	"illegal instruction fault",
-	ILL_PRIVINSTR_FAULT,	"privileged instruction fault",
-#endif sparc
-#ifdef mc68000
-	EMT_EMU1010,		"line 1010 emulator trap",
-	EMT_EMU1111,		"line 1111 emulator trap",
-#endif mc68000
-#ifdef sparc
-	EMT_TAG,		"tag overflow",
-#endif sparc
-#ifdef vax
-	FPE_INTOVF_TRAP,	"integer overflow",
+	/* x86 hardware (cpu) exceptions. */
+	X86_DIVIDE_ERROR,	"integer divide by zero",
+	X86_DEBUG,		"debug exception",
+	X86_NMI_INT,		"NMI interrupt",
+	X86_BREAKPOINT,		"breakpoint",
+	X86_INTO,		"integer overflow",
+	X86_BOUND,		"bound range exceeded",
+	X86_INVALID_OPCODE,	"invalid opcode",
+	X86_DEVICE_NOTAVAIL,	"device not available",
+	X86_DOUBLE_FAULT,	"double fault",
+	X86_SEGMENT_OVERRUN,	"coprocessor segment overrun",
+	X86_INVALID_TSS,	"invalid task state segment",
+	X86_SEGMENT_NOTPRESENT,	"segment not present",
+	X86_STACK_FAULT,	"stack fault",
+	X86_GPE,		"general protection error",
+	X86_PAGE_FAULT,		"page fault",
+	X86_RESERVED_EX15,	"reserved int15",
+	X86_FPE,		"floating point exception",
+	X86_ALIGNMENT_CHECK,	"alignment check",
+	X86_MACHINE_CHECK,	"machine check",
+
+	/* x86 floating point exceptions. */
+	FPE_FPA_ERROR,		"FPA arithmetic exception",
 	FPE_INTDIV_TRAP,	"integer divide by zero",
+	FPE_INTOVF_TRAP,	"integer overflow",
+	FPE_FLTOPERR_TRAP,	"floating operand error",
+	FPE_FLTDEN_TRAP,	"floating denormalized operand",
+	FPE_FLTDIV_TRAP,	"floating divide by zero",
 	FPE_FLTOVF_TRAP,	"floating overflow",
-	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
 	FPE_FLTUND_TRAP,	"floating underflow",
-	FPE_DECOVF_TRAP,	"decimal overflow",
-	FPE_SUBRNG_TRAP,	"subscript out of range",
-	FPE_FLTOVF_FAULT,	"floating overflow fault",
-	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
-	FPE_FLTUND_FAULT,	"floating underflow fault",
-#endif vax
-#ifdef mc68000
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_CHKINST_TRAP,	"CHK [CHK2] instruction",
-	FPE_TRAPV_TRAP,		"TRAPV [cpTRAPcc TRAPcc] instr",
-	FPE_FLTBSUN_TRAP,	"[branch or set on unordered cond]",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-	FPE_FLTNAN_TRAP,	"[floating Not-A-Number]",
-#ifdef sun
-	FPE_FPA_ENABLE,		"[FPA not enabled]",
-	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
-#endif sun
-#endif mc68000
-#ifdef sparc
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-#endif sparc
-#ifdef i386
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTDEN_TRAP,	"[floating denormalized operand]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_UUOP_TRAP,		"[floating undefined opcode]",
-	FPE_DATACH_TRAP,	"[floating data chain exception]",
-	FPE_FLTSTK_TRAP,	"[floating stack fault]",
-	FPE_FPA_ENABLE,		"[FPA not enabled]",
-	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
-#endif i386
-#ifdef mips
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTOVF_TRAP,	"floating overflow",
-	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
-	FPE_FLTUND_TRAP,	"floating underflow",
-	FPE_DECOVF_TRAP,	"decimal overflow",
-	FPE_SUBRNG_TRAP,	"subscript out of range",
-	FPE_FLTOVF_FAULT,	"floating overflow fault",
-	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
-	FPE_FLTUND_FAULT,	"floating underflow fault",
-#endif
-#ifdef SUNOS4
-	BUS_HWERR,		"misc hardware error (e.g. timeout)",
-	BUS_ALIGN,		"hardware alignment error",
-	SEGV_NOMAP,		"no mapping at the fault address",
-	SEGV_PROT,		"access exceeded protections",
-	SEGV_OBJERR,		"object returned errno value",
-#endif
+	FPE_FLTINEX_TRAP,	"floating inexact result",
+	FPE_FLTSTK_TRAP,	"floating stack fault",
 	EOMAP,			""
 };
 
@@ -224,7 +192,7 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	static	int first_call = 1;
 	static	int ignore_sigint;
 	int     vex, uex;
-	PFI     vvector;
+	SIGFUNC	vvector;
 	extern  ex_handler();
 
 	/* Convert code for virtual exception into an index into the table
@@ -244,13 +212,13 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	    
 	*old_epa = handler_epa[vex];
 	handler_epa[vex] = *epa;
-	vvector = (PFI) ex_handler;
+	vvector = (SIGFUNC) ex_handler;
 
 	/* Check for attempt to post same handler twice.  Do not return EPA
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if (*epa == X_IGNORE)
-	    vvector = (PFI) SIG_IGN;
+	    vvector = (SIGFUNC) SIG_IGN;
 	else if (*epa == *old_epa)
 	    *old_epa = X_IGNORE;
 
@@ -290,45 +258,53 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-ex_handler (unix_signal, hwcode, scp, addr)
+ex_handler (unix_signal)
 int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
-int	hwcode;				/* VAX hardware trap/fault codes */
-struct	sigcontext *scp;
-char	*addr;				/* added for SunOS 4.0 */
 {
-	int	vex;
 	XINT	next_epa, epa, x_vex;
-
-#ifdef mc68000
-	/* The Sun floating point accelerator board routinely uses the
-	 * following signal to force recomputation of floating point results
-	 * by the mc68881 when the results would violate the IEEE std.
-	 * If this code is missing the program will enter an infinite loop.
-	 */
-	if (hwcode == FPE_FPA_ERROR)
-	    if (fpa_handler (unix_signal, hwcode, scp, addr))
-		return;
-#endif
+	int	*frame;
+	int	vex;
 
 	last_os_exception = unix_signal;
-	last_os_hwcode = hwcode;
-#ifdef mips
-	if (unix_signal == SIGFPE)
-	    last_os_hwcode = scp->sc_fpc_csr;
-#endif
+	last_os_hwcode = 0;
 	x_vex = unix_exception[unix_signal].x_vex;
 	vex = x_vex - X_FIRST_EXCEPTION;	
 	epa = handler_epa[vex];
 
+	/* [LINUX] The following is horribly system dependent but is the only
+	 * way to find out more about what type of system trap has occurred.
+	 * The EBP register points to the beginning of the current stack frame.
+	 * This is preceded by the saved frame giving the context before the
+	 * exception handler was called.  This frame contains the system level
+	 * trap number indicating which x86 cpu trap occurred.
+	 */
+	asm ("movl %%ebp,%0" : : "g" (frame));  frame++;
+	if (frame[1] == unix_signal)
+	    last_os_hwcode = frame[14] + HWX_BASE;
+
+	/* If the floating point coprocessor is involved try to learn more
+	 * about what type of floating point exception occurred.
+	 */
+	if (unix_signal == SIGFPE)
+	    last_os_hwcode = fpstatus (last_os_hwcode);
+
 	/* If signal was SIGINT, cancel any buffered standard output.
 	 */
-	if (unix_signal == SIGINT)
-	    fcancel (stdout);
+	if (unix_signal == SIGINT) {
+	    /* Linux stdio appears to have a problem with interrupts: the
+	     * file descriptor is partially initialized before the read and
+	     * if an interrupt occurs during the read initialization is not
+	     * completed, causing the next read to reread some old data.
+	     */
+	    fcancel (stdin);
 
-	/* Unblock the signal, in the event that the handler never returns.
-	 * sigsetmask (sigblock(0) & ~mask(unix_signal));
-	 */
-	sigsetmask (0);
+	    /* Cancel the stdout on all systems. */
+	    fcancel (stdout);
+	}
+
+	/* Reenable the exception (LINUX). */
+	signal (unix_signal, (SIGFUNC)ex_handler);
+	__setfpucw (_FPU_DEFAULT);
 
 	/* Call user exception handler(s).  Each handler returns with the
 	 * "value" (epa) of the next handler, or X_IGNORE if exception handling
@@ -336,7 +312,8 @@ char	*addr;				/* added for SunOS 4.0 */
 	 * wishes to restart the process, i.e., initiate error recovery, then
 	 * the handler procedure will not return.
 	 */
-	for (next_epa=epa;  next_epa != X_IGNORE;  ((PFI)epa)(&x_vex,&next_epa))
+	for (next_epa=epa;  next_epa != X_IGNORE;
+		((SIGFUNC)epa)(&x_vex,&next_epa))
 	    epa = next_epa;
 }
 
@@ -359,34 +336,6 @@ XINT	*maxch;
 	    os_errmsg = "";
 	else {
 	    os_errmsg = unix_exception[last_os_exception].x_name;
-#ifdef mips
-	    if (last_os_exception == SIGFPE) {
-		union fpc_csr csr;
-		csr.fc_word = (unsigned long) last_os_hwcode;
-		if (csr.fc_struct.ex_divide0)
-		    os_errmsg = "floating divide by zero";
-		else if (csr.fc_struct.ex_overflow)
-		    os_errmsg = "floating overflow";
-		else if (csr.fc_struct.ex_underflow)
-		    os_errmsg = "floating underflow";
-		else if (csr.fc_struct.ex_invalid)
-		    os_errmsg = "invalid floating operand";
-		else if (csr.fc_struct.ex_inexact)
-		    os_errmsg = "inexact result";
-	    } else if (last_os_exception == SIGTRAP) {
-		switch (last_os_hwcode) {
-		case BRK_OVERFLOW:
-		    os_errmsg = "integer overflow";
-		    break;
-		case BRK_DIVZERO:
-		    os_errmsg = "integer divide by zero";
-		    break;
-		case BRK_RANGE:
-		    os_errmsg = "range error";
-		    break;
-		}
-	    }
-#else
 	    if (last_os_exception == SIGFPE) {
 		for (v=0;  hwx_exception[v].v_code != EOMAP;  v++)
 		    if (hwx_exception[v].v_code == last_os_hwcode) {
@@ -394,11 +343,87 @@ XINT	*maxch;
 			break;
 		    }
 	    }
-#endif
 	}
 
 	strncpy ((char *)errmsg, os_errmsg, (int)*maxch);
 	((char *)errmsg)[*maxch] = EOS;
 
 	last_os_exception = XOK;
+}
+
+
+/*
+ * x86 Floating status register.
+ *
+ *      15-8     7    6    5    4    3    2    1    0
+ * | reserved | ES | SF | PE | UE | OE | ZE | DE | IE
+ *
+ * IE: Invalid operation
+ * DE: Denormalized operand
+ * ZE: Divide by zero
+ * OE: Overflow
+ * UE: Underflow
+ * PE: Inexact result
+ */
+
+#define _FPU_COND_IE	0x01  
+#define _FPU_COND_DE	0x02
+#define _FPU_COND_ZE	0x04
+#define _FPU_COND_OE	0x08
+#define _FPU_COND_UE	0x10
+#define _FPU_COND_PE	0x20
+#define _FPU_COND_SF	0x40
+#define _FPU_COND_ES	0x80
+#define _FPU_COND_MASK	0xff
+
+/* FPSTATUS -- Return the hardware code of the last floating point exception.
+ */
+static int
+fpstatus (old_hwcode)
+int old_hwcode;
+{
+	unsigned short status = 0;
+	int hwcode = 0;
+
+	/* Make sure we have a floating point exception. */
+	if (old_hwcode != X86_FPE)
+	    return (old_hwcode);
+
+	/* Get floating point status register. */
+	asm ("fstsw %0" : "=g" (status));
+
+	/* Return the old hardware code if the status register has been
+	 * cleared and doesn't tell us anything.
+	 */
+	if (!(status & 0xff))
+	    return (old_hwcode);
+
+	switch (status & _FPU_COND_MASK) {
+	case _FPU_COND_IE:
+	    hwcode = FPE_FLTOPERR_TRAP;
+	    break;
+	case _FPU_COND_DE:
+	    hwcode = FPE_FLTDEN_TRAP;
+	    break;
+	case _FPU_COND_ZE:
+	    hwcode = FPE_FLTDIV_TRAP;
+	    break;
+	case _FPU_COND_OE:
+	    hwcode = FPE_FLTOVF_TRAP;
+	    break;
+	case _FPU_COND_UE:
+	    hwcode = FPE_FLTUND_TRAP;
+	    break;
+	case _FPU_COND_PE:
+	    hwcode = FPE_FLTINEX_TRAP;
+	    break;
+	case _FPU_COND_SF:
+	    hwcode = FPE_FLTSTK_TRAP;
+	    break;
+	}
+
+	/* Clear floating point status register. */
+	asm ("fclex");
+
+	return (hwcode);
 }

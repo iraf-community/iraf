@@ -1,0 +1,9 @@
+# Mkpkg special file list for AIX/IRAF on the IBM RS/6000.
+
+# Files requiring special compilation due to host compiler bugs.
+# -------------------------------------------------------------
+
+$set	XNO	= '& "$xc $(XFLAGS) -cq &"'
+
+$special "$(noao)artdata/":		t_mkechelle.x	$(XNO)
+$special "$(noao)astutil/":		t_gratings.x	$(XNO)

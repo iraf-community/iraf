@@ -45,7 +45,10 @@ C character.
 C
       COMMON /AGOCHP/ CHS1,CHS2
 C
-      CHARACTER*504 CHS1,CHS2
+c+noao
+c     CHARACTER*504 CHS1,CHS2
+      CHARACTER*500 CHS1,CHS2
+c-noao
 C
 C The AUTOGRAPH function AGFPBN is of type integer.
 C

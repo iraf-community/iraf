@@ -191,7 +191,7 @@ pointer	duout, dvout		# Output coordinate intervals
 
 int	i, j, nsf, nusf, nvsf, nu1, nv1
 real	xmin, xmax, ymin, ymax, umin, umax, vmin, vmax
-real	u, v, du1, dv1, der[8]
+real	u, v, x, y, du1, dv1, der[8]
 pointer	sp, sfname, usf, vsf, sf, xgrid, ygrid, zgrid, ptr1, ptr2, ptr3
 
 int	clgfil(), clplen()
@@ -338,10 +338,15 @@ begin
 	    v = v1 + (i - 1) * dv1
 	    do j = 1, nu1 {
 		u = u1 + (j - 1) * du1
-		call tr_invert (Memi[usf], nusf, Memi[vsf], nvsf, u, v, der,
-		    xmin, xmax, ymin, ymax)
-		Memr[ptr1+j] = der[1]
-		Memr[ptr2+j] = der[2]
+		call tr_invert (Memi[usf], nusf, Memi[vsf], nvsf, u, v, x, y,
+		    der, xmin, xmax, ymin, ymax)
+		# V2.10.2
+		#Memr[ptr1+j] = der[1]
+		#Memr[ptr2+j] = der[2]
+		# After V2.10.3
+		Memr[ptr1+j] = x
+		Memr[ptr2+j] = y
+
 		Memr[ptr3+j] = 1. / abs (der[4] * der[8] - der[5] * der[7])
 	    }
 	    if (i == nv1)
@@ -354,10 +359,14 @@ begin
 	    v = v1 + i * dv1
 	    do j = nu1, 1, -1 {
 		u = u1 + (j - 1) * du1
-		call tr_invert (Memi[usf], nusf, Memi[vsf], nvsf, u, v, der,
-		    xmin, xmax, ymin, ymax)
-		Memr[ptr1+j] = der[1]
-		Memr[ptr2+j] = der[2]
+		call tr_invert (Memi[usf], nusf, Memi[vsf], nvsf, u, v, x, y,
+		    der, xmin, xmax, ymin, ymax)
+		# V2.10.2
+		#Memr[ptr1+j] = der[1]
+		#Memr[ptr2+j] = der[2]
+		# V2.10.3
+		Memr[ptr1+j] = x
+		Memr[ptr2+j] = y
 		Memr[ptr3+j] = 1. / abs (der[4] * der[8] - der[5] * der[7])
 	    }
 	}
@@ -537,15 +546,17 @@ define	FUDGE		0.5
 # and solving the linear Taylor expansions simultaneously.  The last
 # point sampled is used as the starting point.  Thus, if the
 # input U and V progress smoothly then the number of iterations
-# can be small.  The output is returned in the derivative array
+# can be small.  The output is returned in x and y and in the derivative array
 # DER.  A point outside of the surfaces is returned as the nearest
-# point at the edge of the surfaces.
+# point at the edge of the surfaces in the DER array.
 
-procedure tr_invert (usf, nusf, vsf, nvsf, u, v, der, xmin, xmax, ymin, ymax)
+procedure tr_invert (usf, nusf, vsf, nvsf, u, v, x, y, der,
+	xmin, xmax, ymin, ymax)
 
 pointer	usf[ARB], vsf[ARB]	# User coordinate surfaces U(X,Y) and V(X,Y)
 int	nusf, nvsf		# Number of surfaces for each coordinate
 real	u, v			# Input U and V to determine X and Y
+real	x, y			# Output X and Y
 real	der[8]			# Last result as input, new result as output 
 				# 1=X, 2=Y, 3=U, 4=DUDX, 5=DUDY, 6=V,
 				# 7=DVDX, 8=DVDY
@@ -568,24 +579,14 @@ begin
 		(der[8] * der[4] - der[5] * der[7])
 	    dy = (dv - der[7] * dx) / der[8]
 	    fudge = 1 - FUDGE / i
-	    der[1] = der[1] + fudge * dx
-	    der[2] = der[2] + fudge * dy
-	    if (der[1] < xmin) {
-	        der[1] = xmin
+	    x = der[1] + fudge * dx
+	    y = der[2] + fudge * dy
+	    der[1] = max (xmin, min (xmax, x))
+	    der[2] = max (ymin, min (ymax, y))
+	    if (x < xmin || x > xmax)
 	        nedge = nedge + 1
-	    }
-	    if (der[1] > xmax) {
-	        der[1] = xmax
+	    if (y < ymin || y > ymax)
 	        nedge = nedge + 1
-	    }
-	    if (der[2] < ymin) {
-	        der[2] = ymin
-	        nedge = nedge + 1
-	    }
-	    if (der[2] > ymax) {
-	        der[2] = ymax
-	        nedge = nedge + 1
-	    }
 	    if (nedge > 2)
 	        break
 	    if ((abs (dx) < ERROR) && (abs (dy) < ERROR))
@@ -722,13 +723,13 @@ pointer	jmsi			# Jacobian interpolation pointer
 real	xout[ARB], yout[ARB]	# Output grid relative to interpolation surface
 real	dxout[ARB], dyout[ARB]	# Output coordinate intervals
 
-int	i, nxin, nyin, line1, line2, line3, line4, nlines, dispaxis, axis[2]
+int	i, nxin, nyin, line1, line2, line3, line4, nlines, laxis, paxis, axis[2]
 real	a, b, r[2], w[2], cd[2,2]
 pointer	zmsi, buf, bufout
 pointer	sp, xin, yin, y, mw
 
-int	imgeti(), clgeti()
 pointer	mw_open(), impl2r()
+errchk	get_daxis
 data	axis/1,2/
 
 include	"transform.com"
@@ -751,7 +752,7 @@ begin
 	cd[1,1] = du
 	cd[1,2] = 0.
 	r[2] = 1.
-	if (ulog)
+	if (vlog)
 	    w[2] = log10 (v1)
 	else
 	    w[2] = v1
@@ -762,11 +763,10 @@ begin
 	# The following image parameters are for compatibility with the
 	# ONEDSPEC package.
 
-	iferr (dispaxis = imgeti (in, "dispaxis")) {
-	    dispaxis = clgeti ("dispaxis")
-	    call imaddi (out, "dispaxis", dispaxis)
-	}
-	switch (dispaxis) {
+	call imastr (out, "DCLOG1", "Transform")
+	call get_daxis (in, laxis, paxis)
+	call imaddi (out, "dispaxis", laxis)
+	switch (laxis) {
 	case 1:
 	    if (ulog)
 		call imaddi (out, "dc-flag", 1)
@@ -826,10 +826,12 @@ begin
 	    if (a < 1.) {
 		call arltr (Memr[yin], nu, 1., 1.)
 		a = 1.
+		b = max (a, b)
 	    }
 	    if (b > nyin) {
 		call argtr (Memr[yin], nu, real (nyin), real (nyin))
 		b = nyin
+		a = min (a, b)
 	    }
 
 	    # Get the input image data and fit an interpolator to the data.

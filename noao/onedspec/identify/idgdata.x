@@ -1,8 +1,8 @@
 include	<imhdr.h>
 include	<imio.h>
 include	<pkg/gtools.h>
+include	<smw.h>
 include	"identify.h"
-include	"../shdr.h"
 
 define	SZ_TITLE	320	# Size of long string for title.
 
@@ -12,10 +12,10 @@ procedure id_gdata (id)
 
 pointer	id				# ID pointer
 
-int	i
+int	i, np1
 pointer	sp, str, im, mw, sh
 
-double	mw_c1trand() 
+double	smw_c1trand() 
 errchk	shdr_open
 
 begin
@@ -27,35 +27,19 @@ begin
 	mw = MW(sh)
 
 	# If format is multispec then header info depends on line.
-	call shdr_open (im, mw, ID_LINE(id), 1, INDEFI, SHDATA, sh)
-	ID_AP(id) = AP(sh)
+	if (SMW_FORMAT(mw) == SMW_ES || SMW_FORMAT(mw) == SMW_MS)
+	    ID_LINE(id,2) = 1
+	call shdr_open (im, mw, ID_LINE(id,1), ID_LINE(id,2),
+	    INDEFI, SHDATA, sh)
+	ID_AP(id,1) = AP(sh)
+	ID_AP(id,2) = ID_LINE(id,2)
 	ID_NPTS(id) = SN(sh)
-	if (FORMAT(sh) == MULTISPEC) {
-	    call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, " - Ap %d")
-		call pargi (AP(sh))
-	    call sprintf (Memc[str], SZ_TITLE, "identify %s%s\n%s")
-		call pargstr (Memc[ID_IMAGE(id)])
-		call pargstr (Memc[ID_SECTION(id)])
+	call id_dbsection (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+	     Memc[ID_SECTION(id)], SZ_FNAME)
+	call sprintf (Memc[str], SZ_TITLE, "identify %s%s\n%s")
+	    call pargstr (Memc[ID_IMAGE(id)])
+	    call pargstr (Memc[ID_SECTION(id)])
 		call pargstr (TITLE(sh))
-	} else {
-	    Memc[ID_SECTION(id)] = EOS
-	    if (NDIM(sh) > 1) {
-	        switch (DAXIS(sh)) {
-	        case 1:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[*,%d]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ID_AP(id))
-	        case 2:
-	            call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[%d,*]")
-		        #call pargi (INDEX1(sh))
-			call pargi (ID_AP(id))
-	        }
-	    }
-	    call sprintf (Memc[str], SZ_TITLE, "identify %s%s\n%s")
-	        call pargstr (Memc[ID_IMAGE(id)])
-	        call pargstr (Memc[ID_SECTION(id)])
-	        call pargstr (TITLE(sh))
-	}
 	call gt_sets (ID_GT(id), GTTITLE, Memc[str])
 
 	# Free previous vectors and allocate new vectors.
@@ -64,8 +48,9 @@ begin
 	call malloc (ID_PIXDATA(id), ID_NPTS(id), TY_DOUBLE)
 
 	# Set the physical coordinates.
+	np1 = NP1(sh) - 1
 	do i = 1, ID_NPTS(id)
-	    PIXDATA(id,i) = mw_c1trand (ID_LP(id), double(i))
+	    PIXDATA(id,i) = smw_c1trand (ID_LP(id), double(i+np1))
 
 	# Set the image data
 	ID_IMDATA(id) = SY(sh)

@@ -1,6 +1,16 @@
 .help revisions Jun88 noao.imred.irred
 .nf
 irred$irred.cl
+irred$irred.hd
+irred$irred.men
+irred$mkpkg
+irred$irlincor.par
+irred$x_irred.x
+irred$t_irlincor.x
+irred$doc/irlincor.hlp
+    Added the ctio.irlincor package task to the irred package.
+
+irred$irred.cl
 irred$mosproc.cl
     1. The irred cl script was modified to reference nproto instead of proto.
     2. The irred script was modified to load the core proto package in order to

@@ -51,7 +51,7 @@ begin
 	    sum2 = 0.
 	    nindef = 0
 	    do i = 1, len_prof {
-		if (data[i, spectrum] == INDEFR)
+		if (IS_INDEFR (data[i, spectrum]))
 		    nindef = nindef + 1
 	        else if (model[i, spectrum] > 0.) {
 		    sum1 = sum1 + data[i, spectrum] * model[i, spectrum]
@@ -63,7 +63,7 @@ begin
 	    if (nmax != 0) {
 	        scale = sum1 / sum2
 	        do i = 1, len_prof {
-		    if ((data[i, spectrum] != INDEFR) &&
+		    if (!IS_INDEFR (data[i, spectrum]) &&
 			(model[i, spectrum] > 0.)) {
 		        sigma = sigma +
 		            (data[i,spectrum] - scale * model[i,spectrum]) ** 2
@@ -106,7 +106,7 @@ begin
 		    resid_min = -lower * sigma
 		    resid_max = upper * sigma
 	            do i = 1, len_prof {
-		        if (data[i, spectrum] == INDEFR)
+		        if (IS_INDEFR (data[i, spectrum]))
 			    next
 
 		        # Compute the residual and remove point if it exceeds
@@ -137,7 +137,7 @@ begin
 	    # Replace bad pixels by the model values.
 	    if ((nindef > 0) || (nreplace > 0)) {
 		do i = 1, len_prof {
-		    if (data[i, spectrum] == INDEFR)
+		    if (IS_INDEFR (data[i, spectrum]))
 			data[i, spectrum] = model[i, spectrum]
 		}
 		ntotal = ntotal + nreplace

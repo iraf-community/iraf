@@ -9,14 +9,14 @@ update:
 	;
 
 relink:
-	$set LIBS = "-lnlfit -liminterp -lcurfit -lxtools"
+	$set LIBS = "-lnlfit -liminterp -lcurfit -lds -lxtools"
 	$update libpkg.a
 	$omake x_apphot.x
 	$link x_apphot.o libpkg.a $(LIBS) -o xx_apphot.e
 	;
 
 linkonly:
-	$set LIBS = "-lnlfit -liminterp -lcurfit -lxtools"
+	$set LIBS = "-lnlfit -liminterp -lcurfit -lds -lxtools"
 	$link x_apphot.o libpkg.a $(LIBS) -o xx_apphot.e
 	$call install
 	;

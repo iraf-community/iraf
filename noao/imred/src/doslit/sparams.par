@@ -1,5 +1,5 @@
 line,i,h,INDEF,,,"Default dispersion line"
-nsum,i,h,10,,,"Number of dispersion lines to sum"
+nsum,i,h,10,,,"Number of dispersion lines to sum or median"
 extras,b,h,no,,,"Extract sky, sigma, etc.?
 
 -- DEFAULT APERTURE PARAMETERS -- "
@@ -34,6 +34,7 @@ b_low,r,h,3.,0.,,"Background lower rejection sigma"
 b_high,r,h,3.,0.,,"Background upper rejection sigma
 
 -- ARC DISPERSION FUNCTION PARAMETERS --"
+threshold,r,h,10.,0.,,"Minimum line contrast threshold"
 coordlist,f,h,linelists$idhenear.dat,,,"Line list"
 match,r,h,10.,,,"Line list matching limit in Angstroms"
 fwidth,r,h,4.,,,"Arc line widths in pixels"

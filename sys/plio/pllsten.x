@@ -240,7 +240,7 @@ copyout_	pv = v_dst
 			op = op + 1
 		    } else {
 			if (dv < 0)
-			    ll_out[op] = M_DH + -dv
+			    ll_out[op] = M_DH + (-dv)
 			else
 			    ll_out[op] = M_IH + dv
 			op = op + 1

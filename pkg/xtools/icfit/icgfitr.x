@@ -337,6 +337,50 @@ begin
 	    case 'w':  # Window graph
 		call gt_window (gt, gp, cursor, newgraph)
 
+	    case 'v': # Reset the value of the weight.
+		if (x1 == NULL) {
+		    i = icg_nearestr (ic, gp, gt, cv, x, y, n, wx, wy)
+
+		    if (i != 0) {
+			call printf ("weight = (%g) ")
+			    call pargr (wts[i])
+			call flush (STDOUT)
+			if (scan() != EOF) {
+			    call gargr (px1)
+			    if (nscan() == 1) {
+				if (!IS_INDEF (px1)) {
+				    wts[i] = px1
+				    IC_NEWWTS(ic) = YES
+				}
+			    }
+			}
+		    }
+		} else {
+		    i = icg_nearestr (ic, gp, gt, cv, Memr[x1], Memr[y1], n,
+			wx, wy)
+
+		    if (i != 0) {
+			call printf ("weight = (%g) ")
+			    call pargr (Memr[w1+i-1])
+			call flush (STDOUT)
+			if (scan() != EOF) {
+			    call gargr (px1)
+			    if (nscan() == 1) {
+				if (!IS_INDEF (px1)) {
+				    j = icg_nearestr (ic, gp, gt, cv, x, y, n,
+					wx, wy)
+				    if (j != 0)
+					if (x[j] == Memr[x1+i-1] &&
+					    y[j] == Memr[y1+i-1])
+					    wts[j] = px1
+				    Memr[w1+i-1] = px1
+				    IC_NEWWTS(ic) = YES
+				}
+			    }
+			}
+		    }
+		}
+
 	    case 'x': # Reset the value of the x point.
 		if (x1 == NULL) {
 		    i = icg_nearestr (ic, gp, gt, cv, x, y, n, wx, wy)
@@ -466,6 +510,8 @@ begin
 	    call mfree (x1, TY_REAL)
 	    call mfree (y1, TY_REAL)
 	    call mfree (w1, TY_REAL)
+	    if (IC_WTSFIT(ic) == NULL)
+		IC_NFIT(ic) = npts
 	}
 	call mfree (userwts, TY_REAL)
 	call sfree (sp)

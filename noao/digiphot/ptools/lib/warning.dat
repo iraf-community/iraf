@@ -10,4 +10,3 @@
       PRENUMBER,  PSELECT  and  PSORT will run  only on  APPHOT/DAOPHOT
       output  files  written  in the default text format,  not on files
       written in ST tables format. 
-

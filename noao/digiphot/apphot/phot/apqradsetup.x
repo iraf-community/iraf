@@ -48,7 +48,8 @@ begin
 
         call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 
@@ -99,6 +100,6 @@ begin
 	    pier = apwmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 		YCENTER), apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
 		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
-	call appplot (ap, im, 0, cier, sier, pier, gd, apstati (ap, RADPLOTS))
+	call ap_pplot (ap, im, 0, gd, apstati (ap, RADPLOTS))
 	call ap_qpmag (ap, cier, sier, pier)
 end

@@ -176,7 +176,7 @@ begin
 	    if (dx > hw)
 		;
 	    else if (dx > hw / 2.0)
-		y[i] = max (y[i], min (height, int ((hw - dx) * dy)))
+		y[i] = max (int(y[i]), min (height, int((hw - dx) * dy)))
 	    else
 		y[i] = height
 	}

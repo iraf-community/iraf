@@ -4,7 +4,7 @@ include	<imhdr.h>
 include	<imset.h>
 include	<error.h>
 include	<ctype.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"icombine.h"
 
 # IC_SCALE -- Get the scale factors for the spectra.
@@ -24,13 +24,14 @@ int	nimages			# Number of images
 int	stype, ztype, wtype
 int	i, j, nout
 real	mode, median, mean, exposure, zmean
-pointer	sp, ncombine, exptime, modes, medians, means, expname, fname, rg
+pointer	sp, ncombine, exptime, modes, medians, means, expname
+pointer	str, sname, zname, wname, rg
 bool	domode, domedian, domean, dozero
 
-int	clgwrd()
+int	ic_gscale()
 real	asumr(), asumi()
 pointer	ic_wranges()
-errchk	ic_statr
+errchk	ic_gscale, ic_statr
 
 include	"icombine.com"
 
@@ -42,7 +43,10 @@ begin
 	call salloc (medians, nimages, TY_REAL)
 	call salloc (means, nimages, TY_REAL)
 	call salloc (expname, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (sname, SZ_FNAME, TY_CHAR)
+	call salloc (zname, SZ_FNAME, TY_CHAR)
+	call salloc (wname, SZ_FNAME, TY_CHAR)
 
 	# Set the defaults.
 	call amovki (1, Memi[ncombine], nimages)
@@ -59,37 +63,32 @@ begin
 	    stype = S_NONE
 	    ztype = S_NONE
 	    wtype = S_NONE
+	    do i = 1, nimages
+		Memr[exptime+i-1] = IT(sh[i])
 	} else {
-	    stype = clgwrd ("scale", Memc[fname], SZ_LINE, STYPES)
-	    ztype = clgwrd ("zero", Memc[fname], SZ_LINE, ZTYPES)
-	    wtype = clgwrd ("weight", Memc[fname], SZ_LINE, WTYPES)
+	    stype = ic_gscale ("scale", Memc[sname], STYPES, sh, Memr[exptime],
+		scales, nimages)
+	    ztype = ic_gscale ("zero", Memc[zname], ZTYPES, sh, Memr[exptime],
+		zeros, nimages)
+	    wtype = ic_gscale ("weight", Memc[wname], WTYPES, sh, Memr[exptime],
+		wts, nimages)
 	}
 
-	# Get the exposure times.
-	if (stype == S_EXPOSURE || wtype == S_EXPOSURE) {
+	Memc[expname] = EOS
+	if (combine == SUM || stype == S_EXPOSURE || wtype == S_EXPOSURE) {
 	    call strcpy ("exptime", Memc[expname], SZ_FNAME)
-	    do i = 1, nimages {
-		if (IS_INDEF(IT(sh[i])))
-		    call error (1, "Exposure time not defined")
-		Memr[exptime+i-1] = IT(sh[i])
-	    }
-	} else
-	    Memc[expname] = EOS
-
-	if (stype==S_EXPOSURE)
 	    do i = 1, nimages
-		scales[i] = max (0.001, Memr[exptime+i-1])
-	if (wtype==S_EXPOSURE)
-	    do i = 1, nimages
-		wts[i] = max (0.001, Memr[exptime+i-1])
+		if (IS_INDEFR(Memr[exptime+i-1]))
+		    Memc[expname] = EOS
+	}
 
 	# Get image statistics only if needed.
 	domode = ((stype==S_MODE)||(ztype==S_MODE)||(wtype==S_MODE))
 	domedian = ((stype==S_MEDIAN)||(ztype==S_MEDIAN)||(wtype==S_MEDIAN))
 	domean = ((stype==S_MEAN)||(ztype==S_MEAN)||(wtype==S_MEAN))
 	if (domode || domedian || domean) {
-	    call clgstr ("sample", Memc[fname], SZ_LINE)
-	    rg = ic_wranges (Memc[fname])
+	    call clgstr ("sample", Memc[str], SZ_LINE)
+	    rg = ic_wranges (Memc[str])
 	    do i = 1, nimages {
 		call ic_statr (sh[i], lflags[i], rg, domode, domedian, domean,
 		    mode, median, mean)
@@ -126,44 +125,42 @@ begin
 
 	do i = 1, nimages
 	    if (scales[i] <= 0.) {
-		call eprintf (
-		    "WARNING: Negative scale factors -- ignoring scaling\n")
+		call eprintf ("WARNING: Negative scale factors")
+		call eprintf (" -- ignoring scaling\n")
 		call amovkr (1., scales, nimages)
 		break
 	    }
 
-	do i = 1, nimages
-	    zeros[i] = zeros[i] / scales[i]
-
-	if (wtype != S_NONE) {
-	    do i = 1, nimages {
-		if (wts[i] <= 0.) {
-		    call eprintf (
-			"WARNING: Negative weights -- ignoring weighting\n")
-		    do j = 1, nimages
-			wts[j] = sqrt (real (Memi[ncombine+j-1]))
-		    break
-		}
-		if (ztype == S_NONE)
-	            wts[i] = sqrt (Memi[ncombine+i-1] * wts[i])
-		else {
-		    if (zeros[i] <= 0.) {
-			call eprintf (
-	"WARNING: Negative zero offsets -- ignoring zero weight adjustments\n")
-			do j = 1, nimages
-			    wts[j] = sqrt (Memi[ncombine+j-1]*wts[j])
-			break
-		    }
-		    wts[i] = sqrt (Memi[ncombine+i-1]*wts[i]/zeros[i])
-		}
-	    }
-	}
-
-	# Convert to relative scaling factors.
+	# Convert to relative factors.
 	mean = asumr (scales, nimages) / nimages
 	call adivkr (scales, mean, scales, nimages)
 	call adivr (zeros, scales, zeros, nimages)
 	zmean = asumr (zeros, nimages) / nimages
+
+	if (wtype != S_NONE) {
+	    do i = 1, nimages {
+		if (wts[i] <= 0.) {
+		    call eprintf ("WARNING: Negative weights")
+		    call eprintf (" -- using only NCOMBINE weights\n")
+		    do j = 1, nimages
+			wts[j] = Memi[ncombine+j-1]
+		    break
+		}
+		if (ztype == S_NONE)
+	            wts[i] = Memi[ncombine+i-1] * wts[i]
+		else {
+		    if (zeros[i] <= 0.) {
+			call eprintf ("WARNING: Negative zero offsets")
+			call eprintf (" -- ignoring zero weight adjustments\n")
+			do j = 1, nimages
+			    wts[j] = Memi[ncombine+j-1] * wts[j]
+			break
+		    }
+		    wts[i] = Memi[ncombine+i-1] * wts[i] * zmean / zeros[i]
+		}
+	    }
+	}
+
 	call asubkr (zeros, zmean, zeros, nimages)
 	mean = asumr (wts, nimages)
 	call adivkr (wts, mean, wts, nimages)
@@ -193,12 +190,19 @@ begin
 	    if (wts[i] != wts[1])
 		dowts = true
 	}
-	if (doscale && zmean > 0. && sigscale != 0.) {
+	if (doscale && sigscale != 0.) {
 	    do i = 1, nimages {
-		if (abs (scales[i] - 1) > sigscale ||
-		    abs (zeros[i] / zmean) > sigscale) {
+		if (abs (scales[i] - 1) > sigscale) {
 		    doscale1 = true
 		    break
+		}
+	    }
+	    if (!doscale1 && zmean > 0.) {
+		do i = 1, nimages {
+		    if (abs (zeros[i] / zmean) > sigscale) {
+			doscale1 = true
+			break
+		    }
 		}
 	    }
 	}
@@ -220,13 +224,88 @@ begin
 	    exposure = INDEF
 
 	# Start the log here since much of the info is only available here.
-	call ic_log (sh, shout, Memi[ncombine], Memr[exptime], Memr[modes],
-	    Memr[medians], Memr[means], scales, zeros, wts, nimages,
-	    dozero, nout, Memc[expname], exposure)
+	call ic_log (sh, shout, Memi[ncombine], Memr[exptime], Memc[sname],
+	    Memc[zname], Memc[wname], Memr[modes], Memr[medians], Memr[means],
+	    scales, zeros, wts, nimages, dozero, nout, Memc[expname], exposure)
 
 	doscale = (doscale || dozero)
 
 	call sfree (sp)
+end
+
+
+# IC_GSCALE -- Get scale values as directed by CL parameter
+# The values can be one of those in the dictionary, from a file specified
+# with a @ prefix, or from an image header keyword specified by a ! prefix.
+
+int procedure ic_gscale (param, name, dic, sh, exptime, values, nimages)
+
+char	param[ARB]		#I CL parameter name
+char	name[SZ_FNAME]		#O Parameter value
+char	dic[ARB]		#I Dictionary string
+pointer	sh[nimages]		#I SHDR pointers
+real	exptime[nimages]	#I Exposure times
+real	values[nimages]		#O Values
+int	nimages			#I Number of images
+
+int	type			#O Type of value
+
+int	fd, i, nowhite(), open(), fscan(), nscan(), strdic()
+real	rval, imgetr()
+pointer	errstr
+errchk	open, imgetr()
+
+include	"icombine.com"
+
+begin
+	call clgstr (param, name, SZ_FNAME)
+	if (nowhite (name, name, SZ_FNAME) == 0)
+	    type = S_NONE
+	else if (name[1] == '@') {
+	    type = S_FILE
+	    fd = open (name[2], READ_ONLY, TEXT_FILE)
+	    i = 0
+	    while (fscan (fd) != EOF) {
+		call gargr (rval)
+		if (nscan() != 1)
+		    next
+		if (i == nimages) {
+		   call eprintf (
+		       "Warning: Ignoring additional %s values in %s\n")
+		       call pargstr (param)
+		       call pargstr (name[2])
+		   break
+		}
+		i = i + 1
+		values[i] = rval
+	    }
+	    call close (fd)
+	    if (i < nimages) {
+		call salloc (errstr, SZ_LINE, TY_CHAR)
+		call sprintf (errstr, SZ_FNAME, "Insufficient %s values in %s")
+		    call pargstr (param)
+		    call pargstr (name[2])
+		call error (1, errstr)
+	    }
+	} else if (name[1] == '!') {
+	    type = S_KEYWORD
+	    do i = 1, nimages
+		values[i] = imgetr (IM(sh[i]), name[2])
+	} else {
+	    type = strdic (name, name, SZ_FNAME, dic)
+	    if (type == 0)
+		call error (1, "Unknown scale, zero, or weight type")
+	    if (type==S_EXPOSURE) {
+		do i = 1, nimages {
+		    if (IS_INDEF(IT(sh[i])))
+			call error (1, "Exposure time not defined")
+		    exptime[i] = IT(sh[i])
+		    values[i] = max (0.001, exptime[i])
+		}
+	    }
+	}
+
+	return (type)
 end
 
 

@@ -3,8 +3,8 @@
 image,f,a,,,,Input image
 coords,f,h,"default",,,Output coordinate file
 polygons,f,h,"default",,,Output polygons file
-display,s,h,stdimage,,,Display device
 graphics,s,h,stdgraph,,,Graphics device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+display,s,h,stdimage,,,Display device
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

@@ -11,4 +11,9 @@ libpkg.a:
 	phimtable.x	"../lib/obsfile.h"  <fset.h>
 	phsort.x
 	phmatch.x	<mach.h> "../lib/obsfile.h"
+	t_apfile.x      "../lib/apfile.h"   <fset.h>  <ctotok.h> <ctype.h> 
+	phaimtable.x	"../lib/apfile.h"   <fset.h>
+	phagrow.x	"../lib/apfile.h"   <time.h>  <mach.h>   <fset.h>
+	phaigrow.x	"../lib/apfile.h"   <time.h>  <mach.h>   <gset.h>
+	dinvers.f
 	;

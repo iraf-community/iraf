@@ -1,0 +1,382 @@
+.help asthedit Mar93 astutil
+.ih
+NAME
+asthedit -- astronomical header editor
+.ih
+USAGE
+asthedit images commands
+.ih
+PARAMETERS
+.ls images
+List of images to be edited and modified.
+.le
+.ls commands
+A file of editing commands consisting of lines with a keyword to be
+modified or created followed by an expression using constants, other
+keywords, and functions.
+.le
+.ls table = ""
+File containing a table of values to be used.  There is one line per
+input image in the same order as the input images with blank lines
+ignored.  Each line consists of a number of whitespace separated
+fields.  Note that a string with whitespace needs to be quoted.
+There must be at least as many fields as are defined by the column
+names.
+.le
+.ls colnames = ""
+List of whitespace separated column names.  These are the names referenced
+in the command file by $<name>.  The leading '$' is not part of the
+field name.  There may be fewer columns than the number of columns
+in the table.  Dummy names need to be used if some columns occur
+before a column to be referenced.
+.le
+.ls verbose = no
+Print each keyword added or modified?
+.le
+.ih
+DESCRIPTION
+\fBAsthedit\fR evaluates expressions using image header keywords, column
+names from a text table, constants, and functions to create or modify image
+header keywords.  This task is particularly useful for adding keywords from
+a table and deriving keywords used by IRAF tasks which are not present in
+the images.  It differs from \fBhedit\fR in that it includes astronomical
+functions, operates from a command file which may perform many edits, and
+references columns from a text table.
+
+The command file consists of lines with a keyword to be modified or created
+followed by an expression using constants, other keywords, column names
+from a text table, and functions.  If no expression is given, that is the
+command file line contains only an image header keyword, then the keyword
+is deleted.  The expression syntax is described below.  The commands are
+performed sequentially so it is possible to use intermediate variables.  To
+use values from a text table a column name, assigned with the
+\fIcolnames\fR parameter, is referenced with a leading '$'.  The lines in
+the text file  (excluding blank lines) are used in the same order as the
+input images.
+
+EXPRESSIONS
+
+Expression consist of operands and operators.  The operands may be any
+image header keyword, column name with a leading '$', quoted string
+constants, numeric constants, and functions.  Values
+given as sexagesimal strings are automatically converted to decimal
+numbers.  The operators are arithmetic, logical, and string operators.  The
+expression syntax is equivalent to that used in the CL and SPP languages.
+
+operators:
+
+The following operators are recognized in expressions.  With the exception
+of the operators "?", "?=", and "@", the operator set is equivalent to that
+available in the CL and SPP languages.
+
+
+.nf
+        +  -  *  /              arithmetic operators
+        **                      exponentiation
+        //                      string concatenation
+        !  -                    boolean not, unary negation
+        <  <= >  >=             order comparision (works for strings)
+        == != && ||             equals, not equals, and, or
+        ?=                      string equals pattern
+        ? :                     conditional expression
+        @                       reference a variable
+.fi
+
+
+The operators "==", "&&", and "||" may be abbreviated as "=", "&", and "|"
+if desired.  The ?= operator performs pattern matching upon strings.
+The boolean operators and pattern matching are unlikely to be used
+in this task.  The @ operator is required to reference variables with
+one of the operator characters.  This is most like to be used as:
+
+        @"date-obs"
+
+Additional information may be found in the help for \fBhedit\fR except
+that all nonnumeric strings are considered to be keywords and
+so the '(', ')' operator is not used nor are the special fields
+".", "$", "$I", "$F",  and "$T".  The '$' operator is used to reference
+a column in the text table.
+
+intrinsic functions:
+
+A number of standard intrinsic functions are recognized within expressions.
+The set of functions currently supported is shown below.
+
+
+.nf
+        abs     acos    asin    atan    atan2   bool    cos
+        exp     int     log     log10   max     min     mod
+        nint    real    sin     sqrt    str     tan     
+.fi
+
+
+The trigonometric functions operate in units of degrees rather than radians.
+The \fImin\fR and \fImax\fR functions may have any number of arguments up
+to a maximum of sixteen or so (configurable).  The arguments need not all
+be of the same datatype.
+
+A function call may take either of the following forms:
+
+.nf
+        <identifier> '(' arglist ')'
+or
+        <string_expr> '(' arglist ')'
+.fi
+
+The first form is the conventional form found in all programming languages.
+The second permits the generation of function names by string valued
+expressions and might be useful on rare occasions.
+
+special functions:
+
+In addition to the above intrinsic functions there are a number of
+astronomical functions.  These are:
+
+.nf
+     sexstr - convert a number to a sexagesimal string (xx:mm:ss.ss)
+      epoch - compute an epoch given a date and time
+     julday - compute a Julian day given a date and time
+        mst - compute a mean siderial time given a date, time, and longitude
+ ra_precess - precess ra from one epoch to another
+dec_precess - precess dec from one epoch to another
+    airmass - compute airmass given ra, dec, siderial time, and latitude
+   eairmass - compute effective airmass given
+		ra, dec, siderial time, exposure time, and latitude
+      obsdb - get parameters from the observatory database
+.fi
+
+.ls sexstr (number), sexstr (number, digits)
+Convert a number to a sexagesimal string in the format X:MM:SS.SS.  There
+is an optional second argument (the default is 0) which is the number of
+decimal digits in the seconds field.
+.le
+.ls epoch (date, ut)
+Compute an epoch given a date and time.  The date is a string in the
+format DD/MM/YY.  Typically this argument with be the standard FITS
+keyword DATE-OBS.  Because of possible confusion of the hyphen with
+subtraction this keyword would be specified as @"date-obs".  The time
+is specified in hours and is generally a universal time.
+.le
+.ls julday (date, ut)
+Compute a Julian day given a date and time.  The date and time are
+specified as described previously.
+.le
+.ls mst (date, ut, longitude)
+Compute a mean siderial time given a date, time, and longitude in degrees.  The
+date and time are specified as described previously.  The longitude
+may be given as a constant or using the observatory database function
+as shown in the examples.  The returned value is a sexagesimal
+string with two decimals in the seconds.
+.le
+.ls ra_precess (ra, dec, epoch1, epoch2)
+Precess a right ascension from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed declination.
+The returned value is a sexagesimal string with two decimals in the seconds.
+.le
+.ls dec_precess (ra1, dec1, epoch1, epoch2)
+Precess a declination from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed right ascension.
+The returned value is a sexagesimal string with two decimals in the seconds.
+.le
+.ls airmass (ra, dec, st, latitude)
+Compute an airmass given right ascension in hours, declination in
+degrees, sideral time in hours, and latitude in degrees.  The latitude
+is often specified using the observatory database function as shown
+in the examples.
+.le
+.ls eairmass (ra, dec, st, exptime, latitude)
+Compute an "effective" airmass given right ascension in hours, declination
+in degrees, beginning sideral time in hours, exposure time in seconds, and
+latitude in degrees.  The The latitude is often specified using the
+observatory database function as shown in the examples.  The effective
+airmass is based on a Simpson's rule weighting of the beginning, middle,
+and ending airmass (with no provision for paused exposure).  The weights
+are:
+
+.nf
+    effective = beginning + 4 * middle + ending
+.fi
+.le
+.ls obsdb (observatory, parameter)
+Return a value from the observatory database.  The observatory parameter is
+a observatory identification string as defined in the database.  Often this
+is the value stored in the OBSERVAT keyword.  Another special value is
+"observatory" which then follows a name resolution scheme.  The observatory
+database mechanism is described by the help topic \fBobservatory\fR.  The
+parameter is a string given the quantity desired.  Typically this would be
+"longitude" or "latitude" but there are other possible parameters.
+.le
+.ih
+EXAMPLES
+1.  The following command file exercises the astronomical functions:
+
+.nf
+    cl> type cmds
+    observat "kpno"
+    time     sexstr (1.2345)
+    epoch    epoch (@'date-obs', ut)
+    jd       julday (@'date-obs', ut)
+    mst      mst (@'date-obs', ut, obsdb (observat, "longitude"))
+    rap      ra_precess (ra, dec, epoch, 1950)
+    dap      dec_precess (ra, dec, epoch, 1950)
+    airmass  airmass (ra, dec, mst, obsdb (observat, "latitude"))
+    airmass
+    airmass  " "
+    airmass  eairmass (ra, dec, mst, itime, obsdb (observat, "latitude"))
+    cl> imhead obj001 l+
+        ...
+	DATE-OBS= '05/04/87'            /  DATE DD/MM/YY
+	RA      = '13:29:24.00'         /  RIGHT ASCENSION
+	DEC     = '47:15:34.00'         /  DECLINATION
+	UT      = ' 9:27:27.00'         /  UNIVERSAL TIME
+	ITIME   =                  600  /  REQUESTED INTEGRATION TIME (SECS)
+        ...
+    cl> asthedit obj001 cmds table="" verbose+
+    obj001:
+      observat = kpno
+      time = 1:14:04
+      epoch = 1987.257752395672
+      jd = 2446890.894062519
+      mst = 14:53:39.81
+      rap = 13:27:49.84
+      dap = 47:27:05.72
+      airmass = 1.079586752081809
+      airmass = 1.07958675208181 -> DELETED
+      airmass =  
+      airmass =  -> 1.085091188012901
+.fi
+
+Note the use of the keyword deletion and syntax for adding an empty
+value.
+
+2.  The following command file shows computing a mid-ut and using a table
+of values.
+
+.nf
+    cl> type cmds
+    midut	sexstr ($ut + $itime/3600./2.)
+    imagetyp	$imagetyp
+    cl> type table
+    object	9:27:27		600
+    comp	9:48:00		10
+    object	9:49:00		600
+    flat	12:00:00	2
+    cl> asthedit obj* cmds table=table colnames="imagetyp ut itime" verbose+
+    obj001:
+      midut = 9:32:27
+      imagetyp = object
+    obj002.imh:
+      midut = 9:48:05
+      imagetyp = comp
+    ...
+.fi
+
+3.  The following example computes quantities used by some NOAO tasks from
+a minimal ESO/IHAP header.
+
+.nf
+    cl> type eso.dat
+    observat  "eso"
+    ut        sexstr ((@'tm-start'+0.1) / 3600.)
+    utend     sexstr ((@'tm-end'+0.1) / 3600.)
+    epoch     epoch (@'date-obs', ut)
+    st        mst (@'date-obs', ut, obsdb (observat, "longitude"))
+    exptime   (utend>ut)?(utend-ut)*3600.:(utend+24-ut)*3600.
+    ra        sexstr (@'postn-ra' / 15)
+    dec       sexstr (@'postn-dec')
+    airmass   airmass (ra, dec, st, obsdb (observat, "latitude"))
+    imagetyp  $imagetyp
+    filter    $filter
+    cl> type table.dat
+    object	V
+    as> imhead eso
+        ....
+	DATE-OBS= '12/12/92'            / Date this data created dd/mm/yy
+	TM-START=             84854.    / '23:34:14' measurement start time
+	TM-END  =             84974.    / '23:36:14' measurement end time (U
+	TIME-SID=                 1.    / '00:00:01' sidereal start time
+	POSTN-RA=           354.0709    / '23:36:17' tel. position right-asc
+	POSTN-DE=           6.556945    /'+06:33:25' tel. position declinati
+        ....
+    as> asthedit eso eso.dat table=table.dat col="imagetyp filter" verbose+
+    eso:
+      observat = eso
+      ut = 23:34:14
+      utend = 23:36:14
+      epoch = 1992.948616307863
+      st = 0:18:56.76
+      exptime = 120.000000000006
+      ra = 23:36:17
+      dec = 6:33:25
+      airmass = 1.255875187126549
+      imagetyp = object
+      filter = V
+    as> imhead eso
+	...
+	DATE-OBS= '12/12/92'            / Date this data created dd/mm/yy
+	TM-START=             84854.    / '23:34:14' measurement start time
+	TM-END  =             84974.    / '23:36:14' measurement end time (U
+	TIME-SID=                 1.    / '00:00:01' sidereal start time
+	POSTN-RA=           354.0709    / '23:36:17' tel. position right-asc
+	POSTN-DE=           6.556945    /'+06:33:25' tel. position declinati
+	OBSERVAT= 'eso     '
+	UT      = '23:34:14'
+	UTEND   = '23:36:14'
+	EPOCH   =     1992.94861630786
+	ST      = '0:18:56.76'
+	EXPTIME =     120.000000000006
+	RA      = '23:36:17'
+	DEC     = '6:33:25 '
+	AIRMASS =     1.25587518712655
+	IMAGETYP= 'object  '
+	FILTER  = 'V       '
+	...
+.fi
+
+The 0.1 in the UT calculation are to account for round-off.
+Note the use of the conditional expression for the exposure time.
+
+4.  The following example is for a case where there was no telescope
+information but there is date and time information.  This example is
+relevant to data from the Kitt Peak Schmidt telescope circa 1993.
+A table is prepared with the RA, Dec, and Epoch of each observation
+and all other information is derived from the date, ut, and observatory
+database. 
+
+.nf
+    cl> type table.dat
+    12:45:32  +49:34:12   1950
+    13:12:02  -01:12:05   1950
+    cl> type cmds.hast
+    epoch   epoch (@'date-obs', ut)
+    ra      ra_precess ($ra, $dec, $epoch, epoch)
+    dec     dec_precess ($ra, $dec, $epoch, epoch)
+    st      mst (@'date-obs', ut, obsdb (observat, "longitude"))
+    airmass eairmass (ra, dec, st, obsdb (observat, "latitude"))
+    midut   sexstr (ut + exptime/3600./2.)
+    cl> asthedit *.imh cmds.hast table=table.dat colnames="ra dec epoch" ver+
+    sbs0119.imh:
+      epoch = 1993.19
+      ra = 12:47:31.19
+      dec = 49:20:04.00
+      st = 10:27:41.51
+      airmass = 1.169642
+      midut = 6:38:21
+    sbs0120.imh:
+      epoch = 1993.19
+      ra = 13:14:15.20
+      dec = -1:25:47.06
+      st = 10:36:18.92
+      airmass = 1.557983
+      midut = 6:46:57
+.fi
+
+Note the use of the table and image header epochs in the precession.
+.ih
+SEE ALSO
+hedit, hfix, mkheader, setairmass, setjd, asttimes, precess, observatory
+.endhelp

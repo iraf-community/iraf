@@ -1,12 +1,13 @@
 # SPLOT -- Parameter file for spectral plot package
 
 images,s,a,,,,"List of images to plot"
-line,i,a,1,0,,"Image line/aperture to plot"
-band,i,a,1,1,,"Image band to plot"
+line,i,q,1,0,,"Image line/aperture to plot"
+band,i,q,1,1,,"Image band to plot"
 
-units,s,h,"angstroms",,,"Plotting units"
+units,s,h,"",,,"Plotting units"
 options,s,h,"auto wreset",,,"Combination of plotting options:
-auto, zero, xydraw, histogram, nosysid, wreset"
+auto, zero, xydraw, histogram,
+nosysid, wreset, flip, overplot"
 xmin,r,h,INDEF,,,"Minimum X value of initial graph"
 xmax,r,h,INDEF,,,"Maximum X value of initial graph"
 ymin,r,h,INDEF,,,"Minimum Y value of initial graph"
@@ -14,6 +15,10 @@ ymax,r,h,INDEF,,,"Maximum Y value of initial graph"
 save_file,s,h,"splot.log",,,"File to contain answers"
 graphics,s,h,"stdgraph",,,"Output graphics device"
 cursor,*gcur,h,"",,,"Graphics cursor input
+
+# PARAMETERS FOR ERROR ANALYSIS"
+sigma0,r,h,INDEF,,,"Constant gaussian noise term (INDEF for no errors)"
+invgain,r,h,INDEF,,,"Inverse gain term (INDEF for no errors)
 
 # PARAMETERS FOR CONTINUUM FITTING"
 function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,"Fitting function"
@@ -35,9 +40,9 @@ new_image,s,q,,,,"Image to create"
 overwrite,b,q,,,,"Overwrite image?"
 spec2,s,q,,,,"Spectrum"
 constant,r,q,,,,"Constant to be applied"
-wavelength,r,q,,,,"Wavelength:"
+wavelength,r,q,,,,"Dispersion coordinate:"
 linelist,f,q,,,,"File"
 wstart,r,q,,,,"Starting wavelength"
 wend,r,q,,,,"Ending wavelength"
 dw,r,q,,,,"Wavelength per pixel"
-boxsize,i,q,,1,,"Smoothing box size"
+boxsize,i,q,,1,,"Smoothing box size (odd number)"

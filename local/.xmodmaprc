@@ -1,0 +1,11 @@
+!
+! Initialize keyoard mapping.
+!
+!remove Lock = Caps_Lock
+!keysym F15 = Caps_Lock
+!keysym Caps_Lock = Control_L
+!add Lock = Caps_Lock
+!
+remove Control = Control_R
+keysym Tab = Control_R Tab
+add Control = Control_R

@@ -1,4 +1,4 @@
-.help mkphotcors Aug91 noao.digiphot.photcal
+.help mkphotcors Apr94 noao.digiphot.photcal
 .ih
 NAME
 mkphotcors -- type in and/or check the observing parameters, shifts
@@ -31,7 +31,7 @@ check that there are the correct number of images in each observation.
 .le
 .ls obsparams
 The name of the input/output text file containing the quantities filter id,
-exposure time, and airmass, for each image in \fIimsets\fR.
+exposure time, airmass, and time of observation, for each image in \fIimsets\fR.
 If \fIobsparams\fR does not exist, MKPHOTCORS prompts the user for input
 and writes the results to the new observing parameters file \fIobsparams\fR.
 If \fIobsparams\fR already exists, MKPHOTCORS reads the file using the format
@@ -61,10 +61,10 @@ messages about any errors and inconsistencies it finds.
 If \fIapercors\fR is "", the user is not prompted for input and no output
 file is created.
 .le
-.ls obscolumns = "2 3 4"
+.ls obscolumns = "2 3 4 5"
 The list of numbers separated by commas or whitespace specifying which 
-columns in \fIobsparams\fR contain the filter ids, exposure times, and
-airmasses respectively of the images listed in column 1.
+columns in \fIobsparams\fR contain the filter ids, exposure times,
+airmasses, and times of observation, respectively of the images listed in column 1.
 \fIObscolumns\fR is only used if \fIobsparams\fR already exists on disk.
 The number 0 may be used as a place holder in the \fIobscolumns\fR string.
 For example to read in only the airmass values, \fIobscolumns\fR should be
@@ -110,13 +110,14 @@ image set file \fIimsets\fR. If \fIimsets\fR is "", MKPHOTCORS prompts
 the user for input but does not save the results.
 
 \fIObsparams\fR is the name of the input/output text file listing the
-observng parameters filter id, exposure time, and airmasse for the images in
+observng parameters filter id, exposure time, airmass, and time of observation,
+for the images in
 \fIimsets\fR. \fIObsparams\fR is used to correct missing or incorrect
-filter ids, exposure times, and airmasses in the photometry files, and
+filter ids, exposure times, airmasses, and times of observation in the photometry files, and
 is not required if all these values are correctly recorded in the photometry
 files. The observing parameters for each image are listed in
 \fIobsparams\fR, 1 image per line, with the image name in column 1, and the
-filter id, exposure time, and airmass in the columns \fIobscolumns\fR.
+filter id, exposure time, airmass, and time of observation in the columns \fIobscolumns\fR.
 A sample observing parameters file is shown in the next section.
 
 \fIObsparams\fR may be an existing file created with the MKIMSETS task,
@@ -198,20 +199,21 @@ must match those in the photometry files.
 
 A sample observing parameters file is shown for the above data set. In this
 example the user forgot to tell the photometry code to pick up the filter ids,
-exposure times, and airmasses from the image headers and so is obliged to
+exposure times, airmasses, and times of observation from the image headers and
+so is obliged to
 correct them after the fact via the observing parameters file. The filters
 U B V are represented by the numbers 1 2 3. 
 
 .nf
-	m92us  1  100   1.10
-	m92bs  2  100   1.09
-	m92vs  3  100   1.06
-	m92um  1  600   1.03
-	m92bm  2  600   1.03
-	m92vm  3  600   1.03
-	m92ul  1  1800  1.06
-	m92bl  2  1800  1.12
-	m92vl  3  1800  1.18
+	m92us  1  100   1.10 03:10:53
+	m92bs  2  100   1.09 03:14:06
+	m92vs  3  100   1.06 03:18:54
+	m92um  1  600   1.03 04:15:05
+	m92bm  2  600   1.03 04:29:43
+	m92vm  3  600   1.03 04:44:56
+	m92ul  1  1800  1.06 06:10:33
+	m92bl  2  1800  1.12 06:45:32
+	m92vl  3  1800  1.18 07:23:02
 .fi
 
 A sample shifts file for the above data set is shown below.

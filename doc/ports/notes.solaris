@@ -1,0 +1,359 @@
+Begin IRAF port to Solaris 2.3 
+Wed May 25 15:38:55 MST 1994
+----------------------------------------
+
+bin.ssun			+
+bin.ssun/IB.SSOL.SUN		+
+bin.sf2c			+
+bin.sf2c/IB.SSOL.F2C		+
+noao/bin.ssun			+
+noao/bin.ssun/IB.SSOL.SUN	+
+noao/bin.sf2c			+
+noao/bin.sf2c/IB.SSOL.F2C	+
+	Set up the Solaris platform (SSOL = Sun Solaris) and the two planned
+	Solaris architectures, SUN (Sun unbundled compilers) and F2C (F2C
+	and FSF compilers).  (5/25)
+
+unix/hlib/irafuser.csh
+	1. Replaced the `mach` reference by something that will work on both
+	SunOS and Solaris, using uname.
+	2. Modified to define either SUNOS or SOLARIS in HSI_CF, so that
+	kernel code can support both systems.  (5/25)
+
+unix/os/getproc.c
+	Added a Solaris version of uid_executing().  This reads /proc and
+	scans the process files to see if any belong to the given uid.  (5/25)
+
+unix/hlib/irafuser.csh
+unix/os/mkpkg.sh
+	1. alloc.e would no longer link without linking against the library
+	-ldl.  Note that -ldl can only be linked dynamic (no -Bstatic).
+	2. Added a new definition HSI_LFLAGS to irafuser.csh and modified the
+	mkpkg.sh in OS to use this to define the link flags for alloc.e.
+	This will probably have to be done for other HSI executables as well.
+	(5/25)
+
+unix/os/prwait.c
+	Solaris defines the exit_status argument to wait() differently and
+	the code had to be modified to allow for this.  (5/27)
+
+unix/os/zfioks.c
+	The select facility on Solaris uses fd_set, FD_SET, etc. and it
+	was necessary to add #ifdef SOLARIS code to reflect this.  (5/27)
+	
+
+Fri Jun 24 14:23:32 MST 1994
+----------------------------------------
+Resume port (elsewhere for the past month)
+
+unix/hlib/libc/kernel.h
+	Added a definition PFV; PFI is now a pointer to function returning
+	int, and PFV is a pointer to a function returning void.  Also added
+	a new definition SIGFUNC, which is whatever type signal() refers to
+	on the local system.  (6/24)
+
+unix/os/zfioks.c
+	1. Changed a number of PFI instances to SIGFUNC.
+	2. Changed the second two arguments to ks_onsig to type int*.  These
+	are not used and the actual type is different on Solaris than other
+	systems.  Probably the args should just be omitted but it may be
+	more portable to define a couple of dummy args.
+	3. The second argument to bind() is type (struct sockaddr *) in
+	Solaris, was (caddr_t) on other systems.  (6/24)
+
+unix/os/zfiotx.c
+	1. Deleted the import_fset, which apparently isn't used and which
+	contains a #define which conflicts with a Solaris one.
+	2. Changed a bunch of PFI instances to SIGFUNC.  Added some
+	(SIGFUNC) declarations to the signal handler arguments to signal().
+	3. Replaced the two dummy arguments (same as item 2 above) in three
+	instances of event handlers with dummy args declared (int *).  (6/24)
+
+unix/os/zopdir.c
+	Modified to use Solaris version of opendir/readdir.  (6/24)
+
+unix/os/zoscmd.c
+	Modified to use SIGFUNC instead of PFI, and to declare generic
+	dummy arguments for an event handler.  (6/24)
+
+unix/os/zshlib.c
+	Fixed a syntax error on the last line, an extra ';' following a
+	stubbed out function declaration.  (6/24)
+
+unix/os/zwmsec.c
+	1. Modified to use signal instead of sigvec; the latter is BSD specifc.
+	2. sigpause() takes a signal number instead of a signal mask.  Omitted
+	sigblock, which is no longer needed since we aren't using a mask, and
+	which doesn't exist on Solaris.
+	Possibly this routine should be completely rewritten on Solaris,
+	there may be better facilities for small timed delays.  (6/24)
+
+unix/os/zxwhen.c
+	1. For Solaris we must include <sys/siginfo.h> and <sys/ucontext.h>.
+	2. fcancel macro modified to use the constant BUFSIZ.
+	3. The table of hardware exceptions was modified to omit all
+	codes other than those for SIGFPE; the other codes (at least on
+	Solaris) alias with the FPE codes, and aren't used anywhere in
+	zxwhen anyway.  Added Solaris SIGFPE codes.
+	4. Modified calling sequence of exception handler ex_handler to
+	the form Solaris requires.  Added a statement to get the hardware
+	exception code out of the siginfo argument.
+	5. Replaced a number of PFI's by SIGFUNC's.  (6/25)
+
+unix/os/zfiomt.c
+	Modified signal handling code to use type SIGFUNC.  (6/25)
+
+unix/os/zzstrt.c
+	Made a few changes to get this code to compile, although the shared
+	library support isn't expected to work at this point.  (6/25)
+
+unix/hlib/irafuser.csh
+unix/os/zzstrt.c
+	Added a new define SHLIB, used to conditionally compile zzstrt for
+	shared library support.  (6/25)
+
+unix/boot/bootlib/bootlib.h
+	This file had a #ifdef UNIX in it, but this define is not defined
+	anywhere.  Modified to #ifdef VMS but assume unix otherwise.  (6/25)
+
+unix/hlib/irafuser.csh
+	Modified to define RANLIB as "echo ranlib" for Solaris.  (6/25)
+
+unix/hlib/kernel.h
+	Solaris doesn't have bcopy/bzero, so added a couple of #defines to
+	kernel.h to map these functions onto the equivalent Solaris versions
+	memmove/memset.  (6/25)
+
+unix/os/zoscmd.c
+unix/os/zopdpr.c
+unix/os/zfiopr.c
+	Replaced all calls to getdtablesize() by corresponding calls to
+	getrlimit().  (6/25)
+
+unix/os/zfgcwd.c
+	Replaced getwd() by getcwd().  (6/24)
+
+unix/boot/mkpkg/scanlib.c
+	It was necessary to add an (int) cast to  (int)fread(...) > 0
+	to avoid a warning message from the compiler, because fread has an
+	odd type on Solaris.  (6/25)
+
+unix/hlib/irafuser.csh
+	Added -lsocket -lnsl (the Solaris socket emulation library) to the
+	list of HSI host libraries used to link the HSI utilities.  (6/25)
+
+unix/boot/spp/xc.c
+	Made some minor changes to xc for Solaris - not clear yet what all
+	will be needed.  Most of it looks like it will work.  Added a #ifdef
+	conditional for the Solaris F77 libraries, taking the SunSoft
+	compiler as the builtin default.  Modified signal handling to use
+	SIGFUNC to be more portable.  (6/25)
+
+unix/boot/rmfiles/rmfiles.c
+	Added an "extern char *vfn2osfn()" declaration.  (6/25)
+
+unix/boot/spp/rpp/ratlibc/initst.c
+	Added a #ifdef conditional to access the stdio streams on Solaris.
+	(6/25)
+
+unix/gdev/sgidev/sgi2uapl.c
+unix/gdev/sgidev/sgi2uhpgl.c
+unix/gdev/sgidev/sgi2ueps.c
+	1. These files contained a number of cases where the file descriptor
+	"out" was declared int where (FILE *) was intended.
+	2. Replaced an instance of gethostname() in sgi2uapl.c by a call
+	to sysinfo().  (6/25)
+
+
+Sat Jun 25 23:26:24 MST 1994
+----------------------------------------
+Completed first bootstrap.  Try initial sysgen of core system.
+
+unix/boot/spp/xc.c
+	Modified xc to automatically do a "-t" when linking.  This disables
+	linker warnings about different size commons.  (6/26)
+
+unix/os/irafpath.c
+	Added a case for Solaris/sparc.  (6/26)
+
+mpkg
+as.ssol		+
+bin.ssol	+
+unix/setarch.sh
+unix/hlib/irafuser.csh
+	For Solaris/sparc the HSI AS and BIN are as.ssol and bin.ssol.
+	Hopefully it will be possible to use a single set of directories
+	for both the ssun and sf2c binary architectures.  (6/26)
+
+unix/hlib/install
+	Added some code to set the platform architecture automatically for
+	either SunOS or Solaris.  On a Solaris system the suntools stuff is
+	skipped.  (6/26)
+
+unix/boot/bootlib/envinit.c
+	Fixed a bug/typo in this code: "printf (stderr, ...)".  (6/26)
+
+unix/boot/bootlib/vfn2osfn.c
+	Several more cases of a null statement ";" at the end of this file.
+	This happens in dummy function constructs like "foo(){};".  (6/26)
+
+unix/hlib/mkpkg.inc
+	Added cases for IRAFARCH=ssun and sf2c.  (6/26)
+
+unix/hlib/mkpkg.sf.SSUN		+
+unix/hlib/mkpkg.sf.SF2C		+
+	Added starter special file lists for the two Solaris architectures.
+	(6/26)
+
+unix/as.ssol/zsvjmp.s
+	This assembler source appears to assemble ok, but I had to remove the
+	leading underscore from _zsvjmp_ as the SunSoft Fortran compiler
+	doesn't use leading underscores.  (6/26)
+
+
+Sun Jun 26 20:18:48 MST 1994
+----------------------------------------
+Completed first core system sysgen: system starts up and runs, but a number
+of bugs are evident.
+
+unix/hlib/irafuser.csh
+	HSI_XF now includes flags such as -/DSYSV -/DSOLARIS etc., so that
+	mkpkg can be used to update HSI libraries such as OS.  This is only
+	a temporary solution, ideally XC should accept HSI_CF.  (6/27)
+
+sys/fio/fdirname.x
+	There was an actual bug in this file that showed up during testing
+	of the new port.  zfxdir (kfxdir) was being used incorrectly to
+	test for the existence of host directory pathnames.  (6/27)
+
+unix/os/zopdir.c
+	The above testing also revealed a bug in this file.  This was
+	preventing commands such as "dir /" from working, due to a bug in
+	the code which strips trailing slashes from directory names.  (6/27)
+
+unix/os/zfiotx.c
+	1. Raw mode terminal i/o was not working properly on Solaris; output
+	data was being lost when raw mode was entered, even though the ioctl
+	used would (presumably) wait for the output to drain before changing
+	the terminal mode.  It is not clear what the connection might be,
+	but this was fixed by deleting the iflag=0, i.e., not resetting the
+	iflags, when entering raw mode.  Evidently clearing one of the
+	default input flags was the source of this problem, even though
+	ICANON was disabled.  Since ICANON is disabled we shouldn't need
+	to change the iflags anyway, so it should be safe to omit this.
+	In fact, it is probably safer to preserve all default terminal flags
+	by default and change only those affecting raw i/o, but at present
+	I will leave it fully setting the oflags and lflags, since this
+	is working.
+	2. Solaris also provides the POSIX termios interface which is the
+	recommended interface.  This appears to be a simple front end to
+	the termio ioctl interface.  I decided to avoid this for the moment
+	since the SYSV termio interface appears to be widely available.
+	(6/27)
+
+
+Sun Jul  3 23:08:27 MST 1994
+----------------------------------------
+Resume work on Solaris port.
+
+unix/as.ssol/enbint.s		+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	After a bit more research got IEEE floating point exception handling
+	working under Solaris.  The new routine enbint.s is used to enable the
+	exceptions.  sigaction turned out to block SIGFPE when the handler
+	was called and it proved necessary to add the SA_NODEFER flag to 
+	prevent this.  (7/03)
+
+unix/os/zfioks.c
+unix/os/zfiond.c
+	Fixed a couple bugs that were keeping networking from working.
+	"RSH" was not being defined correctly in zfioks, and it was necessary
+	to add FD_ZERO calls to zero the select fd arrays before calling
+	FD_SET.  (7/04)
+
+sys/imfort/tasks/
+unix/hlib/fc.csh
+	Tested FC on the imfort tasks.  This worked without incident following
+	minor changes to the fc.csh script.  The only thing unusual is that
+	an IEEE retrospective is printed when the task exits, indicating
+	that the IEEE divzero,overflow,invalid exceptions were enabled.
+	This is annoying but is not exactly a bug (ieee_retrospective is always
+	called by Fortran programs, it just doesn't usually generate any
+	output), so for the moment I don't see the need to change anything
+	at present.  (7/04)
+
+Build of ssun binaries for TABLES proceeded without incident.  (7/04)
+
+unix/boot/bootlib/ossymlink.c
+	This file used #ifdef BSDUNIX incorrectly, preventing the #ifdef-ed
+	code from compiling on UNIX systems for which BSDUNIX was not set.
+	Changed the statement to #ifndef VMS.  (7/05)
+
+unix/shlib/zzzend.c
+	Deleted ";" at the end (empty declaration).  (7/10)
+
+unix/shlib/medit.c
+	Added a #define for bcopy, which doesn't exist in Solaris.  (7/10)
+
+unix/shlib/mkpkg
+	Modified to avoid use of ranlib on Solaris platforms.  (7/10)
+
+unix/boot/spp/mkxc.sh
+	Modified to do the compile and link in separate steps.  (7/14)
+
+unix/gdev/sgidev/sgi2uapl.c
+	Modified to put "%!PS" in the Postscript file header.  (7/19)
+
+dev/tapecap
+	Added Solaris support.  (7/20)
+
+unix/boot/spp/xc.c
+	Added -lintl to the list of builtin host libraries.  (7/23)
+
+unix/os/zfiotx.c
+	Rather than leaving iflags unmodified when raw mode is entered,
+	now clears several input processing flags, in particular CR is not
+	mapped to NL.  (7/23)
+
+unix/hlib/zzsetenv.def
+	Changed the default printer device to "lw".  (7/25)
+
+unix/shlib/Slib.c
+unix/shlib/edsym.c
+unix/shlib/elf.c		+
+unix/shlib/medit.c
+unix/shlib/mkpkg
+unix/shlib/mkpkg.sh
+unix/shlib/mkshlib.csh.ssol	+
+unix/shlib/zzzend.c
+unix/os/zzstrt.c
+	There were many changes here, especially to mkshlib.csh, edsym.c,
+	Slib,c, and zzend.c, to support IRAF shared libraries under Solaris.
+	Most of the changes were made earlier but I did not keep detailed
+	notes during development.  The changes are not fully backwards
+	compatible, so it will be necessary to configure separate shlib
+	directories for SunOS and Solaris.  (7/25)
+
+unix/hlib/mkpkg.inc
+	A wfits problem was traced to a bug in the Fortran optimizer using
+	SunSoft Fortran 2.0.1.  Compiling -O2 avoids the problem.  (7/29)
+
+unix/hlib/install
+	The install script was modified earlier to just exit when it came
+	to the gterm/imtool config stuff.  Modified this to continue on
+	with this, but to do only the X11 related configuration.  This
+	consists of making the /dev/imt fifos, installing the imtoolrc,
+	and checking that termcap and graphcap are sufficiently up to date
+	to contain xgterm and imtool entries.  (7/30)
+
+unix/hlib/libc/kernel.h
+unix/os/zfiotx.c
+unix/os/zzstrt.c
+	Replaced the terminal driver by a version which maintains a unique
+	descriptor for every hardware terminal device, regardless of the
+	file descriptor used to access the terminal.  (8/02)
+
+dev/graphcap
+	The xgterm graphcap entry now recognizes either CR or LF as the
+	trailer code for a cursor read.  (8/02)

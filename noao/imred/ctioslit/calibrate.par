@@ -9,3 +9,5 @@ observatory,s,h,)_.observatory,,,Observatory of observation
 ignoreaps,b,h,yes,,,Ignore aperture numbers in flux calibration?
 sensitivity,s,h,"sens",,,Image root name for sensitivity spectra
 fnu,b,h,no,,,Create spectra having units of FNU?
+airmass,r,q,,1.,,Airmass
+exptime,r,q,,,,Exposure time (seconds)

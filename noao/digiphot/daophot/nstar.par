@@ -1,11 +1,13 @@
 # Parameters for the NSTAR task
+
 image,f,a,,,,"Image corresponding to photometry"
 groupfile,f,a,default,,,"Input group file (image.grp.?)"
 psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
 nstarfile,f,a,default,,,"Output photometry file (default: image.nst.?)"
+rejfile,f,a,default,,,"Output rejections file (default: image.nrj.?)"
 datapars,pset,h,"",,,Data parameters
-daopars,pset,h,"",,,Daophot parameters
-verbose,b,h,no,,,Print messages
-verify,b,h,yes,,,Verify critical NSTAR parameters
-update,b,h,no,,,Update critical NSTAR parameters
+daopars,pset,h,"",,,Psf fitting parameters
+verbose,b,h,)_.verbose,,,Print nstar messages?
+verify,b,h,)_.verify,,,Verify critical nstar parameters?
+update,b,h,)_.update,,,Update critical nstar parameters?
 mode,s,h,'ql'

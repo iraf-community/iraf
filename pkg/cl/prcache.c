@@ -8,6 +8,7 @@
 #define	import_finfo
 #define	import_prstat
 #include <iraf.h>
+
 #include "config.h"
 #include "errs.h"
 #include "task.h"
@@ -57,6 +58,7 @@
  */
 
 extern	int	cldebug;
+extern	int	cltrace;
 
 typedef	int (*PFI)();
 
@@ -130,6 +132,10 @@ int	timeit;				/* if !0, time command		*/
 	if (cldebug)
 	    eprintf ("connect: *in, *out, t_in, t_out: %d %d %d %d\n",
 		*in, *out, t_in, t_out);
+	if (cltrace) {
+	    d_fmtmsg (stderr, "\t    ", command, 80 - 13);
+	    eprintf ("\t--------------------------------\n");
+	}
 
 	return (pid);
 }
@@ -207,6 +213,8 @@ FILE	**in, **out;			/* IPC channels (output)	*/
 	    /* Spawn subprocess.  Turn off interrupts during process startup
 	     * to avoid crashing the IPC protocol.
 	     */
+	    if (cltrace)
+		eprintf ("\t----- connect to %s -----\n", process);
 	    intr_disable();
 	    if ((pr->pr_pid = c_propen (process, &fd_in, &fd_out)) == NULL) {
 		intr_enable();
@@ -245,6 +253,9 @@ register struct process *pr;
 	 */
 	if (pr == NULL || pr->pr_pid == NULL || pr_busy(pr))
 	    return;
+
+	if (cltrace)
+	    eprintf ("\t----- disconnect %s -----\n", pr->pr_name);
 
 	/* Command child process to exit, close down communications.  This
 	 * closes the IPC files as well as the terminating the process.

@@ -46,7 +46,7 @@ begin
 	    BINARY_PLOT, VCORRELATION_PLOT)
 
 	# Label the velocities
-	call strcpy ("u=180;h=c;v=b;s=0.5;f=b;q=h", Memc[fmt], SZ_LINE)
+	call strcpy ("u=180;h=c;v=b;s=0.5;q=h", Memc[fmt], SZ_LINE)
 	call gseti (gp, G_WCS, 1)
 	gap = GAP
 	tick = TICK
@@ -69,7 +69,9 @@ begin
 
 	    # Mark the shift number
 	    call gctran (gp, mx, my + gap + tick + gap, x1, y2, 0, 1)
+	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
 	    call gtext (gp, x1, y2, Memc[shift], Memc[fmt])
+	    call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 
 	    # Now print the velocity
 	    call gctran (gp, 0.14, (0.58-(i-1)*0.04), xp, yp, 0, 1)
@@ -83,7 +85,7 @@ begin
 		    call pargi (i)
 		    call pargr (DBL_SHIFT(rv,i))
 	    }
-	    call gtext (gp, xp, yp, Memc[vel], "f=b;s=0.75")
+	    call gtext (gp, xp, yp, Memc[vel], "s=0.75")
 	    call gflush (gp)
 	}
 
@@ -134,9 +136,10 @@ begin
 	# Now get the coords to draw the text
 	call gseti (gp, G_WCS, 2)
 	call ggwind (gp, x1, x2, y1, y2)   
+	call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
 	if (RV_ERRCODE(rv) == ERR_FIT) {
 	    call gctran (gp, 0.14, 0.45, xp, yp, 0, 2)
-	    call gtext (gp, xp, yp, "Fit did not converge.", "f=b")
+	    call gtext (gp, xp, yp, "Fit did not converge.", "")
 	    call gflush (gp)
 	    return
 	} else {
@@ -148,9 +151,11 @@ begin
 	        call wpl_text (rv, gp, xp, yp, i)
 	    }
 	}
+	call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 	call gflush (gp)
 
 	# Lastly, write out the indicator for the FWHM calculation
+	call gseti (gp, G_PLCOLOR, RV_LINECOLOR(rv))
 	if (RV_FITFUNC(rv) != CENTER1D) {
 	    h = RV_FWHM_Y(rv)
 	    if (RV_DCFLAG(rv) == -1) {
@@ -167,6 +172,7 @@ begin
 		    real(RV_VREL(rv)+(0.5*RV_DISP(rv))), h)
 	    }
 	}
+	call gseti (gp, G_PLCOLOR, C_FOREGROUND)
 	call gflush (gp)
 end
 
@@ -217,7 +223,7 @@ begin
 	}
 
 	# Write the text
-	call gtext (gp, xp, yp, Memc[bp], "f=b")
+	call gtext (gp, xp, yp, Memc[bp], "")
 
 	call sfree (sp)
 end

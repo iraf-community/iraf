@@ -6,9 +6,7 @@ unlearn dohydra params
 delete ("demologfile,demoplotfile", verify=no, >& "dev$null")
 
 # Execute playback.
-if (envget("stdgraph") == "xtermjh")
-    stty (playback="demos$xdohydra.dat", nlines=24, verify=no, delay=0)
-else if (envget("stdgraph") == "gterm")
-    stty (playback="demos$gdohydra.dat", nlines=24, verify=no, delay=0)
+if (substr (envget("stdgraph"), 1, 6) == "xgterm")
+    stty (playback="demos$xgdohydra.dat", nlines=24, verify=no, delay=0)
 else
     error (1, "Playback for current terminal type not available")

@@ -48,3 +48,7 @@ $special "sys$vops/ak/":
 $special "sys$vops/lz/":
 	aveqx.x		$(XNO)
 	;
+
+$set	XBIG	= '& "$xc -c -/Ns2048 -/Nx2048 &"'
+$special "sys$fmtio/":		evvexpr.x	$(XBIG)	;
+

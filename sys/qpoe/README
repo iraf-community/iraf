@@ -236,6 +236,7 @@ following interface parameters are defined:
 	"lutminranges"	min ranges required before a lookup table is used
 	"lutscale"	scale factor to convert nranges to n LUT bins
 	"blockfactor"	QPIO blocking factor for output pixel arrays
+	"optbufsize"	FIO i/o buffer size for IMIO access to QPOE file, chars
 	"debuglevel"	debug level, 0 for no runtime debug messages
 
 Environment:

@@ -26,6 +26,8 @@ begin
 	    return (QP_STINDEXLEN(qp))
 	case QPOE_MAXLFILES:
 	    return (QP_FMMAXLFILES(qp))
+	case QPOE_MAXPTPAGES:
+	    return (QP_FMMAXPTPAGES(qp))
 	case QPOE_MAXFRLUTLEN:
 	    return (QP_EXMAXFRLLEN(qp))
 	case QPOE_MAXRRLUTLEN:

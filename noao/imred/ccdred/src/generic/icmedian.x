@@ -61,7 +61,7 @@ begin
 	    return
 	}
 
-	# Repeatedly eliminate the extreme values until there are three
+	# Repeatedly exchange the extreme values until there are three
 	# or fewer pixels.
 
 	do i = 1, npts {
@@ -86,16 +86,24 @@ begin
 		if (j1 < j3 && j2 < j3) {
 		    Mems[d[j1]+k] = val3
 		    Mems[d[j2]+k] = Mems[d[j3]+k]
+		    Mems[d[j3]+k] = val1
+		    Mems[d[n1]+k] = val2
 		} else if (j1 < j3) {
-		    if (j2 == j3)
+		    if (j2 == j3) {
 			Mems[d[j1]+k] = val3
-		    else
+			Mems[d[n1]+k] = val1
+		    } else {
 			Mems[d[j1]+k] = Mems[d[j3]+k]
+			Mems[d[j3]+k] = val1
+		    }
 		} else if (j2 < j3) {
-		    if (j1 == j3)
+		    if (j1 == j3) {
 			Mems[d[j2]+k] = val3
-		    else
+			Mems[d[n1]+k] = val2
+		    } else {
 			Mems[d[j2]+k] = Mems[d[j3]+k]
+			Mems[d[j3]+k] = val2
+		    }
 		}
 		n1 = n1 - 2
 	    }
@@ -188,7 +196,7 @@ begin
 	    return
 	}
 
-	# Repeatedly eliminate the extreme values until there are three
+	# Repeatedly exchange the extreme values until there are three
 	# or fewer pixels.
 
 	do i = 1, npts {
@@ -213,16 +221,24 @@ begin
 		if (j1 < j3 && j2 < j3) {
 		    Memr[d[j1]+k] = val3
 		    Memr[d[j2]+k] = Memr[d[j3]+k]
+		    Memr[d[j3]+k] = val1
+		    Memr[d[n1]+k] = val2
 		} else if (j1 < j3) {
-		    if (j2 == j3)
+		    if (j2 == j3) {
 			Memr[d[j1]+k] = val3
-		    else
+			Memr[d[n1]+k] = val1
+		    } else {
 			Memr[d[j1]+k] = Memr[d[j3]+k]
+			Memr[d[j3]+k] = val1
+		    }
 		} else if (j2 < j3) {
-		    if (j1 == j3)
+		    if (j1 == j3) {
 			Memr[d[j2]+k] = val3
-		    else
+			Memr[d[n1]+k] = val2
+		    } else {
 			Memr[d[j2]+k] = Memr[d[j3]+k]
+			Memr[d[j3]+k] = val2
+		    }
 		}
 		n1 = n1 - 2
 	    }
@@ -256,4 +272,3 @@ begin
 		median[i] = blank
 	}
 end
-

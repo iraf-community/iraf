@@ -1,6 +1,7 @@
 # XYACC -- Yacc parser generator for SPP.
 
-$CC $HSI_CF	y[1-4].c -o xyacc.E
-mv -f		xyacc.E ../../hlib
+$CC -c $HSI_CF	y[1-4].c
+$CC $HSI_LF	y[1-4].o -o xyacc.e
+mv -f		xyacc.e ../../hlib
 cp 		yaccpar.x ../../../lib
 rm -f		*.o

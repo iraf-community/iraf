@@ -12,14 +12,14 @@ int	type				# Feature type
 real	value
 
 real	center1d()
-double	mw_c1trand()
+double	smw_c1trand()
 
 begin
-	value = mw_c1trand (EC_PL(ec), x)
+	value = smw_c1trand (EC_PL(ec), x)
  	value = center1d (value, IMDATA(ec,1), EC_NPTS(ec), width,
 	    abs (type), EC_CRADIUS(ec), EC_THRESHOLD(ec))
 	if (IS_INDEF(value))
 	    return (INDEFD)
 	else
-	    return (mw_c1trand (EC_LP(ec), double(value)))
+	    return (smw_c1trand (EC_LP(ec), double(value)))
 end

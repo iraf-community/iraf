@@ -5,11 +5,11 @@ include "../lib/noise.h"
 # noise fitting parameters.
 
 procedure ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
-    newcenter, newskybuf, newsky, newbuf, newfit)
+        newcenter, newskybuf, newsky, newbuf, newfit)
 
 pointer	ap			# pointer to the apphot structure
 pointer	im			# pointer to the iraf image
-pointer	out			# output file descriptor
+int	out			# output file descriptor
 int	stid			# output file sequence number
 char	cmdstr[ARB]		# command string
 int	newcenterbuf, newcenter	# new centering parameters ?
@@ -48,34 +48,19 @@ begin
 		call printf ("%s = %s %s\n")
 		    call pargstr (KY_NSTRING)
 		    call pargstr (Memc[str])
-		    call pargstr (UN_NSTRING)
+		    call pargstr (UN_NMODEL)
 	    } else {
 		stat = strdic (Memc[cmd], Memc[cmd], SZ_LINE, NFUNCS)
 		if (stat > 0) {
 		    call apseti (ap, NOISEFUNCTION, stat)
 		    call apsets (ap, NSTRING, Memc[cmd])
 		    if (stid > 1)
-		        call ap_sparam (out, KY_NSTRING, Memc[cmd], UN_NSTRING,
+		        call ap_sparam (out, KY_NSTRING, Memc[cmd], UN_NMODEL,
 		            "noise model")
 		    newcenterbuf = YES; newcenter = YES
-		    newsky = YES; newfit = YES
+		    newskybuf = YES; newsky = YES
+		    newbuf = YES; newfit = YES
 		}
-	    }
-
-	case NCMD_CTHRESHOLD:
-	    call gargr (rval)
-	    if (nscan() == 1) {
-		call printf ("%s = %g %s\n")
-		    call pargstr (KY_CTHRESHOLD)
-		    call pargr (apstatr (ap, CTHRESHOLD))
-		    call pargstr (UN_CTHRESHOLD)
-	    } else {
-		call apsetr (ap, CTHRESHOLD, rval)
-		if (stid > 1)
-		    call ap_rparam (out, KY_CTHRESHOLD, rval, UN_CTHRESHOLD,
-			"threshold for centering")
-		newcenterbuf = YES; newcenter = YES
-		newsky = YES; newfit = YES
 	    }
 
 	case NCMD_SIGMA:
@@ -84,15 +69,15 @@ begin
 		call printf ("%s = %g %s\n")
 		    call pargstr (KY_SKYSIGMA)
 		    call pargr (apstatr (ap, SKYSIGMA))
-		    call pargstr (UN_SKYSIGMA)
+		    call pargstr (UN_NCOUNTS)
 	    } else {
 		call apsetr (ap, SKYSIGMA, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_SKYSIGMA, rval, UN_SKYSIGMA,
+		    call ap_rparam (out, KY_SKYSIGMA, rval, UN_NCOUNTS,
 			"standard deviation of 1 pixel")
 		newcenterbuf = YES; newcenter = YES
-		newsky = YES
-		newfit = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 	    }
 
 	case NCMD_EPADU:
@@ -101,15 +86,15 @@ begin
 		call printf ("%s = %g %s\n")
 		    call pargstr (KY_EPADU)
 		    call pargr (apstatr (ap, EPADU))
-		    call pargstr (UN_EPADU)
+		    call pargstr (UN_NEPADU)
 	    } else {
 		call apsetr (ap, EPADU, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_EPADU, rval, UN_EPADU,
+		    call ap_rparam (out, KY_EPADU, rval, UN_NEPADU,
 			"photons per adu")
 		newcenterbuf = YES; newcenter = YES
-		newsky = YES
-		newfit = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 	    }
 
 	case NCMD_GAIN:
@@ -126,11 +111,11 @@ begin
 		if (im != NULL)
 		    call ap_padu (im, ap)
 		if (stid > 1)
-		    call ap_sparam  (out, KY_GAIN, Memc[str], UN_GAIN,
+		    call ap_sparam  (out, KY_GAIN, Memc[str], UN_NKEYWORD,
 			"gain keyword")
 		newcenterbuf = YES; newcenter = YES
-		newsky = YES
-		newfit = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 	    }
 
 	case NCMD_CCDREAD:
@@ -147,9 +132,11 @@ begin
 		if (im != NULL)
 		    call ap_rdnoise (im, ap)
 		if (stid > 1)
-		    call ap_sparam  (out, KY_CCDREAD, Memc[str], UN_CCDREAD,
+		    call ap_sparam  (out, KY_CCDREAD, Memc[str], UN_NKEYWORD,
 			"read noise keyword")
-		newfit = YES
+		newcenterbuf = YES; newcenter = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 	    }
 
 	case NCMD_READNOISE:
@@ -158,30 +145,17 @@ begin
 		call printf ("%s = %g %s\n")
 		    call pargstr (KY_READNOISE)
 		    call pargr (apstatr (ap, READNOISE))
-		    call pargstr (UN_READNOISE)
+		    call pargstr (UN_NELECTRONS)
 	    } else {
 		call apsetr (ap, READNOISE, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_READNOISE, rval, UN_READNOISE,
+		    call ap_rparam (out, KY_READNOISE, rval, UN_NELECTRONS,
 			"readout noise")
-		newfit = YES
+		newcenterbuf = YES; newcenter = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 	    }
 
-
-	case NCMD_THRESHOLD:
-	    call gargr (rval)
-	    if (nscan() == 1) {
-		call printf ("%s = %g %s\n")
-		    call pargstr (KY_THRESHOLD)
-		    call pargr (apstatr (ap, THRESHOLD))
-		    call pargstr (UN_THRESHOLD)
-	    } else {
-		call apsetr (ap, THRESHOLD, rval)
-		if (stid > 1)
-		    call ap_rparam (out, KY_THRESHOLD, rval, UN_THRESHOLD,
-			"threshold for detection")
-		newfit = YES
-	    }
 
 	default:
 	    call printf ("Unknown or ambiguous colon command\7\n")

@@ -115,6 +115,9 @@ oline_	    call strcpy ("# Magtape unit ", Memc[lbuf], SZ_LINE)
 	    call mt_putline (new_lockfile, "\n")
 
 	# Install the new lockfile.
+	call zflstx (new_lockfile, status)
+	if (status == ERR)
+	    goto err_
 	call zclstx (new_lockfile, status)
 	if (status == ERR)
 	    goto err_

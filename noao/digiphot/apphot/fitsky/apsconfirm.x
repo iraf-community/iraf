@@ -56,17 +56,17 @@ begin
 
 	# Update the database file.
 	if (out != NULL && stid > 1) {
-	    call ap_sparam (out, KY_SSTRING, Memc[str], UN_SSTRING,
+	    call ap_sparam (out, KY_SSTRING, Memc[str], UN_SALGORITHM,
 		"sky fitting algorithm")
-	    call ap_rparam (out, KY_ANNULUS, annulus, UN_ANNULUS,
+	    call ap_rparam (out, KY_ANNULUS, annulus, UN_SSCALEUNIT,
 	        "inner radius of sky annulus")
-	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_DANNULUS,
+	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_SSCALEUNIT,
 	        "width of the sky annulus")
-	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
+	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_NCOUNTS,
 	        "standard deviation of 1 sky pixel") 
-	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_ACOUNTS,
 	        "minimum good data value") 
-	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_ACOUNTS,
 	        "maximum good data value") 
 	}
 

@@ -8,7 +8,7 @@ include "sensfunc.h"
 procedure sf_stds (standards, aps, ignoreaps, stds, nstds)
 
 char	standards	# Standard star data file
-int	aps		# Aperture list
+pointer	aps		# Aperture list
 bool	ignoreaps	# Ignore apertures?
 pointer	stds		# Pointer to standard observations (returned)
 int	nstds		# Number of standard observations (returned)
@@ -19,7 +19,7 @@ real	wavelength, flux, dwave, count
 pointer	sp, image, title, std
 pointer	waves, fluxes, dwaves, counts, sens, fit, wts, iwts, x, y
 
-bool	is_in_range()
+bool	rng_elementi()
 int	open(), fscan(), nscan(), stridxs()
 errchk	open, malloc, realloc
 
@@ -36,6 +36,7 @@ begin
 	# begins with the character '['.  Otherwise the line is interpreted
 	# as a data line.  All unrecognized formats are skipped.
 
+	nwaves = 0
 	nstds = 0
 	while (fscan (fd) != EOF) {
 	    call gargwrd (Memc[image], SZ_STDIMAGE)
@@ -49,7 +50,7 @@ begin
 	        call gargstr (Memc[title], SZ_STDTITLE)
 	        if (nscan() < 7)
 		    next
-		if (!is_in_range (aps, beam))
+		if (!rng_elementi (aps, beam))
 		    next
 		if (IS_INDEF (exptime) || exptime <= 0.) {
 		    call eprintf (
@@ -63,12 +64,12 @@ begin
 		# of the pointer array and finish up the previous standard
 		# star.
 
-	        nstds = nstds + 1
-	        if (nstds == 1)
+	        if (nstds == 0) {
+		    nstds = nstds + 1
 		    call calloc (stds, nstds, TY_INT)
-	        else {
-		    call realloc (stds, nstds, TY_INT)
-	    	    STD_NWAVES(std) = nwaves
+		    call calloc (std, LEN_STD, TY_STRUCT)
+		    Memi[stds+nstds-1] = std
+	        } else {
 	    	    if (nwaves > 0) {
 			call realloc (waves, nwaves, TY_REAL)
 			call realloc (fluxes, nwaves, TY_REAL)
@@ -81,6 +82,7 @@ begin
 			call malloc (x, nwaves, TY_REAL)
 			call malloc (y, nwaves, TY_REAL)
 			call amovr (Memr[wts], Memr[iwts], nwaves)
+			STD_NWAVES(std) = nwaves
 			STD_WAVES(std) = waves
 			STD_FLUXES(std) = fluxes
 			STD_DWAVES(std) = dwaves
@@ -91,12 +93,16 @@ begin
 			STD_IWTS(std) = iwts
 			STD_X(std) = x
 			STD_Y(std) = y
+
+			nstds = nstds + 1
+			call realloc (stds, nstds, TY_INT)
+			call calloc (std, LEN_STD, TY_STRUCT)
+			Memi[stds+nstds-1] = std
 		    }
 	        }
 
 		# Start a new standard star.
-	        call calloc (std, LEN_STD, TY_STRUCT)
-	        Memi[stds+nstds-1] = std
+	        std = Memi[stds+nstds-1]
 		if (ignoreaps)
 	            STD_BEAM(std) = 1
 		else
@@ -132,9 +138,11 @@ begin
 		call gargr (count)
 		if (nscan() < 3)
 		    next
-		if (wavelength<=0. || flux<=0. || dwave<=0. || count<=0.)
+		if (wavelength < min (wstart, wend) ||
+		    wavelength > max (wstart, wend) ||
+		    flux<=0. || dwave<=0. || count<=0.)
 		    next
-		if (!is_in_range (aps, beam))
+		if (!rng_elementi (aps, beam))
 		    next
 		nwaves = nwaves + 1
 

@@ -28,22 +28,24 @@ begin
 	    arcec = arcref // "arc.ec"
 	else
 	    arcec = ""
-	if (!access (arcrefec//".imh")) {
+	if (!access (arcrefec//"."//envget("imtype"))) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    apscript (arcref, ansrecenter="NO", ansresize="NO", ansedit="NO",
 		anstrace="NO", background="none", clean=no, weights="none")
 	    if (response != "")
 		sarith (arcrefec, "/", response, arcrefec, w1=INDEF, w2=INDEF,
-		    apertures="", beams="", apmodulus=0, reverse=no,
+		    apertures="", bands="", beams="", apmodulus=0, reverse=no,
 		    ignoreaps=no, format="multispec", renumber=no, offset=0,
 		    clobber=yes, merge=no, errval=0, verbose=no)
 	    if (arcec != "") {
 		scopy (arcrefec, arcec, w1=INDEF, w2=INDEF, apertures=arcaps,
-		    beams=arcbeams, apmodulus=0, offset=0, format="multispec",
-		    clobber=yes, merge=no, renumber=yes, verbose=no)
+		    bands="", beams=arcbeams, apmodulus=0, offset=0,
+		    format="multispec", clobber=yes, merge=no, renumber=yes,
+		    verbose=no)
 		scopy (arcrefec, "", w1=INDEF, w2=INDEF, apertures="!"//arcaps,
-		    beams=arcbeams, apmodulus=0, offset=0, format="multispec",
-		    clobber=yes, merge=no, renumber=yes, verbose=no)
+		    bands="", beams=arcbeams, apmodulus=0, offset=0,
+		    format="multispec", clobber=yes, merge=no, renumber=yes,
+		    verbose=no)
 	    }
 	}
 		    
@@ -67,14 +69,15 @@ begin
 	    ecidentify (arcrefec, database=database,
 		coordlist=params.coordlist, match=params.match,
 		maxfeatures=100, zwidth=10., ftype="emission",
-		fwidth=params.fwidth, cradius=params.cradius, threshold=10.,
-		minsep=2., function=params.i_function, xorder=params.i_xorder,
+		fwidth=params.fwidth, cradius=params.cradius,
+		threshold=params.threshold, minsep=2.,
+		function=params.i_function, xorder=params.i_xorder,
 		yorder=params.i_yorder, niterate=params.i_niterate,
 		lowreject=params.i_low, highreject=params.i_high,
 		autowrite=yes)
 	    if (arcec != "") {
 		ecreidentify (arcec, arcrefec, shift=0., cradius=params.cradius,
-		    threshold=10., refit=yes, database=database,
+		    threshold=params.threshold, refit=yes, database=database,
 		    logfiles=log1//","//log2)
 		imdelete (arcec, verify=no)
 	    }

@@ -27,6 +27,7 @@ begin
 	    # Fix the datafile parameters.
 	    call fm_seti (fm, FM_PAGESIZE, QP_FMPAGESIZE(qp))
 	    call fm_seti (fm, FM_MAXLFILES, QP_FMMAXLFILES(qp))
+	    call fm_seti (fm, FM_MAXPTPAGES, QP_FMMAXPTPAGES(qp))
 	    call fm_seti (fm, FM_FCACHESIZE, QP_FMCACHESIZE(qp))
 
 	    # Create the QPOE header and static storage lfiles.

@@ -62,8 +62,9 @@ be used in finding, recentering, resizing, editing, and starting to
 trace spectra.  A value of INDEF selects the middle of the image.
 .le
 .ls nsum = 1
-Number of dispersion lines to be summed.  The lines are taken around the
-specified dispersion line.
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value takes the
+sum and a negative value selects a median.
 .le
 .ls buffer = 0.
 Buffer to add to aperture limits.  One use for this is to increase

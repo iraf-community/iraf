@@ -102,7 +102,7 @@ begin
     	    peak = center1d (init, ycf[ledge], npts, npts/5., 1, 2., thresh)
 	    RV_HEIGHT(rv) = INDEF
 	    RV_FWHM(rv) = INDEF
-	    RV_ERROR(rv) = INDEF
+	    RV_ERROR(rv) = INDEFD
 	    RV_R(rv) = INDEF
 	    RV_DISP(rv) = INDEF
 	    if (RV_GP(rv) != NULL && RV_INTERACTIVE(rv) == YES) {
@@ -128,7 +128,7 @@ begin
     	    call rv_sinc (rv, shift, fwhm, hght)
 	    RV_FWHM(rv) = fwhm
 	    RV_SHIFT(rv) = shift
-	    RV_ERROR(rv) = INDEF
+	    RV_ERROR(rv) = INDEFD
 	    RV_R(rv) = INDEF
 	    RV_DISP(rv) = INDEF
 	    if (RV_GP(rv) != NULL && RV_INTERACTIVE(rv) == YES)
@@ -147,10 +147,10 @@ begin
 	# window parameters
 	if (ledge != RV_ISTART(rv) && RV_FITFUNC(rv) != SINC) {
 	    if (gp != NULL && RV_INTERACTIVE(rv) == YES) {
-		call gseti (gp, G_PMLTYPE, 0)
+		call gseti (gp, G_PMLTYPE, GL_CLEAR)
 	        call gpmark (gp, xcf[RV_ISTART(rv)], ycf[RV_ISTART(rv)], 
 		    (RV_IEND(rv)-RV_ISTART(rv)+1), 4, 2., 2.)
-		call gseti (gp, G_PMLTYPE, 1)
+		call gseti (gp, G_PMLTYPE, GL_SOLID)
 	        call gpmark (gp, xcf[ledge], ycf[ledge], npts, 4, 2., 2.)
 	        call gpline (gp, xcf[RV_ISTART(rv)], ycf[RV_ISTART(rv)], 
 		    (RV_IEND(rv)-RV_ISTART(rv)+1))
@@ -223,6 +223,7 @@ real procedure rv_width (rv)
 pointer	rv				#I RV struct pointer
 
 real	fwhm, h, l, r, peak, shift
+int	gstati()
 
 include "fitcom.com"
 
@@ -262,7 +263,15 @@ begin
 	
 	# Now draw the line showing the width
 	if (RV_GP(rv) != NULL && RV_INTERACTIVE(rv) == YES) {
+	    if (gstati(RV_GP(rv),G_PLCOLOR) != C_BACKGROUND) {
+	        call gseti (RV_GP(rv), G_PLTYPE, GL_DASHED)
+	        call gseti (RV_GP(rv), G_PLCOLOR, RV_LINECOLOR(rv))
+	    }
 	    call gline (RV_GP(rv), l, h, r, h)
+	    if (gstati(RV_GP(rv),G_PLCOLOR) != C_BACKGROUND) {
+	        call gseti (RV_GP(rv), G_PLTYPE, GL_SOLID)
+	        call gseti (RV_GP(rv), G_PLCOLOR, C_FOREGROUND)
+	    }
 	    call gflush (RV_GP(rv))
 	}	
 

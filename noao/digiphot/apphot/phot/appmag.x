@@ -78,24 +78,22 @@ begin
 
 	# Print the center and sky value.
 	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
-	call printf ("%s x: %0.2f y: %0.2f s: %0.2f ")
+	call printf ("%s  %8.2f %8.2f  %8g  ")
 	    call pargstr (Memc[imname])
 	    call pargr (apstatr (ap, PXCUR))
 	    call pargr (apstatr (ap, PYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 
 	# Print out the magnitudes and errors.
-	call printf ("m: ")
 	do i = 1, AP_NAPERTS(phot) {
 	    if (i == AP_NAPERTS(phot))
-		call printf ("%0.3f ")
+		call printf ("%7.3f  ")
 	    else
-	        call printf ("%0.3f ")
-		    call pargr (Memr[AP_MAGS(phot)+i-1])
+	        call printf ("%7.3f  ")
+		call pargr (Memr[AP_MAGS(phot)+i-1])
 	}
 
 	# Print out the error codes.
-	call printf ("e: ")
 	if (cier != AP_OK || sier != AP_OK || pier != AP_OK) {
 	    call printf ("err\n")
 	} else {
@@ -112,7 +110,7 @@ end
 procedure ap_maghdr (ap, fd)
 
 pointer	ap		# pointer to apphot strucuture
-pointer	fd		# output file descriptor
+int	fd		# output file descriptor
 
 begin
 	if (fd == NULL)

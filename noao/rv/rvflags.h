@@ -62,6 +62,20 @@ define  IN_SPLINE3      	5       	# Cubic spline
 define  IN_SINC         	6       	# Sinc
 define  IN_FUNCTIONS    "|nearest|linear|poly3|poly5|spline3|sinc|"
 
+# Define color constants
+define  C_BACKGROUND	        0
+define  C_FOREGROUND	        1
+define  C_RED	                2
+define  C_GREEN	        	3
+define  C_BLUE	                4
+define  C_CYAN	                5
+define  C_YELLOW	        6
+define  C_MAGENTA	        7
+define  C_PUPLE	                8
+define  C_DARKSLATEGREY	        9
+define	C_COLOR_NAMES	"|background|foreground|red|green|blue|cyan|yellow \
+			 |magenta|purple|slategrey|"
+
 # Miscellaneous flags
 define	ALL_SPECTRUM		0		# No samples selected
 define	MAXIMUM			1		# Find max point

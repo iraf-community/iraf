@@ -89,6 +89,6 @@ begin
 	AP_PSFYPIX(psf) = NULL
 
 	# Allocate space for computed parameters.
-	call malloc (AP_PPARS(psf), AP_MAXNPARS(psf), TY_REAL)
-	call malloc (AP_PPERRS(psf), AP_MAXNPARS(psf), TY_REAL)
+	call calloc (AP_PPARS(psf), AP_MAXNPARS(psf), TY_REAL)
+	call calloc (AP_PPERRS(psf), AP_MAXNPARS(psf), TY_REAL)
 end

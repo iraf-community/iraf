@@ -27,10 +27,6 @@
 #define import_spp
 #include <iraf.h>
 
-#ifdef AUX
-#undef PFI
-#define PFI sigfunc_t
-#endif
 
 /* ZFIOKS -- File i/o to a remote kernel server.  This driver is the network
  * interface for the kernel interface package (sys$ki).  The KS driver is
@@ -95,13 +91,18 @@
  * or active ports.
  */
 
+/*
+ * PORTING NOTE -- A "SysV" system may use rsh instead of remsh.  This should
+ * be checked when doing a port.  Also, on at least one system it was necessary
+ * to change MAXCONN to 1 (maybe that is what it should be anyway).
+ */
+
 extern	int errno;
 extern	int save_prtype;
 
 #define	SZ_NAME		32		/* max size node, etc. name	  */
 #define	SZ_CMD		256		/* max size rexec sh command	  */
-#define	MAXCONN		1		/* for listen (### DSUX=1)	  */
-#define	SELWIDTH	32		/* number of bits for select	  */
+#define	MAXCONN		1		/* for listen			  */
 #define	MAX_UNAUTH	32		/* max unauthorized requests	  */
 #define	ONEHOUR		(60*60)		/* number of seconds in one hour  */
 #define	DEF_TIMEOUT	(1*ONEHOUR)	/* default in.irafksd idle timo   */
@@ -117,34 +118,52 @@ extern	int save_prtype;
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
 
+#ifdef SOLARIS
+#define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
+#else
+#define	SELWIDTH	32		/* number of bits for select	  */
+#endif
+
+#ifdef SOLARIS
+#define	RSH		"rsh"		/* typical names are rsh, remsh   */
+#else
 #ifdef SYSV
 #define	RSH		"remsh"		/* typical names are rsh, remsh   */
 #else
 #define	RSH		"rsh"		/* typical names are rsh, remsh   */
 #endif
+#endif
 
 #define	IRAFKS_DIRECT	0		/* direct connection (via rexec)  */
-#define	IRAFKS_DAEMON	1		/* in.irafksd daemon process	  */
-#define	IRAFKS_SERVER	2		/* irafks server process	  */
-#define	IRAFKS_CLIENT	3		/* zfioks client process	  */
+#define	IRAFKS_CALLBACK	1		/* callback to client socket	  */
+#define	IRAFKS_DAEMON	2		/* in.irafksd daemon process	  */
+#define	IRAFKS_SERVER	3		/* irafks server process	  */
+#define	IRAFKS_CLIENT	4		/* zfioks client process	  */
+
+#define	C_RSH 		1		/* rsh connect protocol		  */
+#define	C_REXEC		2		/* rexec connect protocol	  */
+#define	C_REXEC_CALLBACK 3		/* rexec-callback protocol	  */
 
 struct	ksparam {
 	int	auth;			/* user authorization code	  */
 	int	port;			/* in.irafksd port		  */
 	int	hiport;			/* in.irafksd port region	  */
 	int	timeout;		/* in.irafksd idle timeout, sec   */
+	int	protocol;		/* connect protocol		  */
 };
 
 int	debug_ks = 0;			/* print debug info on stderr	  */
+char	debug_file[64] = "";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
-char	debug_tty[20] = "";		/* debug output file if nonnull   */
 
 extern	int getuid();
 extern	char *getenv();
 static	jmp_buf jmpbuf;
 static	int jmpset = 0;
 static	int recursion = 0;
-static	PFI old_sigcld;
+static	SIGFUNC old_sigcld;
+static  int ks_pchan[MAXOFILES];
+static  int ks_achan[MAXOFILES];
 static	int ks_getresvport(), ks_rexecport();
 static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
 static	dbgmsg(), dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
@@ -159,58 +178,79 @@ static	ks_onsig();
  * dependent and normally comes from the file dev$hosts.  This file is read
  * by the high level VOS code before we are called.
  */
-ZOPNKS (server, mode, chan)
-PKCHAR	*server;		/* type of connection */
+ZOPNKS (x_server, mode, chan)
+PKCHAR	*x_server;		/* type of connection */
 XINT	*mode;			/* access mode (not used) */
 XINT	*chan;			/* receives channel code (socket) */
 {
 	register char	*ip, *op;
+	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype, port, auth, s_port, pid, s;
+	int	proctype, port, auth, s_port, pid, s, i;
 	struct  sockaddr_in sockaddr, from;
 	char	*hostp, *cmd;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
 
-	/* Debug output.  If debug_ks is set (e.g. with adb) but no filename
-	 * is given, debug output goes to stderr.  If a filename is given it
-	 * is interpreted as a tty device name unless a full pathname is given.
-	 */
-	if (debug_ks && !debug_fp) {
-	    if (debug_tty[0] != EOS) {
-		char  tty[30];
-
-		if (debug_tty[0] == '/')
-		    strcpy (tty, debug_tty);
-		else
-		    sprintf (tty, "/dev/%s", debug_tty);
-
-		if ((debug_fp = fopen (tty, "a")) == NULL)
-		    debug_fp = stderr;
-	    } else
-		debug_fp = stderr;
-	}
-	dbgmsg1 ("zopnks (`%s')\n", (char *)server);
-
-	/* Parse the server specification.  There are two possible variations
-	 * on this, depending upon whether we are setting up the irafks daemon
-	 * or the zfioks client.
+	/* Parse the server specification.  We can be called to set up either
+	 * the irafks daemon or to open a client connection.
 	 *
-	 *	(null)				directly connected (via rexec)
-	 *      in.irafksd			daemon process (via rsh)
-	 *      host!irafks-command		zfioks client connection
+	 *	(null)					direct via rexec
+	 *      callback port@host			callback client
+	 *      in.irafksd [port auth [timeout]]	start daemon
+	 *      [-prot] [-log file] host!command	client connection
+	 *
+	 * where -prot is -rsh, -rex, or -rcb denoting the client connect
+	 * protocols rsh, rexec, and rexec-callback.
 	 */
-	if (!*((char *)server))
+
+	/* Eat any protocol specification strings.  The default connect
+	 * protocol is rsh.
+	 */
+	for (ip = server;  isspace(*ip);  ip++)
+	    ;
+	ks.protocol = C_RSH;
+	if (strncmp (ip, "-rsh", 4) == 0) {
+	    ks.protocol = C_RSH;
+	    ip += 4;
+	} else if (strncmp (ip, "-rex", 4) == 0) {
+	    ks.protocol = C_REXEC;
+	    ip += 4;
+	} else if (strncmp (ip, "-rcb", 4) == 0) {
+	    ks.protocol = C_REXEC_CALLBACK;
+	    ip += 4;
+	}
+
+	/* Check for the debug log flag. */
+	for (  ;  isspace(*ip);  ip++)
+	    ;
+	if (strncmp (ip, "-log", 4) == 0) {
+	    debug_ks++;
+	    for (ip += 4;  isspace(*ip);  ip++)
+		;
+	    for (op=debug_file;  *ip && !isspace(*ip);  )
+		*op++ = *ip++;
+	    *op = EOS;
+	}
+
+	/* Determine connection type. */
+	for (  ;  isspace(*ip);  ip++)
+	    ;
+	if (!*ip) {
 	    proctype = IRAFKS_DIRECT;
-	else if (strcmp ((char *)server, "in.irafksd") == 0)
+	} else if (strncmp (ip, "callback ", 9) == 0) {
+	    proctype = IRAFKS_CALLBACK;
+	    ip += 9;
+	} else if (strncmp (ip, "in.irafksd", 10) == 0) {
 	    proctype = IRAFKS_DAEMON;
-	else {
+	    ip += 10;
+	} else {
 	    proctype = IRAFKS_CLIENT;
 	    cmd = NULL;
-	    for (op=host, ip = (char *)server;  *ip != EOS;  ip++)
+	    for (op=host;  *ip != EOS;  ip++)
 		if (*ip == FNNODE_CHAR) {
 		    *op = EOS;
-		    cmd = ip + 1;
+		    cmd = ++ip;
 		    break;
 		} else
 		    *op++ = *ip;
@@ -219,6 +259,23 @@ XINT	*chan;			/* receives channel code (socket) */
 		goto done;
 	    }
 	}
+
+	/* Debug output.  If debug_ks is set (e.g. with adb) but no filename
+	 * is given, debug output goes to stderr.
+	 */
+	if (debug_ks && !debug_fp) {
+	    if (debug_file[0] != EOS) {
+		if ((debug_fp = fopen (debug_file, "a")) == NULL)
+		    debug_fp = stderr;
+	    } else
+		debug_fp = stderr;
+	}
+
+	/* Begin debug message log. */
+	dbgmsg ("---------------------------------------------------------\n");
+	dbgmsg1 ("zopnks (`%s')\n", server);
+	dbgmsg4 ("kstype=%d, prot=%d, host=`%s', cmd=`%s')\n",
+	    proctype, ks.protocol, host, ip);
 
 	/*
 	 * SERVER side code.
@@ -230,6 +287,25 @@ XINT	*chan;			/* receives channel code (socket) */
 	     * communicate on the standard streams.
 	     */
 	    *chan = 0;
+	    goto done;
+
+	} else if (proctype == IRAFKS_CALLBACK) {
+	    /* The kernel server was called by rexec using the rexec-callback
+	     * protocol.  Connect to the client specified socket.
+	     */
+            char    *client_host;
+            int     port, s;
+
+            /* Parse "port@client_host". */
+            for (port=0;  isdigit(*ip);  ip++)
+                port = port * 10 + (*ip - '0');
+            client_host = ip + 1;
+
+	    dbgmsg2 ("callback client %s on port %d\n", client_host, port);
+	    if ((s = ks_socket (client_host, NULL, port, "connect")) < 0)
+		*chan = ERR;
+	    else
+		*chan = s;
 	    goto done;
 
 	} else if (proctype == IRAFKS_DAEMON) {
@@ -251,18 +327,61 @@ XINT	*chan;			/* receives channel code (socket) */
 	     */
 	    struct  timeval timeout;
 	    int     check, fromlen, req_port;
-	    int     nsec, rfd, fd, sig;
+	    int     nsec, fd, sig;
+#ifdef SOLARIS
+	    fd_set  rfd;
+#else
+	    int     rfd;
+#endif
 	    int     once_only = 0;
+	    int     detached = 0;
 	    int     unauth = 0;
 	    int     status = 0;
 
-	    /* Get client data. */
-	    if ((req_port = port = ks_geti(0)) < 0)
-		{ status = 1; goto d_err; }
-	    if ((auth = ks_geti(0)) < 0)
-		{ status = 2; goto d_err; }
-	    if ((nsec = ks_geti(0)) < 0)
-		{ status = 3; goto d_err; }
+	    /* Get the server parameters.  These may be passed either via
+	     * the client in the datastream, or on the command line.  The
+	     * latter mode allows the daemon to be run standalone on a server
+	     * node, without the need for a rsh call from a client to start
+	     * the daemon.
+	     */
+	    while (*ip && isspace (*ip))
+		ip++;
+	    if (isdigit (*ip)) {
+		/* Server parameters were passed on the command line. */
+		char     *np;
+
+		detached++;
+		port = req_port = strtol (ip, &np, 10);
+		if (np == NULL) {
+		    status = 1;
+		    goto d_err;
+		} else
+		    ip = np;
+		auth = strtol (ip, &np, 10);
+		if (np == NULL) {
+		    status = 2;
+		    goto d_err;
+		} else
+		    ip = np;
+		nsec = strtol (ip, &np, 10);
+		if (np == NULL) {
+		    nsec = 0;   /* no timeout */
+		} else
+		    ip = np;
+		dbgmsg3 ("detached in.irafksd, port=%d, auth=%d, timeout=%d\n",
+		    port, auth, nsec);
+
+	    } else {
+		/* Get client data from the client datastream. */
+		if ((req_port = port = ks_geti(0)) < 0)
+		    { status = 1; goto d_err; }
+		if ((auth = ks_geti(0)) < 0)
+		    { status = 2; goto d_err; }
+		if ((nsec = ks_geti(0)) < 0)
+		    { status = 3; goto d_err; }
+		dbgmsg2 ("client spawned in.irafksd, port=%d, timeout=%d\n",
+		    port, nsec);
+	    }
 
 	    /* Attempt to bind the in.irafksd server socket to the client
 	     * specified port.  If this fails a free socket is dynamically
@@ -276,8 +395,13 @@ XINT	*chan;			/* receives channel code (socket) */
 	    if (s < 0 || listen(s,MAXCONN) < 0) {
 		status = 4;
 		goto d_err;
-	    } else if (port != req_port)
+	    } else if (port != req_port) {
+		if (detached) {
+		    status = 4;
+		    goto d_err;
+		}
 		once_only++;
+	    }
 
 	    /* Fork daemon process and return if parent, exiting rsh. */
 	    dbgmsg2 ("fork in.irafksd, port=%d, timeout=%d\n", port, nsec);
@@ -289,8 +413,10 @@ XINT	*chan;			/* receives channel code (socket) */
 
 	    if (pid) {
 d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
-		ks_puti (1, status);
-		ks_puti (1, port);
+		if (!detached) {
+		    ks_puti (1, status);
+		    ks_puti (1, port);
+		}
 		exit(0);
 	    }
 
@@ -303,12 +429,12 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 	     */
 
 	    dbgmsg1 ("in.irafksd started, pid=%d\n", getpid());
-	    old_sigcld = (PFI) signal (SIGCLD, (PFI)ks_onsig);
+	    old_sigcld = (SIGFUNC) signal (SIGCLD, (SIGFUNC)ks_onsig);
 
 	    /* Reset standard streams to console to record error messages. */
 	    fd = open ("/dev/null", 0);     close(0);  dup(fd);  close(fd);
 	    fd = open ("/dev/console", 1);  close(1);  dup(fd);  close(fd);
-	    fd = open ("/dev/console", 1);  close(2);  dup(fd);  close(fd);
+	    fd = open ("/dev/console", 2);  close(2);  dup(fd);  close(fd);
 
 	    /* Loop forever or until the idle timeout expires, waiting for a
 	     * client connection.
@@ -316,7 +442,12 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 	    for (;;) {
 		timeout.tv_sec = nsec;
 		timeout.tv_usec = 0;
+#ifdef SOLARIS
+		FD_ZERO(&rfd);
+		FD_SET(s,&rfd);
+#else
 		rfd = (1 << s); 
+#endif
 		status = 0;
 
 		/* Wait until either we get a connection, or a previously
@@ -329,7 +460,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 		    else
 			exit (0);
 		}
-		if (select (SELWIDTH, &rfd, NULL, NULL, &timeout) <= 0)
+		if (select (SELWIDTH,&rfd,NULL,NULL, nsec ? &timeout : 0) <= 0)
 		    exit (0);
 
 		/* Accept the connection. */
@@ -342,7 +473,11 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 
 		/* Find out where the connection is coming from. */
 		fromlen = sizeof (from);
+#ifdef SOLARIS
+		if (getpeername (fd, (struct sockaddr *)&from, &fromlen) < 0) {
+#else
 		if (getpeername (fd, &from, &fromlen) < 0) {
+#endif
 		    fprintf (stderr, "in.irafksd: getpeername failed\n");
 		    exit (3);
 		}
@@ -427,11 +562,72 @@ s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 	if (ks_getlogin (host, username, password, &ks) == ERR) {
 	    *chan = ERR;
 
-	} else if (*password) {
-	    /* Password given; use rexec protocol. */
+	} else if (ks.protocol == C_REXEC) {
+	    /* Use rexec protocol.  We start the remote kernel server with
+	     * rexec and communicate via the socket returned by rexec.
+	     */
 	    hostp = host;
 	    dbgmsg2 ("rexec for host=%s, user=%s\n", host, username);
 	    *chan = rexec (&hostp, ks_rexecport(), username, password, cmd, 0);
+
+	} else if (ks.protocol == C_REXEC_CALLBACK) {
+	    /* Use rexec-callback protocol.  In this case the remote kernel
+	     * server is started with rexec, but we have the remote server
+	     * call us back on a private socket.  This guarantees a direct
+	     * socket connection for use in cases where the standard i/o
+	     * streams set up for rexec do not provide a direct connection.
+	     */
+	    char    localhost[SZ_FNAME];
+	    char    callback_cmd[SZ_LINE];
+	    struct  hostent *hp;
+	    int     tfd, fd, ss;
+
+	    /* Get reserved port for direct communications link. */
+	    s_port = IPPORT_USERRESERVED - 1;
+	    s = ks_getresvport (&s_port);
+	    if (s < 0)
+		goto r_err;
+
+	    /* Ready to receive callback from server. */
+	    if (listen (s, MAXCONN) < 0)
+		goto r_err;
+
+	    /* Compose rexec-callback command:  "cmd port@client-host". */
+	    if (gethostname (localhost, SZ_FNAME) < 0)
+		goto r_err;
+	    if ((hp = gethostbyname (localhost)) == NULL)
+		goto r_err;
+	    sprintf (callback_cmd, "%s callback %d@%s",
+		cmd, s_port, hp->h_name);
+	    dbgmsg2 ("rexec to host %s: %s\n", host, callback_cmd);
+
+	    hostp = host;
+	    dbgmsg3 ("rexec for host=%s, user=%s, using client port %d\n",
+		host, username, s_port);
+	    ss = rexec (&hostp,
+		ks_rexecport(), username, password, callback_cmd, 0);
+
+	    /* Wait for the server to call us back. */
+	    dbgmsg1 ("waiting for connection on port %d\n", s_port);
+	    if ((tfd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
+r_err:		dbgmsg ("rexec-callback connect failed\n");
+		close(s);  close(ss);
+		*chan = ERR;
+	    } else {
+		close(s);  fd = dup(tfd);  close(tfd);
+		dbgmsg1 ("connected to irafks server on fd=%d\n", fd);
+		*chan = fd;
+
+		/* Mark the rexec channel for deletion at close time when
+		 * the i/o socket is closed.
+		 */
+		for (i=0;  i < MAXOFILES;  i++)
+		    if (!ks_pchan[i]) {
+			ks_pchan[i] = fd;
+			ks_achan[i] = ss;
+			break;
+		    }
+	    }
 
 	} else {
 	    /* Use the default protocol, which avoids passwords.  This uses
@@ -556,8 +752,10 @@ retry:
 		    close (0);  dup (pout[0]);  close (pout[0]);
 		    close (1);  dup (pin[1]);   close (pin[1]);
 
-		    dbgmsg2 ("exec rsh %s %s in.irafksd\n", host, cmd);
-		    execlp (RSH, RSH, host, cmd, "in.irafksd", NULL);
+		    dbgmsg3 ("exec rsh %s -l %s `%s' in.irafksd\n",
+			host, username, cmd);
+		    execlp (RSH, RSH,
+			host, "-l", username, cmd, "in.irafksd", NULL);
 		    exit (1);
 		}
 	    }
@@ -629,7 +827,18 @@ ZCLSKS (chan, status)
 XINT	*chan;				/* socket to kernel server	*/
 XINT	*status;			/* receives close status	*/
 {
+	int	i;
+
+	/* Close the primary channel. */
 	*status = close (*chan);
+
+	/* Close any alternate channels associated with the primary. */
+	for (i=0;  i < MAXOFILES;  i++)
+	    if (ks_pchan[i] == *chan) {
+		close (ks_achan[i]);
+		ks_pchan[i] = 0;
+	    }
+
 	dbgmsg2 ("server [%d] terminated, status = %d\n", *chan, *status);
 }
 
@@ -655,7 +864,7 @@ XLONG	*loffset;		/* not used				*/
 	char	*op;
 	int	fd, nbytes;
 #endif
-	PFI	sigint, sigterm;
+	SIGFUNC	sigint, sigterm;
 	int	status;
 
 	fd = *chan;
@@ -669,8 +878,8 @@ XLONG	*loffset;		/* not used				*/
 	 * entire record.  Reads are interruptable but the interrupt is caught
 	 * and returned as a read error on the server channel.
 	 */
-	sigint  = (PFI) signal (SIGINT,  (PFI)ks_onsig);
-	sigterm = (PFI) signal (SIGTERM, (PFI)ks_onsig);
+	sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)ks_onsig);
+	sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)ks_onsig);
 
 	while (nbytes > 0) {
 	    jmpset++;
@@ -708,7 +917,7 @@ XCHAR	*buf;			/* output buffer			*/
 XINT	*totbytes;		/* number of bytes to write		*/
 XLONG	*loffset;		/* not used				*/
 {
-	PFI	sigint, sigterm, sigpipe;
+	SIGFUNC	sigint, sigterm, sigpipe;
 #ifdef ANSI
 	volatile int fd, nbytes;
 	volatile int ofd;
@@ -732,9 +941,9 @@ XLONG	*loffset;		/* not used				*/
 	 * Trap SIGPIPE and return it as a write error on the channel instead.
 	 * Likewise, turn an interrupt into a write error on the channel.
 	 */
-	sigint  = (PFI) signal (SIGINT,  (PFI)ks_onsig);
-	sigterm = (PFI) signal (SIGTERM, (PFI)ks_onsig);
-	sigpipe = (PFI) signal (SIGPIPE, (PFI)ks_onsig);
+	sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)ks_onsig);
+	sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)ks_onsig);
+	sigpipe = (SIGFUNC) signal (SIGPIPE, (SIGFUNC)ks_onsig);
 	recursion = 0;
 
 	jmpset++;
@@ -754,10 +963,10 @@ XLONG	*loffset;		/* not used				*/
 /* KS_ONSIG -- Catch a signal.
  */
 static
-ks_onsig (sig, code, scp)
+ks_onsig (sig, arg1, arg2)
 int	sig;			/* signal which was trapped	*/
-int	code;			/* subsignal code (vax)		*/
-struct	sigcontext *scp;	/* not used			*/
+int	*arg1;			/* not used */
+int	*arg2;			/* not used */
 {
 	/* If we get a SIGPIPE writing to a server the server has probably
 	 * died.  Make it look like there was an i/o error on the channel.
@@ -814,8 +1023,8 @@ XLONG	*lvalue;
  */
 
 /* KS_SOCKET -- Get a socket configured for the given host and port.  Either
- * bind the socket to the port and ready for connections, or connect to the
- * remote socket at the given address.
+ * bind the socket to the port and make it ready for connections, or connect
+ * to the remote socket at the given address.
  */
 static int
 ks_socket (host, addr, port, mode)
@@ -871,7 +1080,7 @@ failed:
 
 
 /* KS_GETRESVPORT -- Open a socket and attempt to bind it to the given port.
- * Locate a usable port if this fails.  The actual report is returned in the
+ * Locate a usable port if this fails.  The actual port is returned in the
  * output argument.
  */
 static int
@@ -889,7 +1098,11 @@ int	*alport;
 
 	for (;;) {
 	    sin.sin_port = htons((u_short)*alport);
+#ifdef SOLARIS
+	    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) >= 0)
+#else
 	    if (bind(s, (caddr_t)&sin, sizeof (sin)) >= 0)
+#endif
 		return (s);
 	    if (errno != EADDRINUSE) {
 		(void) close(s);
@@ -947,7 +1160,12 @@ int	fd;
 {
 	register int value = 0;
 	struct  timeval timeout;
-	int	stat, rfd, sig;
+	int	stat, sig;
+#ifdef SOLARIS
+	fd_set  rfd;
+#else
+	int     rfd;
+#endif
 	char	ch;
 
 	jmpset++;
@@ -957,7 +1175,12 @@ int	fd;
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
+#ifdef SOLARIS
+	FD_ZERO(&rfd);
+	FD_SET(fd,&rfd);
+#else
 	rfd = (1 << fd); 
+#endif
 
 	/* Read and accumulate a decimal integer.  Timeout if the client
 	 * does not respond within a reasonable period.
@@ -1031,6 +1254,7 @@ int     arg;
 	if (debug_ks) {
 	    fprintf (debug_fp, "[%5d] ", getpid());
 	    fprintf (debug_fp, fmt, arg);
+	    fflush (debug_fp);
 	}
 }
 static
@@ -1041,6 +1265,7 @@ int     arg1, arg2;
 	if (debug_ks) {
 	    fprintf (debug_fp, "[%5d] ", getpid());
 	    fprintf (debug_fp, fmt, arg1, arg2);
+	    fflush (debug_fp);
 	}
 }
 static
@@ -1051,6 +1276,7 @@ int     arg1, arg2, arg3;
 	if (debug_ks) {
 	    fprintf (debug_fp, "[%5d] ", getpid());
 	    fprintf (debug_fp, fmt, arg1, arg2, arg3);
+	    fflush (debug_fp);
 	}
 }
 static
@@ -1061,9 +1287,9 @@ int     arg1, arg2, arg3, arg4;
 	if (debug_ks) {
 	    fprintf (debug_fp, "[%5d] ", getpid());
 	    fprintf (debug_fp, fmt, arg1, arg2, arg3, arg4);
+	    fflush (debug_fp);
 	}
 }
-
 
 
 /*
@@ -1091,6 +1317,11 @@ struct irafhosts {
 		char	*name;
 		char	*login;
 		char	*password;
+		int	port;
+		int	auth;
+		int	hiport;
+		int	timeout;
+		int	protocol;
 	} node[MAX_NODES];
 	int	sbuflen;
 	char	sbuf[SZ_SBUF];
@@ -1187,9 +1418,12 @@ struct	ksparam *ks;		/* networking parameters */
 	/* Get the password. */
 	if (np->password[0]) {
 	    if (strcmp (np->password, USER) == 0) {
-		password[0] = EOS;
+		if (ks->protocol == C_RSH)
+		    password[0] = EOS;
+		else
+		    goto query;  /* need a valid password for rexec */
 	    } else if (strcmp (np->password, "?") == 0) {
-		if (namep = ks_getpass (loginname, hostname))
+query:		if (namep = ks_getpass (loginname, hostname))
 		    strcpy (password, namep);
 		else
 		    password[0] = EOS;
@@ -1281,6 +1515,18 @@ struct	ksparam *ks;		/* networking parameters */
 	    update++;
 	} else
 	    ks->timeout = hp->timeout;
+
+	/* Check for any node specific KS parameter overrides. */
+	if (np->port)
+	    ks->port = np->port;
+	if (np->auth)
+	    ks->auth = np->auth;
+	if (np->hiport)
+	    ks->hiport = np->hiport;
+	if (np->timeout)
+	    ks->timeout = np->timeout;
+	if (np->protocol)
+	    ks->protocol = np->protocol;
 
 	dbgmsg1 ("ks.port = %d\n", ks->port);
 	dbgmsg1 ("ks.hiport = %d\n", ks->hiport);
@@ -1450,6 +1696,35 @@ char	*filename;
 		strcpy (op, word);
 		np->password = op;
 		op += strlen(op) + 1;
+
+		/* Process any optional networking paramaeter overrides.
+		 * These are in the form param=value where param is port,
+		 * auth, etc.
+		 */
+		np->port = 0;
+		np->auth = 0;
+		np->hiport = 0;
+		np->timeout = 0;
+		np->protocol = 0;
+
+		while (ks_getword (&ip, word)) {
+		    if (strncmp (word, "port=", 5) == 0) {
+			np->port = atoi (word + 5);
+		    } else if (strncmp (word, "auth=", 5) == 0) {
+			np->auth = atoi (word + 5);
+		    } else if (strncmp (word, "hiport=", 7) == 0) {
+			np->hiport = atoi (word + 7);
+		    } else if (strncmp (word, "timeout=", 8) == 0) {
+			np->timeout = atoi (word + 8);
+		    } else if (strncmp (word, "protocol=", 9) == 0) {
+			if (strcmp (word + 9, "rsh") == 0)
+			    np->protocol = C_RSH;
+			else if (strcmp (word + 9, "rex") == 0)
+			    np->protocol = C_REXEC;
+			else if (strcmp (word + 9, "rcb") == 0)
+			    np->protocol = C_REXEC_CALLBACK;
+		    }
+		}
 	    }
 
 	    hp->sbuflen = op - hp->sbuf;
@@ -1538,13 +1813,44 @@ char	*filename;
 	 */
 	for (i=0;  i < hp->nnodes;  i++) {
 	    np = &hp->node[i];
+
+	    /* Output username. */
 	    fprintf (fp, "%s\t:", np->name);
 	    for (q=0, ip=np->login;  *ip && !(q = isspace(*ip));  ip++)
 		;
 	    fprintf (fp, q ? " \"%s\"" : " %s", np->login);
+
+	    /* Output password field. */
 	    for (q=0, ip=np->password;  *ip && !(q = isspace(*ip));  ip++)
 		;
 	    fprintf (fp, q ? " \"%s\"" : " %s", np->password);
+
+	    /* Add any optional parameter overrides given in the file when
+	     * originally read.
+	     */
+	    if (np->port)
+		fprintf (fp, " port=%d", np->port);
+	    if (np->auth)
+		fprintf (fp, " auth=%d", np->auth);
+	    if (np->hiport)
+		fprintf (fp, " hiport=%d", np->hiport);
+	    if (np->timeout)
+		fprintf (fp, " timeout=%d", np->timeout);
+	    if (np->protocol) {
+		fprintf (fp, " protocol=");
+		switch (np->protocol) {
+		case C_REXEC:
+		    fprintf (fp, "rex");
+		    break;
+		case C_REXEC_CALLBACK:
+		    fprintf (fp, "rcb");
+		    break;
+		default:
+		    fprintf (fp, "rsh");
+		    break;
+		}
+	    }
+
 	    fprintf (fp, "\n");
 	}
 

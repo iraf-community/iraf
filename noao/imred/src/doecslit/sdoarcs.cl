@@ -12,10 +12,15 @@ bool	batch
 struct	*fd
 
 begin
-	int	i, j, k
+	string	imtype, ectype
+	int	i, j, k, n
 	file	temp, arc1, arc2, str1, str2, arctype, apref, arc, arcec, logs
 	file	specec, specarc
 	bool	verbose1
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
 
@@ -41,8 +46,8 @@ begin
 
 	    # Strip possible image extension.
 	    i = strlen (arc1)
-	    if (i > 4 && substr (arc1, i-3, i) == ".imh")
-		arc1 = substr (arc1, 1, i-4)
+	    if (i > n && substr (arc1, i-n+1, i) == imtype)
+		arc1 = substr (arc1, 1, i-n)
 
 	    # Set extraction output and aperture reference depending on whether
 	    # the arcs are to be rextracted using recentered or retraced object
@@ -51,20 +56,20 @@ begin
 	    if (arcap) {
 		arc2 = spec // arc1
 		apref = spec
-		if (access (arc2//".ec.imh"))
-		    imdelete (arc2//".ec.imh", verify=no)
+		if (access (arc2//ectype))
+		    imdelete (arc2//ectype, verify=no)
 		delete (database//"/ec"//arc2//".ec*", verify = no)
 	    } else {
 		arc2 = arc1
 		apref = apslitproc.references
-		if (reextract && access (arc2//".ec.imh")) {
+		if (reextract && access (arc2//ectype)) {
 		    if (arc2 != arcref)
-			imdelete (arc2//".ec.imh", verify=no)
+			imdelete (arc2//ectype, verify=no)
 		}
 	    }
 
 	    # Extract and determine dispersion function if necessary.
-	    if (!access (arc2//".ec.imh")) {
+	    if (!access (arc2//ectype)) {
 		delete (database//"/ec"//arc2//".ec*", verify = no)
 		if (!batch)
 		    print ("Extract and reidentify arc spectrum ", arc1)
@@ -73,8 +78,8 @@ begin
 		    background="none", clean=no, weights="none",
 		    verbose=verbose1)
 		ecreidentify (arc2//".ec", arcref//".ec", shift=0.,
-		    cradius=sparams.cradius, threshold=10., refit=yes,
-		    database=database, logfiles=logs)
+		    cradius=sparams.cradius, threshold=sparams.threshold,
+		    refit=yes, database=database, logfiles=logs)
 
 		# If not reextracting arcs based on object apertures
 		# then save the extracted arc to avoid doing it again.

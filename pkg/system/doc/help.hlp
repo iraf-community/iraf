@@ -22,6 +22,10 @@ may be formatted without entering the files into a help database.
 In other words, "help file.hlp fi+" makes it possible to use \fIhelp\fR as
 a conventional text formatter.
 .le
+.ls all = no
+Print help for all help modules matching \fItemplate\fR, rather than only the
+first one found.
+.le
 .ls parameter = "all"
 If the value of this parameter is not "all", only the help text
 for the given parameter will be printed.
@@ -85,9 +89,6 @@ Output device if the standard output is not redirected.  If the \fIvalue\fR of
 the parameter is the reserved string "terminal",  the actual device name is
 the value of the CL environment variable \fIterminal\fR.  Only terminal
 devices are permitted; \fBhelp\fR will not write directly to a printer device.
-The special device \fItext\fR should be specified if the output is to be
-saved in a text file for use outside of IRAF (otherwise, \fIhelp\fR inserts
-control codes into the text for pagination, figures, standout mode, etc.).
 .le
 .ih
 BASIC USAGE
@@ -191,6 +192,11 @@ package \fBfmtio\fR:
 default printer device:
 
 	cl> help help,lprint | lpr
+
+10. Capture the manual page for task \fIhedit\fR in a text file, in a form
+suitable for printing on any device.
+
+	cl> help hedit | type dev=text > hedit.txt
 .ih
 BUGS
 On some systems, typing the next command keystroke before the end-of-page

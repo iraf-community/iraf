@@ -10,7 +10,6 @@ include	"ms.h"
 # the sample lines used in the fit, and the spectra to be fitted
 # are all selected by the user.
 
-
 procedure t_fit_function()
 
 char	image[SZ_FNAME]			# Image affected
@@ -103,7 +102,7 @@ begin
 	# If the order is INDEF then use maximum order assuming no INDEF points.
 	spectrum = 0
 	while (get_next_number (spectra, spectrum) != EOF) {
-	    if (order == INDEFI) {
+	    if (IS_INDEFI (order)) {
 	        switch (function) {
 	        case LEGENDRE, CHEBYSHEV:
 		    order =  nlines

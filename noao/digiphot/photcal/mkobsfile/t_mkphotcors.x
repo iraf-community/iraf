@@ -245,11 +245,12 @@ begin
 	    }
 
 	    if (outobs != NULL) {
-		call fprintf (outobs, "%s  %s  %g  %g\n")
+		call fprintf (outobs, "%s  %s  %g  %g %0.1h\n")
 		    call pargstr (IMT_IMNAME(symbol))
 		    call pargstr (IMT_IFILTER(symbol))
 		    call pargr (IMT_ITIME(symbol))
 		    call pargr (IMT_XAIRMASS(symbol))
+		    call pargr (IMT_OTIME(symbol))
 	    }
 
 	    if (outsh != NULL) {

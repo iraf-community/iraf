@@ -11,6 +11,7 @@ define	AP_SHARPLO	Memr[$1+3]	# Lower sharpness bound
 define	AP_SHARPHI	Memr[$1+4]	# Upper sharpness bound
 define	AP_ROUNDLO	Memr[$1+5]	# Lower roundness bound
 define	AP_ROUNDHI	Memr[$1+6]	# Higher roundness bound
+define	AP_THRESHOLD	Memr[$1+7]	# Threshold in sigma for detection
 
 
 # noise model defaults
@@ -22,3 +23,4 @@ define	DEF_SHARPLO		0.2
 define	DEF_SHARPHI		1.0
 define	DEF_ROUNDLO		-1.0
 define	DEF_ROUNDHI		1.0
+define	DEF_THRESHOLD		0.0

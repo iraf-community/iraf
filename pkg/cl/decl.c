@@ -6,12 +6,12 @@
 #define import_stdio
 #include <iraf.h>
 
+#include "config.h"
 #include "clmodes.h"
 #include "operand.h"
 #include "mem.h"
 #include "grammar.h"
 #include "opcodes.h"
-#include "config.h"
 #include "param.h"
 #include "task.h"
 #include "errs.h"

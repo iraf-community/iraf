@@ -5,6 +5,7 @@ include	<imhdr.h>
 include	<gset.h>
 include	<math.h>
 include	<math/gsurfit.h>
+include	<math/nlfit.h>
 include	"imexam.h"
 
 
@@ -26,13 +27,17 @@ bool	center, background, medsky, fitplot, clgpsetb()
 real	radius, buffer, width, magzero, rplot, clgpsetr()
 int	xorder, yorder, clgpseti()
 
-int	i, j, ns, no, np
-int	x1, x2, y1, y2, nx, ny, npts
-real	median, xcntr, ycntr, mag, e, pa, zcntr, fwhm, w, wxcntr, wycntr
-pointer	sp, title, im, data, pp, ws, xs, ys, zs, gs, ptr
-double	sumo, sums, sumxx, sumyy, sumxy, sumw, sumr, suml, sumrr, sumrl
+int	i, j, ns, no, np, nx, ny, npts, x1, x2, y1, y2, plist[2]
+real	median, xcntr, ycntr, mag, e, pa, zcntr, fwhm, wxcntr, wycntr
+real	params[2], dparams[2]
+pointer	sp, title, coords, im, data, pp, ws, xs, ys, zs, gs, ptr, nl
+double	sumo, sums, sumxx, sumyy, sumxy
 real	r, r1, r2, r3, dx, dy, gseval(), amedr()
-pointer	clopset(), ie_gimage(), ie_gdata()
+pointer	clopset(), ie_gimage(), ie_gdata(), locpr()
+extern	ie_gauss(), ie_dgauss()
+errchk	nlinit, nlfit
+
+data	plist/1,2/
 string	label "#\
    COL    LINE    RMAG     FLUX      SKY   N  RMOM ELLIP    PA     PEAK  FWHM\n"
 
@@ -104,14 +109,15 @@ begin
 
 	call smark (sp)
 	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (coords, IE_SZTITLE, TY_CHAR)
 	call salloc (xs, npts, TY_REAL)
 	call salloc (ys, npts, TY_REAL)
+	call salloc (ws, npts, TY_REAL)
 
 	# Extract the background data if background subtracting.
 	ns = 0
 	if (background && width > 0.) {
 	    call salloc (zs, npts, TY_REAL)
-	    call salloc (ws, npts, TY_REAL)
 
 	    r1 = radius ** 2
 	    r2 = (radius + buffer) ** 2
@@ -138,9 +144,10 @@ begin
 	# Accumulate the various sums for the moments and the gaussian fit.
 	no = 0
 	np = 0
+	zcntr = 0.
 	sumo = 0.; sums = 0.; sumxx = 0.; sumyy = 0.; sumxy = 0.
-	sumw = 0.; sumr = 0.; suml = 0.; sumrr = 0.; sumrl = 0.
 	ptr = data
+	gs = NULL
 
 	if (ns > 0) {		# Background subtraction
 
@@ -159,6 +166,7 @@ begin
 			break
 		    xorder = max (1, xorder - 1)
 		    yorder = max (1, yorder - 1)
+		    call gsfree (gs)
 		}
 	    }
 
@@ -180,27 +188,29 @@ begin
 			sumxx = sumxx + dx * dx * r1
 			sumyy = sumyy + dy * dy * r1
 			sumxy = sumxy + dx * dy * r1
-			if (r1 > 0.) {
-			    w  = r1 / max (.1, r ** 2)
-			    sumw = sumw   + w
-			    sumr = sumr   + w * r**2
-			    suml = suml   + w * log (r1)
-			    sumrr = sumrr + w * r**4
-			    sumrl = sumrl + w * r**2 * log(r1)
+			zcntr = max (r1, zcntr)
+			if (r <= rplot) {
+			    Memr[xs+no] = r
+			    Memr[ys+no] = r1
+			    Memr[ws+no] = 1. / max (.1, r**2)
+			    no = no + 1
+			} else {
+			    np = np + 1
+			    Memr[xs+npts-np] = r
+			    Memr[ys+npts-np] = r1
+			    Memr[ws+npts-np] = 1. / max (.1, r**2)
 			}
-			no = no + 1
-		    }
-
-		    if (r <= rplot) {
-		        Memr[xs+np] = r
-		        Memr[ys+np] = r1
+		    } else if (r <= rplot) {
 		        np = np + 1
+		        Memr[xs+npts-np] = r
+		        Memr[ys+npts-np] = r1
 		    }
 		    ptr = ptr + 1
 		}
 	    }
 
-	    call gs_free (gs)
+	    if (gs != NULL)
+	        call gsfree (gs)
 
 	} else {		# No background subtraction
 	    do j = y1, y2 {
@@ -215,34 +225,45 @@ begin
 			sumxx = sumxx + dx * dx * r1
 			sumyy = sumyy + dy * dy * r1
 			sumxy = sumxy + dx * dy * r1
-			if (r1 > 0.) {
-			    w  = r1 / max (.1, r ** 2)
-			    sumw = sumw   + w
-			    sumr = sumr   + w * r**2
-			    suml = suml   + w * log(r1)
-			    sumrr = sumrr + w * r**4
-			    sumrl = sumrl + w * r**2 * log(r1)
+			zcntr = max (r1, zcntr)
+			if (r <= rplot) {
+			    Memr[xs+no] = r
+			    Memr[ys+no] = r1
+			    Memr[ws+no] = 1. / max (.1, r**2)
+			    no = no + 1
+			} else {
+			    np = np + 1
+			    Memr[xs+npts-np] = r
+			    Memr[ys+npts-np] = r1
+			    Memr[ws+npts-np] = 1. / max (.1, r**2)
 			}
-			no = no + 1
-		    }
-
-		    if (r <= rplot) {
-		        Memr[xs+np] = r
-		        Memr[ys+np] = r1
+		    } else if (r <= rplot) {
 		        np = np + 1
+		        Memr[xs+npts-np] = r
+		        Memr[ys+npts-np] = r1
 		    }
 		    ptr = ptr + 1
 		}
 	    }
 	}
+	if (np > 0) {
+	    call amovr (Memr[xs+npts-np], Memr[xs+no], np)
+	    call amovr (Memr[ys+npts-np], Memr[ys+no], np)
+	    call amovr (Memr[ws+npts-np], Memr[ws+no], np)
+	}
+	if (rplot <= radius) {
+	    no = no + np
+	    np = no - np 
+	} else
+	    np = no + np
+	    
 
 	# Compute the photometry and gaussian fit parameters.
+
 	mag = INDEF
 	r = INDEF
 	e = INDEF
 	pa = INDEF
-	zcntr = INDEF
-	fwhm = INDEF
 	if (sumo > 0.) {
 	    mag = magzero - 2.5 * log10 (sumo)
 	    r2 = sumxx + sumyy
@@ -255,28 +276,56 @@ begin
 		    e = 0.
 	    }
 	    pa = RADTODEG (0.5 * atan2 (2*sumxy, sumxx-sumyy))
-	    w = sumw * sumrr - sumr ** 2
-	    zcntr = exp ((sumrr * suml - sumr * sumrl) / w)
-	    fwhm = (sumw * sumrl - sumr * suml) / w
-	    if (fwhm < 0.)
-	        fwhm = 2 * sqrt (-log (2.) / fwhm)
-	    else
+	}
+
+	params[1] = zcntr
+	if (IS_INDEFR(r))
+	    params[2] = 0.25 * radius
+	else
+	    params[2] = r**2 / (8 * log(2.))
+	call nlinitr (nl, locpr (ie_gauss), locpr (ie_dgauss), 
+	    params, dparams, 2, plist, 2, .001, 100)
+	call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
+	if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+	    call eprintf ("WARNING: Gaussian fit did not converge\n")
+	    call tsleep (5)
+	    zcntr = INDEF
+	    fwhm = INDEF
+	} else {
+	    call nlpgetr (nl, params, i)
+	    if (params[2] < 0.) {
+		zcntr = INDEF
 		fwhm = INDEF
+	    } else {
+		zcntr = params[1]
+		fwhm = sqrt (8 * log (2.) * params[2])
+	    }
 	}
 
 	call ie_mwctran (ie, xcntr, ycntr, wxcntr, wycntr)
+	if (xcntr == wxcntr && ycntr == wycntr)
+	    call strcpy ("%.2f %.2f", Memc[title], IE_SZTITLE)
+	else {
+	    call sprintf (Memc[title], IE_SZTITLE, "%s %s")
+		if (IE_XFORMAT(ie) == '%')
+		    call pargstr (IE_XFORMAT(ie))
+		else
+		    call pargstr ("%g")
+		if (IE_YFORMAT(ie) == '%')
+		    call pargstr (IE_YFORMAT(ie))
+		else
+		    call pargstr ("%g")
+	}
+	call sprintf (Memc[coords], IE_SZTITLE, Memc[title])
+	    call pargr (wxcntr)
+	    call pargr (wycntr)
 
 	# Plot the radial profile and overplot the gaussian fit.
 	if (gp != NULL) {
-	    if (xcntr == wxcntr && ycntr == wycntr)
-		call sprintf (Memc[title], IE_SZTITLE,
-		    "%s: Radial profile at %.2f %.2f\n%s")
-	    else
-		call sprintf (Memc[title], IE_SZTITLE,
-		    "%s: Radial profile at %g %g\n%s")
+	    call sprintf (Memc[title], IE_SZTITLE,
+		"%s: Radial profile at %s\n%s")
 	        call pargstr (IE_IMAGE(ie))
-	        call pargr (wxcntr)
-	        call pargr (wycntr)
+	        call pargstr (Memc[coords])
 	        call pargstr (IM_TITLE(im))
 
 	    call ie_graph (gp, mode, pp, Memc[title], Memr[xs], Memr[ys],
@@ -285,17 +334,9 @@ begin
 	    if (fitplot && !IS_INDEF (fwhm)) {
 		np = 51
 		dx = rplot / (np - 1)
-		dy = 4 * log (2.) / fwhm ** 2
-		do i = 0, np - 1 {
-		    r1 = i * dx
-		    r3 = dy * r1 * r1
-		    if (r3 < 10.)
-			r2 = zcntr * exp (-r3)
-		    else
-			r2 = 0.
-		    Memr[xs+i] = r1
-		    Memr[ys+i] = r2
-		}
+		do i = 0, np - 1
+		    Memr[xs+i] = i * dx
+		call nlvectorr (nl, Memr[xs], Memr[ys], np, 1)
 		call gseti (gp, G_PLTYPE, 2)
 		call gpline (gp, Memr[xs], Memr[ys], np)
 		call gseti (gp, G_PLTYPE, 1)
@@ -321,20 +362,9 @@ begin
 	    call pargr (fwhm)
 	if (gp == NULL) {
 	    if (xcntr != wxcntr || ycntr != wycntr) {
-		call printf ("%s: ")
+		call printf ("%s: %s\n")
 		    call pargstr (IE_WCSNAME(ie))
-		if (IE_XFORMAT(ie) == '%')
-		    call printf (IE_XFORMAT(ie))
-		else
-		    call printf ("%g")
-		    call pargr (wxcntr)
-		call printf (" ")
-		if (IE_YFORMAT(ie) == '%')
-		    call printf (IE_YFORMAT(ie))
-		else
-		    call printf ("%g")
-		    call pargr (wycntr)
-		call printf ("\n")
+		    call pargstr (Memc[coords])
 	    }
 	}
 
@@ -356,20 +386,9 @@ begin
 	        call pargr (zcntr)
 	        call pargr (fwhm)
 	    if (xcntr != wxcntr || ycntr != wycntr) {
-		call fprintf (IE_LOGFD(ie), "%s: ")
+		call fprintf (IE_LOGFD(ie), "%s: %s\n")
 		    call pargstr (IE_WCSNAME(ie))
-		if (IE_XFORMAT(ie) == '%')
-		    call fprintf (IE_LOGFD(ie), IE_XFORMAT(ie))
-		else
-		    call fprintf (IE_LOGFD(ie), "%g")
-		    call pargr (wxcntr)
-		call fprintf (IE_LOGFD(ie), " ")
-		if (IE_YFORMAT(ie) == '%')
-		    call fprintf (IE_LOGFD(ie), IE_YFORMAT(ie))
-		else
-		    call fprintf (IE_LOGFD(ie), "%g")
-		    call pargr (wycntr)
-		call fprintf (IE_LOGFD(ie), "\n")
+		    call pargstr (Memc[coords])
 	    }
 	}
 
@@ -378,6 +397,7 @@ begin
 	else
 	    IE_PP(ie) = pp
 
+	call nlfreer (nl)
 	call sfree (sp)
 end
 
@@ -456,5 +476,56 @@ begin
 
 	    if (int(xcntr) == int(xlast) && int(ycntr) == int(ylast))
 		break
+	}
+end
+
+
+# IE_GAUSS -- Gaussian function used in NLFIT.  The parameters are the
+# amplitude and sigma squared and the input variable is the radius.
+
+procedure ie_gauss (x, nvars, p, np, z)
+
+real	x[nvars]		#I Input variables
+int	nvars			#I Number of variables
+real	p[np]			#I Parameter vector
+real	np			#I Number of parameters
+real	z			#O Function return
+
+real	r2
+
+begin
+	r2 = x[1]**2 / (2 * p[2])
+	if (abs (r2) > 20.)
+	    z = 0.
+	else
+	    z = p[1] * exp (-r2)
+end
+
+
+# IE_DGAUSS -- Gaussian function and derivatives used in NLFIT.  The parameters
+# are the amplitude and sigma squared and the input variable is the radius.
+
+procedure ie_dgauss (x, nvars, p, dp, np, z, der)
+
+real	x[nvars]		#I Input variables
+int	nvars			#I Number of variables
+real	p[np]			#I Parameter vector
+real	dp[np]			#I Dummy array of parameters increments
+real	np			#I Number of parameters
+real	z			#O Function return
+real	der[np]			#O Derivatives
+
+real	r2
+
+begin
+	r2 = x[1]**2 / (2 * p[2])
+	if (abs (r2) > 20.) {
+	    z = 0.
+	    der[1] = 0.
+	    der[2] = 0.
+	} else {
+	    der[1] = exp (-r2)
+	    z = p[1] * der[1]
+	    der[2] = z * r2 / p[2]
 	}
 end

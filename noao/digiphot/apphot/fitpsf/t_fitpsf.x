@@ -18,12 +18,13 @@ int	update 		# update the critical parameter
 int	verbose		# verbose mode
 
 int	cl, out, limlist, lclist, lolist, lid, sid, root, stat
-pointer	sp, outfname, ap, im, gd, id, imlist, clist, olist, cname
+int	imlist, clist, olist
+pointer	sp, outfname, ap, im, gd, id, cname
 
 bool	clgetb(), streq()
 int	imtlen(), imtgetim(), clplen(), btoi(), clgfil(), fnldir()
-int	open(), strncmp(), strlen(), apfitpsf()
-pointer	imtopenp(), clpopnu(), gopen(), immap()
+int	open(), strncmp(), strlen(), apfitpsf(), imtopenp(), clpopnu()
+pointer	gopen(), immap()
 errchk	gopen
 
 begin
@@ -68,11 +69,11 @@ begin
 	    call error (0, "Imcompatable image and output list lengths")
 	}
 
-	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
+	call clgstr ("icommands.p_filename", Memc[cname], SZ_FNAME)
 	if (Memc[cname] != EOS)
 	    interactive = NO
-	else if (lclist == 0)
-	    interactive = YES
+	#else if (lclist == 0)
+	    #interactive = YES
 	else
 	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
@@ -87,10 +88,12 @@ begin
 		call ap_ppfpars (ap)
 	}
 
-	# Open plot files.
+	# Get the graphics and display devices.
+	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
+	call clgstr ("display", Memc[display], SZ_FNAME)
+
+	# Open the graphics and display devices.
 	if (interactive == YES) {
-	    call clgstr ("graphics", Memc[graphics], SZ_FNAME)
-	    call clgstr ("display", Memc[display], SZ_FNAME)
 	    if (Memc[graphics] == EOS)
 		gd = NULL
 	    else {
@@ -133,6 +136,8 @@ begin
 	    call ap_airmass (im, ap)
 	    call ap_filter (im, ap)
 	    call ap_otime (im, ap)
+	    if ((id != NULL) && (id != gd))
+		call ap_gswv (id, Memc[image], im, 4)
 
 	    # Open coordinate file, where coords is assumed to be a simple text
 	    # file in which the x and y positions are in columns 1 and 2
@@ -141,25 +146,20 @@ begin
 	    if (lclist <= 0) {
 		cl = NULL
 		call strcpy ("", Memc[outfname], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
-		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
-		    lclist = limlist
-		} else
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
-	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {
+		stat = clgfil (clist, Memc[coords], SZ_FNAME)
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
 		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
+		    call ap_inname (Memc[image], Memc[outfname], "coo",
+		        Memc[outfname], SZ_FNAME)
+		    lclist = limlist
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else if (stat != EOF) {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call apstats (ap, CLNAME, Memc[outfname], SZ_FNAME)
 		    call seek (cl, BOF)
 		}
 	    }
@@ -176,18 +176,18 @@ begin
 		call strcpy ("", Memc[outfname], SZ_FNAME)
 	    } else {
 	        stat = clgfil (olist, Memc[output], SZ_FNAME)
-		if (stat != EOF)
-		    root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
+		root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[output+root], 7) == 0 || root ==
 		    strlen (Memc[output])) {
-		    call apoutname (Memc[image], "", "psf", Memc[outfname],
-		        SZ_FNAME)
+		    call apoutname (Memc[image], Memc[outfname], "psf",
+		        Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    lolist = limlist
 		} else if (stat != EOF) {
 		    call strcpy (Memc[output], Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-		}
+		} else
+		    call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 	    }
 	    call apsets (ap, OUTNAME, Memc[outfname])
 
@@ -211,16 +211,15 @@ begin
 	    }
 	    if (out != NULL && lolist != 1) {
 		call close (out)
-		if (sid <= 1)
+		if (sid <= 1) {
+		    call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 		    call delete (Memc[outfname])
+		}
 		sid = 1
 	    }
 	    if (stat == YES)
 		break
 	}
-
-	# Close up the PSF fitting structure.
-	call apsffree (ap)
 
 	# Close the plot files.
 	if (id == gd && id != NULL)
@@ -239,13 +238,19 @@ begin
 	# If only one output file for a list of images close file.
 	if (out != NULL && lolist == 1) {
 	    call close (out)
-	    if (sid <= 1)
+	    if (sid <= 1) {
+		call apstats (ap, OUTNAME, Memc[outfname], SZ_FNAME)
 	        call delete (Memc[outfname])
+	    }
 	}
+
+	# Close up the PSF fitting structure.
+	call apsffree (ap)
 
 	# Close up the lists.
 	call imtclose (imlist)
 	call clpcls (clist)
 	call clpcls (olist)
+
 	call sfree (sp)
 end

@@ -354,7 +354,7 @@ BUGS
 The internal storage format is currently FITS card image, hence field names
 are limited to 8 characters with no case sensitivity.  String values are
 limited to 63 characters.  There is an upper limit on the number of fields
-in a header but it is quite large - assume it is 128 or so.  Global operations
+in a header but it is quite large - assume it is 1024 or so.  Global operations
 on databases are currently quite slow because the individual records (image
 headers) are stored in separate files.
 

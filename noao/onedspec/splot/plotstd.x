@@ -1,6 +1,6 @@
 include	<error.h>
 include	<gset.h>
-include	"../shdr.h"
+include	<smw.h>
 
 define	VLIGHT	2.997925e18
 

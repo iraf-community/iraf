@@ -6,9 +6,10 @@ $checkin  libpkg.a ..
 $exit
 
 libpkg.a:
-	dcio.x		dispcor.h <error.h> <imhdr.h> <imset.h> <pkg/dttext.h>
-	dctable.x	../shdr.h dctable.h <imhdr.h> <mach.h>
-	dispcor.x	
+	dcio.x		dispcor.h <smw.h> <error.h> <imhdr.h> <imset.h>\
+			<pkg/dttext.h>
+	dctable.x	dctable.h <smw.h> <imhdr.h> <mach.h>
+	dispcor.x	<math/iminterp.h>
 	ranges.x	<ctype.h> <mach.h>
 	refaverage.x	refspectra.h
 	reffollow.x	refspectra.h <mach.h>
@@ -17,10 +18,11 @@ libpkg.a:
 	refmatch.x	refspectra.h
 	refmsgs.x	refspectra.com refspectra.h
 	refnearest.x	refspectra.h <mach.h>
-	refnoextn.x
+	refnoextn.x	
 	refprecede.x	refspectra.h <mach.h>
 	refspectra.x	refspectra.com refspectra.h
 	reftable.x	refspectra.h <error.h>
-	t_dispcor.x	dctable.h dispcor.h <error.h> <imhdr.h> <imio.h>\
-			<mach.h> <mwset.h>
+	t_dispcor.x	dctable.h dispcor.h <smw.h> <error.h> <imhdr.h>\
+			<imio.h> <mach.h> <mwset.h>
+	t_disptrans.x	<error.h> <imhdr.h> <math/curfit.h> <smw.h> <units.h>
 	;

@@ -440,8 +440,8 @@ Object center coordinates.  These coordinates are transformed to image
 coordinates as follows.
 
 .nf
-	xc in image = (xc + xoffset) / distance
-	yc in image = (yc + yoffset) / distance
+	xc in image = xoffset + xc / distance
+	yc in image = yoffset + yc / distance
 .fi
 
 where \fIxoffset\fR and \fIyoffset\fR are the task offset parameters.
@@ -558,23 +558,34 @@ good seeing.
 
 .nf
 	cl> mkobjects gc1 obj=gc.dat nc=400 nl=400 distance=.5 \
-	>>> xo=-156.25 yo=-156.25 radius=.1
+	>>> xo=-313 yo=-313 radius=.1
 .fi
 
-    The offset parameters are used to recenter the cluster from
-    (256.5,256.5) in the data file to (200.5,200.5) in the expanded field.
-    This example takes 30 sec (5 sec CPU) on a SPARCstation 1.
+The offset parameters are used to recenter the cluster from
+(256,256) in the data file to (200,200) in the expanded field.
+This example takes 30 sec (5 sec CPU) on a SPARCstation 1.  To expand
+and contract about a fixed point define the object list to have an
+origin at zero.
+
+.nf
+    ar> starlist gc.dat 5000 spat=hubble lum=bands xmin=-256 xmax=256 \
+    >>> ymin=-256 ymax=256
+    ar> mkobjects gc obj=gc.dat xo=257 yo=257 gain=2 rdnoise=10 poisson+
+    ar> mkobjects gc1 obj=gc.dat xo=257 yo=257 gain=2 \
+    >>> distance=.5 rdnoise=10 poisson+
+.fi
 
 6. Make an image of dev$pix at various distances and orientation.  First we
 must subtract the background.
 
 .nf
 	cl> imarith dev$pix - 38 pix
-	cl> mkobjects pix1 obj=STDIN nc=200 nl=200 back=1000 rd=10 poi+
+	cl> mkobjects pix1 obj=STDIN nc=200 nl=200 back=1000 \
+	>>> magzero=30 rd=10 poi+
 	50 50 15.0 pix 40 1 0
-	50 50 15.6 pix 30 .8 45
-	0 150 16.5 pix 20 .6 90
-	50 150 17.1 pix 15 .4 135
+	150 50 15.6 pix 30 .8 45
+	50 150 16.5 pix 20 .6 90
+	150 150 17.1 pix 15 .4 135
 	[EOF]
 .fi
 

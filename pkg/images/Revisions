@@ -1,5 +1,437 @@
 .help revisions Jun88 pkg.images
 .nf
+pkg/images/geometry/t_geomap.x
+    Corrected a harmless typo in the code which determines the minimum
+    and maximum x values and improved the precision of the test when the
+    input is double precision.
+    (4/18/95, Davis)
+
+pkg/images/doc/fit1d.hlp
+    Added a description of the interactive parameter to the fit1d help page.
+    (4/17/95, Davis)
+
+pkg/images/imarith/t_imcombine.x
+    If an error occurs while opening an input image header the error
+    recovery will close all open images and then propagate the error.
+    For the case of running out of file descriptors with STF format
+    images this will allow the error message to be printed rather
+    than the error code.  (4/3/95, Valdes)
+
+pkg/images/geometry/xregister/t_xregister.x
+    Added a test on the status code returned from the fitting routine so
+    the xregister tasks does not go ahead and write an output image when
+    the user quits the task in in interactive mode.
+    (3/31/95, Davis)
+
+pkg/images/imarith/icscale.x
+pkg/images/doc/imcombine.hlp
+    The behavior of the weights when using both multiplicative and zero
+    point scaling was incorrect; the zero levels have to account for
+    the scaling.  (3/27/95, Valdes)
+
+pkg/images/geometry/xregister/rgxtools.x
+    Changed some amovr and amovi calls to amovkr and amovki calls.
+    (3/15/95, Davis)
+
+pkg/images/geometry/t_imshift.x
+pkg/images/geometry/t_magnify.x
+pkg/images/geometry/geotran.x
+pkg/images/geometry/xregister/rgximshift.x
+    The buffering margins set for the bicubic spline interpolants were
+    increased to improve the flux conservation properties of the interpolant
+    in cases where the data is undersampled. (12/6/94, Davis)
+
+pkg/images/xregister/rgxbckgrd.x
+    In several places the construct array[1++nx-wborder] was being used
+    instead of array[1+nx-wborder]. Apparently caused by a typo which
+    propagated through the code, the Sun compilers did not catch this, but
+    the IBM/RISC6000 compilers did. (11/16/94, Davis)
+
+
+pkg/images/xregister.par
+pkg/images/doc/xregister.hlp
+pkg/images/geometry/xregister/t_xregister.x
+pkg/images/geometry/xregister/rgxcorr.x
+pkg/images/geometry/xregister/rgxicorr.x
+pkg/images/geometry/xregister/rgxcolon.x
+pkg/images/geometry/xregister/rgxdbio.x
+    The xregister task was modified to to write the output shifts file
+    in either text database format (the current default)  or in simple text
+    format. The change was made so that the output of xregister could
+    both be edited more easily by the user and be used directly with the
+    imshift task. (11/11/94, Davis)
+
+pkg/images/imfit/fit1d.x
+    A Memc in the ratio output option was incorrectly used instead of Memr
+    when the bug fix of 11/16/93 was made.  (10/14/94, Valdes)
+
+pkg/images/geometry/xregister/rgxcorr.x
+    The procedure rg_xlaplace was being incorrectly declared as an integer
+    procedure.
+    (8/1/94, Davis)
+
+pkg/images/geometry/xregister/rgxregions.x
+    The routine strncmp was being called (with a missing number of characters
+    argument) instead of strcmp. This was causing a bus error under solaris
+    but not sun os whenever the user set regions to "grid ...". (7/27/94 LED)
+
+pkg/images/tv/imexaine/ierimexam.x
+    The Gaussian fitting can return a negative sigma**2 which would cause
+    an FPE when the square root is taken.  This will only occur when
+    there is no reasonable signal.  The results of the gaussian fitting
+    are now set to INDEF if this unphysical result occurs.  (7/7/94, Valdes)
+
+pkg/images/geometry/geofit.x
+    A routine expecting two char arrays was being passed two real arrays
+    instead resulting in a segmentation violation if calctype=real
+    and reject > 0.
+    (6/21/94, Davis)
+
+pkg/images/imarith/t_imarith.x
+    IMARITH now deletes the CCDMEAN keyword if present.  (6/21/94, Valdes)
+
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icsclip.gx
+    1.	The restoration of deleted pixels to satisfy the nkeep parameter
+	was being done inside the iteration loop causing the possiblity
+	of a non-terminating loop; i.e. pixels are rejected, they are
+	restored, and the number left then does not statisfy the termination
+	condition.  The restoration step was moved following the iterative
+	rejection.
+    2.	The restoration was also incorrectly when mclip=no and could
+	lead to a segmentation violation.
+    (6/13/94, Valdes)
+
+pkg/images/geometry/xregister/rgxicorr.x
+    The path names to the xregister task interactive help files was incorrect.
+    (6/13/94, Davis)
+
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icsclip.gx
+    Found and fixed another typo bug.  (6/7/94, Valdes/Zhang)
+
+pkg/images/imarith/icscale.x
+    The sigma scaling flag, doscale1, would not be set in the case of
+    a mean offset of zero though the scale factors could be different.
+    (5/25/94, Valdes/Zhang)
+
+pkg/images/imarith/icsclip.gx
+    There was a missing line: l = Memi[mp1].  (5/25/94, Valdes/Zhang)
+
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icsclip.gx
+    The reordering step when a central median is used during rejection
+    but the final combining is average was incorrect if the number
+    of rejected low pixels was greater than the number of pixel
+    number of pixels not rejected.  (5/25/94, Valdes)
+
+pkg/images/geometry/t_geotran.x
+    In cases where there was no input geomap database, geotran was
+    unnecessarily  overiding the size of the input image requested by the
+    user if the size of the image was bigger than the default output size
+    (the size of the output image which would include all the input image
+    pixels is no user shifts were applied).
+    (5/10/94, Davis)
+
+pkg/images/imarith/icscale.x
+pkg/images/imarith/t_imcombine.x
+    1.  There is now a warning error if the scale, zero, or weight type
+	is unknown.
+    2.  An sfree was being called before the allocated memory was finished
+	being used.
+    (5/2/94, Valdes)
+
+pkg/images/tv/imexaine/ierimexam.x
+    For some objects the moment analysis could fail producing a floating
+    overflow error in imexamine, because the code was trying to use
+    INDEF as the initial value of the object fwhm.  Changed the gaussian
+    fitting code to use a fraction of the fitting radius as the initial value
+    for the fitted full-width half-maximum in cases where the moment analysis
+    cannot compute an initial value.
+    (4/15/94 LED)
+
+pkg/images/imarith/iclog.x
+    Changed the mean, median, mode, and zero formats from 6g to 7.5g to
+    insure 5 significant digits regardless of signs and decimal points.
+    (4/13/94, Valdes)
+
+pkg/images/doc/imcombine.hlp
+    Tried again to clarify the scaling as multiplicative and the offseting
+    as additive for file input and for log output.  (3/22/94, Valdes)
+
+pkg/images/imarith/iacclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/iscclip.gx
+    The image sigma was incorrectly computed when an offset scaling is used.
+    (3/8/94, Valdes)
+
+pkg/images/doc/imcombine.hlp
+    The MINMAX example confused low and high.  (3/7/94, Valdes)
+
+pkg/images/geometry/t_geomap.x
+pkg/images/geometry/geofit.x
+pkg/images/geometry/geograph.x
+    Fixed a bug in the geomap code which caused the linear portion of the transformation
+    to be computed incorrectly if the x and y fits had a different functional form.
+    (12/29/93, Davis)
+
+pkg/images/imarith/t_imcombine.x
+pkg/images/imcombine.par
+pkg/images/do/imcombine.hlp
+    The output pixel datatypes now include unsigned short integer.
+    (12/4/93, Valdes)
+
+pkg/images/doc/imcombine.hlp
+    Fixed an error in the example of offseting.  (11/23/93, Valdes)
+
+pkg/images/imfit/fit1d.x
+    When doing operations in place the input and output buffers are the
+    same and the difference and ratio operations assumed they were not
+    causing the final results to be wrong.  (11/16/93, Valdes)
+
+pkg/images/imarith/t_imarith.x
+pkg/images/doc/imarith.hlp
+    If no calculation type is specified then it will be at least real
+    for a division.  Since the output pixel type defaults to the
+    calculation type if not specified this will also result in a
+    real output if dividing two integer images.  (11/12/93, Valdes)
+
+pkg/images/imarith/icgrow.gx
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icsclip.gx
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/t_imcombine.x
+pkg/images/doc/imcombine.hlp
+    If there were fewer initial pixels than specified by nkeep then the
+    task would attempt to add garbage data to achieve nkeep pixels.  This
+    could occur when using offsets, bad pixel masks, or thresholds.  The
+    code was changed to check against the initial number of pixels rather
+    than the number of images.  Also a negative nkeep is no longer
+    converted to a positive value based on the number of images.  Instead
+    it specifies the maximum number of pixels to reject from the initial
+    set of pixels.  (11/8/93, Valdes)
+
+pkg/images/imarith/icsetout.x
+    Added MWCS calls to update the axis mapping when using the project
+    option in IMCOMBINE.  (10/8/93, Valdes)
+
+pkg$images/imarith/icscale.x
+pkg$images/doc/imcombine.hlp
+    The help indicated that user input scale or zero level factors
+    by an @file or keyword are multiplicative and additive while the
+    task was using then as divisive and subtractive.  This was
+    corrected to agree with the intend of the documentation.
+    Also the factors are no longer normalized.  (9/24/93, Valdes)
+
+pkg$images/imarith/icsetout.x
+    The case in which absolute offsets are specified but the offsets are
+    all the same did not work correctly.  (9/24/93, Valdes)
+
+pkg$images/imfit/imsurfit.h
+pkg$images/imfit/t_imsurfit.x
+pkg$images/imfit/imsurfit.x
+pkg$images/lib/ranges.x
+    Fixed two bugs in the imsurfit task bad pixel rejection code. For low
+    k-sigma rejections factors the bad pixel list could overflow resulting
+    in a segmentation violation or a hung task. Overlapping ranges were
+    not being decoded into a bad pixel list properly resulting in 
+    oscillating bad pixel rejection behavior where certain groups of
+    bad pixels were alternately being included and excluded from the fit.
+    Both bugs are fixed in iraf 2.10.3
+    (9/21/93, Davis)
+
+pkg$images/doc/imcombine.hlp
+    Clarified how bad pixel masks work with the "project" option.
+    (9/13/93, Valdes)
+
+pkg$images/imfit/fit1d.x
+    When the input and output images are the same there was an typo error
+    such that the output was opened separately but then never unmapped
+    resulting in the end of the image not being updated.  (8/6/93, Valdes)
+
+pkg$images/imarith/t_imcombine.x
+    The algorithm for making sure there are enough file descriptors failed
+    to account for the need to reopen the output image header for an
+    update.  Thus when the number of input images + output images + logfile
+    was exactly 60 the task would fail.  The update occurs when the output
+    image is unmapped so the solution was to close the input images first
+    except for the first image whose pointer is used in the new copy of the
+    output image.  (8/4/93, Valdes)
+
+pkg$images/filters/t_mode.x
+pkg$images/filters/t_median.x
+    Fixed a bug in the error trapping code in the median and mode tasks.
+    The call to eprintf contained an extra invalid error code agument.
+    (7/28/93, Davis)
+
+pkg$images/geometry/geomap.par
+pkg$images/geometry/t_geomap.x
+pkg$images/geometry/geogmap.x
+pkg$images/geometry/geofit.x
+    Fixed a bug in the error handling code in geomap which was producing
+    a segmentation violation on exit if the user's coordinate list
+    had fewer than 3 data points. Also improved the error messages
+    presented to the user in both interactive and non-interactive mode.
+    (7/7/93, Davis)
+
+pkg$images/imarith/icgdata.gx
+    There was an indexing error in setting up the ID array when using
+    the grow option.  This caused the CRREJECT/CCDCLIP algorithm to
+    fail with a floating divide by zero error when there were non-zero
+    shifts.  (5/26/93, Valdes)
+
+pkg$images/imarith/icmedian.gx
+    The median calculation is now done so that the original input data
+    is not lost.  This slightly greater inefficiency is required so
+    that an output sigma image may be computed if desired.  (5/10/93, Valdes)
+
+pkg$images/geometry/t_imshift.x
+    Added support for type ushort to the imshift task in cases where the
+    pixel shifts are integral.
+    (5/8/93, Davis)
+
+pkg$images/doc/rotate.hlp
+    Fixed a bug in the rotate task help page which implied that automatic
+    image size computation would occur if ncols or nlines were set no 0
+    instead of ncols and nlines.
+    (4/17/93, Davis)
+
+pkg$images/imarith/imcombine.gx
+    There was no error checking when writing to the output image.  If
+    an error occurred (the example being when an imaccessible imdir was
+    set) obscure messages would result.  Errchks were added.
+    (4/16/93, Valdes)
+
+pkg$images/doc/gauss.hlp
+    Fixed 2 sign errors in the equations in the documentation describing
+    the elliptical gaussian fucntion.
+    (4/13/92, Davis)
+
+pkg/images/imutil/t_imslice.x
+    Removed an error check in the imslice task, which was preventing it from
+    being used to reduce the dimensionality of images where the length of 
+    the slice dimension is 1.0.
+    (2/16/83, Davis)
+
+pkg/images/filters/fmedian.x
+    The fmedian task was printing debugging information under iraf 2.10.2.
+    (1/25/93, Davis)
+
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icsclip.gx
+    When using mclip=yes and when more pixels are rejected than allowed by
+    the nkeep parameter there was a subtle bug in how the pixels are added
+    back which can result in a segmentation violation.
+	if (nh == n2)  ==>  if (nh == n[i])
+    (1/20/93, Valdes)
+
+.nf
+=======
+V2.10.2
+=======
+
+pkg/images/imarith/t_imcombine.x
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icgrow.gx
+pkg/images/imarith/iclog.x
+pkg/images/imarith/icombine.com
+pkg/images/imarith/icombine.gx
+pkg/images/imarith/icombine.h
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icscale.x
+pkg/images/imarith/icsclip.gx
+pkg/images/imarith/icsetout.x
+pkg/images/imcombine.par
+pkg/images/doc/combine.hlp
+    The weighting was changed from using the square root of the exposure time
+    or image statistics to using the values directly.  This corresponds
+    to variance weighting.  Other options for specifying the scaling and
+    weighting factors were added; namely from a file or from a different
+    image header keyword.  The \fInkeep\fR parameter was added to allow
+    controlling the maximum number of pixels to be rejected by the clipping
+    algorithms.  The \fIsnoise\fR parameter was added to include a sensitivity
+    or scale noise component to the noise model.  Errors will now delete
+    the output image.
+    (9/30/92, Valdes)
+
+pkg/images/imutil/imcopy.x
+    Added a call to flush after the status line printout so that the output
+    will appear immediately. (8/19/92, Davis)
+
+pkg/images/filters/mkpkg
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/fmedian.x
+pkg/images/filters/fmd_buf.x
+pkg/images/filters/fmd_maxmin.x
+    The fmedian task could crash with a segmentation violation if mapping
+    was turned off (hmin = zmin and hmax = zmax) and the input image
+    contained data outside the range defined by zmin and zmax. (8/18/92, Davis)
+
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icpclip.gx
+pkg/images/imarith/icsclip.gx
+    There was a very unlikely possibility that if all the input pixels had
+    exactly the same number of rejected pixels the weighted average would
+    be done incorrectly because the dflag would not be set.  (8/11/92, Valdes)
+
+pkg/images/imarith/icmm.gx
+    This procedure failed to set the dflag resulting in the weighted average
+    being computed in correctly.  (8/11/92, Valdes)
+
+pkg/images/imfit/fit1d.x
+    At some point changes were made but not documented dealing with image
+    sections on the input/output.  The changes seem to have left off the
+    final step of opening the output image using the appropriate image
+    sections.  Because of this it is an error to use an image section
+    on an input image when the output image is different; i.e.
+    
+	cl> fit1d dev$pix[200:400,*] junk
+	
+    This has now been fixed.  (8/10/92, Valdes)
+
+pkg/images/imarith/icscales.x
+    The zero levels were incorrectly scaled twice.  (8/10/92, Valdes)
+
+pkg/images/imarith/icstat.gx
+    Contained the statement
+	nv = max (1., (Memi[v2+i] - Memi[v1+i]) / Memi[dv+i] + 1)
+    which is max(real,int).  Changed the 1. to a 1.  (8/10/92, Valdes)
+
+pkg$images/imarith/icaclip.gx
+pkg$images/imarith/iccclip.gx
+pkg$images/imarith/icsclip.gx
+    These files contained multiple cases (ten or so) of constructs such as
+    "max (1., ...)" or "max (0., ...)" where the ... could be either real
+    or double.   In the double cases the DEC compiler complained about a
+    type mismatch since 1. is real.  (8/10/92, Valdes)
+
+pkg$images/imfit/t_imsurfit.x
+    Fixed a bug in the section reading code. Imsurfit is supposed to switch
+    the order of the section delimiters in x and y if x2 < x1 or y2 < 1.
+    Unfortunately the y test was actually "if (y2 < x1)" instead of 
+    "if (y2 < y1)". Whether or not the code actually works correctly
+    depends on the value of x1 relative to y2. This bug was not present
+    in 2.9.1 but is present in subsequent releases. (7/30/92 LED)
+
+=======
+V2.10.1
+=======
+
+pkg$images/filters/t_gauss.x
+    The case theta=90 and ratio > 0.0 but  < 1.0 was producing an incorrect
+    convolution if bilinear=yes, because the major axis sigmas being 
+    input along the x and y axes were sigma and ratio * sigma respectively
+    instead of ratio * sigma and sigma in this case.
+
 pkg$images/imutil/imcopy.x
     Modified imcopy to write its verbose output to STDOUT instead of
     STDERR. (6/24/92, Davis)

@@ -1,4 +1,4 @@
-.help qphot Jul91 noao.digiphot.apphot
+.help qphot Aug 93 noao.digiphot.apphot
 .ih
 NAME
 qphot -- quick aperture photometer
@@ -21,7 +21,37 @@ The width of the sky annulus in pixels.
 .le
 .ls apertures
 The list of aperture radii in pixels. This list is a string parameter with
-the apertures listed individually and separated by comas.
+the apertures listed individually, separated by comas.
+.le
+.ls coords = ""
+The list of text files containing the coordinates of the objects to be
+measured, 1 object per line with the x and y coordinates in columns
+1 and 2 respectively. If \fIcoords\fR is null (""), QPHOT will either read
+commands from the image cursor (default), or read commands from a cursor
+command file. In the
+latter case the image cursor parameter \fIicommands\fR must be set to the
+name of the cursor command file.
+If coords is defined, QPHOT accepts
+coordinate input from either the image cursor or the list file (interactive
+mode), or reads the coordinates from the coordinates file or a cursor
+command file (batch mode).
+The number of coords files is either 0, 1 or equal to the number of input
+images.
+.le
+.ls output = "default"
+The name of the results file or results directory. If output is "default",
+"dir$default", or a directory specification then an output name of the form
+dir$root.extension.version is constructed, where dir is the directory,
+root is the root image name, extension is "mag" and version is the next
+available version number for the file. If output is null (""),
+then no output file is
+written. The number of output files must be either 1 or
+equal to the number of image files.
+.le
+.ls plotfile = ""
+The name of the file containing radial plots for the stars written to the
+output file. If plotfile is not equal to null then a single radial plot
+is written to plotfile for every record written to output.
 .le
 .ls zmag = 26.0
 The zero point of the magnitude scale.
@@ -39,58 +69,31 @@ The image header keyword containing the filter id of the observation.
 The image header keyword containing the time of the observation.
 .le
 .ls epadu = 1.0
-The gain in photons per adu. This is used to compute the magnitude errors.
+The gain in photons per adu. This parameter
+is used to compute the magnitude errors.
 .le
-.ls coords = ""
-The list of text files containing the coordinates of the objects to be
-processed, 1 object per line with the x and y coordinates in columns
-1 and 2 respectively. If \fIcoords\fR is the null string QPHOT will either read
-from the cursor (default) or read the cursor commands from a file. In the
-latter case the image cursor \fIcommands\fR is set to the name of a text
-command file created by hand or with for example RIMCURSOR.
-If coords is defined QPHOT activates the cursor and accepts
-coordinate input from either the cursor or the list file (interactive
-mode) or reads the coordinates out of the list file directly (batch mode).
-The number of coords files is either 1 or the number of input images.
-.le
-.ls output = "default"
-The name of the results file or results directory. If output is "default",
-"dir$default", or a directory specification then an output name of the form
-dir$root.extension.version is constructed, where dir is the directory,
-root is the root image name, extension is "mag" and version is the current
-version of the file. If the output string is null then no output file is
-written. The number of output files must be either 1 or
-equal to the number of image files. In both batch and interactive mode
-full results are written to output. In interactive mode a subset
-of the results is written to the standard output.
-.le
-.ls plotfile = ""
-The name of the file containing radial plots for the stars written to the
-output file. If plotfile is not equal to null then a single radial plot
-is written to plotfile for every record written to output.
-.le
-.ls graphics = "stdgraph"
-The default graphics device.
-.le
-.ls display = "stdimage"
-The default display device. This can be set to
-stdgraph and QPHOT will run off the graphics device.
-.le
-.ls commands = ""
-The image cursor. The image cursor can be read from a coordinate file.
-.le
-.ls cursor = ""
-The graphics cursor.
+.ls interactive = yes
+Interactive or batch mode.
 .le
 .ls radplots = no
 If radplots is yes and QPHOT is run in interactive mode then a radial profile
 of each measured star is plotted on stdgraph.
 .le
-.ls interactive = yes
-Interactive or batch mode.
-.le
 .ls verbose = no
 Print messages in non-interactive mode.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls display = "stdimage"
+The default display device. \fIDisplay\fR can be set to
+"stdgraph" if QPHOT is to be run off the graphics device.
+.le
+.ls icommands = ""
+The image cursor.
+.le
+.ls gcommands = ""
+The graphics cursor.
 .le
 
 .ih
@@ -103,28 +106,29 @@ cursor or listed in a coordinate file,
 and writes the computed x and y coordinates, sky values and
 magnitudes to the text file \fIoutput\fR.
 In interactive mode the user must define the list of objects
-interactively with the image cursor.  In batch mode
-the image cursor can be read from a text
-file containing a list of cursor commands as specified by the \fIcommands\fR
-parameter.
+interactively with the image cursor, or select them interactively from 
+the coordinate list \fIcoords\fR.  In batch mode
+the coordinates can be read directly from \fIcoords\fR, or from a
+cursor command file specified by the parameter \fIicommands\fR.
 
 QPHOT computes accurate centers for each object using the centroid
 centering
 algorithm, pixels inside \fIcbox\fR and the default values of the
 \fIcenterpars\fR parameters.
 Accurate sky value for each object are computed using
-the \fImode\fR algorithm, pixels inside the sky annulus defined by
-\fIannulus\fR and \fIdannulus\fR, and the default values of the sky fitting
-parameters as defined in \fIfitskypars\fR parameter set.
+the \fIcentroid\fR algorithm with histogram smoothing turned on,
+pixels inside the sky annulus defined by
+\fIannulus\fR and \fIdannulus\fR, and the default values of the remaining
+sky fitting parameters as defined in the \fIfitskypars\fR parameter set.
 Magnitudes are computed using pixels inside the apertures defined by
 \fIapertures\fR.
 The user should set the gain \fIepadu\fR to ensure that the magnitude errors
 are correctly computed and \fIexposure\fR to normalize the computed magnitudes
 to an exposure time of 1 time unit. The zero point of the magnitude scale
 can be adjusted by setting \fIzmag\fR. \fIAirmass\fR,
-\fIfilter\fR, and \fIobstime\fR are pure book-keeping parameters which may
+\fIfilter\fR, and \fIobstime\fR are book-keeping parameters which may
 be useful to
-preserve for future reductions such as calibration. 
+preserve for future reduction steps such as calibration. 
 The noise statistics are assumed to be Poisson.
 
 .ih
@@ -135,40 +139,38 @@ The following list of cursor commands are currently available.
 .nf
 	Interactive Photometry Commands
 
-?	Print help for QPHOT commands
-:	QPHOT colon escape commands (see below)
-w	Store current QPHOT parameters
-q	Exit
-
-d	Plot the radial profile of current star (cursor or list)
-i	Setup QPHOT parameters interactively using current star
-	(cursor or list)
-
-spbar	Fit center, sky, compute magnitudes of current star
-	(cursor or list), and output results
-f	Fit center, sky and compute magnitudes of current star
-	(cursor or list)
-e	Print current QPHOT error message
-
-c	Fit center around the current star (cursor or list)
-t	Fit sky around the current star (cursor or list)
-s	Fit sky around the current centered star
-p	Compute magnitudes around current star (cursor or list),
-	using current sky
-
-:m [n]	Move to next [nth] star in the coordinate list
-:n [n]	Measure next [nth] star in the coordinate list,
-	and output results
-l	Compute magnitudes for remainder of the stars in the
-	coordinate list, and output results
+?	Print help
+:	Colon commands
+w	Save the current parameters
+d	Plot radial profile of current star
+i	Interactively set parameters using current star
+c	Fit center of current star
+t	Fit sky around the cursor
+a       Average sky values fit around several cursor positions
+s	Fit sky for current centered star
+p	Do photometry for current star, using current sky
+o	Do photometry for current star, using current sky, output results
+f	Do photometry for current star
+spbar	Do photometry for current star, output results
+e	Print error messages
+m	Move to next star in coordinate list
+n	Do photometry for next star in coordinate list, output results
+l	Do photometry for remaining stars in coordinate list, output results
 r	Rewind the coordinate list
+q	Exit task
 
-Photometry parameters are listed or set with the following commands.
+
+	Colon Commands
+
+:show	List the parameters
+:m [n]	Move to next [nth] star in coordinate list
+:n [n]	Do photometry for next [nth] star in coordinate list, output results
+
+	Colon Parameter Editing Commands
 
 :image		[string]	Image name
 :output		[string]	Output file name
 :coords		[string]	Coords file name
-:show				List the parameters
 
 :cbox		[value]		Width of the centering box (pixels)
 :annulus	[value]		Inner radius of sky annulus (pixels)
@@ -188,15 +190,15 @@ Photometry parameters are listed or set with the following commands.
 The following commands are available from inside the interactive setup menu
 using the i key.
 
-                    Interactive QPHOT Setup Menu
 
-	v	Set and verify the critical QPHOT parameters
-		(c,a,d,r)
+                    Interactive Qphot Setup Menu
 
-	c	Set and verify the centering box width
-	a	Set and verify the inner radius of the sky annulus
-	d	Set and verify the width of the sky annulus
-	r	Set and verify the aperture radii
+	v	Mark and verify the critical parameters (c,a,d,r)
+
+	c	Mark and verify the centering box width
+	a	Mark and verify the inner radius of the sky annulus
+	d	Mark and verify the width of the sky annulus
+	r	Mark and verify the aperture radii
 .fi
 
 .ih
@@ -205,7 +207,7 @@ In interactive mode the following quantities are printed on the standard
 output as each object is measured. Error is a simple string which indicates
 whether the task encountered an error condition from
 the centering algorithm, the sky fitting algorithm or the photometry
-algorithm respectively. Mag are the mangnitudes in
+algorithm respectively. Mag are the magnitudes in
 apertures 1 through N respectively and xcenter, ycenter and msky are the
 x and y centers and the sky value respectively.
 
@@ -224,7 +226,7 @@ following record is written.
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier cerror
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
 	   itime  xairmass  ifilter  otime
-	   rapert  sum  area  mag  merr  pier  perror
+	   rapert  sum  area  flux mag  merr  pier  perror
 .fi
 
 Image and coords are the name of the image and coordinate file respectively.
@@ -239,22 +241,31 @@ The sense of the xshift and yshift definitions is the following.
 	yshift = ycenter - yinit
 .fi
 
-Sier and serror are the error code and accompanying error message for the
-sky computation.  Msky, stdev and sskew are the sky value,
-standard deviation and skew respectively. Nsky and nsrej are the number of
-sky pixels used and the number of sky pixels rejected respectively.
+Sier and serror are the sky fitting error code and accompanying error message
+respectively.  Msky, stdev and sskew are the best estimage of the sky value
+(per pixel), standard deviation and skew respectively. Nsky and nsrej are
+the number of sky pixels used and the number of sky pixels rejected
+respectively.
 
-Itime is the eposure time, xairmass is self-evident, ifilter is an
+Itime is the exposure time, xairmass is self-evident, ifilter is an
 id string used to identify the filter used during the observation, and
 otime is a string containing the time stamp in whatever units the
 user has written into the image header or the otime parameter.
 
-Rapert, sum, and area are the radius of the aperture in pixels, the total
-number of counts including sky in the aperture and the area of the aperture
-in square pixels. Mag and merr are the magnitude and error in the magnitude
-in the aperture. Pier and perror are photometry error code and accompanying
-error message.
+Rapert, sum, area, and flux  are the radius of the aperture in pixels, the
+total number of counts including sky in the aperture, the area of the aperture
+in square pixels, and the total number of counts in the aperture excluding
+sky. Mag and merr are the magnitude and error in the magnitude in the aperture.
 
+.nf
+	flux = sum - area * msky
+	 mag = zmag - 2.5 * log10 (flux) + 2.5 * log10 (itime)
+	merr = 1.0857 * err / flux
+	 err = sqrt (flux / epadu + area * stdev**2 +
+	       area**2 * stdev**2 / nsky)
+.fi
+
+Pier and perror are photometry error code and accompanying error message.
 
 .ih
 ERRORS
@@ -265,9 +276,7 @@ Non-zero values of cier flag the following error conditions.
 0        # No error
 101      # The centering box is off image
 102      # The centering box is partially off the image
-103      # The S/N ratio is low in the centering box
-107      # The x or y center shift is greater than centerpars.maxshift
-108      # There is bad data in the centering box
+107      # The x or y center shift is greater than 1 pixel
 .fi
 
 If all goes well during the sky fitting process then the error code sier
@@ -277,17 +286,18 @@ will be 0. Non-zero values of sier flag the following error conditions.
 0         # No error
 201       # There are no sky pixels in the sky annulus
 202       # Sky annulus is partially off the image
+203	  # The histogram of sky pixels has no width
+204	  # The histogram of sky pixels is flat or concave
 .fi
 
-If no error occurs during the measurment of the magnitudes then pier is
-0. Non-zero values of pier flag the following error conditins.
+If no error occurs during the measurement of the magnitudes then pier is
+0. Non-zero values of pier flag the following error conditions.
 
 .nf
 0        # No error
 301      # The aperture is off the image
 302      # The aperture is partially off the image
 303      # The sky value is undefined
-305      # There is bad data in the aperture
 .fi
 
 .ih
@@ -334,7 +344,7 @@ contour plot and the graphics cursor.
 	... a 1 line summary will be printed on the standard output
 	    for each object measured
 
-	... full output will be written to M92.mag.1
+	... full output will be written to m92.mag.1
 .fi
 
 3. Setup the parameters interactively and run QPHOT from a contour plot.
@@ -346,7 +356,7 @@ contour plot and the graphics cursor.
 
 	... plot appears on screen
 
-	... adjust contour parameters until good plot acchieved
+	... adjust contour parameters until good plot achieved
 
 	ap> =gcur
 
@@ -362,18 +372,18 @@ contour plot and the graphics cursor.
 
 	... type w to save the parameters
 
-	... type :.read m92.plot  to read in the contour plot metacode
+	... type :.read m92.plot to reread in the contour plot metacode
 	    file
 
 	... move cursor to stars of interest and tap space bar 
 
-	... output will apear in m92.mag.2
+	... output will appear in m92.mag.2
 .fi
 
 4. Run QPHOT in batch using a coords file generated by the DAOFIND task.
 
 .nf
-	ap> daofind m92 fw=3.5 thresh=30.
+	ap> daofind m92 fw=3.5 sigma=10.0 threshold=3.0
 
 	... make a coordinate list by searching for objects with a fwhmpsf
 	    of 3.5 pixels and a maximum pixel of at least 30 counts above

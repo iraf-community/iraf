@@ -128,8 +128,7 @@ begin
 			}
 		    } then {
 			call erract (EA_WARN)
-		        call mfree (o, TY_STRUCT)
-			break
+			call error (0, "Error evaluating selection expression")
 		    }
 
 		    # Write out the expression.

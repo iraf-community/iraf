@@ -34,5 +34,5 @@ begin
 	AP_LOW(ap, dispaxis) = 1 - AP_CEN(ap, dispaxis)
 	AP_HIGH(ap, dispaxis) = IM_LEN(im, dispaxis) - AP_CEN(ap, dispaxis)
 	call ap_cvset (NULL, ap)
-	call ap_icset (NULL, AP_LOW(ap, apaxis), AP_HIGH(ap, apaxis), ap)
+	call ap_icset (NULL, ap, IM_LEN(im, apaxis))
 end

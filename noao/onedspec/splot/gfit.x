@@ -3,6 +3,8 @@ include	<mach.h>
 include	<gset.h>
 
 define	SQ2PI	2.5066283
+define	MC_N	50	# Monte-Carlo samples
+define	MC_SIG	34	# Sigma sample point
 
 # GFIT -- Fit Gaussian
 
@@ -18,15 +20,18 @@ int	fd1, fd2		# Output file descriptors
 pointer	xg, yg, sg		# Pointers to fit parameters
 int	ng			# Number of components
 
-int	bkgfit, posfit, sigfit
+int	bkgfit, posfit, sigfit, nsub
 int	i, j, i1, npts, nlines, wc, key
-real	w, wyc, wx, wy, wx2, wy2
-real	slope, height, flux, cont, sigma, eqw, scale, chisq
+long	seed
+real	w, dw, wyc, wx, wy, wx2, wy2
+real	slope, height, flux, cont, sigma, eqw, scale, sscale, chisq
+real	sigma0, invgain, wyc1, slope1, flux1, cont1, eqw1
 bool	fit
-pointer	sp, cmd, x, y, z
+pointer	xg1, yg1, sg1
+pointer	sp, cmd, x, y, s, z, ym, conte, xge, yge, sge, fluxe, eqwe
 
 int	clgcur()
-real	model()
+real	clgetr(), model(), gasdev(), asumr()
 errchk	dofit
 
 define	done_	99
@@ -54,16 +59,35 @@ begin
 	# Allocate space for the points to be fit.
 	call salloc (x, npts, TY_REAL)
 	call salloc (y, npts, TY_REAL)
+	call salloc (s, npts, TY_REAL)
 	call salloc (z, npts, TY_REAL)
 
 	# Scale the data.
+	sigma0 = clgetr ("sigma0")
+	invgain = clgetr ("invgain")
+	if (IS_INDEF(sigma0) || IS_INDEF(invgain) || sigma0<0. ||
+	    invgain<0. || (sigma0 == 0. && invgain == 0.)) {
+	    sigma0 = INDEF
+	    invgain = INDEF
+	}
 	scale = 0.
 	do i = 1, npts {
 	    Memr[x+i-1] = wcs[i1+i-1]
 	    Memr[y+i-1] = pix[i1+i-1]
+	    if (Memr[y+i-1] <= 0.)
+		sigma0 = INDEF
 	    scale = max (scale, abs (Memr[y+i-1]))
 	}
+	if (IS_INDEF(sigma0)) {
+	    call amovkr (1., Memr[s], npts)
+	    sscale = 1.
+	} else {
+	    do i = 1, npts
+		Memr[s+i-1] = sqrt (sigma0 ** 2 + invgain * Memr[y+i-1])
+	    sscale = asumr (Memr[s], npts) / npts
+	}
 	call adivkr (Memr[y], scale, Memr[y], npts)
+	call adivkr (Memr[s], sscale, Memr[s], npts)
 
 	# Allocate memory.
 	nlines = 1
@@ -98,20 +122,91 @@ begin
 	    }
 	}
 
-	w = Memr[x+j-1]
-	wy = min (0.99, max (0.01, abs (Memr[y+j-1] - wyc - slope * w) / wx))
-	sigma = sqrt (-0.5 * (w-Memr[xg])**2 / log (wy))
-	w = Memr[x+j+1]
-	wy = min (0.99, max (0.01, abs (Memr[y+j+1] - wyc - slope * w) / wx))
-	sigma = sigma + sqrt (-0.5 * (w-Memr[xg])**2 / log (wy))
-	Memr[sg] = sigma / 2
+	if (j > 0 && j < npts-1) {
+	    w = Memr[x+j-1]
+	    wy = min (0.99, max (0.01, abs (Memr[y+j-1] - wyc-slope*w) / wx))
+	    sigma = sqrt (-0.5 * (w-Memr[xg])**2 / log (wy))
+	    w = Memr[x+j+1]
+	    wy = min (0.99, max (0.01, abs (Memr[y+j+1] - wyc-slope*w) / wx))
+	    sigma = sigma + sqrt (-0.5 * (w-Memr[xg])**2 / log (wy))
+	    Memr[sg] = sigma / 2
+	} else {
+	    Memr[sg] = 0.2 * abs (Memr[x+npts-1] - Memr[x])
+	}
 
-	iferr (call dofit (bkgfit, posfit, sigfit, Memr[x], Memr[y], npts,
-	    wyc, slope, Memr[xg], Memr[yg], Memr[sg], ng, chisq)) {
-	    call erract (EA_WARN)
+	nsub = 3
+	dw = (wcs[n] - wcs[1]) / (n - 1)
+	iferr (call dofit (bkgfit, posfit, 3, sigfit, Memr[x], Memr[y],
+	    Memr[s], npts, dw, nsub, wyc, slope, Memr[xg], Memr[yg],
+	    Memr[sg], ng, chisq)) {
 	    fit = false
 	    goto done_
 	}
+
+	# Compute Monte-Carlo errors.
+	if (!IS_INDEF(sigma0)) {
+	    call salloc (ym, npts, TY_REAL)
+	    call salloc (xg1, ng, TY_REAL)
+	    call salloc (yg1, ng, TY_REAL)
+	    call salloc (sg1, ng, TY_REAL)
+	    call salloc (conte, MC_N*ng, TY_REAL)
+	    call salloc (xge, MC_N*ng, TY_REAL)
+	    call salloc (yge, MC_N*ng, TY_REAL)
+	    call salloc (sge, MC_N*ng, TY_REAL)
+	    call salloc (fluxe, MC_N*ng, TY_REAL)
+	    call salloc (eqwe, MC_N*ng, TY_REAL)
+	    do i = 1, npts {
+		w = Memr[x+i-1]
+		Memr[ym+i-1] = model (w, dw, nsub, Memr[xg], Memr[yg],
+		    Memr[sg], ng) + wyc + slope * w
+	    }
+	    seed = 1
+	    do i = 0, MC_N-1 {
+		do j = 1, npts
+		    Memr[y+j-1] = Memr[ym+j-1] +
+			sscale / scale * Memr[s+j-1] * gasdev (seed)
+		wyc1 = wyc
+		slope1 = slope
+		call amovr (Memr[xg], Memr[xg1], ng)
+		call amovr (Memr[yg], Memr[yg1], ng)
+		call amovr (Memr[sg], Memr[sg1], ng)
+		call dofit (bkgfit, posfit, 3, sigfit, Memr[x],
+		    Memr[y], Memr[s], npts, dw, nsub, wyc1, slope1,
+		    Memr[xg1], Memr[yg1], Memr[sg1], ng, chisq)
+
+		do j = 0, ng-1 {
+		    cont = wyc + slope * Memr[xg+j]
+		    cont1 = wyc1 + slope1 * Memr[xg+j]
+		    flux = Memr[sg+j] * Memr[yg+j] * SQ2PI
+		    flux1 = Memr[sg1+j] * Memr[yg1+j] * SQ2PI
+		    if (cont > 0. && cont1 > 0.) {
+			eqw = -flux / cont
+			eqw1 = -flux1 / cont1
+		    } else {
+			eqw = 0.
+			eqw1 = 0.
+		    }
+		    Memr[conte+j*MC_N+i] = abs (cont1 - cont)
+		    Memr[xge+j*MC_N+i] = abs (Memr[xg1+j] - Memr[xg+j])
+		    Memr[yge+j*MC_N+i] = abs (Memr[yg1+j] - Memr[yg+j])
+		    Memr[sge+j*MC_N+i] = abs (Memr[sg1+j] - Memr[sg+j])
+		    Memr[fluxe+j*MC_N+i] = abs (flux1 - flux)
+		    Memr[eqwe+j*MC_N+i] = abs (eqw1 - eqw)
+		}
+	    }
+	    do j = 0, ng-1 {
+		call asrtr (Memr[conte+j*MC_N], Memr[conte+j*MC_N], MC_N)
+		call asrtr (Memr[xge+j*MC_N], Memr[xge+j*MC_N], MC_N)
+		call asrtr (Memr[yge+j*MC_N], Memr[yge+j*MC_N], MC_N)
+		call asrtr (Memr[sge+j*MC_N], Memr[sge+j*MC_N], MC_N)
+		call asrtr (Memr[fluxe+j*MC_N], Memr[fluxe+j*MC_N], MC_N)
+		call asrtr (Memr[eqwe+j*MC_N], Memr[eqwe+j*MC_N], MC_N)
+	    }
+	    call amulkr (Memr[conte], scale, Memr[conte], MC_N*ng)
+	    call amulkr (Memr[yge], scale, Memr[yge], MC_N*ng)
+	    call amulkr (Memr[fluxe], scale, Memr[fluxe], MC_N*ng)
+	}
+
 	call amulkr (Memr[yg], scale, Memr[yg], ng)
 	wyc = (wyc + slope * wx1) * scale
 	slope = slope * scale
@@ -120,15 +215,18 @@ begin
 	fit = true
 	do i = 1, npts {
 	    w = wcs[i1+i-1]
-	    Memr[z+i-1] = model (w, Memr[xg], Memr[yg], Memr[sg], ng)
-	    Memr[z+i-1] = Memr[z+i-1] + wyc + slope * (w - wx1)
+	    Memr[z+i-1] = model (w, dw, nsub, Memr[xg], Memr[yg],
+		Memr[sg], ng) + wyc + slope * (w - wx1)
 	}
 
 	call gseti (gfd, G_PLTYPE, 2)
+	call gseti (gfd, G_PLCOLOR, 2)
 	call gpline (gfd, wcs[i1], Memr[z], npts)
 	call gseti (gfd, G_PLTYPE, 3)
+	call gseti (gfd, G_PLCOLOR, 3)
 	call gline (gfd, wx1, wyc, wx2, wyc + slope * (wx2 - wx1))
 	call gseti (gfd, G_PLTYPE, 1)
+	call gseti (gfd, G_PLCOLOR, 1)
 	call gflush (gfd)
 
 done_
@@ -172,6 +270,28 @@ done_
 			call pargr (height)
 			call pargr (sigma)
 			call pargr (2.355 * sigma)
+		}
+		if (!IS_INDEF(sigma0)) {
+		    if (fd1 != NULL) {
+			call fprintf (fd1,
+		"  (%7.5g) (%7w) (%7.4g) (%7.4g) (%7.4g) (%7.4g) (%7.4g)\n")
+			    call pargr (Memr[xge+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[fluxe+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[eqwe+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[yge+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[sge+(i-1)*MC_N+MC_SIG])
+			    call pargr (2.355*Memr[sge+(i-1)*MC_N+MC_SIG])
+		    }
+		    if (fd2 != NULL) {
+			call fprintf (fd2,
+		"  (%7.5g) (%7w) (%7.4g) (%7.4g) (%7.4g) (%7.4g) (%7.4g)\n")
+			    call pargr (Memr[xge+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[fluxe+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[eqwe+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[yge+(i-1)*MC_N+MC_SIG])
+			    call pargr (Memr[sge+(i-1)*MC_N+MC_SIG])
+			    call pargr (2.355 * Memr[sge+(i-1)*MC_N+MC_SIG])
+		    }
 		}
 	    }
 	} else {

@@ -1,4 +1,4 @@
-.help linebias Oct88 noao.imred.bias
+.help linebias Mar93 noao.imred.bias
 .ih
 NAME
 linebias -- Fit and subtract an average line bias
@@ -14,7 +14,8 @@ Images to be bias subtracted.  The images may not contain image sections.
 .le
 .ls output
 Output bias subtracted images.  An output images may be the same as its
-matching input image.
+matching input image.  The output image pixel type will real regardless
+of the input image pixel type.
 .le
 .ls bias = "[]"
 Bias section appended to the input image to define the bias region.
@@ -102,6 +103,12 @@ are only changed when new instruments are used.  The first image
 is interactively fit and the fitting order is change to 2.  The
 second image is examined and the fit found to be acceptable.  All remaining
 image are then fit non-interactively using the same fitting parameters.
+.ih
+REVISIONS
+.ls LINEBIAS V2.10.3
+The output pixel type is now real instead of preserving the pixel type
+of the input image.
+.le
 .ih
 SEE ALSO
 icfit

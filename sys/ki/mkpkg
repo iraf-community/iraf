@@ -70,6 +70,7 @@ libsys.a:
 	kiinit.x	ki.h kichan.com kinode.com <config.h>
 	kilnode.x	kinode.com ki.h
 	kimapchan.x	ki.h kichan.com kinode.com <config.h> <knet.h> <mach.h>
+	kimapname.x
 	kintpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kiopenks.x	ki.h kii.com kinode.com <chars.h> <config.h> <mach.h>
 	kireceive.x	ki.h kii.com kinode.com <ctype.h> <mach.h>

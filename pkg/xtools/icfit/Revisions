@@ -1,5 +1,35 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+pkg$xtools/icfit/icdosetup.gx
+    Fixed two type mismatches in min/max calls.  (12/30/94, Valdes)
+
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icfit.hlp
+    Added 'v' key to change fitting weight.  (12/29/94, Valdes)
+
+pkg$xtools/icparams.gx
+    Make it legal to call ic_closed with a null pointer.  (8/11/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+pkg$xtools/icfit.gx
+    This procedure now sets the IC_FITERROR structure element so that
+    a program using only the noninteractive ic_fit will have this element
+    defined.  The procedure will still return with an error condition
+    if an error occurs as was true previously.  (6/29/93, Valdes)
+
+pkg$xtools/icdosetup.gx
+    The fitting min and max given to cvinit is now calculated from the data
+    avoiding errors in setting it by calling programs.  This was especially
+    dangerous because fitting data outside this range can cause memory
+    corruption errors by the CURFIT routines.  (7/29/92, Valdes)
+
+=======
+V2.10.1
+=======
+
 pkg$xtools/icfit/icgcolon.gx
 pkg$xtools/icfit/icggraph.gx
 pkg$xtools/icfit/icparams.x

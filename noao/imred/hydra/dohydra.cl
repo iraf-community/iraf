@@ -18,7 +18,7 @@ file	arctable = ""		{prompt="Arc assignment table (optional)\n"}
 
 string	readnoise = "RDNOISE"	{prompt="Read out noise sigma (photons)"}
 string	gain = "GAIN"		{prompt="Photon gain (photons/data number)"}
-int	dispaxis = ")_.dispaxis" {prompt="Dispersion axis (1=along lines, 2=along columns)"}
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 int	fibers = 97		{prompt="Number of fibers"}
 real	width = 12.		{prompt="Width of profiles (pixels)"}
 real	minsep = 8.	{prompt="Minimum separation between fibers (pixels)"}
@@ -31,6 +31,7 @@ string	objbeams = "0,1"	{prompt="Object beam numbers"}
 string	skybeams = "0"		{prompt="Sky beam numbers"}
 string	arcbeams = ""		{prompt="Arc beam numbers\n"}
 
+bool	scattered = no		{prompt="Subtract scattered light?"}
 bool	fitflat = yes		{prompt="Fit and ratio flat field spectrum?"}
 bool	clean = yes		{prompt="Detect and replace bad pixels?"}
 bool	dispcor = yes		{prompt="Dispersion correct spectra?"}
@@ -49,7 +50,6 @@ pset	params = ""		{prompt="Algorithm parameters"}
 begin
 	apscript.readnoise = readnoise
 	apscript.gain = gain
-	apscript.dispaxis = dispaxis
 	apscript.nfind = fibers
 	apscript.width = width
 	apscript.t_width = width
@@ -57,12 +57,13 @@ begin
 	apscript.maxsep = maxsep
 	apscript.radius = minsep
 	apscript.clean = clean
+	proc.datamax = datamax
 
 	proc (objects, apref, flat, throughput, arcs1, arcs2, arcreplace,
 	    arctable, fibers, apidtable, objaps, skyaps, arcaps, objbeams,
-	    skybeams, arcbeams, fitflat, no, no, no, no, clean, dispcor,
-	    savearcs, skysubtract, skyedit, saveskys, splot, redo, update,
-	    batch, listonly)
+	    skybeams, arcbeams, scattered, fitflat, no, no, no, no, clean,
+	    dispcor, savearcs, skysubtract, skyedit, saveskys, splot, redo,
+	    update, batch, listonly)
 
 	if (proc.dobatch) {
 	    print ("-- Do remaining spectra as a batch job --")

@@ -5,6 +5,7 @@
 	 apfind - Automatically find spectra and define apertures
 	  apfit - Fit 2D spectra and output the fit, difference, or ratio
       apflatten - Remove overall spectral and profile shapes from flat fields
+        apnoise - Compute and examine noise characteristics of spectra
          apmask - Create and IRAF pixel list mask of the apertures
     apnormalize - Normalize 2D apertures by 1D functions
      aprecenter - Recenter apertures

@@ -19,12 +19,13 @@ int	update			# update the critical parameters
 int	verbose			# print messages
 
 int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
-pointer	sp, outfname, cname, imlist, plist, olist, clist, im, py, id, gd
+int	imlist, plist, olist, clist
+pointer	sp, outfname, cname, im, py, id, gd
 
 bool	clgetb(), streq()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()
-int	fnldir(), strlen(), ap_yphot()
-pointer	immap(), open(), imtopenp(), clpopnu(), gopen()
+int	fnldir(), strlen(), ap_yphot(), open(), imtopenp(), clpopnu()
+pointer	immap(), gopen()
 errchk	gopen
 
 begin
@@ -79,8 +80,11 @@ begin
 	    call error (0, "Imcompatible image and output list lengths")
 	}
 
-	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	call clgstr ("icommands.p_filename", Memc[cname], SZ_FNAME)
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
@@ -93,10 +97,12 @@ begin
 		call ap_pypars (py)
 	}
 
+	# Get the graphics and display devices.
+	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
+	call clgstr ("display", Memc[display], SZ_FNAME)
+
 	# Open the plot files.
 	if (interactive == YES) {
-	    call clgstr ("graphics", Memc[graphics], SZ_FNAME)
-	    call clgstr ("display", Memc[display], SZ_FNAME)
 	    if (Memc[graphics] == EOS)
 		gd = NULL
 	    else {
@@ -139,30 +145,27 @@ begin
 	    call ap_otime (im, py)
 	    call ap_airmass (im, py)
 	    call ap_filter (im, py)
+	    if ((id != NULL) && (id != gd))
+		call ap_gswv (id, Memc[image], im, 4)
 
 	    # Open the polygons file.
 	    if (lplist <= 0) {
 		pl = NULL
 		call strcpy ("", Memc[outfname], SZ_FNAME)
-	    } else if (clgfil (plist, Memc[polygon], SZ_FNAME) != EOF) {
-		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
-		    strlen (Memc[polygon])) {
-		    call ap_inname (Memc[image], "", "ply", Memc[outfname],
-			SZ_FNAME)
-		    lplist = limlist
-		} else
-		    call strcpy (Memc[polygon], Memc[outfname], SZ_FNAME)
-		pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {
+		stat = clgfil (plist, Memc[polygon], SZ_FNAME)
 		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
 		    strlen (Memc[polygon])) {
-		    call ap_inname (Memc[image], "", "ply", Memc[outfname],
-			SZ_FNAME)
-	            pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
-		} else {
+		    call ap_inname (Memc[image], Memc[outfname], "ply",
+		        Memc[outfname], SZ_FNAME)
+		    lplist = limlist
+		    pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else if (stat != EOF) {
 		    call strcpy (Memc[polygon], Memc[outfname], SZ_FNAME)
+		    pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call apstats (py, PYNAME, Memc[outfname], SZ_FNAME)
 		    call seek (pl, BOF)
 		}
 	    }
@@ -172,25 +175,20 @@ begin
 	    if (lclist <= 0) {
 		cl = NULL
 		call strcpy ("", Memc[outfname], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
-		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
-		    lclist = limlist
-		} else
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
-	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {
+		stat = clgfil (clist, Memc[coords], SZ_FNAME)
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
 		    strlen (Memc[coords])) {
-		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
-			SZ_FNAME)
+		    call ap_inname (Memc[image], Memc[outfname], "coo",
+		        Memc[outfname], SZ_FNAME)
+		    lclist = limlist
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else if (stat != EOF) {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
-		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call apstats (py, CLNAME, Memc[outfname], SZ_FNAME)
 		    call seek (cl, BOF)
 		}
 	    }
@@ -202,18 +200,18 @@ begin
 		call strcpy ("", Memc[outfname], SZ_FNAME)
 	    } else {
 	        stat = clgfil (olist, Memc[output], SZ_FNAME)
-		if (stat != EOF)
-		    root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
+		root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[output+root], 7) == 0 || root ==
 		    strlen (Memc[output])) {
-		    call apoutname (Memc[image], "", "ply", Memc[outfname],
-		        SZ_FNAME)
+		    call apoutname (Memc[image], Memc[outfname], "ply",
+		        Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    lolist = limlist
 		} else if (stat != EOF) {
 		    call strcpy (Memc[output], Memc[outfname], SZ_FNAME)
 		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-		}
+		} else
+		    call apstats (py, OUTNAME, Memc[outfname], SZ_FNAME)
 	    }
 	    call apsets (py, OUTNAME, Memc[outfname])
 
@@ -250,14 +248,13 @@ begin
 	    # Close the output file.
 	    if (out != NULL && lolist != 1) {
 		call close (out)
-		if (sid <= 1)
+		if (sid <= 1) {
+		    call apstats (py, OUTNAME, Memc[outfname], SZ_FNAME)
 		    call delete (Memc[outfname])
+		}
 		sid = 1
 	    }
 	}
-
-	# Close up the files.
-	call ap_yfree (py)
 
 	# Close plot files.
 	if (id == gd && id != NULL)
@@ -278,14 +275,20 @@ begin
 	# Close the singled output file.
         if (out != NULL && lolist == 1) {
 	    call close (out)
-	    if (sid <= 1)
+	    if (sid <= 1) {
+		call apstats (py, OUTNAME, Memc[outfname], SZ_FNAME)
 		call delete (Memc[outfname])
+	    }
 	}
+
+	# Close up the files.
+	call ap_yfree (py)
 
 	# Close image, coord and shift lists.
 	call imtclose (imlist)
 	call clpcls (plist)
 	call clpcls (clist)
 	call clpcls (olist)
+
 	call sfree (sp)
 end

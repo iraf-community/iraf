@@ -32,7 +32,7 @@ begin
 		fft[j+1] = 0.0			# complex
 		j = j + 2
 	    }
-	    j = 1
+	    j = cutoff * 2 + 1
 	    do i = cutoff, N {
 		fft[j] = 0.0			# real
 		fft[j+1] = 0.0			# complex
@@ -67,7 +67,8 @@ begin
 	             fft[j] = 0.0
 	             fft[j+1] = 0.0
 		} else {
-		     fraction = rv_welch (i-cuton+1, npts)
+		     #fraction = rv_welch (i-cuton+1, npts)
+		     fraction = rv_welch (i-cuton, npts)
 		     fft[j] = fft[j] * fraction
 		     fft[j+1] = fft[j+1] * fraction
 		}
@@ -82,7 +83,8 @@ begin
 	             fft[j] = 0.0
 	             fft[j+1] = 0.0
 		} else {
-		     fraction = rv_hanning (i-cuton+1, npts)
+		     #fraction = rv_hanning (i-cuton+1, npts)
+		     fraction = rv_hanning (i-cuton, npts)
 		     fft[j] = fft[j] * fraction
 		     fft[j+1] = fft[j+1] * fraction
 		}
@@ -196,7 +198,7 @@ real	hval
 
 begin
 	hval = 0.5 * (1.0 - cos (double(TWOPI*j) / double (N-1)) )
-	if(hval < 0.0)
+	if (hval < 0.0)
 	    hval = 0.0
 	return (hval)
 end
@@ -213,7 +215,7 @@ real	wval
 
 begin
 	wval = 1.0 - ( (j - (0.5*(N-1))) / (0.5*(N+1)) )**2
-	if(wval < 0.0)
+	if (wval < 0.0)
 	    wval = 0.0
 	return (wval)
 end

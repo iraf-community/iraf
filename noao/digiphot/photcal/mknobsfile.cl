@@ -12,7 +12,8 @@ string	idfilters    {prompt="The list of filter ids"}
 file	imsets       {prompt="The input image set file"}
 file	observations {prompt="The output observations file"}
 file	obsparams    {"", prompt="The input observing parameters file"}
-string	obscolumns   {"2,3,4", prompt="The format of obsparams"}
+string	obscolumns   {"2 3 4 5", prompt="The format of obsparams"}
+real	minmagerr    {0.001, min=0.0, prompt="The minimum error magnitude"}
 file	shifts	     {"", prompt="The input x and y coordinate shifts file"}
 file	apercors     {"", prompt="The input aperture corrections file"}
 int	aperture     {1,
@@ -78,7 +79,7 @@ begin
 	# Add the image, ifilter, itime and xairmass columns to any
 	# files in ST tables format. Non-ST format files are skipped.
 
-	tbkeycol (tfiles, "IMAGE,IFILTER,ITIME,XAIRMASS")
+	tbkeycol (tfiles, "IMAGE,IFILTER,ITIME,XAIRMASS,OTIME")
 
 	# Construct the string describing the fields to be extracted 
 	# making sure to specify the correct aperture number. Extract
@@ -87,13 +88,14 @@ begin
 	tinfields = ",IMAGE,XCENTER,YCENTER," //
 	    "MAG[" // aperture // "]" // ",MERR[" // aperture // "]," //
 	    "MAG\[" // aperture // "]" // ",MERR\[" // aperture // "]," //
-	    "IFILTER,XAIRMASS,ITIME"
-	pdump (tfiles, tinfields, headers=no, parameters=yes, > tdatafile)
+	    "IFILTER,XAIRMASS,OTIME,ITIME"
+	pdump (tfiles, tinfields, "yes", headers=no, parameters=yes,
+	    > tdatafile)
 
 	# Create the observations file.
 
-	obsfile (tdatafile, "1,2,3,6,8,7,4,5", tidfilters, timsets,
-	    tobsfile, obsparams=obsparams, normtime=no,
+	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5", tidfilters, timsets,
+	    tobsfile, obsparams=obsparams, minmagerr=minmagerr, normtime=no,
 	    tolerance=tolerance, allfilters=allfilters,
 	    obscolumns="1," // tobscolumns, shifts=shifts, apercors=apercors,
 	    verify=verify, verbose=verbose)

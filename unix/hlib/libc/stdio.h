@@ -33,14 +33,14 @@
  * the array Memc, an array of XCHAR.
  */
 struct _iobuf {
-	long	_boffset, _F1;		/* XCHAR file offset of buffer	*/
-	int	_bufptr,  _F2;		/* buffer pointer		*/
-	int	_buftop,  _F3;		/* pointer to top of buffer + 1	*/
-	int	_iop,     _F4;		/* pointer to next XCHAR	*/
-	int	_itop,    _F5;		/* call filbuf when _iop >=	*/
-	int	_otop,    _F6;		/* call flsbuf when _iop >=	*/
-	int	_fiodes,  _F7;		/* FIO file descriptor		*/
-	int	_fflags;		/* bit flags			*/
+	XLONG	_boffset, _F1;		/* XCHAR file offset of buffer	*/
+	XINT	_bufptr,  _F2;		/* buffer pointer		*/
+	XINT	_buftop,  _F3;		/* pointer to top of buffer + 1	*/
+	XINT	_iop,     _F4;		/* pointer to next XCHAR	*/
+	XINT	_itop,    _F5;		/* call filbuf when _iop >=	*/
+	XINT	_otop,    _F6;		/* call flsbuf when _iop >=	*/
+	XINT	_fiodes,  _F7;		/* FIO file descriptor		*/
+	XINT	_fflags;		/* bit flags			*/
 };
 
 extern	int FIOCOM[];			/* the FIO common		*/
@@ -89,5 +89,6 @@ c_flsbuf((unsigned)(ch),(fp)) : ((int)(Memc[(fp)->_iop++] = (unsigned)(ch))))
 FILE	*fopen();
 FILE	*fdopen();
 char	*fgets();
+char	*gets();
 
 #define	D_stdio

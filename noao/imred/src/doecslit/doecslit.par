@@ -6,7 +6,7 @@ standards,s,h,"",,,"List of standard star spectra
 "
 readnoise,s,h,"0.",,,"Read out noise sigma (photons)"
 gain,s,h,"1.",,,"Photon gain (photons/data number)"
-dispaxis,i,h,")_.dispaxis",,,"Dispersion axis (1=along lines, 2=along columns)"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
 norders,i,h,10,,,"Number of orders"
 width,r,h,5.,,,"Width of profiles (pixels)
 "

@@ -15,6 +15,7 @@ int	status
 
 pointer	sp
 pointer	hdr_fname, pix_fname
+int	access()
 
 begin
 	call smark (sp)
@@ -28,8 +29,10 @@ begin
 	# If the header cannot be deleted, leave the pixfile alone.
 	iferr (call delete (Memc[hdr_fname]))
 	    call erract (EA_WARN)
-	else iferr (call delete (Memc[pix_fname]))
-	    call erract (EA_WARN)
+	else if (access (Memc[pix_fname],0,0) == YES) {
+	    iferr (call delete (Memc[pix_fname]))
+		call erract (EA_WARN)
+	}
 
 	call sfree (sp)
 	status = OK

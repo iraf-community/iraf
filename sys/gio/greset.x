@@ -9,18 +9,25 @@ include	<gio.h>
 
 procedure greset (gp, flags)
 
-pointer gp			# graphics descriptor
-int	flags			# flags indicating what to reset
+pointer gp			#I graphics descriptor
+int	flags			#I flags indicating what to reset
 
-int	i
-bool	reset_wcs, reset_gio, reset_glabax
+int	color, ch, i
 real	char_height, aspect
-pointer	w, ap, ax
+bool	reset_wcs, reset_gio, reset_glabax
+pointer	sp, glbcolor, param, w, ap, ax, ax1, ax2, ip, op
+
+bool	streq()
 real	ggetr()
-int	and()
+int	envfind(), ctoi(), strncmp()
+define	next_ 91
 errchk	ggetr
 
 begin
+	call smark (sp)
+	call salloc (glbcolor, SZ_LINE, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+
 	# Initialize for a new frame; this is always done.
 	call gfrinit (gp)
 
@@ -82,8 +89,11 @@ begin
 	    # Set general GLABAX parameters.
 	    GP_DRAWTITLE(gp) = YES
 	    GP_TITLESIZE(gp) = 1.0
+	    GP_TITLECOLOR(gp) = 1
 	    GP_TITLEJUST(gp) = GT_CENTER
 	    GP_NTITLELINES(gp) = 0
+	    GP_FRAMECOLOR(gp) = 0
+	    GP_FRAMEDRAWN(gp) = 0
 
 	    # Set GLABAX parameters for the X and Y axes.
 	    do i = 1, 2 {
@@ -97,9 +107,11 @@ begin
 		GL_AXISPOS1(ax) = 0.0
 		GL_AXISPOS2(ax) = 0.0
 		GL_DRAWGRID(ax) = NO
+		GL_GRIDCOLOR(ax) = 1
 		GL_ROUND(ax) = NO
 		GL_LABELAXIS(ax) = YES
 		GL_AXISLABELSIZE(ax) = 1.0
+		GL_AXISLABELCOLOR(ax) = 1
 		GL_DRAWTICKS(ax) = YES
 		GL_LABELTICKS(ax) = YES
 		GL_NMAJOR(ax) = 6
@@ -109,7 +121,10 @@ begin
 		GL_MAJORWIDTH(ax) = 2.0
 		GL_MINORWIDTH(ax) = 2.0
 		GL_AXISWIDTH(ax) = 2.0
+		GL_AXISCOLOR(ax) = 1
 		GL_TICKLABELSIZE(ax) = 1.0
+		GL_TICKLABELCOLOR(ax) = 1
+		GL_TICKCOLOR(ax) = 1
 		GL_TICKFORMAT(ax) = EOS
 	    }
 
@@ -117,6 +132,85 @@ begin
 	    ax = GP_XAP(gp)
 	    GL_MAJORLENGTH(ax) = GL_MAJORLENGTH(ax) / aspect
 	    GL_MINORLENGTH(ax) = GL_MINORLENGTH(ax) / aspect
+
+	    # Set user color defaults if specified.  This is a simple string
+	    # parameter of the form "pt=i,fr=i,ax=i,..." where I is the color
+	    # index.  The actual color corresponding to this index is defined
+	    # externally, e.g. by the graphics server.
+
+	    if (envfind ("glbcolor", Memc[glbcolor], SZ_LINE) > 0) {
+		ax1 = GP_XAP(gp)
+		ax2 = GP_YAP(gp)
+
+		for (ip=glbcolor;  Memc[ip] != EOS;  ) {
+		    # Get color parameter code.
+		    for (op=param;  Memc[ip] != EOS &&
+			Memc[ip] != '=' && Memc[ip] != ':';  ip=ip+1) {
+			Memc[op] = Memc[ip]
+			op = op + 1
+		    }
+		    Memc[op] = EOS
+		    ch = Memc[param+2]
+
+		    # Get color index.
+		    if (Memc[ip] == '=' || Memc[ip] == ':')
+			ip = ip + 1
+		    if (ctoi (Memc, ip, color) <= 0)
+			goto next_
+
+		    # Set parameter.  The two character parameter name may
+		    # have an "x" or "y" appended to set only one axis.  For
+		    # example, "pt=4,fr=3,ax=1,tk=1,al=5,tl=6".  The color
+		    # parameter code names are as follows:
+		    #
+		    #   pt	plot title
+		    #   fr	viewport frame
+		    #   gr[xy]	grid between tick marks
+		    #	ax[xy]	axis
+		    #	al[xy]	axis label
+		    #	tk[xy]	tick
+		    #	tl[xy]	tick label
+		    #
+		    # The color codes are simple integers corresponding to
+		    # graphics device color codes, e.g. 0, 1, 2, and so on.
+
+		    if (streq (Memc[param], "pt")) {
+			GP_TITLECOLOR(gp) = color
+		    } else if (streq (Memc[param], "fr")) {
+			GP_FRAMECOLOR(gp) = color
+		    } else if (strncmp (Memc[param], "gr", 2) == 0) {
+			if (ch == EOS || ch == 'x')
+			    GL_GRIDCOLOR(ax1) = color
+			if (ch == EOS || ch == 'y')
+			    GL_GRIDCOLOR(ax2) = color
+		    } else if (strncmp (Memc[param], "ax", 2) == 0) {
+			if (ch == EOS || ch == 'x')
+			    GL_AXISCOLOR(ax1) = color
+			if (ch == EOS || ch == 'y')
+			    GL_AXISCOLOR(ax2) = color
+		    } else if (strncmp (Memc[param], "al", 2) == 0) {
+			if (ch == EOS || ch == 'x')
+			    GL_AXISLABELCOLOR(ax1) = color
+			if (ch == EOS || ch == 'y')
+			    GL_AXISLABELCOLOR(ax2) = color
+		    } else if (strncmp (Memc[param], "tk", 2) == 0) {
+			if (ch == EOS || ch == 'x')
+			    GL_TICKCOLOR(ax1) = color
+			if (ch == EOS || ch == 'y')
+			    GL_TICKCOLOR(ax2) = color
+		    } else if (strncmp (Memc[param], "tl", 2) == 0) {
+			if (ch == EOS || ch == 'x')
+			    GL_TICKLABELCOLOR(ax1) = color
+			if (ch == EOS || ch == 'y')
+			    GL_TICKLABELCOLOR(ax2) = color
+		    }
+next_
+		while (Memc[ip] != EOS && Memc[ip] != ',')
+		    ip = ip + 1
+		if (Memc[ip] == ',')
+		    ip = ip + 1
+		}
+	    }
 	}
 
 	# Reset the WCS?
@@ -136,7 +230,9 @@ begin
 		WCS_SY2(w) = 1.0
 		WCS_XTRAN(w) = LINEAR
 		WCS_YTRAN(w) = LINEAR
-		WCS_CLIP(w) = YES
+		WCS_FLAGS(w) = WF_NEWFORMAT+WF_CLIP
 	    }
 	}
+
+	call sfree (sp)
 end

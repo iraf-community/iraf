@@ -82,7 +82,6 @@ respectively rather than "fits0001", "fits0002" and "fits0003".
 .le
 .ih
 DESCRIPTION
-
 FITS data is read from the specified source; either disk or
 magnetic tape.  The FITS header may optionally be printed on the standard
 output as either a full listing or a short description.
@@ -100,15 +99,14 @@ length by setting the environment variable min_lenuserarea (see example
 below).
 .ih
 EXAMPLES
-
-Convert a set of FITS files on tape to a set of IRAF image files, allowing
+1. Convert a set of FITS files on tape to a set of IRAF image files, allowing
 rfits to select the output datatype. Blanks are set to zero.
 
 .nf
 	cl> rfits mtb1600 1-999 images
 .fi
 
-Convert a list of FITS files on disk to a set of IRAF images. In the first
+2. Convert a list of FITS files on disk to a set of IRAF images. In the first
 case the files specified by fits* are written to the images images0001,
 images0002, etc. In the second case the fits disk files listed one per
 line in the text file fitslist are written to the output images listed
@@ -120,27 +118,27 @@ one per line in the file imlist.
 	cl. rfits @fitslist * @imlist
 .fi
 
-List the contents of a FITS tape on the standard output without creating
+3. List the contents of a FITS tape on the standard output without creating
 any image files.
 
 .nf
 	cl> rfits mtb1600 1-999 images ma-
 .fi
 
-Convert FITS files directly to IRAF images without scaling.
+4. Convert FITS files directly to IRAF images without scaling.
 
 .nf
 	cl> rfits mtb1600 1-999 images scal-
 .fi
 
-Convert the first three FITS files on tape to IRAF files setting blanks
+5. Convert the first three FITS files on tape to IRAF files setting blanks
 to -1.
 
 .nf
 	cl> rfits mta 1-3 images blan=-1
 .fi
 
-Read in a FITS file with a header roughly twice the usual IRAF length
+6. Read in a FITS file with a header roughly twice the usual IRAF length
 of 8000 characters.
 
 .nf
@@ -148,7 +146,7 @@ of 8000 characters.
 	cl> rfits mta 1 images
 .fi
 
-Read a FITS tape with 5 normal fits records (2880 bytes) to a tape record.
+7. Read a FITS tape with 5 normal fits records (2880 bytes) to a tape record.
 Notice that no extra parameters are needed.
 
 .nf
@@ -157,9 +155,9 @@ Notice that no extra parameters are needed.
 
 .ih
 BUGS
-
-At present RFITS cannot read images with excessively long lines due to
-memory allocation restrictions in image i/o.
-Blank pixels are counted, set to a user determined vlaue  but not flagged
+Blank pixels are counted and set to a user determined value,  but not flagged
 in the image header.
+.ih
+SEE ALSO
+wfits, reblock, t2d
 .endhelp

@@ -17,8 +17,7 @@ real	xcenter, ycenter, rmin, rmax, imin, imax, xc, yc, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
 
 int	apsffit(), clgcur(), ap_showplot()
-real	ap_cfwhmpsf(), ap_cthresh(), ap_cpapert()
-real	ap_cdatamin(), ap_cdatamax()
+real	ap_cfwhmpsf(), ap_cpapert(), ap_cdatamin(), ap_cdatamax()
 
 begin
 	if (gd == NULL)
@@ -43,7 +42,8 @@ begin
 	
 	call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd], SZ_LINE) !=
+	    EOF) {
 
 	switch (key) {
 
@@ -53,8 +53,6 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 	    case 'f':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	    case 't':
-	        rval = ap_cthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'l':
 	        rval = ap_cdatamin (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'u':
@@ -64,7 +62,6 @@ begin
 	    case 'v':
 		rval = ap_cpapert (ap, gd, out, stid, rmin, rmax, imin, imax)
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	        rval = ap_cthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    default:
 		call printf ("Unknown or ambiguous keystroke command\007\n")
 	    }

@@ -1,3 +1,6 @@
+include	<ctype.h>
+
+
 # CCDSUBSET -- Return the CCD subset identifier.
 #
 # 1. Get the subset string and search the subset record file for the ID string.
@@ -83,10 +86,8 @@ begin
 
 	call strcpy (Memc[subset1], subset, sz_name)
 	for (i=1; subset[i]!=EOS; i=i+1)
-	    switch (subset[i]) {
-	    case '-','+','?','*','[',']',' ','\t':
+	    if (!(IS_ALNUM(subset[i])||subset[i]=='.'))
 		subset[i] = '_'
-	    }
 
 	call sfree (sp)
 end

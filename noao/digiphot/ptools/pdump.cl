@@ -1,10 +1,11 @@
 # PDUMP - Select fields from an ST table or an APPHOT/DAOPHOT text file
 # and dump to a text file.
 
-procedure pdump (infiles, fields)
+procedure pdump (infiles, fields, expr)
 
 string	infiles		{prompt="Input apphot/daophot databases(s)"}
 string	fields		{prompt="Fields to be extracted"}
+string	expr		{"yes", prompt="Boolean expression"}
 bool	headers		{no, prompt="Print field headers?"}
 bool	parameters	{yes, prompt="Print parameters?"}
 
@@ -12,8 +13,8 @@ struct	*inlist
 
 begin
 	# Local variable declarations.
-	file	tmpin
-	int	nin
+	file	tmpin, texpr
+	int	nin, tpagwidth
 	string	in, col, inname, hfile, pfile
 
 	# Cache the istable parameters.
@@ -22,6 +23,7 @@ begin
 	# Get the positional parameters.
 	in = infiles
 	col = fields
+	texpr = expr
 
 	# Make temporary names.
 	tmpin = mktemp ("tmp$")
@@ -57,13 +59,22 @@ begin
 	while (fscan (inlist, inname) != EOF) {
 	    istable (inname)
 	    if (istable.table) {
-		tbdump (inname, col, cdfile=hfile, pfile=pfile,
-		    datafile="STDOUT", rows="-", pagwidth=158)
+
+	        # Adjust pagination for TDUMP.
+	        tpagwidth = tdump.pwidth.p_max
+	        tdump.pwidth.p_max = 5000
+
+		tbdump (inname, col, texpr, cdfile=hfile, pfile=pfile,
+		    datafile="STDOUT", rows="-", pagwidth=tpagwidth)
+
+	        # Reset pagination for TDUMP.
+		tdump.pwidth.p_max = tpagwidth
+
 	    } else if (istable.text) {
-		txdump (inname, col, yes, headers=headers,
+		txdump (inname, col, texpr, headers=headers,
 		    parameters=parameters)
 	    } else {
-		print ("ERROR: Cannot run DUMP on file: " // inname)
+		print ("ERROR: Cannot run PDUMP on file: " // inname)
 	    }
 	}
 

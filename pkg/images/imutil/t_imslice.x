@@ -114,13 +114,13 @@ begin
 	}
 
 	# Cannot slice an image which is degnerate in slice dimension.
-	if (IM_LEN(im1,sdim) == 1) {
-	    call printf ("Image %s is degenerate in the %d dimenson.\n")
-		call pargstr (image1)
-		call pargi (sdim)
-	    call imunmap (im1)
-	    return
-	}
+	#if (IM_LEN(im1,sdim) == 1) {
+	    #call printf ("Image %s is degenerate in the %d dimension.\n")
+		#call pargstr (image1)
+		#call pargi (sdim)
+	    #call imunmap (im1)
+	    #return
+	#}
 
 	call smark (sp)
 	call salloc (inname, SZ_LINE, TY_CHAR)

@@ -16,12 +16,13 @@ int	gpb			#I stream to receive GPB cards, or NULL
 int	user			#I stream to receive user cards, or NULL
 
 bool	keyword
-int	p_ch[MAX_PCOUNT]
-pointer	p_len[MAX_PCOUNT]
-pointer	p_namep[MAX_PCOUNT]
+int	p_ch[MAX_PCOUNT+NKW]
+pointer	p_len[MAX_PCOUNT+NKW]
+pointer	p_namep[MAX_PCOUNT+NKW]
 int	delim, ch, npars, ngpbpars, i
 pointer	sp, lbuf, sbuf, pp, op, kw[NKW]
 int	strncmp(), getline(), strlen(), gstrcpy()
+errchk	getline, putline
 
 begin
 	call smark (sp)
@@ -49,7 +50,7 @@ begin
 	}
 
 	# Add the GPB parameters to the list of group related parameters.
-	ngpbpars = STF_PCOUNT(stf)
+	ngpbpars = min (MAX_PCOUNT, STF_PCOUNT(stf))
 	do i = 1, ngpbpars {
 	    npars = npars + 1
 	    pp = STF_PDES(stf,i)

@@ -15,12 +15,13 @@ file	arctable = ""		{prompt="Arc assignment table (optional)\n"}
 
 string	readnoise = "RDNOISE"	{prompt="Read out noise sigma (photons)"}
 string	gain = "GAIN"		{prompt="Photon gain (photons/data number)"}
-int	dispaxis = ")_.dispaxis" {prompt="Dispersion axis (1=along lines, 2=along columns)"}
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 int	fibers = 3		{prompt="Number of fibers"}
 real	width = 6.		{prompt="Width of profiles (pixels)"}
 string	objaps = "2"		{prompt="Object apertures"}
 string	arcaps = "1,3"		{prompt="Arc apertures\n"}
 
+bool	scattered = no		{prompt="Subtract scattered light?"}
 bool	fitflat = yes		{prompt="Fit and ratio flat field spectrum?"}
 bool	recenter = yes		{prompt="Recenter object apertures?"}
 bool	edit = no		{prompt="Edit/review object apertures?"}
@@ -37,18 +38,18 @@ pset	params = ""		{prompt="Algorithm parameters"}
 begin
 	apscript.readnoise = readnoise
 	apscript.gain = gain
-	apscript.dispaxis = dispaxis
 	apscript.nfind = fibers
 	apscript.width = width
 	apscript.t_width = width
 	apscript.radius = width
 	apscript.clean = clean
 	apscript.order = "increasing"
+	proc.datamax = datamax
 
 	proc (objects, apref, flat, "", arcs, "", "",
 	    arctable, fibers, "", objaps, "", arcaps, "",
-	    "", "", fitflat, recenter, edit, no, no, clean, dispcor, no,
-	    no, no, no, splot, redo, update, batch, listonly)
+	    "", "", scattered, fitflat, recenter, edit, no, no, clean,
+	    dispcor, no, no, no, no, splot, redo, update, batch, listonly)
 
 	if (proc.dobatch) {
 	    print ("-- Do remaining spectra as a batch job --")

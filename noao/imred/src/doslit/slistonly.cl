@@ -20,6 +20,7 @@ struct	*fd1
 struct	*fd2
 
 begin
+	string	imtype, mstype
 	string	spec, arcref1
 	string	specms, arcref1ms
 	string	temp, done, str1, str2
@@ -27,6 +28,8 @@ begin
 	bool	newdisp, newsens, extract, disp, ext, flux
 	int	i, dc, sf
 
+	imtype = "." // envget ("imtype")
+	mstype = ".ms" // imtype
 	temp = mktemp ("tmp$iraf")
 	done = mktemp ("tmp$iraf")
 
@@ -41,7 +44,7 @@ begin
 	    if (fscan (fd1, arcref1) == EOF)
 		error (1, "No reference arcs")
 	    fd1 = ""
-	    arcref1ms = arcref1 // ".ms.imh"
+	    arcref1ms = arcref1 // mstype
 
 	    if (redo || !access (arcref1ms)) {
 	        print ("Extract arc reference image ", arcref1)
@@ -68,7 +71,7 @@ begin
 	        reextract = redo || (update && newdisp)
 	        fd1 = standards
 	        while (fscan (fd1, spec) != EOF) {
-		    specms = spec // ".ms.imh"
+		    specms = spec // mstype
 	            if (reextract || !access (specms)) {
 		        print ("Extract standard star spectrum ", spec)
 	                print ("Dispersion correct ", spec)
@@ -94,7 +97,7 @@ begin
 	        }
 	        fd1 = ""
 
-	        sections ("sens.????.imh", option="nolist")
+	        sections ("sens.????" // imtype, option="nolist")
 	        if (newsens || sections.nimages == 0) {
 		    if (!stdfile) {
 		        print ("No standard stars")
@@ -123,7 +126,7 @@ begin
 	        fd2 = ""
 	    }
 
-	    specms = spec // ".ms.imh"
+	    specms = spec // mstype
 
 	    extract = no
 	    disp = no

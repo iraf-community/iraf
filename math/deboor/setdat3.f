@@ -1,4 +1,4 @@
-      subroutine setdat(icount)
+      subroutine setdt3(icount)
 c  from  * a practical guide to splines *  by c. de boor
 c  to be called in main program  l 2 m a i n .
 c	calls titand

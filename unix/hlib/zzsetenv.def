@@ -13,23 +13,24 @@ set	clobber		= no
 set	cmbuflen	= 128000
 set	editor		= vi
 set	filewait	= yes
+set	glbcolor	= "pt=3,fr=9,al=3,tl=6,ax=5,tk=5"
 set	graphcap	= dev$graphcap
 set	imtype		= "imh"
 set	min_lenuserarea	= 20000
 set	multversions	= no
-set	printer		= versatec
-set	stdgraph	= gterm
+set	printer		= lp
+set	stdgraph	= xgterm
 set	stdimage	= imt512
 set	stdimcur	= stdimage
-set	stdplot		= lw5
+set	stdplot		= lp
 set	stdvdm		= uparm$vdm
 set	tapecap		= dev$tapecap
 set	termcap		= dev$termcap
-set	terminal	= gterm
+set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.10EXPORT"
+set	version		= "NOAO/IRAF V2.10.4EXPORT"
 
 # System directories.
 

@@ -38,6 +38,7 @@ begin
 	flatcor = clgetb ("flatcor")
 	call clputb ("flatcor", true)
 	call cal_open (NULL)
+	call ccd_open (0)
 	call clputb ("flatcor", flatcor)
 
 	# Process each image.
@@ -101,7 +102,7 @@ begin
 		    "%s: WARNING - Image should be flat fielded first\n")
 		    call pargstr (Memc[input])
 	    }
-	    call mkillumination (Memc[input], Memc[output], NO)
+	    call mkillumination (Memc[input], Memc[output], NO, YES)
 	    call mkskyflat (Memc[input], Memc[output])
 	    if (!streq (Memc[input], Memc[output]))
 		call ccdcopy (Memc[input], Memc[output])
@@ -112,6 +113,7 @@ begin
 	call imtclose (listin)
 	call imtclose (listout)
 	call cal_close ()
+	call ccd_close ()
 	call sfree (sp)
 end
 
@@ -125,9 +127,11 @@ char	input[SZ_FNAME]		# Input image
 char	output[SZ_FNAME]	# Output image
 
 int	i, nc, nl
+long	time
 real	scale
 pointer	sp, str, flat, tmp, in, im, out, out1, data
 
+int	hdmgeti()
 bool	clgetb(), ccdflag(), streq()
 real	hdmgetr()
 pointer	immap(), imgl2r(), impl2r()
@@ -156,9 +160,13 @@ begin
 	call salloc (tmp, SZ_FNAME, TY_CHAR)
 
 	# Get the flat field.
-	call cal_image (in, FLAT, Memc[flat], SZ_FNAME)
+	call cal_image (in, FLAT, 1, Memc[flat], SZ_FNAME)
 	im = immap (Memc[flat], READ_ONLY, 0)
 	iferr (scale = hdmgetr (im, "ccdmean"))
+	    scale = 1.
+	iferr (time = hdmgeti (im, "ccdmeant"))
+	    time = IM_MTIME(im)
+	if (time < IM_MTIME(im))
 	    scale = 1.
 
 	# Create the temporary output.

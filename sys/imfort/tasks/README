@@ -2,8 +2,7 @@ IMIO$IMFORT/ZZDEBUG -
 
     This directory contains a set of Fortran programs used to test the IMFORT
 software, and to provide real working examples illustrating the use of the
-IMFORT interface in host Fortran programs.  The technique used in the `mkpkg'
-file may also be of interest.
+IMFORT interface in host Fortran programs.
 
 	hello.f		prints `hello, world!'
 	imcopy.f	copy an image
@@ -18,5 +17,4 @@ file may also be of interest.
 	readim.f	test sequential read through an image
 
 To compile individual programs:		cl> fc prog.f
-To compile everything:			cl> mkpkg
 To define the tasks to the CL:		cl> cl < tasks.cl (edit tasks.cl first)

@@ -1,4 +1,4 @@
-.help doslit Feb92 noao.imred.specred
+.help doslit Feb93 noao.imred.specred
 .ih
 NAME
 doslit -- Slit spectra data reduction task
@@ -54,12 +54,17 @@ photon Poisson statistics and the data number statistics.  Image header
 keywords (case insensitive) may be specified to obtain the values from the
 image header.
 .le
-.ls dispaxis = ")_.dispaxis" (apextract)
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+.ls datamax = INDEF (apsum.saturation)
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the standard star or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .le
 .ls width = 5. (apedit)
 Approximate full width of the spectrum profiles.  This parameter is used
@@ -84,7 +89,8 @@ Resize the default aperture for each object based on the spectrum profile?
 .ls clean = no (apsum)
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
-implies variance weighted extraction.
+implies variance weighted extraction.  In addition the datamax parameters
+can be useful.
 .le
 .ls splot = no
 Plot the final spectra with the task \fBsplot\fR?  In quicklook mode
@@ -242,6 +248,10 @@ number of times the sigma of the residuals are rejected before refitting.
 
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
+.ls threshold = 10. (identify/reidentify)
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.le
 .ls coordlist = "linelists$idhenear.dat" (identify)
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
@@ -384,6 +394,13 @@ PACKAGE PARAMETERS
 
 The following package parameters are used by this task.  The default values
 may vary depending on the package.
+.ls dispaxis = 2
+Default dispersion axis.  The dispersion axis is 1 for dispersion
+running along image lines and 2 for dispersion running along image
+columns.  If the image header parameter DISPAXIS is defined it has
+precedence over this parameter.  The default value defers to the
+package parameter of the same name.
+.le
 .ls extinction (standard, sensfunc, calibrate)
 Extinction file for a site.  There are two extinction files in the
 NOAO standards library, onedstds$, for KPNO and CTIO.  These extinction
@@ -429,6 +446,12 @@ If specified metacode plots are recorded in this file for later review.
 Since plot information can become large this should be used only if
 really desired.
 .le
+.ih
+ENVIRONMENT PARAMETERS
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".
 .ih
 DESCRIPTION
 \fBDoslit\fR extracts, sky subtracts, wavelength calibrates, and flux
@@ -552,7 +575,11 @@ with a ".ms" extension added.
 \fBSpectra and Data Files\fR
 
 The basic input consists of two dimensional slit object, standard star, and
-arc calibration spectra stored as IRAF images.  The raw CCD images must be
+arc calibration spectra stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must be
 processed to remove overscan, bias, dark count, and flat field effects.
 This is generally done using the \fBccdred\fR package.  Lines of constant
 wavelength should be closely aligned with one of the image axes though a
@@ -783,7 +810,7 @@ query which may be answered either in lower or upper case.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBsparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-\fBdispaxis\fR parameter if not defined in the image header.  The default
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
 line or column for finding the object position on the slit and the number
 of image lines or columns to sum are set by the \fIline\fR and \fInsum\fR
 parameters.  A line of INDEF (the default) selects the middle of the image.
@@ -1126,6 +1153,17 @@ Flux calibrate demoobj1
 cl> doslit demoobj1 arcs=demoarc1,demoarc2 stand=demostd1 \
 >>> extcor=yes, fluxcal=yes resize=yes redo+
 .fi
+.ih
+REVISIONS
+.ls DOSLIT V2.10.3
+The usual output WCS format is "equispec".  The image format type to be
+processed is selected with the \fIimtype\fR environment parameter.  The
+dispersion axis parameter is now a package parameter.  Images will only
+be processed if the have the CCDPROC keyword.  A \fIdatamax\fR parameter
+has been added to help improve cosmic ray rejection.  The arc reference
+is no longer taken from the center of the image but using the first object
+aperture.  A bug which alphabetized the arc list was fixed.
+.le
 .ih
 SEE ALSO
 apbackground, apedit, apfind, approfiles, aprecenter, apresize, apsum, aptrace,

@@ -23,7 +23,7 @@ begin
 	call fprintf (fd, "image %s\n")
 	    call pargstr (Memc[ID_IMAGE(id)])
 	call fprintf (fd, "nsum %d\n")
-	    call pargi (ID_NSUM(id))
+	    call pargi (ID_NSUM(id,1))
 	switch (ID_FTYPE(id)) {
 	case EMISSION:
 	    call fprintf (fd, "ftype emission\n")

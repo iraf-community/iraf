@@ -6,7 +6,6 @@ z,b,h,no,,,"Is velocity a redshift?
 
 IF NEW SPECTRUM"
 title,s,h,"",,,"Title of spectrum"
-format,s,h,"onedspec","onedspec|multispec|echelle",,Spectrum format
 ncols,i,h,512,1,,"Number of columns"
 naps,i,h,1,1,,Number of lines (apertures)
 header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"

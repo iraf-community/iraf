@@ -4,7 +4,7 @@ include	"sensfunc.h"
 
 # SENSFUNC colon commands
 define	CMDS	"|stats|vstats|function|order|graphs|images|skys|marks\
-		 |fluxlimits|"
+		 |fluxlimits|colors|"
 define	STATS		1	# Show results
 define	VSTATS		2	# Show verbose results
 define	FUNCTION	3	# Sensitivity function type
@@ -14,6 +14,7 @@ define	IMAGES		6	# Select images
 define	SKYS		7	# Select skys
 define	MARKS		8	# Set graph mark types
 define	FLIMITS		9	# Flux graph limits
+define	COLORS		10	# Flux graph limits
 
 # SF_COLON -- Process SENSFUNC colon commands.
 # This procedure has so many arguments because of the STATS option.
@@ -181,6 +182,9 @@ begin
 		    call pargr (GP_FMIN(gp))
 		    call pargr (GP_FMAX(gp))
 	    }
+	case COLORS:
+	    call gargstr (Memc[str], SZ_LINE)
+	    call sf_colors (gp, Memc[str])
 	default:
 	    call printf ("Unrecognized or ambiguous command\007")
 	}

@@ -110,7 +110,7 @@ begin
 	ltv = CT_LTV(ct)
 
 	# We also need some full-system matrix and vector buffers.
-	pdim = min (WCS_NDIM(w1), WCS_NDIM(w1))
+	pdim = min (WCS_NDIM(w1), WCS_NDIM(w2))
 	pdim = min (MI_NDIM(mw), pdim)
 
 	i = pdim * pdim

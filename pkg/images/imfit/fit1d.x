@@ -126,12 +126,12 @@ bool	interactive			# Interactive?
 
 char	graphics[SZ_FNAME]		# Graphics device
 int	i, nx, new
+real	div
 pointer	cv, gp, sp, x, wts, indata, outdata
 
 int	f1d_getline(), f1d_getdata(), strlen()
-real	f1d_efncr()
+real	cveval()
 pointer	gopen()
-extern	f1d_efncr
 
 begin
 	# Error check.
@@ -186,32 +186,25 @@ begin
 		nx, new, YES, new, new)
 	    new = NO
 
+	    # Be careful because the indata and outdata buffers may be the same.
 	    switch (ntype) {
 	    case 1:
 	        call cvvector (cv, Memr[x], Memr[outdata], nx)
 	    case 2:
-		call cvvector (cv, Memr[x], Memr[outdata], nx)
-		call asubr (Memr[indata], Memr[outdata], Memr[outdata], nx)
+		do i = 0, nx-1
+		    Memr[outdata+i] = Memr[indata+i] - cveval (cv, Memr[x+i])
 	    case 3:
-		call cvvector (cv, Memr[x], Memr[outdata], nx)
-		call advzr (Memr[indata], Memr[outdata], Memr[outdata], nx,
-			f1d_efncr)
+		do i = 0, nx-1 {
+		    div = cveval (cv, Memr[x+i])
+		    if (abs (div) < 1E-20)
+			div = 1
+		    Memr[outdata+i] = Memr[indata+i] / div
+		}
 	    }
 	}
 
 	call cvfree (cv)
 	call sfree (sp)
-end
-
-
-# F1D_EFNCR -- Function called by advzr on zero division.
-
-real procedure f1d_efncr (x)
-
-real	x		# Numerator
-
-begin
-	return (1.)
 end
 
 
@@ -287,10 +280,12 @@ begin
 	} else
 	    call strcpy (output, Memc[osect], SZ_FNAME)
 
-	if (streq (input, Memc[isect]))
+	if (streq (input, Memc[osect])) {
+	    call imunmap (in)
+	    in = immap (input, READ_WRITE, 0)
 	    out = in
-	else
-	    out = immap (output, READ_WRITE, 0)
+	} else
+	    out = immap (Memc[osect], READ_WRITE, 0)
 
 	do i = 1, IM_NDIM(in)
 	    if (IM_LEN(in, i) != IM_LEN(out, i)) {

@@ -8,6 +8,7 @@ include "../../lib/ptkeysdef.h"
 include "pexamine.h"
 
 define	GHELPFILE	"ptools$pexamine/pexamine.key"
+define	FRACTION	0.05
 
 int procedure pt_plot (gd, px, apd, apkey, im, deleted, npix, max_npix,
 	first_star, match_radius, use_display)
@@ -76,10 +77,10 @@ replot_
 
 	switch (plottype) {
 	case PX_XYPLOT:
+	    call pt_xyinfo (px, apd, apkey, Memc[title], SZ_LINE,
+	        Memc[xlabel], Memc[ylabel], SZ_LINE)
 	    if (xyinvalid == NO) {
 		if (newplot == YES) {
-	    	    call pt_xyinfo (px, apd, apkey, Memc[title], SZ_LINE,
-	        	Memc[xlabel], Memc[ylabel], SZ_LINE)
 	            call pt_xyplot (gd, Memr[x], Memr[y], deleted, npix,
 		        Memc[title], Memc[xlabel], Memc[ylabel])
 		}
@@ -90,10 +91,10 @@ replot_
 	    }
 
 	case PX_HISTPLOT:
+	    call pt_hinfo (px, apd, apkey, Memc[title], SZ_LINE,
+		Memc[xlabel], Memc[ylabel], SZ_LINE)
 	    if (hinvalid == NO) {
 		if (newplot == YES) {
-	    	    call pt_hinfo (px, apd, apkey, Memc[title], SZ_LINE,
-		        Memc[xlabel], Memc[ylabel], SZ_LINE)
 	            call pt_hplot (gd, Memr[h], deleted, npix, Memc[title],
 		        Memc[xlabel], Memc[ylabel])
 		}
@@ -127,7 +128,7 @@ replot_
 	    call printf ("Invalid plot type\n")
 	}
 
-	if (firstplot == YES || newdata == YES) {
+	if ((firstplot == YES || newdata == YES) && (xyinvalid == NO)) {
 	    call printf ("nstars read: %d  first_star: %d  max_nstars: %d\n")
 	        call pargi (npix)
 	        call pargi (first_star)
@@ -147,8 +148,7 @@ replot_
 
 	    # Quit and do not make changes.
 	    case 'q':
-		call printf (
-		"Type 'q' to confirm quit without saving edits\n")
+		call printf ("Type 'q' to confirm quit without saving edits\n")
 		if (pt_gcur (curtype, wx, wy, key, Memc[cmd], SZ_LINE) == EOF)
 		    next
 		if (key != 'q')
@@ -200,16 +200,20 @@ replot_
 		    call printf ("The input image is undefined\n")
 		    next
 		} else if (cooinvalid == YES) {
-		    call printf ("The x and y coordinate data is undefined\n")
+		    call printf ("The x or y coordinate data is undefined\n")
 		    next
 		} else if (curtype == 'i') {
-		    starno = pt_fstarg (wx, wy, Memr[xpos], Memr[ypos], npix,
-		        match_radius)
+		    starno = pt_fstarg (gd, wx, wy, Memr[xpos], Memr[ypos],
+		        npix, match_radius)
+		} else if (xyinvalid == YES) {
+		    call printf ("The x or y column data is undefined\n")
+		    next
 		} else if (plottype != PX_XYPLOT) {
-		    call printf ("Points must be marked on the X-Y plot\n")
+		    call printf ("Points must be marked on an X-Y plot\n")
 		    next
 		} else {
-		    starno = pt_fstarg (wx, wy, Memr[x], Memr[y], npix, INDEFR)
+		    starno = pt_fstarg (gd, wx, wy, Memr[x], Memr[y], npix,
+		        INDEFR)
 		}
 
 		if (starno > 0)
@@ -225,18 +229,22 @@ replot_
 		    next
 		}
 		if (cooinvalid == YES) {
-		    call printf ("The x and y coordinate data is undefined\n")
+		    call printf ("The x or y coordinate data is undefined\n")
 		    next
 		}
 
 		if (curtype == 'i') {
-		    starno = pt_fstarg (wx, wy, Memr[xpos], Memr[ypos], npix,
-		        match_radius)
+		    starno = pt_fstarg (gd, wx, wy, Memr[xpos], Memr[ypos],
+		        npix, match_radius)
+		} else if (xyinvalid == YES) {
+		    call printf ("The x or y column data is undefined\n")
+		    next
 		} else if (plottype != PX_XYPLOT) {
 		    call printf ("Points must be marked on the X-Y plot\n")
 		    next
 		} else {
-		    starno = pt_fstarg (wx, wy, Memr[x], Memr[y], npix, INDEFR)
+		    starno = pt_fstarg (gd, wx, wy, Memr[x], Memr[y], npix,
+		        INDEFR)
 		}
 
 		if (starno > 0) {
@@ -280,9 +288,11 @@ replot_
 	    # for the object nearest the cursor.
 	    case 'o':
 		if (curtype == 'g') {
-		    if (plottype != PX_XYPLOT)
-			call printf ("Points must be marked on an X-Y plot\n")
-		    else if (xyinvalid == NO) {
+		    if (xyinvalid == YES)
+			call printf ("The x or y column data is undefined\n")
+		    else if (plottype != PX_XYPLOT)
+			call printf ("Points must be marked on an x-y plot\n")
+		    else  {
 		        starno = pt_gldata (gd, px, apd, apkey, wx, wy,
 			    Memr[x], Memr[y], npix, INDEFR)
 			if (starno > 0)
@@ -294,15 +304,16 @@ replot_
 		    if (cooinvalid == NO) {
 		        starno = pt_gldata (gd, px, apd, apkey, wx, wy,
 			    Memr[xpos], Memr[ypos], npix, match_radius)
-			if ((gd != NULL) && (starno > 0) && (plottype ==
-			    PX_XYPLOT)) {
+			if ((gd != NULL) && (starno > 0) && (xyinvalid == NO) &&
+			    (plottype == PX_XYPLOT)) {
 			    call gscur (gd, Memr[x+starno-1], Memr[y+starno-1])
 			    call printf ("Star found\n")
 			    curtype = 'g'
 			} else
 			    call printf ("Star not found\n")
 		    } else
-			call printf ("The X-Y coordinate data is undefined\n")
+			call printf (
+			    "The x or y coordinate data is undefined\n")
 		}
 
 	    # Undelete everything.
@@ -320,37 +331,49 @@ replot_
 	    # Mark a point for deletion.
 	    case 'd':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT)
+		    if ((xyinvalid == YES) || (plottype != PX_XYPLOT))
+			call printf (
+			    "Invalid plot type for deleting points\n")
+		    else
 		        call pt_delpt (gd, wx, wy, Memr[x], Memr[y], Memr[x],
 			    Memr[y], deleted, npix, NO, INDEFR)
-		    else
-		        call printf (
-		    "Points to be deleted must be marked on the X-Y plot\n")
 		} else if (curtype == 'i') {
-		    if (cooinvalid == NO)
-		        call pt_delpt (gd, wx, wy, Memr[xpos], Memr[ypos],
-			    Memr[x], Memr[y], deleted, npix, NO, match_radius)
-		    else
+		    if (cooinvalid == NO) {
+		        if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
+		            call pt_delpt (gd, wx, wy, Memr[xpos], Memr[ypos],
+			        Memr[x], Memr[y], deleted, npix, NO,
+				match_radius)
+			else
+		            call pt_delpt (NULL, wx, wy, Memr[xpos], Memr[ypos],
+			        Memr[x], Memr[y], deleted, npix, NO,
+				match_radius)
+		    } else
 		        call printf (
-			"The x and y coordinate data is undefined\n")
+			"The x or y coordinate data is undefined\n")
 		}
 
 	    # Undelete a point marked for deletion.
 	    case 'u':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT)
+		    if ((xyinvalid == YES) || (plottype != PX_XYPLOT))
+			call printf (
+			    "Invalid plot type for undeleting points\n")
+		    else
 		        call pt_delpt (gd, wx, wy, Memr[x], Memr[y], Memr[x],
 			    Memr[y], deleted, npix, YES, INDEFR)
-		    else
-		        call printf (
-		    "Points to be undeleted must be marked on the X-Y plot\n")
 		} else if (curtype == 'i') {
-		    if (cooinvalid == NO)
-		        call pt_delpt (gd, wx, wy, Memr[xpos], Memr[ypos],
-			    Memr[x], Memr[y], deleted, npix, YES, match_radius)
-		    else
+		    if (cooinvalid == NO) {
+		        if (xyinvalid == NO && plottype == PX_XYPLOT)
+		            call pt_delpt (gd, wx, wy, Memr[xpos], Memr[ypos],
+			         Memr[x], Memr[y], deleted, npix, YES,
+				 match_radius)
+			else
+		            call pt_delpt (NULL, wx, wy, Memr[xpos], Memr[ypos],
+			         Memr[x], Memr[y], deleted, npix, YES,
+				 match_radius)
+		    } else
 		        call printf (
-			"The x and y coordinate data is undefined\n")
+			    "The x and y coordinate data is undefined\n")
 		}
 
 	    # Toggle the delete/undelete function
@@ -366,10 +389,10 @@ replot_
 	    # Mark for deletion points with X < X (cursor).
 	    case '(':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT) {
+		    if ((xyinvalid == NO) && (plottype == PX_XYPLOT)) {
 		        call pt_dxltg (gd, wx, Memr[x], Memr[x], Memr[y],
-			deleted, npix, undelete)
-		    } else if (plottype == PX_HISTPLOT) {
+			    deleted, npix, undelete)
+		    } else if ((hinvalid == NO) && plottype == PX_HISTPLOT) {
 		        call pt_dxltg (NULL, wx, Memr[h], Memr[h], Memr[h],
 			    deleted, npix, undelete)
 			newplot = YES
@@ -379,8 +402,8 @@ replot_
 		} else if (curtype == 'i') {
 		    if (cooinvalid == YES) {
 		        call printf (
-			"The x and y coordinate data is undefined\n")
-		    } else if (plottype == PX_XYPLOT) {
+			    "The x or y coordinate data is undefined\n")
+		    } else if ((xyinvalid == NO) && (plottype == PX_XYPLOT)) {
 		        call pt_dxltg (gd, wx, Memr[xpos], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    } else {
@@ -390,7 +413,7 @@ replot_
 			    newplot = YES
 			else
 			    call printf (
-			"Replot the X-Y or histogram to show (un)deletions\n")
+			    "Replot x-y or histogram to show (un)deletions\n")
 		    }
 		}
 		if (newplot == YES)
@@ -399,10 +422,10 @@ replot_
 	    # Mark for deletion points with X > X (cursor).
 	    case ')':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT) {
+		    if ((xyinvalid == NO) && (plottype == PX_XYPLOT)) {
 		        call pt_dxgtg (gd, wx, Memr[x],  Memr[x], Memr[y],
 			    deleted, npix, undelete)
-		    } else if (plottype == PX_HISTPLOT) {
+		    } else if ((hinvalid == NO) && (plottype == PX_HISTPLOT)) {
 		        call pt_dxgtg (NULL, wx, Memr[h], Memr[h], Memr[h],
 			    deleted, npix, undelete)
 		        newplot = YES
@@ -413,7 +436,7 @@ replot_
 		    if (cooinvalid == YES) {
 		        call printf (
 			"The x and y coordinate data is undefined\n")
-		    } else if (plottype == PX_XYPLOT) {
+		    } else if ((xyinvalid == NO) && (plottype == PX_XYPLOT)) {
 		        call pt_dxgtg (gd, wx, Memr[xpos], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    } else {
@@ -423,7 +446,7 @@ replot_
 			    newplot = YES
 			else
 			    call printf (
-			"Replot the X-Y or histogram to show (un)deletions\n")
+			"Replot x-y or histogram to show (un)deletions\n")
 		    }
 		}
 		if (newplot == YES)
@@ -432,7 +455,7 @@ replot_
 	    # Mark for deletion points with Y  > Y (cursor).
 	    case '^':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT)
+		    if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
 		        call pt_dygtg (gd, wy, Memr[y], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    else
@@ -442,7 +465,7 @@ replot_
 		    if (cooinvalid == YES)
 		        call printf (
 			"The x and y coordinate data is undefined\n")
-		    else if (plottype == PX_XYPLOT)
+		    else if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
 		        call pt_dygtg (gd, wy, Memr[ypos], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    else {
@@ -452,7 +475,7 @@ replot_
 			    newplot = YES
 			else
 			    call printf (
-			"Replot the X-Y or histogram to show (un)deletions\n")
+			    "Replot x-y or histogram to show (un)deletions\n")
 		    }
 		}
 		if (newplot == YES)
@@ -461,7 +484,7 @@ replot_
 	    # Mark for deletion points with Y < Y (cursor).
 	    case 'v':
 		if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT)
+		    if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
 		        call pt_dyltg (gd, wy, Memr[y], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    else
@@ -470,8 +493,8 @@ replot_
 		} else if (curtype == 'i') {
 		    if (cooinvalid == YES)
 		        call printf (
-			"The x and y coordinate data is undefined\n")
-		    else if (plottype == PX_XYPLOT)
+			    "The x and y coordinate data is undefined\n")
+		    else if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
 		        call pt_dyltg (gd, wy, Memr[ypos], Memr[x], Memr[y],
 			    deleted, npix, undelete)
 		    else {
@@ -481,7 +504,7 @@ replot_
 			    newplot = YES
 			else
 			    call printf (
-			"Replot the X-Y or histogram to show (un)deletions\n")
+			"Replot x-y or histogram to show (un)deletions\n")
 		    }
 		}
 		if (newplot == YES)
@@ -490,7 +513,7 @@ replot_
 	    # Mark points for deletion inside a box.
 	    case 'b':
 	        if (curtype == 'g') {
-		    if (plottype == PX_XYPLOT) {
+		    if ((xyinvalid == NO) && (plottype == PX_XYPLOT)) {
 		        twx = wx; twy = wy
 		        call printf ("again:\n")
 		        if (pt_gcur (curtype,  wx, wy, key, Memc[cmd],
@@ -504,21 +527,28 @@ replot_
 	        } else if (curtype == 'i') {
 		    if (cooinvalid == YES)
 		        call printf (
-			    "The x and y coordinate data is undefined\n")
+			    "The x or y coordinate data is undefined\n")
 		    else {
 		        twx = wx; twy = wy
 		        call printf ("again:\n")
 		        if (pt_gcur (curtype,  wx, wy, key, Memc[cmd],
 			    SZ_LINE) == EOF)
 		            next
-			if (plottype == PX_XYPLOT)
+			if ((xyinvalid == NO) && (plottype == PX_XYPLOT))
 		            call pt_dboxg (gd, Memr[xpos], Memr[ypos], Memr[x],
 			        Memr[y], deleted, npix, twx, twy, wx, wy,
 				undelete)
-			else
+			else {
 		            call pt_dboxg (NULL, Memr[xpos], Memr[ypos],
 			        Memr[x], Memr[y], deleted, npix, twx, twy,
 				wx, wy, undelete)
+			    if ((plottype == PX_XYPLOT) || 
+			        (plottype == PX_HISTPLOT))
+			        newplot = YES
+			    else
+			        call printf (
+			    "Replot x-y or histogram to show (un)deletions\n")
+			}
 		    }
 	        }
 
@@ -750,17 +780,15 @@ int	npix		# the number of points
 real	matchrad	# matching radius
 
 int	row, ip, ncol
-pointer	tty, sp, name, units, colptr
-int	ttyodes(), pt_getnames(), pt_fstarg()
+pointer	sp, name, units, colptr
+int	pt_getnames(), pt_fstarg()
 
 begin
 	if (gd != NULL)
 	    call gdeactivate (gd, 0)
-	else
-	    tty = ttyodes ("terminal")
 
 	# Find the star.
-	row = pt_fstarg (wx, wy, x, y, npix, matchrad)
+	row = pt_fstarg (gd, wx, wy, x, y, npix, matchrad)
 
 	# List the values of the loaded columns.
 	if (row != 0) {
@@ -804,8 +832,6 @@ begin
 
 	if (gd != NULL)
 	    call greactivate (gd, 0)
-	else
-	    call ttycdes (tty)
 
 	return (row)
 end
@@ -854,16 +880,16 @@ begin
 	if (IS_INDEFR(x1) || IS_INDEFR(x2)) {
 	    call pt_alimr (x, npix, dmin, dmax)
 	    if (IS_INDEFR(x1))
-		x1 = dmin
+		x1 = dmin - FRACTION * (dmax - dmin)
 	    if (IS_INDEFR(x2))
-		x2 = dmax
+		x2 = dmax + FRACTION * (dmax - dmin)
 	}
 	if (IS_INDEFR(y1) || IS_INDEFR(y2)) {
 	    call pt_alimr (y, npix, dmin, dmax)
 	    if (IS_INDEFR(y1))
-		y1 = dmin
+		y1 = dmin - FRACTION * (dmax - dmin)
 	    if (IS_INDEFR(y2))
-		y2 = dmax
+		y2 = dmax + FRACTION * (dmax - dmin)
 	}
 
 	# Set the scale of the axes.
@@ -1034,7 +1060,7 @@ begin
 	    j = j + 1
 	}
 	Memr[xp+j] = Memr[xp+j-1]
-	Memr[yp+j+1] = 0.0
+	Memr[yp+j] = 0.0
 
 	# Construct the title.
 	call salloc (longtitle, 2 * SZ_LINE, TY_CHAR)
@@ -1339,8 +1365,9 @@ end
 
 # PT_FSTARG -- Find the the point data point nearest the input position.
 
-int procedure pt_fstarg (wx, wy, x, y, npix, matchrad)
+int procedure pt_fstarg (gd, wx, wy, x, y, npix, matchrad)
 
+pointer	gd		# pointer to the graphics descriptor
 real	wx		# X cursor position
 real	wy		# Y cursor position
 real	x[ARB]		# X array of plotted data
@@ -1349,21 +1376,41 @@ int	npix		# number of pixels
 real	matchrad	# the matching radius
 
 int	i, row
-real	r2min, r2, mr2
+real	r2min, r2, mr2, wx0, wy0, x0, y0
 
 begin
 	row = 0
 	r2min = MAX_REAL
-	if (IS_INDEFR(matchrad))
+	if (IS_INDEFR(matchrad)) {
 	    mr2 = MAX_REAL
-	else
+	    if (gd != NULL)
+		call gctran (gd, wx, wy, wx0, wy0, 1, 0)
+	    else {
+	        wx0 = wx
+	        wy0 = wy
+	    }
+	} else {
 	    mr2 = matchrad ** 2
+	    wx0 = wx
+	    wy0 = wy
+	}
 
 	# Search for the nearest point.
 	do i = 1 , npix {
-	    if (! IS_INDEFR(x[i]) && ! IS_INDEFR(y[i]))
-	        r2 = (wx - x[i]) ** 2 + (wy - y[i]) ** 2
-	    else
+	    if (! IS_INDEFR(x[i]) && ! IS_INDEFR(y[i])) {
+		if (IS_INDEFR(matchrad)) {
+		    if (gd != NULL)
+			call gctran (gd, x[i], y[i], x0, y0, 1, 0)
+		    else {
+		        x0 = x[i]
+		        y0 = y[i]
+		    }
+		} else {
+		    x0 = x[i]
+		    y0 = y[i]
+		}
+	        r2 = (wx0 - x0) ** 2 + (wy0 - y0) ** 2
+	    } else
 		r2 = MAX_REAL
 	    if (r2 >= r2min)
 		next
@@ -1378,7 +1425,7 @@ begin
 end
 
 
-# PT__MARKER -- Return an integer code for the marker type string.
+# PT_MARKER -- Return an integer code for the marker type string.
 
 procedure pt_marker (marker, maxch, imark)
 

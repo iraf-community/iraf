@@ -1,18 +1,23 @@
 # Parameters for the PSF task
  
-image,f,a,,,,"Image for which to build PSF"
-photfile,f,a,default,,,"Aperture photometry file (default: image.mag.?)"
-psfimage,f,a,default,,,"Output PSF image (default: image.psf.?)"
-groupfile,f,a,default,,,"Output PSF group file (default: image.psg.?)"
-datapars,pset,h,"",,,Data dependent parameters
-daopars,pset,h,"",,,Daophot fitting parameters
-showplots,b,h,yes,,,"Show plots of PSF stars and fit residuals?"
-plottype,s,h,"mesh",,,"Default plot type (mesh|contour)"
-plotfile,f,h,"",,,Name of output plot metacode file
-graphics,s,h,"stdgraph",,,Graphics device
-display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-verify,b,h,yes,,,"Verify critical PSF parameters"
-update,b,h,no,,,"Update critical PSF parameters"
+image,f,a,,,,"Input image(s) for which to build PSF"
+photfile,f,a,default,,,"Input photometry file(s) (default: image.mag.?)"
+pstfile,f,a,"",,,"Input psf star list(s) (default: image.pst?)"
+psfimage,f,a,default,,,"Output PSF image(s) (default: image.psf.?)"
+opstfile,f,a,default,,,"Output PSF star list(s) (default:image.pst.?)"
+groupfile,f,a,default,,,"Output PSF star group file(s) (default: image.psg.?)"
+plotfile,f,h,"",,,"Output plot metacode file"
+datapars,pset,h,"",,,"Data dependent parameters"
+daopars,pset,h,"",,,"Psf fitting parameters"
+matchbyid,b,h,yes,,,"Match psf star list to photometry file(s) by id number ?"
+interactive,b,h,yes,,,"Compute the psf interactively ?"
+showplots,b,h,yes,,,"Show plots of PSF stars?"
+plottype,s,h,"mesh","|mesh|contour|radial|",,"Default plot type (mesh|contour|radial)"
+verbose,b,h,)_.verbose,,,"Print psf messages ?"
+verify,b,h,)_.verify,,,"Verify critical psf parameters ?"
+update,b,h,)_.update,,,"Update critical psf parameters ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

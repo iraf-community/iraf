@@ -46,7 +46,8 @@ begin
 
 	call printf (
 	    "Waiting for setup menu command (?=help, v=default setup, q=quit):")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 
@@ -91,6 +92,6 @@ begin
 
 	# Fit the new sky value and print it on the standard output.
 	ier = apfitsky (ap, im, xcenter, ycenter, NULL, gd)
-	call apsplot (ap, 0, ier, gd, apstati (ap, RADPLOTS))
+	call ap_splot (ap, 0, gd, apstati (ap, RADPLOTS))
 	call ap_qspsky (ap, ier)
 end

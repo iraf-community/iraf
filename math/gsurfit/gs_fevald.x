@@ -82,7 +82,7 @@ begin
 	}
 
 
-	# call sfree (sp)
+	call sfree (sp)
 end
 
 # GS_EVCHEB -- Procedure to evaluate a Chebyshev polynomial assuming that

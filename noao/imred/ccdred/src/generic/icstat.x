@@ -437,4 +437,3 @@ begin
 
 	return (mode)
 end
-

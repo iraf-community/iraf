@@ -56,9 +56,9 @@ begin
 	op = 1
 	for (p1=l1;  nleft > 0 && p1 <= l2;  p1=p2) {
 	    # Get a contiguous range of datafile pages.
-	    d1 = Mems[pm+p1-1]
+	    d1 = Memi[pm+p1-1]
 	    for (p2=p1+1;  p2 <= l2;  p2=p2+1) {
-		d2 = Mems[pm+p2-1]
+		d2 = Memi[pm+p2-1]
 		if (d2 - d1 != p2 - p1)
 		    break
 	    }

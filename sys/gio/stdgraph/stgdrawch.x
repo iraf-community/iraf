@@ -23,7 +23,8 @@ int	font			# desired character font
 
 pointer	pl, tx
 real	px, py, coso, sino, theta
-int	stroke, tab1, tab2, i, pen, mx, my, save_ltype, save_color
+int	stroke, tab1, tab2, i, pen, mx, my
+int	save_ltype, save_lwidth, save_color
 int	bitupk()
 include	"font.com"
 include	"stdgraph.com"
@@ -45,10 +46,12 @@ begin
 
 	pl = SG_PLAP(g_sg)
 	tx = SG_TXAP(g_sg)
-	save_ltype = PL_LTYPE(pl)
 	save_color = PL_COLOR(pl)
-	PL_LTYPE(pl) = GL_SOLID
+	save_ltype = PL_LTYPE(pl)
+	save_lwidth = PL_WIDTH(pl)
 	PL_COLOR(pl) = TX_COLOR(tx)
+	PL_LTYPE(pl) = GL_SOLID
+	PL_WIDTH(pl) = 1
 
 	tab1 = chridx[i]
 	tab2 = chridx[i+1] - 1
@@ -87,6 +90,7 @@ begin
 
 	# Restore polyline linetype and color.
 	PL_LTYPE(pl) = save_ltype
+	PL_WIDTH(pl) = save_lwidth
 	PL_COLOR(pl) = save_color
 end
 

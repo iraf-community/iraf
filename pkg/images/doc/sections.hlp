@@ -65,7 +65,6 @@ preceded by the escape character '!'.  To explictly limit a wildcard
 template to images one should use an appropriate extension such as ".imh".
 .ih
 EXAMPLES
-
 1. Calculate and print the number of images in a template:
 
 .nf

@@ -134,7 +134,8 @@ bool	errignore
 bool	inblock
 int	blksize, mxbufszo, numblks, cutoff, obufsize, temp, numrecords
 int	inblksize, innumblks, toread, mxbufszi
-int	ooffset, nchars, stat, in, out, lastnchars
+long	ooffset
+int	nchars, stat, in, out, lastnchars
 pointer	op, otop, bufa, bufb
 
 int	fstati(), mtopen(), open(), await()
@@ -257,7 +258,8 @@ begin
 	    ooffset = ooffset + cutoff	    # Update the output offset.
 
 	    # Copy leftover buffer elements into the bottom of other buffer.
-	    call amovc (Memc[otop], Memc[bufb], op - otop)
+	    if ((op - otop) > 0)
+		call amovc (Memc[otop], Memc[bufb], op - otop)
 	    op = bufb + (op - otop)
 
 	    # Swap buffers

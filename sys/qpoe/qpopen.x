@@ -66,6 +66,7 @@ begin
 		# Inherit datafile defaults from parent file.
 		QP_BUCKETLEN(qp)	= QP_BUCKETLEN(o_qp)
 		QP_FMMAXLFILES(qp)	= QP_FMMAXLFILES(o_qp)
+		QP_FMMAXPTPAGES(qp)	= QP_FMMAXPTPAGES(o_qp)
 		QP_FMPAGESIZE(qp)	= QP_FMPAGESIZE(o_qp)
 		QP_FMCACHESIZE(qp)	= QP_FMCACHESIZE(o_qp)
 		QP_STINDEXLEN(qp)	= QP_STINDEXLEN(o_qp)

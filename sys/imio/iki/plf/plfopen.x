@@ -46,7 +46,7 @@ begin
 	    if (access (Memc[fname], 0, 0) == YES)
 		if (!envgetb ("clobber")) {
 		    call pl_close (pl)
-		    call imerr (im, SYS_FCLOBBER)
+		    call imerr (IM_NAME(im), SYS_FCLOBBER)
 		}
 	} else {
 	    # Load the named mask if opening an existing mask image.

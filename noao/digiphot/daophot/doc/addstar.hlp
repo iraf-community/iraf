@@ -1,52 +1,45 @@
-.help addstar Aug91 noao.digiphot.daophot
+.help addstar Dec92 noao.digiphot.daophot
 .ih
 NAME
 addstar -- add artificial stars to images
 .ih
 USAGE
-addstar image starlist psfimage addimage
+addstar image photfile psfimage addimage
 .ih
 PARAMETERS
 .ls image
-The list of images to which the artificial stars are to be added.
+The list of images to which artificial stars are to be added.
 .le
-.ls starlist
-The list of files containing the x and y coordinates and magnitudes of the
-artificial stars to be added. If \fIstarlist\fR is null ("") then
-\fInstar\fR artificial stars uniformly distributed in position and in magnitude
-between \fIminmag\fR and \fImaxmag\fR are added to the input image.
-Otherwise \fIstarlist\fR must specify one coordinate file for each image
-in \fIimage\fR.
-\fIStarlist\fR may be either a simple text file conaining x, y, and mag in
-columns 1, 2 and 3 respectively (\fIsimple_text\fR = yes), an APPHOT/DAOPHOT
-text database or an STSDAS table.
+.ls photfile
+The list of photometry files containing the x and y coordinates and magnitudes
+of the
+artificial stars to be added to \fIimage\fR. If \fIphotfile\fR is null (""),
+then
+\fInstar\fR artificial stars uniformly distributed in position, and 
+between \fIminmag\fR and \fImaxmag\fR in magnitude, are added to \fIimage\fR.
+If \fIphotfile\fR is is defined, there must be one photometry file for
+every input image.
+\fIPhotfile\fR may be a simple text file containing x, y, magnitude, and id
+number in
+columns 1, 2, 3, and 4 respectively (\fIsimple_text\fR = yes), an APPHOT/DAOPHOT
+text database file (\fIsimple_text\fR = no), or an STSDAS binary table file.
 .le
 .ls psfimage
-The list of PSF images created by the DAOPHOT PSF task. If \fIpsfimage\fR
+The list of PSF images computed by the DAOPHOT PSF task. If \fIpsfimage\fR
 is "default", "dir$default", or a directory specification, then ADDSTAR
 will look for a file with the name image.psf.?, where ? is the highest
 existing version number. Otherwise \fIpsfimage\fR must specify one PSF
-image for every image in \fIimage\fR.
+image for every input image.
 .le
 .ls addimage
-The root name of output image with the artificial stars added.
+The root name of output artificial image.
 If \fIaddimage\fR is "default", "dir$default" or a directory specification,
-then an output image and artificial star list called image.add.? and
-image.art.? respectively are written, where ? is the next available version
-number. Otherwise an image called addimage
-and the artificial starlist called \fIaddimage\fR are written.
-If the DAOPHOT  package parameter \fItext\fR is "yes" then an APPHOT/DAOPHOT
-text database is written, otherwise an STSDAS table is written.
-.le
-.ls datapars = ""
-The text file in which the data dependent parameters are stored.
-If \fIdatapars\fR is null ("") then the default parameter set in the
-user's uparm directory will be used.
-.le
-.ls daopars = ""
-The text file in which the daophot fitting parameters are stored.
-If \fIdaopars\fR is null ("") then the default parameter set in the
-user's uparm directory will be used.
+then an output artificial image and artificial star list called image.add.? and
+image.art.? respectively are created, where ? is the next available version
+number. Otherwise there must be one output image for every
+input image.
+If the DAOPHOT  package parameter \fItext\fR is "yes", then an APPHOT/DAOPHOT
+text database file is written, otherwise an STSDAS binary table is written.
 .le
 .ls minmag
 The minimum magnitude of the computer generated artificial stars to be
@@ -64,61 +57,114 @@ stars are computed with respect to the magnitude of the PSF stored in
 The number of computer generated artificial stars to be added to the input
 image.
 .le
+.ls datapars = ""
+The text file in which the data dependent parameters are stored.
+The gain parameter \fIepadu\fR in electrons per ADU is stored here.
+If \fIdatapars\fR is null ("") then the default parameter set in the
+user's uparm directory will be used.
+.le
+.ls daopars = ""
+The text file in which the daophot fitting parameters are stored.
+The PSF radius parameter \fIpsfrad\fR in scale units is stored here.
+If \fIdaopars\fR is null ("") then the default parameter set in the
+user's uparm directory will be used.
+.le
+.ls seed = 0
+The seed for the random number generator.
+.le
 .ls idoffset = 0
 The integer offset to be added to the id numbers of stars in the output
-artificial starlist. By default the stars are numbered from 1 to N where
-N is the number of artifical stars added to the input frame.
+artificial photometry file. By default the artificial stars are numbered from 1
+to N where N is the number of artificial stars added to the input frame.
 .le
 .ls nimage = 1
-The number of output images created per input image.
+The number of output images to be created per input image.
 .le
 .ls simple_text = no
-If \fIstarlist\fR is a text file and \fIsimple_text\fR = "no", then
+If \fIphotfile\fR is a text file and \fIsimple_text\fR = "no", then
 ADDSTAR expects an APPHOT/DAOPHOT database. Otherwise ADDSTAR expects
-a simple list format with x, y and magnitude in columns 1, 2 and 3
+a simple list format with x, y, magnitude, and id in columns 1, 2,3, and 4
 respectively.
 .le
-.ls verbose = no
-Print messages about the progress of the task?
+.ls verbose = ")_.verbose"
+Print messages about the progress of ADDSTAR? \fIVerbose\fR may be set to the
+daophot package parameter value (the default), "yes", or "no".
 .le
-.ls verify = yes
-Verify the critical ADDSTAR task parameters?
+.ls verify = ")_.verify"
+Verify the critical ADDSTAR task parameters? \fIVerify\fR may be set to the
+daophot package parameter value (the default), "yes", or "no".
 .le
-.ls update = no
+.ls update = ")_.update"
 Update the critical ADDSTAR task parameters if \fIverify\fR = "yes"?
+\fIUpdate\fR may be set to the daophot package parameter value (the default),
+"yes", or "no".
 .le
+
 .ih
 DESCRIPTION
-ADDSTAR adds artificial stars from the \fIstarlist\fR or generated at random
-by the computer using the PSF in \fIpsfimage\fR to the input image \fIimage\fR
-and writes the result to the output image and list specified by
-\fIaddimage\fR. The starlist
-may be an STSDAS table database, an APPHOT/DAOPHOT text database or a simple
-text file with the x and y positions and magnitude in columns 1, 2 and 3
-respectively. The ids of stars in the output list may be set to numbers
-outside the range of the real data by setting the parameter \fIoffset\fR.
-Several output images may be written for each input image
-by setting \fInimage\fR greater than 1.
 
-If \fIstarlist\fR is null ("") then the computer will generate an
-articial starlist containing \fInstar\fR stars uniformly distributed
+ADDSTAR adds artificial stars, whose positions and magnitudes are listed in
+\fIphotfile\fR or generated at random by the computer, to the input image
+\fIimage\fR using the PSF in \fIpsfimage\fR,
+and writes the result to the output image and output photometry file
+\fIaddimage\fR.
+If \fIphotfile\fR is null ("") then ADDSTAR generates an
+artificial photometry list containing \fInstar\fR stars uniformly distributed
 in position over the image and in magnitude between \fIminmag\fR
 and \fImaxmag\fR.
+The input photometry file
+may be an STSDAS binary table or an APPHOT/DAOPHOT text database file
+(the output of the PHOT, PSF, PEAK, NSTAR, or ALLSTAR tasks)
+or a simple
+text file with the x and y positions, magnitude, and id in columns 1, 2, 3 and 4
+respectively. The ids of stars in the output photometry file may be set to
+numbers
+outside the range of the real data by setting the parameter \fIoffset\fR.
+Several output images may be written for each input image
+by setting the parameter \fInimage\fR greater than 1.
 
-Users should be sure to specify the correct value of \fIepadu\fR in
-the DATAPARS task so that Poisson noise in the stars can be correctly
-added to the image.
+The intensities in the artificial stellar images are computed
+relative to the intensities in the PSF image, by scaling the magnitudes of
+the artificial stars to the magnitude of the PSF in \fIpsfimage\fR.
+Poisson noise is added to the artificial stars using the
+value of the gain stored in the image header keyword specified
+by the DATAPARS parameter \fIgain\fR if present, or
+the value of the DATAPARS parameter \fIepadu\fR.
+
+.ih
+OUTPUT
+
+If \fIverbose\fR = yes, a line of output is written to the terminal
+for each artificial star added to the input image.
+
+Full output is written to the output photometry file \fIaddimage\fR.
+At the beginning of each file is a header listing the current values
+of all the parameters. For each artifical star added to the input image
+the following record is written.
+
+.nf
+	id  xcenter  ycenter  mag
+.fi
+
+Id is the id number of the star, xcenter and ycenter are its coordinates,
+and mag is its magnitude.
 
 .ih
 EXAMPLES
-1. Add 30 stars uniformly distributed between 17 and 20th magnitude and
-in position to the input image m92.
+
+1. Add 30 stars uniformly distributed between 17 and 20th magnitude and in
+position to the input image m92. Display the new image and mark the
+artificial stars.
 
 .nf
     da> addstar m92 "" m92.psf.1 "default" 17.0 20.0 30 
+
+    da> display m92.add.1 1
+
+    da> pdump m92.art.1 xcenter,ycenter yes | tvmark 1 STDIN point=3
 .fi
 
-2. Add the articifial stars in the simple list file artdata to the same image.
+2. Add the artificial stars in the simple text file artdata to the same image.
 
 .nf
     da> addstar m92 artdata  m92.psf.1 "default" simple+
@@ -130,4 +176,5 @@ TIME REQUIREMENTS
 BUGS
 .ih
 SEE ALSO
+datapars,daopars
 .endhelp

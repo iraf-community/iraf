@@ -29,6 +29,7 @@ begin
 	# done first so that if one of the logfiles is STDOUT the user
 	# will see that something is happening.
 
+	axis = 0
 	while (fntgfntb (logfiles, logfile, SZ_FNAME) != EOF) {
 	    logfd = open (logfile, APPEND, TEXT_FILE)
 	    call sysid (logfile, SZ_FNAME)

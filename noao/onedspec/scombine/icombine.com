@@ -5,8 +5,10 @@ int	reject			# Rejection algorithm
 real	blank			# Blank value
 pointer	rdnoise			# CCD read noise
 pointer	gain			# CCD gain
+pointer	snoise			# CCD sensitivity noise
 real	lthresh			# Low threshold
 real	hthresh			# High threshold
+int	nkeep			# Minimum to keep
 real	lsigma			# Low sigma cutoff
 real	hsigma			# High sigma cutoff
 real	pclip			# Number or fraction of pixels from median
@@ -28,7 +30,7 @@ bool	keepids			# Keep track of the image indices?
 bool	docombine		# Call the combine procedure?
 bool	sort			# Sort data?
 
-common	/scbcom/ combine, reject, blank, rdnoise, gain, lsigma, hsigma,
-		 lthresh, hthresh, pclip, flow, fhigh, grow, logfd,
+common	/scbcom/ combine, reject, blank, rdnoise, gain, snoise, lsigma, hsigma,
+		 lthresh, hthresh, nkeep, pclip, flow, fhigh, grow, logfd,
 		 dflag, sigscale, mclip, doscale, doscale1,
 		 dothresh, dowts, keepids, docombine, sort

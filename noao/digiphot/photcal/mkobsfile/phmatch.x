@@ -1,7 +1,7 @@
 include <mach.h>
 include "../lib/obsfile.h"
 
-define	DEF_LENLABEL	20
+define	DEF_LENLABEL	15
 define	DEF_LENINDEX	6
 
 # PH_JOIN -- For each individual field join the data from each image
@@ -24,6 +24,7 @@ int	verbose		# print status, warning and error messages ?
 
 int	i, j, nobjs, dptr, len_label
 pointer	sp, outfilter, newlabel, bptrs, eptrs
+bool	streq()
 int	ph_nthlabel(), strlen()
 
 begin
@@ -34,10 +35,14 @@ begin
 	if (allfilters == YES) {
 	    nobjs = MAX_INT
 	    do i = 1, nfilters {
-		if (sym[i] == NULL)
-		    return
-		if (IMT_NENTRIES(sym[i]) == 0)
-		    return
+		if (sym[i] == NULL) {
+		    nobjs = 0
+		    break
+		}
+		if (IMT_NENTRIES(sym[i]) == 0) {
+		    nobjs = 0
+		    break
+		}
 		nobjs = min (nobjs, IMT_NENTRIES(sym[i]))
 	    }
 	} else {
@@ -50,8 +55,14 @@ begin
 	}
 
 	# Return if there is no data.
-	if (nobjs <= 0)
+	if (nobjs <= 0) {
+	    if (verbose == YES) {
+	        call printf (
+	        "\tImage set: %s  0 stars written to the observations file\n")
+	            call pargstr (label)
+	    }
 	    return
+	}
 
 	# Allocate working space.
 	call smark (sp)
@@ -86,7 +97,7 @@ begin
 		# Write the label.
 		if (j == 1) {
 		    if (nobjs == 1) {
-		        call fprintf (out, "%*.*s  ")
+		        call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
 			    call pargstr (label)
@@ -94,27 +105,27 @@ begin
 			call sprintf (Memc[newlabel], SZ_FNAME, "%s-%d")
 			    call pargstr (label)
 			    call pargi (i)
-		        call fprintf (out, "%*.*s  ")
+		        call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
 			    call pargstr (Memc[newlabel])
 		    }
 		} else {
-		    call fprintf (out, "%*.*s  ")
+		    call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
 			call pargstr ("*")
 		}
 
 		# Write the results.
+		if (ph_nthlabel (filters, j, Memc[outfilter], SZ_FNAME) != j)
+		    Memc[outfilter] = EOS
 		dptr = Memi[bptrs+j-1]
 		if (dptr == 0) {
-		    if (ph_nthlabel (filters, j, Memc[outfilter],
-		        SZ_FNAME) != j)
-			Memc[outfilter] = EOS
 		    call fprintf (out,
-		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		        "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
 		        call pargstr (Memc[outfilter])
+			call pargr (INDEFR)
 		        call pargr (INDEFR)
 		        call pargr (INDEFR)
 		        call pargr (INDEFR)
@@ -122,8 +133,12 @@ begin
 		        call pargr (INDEFR)
 		} else {
 		    call fprintf (out,
-		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
-		        call pargstr (IMT_IFILTER(sym[j]))
+		        "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
+			if (streq (IMT_IFILTER(sym[j]), "INDEF"))
+			    call pargstr (Memc[outfilter])
+			else
+		            call pargstr (IMT_IFILTER(sym[j]))
+			call pargr (IMT_OTIME(sym[j]))
 		        call pargr (IMT_XAIRMASS(sym[j]))
 		        call pargr (x[dptr] - IMT_XSHIFT(sym[j]))
 		        call pargr (y[dptr] - IMT_YSHIFT(sym[j]))
@@ -178,9 +193,10 @@ int	allfilters		# match objects in all filters
 int	verbose			# print status, warning and error messages
 
 int	i, j, k, l, biptr, eiptr, bjptr, ejptr, len_label
-int	ntimes, nobjs, nref, starok
+int	ntimes, nframe, nobjs, nmatch, starok, lsort
 pointer	sp, newlabel, outfilter
 real	tol2, dx, dy, maxrsq, distsq
+bool	streq()
 int	ph_nthlabel(), strlen()
 
 begin
@@ -190,10 +206,14 @@ begin
 	call salloc (outfilter, SZ_FNAME, TY_CHAR)
 
 	# Initialize.
+	nframe = 0
 	do i = 1, nfilters {
-	    if (sym[i] != NULL)
+	    if (sym[i] != NULL) {
 		call amovki (NO, match[IMT_OFFSET(sym[i])],
 		    IMT_NENTRIES(sym[i]))
+		if (IMT_NENTRIES(sym[i]) > 0)
+		    nframe = nframe + 1
+	    }
 	}
 	tol2 = tolerance ** 2
 	nobjs = 0
@@ -214,7 +234,7 @@ begin
 	    eiptr = biptr + IMT_NENTRIES(sym[i]) - 1
 
 	    # Initialize.
-	    nref = 0
+	    nmatch = 0
 
 	    # Clear the index array.
 	    do j = 1, nfilters
@@ -232,16 +252,17 @@ begin
 	        ejptr = bjptr + IMT_NENTRIES(sym[j]) - 1
 
 	        # Loop over the stars in the first frame.
-	        nref = 0
+	        nmatch = 0
 	        do k = biptr, eiptr {
 
 		    if (match[ysort[k]] == YES)
 			next
 		    if (IS_INDEFR(x[ysort[k]]) || IS_INDEFR(y[ysort[k]]))
 			next
-		    nref = nref + 1
+		    nmatch = nmatch + 1
 		    index[ysort[k]-biptr+1,i] = ysort[k]
 		    maxrsq = tol2
+		    lsort = 0
 
 		    do l = bjptr, ejptr {
 			if (match[ysort[l]] == YES)
@@ -255,25 +276,28 @@ begin
 			distsq = dx * dx + dy * dy 
 			if (distsq > maxrsq)
 			    next
+			if (lsort > 0)
+			    match[ysort[lsort]] = NO
 			match[ysort[l]] = YES
 			index[ysort[k]-biptr+1,j] = ysort[l]
 			maxrsq = distsq
+			lsort = l
 		    }
 	        }
 
 		# If all the stars have been matched quit the loop.
-		if (nref == 0)
+		if (nmatch == 0)
 		    break
 	    }
 
 	    # Search for unmatched stars in the last frame.
-	    if ((allfilters == NO) && (i == nfilters)) {
+	    if ((nframe == 1) || (allfilters == NO && i == nfilters)) {
 		do k = biptr, eiptr {
 		    if (match[ysort[k]] == YES)
 			next
 		    if (IS_INDEFR(x[ysort[k]]) || IS_INDEFR(y[ysort[k]]))
 			next
-		    nref = nref + 1
+		    nmatch = nmatch + 1
 		    index[ysort[k]-biptr+1,i] = ysort[k]
 		}
 	    }
@@ -282,8 +306,9 @@ begin
 	    do j = 1, eiptr - biptr + 1 {
 
 		# Break if no stars were matched.
-	        if (nref <= 0)
-		    next
+	        if (nmatch <= 0)
+		    break
+		    #next
 
 		# If the allfilters switch is on only print points with
 		# data for all the filters, otherwise print all the objects.
@@ -318,8 +343,8 @@ begin
 
 		    # Write the label.
 		    if (k == 1) {
-		        if ((nref == 1) && (nobjs == 0)) {
-		            call fprintf (out, "%*.*s  ")
+		        if ((nmatch == 1) && (nobjs == 0)) {
+		            call fprintf (out, "%*.*s ")
 				call pargi (-len_label)
 				call pargi (len_label)
 			        call pargstr (label)
@@ -327,26 +352,27 @@ begin
 			    call sprintf (Memc[newlabel], SZ_FNAME, "%s-%d")
 			        call pargstr (label)
 			        call pargi (nobjs + 1)
-		            call fprintf (out, "%*.*s  ")
+		            call fprintf (out, "%*.*s ")
 				call pargi (-len_label)
 				call pargi (len_label)
 			        call pargstr (Memc[newlabel])
 		        }
 		    } else {
-		        call fprintf (out, "%*.*s  ")
+		        call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
 			    call pargstr ("*")
 		    }
 
 		    # Write the data.
+		    if (ph_nthlabel (filters, k, Memc[outfilter],
+		        SZ_FNAME) != k)
+			Memc[outfilter] = EOS
 		    if (index[j,k] == 0) {
-		        if (ph_nthlabel (filters, k, Memc[outfilter],
-		            SZ_FNAME) != k)
-			    Memc[outfilter] = EOS
 		        call fprintf (out,
-		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
 		            call pargstr (Memc[outfilter])
+			    call pargr (INDEFR)
 		            call pargr (INDEFR)
 		            call pargr (INDEFR)
 		            call pargr (INDEFR)
@@ -354,8 +380,12 @@ begin
 		            call pargr (INDEFR)
 		    } else {
 		        call fprintf (out,
-		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
-		            call pargstr (IMT_IFILTER(sym[k]))
+		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
+			    if (streq (IMT_IFILTER(sym[k]), "INDEF"))
+		                call pargstr (Memc[outfilter])
+			    else
+		                call pargstr (IMT_IFILTER(sym[k]))
+			    call pargr (IMT_OTIME(sym[k]))
 		            call pargr (IMT_XAIRMASS(sym[k]))
 		            call pargr (x[index[j,k]] - IMT_XSHIFT(sym[k]))
 		            call pargr (y[index[j,k]] - IMT_YSHIFT(sym[k]))

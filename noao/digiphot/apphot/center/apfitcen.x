@@ -17,11 +17,11 @@ pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# object coordinates
 
-int	niter, ier, fier, lowsnr
+int	i, niter, ier, fier, lowsnr
 pointer	ctr, nse
-real	datamin, datamax, owx, owy, xshift, yshift
+real	cthreshold, datamin, datamax, owx, owy, xshift, yshift, med
 int	apctrbuf(), ap_ctr1d(), ap_mctr1d(), ap_gctr1d(), ap_lgctr1d()
-real	ap_csnratio()
+real	ap_csnratio(), amedr()
 
 begin
 	ctr = AP_PCENTER(ap)
@@ -51,6 +51,11 @@ begin
 	owx = wx
 	owy = wy 
 	niter = 0
+	if (IS_INDEFR(AP_SKYSIGMA(nse)) || IS_INDEFR(AP_CTHRESHOLD(ctr)) ||
+	    AP_CTHRESHOLD(ctr) <= 0.0)
+	    cthreshold = 0.0
+	else
+	    cthreshold = AP_CTHRESHOLD(ctr) * AP_SKYSIGMA(nse) 
 
 	repeat {
 
@@ -75,11 +80,28 @@ begin
 	        call apclean (ap, Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
 		    AP_CNY(ctr), AP_CXC(ctr), AP_CYC(ctr))
 
+	    # Compute the datalimits.
+	    if (cthreshold <= 0.0)
+	        call alimr (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) * AP_CNY(ctr),
+		    datamin, datamax)
+	    else {
+		datamin = MAX_REAL
+		datamax = -MAX_REAL
+		do i = 1, AP_CNY(ctr) {
+		    med = amedr (Memr[AP_CTRPIX(ctr)+(i-1)*AP_CNX(ctr)],
+		        AP_CNX(ctr))
+		    if (med < datamin)
+			datamin = med
+		    if (med > datamax)
+			datamax = med
+		}
+	    }
+
 	    # Apply threshold and check for positive or negative features.
 	    if (AP_POSITIVE(ap) == YES) {
 		call apsetr (ap, CDATALIMIT, datamin)
 		call asubkr (Memr[AP_CTRPIX(ctr)], datamin +
-		    AP_CTHRESHOLD(nse), Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) *
+		    cthreshold, Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) *
 		    AP_CNY(ctr))
 		call amaxkr (Memr[AP_CTRPIX(ctr)], 0.0, Memr[AP_CTRPIX(ctr)],
 		    AP_CNX(ctr) * AP_CNY(ctr))
@@ -88,7 +110,7 @@ begin
 		call anegr (Memr[AP_CTRPIX(ctr)], Memr[AP_CTRPIX(ctr)],
 		    AP_CNX(ctr) * AP_CNY(ctr))
 		call aaddkr (Memr[AP_CTRPIX(ctr)], datamax -
-		    AP_CTHRESHOLD(nse), Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) *
+		    cthreshold, Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) *
 		    AP_CNY(ctr))
 		call amaxkr (Memr[AP_CTRPIX(ctr)], 0.0,
 		    Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) * AP_CNY(ctr))
@@ -105,18 +127,18 @@ begin
 	    switch (AP_CENTERFUNCTION(ctr)) {
 
 	    case AP_CENTROID1D:
-		if (AP_CTHRESHOLD(nse) > 0.0) {
-	            fier = ap_ctr1d (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
-		        AP_CNY(ctr), AP_XCENTER(ctr), AP_YCENTER(ctr),
-			AP_XERR(ctr), AP_YERR(ctr))
+		if (AP_CTHRESHOLD(ctr) <= 0.0) {
+	            fier = ap_mctr1d (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
+		        AP_CNY(ctr), AP_EPADU(nse), AP_XCENTER(ctr),
+			AP_YCENTER(ctr), AP_XERR(ctr), AP_YERR(ctr))
 		    if (IS_INDEFR (AP_XERR(ctr)))
 			AP_XCENTER(ctr) = AP_CXC(ctr)
 		    if (IS_INDEFR (AP_YERR(ctr)))
 			AP_YCENTER(ctr) = AP_CYC(ctr)
 		} else {
-	            fier = ap_mctr1d (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
-		        AP_CNY(ctr), AP_XCENTER(ctr), AP_YCENTER(ctr),
-			AP_XERR(ctr), AP_YERR(ctr))
+	            fier = ap_ctr1d (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
+		        AP_CNY(ctr), AP_EPADU(nse), AP_XCENTER(ctr),
+			AP_YCENTER(ctr), AP_XERR(ctr), AP_YERR(ctr))
 		    if (IS_INDEFR (AP_XERR(ctr)))
 			AP_XCENTER(ctr) = AP_CXC(ctr)
 		    if (IS_INDEFR (AP_YERR(ctr)))
@@ -135,8 +157,8 @@ begin
 	        fier = ap_lgctr1d (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr),
 		    AP_CNY(ctr), AP_CXC(ctr), AP_CYC(ctr), CONVERT *
 		    AP_FWHMPSF(ap) * AP_SCALE(ap), AP_CMAXITER(ctr),
-		    AP_SKYSIGMA(nse), AP_XCENTER(ctr), AP_YCENTER(ctr),
-		    AP_XERR(ctr), AP_YERR(ctr))
+		    AP_EPADU(nse), AP_SKYSIGMA(nse), AP_XCENTER(ctr),
+		    AP_YCENTER(ctr), AP_XERR(ctr), AP_YERR(ctr))
 
 	    default:
 		# do nothing gracefully

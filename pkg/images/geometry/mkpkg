@@ -40,4 +40,5 @@ libpkg.a:
 			<mach.h> <math/iminterp.h>
 	imtrans.x
 	shiftlines.x	<imhdr.h> <imset.h>
+	@xregister
 	;

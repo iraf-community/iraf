@@ -147,5 +147,6 @@ begin
 	    }
 	}
 
+	call idb_close (idb)
 	return (iw)
 end

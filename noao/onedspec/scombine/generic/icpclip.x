@@ -7,11 +7,10 @@ define	MINCLIP		3	# Minimum number for clipping
 
 # IC_PCLIP -- Percentile clip
 #
-# 1) Sort the pixels
-# 2) Find the median
-# 3) Find the pixel which is the specified order index away
-# 4) Use the data value difference as a sigma and apply clipping
-# 5) Since the median is known return it so it does not have to computed again
+# 1) Find the median
+# 2) Find the pixel which is the specified order index away
+# 3) Use the data value difference as a sigma and apply clipping
+# 4) Since the median is known return it so it does not have to be recomputed
 
 procedure ic_pclipr (d, m, n, nimages, npts, median)
 
@@ -22,20 +21,27 @@ int	nimages			# Number of input images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh
+int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
 real	sigma, r, s
-pointer	mp1, mp2
+pointer	sp, resid, mp1, mp2
 real	med
 
 include	"../icombine.com"
 
 begin
-	# There must be at  least MINCLIP pixels.
-	if (nimages < MINCLIP || dflag == D_NONE) {
+	# There must be at least MINCLIP and more than nkeep pixels.
+	if (nkeep < 0)
+	    maxkeep = max (0, nimages + nkeep)
+	else
+	    maxkeep = min (nimages, nkeep)
+	if (nimages < max (MINCLIP, maxkeep+1) || dflag == D_NONE) {
 	    docombine = true
 	    return
 	}
+
+	call smark (sp)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
@@ -46,6 +52,10 @@ begin
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
 	    n1 = n[1]
+	    if (nkeep < 0)
+		maxkeep = max (0, n1 + nkeep)
+	    else
+		maxkeep = min (n1, nkeep)
 	    n2 = 1 + n1 / 2
 	    even = (mod (n1, 2) == 0)
 	    if (pclip < 0.) {
@@ -55,11 +65,18 @@ begin
 		    n3 = max (1, nint (n2 + pclip))
 	    } else
 		n3 = min (n1, nint (n2 + pclip))
+	    nin = n1
 	}
 
+	# Now apply clipping.
 	do i = 1, npts {
+	    # Compute median.
 	    if (dflag == D_MIX) {
 		n1 = n[i]
+		if (nkeep < 0)
+		    maxkeep = max (0, n1 + nkeep)
+		else
+		    maxkeep = min (n1, nkeep)
 		if (n1 == 0) {
 		    if (combine == MEDIAN)
 			median[i] = blank
@@ -77,17 +94,19 @@ begin
 	    }
 
 	    j = i - 1 
-	    if (even)
-		med = (Memr[d[n2-1]+j] + Memr[d[n2]+j]) / 2.
-	    else
+	    if (even) {
+		med = Memr[d[n2-1]+j]
+		med = (med + Memr[d[n2]+j]) / 2.
+	    } else
 		med = Memr[d[n2]+j]
 
-	    if (n1 < MINCLIP) {
+	    if (n1 < max (MINCLIP, maxkeep+1)) {
 		if (combine == MEDIAN)
 		    median[i] = med
 		next
 	    }
 
+	    # Define sigma for clipping
 	    sigma = s * (Memr[d[n3]+j] - med)
 	    if (fp_equalr (sigma, 0.)) {
 		if (combine == MEDIAN)
@@ -95,37 +114,76 @@ begin
 		next
 	    }
 
-	    # Check if pixels are clipped
-	    # If  so recompute the median and rest the number of good pixels
-	    # Only reorder if needed
+	    # Reject pixels and save residuals.
+	    # Check if any pixels are clipped.
+	    # If so recompute the median and reset the number of good pixels.
+	    # Only reorder if needed.
 
-	    do nl = 1, n1 {
+	    for (nl=1; nl<=n1; nl=nl+1) {
 		r = (med - Memr[d[nl]+j]) / sigma
 		if (r < lsigma)
 		    break
+		Memr[resid+nl] = r
 	    }
-	    do nh = n1, 1, -1 {
+	    for (nh=n1; nh>=1; nh=nh-1) {
 		r = (Memr[d[nh]+j] -  med) / sigma
 		if (r < hsigma)
 		    break
+		Memr[resid+nh] = r
+	    }
+	    n4 = nh - nl + 1
+
+	    # If too many pixels are rejected add some back in.
+	    # All pixels with the same residual are added.
+	    while (n4 < maxkeep) {
+		if (nl == 1)
+		    nh = nh + 1
+		else if (nh == n[i])
+		    nl = nl - 1
+		else {
+		    r = Memr[resid+nl-1]
+		    s = Memr[resid+nh+1]
+		    if (r < s) {
+			nl = nl - 1
+			r = r + TOL
+			if (s <= r)
+			    nh = nh + 1
+			if (nl > 1) {
+			    if (Memr[resid+nl-1] <= r)
+				nl = nl - 1
+			}
+		    } else {
+			nh = nh + 1
+			s = s + TOL
+			if (r <= s)
+			    nl = nl - 1
+			if (nh < n2) {
+			    if (Memr[resid+nh+1] <= s)
+				nh = nh + 1
+			}
+		    }
+		}
+		n4 = nh - nl + 1
 	    }
 
+	    # If any pixels are rejected recompute the median.
 	    if (nl > 1 || nh < n1) {
-		n4 = nh - nl + 1
 		n5 = nl + n4 / 2
-		if (mod (n4, 2) == 0)
-		    med = (Memr[d[n5-1]+j] + Memr[d[n5]+j]) / 2.
-		else
+		if (mod (n4, 2) == 0) {
+		    med = Memr[d[n5-1]+j]
+		    med = (med + Memr[d[n5]+j]) / 2.
+		} else
 		    med = Memr[d[n5]+j]
 		n[i] = n4
 	    }
-
 	    if (combine == MEDIAN)
 		median[i] = med
+
+	    # Reorder if pixels only if necessary.
 	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
-		k = n4 + 1
+		k = max (nl, n4 + 1)
 		if (keepids) {
-		    do l = 1, nl-1 {
+		    do l = 1, min (n1, nl-1) {
 			Memr[d[l]+j] = Memr[d[k]+j]
 			if (grow > 0) {
 			    mp1 = m[l] + j
@@ -138,7 +196,7 @@ begin
 			k = k + 1
 		    }
 		} else {
-		    do l = 1, nl - 1 {
+		    do l = 1, min (n1, nl - 1) {
 			Memr[d[l]+j] = Memr[d[k]+j]
 			k = k + 1
 		    }
@@ -146,20 +204,21 @@ begin
 	    }
 	}
 
-	# Check if data flag needs to be reset for rejected pixels
+	# Check if data flag needs to be reset for rejected pixels.
 	if (dflag == D_ALL) {
-	    n1 = n[1]
 	    do i = 1, npts {
-		if (n[i] != n1) {
+		if (n[i] != nin) {
 		    dflag = D_MIX
 		    break
 		}
 	    }
 	}
 
-	# Signal that the median has been computed
+	# Flag whether the median has been computed.
 	if (combine == MEDIAN)
 	    docombine = false
 	else
 	    docombine = true
+
+	call sfree (sp)
 end

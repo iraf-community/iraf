@@ -1,4 +1,5 @@
 include	"../lib/parser.h"
+include "../lib/preval.h"
 
 # FT_WTUNIFORM -- Set all the weights to 1.0.
 
@@ -120,10 +121,14 @@ int	sym				# equation symbol
 pointer	otable				# observation table
 pointer	wtable				# weight table (output)
 
+double	errval
 int	n, i, nobs, nobsvars, ncatvars, nrvars, nfvars, nerrors, symvar, icol
-pointer	omap, cmap, sp, rcount, rerrcol, fcount, ferrcol
-real	val, errval
-int	mct_nrows(), pr_gsymi(), pr_gvari(), pr_findmap1()
+int	itemp
+pointer	omap, cmap, sp, rcount, rerrcol, fcount, ferrcol, refcode
+real	val
+int	mct_nrows(), pr_geti(), pr_gsymi(), pr_gvari(), pr_findmap1()
+int	ft_seval()
+pointer	pr_gsymp()
 #int	mct_ncols()
 real	mct_getr()
 errchk	pr_gsymi()
@@ -141,11 +146,6 @@ begin
 	# Map the column numbers for the observed and catalog variables.
 	call pr_obsmap (omap, nobsvars)
 	call pr_catmap (cmap, ncatvars)
-	#call eprintf ("nobs=%d nobsvars=%d ncatvars=%d ncols=%d\n")
-	    #call pargi (nobs)
-	    #call pargi (nobsvars)
-	    #call pargi (ncatvars)
-	    #call pargi (mct_ncols (otable))
 
 	# Get the number of reference and fit equation variables.
 	nrvars = pr_gsymi (sym, PTEQNRCAT) + pr_gsymi (sym, PTEQNROBS) 
@@ -153,10 +153,14 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (rerrcol, nrvars, TY_INT)
-	call salloc (rcount, nrvars, TY_INT)
-	call salloc (ferrcol, nfvars, TY_INT)
-	call salloc (fcount, nfvars, TY_INT)
+	call salloc (rerrcol, nobsvars + ncatvars, TY_INT)
+	call amovi (NULL, Memi[rerrcol], nobsvars + ncatvars)
+	call salloc (rcount, nobsvars + ncatvars, TY_INT)
+	call aclri (Memi[rcount], nobsvars + ncatvars)
+	call salloc (ferrcol, nobsvars + ncatvars, TY_INT)
+	call amovi (NULL, Memi[ferrcol], nobsvars + ncatvars)
+	call salloc (fcount, nobsvars + ncatvars, TY_INT)
+	call aclri (Memi[fcount], nobsvars + ncatvars)
 
 	# Initialize.
 	nerrors = 0
@@ -179,6 +183,17 @@ begin
 	    }
 	}
 
+	# Evaluate the contribution of the set equations to the errors
+	# in the reference equation.
+
+	if (pr_geti (NSETEQS) > 0) {
+	    refcode = pr_gsymp (sym, PTEQRPNREF)
+	    itemp = ft_seval (refcode, cmap, omap, nobsvars,
+	        Memi[rerrcol], Memi[rcount], nrvars)
+	    nrvars = nrvars + itemp 
+	    nerrors = nerrors + itemp
+	}
+
 	# Compute the positions of the fit equation variable errors in the
 	# observations table.
 
@@ -197,11 +212,22 @@ begin
 	    }
 	}
 
+	# Evaluate the contribution of the set equations to the errors
+	# in the fit equation.
+
+	if (pr_geti (NSETEQS) > 0) {
+	    refcode = pr_gsymp (sym, PTEQRPNFIT)
+	    itemp = ft_seval (refcode, cmap, omap, nobsvars,
+	        Memi[ferrcol], Memi[fcount], nfvars)
+	    nfvars = nfvars + itemp
+	    nerrors = nerrors + itemp
+	}
+
 	# Loop over the table rows.
 	if (nerrors > 0) {
 	    do n = 1, nobs {
 
-	        errval = 0.0
+	        errval = 0.0d0
 
 	        # Add contributions from the reference equation variables.
 	        do i = 1, nrvars {
@@ -210,7 +236,7 @@ begin
 		    val = mct_getr (otable, n, Memi[rerrcol+i-1])
 		    if (IS_INDEFR(val) || val < 0.0)
 			next
-		    errval = errval + Memi[rcount+i-1] * val * val
+		    errval = errval + real (Memi[rcount+i-1]) * (val * val)
 	        }
 
 	        # Add contributions from the fitting equation variables.
@@ -220,15 +246,15 @@ begin
 		    val = mct_getr (otable, n, Memi[ferrcol+i-1])
 		    if (IS_INDEFR(val) || val < 0.0)
 			next
-		    errval = errval + Memi[fcount+i-1] * val * val
+		    errval = errval + real (Memi[fcount+i-1]) * (val * val)
 	        }
 
 	        # Check for negative and zero error values and enter value
 		# into weight table.
-	        if (errval <= 0.0)
+	        if (errval <= 0.0d0)
 	            call mct_putr (wtable, n, 1, 0.0)
 		else
-	            call mct_putr (wtable, n, 1, 1.0 / errval)
+	            call mct_putr (wtable, n, 1, real (1.0d0 / errval))
 	    }
 	}
 
@@ -236,4 +262,230 @@ begin
 	call pr_unmap (omap)
 
 	call sfree (sp)
+end
+
+
+# FT_SEVAL -- Locate any catalog and observations variables that are
+# defined in up to two levels of set equations.
+
+int procedure ft_seval (code, cmap, omap, nobsvars, errcol, ecount, nerrors)
+
+pointer	code		# the equation code
+pointer	cmap		# pointer to the catalog variable column map
+pointer	omap		# pointer to the observations variable column map
+int	nobsvars	# the number of observations variables
+int	errcol[ARB]	# the input/output error columns
+int	ecount[ARB]	# the input/output error column counts
+int	nerrors		# the previous number of errors
+
+int	ip, ins, newerr
+pointer	setcode
+int	pr_gsym(), ft_scoeval()
+pointer	pr_gsymp()
+
+begin
+	ip = 0
+	ins = Memi[code+ip]
+
+	newerr = 0
+	while (ins != PEV_EOC) {
+	    switch (ins) {
+	    case PEV_SETEQ:
+		ip = ip + 1
+		setcode = pr_gsymp (pr_gsym (Memi[code+ip], PTY_SETEQ),
+		    PSEQRPNEQ)
+		newerr = newerr + ft_scoeval (setcode, cmap, omap, nobsvars,
+		    errcol, ecount, nerrors + newerr)
+	    case PEV_NUMBER, PEV_CATVAR, PEV_OBSVAR, PEV_PARAM:
+		ip = ip + 1
+	    case PEV_EXTEQ, PEV_TRNEQ:
+		ip = ip + 1
+	    default:
+		;
+	    }
+
+	    ip = ip + 1
+	    ins = Memi[code+ip]
+	}
+
+	return (newerr)
+end
+
+
+# FT_SCOEVAL -- Locate any catalog and observations variables as well as any
+# set equations that are defined in a previous set equation.
+
+int procedure ft_scoeval (code, cmap, omap, nobsvars, errcol, ecount, nerrors)
+
+pointer	code		# the equation code
+pointer	cmap		# pointer to the catalog variable column map
+pointer	omap		# pointer to the observations variable column map
+int	nobsvars	# the number of observations variables
+int	errcol[ARB]	# the input/output error columns
+int	ecount[ARB]	# the input/output error column counts
+int	nerrors		# the previous number of errors
+
+bool	new
+int	i, ip, ins, newerr, ecol
+pointer	sym, setcode
+int	pr_gsym(), pr_gsymi(), pr_findmap1(), ft_coeval()
+pointer	pr_gsymp()
+
+begin
+	ip = 0
+	ins = Memi[code+ip]
+
+	newerr = 0
+	while (ins != PEV_EOC) {
+	    switch (ins) {
+	    case PEV_SETEQ:
+		ip = ip + 1
+		setcode = pr_gsymp (pr_gsym (Memi[code+ip], PTY_SETEQ),
+		    PSEQRPNEQ)
+		newerr = newerr + ft_coeval (setcode, cmap, omap, nobsvars,
+		    errcol, ecount, nerrors + newerr)
+	    case PEV_CATVAR:
+		ip = ip + 1
+		sym = pr_gsym (Memi[code+ip] - nobsvars, PTY_CATVAR)
+		ecol = pr_gsymi (sym, PINPERRCOL)
+		if (! IS_INDEFI(ecol))
+		    ecol = pr_findmap1 (cmap, ecol) + nobsvars
+		else
+		    ecol = NULL
+		if (ecol != NULL) {
+		    new = true
+		    do i = 1, nerrors + newerr {
+			if (ecol != errcol[i])
+			    next
+			new = false
+			ecount[i] = ecount[i] + 1 
+		    }
+		    if (new) {
+			newerr = newerr + 1
+			errcol[nerrors+newerr] = ecol
+			ecount[nerrors+newerr] = 1 
+		    }
+		}
+	    case PEV_OBSVAR:
+		ip = ip + 1
+		sym = pr_gsym (Memi[code+ip], PTY_OBSVAR)
+		ecol = pr_gsymi (sym, PINPERRCOL)
+		if (! IS_INDEFI(ecol))
+		    ecol = pr_findmap1 (omap, ecol)
+		else
+		    ecol = NULL
+		if (ecol != NULL) {
+		    new = true
+		    do i = 1, nerrors + newerr {
+			if (ecol != errcol[i])
+			    next
+			new = false
+			ecount[i] = ecount[i] + 1 
+		    }
+		    if (new) {
+			newerr = newerr + 1
+			errcol[nerrors+newerr] = ecol
+			ecount[nerrors+newerr] = 1 
+		    }
+		}
+	    case PEV_NUMBER, PEV_PARAM:
+		ip = ip + 1
+	    case PEV_EXTEQ, PEV_TRNEQ:
+		ip = ip + 1
+	    default:
+		;
+	    }
+
+	    ip = ip + 1
+	    ins = Memi[code+ip]
+	}
+
+	return (newerr)
+end
+
+
+# FT_COEVAL -- Locate any catalog and observations variables that are defined i
+# a previous set equation.
+
+int procedure ft_coeval (code, cmap, omap, nobsvars, errcol, ecount, nerrors)
+
+pointer	code		# the equation code
+pointer	cmap		# pointer to the catalog variable column map
+pointer	omap		# pointer to the observations variable column map
+int	nobsvars	# the number of observations variables
+int	errcol[ARB]	# the input/output error columns
+int	ecount[ARB]	# the input/output error column counts
+int	nerrors		# the previous number of errors
+
+bool	new
+int	i, ip, ins, newerr, ecol
+pointer	sym
+int	pr_gsym(), pr_gsymi(), pr_findmap1()
+
+begin
+	ip = 0
+	ins = Memi[code+ip]
+
+	newerr = 0
+	while (ins != PEV_EOC) {
+	    switch (ins) {
+	    case PEV_SETEQ:
+		ip = ip + 1
+	    case PEV_CATVAR:
+		ip = ip + 1
+		sym = pr_gsym (Memi[code+ip] - nobsvars, PTY_CATVAR)
+		ecol = pr_gsymi (sym, PINPERRCOL)
+		if (! IS_INDEFI(ecol))
+		    ecol = pr_findmap1 (cmap, ecol) + nobsvars
+		else
+		    ecol = NULL
+		if (ecol != NULL) {
+		    new = true
+		    do i = 1, nerrors + newerr {
+			if (ecol != errcol[i])
+			    next
+			new = false
+			ecount[i] = ecount[i] + 1 
+		    }
+		    if (new) {
+			newerr = newerr + 1
+			errcol[nerrors+newerr] = ecol
+			ecount[nerrors+newerr] = 1 
+		    }
+		}
+	    case PEV_OBSVAR:
+		ip = ip + 1
+		sym = pr_gsym (Memi[code+ip], PTY_OBSVAR)
+		ecol = pr_gsymi (sym, PINPERRCOL)
+		if (! IS_INDEFI(ecol))
+		    ecol = pr_findmap1 (omap, ecol)
+		else
+		    ecol = NULL
+		if (ecol != NULL) {
+		    new = true
+		    do i = 1, nerrors + newerr {
+			if (ecol != errcol[i])
+			    next
+			new = false
+			ecount[i] = ecount[i] + 1 
+		    }
+		    if (new) {
+			newerr = newerr + 1
+			errcol[nerrors+newerr] = ecol
+			ecount[nerrors+newerr] = 1 
+		    }
+		}
+	    case PEV_NUMBER, PEV_PARAM:
+		ip = ip + 1
+	    case PEV_EXTEQ, PEV_TRNEQ:
+		ip = ip + 1
+	    default:
+		;
+	    }
+
+	    ip = ip + 1
+	    ins = Memi[code+ip]
+	}
+
+	return (newerr)
 end

@@ -49,7 +49,7 @@ real procedure poidev (xm, seed)
 real	xm		# Poisson mean
 long	seed		# Random number seed
 
-real	oldm, g, em, t, y, sq, alxm, gammln(), urand()
+real	oldm, g, em, t, y, ymin, ymax, sq, alxm, gammln(), urand(), gasdev()
 data	oldm /-1./
 
 begin
@@ -61,22 +61,24 @@ begin
 	    em = 0
 	    for (t = urand (seed); t > g; t = t * urand (seed))
 		em = em + 1
-	} else {
+	} else if (xm < 100) {
 	    if (xm != oldm) {
 		oldm = xm
 		sq = sqrt (2. * xm)
+		ymin = -xm / sq
+		ymax = (1000 - xm) / sq
 		alxm = log (xm)
 		g = xm * alxm - gammln (xm+1.)
 	    }
 	    repeat {
 		repeat {
 	            y = tan (PI * urand(seed))
-		    em = sq * y + xm
-		} until (em >= 0.)
-	        em = int (em)
+		} until (y >= ymin)
+	        em = int (sq * min (y, ymax) + xm)
 	        t = 0.9 * (1 + y**2) * exp (em * alxm - gammln (em+1) - g)
 	    } until (urand(seed) <= t)
-	}
+	} else
+	    em = xm + sqrt (xm) * gasdev (seed)
 	return (em)
 end
 

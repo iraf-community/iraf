@@ -5,7 +5,7 @@ include <imhdr.h>
 include <imset.h>
 
 # FMD_MAXMIN -- Find the maximum and minimum of an image allowing for
-# boundary extension if necessary
+# boundary extension if necessary.
 
 procedure fmd_maxmin (im, xbox, ybox, boundary, constant, minimum, maximum)
 
@@ -25,18 +25,18 @@ pointer	imgs2r()
 begin
 	if (IM_LIMTIME(im) < IM_MTIME(im) || boundary == BT_PROJECT) {
 
-	    # set image boundary extension parameters
+	    # Set image boundary extension parameters.
 	    call imseti (im, IM_TYBNDRY, boundary)
 	    call imseti (im, IM_NBNDRYPIX, max (xbox / 2, ybox / 2))
 	    call imsetr (im, IM_BNDRYPIXVAL, constant)
 
-	    # set column and line boundaries
+	    # Set the column and line boundaries.
 	    col1 = 1 - xbox / 2
 	    col2 = IM_LEN(im,1) + xbox / 2
 	    line1 = 1 - ybox / 2
 	    line2 = IM_LEN(im,2) + ybox / 2
 
-	    # intialize max and min values
+	    # Initialize the max and min values.
 	    minimum = MAX_REAL
 	    maximum = -MAX_REAL
 

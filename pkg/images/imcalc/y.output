@@ -1,0 +1,1169 @@
+
+state 0
+	$accept : _command $end 
+
+	IDENTIFIER  shift 5
+	YYEOF  shift 3
+	.  error
+
+	command  goto 1
+	assign  goto 2
+	image  goto 4
+
+state 1
+	$accept :  command_$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	command :  assign_eost 
+
+	SEMICOLON  shift 7
+	NEWLINE  shift 8
+	.  error
+
+	eost  goto 6
+
+state 3
+	command :  YYEOF_    (2)
+
+	.  reduce 2
+
+
+state 4
+	assign :  image_EQUALS opnl expr 
+
+	EQUALS  shift 9
+	.  error
+
+
+state 5
+	image :  IDENTIFIER_    (29)
+
+	.  reduce 29
+
+
+state 6
+	command :  assign eost_    (1)
+
+	.  reduce 1
+
+
+state 7
+	eost :  SEMICOLON_    (4)
+
+	.  reduce 4
+
+
+state 8
+	eost :  NEWLINE_    (5)
+
+	.  reduce 5
+
+
+state 9
+	assign :  image EQUALS_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 10
+
+state 10
+	assign :  image EQUALS opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 11
+
+state 11
+	assign :  image EQUALS opnl expr_    (3)
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	.  reduce 3
+
+
+state 12
+	opnl :  opnl NEWLINE_    (31)
+
+	.  reduce 31
+
+
+state 13
+	expr :  image_    (6)
+
+	.  reduce 6
+
+
+state 14
+	expr :  CONSTANT_    (7)
+
+	.  reduce 7
+
+
+state 15
+	expr :  MINUS_expr 
+
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 33
+
+state 16
+	expr :  NOT_expr 
+
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 34
+
+state 17
+	expr :  IDENTIFIER_( arglist ) 
+	image :  IDENTIFIER_    (29)
+
+	(  shift 35
+	.  reduce 29
+
+
+state 18
+	expr :  (_expr ) 
+
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 36
+
+state 19
+	expr :  expr PLUS_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 37
+
+state 20
+	expr :  expr MINUS_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 38
+
+state 21
+	expr :  expr STAR_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 39
+
+state 22
+	expr :  expr SLASH_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 40
+
+state 23
+	expr :  expr EXPON_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 41
+
+state 24
+	expr :  expr AND_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 42
+
+state 25
+	expr :  expr OR_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 43
+
+state 26
+	expr :  expr LT_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 44
+
+state 27
+	expr :  expr GT_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 45
+
+state 28
+	expr :  expr LE_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 46
+
+state 29
+	expr :  expr GE_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 47
+
+state 30
+	expr :  expr EQ_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 48
+
+state 31
+	expr :  expr NE_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 49
+
+state 32
+	expr :  expr QUEST_opnl expr COLON opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 50
+
+state 33
+	expr :  MINUS expr_    (8)
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	.  reduce 8
+
+
+state 34
+	expr :  NOT expr_    (9)
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	.  reduce 9
+
+
+state 35
+	expr :  IDENTIFIER (_arglist ) 
+	arglist : _    (26)
+
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  reduce 26
+
+	image  goto 13
+	expr  goto 52
+	arglist  goto 51
+
+state 36
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+	expr :  ( expr_) 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	)  shift 53
+	.  error
+
+
+state 37
+	expr :  expr PLUS opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 54
+
+state 38
+	expr :  expr MINUS opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 55
+
+state 39
+	expr :  expr STAR opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 56
+
+state 40
+	expr :  expr SLASH opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 57
+
+state 41
+	expr :  expr EXPON opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 58
+
+state 42
+	expr :  expr AND opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 59
+
+state 43
+	expr :  expr OR opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 60
+
+state 44
+	expr :  expr LT opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 61
+
+state 45
+	expr :  expr GT opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 62
+
+state 46
+	expr :  expr LE opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 63
+
+state 47
+	expr :  expr GE opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 64
+
+state 48
+	expr :  expr EQ opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 65
+
+state 49
+	expr :  expr NE opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 66
+
+state 50
+	expr :  expr QUEST opnl_expr COLON opnl expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 67
+
+state 51
+	expr :  IDENTIFIER ( arglist_) 
+	arglist :  arglist_, expr 
+
+	)  shift 68
+	,  shift 69
+	.  error
+
+
+state 52
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+	arglist :  expr_    (27)
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	.  reduce 27
+
+
+state 53
+	expr :  ( expr )_    (25)
+
+	.  reduce 25
+
+
+state 54
+	expr :  expr_PLUS opnl expr 
+	expr :  expr PLUS opnl expr_    (10)
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	.  reduce 10
+
+
+state 55
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr MINUS opnl expr_    (11)
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	.  reduce 11
+
+
+state 56
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr STAR opnl expr_    (12)
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	EXPON  shift 23
+	.  reduce 12
+
+
+state 57
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr SLASH opnl expr_    (13)
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	EXPON  shift 23
+	.  reduce 13
+
+
+state 58
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr EXPON opnl expr_    (14)
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	.  reduce 14
+
+
+state 59
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr AND opnl expr_    (15)
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	GE  shift 29
+	.  reduce 15
+
+
+state 60
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr OR opnl expr_    (16)
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	GE  shift 29
+	.  reduce 16
+
+
+state 61
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr LT opnl expr_    (17)
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  error
+	GT  error
+	LE  error
+	GE  error
+	.  reduce 17
+
+
+state 62
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr GT opnl expr_    (18)
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  error
+	GT  error
+	LE  error
+	GE  error
+	.  reduce 18
+
+
+state 63
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr LE opnl expr_    (19)
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  error
+	GT  error
+	LE  error
+	GE  error
+	.  reduce 19
+
+
+state 64
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr GE opnl expr_    (20)
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  error
+	GT  error
+	LE  error
+	GE  error
+	.  reduce 20
+
+
+state 65
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr EQ opnl expr_    (21)
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  error
+	NE  error
+	GE  shift 29
+	.  reduce 21
+
+
+state 66
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr NE opnl expr_    (22)
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  error
+	NE  error
+	GE  shift 29
+	.  reduce 22
+
+
+state 67
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+	expr :  expr QUEST opnl expr_COLON opnl expr 
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	COLON  shift 70
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	.  error
+
+
+state 68
+	expr :  IDENTIFIER ( arglist )_    (24)
+
+	.  reduce 24
+
+
+state 69
+	arglist :  arglist ,_expr 
+
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 71
+
+state 70
+	expr :  expr QUEST opnl expr COLON_opnl expr 
+	opnl : _    (30)
+
+	.  reduce 30
+
+	opnl  goto 72
+
+state 71
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+	arglist :  arglist , expr_    (28)
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	.  reduce 28
+
+
+state 72
+	expr :  expr QUEST opnl expr COLON opnl_expr 
+	opnl :  opnl_NEWLINE 
+
+	NEWLINE  shift 12
+	CONSTANT  shift 14
+	IDENTIFIER  shift 17
+	NOT  shift 16
+	MINUS  shift 15
+	(  shift 18
+	.  error
+
+	image  goto 13
+	expr  goto 73
+
+73: shift/reduce conflict (shift 19, red'n 23) on PLUS
+73: shift/reduce conflict (shift 20, red'n 23) on MINUS
+73: shift/reduce conflict (shift 21, red'n 23) on STAR
+73: shift/reduce conflict (shift 22, red'n 23) on SLASH
+73: shift/reduce conflict (shift 23, red'n 23) on EXPON
+73: shift/reduce conflict (shift 32, red'n 23) on QUEST
+73: shift/reduce conflict (shift 26, red'n 23) on LT
+73: shift/reduce conflict (shift 27, red'n 23) on GT
+73: shift/reduce conflict (shift 28, red'n 23) on LE
+73: shift/reduce conflict (shift 30, red'n 23) on EQ
+73: shift/reduce conflict (shift 31, red'n 23) on NE
+73: shift/reduce conflict (shift 24, red'n 23) on AND
+73: shift/reduce conflict (shift 25, red'n 23) on OR
+73: shift/reduce conflict (shift 29, red'n 23) on GE
+state 73
+	expr :  expr_PLUS opnl expr 
+	expr :  expr_MINUS opnl expr 
+	expr :  expr_STAR opnl expr 
+	expr :  expr_SLASH opnl expr 
+	expr :  expr_EXPON opnl expr 
+	expr :  expr_AND opnl expr 
+	expr :  expr_OR opnl expr 
+	expr :  expr_LT opnl expr 
+	expr :  expr_GT opnl expr 
+	expr :  expr_LE opnl expr 
+	expr :  expr_GE opnl expr 
+	expr :  expr_EQ opnl expr 
+	expr :  expr_NE opnl expr 
+	expr :  expr_QUEST opnl expr COLON opnl expr 
+	expr :  expr QUEST opnl expr COLON opnl expr_    (23)
+
+	PLUS  shift 19
+	MINUS  shift 20
+	STAR  shift 21
+	SLASH  shift 22
+	EXPON  shift 23
+	QUEST  shift 32
+	LT  shift 26
+	GT  shift 27
+	LE  shift 28
+	EQ  shift 30
+	NE  shift 31
+	AND  shift 24
+	OR  shift 25
+	GE  shift 29
+	.  reduce 23
+
+
+28/127 terminals, 7/300 nonterminals
+32/600 grammar rules, 74/750 states
+14 shift/reduce, 0 reduce/reduce conflicts reported
+25/350 working sets used
+memory: states,etc. 930/12000, parser 62/12000
+18/600 distinct lookahead sets
+81 extra closures
+284 shift entries, 21 exceptions
+43 goto entries
+20 entries saved by goto default
+Optimizer space used: input 649/12000, output 270/12000
+270 table entries, 123 zero
+maximum spread: 278, maximum offset: 268

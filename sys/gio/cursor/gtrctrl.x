@@ -55,9 +55,25 @@ begin
 
 	    # Count the logical openws.
 	    TR_WSOPEN(tr) = TR_WSOPEN(tr) + 1
-	    TR_SKIPOPEN(tr) = YES
 	    TR_WSACTIVE(tr) = YES
 	    TR_WSACTSAVE(tr) = NO
+
+	    # Due to a call to F_CANCEL in prpsio the openws instruction
+	    # spooled by gki_write below is being lost for subkernels,
+	    # so don't set the skipopen flag.  This causes giotr to pass
+	    # the openws on to the subkernel.  For inline kernels setting
+	    # skipopen prevents the openws from being executed twice.
+
+	    if (TR_INTERACTIVE(tr) == YES)
+		TR_SKIPOPEN(tr) = YES
+
+	    # If opening NEW_FILE, discard any previous WCS and clear the
+	    # frame buffer.
+
+	    if (mode == NEW_FILE) {
+		call aclri (Memi[TR_WCSPTR(tr,1)], LEN_WCS * MAX_WCS)
+		call gtr_frame (tr, TR_FRAMEBUF(tr), stream)
+	    }
 
 	case GKI_CLOSEWS:
 	    # Count the logical closews.

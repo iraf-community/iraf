@@ -40,6 +40,7 @@ libex.a:
 	gkititle.x	gki.com <config.h> <gki.h>
 	gkitx.x		gki.com <config.h> <gki.h>
 	gkitxset.x	gki.com <config.h> <gio.h> <gki.h>
+	gkiwesc.x	gki.com <config.h> <gki.h>
 	gkiwrite.x	gki.com <config.h> <gki.h>
 	gkptxparg.x	<gset.h>
 	;

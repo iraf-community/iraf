@@ -5,9 +5,22 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef sun
+#ifdef LINUX
+#include <fpu_control.h>
+#undef SOLARIS
+#endif
+
+#ifdef SHLIB
+#ifdef SOLARIS
+#include <libelf.h>
+#include <sys/mman.h>
+#include <sys/utsname.h>
+#include <unistd.h>
+#include <dlfcn.h>
+#else
 #include <sys/mman.h>
 #include <a.out.h>
+#endif
 #endif
 
 #define	import_spp
@@ -17,11 +30,8 @@
 #define import_prtype
 #include <iraf.h>
 
-#ifdef SUNOS4
+#ifdef sun
 #include <floatingpoint.h>
-#endif
-#ifdef ultrix
-#include <mips/fpu.h>
 #endif
 
 /*
@@ -30,7 +40,7 @@
  * called from a program which does not have a ZMAIN.
  */
 
-/* #define	DEBUG */
+/* #define DEBUG */
 
 static	int prtype, ipc_isatty=NO;
 static	char os_process_name[SZ_FNAME];
@@ -39,7 +49,7 @@ extern	malloc(), realloc(), free();
 extern	char *((*environ)[]);
 extern	int errno;
 
-#ifdef SUNOS4
+#ifdef SHLIB
 extern	int sh_debug;			/* map shared image writeable */
 static	short debug_ieee = 0;
 extern	unsigned USHLIB[], VSHLIB[];	/* shared library descriptors */
@@ -71,18 +81,18 @@ int	BSS_kludge[256];
 ZZSTRT()
 {
 	XINT	wsetsize=0L, junk;
-#ifdef SUNOS4
+#ifdef SHLIB
 	static	int fd = 0;
 	struct  stat fi;
+	char	*segname;
 	XCHAR	*bp;
-	char	*seg;
 #endif
 
 	sprintf (os_process_name, "%d", getpid());
 	strcpy (osfn_bkgfile, "");
 	prtype = PR_HOST;
 
-#ifdef SUNOS4
+#ifdef SHLIB
 	/* Map in the Sun/IRAF shared library, if the calling process was
 	 * linked with the shared library, and the shared library has not
 	 * already been mapped (fd != 0).  (See unix/shlib for more info).
@@ -91,15 +101,28 @@ ZZSTRT()
 	 */
 	if (USHLIB[0] && (!fd || (fd && fstat(fd,&fi) == -1))) {
 	    register unsigned pgsize, pmask;
-	    unsigned t_off, t_loc, t_len;
-	    unsigned d_off, d_loc, d_len;
-	    unsigned b_off, b_loc, b_len;
-	    unsigned hsize;
+	    unsigned t_off, t_len;
+	    unsigned d_off, d_len;
+	    unsigned b_off, b_len;
+	    unsigned b_start, b_bytes;
 	    static   char envdef[SZ_FNAME];
 	    char     shimage[SZ_FNAME];
 	    char     *shlib, *arch;
 	    extern   char *getenv();
 	    caddr_t  addr;
+	    unsigned hsize;
+#ifdef SOLARIS
+	    register Elf32_Phdr *phdr;
+	    register Elf32_Ehdr *ehdr;
+	    caddr_t t_loc, d_loc, b_loc;
+	    int adjust, phnum, nseg, i;
+	    struct utsname uts;
+	    Elf32_Phdr *phdr_array;
+	    Elf32_Phdr seg[32];
+	    Elf *elf;
+#else
+	    unsigned t_loc, d_loc, b_loc;
+#endif
 
 	    /* Determine the architecture of the shared library. */
 	    switch (sh_machtype) {
@@ -111,6 +134,10 @@ ZZSTRT()
 		arch = "f68881"; break;
 	    case 4:
 		arch = "ffpa";	break;
+	    case 5:
+		arch = "ssun";	break;
+	    case 6:
+		arch = "sf2c";	break;
 	    default:
 		arch = "fsoft";	break;
 	    }
@@ -123,7 +150,28 @@ ZZSTRT()
 	    sprintf (envdef, "IRAFARCH=%s", arch);
 	    if (!(arch = getenv("IRAFARCH")) || strcmp(envdef,arch))
 		putenv (envdef);
-	
+
+#ifdef SOLARIS
+	    /* Open the shared library file.  In the case of Solaris the
+	     * statically linked shared library doesn't work for both Solaris
+	     * 2.3 and 2.4, and a separate shared library is required for
+	     * each.  Call uname() to get the OS version and use the 
+	     * appropriate shared library.  If this isn't found attempt to
+	     * fallback on the generic version.
+	     */
+	    uname (&uts);
+	    sprintf (shimage, "S%d_%s.e", u_version, uts.release);
+	    shlib = irafpath (shimage);
+	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
+		sprintf (shimage, "S%d.e", u_version);
+		shlib = irafpath (shimage);
+	    }
+	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
+		fprintf (stderr,
+		    "Error: cannot open iraf shared library %s\n", shlib);
+		exit (1);
+	    }
+#else
 	    /* Open the shared library file */
 	    sprintf (shimage, "S%d.e", u_version);
 	    shlib = irafpath (shimage);
@@ -132,7 +180,87 @@ ZZSTRT()
 		    "Error: cannot open iraf shared library %s\n", shlib);
 		exit (1);
 	    }
+#endif
 
+#ifdef SOLARIS
+	    /* With Solaris executables are ELF format files.  The file
+	     * and program headers tell where everything is and how to map
+	     * the image segments.
+	     */
+	    elf_version (EV_CURRENT);
+	    elf = elf_begin (fd, ELF_C_READ, NULL);
+	    if (!elf) {
+		fprintf (stderr, "%s: not an ELF format file\n", shlib);
+		exit (2);
+	    }
+	    if (!(ehdr = elf32_getehdr (elf))) {
+		fprintf (stderr, "%s: cannot read file header\n", shlib);
+		exit (1);
+	    }
+	    if ((phnum = ehdr->e_phnum) <= 0 ||
+		    !(phdr_array = elf32_getphdr (elf))) {
+		fprintf (stderr, "%s: cannot read program header table\n",
+		    shlib);
+		exit (1);
+	    }
+
+	    /* Get a list of the loadable segments. */
+	    for (i=0, nseg=0;  i < phnum;  i++) {
+		phdr = (Elf32_Phdr *)((char *)phdr_array + i*ehdr->e_phentsize);
+		if (phdr->p_type == PT_LOAD)
+		    seg[nseg++] = *phdr;
+	    }
+
+	    /* Read in the vshlib array, which is stored in the text segment
+	     * of the shared image.
+	     */
+	    if (nseg) {
+		phdr = &seg[0];
+		hsize = (unsigned)((char *)VSHLIB) - USHLIB[1];
+		/* lseek (fd, phdr->p_offset + (long)hsize, 0); */
+		lseek (fd, (long)hsize, 0);
+		if (read (fd, (char *)vshlib, sizeof(vshlib)) !=
+			sizeof(vshlib)) {
+		    fprintf (stderr, "Read error on %s\n", shlib);
+		    exit (1);
+		}
+	    } else {
+		fprintf (stderr,
+		    "Error: cannot open iraf shared library %s\n", shlib);
+		exit (1);
+	    }
+
+	    pgsize = sysconf (_SC_PAGESIZE);
+	    pmask  = pgsize - 1;
+
+	    /* Determine the file and memory offsets of each segment of the
+	     * shared image.
+	     */
+	    phdr = &seg[0];
+	    adjust = phdr->p_offset % pgsize;
+
+	    t_off = phdr->p_offset - adjust;
+	    t_loc = (caddr_t) ((int)phdr->p_vaddr - adjust);
+	    t_len = phdr->p_filesz + adjust;
+
+	    phdr = &seg[1];
+	    adjust = phdr->p_offset % pgsize;
+
+	    d_off = phdr->p_offset - adjust;
+	    d_loc = (caddr_t) ((int)phdr->p_vaddr - adjust);
+	    d_len = phdr->p_filesz + adjust;
+
+	    /* Map the BSS segment beginning with the first hardware page
+	     * following the end of the data segment.
+	     */
+	    b_off = 0;				/* anywhere will do */
+	    b_loc = (caddr_t) align ((int)d_loc + d_len + pgsize);
+	    b_len = phdr->p_vaddr + phdr->p_memsz - (int)b_loc;
+
+	    b_start = phdr->p_vaddr + phdr->p_filesz;
+	    b_bytes = phdr->p_memsz - phdr->p_filesz;
+
+#else !SOLARIS
 	    /* Compute the location and size of each segment of the shared
 	     * image memory.  The shared image is mapped at address s_base.
 	     */
@@ -164,6 +292,9 @@ ZZSTRT()
 	    b_off = 0;				/* anywhere will do */
 	    b_loc = align (d_loc + d_len + pmask);
 	    b_len = v_end - b_loc;
+
+	    b_start = v_edata;
+	    b_bytes = v_end - v_edata;
 #else
 	    /* Map the shared image on a Sun-3 or Sun-4.
 	     */
@@ -193,7 +324,11 @@ ZZSTRT()
 	    b_off = 0;				/* anywhere will do */
 	    b_loc = ((v_edata-1) & ~(getpagesize()-1)) + getpagesize();
 	    b_len = v_end - b_loc;
-#endif
+
+	    b_start = v_edata;
+	    b_bytes = v_end - v_edata;
+#endif i386
+#endif SOLARIS
 
 #ifdef DEBUG
 	    fprintf (stderr, " text: %8x %8x %8x -> %8x etext = %8x\n",
@@ -202,7 +337,9 @@ ZZSTRT()
 		d_loc, d_len, d_off, d_loc + d_len, v_edata);
 	    fprintf (stderr, "  bss: %8x %8x %8x -> %8x   end = %8x\n",
 		b_loc, b_len, b_off, b_loc + b_len, v_end);
-#endif
+	    fprintf (stderr, " zero: %8x %8x %8s -> %8x\n",
+		b_start, b_bytes, "        ", b_start + b_bytes);
+#endif DEBUG
 
 	    /* Map the header region of the "text" segment read-write.
 	     * This area contains any commons exported by the shared image.
@@ -210,7 +347,7 @@ ZZSTRT()
 	    addr = mmap (t_loc, hsize, PROT_READ|PROT_WRITE,
 		MAP_PRIVATE|MAP_FIXED, fd, t_off);
 	    if ((int)addr == -1) {
-		seg = "header";
+		segname = "header";
 		goto maperr;
 	    }
 
@@ -222,7 +359,7 @@ ZZSTRT()
 	    addr = mmap (t_loc+hsize, t_len-hsize, PROT_READ|PROT_EXEC,
 		(sh_debug?MAP_PRIVATE:MAP_SHARED)|MAP_FIXED, fd, t_off+hsize);
 	    if ((int)addr == -1) {
-		seg = "text";
+		segname = "text";
 		goto maperr;
 	    }
 
@@ -230,7 +367,7 @@ ZZSTRT()
 	    addr = mmap (d_loc, d_len, PROT_READ|PROT_WRITE|PROT_EXEC,
 		MAP_PRIVATE|MAP_FIXED, fd, d_off);
 	    if ((int)addr == -1) {
-		seg = "data";
+		segname = "data";
 		goto maperr;
 	    }
 
@@ -244,14 +381,14 @@ ZZSTRT()
 		MAP_PRIVATE|MAP_FIXED, fd, b_off);
 
 	    if ((int)addr == -1) {
-		seg = "bss";
+		segname = "bss";
 maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
-		fprintf (stderr, ", seg=%s, errno=%d\n", seg, errno);
+		fprintf (stderr, ", seg=%s, errno=%d\n", segname, errno);
 		exit (2);
 	    }
 
 	    /* Zero the bss segment. */
-	    bzero (v_edata, v_end - v_edata);
+	    bzero (b_start, b_bytes);
 
 	    /* Verify that the version number and base address match. */
 	    if (USHLIB[0] != VSHLIB[0] || USHLIB[1] != VSHLIB[1]) {
@@ -263,10 +400,35 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	     * in the shared library, so that the library routines will
 	     * allocate memory in the data space of the client.
 	     */
+#ifdef SOLARIS
+	    VLIBINIT (environ, malloc, realloc, free,
+		dlopen, dlclose, dlsym, dlerror);
+#else
 	    VLIBINIT (environ, malloc, realloc, free);
-	}
 #endif
+	}
+#endif SHLIB
 
+	/* Dummy routine called to indicate that mapping is complete. */
+	ready();
+
+#ifdef LINUX
+	/* Enable the common IEEE exceptions.  Linux enables these by default,
+	 * but we don't know who is spawning the IRAF task.
+	 */
+	asm ("fclex");
+	__setfpucw (_FPU_DEFAULT);
+#endif
+#ifdef SOLARIS
+	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
+	 */
+	_ieee_enbint (
+	    (1 << (int)fp_division) |
+	    (1 << (int)fp_overflow) |
+	    (1 << (int)fp_invalid)
+	);
+
+#else
 #ifdef SUNOS4
 	/* The following enables the common IEEE floating point exceptions
 	 * invalid, overflow, and divzero, causing the program to abort if
@@ -344,16 +506,6 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    int mode = FP_BSUN|FP_SNAN|FP_OPERR|FP_DZ|FP_OVFL|FP_INVALID;
 	    fpmode_ (&mode);
 	}
-#else
-#ifdef ultrix
-	{
-	    union fpc_csr csr;
-	    csr.fc_word = get_fpc_csr();
-	    csr.fc_struct.en_overflow = 1;
-	    csr.fc_struct.en_divide0 = 1;
-	    csr.fc_struct.en_invalid = 1;
-	    set_fpc_csr (csr.fc_word);
-	}
 #endif
 #endif
 #endif
@@ -369,6 +521,13 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	 */
 	ZAWSET (&wsetsize, &junk, &junk, &junk);
 
+	/* Initialize the stdio streams. */
+	{   int ro = READ_ONLY, wo = WRITE_ONLY, chan;
+	    ZOPNTY (U_STDIN, &ro, &chan);
+	    ZOPNTY (U_STDOUT, &wo, &chan);
+	    ZOPNTY (U_STDERR, &wo, &chan);
+	}
+
 	/* Pass the values of the kernel parameters into the kernel. */
 	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty);
 }
@@ -377,3 +536,8 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 /* ZZSTOP -- Clean up prior to process shutdown.
  */
 ZZSTOP(){}
+
+/* ready -- This is a dummy routine used when debugging to allow a breakpoint
+ * to be set at a convenient point after the shared image has been mapped in.
+ */
+ready(){}

@@ -1,5 +1,8 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+imred$echelle/demos/mkdoecslit.cl
+    Added a flat field.  (11/6/94, Valdes)
+
 imred$echelle/*
     Further updates for WCS version of ONEDSPEC. (7/24/91, Valdes)
 

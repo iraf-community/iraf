@@ -135,11 +135,12 @@ begin
 	    d = w
 	}
 
+	# Round the number at digit (no_digits + 1).
+	if (no_digits >= 0)
+	    v = v + 0.5 * 10. ** (-no_digits)
+
 	# Be sure the number of digits is in range.
 	no_digits = max(1, min(MAX_DIGITS, no_digits))
-
-	# Round the number at digit (no_digits + 1).
-	v = v + 0.5 * 10. ** (-no_digits)
 
 	# Handle the unusual situation of rounding from .999..  up to 1.000.
 	if (v >= 1.0) {

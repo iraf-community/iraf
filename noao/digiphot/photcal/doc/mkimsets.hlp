@@ -1,4 +1,4 @@
-.help mkimsets Aug91 noao.digiphot.photcal
+.help mkimsets Apr94 noao.digiphot.photcal
 .ih
 NAME
 mkimsets -- create an image set file from the observations for input
@@ -45,7 +45,8 @@ The options are:
 Extract the image list from the APPHOT/DAOPHOT 
 databases containing
 the photometry. This option uses the PTOOLS task DUMP to extract
-the image name, the filter id, the exposure time, the airmass,  and
+the image name, the filter id, the exposure time, the airmass,  the
+time of observation, and
 other user selected fields \fIfields\fR from the database files.
 .le
 .ls images
@@ -143,8 +144,8 @@ filter id \fIfilter\fR, and other user specified fields \fIfields\fR.
 \fIImobsparams\fR may be edited by
 the user, and used by the preprocessor tasks MKNOBSFILE or OBSFILE
 to correct erroneous or undefined values of
-exposure time, airmass and filter id in the input databases.
-By default \fIimobsparams\fR is not written.
+filter id, exposure time, airmass and time of observation in the input
+databases.  By default \fIimobsparams\fR is not written.
 
 After task initialization, MKIMSETS extracts each unique image name,
 the corresponding filter id stored in column \fIfilter\fR,
@@ -199,7 +200,8 @@ identified in the APPHOT databases by the filters ids "1","2", "3"
 respectively. There is one database file
 for each star measured. Since data for each of the stars was taken
 sequentially and the images were read sequentially off tape, the user
-requests MKIMSETS to sort the extracted data by image name.
+requests MKIMSETS to sort the extracted data by image name. Note that
+the time of observation field was undefined in the input data sets.
 
 .nf
 	ph> mkimsets *.mag.* "1,2,3" jan10.stdim sort="image"
@@ -210,40 +212,40 @@ requests MKIMSETS to sort the extracted data by image name.
 	   ... MKIMSETS enters the editor and lists the first few
 	       lines of the intermediate image list file
 
-	   im001  1  3.0  1.150
-	   im002  2  2.0  1.150
-	   im003  3  2.0  1.140
-	   im004  1  6.0  1.300
-	   im005  2  4.0  1.300
-	   im006  3  2.0  1.300
-	   im007  1  5.0  1.263
-	   im008  3  1.0  1.270
-	   im009  2  3.0  1.270
-	   im010  1  2.0  1.030
-	   im011  3  10.0  1.030
-	   im012  1  30.0  1.093
-	   im013  2  20.0  1.110
-	   im014  3  10.0  1.110
+	   im001  1  3.0  1.150 INDEF
+	   im002  2  2.0  1.150 INDEF
+	   im003  3  2.0  1.140 INDEF
+	   im004  1  6.0  1.300 INDEF
+	   im005  2  4.0  1.300 INDEF
+	   im006  3  2.0  1.300 INDEF
+	   im007  1  5.0  1.263 INDEF
+	   im008  3  1.0  1.270 INDEF
+	   im009  2  3.0  1.270 INDEF
+	   im010  1  2.0  1.030 INDEF
+	   im011  3  10.0  1.030 INDEF
+	   im012  1  30.0  1.093 INDEF
+	   im013  2  20.0  1.110 INDEF
+	   im014  3  10.0  1.110 INDEF
 
 	   ... the user notices that standard 4 is missing a B
 	       observation and that the observations of standard 3
 	       are out of order and edits the file as follows
 
-	   im001  1  3.0  1.150
-	   im002  2  2.0  1.150
-	   im003  3  2.0  1.140
-	   im004  1  6.0  1.300
-	   im005  2  4.0  1.300
-	   im006  3  2.0  1.300
-	   im007  1  5.0  1.263
-	   im009  2  3.0  1.270
-	   im008  3  1.0  1.270
-	   im010  1  2.0  1.030
-	   INDEF  2  INDEF  INDEF	
-	   im011  3  10.0  1.030
-	   im012  1  30.0  1.093
-	   im013  2  20.0  1.110
-	   im014  3  10.0  1.110
+	   im001  1  3.0  1.150 INDEF
+	   im002  2  2.0  1.150 INDEF
+	   im003  3  2.0  1.140 INDEF
+	   im004  1  6.0  1.300 INDEF
+	   im005  2  4.0  1.300 INDEF
+	   im006  3  2.0  1.300 INDEF
+	   im007  1  5.0  1.263 INDEF
+	   im009  2  3.0  1.270 INDEF
+	   im008  3  1.0  1.270 INDEF
+	   im010  1  2.0  1.030 INDEF
+	   INDEF  2  INDEF  INDEF INDEF
+	   im011  3  10.0  1.030 INDEF
+	   im012  1  30.0  1.093 INDEF
+	   im013  2  20.0  1.110 INDEF
+	   im014  3  10.0  1.110 INDEF
 
 	   ... the user quits the editor
 

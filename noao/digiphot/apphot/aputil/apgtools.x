@@ -5,7 +5,7 @@ include <pkg/gtools.h>
 
 pointer procedure ap_gtinit (image, wx, wy)
 
-char	image[ARB]	# pointer to image
+char	image[ARB]	# the image name
 real	wx, wy		# center of sky subraster
 
 pointer	sp, gt, str
@@ -55,6 +55,36 @@ begin
 	call gt_sets (gt, GTTYPE, "mark")
 	call gt_sets (gt, GTMARK, polymark)
 	call gt_plot (gd, gt, r, i, npts)
+end
+
+
+# AP_PLOTPTS -- Plot the radial profile of a list of pixels excluding points
+# that are outside the plotting window altogether.
+
+procedure ap_plotpts (gd, gt, r, i, npts, xmin, xmax, ymin, ymax, polymark) 
+
+pointer	gd		# pointer to graphics stream
+pointer	gt		# the GTOOLS pointer
+real	r[ARB]		# the radii array
+real	i[ARB]		# the intensity array
+int	npts		# number of points
+real	xmin, xmax	# the x plot limits
+real	ymin, ymax	# the y plot limits
+char	polymark[ARB]	# polyline type
+
+int	j
+
+begin
+	call gt_sets (gt, GTTYPE, "mark")
+	call gt_sets (gt, GTMARK, polymark)
+	do j = 1, npts {
+	    if (r[j] < xmin || r[j] > xmax)
+		next
+	    if (i[j] < ymin || i[j] > ymax)
+		next
+	    call gt_plot (gd, gt, r[j], i[j], 1)
+	    
+	}
 end
 
 

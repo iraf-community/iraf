@@ -1,4 +1,4 @@
-.help datapars Aug91 noao.digiphot.daophot 
+.help datapars Dec92 noao.digiphot.daophot 
 .ih
 NAME
 datapars -- edit the data dependent parameters
@@ -15,10 +15,10 @@ pixels. DAOPHOT users should leave \fIscale\fR set to 1.0 unless they
 wish to compare their PHOT results with those in the
 literature.
 .le
-.ls fwhmpsf = 1.0 (scale units)
-The full width half maximum of the point spread function in scale units,
+.ls fwhmpsf = 2.5 (scale units)
+The full-width half-maximum of the point spread function in scale units,
 for example arc-seconds.
-Certain tasks and algorithms, for example \fIdaofind\fR, and the "gauss" and
+Certain tasks and algorithms, for example DAOFIND, and the "gauss" and
 "ofilter" centering
 algorithms in the PHOT task depend critically on the value of fwhmpsf.
 DAOPHOT users can either determine fwhmpsf using an external
@@ -32,10 +32,9 @@ considers all features to be emission features. DAOPHOT users should
 leave this parameter set to "yes". Although the DAOFIND and PHOT tasks
 can deal with absorption features the PSF fitting tasks cannot.
 .le
-.ls sigma = INDEF
+.ls sigma = 0.0
 The estimate of the standard deviation of the sky pixels.
-Although this parameter is not critical and leaving it at INDEF does
-no harm DAOPHOT users should set it to some value reasonably
+DAOPHOT users should set it to some value reasonably
 representative of the noise in the sky background.
 .le
 .ls datamin = INDEF
@@ -50,32 +49,16 @@ floating point number supported by the host computer.
 DAOPHOT users should set this parameter to an appropriate value before
 running any of the DAOPHOT package tasks.
 .le
-.ls threshold = 0
-The threshold in counts above (emission features) or  below (absorption
-features) local sky used for image detection in the
-DAOFIND task. A good starting value is 5 times the standard deviation
-of the image background level.
-DAOPHOT users can either determine threshold using an external
-task such as IMEXAMINE in the PROTO package or make use of the interactive
-capabilities of DAOFIND to set and store the correct value of this
-parameter.
-.le
-.ls cthreshold = 0
-The threshold in counts above (emission features) or below (absorption)
-features the data minimum (maximum) in the
-centering subraster below (above) which pixels are not used for centering.
-DAOPHOT users are recommend to leave this value at 0.0.
-.le
 .ls noise = "poisson"
 The noise model used to estimate the uncertainties in the computed
 magnitudes. DAOPHOT users must leave noise set to "poisson".
 .le
 .ls ccdread = ""
-The image header keyword defining the readout noise parameter whose.
+The image header keyword defining the readout noise parameter.
 The units are assumed to be electrons.
 .le
 .ls gain = ""
-The image header keyword defining the gain parameter whose.
+The image header keyword defining the gain parameter.
 The units are assumed to be electrons per adu.
 .le
 .ls readnoise = INDEF
@@ -100,19 +83,19 @@ zero point corrections in future reduction steps.
 .ls airmass = ""
 The image header airmass keyword. This parameter is information only
 and does not affect the computations in any way. The value of \fIairmass\fR
-is recorded in the PHOT header.
+is recorded in the output photomtry file header.
 .le
 .ls filter = ""
 The image header filter id keyword. This parameter is information only
 and does not affect the computations in any way. The value of \fIfilter\fR
-is recorded in the PHOT header.
+is recorded in the output photometry file header.
 .le
 .ls obstime = ""
 The image header time of observation keyword. This parameter is information only
 and does not affect the computations in any way. The value of \fIobstime\fR
-is recorded in the PHOT header.
+is recorded in the output photometry file header.
 .le
-.ls itime = 0.0
+.ls itime = INDEF
 The exposure time for the image in arbitrary units.
 The magnitudes are normalized to 1 timeunit  using the value of \fIexposure\fR
 in the image header if present or the value of \fIitime\fR.
@@ -122,38 +105,35 @@ The value of the airmass which by default is undefined.
 The airmass is set using the value of \fIairmass\fR
 in the image header if present or the value of \fIxairmass\fR.
 The value of \fIxairmass\fR does not affect the computations in any but is
-stored in the PHOT output file.
+stored in the output photometry files.
 .le
 .ls ifilter = "INDEF"
 The value of the filter id string which by default is undefined.
 The filter id is set using the value of \fIfilter\fR
 in the image header if present or the value of \fIifilter\fR.
 The value of \fIifilter\fR does not affect the computations in any but is
-stored in the PHOT output file.
+stored in the output photometry files.
 .le
 .ls otime = "INDEF"
 The value of the time of observation string which by default is undefined.
 The time of observation is set using the value of \fIobstime\fR
 in the image header if present or the value of \fIotime\fR itself.
 The value of \fIotime\fR does not affect the computations in any but is
-stored in the PHOT output file.
+stored in the output photometry files.
 .le
+
 .ih
 DESCRIPTION
+
 \fIDatapars\fR sets those parameters which are expected to
 change as a function of the data.
 These quantities include the seeing, optical quality of the instrument,
 the noise
 characteristics and range of linearity of the detector, and data dependent
-image header parameters. The remaining centering, sky
+image header parameters. Many of the remaining centering, sky
 fitting and photometry algorithm parameters in the CENTERPARS,
 FITSKYPARS and PHOTPARS parameter sets scale with the data
 dependent parameters.
-The parameter sets provide
-a mechanism for storing parameter files with the relevant data. A
-user can edit the DATAPARS parameter set, write it out to file in the
-same directory as the data, and subsequently use it as input to
-other DAOPHOT tasks.
 
 The parameter \fIscale\fR sets the scale of the various apertures used by the
 centering, sky fitting and photometry algorithms.  Scale converts
@@ -162,7 +142,8 @@ scale units. The following DAOPHOT distance dependent parameters
 including cbox, maxshift, rclean and rclip
 in the CENTERPARS parameter set, annulus, dannulus, and rgrow in
 FITSKYPARS parameter set, apertures in the PHOTPARS
-parameter set, and psfrad, fitrad, and matchrad in the DAOPARS parameter
+parameter set, and psfrad, fitrad, sannulus, wsannulus, and matchrad in the
+DAOPARS parameter
 set are expressed in units of the scale. Scale is useful
 in the case where observations are to be compared to published
 aperture photometry measurements in the literature.
@@ -189,11 +170,16 @@ leave this parameter set to "yes". Although the DAOFIND and PHOT tasks
 can deal with absorption features the PSF fitting tasks currently cannot.
 
 The parameter \fIsigma\fR estimates the standard deviation of
-the sky background pixels. The centering algorithm uses this parameter
+the sky background pixels. The star finding algorithm uses this
+parameter via the threshold parameter to define the detection threshold
+in terms of sigma. The centering algorithm uses this parameter
 to define deviant pixels through the kclean parameter  if \fIclean\fR is
-enabled and to estimate the signal to
-noise ratio in the object.  If sigma is undefined no cleaning is performed
-and the total noise is assumed to be 0. The sky fitting routines use sigma
+enabled, to estimate the signal to
+noise ratio in the object, and to define an intensity cutoff threshold
+via the cthreshold parameter.  If sigma is undefined or <= 0.0
+no cleaning is performed,
+the total noise is assumed to be 0, and default cutoff intensity is
+used for centering. The sky fitting routines use sigma
 to compute the width and resolution of the sky pixel histogram through the
 parameters khist and binsize. If sigma
 is undefined each object will have a sky histogram with an extent
@@ -204,8 +190,10 @@ calgorithm = "none" because accurate
 centers are already computed by DAOFIND and the FITSKYPARS parameter
 salgorithm to "mode" because it is the only sky fitting algorithm which gives
 reasonable results in very crowded fields, and as it does not depend on
-the histogram of sky pixels the value of sigma is not critical.
-DAOPHOT users should enter a reasonable value for information purposes.
+the histogram of sky pixels the value of sigma is not critical to the
+centering and sky fitting routines. It is however very important for
+the star finding routine.
+Therefore DAOPHOT users should enter a reasonable value  of sigma.
 
 
 The \fIdatamin\fR and \fIdatamax\fR parameters define the range of good
@@ -276,13 +264,13 @@ EXAMPLES
 1. List the data dependent parameters.
 
 .nf
-	ap> lpar datapars
+	da> lpar datapars
 .fi
 
 2. Edit the data dependent parameters.
 
 .nf
-	ap> datapars
+	da> datapars
 .fi
 
 3. Edit the data dependent parameters from with the PSF task.

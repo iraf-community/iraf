@@ -11,8 +11,10 @@ else if (int (s1) < 40000)
     reset min_lenuserarea = 40000
 
 # Executables
-task	fxcor 		= "rv$x_rv.e"
-task	rvcorrect 	= "astutil$x_astutil.e"
+task	fxcor,
+	rvcorrect,
+	rvidlines,
+	rvreidlines	= "rv$x_rv.e"
 
 # PSET Tasks
 task	filtpars	= "rv$filtpars.par"

@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"icombine.h"
 
 

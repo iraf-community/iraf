@@ -1,4 +1,4 @@
-include	"../lib/apsel.h"
+include	"../lib/apseldef.h"
 
 # DP_TADINIT -- Initializie the column descriptors for the input ST photometry
 # table.

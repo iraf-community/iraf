@@ -6,11 +6,12 @@ include "imtext.h"
 # RT_CONVERT_PIXELS -- Called once for each text file to be converted.  All
 # pixels in the text file are converted to image pixels.
 
-procedure rt_convert_pixels (tf, im, format)
+procedure rt_convert_pixels (tf, im, format, pixels)
 
 int	tf		# File descriptor of input text file
 pointer	im		# Pointer to image header
 int	format		# Format of text pixels (integer/floating point)
+int	pixels		# Get pixels from input text file?
 
 pointer	bufptr, sp, word1, pattern
 int	stat, nlines, npix, i
@@ -30,7 +31,7 @@ begin
 	# or a + or - sign not in the first position, it is a floating point
 	# number.  Complex numbers are assumed to be written as "(r,i)".
 
-	if (format == UNSET) {
+	if (pixels == YES && format == UNSET) {
 	    call smark (sp)
 	    call salloc (word1,   SZ_LINE, TY_CHAR)
 	    call salloc (pattern, SZ_LINE, TY_CHAR)
@@ -87,17 +88,26 @@ begin
 	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
 	    do i = 1, nlines {
 	        stat = impnll (im, bufptr, v) 
-		call rt_output_linel (tf, format, bufptr, npix)
+		if (pixels == YES)
+		    call rt_output_linel (tf, format, bufptr, npix)
+		else
+		    call aclrl (Meml[bufptr], npix)
 	    }
 	case TY_REAL, TY_DOUBLE:
 	    do i = 1, nlines {
 	        stat = impnld (im, bufptr, v)
-		call rt_output_lined (tf, format, bufptr, npix)
+		if (pixels == YES)
+		    call rt_output_lined (tf, format, bufptr, npix)
+		else
+		    call aclrd (Memd[bufptr], npix)
 	    }
 	case TY_COMPLEX:
 	    do i = 1, nlines {
 	        stat = impnlx (im, bufptr, v)
-		call rt_output_linex (tf, format, bufptr, npix)
+		if (pixels == YES)
+		    call rt_output_linex (tf, format, bufptr, npix)
+		else
+		    call aclrx (Memx[bufptr], npix)
 	    }
 	default:
 	    call error (0, "Image pixel type unset")

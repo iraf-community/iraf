@@ -149,14 +149,14 @@ int	i, j, nright, nleft
 
 begin
 	# INDEFR points cannot be local maxima.
-	if (data[index] == INDEFR)
-	    return (FALSE)
+	if (IS_INDEFR (data[index]))
+	    return (false)
 
 	# Find the left and right indices where data values change and the
 	# number of points with the same value.  Ignore INDEFR points.
 	nleft = 0
 	for (i = index - 1; i >= 1; i = i - 1) {
-	    if (data[i] != INDEFR) {
+	    if (!IS_INDEFR (data[i])) {
 		if (data[i] != data[index])
 		    break
 		nleft = nleft + 1
@@ -164,7 +164,7 @@ begin
 	}
 	nright = 0
 	for (j = index + 1; i <= npts; j = j + 1) {
-	    if (data[j] != INDEFR) {
+	    if (!IS_INDEFR (data[j])) {
 		if (data[j] != data[index])
 		    break
 		nright = nright + 1
@@ -250,10 +250,10 @@ begin
 	# peaks are marked by setting their positions to INDEFI.
 
 	for (i = 1; i < nx; i = i + 1) {
-	    if (x[rank[i]] == INDEFI)
+	    if (IS_INDEFI (x[rank[i]]))
 		next
 	    for (j = i + 1; j <= nx; j = j + 1) {
-		if (x[rank[j]] == INDEFI)
+		if (IS_INDEFI (x[rank[j]]))
 		    next
 		if (abs (x[rank[i]] - x[rank[j]]) < separation)
 		    x[rank[j]] = INDEFI
@@ -277,7 +277,7 @@ int	i
 
 begin
 	for (i = 1; (i <= nx) && (npeaks < nmax); i = i + 1) {
-	    if (x[rank[i]] == INDEFI)
+	    if (IS_INDEFI (x[rank[i]]))
 		next
 	    npeaks = npeaks + 1
 	    peaks[npeaks] = x[rank[i]]
@@ -300,9 +300,9 @@ common	/sort/ y
 
 begin
 	# INDEFR points are considered to be smallest possible values.
-	if (Memr[y - 1 + index1] == INDEFR)
+	if (IS_INDEFR (Memr[y - 1 + index1]))
 	    return (1)
-	else if (Memr[y - 1 + index2] == INDEFR)
+	else if (IS_INDEFR (Memr[y - 1 + index2]))
 	    return (-1)
 	else if (Memr[y - 1 + index1] < Memr[y - 1 + index2])
 	    return (1)

@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_GLINE -- Get line of data.

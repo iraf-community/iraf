@@ -1,5 +1,10 @@
 if (deftask ("tables")) {
-    tables
+    if (defpar ("tables.motd")) {
+	tables.motd = no
+	tables
+    } else {
+        tables
+    }
 } else {
     type "photcal$lib/warning.dat"
 }
@@ -18,7 +23,8 @@ package photcal
 
 # PHOTCAL tasks
 
-task	catalog,
+task	apfile,
+	catalog,
 	config,
 	chkconfig,
 	evalfit,
@@ -30,6 +36,7 @@ task	catalog,
 
 # PHOTCAL scripts
 
+task	mkapfile	= "photcal$mkapfile.cl"
 task	mkcatalog	= "photcal$mkcatalog.cl"
 task	mkconfig	= "photcal$mkconfig.cl"
 task	mkimsets	= "photcal$mkimsets.cl"

@@ -1,15 +1,19 @@
-$checkout libpkg.a ..
-$update   libpkg.a
-$checkin  libpkg.a ..
-$exit
+# NOAO astronomical toolslibasttools.a
 
-libpkg.a:
+update:
+	$checkout libasttools.a noaolib$
+	$update   libasttools.a
+	$checkin  libasttools.a noaolib$
+	;
+
+libasttools.a:
 	astcoord.x	
 	astgalactic.x	<math.h>
 	astgaltoeq.x	<math.h>
 	astprecess.x	<math.h>
 	asttimes.x	
 	asthjd.x	<math.h>
+	astlvac.x
 	astvbary.x	<math.h>
 	astvorbit.x	<math.h>
 	astvr.x		<math.h>

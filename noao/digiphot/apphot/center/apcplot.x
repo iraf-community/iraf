@@ -1,19 +1,19 @@
-include <pkg/gtools.h>
+include <mach.h>
 include <gset.h>
+include <pkg/gtools.h>
 include "../lib/apphotdef.h"
 include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/centerdef.h"
 include "../lib/center.h"
 
-# APCPLOT -- Procedure to compute radial profile plots for the centering
+# AP_CPLOT -- Procedure to compute radial profile plots for the centering
 # routine.
 
-procedure apcplot (ap, sid, cier, gd, makeplot)
+procedure ap_cplot (ap, sid, gd, makeplot)
 
 pointer	ap		# the pointer to the apphot structure
 int	sid		# the output sequence number of the star
-int	cier		# the centering error code
 pointer	gd		# the graphics stream
 int	makeplot	# the make a plot ?
 
@@ -76,8 +76,13 @@ begin
 
 	# Make the plot.
 	call gclear (gd)
-	call ap_cpset (gd, gt, ap, cier, rmin, rmax, imin, imax)
-	call ap_plotrad (gd, gt, Memr[r], Memr[AP_CTRPIX(ctr)], nx * ny, "plus")
+	call ap_cpset (gd, gt, ap, rmin, rmax, imin, imax)
+	if (apstati (ap, POSITIVE) == YES)
+	    call ap_plotpts (gd, gt, Memr[r], Memr[AP_CTRPIX(ctr)], nx * ny,
+	        rmin, rmax, imin + EPSILONR, imax, "plus")
+	else
+	    call ap_plotpts (gd, gt, Memr[r], Memr[AP_CTRPIX(ctr)], nx * ny,
+	        rmin, rmax, imin, imax - EPSILONR, "plus")
 	call ap_cpreset (gd, gt, ap, rmin, rmax, imin, imax)
 	call ap_cpannotate (gd, ap)
 
@@ -95,18 +100,18 @@ end
 # AP_CPSET -- Procedure to set up the parameters for the center radial profile
 # plot.
 
-procedure ap_cpset (gd, gt, ap, cier, xmin, xmax, ymin, ymax)
+procedure ap_cpset (gd, gt, ap, xmin, xmax, ymin, ymax)
 
 pointer	gd		# the graphics stream
 pointer	gt		# the gtools pointer
 pointer	ap		# the apphot pointer
-int	cier		# the centering error (not used)
 real	xmin, xmax	# the minimum and maximum radial distance
 real	ymin, ymax	# the minimum and maximum of y axis (ymin not used)
 
 int	fd
 pointer	sp, str, title
-real	scale, aspect, datalimit, threshold, vx1, vx2, vy1, vy2
+real	scale, aspect, datalimit, skysigma, threshold, vx1, vx2, vy1, vy2
+real	cthreshold
 int	stropen(), apstati()
 real	apstatr(), gstatr()
 
@@ -131,13 +136,19 @@ begin
 	    call pargstr (Memc[title])
 	call strclose (fd)
 
-	# Set the labels and window.
+	# Store some default plotting parameters.
 	scale = apstatr (ap, SCALE)
 	aspect = gstatr (gd, G_ASPECT)
 	call gsetr (gd, G_ASPECT, 0.75)
-	datalimit = apstatr (ap, CDATALIMIT)
-	threshold = apstatr (ap, CTHRESHOLD)
 
+	# Set the labels and window.
+	datalimit = apstatr (ap, CDATALIMIT)
+	skysigma = apstatr (ap, SKYSIGMA)
+	cthreshold = apstatr (ap, CTHRESHOLD)
+	if (IS_INDEFR(skysigma) || IS_INDEFR(cthreshold))
+	    threshold = 0.0
+	else
+	    threshold = cthreshold * skysigma
 	if (apstati (ap, POSITIVE) == YES) {
 	    call gseti (gd, G_XDRAWAXES, 2)
 	    call gswind (gd, xmin / scale, xmax / scale, datalimit + threshold,
@@ -166,10 +177,21 @@ begin
 	        "Radial Distance (lower-pixels, upper-scale units)", "")
 	}
 
+	# Set the window up for plotting the data.
 	call gseti (gd, G_YDRAWAXES, 3)
 	call gseti (gd, G_XDRAWAXES, 3)
 	call gsetr (gd, G_ASPECT, aspect)
 	call gt_sets (gt, GTTYPE, "mark")
+	call gt_setr (gt, GTXMIN, xmin)
+	call gt_setr (gt, GTXMAX, xmax)
+	if (apstati (ap, POSITIVE) == YES) {
+	    call gt_setr (gt, GTYMIN, ymin)
+	    call gt_setr (gt, GTYMAX, ymax)
+	} else {
+	    call gt_setr (gt, GTYMIN, ymin)
+	    call gt_setr (gt, GTYMAX, ymax)
+	}
+	call gt_swind (gd, gt)
 
 	call sfree (sp)
 end
@@ -183,7 +205,8 @@ pointer	gd		# the graphics stream
 pointer	ap		# the apphot structure
 
 pointer	sp, str
-real	fwhmpsf, capert, datalimit, threshold, sigma, xmin, xmax, ymin, ymax
+real	fwhmpsf, capert, datalimit, threshold, skysigma, cthreshold
+real	xmin, xmax, ymin, ymax
 int	apstati()
 real	apstatr()
 
@@ -197,7 +220,12 @@ begin
 	fwhmpsf = 0.5 * apstatr (ap, FWHMPSF) * apstatr (ap, SCALE)
 	capert = 2.0 * fwhmpsf * apstatr (ap, CAPERT)
 	datalimit = apstatr (ap, CDATALIMIT)
-	threshold = apstatr (ap, CTHRESHOLD)
+	skysigma = apstatr (ap, SKYSIGMA)
+	cthreshold = apstatr (ap, CTHRESHOLD)
+	if (IS_INDEFR(skysigma) || IS_INDEFR(cthreshold))
+	    threshold = 0.0
+	else
+	    threshold = cthreshold * skysigma
 	if (apstati (ap, POSITIVE) == YES)
 	    threshold = datalimit + threshold
 	else
@@ -227,13 +255,12 @@ begin
 	call gtext (gd, xmin, ymin, Memc[str], "q=h")
 
 	# Mark the sky sigma if defined.
-	sigma = apstatr (ap, SKYSIGMA)
-	if (! IS_INDEFR(sigma) && sigma >= ymin && sigma <= ymax) {
+	if (! IS_INDEFR(skysigma) && skysigma >= ymin && skysigma <= ymax) {
 	    call gmark (gd, (xmin + xmax) / 2.0, (ymin + ymax) / 2.0, 
-		GM_VEBAR, -0.25, -sigma)
+		GM_VEBAR, -0.25, -skysigma)
 	    call sprintf (Memc[str], SZ_LINE, "sigma = %g")
-		call pargr (sigma)
-	    call gtext (gd, (xmin + xmax) / 2.0, (ymin + ymax + sigma) / 2.0,
+		call pargr (skysigma)
+	    call gtext (gd, (xmin + xmax) / 2.0, (ymin + ymax + skysigma) / 2.0,
 		Memc[str], "q=h;h=c")
 	}
 
@@ -252,14 +279,19 @@ pointer	ap		# the apphot pointer
 real	xmin, xmax	# the minimum and maximum radial distance
 real	ymin, ymax	# the minimum and maximum of the y axis (ymin not used)
 
-real	threshold, datalimit
+real	datalimit, skysigma, threshold, cthreshold
 int	apstati()
 real	apstatr()
 
 begin
 	# Set the data window.
 	datalimit = apstatr (ap, CDATALIMIT)
-	threshold = apstatr (ap, CTHRESHOLD)
+	skysigma = apstatr (ap, SKYSIGMA)
+	cthreshold = apstatr (ap, CTHRESHOLD)
+	if (IS_INDEFR(skysigma) || IS_INDEFR(cthreshold))
+	    threshold = 0.0
+	else
+	    threshold = cthreshold * skysigma
 	call gt_setr (gt, GTXMIN, xmin)
 	call gt_setr (gt, GTXMAX, xmax)
 	if (apstati (ap, POSITIVE) == YES) {

@@ -34,6 +34,7 @@ begin
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
 	call cal_open (NULL)
+	call ccd_open (0)
 
 	# Process each image.
 	while (imtgetim (listin, Memc[input], SZ_FNAME) != EOF) {
@@ -100,6 +101,7 @@ begin
 	call imtclose (listin)
 	call imtclose (listout)
 	call cal_close ()
+	call ccd_close ()
 	call sfree (sp)
 end
 
@@ -144,7 +146,7 @@ begin
 	call imunmap (in)
 	call strcpy (input, Memc[tmp], SZ_FNAME)
 	call mktemp ("tmp", Memc[illum], SZ_FNAME)
-	call mkillumination (Memc[tmp], Memc[illum], NO)
+	call mkillumination (Memc[tmp], Memc[illum], NO, NO)
 
 	in = immap (input, READ_ONLY, 0)
 	im = immap (Memc[illum], READ_ONLY, 0)
@@ -167,7 +169,7 @@ begin
 		Memr[impl2r(out,i)], nc)
 
 	# Log the operation.
-	call sprintf (Memc[str], SZ_LINE, "Converted to fringe correction")
+	call sprintf (Memc[str], SZ_LINE, "Fringe correction created")
 	call timelog (Memc[str], SZ_LINE)
 	call ccdlog (out1, Memc[str])
 	call hdmpstr (out, "mkfringe", Memc[str])

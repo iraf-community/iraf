@@ -1,4 +1,4 @@
-.help wtar Dec85 softools
+.help wtar Oct92 softools
 .ih
 NAME
 wtar -- write TAR format archive file
@@ -20,32 +20,30 @@ Print the name of each file as it is written or omitted.
 Verbose mode; print more information about each file.
 .le
 .ls 12 -f archive
-The tar format file to be written, i.e., "stdout", a magtape specification
-(e.g., "mta"), or the IRAF virtual filename of a disk file.  The default
-is the standard output.
+The tar format file to be written, i.e., "stdout", a host magtape device
+name (e.g., "/dev/nrmt8" or "MSA0"), or the IRAF virtual filename of a disk
+file.  The default is the standard output.
 .le
 .ls 12 files
 The names of the files or root directories of directory trees to be written
-to the archive file.  If no files are specified "." (the directory tree rooted
-at the current directory) is assumed.
+to the archive file.  If no files are specified "." (the directory tree
+rooted at the current directory) is assumed.
 .le
 .ih
 DESCRIPTION
-The named files and directories are written to the indicated UNIX "tar" format
-output file.  Any directories in the file list are recursively descended.
-The named directories should be subdirectories of the current directory when
-\fIwtar\fR is called.  Binary files may be omitted if desired, e.g., when
-transporting software to a different host, or when making a backup of a large
-system which would otherwise exceed the capacity of a single reel of tape.
-All file, directory, and magtape names conform to the IRAF standard.
+The named files and directories are written to the indicated
+UNIX "tar" format output file.  Any directories in the file list are
+recursively descended.  The named directories should be subdirectories of
+the current directory when \fIwtar\fR is called.  Binary files may be
+omitted if desired, e.g., when transporting software to a different host, or
+when making a backup of a large system which would otherwise exceed the
+capacity of a single reel of tape.  All file, directory, and magtape names
+conform to the IRAF standard.
 
-The output file is normally either a disk file (e.g., if the transport medium
-is an electronic network), or a magtape file.  If the output file is a magtape
-the tape is rewound before the archive is written, only one file may be written
-on a single reel of tape, and the entire file must fit on a single reel of
-tape.  The blocking factor is fixed at 10240 bytes per record.  Note that a
-disk archive file can be encoded and pushed through a modem to transport
-modest size directories to a remote site with minimum delay.
+The output file is normally either a disk file (e.g., if the transport
+medium is an electronic network), or a magtape file.  If the output file is
+a magtape multiple files, i.e., wtar archives, may be written on the tape.
+The blocking factor is fixed at 10240 bytes per record.
 
 The TAR format file written by \fIwtar\fR conforms to the UNIX standard except
 that [1] no link information is preserved, [2] the user and group numbers
@@ -54,32 +52,38 @@ and [3] some versions of \fIwtar\fR (e.g., VMS) pad text files at the end
 with extra blank lines.
 
 All \fIwtar\fR filename arguments are IRAF virtual filenames (or host
-filenames).  Magtape devices may be specified by their IRAF logical device
-name (if the "dev$devices" file is in place and is up to date), or by the
-host device name, prefixed with a "mt.", e.g., "mt.MUA1" or "mt./dev/rmt9".
+filenames).  Magtape devices should be specified by their host (not IRAF)
+device name, e.g., "/dev/nrmt8" or "MSA0".
 .ih
 EXAMPLES
-1. Make a source-only archive of the IRAF system on drive B at the default
-density.
+1. Make a source-only archive of the IRAF system on the UNIX device
+/dev/nrmt8.
 
 .nf
 	cl> cd iraf
-	cl> wtar -of mtb
+	cl> wtar -of /dev/nrmt8
 .fi
 
-2. Make a disk archive of the LIB and PKG directory trees in your home
+2. Archive the "uparm" directory to the VMS logical device MSA0:.
+
+	cl> wtar -f msa0 uparm
+
+3. Make a disk archive of the LIB and PKG directory trees in your home
 directory.
 
-	cl> wtar -f home$pkgarc lib pkg 
+	cl> wtar -f home$archive.tar lib pkg 
 
-3. Examine the resultant file to make sure everything worked correctly.
+4. Examine the resultant file to make sure everything worked correctly.
 
-	cl> rtar -tvf home$pkgarc
+	cl> rtar -tvf home$archive.tar
 
 
-4. Make a disk archive, using a host filename for the output file.
+5. Make a disk archive, using a host filename for the output file.
 
 	cl> wtar -f /tmp2/arc lib pkg sys
+
+IRAF magtape commands such as \fIrewind\fR may be used with \fIwtar\fR,
+but switching between IRAF and host device names can be confusing.
 .ih
 SEE ALSO
 rtar, rmbin

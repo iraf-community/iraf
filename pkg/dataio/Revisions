@@ -1,5 +1,36 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$fits/fits_cards.x
+    Added some wfits code to filter any "END     " keywords out of the image
+    header userarea.
+    (3/17/95 Davis)
+
+dataio$fits/t_wfits.x
+    Wfits was using the name of the @file instead of the first file  as the
+    root output fits file name if the number of output files was 1.
+    (1/18/95 Davis)
+
+dataio$fits/fits_wheader.x
+    The autoscaling code was failing  in the case bitpix=16 and pixtype=ushort.
+    Bscale and bzero values were being set to 1.0 and 0.0 respectively,
+    resulting in truncation of data values. The code has been modified to
+    set bscale and bzero to 1.0 and 32768 instead.(10/18/94 Davis)
+
+dataio$imtext/t_rtextimage.x
+dataio$imtext/t_wtextimage.x
+dataio$imtext/rt_cvtpix.x
+dataio$rtextimage.par
+dataio$wtextimage.par
+dataio$doc/rtextimage.hlp
+dataio$doc/wtextimage.hlp
+    A parameter "pixels" was added to select whether to read or write
+    the pixel values.  This is complementary to rfits/wfits and allows
+    use of these tasks to store and restore image headers.  (10/22/93, Valdes)
+
+dataio$reblock/t_reblock.x: Davis, Jan 20, 1993
+    Added support for multiple disk file input and output to the reblock
+    task.
+
 dataio$fits/fits_read: Davis, Apr 27, 1992
     Modified rfits to use the fe parameter to skip to EOF for devices
     e.g. cartridge tapes which seem to be having problems with file

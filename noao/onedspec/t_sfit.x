@@ -3,15 +3,16 @@ include <pkg/gtools.h>
 include <pkg/rg.h>
 include <math/curfit.h>
 include	<error.h>
-include "shdr.h"
+include	<smw.h>
 
 # SFIT -- Fit a function to spectra and output the fit, difference or
 # ratio; or print the power series coefficients of the fit.  The fitting
 # parameters may be set interactively using the icfit package.
 
-# Image header keyword for saving the previous fit
+# Image header keywords for saving the previous fit
 
 define	SFT_KW		"SFIT"
+define	SFT_KWB		"SFITB"
 
 # Choices for the type of output
 
@@ -48,7 +49,7 @@ define	SKIP_CANCEL	4
 
 # Switches and pointers
 
-define	SFT_OFF		20			# with a little elbow room
+define	SFT_OFF		22
 
 define	INTERACTIVE	Memi[$1]		# all spectra are noninteractive
 define	REPLACE		Memi[$1+1]		# replace rejected points?
@@ -66,13 +67,17 @@ define	QUIET		Memi[$1+10]		# quiet flag
 define	RGIN		Memi[$1+11]		# lines specified
 define	RGFIT		Memi[$1+12]		# all lines to fit
 define	RGREFIT		Memi[$1+13]		# those to fit again
+define	RGINB		Memi[$1+14]		# bands specified
+define	RGFITB		Memi[$1+15]		# all bands to fit
+define	RGREFITB	Memi[$1+16]		# those to fit again
 
-define	NLOGFD		Memi[$1+14]		# number of logfiles
-define	LOGFD		Memi[$1+15]		# array of logfiles
+define	NLOGFD		Memi[$1+17]		# number of logfiles
+define	LOGFD		Memi[$1+18]		# array of logfiles
 
-define	IC		Memi[$1+16]		# current ic descriptor
-define	YMAX		Memi[$1+17]		# max number of lines
-define	IC_DESC		Memi[$1+SFT_OFF+$2-1]	# ic descriptors
+define	IC		Memi[$1+19]		# current ic descriptor
+define	YMAX		Memi[$1+20]		# max number of lines
+define	BMAX		Memi[$1+21]		# max number of lines
+define	IC_DESC		Memi[$1+SFT_OFF+($3-1)*YMAX($1)+$2-1]	# ic descriptors
 
 
 # T_SFIT -- Entry point for the task.  Read parameters,
@@ -170,14 +175,15 @@ procedure sft_init (listin, listout, sf)
 pointer	listin, listout		#I Image template descriptors
 pointer	sf			#I Pointer to task switches
 
-pointer	input, output, im, sp
-int	ymax, i
+pointer	input, output, im, sp, mw
+int	ymax, bmax, i, j
 
 real	clgetr()
 bool	clgetb()
 int	clgwrd(), clgeti(), btoi(), strlen()
 int	rg_next(), imtgetim(), imaccess(), xt_logopen()
-pointer	rg_ranges(), immap()
+pointer	rg_ranges(), immap(), smw_openim()
+errchk	immap, smw_openim
 
 begin
 	call smark (sp)
@@ -187,13 +193,17 @@ begin
 	sf = NULL
 	iferr {
 
-	    # find the maximum number of lines (spectra)
+	    # find the maximum number of lines and bands (spectra)
 	    ymax = 0
+	    bmax = 0
 
 	    while (imtgetim (listin, Memc[input], SZ_LINE) != EOF)
 		if (imaccess (Memc[input], READ_ONLY) == YES) {
 		    im = immap (Memc[input], READ_ONLY, 0)
-		    ymax = max (IM_LEN(im, 2), ymax)
+		    mw = smw_openim (im)
+		    ymax = max (SMW_LLEN(mw,2), ymax)
+		    bmax = max (SMW_LLEN(mw,3), bmax)
+		    call smw_close (mw)
 		    call imunmap (im)
 		}
 	    call imtrew (listin)
@@ -202,22 +212,28 @@ begin
 		while (imtgetim (listout, Memc[output], SZ_FNAME) != EOF)
 		    if (imaccess (Memc[output], READ_ONLY) == YES) {
 			im = immap (Memc[output], READ_ONLY, 0)
-			ymax = max (IM_LEN(im, 2), ymax)
+			mw = smw_openim (im)
+			ymax = max (SMW_LLEN(mw,2), ymax)
+			bmax = max (SMW_LLEN(mw,3), bmax)
+			call smw_close (mw)
 			call imunmap (im)
 		    }
 		call imtrew (listout)
 	    }
 
 	    # allocate space for the task switch structure
-	    call malloc (sf, SFT_OFF + ymax, TY_STRUCT)
+	    call malloc (sf, SFT_OFF + ymax * bmax, TY_STRUCT)
 
 	    YMAX(sf) = ymax
+	    BMAX(sf) = bmax
 
 	    # NULL the pointers for error handling
 	    RGIN(sf)	= NULL
+	    RGINB(sf)	= NULL
 	    NLOGFD(sf)	= 0
-	    do i = 1, YMAX(sf)
-		IC_DESC(sf,i) = NULL
+	    do j = 1, BMAX(sf)
+		do i = 1, YMAX(sf)
+		    IC_DESC(sf,i,j) = NULL
 
 	    # Set the switches
 	    INTERACTIVE(sf) = btoi (clgetb ("interactive"))
@@ -233,7 +249,6 @@ begin
 	    # Expand the range specification, allow either hyphens or colons
 
 	    call clgstr ("lines", Memc[input], SZ_LINE)
-
 	    do i = 1, strlen (Memc[input])
 		if (Memc[input+i-1] == '-')
 		    Memc[input+i-1] =  ':'
@@ -244,9 +259,21 @@ begin
 	    call rg_order (RGIN(sf))
 	    call rg_merge (RGIN(sf))
 
+	    call clgstr ("bands", Memc[input], SZ_LINE)
+	    do i = 1, strlen (Memc[input])
+		if (Memc[input+i-1] == '-')
+		    Memc[input+i-1] =  ':'
+		else if (Memc[input+i-1] == 'x' || Memc[input+i-1] == 'X')
+		    call error (1, "Range step (`x' notation) not implemented")
+
+	    RGINB(sf) = rg_ranges (Memc[input], 1, BMAX(sf))
+	    call rg_order (RGINB(sf))
+	    call rg_merge (RGINB(sf))
+
 	    i = 0
-	    if (rg_next (RGIN(sf), i) == EOF)
-		call error (1, "With range specification for `lines'")
+	    j = 0
+	    if (rg_next (RGIN(sf), i) == EOF || rg_next (RGINB(sf), j) == EOF)
+		call error (1, "With range specification for `lines or bands'")
 	    else {
 		# Open the initial icfit descriptor
 		call ic_open (IC(sf))
@@ -264,7 +291,7 @@ begin
 		call ic_putr (IC(sf), "grow", clgetr ("grow"))
 		call ic_puti (IC(sf), "markrej", btoi (clgetb ("markrej")))
 
-		IC_DESC(sf,i) = IC(sf)
+		IC_DESC(sf,i,j) = IC(sf)
 	    }
 
 	    # Get the desired output type
@@ -291,17 +318,20 @@ procedure sft_close (sf)
 
 pointer	sf			#I Pointer to task switches
 
-int	i
+int	i, j
 
 begin
 	if (sf != NULL) {
 	    if (RGIN(sf) != NULL)
 		call rg_free (RGIN(sf))
+	    if (RGINB(sf) != NULL)
+		call rg_free (RGINB(sf))
 	    if (NLOGFD(sf) != 0)
 		call xt_logclose (LOGFD(sf), NLOGFD(sf), "END:")
-	    do i = 1, YMAX(sf)
-		if (IC_DESC(sf,i) != NULL)
-		    call ic_closer (IC_DESC(sf,i))
+	    do j = 1, BMAX(sf)
+		do i = 1, YMAX(sf)
+		    if (IC_DESC(sf,i,j) != NULL)
+			call ic_closer (IC_DESC(sf,i,j))
 	    call mfree (sf, TY_STRUCT)
 	}
 end
@@ -319,9 +349,10 @@ pointer	sh			#O SHDR pointer
 pointer	sf			#I Pointer for task switches
 pointer	gp			#I GIO pointer
 
-int	i
+int	i, ax1, ax2, ax3
 pointer	inroot, insect, outroot, outsect, b1, b2
-pointer	sp, inranges, outranges, rgin, rgout, rgtmp
+pointer	sp, inranges, outranges
+pointer	rgin, rgout, rgtmp, rgtmpb
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 char	emsg[SZ_LINE]
 
@@ -347,6 +378,8 @@ begin
 	sh = NULL
 	RGFIT(sf) = NULL
 	RGREFIT(sf) = NULL
+	RGFITB(sf) = NULL
+	RGREFITB(sf) = NULL
 
 	call imgimage (input, Memc[inroot], SZ_FNAME)
 	call imgsection (input, Memc[insect], SZ_FNAME)
@@ -386,6 +419,8 @@ begin
 
 	    in = immap (Memc[inroot], READ_ONLY, 0)
 	    out = immap (Memc[outroot], NEW_COPY, in)
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
 
 	    # Do this since imcopy is unimplemented
 
@@ -411,7 +446,6 @@ begin
 		}
 
 	}
-	mw = smw_openim (in)
 
 	do i = 4, IM_NDIM(in)
 	    if (IM_LEN(in, i) != 1) {
@@ -432,20 +466,51 @@ begin
 	    call imastr (out, SFT_KW, Memc[outranges])
 	}
 
-	rgin = rg_ranges (Memc[inranges], 1, IM_LEN(in, 2))
-	rgout = rg_ranges (Memc[outranges], 1, IM_LEN(out, 2))
+	mw = smw_openim (in)
+	ax1 = SMW_LLEN(mw,1)
+	ax2 = SMW_LLEN(mw,2)
+	ax3 = SMW_LLEN(mw,3)
+
+	rgin = rg_ranges (Memc[inranges], 1, ax2)
+	rgout = rg_ranges (Memc[outranges], 1, ax2)
 	rgtmp = rg_union (rgin, rgout)
 	call rg_free (rgin)
 	call rg_free (rgout)
 
+	if (imaccf (in, SFT_KWB) == YES)
+	    call imgstr (in, SFT_KWB, Memc[inranges], SZ_LINE)
+	else
+	    call strcpy ("", Memc[inranges], SZ_LINE)
+
+	if (imaccf (out, SFT_KWB) == YES)
+	    call imgstr (out, SFT_KWB, Memc[outranges], SZ_LINE)
+	else {
+	    call strcpy ("", Memc[outranges], SZ_LINE)
+	    call imastr (out, SFT_KWB, Memc[outranges])
+	}
+
+	rgin = rg_ranges (Memc[inranges], 1, ax3)
+	rgout = rg_ranges (Memc[outranges], 1, ax3)
+	rgtmpb = rg_union (rgin, rgout)
+	call rg_free (rgin)
+	call rg_free (rgout)
+
 	if (OVERRIDE(sf) == YES) {
-	    RGFIT(sf) = rg_window (RGIN(sf), 1, IM_LEN(in, 2))
+	    RGFIT(sf) = rg_window (RGIN(sf), 1, ax2)
 	    RGREFIT(sf) = rgtmp
+	    RGFITB(sf) = rg_window (RGINB(sf), 1, ax3)
+	    RGREFITB(sf) = rgtmpb
 	} else {
-	    call rg_inverse (rgtmp, 1, IM_LEN(out, 2))
+	    call rg_inverse (rgtmp, 1, ax2)
 	    RGFIT(sf) = rg_intersect (RGIN(sf), rgtmp)
 	    RGREFIT(sf) = rg_ranges ("0", 1, 2)
 	    call rg_free (rgtmp)
+	    #call rg_inverse (rgtmpb, 1, ax3)
+	    #RGFITB(sf) = rg_intersect (RGINB(sf), rgtmpb)
+	    #RGREFITB(sf) = rg_ranges ("0", 1, 2)
+	    #call rg_free (rgtmpb)
+	    RGFITB(sf) = rg_window (RGINB(sf), 1, ax3)
+	    RGREFITB(sf) = rgtmpb
 	}
 
 	if (RG_NPTS(RGFIT(sf)) <= 0) {
@@ -480,7 +545,7 @@ pointer	sf			#I Task structure pointer
 begin
 	call shdr_close (sh)
 	if (mw != NULL)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	if (out != NULL && out != in)
 	    call imunmap (out)
 	if (in != NULL)
@@ -489,6 +554,10 @@ begin
 	    call rg_free (RGFIT(sf))
 	if (RGREFIT(sf) != NULL)
 	    call rg_free (RGREFIT(sf))
+	if (RGFITB(sf) != NULL)
+	    call rg_free (RGFITB(sf))
+	if (RGREFITB(sf) != NULL)
+	    call rg_free (RGREFITB(sf))
 end
 
 
@@ -506,19 +575,20 @@ pointer	gt				#I GTOOLS pointer
 char	graphics[ARB]			#I Graphics device
 
 pointer	sp, wts, cv, data
-int	line
+int	line, band, i, j, n
 
 int	sft_getline()
-pointer	gopen(), impl3r()
+pointer	gopen(), imps3r()
 real	sft_efncr()
 extern	sft_efncr
 
 begin
 	call smark (sp)
-	call salloc (wts, IM_LEN(in,1), TY_REAL)
+	call salloc (wts, SMW_LLEN(mw,1), TY_REAL)
 
 	line = 0
-	while (sft_getline (in, mw, sh, sf, gt, line) > 0) {
+	band = 0
+	while (sft_getline (in, mw, sh, sf, gt, line, band) != EOF) {
 
 	    call amovkr (1., Memr[wts], SN(sh))
 
@@ -534,9 +604,19 @@ begin
 		    Memr[wts], SN(sh), YES, YES, YES, YES)
 
 	    if (LISTONLY(sf) == NO) {
-		data = impl3r (out, line, 1)
-		if (SN(sh) < IM_LEN(out,1))
-		    call aclrr (Memr[data], IM_LEN(out,1))
+		i = LINDEX(sh,1)
+		j = LINDEX(sh,2)
+		n = SMW_LLEN(mw,1)
+		switch (SMW_LAXIS(mw,1)) {
+		case 1:
+		    data = imps3r (out, 1, n, i, i, j, j)
+		case 2:
+		    data = imps3r (out, i, i, 1, n, j, j)
+		case 3:
+		    data = imps3r (out, i, i, j, j,  1, n)
+		}
+		if (SN(sh) < n)
+		    call aclrr (Memr[data], n)
 
 		switch (OUTTYPE(sf)) {
 		case DATA:
@@ -544,17 +624,17 @@ begin
 			call ic_clean (IC(sf), cv, Memr[SX(sh)], Memr[SY(sh)],
 			    Memr[wts], SN(sh))
 		    call amovr (Memr[SY(sh)], Memr[data], SN(sh))
-		    call sft_update (out, line)
+		    call sft_update (out, mw, line, band)
 		case FIT:
 		    call cvvector (cv, Memr[SX(sh)], Memr[data], SN(sh))
-		    call sft_update (out, line)
+		    call sft_update (out, mw, line, band)
 		case DIFFERENCE:
 		    call cvvector (cv, Memr[SX(sh)], Memr[data], SN(sh))
 		    if (REPLACE(sf) == YES)
 			call ic_clean (IC(sf), cv, Memr[SX(sh)], Memr[SY(sh)],
 			    Memr[wts], SN(sh))
 		    call asubr (Memr[SY(sh)], Memr[data], Memr[data], SN(sh))
-		    call sft_update (out, line)
+		    call sft_update (out, mw, line, band)
 		case RATIO:
 		    call cvvector (cv, Memr[SX(sh)], Memr[data], SN(sh))
 		    if (REPLACE(sf) == YES)
@@ -562,7 +642,7 @@ begin
 			    Memr[wts], SN(sh))
 		    call advzr (Memr[SY(sh)], Memr[data], Memr[data], SN(sh),
 			sft_efncr)
-		    call sft_update (out, line)
+		    call sft_update (out, mw, line, band)
 		default:
 		    call error (1, "bad switch in sft_icfit")
 		}
@@ -588,10 +668,10 @@ begin
 end
 
 
-# SFT_GETLINE -- Get image data to be fit.  Returns the line number
-# or 0 when the ranges are exhausted.
+# SFT_GETLINE -- Get image data to be fit.  Returns the line and band numbers.
+# Returns EOF when done.
 
-int procedure sft_getline (in, mw, sh, sf, gt, line)
+int procedure sft_getline (in, mw, sh, sf, gt, line, band)
 
 pointer	in			#I IMIO pointer
 pointer	mw			#I MWCS pointer
@@ -599,8 +679,9 @@ pointer	sh			#I SHDR pointer
 pointer	sf			#I Pointer for task switches
 pointer	gt			#I GTOOLS pointer
 int	line			#U Line number
+int	band			#U Band number
 
-int	i, ny
+int	i
 bool	waveok
 char	ask[LEN_ANS]
 pointer	linebuf, rg1, rg2, sp
@@ -617,38 +698,32 @@ begin
 	call smark (sp)
 	call salloc (linebuf, SZ_LINE, TY_CHAR)
 
-	if (line == 0)
-	    ny = IM_LEN(in, 2)
+	if (band == 0)
+	    if (rg_next (RGFITB(sf), band) == EOF)
+		return (EOF)
 
 again_	if (rg_next (RGFIT(sf), line) == EOF) {
 	    line = 0
-	    return (line)
+	    if (rg_next (RGFITB(sf), band) == EOF)
+		return (EOF)
+	    goto again_
 	}
 
 	if (PROMPT(sf) == YES) {
 	    call clprintf ("ask.p_min", "%s")
 		call pargstr (SFT_ANS1X)
 
-	    if (ny == 1 && rg_inrange (RGREFIT(sf), line) == YES) {
+	    if (rg_inrange (RGREFIT(sf), line) == YES &&
+		rg_inrange (RGREFITB(sf), band) == YES) {
 		call clprintf ("ask.p_prompt",
-		    "Refit %s w/ graph?                   ")
-
-	    } else if (ny == 1) {
-		call clprintf ("ask.p_prompt",
-		    "Fit %s w/ graph?                     ")
-
-	    } else if (rg_inrange (RGREFIT(sf), line) == YES) {
-		call clprintf ("ask.p_prompt",
-		    "Refit line %d of %s w/ graph?        ")
-
+		    "Refit [%d,%d] of %s w/ graph?        ")
 	    } else {
 		call clprintf ("ask.p_prompt",
-		    "Fit line %d of %s w/ graph?          ")
+		    "Fit [%d,%d] of %s w/ graph?          ")
 	    }
-
-		if (ny != 1)
-		    call pargi (line)
-		call pargstr (IM_HDRFILE(in))
+	    call pargi (line)
+	    call pargi (band)
+	    call pargstr (IM_HDRFILE(in))
 
 	    switch (clgwrd ("ask", ask, LEN_ANS, SFT_ANS1)) {
 
@@ -670,11 +745,6 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 		PROMPT(sf) = NO
 
 	    case SKIP_ALWAYS:
-		if (ny == 1) {
-		    line = EOF
-		    return (line)
-		}
-
 		call clprintf ("ask", "cancel")
 		call clprintf ("ask.p_min", "%s")
 		    call pargstr (SFT_ANS2X)
@@ -689,8 +759,8 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 		    call sprintf (Memc[linebuf], SZ_LINE, "%d")
 			call pargi (line)
 
-		    rg1 = rg_ranges (Memc[linebuf], 1, ny)
-		    call rg_inverse (rg1, 1, ny)
+		    rg1 = rg_ranges (Memc[linebuf], 1, SMW_LLEN(mw,2))
+		    call rg_inverse (rg1, 1, SMW_LLEN(mw,2))
 		    rg2 = rg_intersect (RGIN(sf), rg1)
 		    call rg_free (rg1)
 		    call rg_free (RGIN(sf))
@@ -700,13 +770,11 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 
 		case SKIP_IMAGE:
 		    call clprintf ("ask", "yes")
-		    line = 0
-		    return (line)
+		    return (EOF)
 
 		case SKIP_ALL:
 		    call clprintf ("ask", "yes")
-		    line = EOF
-		    return (line)
+		    return (EOF)
 
 		case SKIP_CANCEL:
 		    call clprintf ("ask", "yes")
@@ -725,7 +793,7 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 
 	}
 
-	call shdr_open (in, mw, line, 1, INDEFI, SHDATA, sh)
+	call shdr_open (in, mw, line, band, INDEFI, SHDATA, sh)
 
 	if (LOGSCALE(sf) == YES)
 	    call alogr (Memr[SY(sh)], Memr[SY(sh)], SN(sh), sft_efncr)
@@ -744,13 +812,13 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 
 	# Initialize and/or update the icfit descriptor
 
-	if (IC_DESC(sf,line) == NULL) {
-	    call ic_open (IC_DESC(sf,line))
-	    call ic_copy (IC(sf), IC_DESC(sf,line))
-	    call ic_pstr (IC_DESC(sf,line), "sample", "*")
+	if (IC_DESC(sf,line,band) == NULL) {
+	    call ic_open (IC_DESC(sf,line,band))
+	    call ic_copy (IC(sf), IC_DESC(sf,line,band))
+	    #call ic_pstr (IC_DESC(sf,line,band), "sample", "*")
 	}
 
-	IC(sf) = IC_DESC(sf,line)
+	IC(sf) = IC_DESC(sf,line,band)
 
 	call ic_putr (IC(sf), "xmin", min (Memr[SX(sh)], Memr[SX(sh)+SN(sh)-1]))
 	call ic_putr (IC(sf), "xmax", max (Memr[SX(sh)], Memr[SX(sh)+SN(sh)-1]))
@@ -770,16 +838,17 @@ again_	if (rg_next (RGFIT(sf), line) == EOF) {
 		call ic_pstr (IC(sf), "ylabel", "")
 	    }
 
-	    call sprintf (Memc[linebuf], SZ_LINE, "%s, line = %d\n%s")
+	    call sprintf (Memc[linebuf], SZ_LINE, "%s, [%d,%d]\n%s")
 		call pargstr (IM_HDRFILE(in))
 		call pargi (line)
+		call pargi (band)
 		call pargstr (TITLE(sh))
 
 	    call gt_sets (gt, GTTITLE, Memc[linebuf])
 	}
 
 	call sfree (sp)
-	return (line)
+	return (OK)
 end
 
 
@@ -865,10 +934,12 @@ end
 
 # SFT_UPDATE -- Update the keyword with completed spectrum.  Flush the pixels.
 
-procedure sft_update (im, line)
+procedure sft_update (im, mw, line, band)
 
 pointer	im			#I IMIO pointer
+pointer	mw			#I MWCS pointer
 int	line			#I Line just completed
+int	band			#I Band just completed
 
 pointer linebuf, rg1, rg2, rgold, sp
 
@@ -882,19 +953,34 @@ begin
 
 	call sprintf (Memc[linebuf], SZ_LINE, "%d")
 	    call pargi (line)
-	rg1 = rg_ranges (Memc[linebuf], 1, IM_LEN(im, 2))
+	rg1 = rg_ranges (Memc[linebuf], 1, SMW_LLEN(mw,2))
 
 	call imgstr (im, SFT_KW, Memc[linebuf], SZ_LINE)
-	rg2 = rg_ranges (Memc[linebuf], 1, IM_LEN(im, 2))
+	rg2 = rg_ranges (Memc[linebuf], 1, SMW_LLEN(mw,2))
 
 	rgold = rg_union (rg1, rg2)
 	call rg_encode (rgold, Memc[linebuf], SZ_LINE)
 	call impstr (im, SFT_KW, Memc[linebuf])
 
-	call imflush (im)
+	call rg_free (rg1)
+	call rg_free (rg2)
+	call rg_free (rgold)
+
+	call sprintf (Memc[linebuf], SZ_LINE, "%d")
+	    call pargi (band)
+	rg1 = rg_ranges (Memc[linebuf], 1, SMW_LLEN(mw,3))
+
+	call imgstr (im, SFT_KWB, Memc[linebuf], SZ_LINE)
+	rg2 = rg_ranges (Memc[linebuf], 1, SMW_LLEN(mw,3))
+
+	rgold = rg_union (rg1, rg2)
+	call rg_encode (rgold, Memc[linebuf], SZ_LINE)
+	call impstr (im, SFT_KWB, Memc[linebuf])
 
 	call rg_free (rg1)
 	call rg_free (rg2)
 	call rg_free (rgold)
+
+	call imflush (im)
 	call sfree (sp)
 end

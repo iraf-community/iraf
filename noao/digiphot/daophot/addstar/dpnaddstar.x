@@ -1,9 +1,9 @@
 include <time.h>
 include	<tbset.h>
 include "../lib/daophotdef.h"
-include "../lib/apsel.h"
+include "../lib/apseldef.h"
 
-define	NCOLUMN 	4
+define	ADD_NOUTCOLUMN 	4
 
 # DP_TNADDSTAR -- Create an output ADDSTAR table.
 
@@ -19,11 +19,11 @@ pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 begin
 	# Allocate space for table definition.
 	call smark (sp)
-	call salloc (colnames, NCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, NCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, NCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, NCOLUMN, TY_INT)
-	call salloc (col_len, NCOLUMN, TY_INT)
+	call salloc (colnames, ADD_NOUTCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
+	call salloc (colunits, ADD_NOUTCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
+	call salloc (colformat, ADD_NOUTCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
+	call salloc (col_dtype, ADD_NOUTCOLUMN, TY_INT)
+	call salloc (col_len, ADD_NOUTCOLUMN, TY_INT)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -33,8 +33,8 @@ begin
 
 	# Set up the column formats.
 	call strcpy ("%5d", Memc[colformat], SZ_COLFMT)
-	call strcpy ("%10.2f", Memc[colformat+SZ_COLFMT+1], SZ_COLFMT)
-	call strcpy ("%10.2f", Memc[colformat+2*SZ_COLFMT+2], SZ_COLFMT)
+	call strcpy ("%10.3f", Memc[colformat+SZ_COLFMT+1], SZ_COLFMT)
+	call strcpy ("%10.3f", Memc[colformat+2*SZ_COLFMT+2], SZ_COLFMT)
 	call strcpy ("%12.3f", Memc[colformat+3*SZ_COLFMT+3], SZ_COLFMT)
 
 	# Set up the units definitions.
@@ -50,11 +50,11 @@ begin
 	Memi[col_dtype+2] = TY_REAL
 	Memi[col_dtype+3] = TY_REAL
 
-	do i = 1, NCOLUMN 
+	do i = 1, ADD_NOUTCOLUMN 
 	    Memi[col_len+i-1] = 1
 	
 	call tbcdef (tp, columns, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], NCOLUMN)
+	    Memc[colformat], Memi[col_dtype], Memi[col_len], ADD_NOUTCOLUMN)
 	call tbtcre (tp)
 
 	# Write out the header parameters.
@@ -67,8 +67,8 @@ end
 
 define ADD_NAMESTR "#N%4tID%10tXCENTER%20tYCENTER%30tMAG%80t\\\n"
 define ADD_UNITSTR "#U%4t##%10tpixels%20tpixels%30tmagnitudes%80t\\\n"
-define ADD_FORMATSTR "#F%4t%%-6d%10t%%-10.2f%20t%%-10.2f%30t%%-12.3f%80t \n"
-define ADD_DATASTR "%4t%-6d%10t%-10.2f%20t%-10.2f%30t%-12.3f%80t \n"
+define ADD_FORMATSTR "#F%4t%%-9d%10t%%-10.3f%20t%%-10.3f%30t%%-12.3f%80t \n"
+define ADD_DATASTR "%4t%-6d%10t%-10.3f%20t%-10.3f%30t%-12.3f%80t \n"
 
 
 # DP_XNADDSTAR -- Write out the ADDSTAR header parameters into a text file.
@@ -76,7 +76,7 @@ define ADD_DATASTR "%4t%-6d%10t%-10.2f%20t%-10.2f%30t%-12.3f%80t \n"
 procedure dp_xnaddstar (dao, tp)
 
 pointer	dao			# pointer to the daophot structure
-pointer	tp			# pointer to group output file
+int	tp			# group output file descriptor
 
 begin
 	# Add header parameters to the table.
@@ -94,16 +94,16 @@ end
 # DP_XWADD -- Procedure to write out the new star to the ADDSTAR output
 # text file.
 
-procedure dp_xwadd (grp, id, x, y, mag)
+procedure dp_xwadd (tp, id, x, y, mag)
 
-int	grp			# output file
+int	tp			# output file descriptor
 int	id			# id number
 real	x			# x value
 real	y			# y value
 real	mag			# magnitude
 
 begin
-	call fprintf (grp, ADD_DATASTR)
+	call fprintf (tp, ADD_DATASTR)
 	    call pargi (id)
 	    call pargr (x)
 	    call pargr (y)
@@ -114,9 +114,9 @@ end
 # DP_TWADD -- Procedure to write out the new star to the ADDSTAR output
 # table.
 
-procedure dp_twadd (grp, colpoint, id, x, y, mag, row)
+procedure dp_twadd (tp, colpoint, id, x, y, mag, row)
 
-pointer	grp			# pointer to group output file
+int	tp			# pointer to group output table
 int	colpoint[ARB]		# column pointers
 int	id			# id number
 real	x			# x value
@@ -125,10 +125,10 @@ real	mag			# magnitude
 int	row			# row number to be added
 
 begin
-	call tbrpti (grp, colpoint[1], id, 1, row)
-	call tbrptr (grp, colpoint[2], x, 1, row)
-	call tbrptr (grp, colpoint[3], y, 1, row)
-	call tbrptr (grp, colpoint[4], mag, 1, row)
+	call tbrpti (tp, colpoint[1], id, 1, row)
+	call tbrptr (tp, colpoint[2], x, 1, row)
+	call tbrptr (tp, colpoint[3], y, 1, row)
+	call tbrptr (tp, colpoint[4], mag, 1, row)
 end
 
 
@@ -138,10 +138,9 @@ end
 procedure dp_xgadppars (dao, tp)
 
 pointer	dao			# pointer to the DAOPHOT structure
-pointer	tp			# pointer to the table
+int	tp			# output file descriptor
 
 pointer	sp, outstr, date, time
-bool	itob()
 int	envfind()
 
 begin
@@ -168,18 +167,18 @@ begin
 	call dp_sparam (tp, "TASK", "addstar", "name", "")
 
 	# Write the file name parameters.
-	call dp_sparam (tp, "IMAGE", DP_IMNAME(dao), "imagename", "")
-	call dp_sparam (tp, "PHOTFILE", DP_APFILE(dao), "filename", "")
+	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
+	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
 	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "ADDIMAGE", DP_ADDIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "ADDFILE", DP_ADDFILE(dao), "filename", "")
+	call dp_sparam (tp, "ADDIMAGE", DP_OUTIMAGE(dao), "imagename", "")
+	call dp_sparam (tp, "ADDFILE", DP_OUTPHOTFILE(dao), "filename", "")
 
 	# Write out relevant data parameters.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")
 	call dp_rparam (tp, "DATAMIN", DP_MINGDATA(dao), "counts", "")
 	call dp_rparam (tp, "DATAMAX", DP_MAXGDATA(dao), "counts", "")
-	call dp_rparam (tp, "GAIN", DP_PHOT_ADC(dao), "number", "")
-	call dp_rparam (tp, "READNOISE", DP_READ_NOISE(dao), "electrons", "")
+	call dp_rparam (tp, "GAIN", DP_PHOTADU(dao), "number", "")
+	call dp_rparam (tp, "READNOISE", DP_READNOISE(dao), "electrons", "")
 
 	# Write out the observing parameters.
 	call dp_sparam (tp, "OTIME", DP_OTIME(dao), "timeunit", "")
@@ -189,7 +188,6 @@ begin
 	# Write out the daopars parameters.
 	call dp_rparam (tp, "PSFRAD", DP_SPSFRAD(dao), "scaleunit", "")
 	call dp_rparam (tp, "FITRAD", DP_SFITRAD(dao), "scaleunit", "")
-	call dp_bparam (tp, "VARPSF", itob (DP_VARPSF(dao)), "switch", "")
 
 	call sfree(sp)
 end
@@ -201,10 +199,9 @@ end
 procedure dp_tgadppars (dao, tp)
 
 pointer	dao			# pointer to the DAOPHOT structure
-pointer	tp			# pointer to the table
+pointer	tp			# pointer to the output table
 
 pointer	sp, outstr, date, time
-bool	itob()
 int	envfind()
 
 begin
@@ -232,18 +229,18 @@ begin
 	call tbhadt (tp, "TASK", "group")
 
 	# Write the file name parameters.
-	call tbhadt (tp, "IMAGE", DP_IMNAME(dao))
-	call tbhadt (tp, "PHOTFILE", DP_APFILE(dao))
+	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
+	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
 	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "ADDIMAGE", DP_ADDIMAGE(dao))
-	call tbhadt (tp, "ADDFILE", DP_ADDFILE(dao))
+	call tbhadt (tp, "ADDIMAGE", DP_OUTIMAGE(dao))
+	call tbhadt (tp, "ADDFILE", DP_OUTPHOTFILE(dao))
 
 	# Write out relevant data parameters.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
 	call tbhadr (tp, "DATAMIN", DP_MINGDATA(dao))
 	call tbhadr (tp, "DATAMAX", DP_MAXGDATA(dao))
-	call tbhadr (tp, "GAIN", DP_PHOT_ADC(dao))
-	call tbhadr (tp, "READNOISE", DP_READ_NOISE(dao))
+	call tbhadr (tp, "GAIN", DP_PHOTADU(dao))
+	call tbhadr (tp, "READNOISE", DP_READNOISE(dao))
 
 	# Write out the observing parameters.
 	call tbhadt (tp, "OTIME", DP_OTIME(dao))
@@ -253,7 +250,6 @@ begin
 	# Write out the daophot parameters.
 	call tbhadr (tp, "PSFRAD", DP_SPSFRAD(dao))
 	call tbhadr (tp, "FITRAD", DP_SFITRAD(dao))
-	call tbhadb (tp, "VARPSF", itob (DP_VARPSF(dao)))
 
 	call sfree(sp)
 end

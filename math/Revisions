@@ -1,5 +1,52 @@
 .help revisions Jun88 math
 .nf
+math$nlfit/nlfit.gx
+math$nlfit/nlfitr.x
+math$nlfit/nlfitd.x
+	Fixed a divide by zero error in the nlscatter routine which occurs
+	if the fit has no degrees of freedom and the weighting type is
+	WTS_SCATTER.
+
+	(6/13/94 Davis)
+
+math/gsurfit/gssub.gx
+math/gsurfit/gssubd.x
+	The gsurfit double precision routine gssubd was incorrectly calling
+	the real precision routine gsgeti instead of the double precision
+	routine dgsgeti due to an error in the gssub.gx file. This bug
+	results in the wrong value of the parameter GSNSAVE being returned to
+	the calling routine gssubd in the double precision case.
+
+	(1/17/94 Davis)
+
+math/iminterp/arbpix.x
+math/interp/arbpix.x
+        Changed all if (x == INDEF) constructs to IS_INDEF(x) constructs.
+
+	(1/15/93 Davis)
+
+math/surfit/iseval.x
+	Two indices were not being initialized before being used in a pointer
+	offset computation in the spline1 and spline3 single input point code
+	producing incorrect results.
+
+	(12/17/92 Davis)
+
+math/nlfit/nlfit.gx
+math/nlfit/nlfitr.x
+math/nlfit/nlfitd.x
+math/nlfit/nliter.gx
+math/nlfit/nliterr.x
+math/nlfit/nliterd.x
+	Added a test for lambda<=0.0 in the nlfit loop and in the iteration
+	loop. Precision problems could cause the code to go into an infinite
+	loop in some circumstances. The code returns a NOT_DONE status
+	message if the convergence criteria have not been met in this
+	circumstance. Made some other minor changes to the convergence
+	criteria.
+
+	(7/20/92 Davis)
+
 math/nlfit/nlacpts.gx
 math/nlfit/nlerrors.gx
 	Fixed a bug in the routine nlacpts where the variable sum was

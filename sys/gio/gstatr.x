@@ -47,7 +47,9 @@ begin
 	case G_YTRAN:
 	    return (WCS_YTRAN(w))
 	case G_CLIP:
-	    return (WCS_CLIP(w))
+	    return (and (WCS_FLAGS(w), WF_CLIP))
+	case G_RASTER:
+	    return (WF_RASTER (WCS_FLAGS(w)))
 
 	# Default marker sizes (NDC coords).
 
@@ -112,8 +114,12 @@ begin
 	    return (GP_DRAWTITLE(gp))
 	case G_TITLESIZE:
 	    return (GP_TITLESIZE(gp))
+	case G_TITLECOLOR:
+	    return (GP_TITLECOLOR(gp))
 	case G_NTITLELINES:
 	    return (GP_NTITLELINES(gp))
+	case G_FRAMECOLOR:
+	    return (GP_FRAMECOLOR(gp))
 	case G_ASPECT:
 	    return (GP_ASPECT(gp))
 
@@ -162,12 +168,16 @@ begin
 			return (GL_AXISPOS2(p))
 		    case G_DRAWGRID:
 			return (GL_DRAWGRID(p))
+		    case G_GRIDCOLOR:
+			return (GL_GRIDCOLOR(p))
 		    case G_ROUND:
 			return (GL_ROUND(p))
 		    case G_LABELAXIS:
 			return (GL_LABELAXIS(p))
 		    case G_AXISLABELSIZE:
 			return (GL_AXISLABELSIZE(p))
+		    case G_AXISLABELCOLOR:
+			return (GL_AXISLABELCOLOR(p))
 		    case G_DRAWTICKS:
 			return (GL_DRAWTICKS(p))
 		    case G_LABELTICKS:
@@ -186,8 +196,14 @@ begin
 			return (GL_MINORWIDTH(p))
 		    case G_AXISWIDTH:
 			return (GL_AXISWIDTH(p))
+		    case G_AXISCOLOR:
+			return (GL_AXISCOLOR(p))
 		    case G_TICKLABELSIZE:
 			return (GL_TICKLABELSIZE(p))
+		    case G_TICKLABELCOLOR:
+			return (GL_TICKLABELCOLOR(p))
+		    case G_TICKCOLOR:
+			return (GL_TICKCOLOR(p))
 		    # case G_TICKFORMAT:
 			# not a real parameter
 		    default:

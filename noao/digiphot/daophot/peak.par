@@ -1,12 +1,13 @@
 # Parameters for the PEAK task
 
 image,f,a,,,,"Image corresponding to photometry"
-photfile,f,a,default,,,"Aperture photometry file (default: image.mag.?)"
+photfile,f,a,default,,,"Input photometry file (default: image.mag.?)"
 psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
 peakfile,f,a,"default",,,"Output photometry file (default: image.pk.?)"
-datapars,pset,h,"",,,Data parameters
-daopars,pset,h,"",,,Daophot parameters
-verbose,b,h,no,,,Print messages
-verify,b,h,yes,,,Verify critical PEAK parameters
-update,b,h,no,,,Update critical PEAK parameters
+rejfile,f,a,"default",,,"Output rejections file (default: image.rej.?)"
+datapars,pset,h,"",,,Data dependent parameters
+daopars,pset,h,"",,,Psf fitting parameters
+verbose,b,h,)_.verbose,,,Print peak messages?
+verify,b,h,)_.verify,,,Verify critical peak parameters?
+update,b,h,)_.update,,,Update critical peak parameters?
 mode,s,h,'ql'

@@ -54,7 +54,6 @@ begin
 	AP_CXCUR(ctr) = INDEFR
 	AP_CYCUR(ctr) = INDEFR
 
-	AP_CAPERT(ctr) = cbox
 	AP_CENTERFUNCTION(ctr) = function
 	switch (function) {
 	case AP_CENTROID1D:
@@ -69,13 +68,15 @@ begin
 	    AP_CENTERFUNCTION(ctr) = DEF_CENTERFUNCTION
 	    call strcpy ("centroid", AP_CSTRING(ctr), SZ_FNAME)
 	}
-	AP_MAXSHIFT(ctr) = DEF_MAXSHIFT
+	AP_CAPERT(ctr) = cbox
+	AP_CTHRESHOLD(ctr) = DEF_CTHRESHOLD
 	AP_MINSNRATIO(ctr) = DEF_MINSNRATIO
+	AP_CMAXITER(ctr) = DEF_CMAXITER
+	AP_MAXSHIFT(ctr) = DEF_MAXSHIFT
 	AP_CLEAN(ctr) = DEF_CLEAN
 	AP_RCLEAN(ctr) = DEF_RCLEAN
 	AP_RCLIP(ctr) = DEF_RCLIP
 	AP_SIGMACLEAN(ctr) = DEF_CLEANSIGMA
-	AP_CMAXITER(ctr) = DEF_CMAXITER
 
 	AP_NCTRPIX(ctr) = 0
 	AP_CTRPIX(ctr) = NULL

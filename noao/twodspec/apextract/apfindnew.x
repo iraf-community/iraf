@@ -1,3 +1,4 @@
+include	<mach.h>
 include	"apertures.h"
 
 # Sort flags
@@ -46,7 +47,9 @@ begin
 
 	# Find peaks not already identified.
 	minsep = apgetr ("minsep")
-	call find_peaks (data, npts, 0., 1, nfind, minsep, 0., Memr[x], nx)
+	#call find_peaks (data, npts, 0., 1, nfind, minsep, 0., Memr[x], nx)
+	call find_peaks (data, npts, 0., 1, nfind, minsep, -MAX_REAL,
+	    Memr[x], nx)
 	call asrtr (Memr[x+naps], Memr[x+naps], nx - naps)
 
 	# Center on the new peaks and define new apertures.

@@ -1,0 +1,36 @@
+!# Sample .Xdefaults for IRAF account.
+
+Mwm*useIconBox:				True
+Mwm*iconBoxGeometry:			1x10-0+0
+Mwm*iconBoxSBDisplayPolicy:		vertical
+Mwm*iconDecoration:			label
+Mwm*iconPlacementMargin:		2
+Mwm*keyboardFocusPolicy:		pointer
+Mwm*frameBorderWidth:			5
+Mwm*resizeBorderWidth:			5
+Mwm*menu*background:			SteelBlue
+Mwm*menu*foreground:			white
+Mwm*background: 			#7c8498
+Mwm*foreground:				#fce089
+
+Mwm*XBiff.clientDecoration:		border resizeh
+Mwm*XLoad.clientDecoration:		border resizeh
+Mwm*XClock.clientDecoration:		border resizeh
+Mwm*xbiff.clientDecoration:		border resizeh
+Mwm*xload.clientDecoration:		border resizeh
+Mwm*xclock.clientDecoration:		border resizeh
+
+*XmText.translations: #override\n\
+   <Key>osfDelete: delete-previous-character()
+*XmTextField.translations: #override\n\
+   <Key>osfDelete: delete-previous-character()
+
+Scrollbar.JumpCursor:			True
+XTerm*SaveLines:			500
+XGterm*SaveLines:			500
+
+*numeric:	C
+*displayLang:	C
+*basicLocale:	C
+*timeFormat:	C
+*inputLang:	C

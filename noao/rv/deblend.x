@@ -148,9 +148,9 @@ begin
 	    # Erase old deblended fit in case we've been here before. Fit is
 	    # erased above from when we first entered.
 	    if (IS_DBLSTAR(rv) == YES) {		
-		call gseti (gp, G_PLTYPE, 0)
+		call gseti (gp, G_PLTYPE, GL_CLEAR)
 		call rv_plt_deblend (rv, gp, NO)
-		call gseti (gp, G_PLTYPE, 1)
+		call gseti (gp, G_PLTYPE, GL_SOLID)
 	    }
 
 	    # Save some variables for later plotting.
@@ -329,26 +329,25 @@ begin
 		    call pargr (2.35482 * sigma)
 
 		# Now calculate and save the velocity information
-		serr = 0.0
-		if (RV_DCFLAG(rv) != -1) {
-		    stat = rv_rvcorrect (rv, w, serr, vobs, vhelio, verr)
-		    call salloc (anti, RV_CCFNPTS(rv), TY_REAL)
-		    fwhm = 2.35482 * sigma
-		    call rv_antisym (rv, w, height, fwhm, WRKPIXY(rv,1), 
-			RV_CCFNPTS(rv), Memr[anti], ccfvar, verr, DBL_R(rv,i))
-		} else {
-		    vobs = INDEFR
-		    vhelio = INDEFR
-		    verr = INDEFR
-		}
-		DBL_HEIGHT(rv,i) = height
-		DBL_SHIFT(rv,i) = w
-		DBL_VOBS(rv,i) = real (vobs)
-		DBL_VHELIO(rv,i) = real (vhelio)
-		DBL_VERR(rv,i) = real (verr)
-		DBL_FWHM(rv,i) = 2.35482 * sigma
-		if (RV_DCFLAG(rv) != -1)
-		    DBL_FWHM(rv,i) = DBL_FWHM(rv,i) * RV_DELTAV(rv)
+                serr = 0.0
+                if (RV_DCFLAG(rv) != -1) {
+                    stat = rv_rvcorrect (rv, w, serr, vobs, vhelio, verr)
+                    call salloc (anti, RV_CCFNPTS(rv), TY_REAL)
+                    fwhm = 2.35482 * sigma
+                    call rv_antisym (rv, w, height, fwhm, WRKPIXY(rv,1),
+                        RV_CCFNPTS(rv), Memr[anti], ccfvar, verr, DBL_R(rv,i))
+                    DBL_VOBS(rv,i) = real (vobs)
+                    DBL_VHELIO(rv,i) = real (vhelio)
+                    DBL_VERR(rv,i) = real (verr)
+                    DBL_FWHM(rv,i) = 2.35482 * sigma * RV_DELTAV(rv)
+                } else {
+                    DBL_VOBS(rv,i) = INDEFR
+                    DBL_VHELIO(rv,i) = INDEFR
+                    DBL_VERR(rv,i) = INDEFR
+                    DBL_FWHM(rv,i) = 2.35482 * sigma
+                }
+                DBL_HEIGHT(rv,i) = height
+                DBL_SHIFT(rv,i) = w
 	    }
 	    call printf (OP)
 	}

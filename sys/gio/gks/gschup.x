@@ -17,7 +17,7 @@ begin
 	if (fp_equalr (chux, 0.0))
 	    char_up = 90
 	else
-	    char_up = int (atan2 (chuy, chux) * 180. / 3.1415926)
+	    char_up = nint (atan2 (chuy, chux) * 180. / 3.1415926)
 
 	call gsawi (G_TXUP, char_up)
 end

@@ -39,7 +39,7 @@ define	STD_Y		Memi[$1+115]	# Pointer to plotted y values
 
 define	GP_SZTITLE	79			# Size of title string
 
-define	LEN_GP		70			# Length of structure
+define	LEN_GP		75			# Length of structure
 
 define	GP_GIO		Memi[$1]		# GIO pointer
 define	GP_TITLE	Memc[P2C($1+1)]		# General title
@@ -48,13 +48,17 @@ define	GP_IMAGES	Memi[$1+44+$2-1]	# Pointer to image names
 define	GP_SKYS		Memi[$1+48+$2-1]	# Pointer to sky names
 define	GP_MARK		Memi[$1+52]		# Mark type
 define	GP_SZMARK	Memr[$1+53]		# Mark size
-define	GP_MDEL		Memi[$1+54]		# Deleted mark
-define	GP_SZMDEL	Memr[$1+55]		# Size of deleted mark
-define	GP_MADD		Memi[$1+56]		# Mark type
-define  GP_WSTART       Memr[$1+57]             # Starting wavelength for plots
-define  GP_WEND         Memr[$1+58]             # Ending wavelength for plots
-define	GP_LOG		Memi[$1+59]		# Log flux plots?
-define	GP_FMIN		Memr[$1+60]		# Minimum flux plot limit
-define	GP_FMAX		Memr[$1+61]		# Maximum flux plot limit
-define	GP_SHDR		Memi[$1+61+$2]		# SHDR pointer
-define	GP_AIRMASS	Memr[$1+65+$2]		# Airmass range of plots
+define	GP_CMARK	Memi[$1+54]		# Mark color
+define	GP_MDEL		Memi[$1+55]		# Deleted mark
+define	GP_SZMDEL	Memr[$1+56]		# Size of deleted mark
+define	GP_CDEL		Memi[$1+57]		# Color of deleted mark
+define	GP_MADD		Memi[$1+58]		# Mark type
+define	GP_CADD		Memi[$1+59]		# Mark color
+define	GP_PLCOLOR	Memi[$1+60]		# Line color
+define  GP_WSTART       Memr[$1+61]             # Starting wavelength for plots
+define  GP_WEND         Memr[$1+62]             # Ending wavelength for plots
+define	GP_LOG		Memi[$1+63]		# Log flux plots?
+define	GP_FMIN		Memr[$1+64]		# Minimum flux plot limit
+define	GP_FMAX		Memr[$1+65]		# Maximum flux plot limit
+define	GP_SHDR		Memi[$1+65+$2]		# SHDR pointer
+define	GP_AIRMASS	Memr[$1+69+$2]		# Airmass range of plots

@@ -33,10 +33,10 @@ begin
 	out = immap (output, NEW_COPY, in)
 	mean = clgetr ("mean")
 	lower = clgetr ("lower")
-	if (lower == INDEFR)
+	if (IS_INDEFR (lower))
 	    lower = -MAX_REAL
 	upper = clgetr ("upper")
-	if (upper == INDEFR)
+	if (IS_INDEFR (upper))
 	    upper = MAX_REAL
 	verbose = clgetb ("verbose")
 

@@ -59,6 +59,10 @@ begin
 	Memd[ltv_1+ax1-1] = center[1]
 	Memd[ltv_1+ax2-1] = center[2]
 
+	# Set the back translation vector.
+	Memd[ltv_2+ax1-1] = -center[1]
+	Memd[ltv_2+ax2-1] = -center[2]
+
 	# Perform the translation.
 	call mw_translated (mw, Memd[ltv_1], Memd[ltm], Memd[ltv_2], pdim)
 

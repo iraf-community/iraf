@@ -45,10 +45,18 @@ define	G_TITLEJUST		36
 define	G_NTITLELINES		37
 define	G_ASPECT		38
 define	G_CHARSIZE		39		# char height in NDC units
+define	G_TITLECOLOR		40
+define	G_FRAMECOLOR		41
+define	G_DRIDCOLOR		42
 
+define	G_RASTER		43		# recent additions
+
+
+# GLABAX parameters.
+# ------------------
 
 define	FIRST_GLABAX_PARAM	101
-define	LAST_GLABAX_PARAM	319
+define	LAST_GLABAX_PARAM	324
 
 define	G_XDRAWAXES		101		# GLABAX, x axis parameters
 define	G_XSETAXISPOS		102
@@ -69,8 +77,13 @@ define	G_XMINORWIDTH		116
 define	G_XAXISWIDTH		117
 define	G_XTICKLABELSIZE	118
 define	G_XTICKFORMAT		119
+define	G_XGRIDCOLOR		120
+define	G_XAXISLABELCOLOR	121
+define	G_XAXISCOLOR		122
+define	G_XTICKLABELCOLOR	123
+define	G_XTICKCOLOR		124
 
-define	G_YDRAWAXES		201		# GLABAX, x axis parameters
+define	G_YDRAWAXES		201		# GLABAX, y axis parameters
 define	G_YSETAXISPOS		202
 define	G_YAXISPOS1		203
 define	G_YAXISPOS2		204
@@ -89,8 +102,13 @@ define	G_YMINORWIDTH		216
 define	G_YAXISWIDTH		217
 define	G_YTICKLABELSIZE	218
 define	G_YTICKFORMAT		219
+define	G_YGRIDCOLOR		220
+define	G_YAXISLABELCOLOR	221
+define	G_YAXISCOLOR		222
+define	G_YTICKLABELCOLOR	223
+define	G_YTICKCOLOR		224
 
-define	G_DRAWAXES		301		# GLABAX, simultaneous x & y
+define	G_DRAWAXES		301		# GLABAX, simultaneous x and y
 define	G_SETAXISPOS		302
 define	G_AXISPOS1		303
 define	G_AXISPOS2		304
@@ -109,6 +127,15 @@ define	G_MINORWIDTH		316
 define	G_AXISWIDTH		317
 define	G_TICKLABELSIZE		318
 define	G_TICKFORMAT		319
+define	G_GRIDCOLOR		320
+define	G_AXISLABELCOLOR	321
+define	G_AXISCOLOR		322
+define	G_TICKLABELCOLOR	323
+define	G_TICKCOLOR		324
+
+
+# Graphics operand types.
+# -------------------------
 
 define	GW_LINEAR		0		# WCS transformation types
 define	GW_LOG			1

@@ -39,13 +39,14 @@ begin
 	    } else
 		file_size = FILSIZE(fp)
 
-	    # If writing at EOF (or first block of a new file), and the buffer
-	    # has not yet been flushed, file size is the offset of the file
-	    # buffer plus the number of valid chars in the buffer.
+	    # If writing at EOF (or first block of a new file), and the file
+	    # buffer has not yet been flushed, the file size is the buffer
+	    # offset minus one (number of chars written to disk) plus the
+	    # number of chars in the file buffer.
 
 	    if (BUF_MODIFIED(fd))
 		file_size = max (file_size,
-		    boffset[fd] + (itop[fd] - bufptr[fd]))
+		    boffset[fd]-1 + (itop[fd] - bufptr[fd]))
 	}
 
 	FILSIZE(fp) = file_size				# update fildes

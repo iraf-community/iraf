@@ -1,6 +1,9 @@
 include <mach.h>
 include "../lib/daophotdef.h"
 
+define	NSEC	4
+define	IRMIN	4
+
 # DP_SMPSF -- Smooth the psf before grouping.
 
 procedure dp_smpsf (dao)
@@ -8,61 +11,62 @@ procedure dp_smpsf (dao)
 pointer	dao			# pointer to the daophot strucuture
 
 int	k, icenter, irmax, nexpand
-pointer	psffit, sp, sum, high, low, n
+pointer	psffit, sum, high, low, n
 real	rmax
 
 begin
+	# Get some pointers.
 	psffit = DP_PSFFIT(dao)
 
+	# Get some constants.
 	icenter = (DP_PSFSIZE(psffit) + 1) / 2
 	rmax = .7071068 * real (DP_PSFSIZE(psffit) - 1)
-	irmax = int (rmax) * 4
-	if (DP_VARPSF(dao) == YES)
-	    nexpand  = 3
-	else
-	    nexpand = 1
+	irmax = int (rmax + 1.0e-5)
+	nexpand = DP_NVLTABLE(psffit) + DP_NFEXTABLE(psffit)
 
 	# Allocate working memory.
-	call smark (sp)
-	call salloc (sum, irmax, TY_REAL)
-	call salloc (high, irmax, TY_REAL)
-	call salloc (low, irmax, TY_REAL)
-	call salloc (n, irmax, TY_INT)
+	call malloc (sum, NSEC * irmax, TY_REAL)
+	call malloc (high, NSEC * irmax, TY_REAL)
+	call malloc (low, NSEC * irmax, TY_REAL)
+	call malloc (n, NSEC * irmax, TY_INT)
 
 	# Do the smoothing.
 	do k = 1, nexpand {
 
 	    # Initialize.
-	    call aclrr (Memr[sum], irmax)
-	    call amovkr (-MAX_REAL, Memr[high], irmax)
-	    call amovkr (MAX_REAL, Memr[low], irmax)
-	    call aclri (Memi[n], irmax)
+	    call aclrr (Memr[sum], NSEC * irmax)
+	    call amovkr (-MAX_REAL, Memr[high], NSEC * irmax)
+	    call amovkr (MAX_REAL, Memr[low], NSEC * irmax)
+	    call aclri (Memi[n], NSEC * irmax)
 
 	    # Acumulate.
 	    call dp_smaccum (Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
-		Memr[sum], Memr[low], Memr[high], Memi[n], 4, 4, icenter,
-		rmax, k)
+		DP_PSFSIZE(psffit), Memr[sum], Memr[low], Memr[high], Memi[n],
+		NSEC, IRMIN, icenter, rmax, k)
 
 	    # Normalize.
-	    call dp_smnorm (Memr[sum], Memr[low], Memr[high], Memi[n], 4, 4,
-		int (rmax))
+	    call dp_smnorm (Memr[sum], Memr[low], Memr[high], Memi[n], NSEC,
+	        IRMIN, irmax)
 
 	    # Smooth.
 	    call dp_smo (Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
-		Memr[sum], 4, 4, icenter, rmax, k)
+		DP_PSFSIZE(psffit), Memr[sum], NSEC, IRMIN, icenter, rmax, k)
 	}
 
-	call sfree (sp)
+	call mfree (sum, TY_REAL)
+	call mfree (low, TY_REAL)
+	call mfree (high, TY_REAL)
+	call mfree (n, TY_INT)
 end
 
 
 # DP_SMACCUM -- Accumulate the sums and limits
 
-procedure dp_smaccum (psflut, npsf, sum, low, high, n, nsec, irmin, icenter,
-	rmax, k)
+procedure dp_smaccum (psflut, nxpsf, nypsf, sum, low, high, n, nsec, irmin,
+	icenter, rmax, k)
 
-real	psflut[npsf,npsf,3]		# the lookup tabe
-int	npsf				# size of the psf
+real	psflut[nxpsf,nypsf,ARB]		# the psf lookup table
+int	nxpsf, nypsf			# size of the psf lookup table
 real	sum[nsec,ARB]			# array of sums
 real	low[nsec,ARB]			# array of low values
 real	high[nsec,ARB]			# array of high values
@@ -74,20 +78,20 @@ real	rmax				# max radius
 int	k				# third dimension array index
 
 int	i, j, idx, idy, is, ir
-real	r, dxsq, dysq
+real	dxsq, dysq, r
 int	dp_isctr()
 
 begin
-	do j = 1, npsf {
+	do j = 1, nypsf {
 	    idy = j - icenter
 	    dysq = idy ** 2
-	    do i = 1, npsf {
+	    do i = 1, nxpsf {
 		idx = i - icenter
 		dxsq = idx ** 2
 		r = sqrt (dxsq + dysq)
 		if (r > rmax)
 		    next
-		ir = int (r)
+		ir = int (r + 1.0e-5)
 		if (ir < irmin)
 		    next
 		is = dp_isctr (idx, idy)
@@ -129,11 +133,11 @@ end
 
 # DP_SMO -- Do the actual smoothing.
 
-procedure dp_smo (psflut, npsf, sum, nrec, irmin, icenter, rmax, k)
+procedure dp_smo (psflut, nxpsf, nypsf, sum, nrec, irmin, icenter, rmax, k)
 
-real	psflut[npsf,npsf,3]		# the lookup table
-int	npsf				# size of the psf
-real	sum[nrec,ARB]			# aray of sums
+real	psflut[nxpsf,nypsf,ARB]		# the lookup table
+int	nxpsf, nypsf			# size of the psf lookup table
+real	sum[nrec,ARB]			# array of sums
 int	nrec				# dimension of sum array
 int	irmin				# min radius index
 int	icenter				# index of center
@@ -141,20 +145,19 @@ real	rmax				# maximum radius
 int	k				# index of third dimension
 
 int	i, j, idx, idy, ir, is
-real	dxsq, dysq, r
+real	dysq, r
 int	dp_isctr()
 
 begin
-	do j = 1, npsf {
+	do j = 1, nypsf {
 	    idy = j - icenter
 	    dysq = idy ** 2
-	    do i = 1, npsf {
+	    do i = 1, nxpsf {
 		idx = i - icenter
-		dxsq = idx ** 2
-		r = sqrt (dxsq + dysq)
+		r = sqrt (real (idx ** 2) + dysq)
 		if (r > rmax)
 		    next
-		ir = int (r)
+		ir = int (r + 1.0e-5)
 		if (ir < irmin)
 		    next
 		is = dp_isctr (idx, idy)
@@ -164,7 +167,7 @@ begin
 end
 
 
-# DP_ISCTR -- The index counter.
+# DP_ISCTR -- Convert an index pair into a numbered sector from 1 to 4.
 
 int procedure dp_isctr (i, j)
 
@@ -174,20 +177,20 @@ int	j		# second index
 int	isctr
 
 begin
-	if (i > 0)
+	if (i > 0) {
 	    isctr = 1
-	else if (i < 0)
+	} else if (i < 0) {
 	    isctr = 3
-	else {
+	} else {
 	    if (j <= 0)
 		isctr = 1
 	    else
 		isctr = 3
 	}
 
-	if (j > 0)
+	if (j > 0) {
 	    isctr = isctr + 1
-	else if (j == 0) {
+	} else if (j == 0) {
 	    if (i > 0)
 		isctr = 2
 	}

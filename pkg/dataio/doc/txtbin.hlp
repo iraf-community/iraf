@@ -19,8 +19,10 @@ Print messages about files processed?
 .le
 .ih
 EXAMPLES
-
-Convert a text file on disk to a binary file on disk.
+1. Convert a text file on disk to a binary file on disk.
 
 	cl> txtbin text_file binary_file
+.ih
+SEE ALSO
+bintxt
 .endhelp

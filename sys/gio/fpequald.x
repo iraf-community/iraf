@@ -16,16 +16,24 @@ double	x1, x2, normx, normy, tol
 int	ex, ey
 
 begin
-	tol = EPSILOND * 10.0D0
+	# Check for the obvious first.
 	if (x == y)
 	    return (true)
 
+	# We can't normalize zero, so handle the zero operand cases first.
+	# Note that the case 0 equals 0 is handled above.
+
+	if (x == 0.0D0 || y == 0.0D0)
+	    return (false)
+
+	# Normalize operands and do an epsilon compare.
 	call fp_normd (x, normx, ex)
 	call fp_normd (y, normy, ey)
 
 	if (ex != ey)
 	    return (false)
 	else {
+	    tol = EPSILOND * 10.0D0
 	    x1 = 1.0D0 + abs (normx - normy)
 	    x2 = 1.0D0 + tol
 	    return (x1 <= x2)

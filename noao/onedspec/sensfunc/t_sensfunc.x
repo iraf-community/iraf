@@ -1,6 +1,5 @@
 include	"sensfunc.h"
 
-define	NRANGES		100	# Maximum number of aperture ranges
 
 # T_SENSFUNC -- Determine sensitivities and residual extinctions.
 # The input is a file of standard star produced by the task STANDARD.
@@ -24,9 +23,10 @@ pointer	function		# Sensitivity function type
 int	order			# Order of sensitivity function
 int	interactive		# Interactive?
 
-int	i, j, aperture, nstds, napertures, nextn, clgeti(), decode_ranges()
+int	i, j, aperture, nstds, napertures, nextn, clgeti()
 pointer	sp, str, stds, apertures, wextn, extn, ecvs, gp
 bool	clgetb()
+pointer	rng_open()
 errchk	sf_sensfunc
 
 begin
@@ -36,7 +36,6 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR) 
 	call salloc (logfile, SZ_FNAME, TY_CHAR) 
 	call salloc (function, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 3*NRANGES, TY_INT)
 
 	# CL parameter input.
 	call clgstr ("standards", Memc[standards], SZ_FNAME)
@@ -52,14 +51,14 @@ begin
 	    interactive = 3
 
 	# Decode aperture list.
-	if (decode_ranges (Memc[str], Memi[aps], NRANGES, i) == ERR)
+	iferr (aps = rng_open (Memc[str], INDEF, INDEF, INDEF))
 	    call error (0, "Bad aperture list")
 
 	# Get the standard star data, the aperture array, and the
 	# extinction table, and allocate and initialize an array of
 	# residual extinction curves for each aperture.
 
-	call sf_stds (Memc[standards], Memi[aps], ignoreaps, stds, nstds)
+	call sf_stds (Memc[standards], aps, ignoreaps, stds, nstds)
 	if (nstds == 0) {
 	    call sfree (sp)
 	    return
@@ -95,5 +94,6 @@ begin
 	call ext_free (wextn, extn)
 	do j = 1, napertures
 	    call cvfree (Memi[ecvs+j-1])
+	call rng_close (aps)
 	call sfree (sp)
 end

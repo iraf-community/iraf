@@ -17,7 +17,7 @@ real	rmin, rmax		# minimum and maximum radius
 real	imin, imax		# minimum and maximum intensity
 
 int	lenbuf, nx, ny, nsky
-pointer	sp, r, skypix, coords, str, gt
+pointer	sp, r, skypix, coords, index, str, gt
 real	radius, xc, yc
 int	ap_gvrad(), apstati(), ap_skypix()
 pointer	ap_gtinit()
@@ -35,6 +35,7 @@ begin
 	call salloc (r, lenbuf, TY_REAL)
 	call salloc (skypix, lenbuf, TY_REAL)
 	call salloc (coords, lenbuf, TY_INT)
+	call salloc (index, lenbuf, TY_INT)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Center the star.
@@ -48,9 +49,10 @@ begin
 	    call sfree (sp)
 	    return (ERR)
 	}
+	call ap_index (Memi[index], nsky)
 
 	# Compute the radius and intensity values.
-	call ap_xytor (Memi[coords], Memr[r], nsky, xc, yc, nx)
+	call ap_xytor (Memi[coords], Memi[index], Memr[r], nsky, xc, yc, nx)
 	call alimr (Memr[r], nsky, rmin, rmax)
 	call alimr (Memr[skypix], nsky, imin, imax)
 

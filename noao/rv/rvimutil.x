@@ -216,10 +216,11 @@ begin
 	    # Get the next object aperture
 	    CURAPNUM(rv) = CURAPNUM(rv) + 1
             RV_APNUM(rv) = APLIST(rv,CURAPNUM(rv))
-            if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM) == ERR_READ) {
-		RV_APNUM(rv) = APLIST(rv,apnum)
-		RV_OAPNUM(rv) = RV_APNUM(rv)
-                return (ERR_READ)
+            if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM, INDEF, INDEF, 
+		INDEFI) == ERR_READ) {
+		    RV_APNUM(rv) = APLIST(rv,apnum)
+		    RV_OAPNUM(rv) = RV_APNUM(rv)
+                    return (ERR_READ)
 	    }
             written = false
 
@@ -239,9 +240,9 @@ begin
 	        call rv_errmsg ("At end of template aperture list.")
 		RV_NEWXCOR(rv) = NO
 	    } else {
-               	if (rv_getim(rv,RIMAGE(rv), REFER_SPECTRUM)==ERR_READ) {
-                    return (ERR_READ)
-	        }
+               	if (rv_getim(rv,RIMAGE(rv), REFER_SPECTRUM, INDEF, INDEF,
+		    INDEFI) == ERR_READ)
+                        return (ERR_READ)
                 written = false
 	    }
 	}
@@ -283,10 +284,11 @@ begin
 	    # Get the next object aperture
 	    CURAPNUM(rv) = CURAPNUM(rv) - 1
             RV_APNUM(rv) = APLIST(rv,CURAPNUM(rv))
-            if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM) == ERR_READ) {
-		RV_APNUM(rv) = APLIST(rv,apnum)
-		RV_OAPNUM(rv) = RV_APNUM(rv)
-                return (ERR_READ)
+            if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM, INDEF, INDEF,
+		INDEFI) == ERR_READ) {
+		    RV_APNUM(rv) = APLIST(rv,apnum)
+		    RV_OAPNUM(rv) = RV_APNUM(rv)
+                    return (ERR_READ)
 	    }
             written = false
 
@@ -302,9 +304,9 @@ begin
 
 	# Now try to get the next previous aperture (may be one-dimensional)
 	if (rv_imdim(RIMAGE(rv),2) > 1) {
-            if (rv_getim(rv, RIMAGE(rv), REFER_SPECTRUM) == ERR_READ) {
-                return (ERR_READ)
-	    }
+            if (rv_getim(rv, RIMAGE(rv), REFER_SPECTRUM, INDEF, INDEF,
+		INDEFI) == ERR_READ)
+                    return (ERR_READ)
             written = false
 	}
 
@@ -325,7 +327,7 @@ int	rv_getim()
 
 begin
 	# Try to read the data from the image
-   	if (rv_getim(rv, imname, spec_type) == ERR_READ) {
+   	if (rv_getim(rv, imname, spec_type, INDEF, INDEF, INDEFI) == ERR_READ) {
 	    RV_NEWXCOR(rv) = NO
 	    return (ERR_READ)
 	}
@@ -405,7 +407,7 @@ errchk	immap
 
 begin
 	call smark (sp)
-	call salloc (bp, SZ_FNAME, TY_CHAR)
+	call salloc (bp, SZ_LINE, TY_CHAR)
 
 	iferr (im = immap(image, READ_ONLY, 0)) {
 	    call sprintf (Memc[bp], SZ_FNAME,
@@ -413,7 +415,7 @@ begin
 		    call pargstr (image)
 	    call error (0, Memc[bp])
 	}
-        call rv_fill_blanks (IM_TITLE(im), title, SZ_FNAME)
+        call rv_fill_blanks (IM_TITLE(im), title, maxchar)
 
 	call imunmap (im)
 	call sfree (sp)

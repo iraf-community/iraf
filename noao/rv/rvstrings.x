@@ -41,6 +41,16 @@ begin
 end
 
 
+int procedure cod_color (color)
+
+char	color[SZ_FNAME]
+int	strdic()
+
+begin
+	return (strdic(color, color, SZ_FNAME, C_COLOR_NAMES))
+end
+
+
 int procedure cod_ccftype (ccf)
 
 char	ccf[SZ_FNAME]
@@ -132,6 +142,39 @@ begin
 	    call strcpy ("spline1", mode, SZ_FNAME)
 	default:
 	    call strcpy ("", mode, SZ_FNAME)
+	}
+end
+
+
+procedure nam_color (code, name)
+
+int	code					#I Color code
+char	name[SZ_FNAME]				#O Color name
+
+begin
+	switch (code) {
+	case C_BACKGROUND:
+	    call strcpy ("background", name, SZ_FNAME)
+	case C_FOREGROUND:
+	    call strcpy ("foreground", name, SZ_FNAME)
+	case C_RED:
+	    call strcpy ("red", name, SZ_FNAME)
+	case C_GREEN:
+	    call strcpy ("green", name, SZ_FNAME)
+	case C_BLUE:
+	    call strcpy ("blue", name, SZ_FNAME)
+	case C_CYAN:
+	    call strcpy ("cyan", name, SZ_FNAME)
+	case C_YELLOW:
+	    call strcpy ("yellow", name, SZ_FNAME)
+	case C_MAGENTA:
+	    call strcpy ("magenta", name, SZ_FNAME)
+	case C_PUPLE:
+	    call strcpy ("purple", name, SZ_FNAME)
+	case C_DARKSLATEGREY:
+	    call strcpy ("slategrey", name, SZ_FNAME)
+	default:
+	    call strcpy ("", name, SZ_FNAME)
 	}
 end
 

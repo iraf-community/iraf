@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 define	NBIN	10	# Bin parameter for mode determination
@@ -51,7 +51,7 @@ begin
 		else 
 		    call realloc (diff, ndiff+nx, TY_REAL)
 		do j = 1, nx {
-		    Memr[diff+ndiff] = (Memd[x+j-1] - FIT(ec,i)) * order
+		    Memr[diff+ndiff] = (Memd[y+j-1] - FIT(ec,i)) * order
 		    ndiff = ndiff + 1
 		}
 	    }

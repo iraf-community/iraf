@@ -29,7 +29,7 @@ begin
 	call printf ("Mark maximum radius for profile (%g) pixels:")
 	    call pargr (apstatr (ap, RPRADIUS) * scale)
 	call gscur (gd, apstatr (ap, RPRADIUS) * scale, (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk < 0.0 || xjunk > rmax)
 	    radius = apstatr (ap, RPRADIUS)
 	else
@@ -41,7 +41,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_RPRADIUS, radius, UN_RPRADIUS,
+	    call ap_rparam (out, KY_RPRADIUS, radius, UN_RSCALEUNIT,
 	        "fitting radius")
 
 	call sfree (sp)
@@ -76,7 +76,7 @@ begin
 	call printf ("Mark step size (%g) pixels:")
 	    call pargr (apstatr (ap, RPSTEP) * scale)
 	call gscur (gd, apstatr (ap, RPSTEP) * scale, (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk < 0.0 || xjunk > rmax)
 	    step = apstatr (ap, RPSTEP)
 	else
@@ -88,7 +88,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_RPSTEP, step, UN_RPSTEP,
+	    call ap_rparam (out, KY_RPSTEP, step, UN_RSCALEUNIT,
 	        "step size in pixels")
 
 	call sfree (sp)
@@ -123,7 +123,7 @@ begin
 	call printf ("Mark fitting box half width (%g) pixels:")
 	    call pargr (apstatr (ap, PSFAPERT) * scale)
 	call gscur (gd, apstatr (ap, PSFAPERT) * scale, (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk <= 0.0 || xjunk > rmax)
 	    psfapert = apstatr (ap, PSFAPERT)
 	else
@@ -135,7 +135,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_PSFAPERT, 2.0 * psfapert, UN_PSFAPERT,
+	    call ap_rparam (out, KY_PSFAPERT, 2.0 * psfapert, UN_PSFSCALEUNIT,
 	        "width of the fitting box")
 
 	call sfree (sp)

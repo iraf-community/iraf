@@ -152,7 +152,7 @@ begin
 		Memr[g+ir+mt-2 + (k-1)*mdg] = Memr[x + (jt - 1) + (k - 1)]
 	    # INDEFR data may already be ignored in the column selection in
 	    # band_set.
-	    if (data[column] == INDEFR)
+	    if (IS_INDEFR (data[column]))
 	        Memr[g+ir+mt-2 + nb*mdg] = 0.
 	    else
 	        Memr[g+ir+mt-2 + nb*mdg] = data[column] - model[column]
@@ -243,7 +243,7 @@ begin
 			        # columns[column] = YES
 			        # fitparams[spectrum, parameter] = YES
 
-				if (data[column] != INDEFR) {
+				if (!IS_INDEFR (data[column])) {
 			           columns[column] = YES
 			           fitparams[spectrum, parameter] = YES
 				}

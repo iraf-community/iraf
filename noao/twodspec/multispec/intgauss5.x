@@ -38,7 +38,7 @@ begin
 	# only once (when the ranges array has been flagged) and return
 	# the same profiles for every image line.
 	if (MS_NSAMPLES(ms) == 1) {
-	    if (ranges[1,1,1] == INDEFR) {
+	    if (IS_INDEFR (ranges[1,1,1])) {
 	        call msggauss5 (ms, line1)
 	        call mod_gauss5 (ms, lower, profiles, ranges, len_profile,
 		    nspectra)
@@ -49,7 +49,8 @@ begin
 	# If there is more than one sample line then interpolation makes
 	# sense.  Initialize the interpolation algorithm if the ranges array
 	# has been flagged.
-	if (ranges[1,1,1] == INDEFR) {
+
+	if (IS_INDEFR (ranges[1,1,1])) {
 	    call msgparam (ms, I0, 1)
 	    call msgparam (ms, X0, 1)
 	    call msgfits (ms, X0_FIT)

@@ -16,11 +16,15 @@ file	log2
 struct	*fd
 
 begin
+	string	imtype
 	string	arcref, arcrefms, arc, arcms
 	string	temp, temp1, temp2, str1, str2
-	int	i, nspec, dc
+	int	i, n, nspec, dc
 	real	w
 	bool	log
+
+	imtype = "." // envget ("imtype")
+	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
 	temp1 = mktemp ("tmp$iraf")
@@ -33,26 +37,29 @@ begin
 
 	arcref = arcref1
 	arcrefms = arcref1 // extn
-	if (!access (arcrefms//".imh")) {
+	if (!access (arcrefms//imtype)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    apscript (arcref, output=arcrefms, ansrecenter="NO",
 		ansresize="NO", ansedit="NO", anstrace="NO",
 		nsubaps=params.nsubaps, background="none", clean=no,
 		weights="none")
-	    sapertures (arcrefms, apertures="", apidtable=apidtable, verbose=no)
+	    sapertures (arcrefms, apertures="", apidtable=apidtable,
+		wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF, w1=INDEF,
+		dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 	    if (response != "") {
 		if (params.nsubaps == 1)
 	            sarith (arcrefms, "/", response, arcrefms, w1=INDEF,
-			w2=INDEF, apertures="", beams="", apmodulus=0,
+			w2=INDEF, apertures="", bands="", beams="", apmodulus=0,
 			reverse=no, ignoreaps=no, format="multispec",
 			renumber=no, offset=0, clobber=yes, merge=no,
 			errval=0, verbose=no)
 		else {
 		    blkrep (response, temp, 1, params.nsubaps)
 	            sarith (arcrefms, "/", temp, arcrefms, w1=INDEF, w2=INDEF,
-			apertures="", beams="", apmodulus=0, reverse=no,
-			ignoreaps=yes, format="multispec", renumber=no,
-			offset=0, clobber=yes, merge=no, errval=0, verbose=no)
+			apertures="", bands="", beams="", apmodulus=0,
+			reverse=no, ignoreaps=yes, format="multispec",
+			renumber=no, offset=0, clobber=yes, merge=no,
+			errval=0, verbose=no)
 		    imdelete (temp, verify=no)
 		}
 	    }
@@ -63,16 +70,16 @@ begin
 		fd = arcreplace
 		while (fscan (fd, arc, str1, str2) != EOF) {
 		    i = strlen (arc)
-		    if (i > 4 && substr (arc, i-3, i) == ".imh")
-			arc = substr (arc, 1, i-4)
+		    if (i > n && substr (arc, i-n+1, i) == imtype)
+			arc = substr (arc, 1, i-n)
 		    if (arc != arcref)
 			    next
 		    arc = str1
-		    if (i > 4 && substr (arc, i-3, i) == ".imh")
-			arc = substr (arc, 1, i-4)
+		    if (i > n && substr (arc, i-n+1, i) == imtype)
+			arc = substr (arc, 1, i-n)
 		    arcms = arc // extn
 
-		    if (access (arcms//".imh"))
+		    if (access (arcms//imtype))
 			imdelete (arcms, verify=no)
 
 		    print ("Extract arc reference image ", arc) | tee (log1)
@@ -81,28 +88,30 @@ begin
 			nsubaps=params.nsubaps, background="none", clean=no,
 			weights="none")
 		    sapertures (arcms, apertures="", apidtable=apidtable,
-		        verbose=no)
+			wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF,
+			w1=INDEF, dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF,
+			title=INDEF)
 		    if (response != "") {
 			if (params.nsubaps == 1)
 			    sarith (arcms, "/", response, arcms, w1=INDEF,
-				w2=INDEF, apertures="", beams="", apmodulus=0,
-				reverse=no, ignoreaps=no, format="multispec",
-				renumber=no, offset=0, clobber=yes, merge=no,
-				errval=0, verbose=no)
+				w2=INDEF, apertures="", bands="", beams="",
+				apmodulus=0, reverse=no, ignoreaps=no,
+				format="multispec", renumber=no, offset=0,
+				clobber=yes, merge=no, errval=0, verbose=no)
 			else {
 			    blkrep (response, temp, 1, params.nsubaps)
 			    sarith (arcms, "/", temp, arcms, w1=INDEF,
-				w2=INDEF, apertures="", beams="", apmodulus=0,
-				reverse=no, ignoreaps=yes, format="multispec",
-				renumber=no, offset=0, clobber=yes, merge=no,
-				errval=0, verbose=no)
+				w2=INDEF, apertures="", bands="", beams="",
+				apmodulus=0, reverse=no, ignoreaps=yes,
+				format="multispec", renumber=no, offset=0,
+				clobber=yes, merge=no, errval=0, verbose=no)
 			    imdelete (temp, verify=no)
 			}
 		    }
 		    scopy (arcms, arcrefms, w1=INDEF, w2=INDEF, apertures=str2,
-			beams="", apmodulus=1000, offset=0, format="multispec",
-			clobber=yes, merge=yes, renumber=no, verbose=yes) |
-			tee (log1, > log2)
+			bands="", beams="", apmodulus=1000, offset=0,
+			format="multispec", clobber=yes, merge=yes, renumber=no,
+			verbose=yes) | tee (log1, > log2)
 		    imdelete (arcms, verify=no)
 		}
 		fd = ""
@@ -118,61 +127,58 @@ begin
 	# the database (if the image was deleted but the database
 	# entry was not).
 
-	hselect (arcrefms, "naxis2,dc-flag", yes, > temp)
-	fd = temp
-	nspec = 1
-	dc = -1
-	i = fscan (fd, nspec, dc)
-	fd = ""; delete (temp, verify=no)
-	if (dc == -1) {
+	hselect (arcrefms, "dclog1", yes) | scan (str1)
+	if (nscan () != 1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcrefms//"*", verify=no)
 	    identify (arcrefms, section="middle line", database=database,
 		coordlist=params.coordlist, nsum=1, match=params.match,
 		maxfeatures=50, zwidth=100., ftype="emission",
 		fwidth=params.fwidth, cradius=params.cradius,
-		threshold=10., minsep=2., function=params.i_function,
-		order=params.i_order, sample="*",
-		niterate=params.i_niterate, low_reject=params.i_low,
-		high_reject=params.i_high, grow=0., autowrite=yes)
+		threshold=params.threshold, minsep=2.,
+		function=params.i_function, order=params.i_order,
+		sample="*", niterate=params.i_niterate,
+		low_reject=params.i_low, high_reject=params.i_high,
+		grow=0., autowrite=yes)
 	    hedit (arcrefms, "refspec1", arcrefms, add=yes,
 		show=no, verify=no)
+
+	    nspec = 1
+	    hselect (arcrefms, "naxis2", yes) | scan (nspec)
 	    if (nspec > 1)
 		reidentify (arcrefms, "", interactive=yes,
 		    section="middle line", shift=0., step=1, nsum=1,
-		    cradius=params.cradius, threshold=10., nlost=100,
-		    refit=params.refit, trace=no, override=yes,
+		    cradius=params.cradius, threshold=params.threshold,
+		    nlost=100, refit=params.refit, trace=no, override=yes,
 		    addfeatures=params.addfeatures, newaps=no,
 		    coordlist=params.coordlist, match=params.match,
 		    maxfeatures=50, minsep=2., database=database,
 		    plotfile=plotfile, logfiles=logfile, verbose=yes)
-	}
 
-	# Dispersion correct the reference arc.  This step is required to
-	# use the confirm option of MSDISPCOR to set the wavelength scale
-	# for all further spectra.  Set the newdisp flag.
+	    # Dispersion correct the reference arc.  This step is required to
+	    # use the confirm option of MSDISPCOR to set the wavelength scale
+	    # for all further spectra.  Set the newdisp flag.
 
-	if (dc == -1) {
 	    print ("Dispersion correct ", arcref) | tee (log1)
 	    dispcor (arcrefms, "", linearize=params.linearize,
 		database=database, table="", w1=INDEF, w2=INDEF, dw=INDEF,
 		nw=INDEF, log=params.log, flux=params.flux, samedisp=yes,
 		global=no, ignoreaps=no, confirm=yes, listonly=no, verbose=no,
 		logfile=logfile)
-	    hedit (arcrefms, "dc-flag", 0, add=yes, verify=no,
-		show=no, update=yes)
 	    if (params.nsubaps > 1) {
 		imrename (arcrefms, temp, verbose=no)
 		scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="-999",
-		    beams="", apmodulus=0, offset=0, format="multispec",
-		    clobber=no, merge=no, renumber=no, verbose=no)
+		    bands="", beams="", apmodulus=0, offset=0,
+		    format="multispec", clobber=no, merge=no, renumber=no,
+		    verbose=no)
 		blkavg (temp, temp, 1, params.nsubaps, option="sum")
 		imcopy (temp, arcrefms//"[*,*]", verbose=no)
 		imdelete (temp, verify=no)
 	    }
 	    proc.newdisp = yes
 	}
-	print (arcref, >> done)
+	if (extn == ".ms")
+	    print (arcref, >> done)
 
 	# Extract the alternate shift arc reference.  Transfer the dispersion
 	# function from the primary arc reference and then identify shift
@@ -181,7 +187,7 @@ begin
 	if (arcref2 != "") {
 	    arcref = arcref2
 	    arcrefms = arcref2 // extn
-	    if (proc.newdisp && access (arcrefms//".imh"))
+	    if (proc.newdisp && access (arcrefms//imtype))
 		imdelete (arcrefms, verify=no)
 	    if (!access (arcrefms)) {
 		print ("Extract arc reference image ", arcref) | tee (log1)
@@ -190,32 +196,29 @@ begin
 		    nsubaps=params.nsubaps, background="none", clean=no,
 		    weights="none")
 		sapertures (arcrefms, apertures="", apidtable=apidtable,
-		    verbose=no)
+		    wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF, w1=INDEF,
+		    dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 		if (response != "") {
 		    if (params.nsubaps == 1)
 			sarith (arcrefms, "/", response, arcrefms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=no, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=no,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 		    else {
 			blkrep (response, temp, 1, params.nsubaps)
 			sarith (arcrefms, "/", temp, arcrefms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=yes, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=yes,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 			imdelete (temp, verify=no)
 		    }
 		}
 	    }
 
-	    hselect (arcrefms, "naxis2,dc-flag", yes, > temp)
-	    fd = temp
-	    dc = -1
-	    i = fscan (fd, nspec, dc)
-	    fd = ""; delete (temp, verify=no)
-	    if (i < 2 || dc == -1) {
+	    hselect (arcrefms, "dclog1", yes) | scan (str1)
+	    if (nscan () != 1) {
 		print ("Determine dispersion solution for ", arcref) |
 		    tee (log1)
 		#delete (database//"/id"//arcrefms//"*", verify=no)
@@ -224,30 +227,30 @@ begin
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist="", nsum=1, match=params.match, maxfeatures=50,
 		    zwidth=100., ftype="emission", fwidth=params.fwidth,
-		    cradius=params.cradius, threshold=10., minsep=2.,
-		    function=params.i_function, order=params.i_order,
-		    sample="*", niterate=params.i_niterate,
-		    low_reject=params.i_low, high_reject=params.i_high,
-		    grow=0., autowrite=yes, cursor="STDIN",
-		    >G "dev$null", >& "dev$null")
+		    cradius=params.cradius, threshold=params.threshold,
+		    minsep=2., function=params.i_function,
+		    order=params.i_order, sample="*",
+		    niterate=params.i_niterate, low_reject=params.i_low,
+		    high_reject=params.i_high, grow=0., autowrite=yes,
+		    cursor="STDIN", >G "dev$null", >& "dev$null")
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist="", nsum=1, match=params.match, maxfeatures=50,
 		    zwidth=100., ftype="emission", fwidth=params.fwidth,
-		    cradius=params.cradius, threshold=10., minsep=2.,
-		    function=params.i_function, order=params.i_order,
-		    sample="*", niterate=params.i_niterate,
-		    low_reject=params.i_low, high_reject=params.i_high,
-		    grow=0., autowrite=yes)
+		    cradius=params.cradius, threshold=params.threshold,
+		    minsep=2., function=params.i_function,
+		    order=params.i_order, sample="*",
+		    niterate=params.i_niterate, low_reject=params.i_low,
+		    high_reject=params.i_high, grow=0., autowrite=yes)
 		print (":feat ", temp) |
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist="", nsum=1, match=params.match, maxfeatures=50,
 		    zwidth=100., ftype="emission", fwidth=params.fwidth,
-		    cradius=params.cradius, threshold=10., minsep=2.,
-		    function=params.i_function, order=params.i_order,
-		    sample="*", niterate=params.i_niterate,
-		    low_reject=params.i_low, high_reject=params.i_high,
-		    grow=0., autowrite=yes, cursor="STDIN",
-		    >G "dev$null", >& "dev$null")
+		    cradius=params.cradius, threshold=params.threshold,
+		    minsep=2., function=params.i_function,
+		    order=params.i_order, sample="*",
+		    niterate=params.i_niterate, low_reject=params.i_low,
+		    high_reject=params.i_high, grow=0., autowrite=yes,
+		    cursor="STDIN", >G "dev$null", >& "dev$null")
 		print (":r ", arcref1//extn, "\na\nd", > temp1)
 		fd = temp
 		while (fscan (fd, i, w, w, w) != EOF) {
@@ -258,14 +261,18 @@ begin
 		}
 		print ("g", >> temp1)
 		fd = ""; delete (temp, verify=no)
+
+		nspec = 1
+		hselect (arcrefms, "naxis2", yes) | scan (nspec)
 		for (i = 1; i <= nspec; i+=1)
 		    identify (arcrefms, section="line "//i,
 			database=database, coordlist="", nsum=1,
 			match=params.match, maxfeatures=50, zwidth=100.,
 			ftype="emission", fwidth=params.fwidth,
-			cradius=params.cradius, threshold=10., minsep=2.,
-			function=params.i_function, order=params.i_order,
-			sample="*", niterate=params.i_niterate,
+			cradius=params.cradius, threshold=params.threshold,
+			minsep=2., function=params.i_function,
+			order=params.i_order, sample="*",
+			niterate=params.i_niterate,
 			low_reject=params.i_low, high_reject=params.i_high,
 			grow=0., autowrite=yes, cursor=temp1, < temp2,
 			>G "dev$null", >>& temp)
@@ -279,18 +286,18 @@ begin
 		    dw=INDEF, nw=INDEF, log=params.log, flux=params.flux,
 		    samedisp=yes, global=no, ignoreaps=no, confirm=no,
 		    listonly=no, verbose=yes, logfile=logfile, > log2)
-		hedit (arcrefms, "dc-flag", 0, add=yes, verify=no,
-		    show=no, update=yes)
 		if (params.nsubaps > 1) {
 		    imrename (arcrefms, temp, verbose=no)
 		    scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="-999",
-			beams="", apmodulus=0, offset=0, format="multispec",
-			clobber=no, merge=no, renumber=no, verbose=no)
+			bands="", beams="", apmodulus=0, offset=0,
+			format="multispec", clobber=no, merge=no, renumber=no,
+			verbose=no)
 		    blkavg (temp, temp, 1, params.nsubaps, option="sum")
 		    imcopy (temp, arcrefms//"[*,*]", verbose=no)
 		    imdelete (temp, verify=no)
 		}
 	    }
-	    print (arcref, >> done)
+	    if (extn == ".ms")
+		print (arcref, >> done)
 	}
 end

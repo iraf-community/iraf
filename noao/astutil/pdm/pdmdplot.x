@@ -4,7 +4,8 @@ include <error.h>
 include <gset.h>
 include "pdm.h"
 
-define	MSIZE	2			# Mark size
+define	MSIZE	2.0			# Mark size
+define	EDGESCL	5.0			# Percent extra space around plot data
 
 # PDM_DPLOT -- Plot the data on the screen.
 
@@ -15,8 +16,8 @@ char	filename[SZ_FNAME]		# name of the input data file
 bool	flip				# flip the y-axis scale
 
 int	npt, i
-real	x1,  x2, y1, y2
-pointer	gp
+real	x1, x2, y1, y2, scldif, sclspc
+pointer	gp, xtemp, ytemp
 pointer	title
 pointer	system_id, sp
 
@@ -24,20 +25,39 @@ begin
 	call smark (sp)
 	call salloc (system_id, SZ_LINE, TY_CHAR)
 	call salloc (title, 4*SZ_LINE, TY_CHAR)
+	call salloc (xtemp, PDM_NPT(pdmp), TY_REAL)
+	call salloc (ytemp, PDM_NPT(pdmp), TY_REAL)
 
 	npt = PDM_NPT(pdmp)
 	gp = PDM_GP(pdmp)
 	call gclear (gp)
 
 	# Scale the wcs.
-	call gascale (gp, PDM_X(pdmp,1), npt, 1)
-	call gascale (gp, PDM_DY(pdmp,1), npt, 2)
+	do i = 1, PDM_NPT(pdmp) {
+	    Memr[xtemp+i-1] = real(PDM_X(pdmp,i))
+	    Memr[ytemp+i-1] = real(PDM_DY(pdmp,i))
+	}
+	call gascale (gp, Memr[xtemp], npt, 1)
+	call gascale (gp, Memr[ytemp], npt, 2)
+
+	# Get the X and Y boundaries.
+	call ggwind (gp, x1, x2, y1, y2)
+
+	# Add boundry space.
+	scldif = x2 - x1
+	sclspc = scldif * (EDGESCL / 100.)
+	x1 = x1 - sclspc
+	x2 = x2 + sclspc
+	scldif = y2 - y1
+	sclspc = scldif * (EDGESCL / 100.)
+	y1 = y1 - sclspc
+	y2 = y2 + sclspc
 
 	# Flip the y-axis scale if flip = TRUE.
-	if (flip) {
-	    call ggwind (gp, x1, x2, y1, y2)
+	if (flip)
 	    call gswind (gp, x1, x2, y2, y1)
-	}
+	else
+	    call gswind (gp, x1, x2, y1, y2)
 
 	# Multiline title, save in an array and sprintf to it.
 	# Get the system identification.
@@ -58,21 +78,21 @@ begin
 
 	# Make the plot.
 	if (npt <= PDM_PLUSPOINT(pdmp)) {
-	    call gpmark (gp, PDM_X(pdmp,1), PDM_DY(pdmp,1), npt,
-			"plus", MSIZE, MSIZE)
+	    call gpmark (gp, Memr[xtemp], Memr[ytemp], npt,
+			GM_PLUS, MSIZE, MSIZE)
 	} else {
-	    call gpmark (gp, PDM_X(pdmp,1), PDM_DY(pdmp,1), npt,
-			"point", 1, 1)
+	    call gpmark (gp, Memr[xtemp], Memr[ytemp], npt,
+			GM_POINT, 1.0, 1.0)
 	}
 
 	# Call the routine to mark the ranges if they are in effect.
-	call rg_gxmarkr (gp, PDM_SAMPLE(pdmp), PDM_X(pdmp,1), npt, 1)
+	call rg_gxmarkd (gp, PDM_SAMPLE(pdmp), PDM_X(pdmp,1), npt, 1)
 
 	# Draw an x over any deleted points.
 	do i = 1, npt {
 	    if (PDM_INUSE(pdmp,i) == 0) {
-	        call gscur (gp, PDM_X(pdmp,i), PDM_DY(pdmp,i))
-	        call gmark (gp, PDM_X(pdmp,i), PDM_DY(pdmp,i), GM_CROSS,
+	        call gscur (gp, Memr[xtemp+i-1], Memr[ytemp+i-1])
+	        call gmark (gp, Memr[xtemp+i-1], Memr[ytemp+i-1], GM_CROSS,
 		    MSIZE, MSIZE)
 	    }
 	}

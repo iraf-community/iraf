@@ -2,6 +2,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <signal.h>
 #include <setjmp.h>
@@ -21,14 +22,8 @@
 #define	import_kernel
 #define	import_knames
 #define	import_zfstat
-#define	import_fset
 #define import_spp
 #include <iraf.h>
-
-#define	CTRLC	3
-extern	int errno;		/* error code returned by the kernel	*/
-static	jmp_buf jmpbuf;
-static	tty_rawon(), tty_reset(), uio_bwrite();
 
 /*
  * ZFIOTX -- File i/o to textfiles, for UNIX 4.1BSD.  This driver is used for
@@ -63,24 +58,62 @@ static	tty_rawon(), tty_reset(), uio_bwrite();
  * are ASCII machines.
  */
 
-#define	MAX_TRYS	2	/* max interrupted trys to read		*/
-#define	NEWLINE	'\n'
-static	int	tty_fd = -1;	/* FD of tty device if charmode set	*/
-static	char	tty_redraw = 0;	/* screen redraw control code		*/
-static	int	tty_getraw = 0;	/* raw getc in progress			*/
+#define MAXOTTYS	20	/* max simultaneous open ttys */
+#define	MAX_TRYS	2	/* max interrupted trys to read */
+#define	NEWLINE		'\n'
 
+/* The ttyport descriptor is used by the tty driver (zfiotx). */
+struct ttyport {
+	int inuse;			/* port in use			*/
+	int chan;			/* host channel (file descrip.)	*/
+	unsigned device;		/* tty device number		*/
+	int flags;			/* port flags			*/
+	char redraw;			/* redraw char, sent after susp	*/
 #ifdef SYSV
-static	struct	termio tc_state; /* save terminal state			*/
+	struct termio tc;		/* normal tty state		*/
+	struct termio save_tc;		/* saved rawmode tty state	*/
 #else
-static	short	tty_flags = 0;	/* terminal driver mode flag bits	*/
+	struct sgttyb tc;		/* normal tty state		*/
+	struct sgttyb save_tc;		/* saved rawmode tty state	*/
+#endif
+};
+
+
+
+#define	CTRLC	3
+extern	int errno;
+static	jmp_buf jmpbuf;
+static	int tty_getraw = 0;	/* raw getc in progress */
+static	SIGFUNC	sigint, sigterm;
+static	SIGFUNC	sigtstp, sigcont;
+static	tty_rawon(), tty_reset(), uio_bwrite();
+static	tty_onsig(), tty_stop(), tty_continue();
+
+/* The ttyports array describes up to MAXOTTYS open terminal i/o ports.
+ * Very few processes will ever have more than one or two ports open at
+ * one time.  ttyport descriptors are allocated one per tty device, using
+ * the minor device number to identify the device.  This serves to
+ * uniquely identify each tty device regardless of the file descriptor
+ * used to access it.  Multiple file descriptors (e.g. stdin, stdout,
+ * stderr) used to access a single device must use description of the
+ * device state.
+ */
+struct ttyport ttyports[MAXOTTYS];
+struct ttyport *lastdev = NULL;
+
+#ifdef LINUX
+/* The following definition has intimate knowledge of the STDIO structures. */
+#define	fcancel(fp)	( \
+    (fp)->_IO_read_ptr = (fp)->_IO_read_end = (fp)->_IO_read_base,\
+    (fp)->_IO_write_ptr = (fp)->_IO_write_end = (fp)->_IO_write_base)
 #endif
 
-static	PFI	sigint, sigterm;
-static	PFI	sigtstp, sigcont;
-static	int	tty_onsig(), tty_stop(), tty_continue();
 
-
-/* ZOPNTX -- Open or create a text file.
+/* ZOPNTX -- Open or create a text file.  The pseudo-files "unix-stdin", 
+ * "unix-stdout", and "unix-stderr" are treated specially.  These denote the
+ * UNIX stdio streams of the process.  These streams are not really opened
+ * by this driver, but ZOPNTX should be called on these streams to
+ * properly initialize the file descriptor.
  */
 ZOPNTX (osfn, mode, chan)
 PKCHAR	*osfn;			/* UNIX filename			*/
@@ -89,9 +122,10 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 {
 	register int fd;
 	register FILE *fp;
-	struct	stat filestat;
-	FILE	*fopen();
-	char	*fmode;
+	struct stat filestat;
+	int newmode, maskval;
+	FILE *fopen();
+	char *fmode;
 
 	/* Map FIO access mode into UNIX/stdio access mode.
 	 */
@@ -120,39 +154,80 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 	 * FILE_MODEBITS in kernel.h.  This is done in such a way that the
 	 * user's UMASK bits are preserved.
 	 */
-	if ((fp = fopen ((char *)osfn, fmode)) == NULL)
+	if (strcmp ((char *)osfn, U_STDIN) == 0) {
+	    fp = stdin;
+	} else if (strcmp ((char *)osfn, U_STDOUT) == 0) {
+	    fp = stdout;
+	} else if (strcmp ((char *)osfn, U_STDERR) == 0) {
+	    fp = stderr;
+	} else if ((fp = fopen ((char *)osfn, fmode)) == NULL)
 	    goto error;
-	if (stat ((char *)osfn, &filestat) == ERR) {
-	    fclose (fp);
+
+	fd = fileno (fp); 
+	if (fstat (fd, &filestat) == ERR) {
+	    if (fd > 2)
+		fclose (fp);
 	    goto error;
-	} else if ((fd = fileno(fp)) >= MAXOFILES) {
-	    fclose (fp);
+	} else if (fd >= MAXOFILES) {
+	    if (fd > 2)
+		fclose (fp);
 	    goto error;
 	}
 
-	if ((filestat.st_mode & S_IFREG) &&
-	    (*mode == WRITE_ONLY || *mode == NEW_FILE)) {
-
-	    int    newmode;
-	    int    maskval;
-
+	/* If regular file apply the umask. */
+	if (fd > 2 && S_ISREG(filestat.st_mode) &&
+		(*mode == WRITE_ONLY || *mode == NEW_FILE)) {
 	    umask (maskval = umask (022));
 	    newmode = ((filestat.st_mode | 066) & ~maskval);
-	    if (chmod ((char *)osfn, newmode) == ERR) {
-		fclose (fp);
-		goto error;
-	    }
+	    (void) chmod ((char *)osfn, newmode);
 	}
 
 	/* Set up kernel file descriptor.
 	 */
-	fd = fileno (fp); 
 	zfd[fd].fp = fp;
 	zfd[fd].fpos = 0;
 	zfd[fd].nbytes = 0;
 	zfd[fd].io_flags = 0;
-	zfd[fd].flags = (filestat.st_mode & S_IFCHR) ? KF_NOSEEK : KF_NOSTTY;
+	zfd[fd].port = (char *) NULL;
 
+	zfd[fd].flags = (KF_NOSEEK | KF_NOSTTY);
+	if (S_ISREG (filestat.st_mode))
+	    zfd[fd].flags &= ~KF_NOSEEK;
+	if (S_ISCHR (filestat.st_mode))
+	    zfd[fd].flags &= ~KF_NOSTTY;
+
+	/* If we are opening a terminal device set up ttyport descriptor. */
+	if (!(zfd[fd].flags & KF_NOSTTY)) {
+	    register struct ttyport *port;
+	    register unsigned device;
+	    register int i;
+
+	    /* Check if we already have a descriptor for this device. */
+	    device = (filestat.st_dev << 16) + filestat.st_rdev;
+	    for (i=0, port = &ttyports[0];  i < MAXOTTYS;  i++, port++)
+		if (port->inuse && port->device == device) {
+		    zfd[fd].port = (char *) port;
+		    port->inuse++;
+		    goto done;
+		}
+
+	    /* Fill in a fresh descriptor. */
+	    port = &ttyports[0];
+	    for (i=MAXOTTYS;  --i >= 0 && port->inuse;  port++)
+		;
+	    if (i >= MAXOTTYS)
+		goto error;
+
+	    port->chan = fd;
+	    port->device = device;
+	    port->flags = 0;
+	    port->redraw = 0;
+	    port->inuse = 1;
+
+	    zfd[fd].port = (char *) port;
+	}
+
+done:
 	*chan = fd;
 	return;
 
@@ -169,12 +244,13 @@ XINT	*fd;
 XINT	*status;
 {
 	register struct	fiodes *kfp = &zfd[*fd];
+	register struct ttyport *port = (struct ttyport *) kfp->port;
 
 	/* Disable character mode if still in effect.  If this is necessary
 	 * then we have already saved the old tty status flags in sg_flags.
 	 */
-	if (kfp->flags & KF_CHARMODE)
-	    tty_reset ((int)*fd);
+	if (port && (port->flags & KF_CHARMODE))
+	    tty_reset (port);
 
 	/* Close the file.  Set file pointer field of kernel file descriptor
 	 * to null to indicate that the file is closed.
@@ -184,7 +260,15 @@ XINT	*status;
 	 * a close error was occuring (errno was EPERM - not owner).
 	 */
 	*status = (fclose(kfp->fp) == EOF && kfp->flags&KF_NOSTTY) ? XERR : XOK;
+
 	kfp->fp = NULL;
+	if (port) {
+	    kfp->port = NULL;
+	    if (--port->inuse < 0)
+		port->inuse = 0;
+	    if (lastdev == port)
+		lastdev = NULL;
+	}
 }
 
 
@@ -210,30 +294,35 @@ XCHAR	*buf;
 XINT	*maxchars;
 XINT	*status;
 {
-	register FILE	*fp;
-	register int	ch, maxch = *maxchars;
+	register FILE *fp;
+	register XCHAR *op;
+	register int ch, maxch = *maxchars;
 	register struct	fiodes *kfp;
-	register XCHAR	*op;
-	int	nbytes, ntrys;
+	struct ttyport *port;
+	int nbytes, ntrys;
+
+	if (maxch <= 0) {
+	    *status = 0;
+	    return;
+	}
 
 	kfp = &zfd[*fd];
+	port = (struct ttyport *) kfp->port;
 	fp = kfp->fp;
 
 	/* If maxch=1 assert char mode if legal on device, otherwise clear
 	 * char mode if set.  Ignore ioctl errors if ioctl is illegal on
 	 * device.
 	 */
-	if (maxch <= 0) {
-	    *status = 0;
-	    return;
-     	} else if (maxch == 1) {
-	    if (!(kfp->flags & KF_CHARMODE))
-		tty_rawon ((int)*fd, 0);
-	} else if (kfp->flags & KF_CHARMODE) {
-	    /* Disable character mode.  If this is necessary then we have
-	     * already saved the old tty status flags in sg_flags.
-	     */
-	    tty_reset ((int)*fd);
+	if (port) {
+	    if (maxch == 1 && !(port->flags & KF_CHARMODE))
+		tty_rawon (port, 0);
+	    else if (maxch > 1 && (port->flags & KF_CHARMODE)) {
+		/* Disable character mode.  If this is necessary then we have
+		 * already saved the old tty status flags in sg_flags.
+		 */
+		tty_reset (port);
+	    }
 	}
 
 	/* Copy the next line of text into the user buffer.  Keep track of
@@ -251,7 +340,7 @@ XINT	*status;
 	 * an interrupt occurs while waiting for input from the terminal, in
 	 * which case recovery is probably safe.
 	 */
-	if (!(kfp->flags & KF_CHARMODE)) {
+	if (!port || !(port->flags & KF_CHARMODE)) {
 	    /* Read in line mode.
 	     */
 	    ntrys = MAX_TRYS;
@@ -262,10 +351,42 @@ XINT	*status;
 		while (*op++ = ch = getc(fp), ch != EOF)
 		    if (--maxch <= 0 || ch == NEWLINE)
 			break;
+#ifdef LINUX
+		if (errno == EINTR)
+		    fcancel (fp);
+#endif
 	    } while (errno == EINTR && op-1 == buf && --ntrys >= 0);
 
 	    *op = XEOS;
 	    nbytes = *maxchars - maxch;
+
+	} else if (kfp->flags & KF_NDELAY) {
+	    /* Read a single character in nonblocking raw mode.  Zero
+	     * bytes are returned if there is no data to be read.
+	     */
+	    struct timeval timeout;
+	    int chan = fileno(fp);
+	    fd_set rfds;
+	    char data[1];
+
+	    FD_ZERO (&rfds);
+	    FD_SET (chan, &rfds);
+	    timeout.tv_sec = 0;
+	    timeout.tv_usec = 0;
+	    clearerr (fp);
+
+	    if (select (chan+1, &rfds, NULL, NULL, &timeout)) {
+		if (read (chan, data, 1) != 1) {
+		    *status = XERR;
+		    return;
+		}
+		ch = *data;
+		goto outch;
+	    } else {
+		*buf = XEOS;
+		*status = 0;
+		return;
+	    }
 
 	} else {
 	    /* Read a single character in raw mode.  Catch interrupts and
@@ -275,14 +396,26 @@ XINT	*status;
 	     * because ctrl/s ctrl/q is disabled in raw mode, and that can
 	     * cause sporadic protocol failures.
 	     */
-	    sigint  = (PFI) signal (SIGINT,  tty_onsig);
-	    sigterm = (PFI) signal (SIGTERM, tty_onsig);
+	    sigint  = (SIGFUNC) signal (SIGINT,  (SIGFUNC)tty_onsig);
+	    sigterm = (SIGFUNC) signal (SIGTERM, (SIGFUNC)tty_onsig);
 	    tty_getraw = 1;
+
+	    /* Async mode can be cleared by other processes (e.g. wall),
+	     * so reset it on every nonblocking read.  This code should
+	     * never be executed as KF_NDELAY is handled specially above,
+	     * but it does no harm to leave it in here anyway.
+	     */
+	    if (kfp->flags & KF_NDELAY)
+		fcntl (*fd, F_SETFL, kfp->io_flags | O_NDELAY);
 
 	    if ((ch = setjmp (jmpbuf)) == 0) {
 		clearerr (fp);
 		ch = getc (fp);
 	    }
+#ifdef LINUX
+	    if (ch == CTRLC)
+		fcancel (fp);
+#endif
 
 	    signal (SIGINT,  sigint);
 	    signal (SIGTERM, sigterm);
@@ -290,7 +423,7 @@ XINT	*status;
 
 	    /* Clear parity bit just in case raw mode is used.
 	     */
-	    op = buf;
+outch:	    op = buf;
 	    if (ch == EOF) {
 		*op++ = ch;
 		nbytes = 0;
@@ -353,14 +486,16 @@ register XCHAR	*buf;			/* data to be output		*/
 XINT	*nchars;			/* nchars to write to file	*/
 XINT	*status;			/* return status		*/
 {
-	register FILE	*fp;
-	register int	nbytes;
+	register FILE *fp;
+	register int nbytes;
 	register struct fiodes *kfp = &zfd[*fd];
-	XCHAR	*ip;
-	char	*cp;
-	int	count, ch;
+	struct ttyport *port;
+	int count, ch;
+	XCHAR *ip;
+	char *cp;
 
 	count = nbytes = *nchars;
+	port = (struct ttyport *) kfp->port;
 	fp = kfp->fp;
 
 	/* Clear raw mode if raw mode is set, the output file is a tty, and
@@ -378,8 +513,7 @@ XINT	*status;			/* return status		*/
 	    for (ip=buf, cp=RAWOFF;  *cp && (*ip == *cp);  ip++, cp++)
 		;
 	    if (*cp == EOS) {
-		/* If no tty stream has been established, reset stdin. */
-		tty_reset ((tty_fd >= 0) ? tty_fd : 0);
+		tty_reset (port);
 		*status = XOK;
 		return;
 	    }
@@ -391,13 +525,12 @@ XINT	*status;			/* return status		*/
 	    for (ip=buf, cp=RAWON;  *cp && (*ip == *cp);  ip++, cp++)
 		;
 	    if (*cp == EOS) {
-		/* If writing to stdout|stderr, set tty_fd to stdin. */
-		tty_rawon ((*fd > 2) ? *fd : 0, (*ip++ == 'N') ? KF_NDELAY : 0);
+		tty_rawon (port, (*ip++ == 'N') ? KF_NDELAY : 0);
 		*status = XOK;
 		return;
 	    }
 	
-	    /* The set-redraw control sequence.  If the tty_redraw code is
+	    /* The set-redraw control sequence.  If the redraw code is
 	     * set to a nonnull value, that value will be returned to the
 	     * reader in the next GETC call following a process
 	     * suspend/continue, as if the code had been typed by the user.
@@ -405,7 +538,7 @@ XINT	*status;			/* return status		*/
 	    for (ip=buf, cp=SETREDRAW;  *cp && (*ip == *cp);  ip++, cp++)
 		;
 	    if (*cp == EOS) {
-		tty_redraw = *ip;
+		port->redraw = *ip;
 		*status = XOK;
 		return;
 	    }
@@ -546,63 +679,60 @@ XLONG	*value;			/* return value				*/
  * line mode.
  */
 static
-tty_rawon (fd, flags)
-int	fd;			/* file descriptor */
+tty_rawon (port, flags)
+struct	ttyport *port;		/* tty port */
 int	flags;			/* file mode control flags */
 {
-	register struct	fiodes *kfp = &zfd[fd];
+	register struct	fiodes *kfp;
+	register int fd;
 
-	if (!(kfp->flags & (KF_CHARMODE|KF_NOSTTY))) {
+	if (!port)
+	    return;
+
+	fd = port->chan;
+	kfp = &zfd[fd];
+
+	if (!(port->flags & KF_CHARMODE)) {
 #ifdef SYSV
 	    struct  termio tc;
 	    int     i;
 
 	    ioctl (fd, TCGETA, &tc);
-
-	    /* Save terminal state. */
-	    kfp->tc_iflag = tc.c_iflag;
-	    kfp->tc_oflag = tc.c_oflag;
-	    kfp->tc_lflag = tc.c_lflag;
-	    kfp->flags |= KF_CHARMODE;
-	    for (i=0;  i < NCC && i < MAXCC;  i++)
-		kfp->tc_cc[i] = tc.c_cc[i];
+	    port->flags |= KF_CHARMODE;
+	    port->tc = tc;
 
 	    /* Set raw mode. */
-	    tc.c_iflag = 0;
+	    tc.c_iflag &= ~(ICRNL|INLCR|IUCLC);
 	    tc.c_oflag = 0;
 	    tc.c_lflag  = ISIG;
 	    tc.c_cc[VMIN] = 2;
 	    tc.c_cc[VTIME] = 2;
-	    ioctl (fd, TCSETAF, &tc);
 
-	    /* Save FD, state flags of raw mode tty device. */
-	    tty_fd = fd;
-	    tc_state = tc;
+	    ioctl (fd, TCSETAW, &tc);
 #else
-	    struct  sgttyb ttystat;
+	    struct  sgttyb tc;
 
-	    ioctl (fd, TIOCGETP, &ttystat);
-	    kfp->sg_flags = ttystat.sg_flags;
-	    kfp->flags |= KF_CHARMODE;
+	    ioctl (fd, TIOCGETP, &tc);
+	    port->flags |= KF_CHARMODE;
+	    port->tc = tc;
 
 	    /* Set raw mode in the terminal driver. */
 	    if ((flags & KF_NDELAY) && !(kfp->flags & KF_NDELAY))
-		ttystat.sg_flags |= (RAW|TANDEM);
+		tc.sg_flags |= (RAW|TANDEM);
 	    else
-		ttystat.sg_flags |= CBREAK;
-	    ttystat.sg_flags &= ~(ECHO|CRMOD);
-	    ioctl (fd, TIOCSETN, &ttystat);
+		tc.sg_flags |= CBREAK;
+	    tc.sg_flags &= ~(ECHO|CRMOD);
 
-	    /* Save FD, SG_FLAGS of raw mode tty device. */
-	    tty_fd = fd;
-	    tty_flags = ttystat.sg_flags;
+	    ioctl (fd, TIOCSETN, &tc);
 #endif
+	    /* Set pointer to raw mode tty device. */
+	    lastdev = port;
 
 	    /* Post signal handlers to clear/restore raw mode if process is
 	     * suspended.
 	     */
-	    sigtstp = (PFI) signal (SIGTSTP, tty_stop);
-	    sigcont = (PFI) signal (SIGCONT, tty_continue);
+	    sigtstp = (SIGFUNC) signal (SIGTSTP, (SIGFUNC)tty_stop);
+	    sigcont = (SIGFUNC) signal (SIGCONT, (SIGFUNC)tty_continue);
 	}
 
 	/* Set any file descriptor flags, e.g., for nonblocking reads. */
@@ -610,8 +740,10 @@ int	flags;			/* file mode control flags */
 	    kfp->io_flags = fcntl (fd, F_GETFL, 0);
 	    fcntl (fd, F_SETFL, kfp->io_flags | O_NDELAY);
 	    kfp->flags |= KF_NDELAY;
-	} else if (!(flags & KF_NDELAY) && (kfp->flags & KF_NDELAY))
+	} else if (!(flags & KF_NDELAY) && (kfp->flags & KF_NDELAY)) {
 	    fcntl (fd, F_SETFL, kfp->io_flags);
+	    kfp->flags &= ~KF_NDELAY;
+	}
 }
 
 
@@ -621,48 +753,52 @@ int	flags;			/* file mode control flags */
  * saved.
  */
 static
-tty_reset (fd)
-int	fd;
+tty_reset (port)
+struct	ttyport *port;		/* tty port */
 {
-	register struct	fiodes *kfp = &zfd[fd];
+	register struct	fiodes *kfp;
+	register int fd;
 #ifdef SYSV
-	struct	termio tc;
-	int     i;
+	struct termio tc;
+	int i;
+#else
+	struct	sgttyb tc;
+#endif
 
+	if (!port)
+	    return;
+
+	fd = port->chan;
+	kfp = &zfd[fd];
+
+#ifdef SYSV
 	if (ioctl (fd, TCGETA, &tc) == -1)
 	    return;
 
 	/* If no saved status use current tty status. */
-	if (!(kfp->flags & KF_CHARMODE)) {
-	    kfp->tc_iflag = tc.c_iflag;
-	    kfp->tc_oflag = tc.c_oflag;
-	    kfp->tc_lflag = tc.c_lflag;
-	    for (i=0;  i < NCC && i < MAXCC;  i++)
-		kfp->tc_cc[i] = tc.c_cc[i];
-	}
+	if (!(port->flags & KF_CHARMODE))
+	    port->tc = tc;
 
 	/* Clear raw mode. */
-	tc.c_iflag = (kfp->tc_iflag | ICRNL);
-	tc.c_oflag = (kfp->tc_oflag | OPOST);
-	tc.c_lflag = (kfp->tc_lflag | (ICANON|ISIG|ECHO));
-	for (i=0;  i < NCC && i < MAXCC;  i++)
-	    tc.c_cc[i] = kfp->tc_cc[i];
+	tc = port->tc;
+	tc.c_iflag = (port->tc.c_iflag | ICRNL);
+	tc.c_oflag = (port->tc.c_oflag | OPOST);
+	tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
 
-	ioctl (fd, TCSETAF, &tc);
-	kfp->flags &= ~KF_CHARMODE;
+	ioctl (fd, TCSETAW, &tc);
 #else
-	struct	sgttyb ttystat;
-
-	if (ioctl (fd, TIOCGETP, &ttystat) == -1)
+	if (ioctl (fd, TIOCGETP, &tc) == -1)
 	    return;
 
-	if (!(kfp->flags & KF_CHARMODE))
-	    kfp->sg_flags = ttystat.sg_flags;
+	if (!(port->flags & KF_CHARMODE))
+	    port->tc = tc;
 
-	ttystat.sg_flags = (kfp->sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	ioctl (fd, TIOCSETN, &ttystat);
-	kfp->flags &= ~KF_CHARMODE;
+	tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
+	ioctl (fd, TIOCSETN, &tc);
 #endif
+	port->flags &= ~KF_CHARMODE;
+	if (lastdev == port)
+	    lastdev = NULL;
 
 	if (kfp->flags & KF_NDELAY) {
 	    fcntl (fd, F_SETFL, kfp->io_flags & ~O_NDELAY);
@@ -680,8 +816,8 @@ int	fd;
 static
 tty_onsig (sig, code, scp)
 int	sig;			/* signal which was trapped	*/
-int	code;			/* subsignal code (vax)		*/
-struct	sigcontext *scp;	/* not used			*/
+int	*code;			/* not used */
+int	*scp;			/* not used */
 {
 	longjmp (jmpbuf, CTRLC);
 }
@@ -693,28 +829,36 @@ struct	sigcontext *scp;	/* not used			*/
 static
 tty_stop (sig, code, scp)
 int	sig;			/* signal which was trapped	*/
-int	code;			/* subsignal code (vax)		*/
-struct	sigcontext *scp;	/* not used			*/
+int	*code;			/* not used */
+int	*scp;			/* not used */
 {
+	register struct ttyport *port = lastdev;
+	register int fd = port ? port->chan : 0;
+        register struct fiodes *kfp = port ? &zfd[fd] : NULL;
 #ifdef SYSV
-        register struct fiodes *kfp = &zfd[tty_fd];
-	struct	termio tc;
-	int	i;
+	struct termio tc;
+#else
+	struct sgttyb tc;
+#endif
 
-	if (ioctl (tty_fd, TCGETA, &tc) != -1) {
-	    tc.c_iflag = (kfp->tc_iflag | ICRNL);
-	    tc.c_oflag = (kfp->tc_oflag | OPOST);
-	    tc.c_lflag = (kfp->tc_lflag | (ICANON|ISIG|ECHO));
-	    for (i=0;  i < NCC && i < MAXCC;  i++)
-		tc.c_cc[i] = kfp->tc_cc[i];
-	    ioctl (tty_fd, TCSETAF, &tc);
+	if (!port)
+	    return;
+
+#ifdef SYSV
+	if (ioctl (fd, TCGETA, &tc) != -1) {
+	    port->save_tc = tc;
+	    tc = port->tc;
+	    tc.c_iflag = (port->tc.c_iflag | ICRNL);
+	    tc.c_oflag = (port->tc.c_oflag | OPOST);
+	    tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
+	    ioctl (fd, TCSETAF, &tc);
 	}
 #else
-	struct	sgttyb ttystat;
-
-	if (ioctl (tty_fd, TIOCGETP, &ttystat) != -1) {
-	    ttystat.sg_flags = (tty_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	    ioctl (tty_fd, TIOCSETN, &ttystat);
+	if (ioctl (fd, TIOCGETP, &tc) != -1) {
+	    port->save_tc = tc;
+	    tc = port->tc;
+	    tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
+	    ioctl (fd, TIOCSETN, &tc);
 	}
 #endif
 
@@ -729,21 +873,21 @@ struct	sigcontext *scp;	/* not used			*/
 static
 tty_continue (sig, code, scp)
 int	sig;			/* signal which was trapped	*/
-int	code;			/* subsignal code (vax)		*/
-struct	sigcontext *scp;	/* not used			*/
+int	*code;			/* not used */
+int	*scp;			/* not used */
 {
-#ifdef SYSV
-	ioctl (tty_fd, TCSETAF, &tc_state);
-#else
-	struct	sgttyb ttystat;
+	register struct ttyport *port = lastdev;
 
-	if (ioctl (tty_fd, TIOCGETP, &ttystat) != -1) {
-	    ttystat.sg_flags = tty_flags;
-	    ioctl (tty_fd, TIOCSETN, &ttystat);
-	}
+	if (!port)
+	    return;
+
+#ifdef SYSV
+	ioctl (port->chan, TCSETAF, &port->save_tc);
+#else
+	ioctl (port->chan, TIOCSETN, &port->save_tc);
 #endif
-	if (tty_redraw && tty_getraw)
-	    longjmp (jmpbuf, tty_redraw);
+	if (tty_getraw && port->redraw)
+	    longjmp (jmpbuf, port->redraw);
 }
 
 
@@ -758,11 +902,11 @@ FILE	*fp;			/* output file		*/
 XCHAR	*buf;			/* data buffer		*/
 int	nbytes;			/* data size		*/
 {
-	register XCHAR	*ip = buf;
-	register char	*op;
-	register int	n;
-	char	obuf[1024];
-	int	chunk;
+	register XCHAR *ip = buf;
+	register char *op;
+	register int n;
+	char obuf[1024];
+	int chunk;
 
 	while (nbytes > 0) {
 	    chunk = (nbytes <= 1024) ? nbytes : 1024;

@@ -2,8 +2,7 @@ include <time.h>
 
 define	CENTURY	1900
 
-# DP_DATE -- Procedure to produce the date and time strings for daophot
-# output files.
+# DP_DATE -- Create the date and time strings for the daophot output files.
 
 procedure dp_date (date, time, maxch)
 

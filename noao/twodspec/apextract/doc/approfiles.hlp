@@ -1,4 +1,4 @@
-.help approfiles Aug90 noao.twodspec.apextract
+.help approfiles Feb93 noao.twodspec.apextract
 
 .ce
 Spectrum Profile Determinations
@@ -94,17 +94,19 @@ pieces.  To this base number is added the number of coefficients in the
 trace function in excess of two; i.e. the number of terms in excess of a
 linear function.  This is done because if the trace wiggles a large amount
 then a higher order function will be needed to fit a line or column as the
-profile shifts under it.
+profile shifts under it.  Finally the number of pieces is doubled
+because experience shows that for low tilts it doesn't matter but for
+large tilts this improves the results dramatically.
 
 For the Marsh algorithm there are two parameters to be set, the
 polynomial order parallel to the dispersion and the spacing between
 parallel, coupled polynomials.  The algorithm requires that the spacing
 be less than a pixel to provide sufficient sampling.  The spacing is
-arbitrarily set a 0.6 pixels.  Because the method always fits
+arbitrarily set at 0.95 pixels.  Because the method always fits
 polynomials to points at the same position of the profile the order
 should be 1 except for variations in the profile shape with
-wavelength.  To allow for this the profile order is set at 6; i.e. a
-5th order function.  A final parameter in the algorithm is the number
+wavelength.  To allow for this the profile order is set at 10; i.e. a
+9th order function.  A final parameter in the algorithm is the number
 of polynomials across the profile but this is obviously  determined
 from the polynomial spacing and the width of the aperture including an
 extra pixel on either side.

@@ -20,7 +20,7 @@ begin
 	# dispersion function with IDENTIFY/REIDENTIFY.  Set the wavelength
 	# parameters with ECDISPCOR.
 
-	arcrefec = arcref // ".ec.imh"
+	arcrefec = arcref // ".ec." // envget ("imtype")
 	if (!access (arcrefec)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    apslitproc (arcref, background="none", clean=no, weights="none")
@@ -46,8 +46,9 @@ begin
 	    ecidentify (arcrefec, database=database,
 		coordlist=sparams.coordlist, match=sparams.match,
 		maxfeatures=100, zwidth=10., ftype="emission",
-		fwidth=sparams.fwidth, cradius=sparams.cradius, threshold=10.,
-		minsep=2., function=sparams.i_function, xorder=sparams.i_xorder,
+		fwidth=sparams.fwidth, cradius=sparams.cradius,
+		threshold=sparams.threshold, minsep=2.,
+		function=sparams.i_function, xorder=sparams.i_xorder,
 		yorder=sparams.i_yorder, niterate=sparams.i_niterate,
 		lowreject=sparams.i_low, highreject=sparams.i_high,
 		autowrite=yes)

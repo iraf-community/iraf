@@ -63,8 +63,10 @@ begin
 	# Loop over the pixels.
 	do j = l1, l2 {
 	    buf = imgs2r (im, c1, c2, j, j)
-	    if (buf == EOF)
+	    if (buf == EOF) {
+		call sfree (sp)
 		return
+	    }
 	    yindex = j - l1 + 1
 	    dy2 = (yindex - yc) ** 2
 	    do i = 1, nx {
@@ -167,8 +169,10 @@ begin
 	# Loop over the pixels.
 	do j = l1, l2 {
 	    buf = imgs2r (im, c1, c2, j, j)
-	    if (buf == EOF)
+	    if (buf == EOF) {
+		call sfree (sp)
 		return
+	    }
 	    yindex = j - l1 + 1
 	    dy2 = (yindex - yc) ** 2
 	    do i = 1, nx {

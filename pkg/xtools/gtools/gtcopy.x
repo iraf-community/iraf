@@ -27,6 +27,9 @@ begin
 	GT_TYPE(gt2) = GT_TYPE(gt1)
 	GT_MARK(gt2) = GT_MARK(gt1)
 	GT_LINE(gt2) = GT_LINE(gt1)
+	GT_COLOR(gt2) = GT_COLOR(gt1)
+	GT_XFLIP(gt2) = GT_XFLIP(gt1)
+	GT_YFLIP(gt2) = GT_YFLIP(gt1)
 	GT_TRANSPOSE(gt2) = GT_TRANSPOSE(gt1)
 
 	call mfree (GT_PARAMS(gt2), TY_CHAR)

@@ -3,6 +3,7 @@
 include	<mach.h>
 include	<finfo.h>
 include	<fset.h>
+include	<fio.h>
 include	<clset.h>
 include	<knet.h>
 include	"ki.h"
@@ -645,7 +646,7 @@ pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 int	bfdd[ARB]		# loaded device drivers
 
-long	lval
+long	lval, ks_maxbufsize
 int	dd, status, nchars, arg1, arg2, arg3
 char	osfn[SZ_PATHNAME], temp[SZ_PATHNAME]
 errchk	realloc
@@ -804,6 +805,17 @@ begin
 	case BF_STT:
 	    # Get channel status.
 	    call zcall3 (ZSTTBF(dd), arg1, arg2, lval)
+
+	    # The max transfer size for a binary device is limited by the
+	    # network interface as well as the device.
+
+	    if (arg2 == FSTT_MAXBUFSIZE || arg2 == FSTT_OPTBUFSIZE) {
+		call zsttks (out, FSTT_MAXBUFSIZE, ks_maxbufsize)
+		if (lval == 0)
+		    lval = ks_maxbufsize
+		else if (ks_maxbufsize > 0)
+		    lval = min (ks_maxbufsize, lval)
+	    }
 	    status = lval
 
 	default:

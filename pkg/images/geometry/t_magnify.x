@@ -221,7 +221,9 @@ end
 
 
 define	NLINES		16	# Number of input lines to use for interpolation
-define	NEDGE		3	# Number of edge lines to add for interpolation
+define	NMARGIN		3	# Number of edge lines to add for interpolation
+define	NMARGIN_SPLINE3	16	# Number of edge lines to add for interpolation
+
 
 # MG_MAGNIFY1 -- Magnify the input input image to create the output image.
 
@@ -236,7 +238,7 @@ real	x1, x2			# Starting and ending points of output image
 real	dx			# Pixel interval
 int	flux			# Conserve flux?
 
-int	i, nxin, nxout
+int	i, nxin, nxout, nxymargin
 int	col1, col2
 int	itypes[II_NTYPES2D]
 pointer	sp, x, z, buf, asi
@@ -264,7 +266,11 @@ begin
 
 	col1 = x1
 	col2 = nint (x2)
-	call mg_setboundary1 (in, col1, col2, btype, bconst)
+	if (itype == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
+	call mg_setboundary1 (in, col1, col2, btype, bconst, nxymargin)
 
 	# Initialize the interpolator.
 	call asiinit (asi, itypes[itype])
@@ -313,7 +319,7 @@ real	x2, y2			# Ending point of output image
 real	dx, dy			# Pixel interval
 int	flux			# Conserve flux?
 
-int	i, nxin, nxout, nyout
+int	i, nxin, nxout, nyout, nxymargin
 int	line, linea, lineb, linec
 int	col1, col2, line1, line2
 int	itypes[II_NTYPES2D]
@@ -340,6 +346,10 @@ begin
 
 	# Set the number of output pixels in the image header.
 
+	if (itype == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
 	nxout = (x2 - x1) / dx + 1
 	nyout = (y2 - y1) / dy + 1
 	IM_LEN(out, 1) = nxout
@@ -352,7 +362,8 @@ begin
 	col2 = nint (x2)
 	line1 = y1
 	line2 = nint (y2)
-	call mg_setboundary2 (in, col1, col2, line1, line2, btype, bconst)
+	call mg_setboundary2 (in, col1, col2, line1, line2, btype, bconst,
+	    nxymargin)
 
 	# Initialize the interpolator.
 	call msiinit (msi, itypes[itype])
@@ -382,12 +393,12 @@ begin
 
 	    # Get the input image data and fit an interpolator to the data.
 	    # The input image data is buffered in a section of size NLINES
-	    # + 2 * NEDGE (except at the edge).
+	    # + 2 * NMARGIN (except at the edge).
 
 	    if ((buf == NULL) || (line > linea)) {
 		linea = min (line2, line + NLINES - 1)
-		lineb = max (line1 - NEDGE, line - NEDGE)
-		linec = min (line2 + NEDGE, linea + NEDGE)
+		lineb = max (line1 - nxymargin, line - nxymargin)
+		linec = min (line2 + nxymargin, linea + nxymargin)
 	        call mg_bufl2r (in, col1, col2, lineb, linec, buf)
 	        call msifit (msi, Memr[buf], nxin, linec - lineb + 1, nxin)
 	    }
@@ -481,12 +492,13 @@ end
 
 # MG_SETBOUNDARY1 -- Set boundary extension for a 1D image.
 
-procedure mg_setboundary1 (im, col1, col2, btype, bconst)
+procedure mg_setboundary1 (im, col1, col2, btype, bconst, nxymargin)
 
 pointer	im			# IMIO pointer
 int	col1, col2		# Range of columns
 int	btype			# Boundary extension type
 real	bconst			# Constant for constant boundary extension
+int	nxymargin		# Number of margin pixels
 
 int	btypes[5]
 int	nbndrypix
@@ -499,7 +511,7 @@ begin
 	nbndrypix = max (nbndrypix, col2 - IM_LEN(im, 1))
 
 	call imseti (im, IM_TYBNDRY, btypes[btype])
-	call imseti (im, IM_NBNDRYPIX, nbndrypix + NEDGE + 1)
+	call imseti (im, IM_NBNDRYPIX, nbndrypix + nxymargin + 1)
 	if (btypes[btype] == BT_CONSTANT)
 	    call imsetr (im, IM_BNDRYPIXVAL, bconst)
 end
@@ -507,13 +519,15 @@ end
 
 # MG_SETBOUNDARY2 -- Set boundary extension for a 2D image.
 
-procedure mg_setboundary2 (im, col1, col2, line1, line2, btype, bconst)
+procedure mg_setboundary2 (im, col1, col2, line1, line2, btype, bconst,
+	nxymargin)
 
 pointer	im			# IMIO pointer
 int	col1, col2		# Range of columns
 int	line1, line2		# Range of lines
 int	btype			# Boundary extension type
 real	bconst			# Constant for constant boundary extension
+int	nxymargin		# Number of margin pixels to allow
 
 int	btypes[5]
 int	nbndrypix
@@ -528,7 +542,7 @@ begin
 	nbndrypix = max (nbndrypix, line2 - IM_LEN(im, 2))
 
 	call imseti (im, IM_TYBNDRY, btypes[btype])
-	call imseti (im, IM_NBNDRYPIX, nbndrypix + NEDGE + 1)
+	call imseti (im, IM_NBNDRYPIX, nbndrypix + nxymargin + 1)
 	if (btypes[btype] == BT_CONSTANT)
 	    call imsetr (im, IM_BNDRYPIXVAL, bconst)
 end

@@ -17,11 +17,15 @@ task	continuum,
 	dopcor,
 	mkspec,
 	names,
+	sarith,
 	scombine,
+	sflip,
 	sinterp,
 	splot,
-	specplot	= onedspec$x_onedspec.e
+	specplot,
+	specshift	= onedspec$x_onedspec.e
 task	dispcor1	= onedspec$dispcor1.par
+task	scopy		= onedspec$scopy.cl
 hidetask dispcor1
 
 # Special  IRS/IIDS tasks

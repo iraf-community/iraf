@@ -1,5 +1,36 @@
 .help revisions Jun88 pkg.utilities
 .nf
+utilities$t_polyfit.x
+    Revoved the dependent variable normalization which was not doing anything
+    to improve the numerical statbility of the routine and which was causing
+    problems in the computation of the reduced chi-squared and standard
+    deviation statistics.
+    (7/11/94 LED)
+
+utilities$t_polyfit.x
+utilities$pfregres.f
+    Added a trap for rmul values < 0.0 and > 1.0 to the polyfit routine
+    to avoid floating operand errors caused by trying to take the square
+    route of a negative number.
+    (6/20/94 LED)
+
+utilities$curfit.gx
+    Removed the graph limit setting so that the graph will be automatically
+    drawn with the default buffer distance from the end of the data.
+    Previously the end datapoints would fall right on the axes.
+    (5/10/94, Valdes)
+
+utilities$t_surfit.x +
+utilities$surfit.par +
+utilities$doc/surfit.hlp +
+utilities$x_utilities.x
+utilities$mkpkg
+utilities$utilities.cl
+utilities$utilities.men
+utilities$utilities.hd
+    A task for fitting a 2D function or "surface" to an irregularly
+    sampled set of x, y, and z points has been added.  (7/6/93, Valdes)
+
 utilities$curfit/t_curfit.x,curfit.gx
     Curfit was failing if the input file list contained more than one
     file or image. The problem was that ic_open was being called

@@ -18,15 +18,15 @@ define	SOMEFILE	"hlib$iraf.h"
 
 procedure fwtacc (fd, fname)
 
-int	fd, ofd
-char	fname[ARB]
+int	fd				#I file we are trying to open
+char	fname[ARB]			#I name of file
 
-bool	read_access
-pointer	sp, osfn, myname
-int	perm, delay, chan, status
+bool	locked
+pointer	sp, osfn
+int	perm, delay, chan, status, ofd
 long	fi[LEN_FINFO]
 
-int	access(), finfo(), and()
+int	access(), finfo()
 bool	streq(), envgetb()
 errchk	filerr, fmapfn
 include	<fio.com>
@@ -34,7 +34,6 @@ define	noacc_ 91
 
 begin
 	call smark (sp)
-	call salloc (myname, FI_SZOWNER, TY_CHAR)
 	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	fp = fiodes[fd]
@@ -64,8 +63,8 @@ begin
 	if (FI_TYPE(fi) == FI_DIRECTORY)
 	    goto noacc_
 
-	# Test if we the open failed because we cannot physically open any more
-	# files.
+	# Test if we the open failed because we cannot physically open any
+	# more files.
 
 	call fmapfn (SOMEFILE, Memc[osfn], SZ_PATHNAME)
 	call zopntx (Memc[osfn], READ_ONLY, chan)
@@ -74,42 +73,43 @@ begin
 	else
 	    call zclstx (chan, status)
 
-	call fowner (fname, Memc[myname], FI_SZOWNER)
-	read_access = (FMODE(fiodes[fd]) == READ_ONLY)
+	# If the file exists, we cannot access it, and there is no temporary
+	# read or write lock in place on the file, then the file cannot be
+	# accessed.
+
 	perm = FI_PERM(fi)
-
-	if (streq (FI_OWNER(fi), Memc[myname])) {
-	    # We are the owner of the file.
-
-	    if (read_access && and (perm, FI_ROWNER) == 0)
-	        goto noacc_
-	    else if (and (perm, FI_WOWNER) == 0)
-		goto noacc_
-
-	} else {
-	    # The file belongs to someone else.  We cannot discriminate between
-	    # group and world permission, so ignore group permission and abort
-	    # if the file does not have the indicated world permission.
-
-	    if (read_access && and (perm, FI_RWORLD) == 0)
-	        goto noacc_
-	    else if (and (perm, FI_WWORLD) == 0)
-		goto noacc_
-	}
+	locked = false
+	if (and (fflags[fd], FF_READ) != 0)
+	    locked = locked || (and (perm, FF_RDLOCK) != 0)
+	if (and (fflags[fd], FF_WRITE) != 0)
+	    locked = locked || (and (perm, FF_WRLOCK) != 0)
 
 	# If filewait is enabled, wait for the file to become accessible.
-
-	if (envgetb ("filewait")) {
+	if (envgetb ("filewait") && locked) {
 	    call putline (STDERR, "Waiting for access to file '")
 	    call putline (STDERR, fname)
 	    call putline (STDERR, "'\n")
 
 	    for (delay=MIN_DELAY;  delay > 0;  delay=delay+INC_DELAY) {
 		call tsleep (min (delay, MAX_DELAY))
+
 		if (access (fname,0,0) == NO)
 		    call filerr (fname, SYS_FOPNNEXFIL)
 		else if (access (fname,FMODE(fp),0) == YES)
 		    return
+		
+		# Verify that the file is still locked.
+		if (finfo (fname, fi) == ERR)
+		    call filerr (fname, SYS_FOPNNEXFIL)
+
+		locked = false
+		if (and (fflags[fd], FF_READ) != 0)
+		    locked = locked || (and (perm, FF_RDLOCK) != 0)
+		if (and (fflags[fd], FF_WRITE) != 0)
+		    locked = locked || (and (perm, FF_WRLOCK) != 0)
+		
+		if (!locked)
+		    break
 	    }
 	} 
 noacc_

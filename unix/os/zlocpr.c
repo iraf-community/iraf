@@ -7,6 +7,10 @@
 #define import_spp
 #include <iraf.h>
 
+#ifdef SOLARIS
+#define SUNOS4
+#endif
+
 extern	unsigned VSHLIB[], VSHEND;	/* shared library descriptor */
 
 /* ZLOCPR -- Return the entry point address of a procedure as a magic

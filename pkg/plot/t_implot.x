@@ -10,6 +10,7 @@ include	<mwset.h>
 define	SEGLEN		10
 define	SZ_PLOTTITLE	512
 define	KEYSFILE	"lib$scr/implot.key"
+define	MAX_COLORS	8
 
 
 # IMPLOT -- Image plot program.  An interactive, cursor driven program for
@@ -27,9 +28,11 @@ define	KEYSFILE	"lib$scr/implot.key"
 #	j		move down
 #	k		move up
 #	l		plot line at position of cursor
+#	p		measure profile (mark region and baseline with 2 pos)
 #	o		overplot next vector
 #	r		redraw
 #	s		print statistics on a region
+#	/		scroll status line
 #
 #
 # In addition to the above keystrokes, the following ':' escapes are recognized
@@ -44,6 +47,7 @@ define	KEYSFILE	"lib$scr/implot.key"
 #	:log+,log-	enable, disable log scaling in Y
 #	:step N		set step size for j,k
 #	:solid		overplot with solid, not dashed, lines
+#	:mono		disable coloring of overplotted vectors
 #	:x x1 x2	fix plot window in X (no args to unfix)
 #	:y y1 y2	fix plot window in Y (no args to unfix)
 #	:w wcstype	change world coordinate type
@@ -60,15 +64,15 @@ char	device[SZ_FNAME]
 
 int	xnticks, ynticks
 bool	overplot, lineplot, logscale, erase, rescale[2], p_rescale[2]
-int	key, wcs, ip, i1, i2, n, linetype, nltypes, linestep, navg
-int	npix, nlines, ncols, line, col, shift, step, p_navg
+int	key, wcs, ip, i1, i2, n, linetype, color, nltypes, linestep, navg
+int	npix, nlines, ncols, line, col, shift, step, p_navg, sline
 real	x, y, px, py, qx, qy, x1, x2, y1, y2
 real	median, mean, sigma, sum
-pointer	im, mw, ct, gp, xold, yold, xnew, ynew
+pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl
 
 real	asumr(), amedr(), plt_iformatr()
 int	clgeti(), clgcur(), ctoi(), ctor(), ggeti()
-pointer	gopen(), immap(), mw_openim(), mw_sctran()
+pointer	gopen(), immap(), mw_openim(), mw_sctran(), sl_getstr()
 errchk	mw_sctran
 
 define	line_ 91
@@ -118,10 +122,13 @@ begin
 
 	linestep  = 1
 	linetype  = 1
+	color     = 1
 	nltypes   = ggeti (gp, "lt")
 	p_navg	  = 1
 	navg	  = 1
-	step	  = max (1, nlines / 10)
+	step	  = clgeti ("step")
+	if (IS_INDEFI(step) || step < 1)
+	    step = max (1, nlines / 10)
 
 	npix = max (ncols, nlines)
 	call malloc (xold, npix, TY_REAL)
@@ -142,10 +149,12 @@ begin
 	    call gseti (gp, G_YNMAJOR, ynticks)
 	call gseti (gp, G_NMINOR, 0)
 	call gseti (gp, G_PLTYPE, 1)
+	call gseti (gp, G_PLCOLOR, 1)
 
 	call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], ncols, nlines,
 	    real(line), navg, lineplot, rescale, image, xlabel)
 
+	call sl_init (sl, 1)
 	while (clgcur ("coords", x, y, wcs, key, command, SZ_FNAME) != EOF) {
 	    if (key == 'q')
 		break
@@ -251,6 +260,12 @@ replotline_
 			if (linetype > nltypes)
 			    linetype = 1
 			call gseti (gp, G_PLTYPE, linetype)
+
+			color = color + 1
+			if (color > MAX_COLORS)
+			    color = 1
+			call gseti (gp, G_PLCOLOR, color)
+
 			call gpline (gp, Memr[xnew], Memr[ynew], ncols)
 		    }
 
@@ -268,6 +283,7 @@ replotline_
 		    if (ynticks >= 0)
 			call gseti (gp, G_YNMAJOR, ynticks)
 		    linetype = 1
+		    color = 1
 		    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], ncols,
 			nlines, real(line), navg, lineplot, rescale, image,
 			xlabel)
@@ -287,6 +303,10 @@ replotline_
 		navg = p_navg
 		col = col - (navg - 1) / 2
 col_
+		if (nlines == 1) {
+		    call printf (bell)
+		    next
+		}
 		lineplot = false
 		col = max(1, min(ncols, col))
 		call imp_getvector (im, mw, ct, wcstype, xnew, ynew, xlabel,
@@ -308,6 +328,12 @@ replotcol_
 			if (linetype > nltypes)
 			    linetype = 1
 			call gseti (gp, G_PLTYPE, linetype)
+
+			color = color + 1
+			if (color > MAX_COLORS)
+			    color = 1
+			call gseti (gp, G_PLCOLOR, color)
+
 			call gpline (gp, Memr[xnew], Memr[ynew], nlines)
 		    }
 
@@ -325,6 +351,7 @@ replotcol_
 		    if (ynticks >= 0)
 			call gseti (gp, G_YNMAJOR, ynticks)
 		    linetype = 1
+		    color = 1
 		    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], nlines,
 			ncols, real(col), navg, lineplot, rescale, image,
 			xlabel)
@@ -373,6 +400,18 @@ replotcol_
 		else
 		    goto replotcol_
 
+	    case 'p':
+		# Profile analysis.
+		x1 = x
+		y1 = y
+		call printf (again)
+		if (clgcur ("gcur", x2, y2, wcs, key, command, SZ_FNAME) == EOF)
+		    break
+
+		call imp_profile (gp, Memr[xnew], Memr[ynew], npix,
+		    x1, y1, x2, y2, sl, sline)
+		call printf (Memc[sl_getstr(sl,sline)])
+
 	    case 's':
 		# Statistics.
 		x1 = x
@@ -394,26 +433,33 @@ replotcol_
 		median = amedr (Memr[ynew+i1-1], n)
 		sum = asumr (Memr[ynew+i1-1], n)
 
-		call printf ("median=%g, mean=%g, rms=%g, sum=%g, npix=%d\n")
+		call sl_init (sl, 1)
+		call sprintf (Memc[sl_getstr(sl,1)], SZ_LINE,
+		    "median=%g, mean=%g, rms=%g, sum=%g, npix=%d\n")
 		    call pargr (median)
 		    call pargr (mean)
 		    call pargr (sigma)
 		    call pargr (sum)
 		    call pargi (n)
+		sline = 1
+		call printf (Memc[sl_getstr(sl,sline)])
 
 	    case ' ':
-		# Print cursor coordinates
+		# Print cursor coordinates.
+		call sl_init (sl, 1)
 		if (lineplot) {
 		    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols, nlines)
 		    col = px
 		    call plt_wcscoord (im, mw, ct, wcstype, format, col, line,
-			Memr[ynew+col-1])
+			Memr[ynew+col-1], Memc[sl_getstr(sl,1)], SZ_LINE)
 		} else {
 		    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines, ncols)
 		    line = px
 		    call plt_wcscoord (im, mw, ct, wcstype, format, col, line,
-			Memr[ynew+line-1])
+			Memr[ynew+line-1], Memc[sl_getstr(sl,1)], SZ_LINE)
 		}
+		sline = 1
+		call printf (Memc[sl_getstr(sl,sline)])
 
 	    case '?':
 		# Print command summary.
@@ -479,7 +525,7 @@ replotcol_
 		    }
 
 		case 'w':
-		    # Change wcs type
+		    # Change wcs type.
 		    call mw_ctfree (ct)
 		    ip = ip + 1
 		    while (IS_WHITE (command[ip]))
@@ -491,15 +537,17 @@ replotcol_
 		    } then {
 			call erract (EA_WARN)
 			ct = mw_sctran (mw, "logical", wcstype, 0)
+		    } else {
+			# Only replot if WCS command succeeds, otherwise the
+			# error message is lost.
+			if (lineplot)
+			    goto line_
+			else
+			    goto col_
 		    }
 
-		    if (lineplot)
-			goto line_
-		    else
-			goto col_
-
 		case 'f':
-		    # Change label format
+		    # Change label format.
 		    ip = ip + 1
 		    while (IS_WHITE (command[ip]))
 			ip = ip + 1
@@ -568,6 +616,7 @@ replotcol_
 			# Use only linetype=1 (solid).
 			linetype = 1
 			linestep = 0
+			color = 1
 		    } else {
 			# Set step size.
 			while (IS_ALPHA (command[ip]))
@@ -643,6 +692,12 @@ replotcol_
 		    call printf (bell)
 		}
 
+	    case '/':
+		# Scroll or rewrite the status line.
+
+		sline = sline + 1
+		call printf (Memc[sl_getstr(sl,sline)])
+
 	    default:
 		call printf (bell)
 	    }
@@ -652,6 +707,7 @@ replotcol_
 	call mfree (ynew, TY_REAL)
 	call mfree (xold, TY_REAL)
 	call mfree (yold, TY_REAL)
+	call sl_free (sl, TY_CHAR)
 
 	call gclose (gp)
 	call mw_close (mw)
@@ -785,6 +841,7 @@ char	xlabel[ARB]		# X label
 real	junkr
 int	i, i1, i2, npix, maxch
 pointer	sp, ip, plot_title, op
+bool	fp_equalr()
 
 real	x1, x2, y1, y2
 common	/impcom/ x1, x2, y1, y2
@@ -884,6 +941,11 @@ begin
 
 	if (IM_LEN(im,2) > 1) {
 	    # Draw all but right axes.
+	    if (fp_equalr (y1, y2)) {
+		y1 = 0.99 * y1
+		y2 = 1.01 * y2
+		call gswind (gp, INDEF, INDEF, y1, y2)
+	    }
 	    call gseti (gp, G_YDRAWAXES, 1)
 	    call glabax (gp, Memc[plot_title], xlabel, "")
 
@@ -891,7 +953,7 @@ begin
 	    call gswind (gp, 1., real (nx), 1., real (ny))
 	    call gseti (gp, G_XDRAWAXES, 0)
 	    call gseti (gp, G_YDRAWAXES, 2)
-	    call glabax (gp, Memc[plot_title], xlabel, "")
+	    call glabax (gp, "", "", "")
 	    call gswind (gp, x1, x2, y1, y2)
 
 	    # Mark position on Y axis.
@@ -955,6 +1017,7 @@ begin
 
 	    # Plot same segment of new vector.
 	    call gseti (gp, G_PLTYPE, 1)
+	    call gseti (gp, G_PLCOLOR, 1)
 	    call gpline (gp, xnew[i], ynew[i], n)
 	}
 end

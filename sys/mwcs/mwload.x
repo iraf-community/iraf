@@ -46,10 +46,20 @@ begin
 	call salloc (cw, cwlen, TY_INT)
 	call salloc (ms, mslen, TY_INT)
 
-	# Unpack the saved MWSV descriptor.
+	# Unpack the saved MWSV descriptor.  Due to a bug in MWCS prior to
+	# V2.10.4 IRAF the packed descriptor was erroneously encoded using
+	# miipak32, so if unpacking with miiupk16 doesn't work try using
+	# miiupk32.  This should allow old saved MWCS written on a similar
+	# architecture to still be read - the data is not portable however
+	# unless miipak16 is used, since pl_p2li produces a short array.
+
 	ip = coerce (bp + SV_MWSVOFF(sv), TY_CHAR, TY_STRUCT)
-	call miiupk32 (Memi[ip], Memi[cw], SV_CWCSLEN(sv), TY_INT)
+	call miiupk16 (Memi[ip], Memi[cw], SV_CWCSLEN(sv), TY_SHORT)
 	n = pl_l2pi (Memi[cw], 1, Memi[ms], mslen)
+	if (MI_MAGIC(ms) != MWCS_MAGIC) {
+	    call miiupk32 (Memi[ip], Memi[cw], SV_CWCSLEN(sv), TY_INT)
+	    n = pl_l2pi (Memi[cw], 1, Memi[ms], mslen)
+	}
 
 	# Free any storage associated with the old descriptor.
 	# Start with any still allocated CTRAN descriptors.
@@ -81,6 +91,12 @@ begin
 	}
 	do i = nwcs+1, MAX_WCS
 	    call aclri (Memi[MI_WCSP(mw,i)], LEN_WCS)
+
+	# Initialize the axis map (not preserved over a save/load).
+	do i = 1, MI_NDIM(mw) {
+	    MI_AXNO(mw,i) = i
+	    MI_PHYSAX(mw,i) = i
+	}
 
 	# Load the data buffer.
 	nelem = SV_DBUFLEN(sv)

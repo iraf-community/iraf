@@ -12,7 +12,7 @@ int	nwaves
 
 real	wave, mag, dwave
 int	i, j, fd, nalloc
-pointer	sp, dir, star, file, temp
+pointer	sp, dir, star, name, file, temp
 
 bool	streq()
 int	open(), fscan(), nscan(), getline()
@@ -23,6 +23,7 @@ begin
 	call smark (sp)
 	call salloc (dir, SZ_FNAME, TY_CHAR)
 	call salloc (star, SZ_FNAME, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
 	call salloc (file, SZ_LINE, TY_CHAR)
 	call salloc (temp, SZ_LINE, TY_CHAR)
 	Memc[temp] = EOS
@@ -32,19 +33,34 @@ begin
 
 getstd_	call clgstr ("caldir", Memc[dir], SZ_FNAME)
 	call clgstr ("star_name", Memc[star], SZ_FNAME)
-		    
-	call sprintf (Memc[file], SZ_LINE, "%s%s.dat")
-	    call pargstr (Memc[dir])
-	    call pargstr (Memc[star])
-	call strlwr (Memc[file])
-	j = file
-	for (i=file; Memc[i]!=EOS; i=i+1) {
+
+	call strcpy (Memc[star], Memc[name], SZ_LINE)
+	call strlwr (Memc[name])
+	j = name
+	for (i=name; Memc[i]!=EOS; i=i+1) {
 	    if (IS_WHITE(Memc[i]) || Memc[i]=='+' || Memc[i]=='-')
 		next
 	    Memc[j] = Memc[i]
 	    j = j + 1
 	}
 	Memc[j] = EOS
+
+	# Check if this is an alternate name.
+	call sprintf (Memc[file], SZ_LINE, "%snames.men")
+	    call pargstr (Memc[dir])
+	ifnoerr (fd = open (Memc[file], READ_ONLY, TEXT_FILE)) {
+	    while (fscan (fd) != EOF) {
+		call gargwrd (Memc[file], SZ_LINE)
+		if (streq (Memc[file], Memc[name])) {
+		    call gargwrd (Memc[name], SZ_LINE)
+		    break
+		}
+	    }
+	}
+
+	call sprintf (Memc[file], SZ_LINE, "%s%s.dat")
+	    call pargstr (Memc[dir])
+	    call pargstr (Memc[name])
 
 	iferr (fd = open (Memc[file], READ_ONLY, TEXT_FILE)) {
 	    if (streq (Memc[file], Memc[temp]))

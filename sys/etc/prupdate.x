@@ -10,10 +10,11 @@ include	<error.h>
 # functions SET and CHDIR.  NOTE: we assume that we are called when all child
 # processes are idle.
 
-procedure prupdate (pid, message)
+procedure prupdate (pid, message, flushout)
 
-int	pid			# process to be updated, or 0 for all procs
-char	message[ARB]		# message to be broadcast to each child
+int	pid			#I process to be updated, or 0 for all procs
+char	message[ARB]		#I message to be broadcast to each child
+int	flushout		#I flush output
 
 int	pr
 pointer	sp, cmd, op
@@ -44,9 +45,13 @@ begin
 
 	for (pr=1;  pr <= MAX_CHILDPROCS;  pr=pr+1)
 	    if ((pid != NULL && pr_pid[pr] == pid) ||
-		(pid == NULL && pr_pid[pr] != NULL))
+		(pid == NULL && pr_pid[pr] != NULL)) {
+
 		iferr (call putline (pr_outfd[pr], Memc[cmd]))
 		    call erract (EA_WARN)
+		else if (flushout == YES)
+		    call flush (pr_outfd[pr])
+	    }
 
 	call sfree (sp)
 end

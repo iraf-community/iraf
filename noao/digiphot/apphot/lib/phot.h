@@ -32,9 +32,13 @@ define	KY_APERTS	"apertures"
 
 # define the phot units
 
-define	UN_ZMAG		"zeropoint"
-define	UN_PWSTRING	"model"
-define	UN_APERTS	"scaleunit"
+#define	UN_ZMAG		"zeropoint"
+#define	UN_PWSTRING	"model"
+#define	UN_APERTS	"scaleunit"
+
+define	UN_PZMAG	"zeropoint"
+define	UN_PMODEL	"model"
+define	UN_PSCALEUNIT	"scaleunit"
 
 # define the weighting functions
 

@@ -20,7 +20,7 @@ int	delim			# receives offset of delim char
 int	ch, nchars
 int	ip, op, off, i
 bool	streq()
-int	envfind()
+int	ki_mapname()
 include	"kinode.com"
 define	lookup_ 91
 
@@ -97,7 +97,7 @@ lookup_
 	    # referenced node is the same.
 
 	    # Map possible logical node name.
-	    if (envfind (outstr, n_nodename, SZ_ALIAS) <= 0)
+	    if (ki_mapname (outstr, n_nodename, SZ_ALIAS) <= 0)
 		call strcpy (outstr, n_nodename, SZ_ALIAS)
 
 	    ch = n_nodename[1]

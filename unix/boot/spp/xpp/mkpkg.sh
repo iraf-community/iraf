@@ -10,6 +10,6 @@ else\
 fi
 
 $CC -c $HSI_CF	xppmain.c xppcode.c decl.c
-$CC $HSI_CF	xppmain.o lexyy.o xppcode.o decl.o $HSI_LIBS -o xpp.E
-mv -f		xpp.E ../../../hlib
+$CC $HSI_LF	xppmain.o lexyy.o xppcode.o decl.o $HSI_LIBS -o xpp.e
+mv -f		xpp.e ../../../hlib
 rm		*.o

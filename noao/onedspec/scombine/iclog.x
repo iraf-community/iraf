@@ -1,18 +1,22 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<mach.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"icombine.h"
 
 # IC_LOG -- Output log information is a log file has been specfied.
 
-procedure ic_log (sh, shout, ncombine, exptime, mode, median, mean, scales,
-	zeros, wts, nimages, dozero, nout, expname, exposure)
+procedure ic_log (sh, shout, ncombine, exptime, sname, zname, wname,
+	mode, median, mean, scales, zeros, wts, nimages,
+	dozero, nout, expname, exposure)
 
 pointer	sh[nimages]		# Input spectra
 pointer	shout			# Output spectrum
 int	ncombine[nimages]	# Number of previous combined images
 real	exptime[nimages]	# Exposure times
+char	sname[ARB]              # Scale name
+char	zname[ARB]              # Zero name
+char	wname[ARB]              # Weight name
 real	mode[nimages]		# Modes
 real	median[nimages]		# Medians
 real	mean[nimages]		# Means
@@ -28,7 +32,8 @@ real	exposure		# Output exposure
 int	i, j, ctor()
 real	rval
 long	clktime()
-bool	prncombine, prexptime, prmode, prmedian, prmean, prrdn, prgain
+bool	prncombine, prexptime, prmode, prmedian, prmean
+bool	prrdn, prgain, prsn, prscale, przero, prwts, strne()
 pointer	sp, fname
 
 include	"icombine.com"
@@ -47,49 +52,66 @@ begin
 	    call pargstr (Memc[fname])
 	switch (combine) {
 	case AVERAGE:
-	    call fprintf (logfd, "  combine = average\n")
+	    call fprintf (logfd, "  combine = average,")
 	case MEDIAN:
-	    call fprintf (logfd, "  combine = median\n")
+	    call fprintf (logfd, "  combine = median,")
 	case SUM:
 	    call fprintf (logfd, "  combine = sum\n")
 	}
+	if (combine != SUM) {
+	    call fprintf (logfd, " scale = %s, zero = %s, weight = %s\n")
+		call pargstr (sname)
+		call pargstr (zname)
+		call pargstr (wname)
+	}
+
 	switch (reject) {
 	case MINMAX:
 	    call fprintf (logfd, "  reject = minmax, nlow = %d, nhigh = %d\n")
 		call pargi (nint (flow * nimages))
 		call pargi (nint (fhigh * nimages))
 	case CCDCLIP:
-	    call fprintf (logfd,
-		"  reject = ccdclip, mclip = %b, rdnoise = %s, gain = %s\n")
+	    call fprintf (logfd, "  reject = ccdclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd,
+	    "  rdnoise = %s, gain = %s, snoise = %s, sigma = %g, hsigma = %g\n")
 		call pargstr (Memc[rdnoise])
 		call pargstr (Memc[gain])
-	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
+		call pargstr (Memc[snoise])
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case CRREJECT:
 	    call fprintf (logfd,
-	    "  reject = crreject, mclip = %b, rdnoise = %s, gain = %s, hsigma = %g\n")
+		"  reject = crreject, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd,
+		"  rdnoise = %s, gain = %s, snoise = %s, hsigma = %g\n")
 		call pargstr (Memc[rdnoise])
 		call pargstr (Memc[gain])
+		call pargstr (Memc[snoise])
 		call pargr (hsigma)
 	case PCLIP:
-	    call fprintf (logfd,
-	    "  reject = pclip, pclip = %g, lsigma = %g, hsigma = %g\n")
+	    call fprintf (logfd, "  reject = pclip, nkeep = %d\n")
+		call pargi (nkeep)
+	    call fprintf (logfd, "  pclip = %g, lsigma = %g, hsigma = %g\n")
 		call pargr (pclip)
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case SIGCLIP:
-	    call fprintf (logfd,
-		"  reject = sigclip, mclip = %b, lsigma = %g, hsigma = %g\n")
+	    call fprintf (logfd, "  reject = sigclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
 		call pargr (lsigma)
 		call pargr (hsigma)
 	case AVSIGCLIP:
 	    call fprintf (logfd,
-		"  reject = avsigclip, mclip = %b, lsigma = %g, hsigma = %g\n")
+		"  reject = avsigclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
+		call pargi (nkeep)
+	    call fprintf (logfd, "  lsigma = %g, hsigma = %g\n")
 		call pargr (lsigma)
 		call pargr (hsigma)
 	}
@@ -123,12 +145,16 @@ begin
 	# what information is relevant and print the appropriate header.
 
 	prncombine = false
-	prexptime = false
+	prexptime = (expname[1] != EOS)
+	prscale = (doscale || strne (sname, "none"))
+	przero = (dozero || strne (zname, "none"))
+	prwts = (dowts || strne (wname, "none"))
 	prmode = false
 	prmedian = false
 	prmean = false
 	prrdn = false
 	prgain = false
+	prsn = false
 	do i = 1, nimages {
 	    if (ncombine[i] != ncombine[1])
 		prncombine = true
@@ -147,6 +173,9 @@ begin
 		j = 1
 		if (ctor (Memc[gain], j, rval) == 0)
 		    prgain = true
+		j = 1
+		if (ctor (Memc[snoise], j, rval) == 0)
+		    prsn = true
 	    }
 	}
 
@@ -161,15 +190,15 @@ begin
 		call pargstr ("Exp")
 	}
 	if (prmode) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Mode")
 	}
 	if (prmedian) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Median")
 	}
 	if (prmean) {
-	    call fprintf (logfd, " %6s")
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Mean")
 	}
 	if (prrdn) {
@@ -180,15 +209,19 @@ begin
 	    call fprintf (logfd, " %6s")
 		call pargstr ("Gain")
 	}
-	if (doscale) {
+	if (prsn) {
+	    call fprintf (logfd, " %6s")
+		call pargstr ("Snoise")
+	}
+	if (prscale) {
 	    call fprintf (logfd, " %6s")
 		call pargstr ("Scale")
 	}
-	if (dozero) {
-	    call fprintf (logfd, " %6s")
+	if (przero) {
+	    call fprintf (logfd, " %7s")
 		call pargstr ("Zero")
 	}
-	if (dowts) {
+	if (prwts) {
 	    call fprintf (logfd, " %6s")
 		call pargstr ("Weight")
 	}
@@ -196,7 +229,7 @@ begin
 
 	do i = 1, nimages {
 	    call fprintf (logfd, "  %16s[%3d]")
-		call pargstr (SPECTRUM(sh[i]))
+		call pargstr (IMNAME(sh[i]))
 		call pargi (AP(sh[i]))
 	    if (prncombine) {
 		call fprintf (logfd, " %6d")
@@ -207,15 +240,15 @@ begin
 		    call pargr (exptime[i])
 	    }
 	    if (prmode) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (mode[i])
 	    }
 	    if (prmedian) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (median[i])
 	    }
 	    if (prmean) {
-		call fprintf (logfd, " %6g")
+		call fprintf (logfd, " %7.5g")
 		    call pargr (mean[i])
 	    }
 	    if (prrdn) {
@@ -226,15 +259,19 @@ begin
 		call fprintf (logfd, " %6g")
 		    call pargr (DEC(sh[i]))
 	    }
-	    if (doscale) {
+	    if (prsn) {
+		call fprintf (logfd, " %6g")
+		    call pargr (UT(sh[i]))
+	    }
+	    if (prscale) {
 		call fprintf (logfd, " %6.3f")
 		    call pargr (1./scales[i])
 	    }
-	    if (dozero) {
-		call fprintf (logfd, " %6g")
+	    if (przero) {
+		call fprintf (logfd, " %7.5g")
 		    call pargr (-zeros[i])
 	    }
-	    if (dowts) {
+	    if (prwts) {
 		call fprintf (logfd, " %6.3f")
 		    call pargr (wts[i])
 	    }
@@ -243,7 +280,7 @@ begin
 
 	# Log information about the output images.
 	call fprintf (logfd, "\n  Output image = %s, ncombine = %d")
-	    call pargstr (SPECTRUM(shout))
+	    call pargstr (IMNAME(shout))
 	    call pargi (nout)
 	if (expname[1] != EOS) {
 	    call fprintf (logfd, ", %s = %g")

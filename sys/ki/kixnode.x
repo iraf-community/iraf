@@ -14,15 +14,16 @@ char	r2[ARB]			#U output resource to append node! to
 int	maxch			#I max chars out
 
 pointer	sp, rt
-int	ip, nchars
-int	ki_extnode()
+int	ip, nchars, buflen
+int	ki_extnode(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (rt, SZ_FNAME, TY_CHAR)
+	buflen = strlen(r2) + SZ_FNAME
+	call salloc (rt, buflen, TY_CHAR)
 
-	ip = ki_extnode (r2, Memc[rt], SZ_FNAME, nchars) + 1
-	call strcpy (r2[ip], Memc[rt], SZ_FNAME)
+	ip = ki_extnode (r2, Memc[rt], buflen, nchars) + 1
+	call strcpy (r2[ip], Memc[rt], buflen)
 	ip = ki_extnode (r1, r2, maxch, nchars)
 	call strcpy (Memc[rt], r2[nchars+1], maxch-nchars)
 

@@ -40,5 +40,7 @@ begin
 	    call mfree (AP_INDEX(sky), TY_INT)
 	if (AP_COORDS(sky) != NULL)
 	    call mfree (AP_COORDS(sky), TY_INT)
+	if (AP_SWGT(sky) != NULL)
+	    call mfree (AP_SWGT(sky), TY_REAL)
 	call mfree (AP_PSKY(ap), TY_STRUCT)
 end

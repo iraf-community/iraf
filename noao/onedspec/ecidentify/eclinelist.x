@@ -1,6 +1,6 @@
 include	<error.h>
 include	<mach.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_MAPLL -- Read the line list into memory.

@@ -124,8 +124,8 @@ begin
 	    nout = 0
 
 	    do i = 1, nev {
-		x = max(1, min(ncols,  Mems[ev+xoff]))
-		y = max(1, min(nlines, Mems[ev+yoff]))
+		x = max(1, min(ncols,  int(Mems[ev+xoff])))
+		y = max(1, min(nlines, int(Mems[ev+yoff])))
 
 		if (IO_DEBUG(io) > 4) {
 		    # Egads!  Dump every photon.

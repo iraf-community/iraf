@@ -12,7 +12,7 @@ trace,b,h,yes,,,Trace apertures?
 fittrace,b,h,yes,,,"Fit the traced points interactively?
 "
 line,i,h,INDEF,1,,Starting dispersion line
-nsum,i,h,10,1,,Number of dispersion lines to sum
+nsum,i,h,10,,,Number of dispersion lines to sum
 step,i,h,10,1,,Tracing step
 nlost,i,h,3,1,,"Number of consecutive times profile is lost before quitting
 "

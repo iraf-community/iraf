@@ -31,6 +31,7 @@ begin
 	    call printf ("%s -> %s\n")
 		call pargstr (image1)
 		call pargstr (image2)
+	    call flush (STDOUT)
 	}
 
 	# Map the input image.

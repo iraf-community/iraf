@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_FITDATA -- Compute fit coordinates from pixel coordinates.
@@ -58,11 +58,11 @@ pointer	ec			# ID pointer
 int	order			# Order
 double	pix			# Pixel coordinate
 
-double	fit, ecf_eval(), mw_c1trand(), shdr_lw()
+double	fit, ecf_eval(), smw_c1trand(), shdr_lw()
 
 begin
 	if (EC_ECF(ec) == NULL) {
-	    fit = mw_c1trand (EC_LP(ec), pix)
+	    fit = smw_c1trand (EC_LP(ec), pix)
 	    fit = shdr_lw (EC_SH(ec), fit)
 	} else
 	    fit = ecf_eval (EC_ECF(ec), order, pix)
@@ -84,7 +84,7 @@ double	pixcoord		# Pixel coordinate returned
 int	i, n
 double	dx
 
-double	ec_fitpt(), mw_c1trand()
+double	ec_fitpt(), smw_c1trand()
 
 begin
 	n = EC_NPTS(ec)
@@ -98,8 +98,8 @@ begin
 	    if (FITDATA(ec,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = mw_c1trand (EC_LP(ec), double(i-.5))
-	    dx = mw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
+	    pixcoord = smw_c1trand (EC_LP(ec), double(i-.5))
+	    dx = smw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (ec_fitpt (ec, EC_AP(ec), pixcoord) < fitcoord)
@@ -117,8 +117,8 @@ begin
 	    if (FITDATA(ec,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = mw_c1trand (EC_LP(ec), double(i-.5))
-	    dx = mw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
+	    pixcoord = smw_c1trand (EC_LP(ec), double(i-.5))
+	    dx = smw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (ec_fitpt (ec, EC_AP(ec), pixcoord) < fitcoord)

@@ -1,0 +1,244 @@
+.help pstselect Dec92 noao.digiphot.daophot
+.ih
+NAME
+pstselect -- select candidate psf stars from a photometry file
+.ih
+USAGE
+pstselect image photfile pstfile maxnpsf
+.ih
+PARAMETERS
+.ls image
+The list of images containing the candidate psf stars.
+.le
+.ls photfile
+The list of  input  files  containing  the
+photometry  for the candidate psf stars. If \fIphotfile\fR is
+"default", "dir$default" or  a  directory  specification,  PSTSELECT
+looks  for  a  file  called  image.mag.?  where ? is the highest
+existing version number. Otherwise  \fIphotfile\fR  must  specify  one
+photometry  file  for  each  input  image in \fIimage\fR.  \fIPhotfile\fR is
+normally the output of the PHOT task but may also be the  output
+of  the  PSF,  PEAK,  NSTAR and ALLSTAR tasks. \fIPhotfile\fR may be a
+text file or an STSDAS database file.
+.le
+.ls pstfile
+The  list  of  output  files  containing  the  candidate psf stars.
+If \fIpstfile\fR is "default", "dir$default",  or
+a  directory  specification  then  PSTSELECT writes  a  file called
+image.pst.? where  ?  is  the  next  available  version  number.
+Otherwise  \fIpstfile\fR  must  specify  one  output  file for every
+input image. \fIPstfile\fR  inherits its file type, either APPHOT/DAOPHOT
+text or STSDAS binary table format, from \fIphotfile\fR.
+.le
+.ls maxnpsf = 25
+The maximum number of candidate psf stars to be selected.
+.le
+.ls plotfile = ""
+The name  of  the  output  file  containing  mesh,  contour,  or
+profile  plots  of  the  selected PSF stars. If plotfile is null
+("") no plot file is created,  otherwise  a  mesh,  contour,  or
+profile  plot  is  written  to  this  file  for  each  PSF  star
+selected. Plotfile is opened in append mode and can become  very
+large.
+.le
+.ls datapars = ""
+The  name  of  the  text  file  containing  the  data  dependent 
+parameters. If   datapars  is  null  ("")  then  the  default 
+parameter set in the user's uparm directory is used. The parameter
+\fIscale\fR is located here.
+.le
+.ls daopars = ""
+The name  of  the  text  file  containing  the  daophot  fitting
+parameters.  If  daopars  is null ("") then the default parameter
+set in the user's uparm directory is used. The parameters \fIpsfrad\fR
+and \fIfitrad\fR are located here.
+.le
+.ls interactive = no
+Select the psf stars interactively? If interactive = yes and icommands is
+null (""), PSTSELECT will read in the star list \fIphotfile\fR, sort the
+stars by magnitude and then wait for commands from the user. If
+interactive=no and icommands="", PSTSELECT selects candidate PSF
+stars from \fIphotfile\fR without intervention by the user. If  icommands
+is  not "",  then interactive  is automatically set to "no", and
+commands are read from the image cursor command file.
+.le
+.ls plottype = "mesh"
+The default type of plot displayed  when  selecting  PSF  stars.
+The choices are "mesh", "contour", or "radial".
+.le
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task?
+.le
+.ls verify = ")_.verify"
+Verify the critical task parameters?
+.le
+.ls update = ")_.update"
+Update the critical task parameters if verify is "yes"?
+.le
+.ls
+graphics = ")_.graphics"
+The default graphics device.  Graphics can be set to the default
+daophot package parameter value, "yes", or "no".
+.le
+.ls display = ")_.display"
+The  default  image  display  device.  Display can be set to the
+default daophot package parameter value, "yes", or "no".
+.le
+.ls icommands = ""
+The image display cursor.
+.le
+.ls gcommands = ""
+The graphics cursor.
+.le
+
+.ih
+DESCRIPTION
+
+PSTSELECT reads the input photometry file \fIphotfile\fR,
+extracts the ID, XCENTER, YCENTER, MAG, and MSKY fields from 
+\fIphotfile\fR for a list of up to \fImaxnpsf\fR psf stars, and writes
+them to \fIpstfile\fR.
+\fIPstfile\fR  inherits its file format, whether APPHOT/DAOPHOT
+text or STSDAS binary table format, from \fIphotfile\fR.
+
+PSTSELECT reads in the stars  in \fIphotfile\fR, sorts them in
+order of increasing magnitude, rejecting any stars that have INDEF
+valued magnitudes, or which lie less than \fIfitrad\fR / \fIscale\fR
+pixels from the edge of the image \fIimage\fR. From this list the
+brightest \fImaxnpsf\fR stars which have no brighter stars within a
+distance of (\fIpsfrad\fR + \fIfitrad\fR) / \fIscale\fR + 1 pixels are selected
+as candidate psf stars. \fIPsfrad\fR and \fIfitrad\fR are the psf radius
+and fitting radius parameters respectively and are located in the DAOPARS task. 
+\fIScale\fR is the image scale parameter and is located in the DATAPARS
+task. Plots, either mesh, contour or radial profile depending on
+the value of \fIplottype\fR of the selected stars may be saved in the 
+file \fIplotfile\fR.
+
+If \fIinteractive\fR = "no", PSTSELECT reads the star list in \fIphotfile\fR,
+selects the candidate psf stars, and writes the results to \fIpstfile\fR
+without input from the user. If interactive = "yes", PSTSELECT reads
+in the star list and waits for instruction from the user. At this
+point the user can step through the stars selected by PSTSELECT, examining
+their surface, countour, or radial profile plots for blemishes, 
+neighbours etc,  accepting good candidates and rejecting poor ones,
+or use the cursor and/or id number to select stars until a maximum
+of \fImaxnpsf\fR stars is reached. At any
+point a previously selected psf star can be accepted or deleted.
+
+.ih
+CURSORS
+
+
+.nf
+    The  following  cursor  commands are available once the image cursor
+    has been activated.
+
+
+	Keystroke Commands 
+
+?	Print help
+p	Print photometry for star nearest the cursor
+l	List the current psf stars
+n	Select the next good candidate psf star from the list
+a	Add star nearest cursor to psf star list
+d	Delete psf star nearest cursor from psf star list
+q	Quit task
+
+	Colon Commands
+
+:p [n]	Print photometry for star n
+:a [n]	Add star n to psf star list
+:d [n]	Delete star n from psf star list
+
+The following cursor commands are available once a star has been selected
+and the graphics cursor has been activated.
+
+        Interactive Graphics Keystroke Commands
+
+?       Print help
+p       Print the photometry for this star
+t       Print the plot parameters and data minimum and maximum
+a       Accept star and proceed
+d       Reject star and select another with image cursor
+m       Plot the default mesh plot for this star
+n       Increase vertical angle by 15 degrees (mesh plot only)
+s       Decrease vertical angle by 15 degrees (mesh plot only)
+w       Decrease horizontal angle by 15 degrees (mesh plot only)
+e       Increase horizontal angle by 15 degrees (mesh plot only)
+c       Plot the default contour plot for this star
+r       Plot the radial profile for this star
+
+
+        Colon Graphics Commands
+
+:m [val] [val]  Set the mesh plot vertical and horizontal viewing angles
+:v [val]        Set the mesh plot vertical viewing angle
+:h [val]        Set the mesh plot horizontal viewing angle
+:c [val] [val]  Set the contour plot floor and ceiling levels
+:l [value]      Set the contour plot floor level
+:u [value]      Set the contour plot ceiling level
+.fi
+
+.ih
+OUTPUT
+
+If \fIverbose\fR = "yes" a single line is written to the terminal for
+each star added to the candidate psf star list. 
+Full output is written to the file \fIpstfile\fR. At the beginning
+of the file is a header listing the current values of all the
+important parameters.
+For each star included in the candidate psf star list
+the following quantities are written.
+
+.nf
+	id  xcenter ycenter mag msky
+.fi
+
+Id, xcenter, ycenter, mag, and msky are the id, x and y coordinates,
+magnitudes and sky values for the candidate psf stars as listed in
+\fIphotfile\fR.
+
+.ih
+EXAMPLES
+
+1. Select up to 10 psf stars from the PHOT task output non-interactively. 
+Save surface plots of the selected stars in the file "plots".
+
+.nf
+    da> pstselect m92 default default 10 plotfile=plots
+.fi
+
+2. Repeat example the first example running pstselect in interactive mode
+but do not save the plots.
+
+.nf
+    da> pstselect m92 default default 10 interactive+
+
+	... verify the critical parameters as instructed
+
+	... when the image cursor appears type the n keystroke
+	    command to select the first suitable candidate psf
+	    star, examine its surface plot, and type a or d to
+	    accept or reject the candidate star
+
+	... repeat the previous command until 10 psf stars have
+    	    been selected, the end of the star list is reached,
+	    or a sufficient number of stars but fewer than maxnpsf
+	    have been selected
+
+	... if fewer than maxnpsf stars are found automatically
+	    additional psf stars can be added to the list with the a
+	    keystroke command
+
+	... type q to quit
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,phot,psf
+.endhelp

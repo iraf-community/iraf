@@ -27,6 +27,7 @@ int	incat, sets, sh, ap, obs, outcat, fmt
 int	csp, cp, nincolumns, nfilters, nimages, npts, sortimid
 pointer	sp, outfilters, fname, tfname, column, incolumns, obscolumns, imtable
 pointer	x, y, mag, merr, imid, id
+real	minmagerr
 
 bool	clgetb()
 int	clpopnu(), clgfil(), open(), clplen(), ph_filters(), ph_getlabels()
@@ -89,6 +90,9 @@ begin
 	    call delete (Memc[tfname])
 	fmt = open (Memc[tfname], NEW_FILE, TEXT_FILE)
 
+	# Get the minimum magnitude error.
+	minmagerr = clgetr ("minmagerr")
+
 	# Normalize the exposure times?
 	normtime = btoi (clgetb ("normtime"))
 
@@ -125,13 +129,16 @@ begin
 	    if (obs != STDIN) {
 	        call clgstr ("obscolumns", Memc[columnstr], SZ_LINE)
 	        csp = 1
-	        nincolumns = 0
+	        nincolumns = 1
+		Memi[obscolumns] = 1
 	        while (ph_getlabels (Memc[columnstr], csp, Memc[column],
-	            SZ_FNAME) != EOF) {
+	            SZ_FNAME) != EOF && (nincolumns < OBS_NFIELDS)) {
 		    cp = 1
-		    if (ctoi (Memc[column], cp, Memi[obscolumns+nincolumns]) <=
-		        0)
+		    if (ctoi (Memc[column], cp,
+		        Memi[obscolumns+nincolumns]) <= 0)
 		        Memi[obscolumns+nincolumns] = 0
+		    else if (Memi[obscolumns+nincolumns] == 1)
+		        nincolumns = nincolumns - 1
 		    nincolumns = nincolumns + 1
 	        }
 	    }
@@ -239,7 +246,8 @@ begin
 	# Apply the exposure time corrections, x-y shifts, and the aperture
 	# corrections.
 
-	call ph_correct (imtable, Memr[x], Memr[y], Memr[mag])
+	call ph_correct (imtable, Memr[x], Memr[y], Memr[mag], Memr[merr],
+	    minmagerr)
 
 	if (verbose == YES) {
 	    call fstats (outcat, F_FILENAME, Memc[fname], SZ_FNAME)
@@ -369,12 +377,14 @@ end
 # PH_CORRECT -- Correct the x, y and mag values using the  x-y shifts, aperture
 # corrections, and exposure times.
 
-procedure ph_correct (imtable, x, y, mag)
+procedure ph_correct (imtable, x, y, mag, merr, minmagerr)
 
 pointer	imtable		# pointer to the symbol table
 real	x[ARB]		# array of x coordinates
 real	y[ARB]		# array of y coordinates
 real	mag[ARB]	# array of magnitudes
+real	merr[ARB]	# array of magnitude errors
+real	minmagerr	# the minimum magnitude error
 
 int	i, nptr, ndata
 pointer	sp, imname, symbol, osymbol
@@ -412,6 +422,10 @@ begin
 		    if (IS_INDEFR(mag[i]))
 			next
 		    mag[i] = mag[i] + magshift
+		    if (IS_INDEFR(merr[i]))
+			next
+		    if (merr[i] < minmagerr)
+			merr[i] = minmagerr
 		}
 	    }
 
@@ -454,7 +468,7 @@ begin
 	# Write out the output file column headers.
 	call fprintf (out, "\n")
 	call fprintf (out,
-	"# FIELD%23tFILTER%35tAIRMASS%43tXCENTER%52tYCENTER%61tMAG%72tMERR\n")
+"# FIELD%17tFILTER%34tOTIME%40tAIRMASS%49tXCENTER%59tYCENTER%71tMAG%77tMERR\n")
 	call fprintf (out, "\n")
 
 	# Allocate and or initialize working space.
@@ -509,6 +523,7 @@ begin
 		    IMT_OFFSET(symbol) = IMT_OFFSET(osymbol)
 		    IMT_NENTRIES(symbol) = IMT_NENTRIES(osymbol)
 		    IMT_XAIRMASS(symbol) = IMT_XAIRMASS(osymbol)
+		    IMT_OTIME(symbol) = IMT_OTIME(osymbol)
 		    call strcpy (IMT_IFILTER(osymbol), IMT_IFILTER(symbol),
 			SZ_FNAME)
 		}
@@ -625,6 +640,12 @@ begin
 	do i = 1, nfilters {
 	    if (ph_nthlabel (filters, i, Memc[filterid], SZ_FNAME) != i)
 		Memc[filterid] = EOS
+	    call fprintf (fd,
+	        "T%s%15t%d%30t# time of observation in filter %s\n")
+		call pargstr (Memc[filterid])
+		call pargi (col)
+		call pargstr (Memc[filterid])
+	    col = col + 1
 	    call fprintf (fd, "X%s%15t%d%30t# airmass in filter %s\n")
 		call pargstr (Memc[filterid])
 		call pargi (col)
@@ -660,16 +681,17 @@ end
 
 
 # PH_NXTIMAGE -- Find the first line in the input catalog containing the next
-# image name, given the current image name. Return the new image nam and line.
+# image name, given the current image name. Return the new image name and line.
 
-int procedure ph_nxtimage (fd, columns, image, line)
+int procedure ph_nxtimage (fd, columns, image, line, lbufsize)
 
 int	fd		# file descriptor of the input text file
 int	columns[ARB]	# the list of input columns
 char	image[ARB]	# the name of the current image
-char	line[ARB]	# the output line
+pointer	line		# pointer to the output line
+int	lbufsize	# the line buffer size
 
-int	i, colno
+int	i, op, colno
 long	stat
 pointer	sp, str
 bool	streq()
@@ -679,18 +701,37 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_FNAME, TY_CHAR)
 
-	colno = columns[CAT_IMAGE]
+	if (line == NULL || lbufsize <= 0) {
+	    lbufsize = lbufsize + SZ_LINE
+	    call malloc (line, lbufsize, TY_CHAR)
+	}
 
+	colno = columns[CAT_IMAGE]
 	Memc[str] = EOS
 	repeat {
-	    stat = getline (fd, line)
+
+	    op = 1
+	    repeat {
+	        stat = getline (fd, Memc[line+op-1])
+	        if (stat == EOF)
+		    break
+	        op = op + stat
+		if (op > lbufsize) {
+		    lbufsize = lbufsize + SZ_LINE
+		    call realloc (line, lbufsize, TY_CHAR)
+		}
+	    } until (Memc[line+op-2] == '\n')
 	    if (stat == EOF)
 		break
-	    call sscan (line)
+	    else
+		stat = op - 1
+
+	    call sscan (Memc[line])
 	    do i = 1, colno
 		call gargwrd (Memc[str], SZ_FNAME)
 	    if (nscan() != colno)
 		next
+
 	} until (! streq (image, Memc[str]))
 	call strcpy (Memc[str], image, SZ_FNAME)
 
@@ -703,26 +744,44 @@ end
 # PH_GETIMAGE -- Read the next line in the input catalog and return the image
 # name and the line.
 
-int procedure ph_getimage (fd, columns, image, line)
+int procedure ph_getimage (fd, columns, image, line, lbufsize)
 
 int	fd		# file descriptor of the input text file
 int	columns[ARB]	# the list of input columns
 char	image[ARB]	# the name of the current image
-char	line[ARB]	# the output line
+pointer	line		# pointer to the output line
+int	lbufsize	# the size of the output buffer
 
-int	i, colno
+int	op, i, colno
 int	stat
 int	getline(), nscan()
 
 begin
+	if (line == NULL || lbufsize <= 0) {
+	    lbufsize = lbufsize + SZ_LINE
+	    call malloc (line, lbufsize, TY_CHAR)
+	}
+
 	colno = columns[CAT_IMAGE]
 	repeat {
 
-	    stat = getline (fd, line)
+	    op = 1
+	    repeat {
+	        stat = getline (fd, Memc[line+op-1])
+	        if (stat == EOF)
+		    break
+		op = op + stat
+		if (op > lbufsize) {
+		    lbufsize = lbufsize + SZ_LINE
+		    call realloc (line, lbufsize, TY_CHAR)
+		}
+	    } until (Memc[line+op-2] == '\n')
 	    if (stat == EOF)
 		break
+	    else
+		stat = op - 1
 
-	    call sscan (line)
+	    call sscan (Memc[line])
 	    do i = 1, colno
 	        call gargwrd (image, SZ_FNAME)
 	    if (nscan() != colno)
@@ -738,7 +797,8 @@ end
 # PH_IMDATA -- Decode the filter id, integration time and airmass from
 # a line of the input catalog.
 
-procedure ph_imdata (line, columns, filterid, sz_filterid, itime, airmass)
+procedure ph_imdata (line, columns, filterid, sz_filterid, itime, airmass,
+	otime)
 
 char	line[ARB]	# input line to be scanned
 int	columns[ARB]	# the list of input columns
@@ -746,8 +806,9 @@ char	filterid[ARB]	# the name of the filter
 int	sz_filterid	# maximum length of the filter id
 real	itime		# the exposure time of the observation
 real	airmass		# the airmass of the observation
+real	otime		# the time of observations
 
-int	i, fcol, icol, acol, maxcol
+int	i, fcol, icol, acol, ocol, maxcol
 pointer	sp, str
 int	nscan()
 
@@ -758,64 +819,13 @@ begin
 	fcol = columns[CAT_IFILTER]
 	icol = columns[CAT_ITIME]
 	acol = columns[CAT_XAIRMASS]
-	maxcol = max (fcol, icol, acol)
+	ocol = columns[CAT_OTIME]
+	maxcol = max (fcol, icol, acol, ocol)
 
 	call strcpy ("INDEF", filterid, sz_filterid)
 	itime = INDEFR
 	airmass = INDEFR
-
-	call sscan (line)
-	do i = 1, maxcol {
-	    if ( i == fcol) {
-		call gargwrd (filterid, sz_filterid)
-		if (nscan() != fcol)
-		    call strcpy ("INDEF", filterid, sz_filterid)
-	    } else if (i == icol) {
-		call gargr (itime)
-		if (nscan() != icol)
-		    itime = 1.0
-		    #itime = INDEFR
-	    } else if (i == acol) {
-		call gargr (airmass)
-		if (nscan() != acol)
-		    airmass = INDEFR
-	    } else {
-		call gargwrd (Memc[str], SZ_LINE)
-	    }
-	}
-
-	call sfree (sp)
-end
-
-
-# PH_OBSDATA -- Decode the filter id, integration time and airmass from
-# a line of the observing parameters file.
-
-procedure ph_obsdata (line, columns, filterid, sz_filterid, itime, airmass)
-
-char	line[ARB]	# input line to be scanned
-int	columns[ARB]	# the list of input columns
-char	filterid[ARB]	# the name of the filter
-int	sz_filterid	# maximum length of the filter id
-real	itime		# the exposure time of the observation
-real	airmass		# the airmass of the observation
-
-int	i, fcol, icol, acol, maxcol
-pointer	sp, str
-int	nscan()
-
-begin
-	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-
-	fcol = columns[OBS_IFILTER]
-	icol = columns[OBS_ITIME]
-	acol = columns[OBS_XAIRMASS]
-	maxcol = max (fcol, icol, acol)
-
-	call strcpy ("INDEF", filterid, sz_filterid)
-	itime = INDEFR
-	airmass = INDEFR
+	otime = INDEFR
 
 	call sscan (line)
 	do i = 1, maxcol {
@@ -831,6 +841,70 @@ begin
 		call gargr (airmass)
 		if (nscan() != acol)
 		    airmass = INDEFR
+	    } else if (i == ocol) {
+		call gargr (otime)
+		if (nscan() != ocol)
+		    otime = INDEFR
+	    } else {
+		call gargwrd (Memc[str], SZ_LINE)
+	    }
+	}
+
+	call sfree (sp)
+end
+
+
+# PH_OBSDATA -- Decode the filter id, integration time and airmass from
+# a line of the observing parameters file.
+
+procedure ph_obsdata (line, columns, filterid, sz_filterid, itime, airmass,
+	otime)
+
+char	line[ARB]	# input line to be scanned
+int	columns[ARB]	# the list of input columns
+char	filterid[ARB]	# the name of the filter
+int	sz_filterid	# maximum length of the filter id
+real	itime		# the exposure time of the observation
+real	airmass		# the airmass of the observation
+real	otime		# the time of observation
+
+int	i, fcol, icol, acol, ocol, maxcol
+pointer	sp, str
+int	nscan()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	fcol = columns[OBS_IFILTER]
+	icol = columns[OBS_ITIME]
+	acol = columns[OBS_XAIRMASS]
+	ocol = columns[OBS_OTIME]
+	maxcol = max (fcol, icol, acol, ocol)
+
+	call strcpy ("INDEF", filterid, sz_filterid)
+	itime = INDEFR
+	airmass = INDEFR
+	otime = INDEFR
+
+	call sscan (line)
+	do i = 1, maxcol {
+	    if ( i == fcol) {
+		call gargwrd (filterid, sz_filterid)
+		if (nscan() != fcol)
+		    call strcpy ("INDEF", filterid, sz_filterid)
+	    } else if (i == icol) {
+		call gargr (itime)
+		if (nscan() != icol)
+		    itime = INDEFR
+	    } else if (i == acol) {
+		call gargr (airmass)
+		if (nscan() != acol)
+		    airmass = INDEFR
+	    } else if (i == ocol) {
+		call gargr (otime)
+		if (nscan() != ocol)
+		    otime = INDEFR
 	    } else {
 		call gargwrd (Memc[str], SZ_LINE)
 	    }

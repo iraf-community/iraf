@@ -10,6 +10,7 @@ lcase		hlp=doc$lcase.hlp,	src=lcase.x
 polyfit		hlp=doc$polyfit.hlp,	src=t_polyfit.x
 revisions	sys=Revisions
 split		hlp=doc$split.hlp,	src=split.x
+surfit		hlp=doc$surfit.hlp,	src=t_surfit.x
 translit	hlp=doc$translit.hlp,	src=tranlist.x
 ucase		hlp=doc$ucase.hlp,	src=ucase.x
 urand		hlp=doc$urand.hlp,	src=urand.x

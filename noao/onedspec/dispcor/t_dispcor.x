@@ -5,6 +5,7 @@ include	<mach.h>
 include	<mwset.h>
 include	"dispcor.h"
 include	"dctable.h"
+include	<smw.h>
  
 # Spectra formats
 define	MULTISPEC	1
@@ -20,12 +21,13 @@ int	out			# List of output spectra
 bool	linearize		# Linearize spectra?
 bool	log			# Log scale?
 bool	flux			# Conserve flux?
-int	fd			# Log file descriptor
+int	fd1			# Log file descriptor
+int	fd2			# Log file descriptor
  
 int	i, format, naps, open(), nowhite()
-int	imtopenp(), imtgetim()
+int	imtopenp(), imtgetim(), errcode()
 pointer	sp, input, output, str, err, stp, table
-pointer	im, mw, ap, immap(), smw_openim()
+pointer	im, smw, ap, immap(), smw_openim()
 bool	clgetb()
 errchk	open, immap, smw_openim, dc_gms, dc_gec
  
@@ -62,10 +64,12 @@ begin
 	}
 
 	# Open logfile if specified.
+	if (clgetb ("verbose"))
+	    fd1 = STDOUT
 	if (nowhite (Memc[err], Memc[err], SZ_LINE) != 0)
-	    fd = open (Memc[err], APPEND, TEXT_FILE)
+	    fd2 = open (Memc[err], APPEND, TEXT_FILE)
 	else
-	    fd = NULL
+	    fd2 = NULL
 
 	# Loop through each input image.  Do the dispersion correction
 	# in place if no output spectrum list is given or if the input
@@ -77,19 +81,38 @@ begin
 		
 	    iferr {
 		im = NULL
-		mw = NULL
+		smw = NULL
 		ap = NULL
 
 		i = immap (Memc[input], READ_ONLY, 0); im = i
-		i = smw_openim (im); mw = i
+		i = smw_openim (im); smw = i
+
+		# This task requires EQUISPEC or MULTISPEC WCS.
+		if (SMW_FORMAT(smw) == SMW_ND) {
+		    if (SMW_NSPEC(smw) <= 100)
+			call smw_ndes (im, smw)
+		    else
+			call error (1, "Spectral format not allowed")
+		}
+
+		# This task requires a 2D WCS.
+		if (SMW_PDIM(smw) == 1)
+		    call smw_esms (smw)
 
 		# Get dispersion functions.  Determine type of dispersion
 		# by the error return.
 
 		format = MULTISPEC
-		iferr (call dc_gms (im, mw, stp, ap, fd)) {
+		iferr (call dc_gms (im, smw, stp, ap, fd1, fd2)) {
+		    if (errcode() > 1 && errcode() < 100)
+			call erract (EA_ERROR)
 		    format = ECHELLE
-		    iferr (call dc_gec (im, mw, stp, ap, fd)) {
+		    iferr (call dc_gec (im, smw, stp, ap, fd1, fd2)) {
+			if (errcode() > 1 && errcode() < 100)
+			    call erract (EA_ERROR)
+			call erract (EA_WARN)
+			iferr (call dc_gms (im, smw, stp, ap, fd1, fd2))
+			    call erract (EA_WARN)
 			call sprintf (Memc[err], SZ_LINE,
 			    "%s: Dispersion data not found")
 			    call pargstr (Memc[input])
@@ -99,19 +122,21 @@ begin
 
 		switch (format) {
 		case MULTISPEC:
-		    call dc_multispec (im, mw, ap, Memc[input], Memc[output],
-			linearize, log, flux, table, naps, fd)
+		    call dc_multispec (im, smw, ap, Memc[input],
+			Memc[output], linearize, log, flux, table, naps,
+			fd1, fd2)
 		case ECHELLE:
-		    call dc_echelle (im, mw, ap, Memc[input], Memc[output],
-			linearize, log, flux, table, naps, fd)
+		    call dc_echelle (im, smw, ap, Memc[input],
+			Memc[output], linearize, log, flux, table, naps,
+			fd1, fd2)
 		}
 	    } then
 		call erract (EA_WARN)
 
 	    if (ap != NULL)
 		call mfree (ap, TY_STRUCT)
-	    if (mw != NULL)
-		call mw_close (mw)
+	    if (smw != NULL)
+		call smw_close (smw)
 	    if (im != NULL)
 		call imunmap (im)
 	}
@@ -124,8 +149,10 @@ begin
 	call dc_close (stp)
 	call imtclose (in)
 	call imtclose (out)
-	if (fd != NULL)
-	    call close (fd)
+	if (fd1 != NULL)
+	    call close (fd1)
+	if (fd2 != NULL)
+	    call close (fd2)
 	call sfree (sp)
 end
  
@@ -134,11 +161,11 @@ end
 # spectrum.  The number of pixels in each image line is the maximum
 # required to contain the longest spectrum.
  
-procedure dc_multispec (in, mw, ap, input, output, linearize, log, flux,
-	table, naps, fd)
+procedure dc_multispec (in, smw, ap, input, output, linearize, log, flux,
+	table, naps, fd1, fd2)
  
 pointer	in			# Input IMIO pointer
-pointer	mw			# MWCS pointer
+pointer	smw			# SMW pointer
 pointer	ap			# Aperture pointer
 char	input[ARB]		# Input multispec spectrum
 char	output[ARB]		# Output root name
@@ -147,13 +174,15 @@ bool	log			# Log wavelength parameters?
 bool	flux			# Conserve flux?
 pointer	table			# Wavelength table
 int	naps			# Number of apertures
-int	fd			# Log file descriptor
+int	fd1			# Log file descriptor
+int	fd2			# Log file descriptor
  
 int	i, j, nc, nl, nb, axis[2]
-pointer	sp, temp, str, str1, out, mwout, cti, cto, indata, outdata
-pointer	immap(), imgl3r(), impl3r(), mw_open(), mw_sctran()
+pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
+pointer	immap(), imgl3r(), impl3r()
+pointer	mw_open(), smw_sctran()
 bool	clgetb(), streq()
-errchk	immap, mw_open
+errchk	immap, mw_open, smw_open
 
 data	axis/1,2/
  
@@ -169,34 +198,35 @@ begin
  
 	if (linearize) {
 	    if (log)
-		DT(ap,1) = 1
+		DC_DT(ap,1) = 1
 	    else
-		DT(ap,1) = 0
+		DC_DT(ap,1) = 0
 	    if (clgetb ("samedisp")) {
-		call dc_wavelengths1 (in, mw, ap, output, log, table, naps,
-		    W1(ap,1), W2(ap,1), DW(ap,1), NW(ap,1))
-		if ((DW(ap,1)*(W2(ap,1)-W1(ap,1)) <= 0.) || (NW(ap,1) < 1))
+		call dc_wavelengths1 (in, smw, ap, output, log, table, naps,
+		    DC_W1(ap,1), DC_W2(ap,1), DC_DW(ap,1), DC_NW(ap,1))
+		if ((DC_DW(ap,1)*(DC_W2(ap,1)-DC_W1(ap,1)) <= 0.) ||
+		    (DC_NW(ap,1) < 1))
 		    call error (1, "Error in wavelength scale")
 		do i = 2, nl {
-		    W1(ap,i) = W1(ap,1)
-		    W2(ap,i) = W2(ap,1)
-		    DW(ap,i) = DW(ap,1)
-		    NW(ap,i) = NW(ap,1)
-		    Z(ap,i) = 0.
-		    DT(ap,i) = DT(ap,1)
+		    DC_W1(ap,i) = DC_W1(ap,1)
+		    DC_W2(ap,i) = DC_W2(ap,1)
+		    DC_DW(ap,i) = DC_DW(ap,1)
+		    DC_NW(ap,i) = DC_NW(ap,1)
+		    DC_Z(ap,i) = 0.
+		    DC_DT(ap,i) = DC_DT(ap,1)
 		}
 	    } else {
 		do i = 1, nl {
 		    call dc_wavelengths (in, ap, output, log, table, naps, i,
-			AP(ap,i), W1(ap,i), W2(ap,i), DW(ap,i), NW(ap,i))
-		    Z(ap,i) = 0.
-		    DT(ap,i) = DT(ap,1)
+			DC_AP(ap,i), DC_W1(ap,i), DC_W2(ap,i), DC_DW(ap,i),
+			DC_NW(ap,i))
+		    DC_Z(ap,i) = 0.
+		    DC_DT(ap,i) = DC_DT(ap,1)
 		}
 	    }
 	}
-	if (clgetb ("verbose"))
-	    call dc_log (STDOUT, output, ap, nl, log)
-	call dc_log (fd, output, ap, nl, log)
+	call dc_log (fd1, output, ap, nl, log)
+	call dc_log (fd2, output, ap, nl, log)
 
 	if (clgetb ("listonly"))
 	    return
@@ -204,21 +234,25 @@ begin
 	call smark (sp)
 	call salloc (temp, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
  
 	# Use a temporary image if the output has the same name as the input.
 	if (streq (input, output)) {
 	    if (linearize) {
 		call mktemp ("temp", Memc[temp], SZ_LINE)
 		out = immap (Memc[temp], NEW_COPY, in)
+		if (IM_PIXTYPE(out) != TY_DOUBLE)
+		    IM_PIXTYPE(out) = TY_REAL
 	    } else {
 		call imunmap (in)
 		i = immap (input, READ_WRITE, 0)
 		in = i
 		out = i
 	    }
-	} else
+	} else {
 	    out = immap (output, NEW_COPY, in)
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
+	}
 
 	# Set MWCS or linearize
 	if (!linearize) {
@@ -227,40 +261,52 @@ begin
 		    do i = 1, nl
 			call amovr (Memr[imgl3r(in,i,j)], Memr[impl3r(out,i,j)],
 			    IM_LEN(in,1))
-	    call smw_saveim (mw, out)
+	    call smw_saveim (smw, out)
 	} else {
-	    mwout = mw_open (NULL, 2)
-	    call mw_newsystem (mwout, "multispec", 2)
+	    if (nb > 1)
+		i = 3
+	    else
+		i = 2
+	    mwout = mw_open (NULL, i)
+	    call mw_newsystem (mwout, "multispec", i)
 	    call mw_swtype (mwout, axis, 2, "multispec",
 		"label=Wavelength units=Angstroms")
-	    call mw_ssystem (mwout, "multispec")
-	    do i = 1, nl
-		call shdr_swattrs (mwout, i, AP(ap,i), BM(ap,i),
-		    DT(ap,i), W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i),
-		    LW(ap,i), UP(ap,i), "")
+	    if (i == 3)
+		call mw_swtype (mwout, 3, 1, "linear", "")
+	    call smw_open (mwout, NULL, out)
+	    do i = 1, nl {
+		call smw_swattrs (mwout, i, 1, DC_AP(ap,i), DC_BM(ap,i),
+		    DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i),
+		    DC_Z(ap,i), DC_LW(ap,i), DC_UP(ap,i), "")
+		call smw_gapid (smw, i, 1, Memc[str], SZ_LINE)
+		call smw_sapid (mwout, i, 1, Memc[str])
+	    }
 
-	    IM_LEN(out,1) = NW(ap,1)
+	    IM_LEN(out,1) = DC_NW(ap,1)
 	    do i = 2, nl
-		IM_LEN(out,1) = max (NW(ap,i), IM_LEN(out,1))
-	    cto = mw_sctran (mwout, "logical", "multispec", 3)
-	    cti = mw_sctran (mw, "multispec", "logical", 3)
+		IM_LEN(out,1) = max (DC_NW(ap,i), IM_LEN(out,1))
+	    cti = smw_sctran (smw, "world", "logical", 3)
+	    cto = smw_sctran (mwout, "logical", "world", 3)
 	    do j = 1, nb {
 		do i = 1, nl {
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
 		    call dispcor (cti, cto, i, Memr[indata], nc,
-			Memr[outdata], NW(ap,i), flux)
-		    if (NW(ap,i) < IM_LEN(out,1))
-			call amovkr (Memr[outdata+NW(ap,i)-1],
-			    Memr[outdata+NW(ap,i)], IM_LEN(out,1)-NW(ap,i))
+			Memr[outdata], DC_NW(ap,i), flux)
+		    if (DC_NW(ap,i) < IM_LEN(out,1))
+			call amovkr (Memr[outdata+DC_NW(ap,i)-1],
+			    Memr[outdata+DC_NW(ap,i)],IM_LEN(out,1)-DC_NW(ap,i))
 		}
 	    }
-	    call mw_ctfree (cti)
-	    call mw_ctfree (cto)
+	    call smw_ctfree (cti)
+	    call smw_ctfree (cto)
 	    call smw_saveim (mwout, out)
-	    call mw_close (mwout)
+	    call smw_close (mwout)
 	}
+
+	# Save REFSPEC keywords if present.
+	call dc_refspec (out)
  
 	# Finish up.  Replace input by output if needed.
 	if (out == in) {
@@ -282,11 +328,11 @@ end
 # spectrum.  The number of pixels in each image line is the maximum
 # required to contain the longest spectrum.
  
-procedure dc_echelle (in, mw, ap, input, output, linearize, log, flux, table,
-	naps, fd)
+procedure dc_echelle (in, smw, ap, input, output, linearize, log, flux, table,
+	naps, fd1, fd2)
  
 pointer	in			# IMIO pointer
-pointer	mw			# MWCS pointer
+pointer	smw			# SMW pointers
 pointer	ap			# Aperture pointer
 char	input[ARB]		# Input multispec spectrum
 char	output[ARB]		# Output root name
@@ -295,13 +341,15 @@ bool	log			# Log wavelength parameters?
 bool	flux			# Conserve flux?
 pointer	table			# Wavelength table
 int	naps			# Number of apertures
-int	fd			# Log file descriptor
+int	fd1			# Log file descriptor
+int	fd2			# Log file descriptor
  
 int	i, j, nc, nl, nb, axis[2]
-pointer	sp, temp, str, str1, out, mwout, cti, cto, indata, outdata
-pointer	immap(), imgl3r(), impl3r(), mw_open(), mw_sctran()
+pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
+pointer	immap(), imgl3r(), impl3r()
+pointer	mw_open(), smw_sctran()
 bool	clgetb(), streq()
-errchk	immap, mw_open
+errchk	immap, mw_open, smw_open
 
 data	axis/1,2/
  
@@ -314,19 +362,19 @@ begin
  
 	if (linearize) {
 	    if (log)
-		DT(ap,1) = 1
+		DC_DT(ap,1) = 1
 	    else
-		DT(ap,1) = 0
+		DC_DT(ap,1) = 0
 	    do i = 1, nl {
 		call dc_wavelengths (in, ap, output, log, table, naps,
-		    i, AP(ap,i), W1(ap,i), W2(ap,i), DW(ap,i), NW(ap,i))
-		Z(ap,i) = 0.
-		DT(ap,i) = DT(ap,1)
+		    i, DC_AP(ap,i), DC_W1(ap,i), DC_W2(ap,i), DC_DW(ap,i),
+		    DC_NW(ap,i))
+		DC_Z(ap,i) = 0.
+		DC_DT(ap,i) = DC_DT(ap,1)
 	    }
 	}
-	if (clgetb ("verbose"))
-	    call dc_log (STDOUT, output, ap, nl, log)
-	call dc_log (fd, output, ap, nl, log)
+	call dc_log (fd1, output, ap, nl, log)
+	call dc_log (fd2, output, ap, nl, log)
 
 	if (clgetb ("listonly"))
 	    return
@@ -334,21 +382,25 @@ begin
 	call smark (sp)
 	call salloc (temp, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
 
 	# Use a temporary image if the output has the same name as the input.
 	if (streq (input, output)) {
 	    if (linearize) {
 		call mktemp ("temp", Memc[temp], SZ_LINE)
 		out = immap (Memc[temp], NEW_COPY, in)
+		if (IM_PIXTYPE(out) != TY_DOUBLE)
+		    IM_PIXTYPE(out) = TY_REAL
 	    } else {
 		call imunmap (in)
 		i = immap (input, READ_WRITE, 0)
 		in = i
 		out = i
 	    }
-	} else
+	} else {
 	    out = immap (output, NEW_COPY, in)
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
+	}
 
 	# Set MWCS or linearize
 	if (!linearize) {
@@ -357,40 +409,52 @@ begin
 		    do i = 1, nl
 			call amovr (Memr[imgl3r(in,i,j)], Memr[impl3r(out,i,j)],
 			    IM_LEN(in,1))
-	    call smw_saveim (mw, out)
+	    call smw_saveim (smw, out)
 	} else {
-	    mwout = mw_open (NULL, 2)
-	    call mw_newsystem (mwout, "multispec", 2)
+	    if (nb > 1)
+		i = 3
+	    else
+		i = 2
+	    mwout = mw_open (NULL, i)
+	    call mw_newsystem (mwout, "multispec", i)
 	    call mw_swtype (mwout, axis, 2, "multispec",
 		"label=Wavelength units=Angstroms")
-	    call mw_ssystem (mwout, "multispec")
-	    do i = 1, nl
-		call shdr_swattrs (mwout, i, AP(ap,i), BM(ap,i),
-		    DT(ap,i), W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i),
-		    LW(ap,i), UP(ap,i), "")
+	    if (i == 3)
+		call mw_swtype (mwout, 3, 1, "linear", "")
+	    call smw_open (mwout, NULL, out)
+	    do i = 1, nl {
+		call smw_swattrs (mwout, i, 1, DC_AP(ap,i), DC_BM(ap,i),
+		    DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i),
+		    DC_Z(ap,i), DC_LW(ap,i), DC_UP(ap,i), "")
+		call smw_gapid (smw, i, 1, Memc[str], SZ_LINE)
+		call smw_sapid (mwout, i, 1, Memc[str])
+	    }
 
-	    IM_LEN(out,1) = NW(ap,1)
+	    IM_LEN(out,1) = DC_NW(ap,1)
 	    do i = 2, nl
-		IM_LEN(out,1) = max (NW(ap,i), IM_LEN(out,1))
-	    cto = mw_sctran (mwout, "logical", "multispec", 3)
-	    cti = mw_sctran (mw, "multispec", "logical", 3)
+		IM_LEN(out,1) = max (DC_NW(ap,i), IM_LEN(out,1))
+	    cti = smw_sctran (smw, "world", "logical", 3)
+	    cto = smw_sctran (mwout, "logical", "world", 3)
 	    do j = 1, nb {
 		do i = 1, nl {
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
 		    call dispcor (cti, cto, i, Memr[indata], nc,
-			Memr[outdata], NW(ap,i), flux)
-		    if (NW(ap,i) < IM_LEN(out,1))
-			call amovkr (Memr[outdata+NW(ap,i)-1],
-			    Memr[outdata+NW(ap,i)], IM_LEN(out,1)-NW(ap,i))
+			Memr[outdata], DC_NW(ap,i), flux)
+		    if (DC_NW(ap,i) < IM_LEN(out,1))
+			call amovkr (Memr[outdata+DC_NW(ap,i)-1],
+			    Memr[outdata+DC_NW(ap,i)],IM_LEN(out,1)-DC_NW(ap,i))
 		}
 	    }
-	    call mw_ctfree (cti)
-	    call mw_ctfree (cto)
+	    call smw_ctfree (cti)
+	    call smw_ctfree (cto)
 	    call smw_saveim (mwout, out)
-	    call mw_close (mwout)
+	    call smw_close (mwout)
 	}
+
+	# Save REFSPEC keywords if present.
+	call dc_refspec (out)
  
 	# Finish up.  Replace input by output if needed.
 	if (out == in) {
@@ -442,8 +506,8 @@ begin
 		next
 	    mw = smw_openim (im)
 	    iferr {
-		iferr (call dc_gms (im, mw, stp, ap, NULL)) {
-		    iferr (call dc_gec (im, mw, stp, ap, NULL)) {
+		iferr (call dc_gms (im, mw, stp, ap, NULL, NULL)) {
+		    iferr (call dc_gec (im, mw, stp, ap, NULL, NULL)) {
 			call sprintf (Memc[str], SZ_LINE,
 			    "%s: Dispersion data not found")
 			    call pargstr (Memc[input])
@@ -452,9 +516,9 @@ begin
 		}
  
 		do i = 1, IM_LEN(im,2) {
-		    w1 = W1(ap,i)
-		    w2 = W2(ap,i)
-		    dw = DW(ap,i)
+		    w1 = DC_W1(ap,i)
+		    w2 = DC_W2(ap,i)
+		    dw = DC_DW(ap,i)
 		    wmin = min (wmin, w1, w2)
 		    wmax = max (wmax, w1, w2)
 		    dwmin = min (dwmin, abs (dw))
@@ -463,16 +527,12 @@ begin
 		;
 
 	    call mfree (ap, TY_STRUCT)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 	}
 	call imtrew (in)
 
 	nwmax = (wmax - wmin) / dwmin + 1.5
-	if (log) {
-	    wmin = log10 (wmin)
-	    wmax = log10 (wmax)
-	}
  
 	# Enter the global entry in the first table entry.
 	tbl = Memi[table]
@@ -515,8 +575,8 @@ begin
 		next
 	    mw = smw_openim (im)
 	    iferr {
-		iferr (call dc_gms (im, mw, stp, ap, NULL)) {
-		    iferr (call dc_gec (im, mw, stp, ap, NULL)) {
+		iferr (call dc_gms (im, mw, stp, ap, NULL, NULL)) {
+		    iferr (call dc_gec (im, mw, stp, ap, NULL, NULL)) {
 			call sprintf (Memc[str], SZ_LINE,
 			    "%s: Dispersion data not found")
 			    call pargstr (Memc[input])
@@ -525,12 +585,12 @@ begin
 		}
  
 		do i = 1, IM_LEN(im,2) {
-		    call dc_getentry (false, AP(ap,i), table, naps, j)
+		    call dc_getentry (false, DC_AP(ap,i), table, naps, j)
 		    tbl = Memi[table+j]
      
-		    nw = NW(ap,i)
-		    w1 = W1(ap,i)
-		    w2 = W2(ap,i)
+		    nw = DC_NW(ap,i)
+		    w1 = DC_W1(ap,i)
+		    w2 = DC_W2(ap,i)
 		    TBL_WMIN(tbl) = min (TBL_WMIN(tbl), w1, w2)
 		    TBL_WMAX(tbl) = max (TBL_WMAX(tbl), w1, w2)
 		    TBL_NWMAX(tbl) = max (TBL_NWMAX(tbl), nw)
@@ -539,17 +599,13 @@ begin
 		;
 
 	    call mfree (ap, TY_STRUCT)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 	}
 	call imtrew (in)
  
 	do i = 0, naps {
 	    tbl = Memi[table+i]
-	    if (log) {
-		TBL_WMIN(tbl) = log10 (TBL_WMIN(tbl))
-		TBL_WMAX(tbl) = log10 (TBL_WMAX(tbl))
-	    }
 	    call dc_defaults (TBL_WMIN(tbl), TBL_WMAX(tbl), TBL_NWMAX(tbl),
 		TBL_W1(tbl), TBL_W2(tbl), TBL_DW(tbl), TBL_NW(tbl))
 	}
@@ -563,10 +619,10 @@ end
 # over all apertures and the minimum dispersion over all apertures.  The
 # user may then confirm and change the wavelength parameters if desired.
  
-procedure dc_wavelengths1 (im, mw, ap, output, log, table, naps, w1, w2, dw, nw)
+procedure dc_wavelengths1 (im, smw, ap, output, log, table, naps, w1, w2, dw,nw)
  
 pointer	im		# IMIO pointer
-pointer	mw		# MWCS pointer
+pointer	smw		# SMW pointer
 pointer	ap		# Aperture structure
 char	output[ARB]	# Output image name
 bool	log		# Logarithm wavelength parameters?
@@ -601,19 +657,15 @@ begin
 	    c = MAX_REAL
  
 	    do i = 1, IM_LEN(im,2) {
-		n = NW(ap,i)
-		y1 = W1(ap,i)
-		y2 = W2(ap,i)
-		dy = DW(ap,i)
+		n = DC_NW(ap,i)
+		y1 = DC_W1(ap,i)
+		y2 = DC_W2(ap,i)
+		dy = DC_DW(ap,i)
 		a = min (a, y1, y2)
 		b = max (b, y1, y2)
 		c = min (c, dy)
 	    }
 	    n = (b - a) / c + 1.5
-	    if (log) {
-		a = log10 (a)
-		b = log10 (b)
-	    }
 	}
  
 	call dc_defaults (a, b, n, w1t, w2t, dwt, nwt)
@@ -735,13 +787,9 @@ begin
 	# defaults based on the reference spectrum.
  
 	if (IS_INDEFD(w1t)||IS_INDEFD(w2t)||IS_INDEFD(dwt)||IS_INDEFI(nwt)) {
-	    a = W1(ap,line)
-	    b = W2(ap,line)
-	    n = NW(ap,line)
-	    if (log) {
-		a = log10 (a)
-		b = log10 (b)
-	    }
+	    a = DC_W1(ap,line)
+	    b = DC_W2(ap,line)
+	    n = DC_NW(ap,line)
 	}
  
 	call dc_defaults (a, b, n, w1t, w2t, dwt, nwt)
@@ -987,13 +1035,13 @@ begin
 	    return
 
 	for (i=2; i<=naps; i=i+1) {
-	    if (W1(ap,i) != W1(ap,1))
+	    if (DC_W1(ap,i) != DC_W1(ap,1))
 		break
-	    if (W2(ap,i) != W2(ap,1))
+	    if (DC_W2(ap,i) != DC_W2(ap,1))
 		break
-	    if (DW(ap,i) != DW(ap,1))
+	    if (DC_DW(ap,i) != DC_DW(ap,1))
 		break
-	    if (NW(ap,i) != NW(ap,1))
+	    if (DC_NW(ap,i) != DC_NW(ap,1))
 		break
 	}
 
@@ -1002,11 +1050,11 @@ begin
 		call fprintf (fd,
 		    "%s: ap = %d, w1 = %8g, w2 = %8g, dw = %8g, nw = %d")
 		    call pargstr (output)
-		    call pargi (AP(ap,i))
-		    call pargd (W1(ap,i))
-		    call pargd (W2(ap,i))
-		    call pargd (DW(ap,i))
-		    call pargi (NW(ap,i))
+		    call pargi (DC_AP(ap,i))
+		    call pargd (DC_W1(ap,i))
+		    call pargd (DC_W2(ap,i))
+		    call pargd (DC_DW(ap,i))
+		    call pargi (DC_NW(ap,i))
 		if (log) {
 		    call fprintf (fd, ", log = %b")
 			call pargb (log)
@@ -1017,10 +1065,10 @@ begin
 	    call fprintf (fd,
 		"%s: w1 = %8g, w2 = %8g, dw = %8g, nw = %d")
 		call pargstr (output)
-		call pargd (W1(ap,1))
-		call pargd (W2(ap,1))
-		call pargd (DW(ap,1))
-		call pargi (NW(ap,1))
+		call pargd (DC_W1(ap,1))
+		call pargd (DC_W2(ap,1))
+		call pargd (DC_DW(ap,1))
+		call pargi (DC_NW(ap,1))
 	    if (log) {
 		call fprintf (fd, ", log = %b")
 		    call pargb (log)
@@ -1028,4 +1076,53 @@ begin
 	    call fprintf (fd, "\n")
 	}
 	call flush (fd)
+end
+
+
+# DC_REFSPEC -- Save REFSPEC keywords in DCLOG keywords.
+
+procedure dc_refspec (im)
+
+pointer	im			#U IMIO pointer
+
+int	i, j, imaccf()
+pointer	sp, dckey, dcstr, refkey, refstr
+
+begin
+	call smark (sp)
+	call salloc (dckey, SZ_FNAME, TY_CHAR)
+	call salloc (dcstr, SZ_LINE, TY_CHAR)
+	call salloc (refkey, SZ_FNAME, TY_CHAR)
+	call salloc (refstr, SZ_LINE, TY_CHAR)
+
+	for (i=1;; i=i+1) {
+	    call sprintf (Memc[dckey], SZ_FNAME, "DCLOG%d")
+		call pargi (i)
+	    if (imaccf (im, Memc[dckey]) == NO)
+		break
+	}
+
+	do j = 1, 4 {
+	    if (j == 1)
+		call strcpy ("REFSPEC1", Memc[refkey], SZ_FNAME)
+	    else if (j == 2)
+		call strcpy ("REFSPEC2", Memc[refkey], SZ_FNAME)
+	    else if (j == 3)
+		call strcpy ("REFSHFT1", Memc[refkey], SZ_FNAME)
+	    else if (j == 4)
+		call strcpy ("REFSHFT2", Memc[refkey], SZ_FNAME)
+
+	    ifnoerr (call imgstr (im, Memc[refkey], Memc[refstr], SZ_LINE)) {
+		call sprintf (Memc[dckey], SZ_FNAME, "DCLOG%d")
+		    call pargi (i)
+		call sprintf (Memc[dcstr], SZ_LINE, "%s = %s")
+		    call pargstr (Memc[refkey])
+		    call pargstr (Memc[refstr])
+		call imastr (im, Memc[dckey], Memc[dcstr])
+		call imdelf (im, Memc[refkey])
+		i = i + 1
+	    }
+	}
+
+	call sfree (sp)
 end

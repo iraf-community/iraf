@@ -79,13 +79,13 @@ lo> imcopy pix3034x.i[1:800,*] phoenix
 .fi
 .ju
 
-2. The first line creates the IRAF image pix3034x.i which is readable
+The first line creates the IRAF image pix3034x.i which is readable
 by IRAF tasks, but has 1024 pixels per row. The real image only
 has 800 pixels per row, but we had to read it this way because of the
 way pixels are stored in IRAF images. So we IMCOPY the good part of
 the picture to the new IRAF image we call phoenix.
 
-To read the "snap" format pictures from the Compaq station:
+2. To read the "snap" format pictures from the Compaq station:
 
 .nj
 .nf

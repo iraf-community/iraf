@@ -21,7 +21,11 @@ include	"qpf.h"
 #
 # where param-name is the parameter name to be written to the output image
 # header, "integral" is the value to be computed, and attribute-name is the
-# QPEX attribute (e.g., "time") to be used for the computation.
+# QPEX attribute (e.g., "time") to be used for the computation.  A finite
+# value is returned for the integral if a range list is given for the named
+# attribute and the range is closed.  If the range is open on either or both
+# ends, or no range expression is defined for the attribute, then INDEF is
+# returned for the value of the integral.
 
 procedure qpf_wattr (qpf, im)
 
@@ -112,15 +116,19 @@ begin
 		else
 		    nranges = qpex_attrlr (ex, Memc[atname], xs, xe, xlen)
 
-		rsum = 0
-		do j = 1, nranges {
-		    r1 = Memr[xs+j-1]
-		    r2 = Memr[xe+j-1]
-		    if (IS_INDEFR(r1) || IS_INDEFR(r2)) {
-			rsum = INDEFR
-			break
-		    } else
-			rsum = rsum + (r2 - r1)
+		if (nranges <= 0)
+		    rsum = INDEFR
+		else {
+		    rsum = 0
+		    do j = 1, nranges {
+			r1 = Memr[xs+j-1]
+			r2 = Memr[xe+j-1]
+			if (IS_INDEFR(r1) || IS_INDEFR(r2)) {
+			    rsum = INDEFR
+			    break
+			} else
+			    rsum = rsum + (r2 - r1)
+		    }
 		}
 
 		call mfree (xs, TY_REAL)
@@ -133,15 +141,19 @@ begin
 		else
 		    nranges = qpex_attrld (ex, Memc[atname], xs, xe, xlen)
 
-		dsum = 0
-		do j = 1, nranges {
-		    d1 = Memd[xs+j-1]
-		    d2 = Memd[xe+j-1]
-		    if (IS_INDEFD(d1) || IS_INDEFD(d2)) {
-			dsum = INDEFD
-			break
-		    } else
-			dsum = dsum + (d2 - d1)
+		if (nranges <= 0)
+		    dsum = INDEFD
+		else {
+		    dsum = 0
+		    do j = 1, nranges {
+			d1 = Memd[xs+j-1]
+			d2 = Memd[xe+j-1]
+			if (IS_INDEFD(d1) || IS_INDEFD(d2)) {
+			    dsum = INDEFD
+			    break
+			} else
+			    dsum = dsum + (d2 - d1)
+		    }
 		}
 
 		call mfree (xs, TY_DOUBLE)
@@ -154,15 +166,19 @@ begin
 		else
 		    nranges = qpex_attrli (ex, Memc[atname], xs, xe, xlen)
 
-		isum = 0
-		do j = 1, nranges {
-		    i1 = Memi[xs+j-1]
-		    i2 = Memi[xe+j-1]
-		    if (IS_INDEFI(i1) || IS_INDEFI(i2)) {
-			isum = INDEFI
-			break
-		    } else
-			isum = isum + (i2 - i1)
+		if (nranges <= 0)
+		    isum = INDEFI
+		else {
+		    isum = 0
+		    do j = 1, nranges {
+			i1 = Memi[xs+j-1]
+			i2 = Memi[xe+j-1]
+			if (IS_INDEFI(i1) || IS_INDEFI(i2)) {
+			    isum = INDEFI
+			    break
+			} else
+			    isum = isum + (i2 - i1)
+		    }
 		}
 
 		call mfree (xs, TY_INT)

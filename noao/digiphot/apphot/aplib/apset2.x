@@ -166,12 +166,10 @@ begin
 	    AP_SKYSIGMA(nse) = rval
 	case EPADU:
 	    AP_EPADU(nse) = rval
-	case THRESHOLD:
-	    AP_THRESHOLD(nse) = rval
-	case CTHRESHOLD:
-	    AP_CTHRESHOLD(nse) = rval
 	case READNOISE:
 	    AP_READNOISE(nse) = rval
+	case THRESHOLD:
+	    AP_THRESHOLD(fnd) = rval
 	case RATIO:
 	    AP_RATIO(fnd) = rval
 	case THETA:

@@ -66,7 +66,7 @@ begin
 	    } else if (istable.text) {
 		txselect (inname, outname, ex)
 	    } else {
-		print ("ERROR: Cannot run SELECT on file: " // inname)
+		print ("ERROR: Cannot run PSELECT on file: " // inname)
 	    }
 	}
 

@@ -96,13 +96,18 @@ begin
 
 		# Calculate the ellipse parameters.
 		switch (IM_NDIM(im1)) {
+
 		case 1:
 		    kbilinear = NO
 		    radsym = YES
 		    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1, b1,
 		        c1, f1, nxk1, nyk1)
+
 		case 2:
 		    if (ratio < 1.0) {
+
+			# Determine whether the convolution can be bilinear
+			# and radially symmetric.
 			if (fp_equalr (ratio, 0.0)) {
 			    kbilinear = NO
 			    radsym = YES
@@ -114,17 +119,28 @@ begin
 			    kbilinear = NO
 			    radsym = NO
 			}
+
 			if (kbilinear == YES) {
-		    	    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1,
-			        b1, c1, f1, nxk1, nyk1)
-		    	    call cnv_ell_gauss (ratio * sigma, 0.0, 90.0,
-			        nsigma, a2, b2, c2, f2, nxk2, nyk2)
+			    if (fp_equalr (theta, 90.0)) {
+		    	        call cnv_ell_gauss (ratio * sigma, 0.0, 0.0,
+				    nsigma, a1, b1, c1, f1, nxk1, nyk1)
+		    	        call cnv_ell_gauss (sigma, 0.0, 90.0,
+			            nsigma, a2, b2, c2, f2, nxk2, nyk2)
+			    } else {
+		    	        call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma,
+				    a1, b1, c1, f1, nxk1, nyk1)
+		    	        call cnv_ell_gauss (ratio * sigma, 0.0, 90.0,
+			            nsigma, a2, b2, c2, f2, nxk2, nyk2)
+			    }
 			} else
 		            call cnv_ell_gauss (sigma, ratio, theta, nsigma,
 			        a1, b1, c1, f1, nxk1, nyk1)
+
 		    } else {
+
 			kbilinear = bilinear
 			radsym = YES
+
 			if (kbilinear == YES) {
 		    	    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1,
 			        b1, c1, f1, nxk1, nyk1)
@@ -134,6 +150,7 @@ begin
 		            call cnv_ell_gauss (sigma, ratio, theta, nsigma,
 			        a1, b1, c1, f1, nxk1, nyk1)
 		    }
+
 		default:
 		    call error (0,
 		   "T_GAUSS: Cannot convolve a 3D or higher dimensioned image.")

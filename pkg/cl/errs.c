@@ -11,8 +11,8 @@
 #define	import_varargs
 #include <iraf.h>
 
-#include "clmodes.h"
 #include "config.h"
+#include "clmodes.h"
 #include "operand.h"
 #include "param.h"
 #include "task.h"

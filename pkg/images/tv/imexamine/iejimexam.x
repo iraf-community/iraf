@@ -121,7 +121,7 @@ begin
 	    ptr = xs
 	    do i = 0, nx-1 {
 		if (abs (xc - x1 - i) > r) {
-		    Memr[ptr] = Memr[ys+i-1]
+		    Memr[ptr] = Memr[ys+i]
 		    ptr = ptr + 1
 		}
 	    }
@@ -185,7 +185,7 @@ begin
 	    call pargstr (IM_TITLE(im))
 
 	j = max (0, int (xc - x1 - rplot))
-	k = min (nx-1, int (xc - x1 + rplot))
+	k = min (nx-1, nint (xc - x1 + rplot))
 	if (axis == 1)
 	    call ie_graph (gp, mode, pp, Memc[title],
 		Memr[xs+j], Memr[ys+j], k-j+1, IE_XLABEL(ie), IE_XFORMAT(ie))

@@ -1,8 +1,7 @@
 include <imhdr.h>
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
-# DP_OTIME --  Fetch the time or epoch of the observation from the image
-# header.
+# DP_OTIME -- Read the epoch of the observation from the image header.
 
 procedure dp_otime (im, dao)
 

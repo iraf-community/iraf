@@ -5,7 +5,8 @@ include "../lib/fitpsf.h"
 
 # APSFCOLON -- Process the  fitpsf task colon commands.
 
-procedure apsfcolon (ap, im, cl, out, stid, ltid, cmdstr, newbuf, newfit)
+procedure apsfcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage, newbuf,
+	newfit)
 
 pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the iraf image
@@ -14,8 +15,9 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 int	ltid		# coord file sequence number
 char	cmdstr		# command string
-int	newbuf		# new psf buffer
-int	newfit		# new psf fit
+int	newimage	# new image ?
+int	newbuf		# new psf buffer ?
+int	newfit		# new psf fit ?
 
 int	junk
 pointer	sp, incmd, outcmd
@@ -38,8 +40,8 @@ begin
 	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PSFCMDS) != 0)
 	    call ap_fitcolon (ap, out, stid, cmdstr, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
-	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
-	        junk, junk, newbuf, newfit)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage,
+	        junk, junk, junk, junk, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
 	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
 	        junk, junk, newbuf, newfit)
@@ -118,11 +120,11 @@ begin
 		call printf ("%s = %g %s\n")
 		    call pargstr (KY_PSFAPERT)
 		    call pargr (2.0 * apstatr (ap, PSFAPERT))
-		    call pargstr (UN_PSFAPERT)
+		    call pargstr (UN_PSFSCALEUNIT)
 	    } else {
 		call apsetr (ap, PSFAPERT, rval / 2.0)
 		if (stid > 1)
-		    call ap_rparam (out, KY_PSFAPERT, rval, UN_PSFAPERT,
+		    call ap_rparam (out, KY_PSFAPERT, rval, UN_PSFSCALEUNIT,
 			"fitting box width")
 		newbuf = YES
 		newfit = YES
@@ -133,11 +135,11 @@ begin
 		call printf ("%s = %g %s\n")
 		    call pargstr (KY_PK2)
 		    call pargr (apstatr (ap, PK2))
-		    call pargstr (UN_PK2)
+		    call pargstr (UN_PSFSIGMA)
 	    } else {
 		call apsetr (ap, PK2, rval)
 		if (stid > 1)
-		    call ap_rparam (out, KY_PK2, rval, UN_PK2,
+		    call ap_rparam (out, KY_PK2, rval, UN_PSFSIGMA,
 			"k-sigma rejection criterion")
 		newfit = YES
 	    }
@@ -150,7 +152,7 @@ begin
 	    } else {
 		call apseti (ap, PMAXITER, ival)
 		if (stid > 1)
-		    call ap_iparam (out, KY_PMAXITER, ival, UN_PMAXITER,
+		    call ap_iparam (out, KY_PMAXITER, ival, UN_PSFNUMBER,
 			"maximum number of iterations")
 		newfit = YES
 	    }
@@ -163,7 +165,7 @@ begin
 	    } else {
 		call apseti (ap, PNREJECT, ival)
 		if (stid > 1)
-		    call ap_iparam (out, KY_PNREJECT, ival, UN_PNREJECT,
+		    call ap_iparam (out, KY_PNREJECT, ival, UN_PSFNUMBER,
 			"maximum number of rejection cycles")
 		newfit = YES
 	    }
@@ -203,8 +205,10 @@ begin
 
 	call sscan (cmdstr)
 	    call gargwrd (Memc[cmd], SZ_LINE)
-	if (Memc[cmd] == EOS)
+	if (Memc[cmd] == EOS) {
+	    call sfree (sp)
 	    return
+	}
 
 	# Process the command.
 	ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE, MISC1)

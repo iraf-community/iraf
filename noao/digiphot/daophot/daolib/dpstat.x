@@ -1,7 +1,7 @@
-include	"../lib/daophot.h"
 include	"../lib/daophotdef.h"
+include "../lib/apseldef.h"
 
-# DP_STATS -- Procedure to set an daophot string parameter.
+# DP_STATS -- Fetch a daophot string parameter.
 
 procedure dp_stats (dao, param, str, maxch)
 
@@ -12,28 +12,20 @@ int	maxch		# maximum number of characters
 
 begin
 	switch (param) {
-	case IMNAME:
-	    call strcpy (DP_IMNAME(dao), str, maxch)
+	case INIMAGE:
+	    call strcpy (DP_INIMAGE(dao), str, maxch)
+	case INPHOTFILE:
+	    call strcpy (DP_INPHOTFILE(dao), str, maxch)
+	case COORDS:
+	    call strcpy (DP_COORDS(dao), str, maxch)
 	case PSFIMAGE:
 	    call strcpy (DP_PSFIMAGE(dao), str, maxch)
-	case SUBIMAGE:
-	    call strcpy (DP_SUBIMAGE(dao), str, maxch)
-	case ADDIMAGE:
-	    call strcpy (DP_ADDIMAGE(dao), str, maxch)
-	case ADDFILE:
-	    call strcpy (DP_ADDFILE(dao), str, maxch)
-	case APFILE:
-	    call strcpy (DP_APFILE(dao), str, maxch)
-	case GRPSFFILE:
-	    call strcpy (DP_GRPSFFILE(dao), str, maxch)
-	case GRPFILE:
-	    call strcpy (DP_GRPFILE(dao), str, maxch)
-	case PKFILE:
-	    call strcpy (DP_PKFILE(dao), str, maxch)
-	case NSTARFILE:
-	    call strcpy (DP_NSTARFILE(dao), str, maxch)
-	case ALLSTARFILE:
-	    call strcpy (DP_ASTARFILE(dao), str, maxch)
+	case OUTPHOTFILE:
+	    call strcpy (DP_OUTPHOTFILE(dao), str, maxch)
+	case OUTIMAGE:
+	    call strcpy (DP_OUTIMAGE(dao), str, maxch)
+	case OUTREJFILE:
+	    call strcpy (DP_OUTREJFILE(dao), str, maxch)
 	case IFILTER:
 	    call strcpy (DP_IFILTER(dao), str, maxch)
 	case OTIME:
@@ -50,20 +42,28 @@ begin
 	    call strcpy (DP_FILTER(dao), str, maxch)
 	case AIRMASS:
 	    call strcpy (DP_AIRMASS(dao), str, maxch)
+	case FUNCTION:
+	    call strcpy (DP_FUNCTION(dao), str, maxch)
+	case FUNCLIST:
+	    call strcpy (DP_FUNCLIST(dao), str, maxch)
 	default:
 	    call error (0, "DP_STATS: Unknown daophot string parameter")
 	}
 end
 
 
-# DP_STATI -- Procedure to set an integer daophot parameter.
+# DP_STATI -- Fetch a daophot integer parameter.
 
 int procedure dp_stati (dao, param)
 
 pointer	dao		# pointer to daophot structure
 int	param		# parameter
 
+pointer	apsel
+
 begin
+	apsel = DP_APSEL(dao)
+
 	switch (param) {
 	case MAXITER:
 	    return (DP_MAXITER(dao))
@@ -71,23 +71,35 @@ begin
 	    return (DP_VERBOSE(dao))
 	case TEXT:
 	    return (DP_TEXT(dao))
-	case MAXSTAR:
-	    return (DP_MAXSTAR(dao))
+	case MAXNSTAR:
+	    return (DP_MAXNSTAR(dao))
 	case MAXGROUP:
 	    return (DP_MAXGROUP(dao))
 	case CLIPEXP:
 	    return (DP_CLIPEXP(dao))
 	case RECENTER:
 	    return (DP_RECENTER(dao))
-	case VARPSF:
-	    return (DP_VARPSF(dao))
+	case FITSKY:
+	    return (DP_FITSKY(dao))
+	case GROUPSKY:
+	    return (DP_GROUPSKY(dao))
+	case VARORDER:
+	    return (DP_VARORDER(dao))
+	case FEXPAND:
+	    return (DP_FEXPAND(dao))
+	case SATURATED:
+	    return (DP_SATURATED(dao))
+	case NCLEAN:
+	    return (DP_NCLEAN(dao))
+	case APNUM:
+	    return (DP_APNUM(apsel))
 	default:
 	    call error (0, "DP_STATI: Unknown integer daophot parameter")
 	}
 end
 
 
-# DP_STATR -- Procedure to set a real daophot parameter.
+# DP_STATR -- Fetch a daophot real parameter.
 
 real procedure dp_statr (dao, param)
 
@@ -98,14 +110,18 @@ begin
 	switch (param) {
 	case SCALE:
 	    return (DP_SCALE(dao))
+	case FWHMPSF:
+	    return (DP_FWHMPSF(dao))
+	case SFWHMPSF:
+	    return (DP_SFWHMPSF(dao))
 	case MAXGDATA:
 	    return (DP_MAXGDATA(dao))
 	case MINGDATA:
 	    return (DP_MINGDATA(dao))
-	case READ_NOISE:
-	    return (DP_READ_NOISE(dao))
-	case PHOT_ADC:
-	    return (DP_PHOT_ADC(dao))
+	case READNOISE:
+	    return (DP_READNOISE(dao))
+	case PHOTADU:
+	    return (DP_PHOTADU(dao))
 	case RPSFRAD:
 	    return (DP_RPSFRAD(dao))
 	case SPSFRAD:
@@ -120,15 +136,31 @@ begin
 	    return (DP_SMATCHRAD(dao))
 	case MATCHRAD:
 	    return (DP_MATCHRAD(dao))
-	case CRITOVLAP:
-	    return (DP_CRITOVLAP(dao))
+	case SANNULUS:
+	    return (DP_SANNULUS(dao))
+	case ANNULUS:
+	    return (DP_ANNULUS(dao))
+	case SDANNULUS:
+	    return (DP_SDANNULUS(dao))
+	case DANNULUS:
+	    return (DP_DANNULUS(dao))
+	case CRITSNRATIO:
+	    return (DP_CRITSNRATIO(dao))
 	case CLIPRANGE:
 	    return (DP_CLIPRANGE(dao))
 	case XAIRMASS:
 	    return (DP_XAIRMASS(dao))
 	case ITIME:
 	    return (DP_ITIME(dao))
+	case FLATERR:
+	    return (DP_FLATERR(dao))
+	case PROFERR:
+	    return (DP_PROFERR(dao))
+	case SMERGERAD:
+	    return (DP_SMERGERAD(dao))
+	case MERGERAD:
+	    return (DP_MERGERAD(dao))
 	default:
-	    call error (0, "DP_SETR: Unknown real daophot parameter")
+	    call error (0, "DP_STATR: Unknown real daophot parameter")
 	}
 end

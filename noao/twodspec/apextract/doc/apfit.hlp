@@ -77,16 +77,9 @@ The starting dispersion line (line or column perpendicular to the dispersion
 axis) for the tracing.  A value of INDEF starts at the middle of the image.
 .le
 .ls nsum = 1
-Number of dispersion lines to be summed at each step along the dispersion.
-.le
-
-.ls line = INDEF, nsum = 1
-The dispersion line (line or column perpendicular to the dispersion
-axis) and number of adjacent lines (half before and half after unless
-at the end of the image) used in finding, recentering, resizing,
-and editing operations.  For tracing this is the starting line and
-the same number of lines are summed at each tracing point.  A line of
-INDEF selects the middle of the image along the dispersion axis.
+Number of dispersion lines to be summed or medianed at each step along
+the dispersion.  For tracing only summing is done and the sign is
+ignored.
 .le
 
 .ls threshold = 10.

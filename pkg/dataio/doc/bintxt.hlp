@@ -18,8 +18,11 @@ be concatenated onto the output file name.
 Print messages of actions performed?
 .le
 .ih
-EXAMPLE
-Convert a binary file on disk to a text file on disk.
+EXAMPLES
+1. Convert a binary file on disk to a text file on disk.
 
 	cl> bintxt binary_file text_file
+.ih
+SEE ALSO
+txtbin
 .endhelp

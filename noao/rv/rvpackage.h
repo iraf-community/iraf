@@ -94,11 +94,10 @@ define	RV_GRFD		Memi[$1+78]	# Metacode file FD
 define	RV_VBFD		Memi[$1+79]	# Verbose logfile FD
 define	RV_CCFFILE	Memi[$1+80]	# Output ccf File
 define	RV_CCFTYPE	Memi[$1+81]	# Output ccf Type (image|text)
-define	RV_AXIS		Memi[$1+82]	# Output ccf X-axis type
-define	RV_STATLINE	Memi[$1+83]	# Status line output flag
-define	RV_TEMPCODE	Memi[$1+84]	# Template code on output
-define	RV_TCODE	Memi[$1+85]	# Template code array ptr
-define	RV_PRINTZ	Memi[$1+86]	# Output z values instead of velocities
+define	RV_STATLINE	Memi[$1+82]	# Status line output flag
+define	RV_TEMPCODE	Memi[$1+83]	# Template code on output
+define	RV_TCODE	Memi[$1+84]	# Template code array ptr
+define	RV_PRINTZ	Memi[$1+85]	# Output z values instead of velocities
 
 # Plotting Miscellaneous values
 define	RV_DTYPE	Memi[$1+90]	# Data type
@@ -132,7 +131,7 @@ define	RV_OWPC		Memr[$1+115]	# Object WPC
 define	RV_RW0		Memr[$1+116]	# Reference W0
 define	RV_RW2		Memr[$1+117]	# Template endpoint of dispersion
 define	RV_RWPC		Memr[$1+118]	# Reference WPC
-define	RV_W0_SHIFT	Memr[$1+119]	# Initial w0 shift before rebinning
+define	RV_DO_REBIN	Memi[$1+119]	# Rebin the data?
 
 # The answers
 define	RV_VOBS		Memd[P2D($1+120)]  # Observed velocity (vel)
@@ -189,6 +188,10 @@ define	RV_DEVICE	Memi[$1+173]	   # Output device name
 define	RV_OBJNAME	Memi[$1+174]	   # Object Name
 define	RV_TEMPNAME	Memi[$1+175]	   # Template Name
 
+# Output color values.
+define	RV_TXTCOLOR	Memi[$1+176]	   # Text color
+define	RV_LINECOLOR	Memi[$1+177]	   # Overplot line colors
+
 # Package Debugging info. (To be deleted in installed software.)
 define	DBG_DEBUG	Memi[$1+180]	   # Debug flag
 define	DBG_FNAME	Memi[$1+181]	   # Debug filename (ptr)
@@ -197,6 +200,7 @@ define	DBG_LEVEL	Memi[$1+183]	   # Level of debugging info
 define 	DBG_OTHER	Memi[$1+184]	   # Compare algorithms?
 define 	DBG_KEYSTROKE	Memi[$1+185]	   # Intial keystroke command
 define 	DBG_QUICK	Memi[$1+186]	   # Speed up graphics?
+
 
 ###################  End of structure definitions ##############################
 

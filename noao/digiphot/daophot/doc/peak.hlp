@@ -1,17 +1,18 @@
-.help peak Aug91 noao.digiphot.daophot
+.help peak Dec92 noao.digiphot.daophot
 .ih
 NAME
 peak -- fit the PSF to single stars
 .ih
 USAGE
-peak image photfile psfimage peakfile
+peak image photfile psfimage peakfile rejfile
 .ih
 PARAMETERS
 .ls image
 The list of images containing the stars to be fit.
 .le
 .ls photfile
-The list of input files, or the directory, containing initial estimates of
+The list of input photometry files, or the directory, containing
+initial estimates of
 the positions and magnitudes of the stars to be fit.
 If photfile is "default", "dir$default", or a directory specification,
 then PEAK will look for a file with the name image.mag.?, 
@@ -40,6 +41,20 @@ must specify one output file for each image in \fIimage\fR.
 \fIPeakfile\fR is a text database if the DAOPHOT package parameter
 \fItext\fR is "yes", an STSDAS table database if it is "no".
 .le
+.ls rejfile
+The list of output rejected photometry files.
+If \fIrejfile\fR is null (""), results for all the stars in \fIphotfile\fR
+are written to \fIpeakfile\fR, otherwise only the stars which were
+successfully fit are written to \fIpeakfile\fR and the remainder
+are written to \fIrejfile\fR.
+If \fIrejfile\fR is "default", "dir$default", or a directory specification
+then PEAK will write an output file with the name image.prj.?
+where ? is the next available version number.
+Otherwise \fIrejfile\fR must specify one output photometry file
+for every image in \fIimage\fR.
+\fIRejfile\fR is a text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+.le
 .ls datapars = ""
 The name of the file containing the DAOPHOT data dependent parameters.
 If \fIdatapars\fR is null ("") then the default parameter set in the user's
@@ -50,29 +65,57 @@ The name of the file containing the DAPHOT fitting parameters.
 If \fIdaopars\fR is null ("") then the default parameter set in the user's
 uparm directory is used.
 .le
-.ls verbose = no
+.ls verbose = ")_.verbose"
 Print messages about the progress of the task?
+\fIVerbose\fR may be set to the value of the daophot package parameter
+(the default), "yes", or "no".
 .le
 .ls verify = yes
 Verify critical PEAK task parameters?
+\fIVerify\fR may be set to the value of the daophot package parameter
+(the default), "yes", or "no".
 .le
 .ls update = no
 Update critical PEAK task parameters if \fIverify\fR = "yes"?
+\fIUpdate\fR may be set to the value of the daophot package parameter
+(the default), "yes", or "no".
 .le
 .ih
 DESCRIPTION
-PEAK computes x and y centers and magnitudes for all the stars in
+PEAK computes x and y centers, sky values  and magnitudes for all the stars in
 \fIphotfile\fR by fitting the PSF in \fIpsfimage\fR to single stars in
 \fIimage\fR. PEAK reads initial estimates of the centers and magnitudes
 along with the sky values from the photometry file \fIphotfile\fR.
 \fIPhotfile\fR is usually the output of the DAOPHOT PHOT task but
 may also be the output of PEAK itself, NSTAR, ALLSTAR, GROUP or
-PSF. The computed centers and magnitudes are written to \fIpeakfile\fR
-along with the sky values, the number of iterations it took to fit the
+PSF. The computed centers, sky values, and magnitudes are written
+to \fIpeakfile\fR
+along with the number of iterations it took to fit the
 star, the goodness of fit statistic chi, and the image sharpness statistic
 sharp.
-\fIPeakfile\fR is a text database if the DAOPHOT package parameter \fItext\fR
-is "yes", an STSDAS table database if it is "no".
+If \fIrejfile\fR is not null (""), only stars that are successfully fit
+are written to \fIpeakfile\fR, and the remainder are written to
+\fIrejfile\fR. Otherwise all the stars are written to \fIpeakfile\fR.
+\fIPeakfile\fR and \fIrejfile\fR are text databases if the DAOPHOT package
+parameter \fItext\fR is "yes", an STSDAS table database if it is "no".
+
+By default PEAK computes new centers for all the stars
+in \fIphotfile\fR. However if the DAOPARS parameter \fIrecenter\fR
+is "no", PEAK assumes that the x and y centers in \fIphotfile\fR
+are the true centers and does not refit them. This option can be quite useful
+in cases
+where accurate center values have been derived from an image that has been
+through some non-linear image restoration algorithm, but the photometry
+must be derived from the original unrestored image.
+
+By default PEAK uses the sky value in \fIphotfile\fR.
+However if the DAOPARS parameter \fIfitsky\fR is "yes", then PEAK
+computes a new sky value as part of the non-linear least-squares
+fit.  Recomputing the
+sky can significantly reduce the scatter in the magnitudes in regions
+where the sky background is varying rapidly, but users may need to increase
+\fIfitrad\fR to include more sky pixels in the fit. Users should experiment
+cautiously with this option.
 
 Only pixels within the good data range delimited by the DATAPARS task
 parameters \fIdatamin\fR and \fIdatamax\fR are included in the fit.
@@ -131,7 +174,7 @@ number of iteration permitted is specified by the
 \fImaxiter\fR parameter in the DAOPARS task.
 Obviously the results for stars which
 have reached the maximum iteration count should be viewed with 
-suspicion. However since the convergenge criteria are quite strict,
+suspicion. However since the convergence criteria are quite strict,
 (the computed magnitude must change  by less than .001 magnitudes or
 0.05 sigma whichever is larger and the x and y centroids must change
 by less than 0.01 pixels from one iteration to the next), even
@@ -155,7 +198,7 @@ for blended doubles and partially resolved galaxies, and large
 negative values for cosmic rays and blemishes.
 
 Because PEAK cannot fit stars in crowded fields with overlapped images
-like NSTAR task does, and for sparsely populated frames aperture photometry
+like the NSTAR and ALLSTAR  tasks do, and for sparsely populated frames aperture photometry
 produced by PHOT is often just
 as good and faster to compute, PEAK has few unique functions.
 PEAK is often useful however for fitting and removing single stars in images
@@ -166,6 +209,42 @@ is the removal of stars from sparsely populated sky flats in preparation
 for smoothing.
 
 .ih
+OUTPUT
+
+If \fIverbose\fR = yes, a single line is output to the terminal for
+each star fit or rejected. Full output is written to \fIallstarfile\fR
+and \fIrejfile\fR. At the beginning of these two files a header listing
+the current values of the parameters is written. For each star fit/rejected
+the following quantities are written to the output file.
+
+.nf
+	id  xcenter  ycenter  mag  merr  msky  niter  sharpness  chi
+	    pier  perr
+.fi
+
+Id is the id number of the star. Xcenter and ycenter are the fitted 
+coordinates in pixels. Mag and merr are the fitted magnitude and magnitude
+error respectively. Msky is the individual sky value for the star. Niter
+is the number of iterations it took to fit the star and sharpness and
+chi are the sharpness and goodness of fit statistic respectively.
+Pier and perror are the photometry error code and accompanying error
+message respectively.
+
+.ih
+ERRORS
+
+If no errors occur during the fitting process then pier is 0. Non-zero
+values of pier flag the following error conditions.
+
+.nf
+	0		# No error
+	1		# The sky is undefined
+	2		# There are too few good pixels to fit the star
+	3		# The fit is singular
+	4		# The star is too faint
+.fi
+
+.ih
 EXAMPLES
 
 1. Fit the PSF to a list of single stars which are interfering with the
@@ -173,16 +252,17 @@ image of the galaxy M87. After the fit subtract the fitted stars from
 the image.
 
 .nf
-    da> peak m87 m87.mag.1 m87.psf.1 default verb+ veri+
+    da> peak m87 m87.mag.1 m87.psf.1 default default verb+ veri+
     da> substar m87 m87.pk.1 m87.psf.1 default veri-
 .fi
 
 2. Run peak exactly as in example 1 but submit the task to the background
 saving all the verbose output in a file called peak.out. Remember to turn
-off the verify switch.
+off the verify switch. Note that in this example the user has decided
+to put the fitted and rejected stars in the same file.
 
 .nf
-    da> peak m87 m87.mag.1 m87.psf.1 default verb+ veri- > peak.out & 
+    da> peak m87 m87.mag.1 m87.psf.1 default "" verb+ veri- > peak.out & 
 .fi
 
 .ih

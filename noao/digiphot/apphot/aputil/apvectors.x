@@ -27,6 +27,32 @@ begin
 end
 
 
+# AP_SBOXR -- Boxcar smooth for a vector that has not been boundary
+# extended.
+
+procedure ap_sboxr (in, out, npix, nsmooth)
+
+real	in[npix]		# input array 
+real	out[npix]		# output array
+int	npix			# number of pixels
+int	nsmooth			# half width of smoothing box
+
+int	i, j, ib, ie, ns
+real	sum
+
+begin
+	ns = 2 * nsmooth + 1
+	do i = 1, npix {
+	    ib = max (i - nsmooth, 1)
+	    ie = min (i + nsmooth, npix)
+	    sum = 0.0
+	    do j = ib, ie
+	        sum = sum + in[j]
+	    out[i] = sum / ns
+	}
+end
+
+
 # AP_ALIMR -- Compute the maximum and minimum data values and indices of a
 # 1D array.
 
@@ -55,6 +81,49 @@ begin
 		mindat = data[i]
 	    }
 	}
+end
+
+
+# AP_IALIMR -- Compute the maximum and minimum data values of a 1D indexed
+# array
+
+procedure ap_ialimr (data, index, npts, mindat, maxdat)
+
+real	data[npts]	# data array
+int	index[npts]	# index array
+int	npts		# number of points
+real	mindat, maxdat	# min and max data value
+
+int	i
+
+begin
+	mindat = data[index[1]]
+	maxdat = data[index[1]]
+	do i = 2, npts {
+	    if (data[index[i]] > maxdat)
+		maxdat = data[index[i]]
+	    if (data[index[i]] < mindat)
+		mindat = data[index[i]]
+	}
+end
+
+
+# AP_ASUMR - Compute the sum of an index sorted array
+
+real procedure ap_asumr (data, index, npts)
+
+real	data[npts]	# data array
+int	index[npts]	# index array
+int	npts		# number of points
+
+double	sum
+int	i
+
+begin
+	sum = 0.0d0
+	do i = 1, npts
+	    sum = sum + data[index[i]]
+	return (real (sum))
 end
 
 
@@ -110,6 +179,43 @@ begin
 		next
 	    }
 	    bin = int ((data[i] - z1) * dz) + 1
+	    hgm[bin] = hgm[bin] + 1.0
+	}
+
+	return (nreject)
+end
+
+
+# APHIGMR -- Accumulate the histogram of the input vector.  The output vector
+# hgm (the histogram) should be cleared prior to the first call. The procedure
+# returns the number of data values it could not include in the histogram.
+
+int procedure aphigmr (data, wgt, index, npix, hgm, nbins, z1, z2)
+
+real 	data[ARB]		# data vector
+real	wgt[ARB]		# weights vector
+int	index[ARB]		# index vector
+int	npix			# number of pixels
+real	hgm[ARB]		# output histogram
+int	nbins			# number of bins in histogram
+real	z1, z2			# greyscale values of first and last bins
+
+real	dz
+int	bin, i, nreject
+
+begin
+	if (nbins < 2)
+	    return (0)
+
+	nreject = 0
+	dz = real (nbins - 1) / real (z2 - z1)
+	do i = 1, npix {
+	    if (data[index[i]] < z1 || data[index[i]] > z2) {
+		nreject = nreject + 1
+		wgt[index[i]] = 0.0
+		next
+	    }
+	    bin = int ((data[index[i]] - z1) * dz) + 1
 	    hgm[bin] = hgm[bin] + 1.0
 	}
 
@@ -352,9 +458,10 @@ end
 # distance value. The integer coordinate is equal to coord = (i - xc + 1) +
 # blklen * (j - yc).
 
-procedure ap_xytor (coords, r, nskypix, xc, yc, blklen)
+procedure ap_xytor (coords, index, r, nskypix, xc, yc, blklen)
 
 int	coords[ARB]		# coordinate array
+int	index[ARB]		# the index array
 real	r[ARB]			# radial coordinates
 int	nskypix			# number of sky pixels
 real	xc, yc			# center of sky subraster
@@ -364,10 +471,44 @@ int	i, x, y
 
 begin
 	do i = 1, nskypix {
-	    x = real (mod (coords[i], blklen))
+	    x = real (mod (coords[index[i]], blklen))
 	    if (x == 0)
 		x = blklen
-	    y = (coords[i] - x) / blklen + 1 
+	    y = (coords[index[i]] - x) / blklen + 1 
 	    r[i] = sqrt ((x - xc) ** 2 + (y - yc) ** 2)
 	}
+end
+
+
+# AP_W1SUR -- Linearly combine two vectors where the weight for the first
+# vectors is 1.0 and is k2 for the second vector
+
+procedure ap_w1sur (a, b, c, npts, k2)
+
+real	a[ARB]		# the first input vector
+real	b[ARB]		# the second input vector
+real	c[ARB]		# the output vector
+int	npts		# number of points
+real	k2		# the weigting factor for the second vector
+
+int	i
+
+begin
+	do i = 1, npts
+	    c[i] = a[i] + k2 * b[i]
+end
+
+
+# AP_INDEX -- Define an index array.
+
+procedure ap_index (index, npix)
+
+int	index[ARB]		# the index array
+int	npix			# the number of pixels
+
+int	i
+
+begin
+	do i = 1, npix
+	    index[i] = i
 end

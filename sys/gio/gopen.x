@@ -7,19 +7,21 @@ include	<gset.h>
 include	<gki.h>
 include	<gio.h>
 
-# GOPEN -- Open a graphics stream for output to the named device on file FD.
+# GOPENUI -- Open a graphics stream for output to the named device on file FD.
 # If a logical device name is given the actual device name is fetched from the
-# environment.  The device parameters are then retrieved from the graphcap
-# entry for the device.  GIO is initialized, and if the device is being opened
-# in APPEND mode, the WCS set when the device was last read are retrieved from
-# the CL (if output is to a standard stream) or from the WCS savefile for the
-# device.
+# environment.   If a UI file is specified the named user interface definition
+# file is downloaded to the graphics server.  The device parameters are then
+# retrieved from the graphcap entry for the device.  GIO is initialized, and
+# if the device is being opened in APPEND mode, the WCS set when the device
+# was last read are retrieved from the CL (if output is to a standard stream)
+# or from the WCS savefile for the device.
 
-pointer procedure gopen (device, mode, fd)
+pointer procedure gopenui (device, mode, uifname, fd)
 
-char	device[ARB]		# logical or physical device name
-int	mode			# access mode: NEW_FILE or APPEND
-int	fd			# metacode output file
+char	device[ARB]		#I logical or physical device name
+int	mode			#I access mode: NEW_FILE or APPEND
+char	uifname[ARB]		#I user interface specification file
+int	fd			#I metacode output file
 
 pointer	gp, tty
 int	outfd, stream_type, junk
@@ -146,6 +148,7 @@ begin
 	call greset (gp, GR_RESETALL)
 	call gki_init (outfd)
 	call strcpy (Memc[devname], GP_DEVNAME(gp), SZ_DEVNAME)
+	call strcpy (uifname, GP_UIFNAME(gp), SZ_UIFNAME)
 
 	# Set up info for GEXFLS, called by CLGCUR to flush the graphics
 	# output prior to a cursor read.
@@ -165,4 +168,20 @@ begin
 
 	call sfree (sp)
 	return (gp)
+end
+
+
+# GOPEN -- Open a graphics stream for output to the named device on file FD.
+# Identical to GOPENUI except that the default UI is used.
+
+pointer procedure gopen (device, mode, fd)
+
+char	device[ARB]		#I logical or physical device name
+int	mode			#I access mode: NEW_FILE or APPEND
+int	fd			#I metacode output file
+
+pointer	gopenui()
+
+begin
+	return (gopenui (device, mode, "", fd))
 end

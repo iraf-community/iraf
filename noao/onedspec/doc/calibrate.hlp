@@ -1,4 +1,4 @@
-.help calibrate Mar92 noao.onedspec
+.help calibrate Mar93 noao.onedspec
 .ih
 NAME
 calibrate -- Apply extinction corrections and flux calibrations
@@ -54,10 +54,12 @@ additional information.
 .ls ignoreaps = no
 Ignore aperture numbers and apply a single flux calibration to all
 apertures?  Normally multiaperture instruments have separate sensitivity
-functions for each aperture.  The sensitivity spectra are obtained by
-adding the aperture number as an extension to the sensitivity spectrum
-root name.  When apertures are ignored the specified sensitivity spectrum
-name is used without adding an extension and applied to all input apertures.
+functions for each aperture while long slit or Fabry-Perot data use a
+single sensitivity function where the apertures are to be ignored.  The
+sensitivity spectra are obtained by adding the aperture number as an
+extension to the sensitivity spectrum root name.  When apertures are
+ignored the specified sensitivity spectrum name is used without adding an
+extension and applied to all input apertures.
 .le
 .ls sensitivity = "sens"
 The root name for the sensitivity spectra produced by \fBsensfunc\fR.
@@ -71,6 +73,12 @@ appended automatically.
 The default calibration is into units of flux per unit wavelength (F-lambda).
 If \fIfnu\fR = yes then the calibrated spectrum will be in units of
 flux per unit frequency (F-nu).
+.le
+.ls airmass, exptime
+If the airmass and exposure time are not in the header nor can they be
+determined from other keywords in the header then these query parameters
+are used to request the airmass and exposure time.  The values are updated
+in the input and output images.
 .le
 .ih
 DESCRIPTION
@@ -107,6 +115,12 @@ made and adjustment to the middle of the exposure.  The task
 an effective air mass.  Running this task before calibration is
 recommended.
 
+If the airmass is not in the header and cannot be computed then
+the user is queried for a value.  The value entered is then
+recorded in both the input and output image headers.  Also if
+the exposure time is not found then it is also queried and
+recorded in the image headers.
+
 The extinction correction is given by the factor
 
 		10. ** (0.4 * airmass * extinction)
@@ -141,8 +155,23 @@ the calibrated spectra:
 2.  To only extinction correct echelle spectra:
 
 	cl> calibrate ccd*.ec.imh new//ccd*.ec.imh flux-
+
+3. To flux calibrate a long slit spectrum:
+
+.nf
+	cl> dispaxis = 2
+	cl> calibrate obj.imh fcobj.imh
+.fi
 .ih
 REVISIONS
+.ls CALIBRATE V2.10.3
+This task was revised to operate on 2D and 3D spatial spectra; i.e. long
+slit and Fabry-Perot data cubes.  This task now includes the functionality
+previously found in \fBlongslit.extinction\fR and \fBlongslit.fluxcalib\fR.
+
+A query for the airmass and exposure time is now made if the information
+is not in the header and cannot be computed from other header keywords.
+.le
 .ls CALIBRATE V2.10
 This task was revised to operate on nonlinear dispersion corrected spectra
 and 3D images (the \fBapextract\fR "extras").  The aperture selection

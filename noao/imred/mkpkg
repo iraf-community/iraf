@@ -9,6 +9,8 @@ update:
 	$call update@dtoi
 	$echo "------------------ IMRED.GENERIC -------------------"
 	$call update@generic
+	$echo "------------------ IMRED.IRRED ---------------------"
+	$call update@irred
 	$echo "------------------ IMRED.VTEL ----------------------"
 	$call update@vtel
 	;

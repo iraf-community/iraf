@@ -146,6 +146,9 @@ begin
 	    }
 	    n[i] = n1
 	}
+
+	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
+		dflag = D_MIX
 end
 
 # IC_MM --  Reject a specified number of high and low pixels
@@ -291,6 +294,9 @@ begin
 	    }
 	    n[i] = n1
 	}
+
+	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
+		dflag = D_MIX
 end
 
 # IC_MM --  Reject a specified number of high and low pixels
@@ -436,6 +442,9 @@ begin
 	    }
 	    n[i] = n1
 	}
+
+	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
+		dflag = D_MIX
 end
 
 # IC_MM --  Reject a specified number of high and low pixels
@@ -581,5 +590,8 @@ begin
 	    }
 	    n[i] = n1
 	}
+
+	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
+		dflag = D_MIX
 end
 

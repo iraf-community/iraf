@@ -4,13 +4,12 @@ include	<ctype.h>
 
 # SORT -- Sort a text file, alphabetically or numerically, in forward or
 # reverse order, by line or by the contents of any column.  Derived from
-# Chap. 4 of Software Tools.  THIS IS AN OLD FILE THAT HAS NOT YET BEEN
-# CLEANED UP -- please do not look to close!!
+# Chap. 4 of Software Tools.  This is old code, not very pretty.
 
 define	MERGEORDER	8
-define	MAXPTR		4096
-define	SZ_LINBUF	20000
-define	LOGPTR		15
+define	MAXPTR		20000
+define	SZ_LINBUF	200000
+define	LOGPTR		32
 define	swap		{temp=$1;$1=$2;$2=temp}
 
 

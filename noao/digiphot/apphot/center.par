@@ -1,18 +1,18 @@
 # CENTER
 
 image,f,a,,,,Input image
+coords,f,h,"",,,Coordinate list
+output,f,h,"default",,,Results file
+plotfile,s,h,"",,,Output plot metacode file
 datapars,pset,h,"",,,Data dependent parameters
 centerpars,pset,h,"",,,Centering parameters
-coords,f,h,"",,,Coordinate list
-output,f,h,"default",,,Results
-plotfile,s,h,"",,,Plot metacode file
-graphics,s,h,"stdgraph",,,Graphics device
-display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 interactive,b,h,yes,,,Mode of use
+radplots,b,h,no,,,Plot radial profile plots in interactive mode
 verify,b,h,yes,,,Verify critical parameters in non-interactive mode
 update,b,h,no,,,Update critical parameters in non-interactive mode
-radplots,b,h,no,,,Plot radial plots on standard graph
-verbose,b,h,no,,,Print messages in non interactive mode
+verbose,b,h,no,,,Print messages in non-interactive mode
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Display device
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

@@ -1,5 +1,424 @@
 .help revisions May92 noao.rv
 .nf
+rvplot.x
+        Fixed an old bug in which the code to draw a single plot in
+        spectrum mode was actually recursive.  This would result in an
+        infinite loop if the obj/temp were the same image and the 'i'
+        key was used.  Wrote code for a single plot for both the input
+        and normalized single plots  (3/10/95)
+
+rvidlines/idvhelio.x
+	Changed error action to a single warning to allow for the case
+	of missing header keywords.  (10/20/94, Valdes)
+
+rvbatch.x
+        Fixed a bug where the RV_TEMPNUM wasn't being set before the 
+        rv_data_check() procedure was called.  If the data were rebinned
+        this corrupted the RV_TEMPVEL() pointer. (10/13/94)
+
+rvbatch.x
+	Fixed a bug where the image wasn't being update in batch mode (7/18/94)
+
+rvsample.x
+        Fixed a bug erasing the sample regions with 'u' (5/19/94)
+
+splitplot.x
+	Fixed a bug affecting filter overlay of FFT plots. (4/24/94)
+
+rvidlines/mkpkg
+	The mkpkg was not complete in it's dependencies.  Did a mkmlist
+	to insure all dependencies are checked.  (4/23/94, Valdes)
+
+t_fxcor.x
+        The imtclose() calls when shutting down would fail if the file
+        lists had changed during the task.  Changed this to close the
+        structure pointers instead. (2/22/94)
+
+rvgetim.x
+	Added a check on the dispersion units.
+	(2/18/94, Valdes)
+
+rvfftcorr.x
+	The "prepared spectrum" plot wasn't showing the spectrum with the
+	effects of the filtering.  Filtering is normally done after the 
+	FFT but it made sense that the user should see the centered, apodized
+	and filtered spectrum being correlated.  (2/15/94)
+
+mkpkg
+asttools/		-
+	Deleted the duplicate asttools source and made use of the noao package
+	library.  (8/25/93)
+
+mkpkg
+rv.cl
+rv.hd
+x_rv.x
+rv.men
+rvidlines/*		+
+rvidlines.par		+
+rvreidlines.par		+
+doc/rvidlines.hlp	+
+doc/rvreidlines.hlp	+
+	Added the new tasks RVIDLINES and RVREIDLINES for determining
+	velocities from spectral lines.  This task is similar to the
+	IDENTIFY task for determining dispersion solutions.
+	(8/24/93, Valdes)
+
+rvinit.x
+zzdebug.x
+rvfgauss.x
+rvdebug.par
+	The type of the rvdebug.other parameter was changed but I forgot to
+	update the files that were still treating this as a boolean.  Also
+	removed and option for using an old version of the lorentzian fitting.
+	(8/12/93)
+
+rvcorrel.x
+	Changed the computation of the antisymmetric noise function.  The
+	full discussion is in the RV mail logs but basically the previous
+	algorithm was computing the differences incorrectly about the peak,
+	which is obvious for the case of a shift of zero.  The new algorithm
+	is correct (even though the endpoints look funny).  For consistancy
+	the old agorithm is still available by setting rvdebug.other to a
+	positive value.  Setting rvdebug.other to -1 gets you the old alg-
+	orithm with a bug fix to it.  (8/7/93)
+
+rvanplot.x
+	Added 'sigma' to the text output. (8/7/93)
+
+rvvfit.x
+	Fixed a typo in the definition of c[3] as the Sigma of the Gaussian
+	fit when it's really the Sigma^2 of the fit.  It correctly used in
+	the computation of width elsewhere in the code (7/9/93)
+
+mkpkg
+t_fxcor.x
+rvgetim.x
+rvrebin.x
+rvimutil.x
+coloncmds.x
+dispcor.x		-
+dispcor.com		-
+	Changed the way the data rebinning to get a common dispersion is
+	handled.  Previously the V2.9 DISPCOR code was used but this ran
+	into problems when trying to rebin a log spectrum to a different
+	dispersion with many more points.  What happens now is that the
+	original image is read but then interpolated to the requested disp-
+	ersion rather than the log equivalent of what's in the header.  This
+	This has the advantage that no spectrum is interpolated more than
+	once prior to correlation.  (6/29/93)
+
+rvplot.x
+        Fixed a typo in the specmode.'i' plot annotation (6/21/93)
+
+numrep.x 
+rvbatch.x 
+rvrvcor.x
+rvwrite.x
+rvfparab.x 
+rvimutil.x 
+rvwparam.x 
+rvcolon .x 
+rvcursor.x 
+coloncmds.x 
+readtlist.x 
+rvdrawfit.x 
+rvfitfunc.x 
+rvstrings.x 
+splitplot.x
+	Cleaned up "foo set but not used" messages reported by SPPLINT (5/13/93)
+
+mkpkg
+specmode.x
+rvlinefit.x		+
+	Implemented a new specmode keystroke command, 'v', which is basically
+	an rip-off of the SPLOT 'k' keystroke that fits a gaussian to a 
+	line, asks for a standard wavelength and then computes a velocity
+	for that single line.  For the moment this will be an undocumented
+	command since it will be part of other enhancements to specmode
+	in the next release. (5/12/93)
+
+rvgetim.x
+	The X coordinate array wasn't being initialized with the proper
+	coords (5/11/93)
+
+rvrebin.x
+	The rebinned spectrum was being normalized using the entire spec-
+	trum as the sample.  Any changes made interactively or samples
+	selected were ignored.  This didn't make sense so I commented this
+	out so the fit is done using the same samples it would in any other
+	case.  (5/10/93)
+
+rvwrite.x
+	Changed the FWHM output to .txt files so it prints velocity if
+	present, otherwise it's the pixel width.  The "km/s" units label
+	was removed from the column heading.  (5/7/93)
+
+rvrebin.x
+	Fixed a type declaration problem causing compilation errors under
+	AUX. (5/6/93)
+
+rvwrite.x
+	The "Rebined WPC" field was being printed as some bogus value
+	for pixel correlation.  Changed to print INDEF.  (5/5/93)
+
+rvcont.h
+contin.x
+continpars.x
+	Set it up so that a :markrej command stays in effect until reset
+	by another command.  Requested by Daryl.  (5/5/93)
+
+specmode.x
+doc/fxcor.hlp
+lib/scr/specmode.key
+	Added a new 'b' keystroke command to set the sample region for
+	both spectra simultaneously.  (5/5/93)
+
+rvwrite.x
+	In the case where redshifts are being printed an INDEF value was
+	being converted to a redshift before printing.  Added a bunch of
+	if (IS_INDEF())s so that an INDEF redshift would be printed.
+	(5/5/93)
+
+rvrvcor.x
+	Reset the RV_PRINTZ flag in the case where missing header info 
+	prevented a full velocity computation.  VREL was still being con-
+	verted but it was always printed as a velocity, never a redshift.
+	(5/5/93)
+
+rvsample.x
+        Fixed a small problem w/ erasing sample regions. (4/30/93)
+
+rvbatch.x
+	Fixed a bug in which the .txt file header was being written before
+	the final WPC was computed.  This meant that the WPC and vel-per-pixel
+	values were wrong for batch runs if either spectrum had to be re-
+	binned prior to the correlation.  (4/29/93)
+
+rvrvcor.x
+	The MJD was being computed incorrectly.  As defined in the Astronomical
+	Almanac it's the JD - 240 0000.5.  (4/16/93)
+
+rvvfit.x
+	Fixed a bug in the output of MJD to .log files.  (4/14/93)
+
+rvfilter.x
+	Fixed a bug in the square filter code. (4/7/93)
+
+doc/fxcor.hlp
+	Added notes for the new package params.  (3/31/93)
+
+keywpars.x
+rvcomdef.h
+rvkeywords.h
+keywpars.par
+doc/fxcor.hlp
+doc/keywpars.hlp
+	Removed the W0 and WPC fields from KEYWPARS.  Also made a note in the
+	help pages about how the UT of the heliocentric correction is
+	found.  (3/29/93)
+
+mkpkg
+x_rv.x
+rvcorrect.par		+
+rvcorrect.com		+
+t_rvcorrect.x		+
+	Made a duplicate of the RVCORRECT task for the RV package.  This
+	task is identical to the one in ASTUTIL but it makes use of the
+	KEYWPARS header keyword translation pset. (3/23/93)
+
+wrtccf.x
+rvpackage.h
+	Fixed a bug in writing out the correlation function to an image
+	or text file.  Also removed an unused RV_AXIS macro (3/15/93)
+
+deblend.x
+splitplot.x
+	Fixed some INDEF type conversions that were causing problems on
+	the A/UX port.  Conversion of INDEF is illegal but has only just
+	now been caught because INDEFR == INDEFD on other systems (3/15/93)
+
+rvrebin.x
+rvdatacheck.x
+rvfftcorr.x
+    An integer zero point coordinate offset was computed and applied in
+    rv_fftcorr but the fractional part was ignored.  This would produce
+    a final velocity error of up to a pixel in those cases where the
+    wavelength origins were not the same between the object and
+    template spectra.  This error shows up in tests with DOPCOR which
+    introduces just such a zero point shift.
+
+    o	Moved the setting of w0 and npts from force_rebin to force_which.
+	Force_which is now the main point for checking and resetting
+	compatibility between the object and template spectral WCS.
+	The key part of the fix was to adjust w0 so that it is an
+	integer number of pixels shift from the w0 of the target
+	spectrum.  The integer part of the shift is then handled by
+	rvfftcorr.x
+    
+    o	The checking of the WCS in rv_data_check was moved to force_rebin
+	(which then calls force_which).  Rv_data_check now simply calls
+	force_rebin every time.
+
+   o	Added a nint in rv_fftcorr to make sure that no funny roundoff
+	occurs in setting integer pixel shift zero point offset.
+
+	    ishift = nint ((RV_OW0(rv) - RV_GLOB_W1(rv)) / RV_OWPC(rv))
+    (3/1/93, Valdes)
+
+mkpkg
+rv.par
+rvgetim.x
+aplist.x
+rvmwcs.h	-
+rvmwcs.x	-
+getdisp.x	-
+doc/fxcor.hlp
+    1.	Added dispaxis and nsum to the package parameters.  These are used
+	with 2D and 3D spectra which are now supported.
+    2.  The spectrum header information and data are obtained through
+	the smw/shdr routines from ONEDSPEC.  This supports linear,
+	log-linear, non-linear, equispec, multispec, 1D, 2D, and 3D
+	spectral formats.
+    (2/25/93, Valdes)
+
+coloncmds.x
+deblend.x
+fftmode.x
+rv.par
+rvanplot.x
+rvcolon.x
+rvcomdef.h
+rvdrawfit.x
+rvfitfunc.x
+rvflags.h
+rvinit.x
+rvpackage.h
+rvplot.x
+rvsample.x
+rvstrings.x
+rvsumplot.x
+splitplot.x
+	Added support for color overlay vectors and text (12/14/93)
+
+rvplot.x 
+deblend.x 
+rvsample.x 
+rvdrawfit.x 
+rvfitfunc.x
+splitplot.x
+	Changed the gseti() calls to use symbolic names when changing
+	line and polymarker types. (12/11/92)
+
+rvplot.x
+fftmode.x
+rvanplot.x
+rvsumplot.x
+splitplot.x
+	Removed the bold font definitions from gtext() calls. (12/7/92)
+
+rvrvcor.x
+	Renamed procedure rv_correct() to rv_corr() to avoid possible name
+	clashes at a later date.  (10/13/92)
+
+rv0$rv0.par
+        Added an "observatory" package parameter to allow the parameter
+        indirection used by the RVCORRECT task.  Until now that task
+        couldn't be run.  (10/13/92)
+
+rvrebin.x
+	Had to clear a stack array since grabage was being used in the
+	second correlation.  I really need to go through all of the code
+	and fix this once and for all (9/1/92)
+
+deblend.x
+rvfitfunc.x 
+rvrvcor.x
+	Cleaned up some INDEF expressions so there is no type conversion
+	going on.  This can caused problems on the VXUX systems (9/1/92)
+
+rvwrite.x
+	Cleaned up some INDEF equality tests to us IS_INDEF() macro (9/1/92)
+
+rvcorrel.x
+	Changed the decared dimension of the data array from 'npts' to
+	'ARB'.  (8/26/92)
+
+rvfgauss.x
+rvfparab.x
+	Added some debugging output to print weight info (8/26/92)
+
+aplists.x
+getdisp.x
+rvgetim.x
+rvrebin.x
+prepspec.x
+	Made a simpler debug test macro for readability (8/26/92)
+
+prepspec.x
+	The sample region masking could fail if one of the spectra were
+	smaller than the other.  The masking code assumed the whole global
+	wavelength array was being passed in, but in fact only the data
+	array was being passed.  Also fixed a typo when initializing the
+	array, too many points were being moved.  (8/25/92)
+
+rvgetim.x
+	The values of RV_X1 and RV_X2 were confused w/ log and linear values
+	for data w/ lambda dispersion.  (8/24/92)
+
+splitplot.x
+	Removed the sample regions markers from the prepared spectrum
+	plot (8/24/92)
+
+rvfilter.x
+        There was a small "glitch" in the computed Welch or Hanning filters
+        caused by an extra filter value being computed.  (8/24/92)
+ 
+fftutil.x
+	Changed some procedure arguments named 'data' to 'v' since this causes
+	a compiler error on the RS/6000.  Original complaint was for
+	fft_fixwrap() but as also present in fft_cosbell().  (8/13/92)
+
+rvcursor.x
+rvfgauss.x
+	Cleaned up some missing sfree() calls before error returns. (8/9/92)
+
+t_fxcor.x
+rvsample.x
+	Fixed a bug in the code that parses the sample parameters.  The loop
+	could possibly skip past the EOS in the string, and if there is garbage
+	in the buffer (as could happen when the task in the process cache) it
+	could lead to incorrectly counting the number of ranges and cause a
+	memory fault.  I fixed the parser bug and cleared the array before
+	it was filled.  Reported by Oegerle.  (8/7/92)
+
+rvsample.x
+	Fixed a typo in which RV_ERANGE was not being freed (typo was RV_SRANGE
+	in mfree).  Found w/ SPPTOOLS.  (8/5/92)
+
+rvcursor.x
+coloncmds.x
+	The procedure cmd_write() was declared as an int procedure but not
+	returning anything.  Caused a compiler error on DSUX Dec fortran.
+	Also changed rv_query_save() in rvcursor.x since it was returning
+	something but it's return value was never used.  (8/5/92)
+
+rvrvcor.x
+help/keywpars.hlp
+	Fixed a typo in the explanation of the date field for DATE-OBS and
+	made the error comment when it's parsed incorrectly more clear (7/31/92)
+
+rvmwcs.x
+	Updated with yet another "old-format" special case fix (7/29/92)
+
+rvrvcor.x
+	Fixed a memory leak caused by not unmapping images when there was
+	an error return from rv_correct().  The task would grow in memory
+	continuously until it finally ran out and died.  (7/28/92)
+
+----------------
+V2.10.1 Released
+
 rvmwcs.x
 	Updated with latest changes to onedspec$smw.x.  (5/29/92)
 

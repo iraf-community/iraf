@@ -46,7 +46,8 @@ begin
 	    call gargr (wy)
 	    if (nscan () != 2) {
 	        if (stdin == YES) {
-		    call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+		    call printf (
+		        "Type object x and y coordinates (^D or ^Z to end): ")
 		    call flush (STDOUT)
 	        } 
 		next
@@ -63,7 +64,7 @@ begin
 		if (gid != NULL)
 		    call apmark (ap, gid, apstati (ap, MKCENTER), NO, NO)
 	    }
-	    call apcplot (ap, id, ier, mgd, YES)
+	    call ap_cplot (ap, id, mgd, YES)
 	    if (id == 1)
 	        call ap_param (ap, out, "center")
 	    call ap_pcenter (ap, out, id, ild, ier)
@@ -74,7 +75,8 @@ begin
 	    call apsetr (ap, WX, wx)
 	    call apsetr (ap, WY, wy)
 	    if (stdin == YES) {
-		call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+		call printf (
+		    "Type object x and y coordinates (^D or ^Z to end): ")
 		call flush (STDOUT)
 	    } 
 	}

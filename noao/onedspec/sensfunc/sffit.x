@@ -13,7 +13,7 @@ int	order
 real	xmin
 real	xmax
 
-int	i, n, func, strdic()
+int	i, n, func, ord, strdic()
 pointer	x, y, w
 
 int	functions[4]
@@ -22,10 +22,11 @@ data	functions/CHEBYSHEV,LEGENDRE,SPLINE3,SPLINE1/
 begin
 	func = strdic (function, function, SZ_FNAME, FUNCTIONS)
 	func = functions[max (1, func)]
+	ord = order
 
-	while (order > 0) {
+	while (ord > 0) {
 	    call cvfree (cv)
-	    call cvinit (cv, func, order, xmin, xmax)
+	    call cvinit (cv, func, ord, xmin, xmax)
 	    do i = 1, nstds {
 		if (STD_FLAG(stds[i]) == SF_INCLUDE) {
 	            n = STD_NWAVES(stds[i])
@@ -38,7 +39,23 @@ begin
 	    call cvsolve (cv, i)
 	    if (i == OK)
 		break
-	    order = order - 1
+
+	    switch (func) {
+	    case CHEBYSHEV, LEGENDRE:
+		ord = ord - 1
+	    case SPLINE3:
+		ord = ord - 1
+		if (ord == 0) {
+		    func = CHEBYSHEV
+		    ord = 2
+		}
+	    case SPLINE1:
+		ord = ord - 1
+		if (ord == 0) {
+		    func = CHEBYSHEV
+		    ord = 1
+		}
+	    }
 	}
 
 	switch (i) {

@@ -11,7 +11,7 @@ int	pix
 real	x, y
 real	mx, my, x1, x2, y1, y2, tick, gap
 pointer	sp, format, label
-double	mw_c1trand()
+double	smw_c1trand()
 
 define	TICK	.03	# Tick size in NDC
 define	GAP	.02	# Gap size in NDC
@@ -24,7 +24,7 @@ begin
 	if ((x < min (x1, x2)) || (x > max (x1, x2)))
 	    return
 
-	pix = mw_c1trand (EC_PL(ec), PIX(ec,feature))
+	pix = smw_c1trand (EC_PL(ec), PIX(ec,feature))
 	pix = max (1, min (pix, EC_NPTS(ec) - 1))
 
 	call smark (sp)

@@ -104,8 +104,8 @@ _envinit()
 	    strcpy (osfn, hlib);
 	    strcat (osfn, SETENV);
 	} else {
-	    printf (stderr, "cannot translate logical name `hlib'");
-	    fflush (stdout);
+	    fprintf (stderr, "cannot translate logical name `hlib'");
+	    fflush (stderr);
 	}
 
 	ENVINIT();

@@ -10,8 +10,8 @@ int	iymin, iymax		# absolute y boundaries
 int	lx, mx, ly, my		# the returned limits
 
 begin
-        lx = max (ixmin, min (ixmax, int (xc - radius) + 1))
+        lx = max (ixmin - 1, min (ixmax, int (xc - radius))) + 1
         mx = max (ixmin, min (ixmax, int (xc + radius)))
-        ly = max (iymin, min (iymax, int (yc - radius) + 1))
+        ly = max (iymin - 1, min (iymax, int (yc - radius))) + 1
         my = max (iymin, min (iymax, int (yc + radius)))
 end

@@ -11,7 +11,7 @@ double	dval
 
 begin
 	stat = clglpd (param, dval)
-	if (dval == INDEFD)
+	if (IS_INDEFD (dval))
 	    sval = INDEFS
 	else
 	    sval = short (dval)

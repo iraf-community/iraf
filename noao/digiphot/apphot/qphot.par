@@ -4,21 +4,21 @@ image,f,a,,,,Input image
 cbox,r,a,5.0,,,Centering box width in pixels
 annulus,r,a,,0.0,,Inner radius of sky annulus in pixels
 dannulus,r,a,,1.0,,Width of the sky annulus in pixels
-apertures,s,a,"3.0",,,List of apertures
+apertures,s,a,"3.0",,,List of photometry apertures
+coords,s,h,"",,,Coordinate list
+output,f,h,"default",,,Results file
+plotfile,f,h,"",,,Plot metacode file
 zmag,r,h,26.0,,,Zero point of magnitude scale
-coords,s,h,"",,,Name of coordinate file
 exposure,s,h,"",,,Exposure time image header keyword
 airmass,s,h,"",,,Airmass image header keyword
 filter,s,h,"",,,Filter image header keyword
 obstime,s,h,"",,,Time of observation image header keyword
 epadu,r,h,1.0,,,Instrument gain
-output,f,h,"default",,,Results
-plotfile,f,h,"",,,File of plot metacode
+interactive,b,h,yes,,,Interactive mode
+radplots,b,h,no,,,Plot the radial profiles in interactive mode
+verbose,b,h,no,,,Print messages
 graphics,s,h,"stdgraph",,,Graphics device
 display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-radplots,b,h,no,,,Plot the radial profiles
-interactive,b,h,yes,,,Interactive mode
-verbose,b,h,no,,,Print messages if commands is redirected to a file
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

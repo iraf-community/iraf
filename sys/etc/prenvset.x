@@ -19,6 +19,6 @@ begin
 	call strcat ("=",      Memc[cmd], SZ_COMMAND)
 	call strcat (valuestr, Memc[cmd], SZ_COMMAND)
 
-	call prupdate (pid, Memc[cmd])
+	call prupdate (pid, Memc[cmd], NO)
 	call sfree (sp)
 end

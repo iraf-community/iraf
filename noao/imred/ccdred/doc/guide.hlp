@@ -178,7 +178,10 @@ data file.  For more on the bad pixel file see \fBinstruments\fR.
 .le
 .ls \fIoverscan\fR - Apply overscan strip correction?
 The overscan or prescan region is specified by the parameter
-\fIbiassec\fR.  This is given as an IRAF image section.  The overscan
+\fIbiassec\fR.  This is given as an IRAF image section.  Only the
+part of the section corresponding to the readout axis is used and
+the other part is ignored.  The length of the overscan region is
+set by the \fItrimsec\fR parameter.  The overscan
 region is averaged along the readout axis, specified by the parameter
 \fIreadaxis\fR, to create a one dimensional bias vector.  This bias is
 fit by a function to remove cosmic rays and noise.  There are a number

@@ -1,4 +1,5 @@
 include	<imhdr.h>
+include	<mach.h>
 include	"apertures.h"
 
 # Sort flags
@@ -60,8 +61,10 @@ begin
 
 	    # Find the peaks.
 	    nx = 0
-	    call find_peaks (Memr[imdata], npts, 0., 1, nfind+2, minsep, 0.,
-		Memr[x], nx)
+	    call find_peaks (Memr[imdata], npts, 0., 1, nfind+2, minsep,
+		-MAX_REAL, Memr[x], nx)
+	    #call find_peaks (Memr[imdata], npts, 0., 1, nfind+2, minsep,
+	    #	0, Memr[x], nx)
 	    #call asrtr (Memr[x], Memr[x], nx)
 
 	    # Center on the peaks.

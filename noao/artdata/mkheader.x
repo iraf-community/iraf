@@ -109,6 +109,7 @@ int	type			# datatype
 bool	clgetb()
 int	clgeti()
 real	clgetr()
+double	clgetd()
 pointer	sp, comment, str
 
 begin
@@ -117,21 +118,25 @@ begin
 
 	switch (type) {
 	case 'b':
-	    call sprintf (Memc[comment], LEN_COMMENT, "\t%s%24t%b")
+	    call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%b")
 		call pargstr (param)
 	    	call pargb (clgetb (param))
 	case 'i':
-	    call sprintf (Memc[comment], LEN_COMMENT, "\t%s%24t%d")
+	    call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%d")
 		call pargstr (param)
 	    	call pargi (clgeti (param))
 	case 'r':
-	    call sprintf (Memc[comment], LEN_COMMENT, "\t%s%24t%g")
+	    call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%g")
 		call pargstr (param)
 	    	call pargr (clgetr (param))
+	case 'd':
+	    call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%g")
+		call pargstr (param)
+	    	call pargd (clgetd (param))
 	case 's':
 	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call clgstr (param, Memc[str], SZ_FNAME)
-	    call sprintf (Memc[comment], LEN_COMMENT, "\t%s%24t%s")
+	    call sprintf (Memc[comment], LEN_COMMENT, "%9t%s%24t%s")
 		call pargstr (param)
 	    	call pargstr (Memc[str])
 	}

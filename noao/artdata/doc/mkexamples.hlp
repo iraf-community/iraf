@@ -1,4 +1,4 @@
-.help mkexamples Aug90 noao.artdata
+.help mkexamples Mar93 noao.artdata
 .ih
 NAME
 mkexamples - Make artificial data example images
@@ -11,18 +11,27 @@ PARAMETERS
 Example name (abbreviations are not allowed):
 
 .nf
-        ecarc1d - Echelle thorium extracted arc spectrum
-        ecarc2d - Echelle thorium arc slit spectrum
-        ecarcdc - Echelle thorium dispersion corrected arc spectrum
-	ecobj2d - Echelle object slit spectrum
-       henear1d - 1D helium-neon-argon arc spectrum
-       henear2d - 2D long slit helium-neon-argon arc spectrum
-       longslit - Long slit spectrum
-     multifiber - Multifiber spectrum
      galcluster - Galaxy cluster
        globular - Globular cluster
        galfield - Galaxy field
       starfield - Starfield
+
+         henear - Helium-neon-argon spectrum (uncalibrated)
+       heneardc - Helium-neon-argon spectrum (calibrated)
+
+          ecarc - Echelle thorium-argon spectrum (uncalibrated)
+        ecarcdc - Echelle thorium-argon spectrum (calibrated)
+
+       spectrum - Aborption spectrum (calibrated)
+        echelle - Echelle absorption spectrum (calibrated)
+
+        ecarc2d - Echelle thorium-argon slit spectrum
+        ecobj2d - Echelle object slit spectrum
+
+          lsarc - Long slit helium-neon-argon spectrum
+	  lsobj - Long slit object spectrum
+
+     multifiber - Multifiber spectrum
 .fi
 .le
 .ls image
@@ -30,13 +39,14 @@ Output image name.
 .le
 .ls oseed = 1
 Random number seed affecting object generation.  Different object seeds
-will produces different examples of objects or spectra lines.  This
+will produces different examples of objects or spectral lines or number
+of apertures/orders.  This
 usually modifies the seed parameters in \fBstarlist\fR, \fBgallist\fR,
 and \fBmk1dspec\fR.
 .le
 .ls nseed = 1
 Random number noise seed.  Different noise seeds will produce examples
-with different noise, generally of the same level but simple having
+with different noise, generally of the same level but simply having
 a different pattern.  This is usually the seed parameter in
 \fBmkobjects\fR or \fBmknoise\fR.
 .le
@@ -62,11 +72,12 @@ demonstrations and test procedures for other packages.  The examples are not
 exhaustive.  The only adjustable parameters are variations of the
 random number seeds.  Varying the noise seed allows several observations
 of the same example while varying the object seed allows several observations
-of different "fields" or spectral lines.
+of different "fields", spectral lines, or number of apertures/orders.
 
 If the example name is not given on the command line a menu of example
-names is first printed and then a prompt for the name is given.  The
-example names may not be abbreviated.  If desired the simple command
+names is first printed and then a prompt for the name is given.
+The name may be a submenu or an example.  The
+names may not be abbreviated.  If desired the simple command
 script used to generate the example may be paged.  Otherwise the
 specified image will be generated.  Keep in mind that some of the
 examples (particularly those generating galaxy images) may take a
@@ -94,19 +105,14 @@ EXAMPLES
     ar> mkexample
 	    		MKEXAMPLE Menu
 
-        ecarc1d - Echelle thorium extracted arc spectrum
-        ecarc2d - Echelle thorium arc slit spectrum
-        ecarcdc - Echelle thorium dispersion corrected arc spectrum
-	ecobj2d - Echelle object slit spectrum
-       henear1d - 1D helium-neon-argon arc spectrum
-       henear2d - 2D long slit helium-neon-argon arc spectrum
-       longslit - Long slit spectrum
-     multifiber - Multifiber spectrum
      galcluster - Galaxy cluster
        globular - Globular cluster
        galfield - Galaxy field
       starfield - Starfield
 
+       onedspec - Menu of one dimensional spectra
+       twodspec - Menu of two dimensional spectra
+     threedspec - Menu of three dimensional spectra
     Example name: globular
     Image name: globular
     Creating example globular in image globular ...
@@ -147,4 +153,15 @@ EXAMPLES
 
     delete (dat, verify=no)
 .fi
+.ih
+REVISIONS
+.ls MKEXAMPLES V2.10.3
+The examples have been expanded to include submenus.  The submenus organize
+the various types of spectra.  Additional spectral examples have been
+added.  The oseed parameter selects the number of apertures in the
+onedspec spectra and the number of orders in the echelle examples.
+.le
+.ih
+SEE ALSO
+mkobjects, mknoise, mk1dspec, mk2dspec, mkechelle
 .endhelp

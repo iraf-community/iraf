@@ -54,9 +54,9 @@ begin
 		ip_top = ip + (op_top-op) - 1
 		do i = ip, ip_top {
 		    Memc[op] = linebuf[i]
-		    if (Memc[op] == EOS)
-			goto done_
 		    op = op + 1
+		    if (linebuf[i+1] == EOS)
+			goto done_
 		}
 
 		# If we reach here then the buffer is full and needs to be
@@ -76,14 +76,14 @@ begin
 		ip_top = ip + (op_top-op) - 1
 		do i = ip, ip_top {
 		    ch = linebuf[i]
-		    if (ch == EOS)
-			goto done_
 		    Memc[op] = ch
 		    op = op + 1
 		    if (ch == '\n') {
 			ip_top = i
 			break
 		    }
+		    if (linebuf[i+1] == EOS)
+			goto done_
 		}
 
 		# If we get here then either newline has been seen or the output

@@ -10,7 +10,7 @@ resize,b,h,yes,,,Resize apertures?
 edit,b,h,yes,,,"Edit apertures?
 "
 line,i,h,INDEF,1,,Dispersion line
-nsum,i,h,1,1,,Number of dispersion lines to sum
+nsum,i,h,1,,,Number of dispersion lines to sum or median
 llimit,r,h,INDEF,,,Lower aperture limit relative to center
 ulimit,r,h,INDEF,,,Upper aperture limit relative to center
 ylevel,r,h,0.1,,,Fraction of peak or intensity for automatic width

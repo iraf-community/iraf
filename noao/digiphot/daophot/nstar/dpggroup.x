@@ -1,6 +1,6 @@
 include "../../lib/ptkeysdef.h"
 include "../lib/daophotdef.h"
-include "../lib/apsel.h"
+include "../lib/apseldef.h"
 
 # DP_GNSTPSF -- Procedure to initialize for reading the group file fields from
 # a photometry text file . The group file fields are ID, GROUP, X, Y, MAG, ERR,
@@ -33,7 +33,7 @@ begin
 	    	    call pargstr (YCENTER)
 	    case DP_PAPSKY:
 		call sprintf (sel_fields[strlen(sel_fields)+1], SZ_LINE, "%s ")
-	    	    call pargstr (APSKY)
+	    	    call pargstr (SKY)
 	    case DP_PAPMAG1:
 		call sprintf (sel_fields[strlen(sel_fields)+1], SZ_LINE, "%s ")
 	            call pargstr (MAG)
@@ -93,10 +93,10 @@ begin
 	# Get the sky.
 	call tbcfnd (tp, SKY, colpoint[5], 1)
 	if (colpoint[5] == NULL)
-	    call tbcfnd (tp, APSKY, colpoint[5], 1)
+	    call tbcfnd (tp, SKY, colpoint[5], 1)
 	if (colpoint[5] == NULL) {
 	    call eprintf ("Column %s not found\n")
-	        call pargstr (APSKY)
+	        call pargstr (SKY)
 	}
 
 	# Get the group number.
@@ -114,7 +114,7 @@ int procedure dp_ggroup (dao, tp, key, fields, indices, colpoint, max_row,
 	max_group, in_record, curr_group)
 
 pointer	dao				# pointer to daophot structure
-pointer	tp				# input file/table descriptor
+int	tp				# input file/table descriptor
 pointer	key				# pointer to text database structure
 char	fields[ARB]			# nstar fields to be read
 int	indices[ARB]			# array of text file field pointers
@@ -202,7 +202,7 @@ begin
 		buf_size = buf_size + max_group
 		call dp_rmemapsel (dao, indices, NAPPAR, buf_size + 1)
 	    }
- 
+
 	} until ((group != curr_group) && (curr_group != 0))
 
 	# Return the number of stars in the group.
@@ -344,6 +344,7 @@ real	mag		# magnitude
 
 int	i, index, elem, maxch, kip, ip
 int	ctoi(), ctor()
+char	buffer[SZ_LINE]
 
 begin
 	do i = 1, KY_NSELECT(key) {
@@ -353,27 +354,29 @@ begin
 	    elem = Memi[KY_ELEM_SELECT(key)+i-1]
 	    maxch = Memi[KY_LEN_SELECT(key)+i-1]
 	    kip = Memi[KY_PTRS(key)+index-1] + (elem - 1) * maxch
+	    call amovc (Memc[kip], buffer, maxch)
+	    buffer[maxch+1] = EOS
 
 	    # Decode the output value.
 	    ip = 1
 	    switch (fields[i]) {
 	    case DP_PAPID: 
-		if (ctoi (Memc[kip], ip, id) <= 0)
+		if (ctoi (buffer, ip, id) <= 0)
 		    call error (0, "ERROR: Error reading ID field.")
 	    case DP_PAPGROUP: 
-		if (ctoi (Memc[kip], ip, group) <= 0)
+		if (ctoi (buffer, ip, group) <= 0)
 		    call error (0, "ERROR: Error reading GROUP field.")
 	    case DP_PAPXCEN:
-		if (ctor (Memc[kip], ip, x) <= 0)
+		if (ctor (buffer, ip, x) <= 0)
 		    call error (0, "ERROR: Error reading XCENTER field.")
 	    case DP_PAPYCEN:
-		if (ctor (Memc[kip], ip, y) <= 0)
+		if (ctor (buffer, ip, y) <= 0)
 		    call error (0, "ERROR: Error reading YCENTER field.")
 	    case DP_PAPSKY:
-	        if (ctor (Memc[kip], ip, sky) <= 0)
+	        if (ctor (buffer, ip, sky) <= 0)
 		    call error (0, "ERROR: Error reading MSKY field.")
 	    case DP_PAPMAG1:
-		if (ctor (Memc[kip], ip, mag) <= 0)
+		if (ctor (buffer, ip, mag) <= 0)
 		    call error (0, "ERROR: Error reading MAG field.")
 	    default:
 		call printf ("Error reading the photometry file.\n")

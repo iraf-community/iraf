@@ -69,6 +69,12 @@ char *fname;			/* simple filename, no dirs */
 	 */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin.");
+#ifdef LINUX
+	strcat (pathname, "linux");
+#else
+#ifdef SOLARIS
+	strcat (pathname, "ssol");
+#else
 #ifdef mc68010
 	strcat (pathname, "mc68010");
 #else
@@ -86,9 +92,7 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
-#else
-#ifdef ultrix
-	strcat (pathname, "dsux");
+#endif
 #endif
 #endif
 #endif

@@ -420,12 +420,12 @@ begin
 		call pargi (NP1(ids))
 		call pargi (NP2(ids))
 
-	    if (UT(ids) == INDEFI)
+	    if (IS_INDEFI (UT(ids)))
 		value1 = INDEFR
 	    else 
 		value1 = real (UT(ids) / 3600.)
 
-	    if (ST(ids) == INDEFI)
+	    if (IS_INDEFI (ST(ids)))
 		value2 = INDEFR
 	    else
 		value2 = real (ST(ids) / 3600.)

@@ -1,17 +1,19 @@
 # AP_GROW_REGIONS -- Perform region growing around a rejected pixel.
 
-int procedure ap_grow_regions (skypix, coords, wgt, nskypix, index, snx, sny,
-    rgrow, sumpx, sumsqpx, sumcbpx)
+int procedure ap_grow_regions (skypix, coords, wgt, nskypix, sky_zero,
+	index, snx, sny, rgrow, sumpx, sumsqpx, sumcbpx)
 
 real	skypix[ARB]		# sky pixels
 int	coords[ARB]		# sky cordinates
 real	wgt[ARB]		# weights
 int	nskypix			# total number of sky pixels
+real	sky_zero		# sky zero point for moment analysis
 int	index			# index of pixel to be rejected
 int	snx, sny		# size of sky subraster
 real	rgrow			# region growing radius
 double	sumpx, sumsqpx, sumcbpx	# sum and sum of squares of sky pixels
 
+double	dsky
 int	j, k, ixc, iyc, xmin, xmax, ymin, ymax, cstart, c, nreject
 real	rgrow2, r2, d
 
@@ -48,9 +50,10 @@ begin
 	    	    cstart = cstart + 1
 		r2 = (k - ixc) ** 2 + (j - iyc) ** 2
 		if (r2 <= rgrow2 && c == coords[cstart] && wgt[cstart] > 0.0) {
-		    sumpx = sumpx - skypix[cstart]
-		    sumsqpx = sumsqpx - skypix[cstart] ** 2
-		    sumcbpx = sumcbpx - skypix[cstart] ** 3
+		    dsky = skypix[cstart] - sky_zero
+		    sumpx = sumpx - dsky
+		    sumsqpx = sumsqpx - dsky ** 2
+		    sumcbpx = sumcbpx - dsky ** 3
 		    nreject = nreject + 1
 		    wgt[cstart] = 0.0
 		}

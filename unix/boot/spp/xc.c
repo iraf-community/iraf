@@ -10,19 +10,17 @@
 #include "xpp.h"
 
 #define	NOKNET
+#define	import_kernel
 #define	import_knames
 #include <iraf.h>
+
+#ifdef SOLARIS
+#undef SOLARIS
+#endif
 
 /*
  * XC -- Main entry point of the SPP compiler for the IRAF subset preprocessor
  * language).
- *
- * DSUX version.  This version of XC supports both the MIPS  and DEC Fortran
- * compilers.  The compiler to be used is the first "f77" command found in the
- * user's search patch.  The "f77" should be a symbolic link to the installed
- * compiler, for example /usr/lib/cmplrs/fort/fort for the DEC compiler, or
- * /usr/lib/cmplrs/cc2.1/driver for Version 2.1 of the MIPS compiler.  XC uses
- * this link to determine which compiler is being used.
  */
 
 #define	ERR		(-1)
@@ -37,8 +35,8 @@
 #define	SZ_PATHNAME	127
 #define	SZ_PKGENV	256
 
-#define	DEBUGFLAG	'g'			/* host version of -x */
-#define	SYSBINDIR	"/usr/lib/cmplrs/"	/* special system BIN */
+#define	DEBUGFLAG	'g'		/* what to use when -x is seen */
+#define	SYSBINDIR	"/usr/bin/"		/* special system BIN */
 #define	LOCALBINDIR	"/usr/local/bin/"	/* standard local BIN */
 
 #define	XPP		"xpp.e"
@@ -52,27 +50,45 @@
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
 
-/* MIPS fortran compiler */
-#define M_FORTLIB1	"-lF77"
-#define M_FORTLIB2	"-lI77"
-#define M_FORTLIB3	"-lU77"
-#define M_FORTLIB4	"-lm"
-
-/* DEC fortran compiler */
-#define D_FORTLIB1	"-lUfor"
-#define D_FORTLIB2	"-lfor"
-#define D_FORTLIB3	"-lutil"
-#define D_FORTLIB4	"-li"
-#define D_FORTLIB5	"-lots"
-#define D_FORTLIB6	"-lm"
-
-#ifdef SUNOS4
-int	usesharelib = YES;
+#ifdef LINUX
+#define FORTLIB0	"-lf2c"
+#define FORTLIB1	"-lf2c"
+#define FORTLIB2	"-lm"
+#define FORTLIB3	""
+#define FORTLIB4	""
+#define FORTLIB5	""
+#define FORTLIB6	""
+#define FORTLIB7	""
+#define FORTLIB8	""
+#define FORTLIB9	""
+#define FORTLIBA	""
 #else
-int	usesharelib = NO;
+#define FORTLIB0	"-lU77"
+#define FORTLIB1	"-lm"
+#define FORTLIB2	"-lF77"
+#define FORTLIB3	"-lI77"
+#define FORTLIB4	"-lm"
+#define FORTLIB5	""
+#define FORTLIB6	""
+#define FORTLIB7	""
+#define FORTLIB8	""
+#define FORTLIB9	""
+#define FORTLIBA	""
 #endif
 
+#ifdef SOLARIS
+int	usesharelib = YES;
 int	noedsym = NO;
+#else
+#ifdef SHLIB
+int	usesharelib = YES;
+int	noedsym = NO;
+#else
+int	usesharelib = NO;
+int	noedsym = YES;
+#endif
+#endif
+
 int	stripexe = NO;
 int	notvsym = NO;
 int	noshsym = NO;
@@ -84,6 +100,7 @@ int	mktask = YES;
 int	optimize = YES;
 int	cflagseen = NO;
 int	nfileargs = 0;
+int	link_static = 0;
 char	outfile[SZ_FNAME] = "";
 char	tempfile[SZ_FNAME] = "";
 char	*lflags[MAXFLAG+1];
@@ -93,6 +110,7 @@ char	*lxfiles[MAXFILE+1];			/* .x files		*/
 char	*lffiles[MAXFILE+1];			/* .f files		*/
 char	buffer[SZ_BUFFER+1];
 char	libbuf[SZ_LIBBUF+1];
+char	f77cmd[SZ_PATHNAME+1];
 char	*bp = buffer;
 char	*libp = libbuf;
 char	*pkgenv = NULL;
@@ -119,7 +137,7 @@ char	*findexe();
  *	xpp		SPP to modified-ratfor
  *	rpp		modified-ratfor to Fortran
  *	f77		UNIX fortran compiler
- *	cc		compile other sources, link if desired
+ *	gcc		compile other sources, link if desired
  *
  * The Fortran source is left behind if the -F flag is given.  The IRAF root
  * directory must either be given on the command line as "-r pathname" or in
@@ -136,16 +154,23 @@ char	*argv[];
 
 	/* Initialization. */
 	ZZSTRT();
-	isdec();
+	isv13();
+
+#ifdef LINUX
+	if (os_sysfile ("f77.sh", f77cmd, SZ_PATHNAME) < 0)
+	    strcpy (f77cmd, "f77");
+#else
+	strcpy (f77cmd, "f77");
+#endif
 
 	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
 
-	sig_int  = (int) signal (SIGINT, SIG_IGN) & 01;
-	sig_quit = (int) signal (SIGQUIT,SIG_IGN) & 01;
-	sig_hup  = (int) signal (SIGHUP, SIG_IGN) & 01;
-	sig_term = (int) signal (SIGTERM,SIG_IGN) & 01;
+	sig_int  = (int) signal (SIGINT,  SIG_IGN) & 01;
+	sig_quit = (int) signal (SIGQUIT, SIG_IGN) & 01;
+	sig_hup  = (int) signal (SIGHUP,  SIG_IGN) & 01;
+	sig_term = (int) signal (SIGTERM, SIG_IGN) & 01;
 
-	enbint (interrupt);
+	enbint ((SIGFUNC)interrupt);
 	pid = getpid();
 
 	/* Count the number of file arguments.  Load the environment for
@@ -166,11 +191,29 @@ char	*argv[];
 	/* If no package environment was specified see if the user has
 	 * specified a default package in their user environment.
 	 */
-	if (!pkgenv)
-	    if (pkgenv = os_getenv ("PKGENV")) {
-		strcpy (v_pkgenv, pkgenv);
-		loadpkgenv (pkgenv = v_pkgenv);
+	if (!pkgenv) {
+	    char *s, u_pkgenv[SZ_PKGENV+1];
+	    char *pkgname, *ip;
+
+	    if (s = os_getenv ("PKGENV")) {
+		strcpy (ip = u_pkgenv, s);
+		while (*ip) {
+		    while (isspace(*ip))
+			;
+		    pkgname = ip;
+		    while (*ip && !isspace(*ip))
+			ip++;
+		    *ip++ = EOS;
+
+		    if (pkgname[0]) {
+			loadpkgenv (pkgname);
+			strcat (v_pkgenv, v_pkgenv[0] ? " -p " : "-p ");
+			strcat (v_pkgenv, pkgname);
+			pkgenv = v_pkgenv;
+		    }
+		}
 	    }
+	}
 
 	/* Process command line options, make file lists.
 	 * Convert ".x" files to ".f".
@@ -180,22 +223,14 @@ char	*argv[];
 		switch (arg[1]) {
 		case '/':
 		    /* Pass flag on without further interpretation.
-		     *     "-/foo"    ->  "-foo"
-		     *     "-//foo"   ->  "foo"
+		     *     -/hostflag
 		     */
 		    lflags[nflags] = bp;
-		    ip = &arg[2];
-		    if (*ip == '/')
-			ip++;
-		    else
-			*bp++ = '-';
-
-		    while (*bp++ = *ip++)
+		    *bp++ = '-';
+		    for (ip = &arg[2];  (*bp++ = *ip++);  )
 			;
-
 		    if (nflags++ >= MAXFLAG)
 			fatal ("Too many compiler options");
-		    break;
 #ifdef sun
 		    /* Check for an explicit architecture setting.  If given
 		     * this will override IRAFARCH.
@@ -385,8 +420,12 @@ passflag:		    mkobject = YES;
 	 * everything be declared) for raw Fortran files.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "f77";
+	arglist[nargs++] = f77cmd;
 	arglist[nargs++] = "-c";
+#ifdef LINUX
+	arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
@@ -404,7 +443,16 @@ passflag:		    mkobject = YES;
 	if (i > 0) {
 	    if (debug)
 		printargs ("f77", arglist, nargs);
-	    errflag += run ("f77", arglist);
+	    status = run (f77cmd, arglist);
+#ifdef LINUX
+	    /* This kludge is to work around a bug in the F2C based F77 script
+	     * on Linux, which returns an exit status of 4 when successfully
+	     * compiling a Fortran file.
+	     */
+	    if (status == 4)
+		status = 0;
+#endif
+	    errflag += status;
 	}
 
 
@@ -412,9 +460,13 @@ passflag:		    mkobject = YES;
 	 * object code.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "f77";
+	arglist[nargs++] = f77cmd;
 	arglist[nargs++] = "-c";
 	arglist[nargs++] = "-u";
+#ifdef LINUX
+	arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
@@ -441,7 +493,16 @@ passflag:		    mkobject = YES;
 	if (noperands > 0) {
 	    if (debug)
 		printargs ("f77", arglist, nargs);
-	    errflag += run ("f77", arglist);
+	    status = run (f77cmd, arglist);
+#ifdef LINUX
+	    /* This kludge is to work around a bug in the F2C based F77 script
+	     * on Linux, which returns an exit status of 4 when successfully
+	     * compiling a Fortran file.
+	     */
+	    if (status == 4)
+		status = 0;
+#endif
+	    errflag += status;
 	}
 
 
@@ -449,8 +510,12 @@ passflag:		    mkobject = YES;
 	 * object code.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "cc";
+	arglist[nargs++] = "gcc";
 	arglist[nargs++] = "-c";
+#ifdef LINUX
+	arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
@@ -461,11 +526,11 @@ passflag:		    mkobject = YES;
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
 	
-	/* Make list of files to be compiled.  Do not include any Fortran
-	 * files, as they were already compiled above.
+	/* Make list of files to be compiled.   Only C and assembler files
+	 * are included.
 	 */
 	for (i=0, noperands=0;  i < nfiles;  i++) {
-	    if (!isffile (lfiles[i])) {
+	    if (iscfile (lfiles[i]) || issfile (lfiles[i])) {
 		arglist[nargs++] = lfiles[i];
 		noperands++;
 	    }
@@ -474,8 +539,8 @@ passflag:		    mkobject = YES;
 
 	if (noperands > 0) {
 	    if (debug)
-		printargs ("cc", arglist, nargs);
-	    errflag += run ("cc", arglist);
+		printargs ("gcc", arglist, nargs);
+	    errflag += run ("gcc", arglist);
 	}
 
 
@@ -489,11 +554,17 @@ passflag:		    mkobject = YES;
 	/* Link the object files and libraries to produce the "-o" task.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "cc";
-	arglist[nargs++] = "-nocount";		/* DSUX */
+	arglist[nargs++] = "gcc";
+#ifdef SOLARIS
+	arglist[nargs++] = "-t";
+#endif
+#ifdef LINUX
+	arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 	arglist[nargs++] = "-o";
 
-	sprintf (tempfile, "T_%s.E", outfile);	/* DSUX doesn't like .e */
+	sprintf (tempfile, "T_%s", outfile);
 	arglist[nargs++] = tempfile;
 
 	ncomp = 0;
@@ -516,8 +587,14 @@ passflag:		    mkobject = YES;
 	    }
 
 	/* Link options. */
-	for (i=0;  i < nflags;  i++)
+	link_static = 0;
+	for (i=0;  i < nflags;  i++) {
 	    arglist[nargs++] = lflags[i];
+	    if (strcmp (lflags[i], "-Bstatic") == 0)
+		link_static = 1;
+	    else if (strcmp (lflags[i], "-Bdynamic") == 0)
+		link_static = 0;
+	}
 
 #ifdef sun
 	/* Need to pass -f<float> to CC for the C libraries. */
@@ -569,21 +646,14 @@ passflag:		    mkobject = YES;
 	}
 #endif
 
-	/* [DSUX] - Search the library directory appropriate for the compiler
-	 * we are using.
-	 */
-	if (isdec())
-	    arglist[nargs++] = "-L/usr/lib/cmplrs/fort";
-	else
-	    arglist[nargs++] = "-L/usr/lib/cmplrs/cc";
-
 	/* File to link. */
 	for (i=0;  i < nfiles;  i++)
 	    arglist[nargs++] = lfiles[i];
 
 	/* Libraries to link against. */
 	if (hostprog) {
-	    ;
+	    if (!isv13())
+		arglist[nargs++] = FORTLIB0;
 	} else {
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	    if (usesharelib) {
@@ -601,21 +671,24 @@ passflag:		    mkobject = YES;
 	for (i=0;  i < nhlibs;  i++)
 	    arglist[nargs++] = hlibs[i];
 
-	/* The remaining system libraries depend upon which version of
-	 * the DSUX compiler we are using.
+	/* The remaining system libraries depend upon which vversion of
+	 * the SunOS compiler we are using.  The V1.3 compilers use only
+	 * -lF77 and -lm.
 	 */
-	if (isdec()) {
-	    arglist[nargs++] = mkfname (D_FORTLIB1);
-	    arglist[nargs++] = mkfname (D_FORTLIB2);
-	    arglist[nargs++] = mkfname (D_FORTLIB3);
-	    arglist[nargs++] = mkfname (D_FORTLIB4);
-	    arglist[nargs++] = mkfname (D_FORTLIB5);
-	    arglist[nargs++] = mkfname (D_FORTLIB6);
+	if (isv13()) {
+	    addflag (FORTLIB2, arglist, &nargs);
+	    addflag (FORTLIB4, arglist, &nargs);
 	} else {
-	    arglist[nargs++] = mkfname (M_FORTLIB1);
-	    arglist[nargs++] = mkfname (M_FORTLIB2);
-	    arglist[nargs++] = mkfname (M_FORTLIB3);
-	    arglist[nargs++] = mkfname (M_FORTLIB4);
+	    addflag (FORTLIB1, arglist, &nargs);
+	    addflag (FORTLIB2, arglist, &nargs);
+	    addflag (FORTLIB3, arglist, &nargs);
+	    addflag (FORTLIB4, arglist, &nargs);
+	    addflag (FORTLIB5, arglist, &nargs);
+	    addflag (FORTLIB6, arglist, &nargs);
+	    addflag (FORTLIB7, arglist, &nargs);
+	    addflag (FORTLIB8, arglist, &nargs);
+	    addflag (FORTLIB9, arglist, &nargs);
+	    addflag (FORTLIBA, arglist, &nargs);
 	}
 	arglist[nargs] = NULL;
 
@@ -624,13 +697,13 @@ passflag:		    mkobject = YES;
 	    fflush (stderr);
 	}
 	if (debug)
-	    printargs ("cc", arglist, nargs);
+	    printargs ("gcc", arglist, nargs);
 
 	/* If the link is successful, replace the old executable with the
 	 * new one.  Do not delete the bad executable if the link fails,
 	 * as we might want to examine its symbol table.
 	 */
-	if ((status = run ("cc", arglist)) == 0) {
+	if ((status = run ("gcc", arglist)) == 0) {
 	    unlink (outfile);
 	    link   (tempfile, outfile);
 	    unlink (tempfile);
@@ -695,6 +768,44 @@ char	*i_fname;
 	libp += strlen (oname = libp) + 1;
 
 	return (oname);
+}
+
+
+/* ADDFLAG -- Add a flag to an argument list.  Ignore null flags.
+ */
+addflag (flag, arglist, p_nargs)
+char *flag;
+char *arglist[];
+int *p_nargs;
+{
+	register nargs = *p_nargs;
+
+	if (flag && *flag) {
+	    if (strcmp (flag, "-Bstatic") == 0)
+		link_static = 1;
+	    else if (strcmp (flag, "-Bdynamic") == 0)
+		link_static = 0;
+#ifdef SOLARIS
+	    else if (strcmp (flag, "-ldl") == 0) {
+		/* This beastie has to be linked dynamic on Solaris, but
+		 * we don't want to have to know this everywhere so we do
+		 * it automatically there.
+		 */
+		if (link_static)
+		    arglist[nargs++] = "-Bdynamic";
+		arglist[nargs++] = flag;
+		if (link_static)
+		    arglist[nargs++] = "-Bstatic";
+		*p_nargs = nargs;
+		return (1);
+	    }
+#endif
+	    arglist[nargs++] = flag;
+	    *p_nargs = nargs;
+	    return (1);
+	}
+
+	return (0);
 }
 
 
@@ -818,6 +929,40 @@ char	*fname;
 	    if (*p == '.')
 		dot = p;
 	if (dot != NULL && *(dot+1) == 'f')
+	    return (YES);
+	else
+	    return (NO);
+}
+
+
+/* ISCFILE -- Determine if the named file has a ".c" extension.
+ */
+iscfile (fname)
+char	*fname;
+{
+	char	*p, *dot;
+
+	for (p=fname, dot=NULL;  *p != EOS;  p++)
+	    if (*p == '.')
+		dot = p;
+	if (dot != NULL && *(dot+1) == 'c')
+	    return (YES);
+	else
+	    return (NO);
+}
+
+
+/* ISSFILE -- Determine if the named file has a ".s" extension.
+ */
+issfile (fname)
+char	*fname;
+{
+	char	*p, *dot;
+
+	for (p=fname, dot=NULL;  *p != EOS;  p++)
+	    if (*p == '.')
+		dot = p;
+	if (dot != NULL && *(dot+1) == 's')
 	    return (YES);
 	else
 	    return (NO);
@@ -988,7 +1133,7 @@ int	k;
  * of interrupt occurs.
  */
 enbint (handler)
-int	(*handler)();
+SIGFUNC	handler;
 {
 	if (sig_int == 0)
 	    signal (SIGINT, handler);
@@ -1022,7 +1167,7 @@ int	waitpid;
 	while ((w = wait (&status)) != waitpid)
 	    if (w == -1)
 		fatal ("bad wait code");
-	enbint (interrupt);
+	enbint ((SIGFUNC)interrupt);
 	if (status & 0377) {
 	    if (status != SIGINT) {
 		fprintf (stderr, "Termination code %d", status);
@@ -1094,6 +1239,10 @@ isv13()
 	char	*name;
 	DIR	*dirp;
 
+#ifdef SOLARIS
+	return (v13 = 0);
+#else
+
 	if (v13 != -1)
 	    return (v13);
 
@@ -1113,35 +1262,7 @@ isv13()
 	}
 
 	return (v13 = 0);
-}
-
-
-/* ISDEC -- [DSUX] Test if we are using the DEC Fortran compiler, as
- * opposed to the MIPS RISC Fortran compiler.
- */
-isdec()
-{
-	static	int dec = -1;
-	static	char buf[256];
-	char	*path;
-	char	*ip;
-
-	if (dec != -1)
-	    return (dec);
-
-	dec = 1;
-	if (path = findexe ("f77", NULL))
-	    if (readlink (path, buf, 256) > 0) {
-		for (ip = buf;  *ip;  ip++)
-		    if (!strncmp (ip, "/fort", 5)) {
-			dec = 1;
-			goto done;
-		    }
-		dec = 0;
-	    }
-done:
-	os_putenv ("IRAFARCH", dec ? "ddec" : "dmip");
-	return (dec);
+#endif
 }
 
 

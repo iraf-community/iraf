@@ -29,7 +29,7 @@ char *
 envget (var)
 char	*var;
 {
-	if (ENVGETS (c_sppstr(var), valuestr, &len_valuestr) < 0)
+	if (ENVFIND (c_sppstr(var), valuestr, &len_valuestr) < 0)
 	    return (NULL);
 	else
 	    return (c_strpak (valuestr, (char *)valuestr, len_valuestr+1));

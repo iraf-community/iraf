@@ -1,5 +1,5 @@
 include	<math/gsurfit.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_DBREAD -- Read features data from the database.
@@ -18,7 +18,7 @@ pointer	sp, coeffs, line, cluster
 int	ec_line()
 int	dtgeti(), dgsgeti(), dtlocate(), dtscan(), nscan()
 real	dtgetr()
-double	dgsgetd(), mw_c1trand()
+double	dgsgetd(), smw_c1trand()
 pointer	dtmap1()
 
 errchk	dtmap1(), dtlocate(), dtgeti(), dtgad()
@@ -67,7 +67,7 @@ begin
 		FTYPE(ec,j) = -FTYPE(ec,j)
 	    iferr (LINE(ec,j) = ec_line (ec, APN(ec,j)))
 		next
-	    shift = mw_c1trand (EC_PL(ec), PIX(ec,j))
+	    shift = smw_c1trand (EC_PL(ec), PIX(ec,j))
 	    low = 0.5
 	    high = SN(SH(ec,LINE(ec,j))) + 0.5
 	    if (shift < low || shift > high)

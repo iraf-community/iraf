@@ -152,6 +152,10 @@ begin
 	    # Set/Show the image update flag
 	    call cmd_imupdate (rv)
 
+	case RVX_LINECOLOR:
+	    # Set/Show the overlay vector line color
+	    call cmd_linecolor (rv)
+
 	case RVX_MINWIDTH:
 	    # Set/Show the minwidth parameter
 	    call cmd_minwidth (rv)
@@ -233,6 +237,10 @@ begin
 	case RVX_TEMPVEL:
 	    # Set/Show the template velocity
 	    call cmd_tempvel (rv, RV_TEMPNUM(rv))
+
+	case RVX_TEXTCOLOR:
+	    # Set/Show the graphics text color.
+	    call cmd_textcolor (rv)
 
 	case RVX_TNUM:
 	    # Move on to next spectrum in list

@@ -1,4 +1,4 @@
-.help scombine Mar92 noao.onedspec
+.help scombine Sep92 noao.onedspec
 .ih
 NAME
 scombine -- Combine spectra
@@ -97,20 +97,27 @@ wavelength.  The dispersion is interpreted in that case as the difference
 in the log of the endpoints divided by the number of pixel increments.
 .le
 
-.ls scale = "none" (none|mode|median|mean|exposure)
-Multiplicative scaling to be applied to each spectrum.  The choices are none,
-scale by the mode, median, or mean of the specified sample region, or scale
-by the exposure time given in the image header.
+.ls scale = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
+Multiplicative image scaling to be applied.  The choices are none, scale
+by the mode, median, or mean of the specified statistics section, scale
+by the exposure time in the image header, scale by the values in a specified
+file, or scale by a specified image header keyword.  When specified in
+a file the scales must be one per line in the order of the input
+spectra.
 .le
-.ls zero = "none" (none|mode|median|mean)
+.ls zero = "none" (none|mode|median|mean|@<file>|!<keyword>)
 Additive zero level image shifts to be applied.  The choices are none or
-shift by the mode, median, or mean of the specified sample regions.
+shift by the mode, median, or mean of the specified statistics section,
+shift by values given in a file, or shift by values given by an image
+header keyword.  When specified in a file the zero values must be one
+per line in the order of the input spectra.
 .le
-.ls weight = "none" (none|mode|median|mean|exposure)
+.ls weight = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
 Weights to be applied during the final averaging.  The choices are none,
-weight by the square root of the mode, median, or mean of the specified
-sample region, or weight by the square root of the exposure time given
-in the image header.
+the mode, median, or mean of the specified statistics section, the exposure
+time, values given in a file, or values given by an image header keyword.
+When specified in a file the weights must be one per line in the order of
+the input spectra.
 .le
 .ls sample = ""
 Wavelength sample regions to use in computing spectrum statistics for
@@ -135,6 +142,14 @@ are rejected while if pixels have been rejected by thresholding
 or nonoverlap, then the fraction of the remaining pixels, truncated
 to an integer, is used.
 .le
+.ls nkeep = 1
+The minimum number of pixels to retain or the maximum number to reject
+when using the clipping algorithms (ccdclip, crreject, sigclip,
+avsigclip, or pclip).  When given as a positive value this is the minimum
+number to keep.  When given as a negative value the absolute value is
+the maximum number to reject.  This is actually converted to a number
+to keep by adding it to the number of images.
+.le
 .ls mclip = yes (ccdclip, crreject, sigclip, avsigcliip)
 Use the median as the estimate for the true intensity rather than the
 average with high and low values excluded in the "ccdclip", "crreject",
@@ -149,13 +164,13 @@ produced by the algorithm to select a point below and above the average or
 median value for rejecting pixels.  The lower sigma is ignored for the
 "crreject" algorithm.
 .le
-.ls rdnoise = "0.", gain = "1." (ccdclip, crreject)
-Effective CCD readout noise and gain parameters (in electrons and electrons/DN)
-used with the "ccdclip" and "crreject" algorithms.  The values may
-be either numeric or an image header keyword which contains the value.
-Note that if the spectra have been extracted from a 2D CCD image then
-the noise parameters must be adjusted for background and the aperture
-summing.
+.ls rdnoise = "0.", gain = "1.", snoise = "0." (ccdclip, crreject)
+Effective CCD readout noise in electrons, gain in electrons/DN, and
+sensitivity noise as a fraction.  These parameters are used with the
+"ccdclip" and "crreject" algorithms.  The values may be either numeric or
+an image header keyword which contains the value.  Note that if the spectra
+have been extracted from a 2D CCD image then the noise parameters must be
+adjusted for background and the aperture summing.
 .le
 .ls sigscale = 0.1 (ccdclip, crreject, sigclip, avsigclip)
 This parameter determines when poisson corrections are made to the
@@ -245,7 +260,7 @@ first is interpolation to a common dispersion sampling as discussed
 above.  The second stage is to eliminate any pixels outside the specified
 thresholds.  Note that the thresholds apply to the interpolated
 spectra.  Scaling and zero offset factors are computed and applied to the
-spectra if desired  The computation of these factors as well as weights is
+spectra if desire.  The computation of these factors as well as weights is
 discussed in the following section.  Next there is a choice of rejection
 algorithms to identify and eliminate deviant pixels.  Some of these are
 based on order statistics and some relative to the distance from an initial
@@ -260,14 +275,29 @@ output image as well the number of pixels used in the final combining.
 SCALES AND WEIGHTS
 
 In order to combine spectra with rejection of pixels based on deviations
-from some average or median they must be scaled to a common level.
-There are two types of scaling available, a multiplicative intensity
-scale and an additive zero point shift.
-The intensity scaling is defined by the \fIscale\fR parameter
-and the zero point shift by the \fIzero\fR parameter.  These parameters may
-take the values "none" for no scaling, "mode", "median", or "mean"
-to scale by statistics of the spectrum pixels, and "exposure"
-(for intensity scaling only) to scale by a keyword in the image header.
+from some average or median they must be scaled to a common level.  There
+are two types of scaling available, a multiplicative intensity scale and an
+additive zero point shift.  The intensity scaling is defined by the
+\fIscale\fR parameter and the zero point shift by the \fIzero\fR
+parameter.  These parameters may take the values "none" for no scaling,
+"mode", "median", or "mean" to scale by statistics of the spectrum pixels,
+"exposure" (for intensity scaling only) to scale by the exposure time
+keyword in the image header, any other image header keyword specified by
+the keyword name prefixed by the character '!', and the name of a file
+containing the scale factors for the input image prefixed by the
+character '@'.
+
+Examples of the possible parameter values are shown below where
+"myval" is the name of an image header keyword and "scales.dat" is
+a text file containing a list of scale factors.
+
+.nf
+	scale = none		No scaling
+	zero = mean		Intensity offset by the mean
+	scale = exposure	Scale by the exposure time
+	zero = !myval		Intensity offset by an image keyword
+	scale = @scales.dat	Scales specified in a file
+.fi
 
 The spectrum statistics factors are computed within specified sample
 regions given as a series of colon separated wavelengths.  If no
@@ -282,8 +312,22 @@ range of the pixels and is not based on a relationship between the
 mode, median, and mean.  Also thresholded pixels are excluded from the
 computations as well as during the rejection and combining operations.
 
-The "exposure" option in the intensity scaling uses the value of the
-image header keyword (EXPTIME, EXPOSURE, or ITIME).
+The "exposure" option in the intensity scaling uses the value of the image
+header keyword (EXPTIME, EXPOSURE, or ITIME).  Note that the exposure
+keyword is also updated in the final image as the weighted average of the
+input values.  If one wants to use a nonexposure time keyword and keep the
+exposure time updating feature the image header keyword syntax is
+available; i.e. !<keyword>.
+
+Scaling values may be defined as a list of values in a text file.  The file
+name is specified by the standard @file syntax.  The list consists of one
+value per line.  The order of the list is assumed to be the same as the
+order of the input spectra.  It is a fatal error if the list is incomplete
+and a warning if the list appears longer than the number of input spectra.
+Consideration of the grouping parameter must be included in
+generating this list since spectra may come from different images,
+some apertures may be missing, and, when there are multiple output spectra
+or images, the same list will be repeatedly used.
 
 If both an intensity scaling and zero point shift are selected the
 multiplicative scaling is done first.  Use of both makes sense for images
@@ -325,14 +369,39 @@ corrections the parameter is set to zero and to eliminate the correction in
 all cases it is set to a very large number.
 
 If the final combining operation is "average" then the spectra may be
-weighted during the averaging.  The weights are specified in the
-same way as the scale factors.  The weights, however, are the square
-root of the spectrum statistic or exposure time keyword value.
-The weights, scaled to a unit sum, are printed in the log output.
+weighted during the averaging.  The weights are specified in the same way
+as the scale factors.  The weights, scaled to a unit sum, are printed in
+the log output.
 
-The weights are only used for the final weighted average.
-They are not used to form averages in the various rejection
-algorithms.
+The weights are only used for the final weighted average and sigma image
+output.  They are not used to form averages in the various rejection
+algorithms.  For weights in the case of no scaling or only multiplicative
+scaling the weights are used as given or determined so that images
+with lower signal levels will have lower weights.  However, for
+cases in which zero level scaling is used the weights are computed
+from the initial weights (the exposure time, image statistics, or
+input values) using the formula:
+
+.nf
+	weight_final = weight_initial / (scale * zero)
+.fi
+
+where the zero values are those before adjustment to zero mean over
+all images.  The reasoning is that if the zero level is high the sky
+brightness is high and so the S/N is lower and the weight should be lower.
+
+
+THRESHOLD REJECTION
+
+There is an initial threshold rejection step which may be applied.  The
+thresholds are given by the parameters \fIlthreshold\fR and
+\fIhthreshold\fR.  Values of INDEF mean that no threshold value is
+applied.  Threshold rejection may be used to exclude very bad pixel values
+or as a way of masking images.  The former case is useful to exclude very
+bright cosmic rays.  Some of the rejection algorithms, such as "avsigclip",
+can perform poorly if very strong cosmic rays are present.  For masking one
+can use a task like \fBimedit\fR or \fBimreplace\fR to set parts of the
+spectra to be excluded to some very low or high magic value.
 
 
 REJECTION ALGORITHMS
@@ -346,7 +415,7 @@ Some the algorithms are more appropriate to images but are available
 in this task also for completeness.
 
 MINMAX
-.in +4
+.in 4
 A specified fraction of the highest and lowest pixels are rejected.
 The fraction is specified as the number of high and low pixels, the
 \fInhigh\fR and \fInlow\fR parameters, when data from all the input spectra
@@ -375,8 +444,91 @@ and the number rejected as a function of n is:
 	 nh  0  0  0  0  0  0  0  0  0  0  1
 .fi
 .in -4
+CCDCLIP
+.in 4
+If the noise characteristics of the spectra can be described by fixed
+gaussian noise, a poissonian noise which scales with the square root of
+the intensity, and a sensitivity noise which scales with the intensity,
+the sigma in data values at a pixel with true value <I>,
+as approximated by the median or average with the lowest and highest value
+excluded, is given as:
+
+.nf
+	sigma = ((rn / g) ** 2 + <I> / g + (s * <I>) ** 2) ** 1/2
+.fi
+
+where rn is the read out noise in electrons, g is the gain in
+electrons per data value, s is a sensitivity noise given as a fraction,
+and ** is the exponentiation operator.  Often the sensitivity noise,
+due to uncertainties in the pixel sensitivities (for example from the
+flat field), is not known in which case a value of zero can be used.
+
+This model is typically valid for CCD images.  During extraction of 
+spectra from CCD images the noise parameters of the spectrum pixels
+will be changed from those of the CCD pixels.  Currently it is up to
+the user to determine the proper modifications of the CCD read noise
+gain, and sensitivity noise.
+
+The read out noise is specified by the \fIrdnoise\fR parameter.  The value
+may be a numeric value to be applied to all the input spectra or an image
+header keyword containing the value for spectra from each image.
+Similarly, the parameter \fIgain\fR specifies the gain as either a value or
+image header keyword and the parameter \fIsnoise\fR specifies the
+sensitivity noise parameter as either a value or image header keyword.
+
+The algorithm operates on each output pixel independently.  It starts by
+taking the median or unweighted average (excluding the minimum and maximum)
+of the unrejected pixels provided there are at least two input pixels.  The
+expected sigma is computed from the CCD noise parameters and pixels more
+that \fIlsigma\fR times this sigma below or \fIhsigma\fR times this sigma
+above the median or average are rejected.  The process is then iterated
+until no further pixels are rejected.  If the average is used as the
+estimator of the true value then after the first round of rejections the
+highest and lowest values are no longer excluded.  Note that it is possible
+to reject all pixels if the average is used and is sufficiently skewed by
+bad pixels such as cosmic rays.
+
+If there are different CCD noise parameters for the input images
+(as might occur using the image header keyword specification) then
+the sigmas are computed for each pixel from each image using the
+same estimated true value.
+
+If the images are scaled and shifted and the \fIsigscale\fR threshold
+is exceeded then a sigma is computed for each pixel based on the
+spectrum scale parameters; i.e. the median or average is scaled to that of the
+original image before computing the sigma and residuals.
+
+After rejection the number of retained pixels is checked against the
+\fInkeep\fR parameter.  If there are fewer pixels retained than specified
+by this parameter the pixels with the smallest residuals in absolute
+value are added back.  If there is more than one pixel with the same
+absolute residual (for example the two pixels about an average
+or median of two will have the same residuals) they are all added
+back even if this means more than \fInkeep\fR pixels are retained.
+Note that the \fInkeep\fR parameter only applies to the pixels used
+by the clipping rejection algorithm and does not apply to threshold
+or bad pixel mask rejection.
+
+This is the best clipping algorithm to use if the CCD noise parameters are
+adequately known.  The parameters affecting this algorithm are \fIreject\fR
+to select this algorithm, \fImclip\fR to select the median or average for
+the center of the clipping, \fInkeep\fR to limit the number of pixels
+rejected, the CCD noise parameters \fIrdnoise, gain\fR and \fIsnoise\fR,
+\fIlsigma\fR and \fIhsigma\fR to select the clipping thresholds,
+and \fIsigscale\fR to set the threshold for making corrections to the sigma
+calculation for different image scale factors.
+
+.in -4
+CRREJECT
+.in 4
+This algorithm is identical to "ccdclip" except that only pixels above
+the average are rejected based on the \fIhsigma\fR parameter.  This
+is appropriate for rejecting cosmic ray events and works even with
+two spectra.
+
+.in -4
 SIGCLIP
-.in +4
+.in 4
 The sigma clipping algorithm computes at each output pixel the median or
 average excluding the high and low values and the sigma about this
 estimate.  There must be at least three input pixels, though for this method
@@ -385,24 +537,50 @@ than the specified sigma threshold factors are rejected.  These steps are
 repeated, except that after the first time the average includes all values,
 until no further pixels are rejected or there are fewer than three pixels.
 
+After rejection the number of retained pixels is checked against the
+\fInkeep\fR parameter.  If there are fewer pixels retained than specified
+by this parameter the pixels with the smallest residuals in absolute
+value are added back.  If there is more than one pixel with the same
+absolute residual (for example the two pixels about an average
+or median of two will have the same residuals) they are all added
+back even if this means more than \fInkeep\fR pixels are retained.
+Note that the \fInkeep\fR parameter only applies to the pixels used
+by the clipping rejection algorithm and does not apply to threshold
+rejection.
+
 The  parameters affecting this algorithm are \fIreject\fR to select
 this algorithm, \fImclip\fR to select the median or average for the
-center of the clipping, \fIlsigma\fR and \fIhsigma\fR to select the
+center of the clipping, \fInkeep\fR to limit the number of pixels
+rejected, \fIlsigma\fR and \fIhsigma\fR to select the
 clipping thresholds, and \fIsigscale\fR to set the threshold for
 making corrections to the sigma calculation for different spectrum scale
 factors.
 
 .in -4
 AVSIGCLIP
-.in +4
+.in 4
 The averaged sigma clipping algorithm assumes that the sigma about the
 median or mean (average excluding the low and high values) is proportional
-to the square root of the median or mean at each point.  This assumption is
-valid for spectra whose values are proportional to the number of photons
-recorded.  The proportionality factor is computed independently for each
-output spectrum by averaging the square of the residuals (at points having
-three or more input values) scaled by the median or mean.  Once the
-proportionality factor is determined, deviant pixels exceeding the
+to the square root of the median or mean at each point.  This is
+described by the equation:
+
+.nf
+	sigma(column,line) = sqrt (gain(line) * signal(column,line))
+.fi
+
+where the \fIestimated\fR signal is the mean or median (hopefully excluding
+any bad pixels) and the gain is the \fIestimated\fR proportionality
+constant having units of photons/data number.
+
+This noise model is valid for spectra whose values are proportional to the
+number of photons recorded.  In effect this algorithm estimates a
+photon per data value gain for each spectrum.
+The gain proportionality factor is computed
+independently for each output spectrum by averaging the square of the residuals
+(at points having three or more input values) scaled by the median or
+mean.
+
+Once the proportionality factor is determined, deviant pixels exceeding the
 specified thresholds are rejected at each point by estimating the sigma
 from the median or mean.  If any values are rejected the median or mean
 (this time not excluding the extreme values) is recomputed and further
@@ -413,98 +591,42 @@ that the proportionality factor is not recomputed after rejections.
 If the spectra are scaled differently and the sigma scaling correction
 threshold is exceeded then a correction is made in the sigma
 calculations for these differences, again under the assumption that
-the noise in an spectrum scales as the square root of the mean intensity.
+the noise in an spectra scales as the square root of the mean intensity.
 
-This algorithm works well for even a few spectra.  It works better if the
-median is used though this is slower than using the average.  Note that if
-the spectra have known noise characteristics then the "ccdclip" algorithm
-is superior.  However, currently the CCD noise characteristics are not well
-propagated during extraction so this empirical algorithm is the one most
-likely to be useful.  The two algorithms are related in that the average
-sigma proportionality factor is an estimate of the gain.
+After rejection the number of retained pixels is checked against the
+\fInkeep\fR parameter.  If there are fewer pixels retained than specified
+by this parameter the pixels with the smallest residuals in absolute
+value are added back.  If there is more than one pixel with the same
+absolute residual (for example the two pixels about an average
+or median of two will have the same residuals) they are all added
+back even if this means more than \fInkeep\fR pixels are retained.
+Note that the \fInkeep\fR parameter only applies to the pixels used
+by the clipping rejection algorithm and does not apply to threshold
+rejection.
+
+This algorithm works well for even a few input spectra.  It works better if
+the median is used though this is slower than using the average.  Note that
+if the spectra have a known read out noise and gain (the proportionality
+factor above) then the "ccdclip" algorithm is superior.  However, currently
+the CCD noise characteristics are not well propagated during extraction so
+this empirical algorithm is the one most likely to be useful.  The two
+algorithms are related in that the average sigma proportionality factor is
+an estimate of the gain.
 
 The  parameters affecting this algorithm are \fIreject\fR to select
 this algorithm, \fImclip\fR to select the median or average for the
-center of the clipping, \fIlsigma\fR and \fIhsigma\fR to select the
+center of the clipping, \fInkeep\fR to limit the number of pixels
+rejected, \fIlsigma\fR and \fIhsigma\fR to select the
 clipping thresholds, and \fIsigscale\fR to set the threshold for
-making corrections to the sigma calculation for different spectrum scale
+making corrections to the sigma calculation for different image scale
 factors.
 
 .in -4
-CCDCLIP
-.in +4
-If the noise characteristics of the spectra can be described by fixed
-gaussian noise and a poissonian noise which scales with the square root of
-the intensity, the the sigma in data values at a pixel with true value <I>,
-as approximated by the median or average with the lowest and highest value
-excluded, is written as:
-
-.nf
-	sigma = ((rn / g) ** 2 + <I> / g) ** 1/2
-.fi
-
-where rn is the read out noise parameter in photons, g is the gain in
-photons per data value, and ** is the exponentiation operator.
-
-This model is typically valid for CCD images.  During extraction of 
-spectra from CCD images the noise parameters of the spectrum pixels
-will be changed from those of the CCD pixels.  Currently it is up to
-the user to determine the proper modifications of the CCD read noise
-and gain.
-
-The read out noise is specified by the \fIrdnoise\fR parameter.  The value
-may be a numeric value to be applied to all the input spectra or a image
-header keyword containing the value for each image.  Similarly, the
-parameter \fIgain\fR specifies the gain as either a value or image header
-keyword.  Again, if these parameters are part of the image header they
-are likely to refer to the original CCD noise characteristics and not
-the extracted spectra noise characteristics.
-
-The algorithm operates on each output pixel independently.  It starts by
-taking the median or unweighted average (excluding the minimum and maximum)
-of the unrejected pixels provided there are at least two input pixels.  The
-expected sigma is computed from the noise parameters and pixels more
-that \fIlsigma\fR times this sigma below or \fIhsigma\fR times this sigma
-above the median or average are rejected.  The process is then iterated
-until no further pixels are rejected.  If the average is used as the
-estimator of the true value then after the first round of rejections the
-highest and lowest values are no longer excluded.  Note that it is possible
-to reject all pixels if the average is used and is sufficiently skewed by
-bad pixels such as cosmic rays.
-
-If there are different noise parameters for the input spectrum
-(as might occur using the image header keyword specification) then
-the sigmas are computed for each pixel from each spectrum using the
-same estimated true value.
-
-If the spectra are scaled and shifted and the \fIsigscale\fR threshold
-is exceeded then a sigma is computed for each pixel based on the
-spectrum scale parameters; i.e. the median or average is scaled to that of the
-original spectrum before computing the sigma and residuals.
-
-This is the best clipping algorithm to use if the noise parameters are
-adequately known.  If the noise parameters are not well known then the
-empirical "avsigclip" algorithm should be used.  The parameters affecting
-this algorithm are \fIreject\fR to select this algorithm, \fImclip\fR to
-select the median or average for the center of the clipping, \fIlsigma\fR
-and \fIhsigma\fR to select the clipping thresholds, and \fIsigscale\fR to
-set the threshold for making corrections to the sigma calculation for
-different spectrum scale factors.
-
-.in -4
-CRREJECT
-.in +4
-This algorithm is identical to "ccdclip" except that only pixels above
-the average are rejected based on the \fIhsigma\fR parameter.  This
-is appropriate for rejecting cosmic ray events and works even with
-two spectra.
-
-.in -4
 PCLIP
-.in +4
+.in 4
 The percentile clipping algorithm is similar to sigma clipping using the
 median as the center of the distribution except that, instead of computing
-the sigma of the pixels from the noise parameters or from the data
+the sigma of the pixels from the CCD noise parameters or from the data
 values, the width of the distribution is characterized by the difference
 between the median value and a specified "percentile" pixel value.  This
 width is then multipled by the scale factors \fIlsigma\fR and \fIhsigma\fR
@@ -529,6 +651,17 @@ nonoverlap or thresholding; for example, if the 3nd pixel below
 the median is specified then the 3rd pixel will be used whether there are
 10 pixels or 5 pixels remaining after the preliminary steps.
 
+After rejection the number of retained pixels is checked against the
+\fInkeep\fR parameter.  If there are fewer pixels retained than specified
+by this parameter the pixels with the smallest residuals in absolute
+value are added back.  If there is more than one pixel with the same
+absolute residual (for example the two pixels about an average
+or median of two will have the same residuals) they are all added
+back even if this means more than \fInkeep\fR pixels are retained.
+Note that the \fInkeep\fR parameter only applies to the pixels used
+by the clipping rejection algorithm and does not apply to threshold
+or bad pixel mask rejection.
+
 Some examples help clarify the definition of the percentile pixel.  In the
 examples assume 10 pixels.  The median is then the average of the
 5th and 6th pixels.  A \fIpclip\fR value of 2 selects the 2nd pixel
@@ -541,20 +674,37 @@ The percentile clipping algorithm is most useful for clipping small
 excursions, such as the wings of bright lines when combining
 disregistered observations, that are missed when using
 the pixel values to compute a sigma.  It is not as powerful, however, as
-using the noise parameters (provided they are accurately known) to clip
+using the CCD noise parameters (provided they are accurately known) to clip
 about the median.  This algorithm is primarily used with direct images
 but remains available for spectra.
 
 The  parameters affecting this algorithm are \fIreject\fR to select this
-algorithm, \fIpclip\fR to select the percentile pixel, and \fIlsigma\fR and
-\fIhsigma\fR to select the clipping thresholds.
+algorithm, \fIpclip\fR to select the percentile pixel, \fInkeep\fR to limit
+the number of pixels rejected, and \fIlsigma\fR and \fIhsigma\fR to select
+the clipping thresholds.
+
 
 .in -4
 GROW REJECTION
-.in +4
+
 Neighbors of pixels rejected by the rejection algorithms
 may also be rejected.  The number of neighbors to be rejected on either
 side is specified by the \fIgrow\fR parameter.
+
+This rejection step is also checked against the \fInkeep\fR parameter
+and only as many pixels as would not violate this parameter are
+rejected.  Unlike it's application in the rejection algorithms at
+this stage there is no checking on the magnitude of the residuals
+and the pixels retained which would otherwise be rejected are randomly
+selected.
+
+
+COMBINING
+
+After all the steps of offsetting the input images, masking pixels,
+threshold rejection, scaling, and applying a rejection algorithms the
+remaining pixels are combined and output.  The pixels may be combined
+by computing the median or by computing a weighted average.
 .ih
 EXAMPLES
 1.  Combine orders of echelle images.
@@ -578,6 +728,16 @@ EXAMPLES
 .fi
 .ih
 REVISIONS
+.ls SCOMBINE V2.10.3
+The weighting was changed from using the square root of the exposure time
+or spectrum statistics to using the values directly.  This corresponds
+to variance weighting.  Other options for specifying the scaling and
+weighting factors were added; namely from a file or from a different
+image header keyword.  The \fInkeep\fR parameter was added to allow
+controling the maximum number of pixels to be rejected by the clipping
+algorithms.  The \fIsnoise\fR parameter was added to include a sensitivity
+or scale noise component to the noise model.
+.le
 .ls SCOMBINE V2.10
 This task is new.
 .le
@@ -588,5 +748,5 @@ particular it would be desirable to propagate the pixel uncertainties
 and CCD noise parameters from the initial CCD images.
 .ih
 SEE ALSO
-images.imcombine
+images.imcombine ccdred.combine
 .endhelp

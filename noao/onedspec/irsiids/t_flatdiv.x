@@ -142,7 +142,7 @@ begin
 	}
 
 	# Has this beam already been loaded?
-	if (beam_stat[beam] == INDEFI) {
+	if (IS_INDEFI (beam_stat[beam])) {
 
 	    # Create file name
 	    call strcpy (flat_file, sfname, SZ_FNAME)

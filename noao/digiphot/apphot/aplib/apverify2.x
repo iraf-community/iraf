@@ -1,6 +1,46 @@
 include "../lib/apphot.h"
+include "../lib/noise.h"
+include "../lib/find.h"
 include "../lib/fitpsf.h"
 include "../lib/radprof.h"
+
+
+# AP_VTHRESHOLD -- Verify the full detection threshold.
+
+real procedure ap_vthreshold (ap)
+
+pointer	ap		# pointer to the apphot structure
+
+real	skysigma, threshold
+int	scan(), nscan()
+real	apstatr()
+
+begin
+	skysigma = apstatr (ap, SKYSIGMA)
+
+	# Confirm the threshold parameter.
+	call printf (
+	"Detection threshold in sigma (%g) (CR or value): ")
+	    call pargr (apstatr (ap, THRESHOLD))
+	call flush (STDOUT)
+	if (scan() == EOF)
+	    threshold = apstatr (ap, THRESHOLD)
+	else {
+	    call gargr (threshold)
+	    if (nscan () != 1)
+	        threshold = apstatr (ap, THRESHOLD)
+	}
+
+	call printf ("\tNew detection threshold: %g sigma %g counts\n")
+	    call pargr (threshold)
+	call apsetr (ap, THRESHOLD, threshold)
+	if (IS_INDEFR(skysigma))
+	    call pargr (INDEFR)
+	else
+	    call pargr (threshold * skysigma)
+
+	return (threshold)
+end
 
 # AP_VPFSTRING -- Verify the psf fitting function.
 

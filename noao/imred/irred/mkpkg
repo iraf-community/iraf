@@ -1,0 +1,24 @@
+# Make the IRRED package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set LIBS="-lxtools"
+	$update	libpkg.a
+	$omake	x_irred.x
+	$link	x_irred.o libpkg.a $(LIBS) -o xx_irred.e
+	;
+
+install:
+	$move	xx_irred.e noaobin$x_irred.e
+	;
+
+libpkg.a:
+	t_irlincor.x	<error.h> <imhdr.h>
+	;

@@ -13,4 +13,6 @@ interact,b,h,yes,,,Graphic interaction to define new bandpasses
 graphics,s,h,"stdgraph",,,Graphics output device
 cursor,*gcur,h,"",,,Graphics cursor input
 star_name,s,q,,,,Star name in calibration list
+airmass,r,q,,1.,,Airmass
+exptime,r,q,,,,Exposure time (seconds)
 answer,s,q,no,,,"(no|yes|NO|YES|NO!|YES!)"

@@ -26,7 +26,7 @@ real	xcenter, ycenter, xc, yc, rval
 int	ap_ycenter(), clgcur(), ap_showplot()
 int	apfitsky(),  ap_yfit(), apstati(), ap_ymkpoly()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_csigma()
-real	ap_cdannulus(), ap_ccthresh(), ap_cdatamin(), ap_cdatamax()
+real	ap_cdannulus(), ap_cdatamin(), ap_cdatamax()
 real	ap_crgrow(), ap_crclean(), ap_crclip()
 
 begin
@@ -34,6 +34,12 @@ begin
 	nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices)
 	if (nvertices <= 0)
 	    return (nvertices)
+	if (id != NULL) {
+	    if (gd == id)
+		call gflush (id)
+	    else
+		call gframe (id)
+	}
 
 	# Store the viewport and window coordinates.
 	call ggview (gd, u1, u2, v1, v2)
@@ -58,7 +64,8 @@ begin
 
         call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 
@@ -69,7 +76,7 @@ begin
 	    case 'f':
 		rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'h':
-		rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
+		#rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'c':
 		rval = ap_ccapert (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 's':

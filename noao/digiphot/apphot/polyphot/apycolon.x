@@ -9,7 +9,7 @@ include "../lib/polyphot.h"
 
 # AP_YCOLON -- Process polyphot task colon commands
 
-procedure ap_ycolon (ap, im, pl, cl, out, stid, ptid, ltid, cmdstr,
+procedure ap_ycolon (ap, im, pl, cl, out, stid, ptid, ltid, cmdstr, newimage,
         newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag)
 
 pointer	ap				# pointer to the apphot structure
@@ -21,9 +21,10 @@ int	stid				# output file number
 int	ptid				# polygon file sequence number
 int	ltid				# coord file sequence number
 char	cmdstr[ARB]			# command string
-int	newcenterbuf, newcenter		# new center buffer, fit
-int	newskybuf, newsky		# new sky buffer, fit
-int	newmagbuf, newmag		# new aperture buffer, fit
+int	newimage			# new image ?
+int	newcenterbuf, newcenter		# new center buffer ?, new center fit ?
+int	newskybuf, newsky		# new sky buffer ?, new sky fit ?
+int	newmagbuf, newmag		# new aperture buffer ?, new fit ?
 
 pointer	sp, incmd, outcmd
 int	strdic()
@@ -47,8 +48,8 @@ begin
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
 	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
-	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
-	        newcenter, newskybuf, newsky, newmagbuf, newmag)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newimage,
+	        newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
 	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
@@ -80,8 +81,10 @@ begin
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
-	if (Memc[cmd] == EOS)
+	if (Memc[cmd] == EOS) {
+	    call sfree (sp)
 	    return
+	}
 
 	# Process the command.
 	ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE, MISC1)
@@ -130,8 +133,8 @@ int	stid		# output file sequence number
 int	ptid		# polygon file sequence number
 int	ltid		# coords file sequence number
 char	cmdstr[ARB]	# command string
-int	newmagbuf	# new aperture buffers (unused)
-int	newmag		# compute new magnitudes
+int	newmagbuf	# new aperture buffers ?
+int	newmag		# compute new magnitudes ?
 
 bool	bval
 int	ncmd

@@ -18,6 +18,7 @@ long	lvalue			# receives the parameter value
 int	server, ks_maxbufsize
 int	ki_sendrcv()
 include	"kichan.com"
+include	"kinode.com"
 include	"kii.com"
 data	ks_maxbufsize /-1/
 
@@ -36,14 +37,13 @@ begin
 	    # smaller.
 
 	    if (what == FSTT_MAXBUFSIZE || what == FSTT_OPTBUFSIZE) {
+		if (ks_maxbufsize < 0)
+		    call zsttks (n_kschan[server],
+			FSTT_MAXBUFSIZE, ks_maxbufsize)
 		if (lvalue == 0)
 		    lvalue = ks_maxbufsize
-		else {
-		    if (ks_maxbufsize < 0)
-			call zsttks (0, FSTT_MAXBUFSIZE, ks_maxbufsize)
-		    if (ks_maxbufsize > 0)
-			lvalue = min (lvalue, ks_maxbufsize)
-		}
+		else if (ks_maxbufsize > 0)
+		    lvalue = min (lvalue, ks_maxbufsize)
 	    }
 	}
 end

@@ -1,19 +1,19 @@
 # POLYPHOT
 
 image,f,a,,,,Input image
+polygons,f,h,"",,,Polygon list
+coords,f,h,"",,,Coordinates file
+output,f,h,"default",,,Results
 datapars,pset,h,"",,,Data dependent parameters
 centerpars,pset,h,"",,,Centering parameters
 fitskypars,pset,h,"",,,Sky fitting parameters
 polypars,pset,h,"",,,Photometry parameters
-polygons,f,h,"",,,Polygon list
-coords,f,h,"",,,Coordinates file
-output,f,h,"default",,,Results
+interactive,b,h,yes,,,Interactive mode
+verify,b,h,yes,,,Verify critical parameters in non-interactive mode
+update,b,h,no,,,Update critical parameters in non-interactive mode
+verbose,b,h,no,,,Print messages in non-interactive mode
 graphics,s,h,stdgraph,,,Graphics device
 display,s,h,stdimage,,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-interactive,b,h,yes,,,Interactive mode
-verify,b,h,yes,,,Verify critical parameters in non interactive mode
-update,b,h,yes,,,Update critical parameters in on interactive mode
-verbose,b,h,no,,,Print messages in non interactive mode
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

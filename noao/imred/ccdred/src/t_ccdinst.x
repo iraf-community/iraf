@@ -14,7 +14,7 @@ define	CMDS	"|quit|?|help|show|instrument|imheader|read|write|newimage\
 		 |ccdsec|datasec|trimsec|darkcor|fixpix|flatcor|fringcor\
 		 |illumcor|overscan|readcor|scancor|trim|zerocor|ccdmean\
 		 |fringscl|illumflt|mkfringe|mkillum|skyflat|ncombine\
-		 |date-obs|dec|ra|title|next|"
+		 |date-obs|dec|ra|title|next|nscanrow|"
 
 define	QUIT		1	# Quit
 define	QUESTION	2	# Help
@@ -43,6 +43,7 @@ define	ILLUMCOR	24	# Illumination flag
 define	OVERSCAN	25	# Overscan flag
 define	READCOR		26	# Readout flag
 define	SCANCOR		27	# Scan mode flag
+define	NSCANROW	42	# Number of scan rows
 define	TRIM		28	# Trim flag
 define	ZEROCOR		29	# Zero level flag
 define	CCDMEAN		30	# CCD mean value
@@ -292,6 +293,9 @@ begin
 	    case SCANCOR:
 		call ccdinst_e (im, "scan mode flag", "scancor",
 		    Memc[key], Memc[def], Memc[imval], update)
+	    case NSCANROW:
+		call ccdinst_e (im, "scan mode rows", "nscanrow",
+		    Memc[key], Memc[def], Memc[imval], update)
 	    case TRIM:
 		call ccdinst_e (im, "trim flag", "trim",
 		    Memc[key], Memc[def], Memc[imval], update)
@@ -412,6 +416,7 @@ begin
 	    call ccdinst_p (im, "fringcor", Memc[key], Memc[def], Memc[imval])
 	    call ccdinst_p (im, "readcor", Memc[key], Memc[def], Memc[imval])
 	    call ccdinst_p (im, "scancor", Memc[key], Memc[def], Memc[imval])
+	    call ccdinst_p (im, "nscanrow", Memc[key], Memc[def], Memc[imval])
 	    call printf ("\n")
 	    call ccdinst_p (im, "illumflt", Memc[key], Memc[def], Memc[imval])
 	    call ccdinst_p (im, "mkfringe", Memc[key], Memc[def], Memc[imval])
@@ -444,7 +449,7 @@ char	def[SZ_LINE]		# Default value
 char	value[SZ_LINE]		# Value
 
 int	i, strdic(), hdmaccf()
-bool	ccdflag()
+bool	bval, ccdflag()
 
 begin
 	i = strdic (name, key, SZ_FNAME, CMDS)
@@ -460,11 +465,12 @@ begin
 
 	switch (i) {
 	case IMAGETYPE: 
-	    call printf ("%-8s  %-8s  %-8s  %-8s  %-.39s\n")  
+	    call printf ("%-8s  %-8s  %-8s")  
 		call pargstr (name)
 		call pargstr (key)
 		call pargstr (def)
-	        call ccdtypes (im, def, SZ_LINE)
+	    call ccdtypes (im, def, SZ_LINE)
+	    call printf ("  %-8s  %-.39s\n")  
 		call pargstr (def)
 		call pargstr (value)
 	case SUBSET: 
@@ -479,22 +485,24 @@ begin
 	case FIXPIX, OVERSCAN, TRIM, ZEROCOR, DARKCOR, FLATCOR, ILLUMCOR,
 	     FRINGCOR, READCOR, SCANCOR, ILLUMFLT, MKFRINGE, MKILLUM,
 	     SKYFLAT:
+	    bval = ccdflag (im, name)
+	    if (hdmaccf (im, name) == NO)
+		call strcpy ("?", value, SZ_LINE)
 	    call printf ("%-8s  %-8s  %-8s  %-8b  %-.39s\n")  
 		call pargstr (name)
 		call pargstr (key)
 		call pargstr (def)
-		call pargb (ccdflag (im, name))
-		if (hdmaccf (im, name) == NO)
-		    call strcpy ("?", value, SZ_LINE)
+		call pargb (bval)
 		call pargstr (value)
 	default:
-	    call printf ("%-8s  %-8s  %-8s  %-8s  %-.39s\n")  
+	    call printf ("%-8s  %-8s  %-8s  %-8s")  
 		call pargstr (name)
 		call pargstr (key)
 		call pargstr (def)
 		call pargstr (value)
-		if (hdmaccf (im, name) == NO)
-		    call strcpy ("?", value, SZ_LINE)
+	    if (hdmaccf (im, name) == NO)
+		call strcpy ("?", value, SZ_LINE)
+	    call printf ("  %-.39s\n")  
 		call pargstr (value)
 	}
 end

@@ -1310,9 +1310,7 @@ FILE	*fp;
 		pp->p_valo.o_type = OT_STRING;
 		len = strlen (s) + 1;		/* allow for eos */
 		if (len < SZ_LINE) {
-		    if (memneed (btoi (SZ_LINE) - btoi(len)) !=
-			&s[btoi(len)*BPI])
-			cl_error (E_FERR, "addparam memneed did not sync");
+		    memneed (btoi(SZ_LINE) - btoi(len));
 		    len = SZ_LINE;
 		}
 	    } else {

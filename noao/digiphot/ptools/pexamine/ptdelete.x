@@ -22,31 +22,52 @@ int	undelete		# undelete flag
 real	matchrad		# matching radius
 
 int	i, row
-real	r2min, r2, mr2
+real	r2min, r2, mr2, wx0, wy0, xpos0, ypos0
 
 begin
 	# Initialize.
 	row = 0
 	r2min = MAX_REAL
 
-	# Set matching radius for the image display.
-	if (IS_INDEFR(matchrad))
+	# Set matching radius for the image display or graph.
+	if (IS_INDEFR(matchrad)) {
 	    mr2 = MAX_REAL
-	else
+	    if (gd != NULL)
+	        call gctran (gd, wx, wy, wx0, wy0, 1, 0)
+	    else {
+	        wx0 = wx
+	        wy0 = wy
+	    }
+	} else {
 	    mr2 = matchrad ** 2
+	    wx0 = wx
+	    wy0 = wy
+	}
 
 	# Search for the point nearest the cursor.
 	do i = 1 , npix {
 
 	    if (deleted[i] == PX_DELETE)
 		next
+
 	    if ((deleted[i] == PX_MARK && undelete == NO) ||
 		(deleted[i] == PX_GOOD && undelete == YES))
 		next
 
-	    if (! IS_INDEFR(xpos[i]) && ! IS_INDEFR(ypos[i]))
-	        r2 = (wx - xpos[i]) ** 2 + (wy - ypos[i]) ** 2
-	    else
+	    if (! IS_INDEFR(xpos[i]) && ! IS_INDEFR(ypos[i])) {
+	        if (IS_INDEFR(matchrad)) {
+		    if (gd != NULL)
+	                call gctran (gd, xpos[i], ypos[i], xpos0, ypos0, 1, 0)
+		    else {
+	                xpos0 = xpos[i]
+	                ypos0 = ypos[i]
+		    }
+	        } else {
+	            xpos0 = xpos[i]
+	            ypos0 = ypos[i]
+	        }
+	        r2 = (wx0 - xpos0) ** 2 + (wy0 - ypos0) ** 2
+	    } else
 		r2 = MAX_REAL
 	    if (r2 >= r2min)
 		next

@@ -20,7 +20,7 @@ begin
 	string	htype
 
 	out = image
-	if (access (out) || access (out//".imh") || access (out//".hhh"))
+	if (access (out) || access (out//"."//envget("imtype")))
 	    return
 
 	print ("Creating image ", out, " ...")
@@ -34,21 +34,20 @@ begin
 	if (type == "object") {		# Object spectrum + sky
 	    htype = "object"
 	    mk1dspec (obj, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=1000., slope=0., temperature=7000.,
-		lines="", nlines=50, peak=-0.5, sigma=10., seed=2, comments=no)
+		wstart=wstart, wend=wend, continuum=1000., slope=0.,
+		temperature=7000., lines="", nlines=50, peak=-0.5,
+		sigma=10., seed=2, comments=no)
 	    mk1dspec (sky, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=1000., slope=0., temperature=5800.,
-	        lines="", nlines=20, peak=1., sigma=5., seed=1, comments=no)
+		wstart=wstart, wend=wend, continuum=1000., slope=0.,
+		temperature=5800., lines="", nlines=20, peak=1., sigma=5.,
+		seed=1, comments=no)
 	    imarith (obj, "+", sky, obj, verbose=no, noact=no)
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0.8, slope=0., temperature=0.,
-		lines="mkexamples$henear2.dat", sigma=6., comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0.8, slope=0.,
+		temperature=0., lines="mkexamples$henear2.dat", sigma=6.,
+		comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF) {
 		if (beam == 0)
 		    print (sky, " ", line, >> dat)
@@ -60,16 +59,15 @@ begin
 	} else if (type == "objnosky") {	# Object spectrum
 	    htype = "object"
 	    mk1dspec (obj, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=1000., slope=0., temperature=7000.,
-		lines="", nlines=50, peak=-0.5, sigma=10., seed=2, comments=no)
+		wstart=wstart, wend=wend, continuum=1000., slope=0.,
+		temperature=7000., lines="", nlines=50, peak=-0.5,
+		sigma=10., seed=2, comments=no)
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0.8, slope=0., temperature=0.,
-		lines="mkexamples$henear2.dat", sigma=6., comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0.8, slope=0.,
+		temperature=0., lines="mkexamples$henear2.dat", sigma=6.,
+		comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF) {
 		if (beam == 1)
 		    print (obj, " ", line, >> dat)
@@ -79,39 +77,36 @@ begin
 	} else if (type == "sky") {	# Sky only
 	    htype = "object"
 	    mk1dspec (sky, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=1000., slope=0., temperature=5800.,
-	        lines="", nlines=20, peak=1., sigma=5., seed=1, comments=no)
+		wstart=wstart, wend=wend, continuum=1000., slope=0.,
+		temperature=5800., lines="", nlines=20, peak=1., sigma=5.,
+		seed=1, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF)
 		print (sky, " ", line, >> dat)
 	} else if (type == "flat") {	# Flat field
 	    htype = "flat"
 	    mk1dspec (obj, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=10000., slope=0., temperature=8000.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=10000., slope=0.,
+		temperature=8000., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF)
 		print (obj, " ", line, >> dat)
 	} else if (type == "henear") {	# HE-NE-AR
 	    htype = "comp"
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0.8, slope=0., temperature=0.,
-		lines="mkexamples$henear2.dat", sigma=6., comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0.8, slope=0.,
+		temperature=0., lines="mkexamples$henear2.dat", sigma=6.,
+		comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF)
 		print (arc, " ", line, >> dat)
 	} else if (type == "ehenear") {	# HE-NE-AR Even fibers
 	    htype = "comp"
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0.8, slope=0., temperature=0.,
-		lines="mkexamples$henear2.dat", sigma=6., comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0.8, slope=0.,
+		temperature=0., lines="mkexamples$henear2.dat", sigma=6.,
+		comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF) {
 		if (mod (ap, 2) == 0) {
 		    print (arc, " ", line, >> dat)
@@ -120,12 +115,11 @@ begin
 	} else if (type == "ohenear") {	# HE-NE-AR Odd fibers
 	    htype = "comp"
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0.8, slope=0., temperature=0.,
-		lines="mkexamples$henear2.dat", sigma=6., comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0.8, slope=0.,
+		temperature=0., lines="mkexamples$henear2.dat", sigma=6.,
+		comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF) {
 		if (mod (ap, 2) == 1) {
 		    print (arc, " ", line, >> dat)
@@ -134,13 +128,11 @@ begin
 	} else if (type == "mercury") {	# Emission lines
 	    htype = "comp"
 	    mk1dspec (arc, output="", ap=1, rv=0., z=no, ncols=nlines, naps=1,
-		wstart=wstart, wend=wend, format="onedspec",
-		continuum=0., slope=0., temperature=0.,
-		lines="", nlines=30, peak=10000., sigma=3., seed=i,
-		comments=no)
-	    mk1dspec (arc, output="", ap=1, rv=0., z=no,
-		continuum=20, slope=0., temperature=0.,
-		lines="", nlines=0, comments=no)
+		wstart=wstart, wend=wend, continuum=0., slope=0.,
+		temperature=0., lines="", nlines=30, peak=10000., sigma=3.,
+		seed=i, comments=no)
+	    mk1dspec (arc, output="", ap=1, rv=0., z=no, continuum=20,
+		slope=0., temperature=0., lines="", nlines=0, comments=no)
 	    while (fscan (list, ap, beam, line) != EOF) {
 		print (arc, " ", line, >> dat)
 	    }

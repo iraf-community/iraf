@@ -60,9 +60,10 @@ libpkg.a:
 	ccdflag.x	
 	ccdlog.x	<imset.h>
 	ccdmean.x	<imhdr.h>
+	ccdnscan.x	ccdtypes.h
 	ccdproc.x	ccdred.h ccdtypes.h <error.h>
 	ccdsection.x	<ctype.h> <imhdr.h>
-	ccdsubsets.x
+	ccdsubsets.x	<ctype.h>
 	ccdtypes.x	ccdtypes.h
 	doproc.x	ccdred.h
 	hdrmap.x	hdrmap.com

@@ -49,6 +49,8 @@ COLON COMMANDS
 :/help			Print this menu
 :/mark string		Mark type (point, box, plus, cross, diamond,
 				   hline, vline, hebar, vebar, circle)
+:/line [0-9]		Line style
+:/color [0-9]		Line or mark color
 :/sysid [yes|no]	Include the standard IRAF user/date banner?
 :/title	string		Title
 :/transpose		Transpose the graph axes

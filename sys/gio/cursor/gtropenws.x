@@ -17,16 +17,16 @@ include	"gtr.h"
 # kernels reside in connected subprocesses communicating via the central
 # process (the CL process) with the graphics task in another subprocess.
 
-procedure gtr_openws (devname, mode, stream, source_pid)
+procedure gtr_openws (devspec, mode, stream, source_pid)
 
-char	devname[ARB]		# graphcap name of device to be opened
-int	mode			# access mode
-int	stream			# graphics stream
-int	source_pid		# process which issued the openws directive
+char	devspec[ARB]		#I device specification
+int	mode			#I access mode
+int	stream			#I graphics stream
+int	source_pid		#I process which issued the openws directive
 
-int	redir_code
-pointer	sp, tr, tty, kernfname, taskname
-int	dd[LEN_GKIDD]
+int	redir_code, dd[LEN_GKIDD], ip
+pointer	sp, op, tr, tty, kernfname, taskname, device
+
 bool	streq()
 pointer	ttygdes()
 int	pr_getredir(), ttygets(), gtr_connect(), pr_findproc(), locpr()
@@ -40,8 +40,20 @@ begin
 	call smark (sp)
 	call salloc (kernfname, SZ_FNAME, TY_CHAR)
 	call salloc (taskname, SZ_FNAME, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
 
 	tr = trdes[stream]
+
+	# Extract the device name field from the device specification.
+	op = device
+	for (ip=1;  devspec[ip] != EOS;  ip=ip+1)
+	    if (devspec[ip] == ',')
+		break
+	    else {
+		Memc[op] = devspec[ip]
+		op = op + 1
+	    }
+	Memc[op] = EOS
 
 	# We only connect up the i/o channels, and do not issue the OPENWS
 	# to the gio kernel, so reset the counter to zero to indicate that
@@ -66,12 +78,14 @@ begin
 	call fseti (stream, F_TYPE, SPOOL_FILE)
 	call fseti (stream, F_CANCEL, OK)
 
-	# If the device is already connected to the stream all we need do is
-	# reset the redirection code for the graphics stream.  This code is
-	# reset to the default value (the code for the stream itself) by the
-	# CL when a task is spawned.
+	# If the device is already connected to the stream (or we are
+	# appending to a connected device) all we need do is reset the
+	# redirection code for the graphics stream.  This code is reset to
+	# the default value (the code for the stream itself) by the CL when
+	# a task is spawned.
 
-	if (streq (devname, TR_DEVNAME(tr))) {
+	if (TR_DEVNAME(tr) != EOS && mode == APPEND ||
+		streq (devspec, TR_DEVNAME(tr))) {
 	    call pr_redir (source_pid, stream, TR_REDIR(tr))
 	    call sfree (sp)
 	    return
@@ -104,7 +118,7 @@ begin
 	# Get graphcap entry for the new device.  The special device name
 	# "none" indicates that there is no suitable stdgraph device.
 
-	if (streq (devname, "none")) {
+	if (streq (devspec, "none")) {
 	    switch (stream) {
 	    case STDGRAPH:
 		call syserr (SYS_GGNONE)
@@ -116,7 +130,7 @@ begin
 		call syserr (SYS_GGNONE)
 	    }
 	} else {
-	    tty = ttygdes (devname)
+	    tty = ttygdes (Memc[device])
 	    TR_TTY(tr) = tty
 	}
 
@@ -125,7 +139,7 @@ begin
 
 	if (ttygets (tty, "kf", Memc[kernfname], SZ_FNAME) <= 0) {
 	    call ttycdes (tty)
-	    call syserrs (SYS_GNOKF, devname)
+	    call syserrs (SYS_GNOKF, Memc[device])
 	} else if (ttygets (tty, "tn", Memc[taskname], SZ_FNAME) <= 0)
 	    ;
 
@@ -138,7 +152,7 @@ begin
 	    # flag that GIOTR is to be called to filter graphics output from
 	    # the process.
 
-	    call stg_open (devname, dd, STDIN, STDOUT, 0, 0, 0)
+	    call stg_open (devspec, dd, STDIN, STDOUT, 0, 0, 0)
 	    call gki_inline_kernel (stream, dd)
 	    if (source_pid != NULL)
 		call pr_redir (source_pid, stream, -stream)
@@ -148,7 +162,7 @@ begin
 	} else {
 	    # Spawn subprocess and start up kernel task.
 	    TR_PID(tr) = gtr_connect (Memc[kernfname], Memc[taskname],
-		devname, stream, TR_IN(tr), TR_OUT(tr))
+		devspec, stream, TR_IN(tr), TR_OUT(tr))
 
 	    # Encode the process slot number of the kernel process in the
 	    # redirection code for the source process (the process which
@@ -173,7 +187,7 @@ begin
 	# successfully connected, since this variable is used to test if
 	# the kernel is already connected.
 
-	call strcpy (devname, TR_DEVNAME(tr), SZ_TRDEVNAME)
+	call strcpy (devspec, TR_DEVNAME(tr), SZ_TRDEVNAME)
 
 	# Post the gtr_reset procedure to be executed upon process shutdown,
 	# to close down any connected graphics subkernels in an orderly way.

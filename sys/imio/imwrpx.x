@@ -16,10 +16,11 @@ int	npix			# number of pixels to be written
 long	v[ARB]			# physical coords of first pixel to be written
 int	xstep			# step size between output pixels
 
-pointer	pl
+bool	rlio
 long	offset
+pointer	pl, sp, ibuf
 long	o_v[IM_MAXDIM]
-int	sz_pixel, nchars, ip, step, i
+int	sz_pixel, nchars, ip, step
 long	imnote()
 errchk	imerr, imwrite
 include	<szdtype.inc>
@@ -38,18 +39,49 @@ begin
 	if (pl != NULL) {
 	    # Write to a pixel list.
 
-	    if (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
-		call pl_plri (pl, v, buf, 0, npix, PIX_SRC)
-	    else if (step == 1)
-		call pl_plpi (pl, v, buf, 0, npix, PIX_SRC)
-	    else {
-		ip = 1
-		call amovl (v, o_v, IM_MAXDIM)
-		do i = 1, npix {
-		    call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
-		    o_v[1] = o_v[1] + step
-		    ip = ip + step
+	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
+	    call amovl (v, o_v, IM_MAXDIM)
+	    nchars = npix * sz_pixel
+
+	    switch (IM_PIXTYPE(im)) {
+	    case TY_SHORT:
+		if (rlio)
+		    call pl_plrs (pl, v, buf, 0, npix, PIX_SRC)
+		else if (step == 1)
+		    call pl_plps (pl, v, buf, 0, npix, PIX_SRC)
+		else {
+		    do ip = 1, nchars, sz_pixel {
+			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			o_v[1] = o_v[1] + step
+		    }
 		}
+	    case TY_INT, TY_LONG:
+		if (rlio)
+		    call pl_plri (pl, v, buf, 0, npix, PIX_SRC)
+		else if (step == 1)
+		    call pl_plpi (pl, v, buf, 0, npix, PIX_SRC)
+		else {
+		    do ip = 1, nchars, sz_pixel {
+			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			o_v[1] = o_v[1] + step
+		    }
+		}
+	    default:
+		call smark (sp)
+		call salloc (ibuf, npix, TY_INT)
+
+		call acht (buf, Memi[ibuf], npix, IM_PIXTYPE(im), TY_INT)
+		if (rlio)
+		    call pl_plri (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
+		else if (step == 1)
+		    call pl_plpi (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
+		else {
+		    do ip = 1, npix {
+			call pl_plpi (pl, o_v, Memi[ibuf+ip-1], 0, 1, PIX_SRC)
+			o_v[1] = o_v[1] + step
+		    }
+		}
+		call sfree (sp)
 	    }
 
 	} else {

@@ -1,5 +1,5 @@
-include <gset.h>
 include <gio.h>
+include <gset.h>
 include "wcslab.h"
 include "wcs_desc.h"
 
@@ -122,15 +122,9 @@ procedure wl_graphics (wd)
 pointer wd		  # I: the WCSLAB descriptor
 
 real	relative_size, vl, vr, vb, vt
-int	btoi(), strncmp()
 real	ggetr()
 
 begin
-	# Check to see if we are using an imd device and set a flag
-	# appropriately.
-	WL_IS_IMAGE_DISPLAY(wd) =  btoi ((strncmp (IMAGE_GRAPHICS_DEVICE, 
-	    GP_DEVNAME(WL_GP(wd)), 3) == 0))
-
 	# Setup a graphics WCS that mimics the NDC coordinate WCS,
 	# but with clipping.
 	call ggview (WL_GP(wd), vl, vr, vb, vt)

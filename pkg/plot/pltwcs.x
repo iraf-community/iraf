@@ -58,6 +58,7 @@ begin
 		Memr[xin+i-1] = axvals[j]
 	}
 	if (paxis == 0) {		# Bug workaround
+	    paxis = 1
 	    do i = 1, wcsdim {
 		j = i
 		if (j == axis)
@@ -116,9 +117,9 @@ begin
 end
 
 
-# PLT_WCSCOORD -- Print 2D WCS coordinate
+# PLT_WCSCOORD -- Return 2D WCS coordinate
 
-procedure plt_wcscoord (im, mw, ct, wcs, format, col, line, value)
+procedure plt_wcscoord (im, mw, ct, wcs, format, col, line, value, str, maxchar)
 
 pointer	im			# image descriptor
 pointer	mw			# mwcs descriptor
@@ -128,15 +129,17 @@ char	format[ARB]		# default format
 int	col			# logical column
 int	line			# logical line
 real	value			# pixel value
+char	str[maxchar]		# coordinate string
+int	maxchar			# maximum length of coordinate string
 
 int	i, j, k, wcsdim, mw_stati()
-pointer	sp, axno, axval, axis, xin, xout, fmt
+pointer	sp, axno, axval, axis, xin, xout, fmt, temp
 bool	streq()
 errchk	mw_gwattrs
 
 begin
 	if (streq (wcs, "logical")) {
-	    call printf ("pixel=[%d,%d] value=%g\n")
+	    call sprintf (str, maxchar, "pixel=[%d,%d] value=%g\n")
 		call pargi (col)
 		call pargi (line)
 		call pargr (value)
@@ -150,6 +153,7 @@ begin
 	call salloc (xin, IM_MAXDIM, TY_REAL)
 	call salloc (xout, IM_MAXDIM, TY_REAL)
 	call salloc (fmt, SZ_FNAME, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
 	call aclri (Memi[axis], IM_MAXDIM)
 
 	# Map the logical to physical coordinates
@@ -199,14 +203,15 @@ begin
 	i = min (j, k)
 	j = max (j, k)
 	if (streq (wcs, "physical")) {
-	    call printf ("pixel=[%d,%d], physical=[%d,%d], value=%g\n")
+	    call sprintf (str, maxchar,
+		"pixel=[%d,%d], physical=[%d,%d], value=%g\n")
 		call pargi (col)
 		call pargi (line)
 		call pargi (nint (Memr[xout+i-1]))
 		call pargi (nint (Memr[xout+j-1]))
 		call pargr (value)
 	} else {
-	    call printf ("pixel=[%d,%d], world=[")
+	    call sprintf (str, maxchar, "pixel=[%d,%d], world=[")
 		call pargi (col)
 		call pargi (line)
 
@@ -214,18 +219,21 @@ begin
 	    if (Memc[fmt] == EOS)
 		iferr (call mw_gwattrs (mw,i,"format",Memc[fmt],SZ_FNAME))
 		    call strcpy ("%g", Memc[fmt], SZ_FNAME)
-	    call printf (Memc[fmt])
+	    call sprintf (Memc[temp], SZ_FNAME, Memc[fmt])
 		call pargr (Memr[xout+i-1])
-	    call printf (",")
+	    call strcat (Memc[temp], str, maxchar)
+	    call strcat (",", str, maxchar)
 	    call strcpy (format, Memc[fmt], SZ_FNAME)
 	    if (Memc[fmt] == EOS)
 		iferr (call mw_gwattrs (mw,j,"format",Memc[fmt],SZ_FNAME))
 		    call strcpy ("%g", Memc[fmt], SZ_FNAME)
-	    call printf (Memc[fmt])
+	    call sprintf (Memc[temp], SZ_FNAME, Memc[fmt])
 		call pargr (Memr[xout+j-1])
+	    call strcat (Memc[temp], str, maxchar)
 
-	    call printf ("] value=%g\n")
+	    call sprintf (Memc[temp], SZ_FNAME, "] value=%g\n")
 		call pargr (value)
+	    call strcat (Memc[temp], str, maxchar)
 	}
 
 	call sfree (sp)

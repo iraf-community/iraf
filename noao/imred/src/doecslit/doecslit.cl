@@ -16,7 +16,7 @@ string	standards = ""		{prompt="List of standard star spectra\n"}
 
 string	readnoise = "0."	{prompt="Read out noise sigma (photons)"}
 string	gain = "1."		{prompt="Photon gain (photons/data number)"}
-int	dispaxis = ")_.dispaxis" {prompt="Dispersion axis (1=along lines, 2=along columns)"}
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 int	norders = 10		{prompt="Number of orders"}
 real	width = 5.		{prompt="Width of profiles (pixels)\n"}
 
@@ -47,7 +47,7 @@ begin
 	obj = mktemp ("tmp$iraf") 
 	arc = mktemp ("tmp$iraf")
 	std = mktemp ("tmp$iraf")
-	sgetspec (objects, arcs, standards, obj, arc, std)
+	sgetspec (objects, arcs, arctable, standards, obj, arc, std)
 
 	# Remove any leading whitespace from parameters that might be null.
 	if (logfile != "") {
@@ -63,7 +63,6 @@ begin
 
 	apslitproc.readnoise = readnoise
 	apslitproc.gain = gain
-	apslitproc.dispaxis = dispaxis
 	apslitproc.nfind = norders
 	apslitproc.width = width
 	apslitproc.lower = -width / 2.
@@ -81,6 +80,7 @@ begin
 	    scat = no
 	    apslitproc.background = background
 	}
+	sproc.datamax = datamax
 
 	recenter = yes
 	tr = trace

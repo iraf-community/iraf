@@ -265,9 +265,9 @@ begin
 
 	    # Compute the size of the output image.
 	    xmax = abs (cos(GT_XROTATION(geo)) * IM_LEN(in,1) /
-	        GT_XMAG(geo)) + abs(sin(GT_XROTATION(geo)) * IM_LEN(in,2) /
+	        GT_XMAG(geo)) + abs(sin(GT_YROTATION(geo)) * IM_LEN(in,2) /
 		GT_YMAG(geo))
-	    ymax = abs (sin(GT_YROTATION(geo)) * IM_LEN(in, 1) /
+	    ymax = abs (sin(GT_XROTATION(geo)) * IM_LEN(in, 1) /
 	        GT_XMAG(geo)) + abs (cos(GT_YROTATION(geo)) * IM_LEN(in,2) /
 		GT_YMAG(geo))
 	}
@@ -650,8 +650,8 @@ begin
 
 	# Calculate the coefficients.
 	Memr[xcoeff+GS_SAVECOEFF+1] =  xscale * cosx
-	Memr[xcoeff+GS_SAVECOEFF+2] =  yscale * sinx
-	Memr[ycoeff+GS_SAVECOEFF+1] = -xscale * siny
+	Memr[xcoeff+GS_SAVECOEFF+2] =  yscale * siny
+	Memr[ycoeff+GS_SAVECOEFF+1] = -xscale * sinx
 	Memr[ycoeff+GS_SAVECOEFF+2] =  yscale * cosy
 
 	# Normalize coefficients for non polynomial functions.

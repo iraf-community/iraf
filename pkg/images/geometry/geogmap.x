@@ -24,16 +24,15 @@ real	yin[npts]	# input y coordinates
 real	wts[npts]	# array of weights
 int	npts		# number of data points
 
-char	cmd[SZ_LINE]
-int	newgraph, delete, wcs, key
-pointer	sp, w, gfit, xresid, yresid
+char	errstr[SZ_LINE]
+int	newgraph, delete, wcs, key, errcode
+pointer	sp, w, gfit, xresid, yresid, cmd, xerrmsg, yerrmsg
 pointer	gt1, gt2, gt3, gt4, gt5
 real	wx, wy, xshift, yshift, xscale, yscale, thetax, thetay
 
-int	clgcur()
+int	clgcur(), errget()
 pointer	gt_init()
-
-errchk	smark, salloc, geomfit, geomreject
+errchk	smark(), salloc(), geomfit(), geomreject()
 
 begin
 	# initialize gfit structure and working space
@@ -42,25 +41,24 @@ begin
 	call salloc (xresid, npts, TY_REAL)
 	call salloc (yresid, npts, TY_REAL)
 	call salloc (w, npts, TY_REAL)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	# do first fit
-	iferr  {
-	    call geomfit (fit, sx1, sx2, xref, yref, xin, wts, Memr[xresid],
-	        npts, YES)
-	    call geomfit (fit, sy1, sy2, xref, yref, yin, wts, Memr[yresid],
-	        npts, NO)
-	    if (GM_REJECT(fit) > 0.)
-	        call geomreject (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-		    wts, Memr[xresid], Memr[yresid], npts)
-	    else
-		GM_NREJECT(fit) = 0
-	    GG_NEWFUNCTION(gfit) = NO
-	    GG_FITERROR(gfit) = NO
-	} then {
-	    call erract (EA_WARN)
-	    GG_FITERROR(gfit) = YES
-	}
-
+	call geomfit (fit, sx1, sx2, xref, yref, xin, wts, Memr[xresid],
+	    npts, YES, Memc[xerrmsg], SZ_LINE)
+	call geomfit (fit, sy1, sy2, xref, yref, yin, wts, Memr[yresid],
+	    npts, NO, Memc[yerrmsg], SZ_LINE)
+	if (GM_REJECT(fit) > 0.)
+	    call geomreject (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
+		wts, Memr[xresid], Memr[yresid], npts, Memc[xerrmsg],
+		SZ_LINE, Memc[yerrmsg], SZ_LINE)
+	else
+	    GM_NREJECT(fit) = 0
+	GG_NEWFUNCTION(gfit) = NO
+	GG_FITERROR(gfit) = NO
+	errcode = OK
 
 	# set up plotting defaults
 	GG_PLOTTYPE(gfit) = FIT
@@ -84,17 +82,18 @@ begin
 
 	# make the first plot
 	call gclear (gd)
-	if (GG_FITERROR(gfit) == NO) {
-	    call geolabel (FIT, gt1, fit)
-	    call geograph1 (gd, gt1, fit, gfit, xref, yref, xin, yin, wts,
-	        npts)
-	    if (GG_CONSTXY(gfit) == YES)
-		call geoconxy (gd, fit, sx1, sy1, sx2, sy2)
-	}
+	call geolabel (FIT, gt1, fit)
+	call geograph1 (gd, gt1, fit, gfit, xref, yref, xin, yin, wts,
+	    npts)
+	if (GG_CONSTXY(gfit) == YES)
+	    call geoconxy (gd, fit, sx1, sy1, sx2, sy2)
+	call printf ("%s  %s\n")
+	    call pargstr (Memc[xerrmsg])
+	    call pargstr (Memc[yerrmsg])
 
 	# read the cursor commands
 	call amovr (wts, Memr[w], npts)
-	while (clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) != EOF) {
+	while (clgcur ("cursor", wx, wy, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
 
 	    switch (key) {
 
@@ -105,35 +104,37 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 
 	    case ':':
-		call geocolon (gd, fit, gfit, cmd, newgraph)
+		call geocolon (gd, fit, gfit, Memc[cmd], newgraph)
 		switch (GG_PLOTTYPE(gfit)) {
 		case FIT:
-		    call gt_colon (cmd, gt1, newgraph)
+		    call gt_colon (Memc[cmd], gt1, newgraph)
 		case XXRESID:
-		    call gt_colon (cmd, gt2, newgraph)
+		    call gt_colon (Memc[cmd], gt2, newgraph)
 		case XYRESID:
-		    call gt_colon (cmd, gt3, newgraph)
+		    call gt_colon (Memc[cmd], gt3, newgraph)
 		case YXRESID:
-		    call gt_colon (cmd, gt4, newgraph)
+		    call gt_colon (Memc[cmd], gt4, newgraph)
 		case YYRESID:
-		    call gt_colon (cmd, gt5, newgraph)
+		    call gt_colon (Memc[cmd], gt5, newgraph)
 		}
 
 	    case 'l':
-		call lincoeff (fit, sx1, sy1, xshift, yshift, xscale, yscale,
-		    thetax, thetay)
-		call printf ("xshift: %.2f yshift: %.2f ")
-		    call pargr (xshift)
-		    call pargr (yshift)
-		call printf ("xmag: %.2f ymag: %.2f ")
-		    call pargr (xscale)
-		    call pargr (yscale)
-		call printf ("xrot: %.2f yrot: %.2f\n")
-		    call pargr (thetax)
-		    call pargr (thetay)
+		if (GG_FITERROR(gfit) == NO) {
+		    call lincoeff (fit, sx1, sy1, xshift, yshift, xscale,
+		        yscale, thetax, thetay)
+		    call printf ("xshift: %.2f yshift: %.2f ")
+		        call pargr (xshift)
+		        call pargr (yshift)
+		    call printf ("xmag: %.2f ymag: %.2f ")
+		        call pargr (xscale)
+		        call pargr (yscale)
+		    call printf ("xrot: %.2f yrot: %.2f\n")
+		        call pargr (thetax)
+		        call pargr (thetay)
+		}
 
 	    case 't':
-		if (GG_PLOTTYPE(gfit) == FIT)
+		if (GG_FITERROR(gfit) == NO && GG_PLOTTYPE(gfit) == FIT)
 		    call geolinxy (gd, fit, sx1, sy1, sx2, sy2, xref, yref,
 		        xin, yin, npts, wx, wy)
 	    case 'c':
@@ -198,19 +199,23 @@ begin
 		if (GG_NEWFUNCTION(gfit) == YES) {
 		    iferr {
 		        call geomfit (fit, sx1, sx2, xref, yref, xin, Memr[w],
-			    Memr[xresid], npts, YES) 
+			    Memr[xresid], npts, YES, Memc[xerrmsg], SZ_LINE) 
 		        call geomfit (fit, sy1, sy2, xref, yref, yin, Memr[w],
-			    Memr[yresid], npts, NO) 
+			    Memr[yresid], npts, NO, Memc[yerrmsg], SZ_LINE) 
 		        if (GM_REJECT(fit) > 0.)
 			    call geomreject (fit, sx1, sy1, sx2, sy2, xref,
 			        yref, xin, yin, Memr[w], Memr[xresid],
-				Memr[yresid], npts)
+				Memr[yresid], npts, Memc[xerrmsg], SZ_LINE,
+				Memc[yerrmsg], SZ_LINE)
 		        else
 			    GM_NREJECT(fit) = 0
 			GG_NEWFUNCTION(gfit) = NO
 			GG_FITERROR(gfit) = NO
+			errcode = OK
 		    } then {
-			call erract (EA_WARN)
+	    		errcode = errget (errstr, SZ_LINE)
+	    		call printf ("%s\n")
+			    call pargstr (errstr)
 			GG_FITERROR(gfit) = YES
 		    }
 		}
@@ -254,17 +259,24 @@ begin
 	    	    call geograph2 (gd, gt5, fit, gfit, yref, Memr[yresid],
 		         Memr[w], npts)
 		}
+	        call printf ("%s  %s\n")
+	    	    call pargstr (Memc[xerrmsg])
+	    	    call pargstr (Memc[yerrmsg])
 		newgraph = NO
 	    }
 	}
 
 	# free space
-	call sfree (sp)
 	call gt_free (gt1)
 	call gt_free (gt2)
 	call gt_free (gt3)
 	call gt_free (gt4)
 	call gt_free (gt5)
+	call sfree (sp)
+
+	# call an error if appropriate
+	if (errcode > 0)
+	    call error (0, errstr)
 end
 
 
@@ -286,18 +298,17 @@ double	yin[npts]	# input y coordinates
 double	wts[npts]	# array of weights
 int	npts		# number of data points
 
-char	cmd[SZ_LINE]
+char	errstr[SZ_LINE]
 double	xshift, yshift, xscale, yscale, thetax, thetay
-int	newgraph, delete, wcs, key
-pointer	sp, w, gfit, xresid, yresid
+int	newgraph, delete, wcs, key, errcode
+pointer	sp, w, gfit, xresid, yresid, cmd, xerrmsg, yerrmsg
 pointer	rxref, ryref, rxin, ryin, rxresid, ryresid, rwts, rw
 pointer	gt1, gt2, gt3, gt4, gt5
 real	wx, wy
 
-int	gt_gcur()
+int	gt_gcur(), errget()
 pointer	gt_init()
-
-errchk	smark, salloc, geomfitd, geomrejectd
+errchk	smark(), salloc(), geomfitd(), geomrejectd()
 
 begin
 	# initialize gfit structure and working space
@@ -306,6 +317,9 @@ begin
 	call salloc (xresid, npts, TY_DOUBLE)
 	call salloc (yresid, npts, TY_DOUBLE)
 	call salloc (w, npts, TY_DOUBLE)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	# allocate temporary arrays for graphing programs
 	call salloc (rxref, npts, TY_REAL)
@@ -319,22 +333,19 @@ begin
 
 
 	# do first fit
-	iferr  {
-	    call geomfitd (fit, sx1, sx2, xref, yref, xin, wts, Memd[xresid],
-	        npts, YES)
-	    call geomfitd (fit, sy1, sy2, xref, yref, yin, wts, Memd[yresid],
-	        npts, NO)
-	    if (GM_REJECT(fit) > 0.)
-	        call geomrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-		    wts, Memd[xresid], Memd[yresid], npts)
-	    else
-		GM_NREJECT(fit) = 0
-	    GG_NEWFUNCTION(gfit) = NO
-	    GG_FITERROR(gfit) = NO
-	} then {
-	    call erract (EA_WARN)
-	    GG_FITERROR(gfit) = YES
-	}
+	call geomfitd (fit, sx1, sx2, xref, yref, xin, wts, Memd[xresid],
+	    npts, YES, Memc[xerrmsg], SZ_LINE)
+	call geomfitd (fit, sy1, sy2, xref, yref, yin, wts, Memd[yresid],
+	    npts, NO, Memc[yerrmsg], SZ_LINE)
+	if (GM_REJECT(fit) > 0.)
+	    call geomrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
+	        wts, Memd[xresid], Memd[yresid], npts, Memc[xerrmsg],
+		SZ_LINE, Memc[yerrmsg], SZ_LINE)
+	else
+	    GM_NREJECT(fit) = 0
+	GG_NEWFUNCTION(gfit) = NO
+	GG_FITERROR(gfit) = NO
+	errcode = OK
 
 	# set up plotting arrays
 	call achtdr (xref, Memr[rxref], npts)
@@ -371,16 +382,18 @@ begin
 
 	# make the first plot
 	call gclear (gd)
-	if (GG_FITERROR(gfit) == NO) {
-	    call geolabel (FIT, gt1, fit)
-	    call geograph1 (gd, gt1, fit, gfit, Memr[rxref], Memr[ryref],
-	        Memr[rxin], Memr[ryin], Memr[rw], npts)
-	    if (GG_CONSTXY(gfit) == YES)
-		call geoconxyd (gd, fit, sx1, sy1, sx2, sy2)
-	}
+	call geolabel (FIT, gt1, fit)
+	call geograph1 (gd, gt1, fit, gfit, Memr[rxref], Memr[ryref],
+	    Memr[rxin], Memr[ryin], Memr[rw], npts)
+	if (GG_CONSTXY(gfit) == YES)
+	    call geoconxyd (gd, fit, sx1, sy1, sx2, sy2)
+	call printf ("%s  %s\n")
+	    call pargstr (Memc[xerrmsg])
+	    call pargstr (Memc[yerrmsg])
 
 	# read the cursor commands
-	while (gt_gcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) != EOF) {
+	while (gt_gcur ("cursor", wx, wy, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	    switch (key) {
 
@@ -388,35 +401,37 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 
 	    case ':':
-		call geocolon (gd, fit, gfit, cmd, newgraph)
+		call geocolon (gd, fit, gfit, Memc[cmd], newgraph)
 		switch (GG_PLOTTYPE(gfit)) {
 		case FIT:
-		    call gt_colon (cmd, gt1, newgraph)
+		    call gt_colon (Memc[cmd], gt1, newgraph)
 		case XXRESID:
-		    call gt_colon (cmd, gt2, newgraph)
+		    call gt_colon (Memc[cmd], gt2, newgraph)
 		case XYRESID:
-		    call gt_colon (cmd, gt3, newgraph)
+		    call gt_colon (Memc[cmd], gt3, newgraph)
 		case YXRESID:
-		    call gt_colon (cmd, gt4, newgraph)
+		    call gt_colon (Memc[cmd], gt4, newgraph)
 		case YYRESID:
-		    call gt_colon (cmd, gt5, newgraph)
+		    call gt_colon (Memc[cmd], gt5, newgraph)
 		}
 
 	    case 'l':
-		call lincoeffd (fit, sx1, sy1, xshift, yshift, xscale, yscale,
-		    thetax, thetay)
-		call printf ("xshift: %.2f yshift: %.2f ")
-		    call pargd (xshift)
-		    call pargd (yshift)
-		call printf ("xmag: %.2f ymag: %.2f ")
-		    call pargd (xscale)
-		    call pargd (yscale)
-		call printf ("xrot: %.2f yrot: %.2f\n")
-		    call pargd (thetax)
-		    call pargd (thetay)
+		if (GG_FITERROR(gfit) == NO) {
+		    call lincoeffd (fit, sx1, sy1, xshift, yshift, xscale,
+		        yscale, thetax, thetay)
+		    call printf ("xshift: %.2f yshift: %.2f ")
+		        call pargd (xshift)
+		        call pargd (yshift)
+		    call printf ("xmag: %.2f ymag: %.2f ")
+		        call pargd (xscale)
+		        call pargd (yscale)
+		    call printf ("xrot: %.2f yrot: %.2f\n")
+		        call pargd (thetax)
+		        call pargd (thetay)
+		}
 
 	    case 't':
-		if (GG_PLOTTYPE(gfit) == FIT)
+		if (GG_FITERROR(gfit) == NO && GG_PLOTTYPE(gfit) == FIT)
 		    call geolinxyd (gd, fit, sx1, sy1, sx2, sy2, xref,
 		        yref, xin, yin, npts, wx, wy)
 
@@ -483,21 +498,25 @@ begin
 		if (GG_NEWFUNCTION(gfit) == YES) {
 		    iferr {
 		        call geomfitd (fit, sx1, sx2, xref, yref, xin, Memd[w],
-			    Memd[xresid], npts, YES) 
+			    Memd[xresid], npts, YES, Memc[xerrmsg], SZ_LINE) 
 		        call geomfitd (fit, sy1, sy2, xref, yref, yin, Memd[w],
-			    Memd[yresid], npts, NO) 
+			    Memd[yresid], npts, NO, Memc[yerrmsg], SZ_LINE) 
 			if (GM_REJECT(fit) > 0.)
 			    call geomrejectd (fit, sx1, sy1, sx2, sy2, xref,
 			        yref, xin, yin, Memd[w], Memd[xresid],
-				Memd[yresid], npts)
+				Memd[yresid], npts, Memc[xerrmsg], SZ_LINE,
+				Memc[yerrmsg], SZ_LINE)
 			else
 			    GM_NREJECT(fit) = 0
 		        call achtdr (Memd[xresid], Memr[rxresid], npts)
 			call achtdr (Memd[yresid], Memr[ryresid], npts)
 			GG_NEWFUNCTION(gfit) = NO
 		        GG_FITERROR(gfit) = NO
+			errcode = OK
 		    } then {
-		        call erract (EA_WARN)
+	    		errcode = errget (errstr, SZ_LINE)
+	    		call printf ("%s\n")
+			    call pargstr (errstr)
 		        GG_FITERROR(gfit) = YES
 		    }
 		}
@@ -543,15 +562,21 @@ begin
 		        Memr[ryresid], Memr[rw], npts)
 		}
 
+		call printf ("%s  %s\n")
+	    	    call pargstr (Memc[xerrmsg])
+	    	    call pargstr (Memc[yerrmsg])
 		newgraph = NO
 	    }
 	}
 
 	# free space
-	call sfree (sp)
 	call gt_free (gt1)
 	call gt_free (gt2)
 	call gt_free (gt3)
 	call gt_free (gt4)
 	call gt_free (gt5)
+	call sfree (sp)
+
+	if (errcode > 0)
+	    call error (0, errstr)
 end

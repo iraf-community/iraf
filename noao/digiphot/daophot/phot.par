@@ -1,21 +1,21 @@
 # PHOT parameters
 
-image,f,a,,,,Input image
-coords,f,a,"default",,,"Coordinate list (default: image.coo.?)"
-output,f,a,"default",,,Results file (default: image.mag.?)"
-datapars,pset,h,"",,,Data dependent parameters
-centerpars,pset,h,"",,,Centering parameters
-fitskypars,pset,h,"",,,Sky fitting parameters
-photpars,pset,h,"",,,Photometry parameters
-skyfile,f,a,"",,,Sky file
-plotfile,f,h,"",,,File of plot metacode
-graphics,s,h,"stdgraph",,,Graphics device
-display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-radplots,b,h,no,,,Plot the radial profiles
-interactive,b,h,no,,,Mode of use
-verify,b,h,yes,,,Verify critical parameters in non interactive mode
-update,b,h,yes,,,Update critical parameters in non interactive mode
-verbose,b,h,no,,,Print messages in non interactive mode
+image,f,a,,,,"Input image(s)"
+coords,f,a,"default",,,"Input coordinate list(s) (default: image.coo.?)"
+output,f,a,"default",,,"Output photometry file(s) (default: image.mag.?)"
+skyfile,f,a,"",,,"Input sky value file(s)"
+plotfile,f,h,"",,,"Output plot metacode file"
+datapars,pset,h,"",,,"Data dependent parameters"
+centerpars,pset,h,"",,,"Centering parameters"
+fitskypars,pset,h,"",,,"Sky fitting parameters"
+photpars,pset,h,"",,,"Photometry parameters"
+interactive,b,h,no,,,"Interactive mode ?"
+radplots,b,h,no,,,Plot the radial profiles?
+verify,b,h,)_.verify,,,"Verify critical phot parameters ?"
+update,b,h,)_.update,,,"Update critical phot parameters ?"
+verbose,b,h,)_.verbose,,,"Print phot messages ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

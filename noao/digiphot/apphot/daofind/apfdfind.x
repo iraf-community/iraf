@@ -6,10 +6,11 @@ define	HELPFILE	"apphot$daofind/daofind.key"
 
 # AP_FDFIND -- Find objects in an image interactively.
 
-int procedure ap_fdfind (cnvname, ap, im, gd, id, out, boundary, constant,
-        save, interactive)
+int procedure ap_fdfind (denname, skyname, ap, im, gd, id, out, boundary,
+	constant, save, skysave, interactive)
 
-char	cnvname[ARB]		# name of convolved image
+char	denname[ARB]		# name of density enhancement image
+char	skyname[ARB]		# name of the fitted sky image
 pointer ap			# pointer to the apphot structure
 pointer	im			# pointer to the IRAF image
 pointer	gd			# pointer to the graphics stream
@@ -18,14 +19,15 @@ int	out			# output file descriptor
 int	boundary		# type of boundary extension
 real	constant		# constatn for constant boundary extension
 int	save			# save convolved image
+int	skysave			# save the sky image
 int	interactive		# interactive mode
 
-int	wcs, key, newconv, newfit, stid
-pointer	sp, cmd, root, cnv
+int	wcs, key, newimage, newden, newfit, stid
+pointer	sp, cmd, root, den, sky
 real	wx, wy
 
 int	clgcur(), apgqverify(), apgtverify()
-pointer	ap_cnvmap()
+pointer	ap_immap()
 real	apstatr()
 
 begin
@@ -39,13 +41,15 @@ begin
 	call strcpy (" ", Memc[root], SZ_FNAME)
 
 	# Initialize fitting parameters.
-	cnv = NULL
-	newconv = YES
+	den = NULL
+	sky = NULL
+	newimage = NO
+	newden = YES
 	newfit = YES
-	stid = 1
 
 	# Loop over the cursor commands.
-	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
+	stid = 1
+	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 
 	    # Store the current cursor coordinates.
@@ -60,11 +64,13 @@ begin
 		if (interactive == YES && apgqverify ("daofind",
 		    ap, key) == YES) {
 		    call sfree (sp)
-		    if (cnv != NULL) {
-	    	        call imunmap (cnv)
+		    if (den != NULL) {
+	    	        call imunmap (den)
 		        if (save == NO)
-	    	            call imdelete (cnvname)
+	    	            call imdelete (denname)
 		    }
+		    if (sky != NULL)
+			call imunmap (sky)
 		    return (apgtverify (key))
 		} else {
 		    call sfree (sp)
@@ -73,7 +79,7 @@ begin
 
 	    # Get information on keystroke commands.
 	    case '?':
-		if (id != NULL)
+		if ((id != NULL) && (gd == id))
 		    call gpagefile (id, HELPFILE, "")
 		else if (interactive == YES)
 		    call pagefile (HELPFILE, "[space=morehelp,q=quit,?=help]")
@@ -85,13 +91,13 @@ begin
 	    # Interactively set the daofind parameters.
 	    case 'i':
 		call ap_fdradsetup (ap, im, wx, wy, gd, out, stid)
-		newconv = YES
+		newden = YES
 		newfit = YES
 
 	    # Verify the critical daofind parameters.
 	    case 'v':
 		call ap_fdconfirm (ap)
-		newconv = YES
+		newden = YES
 		newfit = YES
 
 	    # Save daofind parameters in the pset files.
@@ -100,47 +106,71 @@ begin
 
 	    # Process apphot : commands.
 	    case ':':
-		call ap_fdcolon (ap, im, out, stid, Memc[cmd], newconv, newfit)
+		call ap_fdcolon (ap, im, out, stid, Memc[cmd], newimage,
+		    newden, newfit)
+
+		# Determine the viewport and data window of image display.
+		if ((newimage == YES) && (id != NULL) && (id != gd)) {
+		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
+		    call ap_gswv (id, Memc[cmd], im, 4)
+		}
+		newimage = NO
 
 	    # Find the stars.
-	    case 'f':
-		if (newconv == YES) {
-		    if (cnv != NULL) {
-			call imunmap (cnv)
-		        call imdelete (cnvname)
+	    case 'f', ' ':
+
+		if (newden == YES) {
+
+		    if (den != NULL) {
+			call imunmap (den)
+		        call imdelete (denname)
 		    }
-		    cnv = ap_cnvmap (cnvname, im, ap, save)
-		    call ap_fdstars (im, ap, cnv, NULL, id, boundary, constant,
-		        NO, stid)
+		    den = ap_immap (denname, im, ap, save)
+
+		    if (sky != NULL)
+			call imunmap (sky)
+		    if (skysave == YES)
+		        sky = ap_immap (skyname, im, ap, YES)
+		    else
+			sky = NULL
+		    newden = NO
+
+		    if (key == 'f') {
+		        call ap_fdstars (im, ap, den, sky, NULL, id,
+			    boundary, constant, NO, stid)
+		    } else {
+		        call ap_outmap (ap, out, Memc[root])
+		        call ap_fdstars (im, ap, den, sky, out, id,
+			    boundary, constant, NO, stid)
+			newfit = NO
+		    }
+
 		} else if (newfit == YES) {
-		    call ap_fdstars (im, ap, cnv, NULL, id, boundary, constant,
-		        YES, stid)
+
+		    if (key == 'f') {
+		        call ap_fdstars (im, ap, den, sky, NULL, id,
+			    boundary, constant, YES, stid)
+		    } else {
+		        call ap_outmap (ap, out, Memc[root])
+		        call ap_fdstars (im, ap, den, sky, out, id,
+			    boundary, constant, YES, stid)
+			newfit = NO
+		    }
+
 		} else {
 		    call printf ("Detection parameters have not changed\7\n")
 		}
-		stid = 1
-		newconv = NO; newfit = NO
 
-	    # Find the stars and store the results.
-	    case ' ':
-		if (newconv == YES) {
-		    if (cnv != NULL) {
-			call imunmap (cnv)
-			call imdelete (cnvname)
-		    }
-		    cnv = ap_cnvmap (cnvname, im, ap, save)
-		    call ap_outmap (ap, out, Memc[root])
-		    call ap_fdstars (im, ap, cnv, out, id, boundary, constant,
-		        NO, stid)
-		} else if (newfit == YES) {
-		    call ap_outmap (ap, out, Memc[root])
-		    call ap_fdstars (im, ap, cnv, out, id, boundary, constant,
-		        YES, stid)
-		} else {
-		    call printf ("Detection parameters have not changed\7\n\n")
+		if (id != NULL) {
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id) 
 		}
+
 		stid = 1
-		newconv = NO; newfit = NO
+		#newden = NO
+		#newfit = NO
 
 	    default:
 		# do nothing

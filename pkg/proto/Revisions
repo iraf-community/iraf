@@ -1,5 +1,21 @@
 .help revisions Jun88 proto
 .nf
+proto$t_imcntr.x
+    Modified the format of the output to ensure a space between the x: and
+    y: and the x and y coordinate and increased the precision of the output
+    from %7.3f to %8.3f. (22/4/94, Davis)
+
+proto$t_bscale.x
+    Added a call to flush after the status printout so that the output will
+    appear after each images is processed. (29/11/93, Davis)
+
+proto$t_imcntr.x
+    Modified to imcntr task to use image templates instead of file templates.
+    (10/27/92, Davis)
+
+proto$t_imcntr.x
+    Added an error check for constant data. (10/26/92, Davis)
+
 proto$doc/suntoiraf.hlp
     Replaced the help page with an updated one. (4/30/92, Davis)
 

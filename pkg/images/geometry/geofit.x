@@ -7,7 +7,7 @@ include "geomap.h"
 # GEOMINIT -- Procedure to initialize the fitting routines
 
 procedure geominit (fit, function, xxorder, xyorder, xxterms,
-    yxorder, yyorder, yxterms, reject)
+        yxorder, yyorder, yxterms, reject)
 
 pointer	fit		# pointer to the fit structure
 int	function	# fitting function
@@ -41,6 +41,7 @@ begin
 	GM_REJ(fit) = NULL
 end
 
+
 # GEOFREE -- Procedure to release fitting space
 
 procedure geofree (fit)
@@ -51,9 +52,11 @@ begin
 	call mfree (fit, TY_STRUCT)
 end
 
+
 # GEOMFIT -- Fit the surface
 
-procedure geomfit (fit, sf1, sf2, x, y, z, wts, resid, npts, xfit)
+procedure geomfit (fit, sf1, sf2, x, y, z, wts, resid, npts, xfit, errmsg,
+	maxch)
 
 pointer	fit		# pointer to the fit sturcture
 pointer	sf1		# pointer to linear surface
@@ -64,11 +67,12 @@ real	z[npts]	        # z values
 real	wts[npts]	# array of weights
 real	resid[npts]	# fitted residuals
 int	npts		# number of points
-int	xfit		# X fit?
+int	xfit		# X fit ?
+char	errmsg[ARB]	# returned error message
+int	maxch		# maximum number of characters in error message
 
 int	ier
 pointer	sp, zfit
-
 int	i
 
 begin
@@ -82,13 +86,8 @@ begin
 		call gsfree (sf2)
 
 	    if (xfit == YES) {
-		if (GM_XXORDER(fit) == 2 && GM_XYORDER(fit) == 2 &&
-		    GM_XXTERMS(fit) == NO)
-	            call gsinit (sf1, GS_POLYNOMIAL, 2, 2, NO, GM_XMIN(fit),
-		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
-		else
-	            call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
-		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
+	        call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
+		    GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
 		if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 ||
 		    GM_XXTERMS(fit) == YES)
 	            call gsinit (sf2, GM_FUNCTION(fit), GM_XXORDER(fit),
@@ -97,13 +96,8 @@ begin
 		else 
 		    sf2 = NULL
 	     } else {
-		if (GM_YXORDER(fit) == 2 && GM_YYORDER(fit) == 2 &&
-		    GM_YXTERMS(fit) == NO)
-	            call gsinit (sf1, GS_POLYNOMIAL, 2, 2, NO, GM_XMIN(fit),
-		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
-		else
-	            call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
-		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
+	        call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
+		    GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
 		if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
 		    GM_YXTERMS(fit) == YES)
 	            call gsinit (sf2, GM_FUNCTION(fit), GM_YXORDER(fit),
@@ -116,15 +110,23 @@ begin
 	    # fit linear function
 	    call gsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	    if (ier == NO_DEG_FREEDOM) {
+		call sfree (sp)
 		if (xfit == YES)
-		    call error (0, "GEOMFIT: Too few data points for X fit.")
+		    call error (0, "Too few data points for X fit.")
 		else
-		    call error (0, "GEOMFIT: Too few data points for Y fit.")
+		    call error (0, "Too few data points for Y fit.")
 	    } else if (ier == SINGULAR) {
 		if (xfit == YES)
-		    call eprintf ("GEOMFIT: Warning singular X solution.\n")
+		    call sprintf (errmsg, maxch,
+		        "Warning singular X fit.")
 		else
-		    call eprintf ("GEOMFIT: Warning singular Y solution.\n")
+		    call sprintf (errmsg, maxch,
+		        "Warning singular Y fit.")
+	    } else {
+		if (xfit == YES)
+		    call sprintf (errmsg, maxch, "X fit ok.")
+		else
+		    call sprintf (errmsg, maxch, "Y fit ok.")
 	    }
 	    call gsvector (sf1, x, y, resid, npts)
 	    call asubr (z, resid, resid, npts)
@@ -133,15 +135,23 @@ begin
 	    if (sf2 != NULL) {
 		call gsfit (sf2, x, y, resid, wts, npts, WTS_USER, ier)
 		if (ier == NO_DEG_FREEDOM) {
+		    call sfree (sp)
 		    if (xfit == YES)
-		       call error (0, "GEOMFIT: Too few data points for X fit.")
+		       call error (0, "Too few data points for X fit.")
 		    else
-		       call error (0, "GEOMFIT: Too few data points for Y fit.")
+		       call error (0, "Too few data points for Y fit.")
 		} else if (ier == SINGULAR) {
 		    if (xfit == YES)
-			call eprintf ("GEOMFIT: Warning singular X solution.\n")
+		        call sprintf (errmsg, maxch,
+		            "Warning singular X fit.")
 		    else
-			call eprintf ("GEOMFIT: Warning singular Y solution.\n")
+		        call sprintf (errmsg, maxch,
+		            "Warning singular Y fit.")
+		} else {
+		    if (xfit == YES)
+		        call sprintf (errmsg, maxch, "X fit ok.")
+		    else
+		        call sprintf (errmsg, maxch, "Y fit ok.")
 		}
 		call gsvector (sf2, x, y, Memr[zfit], npts)
 		call asubr (resid, Memr[zfit], resid, npts)
@@ -170,9 +180,11 @@ begin
 	    call sfree (sp)
 end
 
+
 # GEOFIT -- Procedure to fit surface in batch
 
-procedure geofit (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts, npts)
+procedure geofit (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts, npts,
+	verbose)
 
 pointer	fit		# pointer to fitting structure
 pointer	sx1, sy1	# pointer to linear surface
@@ -182,34 +194,45 @@ real	yref[ARB]	# y reference array
 real	xin[ARB]	# x array
 real	yin[ARB]	# y array
 real	wts[ARB]	# weight array
-int	npts
+int	npts		# the number of data points
+bool	verbose		# verbose mode
 
-pointer	sp, xresidual, yresidual
-
-errchk	geomfit, geomreject
+pointer	sp, xresidual, yresidual, xerrmsg, yerrmsg
+errchk	geomfit(), geomreject()
 
 begin
 	call smark (sp)
 	call salloc (xresidual, npts, TY_REAL)
 	call salloc (yresidual, npts, TY_REAL)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	call geomfit (fit, sx1, sx2, xref, yref, xin, wts, Memr[xresidual],
-	    npts, YES)
+	    npts, YES, Memc[xerrmsg], SZ_LINE)
 	call geomfit (fit, sy1, sy2, xref, yref, yin, wts, Memr[yresidual],
-	    npts, NO)
+	    npts, NO, Memc[yerrmsg], SZ_LINE)
+
 	if (GM_REJECT(fit) > 0.0)
 	    call geomreject (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-		wts, Memr[xresidual], Memr[yresidual], npts)
+		wts, Memr[xresidual], Memr[yresidual], npts, Memc[xerrmsg],
+		SZ_LINE, Memc[yerrmsg], SZ_LINE)
 	else
 	    GM_NREJECT(fit) = 0
+
+	if (verbose) {
+	    call printf ("%s  %s\n")
+	        call pargstr (Memc[xerrmsg])
+	        call pargstr (Memc[yerrmsg])
+	}
 
 	call sfree (sp)
 end
 
+
 # GEOMREJECT -- Procedure to reject points from the fit
 
 procedure geomreject (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts,
-    xresid, yresid, npts) 
+        xresid, yresid, npts, xerrmsg, xmaxch, yerrmsg, ymaxch) 
 
 pointer	fit		# pointer to the fit structure
 pointer	sx1, sy1	# pointers to the linear surface
@@ -222,6 +245,10 @@ real	wts[npts]	# weights
 real	xresid[npts]	# residuals
 real	yresid[npts]	# yresiduals
 int	npts		# number of data points
+char	xerrmsg[ARB]	# the output x error message
+int	xmaxch		# maximum number of characters in the x error message
+char	yerrmsg[ARB]	# the output y error message
+int	ymaxch		# maximum number of characters in the y error message
 
 int	i
 int	nreject, ier
@@ -283,18 +310,25 @@ begin
 
 	    # xfit
 	    call gssolve (sx1, ier)
-	    if (ier == NO_DEG_FREEDOM)
-		call error (0, "GEOMREJECT: Error computing x fit.")
-	    else if (ier == SINGULAR)
-		call eprintf ("GEOMREJECT: Warning singular x solution.\n")
+	    if (ier == NO_DEG_FREEDOM) {
+		call error (0, "Too few data points to compute X fit.")
+	    } else if (ier == SINGULAR) {
+		call sprintf (xerrmsg, xmaxch, "Warning singular X fit.")
+	    } else {
+		call sprintf (xerrmsg, xmaxch, "X fit is ok.")
+	    }
 	    call gsvector (sx1, xref, yref, xresid, npts)
 	    call asubr (xin, xresid, xresid, npts)
 	    if (sx2 != NULL) {
 	        call gssolve (sx2, ier)
-	        if (ier == NO_DEG_FREEDOM)
-		    call error (0, "GEOMREJECT: Error computing x fit.")
-		else if (ier == SINGULAR)
-		    call eprintf ("GEOMREJECT: Warning singular x solution.\n")
+	        if (ier == NO_DEG_FREEDOM) {
+		    call error (0, "Too few data points to compute X fit.")
+	        } else if (ier == SINGULAR) {
+		    call sprintf (xerrmsg, xmaxch,
+		        "Warning singular X fit.")
+	        } else {
+		    call sprintf (xerrmsg, xmaxch, "X fit is ok.")
+	        }
 		call gsvector (sx2, xref, yref, Memr[xfit], npts)
 		call asubr (xresid, Memr[xfit], xresid, npts)
 	    }
@@ -306,18 +340,25 @@ begin
 
 	    # yfit
 	    call gssolve (sy1, ier)
-	    if (ier == NO_DEG_FREEDOM)
-		call error (0, "GEOMREJECT: Error computing y fit.")
-	    else if (ier == SINGULAR)
-	       call eprintf ("GEOMREJECT: Error warning singular y solution.\n")
+	    if (ier == NO_DEG_FREEDOM) {
+		call error (0, "Too few data points to compute Y fit.")
+	    } else if (ier == SINGULAR) {
+		call sprintf (yerrmsg, ymaxch, "Warning singular Y fit.")
+	    } else {
+		call sprintf (yerrmsg, ymaxch, "Y fit is ok.")
+	    }
 	    call gsvector (sy1, xref, yref, yresid, npts)
 	    call asubr (yin, yresid, yresid, npts)
 	    if (sy2 != NULL) {
 		call gssolve (sy2, ier)
-	        if (ier == NO_DEG_FREEDOM)
-		    call error (0, "GEOMREJECT: Error computing y fit.")
-		else if (ier == SINGULAR)
-		    call eprintf ("GEOMREJECT: Warning singular y solution.\n")
+	        if (ier == NO_DEG_FREEDOM) {
+		    call error (0, "Too few data points to compute Y fit.")
+	        } else if (ier == SINGULAR) {
+		    call sprintf (yerrmsg, ymaxch,
+		        "Warning singular Y fit.")
+	        } else {
+		    call sprintf (yerrmsg, ymaxch, "Y fit is ok.")
+		}
 		call gsvector (sy2, xref, yref, Memr[yfit], npts)
 		call asubr (yresid, Memr[yfit], yresid, npts)
 	    }
@@ -337,6 +378,7 @@ begin
 
 	call sfree (sp)
 end
+
 
 # GEOMFREE - procedure to free space used by GEOFIT
 
@@ -358,6 +400,7 @@ begin
 	    call gsfree (sy2)
 end
 
+
 # GEODMFREE - procedure to free space used by GEOFIT
 
 procedure geodmfree (sx1, sy1, sx2, sy2)
@@ -378,9 +421,11 @@ begin
 	    call dgsfree (sy2)
 end
 
+
 # GEOMFITD -- Fit the surface
 
-procedure geomfitd (fit, sf1, sf2, x, y, z, wts, resid, npts, xfit)
+procedure geomfitd (fit, sf1, sf2, x, y, z, wts, resid, npts, xfit, errmsg,
+	maxch)
 
 pointer	fit		# pointer to the fit sturcture
 pointer	sf1		# pointer to linear surface
@@ -392,6 +437,8 @@ double	wts[npts]	# array of weights
 double	resid[npts]	# fitted residuals
 int	npts		# number of points
 int	xfit		# X fit?
+char	errmsg[ARB]	# output error message
+int	maxch		# maximum size of the output error message
 
 int	i, ier
 pointer	sp, zfit
@@ -409,15 +456,9 @@ begin
 
 	# fit the function
 	if (xfit == YES) {
-	    if (GM_XXORDER(fit) == 2 && GM_XYORDER(fit) == 2 &&
-	        GM_XXTERMS(fit) == NO)
-	        call dgsinit (sf1, GS_POLYNOMIAL, 2, 2, NO,
-	            double (GM_XMIN(fit)), double (GM_XMAX(fit)),
-		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
-	    else
-	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
-	            double (GM_XMIN(fit)), double (GM_XMAX(fit)),
-		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
+	    call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
+	        double (GM_XMIN(fit)), double (GM_XMAX(fit)),
+	        double (GM_YMIN(fit)), double (GM_YMAX(fit)))
 	    if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 || 
 		GM_XXTERMS(fit) == YES)
 	        call dgsinit (sf2, GM_FUNCTION(fit), GM_XXORDER(fit),
@@ -427,15 +468,9 @@ begin
 	    else 
 		sf2 = NULL
 	 } else {
-	    if (GM_YXORDER(fit) == 2 && GM_YYORDER(fit) == 2 &&
-	        GM_YXTERMS(fit) == NO)
-	        call dgsinit (sf1, GS_POLYNOMIAL, 2, 2, NO,
-		    double (GM_XMIN(fit)), double (GM_XMAX(fit)),
-		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
-	    else
-	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
-		    double (GM_XMIN(fit)), double (GM_XMAX(fit)),
-		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
+	    call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
+	        double (GM_XMIN(fit)), double (GM_XMAX(fit)),
+	        double (GM_YMIN(fit)), double (GM_YMAX(fit)))
 	    if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
 		GM_YXTERMS(fit) == YES)
 	        call dgsinit (sf2, GM_FUNCTION(fit), GM_YXORDER(fit),
@@ -449,15 +484,21 @@ begin
 	# fit linear function
 	call dgsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	if (ier == NO_DEG_FREEDOM) {
+	    call sfree (sp)
 	    if (xfit == YES)
-	        call error (0, "GEOMFIT: Too few data points for X fit.")
+	        call error (0, "Too few data points for X fit.")
 	    else
-		call error (0, "GEOMFIT: Too few data points for Y fit.")
+		call error (0, "Too few data points for Y fit.")
 	} else if (ier == SINGULAR) {
 	    if (xfit == YES)
-		call eprintf ("GEOMFIT: Warning singular X solution.")
+		call sprintf (errmsg, maxch, "Warning singular X fit.")
 	    else
-		call eprintf ("GEOMFIT: Warning singular Y solution.")
+		call sprintf (errmsg, maxch, "Warning singular Y fit.")
+	} else {
+	    if (xfit == YES)
+		call sprintf (errmsg, maxch, "X fit is ok.")
+	    else
+		call sprintf (errmsg, maxch, "Y fit is ok.")
 	}
 	call dgsvector (sf1, x, y, resid, npts)
 	call asubd (z, resid, resid, npts)
@@ -466,15 +507,21 @@ begin
 	if (sf2 != NULL) {
 	    call dgsfit (sf2, x, y, resid, wts, npts, WTS_USER, ier)
 	    if (ier == NO_DEG_FREEDOM) {
+	        call sfree (sp)
 	        if (xfit == YES)
-	            call error (0, "GEOMFIT: Too few data points for X fit.")
+	            call error (0, "Too few data points for X fit.")
 	        else
-		    call error (0, "GEOMFIT: Too few data points for Y fit.")
+		    call error (0, "Too few data points for Y fit.")
 	    } else if (ier == SINGULAR) {
 	        if (xfit == YES)
-		    call eprintf ("GEOMFIT: Warning singular X solution.\n")
+		    call sprintf (errmsg, maxch, "Warning singular X fit.")
 	        else
-		    call eprintf ("GEOMFIT: Warning singular Y solution.\n")
+		    call sprintf (errmsg, maxch, "Warning singular Y fit.")
+	    } else {
+	        if (xfit == YES)
+		    call sprintf (errmsg, maxch, "X fit is ok.")
+	        else
+		    call sprintf (errmsg, maxch, "Y fit is ok.")
 	    }
 	    call dgsvector (sf2, x, y, Memd[zfit], npts)
 	    call asubd (resid, Memd[zfit], resid, npts)
@@ -504,9 +551,11 @@ begin
 	call sfree (sp)
 end
 
+
 # GEOFITD -- Procedure to fit surface in batch
 
-procedure geofitd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts, npts)
+procedure geofitd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts, npts,
+	verbose)
 
 pointer	fit		# pointer to fitting structure
 pointer	sx1, sy1	# pointer to linear surface
@@ -516,33 +565,45 @@ double	yref[ARB]	# y reference array
 double	xin[ARB]	# x array
 double	yin[ARB]	# y array
 double	wts[ARB]	# weight array
-int	npts
+int	npts		# the number of data points
+bool	verbose		# verbose mode
 
-pointer	sp, xresidual, yresidual
-
+pointer	sp, xresidual, yresidual, xerrmsg, yerrmsg
 errchk	geomfitd, geomrejectd
+
 begin
 	call smark (sp)
 	call salloc (xresidual, npts, TY_DOUBLE)
 	call salloc (yresidual, npts, TY_DOUBLE)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	call geomfitd (fit, sx1, sx2, xref, yref, xin, wts, Memd[xresidual],
-	    npts, YES)
+	    npts, YES, Memc[xerrmsg], SZ_LINE)
 	call geomfitd (fit, sy1, sy2, xref, yref, yin, wts, Memd[yresidual],
-	    npts, NO)
+	    npts, NO, Memc[yerrmsg], SZ_LINE)
+
 	if (GM_REJECT(fit) > 0.)
 	    call geomrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-	        wts, Memd[xresidual], Memd[yresidual], npts)
+	        wts, Memd[xresidual], Memd[yresidual], npts, Memc[xerrmsg],
+		SZ_LINE, Memc[yerrmsg], SZ_LINE)
 	else
 	    GM_NREJECT(fit) = 0
+
+	if (verbose) {
+	    call printf ("%s  %s\n")
+	        call pargstr (Memc[xerrmsg])
+	        call pargstr (Memc[yerrmsg])
+	}
 
 	call sfree (sp)
 end
 
+
 # GEOMREJECTD -- Procedure to reject points from the fit
 
 procedure geomrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin, wts,
-    xresid, yresid, npts) 
+    xresid, yresid, npts, xerrmsg, xmaxch, yerrmsg, ymaxch) 
 
 pointer	fit		# pointer to the fit structure
 pointer	sx1, sy1	# pointers to the linear surface
@@ -555,6 +616,10 @@ double	wts[npts]	# weights
 double	xresid[npts]	# residuals
 double	yresid[npts]	# yresiduals
 int	npts		# number of data points
+char	xerrmsg[ARB]	# output x fit error message
+int	xmaxch		# maximum size of x fit error message
+char	yerrmsg[ARB]	# output y fit error message
+int	ymaxch		# maximum size of y fit error message
 
 int	i
 int	nreject, ier
@@ -615,18 +680,24 @@ begin
 
 	    # xfit
 	    call dgssolve (sx1, ier)
-	    if (ier == NO_DEG_FREEDOM)
-		call error (0, "GEOMREJECT: Error computing x fit.")
-	    else if (ier == SINGULAR)
-		call eprintf ("GEOMREJECTD: Warning singular x solution.\n")
+	    if (ier == NO_DEG_FREEDOM) {
+		call error (0, "Too few data points to compute X fit.")
+	    } else if (ier == SINGULAR) {
+		call sprintf (xerrmsg, xmaxch, "Warning singular X fit.")
+	    } else {
+		call sprintf (xerrmsg, xmaxch, "X fit is ok.")
+	    }
 	    call dgsvector (sx1, xref, yref, xresid, npts)
 	    call asubd (xin, xresid, xresid, npts)
 	    if (sx2 != NULL) {
 	        call dgssolve (sx2, ier)
-	        if (ier == NO_DEG_FREEDOM)
-		    call error (0, "GEOMREJECT: Error computing x fit.")
-	        else if (ier == SINGULAR)
-		    call eprintf ("GEOMREJECTD: Warning singular x solution.\n")
+	        if (ier == NO_DEG_FREEDOM) {
+		    call error (0, "Too few data points to compute X fit.")
+	        } else if (ier == SINGULAR) {
+		    call sprintf (xerrmsg, xmaxch, "Warning singular X fit.")
+	        } else {
+		    call sprintf (xerrmsg, xmaxch, "X fit is ok.")
+	        }
 		call dgsvector (sx2, xref, yref, Memd[xfit], npts)
 		call asubd (xresid, Memd[xfit], xresid, npts)
 	    }
@@ -636,18 +707,24 @@ begin
 
 	    # yfit
 	    call dgssolve (sy1, ier)
-	    if (ier == NO_DEG_FREEDOM)
-		call error (0, "GEOMREJECT: Error computing y fit.")
-	    else if (ier == SINGULAR)
-		call eprintf ("GEOMREJECTD: Warning singular y solution.\n")
+	    if (ier == NO_DEG_FREEDOM) {
+		call error (0, "Too few data points to compute Y fit.")
+	    } else if (ier == SINGULAR) {
+		call sprintf (yerrmsg, ymaxch, "Warning singular Y fit.")
+	    } else {
+		call sprintf (yerrmsg, ymaxch, "Y fit is ok.")
+	    }
 	    call dgsvector (sy1, xref, yref, yresid, npts)
 	    call asubd (yin, yresid, yresid, npts)
 	    if (sy2 != NULL) {
 		call dgssolve (sy2, ier)
-	        if (ier == NO_DEG_FREEDOM)
-		    call error (0, "GEORMEJECT: Error computing y fit.")
-	        else if (ier == SINGULAR)
-		    call eprintf ("GEOMREJECTD: Warning singular y solution.\n")
+	        if (ier == NO_DEG_FREEDOM) {
+		    call error (0, "Too few data points to compute Y fit.")
+	        } else if (ier == SINGULAR) {
+		    call sprintf (yerrmsg, ymaxch, "Warning singular Y fit.")
+	        } else {
+		    call sprintf (yerrmsg, ymaxch, "Y fit is ok.")
+	        }
 		call dgsvector (sy2, xref, yref, Memd[yfit], npts)
 		call asubd (yresid, Memd[yfit], yresid, npts)
 	    }

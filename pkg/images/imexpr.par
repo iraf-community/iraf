@@ -1,0 +1,44 @@
+# IMEXPR parameters
+
+expr,s,a,,,,expression
+output,f,a,,,,output image
+dims,s,h,auto,,,output image dimensions
+intype,s,h,auto,,,minimum type for input operands
+outtype,s,h,auto,,,output image pixel datatype
+refim,s,h,auto,,,reference image for wcs etc
+bwidth,i,h,0,0,,boundary extension width
+btype,s,h,nearest,"constant|nearest|reflect|wrap|project",,\
+"boundary extension type"
+bpixval,r,h,0,,,boundary pixel value
+rangecheck,b,h,yes,,,perform range checking
+verbose,b,h,yes,,,print informative messages
+exprdb,s,h,none,,,expression database
+lastout,s,h,,,,last output image
+
+# Input image operands.
+a,s,a,,,,operand a
+b,s,a,,,,operand b
+c,s,a,,,,operand c
+d,s,a,,,,operand d
+e,s,a,,,,operand e
+f,s,a,,,,operand f
+g,s,a,,,,operand g
+h,s,a,,,,operand h
+i,s,a,,,,operand i
+j,s,a,,,,operand j
+k,s,a,,,,operand k
+l,s,a,,,,operand l
+m,s,a,,,,operand m
+n,s,a,,,,operand n
+o,s,a,,,,operand o
+p,s,a,,,,operand p
+q,s,a,,,,operand q
+r,s,a,,,,operand r
+s,s,a,,,,operand s
+t,s,a,,,,operand t
+u,s,a,,,,operand u
+v,s,a,,,,operand v
+w,s,a,,,,operand w
+x,s,a,,,,operand x
+y,s,a,,,,operand y
+z,s,a,,,,operand z

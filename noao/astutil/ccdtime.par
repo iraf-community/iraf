@@ -1,8 +1,15 @@
-magnitude,r,a,10.,,,magnitude
-precision,r,a,.01,0,1,photometric precision
-aperture,r,h,0.9,,,aperture(mtrs)
-fratio,r,h,7.5,2.5,13.5,telescope f-ratio
-seeing,r,h,1.5,0.1,10.0,seeing(arcsec)
-dark,r,h,0,,,dark
-isum,i,h,1,,,on-chip summing factor
-chip,s,h,RCA1,,,chip-RCA1 RCA2 or TI
+time,r,h,INDEF,,,Time (seconds)
+magnitude,r,h,20.,,,Magnitude
+snr,r,h,10.,0.1,,Signal-to-noise ratio
+database,s,h,"ccdtime$kpno.dat",,,Database file
+telescope,s,h,,,,Telescope name (? for list)
+detector,s,h,,,,Detector name (? for list)
+sum,i,h,1,,,CCD summing factor
+seeing,r,h,1.5,0.1,10.0,Seeing (arcsec)
+airmass,r,h,1.2,1.,,Airmass
+phase,r,h,0.,0.,28.,Moon phase (0-28)
+f1,s,h,U,,,Filter 1
+f2,s,h,B,,,Filter 2
+f3,s,h,V,,,Filter 3
+f4,s,h,R,,,Filter 4
+f5,s,h,I,,,Filter 5

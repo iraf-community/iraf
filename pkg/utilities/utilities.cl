@@ -10,6 +10,7 @@ task	ucase,
 	urand,
 	polyfit,
 	curfit,
+	surfit,
 	split		= "utilities$x_utilities.e"
 
 clbye()

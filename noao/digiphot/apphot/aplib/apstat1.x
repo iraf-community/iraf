@@ -157,6 +157,8 @@ begin
 	    return (AP_PXCUR(phot))
 	case PYCUR:
 	    return (AP_PYCUR(phot))
+	case CTHRESHOLD:
+	    return (AP_CTHRESHOLD(cen))
 	case MAXSHIFT:
 	    return (AP_MAXSHIFT(cen))
 	case MINSNRATIO:
@@ -177,8 +179,14 @@ begin
 	    return (AP_SCALE(ap))
 	case K1:
 	    return (AP_K1(sky))
-	case K2:
-	    return (AP_K2(sky))
+	case SLOREJECT:
+	    return (AP_SLOREJECT(sky))
+	case SHIREJECT:
+	    return (AP_SHIREJECT(sky))
+	case SLOCLIP:
+	    return (AP_SLOCLIP(sky))
+	case SHICLIP:
+	    return (AP_SHICLIP(sky))
 	case BINSIZE:
 	    return (AP_BINSIZE(sky))
 	case RGROW:

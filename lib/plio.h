@@ -82,9 +82,9 @@ define	LP_FIRST	3		# first data range entry in list
 
 # Packed instruction decoding.
 define	I_SHIFT		10000B		# shift to encode/decode data bits
-define	I_DATA		and($1,7777B)	# extract data
+define	I_DATA		and(int($1),7777B)	# extract data
 define	I_OPCODE	(($1)/10000B)	# extract opcode value
-define	I_OPCODEMASK	and($1,70000B)	# extract opcode mask
+define	I_OPCODEMASK	and(int($1),70000B)	# extract opcode mask
 define	I_DATAMAX	7777B		# max data field value
 define	I_PVMAX		777777777B	# max mask pixel value (27 bits)
 

@@ -67,6 +67,8 @@ at the end of the image) used in finding, recentering, resizing,
 and editing operations.  For tracing this is the starting line and
 the same number of lines are summed at each tracing point.  A line of
 INDEF selects the middle of the image along the dispersion axis.
+A negative nsum selects a median rather than a sum except that
+tracing always uses a sum.
 .le
 .ls cennorm = no
 Normalize to the aperture center rather than the mean?

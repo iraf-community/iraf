@@ -15,6 +15,7 @@ define	QPOE_LUTMINRANGES	8	# min ranges before using LUT
 define	QPOE_LUTSCALE		9	# scale nranges to LUT bins
 define	QPOE_MAXFRLUTLEN	10	# max full-res LUT length
 define	QPOE_MAXLFILES		11	# max lfiles in datafile
+define	QPOE_MAXPTPAGES		   25	# max lfiles in datafile
 define	QPOE_MAXPUSHBACK	12	# max amount of pushed back macro data
 define	QPOE_MAXRRLUTLEN	13	# max reduced-res LUT length
 define	QPOE_OPTBUFSIZE		14	# optimum buffer size for IMIO/QPF/FIO

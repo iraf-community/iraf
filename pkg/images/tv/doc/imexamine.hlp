@@ -312,7 +312,7 @@ parameters.  If 2 then a linear background is fit simultaneously with the
 other gaussian parameters.
 .le
 .ls xorder = 0, yorder = 0		(r)
-If either parameter is less than 1 then the median value of the
+If either parameter is zero then the median value of the
 background annulus is used for background subtraction in aperture sums and
 radial profile plots.  Values greater than zero define polynomial
 surface orders for background subtraction.  The orders are actually the
@@ -478,17 +478,18 @@ are:
 	Myy = sum (y * y * I) / sum (I)
 	Mxy = sum (x * y * I) / sum (I)
 	r = 2 * sqrt (ln (2) * (Mxx + Myy))
-	e = sqrt ((Mxx - Myy) ** 2 + (2 * Myy) ** 2)
+	e = sqrt ((Mxx - Myy) ** 2 + (2 * Mxy) ** 2) / (Mxx + Myy)
 	pa = 0.5 * atan (2 * Mxy / (Mxx - Myy))
 .fi
 
 The size is scaled so that a gaussian intensity distribution gives a value
 of r equal to the full width at half maximum (FWHM).
 
-Finally, a least squares gaussian of fixed center and zero background is
-fit for a peak intensity and FWHM.  Pixel values greater than zero are used with weights given by
-
-	wt = I / max (0.1, r**2)
+Finally, a nonlinear least squares gaussian of fixed center and zero background is
+fit for a peak intensity and FWHM.  Weights which are the inverse
+square of the pixel radius are used.  This has the effect of giving
+equal weight to all parts of the profile instead of being overwhelmed
+by the larger number of pixels are larger radii.
 
 The output consists of the x-y coordinates, magnitude, flux, number of
 pixels within the aperture, mean background, r (FWHM), e, pa (in degrees
@@ -762,6 +763,7 @@ angh        s           Horizontal angle for surface plot
 angv        s           Vertical angle for surface plot
 autoredraw  cehlrsuv    Automatically redraw graph after colon command?
 autoscale   h           Adjust number of histogram bins to avoid aliasing
+axes	    s		Draw the axes?
 background  jkr         Subtract background for radial plot and photometry?
 banner      cehjklrsuv  Include standard banner on plots?
 boundary    uv          Boundary extension type for vector plots
@@ -776,7 +778,7 @@ fill        e           Fill viewport vs enforce unity aspect ratio?
 fitplot     r           Overplot gaussian fit on data?
 floor       es          Data floor for contour and surface plots
 interval    e           Contour interval (0 for default)
-label       s           Draw axis labels for surface plot?
+label       e           Draw axis labels for contour plot?
 logfile                 Log file name
 logx        chjklruv    Plot x axis logrithmically?
 logy        chjklruv    Plot y axis logrithmically?

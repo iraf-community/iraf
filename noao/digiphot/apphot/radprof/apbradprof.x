@@ -79,7 +79,7 @@ begin
 	    if (id == 1)
 	        call ap_param (ap, out, "radprof")
 	    call ap_prprof (ap, out, id, ild, cier, sier, pier, rier)
-	    call ap_rpplot (ap, id, cier, sier, pier, rier, mgd, YES)
+	    call ap_rpplot (ap, id, mgd, YES)
 
 	    # Setup for the next object.
 	    id = id + 1

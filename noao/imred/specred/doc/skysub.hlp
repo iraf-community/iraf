@@ -1,4 +1,4 @@
-.help skysub Sep90 noao.imred.msred
+.help skysub Mar94 noao.imred.specred
 .ih
 NAME
 skysub -- Sky subtract extracted multispec spectra
@@ -30,24 +30,23 @@ Edit the sky spectra?  If yes the sky spectra are graphed using the
 task \fBspecplot\fR and the user may delete contaminated sky spectra with
 the 'd' key and exit with 'q'.
 .le
-.ls combine = "avsigclip"
-Type of sky spectra combining algorithm.  This may be any of the options
-from \fBimcombine\fR.  The choices are:
+.ls combine = "average" (average|median|sum)
+Option for combining pixels at the same dispersion coordinate after any
+rejection operation.  The options are to compute the  "average", "median",
+or "sum" of the pixels.  The median uses the average of the two central
+values when the number of pixels is even.
+.le
+.ls reject = "none" (none|minmax|avsigclip)
+Type of rejection operation performed on the pixels which overlap at each
+dispersion coordinate.  The algorithms are discussed in the
+DESCRIPTION section.  The rejection choices are:
 
 .nf
-     none - Don't combine but pair the objects and sky for
-            subtraction.
-
-      sum - Sum the input images
-  average - Average the input images
-   median - Median the input images
-minreject - Reject the minimum value at each pixel
-maxreject - Reject the maximum value at each pixel
-minmaxrej - Reject the min and max values at each pixel
-threshold - Reject pixels above and below thresholds
-  sigclip - Apply a sigma clipping algorithm to each pixel
-avsigclip - Apply a sigma clipping algorithm to each pixel
+      none - No rejection
+    minmax - Reject the nlow and nhigh pixels
+ avsigclip - Reject pixels using an averaged sigma clipping algorithm
 .fi
+
 .le
 .ls scale = no
 Scale the sky spectra by the mode?
@@ -84,11 +83,8 @@ When interactively editing the sky spectra the task \fBspecplot\fR
 is used.  To delete a spectrum type 'd'.  To undelete the last deleted
 spectrum type 'e'.  When finished type 'e'.
 
-The sky spectra are combined using one of the combining options from
-the task \fBimcombine\fR except for the option "none".  This option
-pairs the sky and object spectra and subtracts them.  This option is
-only reasonable when the data is taken with some simple pattern of
-object and aperture spectra such as with the CTIO Argus system.
+The sky spectra are combined using one of combining and rejection options from
+the task \fBscombine\fR except for the option "none".
 .ih
 EXAMPLES
 1.  To median and subtract apertures 1,10,15,20 from all apertures:
@@ -98,5 +94,5 @@ EXAMPLES
 .fi
 .ih
 SEE ALSO
-specplot, imcombine
+specplot, scombine
 .endhelp

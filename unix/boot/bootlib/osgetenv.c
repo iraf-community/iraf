@@ -82,9 +82,10 @@ int	maxch;
 	strcpy ((char *)symbol, envvar);
 	ZGTENV (symbol, value, &x_maxch, &status);
 
-	if (status < 0)
+	if (status < 0) {
+	    outstr[0] = EOS;
 	    return (NULL);
-	else {
+	} else {
 	    strncpy (outstr, (char *)value, maxch);
 	    outstr[maxch] = EOS;
 	    return (outstr);
@@ -108,9 +109,10 @@ int	maxch;
 	os_strupk (envvar, x_symbol, SZ_FNAME);
 	status = ENVFIND (x_symbol, x_value, &x_maxch);
 
-	if (status <= 0)
+	if (status <= 0) {
+	    outstr[0] = EOS;
 	    return (NULL);
-	else {
+	} else {
 	    os_strpak (x_value, outstr, maxch);
 	    return (outstr);
 	}

@@ -23,6 +23,7 @@ pointer	sp, image, str, badcols, badlines
 
 int	open(), fscan(), nscan(), strmatch()
 bool	clgetb(), streq(), ccdflag()
+errchk	open
 
 begin
 	# Check if the user wants this operation or it has been done.
@@ -49,18 +50,11 @@ begin
 	}
 
 	# Open the file and read the bad pixel regions.  Use dynamic memory.
-	iferr (fd = open (Memc[image], READ_ONLY, TEXT_FILE)) {
-	    call eprintf (
-	    "Warning: Bad pixel file %s not found.  No correction applied.\n")
-	        call pargstr (Memc[image])
-	    call sfree (sp)
-	    return
-	}
-
 	# Set the bad pixel coordinates.  By default the bad pixel coordinates
 	# refer to the image directly but if the word "untrimmed" appears
 	# in a comment then the coordinates refer to the CCD coordinates.
 
+	fd = open (Memc[image], READ_ONLY, TEXT_FILE)
 	dc = 0
 	dl = 0
 	nc = IM_LEN(IN_IM(ccd),1)
@@ -144,14 +138,12 @@ begin
 	    COR(ccd) = YES
 	}
 
-	if (CORS(ccd, FIXPIX) == YES) {
-	    # Log the operation.
-	    call sprintf (Memc[str], SZ_LINE, "Bad pixel file is %s")
-	        call pargstr (Memc[image])
-	    call timelog (Memc[str], SZ_LINE)
-	    call ccdlog (IN_IM(ccd), Memc[str])
-	    call hdmpstr (OUT_IM(ccd), "fixpix", Memc[str])
-	}
+	# Log the operation.
+	call sprintf (Memc[str], SZ_LINE, "Bad pixel file is %s")
+	    call pargstr (Memc[image])
+	call timelog (Memc[str], SZ_LINE)
+	call ccdlog (IN_IM(ccd), Memc[str])
+	call hdmpstr (OUT_IM(ccd), "fixpix", Memc[str])
 
 	call sfree (sp)
 end

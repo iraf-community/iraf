@@ -29,7 +29,8 @@ images.  Because the subset parameter in the image header may be
 any string there must be a mapping applied to generate unique
 identifiers.  This mapping is defined in the file given by
 the package parameter \fIccdred.ssfile\fR.  The file consists of
-lines with two fields:
+lines with two fields (except that comment lines may be included
+as a line by itself or following the second field):
 
 	'subset string'	subset_id
 
@@ -71,6 +72,7 @@ Suppose the user wants to have more descriptive names then the subset
 file can be created or edited to the form:
 
 .nf
+	# Sample translation file.
 	'2'	U
 	'3'	B
 	'4'	V

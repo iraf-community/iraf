@@ -10,8 +10,8 @@ define  DEF_MAXBUFNP    0               # default npages max buffer size
 define  DEF_BIGBUFNP    16              # large buffer for lfile copies
 define  DEF_DFHDRLEN    4096            # default DF header buflen (su)
 define  DEF_FCACHESIZE  8               # default open files in file cache
-define  DEF_PMLEN       32              # default lfile pagemap array length
-define  INC_PMLEN       32              # default page table buflen (pte)
+define  DEF_PMLEN       64              # default lfile pagemap array length
+define  INC_PMLEN       128             # default page table buflen (pte)
 define  SZ_DFNAME       63              # datafile name
 define  SZ_ERROPSTR     63              # operand string, for posted errors
 define  SYNC_INTERVAL   300             # interval between automatic syncs

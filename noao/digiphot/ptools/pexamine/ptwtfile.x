@@ -80,6 +80,7 @@ begin
 
 	# Initialize the file read.
 	record = 0
+	lenrecord = 0
 	buflen = LEN_LONGLINE * SZ_LINE
 	call malloc (line, SZ_LINE, TY_CHAR)
 	call malloc (lline, buflen, TY_CHAR)

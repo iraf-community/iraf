@@ -6,14 +6,13 @@ include "../lib/noise.h"
 include "../lib/fitskydef.h"
 include "../lib/fitsky.h"
 
-# APSPLOT -- Procedure to compute radial profile plots for the sky fitting
+# AP_SPLOT -- Procedure to compute radial profile plots for the sky fitting
 # routine.
 
-procedure apsplot (ap, sid, sier, gd, makeplot)
+procedure ap_splot (ap, sid, gd, makeplot)
 
 pointer	ap		# pointer to the apphot structure
 int	sid		# id number of the star
-int	sier		# centering error
 pointer	gd		# graphics stream
 int	makeplot	# make a plot
 
@@ -52,8 +51,8 @@ begin
 	call salloc (r, nskypix, TY_REAL)
 
 	# Compute the radii and the plot limits.
-	call ap_xytor (Memi[AP_COORDS(sky)], Memr[r], nskypix, AP_SXC(sky),
-	    AP_SYC(sky), nx)
+	call ap_xytor (Memi[AP_COORDS(sky)], Memi[AP_INDEX(sky)],
+	    Memr[r], nskypix, AP_SXC(sky), AP_SYC(sky), nx)
 	call alimr (Memr[r], nskypix, rmin, rmax)
 	rmin = rmin - 1.0
 	rmax = rmax + 1.0
@@ -75,7 +74,7 @@ begin
 	
 	# Draw the plot.
 	call gclear (gd)
-	call ap_spset (gd, gt, ap, sier, rmin, rmax, imin, imax)
+	call ap_spset (gd, gt, ap, rmin, rmax, imin, imax)
 	call ap_spannotate (gd, ap, rmin, rmax, imin, imax)
 	call ap_plotrad (gd, gt, Memr[r], Memr[AP_SKYPIX(sky)], nskypix, "plus")
 
@@ -93,12 +92,11 @@ end
 # AP_SPSET -- Procedure to set up the parameters for the fitsky radial profile
 # plot.
 
-procedure ap_spset (gd, gt, ap, sier, xmin, xmax, ymin, ymax)
+procedure ap_spset (gd, gt, ap, xmin, xmax, ymin, ymax)
 
 pointer	gd		# graphics stream
 pointer	gt		# gtools pointer
 pointer	ap		# apphot pointer
-int	sier		# sky fitting error (unused)
 real	xmin, xmax	# minimum and maximum radial distance
 real	ymin, ymax	# minimum and maximum of the y axis
 
@@ -220,7 +218,8 @@ begin
 	# Mark the upper sky sigma.
 	call gseti (gd, G_PLTYPE, GL_DASHED)
 	if (! IS_INDEFR(apstatr (ap, SKY_SIGMA)))
-	    skysigma = skyval + apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
+	    skysigma = skyval + apstatr (ap, SHIREJECT) * apstatr (ap,
+	        SKY_SIGMA)
 	else
 	    skysigma = INDEFR
 	if (! IS_INDEFR(skysigma) && (skysigma >= ymin) && skysigma <= ymax) {
@@ -232,7 +231,8 @@ begin
 
 	# Mark the lower sky sigma
 	if (! IS_INDEFR(apstatr (ap, SKY_SIGMA)))
-	    skysigma = skyval - apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
+	    skysigma = skyval - apstatr (ap, SLOREJECT) * apstatr (ap,
+	        SKY_SIGMA)
 	else
 	    skysigma = INDEFR
 	if (! IS_INDEFR(skysigma) && (skysigma >= ymin) && skysigma <= ymax) {

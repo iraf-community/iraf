@@ -41,12 +41,17 @@ define	KY_PSFSTRING	"function"
 
 # define fitpsf units
 
-define	UN_PSFUNCTION	"model"
-define	UN_PSFAPERT	"scaleunit"
-define	UN_PK2		"sigma"
-define	UN_PMAXITER	"number"
-define	UN_PNREJECT	"number"
-define	UN_PSFSTRING	"model"
+#define	UN_PSFUNCTION	"model"
+#define	UN_PSFAPERT	"scaleunit"
+#define	UN_PK2		"sigma"
+#define	UN_PMAXITER	"number"
+#define	UN_PNREJECT	"number"
+#define	UN_PSFSTRING	"model"
+
+define	UN_PSFSCALEUNIT	"scaleunit"
+define	UN_PSFNUMBER	"number"
+define	UN_PSFMODEL	"model"
+define	UN_PSFSIGMA	"sigma"
 
 # fitpsf string constants
 

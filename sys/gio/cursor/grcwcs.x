@@ -11,12 +11,14 @@ include	"grc.h"
 # for cursor mode applications which do not involve many coordinate
 # transformations.
 
-procedure grc_scrtowcs (stream, sx, sy, wx, wy, wcs)
+procedure grc_scrtowcs (stream, sx, sy, raster, rx, ry, wx, wy, wcs)
 
-int	stream			# graphics stream
-real	sx, sy			# screen coordinates
-real	wx, wy			# world coordinates (output)
-int	wcs			# world coordinate system (output)
+int	stream			#I graphics stream
+real	sx, sy			#I screen coordinates
+int	raster			#I raster number
+real	rx, ry			#I raster coordinates
+real	wx, wy			#O world coordinates
+int	wcs			#O world coordinate system
 
 pointer	w, tr
 real	mx, my
@@ -27,17 +29,30 @@ pointer	gtr_init()
 begin
 	tr = gtr_init (stream)
 
-	# Convert screen to NDC coordinates, undoing the effects of the
-	# workstation transformation.
+	# Convert screen (raster 0) to NDC coordinates, undoing the effects
+	# of the workstation transformation.  This is not done for raster
+	# coordinates since these are already raster-normalized coordinates
+	# as returned by the server.
 
-	call grc_scrtondc (sx, sy, mx, my)
+	if (raster == 0)
+	    call grc_scrtondc (rx, ry, mx, my)
+	else {
+	    mx = rx
+	    my = ry
+	}
 
-	# Select a WCS.  The TR_WCS variable is set only if the user explicitly
-	# fixes the WCS to override automatic selection.
+	# Select a WCS.  The TR_WCS variable is set only if the user
+	# explicitly fixes the WCS to override automatic selection.  The
+	# best WCS for the raster is used if there is one, otherwise the
+	# best screen WCS is used.
 
-	if (TR_WCS(tr) == NULL)
-	    wcs = grc_selectwcs (tr, mx, my)
-	else
+	if (TR_WCS(tr) == NULL) {
+	    wcs = grc_selectwcs (tr, raster, mx, my)
+	    if (wcs == 0) {
+		call grc_scrtondc (sx, sy, mx, my)
+		wcs = grc_selectwcs (tr, 0, mx, my)
+	    }
+	} else
 	    wcs = TR_WCS(tr)
 
 	# Set up the coordinate transformation.
@@ -190,20 +205,21 @@ end
 # distance, e.g., when the WCS share the same viewport, then the highest
 # numbered WCS is selected.
 
-int procedure grc_selectwcs (tr, mx, my)
+int procedure grc_selectwcs (tr, raster, mx, my)
 
-pointer	tr			# GTR descriptor
-real	mx, my			# NDC coordinates of point
+pointer	tr			#I GTR descriptor
+int	raster			#I raster number
+real	mx, my			#I NDC coordinates of point
 
 pointer	w
-int	wcs, closest_wcs
+int	wcs, closest_wcs, flags
 real	tol, sx1, sx2, sy1, sy2
 real	distance, old_distance, xcen, ycen
 int	nin, in[MAX_WCS]
 
 begin
 	nin = 0
-	closest_wcs = 1
+	closest_wcs = 0
 	old_distance = 1.0
 	tol = EPSILON * 10.0
 
@@ -216,15 +232,26 @@ begin
 	    w = TR_WCSPTR(tr,wcs)
 
 	    # Cache WCS params in local storage.
-	    sx1  = WCS_SX1(w)
-	    sx2  = WCS_SX2(w)
-	    sy1  = WCS_SY1(w)
-	    sy2  = WCS_SY2(w)
+	    sx1 = WCS_SX1(w)
+	    sx2 = WCS_SX2(w)
+	    sy1 = WCS_SY1(w)
+	    sy2 = WCS_SY2(w)
+	    flags = WCS_FLAGS(w)
 	    xcen = (sx1 + sx2) / 2.0
 	    ycen = (sy1 + sy2) / 2.0
 
-	    # Skip to next WCS if this one is unitary.
-	    if (abs ((sx2-sx1) - 1.0) < tol && abs ((sy2-sy1) - 1.0) < tol)
+	    # Skip to next WCS if the raster number doesn't match.
+	    if (WF_RASTER(flags) != raster)
+		next
+
+	    # Skip to next WCS if this one is not defined.
+	    if (and (flags, WF_NEWFORMAT) == 0) {
+		# Preserve old semantics if passed old format WCS.
+		if (sx1 == 0 && sx2 == 0 || sy1 == 0 && sy2 == 0)
+		    next
+		if (abs ((sx2-sx1) - 1.0) < tol && abs ((sy2-sy1) - 1.0) < tol)
+		    next
+	    } else if (and (flags, WF_DEFINED) == 0)
 		next
 
 	    # Determine closest WCS to point (mx,my).

@@ -91,8 +91,23 @@ begin
 	    else if (i1 > 0)	# Nearest preceding spectrum
 		call refspectra (Memc[image], Memc[Memi[refimages+i1-1]], 1.,
 		    Memc[Memi[refimages+i1-1]], 0.)
-	    else		# No reference spectrum found
-		call refmsgs (NO_REFSPEC, Memc[image], ap, "", "")
+	    else {		# No reference spectrum found
+		call refprint (STDERR, NO_REFSPEC, Memc[image], "", "", "",
+		    ap, 0, "")
+		do i = 1, nrefs {
+		    if (!streq (Memc[gval], Memc[Memi[refgvals+i-1]])) {
+			call refprint (STDERR, REF_GROUP, Memc[image],
+			    Memc[Memi[refimages+i-1]], Memc[gval],
+			    Memc[Memi[refgvals+i-1]], ap, Memi[refaps+i-1], "")
+			next
+		    }
+		    if (!ignoreaps  && ap != Memi[refaps+i-1])
+			call refprint (STDERR, REF_AP, Memc[image],
+			    Memc[Memi[refimages+i-1]], Memc[gval],
+			    Memc[Memi[refgvals+i-1]], ap, Memi[refaps+i-1], "")
+			next
+		}
+	    }
 	}
 
 	call sfree (sp)

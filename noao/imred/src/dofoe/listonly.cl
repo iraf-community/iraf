@@ -20,11 +20,16 @@ struct	*fd1
 struct	*fd2
 
 begin
+	string	imtype, ectype
 	string	spec, arcref
 	string	specec, arcrefec, response
 	string	temp1, temp2, done, str
 	bool	reextract, newaps, newresp, newdisp, extract, disp, scat
-	int	i, j
+	int	i, j, n
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	temp1 = mktemp ("tmp$iraf")
 	temp2 = mktemp ("tmp$iraf")
@@ -35,8 +40,8 @@ begin
 	newdisp = no
 
 	i = strlen (apref)
-	if (i > 4 && substr (apref, i-3, i) == ".imh")
-	    apref = substr (apref, 1, i-4)
+	if (i > n && substr (apref, i-n+1, i) == imtype)
+	    apref = substr (apref, 1, i-n)
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
@@ -47,8 +52,8 @@ begin
 	if (flat != "") {
 	    response = flat
 	    i = strlen (response)
-	    if (i > 4 && substr (response, i-3, i) == ".imh")
-	        response = substr (response, 1, i-4)
+	    if (i > n && substr (response, i-n+1, i) == imtype)
+	        response = substr (response, 1, i-n)
 	    response = response // "norm.ec"
 
 	    reextract = redo || (update && newaps)
@@ -60,7 +65,7 @@ begin
 		    scat = yes
 		fd2 = ""; delete (temp2, verify=no)
 	    }
-	    if (reextract || !access (response // ".imh") || (update && scat)) {
+	    if (reextract || !access (response // imtype) || (update && scat)) {
 		if (scat)
 		    print ("Subtract scattered light from ", flat)
 	        print ("Create response function ", response)
@@ -69,17 +74,17 @@ begin
 	}
 
 	if (dispcor) {
-	    hselect (arcs, "$I,ctype1", yes, > temp1)
+	    hselect (arcs, "$I", yes, > temp1)
 	    #sections (arcs, option="fullname", > temp1)
-	    fd1 = temp1; s1 = ""
-	    i = fscan (fd1, arcref, s1)
-	    if (i < 1 || (i == 2 && s1 == "MULTISPE"))
+	    fd1 = temp1
+	    i = fscan (fd1, arcref)
+	    if (i < 1)
 		error (1, "No reference arcs")
 	    fd1 = ""; delete (temp1, verify=no)
 	    i = strlen (arcref)
-	    if (i > 4 && substr (arcref, i-3, i) == ".imh")
-	        arcref = substr (arcref, 1, i-4)
-	    arcrefec = arcref // ".ec.imh"
+	    if (i > n && substr (arcref, i-n+1, i) == imtype)
+	        arcref = substr (arcref, 1, i-n)
+	    arcrefec = arcref // ectype
 
 	    reextract = redo || (update && newaps)
 	    if (reextract || !access (arcrefec)) {
@@ -100,14 +105,12 @@ begin
 	}
 
 	reextract = redo || (update && (newaps || newresp || newdisp))
-	hselect (objects, "$I,ctype1", yes, > temp1)
+	hselect (objects, "$I", yes, > temp1)
 	#sections (objects, option="fullname", > temp1)
 	fd1 = temp1
-	while (fscan (fd1, spec, s1) != EOF) {
-	    if (nscan() == 2 && s1 == "MULTISPE")
-		next
-	    if (i > 4 && substr (spec, i-3, i) == ".imh")
-	        spec = substr (spec, 1, i-4)
+	while (fscan (fd1, spec) != EOF) {
+	    if (i > n && substr (spec, i-n+1, i) == imtype)
+	        spec = substr (spec, 1, i-n)
 
 	    if (access (done)) {
 	        fd2 = done
@@ -119,7 +122,7 @@ begin
 	        fd2 = ""
 	    }
 
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    scat = no
 	    extract = no

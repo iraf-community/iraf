@@ -14,7 +14,7 @@ dispersion functions.
 .ls database = "database"
 Database in which the feature data and dispersion functions are recorded.
 .le
-.ls coordlist = "onedstds$thorium.dat"
+.ls coordlist = "onedstds$thar.dat"
 User coordinate list consisting of an ordered list of line coordinates.
 Some standard line lists are available in the directory "onedstds$".
 .le

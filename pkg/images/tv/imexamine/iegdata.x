@@ -33,7 +33,7 @@ begin
 	y1 = min (y1, y2)
 	y2 = i
 
-	if (x2 < 1 || x1 >= nc || y2 < 1 || y1 >= nl)
+	if (x2 < 1 || x1 > nc || y2 < 1 || y1 > nl)
 	    call error (1, "Pixels out of bounds")
 	
 	x1 = max (1, x1)

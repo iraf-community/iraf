@@ -21,18 +21,20 @@ odd integers. Even values for xwindow or ywindow will be rounded up to the
 nearest odd integer.
 .le
 .ls hmin = -32768, hmax = 32767
-The quantization parameters. Hmin and hmax define the minimum and maximum
+The histogram quantization parameters. Hmin and hmax define the minimum and
+maximum
 permitted values for the integer representation of the IRAF image. The
 default values are those suitable for the 16 bit twos complement data
 produced by current CCDS. Hmin and hmax should be chosen so as to
 minimize the space required to store the image histogram.
 .le
 .ls zmin = INDEF, zmax = INDEF
-The quantization parameters. Zmin and zmax default to the minimum and
+The data quantization parameters. Zmin and zmax default to the minimum and
 maximum values in the IRAF image. Pixel values from zmin to zmax are mapped
 linearly
-to integers from hmin to hmax. If zmin = hmin and zmax = hmax no 
-quantization will be performed. Image values less than or greater than
+to integers from hmin to hmax. If zmin = hmin and zmax = hmax the image
+pixels are converted directly to integers.
+Image values less than or greater than
 zmin or zmax will default to hmin and hmax respectively.
 .le
 .ls unmap = yes
@@ -71,15 +73,17 @@ in value and (n - 1) / 2 elements are equal or larger in value.
 Out of bounds
 pixel references are handled by setting the parameter \fIboundary\fR.
 
-If zmin = hmin and zmax = hmax FMEDIAN filters the image data directly.
-Otherwise the IRAF image is quantized before median filtering. The
-IRAF image values from zmin to zmax are linearly mapped to integer
+If zmin = hmin and zmax = hmax FMEDIAN maps the image data directly into
+integers.  This operation will result in truncation of the pixel values
+if the IRAF image format is not integer. Otherwise the
+IRAF pixel values from zmin to zmax are linearly mapped to integer
 values from hmin to hmax. The histogram, median and number of pixels less
 than the median are calculated for the first window position. These
 quantities are then updated as the median filter moves one position.
-The unmap parameter may be set in order to restore the pixel values
-to the range zmin to zmax. Note that the precision of the median in this
-case is (zmax - zmin) / (hmax - hmin).
+The unmap parameter is normally set so as to restore the pixel values
+to the range zmin to zmax, but may be left off is the user wishes to
+examine the quantized pixels. Note that the precision of the median 
+is (zmax - zmin) / (hmax - hmin).
 
 .ih
 EXAMPLES

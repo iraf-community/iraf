@@ -195,9 +195,9 @@ begin
 		    }
 		}
 		if (grow > 0) {
-		    do j = 0, npts-1 {
-			do i = n[i]+1, nimages
-			    Memi[id[i]+j] = 0
+		    do j = 1, npts {
+			do i = n[j]+1, nimages
+			    Memi[id[i]+j-1] = 0
 		    }
 		}
 	    } else {
@@ -421,9 +421,9 @@ begin
 		    }
 		}
 		if (grow > 0) {
-		    do j = 0, npts-1 {
-			do i = n[i]+1, nimages
-			    Memi[id[i]+j] = 0
+		    do j = 1, npts {
+			do i = n[j]+1, nimages
+			    Memi[id[i]+j-1] = 0
 		    }
 		}
 	    } else {
@@ -647,9 +647,9 @@ begin
 		    }
 		}
 		if (grow > 0) {
-		    do j = 0, npts-1 {
-			do i = n[i]+1, nimages
-			    Memi[id[i]+j] = 0
+		    do j = 1, npts {
+			do i = n[j]+1, nimages
+			    Memi[id[i]+j-1] = 0
 		    }
 		}
 	    } else {
@@ -873,9 +873,9 @@ begin
 		    }
 		}
 		if (grow > 0) {
-		    do j = 0, npts-1 {
-			do i = n[i]+1, nimages
-			    Memi[id[i]+j] = 0
+		    do j = 1, npts {
+			do i = n[j]+1, nimages
+			    Memi[id[i]+j-1] = 0
 		    }
 		}
 	    } else {

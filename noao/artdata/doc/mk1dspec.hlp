@@ -1,4 +1,4 @@
-.help mk1dspec Aug90 noao.artdata
+.help mk1dspec Mar93 noao.artdata
 .ih
 NAME
 mk1dspec -- Make/add artificial 1D spectra
@@ -33,15 +33,11 @@ WHEN CREATING NEW SPECTRA
 .ls title = ""
 Image title to be given to the spectra.  Maximum of 79 characters.
 .le
-.ls format = "onedspec"
-Image spectral to be created.  The choices are "onedspec", "multispec",
-or "echelle".
-.le
 .ls ncols = 512
 Number of columns.
 .le
 .ls naps = 1
-Number of lines or apertures for multispec and echelle format.
+Number of lines or apertures.
 .le
 .ls header = "artdata$stdheader.dat"
 Image or header keyword data file.  If an image is given then the image header
@@ -124,15 +120,15 @@ the profiles.
 .le
 .ih
 DESCRIPTION
-This task creates or modifies one dimensional spectra in onedspec,
-multispec, or echelle format with a combination of blackbody and linear
+This task creates or modifies one dimensional spectra.
+with a combination of blackbody and linear
 sloped continuum and emission and absorption gaussian profile spectral
 lines.  A velocity shift may be applied to the underlying artificial
 spectrum which is shifted into the specified observed wavelength region.
 No noise is included but may be added with the task \fBmknoise\fR.  New
 spectra are created with the specified number of pixels, wavelength range,
-and real datatype.  For multispec and echelle format an image of the
-specified number of lines is also created though only the line given by the
+and real datatype.  When \fInlines\fR is greater than 1 then an image with
+the specified number of lines is created though only the line given by the
 \fIap\fR is will have a spectrum.  Existing spectra may be modified in
 place or new spectra output.  Spectra are modified by adding the continuum
 and lines defined by the parameters.
@@ -148,13 +144,12 @@ Finally, comments may be added to the image header recording the task
 parameters and any information from the line file which are not
 line definitions.
 
-For multispec and echelle format spectra the task must be executed for
-each image line.  If there is no APNUM keyword it is created with
-whatever values of the dispersion are set.  This lets
-spectra have different wavelength ranges as is allowed by the
-multispec format.  If there is an APNUM keyword it is not modified
-and its dispersion parameters are used (overriding the task parameters
-and the global W0 and WPC image header parameters).
+Initially all spectra are created without a dispersion function; i.e.
+pixel coordinates.  For multiple spectra in an image this task must be
+executed for each image line to set the dispersion function and add
+data.  When an image line is selected if it has a defined
+dispersion function that is used otherwise the task wavelength
+parameters are used.
 
 A continuum is defined by the value at the starting wavelength at rest,
 a slope, and a blackbody function of a given temperture.  The blackbody
@@ -303,12 +298,18 @@ in redshift.
 9. Make a multispec image with 5 apertures and a range of redshifts.
 
 .nf
-	cl> mk1dspec spec.ms ap=1 nl=30 rv=0 naps=5 format=multispec
+	cl> mk1dspec spec.ms ap=1 nl=30 rv=0 naps=5
 	cl> mk1dspec spec.ms ap=2 nl=30 rv=1000
 	cl> mk1dspec spec.ms ap=3 nl=30 rv=2000
 	cl> mk1dspec spec.ms ap=4 nl=30 rv=3000
 	cl> mk1dspec spec.ms ap=5 nl=30 rv=4000
 .fi
+.ih
+REVISIONS
+.ls MK1DSPEC V2.10.3
+The format parameter was eliminated and the task updated to produce the
+current coordinate system format.
+.le
 .ih
 SEE ALSO
 mknoise, mk2dspec, mkheader, onedspec.sinterp

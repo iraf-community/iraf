@@ -2,7 +2,7 @@
 # the main RV structure into this one.  This sub-structure contains the
 # parameters used for continuum removal.
 
-define	SZ_CONT_STRUCT	     12
+define	SZ_CONT_STRUCT	     16
 
 define	CON_INTERACTIVE	     Memi[RV_CONT($1)]		# Process interactively?
 define	CON_CNFUNC	     Memi[RV_CONT($1)+1]	# Interpolation func
@@ -15,6 +15,7 @@ define	CON_GROW	     Memr[RV_CONT($1)+7]	# Growth radius
 define  CON_SAMPLE	     Memi[RV_CONT($1)+8]	# Sample string (ptr)
 define  CON_NAVERAGE	     Memi[RV_CONT($1)+9]	# Npts to average
 define  CON_FUNC	     Memi[RV_CONT($1)+10]	# Function type (ptr)
+define  CON_MARKREJ	     Memi[RV_CONT($1)+11]	# Mark rejected points
 
 ######################  END  OF  STRUCTURE  DEFINITIONS  ######################
 

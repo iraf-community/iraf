@@ -16,10 +16,15 @@ bool	batch
 struct	*fd
 
 begin
-	int	i, j, k
+	string	imtype, ectype
+	int	i, j, k, n
 	file	temp, arc1, arc2, str1, str2, arctype, apref, arc, arcec, logs
 	file	specec, specarc
 	bool	verbose1
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
 
@@ -40,11 +45,11 @@ begin
 	     specarc = ""
 	if (specarc != "") {
 	    scopy (specec, specarc, w1=INDEF, w2=INDEF, apertures=arcaps,
-		beams="", apmodulus=0, format="multispec", renumber=yes,
-		offset=0, clobber=yes, merge=no, verbose=no)
+		bands="", beams="", apmodulus=0, format="multispec",
+		renumber=yes, offset=0, clobber=yes, merge=no, verbose=no)
 	    scopy (specec, "", w1=INDEF, w2=INDEF, apertures="!"//arcaps,
-		beams="", apmodulus=0, format="multispec", renumber=yes,
-		offset=0, clobber=yes, merge=no, verbose=no)
+		bands="", beams="", apmodulus=0, format="multispec",
+		renumber=yes, offset=0, clobber=yes, merge=no, verbose=no)
 	}
 
 	for (j=1; j<=2; j+=1) {
@@ -60,8 +65,8 @@ begin
 
 	    # Strip possible image extension.
 	    i = strlen (arc1)
-	    if (i > 4 && substr (arc1, i-3, i) == ".imh")
-		arc1 = substr (arc1, 1, i-4)
+	    if (i > n && substr (arc1, i-n+1, i) == imtype)
+		arc1 = substr (arc1, 1, i-n)
     
 	    # Set extraction output and aperture reference depending on whether
 	    # the arcs are to be rextracted using recentered or retraced object
@@ -72,8 +77,8 @@ begin
 		 apscript.ansrecenter=="YES" || apscript.anstrace=="YES")) {
 		arc2 = spec // arc1
 		apref = spec
-		if (access (arc2//".ec.imh"))
-		    imdelete (arc2//".ec.imh", verify=no)
+		if (access (arc2//ectype))
+		    imdelete (arc2//ectype, verify=no)
 		delete (database//"/ec"//arc2//".ec*", verify = no)
 	    } else {
 		arc2 = arc1
@@ -89,38 +94,38 @@ begin
 	    fd = ""; delete (temp, verify=no)
     
 	    # Extract and determine dispersion function if necessary.
-	    if (!access (arc2//".ec.imh")) {
+	    if (!access (arc2//ectype)) {
 		if (!batch)
 		    print ("Extract and reidentify arc spectrum ", arc1)
 		print ("Extract and reidentify arc spectrum ", arc1, >> logfile)
-		apscript (arc1, output=arc2//".ms", references=apref,
+		apscript (arc1, output=arc2//".ec", references=apref,
 		    ansrecenter="NO", ansresize="NO", ansedit="NO",
 		    anstrace="NO", background="none",
 		    clean=no, weights="none", verbose=verbose1)
 		if (response != "")
 		    sarith (arc2//".ec", "/", response, arc2//".ec", w1=INDEF,
-			w2=INDEF, apertures="", beams="", apmodulus=0,
+			w2=INDEF, apertures="", bands="", beams="", apmodulus=0,
 			reverse=no, ignoreaps=no, format="multispec",
 			renumber=no, offset=0, clobber=yes, merge=no, errval=0,
 			verbose=no)
 
 		if (arcaps != "") {
 		    scopy (arc2//".ec", arc2//"arc.ec", w1=INDEF, w2=INDEF,
-			apertures=arcaps, beams="", apmodulus=0,
+			apertures=arcaps, bands="",  beams="", apmodulus=0,
 			format="multispec", renumber=yes, offset=0,
 			clobber=yes, merge=no, verbose=no)
 		    scopy (arc2//".ec", "", w1=INDEF, w2=INDEF,
-			apertures="!"//arcaps, beams="", apmodulus=0,
-			format="multispec", renumber=yes, offset=0,
+			apertures="!"//arcaps, bands="",  beams="",
+			apmodulus=0, format="multispec", renumber=yes, offset=0,
 			clobber=yes, merge=no, verbose=no)
 		    ecreidentify (arc2//"arc.ec", arcref//"arc.ec", shift=0.,
-			cradius=params.cradius, threshold=10., refit=yes,
-			database=database, logfiles=logs)
+			cradius=params.cradius, threshold=params.threshold,
+			refit=yes, database=database, logfiles=logs)
 		    imdelete (arc2//"arc.ec", verify=no)
 		}
 		ecreidentify (arc2//".ec", arcref//".ec", shift=0.,
-		    cradius=params.cradius, threshold=10., refit=yes,
-		    database=database, logfiles=logs)
+		    cradius=params.cradius, threshold=params.threshold,
+		    refit=yes, database=database, logfiles=logs)
 
 		# If not reextracting arcs based on object apertures
 		# then save the extracted arc to avoid doing it again.
@@ -146,8 +151,8 @@ begin
 		    " with respect to ", arc1, >> logfile)
 		delete (database//"/ec"//specarc, verify = no, >& "dev$null")
 		ecreidentify (specarc, arc2//"arc.ec", shift=0.,
-		    cradius=params.cradius, threshold=10., refit=no,
-		    database=database, logfiles=logs)
+		    cradius=params.cradius, threshold=params.threshold,
+		    refit=no, database=database, logfiles=logs)
 		hedit (specec, "refshft"//j, specarc,
 		    add=yes, verify=no, show=no, update=yes)
 		imrename (specarc, spec//"arc"//j+1//".ec", verbose=no)

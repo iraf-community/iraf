@@ -26,3 +26,5 @@ define	DEF_REFSPEC	5	# Reference spectra already defined
 define	OVR_REFSPEC	6	# Override reference spectra
 define	BAD_AP		7	# Bad aperture
 define	BAD_REFAP	8	# Bad reference aperture
+define	REF_GROUP	9	# Group
+define	REF_AP		10	# Aperture

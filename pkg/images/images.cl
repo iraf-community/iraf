@@ -33,6 +33,7 @@ task	blkavg,
 	imcopy,
 	imdelete,
 	imdivide,
+	imexpr,
 	imheader,
 	imhistogram,
 	imgets,
@@ -53,6 +54,7 @@ task	blkavg,
 	mode,
 	sections,
 	shiftlines,
+	xregister,
 	_imaxes		= "images$x_images.e"
 
 task	tv.pkg		= "tv$tv.cl"

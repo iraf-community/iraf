@@ -49,8 +49,9 @@ be used in finding the spectra.  A value of INDEF selects the middle of the
 image.
 .le
 .ls nsum = 1
-Number of dispersion lines to be summed.  The lines are taken around the
-specified dispersion line.
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value sums lines and
+a negative value medians lines.
 .le
 .ls nfind = 1
 Maximum number of apertures to be defined.  This is a query parameter

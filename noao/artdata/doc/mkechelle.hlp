@@ -1,4 +1,4 @@
-.help mkechelle Mar91 noao.artdata
+.help mkechelle Mar93 noao.artdata
 .ih
 NAME
 mkechelle -- Make artificial echelle spectra
@@ -574,6 +574,11 @@ nonlinear behavior of the dispersion can be applied by \fBecidentify\fR and
 \fBdispcor\fR.  As with example 3, the noise is different since it is added
 after extraction and dispersion correction.
 .fi
+.ih
+REVISIONS
+.ls MKECHELLE V2.10.3
+The task was updated to produce the current coordinate system format.
+.le
 .ih
 SEE ALSO mknoise, mk1dspec, mk2dspec, mkheader, astutil.gratings
 .endhelp

@@ -13,6 +13,6 @@ else\
 fi
 
 $CC -c $HSI_CF	generic.c chario.c yywrap.c
-$CC $HSI_CF	generic.o lexyy.o chario.o yywrap.o $HSI_LIBS -o generic.E
-mv -f		generic.E ../../hlib
+$CC $HSI_LF	generic.o lexyy.o chario.o yywrap.o $HSI_LIBS -o generic.e
+mv -f		generic.e ../../hlib
 rm		*.o

@@ -75,6 +75,7 @@
 	   arlt - Vector replace pixel if less than scalar
 	   argt - Vector replace pixel if greater than scalar
 	   asel - Vector select from two vectors based on boolean flag vector
+	  aselk - Vector select from vector/scalar based on boolean flag vector
 	   asok - Selection of the Kth smallest element of a vector
 	   asqr - Square root of a vector
 	   asrt - Sort a vector in order of increasing pixel value

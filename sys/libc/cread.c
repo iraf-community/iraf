@@ -43,7 +43,8 @@ int	maxbytes;		/* max bytes to read		*/
 	    }
 	    if (ferror (fp))
 		c_erract (EA_ERROR);
-	    nchars_read = op - buf;
+	    if (!(nchars_read = op - buf))
+		nchars_read = XEOF;
 
 	} else {
 	    XINT	maxchars = maxbytes / sizeof(XCHAR);

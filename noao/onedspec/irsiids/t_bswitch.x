@@ -2,7 +2,7 @@ include	<error.h>
 include	<imhdr.h>
 include	<mach.h>
 include	<time.h>
-include	"../shdr.h"
+include	<smw.h>
 
 define	MAX_NR_BEAMS	100	# Max number of instrument apertures
 define	MIN_RANGES	100	# Minimum spectra per beam if not given
@@ -250,7 +250,7 @@ begin
 	# Load header area
 	mw = smw_openim (imin)
 	call shdr_open (imin, mw, 1, 1, INDEFI, SHDATA, ids[def_beam])
-	call mw_close (mw)
+	call smw_close (MW(ids[def_beam]))
 
 	accumo[def_beam] = SY(ids[def_beam])
 
@@ -336,7 +336,7 @@ begin
 	}
 
 	# If this is an object observation, save the image name
-	if (TYPE(ids[def_beam]) == 1) {
+	if (OFLAG(ids[def_beam]) == 1) {
 	    call strcpy (image[1,def_beam], Memc[Memi[imnames[beam_nr]+
 		name_nr[beam_nr]-1]], SZ_LINE)
 	    name_nr[beam_nr] = name_nr[beam_nr] + 1
@@ -356,7 +356,7 @@ begin
 	# if BSWITCH is to perform the function of EXTINCTION
 	# only when sky frames are to be written out as well.
 
-	if (TYPE(ids[def_beam]) == 1 || !idsmode) {
+	if (OFLAG(ids[def_beam]) == 1 || !idsmode) {
 	    # Save headers - could probably be done faster by AMOV
 	    call shdr_copy (ids[def_beam], ids[beam_nr], NO)
 
@@ -404,7 +404,7 @@ begin
 	    # is not used. 
 
 	    call add_spec (Memr[accumo[def_beam]], Memr[accums[beam_nr]],
-		beam_stat[beam_nr], TYPE(ids[def_beam]), last_len[beam_nr])
+		beam_stat[beam_nr], OFLAG(ids[def_beam]), last_len[beam_nr])
 
 	    # IDSMODE requires that every 2N observations produce an
 	    # OBJECT-SKY pair
@@ -417,7 +417,7 @@ begin
 
 
 	    # Object and sky exposure times must be equal.
-	    if (TYPE(ids[def_beam]) == 1) {
+	    if (OFLAG(ids[def_beam]) == 1) {
 		expo[beam_nr] = expo[beam_nr] + IT(ids[def_beam])
 
 		# Increment number of object observations for this beam
@@ -464,7 +464,7 @@ begin
 	    # Non IDSMODE -accumulate separate object and sky CPS sums
 
 	    # Set pointers and update obj-sky parameters
-	    if (TYPE(ids[def_beam]) == 1) {
+	    if (OFLAG(ids[def_beam]) == 1) {
 		beam_stat[beam_nr] = beam_stat[beam_nr] + 1
 		ipacc = accumo[beam_nr]
 		ipc   = counto[beam_nr]
@@ -716,7 +716,7 @@ begin
 		else
 		    bsflag = -1
 
-		if (TYPE(ids[i]) == 1)
+		if (OFLAG(ids[i]) == 1)
 		    IT(ids[i]) = expo[i]
 		else
 		    IT(ids[i]) = exps[i]
@@ -881,7 +881,7 @@ begin
 	}
 
 	# Is accumulator to be cleared?
-	if (stat == INDEFI || stat == 0) {
+	if (IS_INDEFI (stat) || stat == 0) {
 	    call amulkr (inspec, real (add_sub), accum, len)
 	    stat = add_sub
 

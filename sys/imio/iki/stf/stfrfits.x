@@ -48,7 +48,7 @@ int	in, index, nchars, spool, slot, user, i
 bool	streq()
 long	clktime(), fstatl()
 int	envgeti(), stf_ctype(), finfo(), getline(), open(), stropen()
-errchk	getline, putline, syserrs, seek, calloc, realloc
+errchk	getline, putline, syserrs, open, seek, calloc, realloc
 errchk	fpathname, malloc, stf_copyfits
 
 bool	initialized			# CACHE definitions...

@@ -73,8 +73,10 @@ begin
 		# Save the size of the old GPB user area header if we are
 		# making a new copy of an old STF format image.
 
-		copy_of_stf_image = ((IM_ACMODE(im) == NEW_COPY) &&
-		    (IM_KERNEL(o_im) == IM_KERNEL(im)))
+		copy_of_stf_image = false
+		if (IM_ACMODE(im) == NEW_COPY && o_im != NULL)
+		    if (IM_KERNEL(o_im) == IM_KERNEL(im))
+			copy_of_stf_image = true
 
 		if (copy_of_stf_image) {
 		    o_stf = IM_KDES(o_im)

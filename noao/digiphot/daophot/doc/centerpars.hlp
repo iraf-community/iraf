@@ -1,4 +1,4 @@
-.help centerpars Aug91 noao.digiphot.daophot
+.help centerpars Dec92 noao.digiphot.daophot
 .ih
 NAME
 centerpars -- edit the centering algorithm parameters
@@ -24,15 +24,15 @@ detect objects.
 .ls centroid
 The object centers are determined by computing the
 intensity weighted means of the marginal profiles in x and y.
-This is the recommended centering algorithm users using PHOT
+This is the recommended centering algorithm for users using PHOT
 interactively with the image cursor as input or in the case when the
 coordinate list has not already been centered.
 .le
-.ls gauss
+.ls gauss (fwhmpsf dependent algorithm)
 The object centers are computed by fitting a Gaussian of fixed fwhmpsf to
 the marginal profiles in x and y using non-linear least squares techniques.
 .le
-.ls ofilter
+.ls ofilter (fwhmpsf dependent algorithm)
 The object centers are computed using optimal filtering techniques,
 a triangular weighting function of half width equal to fwhmpsf and
 the marginal distributions in x and y.
@@ -41,7 +41,22 @@ the marginal distributions in x and y.
 .ls cbox = 5.0  (scale units)
 The width of the subraster used for object centering in units of the
 scale parameter. Cbox needs to be big enough to include sufficient
-pixel for centering but not so large as to include a lot of noise.
+pixels for centering but not so large as to include a lot of noise.
+A reasonable starting value is twice the FWHM of the PSF.
+.le
+.ls cthreshold = 0 (sigma)
+Points cthreshold * sigma above (emission features) or below (absorption
+features) the data minimum or maximum respecitvely, are used by the
+centering algorithm.
+DAOPHOT users should leave this value at 0.0 which invokes the appropriate
+default thresholding technique for each centering algorithm. Setting
+cthreshold to INDEF turns off thresholding altogether for all the centering
+algorithms.
+.le
+.ls minsnratio = 1.0
+The minimum signal to noise ratio required for object centering. If
+the estimated signal to noise ratio is less than this number the
+computed center will be returned with an error estimate.
 .le
 .ls cmaxiter = 10
 The maximum number of iterations performed by the centering algorithm.
@@ -53,15 +68,10 @@ coordinates in units of the scale parameter.
 If the shift produced by the centering algorithm is
 larger than this, the computed center is returned with an error flag.
 .le
-.ls minsnratio = 1.0
-The minimum signal to noise ratio required for object centering. If
-the estimated signal to noise ratio is less than this number the
-computed center will be returned with an error estimate.
-.le
 .ls clean = no
 A switch to determine whether or not symmetry-cleaning is to
 be performed on the image subraster before centering.
-DAOPHOT users are recommended to leave this switch  set to "no".
+DAOPHOT users should leave this switch  set to "no".
 .le
 .ls rclean = 1.0  (scale units)
 The cleaning radius for the symmetry-clean algorithm in units of
@@ -73,6 +83,9 @@ the scale parameter.
 .le
 .ls kclean = 3.0  (sigma)
 The number of standard sky deviations for the symmetry-clean algorithm.
+.le
+.ls mkcenter = no
+Mark the fitted centers on the displayed image ?
 .le
 .ih
 DESCRIPTION
@@ -89,13 +102,12 @@ Using an initial position and \fIscale\fR supplied by the user,
 a subraster of data
 \fIcbox\fR / \fIscale\fR pixels wide around the initial position
 is extracted from the IRAF image.
-
-If scale is defined in terms of the half width half maximum
+If scale is defined in terms of the half-width half-maximum
 of the psf then a single value of cbox once chosen 
 will work well for centering objects in images of different seeing and
 detector characteristics.
 
-The symmetry-clean algorithm of may be optionally applied
+The symmetry-clean algorithm may be optionally applied
 to the image subraster prior to centering. The cleaning algorithm attempts
 to correct defects in the image subraster by assuming that the image has radial
 symmetry and comparing pixels on opposite sides of the center of symmetry.
@@ -106,10 +118,10 @@ center is used as the center of symmetry.  Pixels which are inside the
 cleaning radius are not edited.
 Pairs of pixels in the cleaning region, r > \fIrclean / scale\fR
 and r <= \fIrclip / scale\fR
-and diammetrically opposed about the center of symmetry are tested for
+and diametrically opposed about the center of symmetry are tested for
 equality.  If the difference between the pixels
-is greater than kclean * sigma, the larger value is replaced by the smaller.
-In the cleaning region the sigma is determined by the
+is greater than \fIkclean * sigma\fR, the larger value is replaced by the
+smaller.  In the cleaning region the sigma is determined by the
 noise model assumed for the data.
 Pairs of pixels in the clipping region, r > \fIrclip / scale\fR
 are tested in the same manner
@@ -123,13 +135,15 @@ flag is associated with that object.
 
 New centers are computed using the centering algorithm specified by
 \fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and points
-that are \fIcthreshold\fR above the local minimum.
+that are some threshold above an estimate of the local minimum.
 The recommended centering algorithm is \fIcentroid\fR. This centering algorithm
 computes the marginal distributions in x and y of the extracted subraster.
 The intensity weighted mean and mean error of the x and y marginal
 distributions is computed using only points in the marginal array above
-the minimum data pixel plus a threshold value which is either the mean
-or \fIcthreshold\fR if cthreshold is greater than zero.
+the minimum data pixel plus a threshold value which is either the mean,
+the local minimum plus \fIdatapars.sigma * cthreshold\fR if cthreshold is
+greater than zero, or the local minimum, if \fIcthreshold\fR is
+0.0, a positive number, or INDEF respectively.
 This algorithm is similar to that used in MPC (Mountain Photometry Code).
 Note that this is the only centering algorithm for which the choice of
 \fIdatapars.fwhmpsf\fR is not crucial.
@@ -140,7 +154,8 @@ Initial guesses for the fit parameters are made from the data
 values. The routines then iterate until a best fit solution is achieved.
 The final choice \fIofilter\fR employ a variation of the optimal filtering
 technique in which the profile is simulated by a triangle function of
-width \fIdatapars.fwhmpsf\fR.
+width \fIdatapars.fwhmpsf\fR. The default threshold algorithm for
+all the centering algorithms other than "centroid" is no thresholding.
 Detailed descriptions of all the centering algorithms
 can be found in the Apphot Specifications Document.
 
@@ -153,13 +168,13 @@ EXAMPLES
 1. List the centering parameters.
 
 .nf
-	ap> lpar centerpars
+	da> lpar centerpars
 .fi
 
 2. Edit the centering parameters.
 
 .nf
-	ap> centerpars
+	da> centerpars
 .fi
 
 3. Edit the CENTERPARS parameters from with the PHOT task.

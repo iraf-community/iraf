@@ -225,6 +225,8 @@ begin
 		    stat = NO
 	        } else if (strmatch (card, "^IRAF-BPX") != 0) {
 		    stat = NO
+	        } else if (strmatch (card, "^END     ") != 0) {
+		    stat = NO
 	        } else
                     stat = YES
 	    }

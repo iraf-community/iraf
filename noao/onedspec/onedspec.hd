@@ -15,6 +15,7 @@ continuum	hlp=doc$continuum.hlp,		src=t_sfit.x
 deredden	hlp=doc$deredden.hlp,		src=t_deredden.x
 dispaxis	hlp=doc$dispaxis.hlp,		src=dispaxis.par
 dispcor		hlp=doc$dispcor.hlp,		src=dispcor$dispcor.x
+disptrans	hlp=doc$disptrans.hlp,		src=dispcor$disptrans.x
 dopcor		hlp=doc$dopcor.hlp,		src=t_dopcor.x
 fitprofs	hlp=doc$fitprofs.hlp,		src=t_fitprofs.x
 identify	hlp=doc$identify.hlp,		src=identify$t_identify.x
@@ -24,18 +25,24 @@ names		hlp=doc$names.hlp,		src=t_names.x
 ndprep		hlp=doc$ndprep.hlp,		src=ndprep.cl
 refspectra	hlp=doc$refspectra.hlp,		src=dispcor$refspectra.x
 reidentify	hlp=doc$reidentify.hlp,		src=identify$t_reidentify.x
+rspectext	hlp=doc$rspectext.hlp,		src=rspectext.cl
 sapertures	hlp=doc$sapertures.hlp,		src=t_sapertures.x
+sbands		hlp=doc$sbands.hlp,		src=t_sbands.x
 sarith		hlp=doc$sarith.hlp,		src=t_sarith.x
 scombine	hlp=doc$scombine.hlp,		src=t_scombine.x
 scopy		hlp=doc$scopy.hlp,		src=scopy.cl
 sensfunc	hlp=doc$sensfunc.hlp,		src=sensfunc$t_sensfunc.x
 sfit		hlp=doc$sfit.hlp,		src=t_sfit.x
+sflip		hlp=doc$sflip.hlp,		src=t_sflip.x
 sinterp		hlp=doc$sinterp.hlp,		src=t_sinterp.x
 slist		hlp=doc$slist.hlp,		src=t_slist.x
 specplot	hlp=doc$specplot.hlp,		src=t_specplot.x
+specshift	hlp=doc$specshift.hlp,		src=t_specshift.x
 splot		hlp=doc$splot.hlp,		src=splot$splot.x
 standard	hlp=doc$standard.hlp,		src=t_standard.x
+wspectext	hlp=doc$wspectext.hlp,		src=wspectext.cl
 
 package		hlp=doc$onedspec.hlp,		src=onedspec.cl
+specwcs		hlp=doc$specwcs.hlp
 
 irsiids		pkg=irsiids$irsiids.hd

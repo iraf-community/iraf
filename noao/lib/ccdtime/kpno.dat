@@ -1,0 +1,153 @@
+# KPNO Telescope, Filter, and Detector Database
+
+# Telescope data:
+# aperture diameter in meters, scale in arcsec/mm, and tranmission.
+
+telescope = "0.9m"
+	aperture = 0.91
+	scale = 28.3
+	transmission = 1.0
+
+telescope = "0.9mf13"
+	aperture = 0.91
+	scale = 15.9
+	transmission = 1.0
+
+telescope = "4m"
+	aperture = 4.00
+	scale = 19.6
+	transmission = 1.0
+
+telescope = "2.1m"
+	aperture = 2.1
+	scale = 12.7
+	transmission = 1.0
+
+telescope = "Schmidt"
+	aperture = 0.61
+	scale = 96.4 
+	transmission = 0.7
+
+telescope = "WIYN"
+	aperture = 3.3	
+	scale = 9.4
+	transmission = 1.0
+
+end
+
+# Filter data:
+# Magnitude corresponding to photon count rate. 
+# Photons/second/stellar-image for a 1-m telescope at 1 airmass.
+# Sky magnitudes per sq arc sec:
+# sky = sky0 + sky1 * phase + sky2 * phase**2 (phase=0-14)
+
+filter = "U"
+	mag = 20
+	star = 10.2
+	sky0 = 22.0
+	sky1 = -0.2666
+	sky2 = -.00760
+
+filter = "B"
+	mag = 20
+	star = 34.0
+	sky0 = 22.7 
+	sky1 = -0.0998
+	sky2 = -0.00953
+
+filter = "V"
+	mag = 20
+	star = 37.0
+	sky0 = 21.8 
+	sky1 = -0.0153
+	sky2 = -0.00838
+
+filter = "R"
+	mag = 20
+	star = 40.0
+	sky0 = 20.9 
+	sky1 = -0.0211
+	sky2 = -0.00364
+
+filter = "I"
+	mag = 20
+	star = 28.0
+	sky0 = 19.9 
+	sky1 = -0.0086
+	sky2 = -0.00311
+
+end
+
+# Detector information:
+# rdnoise in photons, dark rate in photons per second, pixel size in microns,
+# and the effective DQE for each filter.
+
+detector = "T1KA"
+	rdnoise = 3.5
+	dark = 0.001
+	pixsize = 24
+	U = 0.24
+	B = 0.44
+	V = 0.70
+	R = 0.79
+	I = 0.59
+
+detector = "T2KA"
+	rdnoise = 4.0
+	dark = 0.001
+	pixsize = 24
+	U = 0.31
+	B = 0.53
+	V = 0.63
+	R = 0.67
+	I = 0.51
+
+detector = "T2KB"
+	rdnoise = 4.0
+	dark = 0.001
+	pixsize = 24
+	U = 0.42
+	B = 0.67
+	V = 0.78
+	R = 0.79
+	I = 0.56
+
+detector = "TI5"
+	rdnoise = 8.6
+	dark = 0.001
+	pixsize = 15
+	U = 0.51
+	B = 0.59
+	V = 0.69
+	R = 0.61
+	I = 0.39
+
+detector = "T5HA"
+	rdnoise = 13.5
+	dark = 0.001
+	pixsize = 27
+	U = 0.30
+	B = 0.51
+	V = 0.64
+	R = 0.69
+	I = 0.50
+
+detector = "S2KA"
+	rdnoise = 3.0
+	dark = 0.001
+	pixsize = 21
+	U = 0.30
+	B = 0.18
+	V = 0.34
+	R = 0.40
+	I = 0.60
+
+detector = "S2KB"
+	rdnoise = 7.0
+	dark = 0.001
+	pixsize = 21
+	U = 0.40
+	B = 0.70
+	V = 0.80
+	R = 0.82
+	I = 0.60

@@ -19,8 +19,12 @@ XINT	*maxch, *status;
 {
 	register char	*ip, *op;
 	register int	n;
-	char	dirname[1024];
+	char	dirname[1025];
+#ifdef SOLARIS
+	char	*getcwd();
+#else
 	char	*getwd();
+#endif
 
 	/* If cwd is already known, just return the name.  Reconstructing
 	 * the pathname of the cwd is expensive on some systems.
@@ -28,7 +32,11 @@ XINT	*maxch, *status;
 	if (oscwd[0] != EOS)
 	    ip = oscwd;
 	else {
+#ifdef SOLARIS
+	    ip = getcwd (dirname, 1024);
+#else
 	    ip = getwd (dirname);
+#endif
 	    if (ip == NULL) {
 		*status = XERR;
 		return;

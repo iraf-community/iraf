@@ -15,6 +15,7 @@ as many of them are shared by several tasks.
 	     |-pexamine------routines specific to the pexamine task
              |-ptutils-------routines specific to miscellneous utility tasks
 	     |-txtools-------routines specific to the text file operators
+	     |-test----------directory of test data
 
 
 Lindsey Davis

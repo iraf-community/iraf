@@ -35,7 +35,7 @@ define	NSAMPLE		20	# Maximum number of background sample regions
 # wants to save the subtracted 1D sky spectrum.
 
 procedure ap_skyeval (im, ap, dbuf, nc, nl, c1, l1, sbuf, svar, sky, nx, ny,
-	xs, ys, nsubaps)
+	xs, ys, nsubaps, rdnoise)
 
 pointer	im		# IMIO pointer
 pointer	ap		# Aperture structure
@@ -48,18 +48,18 @@ real	sky[ny,nsubaps]	# Extracted sky (out)
 int	nx, ny		# Size of profile array
 int	xs[ny], ys	# Origin of profile array
 int	nsubaps		# Number of subapertures
+real	rdnoise		# Readout noise in RMS data numbers.
 
 int	bkg		# Background type
 int	skybox		# Sky box car smoothing
-real	rdnoise		# Readout noise in RMS data numbers.
 
 int	i, j, ix1, ix2, nsample, nsky, nfit, ix, iy
 real	center, xmin, xmax, a, b, c, s, avg
 pointer	ic, cv, cv1, asi, sp, str, data, as, bs, x, y, w
 
 int	apgwrd(), apgeti(), ctor()
-real	apgimr(), ic_getr(), cveval(), asieval(), asigrl(), amedr()
-errchk	salloc, ic_fit, apgimr
+real	ic_getr(), cveval(), asieval(), asigrl(), amedr()
+errchk	salloc, ic_fit
 
 begin
 	call smark (sp)
@@ -68,7 +68,6 @@ begin
 	# Get CL parameters and set shift and fitting function pointers.
 	bkg = apgwrd ("background", Memc[str], SZ_LINE, BACKGROUND)
 	skybox = apgeti ("skybox")
-	rdnoise = apgimr ("readnoise", im) ** 2
 
 	cv = AP_CV(ap)
 	ic = AP_IC(ap)
@@ -214,7 +213,7 @@ begin
 		c = center + s
 	        a = ix1 + c - int (c)
 	        do i = 1, nfit-1 {
-	            Memr[x+i-1] = a - c
+	            Memr[x+i-1] = nint (1000. * (a - c)) / 1000.
 		    Memr[y+i-1] = asieval (asi, a-ix1+1)
 		    Memr[w+i-1] = 1.
 		    a = a + 1.

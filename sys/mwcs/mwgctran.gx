@@ -35,7 +35,7 @@ begin
 	do j = 1, ndim {
 	    axtype1[j] = WCS_AXCLASS(CT_WCSI(ct),j)
 	    axtype2[j] = WCS_AXCLASS(CT_WCSO(ct),j)
-	    o_ltv[i] = Mem$t[CT_LTV(ct)+(j-1)]
+	    o_ltv[j] = Mem$t[CT_LTV(ct)+(j-1)]
 	    do i = 1, ndim
 		o_ltm[(j-1)*ndim+i] = Mem$t[CT_LTM(ct)+(j-1)*pdim+(i-1)]
 	}

@@ -11,9 +11,9 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 
 pointer	sp, str
-real	fwhmpsf, capert, cthreshold, skysigma, datamin, datamax
+real	fwhmpsf, capert, skysigma, datamin, datamax
 int	apstati()
-real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vcthreshold(), ap_vsigma()
+real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vsigma()
 real	ap_vdatamin(), ap_vdatamax()
 
 begin
@@ -36,19 +36,18 @@ begin
 	    # Confirm the centering box.
 	    capert = 2.0 * ap_vcapert (ap)
 
-	    # Confirm the centering threshold parameter.
-	    cthreshold = ap_vcthreshold (ap)
+	    # Confirm the sky sigma parameter.
+	    skysigma = ap_vsigma (ap)
 
 	} else {
 
 	    fwhmpsf = apstatr (ap, FWHMPSF)
 	    capert = 2.0 * apstatr (ap, CAPERT)
-	    cthreshold = apstatr (ap, CTHRESHOLD)
+	    skysigma = apstatr (ap, SKYSIGMA)
 
 	}
 
 	# Confirm the sky sigma parameter.
-	skysigma = ap_vsigma (ap)
 
 	# Confirm the minimum and maximum good data values.
 	datamin = ap_vdatamin (ap)
@@ -58,19 +57,17 @@ begin
 
 	# Update the database file.
 	if (out != NULL && stid > 1) {
-	    call ap_sparam (out, KY_CSTRING, Memc[str], UN_CSTRING,
+	    call ap_sparam (out, KY_CSTRING, Memc[str], UN_CALGORITHM,
 		"centering algorithm")
-	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_FWHMPSF,
+	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_ASCALEUNIT,
 	        "full width half maximum of the psf")
-	    call ap_rparam (out, KY_CAPERT, capert, UN_CAPERT,
+	    call ap_rparam (out, KY_CAPERT, capert, UN_CSCALEUNIT,
 	        "centering box width")
-	    call ap_rparam (out, KY_CTHRESHOLD, cthreshold, UN_CTHRESHOLD,
-	        "threshold for centering ")
-	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
+	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_NCOUNTS,
 	        "standard deviation of 1 sky pixel")
-	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_ACOUNTS,
 	        "minimum good data value")
-	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_ACOUNTS,
 	        "maximum good data value")
 	}
 

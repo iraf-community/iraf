@@ -9,6 +9,7 @@ pointer	ccd			# CCD structure
 
 int	nc, nl
 pointer	sp, str, out
+long	clktime()
 
 begin
 	call smark (sp)
@@ -61,8 +62,10 @@ begin
 	}
 
 	# Set mean value if desired.
-	if (CORS(ccd, FINDMEAN) == YES)
+	if (CORS(ccd, FINDMEAN) == YES) {
 	    call hdmputr (out, "ccdmean", MEAN(ccd))
+	    call hdmputi (out, "ccdmeant", int (clktime (long (0))))
+	}
 
 	# Mark image as processed.
 	call sprintf (Memc[str], SZ_LINE, "CCD processing done")

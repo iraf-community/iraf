@@ -23,18 +23,23 @@ begin
 
 	# Compute the smoothing length and initialize output array.
 	nsmooth = nbins - nker + 1
-	call ap_aboxr (hgm, shgm[1+nker/2], nsmooth, nker)
+	#call ap_aboxr (hgm, shgm[1+nker/2], nsmooth, nker)
+	call ap_sboxr (hgm, shgm, nbins, nker)
 
 	# Iterate on the solution.
 	do i = 1, iter {
-	    call ap_aboxr (shgm, Memr[work1+nker/2], nsmooth, nker)
-	    do j = 1 + nker / 2, nsmooth + nker / 2 {
+	    #call ap_aboxr (shgm, Memr[work1+nker/2], nsmooth, nker)
+	    call ap_sboxr (shgm, Memr[work1], nbins, nker)
+	    #do j = 1 + nker / 2, nsmooth + nker / 2 {
+	    do j = 1, nbins {
 		if (Memr[work1+j-1] == 0.0)
 		    Memr[work1+j-1] = ap_diverr ()
 		else
-		    Memr[work1+j-1] = hgm[j] / Memr[work1+j-1]
+		    #Memr[work1+j-1] = hgm[j] / Memr[work1+j-1]
+		    Memr[work1+j-1] = shgm[j] / Memr[work1+j-1]
 	    }
-	    call ap_aboxr (Memr[work1], Memr[work2+nker/2], nsmooth, nker)
+	    #call ap_aboxr (Memr[work1], Memr[work2+nker/2], nsmooth, nker)
+	    call ap_sboxr (Memr[work1], Memr[work2], nbins, nker)
 	    call amulr (shgm, Memr[work2], shgm, nbins)
 	}
 

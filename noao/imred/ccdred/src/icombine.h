@@ -28,6 +28,8 @@ define	S_MODE		2
 define	S_MEDIAN	3
 define	S_MEAN		4
 define	S_EXPOSURE	5
+define	S_FILE		6
+define	S_KEYWORD	7
 define	S_SECTION	"|input|output|overlap|"
 define	S_INPUT		1
 define	S_OUTPUT	2
@@ -46,3 +48,5 @@ define	M_BOOLEAN	-1	# Ignore mask values
 define	D_ALL		0	# All pixels are good
 define	D_NONE		1	# All pixels are bad or rejected
 define	D_MIX		2	# Mixture of good and bad pixels
+
+define	TOL		0.001	# Tolerance for equal residuals

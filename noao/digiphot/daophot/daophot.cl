@@ -2,14 +2,23 @@
 #{ DAOPHOT -- Point Spread Function photometry package.
 
 if (deftask ("tables")) {
-    tables
+    if (defpar ("tables.motd")) {
+	tables.motd = no
+	tables
+    } else {
+        tables
+    }
 } else {
     type "daophot$lib/warning.dat"
 }
 
 dataio			# rfits task is required for the daotest script
+;
 
 package daophot
+
+task	setimpars	= "daophot$setimpars.cl"
+task	daotest		= "daophot$daotest.cl"
 
 task	daofind,
 	phot		= "daophot$x_apphot.e"
@@ -20,22 +29,26 @@ task	addstar,
 	grpselect,
 	nstar,
 	peak,
+	pfmerge,
 	psf,
+	pstselect,
 	seepsf,
+	daoedit,
 	substar		= "daophot$x_daophot.e"
 
 task	datapars	= "daophot$datapars.par"
+task	findpars	= "daophot$findpars.par"
 task	centerpars	= "daophot$centerpars.par"
 task	fitskypars	= "daophot$fitskypars.par"
 task	photpars	= "daophot$photpars.par"
 task	daopars		= "daophot$daopars.par"
-task	daotest		= "daophot$daotest.cl"
 
 # PTOOLS tasks
 
 task	pconvert,
 	istable,
-	txappend,
+	txcalc,
+	txconcat,
 	txdump,
 	txrenumber,
 	txselect,
@@ -51,7 +64,8 @@ task	cntrplot	= "ptools$cntrplot.par"
 
 # PTOOLS scripts which depend on PTOOLS and TTOOLS tasks
 
-task	pappend		= "ptools$pappend.cl"
+task	pcalc		= "ptools$pcalc.cl"
+task	pconcat		= "ptools$pconcat.cl"
 task	pdump	 	= "ptools$pdump.cl"
 task	prenumber	= "ptools$prenumber.cl"
 task	pselect		= "ptools$pselect.cl"
@@ -59,11 +73,12 @@ task	psort		= "ptools$psort.cl"
 
 # PTOOLS Scripts which depend only on TTOOLS tasks
 
-task	tbappend	= "ptools$tbappend.cl"
+task	tbconcat	= "ptools$tbconcat.cl"
+task	tbcalc		= "ptools$tbcalc.cl"
 task	tbdump		= "ptools$tbdump.cl"
 
-hidetask    istable, txappend, txdump, txrenumber, txselect, txsort
+hidetask    istable, txcalc, txconcat, txdump, txrenumber, txselect, txsort
 hidetask    xyplot, histplot, radplot, surfplot, cntrplot
-hidetask    tbappend, tbdump
+hidetask    tbcalc, tbconcat, tbdump
 
 clbye()

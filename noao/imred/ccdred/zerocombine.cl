@@ -17,12 +17,15 @@ string	scale="none"	{prompt="Image scaling",
 string	statsec=""	{prompt="Image section for computing statistics"}
 int	nlow=0		{prompt="minmax: Number of low pixels to reject"}
 int	nhigh=1		{prompt="minmax: Number of high pixels to reject"}
+int	nkeep=1		{prompt="Minimum to keep (pos) or maximum to reject (neg)"}
 bool	mclip=yes	{prompt="Use median in sigma clipping algorithms?"}
 real	lsigma=3.	{prompt="Lower sigma clipping factor"}
 real	hsigma=3.	{prompt="Upper sigma clipping factor"}
 string	rdnoise="0."	{prompt="ccdclip: CCD readout noise (electrons)"}
 string	gain="1."	{prompt="ccdclip: CCD gain (electrons/DN)"}
+string	snoise="0."	{prompt="ccdclip: Sensitivity noise (fraction)"}
 real	pclip=-0.5	{prompt="pclip: Percentile clipping parameter"}
+real	blank=0.	{prompt="Value if there are no pixels"}
 
 begin
 	string	ims
@@ -31,14 +34,15 @@ begin
 
 	# Process images first if desired.
 	if (process == YES)
-	    ccdproc (ims, ccdtype=ccdtype)
+	    ccdproc (ims, ccdtype=ccdtype, noproc=no)
 
 	# Combine the flat field images.
 	combine (ims, output=output, plfile="", sigma="", combine=combine,
 	    reject=reject, ccdtype=ccdtype, subsets=no, delete=delete,
 	    clobber=clobber, project=no, outtype="real", offsets="none",
-	    masktype="none", blank=0., scale=scale, zero="none", weight=no,
+	    masktype="none", blank=blank, scale=scale, zero="none", weight=no,
 	    statsec=statsec, lthreshold=INDEF, hthreshold=INDEF, nlow=nlow,
-	    nhigh=nhigh, mclip=mclip, lsigma=lsigma, hsigma=hsigma,
-	    rdnoise=rdnoise, gain=gain, sigscale=0.1, pclip=pclip, grow=0)
+	    nhigh=nhigh, nkeep=nkeep, mclip=mclip, lsigma=lsigma, hsigma=hsigma,
+	    rdnoise=rdnoise, gain=gain, snoise=snoise, sigscale=0.1,
+	    pclip=pclip, grow=0)
 end

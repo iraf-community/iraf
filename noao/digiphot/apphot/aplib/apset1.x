@@ -181,8 +181,14 @@ begin
 	    AP_SCALE(ap) =  rval
 	case K1:
 	    AP_K1(sky) = rval
-	case K2:
-	    AP_K2(sky) = rval
+	case SLOREJECT:
+	    AP_SLOREJECT(sky) = rval
+	case SHIREJECT:
+	    AP_SHIREJECT(sky) = rval
+	case SLOCLIP:
+	    AP_SLOCLIP(sky) = rval
+	case SHICLIP:
+	    AP_SHICLIP(sky) = rval
 	case BINSIZE:
 	    AP_BINSIZE(sky) = rval
 	case RGROW:
@@ -191,6 +197,8 @@ begin
 	    AP_WX(ap) = rval
 	case WY:
 	    AP_WY(ap) = rval
+	case CTHRESHOLD:
+	    AP_CTHRESHOLD(cen) = rval
 	case MAXSHIFT:
 	    AP_MAXSHIFT(cen) = rval
 	case MINSNRATIO:

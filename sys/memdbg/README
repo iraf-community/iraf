@@ -1,0 +1,107 @@
+MEMDBG -- Debug version of MEMIO.
+
+This library may be linked with an application to perform runtime checks on
+the memory allocation subsystem to check for memory leaks.  This library is
+used only for debugging and is not supported on all IRAF host systems.
+
+To use this package link the iraf process with the flags
+
+    -z -lmemdbg
+
+e.g.
+    xc -c zz.x;  xc -z -o zz.e zz.o -lmemdbg
+
+or include -lmemdbg on the $link line in the mkpkg file.
+
+It may be desirable to edit the IRAF source code to insert MEMLOG messages
+or change the logging defaults.  The following routines are provided for this
+purpose.
+
+		 memlog (message)
+		memlog1 (message, arg1)
+		memlog2 (message, arg1, arg2)
+		memlogs (message, strarg)
+		 memlev (loglevel)
+
+MEMLOG logs a simple message string.  MEMLOG[12] allow one or two integer
+arguments.  MEMLOGS allows one string argument.
+
+The debug level may be set with MEMLEV, as follows:
+
+	level = 1	log malloc/realloc/mfree calls
+	level = 2	log smark/sfree calls
+	level = 3	log both types of calls
+
+The default debug level is 3.
+
+Run one or more IRAF tasks in the process you want to debug and then type
+flpr to exit the process (debug logging is process level and ALL calls during
+the process lifetime are logged).  When the IRAF process is run a file
+
+	mem.log
+
+will be left in the current directory.  This contains a long sequence of lines
+such as the following:
+
+    215738  00000696    18d74  A 1  malloc 572 type 10
+    21929d  00000697    59e34  A 2      smark
+    21929d  00000698    5a0aa  F 2      sfree
+
+The columns are as follows.
+
+	bufadr		Buffer address for malloc, mfree, smark, etc.
+	seqno		Sequence number - order in which the calls were made
+	retadr		Return address - identifies routine which made the call
+	action		Action code - A (alloc), R (realloc), F (free)
+	class		Class of allocator (1=malloc/mfree, 2=smark/sfree)
+	comment		Describes the type of call, may give extra info
+
+This is just the raw debug output.  To check the debug output to see if there
+are any calls that don't match up, the task MEMCHK in SOFTOOLS is used, e.g.,
+
+    cl> sort mem.log | memchk | sort col=2 > mem.log2
+
+This can also be run at the host level as follows.
+
+    % sort mem.log | x_softools.e memchk fname=STDIN passall+ | sort +1 > ...
+
+This may take a while for very large (> 10K lines) mem.log files.  The
+output file will look like the input file except that any bad calls will be
+flagged with the string "####" at the end of the line.
+
+The RETADR field (printed in hex) can be used to determine what IRAF procedure
+made a particular call.  On a Sun one can run
+
+    % nm -n x_whatever.e
+
+To list the symbol table sorted by address.  The routine which made the call
+will be the .text routine with the greatest address which is less than
+retadr, i.e., retadr is an address within the text of the calling procedure.
+
+On a SysV system NM produces "pretty" output and is harder to use.  The
+following command produces the necessary sorted list on my A/UX system.
+
+    % nm -e -x imexpr.e | sort -t\| +1
+
+Another way to do this is to let a debugger look up the symbol in the
+symbol table for us.  Here is an example using adb.
+
+    % adb zz.e
+    0x25f0?i
+    _foo_+0x28:     call    _xmallc_
+
+In this example the value of retadr is 0x25f0, the executable is the file
+zz.e, and the procedure which called the MEMIO (MEMDBG) routine malloc
+was "foo" according to adb.
+
+Note that memory debug logging starts during process startup and the first
+messages logged will record the MEMIO calls made by the system code.  It is
+normal for the system code to allocate some buffers which are used for the
+lifetime of the process hence are never freed.  A simple way to determine
+where the system MEMIO calls end and your task execution begins is to put a
+call such as
+
+	call memlog ("--------- start task -----------")
+
+in the first executable line of your IRAF task.  Comments such as this will
+be preserved in the mem.log file.

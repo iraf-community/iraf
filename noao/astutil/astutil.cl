@@ -3,6 +3,7 @@
 package astutil
 
 task	airmass,
+	asthedit,
 	precess,
 	galactic,
 	gratings,
@@ -12,5 +13,8 @@ task	airmass,
 	setairmass,
 	setjd,
 	ccdtime		= "astutil$x_astutil.e"
+
+# PSET Tasks
+task    keywpars        = "astutil$keywpars.par"
 
 clbye

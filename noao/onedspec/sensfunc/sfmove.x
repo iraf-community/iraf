@@ -14,13 +14,14 @@ int	istd			# Index of standard star
 int	ipt			# Index of point
 real	shift
 
-int	i, j, n, wcs, mark, mdel, stridx()
+int	i, j, n, wcs, mark, mdel, cdel, color, stridx()
 real	wave, szmark, szmdel
 pointer	x, y, z, w, gio
 
 begin
 	gio = GP_GIO(gp)
 	mdel = GP_MDEL(gp)
+	cdel = GP_CDEL(gp)
 	szmdel = GP_SZMDEL(gp)
 	szmark = GP_SZMARK(gp)
 
@@ -33,10 +34,13 @@ begin
 	    call sf_data (stds, nstds, GP_GRAPHS(gp,wcs))
 	    switch (key) {
 	    case 'p':
-		if (istd != nstds-1)
+		if (istd != nstds-1) {
 		    mark = GP_MARK(gp)
-		else
+		    color = GP_CMARK(gp)
+		} else {
 		    mark = GP_MADD(gp)
+		    color = GP_CADD(gp)
+		}
 	        x = STD_X(stds[istd])+ipt-1
 	        y = STD_Y(stds[istd],1)+ipt-1
 	        w = STD_WTS(stds[istd])+ipt-1
@@ -44,20 +48,25 @@ begin
 		    call gseti (gio, G_PMLTYPE, 0)
 	            call gmark (gio, Memr[x], Memr[y], mark, szmark, szmark)
 		    call gseti (gio, G_PMLTYPE, 1)
+		    call gseti (gio, G_PLCOLOR, color)
 	            call gmark (gio, Memr[x], Memr[y]+shift, mark, szmark,
 			szmark)
 		} else {
 		    call gseti (gio, G_PMLTYPE, 0)
 	            call gmark (gio, Memr[x], Memr[y], mdel, szmdel, szmdel)
 		    call gseti (gio, G_PMLTYPE, 1)
+		    call gseti (gio, G_PLCOLOR, cdel)
 	            call gmark (gio, Memr[x], Memr[y]+shift, mdel, szmdel,
 			szmdel)
 		}
 	    case 's':
-		if (istd != nstds-1)
+		if (istd != nstds-1) {
 		    mark = GP_MARK(gp)
-		else
+		    color = GP_CMARK(gp)
+		} else {
 		    mark = GP_MADD(gp)
+		    color = GP_CADD(gp)
+		}
 	        n = STD_NWAVES(stds[istd])
 	        x = STD_X(stds[istd])
 	        y = STD_Y(stds[istd])
@@ -67,12 +76,14 @@ begin
 		        call gseti (gio, G_PMLTYPE, 0)
 	                call gmark (gio, Memr[x], Memr[y], mark, szmark, szmark)
 		        call gseti (gio, G_PMLTYPE, 1)
+		        call gseti (gio, G_PLCOLOR, color)
 	                call gmark (gio, Memr[x], Memr[y]+shift, mark, szmark,
 			    szmark)
 		    } else {
 		        call gseti (gio, G_PMLTYPE, 0)
 	                call gmark (gio, Memr[x], Memr[y], mdel, szmdel, szmdel)
 		        call gseti (gio, G_PMLTYPE, 1)
+		        call gseti (gio, G_PLCOLOR, cdel)
 	                call gmark (gio, Memr[x], Memr[y]+shift, mdel, szmdel,
 			    szmdel)
 		    }
@@ -85,10 +96,13 @@ begin
 	        do i = 1, nstds {
 	            if (STD_FLAG(stds[i]) != SF_INCLUDE)
 		        next
-		    if (i != nstds-1)
+		    if (i != nstds-1) {
 			mark = GP_MARK(gp)
-		    else
+			color = GP_CMARK(gp)
+		    } else {
 			mark = GP_MADD(gp)
+			color = GP_CADD(gp)
+		    }
 	            n = STD_NWAVES(stds[i])
 	            x = STD_X(stds[i])
 	            y = STD_Y(stds[i])
@@ -101,6 +115,7 @@ begin
 	                        call gmark (gio, Memr[x], Memr[y], mark, szmark,
 				    szmark)
 		                call gseti (gio, G_PMLTYPE, 1)
+		                call gseti (gio, G_PLCOLOR, color)
 	                        call gmark (gio, Memr[x], Memr[y]+shift, mark,
 				    szmark, szmark)
 			    } else {
@@ -108,6 +123,7 @@ begin
 	                        call gmark (gio, Memr[x], Memr[y], mdel, szmdel,
 				    szmdel)
 		                call gseti (gio, G_PMLTYPE, 1)
+		                call gseti (gio, G_PLCOLOR, cdel)
 	                        call gmark (gio, Memr[x], Memr[y]+shift, mdel,
 				    szmdel, szmdel)
 			    }

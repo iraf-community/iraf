@@ -9,18 +9,18 @@ continuum input output
 PARAMETERS
 .ls input
 Input spectra to be continuum normalized.  These may be any combination
-of echelle, multiaperture, and one dimensional images.  Two dimensional
-images, such as long slit spectra, are not allowed.
+of echelle, multiaperture, one dimensional, long slit, and spectral
+cube images.
 .le
 .ls output
 Output continuum normalized spectra.  The number of output spectra must
 match the number of input spectra.  \fBOutput\fR may be omitted if
 \fBlistonly\fR is yes.
 .le
-.ls lines = "*"
-A range specification of the image lines to be normalized.  Unspecified
-lines will be copied from the original.  If \fIlines\fR = "*", all of
-the currently unprocessed lines will be fit.  A range consists of
+.ls lines = "*", bands = "1"
+A range specifications for the image lines and bands to be fit.  Unspecified
+lines and bands will be copied from the original.  If the value is "*", all of
+the currently unprocessed lines or bands will be fit.  A range consists of
 a first line number and a last line number separated by a hyphen.  A
 single line number may also be a range and multiple ranges may be
 separated by commas.
@@ -45,9 +45,9 @@ Take the log (base 10) of both axes?  This can be used when \fBlistonly\fR
 is yes to measure the exponent of the slope of the continuum.
 .le
 .ls override = no
-Override previously normalized lines?  If \fBoverride\fR is yes and
+Override previously normalized spectra?  If \fBoverride\fR is yes and
 \fBinteractive\fR is yes, the user will be prompted before each order is
-refit.  If \fBoverride\fR is no, previously fit lines are silently
+refit.  If \fBoverride\fR is no, previously fit spectra are silently
 skipped.
 .le
 .ls listonly = no
@@ -77,7 +77,7 @@ A positive value specifies an average and a negative value specifies
 a median.
 .le
 .ls function = spline3
-Function to be fit to the image lines.  The functions are
+Function to be fit to the spectra.  The functions are
 "legendre" (legendre polynomial), "chebyshev" (chebyshev polynomial),
 "spline1" (linear spline), and "spline3" (cubic spline).  The functions
 may be abbreviated.  The power series coefficients can only be
@@ -108,25 +108,25 @@ Graphics cursor input.
 .le
 .ih
 DESCRIPTION
-A one dimensional function is fit to the continuum of spectra in a list
-of echelle, multispec, or onedspec format images and then divided into
-the spectrum to produce continuum normalized spectra.  The first two
-formats will normalize the spectra or orders (i.e. the lines) in each
-image.  In this description the term "spectrum" will refer to a line of
-an image while "image" will refer to all spectra in an image.  The
-parameters of the fit may vary from spectrum to spectrum within images
-and between images.  The fitted function may be a legendre polynomial,
-chebyshev polynomial, linear spline, or cubic spline of a given order
-or number of spline pieces.  The output image is of pixel type real.
+A one dimensional function is fit to the continuum of spectra in a list of
+echelle, multispec, or onedspec format images and then divided into the
+spectrum to produce continuum normalized spectra.  The first two formats
+will normalize the spectra or orders (i.e. the lines) in each image.  In
+this description the term "spectrum" will refer to a line (in whatever
+band) of an image while "image" will refer to all spectra in an image.  The
+parameters of the fit may vary from spectrum to spectrum within images and
+between images.  The fitted function may be a legendre polynomial,
+chebyshev polynomial, linear spline, or cubic spline of a given order or
+number of spline pieces.  The output image is of pixel type real.
 
-The lines numbers (for two dimensional images) are written to a list of
-previously processed lines in the header keyword \fISFIT\fR of the output
-image.  A subsequent invocation of \fIcontinuum\fR will only process those
-requested spectra that are not in this list.  This ensures that even if the
-output image is the same as the input image that no spectra will be
-processed twice and permits an easy exit from the task in the midst of
-processing many spectra without losing any work or requiring detailed
-notes.
+The line/band numbers (for two/three dimensional images) are written to a
+list of previously processed lines in the header keywords \fISFIT\fR and
+\fISFITB\fR of the output image.  A subsequent invocation of SFIT will only
+process those requested spectra that are not in this list.  This ensures
+that even if the output image is the same as the input image that no
+spectra will be processed twice and permits an easy exit from the task in
+the midst of processing many spectra without losing any work or requiring
+detailed notes.
 
 The points to be fit in each spectrum are determined by
 selecting a sample of X values specified by the parameter \fIsample\fR
@@ -159,12 +159,12 @@ ratio, or data.  For example with replacing the difference will
 be zero at the rejected points and the data output will be cleaned
 of deviant points.
 
-A range specification is used to select the \fIlines\fR to be
-fit.  \fBLines\fR may either be specified with the same syntax as the
+A range specification is used to select the \fIlines\fR and \fIbands\fR to be
+fit.  These parameters may either be specified with the same syntax as the
 \fBsample\fR parameter, or with the "hyphen" syntax used elsewhere in
-IRAF.  Note that a NULL range for \fBlines\fR expands to \fBno\fR
+IRAF.  Note that a NULL range for \fBlines/bands\fR expands to \fBno\fR
 lines, not to all lines.  An asterisk (*) should be used to represent a
-range of all of the image lines.  The fitting parameters (\fIsample,
+range of all of the image lines/bands.  The fitting parameters (\fIsample,
 naverage, function, order, low_reject, high_reject, niterate, grow\fR)
 may be adjusted interactively if the parameter \fIinteractive\fR is
 yes.  The fitting is performed with the \fBicfit\fR package.  The
@@ -174,7 +174,7 @@ maintained for each line so that interactive changes to the parameter
 defaults will be remembered from image to image.
 .ih
 PROMPTS
-If several images or lines are specified, the user is asked whether
+If several images or lines/bands are specified, the user is asked whether
 to perform an interactive fit for each spectrum.  The response
 may be \fByes, no, skip, YES, NO\fR or \fBSKIP\fR.  The meaning of each
 response is:
@@ -236,9 +236,15 @@ command or by editing.
 	cl> continuum uv.* type=ratio logscale+ listonly+ fun=leg order=2
 .ih
 REVISIONS
+.ls CONTINUUM V2.11
+The task was expanded to include fitting specified bands in 3D multispec
+spectra.
+
+The task was expanded to include long slit and spectral cube data.
+.le
 .ls CONTINUUM V2.10
 This task was changed from a script based on \fBimages.fit1d\fR to a
-script based on \fBsfit\fR.  This provides for individual independent
+task based on \fBsfit\fR.  This provides for individual independent
 continuum fitting in multiple spectra images and for additional
 flexibility and record keeping.  The parameters have been largely
 changed.
@@ -249,8 +255,6 @@ The errors are not listed for the power series coefficients.
 
 Spectra that are updated when \fBlogscale\fR is yes are written with a
 linear wavelength scale, but with a log normalized data value.
-
-Long slit spectra are not supported.
 
 Selection by aperture number is not supported.
 .ih

@@ -38,7 +38,7 @@ begin
 	if (IS_INLINE(fd)) {
 	    epa = gk_dd[GKI_CLOSEWS]
 	    if (epa != 0)
-		call zcall2 (epa, Mems[GKI_CLOSEWS_D-1], n)
+		call zcall2 (epa, Mems[gki+GKI_CLOSEWS_D-1], n)
 	} else {
 	    Mems[gki  ] = BOI
 	    Mems[gki+1] = GKI_CLOSEWS

@@ -22,7 +22,7 @@ int	stid		# output file sequence number
 int	interactive	# interactive mode
 
 int	nvertices, cier, sier, pier, wcs, key, ip, colonkey
-int	prev_num, req_num, ptid, ltid, delim, newlist
+int	prev_num, req_num, ptid, ltid, delim, newlist, newimage
 int	newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag
 pointer	sp, x, y, cmd
 real	wx, wy
@@ -30,7 +30,7 @@ real	wx, wy
 bool	fp_equalr()
 int	ap_ymkpoly(), ap_yfit(), clgcur(), apfitsky(), aprefitsky()
 int	apstati(), ctoi(), ap_ynextobj(), ap_ycenter(), ap_yrecenter()
-int	apgqverify(), apgtverify(), ap_yradsetup(), apnew()
+int	apgqverify(), apgtverify(), ap_yradsetup(), apnew(), ap_avsky()
 real	apstatr()
 data	delim /';'/
 
@@ -46,16 +46,11 @@ begin
 	Memc[cmd] = EOS
 
 	# Initialize the fit.
-	newcenterbuf = YES
-	newcenter = YES
-	newskybuf = YES
-	newsky = YES
-	newmagbuf = YES
-	newmag = YES
-
-	cier = AP_OK
-	sier = AP_OK
-	pier = AP_OK
+	newimage = NO
+	newcenterbuf = YES; newcenter = YES
+	newskybuf = YES; newsky = YES
+	newmagbuf = YES; newmag = YES
+	cier = AP_OK; sier = AP_OK; pier = AP_OK
 
 	# Initialize the sequencing.
 	newlist = NO
@@ -64,7 +59,7 @@ begin
 
 	# Loop over the polygon file.
 	nvertices = 0
-	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
+	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 
 	    # Store the current coordinates
@@ -96,7 +91,7 @@ begin
 
 	    # Print the help page.
 	    case '?':
-		if (id != NULL)
+		if ((id != NULL) && (id == gd))
 		    call gpagefile (id, HELPFILE, "")
 		else if (interactive == YES)
 		    call pagefile (HELPFILE, "[space=morehelp,q=quit,?=help]")
@@ -126,6 +121,12 @@ begin
 		if (interactive == YES) {
 		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
 		        MAX_NVERTICES)
+		    if (id != NULL) {
+			if (id == gd)
+			    call gflush (id)
+			else
+			    call gframe (id)
+		    }
 		    newlist = NO
 		    newcenterbuf = YES; newcenter = YES
 		    newskybuf = YES; newsky = YES
@@ -154,39 +155,13 @@ begin
 		    ;
 		colonkey = Memc[cmd+ip-1]
 		switch (colonkey) {
-		case 'm':
+		case 'm', 'n':
 
 		    # Show/set polyphot parameters
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 		        call ap_ycolon (py, im, pl, cl, out, stid, ptid, ltid,
-			    Memc[cmd], newcenterbuf, newcenter, newskybuf,
-			    newsky, newmagbuf, newmag)
-
-	    	    # Move to the next object in the list.
-		    } else if (pl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        nvertices = ap_ynextobj (py, id, pl, cl, delim, Memr[x],
-			    Memr[y], MAX_NVERTICES, prev_num, req_num,
-			    ltid, ptid)
-		        if (nvertices == EOF) {
-			    call printf (
-			    "End of polygon list, use r key to rewind\7\n")
-			} else
-		            newlist = YES
-
-		    } else if (interactive == YES)
-		        call printf ("No polygon list\7\n")
-
-		case 'n':
-
-		    # Show/set polyphot parameters
-		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
-		        call ap_ycolon (py, im, pl, cl, out, stid, ptid, ltid,
-			    Memc[cmd], newcenterbuf, newcenter, newskybuf,
-			    newsky, newmagbuf, newmag)
+			    Memc[cmd], newimage, newcenterbuf, newcenter,
+			    newskybuf, newsky, newmagbuf, newmag)
 
 	    	    # Measure the next object in the list.
 		    } else if (pl != NULL) {
@@ -205,8 +180,93 @@ begin
 			} else {
 
 		            newlist = YES
-
 		            # Fit the center, sky and measure polygon.
+			    if (colonkey == 'm') {
+			        newcenterbuf = YES; newcenter = YES
+		                newskybuf = YES; newsky = YES
+			        newmagbuf = YES; newmag = YES
+			    } else {
+
+		    	        cier = ap_ycenter (py, im, apstatr (py, PYCX),
+			    	    apstatr (py, PYCY), Memr[x], Memr[y],
+				    nvertices + 1)
+		                sier = apfitsky (py, im, apstatr (py, PYCX),
+			            apstatr (py, PYCY), NULL, gd)
+		                pier = ap_yfit (py, im, Memr[x], Memr[y],
+			            nvertices + 1, apstatr (py, SKY_MODE),
+				    apstatr (py, SKY_SIGMA), apstati (py, NSKY))
+
+		                # Draw the polygon.
+			        if (interactive == YES)
+		                    call ap_qyprint (py, cier, sier, pier)
+			        call appymark (py, id, Memr[x], Memr[y],
+			            nvertices + 1, apstati (py, MKCENTER),
+				    apstati (py, MKSKY), apstati (py,
+				    MKPOLYGON))
+			        if (id != NULL) {
+				    if (id == gd)
+				        call gflush (id)
+				    else
+				        call gframe (id)
+			        }
+
+		                # Write the results to output.
+		                if (stid == 1)
+			            call ap_param (py, out, "polyphot")
+		                if (newlist == YES)
+		                    call ap_yprint (py, out, Memr[x], Memr[y],
+				        nvertices, stid, ltid, ptid, cier, sier,
+				        pier)
+		                else
+			            call ap_yprint (py, out, Memr[x], Memr[y],
+				        nvertices, stid, 0, ptid, cier, sier,
+					pier)
+
+		                # Set up for the next object.
+		                stid = stid + 1
+			        newcenterbuf = NO; newcenter = NO
+		                newskybuf = NO; newsky = NO
+			        newmagbuf = NO; newmag = NO
+			    }
+			}
+
+		    } else if (interactive == YES)
+		        call printf ("No coordinate list\7\n")
+
+		# Show/set polyphot parameters.
+		default:
+		    call ap_ycolon (py, im, pl, cl, out, stid, ptid, ltid,
+		        Memc[cmd], newimage, newcenterbuf, newcenter,
+			newskybuf, newsky, newmagbuf, newmag)
+		}
+
+		# Reestablish the image display viewport and window.
+		if ((newimage == YES) && (id != NULL) && (id != gd)) {
+		    call apstats (py, IMNAME, Memc[cmd], SZ_LINE)
+		    call ap_gswv (id, Memc[cmd], im, 4)
+		    newimage = NO
+		}
+
+	    # Get measure next object in the list.
+	    case 'm', 'n':
+		if (pl != NULL) {
+
+		    # Get the next polygon.
+		    prev_num = ltid
+		    req_num = ltid + 1
+		    nvertices = ap_ynextobj (py, id, pl, cl, delim, Memr[x],
+			Memr[y], MAX_NVERTICES, prev_num, req_num, ltid, ptid)
+		    if (nvertices == EOF) {
+			call printf (
+			    "End of polygon list, use r key to rewind\7\n")
+		    } else {
+
+		        newlist = YES
+			if (key == 'm') {
+			    newcenterbuf = YES; newcenter = YES
+		            newskybuf = YES; newsky = YES
+			    newmagbuf = YES; newmag = YES
+			} else {
 		    	    cier = ap_ycenter (py, im, apstatr (py, PYCX),
 			    	apstatr (py, PYCY), Memr[x], Memr[y],
 				nvertices + 1)
@@ -221,7 +281,14 @@ begin
 		                call ap_qyprint (py, cier, sier, pier)
 			    call appymark (py, id, Memr[x], Memr[y],
 			        nvertices + 1, apstati (py, MKCENTER),
-				apstati (py, MKSKY), apstati (py, MKPOLYGON))
+			        apstati (py, MKSKY), apstati (py,
+				MKPOLYGON))
+			    if (id != NULL) {
+				if (id == gd)
+				    call gflush (id)
+				else
+				    call gframe (id)
+			    }
 
 		            # Write the results to output.
 		            if (stid == 1)
@@ -232,33 +299,31 @@ begin
 				    pier)
 		            else
 			        call ap_yprint (py, out, Memr[x], Memr[y],
-				    nvertices, stid, 0, ptid, cier, sier, pier)
+				    nvertices, stid, 0, ptid, cier, sier,
+				    pier)
 
 		            # Set up for the next object.
 		            stid = stid + 1
-			    newcenterbuf = NO
-			    newcenter = NO
-		            newskybuf = NO
-			    newsky = NO
-			    newmagbuf = NO
-			    newmag = NO
+			    newcenterbuf = NO; newcenter = NO
+		            newskybuf = NO; newsky = NO
+			    newmagbuf = NO; newmag = NO
 			}
+		    }
 
-		    } else if (interactive == YES)
-		        call printf ("No coordinate list\7\n")
+		} else if (interactive == YES)
+		    call printf ("No coordinate list\7\n")
 
-		# Show/set polyphot parameters.
-		default:
-		    call ap_ycolon (py, im, pl, cl, out, stid, ptid, ltid,
-		        Memc[cmd], newcenterbuf, newcenter, newskybuf, newsky,
-			newmagbuf, newmag)
-		}
-
-	    # Process the remainder of the list
+	    # Process the remainder of the list.
 	    case 'l':
 		if (pl != NULL) {
 		    call ap_ybphot (py, im, cl, pl, out, stid, ltid, ptid, id,
 		        YES)
+		    if (id != NULL) {
+			if (id == gd)
+			    call gflush (id)
+			else
+			    call gframe (id)
+		    }
 		} else if (interactive == YES)
 		    call printf ("No polygon list\7\n")
 
@@ -277,8 +342,13 @@ begin
 		if (interactive == YES)
 		    call ap_qcenter (py, cier)
 		call apmark (py, id, apstati (py, MKCENTER), NO, NO)
-		newcenterbuf = NO
-		newcenter = NO
+		if (id != NULL) {
+		    if (id == gd)
+		        call gflush (id)
+		    else
+			call gframe (id)
+		}
+		newcenterbuf = NO; newcenter = NO
 
 	    # Fit the sky around the cursor position.
 	    case 't':
@@ -292,8 +362,21 @@ begin
 		    call ap_qspsky (py, sier)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1, NO,
 		    apstati (py, MKSKY), NO)
-		newskybuf = NO
-		newsky = NO
+		if (id != NULL) {
+		    if (id == gd)
+		        call gflush (id)
+		    else
+			call gframe (id)
+		}
+		newskybuf = NO; newsky = NO
+
+ 	    # Compute the average of several sky measurements around
+            # different cursor postions.
+            case 'a':
+                sier = ap_avsky (py, im, stid, NULL, id, gd, interactive)
+                if (interactive == YES)
+                    call ap_qaspsky (py, sier)
+                newskybuf = NO; newsky = NO
 
 	     # Fit sky in an annulus around the current polygon.
 	     case 's':
@@ -308,11 +391,22 @@ begin
 		    call ap_qspsky (py, sier)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1, NO,
 		    apstati (py, MKSKY), NO)
-		newskybuf = NO
-		newsky = NO
+		if (id != NULL) {
+		    if (id == gd)
+		        call gflush (id)
+		    else
+			call gframe (id)
+		}
+		newskybuf = NO; newsky = NO
 
 	    # Compute the magnitudes of current polygon using the current sky.
-	    case 'p':
+	    case 'p', 'o':
+		if (newcenterbuf == YES)
+		    cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
+		        nvertices + 1)
+		else if (newcenter == YES)
+		    cier = ap_yrecenter (py, Memr[x], Memr[y], nvertices + 1,
+			cier)
 		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
 		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
 		    apstati (py, NSKY))
@@ -320,11 +414,29 @@ begin
 		    call ap_qyprint (py, cier, sier, pier)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1, NO, NO,
 		    apstati (py, MKPOLYGON))
-		newmagbuf = NO
-		newmag = NO
+		if (id != NULL) {
+		    if (id == gd)
+		        call gflush (id)
+		    else
+			call gframe (id)
+		}
+		newcenterbuf = NO; newcenter = NO
+		newmagbuf = NO; newmag = NO
+
+		if (key == 'o') {
+		    if (stid == 1)
+		        call ap_param (py, out, "polyphot")
+		    if (newlist == YES)
+		        call ap_yprint (py, out, Memr[x], Memr[y], nvertices,
+			    stid, ltid, ptid, cier, sier, pier)
+		    else
+		        call ap_yprint (py, out, Memr[x], Memr[y], nvertices,
+			    stid, 0, ptid, cier, sier, pier)
+		    stid = stid + 1
+		}
 
 	    # Center, compute the sky and the magnitudes and save the results.
-	    case 'h', 'm', 'f', ' ':
+	    case 'h', 'j', 'f', ' ':
 
 		# Compute the centers.
 		if (key == 'f' || key == ' ') {
@@ -359,13 +471,19 @@ begin
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1,
 		    apstati (py, MKCENTER), apstati (py, MKSKY), apstati (py,
 		    MKPOLYGON))
+		if (id != NULL) {
+		    if (id == gd)
+		        call gflush (id)
+		    else
+			call gframe (id)
+		}
 
 		newcenterbuf = NO; newcenter = NO
 		newskybuf = NO; newsky = NO
 		newmagbuf = NO; newmag = NO
 
 		# Write the results to an output file.
-		if (key == ' ' || key == 'm') {
+		if (key == ' ' || key == 'j') {
 		    if (stid == 1)
 		        call ap_param (py, out, "polyphot")
 		    if (newlist == YES)

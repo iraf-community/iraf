@@ -20,6 +20,7 @@ define	SZ_FORMAT	20
 procedure t_wtextimage ()
 
 bool	header
+bool	pixels
 pointer	im
 char	output[SZ_FNAME], format[SZ_FORMAT], imlist[SZ_LINE]
 char	image[SZ_FNAME], out_fname[SZ_FNAME]
@@ -46,6 +47,7 @@ begin
 	
 	# Get other parameters from cl.
 	header = clgetb ("header")
+	pixels = clgetb ("pixels")
 	maxll = min (MAX_LENTEXT, clgeti ("maxlinelen"))
 	if (maxll <= 0)
 	    call error (1, "Illegal maximum line length:  must be > 0")
@@ -79,7 +81,8 @@ begin
 		next
 	    }
 
-	    iferr (call wti_convert_image (im,image,out,header,maxll,format))
+	    iferr (call wti_convert_image (im,image,out,header,pixels,
+		maxll,format))
 		call erract (EA_WARN)
 
 	    call imunmap (im)
@@ -94,12 +97,13 @@ end
 # procedure determines the output pixel format and then directs the processing
 # depending on user request.
 
-procedure wti_convert_image (im, image, out, header, maxll, user_format)
+procedure wti_convert_image (im, image, out, header, pixels, maxll, user_format)
 
 pointer	im			# input image
 char	image[ARB]		# image name
 int	out			# output text file descriptor
 bool	header			# convert header information (y/n)?
+bool	pixels			# convert pixels (y/n)?
 int	maxll			# maximum line length of text file
 char	user_format[ARB] 	# output format for single pixel entered by user
 
@@ -163,13 +167,15 @@ begin
 	}
 
 	# Write out the pixels in text form.
-	switch (fmtchar) {
-	case 'd':
-	     call wti_putint (im, out, maxll, width)
-	case 'e', 'f', 'g':
-	     call wti_putreal (im, out, maxll, decpl, fmtchar, width)
-	case 'z':
-	     call wti_putcomplex (im, out, maxll, decpl, 'e', width)
+	if (pixels) {
+	    switch (fmtchar) {
+	    case 'd':
+		 call wti_putint (im, out, maxll, width)
+	    case 'e', 'f', 'g':
+		 call wti_putreal (im, out, maxll, decpl, fmtchar, width)
+	    case 'z':
+		 call wti_putcomplex (im, out, maxll, decpl, 'e', width)
+	    }
 	}
 
 	call sfree (sp)

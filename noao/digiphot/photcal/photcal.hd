@@ -1,21 +1,21 @@
 # Help directory for the PHOTCAL package.
 
-$doc		= "noao$digiphot/photcal/doc/"
-$photcal	= "noao$digiphot/photcal/"
+$doc		= "./doc/"
 
 $evaluate	= "photcal$evaluate/"
 $fitparams	= "photcal$fitparams/"
 $mkobsfile	= "photcal$mkobsfile/"
 $mkconfig	= "photcal$mkconfig/"
 $mkimsets	= "photcal$mkimsets/"
-$mkobs	        = "photcal$mkobs/"
 $parser		= "photcal$parser/"
 
+apfile		hlp = doc$apfile.hlp,      src = mkobsfile$t_apfile.x
 chkconfig	hlp = doc$chkconfig.hlp,   src = parser$t_chkconfig.x
 config		hlp = doc$config.hlp
 evalfit 	hlp = doc$evalfit.hlp,	   src = evaluate$t_evalfit.x
 fitparams	hlp = doc$fitparams.hlp,   src = fitparams$t_fitparams.x
 invertfit	hlp = doc$invertfit.hlp,   src = evaluate$t_invertfit.x
+mkapfile	hlp = doc$mkapfile.hlp,    src = photcal$mkapfile.cl
 mkconfig	hlp = doc$mkconfig.hlp,    src = mkconfig$t_config.x
 mkimsets	hlp = doc$mkimsets.hlp,    src = mkimsets$t_mkimsets.x
 mknobsfile	hlp = doc$mknobsfile.hlp,  src = photcal$mknobsfile.cl

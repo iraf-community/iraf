@@ -19,7 +19,8 @@ yxterms,b,h,no,,,Include cross-terms in y fit?
 reject,r,h,0.0,,,Number of sigma for rejection
 calctype,s,h,'real',,,'Computation type (real,double)'
 
-# graphics parameters
+# output and graphics parameters
+verbose,b,h,yes,,,Print geomap messages ?
 interactive,b,h,yes,,,Fit surface interactively
 graphics,s,h,"stdgraph",,,Default graphics device
 cursor,*gcur,h,,,,Graphics cursor

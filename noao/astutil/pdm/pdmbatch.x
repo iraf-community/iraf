@@ -13,7 +13,7 @@ char	infile[SZ_FNAME]		# input data file name
 bool	flip				# flip y-axis scale
 
 int	fd
-real	pdm_signif(), signif
+double	pdm_signif(), signif
 bool	verbose
 errchk	pdm_alltheta, pdm_signif, pdm_ampep, pdm_phase
 
@@ -31,7 +31,7 @@ begin
 	# Write this significance out to the file.
 	fd = PDM_LFD(pdmp)
 	call fprintf (fd, "significance at this minimum = %g\n")
-	    call pargr (signif)
+	    call pargd (signif)
 	call close (fd)
 
 	# Call pdm_amplitudeepoch to get the amplitude and epoch.

@@ -43,13 +43,13 @@ begin
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
-	call printf ( "%s x: %0.2f y: %0.2f s: %0.2f sd: %0.2f ") 
+	call printf ( "%s  %8.2f %8.2f  %8g %8g ") 
 	    call pargstr (Memc[imname])
 	    call pargr (apstatr (ap, SXCUR))
 	    call pargr (apstatr (ap, SYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
-	call printf ("sk: %0.2f n: %d nr: %d e: %s\n")
+	call printf ("%8g  %5d %5d  %s\n")
 	    call pargr (apstatr (ap, SKY_SKEW))
 	    call pargi (apstati (ap, NSKY))
 	    call pargi (apstati (ap, NSKY_REJECT))
@@ -61,13 +61,39 @@ begin
 end
 
 
+# AP_QASPSKY -- Procedure to print a quick summary of the fitsky task on the
+# standard output.
+
+procedure ap_qaspsky (ap, ier)
+
+pointer	ap		# pointer to apphot structure
+int	ier		# error code
+
+int	apstati()
+real	apstatr()
+
+begin
+	# Print out the results on the standard output.
+	call printf ( "    Averages  %8g %8g ") 
+	    call pargr (apstatr (ap, SKY_MODE))
+	    call pargr (apstatr (ap, SKY_SIGMA))
+	call printf ("%8g  %5d %5d  %s\n\n")
+	    call pargr (apstatr (ap, SKY_SKEW))
+	    call pargi (apstati (ap, NSKY))
+	    call pargi (apstati (ap, NSKY_REJECT))
+	    if (ier != AP_OK)
+		call pargstr ("err")
+	    else
+		call pargstr ("ok")
+end
+
 # AP_SPHDR -- Procedure to write the banner for the fitsky task to the
 # output file.
 
 procedure ap_sphdr (ap, fd)
 
 pointer	ap		# pointer to apphot structure
-pointer	fd		# output file descriptor
+int	fd		# output file descriptor
 
 begin
 	if (fd == NULL)

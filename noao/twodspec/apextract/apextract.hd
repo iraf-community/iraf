@@ -10,6 +10,7 @@ apfind		hlp=doc$apfind.hlp
 apfit		hlp=doc$apfit.hlp
 apflatten	hlp=doc$apflatten.hlp
 apmask		hlp=doc$apmask.hlp
+apnoise		hlp=doc$apnoise.hlp
 apnormalize	hlp=doc$apnormalize.hlp
 aprecenter	hlp=doc$aprecenter.hlp
 apresize	hlp=doc$apresize.hlp

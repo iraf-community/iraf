@@ -9,9 +9,9 @@ pointer	stds[nstds]		# Standard star data
 int	nstds			# Number of standard stars
 int	flag			# Shift flag
 
-pointer	x, y, f
-int	i, j, n
-real	shift, minshift
+pointer	x, y, w, f
+int	i, j, n, nshift
+real	shift, shift1, minshift
 
 begin
 	# If flag is YES then unshift the data.
@@ -43,13 +43,24 @@ begin
 		next
 	    x = STD_WAVES(stds[i])
 	    y = STD_SENS(stds[i])
+	    w = STD_WTS(stds[i])
 	    f = STD_FIT(stds[i])
+	    nshift = 0
 	    shift = 0.
-	    do j = 1, n
-		shift = shift + Memr[f+j-1] - Memr[y+j-1]
-	    shift = STD_SHIFT(stds[i]) + shift / n
-	    if (shift < minshift)
-		minshift = shift
+	    shift1 = 0.
+	    do j = 1, n {
+		shift1 = shift1 + Memr[f+j-1] - Memr[y+j-1]
+		if (Memr[w+j-1] > 0.) {
+		    shift = shift + Memr[f+j-1] - Memr[y+j-1]
+		    nshift = nshift + 1
+		}
+	    }
+	    if (nshift > 0) {
+		shift = STD_SHIFT(stds[i]) + shift / nshift
+		if (shift < minshift)
+		    minshift = shift
+	    } else
+		shift = STD_SHIFT(stds[i]) + shift1 / n
 	    STD_SHIFT(stds[i]) = shift
 	}
 

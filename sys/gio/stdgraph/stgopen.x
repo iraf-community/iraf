@@ -57,6 +57,10 @@ begin
 	g_hardchar = hardchar
 	g_active = NO
 	g_enable = NO
+	g_message = NO
+	g_msgbuf = NULL
+	g_msgbuflen = 0
+	g_msglen = 0
 	call strcpy (devname, g_device, SZ_GDEVICE)
 
 	# Install the device driver.
@@ -92,7 +96,7 @@ begin
 	len_devname = strlen (devname)
 	if (len_devname > 0) {
 	    call achtcs (devname, Mems[devns], len_devname)
-	    call stg_openws (Mems[devns], len_devname, APPEND)
+	    call stg_openws (Mems[devns], len_devname, NEW_FILE)
 	}
 
 	call sfree (sp)

@@ -14,15 +14,15 @@ real	xinit, yinit, xcntr, ycntr
 int	cboxsize
 pointer	im
 
-int	clpopni(), clplen(), clgfil()
+int	imtopenp (), imtlen(), imtgetim()
 int	clgeti()
 real	clgetr()
 pointer	immap()
 
 begin
 	# Get file names
-	infile = clpopni ("input")
-	nfiles = clplen (infile)
+	infile = imtopenp ("input")
+	nfiles = imtlen (infile)
 
 	# Get x and y initial
 	xinit = clgetr ("x_init")
@@ -32,7 +32,7 @@ begin
 	cboxsize = clgeti ("cboxsize")
 
 	# Loop over all images
-	while (clgfil (infile, ifile, SZ_FNAME) != EOF) {
+	while (imtgetim (infile, ifile, SZ_FNAME) != EOF) {
 	    iferr (im = immap (ifile, READ_ONLY, 0)) {
 		call eprintf ("[%s] not found\n")
 		call pargstr (ifile)
@@ -41,13 +41,15 @@ begin
 
 	    call mpc_cntr (im, xinit, yinit, cboxsize, xcntr, ycntr)
 
-	    call printf ("[%s] x:%7.2f   y:%7.2f\n")
+	    call printf ("[%s] x: %8.3f   y: %8.3f\n")
 		call pargstr (ifile)
 		call pargr (xcntr)
 		call pargr (ycntr)
 
 	    call imunmap (im)
 	}
+
+	call imtclose (infile)
 end
 
 
@@ -104,12 +106,19 @@ begin
 	    # Find centers
 	    call mpc_getcenter (Memr[x_vect], nx, xcntr)
 	    call mpc_getcenter (Memr[y_vect], ny, ycntr)
+	    call sfree (sp)
+
+	    # Check for INDEF centers.
+	    if (IS_INDEFR(xcntr) || IS_INDEFR(ycntr)) {
+		xcntr = xinit
+		ycntr = yinit
+		break
+	    }
 
 	    # Add in offsets
 	    xcntr = xcntr + x1
 	    ycntr = ycntr + y1
 
-	    call sfree (sp)
 	    try = try + 1
 	    if (try == 1) {
 		if ((abs(xcntr-xinit) > 1.0) || (abs(ycntr-yinit) > 1.0)) {
@@ -182,5 +191,8 @@ begin
 	    }
 
 	# Determine center
-	vc = sum1 / sum2
+	if (sum2 == 0.0)
+	    vc = INDEFR
+	else
+	    vc = sum1 / sum2
 end

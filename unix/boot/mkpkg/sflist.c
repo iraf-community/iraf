@@ -142,7 +142,7 @@ struct	context *cx;		/* current mkpkg context */
 	    else if (tok != TOK_FNAME)
 		goto badline;
 	    else
-		strcpy (stname, token, SZ_PATHNAME);
+		strcpy (stname, token);
 
 	    /* Get the special file name. */
 	    if ((tok = gettok (cx, sfname, SZ_PATHNAME)) == TOK_END)

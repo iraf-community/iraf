@@ -69,7 +69,7 @@ begin
 
 	call gargstr (Memc[buf], SZ_FNAME)
 	if (Memc[buf] != EOS) {
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    stat = rv_apnum_range (rv, Memc[buf+1])
 	} else {
 	    call printf ("Aperture list = `%s'")
@@ -105,7 +105,7 @@ begin
 		   "Apnum not in current list. Reset list with `:apertures'")
 		return
 	    }
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    RV_APNUM(rv) = ival
 	} else {
 	    call printf ("APNUM = %d")
@@ -118,11 +118,13 @@ begin
 	IS_DBLSTAR(rv) = NO
 	SR_COUNT(RV_OSAMPLE(rv)) = ALL_SPECTRUM
 	SR_COUNT(RV_RSAMPLE(rv)) = ALL_SPECTRUM
-	if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM) == ERR_READ)
-	    return
+	if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM, INDEF, INDEF, INDEFI) ==
+	    ERR_READ)
+	        return
 	REFCONT(rv) = NO
-	if (rv_getim(rv, RIMAGE(rv), REFER_SPECTRUM) == ERR_READ)
-	    return
+	if (rv_getim(rv, RIMAGE(rv), REFER_SPECTRUM, INDEF, INDEF, INDEFI) == 
+	    ERR_READ)
+	        return
 
 	RV_NEWXCOR(rv) = YES
 end
@@ -467,6 +469,26 @@ begin
 end
 
 
+# CMD_LINECOLOR - Set/Show the overlay vector line color.
+
+procedure cmd_linecolor (rv)
+
+pointer	rv					#I RV struct pointer
+
+int	ival, nscan()
+
+begin
+	call gargi (ival)
+	if (nscan() == 2) {
+	    RV_LINECOLOR(rv) = ival
+	    RV_NEWGRAPH(rv) = YES
+	} else {
+	    call printf ("Line color = %d")
+	        call pargi (RV_LINECOLOR(rv))
+	}
+end
+
+
 # CMD_MAXWIDTH - Get/Set the maximum fitting width.
 
 procedure cmd_maxwidth (rv)
@@ -546,13 +568,13 @@ begin
 	call gargstr (Memc[cmd], SZ_FNAME)
 	switch (Memc[cmd+1]) {
 	case 'a':				# next aperture
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = next_ap (rv, written)
 	case 'o':				# next object spectrum
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = next_spec (rv, infile, written)
 	case 't':				# next template spectrum
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = next_temp (rv, rinfile, written)
 	default:
 	    call rv_errmsg ("Please specify 'aperture|object|template'.")
@@ -584,7 +606,7 @@ begin
 
 	call gargstr (Memc[buf], SZ_FNAME)
 	if (Memc[buf] != EOS) {
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    for (ip=1; IS_WHITE(Memc[buf+ip-1]); ip=ip+1)
 	          ;
 	    call imtclose (infile)
@@ -744,8 +766,10 @@ begin
 	        RV_NEWXCOR(rv) = YES
 		call printf ("Re-reading images....")
 		call flush (STDOUT)
-                stat = rv_getim (rv, IMAGE(rv), OBJECT_SPECTRUM)
-                stat = rv_getim (rv, RIMAGE(rv), REFER_SPECTRUM)
+                stat = rv_getim (rv, IMAGE(rv), OBJECT_SPECTRUM, INDEF,
+		    INDEF, INDEFI)
+                stat = rv_getim (rv, RIMAGE(rv), REFER_SPECTRUM, INDEF,
+		    INDEF, INDEFI)
 		call printf ("\n")
 		call flush (STDOUT)
             }
@@ -782,13 +806,13 @@ begin
 	call gargstr (Memc[cmd], SZ_FNAME)
 	switch (Memc[cmd+1]) {
 	case 'a':				# previous aperture
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = prev_ap (rv, written)
 	case 'o':				# previous object spectrum
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = prev_spec (rv, infile, written)
 	case 't':				# previous template spectrum
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    code = prev_temp (rv, rinfile, written)
 	default:
 	    call rv_errmsg ("Please specify 'aperture|object|template'.")
@@ -838,7 +862,7 @@ begin
 	            call pargr (RV_OWPC(rv))
 	    } else {
 	        call printf (
-		  "No dispersion information preset. (Pixel correlation only.)")
+		  "No dispersion information present. (Pixel correlation only)")
 	    }
 	}
 end
@@ -895,7 +919,7 @@ begin
 
 	call gargstr (Memc[buf], SZ_FNAME)
 	if (Memc[buf] != EOS) {
-	    call rv_do_save (rv, written, MOVE)
+	    call rv_do_save (rv, written)
 	    for (ip=0; IS_WHITE(Memc[buf+ip]); ip=ip+1)	# skip white space
 	          ;
 	    tmp = imtopen (Memc[buf+ip])
@@ -1089,7 +1113,7 @@ begin
 
 	# Optimize.
 	if (RV_TEMPNUM(rv) == tn) {
-	    call nam_tempcode (rv, tn, Memc[cmd])
+	    call nam_tempcode (tn, Memc[cmd])
 	    call rv_errmsg ("Current template is already template `%s'.\n")
 		call pargstr (Memc[cmd])
 	    call sfree (sp)
@@ -1097,7 +1121,7 @@ begin
 	}
 
 	# Check for the data write.
-	call rv_do_save (rv, written, MOVE)
+	call rv_do_save (rv, written)
  
 	# Do the read on the template
 	RV_TEMPNUM(rv) = tn
@@ -1116,6 +1140,25 @@ begin
 
 exit_   call sfree (sp)
         return (code)
+end
+
+
+# CMD_TEXTCOLOR - Set/Show the text color.
+
+procedure cmd_textcolor (rv)
+
+pointer rv                                      #I RV struct pointer
+
+int     ival, nscan()
+
+begin
+        call gargi (ival)
+        if (nscan() == 2) {
+            RV_TXTCOLOR(rv) = ival
+        } else {
+            call printf ("Text color = %d")
+                call pargi (RV_TXTCOLOR(rv))
+        }
 end
 
 
@@ -1274,7 +1317,7 @@ end
 
 # CMD_WRITE - Write results to logfile and/or header.
 
-int procedure cmd_write (rv, written)
+procedure cmd_write (rv, written)
 
 pointer	rv					#I RV struct pointer
 bool	written					#I data write flag

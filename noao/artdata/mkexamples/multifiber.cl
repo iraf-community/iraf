@@ -7,9 +7,9 @@ obj = mktemp ("art")
 dat = mktemp ("art")
 
 mk1dspec (obj, output="", ap=1, rv=0., z=no, title="", header="",
-    format="onedspec", ncols=512, naps=1,
-    wstart=4000., wend=8000., continuum=1000., slope=0., temperature=5700.,
-    lines="", nlines=50, peak=-0.5, sigma=10., seed=i, comments=b1)
+    ncols=512, naps=1, wstart=4000., wend=8000., continuum=1000., slope=0.,
+    temperature=5700., lines="", nlines=50, peak=-0.5, sigma=10., seed=i,
+    comments=b1)
 
 print (obj, " .1 gauss 3 0 10.1 .002", > dat)
 print (obj, " .2 gauss 3 0 20.2 .002", >> dat)

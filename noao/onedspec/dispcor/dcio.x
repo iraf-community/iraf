@@ -2,6 +2,7 @@ include	<error.h>
 include	<imhdr.h>
 include	<imset.h>
 include	<pkg/dttext.h>
+include	<smw.h>
 include	"dispcor.h"
 
 # Symbol table structure for the dispersion solutions.
@@ -75,26 +76,27 @@ end
 # DC_GMS -- Get a multispec spectrum.  This consists of mapping the image
 # and setting a MWCS coordinate transformation.  If not dispersion corrected
 # the dispersion function is found in the database for the reference
-# spectra and set in the MWCS.
+# spectra and set in the SMW.
 
-procedure dc_gms (im, mw, stp, ap, fd)
+procedure dc_gms (im, smw, stp, ap, fd1, fd2)
 
 pointer	im		#I IMIO pointer
-pointer	mw		#I MWCS pointer
+pointer	smw		#I SMW pointer
 pointer	stp		#I Dispersion symbol table
 pointer	ap		#O Aperture data structure
-int	fd		#I Logfile descriptor
+int	fd1		#I Logfile descriptor
+int	fd2		#I Logfile descriptor
 
 double	wt1, wt2
 int	i, j, k, l, dc, sfd, axis[2], naps, naps1, naps2, ncoeffs
-pointer	sp, spec, str1, str2, coeff, papcen, pshift, coeffs, ct
+pointer	sp, spec, str1, str2, coeff, papcen, pshift, coeffs, ct1, ct2
 pointer	paps1, paps2, pshift1, pshift2, pcoeff1, pcoeff2
 
 bool	clgetb()
-double	mw_c1trand()
-int	nscan(), stropen()
-pointer	mw_sctran()
-errchk	dc_gmsdb, dc_refshft, imgstr
+double	smw_c1trand()
+int	imaccf(), nscan(), stropen()
+pointer	smw_sctran()
+errchk	dc_gmsdb, dc_refshft, imgstr, smw_sctran
 
 data	axis/1,2/
 define	done_	90
@@ -111,24 +113,37 @@ begin
 	# Set WCS attributes
 	naps = IM_LEN(im,2)
 	call malloc (ap, LEN_AP(naps), TY_STRUCT)
-	ct = mw_sctran (mw, "logical", "physical", 2)
 	do i = 1, naps {
-	    PL(ap,i) = nint (mw_c1trand (ct, double(i)))
-	    call shdr_gwattrs (mw, PL(ap,i), AP(ap,i), BM(ap,i), DT(ap,i),
-		W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i), LW(ap,i), UP(ap,i),
-		coeff)
-	    dc = DT(ap,i)
+	    DC_PL(ap,i) = i
+	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), coeff)
+	    dc = DC_DT(ap,i)
 	}
-	call mw_ctfree (ct)
 
-	# Determine if spectrum has been dispersion corrected and return
-	# This assumes all spectra have the same dispersion type
-	if (dc > -1)
+	# Check if the spectra have been dispersion corrected
+	# by an earlier version of DISPCOR.  If so then don't allow
+	# another database dispersion correction.  This assumes all
+	# spectra have the same dispersion type.  Check for a
+	# reference spectrum.
+
+	if ((imaccf (im, "REFSPEC1") == NO) ||
+	    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	    if (fd1 != NULL) {
+		call fprintf (fd1,
+		    "%s: Resampling using current coordinate system\n")
+		    call pargstr (Memc[spec])
+	    }
+	    if (fd2 != NULL) {
+		call fprintf (fd2,
+		    "%s: Resampling using current coordinate system\n")
+		    call pargstr (Memc[spec])
+	    }
 	    goto done_
-
+	}
+	    
 	# Get the reference spectra dispersion function from the database
-	# and determine a reference shift.  Return a null pointer if no
-	# reference spectrum specified.
+	# and determine a reference shift.
 
 	iferr {
 	    call imgstr (im, "REFSPEC1", Memc[str1], SZ_LINE)
@@ -148,15 +163,21 @@ begin
 	}
 	call salloc (pshift1, naps1, TY_DOUBLE)
 	call amovd (Memd[pshift], Memd[pshift1], naps1)
-	if (fd != NULL) {
-	    call fprintf (fd, "%s: REFSPEC1 = '%s %.3g'\n")
+	if (fd1 != NULL) {
+	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.3g'\n")
+		call pargstr (Memc[spec])
+		call pargstr (Memc[str1])
+		call pargd (wt1)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.3g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
 	}
 
 	iferr (call  dc_refshft (Memc[spec], stp, Memc[str1], "REFSHFT1", im,
-	    Memi[paps1], Memr[papcen], Memd[pshift1], naps1, fd))
+	    Memi[paps1], Memr[papcen], Memd[pshift1], naps1, fd1, fd2))
 	    ;
 
 	iferr {
@@ -170,22 +191,28 @@ begin
 		naps2)
             call salloc (pshift2, naps2, TY_DOUBLE)
             call amovd (Memd[pshift], Memd[pshift2], naps2)
-	    if (fd != NULL) {
-		call fprintf (fd, "%s: REFSPEC2 = '%s %.3g'\n")
+	    if (fd1 != NULL) {
+		call fprintf (fd1, "%s: REFSPEC2 = '%s %.3g'\n")
+		    call pargstr (Memc[spec])
+		    call pargstr (Memc[str1])
+		    call pargd (wt2)
+	    }
+	    if (fd2 != NULL) {
+		call fprintf (fd2, "%s: REFSPEC2 = '%s %.3g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
 	    }
 	    iferr (call  dc_refshft (Memc[spec], stp, Memc[str1],
 		"REFSHFT2", im, Memi[paps2], Memr[papcen], Memd[pshift2],
-		naps2, fd))
+		naps2, fd1, fd2))
 	        ;
 	} then
 	    wt2 = 0.
 
 	# Enter dispersion function in the MWCS.
 	do i = 1, naps {
-	    j = AP(ap,i)
+	    j = DC_AP(ap,i)
 	    for (k=0; k<naps1 && Memi[paps1+k]!=j; k=k+1)
 		;
 	    if (k == naps1)
@@ -203,7 +230,10 @@ begin
 		}
 	    }
 	    coeffs = Memi[pcoeff1+k]
-	    ncoeffs = nint (Memd[coeffs])
+	    if (coeffs == NULL)
+		ncoeffs = 6
+	    else
+		ncoeffs = nint (Memd[coeffs])
 	    l = 20 * (ncoeffs + 2)
 	    if (wt2 > 0.)
 		l = 2 * l
@@ -216,13 +246,26 @@ begin
 
 	    # The following assumes some knowledge of the data structure in
 	    # order to shortten the the attribute string.
-
-	    call fprintf (sfd, " %d %d")
-		call pargi (nint (Memd[coeffs+1]))
-		call pargi (nint (Memd[coeffs+2]))
-	    do k = 3, ncoeffs {
-		call fprintf (sfd, " %g")
-		    call pargd (Memd[coeffs+k])
+	    if (coeffs == NULL) {
+		if (DC_DT(ap,i) == 2) {
+		    call mfree (coeff, TY_CHAR)
+		    call sfree (sp)
+		    call error (2,
+			"Cannot apply shift to unlinearized spectrum")
+		}
+		wt1 = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
+		call fprintf (sfd, " 1 2 1 %d %g %g")
+		    call pargi (DC_NW(ap,i))
+		    call pargd (DC_W1(ap,i) + wt1)
+		    call pargd (wt1)
+	    } else {
+		call fprintf (sfd, " %d %d")
+		    call pargi (nint (Memd[coeffs+1]))
+		    call pargi (nint (Memd[coeffs+2]))
+		do k = 3, ncoeffs {
+		    call fprintf (sfd, " %.15g")
+			call pargd (Memd[coeffs+k])
+		}
 	    }
 
 	    if (wt2 > 0.) {
@@ -246,44 +289,82 @@ begin
 		    }
 		}
 		coeffs = Memi[pcoeff2+k]
-		ncoeffs = nint (Memd[coeffs])
+		l = 20 * (ncoeffs + 2)
+		if (coeffs == NULL)
+		    ncoeffs = 6
+		else
+		    ncoeffs = nint (Memd[coeffs])
 		call fprintf (sfd, " %5.3g %g")
 		    call pargd (wt2)
 		    call pargd (Memd[pshift2+k])
-		call fprintf (sfd, " %d %d")
-		    call pargi (nint (Memd[coeffs+1]))
-		    call pargi (nint (Memd[coeffs+2]))
-		do k = 3, ncoeffs {
-		    call fprintf (sfd, " %g")
-			call pargd (Memd[coeffs+k])
+		if (coeffs == NULL) {
+		    if (DC_DT(ap,i) == 2) {
+			call mfree (coeff, TY_CHAR)
+			call sfree (sp)
+			call error (2,
+			    "Cannot apply shift to unlinearized spectrum")
+		    }
+		    wt1 = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
+		    call fprintf (sfd, " 1 2 1 %d %g %g")
+			call pargi (DC_NW(ap,i))
+			call pargd (DC_W1(ap,i) + wt1)
+			call pargd (wt1)
+		} else {
+		    call fprintf (sfd, " %d %d")
+			call pargi (nint (Memd[coeffs+1]))
+			call pargi (nint (Memd[coeffs+2]))
+		    do k = 3, ncoeffs {
+			call fprintf (sfd, " %.15g")
+			    call pargd (Memd[coeffs+k])
+		    }
 		}
 	    }
 
-	    DT(ap,i) = 2
-	    call mw_swattrs (mw, 1, "label", "Wavelength")
-	    call mw_swattrs (mw, 1, "units", "Angstroms")
-	    call shdr_swattrs (mw, PL(ap,i), AP(ap,i), BM(ap,i), DT(ap,i),
-		W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i), LW(ap,i), UP(ap,i),
-		Memc[coeff])
+	    if (i == 1) {
+		call mw_swattrs (SMW_MW(smw,0), 1, "label", "Wavelength")
+		call mw_swattrs (SMW_MW(smw,0), 1, "units", "Angstroms")
+	    }
+	    DC_DT(ap,i) = 2
+	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
 	    call strclose (sfd)
 	}
 
-done_	# Set aperture parameters in terms of logical image.
-	ct = mw_sctran (mw, "physical", "logical", 2)
+	# Update the linear part of WCS.
+	ct1 = smw_sctran (smw, "logical", "physical", 2)
+	ct2 = smw_sctran (smw, "physical", "world", 3)
 	do i = 1, naps {
-	    j = nint (mw_c1trand (ct, double(1)))
-	    k = nint (mw_c1trand (ct, double(NW(ap,i))))
-	    NW(ap,i) = min (IM_LEN(im,1), max (j, k))
+	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), coeff)
+	    wt1 = nint (smw_c1trand (ct1, double(i)))
+	    call smw_c2trand (ct2, double(DC_NW(ap,i)), wt1, DC_W2(ap,i), wt2)
+	    DC_DW(ap,i) = (DC_W2(ap,i) - DC_W1(ap,i)) / (DC_NW(ap,i) - 1)
+	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
 	}
-	call mw_ctfree (ct)
+	call smw_ctfree (ct1)
+	call smw_ctfree (ct2)
 
-	ct = mw_sctran (mw, "logical", "multispec", 3)
+done_	# Set aperture parameters in terms of logical image.
+	ct1 = smw_sctran (smw, "physical", "logical", 1)
+	j = nint (smw_c1trand (ct1, 1D0))
 	do i = 1, naps {
-	    call mw_c2trand (ct, double(1), double(i), W1(ap,i), wt1)
-	    call mw_c2trand (ct, double(NW(ap,i)), double(i), W2(ap,i), wt1)
-	    DW(ap,i) = (W2(ap,i) - W1(ap,i)) / (NW(ap,i) - 1)
+	    k = nint (smw_c1trand (ct1, double(DC_NW(ap,i))))
+	    DC_NW(ap,i) = min (IM_LEN(im,1), max (j, k))
 	}
-	call mw_ctfree (ct)
+	call smw_ctfree (ct1)
+
+	ct1 = smw_sctran (smw, "logical", "world", 3)
+	do i = 1, naps {
+	    wt1 = i
+	    call smw_c2trand (ct1, 1D0, wt1, DC_W1(ap,i), wt2)
+	    call smw_c2trand (ct1, double(DC_NW(ap,i)), wt1, DC_W2(ap,i), wt2)
+	    DC_DW(ap,i) = (DC_W2(ap,i) - DC_W1(ap,i)) / (DC_NW(ap,i) - 1)
+	}
+	call smw_ctfree (ct1)
 
 	call mfree (coeff, TY_CHAR)
 	call sfree (sp)
@@ -308,7 +389,8 @@ int	naps		# Number of apertures
 double	dval
 int	i, n, dtgeti(), getline(), ctod()
 real	low, high, dtgetr()
-pointer	sp, str, coeffs, sym, db, dt, stfind(), stenter(), strefsbuf(), dtmap1()
+pointer	sp, str, coeffs, sym, db, dt, dt1
+pointer	stfind(), stenter(), strefsbuf(), dtmap1()
 errchk	dtmap1, dtgeti, dtgad
 
 begin
@@ -321,9 +403,24 @@ begin
 	    call smark (sp)
 	    call salloc (str, SZ_LINE, TY_CHAR)
 	    call strcpy ("id", Memc[str], SZ_LINE)
-	    call imgcluster (spec, Memc[str+2], SZ_LINE)
+	    call imgcluster (spec, Memc[str+2], SZ_LINE-2)
+	    call xt_imroot (Memc[str+2], Memc[str+2], SZ_LINE-2)
 	    db = strefsbuf (stp, Memi[stfind (stp, "database")])
 	    dt = dtmap1 (Memc[db], Memc[str], READ_ONLY)
+	    call strcpy ("ec", Memc[str], SZ_LINE)
+	    call imgcluster (spec, Memc[str+2], SZ_LINE-2)
+	    call xt_imroot (Memc[str+2], Memc[str+2], SZ_LINE-2)
+	    ifnoerr (dt1 = dtmap1 (Memc[db], Memc[str], READ_ONLY)) {
+		call sprintf (Memc[str], SZ_LINE,
+		    "Ambiguous database files: %s/%s and %s/%s")
+		    call pargstr (DT_DNAME(dt))
+		    call pargstr (DT_FNAME(dt))
+		    call pargstr (DT_DNAME(dt1))
+		    call pargstr (DT_FNAME(dt1))
+		call dtunmap (dt)
+		call dtunmap (dt1)
+		call fatal (3, Memc[str])
+	    }
 
 	    naps = max (1, DT_NRECS(dt))
 	    call calloc (paps, naps, TY_INT)
@@ -335,17 +432,23 @@ begin
 		    iferr (Memi[paps+i-1] = dtgeti (dt, i, "aperture"))
 			Memi[paps+i-1] = INDEFI
 		    iferr (low = dtgetr (dt, i, "aplow"))
-			low = 0.
+			low = INDEF
 		    iferr (high = dtgetr (dt, i, "aphigh"))
-			high = 0.
-		    Memr[papcen+i-1] = (low + high) / 2.
+			high = INDEF
+		    if (IS_INDEF(low) || IS_INDEF(high))
+			Memr[papcen+i-1] = 0.
+		    else
+			Memr[papcen+i-1] = (low + high) / 2.
 		    iferr (Memd[pshift+i-1] = dtgetr (dt, i, "shift"))
 			Memd[pshift+i-1] = 0.
-		    n = dtgeti (dt, i, "coefficients")
-		    call malloc (coeffs, 1+n, TY_DOUBLE)
-		    Memd[coeffs] = n
-		    call dtgad (dt, i, "coefficients", Memd[coeffs+1], n, n)
-		    Memi[pcoeff+i-1] = coeffs
+		    iferr {
+			n = dtgeti (dt, i, "coefficients")
+			call malloc (coeffs, 1+n, TY_DOUBLE)
+			Memd[coeffs] = n
+			call dtgad (dt, i, "coefficients", Memd[coeffs+1], n, n)
+			Memi[pcoeff+i-1] = coeffs
+		    } then
+			Memi[pcoeff+i-1] = NULL
 		}
 	    } else {
 		Memi[paps] = INDEFI
@@ -365,7 +468,7 @@ begin
 		}
 		Memd[coeffs] = n - 1
 		Memd[coeffs+1] = 5
-		Memd[coeffs+2] = n - 2
+		Memd[coeffs+2] = n - 3
 		Memi[pcoeff] = coeffs
 	    }
 
@@ -394,7 +497,7 @@ end
 # DC_REFSHFT -- Compute dispersion shift.
 
 procedure dc_refshft (spec, stp, refspec, keywrd, im, aps, apcens, shifts,
-	naps, fd)
+	naps, fd1, fd2)
 
 char	spec[ARB]		# Spectrum to be corrected
 pointer	stp			# Symbol table pointer
@@ -405,7 +508,8 @@ int	aps[naps]		# Reference apertures
 real	apcens[naps]		# Reference aperture centers
 double	shifts[naps]		# Reference aperture shifts (to be modified)
 int	naps			# Number of refernce apertures
-int	fd			# Logfile descriptor
+int	fd1			# Logfile descriptor
+int	fd2			# Logfile descriptor
 
 int	i, j, k, pnaps
 double	apcen, shift, sumx, sumy, sumxx, sumyy, sumxy, a, b
@@ -446,16 +550,17 @@ begin
 	sumyy = sqrt (max (0.D0, sumyy / pnaps - sumy ** 2))
 
 	# Print.
-	call printf ("%s: %s = '%s %s', shift = %.6g, rms = %.6g\n")
-	    call pargstr (spec)
-	    call pargstr (keywrd)
-	    call pargstr (Memc[refshft])
-	    call pargstr (Memc[option])
-	    call pargd (sumy)
-	    call pargd (sumyy)
-	if (fd != NULL) {
-	    call fprintf (fd,
-	    "%s: %s = '%s %s', shift = %.6g, rms = %.6g\n")
+	if (fd1 != NULL) {
+	    call fprintf (fd1, "%s: %s = '%s %s', shift = %.6g, rms = %.6g\n")
+		call pargstr (spec)
+		call pargstr (keywrd)
+		call pargstr (Memc[refshft])
+		call pargstr (Memc[option])
+		call pargd (sumy)
+		call pargd (sumyy)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, "%s: %s = '%s %s', shift = %.6g, rms = %.6g\n")
 	        call pargstr (spec)
 		call pargstr (keywrd)
 	        call pargstr (Memc[refshft])
@@ -489,12 +594,13 @@ begin
 	    }
 	    do i = 1, naps
 	        shifts[i] = shifts[i] + a + b * apcens[i]
-	    call printf ("\tintercept = %.6g, slope = %.6g\n")
-		call pargd (a)
-		call pargd (b)
-	    if (fd != NULL) {
-	        call fprintf (fd,
-		    "\tintercept = %.6g, slope = %.6g\n")
+	    if (fd1 != NULL) {
+	        call fprintf (fd1, "\tintercept = %.6g, slope = %.6g\n")
+		    call pargd (a)
+		    call pargd (b)
+	    }
+	    if (fd2 != NULL) {
+	        call fprintf (fd2, "\tintercept = %.6g, slope = %.6g\n")
 		    call pargd (a)
 		    call pargd (b)
 	    }
@@ -508,15 +614,16 @@ begin
 		        sumy = abs (apcens[i] - Memr[papcen+k])
 		    }
 	        shifts[i] = shifts[i] + Memd[pshift+k]
-		call printf ("\t%4d %7.2f %4d %7.2f %.6g\n")
-		    call pargi (aps[i])
-		    call pargr (apcens[i])
-		    call pargi (Memi[paps+k])
-		    call pargr (Memr[papcen+k])
-		    call pargd (Memd[pshift+k])
-	        if (fd != NULL) {
-		    call fprintf (fd,
-		        "\t%4d %7.2f %4d %7.2f %.6g\n")
+	        if (fd1 != NULL) {
+		    call fprintf (fd1, "\t%4d %7.2f %4d %7.2f %.6g\n")
+		        call pargi (aps[i])
+		        call pargr (apcens[i])
+		        call pargi (Memi[paps+k])
+		        call pargr (Memr[papcen+k])
+		        call pargd (Memd[pshift+k])
+	        }
+	        if (fd2 != NULL) {
+		    call fprintf (fd2, "\t%4d %7.2f %4d %7.2f %.6g\n")
 		        call pargi (aps[i])
 		        call pargr (apcens[i])
 		        call pargi (Memi[paps+k])
@@ -534,25 +641,26 @@ end
 # DC_GEC -- Get an echelle spectrum.  This consists of mapping the image
 # and setting a MWCS coordinate transformation.  If not dispersion corrected
 # the dispersion function is found in the database for the reference
-# spectra and set in the MWCS.
+# spectra and set in the SMW.
 
-procedure dc_gec (im, mw, stp, ap, fd)
+procedure dc_gec (im, smw, stp, ap, fd1, fd2)
 
 pointer	im		#I IMIO pointer
-pointer	mw		#I MWCS pointer
+pointer	smw		#I SMW pointers
 pointer	stp		#I Symbol table
 pointer	ap		#O Aperture data structure
-int	fd		#I Logfile descriptor
+int	fd1		#I Logfile descriptor
+int	fd2		#I Logfile descriptor
 
 double	wt1, wt2
 int	i, j, k, l, dc, sfd, axis[2], naps, ncoeffs, offset, slope
-pointer	sp, spec, str1, str2, coeff, coeffs, ct
+pointer	sp, spec, str1, str2, coeff, coeffs, ct1, ct2
 pointer	pshift1, pshift2, pshift3, pcoeff1, pcoeff2, pcoeff3
 
-double	mw_c1trand()
-int	nscan(), stropen()
-pointer	mw_sctran()
-errchk	dc_gecdb, imgstr
+double	smw_c1trand()
+int	imaccf(), nscan(), stropen()
+pointer	smw_sctran()
+errchk	dc_gecdb, imgstr, smw_sctran
 
 data	axis/1,2/
 define	done_	90
@@ -569,24 +677,37 @@ begin
 	# Set WCS attributes
 	naps = IM_LEN(im,2)
 	call malloc (ap, LEN_AP(naps), TY_STRUCT)
-	ct = mw_sctran (mw, "logical", "physical", 2)
 	do i = 1, naps {
-	    PL(ap,i) = nint (mw_c1trand (ct, double(i)))
-	    call shdr_gwattrs (mw, PL(ap,i), AP(ap,i), BM(ap,i), DT(ap,i),
-		W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i), LW(ap,i), UP(ap,i),
-		coeff)
-	    dc = DT(ap,i)
+	    DC_PL(ap,i) = i
+	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), coeff)
+	    dc = DC_DT(ap,i)
 	}
-	call mw_ctfree (ct)
 
-	# Determine if spectrum has been dispersion corrected and return
-	# This assumes all orders have the same dispersion type
-	if (dc > -1)
+	# Check if the spectra have been dispersion corrected
+	# by an earlier version of DISPCOR.  If so then don't allow
+	# another database dispersion correction.  This assumes all
+	# spectra have the same dispersion type.  Check for a
+	# reference spectrum.
+
+	if ((imaccf (im, "REFSPEC1") == NO) ||
+	    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	    if (fd1 != NULL) {
+		call fprintf (fd1,
+		    "%s: Resampling using current coordinate system\n")
+		    call pargstr (Memc[spec])
+	    }
+	    if (fd2 != NULL) {
+		call fprintf (fd2,
+		    "%s: Resampling using current coordinate system\n")
+		    call pargstr (Memc[spec])
+	    }
 	    goto done_
+	}
 
 	# Get the reference spectra dispersion function from the database
-	# and determine a reference shift.  Return a null pointer if no
-	# reference spectrum specified.
+	# and determine a reference shift.
 
 	iferr {
 	    call imgstr (im, "REFSPEC1", Memc[str1], SZ_LINE)
@@ -607,8 +728,14 @@ begin
 	    call sfree (sp)
 	    call erract (EA_ERROR)
 	}
-	if (fd != NULL) {
-	    call fprintf (fd, "%s: REFSPEC1 = '%s %.3g'\n")
+	if (fd1 != NULL) {
+	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.3g'\n")
+		call pargstr (Memc[spec])
+		call pargstr (Memc[str1])
+		call pargd (wt1)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.3g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
@@ -620,8 +747,14 @@ begin
 	    call salloc (pcoeff3, naps, TY_POINTER)
 	    call dc_gecdb (Memc[str1], stp, ap, Memd[pshift3],
 		Memi[pcoeff3], naps, offset, slope)
-            if (fd != NULL) {
-                call fprintf (fd, "%s: REFSHFT1 = '%s', shift = %.6g\n")
+            if (fd1 != NULL) {
+                call fprintf (fd1, "%s: REFSHFT1 = '%s', shift = %.6g\n")
+                    call pargstr (Memc[spec])
+                    call pargstr (Memc[str1])
+                    call pargd (Memd[pshift3])
+            }
+            if (fd2 != NULL) {
+                call fprintf (fd2, "%s: REFSHFT1 = '%s', shift = %.6g\n")
                     call pargstr (Memc[spec])
                     call pargstr (Memc[str1])
                     call pargd (Memd[pshift3])
@@ -641,8 +774,14 @@ begin
 	    call salloc (pcoeff2, naps, TY_POINTER)
 	    call dc_gecdb (Memc[str1], stp, ap, Memd[pshift2],
 		Memi[pcoeff2], naps, offset, slope)
-	    if (fd != NULL) {
-		call fprintf (fd, "%s: REFSPEC2 = '%s %.3g'\n")
+	    if (fd1 != NULL) {
+		call fprintf (fd1, "%s: REFSPEC2 = '%s %.3g'\n")
+		    call pargstr (Memc[spec])
+		    call pargstr (Memc[str1])
+		    call pargd (wt2)
+	    }
+	    if (fd2 != NULL) {
+		call fprintf (fd2, "%s: REFSPEC2 = '%s %.3g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
@@ -654,8 +793,14 @@ begin
 		call salloc (pcoeff3, naps, TY_POINTER)
 		call dc_gecdb (Memc[str1], stp, ap, Memd[pshift3],
 		    Memi[pcoeff3], naps, offset, slope)
-		if (fd != NULL) {
-		    call fprintf (fd, "%s: REFSHFT2 = '%s', shift = %.6g\n")
+		if (fd1 != NULL) {
+		    call fprintf (fd1, "%s: REFSHFT2 = '%s', shift = %.6g\n")
+			call pargstr (Memc[spec])
+                    call pargstr (Memc[str1])
+                    call pargd (Memd[pshift3])
+		}
+		if (fd2 != NULL) {
+		    call fprintf (fd2, "%s: REFSHFT2 = '%s', shift = %.6g\n")
 			call pargstr (Memc[spec])
                     call pargstr (Memc[str1])
                     call pargd (Memd[pshift3])
@@ -689,7 +834,7 @@ begin
 		call pargd (Memd[coeffs+3])
 		call pargd (Memd[coeffs+4])
 	    do j = 5, ncoeffs {
-		call fprintf (sfd, " %g")
+		call fprintf (sfd, " %.15g")
 		    call pargd (Memd[coeffs+j])
 	    }
 
@@ -705,34 +850,57 @@ begin
 		    call pargd (Memd[coeffs+3])
 		    call pargd (Memd[coeffs+4])
 		do j = 5, ncoeffs {
-		    call fprintf (sfd, " %g")
+		    call fprintf (sfd, " %.15g")
 			call pargd (Memd[coeffs+j])
 		}
 	    }
 
-	    DT(ap,i) = 2
-	    call shdr_swattrs (mw, PL(ap,i), AP(ap,i), BM(ap,i), DT(ap,i),
-		W1(ap,i), DW(ap,i), NW(ap,i), Z(ap,i), LW(ap,i), UP(ap,i),
-		Memc[coeff])
+	    if (i == 1) {
+		call mw_swattrs (SMW_MW(smw,0), 1, "label", "Wavelength")
+		call mw_swattrs (SMW_MW(smw,0), 1, "units", "Angstroms")
+	    }
+	    DC_DT(ap,i) = 2
+	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
 	    call strclose (sfd)
 	}
 
-done_	# Set WCS parameters in terms of logical image.
-        ct = mw_sctran (mw, "physical", "logical", 2)
-        do i = 1, naps {
-            j = nint (mw_c1trand (ct, double(1)))
-            k = nint (mw_c1trand (ct, double(NW(ap,i))))
-            NW(ap,i) = min (IM_LEN(im,1), max (j, k))
-        }
-        call mw_ctfree (ct)
-
-	ct = mw_sctran (mw, "logical", "multispec", 3)
+	# Update the linear part of WCS.
+	ct1 = smw_sctran (smw, "logical", "physical", 2)
+	ct2 = smw_sctran (smw, "physical", "world", 3)
 	do i = 1, naps {
-	    call mw_c2trand (ct, double(1), double(i), W1(ap,i), wt1)
-	    call mw_c2trand (ct, double(NW(ap,i)), double(i), W2(ap,i), wt1)
-	    DW(ap,i) = (W2(ap,i) - W1(ap,i)) / (NW(ap,i) - 1)
+	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), coeff)
+	    wt1 = nint (smw_c1trand (ct1, double(i)))
+	    call smw_c2trand (ct2, 1D0, wt1, DC_W1(ap,i), wt2)
+	    call smw_c2trand (ct2, double(DC_NW(ap,i)), wt1, DC_W2(ap,i), wt2)
+	    DC_DW(ap,i) = (DC_W2(ap,i) - DC_W1(ap,i)) / (DC_NW(ap,i) - 1)
+	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
+		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
+		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
 	}
-	call mw_ctfree (ct)
+	call smw_ctfree (ct1)
+	call smw_ctfree (ct2)
+
+done_	# Set aperture parameters in terms of logical image.
+	ct1 = smw_sctran (smw, "physical", "logical", 1)
+	j = nint (smw_c1trand (ct1, 1D0))
+	do i = 1, naps {
+	    k = nint (smw_c1trand (ct1, double(DC_NW(ap,i))))
+	    DC_NW(ap,i) = min (IM_LEN(im,1), max (j, k))
+	}
+	call smw_ctfree (ct1)
+
+	ct1 = smw_sctran (smw, "logical", "world", 3)
+	do i = 1, naps {
+	    wt1 = i
+	    call smw_c2trand (ct1, 1D0, wt1, DC_W1(ap,i), wt2)
+	    call smw_c2trand (ct1, double(DC_NW(ap,i)), wt1, DC_W2(ap,i), wt2)
+	    DC_DW(ap,i) = (DC_W2(ap,i) - DC_W1(ap,i)) / (DC_NW(ap,i) - 1)
+	}
+	call smw_ctfree (ct1)
 
 	call mfree (coeff, TY_CHAR)
 	call sfree (sp)
@@ -771,15 +939,20 @@ begin
 	    call smark (sp)
 	    call salloc (str, SZ_LINE, TY_CHAR)
 	    call strcpy ("ec", Memc[str], SZ_LINE)
-	    call imgcluster (spec, Memc[str+2], SZ_LINE)
+	    call imgcluster (spec, Memc[str+2], SZ_LINE-2)
+	    call xt_imroot (Memc[str+2], Memc[str+2], SZ_LINE-2)
 	    db = strefsbuf (stp, Memi[stfind (stp, "database")])
 	    dt = dtmap1 (Memc[db], Memc[str], READ_ONLY)
 
             call sprintf (Memc[str], SZ_LINE, "ecidentify %s")
                 call pargstr (spec)
-            rec = dtlocate (dt, Memc[str])
-            if (rec == EOF)
-                call fatal (0, "Ecdispcor: Database entry not found")
+            iferr (rec = dtlocate (dt, Memc[str])) {
+		call sprintf (Memc[str], SZ_LINE,
+		    "DISPCOR: Echelle dispersion function not found (%s/%s)")
+		    call pargstr (DT_DNAME(dt))
+		    call pargstr (DT_FNAME(dt))
+                call fatal (0, Memc[str])
+	    }
 
             iferr (offst = dtgeti (dt, rec, "offset"))
                 offst = 0
@@ -814,15 +987,18 @@ begin
 	    offset = offst
 	    slope = slpe
 	} else if (offset != offst || slope != slpe) {
-	    call fatal (1,
-		"Reference order offset/slope parameters don't agree")
+	    call sprintf (Memc[str], SZ_LINE,
+		"DISPCOR: Reference order offset/slope error (%s/%s)")
+		call pargstr (DT_DNAME(dt))
+		call pargstr (DT_FNAME(dt))
+	    call fatal (1, Memc[str])
 	}
 
 	# Convert to multispec coefficients
 	do i = 1, naps {
-	    BM(ap,i) = offset + slope * AP(ap,i)
-	    call dc_ecms (BM(ap,i), Memd[coeffs], pcoeff[i])
-	    shifts[i] = shift / BM(ap,i)
+	    DC_BM(ap,i) = offset + slope * DC_AP(ap,i)
+	    call dc_ecms (DC_BM(ap,i), Memd[coeffs], pcoeff[i])
+	    shifts[i] = shift / DC_BM(ap,i)
 	}
 end
 

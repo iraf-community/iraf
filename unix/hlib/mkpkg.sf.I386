@@ -9,6 +9,8 @@
 
 $special "sys$osb/":		aclrb.c		as$aclrb.c
 				bytmov.c	as$bytmov.c
+                                ieeer.x         as$ieeer.x
+                                ieeed.x         as$ieeed.x
 				;
 
 $special "sys$vops/ak/":	aclrc.x		as$aclrc.c
@@ -52,6 +54,9 @@ $special "sys$gio/ncarutil/":
 
 $special "sys$gio/cursor/":
 	grcwcs.x	$(XNO);
+
+$special "sys$mwcs/":
+	wftan.x		$(XNO);
 
 # The following causes the compiler to produce semi-infinite intermediate code
 # tables, necessitating use of reduced levels (O1 or O2) of optimization.

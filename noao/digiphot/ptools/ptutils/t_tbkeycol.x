@@ -16,7 +16,7 @@ pointer	sp, table, keyword, keyvalue, format, tp, colptr
 real	rval
 
 bool	itob()
-int	clpopnu(), clgfil(), clplen(), tbpsta(), strlen()
+int	clpopnu(), clgfil(), clplen(), tbpsta(), strlen(), access()
 int	ctoi(), ctor(), ctod()
 pointer	tbtopn()
 errchk	tbtopn()
@@ -41,8 +41,13 @@ begin
 	while (clgfil (tlist, Memc[table], SZ_FNAME) != EOF) {
 
 	    # If the file is not an ST table go to the next file in the list.
+	    if (access(Memc[table], 0, TEXT_FILE) == YES)
+		next
 	    iferr (tp = tbtopn (Memc[table], READ_WRITE, 0))
 		next
+	    if (tbpsta (tp, TBL_WHTYPE) == TBL_TYPE_TEXT)
+                next
+
 
 	    # Loop over the keywords.
 	    while (clgfil (klist, Memc[keyword], SZ_FNAME) != EOF) {

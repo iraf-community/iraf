@@ -22,24 +22,24 @@ begin
 	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
 	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
 
-	# Initialize
+	# Rewind the polygon and coordinate files.
 	if (pl != NULL)
 	    call seek (pl, BOF)
 	if (cl != NULL)
 	    call seek (cl, BOF)
 
+	# Initialize.
 	pd = 0
 	prev_num = 0
 	req_num = ld + 1
-
 	nvertices = ap_ynextobj (py, id, pl, cl, delim, Memr[x], Memr[y],
 	    MAX_NVERTICES, prev_num, req_num, ld, pd)
 
 	# Loop over the coordinate and polygon file.
 	while (nvertices != EOF) {
 	    
-	    # Write the output.
-	    if (id != NULL)
+	    # Draw the polygon if it has more than three vertices.
+	    if (id != NULL && nvertices >= 3)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1,
 		    NO, NO, YES)
 

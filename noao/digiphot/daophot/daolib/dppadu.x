@@ -1,8 +1,7 @@
 include <imhdr.h>
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
-# DP_PADU -- Procedure to set the gain parameter for the noise model
-# computation.
+# DP_PADU -- Read the gain value from the image header.
 
 procedure dp_padu (im, dao)
 
@@ -18,20 +17,20 @@ begin
 	call salloc (key, SZ_FNAME, TY_CHAR)
 	call dp_stats (dao, CCDGAIN, Memc[key], SZ_FNAME)
 	if (Memc[key] == EOS)
-	    padu = dp_statr (dao, PHOT_ADC)
+	    padu = dp_statr (dao, PHOTADU)
 	else {
 	    iferr {
 	        padu = imgetr (im, Memc[key])
 	    } then {
-		padu = dp_statr (dao, PHOT_ADC)
+		padu = dp_statr (dao, PHOTADU)
 		call eprintf ("Warning: Image %s  Keyword %s not found.\n")
 		    call pargstr (IM_HDRFILE(im))
 		    call pargstr (Memc[key])
 	    }
 	}
 	if (IS_INDEFR(padu) || padu <= 0.0)
-	    call dp_setr (dao, PHOT_ADC, 1.0)
+	    call dp_setr (dao, PHOTADU, 1.0)
 	else
-	    call dp_setr (dao, PHOT_ADC, padu)
+	    call dp_setr (dao, PHOTADU, padu)
 	call sfree (sp)
 end

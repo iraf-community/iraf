@@ -3,14 +3,14 @@
 define	SZ_FORMAT		19
 define	SZ_LABEL		19
 define	MAX_LINEARITY		1.0			# no log scaling if gt
-define	LEFT_BORDER		10			# nchars at l|r edge
-define	BOTTOM_BORDER		6			# nlines at bottom edge
+define	LEFT_BORDER		9			# nchars at l|r edge
+define	BOTTOM_BORDER		5			# nlines at bottom edge
 define	Y_LABELOFFSET		7			# Y label dist from axis
 define	MAX_SZTITLEBLOCK	0.5			# max sztitleblock, NDC
 define	MIN_NTITLELINES		2			# min lines in titleblk
 define	TOL			(EPSILONR*10.0)
 
-define	LEN_AX			76
+define	LEN_AX			85
 define	AX_POS			Memd[P2D($1)+$2-1]	# tick coords
 define	AX_DRAWME		Memi[$1+4]		# draw this axis
 define	AX_HORIZONTAL		Memi[$1+5]		# axis is horizontal
@@ -34,7 +34,13 @@ define	AX_MAJORWIDTH		Memr[$1+29]		# major tick linewidth
 define	AX_LABELTICKS		Memi[$1+30]		# draw tick labels
 define	AX_TICKLABELOFFSET	Memr[$1+31+$2-1]	# offset to ticklabel
 define	AX_TICKLABELSIZE	Memr[$1+33]		# char size of ticklabel
-define	AX_AXISLABELSIZE	Memr[$1+34]		# char size axislabel
-define	AX_AXISWIDTH		Memr[$1+35]		# axis linewidth
-define	AX_TICKLABELPOS		Memc[P2C($1+36)]	# gtext format
-define	AX_TICKFORMAT		Memc[P2C($1+56)]	# numeric format
+define	AX_TICKLABELCOLOR	Memi[$1+34]		# char size of ticklabel
+define	AX_TICKCOLOR		Memi[$1+35]		# grid between ticks
+define	AX_AXISLABELSIZE	Memr[$1+36]		# char size axislabel
+define	AX_AXISLABELCOLOR	Memi[$1+37]		# char size axislabel
+define	AX_AXISWIDTH		Memr[$1+38]		# axis linewidth
+define	AX_AXISCOLOR		Memi[$1+39]		# axis linewidth
+define	AX_GRIDCOLOR		Memi[$1+40]		# grid between ticks
+
+define	AX_TICKLABELPOS		Memc[P2C($1+45)]	# gtext format
+define	AX_TICKFORMAT		Memc[P2C($1+65)]	# numeric format

@@ -2,7 +2,7 @@ include	<error.h>
 include	<fset.h>
 include	<gset.h>
 include	<pkg/gtools.h>
-include	"../shdr.h"
+include	<smw.h>
 include	"identify.h"
 
 define	ICFITHELP	"noao$lib/scr/idicgfit.key"
@@ -21,6 +21,7 @@ define	ICFITHELP	"noao$lib/scr/idicgfit.key"
 # the reference image.  This may be done either by tracing or by reidentifying
 # starting from the same reference features.  Reidentification between images
 # is done by taking the same line or column from the reference image.
+# The step and summing are ignored for multispec images.
 # 
 # Multispec format images are matched by aperture number and the spectra
 # need not be in the same order in each image.
@@ -34,8 +35,8 @@ char	ans[3]			# Interactive?
 int	i, fd, nlogfd
 pointer	sp, logfile, str, id, logfd, pd
 
-int	clgeti(), clpopnu(), clgfil(), open(), btoi(), clgwrd(), nowhite()
-int	imtopenp(), imtgetim()
+int	clscan(), clgeti(), clpopnu(), clgfil(), clgwrd()
+int	nscan(), open(), btoi(), nowhite(), imtopenp(), imtgetim()
 bool	clgetb()
 real	clgetr()
 pointer	gopen(), gt_init()
@@ -57,7 +58,16 @@ begin
 
 	ID_REFIT(id) = btoi (clgetb ("refit"))
 
-	ID_NSUM(id) = clgeti ("nsum")
+	if (clscan ("nsum") != EOF) {
+	    call gargi (ID_NSUM(id,1))
+	    call gargi (ID_NSUM(id,2))
+	    if (nscan() == 0)
+		call error (1, "Error in 'nsum' parameter")
+	    if (nscan() == 1)
+		ID_NSUM(id,2) = ID_NSUM(id,1)
+	    ID_NSUM(id,1) = max (1, ID_NSUM(id,1))
+	    ID_NSUM(id,2) = max (1, ID_NSUM(id,2))
+	}
 	ID_MAXFEATURES(id) = clgeti ("maxfeatures")
 	ID_MINSEP(id) = clgetr ("minsep")
 	ID_MATCH(id) = clgetr ("match")
@@ -146,7 +156,7 @@ begin
 	call clpcls (ID_LOGFILES(id))
 	call imtclose (list)
 	call id_free (id)
-	call shdr_2d (NULL, 0, 0)
+	call smw_daxis (NULL, NULL, 0, 0, 0)
 	call sfree (sp)
 end
 
@@ -162,64 +172,126 @@ int	logfd[ARB]		# Logfiles
 int	nlogfd			# Number of logfiles
 pointer	pd			# Plot file pointer
 
-int	step
-double	shift
+int	step[2]
+double	shift[2]
 int	nreid
 bool	override
 bool	trace
 
-int	i, start, line, loghdr, clgeti(), id_gid(), id_dbcheck()
-double	fit_shift, clgetd()
+int	i, start[2], line[2], loghdr
+double	fit_shift[2]
 pointer	ic, ic1
 bool	clgetb()
+int	clscan(), clgeti(), nscan(), id_gid(), id_dbcheck()
 errchk	id_dbread
 
 begin
 	# Open the image and return if there is an error.
 	call strcpy (reference, Memc[ID_IMAGE(id)], SZ_FNAME)
-	call id_noextn (Memc[ID_IMAGE(id)])
 	iferr (call id_map (id)) {
 	    call erract (EA_WARN)
 	    return
 	}
 
 	# Set parameters
-	start = ID_LINE(id)
-	step = clgeti ("step")
-	shift = clgetd ("shift")
+	start[1] = ID_LINE(id,1)
+	start[2] = ID_LINE(id,2)
+
+	if (clscan ("step") == EOF)
+	    call error (1, "Error in 'step' parameter")
+	call gargi (step[1])
+	call gargi (step[2])
+	if (nscan() == 0)
+	    call error (1, "Error in 'step' parameter")
+	if (nscan() == 1)
+	    step[2] = step[1]
+	if (SMW_FORMAT(MW(ID_SH(id))) != SMW_ND) {
+	    step[1] = min (step[1], 1)
+	    step[2] = min (step[2], 1)
+	}
+	if (step[1] == 0)
+	    step[1] = ID_MAXLINE(id,1)
+	if (step[2] == 0)
+	    step[2] = ID_MAXLINE(id,2)
+
+	if (clscan ("shift") != EOF) {
+	    call gargd (shift[1])
+	    call gargd (shift[2])
+	    if (nscan() == 0)
+		call error (1, "Error in 'shift' parameter")
+	    if (nscan() == 1)
+		shift[2] = shift[1]
+	}
 	nreid = max (1, ID_NFEATURES(id) - clgeti ("nlost"))
 	override = clgetb ("override")
 	trace = clgetb ("trace")
 
 	# Get and save the reference database entry.
-	call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO, NO)
-	call id_saveid (id, ID_LINE(id))
+	call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO, NO)
+	call id_saveid (id, ID_LINE(id,1))
 
 	# Get and save other entries.
 	if (!override) {
-	    for (line=start-step; line>0; line=line-step) {
-		ID_LINE(id) = line
-		ID_AP(id) = line
-		if (ID_APS(id) != NULL)
-		    ID_AP(id) = Memi[ID_APS(id)+line-1]
-		ifnoerr (
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO,NO)) {
-		    call id_saveid (id, ID_LINE(id))
+	    for (line[2]=start[2]; line[2]>0; line[2]=line[2]-step[2]) {
+		ID_LINE(id,2) = line[2]
+		ID_AP(id,2) = line[2]
+		for (line[1]=start[1]; line[1]>0; line[1]=line[1]-step[1]) {
+		    if (line[1]==start[1] && line[2]==start[2])
+			next
+		    ID_LINE(id,1) = line[1]
+		    ID_AP(id,1) = line[1]
+		    if (ID_APS(id) != NULL)
+			ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		    ifnoerr (
+			call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			    NO, NO)) {
+			call id_saveid (id, ID_LINE(id,1))
+		    }
+		}
+		for (line[1]=start[1]+step[1]; line[1]<=ID_MAXLINE(id,1);
+		    line[1]=line[1]+step[1]) {
+		    ID_LINE(id,1) = line[1]
+		    ID_AP(id,1) = line[1]
+		    if (ID_APS(id) != NULL)
+			ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		    ifnoerr (call id_dbread (id, Memc[ID_IMAGE(id)],
+			ID_AP(id,1), NO, NO)) {
+			call id_saveid (id, ID_LINE(id,1))
+		    }
 		}
 	    }
-	    for (line=start+step; line<=ID_MAXLINE(id); line=line+step) {
-		ID_LINE(id) = line
-		ID_AP(id) = line
-		if (ID_APS(id) != NULL)
-		    ID_AP(id) = Memi[ID_APS(id)+line-1]
-		ifnoerr (
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO,NO)) {
-		    call id_saveid (id, ID_LINE(id))
+	    for (line[2]=start[2]+step[2]; line[2]<=ID_MAXLINE(id,2);
+		line[2]=line[2]+step[2]) {
+		ID_LINE(id,2) = line[2]
+		ID_AP(id,2) = line[2]
+		for (line[1]=start[1]-step[1]; line[1]>0;
+		    line[1]=line[1]-step[1]) {
+		    ID_LINE(id,1) = line[1]
+		    ID_AP(id,1) = line[1]
+		    if (ID_APS(id) != NULL)
+			ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		    ifnoerr (
+			call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+			    NO, NO)) {
+			call id_saveid (id, ID_LINE(id,1))
+		    }
+		}
+		for (line[1]=start[1]+step[1]; line[1]<=ID_MAXLINE(id,1);
+		    line[1]=line[1]+step[1]) {
+		    ID_LINE(id,1) = line[1]
+		    ID_AP(id,1) = line[1]
+		    if (ID_APS(id) != NULL)
+			ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		    ifnoerr (call id_dbread (id, Memc[ID_IMAGE(id)],
+			ID_AP(id,1), NO, NO)) {
+			call id_saveid (id, ID_LINE(id,1))
+		    }
 		}
 	    }
 	}
 
-	# Reidentify to lower line numbers.
+	# Reidentify.
+	loghdr = 2
 	ic = ID_IC(id)
 	if (ans[1] == 'N')
 	    ic1 = ic
@@ -228,83 +300,229 @@ begin
 	    call ic_copy (ic, ic1)
 	}
 
-	loghdr = 2
-	fit_shift = 0.
-	for (line = start - step; line > 0; line = line - step) {
-	    ID_LINE(id) = line
-	    ID_AP(id) = line
+	fit_shift[2] = shift[2]
+	for (line[2]=start[2]; line[2]>0; line[2]=line[2]-step[2]) {
+	    ID_LINE(id,2) = line[2]
+	    ID_AP(id,2) = line[2]
 	    ID_IC(id) = ic
-	    if (ID_APS(id) != NULL)
-		ID_AP(id) = Memi[ID_APS(id)+line-1]
-	    if (!override)
-		if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id)) == YES)
-		    next
 
-	    if (!trace) {
-		i = id_gid (id, start)
-	        ID_LINE(id) = line
-		fit_shift = fit_shift - shift
-	    } else
-	        fit_shift = -shift
-
-	    ID_IC(id) = ic1
-	    call id_gdata (id)
-	    iferr (call id_fitdata (id))
-		;
-
-	    call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
-	    loghdr = 0
-	    call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
-
-	    if (ID_NFEATURES(id) < nreid && trace) {
-	    	call ri_loghdr (id, reference, logfd, nlogfd, 3)
-	        break
+	    if (IS_INDEFD(shift[2]))
+		fit_shift[2] = INDEFD
+	    else {
+		if (!trace)
+		    fit_shift[2] = fit_shift[2] - shift[2]
+		else
+		    fit_shift[2] = -shift[2]
 	    }
 
-	    if (ID_NFEATURES(id) > 0) {
-	        call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
-		call id_saveid (id, line)
+	    fit_shift[1] = fit_shift[2]
+	    for (line[1]=start[1]; line[1]>0; line[1]=line[1]-step[1]) {
+		if (line[1]==start[1] && line[2]==start[2])
+		    next
+		ID_LINE(id,1) = line[1]
+		ID_AP(id,1) = line[1]
+		ID_IC(id) = ic
+		if (ID_APS(id) != NULL)
+		    ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		if (!override)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
+			next
+
+		if (!trace) {
+		    i = id_gid (id, start)
+		    ID_LINE(id,1) = line[1]
+		    ID_LINE(id,2) = line[2]
+		}
+
+		if (IS_INDEFD(shift[1]))
+		    fit_shift[1] = INDEFD
+		else {
+		    if (!trace)
+			fit_shift[1] = fit_shift[1] - shift[1]
+		    else
+			fit_shift[1] = -shift[1]
+		}
+
+		ID_IC(id) = ic1
+		call id_gdata (id)
+		iferr (call id_fitdata (id))
+		    ;
+
+		call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
+		loghdr = 0
+		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
+
+		if (ID_NFEATURES(id) < nreid && trace) {
+		    call ri_loghdr (id, reference, logfd, nlogfd, 3)
+		    break
+		}
+
+		if (ID_NFEATURES(id) > 0) {
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
+		    call id_saveid (id, line)
+		}
+	    }
+
+	    ID_IC(id) = ic
+	    i = id_gid (id, start)
+	    fit_shift[1] = fit_shift[2]
+	    for (line[1]=start[1]+step[1]; line[1]<=ID_MAXLINE(id,1);
+		line[1]=line[1]+step[1]) {
+		ID_LINE(id,1) = line[1]
+		ID_AP(id,1) = line[1]
+		ID_IC(id) = ic
+		if (ID_APS(id) != NULL)
+		    ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		if (!override)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
+			next
+
+		if (!trace) {
+		    i = id_gid (id, start)
+		    ID_LINE(id,1) = line[1]
+		    ID_LINE(id,2) = line[2]
+		}
+
+		if (IS_INDEFD(shift[1]))
+		    fit_shift[1] = INDEFD
+		else {
+		    if (!trace)
+			fit_shift[1] = fit_shift[1] + shift[1]
+		    else
+			fit_shift[1] = shift[1]
+		}
+
+		ID_IC(id) = ic1
+		call id_gdata (id)
+		iferr (call id_fitdata (id))
+		    ;
+
+		call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
+		loghdr = 0
+		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
+
+		if (ID_NFEATURES(id) < nreid && trace) {
+		    call ri_loghdr (id, reference, logfd, nlogfd, 3)
+		    break
+		}
+
+		if (ID_NFEATURES(id) > 0) {
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
+		    call id_saveid (id, line)
+		}
 	    }
 	}
 
-	# Reidentify to higher line numbers.
-	ID_IC(id) = ic
-	i = id_gid (id, start)
-	fit_shift = 0.
-	for (line = start + step; line <= ID_MAXLINE(id); line = line + step) {
-	    ID_LINE(id) = line
-	    ID_AP(id) = line
+
+	fit_shift[2] = 0.
+	for (line[2]=start[2]+step[2]; line[2]<=ID_MAXLINE(id,2);
+	    line[2]=line[2]+step[2]) {
+	    ID_LINE(id,2) = line[2]
+	    ID_AP(id,2) = line[2]
 	    ID_IC(id) = ic
-	    if (ID_APS(id) != NULL)
-		ID_AP(id) = Memi[ID_APS(id)+line-1]
-	    if (!override)
-		if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id)) == YES)
-		    next
 
-	    if (!trace) {
-		i = id_gid (id, start)
-		ID_LINE(id) = line
-		fit_shift = fit_shift + shift
-	    } else
-		fit_shift = shift
-
-	    ID_IC(id) = ic1
-	    call id_gdata (id)
-	    iferr (call id_fitdata (id))
-		;
-
-	    call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
-	    loghdr = 0
-	    call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
-
-	    if (ID_NFEATURES(id) < nreid && trace) {
-	    	call ri_loghdr (id, reference, logfd, nlogfd, 3)
-	        break
+	    if (IS_INDEFD(shift[2]))
+		fit_shift[2] = INDEFD
+	    else {
+		if (!trace)
+		    fit_shift[2] = fit_shift[2] + shift[2]
+		else
+		    fit_shift[2] = shift[2]
 	    }
 
-	    if (ID_NFEATURES(id) > 0) {
-	        call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
-		call id_saveid (id, line)
+	    fit_shift[1] = fit_shift[2]
+	    for (line[1]=start[1]; line[1]>0; line[1]=line[1]-step[1]) {
+		ID_LINE(id,1) = line[1]
+		ID_AP(id,1) = line[1]
+		ID_IC(id) = ic
+		if (ID_APS(id) != NULL)
+		    ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		if (!override)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
+			next
+
+		if (!trace) {
+		    i = id_gid (id, start)
+		    ID_LINE(id,1) = line[1]
+		    ID_LINE(id,2) = line[2]
+		}
+
+		if (IS_INDEFD(shift[1]))
+		    fit_shift[1] = INDEFD
+		else {
+		    if (!trace)
+			fit_shift[1] = fit_shift[1] - shift[1]
+		    else
+			fit_shift[1] = -shift[1]
+		}
+
+		ID_IC(id) = ic1
+		call id_gdata (id)
+		iferr (call id_fitdata (id))
+		    ;
+
+		call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
+		loghdr = 0
+		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
+
+		if (ID_NFEATURES(id) < nreid && trace) {
+		    call ri_loghdr (id, reference, logfd, nlogfd, 3)
+		    break
+		}
+
+		if (ID_NFEATURES(id) > 0) {
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
+		    call id_saveid (id, line)
+		}
+	    }
+
+	    ID_IC(id) = ic
+	    i = id_gid (id, start)
+	    fit_shift[1] = fit_shift[2]
+	    for (line[1]=start[1]+step[1]; line[1]<=ID_MAXLINE(id,1);
+		line[1]=line[1]+step[1]) {
+		ID_LINE(id,1) = line[1]
+		ID_AP(id,1) = line[1]
+		ID_IC(id) = ic
+		if (ID_APS(id) != NULL)
+		    ID_AP(id,1) = Memi[ID_APS(id)+line[1]-1]
+		if (!override)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
+			next
+
+		if (!trace) {
+		    i = id_gid (id, start)
+		    ID_LINE(id,1) = line[1]
+		    ID_LINE(id,2) = line[2]
+		}
+
+		if (IS_INDEFD(shift[1]))
+		    fit_shift[1] = INDEFD
+		else {
+		    if (!trace)
+			fit_shift[1] = fit_shift[1] + shift[1]
+		    else
+			fit_shift[1] = shift[1]
+		}
+
+		ID_IC(id) = ic1
+		call id_gdata (id)
+		iferr (call id_fitdata (id))
+		    ;
+
+		call ri_loghdr (id, reference, logfd, nlogfd, loghdr)
+		loghdr = 0
+		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
+
+		if (ID_NFEATURES(id) < nreid && trace) {
+		    call ri_loghdr (id, reference, logfd, nlogfd, 3)
+		    break
+		}
+
+		if (ID_NFEATURES(id) > 0) {
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
+		    call id_saveid (id, line)
+		}
 	    }
 	}
 
@@ -312,7 +530,7 @@ begin
 	if (ic != ic1)
 	    call ic_closed (ic1)
 
-	call mw_close (MW(ID_SH(id)))
+	call smw_close (MW(ID_SH(id)))
 	call imunmap (IM(ID_SH(id)))
 	call shdr_close (ID_SH(id))
 end
@@ -342,7 +560,6 @@ bool	clgetb()
 begin
 	# Open the image and return if there is an error.
 	call strcpy (image, Memc[ID_IMAGE(id)], SZ_FNAME)
-	call id_noextn (Memc[ID_IMAGE(id)])
 	iferr (call id_map (id)) {
 	    call erract (EA_WARN)
 	    return
@@ -366,13 +583,14 @@ begin
 	# a reference of the same aperture is not found and the newaps
 	# flag is set use the initial reference and then add the
 	# reidentification to the reference list.
-	# For TWODSPEC apply each reference to the image.
+	# For NDSPEC apply each reference to the image.
 
-	if (FORMAT(ID_SH(id)) == MULTISPEC) {
-	    for (i=1; i<=ID_MAXLINE(id); i=i+1) {
+	if (SMW_FORMAT(MW(ID_SH(id))) == SMW_ES ||
+	    SMW_FORMAT(MW(ID_SH(id))) == SMW_MS) {
+	    for (i=1; i<=ID_MAXLINE(id,1); i=i+1) {
 		ap = Memi[ID_APS(id)+i-1]
 		for (j=ID_NID(id); id_getid (id,j)!=EOF; j=j-1)
-		    if (ap == ID_AP(id))
+		    if (ap == ID_AP(id,1))
 			break
 
 		if (j == 0 && !newaps) {
@@ -385,14 +603,14 @@ begin
 		    next
 		}
 
-		ID_AP(id) = ap
-		ID_LINE(id) = i
+		ID_AP(id,1) = ap
+		ID_LINE(id,1) = i
 
 		if (i == 1 && ic != ic1)
 		    call ic_copy (ic, ic1)
 
 		if (!override)
-		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id)) == YES)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
 			next
 		
 		ID_IC(id) = ic1
@@ -407,7 +625,7 @@ begin
 		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
 
 		if (ID_NFEATURES(id) > 0) {
-		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
 		    if (j == 0 && newaps) {
 			call id_sid (id, ID_NID(id)+1)
 			if (verbose) {
@@ -427,7 +645,7 @@ begin
 		    call ic_copy (ic, ic1)
 
 		if (!override)
-		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id)) == YES)
+		    if (id_dbcheck (id, Memc[ID_IMAGE(id)], ID_AP(id,1)) == YES)
 			next
 		
 		ID_IC(id) = ic1
@@ -442,7 +660,7 @@ begin
 		call ri_reidentify (id, fit_shift, ans, logfd, nlogfd, pd)
 
 		if (ID_NFEATURES(id) > 0)
-		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
 		ID_IC(id) = ic
 	    }
 	}
@@ -450,7 +668,7 @@ begin
 	ID_IC(id) = ic
 	if (ic != ic1)
 	    call ic_closed (ic1)
-	call mw_close (MW(ID_SH(id)))
+	call smw_close (MW(ID_SH(id)))
 	call imunmap (IM(ID_SH(id)))
 	call shdr_close (ID_SH(id))
 end
@@ -491,7 +709,7 @@ begin
 	# case of tracing features in a two dimensional image or for a
 	# set of images taken with the same observing setup.
 
-	if (IS_INDEFD (fit_shift)) {
+	if (IS_INDEFD(fit_shift)) {
 	    ID_FWIDTH(id) = FWIDTH(id,1)
 	    ID_FTYPE(id) = FTYPE(id,1)
 	    shift = id_shift (id)
@@ -507,14 +725,14 @@ begin
 	do i = 1, ID_NFEATURES(id) {
 	    PIX(id,i) = fit_to_pix (id, FIT(id,i) + shift)
 	    PIX(id,i) = id_center (id, PIX(id,i), FWIDTH(id,i), FTYPE(id,i))
-	    if (!IS_INDEFD (PIX(id,i)))
+	    if (!IS_INDEFD(PIX(id,i)))
 	        FIT(id,i) = id_fitpt (id, PIX(id,i))
 	}
 	for (i=1; i<ID_NFEATURES(id); i=i+1) {
-	    if (IS_INDEFD (PIX(id,i)))
+	    if (IS_INDEFD(PIX(id,i)))
 		next
 	    for (j=i+1; j<=ID_NFEATURES(id); j=j+1) {
-	        if (IS_INDEFD (PIX(id,j)))
+	        if (IS_INDEFD(PIX(id,j)))
 		    next
 		if (abs (PIX(id,i)-PIX(id,j)) < ID_MINSEP(id)) {
 		    if (abs (FIT(id,i)-USER(id,i)) < abs (FIT(id,j)-USER(id,j)))
@@ -532,7 +750,7 @@ begin
 	z_shift = 0.
 	j = 0
 	do i = 1, ID_NFEATURES(id) {
-	    if (IS_INDEFD (PIX(id,i)))
+	    if (IS_INDEFD(PIX(id,i)))
 		next
 
 	    pix_shift = pix_shift + PIX(id,i) - Memd[pix+i-1]
@@ -561,12 +779,10 @@ begin
 	# shift.
 
 	mono = YES
-	if (ID_CV(id) != NULL) {
-	    if ((ID_REFIT(id)==YES) && (ID_NFEATURES(id)>1))
-		call id_dofit (id, NO)
-	    else
-		call id_doshift (id, NO)
-	}
+	if (ID_REFIT(id)==YES && ID_CV(id)!=NULL && ID_NFEATURES(id)>1)
+	    call id_dofit (id, NO)
+	else
+	    call id_doshift (id, NO)
 	if (ID_NEWCV(id) == YES) {
 	    iferr (call id_fitdata (id))
 		mono = NO
@@ -622,12 +838,6 @@ begin
 	        switch (ans[1]) {
 	        case 'y', 'Y':
 		    mono = YES
-#		    call id_dofit (id, YES)
-#		    if (ID_NEWCV(id) == YES) {
-#		        iferr (call id_fitdata (id))
-#			    mono = NO
-#		        call id_fitfeatures (id)
-#		    }
 		    i = ID_REFIT(id)
 		    call reidentify (id)
 		    ID_REFIT(id) = i
@@ -757,7 +967,7 @@ begin
 	# Set plot points.
 	j = 0
 	do i = 1, ID_NFEATURES(id) {
-	    if (IS_INDEFD (USER(id,i)))
+	    if (IS_INDEFD(USER(id,i)))
 		break
 
 	    Memr[x+j] = USER(id,i)

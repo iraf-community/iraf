@@ -80,7 +80,7 @@ begin
 	    if (id == 1)
 	        call ap_param (ap, out, "wphot")
 	    call ap_pmag (ap, out, id, ild, cier, sier, pier)
-	    call appplot (ap, im, id, cier, sier, pier, mgd, YES)
+	    call ap_pplot (ap, im, id, mgd, YES)
 
 	    # Prepare for the next object.
 	    id = id + 1

@@ -1,0 +1,140 @@
+# CTIO Telescope, Filter, and Detector Database
+
+# Telescope data:
+# aperture diameter in meters, scale in arcsec/mm, and tranmission.
+
+telescope = "4.0m PF"
+	aperture =  3.960
+	scale = 18.0
+	transmission =  0.841
+
+telescope = "4.0m RC"
+	aperture =  3.960
+	scale = 6.56
+	transmission =  0.841
+
+telescope = "1.5m f/7.5"
+	aperture =  1.570
+	scale = 18.1
+	transmission =  0.766
+
+telescope = "1.5m f/13.5"
+	aperture =  1.570
+	scale = 10.0
+	transmission =  0.766
+
+telescope = "1.0m"
+	aperture =  1.020
+	scale = 19.6
+	transmission =  0.727
+
+telescope = "0.9m"
+	aperture =  0.910
+	scale = 16.5
+	transmission =  0.872
+
+telescope = "Curtis Schmidt"
+	aperture =  0.600
+	scale = 96.6
+	transmission =  0.848
+
+end
+
+# Filter data:
+# Magnitude corresponding to photon count rate. 
+# Photons/second/stellar-image for a 1-m telescope at 1 airmass.
+# Sky magnitudes per sq arc sec:
+# sky = sky0 + sky1 * phase + sky2 * phase**2 (phase=0-14)
+
+filter = "U"
+	mag = 20
+	star = 6.76
+	sky0 = 22.0
+	sky1 = -0.2666
+	sky2 = -.00760
+
+filter = "B"
+	mag = 20
+	star = 30.90
+	sky0 = 22.7
+	sky1 = -0.0998
+	sky2 = -0.00953
+
+filter = "V"
+	mag = 20
+	star = 33.79
+	sky0 = 21.8
+	sky1 = -0.0153
+	sky2 = -0.00838
+
+filter = "R"
+	mag = 20
+	star = 38.62
+	sky0 = 20.9
+	sky1 = -0.0211
+	sky2 = -0.00364
+
+filter = "I"
+	mag = 20
+	star = 28.96
+	sky0 = 19.9
+	sky1 = -0.0086
+	sky2 = -0.00311
+
+end
+
+# Detector information:
+# rdnoise in photons, dark rate in photons per second, pixel size in microns,
+# and the effective DQE for each filter.
+
+detector = "Tek2048"
+	rdnoise = 4.0
+	dark = 0.0008
+	pixsize = 24
+	U = 1.0
+	B = 1.0
+	V = 1.0
+	R = 1.0
+	I = 1.0
+
+detector = "Tek1024 #1 & #2"
+	rdnoise = 4.0
+	dark = 0.0008
+	pixsize = 24
+	U = 0.286
+	B = 0.875
+	V = 1.0
+	R = 1.0
+	I = 1.0
+
+detector = "Tek512 #4"
+	rdnoise = 7.0
+	dark = 0.0006
+	pixsize = 27
+	U = 0.286
+	B = 0.875
+	V = 1.0
+	R = 1.0
+	I = 1.0
+
+detector = "TI #3"
+	rdnoise = 9.0
+	dark = 0.0017
+	pixsize = 15
+	U = 1.72
+	B = 0.906
+	V = 0.8
+	R = 0.65
+	I = 0.5
+
+detector = "Thomson #1 & #2"
+	rdnoise = 4.0
+	dark = 0.001
+	pixsize = 19
+	U = 0.57
+	B = 0.31
+	V = 0.429
+	R = 0.55
+	I = 0.47
+
+end

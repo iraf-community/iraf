@@ -1,7 +1,7 @@
 include <imhdr.h>
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
-# DP_RDNOISE -  Procedure to set the image read noise parameter.
+# DP_RDNOISE -  Read the readout noise value from the image header.
 
 procedure dp_rdnoise (im, dao)
 
@@ -17,20 +17,20 @@ begin
 	call salloc (key, SZ_FNAME, TY_CHAR)
 	call dp_stats (dao, CCDREAD, Memc[key], SZ_FNAME)
 	if (Memc[key] == EOS)
-	    rdnoise = dp_statr (dao, READ_NOISE)
+	    rdnoise = dp_statr (dao, READNOISE)
 	else {
 	    iferr {
 	        rdnoise = imgetr (im, Memc[key])
 	    } then {
-		rdnoise = dp_statr (dao, READ_NOISE)
+		rdnoise = dp_statr (dao, READNOISE)
 		call eprintf ("Warning: Image %s  Keyword %s not found.\n")
 		    call pargstr (IM_HDRFILE(im))
 		    call pargstr (Memc[key])
 	    }
 	}
 	if (IS_INDEFR(rdnoise) || rdnoise <= 0.0)
-	    call dp_setr (dao, READ_NOISE, 0.0)
+	    call dp_setr (dao, READNOISE, 0.0)
 	else
-	    call dp_setr (dao, READ_NOISE, rdnoise)
+	    call dp_setr (dao, READNOISE, rdnoise)
 	call sfree (sp)
 end

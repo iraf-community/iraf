@@ -27,7 +27,7 @@ extern char *eofstr;
 extern char *indefstr;
 extern char *indeflc;
 
-unsigned parhead;		/* dict index of first pfile 		*/
+int parhead;			/* dict index of first pfile 		*/
 
 
 #define	INDEX_OFFSET	0	/* Offsets using index list.		*/
@@ -610,19 +610,19 @@ char	field;
 	    paramget (np, *f);
 
 	} else {
-	    /* Check for undefined values. */
-	    if (arrflag && (field == FN_VALUE || field == FN_NULL))
-
+	    /* Check for indefinite values. */
+	    if (arrflag && (field == FN_VALUE || field == FN_NULL)) {
 		if ((result.o_type == OT_BOOL || result.o_type == OT_INT) &&
 		    result.o_val.v_i == INDEFL) {
 
-		    setopundef (&result);
+		    setopindef (&result);
 
 		} else if (result.o_type == OT_REAL &&
 		    result.o_val.v_r == INDEFR) {
 
-		    setopundef (&result);
+		    setopindef (&result);
 		}
+	    }
 
 	    pushop (&result);
 	}

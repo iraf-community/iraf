@@ -22,15 +22,46 @@ define	FIRSTPT		GKI_POLYLINE_P
 
 procedure gtr_wstran (gki)
 
-short	gki[ARB]		# metacode instruction to be spooled
-int	length
+short	gki[ARB]		#I metacode instruction to be spooled
+
 long	x, y
 pointer	sp, buf
+int	length, npts, data
+int	gtr_polyclip()
+bool	sge_wsenable()
 include	"gtr.com"
 
 begin
+	# Check with the graphics kernel to see if scaling of graphics
+	# instructions is enabled (it is disabled if the graphics device is
+	# already doing it for us).
+
+	if (!sge_wsenable()) {
+	    call gki_write (tr_stream, gki)
+	    return
+	}
+
 	switch (gki[GKI_HDR_OPCODE]) {
-	case GKI_POLYLINE, GKI_POLYMARKER, GKI_FILLAREA:
+	case GKI_FILLAREA:
+	    npts = gki[GKI_FILLAREA_N]
+	    data = GKI_FILLAREA_P
+	    length = gki[GKI_HDR_LENGTH]
+	    call amovs (gki, pl, length)
+
+	    switch (gtr_polyclip (pl[data], npts, mx1, mx2, my1, my2)) {
+	    case 0:
+		# Entire instruction out of bounds.
+	    case 1:
+		# Entire instruction in bounds.
+		pl_op = GKI_POLYLINE_P + npts * 2
+		call gpt_flush()
+	    default:
+		# Instruction has been clipped.
+		pl_op = GKI_POLYLINE_P + npts * 2
+		call gpt_flush()
+	    }
+
+	case GKI_POLYLINE, GKI_POLYMARKER:
 	    call gtr_polytran (gki)
 
 	case GKI_SETCURSOR:

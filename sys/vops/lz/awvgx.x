@@ -9,8 +9,8 @@
 int procedure awvgx (a, npix, mean, sigma, lcut, hcut)
 
 complex	a[ARB]
-real	mean, sigma, lcut, hcut, value
-real	sum, sumsq, temp
+real	mean, sigma, lcut, hcut
+double	sum, sumsq, value, temp
 int	npix, i, ngpix
 
 begin

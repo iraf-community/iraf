@@ -26,7 +26,7 @@ pointer	catdir			# pointer to the standard star directory
 
 int	i, j, vcol, ecol, pindex, dummy, stat, getid, matchid
 int	obslist, stdlist, plist, ofd, ifd, sym, symvar, ncols, nstd, nset
-int	ntrneqs, nparams, nstdvars, nustdvars, nobsvars, nvars, nueq
+int	ntrneqs, nparams, nstdvars, nustdvars, nobsvars, nvars, nueq, maxnset
 int	len_plist, refcode
 pointer	sp, input, starname, dummyname, stdtable, omap, cmap
 pointer	vars, eqvartable, uservars, usererrs, userset, eqset, tvars
@@ -262,8 +262,9 @@ begin
 	# in the transformation equations.  Recompute the number of catalog
 	# variables used in the fit equations.
 
-	call salloc (eqset, pr_geti (NSETEQS) * ntrneqs, TY_INT)
-	call aclri (Memi[eqset], pr_geti (NSETEQS) * ntrneqs)
+	maxnset = max (1, pr_geti (NSETEQS))
+	call salloc (eqset, maxnset * ntrneqs, TY_INT)
+	call aclri (Memi[eqset], maxnset * ntrneqs)
 	nset = 0
 	if (pr_geti (NSETEQS) > 0) {
 
@@ -422,7 +423,7 @@ begin
 
 		# Invert the transformations and compute the errors.
 		if (ph_objcheck (MEMP[params], Memr[tvars], Memi[eqvartable],
-		    nstdvars, ntrneqs, Memi[eqset], pr_geti (NSETEQS),
+		    nstdvars, ntrneqs, Memi[eqset], maxnset,
 		    Memi[varindex], nustdvars, Memi[eqindex],
 		    nueq) == ERR) {
 		    call amovkr (INDEFR, Memr[tvars+nobsvars], nstdvars)

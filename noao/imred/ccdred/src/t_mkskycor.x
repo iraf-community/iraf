@@ -40,6 +40,7 @@ begin
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
 	call cal_open (NULL)
+	call ccd_open (0)
 
 	# Process each image.
 	while (imtgetim (listin, Memc[input], SZ_FNAME) != EOF) {
@@ -102,7 +103,7 @@ begin
 		    "%s: WARNING - Image should be flat fielded first\n")
 		    call pargstr (Memc[input])
 	    }
-	    call mkillumination (Memc[input], Memc[output], NO)
+	    call mkillumination (Memc[input], Memc[output], NO, YES)
 	    if (!streq (Memc[input], Memc[output]))
 		call ccdcopy (Memc[input], Memc[output])
 	}
@@ -112,6 +113,7 @@ begin
 	call imtclose (listin)
 	call imtclose (listout)
 	call cal_close ()
+	call ccd_close ()
 	call sfree (sp)
 end
 
@@ -121,11 +123,12 @@ end
 # The images are boxcar smoothed to obtain the large scale illumination.
 # Objects in the images are excluded from the average by sigma clipping.
 
-procedure mkillumination (input, output, inverse)
+procedure mkillumination (input, output, inverse, log)
 
 char	input[SZ_FNAME]		# Input image
 char	output[SZ_FNAME]	# Output image
 int	inverse			# Return inverse of illumination
+int	log			# Add log info?
 
 real	xbminr			# Minimum size of X smoothing box
 real	ybminr			# Minimum size of Y smoothing box
@@ -214,18 +217,20 @@ begin
 	    call qillumination (in, out, xbmin, ybmin, xbmax, ybmax, inverse)
 
 	# Log the operation.
-	if (ndivzero > 0) {
+	if (log == YES) {
+	    if (ndivzero > 0) {
+		call sprintf (Memc[str], SZ_LINE,
+		    "Warning: %d divisions by zero replaced by %g")
+		    call pargi (ndivzero)
+		    call pargr (rdivzero)
+		call ccdlog (out1, Memc[str])
+	    }
 	    call sprintf (Memc[str], SZ_LINE,
-		"Warning: %d divisions by zero replaced by %g")
-		call pargi (ndivzero)
-		call pargr (rdivzero)
+		"Illumination correction created from %s")
+		call pargstr (input)
+	    call timelog (Memc[str], SZ_LINE)
 	    call ccdlog (out1, Memc[str])
 	}
-	call sprintf (Memc[str], SZ_LINE,
-	    "Illumination correction created from %s")
-	    call pargstr (input)
-	call timelog (Memc[str], SZ_LINE)
-	call ccdlog (out1, Memc[str])
 	call hdmpstr (out, "mkillum", Memc[str])
 	call hdmpstr (out, "imagetyp", "illum")
 
@@ -256,6 +261,7 @@ real	scale, ccdmean
 int	i, ncols, nlines, linein, lineout, ybox2, nrej
 pointer	sp, ptr, ptrs, data, sum, avg, output
 
+long	clktime()
 int	boxclean()
 real	asumr(), divzero()
 pointer	imgl2r(), impl2r()
@@ -413,6 +419,7 @@ begin
 	# Write scale factor out.
 	ccdmean = ccdmean / (ncols * nlines)
 	call hdmputr (out, "ccdmean", ccdmean)
+	call hdmputi (out, "ccdmeant", int (clktime (long (0))))
 
 	# Free buffers
 	call sfree (sp)
@@ -433,6 +440,7 @@ real	scale, ccdmean
 int	ncols, nlines, linein, lineout, ybox1
 pointer	sp, ptr, ptrs, data, sum, output
 
+long	clktime()
 real	asumr(), divzero()
 pointer	imgl2r(), impl2r()
 extern	divzero()
@@ -553,6 +561,7 @@ begin
 	# Write scale factor out.
 	ccdmean = ccdmean / (ncols * nlines)
 	call hdmputr (out, "ccdmean", ccdmean)
+	call hdmputi (out, "ccdmeant", int (clktime (long (0))))
 
 	# Free buffers
 	call sfree (sp)

@@ -406,8 +406,9 @@ end
 
 
 # DP_ALBUFL2R -- Maintain a buffer of image lines which can be read
-# sequentially from an input image. A new buffer is created when the buffer
-# pointer is null and reallocated when the buffer changes size.
+# sequentially from an input image. The buffer pointer must be initialized
+# to NULL. A new buffer is created when the buffer pointer is null and
+# reallocated when the buffer increases in size.
 
 procedure dp_albufl2r (inim, buf, llast1, llast2, line1, line2, flush)
 
@@ -424,6 +425,7 @@ pointer	imgl2r()
 define	flush_ 11
 
 begin
+
 	# Write the data in the buffer to the output image and free
 	# the buffer.
 

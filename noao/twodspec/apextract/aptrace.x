@@ -72,7 +72,7 @@ begin
 
 	# Tracing parameters
 	step = apgeti ("t_step")
-	nsum = apgeti ("t_nsum")
+	nsum = max (1, abs (apgeti ("t_nsum")))
 	nlost = apgeti ("t_nlost")
 	if (ic == NULL || ic1 == NULL) {
 	    call ic_open (ic)
@@ -195,6 +195,7 @@ begin
 	call salloc (x, ntrace, TY_REAL)
 	call salloc (y, ntrace, TY_REAL)
 	call salloc (wts, ntrace, TY_REAL)
+	call aclrr (Memr[y], ntrace)
 	data = NULL
 
 	# Initialize the ICFIT limits and the GTOOLS parameters.
@@ -451,6 +452,7 @@ begin
 	call salloc (wts, ntrace, TY_REAL)
 	call salloc (xc, naps, TY_REAL)
 	call salloc (lost, naps, TY_INT)
+	call aclrr ( Memr[x], ntrace * naps)
 	data = NULL
 
 	# Set the dispersion lines to be traced.

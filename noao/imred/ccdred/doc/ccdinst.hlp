@@ -1,4 +1,4 @@
-.help ccdinstrument Nov90 noao.imred.ccdred
+.help ccdinstrument Dec93 noao.imred.ccdred
 .ih
 NAME
 ccdinstrument -- Setup and verify CCD instrument translation files
@@ -183,6 +183,7 @@ fringcor	Fringe correction flag
 illumcor	Ilumination correction flag
 readcor		One dimensional zero level read out correction
 scancor		Scan mode correction flag
+nscanrow	Number of scan rows
 
 illumflt	Ilumination flat image
 mkfringe	Fringe image
@@ -190,6 +191,7 @@ mkillum		Illumination image
 skyflat		Sky flat image
 
 ccdmean		Mean value
+ccdmeant	Mean value compute time
 fringscl	Fringe scale factor
 ncombine	Number of images combined
 date-obs	Date of observations

@@ -1,4 +1,4 @@
-.help rename Nov84 system
+.help rename Apr96 system
 .ih
 NAME
 rename -- rename a file or set of files
@@ -12,35 +12,48 @@ A template specifying the file or files to be renamed.
 .le
 .ls newname
 If a single file is being renamed, the new filename, else the new name of
-the field being renamed in a set of filenames.
+the field being renamed in a set of filenames.  If \fInewname\fR is a
+directory the input files will be moved to this directory with the same
+name.
 .le
-.ls field = root
-Specifies either the "root" or the "extn" field as the
-one to be modified.
+.ls field = all
+If set to "all" the image name remains unchanged and the \fInewname\fR is
+assumed to be a destination directory in the case of multiple input files,
+or the new filename in the case of a single input file.  Otherwise,
+specifies either the "root" or the "extn" field as the one to be modified.
 .le
 .ih
 DESCRIPTION
 \fIRename\fR renames either a single file to "newname", or a set of files,
-changing either the root or the extension part of each name.
+changing either the root or the extension part of each name.  If \fInewname\fR
+is a directory the input files are moved to this directory and the filenames
+remain the same regardless of the \fIfield\fR value.  When modifying the 
+root or extension part of the filename \fInewname\fR is the new root or
+extension name for the input files.  For multiple input files it is assumed
+that \fInewname\fR is a directory is the value of \fIfield\fR is "all", 
+otherwise an error is generated to prevent overwriting files.
 .ih
 EXAMPLES
-
 1. Rename file "fred" to "jay".
 
-	cl> rename fred jay
+    cl> rename fred jay
 
 2. Change the root name of a set of files from "out" to "pkout".
 
-	cl> rename out.x,out.o,out.par pkout
+    cl> rename out.x,out.o,out.par pkout field=root
 
 3. Change the extension of all ".f77" files from ".f77" to ".f".
 
-	cl> rename *.f77 f field=extn
+    cl> rename *.f77 f field=extn
+
+4. Move all files with a ".dat" extension to a new directory.
+
+.nf
+    cl> rename *.dat data$
+    cl> rename *.dat /data/user
+.fi
 .ih
 BUGS
-\fIRename\fR cannot be used to move a file to another directory unless the
-full destination filename is specified.  Use \fImovefiles\fR if do not want
-to type the filename twice.
 .ih
 SEE ALSO
 movefiles, copy

@@ -27,7 +27,7 @@ struct task *newtask;		/* ptr to new, but unlinked, task	*/
 struct task *currentask;	/* ptr to ltask currently running	*/
 struct package *curpack;	/* current package in effect		*/
 
-unsigned pachead;		/* dict index of first package		*/
+int pachead;			/* dict index of first package		*/
 
 
 /* CMDSRCH -- Used by callnewtask() to find the ltask to be run.  Ltname is

@@ -745,6 +745,16 @@ begin
 	    lo = i
 	}
 	hi = lo + 1
+	#call eprintf (
+	    #"hmin=%g hmax=%g hw=%g nbins=%d lo=%d ih(lo)=%g hi=%d ih(hi)=%g\n")
+	    #call pargr (hmin)
+	    #call pargr (hmax)
+	    #call pargr (hwidth)
+	    #call pargi (nbins)
+	    #call pargi (lo)
+	    #call pargr (Memr[ihgm+lo-1])
+	    #call pargi (hi)
+	    #call pargr (Memr[ihgm+hi-1])
 
 	# Approximate the histogram.
 	h1 = hmin + lo * hwidth
@@ -758,6 +768,12 @@ begin
 	    IS_MEDIAN(ist) = h1 + 0.5 / hdiff * hwidth
 	else
 	    IS_MEDIAN(ist) = h1 + (0.5 - Memr[ihgm+lo-1]) / hdiff * hwidth
+	#call eprintf ("hlo=%g hhi=%g h1=%g hdiff=%g median=%g\n")
+	    #call pargr (hmin)
+	    #call pargr (hmin + (nbins - 1) * hwidth)
+	    #call pargr (h1)
+	    #call pargr (hdiff)
+	    #call pargr (IS_MEDIAN(ist))
 
 	call sfree (sp)
 end

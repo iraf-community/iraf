@@ -119,6 +119,12 @@ data for the star must be in the specified calibration directory "caldir".
 This is normally a interactive query parameter and should not be specified on
 the command line unless all spectra are of the same standard star.
 .le
+.ls airmass, exptime
+If the airmass and exposure time are not in the header nor can they be
+determined from other keywords in the header then these query parameters
+are used to request the airmass and exposure time.  The values are updated
+in the image.
+.le
 .ls answer
 Interactive query parameter.
 .le
@@ -155,6 +161,8 @@ input spectra may be selected by their aperture numbers using the parameter
 to the standard output.  The airmass is required but if absent from the image
 header it may be computed from the observation header parameters and the
 latitude task parameter (normally obtained from the \fBobservatory\fR task).
+If the airmass cannot be computed, due to missing keywords, then a
+query is made for the airmass.  The airmass is then updated in the header.
 
 The name of the standard star is obtained by querying the user.  If the
 parameter \fIsamestar\fR is yes or beam switch mode is selected then
@@ -242,12 +250,13 @@ response the evenly spaced bandpasses may be needed.  The calibration
 fluxes are linearly interpolated (or extrapolated) from the calibration
 data points to the defined bandpasses.
 
-Each spectrum adds a line to the output file containing the spectrum
-image name, the sky spectrum image name if beam switching, the aperture
-or beam number, the number of points in the spectrum, the exposure
-time, airmass, wavelength range, and title.  If the airmass is not
-found in the image header it is computed using the latitude parameter
-and observation information from the header.
+Each spectrum adds a line to the output file containing the spectrum image
+name, the sky spectrum image name if beam switching, the aperture or beam
+number, the number of points in the spectrum, the exposure time, airmass,
+wavelength range, and title.  If the airmass is not found in the image
+header it is computed using the latitude parameter and observation
+information from the header.  If the airmass cannot be computed, due to
+missing keywords, then a query is made for the airmass.
 
 Following the spectrum information, calibration data is added for each
 bandpass.  The bandpass wavelength, absolute flux (per Angstrom),
@@ -320,6 +329,10 @@ bandpasses are used.
 
 .ih
 REVISIONS
+.ls STANDARD V2.10.3
+A query for the airmass and exposure time is now made if the information
+is not in the header and cannot be computed from other header keywords.
+.le
 .ls STANDARD V2.10
 Giving an unrecognized standard star name will page a list of standard
 stars available in the calibration directory and then repeat the

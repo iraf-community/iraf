@@ -3,7 +3,7 @@
 
 #include <iraf.h>
 
-#ifdef BSDUNIX
+#ifndef VMS
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
@@ -15,7 +15,7 @@ char	*fname;			/* file to be tested */
 char	*valbuf;		/* buffer to receive link path, else NULL */
 int	maxch;
 {
-#ifdef BSDUNIX
+#ifndef VMS
 	struct	stat fi;
 	int	n;
 

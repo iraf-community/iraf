@@ -14,10 +14,6 @@ if (envget("TERM") == "sun") {
     if (!access (".hushiraf"))
 	print "setting terminal type to gterm..."
     stty gterm
-} else if (envget("TERM") == "xterm") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xterm..."
-    stty xterm nl=44
 } else {
     if (!access (".hushiraf"))
 	print "setting terminal type to U_TERM..."
@@ -37,8 +33,8 @@ if (envget("TERM") == "sun") {
 #set	imtype		= "imh"
 
 # IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
-# enable remote image display.
-#set	node		= ""
+# enable remote image display.  The trailing "!" is required.
+#set	node		= "my_workstation!"
 
 # CL parameters you mighth want to change.
 #ehinit   = "nostandout eol noverify"
@@ -50,11 +46,11 @@ showtype = yes
 
 package user
 
-task	$adb $bc $cal $cat $comm $cp $csh $date $df $diff	= "$foreign"
-task	$du $find $finger $ftp $grep $lpq $ls $mail $make	= "$foreign"
+task	$adb $bc $cal $cat $comm $cp $csh $date $dbx $df $diff	= "$foreign"
+task	$du $find $finger $ftp $grep $lpq $lprm $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
 task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
-task	$touch $vi $emacs $w $wc $less $rusers $sync $pwd	= "$foreign"
+task	$touch $vi $emacs $w $wc $less $rusers $sync $pwd $gdb	= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"

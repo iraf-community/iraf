@@ -87,7 +87,7 @@ char	*library;
 	}
 
 	len_arfmag = strlen (ARFMAG);
-	while (fread (&arf, 1, sizeof(arf), fp) > 0) {
+	while ((int)(fread (&arf, 1, sizeof(arf), fp)) > 0) {
 	    if (strncmp (arf.ar_fmag, ARFMAG, len_arfmag) != 0) {
 		printf ("cannot decode library `%s'\n", library);
 		goto err;

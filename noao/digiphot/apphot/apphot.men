@@ -3,6 +3,7 @@
      centerpars - Edit the centering parameters
 	daofind - Find stars in an image using the DAO algorithm
        datapars - Edit the data dependent parameters
+       findpars - Edit the star detection parameters
 	 fitpsf - Model the stellar psf with an analytic function
          fitsky - Compute sky values in a list of annular or circular regions
      fitskypars - Edit the sky fitting parameters

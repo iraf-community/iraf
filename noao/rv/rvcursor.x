@@ -25,7 +25,6 @@ char	ans[2*SZ_LINE,4]
 
 pointer open(), gopen()
 int 	rv_colon(), rv_data_check(), scan()
-int	cmd_write(), rv_query_save()
 int	clgcur(), fstati(), fft_cursor(), spc_cursor()
 int	next_spec(), next_temp(), next_ap()
 int	prev_spec(), prev_temp(), prev_ap()
@@ -350,9 +349,9 @@ begin
 	    	# Quit, possibly saving results before hand.
 		if (!written || RV_UPDATE(rv) == YES) {
 		    if (RV_AUTOWRITE(rv) == YES && !streq(SPOOL(rv),""))
-		        stat = cmd_write (rv, written)
+		        call cmd_write (rv, written)
 		    else
-		        stat = rv_query_save (rv, written, QUIT)
+		        call rv_query_save (rv, written, QUIT)
 		}
 		break
 
@@ -401,10 +400,10 @@ replot_	    	call rv_plot (rv, CORRELATION_PLOT)
         	        RV_MGP(rv) = gopen ("stdvdm", APPEND, RV_GRFD(rv))
 			written = false
 	            }
-		    stat = cmd_write (rv, written)
+		    call cmd_write (rv, written)
 		    written = true
 		} else
-		    stat = rv_query_save (rv, written, NULL)
+		    call rv_query_save (rv, written, NULL)
 
 	    case 'x':				
 	    	# Re-do the correlation and check params.
@@ -460,13 +459,11 @@ pointer	rv				#I RV struct pointer
 bool	written				#U Data write flag
 int	type				#I Type of save
 
-int	stat, cmd_write(), rv_query_save()
-
 begin
 	if (RV_AUTOWRITE(rv) == YES && (!written || RV_UPDATE(rv) == YES))
-  	    stat = cmd_write (rv, written)
+  	    call cmd_write (rv, written)
 	else if (!written || RV_UPDATE(rv) == YES)
-	    stat = rv_query_save (rv, written, MOVE)
+	    call rv_query_save (rv, written, MOVE)
 end
 
 
@@ -518,14 +515,14 @@ end
 # RV_QUERY_SAVE - Query the user to save the results, and possibly a file
 # name.
 
-int procedure rv_query_save (rv, written, type)
+procedure rv_query_save (rv, written, type)
 
 pointer	rv				#I RV struct pointer
 bool	written				#I Results written flag
 int	type				#I Type of prompt
 
 pointer	sp, resp, gopen()
-int	stat, cmd_write(), scan()
+int	stat, scan()
 bool	answer, streq()
 
 data	answer	/true/
@@ -570,21 +567,21 @@ begin
 	    }
 	    if (!streq(Memc[resp],"\"\"")) {
 	        written = false
-	        stat = cmd_write (rv, written)
+	        call cmd_write (rv, written)
 	        answer = true
 	    } else {
 		call printf ("Results not saved.\n")
-		return (NO)
+	        call sfree (sp)
+		return
 	    }
 
 	} else {
 	    answer = false
 	    call sfree (sp)
-	    return (NO)
+	    return
 	}
 
 	call sfree (sp)
-	return (YES)
 end
 
 

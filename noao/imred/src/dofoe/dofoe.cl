@@ -15,7 +15,7 @@ file	arctable = ""		{prompt="Arc assignment table (optional)\n"}
 
 string	readnoise = "0."	{prompt="Read out noise sigma (photons)"}
 string	gain = "1."		{prompt="Photon gain (photons/data number)"}
-int	dispaxis = ")_.dispaxis" {prompt="Dispersion axis (1=along lines, 2=along columns)"}
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 int	norders = 12		{prompt="Number of orders"}
 real	width = 4.		{prompt="Width of profiles (pixels)"}
 string	arcaps = "2x2"		{prompt="Arc apertures\n"}
@@ -60,7 +60,6 @@ begin
 
 	apscript.readnoise = readnoise
 	apscript.gain = gain
-	apscript.dispaxis = dispaxis
 	if (arcaps != "")
 	    i = 2 * norders
 	else
@@ -77,6 +76,7 @@ begin
 	    scattered = no
 	    apscript.background = background
 	}
+	proc.datamax = datamax
 
 	proc (objects, apref, flat, arcs, arctable, i, "", arcaps,
 	    "", "", fitflat, yes, scattered, no, no, no, clean, dispcor,

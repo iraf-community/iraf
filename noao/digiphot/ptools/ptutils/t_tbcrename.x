@@ -9,7 +9,7 @@ int	columns			# the input columns list descriptor
 int	names			# the output column names list descriptor
 
 pointer	sp, table, incname, outcname, tp, colptr
-int	clpopnu(), clplen(), clgfil()
+int	clpopnu(), clplen(), clgfil(), access(), tbpsta()
 pointer	tbtopn()
 
 begin
@@ -33,7 +33,11 @@ begin
 	while (clgfil (tlist, Memc[table], SZ_FNAME) != EOF) {
 
 	    # If the file is not an ST table go to the next file in the list.
+	    if (access (Memc[table], 0, TEXT_FILE) == YES)
+		next
 	    iferr (tp = tbtopn (Memc[table], READ_WRITE, 0))
+		next
+	    if (tbpsta (tp, TBL_WHTYPE) == TBL_TYPE_TEXT)
 		next
 
 	    # Loop over the input column list.
@@ -42,7 +46,6 @@ begin
 
 		# If the output column already exists in the table skip
 		# to the next input column.
-
 		call tbcfnd (tp, Memc[outcname], colptr, 1)
 		if (colptr != NULL)
 		    next

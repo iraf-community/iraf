@@ -20,6 +20,7 @@ int	newfunction			# New function?
 int	refit				# Use cvrefit?
 
 int	ord
+double	xmin, xmax
 
 pointer	rg_xrangesd()
 #extern	hd_power$t()
@@ -61,9 +62,14 @@ begin
 	        call mfree (IC_WTSFIT(ic), TY_DOUBLE)
 	        IC_YFIT(ic) = NULL
 		IC_WTSFIT(ic) = NULL
-	    } else
+		call alimd (x, npts, xmin, xmax)
+	    } else {
 	        call malloc (IC_YFIT(ic), IC_NFIT(ic), TY_DOUBLE)
+		call alimd (Memd[IC_XFIT(ic)], IC_NFIT(ic), xmin, xmax)
+	    }
 
+	    IC_XMIN(ic) = min (IC_XMIN(ic), real(xmin))
+	    IC_XMAX(ic) = max (IC_XMAX(ic), real(xmax))
 	    refit = NO
 	}
 

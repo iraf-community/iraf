@@ -9,8 +9,8 @@
 int procedure awvgs (a, npix, mean, sigma, lcut, hcut)
 
 short	a[ARB]
-real	mean, sigma, lcut, hcut, value
-real	sum, sumsq, temp
+real	mean, sigma, lcut, hcut
+double	sum, sumsq, value, temp
 int	npix, i, ngpix
 
 begin

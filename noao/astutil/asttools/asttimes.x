@@ -1,3 +1,8 @@
+define	J2000		2000.0D0		# J2000
+define	JD2000		2451545.0D0		# J2000 Julian Date
+define	JYEAR		365.25D0		# Julian year
+
+
 # AST_DATE_TO_EPOCH -- Convert Gregorian date and solar mean time to
 # a Julian epoch.  A Julian epoch has 365.25 days per year and 24
 # hours per day.
@@ -10,17 +15,11 @@ int	day			# Day of month
 double	ut			# Universal time for date (mean solar day)
 double	epoch			# Julian epoch
 
-int	yr
-int	ast_day_of_year()
+double	jd, ast_date_to_julday()
 
 begin
-	if (year < 100)
-	    yr = 1900 + year
-	else
-	    yr = year
-
-	ut = int (ut * 360000. + 0.5) / 360000.
-	epoch = yr + (ast_day_of_year (yr, month, day)-1+ut/24.) / 365.25
+	jd = ast_date_to_julday (year, month, day, ut)
+	epoch = J2000 + (jd - JD2000) / JYEAR
 end
 
 
@@ -34,23 +33,11 @@ int	month			# Month (1-12)
 int	day			# Day of month
 double	ut			# Universal time for date
 
-int	d
-int	ast_day_of_year()
+double	jd
 
 begin
-	year = epoch
-	d = (epoch - year) * 365.25
-	ut = ((epoch - year) * 365.25 - d) * 24.
-	ut = int (ut * 360000. + 0.5) / 360000.
-	if (ut >= 24.) {
-	    d = d + 1
-	    ut = ut - 24.
-	}
-
-	d = d + 1
-	for (month=1; d >= ast_day_of_year (year, month+1, 1); month=month+1)
-	    ;
-	day = d - ast_day_of_year (year, month, 1) + 1
+	jd = JD2000 + (epoch - J2000) * JYEAR
+	call ast_julday_to_date (jd, year, month, day, ut)
 end
 
 
@@ -114,16 +101,11 @@ double procedure ast_julday (epoch)
 
 double	epoch			# Epoch
 
-int	year, century
 double	jd
 
 begin
-      year = int (epoch) - 1
-      century = year / 100
-      jd = 1721425.5d0 +
-	  365 * year - century + int (year / 4) + int (century / 4)
-      jd = jd + (epoch - int(epoch)) * 365.25
-      return (jd)
+	jd = JD2000 + (epoch - J2000) * JYEAR
+	return (jd)
 end
 
 
@@ -153,7 +135,7 @@ begin
 	    y = y - 1
 	}
 
-	jd = int (365.25 * y) + int (30.6001 * m) + day + 1720995
+	jd = int (JYEAR * y) + int (30.6001 * m) + day + 1720995
 	if (day + 31 * (m + 12 * y) >= 588829) {
 	    d = int (y / 100)
 	    m = int (y / 400)
@@ -188,7 +170,7 @@ begin
 	}
 
 	jb = ja + 1524
-	jc = int (6680. + ((jb - 2439870) - 122.1) / 365.25)
+	jc = int (6680. + ((jb - 2439870) - 122.1) / JYEAR)
 	jd = 365 * jc + int (jc / 4)
 	je = int ((jb - jd) / 30.6001)
 	day = jb - jd - int (30.6001 * je)

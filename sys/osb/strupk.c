@@ -28,10 +28,11 @@ XINT	*maxch;
 	/* Is is necessary to determine the length of the string in order to
 	 * be able to unpack the string in place, i.e., from right to left.
 	 */
-	n = strlen (ip);
+	for (n=0;  *ip++;  n++)
+	    ;
 	n = (n < *maxch) ? n : *maxch;
 	op[n] = XEOS;
 
-	while (--n >= 0)
+	for (ip = (char *)instr;  --n >= 0;  )
 	    op[n] = ip[n];
 }

@@ -154,8 +154,8 @@ begin
 	if (and (subunit, 77B) == ZOOM) {
 	    FCB_NBYTES(fcb) = 3 * (SZ_SHORT * SZB_CHAR)
 	    FCB_STATUS(fcb) = IIS_INACTIVE
-	    buf[3] = mod (buf[2], 10000B) 
-	    buf[2] = mod (buf[1], 10000B) 
+	    buf[3] = mod (int(buf[2]), 10000B) 
+	    buf[2] = mod (int(buf[1]), 10000B) 
 	    buf[1] = buf[1] / 10000B
 	}
 

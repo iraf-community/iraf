@@ -2,7 +2,12 @@
 #{ PTOOLS -- Photometry tools package.
 
 if (deftask ("tables")) {
-    tables
+    if (defpar ("tables.motd")) {
+	tables.motd = no
+	tables 
+    } else {
+        tables
+    }
 } else {
     type "ptools$lib/warning.dat"
 }
@@ -16,7 +21,8 @@ task	pconvert,
 	pexamine,
 	tbcrename,
 	tbkeycol,
-	txappend,
+	txconcat,
+	txcalc,
 	txdump,
 	txrenumber,
 	txselect,
@@ -24,13 +30,15 @@ task	pconvert,
 
 # Define the tasks which are CL scripts.
 
-task	tbappend	= "ptools$tbappend.cl"
+task	tbconcat	= "ptools$tbconcat.cl"
 task	tbdump		= "ptools$tbdump.cl"
+task	tbcalc		= "ptools$tbcalc.cl"
 task	tbrenumber	= "ptools$tbrenumber.cl"
 task	tbselect	= "ptools$tbselect.cl"
 task	tbsort		= "ptools$tbsort.cl"
 
-task	pappend		= "ptools$pappend.cl"
+task	pconcat		= "ptools$pconcat.cl"
+task	pcalc		= "ptools$pcalc.cl"
 task	pdump		= "ptools$pdump.cl"
 task	prenumber	= "ptools$prenumber.cl"
 task	pselect		= "ptools$pselect.cl"

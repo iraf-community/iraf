@@ -2,4 +2,5 @@
 
 # Link the SOFTOOLS package.
 
-task	mktags		= t_mktags
+task	mktags		= t_mktags,
+	memchk		= t_memchk

@@ -8,15 +8,22 @@ int	index[ARB]	# sorted index array
 int	npts		# number of pixels
 int	medcut		# averaging half width
 
-int	med, j, nmed
+int	med, j, nmed, medlo, medhi
 real	sumed
 
 begin
-	sumed = 0.0
 	med = (npts + 1) / 2
+	if (mod (med, 2) == 1) {
+	    medlo = max (1, med - medcut)
+	    medhi = min (npts, med + medcut)
+	} else {
+	    medlo = max (1, med - medcut)
+	    medhi = min (npts, med + medcut + 1)
+	}
 
+	sumed = 0.0
 	nmed = 0
-	do j = max (1, med - medcut), min (npts, med + medcut) {
+	do j = medlo, medhi {
 	    sumed = sumed + pix[index[j]]
 	    nmed = nmed + 1
 	}
@@ -64,11 +71,15 @@ int	npix			# number of pixels
 int	med			# index of median value
 int	medcut			# of median cut
 
-int	j, nmed
+int	j, nmed, maxmed
 real	sumed
 
 begin
 	sumed = pix[index[med]]
+	if (mod (med, 2) == 1)
+	    maxmed = 2 * medcut + 1 
+	else
+	    maxmed = 2 * medcut + 2 
 
 	nmed = 1
 	for (j = med - 1; j >= 1; j = j - 1) {
@@ -80,7 +91,7 @@ begin
 	    }
 	}
 	for (j = med + 1; j <= npix; j = j + 1) {
-	    if (nmed >= 2 * medcut + 1)
+	    if (nmed >= maxmed)
 		break
 	    if (weight[index[j]] > 0.0) {
 		sumed = sumed + pix[index[j]]
@@ -89,4 +100,55 @@ begin
 	}
 
 	return (sumed / nmed)
+end
+
+
+# APMEDR -- Vector median selection. The selection is carried out in a temporary
+# array, leaving the input vector unmodified.  Especially demanding applications
+# may wish to call the asok routine directory to avoid the call to the memory
+# allocator.
+
+real procedure apmedr (a, index, npix)
+
+real	a[ARB]				# input array of values
+int	index[ARB]			# sorted index array
+int	npix				# number of pixels
+
+int	i
+pointer	sp, aa
+real	median
+real	asokr()		# select the Kth smallest element from A
+
+begin
+	switch (npix) {
+	case 1, 2:
+	    return (a[1])
+
+	case 3:
+	    if (a[1] < a[2]) {
+		if (a[2] < a[3])
+		    return (a[2])
+		else if (a[1] < a[3])
+		    return (a[3])
+		else
+		    return (a[1])
+	    } else {
+		if (a[2] > a[3])
+		    return (a[2])
+		else if (a[1] < a[3])
+		    return (a[1])
+		else
+		    return (a[3])
+	    }
+
+	default:
+	    call smark (sp)
+	    call salloc (aa, npix, TY_REAL)
+	    do i = 1, npix
+		Memr[aa+i-1] = a[index[i]]
+	    median = asokr (Memr[aa], npix, (npix + 1) / 2)
+	    call sfree (sp)
+
+	    return (median)
+	}
 end

@@ -117,6 +117,11 @@ begin
 		    call strcpy (Memc[cmd], PX_XCOLNAME(px), PX_SZCOLNAME)
 		    newxy = YES
 		    newplot = YES
+		    call clputr ("xyplot.x1", INDEFR)
+		    call clputr ("xyplot.x2", INDEFR)
+		} else {
+		    call printf ("Column %s not found\n")
+			call pargstr (PX_RXCOLNAME(px))
 		}
 	    }
 
@@ -134,6 +139,11 @@ begin
 		    call strcpy (Memc[cmd], PX_YCOLNAME(px), PX_SZCOLNAME)
 		    newxy = YES
 		    newplot = YES
+		    call clputr ("xyplot.y1", INDEFR)
+		    call clputr ("xyplot.y2", INDEFR)
+		} else {
+		    call printf ("Column %s not found\n")
+			call pargstr (PX_RYCOLNAME(px))
 		}
 	    }
 
@@ -151,6 +161,15 @@ begin
 		    call strcpy (Memc[cmd], PX_HCOLNAME(px), PX_SZCOLNAME)
 		    newhist = YES
 		    newplot = YES
+		    call clputr ("histplot.z1", INDEFR)
+		    call clputr ("histplot.z2", INDEFR)
+		    call clputr ("histplot.x1", INDEFR)
+		    call clputr ("histplot.x2", INDEFR)
+		    call clputr ("histplot.y1", INDEFR)
+		    call clputr ("histplot.y2", INDEFR)
+		} else {
+		    call printf ("Column %s not found\n")
+			call pargstr (PX_RHCOLNAME(px))
 		}
 	    }
 
@@ -167,6 +186,9 @@ begin
 		    Memc[PX_COLNAMES(px)]) > 0) {
 		    call strcpy (Memc[cmd], PX_XPOSNAME(px), PX_SZCOLNAME)
 		    newcoords = YES
+		} else {
+		    call printf ("Column %s not found\n")
+			call pargstr (PX_RXPOSNAME(px))
 		}
 	    }
 
@@ -183,6 +205,9 @@ begin
 		    Memc[PX_COLNAMES(px)]) > 0) {
 		    call strcpy (Memc[cmd], PX_YPOSNAME(px), PX_SZCOLNAME)
 		    newcoords = YES
+		} else {
+		    call printf ("Column %s not found\n")
+			call pargstr (PX_RXPOSNAME(px))
 		}
 	    }
 
@@ -240,40 +265,44 @@ begin
 	    }
 
 	case PX_PCMD_NBINS:
+	    call strcpy ("histplot.nbins", Memc[str], SZ_LINE)
 	    call gargi (ival)
 	    if (nscan() == 1) {
-		ival = clgeti ("histplot.nbins")
+		ival = clgeti (Memc[str])
 		call printf ("nbins = %d\n")
 		    call pargi (ival)
 	    } else
-		call clputi ("histplot.nbins", ival)
+		call clputi (Memc[str], ival)
 
 	case PX_PCMD_Z1:
+	    call strcpy ("histplot.z1", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("histplot.z1")
+		rval = clgetr (Memc[str])
 		call printf ("z1 = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("histplot.z1", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_Z2:
+	    call strcpy ("histplot.z2", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("histplot.z2")
+		rval = clgetr (Memc[str])
 		call printf ("z2 = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("histplot.z2", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_TOP_CLOSED:
+	    call strcpy ("histplot.top_closed", Memc[str], SZ_LINE)
 	    call gargb (bval)
 	    if (nscan() == 1) {
-		bval = clgetb ("histplot.top_closed")
+		bval = clgetb (Memc[str])
 		call printf ("top_closed = %b\n")
 		    call pargb (bval)
 	    } else
-		call clputb ("histplot.top_closed", bval)
+		call clputb (Memc[str], bval)
 
 	case PX_PCMD_X1:
 	    call strcat (Memc[cmd], Memc[str], SZ_LINE)
@@ -478,22 +507,24 @@ begin
 	    }
 
 	case PX_PCMD_RIN:
+	    call strcpy ("radplot.rinner", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("radplot.rinner")
+		rval = clgetr (Memc[str])
 		call printf ("rinner = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("radplot.rinner", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_ROUT:
+	    call strcpy ("radplot.router", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("radplot.router")
+		rval = clgetr (Memc[str])
 		call printf ("router = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("radplot.router", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_NCOLUMNS:
 	    call strcat (Memc[cmd], Memc[str], SZ_LINE)
@@ -518,31 +549,34 @@ begin
 		call clputi (Memc[str], ival)
 
 	case PX_PCMD_AXES:
+	    call strcpy ("surfplot.axes", Memc[str], SZ_LINE)
 	    call gargb (bval)
 	    if (nscan() == 1) {
-		bval = clgetb ("surfplot.axes")
+		bval = clgetb (Memc[str])
 		call printf ("axes = %b\n")
 		    call pargb (bval)
 	    } else
-		call clputb ("surfplot.axes", bval)
+		call clputb (Memc[str], bval)
 
 	case PX_PCMD_ANGH:
+	    call strcpy ("surfplot.angh", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("surfplot.angh")
+		rval = clgetr (Memc[str])
 		call printf ("angh = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("surfplot.angh", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_ANGV:
+	    call strcpy ("surfplot.angv", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("surfplot.angv")
+		rval = clgetr (Memc[str])
 		call printf ("angv = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("surfplot.angv", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_FLOOR:
 	    call strcat (Memc[cmd], Memc[str], SZ_LINE)
@@ -567,58 +601,64 @@ begin
 		call clputr (Memc[str], rval)
 
 	case PX_PCMD_ZERO:
+	    call strcpy ("cntrplot.zero", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("cntrplot.zero")
+		rval = clgetr (Memc[str])
 		call printf ("zero = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("cntrplot.zero", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_NCONTOURS:
+	    call strcpy ("cntrplot.ncontours", Memc[str], SZ_LINE)
 	    call gargi (ival)
 	    if (nscan() == 1) {
-		ival = clgeti ("cntrplot.ncontours")
+		ival = clgeti (Memc[str])
 		call printf ("ncontours = %d\n")
 		    call pargi (ival)
 	    } else
-		call clputi ("cntrplot.ncontours", ival)
+		call clputi (Memc[str], ival)
 
 	case PX_PCMD_INTERVAL:
+	    call strcpy ("cntrplot.interval", Memc[str], SZ_LINE)
 	    call gargr (rval)
 	    if (nscan() == 1) {
-		rval = clgetr ("cntrplot.interval")
+		rval = clgetr (Memc[str])
 		call printf ("interval = %g\n")
 		    call pargr (rval)
 	    } else
-		call clputr ("cntrplot.interval", rval)
+		call clputr (Memc[str], rval)
 
 	case PX_PCMD_NHI:
+	    call strcpy ("cntrplot.nhi", Memc[str], SZ_LINE)
 	    call gargi (ival)
 	    if (nscan() == 1) {
-		ival = clgeti ("cntrplot.nhi")
+		ival = clgeti (Memc[str])
 		call printf ("nhi = %d\n")
 		    call pargi (ival)
 	    } else
-		call clputi ("cntrplot.nhi", ival)
+		call clputi (Memc[str], ival)
 
 	case PX_PCMD_DASHPAT:
+	    call strcpy ("cntrplot.dashpat", Memc[str], SZ_LINE)
 	    call gargi (ival)
 	    if (nscan() == 1) {
-		ival = clgeti ("cntrplot.dashpat")
+		ival = clgeti (Memc[str])
 		call printf ("dashpat = %d\n")
 		    call pargi (ival)
 	    } else
-		call clputi ("cntrplot.dashpat", ival)
+		call clputi (Memc[str], ival)
 
 	case PX_PCMD_LABEL:
+	    call strcpy ("cntrplot.label", Memc[str], SZ_LINE)
 	    call gargb (bval)
 	    if (nscan() == 1) {
-		bval = clgetb ("cntrplot.label")
+		bval = clgetb (Memc[str])
 		call printf ("label = %b\n")
 		    call pargb (bval)
 	    } else
-		call clputb ("cntrplot.label", bval)
+		call clputb (Memc[str], bval)
 
 	default:
 	    call printf ("Unknown or ambiguous colon command\7\n")

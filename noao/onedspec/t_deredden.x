@@ -1,6 +1,6 @@
 include	<error.h>
 include	<imhdr.h>
-include "shdr.h"
+include	<smw.h>
 
 define	DEREDTYPES	"|A(V)|E(B-V)|c|"
 
@@ -17,17 +17,18 @@ pointer	outlist		# Output list
 real	av		# Extinction parameter: A(V), E(B-V), c
 real	rv		# A(V)/E(B-V)
 
-bool	dered
-int	i, j
+int	i, j, n
+real	w, avold, rvold
 pointer	sp, input, output, temp, log, aps
-pointer	in, out, mw, sh, tmp, data
+pointer	in, out, mw, sh, tmp, inbuf, outbuf
 
 long	clktime()
 real	clgetr()
-bool	clgetb(), streq(), is_in_range()
-int	clgwrd(), imtgetim(), imtlen(), imaccf(), decode_ranges()
-pointer	imtopenp(), immap(), smw_openim(), impl3r()
-errchk	immap, smw_openim, shdr_open, deredden
+double	shdr_lw()
+bool	clgetb(), streq(), rng_elementi()
+int	clgwrd(), imtgetim(), imtlen(), imaccf(), nscan(), strncmp(), ctor()
+pointer	imtopenp(), rng_open(), immap(), smw_openim(), imgl3r(), impl3r()
+errchk	immap, smw_openim, shdr_open, deredden, deredden1
 
 begin
 	call smark (sp)
@@ -35,7 +36,6 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (temp, SZ_LINE, TY_CHAR)
 	call salloc (log,  SZ_LINE, TY_CHAR)
-	call salloc (aps, 300, TY_INT)
 
 	call cnvdate (clktime(0), Memc[log], SZ_LINE)
 
@@ -73,7 +73,7 @@ begin
 	}
 
 	call clgstr ("apertures", Memc[temp], SZ_LINE)
-	if (decode_ranges (Memc[temp], Memi[aps], 100, i) == ERR)
+	iferr (aps = rng_open (Memc[temp], INDEF, INDEF, INDEF))
 	    call error (0, "Bad aperture list")
 	if (Memc[temp] != EOS) {
 	    call sprintf (Memc[log], SZ_LINE, "%s ap=%s")
@@ -97,21 +97,41 @@ begin
 		# Map the image and check its calibration status.
 		tmp = immap (Memc[input], READ_ONLY, 0); in = tmp
 		tmp = smw_openim (in); mw = tmp
-		call shdr_open (in, mw, 1, 1, INDEFI, SHDATA, sh)
-	    
+
+		call shdr_open (in, mw, 1, 1, INDEFI, SHHDR, sh)
 		if (DC(sh) == DCNO) {
 		    call sprintf (Memc[temp], SZ_LINE,
 			"[%s] has no dispersion function")
 			call pargstr (Memc[input])
 		    call error (1, Memc[temp])
 		}
+		call shdr_units (sh, "angstroms")
 
-		if (!clgetb ("override")) {
-		    if (imaccf (in, "DEREDDEN") == YES) {
+		rvold = rv
+		avold = 0.
+		if (imaccf (in, "DEREDDEN") == YES) {
+		    if (!clgetb ("override")) {
 			call sprintf (Memc[temp], SZ_LINE,
 			    "[%s] has already been corrected")
 			call pargstr (Memc[input])
 			call error (1, Memc[temp])
+		    } else {
+			if (clgetb ("uncorrect")) {
+			    call imgstr (in, "DEREDDEN", Memc[temp], SZ_LINE)
+			    call sscan (Memc[temp])
+			    for (i=1;; i=i+1) {
+				call gargwrd (Memc[temp], SZ_LINE)
+				if (nscan() < i)
+				    break
+				if (strncmp (Memc[temp], "A(V)=", 5) == 0) {
+				    j = 6
+				    j = ctor (Memc[temp], j, avold)
+				} else if (strncmp (Memc[temp], "R=", 2) == 0) {
+				    j = 3
+				    j = ctor (Memc[temp], j, rvold)
+				}
+			    }
+			}
 		    }
 		}
 
@@ -121,36 +141,63 @@ begin
 		else
 		    call strcpy (Memc[output], Memc[temp], SZ_LINE)
 		tmp = immap (Memc[temp], NEW_COPY, in); out = tmp
-		IM_PIXTYPE(out) = TY_REAL
+		if (IM_PIXTYPE(out) != TY_DOUBLE)
+		    IM_PIXTYPE(out) = TY_REAL
 		call imastr (out, "DEREDDEN", Memc[log])
 
-		do i = 1, IM_LEN(out,2) {
-		    call shdr_open (in, mw, i, 1, INDEFI, SHDATA, sh)
-
-		    if (is_in_range (Memi[aps], AP(sh)))
-			dered = true
+		# Initialize for NDSPEC data.
+		if (SMW_FORMAT(mw) == SMW_ND) {
+		    if (SX(sh) == NULL)
+			call malloc (SX(sh), SN(sh), TY_REAL)
 		    else
-			dered = false
-			
-		    if (dered) {
-			call printf ("[%s][%d]: %s\n  %s\n")
-			    call pargstr (Memc[output])
-			    call pargi (AP(sh))
-			    call pargstr (TITLE(sh))
-			    call pargstr (Memc[log])
-		    }
+			call realloc (SX(sh), SN(sh), TY_REAL)
+		    do i = 1, SN(sh)
+			Memr[SX(sh)+i-1] = shdr_lw (sh, double(i))
+		}
 
-		    do j = 1, IM_LEN(out,3) {
-			call shdr_open (in, mw, i, j, INDEFI, SHDATA, sh)
-			if (dered) {
-			    call deredden (Memr[SX(sh)], Memr[SY(sh)], SN(sh),
-				av, rv)
+		# Log operation.
+		call printf ("[%s]: %s\n  %s\n")
+		    call pargstr (Memc[output])
+		    call pargstr (IM_TITLE(in))
+		    call pargstr (Memc[log])
+
+		# Deredden data.
+		n = IM_LEN(in,1)
+		do j = 1, IM_LEN(in,3) {
+		    do i = 1, IM_LEN(in,2) {
+			outbuf = impl3r (out, i, j)
+			switch (SMW_FORMAT(mw)) {
+			case SMW_ND:
+			    inbuf = imgl3r (in, i, j)
+			    switch (SMW_LAXIS(mw,1)) {
+			    case 1:
+				call deredden (Memr[SX(sh)], Memr[inbuf],
+				    Memr[outbuf], SN(sh), av, rv, avold, rvold)
+			    case 2:
+				w = Memr[SX(sh)+i-1]
+				call deredden1 (w, Memr[inbuf], Memr[outbuf],
+				    n, av, rv, avold, rvold)
+			    case 3:
+				w = Memr[SX(sh)+j-1]
+				call deredden1 (w, Memr[inbuf], Memr[outbuf],
+				    n, av, rv, avold, rvold)
+			    }
+			case SMW_ES, SMW_MS:
+			    call shdr_open (in, mw, i, j, INDEFI, SHDATA, sh)
+			    if (rng_elementi (aps, AP(sh))) {
+				if (j==1) {
+				    call printf ("  Ap %d: %s\n")
+					call pargi (AP(sh))
+					call pargstr (TITLE(sh))
+				}
+				call deredden (Memr[SX(sh)], Memr[SY(sh)],
+				    Memr[outbuf], SN(sh), av, rv, avold, rvold)
+			    } else
+				call amovr (Memr[SY(sh)], Memr[outbuf], SN(sh))
+			    if (IM_LEN(out,1) > SN(sh))
+				call amovkr (Memr[SY(sh)+SN(sh)-1],
+				    Memr[outbuf+SN(sh)], IM_LEN(out,1)-SN(sh))
 			}
-			data = impl3r (out, i, j)
-			call amovr (Memr[SY(sh)], Memr[data], SN(sh))
-			if (IM_LEN(out,1) > SN(sh))
-			    call amovkr (Memr[SY(sh)+SN(sh)-1],
-				Memr[data+SN(sh)-1], IM_LEN(out,1)-SN(sh))
 		    }
 		}
 	    } then {
@@ -161,8 +208,12 @@ begin
 		call erract (EA_WARN)
 	    }
 
-	    if (mw != NULL)
-		call mw_close (mw)
+	    if (mw != NULL) {
+		if (MW(sh) == mw)
+		    call smw_close (MW(sh))
+		else
+		    call smw_close (mw)
+	    }
 	    if (out != NULL) {
 		call imunmap (out)
 		call imunmap (in)
@@ -175,6 +226,7 @@ begin
 	}
 
 	call shdr_close (sh)
+	call rng_close (aps)
 	call imtclose (inlist)
 	call imtclose (outlist)
 	call sfree (sp)
@@ -183,23 +235,68 @@ end
 
 # DEREDDEN -- Deredden spectrum
 
-procedure deredden (x, y, n, av, rv)
+procedure deredden (x, y, z, n, av, rv, avold, rvold)
 
 real	x[n]			# Wavelengths
-real	y[n]			# Fluxes
+real	y[n]			# Input fluxes
+real	z[n]			# Output fluxes
 int	n			# Number of points
-real	av			# A(V)
-real	rv			# A(V)/E(B-V)
+real	av, avold		# A(V)
+real	rv, rvold		# A(V)/E(B-V)
 
 int	i
-real	z, ccm()
+real	cor, ccm()
 errchk	ccm
 
 begin
-	do i = 1, n {
-	    z = av * ccm (x[i], rv)
-	    y[i] = y[i] * 10. ** (0.4 * z)
+	if (avold != 0.) {
+	    if (rv != rvold) {
+		do i = 1, n {
+		    cor = 10. ** (0.4 *
+			(av * ccm (x[i], rv) - avold * ccm (x[i], rvold)))
+		    z[i] = y[i] * cor
+		}
+	    } else {
+		do i = 1, n {
+		    cor = 10. ** (0.4 * (av - avold) * ccm (x[i], rv))
+		    z[i] = y[i] * cor
+		}
+	    }
+	} else {
+	    do i = 1, n {
+		cor = 10. ** (0.4 * av * ccm (x[i], rv))
+		z[i] = y[i] * cor
+	    }
 	}
+end
+
+
+# DEREDDEN1 -- Deredden fluxes at a single wavelength
+
+procedure deredden1 (x, y, z, n, av, rv, avold, rvold)
+
+real	x			# Wavelength
+real	y[n]			# Input fluxes
+real	z[n]			# Output fluxes
+int	n			# Number of points
+real	av, avold		# A(V)
+real	rv, rvold		# A(V)/E(B-V)
+
+int	i
+real	cor, ccm()
+errchk	ccm
+
+begin
+	if (avold != 0.) {
+	    if (rv != rvold)
+		cor = 10. ** (0.4 *
+		    (av * ccm (x, rv) - avold * ccm (x, rvold)))
+	    else
+		cor = 10. ** (0.4 * (av - avold) * ccm (x, rv))
+	} else
+	    cor = 10. ** (0.4 * av * ccm (x, rv))
+	do i = 1, n
+	    z[i] = y[i] * cor
 end
 
 
@@ -230,7 +327,7 @@ begin
 	    a = 1 + y * (0.17699 + y * (-0.50447 + y * (-0.02427 +
 		y * (0.72085 + y * (0.01979 + y * (-0.77530 + y * 0.32999))))))
 	    b = y * (1.41338 + y * (2.28305 + y * (1.07233 + y * (-5.38434 +
-		y * (-0.62251 + y * (5.30260 + y * -2.09002))))))
+		y * (-0.62251 + y * (5.30260 + y * (-2.09002)))))))
 
 	} else if (x < 5.9) {
 	    y = (x - 4.67) ** 2

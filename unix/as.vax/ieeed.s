@@ -70,6 +70,8 @@ L2:	jsb	cvt_ieee_vax			# convert one value
 _ieesnd_:	# IEESNAND (VAXNAN)
 	.word	0x0
 	movq	*4(ap), vaxnan
+        clrl    nanin
+        clrl    nanout
 	ret
 _ieegnd_:	# IEEGNAND (VAXNAN)
 	.word	0x0

@@ -53,9 +53,13 @@ begin
 	if (ph_amfit (imtable, agr, nap, rap, mag, merr, naperts, params,
 	    lterms) == ERR) {
 	    call printf ("Error: The cog model fit did not converge\n")
-	    if (logfd != NULL)
+	    if (logfd != NULL) {
+		call ph_ishow (logfd, params, lterms)
+	        call ph_pshow (logfd, agr, lterms)
+	        call ph_rshow (logfd, imtable)
 	        call fprintf (logfd,
 		    "Error: The cog model fit did not converge\n")
+	    }
 	} else {
 	    if (logfd != NULL) {
 		call ph_ishow (logfd, params, lterms)
@@ -64,9 +68,8 @@ begin
 	    }
 	    call ph_aeval (imtable, agr, apcat, magfd, logfd, mgd, id, x, y,
 	        nap, rap, mag, merr, naperts, smallap, largeap)
-	    if (logfd != NULL) {
+	    if (logfd != NULL)
 		call ph_tfshow (logfd, agr, naperts)
-	    }
 	}
 
 	# Free memory required for fitting.
@@ -168,7 +171,7 @@ double	params[ARB]		# the parameters to be fit
 int	lterms			# number of terms to fit
 
 double	pold, sumd, sumw, sumn, sumr, sumy, old
-int	niter, k, nimages, ipow, nterms, iflag
+int	niter, i, j, k, nimages, ipow, nterms, iflag, ntimes, ngood
 pointer	sp, sym, symbol
 real	gain, rold, rclamp, dr
 int	stnsymbols()
@@ -221,8 +224,21 @@ begin
 		symbol = Memi[sym+k-1]
 
 		# Check to see if there is any data.
-		if (IMT_NENTRIES(symbol) <= 0)
+		if (IMT_NENTRIES(symbol) <= 0) {
+		    IMT_RO(symbol) = INDEFR
 		    next
+		}
+
+		# Check to see if there is any good data.
+		ngood = 0
+		do i = 1, IMT_NENTRIES(symbol) {
+		    do j = 2, nap[i]
+			ngood = ngood + 1
+		}
+		if (ngood <= 0) {
+		    IMT_RO(symbol) = INDEFR
+		    next
+		}
 
 		# Get better estimage of ro.
 		if (niter == 1) {
@@ -240,6 +256,7 @@ begin
 		# Get the new estimate of ro
 		rold = 0.0
 		rclamp = IMT_RO(symbol) / 4.0
+		ntimes = 0
 		repeat {
 		    
 		    sumr = 0.0d0
@@ -268,12 +285,19 @@ begin
 			    return (ERR)
 			}
 			rold = dr
-			if (abs (dr / IMT_RO(symbol)) > 3.0e-4)
-			    next
-			else
+			if (abs (dr / IMT_RO(symbol)) <= 3.0e-4)
 			    break
-		    } else
+		    } else {
+			IMT_RO(symbol) = INDEFR
 		        break
+		    }
+
+		    ntimes = ntimes + 1
+		    if (ntimes >= 100) {
+			IMT_RO(symbol) = INDEFR
+			call sfree (sp)
+			return (ERR)
+		    }
 		}
 
 		call ph_adp (rap[1,IMT_OFFSET(symbol)], Memd[AGR_DM(agr)],
@@ -414,7 +438,7 @@ begin
 	    "\nThe seeing radius and assumed airmass for each image\n")
 	do i = 1, nimages {
 	    symbol = Memi[sym+i-1]
-	    call fprintf (fd, "\t%s  %8.4f  %8.3f\n")
+	    call fprintf (fd, "%30s  %8.4f  %8.3f\n")
 		call pargstr (IMT_IMNAME(symbol))
 		call pargr (IMT_RO(symbol))
 		call pargr (IMT_XAIRMASS(symbol))
@@ -500,11 +524,15 @@ begin
 	    call aclrr (Memr[AGR_RESSQ(agr)], naperts)
 	    call aclrr (Memr[AGR_WR(agr)], naperts)
 
-	    call ph_tinit (rap[1,IMT_OFFSET(symbol)], Memr[AGR_RBAR(agr)],
-	        Memr[AGR_THEO(agr)], naperts, Memd[AGR_PARAMS(agr)],
-		IMT_RO(symbol), IMT_NXAIRMASS(symbol))
 	    call aclrr (Memr[AGR_ADOPT(agr)], naperts)
+	    call aclrr (Memr[AGR_WADO(agr)], naperts)
 	    call aclrr (Memr[AGR_WOBS(agr)], naperts)
+
+	    call ph_rinit (rap[1,IMT_OFFSET(symbol)], Memr[AGR_RBAR(agr)],
+	        naperts)
+	    call ph_tinit (rap[1,IMT_OFFSET(symbol)], Memr[AGR_THEO(agr)],
+	        naperts, Memd[AGR_PARAMS(agr)], IMT_RO(symbol),
+		IMT_NXAIRMASS(symbol))
 
 	    # Accumulate the difference data.
 	    call ph_taccum (nap[IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
@@ -522,8 +550,9 @@ begin
 		IMT_RO(symbol), IMT_NXAIRMASS(symbol))
 
 	    # Write the aperture photometry file.
-	    call ph_wapcat (apcat, IMT_IMNAME(symbol), Memr[AGR_ADOPT(agr)],
-	        Memr[AGR_WADO(agr)], naperts, smallap, largeap)
+	    call ph_wapcat (apcat, IMT_IMNAME(symbol), IMT_RO(symbol),
+	        Memr[AGR_ADOPT(agr)], Memr[AGR_WADO(agr)], naperts, smallap,
+		largeap)
 
 	    if (logfd != NULL) {
 		call ph_twrite (logfd, IMT_IMNAME(symbol), IMT_RO(symbol),
@@ -543,7 +572,7 @@ begin
 		    Memr[AGR_WCUM(agr)], Memr[AGR_MAGS(agr)],
 		    Memr[AGR_CMAGS(agr)], Memr[AGR_TMAGS(agr)],
 		    Memr[AGR_WMAGS(agr)], naperts, IMT_NENTRIES(symbol))
-		call ph_papcor (logfd, IMT_IMNAME(symbol),
+		call ph_papcor (logfd, IMT_IMNAME(symbol), IMT_RO(symbol),
 		    rap[1,IMT_OFFSET(symbol)], Memr[AGR_ADOPT(agr)],
 		    Memr[AGR_WADO(agr)], naperts, smallap, largeap)
 		call fprintf (logfd, "\n")
@@ -566,40 +595,45 @@ begin
 		    nap[IMT_OFFSET(symbol)], rap[1,IMT_OFFSET(symbol)],
 		    mag[1,IMT_OFFSET(symbol)], naperts,
 		    IMT_NENTRIES(symbol), YES)
-		call ph_gaimres (mgd, agr, IMT_IMNAME(symbol), IMT_RO(symbol),
-		    IMT_XAIRMASS(symbol), nap[IMT_OFFSET(symbol)],
-		    nap[IMT_OFFSET(symbol)], rap[1,IMT_OFFSET(symbol)],
-		    mag[1,IMT_OFFSET(symbol)], naperts, IMT_NENTRIES(symbol),
-		    YES)
-		call ph_gbimres (mgd, agr, IMT_IMNAME(symbol), IMT_RO(symbol),
-		    IMT_XAIRMASS(symbol), nap[IMT_OFFSET(symbol)],
-		    nap[IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
-		    naperts, IMT_NENTRIES(symbol), YES)
-		call ph_gaximres (mgd, agr, IMT_IMNAME(symbol),
-		    IMT_RO(symbol), IMT_XAIRMASS(symbol),
-		    nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
-		    x[IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)], naperts,
-		    IMT_NENTRIES(symbol), YES)
-		call ph_gayimres (mgd, agr, IMT_IMNAME(symbol), IMT_RO(symbol),
-		    IMT_XAIRMASS(symbol), nap[IMT_OFFSET(symbol)],
-		    nap[IMT_OFFSET(symbol)], y[IMT_OFFSET(symbol)],
-		    mag[1,IMT_OFFSET(symbol)], naperts,
-		    IMT_NENTRIES(symbol), YES)
-		call ph_gacum (mgd, agr, IMT_IMNAME(symbol), IMT_RO(symbol),
-		    IMT_XAIRMASS(symbol), nap[IMT_OFFSET(symbol)],
-		    nap[IMT_OFFSET(symbol)], rap[1,IMT_OFFSET(symbol)],
-		    mag[1,IMT_OFFSET(symbol)], naperts, IMT_NENTRIES(symbol),
-		    smallap, largeap, YES)
+	        if (! IS_INDEFR(IMT_RO(symbol))) {
+		    call ph_gaimres (mgd, agr, IMT_IMNAME(symbol),
+		        IMT_RO(symbol), IMT_XAIRMASS(symbol),
+			nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
+			rap[1,IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
+			naperts, IMT_NENTRIES(symbol), YES)
+		    call ph_gbimres (mgd, agr, IMT_IMNAME(symbol),
+		        IMT_RO(symbol), IMT_XAIRMASS(symbol),
+			nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
+			mag[1,IMT_OFFSET(symbol)], naperts,
+			IMT_NENTRIES(symbol), YES)
+		    call ph_gaximres (mgd, agr, IMT_IMNAME(symbol),
+		        IMT_RO(symbol), IMT_XAIRMASS(symbol),
+		        nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
+		        x[IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
+			naperts, IMT_NENTRIES(symbol), YES)
+		    call ph_gayimres (mgd, agr, IMT_IMNAME(symbol),
+		        IMT_RO(symbol), IMT_XAIRMASS(symbol),
+			nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
+			y[IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
+			naperts, IMT_NENTRIES(symbol), YES)
+		    call ph_gacum (mgd, agr, IMT_IMNAME(symbol),
+		        IMT_RO(symbol), IMT_XAIRMASS(symbol),
+			nap[IMT_OFFSET(symbol)], nap[IMT_OFFSET(symbol)],
+			rap[1,IMT_OFFSET(symbol)], mag[1,IMT_OFFSET(symbol)],
+			naperts, IMT_NENTRIES(symbol), smallap, largeap, YES)
+		}
 	    }
 
-	    call aaddr (Memr[AGR_AVE(agr)], Memr[AGR_TAVE(agr)],
-	        Memr[AGR_TAVE(agr)], naperts)
-	    call aaddr (Memr[AGR_RESID(agr)], Memr[AGR_TRESID(agr)],
-	        Memr[AGR_TRESID(agr)], naperts)
-	    call aaddr (Memr[AGR_RESSQ(agr)], Memr[AGR_TRESSQ(agr)],
-	        Memr[AGR_TRESSQ(agr)], naperts)
-	    call aaddr (Memr[AGR_WR(agr)], Memr[AGR_TWR(agr)],
-	        Memr[AGR_TWR(agr)], naperts)
+	    if (! IS_INDEFR(IMT_RO(symbol))) {
+	        call aaddr (Memr[AGR_AVE(agr)], Memr[AGR_TAVE(agr)],
+	            Memr[AGR_TAVE(agr)], naperts)
+	        call aaddr (Memr[AGR_RESID(agr)], Memr[AGR_TRESID(agr)],
+	            Memr[AGR_TRESID(agr)], naperts)
+	        call aaddr (Memr[AGR_RESSQ(agr)], Memr[AGR_TRESSQ(agr)],
+	            Memr[AGR_TRESSQ(agr)], naperts)
+	        call aaddr (Memr[AGR_WR(agr)], Memr[AGR_TWR(agr)],
+	            Memr[AGR_TWR(agr)], naperts)
+	    }
 	}
 end
 
@@ -626,12 +660,13 @@ begin
 	call aclrr (Memr[AGR_RESID(agr)], naperts)
 	call aclrr (Memr[AGR_RESSQ(agr)], naperts)
 	call aclrr (Memr[AGR_WR(agr)], naperts)
-
-	# Compute the theoretical curve
-	call ph_tinit (rap, Memr[AGR_RBAR(agr)], Memr[AGR_THEO(agr)], naperts,
-	    Memd[AGR_PARAMS(agr)], r0, xairmass)
 	call aclrr (Memr[AGR_ADOPT(agr)], naperts)
 	call aclrr (Memr[AGR_WOBS(agr)], naperts)
+
+	# Compute the theoretical curve
+	call ph_rinit (rap, Memr[AGR_RBAR(agr)], naperts)
+	call ph_tinit (rap, Memr[AGR_THEO(agr)], naperts,
+	    Memd[AGR_PARAMS(agr)], r0, xairmass)
 
 	# Accumulate the difference data.
 	call ph_taccum (nap, mag, merr, Memr[AGR_THEO(agr)], Memr[AGR_W(agr)],
@@ -1020,13 +1055,26 @@ begin
 	call fprintf (fd, "\n")
 end
 
+# PH_RINIT -- Initialize the rbar vector.
 
-# PH_TINIT -- Initialize the rbar vector and compute the theoretical estimates.
-
-procedure ph_tinit (rap, rbar, theo, naperts, params, r0, airmass)
+procedure ph_rinit (rap, rbar, naperts)
 
 real	rap[ARB]		# the array of aperture radii
 real	rbar[ARB]		# the mean radius estimates
+int	naperts			# the number of aperture radii
+
+int	j
+
+begin
+	do j = 2, naperts 
+	    rbar[j] = 0.5 * (rap[j-1] + rap[j])
+end
+
+# PH_TINIT -- Initialize the rbar vector and compute the theoretical estimates.
+
+procedure ph_tinit (rap, theo, naperts, params, r0, airmass)
+
+real	rap[ARB]		# the array of aperture radii
 real	theo[ARB]		# the current model estimates
 int	naperts			# the number of aperture radii
 double	params[ARB]		# the current parameter estimates
@@ -1037,9 +1085,11 @@ int	j
 double	ph_dmag()
 
 begin
-	do j = 2, naperts {
-	    rbar[j] = 0.5 * (rap[j-1] + rap[j])
-	    theo[j] = ph_dmag (rap[j-1], rap[j], airmass, r0, params)
+	if (IS_INDEFR(r0))
+	    call amovkr (INDEFR, theo[2], naperts - 1)
+	else {
+	    do j = 2, naperts 
+	        theo[j] = ph_dmag (rap[j-1], rap[j], airmass, r0, params)
 	}
 end
 
@@ -1074,20 +1124,32 @@ begin
 	    if (nap[i] <= 1)
 		next
 	    do j = 2, nap[i] {
-		diff = mag[j,i] - theo[j]
-		w[j] = 1.0 / (1.0 + abs (diff / (2.0 * merr[j,i])))
-		w[j] = min (w[j], w[j-1])
-		wt = w[j] / merr[j,i] ** 2
+		if (IS_INDEFR(theo[j])) {
+		    wt = 1.0 / merr[j,i] ** 2
+		    ave[1] = INDEFR
+		    ave[j] = INDEFR
+		    resid[1] = INDEFR
+		    resid[j] = INDEFR
+		    ressq[1] = INDEFR
+		    ressq[j] = INDEFR
+		    wr[1] = INDEFR
+		    wr[j] = INDEFR
+		} else {
+		    diff = mag[j,i] - theo[j]
+		    w[j] = 1.0 / (1.0 + abs (diff / (2.0 * merr[j,i])))
+		    w[j] = min (w[j], w[j-1])
+		    wt = w[j] / merr[j,i] ** 2
+		    ave[1] = ave[1] + wt * theo[j]
+		    ave[j] = ave[j] + wt * theo[j]
+		    resid[1] = resid[1] + wt * diff
+		    resid[j] = resid[j] + wt * diff
+		    ressq[1] = ressq[1] + wt * diff ** 2
+		    ressq[j] = ressq[j] + wt * diff ** 2
+		    wr[1] = wr[1] + wt
+		    wr[j] = wr[j] + wt
+		}
 		adopt[j] = adopt[j] + wt * mag[j,i]
 		wobs[j] = wobs[j] + wt
-		ave[1] = ave[1] + wt * theo[j]
-		ave[j] = ave[j] + wt * theo[j]
-		resid[1] = resid[1] + wt * diff
-		resid[j] = resid[j] + wt * diff
-		ressq[1] = ressq[1] + wt * diff ** 2
-		ressq[j] = ressq[j] + wt * diff ** 2
-		wr[1] = wr[1] + wt
-		wr[j] = wr[j] + wt
 	    }
 	}
 
@@ -1138,9 +1200,13 @@ begin
 	scale = 0.1
 	do j = 2, naperts {
 	    if (wobs[j] > 0.0) {
-		wt = 1.0 / (scale * theo[j]) ** 2
 		obs[j] = adopt[j] / wobs[j]
-		adopt[j] = adopt[j] + wt * theo[j]
+		if (IS_INDEFR(theo[j]))
+		    wt = 0.0
+		else {
+		    wt = 1.0 / (scale * theo[j]) ** 2
+		    adopt[j] = adopt[j] + wt * theo[j]
+		}
 		wt = 1.0 / (wobs[j] + wt)
 		adopt[j] = wt * adopt[j]
 		#wado[j] = sqrt (wt)
@@ -1148,7 +1214,12 @@ begin
 		wobs[j] = sqrt (1.0 / wobs[j])
 	    } else {
 		adopt[j] = theo[j]
-		wado[j] = 2.0 * scale * abs (theo[j])
+		if (IS_INDEFR(theo[j])) {
+		    wado[j] = INDEFR
+		    obs[j] = INDEFR
+		    wobs[j] = INDEFR
+		} else
+		    wado[j] = 2.0 * scale * abs (theo[j])
 	    }
 	}
 end
@@ -1174,24 +1245,31 @@ int	i
 double	ph_dmag()
 
 begin
-	cum[naperts+1] = 0.0
-	tcum[naperts+1] = ph_dmag (rap[naperts], 2.0*rap[naperts], airmass, r0,
-	    params)
-	wcum[naperts+1] = 0.0
-	do i = naperts, 2, -1 {
-	    cum[i] = adopt[i] + cum[i+1]
-	    tcum[i] = adopt[i] + tcum[i+1]
-	    wcum[i] = wado[i] ** 2 + wcum[i+1]
+	if (IS_INDEFR(r0)) {
+	    call amovkr (INDEFR, cum, naperts + 1)
+	    call amovkr (INDEFR, tcum, naperts + 1)
+	    call amovkr (INDEFR, wcum, naperts + 1)
+	} else {
+	    cum[naperts+1] = 0.0
+	    tcum[naperts+1] = ph_dmag (rap[naperts], 2.0 * rap[naperts],
+	        airmass, r0, params)
+	    wcum[naperts+1] = 0.0
+	    do i = naperts, 2, -1 {
+	        cum[i] = adopt[i] + cum[i+1]
+	        tcum[i] = adopt[i] + tcum[i+1]
+	        wcum[i] = wado[i] ** 2 + wcum[i+1]
+	    }
 	}
 end
 
 
 # PH_WAPCAT -- Write the image entry to the aperture correction catalog.
 
-procedure ph_wapcat (apcat, image, adopt, wado, naperts, smallap, largeap)
+procedure ph_wapcat (apcat, image, r0, adopt, wado, naperts, smallap, largeap)
 
 int	apcat			# the aperture correction catalog descriptor
 char	image[ARB]		# the image name
+real	r0			# the seeing radius
 real	adopt[ARB]		# the adopted difference values
 real	wado[ARB]		# the adopted difference errors
 int	naperts			# the number of apertures
@@ -1202,25 +1280,32 @@ int	i
 real	cum, wcum
 
 begin
-	cum = 0.0
-	wcum = 0.0
-	do i = largeap, smallap + 1, -1 {
-	    cum = cum + adopt[i]
-	    wcum = wcum + wado[i] ** 2
+	if (IS_INDEFR(r0)) {
+	    cum = INDEFR
+	    wcum = INDEFR
+	} else {
+	    cum = 0.0
+	    wcum = 0.0
+	    do i = largeap, smallap + 1, -1 {
+	        cum = cum + adopt[i]
+	        wcum = wcum + wado[i] ** 2
+	    }
+	    wcum = sqrt (wcum)
 	}
 	call fprintf (apcat, "%s %g %g\n")
 	    call pargstr (image)
 	    call pargr (cum)
-	    call pargr (sqrt (wcum))
+	    call pargr (wcum)
 end
 
 
 # PH_PAPCOR -- Print the aperture correction on the standard output.
 
-procedure ph_papcor (fd, image, rap, adopt, wado, naperts, smallap, largeap)
+procedure ph_papcor (fd, image, r0, rap, adopt, wado, naperts, smallap, largeap)
 
 int	fd			# the output file descriptor
 char	image[ARB]		# the image name
+real	r0			# the seeing radius
 real	rap[ARB]		# the aperture radii
 real	adopt[ARB]		# the adopted difference values
 real	wado[ARB]		# the adopted difference errors
@@ -1232,11 +1317,17 @@ int	i
 real	cum, wcum
 
 begin
-	cum = 0.0
-	wcum = 0.0
-	do i = largeap, smallap + 1, -1 {
-	    cum = cum + adopt[i]
-	    wcum = wcum + wado[i] ** 2
+	if (IS_INDEFR(r0)) {
+	    cum = INDEFR
+	    wcum = INDEFR
+	}  else {
+	    cum = 0.0
+	    wcum = 0.0
+	    do i = largeap, smallap + 1, -1 {
+	        cum = cum + adopt[i]
+	        wcum = wcum + wado[i] ** 2
+	    }
+	    wcum = sqrt (wcum)
 	}
 
 	call fprintf (fd,
@@ -1245,7 +1336,7 @@ begin
 	    call pargr (rap[smallap])
 	    call pargr (rap[largeap])
 	    call pargr (cum)
-	    call pargr (sqrt (wcum))
+	    call pargr (wcum)
 end
 
 
@@ -1273,6 +1364,7 @@ real	wcum[ARB]		# the errors in the cumulative differences
 int	naperts			# the number of aperture
 
 int	j
+real	sqwcum
 
 begin
 	# Print the title.
@@ -1396,7 +1488,8 @@ begin
 	    call fprintf (fd, "\n")
 
 	# Print the title.
-	call fprintf (fd, "\nThe cog for image %s from radius %.2f to %.2f\n")
+	call fprintf (fd,
+	    "\nThe aperture correction for image %s from radius %.2f to %.2f\n")
 	    call pargstr (image)
 	    call pargr (rap[1])
 	    call pargr (rap[naperts])
@@ -1442,25 +1535,27 @@ begin
 
 	# Print the error in the aperture correction.
 	do j = 2, naperts {
+	    sqwcum = wcum[j]
 	    if (j == 2) {
 		call fprintf (fd, "   sigma  %9.4f")
-		    call pargr (sqrt (wcum[j]))
+		    call pargr (sqwcum)
 	    } else if (mod (j, NPERLINE) == 1) {
 		call fprintf (fd, "%9.4f\n")
-		    call pargr (sqrt (wcum[j]))
+		    call pargr (sqwcum)
 	    } else if (mod (j, NPERLINE) == 2) {
 		call fprintf (fd, "          %9.4f")
-		    call pargr (sqrt(wcum[j]))
+		    call pargr (sqwcum)
 	    } else {
 		call fprintf (fd, "%9.4f")
-		    call pargr (sqrt(wcum[j]))
+		    call pargr (sqwcum)
 	    }
 	}
 	if (mod (naperts, NPERLINE) != 1)
 	    call fprintf (fd, "\n")
 
 	# Print the title.
-	call fprintf (fd, "\nThe cog for image %s from radius %.2f to %.2f\n")
+	call fprintf (fd,
+	    "\nThe aperture correction for image %s from radius %.2f to %.2f\n")
 	    call pargstr (image)
 	    call pargr (rap[1])
 	    call pargr (2.0 * rap[naperts])
@@ -1540,9 +1635,15 @@ begin
 		    w[j] = 1.0 / (1.0 + (diff / (2.0 * merr[j,i])) ** 2)
 		    w[j] = min (w[j], w[j-1])
 		}
-		obs[j]  = tmpmags[j] + cum[j+1]
-		tobs[j]  = tmpmags[j] + tcum[j+1]
-		wobs[j] = sqrt (wcum[j+1] + merr[j,i] ** 2 / w[j])
+		if (IS_INDEFR(cum[j+1])) {
+		    obs[j]  = INDEFR
+		    tobs[j]  = INDEFR
+		    wobs[j] = INDEFR
+		} else {
+		    obs[j]  = tmpmags[j] + cum[j+1]
+		    tobs[j]  = tmpmags[j] + tcum[j+1]
+		    wobs[j] = sqrt (wcum[j+1] + merr[j,i] ** 2 / w[j])
+		}
 	    }
 	    do j = nap[i] + 1, naperts {
 		obs[j]  = INDEFR
@@ -1694,6 +1795,8 @@ begin
 	    # Compute the observed, correctged and estimated total magnitudes.
 	    tmpmags[1] = mag[1,i]
 	    sigmin = MAX_REAL
+	    #jfinal = min (nap[i], largeap)
+	    jfinal = largeap
 	    if (largeap < nap[i])
 		sigcor = assqr (wado[largeap+1], nap[i] - largeap)
 	    else
@@ -1707,11 +1810,16 @@ begin
 		    w[j] = 1.0 / (1.0 + (diff / (2.0 * merr[j,i])) ** 2)
 		    w[j] = min (w[j], w[j-1])
 		}
-		obs[j]  = tmpmags[j] + cum[j+1] - cum[largeap+1]
-		wobs[j] = sqrt (wcum[j+1] - sigcor + merr[j,i] ** 2 / w[j])
-		if (wobs[j] < sigmin) {
-		    jfinal = j
-		    sigmin = wobs[j]
+		if (IS_INDEFR(cum[j+1])) {
+		    obs[j] = INDEFR
+		    wobs[j] = INDEFR
+		} else {
+		    obs[j]  = tmpmags[j] + cum[j+1] - cum[largeap+1]
+		    wobs[j] = sqrt (wcum[j+1] - sigcor + merr[j,i] ** 2 / w[j])
+		    if (wobs[j] < sigmin) {
+		        jfinal = j
+		        sigmin = wobs[j]
+		    }
 		}
 	    }
 
@@ -1743,16 +1851,22 @@ real	resid[ARB]		# the residuals
 real	ressq[ARB]		# the residuals
 int	naperts			# the number of apertures
 
-double	sumwr, sumres, sumressq, chi
+double	sumwr, sumres, sumressq
+real	chi
 real	asumr()
 
 begin
 	sumwr = asumr (wr, naperts)
 	sumres = asumr (resid, naperts)
 	sumressq = asumr (ressq, naperts)
-	chi = sumressq / sumwr - (sumres / sumwr) ** 2
-
-	return (real (chi))
+	if (sumwr <= 0.0d0)
+	    chi = 0.0
+	else
+	    chi = sumressq / sumwr - (sumres / sumwr) ** 2
+	if (chi <= 0.0 || chi > MAX_REAL)
+	    return (INDEFR)
+	else
+	    return (chi)
 end
 
 
@@ -1768,14 +1882,25 @@ real	ressq[ARB]		# the residuals
 int	naperts			# the number of apertures
 
 int	j
+real	rtmp
 
 begin
 	call fprintf (fd, "\nAverage model cog, residual, and rms residual ")
 	call fprintf (fd, "for each aperture all images\n")
 	do j = 1, naperts {
-	    ave[j] = ave[j] / wr[j]
-	    resid[j] = resid[j] / wr[j]
-	    ressq[j] = sqrt (ressq[j] / wr[j] - resid[j] ** 2)
+	    if (wr[j] <= 0.0) {
+		ave[j] = INDEFR
+		resid[j] = INDEFR
+		ressq[j] = INDEFR
+	    } else {
+	        ave[j] = ave[j] / wr[j]
+	        resid[j] = resid[j] / wr[j]
+	        rtmp = ressq[j] / wr[j] - resid[j] ** 2
+		if (rtmp <= 0.0)
+		    ressq[j] = 0.0
+		else
+	            ressq[j] = sqrt (rtmp)
+	    }
 	    call fprintf (fd, "\t%3d  %9.5f  %9.5f  %9.5f\n")
 		call pargi (j)
 		call pargr (ave[j])

@@ -60,15 +60,17 @@ int	i, j, k, k1, k2, m, m1, m2
 real	mwc, mw1, mw2, dmw, x, x1, x2, dx, w, p, s, xc1, dx1
 real	p1, p2, pcen, fwhm, flux, flux1
 real	a[2], b[2], c[2], tb[2], cb[2], tt[2], ctb[2], t2tb[2], xmin[2], xmax[2]
+real	aplow[2], aphigh[2]
+double	w1, dw
 pointer	sp, image, fname, apnum, comment
-pointer	im, waves, peaks, sigmas, buf, spec, bf1, bf2, asi, data
+pointer	im, mw, waves, peaks, sigmas, buf, spec, bf1, bf2, asi, data
 
 long	clgetl(), clktime()
 int	clgeti(), clgwrd(), imtopenp(), imtgetim(), imaccess()
 int	nowhite(), access(), open(), fscan(), nscan()
 real	clgetr(), urand(), asigrl()
 real	ecx2w(), ecxdx(), ecw2x(), ecw2xr, ecdelta()
-pointer	immap(), impl2r(), imgl2r()
+pointer	immap(), mw_open(), impl2r(), imgl2r()
 bool	clgetb()
 errchk	open(), ecgrating()
 
@@ -292,34 +294,39 @@ begin
 
 		call clgstr ("title", IM_TITLE(im), SZ_IMTITLE)
 		if (profile == EXTRACTED) {
-		    call imastr (im, "APFORMAT", "echelle")
-		    if (IS_INDEF (f[1]))
-			call imaddi (im, "DC-FLAG", 0)
+		    mw = mw_open (NULL, 2)
+		    call mw_newsystem (mw, "multispec", 2)
+		    call mw_swtype (mw, 1, 1, "multispec", "")
+		    call mw_swtype (mw, 2, 1, "multispec", "")
+		    if (IS_INDEF(f[1])) {
+			call mw_swattrs (mw, 1, "label", "Wavelength")
+			call mw_swattrs (mw, 1, "units", "Angstroms")
+		    }
+		    call smw_open(mw, NULL, im)
 
 		    do m = m1, m2 {
+			i = m - m1 + 1
+			if (IS_INDEF(f[1])) {
+			    w1 = mw1 / m
+			    dw = b[1] / m
+			} else {
+			    w1 = 1.
+			    dw = 1.
+			}
 			w = mwc / m
 			if (mc[2] == 0)
 			    x = (w - wc[1]) / (w * disp[2]) + xc
 			else
 			    x = ecw2x (mc[2]*w, 2, a, b, f, tb, ctb, t2tb) + xc1
-			call sprintf (Memc[apnum], SZ_FNAME, "APNUM%d")
-			    call pargi (m-m1+1)
-			call sprintf (Memc[comment], LEN_COMMENT,
-			    "%d %d %g %g %d %.2f %.2f")
-			    call pargi (m-m1+1)
-			    call pargi (m)
-			    if (IS_INDEF(f[1])) {
-				call pargr (mw1 / m)
-				call pargr (b[1] / m)
-			    } else {
-				call pargr (1.)
-				call pargr (1.)
-			    }
-			    call pargi (nl)
-			    call pargr (1 + x - width)
-			    call pargr (1 + x + width)
-			call imastr (im, Memc[apnum], Memc[comment])
+			aplow[1] = 1 + x - width
+			aphigh[1] = 1 + x + width
+			aplow[2] = INDEFR
+			aphigh[2] = INDEFR
+			call smw_swattrs (mw, i, 1, i, m, 0, w1, dw, nl,
+			    0D0, aplow, aphigh, "")
 		    }
+		    call smw_saveim (mw, im)
+		    call smw_close (mw)
 		} else
 		    call imaddi (im, "DISPAXIS", 2)
 	    }
@@ -363,7 +370,7 @@ begin
 		call malloc (sigmas, nrandom, TY_REAL)
 		j = max (1, mc[1] - (norders-1) / 2)
 		do i = 0, nrandom-1 {
-		    w = z * (j + dmw * urand (seed))
+		    w = z * (mw1 + dmw * urand (seed))
 		    w = w - dmw * nint ((w - mwc) / dmw)
 		    m = j + norders * urand (seed)
 		    Memr[waves+i] = w / m
@@ -608,6 +615,8 @@ begin
 			k2 = p2 + 0.5
 			x1 = (p1 - x) * dx + pcen + 1
 			x2 = (min (p2, k1 + 0.5) - x) * dx + pcen + 1
+			x1 = max (1., x1)
+			x2 = max (1., x2)
 
 			m = data + k1
 			Memr[m] = Memr[m] + p * asigrl (asi, x1, x2)
@@ -641,71 +650,71 @@ begin
 		call strcpy ("# ", Memc[comment], LEN_COMMENT)
 		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
 		call mkh_comment (im, Memc[comment])
-		call mkh_comment (im, "begin\tmkechelle")
+		call mkh_comment (im, "begin        mkechelle")
 		call mkh_comment1 (im, "profile", 's')
 		if (profile != EXTRACTED) {
 		    call mkh_comment1 (im, "width", 'r')
 		    call mkh_comment1 (im, "scattered", 'r')
 		}
 		call mkh_comment1 (im, "norders", 'i')
-		call sprintf (Memc[comment], LEN_COMMENT, "\txc%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9txc%24t%g")
 		    call pargr (1+xc)
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tyc%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tyc%24t%g")
 		    call pargr (1+yc)
 		call mkh_comment (im, Memc[comment])
 		call mkh_comment1 (im, "pixsize", 'r')
 
-		call sprintf (Memc[comment], LEN_COMMENT, "\tf%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tf%24t%g")
 		    if (IS_INDEF(pixsize) || IS_INDEF(f[1]))
 			call pargr (f[1])
 		    else
 			call pargr (f[1] * pixsize)
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tgmm%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tgmm%24t%g")
 		    call pargr (gmm[1])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tblaze%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tblaze%24t%g")
 		    call pargr (blaze[1])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\ttheta%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9ttheta%24t%g")
 		    call pargr (t[1])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\torder%24t%d")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9torder%24t%d")
 		    call pargi (mc[1])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\twavelength%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9twavelength%24t%g")
 		    call pargr (wc[1])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tdispersion%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tdispersion%24t%g")
 		    if (IS_INDEF(pixsize) || IS_INDEF(disp[1]))
 			call pargr (disp[1])
 		    else
 			call pargr (disp[1] / pixsize)
 		call mkh_comment (im, Memc[comment])
 
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcf%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcf%24t%g")
 		    if (IS_INDEF(pixsize) || IS_INDEF(f[2]))
 			call pargr (f[2])
 		    else
 			call pargr (f[2] * pixsize)
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcgmm%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcgmm%24t%g")
 		    call pargr (gmm[2])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcblaze%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcblaze%24t%g")
 		    call pargr (blaze[2])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tctheta%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tctheta%24t%g")
 		    call pargr (t[2])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcorder%24t%d")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcorder%24t%d")
 		    call pargi (mc[2])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcwavelength%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcwavelength%24t%g")
 		    call pargr (wc[2])
 		call mkh_comment (im, Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tcdispersion%24t%g")
+		call sprintf (Memc[comment], LEN_COMMENT, "%9tcdispersion%24t%g")
 		    if (IS_INDEF(pixsize) || IS_INDEF(disp[2]))
 			call pargr (disp[2])
 		    else
@@ -719,7 +728,7 @@ begin
 		if (nrandom > 0) {
 		    if (Memc[fname] != EOS)
 			call mkh_comment1 (im, "lines", 's')
-		    call sprintf (Memc[comment], LEN_COMMENT, "\tnlines%24t%d")
+		    call sprintf (Memc[comment], LEN_COMMENT, "%9tnlines%24t%d")
 			call pargi (nrandom)
 		    call mkh_comment (im, Memc[comment])
 		    call mkh_comment1 (im, "peak", 'r')
@@ -1169,7 +1178,7 @@ begin
 	    return (1.)
 
 	dx = x / f[i]
-	dx = (1 - dx * tb[i]) / (1 + dx * dx) ** 1.5
+	dx = (1 - dx * tb[i]) / sqrt ((1 + dx * dx) ** 3)
 	return (dx)
 end
 

@@ -15,18 +15,20 @@ int	param			# parameter to be set
 real	rval			# new value for parameter
 
 real	char_height
-int	wcs, axes, field, ax[2], i
+int	wcs, axes, field, ax[2], wflags, i
 pointer	w, p, pl, pm, tx, fa
 real	ggetr()
 
 begin
 	# Compute pointers to substructures once, here, to save space later.
 	wcs = GP_WCS(gp)
-	w   = GP_WCSPTR(gp,wcs)
-	pl  = GP_PLAP(gp)
-	pm  = GP_PMAP(gp)
-	tx  = GP_TXAP(gp)
-	fa  = GP_FAAP(gp)
+	w = GP_WCSPTR(gp,wcs)
+	wflags = WCS_FLAGS(w)
+
+	pl = GP_PLAP(gp)
+	pm = GP_PMAP(gp)
+	tx = GP_TXAP(gp)
+	fa = GP_FAAP(gp)
 
 	switch (param) {
 
@@ -52,7 +54,14 @@ begin
 	    GP_WCSSTATE(gp) = MODIFIED
 	    call gpl_reset()
 	case G_CLIP:
-	    WCS_CLIP(w) = nint(rval)
+	    if (nint(rval) == 0)
+		WCS_FLAGS(w) = and (wflags, not(WF_CLIP))
+	    else
+		WCS_FLAGS(w) = or (wflags, WF_CLIP)
+	    GP_WCSSTATE(gp) = MODIFIED
+	    call gpl_reset()
+	case G_RASTER:
+	    WCS_FLAGS(w) = WF_SETRASTER (wflags, nint(rval))
 	    GP_WCSSTATE(gp) = MODIFIED
 	    call gpl_reset()
 
@@ -119,8 +128,14 @@ begin
 	    GP_DRAWTITLE(gp) = nint(rval)
 	case G_TITLESIZE:
 	    GP_TITLESIZE(gp) = rval
+	case G_TITLECOLOR:
+	    GP_TITLECOLOR(gp) = nint(rval)
+	case G_TITLEJUST:
+	    GP_TITLEJUST(gp) = nint(rval)
 	case G_NTITLELINES:
 	    GP_NTITLELINES(gp) = nint(rval)
+	case G_FRAMECOLOR:
+	    GP_FRAMECOLOR(gp) = nint(rval)
 	case G_ASPECT:
 	    GP_ASPECT(gp) = rval
 
@@ -173,12 +188,16 @@ begin
 			GL_AXISPOS2(p) = rval
 		    case G_DRAWGRID:
 			GL_DRAWGRID(p) = nint(rval)
+		    case G_GRIDCOLOR:
+			GL_GRIDCOLOR(p) = nint(rval)
 		    case G_ROUND:
 			GL_ROUND(p) = nint(rval)
 		    case G_LABELAXIS:
 			GL_LABELAXIS(p) = nint(rval)
 		    case G_AXISLABELSIZE:
 			GL_AXISLABELSIZE(p) = rval
+		    case G_AXISLABELCOLOR:
+			GL_AXISLABELCOLOR(p) = nint(rval)
 		    case G_DRAWTICKS:
 			GL_DRAWTICKS(p) = nint(rval)
 		    case G_LABELTICKS:
@@ -197,8 +216,14 @@ begin
 			GL_MINORWIDTH(p) = rval
 		    case G_AXISWIDTH:
 			GL_AXISWIDTH(p) = rval
+		    case G_AXISCOLOR:
+			GL_AXISCOLOR(p) = nint(rval)
 		    case G_TICKLABELSIZE:
 			GL_TICKLABELSIZE(p) = rval
+		    case G_TICKLABELCOLOR:
+			GL_TICKLABELCOLOR(p) = nint(rval)
+		    case G_TICKCOLOR:
+			GL_TICKCOLOR(p) = nint(rval)
 		    # case G_TICKFORMAT:
 			# not a real parameter
 		    default:

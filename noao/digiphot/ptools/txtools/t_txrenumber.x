@@ -10,9 +10,9 @@ pointer	tp_in		# pointer to the input table
 pointer	tp_out		# pointer to the output table
 pointer	id		# name of the id column
 
-int	inlist, nrecs
+int	inlist, nrecs, idoffset
 pointer	sp, infile, outfile
-int	clpopnu(), clgfil(), access(), open(), fstati(), pt_renumber()
+int	clpopnu(), clgeti(), clgfil(), access(), open(), fstati(), pt_renumber()
 
 begin
 	# Set the standard output to flush on newline.
@@ -27,6 +27,7 @@ begin
 
 	# Get the various task parameters.
 	inlist = clpopnu ("textfiles")
+	idoffset = clgeti ("idoffset")
 	call clgstr ("id", Memc[id], SZ_FNAME)
 	call strlwr (Memc[id])
 
@@ -44,7 +45,7 @@ begin
 	    tp_out = open (Memc[outfile], NEW_FILE, TEXT_FILE)
 
 	    # Renumber the stars.
-	    nrecs = pt_renumber (tp_in, tp_out, Memc[id])
+	    nrecs = pt_renumber (tp_in, tp_out, idoffset, Memc[id])
 
 	    # Close up the input and output files.
 	    call close (tp_in)

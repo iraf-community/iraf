@@ -22,12 +22,17 @@ struct	*fd1
 struct	*fd2
 
 begin
+	string	imtype, ectype
 	string	spec, arcref
 	string	specec, arcrefec
 	string	temp1, temp2, done, str
 	bool	newaps, newdisp, newsens
 	bool	extract, disp, ext, flux, scat, reextract, fluxcal1, stdfile
-	int	i, j
+	int	i, j, n
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	temp1 = mktemp ("tmp$iraf")
 	temp2 = mktemp ("tmp$iraf")
@@ -39,8 +44,8 @@ begin
 	fluxcal1 = fluxcal
 
 	i = strlen (apref)
-	if (i > 4 && substr (apref, i-3, i) == ".imh")
-	    apref = substr (apref, 1, i-4)
+	if (i > n && substr (apref, i-n+1, i) == imtype)
+	    apref = substr (apref, 1, i-n)
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
@@ -60,16 +65,16 @@ begin
 	    print ("Subtract scattered light in ", apref) | tee (log1)
 
 	if (dispcor) {
-	    hselect (arcs, "$I,ctype1", yes, > temp1)
+	    hselect (arcs, "$I,wat0_001", yes, > temp1)
 	    fd1 = temp1; s1 = ""
-	    i = fscan (fd1, arcref, s1)
-	    if (i < 1 || (i == 2 && s1 == "MULTISPE"))
+	    i = fscanf (fd1, "%s\tsystem=%s", arcref, s1)
+	    if (i < 1 || (i == 2 && (s1 == "equispec" || s1 == "multispec")))
 		error (1, "No reference arcs")
 	    fd1 = ""; delete (temp1, verify=no)
 	    i = strlen (arcref)
-	    if (i > 4 && substr (arcref, i-3, i) == ".imh")
-	        arcref = substr (arcref, 1, i-4)
-	    arcrefec = arcref // ".ec.imh"
+	    if (i > n && substr (arcref, i-n+1, i) == imtype)
+	        arcref = substr (arcref, 1, i-n)
+	    arcrefec = arcref // ectype
 
 	    reextract = redo || (update && newaps)
 	    if (reextract || !access (arcrefec)) {
@@ -100,9 +105,9 @@ begin
 		    if (nscan() == 2 && s1 == "MULTISPE")
 			next
 		    i = strlen (spec)
-		    if (i > 4 && substr (spec, i-3, i) == ".imh")
-		        spec = substr (spec, 1, i-4)
-		    specec = spec // ".ec.imh"
+		    if (i > n && substr (spec, i-n+1, i) == imtype)
+		        spec = substr (spec, 1, i-n)
+		    specec = spec // ectype
 
 		    scat = no
 		    if (scattered) {
@@ -137,7 +142,7 @@ begin
 	        }
 	        fd1 = ""; delete (temp1, verify=no)
 
-	        sections ("sens.????.imh", option="nolist")
+	        sections ("sens.????"//imtype, option="nolist")
 	        if (newsens || sections.nimages == 0) {
 		    if (!stdfile) {
 		        print ("No standard stars")
@@ -159,8 +164,8 @@ begin
 	while (fscan (fd1, spec, s1) != EOF) {
 	    if (nscan() == 2 && s1 == "MULTISPE")
 		next
-	    if (i > 4 && substr (spec, i-3, i) == ".imh")
-	        spec = substr (spec, 1, i-4)
+	    if (i > n && substr (spec, i-n+1, i) == imtype)
+	        spec = substr (spec, 1, i-n)
 
 	    if (access (done)) {
 	        fd2 = done
@@ -172,7 +177,7 @@ begin
 	        fd2 = ""
 	    }
 
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    scat = no
 	    extract = no

@@ -5,4 +5,4 @@
  * ZZZEND -- Dummy symbol used to mark the end of the shared image.
  * (makes debugger stack traces easier to understand).
  */
-zzzend_(){};
+zzzend_(){}

@@ -5,7 +5,7 @@ procedure bplot (images, records)
 string	images				{prompt="List of images to plot"}
 string	records = ""			{prompt="List of records to plot"}
 string	graphics = "stdgraph"		{prompt="Graphics output device"}
-string	cursor   = "onedspec$gcurval"	{prompt="Cursor file(s)\n"}
+string	cursor   = "onedspec$gcurval.dat"	{prompt="Cursor file(s)\n"}
 
 struct	*ilist, *clist
 

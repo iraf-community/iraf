@@ -10,7 +10,7 @@ long	lval
 
 begin
 	lval = value
-	if (value == INDEFI)
+	if (IS_INDEFI (value))
 	    lval = INDEFL
 
 	call clputl (param, lval)
@@ -27,7 +27,7 @@ long	lval
 
 begin
 	lval = value
-	if (value == INDEFS)
+	if (IS_INDEFS (value))
 	    lval = INDEFL
 
 	call clputl (param, lval)

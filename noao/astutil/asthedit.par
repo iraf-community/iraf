@@ -1,0 +1,5 @@
+images,s,a,,,,Images to be operated upon
+commands,f,a,,,,File of commands
+table,f,h,,,,File of values
+colnames,s,h,"",,,Column names in table file
+verbose,b,h,no,,,Verbose output?

@@ -18,8 +18,8 @@ IMOFNLS opens the list sorted, whereas IMOFNLU opens it unsorted.  Both std.
 and user header keywords are included in the list.
 .endhelp ---------------------------------------------------------------------
 
-define	MAX_FIELDS	128
-define	SZ_SBUF		1024
+define	MAX_FIELDS	1024
+define	SZ_SBUF		8192
 define	LEN_FNSTRUCT	(10+MAX_FIELDS)
 
 define	FN_NENTRIES	Memi[$1]	# number of field names in list
@@ -255,7 +255,7 @@ int	ip, index, nmatch
 int	patmatch(), strlen()
 
 string	keywords "|ctime|history|limtime|maxpixval|minpixval|mtime|naxis\
-|naxis1|naxis2|naxis3|pixfile|pixtype|title|"
+|naxis1|naxis2|naxis3|naxis4|naxis5|naxis6|naxis7|pixfile|pixtype|title|"
 errchk	imfn_putkey
 
 begin
@@ -270,7 +270,7 @@ begin
 	    # actual image dimension into the matched list.
 
 	    validfield = true
-	    if (index >= 8 && index <= 10)
+	    if (index >= 8 && index <= 14)
 		validfield = (index - 7 <= IM_NDIM(im))
 
 	    # Extract keyword into buffer, after the "i_".

@@ -1,7 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 include	<fset.h>
-include "../shdr.h"
+include <smw.h>
 
 
 # SLIST1D --  Lists header information from IIDS/IRS format header
@@ -44,7 +44,7 @@ begin
 		call shdr_open (im, mw, 1, 1, INDEFI, SHHDR, sh)
 	    } then {
 		if (mw != NULL)
-		    call mw_close (mw)
+		    call smw_close (mw)
 		if (im != NULL)
 		    call imunmap (im)
 		call erract (EA_WARN)
@@ -57,14 +57,14 @@ begin
 
 		if (long_header == YES) {
 		    call printf ("[%s] %4dpts %s\n")
-			call pargstr (SPECTRUM(sh))
+			call pargstr (IMNAME(sh))
 			call pargi (SN(sh))
 			call pargstr (TITLE(sh))
 
-		    if (TYPE(sh) == 1) {
+		    if (OFLAG(sh) == 1) {
 			call printf ("oflag = OBJECT, beam_number = %d")
 			    call pargi (BEAM(sh))
-		    } else if (TYPE (sh) == 0) {
+		    } else if (OFLAG (sh) == 0) {
 			call printf ("oflag = SKY,    beam_number = %d")
 			    call pargi (BEAM(sh))
 		    }
@@ -120,8 +120,8 @@ begin
 		} else {
 		    if (nl == 1) {
 			call printf ("[%s]:%s %4ds %4dpts   %s\n")
-			    call pargstr (SPECTRUM(sh))
-			    if (TYPE(sh) == 1)
+			    call pargstr (IMNAME(sh))
+			    if (OFLAG(sh) == 1)
 				call pargstr ("o")
 			    else
 				call pargstr ("s")
@@ -130,8 +130,8 @@ begin
 			    call pargstr (TITLE(sh))
 		    } else {
 			call printf ("[%s]:%s %6.2fs %4dpts %dspectra   %s\n")
-			    call pargstr (SPECTRUM(sh))
-			    if (TYPE(sh) == 1)
+			    call pargstr (IMNAME(sh))
+			    if (OFLAG(sh) == 1)
 				call pargstr ("o")
 			    else
 				call pargstr ("s")
@@ -144,7 +144,7 @@ begin
 		}
 	    }
 
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 	}
 

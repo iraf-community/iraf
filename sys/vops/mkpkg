@@ -31,7 +31,7 @@ tfiles:
 	# The following files are not generic hence are merely copied to the
 	# type specific directory.
 
-	$ifolder (ak/acjgx.x,  acjgx.x )   $copy acjgx.x  ak/acjgx.x		$endif
+	$ifolder (ak/acjgx.x,  acjgx.x )   $copy acjgx.x  ak/acjgx.x	$endif
 	$ifolder (ak/afftrr.x, afftrr.x)   $copy afftrr.x ak/afftrr.x	$endif
 	$ifolder (ak/afftrx.x, afftrx.x)   $copy afftrx.x ak/afftrx.x	$endif
 	$ifolder (ak/afftxr.x, afftxr.x)   $copy afftxr.x ak/afftxr.x	$endif
@@ -117,6 +117,7 @@ tfiles:
 	$ifolder (lz/argti.x,  argt.gx )    $(GL) -t  silrdx argt.gx	$endif
 	$ifolder (lz/arlti.x,  arlt.gx )    $(GL) -t  silrdx arlt.gx	$endif
 	$ifolder (lz/aseli.x,  asel.gx )    $(GL) -t csilrdx asel.gx	$endif
+	$ifolder (lz/aselki.x, aselk.gx)    $(GL) -t csilrdx aselk.gx	$endif
 	$ifolder (lz/asoki.x,  asok.gx )    $(GL) -t csilrdx asok.gx	$endif
 	$ifolder (lz/asqri.x,  asqr.gx )    $(GL) -t  silrdx asqr.gx	$endif
 	$ifolder (lz/asrti.x,  asrt.gx )    $(GL) -t csilrdx asrt.gx	$endif

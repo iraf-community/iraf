@@ -133,6 +133,8 @@ begin
 	if (CON_CNFUNC(rv) == 0) 
 	    call error (0, "Unknown fitting function type")
 
+	CON_MARKREJ(rv) = YES
+
 	call clcpset (pp)				# Close pset
 	call sfree (sp)
 end

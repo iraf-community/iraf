@@ -58,6 +58,9 @@
 	} else
 	    print ("  ERROR: Cannot normalize calibration image.")
 
+	# Set CCDMEAN to 1.
+	hedit (flt, "ccdmean", "1.", add=yes, update=yes, show=no, verify=no)
+
 	# Ending message.
 	if (keeplog) {
 	    time (>> logfile)

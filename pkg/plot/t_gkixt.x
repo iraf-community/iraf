@@ -4,7 +4,7 @@ define	LEN_DEFIBUF	2048
 define	ONEWORD		SZ_SHORT
 define	TWOWORDS	(2*SZ_SHORT)
 define	MAX_RANGES	100
-define	MAX_FRAMES	2048
+define	MAX_FRAMES	8192
 define	SZ_TEXT		(5 * SZ_LINE)
 
 # Header fields of a GKI instruction.
@@ -197,6 +197,8 @@ begin
 
 		# Increment or reinitialize internal variables
 		nframe = nframe + 1
+		if (nframe > MAX_FRAMES)
+		    call error (4, "Too many frames in metacode file.")
 		mc_length = length
 		nchars_max = 0
 		call strcpy ("(no title)", tx_string, SZ_LINE)

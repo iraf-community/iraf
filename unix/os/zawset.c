@@ -1,8 +1,21 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#ifdef SYSV
+#define NORLIMIT
+#endif
+
+#ifdef LINUX
+#undef NORLIMIT
+#endif
+
+#ifdef SOLARIS
+#define RLIMIT_RSS RLIMIT_VMEM
+#undef NORLIMIT
+#endif
+
 #include <stdio.h>
-#ifndef SYSV
+#ifndef NORLIMIT
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
@@ -12,61 +25,62 @@
 #define import_spp
 #include <iraf.h>
 
-/* ZAWSET -- Adjust the "working set", i.e., the maximum amount of physical
- * memory allocated to the process.  4.[23]BSD UNIX implements a "soft" working
- * set limit as the resource limit RLIMIT_RSS.  Both soft and and hard limits
- * are provided; we use only the soft limit, which tells the system to steal
- * (or don't steal) memory from a particular process if memory gets tight.
- * The soft limit is initialized to the IRAF default by zmain at process
- * starup time, if not already set by the parent process when the child was
- * forked.
+/* Kernel default working set values in bytes. */
+int defworkset = SZ_DEFWORKSET;
+int maxworkset = SZ_MAXWORKSET;
+static int max_wss = 0;
+
+
+/* ZAWSET -- Adjust or query the "working set", i.e., the maximum amount of
+ * physical memory allocated to the process.
  */
 ZAWSET (best_size, new_size, old_size, max_size)
 XINT	*best_size;		/* requested working set size, bytes.	*/
 XINT	*new_size, *old_size;	/* actual new and old sizes, bytes.	*/
 XINT	*max_size;		/* max working set size, bytes		*/
 {
-#ifdef SYSV
+	char *s, *getenv();
+#ifndef NORLIMIT
+	int working_set_size;
+	struct rlimit rlp;
+#endif
+
+	/* The hard upper limit on memory utilization defined by the unix
+	 * kernel can be limited either by the value compiled into the IRAF
+	 * kernel, or by the value set in the user environment variable
+	 * MAXWORKSET, given in units of Mb.
+	 */
+	if (!max_wss)
+	    if (s = getenv ("MAXWORKSET")) {
+		max_wss = atoi(s) * 1024*1024;
+		if (max_wss < 1024*1024)
+		    max_wss = maxworkset;
+	    } else
+		max_wss = maxworkset;
+
+#ifdef NORLIMIT
 	if (*best_size == 0)
-	    *old_size = *new_size = SZ_DEFWORKSET;
+	    *old_size = *new_size = defworkset;
 	else
-	    *new_size = *old_size = min (SZ_MAXWORKSET, *best_size);
-	*max_size = SZ_MAXWORKSET;
+	    *new_size = *old_size = min (max_wss, *best_size);
+	*max_size = max_wss;
 #else
-	static	int initialized;
-	int	working_set_size;
-	struct	rlimit rlp;
-
-	getrlimit (RLIMIT_RSS,  &rlp); working_set_size = rlp.rlim_cur;
-
-	/* The hard limit value rlim_max can greatly exceed the physical
-	 * memory on some systems, so we provide a defined parameter in
-	 * kernel.h to set a more realistic upper limit.
-	 */
-	(*max_size) = min (rlp.rlim_max, SZ_MAXWORKSET);
-
-	/* We are called by zmain during process startup to set the initial
-	 * default working set.
-	 */
-	if (!initialized) {
-	    rlp.rlim_cur = SZ_DEFWORKSET;
-	    setrlimit (RLIMIT_RSS, &rlp);
-	    working_set_size = SZ_DEFWORKSET;
-	    initialized++;
-	}
+	getrlimit (RLIMIT_RSS, &rlp);
+	working_set_size = min (max_wss, rlp.rlim_cur);
 
 	/* Now try to set the size requested by our caller.  If bestsize was
 	 * given as zero, merely return the status values.
 	 */
-	if (*best_size == 0)
-	    *old_size = *new_size = working_set_size;
+	(*max_size) = min (max_wss, rlp.rlim_max);
+	if (*best_size <= 0)
+	    *new_size = *old_size = working_set_size;
 	else {
-	    rlp.rlim_cur = min (*best_size, rlp.rlim_max);
-	    setrlimit (RLIMIT_RSS, &rlp);
+	    rlp.rlim_cur = min (*best_size, *max_size);
+	    if (rlp.rlim_cur > working_set_size)
+		setrlimit (RLIMIT_RSS, &rlp);
 	    getrlimit (RLIMIT_RSS, &rlp);
-
 	    *old_size = working_set_size;
-	    *new_size = min (*best_size, rlp.rlim_cur);
+	    *new_size = min(*best_size, min(max_wss, rlp.rlim_cur));
 	}
 #endif
 }

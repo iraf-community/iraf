@@ -36,8 +36,13 @@ Apply an automatic intensity mapping algorithm when loading the image?
 Contrast factor for the automatic intensity mapping algorithm.
 .le
 .ls zrange = yes
-If not using the automatic mapping algorithm (\fIzcale = no\fR) map the
-full range of the image intensity to the full range of the display?
+If not using the automatic mapping algorithm (\fIzscale = no\fR) map the
+full range of the image intensity to the full range of the display?  If the
+displayed image has current min/max values defined these will be used 
+to determine the mapping, otherwise the image will be subsampled 
+using \fInsample_lines\fR of data and an approximate min/max value 
+will be used to determine the mapping.  The \fIMINMAX\fR task can
+be used to update the min/max values in the image header.
 .le
 .ls nsample_lines = 5
 Number of sample lines to use in the automatic intensity mapping algorithm.
@@ -297,5 +302,5 @@ BUGS
 The "repeat" option is not implemented.
 .ih
 SEE ALSO
-cvl, magnify, implot
+cvl, magnify, implot, minmax
 .endhelp

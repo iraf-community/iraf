@@ -5,6 +5,7 @@
 procedure batch ()
 
 string	objects		{prompt="Object spectra"}
+real	datamax		{prompt="Max data value / cosmic ray threshold"}
 
 file	response	{prompt="Response spectrum"}
 string	arcs1		{prompt="List of arc spectra"}
@@ -28,6 +29,7 @@ file	logfile		{prompt="Logfile"}
 
 bool	redo		{prompt="Redo operations?"}
 bool	update		{prompt="Update spectra?"}
+bool	scattered	{prompt="Subtracted scattered light?"}
 bool	arcap		{prompt="Use object apertures for arcs?"}
 bool	dispcor		{prompt="Dispersion correct spectra?"}
 bool	savearcs	{prompt="Save internal arcs?"}
@@ -36,16 +38,20 @@ bool	saveskys	{prompt="Save sky spectra?\n"}
 
 bool	newaps, newresp, newdisp, newarcs
 
-struct	*fd1, *fd2
+struct	*fd1, *fd2, *fd3
 
 begin
-	file	objs, temp, spec, specms, arc
-	bool	reextract, extract, disp, sky, log
-	string	str
+	file	objs, temp, temp1, spec, specms, arc
+	bool	reextract, extract, scat, disp, sky, log
+	string	imtype, mstype, str, str2, str3, str4
 	int	i
+
+	imtype = "." // envget ("imtype")
+	mstype = ".ms" // imtype
 
 	objs = mktemp ("tmp$iraf")
 	temp = mktemp ("tmp$iraf")
+	temp1 = mktemp ("tmp$iraf")
 
 	# Initialize extraction to be noninteractive.
 	if (apscript.ansrecenter == "yes")
@@ -61,7 +67,7 @@ begin
 
 	reextract = redo || (update && (newaps || newresp || newdisp))
 
-	getspec (objects, > objs)
+	getspec (objects, objs)
 	fd1 = objs
 	while (fscan (fd1, spec) != EOF) {
 	    if (access (done)) {
@@ -73,21 +79,30 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec, >> logfile)
 		next
 	    }
-	    specms = spec // ".ms.imh"
+	    specms = spec // mstype
 
+	    scat = no
 	    extract = no
 	    disp = no
 	    sky = no
-	    if (reextract || !access (specms))
+	    if (scattered) {
+		if (redo && access (spec//"noscat"//imtype)) {
+		    imdelete (spec, verify=no)
+		    imrename (spec//"noscat", spec)
+		}
+		hselect (spec, "apscatte", yes) | scan (str)
+		if (nscan() == 0)
+		    scat = yes
+	    }
+	    if (reextract || !access (specms) || (update && scat))
 		extract = yes
 	    else {
-		hselect (specms, "dc-flag", yes, > temp)
-		fd2 = temp
-		if (fscan (fd2, str) == 1) {
+		hselect (specms, "dclog1", yes) | scan (str)
+		if (nscan () == 1) {
 		    extract = update && newdisp
 		    if (update && !newdisp)
 		        # We really should check if REFSPEC will assign
@@ -95,13 +110,10 @@ begin
 			;
 		} else
 		    disp = dispcor
-		fd2 = ""; delete (temp, verify=no)
 
-		hselect (specms, "skysub", yes, > temp)
-		fd2 = temp
-		if (fscan (fd2, str) < 1)
+		hselect (specms, "skysub", yes) | scan (str)
+		if (nscan() == 0)
 		    sky = skysubtract
-		fd2 = ""; delete (temp, verify=no)
 	    }
 		
 	    if (extract) {
@@ -112,32 +124,47 @@ begin
 	    if (extract) {
 		if (access (specms))
 		    imdelete (specms, verify=no)
+		if (scat) {
+		    print ("Subtract scattered light from ", spec, >> logfile)
+		    imrename (spec, spec//"noscat")
+		    apscript (spec//"noscat", output=spec, ansextract="NO",
+			ansscat="YES", anssmooth="YES", verbose=no)
+		}
 		print ("Extract object spectrum ", spec, >> logfile)
-		setjd (spec, observatory=observatory, date="date-obs",
-		    time="ut", exposure="exptime", jd="jd", hjd="",
-		    ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-		    >> logfile)
-	        setairmass (spec, intype="beginning",
-		    outtype="effective", exposure="exptime",
-		    observatory=observatory, show=no, update=yes,
-		    override=yes, >> logfile)
-		apscript (spec, nsubaps=params.nsubaps, verbose=no)
-		sapertures (specms, apertures="", apidtable=apidtable,
+		hselect (spec, "date-obs,ut,exptime", yes, > temp1)
+		hselect (spec, "ra,dec,epoch,st", yes, >> temp1)
+		fd3 = temp1
+		if (fscan (fd3, str, str2, str3) == 3) {
+		    setjd (spec, observatory=observatory, date="date-obs",
+			time="ut", exposure="exptime", jd="jd", hjd="",
+			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+			>> logfile)
+		    if (fscan (fd3, str, str2, str3, str4) == 4)
+			setairmass (spec, intype="beginning",
+			    outtype="effective", exposure="exptime",
+			    observatory=observatory, show=no, update=yes,
+			    override=yes, >> logfile)
+		}
+		fd3 = ""; delete (temp1, verify=no)
+		apscript (spec, nsubaps=params.nsubaps, saturation=datamax,
 		    verbose=no)
+		sapertures (specms, apertures="", apidtable=apidtable,
+		    wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF, w1=INDEF,
+		    dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 		if (response != "") {
 		    if (params.nsubaps == 1)
 			sarith (specms, "/", response, specms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=no, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=no,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 		    else {
 			blkrep (response, temp, 1, params.nsubaps)
 			sarith (specms, "/", temp, specms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=yes, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=yes,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 			imdelete (temp, verify=no)
 		    }
 		}
@@ -146,34 +173,49 @@ begin
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    getspec (arcs1, > temp)
-		    setjd ("@"//temp, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> logfile)
-	    	    setairmass ("@"//temp, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> logfile)
+		    getspec (arcs1, temp)
 	    	    fd2 = temp
 	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp1)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp1)
+			fd3 = temp1
+			if (fscan (fd3, str, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory, date="date-obs",
+				time="ut", exposure="exptime", jd="jd", hjd="",
+				ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+				>> logfile)
+			    if (fscan (fd3, str, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no, update=yes,
+				    override=yes, >> logfile)
+			}
+			fd3 = ""; delete (temp1, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "henear", add=yes, verify=no,
 		    	    show=no, update=yes)
 	    	    }
 	    	    fd2 = ""; delete (temp, verify=no)
-		    getspec (arcs2, > temp)
-		    setjd ("@"//temp, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> logfile)
-	    	    setairmass ("@"//temp, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> logfile)
+		    getspec (arcs2, temp)
 	    	    fd2 = temp
 	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp1)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp1)
+			fd3 = temp1
+			if (fscan (fd3, str, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory,
+				date="date-obs", time="ut", exposure="exptime",
+				jd="jd", hjd="", ljd="ljd", utdate=yes,
+				uttime=yes, listonly=no, >> logfile)
+			    if (fscan (fd3, str, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no,
+				    update=yes, override=yes, >> logfile)
+
+			}
+			fd3 = ""; delete (temp1, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "shift", add=yes, verify=no,
@@ -194,7 +236,7 @@ begin
 
 		doarcs (spec, response, arcref1, arcref2, extn, arcreplace,
 		    apidtable, arcaps, arcbeams, savearcs, reextract, arcap,
-		    logfile, yes)
+		    logfile, yes, done)
 
 	        hselect (specms, "refspec1", yes, > temp)
 	        fd2 = temp
@@ -210,13 +252,11 @@ begin
 			flux=params.flux, samedisp=no, global=no,
 			ignoreaps=no, confirm=no, listonly=no, verbose=no,
 			logfile=logfile)
-		    hedit (specms, "dc-flag", 0, add=yes, verify=no,
-			show=no, update=yes)
 		    if (params.nsubaps > 1) {
 			imrename (specms, temp, verbose=no)
 			scopy (temp, specms, w1=INDEF, w2=INDEF,
-			    apertures="-999", beams="", apmodulus=0, offset=0,
-			    format="multispec", clobber=no, merge=no,
+			    apertures="-999", bands="", beams="", apmodulus=0,
+			    offset=0, format="multispec", clobber=no, merge=no,
 			    renumber=no, verbose=no)
 			blkavg (temp, temp, 1, params.nsubaps, option="sum")
 			imcopy (temp, specms//"[*,*]", verbose=no)

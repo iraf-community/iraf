@@ -129,7 +129,6 @@ PACKAGE = apextract
                                 
                                 # DEFAULT APERTURE PARAMETERS
 
-(dispaxi=          )_.dispaxis) Dispersion axis (1=along lines, 2=along columns)(lower  =     )apdefault.lower) Lower aperture limit relative to center
 (upper  =     )apdefault.upper) Upper aperture limit relative to center
 (apidtab= )apdefault.apidtable) Aperture ID table (optional)
                                 
@@ -201,8 +200,8 @@ e_profil=                       Profile reference image
 (lsigma =        )apsum.lsigma) Lower rejection threshold
 (usigma =        )apsum.usigma) Upper rejection threshold
 (maxtilt=                    3) Maximum excursion for line/column fitting
-(polysep=                  0.6) Marsh algorithm polynomial spacing
-(polyord=                    4) Marsh algorithm polynomial order
+(polysep=                 0.95) Marsh algorithm polynomial spacing
+(polyord=                   10) Marsh algorithm polynomial order
 (nsubaps=       )apsum.nsubaps) Number of subapertures per aperture
                                 
                                 # ANSWER PARAMETERS
@@ -272,10 +271,10 @@ is not very sensitive to deviant points.
 .ls maxtilt = 3
 Maximum excursion separating the two profile fitting algorithms.
 .le
-.ls polysep = 0.6
+.ls polysep = 0.95
 Marsh algorithm polynomial spacing.
 .le
-.ls polyorder = 4
+.ls polyorder = 10
 Marsh algorithm polynomial order.
 .le
 

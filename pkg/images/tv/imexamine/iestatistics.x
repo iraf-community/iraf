@@ -11,7 +11,7 @@ procedure ie_statistics (ie, x, y)
 pointer	ie			# IMEXAM structure
 real	x, y			# Aperture coordinates
  
-real	mean, median, std
+double	mean, median, std
 int	ncstat, nlstat, x1, x2,y1, y2, npts, clgeti()
 pointer	sp, imname, im, data, sortdata, ie_gimage(), ie_gdata()
 string	label "\
@@ -37,14 +37,15 @@ begin
 
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (sortdata, npts, TY_REAL)
+	call salloc (sortdata, npts, TY_DOUBLE)
 
-	call asrtr (Memr[data], Memr[sortdata], npts)
-	call aavgr (Memr[sortdata], npts, mean, std)
+	call achtrd (Memr[data], Memd[sortdata], npts)
+	call asrtd (Memd[sortdata], Memd[sortdata], npts)
+	call aavgd (Memd[sortdata], npts, mean, std)
 	if (mod (npts, 2) == 0)
-	    median = (Memr[sortdata+npts/2-1] + Memr[sortdata+npts/2]) / 2
+	    median = (Memd[sortdata+npts/2-1] + Memd[sortdata+npts/2]) / 2
 	else
-	    median = Memr[sortdata+npts/2]
+	    median = Memd[sortdata+npts/2]
 
 	call sprintf (Memc[imname], SZ_FNAME, "[%d:%d,%d:%d]")
 	    call pargi (x1)
@@ -58,11 +59,11 @@ begin
 	call printf ("%20s %8d %8.4g %8.4g %8.4g %8.4g %8.4g\n")
 	    call pargstr (Memc[imname])
 	    call pargi (npts)
-	    call pargr (mean)
-	    call pargr (median)
-	    call pargr (std)
-	    call pargr (Memr[sortdata])
-	    call pargr (Memr[sortdata+npts-1])
+	    call pargd (mean)
+	    call pargd (median)
+	    call pargd (std)
+	    call pargd (Memd[sortdata])
+	    call pargd (Memd[sortdata+npts-1])
 
 	if (IE_LOGFD(ie) != NULL) {
 	    if (IE_LASTKEY(ie) != 'm')
@@ -72,11 +73,11 @@ begin
 		"%20s %8d %8.4g %8.4g %8.4g %8.4g %8.4g\n")
 	        call pargstr (Memc[imname])
 	        call pargi (npts)
-	        call pargr (mean)
-	        call pargr (median)
-	        call pargr (std)
-	        call pargr (Memr[sortdata])
-	        call pargr (Memr[sortdata+npts-1])
+	        call pargd (mean)
+	        call pargd (median)
+	        call pargd (std)
+	        call pargd (Memd[sortdata])
+	        call pargd (Memd[sortdata+npts-1])
 	}
 
 	call sfree (sp)

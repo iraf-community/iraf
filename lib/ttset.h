@@ -23,3 +23,5 @@ define	TT_OUTFILE	119		# logout file name
 define	TT_PBFILE	120		# playback file name
 define	TT_TDEVICE	121		# terminal device at record time
 define	TT_GDEVICE	122		# stdgraph device at record time
+define	TT_FILTER	123		# input filter (e.g. for escapes)
+define	TT_FILTERKEY	124		# input filter key character

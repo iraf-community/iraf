@@ -13,7 +13,9 @@ task	$generic,
 	$xc,
 	$xyacc		= "$foreign"
 
-task	mktags		= "softools$x_softools.e"
+task	mktags,
+	memchk		= "softools$x_softools.e"
+
 task	mkttydata	= "softools$x_mkttydata.e"
 task	mkmanpage	= "softools$mkmanpage.cl"
 

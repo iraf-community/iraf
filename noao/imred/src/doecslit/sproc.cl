@@ -32,21 +32,24 @@ bool	update			{prompt="Update spectra if cal data changes?"}
 bool	batch			{prompt="Extract objects in batch?"}
 bool	listonly		{prompt="List steps but don't process?\n"}
 
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
+
 string	anssplot = "yes"	{prompt="Splot spectrum?", mode="q",
 				 enum="no|yes|NO|YES"}
 bool	newaps, newdisp, newsens, newarcs
 bool	fluxcal1, splot1, splot2
 bool	dobatch
 
-struct	*fd1, *fd2
+struct	*fd1, *fd2, *fd3
 
 begin
+	string	imtype, ectype
 	string	arcref, spec, arc
 	string	arcrefec, specec, arcec
 	string	temp, done
-	string	str1, arcrefs, log1, log2
+	string	str1, str2, str3, str4, arcrefs, log1, log2
 	bool	reextract, extract, scat, disp, ext, flux, log, disperr
-	int	i, j
+	int	i, j, n
 	str1 = ""
 
 	# Call a separate task to do the listing to minimize the size of
@@ -58,6 +61,10 @@ begin
 		dispcor, extcor, fluxcal, redo, update)
 	    bye
 	}
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	# Temporary files used repeatedly in this script.  Under some
 	# abort circumstances these files may be left behind.
@@ -97,7 +104,8 @@ begin
 	# Set the newaps flag in case an update is desired.
 
 	# Initialize APSCRIPT for aperture reference.
-	apslitproc.references = apref
+	apslitproc.saturation = INDEF
+	apslitproc.references = ""
 	apslitproc.ansfind = "YES"
 	if (recenter)
 	    apslitproc.ansrecenter = "YES"
@@ -113,12 +121,12 @@ begin
 	apslitproc.ansextract = "NO"
 
 	i = strlen (apref)
-	if (i > 4 && substr (apref, i-3, i) == ".imh")
-	    apref = substr (apref, 1, i-4)
+	if (i > n && substr (apref, i-n+1, i) == imtype)
+	    apref = substr (apref, 1, i-n)
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
-	    if (!access (apref // ".imh"))
+	    if (!access (apref // imtype))
 		error (1, "Aperture reference spectrum not found - " // apref)
 	    scat = no
 	    if (scattered) {
@@ -150,12 +158,12 @@ begin
 
 	print ("Define object apertures", >> log1)
 	if (redo)
-	    apslitproc ("@"//objects)
+	    apslitproc ("@"//objects, references=apref)
 	else
 	    apslitproc ("@"//objects, references="NEW"//apref)
 	if (dispcor && fluxcal1) {
 	    if (redo)
-		apslitproc ("@"//standards)
+		apslitproc ("@"//standards, references=apref)
 	    else
 		apslitproc ("@"//standards, references="NEW"//apref)
 	}
@@ -217,14 +225,16 @@ begin
 	    if (fscan (fd1, arcref) == EOF)
 		error (1, "No reference arcs")
 	    fd1 = ""
-	    if (!access (arcref // ".imh"))
+	    if (!access (arcref // imtype))
 		error (1, "Arc reference spectrum not found - " // arcref)
-	    arcrefec = arcref // ".ec.imh"
+	    arcrefec = arcref // ectype
 	    reextract = redo || (update && newaps)
 	    if (reextract && access (arcrefec))
 	        imdelete (arcrefec, verify=no)
 
+	    apslitproc.references = apref
 	    sarcrefs (arcref, done, log1, log2)
+	    apslitproc.references = ""
 
 	    if (fluxcal1)
 		sfluxcal (standards, arcs, arcref, arcrefs, redo, update,
@@ -246,11 +256,11 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec) | tee (log1)
 		next
 	    }
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    # Determine required operations from the flags and image header.
 	    scat = no
@@ -318,33 +328,48 @@ begin
 		}
 
 		print ("Extract object spectrum ", spec) | tee (log1)
-		setjd (spec, observatory=observatory, date="date-obs",
-		    time="ut", exposure="exptime", jd="jd", hjd="",
-		    ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-		    >> log1)
-	        setairmass (spec, intype="beginning",
-		    outtype="effective", exposure="exptime",
-		    observatory=observatory, show=no, update=yes,
-		    override=yes, >> log1)
-		apslitproc (spec)
+		hselect (spec, "date-obs,ut,exptime", yes, > temp)
+		hselect (spec, "ra,dec,epoch,st", yes, >> temp)
+		fd2 = temp
+		if (fscan (fd2, str1, str2, str3) == 3) {
+		    setjd (spec, observatory=observatory, date="date-obs",
+			time="ut", exposure="exptime", jd="jd", hjd="",
+			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+			>> log1)
+		    if (fscan (fd2, str1, str2, str3, str4) == 4)
+			setairmass (spec, intype="beginning",
+			    outtype="effective", exposure="exptime",
+			    observatory=observatory, show=no, update=yes,
+			    override=yes, >> log1)
+		}
+		fd2 = ""; delete (temp, verify=no)
+		apslitproc (spec, saturation=datamax)
 	    }
 
 	    disperr = no
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    setjd ("@"//arcs, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> log1)
-	    	    setairmass ("@"//arcs, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> log1)
 	    	    fd2 = arcs
-	    	    while (fscan (fd2, arc) != EOF)
+	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp)
+			fd3 = temp
+			if (fscan (fd3, str1, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory,
+				date="date-obs", time="ut", exposure="exptime",
+				jd="jd", hjd="", ljd="ljd", utdate=yes,
+				uttime=yes, listonly=no, >> log1)
+			    if (fscan (fd3, str1, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no,
+				    update=yes, override=yes, >> log1)
+			}
+			fd3 = ""; delete (temp, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
+		    }
 	    	    fd2 = ""
 		    newarcs = no
 		}
@@ -370,7 +395,7 @@ begin
 		} else {
 	            print ("Dispersion correct ", spec) | tee (log1)
 		    dispcor (specec, "", linearize=sparams.linearize,
-			database=database, table=arcref//".ec.imh",
+			database=database, table=arcref//ectype,
 			w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF,
 			log=sparams.log, flux=sparams.flux, samedisp=no,
 			global=no, confirm=no, ignoreaps=no, listonly=no,
@@ -434,6 +459,7 @@ begin
 batch:
 	flprcache
 	sbatch.objects = objects
+	sbatch.datamax = datamax
 	sbatch.arcs = arcs
 	sbatch.arcref = arcref
 	sbatch.arcrefs = arcrefs

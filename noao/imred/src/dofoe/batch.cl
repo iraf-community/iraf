@@ -5,6 +5,7 @@
 procedure batch ()
 
 string	objects		{prompt="Object spectra"}
+real	datamax 	{prompt="Max data value / cosmic ray threshold"}
 
 file	response	{prompt="Response spectrum"}
 string	arcs		{prompt="List of arc spectra"}
@@ -32,8 +33,12 @@ struct	*fd1, *fd2
 begin
 	file	temp1, temp2, spec, specec, arc, arcec
 	bool	reextract, extract, scat, disp, log
-	string	str
-	int	i
+	string	imtype, ectype, str
+	int	i, n
+
+	imtype = "." // envget ("imtype")
+	ectype = ".ec" // imtype
+	n = strlen (imtype)
 
 	temp1 = mktemp ("tmp$iraf")
 	temp2 = mktemp ("tmp$iraf")
@@ -52,15 +57,13 @@ begin
 
 	reextract = redo || (update && (newaps || newresp || newdisp))
 
-	hselect (objects, "$I,ctype1", yes, > temp1)
+	hselect (objects, "$I", yes, > temp1)
 	#sections (objects, option="fullname", > temp1)
-	fd1 = temp1; s1 = ""
-	while (fscan (fd1, spec, s1) != EOF) {
-	    if (nscan() == 2 && s1 == "MULTISPE")
-		next
+	fd1 = temp1
+	while (fscan (fd1, spec) != EOF) {
 	    i = strlen (spec)
-	    if (i > 4 && substr (spec, i-3, i) == ".imh")
-		spec = substr (spec, 1, i-4)
+	    if (i > n && substr (spec, i-n+1, i) == imtype)
+		spec = substr (spec, 1, i-n)
 	    
 	    if (access (done)) {
 	        fd2 = done
@@ -71,11 +74,11 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec) | tee (log1)
 		next
 	    }
-	    specec = spec // ".ec.imh"
+	    specec = spec // ectype
 
 	    scat = no
 	    extract = no
@@ -123,19 +126,19 @@ begin
 		    outtype="effective", exposure="exptime",
 		    observatory=observatory, show=no, update=yes,
 		    override=yes, >> logfile)
-		apscript (spec, verbose=no)
+		apscript (spec, saturation=datamax, verbose=no)
 		if (response != "")
 		    sarith (specec, "/", response, specec, w1=INDEF, w2=INDEF,
-			apertures="", beams="", apmodulus=0, reverse=no,
-			ignoreaps=no, format="multispec", renumber=no,
-			offset=0, clobber=yes, merge=no, errval=0, verbose=no)
+			apertures="", bands="", beams="", apmodulus=0,
+			reverse=no, ignoreaps=no, format="multispec",
+			renumber=no, offset=0, clobber=yes, merge=no,
+			errval=0, verbose=no)
 	    }
 
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    hselect (arcs, "$I,ctype1", yes, >temp2)
-	    	    #sections (arcs, option="fullname", >temp2)
+	    	    sections (arcs, option="fullname", >temp2)
 		    setjd ("@"//temp2, observatory=observatory, date="date-obs",
 			time="ut", exposure="exptime", jd="jd", hjd="",
 			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
@@ -144,13 +147,13 @@ begin
 			outtype="effective", exposure="exptime",
 			observatory=observatory, show=no, update=yes,
 			override=yes, >> logfile)
+		    delete (temp2, verify=no)
+		    hselect (arcs, "$I", yes, >temp2)
 	    	    fd2 = temp2
-	    	    while (fscan (fd2, arc, s1) != EOF) {
-			if (nscan() == 2 && s1 == "MULTISPE")
-			    next
+	    	    while (fscan (fd2, arc) != EOF) {
 	        	i = strlen (arc)
-	        	if (i > 4 && substr (arc, i-3, i) == ".imh")
-	            	    arc = substr (arc, 1, i-4)
+	        	if (i > n && substr (arc, i-n+1, i) == imtype)
+	            	    arc = substr (arc, 1, i-n)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "henear", add=yes, verify=no,
@@ -181,7 +184,7 @@ begin
 		else {
 	            print ("Dispersion correct ", spec, >> logfile)
 		    dispcor (specec, "", linearize=params.linearize,
-			database=database, table=arcref//".ec.imh",
+			database=database, table=arcref//ectype,
 			w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF,
 			log=params.log, samedisp=no, flux=params.flux,
 			global=no, ignoreaps=no, confirm=no, listonly=no,

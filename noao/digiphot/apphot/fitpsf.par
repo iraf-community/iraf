@@ -1,21 +1,21 @@
-# FITPSF parameter file
+# FITPSF
 
 image,f,a,,,,Image
 box,r,a,,,,Fitting box width in scale units
-datapars,pset,h,"",,,Data dependent parameters
-function,s,h,"radgauss",,,Fitting function
-maxiter,i,h,50,,,Maximum number of iterations
-kreject,r,h,0.0,,,K-sigma rejection limit
-nreject,i,h,0,,,Maximum number of rejection cycles
-mkbox,b,h,no,,,Draw the fitting box on the display
 coords,f,h,"",,,Coordinate list
-output,f,h,"default",,,Results
+output,f,h,"default",,,Results file
+datapars,pset,h,"",,,Data dependent parameters
+function,s,h,"radgauss","|radgauss|elgauss|moments|",,Fitting function
+maxiter,i,h,50,,,Maximum number of fitting iterations
+nreject,i,h,0,,,Maximum number of rejection cycles
+kreject,r,h,3.0,,,K-sigma rejection limit
+interactive,b,h,yes,,,Mode of use
+mkbox,b,h,no,,,Draw the fitting box on the display
+verify,b,h,yes,,,Verify critical parameters in non-interactive mode
+update,b,h,no,,,Update critical parameters in non-interactive mode
+verbose,b,h,no,,,Print messages in non-interactive mode
 graphics,s,h,"stdgraph",,,Graphics device
 display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-interactive,b,h,yes,,,Mode of use
-verify,b,h,yes,,,Verify critical parameters in non interactive mode
-update,b,h,yes,,,Update critical parameters in non interactive mode
-verbose,b,h,no,,,Print messages in non interactive mode
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

@@ -99,7 +99,7 @@ begin
 	# between the first and last point.
 
 	do i = 1, SI_MAXDIM {
-	    if ((blksize[i] >= 1) && (blksize[i] != INDEFI)) {
+	    if ((blksize[i] >= 1) && !IS_INDEFI(blksize[i])) {
 	        if (npts[i] == 1)
 		    tau[i] = 0.
 	        else

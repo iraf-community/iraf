@@ -32,10 +32,13 @@ begin
 	GT_YUNITS(gt) = NULL
 	GT_XBUF(gt) = .03
 	GT_YBUF(gt) = .03
+	GT_XFLIP(gt) = NO
+	GT_YFLIP(gt) = NO
 	GT_TRANSPOSE(gt) = NO
 	call gt_sets (gt, GTTYPE, "mark")
 	call gt_sets (gt, GTMARK, "plus")
 	call gt_seti (gt, GTLINE, 1)
+	call gt_seti (gt, GTCOLOR, 1)
 
 	return (gt)
 end

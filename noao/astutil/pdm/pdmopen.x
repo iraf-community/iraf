@@ -41,6 +41,7 @@ begin
 	# Booleans.
 	PDM_RESID(pdmp) = NO
 	PDM_RANGE(pdmp) = YES
+	PDM_EB(pdmp) = NO
 
 	return (pdmp)
 end

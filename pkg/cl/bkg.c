@@ -9,8 +9,8 @@
 #define import_ctype
 #include <iraf.h>
 
-#include "clmodes.h"
 #include "config.h"
+#include "clmodes.h"
 #include "operand.h"
 #include "clmodes.h"
 #include "mem.h"
@@ -60,7 +60,7 @@ extern	int pipetable[];	/* pipe stack (pipecodes)		*/
 extern	int nextpipe;		/* pipe stack pointer (next index)	*/
 extern	int dobkg;		/* flag bkg execution 			*/
 
-extern	unsigned cl_dictbuf[];	/* static dictionary area		*/
+extern	memel cl_dictbuf[];	/* static dictionary area		*/
 extern	long c_clktime();
 extern	char *findexe();
 
@@ -92,8 +92,8 @@ struct bkgfilehdr {
 	int	b_nextpipe;		/* more pipefile database	*/
 	int	b_szstack;		/* size of stack area, bytes	*/
 	int	b_szdict;		/* size of dictionary, bytes	*/
-	unsigned *b_dict,		/* ptr to start of dict		*/
-		b_topd,			/* dict ptr			*/
+	memel	*b_dict;		/* ptr to start of dict		*/
+	int	b_topd,			/* dict ptr			*/
 		b_maxd,			/* top of dict			*/
 		b_pachead,		/* head of package list		*/
 		b_parhead,		/* head of param list		*/

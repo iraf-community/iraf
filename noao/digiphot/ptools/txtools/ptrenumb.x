@@ -2,10 +2,11 @@ include "../../lib/ptkeysdef.h"
 
 # PT_RENUMBER -- Renumber the input file.
 
-int procedure pt_renumber (tp_in, tp_out, id)
+int procedure pt_renumber (tp_in, tp_out, idoffset, id)
 
 int	tp_in		# the input text file descriptor
 int	tp_out		# the output text file descriptor
+int	idoffset	# the id number offset
 char	id[ARB]		# the name of the id column
 
 int	first_rec, nunique, uunique, funique, record
@@ -83,7 +84,7 @@ begin
 
 		# Replace the ID string.
 		call pt_idreplace (key, field, 1, Memc[line], nchars,
-		    record + 1, first_rec, recptr, ncontinue) 
+		    record + idoffset + 1, first_rec, recptr, ncontinue) 
 
 		# Write the output record.
 		call putline (tp_out, Memc[line])

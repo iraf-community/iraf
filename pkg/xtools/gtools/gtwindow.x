@@ -15,7 +15,7 @@ char	cursor[ARB]	# Cursor
 int	redraw		# Redraw flag
 
 char	cmd[1]
-int	i, wcs, key
+int	i, wcs, key, gt_geti()
 real	wx, wy, wx1, wy1, x1, x2, y1, y2, dx, dy
 
 int	clgcur()
@@ -59,11 +59,15 @@ begin
 	        call gt_setr (gt, GTYMAX, wy1)
 	    }
 	case 'f':	# Flip x axis
-	    call gt_setr (gt, GTXMIN, x2)
-	    call gt_setr (gt, GTXMAX, x1)
+	    if (gt_geti (gt, GTXFLIP) == NO)
+		call gt_seti (gt, GTXFLIP, YES)
+	    else
+		call gt_seti (gt, GTXFLIP, NO)
 	case 'g':	# Flip y axis
-	    call gt_setr (gt, GTYMIN, y2)
-	    call gt_setr (gt, GTYMAX, y1)
+	    if (gt_geti (gt, GTYFLIP) == NO)
+		call gt_seti (gt, GTYFLIP, YES)
+	    else
+		call gt_seti (gt, GTYFLIP, NO)
 	case 'j':	# Left edge
 	    call gt_setr (gt, GTXMIN, wx)
 	case 'k':	# Right edge

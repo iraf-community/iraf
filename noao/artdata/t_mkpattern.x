@@ -288,7 +288,7 @@ int	nl		# Number of lines
 int	i
 
 begin
-	i = max (1, line) / size
+	i = max (0, line-1) / size
 
 	switch (pat) {
 	case CONST:

@@ -17,7 +17,7 @@ Relink:
 relink_:
 	$set	ADDR = 0a000000
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = bin$$S$(VV)_$(OSRELEASE).e
+	$set	SI = bin$$S$(VV).e
 
 	$set	L1 = <libos.a>
 	$set	L2 = <libex.a>
@@ -40,7 +40,7 @@ relink_:
 
 install:
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = S$(VV)_$(OSRELEASE).e
+	$set	SI = S$(VV).e
 
 	$iffile (S.e)
 	    $iffile (bin$$$(SI).2) $move bin$$$(SI).2 bin$$$(SI).3 $endif
@@ -59,11 +59,7 @@ libshare.a:
 	$set	SYSF = onentry.o
 	$omake	S.s
 	!ar xv $(iraf)lib/libsys.a $(SYSF)
-	$ifeq (MACH, ssun, sf2c)
-	    !ar rv libshare.a S.o $(SYSF); rm $(SYSF)
-	$else
-	    !ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
-	$endif
+	!ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
 	;
 
 coff:
@@ -75,7 +71,7 @@ coff.e:
 edsym:
 edsym.e:
 	$omake	edsym.c
-	!cc edsym.o -lelf -o edsym.e
+	!cc edsym.o -o edsym.e
 	;
 
 clean:

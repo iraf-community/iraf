@@ -181,11 +181,11 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		if (value == NULL)
 		    goto noval_
 		else {
+		    # Accumulate expression term.
 		    op = start + gstrcpy (Memc[vp], F(start), ARB)
 		    F(op) = ',';  op = op + 1
 		    F(op) = EOS
 		}
-		op = start
 
 	    case KW_KEY:
 		# Set the offsets of the event attribute fields to be used

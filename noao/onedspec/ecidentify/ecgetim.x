@@ -6,19 +6,12 @@ int	list		# Image list
 char	image[maxchar]	# Image name
 int	maxchar		# Maximum number of chars in image name
 
-int	i, stat, imtgetim(), strldx()
+int	stat, imtgetim()
 
 begin
 	stat = imtgetim (list, image, maxchar)
-
-	if (stat == EOF)
-	    return (stat)
-
-        # .??h
-        i = strldx ("h", image)
-        if (i > 4)
-           if (image[i-3] == '.')
-               call strcpy (image[i+1], image[i-3], ARB)
+	if (stat != EOF)
+	    call xt_imroot (image, image, maxchar)
 
   	return (stat)
 end

@@ -6,10 +6,11 @@ $checkin libpkg.a ".."
 $exit
 
 libpkg.a:
+	apavsky.x       ../lib/display.h        ../lib/fitsky.h
 	apbsky.x	<fset.h>		../lib/apphot.h         \
 			../lib/display.h
-	apcentroid.x	../lib/fitsky.h
-	apcrosscor.x	../lib/fitsky.h
+	apcentroid.x	<mach.h>		../lib/fitsky.h
+	apcrosscor.x	<mach.h>		../lib/fitsky.h
 	apfitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
 			../lib/fitskydef.h	../lib/fitsky.h
 	apgauss.x	<mach.h>		../lib/fitsky.h         \
@@ -20,10 +21,10 @@ libpkg.a:
 	aphgmsub.x
 	aphistplot.x	<gset.h>		<pkg/gtools.h>		\
 			../lib/fitsky.h
-	aplgsky.x	../lib/fitsky.h
-	apmean.x		../lib/fitsky.h
-	apmedian.x	../lib/fitsky.h
-	apmode.x	../lib/fitsky.h
+	aplgsky.x	<mach.h>		../lib/fitsky.h
+	apmean.x	<mach.h>		../lib/fitsky.h
+	apmedian.x	<mach.h>		../lib/fitsky.h
+	apmode.x	<mach.h>		../lib/fitsky.h
 	appsky.x	../lib/fitsky.h		../lib/apphot.h
 	apradplot.x	../lib/fitsky.h
 	apreadsky.x
@@ -49,8 +50,7 @@ libpkg.a:
 			../lib/apphot.h		../lib/noise.h          \
 			../lib/fitsky.h		../lib/fitskydef.h	\
 			../lib/apphotdef.h
-	apspshow.x	../lib/display.h	../lib/fitsky.h
-	apsshow.x	../lib/display.h
+	apsshow.x	../lib/display.h	../lib/fitsky.h
 	t_fitsky.x	<fset.h>		 <gset.h>		\
 			../lib/apphot.h
 	;

@@ -55,6 +55,6 @@ begin
 	return
 err_
 	call close (fd)
-	call grc_message (" [READ ERROR]")
+	call grc_message (stream, " [READ ERROR]")
 	call sfree (sp)
 end

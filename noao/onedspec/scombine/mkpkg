@@ -6,13 +6,13 @@ $exit
 libpkg.a:
 	@generic
 
-	icgdata.x	../shdr.h icombine.com icombine.h
-	iclog.x		../shdr.h icombine.com icombine.h <mach.h>
-	icombine.x	../shdr.h icombine.com <mach.h> icombine.h
-	icscale.x	../shdr.h icombine.com icombine.h <ctype.h>\
-			<error.h> <imhdr.h> <imset.h>
-	icstat.x	../shdr.h icombine.com icombine.h
+	icgdata.x	<smw.h> icombine.com icombine.h
+	iclog.x		<smw.h> icombine.com icombine.h <mach.h>
+	icombine.x	<smw.h> icombine.com <mach.h> icombine.h
+	icscale.x	<smw.h> icombine.com icombine.h <ctype.h> <error.h>\
+			<imhdr.h> <imset.h>
+	icstat.x	<smw.h> icombine.com icombine.h
 	icsum.x		icombine.com icombine.h
-	t_scombine.x	../shdr.h icombine.h icombine.com <error.h> <imhdr.h>\
+	t_scombine.x	<smw.h> icombine.h icombine.com <error.h> <imhdr.h>\
 			<mach.h>
 	;

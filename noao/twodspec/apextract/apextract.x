@@ -1,7 +1,6 @@
 include	<error.h>
 include	<imhdr.h>
 include	<mach.h>
-include	<mwset.h>
 include	<math/iminterp.h>
 include	<pkg/gtools.h>
 include	"apertures.h"
@@ -26,7 +25,7 @@ define	P_FIT2D		2
 
 # Output formats
 define	FORMATS		"|onedspec|multispec|echelle|strip|normalize|flatten\
-			|ratio|difference|fit|"
+			|ratio|difference|fit|noise|"
 define	ONEDSPEC	1	# Individual 1D spectra
 define	MULTISPEC	2	# Multiple spectra
 define	ECHELLE		3	# Echelle spectra
@@ -36,6 +35,7 @@ define	FLAT		6	# Flat spectra
 define	RATIO		7	# Ratio of data to model
 define	DIFF		8	# Difference of data and model
 define	FIT		9	# Model
+define	NOISE		10	# Noise calculation
 
 
 # AP_EXTRACT -- Extract spectra by a weighted sum across the apertures.
@@ -92,13 +92,15 @@ int	weights			# Extraction weights
 int	pfit			# Profile fitting algorithm
 bool	clean			# Reject cosmic rays?
 real	gain			# Photon/DN gain
+real	rdnoise			# Read out noise
 int	nsubaps			# Number of subapertures
 
 int	i, j, k, aaxis, baxis, namax, na, nb, na1
 int	amin, amax, bmin, bmax
 int	new_size, old_size, max_size, best_size
 real	cmin, cmax, xmin, xmax, shift
-pointer	sp, str, a, b, c, astart, spec, specsky, specsig, raw, profile
+pointer	sp, str, bkgstr, wtstr, cleanstr
+pointer	a, b, c, astart, spec, specsky, specsig, raw, profile
 pointer	a1, a2, b1, b2, c1, c2, im, pim, ap, cv, ic, dbuf, pbuf, sbuf, svar, ptr
 
 bool	clgetb(), apgetb(), strne()
@@ -111,6 +113,9 @@ errchk	ap_check, ap_skyeval, ap_profile, ap_variance, ap_output, apgimr
 begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (bkgstr, SZ_FNAME, TY_CHAR)
+	call salloc (wtstr, SZ_FNAME, TY_CHAR)
+	call salloc (cleanstr, SZ_FNAME, TY_CHAR)
 
 	if (naps == 0) {
 	    call sprintf (Memc[str], SZ_LINE,
@@ -122,9 +127,13 @@ begin
 	}
 
 	# Get CL parameters
-	bkg = apgwrd ("background", Memc[str], SZ_LINE, BACKGROUND)
+	bkg = apgwrd ("background", Memc[bkgstr], SZ_FNAME, BACKGROUND)
 	pfit = apgwrd ("pfit", Memc[str], SZ_LINE, P_FIT)
 	clean = apgetb ("clean")
+	if (clean)
+	    call strcpy ("yes", Memc[cleanstr], SZ_FNAME)
+	else
+	    call strcpy ("no", Memc[cleanstr], SZ_FNAME)
 	nsubaps = apgeti ("nsubaps")
 
 	# Do clobber checking.  Return if output exists and not clobbering.
@@ -138,13 +147,14 @@ begin
 
 	# Force weights depending on format or cleaning.
 	switch (fmt) {
-	case FLAT, RATIO, DIFF, FIT:
+	case FLAT, RATIO, DIFF, FIT, NOISE:
 	    weights = W_VARIANCE
 	default:
-	    if (clean)
+	    if (clean) {
+		call strcpy ("variance", Memc[wtstr], SZ_FNAME)
 		weights = W_VARIANCE
-	    else
-	        weights = apgwrd ("weights", Memc[str], SZ_LINE, WEIGHTS)
+	    } else
+	        weights = apgwrd ("weights", Memc[wtstr], SZ_FNAME, WEIGHTS)
 	}
 
 	if (clgetb ("verbose")) {
@@ -272,14 +282,19 @@ begin
 	    }
 	    profile = NULL
 	    if (aaxis == 2) {
-		call malloc (dbuf, namax * nb, TY_REAL)
+		call calloc (dbuf, namax * nb, TY_REAL)
 		if (pim != NULL)
-		    call malloc (pbuf, namax * nb, TY_REAL)
+		    call calloc (pbuf, namax * nb, TY_REAL)
 	    }
 
 	    # For variance weighting the computations are done in photon units.
-	    if (weights == W_VARIANCE)
+	    if (weights == W_VARIANCE) {
 		gain = apgimr ("gain", im)
+		rdnoise = apgimr ("readnoise", im)
+	    } else {
+		gain = 1
+		rdnoise = 0
+	    }
 
 	    # Loop through each aperture doing the extractions.
 	    amax = 0
@@ -308,7 +323,7 @@ begin
 			if (na > namax) {
 			    call mfree (dbuf, TY_REAL)
 			    namax = na
-			    call malloc (dbuf, namax * nb, TY_REAL)
+			    call calloc (dbuf, namax * nb, TY_REAL)
 			}
 			do j = amin, amax {
 			    sbuf = imgl2r (im, j)
@@ -328,7 +343,7 @@ begin
 			    if (na > namax) {
 				call mfree (pbuf, TY_REAL)
 				namax = na
-				call malloc (pbuf, namax * nb, TY_REAL)
+				call calloc (pbuf, namax * nb, TY_REAL)
 			    }
 			    do j = amin, amax {
 				sbuf = imgl2r (pim, j)
@@ -407,11 +422,11 @@ begin
 		    if (pim == NULL)
 			call ap_skyeval (im, ap, dbuf, na, nb, amin, 1,
 			    Memr[sbuf], Memr[svar], Memr[specsky], na1, nb,
-			    Memi[astart], 1, nsubaps)
+			    Memi[astart], 1, nsubaps, rdnoise)
 		    else
 			call ap_skyeval (pim, ap, pbuf, na, nb, amin, 1,
 			    Memr[sbuf], Memr[svar], Memr[specsky], na1, nb,
-			    Memi[astart], 1, nsubaps)
+			    Memi[astart], 1, nsubaps, rdnoise)
 		} else {
 		    sbuf = NULL
 		    svar = NULL
@@ -438,7 +453,7 @@ begin
 			if (sbuf != NULL)
 			    call ap_skyeval (im, ap, dbuf, na, nb, amin, 1,
 				Memr[sbuf], Memr[svar], Memr[specsky], na1, nb,
-				Memi[astart], 1, nsubaps)
+				Memi[astart], 1, nsubaps, rdnoise)
 		    }
 
 		    call ap_variance (im, ap, dbuf, na, nb, amin, 1, sbuf, svar,
@@ -458,9 +473,11 @@ begin
 			call adivkr (Memr[specsky], gain, Memr[specsky], nb)
 		    if (specsig != NULL)
 			call adivkr (Memr[specsig], gain, Memr[specsig], nb)
+		    call amulkr (Memr[profile], gain, Memr[profile], nb*na1)
 		}
 
-		call ap_output (input, output, format, im, aps, naps, i,
+		call ap_output (input, output, format, Memc[bkgstr],
+		    Memc[wtstr], Memc[cleanstr], gain, im, aps, naps, i,
 		    nsubaps, spec, raw, specsky, specsig, dbuf, na, nb, amin,
 		    1, sbuf, profile, na1, nb, Memi[astart], 1)
 
@@ -517,49 +534,52 @@ int	naps				# Number of apertures
 int	nsubaps				# Number of subapertures
 
 int	i, fmt
-pointer	sp, name, ans
+pointer	sp, name, input1, ans
 
 int	strdic(), imaccess()
 bool	streq(), ap_answer()
 
 begin
 	call smark (sp)
-	call salloc (name, SZ_FNAME, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
+	call salloc (input1, SZ_LINE, TY_CHAR)
 	call salloc (ans, SZ_LINE, TY_CHAR)
 
 	fmt = strdic (format, format, SZ_LINE, FORMATS)
 	if (nsubaps > 1 && fmt == ONEDSPEC)
 	    fmt = MULTISPEC
 
+	call imgimage (input, Memc[input1], SZ_LINE)
+
 	switch (fmt) {
 	case ECHELLE, MULTISPEC, NORM, FLAT, RATIO, DIFF, FIT:
 	    if (output[1] == EOS)
-	        call strcpy (input, Memc[name], SZ_FNAME)
+	        call strcpy (Memc[input1], Memc[name], SZ_LINE)
 	    else
-	        call strcpy (output, Memc[name], SZ_FNAME)
+	        call strcpy (output, Memc[name], SZ_LINE)
 
 	    switch (fmt) {
 	    case ECHELLE:
-		if (streq (input, Memc[name]))
-	            call strcat (".ec", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".ec", Memc[name], SZ_LINE)
 	    case MULTISPEC:
-		if (streq (input, Memc[name]))
-	            call strcat (".ms", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".ms", Memc[name], SZ_LINE)
 	    case NORM:
-		if (streq (input, Memc[name]))
-	            call strcat (".norm", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".norm", Memc[name], SZ_LINE)
 	    case FLAT:
-		if (streq (input, Memc[name]))
-	            call strcat (".flat", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".flat", Memc[name], SZ_LINE)
 	    case RATIO:
-		if (streq (input, Memc[name]))
-	            call strcat (".ratio", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".ratio", Memc[name], SZ_LINE)
 	    case DIFF:
-		if (streq (input, Memc[name]))
-	            call strcat (".diff", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".diff", Memc[name], SZ_LINE)
 	    case FIT:
-		if (streq (input, Memc[name]))
-	            call strcat (".fit", Memc[name], SZ_FNAME)
+		if (streq (Memc[input1], Memc[name]))
+	            call strcat (".fit", Memc[name], SZ_LINE)
 	    }
 	    if (imaccess (Memc[name], 0) == YES) {
 		call sprintf (Memc[ans], SZ_LINE,
@@ -577,9 +597,9 @@ begin
 	    }
 	case ONEDSPEC, STRIP:
 	    do i = 1, naps {
-	        call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
+	        call sprintf (Memc[name], SZ_LINE, "%s.%04d")
 	            if (output[1] == EOS)
-		        call pargstr (input)
+		        call pargstr (Memc[input1])
 	            else
 	                call pargstr (output)
 		    call pargi (AP_ID(aps[i]))
@@ -598,6 +618,8 @@ begin
 		    }
 		}
 	    }
+	case NOISE:
+	    ;
 	default:
 	    call sfree (sp)
 	    call error (1, "EXTRACT - Unknown output format")
@@ -613,13 +635,17 @@ end
 # unweighted, and sigma spectra.  The appropriate header keywords have
 # to be added.
 
-procedure ap_output (image, output, format, in, aps, naps, iap, nsubaps,
-	spec, raw sky, sig, dbuf, nc, nl, c1, l1, sbuf, profile,
-	nx, ny, xs, ys)
+procedure ap_output (image, output, format, bkg, wt, clean, gain, in, aps,
+	naps, iap, nsubaps, spec, raw sky, sig, dbuf, nc, nl, c1, l1, sbuf,
+	profile, nx, ny, xs, ys)
 
 char	image[ARB]		# Input image name
 char	output[ARB]		# Output root name
 char	format[ARB]		# Output format
+char	bkg[ARB]		# Background type
+char	wt[ARB]			# Weight type
+char	clean[ARB]		# Clean?
+real	gain			# Gain
 pointer	in			# Input IMIO pointer
 pointer	aps[naps]		# Apertures
 int	naps			# Number of apertures
@@ -640,14 +666,16 @@ int	xs[ny], ys		# Origin of sky and profile array
 int	fmt			# Output format
 bool	extras			# Include raw spectrum, sky, and sigma
 
-real	w0, wpc, low, high, step
-int	k, l, m, apaxis, dispaxis, dtype
-pointer	sp, str, str1, name, ap, out, gt, mw
+real	low, high, step
+int	k, l, m, apaxis, dispaxis
+pointer	sp, str, str1, name, input, ap, out, gt, apmw, sum2, sum4, nsum
 
-int	scan(), strdic()
+real	clgetr()
+int	scan(), strdic(), imaccf()
 bool	streq(), ap_answer(), apgetb()
-pointer	immap(), imgl2r(), impl1r(), impl2r(), impl3r(), gt_init(), ap_wcs()
-errchk	immap, ap_strip, ap_pstrip, ap_wcs
+pointer	immap(), imgl2r(), impl1r(), impl2r(), impl3r()
+pointer	gt_init(), apmw_open()
+errchk	immap, impl1r, impl2r, impl3r, imps2r, ap_strip, ap_pstrip, apmw_open
 errchk	ap_fitspec, ap_lnorm, ap_cnorm, ap_lflat, ap_cflat
 
 begin
@@ -655,7 +683,8 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (name, SZ_FNAME, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
+	call salloc (input, SZ_LINE, TY_CHAR)
 
 	fmt = strdic (format, format, SZ_LINE, FORMATS)
 	extras = apgetb ("extras")
@@ -665,37 +694,40 @@ begin
 	dispaxis = mod (apaxis, 2) + 1
 
 	# Set output name.
+	call imgimage (image, Memc[input], SZ_LINE)
 	if (output[1] == EOS)
-	    call strcpy (image, Memc[name], SZ_LINE)
+	    call strcpy (Memc[input], Memc[name], SZ_LINE)
 	else
 	    call strcpy (output, Memc[name], SZ_LINE)
 
 	switch (fmt) {
 	case ECHELLE:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 		call strcat (".ec", Memc[name], SZ_LINE)
 	case MULTISPEC:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 		call strcat (".ms", Memc[name], SZ_LINE)
 	case NORM:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 	        call strcat (".norm", Memc[name], SZ_LINE)
 	case FLAT:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 	        call strcat (".flat", Memc[name], SZ_LINE)
 	case RATIO:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 	        call strcat (".ratio", Memc[name], SZ_LINE)
 	case DIFF:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 	        call strcat (".diff", Memc[name], SZ_LINE)
 	case FIT:
-	    if (streq (image, Memc[name]))
+	    if (streq (Memc[input], Memc[name]))
 	        call strcat (".fit", Memc[name], SZ_LINE)
 	case ONEDSPEC, STRIP:
-	    call sprintf (Memc[str], SZ_FNAME, ".%04d")
+	    call sprintf (Memc[str], SZ_LINE, ".%04d")
 	        call pargi (AP_ID(ap))
 	    call strcat (Memc[str], Memc[name], SZ_LINE)
+	case NOISE:
+	    Memc[name] = EOS
 	}
 
 
@@ -732,7 +764,7 @@ begin
 		        return
 		    }
 	            if (Memc[str] != EOS)
-		        call strcpy (Memc[str], Memc[name], SZ_FNAME)
+		        call strcpy (Memc[str], Memc[name], SZ_LINE)
 		}
 	    }
 	}
@@ -745,10 +777,10 @@ begin
 
 		IM_PIXTYPE(out) = TY_REAL
 		IM_NDIM(out) = 1
-		IM_LEN(out, 1) = IM_LEN(in, dispaxis)
+		IM_LEN(out, 1) = ny
 		IM_LEN(out, 2) = nsubaps * naps
+		IM_LEN(out, 3) = 1
 		if (extras) {
-		    IM_LEN(out, 3) = 1
 		    if (sky != NULL)
 		        IM_LEN(out, 3) = IM_LEN(out, 3) + 1
 		    if (raw != NULL)
@@ -761,7 +793,49 @@ begin
 		if (IM_LEN(out, 3) > 1)
 		    IM_NDIM(out) = 3
 
-		mw = ap_wcs (in, out, dispaxis, w0, wpc, dtype)
+		apmw = apmw_open (in, out, dispaxis)
+
+		# Write BAND IDs.
+		k = 1
+		call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+		    call pargi (k)
+		call sprintf (Memc[str], SZ_LINE,
+		    "spectrum - background %s, weights %s, clean %s")
+		    call pargstr (bkg)
+		    call pargstr (wt)
+		    call pargstr (clean)
+		call imastr (out, Memc[str1], Memc[str])
+		k = k + 1
+		if (extras) {
+		    if (raw != NULL) {
+			call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			    call pargi (k)
+			call sprintf (Memc[str], SZ_LINE,
+			    "raw - background %s, weights none, clean no")
+			    call pargstr (bkg)
+			call imastr (out, Memc[str1], Memc[str])
+			k = k + 1
+		    }
+		    if (sky != NULL) {
+			call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			    call pargi (k)
+			call sprintf (Memc[str], SZ_LINE,
+			    "background - background %s")
+			    call pargstr (bkg)
+			call imastr (out, Memc[str1], Memc[str])
+			k = k + 1
+		    }
+		    if (sig != NULL) {
+			call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			    call pargi (k)
+			call sprintf (Memc[str], SZ_LINE,
+			    "sigma - background %s, weights %s, clean %s")
+			    call pargstr (bkg)
+			    call pargstr (wt)
+			    call pargstr (clean)
+			call imastr (out, Memc[str1], Memc[str])
+		    }
+		}
 
 		do k = 1, naps {
 		    low = AP_CEN(aps[k],apaxis) + AP_LOW(aps[k],apaxis)
@@ -771,20 +845,9 @@ begin
 		    do l = 1, nsubaps {
 			low = low + step
 			high = low + step
-			call sprintf (Memc[str1], SZ_LINE,
-			    "%d %d %d %g %g %d %g %.2f %.2f")
-			    call pargi (AP_ID(aps[k])+1000*(l-1))
-			    call pargi (AP_BEAM(aps[k]))
-			    call pargi (dtype)
-			    call pargr (w0)
-			    call pargr (wpc)
-			    call pargi (ny)
-			    call pargr (0.)
-			    call pargr (low)
-			    call pargr (high)
-			call sprintf (Memc[str], SZ_LINE, "spec%d")
-			    call pargi ((k-1)*nsubaps+l)
-			call mw_swattrs (mw, 2, Memc[str], Memc[str1])
+			call apmw_setap (apmw, (k-1)*nsubaps+l,
+			    AP_ID(aps[k])+1000*(l-1), AP_BEAM(aps[k]),
+			    low, high)
 		    }
 		}
 		do k = 1, naps {
@@ -822,8 +885,8 @@ begin
 		}
 	    }
 	    if (iap == naps) {
-		call mw_saveim (mw, out)
-		call mw_close (mw)
+		call apmw_saveim (apmw, out)
+		call apmw_close (apmw)
 	        call imunmap (out)
 	    }
 			
@@ -832,7 +895,7 @@ begin
 
 	    IM_PIXTYPE(out) = TY_REAL
 	    IM_NDIM(out) = 1
-	    IM_LEN(out, 1) = IM_LEN(in, dispaxis)
+	    IM_LEN(out, 1) = ny
 	    IM_LEN(out, 2) = 1
 	    IM_LEN(out, 3) = 1
 	    if (extras) {
@@ -848,23 +911,57 @@ begin
 	    if (IM_LEN(out, 3) > 1)
 		IM_NDIM(out) = 3
 
-	    mw = ap_wcs (in, out, dispaxis, w0, wpc, dtype)
+	    apmw = apmw_open (in, out, dispaxis)
 
-	    call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
-		call pargstr (IM_TITLE(out))
-		call pargi (AP_ID(ap))
-	    call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
-	    call sprintf (Memc[str1], SZ_LINE, "%d %d %d %g %g %d %g %.2f %.2f")
-		call pargi (AP_ID(ap))
-		call pargi (AP_BEAM(ap))
-		call pargi (dtype)
-		call pargr (w0)
-		call pargr (wpc)
-		call pargi (ny)
-		call pargr (0.)
-		call pargr (AP_CEN(ap,apaxis)+AP_LOW(ap,apaxis))
-		call pargr (AP_CEN(ap,apaxis)+AP_HIGH(ap,apaxis))
-	    call mw_swattrs (mw, 2, "spec1", Memc[str1])
+	    # Write BAND IDs.
+	    k = 1
+	    call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+		call pargi (k)
+	    call sprintf (Memc[str], SZ_LINE,
+		"spectrum: background %s, weights %s, clean %s")
+		call pargstr (bkg)
+		call pargstr (wt)
+		call pargstr (clean)
+	    call imastr (out, Memc[str1], Memc[str])
+	    k = k + 1
+	    if (extras) {
+		if (raw != NULL) {
+		    call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			call pargi (k)
+		    call sprintf (Memc[str], SZ_LINE,
+			"spectrum: background %s, weights none, clean no")
+			call pargstr (bkg)
+		    call imastr (out, Memc[str1], Memc[str])
+		    k = k + 1
+		}
+		if (sky != NULL) {
+		    call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			call pargi (k)
+		    call sprintf (Memc[str], SZ_LINE,
+			"background: background %s")
+			call pargstr (bkg)
+		    call imastr (out, Memc[str1], Memc[str])
+		    k = k + 1
+		}
+		if (sig != NULL) {
+		    call sprintf (Memc[str1], SZ_LINE, "BANDID%d")
+			call pargi (k)
+		    call sprintf (Memc[str], SZ_LINE,
+			"sigma - background %s, weights %s, clean %s")
+			call pargstr (bkg)
+			call pargstr (wt)
+			call pargstr (clean)
+		    call imastr (out, Memc[str1], Memc[str])
+		}
+	    }
+
+	    #call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
+	    #    call pargstr (IM_TITLE(out))
+	    #    call pargi (AP_ID(ap))
+	    #call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
+	    call apmw_setap (apmw, 1, AP_ID(ap), AP_BEAM(ap),
+		AP_CEN(ap,apaxis)+AP_LOW(ap,apaxis),
+		AP_CEN(ap,apaxis)+AP_HIGH(ap,apaxis))
 	    if (AP_TITLE(ap) != NULL)
 		call imastr (out, "APID1", Memc[AP_TITLE(ap)])
 
@@ -885,33 +982,25 @@ begin
 		}
 	    }
 
-	    call mw_saveim (mw, out)
-	    call mw_close (mw)
+	    call apmw_saveim (apmw, out)
+	    call apmw_close (apmw)
 	    call imunmap (out)
 
 	case STRIP:
 	    out = immap (Memc[name], NEW_COPY, in)
-	    mw = ap_wcs (in, out, dispaxis, w0, wpc, dtype)
+	    apmw = apmw_open (in, out, dispaxis)
 
 	    IM_PIXTYPE(out) = TY_REAL
 	    IM_NDIM(out) = 2
-	    IM_LEN(out, 1) = IM_LEN(in, dispaxis)
+	    IM_LEN(out, 1) = ny
 	    IM_LEN(out, 2) = AP_HIGH(ap,apaxis) - AP_LOW(ap,apaxis) + 1
 	    call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
 		call pargstr (IM_TITLE(out))
 		call pargi (AP_ID(ap))
 	    call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
-	    call sprintf (Memc[str1], SZ_LINE, "%d %d %d %g %g %d %g %.2f %.2f")
-		call pargi (AP_ID(ap))
-		call pargi (AP_BEAM(ap))
-		call pargi (dtype)
-		call pargr (w0)
-		call pargr (wpc)
-		call pargi (ny)
-		call pargr (0.)
-		call pargr (AP_CEN(ap,apaxis)+AP_LOW(ap,apaxis))
-		call pargr (AP_CEN(ap,apaxis)+AP_HIGH(ap,apaxis))
-	    call mw_swattrs (mw, 2, "spec1", Memc[str1])
+	    call apmw_setap (apmw, 1, AP_ID(ap), AP_BEAM(ap),
+		AP_CEN(ap,apaxis)+AP_LOW(ap,apaxis),
+		AP_CEN(ap,apaxis)+AP_HIGH(ap,apaxis))
 	    if (AP_TITLE(ap) != NULL)
 		call imastr (out, "APID1", Memc[AP_TITLE(ap)])
 
@@ -919,17 +1008,19 @@ begin
 		call ap_strip (ap, out, dbuf, nc, nl, c1, l1, sbuf,
 		    nx, ny, xs, ys)
 	    else
-	        call ap_pstrip (ap, out, Memr[spec], Memr[profile],
+	        call ap_pstrip (ap, out, gain, Memr[spec], Memr[profile],
 		    nx, ny, xs, ys)
 
-	    call mw_saveim (mw, out)
-	    call mw_close (mw)
+	    call apmw_saveim (apmw, out)
+	    call apmw_close (apmw)
 	    call imunmap (out)
 
 	case NORM, FLAT:
 	    if (iap == 1) {
 	        out = immap (Memc[name], NEW_COPY, in)
 	        IM_PIXTYPE(out) = TY_REAL
+		if (imaccf (out, "CCDMEAN") == YES)
+		    call imdelf (out, "CCDMEAN")
 	        call ap_fitspec (ap, in, Memr[spec], ny)
 		k = YES
 	    } else {
@@ -938,15 +1029,15 @@ begin
 	    }
 	    if (apaxis == 1) {
 		if (fmt == NORM)
-		    call ap_lnorm (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
-		        ny, ys, k)
+		    call ap_lnorm (ap, out, gain, dbuf, nc, nl, c1, l1,
+			Memr[spec], ny, ys, k)
 		else
 		    call ap_lflat (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
 		        sbuf, Memr[profile], nx, ny, xs, ys, k)
 	    } else {
 		if (fmt == NORM)
-		    call ap_cnorm (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
-		        ny, ys, k)
+		    call ap_cnorm (ap, out, gain, dbuf, nc, nl, c1, l1,
+			Memr[spec], ny, ys, k)
 		else
 		    call ap_cflat (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
 		        sbuf, Memr[profile], nx, ny, xs, ys, k)
@@ -967,8 +1058,8 @@ begin
 		    call ap_lflat (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
 		        sbuf, Memr[profile], nx, ny, xs, ys, k)
 		case FIT:
-		    call ap_lfit (ap, out, Memr[spec], Memr[profile], nx, ny,
-			xs, ys, k)
+		    call ap_lfit (ap, out, gain, Memr[spec], Memr[profile],
+			nx, ny, xs, ys, k)
 		}
 	    } else {
 		switch (fmt) {
@@ -976,8 +1067,8 @@ begin
 		    call ap_cflat (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
 		        sbuf, Memr[profile], nx, ny, xs, ys, k)
 		case FIT:
-		    call ap_cfit (ap, out, Memr[spec], Memr[profile], nx, ny,
-			xs, ys, k)
+		    call ap_cfit (ap, out, gain, Memr[spec], Memr[profile],
+			nx, ny, xs, ys, k)
 		}
 	    }
 	    if (iap == naps)
@@ -994,144 +1085,63 @@ begin
 	    } else
 		k = NO
 	    if (apaxis == 1)
-		call ap_ldiff (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
+		call ap_ldiff (ap, out, gain, dbuf, nc, nl, c1, l1, Memr[spec],
 		    Memr[profile], nx, ny, xs, ys, k)
 	    else
-		call ap_cdiff (ap, out, dbuf, nc, nl, c1, l1, Memr[spec],
+		call ap_cdiff (ap, out, gain, dbuf, nc, nl, c1, l1, Memr[spec],
 		    Memr[profile], nx, ny, xs, ys, k)
 	    if (iap == naps)
 	        call imunmap (out)
+
+	case NOISE:
+	    if (iap == 1) {
+		low = clgetr ("dmin")
+		high = clgetr ("dmax")
+		l = clgetr ("nbins")
+		if (high < low) {
+		    step = low; low = high; high = step
+		}
+		step = (high - low) / l
+		call malloc (sum2, l, TY_REAL)
+		call malloc (sum4, l, TY_REAL)
+		call malloc (nsum, l, TY_INT)
+		call aclrr (Memr[sum2], l)
+		call aclrr (Memr[sum4], l)
+		call aclri (Memi[nsum], l)
+	    }
+	    call ap_noise (ap, gain, dbuf, nc, nl, c1, l1, sbuf, Memr[spec],
+		Memr[profile], nx, ny, xs, ys, Memr[sum2], Memr[sum4],
+		Memi[nsum], l, low, high)
+	    if (iap == naps) {
+		do k = 0, l-1 {
+		    m = Memi[nsum+k]
+		    if (m > 10) {
+			Memr[sum2+k] = sqrt (Memr[sum2+k] / (m - 1))
+			step = max (0., Memr[sum4+k] / m - Memr[sum2+k]**2)
+			Memr[sum4+k] = sqrt (sqrt (step / m))
+		    } else {
+			Memr[sum2+k] = 0.
+			Memr[sum4+k] = 0.
+		    }
+		}
+		call ap_nplot (image, in, Memr[sum2], Memr[sum4], l,
+		    low, high)
+		call mfree (sum2, TY_REAL)
+		call mfree (sum4, TY_REAL)
+		call mfree (nsum, TY_INT)
+	    }
 	}
 
-	call sprintf (Memc[str], SZ_LINE,
-	    "EXTRACT - Aperture %d from %s --> %s")
-	    call pargi (AP_ID(ap))
-       	    call pargstr (image)
-	    call pargstr (Memc[name])
-	call ap_log (Memc[str], YES, YES, NO)
-	call ap_plot1 (gt, Memr[spec], ny, nsubaps)
+	if (Memc[name] != EOS) {
+	    call sprintf (Memc[str], SZ_LINE,
+		"EXTRACT - Aperture %d from %s --> %s")
+		call pargi (AP_ID(ap))
+		call pargstr (image)
+		call pargstr (Memc[name])
+	    call ap_log (Memc[str], YES, YES, NO)
+	    call ap_plot1 (gt, Memr[spec], ny, nsubaps)
+	}
 	call gt_free (gt)
-	call sfree (sp)
-end
-
-
-# AP_WCS -- Set WCS parameters.
-
-pointer procedure ap_wcs (in, out, dispaxis, w1, dw, dtype)
-
-pointer	in		# Input IMIO pointer
-pointer	out		# Output IMIO pointer
-int	dispaxis	# Input dispersion axis
-real	w1		# Output coordinate limits
-real	dw		# Output step
-int	dtype		# Dispersion type
-pointer	mw		# Output MWCS pointer
-
-int	nw, axis[2], axval[2], imgeti()
-real	w2, mw_c1tranr()
-pointer	sp, label, units, ct, mw_openim(), mw_sctran(), mw_open()
-data	axval/0,0/
-errchk	mw_openim, mw_sctran, mw_c1tranr, ap_wcsfix
-
-begin
-	call smark (sp)
-	call salloc (label, SZ_LINE, TY_CHAR)
-	call salloc (units, SZ_LINE, TY_CHAR)
-
-	# Initialize
-	w1 = 1.
-	dw = 1.
-	dtype = -1
-	call strcpy ("Pixel", Memc[label], SZ_LINE)
-	Memc[units] = EOS
-
-	# Get WCS info from input image
-	iferr {
-	    mw = mw_openim (in)
-	    call ap_wcsfix (in, mw)
-	    ct = mw_sctran (mw, "logical", "world", dispaxis)
-	    nw = IM_LEN(out,1)
-	    w1 = mw_c1tranr (ct, 1.)
-	    w2 = mw_c1tranr (ct, real (nw))
-	    dw = (w2 - w1) / (nw - 1)
-	    iferr (dtype = imgeti (in, "DC-FLAG"))
-		dtype = -1
-	    iferr (call mw_gwattrs (mw, dispaxis, "label",
-		Memc[label], SZ_LINE)) {
-		if (dtype == -1)
-		    call strcpy ("Pixel", Memc[label], SZ_LINE)
-		else
-		    call strcpy ("Wavelength", Memc[label], SZ_LINE)
-	    }
-	    iferr (call mw_gwattrs (mw, dispaxis, "units",
-		Memc[units], SZ_LINE)) {
-		if (dtype == -1)
-		    Memc[units] = EOS
-		else
-		    call strcpy ("Angstroms", Memc[label], SZ_LINE)
-	    }
-	} then
-	    call erract (EA_WARN)
-
-	call mw_close (mw)
-
-	# Write WCS to output image
-	axis[1] = 1
-	axis[2] = 2
-	mw = mw_open (NULL, 2)
-	call mw_newsystem (mw, "multispec", 2)
-	call mw_swtype (mw, axis, 2, "multispec", "")
-	if (Memc[label] != EOS)
-	    call mw_swattrs (mw, 1, "label", Memc[label])
-	if (Memc[units] != EOS)
-	    call mw_swattrs (mw, 1, "units", Memc[units])
-	if (IM_NDIM(out) == 1) {
-	    axis[2] = 0
-	    call mw_saxmap (mw, axis, axval, 2)
-	}
-
-	iferr (call imdelf (out, "dispaxis"))
-	    ;
-	iferr (call imdelf (out, "dc-flag"))
-	    ;
-
-	call sfree (sp)
-	return (mw)
-end
-
-
-# AP_WCSFIX -- Fix up WCS to avoid CDELT=0 which occurs if there are WCS
-# keywords in the header but no CDELT.
-
-procedure ap_wcsfix (im, mw)
-
-pointer	im			# IMIO pointer
-pointer	mw			# MWCS pointer
-
-int	i, ndim, mw_stati()
-double	val
-pointer	sp, r, w, cd
-errchk	mw_gwtermd, mw_swtermd
-
-begin
-	ndim = mw_stati (mw, MW_NDIM)
-
-	call smark (sp)
-	call salloc (r, ndim, TY_DOUBLE)
-	call salloc (w, ndim, TY_DOUBLE)
-	call salloc (cd, ndim*ndim, TY_DOUBLE)
-
-	# Check cd terms.  Assume no rotation.
-	call mw_gwtermd (mw, Memd[r], Memd[w], Memd[cd], ndim)
-	do i = 0, ndim-1 {
-	    val = Memd[cd+i*(ndim+1)]
-	    if (val == 0D0) {
-		Memd[w+i] = 1D0
-	        Memd[cd+i*(ndim+1)] = 1D0
-	    }
-	}
-	call mw_swtermd (mw, Memd[r], Memd[w], Memd[cd], ndim)
-
 	call sfree (sp)
 end
 
@@ -1270,10 +1280,11 @@ end
 # Interpolate the profile spectrum so that the lower aperture edge is the
 # first pixel.
 
-procedure ap_pstrip (ap, out, spec, profile, nx, ny, xs, ys)
+procedure ap_pstrip (ap, out, gain, spec, profile, nx, ny, xs, ys)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 real	spec[ny]		# Spectrum
 real	profile[ny,nx]		# Profile
 int	nx, ny			# Size of profile array
@@ -1295,7 +1306,7 @@ begin
 	call asiinit (asi, II_LINEAR)
 
 	do iy = 1, ny {
-	    s = spec[iy]
+	    s = spec[iy] / gain
 	    do ix = 1, nx
 		Memr[data+ix-1] = s * profile[iy,ix]
 	    call asifit (asi, Memr[data], nx)

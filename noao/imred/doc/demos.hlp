@@ -6,6 +6,7 @@ demos -- Demonstration and Test Procedures
 PACKAGES
 noao.imred.argus, noao.imred.goldcams, noao.imred.kpcoude.fiber
 noao.imred.kpcoude.slit, noao.imred.nessie, noao.imred.specred
+noao.twodspec.longslit
 .ih
 USAGE
 demos demoname

@@ -1,4 +1,4 @@
-.help package Aug90 noao.twodspec.apextract
+.help package Feb94 noao.twodspec.apextract
 .ih
 NAME
 apextract -- Identify, manipulate, and extract spectra in 2D images
@@ -14,16 +14,6 @@ when displayed normally.  The dispersion axis is 2 when the dispersion
 is along columns so that spectra are vertical when displayed normally.
 This parameter is superseded when the dispersion axis is defined in
 the image header by the parameter DISPAXIS.
-.le
-.ls format = "multispec"
-Image format for extracted spectra.  The formats are "multispec" for
-multiple spectra, one per line, in a single two dimensional image,
-"echelle for orders along image lines in a two dimensional image,
-"onedspec" for individual one dimensional images with numeric aperture
-extensions, and "strip" for two dimensional spectra interpolated so
-that the aperture centers are along the center of the strips.
-The first three formats may be extended into three dimensions for
-auxiliary data if the parameter \fIextras\fR is set during extraction.
 .le
 .ls database = "database"
 Database for storing aperture definitions.  Currently the database is
@@ -301,7 +291,7 @@ format used by the \fBonedspec\fR package.
 
 If the format parameter is "echelle" or "multispec" the output aperture
 extractions are put into a two dimensional image with a name formed from
-the output rootname and the extension ".ech" or ".ms".  Each line in
+the output rootname and the extension ".ec" or ".ms".  Each line in
 the output image corresponds to one aperture.  Thus in this format
 there is one output image for each input image.  These are the preferred
 output formats for reasons of compactness, ease of handling, and efficiency.
@@ -314,25 +304,51 @@ specialized image header keywords.  Below is an example of the keywords.
 MULTISPEC/ECHELLE Format Image Header Keywords
 
 .nf
-    APFORMAT= 'multispec'
-    APNUM2  = '10 0 1. 1. 512 75.78 85.78'
-    APID2   = 'SN 1987a west'
+    ap> imhead test.ms
+    test.ms[512,2,4][real]: Title
+	BANDID1 = 'spectrum - background fit, weights variance, clean yes'
+	BANDID2 = 'spectrum - background fit, weights none, clean no'
+	BANDID3 = 'background - background fit'
+	BANDID4 = 'sigma - background fit, weights variance, clean yes'
+	APNUM1  = '1 1 87.11 94.79'
+	APNUM2  = '2 1 107.11 114.79'
+	APID1   = 'Galaxy center'
+	APID2   = 'Galaxy edge'
+	WCSDIM  =                    3
+	CTYPE1  = 'PIXEL   '
+	CTYPE2  = 'LINEAR  '
+	CTYPE3  = 'LINEAR  '
+	CRVAL1  =                   1.
+	CRPIX1  =                   1.
+	CD1_1   =                   1.
+	CD2_2   =                   1.
+	CD3_3   =                   1.
+	LTM1_1  =                   1.
+	LTM2_2  =                   1.
+	LTM3_3  =                   1.
+	WAT0_001= 'system=equispec
+	WAT1_001= 'wtype=linear label=Pixel
+	WAT2_001= 'wtype=linear
+	WAT3_001= 'wtype=linear
 .fi
 
-The APFORMAT keyword identifies the format.  This is used by some of
-the \fBonedspec\fR and \fBechelle\fR tasks.  The relation between the
-line and the aperture numbers is given by the header parameters APNUMn
-where n is the line and the value gives extraction and coordinate
-information about the spectrum.  The first field is the aperture number
-and the second is the beam number.  After dispersion calibration of
-echelle format spectra the beam number becomes the order number.  The
-next three values are the coordinate of the first pixel, the coordinate
-interval per pixel, and the number of useful pixels.  Upon extraction
-the coordinates are in pixels but this changes after wavelength
-calibration.  The last two numbers are the actual extraction aperture
-limits at the aperture dispersion center (usually the image center).
+The BANDIDn keywords describe the various elements of the 3rd dimension.
+Except for the first one the other bands only occur when \fIextras\fI is
+yes and when sky subtraction and/or variance and cleaning are done.  The
+relation between the line and the aperture numbers is given by the header
+parameters APNUMn where n is the line and the value gives extraction and
+coordinate information about the spectrum.  The first field is the aperture
+number and the second is the beam number.  After dispersion calibration of
+echelle format spectra the beam number becomes the order number.  The other
+two numbers are the aperture limits at the line or column at which the
+aperture was defined.
 The APID keywords provide an optional title for each extracted spectrum
 in addition to the overall image title.
+
+The rest of the keywords are part of the IRAF World Coordinate System
+(WCS).  If the image being extracted has been previously calibrated
+(say with \fBlongslit.transform\fR) then the dispersion coordinates
+will be carried in CRVAL1 and CD1_1.
 
 There is one other value for the format parameter, "strip".  This produces
 two dimensional extractions rather than one dimensional extractions.

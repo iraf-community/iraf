@@ -1,4 +1,4 @@
-.help ccdproc Oct90 noao.imred.ccdred
+.help ccdproc Dec93 noao.imred.ccdred
 .ih
 NAME
 ccdproc -- Process CCD images
@@ -62,8 +62,9 @@ zero level images are averaged across the readout axis to form one
 dimensional zero level readout correction images.
 .le
 .ls scancor = no
-Convert flat field images to scan mode flat field images?  If yes then the
-form of scan mode correction is specified by the parameter \fIscantype\fR.
+Convert zero level, dark count and flat field images to scan mode flat
+field images?  If yes then the form of scan mode correction is specified by
+the parameter \fIscantype\fR.
 .le
 
 .ce
@@ -78,6 +79,12 @@ the file is specified in the image header or instrument translation file.
 .ls biassec
 Overscan bias strip image section.  If "image" is specified then the overscan
 bias section is specified in the image header or instrument translation file.
+Only the part of the bias section along the readout axis is used.  The
+length of the bias region fit is defined by the trim section.  If one
+wants to limit the region of the overscan used in the fit to be less
+than that of the trim section then the sample region parameter,
+\fIsample\fR, should be used.  It is an error if no section or the
+whole image is specified.
 .le
 .ls trimsec
 image section for trimming.  If "image" is specified then the trim
@@ -124,11 +131,9 @@ images.
 Type of scan format used in creating the CCD images.  The modes are:
 .ls "shortscan"
 The CCD is scanned over a number of lines and then read out as a regular
-two dimensional image.  In this mode unscanned flat fields are numerically
-scanned to form scanned flat fields comparable to the observations.  If
-the flat field calibration images are taken in scanned mode then
-\fIscancor\fR should be no and the processing performed in the same manner
-as in unscanned mode.
+two dimensional image.  In this mode unscanned zero level, dark count and
+flat fields are numerically scanned to form scanned flat fields comparable
+to the observations.
 .le
 .ls "longscan"
 In this mode the CCD is clocked and read out continuously to form a long
@@ -139,8 +144,10 @@ CCD.
 .le
 .le
 .ls nscan
-Number of scan readout lines used in short scan mode.  This parameter is used
-when the scan type is "shortscan".
+Number of object scan readout lines used in short scan mode.  This parameter
+is used when the scan type is "shortscan" and the number of scan lines
+cannot be determined from the object image header (using the keyword
+nscanrows or it's translation).
 .le
 
 
@@ -293,13 +300,17 @@ image names.
 1. Fixpix
 Regions of bad lines and columns may be replaced by linear
 interpolation from neighboring lines and columns when the parameter
-\fIfixpix\fR is set.  The bad regions are specified in a bad pixel
+\fIfixpix\fR is set.  This algorithm is the same as used in the
+task \fBfixpix\fR.  The bad regions are specified in a bad pixel
 file.  The file consists of lines with four fields, the starting and
 ending columns and the starting and ending lines.  Any number of
 regions may be specified.  Comment lines beginning with the character
 '#' may be included.  If a comment line preceding the bad regions
 contains the word "untrimmed" then the coordinate system refers to the
-original format of the images; i.e.  before trimming.  If an image has
+original CCD format of the images; i.e.  before trimming.  Note that
+if a subraster readout is used the coordinates MUST refer to the original
+CCD coordinates when the "untrimmed" mode is used.
+If an image has
 been trimmed previously then the trim region specified in the image
 header is used to convert the coordinates in the bad pixel file to
 those of the trimmed image.  If the file does not contain the word
@@ -307,7 +318,7 @@ those of the trimmed image.  If the file does not contain the word
 being corrected; i.e. untrimmed coordinates if the image has not been
 trimmed and trimmed coordinates if the image has been trimmed.
 Standard bad pixel files should always be specified in terms of the
-original format.
+original CCD detector coordinates.
 
 The bad pixel file may be specified explicitly with the parameter \fIfixfile\fR
 or indirectly if the parameter has the value "image".  In the latter case
@@ -462,29 +473,39 @@ scanning modes called "shortscan" and "longscan".  The type of scan
 mode is set with the parameter \fIscanmode\fR.
 
 In "shortscan" mode the detector is scanned over a specified number of
-lines (not necessarily at sideral rates).  The lines that scroll off
-the detector during the integration are thrown away.  At the end of the
+lines (not necessarily at sideral rates).  The lines that scroll off the
+detector during the integration are thrown away.  At the end of the
 integration the detector is read out in the same way as an unscanned
-observation.  The advantage of this mode is that the small scale flat
-field response is averaged in one dimension over the number of lines
-scanned.  A flat field may be observed in the same way in which case
-there is no difference in the processing from unscanned imaging and the
-parameter \fIscancor\fR should be no.  However, one obtains an increase
-in the statistical accuracy of the flat fields if they are not scanned
-during the observation but digitally scanned during the processing.  In
-shortscan mode with \fIscancor\fR set to yes, flat field images are
-digitally scanned, if needed, by the specified number of scan lines
-(\fInscan\fR parameter).
+observation.  The advantage of this mode is that the small scale, zero
+level, dark count and flat field responses are averaged in one dimension
+over the number of lines scanned.  A zero level, dark count or flat field may be
+observed in the same way in which case there is no difference in the
+processing from unscanned imaging and the parameter \fIscancor\fR may be
+no.  If it is yes, though, checking is done to insure that the calibration
+image used has the same number of scan lines as the object being
+processed.  However, one obtains an increase in the statistical accuracy of
+if they are not scanned during the observation but
+digitally scanned during the processing.  In shortscan mode with
+\fIscancor\fR set to yes, zero level, dark count and flat field images are
+digitally scanned, if needed, by the same number of scan lines as the
+object.  The number of scan lines is determined from the object image
+header using the keyword nscanrow (or it's translation).  If not found the
+object is assumed to have been scanned with the value given by the
+\fInscan\fR parameter.  Zero, dark and flat calibration images are assumed
+to be unscanned if the header keyword is not found.
 
-In "longscan" mode the detector is continuously read out to produce
-an arbitrarily long strip.  Provided data which has not passed over
-the entire detector is thrown away, the flat field corrections will
-be one dimensional.  If \fIscancor\fR is specified and the
-scan mode is "longscan" then a one dimensional flat field correction
-will be applied.  If the specified flat field (\fIflat\fR parameter)
-is a two dimensional image then when the flat field image is processed
-it will be averaged across the readout axis to form a one dimensional
-correction image.
+If a scanned zero level, dark count or flat field image is not found
+matching the object then one may be created from the unscanned calibration
+image.  The image will have the root name of the unscanned image with an
+extension of the number of scan rows; i.e. Flat1.32 is created from Flat1
+with a digital scanning of 32 lines.
+
+In "longscan" mode the detector is continuously read out to produce an
+arbitrarily long strip.  Provided data which has not passed over the entire
+detector is thrown away, the zero level, dark count, and flat field
+corrections will be one dimensional.  If \fIscancor\fR is specified and the
+scan mode is "longscan" then a one dimensional zero level, dark count, and
+flat field correction will be applied.
 .sh
 11. Processing Steps
 The following describes the steps taken by the task.  This detailed
@@ -600,7 +621,10 @@ a special data path for each combination of corrections is used to
 perform all the processing in the most efficient manner.  If the
 image is a flat field any pixels less than the \fIminreplace\fR
 parameter are replaced by that minimum value.  Also a mean is
-computed for the flat field and stored as the CCDMEAN keyword.
+computed for the flat field and stored as the CCDMEAN keyword and
+the time, in a internal format, when this value was calculated is stored
+in the CCDMEANT keyword.  The time is checked against the image modify
+time to determine if the value is valid or needs to be recomputed.
 .le
 .ls (13)
 The input image is deleted or renamed to a backup image.  The temporary
@@ -611,9 +635,9 @@ If the image is a zero level image and the readout correction is specified
 then it is averaged to a one dimensional readout correction.
 .le
 .ls (15)
-If the image is a flat field image and the scan mode correction is specified
-then the correction is applied.  For shortscan mode a
-modified two dimensional image is produced while for longscan mode a
+If the image is a zero level, dark count, or flat field image and the scan
+mode correction is specified then the correction is applied.  For shortscan
+mode a modified two dimensional image is produced while for longscan mode a
 one dimensional average image is produced.
 .le
 .ls (16)
@@ -712,6 +736,28 @@ Caching:     151.5u 29.0s 4:14 70% 27+227K 2346+1637io 148pf+0w
 No caching:  272.7u 63.8u 8:47 63% 28+ 50K 9598+3713io  12pf+0w
 Caching:     271.2u 50.9s 7:00 76% 28+173K 4487+3613io  51pf+0w
 .fi
+.ih
+REVISIONS
+.ls CCDPROC: V2.10.3
+The output pixel datatypes (specified by the package parameter
+\fIpixeltype\R have been extended to include unsigned short
+integers.  Also it was previously possible to have the output
+pixel datatype be of lower precision than the input.  Now the
+output pixel datatype is not allowed to lose precision; i.e.
+a real input image may not be processed to a short datatype.
+
+For short scan data the task now looks for the number of scan lines in the
+image header.  Also when a calibration image is software scanned a new
+image is created.  This allows processing objects with different numbers of
+scan lines and preserving the unscanned calibration image.
+
+It is an error if no biassec is specified rather than defaulting to
+the whole image.
+
+The time, in a internal format, when the CCDMEAN value is calculated is
+stored in the CCDMEANT keyword.  The time is checked against the image
+modify time to determine if the value is valid or needs to be recomputed.
+.le
 .ih
 SEE ALSO
 .nf

@@ -28,10 +28,14 @@ begin
 	    # by an empty line.
 
 	    stat = getline (fd, Memc[line])
-	    if (stat == EOF)
+	    if (stat == EOF) {
+		call sfree (sp)
 		return (EOF)
-	    if (Memc[line] == EOS || Memc[line] == '\n')
+	    }
+	    if (Memc[line] == EOS || Memc[line] == '\n') {
+		call sfree (sp)
 		return (EOF)
+	    }
 
 	    # Empty records are skipped.
 	    if ((strncmp (MKCAT_COMMENTSTR, Memc[line], MKCAT_SZSTR) == 0) &&

@@ -8,7 +8,7 @@
 #	in taking the arcs.
 
 procedure doarcs (spec, response, arcref1, arcref2, extn, arcreplace, apidtable,
-	arcaps, arcbeams, savearcs, reextract, arcap, logfile, batch)
+	arcaps, arcbeams, savearcs, reextract, arcap, logfile, batch, done)
 
 file	spec
 file	response
@@ -24,13 +24,18 @@ bool	reextract
 bool	arcap
 file	logfile
 bool	batch
+file	done
 
 struct	*fd
 
 begin
-	int	i, j, k
+	string	imtype
+	int	i, j, k, n
 	file	temp, arc1, arc2, str1, str2, arctype, apref, arc, arcms
 	bool	verbose1
+
+	imtype = "." // envget ("imtype")
+	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
 
@@ -52,8 +57,8 @@ begin
 
 	    # Strip possible image extension.
 	    i = strlen (arc1)
-	    if (i > 4 && substr (arc1, i-3, i) == ".imh")
-		arc1 = substr (arc1, 1, i-4)
+	    if (i > n && substr (arc1, i-n+1, i) == imtype)
+		arc1 = substr (arc1, 1, i-n)
     
 	    # Set extraction output and aperture reference depending on whether
 	    # the arcs are to be rextracted using recentered or retraced object
@@ -64,15 +69,25 @@ begin
 		 apscript.ansrecenter=="YES" || apscript.anstrace=="YES")) {
 		arc2 = spec // arc1 // ".ms"
 		apref = spec
-		if (access (arc2//".imh"))
-		    imdelete (arc2//".imh", verify=no)
+		if (access (arc2//imtype))
+		    imdelete (arc2//imtype, verify=no)
 		delete (database//"/id"//arc2//"*", verify = no)
 	    } else {
 		arc2 = arc1 // extn
 		apref = apscript.references
-		if (reextract && access (arc2//".imh")) {
-		    if (arc2 != arcref1 // extn && arc2 != arcref2 // extn)
-			imdelete (arc2, verify=no)
+		if (reextract && access (arc2//imtype)) {
+		    if (arc2 != arcref1 // extn && arc2 != arcref2 // extn) {
+			if (access (done)) {
+			    fd = done
+			    while (fscan (fd, arcms) != EOF)
+				if (arcms == arc2)
+				    break
+			    fd = ""
+			} else
+			    arcms = ""
+			if (arcms != arc2)
+			    imdelete (arc2, verify=no)
+		    }
 		}
 	    }
 
@@ -86,7 +101,7 @@ begin
 	    fd = ""; delete (temp, verify=no)
     
 	    # Extract and determine dispersion function if necessary.
-	    if (!access (arc2//".imh")) {
+	    if (!access (arc2//imtype)) {
 		delete (database//"/id"//arc2//"*", verify = no)
 		if (!batch)
 		    print ("Extract and reidentify arc spectrum ", arc1)
@@ -96,31 +111,33 @@ begin
 		    anstrace="NO", nsubaps=params.nsubaps, background="none",
 		    clean=no, weights="none", verbose=verbose1)
 		sapertures (arc2, apertures="", apidtable=apidtable,
-		    verbose=no)
+		    wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF, w1=INDEF,
+		    dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 		if (response != "") {
 		    if (params.nsubaps == 1)
 			sarith (arc2, "/", response, arc2, w1=INDEF, w2=INDEF,
-			    apertures="", beams="", apmodulus=0, reverse=no,
-			    ignoreaps=no, format="multispec", renumber=no,
-			    offset=0, clobber=yes, merge=no, errval=0,
-			    verbose=no)
+			    apertures="", bands="", beams="", apmodulus=0,
+			    reverse=no, ignoreaps=no, format="multispec",
+			    renumber=no, offset=0, clobber=yes, merge=no,
+			    errval=0, verbose=no)
 		    else {
 			blkrep (response, temp, 1, params.nsubaps)
 			sarith (arc2, "/", temp, arc2, w1=INDEF, w2=INDEF,
-			    apertures="", beams="", apmodulus=0, reverse=no,
-			    ignoreaps=yes, format="multispec", renumber=no,
-			    offset=0, clobber=yes, merge=no, errval=0,
-			    verbose=no)
+			    apertures="", bands="", beams="", apmodulus=0,
+			    reverse=no, ignoreaps=yes, format="multispec",
+			    renumber=no, offset=0, clobber=yes, merge=no,
+			    errval=0, verbose=no)
 			imdelete (temp, verify=no)
 		    }
 		}
+		print (arc2, >> done)
 
 		if (arctype == "shift") {
 		    reidentify (arcref2//extn, arc2,
 			interactive=no, section="middle line", shift=0.,
 			step=1, nsum=1, cradius=params.cradius,
-			threshold=10., nlost=100, newaps=no, refit=no,
-			trace=no, override=no, addfeatures=no,
+			threshold=params.threshold, nlost=100, newaps=no,
+			refit=no, trace=no, override=no, addfeatures=no,
 			database=database, plotfile=plotfile,
 			logfiles=logfile, verbose=verbose1)
 		} else {
@@ -128,14 +145,14 @@ begin
 			fd = arcreplace
 			while (fscan (fd, arc, arcms, str2) != EOF) {
 			    i = strlen (arc)
-			    if (i > 4 && substr (arc, i-3, i) == ".imh")
-				arc = substr (arc, 1, i-4)
+			    if (i > n && substr (arc, i-n+1, i) == imtype)
+				arc = substr (arc, 1, i-n)
 			    if (arc != arc1)
 				    next
 			    arc = arcms
-			    if (i > 4 && substr (arc, i-3, i) == ".imh")
-				arc = substr (arc, 1, i-4)
-			    arcms = arc // extn // ".imh"
+			    if (i > n && substr (arc, i-n+1, i) == imtype)
+				arc = substr (arc, 1, i-n)
+			    arcms = arc // extn // imtype
 	
 			    if (access (arcms))
 				imdelete (arcms, verify=no)
@@ -149,12 +166,14 @@ begin
 				background="none", clean=no,
 				weights="none", verbose=verbose1)
 			    sapertures (arcms, apertures="",
-				apidtable=apidtable, verbose=no)
+				apidtable=apidtable, wcsreset=no, verbose=no,
+				beam=INDEF, dtype=INDEF, w1=INDEF, dw=INDEF,
+				z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 			    if (response != "") {
 			        if (params.nsubaps == 1)
 				    sarith (arcms, "/", response, arcfms,
 					w1=INDEF, w2=INDEF,
-					apertures="", beams="",
+					apertures="", bands="", beams="",
 					apmodulus=0, reverse=no,
 					ignoreaps=no, format="multispec",
 					renumber=no, offset=0, clobber=yes,
@@ -163,7 +182,7 @@ begin
 				    blkrep (response, temp, 1, params.nsubaps)
 				    sarith (arcms, "/", temp, arcfms,
 					w1=INDEF, w2=INDEF,
-					apertures="", beams="",
+					apertures="", bands="", beams="",
 					apmodulus=0, reverse=no,
 					ignoreaps=yes, format="multispec",
 					renumber=no, offset=0, clobber=yes,
@@ -172,9 +191,10 @@ begin
 			        }
 			    }
 			    scopy (arcms, arc2, w1=INDEF, w2=INDEF,
-				apertures=str2, beams="", apmodulus=1000,
-				offset=0, format="multispec", clobber=yes,
-				merge=yes, renumber=no, verbose=yes, >> logfile)
+				apertures=str2, bands="", beams="",
+				apmodulus=1000, offset=0, format="multispec",
+				clobber=yes, merge=yes, renumber=no,
+				verbose=yes, >> logfile)
 			    imdelete (arcms, verify=no)
 			}
 			fd = ""
@@ -182,8 +202,8 @@ begin
 		    reidentify (arcref1//extn, arc2,
 			interactive=!batch, section="middle line",
 			shift=0., step=1, nsum=1, cradius=params.cradius,
-			threshold=10., nlost=100, refit=params.refit,
-			trace=no, override=no,
+			threshold=params.threshold, nlost=100,
+			refit=params.refit, trace=no, override=no,
 			addfeatures=params.addfeatures,
 			coordlist=params.coordlist, match=params.match,
 			maxfeatures=50, minsep=2., database=database,
@@ -209,10 +229,10 @@ begin
 	    # Check for arc fibers in object spectra.
 	    if (arctype != "shift" && (arcaps != "" || arcbeams != "")) {
 	        scopy (spec//".ms", spec//"arc.ms", w1=INDEF, w2=INDEF,
-		    apertures=arcaps, beams=arcbeams, apmodulus=1000, offset=0,
-		    format="multispec", clobber=yes, merge=no, renumber=no,
-		    verbose=no, >& "dev$null")
-	        if (access (spec//"arc.ms.imh")) {
+		    apertures=arcaps, bands="", beams=arcbeams, apmodulus=1000,
+		    offset=0, format="multispec", clobber=yes, merge=no,
+		    renumber=no, verbose=no, >& "dev$null")
+	        if (access (spec//"arc.ms"//imtype)) {
 		    if (!batch)
 		        print ("Reidentify arc fibers in ", spec,
 			    " with respect to ", arc1)
@@ -221,16 +241,17 @@ begin
 		    delete (database//"/id"//spec//"arc.ms*", verify = no)
 		    reidentify (arc2, spec//"arc.ms", interactive=no,
 		        section="middle line", shift=0., step=1, nsum=1,
-		        cradius=params.cradius, threshold=10., nlost=100,
-		        refit=no, trace=no, override=no,
-		        addfeatures=no, database=database, plotfile=plotfile,
-		        logfiles=logfile, verbose=verbose1)
+			cradius=params.cradius, threshold=params.threshold,
+			nlost=100, refit=no, trace=no, override=no,
+			addfeatures=no, database=database,
+			plotfile=plotfile, logfiles=logfile,
+			verbose=verbose1)
 		    imdelete (spec//"arc.ms", verify=no)
 		    hedit (spec//".ms", "refshft"//j, spec//"arc.ms interp",
 		        add=yes, verify=no, show=no, update=yes)
 		    if (!savearcs)
 	                scopy (spec//".ms", "", w1=INDEF, w2=INDEF,
-			    apertures="!"//arcaps, beams=arcbeams,
+			    apertures="!"//arcaps, bands="", beams=arcbeams,
 			    apmodulus=1000, offset=0, format="multispec",
 			    clobber=yes, merge=no, renumber=no,
 			    verbose=yes, >> logfile)

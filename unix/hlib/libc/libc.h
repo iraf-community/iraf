@@ -12,19 +12,20 @@
 #define	MEMCOM		mem_
 #define	XERPSH		xerpsh_
 #define	XERPOP		xerpop_
+#define	XERPOPI		xerpoi_
 #define	c_main		cmain_
 
 /* Error handling.
  */
-#define	iferr(stmt)	{XERPSH();stmt;}if(XERPOP())
+#define	iferr(stmt)	{XERPSH();stmt;}if(XERPOPI())
 
 /* SPP/C pointer conversions.
  */
 extern	char		MEMCOM[];
 #define	Memc		(((XCHAR *)MEMCOM)-1)
 #define	Memi		(((XINT *)MEMCOM)-1)
-#define	Memcptr(addr)	((XCHAR *)(addr) - Memc + 1)
-#define	Memiptr(addr)	((XINT *)(addr) - Memi + 1)
+#define	Memcptr(addr)	((XCHAR *)(addr) - Memc)
+#define	Memiptr(addr)	((XINT *)(addr) - Memi)
 
 /* External names.
  */

@@ -31,7 +31,7 @@ sgibi|SGI bitmap (raster) file:\
 # STDPLOT devices.  The following are pointer to host system dependent
 # entries given later.
 
-versatec|ver|vup|	:tc=uver:
+versatec|ver|vup|	:WS:tc=uver:
 #imagen|i240|		:tc=ui240:
 imagend|i300|		:tc=ui300:
 i240s|			:PW#1.2:tc=ui240:
@@ -58,7 +58,20 @@ lw9|                    :tc=uapl9:
 lw9s|                   :PW#1.2:tc=uapl9:
 lw10|                   :tc=uapl10:
 lw10s|                  :PW#1.2:tc=uapl10:
+lwti|ti|		:tc=ulwti:
+lw14|                   :tc=uapl14:
+lw14s|                  :PW#1.2:tc=uapl14:
+lw15|lwcloset|		:tc=uapl15:
+lw16|                   :tc=uapl16:
+lw16s|                  :PW#1.2:tc=uapl16:
+lw19|                   :tc=uapl19:
+lw19s|                  :PW#1.2:tc=uapl19:
+lw20|                   :tc=uapl20:
+lw20s|                  :PW#1.2:tc=uapl20:
 printronix|ptx|		:tc=uptx:
+solitaire2k|solitaire|  :tc=usolitaire2k:
+solitaire4k|            :tc=usolitaire4k:
+solitaire8k|            :tc=usolitaire8k:
 epsf|eps|               :tc=uepsf:
 epsfl|epsl|             :tc=uepsfl:
 epshalf|epsh|           :XO#300:YO#1650:tc=uepsf:
@@ -70,12 +83,8 @@ trilog|tri|		:tc=vtri:
 hpplot|			:tc=vhpp:
 hplaser|		:tc=vhpl:
 ln03|			:tc=vln03:
-
 film_recorder|		:tc=solitaire:
 dicomed|d47|		:tc=nspp_dicomed:
-solitaire|solitaire2k|  :tc=nas_solitaire2k:
-solitaire4k|            :tc=nas_solitaire4k:
-solitaire8k|            :tc=nas_solitaire8k:
 
 laserup|		:HN=solpl!:tc=laser:
 laserdown|		:HN=cti!:tc=laser:
@@ -91,77 +100,79 @@ laserjet|		:QN=laser:tc=ahpl:
 imtx|Imtool display server:\
 	:cn#1:LC:BS@:z0#1:zr#200:DD=node!imtool,/tmp/imt1,512,512:tc=iism70:
 imt1|imt512|imtool|Imtool display server:\
-	:cn#1:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,512,512:tc=iism70:
+	:cn#1:LC:BS@:z0#1:zr#200:DD=node!imtool,,512,512:tc=iism70:
 imt2|imt800|:cn#2:xr#800:yr#800:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,800,800:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,800,800:tc=iism70:
 imt3|imt1024|:cn#3:xr#1024:yr#1024:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1024,1024:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1024,1024:tc=iism70:
 imt4|imt1600|:cn#4:xr#1600:yr#1600:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1600,1600:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1600,1600:tc=iism70:
 imt5|imt2048|:cn#5:xr#2048:yr#2048:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,2048,2048:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,2048,2048:tc=iism70:
 imt6|imt4096|:cn#6:xr#4096:yr#4096:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,4096,4096:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4096,4096:tc=iism70:
 imt7|imt4x1|:cn#7:xr#4096:yr#1024:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,4096,1024:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4096,1024:tc=iism70:
 imt8|imt1x4|:cn#8:xr#1024:yr#4096:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1024,4096:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1024,4096:tc=iism70:
 imt9|imtfs|Full screen, landscape mode:cn#9:xr#1144:yr#880:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1144,880:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1144,880:tc=iism70:
 imt10|imtfs35|imtmatrix|full screen at 35mm film aspect:cn#10:xr#1144:yr#764:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1144,764:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1144,764:tc=iism70:
 imt11|imt128|:cn#11:xr#128:yr#128:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,128,128:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,128,128:tc=iism70:
 imt12|imt256|:cn#12:xr#256:yr#256:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,256:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,256,256:tc=iism70:
 imt13|imttall128|tall and narrow for spectroscopy:cn#13:xr#128:yr#1056:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,128,1056:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,128,1056:tc=iism70:
 imt14|imttall256|tall and wider for spectroscopy:cn#14:xr#256:yr#1056:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,1056:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,256,1056:tc=iism70:
 imt15|imtwide128|wide and thin for spectroscopy:cn#15:xr#1056:yr#128:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,128:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1056,128:tc=iism70:
 imt16|imtwide256|wide and fatter for spectroscopy:cn#16:xr#1056:yr#256:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,256:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1056,256:tc=iism70:
 imt17|imtssy|:cn#17:xr#1008:yr#648:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1008,648:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1008,648:tc=iism70:
 imt18|imtssn|:cn#18:xr#1024:yr#680:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1024,680:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1024,680:tc=iism70:
 
 # NOAO specific display frame buffer formats.
 imt20|imtgec|GEC CCD detector format:cn#20:xr#388:yr#576:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,388,576:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,388,576:tc=iism70:
 imt21|imtkpca|KPCA CCD detector format:cn#21:xr#3040:yr#976:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,3040,976:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3040,976:tc=iism70:
 imt22|imt2df1|imt2df1x1|2D-Frutti detector format:cn#22:xr#128:yr#1520:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,128,1520:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,128,1520:tc=iism70:
 imt23|imt2df2|imt2df2x1|2D-Frutti detector format:cn#23:xr#256:yr#1520:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,1520:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,256,1520:tc=iism70:
 imt24|imt2df5|imt2df5x1|2D-Frutti detector format:cn#24:xr#512:yr#1520:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,512,1520:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,512,1520:tc=iism70:
 imt25|imt2df9|imt2df9x1|2D-Frutti detector format:cn#25:xr#960:yr#1520:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,960,1520:tc=iism70:
-imt26|imtcryo|Cryogenic camera:cn#26:xr#512:yr#800:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,512,800:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,960,1520:tc=iism70:
+imt26|imtcryo|Cryogenic camera:cn#26:xr#1232:yr#400:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1232,400:tc=iism70:
 imt27|imtgcam|Gold camera - Ford:cn#27:xr#3104:yr#348:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,3104,348:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3104,348:tc=iism70:
 imt28|imt2df9x3|2D-Frutti detector format:cn#28:xr#976:yr#3040:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,976,3040:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,976,3040:tc=iism70:
 imt29|imtgw|GONG Cache Monitor:cn#29:xr#800:yr#256:\
-        :LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,800,256:tc=iism70:
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,800,256:tc=iism70:
 imt30|imtgl|imtgong|GONG Cache Monitor:cn#30:xr#256:yr#800:\
-        :LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,800:tc=iism70:
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,256,800:tc=iism70:
 imt31|imtret|Reticon detector format:cn#31:xr#1240:yr#400:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1240,400:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1240,400:tc=iism70:
 imt32|imtti|imtti2|imtti3|imtti4|imtti5|KPNO TI 800x800:cn#32:xr#832:yr#800:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,832,800:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,832,800:tc=iism70:
 imt33|imtt5ha|KPNO Tek 512x512:cn#33:xr#544:yr#512:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,544,512:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,544,512:tc=iism70:
 imt34|imtt1ka|KPNO Tek 1K:cn#34:xr#1056:yr#1024:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,1024:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1056,1024:tc=iism70:
 imt35|imts2ka|imtt2ka|imtt2kb|KPNO Tek or STIS 2K:cn#35:xr#2080:yr#2048:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,2080,2048:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,2080,2048:tc=iism70:
 imt36|imtf3ka|imtfo3k|KPNO Ford 3072x1024:cn#36:xr#3104:yr#1024:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,3104,1024:tc=iism70:
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3104,1024:tc=iism70:
+imt37|imtf1ka|KPNO Ford (Loral) 1200x800:cn#37:xr#1232:yr#800:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1232,800:tc=iism70:
 
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
@@ -258,6 +269,30 @@ uapl10|UNIX generic interface to 300dpi SPARCPrinter on Solitaire:\
         :xs#0.267:ys#0.201:ar#0.753:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw10; rm $F; }&:tc=sgi_apl:
+uapl14|UNIX generic interface to 300dpi Printer on Helios:\
+       :xs#0.267:ys#0.201:ar#0.753:\
+       :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+       -h$(YW) -p$(PW) | lpr -Plw14; rm $F; }&:tc=sgi_apl:
+uapl15|UNIX generic interface to QMS-PS in PC "closet":\
+        :xs#0.267:ys#0.201:ar#0.753:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw15; rm $F; }&:tc=sgi_apl:
+uapl16|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw16; rm $F; }&:tc=sgi_apl:
+uapl19|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw19; rm $F; }&:tc=sgi_apl:
+uapl20|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw20; rm $F; }&:tc=sgi_apl:
+ulwti|UNIX generic interface to TI Turbo laser printer on lepus, via SLIP:\
+	:xs#0.269:ys#0.210:ar#0.781:\
+	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+	-h$(YW) -p$(PW) | lpr -Pti; rm $F; }&:tc=sgi_apl:
 uptx|UNIX generic printronix interface for UNIX/IRAF:\
 	:DD=uptx,tmp$sgk,!{ sgidispatch sgi2uptx $(PX) $(PY) $F.[1-8] | \
 	lpr -Plp -J IRAF; rm $F.[1-8]; }&:NF:tc=sgi_printronix:
@@ -327,6 +362,10 @@ vapl5|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
 	:xs#0.269:ys#0.210:ar#0.781:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw5; rm $F; }&:tc=sgi_apl:
+vapl6|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.269:ys#0.210:ar#0.781:\
+	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw6; rm $F; }&:tc=sgi_apl:
 vapl7|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
 	:xs#0.267:ys#0.201:ar#0.753:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
@@ -341,15 +380,19 @@ vapl9|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
 vapl10|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
         :DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
         -b$(YO) -h$(YW) -p$(PW) | lpr  -Plw10; rm $F; }&:tc=sgi_apl:
+vlwti|VMS interface to the TI Turbo laser printer on lepus:\
+	:xs#0.269:ys#0.210:ar#0.781:\
+	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+	-b$(YO) -h$(YW) -p$(PW) | lpr  -Pti; rm $F; }&:tc=sgi_apl:
 vepsf|veps|Encapsulated Postscript file (portrait) VMS:\
         :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
-        :DD=eps,tmp$sgk,submit/que=fast/noprint/nolog \
-        /para=\050"eps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
+        :DD=eps,home$sgi,submit/que=fast/noprint/nolog \
+        /para=\050"veps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
         \051 irafhlib\072sgiqueue.com:tc=sgi_apl:
 vepsfl|vepsl|Encapsulated Postscript file (landscape) VMS:\
         :XO#300:XW#1950:YO#300:YW#2700:RO:YF:\
-        :RO:YF:DD=eps,tmp$sgk,submit/que=fast/noprint/nolog \
-        /para=\050"eps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
+        :RO:YF:DD=eps,home$sgi,submit/que=fast/noprint/nolog \
+        /para=\050"veps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
         \051 irafhlib\072sgiqueue.com:tc=sgi_apl:
 vccp|VMS generic interface to the calcomp:\
 	:DD=vccp,tmp$sgk,submit/que=fast/noprint/nolog/para=\050"vccp",\
@@ -491,17 +534,32 @@ nspp_tek|Tektronix driven via NSPP:\
 	!{ cd /tmp; /local/bin/plotX -T4014 -W=1 $F |\
 	/usr/bin/plot  -T4014 > /dev/tty; rm $F; }:
 
-# Nigel's test quick-and-dirty Solitaire stuff.
-nas_solitaire2k|Solitaire film recorder, 2k mode (2048x1536):\
+# Solitaire film recorder.
+vsolitaire2k|Solitaire film recorder, VMS version (2048x1536):\
+        :DD=solitaire,tmp$slt,submit/queue=fast/noprint/nolog/para=\
+        \050"-w 2048 -h 1536 -r 2048 -b 250","$F"\051 \
+        usr3\072[irafext.nlocal.lib]qsoli.com:\
+        :tc=usolitaire2k:
+vsolitaire4k|Solitaire film recorder, VMS version (4096x3072):\
+        :DD=solitaire,tmp$slt,submit/queue=fast/noprint/nolog/para=\
+        \050"-w 4096 -h 3072 -r 4096 -b 500","$F"\051 \
+	usr3\072[irafext.nlocal.lib]qsoli.com:\
+        :tc=usolitaire4k:
+vsolitaire8k|Solitaire film recorder, VMS version (8192x6144):\
+        :DD=solitaire,tmp$slt,submit/queue=fast/noprint/nolog/para=\
+        \050"-w 8192 -h 6144 -r 8192 -b 1000","$F"\051 \
+	usr3\072[irafext.nlocal.lib]qsoli.com:\
+        :tc=usolitaire8k:
+usolitaire2k|Solitaire film recorder, 2k mode (2048x1536):\
         :xr#2048:yr#2048:\
         :DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 2048 \
          -hgt 1536 -res 2048 -bot 250 $F; 'rm' $F; }&:\
         :tc=nas_solitaire:
-nas_solitaire4k|Solitaire film recorder, default (4096x3072):\
+usolitaire4k|Solitaire film recorder, default (4096x3072):\
         :xr#4096:yr#4096:\
         :DD=solitaire,tmp$slt,!{ /local/bin/qsoli $F; 'rm' $F; }&:\
         :tc=nas_solitaire:
-nas_solitaire8k|Solitaire film recorder, 8k mode (8192x6144):\
+usolitaire8k|Solitaire film recorder, 8k mode (8192x6144):\
 	:xr#8192:yr#8192:\
 	:DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 8192 \
 	 -hgt 6144 -res 8192 -bot 1000 $F; 'rm' $F; }&:\
@@ -519,6 +577,35 @@ nas_solitaire|Common parameters for above different resolutions:\
 # at the end of the graphcap file by default.  Users should note that they
 # can have their own copy of the graphcap file if a more personalized
 # ordering is called for.
+
+xgtermb|XGterm graphics terminal emulator for the X window system:\
+	:tc=gterm:
+xgtermc|xgterm|XGterm with imaging and color enabled:\
+	:EM=^]^Y:ED=lib$scr/xgterm.gui:\
+	:EZ=^]\Esre[\EP%s\E\\]:ER=^]\Essz[%s]:\
+	:RI=\Erir:IM=\Erim:\
+	:CR=\Ercr[%d;%d;%d;%d;%d]:DR=\Erde[%d]:\
+	:QR=\Erqr[%d]:Qr=\E[5;%1;%2;%3;%4;%5]:\
+	:WP=\Erwr[%d;%d;%d;%d;%d;%d;%d]:\
+	:RP=\Errd[%d;%d;%d;%d;%d;%d;%d]:\
+	:RX=\Errp[%d;%d;%d;%d;%d;%d]:\
+	:SP=\Ersp[%d;%d;%d;%d;%d;%d;%d;%d;%d]:\
+	:WM=\Erwc[%d;%d;%d]:RM=\Errc[%d;%d;%d]:LM=\Erlc[%d;%d;%d;%d]:\
+	:WO=\Erwo[%d;%d]:RO=\Erro[%d;%d]:\
+	:CP=\Erco[%d; %d;%d;%d;%d;%d;%d; %d;%d;%d;%d;%d;%d]:\
+	:SM=\Ersm[%d;%d; %d;%d;%d;%d;%d;%d; %d;%d;%d;%d;%d;%d]:\
+	:GM=\Ergm[%d]:Gm=\E[6;%1;%2 %3;%4;%5;%6;%7;%8 %9;%a;%b;%c;%d;%e]:\
+	:SR=\Ersr[%d]:MN=\Erem[%d;%d]:MD=\Erdm[%d;%d]:RF=\Errm[%d]:\
+	:FL=\Erfc[%d]:FM=\Erfm[%d]:\
+	:LW=\E/nw[(1%d)]:FS=\036:\
+	:LT=^]\E/(1$0)1d\E`($1-5)0d\E(1_+.$D)0d\E`($$:\
+	:LC=\E/nc[(1%d)]:MC=\E/nc[(1%d)]:FC=\E/nc[(1%d)]:TC=\E/nc[(1%d)]:\
+	:CL=^]\E^L:OW=^]^_:CW=^X:GE=^]^_:GD=\E^M:\
+	:RC=^]\E/^Z:WC=^]%t\E/f:CD=[^M^J]:CN#16:\
+	:SC=(,!3, & *, &+!1, & *, &+!2\
+	, & *, &+!4, & *, &+!5, & * *, & *+, &+!6, & * *, & *+, &+!7:\
+	:fa:lt#5:nc#1:se:xr#800:yr#630:ar#.7875:xs#.23:ys#.13:\
+	:z0#0:z1#10:zr#210:tc=4012:
 
 gterm|Gterm graphics terminal emulator for the Sun:\
 	:LW=\E/(1$1)0($2)1($D)2($$)w:CL=^]\E^L:\
@@ -599,6 +686,8 @@ em4010im|em4010 emulator for IBM medium-res board:\
 	:xr#320:yr#200:li#33:co#64:ch#.030:cw#.016:tc=em4010:
 em4010ieh|em4010 emulator for IBM enhanced graphics board:\
 	:xr#640:yr#350:li#38:ch#.026:tc=em4010:
+em4010vg|em4010 emulator for VGA high resolution graphics board:\
+	:xr#640:yr#480:li#38:ch#.028:tc=em4010:
 em4010tn|em4010 emulator for Tecmar Master graphics board, non-interlaced:\
 	:xr#720:yr#352:li#38:ch#.026:tc=em4010:
 em4010ti|em4010 emulator for Tecmar Master graphics board, interlaced:\
@@ -679,6 +768,13 @@ vt240a|vt240 in ReGIS mode, "all" (2 lw's, normal + bold font); R5=lw:\
 vt240b|vt240 in ReGIS mode, "bold" (all lines and text bold):\
 	:OW=\EP1pS'(C0')W'(I3'):CW=W'(I2')\E/\E[24;0H\E[0J:\
 	:GE=\EP1pW'(I3'):tc=vt240:
+vwsregis|regis emulator in vws 3.3 and later:\
+        :WC=\EP1pP[(1)%d,(62-)%d]W'(E')V[(1)%d,(62-)%d]W'(R'):\
+        :OW=\EP1pS'(C0')W'(I2')\E[1;1''z:\
+        :CW=\E/\E[23;0H\E[0J\E[0;1''z:\
+        :Y1#20:Y2#459:yr#220:li#22:\
+        :GE=\E[1;1''z\EP1p:GD=\E/\E[23;0H\E[K\E[0;1''z:\
+        :tc=vt240:
 #ReGIS entry; R6=Y2, R7=txheight in pixels, R8,R9=tmp reg for SC.
 vt240|vt240 in ReGIS mode, "plain" (all lines + text light grey):\
 	:kf=cl:xr#800:yr#230:ar#.602:xs#.206:ys#.124:li#23:co#88:tx:\
@@ -702,6 +798,46 @@ vt240|vt240 in ReGIS mode, "plain" (all lines + text light grey):\
 	:CL=50^]\E^L(#50!!)\E2(#20!!)\E[J:\
 	:LT=\E(1$1-5)(1_+.$D)h($$:\
 	:lt#5:nc#1:se:xr#640:yr#480:tc=4012:
+
+# IRAF trial graphcap entries for Kermit 3.12 and CGA or VGA display
+#
+# There is no computer control of graphics cursor - only keyboard.
+# In graphics cursor mode - keys 2-4-6-8 move cursor (IRAF applications
+#       requiring these keystrokes have a problem).
+#
+# Graphics memory is erased when switching from graphics to text.
+#  (BUT this should not happen in VGA mode!! - needs work).
+# Using kermit or kermvga switches automatically back to text when
+#       graphics is complete.
+# Using kermitne or kermvgane leaves one in graphics mode.
+#       (the ne stands for No Erase).
+# hotkey ALT- (Alt and minus sign) switches from graphics to text.
+#
+# Use following settings in mskermit.ini or mscustom.ini file:
+#       set terminal vt320
+#       set terminal graphics char opaque
+#
+#       dec92   Pat Seitzer (seitzer@astro.lsa.umich.edu)
+#
+# This CGA graphcap has aspect ratio for a laptop.
+kermit|Kermit 3.12 Tektronix emulator for CGA display:\
+        :ar#.482:xs#.195:ys#.094:xr#640:yr#200:ch#.04:cw#.0125:li#25:co#80\
+	:lt#6:nk#127:k1#1:k2#127:tx:th#1:t1#1:kf=cl:wc:nc#1:in:se:OW=\E[?38;h:\
+        :CW=\E^X:GE=^]:GD=\E[24;1f\E[2K^_:CL=\E^L:\
+        :LT=(1$0)\E(#127.)\E`($1-5)^M\E(1_+.$D)\E/0d\E`($$:\
+        :TS=^]%t^_:RC=^]\E^Z:CD=^M:CN#6:\
+        :SC=(,!3, & *, &+!1, & *, &+!2:TH=\E(1#55+.:MS=\034:PL:XY=%t:VS=^]:\
+        :X1#0:X2#1023:Y1#0:Y2#779:
+
+kermitne|Kermit 3.12 with no auto switch back to vt320 mode:\
+        :CW=\E[24;1f\E[2K\E[23;1f^_:tc=kermit:
+
+kermvga|Kermit 3.12 Tektronix emulator for VGA display:\
+        :ar#0.75:xs#.195:ys#.146:xr#640:yr#480:ch#.02326:li#43:tc=kermit:
+
+kermvgane|Kermit 3.12 VGA with no auto switch back to vt320 mode:\
+        :CW=\E[24;1f\E[2K\E[23;1f^_:tc=kermvga:
+
 
 # Selanar entries for CL, LT, ar, xs and ys have been changed from V2.5.
 # Setup mode requirement: Screen clear with auto TEK entry DISabled.  

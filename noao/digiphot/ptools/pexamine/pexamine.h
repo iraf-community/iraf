@@ -18,8 +18,9 @@ define	PX_MAXNCOLS	20	# the maximum number of columns
 
 # Define the default photometry columns.
 
-define	PX_DAOCOLS  ",GROUP,ID,XCENTER,YCENTER,MSKY,MAG,MERR,NITER,CHI,SHARP,"
-define	PX_APCOLS  ",ID,XCENTER,YCENTER,MSKY,MAG,MERR,"
+define	PX_DAOCOLS  ",GROUP,ID,XCENTER,YCENTER,MSKY,STDEV,MAG,MERR,NITER,\
+CHI,SHARPNESS,ROUNDNESS"
+define	PX_APCOLS  ",ID,XCENTER,YCENTER,MSKY,STDEV,MAG,MERR,"
 
 # Define the structure.
 
@@ -50,9 +51,9 @@ define	PX_HCOLNAME	Memc[P2C($1+10+9*PX_SZCOLNAME+9)] # the  hgm column
 
 define	PX_PCMDS "|photcolumns|usercolumns|xcolumn|ycolumn|hcolumn|xposcolumn|\
 yposcolumn|eparam|unlearn|x1|x2|y1|y2|marker|szmarker|grid|logx|logy|box|\
-ticklabels|majrx|minrx|majry|minry|round|fill|nbins|z1|z2|top_closed|rin|rout|\
-ncolumns|nlines|axes|angh|angv|floor|ceiling|zero|ncontours|interval|nhi|\
-dashpat|label|delete|"
+ticklabels|majrx|minrx|majry|minry|round|fill|nbins|z1|z2|top_closed|rinnner|\
+router|ncolumns|nlines|axes|angh|angv|floor|ceiling|zero|ncontours|interval|\
+nhi|dashpat|label|delete|"
 
 define	PX_PCMD_PHOTCOLUMNS	1
 define	PX_PCMD_USERCOLUMNS	2

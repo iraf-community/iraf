@@ -51,6 +51,7 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 define	IEEE_SWAP	IEEE_SWAP4
 define	BSWAP		bswap4
 define	NSWAP		4
+define	IOFF		1
 
 
 # IEEVPAK -- Convert an array in the native floating point format into an
@@ -112,7 +113,7 @@ begin
 	    if (mapin != NO)
 		do i = 1, nelem {
 		    fval = native[i]
-	            if (and (ival[1], NaNmask) == NaNmask) {
+	            if (and (ival[IOFF], NaNmask) == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    }
@@ -123,7 +124,7 @@ begin
 	    else {
 		do i = 1, nelem {
 		    fval = ieee[i]
-	            if (and (ival[1], NaNmask) == NaNmask) {
+	            if (and (ival[IOFF], NaNmask) == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    } else
@@ -174,7 +175,7 @@ begin
 	    call BSWAP (x, 1, x, 1, NSWAP)
 	if (mapin != NO) {
 	    fval = x
-	    if (and (ival[1], NaNmask) == NaNmask) {
+	    if (and (ival[IOFF], NaNmask) == NaNmask) {
 	        x = native_NaN
 		nin = nin + 1
 	    }

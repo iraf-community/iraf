@@ -14,11 +14,11 @@
 #define import_xnames
 #include <iraf.h>
 
+#include "config.h"
 #include "grammar.h"
 #include "opcodes.h"
 #include "operand.h"
 #include "param.h"
-#include "config.h"
 #include "clmodes.h"
 #include "task.h"
 #include "errs.h"
@@ -54,14 +54,15 @@ extern	dobkg;			/* set when code is to be done in bkg	*/
 extern	bkgno;			/* job number if bkg job		*/
 
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
+int	cltrace = 0;		/* trace instruction execution if > 0	*/
 
 static	int old_onipc;		/* X_IPC handler chained to onint()	*/
-static	int *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
+static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
 static	int intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
-unsigned cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
+memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
 jmp_buf intenv;			/* X_INT during process jumps here	*/
@@ -92,8 +93,8 @@ PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
 	 * ourselves during normal execution, but when the CL exits we are
 	 * not prepared to deal with errors occuring during shutdown.
 	 */
-	XMJBUF (&bp);  jumpcom = (int *)&Memc[bp];
-	cl_amovi (jumpcom, (int *)jmp_save, LEN_JUMPBUF);
+	XMJBUF (&bp);  jumpcom = (long *)&Memc[bp];
+	cl_amovi ((int *)jumpcom, (int *)jmp_save, LEN_JUMPBUF);
 
 	/* Init clexit() in case we have to panic stop.  */
 	if (setjmp (jmp_clexit))
@@ -464,13 +465,18 @@ char *
 memneed (incr)
 int	incr;		/* amount of space desired in ints, not bytes	*/
 {
-	unsigned *old;
+	memel *old;
 
 	old = daddr (topd);
 	topd += incr;
 
+        /* Quad alignment is desirable for some architectures. */
+        if (topd & 1)
+            topd++;
+
 	if (topd > maxd)
 	    cl_error (E_IERR, "dictionary full");
+
 	return ((char *)old);
 }
 

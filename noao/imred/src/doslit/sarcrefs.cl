@@ -12,7 +12,7 @@ struct	*fd
 
 begin
 	string	arcref, arcrefms, arc, arcms, temp, str1, str2
-	int	i, dc
+	int	i, dc, nspec
 	bool	log
 
 	temp = mktemp ("tmp$iraf")
@@ -23,7 +23,7 @@ begin
 
 	newdisp = no
 	arcref = arcref1
-	arcrefms = arcref1 // ".ms.imh"
+	arcrefms = arcref1 // ".ms." // envget ("imtype")
 	if (!access (arcrefms)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    if (apslitproc.reference == "") {
@@ -32,6 +32,14 @@ begin
 		    background="none", clean=no, weights="none")
 	    } else
 		apslitproc (arcref, background="none", clean=no, weights="none")
+
+	    nspec = 1
+	    hselect (arcrefms, "naxis2", yes) | scan (nspec)
+	    if (nspec > 1)
+		scopy (arcrefms//"[*,1]", arcrefms, w1=INDEF, w2=INDEF,
+		    apertures="", bands="", beams="", apmodulus=0,
+		    format="multispec", renumber=no, offset=0, clobber=yes,
+		    merge=no, rebin=yes, verbose=no)
 	}
 		    
 	# Check for dispersion correction.  If missing determine the
@@ -51,17 +59,18 @@ begin
 		coordlist=sparams.coordlist, nsum=1, match=sparams.match,
 		maxfeatures=50, zwidth=100., ftype="emission",
 		fwidth=sparams.fwidth, cradius=sparams.cradius,
-		threshold=10., minsep=2., function=sparams.i_function,
-		order=sparams.i_order, sample="*",
-		niterate=sparams.i_niterate, low_reject=sparams.i_low,
-		high_reject=sparams.i_high, grow=0., autowrite=yes)
+		threshold=sparams.threshold, minsep=2.,
+		function=sparams.i_function, order=sparams.i_order,
+		sample="*", niterate=sparams.i_niterate,
+		low_reject=sparams.i_low, high_reject=sparams.i_high,
+		grow=0., autowrite=yes)
 	    hedit (arcrefms, "refspec1", arcref // ".ms", add=yes,
 		show=no, verify=no)
 
 	    dispcor (arcrefms, "", linearize=sparams.linearize,
 		database=database, table="", w1=INDEF, w2=INDEF, dw=INDEF,
 		nw=INDEF, log=sparams.log, flux=sparams.flux, samedisp=yes,
-		global=no, ignoreaps=no, confirm=yes, verbose=no, listonly=no,
+		global=no, ignoreaps=yes, confirm=yes, verbose=no, listonly=no,
 		logfile=logfile)
 
 	    hedit (arcrefms, "dispcor", 0, add=yes, verify=no,

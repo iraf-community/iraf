@@ -43,6 +43,7 @@ begin
 	call salloc (plfile, SZ_FNAME, TY_CHAR)
 	call salloc (sigma, SZ_FNAME, TY_CHAR)
 	call salloc (gain, SZ_FNAME, TY_CHAR)
+	call salloc (snoise, SZ_FNAME, TY_CHAR)
 	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
 	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
@@ -71,6 +72,7 @@ begin
         blank = clgetr ("blank")
         call clgstr ("gain", Memc[gain], SZ_FNAME)
         call clgstr ("rdnoise", Memc[rdnoise], SZ_FNAME)
+        call clgstr ("snoise", Memc[snoise], SZ_FNAME)
         lthresh = clgetr ("lthreshold")
         hthresh = clgetr ("hthreshold")
         lsigma = clgetr ("lsigma")
@@ -256,7 +258,7 @@ bool	strne()
 int	getdatatype(), imaccess()
 real	clgetr()
 char	clgetc()
-int	begmem(), errcode(), open(), ty_max(), sizeof()
+int	clgeti(), begmem(), errcode(), open(), ty_max(), sizeof()
 pointer	immap(), ic_plfile()
 errchk	immap, ic_plfile, ic_setout, ccddelete
 
@@ -303,10 +305,15 @@ begin
 	    }
 	}
 
+	# Convert the nkeep parameter if needed.
         # Convert the pclip parameter to a number of pixels rather than
         # a fraction.  This number stays constant even if pixels are
         # rejected.  The number of low and high pixel rejected, however,
         # are converted to a fraction of the valid pixels.
+
+	nkeep = clgeti ("nkeep")
+	if (nkeep < 0)
+	    nkeep = max (0, nimages + nkeep)
 
         if (reject == PCLIP) {
 	    pclip = clgetr ("pclip")
@@ -351,7 +358,12 @@ begin
 	bufsize = 0
 retry_
 	do i = 1, nimages
-	    Memi[in+i-1] = immap (images[1,i], READ_ONLY, 0)
+	    iferr (Memi[in+i-1] = immap (images[1,i], READ_ONLY, 0)) {
+		do j = 1, i-1
+		    call imunmap (Memi[in+i-1])
+		call sfree (sp)
+		call erract (EA_ERROR)
+	    }
 
         # Map the output image and set dimensions and offsets.
         out[1] = immap (Memc[temp1], NEW_COPY, Memi[in])
@@ -362,25 +374,31 @@ retry_
         intype = IM_PIXTYPE(Memi[in])
         do i = 2, nimages
             intype = ty_max (intype, IM_PIXTYPE(Memi[in+i-1]))
-        IM_PIXTYPE(out[1]) = getdatatype (clgetc ("pixeltype"))
+        IM_PIXTYPE(out[1]) = getdatatype (clgetc ("outtype"))
         if (IM_PIXTYPE(out[1]) == ERR)
             IM_PIXTYPE(out[1]) = intype
 
         # Open pixel list file if given.
-        if (Memc[temp2] != EOS)
+        if (Memc[temp2] != EOS) {
             out[2] = ic_plfile (Memc[temp2], NEW_COPY, out[1])
-        else
+	    call imastr (out[2], "TEMPNAME", plfile)
+        } else
             out[2] = NULL
 
         # Open the sigma image if given.
         if (Memc[temp3] != EOS) {
             out[3] = immap (Memc[temp3], NEW_COPY, out[1])
+	    call imastr (out[3], "TEMPNAME", sigma)
             IM_PIXTYPE(out[3]) = ty_max (TY_REAL, IM_PIXTYPE(out[1]))
             call sprintf (IM_TITLE(out[3]), SZ_IMTITLE,
                 "Combine sigma images for %s")
                 call pargstr (output)
         } else
             out[3] = NULL
+
+        # This is done hear to work around problem adding a keyword to
+        # an NEW_COPY header and then using that header in a NEW_COPY.
+        call imastr (out[1], "TEMPNAME", output)
 
         # Open masks.
         call ic_mopen (Memi[in], out, nimages)
@@ -423,41 +441,52 @@ retry_
                 call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize)
             }
         } then {
+	    call ic_mclose (nimages)
+	    if (!project) {
+		do j = 2, nimages
+		    call imunmap (Memi[in+j-1])
+	    }
+	    if (out[2] != NULL) {
+		call imunmap (out[2])
+		call imdelete (plfile)
+	    }
+	    if (out[3] != NULL) {
+		call imunmap (out[3])
+		call imdelete (sigma)
+	    }
+	    call imunmap (out[1])
+	    call imdelete (output)
+	    call imunmap (Memi[in])
+	    if (logfd != NULL)
+		call close (logfd)
             switch (errcode()) {
             case SYS_MFULL:
-                call sfree (sp)
-                call ic_mclose (nimages)
-                do j = 1, nimages {
-                    call imunmap (Memi[in+j-1])
-                    if (project)
-                        break
-                }
-               call imunmap (out[1])
-               call imdelete (output)
-               if (out[2] != NULL) {
-                    call imunmap (out[2])
-                    call imdelete (plfile)
-                }
-                if (out[3] != NULL) {
-                    call imunmap (out[3])
-                    call imdelete (sigma)
-                }
-                if (logfd != NULL)
-                    call close (logfd)
                 bufsize = bufsize / 2
+		call sfree (sp)
                 goto retry_
             default:
+		call fixmem (oldsize)
+		call sfree (sp)
                 call erract (EA_ERROR)
             }
         }
 
         # Unmap all the images, close the log file, and restore memory.
-	call imunmap (out[1])
-	if (strne (Memc[temp1], output)) {
-	    call ccddelete (output)
-	    call imrename (Memc[temp1], output)
+	# The input images must be unmapped first to insure that there
+	# is a FD for the output images since the headers are opened to
+	# update them.  However, the order of the NEW_COPY pointers must
+	# be preserved; i.e. the output depends on the first input image,
+	# and the extra output images depend on the output image.
+
+	if (!project) {
+	    do i = 2, nimages {
+		call imunmap (Memi[in+i-1])
+		if (delete)
+		    call ccddelete (images[1,i])
+	    }
 	}
 	if (out[2] != NULL) {
+	    call imdelf (out[2], "TEMPNAME")
 	    call imunmap (out[2])
 	    if (strne (Memc[temp2], plfile)) {
 	        call ccddelete (plfile)
@@ -465,20 +494,25 @@ retry_
 	    }
 	}
 	if (out[3] != NULL) {
+	    call imdelf (out[3], "TEMPNAME")
 	    call imunmap (out[3])
 	    if (strne (Memc[temp3], sigma)) {
 	        call ccddelete (sigma)
 	        call imrename (Memc[temp3], sigma)
 	    }
 	}
+	call imdelf (out[1], "TEMPNAME")
+	call imunmap (out[1])
+	if (strne (Memc[temp1], output)) {
+	    call ccddelete (output)
+	    call imrename (Memc[temp1], output)
+	}
+	call imunmap (Memi[in])
+	if (delete)
+	    call ccddelete (images[1,1])
 	if (logfd != NULL)
 	    call close (logfd)
 	call ic_mclose (nimages)
-	do i = 1, nimages {
-	    call imunmap (Memi[in+i-1])
-	    if (delete)
-		call ccddelete (images[1,i])
-	}
 
 	call fixmem (oldsize)
 	call sfree (sp)
@@ -491,13 +525,13 @@ int procedure ty_max (type1, type2)
 
 int	type1, type2		# Datatypes
 
-int	i, j, order[3]
-data	order/TY_SHORT,TY_REAL,TY_REAL/
+int	i, j, order[8]
+data	order/TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,TY_COMPLEX,TY_REAL/
 
 begin
-	for (i=1; (i<=2) && (type1!=order[i]); i=i+1)
+	for (i=1; (i<=7) && (type1!=order[i]); i=i+1)
 	    ;
-	for (j=1; (j<=2) && (type2!=order[j]); j=j+1)
+	for (j=1; (j<=7) && (type2!=order[j]); j=j+1)
 	    ;
 	return (order[max(i,j)])
 end

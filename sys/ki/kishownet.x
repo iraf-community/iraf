@@ -9,14 +9,10 @@ procedure ki_shownet (fd)
 int	fd			# output file
 
 int	i, j, n
-pointer	sp, text
-int	ki_gethosts(), envfind()
+int	ki_gethosts()
 include	"kinode.com"
 
 begin
-	call smark (sp)
-	call salloc (text, SZ_FNAME, TY_CHAR)
-
 	if (n_nnodes == 0)
 	    n = ki_gethosts()
 
@@ -54,18 +50,20 @@ begin
 	    call fprintf (fd, "\n")
 	}
 
-	n = 0
-	do i = 1, n_nnodes
-	    do j = 1, n_nalias[i]
-		if (envfind (n_alias[1,j,i], Memc[text], SZ_FNAME) > 0) {
-		    if (n == 0)
-			call fprintf (fd, "\n")
-		    call fprintf (fd,
-			"Warning: node name `%s' is an alias for `%s'\n")
-			call pargstr (n_alias[1,j,i])
-			call pargstr (Memc[text])
-		    n = n + 1
-		}
-
-	call sfree (sp)
+#	The following should no longer be needed as ki_mapname and the
+#	"node!" syntax should prevent accidential aliasing of node names
+#	and non-network related environment variables.
+#
+#	n = 0
+#	do i = 1, n_nnodes
+#	    do j = 1, n_nalias[i]
+#		if (envfind (n_alias[1,j,i], Memc[text], SZ_FNAME) > 0) {
+#		    if (n == 0)
+#			call fprintf (fd, "\n")
+#		    call fprintf (fd,
+#			"Warning: node name `%s' is an alias for `%s'\n")
+#			call pargstr (n_alias[1,j,i])
+#			call pargstr (Memc[text])
+#		    n = n + 1
+#		}
 end

@@ -75,13 +75,13 @@ begin
 		    # Output IH or DH instruction?
 		    hi = pv
 		    if (abs(dv) > I_DATAMAX) {
-			ll_dst[op] = M_SH + and (pv, I_DATAMAX)
+			ll_dst[op] = M_SH + and (int(pv), I_DATAMAX)
 			op = op + 1
 			ll_dst[op] = pv / I_SHIFT
 			op = op + 1
 		    } else {
 			if (dv < 0)
-			    ll_dst[op] = M_DH + -dv
+			    ll_dst[op] = M_DH + (-dv)
 			else
 			    ll_dst[op] = M_IH + dv
 			op = op + 1

@@ -7,6 +7,7 @@ $exit
 
 libpttables.a:
 	ptchoose.x	../ptkeysdef.h
+	ptfmkrec.x	../ptkeysdef.h
 	ptgetop.x	../ptkeysdef.h    <evexpr.h>
 	ptgnfn.x	../ptkeysdef.h    <ctype.h>   <syserr.h>
 	pthdrs.x	../ptkeysdef.h

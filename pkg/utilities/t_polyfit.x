@@ -71,7 +71,7 @@ bool	verbose, listdata			# printout options
 int	i, in, item, m[50], mode, nterms, line_number
 real	x[MAX_ITEMS], y[MAX_ITEMS], yfit[MAX_ITEMS], sigy[MAX_ITEMS]
 real	a0, a[50], siga0, siga[50], r[50], rmul, chisqr, ftest
-real	yavg, sum, stdev
+real	stdev
 
 extern	pf_fctn()
 bool	fp_equalr()
@@ -142,16 +142,6 @@ begin
 	# to 1.0 on average to minimize the dynamic range during
 	# matrix inversion.
 
-	sum = 0.0
-	for (i=1;  i <= item;  i=i+1)
-	    sum = sum + y[i]
-	yavg = sum/item
-
-	for (i=1;  i <= item;  i=i+1) {
-	    y[i] = y[i] / yavg
-	    sigy[i] = sigy[i] / yavg
-	}
-
 	nterms = order
 	switch (weighting) {
 	case POLY_INSTRUMENTAL:
@@ -168,26 +158,36 @@ begin
 	    a0, a, siga0, siga, r, rmul, chisqr, ftest, pf_fctn)
 
 	# Compute standard deviation of residuals from reduced chi-sqr.
-	stdev = sqrt ((item - nterms - 1) * chisqr / (item - 1))
+	switch (weighting) {
+	case POLY_STATISTICAL, POLY_INSTRUMENTAL:
+	    stdev = 0.0
+	    do i = 1, item
+		stdev = stdev + (y[i] - yfit[i]) ** 2
+	    stdev = sqrt (stdev / (item - 1))
+	case POLY_UNIFORM:
+	    stdev = sqrt ((item - nterms - 1) * chisqr / (item - 1))
+	default:
+	    stdev = sqrt ((item - nterms - 1) * chisqr / (item - 1))
+	}
 
 	# Print coefficients scaled back to input Y levels
 	if (!listdata) {
 	    call printf ("%12.7g")
-		call pargr (a0 * yavg)
+		call pargr (a0)
 
 	    for (i=1;  i <= order;  i=i+1) {
 		call printf ("  %12.7g")
-		    call pargr (a[i] * yavg)
+		    call pargr (a[i])
 	    }
 	    call printf ("\n")
 
 	    # Print sigmas.
 	    call printf ("%12.7g")
-	        call pargr (siga0 * abs(yavg))
+	        call pargr (siga0)
 
 	    for (i=1;  i <= order;  i=i+1) {
 	        call printf ("  %12.7g")
-		    call pargr (siga[i] * abs(yavg))
+		    call pargr (siga[i])
 	    }
 	    call printf ("\n")
 
@@ -200,20 +200,30 @@ begin
 
 		if (fp_equalr (ftest, -99999.)) {
 		    call printf ("\nchi sqr: %7g  ftest: UNDEF  ")
-		        call pargr (chisqr * yavg**2)
-		    call printf (" correlation: %7g\n")
-		        call pargr (rmul)
+		        call pargr (chisqr)
+		    if (fp_equalr (rmul, -99999.)) {
+		        call printf (" correlation: UNDEF\n")
+		            call pargr (rmul)
+		    } else {
+		        call printf (" correlation: %7g\n")
+		            call pargr (rmul)
+		    }
 		} else {
 		    call printf ("\nchi sqr: %7g   ftest: %7g   ")
-		        call pargr (chisqr * yavg**2)
+		        call pargr (chisqr)
 		        call pargr (ftest)
-		    call printf ("correlation: %7g\n")
-		        call pargr (rmul)
+		    if (fp_equalr (rmul, -99999.)) {
+		        call printf (" correlation: UNDEF\n")
+		            call pargr (rmul)
+		    } else {
+		        call printf ("correlation: %7g\n")
+		            call pargr (rmul)
+		    }
 		}
 
 		call printf (" nr pts: %7g   std dev res: %0.6g\n")
 		    call pargi (item)
-		    call pargr (stdev * abs(yavg))
+		    call pargr (stdev)
 
 		call printf ("\nx(data)     y(calc)     y(data)     sigy(data)\n")
 	    }
@@ -223,9 +233,9 @@ begin
 	    for (i=1;  i <= item;  i=i+1) {
 		call printf ("%7g     %7g     %7g     %7g\n")
 		    call pargr (x[i])
-		    call pargr (yfit[i] * yavg)
-		    call pargr (y[i] * yavg)
-		    call pargr (sigy[i] * yavg)
+		    call pargr (yfit[i])
+		    call pargr (y[i])
+		    call pargr (sigy[i])
 	    }
 	}
 

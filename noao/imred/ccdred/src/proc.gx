@@ -60,13 +60,19 @@ procedure proc1$t (ccd)
 
 pointer	ccd		# CCD structure
 
-int	line, ncols, nlines, findmean
+int	line, ncols, nlines, findmean, rep
 real	overscan, darkscale, flatscale, illumscale, frgscale, mean
 PIXEL	minrep
 pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
 pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
+$if (datatype == csir)
+real	asum$t()
+$else $if (datatype == ld)
+double	asum$t()
+$else
 PIXEL	asum$t()
+$endif $endif
 pointer	imgl2$t(), impl2$t(), ccd_gl$t()
 
 begin
@@ -82,10 +88,11 @@ begin
 	    call lfixinit$t (in)
 
 	findmean = CORS(ccd, FINDMEAN)
-	if (findmean == YES) {
-	    minrep = MINREPLACE(ccd)
+	if (findmean == YES)
 	    mean = 0.
-	}
+	rep = CORS(ccd, MINREP)
+	if (rep == YES)
+	    minrep = MINREPLACE(ccd)
 
 	overscan_vec = OVERSCAN_VEC(ccd)
 
@@ -101,6 +108,10 @@ begin
 	if (CORS(ccd, DARKCOR) == 0) {
 	    darkim = NULL
 	    darkbuf = 1
+	} else if (IM_LEN(DARK_IM(ccd),2) == 1) {
+	    darkim = NULL
+	    darkbuf = ccd_gl$t (DARK_IM(ccd), DARK_C1(ccd), DARK_C2(ccd), 1)
+	    darkscale = FLATSCALE(ccd)
 	} else {
 	    darkim = DARK_IM(ccd)
 	    darkscale = DARKSCALE(ccd)
@@ -175,10 +186,10 @@ begin
 		Mem$t[flatbuf], Mem$t[illumbuf], Mem$t[fringebuf], ncols,
 		darkscale, flatscale, illumscale, frgscale)
 
-	    if (findmean == YES) {
+	    if (rep == YES)
 		call amaxk$t (Mem$t[outbuf], minrep, Mem$t[outbuf], ncols)
+	    if (findmean == YES)
 		mean = mean + asum$t (Mem$t[outbuf], ncols)
-	    }
 	}
 
 	do line = nlines+1, IM_LEN(out,2)-OUT_L1(ccd)+1
@@ -201,13 +212,19 @@ procedure proc2$t (ccd)
 
 pointer	ccd		# CCD structure
 
-int	line, ncols, nlines, findmean
+int	line, ncols, nlines, findmean, rep
 real	darkscale, flatscale, illumscale, frgscale, mean
 PIXEL	minrep
 pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
 pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
+$if (datatype == csir)
+real	asum$t()
+$else $if (datatype == ld)
+double	asum$t()
+$else
 PIXEL	asum$t()
+$endif $endif
 pointer	imgl2$t(), impl2$t(), imgs2$t(), ccd_gl$t()
 
 begin
@@ -223,10 +240,11 @@ begin
 	    call lfixinit$t (in)
 
 	findmean = CORS(ccd, FINDMEAN)
-	if (findmean == YES) {
-	    minrep = MINREPLACE(ccd)
+	if (findmean == YES)
 	    mean = 0.
-	}
+	rep = CORS(ccd, MINREP)
+	if (rep == YES)
+	    minrep = MINREPLACE(ccd)
 
 	overscan_vec = OVERSCAN_VEC(ccd)
 
@@ -242,6 +260,10 @@ begin
 	if (CORS(ccd, DARKCOR) == 0) {
 	    darkim = NULL
 	    darkbuf = 1
+	} else if (IM_LEN(DARK_IM(ccd),1) == 1) {
+	    darkim = NULL
+	    darkbuf = imgs2$t (DARK_IM(ccd), 1, 1, DARK_L1(ccd), DARK_L2(ccd))
+	    darkscale = DARKSCALE(ccd)
 	} else {
 	    darkim = DARK_IM(ccd)
 	    darkscale = DARKSCALE(ccd)
@@ -314,10 +336,10 @@ begin
 		Mem$t[flatbuf], Mem$t[illumbuf], Mem$t[fringebuf], ncols,
 		zeroim, flatim, darkscale, flatscale, illumscale, frgscale)
 
-	    if (findmean == YES) {
+	    if (rep == YES)
 		call amaxk$t (Mem$t[outbuf], minrep, Mem$t[outbuf], ncols)
+	    if (findmean == YES)
 		mean = mean + asum$t (Mem$t[outbuf], ncols)
-	    }
 	}
 
 	do line = nlines+1, IM_LEN(out,2)-OUT_L1(ccd)+1

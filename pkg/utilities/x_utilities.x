@@ -10,4 +10,5 @@ task	ucase	 = t_ucase,
 	urand	 = t_urand,
 	polyfit  = t_polyfit,
 	curfit   = t_curfit,
-	split	 = t_split
+	split	 = t_split,
+	surfit   = t_surfit

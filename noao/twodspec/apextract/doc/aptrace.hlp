@@ -1,4 +1,4 @@
-.help aptrace Aug91 noao.twodspec.apextract
+.help aptrace Aug93 noao.twodspec.apextract
 .ih
 NAME
 aptrace -- Trace spectra for aperture extraction
@@ -57,6 +57,8 @@ at the end of the image) used in finding, recentering, resizing,
 and editing operations.  For tracing this is the starting line and
 the same number of lines are summed at each tracing point.  A line of
 INDEF selects the middle of the image along the dispersion axis.
+A positive nsum selects the number of lines to sum while a negative
+value selects a median.  Tracing always uses a sum.
 .le
 .ls step = 10
 Step along the dispersion axis between determination of the spectrum
@@ -208,6 +210,124 @@ all apertures in all images with the last set of fitting parameters.
 The tracing may also be done from the interactive aperture editor with
 the 't' key.  The aperture tracing algorithm may be selected from many
 of the tasks in the package with the \fItrace\fR parameter.
+.ih
+APTRACE DATABASE COEFFICIENTS
+The path of an aperture is described by a function that gives an additive
+offset relative to the aperture center as stored under the database keyword
+center.  The function is saved in the database as a series of
+coefficients.  The section containing the coefficients starts with the
+keyword "curve" and the number of coefficients.
+
+The first four coefficients define the type of function, the order
+or number of spline pieces, and the range of the independent variable
+(the line or column coordinate along the dispersion).  The first
+coefficient is the function type code with values:
+
+.nf
+	Code	Type
+	   1	Chebyshev polynomial
+	   2	Legendre polynomial
+	   3	Cubic spline
+	   4	Linear spline
+.fi
+
+The second coefficient is the order (actually the number of terms) of
+the polynomial or the number of pieces in the spline.
+
+The next two coefficients are the range of the independent variable over
+which the function is defined.  These values are used to normalize the
+input variable to the range -1 to 1 in the polynomial functions.  If the
+independent variable is x and the normalized variable is n, then
+
+.nf
+	n = (2 * x - (xmax + xmin)) / (xmax - xmin)
+.fi
+
+where xmin and xmax are the two coefficients.
+
+The spline functions divide the range into the specified number of
+pieces.  A spline coordinate s and the nearest integer below s,
+denoted as j, are defined by
+
+.nf
+	s = (x - xmin) / (xmax - xmin) * npieces
+	j = integer part of s
+.fi
+
+where npieces are the number of pieces.
+
+The remaining coefficients are those for the appropriate function.
+The number of coefficients is either the same as the function order
+for the polynomials, npieces+1 for the linear spline, or npieces + 3
+for the cubic spline.
+
+1. Chebyshev Polynomial
+
+The polynomial can be expressed as the sum
+
+.nf
+	y = sum from i=1 to order {c_i * z_i}
+.fi
+
+where the the c_i are the coefficients and the z_i are defined
+interatively as:
+
+.nf
+	z_1 = 1
+	z_2 = n
+	z_i = 2 * n * z_{i-1} - z_{i-2}
+.fi
+
+2. Legendre Polynomial
+
+The polynomial can be expressed as the sum
+
+.nf
+	y = sum from i=1 to order {c_i * z_i}
+.fi
+
+where the the c_i are the coefficients and the z_i are defined
+interatively as:
+
+.nf
+	z_1 = 1
+	z_2 = n
+	z_i = ((2*i-3) * n * z_{i-1} - (i-2) * z_{i-2}) / (i - 1)
+.fi
+
+3. Linear Spline
+
+The linear spline is evaluated as
+
+.nf
+	y = c_j * a + c_{j+1} * b
+.fi
+
+where j is as defined earlier and a and b are fractional difference
+between s and the nearest integers above and below
+
+.nf
+	a = (j + 1) - s
+	b = s - j
+.fi
+
+4.  Cubic Spline
+
+The cubic spline is evaluated as
+
+.nf
+	y = sum from i=0 to 3 {c_{i+j} * z_i}
+.fi
+
+where j is as defined earlier.  The term z_i are computed from
+a and b, as defined earlier, as follows
+
+.nf
+	z_0 = a**3
+	z_1 = 1 + 3 * a * (1 + a * b)
+	z_2 = 1 + 3 * b * (1 + a * b)
+	z_3 = b**3
+.fi
 .ih
 EXAMPLES
 .ih

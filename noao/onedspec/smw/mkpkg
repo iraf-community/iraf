@@ -1,0 +1,38 @@
+# SMW/SHDR Interface
+
+update:
+	$checkout libsmw.a noaolib$
+	$update   libsmw.a
+	$checkin  libsmw.a noaolib$
+	;
+
+libsmw.a:
+	funits.x	<funits.h> <error.h>
+	shdr.x		<smw.h> <error.h> <imhdr.h> <imset.h> <math/iminterp.h>
+	smwclose.x	<smw.h>
+	smwct.x		<smw.h>
+	smwctfree.x	<smw.h>
+	smwctran.x	<smw.h>
+	smwdaxis.x	<smw.h>
+	smwequispec.x	<smw.h> <mwset.h> <imhdr.h>
+	smwesms.x	<smw.h> <mwset.h>
+	smwgapid.x	<smw.h>
+	smwgwattrs.x	<smw.h> <error.h>
+	smwnewcopy.x	<smw.h>
+	smwmerge.x	<smw.h> <mwset.h>
+	smwmultispec.x	<smw.h>
+	smwmw.x		<smw.h>
+	smwnd.x		<smw.h> <imhdr.h>
+	smwndes.x	<smw.h> <imhdr.h>
+	smwoldms.x	<smw.h> <mwset.h>
+	smwonedspec.x	<smw.h> <imhdr.h>
+	smwopen.x	<smw.h>
+	smwopenim.x		<imio.h> <mwset.h> <imhdr.h>
+	smwsapid.x	<smw.h>
+	smwsaveim.x	<smw.h> <imio.h> <imhdr.h>
+	smwsaxes.x	<smw.h> <imhdr.h> <mwset.h>
+	smwsctran.x	<smw.h>
+	smwsmw.x	<smw.h>
+	smwswattrs.x	<smw.h> <error.h>
+	units.x		<units.h> <error.h>
+	;

@@ -149,7 +149,7 @@ begin
 		y2 = gki[GKI_GETCELLARRAY_UR+1]
 		m  = gki[GKI_GETCELLARRAY_NC]
 		n  = gki[GKI_GETCELLARRAY_NL]
-		call zcall7 (kp, m, n, x1,y1, x2,y2)
+		call zcall6 (kp, m, n, x1,y1, x2,y2)
 	    }
 	case GKI_ESCAPE:
 	    kp = dd[GKI_ESCAPE]

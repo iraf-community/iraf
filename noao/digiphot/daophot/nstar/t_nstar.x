@@ -1,26 +1,29 @@
 include	<fset.h>
-include	"../lib/daophot.h"
 include "../lib/daophotdef.h"
 
 # T_NSTAR  -- Procedure to fit the PSF to multiple stars.
 
 procedure t_nstar ()
 
-pointer	image				# name of the image
-pointer	psfimage			# name of the input PSF image
-pointer	groupfile			# input group file
-pointer	nstarfile			# output nstar table
+pointer	image				# input image descriptor
+pointer	groupfile			# input group file descriptor
+pointer	psfimage			# input PSF image descriptor
+pointer	nstarfile			# output photometry file descriptor
+pointer	rejfile				# output rejections file descriptor
+int	verbose				# print messages 
+int	verify				# verify the critical parameters
+int	update				# update the parameter set
 
 bool	ap_text
-int	root, verify, update
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
-pointer	sp, outfname, im, psfim, grp, nst, dao
+int	rlist, lrlist, root, grp, nst, rejfd
+pointer	sp, outfname, im, psfim, dao
 
 bool	clgetb(), itob()
-int	tbtopn(), strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
+int	strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
 int	access(), imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb()
 int	fntgfnb()
-pointer	immap()
+pointer	immap(), tbtopn()
 
 begin
 	# Set the standard output to flush on newline.
@@ -33,6 +36,7 @@ begin
 	call salloc (groupfile, SZ_FNAME, TY_CHAR)
 	call salloc (psfimage, SZ_FNAME, TY_CHAR)
 	call salloc (nstarfile, SZ_FNAME, TY_CHAR)
+	call salloc (rejfile, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 
 	# Get the input and output file names.
@@ -40,8 +44,10 @@ begin
 	call clgstr ("groupfile", Memc[groupfile], SZ_FNAME)
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("nstarfile", Memc[nstarfile], SZ_FNAME)
+	call clgstr ("rejfile", Memc[rejfile], SZ_FNAME)
 
 	# Get the task mode parameters.
+	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 
@@ -54,59 +60,81 @@ begin
 	lpimlist = imtlen (pimlist)
 	olist = fntopnb (Memc[nstarfile], NO)
 	lolist = fntlenb (olist)
-
+	rlist = fntopnb (Memc[rejfile], NO)
+	lrlist = fntlenb (rlist)
 
 	# Test that the lengths of the photometry file, psf image, and
 	# output file lists are the same as the length of the input image
 	# list.
 
-	if ((limlist != lalist) && (strncmp (Memc[groupfile],
-	    "default", 7) != 0)) {
+	if ((limlist != lalist) && (strncmp (Memc[groupfile], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatable image and group file list lengths")
 	}
 
-	if ((limlist != lpimlist) && (strncmp (Memc[psfimage],
-	    "default", 7) != 0)) {
+	if ((limlist != lpimlist) && (strncmp (Memc[psfimage], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatable image and psf file list lengths")
 	}
 
-	if ((limlist != lolist) && (strncmp (Memc[nstarfile],
-	    "default", 7) != 0)) {
+	if ((limlist != lolist) && (strncmp (Memc[nstarfile], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatable image and nstar file list lengths")
 	}
 
-	# Open the input image and initialize the daophot structure and
-	# get some pset parameters.
+	if ((lrlist > 0) && (limlist != lrlist) && (strncmp (Memc[rejfile],
+	    DEF_DEFNAME, DEF_LENDEFNAME) != 0)) {
+	    call imtclose (imlist)
+	    call fntclsb (alist)
+	    call imtclose (pimlist)
+	    call fntclsb (olist)
+	    call fntclsb (rlist)
+	    call sfree (sp)
+	    call error (0,
+	        "Incompatable image and rejections file list lengths")
+	}
+
+	# Open the daophot structure and get some parameters.
 	call dp_gppars (dao, NULL)	
-	call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
-	# Verify and update the parameters as appropriate.
+
+	# Set some parameters.
+	call dp_seti (dao, VERBOSE, verbose)
+
+	# Verify and update the parameters if appropriate.
 	if (verify == YES) {
 	    call dp_nconfirm (dao)
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
 
-	# Initalize the daophot fitting structure.
-	call dp_fitsetup (dao)
+	# Initialize the photometry structure.
 	call dp_apsetup (dao)
+
+	# Initialize the PSF structure.
+	call dp_fitsetup (dao)
+
+	# Initialize the nstar structure.
 	call dp_nstarsetup (dao)
 
 	# Loop over the images.
@@ -119,14 +147,14 @@ begin
 	    call dp_otime (im, dao)
 	    call dp_filter (im, dao)
 	    call dp_airmass (im, dao)
-	    call dp_sets (dao, IMNAME, Memc[image])
+	    call dp_sets (dao, INIMAGE, Memc[image])
 
 	    # Open the input group table.
 	    if (fntgfnb (alist, Memc[groupfile], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[groupfile], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[groupfile], SZ_FNAME)
 	    root = fnldir (Memc[groupfile], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[groupfile+root], 7) == 0 || (root ==
-	        strlen (Memc[groupfile])))
+	    if (strncmp (DEF_DEFNAME, Memc[groupfile+root],
+	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[groupfile])))
 	        call dp_inname (Memc[image], "", "grp", Memc[outfname],
 		    SZ_FNAME)
 	    else
@@ -136,14 +164,14 @@ begin
 	        grp = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
 	        grp = tbtopn (Memc[outfname], READ_ONLY, 0)
-	    call dp_sets (dao, GRPFILE, Memc[outfname])
+	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Open and read the PSF image.
 	    if (imtgetim (pimlist, Memc[psfimage], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[psfimage], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[psfimage], SZ_FNAME)
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[psfimage+root], 7) == 0 || (root ==
-	        strlen (Memc[psfimage])))
+	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
+	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[psfimage])))
 	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
 		    SZ_FNAME)
 	    else
@@ -152,33 +180,48 @@ begin
 	    call dp_readpsf (dao, psfim)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	
-	    # Open the output NSTAR file. If the output is "default",
+	    # Open the output NSTAR file. If the output is DEF_DEFNAME,
 	    # dir$default or a directory specification then the extension
 	    # "nst" is added to the image name and a suitable version number
 	    # is appended to the output name.
 
 	    if (fntgfnb (olist, Memc[nstarfile], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[nstarfile], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[nstarfile], SZ_FNAME)
 	    root = fnldir (Memc[nstarfile], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[nstarfile+root], 7) == 0 || (root ==
-	        strlen (Memc[nstarfile]))) {
+	    if (strncmp (DEF_DEFNAME, Memc[nstarfile+root],
+	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[nstarfile]))) {
 	        call dp_outname (Memc[image], "", "nst", Memc[outfname],
 		    SZ_FNAME)
-	        if (DP_TEXT(dao) == YES)
-	            nst = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-	        else
-	            nst = tbtopn (Memc[outfname], NEW_FILE, 0)
-	    } else {
+	    } else
 	        call strcpy (Memc[nstarfile], Memc[outfname], SZ_FNAME)
-	        if (DP_TEXT(dao) == YES)
-	            nst = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	    if (DP_TEXT(dao) == YES)
+	        nst = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	    else
+	        nst = tbtopn (Memc[outfname], NEW_FILE, 0)
+	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
+
+	    if (lrlist <= 0) {
+		rejfd = NULL
+		Memc[outfname] = EOS
+	    } else {
+	        if (fntgfnb (rlist, Memc[rejfile], SZ_FNAME) == EOF)
+		    call strcpy (DEF_DEFNAME, Memc[rejfile], SZ_FNAME)
+	        root = fnldir (Memc[rejfile], Memc[outfname], SZ_FNAME)
+	        if (strncmp (DEF_DEFNAME, Memc[rejfile+root],
+		    DEF_LENDEFNAME) == 0 || (root == strlen (Memc[rejfile])))
+	            call dp_outname (Memc[image], "", "nrj", Memc[outfname],
+		        SZ_FNAME)
 	        else
-	            nst = tbtopn (Memc[outfname], NEW_FILE, 0)
+	            call strcpy (Memc[rejfile], Memc[outfname], SZ_FNAME)
+	        if (DP_TEXT(dao) == YES)
+	            rejfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	        else
+	            rejfd = tbtopn (Memc[outfname], NEW_FILE, 0)
 	    }
-	    call dp_sets (dao, NSTARFILE, Memc[outfname])
+	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
 	    # Do the PSF fitting.
-	    call dp_nphot (dao, im, grp, nst, ap_text)
+	    call dp_nphot (dao, im, grp, nst, rejfd, ap_text)
 
 	    # Close the input image.
 	    call imunmap (im)
@@ -197,18 +240,33 @@ begin
 		call close (nst)
 	    else
 	        call tbtclo (nst)
+
+	    # Close the output rejections file.
+	    if (rejfd != NULL) {
+	        if (DP_TEXT(dao) == YES)
+		    call close (rejfd)
+	        else
+	            call tbtclo (rejfd)
+	    }
 	}
 
-	# Close the lists.
+	# Close the image/file lists.
 	call imtclose (imlist)
 	call fntclsb (alist)
 	call imtclose (pimlist)
 	call fntclsb (olist)
+	call fntclsb (rlist)
+
+	# Close the nstar structure.
+	call dp_nsclose (dao)
+
+	# Close the PSF structure.
+	call dp_fitclose (dao)
+
+	# Close the photometry structure.
+	call dp_apclose (dao)
 
 	# Free the daophot structure.
-	call dp_apclose (dao)
-	call dp_nsclose (dao)
-	call dp_fitclose (dao)
 	call dp_free (dao)
 
 	call sfree(sp)

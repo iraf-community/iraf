@@ -18,6 +18,7 @@ pointer	ccd			# CCD structure
 int	nc, nl, c1, c2, cs, l1, l2, ls, data_c1, ccd_c1, data_l1, ccd_l1
 pointer	sp, str, image, im, ccd_cache()
 bool	clgetb(), ccdflag(), ccdcheck()
+int	nscan, ccdnscan(), ccdtypei()
 real	hdmgetr()
 errchk	cal_image, ccd_cache, ccdproc, hdmgetr
 
@@ -31,7 +32,11 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the flat field correction image.
-	call cal_image (IN_IM(ccd), FLAT, Memc[image], SZ_FNAME)
+	if (clgetb ("scancor"))
+	    nscan = ccdnscan (IN_IM(ccd), ccdtypei(IN_IM(ccd)))
+	else
+	    nscan = 1
+	call cal_image (IN_IM(ccd), FLAT, nscan, Memc[image], SZ_FNAME)
 
 	# If no processing is desired print flat field image name and return.
 	if (clgetb ("noproc")) {
@@ -41,10 +46,22 @@ begin
 	    return
 	}
 
-	# Map the image and return on an error.  Process the flat field
-	# image if necessary.
+	# Map the image and return on an error.
+	# Process the flat field image if necessary.
+	# If nscan > 1 then the flat field may not yet exist so create it
+	# from the unscanned flat field.
 
-	im = ccd_cache (Memc[image], FLAT)
+	iferr (im = ccd_cache (Memc[image], FLAT)) {
+	    call cal_image (IN_IM(ccd), FLAT, 1, Memc[str], SZ_LINE)
+	    im = ccd_cache (Memc[str], FLAT)
+	    if (ccdcheck (im, FLAT)) {
+		call ccd_flush (im)
+		call ccdproc (Memc[str], FLAT)
+	    }
+	    call scancor (Memc[str], Memc[image], nscan, MINREPLACE(ccd))
+	    im = ccd_cache (Memc[image], FLAT)
+	}
+
 	if (ccdcheck (im, FLAT)) {
 	    call ccd_flush (im)
 	    call ccdproc (Memc[image], FLAT)

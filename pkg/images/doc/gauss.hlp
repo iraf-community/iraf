@@ -103,7 +103,7 @@ profile and is defined mathematically as follows.
 
     sigmax = sigma   sigmay = ratio * sigmax   N = normalization factor
 
-    A = cos (theta) ** 2 / sigmax ** 2 - sin (theta) ** 2 / sigmay ** 2
+    A = cos (theta) ** 2 / sigmax ** 2 + sin (theta) ** 2 / sigmay ** 2
 
     B = 0.0
 
@@ -117,9 +117,9 @@ profile and is defined mathematically as follows.
 
     sigmax = sigma   sigmay = ratio * sigmax   N=normalization factor
 
-    A = cos (theta) ** 2 / sigmax ** 2 - sin (theta) ** 2 / sigmay ** 2
+    A = cos (theta) ** 2 / sigmax ** 2 + sin (theta) ** 2 / sigmay ** 2
 
-    B = -2 * (1 / sigmax ** 2 - 1 / sigmay ** 2) * sin (theta) * cos (theta)
+    B = 2 * (1 / sigmax ** 2 - 1 / sigmay ** 2) * sin (theta) * cos (theta)
 
     C = sin (theta) ** 2 / sigmax ** 2 + cos (theta) ** 2 / sigmay ** 2
 

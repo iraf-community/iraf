@@ -101,29 +101,29 @@ struct fheader {
 };
 
 
-int	advance;		/* Advance to named file		*/
-int	stripblanks;		/* strip blank padding at end of file	*/
-int	debug;			/* Print debugging messages		*/
-int	binaryout;		/* make only binary byte stream files	*/
-int	omitbinary;		/* omit binary files (do not write)	*/
-int	extract;		/* Extract files from the tape		*/
-int	replace;		/* Replace existing files		*/
-int	exclude;		/* Excluded named files			*/
-int	printfnames;		/* Print file names			*/
-int	verbose;		/* Print everything			*/
-int	links;			/* Defeat copy to resolve link		*/
-int	setmtime;		/* Restore file modify times		*/
-int	setuid;			/* Restore file user id			*/
+static int advance;		/* Advance to named file		*/
+static int stripblanks;		/* strip blank padding at end of file	*/
+static int debug;			/* Print debugging messages		*/
+static int binaryout;		/* make only binary byte stream files	*/
+static int omitbinary;		/* omit binary files (do not write)	*/
+static int extract;		/* Extract files from the tape		*/
+static int replace;		/* Replace existing files		*/
+static int exclude;		/* Excluded named files			*/
+static int printfnames;		/* Print file names			*/
+static int verbose;		/* Print everything			*/
+static int links;			/* Defeat copy to resolve link		*/
+static int setmtime;		/* Restore file modify times		*/
+static int setuid;			/* Restore file user id			*/
 
-char	*pathprefix = NULL;
-int	len_pathprefix = 0;
-struct	fheader *curfil;
-int	eof;
-int	nerrs;
-char	*first_file;
-char	tapeblock[SZ_TAPEBUFFER];
-char	*nextblock;
-int	nblocks;
+static char *pathprefix = NULL;
+static int len_pathprefix = 0;
+static struct fheader *curfil;
+static int eof;
+static int nerrs;
+static char *first_file;
+static char tapeblock[SZ_TAPEBUFFER];
+static char *nextblock;
+static int nblocks;
 
 char	*getblock();
 

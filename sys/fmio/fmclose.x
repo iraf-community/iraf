@@ -39,7 +39,7 @@ begin
 	lf = FM_FTABLE(fm)
 	do i = 0, FM_NLFILES(fm) {
 	    if (LF_PAGEMAP(lf) != NULL)
-		call mfree (LF_PAGEMAP(lf), TY_SHORT)
+		call mfree (LF_PAGEMAP(lf), TY_INT)
 	    lf = lf + LEN_FTE
 	}
 

@@ -116,8 +116,8 @@ begin
 	if ( i_maxframes < 1 )
 	    i_maxframes = 1
 	i_maxgraph  = ttygeti(tty, "gp")
-	i_maxframes = min(i_maxframes, IDS_MAXIMPL)
-	i_maxgraph  = min(i_maxgraph,  IDS_MAXGRPL)
+	i_maxframes = min(int(i_maxframes), IDS_MAXIMPL)
+	i_maxgraph  = min(int(i_maxgraph),  IDS_MAXGRPL)
 
 	# allocate space for the frame descriptors
 	# the "2" accounts for possible graphics channel ( see ids_expand.x)

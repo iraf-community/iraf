@@ -34,11 +34,11 @@ set W		= '\([ 	"]\)'		# match a blank, tab, or "
 set TEMP	= "/tmp/I_temp"
 set exec	= yes
 set user	= iraf
-#set mach	= `mach`
-set mach	= dsux
 set LS		= /bin/ls
-
 alias PUT	"mv -f \!*; chown $user \!$ "
+
+# Determine platform architecture.
+set mach	= linux
 
 if ($?iraf == 1) then
     if (! -d $iraf) then
@@ -291,8 +291,8 @@ set BINDIRS	= "$hbin $hlib $fbin"
 
 # The following file lists are partially system dependent.
 set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
-set MODEFILES	= "mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e cl.csh mkfloat.csh fc.csh $host/reboot saoimage.e xterm.e"
-set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e saoimage.e xterm.e"
+set MODEFILES	= "mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e cl.csh mkfloat.csh fc.csh $host/reboot"
+set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
 # ------------------------------------------
 
 # Begin installation.
@@ -320,6 +320,11 @@ else
     echo "default root imdir is ok"
 endif
 
+# Allow deletion of files in /tmp - needed for multiuser tape allocation.
+if ($exec == yes) then
+    chmod -t /tmp
+endif
+
 # Set owner=root for the device allocation task, alloc.e.
 
 foreach i ($BINDIRS)
@@ -343,6 +348,7 @@ end
 cd $iraf/local
 
 if (-e .login) then
+    rm -f $TEMP >& /dev/null
     sed -e "s+$W$o_iraf+\1$iraf+" .login > $TEMP
     cmp -s .login $TEMP
     if ($status) then
@@ -361,6 +367,7 @@ cd $iraf/unix/hlib
 
 foreach i ($PATHFILES)
     if (-e $i) then
+	rm -f $TEMP >& /dev/null
 	sed -e "s+$W$o_iraf+\1$iraf+" $i |\
 	    sed -e "s+$W$o_imdir+\1$imdir+" > $TEMP
 	cmp -s $i $TEMP
@@ -459,7 +466,7 @@ foreach i ($LINKFILES)
 
     # Verify or set the link.
     if ("`$LS $file1`" == "$file1") then
-	if ("`$LS -l $file1 | /bin/grep $file2`" != "") then
+	if ("`$LS -l $file1 | grep $file2`" != "") then
 	    echo "symbolic link $file1 is ok"
 	else
 	    echo "link $file1 exists but is invalid; unlink $file1"
@@ -488,10 +495,13 @@ if ($exec == yes) then
 endif
 
 #exit 0					# COMMENT OUT FOR SUN/IRAF
-goto install_fifo			# Added for X11 version
 
 # SUN/IRAF specific stuff.
 # ------------------------------
+
+if ($mach == linux) then		# Only do X on Linux.
+    goto xconfig
+endif
 
 # Install custom suntools (GTERM and IMTOOL).
 
@@ -525,6 +535,7 @@ if ($SUNOS4 == "yes") then
 	set file2 = $hbin/$i.e
 	# Check if installed executable, if any, is up to date.
 	if (-e $i) then
+	    rm -f $TEMP.[12] >& /dev/null
 	    size $i > $TEMP.1;  size $file2 > $TEMP.2
 	    cmp -s $TEMP.1 $TEMP.2
 	    if ($status || "`find $file2 -newer $i -print`" != "") then
@@ -557,21 +568,22 @@ if ($SUNOS4 == "yes") then
 
     # Add entries for GTERM and IMTOOL to rootmenu file, if necessary.
     set file = /usr/lib/rootmenu
-    if ("`/bin/grep gterm $file`" != "" &&\
-	"`/bin/grep imtool $file`" != "") then
+    if ("`grep gterm $file`" != "" &&\
+	"`grep imtool $file`" != "") then
 	echo "standard rootmenu file is ok (has gterm, imtool entries)"
     else
 	echo -n "add entries for gterm and imtool to rootmenu file? (yes): "
 	set temp = "$<"
 
 	if ("$temp" == "" || "$temp" == "y" || "$temp" == "yes") then
-	    if ("`/bin/grep gterm $file`" == "") then
+	    (rm -f $TEMP;  rm -f $TEMP.s) >& /dev/null
+	    if ("`grep gterm $file`" == "") then
 		echo '7a\' > $TEMP.s
 		echo '"Gterm"			gterm' >> $TEMP.s
 		sed -f $TEMP.s < $file > $TEMP
 		PUT $TEMP $file; rm $TEMP.s
 	    endif
-	    if ("`/bin/grep imtool $file`" == "") then
+	    if ("`grep imtool $file`" == "") then
 		echo '8a\' > $TEMP.s
 		echo '"ImTool"		imtool' >> $TEMP.s
 		sed -f $TEMP.s < $file > $TEMP
@@ -620,6 +632,7 @@ else
 	set suntools = $usrbin/suntools
 
 	# Check if installed executable is up to date.
+	rm -f $TEMP.[12] >& /dev/null
 	size $suntools > $TEMP.1;  size $file2 > $TEMP.2
 	cmp -s $TEMP.1 $TEMP.2
 	if ($status || "`find $file2 -newer $suntools -print`" != "") then
@@ -654,21 +667,22 @@ else
 
 	# Add entries for GTERM and IMTOOL to rootmenu file, if necessary.
 	set file = /usr/lib/rootmenu
-	if ("`/bin/grep gterm $file`" != "" &&\
-	    "`/bin/grep imtool $file`" != "") then
+	if ("`grep gterm $file`" != "" &&\
+	    "`grep imtool $file`" != "") then
 	    echo "standard rootmenu file is ok (has gterm, imtool entries)"
 	else
 	    echo -n "add entries for gterm and imtool to rootmenu file? (yes): "
 	    set temp = "$<"
 
 	    if ("$temp" == "" || "$temp" == "y" || "$temp" == "yes") then
-		if ("`/bin/grep gterm $file`" == "") then
+		(rm -f $TEMP;  rm -f $TEMP.s) >& /dev/null
+		if ("`grep gterm $file`" == "") then
 		    echo '7a\' > $TEMP.s
 		    echo '"Gterm"			gterm' >> $TEMP.s
 		    sed -f $TEMP.s < $file > $TEMP
 		    PUT $TEMP $file; rm $TEMP.s
 		endif
-		if ("`/bin/grep imtool $file`" == "") then
+		if ("`grep imtool $file`" == "") then
 		    echo '8a\' > $TEMP.s
 		    echo '"ImTool"		imtool' >> $TEMP.s
 		    sed -f $TEMP.s < $file > $TEMP
@@ -693,7 +707,7 @@ else
 		endif
 	    endif
 	    if (-e $i) then
-		if ("`$LS -l $i | /bin/grep $exe`" != "") then
+		if ("`$LS -l $i | grep $exe`" != "") then
 		    echo "symbolic link $i is ok"
 		else
 		    echo "link $i exists but is invalid; unlink it"
@@ -733,7 +747,7 @@ else
 		endif
 	    endif
 	    if (-e $i) then
-		if ("`$LS -l $i | /bin/grep iraf`" != "") then
+		if ("`$LS -l $i | grep iraf`" != "") then
 		    echo "symbolic link $i is ok"
 		else
 		    echo "link $i exists but is invalid; unlink it"
@@ -755,10 +769,10 @@ else
     endif
 endif
 
-install_fifo:
-
 # Common code for GTERM/IMTOOL installation.
 # -------------------------------------------
+
+xconfig:
 
 # Make sure special device entries for the IMTOOL display server exist
 # in /dev.
@@ -769,7 +783,7 @@ foreach i (/dev/imt1i /dev/imt1o)
     else
 	echo "make device entry $i for imtool"
 	if ($exec == yes) then
-	    /etc/mknod $i p
+	    /bin/mknod $i p
 	    chmod 777 $i
 	endif
     endif
@@ -808,7 +822,7 @@ set file2 = $iraf/dev/imtoolrc
 
 # Verify or set the link.
 if ("`$LS $file1`" == "$file1") then
-    if ("`$LS -l $file1 | /bin/grep $file2`" != "") then
+    if ("`$LS -l $file1 | grep $file2`" != "") then
 	echo "symbolic link $file1 is ok"
     else
 	echo "link $file1 exists but is invalid; unlink $file1"
@@ -829,22 +843,20 @@ else
     endif
 endif
 
-exit 0					# Added for X11 version
-
-# Make sure there are entries in the the termcap and graphcap files for gterm
+# Make sure there are entries in the the termcap and graphcap files for xgterm
 # and imtool.
 
-set temp = `grep -l gterm $iraf/dev/termcap | grep -v "^#"`
+set temp = `grep -l xgterm $iraf/dev/termcap | grep -v "^#"`
 if ("$temp" == "") then
-    echo "WARNING: no gterm entry in termcap file"
+    echo "WARNING: no xgterm entry in termcap file"
 else
-    echo "termcap file is ok (contains gterm entry)"
+    echo "termcap file is ok (contains xgterm entry)"
 endif
 
 set gcok = yes
-set temp = `grep -l gterm $iraf/dev/graphcap | grep -v "^#"`
+set temp = `grep -l xgterm $iraf/dev/graphcap | grep -v "^#"`
 if ("$temp" == "") then
-    echo "WARNING: no gterm entry in graphcap file"
+    echo "WARNING: no xgterm entry in graphcap file"
     set gcok = no
 endif
 set temp = `grep -l imtool $iraf/dev/graphcap | grep -v "^#"`
@@ -853,16 +865,16 @@ if ("$temp" == "") then
     set gcok = no
 endif
 if ($gcok == yes) then
-    echo "graphcap file is ok (contains gterm, imtool entries)"
+    echo "graphcap file is ok (contains xgterm, imtool entries)"
 endif
 
-# Install or update the GTERM and IMTOOL manual pages.
-if (-e /usr/man/manl) then
-    cd /usr/man/manl
-    set src = $iraf/unix/sun
+# Install or update the XGTERM and XIMTOOL manual pages.
+if ($mach != linux && -e /usr/man/mann) then
+    cd /usr/man/mann
+    set src = $iraf/unix/x11
 
-    foreach i (gterm imtool)
-	set file1 = $i.l
+    foreach i (xgterm ximtool)
+	set file1 = $i.n
 	set file2 = $src/$i.man
 
 	# Install or update the manpage source file.
@@ -877,7 +889,7 @@ if (-e /usr/man/manl) then
 		echo "$i manual page is up to date"
 	    endif
 	else
-	    echo "install $i manual page in /usr/man/manl"
+	    echo "install $i manual page in /usr/man/mann"
 	    if ($exec == yes) then
 		cp $file2 $file1
 	    endif
@@ -885,11 +897,11 @@ if (-e /usr/man/manl) then
 
 	# Rerun catman if necessary.
 	if (-e /usr/man/catl) then
-	    set file2 = /usr/man/catl/$i.l
+	    set file2 = /usr/man/catl/$i.n
 	    if (! -e $file2 || "`find $file1 -newer $file2 -print`" != "") then
-		echo "rerun catman on section l"
+		echo "rerun catman on section n"
 		if ($exec == yes) then
-		    /usr/etc/catman l
+		    /usr/etc/catman n
 		endif
 	    endif
 	endif

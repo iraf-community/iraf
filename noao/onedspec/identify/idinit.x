@@ -118,7 +118,7 @@ end
 procedure id_saveid (id, line)
 
 pointer	id		# IDENTIFY structure
-int	line		# Save as line
+int	line[2]		# Save as line
 
 int	i
 pointer	id1
@@ -127,7 +127,7 @@ begin
 	# Check if already saved.  If not saved allocate memory.
 	for (i = 1; i <= ID_NID(id); i = i + 1) {
 	    id1 = Memi[ID_ID(id)+i-1]
-	    if (ID_LINE(id1) == line)
+	    if (ID_LINE(id1,1) == line[1] && ID_LINE(id1,2) == line[2])
 		break
 	}
 
@@ -158,11 +158,6 @@ begin
 	} else
 	    id1 = Memi[ID_ID(id)+n-1]
 
-	# Save SHDR structure and transformation
-	#call shdr_copy (ID_SH(id), ID_SH(id1), NO)
-	#ID_LP(id1) = ID_LP(id)
-	#ID_PL(id1) = ID_PL(id)
-
 	# Allocate or reallocate memory for features and copy them.
 	if (ID_NFEATURES(id) > 0) {
 	    if (ID_NALLOC(id1) == 0) {
@@ -185,7 +180,7 @@ begin
 		j = ID_NALLOC(id1)
 		i = ID_NFEATURES(id) - j
 		if (i > 0)
-		    call aclrr (Memi[ID_LABEL(id1)+j], i)
+		    call aclri (Memi[ID_LABEL(id1)+j], i)
 	    }
 	    call amovd (PIX(id,1), PIX(id1,1), ID_NFEATURES(id))
 	    call amovd (FIT(id,1), FIT(id1,1), ID_NFEATURES(id))
@@ -226,9 +221,12 @@ begin
 	    call ic_copy (ID_IC(id), ID_IC(id1))
 	}
 
-	#ID_LINE(id1) = line
-	ID_LINE(id1) = ID_LINE(id)
-	ID_AP(id1) = ID_AP(id)
+	#ID_LINE(id1,1) = line[1]
+	#ID_LINE(id1,2) = line[2]
+	ID_LINE(id1,1) = ID_LINE(id,1)
+	ID_LINE(id1,2) = ID_LINE(id,2)
+	ID_AP(id1,1) = ID_AP(id,1)
+	ID_AP(id1,2) = ID_AP(id,2)
 	ID_NFEATURES(id1) = ID_NFEATURES(id)
 	ID_SHIFT(id1) = ID_SHIFT(id)
 	ID_CURRENT(id1) = ID_CURRENT(id)
@@ -244,14 +242,15 @@ end
 int procedure id_gid (id, line)
 
 pointer	id		# IDENTIFY structure
-int	line		# Line number to get
+int	line[2]		# Line number to get
 
 int	i, id_getid()
 
 begin
 	# Check if saved.
 	for (i = 1; i <= ID_NID(id); i = i + 1) {
-	    if (ID_LINE(Memi[ID_ID(id)+i-1]) == line)
+	    if (ID_LINE(Memi[ID_ID(id)+i-1],1) == line[1] &&
+	        ID_LINE(Memi[ID_ID(id)+i-1],2) == line[2])
 		break
 	}
 
@@ -275,11 +274,6 @@ begin
 
 	id1 = Memi[ID_ID(id)+n-1]
 
-	# Copy SHDR structure and transformations
-	#call shdr_copy (ID_SH(id1), ID_SH(id), NO)
-	#ID_LP(id) = ID_LP(id1)
-	#ID_PL(id) = ID_PL(id1)
-
 	# Reallocate memory for features and copy them.
 	if (ID_NFEATURES(id1) > 0) {
 	    if (ID_NALLOC(id1) != ID_NALLOC(id)) {
@@ -294,7 +288,7 @@ begin
 		j = ID_NALLOC(id)
 		i = ID_NALLOC(id1) - j
 		if (i > 0)
-		    call aclrr (Memi[ID_LABEL(id)+j], i)
+		    call aclri (Memi[ID_LABEL(id)+j], i)
 	    }
 	    call amovd (PIX(id1,1), PIX(id,1), ID_NFEATURES(id1))
 	    call amovd (FIT(id1,1), FIT(id,1), ID_NFEATURES(id1))
@@ -341,8 +335,10 @@ begin
 	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(id1)
 	}
 
-	ID_LINE(id) = ID_LINE(id1)
-	ID_AP(id) = ID_AP(id1)
+	ID_LINE(id,1) = ID_LINE(id1,1)
+	ID_LINE(id,2) = ID_LINE(id1,2)
+	ID_AP(id,1) = ID_AP(id1,1)
+	ID_AP(id,2) = ID_AP(id1,2)
 
 	return (OK)
 end

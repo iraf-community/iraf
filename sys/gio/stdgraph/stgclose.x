@@ -35,6 +35,13 @@ begin
 		g_pbtty = NULL
 	    }
 
+	    if (g_msgbuf != NULL) {
+		call mfree (g_msgbuf, TY_CHAR)
+		g_msgbuf = NULL
+		g_msgbuflen = 0
+		g_msglen = 0
+	    }
+
 	    g_nopen = 0
 	}
 end

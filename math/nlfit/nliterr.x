@@ -41,13 +41,15 @@ begin
 	    # Reaccumulate the residuals and increment lambda.
 	    NL_SUMSQ(nl) = nlresidr (nl, x, z, w, npts, nvars)
 	    #if (NL_OLDSQ(nl) > (NL_SUMSQ(nl) + NL_TOL(nl) * NL_SUMSQ(nl))) {
-	    if (NL_OLDSQ(nl) > NL_SUMSQ(nl)) {
+	    if (NL_OLDSQ(nl) >= NL_SUMSQ(nl)) {
 		call amovr (TRY(NL_TRY(nl)), PARAM(NL_PARAM(nl)),
 		    NL_NPARAMS(nl))
 		NL_LAMBDA(nl) = real (0.10) * NL_LAMBDA(nl)
 		break
 	    } else
-	        NL_LAMBDA(nl) = real (10.0) * NL_LAMBDA(nl)
+	        NL_LAMBDA(nl) = min (real(LAMBDAMAX),
+		    real (10.0) * NL_LAMBDA(nl))
 
-	} until (NL_LAMBDA(nl) > LAMBDAMAX)
+	} until (NL_LAMBDA(nl) <= real(0.0) ||
+	    NL_LAMBDA(nl) >= real(LAMBDAMAX))
 end

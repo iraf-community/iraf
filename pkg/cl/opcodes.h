@@ -11,9 +11,9 @@
  */
 
 struct codeentry {
-	int c_opcode;		/* opcodetbl index; see below		*/
-	int c_length;		/* total length, in ints		*/
-	unsigned c_args;	/* addr of this is addr of first arg	*/
+	memel c_opcode;		/* opcodetbl index; see below		*/
+	memel c_length;		/* total length in memory elements	*/
+	memel c_args;		/* addr of this is addr of first arg	*/
 };
 
 extern int (*opcodetbl[])();

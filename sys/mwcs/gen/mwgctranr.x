@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	"../mwcs.h"
 
 # MW_GCTRAN -- Get a coordinate transformation compiled in a previous call
@@ -33,7 +35,7 @@ begin
 	do j = 1, ndim {
 	    axtype1[j] = WCS_AXCLASS(CT_WCSI(ct),j)
 	    axtype2[j] = WCS_AXCLASS(CT_WCSO(ct),j)
-	    o_ltv[i] = Memr[CT_LTV(ct)+(j-1)]
+	    o_ltv[j] = Memr[CT_LTV(ct)+(j-1)]
 	    do i = 1, ndim
 		o_ltm[(j-1)*ndim+i] = Memr[CT_LTM(ct)+(j-1)*pdim+(i-1)]
 	}

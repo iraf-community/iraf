@@ -21,5 +21,4 @@ echo "----------------------- GDEV ---------------------------"
 
 # Install the newly created executables.
 echo "install HSI executables in $host/bin.$MACH"
-mv -f hlib/*.E bin.$MACH
-(cd bin.$MACH; fixnames)		# added for DSUX/MIPS
+mv -f hlib/*.e bin.$MACH

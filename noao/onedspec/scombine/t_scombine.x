@@ -1,7 +1,7 @@
 include	<imhdr.h>
 include	<error.h>
 include	<mach.h>
-include	"../shdr.h"
+include	<smw.h>
 include "icombine.h"
 
 
@@ -20,22 +20,22 @@ pointer	aps			# aperture ranges
 int	group			# grouping option
 
 int	reject1
-real	flow1, fhigh1, pclip1
+real	flow1, fhigh1, pclip1, nkeep1
 
 real	rval
-bool	grdn, ggain
-int	i, j, n, naps, npts
+bool	grdn, ggain, gsn
+int	i, j, k, l, n, naps, npts
 pointer	im, mw, nout, shin, shout
 pointer	sp, input, output, noutput, str, logfile, sh, ns
 pointer	sp1, d, id, nc, m, lflag, scales, zeros, wts
 
 real	clgetr(), imgetr()
-bool	clgetb(), is_in_range()
-int	clgeti(), clgwrd(), decode_ranges(), ctor()
+bool	clgetb(), rng_elementi()
+int	clgeti(), clgwrd(), ctor()
 int	imtopenp(), imtgetim(), open()
-pointer	immap(), smw_openim(), impl2i(), impl2r()
+pointer	rng_open(), immap(), smw_openim(), impl2i(), impl2r()
 errchk	open, immap, smw_openim, shdr_open, imgetr
-errchk	scb_output, scb_combine
+errchk	scb_output, scb_combine, ic_combiner
 
 include	"icombine.com"
 
@@ -44,9 +44,9 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (noutput, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 300, TY_INT)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (gain, SZ_FNAME, TY_CHAR)
+	call salloc (snoise, SZ_FNAME, TY_CHAR)
 	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
 	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
@@ -64,6 +64,7 @@ begin
 	blank = clgetr ("blank")
 	call clgstr ("gain", Memc[gain], SZ_FNAME)
 	call clgstr ("rdnoise", Memc[rdnoise], SZ_FNAME)
+	call clgstr ("snoise", Memc[snoise], SZ_FNAME)
 	lthresh = clgetr ("lthreshold")
 	hthresh = clgetr ("hthreshold")
 	lsigma = clgetr ("lsigma")
@@ -71,6 +72,7 @@ begin
 	pclip1 = clgetr ("pclip")
 	flow1 = clgetr ("nlow")
 	fhigh1 = clgetr ("nhigh")
+	nkeep1 = clgeti ("nkeep")
 	grow = clgeti ("grow")
 	mclip = clgetb ("mclip")
 	sigscale = clgetr ("sigscale")
@@ -86,6 +88,8 @@ begin
 	    hsigma = MAX_REAL
 	if (IS_INDEFR (pclip1))
 	    pclip1 = -0.5
+	if (IS_INDEFI (nkeep1))
+	    nkeep1 = 0
 	if (IS_INDEFR (flow1))
 	    flow1 = 0
 	if (IS_INDEFR (fhigh))
@@ -108,6 +112,7 @@ begin
 	# Get read noise and gain?
 	grdn = false
 	ggain = false
+	gsn = false
 	if (reject1 == CCDCLIP || reject1 == CRREJECT) {
 	    i = 1
 	    if (ctor (Memc[rdnoise], i, rval) == 0)
@@ -115,6 +120,9 @@ begin
 	    i = 1
 	    if (ctor (Memc[gain], i, rval) == 0)
 		ggain = true
+	    i = 1
+	    if (ctor (Memc[snoise], i, rval) == 0)
+		gsn = true
 	}
 
 	# Open the log file.
@@ -126,7 +134,7 @@ begin
 	    }
 	}
 
-	if (decode_ranges (Memc[str], Memi[aps], 100, i) == ERR)
+	iferr (aps = rng_open (Memc[str], INDEF, INDEF, INDEF))
 	    call error (1, "Error in aperture list")
 
 	# Loop through input images.
@@ -152,13 +160,15 @@ begin
 		mw = smw_openim (im)
 		shin = NULL
 
-		do i = 1, IM_LEN(im,2) {
+		do i = 1, SMW_NSPEC(mw) {
 		    call shdr_open (im, mw, i, 1, INDEFI, SHDATA, shin)
 		    if (grdn)
 			RA(shin) = imgetr (im, Memc[rdnoise])
 		    if (ggain)
 			DEC(shin) = imgetr (im, Memc[gain])
-		    if (!is_in_range (Memi[aps], AP(shin)))
+		    if (gsn)
+			UT(shin) = imgetr (im, Memc[gain])
+		    if (!rng_elementi (aps, AP(shin)))
 			next
 		    if (group == GRP_APERTURES) {
 			for (j=1; j<=naps; j=j+1)
@@ -194,6 +204,7 @@ begin
 		}
 
 		call imunmap (IM(shin))
+		MW(shin) = NULL
 		call shdr_close (shin)
 
 		if (group == GRP_IMAGES)
@@ -234,6 +245,9 @@ begin
 		# are converted to a fraction of the valid pixels.
 
 		reject = reject1
+		nkeep = nkeep1
+		if (nkeep < 0)
+		    nkeep = n + nkeep
 		if (reject == PCLIP) {
 		    pclip = pclip1
 		    i = (n - 1) / 2.
@@ -275,27 +289,37 @@ begin
 
 	    # Finish up
 	    call shdr_close (shout)
-	    call mw_close (mw)
+	    call smw_close (mw)
 	    call imunmap (im)
 	    if (nout != NULL)
 		call imunmap (nout)
 
+	    # Find all the distinct SMW pointers and free them.
 	    do j = 1, naps {
-		mw = NULL
 		do i = 1, NS(ns,j) {
-		    shin = SH(sh,j,i)
-		    if (MW(shin) != mw) {
-			mw = MW(shin)
-			call mw_close (MW(shin))
+		    mw = MW(SH(sh,j,i))
+		    if (mw != NULL) {
+			do k = 1, naps  {
+			    do l = 1, NS(ns,k) {
+				shin = SH(sh,k,l)
+				if (MW(shin) == mw)
+				    MW(shin) = NULL
+			    }
+			}
+			call smw_close (mw)
 		    }
-		    call shdr_close (shin)
 		}
+	    }
+	    do j = 1, naps {
+		do i = 1, NS(ns,j)
+		    call shdr_close (SH(sh,j,i))
 		call mfree (Memi[sh+j-1], TY_POINTER)
 	    }
 	    call mfree (sh, TY_POINTER)
 	    call mfree (ns, TY_INT)
 	}
 
+	call rng_close (aps)
 	call imtclose (ilist)
 	call imtclose (olist)
 	call imtclose (nlist)
@@ -376,10 +400,10 @@ pointer	mw			# output MWCS pointer
 pointer	nout			# output number combined IMIO pointer
 
 int	i, ap, beam, dtype, nw, nmax, axis[2]
-double	w1, dw, z, aplow, aphigh
+double	w1, dw, z
+real	aplow[2], aphigh[2]
 pointer	sp, key, coeff, sh1, junk
 pointer	immap(), mw_open(), smw_openim()
-bool	strne()
 errchk	immap, smw_openim
 data	axis/1,2/
 
@@ -389,46 +413,45 @@ begin
 	coeff = NULL
 
 	# Create output image using the first input image as a reference
-	nout = immap (SPECTRUM(SH(sh,1,1)), READ_ONLY, 0)
+	nout = immap (IMNAME(SH(sh,1,1)), READ_ONLY, 0)
 	im = immap (output, NEW_COPY, nout)
 	call imunmap (nout)
+
+	if (naps == 1)
+	    IM_NDIM(im) = 1
+	else
+	    IM_NDIM(im) = 2
+	IM_LEN(im,2) = naps
+	if (IM_PIXTYPE(im) != TY_DOUBLE)
+	    IM_PIXTYPE(im) = TY_REAL
 
 	# Set new header.
 	mw = mw_open (NULL, 2)
 	call mw_newsystem (mw, "multispec", 2)
 	call mw_swtype (mw, axis, 2, "multispec",
 	    "label=Wavelength units=Angstroms")
+	call smw_open (mw, NULL, im)
 
 	nmax = 0
 	do i = 1, naps {
 	    sh1 = SH(sh,i,1)
-	    call shdr_gwattrs (MW(sh1), PINDEX1(sh1), ap, beam, dtype,
+	    call smw_gwattrs (MW(sh1), APINDEX(sh1), 1, ap, beam, dtype,
 		w1, dw, nw, z, aplow, aphigh, coeff)
 	    call scb_default (SH(sh,i,1), NS(ns,i),
 		dtype, w1, dw, nw, z, Memc[coeff])
-	    call shdr_swattrs (mw, i, ap, beam, dtype,
+	    call smw_swattrs (mw, i, 1, ap, beam, dtype,
 		w1, dw, nw, z, aplow, aphigh, Memc[coeff])
-	    if (strne (IM_TITLE(im), TITLE(sh1))) {
-		call sprintf (Memc[key], SZ_FNAME, "APID%d")
-		    call pargi (i)
-		call imastr (im, Memc[key], TITLE(sh1))
-	    }
+	    call smw_sapid (mw, i, 1, TITLE(sh1))
 	    nmax = max (nmax, nw)
 	}
 
-	if (naps == 1)
-	    IM_NDIM(im) = 1
-	else
-	    IM_NDIM(im) = 2
 	IM_LEN(im,1) = nmax
-	IM_LEN(im,2) = naps
-	IM_PIXTYPE(im) = TY_REAL
 
 	# Set header.  Use smw_openim to clean up old keywords.
 	junk = smw_openim (im)
-	call mw_close (junk)
+	call smw_close (junk)
 	call smw_saveim (mw, im)
-	call mw_close (mw)
+	call smw_close (mw)
 	mw = smw_openim (im)
 
 	# Create number combined image
@@ -551,10 +574,4 @@ begin
 
 	# Force the ending wavelength
 	w2 = w1 + (nw - 1) * dw
-
-	# Reset to log if necessary
-	if (dtype == DCLOG) {
-	    w1 = log10 (w1)
-	    dw = log10 (w2/w1)/(nw-1)
-	}
 end

@@ -33,6 +33,8 @@ begin
 	    QP_EXMAXFRLLEN(qp) = value
 	case QPOE_MAXLFILES:
 	    QP_FMMAXLFILES(qp) = value
+	case QPOE_MAXPTPAGES:
+	    QP_FMMAXPTPAGES(qp) = value
 	case QPOE_MAXRRLUTLEN:
 	    QP_EXMAXRRLLEN(qp) = value
 	case QPOE_MAXPUSHBACK:

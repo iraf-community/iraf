@@ -1,5 +1,19 @@
 .help revisions Jun88 noao.imred.msred
 .nf
+specred/specred.cl
+specred/specred.men
+    1.  Added background, illumination, and response.
+    2.  Renamed the fiber response task to "fibresponse".
+    (12/29/94, Valdes)
+
+imred$specred/dofibers.cl
+    There was an incorrect default value for the dispaxis parameter:
+	)_dispaxis --> )_.dispaxis.  (8/24/92, Valdes)
+
+=============
+V2.10-V2.10.1
+=============
+
 imred$msred --> imred$specred
     Renamed the package to a more generic name since it is for both
     multiple aperture/fiber data as well as generic slit data.

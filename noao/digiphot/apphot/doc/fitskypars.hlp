@@ -1,4 +1,4 @@
-.help fitskypars Jan90 noao.digiphot.apphot
+.help fitskypars Dec92 noao.digiphot.apphot
 .ih
 NAME
 fitskypars - edit the sky fitting algorithm parameters
@@ -7,7 +7,7 @@ USAGE
 fitskypars
 .ih
 PARAMETERS
-.ls salgorithm = "mode"
+.ls salgorithm = "centroid"
 The sky fitting algorithm to be employed. The sky fitting options are:
 .ls constant
 Use a user supplied constant value \fIskyvalue\fR for the sky.
@@ -52,7 +52,7 @@ The inner radius of the annular sky fitting region in units of the
 scale parameter.
 .le
 .ls dannulus = 10.0  (scale units)
-The width of the annular sky fiting region in units of the scale parameter.
+The width of the annular sky fitting region in units of the scale parameter.
 .le
 .ls skyvalue
 The constant for constant sky subtraction.
@@ -61,29 +61,38 @@ The constant for constant sky subtraction.
 The maximum number of iterations performed by the sky fitting algorithm.
 \fISmaxiter\fR is required by the "gauss" and "ofilter" sky fitting algorithms.
 .le
-.ls nreject = 50
+.ls sloclip = 0.0 (percent)
+The low-side clipping factor in percentage points of the total number of
+sky pixels.
+.le
+.ls shiclip = 0.0 (percent)
+The high-side clipping factor in percentage points of the total number of
+sky pixels.
+.le
+.ls snreject = 50
 The maximum number of pixel rejection cycles.
 .le
-.ls kreject = 3.0
-The ksigma clipping factor for the pixel rejection  phase of the
-sky fitting algorithm. \fIKreject\fR is in units of the \fIcomputed\fR sky
+.ls sloreject = 3.0
+The ksigma low-side clipping factor for the pixel rejection  phase of the
+sky fitting algorithm. \fIsloreject\fR is in units of the \fIcomputed\fR sky
 sigma.
 .le
-.ls khist = 3.0  (sigma)
+.ls shireject = 3.0
+The ksigma high-side clipping factor for the pixel rejection  phase of the
+sky fitting algorithm. \fIshireject\fR is in units of the \fIcomputed\fR sky
+sigma.
+.le
+.ls khist = 3.0 
 The ksigma clipping factor for computing the histogram of the sky pixels.
-\fIKhist\fR is in units of \fIdatapars.sigma\fR if datapars.sigma is defined
-otherwise the
-sigma of the sky pixel distribution is computed for each local sky region.
-The histogram will be 2.0 * khist * sigma wide.
+\fIKhist\fR is in units of the computed sky sigma.
+The computed histogram will be 2.0 * khist * sigma wide.
 .le
-.ls binsize = 0.10  (sigma)
+.ls binsize = 0.10
 The width of a single bin of the histogram of sky values.
-\fIBinsize\fR is in units of \fIdatapars.sigma\fR if datapars.sigma is
-defined, otherwise the sigma of the sky pixel distribution is computed for
-each local sky area.
+\fIBinsize\fR is in units of the computed sky sigma.
 .le
-.ls smooth = yes
-Lucy smooth the histogram before computing a sky value?
+.ls smooth = no
+Boxcar smooth the histogram before computing a sky value?
 .le
 .ls rgrow = 0.0  (scale units)
 The region growing radius for pixel rejection in the sky region, in units
@@ -91,39 +100,44 @@ of \fIscale\fR. When a bad sky pixel is detected, all pixels within
 \fIrgrow / scale\fR will be rejected. If \fIrgrow\fR is 0.0 region growing
 is not performed.
 .le
+.ls mksky = no
+Mark the sky annuli on the displayed image ?
+.le
 .ih
 DESCRIPTION
 The sky fitting algorithm parameters control the action of the sky fitting
 algorithms.  The default
 values have been chosen for efficiency and to give reasonable results in
 the majority of cases.
-Note that many of the sky fitting parameters scale with two quantities which
-are data dependent, the image scale,
-\fIscale\fR, and the standard deviation of the sky pixels
-\fIsigma\fR. Both \fIsigma\fR and \fIscale\fR are in the DATAPARS parameter
-set.
+Note that some of the sky fitting parameters scale with the
+image scale, \fIscale\fR, which is data dependent.
+\fIScale\fR is in the DATAPARS parameter set.
 
 Using an initial position and \fIscale\fR supplied by the user, sky pixels
 in an annular region of inner radius \fIannulus / scale\fR pixels and width
-\fIdannulus / scale\fR pixels are extracted from the IRAF image.
-
+\fIdannulus / scale\fR pixels are extracted from the image.
 If the \fIscale\fR parameter is defined in terms of the half-width
 at half-maximum of the point spread function, then single values of
 \fIannulus\fR and \fIdannulus\fR once chosen will work well for
 computing sky values in images with different seeing and
 detector characteristics.
 
+Pixels outside of the good data range specified by the DATAPARS
+parameters \fIdatamin\fR and
+\fIdatamax\fR are rejected before any sky fitting is done. In addition
+\fIsloclip\fR and \fIshilip\fR percent pixels are rejected from the
+low and high sides of the sorted pixel distribution before any sky fitting
+is done.
+
 Sky values are computed using the sky fitting algorithm specified by
 \fIsalgorithm\fR. The default value is "mode".
 If \fIsalgorithm\fR = "mean", "median" or "mode", the
 sky value is computed directly from the array of sky pixels.
-
-The remaining sky fitting algorithms employ the histogram of the object sky
-pixels. The computed histogram is \fIkhist\fR * \fIsigma\fR wide with
-a bin width of \fIbinsize\fR * \fIsigma\fR where sigma is either the
-value in DATAPARS if defined or computed directly from the sky pixels for
-each object.
-If \fIsmooth\fR = yes, Lucy-smoothing is performed on the computed
+The remaining sky fitting algorithms employ the histogram of the sky
+pixels. The computed histogram is \fIkhist\fR * sigma wide with
+a bin width of \fIbinsize\fR * sigma  where sigma is
+computed directly from the sky pixels for each object.
+If \fIsmooth\fR = yes, boxcar smoothing is performed on the computed
 histogram before sky fitting.
 The mode of the histogram is then computed by, a non-linear least squares
 fit to a Gaussian (salgorithm = "gauss"), optimal filtering of the histogram
@@ -137,12 +151,13 @@ the value of the sky using a plot on the standard graphics device and
 the graphics cursor.
 
 Pixels which deviate from the sky value by more than
-\fIkreject times the computed sky sigma are rejected from the fit.
+\fIsloreject\fR and \fIshireject\fR  times the computed sky sigma
+above and below the current best sky value are rejected from the fit.
 If \fIrgrow\fR > 0, pixels within a radius of
 \fIrgrow / scale\fR of the rejected pixel are also rejected from
 the fit.  The procedure iterates
 until no more pixels are rejected, all pixels are rejected or
-the maximum number of rejection cycles \fInreject\fR iterations is reached.
+the maximum number of rejection cycles \fIsnreject\fR iterations is reached.
 
 .ih
 EXAMPLES

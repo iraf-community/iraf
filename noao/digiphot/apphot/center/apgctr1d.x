@@ -69,6 +69,8 @@ begin
 	call nlfreer (nl)
 	xc = p[2]
 	xerr = dp[2] / sqrt (real (nx))
+	if (xerr > real (nx))
+	    xerr = INDEFR
 
 	# Initialize the y fit parameters.
 	call ap_alimr (Memr[ym], ny, p[4], p[1], minel, maxel)
@@ -87,6 +89,8 @@ begin
 	call nlfreer (nl)
 	yc = p[2]
 	yerr = dp[2] / sqrt (real (ny))
+	if (yerr > real (ny))
+	    yerr = INDEFR
 
 	# Return the appropriate error code.
 	call sfree (sp)

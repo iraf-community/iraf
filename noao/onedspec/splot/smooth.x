@@ -18,6 +18,11 @@ begin
 
 	# Get boxsize
 	boxsize = clgeti ("boxsize")
+	if (mod (boxsize, 2) == 0) {
+	    boxsize = boxsize + 1
+	    call eprintf ("WARNING: Using a box size of %d")
+		call pargi (boxsize)
+	}
 
 	halfbox = boxsize/2
 

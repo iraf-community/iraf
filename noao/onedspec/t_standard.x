@@ -1,9 +1,10 @@
 include	<error.h>
 include	<imhdr.h>
+include	<imset.h>
 include	<gset.h>
 include	<mach.h>
 include	<pkg/gtools.h>
-include "shdr.h"
+include	<smw.h>
 
 define	KEY	"noao$onedspec/standard.key"
 define	PROMPT	"STANDARD options"
@@ -11,7 +12,6 @@ define	PROMPT	"STANDARD options"
 define	VLIGHT		2.997925e18	# Velocity of light in Angstroms/sec
 define	EXT_LOOKUP	1		# Interp entry ID for extinction table
 define	MAG_LOOKUP	2		# Interp entry ID for magnitude table
-define	NRANGES		100		# Maximum number of aperture ranges
 
 define	STD_LEN		13		# Length of standard structure
 define	STD_AP		Memi[$1]	# Aperture number
@@ -72,10 +72,10 @@ int	i, j, line, enwaves, nstds
 real	wave, dwave, latitude
 pointer	sp, image, ewaves, emags, im, mw, sh, obj, sky, std, stds, obs, gp
 
-int	imtgetim(), decode_ranges()
+int	imtgetim()
 real	clgetr(), obsgetr()
-bool	clgetb(), is_in_range()
-pointer	imtopenp(), immap(), smw_openim()
+bool	clgetb(), rng_elementi()
+pointer	imtopenp(), rng_open(), immap(), smw_openim()
 errchk	immap, smw_openim, shdr_open, std_calib, get_airm, ext_load, obsimopen
 
 begin
@@ -83,7 +83,6 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (observatory, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 3*NRANGES, TY_INT)
 
 	# Get task parameters.
 	list = imtopenp ("input")
@@ -104,7 +103,7 @@ begin
 	    interactive = NO3
 
 	# Expand the aperture list.
-	if (decode_ranges (Memc[image], Memi[aps], NRANGES, i) == ERR)
+	iferr (aps = rng_open (Memc[image], INDEF, INDEF, INDEF))
 	    call error (0, "Bad aperture list")
 
 	call ext_load (ewaves, emags, enwaves)
@@ -121,28 +120,40 @@ begin
 		next
 	    }
 	    mw = smw_openim (im)
-	    call shdr_open (im, mw, 1, 1, INDEFI, SHDATA, sh)
+	    call shdr_open (im, mw, 1, 1, INDEFI, SHHDR, sh)
 
 	    if (DC(sh) == DCNO) {
 		call eprintf ("%s: No dispersion function\n")
 		    call pargstr (Memc[image])
-		call mw_close (mw)
-		call imunmap (im)
+		call smw_close (MW(sh))
+		call imunmap (IM(sh))
 		next
 	    }
 	    if (IS_INDEF (IT(sh))) {
-		call eprintf ("%s: Warning - exposure time missing\n")
+		call printf ("%s: ")
 		    call pargstr (Memc[image])
+		call flush (STDOUT)
+		IT(sh) = clgetr ("exptime")
+		call imunmap (IM(sh))
+		ifnoerr (im = immap (Memc[image], READ_WRITE, 0)) {
+		    IM(sh) = im
+		    call imseti (IM(sh), IM_WHEADER, YES)
+		    call imaddr (IM(sh), "exptime", IT(sh))
+		} else {
+		    im = immap (Memc[image], READ_ONLY, 0)
+		    IM(sh) = im
+		}
 	    }
 
-	    do line = 1, IM_LEN(im,2) {
+	    do line = 1, SMW_NSPEC(mw) {
 		call shdr_open (im, mw, line, 1, INDEFI, SHDATA, sh)
-		if (!is_in_range (Memi[aps], AP(sh)))
+		if (!rng_elementi (aps, AP(sh)))
 		    next
 
-		if (!bswitch || TYPE(sh) == OBJ) {
-		    call printf ("%s[%d]: %s\n")
-			call pargstr (SPECTRUM(sh))
+		if (!bswitch || OFLAG(sh) == OBJ) {
+		    call printf ("%s%s(%d): %s\n")
+			call pargstr (IMNAME(sh))
+			call pargstr (IMSEC(sh))
 			call pargi (AP(sh))
 			call pargstr (TITLE(sh))
 		    call flush (STDOUT)
@@ -155,8 +166,22 @@ begin
 		    if (newobs)
 			call obslog (obs, "STANDARD", "latitude", STDOUT)
 		    latitude = obsgetr (obs, "latitude")
-		    call get_airm (RA(sh), DEC(sh), HA(sh), ST(sh),
-			latitude, AM(sh))
+		    iferr (call get_airm (RA(sh), DEC(sh), HA(sh), ST(sh),
+			latitude, AM(sh))) {
+			call printf ("%s: ")
+			    call pargstr (Memc[image])
+			call flush (STDOUT)
+			AM(sh) = clgetr ("airmass")
+			call imunmap (IM(sh))
+			ifnoerr (im = immap (Memc[image], READ_WRITE, 0)) {
+			    IM(sh) = im
+			    call imseti (IM(sh), IM_WHEADER, YES)
+			    call imaddr (IM(sh), "airmass", AM(sh))
+			} else {
+			    im = immap (Memc[image], READ_ONLY, 0)
+			    IM(sh) = im
+			}
+		    }
 		}
 
 		for (i=0; i<nstds; i=i+1) {
@@ -215,34 +240,37 @@ begin
 		    }
 		}
 
+		# The copying of SHDR structures and associated MWCS only
+		# occurs with beam switched data.
+
 		if (bswitch) {
 		    switch (STD_TYPE(std)) {
 		    case NONE:
-			STD_TYPE(std) = TYPE(sh)
+			STD_TYPE(std) = OFLAG(sh)
 			call shdr_copy (sh, STD_SH(std), YES)
 			next
 		    case SKY:
 			obj = sh
 			sky = STD_SH(std)
-			if (TYPE(sh) == SKY) {
+			if (OFLAG(sh) == SKY) {
 			    call eprintf ("%s[%d]: Object spectrum not found\n")
-				call pargstr (SPECTRUM(sky))
+				call pargstr (IMNAME(sky))
 				call pargi (AP(sky))
 
-			    call mw_close (MW(sky))
+			    call smw_close (MW(sky))
 			    call shdr_copy (sh, STD_SH(std), YES)
 			    next
 			}
 		    case OBJ:
 			obj = STD_SH(std)
 			sky = sh
-			if (TYPE(sh) == OBJ) {
+			if (OFLAG(sh) == OBJ) {
 			    obj = STD_SH(std)
 			    call eprintf ("%s[%d]: Sky spectrum not found\n")
-				call pargstr (SPECTRUM(obj))
+				call pargstr (IMNAME(obj))
 				call pargi (AP(obj))
 
-			    call mw_close (MW(obj))
+			    call smw_close (MW(obj))
 			    call shdr_copy (sh, STD_SH(std), YES)
 			    next
 			}
@@ -268,13 +296,13 @@ begin
 		}
 
 		if (bswitch) {
-		    call mw_close (MW(STD_SH(std)))
+		    call smw_close (MW(STD_SH(std)))
 		    STD_TYPE(std) = NONE
 		}
 	    }
 
-	    call mw_close (mw)
-	    call imunmap (im)
+	    call smw_close (MW(sh))
+	    call imunmap (IM(sh))
 	}
 
 	if (obs != NULL)
@@ -287,11 +315,11 @@ begin
 	    switch (STD_TYPE(std)) {
 	    case SKY:
 		call eprintf ("%s[%d]: Object spectrum not found\n")
-		    call pargstr (SPECTRUM(obj))
+		    call pargstr (IMNAME(obj))
 		    call pargi (AP(obj))
 	    case OBJ:
 		call eprintf ("%s[%d]: Sky spectrum not found\n")
-		    call pargstr (SPECTRUM(obj))
+		    call pargstr (IMNAME(obj))
 		    call pargi (AP(obj))
 	    }
 	    if (obj != NULL)
@@ -310,6 +338,7 @@ begin
 	call mfree (ewaves, TY_REAL)
 	call mfree (emags, TY_REAL)
 	call shdr_close (sh)
+	call rng_close (aps)
 	call imtclose (list)
 	call sfree (sp)
 end
@@ -376,7 +405,7 @@ begin
 	# Plot spectrum if user wants to see whats happening
 	if (STD_IFLAG(std) == NO1 || STD_IFLAG(std) == YES1) {
 	    call printf ("%s[%d]: Edit bandpasses? ")
-		call pargstr (SPECTRUM(obj))
+		call pargstr (IMNAME(obj))
 		call pargi (AP(obj))
 	    STD_IFLAG(std) = clgwrd ("answer", Memc[cmd], SZ_FNAME, ANSWERS)
 	}
@@ -389,7 +418,7 @@ begin
 	    }
 	    gt = gt_init()
 	    call gt_sets (gt, GTTITLE, TITLE(obj))
-	    call gt_sets (gt, GTPARAMS, SPECTRUM(obj))
+	    call gt_sets (gt, GTPARAMS, IMNAME(obj))
 	    call gt_sets (gt, GTXLABEL, LABEL(obj))
 	    call gt_sets (gt, GTXUNITS, UNITS(obj))
 	    call gt_sets (gt, GTYLABEL, "instrumental flux")
@@ -495,10 +524,10 @@ errchk	open()
 begin
 	fd = open (output, APPEND, TEXT_FILE)
 	call fprintf (fd, "[%s]")
-	    call pargstr (SPECTRUM(obj))
+	    call pargstr (IMNAME(obj))
 	if (sky != NULL) {
 	    call fprintf (fd, "-[%s]")
-	        call pargstr (SPECTRUM(sky))
+	        call pargstr (IMNAME(sky))
 	}
 	call fprintf (fd, " %d %d %.2f %5.3f %9.3f %9.3f %s\n")
 	    call pargi (AP(obj))

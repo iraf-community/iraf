@@ -47,7 +47,7 @@ begin
 	    # Open an output text file.
 	    tp_out = open (Memc[outfile], NEW_FILE, TEXT_FILE)
 
-	    # Sort the stars.
+	    # Select the stars.
 	    if (pt_xselect (tp_in, tp_out, Memc[expr]) <= 0) {
 		call eprintf ("File: %s is empty\n")
 		    call pargstr (Memc[infile])

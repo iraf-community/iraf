@@ -10,9 +10,9 @@
 
 procedure proc (objects, apref, flat, throughput, arcs1, arcs2, arcreplace,
 	arctable, fibers, apidtable, objaps, skyaps, arcaps, objbeams, skybeams,
-	arcbeams, fitflat, recenter, edit, trace, arcap, clean, dispcor,
-	savearcs, skysubtract, skyedit, saveskys, splot, redo, update,
-	batch, listonly)
+	arcbeams, scattered, fitflat, recenter, edit, trace, arcap, clean,
+	dispcor, savearcs, skysubtract, skyedit, saveskys, splot, redo,
+	update, batch, listonly)
 
 string	objects			{prompt="List of object spectra"}
 
@@ -33,6 +33,7 @@ string	objbeams		{prompt="Object beam numbers"}
 string	skybeams		{prompt="Sky beam numbers"}
 string	arcbeams		{prompt="Arc beam numbers\n"}
 
+bool	scattered		{prompt="Subtract scattered light?"}
 bool	fitflat			{prompt="Fit and ratio flat field spectrum?"}
 bool	recenter		{prompt="Recenter object apertures?"}
 bool	edit			{prompt="Edit/review object apertures?"}
@@ -50,6 +51,8 @@ bool	update			{prompt="Update spectra if cal data changes?"}
 bool	batch			{prompt="Extract objects in batch?"}
 bool	listonly		{prompt="List steps but don't process?\n"}
 
+real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
+
 string	ansskyedit = "yes"	{prompt="Edit the sky spectra?", mode="q"}
 bool	newaps, newresp, newdisp, newarcs, dobatch
 
@@ -57,32 +60,38 @@ string	anssplot = "yes"	{prompt="Splot spectrum?", mode="q",
 				 enum="no|yes|NO|YES"}
 
 string	extn = ".ms"		{prompt="Extraction extension"}
-struct	*fd1, *fd2
+struct	*fd1, *fd2, *fd3
 
 begin
+	string	imtype, mstype
 	string	arcref1, arcref2, spec, arc
 	string	arcref1ms, arcref2ms, specms, arcms, response
-	string	objs, temp, done
-	string	str1, str2, arcrefs, log1, log2
-	bool	reextract, extract, disp, disperr, sky, log
+	string	objs, temp, temp1, done
+	string	str1, str2, str3, str4, arcrefs, log1, log2
+	bool	scat, reextract, extract, disp, disperr, sky, log
 	bool	skyedit1, skyedit2, splot1, splot2
-	int	i, j, nspec
+	int	i, j, n, nspec
 
 	# Call a separate task to do the listing to minimize the size of
 	# this script and improve it's readability.
 
 	dobatch = no
 	if (listonly) {
-	    listonly (objects, apref, flat, throughput, arcs1, arcs2, dispcor,
-		skysubtract, redo, update)
+	    listonly (objects, apidtable, apref, flat, throughput, arcs1, arcs2,
+		scattered, dispcor, skysubtract, redo, update)
 	    bye
 	}
+
+	imtype = "." // envget ("imtype")
+	mstype = ".ms" // imtype
+	n = strlen (imtype)
 
 	# Temporary files used repeatedly in this script.  Under some
 	# abort circumstances these files may be left behind.
 
 	objs = mktemp ("tmp$iraf")
 	temp = mktemp ("tmp$iraf")
+	temp1 = mktemp ("tmp$iraf")
 	done = mktemp ("tmp$iraf")
 
 	if (apidtable != "") {
@@ -110,12 +119,12 @@ begin
 	}
 
 	# Get query parameter.
-	getspec (objects, > objs)
+	getspec (objects, objs)
 	if (arctable == "" || arctable == " ") {
-	    if (arcs2 != "" || arcs2 == " ")
-		arcrefs = arcs2
-	    else
+	    if (arcs2 == "" || arcs2 == " ")
 	        arcrefs = arcs1
+	    else
+		arcrefs = arcs2
 	} else
 	    arcrefs = arctable
 	arcref1 = ""
@@ -154,10 +163,17 @@ begin
 	# desired.
 
 	i = strlen (apref)
-	if (i > 4 && substr (apref, i-3, i) == ".imh")
-	    apref = substr (apref, 1, i-4)
+	if (i > n && substr (apref, i-n+1, i) == imtype)
+	    apref = substr (apref, 1, i-n)
+
+	getspec (apref, temp)
+	fd1 = temp
+	if (fscan (fd1, apref) == EOF)
+	    error (1, "No aperture reference")
+	fd1 = ""; delete (temp, verify=no)
 
 	# Initialize
+	apscript.saturation = INDEF
 	apscript.references = apref
 	apscript.profiles = ""
 	apscript.apidtable = apidtable
@@ -172,18 +188,27 @@ begin
 	}
 
 	reextract = redo
-	if (reextract || !access (database // "/ap" // apref)) {
-	    if (!access (apref // ".imh"))
+	if (reextract || !access (database // "/ap" // apref // extn)) {
+	    if (!access (apref // imtype))
 		error (1, "Aperture reference spectrum not found - " // apref)
 	    print ("Set reference apertures for ", apref) | tee (log1)
 	    if (access (database // "/ap" // apref))
 		delete (database // "/ap" // apref, verify=no)
+	    if (access (database // "/ap" // apref//extn))
+		delete (database // "/ap" // apref // extn, verify=no)
 	    apscript.ansresize = "yes"
 	    apscript.ansedit = "yes"
 	    apscript.ansfittrace = "yes"
 	    apscript (apref, references="", ansfind="YES", ansrecenter="NO",
 		anstrace="YES", ansextract="NO")
 	    newaps = yes
+	    copy (database//"/ap"//apref, database//"/ap"//apref//extn,
+		verbose=no)
+	} else {
+	    if (access (database // "/ap" // apref))
+		delete (database // "/ap" // apref, verify=no)
+	    copy (database//"/ap"//apref//extn, database//"/ap"//apref,
+		verbose=no)
 	}
 
 	if (recenter)
@@ -199,6 +224,10 @@ begin
 	    apscript.anstrace = "YES"
 	else
 	    apscript.anstrace = "NO"
+	if (scattered) {
+	    apscript.ansfitscatter = "yes"
+	    apscript.ansfitsmooth = "yes"
+	}
 	apscript.ansfittrace = "NO"
 	apscript.ansextract = "YES"
 	apscript.ansreview = "NO"
@@ -210,17 +239,81 @@ begin
 	    skyedit2 = no
 	}
 
+	# The next step is to setup the scattered light correction if needed.
+	# We use the flat field image for the interactive setting unless
+	# one is not used and then we use the aperture reference.
+	# If these images have been  scattered light corrected we assume the
+	# scattered light functions parameters are correctly set.
+
+	i = strlen (flat)
+	if (i > n && substr (flat, i-n+1, i) == imtype)
+	    flat = substr (flat, 1, i-n)
+
+	if (flat != "")
+	    spec = flat
+	else
+	    spec = apref
+
+	getspec (spec, temp)
+	fd1 = temp
+	if (fscan (fd1, spec) == EOF)
+	    error (1, "No flat field")
+	fd1 = ""; delete (temp, verify=no)
+
+	scat = no
+	if (scattered) {
+	    if (redo && access (spec//"noscat"//imtype)) {
+		imdelete (spec, verify=no)
+		imrename (spec//"noscat", spec)
+	    }
+	    hselect (spec, "apscatte", yes) | scan (str1)
+	    if (nscan() == 0)
+		scat = yes
+	}
+	if (scat) {
+	    print ("Subtract scattered light from ", spec) | tee (log1)
+	    #apscript.ansfitscatter = "yes"
+	    #apscript.ansfitsmooth = "yes"
+	    imrename (spec, spec//"noscat")
+	    apscript (spec//"noscat", output=spec, ansextract="NO",
+		ansscat="YES", anssmooth="YES")
+	    #apscript.ansfitscatter = "NO"
+	    #apscript.ansfitsmooth = "NO"
+	}
+
 	# The next step is to process the flat field image which is used
 	# as a flat field and a throughput correction.
 
-	i = strlen (flat)
-	if (i > 4 && substr (flat, i-3, i) == ".imh")
-	    flat = substr (flat, 1, i-4)
 	spec = throughput
 	i = strlen (spec)
-	if (i > 4 && substr (spec, i-3, i) == ".imh")
-	    spec = substr (spec, 1, i-4)
-	specms = spec // ".ms.imh"
+	if (i > n && substr (spec, i-n+1, i) == imtype)
+	    spec = substr (spec, 1, i-n)
+	specms = spec // mstype
+
+	if (spec != "" && access (spec//imtype)) {
+	    getspec (spec, temp)
+	    fd1 = temp
+	    if (fscan (fd1, spec) == EOF)
+		error (1, "No flat field")
+	    fd1 = ""; delete (temp, verify=no)
+
+	    scat = no
+	    if (scattered) {
+		if (redo && access (spec//"noscat"//imtype)) {
+		    imdelete (spec, verify=no)
+		    imrename (spec//"noscat", spec)
+		}
+		hselect (spec, "apscatte", yes) | scan (str1)
+		if (nscan() == 0)
+		    scat = yes
+	    }
+	    if (scat) {
+		print ("Subtract scattered light from ", spec) | tee (log1)
+		imrename (spec, spec//"noscat")
+		apscript (spec//"noscat", output=spec, ansextract="NO",
+		    ansscat="YES", anssmooth="YES")
+	    }
+	}
 
 	response = ""
 	if (flat != "" || spec != "") {
@@ -229,17 +322,17 @@ begin
 	    else
 		response = flat // spec // extn
 	    reextract = redo || (update && newaps)
-	    if (reextract || !access (response // ".imh")) {
+	    if (reextract || !access (response // imtype) || (redo && scat)) {
 	        print ("Create response function ", response) | tee (log1)
 
-	        if (access (response // ".imh"))
+	        if (access (response // imtype))
 		    imdelete (response, verify=no)
-	        if (access (flat //".ms.imh"))
-		    imdelete (flat//".ms.imh", verify=no)
+	        if (access (flat //mstype))
+		    imdelete (flat//mstype, verify=no)
 	        if (access (specms))
 		    imdelete (specms, verify=no)
 
-	        response (flat, spec, apref, response, recenter=recenter,
+	        fibresponse (flat, spec, apref, response, recenter=recenter,
 		    edit=edit, trace=trace, clean=clean,
 		    fitflat=fitflat, interactive=params.f_interactive,
 		    function=params.f_function, order=params.f_order)
@@ -254,27 +347,27 @@ begin
 	# by the task ARCREFS.
 
 	if (dispcor) {
-	    getspec (arcs1, > temp)
+	    getspec (arcs1, temp)
 	    fd1 = temp
 	    if (fscan (fd1, arcref1) == EOF)
 		error (1, "No reference arcs")
 	    fd1 = ""; delete (temp, verify=no)
-	    if (!access (arcref1 // ".imh"))
+	    if (!access (arcref1 // imtype))
 		error (1, "Arc reference spectrum not found - " // arcref1)
 	    arcref1ms = arcref1 // extn
 	    reextract = redo || (update && newaps)
-	    if (reextract && access (arcref1ms//".imh"))
+	    if (reextract && access (arcref1ms//imtype))
 	        imdelete (arcref1ms, verify=no)
 
-	    getspec (arcs2, > temp)
+	    getspec (arcs2, temp)
 	    fd1 = temp
 	    if (fscan (fd1, arcref2) == EOF)
 		arcref2 = ""
 	    else {
-	        if (!access (arcref2 // ".imh"))
+	        if (!access (arcref2 // imtype))
 		    error (1, "Arc reference spectrum not found - " // arcref2)
 	        arcref2ms = arcref2 // extn
-	        if (reextract && access (arcref2ms//".imh"))
+	        if (reextract && access (arcref2ms//imtype))
 	            imdelete (arcref2ms, verify=no)
 	    }
 	    fd1 = ""; delete (temp, verify=no)
@@ -298,22 +391,31 @@ begin
 		    next
 	        fd2 = ""
 	    }
-	    if (!access (spec // ".imh")) {
+	    if (!access (spec // imtype)) {
 		print ("Object spectrum not found - " // spec) | tee (log1)
 		next
 	    }
-	    specms = spec // ".ms.imh"
+	    specms = spec // mstype
 
 	    # Determine required operations from the flags and image header.
+	    scat = no
 	    extract = no
 	    disp = no
 	    sky = no
-	    if (reextract || !access (specms))
+	    if (scattered) {
+		if (redo && access (spec//"noscat"//imtype)) {
+		    imdelete (spec, verify=no)
+		    imrename (spec//"noscat", spec)
+		}
+		hselect (spec, "apscatte", yes) | scan (str1)
+		if (nscan() == 0)
+		    scat = yes
+	    }
+	    if (reextract || !access (specms) || (redo && scat))
 		extract = yes
 	    else {
-		hselect (specms, "dc-flag", yes, > temp)
-		fd2 = temp
-		if (fscan (fd2, str1) == 1) {
+		hselect (specms, "dclog1", yes) | scan (str1)
+		if (nscan () == 1) {
 		    extract = update && newdisp
 		    if (update && !newdisp)
 		        # We really should check if REFSPEC will assign
@@ -322,12 +424,9 @@ begin
 		} else
 		    disp = dispcor
 
-		fd2 = ""; delete (temp, verify=no)
-		hselect (specms, "skysub", yes, > temp)
-		fd2 = temp
-		if (fscan (fd2, str1) < 1)
+		hselect (specms, "skysub", yes) | scan (str1)
+		if (nscan() == 0)
 		    sky = skysubtract
-		fd2 = ""; delete (temp, verify=no)
 	    }
 		
 	    if (extract) {
@@ -343,6 +442,8 @@ begin
 	    if (batch && !skyedit1 && !skyedit2 && !splot1 && !splot2 &&
 		apscript.ansedit == "NO") {
 		fd1 = ""; delete (objs, verify=no)
+		apscript.ansfitscatter = "NO"
+		apscript.ansfitsmooth = "NO"
 		goto batch
 	    }
 
@@ -350,32 +451,48 @@ begin
 	    if (extract) {
 		if (access (specms))
 		    imdelete (specms, verify=no)
+
+		if (scat) {
+		    print ("Subtract scattered light from ", spec) | tee (log1)
+		    imrename (spec, spec//"noscat")
+		    apscript (spec//"noscat", output=spec, ansextract="NO",
+			ansscat="YES", anssmooth="YES")
+		}
+
 		print ("Extract object spectrum ", spec) | tee (log1)
-		setjd (spec, observatory=observatory, date="date-obs",
-		    time="ut", exposure="exptime", jd="jd", hjd="",
-		    ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-		    >> log1)
-	        setairmass (spec, intype="beginning",
-		    outtype="effective", exposure="exptime",
-		    observatory=observatory, show=no, update=yes,
-		    override=yes, >> log1)
-		apscript (spec, nsubaps=params.nsubaps)
+		hselect (spec, "date-obs,ut,exptime", yes, > temp1)
+		hselect (spec, "ra,dec,epoch,st", yes, >> temp1)
+		fd3 = temp1
+		if (fscan (fd3, str1, str2, str3) == 3) {
+		    setjd (spec, observatory=observatory, date="date-obs",
+			time="ut", exposure="exptime", jd="jd", hjd="",
+			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+			>> log1)
+		    if (fscan (fd3, str1, str2, str3, str4) == 4)
+			setairmass (spec, intype="beginning",
+			    outtype="effective", exposure="exptime",
+			    observatory=observatory, show=no, update=yes,
+			    override=yes, >> log1)
+		}
+		fd3 = ""; delete (temp1, verify=no)
+		apscript (spec, nsubaps=params.nsubaps, saturation=datamax)
 		sapertures (specms, apertures="", apidtable=apidtable,
-		    verbose=no)
+		    wcsreset=no, verbose=no, beam=INDEF, dtype=INDEF, w1=INDEF,
+		    dw=INDEF, z=INDEF, aplow=INDEF, aphigh=INDEF, title=INDEF)
 		if (response != "") {
 		    if (params.nsubaps == 1)
 			sarith (specms, "/", response, specms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=no, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=no,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 		    else {
 			blkrep (response, temp, 1, params.nsubaps)
 			sarith (specms, "/", temp, specms, w1=INDEF,
-			    w2=INDEF, apertures="", beams="", apmodulus=0,
-			    reverse=no, ignoreaps=yes, format="multispec",
-			    renumber=no, offset=0, clobber=yes, merge=no,
-			    errval=0, verbose=no)
+			    w2=INDEF, apertures="", bands="", beams="",
+			    apmodulus=0, reverse=no, ignoreaps=yes,
+			    format="multispec", renumber=no, offset=0,
+			    clobber=yes, merge=no, errval=0, verbose=no)
 			imdelete (temp, verify=no)
 		    }
 		}
@@ -385,34 +502,49 @@ begin
 	    if (disp) {
 		# Fix arc headers if necessary.
 		if (newarcs) {
-		    getspec (arcs1, > temp)
-		    setjd ("@"//temp, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> log1)
-	    	    setairmass ("@"//temp, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> log1)
+		    getspec (arcs1, temp)
 	    	    fd2 = temp
 	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp1)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp1)
+			fd3 = temp1
+			if (fscan (fd3, str1, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory, date="date-obs",
+				time="ut", exposure="exptime", jd="jd", hjd="",
+				ljd="ljd", utdate=yes, uttime=yes, listonly=no,
+				>> log1)
+			    if (fscan (fd3, str1, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no, update=yes,
+				    override=yes, >> log1)
+			}
+			fd3 = ""; delete (temp1, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "henear", add=yes, verify=no,
 		    	    show=no, update=yes)
 	    	    }
 	    	    fd2 = ""; delete (temp, verify=no)
-		    getspec (arcs2, > temp)
-		    setjd ("@"//temp, observatory=observatory, date="date-obs",
-			time="ut", exposure="exptime", jd="jd", hjd="",
-			ljd="ljd", utdate=yes, uttime=yes, listonly=no,
-			>> log1)
-	    	    setairmass ("@"//temp, intype="beginning",
-			outtype="effective", exposure="exptime",
-			observatory=observatory, show=no, update=yes,
-			override=yes, >> log1)
+		    getspec (arcs2, temp)
 	    	    fd2 = temp
 	    	    while (fscan (fd2, arc) != EOF) {
+			hselect (arc, "date-obs,ut,exptime", yes, > temp1)
+			hselect (arc, "ra,dec,epoch,st", yes, >> temp1)
+			fd3 = temp1
+			if (fscan (fd3, str1, str2, str3) == 3) {
+			    setjd (arc, observatory=observatory,
+				date="date-obs", time="ut", exposure="exptime",
+				jd="jd", hjd="", ljd="ljd", utdate=yes,
+				uttime=yes, listonly=no, >> log1)
+			    if (fscan (fd3, str1, str2, str3, str4) == 4)
+				setairmass (arc, intype="beginning",
+				    outtype="effective", exposure="exptime",
+				    observatory=observatory, show=no,
+				    update=yes, override=yes, >> log1)
+
+			}
+			fd3 = ""; delete (temp1, verify=no)
 	        	hedit (arc, "refspec1", arc, add=yes, verify=no,
 		    	    show=no, update=yes)
 	        	hedit (arc, "arctype", "shift", add=yes, verify=no,
@@ -433,7 +565,7 @@ begin
 
 		doarcs (spec, response, arcref1, arcref2, extn, arcreplace,
 		    apidtable, arcaps, arcbeams, savearcs, reextract, arcap,
-		    log1, no)
+		    log1, no, done)
 
 	        hselect (specms, "refspec1", yes, > temp)
 	        fd2 = temp
@@ -450,13 +582,11 @@ begin
 			flux=params.flux, samedisp=no, global=no,
 			ignoreaps=no, confirm=no, listonly=no,
 			verbose=verbose, logfile=logfile)
-		    hedit (specms, "dc-flag", 0, add=yes, verify=no,
-			show=no, update=yes)
 		    if (params.nsubaps > 1) {
 			imrename (specms, temp, verbose=no)
 			scopy (temp, specms, w1=INDEF, w2=INDEF,
-			    apertures="-999", beams="", apmodulus=0, offset=0,
-			    format="multispec", clobber=no, merge=no,
+			    apertures="-999", bands="", beams="", apmodulus=0,
+			    offset=0, format="multispec", clobber=no, merge=no,
 			    renumber=no, verbose=no)
 			blkavg (temp, temp, 1, params.nsubaps, option="sum")
 			imcopy (temp, specms//"[*,*]", verbose=no)
@@ -518,6 +648,7 @@ begin
 batch:
 	flprcache
 	batch.objects = objects
+	batch.datamax = datamax
 	batch.response = response
 	batch.arcs1 = arcs1
 	batch.arcs2 = arcs2
@@ -537,6 +668,7 @@ batch:
 	batch.logfile = log1
 	batch.redo = reextract
 	batch.update = update
+	batch.scattered = scattered
 	batch.arcap = arcap
 	batch.dispcor = dispcor
 	batch.savearcs = savearcs

@@ -145,9 +145,10 @@ begin
 	# Fit residual extinction curve using ICFIT.
 	gt = gt_init()
 	call gt_sets (gt, GTTYPE, "mark")
+	call gt_seti (gt, GTCOLOR, GP_PLCOLOR(gp))
 	call ic_open (ic)
-	call ic_putr (ic, "xmin", STD_WSTART(stds[1]))
-	call ic_putr (ic, "xmax", STD_WEND(stds[1]))
+	call ic_putr (ic, "xmin", min (STD_WSTART(stds[1]), STD_WEND(stds[1])))
+	call ic_putr (ic, "xmax", max (STD_WSTART(stds[1]), STD_WEND(stds[1])))
 	call ic_pstr (ic, "function", "chebyshev")
 	call ic_puti (ic, "order", 1)
 	call ic_pstr (ic, "xlabel", "wavelength")
@@ -160,7 +161,7 @@ begin
 
 	# Determine significance of the fit.
 	call sf_fit (stds, nstds, cv, function, order,
-	    GP_WSTART(gp), GP_WEND(gp))
+	    min (GP_WSTART(gp), GP_WEND(gp)), max (GP_WSTART(gp), GP_WEND(gp)))
 	call sf_rms (stds, nstds, rms1, npts)
 	do i = 1, nstds - 2 {
 	    if (STD_FLAG(stds[i]) != SF_INCLUDE)
@@ -174,7 +175,7 @@ begin
 	    call aaddr (Memr[yp], Memr[sens], Memr[yp], n)
 	}
 	call sf_fit (stds, nstds, cv, function, order,
-	    GP_WSTART(gp), GP_WEND(gp))
+	    min (GP_WSTART(gp), GP_WEND(gp)), max (GP_WSTART(gp), GP_WEND(gp)))
 	call sf_rms (stds, nstds, rms, npts)
 	do i = 1, SF_NGRAPHS
 	    if (GP_SHDR(gp,i) != NULL)

@@ -40,14 +40,14 @@ begin
 	call printf ("    %s = %g %s    %s = %d\n")
 	    call pargstr (KY_PSFAPERT)
 	    call pargr (2.0 * apstatr (ap, PSFAPERT))
-	    call pargstr (UN_PSFAPERT)
+	    call pargstr (UN_PSFSCALEUNIT)
 	    call pargstr (KY_PMAXITER)
 	    call pargi (apstati (ap, PMAXITER))
 
 	call printf ("    %s = %g %s    %s = %d\n")
 	    call pargstr (KY_PK2)
 	    call pargr (apstatr (ap, PK2))
-	    call pargstr (UN_PK2)
+	    call pargstr (UN_PSFSIGMA)
 	    call pargstr (KY_PNREJECT)
 	    call pargi (apstati (ap, PNREJECT))
 

@@ -350,9 +350,51 @@ begin
 	# To avoid any bias scale weighted extraction to same total flux
 	# as raw spectrum (with rejected pixels replaced by fit).
 
-	if (total2 != 0.) {
-	    call amulkr (spec, total1 / total2, spec, ny * nsubaps)
-	    call amulkr (specsig, total1 / total2, specsig, ny * nsubaps)
+	if (total1 * total2 <= 0.) {
+	    call sprintf (Memc[str], SZ_LINE,
+		"EXTRACT: WARNING - Aperture %d:")
+		call pargi (AP_ID(ap))
+	    call ap_log (Memc[str], YES, NO, YES)
+	    call sprintf (Memc[str], SZ_LINE,
+		"   Total variance weighted spectrum flux is %g")
+		call pargr (total2)
+	    call ap_log (Memc[str], YES, NO, YES)
+	    call sprintf (Memc[str], SZ_LINE,
+		"   Total unweighted spectrum flux is %g")
+		call pargr (total1)
+	    call ap_log (Memc[str], YES, NO, YES)
+	    call sprintf (Memc[str], SZ_LINE,
+		"   Variance spectrum bias factor ignored")
+	    call ap_log (Memc[str], YES, NO, YES)
+	} else {
+	    sum = total1 / total2
+	    call amulkr (spec, sum, spec, ny * nsubaps)
+	    call amulkr (specsig, sum, specsig, ny * nsubaps)
+	    if (sum < .5 || sum > 2) {
+		call sprintf (Memc[str], SZ_LINE,
+		    "EXTRACT: WARNING - Aperture %d:")
+		    call pargi (AP_ID(ap))
+		call ap_log (Memc[str], YES, NO, YES)
+		call sprintf (Memc[str], SZ_LINE,
+		    "   Total variance weighted spectrum flux is %g")
+		    call pargr (total2)
+		call ap_log (Memc[str], YES, NO, YES)
+		call sprintf (Memc[str], SZ_LINE,
+		    "   Total unweighted spectrum flux is %g")
+		    call pargr (total1)
+		call ap_log (Memc[str], YES, NO, YES)
+		call sprintf (Memc[str], SZ_LINE,
+		    "EXTRACT: Aperture %d variance spectrum bias factor is %g")
+		    call pargi (AP_ID(ap))
+		    call pargr (total1 / total2)
+		call ap_log (Memc[str], YES, NO, YES)
+	    } else {
+		call sprintf (Memc[str], SZ_LINE,
+		    "EXTRACT: Aperture %d variance spectrum bias factor is %g")
+		    call pargi (AP_ID(ap))
+		    call pargr (total1 / total2)
+		call ap_log (Memc[str], YES, NO, NO)
+	    }
 	}
 
 	# Log the number of rejected pixels.

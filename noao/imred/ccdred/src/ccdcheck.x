@@ -1,3 +1,4 @@
+include	<imhdr.h>
 include	"ccdtypes.h"
 
 # CCDCHECK -- Check processing status.
@@ -9,6 +10,8 @@ int	ccdtype			# CCD type
 
 real	ccdmean, hdmgetr()
 bool	clgetb(), ccdflag()
+long	time
+int	hdmgeti()
 
 begin
 	if (clgetb ("trim") && !ccdflag (im, "trim"))
@@ -33,6 +36,10 @@ begin
 	    if (clgetb ("scancor") && !ccdflag (im, "scancor"))
 	        return (true)
 	    iferr (ccdmean = hdmgetr (im, "ccdmean"))
+		    return (true)
+	    iferr (time = hdmgeti (im, "ccdmeant"))
+		time = IM_MTIME(im)
+	    if (time < IM_MTIME(im))
 		return (true)
 	case ILLUM:
 	    if (clgetb ("zerocor") && !ccdflag (im, "zerocor"))

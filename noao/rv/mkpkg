@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set LIBS = "-lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit"
+	$set LIBS = "-lasttools -lsmw -lxtools -ldeboor -lcurfit -liminterp -lllsq -lnlfit"
 	$update libpkg.a
 	$omake x_rv.x
 	$link -o xx_rv.e x_rv.o libpkg.a $(LIBS)
@@ -20,20 +20,18 @@ install:
 	;
 	
 libpkg.a:
-	@asttools				# Update the libraries
+	@rvidlines				# Update the libraries
 
-	aplists.x	rvpackage.h rvflags.h rvmwcs.h <imhdr.h>
+	aplists.x	<smw.h> rvpackage.h
 	coloncmds.x	rvpackage.h rvflags.h rvcont.h rvsample.h <fset.h> \
 			<ctype.h> <error.h>
 	complex.x	<math.h>
 	contin.x	rvpackage.h rvflags.h rvcont.h
 	continpars.x	rvpackage.h rvflags.h rvcomdef.h rvcont.h
 	deblend.x	rvpackage.h rvflags.h <error.h> <mach.h> <gset.h>
-	dispcor.x	<error.h> <imhdr.h> <math/iminterp.h> 
 	fftmode.x	rvpackage.h rvflags.h rvplots.h rvfilter.h <gset.h>
 	fftutil.x	rvpackage.h rvflags.h rvplots.h <math.h> 
 	filtpars.x	rvcomdef.h rvfilter.h rvpackage.h
-	getdisp.x	rvpackage.h rvflags.h rvkeywords.h rvmwcs.h <imhdr.h>
 	keywpars.x	rvcomdef.h rvkeywords.h rvpackage.h
 	numrep.x	<mach.h> <math.h>
 	plotpars.x	rvcomdef.h rvplots.h rvpackage.h rvflags.h
@@ -56,12 +54,12 @@ libpkg.a:
 	rvfparab.x	rvflags.h rvpackage.h fitcom.com <math/nlfit.h> \
 			<gset.h> <math.h> 
 	rvfuncs.x	<math.h> <mach.h>
-	rvgetim.x	rvpackage.h rvflags.h rvkeywords.h rvsample.h \
-			<imhdr.h> <imio.h>
+	rvgetim.x	<smw.h> <units.h> rvpackage.h rvflags.h rvkeywords.h\
+			rvsample.h
 	rvimutil.x	rvpackage.h rvflags.h <fio.h> <imhdr.h>
 	rvinit.x	rvpackage.h rvflags.h rvcont.h rvsample.h rvsinc.com \
 			<error.h> <pkg/gtools.h>
-	rvmwcs.x	rvpackage.h rvmwcs.h <imhdr.h> <imio.h> <mwset.h>
+        rvlinefit.x     <error.h> <mach.h> <gset.h> rvflags.h rvpackage.h
 	rvparam.x	rvpackage.h rvflags.h rvsample.h
 	rvplot.x	rvpackage.h rvflags.h rvplots.h rvsample.h <gset.h> 
 	rvrebin.x	rvpackage.h rvflags.h rvcont.h  <error.h>
@@ -80,6 +78,7 @@ libpkg.a:
 	splitplot.x	rvpackage.h rvflags.h rvplots.h rvsample.h <gset.h> 
 	t_fxcor.x 	rvcomdef.h rvpackage.h rvflags.h rvsample.h <ctype.h> \
 			<fio.h> <gset.h> <imhdr.h> <error.h>
+	t_rvcorrect.x	<error.h>
 	titles.x	rvpackage.h rvflags.h <gset.h> 
 	wrtccf.x	rvpackage.h rvflags.h rvcont.h rvfilter.h <imhdr.h>
 	zzdebug.x	rvpackage.h rvflags.h <imhdr.h> <error.h>

@@ -108,10 +108,11 @@ end
 
 # AP_LNORM -- Normalize the input line apertures by the norm spectra.
 
-procedure ap_lnorm (ap, out, dbuf, nc, nl, c1, l1, spec, ny, ys, init)
+procedure ap_lnorm (ap, out, gain, dbuf, nc, nl, c1, l1, spec, ny, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 pointer	dbuf			# Data buffer
 int	nc, nl			# Size of data buffer
 int	c1, l1			# Origin of data buffer
@@ -159,7 +160,7 @@ begin
 		nsum = nsum + 1
 	    }
 	    if (nsum > 0) {
-	        sum = (asumr (spec, ny) / ny) / (sum / nsum)
+	        sum = (asumr (spec, ny) / ny) / (sum / nsum / gain)
 		call adivkr (spec, sum, spec, ny)
 	    }
 	}
@@ -189,17 +190,21 @@ begin
 		dataout = dataout + ix1 - 1
 	    else
 	        dataout = imps2r (out, ix1, ix2, i, i)
-	    call adivkr (Memr[datain], spec[iy], Memr[dataout], ix2-ix1+1)
+	    call adivkr (Memr[datain], spec[iy] * gain, Memr[dataout],
+		ix2-ix1+1)
 	}
+
+	call imaddr (out, "CCDMEAN", 1.)
 end
 
 
 # AP_CNORM -- Normalize the input column apertures by the norm spectra.
 
-procedure ap_cnorm (ap, out, dbuf, nc, nl, c1, l1, spec, ny, ys, init)
+procedure ap_cnorm (ap, out, gain, dbuf, nc, nl, c1, l1, spec, ny, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 pointer	dbuf			# Data buffer
 int	nc, nl			# Size of data buffer
 int	c1, l1			# Origin of data buffer
@@ -230,13 +235,6 @@ begin
 	ncols = IM_LEN(out, 1)
 	nlines = IM_LEN(out, 2)
 
-	do ix = ys, ys+ny-1 {
-	    s = cveval (cv, real (ix))
-	    Memi[y1+ix] = nint (low + s) 
-	    Memi[y2+ix] = nint (high + s) 
-	}
-	call alimi (Memi[y1+ys], 2 * ny, iy1, iy2)
-
 	# Normalize by the aperture width and apply threshold.
 	call adivkr (spec, high - low, spec, ny)
 	if (clgetb ("cennorm")) {
@@ -245,23 +243,30 @@ begin
 	    do ix = ys, ys+ny-1 {
 		s = cen + cveval (cv, real (ix))
 		iy1 = max (1, int (s))
-		iy2 = min (ncols, int (s + 1))
+		iy2 = min (nlines, int (s + 1))
 		if (iy1 > iy2)
 		    next
-		datain = dbuf + (iy1 - l1) * nc + ix - c1
+		datain = dbuf + (ix - l1) * nc + iy1 - c1
 		if (iy1 == iy2)
 		    sum = sum + Memr[datain]
 		else
-		    sum = sum + (iy2-s)*Memr[datain] + (s-iy1)*Memr[datain+nc]
+		    sum = sum + (iy2-s)*Memr[datain] + (s-iy1)*Memr[datain+1]
 		nsum = nsum + 1
 	    }
 	    if (nsum > 0) {
-	        sum = (asumr (spec, ny) / ny) / (sum / nsum)
+	        sum = (asumr (spec, ny) / ny) / (sum / nsum / gain)
 		call adivkr (spec, sum, spec, ny)
 	    }
 	}
 	if (!IS_INDEF (threshold))
 	    call arltr (spec, ny, threshold, threshold)
+
+	do ix = ys, ys+ny-1 {
+	    s = cveval (cv, real (ix))
+	    Memi[y1+ix] = nint (low + s) 
+	    Memi[y2+ix] = nint (high + s) 
+	}
+	call alimi (Memi[y1+ys], 2 * ny, iy1, iy2)
 
 	do iy = 1, nlines {
 	    if (init == YES) {
@@ -286,13 +291,15 @@ begin
 	        else
 	            dataout = imps2r (out, ix1, ix2, iy, iy)
 		do ix = ix1, ix2 {
-		    Memr[dataout] = Memr[datain] / spec[ix-ys+1]
+		    Memr[dataout] = Memr[datain] / spec[ix-ys+1] / gain
 		    datain = datain +  nc
 		    dataout = dataout + 1
 		}
 		ix1 = ix2
 	    }
 	}
+
+	call imaddr (out, "CCDMEAN", 1.)
 
 	call sfree (sp)
 end
@@ -370,6 +377,8 @@ begin
 		dataout = dataout + 1
 	    }
 	}
+
+	call imaddr (out, "CCDMEAN", 1.)
 end
 
 
@@ -459,17 +468,20 @@ begin
 	    }
 	}
 
+	call imaddr (out, "CCDMEAN", 1.)
+
 	call sfree (sp)
 end
 
 
 # AP_LDIFF -- Model residuals.
 
-procedure ap_ldiff (ap, out, dbuf, nc, nl, c1, l1, spec, profile, nx, ny,
+procedure ap_ldiff (ap, out, gain, dbuf, nc, nl, c1, l1, spec, profile, nx, ny,
 	xs, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 pointer	dbuf			# Data buffer
 int	nc, nl			# Size of data buffer
 int	c1, l1			# Origin of data buffer
@@ -515,7 +527,7 @@ begin
 	        dataout = imps2r (out, ix1, ix2, i, i)
 	    do ix = ix1, ix2 {
 		s = spec[iy] * profile[iy, ix-xs[iy]+1]
-		Memr[dataout] = Memr[datain] - s
+		Memr[dataout] = (Memr[datain] - s) / gain
 		datain = datain + 1
 		dataout = dataout + 1
 	    }
@@ -525,11 +537,12 @@ end
 
 # AP_CDIFF -- Model residuals
 
-procedure ap_cdiff (ap, out, dbuf, nc, nl, c1, l1, spec, profile, nx, ny,
+procedure ap_cdiff (ap, out, gain, dbuf, nc, nl, c1, l1, spec, profile, nx, ny,
     xs, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 pointer	dbuf			# Data buffer
 int	nc, nl			# Size of data buffer
 int	c1, l1			# Origin of data buffer
@@ -586,7 +599,7 @@ begin
 	            dataout = imps2r (out, ix1, ix2, iy, iy)
 	        do ix = ix1, ix2 {
 		    s = spec[ix-ys+1] * profile[ix-ys+1, iy-xs[ix-ys+1]+1]
-		    Memr[dataout] = Memr[datain] - s
+		    Memr[dataout] = (Memr[datain] - s) / gain
 		    datain = datain + nc
 		    dataout = dataout + 1
 	        }
@@ -600,10 +613,11 @@ end
 
 # AP_LFIT -- Model fit
 
-procedure ap_lfit (ap, out, spec, profile, nx, ny, xs, ys, init)
+procedure ap_lfit (ap, out, gain, spec, profile, nx, ny, xs, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 real	spec[ny]		# Normalization spectrum
 real	profile[ny,nx]		# Profile
 int	nx, ny			# Size of profile array
@@ -645,7 +659,7 @@ begin
 	        dataout = imps2r (out, ix1, ix2, i, i)
 	    do ix = ix1, ix2 {
 		s = spec[iy] * profile[iy, ix-xs[iy]+1]
-		Memr[dataout] = s
+		Memr[dataout] = s / gain
 		dataout = dataout + 1
 	    }
 	}
@@ -654,10 +668,11 @@ end
 
 # AP_CFIT -- Model fit
 
-procedure ap_cfit (ap, out, spec, profile, nx, ny, xs, ys, init)
+procedure ap_cfit (ap, out, gain, spec, profile, nx, ny, xs, ys, init)
 
 pointer	ap			# Aperture structure
 pointer	out			# Output IMIO pointer
+real	gain			# Gain
 real	spec[ny]		# Normalization spectrum
 real	profile[ny,nx]		# Profile
 int	nx, ny			# Size of profile array
@@ -710,7 +725,7 @@ begin
 	            dataout = imps2r (out, ix1, ix2, iy, iy)
 	        do ix = ix1, ix2 {
 		    s = spec[ix-ys+1] * profile[ix-ys+1, iy-xs[ix-ys+1]+1]
-		    Memr[dataout] = s
+		    Memr[dataout] = s / gain
 		    dataout = dataout + 1
 	        }
 		ix1 = ix2

@@ -37,6 +37,7 @@ begin
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
 	call cal_open (NULL)
+	call ccd_open (0)
 
 	# Process each image.
 	while (imtgetim (listin, Memc[input], SZ_FNAME) != EOF) {
@@ -101,6 +102,7 @@ begin
 	call imtclose (listin)
 	call imtclose (listout)
 	call cal_close ()
+	call ccd_close ()
 	call sfree (sp)
 end
 
@@ -118,9 +120,11 @@ char	output[SZ_FNAME]	# Output image
 
 int	i, nc, nl
 real	scale
+long	time
 pointer	sp, str, illum, tmp, in, im, out, out1, data
 
 bool	clgetb(), ccdflag(), streq()
+int	hdmgeti()
 real	hdmgetr(), clgetr(), divzero()
 pointer	immap(), imgl2r(), impl2r()
 errchk	immap, ccddelete
@@ -160,11 +164,15 @@ begin
 	call imunmap (in)
 	call strcpy (input, Memc[tmp], SZ_FNAME)
 	call mktemp ("tmp", Memc[illum], SZ_FNAME)
-	call mkillumination (Memc[tmp], Memc[illum], NO)
+	call mkillumination (Memc[tmp], Memc[illum], NO, NO)
 
 	in = immap (input, READ_ONLY, 0)
 	im = immap (Memc[illum], READ_ONLY, 0)
 	iferr (scale = hdmgetr (im, "ccdmean"))
+	    scale = 1.
+	iferr (time = hdmgeti (im, "ccdmeant"))
+	    time = IM_MTIME(im)
+	if (time < IM_MTIME(im))
 	    scale = 1.
 
 	# Create the temporary output.
@@ -196,7 +204,7 @@ begin
 		call pargr (rdivzero)
 	    call ccdlog (out1, Memc[str])
 	}
-	call sprintf (Memc[str], SZ_LINE, "Removed illumination")
+	call sprintf (Memc[str], SZ_LINE, "Removed illumination from flat")
 	call sprintf (Memc[str], SZ_LINE,
 	    "Illumination flat created from %s")
 	    call pargstr (input)

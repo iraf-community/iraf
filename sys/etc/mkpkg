@@ -18,8 +18,6 @@ libsys.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 	@gen
 
-	#$set XFLAGS = "$(XFLAGS) -f -/g"
-
 	brktime.x	<time.h>
 	btoi.x	
 	clktime.x	
@@ -57,7 +55,7 @@ libsys.a:
 			<knet.h> <printf.h> <xwhen.h>
 	miireadc.x	<mii.h>
 	miiwritec.x	<mii.h>
-	onentry.x	<clset.h> <fset.h> <knet.h>
+	onentry.x	<clset.h> <error.h> <fset.h> <knet.h>
 	onerror.x	<config.h> <error.h>
 	onexit.x	<config.h> <error.h>
 	oscmd.x		<clset.h> <ctype.h> <error.h> <knet.h>

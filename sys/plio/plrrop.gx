@@ -119,7 +119,7 @@ begin
 		    if (R_NOTSRC(rop)) {
 			v_src = not (v_src)
 			if (src_maxval != 0)
-			    v_src = and (v_src, src_maxval)
+			    v_src = and (int(v_src), src_maxval)
 		    }
 
 		    if (v_src != 0 && src_maxval == 1)
@@ -131,7 +131,7 @@ begin
 		    if (R_NOTDST(rop)) {
 			v_dst = not (v_dst)
 			if (dst_maxval != 0)
-			    v_dst = and (v_dst, dst_maxval)
+			    v_dst = and (int(v_dst), dst_maxval)
 		    }
 		}
 
@@ -165,7 +165,7 @@ begin
 		if (dst_maxval == 1 && pv != 0)
 		    pv = 1
 		else if (dst_maxval > 1)
-		    pv = and (dst_maxval, pv)
+		    pv = and (int(pv), dst_maxval)
 
 	    } else
 		pv = v_dst

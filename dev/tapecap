@@ -1,50 +1,61 @@
-# TAPECAP file (DEC Ultrix).
+# TAPECAP file for LINUX.   Aug95
+# -------------------------------------
 
 # User logical devices (aliases).  These entries are SERVER specific.
 # Uncomment the set which applies to the server on which iraf is installed.
 
+# Here are some simple examples of user logical device aliases.
+#mta|Generic DAT entry, unit 0|		:tc=mtst0.solaris.dat:
+#mtb|Generic Exabyte entry, unit 0|	:tc=mtst0.solaris.exb8200:
+#mtc|Generic DAT entry, unit 1|		:tc=mtst1.solaris.dat:
+#mtd|Generic Exabyte entry, unit 2|	:tc=mtst1.solaris.exb8200:
+
+
 # NOAO/TUCSON servers and device aliases.  If installing on a non-NOAO/TUCSON
-# machine these entries should be considered only examples.
+# machine these entries should be considered only examples.  You can delete
+# them if you want.  Unless otherwise specified all of the following are
+# SunOS systems.
 
-# CRATER (Vaxstation) aliases.
-#mta|TZ30 unit 0|			:tc=mttz0:
 
-# CEPHUS (Decstation 3100) aliases.
-mta|TK50 unit 0|			:tc=mttk0:
+# CERES (Gateway P5-90, Adaptec 2940 PCI SCSI adaptor, HPDAT tape drive).
+mta|HP DAT drive unit 0|		:so:tc=mtst0-dat:
+mtx|HP DAT with debug output|		:so=/dev/ttyp8:tc=mtst0-dat:
 
 # OTHER local aliases.
-mtf|Personal Exabyte unit 0|		:tc=mtst0-exb:
-mtg|Personal Exabyte unit 1|		:tc=mtst1-exb:
-mth|Personal Exabyte unit 2|		:tc=mtst2-exb:
-mti|Personal Exabyte unit 3|		:tc=mtst3-exb:
-mtp|Personal DAT unit 0|		:tc=mtwd0-dat:
-mtq|Personal DAT unit 1|		:tc=mtwd1-dat:
+mtf|Personal Exabyte unit 0:		:tc=mtst0-exb:
+mtg|Personal Exabyte unit 1:		:tc=mtst1-exb:
+mth|Personal Exabyte unit 2:		:tc=mtst2-exb:
+mti|Personal Exabyte unit 3:		:tc=mtst3-exb:
+mtp|Personal DAT unit 0:		:tc=mtst0-dat:
+mtq|Personal DAT unit 1:		:tc=mtst1-dat:
 
-
-# Site logical devices.  These entries are SITE specific.  These should be
-# the same for all copies of the tapecap file at a given site.  Make any
-# site or host specific device capability changes here.
-
-# (none at present)
 
 # Everything below this line is mostly (but not entirely) site independent.
 # It is impossible to list every possible combination of device type, bus
 # address, etc. here, but most of the common configurations are listed.
 # --------------------------------------------------------------------------
 
-# Unit assignments.
-mttk0|TK50 Cartridge drive unit 0:\
-	:al=nrmt0a nrmt0h nrmt0l nrmt0m rmt0a rmt0h rmt0l rmt0m:\
-	:dv=nrmt0h:lk=mt0:tc=tk50:
-mttk1|TK50 Cartridge drive unit 1:\
-	:al=nrmt1a nrmt1h nrmt1l nrmt1m rmt1a rmt1h rmt1l rmt1m:\
-	:dv=nrmt1h:lk=mt1:tc=tk50:
-mttz0|TZ30 Cartridge drive unit 0:\
-	:al=nrmt0a nrmt0h nrmt0l nrmt0m rmt0a rmt0h rmt0l rmt0m:\
-	:dv=nrmt0h:lk=mt0:tc=tz30:
-mttz1|TZ30 Cartridge drive unit 1:\
-	:al=nrmt1a nrmt1h nrmt1l nrmt1m rmt1a rmt1h rmt1l rmt1m:\
-	:dv=nrmt1h:lk=mt1:tc=tz30:
+
+# Unit assignments (Linux).
+# ---------------------------
+
+mtdat0|mtst0-dat|HP DAT drive unit 0:\
+	:dt=HP 35480A Helical Scan DAT drive:al=st0 nst0:\
+	:dv=nst0:lk=st0:tc=generic-dat:
+mtdat1|mtst1-dat|HP DAT drive unit 1:\
+	:dt=HP 35480A Helical Scan DAT drive:al=st1 nst1:\
+	:dv=nst1:lk=st1:tc=generic-dat:
+
+mtexb0|mtst0-exb|Exabyte drive on ST 0:\
+	:al=st0 nst0:\
+	:dv=nst0:lk=st0:tc=generic-exabyte:
+mtexb1|mtst1-exb|Exabyte drive on ST 1:\
+	:al=st1 nst1:\
+	:dv=nst1:lk=st1:tc=generic-exabyte:
+
+
+# Unit assignments (Macintosh A/UX).
+# ---------------------------
 
 mttc2|Apple drive at SCSI 2:\
         :al=tc2 tc2n:lk=tc2:\
@@ -54,48 +65,37 @@ mtfd0|Macintosh FDHD floppy drive 0:\
         :al=floppy0 rfloppy0:lk=fd0:\
         :dv=rfloppy0:rd=rfloppy0:tc=fdhd:
 
-mtwd0|mtwd0-dat|ApUNIX WangDAT drive 0:\
-	:al=cwd0 ncwd0 nrcwd0 nrwd0 nwd0 rcwd0 rwd0 wd0:\
-	:dv=nrwd0:lk=wd0:tc=apunix-dat:
-mtwd0c|mtwd0-dat.comp|ApUNIX WangDAT drive 0 with compression:\
-	:dv=nrcwd0:tc=mtwd0-dat:
-mtwd1|mtwd1-dat|ApUNIX WangDAT drive 1:\
-	:al=cwd1 ncwd1 nrcwd1 nrwd1 nwd1 rcwd1 rwd1 wd1:\
-	:dv=nrwd1:lk=wd1:tc=apunix-dat:
-mtwd1c|mtwd1-dat.comp|ApUNIX WangDAT drive 1 with compression:\
-	:dv=nrcwd1:tc=mtwd1-dat:
-
-mtsx0|mtsx0-exb|Exabyte drive on ApUNIX unit 0:\
-	:al=lsx0 nlsx0 nrlsx0 nrsx0 nsx0 rlsx0 rsx0 sx0:\
-	:dv=nrsx0:lk=sx0:tc=apunix-exabyte:
-mtsx1|mtsx1-exb|Exabyte drive on ApUNIX unit 1:\
-	:al=lsx1 nlsx1 nrlsx1 nrsx1 nsx1 rlsx1 rsx1 sx1:\
-	:dv=nrsx1:lk=sx1:tc=apunix-exabyte:
-mtsx2|mtsx2-exb|Exabyte drive on ApUNIX unit 2:\
-	:al=lsx2 nlsx2 nrlsx2 nrsx2 nsx2 rlsx2 rsx2 sx2:\
-	:dv=nrsx2:lk=sx2:tc=apunix-exabyte:
 
 # Generic device entries.
-tc|appletape|Macintosh DC2000 cartridge tape drive:\
-        :dt=Apple Tape 40SC:tt=DC2000:ts#38500:\
-        :bs#8192:mr#0:or#65536:fb#22:se:nf:
-fdhd|Macintosh FDHD 1440 Kb floppy disk:\
-        :dt=Apple FDHD 1440 Kb floppy disk:tt=FDHD:ts#1440:\
-        :bs#512:mr#0:or#65536:fb#22:nb:np:
-dat60|DAT with 60 meter tape:\
-        :dt=DAT DDS 4mm:tc=dat:
-dat90|DAT with 90 meter tape:\
-        :dt=DAT DDS 4mm:tt=DG-90M:ts#1911570:tc=dat:
-apunix-dat|dat|WangDAT 1300 DDS with ApUNIX driver:\
+# -------------------------
+dat-60m|Generic DAT/DDS tape drive with 60M tape:\
+	:tt=DG-90M:ts#1274378:tc=generic-dat:
+generic-dat|dat-90m|Generic DAT/DDS tape drive with 90M tape:\
+	:dt=DAT 4mm Helical Scan tape drive:tt=DG-90M:\
+	:ts#1911567:bs#0:mr#32768:or#32768:fb#10:fs#127000:mf:fe#2000:
+generic-exb|Generic Exabyte Model 8200 drive:\
+        :dt=Exabyte EXB-8200 8mm tape drive:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#32768:or#32768:fb#10:rs#2000:fs#188416:mf:
+
+hpdat-90m|HP DAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=hpdat-60m:
+apunix-hpdat|hpdat|hpdat-60m|HP DAT with ApUNIX driver:\
+        :dt=HP DAT DDS 4mm:tt=DG-60M:tc=apunix-dat:
+dat-90m|WangDAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=dat-60m:
+apunix-dat|dat|dat-60m|WangDAT 1300 DDS with ApUNIX driver:\
         :dt=WangDAT 1300 DDS 4mm:tt=DG-60M:ts#1274378:\
         :bs#0:mr#0:or#65536:fb#10:fs#127000:mf:fe#2000:
 sun-exabyte|exb8200|Exabyte on Sun ST driver:\
-        :dt=Exabyte EXB-8200 8mm tape drive:tt=P6-120MP:ts#2200000:\
-        :bs#0:mr#0:or#65536:fb#10:rs#2000:fs#2200000:mf:re:
+        :dt=Exabyte EXB-8200 8mm tape drive:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#0:or#65536:fb#10:rs#2000:fs#2252800:mf:re:
+ciprico-exabyte|Exabyte on Ciprico RT driver:\
+        :dt=Exabyte EXB-8200 8mm tape drive on Ciprico controller:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#0:or#65536:fb#10:rs#2000:fs#2252800:mf:re:se:
 apunix-exabyte|Exabyte on ApUNIX driver:\
         :dt=Exabyte EXB-8200 8mm tape drive with ApUNIX driver:\
-	:tt=P6-120MP:ts#2200000:\
-        :bs#0:mr#64512:or#64512:fb#10:rs#2000:fs#500000:mf:re:
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#64512:or#64512:fb#10:rs#2000:fs#188416:mf:re:
 qic-11|QIC-11 cartridge tape:\
 	:dt=QIC-11 4 track 1/4inch cartridge tape drive:tt=DC-300A:ts#20000:\
 	:bs#512:mr#64512:or#64512:fb#22:re:nb:fe#2000:
@@ -114,9 +114,10 @@ qic-150|QIC-150 cartridge tape:\
 9tk-800|9track 1/2 inch tape drive at 800 bpi:\
 	:dt=9 track at 800 bpi:tt=2400 foot:ts#20000:\
 	:dn#800:bs#0:mr#65535:or#65535:fb#10:
-tk50|TK50 1/2 inch cartridge tape drive:\
-	:dt=DEC TK50 1/2 inch cartridge tape:tt=TK50:ts#95000:\
-	:dn#6667:bs#0:mr#64512:or#64512:fb#10:se:nf:
-tz30|TZ30 1/2 inch cartridge tape drive (VAX):\
-	:dt=DEC TZ30 1/2 inch cartridge tape:tt=TK50:ts#95000:\
-	:dn#6667:bs#0:mr#16384:or#16384:fb#5:se:nf:
+
+tc|appletape|Macintosh DC2000 cartridge tape drive:\
+        :dt=Apple Tape 40SC:tt=DC2000:ts#38500:\
+        :bs#8192:mr#0:or#65536:fb#22:se:nf:
+fdhd|Macintosh FDHD 1440 Kb floppy disk:\
+        :dt=Apple FDHD 1440 Kb floppy disk:tt=FDHD:ts#1440:\
+        :bs#512:mr#0:or#65536:fb#22:nb:np:

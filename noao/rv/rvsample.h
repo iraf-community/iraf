@@ -42,4 +42,3 @@ define	RRCOUNT		SR_COUNT(RV_RSAMPLE($1))    # Temp. # of samples
 define	RSRANGE		SRANGE(RV_RSAMPLE($1),$2)   # Temp. start of range
 define	RERANGE		ERANGE(RV_RSAMPLE($1),$2)   # Temp. end of range
 define	RNPSAMP		NPSAMP(RV_RSAMPLE($1),$2)   # Temp. npts in sample
-

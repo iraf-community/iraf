@@ -100,6 +100,7 @@ begin
 	}
 
 	# Compute the errors.
-	call amovkr (0.0, perr, npar)
+	npar = NPARAMETERS
+	call amovkr (0.0, perr, NPARAMETERS)
 	return (AP_OK)
 end

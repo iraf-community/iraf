@@ -18,7 +18,7 @@ int	i, ncoeff
 pointer	sp, coeff, sfx, sfn, ptr1, ptr2, ptr3
 
 bool	fpequald()
-int	gsgeti()
+int	dgsgeti()
 
 begin
 	# test for NULL surface
@@ -26,7 +26,7 @@ begin
 	    sf3 = NULL
 	    return
 	} else if (sf1 == NULL) {
-	    ncoeff = gsgeti (sf2, GSNSAVE)
+	    ncoeff = dgsgeti (sf2, GSNSAVE)
 	    call smark (sp)
 	    call salloc (coeff, ncoeff, TY_DOUBLE)
 	    call gssave (sf2, Memd[coeff])

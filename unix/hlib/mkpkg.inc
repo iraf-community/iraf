@@ -6,18 +6,14 @@ $set	MACH		= $(IRAFARCH)	# machine/fpu type
 $set	HOSTID		= unix		# host system name
 $set	SITEID		= noao		# site name
 
-$ifeq (MACH, ddec) then
-$set	XFLAGS		= "-c -/G -//0"
-$set	XVFLAGS		= "-c -/G -//0"
-$set	LFLAGS		= ""
-$else $ifeq (MACH, dmip) then
-$set	XFLAGS		= "-c -/G -//0 -/Olimit -//1024"
-$set	XVFLAGS		= "-c -/G -//0 -/Olimit -//1024"
-$set	LFLAGS		= ""
+$ifeq (MACH, linux) then
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-z -t -/static"	# default XC link flags
 $else
-$set	XFLAGS		= "-c -/G -//0"
-$set	XVFLAGS		= "-c -/G -//0"
-$set	LFLAGS		= ""
+$set	XFLAGS		= "-c"		# default XC compile flags
+$set	XVFLAGS		= "-c"		# VOPS XC compile flags
+$set	LFLAGS		= ""		# default XC link flags
 $end
 
 $set	USE_LIBMAIN	= yes		# update lib$libmain.o (root object)
@@ -25,13 +21,13 @@ $set	USE_KNET	= yes		# use the KI (network interface)
 $set	USE_SHLIB	= no		# use (update) the shared library
 $set	USE_CCOMPILER	= yes		# use the C compiler
 $set	USE_GENERIC	= yes		# use the generic preprocessor
-$set	USE_NSPP	= yes		# make the NCAR/NSPP graphics kernel
-$set    USE_IIS         = yes           # make the IIS display control package
+$set	USE_NSPP	= no		# make the NCAR/NSPP graphics kernel
+$set    USE_IIS         = no		# make the IIS display control package
 $set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
 $set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 
-$ifeq (MACH, ddec) then
-$include "hlib$mkpkg.sf.DDEC"
-$else $ifeq (MACH, dmip) then
-$include "hlib$mkpkg.sf.DMIP"
+$ifeq (MACH, linux) then
+    $include "hlib$mkpkg.sf.LINUX"
+$else
+    $include "hlib$mkpkg.sf.LINUX"
 $end

@@ -1,7 +1,7 @@
 include	<imhdr.h>
 include	<mach.h>
 include	"dctable.h"
-include	"../shdr.h"
+include	<smw.h>
 
 
 # DC_TABLE -- Set default wavelengths.
@@ -18,7 +18,7 @@ pointer	table			# Table pointer (returned)
 int	naps			# Number of apertures (returned)
 
 int	i, j, ap, nw, fd, clgeti(), open(), fscan(), nscan(), btoi(), nowhite()
-double	w1, w2, dw, clgetd()
+double	ws, we, dw, clgetd()
 pointer	sp, fname, tbl, mw, sh, immap(), smw_openim()
 bool	clgetb()
 errchk	smw_openim(), shdr_open()
@@ -56,26 +56,20 @@ begin
 			tbl = Memi[table+i]
 			TBL_AP(tbl) = AP(sh)
 			TBL_NW(tbl) = SN(sh)
-			if (DC(sh) == DCLOG) {
-			    TBL_W1(tbl) = log10 (W0(sh))
-			    TBL_W2(tbl) = log10 (W1(sh))
-			    TBL_DW(tbl) = log10 (W1(sh) / W0(sh)) / (SN(sh) - 1)
-			} else {
-			    TBL_W1(tbl) = W0(sh)
-			    TBL_W2(tbl) = W1(sh)
-			    TBL_DW(tbl) = WP(sh)
-			}
+			TBL_W1(tbl) = W0(sh)
+			TBL_W2(tbl) = W1(sh)
+			TBL_DW(tbl) = WP(sh)
 		    }
 		}
 		call shdr_close (sh)
-		call mw_close (mw)
+		call smw_close (mw)
 		call imunmap (fd)
 	    } else {
 		ifnoerr (fd = open (Memc[fname], READ_ONLY, TEXT_FILE)) {
 		    while (fscan (fd) != EOF) {
 			call gargi (ap)
-			call gargd (w1)
-			call gargd (w2)
+			call gargd (ws)
+			call gargd (we)
 			call gargd (dw)
 			call gargi (nw)
 			if (nscan() < 5)
@@ -84,8 +78,8 @@ begin
 			call dc_getentry (false, ap, table, naps, i)
 			tbl = Memi[table+i]
 			TBL_AP(tbl) = ap
-			TBL_W1(tbl) = w1
-			TBL_W2(tbl) = w2
+			TBL_W1(tbl) = ws
+			TBL_W2(tbl) = we
 			TBL_DW(tbl) = dw
 			TBL_NW(tbl) = nw
 		    }
@@ -93,6 +87,21 @@ begin
 		} else
 		    call error (1, "Can't access wavelength table")
 	    }
+	}
+
+	# If ignoreaps=yes then replace INDEFs in the default entry with
+	# the first non-INDEF entry.
+
+	if (clgetb ("ignoreaps") && naps > 0) {
+	    tbl= Memi[table]
+	    if (IS_INDEFD(TBL_W1(tbl)))
+		TBL_W1(tbl) = TBL_W1(Memi[table+1])
+	    if (IS_INDEFD(TBL_W2(tbl)))
+		TBL_W2(tbl) = TBL_W2(Memi[table+1])
+	    if (IS_INDEFD(TBL_DW(tbl)))
+		TBL_DW(tbl) = TBL_DW(Memi[table+1])
+	    if (IS_INDEFI(TBL_NW(tbl)))
+		TBL_NW(tbl) = TBL_NW(Memi[table+1])
 	}
 
 	call sfree (sp)

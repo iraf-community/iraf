@@ -47,14 +47,14 @@ length and written to disk.  If 'errignore' is 'yes' when an error is
 found, the the input buffer is disposed of for that record.
 .ih
 EXAMPLES
-To read the second image from mta at 1600 bpi, store the image into
+1. To read the second image from mta at 1600 bpi, store the image into
 "image" and see verbose output the command would be:
 
 .nf
 	cl> t2d mta1600[2] image
 .fi
 
-To read all the files on mtb at the default speed of 1600 bpi and put
+2. To read all the files on mtb at the default speed of 1600 bpi and put
 the disk files in root001, root002, root003, etc. and turn off verbose
 output, the command would be:
 
@@ -64,4 +64,7 @@ output, the command would be:
 
 The program will prompt the user and ask for the list of files to be read
 to which the response would be "1-999".
+.ih
+SEE ALSO
+reblock
 .endhelp

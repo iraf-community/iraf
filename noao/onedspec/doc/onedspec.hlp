@@ -1,4 +1,4 @@
-.help package Mar92 noao.onedspec
+.help package Nov94 noao.onedspec
 .ih
 NAME
 onedspec -- generic 1D spectral reduction and analysis package
@@ -41,6 +41,38 @@ Spectrum interpolation type used when spectra are resampled.  The choices are:
 	   sinc - sinc function
 .fi
 .le
+
+The following parameters apply to two and three dimensional images
+such as long slit or Fabry-Perot spectra.  They allow selection of
+a line or column as the spectrum "aperture" and summing of neighboring
+elements to form a one dimensional spectrum as the tasks in the
+ONEDSPEC package expect.
+
+.ls dispaxis = 1
+The image axis corresponding to the dispersion.  If there is an image
+header keyword DISPAXIS then the value of the keyword will be used
+otherwise this package parameter is used.  The dispersion coordinates
+are a function of column, line, or band when this parameter is 1, 2
+or 3.
+.le
+.ls nsum = "1"
+The number of neighboring elements to sum.  This is a string parameter
+that can have one or two numbers.  For two dimensional images only
+one number is needed and specifies the number of lines or columns
+to sum depending on the dispersion axis.  For three dimensional
+images two numbers may be given (if only one is given it defaults
+to the same value for both spatial axes) to specify the summing of
+the two spatial axes.  The order is the lower dimensional spatial
+axis first.
+
+For an even value the elements summed are the central specified
+"aperture", nsum / 2 - 1 below, and nsum /2 above; i.e the
+central value is closer to the lower element than the upper.
+For example, for nsum=4 and an aperture of 10 for a dispersion
+axis of 1 in a two dimensional image the spectrum used will be
+the sum of lines 9 to 12.
+.le
+
 .ls records = ""
 This is a dummy parameter.  It is applicable only in the \fBimred.irs\fR
 and \fBimred.iids\fR packages.
@@ -74,6 +106,7 @@ Table 1:  Functions provided in the \fBonedspec\fR package
        identify - Identify features and fit dispersion functions
      refspectra - Assign reference spectra to other spectra
      reidentify - Automatically identify features in spectra
+      specshift - Shift spectral dispersion coordinate system
 
 3.  Determining and applying flux calibrations
       calibrate - Apply extinction and flux calibrations to spectra
@@ -115,426 +148,31 @@ Table 2:  \fBImred\fR spectroscopy packages
 
 .nf
  	  argus - CTIO ARGUS reduction package
-	echelle - Generic Echelle spectral reductions
-	    foe - Fiber Optic Echelle spectral reductions
-        goldcam - KPNO GOLDCAM reduction package
+       ctioslit - CTIO spectrophotometric reduction package
+	echelle - Echelle spectral reductions (slit and FOE)
  	  hydra - KPNO HYDRA (and NESSIE) reduction package
 	   iids - KPNO IIDS spectral reductions
 	    irs - KPNO IRS spectral reductions
-        kpcoude - KPNO Coude reduction package
-	  msred - Generic multiple spectra data reduction package
- 	specred - CTIO Spectrophotometric reduction package
+      kpnocoude - KPNO coude reduction package (slit and 3 fiber)
+       kpnoslit - KPNO low/moderate dispersion slits (Goldcam, RCspec, Whitecam)
+        specred - Generic slit and fiber spectral reduction package
 .fi
 
 Finally, there are non-NOAO packages which may contain generally useful
 software for spectra.  Currently available packages are \fBstsdas\fR
 and \fBxray\fR.
-
 .ih
-SPECTRUM IMAGE FORMATS
-One dimensional spectra consist of an ordered vector of data values with an
-associated set of coordinates.  Generally the data consist of a continuous
-sequence of pixels whose value is the flux integral over the extent of the
-pixel.  In terms of pixel coordinates, a pixel center is at an integer
-value and the pixel edges are at the half integer values on either side.
-In some cases it is important to remember this definition.  The
-DISPERSION COORDINATES section discusses the coordinate systems further.
-
-One dimensional spectra are stored as one or more lines in an image, each
-line possibly having an independent dispersion sampling but sharing many
-common header parameters.  There may be single spectra in one dimensional
-images, multiple spectra in two dimensional images, and spectra with
-associated parameters stored in a third dimension.  The spectra are
-identified by an aperture number, which is unique in a single image, and a
-beam number.  In many tasks it is possible to specify spectra to be used by
-these numbers.
-
-In addition, spectra may be true two or three dimensional images with the
-other dimensions generally being spatial dimensions.  Currently only two
-dimensional images are supported but there are plans to add Fabry-Perot
-(and other) types of image cubes.  The typical example of 2D spectra are
-long slit images.  Rather than require a separate extraction step to select
-regions of the higher dimensional image to be summed to form a one
-dimensional spectrum, the \fBonedspec\fR tasks allow neighboring lines or
-columns to be summed automatically and treated as one dimensional spectra.
-In this case the dispersion axis is either defined in the image header with
-the DISPAXIS keyword or with a task or package parameter.
-The number of neighboring
-elements is also a parameter.  Such simple aperture spectra are also
-referenced by aperture and beam numbers which are the central line or
-column.  The aperture and beam numbers are identical in this case.
-
-An important task to be aware of for manipulating spectra between image
-formats is \fBscopy\fR.  This task allows selecting spectra from multiple
-spectrum images and grouping them in various ways.  This task may also be
-used to "extract" apertures from long slit spectra simply without resort to
-the more general \fBapextract\fR package.
-
-There are plans to someday have more general data structures that allow
-grouping independent spectra in various ways without resorting to using
-multidimensional images.
-.ih
-DISPERSION COORDINATES
-IRAF images have three types of coordinate systems.  The array or pixel
-coordinates of the pixels in an image or image section, i.e. the lines and
-columns, are called the "logical" coordinates.  The logical coordinates of
-individual pixels change as sections of the image are used or extracted.
-Pixel coordinates which are tied to the data in the pixels, i.e. features
-in the image, are called "physical" coordinates.  Initially the logical
-and physical coordinates are the same and differ when image sections
-are applied.
-
-The last type of coordinate system is called the "world" coordinate
-system.  Like the physical coordinates, the world coordinates are tied to
-the features in the image and remain unchanged when sections of the image
-are used or extracted.  If a world coordinate system is not defined for an
-image, the physical coordinate system is considered to be the world
-coordinate system.  In spectral images the world coordinate system consist
-of dispersion coordinates such as wavelengths.  In many tasks outside the
-spectroscopy packages, for example the \fBplot\fR, \fBtv\fR and
-\fBimages\fR packages, one may select the type of coordinate system to be
-used.  To make plots and get coordinates in dispersion units for spectra
-with these tasks one selects the "world" system.
-
-The coordinate systems are defined in the image headers using a set of
-reserved keywords which are set, changed, and updated by IRAF tasks.
-While the keywords are visible to the user they are not intended to be
-modified directly by the user, say using the header editor.  While some
-of the reserved keywords have single simple values, there are some
-keywords which are used to contain long strings split between many
-keywords.  These long, split strings are called attributes.
-
-There are two types of world coordinate systems currently used in spectra.
-The simplest is a "linear" system; one that has a constant dispersion
-increment per pixel.  This is used in two dimensional long slit spectra
-and in "linearized" one dimensional spectra in which there is only a single
-spectrum per image.  This system is simple and somewhat portable to other
-software systems since it uses standardized FITS keywords.  If such
-portability is required then spectra should be linearized using
-\fBdispcor\fR and converted to single spectra per image, say with \fBscopy\fR,
-prior to storing in FITS format.  Figure 1 shows examples of
-image headers from a one dimensional spectrum with a linear dispersion
-function and a distortion and dispersion calibrated long slit spectrum.
-
-.ce
-Figure 1: Examples of 1D and 2D linear coordinate systems
-
-.nf
-    example1[512][real]: One Dimensional Linear Dispersion Example
-	WCSDIM  =                    1
-	CTYPE1  = 'LINEAR  '
-	CRPIX1  =                   1.
-	CRVAL1  =      4199.6539492787
-	CDELT1  =       6.168933303812
-	CD1_1   =       6.168933303812
-	WAT0_001= 'system=linear
-	WAT1_001= 'wtype=linear label=Wavelength units=Angstroms
-	DC-FLAG =                    0
-	APNUM   =                    2
-	BEAM-NUM=                    2
-	DOPCOR  =                  3.2
-	APLOW   =                61.83
-	APHIGH  =                71.83
-
-    example2d[100,512][real]: Distortion Corrected Long Slit Example
-	DISPAXIS=                    2
-	CRPIX1  =                   1.
-	CRVAL1  =                   1.
-	CDELT1  =                   1.
-	CD1_1   =                   1.
-	CRPIX2  =                   1.
-	CRVAL2  =             4199.802
-	CDELT2  =             6.168594
-	CD2_2   =             6.168594
-.fi
-
-The first example is a one dimensional image with a world coordinate system
-(WCS) dimensionality of one as given by the WCSDIM keyword; the dispersion
-coordinate depends only on one pixel coordinate.  Later there will be
-examples of coordinate systems which are two dimensional.  The CTYPE1
-keyword as well as the "system" and "wtype" attributes identify the
-coordinate system as linear.  The linear dispersion function is defined by
-a coordinate value, CRVAL1, at a logical pixel coordinate, CRPIX1 (which
-may be off the actual image), and an increment per pixel, CD1_1 and
-CDELT1.  The DC-FLAG keyword identifies the coordinate system as
-uncalibrated (-1), linear in wavelength (0), or linear in the logarithm of
-the wavelength (1).  An optional keyword, DOPCOR, specifies a redshift to
-be applied to the coordinates.  It is not included if the value is zero.
-
-The other keywords shown specify the spectrum aperture and beam numbers and
-the extraction limits if the spectrum was extracted from a two dimensional
-image using the \fBapextract\fR package.  These keywords are shown here
-because they map into the more complicated "multispec" coordinate systems
-described below.  The remaining attributes give the type or label for the
-dispersion type and the units.
-
-The long slit linear coordinate system produced by the task
-\fBlongslit.transform\fR is quite simple.  The dispersion axis is
-identified by the DISPAXIS keyword.  The other keywords define the linear
-coordinates on each axis in the same way as is done for the one dimensional
-linear coordinate system.
-
-The more complex spectral coordinate system is called "multispec".  This is
-used when the spectra have nonlinear dispersion sampling or when multiple
-spectra are stored per image.  A sample of multiple, linear dispersion spectra
-is shown in Figure 2.
-
-.ce
-Figure 2: Example of linear multispec coordinate system
-
-.nf
-    example2.ms.imh[512,2][real]: Simple Linear Multispec Example
-	WCSDIM  =                    2
-	CTYPE1  = 'MULTISPE'
-	CTYPE2  = 'MULTISPE'
-	CDELT1  =                   1.
-	CDELT2  =                   1.
-	CD1_1   =                   1.
-	CD2_2   =                   1.
-	WAT0_001= 'system=multispec
-	WAT1_001= 'wtype=multispec label=Wavelength units=Angstroms
-	WAT2_003= ' 512 0. 61.83 71.83"
-	WAT2_001= 'wtype=multispec spec1 = "1 1 0 4199.59 6.16
-	WAT2_002= '12 0. 23.81 33.81" spec2 = "2 2 0 4199.65 6.16
-	WAT2_003= ' 512 0. 61.83 71.83"                                             
-.fi
-
-In this example there are two spectra.  Since the world coordinate of a
-pixel depends both on the image line and column the coordinate system
-dimensionality is 2 and both axes are identified as part of the "MULTISPEC"
-coordinate system.  The linear coordinate keywords for both image
-dimensions are given but are not used.  The dispersion function information
-is contained in the "spec" attributes, one per image line with the
-appended number identifying the line.  Note how the attribute descriptions
-are stored in long, split strings covered by the sequence of WAT
-keywords.  The "spec" attribute strings are described in the MULTISPEC
-ATTRIBUTES section.  In outline, the attributes pack the aperture, beam
-number, dispersion type, linear dispersion coefficients, number of valid
-pixels, doppler factor, and aperture limits that were described previously
-for the "linear" coordinate system into a single long string.
-
-One important difference is that in the linear coordinate system the linear
-coefficients are in given in terms of the logical pixel coordinates while
-in the multispec coordinate system the coefficients are in terms of the physical
-coordinates.  Image section operations will change the linear system
-coefficients but not the coefficients in the spec attributes of the
-multispec system.  Also the reference coordinate is always the first
-physical pixel in the multispec system.  Another difference is that since
-multiple spectra of different lengths may be in the same image, the number
-of valid pixels is used to define the lengths with the the unused pixels
-following the valid pixels.
-
-There are several ways nonlinear dispersion coordinate systems may be
-specified.  These include a functional representation, a sampled table with
-linear interpolation between the sample points, and an array containing the
-coordinates of each pixel.  In addition, there may be two or more such
-functions for a spectrum which are combined using specified weights.
-Typically this would consist of two functions of the same form derived from
-arc calibration spectra bracketing the object spectrum in time with the
-weights based on the relative time between the arc spectra and the object
-spectra.  Figure 3 shows a fairly simple nonlinear dispersion
-function.
-
-.ce
-Figure 3: Example of nonlinear multispec coordinate system
-
-.nf
-    example3.imh[512][real]: Nonlinear dispersion example
-	WCSDIM  =                    2
-	CTYPE1  = 'MULTISPE'
-	CTYPE2  = 'MULTISPE'
-	CDELT1  =                   1.
-	CDELT2  =                   1.
-	CD1_1   =                   1.
-	CD2_2   =                   1.
-	WAT0_001= 'system=multispec
-	WAT1_001= 'wtype=multispec label=Wavelength units=Angstroms
-	WAT2_001= 'wtype=multispec spec1 = "2 2 2 1. 1. 512 0. 61.83
-	WAT2_002= ' 71.83 1. 0. 3 1 1 512. 162.23 702.47 1227.52 173
-	WAT2_003= '9.548231273"
-.fi
-
-The first part of the spec attributes are the same as for the linear
-multispec case except the dispersion type indicates a nonlinear dispersion
-function and the linear coefficients are not used.  The remaining numbers
-define the nonlinear functions as described later.  In this case there is a
-single "curfit" dispersion function produced by \fBidentify\fR.  The
-sampled functions are similar except the coefficients are arrays of dispersion
-coordinates which are linearly interpolated.
-
-The above examples did not show additional coordinate system keywords which
-appear when image sections are applied.  These keywords provide the
-translation from the logical image pixel coordinates to the original
-physical coordinates.  Remember that the multispec dispersion functions are
-in terms of physical coordinates while the linear WCS is in terms of
-logical coordinates.
-
-.ce
-Figure 4:  Example of coordinate system with image section terms
-
-.nf
-    example1a[145][real]: Example of a copy of an image section
-	New copy of example1[300:11:-2]
-	WCSDIM  =                    1
-	CTYPE1  = 'LINEAR  '
-	CRPIX1  =                150.5
-	CRVAL1  =      4199.6539492787
-	CDELT1  =     -12.337866607624
-	CD1_1   =     -12.337866607624
-	LTM1_1  =                 -0.5
-	LTV1    =                 151.
-	WAT0_001= 'system=linear
-	WAT1_001= 'wtype=linear label=Wavelength units=Angstroms
-	DC-FLAG =                    0
-	APNUM   =                    2
-	BEAM-NUM=                    2
-	APLOW   =                61.83
-	APHIGH  =                71.83
-.fi
-
-The LTV terms define an offset of the logical coordinates from the
-physical coordinates and the LTM terms are a scale and rotation matrix.
-In this example the copy flipped the direction of the original spectrum,
-sampled every second pixel and starts with the original pixel 300.
-
-Spectral formats produced by versions of IRAF prior to V2.10 are still
-recognized.  In particular the oldest "onedspec" format using W0 and
-WPC keywords and the "multispec" and "echelle" formats using the
-APNUM keywords are recognized.
-.ih
-MULTISPEC ATTRIBUTES
-Each spectrum in an image using the multispec coordinate system has an
-attribute with the identifier "spec" and the image physical line
-number appended.  Note that even if image lines are removed by an image
-section the relation between the logical image line and the original
-physical image line is preserved by the IRAF coordinate system allowing the
-correct attribute to be found for any line in the image section.
-
-The attributes are long strings of space separated numbers.  While it is
-not intended that users interpret or directly modify these numbers they
-always ask anyway.  Therefore, this section describes the meaning of each
-field in the attributes.  Table 3 defines the fields, in the order in which
-they appear, in terms of symbolic names.  The first set of fields are
-present for both the linear and nonlinear dispersion functions.  See Figure
-2 above for an example.
-
-The nonlinear dispersion functions
-follow the first nine fields.  The dispersion type has a value of 2
-in this case.  There may be more than one dispersion function and each may
-be of any type.  When there is more than one, the dispersion coordinate
-at any physical pixel coordinate is the weighted average of the function
-values at that point with the weight given by the value in the weight
-field.
-
-The weight, shift, and function type fields are common to all the
-functions.  The shift is a dispersion value added to the values obtained by
-evaluating the dispersion function.  Shifts are determined by
-\fBidentify/reidentify\fR when it is desired to preserve the shape
-of the dispersion function but adjust a zero point.  The function
-type consists of a code for the CURFIT functions, the pixel coordinate
-array, and the sampled coordinates.  The data which follows then
-depends on the type of function.
-
-The CURFIT functions are those generated by the IRAF \fBcurfit\fR math
-package.  These are the functions fit by \fBidentify/reidentify\fR
-and their stored form is identical with that in the database entries
-created by those tasks.  The fields include, in the order in which they
-appear, the number of terms in the polynomials or the number of pieces in
-the splines, the range of physical pixel coordinates over which the
-function is defined, and the coefficients.  When the value at a particular
-physical pixel is evaluated it is first normalized to the range -1 to 1 by
-the range terms.  The coefficients are, therefore, in terms of this
-normalized variable.  Figure 3 gives an example of a single
-cubic spline dispersion function.
-
-The first term in the pixel coordinate array is the length of the array.
-This is followed by that number of dispersion coordinates for each integer
-physical pixel coordinate starting with 1.  Evaluation of noninteger
-coordinates is done by linear interpolation.
-
-The first two terms in the sampled coordinate array is the number of
-coordinate pairs and a dummy field with a default value of 1.
-The sampled coordinate array consists of pairs of physical pixel coordinate
-and corresponding dispersion coordinate.  Linear interpolation is used
-between the sample points.  The coordinate pairs must be sorted
-in increasing order but may otherwise be arbitrarily sampled.  This is
-more general than the pixel coordinate array but becomes large for many
-sample points.
-
-
-.ce
-Table 3: MULTISPEC Dispersion Attribute Field Definitions
-
-The following fields, in this order, apply to all dispersion functions.
-
-.nf
-APNUM    - Spectrum aperture number
-BEAM-NUM - Spectrum beam number
-DC-FLAG  - Dispersion type with one of the following values:
-	        -1 - No dispersion function
-		 0 - Linear dispersion function
-		 1 - Log linear dispersion function
-		 2 - Nonlinear dispersion function
-CRVAL    - Coordinate at first physical pixel (DC-FLAG not 2)
-CDELT    - Coordinate interval per physical pixel (DC-FLAG not 2)
-NPIX     - Number of valid physical pixels
-DOPCOR   - Doppler correction factor given as a redshift
-APLOW    - Lower aperture limit for spectra extracted by APEXTRACT
-APHIGH   - Upper aperture limit for spectra extracted by APEXTRACT
-.fi
-
-The fields below follow the previous fields and apply to all the
-nonlinear functions.
-
-.nf
-WEIGHT   - Weight given to the dispersion function coordinates
-SHIFT    - Shift added to the dispersion function coordinates
-TYPE     - Function type with one of the following values:
-		1 - CURFIT Chebyshev polynomial
-		2 - CURFIT Legendre polynomial
-		3 - CURFIT cubic spline
-		4 - CURFIT linear spline
-		5 - Pixel coordinate array
-		6 - Sampled coordinates
-.fi
-
-The fields below follow the TYPE field for the CURFIT functions.
-
-.nf
-ORDER    - Number of polynomial terms or spline pieces
-XMIN     - Beginning of function range
-XMIN     - End of function range
-COEFF    - Function coefficients for an independent variable
-	   between -1 and 1
-.fi
-
-The fields below follow the TYPE field for the pixel coordinate array
-function type.
-
-.nf
-NCOORDS  - Number of dispersion coordinates
-COORDS   - Dispersion coordinates indexed by integer physical
-	   pixel coordinates
-.fi
-
-The fields below follow the TYPE field for the sampled coordinate array
-function type.
-
-.nf
-NCOORDS  - Number of dispersion coordinates pairs
-DUMMY    - Dummy field with value 1
-COORDS   - Physical coordinate/Dispersion coordinate pairs
-.fi
+SPECTRUM IMAGE FORMATS AND COORDINATE SYSTEMS
+See the separate help topic \fIspecwcs\fR.
 .ih
 INTERPOLATION
-Changing the dispersion sampling of spectra, such as when converting to
-a constant sampling interval per pixel or a common sampling for combining
-or doing arithmetic on spectra, requires interpolation.
-The tasks which
-reinterpolate spectra, if needed, are \fBdispcor, sarith, scombine,\fR
-and \fBsplot\fR.
+Changing the dispersion sampling of spectra, such as when converting to a
+constant sampling interval per pixel or a common sampling for combining or
+doing arithmetic on spectra, requires interpolation.  The tasks which
+reinterpolate spectra, if needed, are \fBdispcor, sarith, scombine,\fR and
+\fBsplot\fR.
 
-The interpolation type is set by the package parameter \fIinterp\R.
+The interpolation type is set by the package parameter \fIinterp\fR.
 The available interpolation types are:
 
 .nf
@@ -603,6 +241,7 @@ recognized standard scientific abbreviations such as mm for millimeter.
 		Table 1:  Unit Types
 
 	   angstroms - Wavelength in Angstroms
+	  nanometers - Wavelength in nanometers
 	millimicrons - Wavelength in millimicrons
 	     microns - Wavelength in microns
 	 millimeters - Wavelength in millimeters
@@ -611,15 +250,16 @@ recognized standard scientific abbreviations such as mm for millimeter.
 	       hertz - Frequency in hertz (cycles per second)
 	   kilohertz - Frequency in kilohertz
 	   megahertz - Frequency in megahertz
-	    gigahertz - Frequency in gigahertz
+	   gigahertz - Frequency in gigahertz
 	         m/s - Velocity in meters per second
 	        km/s - Velocity in kilometers per second
 	          ev - Energy in electron volts
 	         kev - Energy in kilo electron volts
 	         mev - Energy in mega electron volts
+		   z - Redshift
 .fi
 
-The velocity units require a trailing value and unit defining the
+The velocity and redshift units require a trailing value and unit defining the
 velocity zero point.  For example to plot velocity relative to
 a wavelength of 1 micron the unit string would be:
 
@@ -635,9 +275,9 @@ Some additional examples of units strings are:
 	inv mic
 	log hertz
 	m/s 3 inv mic
+	z 5015 ang
 .fi
 .ih
 SEE ALSO
-apextract, longslit, rv, imred spectroscopy packages, dispcor, identify,
-reidentify, dispaxis
+apextract, longslit, rv, imred, specwcs
 .endhelp

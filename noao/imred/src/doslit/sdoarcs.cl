@@ -12,8 +12,13 @@ struct	*fd
 
 begin
 	file	temp, arc1, arc2, str1
-	string	reid
+	string	imtype, mstype, reid
 	bool	verbose1
+	int	i, n
+
+	imtype = "." // envget ("imtype")
+	mstype = ".ms" // imtype
+	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
 
@@ -44,20 +49,20 @@ begin
 
 	    # Strip possible image extension.
 	    i = strlen (arc1)
-	    if (i > 4 && substr (arc1, i-3, i) == ".imh")
-		arc1 = substr (arc1, 1, i-4)
+	    if (i > n && substr (arc1, i-n+1, i) == imtype)
+		arc1 = substr (arc1, 1, i-n)
     
 	    # Set extraction output and aperture reference depending on whether
 	    # the arcs are to be rextracted using recentered or retraced object
 	    # apertures.
 
 	    arc2 = spec // arc1
-	    if (access (arc2//".ms.imh"))
-		imdelete (arc2//".ms.imh", verify=no)
+	    if (access (arc2//mstype))
+		imdelete (arc2//mstype, verify=no)
 	    delete (database//"/id"//arc2//".ms*", verify = no, >& "dev$null")
     
 	    # Extract and determine dispersion function if necessary.
-	    if (!access (arc2//".ms.imh")) {
+	    if (!access (arc2//mstype)) {
 		if (!batch)
 		    print ("Extract and reidentify arc spectrum ", arc1)
 		print ("Extract and reidentify arc spectrum ", arc1, >> logfile)
@@ -68,13 +73,12 @@ begin
 		    >& "dev$null")
 		reidentify (arcref1//".ms", arc2//".ms", interactive=reid,
 		    section="middle line", shift=0., step=1, nsum=1,
-		    cradius=sparams.cradius, threshold=10., nlost=100,
-		    refit=sparams.refit, trace=no, override=no,
+		    cradius=sparams.cradius, threshold=sparams.threshold,
+		    nlost=100, refit=sparams.refit, trace=no, override=no,
 		    newaps=yes, addfeatures=sparams.addfeatures,
 		    coordlist=sparams.coordlist, match=sparams.match,
-		    maxfeatures=50, minsep=2.,
-		    database=database, plotfile=plotfile,
-		    logfiles=logfile, verbose=verbose1)
+		    maxfeatures=50, minsep=2., database=database,
+		    plotfile=plotfile, logfiles=logfile, verbose=verbose1)
 
 		# If not reextracting arcs based on object apertures
 		# then save the extracted arc to avoid doing it again.

@@ -9,4 +9,3 @@
       MKOBSFILE  will run only on APPHOT/DAOPHOT output files written
       in  text  database  format (the default),  but  will not run on
       files written in ST tables format.
-

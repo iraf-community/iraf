@@ -27,9 +27,10 @@ output image.
 .le
 .ls ncols = INDEF, nlines = INDEF
 The number of columns and rows in the output image. The default is to
-keep the dimensions the same as the input image. If ncols or nrows is
+keep the dimensions the same as the input image. If ncols and nrows is
 less then or equal to zero the program will compute the number of columns
-and rows needed to include the whole image.
+and rows needed to include the whole image, excluding the effects of
+any origin shifts.
 .le
 .ls interpolant = "linear"
 The interpolant. The options are the following:
@@ -125,5 +126,5 @@ Simple 90, 270 etc degree rotations are best performed using the intranspose
 task and/or image section notation.
 .ih
 SEE ALSO
-intranspose, imshift, magnify, lintran, geotran, geomap
+imtranspose, imshift, magnify, lintran, geotran, geomap
 .endhelp

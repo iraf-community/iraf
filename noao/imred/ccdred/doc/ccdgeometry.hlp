@@ -39,7 +39,10 @@ The section of the image containing prescan or overscan bias information.
 It consists of a strip perpendicular to the readout axis.  There may be
 both a prescan and overscan but the package currently only uses one.
 This parameter may be overridden during processing by the parameter
-\fIccdproc.biassec\fR.
+\fIccdproc.biassec\fR.  Only the part of the bias section along the
+readout is used and the length of the bias region is determined by
+the trim section.  If one wants to limit the region of the bias
+strip used in the fit then the \fIsample\fR parameter should be used.
 .le
 .ls TRIMSEC
 The section of the image extracted during processing when the trim

@@ -1,6 +1,6 @@
 include	<error.h>
 include	<imhdr.h>
-include "shdr.h"
+include	<smw.h>
 
 define	EXTN_LOOKUP	10	# Interp index for de-extinction
 define	VLIGHT	2.997925e5	# Speed of light, Km/sec
@@ -13,6 +13,7 @@ int	inlist			# List of input spectra
 int	outlist			# List of output spectra
 double	z			# Doppler redshift or velocity
 bool	isvel			# Is redshift parameter a velocity?
+bool	add			# Add to existing correction?
 bool	dcor			# Apply dispersion correction?
 bool	fcor			# Apply flux correction?
 real	ffac			# Flux correction factor (power of 1+z)
@@ -20,18 +21,19 @@ pointer	aps			# Apertures
 bool	verbose			# Verbose?
 
 real	fcval
-bool	wc, fc
+bool	wc, fc, aplow[2], aphigh[2]
 int	i, j, ap, beam, nw, dtype
-double	w1, dw, zold, aplow,aphigh
-pointer	ptr, in, out, mw, sh
+double	w1, dw, zold, znew
+pointer	ptr, in, out, mw, sh, inbuf, outbuf
 pointer	sp, input, output, vkey, apstr, key, coeff
 
 real	clgetr()
 double	imgetd()
-bool	clgetb(), streq(), is_in_range()
-int	imtopenp(), imtgetim(), decode_ranges(), ctod()
-pointer	immap(), smw_openim(), impl3r()
-errchk	immap, smw_openim, shdr_open, shdr_gwattrs, imgetd, imgstr, impl3r
+bool	clgetb(), streq(), rng_elementi()
+int	imtopenp(), imtgetim(), ctod()
+pointer	rng_open(), immap(), smw_openim(), imgl3r(), impl3r()
+errchk	immap, imgetd, imgstr,imgl3r, impl3r
+errchk	smw_openim, shdr_open, smw_gwattrs
 
 begin
 	call smark (sp)
@@ -40,7 +42,6 @@ begin
 	call salloc (vkey, SZ_FNAME, TY_CHAR)
 	call salloc (apstr, SZ_FNAME, TY_CHAR)
 	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (aps, 300, TY_INT)
 	coeff = NULL
 
 	# Parameters
@@ -48,6 +49,7 @@ begin
 	outlist = imtopenp ("output")
 	call clgstr ("redshift", Memc[vkey], SZ_FNAME)
 	isvel = clgetb ("isvelocity")
+	add = clgetb ("add")
 	dcor = clgetb ("dispersion") 
 	fcor = clgetb ("flux")
 	if (fcor)
@@ -60,7 +62,7 @@ begin
 	# Parameter checks
 	if (!dcor && !fcor)
 	    call error (1, "No correction specified")
-	if (decode_ranges (Memc[apstr], Memi[aps], 100, i) == ERR)
+	iferr (aps = rng_open (Memc[apstr], INDEF, INDEF, INDEF))
 	    call error (1, "Bad aperture list")
 	if (Memc[apstr] == EOS)
 	    call strcpy ("all", Memc[apstr], SZ_LINE)
@@ -74,22 +76,43 @@ begin
 		in = NULL
 		out = NULL
 		mw = NULL
+		sh = NULL
 
-		# Map input and output images
-		if (streq (Memc[input], Memc[output])) {
-		    ptr = immap (Memc[input], READ_WRITE, 0); in = ptr
-		    out = in
-		} else {
-		    ptr = immap (Memc[input], READ_ONLY, 0); in = ptr
-		    ptr = immap (Memc[output], NEW_COPY, in); out = ptr
-		}
+		# Map and check input image.
+		if (streq (Memc[input], Memc[output]))
+		    ptr = immap (Memc[input], READ_WRITE, 0)
+		else
+		    ptr = immap (Memc[input], READ_ONLY, 0)
+		in = ptr
+
+		ptr = smw_openim (in); mw = ptr
+		call shdr_open (in, mw, 1, 1, INDEFI, SHHDR, sh)
+                if (DC(sh) == DCNO) {
+                    call sprintf (Memc[output], SZ_LINE,
+                        "[%s] has no dispersion function")
+                        call pargstr (Memc[input])
+                    call error (1, Memc[output])
+                }
+
+		# Map output image.
+		if (streq (Memc[input], Memc[output]))
+		    ptr = in
+		else
+		    ptr = immap (Memc[output], NEW_COPY, in)
+		out = ptr
 
 		# Set velocity and flux correction
 		i = 1
 		if (Memc[vkey] == '-' || Memc[vkey] == '+') {
-		    if (ctod (Memc[vkey+1], i, z) == 0)
+		    if (ctod (Memc[vkey+1], i, z) == 0) {
 			z = imgetd (in, Memc[vkey+1])
-		    if (Memc[vkey] == '-')
+			if (Memc[vkey] == '-') {
+			    if (isvel)
+				z = -z
+			    else
+				z = 1 / (1 + z) - 1
+			}
+		    } else if (Memc[vkey] == '-')
 			z = -z
 		} else {
 		    if (ctod (Memc[vkey], i, z) == 0)
@@ -97,64 +120,116 @@ begin
 		}
 		if (isvel) {
 		    z = z / VLIGHT
-		    z = sqrt ((1 - z) / (1 + z)) - 1
+		    if (abs (z) >= 1.)
+			call error (1, "Impossible velocity")
+		    z = sqrt ((1 + z) / (1 - z)) - 1
 		}
-		if (fcor)
+		if (z <= -1.)
+		    call error (1, "Impossible redshift")
+
+		if (fcor) {
 		    fcval = (1 + z) ** ffac
+		    if (in != out && IM_PIXTYPE(out) != TY_DOUBLE)
+			IM_PIXTYPE(out) = TY_REAL
+		}
 
-		# Check format
-		ptr = smw_openim (in); mw = ptr
-		call shdr_open (in, mw, i, 1, INDEFI, SHHDR, sh)
-		if (FORMAT(sh) != MULTISPEC)
-		    call error (1, "Spectrum must be in multispec format")
-
-		# Go through lines and apply corrections to selected apertures
-		do i = 1, IM_LEN(in,2) {
-		    call shdr_open (in, mw, i, 1, INDEFI, SHHDR, sh)
-		    if (is_in_range (Memi[aps], AP(sh))) {
-			wc = dcor
-			fc = fcor
-		    } else {
-			wc = false
-			fc = false
-		    }
-
-		    # Reset wcs
-		    if (wc) {
-			call shdr_gwattrs (mw, PINDEX1(sh), ap, beam, dtype,
+		# Go through spectrum and apply corrections.
+		switch (SMW_FORMAT(mw)) {
+		case SMW_ND:
+		    if (dcor) {
+			call smw_gwattrs (mw, 1, 1, ap, beam, dtype,
 			    w1, dw, nw, zold, aplow, aphigh, coeff)
-			call shdr_swattrs (mw, PINDEX1(sh), ap, beam, dtype,
-			    w1, dw, nw, z, aplow, aphigh, Memc[coeff])
+			if (add)
+			    znew = (1+z) * (1+zold) - 1
+			else
+			    znew = z
+			call smw_swattrs (mw, 1, 1, ap, beam, dtype,
+			    w1, dw, nw, znew, aplow, aphigh, Memc[coeff])
 		    }
 
-		    # Correct fluxes
-		    # Note that if the operation is in-place we can skip this
-		    # step if there is no corrections.  Otherwise we still
-		    # have copy the data even if there is no correction.
+		    if (fcor || in != out) {
+			do j = 1, IM_LEN(in,3) {
+			    do i = 1, IM_LEN(in,2) {
+				inbuf = imgl3r (in, i, j)
+				outbuf = impl3r (out, i, j)
+				if (fcor)
+				    call amulkr (Memr[inbuf], fcval,
+					Memr[outbuf], IM_LEN(in,1))
+				else
+				    call amovr (Memr[inbuf], Memr[outbuf],
+					IM_LEN(in,1))
+			    }
+			}
+		    }
+		case SMW_ES, SMW_MS:
+		    do i = 1, IM_LEN(in,2) {
+			call shdr_open (in, mw, i, 1, INDEFI, SHHDR, sh)
+			if (rng_elementi (aps, AP(sh))) {
+			    wc = dcor
+			    fc = fcor
+			} else {
+			    wc = false
+			    fc = false
+			}
 
-		    if (!fc && in == out)
-			next
+			if (wc) {
+			    call smw_gwattrs (mw, i, 1, ap, beam, dtype,
+				w1, dw, nw, zold, aplow, aphigh, coeff)
+			    if (add)
+				znew = (1+z) * (1+zold) - 1
+			    else
+				znew = z
+			    call smw_swattrs (mw, i, 1, ap, beam, dtype, w1,
+				dw, nw, znew, aplow, aphigh, Memc[coeff])
+			    if (mw != MW(sh)) {
+				MW(sh) = NULL
+				call shdr_close (sh)
+			    }
+			}
 
-		    do j = 1, IM_LEN(in,3) {
-			call shdr_open (in, mw, i, j, INDEFI, SHDATA, sh)
-			if (fc)
-			    call amulkr (Memr[SY(sh)], fcval, Memr[SY(sh)],
-				SN(sh))
-			call amovr (Memr[SY(sh)], Memr[impl3r(out,i,j)], SN(sh))
-			if (SN(sh) < IM_LEN(out,1))
-			    call aclrr (Memr[impl3r(out,i,j)+SN(sh)],
-				IM_LEN(out,1)-SN(sh))
+			# Correct fluxes
+			# Note that if the operation is in-place we can skip
+			# this step if there is no corrections.  Otherwise we
+			# still have to copy the data even if there is no
+			# correction.
+
+			if (fc || in != out) {
+			    do j = 1, IM_LEN(in,3) {
+				call shdr_open (in, mw, i, j, INDEFI,
+				    SHDATA, sh)
+				outbuf = impl3r (out, i, j)
+				if (fc)
+				    call amulkr (Memr[SY(sh)], fcval,
+					Memr[outbuf], SN(sh))
+				else
+				    call amovr (Memr[SY(sh)], Memr[outbuf],
+					SN(sh))
+				if (IM_LEN(out,1) > SN(sh))
+				    call amovkr (Memr[outbuf+SN(sh)-1],
+					Memr[outbuf+SN(sh)],
+					IM_LEN(out,1)-SN(sh))
+			    }
+			}
 		    }
 		}
 
 		# Verbose output
 		if (verbose) {
-		    call printf ("%s: Doppler correction - apertures=%s, ")
+		    call printf ("%s: Doppler correction -")
 			call pargstr (Memc[output])
-			call pargstr (Memc[apstr])
-		    call printf ("redshift=%8g, flux factor=%g\n")
+		    if (SMW_FORMAT(mw) != SMW_ND) {
+			call printf (" apertures=%s,")
+			    call pargstr (Memc[apstr])
+		    }
+		    call printf (" redshift=%8g, flux factor=%g\n")
 			call pargd (z)
 			call pargr (ffac)
+		    if (add && zold != 0.) {
+			call printf ("    Correction added: %g + %g = %g\n")
+			    call pargd (zold)
+			    call pargd (z)
+			    call pargd (znew)
+		    }
 		    call flush (STDOUT)
 		}
 
@@ -166,17 +241,19 @@ begin
 		call erract (EA_WARN)
 	    }
 
-	    if (mw != NULL) {
+	    if (mw != NULL && out != NULL)
 		call smw_saveim (mw, out)
-		call mw_close (mw)
-	    }
+	    if (sh != NULL)
+		call shdr_close (sh)
+	    if (mw != NULL)
+		call smw_close (mw)
 	    if (out != NULL && out != in)
 		call imunmap (out)
 	    if (in != NULL)
 		call imunmap (in)
 	}
 
-	call shdr_close (sh)
+	call rng_close (aps)
 	call imtclose (inlist)
 	call imtclose (outlist)
 	call mfree (coeff, TY_CHAR)

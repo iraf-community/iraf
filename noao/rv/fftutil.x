@@ -151,9 +151,9 @@ end
 
 # FFT_COSBEL - Apply a cosine bell to the data.
 
-procedure fft_cosbel (data, npts, code, percent)
+procedure fft_cosbel (v, npts, code, percent)
 
-real	data[ARB]			#U Data vector
+real	v[ARB]				#U Data vector
 int	npts				#I Number of data points
 int 	code				#I Direction code 
 					     # <0 for forward,  >=0 for reverse
@@ -172,8 +172,8 @@ begin
 	    do i = 1,ndpercent {
 	        f = (1.0 - cos(PI*real(i-1)/real(ndpercent))) / 2.0
 	        index = npts - i + 1
-	        data[i] =  f * data[i]
-	        data[index] =  f * data[index]
+	        v[i] =  f * v[i]
+	        v[index] =  f * v[index]
 	    }
 	} else if (code >= 0) {			# Reverse application of window
 	    do i = 1,ndpercent {
@@ -181,8 +181,8 @@ begin
 	        if (abs(f) < 1.0e-3) 
 		    f = 1.0e-3
 	        index = npts - i + 1
-	        data[i] = data[i] / f
-	        data[index] = data[index] / f
+	        v[i] = v[i] / f
+	        v[index] = v[index] / f
 	    }
 	}
 end
@@ -192,9 +192,9 @@ end
 # Recipes FFT routines.  Re-ordering is done such that points 1 to N/2 are
 # switched in the array with points N/2+1 to N.  Re-ordering is done in-place.
 
-procedure fft_fixwrap (data, npts)
+procedure fft_fixwrap (v, npts)
 
-real	data[ARB]			#U Data array in wrap around order
+real	v[ARB]				#U Data array in wrap around order
 int	npts				#I length of data array
 
 real 	temp
@@ -202,9 +202,9 @@ int 	i
 
 begin
 	do i = 1, npts/2 {
-	    temp = data[i]
-	    data[i] = data[i+npts/2]
-	    data[i+npts/2] = temp
+	    temp = v[i]
+	    v[i] = v[i+npts/2]
+	    v[i+npts/2] = temp
 	}
 end
 

@@ -396,7 +396,7 @@ end
 # PH_AGETIMAGE -- Read the next line in the input catalog and return the image
 # name and the line.
 
-int procedure ph_agetimage (fd, columns, image, line)
+int procedure ph_agetimage (fd, columns, image, line, lbufsize)
 
 int	fd		# file descriptor of the input text file
 int	columns[ARB]	# the list of input columns

@@ -1,4 +1,4 @@
-include	"../shdr.h"
+include	<smw.h>
 include	"ecidentify.h"
 
 # EC_DOFIT -- Fit an echelle function to the features.  Eliminate INDEF points.

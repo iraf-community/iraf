@@ -42,6 +42,7 @@ get_timezone()
 {
 #ifdef SYSV
 	extern	long timezone;
+	tzset();
 	return (timezone);
 #else
 	struct	timeb time_info;

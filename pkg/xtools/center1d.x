@@ -74,7 +74,7 @@ begin
 
 	switch (type) {
 	case EMISSION:
-	    a = 0.
+	    a = min (0., a)
 	    call asubkr (data[x1], a + threshold, Memr[data1], nx)
 	    call amaxkr (Memr[data1], 0., Memr[data1], nx)
 	case ABSORPTION:
@@ -166,7 +166,7 @@ begin
 	# there is a problem in the computation, 4) successive steps
 	# continue to exceed the minimum delta.
 
-	dxlast = 1.
+	dxlast = npts
 	do iteration = 1, ITERATIONS {
 	    # Ramp centering function.
 	    # a = xc - hwidth
@@ -201,9 +201,9 @@ begin
 		break
 
 	    # Limit dx change in one iteration to 1 pixel.
-	    dx = max (-1., min (1., sum1 / abs (sum2)))
+	    dx = sum1 / abs (sum2)
 	    dxabs = abs (dx)
-	    xc = xc + dx
+	    xc = xc + max (-1., min (1., dx))
 
 	    # Check data range.  Return no center if at edge of data.
 	    if ((xc - hwidth < 1) || (xc + hwidth > npts))
@@ -217,9 +217,8 @@ begin
 		if (dxcheck > MAX_DXCHECK)
 		    break
 	    } else if (dxabs > dxlast - EPSILON1) {
-		xc = xc - dx / 2.
+		xc = xc - max (-1., min (1., dx)) / 2
 		dxcheck = 0
-		dxlast = dxabs / 2.
 	    } else {
 		dxcheck = 0
 	        dxlast = dxabs

@@ -1,6 +1,5 @@
 include <imhdr.h>
 include	<fset.h>
-include	"../lib/daophot.h"
 include "../lib/daophotdef.h"
 
 # T_ALLSTAR  -- Group a list of stars into physical associations, fit the PSF
@@ -14,19 +13,23 @@ pointer	psfimage		# the input psf image
 pointer	photfile		# the input photometry file
 pointer	allstarfile		# the output photometry file
 pointer	subimage		# the output subtracted image
+pointer	rejfile			# the output rejections file
 int	cache			# cache the data in memory
+int	verbose			# verbose mode ?
+int	verify			# verify critical task parameters ?
+int	update			# update the task parameters ?
 
 bool	ap_text
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
-int	simlist, lsimlist
-int	photfd, psffd, allfd, root, savesub, verify, update
+int	simlist, lsimlist, rlist, lrlist, photfd, psffd, allfd, root, savesub
+int	rejfd
 pointer	sp, outfname, im, subim, dao
 
 bool	itob(), clgetb()
-int	open(), tbtopn(), fnldir(), strncmp(), strlen(), btoi(), access()
+int	open(), fnldir(), strncmp(), strlen(), btoi(), access()
 int	fstati(), imtopen, imtlen(), imtgetim(), fntopnb(), fntlenb()
 int	fntgfnb()
-pointer	immap()
+pointer	immap(), tbtopn()
 
 begin
 	# Set the standard output to flush on newline.
@@ -39,6 +42,7 @@ begin
 	call salloc (psfimage, SZ_FNAME, TY_CHAR)
 	call salloc (photfile, SZ_FNAME, TY_CHAR)
 	call salloc (allstarfile, SZ_FNAME, TY_CHAR)
+	call salloc (rejfile, SZ_FNAME, TY_CHAR)
 	call salloc (subimage, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 
@@ -48,8 +52,10 @@ begin
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("allstarfile", Memc[allstarfile], SZ_FNAME)
 	call clgstr ("subimage", Memc[subimage], SZ_FNAME)
+	call clgstr ("rejfile", Memc[rejfile], SZ_FNAME)
 
 	# Get the task mode parameters.
+	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	cache = btoi (clgetb ("cache"))
@@ -65,52 +71,71 @@ begin
 	lolist = fntlenb (olist)
 	simlist = imtopen (Memc[subimage])
 	lsimlist = imtlen (simlist)
+	rlist = fntopnb (Memc[rejfile], NO)
+	lrlist = fntlenb (rlist)
 
 	# Test the lengths of the photometry file, psf image and subtracted
 	# image lists are the same as the length of the input image.
 
-	if ((limlist != lalist) && (strncmp (Memc[photfile], "default",
-	    7) != 0)) {
+	if ((limlist != lalist) && (strncmp (Memc[photfile], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call imtclose (simlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatible image and photometry file list lengths")
 	}
 
-	if ((limlist != lpimlist) && (strncmp (Memc[psfimage], "default",
-	    7) != 0)) {
+	if ((limlist != lpimlist) && (strncmp (Memc[psfimage], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call imtclose (simlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatible image and psf file list lengths")
 	}
 
-	if ((limlist != lsimlist) && (strncmp (Memc[subimage], "default",
-	    7) != 0)) {
+	if ((limlist != lsimlist) && (strncmp (Memc[subimage], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call imtclose (simlist)
 	    call sfree (sp)
 	    call error (0,
 	        "Incompatible image and subtracted image list lengths")
 	}
 
-	if ((limlist != lolist) && (strncmp (Memc[allstarfile], "default",
-	    7) != 0)) {
+	if ((limlist != lolist) && (strncmp (Memc[allstarfile], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
 	    call fntclsb (alist)
 	    call imtclose (pimlist)
 	    call fntclsb (olist)
+	    call fntclsb (rlist)
+	    call imtclose (simlist)
+	    call sfree (sp)
+	    call error (0,
+	        "Incompatible image and subtracted image list lengths")
+	}
+
+	if ((lrlist > 0) && (limlist != lrlist) && (strncmp (Memc[rejfile],
+	    DEF_DEFNAME, DEF_LENDEFNAME) != 0)) {
+	    call imtclose (imlist)
+	    call fntclsb (alist)
+	    call imtclose (pimlist)
+	    call fntclsb (olist)
+	    call fntclsb (rlist)
 	    call imtclose (simlist)
 	    call sfree (sp)
 	    call error (0,
@@ -121,7 +146,9 @@ begin
 	# pset parameters
 
 	call dp_gppars (dao, NULL)	
-	call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
+
+	# Set some parameters.
+	call dp_seti (dao, VERBOSE, verbose)
 
 	# Verify and update the parameters as appropriate.
 	if (verify == YES) {
@@ -130,28 +157,33 @@ begin
 		call dp_pppars (dao)
 	}
 
+	# Initialize the PSF structure.
+	call dp_fitsetup (dao)
+
 	# Initialize the daophot fitting structure.
 	call dp_apsetup (dao)
-	call dp_fitsetup (dao)
+
+	# Initialize the allstar structure.
 	call dp_allstarsetup (dao)
 
 	# Loop over the images. 
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
+	    # Open the image and store some header parameters.
 	    im = immap (Memc[image], READ_ONLY, 0)		
 	    call dp_padu (im, dao)
 	    call dp_rdnoise (im, dao)
 	    call dp_otime (im, dao)
 	    call dp_filter (im, dao)
 	    call dp_airmass (im, dao)
-	    call dp_sets (dao, IMNAME, Memc[image])
+	    call dp_sets (dao, INIMAGE, Memc[image])
 
 	    # Open the input photometry file.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[photfile], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[photfile], SZ_FNAME)
 	    root = fnldir (Memc[photfile], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[photfile+root], 7) == 0 || root ==
-	        strlen (Memc[photfile]))
+	    if (strncmp (DEF_DEFNAME, Memc[photfile+root],
+	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[photfile]))
 	        call dp_inname (Memc[image], "", "mag", Memc[outfname],
 		    SZ_FNAME)
 	    else
@@ -161,15 +193,15 @@ begin
 	        photfd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
 	        photfd = tbtopn (Memc[outfname], READ_ONLY, 0)
-	    call dp_sets (dao, APFILE, Memc[outfname])
-	    call dp_getapert (dao, photfd, DP_MAXSTAR(dao) + 1, ap_text)
+	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
+	    call dp_getapert (dao, photfd, DP_MAXNSTAR(dao) + 1, ap_text)
 
 	    # Open the PSF image and read in the PSF.
 	    if (imtgetim (pimlist, Memc[psfimage], SZ_FNAME) == EOF)
-	        call strcpy ("default", Memc[psfimage], SZ_FNAME)
+	        call strcpy (DEF_DEFNAME, Memc[psfimage], SZ_FNAME)
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[psfimage+root], 7) == 0 || root ==
-	        strlen (Memc[psfimage]))
+	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
+	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
 	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
 		    SZ_FNAME)
 	    else
@@ -178,38 +210,53 @@ begin
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	    call dp_readpsf (dao, psffd)
 	
-	    # Open the output ALLSTAR file. If the output is "default",
+	    # Open the output ALLSTAR file. If the output is DEF_DEFNAME,
 	    # dir$default or a directory specification then the extension
 	    # "als" is added to the image name and a suitable version
 	    # number if appended to the output name.
 
 	    if (fntgfnb (olist, Memc[allstarfile], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[allstarfile], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[allstarfile], SZ_FNAME)
 	    root = fnldir (Memc[allstarfile], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[allstarfile+root], 7) == 0 || root ==
-	        strlen (Memc[allstarfile])) {
+	    if (strncmp (DEF_DEFNAME, Memc[allstarfile+root],
+	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[allstarfile]))
 	        call dp_outname (Memc[image], "", "als", Memc[outfname],
 		    SZ_FNAME)
-	        if (DP_TEXT(dao)  == YES)
-		    allfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-	        else
-		    allfd = tbtopn (Memc[outfname], NEW_FILE, 0)
-	    } else {
+	    else 
 	        call strcpy (Memc[allstarfile], Memc[outfname], SZ_FNAME)
+	    if (DP_TEXT(dao)  == YES)
+	        allfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	    else
+	        allfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
+
+	    if (lrlist <= 0) {
+		rejfd = NULL
+		Memc[outfname] = EOS
+	    } else {
+	        if (fntgfnb (rlist, Memc[rejfile], SZ_FNAME) == EOF)
+		    call strcpy (DEF_DEFNAME, Memc[rejfile], SZ_FNAME)
+	        root = fnldir (Memc[rejfile], Memc[outfname], SZ_FNAME)
+	        if (strncmp (DEF_DEFNAME, Memc[rejfile+root],
+		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[rejfile]))
+	            call dp_outname (Memc[image], "", "arj", Memc[outfname],
+		        SZ_FNAME)
+	        else 
+	            call strcpy (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (DP_TEXT(dao)  == YES)
-		    allfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	            rejfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	        else
-		    allfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	            rejfd = tbtopn (Memc[outfname], NEW_FILE, 0)
 	    }
-	    call dp_sets (dao, ALLSTARFILE, Memc[outfname])
+	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
 	    # Open the subtracted image.
 	    savesub = YES
 	    if (imtgetim (simlist, Memc[subimage], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[subimage], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[subimage], SZ_FNAME)
 	    root = fnldir (Memc[subimage], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[subimage+root], 7) == 0 || root ==
-	        strlen (Memc[subimage])) {
+	    if (strncmp (DEF_DEFNAME, Memc[subimage+root],
+	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[subimage])) {
 	        call dp_oimname (Memc[image], "", "sub", Memc[outfname],
 		    SZ_FNAME)
 	        subim = immap (Memc[outfname], NEW_COPY, im)
@@ -219,10 +266,10 @@ begin
 	        subim = immap (Memc[outfname], NEW_COPY, im)
 	        IM_PIXTYPE(subim) = TY_REAL
 	    }
-	    call dp_sets (dao, SUBIMAGE, Memc[outfname])
+	    call dp_sets (dao, OUTIMAGE, Memc[outfname])
 
 	    # Fit the stars.
-	    call dp_astar (dao, im, subim, allfd, cache, savesub)
+	    call dp_astar (dao, im, subim, allfd, rejfd, cache, savesub)
 
 	    # Close the input image.
 	    call imunmap (im)
@@ -242,6 +289,14 @@ begin
 	    else
 	        call tbtclo (allfd)
 
+	    # Close the output rejections files.
+	    if (rejfd != NULL) {
+	        if (DP_TEXT(dao) == YES)
+		    call close (rejfd)
+	        else
+	            call tbtclo (rejfd)
+	    }
+
 	    # Close the output subtracted image.
 	    call strcpy (IM_HDRFILE(subim), Memc[subimage], SZ_FNAME)
 	    call imunmap (subim)
@@ -249,17 +304,24 @@ begin
 	        call imdelete (Memc[subimage])
 	}
 
-	# Close the lists.
+	# Close the file/image lists.
 	call imtclose (imlist)
 	call fntclsb (alist)
 	call imtclose (pimlist)
 	call fntclsb (olist)
+	call fntclsb (rlist)
 	call imtclose (simlist)
 
-	# Close up the daophot structure.
+	# Close the allstar structure.
 	call dp_alclose (dao)
+
+	# Close the photometry structure.
 	call dp_apclose (dao)
+
+	# Close the PSF structure.
 	call dp_fitclose (dao)
+
+	# Close up the daophot structure.
 	call dp_free (dao)
 
 	call sfree(sp)

@@ -41,7 +41,7 @@
 #define SZ_OBUF		50000	/* buffers procedure body		*/
 #define SZ_DBUF		4096	/* for errchk, common, ect. decls	*/
 #define SZ_SBUF		8192	/* buffers text of strings		*/
-#define MAX_STRINGS	100	/* max strings in a procedure		*/
+#define MAX_STRINGS	256	/* max strings in a procedure		*/
 #define MAX_INCLUDE	5	/* maximum nesting of includes		*/
 #define	MIN_REALPREC	7	/* used by HMS				*/
 #define	SZ_NUMBUF	32	/* for numeric constants		*/

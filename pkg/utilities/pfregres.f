@@ -95,6 +95,7 @@ c
       wmean=sum/fnpts
       do 57 i=1,npts
 57    weight(i)=weight(i)/wmean
+
 c
 c accumulate matrices r and array
 c
@@ -150,17 +151,28 @@ c
 124   varnce=chisqr
 131   do 133 j=1,nterms
 132   sigmaa(j)=array(j,j)*varnce/(free1*sigmax(j)**2)
-      sigmaa(j)=sqrt(sigmaa(j))
+      if (sigmaa(j)) 835, 835, 836
+835   sigmaa(j) = 0.0
+      goto 133
+836   sigmaa(j)=sqrt(sigmaa(j))
 133   rmul=rmul+a(j)*r(j)*sigmax(j)/sigma
       freej=nterms
 c +noao: When rmul = 1, the following division (stmt 135) would blow up.
 c        It has been changed so ftest is set to -99999. in this case.
-      if (1. - rmul) 135, 935, 135
-135   ftest=(rmul/freej)/((1.-rmul)/freen)
-      goto 136
+      if (rmul) 935, 136, 136
 935   ftest = -99999.
+      rmul = -99999.
+      goto 141
 c -noao
-136   rmul=sqrt(rmul)
+136   if (1.0 - abs(rmul)) 1035, 1036, 1037
+1035  rmul=-99999.
+      ftest = -99999.
+      goto 141
+1036  ftest = -99999.
+      rmul = 1.0
+      goto 141
+1037  ftest=(rmul/freej)/((1.-rmul)/freen)
+      rmul=sqrt(rmul)
 141   sigma0=varnce/fnpts
       do 145 j=1,nterms
       do 145 k=1,nterms

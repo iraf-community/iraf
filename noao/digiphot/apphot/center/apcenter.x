@@ -21,7 +21,7 @@ int	out			# output file descriptor
 int	stid			# output file sequence number
 int	interactive		# interactive mode
 
-int	wcs, key, colonkey, newobject, newcenter, newlist, ier, oid
+int	wcs, key, colonkey, newimage, newobject, newcenter, newlist, ier, oid
 int	ip, prev_num, req_num, ltid
 pointer	sp, cmd
 real	wx, wy, xlist, ylist
@@ -39,6 +39,7 @@ begin
 	Memc[cmd] = EOS
 
 	# Initialize fitting parameters.
+	newimage = NO
 	newobject = YES
 	newcenter = YES
 	ier = AP_OK
@@ -48,7 +49,7 @@ begin
 	ltid = 0
 
 	# Loop over the cursor commands.
-	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
+	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 
 	    # Store the current cursor coordinates.
@@ -83,7 +84,7 @@ begin
 
 	    # Get information on keystroke commands.
 	    case '?':
-		if (id != NULL)
+		if ((id != NULL) && (id == gd))
 		    call gpagefile (id, HELPFILE, "")
 		else if (interactive == YES)
 		    call pagefile (HELPFILE, "[space=cmhelp,q=quit,?=help]")
@@ -116,6 +117,45 @@ begin
 	    case 'v':
 		call ap_cconfirm (ap, out, stid)
 
+	    # Measure the next object.
+	    case 'm', 'n':
+		if (cl != NULL) {
+		    prev_num = ltid
+		    req_num = ltid + 1
+		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+			ltid) != EOF) {
+		    	newlist = YES
+			if (key == 'm') {
+		    	    newobject = YES
+			    newcenter = YES
+			} else {
+		    	    ier = apfitcenter (ap, im, xlist, ylist)
+			    if (id != NULL) {
+			        call apmark (ap, id, apstati (ap, MKCENTER),
+				    NO, NO)
+		    	        if (id == gd)
+			            call gflush (id)
+		    	        else
+		                    call gframe (id)
+			    }
+			    call ap_cplot (ap, stid, gd, apstati (ap,
+			        RADPLOTS))
+			    if (interactive == YES)
+		    	        call ap_qcenter (ap, ier)
+		    	    if (stid == 1)
+			        call ap_param (ap, out, "center")
+			    call ap_cplot (ap, stid, mgd, YES)
+			    call ap_pcenter (ap, out, stid, ltid, ier)
+		    	    stid = stid + 1
+		    	    newobject = NO
+			    newcenter = NO
+			}
+		    } else if (interactive == YES)
+			call printf (
+			    "End of coordinate list, use r key to rewind\7\n")
+		} else if (interactive == YES)
+		    call printf ("No coordinate list\7\n")
+
 	    # Save centering parameters in the pset files.
 	    case 'w':
 		call ap_pcpars (ap)
@@ -127,37 +167,15 @@ begin
 		colonkey = Memc[cmd+ip-1]
 
 		switch (colonkey) {
-		# Process the :m command
-		case 'm':
-
-		    # Show/set apphot parameters.
-		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
-		        call apcentercolon (ap, im, cl, out, stid, ltid,
-			    Memc[cmd], newobject, newcenter)
-
-		    # Get the nth object from the list.
-		    } else if (cl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
-			    ltid) != EOF) {
-		            newobject = YES
-			    newcenter = YES
-			    newlist = YES
-			} else if (interactive == YES)
-			    call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
-		    } else if (interactive == YES)
-		        call printf ("No coordinate list\7\n")
 
 		# Process the apphot :n command.
-		case 'n':
+		case 'm', 'n':
+
 		    # Show/set apphot commands
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
+
 		        call apcentercolon (ap, im, cl, out, stid, ltid,
-			    Memc[cmd], newobject, newcenter)
+			    Memc[cmd], newimage, newobject, newcenter)
 
 		    # Measure the nth object in the list.
 		    } else if (cl != NULL) {
@@ -171,23 +189,32 @@ begin
 			# Fit the center, save results, setup for next object.
 		        if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
 			    ltid) != EOF) {
-
 		    	    newlist = YES
-		    	    ier = apfitcenter (ap, im, xlist, ylist)
-
-			    call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
-			    call apcplot (ap, stid, ier, gd, apstati (ap,
-			        RADPLOTS))
-			    if (interactive == YES)
-		    	        call ap_qcenter (ap, ier)
-
-		    	    if (stid == 1)
-				call ap_param (ap, out, "center")
-			    call apcplot (ap, stid, ier, mgd, YES)
-			    call ap_pcenter (ap, out, stid, ltid, ier)
-		    	    stid = stid + 1
-		    	    newobject = NO
-			    newcenter = NO
+			    if (colonkey == 'm') {
+		    	        newobject = YES
+			        newcenter = YES
+			    } else {
+		    	        ier = apfitcenter (ap, im, xlist, ylist)
+			        if (id != NULL) {
+			            call apmark (ap, id, apstati (ap, MKCENTER),
+				        NO, NO)
+		    		    if (id == gd)
+				        call gflush (id)
+		    		    else
+		        	        call gframe (id)
+			        }
+			        call ap_cplot (ap, stid, gd, apstati (ap,
+			            RADPLOTS))
+			        if (interactive == YES)
+		    	            call ap_qcenter (ap, ier)
+		    	        if (stid == 1)
+				    call ap_param (ap, out, "center")
+			        call ap_cplot (ap, stid, mgd, YES)
+			        call ap_pcenter (ap, out, stid, ltid, ier)
+		    	        stid = stid + 1
+		    	        newobject = NO
+			        newcenter = NO
+			    }
 
 			} else if (interactive == YES)
 			    call printf (
@@ -199,8 +226,15 @@ begin
 		# Show/set apphot parameters.
 		default:
 		    call apcentercolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-		        newobject, newcenter)
+		        newimage, newobject, newcenter)
 		}
+
+		if ((newimage== YES) && (id != NULL) && (id != gd)) {
+		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
+		    call ap_gswv (id, Memc[cmd], im, 4)
+		}
+
+		newimage = NO
 
 	    # Fit the center, and save the results.
 	    case 'f',  ' ':
@@ -210,8 +244,14 @@ begin
 		    ier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
 		    ier = aprefitcenter (ap, ier)
-		call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
-		call apcplot (ap, stid, ier, gd, apstati (ap, RADPLOTS))
+		if (id != NULL) {
+		    call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
+		    if (id == gd)
+			call gflush (id)
+		    else
+		        call gframe (id)
+		}
+		call ap_cplot (ap, stid, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qcenter (ap, ier)
 		newobject = NO; newcenter = NO
@@ -224,7 +264,7 @@ begin
 		        call ap_pcenter (ap, out, stid, ltid, ier)
 		    else
 		        call ap_pcenter (ap, out, stid, 0, ier)
-		    call apcplot (ap, stid, ier, mgd, YES)
+		    call ap_cplot (ap, stid, mgd, YES)
 		    stid = stid + 1
 		}
 
@@ -236,15 +276,24 @@ begin
 		    oid = stid
 		    call apbcenter (ap, im, cl, out, stid, ltid, mgd, id, YES)
 		    ltid = ltid + stid - oid + 1
+		    if (id != NULL) {
+			if (id == gd)
+			    call gflush (id)
+			else
+			    call gframe (id)
+		    }
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\7\n")
 
+	    # Unknown command.
 	    default:
-		# do nothing
 		call printf ("Unknown or ambiguous keystroke command\7\n")
 	    }
 
-	    # Setup for the next object.
+	    # Setup for the next object by setting the default keystroke
+	    # command and storing the old cursor coordinates in the 
+	    # centering structure.
+
 	    key = ' '
 	    Memc[cmd] = EOS
 	    call apsetr (ap, WX, apstatr (ap, CWX))

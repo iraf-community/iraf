@@ -59,8 +59,10 @@ begin
 	    nelems = 1
 	    Memi[list] = 1
 	} else if (decode_ranges (Memc[ranges], Memi[list], KY_MAXNRANGES,
-	    nelems) == ERR)
+	    nelems) == ERR) {
+	    call sfree (sp)
 	    call error (0, "Cannot decode range string")
+	}
 
 	# Decode the value.
 	switch (type) {
@@ -69,6 +71,7 @@ begin
 	        call xev_initop (o, 0, TY_BOOL)
 	        O_VALB(o) = pt_kybool (key, Memc[root], Memi[list])
 	    } else {
+		call sfree (sp)
 		call eprintf ("Error decoding boolean field array: %s\n")
 		    call pargstr (field)
 		call error (0, "Boolean arrays not allowed in expressions.")
@@ -78,6 +81,7 @@ begin
 	        call xev_initop (o, 0, TY_INT)
 	        O_VALI(o) = pt_kyinteger (key, Memc[root], Memi[list])
 	    } else {
+		call sfree (sp)
 		call eprintf ("Error decoding integer field array: %s\n")
 		    call pargstr (field)
 		call error (0, "Integer arrays not allowed in expressions.")
@@ -87,6 +91,7 @@ begin
 		call xev_initop (o, 0, TY_REAL)
 	        O_VALR(o) = pt_kyreal (key, Memc[root], Memi[list])
 	    } else {
+		call sfree (sp)
 		call eprintf ("Error decoding real array field: %s\n")
 		    call pargstr (field)
 		call error (0, "Real arrays not allowed in expressions.")
@@ -97,6 +102,7 @@ begin
 	        call pt_kystr (key, Memc[root], Memi[list], O_VALC(o), SZ_LINE)
 	    } else {
 		call eprintf ("Error decoding char array field: %s\n")
+		call sfree (sp)
 		    call pargstr (field)
 		call error (0, "Character arrays not allowed in expressions.")
 	    }

@@ -9,10 +9,10 @@ int procedure pdm_findmin (pdmp, ptype, startint, endint, is, ie)
 
 pointer	pdmp			# pointer to PDM data structure
 int	ptype			# plot type
-real	startint, endint	# start and end ordinates
+double	startint, endint	# start and end ordinates
 int	is, ie			# start and end indexs
 
-real	miny, dy, dx
+double	miny, dy, dx
 int	i, isave, npt
 pointer	xpt, ypt
 
@@ -40,10 +40,10 @@ begin
 	# for the minimum value.
 
 	isave = 1
-	miny = MAX_REAL
+	miny = MAX_DOUBLE
 	do i = is, ie {
-	    dx = Memr[xpt+i-1]
-	    dy = Memr[ypt+i-1]
+	    dx = Memd[xpt+i-1]
+	    dy = Memd[ypt+i-1]
 	    if (dx > startint && dx < endint) {
 		if (dy < miny) {
 	    	    miny = dy

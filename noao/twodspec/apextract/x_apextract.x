@@ -10,5 +10,6 @@ task	apall		= t_apall,
 	apscatter	= t_apscatter,
 	apscript	= t_apscript,
 	apslitproc	= t_apslitproc,
+	apnoise		= t_apnoise,
 	apsum		= t_apsum,
 	aptrace		= t_aptrace

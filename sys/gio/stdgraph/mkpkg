@@ -20,6 +20,8 @@ install:				# install in system library
 	;
 
 libstg.a:
+	# $set xflags = "$(xflags) -qfx"
+
 	stgcancel.x	stdgraph.com stdgraph.h <fset.h>
 	stgclear.x	stdgraph.com stdgraph.h
 	stgclose.x	stdgraph.com stdgraph.h
@@ -33,10 +35,13 @@ libstg.a:
 	stgescape.x	
 	stgfa.x		stdgraph.com stdgraph.h
 	stgfaset.x	stdgraph.com stdgraph.h <gki.h>
+	stgfilter.x	stdgraph.com stdgraph.h <ttset.h> <chars.h>
 	stgflush.x	stdgraph.com stdgraph.h
 	stggcell.x	
 	stggcur.x	stdgraph.com stdgraph.h
 	stggdisab.x	stdgraph.com stdgraph.h
+	stggim.x	stdgraph.com <chars.h> <ctype.h> <fset.h>\
+			<gescape.h> <gki.h>
 	stggenab.x	stdgraph.com stdgraph.h
 	stggrstr.x	stdgraph.com stdgraph.h
 	stginit.x	stdgraph.com stdgraph.h <ctype.h> <gki.h> <mach.h>
@@ -47,6 +52,7 @@ libstg.a:
 	stgopen.x	stdgraph.com stdgraph.h <gki.h> <gset.h>
 	stgopenws.x	stdgraph.com stdgraph.h <error.h> <gki.h> <ttset.h>
 	stgoutput.x	stdgraph.com stdgraph.h
+	stgoutstr.x	stdgraph.com stdgraph.h
 	stgpcell.x	stdgraph.com stdgraph.h <gki.h>
 	stgpl.x		stdgraph.com stdgraph.h
 	stgplset.x	stdgraph.com stdgraph.h <gki.h>
@@ -65,7 +71,7 @@ libstg.a:
 	stgtxset.x	stdgraph.com stdgraph.h <gki.h> <gset.h>
 	stgtxsize.x	stdgraph.com stdgraph.h <gki.h>
 	stgunkown.x	
-	stgwtty.x	stdgraph.com stdgraph.h
+	stgwtty.x	stdgraph.com stdgraph.h <ctype.h> <chars.h>
 	t_gkideco.x	<error.h> <gki.h>
 	t_showcap.x	stdgraph.h <ctype.h>
 	t_stdgraph.x	<error.h> <gki.h> <gset.h>

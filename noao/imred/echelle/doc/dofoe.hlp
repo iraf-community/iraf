@@ -1,4 +1,4 @@
-.help dofoe Feb92 noao.imred.echelle
+.help dofoe Feb93 noao.imred.echelle
 .ih
 NAME
 dofoe -- Fiber Optic Echelle (FOE) data reduction task
@@ -55,12 +55,17 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .le
-.ls dispaxis = ")_.dispaxis" (apextract)
-Default dispersion axis.  The dispersion axis is 1 for dispersion
-running along image lines and 2 for dispersion running along image
-columns.  If the image header parameter DISPAXIS is defined it has
-precedence over this parameter.  The default value defers to the
-package parameter of the same name.
+.ls datamax = INDEF (apsum.saturation)
+The maximum data value which is not a cosmic ray.
+When cleaning cosmic rays and/or using variance weighted extraction
+very strong cosmic rays (pixel values much larger than the data) can
+cause these operations to behave poorly.  If a value other than INDEF
+is specified then all data pixels in excess of this value will be
+excluded and the algorithms will yield improved results.
+This applies only to the object spectra and not the flat field or
+arc spectra.  For more
+on this see the discussion of the saturation parameter in the
+\fBapextract\fR package.
 .le
 .ls norders = 12 (apfind)
 Number of orders to be found.  This number is used during the automatic
@@ -108,7 +113,8 @@ and \fBapscat2\fR.
 Detect and correct for bad pixels during extraction?  This is the same
 as the clean option in the \fBapextract\fR package.  If yes this also
 implies variance weighted extraction and requires reasonably good values
-for the readout noise and gain.
+for the readout noise and gain.  In addition the datamax parameters
+can be useful.
 .le
 .ls dispcor = yes
 Dispersion correct spectra?  Depending on the \fIparams.linearize\fR
@@ -327,7 +333,11 @@ order specifying the number of pieces.
 
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
-.ls coordlist = "linelist$thorium.dat" (ecidentify)
+.ls threshold = 10. (identify/reidentify)
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.le
+.ls coordlist = "linelist$thar.dat" (ecidentify)
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelist$".
 .le
@@ -442,6 +452,12 @@ wavelength coordinate.  If \fIyes\fR the input spectrum is integrated
 over the extent of each output pixel.  This is slower than
 simple interpolation.
 .le
+.ih
+ENVIRONMENT PARAMETERS
+The environment parameter \fIimtype\fR is used to determine the extension
+of the images to be processed and created.  This allows use with any
+supported image extension.  For STF images the extension has to be exact;
+for example "d1h".
 .ih
 DESCRIPTION
 The \fBdofoe\fR reduction task is specialized for scattered light
@@ -574,7 +590,11 @@ with a ".ec" extension added.
 \fBSpectra and Data Files\fR
 
 The basic input consists of dual fiber FOE object and calibration spectra
-stored as IRAF images.  The raw CCD images must be processed to remove
+stored as IRAF images.
+The type of image format is defined by the
+environment parameter \fIimtype\fR.  Only images with that extension will
+be processed and created.
+The raw CCD images must be processed to remove
 overscan, bias, and dark count effects.  This is generally done using the
 \fBccdred\fR package.  Flat fielding is generally not done at this stage
 but as part of \fBdofoe\fR.  The calibration spectra are
@@ -773,7 +793,7 @@ further queries and so are used to eliminate further queries of that kind.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-\fBdispaxis\fR parameter if not defined in the image header.  The default
+package \fBdispaxis\fR parameter if not defined in the image header.  The default
 line or column for finding the orders and the number of image lines or
 columns to sum are set by the \fIline\fR and \fInsum\fR parameters.  A line
 of INDEF (the default) selects the middle of the image.  The automatic
@@ -1096,6 +1116,16 @@ d...ec.imh: ap = 1, w1 = 4959.1, w2 = 4978.5, dw = 0.076, nw = 256
 d...ec.imh: ap = 2, w1 = 5003.4, w2 = 5022.1, dw = 0.073, nw = 256
 d...ec.imh: ap = 3, w1 = 5049.0, w2 = 5067.0, dw = 0.070, nw = 256
 .fi
+.ih
+REVISIONS
+.ls DOFOE V2.10.3
+The image format type to be
+processed is selected with the \fIimtype\fR environment parameter.  The
+dispersion axis parameter is now a package parameter.  Images will only
+be processed if the have the CCDPROC keyword.  A \fIdatamax\fR parameter
+has been added to help improve cosmic ray rejection.  A scattered
+light subtraction processing option has been added.
+.le
 .ih
 SEE ALSO
 apedit, apfind, approfiles, aprecenter, apresize, apsum, aptrace, apvariance,

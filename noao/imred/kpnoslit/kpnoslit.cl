@@ -19,9 +19,11 @@ task	continuum,
 	reidentify,
 	sarith,
 	scombine,
+	sflip,
 	slist,
 	splot,
-	specplot	= "onedspec$x_onedspec.e"
+	specplot,
+	specshift	= "onedspec$x_onedspec.e"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
 task	dispcor1	= "onedspec$dispcor1.par"
@@ -35,6 +37,8 @@ task	calibrate,
 task	apall,
 	apedit,
 	apfind,
+	apflatten,
+	apnormalize,
 	aprecenter,
 	apresize,
 	apsum,
@@ -42,6 +46,13 @@ task	apall,
 task	apdefault	= "apextract$apdefault.par"
 task	apparams	= "apextract$apparams.par"
 task	apall1		= "apextract$apall1.par"
+task	apflat1		= "apextract$apflat1.par"
+task	apnorm1		= "apextract$apflat1.par"
+
+# Longslit tasks
+task	illumination,
+	response	= "twodspec$longslit/x_longslit.e"
+task	background	= "generic$background.cl"
 
 # Demos
 task	demos		= "demos$demos.cl"
@@ -51,6 +62,6 @@ task	setairmass,
 	setjd		= "astutil$x_astutil.e"
 
 # Hide tasks from the user
-hidetask apparams, apall1, dispcor1, sparams
+hidetask apparams, apall1, apflat1, apnorm1, dispcor1, sparams
 
 clbye()

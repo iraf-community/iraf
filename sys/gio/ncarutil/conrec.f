@@ -744,8 +744,9 @@ C Y=1. AT Z(I,1), Y=FLOAT(N) AT Z(I,N). Y TAKES ON NON-INTEGER VALUES.
 C
       COMMON /CONRE2/ IX         ,IY         ,IDX        ,IDY        ,
      1                IS         ,ISS        ,NP         ,CV         ,
-     2                INX(8)     ,INY(8)     ,IR(20000)  ,NR
+     2                INX(8)     ,INY(8)     ,IR(80000)  ,NR
 c + noao:  dimension of ir array in conre2 changed from 500 to 20000 6March87
+c + noao:  dimension of ir array in conre2 changed from 20000 to 80000 6-93
       COMMON /CONRE1/ IOFFP      ,SPVAL
       COMMON /CONRE3/ IXBITS     ,IYBITS
       LOGICAL         IPEN       ,IPENO
@@ -1141,8 +1142,9 @@ C CONV.
 C
       COMMON /CONRE2/ IX         ,IY         ,IDX        ,IDY        ,
      1                IS         ,ISS        ,NP         ,CV         ,
-     2                INX(8)     ,INY(8)     ,IR(20000)  ,NR
+     2                INX(8)     ,INY(8)     ,IR(80000)  ,NR
 c + noao:  dimension of ir array in conre2 changed from 500 to 20000 6March87
+c + noao:  dimension of ir array in conre2 changed from 20000 to 80000 6-93
       COMMON /CONRE3/ IXBITS     ,IYBITS
 C
 C
@@ -1221,12 +1223,12 @@ C     WRITE(IUNIT,1000)
 C1000 FORMAT(
 C    1' WARNING FROM ROUTINE STLINE IN CONREC--WORK ARRAY OVERFLOW')
 C     CALL GETSET(VXA,VXB,VYA,VYB,XA,XB,YA,YB,LTYPE)
-      Y = (YB - YA) / 2.
-      X = (XB - XA) / 2.
+C     Y = (YB - YA) / 2.
+C     X = (XB - XA) / 2.
 C     CALL PWRIT(X,Y,
 C    1'**WARNING--PICTURE INCOMPLETE**',
 C    2 31,3,0,0)
-      Y = Y * .7
+C     Y = Y * .7
 C     CALL PWRIT(X,Y,
 C    1'WORK ARRAY OVERFLOW IN STLINE',
 C    2 29,3,0,0)

@@ -16,9 +16,10 @@ procedure set_zero (ccd)
 
 pointer	ccd			# CCD structure
 
-int	nc, nl, c1, c2, cs, l1, l2, ls, data_c1, ccd_c1, data_l1, ccd_l1
+int	nscan, nc, nl, c1, c2, cs, l1, l2, ls, data_c1, ccd_c1, data_l1, ccd_l1
 pointer	sp, str, image, im, ccd_cache()
 bool	clgetb(), ccdflag(), ccdcheck()
+int	ccdtypei(), ccdnscan()
 errchk	cal_image, ccd_cache, ccdproc
 
 begin
@@ -31,7 +32,11 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the zero level correction image.
-	call cal_image (IN_IM(ccd), ZERO, Memc[image], SZ_FNAME)
+	if (clgetb ("scancor"))
+	    nscan = ccdnscan (IN_IM(ccd), ccdtypei(IN_IM(ccd)))
+	else
+	    nscan = 1
+	call cal_image (IN_IM(ccd), ZERO, nscan, Memc[image], SZ_FNAME)
 
 	# If no processing is desired print zero correction image and return.
 	if (clgetb ("noproc")) {
@@ -41,10 +46,22 @@ begin
 	    return
 	}
 
-	# Map the image and return an error if not found.  Check if the
-	# zero level image has been processed and call CCDPROC if not.
+	# Map the image and return on an error.
+	# Process the zero image if necessary.
+	# If nscan > 1 then the zero may not yet exist so create it
+	# from the unscanned zero.
 
-	im = ccd_cache (Memc[image], ZERO)
+	iferr (im = ccd_cache (Memc[image], ZERO)) {
+	    call cal_image (IN_IM(ccd), ZERO, 1, Memc[str], SZ_LINE)
+	    im = ccd_cache (Memc[str], ZERO)
+	    if (ccdcheck (im, ZERO)) {
+		call ccd_flush (im)
+		call ccdproc (Memc[str], ZERO)
+	    }
+	    call scancor (Memc[str], Memc[image], nscan, INDEF)
+	    im = ccd_cache (Memc[image], ZERO)
+	}
+
 	if (ccdcheck (im, ZERO)) {
 	    call ccd_flush (im)
 	    call ccdproc (Memc[image], ZERO)

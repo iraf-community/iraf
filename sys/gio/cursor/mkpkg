@@ -6,6 +6,8 @@ $checkin  libcur.a lib$
 $exit
 
 libcur.a:
+	# $set xflags = "$(xflags) -qfx"
+
 	giotr.x		gtr.com gtr.h <config.h> <gio.h> <gki.h> <xwhen.h>
 	grcaxes.x	grc.h gtr.com gtr.h <gio.h> <gset.h>
 	grcclose.x	grc.h gtr.h <gio.h>
@@ -26,6 +28,7 @@ libcur.a:
 	gtrconn.x	
 	gtrctrl.x	gtr.com gtr.h <fset.h> <gio.h> <gki.h> <gset.h>\
 			<prstat.h> <config.h>
+	gtrdelete.x	gtr.h <gio.h> <gki.h>
 	gtrdiscon.x	<gio.h>
 	gtrfetch.x	gtr.h <gio.h> <gki.h>
 	gtrframe.x	gtr.h <gio.h> <gki.h>
@@ -48,6 +51,7 @@ libcur.a:
 	gtrwcur.x	<gki.h>
 	gtrwritep.x	gtr.com <error.h> <gio.h> <gki.h> gtr.h
 	gtrwstran.x	gtr.com gtr.h <gio.h> <gki.h> <mach.h>
+	gtrwsclip.x
 	prpsinit.x
 	rcursor.x	grc.h gtr.com gtr.h <ctype.h> <gio.h> <gki.h> <ttset.h>
 	;

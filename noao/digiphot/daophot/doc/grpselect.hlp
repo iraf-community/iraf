@@ -1,4 +1,4 @@
-.help grpselect Aug91 noao.digiphot.daophot
+.help grpselect Dec92 noao.digiphot.daophot
 .ih
 NAME
 grpselect -- select groups from a file by group size
@@ -22,8 +22,10 @@ The minimum group size to select from the input file(s).
 .ls max_group
 The maximum group size to select from the input file(s).
 .le
-.ls verbose = no
-Print messages about the progress of the task?
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task? \fIVerbose\fR may be set
+to the value of the daophot package parameter (the default), "yes", or
+"no".
 .le
 .ih
 DESCRIPTION

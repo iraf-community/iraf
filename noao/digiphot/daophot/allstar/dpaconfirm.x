@@ -1,4 +1,4 @@
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
 # DP_ACONFIRM -- Procedure to confirm the critical allstar parameters.
 
@@ -6,8 +6,19 @@ procedure dp_aconfirm (dao)
 
 pointer	dao		# pointer to the group structure
 
+int	dp_stati()
+
 begin
 	call printf ("\n")
+
+	# Confirm the recentering and sky fitting parameters.
+	call dp_vrecenter (dao)
+	call dp_vgroupsky (dao)
+	call dp_vfitsky (dao)
+	if (dp_stati (dao, FITSKY) == YES) {
+	    call dp_vsannulus (dao)
+	    call dp_vwsannulus (dao)
+	}
 
 	# Confirm the psf radius.
 	call dp_vpsfrad (dao)

@@ -67,13 +67,14 @@ end
 
 # AP_GROW_HIST2 -- Procedure to reject pixels with region growing.
 
-int procedure ap_grow_hist2 (skypix, coords, wgt, nskypix, index, snx, sny, hgm,
-    nbins, z1, z2, rgrow, sumpx, sumsqpx, sumcbpx)
+int procedure ap_grow_hist2 (skypix, coords, wgt, nskypix, sky_zero, index,
+    snx, sny, hgm, nbins, z1, z2, rgrow, sumpx, sumsqpx, sumcbpx)
 
 real	skypix[ARB]		# sky pixels
 int	coords[ARB]		# coordinates
 real	wgt[ARB]		# array of weights
 int	nskypix			# number of sky pixels
+real	sky_zero		# the sky zero point for moment analysis
 int	index			# index of pixel to be rejected
 int	snx, sny		# size of sky subraster
 real	hgm[ARB]		# histogram
@@ -84,6 +85,7 @@ double	sumpx			# sum of sky values
 double	sumsqpx			# sum of sky values squared
 double	sumcbpx			# sum of sky values cubed
 
+double	dsky
 int	j, k, ixc, iyc, ymin, ymax, xmin, xmax, nreject, cstart, c, bin
 real	dh, r2, rgrow2, d
 
@@ -118,9 +120,10 @@ begin
 		if (r2 <= rgrow2 && c == coords[cstart] && wgt[cstart] > 0.0) {
 		    nreject = nreject + 1
 		    wgt[cstart] = 0.0
-		    sumpx = sumpx - skypix[cstart]
-		    sumsqpx = sumsqpx - skypix[cstart] ** 2
-		    sumcbpx = sumcbpx - skypix[cstart] ** 3
+		    dsky = skypix[cstart] - sky_zero
+		    sumpx = sumpx - dsky
+		    sumsqpx = sumsqpx - dsky ** 2
+		    sumcbpx = sumcbpx - dsky ** 3
 		    if (skypix[cstart] >= z1 && skypix[cstart] <= z2) {
 		        bin = int ((skypix[cstart] - z1) * dh) + 1
 		        hgm[bin] = hgm[bin] - 1.0

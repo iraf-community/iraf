@@ -10,11 +10,11 @@ int	item2		# index of second phase
 
 pointer	comarray
 common /sortcom/ comarray
-real	p1, p2
+double	p1, p2
 
 begin
-	p1 = Memr[comarray+item1-1]
-	p2 = Memr[comarray+item2-1]
+	p1 = Memd[comarray+item1-1]
+	p2 = Memd[comarray+item2-1]
 
 	if (p1 > p2)
 	    return (1)

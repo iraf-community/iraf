@@ -29,6 +29,7 @@ libxtools.a:
 	isdir.x		<ctype.h> <finfo.h>
 	peaks.x	
 	ranges.x	<ctype.h> <mach.h>
+	rngranges.x	<ctype.h> <mach.h>
 	obsdb.x
 	strdetab.x	
 	strentab.x	

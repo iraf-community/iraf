@@ -27,6 +27,7 @@ define	SP_PX		Memi[$1+15]		# Pointer to wavelengths
 define	SP_PY		Memi[$1+16]		# Pointer to intensities
 define	SP_XLPOS	Memr[$1+17]		# X label position
 define	SP_YLPOS	Memr[$1+18]		# Y label position
+define	SP_COLOR	Memi[$1+19]		# Color
 define	SP_IMNAME	Memc[P2C($1+20)]	# Image name
 define	SP_IMTITLE	Memc[P2C($1+70)]	# Title
 define	SP_PTYPE	Memc[P2C($1+120)]	# Plot type

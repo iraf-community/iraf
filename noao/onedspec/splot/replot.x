@@ -18,8 +18,7 @@ begin
 	    wc = gstati (gfd, G_WCS)
 	    call gclear (gfd)
 	    call gseti (gfd, G_WCS, wc)
-	    call gascale (gfd, x, npts, 1)
-	    call gascale (gfd, y, npts, 2)
+	    call gt_ascale (gfd, gt, x, y, npts)
 	    call gt_swind (gfd, gt)
 	    call gt_labax (gfd, gt)
 	}

@@ -10,12 +10,11 @@ int procedure awvg$t (a, npix, mean, sigma, lcut, hcut)
 
 PIXEL	a[ARB]
 $if (datatype == dl)
-double	mean, sigma, lcut, hcut, value
-double	sum, sumsq, temp
+double	mean, sigma, lcut, hcut
 $else
-real	mean, sigma, lcut, hcut, value
-real	sum, sumsq, temp
+real	mean, sigma, lcut, hcut
 $endif
+double	sum, sumsq, value, temp
 int	npix, i, ngpix
 
 begin

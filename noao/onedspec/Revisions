@@ -1,8 +1,1175 @@
 .help revisions Jun88 noao.onedspec
 .nf
+t_sarith.x
+    The "units_display" WCS attribute is copied if set.  (5/13/95, Valdes)
+
+splot/splot.x
+splot/getimage.x
+t_specplot.x
+    1.  The task "units" parameter value is mapped to "display" if null.
+    2.  The units are set with shdr_units.
+    (5/13/95, Valdes)
+
+smw/shdr.x
+    1.  The spectrum structure is loaded in the image MWCS units ("units").
+    2.  The special unit string "display" changes units to the "units_display"
+	attribute in shdr_units.
+    3.  The special unit string "default" changes units to the image MWCS
+	units in shdr_units.
+    (5/13/95, Valdes)
+
+doc/sfit.hlp
+    Added a description of the "sample" range syntax.  (5/12/95, Valdes)
+
+splot/splot.x
+splot/getimage.x
+doc/splot.hlp
+    Because it can be desirable to use image sections on the input but
+    this will cause problems if the user attempts to update the image
+    SPLOT was modified to parse the image section for the specified image
+    line, column, or band and then map the full image.  (5/1/95, Valdes)
+
+t_sbands.x
+doc/t_sbands.x
+    Increase the length and changed to g format for the flux so that
+    flux calibrated data will print.  (4/12/95, Valdes)
+
+doc/wspectext.hlp
+    Fixed typo in example.  (4/12/95, Valdes)
+
+t_sarith.x
+    Image extensions are no only stripped for onedspec format output
+    images rather than in all image names.  This is necessary to allow
+    STF images with explicit extensions not matching the imtype value
+    to be specified.  (3/31/95, Valdes)
+
+scombine/icscale.x
+doc/scombine.hlp
+    The behavior of the weights when using both multiplicative and zero
+    point scaling was incorrect; the zero levels have to account for
+    the scaling.  (3/27/95, Valdes)
+
+splot/flatten.x
+    Removed use of faulty fp_equal test for equality with zero.  This would
+    cause continuum normalization to fail for fluxed data.  (2/23/95, Valdes)
+
+sensfunc/sfshift.x
+    Deleted points and stars are now ignored in the grey shift calculation.
+    (2/22/95, Valdes)
+
+t_sinterp.x
+    Updated the image header keywords to give a complete and standard
+    linear WCS.  (2/21/95, Valdes)
+
+splot/gfit.x
+    If the marked region does not span the profile peak then an pointer
+    indexing error occurs when estimating the initial sigma.  Modified
+    to estimate the sigma differently in this case.  (2/17/95, Valdes)
+
+t_fitprofs.x
+splot/spdeblend.x
+splot/gfit.x
+    1.  The indexing was incorrect in the Monte-Carlo error estimation.
+    2.  Change the number of Monte-Carlo samples from 100 to 50.
+    (2/16/95, Valdes)
+
+smw/shdr.x
+    If an associated spectrum doesn't exist free any previous spectrum.
+    (2/13/95, Valdes)
+
+getcalib.x
+    Added missing length argument to strcpy which caused an unaligned
+    access error on the Alpha.  (1/27/95, Valdes)
+
+t_dopcor.x
+    Fixed typo bug which prevents more than 8 spectra in multispec format
+    to work.  This affects primarily echelle data.  (1/18/95, Valdes)
+
+smw/swmctran.x
+    The equispec coordinate transformations now include mapping apertures
+    and lines.  (1/16/95, Valdes)
+
+smw/smwopenim.x
+    Changed unknown coordinate system from a fatal error to a warning.
+    (1/14/95, Valdes)
+
+t_standard.x
+    Fixed bug in closing sh structure.  (1/3/95, Valdes)
+
+t_standard.x
+t_calibrate.x
+standard.par
+calibrate.par
+doc/standard.hlp
+doc/calibrate.hlp
+    If the exposure time and airmass cannot be determined from the header
+    they are queried and updated in the images.  New query parameters
+    were added.  (1/2/95, Valdes)
+
+dispcor/refmsgs.x
+dispcor/refgspec.x
+dispcor/reftable.x
+dispcor/refspectra.h
+dispcor/refinterp.x
+dispcor/reffollow.x
+dispcor/refnearest.x
+dispcor/refprecede.x
+    Added error information if no reference spectrum is found to aid in
+    diagnosing the problem.  (12/30/94, Valdes)
+
+dispcor/t_dispcor.x
+dispcor/dcio.x
+    1.	Improved the error messages again to more clearly pinpoint problems
+	with the dispersion database.
+    2.	The image extensions are now stripped in REFSPEC keywords.
+    (12/30/94, Valdes)
+
+identify/identify.x
+identify/reidentify.x
+identify/iddofit.x
+identify/identify.key
+    1.  Added 'v' to change fitting weights.  (12/29/94, Valdes)
+
+identify/t_reidentify.x
+doc/reidentify.hlp
+    The step parameter for multispec/equispec data is now ignored and
+    all apertures are reidentified expect for a value of zero indicates
+    don't reidentify anything but the reference aperture.  (11/15/94, Valdes)
+
+onedspec.men
+doc/mkspec.hlp
+    Highlighted the fact that the MKSPEC task is obsolete.  (11/12/94, Valdes)
+
+doc/identify.hlp
+identify/identify.key
+identify/idcolon.x
+    The help described one of the options for :label to be "coords" when
+    it is actually "coord".  Rather than modify the code I modified the
+    help.  The colon procedure was modified only in that when it
+    reports the current value of the label parameter it shows coord
+    and not coords.  (11/8/94, Valdes)
+
+doc/onedspec.hlp
+doc/specwcs.hlp
+    Added description of dispaxis and nsum package parameters to the package
+    description.  (11/1/94, Valdes)
+
+scombine/t_scombine.x
+    There was a problem with using SCOMBINE with 2D/3D spectra in that
+    it assumed the number of spectra is the second image dimension.
+    Changed this to the approriate number of spectra for all spectral
+    formats.  (10/27/94, Valdes)
+
+dispcor/dctable.x
+    If ignoreaps=yes and there are apertures defined with an aperture table
+    or reference image then the defaults for the wavelength scale if
+    an undefined aperture is encountered will be that of the first defined
+    aperture unless an explicit value has been given with the task parameters.
+    This is needed to make the IMRED reductions scripts run as desired.
+    (10/12/94, Valdes)
+
+smw/smwonedspec.x
+smw/smwoldms.x
+    Added a missing call to close the image header keyword template list
+    which caused memory to not be freed.  (10/4/94, Valdes)
+
+identify/t_reidentify.x
+    Now checks for a zero step and only operates on the specified reference
+    line.  (9/15/94, Valdes)
+
+t_sfit.x
+doc/sfit.hlp
+doc/continuum.hlp
+    Extended SFIT and CONTINUUM to work on NDSPEC spectra.  (9/13/94, Valdes)
+
+splot/splot.x
+    1.  The 'p' and 'u' now restore the "world" system before setting the
+    	dispersion.  Previously if the user switched to "pixel" (with '$')
+    	the a units conversion error would occur if the user tried to
+	set the dispersion.
+    2.  The 'v' key now toggles even if no input units are specified.
+    (8/17/94, Valdes)
+
+splot/wrspect.x
+    Fixed a bug in which the output units when saving a spectrum were
+    incorrectly set to be the current display units rather than the MWCS
+    units.
+    (8/17/94, Valdes)
+
+splot/wrspect.x
+    Fixed a typo in a pointer assignment in the case of overwriting
+    an existing 2D image which caused a segmentation violation.
+    (8/17/94, Valdes)
+
+doc/splot.hlp
+doc/fitprofs.hlp
+    Fixed various typos and added suggestions as pointed out by Dave Bell.
+    (8/17/94, Valdes)
+
+splot/gfit.x
+splot/spdeblend.x
+t_fitprofs.x
+    Added a check for both sigma0 and invgain being zero.
+    (8/17/94, Valdes)
+    
+t_fitprofs.x
+    Failed to treat the scaling of the sigmas properly to avoid overflow 
+    problems.
+    (8/17/94, Valdes)
+
+onedspec.cl
+onedspec.hd
+onedspec.men
+x_onedspec.x
+dispcor/mkpkg
+dispcor/t_disptrans.x	+
+disptrans.par		+
+doc/disptrans.hlp	+
+    Added a new task to convert the WCS dispersion relation between units
+    and to apply a vacuum/air conversion.  (8/8/94, Valdes)
+
+t_slist.x
+    Removed the restriction against N-dim spectra so that this could
+    be used with BPLOT to expand a list of apertures.  (7/29/94, Valdes)
+
+splot/spdeblend.x
+splot/gfit.x
+    1.  The sigmas needed to be scaled to unit mean to avoid possible
+	overflow problems during the fitting.
+    2.  There was an incorrect calling sequence in gfit for the new
+	model parameters.
+    (7/26/94, Valdes)
+
+noao/lib/units.h
+smw/units.x
+splot/splot.key
+specplot.key
+doc/onedspec.hlp
+doc/splot.hlp
+    Added nanometers as a unit.  (7/21/94, Valdes)
+
+noao/lib/smw.h
+smw/shdr.x
+splot/wrspect.x
+splot/splot.x
+    1.  Added a reddening correction flag to the basic spectrum data structure.
+    2.  When writing out a spectrum with WRSPECT also update the calibration
+	parameters.
+    3.  Restructured WRSPECT to be more general for use with SPECTOOL and
+	put an SPLOT specific routine to handle the parameter queries.
+    (7/20/94, Valdes)
+
+t_sflip.x		+
+sflip.par		+
+doc/sflip.hlp		+
+x_onedspec.x
+mkpkg
+onedspec.cl
+onedspec.men
+onedspec.hd
+    Added a new task for flipping spectra.  (7/18/94, Valdes)
+
+splot/wrspect.x
+splot/splot.x
+smw/smwswattrs.x
+    Fixed a rather tricky bug with replacing a spectrum in the current
+    image with SPLOT.  (7/13/94, Valdes)
+
+splot/spdeblend.x	+
+splot/deblend.x
+splot/gfit.x
+splot/sumflux.x
+splot/eqwidth.x
+splot/splot.x
+splot.par
+t_fitprofs.x
+fitprofs.par
+doc/splot.hlp
+doc/fitprofs.hlp
+    1.  Separated the SPLOT specific delending routine from the mathematical
+        deblending routines called by the various gaussian fitting routines.
+    2.  Replaced deblending code with a version that uses a sigma array
+	and subsampling of the pixels.  This version also allows contraining
+	the relative line strengths but this feature is not used by
+	SPLOT of FITPROFS.
+    3.  Added constant noise and inverse gain parameters to SPLOT and FITPROFS.
+    4.  If a sigma0 and inverse gain are specified the deblending estimates
+	errors in the fit parameters using Monte-Carlo simulation.  The
+	errors are recorded in the log and :show output.  This was
+	added to both SPLOT and FITPROFS.
+    5.  If a sigma0 and inverse gain are specified the centroid, flux, and
+	equivalent width estimates (from 'e' key) include error estimates.
+	The errors are recorded in the log and :show output.
+    (7/12/94, Valdes)
+
+dispcor/t_dispcor.x
+dispcor/dcio.x
+    1.  Added a check for the existence of both IDENTIFY and ECIDENTIFY
+	database files for the same image.
+    2.  The recent errcode check addition (5/20) was incorrect in that
+	it would not proceed to look for an ECIDENTIFY file if no
+	IDENTIFY file was found; i.e. echelle data would fail.  The
+	appropriate checking of errors is now done.
+    (7/11/94, Valdes)
+
+t_dopcor.x
+    The verbose output was enhanced to show the old redshift in the case
+    of adding to warn a user.  This only applies to multispec images
+    which store the redshift separately.  (7/7/94, Valdes)
+
+t_sbands.x
+    Instead of passing a file name to the routine which reads the bandpass
+    descriptions a file descriptor is not passed.  This allows the
+    calling procedure to use either a file or a string file.
+    (6/30/94, Valdes)
+
+doc/sbands.hlp
+doc/splot.hlp
+    Typo fixes.  (6/30/94, Valdes)
+
+doc/dopcor.hlp
+    Made a slight change to description of isvelocity to make as clear as
+    possible that velocities are relativistic and not c*z velocities.
+    (6/30/94, Valdes)
+
+t_rstext.x	+
+rstext.par	+
+rspectext.cl
+x_onedspec.e
+onedspec.cl
+mkpkg
+    Added a compiled task to reformat the input RSPECTEXT file into the
+    formats needed by RTEXTIMAGE and DISPCOR and modified RSPECTEXT
+    to use it.  This improves the speed of this script task enormously for
+    large input text files since the CL facilities can be slow.
+    (6/20/94, Valdes)
+
+splot/wrspect.x
+    Failed to initialize a pointer to NULL.  This became a seg vio after the
+    changes for the BANDID info.  (6/15/94, Valdes)
+
+scombine/generic/iccclip.x
+scombine/generic/icsclip.x
+    Found and fixed another typo bug.  (6/7/94, Valdes/Zhang)
+
+scombine/generic/icaclip.x
+scombine/generic/iccclip.x
+scombine/generic/icpclip.x
+scombine/generic/icsclip.x
+scombine/generic/icgrow.x
+scombine/generic/icmedian.x
+    The restoration of deleted pixels to satisfy the nkeep parameter
+    was being done inside the iteration loop causing the possiblity
+    of a non-terminating loop; i.e. pixels are rejected, they are
+    restored, and the number left then does not statisfy the termination
+    condition.  The restoration step was moved following the iterative
+    rejection.
+
+    There was a bug in how the restored points were added back when
+    mclip=no and there are multiple residuals with the same value.
+    
+    Also updated icgrow and icmedian.  All these files are the same
+    as the generic files from IMCOMBINE reduced to only the real datatype.
+    (6/13/94, Valdes)
+
+t_sbands.x
+    When scanning the bandpass file, if there was an filter file then
+    the scanning of the filter file caused the remaining scan of the
+    bandpass line to be terminated.  This was fixed by using getline
+    instead of fscan in the scanning the bandpass file.  (6/3/94, Valdes)
+
+doc/sbands.hlp
+    Fixed a discrepancy in the bandpass file description between the
+    description section and the examples.  (6/2/94, Valdes)
+
+splot/splot.x
+splot/splotcolon.x
+splot/splot.key
+splot.par
+doc/splot.hlp
+    Added an overplot options to permanently toggle overplotting.
+    (5/31/94, Valdes)
+
+scombine/icscale.x
+    The sigma scaling flag, doscale1, would not be set in the case of
+    a mean offset of zero though the scale factors could be different.
+    (5/25/94, Valdes/Zhang)
+
+scombine/generic/icsclip.gx
+    There was a missing line: l = Memi[mp1].  (5/25/94, Valdes/Zhang)
+
+scombine/generic/icaclip.x
+scombine/generic/iccclip.x
+scombine/generic/icpclip.x
+scombine/generic/icsclip.x
+    The reordering step when a central median is used during rejection
+    but the final combining is average was incorrect if the number
+    of rejected low pixels was greater than the number of pixel
+    number of pixels not rejected.  (5/25/94, Valdes)
+
+dispcor/dcio.x
+dispcor/t_dispcor.x
+    All warning messages were being converted to a single warning which
+    was not appropriate in all cases.  Added an errcode check.
+    (5/20/94, Valdes)
+
+============================
+V2.10.3beta internal release
+============================
+
+noao/lib/smw.h
+smw/shdr.x
+t_fitprofs.x
+t_sarith.x
+splot/wrspect.x
+    The spectrum data structure was modified so that it can contain
+    all the associated spectra such as the spectrum, raw spectrum,
+    sky, continuum, and sigma.  Also the STYPE field was changed
+    to an array of string pointers SID to contain the specturm
+    type strings for all the associated spectra.  Except for the
+    SID changes (in FITPROFS, SARITH, and SPLOT) the structure
+    changes are invisible to any spectral task.  (5/4/94, Valdes)
+
+scombine/icscale.x
+scombine/t_scombine.x
+    There is now a warning error if the scale, zero, or weight type
+    is unknown.  (5/2/94, Valdes)
+
+t_sfit.x
+sfit.par
+continuum.par
+doc/sfit.hlp
+doc/continuum.hlp
+    1.	The sample regions are now set to the task parameter after each
+	fit.  Previously this was only done for the first spectrum and
+	after that it was set to "*".
+    2.  A straightforward replication of the line selection mechanism
+	to allow band selection was added.
+    (4/29/94, Valdes)
+
+identify/t_reidentify.x
+    The refit=no options would not work if there was not dispersion
+    function even though it makes sense to do so.  It was case of
+    the if clauses not being defined correctly.  (4/28/94, Valdes)
+
+dispcor/dcio.x
+    A possibly very useful and common case is when IDENITFY/REIDENTIFY
+    are used on previously dispersion corrected data to get only a
+    shift with no dispersion function.  DISPCOR was modified to
+    allow this case.  (4/21/94, Valdes)
+
+scombine/iclog.x
+    Changed the mean, median, mode, and zero formats from 6g to 7.5g to
+    insure 5 significant digits regardless of signs and decimal points.
+    (4/13/94, Valdes)
+
+noao/lib/smw.h
+smw/shdr.x
+    The standard spectrum data structure now includes a pointer for a
+    continuum spectrum.  Currently it is unused.  (4/12/94, Valdes)
+
+scombine/icscale.x
+    When the combine object is "sum" the task attempts to compute the
+    total exposure time.  Since a missing exposure time is represented
+    as INDEF this caused an arithmetic error.  The task was modified to
+    not compute or output a total exposure time if any of the spectra
+    have an undefined exposure time.  (4/11/94, Valdes)
+
+identify/idmark.x
+    Changed the mark and mark label color to be the tick label color
+    currently in effect.  Eventually the user should have more control
+    over the color but this cannot be done without changing GTOOLS or
+    IDENTIFY more than is appropriate at the moment.  (4/11/94, Valdes)
+
+doc/identify.hlp
+    Fixed a typo in the description of the Legendre polynomial formula.
+    (4/11/94, Valdes)
+
+smw/shdr.x
+    The case of DC-FLAG=-1 was not being handled by shdr_lw and shdr_wl.
+    (4/9/93, Valdes)
+
+smw/shdr.x
+    The flux units were not being copied when the spectrum header is
+    copied.  (3/31/94, Valdes)
+
+t_sarith.x
+    The string used to read in the aperture, band, and beam lists was
+    SZ_FNAME which is too short for possible input lines.  Changed
+    the lengths to SZ_LINE.  (3/31/94, Valdes)
+
+splot.par
+    Changed the mode of line and band to be query so that if SPLOT is run
+    from epar line and band queries will still be made.  (3/21/94, Valdes)
+
+scombine/generic/icaclip.x
+scombine/generic/iccclip.x
+scombine/generic/icsclip.x
+    The image sigma was incorrectly computed when an offset scaling is used.
+    (3/8/94, Valdes)
+
+smw/shdr.x
+    The call to shdr_units can specify "default" to restore the original
+    units.  (3/7/94, Valdes)
+
+smw/shdr.x
+splot/wrspect.x
+t_sarith.x
+t_fitprofs.
+    Fixed problems when NP1 > 1 due to a IMSHIFT operation that moves
+    the first physical pixel higher logical coordinates (or the
+    first logical pixel in the image corresponds to a negative
+    physical pixel coordinate).  (3/5/94, Valdes)
+    
+t_deredden.x
+    Fixed bug causing memory corruption.  (3/2/94, Valdes)
+
+scombine/icscale.x
+scombine/iclog.x
+    1.  The exposure time was not being summed when summing spectra.
+    2.  The exposure time is now printed whenever the exposure time is used
+	even if the times are all equal.
+    (2/24/94, Valdes)
+
+t_deredden.x
+doc/deredden.hlp
+    Overriding a previous correction will apply to the original data
+    rather than being incremental.  (2/23/94, Valdes)
+
+smw/shdr.x
+noao$lib/smw.h
+    Added structure fields for the flux units and shdr_open sets the
+    field if possible.  The flux units are determined first by any
+    BUNIT keyword, then if the flux calibration flag is set by
+    the magnitude of the data.  (2/22/94, Valdes)
+
+smw/funits.x		+
+noao$lib/funits.h	+
+    Added a flux units package.  (2/21/94, Valdes)
+
+smw/shdr.x
+    Added a routine to change the units.  (2/19/94, Valdes)
+
+splot/usercoord.x
+    The routine was not correct for input log-linear spectra (dc-flag=1).
+    (2/19/94, Valdes)
+
+dispcor/dispcor.x
+    Fixed typo (out[1] -> out[i]) which was causing the non-flux conserving
+    mode to fail.  (2/18/94, Valdes)
+
+splot.par
+specplot.par
+doc/splot.hlp
+doc/specplot.hlp
+    1.  SPLOT will write out the current display units to the WCS attribute
+	"units_display".
+    2.  The default "units" task parameter now has the null string value
+	to allow selecting the units given by "units_display" or the WCS
+	units in that order.  (2/18/94, Valdes)
+
+smw/smwsaveim.x
+smw/smwesms.x
+smw/smwmerge.x
+smw/smwndes.x
+smw/shdr.x
+    1.  A new WCS attribute "units_display" has been defined.  It is now
+	stored in the image and transfered when copying WCS if it is defined.
+    2.  When a spectrum is opened with shdr_open the user units are set
+	to that specified by "units_display" if present.  Otherwise
+	the units of the WCS are used.
+	(2/18/94, Valdes)
+
+noao$lib/smw.h
+shdr.x
+    Added a field to the standard spectrum data structure to contain an
+    error array.  This array is filled in by shdr_open if a new flag
+    value is used.  Since there are no current tasks which use the
+    new value this feature is unused in current tasks.  (2/7/94, Valdes)
+
+noao$lib/smw.h
+t_fitprofs.x
+t_sarith.x
+splot/wrspect.x
+smw/smwsaveim.x
+    Added a field to the standard spectrum data structure to contain the
+    type of spectrum; i.e. spectrum, background, sigma.  This type is
+    stored in the BANDIDn keywords for multispec format data extracted by
+    APEXTRACT.  This information, if present, is now updated on outputing a
+    new spectrum.  This is particularly important for SCOPY when the bands
+    are adjusted.  (2/4/94, Valdes)
+
+dispcor/t_dispcor.x
+    Deleted unused variable, junk, which somehow snuck in.  (2/7/94, Valdes)
+
+t_specplot.x
+specplot.key
+doc/specplot.hlp
+    Extended the :units command to allow specifying individual spectra.
+    This is intended to allow multiple spectra to be plotted on a velocity
+    scale with different zero points.  (2/4/94, Valdes)
+
+smw/shdr.x
+smw/smwmw.x
+    Added checks for the aperture number to be outside of the range of
+    spectra in N-dimensional spectra.  (1/8/94, Valdes)
+
+splot/splot.x
+splot/splotcolon.x
+splot/splot.key
+doc/splot.hlp
+splot.par
+    A new options, "flip", has been added to select plotting the spectra
+    in decreasing wavelength.  (12/8/93, Valdes)
+
+dispcor/dispcor.x
+doc/dispcor.hlp
+    When flux=no DISPCOR now computes an average across the output pixel
+    rather than interpolating to the pixel center.  This allows
+    flux density conservation.  (12/6/93, Valdes)
+
+identify/idinit.x
+    Changed aclrr to aclri.  (12/1/93, Valdes)
+
+doc/identify.hlp
+    Added a description of the function coefficients. (12/1/93, Valdes)
+
+t_calibrate.x
+    Added a warning if the exposure time is not found.  (11/19/93, Valdes)
+
+sensfunc/sfoutput.x
+    Instead of using the dispersion range from a single standard star
+    the code now uses the maximum range and minimum dispersion.
+    (11/15/93, Valdes)
+
+t_sbands.x	+
+sbands.par	+
+doc/sbands.hlp	+
+x_onedspec.x
+onedspec.cl
+onedspec.men
+onedspec.hd
+mkpkg
+    Added a new task to do bandpass spectrophotometry.  (11/1/93, Valdes)
+
+rspectext.cl
+wspectext.cl
+doc/rspectext.hlp
+doc/wspectext.hlp
+onedspec.cl
+onedspec.men
+onedspec.hd
+    Added two script tasks to convert between 1D image spectra and
+    ascii text spectra.  (10/22/93, Valdes)
+
+splot/splot.x
+splot/getimage.x
+splot/splotfun.x
+doc/splot.hlp
+    If a wavelength scale is set with 'p' or 'u' then all subsequent
+    spectra which are not dispersion calibrated will use that wavelength
+    scale.  (9/2/93, Valdes)
+
+t_sapertures.x
+    The negative beam number warning is only issued if verbose = yes.
+    (9/1/93, Valdes)
+
+dispcor/t_dispcor.x
+smw/smwesms.x
+    The aperture IDs were not being properly propagated.  (9/1/93, Valdes)
+
+t_fitprofs.x
+fitprofs.par
+doc/fitprofs.hlp
+    1.  Fixed bug with close MWCS
+    2.  Add a bands parameter for 3D images.
+    (8/31/93, Valdes)
+
+t_deredden.x
+    There was an error in freeing the sh pointer causing a segmentation
+    violation after the spectra are successfully dereddened.  (8/13/93, Valdes)
+
+splot/splot.x
+doc/splot.hlp
+    The '(' and ')' keys will now cycle in bands if there is only one line.
+    (8/10/93, Valdes)
+
+t_sapertures.x
+    Modified to ignore attempts to set a negative beam number.
+    (8/9/93, Valdes)
+
+splot/wrspect.x
+    Added check against an error opening an output image in shdr_open.
+    (8/4/93, Valdes)
+
+splot/fudgex.x
+    Added check against a divide by zero if the cursor is not moved.
+    (8/4/93, Valdes)
+
+splot/splotcolon.x
+    The call to ans_hdr in the COMMENT case was missing the key argument.
+    (8/3/93, Valdes)
+
+smw/smwonedspec.x
+    For spectra which are dispersion corrected (DC-FLAG set) but have no
+    units the code was setting the "label" rather than "units" to
+    "angstroms".  (8/3/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+splot.par
+splot/smooth.x
+doc/splot.hlp
+    1.  The parameter file parameter prompt for the smoothing box size was
+	modified to request an odd number.
+    2.  If an even number is given, a warning is printed.
+    3.  The help for the parameter boxsize indicates the the value must
+	be odd.
+    (6/28/93, Valdes)
+
+scombine/icscale.x
+    The result of reading an @file for the zero or weight parameter was
+    being placed in the scales array.  This has been fixed.  This
+    affected only one IRAFX users.  (6/28/93, Valdes)
+
+specplot.key
+    Added missing :redshift and :velocity commands in the summary.  Also
+    sorted and cleaned up the multicolumn lists.  (6/15/93, Valdes)
+
+t_dopcor.x
+dopcor.par
+doc/dopcor.hlp
+    An new parameter has been added to allow combining sequential
+    corrections in "multispec" format spectra.  (6/15/93, Valdes)
+
+usercoord.x
+wrspect.x
+t_dopcor.x
+    When smw_swattrs is called it is possible that the smw pointer will be
+    changes (promoting an equispec format to multispec).  If this happens
+    and the pointer is part of an open shdr structure then the routine
+    must invalidate the mwcs stuff and possibly open or update the shdr
+    structure.  (6/14/93, Valdes)
+
+bplot.cl
+doc/bplot.hlp
+    The query parameters from SPLOT were added as hidden parameters in
+    BPLOT to allow such things as writing output spectra without generating
+    queries.  (6/8/93, Valdes)
+
+identify/ididentify.x
+    Added newlines when printing to the status line.  This is needed when
+    redirecting the output to a file in the IMRED scripts.  (6/4/93, Valdes)
+   
+identify/iddelete.x
+    The label pointers needed to be updated when deleting a feature.
+    (6/4/93, Valdes)
+
+t_specplot.x
+    Modified the log output format to include the aperture number.
+    (5/25/93, Valdes)
+
+t_sarith.x
+t_fitprofs.x
+wrspect.x
+    The conversion from logical to physical coordinates was incorrect in
+    that it truncated the physical coordinates.  This could cause a subtle
+    error in the coordinate system.  (5/20/93, Valdes)
+
+identify/idmap.x
+    The user specified vector axis is interpreted as a logical axis rather
+    than a physical axis.  This is only significant for transposed images.
+    (5/14/93, Valdes)
+
+smw/smwsaxes.x
+smw/smwsaveim.x
+    Transposed NDSPEC images are now allowed.  (5/11/93, Valdes)
+
+getcalib.x
+    Added a search for alternate standard names in a file <caldir>names.men
+    if that file is present.  (5/4/93, Valdes)
+
+splot/splot.x
+splot/anshdr.x
+splot/avgsnr.x
+    Added logging of the 'm' key output.  (5/4/93, Valdes)
+
+splot/splot.x
+splot/splotfun.x
+    1.  fun_do was not initializing the pointers passed to getimage.
+	This proves to be a problem if an error occurs in getting the
+	second image data, such as due to a mistype, so that the
+	next time the routine is called an invalid pointer is found
+	and a segmentation error occurs.
+    2.  Added a time delay on an error message in fun_do followed by the
+	function mode prompt.
+    (3/2/93, Valdes)
+
+sensfunc/sfstds.x
+    1.  Eliminated input stars/apertures that have no data.
+    2.  Eliminated input flux points outside the range of the
+	star/aperture wavelength range.
+    3.  Improved the iterative fitting to drop back to a polynomial
+	function if the lowest order spline does not fit.
+    (2/12/93, Valdes)
+
+identify/idgraph.x
+    Because these procedures used the SX array as temporary storage it
+    caused the initialize option to fail.  (2/3/92, Valdes)
+
+onedspec.men
+    Removed reference to dispaxis.  (1/21/93, Valdes)
+
+scombine/generic/icaclip.x
+scombine/generic/iccclip.x
+scombine/generic/icpclip.x
+scombine/generic/icsclip.x
+    When using mclip=yes and when more pixels are rejected than allowed by
+    the nkeep parameter there was a subtle bug in how the pixels are added
+    back which can result in a segmentation violation.
+	if (nh == n2)  ==>  if (nh == n[i])
+    (1/20/93, Valdes)
+
+sensfunc/sensfunc.h
+sensfunc/sfgraph.x
+sensfunc/sfginit.x
+sensfunc/sfimage.x
+sensfunc/sfcgraph.x
+sensfunc/sfextinct.x
+sensfunc/sfcolors.x
+sensfunc/sfcolon.x
+sensfunc/sfmove.x
+sensfunc/sfundelete.x
+sensfunc/sfdelete.x
+sensfunc/sfadd.x
+sensfunc/mkpkg
+sensfunc/sensfunc.key
+sensfunc.par
+doc/sensfunc.hlp
+    Added color support. (12/17/92, Valdes)
+
+splot/gfit.x
+splot/eqwidthcp.x
+splot/deblend.x
+splot/splot.x
+identify/idmark.x
+    Added color support.  (12/8/92, Valdes)
+
+splot/sumflux.x
+    1.  There was no check of whether esum was INDEF (a possible value) before
+        multiplying by wpc.  A check was added.
+    2.  Because of a change to fp_equalr which occured on (10/18) the
+        equivalent widths of flux calibrated data would be INDEF.  To
+	compensate the test is made on scaled data.
+	(12/7/92, Valdes)
+
+units.h
+    The conversion factors for millimeter and centimeter were off by a
+    factor of 10.  (12/4/92, Valdes)
+
+dispcor/dcio.x
+    The wrong axis was selected in computing the logical NW.  (11/24/92, Valdes)
+
+splot/splot.x
+splot/usercoord.x
+splot/splot.key
+splot/mkpkg
+doc/splot.hlp
+splot.par
+    Changed the 'u' and 'p' keys to include additional ways to adjust the
+    dispersion scale.  In particular a doppler and zeropoint adjustment can
+    be made using the cursor and entering a coordinate.  Note that these
+    two adjustments apply to all coordinate systems and units and do not
+    require assuming a linear dispersion.  In effect these are interactive,
+    cursor marking versions of DOPCOR (without the flux correction) and
+    SPECSHIFT.  The coordinates are specified in the current displayed
+    units.  The code that does the adjustment is now well integrated with
+    the MWCS rather than fudging the W0 and WP entries.  The output of a
+    new spectrum with 'i' will properly handle the adjusted coordinate
+    system.  (11/20/92, Valdes)
+
+bplot.cl
+irsiids/bplot.cl
+doc/bplot.hlp
+gcurval -> gcurval.dat
+    Changed the name of the default cursor file to avoid stripping.
+    (11/20/92, Valdes)
+
+splot/wrspect.x
+    Fixed typo affecting 3D images:  PNDIM(out) --> PNDIM(sh2).
+    (11/19/92, Valdes)
+
+splot/wrspect.x
+    A spectrum was being written using the W0, WPC of the current units
+    rather than Angstroms as it should be.  A call to un_ctran to convert
+    to the MWCS units was added.  (11/17/92, Valdes)
+
+t_specplot.x
+specplot.h
+doc/specplot.hlp
+specplot.key
+    Added a color parameter for specifying the color of each spectrum
+    on color graphics terminals.  (10/30/92, Valdes)
+
+t_sarith.x
+t_fitprofs.x
+splot/wrspect.x
+    1.	The doppler correction was still not properly handled.  Instead of
+	dividing by (1 - z) it should multiple by (1 + z) in order to
+	be symmetric with the WCS driver.
+    2.  To avoid roundoff with multispec format W0 and W1 (which are real)
+	are not used when recalculating the w1, dw attribute values.  Instead
+	shdr_lw is called to get the double precision values.
+	(10/16/92, Valdes)
+
+dispcor/t_dispcor.x
+dispcor/dcio.x
+doc/dispcor.hlp
+    DISPCOR will now allow multiple uses of IDENTIFY dispersion solutions
+    in a simple way with but with continuing protection against accidental
+    multiple uses of the same dispersion solutions.  When a spectrum is
+    first dispersion corrected using one or more reference spectra keywords
+    the dispersion flag is set and the reference spectra keywords are moved to
+    DCLOGn keywords.  If DISPCOR is called again without setting new
+    reference spectra keywords then the spectra are resampled (rebinned)
+    using the current coordinate system.  If new reference spectra are set
+    then DISPCOR will apply these new dispersion functions.  Thus the user
+    now explicitly enables multiple dispersion functions by adding
+    reference spectra keywords and DISPCOR eliminates accidental multiple
+    uses of the same dispersion function by renaming the reference
+    spectra.  The renamed keywords also provide a history.
+
+    Some additional log and verbose output was added to better inform the
+    user about what is done.
+    (10/15/92, Valdes)
+
+t_specshift.x		+
+specshift.par		+
+doc/specshift.hlp	+
+x_onedspec.x
+mkpkg
+onedspec.cl
+onedspec.men
+onedspec.hd
+imred$argus/argus.cl
+imred$ctioslit/ctioslit.cl
+imred$echelle/echelle.cl
+imred$hydra/hydra.cl
+imred$iids/iids.cl
+imred$irs/irs.cl
+imred$kpnocoude/kpnocoude.cl
+imred$kpnoslit/kpnoslit.cl
+imred$specred/specred.cl
+imred$argus/argus.men
+imred$ctioslit/ctioslit.men
+imred$echelle/echelle.men
+imred$hydra/hydra.men
+imred$iids/iids.men
+imred$irs/irs.men
+imred$kpnocoude/kpnocoude.men
+imred$kpnoslit/kpnoslit.men
+imred$specred/specred.men
+    The new task SPECSHIFT applies a coordinate system shift to selected
+    spectra.  For linear coordinate systems this is done by changing
+    the wavelength of the first physical pixel.  For nonlinear systems
+    the existing shift coefficient is adjusted.
+    (10/14/92, Valdes)
+
+dispcor/dcio.x
+    Added step to update the linear part of the nonlinear WCS.
+    This is mostly cosmetic.
+    (10/14/92, Valdes)
+
+dispcor/idmap.x
+    Changed the way the image is opened to avoid updating the WCS.
+    (10/14/92, Valdes)
+
+*doc/onedspec.hlp
+smw.x
+    1.  Spectra in a single image which all have the same linear dispersion
+	are now stored with linear axis types.  This gives a simpler header
+	structure than the multispec axis type for this common case.  This
+	modification applies to 1, 2, and 3 dimensional images.
+    2.  Extensions were added to allow importing spectra which use
+	a different WCS driver than multispec or linear.
+    (10/13/92, Valdes)
+
+doc/onedspec.hlp
+    First an error in a font switch causing part of the text to all be in
+    standout.  (10/9/92, Valdes)
+
+scombine/t_scombine.x
+scombine/icombine.h
+scombine/icombine.com
+scombine/icombine.x
+scombine/icscale.x
+scombine/iclog.x
+scombine/generic/iccclip.x
+scombine/generic/icsclip.x
+scombine/generic/icpclip.x
+scombine/generic/icaclip.x
+scombine/generic/icgrow.x
+scombine.par
+doc/scombine.hlp
+    The weighting was changed from using the square root of the exposure time
+    or spectrum statistics to using the values directly.  This corresponds
+    to variance weighting.  Other options for specifying the scaling and
+    weighting factors were added; namely from a file or from a different
+    image header keyword.  The \fInkeep\fR parameter was added to allow
+    controling the maximum number of pixels to be rejected by the clipping
+    algorithms.  The \fIsnoise\fR parameter was added to include a sensitivity
+    or scale noise component to the noise model.
+    (10/2/92, Valdes)
+
+splot/usercoords.x
+    This routine no longer puts a default value in the wavelength parameters.
+    This will allow using SPLOT to noninteractively set wavelengths.
+    (9/17/92, Valdes)
+
+identify/idfitdata.x
+identify/idmark.x
+identify/idgdata.x
+identify/idcenter.x
+    IDENITFY/REIDENTIFY use the standard SHDR interface which eliminates
+    data with negative physical coordinates.  This occurs because NP1 is
+    then computed to be positive.  The case where this can occur is using
+    IMSHIFT with a positive shift though explicit use of NP1 could also do
+    it.  However, the above routines use the MWCS logical-physical and
+    physical-logical conversions without accounting for NP1.  This results
+    in incorrect results.  The routines were fixed to apply NP1.  (9/16/92,
+    Valdes)
+
+splot/splot.x
+splot/getimage.x
+    Modified getimage to also allow specification of the aperture.  This
+    is needed in order for the scrolling through lines, the '(' and ')'
+    keys, to work correctly by indicating that the aperture number is
+    to be ignored.  (9/8/92, Valdes)
+
+dispcor/dcio.x
+    The computation of the aperture center was not prepared to deal with
+    INDEF aperture limits.  (9/3/92, Valdes)
+
+smw.x
+    There was a type mismatch when setting aplow and aphigh to INDEF.
+    Changed to set them to INDEFD.  This bug caused the APLOW and APHIGH
+    keywords to appear in the image header unexpectedly with IDENTIFY
+    on the VaxStation port.  (8/31/92, Valdes)
+
+ecidentify/ecgetim.x
+identify/idnoextn.x
+    The algorithm for stripping the image extension could get confused
+    with the name such as ec025.john.ec --> ec025n.ec.  The routines
+    were modified to use xt_imroot which does a better job.  (8/31/92, Valdes)
+
+t_sarith.x
+smw.x
+    Added provision to save multispec title in MSTITLE keyword when
+    separating out multispec spectra or converting to simple 1D format and
+    to restore the title when combining 1D spectra into a multispec
+    spectrum.  (8/24/92, Valdes)
+
+sensfunc/sfsvstats.x
+    A real variable was used where a double should have been giving round
+    off errors in the computation of the standard deviation.  (8/13/92, Valdes)
+
+t_sfit.x
+    Output images are of type real regardless of the input type.
+    (8/11/92, Valdes)
+
+scombine/icscale.x
+    The zero level offsets were being incorrectly scaled twice.
+    (8/10/92, Valdes)
+
+dispcor/refgspec.x
+    Arguments incompatible with intrinsic function:
+	sortval = mod (sortval + 24. - timewrap, 24.)
+    Changed second 24. to 24.0D0.  (8/10/92, Valdes)
+
+splot/fixx.x
+    Arguments incompatible with intrinsic function:
+	z1 = max (0.5, min (double (SN(sh)+.499), shdr_wl(sh, z1)))
+	z2 = max (0.5, min (double (SN(sh)+.499), shdr_wl(sh, z2)))
+    The 0.5 should be double.  (8/10/92, Valdes)
+
+shdr.x
+    Arguments incompatible with intrinsic function:  on lines 268-269,
+    319-320, need to real the image limits.  (8/10/92, Valdes)
+
+units.x
+onedspec.hlp
+    The velocity label was changed to "cz velocity" to show that it
+    is c*z and not a true velocity.  (7/30/92, Valdes)
+
+dispcor/t_dispcor.x
+    Changed WCSDIM to be 3 in the case of a 3D image.  (7/27/92, Valdes)
+
+splot/splot.x
+    Getttng a new image always forces the data to be read even if the
+    same image is given.  (7/20/92, Valdes)
+
+smw.x
+    Altered the way in which old APNUM keywords are deleted to avoid
+    a problem with the limit on the number of keywords that can be
+    mapped with imofnl in the imio$db package.  (7/17/92, Valdes)
+
+splot/replot.x
+    Replaced gascale with gt_ascale to do the autoscaling only within
+    the GTOOLS window.  (7/16/92, Valdes)
+
+t_sapertures.x
+sapertures.par
+doc/sapertures.hlp
+    Modified this task to allow resetting the WCS to pixels and changing
+    any of the WCS fields.  (7/2/92, Valdes)
+
+splot/wrspect.x
+    Harmless typo fix mwopen -> mw_open.  (7/1/92, Valdes)
+
+t_sarith.x
+    Modified to properly handle 3D images.  (7/1/92, Valdes)
+
+t_sarith.x
+    Onedspec output format now splits out the bands as well.
+    (7/1/92, Valdes)
+
+=======
+V2.10.2
+=======
+
+t_dopcor.x
+doc/dopcor.hlp
+    1.  The conversion from velocity to z was incorrect.
+    2.  Checks were added for reasonable velocities and redshifts.
+    3.  A negative sign for a header parameter changes the sense of
+	a redshift if the parameter is a redshift.
+
+=======
+V2.10.1
+=======
+
+t_deredden.x
+    The declaration for decode_ranges was incorrect.  Changed from bool to int.
+    (7/21/92, Valdes)
+
+shdr.x
+    1.  An earlier fix left the aaxis parameter undefined for longslit images.
+    This meant that references to IM_LEN(im,aaxis) yield the dimension
+    of the image rather than the axis length.
+    2.  Discovered that image sections don't automatically reset the lengths
+    of the higher dimensions to 1 as assumed in several tasks.  SHDR now
+    resets these.  (7/20/92, Valdes)
+
 =======
 V2.10.0
 =======
+
+irsiids/batchred.cl
+    The parameter "recformat" in STANDARD and CALIBRATE and "apertures" in
+    CALIBRATE are no longer present.  The BATCHRED task was modified to not
+    add these parameters to the PROCESS script.  (7/6/92, Valdes)
 
 shdr.x
     The resampling in shdr_linear and shdr_rebin is now an average rather
@@ -984,7 +2151,7 @@ onedspec$t_calibrate.x
     1.	CALIBRATE did not take the differing lengths of the echelle orders
 	into account and so gave many warnings about spectrum extends outside
 	of flux calibration limits.
-    2.	The warning is no only printed once per spectrum/order rather than
+    2.	The warning is now only printed once per spectrum/order rather than
 	for each pixel.
     (2/27/89, Valdes)
 

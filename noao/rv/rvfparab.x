@@ -63,6 +63,7 @@ begin
 	    call d_printf (DBG_FD(rv), "\nrv_fparab:\n\t")
 	    call d_printf (DBG_FD(rv), "init c[1-3] = %.6g %.6g %.6g\n")
 		call pargr (c[1]) ; call pargr (c[2]) ; call pargr (c[3])
+	    call d_flush (DBG_FD(rv))
 	}
 
 	# Now iterate the fit.
@@ -89,6 +90,11 @@ begin
 	    do i = 0, npts-1 {
 	        distance = abs (center - xcf[ledge+i])
 	        Memr[w+i] = fit_weight (distance, width, RV_WEIGHTS(rv))
+                if (DEBUG(rv)) {
+                    call d_printf (DBG_FD(rv),"\tx=%g y=%g dist=%g weight=%g\n")
+                        call pargr(xcf[ledge+i-1]) ; call pargr(ycf[ledge+i-1])
+                        call pargr (distance) ; call pargr(Memr[w+i-1])
+                }
 	    }
 
 	    # Now do the NLFIT initializations and fit.

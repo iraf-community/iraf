@@ -70,14 +70,14 @@ begin
 	print ("INITIALIZE THE PTOOLS PACKAGE")
 	print ("")
 
-	unlearn ("txappend")
+	unlearn ("txconcat")
 	unlearn ("txdump")
 	unlearn ("txrenumber")
 	unlearn ("txselect")
 	unlearn ("txsort")
 	unlearn ("pconvert")
 
-	unlearn ("tbappend")
+	unlearn ("tbconcat")
 	unlearn ("tbdump")
 	unlearn ("tbrenumber")
 	unlearn ("tbselect")
@@ -85,7 +85,7 @@ begin
 	unlearn ("tbkeycol")
 	unlearn ("tbcrename")
 
-	unlearn ("pappend")
+	unlearn ("pconcat")
 	unlearn ("pdump")
 	unlearn ("prenumber")
 	unlearn ("pselect")
@@ -106,27 +106,27 @@ begin
 
 	concatenate (txtfile1, ptlog, append=yes)
 
-	# Testing the TXAPPEND task.
+	# Testing the TXCONCAT task.
 
 	print ("", >> ptlog)
-	print ("TESTING THE TXAPPEND TASK (FIRST TEXT FILE)", >> ptlog) 
+	print ("TESTING THE TXCONCAT TASK (FIRST TEXT FILE)", >> ptlog) 
 	print ("    APPENDING THE FIRST TEXT FILE TO ITSELF", >> ptlog) 
-	print ("TESTING THE TXAPPEND TASK (FIRST TEXT FILE)") 
+	print ("TESTING THE TXCONCAT TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	txappend (txtfile1 // "," // txtfile1, root // ".app.1", task="TASK")
+	txconcat (txtfile1 // "," // txtfile1, root // ".app.1", task="TASK")
 	concatenate (root // ".app.1", ptlog, append=yes)
 	delete (root // ".app.1", ver-, >& "dev$null")
 
-	# Testing the PAPPEND task.
+	# Testing the PCONCAT task.
 
 	print ("", >> ptlog)
-	print ("TESTING THE PAPPEND TASK (FIRST TEXT FILE)", >> ptlog) 
+	print ("TESTING THE PCONCAT TASK (FIRST TEXT FILE)", >> ptlog) 
 	print ("    APPENDING THE FIRST TEXT FILE TO ITSELF", >> ptlog) 
-	print ("TESTING THE PAPPEND TASK (FIRST TEXT FILE)") 
+	print ("TESTING THE PCONCAT TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	pappend (txtfile1 // "," // txtfile1, root // ".app.1", task="TASK")
+	pconcat (txtfile1 // "," // txtfile1, root // ".app.1", task="TASK")
 	concatenate (root // ".app.1", ptlog, append=yes)
 	delete (root // ".app.1", ver-, >& "dev$null")
 
@@ -139,7 +139,7 @@ begin
 	print ("TESTING THE TXDUMP TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	txdump (txtfile1, "id,xcenter,ycenter,msky,mag[1]", yes, headers-,
+	txdump (txtfile1, "id,xcenter,ycenter,msky,mag[1]", "yes", headers-,
 	    parameters+, >> ptlog)
 
 	# Testing the PDUMP task.
@@ -151,7 +151,7 @@ begin
 	print ("TESTING THE PDUMP TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	pdump (txtfile1, "id,xcenter,ycenter,msky,mag[1]", headers-,
+	pdump (txtfile1, "id,xcenter,ycenter,msky,mag[1]", yes, headers-,
 	    parameters+, >> ptlog)
 
 	# Testing the TXSELECT task.
@@ -210,7 +210,7 @@ begin
 	print ("TESTING THE TXRENUMBER TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	txrenumber (root // ".srt.1", id="ID")
+	txrenumber (root // ".srt.1", idoffset=0, id="ID")
 	concatenate (root // ".srt.1", ptlog, append=yes)
 
 	# Testing the PRENUMBER task.
@@ -221,7 +221,7 @@ begin
 	print ("TESTING THE PRENUMBER TASK (FIRST TEXT FILE)") 
 	print ("", >> ptlog)
 
-	prenumber (root // ".srt.2", id="ID")
+	prenumber (root // ".srt.2", idoffset=0, id="ID")
 	concatenate (root // ".srt.2", ptlog, append=yes)
 
 	delete (root // ".srt.1", ver-, >& "dev$null")
@@ -246,7 +246,7 @@ begin
 	print ("TESTING THE TXDUMP TASK (SECOND TEXT FILE)") 
 	print ("", >> ptlog)
 
-	txdump (txtfile2, "id,xcenter,ycenter,msky,mag[1]", yes, headers-,
+	txdump (txtfile2, "id,xcenter,ycenter,msky,mag[1]", "yes", headers-,
 	    parameters+, >> ptlog)
 
 	# Testing the PDUMP task.
@@ -258,7 +258,7 @@ begin
 	print ("TESTING THE PDUMP TASK (SECOND TEXT FILE)") 
 	print ("", >> ptlog)
 
-	pdump (txtfile2, "id,xcenter,ycenter,msky,mag[1]", headers-,
+	pdump (txtfile2, "id,xcenter,ycenter,msky,mag[1]", yes, headers-,
 	    parameters+, >> ptlog)
 
 	# Testing the TXSELECT task.
@@ -353,37 +353,37 @@ begin
 
 	} else {
 
-	    # Testing the TBAPPEND task.
+	    # Testing the TBCONCAT task.
 
 	    print ("", >> ptlog)
-	    print ("TESTING THE TBAPPEND/TBDUMP TASKS", >> ptlog) 
+	    print ("TESTING THE TBCONCAT/TBDUMP TASKS", >> ptlog) 
 	    print ("APPENDING TABLE FILE TO ITSELF", >> ptlog)
 	    print ("DUMPING COLUMNS ID, XCENTER, YCENTER, MKSKY, and MAG[1]",
 	        >> ptlog) 
-	    print ("TESTING THE TBAPPEND/TBDUMP TASKS") 
+	    print ("TESTING THE TBCONCAT/TBDUMP TASKS") 
 	    print ("", >> ptlog)
 
-	    tbappend (tblfile1 // "," // tblfile1, root // ".app.1",
+	    tbconcat (tblfile1 // "," // tblfile1, root // ".app.1",
 	        task="TASK")
 	    tbdump (root // ".app.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-	        datafile="STDOUT", cdfile="", pfile="", rows="-",
+	        "yes", datafile="STDOUT", cdfile="", pfile="", rows="-",
 		pagwidth=158, >> ptlog)
 	    delete (root // ".app.1", ver-, >& "dev$null")
 
-	    # Testing the PAPPEND task.
+	    # Testing the PCONCAT task.
 
 	    print ("", >> ptlog)
-	    print ("TESTING THE PAPPEND/PDUMP TASKS", >> ptlog) 
+	    print ("TESTING THE PCONCAT/PDUMP TASKS", >> ptlog) 
 	    print ("APPENDING TABLE FILE TO ITSELF", >> ptlog)
 	    print ("DUMPING COLUMNS ID, XCENTER, YCENTER, MKSKY, and MAG[1]",
 	        >> ptlog) 
-	    print ("TESTING THE PAPPEND/PDUMP TASKS") 
+	    print ("TESTING THE PCONCAT/PDUMP TASKS") 
 	    print ("", >> ptlog)
 
-	    pappend (tblfile1 // "," // tblfile1, root // ".app.1",
+	    pconcat (tblfile1 // "," // tblfile1, root // ".app.1",
 	        task="TASK")
 	    pdump (root // ".app.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-		headers-, parameters+, >> ptlog)
+		yes, headers-, parameters+, >> ptlog)
 	    delete (root // ".app.1", ver-, >& "dev$null")
 
 	    # Testing the TBSELECT task.
@@ -398,7 +398,7 @@ begin
 
 	    tbselect (tblfile1, root // ".sel.1", "mag[1] <= 18.0")
 	    tbdump (root // ".sel.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-	        datafile="STDOUT", cdfile="", pfile="", rows="-",
+	        "yes", datafile="STDOUT", cdfile="", pfile="", rows="-",
 		pagwidth=158, >> ptlog)
 	    delete (root // ".sel.1", ver-, >& "dev$null")
 
@@ -414,7 +414,7 @@ begin
 
 	    pselect (tblfile1, root // ".sel.1", "mag[1] <= 18.0")
 	    pdump (root // ".sel.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-		headers-, parameters+, >> ptlog)
+		yes, headers-, parameters+, >> ptlog)
 	    delete (root // ".sel.1", ver-, >& "dev$null")
 
 	    # Testing the TBSORT task.
@@ -430,7 +430,7 @@ begin
 	    copy (tblfile1, root // ".srt.1", verbose-)
 	    tbsort (root // ".srt.1", "MAG\[1]", ascend+, casesens+)
 	    tbdump (root // ".srt.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-	        datafile="STDOUT", cdfile="", pfile="", rows="-",
+	        "yes", datafile="STDOUT", cdfile="", pfile="", rows="-",
 		pagwidth=158, >> ptlog)
 
 	    # Testing the PSORT task.
@@ -446,7 +446,7 @@ begin
 	    copy (tblfile1, root // ".srt.2", verbose-)
 	    psort (root // ".srt.2", "MAG\[1]", ascend+)
 	    pdump (root // ".srt.2", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-		headers-, parameters+, >> ptlog)
+		yes, headers-, parameters+, >> ptlog)
 
 	    # Testing the TBRENUMBER task.
 
@@ -458,9 +458,9 @@ begin
 	    print ("TESTING THE TBRENUMBER/PDUMP TASKS") 
 	    print ("", >> ptlog)
 
-	    tbrenumber (root // ".srt.1", id="ID")
+	    tbrenumber (root // ".srt.1", idoffset=0, id="ID")
 	    tbdump (root // ".srt.1", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-	        datafile="STDOUT", cdfile="", pfile="", rows="-",
+	        "yes", datafile="STDOUT", cdfile="", pfile="", rows="-",
 		pagwidth=158, >> ptlog)
 
 	    # Testing the PRENUMBER task.
@@ -475,7 +475,7 @@ begin
 
 	    prenumber (root // ".srt.2", id="ID")
 	    pdump (root // ".srt.2", "ID,XCENTER,YCENTER,MSKY,MAG\[1]",
-		headers-, parameters+, >> ptlog)
+		yes, headers-, parameters+, >> ptlog)
 
 	    delete (root // ".srt.1", ver-, >& "dev$null")
 	    delete (root // ".srt.2", ver-, >& "dev$null")
@@ -516,14 +516,14 @@ begin
 	delete (txtfile2, ver-, >& "dev$null")
 	delete (tblfile1, ver-, >& "dev$null")
 
-	unlearn ("txappend")
+	unlearn ("txconcat")
 	unlearn ("txdump")
 	unlearn ("txrenumber")
 	unlearn ("txselect")
 	unlearn ("txsort")
 	unlearn ("pconvert")
 
-	unlearn ("tbappend")
+	unlearn ("tbconcat")
 	unlearn ("tbdump")
 	unlearn ("tbrenumber")
 	unlearn ("tbselect")
@@ -531,7 +531,7 @@ begin
 	unlearn ("tbkeycol")
 	unlearn ("tbcrename")
 
-	unlearn ("pappend")
+	unlearn ("pconcat")
 	unlearn ("pdump")
 	unlearn ("prenumber")
 	unlearn ("pselect")

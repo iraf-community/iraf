@@ -126,6 +126,7 @@ begin
 		IMT_YSHIFT(sym) = 0.0
 		IMT_APERCOR(sym) = 0.0
 		IMT_ITIME(sym) = INDEFR
+		IMT_OTIME(sym) = INDEFR
 		IMT_XAIRMASS(sym) = INDEFR
 		call strcpy ("INDEF",  IMT_IFILTER(sym), SZ_FNAME)
 
@@ -233,6 +234,7 @@ begin
 		IMT_APERCOR(sym) = 0.0
 		IMT_ITIME(sym) = INDEFR
 		IMT_XAIRMASS(sym) = INDEFR
+		IMT_OTIME(sym) = INDEFR
 		call strcpy ("INDEF",  IMT_IFILTER(sym), SZ_FNAME)
 
 		call strcpy (Memc[name], IMT_LABEL(sym), SZ_FNAME)
@@ -595,7 +597,7 @@ int	verify			# verify the user input
 
 int	i, osetno, setno
 pointer	sp, sym, filterid, symbol
-real	itime, xairmass
+real	itime, xairmass, otime
 int	scan(), nscan(), strncmp()
 pointer	sthead(), stnext()
 
@@ -629,12 +631,13 @@ begin
 	        call printf ("Image set %d (%s): ")
 	            call pargi (setno)
 		    call pargstr (IMT_LABEL(symbol))
-		call printf ("Enter filter id, exposure time and airmass\n")
+		call printf (
+	        "Enter filter id, exposure time, airmass, observation time\n")
 	    }
 
 	    # Issue the prompt for each image.
 	    call printf (
-	    "    Image %s (f t X, <CR>=INDEF INDEF INDEF, <EOF>=quit entry): " )
+            "    Image %s (f t X T, <CR>=4 X (INDEF), <EOF>=quit entry): " )
 		    call pargstr (IMT_IMNAME(symbol))
 	    call flush (STDOUT)
 
@@ -651,15 +654,22 @@ begin
 	    call gargwrd (Memc[filterid], SZ_FNAME)
 	    call gargr (itime)
 	    call gargr (xairmass)
+	    call gargr (otime)
 	    if (nscan() < 1) {
 		call strcpy ("INDEF", Memc[filterid], SZ_FNAME)
 		itime = INDEFR
 		xairmass = INDEFR
+		otime = INDEFR
 	    } else if (nscan() < 2) {
 		itime = INDEFR
 		xairmass = INDEFR
-	    } else if (nscan() < 3)
+		otime = INDEFR
+	    } else if (nscan() < 3) {
 		xairmass = INDEFR
+		otime = INDEFR
+	    } else if (nscan() < 4) {
+		otime = INDEFR
+	    }
 
 	    # Update the symbol table.
 	    if (strncmp (IMT_IFILTER(symbol), "INDEF", 5) == 0)
@@ -668,6 +678,8 @@ begin
 	        IMT_ITIME(symbol) = itime
 	    if (! IS_INDEFR(xairmass))
 	        IMT_XAIRMASS(symbol) = xairmass
+	    if (! IS_INDEFR(otime))
+		IMT_OTIME(symbol) = otime
 
 	    # Verify the input.
 	    if (verify == NO)
@@ -675,10 +687,11 @@ begin
 
 	    # Issue the verify prompt.
 	    call printf (
-	        "        Verify (f t X, <CR>=%s %g %g): ")
+	        "        Verify (f t X T, <CR>=%s %g %g %0.1h): ")
 		call pargstr (IMT_IFILTER(symbol))
 		call pargr (IMT_ITIME(symbol))
 		call pargr (IMT_XAIRMASS(symbol))
+		call pargr (IMT_OTIME(symbol))
 	    call flush (STDOUT)
 
 	    # Scan the standard input.
@@ -691,7 +704,13 @@ begin
 	    call gargwrd (Memc[filterid], SZ_FNAME)
 	    call gargr (itime)
 	    call gargr (xairmass)
-	    if (nscan() == 3) {
+	    call gargr (otime)
+	    if (nscan() == 4) {
+		call strcpy (Memc[filterid], IMT_IFILTER(symbol), SZ_FNAME)
+		IMT_ITIME(symbol) = itime
+		IMT_XAIRMASS(symbol) = xairmass
+		IMT_OTIME(symbol) = otime
+	    } else if (nscan() == 3) {
 		call strcpy (Memc[filterid], IMT_IFILTER(symbol), SZ_FNAME)
 		IMT_ITIME(symbol) = itime
 		IMT_XAIRMASS(symbol) = xairmass
@@ -720,9 +739,9 @@ int	fd			# file descriptor of the input text file
 int	columns[ARB]		# the list of input columns
 int	verbose			# print status, warning and error messages
 
-int	stat
+int	stat, lbufsize
 pointer	sp, image, fname, filterid, line, sym
-real	itime, airmass
+real	itime, airmass, otime
 bool	streq()
 int	ph_nxtimage()
 pointer	stfind()
@@ -731,16 +750,17 @@ begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
 	call salloc (filterid, SZ_FNAME, TY_CHAR)
 
 	Memc[image] = EOS
 	call fstats (fd, F_FILENAME, Memc[fname], SZ_FNAME)
 
+	line = NULL
+	lbufsize = 0
 	repeat {
 
 	    # Get the image name.
-	    stat = ph_nxtimage (fd, columns, Memc[image], Memc[line])
+	    stat = ph_nxtimage (fd, columns, Memc[image], line, lbufsize)
 	    if (stat == EOF)
 		break
 
@@ -759,15 +779,23 @@ begin
 
 	    # Decode the data.
 	    call ph_obsdata (Memc[line], columns, Memc[filterid], SZ_FNAME,
-	        itime, airmass)
+	        itime, airmass, otime)
 
 	    # Enter the data in the symbol table.
 	    if (! IS_INDEFR(itime))
 	        IMT_ITIME(sym) = itime
 	    if (! IS_INDEFR(airmass))
 	        IMT_XAIRMASS(sym) = airmass
+	    if (! IS_INDEFR(otime))
+		IMT_OTIME(sym) = otime
 	    if (! streq (Memc[filterid], "INDEF"))
 	        call strcpy (Memc[filterid], IMT_IFILTER(sym), SZ_FNAME)
+	}
+
+	if (line != NULL) {
+	    call mfree (line, TY_CHAR)
+	    line = NULL
+	    lbufsize = 0
 	}
 
 	call sfree (sp)
@@ -795,9 +823,9 @@ int	normtime		# normalize exposure times
 int	sortimid		# does data need to be sorted on imid or id
 int	verbose			# print status, warning and error messages
 
-int	stat, bufsize
+int	stat, dbufsize, lbufsize
 pointer	sp, fname, image, imname, filterid, line, sym
-real	itime, airmass
+real	itime, airmass, otime
 
 bool	streq()
 int	ph_nxtimage(), ph_stardata(), ph_getimage()
@@ -808,18 +836,17 @@ begin
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
 	call salloc (filterid, SZ_FNAME, TY_CHAR)
 
 	# Allocate some initial buffer space.
 	if (nptr == 0) {
-	    bufsize = DEF_BUFSIZE
-	    call malloc (x, bufsize, TY_REAL)
-	    call malloc (y, bufsize, TY_REAL)
-	    call malloc (mag, bufsize, TY_REAL)
-	    call malloc (merr, bufsize, TY_REAL)
-	    call malloc (imid, bufsize, TY_INT)
-	    call malloc (id, bufsize, TY_INT)
+	    dbufsize = DEF_BUFSIZE
+	    call malloc (x, dbufsize, TY_REAL)
+	    call malloc (y, dbufsize, TY_REAL)
+	    call malloc (mag, dbufsize, TY_REAL)
+	    call malloc (merr, dbufsize, TY_REAL)
+	    call malloc (imid, dbufsize, TY_INT)
+	    call malloc (id, dbufsize, TY_INT)
 	}
 
 	# Initialize.
@@ -827,7 +854,9 @@ begin
 	call fstats (fd, F_FILENAME, Memc[fname], SZ_FNAME)
 
 	# Find the first image.
-	stat = ph_nxtimage (fd, columns, Memc[image], Memc[line])
+	lbufsize = 0
+	line = NULL
+	stat = ph_nxtimage (fd, columns, Memc[image], line, lbufsize)
 
 	# Read the data.
 	while (stat != EOF) {
@@ -842,26 +871,34 @@ begin
 		        call pargstr (Memc[image])
 		    call eprintf ("is not in the image sets file\n")
 		}
-		stat = ph_nxtimage (fd, columns, Memc[image], Memc[line])
+		stat = ph_nxtimage (fd, columns, Memc[image], line, lbufsize)
 		next
 	    }
 
 	    # Decode the filter, exposure time and airmass information.
 	    call ph_imdata (Memc[line], columns, Memc[filterid], SZ_FNAME,
-	        itime, airmass)
+	        itime, airmass, otime)
 
 	    # Enter the new values in the symbol table.
 	    if (IS_INDEFR(IMT_ITIME(sym))) {
-		if (normtime == YES)
-		    IMT_ITIME(sym) = itime
-		else
+		if (IS_INDEFR(itime))
 		    IMT_ITIME(sym) = 1.0
-	    } else if (IMT_NENTRIES(sym) > 0) 
+		else if (normtime == NO)
+		    IMT_ITIME(sym) = 1.0
+		else
+		    IMT_ITIME(sym) = itime
+	    } else if (IMT_NENTRIES(sym) > 0) { 
 		# do nothing
-	    else
+	    } else if (IS_INDEFR(itime)) {
+		if (normtime == NO)
+		    IMT_ITIME(sym) = 1.0
+	    } else {
 	        IMT_ITIME(sym) = IMT_ITIME(sym) / itime
+	    }
 	    if (IS_INDEFR(IMT_XAIRMASS(sym)))
 	        IMT_XAIRMASS(sym) = airmass
+	    if (IS_INDEFR(IMT_OTIME(sym)))
+	        IMT_OTIME(sym) = otime
 	    if (streq (IMT_IFILTER(sym), "INDEF"))
 	        call strcpy (Memc[filterid], IMT_IFILTER(sym), SZ_FNAME)
 
@@ -888,23 +925,29 @@ begin
 		}
 
 		# Allocate more buffer space if necessary.
-		if (nptr >= bufsize) {
-		    bufsize = bufsize + DEF_BUFSIZE
-	    	    call realloc (x, bufsize, TY_REAL)
-	            call realloc (y, bufsize, TY_REAL)
-	            call realloc (mag, bufsize, TY_REAL)
-	            call realloc (merr, bufsize, TY_REAL)
-	            call realloc (imid, bufsize, TY_INT)
-	            call realloc (id, bufsize, TY_INT)
+		if (nptr >= dbufsize) {
+		    dbufsize = dbufsize + DEF_BUFSIZE
+	    	    call realloc (x, dbufsize, TY_REAL)
+	            call realloc (y, dbufsize, TY_REAL)
+	            call realloc (mag, dbufsize, TY_REAL)
+	            call realloc (merr, dbufsize, TY_REAL)
+	            call realloc (imid, dbufsize, TY_INT)
+	            call realloc (id, dbufsize, TY_INT)
 		}
 
 		# Decode the next data.
-		stat = ph_getimage (fd, columns, Memc[imname], Memc[line])
+		stat = ph_getimage (fd, columns, Memc[imname], line, lbufsize)
 
 	    } until ((stat == EOF) || (! streq (Memc[imname], Memc[image])))
 
 	    call strcpy (Memc[imname], Memc[image], SZ_FNAME)
 
+	}
+
+	if (line != NULL) {
+	    call mfree (line, TY_CHAR)
+	    line = NULL
+	    lbufsize = 0
 	}
 
 	call sfree (sp)

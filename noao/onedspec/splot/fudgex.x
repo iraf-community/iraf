@@ -16,6 +16,7 @@ real	slope
 real	wx2, wy2
 
 int	clgcur()
+bool	fp_equalr()
 
 begin
 	# Get second point
@@ -30,7 +31,10 @@ begin
 	    wy1 = y[i1]
 	    wy2 = y[i2]
 	}
-	slope = (wy2-wy1) / (wx2-wx1)
+	if (fp_equalr (wx1, wx2))
+	    slope = 0.
+	else
+	    slope = (wy2-wy1) / (wx2-wx1)
 
 	# Replace pixels
 	do i = i1, i2

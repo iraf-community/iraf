@@ -6,10 +6,11 @@ $checkin libpkg.a ".."
 $exit
 
 libpkg.a:
+	apbsmooth.x
+	apclip.x
 	apdate.x		<time.h>
 	apdiverr.x
 	apfnames.x
-	apgflags.x		<gio.h>
 	apgscur.x		<gset.h>		<fset.h>
 	apgtools.x		<pkg/gtools.h>		<gset.h>
 	aplucy.x

@@ -328,7 +328,7 @@ begin
 		    call pargstr ("parameter")
 		    call pargi (nparam)
 		stat = ph_rlist (Memc[dexpr], len_dexpr, CFG_MAXLENEQN,
-		    Memc[str],  neq + 1, verify)
+		    Memc[str],  verify)
 	        if (stat == EOF)
 	            break
 		if (stat <= 0) {
@@ -359,7 +359,7 @@ begin
 		    call pargstr ("parameter")
 		    call pargi (nparam)
 		stat = ph_rlist (Memc[dexpr], len_dexpr, CFG_MAXLENEQN,
-		    Memc[str], neq + 1, verify)
+		    Memc[str], verify)
 	        if (stat == EOF)
 	            break
 		if (stat <= 0) {
@@ -677,13 +677,12 @@ end
 
 # PH_RLIST -- Get a list of parameter = value strings.
 
-int procedure ph_rlist (list, op, max_lenlist, keyword, neq, verify)
+int procedure ph_rlist (list, op, max_lenlist, keyword, verify)
 
 char	list[ARB]		# list of parameter=value strings
 int	op			# pointer into the parameter list
 int	max_lenlist		# maximum length of parameter list
 char	keyword[ARB]		# prompt keyword
-int	neq			# the equation number
 int	verify			# verify the parameter values
 
 int	stat

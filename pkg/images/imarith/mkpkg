@@ -8,6 +8,9 @@ $exit
 generic:
 	$set	GEN = "$$generic -k"
 
+	$ifolder (imexpr.x, imexpr.gx)
+	    $(GEN) imexpr.gx -o imexpr.x $endif
+
         $ifolder (generic/icaclip.x, icaclip.gx)
 	    $(GEN) icaclip.gx -o generic/icaclip.x $endif
         $ifolder (generic/icaverage.x, icaverage.gx)
@@ -63,6 +66,9 @@ libpkg.a:
 	icscale.x	icombine.com icombine.h <error.h> <imhdr.h> <imset.h>
 	icsection.x	<ctype.h>
 	icsetout.x	icombine.com <imhdr.h>
+	gettok.x	<error.h> <ctype.h> <fset.h> gettok.h
+	imexpr.x	<ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\
+			<fset.h> <lexnum.h> <evvexpr.h> gettok.h
 	t_imarith.x	<imhdr.h> <error.h> <lexnum.h>
 	t_imcombine.x	icombine.com icombine.h <error.h> <imhdr.h> <mach.h>
 	t_imdivide.x	<imhdr.h>

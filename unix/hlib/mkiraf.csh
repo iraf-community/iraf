@@ -4,15 +4,21 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf	= "/usr/iraf"
-set	imdir	= "/d0/iraftmp"
+set	iraf	= "/iraf/iraf"
+set	imdir	= "/d0/iraf"
 set	ttymsg  =\
-"Terminal types: xterm,gterm,vt640,vt100,etc."
+"Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
 
 # ------------- (end of site dependent definitions) ------------------------
 # Make an empty "uparm" (user parameter) directory.
 
 unalias rm mkdir pwd echo mkdir sed whoami pushd popd
+
+# The following kludge is for Solaris, which doesn't have whomai.
+if (! $?USER) then
+    setenv USER `whoami`
+endif
+alias whoami "(echo $USER)"
 
 # Protect against running mkiraf in an iraf system directory.
 pushd $iraf >& /dev/null;  set irafdir = `pwd`;  popd >& /dev/null

@@ -7710,6 +7710,17 @@ sys/gio/glabax/glabax.x
 unix/boot/mkpkg/mkpkg
 	Changed a "cc" to a "$(CC)".  (11/04)
 
+pkg/images/tv/imexamine/iecolon.x
+pkg/images/tv/doc/imexamine.imh
+lib/src/imexamine.key
+	1.  The "label" parameter was incorrectly attributed to the surface
+	    plot instead of the contour plot.
+	2.  The "axes" parameter for the surface plot was missing in the code
+	    though noted in the help.
+	3.  Updated the help and key file to show the label parameter belongs
+	    to the e plot and to show the axes parameter.
+	(11/08)
+
 pkg/images/xregister.par
 pkg/images/doc/xregister.hlp
 pkg/images/geometry/xregister/t_xregister.x
@@ -7998,6 +8009,9 @@ sys/fio/open.x
 pkg/images/tv/mkpkg
 pkg/images/tv/wcslab/mkpkg
 	The general purpose routines in WCSLAB were moved into libds.a.  (4/10)
+
+pkg/images/tv/doc/imexamine.hlp
+	Fixed a typo in the equation for ellipticity.  (4/10)
 
 pkg/images/tv/imedit/t_imedit.x
 pkg/images/doc/imedit.hlp
@@ -8542,3 +8556,344 @@ sys/mwcs/mwsave.x
 
 -------------------------------------
 V2.10.4 patch 1 generated.  (8/30)
+
+doc/rev2.hlp
+	Renamed this file to rev2.txt, it is not a help file.  (9/03)
+
+unix/boot/bootlib/osfiletype.c
+	Added ".gz" to the list of "source" file types.  Also added ".fit"
+	as an alias for ".fits".   (9/03)
+
+mkpkg
+noao/mkpkg
+	Added entries for linux and linuz architectures.  (9/06)
+
+unix/hlib/strip.iraf
+noao/lib/strip.noao
+	Replaced by updated versions, some files moved around and others
+	have been added.  (9/06)
+
+local/.cshrc
+	Added "." and moved /usr/lang up in the hierarchy.  (9/21)
+
+hlib/extern.pkg
+	Added the helpdb for the finder package on gemini and ursa.  The
+	package is still loaded through the nlocal package.  (10/12 RLS)
+
+sys/mwcs/imwcs.h
+	CROTA was being stored internally as an integer, causing small
+	truncation errors of non-integral rotational angles.  (10/18)
+
+dev/graphcap
+dev/imtoolrc
+	Added a new 8192x8192 frame buffer (imt7|imt8192).  Redefined the
+	old imt7 (imt4x1) as imt19.  (11/01)
+
+pkg/images/tv/imexamine/ierimexam.x
+pkg/images/tv/imexamine/stfmeasure.x +
+pkg/images/tv/imexamine/starfocus.h +
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/doc/imexamine.hlp
+lib/src/imexamine.key
+	New FWHM estimates based on the enclosed flux and a direct
+	measurement were added to the 'a' and 'r' keys.  The weights for
+	the Gaussian fit were modified to reduce the influence of pixels
+	outside the half-maximum radius.  The ? help and help page were
+	revised to described the new output and algorithms.  (11/09)
+
+dev/hosts
+	Added 'inti' to all downtown servers.  (11/20  MJF)
+
+pkg/images/median.par
+pkg/images/rmedian.par
+pkg/images/mode.par
+pkg/images/rmode.par
+pkg/images/fmedian.par
+pkg/images/frmedian.par
+pkg/images/fmode.par
+pkg/images/frmode.par
+pkg/images/doc/median.hlp
+pkg/images/doc/rmedian.hlp
+pkg/images/doc/mode.hlp
+pkg/images/doc/rmode.hlp
+pkg/images/doc/fmedian.hlp
+pkg/images/doc/frmedian.hlp
+pkg/images/doc/fmode.hlp
+pkg/images/doc/frmode.hlp
+pkg/images/filters/t_median.x
+pkg/images/filters/t_rmedian.x
+pkg/images/filters/t_mode.x
+pkg/images/filters/t_rmode.x
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/t_frmedian.x
+pkg/images/filters/t_fmode.x
+pkg/images/filters/t_frmode.x
+	Added a verbose parameter to the median, rmedian, mode, rmode, fmedian,
+	frmedian, fmode, and frmode tasks. (11/27/95, Davis)
+
+dev/hosts
+	Corrected path to irafks.e for cephus on all servers (11/30 MJF)
+
+unix/boot/spp/xpp/xppcode.c
+	Modified XPP to make keyword recognition case sensitive.  Keywords
+	such as "int", "char", "procedure", etc. must be lower case to be
+	recognized.  This permits macros to use the upper case versions of
+	these keywords.  (12/05)
+
+pkg/cl/debug.c
+	Added INDXINCR and PUSHINDEX to the debug code.  (12/14)
+
+pkg/cl/builtin.c
+pkg/cl/compile.c
+pkg/cl/debug.c
+pkg/cl/exec.c
+pkg/cl/grammar.y
+pkg/cl/main.c
+pkg/cl/opcodes.c
+pkg/cl/opcodes.h
+pkg/cl/prcache.c
+	1. Fixed minor bugs in the CL array code which showed up on the 64bit
+	DEC Alpha.  The array code had builtin assumptions about the size of
+	structures stored in CL memory, but on 64 bit systems the CL stack
+	and dictionary have a 64 bit memel size, rather than 32 bit.
+
+	2. Added a new builtin "d_trace" which permits instruction and
+	process tracing during execution.  Typing d_trace without any
+	arguments toggles this feature.  An optional argument 0 or 1 may be
+	used to disable or enable instruction tracing.  A source line trace
+	feature might have been nicer, but instruction tracing should still
+	be of use for tracking down bugs in scripts, or otherwise revealing
+	what is going on when the CL executes a task.  (12/16)
+
+sys/fmio/zzdebug.x
+	Added a parameter to the create datafile task to allow specification
+	of FM_MAXPTPAGES (max page table pages), for testing large datafiles.
+	(12/18)
+
+dev/hosts
+	Added new solaris machine oso to all servers. (1/29/96 MJF)
+
+pkg/images/imarith/imexpr.gx
+	Modified imexpr so that it will accept an image name that looks like
+	a number in the first few characters, but which is really an image
+	name.  For example, "123.imh" or "../foo.imh".  The previous version
+	of imexpr was treating any string which looked like a number in the
+	first few characters as a numeric constant.  (2/8/96 LED  2/14 DCT).
+
+dev/hosts
+	Eliminated all references to /gemini and /ursa since all machines
+	have been updated such that /iraf is the correct path.  Merged all
+	changes from other servers to tucana so all hosts files are now
+	identical, new machines added include ozzie, verdi, corondito and
+	pearl.kpno.  Backups of previous files will be maintained. (2/14 MJF)
+
+pkg/images/geometry/t_geotran.x
+pkg/images/geometry/geograph.x
+pkg/images/doc/geomap.hlp
+         Corrected the definition of skew in the routines which, compute the
+	geometric interpretation of the 6-coefficient fit, compute the
+	coefficients from the geometric parameters, and in the relevant help
+	pages.  (2/19/96, LED)
+
+sys/fio/zzdebug.x
+	Spiffed up the "daytime" debug/test task to permit entry of a host
+	name, so that one can use this to find out what time it is at some
+	site halfway around the world.   (2/23)
+
+pkg/images/tv/imexamine/iejimexam.x
+pkg/images/tv/jimexam.par
+pkg/images/tv/doc/imexamine.hlp
+	There were several errors in this which only showed up when using a
+	world WCS.  The parameter prompt and help now indicate the initial
+	sigma value is in pixels even when fitting in world coordinates.
+	(2/27/96, FV)
+
+pkg/images/tv/imexamine/iemw.x
+	The inverse WCS function was incorrect and is fixed.  (2/27/96, FV)
+
+pkg/dataio/doc/rfits.hlp
+	Added a note about support for unsigned short integers to the
+	rfits help page. (2/27/96, LED)
+
+pkg/xtools/icfit/icvshow.gx
+pkg/xtools/icfit/icshow.x
+pkg/xtools/icfit/icerrors.gx
+	All output except the tabular part of :xyshow now begins with
+	the comment character.  (2/29, Valdes)
+
+pkg/utilities/curfit.gx
+	Removed repeated output and added a comment character to the table
+	header line.  (2/29, Valdes)
+
+dev/hosts
+	Changed GONG machines soi/mdi to use bin.ssun after solaris upgrades.
+	(3/8/96  MJF)
+
+sys/fmio/fmio.h
+sys/fmio/fmlfopen.x
+sys/fmio/fmlfbwr.x
+sys/fmio/fmlfbrd.x
+sys/fmio/fmioextnd.x
+sys/fmio/fmclose.x
+	1. Changed the lfile pagemap (LF_PAGEMAP) from type short to int.
+	This is entirely an internal array, created at lfile open time from
+	the global pagemap, and never written out, so there should be no
+	problem changing the datatype of the array.  A type short lfile
+	pagemap limits the maximum datafile size by limiting the max file
+	offset to 32K datafile pages.  This is not a problem for the global
+	page table as the global table stores the lfile number in each PTE,
+	with the offset of the PTE entry giving the associated file offset
+	(page number).
+	2. Increased the default lfile pagemap size and increment on
+	overflow.  (3/11)
+
+lib/qpset.h
+sys/qpoe/qpoe.h
+sys/qpoe/qpstati.x
+sys/qpoe/qpseti.x
+sys/qpoe/qpopen.x
+sys/qpoe/qpmacro.x
+sys/qpoe/qpbind.x
+	Added a new parameter "maxptpages" (QPOE_MAXPTPAGES) to QPOE.  This
+	is a datafile control parameter similar to "maxlfiles" or "pagesize".
+	The pagesize and matptpages together determine the maximum datafile
+	size.  In the past we have had to increase the pagesize to accomodate
+	very large datafiles, but beyond a certain point it is better to
+	increase the maximum page table size (maxptpages).  Since QPOE files
+	can be very large it is necessary to allow control of this parameter
+	from within QPOE.  (3/11)
+
+dev/hosts
+	Added Doug Geisler's machine kukita to all servers. (3/11/96  MJF)
+
+sys/fmtio/dtoc.x
+	Added some rounding to avoid printing numbers such as 12:29:60.0
+	when formatting sexagesimal (HMS or MS) numbers.  (3/12)
+
+sys/mwcs/iwewcs.x
+	Modified the code which computes the CD matrix from CDELT/CROTA.
+	The old code computed the diagonal (scale) terms correctly but the
+	rotation terms were evidently incorrect.  The old code was based on
+	the 1988 Hanisch and Wells WCS paper and the new code is based on a
+	more recent paper by Mark Calabretta et. al. which supercedes the
+	1988 representation.  The affect of this change should be limited
+	as it only affects rotated images for which CDELT is given but no
+	CD matrix is defined.  (3/13)
+
+pkg/images/tv/src/iecolon.x
+pkg/images/tv/src/starfocus.h
+pkg/images/tv/src/stfmeasure.x
+pkg/images/tv/src/ierimexam.x
+pkg/images/tv/rimexam.par
+pkg/images/doc/imexamine.hlp
+lib/scr/imexamine.key
+	The radial profile fitting and width measurements now have an option to
+	use a Gaussian or Moffat profile model.  The model is selected by a
+	new "fittype" parameter.  A new "beta" parameter may be specified as
+	INDEF to be determined from the fit or have a fixed value.  The Moffat
+	profile model does better in producing consistent FWHM values so
+	this is the default.  (3/16, Valdes)
+
+math/gsurfit/gsrestore.gx
+math/gsurfit/gsrestorer.x
+math/gsurfit/gsrestored.x
+	Changed the type declaration of the xmin, xmax, ymin, ymax variables
+        from real to PIXEL to avoid machine precision problems.  (3/21 Davis)
+
+pkg/cl/builtin.c
+	Modified the clprintf code to support INDEF operands.  (3/23)
+
+pkg/images/tv/imedit/epsearch.x
+pkg/images/tv/imedit/epgcur.x
+	1.  The search algorithm produced incorrect results if part of the
+	    aperture was off the edge (negative image coordinates).
+	2.  The rounding was incorrect when part of the aperture was off the
+	    edge (negative image coordinates).
+	3.  A floating operand error occurs when a key is given without
+	    coordinates.
+	(3/26, Valdes)
+
+pkg/plot/t_implot.x
+	When the vector being plotted was constant the 'l' and 'c' keys
+	selecting lines/columns from the right plot axis did not work.  The
+	code was fixed for this case. (3/27, Valdes)
+
+pkg/images/geometry/xregister/rgxfit.x
+        Changed several Memr[] references to Memi[] in the rg_fit routine.
+        This type conversion bug was causing a floating point error
+	in the xregister task on the Dec Alpha machines if the coords file
+	was defined, and could potentially cause problems on other machines.
+	(Davis, April 3, 1996)
+
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	Removed the type long variables gmtl, lstl and modified all calls to
+	localtime() so that the argument is of type time_t.  This is standard
+	for all modern systems.  Some older systems still require that the
+	argument be type long, but as this is nonstandard it should be
+	ifdef-ed in the source for these older systems.  (4/04 1996)
+
+unix/hlib/libc/libc.h
+	The macros Memcptr and Memiptr included a "+ 1" which shouldn't have
+	been there.  The one indexing correction was already being done in
+	the Memc/Memi macros and Memcptr/Memiptr take a zero indexed C pointer
+	as input.  This was causing a bug in LIBC version of realloc, which
+	is not used anywhere in the IRAF system code.  (4/05)
+
+pkg/images/tv/imexamine/ierimexam.x
+pkg/images/tv/imexamine/stfmeasure.x
+	Fixed incorrect datatype declaration "real np" -> "int np" in various
+	related places.  (4/9/96, Valdes)
+
+unix/os/zmain.c
+	Added a #ifdef SYSV conditional to change the calling sequence for
+	setpgrp() for SYSV and BSD systems.  (4/24)
+
+sys/imio/iki/plf/plfopen.x
+	Fixed an imerr() call which had the wrong argument type.   (5/06)
+
+sys/libc/realloc.c
+	Modified to work when called with a null pointer.  (5/06)
+
+sys/gio/stdgraph/stgdrawch.x
+	The text drawing routines were not controlling the polyline width
+	when drawing characters in software mode using polylines.  There is
+	no line width attribute for graphics text and we probably don't want
+	one, so the code was modified to force the line width to 1 when
+	drawing software characters.  (5/10)
+
+unix/boot/bootlib/osgetenv.c
+	The envinit code calls _os_getenv to fetch the value of "pkglibs".
+	This code assumes that _os_getenv returns the string argument, but
+	nothing was being returned if the named environment variable was not
+	found.  Changed it to return a NULL-terminated empty string in this
+	case.  (5/10)
+
+sys/etc/mkpkg
+sys/etc/onentry.x
+sys/etc/main.x
+unix/os/zmain.c
+	1. The IRAF main (irafmn) was changed to an integer function and
+	modified to return an exit status.  If a task aborts and the main
+	exits without running any more tasks (as when executing a task at
+	the host level where only a single task is run) then the error status
+	of the task is returned.  In normal use as a connected process this
+	condition never occurs and the main always returns XOK as the status.
+
+	2. Several calls to sys_panic in various etc$ routines were modified
+	to ensure that a zero error code is not returned.  sys_panic returns
+	the error code as the exit status of the process.
+
+	3. The process main (zmain.c) was modified to call IRAF_MAIN as an
+	integer function and to return its exit status.
+	4. The call to exit() in zmain.c was changed to _exit().  (5/11)
+
+pkg/plot/t_graph.x
+pkg/plot/graph.par
+pkg/plot/doc/graph.hlp
+	Added parameters "ltypes" and "colors" to specify a list of line types
+	and colors when doing multiple data sets.  (5/13, Valdes)
+
+----------------------------------------
+V2.10.4 patch 2 release.  (5/22 1996)
+

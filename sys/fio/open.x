@@ -20,7 +20,7 @@ bool	nullfile, fnullfile()
 extern	zopnbf(), zopntx(), zardbf(), zgettx(), zopnsf(), zardsf()
 extern	zopnnu(), zardnu(), zgetnu()
 int	filopn(), fgetfd(), nowhite()
-errchk	syserr
+errchk	syserr, fgetfd, filopn, seek
 
 begin
 	call smark (sp)

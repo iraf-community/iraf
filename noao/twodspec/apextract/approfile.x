@@ -114,6 +114,8 @@ begin
 	do iy = 1, ny {
 	    if (Memr[x1+iy] >= Memr[x2+iy]) {
 		Memr[spec+iy] = 0.
+	        do ix = 1, nx
+		    profile[iy,ix] = 0.
 		next
 	    }
 
@@ -147,8 +149,10 @@ begin
 	    if (s > 0.) {
 	        do ix = 1, nx
 		    profile[iy,ix] = max (0., (Memr[data+ix]-Memr[sky+ix])/p)
-	    } else
-		call aclrr (profile[iy,1], nx)
+	    } else {
+	        do ix = 1, nx
+		    profile[iy,ix] = 0.
+	    }
 	}
 
 	if (nrej == ny)
@@ -378,7 +382,8 @@ begin
 	call alimr (x1, ny, p, s)
 	cvtype = SPLINE3
 	order = int (s - p + 1) + max (0, cvstati (cvtrace, CVNCOEFF) - 2)
-	order = min (20, order)
+	#order = min (20, order)
+	order = 2 * order
 	call cvinit (cv, cvtype, order, 1., real (ny))
 	do iy = 1, ny
 	    Memr[y+iy-1] = iy

@@ -1,4 +1,4 @@
-.help flat1d Jul85 noao.imred.generic
+.help flat1d Mar93 noao.imred.generic
 .ih
 NAME
 flat1d -- Make flat fields by fitting a 1D function to the image
@@ -142,6 +142,11 @@ example the files might contain
 A flat field for the slits is then obtained with the command
 
 	cl> flat1d @quartzs flats axis=2
+.ih
+REVISIONS
+.ls FLAT1D V2.10.3
+The image header keyword "CCDMEAN = 1." is now added or updated.
+.le
 .ih
 BUGS
 The creation of multi-slit files and the need for an equal number of

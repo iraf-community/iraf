@@ -128,15 +128,15 @@ pointer	ff		# IMIO pointer for the flux file
 bool	fnu		# Convert to fnu?
 pointer	fluxdata	# Pointer to flux data
 
-int	i, dispaxis, nw, ff_nw, ff_dcflag, dcflag
+int	i, laxis, paxis, nw, ff_nw, ff_dcflag, dcflag
 char	exposure[SZ_LINE]
 real	w, dw, w0, wpc, crpix, exptime, ff_w0, ff_wpc
 pointer	ff_data, wavelens, asi
 
-int	imgeti(), clgeti()
+int	imgeti()
 real	imgetr()
 pointer	imgl1r()
-errchk	imgeti(), imgetr()
+errchk	imgeti, imgetr
 
 define	VLIGHT	2.997925e18		# Speed of light in Angstroms/sec
 
@@ -162,12 +162,9 @@ begin
 	}
 
 	# Determine dispersion and exposure time for the image.
-	iferr (dispaxis = imgeti (im, "dispaxis")) {
-	    dispaxis = clgeti ("dispaxis")
-	    call imaddi (im, "dispaxis", dispaxis)
-	}
+	call get_daxis (im, laxis, paxis)
 	dcflag = imgeti (im, "dc-flag")
-	if (dispaxis == 1) {
+	if (laxis == 1) {
 	    w0 = imgetr (im, "crval1")
 	    iferr (wpc = imgetr (im, "cdelt1"))
 	        wpc = imgetr (im, "cd1_1")
@@ -179,7 +176,7 @@ begin
 	    crpix = imgetr (im, "crpix2")
 	}
 	w0 = w0 + (1 - crpix) * wpc
-	nw = IM_LEN (im, dispaxis)
+	nw = IM_LEN (im, laxis)
 	call clgstr ("exposure", exposure, SZ_LINE)
 	exptime = imgetr (im, exposure)
 	if (exptime <= 0.)
@@ -209,8 +206,9 @@ begin
 		    Memr[wavelens+i-1] = ((w0+(i-1)*wpc) - ff_w0) / ff_wpc + 1
 
 	    if ((Memr[wavelens] < 1.) || (Memr[wavelens+nw-1] > ff_nw)) {
-		call eprintf (
-		"Warning: Image wavelengths extend beyond flux calibration\n.")
+		if ((Memr[wavelens]<0.5) || (Memr[wavelens+nw-1]>ff_nw+0.5))
+		    call eprintf (
+		    "Warning: Wavelengths extend beyond flux calibration\n.")
 		call arltr (Memr[wavelens], nw, 1., 1.)
 		call argtr (Memr[wavelens], nw, real(ff_nw), real(ff_nw))
 	    }
@@ -266,20 +264,18 @@ pointer	im1			# IMIO pointer for image to be calibrated
 pointer	im2			# IMIO pointer for calibrated image
 real	fluxdata[ARB]		# Flux calibration data
 
-int	dispaxis, nw, npts
+int	laxis, paxis, nw, npts
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	in, out
 
-int	imgeti(), clgeti(), imgnlr(), impnlr()
+int	imgnlr(), impnlr()
+errchk	get_daxis
 
 begin
 	# Determine the dispersion axis of the image.
 
-	iferr (dispaxis = imgeti (im1, "dispaxis")) {
-	    dispaxis = clgeti ("dispaxis")
-	    call imaddi (im1, "dispaxis", dispaxis)
-	}
-	nw = IM_LEN (im1, dispaxis)
+	call get_daxis (im1, laxis, paxis)
+	nw = IM_LEN (im1, laxis)
 
 	# Calibrate the image.
 
@@ -287,7 +283,7 @@ begin
 	call amovkl (long (1), v1, IM_MAXDIM)
 	call amovkl (long (1), v2, IM_MAXDIM)
 
-	if (dispaxis == 1) {
+	if (laxis == 1) {
 	    while ((imgnlr(im1, in, v1) != EOF) &&
 		(impnlr(im2, out, v2) != EOF))
 		call amulr (Memr[in], fluxdata, Memr[out], npts)
@@ -295,7 +291,7 @@ begin
 	} else {
 	    while ((imgnlr(im1, in, v1) != EOF) &&
 		(impnlr(im2, out, v2) != EOF))
-		call amulkr (Memr[in], fluxdata[v1[dispaxis]-1], Memr[out],
+		call amulkr (Memr[in], fluxdata[v1[laxis]-1], Memr[out],
 		    npts)
 	}
 

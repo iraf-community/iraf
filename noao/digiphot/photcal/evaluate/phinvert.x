@@ -59,10 +59,10 @@ int procedure ph_objcheck (params, a, vartable, nstdvars, nreq, eqset,
 
 pointer	params[ARB]		# array of pointers to the fitted parameters
 real	a[ARB]			# array of observed and catalog variables
-int	vartable[nstdvars,nreq]	# table of variables as a function of equation
+int	vartable[nstdvars,ARB]	# table of variables as a function of equation
 int	nstdvars		# the total number of catalog variables
 int	nreq			# the total number of reference equations
-int	eqset[maxnset,nreq]	# set equation table
+int	eqset[maxnset,ARB]	# set equation table
 int	maxnset			# maximum number of set equations
 int	vindex[ARB]		# output index of variables
 int	nvar			# number of variables used in the equations
@@ -421,7 +421,7 @@ int	aindex[ARB]	# the index of active catalog variables
 int	nstd		# number of catalog variables
 real	rms1		# the first rms point
 
-int	j, i, sym
+int	j, i, sym, niter
 real	orms2, rms2, orms3, rms3, delta, rms
 int	pr_gsym()
 pointer	pr_gsymp()
@@ -438,6 +438,7 @@ begin
 
 	# Alter the parameter increments until the rms starts to decrease.
 	orms2 = MAX_REAL
+	niter = 0
 	repeat {
 
 	    rms2 = 0.0
@@ -448,7 +449,13 @@ begin
 	        rms2 = rms2 + (y[i] - yfit[i]) ** 2
 	    }
 	    rms2 = rms2 / neq
-	    if ((rms1 - rms2) >= 0.0)
+	    if (rms2 <= 0.0)
+		break
+	    #call eprintf ("\torms2=%g rms2=%g rms1=%g\n")
+		#call pargr (orms2)
+		#call pargr (rms2)
+		#call pargr (rms1)
+	    if ((rms1 - rms2) >= 0.0)  
 		break
 
 	    # If rms2 does not decrease and does not change from one iteration
@@ -456,7 +463,14 @@ begin
 	    # computer or the computed curvature has the wrong sign. In that
 	    # case quit.
 
-	    if (rms2 == orms2)
+	    if (orms2 < MAX_REAL) {
+		if (abs ((rms2 - orms2) / orms2) < EPSILONR)
+		    return (rms)
+	    }
+
+	    orms2 = rms2
+	    niter = niter + 1
+	    if (niter >= MAX_NITER)
 		return (rms)
 
 	    do j = 1, nstd {
@@ -465,11 +479,13 @@ begin
 		da[j] = da[j] / 2.0
 		a[j+nobs] = a[j+nobs] - da[j]
 	    }
-	    orms2 = rms2
+
+
 	}
 
 	# Alter the parameter increments until the rms starts to increase.
 	orms3 = MAX_REAL
+	niter = 0
 	repeat {
 
 	    do j = 1, nstd {
@@ -486,15 +502,26 @@ begin
 	        rms3 = rms3 + (y[i] - yfit[i]) ** 2
 	    }
 	    rms3 = rms3 / neq
+	    #call eprintf ("\torms3=%g rms3=%g rms2=%g\n")
+		#call pargr (orms3)
+		#call pargr (rms3)
+		#call pargr (rms2)
 	    if ((rms3 - rms2) >= 0.0)
 		break
 
-	    if (rms3 == orms3)
+	    if (orms3 < MAX_REAL) {
+		if (abs ((rms3 - orms3) / orms3) < EPSILONR)
+		    return (rms)
+	    }
+
+	    niter = niter + 1
+	    if (niter >= MAX_NITER)
 		return (rms)
 
+	    orms3 = rms3
 	    rms1 = rms2
 	    rms2 = rms3
-	    orms3 = rms3
+
 	}
 
 	# Fit a parabola to the three values of the rms that bracket the fit.
@@ -530,6 +557,12 @@ begin
 	    }
 	    rms = rms2
 	}
+
+	#call eprintf ("\trms1=%g rms2=%g rms3=%g rms=%g\n")
+	    #call pargr (rms1)
+	    #call pargr (rms2)
+	    #call pargr (rms3)
+	    #call pargr (rms)
 
 	return (rms)
 end

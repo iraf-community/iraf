@@ -9,8 +9,8 @@
 int procedure awvgd (a, npix, mean, sigma, lcut, hcut)
 
 double	a[ARB]
-double	mean, sigma, lcut, hcut, value
-double	sum, sumsq, temp
+double	mean, sigma, lcut, hcut
+double	sum, sumsq, value, temp
 int	npix, i, ngpix
 
 begin

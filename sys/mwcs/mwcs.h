@@ -9,7 +9,7 @@ define	DEF_SZDBUF	64		# initial double buffer size
 define	INC_SZDBUF	64		# increment double buffer size
 define	MAX_DIM		7		# max dimension of a wcs
 define	MAX_WCS		8		# max wcs per mwcs
-define	MAX_WATTR	256		# max attributes per wcs
+define	MAX_WATTR	512		# max attributes per wcs
 define	MAX_CTRAN	20		# max runtime ctran descriptors
 define	MAX_CALL	7		# max CTRAN function calls
 define	MAX_FUNC	7		# max WCS function descriptors
@@ -30,7 +30,7 @@ define	SZ_ATNAME	20		# max size attribute name
 # and for each WCS, for a fixed number of attributes.
 
 define	LEN_BASEMWCS	70
-define	LEN_WCS		858 # (depends upon MAX_WATTR)
+define	LEN_WCS		1626 # (depends upon MAX_WATTR)
 define	LEN_MWCS	(LEN_BASEMWCS+LEN_WCS*MAX_WCS)
 define	MI_LEN		(LEN_BASEMWCS+LEN_WCS*MI_NWCS($1))
 

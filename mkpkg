@@ -79,19 +79,36 @@ summary:
 	    $ifeq (MACH, dmip)
 		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
 		    | grep -v '^check file' | grep -v 'never used$'
+	    $else $ifeq (MACH, rs6000)
+		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+		    | grep -v '^check file' | grep -v 'Compilation successful'\
+		    | grep -v 'End of Compilation'
 	    $else
 		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
 		    | grep -v '^check file'
-	    $endif
+	    $endif $endif
 	$else
 	    $echo "mkpkg summary only available on a UNIX system"
 	$endif
+	;
+
+# REVIEW -- Full spool listing minus unwanted messages. [AIX]
+
+review:
+	$ifndef (spool)
+	    $set spool = spool
+	$endif
+	! cat $(spool) | grep -v 'End of Compilation' |\
+	    grep -v 'Compilation successful'
 	;
 
 # STRIP -- Strip the system of all sources and other files not required to
 # run the system, or for user programming.
 
 strip:
+	$echo "Ignore any messages about cannot delete a file."
+	$echo "Be sure to do a `cd noao; mkpkg strip' as well."
+	$echo "Stripping non-runtime files from IRAF source tree..."
 	!rmfiles -f $(hlib)strip.iraf
 	;
 
@@ -113,7 +130,7 @@ showfloat:				# show current float option
 generic:				# make architecture indep. (no bins)
 	$verbose off
 	!$(hlib)/mkfloat.csh generic
-	#!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
+	!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
 	;
 f68881:					# install f68881 binaries
 	$verbose off
@@ -145,11 +162,26 @@ sparc:					# install sparc binaries
 	!$(hlib)/mkfloat.csh sparc
 	!(cd ./unix; setenv MACH sparc; sh -x setarch.sh)
 	;
+ssun:					# install ssun binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ssun
+	!(cd ./unix; setenv MACH ssol; sh -x setarch.sh)
+	;
+sf2c:					# install sf2c binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sf2c
+	!(cd ./unix; setenv MACH ssol; sh -x setarch.sh)
+	;
 386i:
 i386:					# install 386i binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh i386
 	!(cd ./unix; setenv MACH i386; sh -x setarch.sh)
+	;
+alpha:					# install DEC Alpha/OSF binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh alpha
+	!(cd ./unix; setenv MACH alpha; sh -x setarch.sh)
 	;
 ddec:					# install DSUX DEC Fortran binaries
 	$verbose off
@@ -161,8 +193,44 @@ dmip:					# install DSUX MIPS Fortran binaries
 	!$(hlib)/mkfloat.csh dmip
 	#!(cd ./unix; setenv MACH dmip; sh -x setarch.sh)
 	;
+rs6000:					# install rs6000 binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh rs6000
+	!(cd ./unix; setenv MACH rs6000; sh -x setarch.sh)
+	;
 mips:					# install mips binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh mips
 	!(cd ./unix; setenv MACH mips; sh -x setarch.sh)
 	;
+f2c:					# install F2C/GCC binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh f2c
+	!(cd ./unix; setenv MACH mac; sh -x setarch.sh)
+	;
+irix:                                   # install irix binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh irix
+        !(cd ./unix; setenv MACH irix; sh -x setarch.sh)
+        ;
+hp300:                                  # install HPUX series 300 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp300
+        !(cd ./unix; setenv MACH hp300; sh -x setarch.sh)
+        ;
+hp700:                                  # install HPUX series 700 binaries
+hp800:					# install HPUX series 800/700 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp700
+        !(cd ./unix; setenv MACH hp700; sh -x setarch.sh)
+        ;
+linux:					# install linux binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linux
+        !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
+        ;
+linuz:					# install linuz binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linuz
+        !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
+        ;

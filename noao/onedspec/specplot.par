@@ -4,7 +4,7 @@ bands,s,h,"1",,,Bands of 3D images to plot
 autolayout,b,h,yes,,,Use automatic layout algorithm?
 autoscale,b,h,yes,,,Scale to common mean for automatic layout?
 fraction,r,h,1.0,,,Fraction of automatic minimum separation step
-units,s,h,"angstroms",,,Coordinate units
+units,s,h,"",,,Coordinate units
 scale,r,h,1.,,,Default intensity scale
 offset,r,h,0.,,,Default intensity offset
 step,r,h,0.,,,Default separation step

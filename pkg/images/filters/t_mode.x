@@ -80,7 +80,7 @@ begin
 	    iferr {
 		call mod_box (im1, im2, boundary, constant)
 	    } then {
-		call eprintf (0, "Error modal filtering image: %s\n")
+		call eprintf ("Error modal filtering image: %s\n")
 		    call pargstr (image1)
 		call erract (EA_WARN)
 		call imunmap (im1)

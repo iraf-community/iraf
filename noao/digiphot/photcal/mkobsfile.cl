@@ -9,7 +9,8 @@ string	idfilters    {prompt="The list of filter ids"}
 file	observations {prompt="The output observations file"}
 file	imsets       {"STDIN", prompt="The input image set file"}
 file	obsparams    {"", prompt="The observing parameters file"}
-string	obscolumns   {"2 3 4", prompt="The format of obsparams"}
+string	obscolumns   {"2 3 4 5", prompt="The format of obsparams"}
+real	minmagerr    {0.001, min=0.0, prompt="The minimum magnitude error"}
 file	shifts	     {"STDIN", prompt="The x and y coordinate shifts file"}
 file	apercors     {"STDIN", prompt="The aperture corrections file"}
 int	aperture     {1,
@@ -55,7 +56,7 @@ begin
 	if (iobsparams != "") {
 	    if (iobsparams == "STDIN") {
 		tobsparams = mktemp ("tmp$")
-		tobscolumns = "2 3 4"
+		tobscolumns = "2 3 4 5"
 	    } else if (! access (iobsparams)) {
 	        error (0, "The obsparams file " // iobsparams //
 		    " does not exist")
@@ -65,7 +66,7 @@ begin
 	    }
 	} else {
 	    tobsparams = ""
-	    tobscolumns = "2 3 4"
+	    tobscolumns = "2 3 4 5"
 	}
 
 	ishifts = shifts
@@ -99,7 +100,7 @@ begin
 	# Create temporary file names to store the intermediate image list.
 	tdatafile = mktemp ("tmp$")
 
-	# Change columns named "MAG" and "MERR" to "MAG[1]" aand "MERR[1]"
+	# Change columns named "MAG" and "MERR" to "MAG[1]" and "MERR[1]"
 	# in any ST tables databases.
 
 	tbcrename (tfiles, "MAG,MERR", "MAG\[1],MERR\[1]")
@@ -107,7 +108,7 @@ begin
 	# Add the image, ifilter, itime, and xairmass columns to any files
 	# in ST tables format.
 
-	tbkeycol (tfiles, "IMAGE,IFILTER,ITIME,XAIRMASS")
+	tbkeycol (tfiles, "IMAGE,IFILTER,ITIME,XAIRMASS,OTIME")
 
 	# Construct the string describing the fields to be extracted 
 	# making sure to specify the correct aperture number. Extract
@@ -118,16 +119,18 @@ begin
 	tinfields = ",IMAGE,XCENTER,YCENTER," //
 	      "MAG[" // aperture // "]" // ",MERR[" // aperture // "]," //
 	      "MAG\[" // aperture // "]" // ",MERR\[" // aperture // "]," //
-	      "IFILTER,XAIRMASS,ITIME"
+	      "IFILTER,XAIRMASS,OTIME,ITIME"
 
-	pdump (tfiles, tinfields, headers=no, parameters=yes, > tdatafile)
+	pdump (tfiles, tinfields, "yes", headers=no, parameters=yes,
+	    > tdatafile)
 
 	# Create the output catalog.
 
-	obsfile (tdatafile, "1,2,3,6,8,7,4,5", tidfilters, timsets,
-	    tobsfile, obsparams=tobsparams, normtime=no, tolerance=tolerance,
-	    allfilters=allfilters, obscolumns="1," // tobscolumns,
-	    shifts=tshifts, apercors=tapercors, verify-, verbose=verbose)
+	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5", tidfilters, timsets,
+	    tobsfile, obsparams=tobsparams, minmagerr=minmagerr,
+	    normtime=no, tolerance=tolerance, allfilters=allfilters,
+	    obscolumns="1," // tobscolumns, shifts=tshifts,
+	    apercors=tapercors, verify-, verbose=verbose)
 
 	# Delete the temporary files.
 

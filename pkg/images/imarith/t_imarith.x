@@ -156,7 +156,7 @@ begin
 	    }
 
 	    # Determine the output pixel datatype and calculation datatype.
-	    call ima_set (pixtype1, pixtype2, pixtype, calctype)
+	    call ima_set (pixtype1, pixtype2, op, pixtype, calctype)
 
 	    # If verbose or noact print the operation.
 	    if (verbose || noact) {
@@ -318,6 +318,9 @@ begin
 
 	    # Do the header parameters.
 	    iferr {
+		ifnoerr (dval1 = imgetd (im3, "CCDMEAN"))
+		    call imdelf (im3, "CCDMEAN")
+
 	        hlist = imofnlu (im3, Memc[hparams])
 		while (imgnfn (hlist, Memc[field], SZ_FNAME) != EOF) {
 	            if (im1 != NULL)
@@ -368,13 +371,15 @@ end
 
 # IMA_SET -- Determine the output image pixel type and the calculation
 # datatype.  The default pixel types are based on the highest arithmetic
-# precendence of the input images or constants.
+# precendence of the input images or constants.  Division requires
+# a minimum of real.
 
-procedure ima_set (pixtype1, pixtype2, pixtype, calctype)
+procedure ima_set (pixtype1, pixtype2, op, pixtype, calctype)
 
 int	pixtype1			# Pixel datatype of operand 1
 int	pixtype2			# Pixel datatype of operand 2
 int	pixtype				# Pixel datatype of resultant image
+int	op				# Operation
 int	calctype			# Pixel datatype for calculations
 
 char	line[1]
@@ -384,22 +389,30 @@ begin
 	# Determine maximum precedence datatype.
 	switch (pixtype1) {
 	case TY_SHORT:
-	    if (pixtype2 == TY_USHORT)
+	    if (op == DIV)
+		max_type = TY_REAL
+	    else if (pixtype2 == TY_USHORT)
 		max_type = TY_LONG
 	    else
 	        max_type = pixtype2
 	case TY_USHORT:
-	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
+	    if (op == DIV)
+		max_type = TY_REAL
+	    else if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
 		max_type = TY_LONG
 	    else
 		max_type = pixtype2
 	case TY_INT:
-	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
+	    if (op == DIV)
+		max_type = TY_REAL
+	    else if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
 		max_type = pixtype1
 	    else
 		max_type = pixtype2
 	case TY_LONG:
-	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT) ||
+	    if (op == DIV)
+		max_type = TY_REAL
+	    else if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT) ||
 	        (pixtype2 == TY_INT))
 		max_type = pixtype1
 	    else

@@ -1,7 +1,7 @@
-.help dispcor Mar92 noao.onedspec
+.help dispcor Oct92 noao.onedspec
 .ih
 NAME
-dispcor -- Dispersion correct spectra
+dispcor -- Dispersion correct and resample spectra
 .ih
 USAGE
 dispcor input output [records]
@@ -40,7 +40,7 @@ and the spectral data are not interpolated.
 .ls database = "database"
 Database containing dispersion solutions created by \fBidentify\fR or
 \fBecidentify\fR.  If the spectra have been previous dispersion corrected
-this parameter is ignored.
+this parameter is ignored unless a new reference spectra are defined.
 .le
 .ls table = ""
 Wavelength coordinate table or reference image.  Elements in this optional
@@ -68,12 +68,13 @@ in the logarithm of the wavelength.  Note that if conserving flux
 this will change the flux units to flux per log lambda interval.
 .le
 .ls flux = yes
-Conserve the total flux during interpolation?  If "no", the output spectrum
-is interpolated from the input spectrum at each output wavelength
-coordinate.  If "yes" the input spectrum is integrated over the extent of
-each output pixel.  Note that this will change the units of the flux; for
-example rebinning to logrithmic wavelengths will produce flux per log
-lambda.  For flux calibrated data you most likely would not want to
+Conserve the total flux during interpolation rather than the flux density?
+If "no", the output spectrum is average of the input spectrum across each
+output wavelength coordinate.  This conserves flux density.  If "yes" the
+input spectrum is integrated over the extent of each output pixel.  This
+conserves the total flux.  Note that in this case units of the flux will
+change; for example rebinning to logrithmic wavelengths will produce flux
+per log lambda.  For flux calibrated data you most likely would not want to
 conserve flux.
 .le
 .ls samedisp = no
@@ -110,6 +111,12 @@ the first dispersion solution is used.  Note this parameter does not
 mean ignore matches between reference and spectrum aperture numbers
 but only ignore the aperture number if no matching reference is
 found.
+
+Also if a reference table or image is given and \fIignoreaps\fR=yes
+then the default dispersion parameters for any aperture not defined
+by the table or image will be that of the first defined aperture.
+This can still be overridden by giving explicit values for
+\fIw1, w2, dw\fR and \fInw\fR.
 .le
 .ls confirm = no
 Confirm the wavelength parameters for each spectrum?  If \fIyes\fR
@@ -127,7 +134,7 @@ to determine what the default wavelengths would be based on the dispersion
 solutions.
 .le
 .ls verbose = yes
-Print the dispersion  coordinate assignments?
+Print the dispersion function and coordinate assignments?
 .le
 .ls logfile = ""
 Log file for recording the dispersion correction operations.  If no file
@@ -135,7 +142,7 @@ name is given then no log information is recorded.
 .le
 .ih
 DESCRIPTION
-The dispersion coordinate systems of the input spectra are set or changed.
+The dispersion coordinate systems of the input spectra are set or changed
 in the output spectra.  The output spectra may be the same as the input
 spectra if no output spectra are specified or the output name is the
 same as the input name.  The input and output spectra are specified
@@ -146,8 +153,20 @@ given as a set of comma separate single numbers or ranges of hyphen
 separated numbers.  If no records are specified then the input and output
 images are assumed to be full names.
 
-For spectra which have not been previously dispersion corrected the
-dispersion function is specified by one or both of the reference spectrum
+The dispersion coordinate system is defined either in the image header or
+by dispersion functions in the specified database.  To use reference
+spectra dispersion functions they must first be assigned to the image with
+\fBidentify (reidentify)\fR, \fBecidentify (ecreidentify)\fR,
+\fBrefspectra\fR, or \fBhedit\fR.  These tasks define the image header
+keywords REFSPEC1, REFSPEC2, REFSHFT1, and REFSHFT2.  The test which
+determines whether to use the current dispersion coordinate system or
+reference spectra dispersion solutions is the presence of the REFSPEC1
+keyword.  Since it is an error to apply a dispersion function to data which
+have already been dispersion corrected the any dispersion function keywords
+are deleted after use and a record of them entered in sequential image
+header keywords beginning with DCLOG.
+
+Dispersion functions are specified by one or both of the reference spectrum
 image header keywords REFSPEC1 and REFSPEC2 containing the name of
 calibration spectra with dispersion function solutions (either echelle
 dispersion functions from \fBecidentify\fR or non-echelle dispersion
@@ -169,7 +188,9 @@ is then the weighted averge of the wavelengths of the two dispersion
 functions.  The task \fBrefspectra\fR provides a number of ways to assign
 reference spectra.  Note, however, that these assignments may be made
 directly using the task \fBhedit\fR or with some other task or script if
-none of the methods are suitable.
+none of the methods are suitable.  Also note that \fBidentify\fR and
+\fBreidentify\fR add the REFSPEC1 keyword refering to the image itself
+when a database entry is written.
 
 In addition to the one or two reference dispersion functions for each input
 aperture there may also be image header keywords REFSHFT1 and REFSHFT2
@@ -211,9 +232,8 @@ use in those reduction packages.
 
 If the \fIlinearize\fR parameter is no the dispersion functions, weights,
 and shifts are transfered from the database to the world coordinate system
-keywords in the image header.
-Except for printing processing information that is all that is done to the
-spectra.
+keywords in the image header.  Except for printing processing information
+that is all that is done to the spectra.
 
 If the \fIlinearize\fR parameter is yes the spectra are interpolated to a
 linear wavelength scale and the dispersion coordinate system in the header
@@ -279,26 +299,22 @@ applies to all tasks which might need to interpolate spectra in the
 \fBonedspec\fR and associated packages.  For a discussion of interpolation
 types see \fBonedspec\fR.
 
-When it is desired to conserve flux, particularly when the dispersion is
+When it is desired to conserve total flux, particularly when the dispersion is
 significantly reduced, the parameter \fIflux\fR is set to yes and the
 output pixel value is obtained by integrating the interpolation function
-across the wavelength limits of the output pixel.
+across the wavelength limits of the output pixel.  If it is set to no
+then the flux density is conserved by averaging across the output pixel
+limits.
 
-If an input spectrum has been previously corrected, it may be
-reinterpolated to another coordinate system using the current dispersion
-coordinates in place of any dispersion functions in the database;  the
-database parameter and the REFSPEC/REFSHFT header keywords are ignored and
-the existing dispersion coordinate system is modified.  The \fIlinearize\fR
-parameter must be yes otherwise image is not modified.  Thus, this task
-may be used to resample (also called rebin) spectra.  An alternative
-simple task for resampling is \fBscopy\fR.
-
-The input spectrum name and the wavelength parameters will be printed on
-the standard output if the \fIverbose\fR parameter is set and printed
-to a log file if one is specified with the \fIlogfile\fR parameter.
-If one wishes to only check what wavelengths will be determined for the
-defaults without actually dispersion correcting the spectra the
+The input spectrum name, reference spectra, and the wavelength parameters
+will be printed on the standard output if the \fIverbose\fR parameter is
+set and printed to a log file if one is specified with the \fIlogfile\fR
+parameter.  If one wishes to only check what wavelengths will be determined
+for the defaults without actually dispersion correcting the spectra the
 \fIlistonly\fR flag may be set.
+
+Other tasks which may be used to change the dispersion coordinate system
+are \fBscopy\fR, \fBspecshift\fR, and \fBsapertures\fR.
 .ih
 EXAMPLES
 In the examples when the task is used in the IRS and IIDS packages,
@@ -384,6 +400,40 @@ ir> dispcor nite101 dcnite101 "1-10" ignore+ confirm-
 
 .ih
 REVISIONS
+.ls DISPCOR V2.10.3
+Provision was added for IDENTIFY dispersion solutions consisting of
+only a shift (as produced by the 'g' key in IDENTIFY or the refit=no
+flag in REIDENTIFY) to be applied to previously LINEARIZED spectra.
+Thus it is possible to use IDENIFY/REIDENTIFY to automatically
+compute a zero point shift based on 1 or more lines and then shift
+all the spectra to that zero point.
+
+DISPCOR will now allow multiple uses of IDENTIFY dispersion solutions
+in a simple way with but with continuing protection against accidental
+multiple uses of the same dispersion solutions.  When a spectrum is
+first dispersion corrected using one or more reference spectra keywords
+the dispersion flag is set and the reference spectra keywords are moved to
+DCLOGn keywords.  If DISPCOR is called again without setting new
+reference spectra keywords then the spectra are resampled (rebinned)
+using the current coordinate system.  If new reference spectra are set
+then DISPCOR will apply these new dispersion functions.  Thus the user
+now explicitly enables multiple dispersion functions by adding
+reference spectra keywords and DISPCOR eliminates accidental multiple
+uses of the same dispersion function by renaming the reference
+spectra.  The renamed keywords also provide a history.
+
+The flux conservation option now computes an average across the
+output pixel rather than interpolating to the middle of the output
+pixel when \fIflux\fR is no.  This preserves the flux density and
+includes all the data; i.e. a coarse resampling will not eliminate
+features which don't fall at the output pixel coordinates.
+
+Some additional log and verbose output was added to better inform the
+user about what is done.
+
+Better error information is now printed if a database dispersion function
+is not found.
+.le
 .ls DISPCOR V2.10
 This is a new version with many differences.  It replaces the previous
 three tasks \fBdispcor, ecdispcor\fR and \fBmsdispcor\fR.  It applies both
@@ -406,5 +456,5 @@ The record format syntax is available in the \fBirs/iids\fR packages.
 .le
 .ih
 SEE ALSO
-package, refspectra, scopy
+package, refspectra, scopy, specshift, sapertures
 .endhelp

@@ -4,9 +4,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <signal.h>
+#include <fcntl.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <fcntl.h>
 
 #define import_spp
 #define	import_xwhen
@@ -15,6 +15,9 @@
 #include <iraf.h>
 
 #define	QUANTUM		6
+#ifdef SYSV
+#define	vfork	fork
+#endif
 
 
 /* ZOPDPR -- Open a detached process.  In this implementation detached
@@ -49,7 +52,11 @@ XINT	*jobcode;
 	 * the process to 4, 6 or whatever the QUANTUM is).  If an absolute
 	 * priority is specified it is used without scaling.
 	 */
-	curpri = getpriority (PRIO_PROCESS, getpid());
+#ifdef SYSV
+	curpri = nice (0);
+#else
+	curpri = getpriority (PRIO_PROCESS, 0);
+#endif
 
 	for (ip=(char *)queue;  isspace (*ip);  ip++)
 	    ;
@@ -98,10 +105,22 @@ XINT	*jobcode;
 	     * do not expect to inherit any file descriptors other than
 	     * stdin, stdout, and stderr.
 	     */
-	    int     fd;
+	    struct rlimit rlim;
+	    int maxfd, fd;
 
-	    for (fd=3;  fd < min(MAXOFILES,getdtablesize());  fd++)
+	    if (getrlimit (RLIMIT_NOFILE, &rlim))
+		maxfd = MAXOFILES;
+	    else
+		maxfd = rlim.rlim_cur;
+
+	    for (fd=3;  fd < min(MAXOFILES,maxfd);  fd++)
 		fcntl (fd, F_SETFD, 1);
+
+#ifdef SYSV
+	    nice (0, priority * 2);
+#else
+	    setpriority (PRIO_PROCESS, 0, priority);
+#endif
 
 	    /* Since we used vfork we share memory with the parent until the
 	     * call to execl(), hence we must not close any files or do
@@ -130,7 +149,6 @@ XINT	*jobcode;
 	    pr_enter (pid, 0, 0);
 	}
 
-	setpriority (PRIO_PROCESS, pid, priority);
 	*jobcode = pid;
 }
 

@@ -30,7 +30,8 @@ begin
 	x[1] = center
 	call mkt_prof_derv (Memr[wgt], npix, x[1], sigma, ortho)
 	s[1] = adotr (Memr[wgt], data, npix)
-	if (abs (s[1]) <= EPSILONR) {
+	#if (abs (s[1]) <= EPSILONR) {
+	if (s[1] == 0.0) {
 	    center = x[1]
 	    call sfree (sp)
 	    return (0)
@@ -44,7 +45,8 @@ begin
 	    x[1] = x[3] + sign (sigma, s[3])
 	    call mkt_prof_derv (Memr[wgt], npix, x[1], sigma, ortho)
 	    s[1] = adotr (Memr[wgt], data, npix)
-	    if (abs (s[1]) <= EPSILONR) {
+	    #if (abs (s[1]) <= EPSILONR) {
+	    if (s[1] == 0.0) {
 		center = x[1]
 		call sfree (sp)
 		return (0)
@@ -62,7 +64,8 @@ begin
 	x[2] = x[3] - s[3] * delx / (s[1] - s[3])
 	call mkt_prof_derv (Memr[wgt], npix, x[2], sigma, ortho)
 	s[2] = adotr (Memr[wgt], data, npix)
-	if (abs (s[2]) <= EPSILONR) {
+	#if (abs (s[2]) <= EPSILONR) {
+	if (s[2] == 0.0) {
 	    center = x[2]
 	    call sfree (sp)
 	    return (1)
@@ -72,7 +75,8 @@ begin
 	for (iter = 2; iter <= maxiter; iter = iter + 1)  {
 
 	    # Check for completion.
-	    if (abs (s[2]) <= EPSILONR)
+	    #if (abs (s[2]) <= EPSILONR)
+	    if (s[2] == 0.0)
 		break
 	    if (abs (x[2] - x[1]) <= tol)
 		break
@@ -207,7 +211,8 @@ begin
 	det = x2 * x3 * (x2 - x3)
 
 	# Compute the shift in x.
-	if (abs (det) > 100.0 * EPSILONR) {
+	#if (abs (det) > 100.0 * EPSILONR) {
+	if (abs (det) > 0.0) {
 	    a = (x3 * y2 - x2 * y3) / det
 	    b = - (x3 * x3 * y2 - x2 * x2 * y3) / det
 	    c =  a * y[1] / (b * b)
@@ -216,7 +221,8 @@ begin
 	    else
 		dx = - (y[1] / b) * (1.0 + c)
 	    return (dx)
-	} else if (abs (y3) > EPSILONR)
+	#} else if (abs (y3) > EPSILONR)
+	} else if (abs (y3) > 0.0)
 	    return (-y[1] * x3 / y3)
 	else
 	    return (0.0)

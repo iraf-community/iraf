@@ -136,6 +136,8 @@ begin
 	SG_ENDMOVE(g_sg)    = stg_gstring ("VE")
 	SG_STARTMARK(g_sg)  = stg_gstring ("MS")
 	SG_ENDMARK(g_sg)    = stg_gstring ("ME")
+	SG_STARTFILL(g_sg)  = stg_gstring ("FS")
+	SG_ENDFILL(g_sg)    = stg_gstring ("FE")
 	SG_STARTTEXT(g_sg)  = stg_gstring ("TS")
 	SG_ENDTEXT(g_sg)    = stg_gstring ("TE")
 
@@ -150,6 +152,11 @@ begin
 	SG_DEVNAME(g_sg) = nextch
 	maxch = SG_SBUF(g_sg) + SZ_SBUF - nextch + 1
 	nextch = nextch + gstrcpy (devname, Memc[nextch], maxch) + 1
+
+	# Initialize the UIFNAME field.
+	SG_UIFNAME(g_sg) = nextch
+	Memc[nextch] = EOS
+	nextch = nextch + SZ_UIFNAME + 1
 	SG_NEXTCH(g_sg) = nextch
 end
 

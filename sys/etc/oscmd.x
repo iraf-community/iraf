@@ -19,6 +19,7 @@ char	errfile[ARB]		# name of file to receive error output
 
 int	status, ip, ch
 pointer	sp, cmdbuf, osin, osout, oserr, ostmp, op
+errchk	fmapfn, mktemp, fclobber, flush, putline
 int	clstati(), getci()
 bool	fnullfile()
 
@@ -58,15 +59,19 @@ begin
 		call strpak ("", Memc[osout], SZ_PATHNAME)
 	    else if (fnullfile (outfile))
 		call fmapfn (Memc[ostmp], Memc[osout], SZ_PATHNAME)
-	    else
+	    else {
+		call fclobber (outfile)
 		call fmapfn (outfile, Memc[osout], SZ_PATHNAME)
+	    }
 
 	    if (errfile[1] == EOS)
 		call strpak ("", Memc[oserr], SZ_PATHNAME)
 	    else if (fnullfile (errfile))
 		call fmapfn (Memc[ostmp], Memc[oserr], SZ_PATHNAME)
-	    else
+	    else {
+		call fclobber (outfile)
 		call fmapfn (errfile, Memc[oserr], SZ_PATHNAME)
+	    }
 
 	    # Execute the command and wait for completion.
 	    call zoscmd (Memc[cmdbuf], Memc[osin], Memc[osout], Memc[oserr],

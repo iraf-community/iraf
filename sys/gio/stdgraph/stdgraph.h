@@ -4,6 +4,8 @@ define	MAX_CHARSIZES	10			# max discreet device char sizes
 define	SZ_SBUF		1024			# initial string buffer size
 define	SZ_MEMORY	1024			# encoder memory size
 define	SZ_GDEVICE	31			# force output to named device
+define	SZ_UIFNAME	99			# user interface file name
+define	SZ_MSGBUF	4096			# default size message buffer
 define	FLUSH_MEMORY	117			# time to flush encoded polyline
 define	LEN_STACK	20			# encoder stack size
 define	NREGISTERS	12			# number of encoder registers
@@ -12,9 +14,12 @@ define	E_TOP		12			# encoder top memory register
 define	LONG_POLYLINE	50			# big enough to post X_INT
 define	PADCHAR		0			# used to gen. delays
 
+# The user can have private copies of UI specifications in GUIDIR.
+define	GUIDIR		"guidir"
+
 # The STDGRAPH state/device descriptor.
 
-define	LEN_SG		81
+define	LEN_SG		91
 
 define	SG_SBUF		Memi[$1]		# string buffer
 define	SG_SZSBUF	Memi[$1+1]		# size of string buffer
@@ -30,26 +35,31 @@ define	SG_STARTMOVE	Memi[$1+10]		# pointer to VS string
 define	SG_ENDMOVE	Memi[$1+11]		# pointer to VE string
 define	SG_STARTMARK	Memi[$1+12]		# pointer to MS string
 define	SG_ENDMARK	Memi[$1+13]		# pointer to ME string
-define	SG_STARTTEXT	Memi[$1+14]		# start text draw
-define	SG_ENDTEXT	Memi[$1+15]		# end text draw
-define	SG_CURSOR	Memi[$1+16]		# last cursor accessed
-define	SG_UPDCURSOR	Memi[$1+17]		# update cursor pos before read
-define	SG_CURSOR_X	Memi[$1+18]		# current cursor X position
-define	SG_CURSOR_Y	Memi[$1+19]		# current cursor Y position
-define	SG_COLOR	Memi[$1+20]		# last color set
-define	SG_TXSIZE	Memi[$1+21]		# last text size set
-define	SG_TXFONT	Memi[$1+22]		# last text font set
-define	SG_PLTYPE	Memi[$1+23]		# last line type set
-define	SG_PLWIDTH	Memi[$1+24]		# last line width set
-define	SG_DEVNAME	Memi[$1+25]		# name of open device
-			# (open)
-define	SG_CHARHEIGHT	Memi[$1+30+$2-1]	# character height
-define	SG_CHARWIDTH 	Memi[$1+40+$2-1]	# character width
-define	SG_CHARSIZE	Memr[$1+50+$2-1]	# text sizes permitted
-define	SG_PLAP		($1+60)			# polyline attributes
-define	SG_PMAP		($1+64)			# polymarker attributes
-define	SG_FAAP		($1+68)			# fill area attributes
-define	SG_TXAP		($1+71)			# default text attributes
+define	SG_STARTFILL	Memi[$1+14]		# pointer to FS string
+define	SG_ENDFILL	Memi[$1+15]		# pointer to FE string
+define	SG_STARTTEXT	Memi[$1+16]		# start text draw
+define	SG_ENDTEXT	Memi[$1+17]		# end text draw
+define	SG_CURSOR	Memi[$1+18]		# last cursor accessed
+define	SG_UPDCURSOR	Memi[$1+19]		# update cursor pos before read
+define	SG_CURSOR_X	Memi[$1+20]		# current cursor X position
+define	SG_CURSOR_Y	Memi[$1+21]		# current cursor Y position
+define	SG_COLOR	Memi[$1+22]		# last color set
+define	SG_TXSIZE	Memi[$1+23]		# last text size set
+define	SG_TXFONT	Memi[$1+24]		# last text font set
+define	SG_PLTYPE	Memi[$1+25]		# last line type set
+define	SG_FASTYLE	Memi[$1+26]		# last fill area style set
+define	SG_PLWIDTH	Memi[$1+27]		# last line width set
+define	SG_DEVNAME	Memi[$1+28]		# name of open device
+define	SG_UIFNAME	Memi[$1+29]		# user interface file name
+define	SG_UIFDATE	Memi[$1+30]		# UI file date
+			# empty
+define	SG_CHARHEIGHT	Memi[$1+40+$2-1]	# character height
+define	SG_CHARWIDTH 	Memi[$1+50+$2-1]	# character width
+define	SG_CHARSIZE	Memr[$1+60+$2-1]	# text sizes permitted
+define	SG_PLAP		($1+70)			# polyline attributes
+define	SG_PMAP		($1+74)			# polymarker attributes
+define	SG_FAAP		($1+78)			# fill area attributes
+define	SG_TXAP		($1+81)			# default text attributes
 
 # Substructure definitions.
 

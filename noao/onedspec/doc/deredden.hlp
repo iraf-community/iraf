@@ -1,4 +1,4 @@
-.help deredden Mar92 noao.onedspec
+.help deredden Feb94 noao.onedspec
 .ih
 NAME
 deredden -- Apply interstellar reddening correction
@@ -51,20 +51,25 @@ The logarithmic H beta extinction.
 .le
 .le
 .ls apertures = ""
-List of apertures to be selected from the input spectra to be
-calibrated.  If no list is specified then all apertures are
+List of apertures to be selected from input one dimensional spectra
+to be calibrated.  If no list is specified then all apertures are
 corrected.  The syntax is the same as the record number
-extensions.
+extensions.  This parameter is ignored for N-dimensional spatial
+spectra such as calibrated long slit and Fabry-Perot data.
 .le
-.ls override = no
-If a spectrum has been previously corrected it will contain the
-header parameter DEREDDEN.  If this parameter is present and the
-override parameter is no then a warning will be issued and no
-further correction will be applied.  The override parameter permits
-overriding this check.  This may be necessary when correcting different
-spectra in the same multispectra image with different extinction
-parameters since currently there is only one dereddening header
-parameter.
+.ls override = no, uncorrect = yes
+If a spectrum has been previously corrected it will contain the header
+parameter DEREDDEN.  If this parameter is present and the override
+parameter is no then a warning will be issued and no further correction
+will be applied.  The override parameter permits overriding this check.  If
+overriding a previous correction the \fIuncorrect\fR parameter determines
+whether the spectra are first uncorrected to the original values before
+applying the new correction.  If \fIuncorrect\fR is yes then the image
+header DEREDDEN parameter will refer to a correction from the original data
+while if it is no then the new correction is differential and the keyword
+will only reflect the last correction.  When correcting individual spectra
+separately in a multispectra image with different extinction parameters the
+uncorrect parameter should be no.
 .le
 .ih
 DESCRIPTION
@@ -112,9 +117,18 @@ extension format) or full image names.  They are required to be dispersion
 corrected (DC-FLAG >= 0) and not previously corrected (DEREDDEN absent).
 Spectra not satisfying these requirements are skipped with a warning.  The
 DEREDDEN flag may be overridden with the \fIoverride\fR parameter.  This
-may be if different extinction parameters are required for different
-spectra in the same multiple spectrum image.  A subset of apertures to be
-corrected may be selected with the \fIapertures\fR parameter.  The output
+may be done if different extinction parameters are required for different
+spectra in the same multiple spectrum image or if a new correction is
+to be applied.  The \fIuncorrect\fR parameter determines whether the
+previous correction is removed so that the final correction is relative
+to the original data or if the new correction is differential on the
+previous correction.  Note that if applying separate corrections to
+different spectra in a single multispectral image then override should
+be yes and uncorrect should be no.
+
+A subset of apertures to be corrected may be selected from one dimensional
+spectra with the \fIapertures\fR parameter.  Long slit or other higher
+dimensional spatially sampled spectra are treated as a unit.  The output
 calibrated spectra may replace the input spectra if no output spectra list
 is specified or if the output name is the same as the input name.  When
 using record number extensions the output spectra will have the same
@@ -151,14 +165,30 @@ H beta extinction in the irs package:
 .nf
 	cl> deredden artspec artspec -1.2 type=A
 .fi
+
+5. To deredden a long slit or Fabry-Perot spectrum either DISPAXIS
+must be in the image header or be specified in the package parameters.
+The summing parameters are ignored.
+    
+.nf
+	cl> deredden obj1 drobj1 1.2 type=A
+.fi
 .ih
 REVISIONS
+.ls DEREDDEN V2.10.3
+Extended to operate on two and three dimensional spatial spectra such as
+calibrated long slit and Fabry-Perot data.
+
+An option was added to allow a previous correction to be undone in order
+to keep the DEREDDEN information accurate relative to the original
+data.
+.le
 .ls DEREDDEN V2.10
 This task is new.
 .le
 .ih
 NOTES
-Since there can be only one deredding flag in multispectra images
+Since there can be only one deredding flag in multispectral images
 one needs to override the flag if different spectra require different
 corrections and then only the last correction will be recorded.
 .ih

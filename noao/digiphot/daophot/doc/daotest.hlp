@@ -1,4 +1,4 @@
-.help daotest Oct91 noao.digiphot.daophot
+.help daotest Dec92 noao.digiphot.daophot
 .ih
 NAME
 daotest -- run basic tests on the daophot package tasks
@@ -8,7 +8,7 @@ daotest imname
 .ih
 PARAMETERS
 .ls imname
-The root name of the output test images. The actual test image is stored in
+The root name of the output test images. The input test image is stored in
 fits format in the DAOPHOT package test directory. If the image already exists
 DAOTEST will exit with a warning message.
 .le
@@ -74,7 +74,7 @@ EXAMPLES
 	... display the image with all the stars fitted by ALLSTAR
 	    substracted out
 
-	dal> display testim.add.1 1
+	da> display testim.add.1 1
 
 	... display the image  containing three additional artificial
 	    stars added by the ADDSTAR routine

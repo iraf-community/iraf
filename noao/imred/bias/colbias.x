@@ -118,6 +118,7 @@ begin
 	    bias = immap (biasimage, READ_ONLY, 0)
 	    call xt_mkimtemp (image, output, original, SZ_FNAME)
 	    out = immap (output, NEW_COPY, in)
+	    IM_PIXTYPE(out) = TY_REAL
 
 	    call sprintf (title, SZ_LINE, "colbias %s")
 		call pargstr (image)

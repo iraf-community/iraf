@@ -1,11 +1,11 @@
-.help tbdump Aug91 noao.digiphot.ptools
+.help tbdump Feb93 noao.digiphot.ptools
 .ih
 NAME
 tbdump -- print fields (columns) from a list of  APPHOT/DAOPHOT STSDAS table
-	  databases
+databases
 .ih
 USAGE
-tbdump tables columns
+tbdump tables columns expr
 .ih
 PARAMETERS
 .ls tables
@@ -23,6 +23,13 @@ by an '@' character given in place of the column template.
 If the first non-white character in the column template
 is the negation character '~', the output will contain those columns
 NOT named in the remainder of the column template.
+.le
+.ls expr
+The boolean expression to be evaluated once per record.
+Only the fields in those records for which the boolean expression
+evaluates to yes are printed.
+If \fIexpr\fR = "yes", the specified columns in all the records are
+printed.
 .le
 .ls datafile = STDOUT
 If \fIDatafile\fR is not null ("") then the table data will be written
@@ -59,14 +66,14 @@ increased by two to include a pair of enclosing quotes.
 .le
 .ih
 DESCRIPTION
-This task converts an APPHOT/DAOPHOT STSDAS table database to ASCII format
+This task converts selected records from an APPHOT/DAOPHOT STSDAS table
+database to ASCII format
 and by default prints the result on the standard output.
 TBDUMP  output does not include row numbers or column names.
 The TABLES package task TPRINT can be used for more readable output.
 
-The PTOOLS version of TBDUMP described here is identical to TBDUMP in
-the STSDAS TABLES package except that its default parameter set has been
-modified for greater compatibility with TXDUMP.
+The PTOOLS version of TBDUMP described here is 
+actually a combination of the STSDAS TABLES package tasks TSELECT and TDUMP.
 
 The three primary uses for TBDUMP are to format STSDAS tables for input to
 applications
@@ -99,22 +106,84 @@ column names so there is no question about spelling or case.  This list may
 be edited to rearrange the names and/or delete some, the list
 file preceded by an '@' and used as the value of the \fIcolumns\fR
 parameter.
+
+The output records are selected on the basis of an input boolean
+expression \fIexpr\fR whose variables are the tables column names.
+If after substituting the values associated
+with a particular record into the field name variables the
+expression evaluates
+to yes, that record is included in the output table.
+
+The supported
+operators and functions are briefly described below. A detailed description
+of the boolean expression evaluator and its syntax can be found
+in the manual page for the IMAGES package HEDIT task.
+
+The following logical operators can be used in the boolean expression. 
+
+.nf
+	equal		  ==	not equal		!=
+	less than	  <	less than or equal	<=
+	greater than	  >	greater than or equal	>=
+	or		  ||	and			&&
+	negation	  !	pattern match		?=
+	concatenation	  //
+.fi
+
+The pattern match character ?=  takes a
+string expression as its first argument and a pattern as its second argument.
+The result is yes if the pattern is contained in the string expression.
+Patterns are strings which may contain pattern matching metacharacters.
+The metacharacters themselves can be matched by preceeding them with the escape
+character.  The metacharacters listed below. 
+
+.nf
+	beginning of string	^	end of string		$
+	one character		?	zero or more characters	*
+	white space		#	escape character	\
+	ignore case		{	end ignore case		}
+	begin character class	[	end character class	]
+	not, in char class	^	range, in char class	-
+.fi
+
+The expression may also include arithmetic operators and functions.
+The following arithmetic operators and functions are supported.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
 .ih
 EXAMPLES
 .nf
 1. Dump the "ID", "MAG" and "MAGERR" columns of the DAOPHOT package NSTAR
 output to the standard output.
 
-    pt> tbdump n4147.nst.1 "ID,MAG,MAGERR"
+    pt> tbdump n4147.nst.1 "ID,MAG,MAGERR" yes
 
-2. Dump the "MAG" and "MAGERR" columns of the above file and pipe the
+2. Dump the "ID", "MAG", and "MAGERR" columns of the above file for records
+which have  MAG <= 20.0".
+
+    pt> tbdump n4147.nst.1 "ID,MAG,MAGERR" "MAG <= 20.0"
+
+3. Dump the "MAG" and "MAGERR" columns of the above file and pipe the
 result to graph.
 
-    pt> tbdump n4147.nst.1 "MAG,MAGERR" | graph STDIN
+    pt> tbdump n4147.nst.1 "MAG,MAGERR" yes | graph STDIN
 
-3.  Dump all the columns in the first 100 rows of the above file.
+4.  Dump all the columns in the first 100 rows of the above file.
 
-    pt> tbdump n4147.nst.1 "" rows="1-100"
+    pt> tbdump n4147.nst.1 "" yes rows="1-100"
 .fi
 .ih
 BUGS

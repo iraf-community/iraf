@@ -50,6 +50,8 @@ begin
 	RV_ZTHRESH(rv) = clgetr ("z_threshold")
 	RV_TOLERANCE(rv) = clgetr ("tolerance")
 	RV_MAXITERS(rv) = clgeti ("maxiters")
+	RV_LINECOLOR(rv) = clgeti ("line_color")
+	RV_TXTCOLOR(rv) = clgeti ("text_color")
         call clgstr ("interp", Memc[ip], SZ_LINE)
         if (streq(Memc[ip],"") || streq(Memc[ip]," "))
             call error (0,"Rv.interp specified as empty string.")
@@ -201,7 +203,7 @@ begin
 	DBG_DEBUG(rv) = NO
 	DBG_FNAME(rv) = NULL
 	DBG_FD(rv) = STDOUT
-	DBG_OTHER(rv) = NO
+	DBG_OTHER(rv) = 0
 	DBG_LEVEL(rv) = 4
 
 	# Miscellaneous

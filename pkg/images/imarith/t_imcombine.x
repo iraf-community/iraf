@@ -30,6 +30,7 @@ begin
 	call salloc (sigma, SZ_FNAME, TY_CHAR)
 	call salloc (gain, SZ_FNAME, TY_CHAR)
 	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
+	call salloc (snoise, SZ_FNAME, TY_CHAR)
 	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.  Some additional parameters are obtained later.
@@ -45,6 +46,7 @@ begin
 	blank = clgetr ("blank")
 	call clgstr ("gain", Memc[gain], SZ_FNAME)
 	call clgstr ("rdnoise", Memc[rdnoise], SZ_FNAME)
+	call clgstr ("snoise", Memc[snoise], SZ_FNAME)
 	lthresh = clgetr ("lthreshold")
 	hthresh = clgetr ("hthreshold")
 	lsigma = clgetr ("lsigma")
@@ -52,6 +54,7 @@ begin
 	pclip = clgetr ("pclip")
 	flow = clgetr ("nlow")
 	fhigh = clgetr ("nhigh")
+	nkeep = clgeti ("nkeep")
 	grow = clgeti ("grow")
 	mclip = clgetb ("mclip")
 	sigscale = clgetr ("sigscale")
@@ -166,7 +169,14 @@ retry_
 	    call salloc (in, imtlen(list), TY_POINTER)
 	    call imtrew (list)
 	    while (imtgetim (list, input, SZ_FNAME)!=EOF) {
-		Memi[in+nimages] = immap (input, READ_ONLY, 0)
+                iferr (Memi[in+nimages] = immap (input, READ_ONLY, 0)) {
+                    do i = 1, nimages
+                        call imunmap (Memi[in+i-1])
+                    while (imtgetim (list, input, SZ_FNAME)!=EOF)
+                        ;
+                    call sfree (sp)
+                    call erract (EA_ERROR)
+                }
 		nimages = nimages + 1
 	    }
 	}
@@ -285,44 +295,59 @@ retry_
 		call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize)
 	    }
 	} then {
+	    call ic_mclose (nimages)
+	    if (!project) {
+		do j = 2, nimages
+		    call imunmap (Memi[in+j-1])
+	    }
+	   if (out[2] != NULL) {
+		call imunmap (out[2])
+		call imdelete (plfile)
+	    }
+	    if (out[3] != NULL) {
+		call imunmap (out[3])
+		call imdelete (sigma)
+	    }
+	   call imunmap (out[1])
+	   call imdelete (output)
+	   call imunmap (Memi[in])
+	    if (logfd != NULL)
+		call close (logfd)
+
 	    switch (errcode()) {
 	    case SYS_MFULL:
-		call sfree (sp)
-		call ic_mclose (nimages)
-		do j = 1, nimages {
-		    call imunmap (Memi[in+j-1])
-		    if (project)
-			break
-		}
-	       call imunmap (out[1])
-	       call imdelete (output)
-	       if (out[2] != NULL) {
-		    call imunmap (out[2])
-		    call imdelete (plfile)
-		}
-		if (out[3] != NULL) {
-		    call imunmap (out[3])
-		    call imdelete (sigma)
-		}
-	     	if (logfd != NULL)
-		    call close (logfd)
 		bufsize = bufsize / 2
+		call sfree (sp)
 		goto retry_
 	    default:
+		call fixmem (oldsize)
+		call sfree (sp)
 		call erract (EA_ERROR)
 	    }
 	}
 
 	# Unmap all the images, close the log file, and restore memory.
-	call imunmap (out[1])
+	# The input images must be unmapped first to insure that there
+	# is a FD for the output images since the headers are opened to
+	# update them.  However, the order of the NEW_COPY pointers must
+	# be preserved.
+
+	if (!project) {
+	    do i = 2, nimages
+		call imunmap (Memi[in+i-1])
+	}
 	if (out[2] != NULL)
 	    call imunmap (out[2])
 	if (out[3] != NULL)
 	    call imunmap (out[3])
+	call imunmap (out[1])
+	call imunmap (Memi[in])
 	if (logfd != NULL)
 	    call close (logfd)
 	call ic_mclose (nimages)
 	call fixmem (oldsize)
+	call sfree (sp)
+	return
 
 done_
 	do i = 1, nimages {
@@ -341,13 +366,13 @@ int procedure ty_max (type1, type2)
 
 int	type1, type2		# Datatypes
 
-int	i, j, order[7]
-data	order/TY_SHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,TY_COMPLEX,TY_REAL/
+int	i, j, order[8]
+data	order/TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,TY_COMPLEX,TY_REAL/
 
 begin
-	for (i=1; (i<=6) && (type1!=order[i]); i=i+1)
+	for (i=1; (i<=7) && (type1!=order[i]); i=i+1)
 	    ;
-	for (j=1; (j<=6) && (type2!=order[j]); j=j+1)
+	for (j=1; (j<=7) && (type2!=order[j]); j=j+1)
 	    ;
 	return (order[max(i,j)])
 end

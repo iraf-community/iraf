@@ -16,9 +16,8 @@ int	key, wcs
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, xcenter, ycenter, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
-
 int	ap_showplot(), clgcur()
-real	ap_cfwhmpsf(), ap_cthresh(), ap_csigma(), ap_cdatamin(), ap_cdatamax()
+real	ap_cfwhmpsf(), ap_csigma(), ap_cdatamin(), ap_cdatamax()
 
 begin
 	# Check for open graphics stream.
@@ -43,7 +42,7 @@ begin
 
 	call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
-	while (clgcur ("cursor", xcenter, ycenter, wcs, key, Memc[cmd],
+	while (clgcur ("gcommands", xcenter, ycenter, wcs, key, Memc[cmd],
 	    SZ_LINE) != EOF) {
 
 	# Enter the cursor setup loop.
@@ -54,8 +53,6 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 	    case 'f':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	    case 't':
-	        rval = ap_cthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 's':
 	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'l':
@@ -64,7 +61,7 @@ begin
 	        rval = ap_cdatamax (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'v':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	        rval = ap_cthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
+	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    default:
 		call printf ("Unknown or ambiguous keystroke command\007\n")
 	    }

@@ -7,6 +7,9 @@ npasses,i,h,5,1,,Number of detection passes
 window,s,h,"5","5|7",,Size of detection window
 interactive,b,h,yes,,,Examine parameters interactively?
 answer,s,q,,"no|yes|NO|YES",,Examine parameters interactively?
+train,b,h,no,,,Use training objects?
+objects,*imcur,h,"",,,Cursor list of training objects
+savefile,f,h,"",,,File to save train objects
 verbose,b,h,yes,,,Print log information to the standard output?
 logfile,f,h,"",,,Text log file
 plotfile,f,h,"",,,Log metacode plot file

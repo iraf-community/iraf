@@ -132,7 +132,7 @@ following recursion relations.
     Legendre series
     F(1,x) = 1.
     F(2,x) = x
-    F(n,x) = [(2*n-1)*x*F(n-1,x)-(n-2)*F(n-2,x)]/(n-1)
+    F(n,x) = [(2*n-3)*x*F(n-1,x)-(n-2)*F(n-2,x)]/(n-1)
 
     Chebyshev series
     F(1,x) = 1.

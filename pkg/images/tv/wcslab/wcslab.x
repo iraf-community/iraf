@@ -147,7 +147,6 @@ begin
 	WL_MIN_LINE_TYPE(wd) = GL_DOTTED
 	WL_TITLE_SIDE(wd) = TOP
 	WL_ALWAYS_FULL_LABEL(wd) = NO
-	WL_INTERACTIVE(wd) = NO
 	WL_LABEL_ROTATE(wd) = YES
 	WL_LABON(wd) = YES
 	WL_LABOUT(wd) = YES
@@ -372,7 +371,13 @@ begin
 
 	    # Examine each axis to determine whether the current axis type is
 	    # the one to use.
-	    for (axis = 1; axis <= wcs_dim; axis = axis + 1)
+	    for (axis = 1; axis <= wcs_dim; axis = axis + 1) {
+
+		# If the current physical axis is not mapped, ignore it.
+		# This statement is causing a problem in 2.10.3, not sure
+		# why but am removing it for now.
+		#if (axno[axis] == 0)
+		    #next
 
 	        ifnoerr (call mw_gwattrs( mw, axis, "wtype", Memc[axtype],
 	            SZ_LINE)) {
@@ -389,6 +394,7 @@ begin
 			    found_axis_list[found_axis] = axis
 		    }
 	        }
+	    }
 
 	    # Check to see whether we have the right number axes.
 	    if (found_axis == N_DIM)
@@ -425,11 +431,11 @@ begin
 	# is nothing more to be done.
 
 	if (IS_INDEFI (index_sys1) || IS_INDEFI (index_sys2)) {
-	    if (wcs_dim == N_DIM) {
+	    if (wcs_dim >= N_DIM) {
 	        index_sys1 = 1
 	        index_sys2 = 2
 	    } else
-	        call error (0, "ERROR: Fewer than two defined axes\n")
+	        call error (0, "Wcslab: Fewer than two defined axes")
 	}
 
 	# Zero the axis values and set any "unknown" axis to always use the
@@ -437,7 +443,7 @@ begin
 	# be a problem, but no general solution comes to mind this second.
 
 	call amovki (0, axno, wcs_dim)
-	call amovki (1, axval, wcs_dim)
+	call amovki (0, axval, wcs_dim)
 
 	# Setup so that the desired axes are set as the X and Y axis.
 	axno[index_sys1] = X_DIM
@@ -500,7 +506,6 @@ begin
 	# Get the parameters.
 	WL_ALWAYS_FULL_LABEL(wd) = btoi (clgpsetb (pp,"full_label"))
 	WL_AXIS_TITLE_SIZE(wd) = clgpsetr (pp, "axis_title_size")
-	WL_INTERACTIVE(wd) =  NO
 	WL_LABEL_ROTATE(wd) = btoi (clgpsetb (pp, "rotate"))
 	WL_LABEL_SIZE(wd) = clgpsetr (pp, "label_size")
 	WL_LABON(wd) = btoi (clgpsetb (pp, "dolabel"))

@@ -1,4 +1,4 @@
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
 # DP_NCONFIRM -- Procedure to confirm the critical nstar parameters.
 
@@ -6,8 +6,16 @@ procedure dp_nconfirm (dao)
 
 pointer	dao		# pointer to the group structure
 
+int	dp_stati()
+
 begin
 	call printf ("\n")
+
+	# Confirm recentering and sky fitting.
+	call dp_vrecenter (dao)
+	call dp_vfitsky (dao)
+	if (dp_stati (dao, FITSKY) == NO)
+	    call dp_vgroupsky (dao)
 
 	# Confirm the psf radius.
 	call dp_vpsfrad (dao)

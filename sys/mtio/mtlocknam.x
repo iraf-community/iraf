@@ -6,16 +6,12 @@ include	"mtio.h"
 
 # MT_LOCKNAME -- Generate the file name of the magtape lock file, given the
 # logical drive name.  We are called from a z-routine, so do not use any high
-# level i/o routines.  The generated lockfile name is one of the forms
+# level i/o routines.  The generated lockfile name is of the form
 #
-#		dir$mta.lok
-# 	or	dir$mta_node.lok
+#		[node!]dir$mta.lok
 #
-# depending upon whether a node prefix is present in the drive name string,
-# e.g., whether the drive is local or remote.  Note that the "lock" file is
-# always maintained on the current host, even if the drive is remote, because
-# the named directory is normally a user directory and may not exist on the
-# remote host.
+# The lock file is maintained on the same node as the drive to which it
+# refers.
 
 procedure mt_lockname (device, lockfile, maxch)
 
@@ -23,37 +19,22 @@ char	device[ARB]		#I device name
 char	lockfile[maxch]		#O receives generated lockfile name
 int	maxch			#I max chars out
 
-pointer	sp, node, cp
-int	ip, op, nchars
-int	ki_extnode(), gstrcpy()
+int	ip, op
+int	gstrcpy(), strlen()
 
 begin
-	call smark (sp)
-	call salloc (node, SZ_FNAME, TY_CHAR)
+	lockfile[1] = EOS
 
-	# Extract the node name prefix, if any.
-	ip = ki_extnode (device, Memc[node], SZ_FNAME, nchars) + 1
+	# Copy the node name prefix, if any.
+	call ki_xnode (device, lockfile, maxch)
+	op = strlen (lockfile) + 1
+	ip = op
 
-	# Begin with the directory name prefix, "mt", and device name.
-	op = gstrcpy (LOCKLDIR, lockfile, maxch) + 1
+	# Add the directory name prefix, "mt", and device name.
+	op = op + gstrcpy (LOCKLDIR, lockfile[op], maxch-op+1)
 	op = op + gstrcpy (LOCKFILE,  lockfile[op], maxch-op+1)
 	op = op + gstrcpy (device[ip], lockfile[op], maxch-op+1)
 
-	# Add the node name as the root lockfile filename, minus any funny
-	# characters that may be in the node name (such as - and the !).
-
-	if (nchars > 0) {
-	    lockfile[op] = '_'
-	    op = min (maxch, op + 1)
-	    for (cp=node;  Memc[cp] != EOS;  cp=cp+1)
-		if (IS_ALNUM(Memc[cp])) {
-		    lockfile[op] = Memc[cp]
-		    op = min (maxch, op + 1)
-		}
-	}
-
 	# Add file extension.
 	op = op + gstrcpy (LOCKEXTN,  lockfile[op], maxch-op+1)
-
-	call sfree (sp)
 end

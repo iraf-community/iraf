@@ -52,15 +52,17 @@ begin
 
 	# Initialize the APPHOT package.
 	print ("INITIALIZE THE APPHOT PACKAGE", >> aplog)
+	print ("", >> aplog)
 	print ("")
 	print ("INITIALIZE THE APPHOT PACKAGE")
-	print ("", >> aplog)
+	print ("")
 
 	unlearn ("txdump")
 	unlearn ("center")
 	unlearn ("centerpars")
 	unlearn ("daofind")
 	unlearn ("datapars")
+	unlearn ("findpars")
 	unlearn ("fitpsf")
 	unlearn ("fitsky")
 	unlearn ("fitskypars")
@@ -80,8 +82,8 @@ begin
 	print ("", >> aplog)
 
 	datapars.fwhmpsf=2.354820
-	datapars.threshold=30.0
 	datapars.sigma=10.0
+	findpars.threshold=3.0
 
 	apcoords = im // ".coo.1"
 	daofind (im, output=apcoords, interactive-, verify-)
@@ -202,6 +204,7 @@ begin
 	unlearn ("centerpars")
 	unlearn ("daofind")
 	unlearn ("datapars")
+	unlearn ("findpars")
 	unlearn ("fitpsf")
 	unlearn ("fitsky")
 	unlearn ("fitskypars")

@@ -79,11 +79,11 @@ begin
 	call printf ("#%19s")
 	    call pargstr ("Image")
 	if (nowhite (Memc[ujd_key], Memc[ujd_key], SZ_LINE) != 0) {
-	    call printf ("  %12s")
+	    call printf ("  %13s")
 		call pargstr (Memc[ujd_key])
 	}
 	if (nowhite (Memc[hjd_key], Memc[hjd_key], SZ_LINE) != 0) {
-	    call printf ("  %12s")
+	    call printf ("  %13s")
 		call pargstr (Memc[hjd_key])
 	}
 	if (nowhite (Memc[ljd_key], Memc[ljd_key], SZ_LINE) != 0) {
@@ -164,7 +164,7 @@ begin
 		    call pargstr (Memc[input])
 		if (Memc[ujd_key] != EOS) {
 		    call imaddd (im, Memc[ujd_key], ujd)
-		    call printf ("  %12.4f")
+		    call printf ("  %13.5f")
 			call pargd (ujd)
 		}
 		if (Memc[hjd_key] != EOS) {
@@ -175,7 +175,7 @@ begin
 		    call ast_precess (ra, dec, ep, ra, dec, epoch)
 		    call ast_jd_to_hjd (ra, dec, ujd, lt, hjd)
 		    call imaddd (im, Memc[hjd_key], hjd)
-		    call printf ("  %12.4f")
+		    call printf ("  %13.5f")
 			call pargd (hjd)
 		}
 		if (Memc[ljd_key] != EOS) {

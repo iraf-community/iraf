@@ -333,7 +333,7 @@ begin
 		        marker_type, Memr[size[i]], Memr[size[i]])
 		} else {
 		    if (szmarker < 0)
-		        call amulkr (Memr[size[i]], -szmarker, Memr[size[i]],
+		        call amulkr (Memr[size[i]], szmarker, Memr[size[i]],
 			    npix[i])
 		    do j = 1, npix[i] {
 			xx = Memr[x[i]+j-1]

@@ -222,7 +222,7 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 		# centering.
 		if (EP_LOGFD(ep) != NULL) {
 		    switch (key) {
-		    case 'a', 'c', 'd', 'l', 'f':
+		    case 'a', 'c', 'd', 'f', 'j', 'l':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
 			    call pargi (xa)
 			    call pargi (ya)
@@ -231,12 +231,17 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 			    call pargi (xb)
 			    call pargi (yb)
 			    call pargi (key)
-		    case 'b', 'e':
+		    case 'b', 'e', 'k':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
 			    call pargi ((xa+xb)/2)
 			    call pargi ((ya+yb)/2)
 			    call pargi (key)
-		    case 'm':
+		    case 'u':
+			if (EP_OUTDATA(ep) != NULL) {
+			    call fprintf (EP_LOGFD(ep), "%c\n")
+				call pargi (key)
+			}
+		    case 'm', 'n':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
 			    call pargi ((xa+xb)/2)
 			    call pargi ((ya+yb)/2)

@@ -39,7 +39,8 @@ output image.
 The number of columns and rowsx in the output image. The default is to
 keep the dimensions the same as the input image. If ncols and nrows are
 less than or equal to zero then the task computes the number of rows and
-columns required to include the whole image.
+columns required to include the whole input image, excluding the effects
+of any origin shift.
 .le
 .ls interpolant = "linear"
 The choices are the following.

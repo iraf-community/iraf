@@ -1,29 +1,32 @@
 include	<fset.h>
-include	"../lib/daophot.h"
+include <imhdr.h>
 include "../lib/daophotdef.h"
 
-# T_ADDSTAR  -- Procedure to add artificial stars to some images.
+define	NSEED	3
+
+# T_ADDSTAR  -- Add artificial stars to a list of images.
 
 procedure t_addstar ()
 
-pointer	image				# name of the image
-pointer	psfimage			# name of the input PSF image
-pointer	coords				# input coord and mag list
-pointer	addimage 			# root name for output images and file
-real	minmag, maxmag			# range of magnitudes to add
-int	nstar				# number of stars to add
-int	nimage				# number of new images to create
+pointer	image				# the input image
+pointer	psfimage			# the input PSF image
+pointer	photfile			# the input photometry file
+pointer	addimage 			# root name for output image and file
+real	minmag, maxmag			# magnitude range of artificial stars 
+int	nstar				# number of artificial stars
+int	nimage				# number of new images
 
 bool	coo_text
-int	imlist, limlist, clist, lclist, pimlist, lpimlist, oimlist, loimlist
-int	cl, ofd, j, simple, idoffset, root, verify, update
+int	imlist, limlist, plist, lplist, pimlist, lpimlist, oimlist, loimlist
+int	ifd, ofd, j, simple, idoffset, root, verbose, verify, update
+int	seed, iseed[NSEED]
 pointer	sp, outfname, im, psffd, oim, dao
 
 bool	itob(), clgetb()
-int	tbtopn(), clgeti(), fstati(), btoi(), fnldir(), strlen(), strncmp()
+int	clgeti(), fstati(), btoi(), fnldir(), strlen(), strncmp()
 int	access(), open(), imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb()
 int	fntgfnb()
-pointer	immap()
+pointer	immap(), tbtopn()
 real	clgetr()
 
 begin
@@ -35,41 +38,41 @@ begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
+	call salloc (photfile, SZ_FNAME, TY_CHAR)
 	call salloc (addimage, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 
 	# Get the file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	call clgstr ("starlist", Memc[coords], SZ_FNAME)
+	call clgstr ("photfile", Memc[photfile], SZ_FNAME)
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("addimage", Memc[addimage], SZ_FNAME)
 
-	# Get the lists.
+	# Open the file/image lists.
 	imlist = imtopen (Memc[image])
 	limlist = imtlen (imlist)
-	clist = fntopnb (Memc[coords], NO)
-	lclist = fntlenb (clist)
+	plist = fntopnb (Memc[photfile], NO)
+	lplist = fntlenb (plist)
 	pimlist = imtopen (Memc[psfimage])
 	lpimlist = imtlen (pimlist)
 	oimlist = imtopen (Memc[addimage])
 	loimlist = imtlen (oimlist)
 
-	# Check that the image and coordinate list lengths match.
-	if ((lclist > 1) && (lclist != limlist)) {
+	# Check that the image and input photometry list lengths match.
+	if ((lplist > 1) && (lplist != limlist)) {
 	    call imtclose (imlist)
-	    call fntclsb (clist)
+	    call fntclsb (plist)
 	    call imtclose (pimlist)
 	    call imtclose (oimlist)
 	    call sfree (sp)
-	    call error (0, "Incompatible image and coordinate list lengths")
+	    call error (0, "Incompatible image and photometry list lengths")
 	}
 
 	# Check that the image and psf image list lengths match.
-	if ((limlist != lpimlist) && (strncmp (Memc[psfimage], "default",
-	    7) != 0)) {
+	if ((limlist != lpimlist) && (strncmp (Memc[psfimage], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
-	    call fntclsb (clist)
+	    call fntclsb (plist)
 	    call imtclose (pimlist)
 	    call imtclose (oimlist)
 	    call sfree (sp)
@@ -77,37 +80,49 @@ begin
 	}
 
 	# Check that image and output image list lengths match.
-	if ((loimlist != limlist) && (strncmp (Memc[addimage], "default",
-	    7) != 0)) {
+	if ((loimlist != limlist) && (strncmp (Memc[addimage], DEF_DEFNAME,
+	    DEF_LENDEFNAME) != 0)) {
 	    call imtclose (imlist)
-	    call fntclsb (clist)
+	    call fntclsb (plist)
 	    call imtclose (pimlist)
 	    call imtclose (oimlist)
 	    call sfree (sp)
-	    call error (0, "Incompatible input and output images lists")
+	    call error (0, "Incompatible input and output image list lengths")
 	}
 
-	# Get the remaining parameters.
+	# Set the type of input text file.
+	simple = btoi (clgetb ("simple_text"))
+
+	# Get the articial star parameters.
 	nimage = clgeti ("nimage")
-	if (lclist <= 0) {
+	if (lplist <= 0) {
 	    nstar = clgeti ("nstar")
 	    minmag = clgetr ("minmag")
 	    maxmag = clgetr ("maxmag")
 	}
+	seed = clgeti ("seed")
+	idoffset = clgeti ("idoffset")
+
+	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
-	idoffset = clgeti ("idoffset")
-	simple = btoi (clgetb ("simple_text"))
 
 	# Initialize the daophot structure.
 	call dp_gppars (dao, NULL)	
-	call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
+	call dp_seti (dao, VERBOSE, verbose)
+
+	# Verify, confirm, update the parameters.
 	if (verify == YES) {
 	    call dp_adconfirm (dao)
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
+
+	# Open the PSF structure
 	call dp_fitsetup (dao)
+
+	# Initialize the random number generator.
+	call dp_seed3 (seed, iseed)
 
 	# Now loop over the input image list
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
@@ -119,14 +134,14 @@ begin
 	    call dp_otime (im, dao)
 	    call dp_filter (im, dao)
 	    call dp_airmass (im, dao)
-	    call dp_sets (dao, IMNAME, Memc[image])
+	    call dp_sets (dao, INIMAGE, Memc[image])
 
 	    # Read the PSF image.
 	    if (imtgetim (pimlist, Memc[psfimage], SZ_FNAME) == EOF)
-	        call strcpy ("default", Memc[psfimage], SZ_FNAME)
+	        call strcpy (DEF_DEFNAME, Memc[psfimage], SZ_FNAME)
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    if (strncmp ("default", Memc[psfimage+root], 7) == 0 || root ==
-	        strlen (Memc[psfimage]))
+	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
+	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
 	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
 		    SZ_FNAME)
 	    else
@@ -135,35 +150,32 @@ begin
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	    call dp_readpsf (dao, psffd)
 
-	    # Open the coordinate file, where coords is assumed to be
-	    # a simple text file in which the x and Y positions are in
-	    # columns 1 and 2 and the magnitude is on column 3 or a 
-	    # table.
+	    # Open the input photometry file.
 
-	    if (lclist <= 0 ) {
-	    	cl = NULL
-	    	call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (fntgfnb (clist, Memc[coords], SZ_FNAME) != EOF) {
-		coo_text = itob (access (Memc[coords], 0, TEXT_FILE))
+	    if (lplist <= 0 ) {
+	    	ifd = NULL
+	    	call strcpy ("", Memc[photfile], SZ_FNAME)
+	    } else if (fntgfnb (plist, Memc[photfile], SZ_FNAME) != EOF) {
+		coo_text = itob (access (Memc[photfile], 0, TEXT_FILE))
 		if (coo_text)
-	    	    cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
+	    	    ifd = open (Memc[photfile], READ_ONLY, TEXT_FILE)
 		else
-		    cl = tbtopn (Memc[coords], READ_ONLY, 0)
+		    ifd = tbtopn (Memc[photfile], READ_ONLY, 0)
 	    } else
-	    	call seek (cl, BOF)
-	    call dp_sets (dao, APFILE, Memc[coords])
+	    	call seek (ifd, BOF)
+	    call dp_sets (dao, INPHOTFILE, Memc[photfile])
 
-	    # Get the output image and table file root name.
+	    # Get the output image and file root name.
 	    if (imtgetim (oimlist, Memc[addimage], SZ_FNAME) == EOF)
-		call strcpy ("default", Memc[addimage], SZ_FNAME)
+		call strcpy (DEF_DEFNAME, Memc[addimage], SZ_FNAME)
 
 	    # Now loop over the number of output images per input image.
 	    do j = 1, nimage {
 
 		# Open the output image.
 		root = fnldir (Memc[addimage], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[addimage+root], 7) == 0 || root ==
-		    strlen (Memc[addimage])) {
+		if (strncmp (DEF_DEFNAME, Memc[addimage+root],
+		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[addimage])) {
 		    call dp_oimname (Memc[image], "", "add", Memc[outfname],
 			SZ_FNAME)
 		    oim = immap (Memc[outfname], NEW_COPY, im)
@@ -176,15 +188,15 @@ begin
 		    }
 		    oim = immap (Memc[outfname], NEW_COPY, im)
 		}
-		call dp_sets (dao, ADDIMAGE, Memc[outfname])
+		call dp_sets (dao, OUTIMAGE, Memc[outfname])
 
 		# Copy the input image to the new output image.
 	    	call dp_imcopy (im, oim)
 
-	    	# Open output table to contain list of stars added.
+	    	# Open the output photometry file.
 		root = fnldir (Memc[addimage], Memc[outfname], SZ_FNAME)
-		if (strncmp ("default", Memc[addimage+root], 7) == 0 || root ==
-		    strlen (Memc[addimage])) {
+		if (strncmp (DEF_DEFNAME, Memc[addimage+root],
+		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[addimage])) {
 		    call dp_outname (Memc[image], "", "art", Memc[outfname],
 		        SZ_FNAME)
 		    if (DP_TEXT(dao) == YES)
@@ -193,21 +205,21 @@ begin
 	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, 0)
 		} else {
 		    call strcpy (Memc[addimage], Memc[outfname], SZ_FNAME)
-		    if (DP_TEXT(dao) == YES)
-		        ofd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
-		    else
-	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, 0)
 		    if (nimage > 1) {
 	    	        call sprintf (Memc[outfname+
 			    strlen(Memc[outfname])], SZ_FNAME, "%03d")
 	                call pargi (j)
 		    }
+		    if (DP_TEXT(dao) == YES)
+		        ofd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+		    else
+	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, 0)
 		}
-		call dp_sets (dao, ADDFILE, Memc[outfname])
+		call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    	# Now go and actually add the stars.
-	    	call dp_addstar (dao, oim, cl, ofd, nstar, minmag,
-		    maxmag, coo_text, simple, idoffset)
+	    	call dp_artstar (dao, oim, ifd, ofd, nstar, minmag,
+		    maxmag, iseed, coo_text, simple, idoffset)
 
 	    	# Close the output image and output table. 
 	    	call imunmap (oim)
@@ -223,32 +235,60 @@ begin
 	    # Close the PSF image.
 	    call imunmap (psffd)
 
-	    # Close the coordinate list if there is more than one.
-	    if ((cl != NULL) && (lclist > 1)) {
+	    # Close the input photometry file if there is more than one.
+	    if ((ifd != NULL) && (lplist > 1)) {
 		if (coo_text)
-		    call close (cl)
+		    call close (ifd)
 		else
-		    call tbtclo (cl)
-		cl = NULL
+		    call tbtclo (ifd)
+		ifd = NULL
 	    }
 	}
 
-	# If there was only a single coordinate file close it.
-	if (cl != NULL && lclist == 1) {
+	# If there was only a single photometry file close it.
+	if (ifd != NULL && lplist == 1) {
 	    if (coo_text)
-		call close (cl)
+		call close (ifd)
 	    else
-		call tbtclo (cl)
+		call tbtclo (ifd)
 	}
 
-	# Close the lists.
+	# Close the image/file lists.
 	call imtclose (imlist)
-	call fntclsb (clist)
+	call fntclsb (plist)
 	call imtclose (pimlist)
 	call imtclose (oimlist)
 
+	# Close the PSF structure.
 	call dp_fitclose (dao)
+
+	# Close the daophot structure.
 	call dp_free (dao)
 
 	call sfree (sp)
+end
+
+
+# DP_IMCOPY -- Make a copy of an image.
+
+procedure  dp_imcopy (in, out)
+
+pointer	in		# the input image
+pointer	out		# input and output descriptors
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	l1, l2
+pointer	imgnlr(), impnlr()
+
+begin
+	# Initialize position vectors.
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+	npix = IM_LEN(in, 1)
+
+	# Copy the image.
+	while (imgnlr (in, l1, v1) != EOF && impnlr (out, l2, v2) != EOF)
+	    call amovr (Memr[l1], Memr[l2], npix)
+	call imflush (out)
 end

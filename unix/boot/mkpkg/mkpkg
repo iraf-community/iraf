@@ -14,7 +14,8 @@ relink:
 
 	$update	libpkg.a
 	$omake	main.c mkpkg.h <libc/error.h>
-	!cc	$(HSI_CF) main.o libpkg.a $(LIBS) -o mkpkg.e
+	!$(CC)	$(HSI_CF) $(HSI_LF) main.o libpkg.a $(LIBS) $(HSI_OSLIBS) \
+	     -o mkpkg.e
 	;
 
 install:

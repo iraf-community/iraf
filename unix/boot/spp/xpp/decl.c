@@ -490,6 +490,11 @@ int	maxch;			/* max chars to token string	*/
 	if (ch <= 0)
 	    error (XPP_SYNTAX, "unexpected EOF");
 
+/*
+fprintf (stderr, "token = `%s':  ", tokstr);
+fprintf (stderr, "token = `%c' %d(0%o)\n", tokstr[0], tokstr[0]);
+*/
+
 	return (tokstr[0]);
 }
 

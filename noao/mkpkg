@@ -6,6 +6,7 @@ $ifeq (hostid, unix)  !(date)  $endif
 $exit
 
 update:
+	$call noaolib
 	$call artdata
 	$call astutil
 	$call digiphot
@@ -21,6 +22,11 @@ update:
 	$purge noaobin$
 	;
 
+noaolib:
+	$echo "--------------------- NOAOLIB ---------------------"
+	$call asttools@astutil
+	$call smw@onedspec
+	;
 artdata:
 	$echo "--------------------- ARTDATA ---------------------"
 	$call update@artdata
@@ -75,7 +81,10 @@ strip:
 
 summary:
 	$ifeq (HOSTID, unix)
-	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+	    $ifndef (spool)
+		$set spool = spool
+	    $endif
+	    ! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
 	    | grep -v '^check file'
 	$else
 	    $echo "mkpkg summary only available on a UNIX system"
@@ -101,6 +110,18 @@ sparc:					# install sparc binaries
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh sparc -d $(DIRS)
+	;
+ssun:					# install ssun binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh ssun -d $(DIRS)
+	;
+sf2c:					# install sf2c binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh sf2c -d $(DIRS)
 	;
 i386:					# install i386 binaries
 	$verbose off
@@ -138,21 +159,42 @@ pg:					# install -pg -f68881 binaries
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh pg -d $(DIRS)
 	;
-ddec:					# install DSUX DEC Fortran binaries
+f2c:					# install Macintosh A/UX f2c binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh f2c -d $(DIRS)
+	;
+alpha:					# install DEC Alpha/OSF binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh alpha -d $(DIRS)
+	;
+ddec:					# install DECstation DEC-Fortran bins
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh ddec -d $(DIRS)
 	;
-dmip:					# install DSUX MIPS Fortran binaries
+dmip:					# install DECstation MIPS-Fortran bins
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh dmip -d $(DIRS)
 	;
-mips:					# install mips binaries
+mips:					# install MIPS workstation binaries
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh mips -d $(DIRS)
 	;
+hp300:                                  # install HPUX series 300 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp300
+        ;
+hp700:                                  # install HPUX series 700 binaries
+hp800:					# install HPUX series 800/700 binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh hp700
+        ;

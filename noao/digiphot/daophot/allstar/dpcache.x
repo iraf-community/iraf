@@ -19,7 +19,7 @@ int	npix, req_mem1, req_mem2, req_mem3, old_mem, max_mem
 pointer	sp, temp, allstar, data, weights, subt
 int	sizeof(), begmem()
 pointer	immap()
-errchk	begmem(), malloc()
+errchk	begmem(), calloc()
 
 begin
 	# Allocate some working memory.
@@ -87,7 +87,7 @@ begin
 	    subt = NULL
 	    if (DP_CACHE(allstar, A_SUBT) == YES) {
 		iferr {
-	            call malloc (subt, npix, TY_REAL)
+	            call calloc (subt, npix, TY_REAL)
 		} then {
 		    if (subt != NULL)
 		        call mfree (subt, TY_REAL)
@@ -109,7 +109,7 @@ begin
 	    weights = NULL
 	    if (DP_CACHE(allstar, A_WEIGHT) == YES) {
 		iferr {
-	            call malloc (weights, npix, TY_REAL)
+	            call calloc (weights, npix, TY_REAL)
 		} then {
 		    if (weights != NULL)
 		        call mfree (weights, TY_REAL)
@@ -131,7 +131,7 @@ begin
 	    data = NULL
 	    if (DP_CACHE(allstar, A_DCOPY) == YES) {
 		iferr {
-	            call malloc (data, npix, TY_REAL)
+	            call calloc (data, npix, TY_REAL)
 		} then {
 		    if (data != NULL)
 		        call mfree (data, TY_REAL)

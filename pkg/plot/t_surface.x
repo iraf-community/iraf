@@ -29,7 +29,7 @@ real	floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
 pointer gp, gopen()
 bool	clgetb(), streq()
-int	clgeti()
+int	clgeti(), surf_limits()
 real	clgetr()
 extern	tsu_onint()
 pointer	immap(), plt_getdata()
@@ -37,6 +37,7 @@ common	/tsucom/ tsujmp
 common  /noaovp/ vpx1, vpx2, vpy1, vpy2
 common  /frstfg/ first
 
+define	exit_ 91
 begin
 	# First initialize srface common blocks before changing any parameters
 	first = 1
@@ -101,7 +102,8 @@ begin
 
 	# Take floor and ceiling if enabled (nonzero).
 	npix = nx * ny
-	call surf_limits (Memr[subras], npix, floor, ceiling)
+	if (surf_limits (Memr[subras], npix, floor, ceiling) == ERR)
+	    goto exit_
 
 	# Open graphics device and make plot.
 	call gopks (STDERR)
@@ -111,7 +113,6 @@ begin
 	call gacwk (wkid)
 	call gtext (gp, 0.5, .96, title, "s=0.8;f=b;h=c")
 	call set (vpx1, vpx2, vpy1, vpy2, 1.0, 1024., 1.0, 1024., 1)
-
 
 	# Install interrupt exception handler.
 	call zlocpr (tsu_onint, epa)
@@ -135,6 +136,7 @@ begin
 	call gdawk (wkid)
 	call gclwk (wkid)
 	call gclks ()
+exit_
 	call mfree (subras, TY_REAL)
 	call mfree (work, TY_REAL)
 
@@ -161,7 +163,7 @@ end
 # SURF_LIMITS -- Apply the floor and ceiling constraints to the subraster.
 # If both values are exactly zero, they are not applied.
 
-procedure surf_limits (ras, npix, floor, ceiling)
+int procedure surf_limits (ras, npix, floor, ceiling)
 
 real	ras[npix]		# Input array of pixels
 int	npix			# npixels in array
@@ -176,8 +178,10 @@ begin
 	apply = YES
 
 	call alimr (ras, npix, dmin, dmax)
-	if (fp_equalr (dmin, dmax))
-	    call error (1, "constant valued array; no plot drawn")
+	if (fp_equalr (dmin, dmax)) {
+	    call eprintf ("Constant valued array; no plot drawn\n")
+	    return (ERR)
+	}
 
 	if (fp_equalr (tfloor, INDEF))
 	    tfloor = dmin
@@ -204,10 +208,14 @@ begin
 
 	if (apply == YES) {
 	    # First verify that floor and ceiling are valid
-	    if (dmax <= floor)
-	        call error (1, "entire image is at or below specified floor")
-	    if (dmin >= ceiling)
-	        call error (1, "entire image is at or above specified ceiling")
+	    if (dmax <= floor) {
+	        call eprintf ("Entire image is at or below specified floor\n")
+		return (ERR)
+	    }
+	    if (dmin >= ceiling) {
+	        call eprintf ("Entire image is at or above specified ceiling\n")
+		return (ERR)
+	    }
 
 	    do i = 1, npix {
 		# Apply surface limits
@@ -215,7 +223,7 @@ begin
 		ras[i] = min (ceiling, ras[i])
 	    }
 	}
-
+	 return (OK)
 end
 
 

@@ -461,6 +461,7 @@ begin
 	return (element - 1)
 end
 
+
 # MAKE_RANGES -- Procedure to make a set of ranges from an ordered list
 # of column numbers. Only a step size of 1 is checked for.
 
@@ -475,37 +476,28 @@ bool	next_range
 int	ip, op, nranges
 
 begin
-	# if zero list elements return
+	# If zero list elements return
 	if (npts == 0) {
 	    ranges[1] = NULL	
 	    return (0)
 	}
 
-	# initialize
+	# Initialize
 	nranges = 0
 	ranges[1] = list[1]
+	op = 2
 	next_range = false
 
-	ip = 2
-	op = 2
-
-	# loop over column list
-	while (ip < npts && nranges <= max_nranges) {
-	    if (next_range) {
-		ranges[op] = list[ip]
-		ip = ip + 1
+	# Loop over column list
+	for (ip = 2; ip <= npts && nranges < max_nranges; ip = ip + 1) {
+	    if ((list[ip] != (list[ip-1] + 1))) {
+		ranges[op] = list[ip-1]
 		op = op + 1
-		next_range = false
-	    } else if ((list[ip] == (list[ip-1] + 1)) && (list[ip] ==
-	        (list[ip+1] - 1))) {
-		ip = ip + 1
-	    } else {
-		ranges[op] = list[ip]
-		ranges[op+1] = list[ip] - list[ip-1]
-		ip = ip + 1
-		op = op + 2
+		ranges[op] = 1
+		op = op + 1
 		nranges = nranges + 1
-		next_range = true
+		ranges[op] = list[ip]
+		op = op + 1
 	    }
 	}
 
@@ -515,19 +507,11 @@ begin
 	    ranges[op+1] = 1
 	    ranges[op+2] = NULL
 	    nranges = 1
-	} else if (next_range) {
-	    if (nranges == max_nranges)
-		ranges[op] = NULL
-	    else {
-	        ranges[op] = list[ip]
-	        ranges[op+1] = list[ip]
-	        ranges[op+2] = 1
-	        ranges[op+3] = NULL
-		nranges = nranges + 1
-	    }
+	} else if (nranges == max_nranges) {
+	    ranges[op-1] = NULL
 	} else {
 	    ranges[op] = list[npts]
-	    ranges[op+1] = list[npts] - list[npts-1]
+	    ranges[op+1] = 1
 	    ranges[op+2] = NULL
 	    nranges = nranges + 1
 	}

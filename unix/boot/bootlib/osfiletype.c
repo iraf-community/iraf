@@ -25,8 +25,10 @@ char *srcextn[] = {		/* Known source file extensions */
 	".f",
 	".s",
 	".hlp",
+	".fit",
 	".fits",
 	".mip",
+	".gz",
 	NULL
 };
 

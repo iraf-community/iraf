@@ -49,8 +49,8 @@ begin
 	    if (STD_FLAG(stds[i]) == SF_EXCLUDE)
 		next
 	    aperture = STD_BEAM(stds[i])
-	    xmin = min (xmin, STD_WSTART(stds[i]))
-	    xmax = max (xmax, STD_WEND(stds[i]))
+	    xmin = min (xmin, STD_WSTART(stds[i]), STD_WEND(stds[i]))
+	    xmax = max (xmax, STD_WSTART(stds[i]), STD_WEND(stds[i]))
 	}
 	cv = NULL
 	call sf_fit (stds, nstds, cv, function, order, xmin, xmax)

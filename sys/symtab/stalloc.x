@@ -21,7 +21,7 @@ begin
 	    # minimize reallocation.
 
 	    buflen = buflen + max (blklen, ST_STABINC(stp))
-	    ST_STABINC(stp) = ST_STABINC(stp) * INC_GROW
+	    ST_STABINC(stp) = min (MAX_INCREMENT, ST_STABINC(stp) * INC_GROW)
 	    ST_STABLEN(stp) = buflen
 	    ST_STABNGROW(stp) = ST_STABNGROW(stp) + 1
 

@@ -1,0 +1,14 @@
+.help revisions Jun88 noao.imred.kpnoslit
+.nf
+kpnoslit/kpnoslit.cl
+kpnoslit/kpnoslit.men
+    Added background, illumination, response, apflatten, apnormalize.
+    (12/29/94, Valdes)
+
+kpnoslit/demos/xdoslit.dat
+    Incorrectly used hz2 as a standard star instead of hz44.  (8/10/92, Valdes)
+
+=======
+V2.10.1
+=======
+.endhelp

@@ -14,5 +14,5 @@ fittrace,b,h,yes,,,Fit the traced points interactively?
 mask,b,h,yes,,,"Create mask images?
 "
 line,i,h,INDEF,1,,Starting dispersion line
-nsum,i,h,10,1,,Number of dispersion lines to sum
+nsum,i,h,10,,,Number of dispersion lines to sum or median
 buffer,r,h,0.,,,Buffer distance from apertures

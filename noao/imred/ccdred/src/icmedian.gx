@@ -69,7 +69,7 @@ begin
 	    return
 	}
 
-	# Repeatedly eliminate the extreme values until there are three
+	# Repeatedly exchange the extreme values until there are three
 	# or fewer pixels.
 
 	do i = 1, npts {
@@ -102,16 +102,24 @@ begin
 		if (j1 < j3 && j2 < j3) {
 		    Mem$t[d[j1]+k] = val3
 		    Mem$t[d[j2]+k] = Mem$t[d[j3]+k]
+		    Mem$t[d[j3]+k] = val1
+		    Mem$t[d[n1]+k] = val2
 		} else if (j1 < j3) {
-		    if (j2 == j3)
+		    if (j2 == j3) {
 			Mem$t[d[j1]+k] = val3
-		    else
+			Mem$t[d[n1]+k] = val1
+		    } else {
 			Mem$t[d[j1]+k] = Mem$t[d[j3]+k]
+			Mem$t[d[j3]+k] = val1
+		    }
 		} else if (j2 < j3) {
-		    if (j1 == j3)
+		    if (j1 == j3) {
 			Mem$t[d[j2]+k] = val3
-		    else
+			Mem$t[d[n1]+k] = val2
+		    } else {
 			Mem$t[d[j2]+k] = Mem$t[d[j3]+k]
+			Mem$t[d[j3]+k] = val2
+		    }
 		}
 		n1 = n1 - 2
 	    }

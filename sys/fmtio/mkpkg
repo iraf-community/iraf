@@ -1,20 +1,37 @@
 # Formatted i/o (FMTIO) portion of the system library.
 
-$ifnewer (evexpr.y, evexpr.x)
-	$ifeq (HOSTID, unix)
-	    $echo "fmtio/evexpr.x is out of date; rebuilding with XYACC:"
-	    !(xyacc evexpr.y; mv -f ytab.x evexpr.x)
-	$else
-	    $echo "fmtio/evexpr.x is out of date; rebuild with XYACC"
-	$endif
-$endif
-
 $checkout libsys.a lib$
 $update   libsys.a
 $checkin  libsys.a lib$
 $exit
 
+tfiles:
+	$ifnewer (evvexpr.gy, evvexpr.y)
+	    $generic -k evvexpr.gy -o evvexpr.y
+	$endif
+
+	$ifnewer (evvexpr.y, evvexpr.x)
+	    $ifeq (HOSTID, unix)
+		$echo "fmtio/evvexpr.x is out of date; rebuilding with XYACC:"
+		!(xyacc evvexpr.y; mv -f ytab.x evvexpr.x)
+	    $else
+		$echo "fmtio/evvexpr.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+
+	$ifnewer (evexpr.y, evexpr.x)
+	    $ifeq (HOSTID, unix)
+		$echo "fmtio/evexpr.x is out of date; rebuilding with XYACC:"
+		!(xyacc evexpr.y; mv -f ytab.x evexpr.x)
+	    $else
+		$echo "fmtio/evexpr.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+	;
+
 libsys.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
 	cctoc.x		escchars.inc <chars.h> <ctype.h>
 	chdeposit.x	
 	chfetch.x	
@@ -35,6 +52,8 @@ libsys.a:
 	dtoc3.x		<ctype.h> <mach.h> <printf.h>
 	eprintf.x	<printf.h>
 	evexpr.x	evexpr.com <ctype.h> <evexpr.h> <lexnum.h> <mach.h>
+	evvexpr.x	evvexpr.com <lexnum.h> <ctype.h> <mach.h> <math.h>\
+			<evvexpr.h>
 	fmterr.x	
 	fmtinit.x	fmt.com <printf.h>
 	fmtread.x	fmt.com <printf.h>

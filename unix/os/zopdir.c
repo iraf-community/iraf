@@ -1,9 +1,15 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#include <sys/types.h>
-#include <sys/dir.h>
 #include <stdio.h>
+#include <sys/types.h>
+
+#ifdef SOLARIS
+#include <dirent.h>
+#else
+#include <sys/dir.h>
+#endif
+
 
 #define	import_kernel
 #define	import_knames
@@ -31,6 +37,7 @@ struct dir {
 	int	entry;
 	char	*sbuf;
 	int	*soff;
+	DIR	*dir;
 };
 
 static	int _getfile();
@@ -55,7 +62,7 @@ XINT	*chan;
 	register DIR	*dir;
 	char	osfn[SZ_PATHNAME+1];
 	int	maxentries, sbuflen;
-	int	nchars, sbufoff;
+	int	nchars, sbufoff, fd;
 	struct	dir *dp = NULL;
 
 	/* The file name should have an "/" appended, if it is a proper
@@ -64,7 +71,7 @@ XINT	*chan;
 	 */
 	for (ip=(char *)fname, op=osfn;  (*op = *ip++) != EOS;  op++)
 	    ;
-	if (*--op == '/')
+	if (*--op == '/' && op > osfn)
 	    *op = EOS;
 
 	/* Open the directory. */
@@ -119,9 +126,12 @@ XINT	*chan;
 	dp->sbuf = sbuf;
 	dp->soff = soff;
 	dp->entry = 0;
+	dp->dir = dir;
 
-	*chan = (XINT)dp;
-	closedir (dir);
+	fd = dir->dd_fd;		/* MACHDEP */
+	zfd[fd].fp = (FILE *)dp;
+
+	*chan = fd;
 	return;
 
 err:
@@ -142,8 +152,9 @@ ZCLDIR (chan, status)
 XINT	*chan;
 XINT	*status;
 {
-	register struct dir *dp = (struct dir *)*chan;
+	register struct dir *dp = (struct dir *)zfd[*chan].fp;
 
+	closedir (dp->dir);
 	free (dp->sbuf);
 	free (dp->soff);
 	free (dp);
@@ -160,9 +171,9 @@ ZGFDIR (chan, outstr, maxch, status)
 XINT	*chan, *maxch, *status;
 PKCHAR	*outstr;
 {
+	register struct dir *dp = (struct dir *)zfd[*chan].fp;
 	register int	n, nchars;
 	register char	*ip, *op;
-	struct	dir *dp = (struct dir *)*chan;
 
 	if (dp->entry < dp->nentries) {
 	    ip = dp->sbuf + dp->soff[dp->entry++];  
@@ -184,14 +195,22 @@ DIR	*dir;
 char	*outstr;
 int	maxch;
 {
-	register int	n;
+	register char *ip, *op;
+	register int n;
+	int status;
+#ifdef SOLARIS
+	register struct	dirent *dp;
+#else
 	register struct	direct *dp;
-	register char	*ip, *op;
-	int	status;
+#endif
 
 	for (dp = readdir(dir);  dp != NULL;  dp = readdir(dir))
 	    if (dp->d_ino != 0) {
+#ifdef SOLARIS
+		n = strlen (dp->d_name);
+#else
 		n = (dp->d_namlen < maxch) ? dp->d_namlen : maxch;
+#endif
 		status = n;
 		for (ip=dp->d_name, op=outstr;  --n >= 0;  )
 		    *op++ = *ip++;

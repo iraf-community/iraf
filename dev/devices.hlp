@@ -1,7 +1,7 @@
 # DEVICES.HLP -- Edit this file to describe the devices available on your
 # local host or network.
 
-.help devices Sep91 "NOAO/Tucson Devices"
+.help devices Feb95 "NOAO/Tucson Devices"
 .nf
     \fBDevice      Aliases 	Description+Location\fR
 
@@ -15,11 +15,19 @@
     lw5p2			lw5 with 2 landscape pages per page
     lw6		apl6		Laserwriter, Engineering, Rm 210
     lw7		apl7|tops	Laserwriter, Solar Office, Rm 152
-    imagend	i300		300 dpi imagen, Rm 113
-    versatec	vup|ver         Versatec V-80, fan-fold, Rm 72
-    calcomp	ccp		Calcomp pen plotter, Rm 101
+    lw8		apple8		Laserwriter, Gemini, Rm 120, *restricted use*
+    lw9				QMS PostScript 815, hallway near Rm 152
+    lw10			SPARCprinter, Rm 105 (inside Rm 101)
+    lw15			QMS-PS 410, Rm 72
+    lw16			HP LaserJet 4, Rm 72
+    lw17			Tektronix Phaser 200e, Rm 105 (inside Rm 101)
     vmsprint	vmslp	        VMS cluster lineprinter, Rm 101
+    vapl			DECLaser 1100, VMS only
     lw		lp|lpr		Default UNIX `lpr' printer(*)
+    psdump			PostScript file named /tmp/irafdmp$$.ps
+    epsf	eps		EPS file ./sgi$$.eps, portrait mode
+    epsfl	epsl		EPS file ./sgi$$.eps, landscape mode
+    epshalf	epsh		halfpage portrait EPS file, ./sgi$$.eps
 
     (*)This device is available on UNIX systems only.  A specific output
     device may be selected by defining PRINTER in the user environment.
@@ -39,22 +47,15 @@
     gemini!mtd  [?]		Exabyte, Rm 101
     gemini!mte	[?]		Sun QIC 1/4" cartridge, Rm 101
     ursa!mta    [6250|1600]     Sun/HP 1/2" tapedrive, Rm 101
-    ursa!mtb    [6250|1600]     Sun/HP 1/2" tapedrive, Rm 101 (on order)
+    ursa!mtb    [6250|1600]     Sun/HP 1/2" tapedrive, Rm 101 
     ursa!mtc    [?]             Exabyte, Rm 101
     ursa!mtd    [?]             Exabyte, Rm 101
     ursa!mte    [?]             Sun QIC 1/4" cartridge, Rm 101
-    aquila!mta  [1600]		DEC TU80 1/2" tapedrive, Rm B-49
-    aquila!mtb  [1600|800]+   	Kennedy 1/2" tapedrive, Rm B-49
-    aquila!mtc	[1600|800]+   	Kennedy 1/2" tapedrive, Rm B-49
-    draco!mta	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
-    draco!mtb	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
-    draco!mtc	[1600|800]+    	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
-    draco!mtd	[1600|800]+ 	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
-    draco!mte	[1600]		TS11 1/2" tapedrive, Rm B-49 	  [VELA only]
-    draco!mtg	[1600|800]+ 	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
-    draco!mth	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
+    draco!mtf			TK50 on G11		[VMS cluster only]
+    draco!mtflo			low density G11 TK50	[VMS cluster only]
+    draco!mtg			Robur's DAT drive	[VMS cluster only]
+    draco!mti			HP tabletop 9T, Rm 101  [VMS cluster only]
+    draco!mtj			Exabyte, Rm 101		[VMS cluster only]
 
     *Default tape densities listed first.
-    +The Kennedy drives on VMS nodes do not have a default density;
-    the density must be set manually with the switch on the tape drive.
 .endhelp

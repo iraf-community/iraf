@@ -16,6 +16,7 @@ pointer gp, sp
 pointer title
 real	y1, y2, statr
 real	rv_width()
+bool 	streq()
 
 begin
 	if (RV_INTERACTIVE(rv) == YES)
@@ -58,10 +59,17 @@ begin
 	switch (flags) {
 	case SPECTRUM_PLOT, FILTER_PLOT, NORM_PLOT:
 	    call gclear (gp)				
-	    if (RV_GTYPE(rv) == NORM_PLOT)
-	        call rv_splot (rv, SPLIT_PLOT)
-	    else
-	        call rv_splot (rv, SPLIT_PLOT)
+	    if (streq(IMAGE(rv),RIMAGE(rv))) {
+	        if (RV_GTYPE(rv) == NORM_PLOT)
+	            call rv_nplot (rv, SINGLE_PLOT)
+	        else
+	            call rv_splot (rv, SINGLE_PLOT)
+	    } else {
+	        if (RV_GTYPE(rv) == NORM_PLOT)
+	            call rv_nplot (rv, SPLIT_PLOT)
+	        else
+	            call rv_splot (rv, SPLIT_PLOT)
+	    }
 	    if (ORCOUNT(rv) != ALL_SPECTRUM)
 	        call rv_mark_regions (RV_OSAMPLE(rv), gp)
 	    if (RRCOUNT(rv) != ALL_SPECTRUM)
@@ -97,7 +105,10 @@ pointer	rv				#I RV struct pointer
 int	flag				#I Type of flag to print (SINGLE/SPLIT)
 
 pointer	gp				# Graphics pointer
-pointer	sp, title, bp
+pointer sp, title, bp, xlbl, ylbl, sid
+int     npts
+real    x1, x2, y1, y2
+bool	streq()
 
 begin
 	gp = RV_GP(rv)
@@ -107,13 +118,65 @@ begin
 	# Allocate working space
 	call smark (sp)			
 	call salloc (bp,    SZ_LINE,   TY_CHAR)
-	call salloc (title, 3*SZ_LINE, TY_CHAR)
+	call salloc (title, 4*SZ_LINE, TY_CHAR)
 
 	# Clear the screen
 	call gclear (gp)
 
-	if (flag == SINGLE_PLOT || RV_CONTINUUM(rv) == OBJ_ONLY) {
-	    call rv_plot (rv, NORM_PLOT)
+	if (flag == SINGLE_PLOT || RV_CONTINUUM(rv) == OBJ_ONLY ||
+	    streq(IMAGE(rv),RIMAGE(rv))) {
+
+            call salloc (xlbl, SZ_FNAME, TY_CHAR)
+            call salloc (ylbl, SZ_FNAME, TY_CHAR)
+            call salloc (sid, SZ_LINE, TY_CHAR)
+            call aclrc (Memc[title], 4*SZ_LINE)
+            call aclrc (Memc[xlbl], SZ_FNAME)
+            call aclrc (Memc[ylbl], SZ_FNAME)
+            call aclrc (Memc[sid], SZ_LINE)
+
+            # Draw the plot to the screen
+            npts = RV_NPTS(rv)
+            call sysid (Memc[sid], SZ_LINE)
+            call sprintf (Memc[title], 4*SZ_LINE,
+    "%s\nObject='%s' Reference='%s'\nStar='%s' Temp='%s' npts=%d aperture=%d")
+                 call pargstr (Memc[sid])
+                 call pargstr (IMAGE(rv))
+                 call pargstr (RIMAGE(rv))
+                 call pargstr (OBJNAME(rv))
+                 call pargstr (TEMPNAME(rv))
+                 call pargi (npts)
+                 call pargi (RV_APNUM(rv))
+            call strcpy ("Intensity", Memc[ylbl], SZ_FNAME)
+            call gascale (gp, OCONT_DATA(rv,1), npts, 2)
+            call ggwind (gp, x1, x2, y1, y2)
+            y1 = y1 - ((y2-y1)/10.0)
+            y2 = y2 + ((y2-y1)/10.0)
+            if (RV_DCFLAG(rv) == -1) {
+                call strcpy ("Pixel", Memc[xlbl], SZ_FNAME)
+                x1 = 1.0
+                x2 = real (npts)
+            } else {
+                call strcpy ("Wavelength", Memc[xlbl], SZ_FNAME)
+                x1 = 10.0 ** (RV_OW0(rv))
+                x2 = 10.0 ** (RV_OW2(rv))
+            }
+
+            # Draw the axis labels.
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.845)
+            call gswind (gp, x1, x2, y1, y2)
+            call glabax (gp, Memc[title], Memc[xlbl], Memc[ylbl])
+
+            # Draw the vector.
+            call gvline (gp, OCONT_DATA(rv,1), npts, x1, x2)
+
+            # Lastly, annotate ther plot so we know what we're looking at.
+            call gctran (gp, 0.6, 0.23, x1, y1, 0, 1)
+            call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
+            call gtext (gp, x1, y1, "Normalized Spectrum", "")
+            call gseti (gp, G_TXCOLOR, C_FOREGROUND)
+            call gseti (gp, G_XDRAWAXES, 3)             # reset gio flags
+
+            call gflush (gp)
 
 	} else if (flag == SPLIT_PLOT) {
 	    if (RV_CONTINUUM(rv) == BOTH || RV_CONTINUUM(rv) == OBJ_ONLY) {
@@ -226,27 +289,29 @@ begin
 	}
 
 	# Draw the label and vectors
-	if (gstati(gp,G_PLTYPE) != 0)
-	    call gseti (gp, G_PLTYPE, 3)
+	if (gstati(gp,G_PLTYPE) != GL_CLEAR)
+	    call gseti (gp, G_PLTYPE, GL_DOTTED)
 	call gline (gp, WRKPIXX(rv,RV_ISTART(rv)), WRKPIXY(rv,RV_ISTART(rv)), 
 	    Memr[resx], Memr[resy])
 	call gpline (gp, Memr[resx], Memr[resy], npts)
 	call gline (gp, Memr[resx+npts-1], Memr[resy+npts-1],
 	    WRKPIXX(rv,RV_IEND(rv)), WRKPIXY(rv,RV_IEND(rv))) 
-	if (gstati(gp,G_PLTYPE) != 0)
-	    call gseti (gp, G_PLTYPE, 1)
+	if (gstati(gp,G_PLTYPE) != GL_CLEAR)
+	    call gseti (gp, G_PLTYPE, GL_SOLID)
 
 	# Mark plot with sigma and mean of the residuals.
-	if (gstati(gp,G_PLTYPE) != 0) {
+	if (gstati(gp,G_PLTYPE) != GL_CLEAR) {
 	    call aavgr (Memr[resy], npts, mean, sigma)
+	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
 	    call sprintf (Memc[buf], SZ_LINE, "Mean residual = %f")
 		call pargr (mean)
 	    call gctran (gp, 0.15, 0.63, xp, yp, 0, 2)
-	    call gtext (gp, xp, yp, Memc[buf], "f=b")
+	    call gtext (gp, xp, yp, Memc[buf], "")
 	    call sprintf (Memc[buf], SZ_LINE, "     sigma = %f")
 		call pargr (sigma)
 	    call gctran (gp, 0.15, 0.58, xp, yp, 0, 2)
-	    call gtext (gp, xp, yp, Memc[buf], "f=b")
+	    call gtext (gp, xp, yp, Memc[buf], "")
+	    call gseti (gp, G_TXCOLOR, C_FOREGROUND)
 	}
 	RV_RESDONE(rv) = YES
 
@@ -263,26 +328,83 @@ pointer	rv				#I RV struct pointer
 int	flag				#I Type of flag to print (SINGLE/SPLIT)
 
 pointer	gp				# Graphics pointer
+pointer	sp, title, xlbl, ylbl, sid
+int	npts
+real	x1, x2, y1, y2
 bool	streq()
 
 begin
 	gp = RV_GP(rv)
 	if (gp == NULL)
-		return
+	    return
 
-	# Clear the screen
+	# Clear the screen.
 	call gclear (gp)
 
-        # Draw the plot to the screen
+        # Draw the plot to the screen.
 	if (flag == SINGLE_PLOT || streq(IMAGE(rv),RIMAGE(rv))) {
-	    call rv_plot (rv, SPECTRUM_PLOT)
+
+	    call smark (sp)
+	    call salloc (title, 4*SZ_LINE, TY_CHAR)
+	    call salloc (xlbl, SZ_FNAME, TY_CHAR)
+	    call salloc (ylbl, SZ_FNAME, TY_CHAR)
+            call salloc (sid, SZ_LINE, TY_CHAR)
+	    call aclrc (Memc[title], 4*SZ_LINE)
+	    call aclrc (Memc[xlbl], SZ_FNAME)
+	    call aclrc (Memc[ylbl], SZ_FNAME)
+	    call aclrc (Memc[sid], SZ_LINE)
+
+            # Draw the plot to the screen
+            npts = RV_NPTS(rv)
+            call sysid (Memc[sid], SZ_LINE)
+            call sprintf (Memc[title], 4*SZ_LINE,
+    "%s\nObject='%s' Reference='%s'\nStar='%s' Temp='%s' npts=%d aperture=%d")
+                 call pargstr (Memc[sid])
+                 call pargstr (IMAGE(rv))
+                 call pargstr (RIMAGE(rv))
+                 call pargstr (OBJNAME(rv))
+                 call pargstr (TEMPNAME(rv))
+                 call pargi (npts)
+                 call pargi (RV_APNUM(rv))
+            call strcpy ("Intensity", Memc[ylbl], SZ_FNAME)
+            call gascale (gp, OBJPIXY(rv,1), npts, 2)
+            call ggwind (gp, x1, x2, y1, y2)
+	    y1 = y1 - ((y2-y1)/10.0)
+	    y2 = y2 + ((y2-y1)/10.0)
+	    if (RV_DCFLAG(rv) == -1) {
+		call strcpy ("Pixel", Memc[xlbl], SZ_FNAME)
+		x1 = 1.0
+		x2 = real (npts)
+	    } else {
+		call strcpy ("Wavelength", Memc[xlbl], SZ_FNAME)
+		x1 = 10.0 ** (RV_OW0(rv))
+		x2 = 10.0 ** (RV_OW2(rv))
+	    }
+
+            # Draw the axis labels.
+	    call gsview (gp, 0.115, 0.95, 0.125, 0.845)
+            call gswind (gp, x1, x2, y1, y2)
+            call glabax (gp, Memc[title], Memc[xlbl], Memc[ylbl])
+
+	    # Draw the vector.
+            call gvline (gp, OBJPIXY(rv,1), npts, x1, x2)
+
+            # Lastly, annotate ther plot so we know what we're looking at.
+            call gctran (gp, 0.63, 0.23, x1, y1, 0, 1)
+            call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
+            call gtext (gp, x1, y1, "Object Spectrum", "")
+            call gseti (gp, G_TXCOLOR, C_FOREGROUND)
+            call gseti (gp, G_XDRAWAXES, 3)             # reset gio flags
+
+	    call gflush (gp)
+	    call sfree (sp)
 
 	} else if (flag == SPLIT_PLOT) {
 	    call split_plot (rv, gp, TOP, OBJPIXY(rv,1), RV_NPTS(rv), 
-	        OBJ_ONLY, SPECTRUM_PLOT)
+	        OBJECT_SPECTRUM, SPECTRUM_PLOT)
 	    call rv_mark_regions (RV_OSAMPLE(rv), gp)
 	    call split_plot (rv, gp, BOTTOM, REFPIXY(rv,1), RV_RNPTS(rv),
-	        TEMP_ONLY, SPECTRUM_PLOT)
+	        REFER_SPECTRUM, SPECTRUM_PLOT)
 	    call rv_mark_regions (RV_RSAMPLE(rv), gp)
 	}
 

@@ -1,4 +1,4 @@
-.help polymark May89 noao.digiphot.apphot
+.help polymark Dec92 noao.digiphot.apphot
 .ih
 NAME
 polymark -- create polygon and coordinate lists for input to the polyphot task
@@ -11,13 +11,13 @@ PARAMETERS
 The list of input images.
 .le
 .ls coords = "default"
-The name of the output coordinate file or results directory.
+The name of the output coordinate file or coordinates directory.
 The average of the x and
 y vertices of the current marked polygon, shifted to the current cursor
 position, are written to the text file
-\fIcoords\fR 1 per line with the x and y coordinates in columns 1 and 2
+\fIcoords\fR, 1 per line with the x and y coordinates in columns 1 and 2
 respectively.
-These center positions are associated with a particular polygon.
+These center positions are associated with the currently defined polygon.
 POLYMARK inserts a
 single ';' character in column 1 when the user defines a new polygon.
 If \fIcoords\fR is "default", "dir$default"
@@ -28,7 +28,7 @@ extension is "coo" and version is the next available version of the file.
 If \fIcoords\fR is the null string then no coordinate file is written.
 .le
 .ls polygons = "default"
-The name of the polygons file or results directory. The x and
+The name of the polygons file or polygons directory. The x and
 y vertices of each marked polygon are written to the text file
 \fIpolygons\fR 1 per line with the x and y coordinates in columns 1 and 2
 respectively. Each polygon is terminated by a single ';' in column 1.
@@ -40,6 +40,9 @@ extension is "ver" and version is the current version of the file.
 The number of polygon files must be equal to the number of image files.
 If \fIpolygons\fR is the null string then no output file is written.
 .le
+.ls graphics = "stdgraph"
+The standard graphics device.
+.le
 .ls display = "stdimage"
 The image display device. At present the display interface can read
 from the image display but not write to it. This means that the marked
@@ -48,13 +51,10 @@ polygons are not drawn on the display device.
 run off a contour plot. In this case the marked polygons can be drawn
 on the displayed contour plot.
 .le
-.ls graphics = "stdgraph"
-The standard graphics device.
-.le
-.ls commands = ""
+.ls icommands = ""
 The image cursor.
 .le
-.ls cursor = ""
+.ls gcommands = ""
 The graphics cursor.
 .le
 
@@ -82,22 +82,25 @@ POLYMARK off of a contour plot.
 .ih
 CURSOR COMMANDS
 
-The following interactive keystroke and : commands are available.
+The following interactive keystroke and colon commands are available.
 
 .nf
-	Interactive POLYMARK Commands
+	Interactive Keystroke Commands
 
-?	Print help for POLYMARK commands
-:	POLYMARK colon escape commands (see below)
-d	Plot a centered stellar radial profile
+?	Print help
+:	Colon commands 
+d	Plot radial profile of star near cursor
 g	Define the current polygonal aperture
-r	Rewind the polygon list
-l	Draw all the remaining polygons in the list on the display
 f	Draw the current polygon on the display
-spbar	Draw the current polygon on the display and output it
+spbar	Draw the current polygon on the display, output the polygon
+r	Rewind the polygon list
+m	Draw the next polygon in the polygon list on the display
+l	Draw all the remaining polygons in the list on the display
 q	Exit
 
-:m [n]	Draw the next [nth] polygon in the polygon list
+	Colon commands
+
+:m [n]	Draw the next [nth] polygon in the polygon list on the display
 .fi
 
 .ih
@@ -204,7 +207,7 @@ image display cursor.
 
 	... type g to define the next polygon
 	... move the cursor to the first vertex, tap the space bar
-	    to mark the vertext and repeat for each vertex
+	    to mark the vertex and repeat for each vertex
 	... type q to quit the polygon menu
 	... mark each vertex only once, POLYPHOT will close the
 	    polygon for you

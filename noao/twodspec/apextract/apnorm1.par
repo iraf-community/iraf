@@ -8,7 +8,6 @@ verbose,b,h,)_.verbose,,,"Verbose output?
 
 # DEFAULT APERTURE PARAMETERS
 "
-dispaxis,i,h,)apdefault.dispaxis,,,>apdefault.dispaxis
 lower,r,h,)apdefault.lower,,,>apdefault.lower
 upper,r,h,)apdefault.upper,,,>apdefault.upper
 apidtable,s,h,)apdefault.apidtable,,,">apdefault.apidtable
@@ -61,6 +60,7 @@ e_profiles,s,q,,,,Profile reference image
 # TRACING PARAMETERS
 t_nsum,i,h,)aptrace.nsum,,,>aptrace.nsum
 t_step,i,h,)aptrace.step,,,>aptrace.step
+t_nlost,i,h,)aptrace.nlost,,,>aptrace.nlost
 t_width,r,h,)apedit.width,,,>apedit.width
 t_function,s,h,)aptrace.function,,,>aptrace.function
 t_order,i,h,)aptrace.order,,,>aptrace.order
@@ -76,17 +76,17 @@ t_grow,r,h,)aptrace.grow,,,">aptrace.grow
 background,s,h,)apnorm.background,,,>apnorm.background
 skybox,i,h,)apnorm.skybox,,,>apnorm.skybox
 weights,s,h,)apnorm.weights,,,>apnorm.weights
-pfit,s,h,)apnorm.pfit,,,>apnorm.pfiT
+pfit,s,h,)apnorm.pfit,,,>apnorm.pfit
 clean,b,h,)apnorm.clean,,,>apnorm.clean
 nclean,r,h,0.5,,,Maximum number of pixels to clean
-niterate,i,h,2,0,,Number of profile fitting iterations
+niterate,i,h,5,0,,Number of profile fitting iterations
 saturation,r,h,)apnorm.saturation,,,>apnorm.saturation
 readnoise,s,h,)apnorm.readnoise,,,>apnorm.readnoise
 gain,s,h,)apnorm.gain,,,>apnorm.gain
 lsigma,r,h,)apnorm.lsigma,,,>apnorm.lsigma
 usigma,r,h,)apnorm.usigma,,,>apnorm.usigma
-polysep,r,h,0.6,0.1,1,Marsh algorithm polynomial spacing
-polyorder,i,h,6,1,,Marsh algorithm polynomial order
+polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,1,,,"Number of subapertures per aperture
 
 # ANSWER PARAMETERS

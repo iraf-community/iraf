@@ -81,3 +81,8 @@ Helocentric Parameters:
 
     astdsun.x:
 	AST_DSUN - Distance to Sun in AU.
+
+Misc
+
+    astlvac.x:
+	AST_LVAC - Convert air wavelengths to vacuum wavelengths (Angstroms)

@@ -62,12 +62,12 @@ begin
 
 	# Print polyphot magnitudes.
 	call apstats (py, IMNAME, Memc[imname], SZ_FNAME)
-	call printf ("%s x: %0.2f y: %0.2f s: %.2f ")
+	call printf ("%s  %8.2f %8.2f  %8g  ")
 	    call pargstr (Memc[imname])
 	    call pargr (apstatr (py, PYCX))
 	    call pargr (apstatr (py, PYCY))
 	    call pargr (apstatr (py, SKY_MODE))
-	call printf ("mag: %0.2f err: %s\n")
+	call printf ("%7.3f  %s\n")
 	    call pargr (apstatr (py, PYMAG))
 	if (cier != AP_OK || sier != AP_OK || pier != AP_OK)
 	    call pargstr ("err")

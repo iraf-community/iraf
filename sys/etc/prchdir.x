@@ -16,6 +16,6 @@ begin
 	call strcpy ("chdir ", Memc[cmd], SZ_COMMAND)
 	call strcat (newdir, Memc[cmd], SZ_COMMAND)
 
-	call prupdate (pid, Memc[cmd])
+	call prupdate (pid, Memc[cmd], YES)
 	call sfree (sp)
 end

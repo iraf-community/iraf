@@ -81,7 +81,7 @@ begin
 	    iferr {
 		call med_box (im1, im2, boundary, constant)
 	    } then {
-		call eprintf (0, "Error median filtering image: %s\n")
+		call eprintf ("Error median filtering image: %s\n")
 		    call pargstr (image1)
 		call erract (EA_WARN)
 		call imunmap (im1)

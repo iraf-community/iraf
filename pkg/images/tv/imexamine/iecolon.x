@@ -15,7 +15,7 @@ define	CMDS	"|angh|angv|background|banner|boundary|box|buffer|ceiling|\
 		|pointmode|radius|round|rplot|select|szmarker|ticklabels|\
 		|title|width|x|xlabel|xorder|y|ylabel|yorder|zero|unlearn|\
 		|autoredraw|nbins|z1|z2|autoscale|top_closed|allframes|wcs|\
-		|xformat|yformat|fitplot|sigma|"
+		|xformat|yformat|fitplot|sigma|axes|"
  
 define	ANGH		 1
 define	ANGV		 2
@@ -86,6 +86,7 @@ define	XFORMAT		66
 define	YFORMAT		67
 define	FITPLOT		68
 define	SIGMA		69
+define	AXES		70
 
  
 # IE_COLON -- Respond to colon commands.
@@ -334,8 +335,8 @@ begin
 	case LABEL:
 	    call gargb (bval)
 	    if (nscan() == 2) {
-		call clputb ("simexam.label", bval)
-		if (gtype == 's')
+		call clputb ("eimexam.label", bval)
+		if (gtype == 'e')
 		    redraw = YES
 	    }
 
@@ -946,6 +947,13 @@ begin
 	    } else {
 		call clputr ("jimexam.sigma", rval1)
 		if (gtype == 'j' || gtype == 'k')
+		    redraw = YES
+	    }
+	case AXES:
+	    call gargb (bval)
+	    if (nscan() == 2) {
+		call clputb ("simexam.axes", bval)
+		if (gtype == 's')
 		    redraw = YES
 	    }
 

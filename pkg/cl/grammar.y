@@ -127,8 +127,8 @@ struct	label *getlabel(), *setlabel();
 %left	YOP_CONCAT
 %left	'+' '-'
 %left	'*' '/' '%'
-%left	YOP_POW
 %left	YOP_NOT UMINUS		/* supplies precedence for unary minus	*/
+%left	YOP_POW
 
 %start	block
 
@@ -1723,7 +1723,7 @@ xstmt	:	/* empty */ {
 		      	/* If there was an open reference compile the
 			 * loop increment and goback.
 			 */
-			int  push_pc;
+			int push_pc;
 
 			if (!errcnt) {
 			    if (n_oarr) {

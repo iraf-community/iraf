@@ -36,7 +36,7 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	call salloc (buf, SZ_LINE + maxch, TY_CHAR)
 
 	# Flush any buffered text or graphics output.
 	call flush (STDERR)
@@ -44,7 +44,7 @@ begin
 	call gexfls()
 
 	# Read the cursor.
-	if (clglstr (param, Memc[buf], SZ_LINE) == EOF) {
+	if (clglstr (param, Memc[buf], SZ_LINE + maxch) == EOF) {
 	    call sfree (sp)
 	    return (EOF)
 	}

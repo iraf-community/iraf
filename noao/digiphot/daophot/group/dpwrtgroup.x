@@ -1,9 +1,8 @@
-include <time.h>
 include <mach.h>
+include <time.h>
 include	<tbset.h>
-include	"../lib/daophot.h"
 include "../lib/daophotdef.h"
-include "../lib/apsel.h"
+include "../lib/apseldef.h"
 
 define	NCOLUMN 	6
 
@@ -11,7 +10,7 @@ define	NCOLUMN 	6
 
 procedure dp_tgnewgrp (tp, colpoint)
 
-pointer	tp			# pointer to table
+pointer	tp			# pointer to outpu ST table
 pointer	colpoint[ARB]		# array of pointers to columns
 
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
@@ -31,15 +30,15 @@ begin
 	call strcpy (XCENTER, Memc[colnames+2*SZ_COLNAME+2], SZ_COLNAME)
 	call strcpy (YCENTER, Memc[colnames+3*SZ_COLNAME+3], SZ_COLNAME)
 	call strcpy (MAG, Memc[colnames+4*SZ_COLNAME+4], SZ_COLNAME)
-	call strcpy (APSKY, Memc[colnames+5*SZ_COLNAME+5], SZ_COLNAME)
+	call strcpy (SKY, Memc[colnames+5*SZ_COLNAME+5], SZ_COLNAME)
 
 	# Set up the format definitions.
 	call strcpy ("%6d", Memc[colformat], SZ_COLFMT)
 	call strcpy ("%6d", Memc[colformat+SZ_COLFMT+1], SZ_COLFMT)
-	call strcpy ("%10.2f", Memc[colformat+2*SZ_COLFMT+2], SZ_COLFMT)
-	call strcpy ("%10.2f", Memc[colformat+3*SZ_COLFMT+3], SZ_COLFMT)
+	call strcpy ("%10.3f", Memc[colformat+2*SZ_COLFMT+2], SZ_COLFMT)
+	call strcpy ("%10.3f", Memc[colformat+3*SZ_COLFMT+3], SZ_COLFMT)
 	call strcpy ("%12.3f", Memc[colformat+4*SZ_COLFMT+4], SZ_COLFMT)
-	call strcpy ("%14.3f", Memc[colformat+5*SZ_COLFMT+5], SZ_COLFMT)
+	call strcpy ("%15.7g", Memc[colformat+5*SZ_COLFMT+5], SZ_COLFMT)
 
 	# Set up the unit definitions.
 	call strcpy ("##", Memc[colunits], SZ_COLUNITS)
@@ -80,10 +79,9 @@ end
 procedure dp_xggrppars (dao, tp)
 
 pointer	dao			# pointer to the DAOPHOT structure
-pointer	tp			# pointer to the table
+int	tp			# the output file descriptor
 
 pointer	sp, outstr, date, time, psffit
-bool	itob()
 int	envfind()
 
 begin
@@ -111,17 +109,17 @@ begin
 	call dp_sparam (tp, "TASK", "group", "name", "")
 
 	# Write the file name parameters.
-	call dp_sparam (tp, "IMAGE", DP_IMNAME(dao), "imagename", "")
-	call dp_sparam (tp, "APFILE", DP_APFILE(dao), "filename", "")
+	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
+	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
 	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "GRPFILE", DP_GRPFILE(dao), "filename", "")
+	call dp_sparam (tp, "GRPFILE", DP_OUTPHOTFILE(dao), "filename", "")
 
 	# Write out relevant data parameters.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")
 	call dp_rparam (tp, "DATAMIN", DP_MINGDATA(dao), "counts", "")
 	call dp_rparam (tp, "DATAMAX", DP_MAXGDATA(dao), "counts", "")
-	call dp_rparam (tp, "GAIN", DP_PHOT_ADC(dao), "number", "")
-	call dp_rparam (tp, "READNOISE", DP_READ_NOISE(dao), "electrons", "")
+	call dp_rparam (tp, "GAIN", DP_PHOTADU(dao), "number", "")
+	call dp_rparam (tp, "READNOISE", DP_READNOISE(dao), "electrons", "")
 
 	# Write out the observing parameters.
 	call dp_sparam (tp, "OTIME", DP_OTIME(dao), "timeunit", "")
@@ -132,14 +130,13 @@ begin
 	call dp_rparam (tp, "PSFRAD", DP_SPSFRAD(dao), "scaleunit", "")
 	call dp_rparam (tp, "FITRAD", DP_SFITRAD(dao), "scaleunit", "")
 	call dp_rparam (tp, "PSFMAG", DP_PSFMAG(psffit), "magnitude", "")
-	call dp_bparam (tp, "VARPSF", itob (DP_VARPSF(dao)), "switch", "")
-	call dp_rparam (tp, "CRITOVLAP", DP_CRITOVLAP(dao), "pixels", "")
+	call dp_rparam (tp, "CRITSNRATIO", DP_CRITSNRATIO(dao), "sigma", "")
 	call dp_iparam (tp, "MAXGROUP", DP_MAXGROUP(dao), "number", "")
-	call dp_iparam (tp, "MAXSTAR", DP_MAXSTAR(dao), "number", "")
+	call dp_iparam (tp, "MAXNSTAR", DP_MAXNSTAR(dao), "number", "")
 
 	# Write out the group size parameters.
-	call dp_iparam (tp, "MINSZGROUP", 1, "number", "")
-	call dp_iparam (tp, "MAXSZGROUP", MAX_INT, "number", "")
+	# call dp_iparam (tp, "MINSZGROUP", 1, "number", "")
+	# call dp_iparam (tp, "MAXSZGROUP", MAX_INT, "number", "")
 
 	call sfree(sp)
 end
@@ -151,10 +148,9 @@ end
 procedure dp_tggrppars (dao, tp)
 
 pointer	dao			# pointer to the DAOPHOT structure
-pointer	tp			# pointer to the table
+pointer	tp			# pointer to the output table
 
 pointer	sp, outstr, date, time, psffit
-bool	itob()
 int	envfind()
 
 begin
@@ -182,17 +178,17 @@ begin
 	call tbhadt (tp, "TASK", "group")
 
 	# Write the file name parameters.
-	call tbhadt (tp, "IMAGE", DP_IMNAME(dao))
-	call tbhadt (tp, "APFILE", DP_APFILE(dao))
+	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
+	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
 	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "GRPFILE", DP_GRPFILE(dao))
+	call tbhadt (tp, "GRPFILE", DP_OUTPHOTFILE(dao))
 
 	# Write out relevant data parameters.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
 	call tbhadr (tp, "DATAMIN", DP_MINGDATA(dao))
 	call tbhadr (tp, "DATAMAX", DP_MAXGDATA(dao))
-	call tbhadr (tp, "GAIN", DP_PHOT_ADC(dao))
-	call tbhadr (tp, "READNOISE", DP_READ_NOISE(dao))
+	call tbhadr (tp, "GAIN", DP_PHOTADU(dao))
+	call tbhadr (tp, "READNOISE", DP_READNOISE(dao))
 
 	# Write out the observing parameters.
 	call tbhadt (tp, "OTIME", DP_OTIME(dao))
@@ -203,13 +199,12 @@ begin
 	call tbhadr (tp, "PSFRAD", DP_SPSFRAD(dao))
 	call tbhadr (tp, "FITRAD", DP_SFITRAD(dao))
 	call tbhadr (tp, "PSFMAG", DP_PSFMAG(psffit))
-	call tbhadb (tp, "VARPSF", itob (DP_VARPSF(dao)))
-	call tbhadr (tp, "CRITOVLAP", DP_CRITOVLAP(dao))
+	call tbhadr (tp, "CRITSNRATIO", DP_CRITSNRATIO(dao))
 	call tbhadi (tp, "MAXGROUP", DP_MAXGROUP(dao))
-	call tbhadi (tp, "MAXSTAR", DP_MAXSTAR(dao))
+	call tbhadi (tp, "MAXNSTAR", DP_MAXNSTAR(dao))
 
-	call tbhadi (tp, "MINSZGROUP", 1)
-	call tbhadi (tp, "MAXSZGROUP", MAX_INT)
+	# call tbhadi (tp, "MINSZGROUP", 1)
+	# call tbhadi (tp, "MAXSZGROUP", MAX_INT)
 
 	call sfree(sp)
 end
@@ -220,7 +215,7 @@ end
 procedure dp_wrtgroup (dao, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to daophot structure
-pointer	grp			# pointer to group output file
+int	grp			# the output file descriptor
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
 int	group_size[ARB]		# size of groups
@@ -234,10 +229,14 @@ begin
 end
 
 
-define GR_NAMESTR "#N%4tGROUP%10tID%16tXCENTER%26tYCENTER%36tMAG%48tMSKY%80t\\\n"
-define GR_UNITSTR "#U%4t##%10t##%16tpixels%26tpixels%36tmagnitudes%48tcounts%80t\\\n"
-define GR_FORMATSTR "#F%4t%%-9d%10t%%-6d%16t%%-10.2f%26t%%-10.2f%36t%%-12.3f%48t%%-14.3f%80t \n"
-define GR_DATASTR "%-9d%10t%-6d%16t%-10.2f%26t%-10.2f%36t%-12.3f%48t%-14.3f%80t \n"
+define GR_NAMESTR "#N%4tGROUP%10tID%16tXCENTER%26tYCENTER%36tMAG%48tMSKY\
+%80t\\\n"
+define GR_UNITSTR "#U%4t##%10t##%16tpixels%26tpixels%36tmagnitudes%48tcounts\
+%80t\\\n"
+define GR_FORMATSTR "#F%4t%%-9d%10t%%-6d%16t%%-10.3f%26t%%-10.3f%36t%%-12.3f\
+%48t%%-15.7g%80t \n"
+define GR_DATASTR "%-9d%10t%-6d%16t%-10.3f%26t%-10.3f%36t%-12.3f%48t%-15.7g\
+%80t \n"
 
 
 # DP_XWRTGROUP -- Write each group into the GROUP output ST table.
@@ -245,7 +244,7 @@ define GR_DATASTR "%-9d%10t%-6d%16t%-10.2f%26t%-10.2f%36t%-12.3f%48t%-14.3f%80t 
 procedure dp_xwrtgroup (dao, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to the daophot structure
-pointer	grp			# pointer to group output file
+int	grp			# the output file descriptor
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
 int	group_size[ARB]		# size of groups
@@ -262,11 +261,11 @@ begin
 	# Print results to the standard output.
 	if (DP_VERBOSE(dao) == YES) {
 	    call printf (" Size of     Number of\n")
-	    call printf ("  group        groups\n\n")
+	    call printf ("  group       groups\n\n")
 	    do i = 1, maxgroup {
 		if (number[i] <= 0)
 		    next
-	        call printf ("  %d        %d\n")
+	        call printf ("%8d    %9d\n")
 	    	    call pargi (i)
 	    	    call pargi (number[i])
 	    }

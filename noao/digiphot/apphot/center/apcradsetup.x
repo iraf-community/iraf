@@ -19,7 +19,7 @@ real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
 
 int	ap_showplot(), apfitcenter(), apstati(), clgcur()
-real	ap_cfwhmpsf(), ap_ccapert(), ap_csigma(), ap_ccthresh()
+real	ap_cfwhmpsf(), ap_ccapert(), ap_csigma()
 real	ap_cdatamin(), ap_cdatamax(), ap_crclean(), ap_crclip()
 
 begin
@@ -46,7 +46,8 @@ begin
 	call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
 
-	while (clgcur ("cursor", xc, yc, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 
 	switch (key) {
 	    case 'q':
@@ -55,8 +56,6 @@ begin
 		call gpagefile (gd, HELPFILE, "")
 	    case 'f':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
-	    case 'h':
-	        rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 's':
 	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    case 'l':
@@ -72,8 +71,8 @@ begin
 	    case 'v':
 	        rval = ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
 		rval = ap_ccapert (ap, gd, out, stid, rmin, rmax, imin, imax)
-	        #rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	        rval = ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
+	        #rval = ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
 	    default:
 		call printf ("Unknown or ambiguous keystroke command\007\n")
 	    }
@@ -95,6 +94,6 @@ begin
 
 	# Fit the center and plot the results.
 	cier = apfitcenter (ap, im, xcenter, ycenter)
-	call apcplot (ap, 0, cier, gd, apstati (ap, RADPLOTS))
+	call ap_cplot (ap, 0, gd, apstati (ap, RADPLOTS))
 	call ap_qcenter (ap, cier)
 end

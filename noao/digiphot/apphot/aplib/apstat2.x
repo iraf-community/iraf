@@ -155,12 +155,10 @@ begin
 	    return (AP_SKYSIGMA(nse))
 	case EPADU:
 	    return (AP_EPADU(nse))
-	case THRESHOLD:
-	    return (AP_THRESHOLD(nse))
-	case CTHRESHOLD:
-	    return (AP_CTHRESHOLD(nse))
 	case READNOISE:
 	    return (AP_READNOISE(nse))
+	case THRESHOLD:
+	    return (AP_THRESHOLD(fnd))
 	case RATIO:
 	    return (AP_RATIO(fnd))
 	case THETA:

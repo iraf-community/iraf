@@ -59,6 +59,7 @@ libex.a:
 
 	@glabax
 	@gki
+	@gim
 
 	aelogd.x	
 	aelogr.x	
@@ -98,6 +99,8 @@ libex.a:
 	gline.x	
 	gmark.x		markers.inc <gio.h> <gset.h>
 	gmftitle.x	<gio.h>
+	gmprintf.x
+	gmsg.x		<gio.h> <chars.h>
 	gopen.x		<error.h> <gio.h> <gset.h> <knet.h> <gki.h>
 	gpagefile.x	<error.h> <gset.h> <gio.h>
 	gpcell.x	gpl.com <gio.h>

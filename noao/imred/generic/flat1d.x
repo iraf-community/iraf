@@ -183,6 +183,8 @@ begin
 		minflat, mindata, maxdata)
 	}
 
+	call imaddr (out, "ccdmean", 1.)
+
 	call cvfree (cv)
 	call sfree (sp)
 end

@@ -1,5 +1,5 @@
 include <imhdr.h>
-include "../lib/daophot.h"
+include "../lib/daophotdef.h"
 
 # DP_FILTER --  Procedure to set the image airmass.
 

@@ -1,7 +1,7 @@
 include <imhdr.h>
 include "../lib/apphot.h"
 
-# AP_AIRMASS -  Procedure to set the image airmass.
+# AP_AIRMASS -  Procedure to determine the image airmass.
 
 procedure ap_airmass (im, ap)
 

@@ -1,11 +1,12 @@
 include	<error.h>
 include	<pkg/gtools.h>
-include	"../shdr.h"
-include	"../units.h"
+include	<smw.h>
+include	<units.h>
+include	<ctype.h>
 
 # List of colon commands.
 define	CMDS		 "|show|nolog|log|dispaxis|nsum|#|units|auto|zero\
-			  |xydraw|histogram|nosysid|wreset|"
+			  |xydraw|histogram|nosysid|wreset|flip|overplot|"
 define	SHOW		1	# Show logged data
 define	NOLOG		2	# Turn off logging
 define	LOG		3	# Turn on logging
@@ -19,6 +20,8 @@ define	XYDRAW		10	# Draw connection X,Y pairs
 define	HIST		11	# Draw histogram style lines
 define	NOSYSID		12	# Don't include system id
 define	WRESET		13	# Reset window for each new spectrum
+define	FLIP		14	# Flip the dispersion coordinates
+define	OVERPLOT	15	# Toggle overplot
 
 define	OPOFF		7	# Offset in options array
 
@@ -41,7 +44,8 @@ int	newgraph		# New graph?
 bool	bval
 char	cmd[SZ_LINE]
 real	x, gt_getr()
-int	ncmd, ival, access(), nscan(), strdic(), btoi()
+int	ncmd, ival, access(), nscan(), strdic(), btoi(), gt_geti()
+pointer	smw
 errchk	un_changer
 
 begin
@@ -49,6 +53,8 @@ begin
 	call sscan (command)
 	call gargwrd (cmd, SZ_LINE)
 	ncmd = strdic (cmd, cmd, SZ_LINE, CMDS)
+
+	smw = MW(sh)
 
 	switch (ncmd) {
 	case SHOW:
@@ -73,41 +79,45 @@ begin
 	    call printf ("Logging to %s enabled")
 		call pargstr (fname1)
 	case DA:
-	    if (FORMAT(sh) == TWODSPEC) {
+	    if (SMW_FORMAT(smw) == SMW_ND) {
 		call gargi (ival)
 		if (nscan() == 2) {
 		    if (ival < 1) {
 			call printf ("Bad value for dispaxis (%d)\n")
 			    call pargi (ival)
-		    } else if (ival != DAXISP(sh)) {
+		    } else if (ival != SMW_PAXIS(smw,1)) {
+			call smw_daxis (smw, IM(sh), ival, INDEFI, INDEFI)
+			call smw_saxes (smw, NULL, IM(sh))
 			call shdr_close (sh)
-			call shdr_2d (NULL, ival, INDEFI)
 		    }
 		} else {
 		    call printf ("dispaxis %d\n")
-			call pargi (DAXISP(sh))
+			call pargi (SMW_PAXIS(smw,1))
 		}
 	    } else
 		call printf ("Image is not two dimensional\n")
 	case NS:
-	    if (FORMAT(sh) == TWODSPEC) {
+	    if (SMW_FORMAT(smw) == SMW_ND) {
 		call gargi (ival)
-		if (nscan() == 2) {
-		    if (ival < 1) {
-			call printf ("Bad value for nsum (%d)\n")
-			    call pargi (ival)
-		    } else if (ival != NSUM(sh)) {
-			call shdr_close (sh)
-			call shdr_2d (NULL, INDEFI, ival)
-		    }
+		call gargi (ncmd)
+		if (nscan() == 1) {
+		    call printf ("nsum %d %d\n")
+			call pargi (SMW_NSUM(smw,1))
+			call pargi (SMW_NSUM(smw,2))
 		} else {
-		    call printf ("nsum %d\n")
-			call pargi (NSUM(sh))
+		    if (nscan() == 2)
+			ncmd = INDEFI
+		    if ((!IS_INDEFI(ival) && ival != SMW_NSUM(smw,1)) ||
+			(!IS_INDEFI(ncmd) && ncmd != SMW_NSUM(smw,2))) {
+			call smw_daxis (smw, IM(sh), INDEFI, ival, ncmd)
+			call smw_saxes (smw, NULL, IM(sh))
+			call shdr_close (sh)
+		    }
 		}
 	    } else
-		call printf ("Image is not two dimensional\n")
+		call printf ("Invalid image format\n")
 	case COMMENT:
-	    call ans_hdr (sh, NO, fname1, fname2, fd1, fd2)
+	    call ans_hdr (sh, NO, 'm', fname1, fname2, fd1, fd2)
 	    call gargstr (cmd, SZ_LINE)
 	    if (fd1 != NULL) {
 		call fprintf (fd1, "%s\n")
@@ -119,19 +129,21 @@ begin
 	    }
 	case UNITS:
 	    call gargstr (cmd, SZ_LINE)
+	    for (ival=1; IS_WHITE(cmd[ival]); ival=ival+1)
+		;
 	    iferr {
 		x = gt_getr (gt, GTXMIN)
 		if (!IS_INDEF(x)) {
-		    call un_changer (UN(sh), cmd, x, 1, NO)
+		    call un_changer (UN(sh), cmd[ival], x, 1, NO)
 		    call gt_setr (gt, GTXMIN, x)
 		}
 		x = gt_getr (gt, GTXMAX)
 		if (!IS_INDEF(x)) {
-		    call un_changer (UN(sh), cmd, x, 1, NO)
+		    call un_changer (UN(sh), cmd[ival], x, 1, NO)
 		    call gt_setr (gt, GTXMAX, x)
 		}
-		call un_changer (UN(sh), cmd, Memr[SX(sh)], SN(sh), YES)
-		call strcpy (cmd, units, SZ_FNAME)
+		call un_changer (UN(sh), cmd[ival], Memr[SX(sh)], SN(sh), YES)
+		call strcpy (cmd[ival], units, SZ_FNAME)
 		call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
 		call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
 		newgraph = YES
@@ -197,6 +209,24 @@ begin
 	    else {
 		call printf ("wreset %b\n")
 		    call pargi (options[WRESET-OPOFF])
+	    }
+	case FLIP:
+	    call gargb (bval)
+	    if (nscan() == 2) {
+		options[FLIP-OPOFF] = btoi (bval)
+		call gt_seti (gt, GTXFLIP, options[FLIP-OPOFF])
+	    } else {
+		options[FLIP-OPOFF] = gt_geti (gt, GTXFLIP)
+		call printf ("flip %b\n")
+		    call pargi (options[FLIP-OPOFF])
+	    }
+	case OVERPLOT:
+	    call gargb (bval)
+	    if (nscan() == 2) {
+		options[OVERPLOT-OPOFF] = btoi (bval)
+	    } else {
+		call printf ("overplot %b\n")
+		    call pargi (options[OVERPLOT-OPOFF])
 	    }
 
 	default:

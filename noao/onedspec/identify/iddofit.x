@@ -32,7 +32,7 @@ begin
 		next
 	    Memd[x+nfit] = PIX(id,i)
 	    Memd[y+nfit] = USER(id,i)
-	    Memd[wts+nfit] = 1.
+	    Memd[wts+nfit] = max (1D0, WTS(id,i))
 	    nfit = nfit + 1
 	}
 

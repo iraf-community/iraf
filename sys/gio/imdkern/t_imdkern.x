@@ -8,14 +8,14 @@ include	<gki.h>
 
 procedure t_imdkern()
 
-int	fd, list
-pointer	gki, sp, fname, devname
+int	fd, list, dbfd
+pointer	gki, sp, fname, devname, dbfname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 int	color, frame
 
 bool	clgetb()
-int	clgeti()
+int	clgeti(), envfind()
 int	clpopni(), clgfil(), open(), btoi()
 int	gki_fetch_next_instruction()
 
@@ -23,19 +23,29 @@ begin
 	call smark (sp)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (dbfname, SZ_PATHNAME, TY_CHAR)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")
 
+	# Set parameter defaults.
+	debug = NO
+	verbose = NO
+	gkiunits = NO
+	frame = -1
+	color = -1
+
+	# Check for global kernel debug flag.
+	if (envfind ("idkdebug", Memc[dbfname], SZ_PATHNAME) > 0)
+	    iferr (dbfd = open (Memc[dbfname], APPEND, TEXT_FILE)) {
+		debug = NO
+		dbfd = 0
+	    } else
+		debug = YES
+
 	# Get parameters.
 	call clgstr ("device", Memc[devname], SZ_FNAME)
-	if (clgetb ("generic")) {
-	    debug = NO
-	    verbose = NO
-	    gkiunits = NO
-	    frame = -1
-	    color = -1
-	} else {
+	if (!clgetb ("generic")) {
 	    debug   = btoi (clgetb ("debug"))
 	    verbose = btoi (clgetb ("verbose"))
 	    gkiunits = btoi (clgetb ("gkiunits"))
@@ -43,9 +53,12 @@ begin
 	    color = clgeti ("color")
 	}
 
+	if (debug == YES && dbfd == 0)
+	    dbfd = STDERR
+
 	# Open the graphics kernel.
 	call imd_opendev (Memc[devname], frame, color, dev)
-	call gkp_install (deb, STDERR, verbose, gkiunits)
+	call gkp_install (deb, dbfd, verbose, gkiunits)
 
 	# Process a list of metacode files, writing the decoded metacode
 	# instructions on the standard output.
@@ -59,8 +72,10 @@ begin
 
 	    # Process the metacode instruction stream.
 	    while (gki_fetch_next_instruction (fd, gki) != EOF) {
-		if (debug == YES)
+		if (debug == YES) {
 		    call gki_execute (Mems[gki], deb)
+		    call flush (dbfd)
+		}
 		call gki_execute (Mems[gki], dev)
 	    }
 

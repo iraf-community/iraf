@@ -70,8 +70,6 @@ begin
 	default:
 	    call strcpy ("poisson", AP_NSTRING(nse), SZ_FNAME)
 	}
-	AP_THRESHOLD(nse) = DEF_THRESHOLD
-	AP_CTHRESHOLD(nse) = DEF_CTHRESHOLD
 	AP_READNOISE(nse) = DEF_READNOISE
 	AP_SKYSIGMA(nse) = DEF_SKYSIGMA
 	AP_EPADU(nse) = DEF_EPADU

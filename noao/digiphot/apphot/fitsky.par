@@ -1,18 +1,18 @@
 # FITSKY
 
 image,f,a,,,,Input image
+coords,f,h,"",,,Coordinate list
+output,f,h,"default",,,Results file
+plotfile,f,h,"",,,Metacode plot file
 datapars,pset,h,"",,,Data dependent parameters
 fitskypars,pset,h,"",,,Sky fitting parameters
-coords,f,h,"",,,Coordinate list
-output,f,h,"default",,,Results
-plotfile,f,h,"",,,Metacode plot file
+interactive,b,h,yes,,,Mode of use
+radplots,b,h,no,,,Plot radial profiles in interactive mode
+verify,b,h,yes,,,Verify critical parameters in non-interactive mode
+update,b,h,no,,,Update critical parameters in non-interactive mode
+verbose,b,h,no,,,Print messages in non-interactive mode
 graphics,s,h,"stdgraph",,,Graphics device
 display,s,h,"stdimage",,,Display device
-commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
-cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
-radplots,b,h,no,,,Plot radial profiles in interactive mode
-interactive,b,h,yes,,,Mode of use
-verify,b,h,yes,,,Verify critical parameters in non interactive mode
-update,b,h,no,,,Update critical parameters in non interactive mode
-verbose,b,h,no,,,Print messages in non interactive mode
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mode,s,h,'ql'

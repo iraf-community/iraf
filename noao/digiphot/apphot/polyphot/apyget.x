@@ -146,7 +146,7 @@ begin
 	# Type prompt.
 	call printf (
 	    "Mark polygon vertex [space=mark,q=quit].\n")
-	stat = clgcur ("commands", xtemp, ytemp, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd], SZ_LINE)
 
 	# Fetch the polygon and draw it on the display.
 	nvertices = 0
@@ -172,9 +172,10 @@ begin
 	    # Type prompt.
 	    call printf (
 	        "Mark polygon vertex [space=mark,q=quit].\n")
-	    stat = clgcur ("commands", xtemp, ytemp, wcs, key, Memc[cmd],
+	    stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd],
 	        SZ_LINE)
 	}
+	call printf ("\n")
 
 	call sfree (sp)
 

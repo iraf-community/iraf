@@ -122,19 +122,21 @@ procedure ic_closed (ic)
 pointer	ic		# ICFIT pointer
 
 begin
-	# Free memory for the package parameter structure.
-	call rg_free (IC_RG(ic))
-	call mfree (IC_XFIT(ic), TY_DOUBLE)
-	call mfree (IC_YFIT(ic), TY_DOUBLE)
-	call mfree (IC_WTSFIT(ic), TY_DOUBLE)
-	call mfree (IC_REJPTS(ic), TY_INT)
-	call mfree (IC_SAMPLE(ic), TY_CHAR)
-	call mfree (IC_LABELS(ic,1), TY_CHAR)
-	call mfree (IC_LABELS(ic,2), TY_CHAR)
-	call mfree (IC_UNITS(ic,1), TY_CHAR)
-	call mfree (IC_UNITS(ic,2), TY_CHAR)
-	call mfree (IC_HELP(ic), TY_CHAR)
-	call mfree (ic, TY_STRUCT)
+	if (ic != NULL) {
+	    # Free memory for the package parameter structure.
+	    call rg_free (IC_RG(ic))
+	    call mfree (IC_XFIT(ic), TY_DOUBLE)
+	    call mfree (IC_YFIT(ic), TY_DOUBLE)
+	    call mfree (IC_WTSFIT(ic), TY_DOUBLE)
+	    call mfree (IC_REJPTS(ic), TY_INT)
+	    call mfree (IC_SAMPLE(ic), TY_CHAR)
+	    call mfree (IC_LABELS(ic,1), TY_CHAR)
+	    call mfree (IC_LABELS(ic,2), TY_CHAR)
+	    call mfree (IC_UNITS(ic,1), TY_CHAR)
+	    call mfree (IC_UNITS(ic,2), TY_CHAR)
+	    call mfree (IC_HELP(ic), TY_CHAR)
+	    call mfree (ic, TY_STRUCT)
+	}
 end
 
 

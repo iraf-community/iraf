@@ -5,65 +5,15 @@ include	<math.h>
 include	<mwset.h>
 include	"imwcs.h"
 
-task	inv	= t_inv,
-	simple	= t_simple,
+task	simple	= t_simple,
 	wcs	= t_wcs,
 	float	= t_float,
-	imtest	= t_imtest
+	imtest	= t_imtest,
+	inv	= t_inv,
+	save	= t_save,
+	load	= t_load
 
-
-# INV -- Test matrix inversion.
-
-procedure t_inv()
-
-int	i, j
-double	a[3,3], b[3,3], c[3,3]
-long	seed, clktime()
-real	urand()
-
-begin
-	# Construct the identity matrix.
-	do i = 1, 3 {
-	    do j = 1, 3
-		a[i,j] = 0.0
-	    a[i,i] = 1.0
-	}
-
-	# Invert the matrix.
-	call mw_invertd (a, b, 3)
-
-	# Print the inverse.
-	call printf ("inverse of identity matrix:\n")
-	do i = 1, 3 {
-	    do j = 1, 3 {
-		call printf ("  %20.*f")
-		    call pargi (NDIGITS_DP)
-		    call pargd (b[i,j])
-	    }
-	    call printf ("\n")
-	}
-
-	# Compute a random matrix.
-	seed = clktime(0)
-	do i = 1, 3
-	    do j = 1, 3
-		a[i,j] = urand (seed)
-
-	# Invert the matrix.
-	call mw_invertd (a, b, 3)
-	call mw_invertd (b, c, 3)
-
-	# Print the difference of the original and the inverted inverse.
-	call printf ("difference of inverse of random matrix:\n")
-	do i = 1, 3 {
-	    do j = 1, 3 {
-		call printf ("  %20.*f")
-		    call pargi (NDIGITS_DP)
-		    call pargd (a[i,j] - c[i,j])
-	    }
-	    call printf ("\n")
-	}
-end
+define	SAVELEN		10240
 
 
 # SIMPLE -- Simple test of the most common interface routines.
@@ -374,6 +324,159 @@ begin
 	    call pargr (x2)
 
 	call mw_close (mw)
+end
+
+
+# INV -- Test matrix inversion.
+
+procedure t_inv()
+
+int	i, j
+double	a[3,3], b[3,3], c[3,3]
+long	seed, clktime()
+real	urand()
+
+begin
+	# Construct the identity matrix.
+	do i = 1, 3 {
+	    do j = 1, 3
+		a[i,j] = 0.0
+	    a[i,i] = 1.0
+	}
+
+	# Invert the matrix.
+	call mw_invertd (a, b, 3)
+
+	# Print the inverse.
+	call printf ("inverse of identity matrix:\n")
+	do i = 1, 3 {
+	    do j = 1, 3 {
+		call printf ("  %20.*f")
+		    call pargi (NDIGITS_DP)
+		    call pargd (b[i,j])
+	    }
+	    call printf ("\n")
+	}
+
+	# Compute a random matrix.
+	seed = clktime(0)
+	do i = 1, 3
+	    do j = 1, 3
+		a[i,j] = urand (seed)
+
+	# Invert the matrix.
+	call mw_invertd (a, b, 3)
+	call mw_invertd (b, c, 3)
+
+	# Print the difference of the original and the inverted inverse.
+	call printf ("difference of inverse of random matrix:\n")
+	do i = 1, 3 {
+	    do j = 1, 3 {
+		call printf ("  %20.*f")
+		    call pargi (NDIGITS_DP)
+		    call pargd (a[i,j] - c[i,j])
+	    }
+	    call printf ("\n")
+	}
+end
+
+
+# SAVE -- Save a test WCS to a file.
+
+procedure t_save()
+
+pointer	mw, bp
+double	cd[3,3], r[3], w[3]
+int	ndim, naxes, axes[2], npts, buflen, nchars, fd, i
+real	theta, center[3], shift[3], scale[3], pv[10], wv[10]
+int	open(), mw_save
+pointer	mw_open()
+
+begin
+	ndim = 3
+
+	# Create a unitary, 3 dim WCS.
+	mw = mw_open (NULL, ndim)
+
+	# Apply a transform to the first 2 axes.
+	call aclrr (center, 2)
+	theta = DEGTORAD(30.0D0)
+	shift[1] = 10.0;  shift[2] = 20.0
+	scale[1] = 4.0;   scale[2] = 0.2
+
+	call mw_rotate (mw, theta, center, 3B)
+	call mw_shift (mw, shift, 3B)
+	call mw_scale (mw, scale, 3B)
+
+	# Add a WCS.
+	call mw_newsystem (mw, "sky", 3)
+
+	cd[1,1] = .01D0;  cd[2,1] = 0;    cd[3,1] = 0
+	cd[1,2] = 0;    cd[2,2] = .01D0;  cd[3,2] = 0
+	cd[1,3] = 0;    cd[2,3] = 0;    cd[3,3] = 1
+	r[1]    = 0;    r[2]    = 0;    r[3]    = 0
+	w[1]    = 100;  w[2]    = 20;   w[3]    = 0
+
+	# Put a tangent projection on axis 1&2.
+	call mw_swtermd (mw, r, w, cd, ndim)
+	axes[1] = 1;  axes[2] = 2;  naxes = 2
+	call mw_swtype (mw, axes, naxes, "tan",
+	    "axis 1: axtype=ra  axis 2: axtype=dec")
+
+	# Put a simple sampled curve on axis 3.
+	call mw_swtype (mw, 3, 1, "sampled", "")
+	npts = 10
+	do i = 1, npts {
+	    pv[i] = i
+	    wv[i] = i * 2
+	}
+	call mw_swsampr (mw, 3, pv, wv, npts)
+
+	# Display the new WCS.
+	call mw_show (mw, STDOUT, 0)
+
+	# Save to a file.
+	bp = NULL;  buflen = 0
+	nchars = mw_save (mw, bp, buflen)
+
+	fd = open ("mwcs.sav", NEW_FILE, BINARY_FILE)
+	call write (fd, Memc[bp], nchars)
+	call close (fd)
+
+	call mfree (bp, TY_CHAR)
+	call mw_close (mw)
+end
+
+
+# LOAD -- Load a test WCS from a file.
+
+procedure t_load()
+
+pointer	mw, bp
+int	fd, nchars
+char	fname[SZ_FNAME]
+int	open(), read()
+pointer	mw_open()
+
+begin
+	call clgstr ("savefile", fname, SZ_FNAME)
+	call malloc (bp, SAVELEN, TY_CHAR)
+
+	# Open and read save file.
+	fd = open (fname, READ_ONLY, BINARY_FILE)
+	nchars = read (fd, Memc[bp], SAVELEN)
+	call printf ("read %d chars from %s\n")
+	    call pargi (nchars)
+	    call pargstr (fname)
+
+	mw = mw_open (NULL, 3)
+	call mw_load (mw, bp)
+
+	# Display the new WCS.
+	call mw_show (mw, STDOUT, 0)
+
+	call mw_close (mw)
+	call mfree (bp, TY_CHAR)
 end
 
 

@@ -1,5 +1,35 @@
 .help revisions Jun88 noao.imred
 .nf
+imred$hydra/demos/xgdonessie.dat
+    Fixed playback.  (7/26/94, Valdes)
+
+imred$argus/argus.cl
+imred$argus/argus.men
+imred$ctioslit/ctioslit.cl
+imred$ctioslit/ctioslit.men
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+imred$hydra/hydra.cl
+imred$hydra/hydra.men
+imred$iids/iids.cl
+imred$iids/iids.men
+imred$irs/irs.cl
+imred$irs/irs.men
+imred$kpnocoude/kpnocoude.cl
+imred$kpnocoude/kpnocoude.men
+imred$kpnoslit/kpnoslit.cl
+imred$kpnoslit/kpnoslit.men
+imred$specred/specred.cl
+imred$specred/specred.men
+    Added new SFLIP task to packages.  (7/18/94, Valdes)
+
+imred$doc/demos.hlp
+    Added noao.twodspec.longslit to the packages with demos.  (7/24/92, Valdes)
+
+=======
+V2.10.0
+=======
+
 imred$imred.cl
 imred$imred.men
 imred$<spectroscopy packages>

@@ -1,4 +1,5 @@
-task	catalog		= t_catalog,
+task	apfile		= t_apfile,
+	catalog		= t_catalog,
 	config		= t_config,
 	chkconfig	= t_chkconfig,
 	fitparams	= t_fitparams,

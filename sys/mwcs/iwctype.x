@@ -71,6 +71,8 @@ begin
 		if (card[3] == 'T' && IS_DIGIT (card[4])) {
 		    type = TY_WATDATA
 		    axis = TO_INTEG (card[4])
+		    if (IS_DIGIT(card[5]))
+			ip = 5
 		    if (ctoi (card, ip, index) <= 0)
 			type = ERR
 		} else if (strncmp (card, "WAXMAP", 6) == 0) {
@@ -92,9 +94,13 @@ begin
 			type = TY_WSVLEN
 			axis = TO_INTEG (card[4])
 			index = ERR
-		    } else if (ctoi (card, ip, index) > 0) {
-			type = TY_WSVDATA
-			axis = TO_INTEG (card[4])
+		    } else {
+			if (IS_DIGIT(card[5]))
+			    ip = 5
+			if (ctoi (card, ip, index) > 0) {
+			    type = TY_WSVDATA
+			    axis = TO_INTEG (card[4])
+			}
 		    }
 		}
 	    }

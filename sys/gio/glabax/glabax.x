@@ -20,12 +20,15 @@ char	ylabel[ARB]		# Y axis label
 
 char	label[SZ_LABEL]
 int	axis, wcs, ntitlelines, ip, major_tick
+int	save_plcolor, save_txcolor, save_facolor
 int	save_pltype, save_clip, save_txfont
+real	xv[4], yv[4], x1, x2, y1, y2
 real	save_plwidth, save_txsize
 real	dx, dy, x, y, sx, sy, scalar, wc, wstep
 pointer	sp, axes[4], ax, w
 
 real	gstatr()
+bool	ttygetb()
 int	gstati(), glb_gettick()
 errchk	glb_setup, gadraw, grdraw, gamove, gtext
 errchk	glb_label_axis, glb_plot_title, glb_gettick
@@ -60,10 +63,40 @@ begin
 	# the axes.
 
 	save_pltype  = gstati (gp, G_PLTYPE)
-	save_txfont  = gstati (gp, G_TXFONT)
 	save_plwidth = gstatr (gp, G_PLWIDTH)
+	save_plcolor = gstati (gp, G_PLCOLOR)
+	save_txfont  = gstati (gp, G_TXFONT)
 	save_txsize  = gstatr (gp, G_TXSIZE)
+	save_txcolor = gstati (gp, G_TXCOLOR)
+	save_facolor = gstati (gp, G_FACOLOR)
 	save_clip    = WCS_CLIP(w)
+
+	# Prepare the background.
+	if (ttygetb (GP_TTY(gp), "fa") &&
+	    GP_FRAMECOLOR(gp) != 0 && GP_FRAMEDRAWN(gp) == NO) {
+
+	    call ggview (gp, x1, x2, y1, y2)
+	    call gseti (gp, G_WCS, 0)
+	    call gseti (gp, G_CLIP, NO)
+
+	    xv[1] = 0.0;  yv[1] = 0.0
+	    xv[2] = 1.0;  yv[2] = 0.0
+	    xv[3] = 1.0;  yv[3] = 1.0
+	    xv[4] = 0.0;  yv[4] = 1.0
+	    call gseti (gp, G_FACOLOR, GP_FRAMECOLOR(gp))
+	    call gfill (gp, xv, yv, 4, GF_SOLID)
+
+	    xv[1] = x1;  yv[1] = y1
+	    xv[2] = x2;  yv[2] = y1
+	    xv[3] = x2;  yv[3] = y2
+	    xv[4] = x1;  yv[4] = y2
+	    call gseti (gp, G_FACOLOR, 0)
+	    call gfill (gp, xv, yv, 4, GF_SOLID)
+
+	    call gseti (gp, G_CLIP, save_clip)
+	    call gseti (gp, G_WCS, wcs)
+	    GP_FRAMEDRAWN(gp) = YES
+	}
 
 	# Draw and label the four axes.  First set the linetype and linewidth
 	# to be used to draw the axes and ticks; these may be different than
@@ -100,6 +133,7 @@ begin
 
 	    # Set the axis linewidth and move to the start of the axis.
 	    call gsetr (gp, G_PLWIDTH, AX_AXISWIDTH(ax))
+	    call gseti (gp, G_PLCOLOR, AX_AXISCOLOR(ax))
 	    call gamove (gp, AX_START(ax,1), AX_START(ax,2))
 
 	    # Draw the axis and label the major ticks if so indicated.
@@ -110,12 +144,14 @@ begin
 
 		# Advance to the next tick.
 		call gsetr (gp, G_PLWIDTH, AX_AXISWIDTH(ax))
+		call gseti (gp, G_PLCOLOR, AX_AXISCOLOR(ax))
 		call gadraw (gp, x, y)
 
 		if (major_tick == YES) {
 		    # Draw a major tick.
 
 		    call gsetr (gp, G_PLWIDTH, AX_MAJORWIDTH(ax))
+		    call gseti (gp, G_PLCOLOR, AX_TICKCOLOR(ax))
 		    dx = AX_MAJORTICK(ax,1)
 		    dy = AX_MAJORTICK(ax,2)
 		    call grdraw (gp, dx, dy)
@@ -147,6 +183,7 @@ begin
 
 			# Draw the label string.
 			call gsetr (gp, G_TXSIZE, AX_TICKLABELSIZE(ax))
+			call gseti (gp, G_TXCOLOR, AX_TICKLABELCOLOR(ax))
 
 			# If log scaling, label the ticks in log units.
 			if (AX_SCALING(ax) == LINEAR) {
@@ -171,6 +208,7 @@ begin
 		    dy = AX_MINORTICK(ax,2)
 
 		    call gsetr (gp, G_PLWIDTH, AX_MINORWIDTH(ax))
+		    call gseti (gp, G_PLCOLOR, AX_TICKCOLOR(ax))
 		    call grdraw (gp, dx, dy)
 		    call grdraw (gp, -dx, -dy)
 		}
@@ -188,28 +226,38 @@ begin
 	}
 
 	# Draw grid between major ticks.
-	if (GL_DRAWGRID (GP_XAP(gp)) == YES)
+	if (GL_DRAWGRID (GP_XAP(gp)) == YES) {
+	    call gseti (gp, G_PLCOLOR, AX_GRIDCOLOR(axes[3]))
 	    call glb_drawgrid (gp, axes[3], axes[2])
-	if (GL_DRAWGRID (GP_YAP(gp)) == YES)
+	}
+	if (GL_DRAWGRID (GP_YAP(gp)) == YES) {
+	    call gseti (gp, G_PLCOLOR, AX_GRIDCOLOR(axes[1]))
 	    call glb_drawgrid (gp, axes[1], axes[4])
+	}
 
 	# Label the X and Y axes.
 	do axis = 1, 4 {
 	    ax = axes[axis]
-	    if (AX_DRAWME(ax) == YES && AX_LABELTICKS(ax) == YES)
+	    if (AX_DRAWME(ax) == YES && AX_LABELTICKS(ax) == YES) {
+		call gseti (gp, G_TXCOLOR, AX_AXISLABELCOLOR(ax))
 		call glb_label_axis (gp, ax, xlabel, ylabel)
+	    }
 	}
 
 	# Draw plot title block.
+	call gseti (gp, G_TXCOLOR, GP_TITLECOLOR(gp))
 	call glb_plot_title (gp, title, ntitlelines)
 
 	# Restore the parameters we were originally called with.
 	call gseti (gp, G_WCS, wcs)
+	call gseti (gp, G_CLIP,    save_clip)
 	call gseti (gp, G_PLTYPE,  save_pltype)
 	call gsetr (gp, G_PLWIDTH, save_plwidth)
+	call gseti (gp, G_PLCOLOR, save_plcolor)
 	call gsetr (gp, G_TXSIZE,  save_txsize)
 	call gseti (gp, G_TXFONT,  save_txfont)
-	call gseti (gp, G_CLIP,    save_clip)
+	call gseti (gp, G_TXCOLOR, save_txcolor)
+	call gseti (gp, G_FACOLOR, save_facolor)
 
 	call gflush (gp)
 	call sfree (sp)

@@ -54,9 +54,10 @@ begin
 	# Initialize the DAOPHOT package.
 
 	print ("INITIALIZE THE DAOPHOT PACKAGE", >> daolog)
+	print ("", >> daolog)
 	print ("")
 	print ("INITIALIZE THE DAOPHOT PACKAGE")
-	print ("", >> daolog)
+	print ("")
 
 	daophot.text=yes
 
@@ -67,21 +68,24 @@ begin
 	unlearn ("daofind")
 	unlearn ("daopars")
 	unlearn ("datapars")
+	unlearn ("findpars")
 	unlearn ("fitskypars")
 	unlearn ("group")
 	unlearn ("grpselect")
 	unlearn ("histplot")
 	unlearn ("nstar")
-	unlearn ("pappend")
+	unlearn ("pconcat")
 	unlearn ("pconvert")
 	unlearn ("pdump")
 	unlearn ("peak")
 	unlearn ("pexamine")
+	unlearn ("pfmerge")
 	unlearn ("phot")
 	unlearn ("photpars")
 	unlearn ("prenumber")
 	unlearn ("pselect")
 	unlearn ("psf")
+	unlearn ("pstselect")
 	unlearn ("psort")
 	unlearn ("radplot")
 	unlearn ("seepsf")
@@ -96,8 +100,8 @@ begin
 	print ("", >> daolog)
 
 	datapars.fwhmpsf=2.0
-	datapars.threshold=30.0
 	datapars.sigma=10.0
+	findpars.threshold=3.0
 
 	daofind (im, "default", interactive-, verify-, verbose-)
 	concat (im // ".coo.1", daolog, append=yes)
@@ -116,6 +120,16 @@ begin
 	phot (im, "default", "default", interactive-, verify-, verbose-)
 	concat (im // ".mag.1", daolog, append=yes)
 
+	# Test the PSTSELECT task.
+
+	print ("", >> daolog)
+	print ("TESTING THE PSTSELECT TASK", >> daolog) 
+	print ("TESTING THE PSTSELECT TASK") 
+	print ("", >> daolog)
+
+	pstselect (im, im // ".mag.1", "default", 1, verify-, verbose-)
+	concat (im // ".pst.1", daolog, append=yes)
+
 	# Test the PSF task.
 
 	print ("", >> daolog)
@@ -126,12 +140,14 @@ begin
 	daopars.psfrad=5.0
 	daopars.fitrad=3.0
 
-	psf (im, "default", "default", "default",
-	    plotfile=daoplot, commands="daophot$test/cmds.dat", verify-,
-	    >> daolog)
+	psf (im, "default", "", "default", "default", "default",
+	    plotfile=daoplot, icommands="daophot$test/cmds.dat", verify-,
+	    verbose-, >> daolog)
 	imheader (im //".psf.1", longheader+, userfields+, >> daolog)
 	print ("", >> daolog)
 	concat (im // ".psg.1", daolog, append=yes)
+	print ("", >> daolog)
+	concat (im // ".pst.2", daolog, append=yes)
 
 	# Test the PEAK task.
 
@@ -140,12 +156,14 @@ begin
 	print ("TESTING THE PEAK TASK") 
 	print ("", >> daolog)
 
-	peak (im, "default", "default", "default", verify-, verbose-,
+	peak (im, "default", "default", "default", "", verify-, verbose-,
 	    >> daolog)
 	print ("", >> daolog)
 	concat (im // ".pk.1", daolog, append=yes)
 
 	# Test the GROUP task.
+
+	daopars.critsnratio = 0.2
 
 	print ("", >> daolog)
 	print ("TESTING THE GROUP TASK", >> daolog) 
@@ -176,7 +194,7 @@ begin
 	print ("TESTING THE NSTAR TASK") 
 	print ("", >> daolog)
 
-	nstar (im, "default", "default", "default", verify-, verbose-,
+	nstar (im, "default", "default", "default", "", verify-, verbose-,
 	    >> daolog)
 	print ("", >> daolog)
 	concat (im // ".nst.1", daolog, append=yes)
@@ -188,10 +206,9 @@ begin
 	print ("TESTING THE ALLSTAR TASK (CACHE=YES)") 
 	print ("", >> daolog)
 
-	datapars.readnoise=1.0
-	daopars.fitrad=2.5
+	daopars.fitrad=3.0
 
-	allstar (im, "default", "default", "default", "default", verify-,
+	allstar (im, "default", "default", "default", "", "default", verify-,
 	    verbose-, cache=yes, >> daolog)
 	print ("", >> daolog)
 	concat (im // ".als.1", daolog, append=yes)
@@ -204,7 +221,7 @@ begin
 	print ("TESTING THE ALLSTAR TASK (CACHE=NO)") 
 	print ("", >> daolog)
 
-	allstar (im, "default", "default", "default", "default", verify-,
+	allstar (im, "default", "default", "default", "", "default", verify-,
 	    verbose-, cache=no, >> daolog)
 	print ("", >> daolog)
 	concat (im // ".als.2", daolog, append=yes)
@@ -217,7 +234,7 @@ begin
 	print ("TESTING THE SUBSTAR TASK") 
 	print ("", >> daolog)
 
-	substar (im, "default", "default", "default", verify-, verbose-,
+	substar (im, "default", "", "default", "default", verify-, verbose-,
 	    >> daolog)
 	imheader (im //".sub.1", longheader+, userfields+, >> daolog)
 	print ("", >> daolog)
@@ -239,7 +256,9 @@ begin
 	# Clean up.
 	delete (im // ".coo.1", ver-, >& "dev$null")
 	delete (im // ".mag.1", ver-, >& "dev$null")
+	delete (im // ".pst.1", ver-, >& "dev$null")
 	delete (im // ".psg.1", ver-, >& "dev$null")
+	delete (im // ".pst.2", ver-, >& "dev$null")
 	delete (im // ".pk.1", ver-, >& "dev$null")
 	delete (im // ".grp.1", ver-, >& "dev$null")
 	delete (im // ".nst.1", ver-, >& "dev$null")
@@ -254,27 +273,36 @@ begin
 	unlearn ("daofind")
 	unlearn ("daopars")
 	unlearn ("datapars")
+	unlearn ("findpars")
 	unlearn ("fitskypars")
 	unlearn ("group")
 	unlearn ("grpselect")
 	unlearn ("histplot")
 	unlearn ("nstar")
-	unlearn ("pappend")
+	unlearn ("pconcat")
 	unlearn ("pconvert")
 	unlearn ("pdump")
 	unlearn ("peak")
 	unlearn ("pexamine")
+	unlearn ("pfmerge")
 	unlearn ("phot")
 	unlearn ("photpars")
 	unlearn ("prenumber")
 	unlearn ("pselect")
 	unlearn ("psf")
+	unlearn ("pstselect")
 	unlearn ("psort")
 	unlearn ("radplot")
 	unlearn ("seepsf")
 	unlearn ("substar")
 	unlearn ("surfplot")
 	unlearn ("xyplot")
+
+	print ("DAOPHOT PACKAGE TESTS COMPLETED", >> daolog)
+	print ("", >> daolog)
+	print ("")
+	print ("DAOPHOT PACKAGE TESTS COMPLETED")
+	print ("")
 
 	bye
 end

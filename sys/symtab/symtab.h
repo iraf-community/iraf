@@ -4,6 +4,7 @@ define	MAX_HASHCHARS	18		# max characters used in hash function
 define	SZ_ASCII	128		# max possible character values
 define	INC_START	0.50		# used in overflow algorithm
 define	INC_GROW	2		# growing factor for increment
+define	MAX_INCREMENT	32768		# max sbuf or stab increment
 define	MAX_SZKEY	256		# arbitrarily large number
 
 # Symbol table descriptor.

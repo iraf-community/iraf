@@ -1,4 +1,4 @@
-.help instruments Jun87 noao.imred.ccdred
+.help instruments Dec93 noao.imred.ccdred
 
 .ih
 NAME
@@ -63,6 +63,7 @@ are separated by whitespace (blanks and tabs).  String  default values
 containing blanks must be quoted.  An example is given below.
 
 .nf
+    # Sample translation file.
     exptime     itime
     darktime    itime
     imagetyp    data-typ
@@ -78,12 +79,12 @@ containing blanks must be quoted.  An example is given below.
     fringcor    fr-flag    0 
 .fi
 
+The first comment line is ignored as are blank lines.
 The first two lines translate the CCD image type, and the subset parameter
 without default values (see \fBccdtypes\fR and \fBsubsets\fR for more
 information).  The next two lines give the overscan bias strip
 section and the data section with default values for the instrument.
 Note that these parameters may be overridden in the task \fBccdproc\fR.
-The blank line is ignored.
 
 The next set of translations requires further discussion.  For processing
 flags the package assumes that the absence of a keyword means that the
@@ -94,6 +95,9 @@ used by the package).  However, for compatibility with the original NOAO
 CCD images, which may be processed outside of IRAF and which use 0 as the
 no processing value, the processing flags are translated and the false values
 are indicated by the default values.
+
+If there is more than one translation for the same CCDRED parameter,
+for example more than one exptime, then the last one is used.
 
 In addition to the parameter name translations the translation file
 contains translations between the value of the image type parameter
@@ -142,7 +146,7 @@ standard image header keywords being adopted by NOAO.
 	General Image Header and Default Parameters
     ccdmean		darktime	exptime		fixfile
     imagetyp		ncombine	biassec		subset
-    title		datasec
+    title		datasec         nscanrow
 
 	       CCDRED Processing Flags
     ccdproc		darkcor		fixpix		flatcor
@@ -227,10 +231,14 @@ example below illustrates a bad pixel file.
 .fi
 
 If there is a comment line in the file containing the word "untrimmed"
-then the coordinates of the bad pixel regions apply to the original image.
+then the coordinates of the bad pixel regions apply to the original CCD
+detector coordinates.
 If the image has been trimmed and the bad pixels are replaced at a later
 stage then this word indicates that the trim region be determined from the
-image header and the necessary coordinate conversion made.  If the word
+image header and the necessary coordinate conversion made to the original
+CCD pixel coordinates.  Note that if a subraster readout is used the
+coordinates must still refer to the original CCD coordinates and
+not the raw, untrimmed readout image.  If the word
 "untrimmed" does not appear then the coordinates are assumed to apply to
 the image directly; i.e. the trimmed coordinates if the image has been
 trimmed or the original coordinates if the image has not been trimmed.

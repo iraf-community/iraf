@@ -1,4 +1,4 @@
-.help phot Jul91 noao.digiphot.apphot
+.help phot Dec92 noao.digiphot.apphot
 .ih
 NAME
 phot -- perform aperture photometry on a list of stars
@@ -9,6 +9,44 @@ phot image
 PARAMETERS
 .ls image
 The list of images containing the objects to be measured.
+.le
+.ls skyfile = ""
+The list of text files containing the sky values, of the measured objects,
+one object per line with x, y, the sky value, sky sigma, sky skew, number of sky
+pixels and number of rejected sky pixels in columns
+one to seven respectively. The number of sky files must be none, one,
+or equal to the number of input images. This parameter is only requested if
+\fIfitskypars.salgorithm\fR = "file" and
+if PHOT is run in batch.
+.le
+.ls coords = ""
+The list of the text files containing the initial coordinates of the objects to
+be measured, one object per line with the x and y coordinates in columns
+one and two respectively. If \fIcoords\fR is null (""), PHOT will either
+read commands from the
+image cursor (default), or read the commands from an image cursor command
+file. In the latter case the parameter \fIicommands\fR must be set
+to the name of the cursor command file.
+If \fIcoords\fR is defined, PHOT activates the image cursor and reads
+coordinates from either the image cursor or the coordinate list (interactive
+mode), or reads coordinate from a cursor command file or the coordinate list
+(batch mode). If \fIcoords\fR is defined, the number of coordinate files must
+be 1 or equal to the number of image files.
+.le
+.ls output = "default"
+The name of the results file or results directory. If output is "default",
+"dir$default", or a directory specification then an output name of the form
+dir$root.extension.version is constructed, where dir is the directory,
+root is the root image name, extension is "mag" and version is the next
+available version of the file. If the output string is null then no output
+file is
+written. If output is defined, the number of output files mut be either 1 or
+equal to the number of image files. 
+.le
+.ls plotfile = ""
+The name of the file containing radial plots for the stars written to the
+output file. If plotfile is not equal to null then a single radial plot
+is written to plotfile for every record written to output.
 .le
 .ls datapars = ""
 The name of the text file containing the data dependent parameters.
@@ -35,70 +73,34 @@ If \fIphotpars\fR is null ("") then the default parameter set in the
 user's uparm directory is used. The critical parameter \fIapertures\fR
 is located here.
 .le
-.ls coords = ""
-The name of the text files containing the initial coordinates of the objects to
-be measured, one object per line with the x and y coordinates in columns
-one and two respectively. If \fIcoords\fR is null, PHOT will either read the
-image cursor (default) or read the image cursor commands
-from a file (image cursor is redirected to a text cursor command file
-created with say rimcursor).
-If \fIcoords\fR is defined, PHOT will activate the image cursor and read the 
-coordinates from either the cursor or the coordinate list (interactive
-mode) or process the objects in the coordinate list automatically
-(batch mode). The number of coordinate files must either be 1 or equal
-to the number of image files.
+.ls interactive = yes
+Interactive or batch mode.
 .le
-.ls skyfile = ""
-The name of the text file containing the sky values, of the measured objects,
-one object per line with x, y, the sky value, sky sigma, sky skew, number of sky
-pixels and number of rejected sky pixels in columns
-one to seven respectively. This method can only be used
-if PHOT is run in batch.
+.ls radplots = no
+If radplots is yes and PHOT is run in interactive mode then a radial profile
+of each measured star is plotted on stdgraph.
 .le
-.ls output = "default"
-The name of the results file or results directory. If output is "default",
-"dir$default", or a directory specification then an output name of the form
-dir$root.extension.version is constructed, where dir is the directory,
-root is the root image name, extension is "mag" and version is the current
-version of the file. If the output string is null then no output file is
-written. The number of output files mut be either 1 or
-equal to the number of image files. In both batch and interactive mode
-full results are written to output. In interactive mode a subset
-of commands is written to the standard output.
+.ls verify = yes
+Verify the critical PHOT parameters in non-interactive mode.
 .le
-.ls plotfile = ""
-The name of the file containing radial plots for the stars written to the
-output file. If plotfile is not equal to null then a single radial plot
-is written to plotfile for every record written to output.
+.ls update = no
+Update the critical parameters in non-interactive mode if verify is yes.
+.le
+.ls verbose = no
+Print results on the screen in non-interactive mode.
 .le
 .ls graphics = "stdgraph"
 The default graphics device.
 .le
 .ls display = "stdimage"
-The default display device. For the time being display can be set to
-stdgraph and PHOT may be run interactively off the graphics device.
+The default display device.  \fIDisplay\fR can be set to "stdgraph"to
+enable PHOT to work interactively from a contour plot.
 .le
-.ls commands = ""
+.ls icommands = ""
 The image cursor.
 .le
-.ls cursor = ""
+.ls gcommands = ""
 The graphics cursor.
-.le
-.ls radplots = no
-If radplots is yes and phot is run in interactive mode then a radial profile
-of each measured star is plotted on stdgraph.
-.le
-.ls interactive = yes
-Interactive or batch mode.
-.le
-.ls verify = yes
-Verify the critical PHOT parameters in non interactive mode.
-.le
-.ls update = no
-Update the critical parameters in on interactive mode if verify is yes.
-.le
-.ls verbose = no
-Print results on the screen in non interactive mode.
 .le
 
 .ih
@@ -119,7 +121,7 @@ until a satisfactory fit is achieved and optionally store the final results in
 \fIoutput\fR.
 In batch
 mode the initial positions are read from the text file \fIcoords\fR
-or the image cursor parameter \fIcommands\fR can be redirected to a text
+or the image cursor parameter \fIicommands\fR can be redirected to a text
 file containing a list of cursor commands.
 In batch mode the current set of photometry parameters is used.
 
@@ -137,51 +139,47 @@ CURSOR COMMANDS
 The following list of cursor commands are currently available.
 
 .nf
-	Interactive Photometry Commands
+	Interactive Keystroke Commands
 
-?	Print help for PHOT commands
-:	PHOT colon escape commands (see below)
-v	Verify the critical PHOT parameters
-w	Store current PHOT parameters in the pset files
-q	Exit
-
-d	Plot the radial profile of current star (cursor or list)
-i	Set PHOT parameters interactively using current star
-	(cursor or list)
-
-spbar	Fit center, sky, compute magnitudes of current star
-	(cursor or list), and output results
-f	Fit center, sky and compute magnitudes of current star
-	(cursor or list)
-e	Print PHOT error messages
-
-c	Fit center around the current star (cursor or list)
-t	Fit sky around the current star (cursor or list)
-s	Fit sky around the current centered star
-p	Compute magnitudes around current star (cursor or list),
-	using current sky
-
-:m [n]	Move to next [nth] star in the coordinate list
-:n [n]	Measure next [nth] star in the coordinate list, and
-	output results
-l	Compute magnitudes for remainder of the stars in the
-	coordinate list, and output results
-r	Rewind the coordinate list
+?	Print help
+:	Colon commands
+v	Verify the critical parameters
+w	Save the current parameters
+d	Plot radial profile of current star
+i	Interactively set parameters using current star
+c	Fit center for current star
+t	Fit sky around the cursor
+a	Average sky values fit around several cursor positions
+s	Fit sky around current centered star
+p	Do photometry for current star, using current sky
+o	Do photometry for current star, using current sky, output results
+f	Do photometry for current star
+spbar	Do photometry for current star, output results
+m	Move to next star in coordinate list
+n	Do photometry for next star in coordinate list, output results
+l	Do photometry for remaining stars in coordinate list, output results
+e	Print error messages
+r	Rewind coordinate list
+q	Exit task
 
 
 Photometry parameters are listed or set with the following commands.
 
-# commands
+	Colon commands
 
 :show	[data/center/sky/phot]	List the parameters
+:m [n]	Move to next [nth] star in coordinate list
+:n [n]	Do photometry for next [nth] star in coordinate list, output results
 
-# file names
+	Colon Parameter Editing Commands
+
+# Image and file name parameters
 
 :image		[string]	Image name
 :coords		[string]	Coordinate file name
 :output		[string]	Output file name
 
-# data dependent parameters
+# Data dependent parameters
 
 :scale		[value]		Image scale (units per pixel)
 :fwhmpsf	[value]		Full width half maximum of PSF (scale units)
@@ -189,10 +187,8 @@ Photometry parameters are listed or set with the following commands.
 :sigma	        [value]		Standard deviation of sky (counts)
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
-:threshold	[value]		Detection intensity threshold (counts)
-:cthreshold	[value]		Centering intensity threshold (counts)
 
-# noise parameters
+# Noise parameters
 
 :noise		[string]	Noise model (constant|poisson)
 :gain		[string]	Gain image header keyword
@@ -200,7 +196,7 @@ Photometry parameters are listed or set with the following commands.
 :epadu		[value]		Gain (electrons  per adu)
 :readnoise	[value]		Readout noise (electrons)
 
-# observing parameters
+# Observations parameters
 
 :exposure	[string]	Exposure time image header keyword
 :airmass	[string]	Airmass image header keyword
@@ -211,42 +207,42 @@ Photometry parameters are listed or set with the following commands.
 :ifilter	[string]	Filter id string
 :otime		[string]	Time of observation (time units)
 
-# centering algorithm parameters
+# Centering algorithm parameters
 
 :calgorithm	[string]	Centering algorithm
-				(centroid|gauss| none|ofilt)
 :cbox		[value]		Width of the centering box (scale units)
+:cthreshold	[value]		Centering intensity threshold (sigma)
 :cmaxiter	[value]		Maximum number of iterations
 :maxshift	[value]		Maximum center shift (scale units)
-:minsnratio	[value]		Minimum signal to noise ratio for
-				centering
+:minsnratio	[value]		Minimum S/N ratio for centering
 :clean		[y/n]		Clean subraster before centering
 :rclean		[value]		Cleaning radius (scale units)
 :rclip		[value]		Clipping radius (scale units)
 :kclean		[value]		Clean K-sigma rejection limit (sigma)
 
-# sky fitting algorithm parameters
+# Sky fitting algorithm parameters
 
-:salgorithm	[string]	Sky fitting algorithm (constant|file|
-				median|mode|centroid|gauss|crosscor|
-				histplot|radplot)
+:salgorithm	[string]	Sky fitting algorithm
 :skyvalue	[value]		User supplied sky value (counts)
 :annulus	[value]		Inner radius of sky annulus (scale units)
 :dannulus	[value]		Width of sky annulus (scale units)
 :khist		[value]		Sky histogram extent (+/- sky sigma)
-:smooth		[y/n]		Lucy smooth the sky histogram
 :binsize	[value]		Resolution of sky histogram (sky sigma)
+:smooth		[y/n]		Lucy smooth the sky histogram
+:sloclip	[value]	        Low-side clipping factor in percent
+:shiclip	[value]	        High-side clipping factor in percent
 :smaxiter	[value]		Maximum number of iterations
-:skreject	[value]		Pixel rejection limits (sky sigma)
 :snreject	[value]		Maximum number of rejection cycles
+:sloreject	[value]		Low-side pixel rejection limits (sky sigma)
+:shireject	[value]		High-side pixel rejection limits (sky sigma)
 :rgrow		[value]		Region growing radius (scale units)
 
-# photometry parameters
+# Photometry parameters
 
 :apertures	[string]	List of aperture radii (scale units)
 :zmag		[value]		Zero point of magnitude scale
 
-# plotting and marking parameters
+# Plotting and marking parameters
 
 :mkcenter	[y/n]		Mark computed centers on display
 :mksky		[y/n]		Mark the sky annuli on the display
@@ -254,28 +250,24 @@ Photometry parameters are listed or set with the following commands.
 :radplot	[y/n]		Plot radial profile of object
 
 
-The following commands are available from inside the interactive setup menu.
+                    Interactive Phot Setup Menu
 
-                    Interactive PHOT/WPHOT Setup Menu
+	v	 Mark and verify the critical parameters (f,s,c,a,d,r)
 
-	v	Set and verify the critical PHOT/WPHOT parameters
-		(f,c,s,a,d,r)
+	f	 Mark and verify the full-width half-maximum of psf
+	s	 Mark and verify the standard deviation of the background
+	l	 Mark and verify the minimum good data value
+	u	 Mark and verify the maximum good data value
 
-	f	Set and verify the full width half maximum of the psf
-	h	Set and verify the centering threshold
-	s	Set and verify the standard deviation of the background
-	l	Set and verify the minimum good data value
-	u	Set and verify the maximum good data value
+	c	 Mark and verify the centering box width
+	n	 Mark and verify the cleaning radius
+	p	 Mark and verify the clipping radius
 
-	c	Set and verify the centering box width
-	n	Set and verify the cleaning radius
-	p	Set and verify the clipping radius
+	a	 Mark and verify the inner radius of the sky annulus
+	d	 Mark and verify the width of the sky annulus
+	g	 Mark and verify the region growing radius
 
-	a	Set and verify the inner radius of the sky annulus
-	d	Set and verify the width of the sky annulus
-	g	Set and verify the region growing radius
-
-	r	Set and verify the aperture radii
+	r	 Mark and verify the aperture radii
 .fi
 
 .ih
@@ -283,8 +275,8 @@ ALGORITHMS
 
 A brief description of the data dependent parameters, centering algorithms,
 sky fitting algorithms and photometry parameters can be found in the
-online help pages for \fIdatapars\fR, \fIcenterpars\fR, \fIfitskypars\fR
-and \fIphotpars\fR. A full description of the algorithms can be found in
+online help pages for the DATAPARS, CENTERPARS, FITSKYPARS, and PHOTPARS
+tasks. A full description of the algorithms can be found in
 the document \fISpecifications for the Apphot Package\fR.
 
 .ih
@@ -294,7 +286,7 @@ In interactive mode the following quantities are printed on the standard
 output as each object is measured. Err is a simple string indicating
 whether or not an error was detected in
 the centering algorithm, the sky fitting algorithm or the photometry
-algorithm. Mag are the mangnitudes in
+algorithm. Mag are the magnitudes in
 apertures 1 through N respectively and xcenter, ycenter and msky are the
 x and y centers and the sky value respectively.
 
@@ -313,12 +305,13 @@ following record is written
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
 	   itime  xairmass  ifilter  otime
-	   rapert  sum  area  mag  merr  pier  perr
+	   rapert  sum  area  flux mag  merr  pier  perr
 .fi
 
 Image and coords are the name of the image and coordinate file respectively.
 Id and lid are the sequence numbers of stars in the output and coordinate
-files respectively. Cier and cerror are the error code and accompanying
+files respectively. Cier and cerror are the centering algroithm
+error code and accompanying
 error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
 and xerr, yerr are self explanatory and output in pixel units. The sense of
 the xshift and yshift definitions is the following.
@@ -328,8 +321,9 @@ the xshift and yshift definitions is the following.
 	yshift = ycenter - yinit
 .fi
 
-Sier and serror are the error code and accompanying error message respectively.
-Msky, stdev and sskew are the sky value,
+Sier and serror are the sky fitting error code and accompanying error
+message respectively.
+Msky, stdev and sskew are the best estimate of the sky value (per pixel),
 standard deviation and skew respectively. Nsky and nsrej are the number of
 sky pixels and the number of sky pixels rejected respectively.
 
@@ -338,11 +332,21 @@ id string identifying the filter used in the observations, and otime is
 a string containing the time of the observation in whatever units the
 user has set up.
 
-Rapert, sum, and area are the radius of the aperture in scale units, the total
-number of counts including sky in the aperture and the area of the aperture
-in square pixels. Mag and merr are the magnitude and error in the magnitude
-in the aperture. Pier and perror are photometry error code and accompanying
-error message.
+Rapert, sum, area, and flux  are the radius of the aperture in scale units,
+the total number of counts including sky in the aperture, the area of the
+aperture in square pixels, and the total number of counts excluding sky
+in the aperture. Mag and merr are the magnitude and error in the magnitude
+in the aperture (see below).
+
+.nf
+	flux = sum - area * msky
+	 mag = zmag - 2.5 * log10 (flux) + 2.5 * log10 (itime)
+	merr = 1.0857 * error / flux
+       error = sqrt (flux / epadu + area * stdev**2 +
+               area**2 * stdev**2 / nsky)
+.fi
+
+Pier and perror are photometry error code and accompanying error message.
 
 .ih
 ERRORS
@@ -351,7 +355,7 @@ If the object centering was error free then the field cier will be zero.
 Non-zero values of cier flag the following error conditions.
 
 .nf
-	0       # No error
+	0        # No error
 	101      # The centering box is off image
 	102      # The centering box is partially off the image
 	103      # The S/N ratio is low in the centering box
@@ -381,8 +385,8 @@ will be 0. Non-zero values of sier flag the following error conditions.
 	212       # The best fit parameter are non-physical
 .fi
 
-If no error occursor during the measurment of the magnitudes then pier is
-0. Non-zero values of pier flag the following error conditins.
+If no error occursor during the measurement of the magnitudes then pier is
+0. Non-zero values of pier flag the following error conditions.
 
 .nf
 	0         # No error
@@ -416,7 +420,7 @@ setup menu defined by the i key command and a radial profile plot.
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, and sigma using the graphics cursor and the
+	    photometry apertures, and sigma using the graphics cursor and the
             stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
@@ -497,10 +501,9 @@ saved in example 1.
 
 	... type any key to quit cursor mode
 
-	ap> daofind m92 fwhmpsf=2.0 threshold=30
+	ap> daofind m92 
 
-	... make a coordinate list by searching for objects with  the
-	    fwhmpsf and threshold  specified above
+	... make a coordinate list
 
 	... the output will appear in the text file m92.coo.1
 
@@ -514,7 +517,7 @@ saved in example 1.
 
 				or
 
-	... use :m and/or :n, l, r commands to measure objects in the
+	... use m, :m and/or n, :n, l, r commands to measure objects in the
 	    coordinate list
 
 	... a one line summary of results will appear on the standard output
@@ -548,44 +551,31 @@ appending an ampersand to the command line listed below.
 .fi
 
 
-6. Run PHOT interactively on the sun workstation using the imtool window,
-a coordinate list and the current set of parameters. This example assumes
-knowledge of the imtool functions, and that
-the image cursor is reading back positions in image pixel coordinates not
-device coordinates.
+6. Run PHOT interactively on the Sun workstation without the use of the
+IMTOOL window using only a coordinate list and the current set of parameters
+as input.
 
 .nf
 	ap> set stdimcur = text
 
 	... set the image cursor to the standard input
 
-	ap> display m92 1
-
-	... display the image in the imtool window and put the mouse
-	    in the imtool window
-
-	... use the imtool setup window to enter the coordinate file name
-	    m92.coo.2
-
-	... type the F6 key to enter cursor readback mode
-
-	... move the image cursor to the stars of interest, press the
-	    left mouse button and a number will appear beside each star
-	    measured
-
 	ap> phot m92 coords=m92.coo.2
 
-	... type ? to get an optional help page
+	... type ? for optional help
 
-	... type :m 3 to set the coordinates to the third star
-	    in the list
+	... type :m 3 to set the initial coordinates to those of the
+	    third star in the list
 
-	... type i to enter the interactive setup menu
+	... type i to enter the interactive setup menu followed by v to
+	    get the default menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, and sigma using the graphics cursor and
-	    the stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+	... set the fwhmpsf,  centering box half-width, inner radius
+	    and width of the sky annulus, photometry apertures and
+	    sigma using the graphics cursor and the stellar radial profile
+	    plot
+	... typing <CR> after the prompt leaves the parameter at its default
+	    value
 
 	... type r to rewind the coordinate list
 
@@ -594,7 +584,7 @@ device coordinates.
 	... a one line summary of the answers will appear on the standard
 	    output for each star measured
 
-	... full output will appear in the text file m92.mag.4 
+	... full output will appear in the text file m92.mag.5 
 .fi
 
 .ih

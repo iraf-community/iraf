@@ -58,7 +58,7 @@ install:
 	;
 
 libpkg.a:
-	#$set	xflags = "$(xflags) -x"
+	#$set	xflags = "$(xflags) -qx"
 
 	binop.c		<libc/spp.h> <libc/libc.h> <libc/xnames.h>\
 			<libc/math.h> <libc/ctype.h> config.h\

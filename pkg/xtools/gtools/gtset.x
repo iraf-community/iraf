@@ -22,6 +22,12 @@ begin
 	    GT_TRANSPOSE(gt) = ival
 	case GTSYSID:
 	    GT_SYSID(gt) = ival
+	case GTCOLOR:
+	    GT_COLOR(gt) = ival
+	case GTXFLIP:
+	    GT_XFLIP(gt) = ival
+	case GTYFLIP:
+	    GT_YFLIP(gt) = ival
 	}
 end
 
@@ -40,13 +46,25 @@ begin
 
 	switch (param) {
 	case GTXMIN:
-	    GT_XMIN(gt) = rval
+	    if (GT_XFLIP(gt) == NO)
+		GT_XMIN(gt) = rval
+	    else
+		GT_XMAX(gt) = rval
 	case GTXMAX:
-	    GT_XMAX(gt) = rval
+	    if (GT_XFLIP(gt) == NO)
+		GT_XMAX(gt) = rval
+	    else
+		GT_XMIN(gt) = rval
 	case GTYMIN:
-	    GT_YMIN(gt) = rval
+	    if (GT_YFLIP(gt) == NO)
+		GT_YMIN(gt) = rval
+	    else
+		GT_YMAX(gt) = rval
 	case GTYMAX:
-	    GT_YMAX(gt) = rval
+	    if (GT_YFLIP(gt) == NO)
+		GT_YMAX(gt) = rval
+	    else
+		GT_YMIN(gt) = rval
 	case GTXSIZE:
 	    GT_XSIZE(gt) = rval
 	case GTYSIZE:

@@ -6,12 +6,12 @@ $checkin libpkg.a ".."
 $exit
 
 libpkg.a:
-	dpaddrd.x	../lib/apsel.h
-	dpadconfirm.x	../lib/daophot.h
-	dpaddstar.x	<imhdr.h>		../lib/daophotdef.h       \
-			../lib/daophot.h	<tbset.h>
-	dpnaddstar.x	<tbset.h>		../lib/daophotdef.h       \
-			../lib/apsel.h 
-	t_addstar.x	<fset.h>		 ../lib/daophotdef.h      \
-			../lib/daophot.h
+	dpaddrd.x	../lib/apseldef.h
+	dpadconfirm.x
+	dpartstar.x	<tbset.h>               <imhdr.h>                 \
+			../lib/daophotdef.h     ../lib/apseldef.h
+	dpnaddstar.x	<tbset.h>		<time.h>                  \
+	                ../lib/daophotdef.h	../lib/apseldef.h 
+	t_addstar.x	<fset.h>		<imhdr.h>                 \
+			../lib/daophotdef.h
 	;

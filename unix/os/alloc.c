@@ -102,7 +102,14 @@ int	statonly;		/* if set, just return device status */
 	    ruid = fp->f_sbuf.st_uid;
 	    mode = fp->f_sbuf.st_mode;
 
-	    if (ruid == 0 && (mode & 06) == 0) {
+	    /* We don't really care if the uid when the device is not
+	     * allocated is root, bin, or whatever, so long at it is some
+	     * system uid.
+	     */
+	    if (ruid < 10)
+		ruid = 0;
+
+	    if (ruid == 0 && (mode & 06) != 06) {
 		if (!statonly)
 		    printf ("rw access to %s is denied\n", fp->f_name);
 		return (DV_DEVINUSE);

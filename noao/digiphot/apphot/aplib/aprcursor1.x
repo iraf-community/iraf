@@ -32,7 +32,7 @@ begin
 	    call pargr (apstatr (ap, FWHMPSF) * scale / 2.0)
 	call gscur (gd, apstatr (ap, FWHMPSF) * scale / 2.0, (imin + imax) /
 	    2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk <= 0.0 || xjunk > rmax)
 	    fwhmpsf = apstatr (ap, FWHMPSF)
 	else
@@ -44,7 +44,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_FWHMPSF,
+	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_ASCALEUNIT,
 		"full width half maximum of the psf")
 
 	call sfree (sp)
@@ -81,7 +81,7 @@ begin
 	    call gscur (gd, (rmin + rmax) / 2.0, imin - 1.0)
 	else
 	    call gscur (gd, (rmin + rmax) / 2.0, apstatr (ap, DATAMIN))
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || yjunk < imin || yjunk > imax)
 	    datamin = apstatr (ap, DATAMIN)
 	else
@@ -93,7 +93,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_ACOUNTS,
 	        "minimum good data value")
 	call sfree (sp)
 
@@ -129,7 +129,7 @@ begin
 	    call gscur (gd, (rmin + rmax) / 2.0, imax + 1.0)
 	else
 	    call gscur (gd, (rmin + rmax) / 2.0, apstatr (ap, DATAMAX))
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || yjunk < imin || yjunk > imax)
 	    datamax = apstatr (ap, DATAMAX)
 	else
@@ -141,7 +141,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_ACOUNTS,
 	        "maximum good data value")
 	call sfree (sp)
 
@@ -175,7 +175,7 @@ begin
 	call printf ("Mark centering box half width (%g) pixels:")
 	    call pargr (apstatr (ap, CAPERT) * scale)
 	call gscur (gd, apstatr (ap, CAPERT) * scale, (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk <= 0.0 || xjunk > rmax)
 	    capert = apstatr (ap, CAPERT)
 	else
@@ -187,7 +187,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_CAPERT, 2.0 * capert, UN_CAPERT,
+	    call ap_rparam (out, KY_CAPERT, 2.0 * capert, UN_CSCALEUNIT,
 	        "centering box width")
 	call sfree (sp)
 
@@ -223,7 +223,7 @@ begin
 	    call pargr (apstatr (ap, RCLEAN) * scale)
 	call gscur (gd, apstatr (ap, RCLEAN) * scale, (imin + imax) /
 	    2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk <= 0.0 || xjunk > rmax)
 	    rclean = apstatr (ap, RCLEAN)
 	else
@@ -235,7 +235,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_RCLEAN, rclean, UN_RCLEAN,
+	    call ap_rparam (out, KY_RCLEAN, rclean, UN_CSCALEUNIT,
 		"cleaning radius")
 	call sfree (sp)
 
@@ -271,7 +271,7 @@ begin
 	    call pargr (apstatr (ap, RCLIP) * scale)
 	call gscur (gd, apstatr (ap, RCLIP) * scale, (imin + imax) /
 	    2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk <= 0.0 || xjunk > rmax)
 	    rclip = apstatr (ap, RCLIP)
 	else
@@ -283,7 +283,8 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_RCLIP, rclip, UN_RCLIP, "clipping radius")
+	    call ap_rparam (out, KY_RCLIP, rclip, UN_CSCALEUNIT,
+	        "clipping radius")
 	call sfree (sp)
 
 	return (rclip)
@@ -317,7 +318,7 @@ begin
 	    call pargr (apstatr (ap, ANNULUS) * apstatr (ap, SCALE))
 	call gscur (gd, apstatr (ap, ANNULUS) * apstatr (ap, SCALE),
 	    (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk < 0.0 || xjunk > rmax)
 	    annulus = apstatr (ap, ANNULUS)
 	else
@@ -329,7 +330,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_ANNULUS, annulus, UN_ANNULUS,
+	    call ap_rparam (out, KY_ANNULUS, annulus, UN_SSCALEUNIT,
 		"radius of the inner sky annulus")
 	call sfree (sp)
 
@@ -364,7 +365,7 @@ begin
 	    call pargr (apstatr (ap, RGROW) * apstatr (ap, SCALE))
 	call gscur (gd, apstatr (ap, RGROW) * apstatr (ap, SCALE),
 	    (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || xjunk < 0.0 || xjunk > rmax)
 	    rgrow = apstatr (ap, RGROW)
 	else
@@ -376,7 +377,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_RGROW, rgrow, UN_RGROW,
+	    call ap_rparam (out, KY_RGROW, rgrow, UN_SSCALEUNIT,
 	        "region growing radius")
 	call sfree (sp)
 
@@ -412,7 +413,7 @@ begin
 		apstatr (ap, DANNULUS)))
 	call gscur (gd, apstatr (ap, SCALE) * (apstatr (ap, ANNULUS) +
 	    apstatr (ap, DANNULUS)), (imin + imax) / 2.0)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || (xjunk / scale < annulus) || xjunk > rmax)
 	    dannulus = apstatr (ap, DANNULUS)
 	else
@@ -424,7 +425,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_DANNULUS,
+	    call ap_rparam (out, KY_DANNULUS, dannulus, UN_SSCALEUNIT,
 	        "width of the sky annulus")
 	call sfree (sp)
 
@@ -462,7 +463,7 @@ begin
 	call printf ("Estimate sky sigma. Mark mean sky level (%g):")
 	    call pargr (mean)
 	call gscur (gd, (rmin + rmax) / 2.0, mean)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
 	if (stat == EOF || yjunk < imin || yjunk > imax)
 	    mean = mean
 	else
@@ -479,7 +480,7 @@ begin
 	    call gscur (gd, (rmin + rmax) / 2.0, imin - 1.0)
 	else
 	    call gscur (gd, (rmin + rmax) / 2.0, mean + sigma3)
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
+	stat = clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
         if (stat == EOF || yjunk < imin || yjunk > imax) {
 	    sigma3 = apstatr (ap, SKYSIGMA)
 	    if (! IS_INDEFR (sigma3))
@@ -496,7 +497,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_SKYSIGMA, sigma3, UN_SKYSIGMA,
+	    call ap_rparam (out, KY_SKYSIGMA, sigma3, UN_NCOUNTS,
 	        "standard deviation of 1 sky pixel")
 
 	call sfree (sp)
@@ -505,158 +506,6 @@ begin
 	    return (sigma3)
 	else
 	    return (sigma3 / 3.0)
-end
-
-
-# AP_CCTHRESH -- Read the centering threshold from the radial profile plot.
-
-real procedure ap_ccthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
-
-pointer	ap		# pointer to the apphot structure
-pointer	gd		# pointer to the grapics stream
-int	out		# output file descriptor
-int	stid		# sequence number in output file
-real	rmin, rmax	# x axis limits
-real	imin, imax	# y axis limits
-
-int	wcs, key, stat
-pointer	sp, cmd
-real	minsky, threshold, xjunk, yjunk
-int	clgcur()
-int	apstati()
-real	apstatr(), ap_vcthreshold()
-
-begin
-	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-
-	# Estimate the minimum (maximum) data level.
-	if (apstati (ap, POSITIVE) == YES) {
-	    minsky = imin
-	    call printf (
-	     "Estimate threshold for centering. Mark minimum data level (%g):")
-	        call pargr (minsky)
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky)
-	} else {
-	    minsky = imax
-	    call printf (
-	     "Estimate threshold for centering. Mark maximun data level (%g):")
-	        call pargr (minsky)
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky)
-	}
-
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
-	if (stat == EOF || yjunk < imin || yjunk > imax)
-	    minsky = minsky
-	else
-	    minsky = yjunk 
-
-	# Mark the threshold above the data minimum.
-	if (apstati (ap, POSITIVE) == YES) {
-	    call printf ("Next mark threshold above data min (%g) adu:")
-	        call pargr (apstatr (ap, CTHRESHOLD))
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky + apstatr (ap,
-		CTHRESHOLD))
-	} else {
-	    call printf ("Next mark threshold below data max (%g) adu:")
-	        call pargr (apstatr (ap, CTHRESHOLD))
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky - apstatr (ap,
-		CTHRESHOLD))
-	}
-
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
-	if (stat == EOF || yjunk < imin || yjunk > imax)
-	    threshold = apstatr (ap, CTHRESHOLD)
-	else
-	    threshold = abs (yjunk - minsky)
-
-	# Verify the results.
-	call apsetr (ap, CTHRESHOLD, threshold)
-	threshold = ap_vcthreshold (ap)
-
-	# Save the results.
-	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_CTHRESHOLD, threshold, UN_CTHRESHOLD,
-	        "threshold for centering")
-	call sfree (sp)
-
-	return (threshold)
-end
-
-
-# AP_CTHRESH -- Read the threshold from the radial profile plot.
-
-real procedure ap_cthresh (ap, gd, out, stid, rmin, rmax, imin, imax)
-
-pointer	ap		# pointer to the apphot structure
-pointer	gd		# pointer to the grapics stream
-int	out		# output file descriptor
-int	stid		# sequence number in output file
-real	rmin, rmax	# x axis limits
-real	imin, imax	# y axis limits
-
-int	wcs, key, stat
-pointer	sp, cmd
-real	minsky, threshold, xjunk, yjunk
-int	clgcur()
-int	apstati()
-real	apstatr(), ap_vthreshold()
-
-begin
-	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-
-	# Estimate the minimum (maximum) data level.
-	if (apstati (ap, POSITIVE) == YES) {
-	    minsky = imin
-	    call printf (
-	     "Estimate detection threshold. Mark minimum data level (%g):")
-	        call pargr (minsky)
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky)
-	} else {
-	    minsky = imax
-	    call printf (
-	     "Estimate detection threshold. Mark maximum data level (%g):")
-	        call pargr (minsky)
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky)
-	}
-
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
-	if (stat == EOF || yjunk < imin || yjunk > imax)
-	    minsky = minsky
-	else
-	    minsky = yjunk 
-
-	# Mark the threshold above the data minimum.
-	if (apstati (ap, POSITIVE) == YES) {
-	    call printf ("Next mark threshold above data min (%g) adu:")
-	        call pargr (apstatr (ap, THRESHOLD))
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky + apstatr (ap,
-		THRESHOLD))
-	} else {
-	    call printf ("Next mark threshold below data max (%g) adu:")
-	        call pargr (apstatr (ap, THRESHOLD))
-	    call gscur (gd, (rmin + rmax) / 2.0, minsky - apstatr (ap,
-		THRESHOLD))
-	}
-
-	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
-	if (stat == EOF || yjunk < imin || yjunk > imax)
-	    threshold = apstatr (ap, THRESHOLD)
-	else
-	    threshold = abs (yjunk - minsky)
-
-	# Verify the result.
-	call apsetr (ap, THRESHOLD, threshold)
-	threshold = ap_vthreshold (ap)
-
-	# Save the results.
-	if (out != NULL && stid > 1)
-	    call ap_rparam (out, KY_THRESHOLD, threshold, UN_THRESHOLD,
-	        "detection threshold")
-	call sfree (sp)
-
-	return (threshold)
 end
 
 
@@ -707,8 +556,8 @@ begin
 	# Mark the apertures.
 	outstr[1] = EOS
 	Memc[tstr] = EOS
-	while (clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE) !=
-	    EOF) {
+	while (clgcur ("gcommands", xjunk, yjunk, wcs, key, Memc[cmd],
+	    SZ_LINE) != EOF) {
 	    if (key == 'q')
 		break
 	    if (xjunk <= 0.0 || xjunk > rmax)
@@ -728,7 +577,7 @@ begin
 
 	# Save the results.
 	if (out != NULL && stid > 1)
-	    call ap_sparam (out, KY_APERTS, outstr, UN_APERTS,
+	    call ap_sparam (out, KY_APERTS, outstr, UN_PSCALEUNIT,
 	        "list of aperture radii")
 
 	call sfree (sp)

@@ -1,5 +1,8 @@
 .help revisions Jul91 noao.imred.hydra
 .nf
+imred$hydra/hydra.cl
+    Renamed "response" to "fibresponse". (12/31/94, Valdes)
+
 imred/hydra/*
     Installed (7/24/91, Valdes)
 .endhelp

@@ -1,0 +1,48 @@
+.help revisions May93 noao.lib
+.nf
+noaolib$scr/icgfit.key
+noaolib$scr/idicgfit.key
+    Added 'v' key for changing weights.  (12/29/94, Valdes)
+
+noaolib$obsdb.dat
+    Added an entry for Venezuala.  (9/1/94, Valdes)
+
+noaolib$zzsetenv.def
+	Added a definition of "noao$bin(arch)/" to 'pkglibs' so that the
+	smw and asttools libraries would be picked up  by other packages
+	using '-p noao' when the package is configured generically.  
+	(1/10/94 MJF)
+
+noaolib$libasttools.a +
+    A library of astronomical tools is now an NOAO package library.
+    The source is in noao$astutil/asttools.  (8/19/93, Valdes)
+
+noaolib$ccdtime/ +
+noaolib$cctime/kpno.dat +
+noaolib$zzsetenv.def
+    Added a ccdtime directory to contain standard database files for
+    CCDTIME task.  (8/16/93, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for San Pedro Martir and Tonantzintla.  These were
+    submitted by Patrick Vielle via e-mail to IRAF.  (5/4/93, Valdes)
+
+noaolib$linelists/henearhres.dat +
+noaolib$linelists/README
+    Added a new high resolution HENEAR line list created by Daryl Willmarth.
+    (5/4/93, Valdes)
+
+noaolib$onedstds/*cal/names.men +
+noaolib$onedstds/*cal/standards.men
+    Added alternate star names in the files names.men.  These files are
+    used, if present, by a recent revision to the ONEDSPEC tasks.
+    (5/4/93, Valdes)
+
+noaolib$units.h +
+noaolib$smw.h +
+noaolib$libsmw.a -> ../bin/libsmw.a +
+noaolib$zzsetenv.def
+    Added the ONEDSPEC spectral WCS routines and include files for export
+    to the RV package and other NOAO packages.
+    (3/22/93, Valdes)
+.endhelp

@@ -11,6 +11,10 @@ int	npts			# number of points, i.e., (x,y) pairs
 include	"sgi.com"
 
 begin
-	# Not implemented yet.
-	call sgi_polyline (p, npts)
+	# This kernel doesn't have any real fill area capability yet; if
+	# fill area is enabled in the graphcap entry, just draw the outline
+	# of the area.
+
+	if (SGI_FILLAREA(g_kt) == YES)
+	    call sgi_polyline (p, npts)
 end

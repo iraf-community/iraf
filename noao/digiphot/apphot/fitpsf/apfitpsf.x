@@ -20,7 +20,7 @@ int	out			# output file descriptor
 int	stid			# output file sequence number
 int	interactive		# interactive mode
 
-int	wcs, key, newbuf, newfit, newlist, ltid, ier
+int	wcs, key, newimage, newbuf, newfit, newlist, ltid, ier
 int	ip, oid, colonkey, prev_num, req_num
 pointer	sp, cmd
 real	wx, wy, xlist, ylist
@@ -39,6 +39,7 @@ begin
 	Memc[cmd] = EOS
 
 	# Initialize the fitting commands.
+	newimage = NO
 	newbuf = YES
 	newfit = YES
 	ier = AP_OK
@@ -48,7 +49,7 @@ begin
 	ltid = 0
 
 	# Loop over the cursor commands.
-	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
+	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
 
 	    # Store the cursor coordinates
@@ -84,7 +85,7 @@ begin
 
 	    # Print the help pages.
 	    case '?':
-		if (id != NULL)
+		if ((id != NULL) && (id == gd))
 		    call gpagefile (id, HELPFILE, "")
 		else if (interactive == YES)
 		    call pagefile (HELPFILE, "[space=morehelp,q=quit,?=help]")
@@ -103,12 +104,12 @@ begin
 		    ;
 		colonkey = Memc[cmd+ip-1]
 		switch (colonkey) {
-		case 'm':
+		case 'm', 'n':
 
 		    # Show/set fitpsf parameters.
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 		        call apsfcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-			    newbuf, newfit)
+			    newimage, newbuf, newfit)
 
 		    # Get next object from the list.
 		    } else if (cl != NULL) {
@@ -119,41 +120,27 @@ begin
 		        if (apgscur (cl, id, xlist, ylist, prev_num,
 			    req_num, ltid) != EOF) {
 		            newlist = YES
-			    newbuf = YES
-			    newfit = YES
-			} else if (interactive == YES)
-			    call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
-
-		    } else if (interactive == YES)
-		        call printf ("No coordinate list\7\n")
-
-		case 'n':
-
-		    # Show/set the fitpsf parameters.
-		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
-		        call apsfcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-			    newbuf, newfit)
-
-		    # Process the next object.
-		    } else if (cl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        if (apgscur (cl, id, xlist, ylist, prev_num,
-			    req_num, ltid) != EOF) {
-		    	    newlist = YES
-	            	    ier = apsffit (ap, im, xlist, ylist)
-			    if (interactive == YES)
-	            	        call ap_qppsf (ap, ier)
-			    call appfmark (ap, id, apstati (ap, MKPSFBOX))
-		    	    if (stid == 1)
-				call ap_param (ap, out, "fitpsf")
-		            call ap_ppsf (ap, out, stid, ltid, ier)
-		            stid = stid + 1
-		            newbuf = NO
-			    newfit = NO
+			    if (colonkey == 'm') {
+			        newbuf = YES
+			        newfit = YES
+			    } else {
+	            	        ier = apsffit (ap, im, xlist, ylist)
+			        if (interactive == YES)
+	            	            call ap_qppsf (ap, ier)
+			        call appfmark (ap, id, apstati (ap, MKPSFBOX))
+			        if (id != NULL) {
+		    		    if (id == gd)
+				        call gflush (id)
+		    		    else
+				        call gframe (id)
+			        }
+		    	        if (stid == 1)
+				    call ap_param (ap, out, "fitpsf")
+		                call ap_ppsf (ap, out, stid, ltid, ier)
+		                stid = stid + 1
+		                newbuf = NO
+			        newfit = NO
+			    }
 			} else if (interactive == YES)
 			    call printf (
 			    "End of coordinate list, use r key to rewind\7\n")
@@ -163,7 +150,14 @@ begin
 
 		default:
 		    call apsfcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
-		        newbuf, newfit)
+		        newimage, newbuf, newfit)
+		}
+
+		# Reestablish the image viewport and window.
+		if ((newimage == YES) && (id != NULL) && (id != gd)) {
+		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
+		    call ap_gswv (id, Memc[cmd], im, 4)
+		    newimage = NO
 		}
 
 	    # Plot a centered stellar radial profile.
@@ -199,6 +193,12 @@ begin
 		if (interactive == YES)
 		    call ap_qppsf (ap, ier)
 		call appfmark (ap, id, apstati (ap, MKPSFBOX))
+		if (id != NULL) {
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
 		newbuf = NO
 		newfit = NO
 
@@ -212,6 +212,43 @@ begin
 		    stid = stid + 1
 		}
 
+
+	    # Get, measure the next star in the coordinate list.
+	    case 'm', 'n':
+		if (cl != NULL) {
+		    prev_num = ltid
+		    req_num = ltid + 1
+		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+		        ltid) != EOF) {
+		        newlist = YES
+			if (key == 'm') {
+			    newbuf = YES
+			    newfit = YES
+			} else {
+	            	    ier = apsffit (ap, im, xlist, ylist)
+			    if (interactive == YES)
+	            	        call ap_qppsf (ap, ier)
+			    call appfmark (ap, id, apstati (ap, MKPSFBOX))
+			    if (id != NULL) {
+		    		if (id == gd)
+				    call gflush (id)
+		    		else
+				    call gframe (id)
+			    }
+		    	    if (stid == 1)
+			        call ap_param (ap, out, "fitpsf")
+		            call ap_ppsf (ap, out, stid, ltid, ier)
+		            stid = stid + 1
+		            newbuf = NO
+			    newfit = NO
+			}
+		    } else if (interactive == YES)
+			call printf (
+			    "End of coordinate list, use r key to rewind\7\n")
+
+		} else if (interactive == YES)
+		    call printf ("No coordinate list\7\n")
+
 	    # Process the remainder of the coordinate list.
 	    case 'l':
 		if (cl != NULL) {
@@ -219,6 +256,12 @@ begin
 		    ltid = ltid + 1
 		    call apbfitpsf (ap, im, cl, out, id, stid, ltid, YES)
 		    ltid = ltid + stid - oid + 1
+		    if (id != NULL) {
+		        if (id == gd)
+			    call gflush (id)
+		        else
+			    call gframe (id)
+		    }
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\7\n")
 

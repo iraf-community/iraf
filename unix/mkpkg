@@ -8,7 +8,7 @@ summary:
 	    $else
 		! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
 		    | grep -v '^check file' | grep -v '^a - '\
-		    | grep -v '^+ cc' | grep -v '^+ ar ' | grep -v '^+ rm'\
+		    | grep -v '^+ [g]*cc' | grep -v '^+ ar ' | grep -v '^+ rm'\
 		    | grep -v '^+ f77'
 	    $endif
 	$else

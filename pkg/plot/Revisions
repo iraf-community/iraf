@@ -1,5 +1,68 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg$plot/t_gkixt.x
+    Increased the size of the index array from 2048 to 8192 to accomodate
+    very large metacode files.  (3/22/95  MJF)
+
+pkg$plot/t_implot.x
+pkg$plot/pltwcs.x
+    When trying to plot a column of a 1D image the physical axis was
+    being set to zero and then used inapproprriately as a pointer offset
+    causing an error on the Dec Alpha port.  The axis now defaults to
+    1 and also the task now beeps when attempting a column plot rather
+    than plotting a point point line.  (2/16/95, Valdes)
+
+pkg$plot/t_surface.x
+    The surface task no longer calls error when the input array is unsuitable
+    for plotting (constant valued, entirely below floor or above ceiling).
+    The surf_limits procedure was modified to call eprintf and then return an
+    error value to the calling program, which terminates the task quietly.
+    This less drastic error exit will allow [e.g., IRAF test] scripts to
+    continue after calling SURFACE with an invalid input image.  (ShJ 6/23/94)
+
+pkg$plot/implot.hlp -
+    This junk copy was deleted.  The actual file is doc/implot.hlp.
+    (2/2/94, Valdes)
+
+pkg$plot/t_implot.x
+pkg$plot/implot.par
+pkg$plot/doc/implot.hlp
+    The step for the j/k keys may now be set by a task parameter.
+    (2/2/94, Valdes)
+
+pkg$plot/t_graph.x
+    The marker sizes were given the wrong sign when inputing the size from
+    a list.  The size must be negative.  (8/21/93, Valdes)
+
+pkg$plot/phistogram.x
+    Fixed a bug in the way phistogram was binning real data read in from
+    a list or image that was causing to create one less bin than required
+    to hold the data. (26/6/93, Davis)
+
+pkg$plot/phistogram.x
+    Fixed a bug in the way the the phistogram task was handling input
+    redirected from the standard input STDIN. (5/20/93, Davis)
+
+pkg$plot/t_implot.x
+pkg$plot/pltwcs.x
+pkg$plot/impprofile.x +
+pkg$plot/impstatus.x +
+pkg$plot/doc/implot.hlp
+lib$scr/implot.key
+    Add a profile analysis command, 'p', with a scrolling status line.
+    (8/31/92, Valdes)
+
+pkg$plot/t_implot.x
+    Changed an incorrect real array index to an int.  (7/21/92, Valdes)
+
+=======
+V2.10.0
+=======
+
+=======
+V2.10
+=======
+
 pkg$plot/t_pradprof.x
     The new pradprof task was using the file name template expansion routines
     instead of the image name template expansion routines producing an error

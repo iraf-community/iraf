@@ -1,4 +1,4 @@
-.help center Jul91 noao.digiphot.apphot
+.help center Dec92 noao.digiphot.apphot
 .ih
 NAME
 center -- compute accurate centers for a list of objects
@@ -9,6 +9,41 @@ center image
 PARAMETERS
 .ls image
 The list of images containing the objects to be centered.
+.le
+.ls coords = ""
+The list of text files containing the coordinates of the objects
+to be centered, one object per line with the x and y coordinates in
+columns one and two respectively.
+If \fIcoords\fR is null (""), CENTER will either read commands from the
+image cursor (default), or read the commands from a cursor command file.
+In the latter case the image cursor parameter \fIicommands\fR must be set to
+the name of the cursor command file.
+If \fIcoords\fR is defined,
+CENTER can read the coordinates from either
+the image cursor or \fIcoords\fR (interactive mode),
+or read coordinates from \fIcoords\fR
+or a cursor command file (batch mode).
+The number of coordinates files must be either zero, one, or equal to the
+number of image files.
+.le
+.ls output = "default"
+The name of the results file or results directory. The string "default"
+indicates the current directory. If \fIoutput\fR is "default", "dir$default"
+or a directory specification then an output name of the form
+dir$root.extension.version
+is constructed, where dir is the directory, root is the root image name,
+extension is "ctr" and version is the next available version of the file.
+The number of output files must be either one or equal to the number of
+image files. If \fIoutput\fR is null ("") then no output file is written.
+In both interactive and batch mode full output is written to \fIoutput\fR. In
+interactive mode a subset of the results is written to the standard output.
+.le
+.ls plotfile = ""
+The name of the file containing radial profile plots of the stars written
+to the output file. If \fIplotfile\fR is
+not equal to null ("") then a radial profile plot is written to \fIplotfile\fR
+every time a record is written to \fIoutput\fR. The user should be
+aware that this can be a time consuming operation.
 .le
 .ls datapars = ""
 The name of the file containing the data dependent parameters.
@@ -23,92 +58,58 @@ The critical parameters \fIcalgorithm\fR and \fIcbox\fR are located here.
 If \fIcenterpars\fR is null ("") then the default parameter set in the
 user's uparm directory is used.
 .le
-.ls coords = ""
-The list of text files containing the coordinates of the objects
-to be centered, one object per line with the x and y coordinates in
-columns one and two respectively.
-If \fIcoords\fR is null, CENTER will either read the image cursor (default),
-or read the cursor commands from a text file.
-In the latter case the image cursor \fIcommands\fR is set to the name of
-a command file created for example by hand or with the RIMCURSOR task.
-If \fIcoords\fR is defined,
-CENTER will activate the image cursor and read the coordinates from either
-the image cursor or \fIcoords\fR (interactive mode),
-or compute centers using the initial postions in \fIcoords\fR if defined
-or those in the command file (batch mode).
-The number of coordinates files must be either 1 or equal to the number of
-image files.
+.ls interactive = yes
+Interactive or batch mode?
 .le
-.ls output = "default"
-The name of the results file or results directory. The string "default"
-indicates the current directory. If \fIoutput\fR is "default", "dir$default"
-or a directory specification then an output name of the form
-dir$root.extension.version
-is constructed, where dir is the directory, root is the root image name,
-extension is "ctr" and version is the current version of the file.
-The number of output files must be either 1 or equal to the number of
-image files. If \fIoutput\fR is the null string then no output file is written.
-In both interactive and batch mode full output is written to \fIoutput\fR. In
-interactive mode a subset of the results is written to the standard output.
+.ls radplots = no
+If \fIradplots\fR is "yes" and CENTER is run in interactive mode, a radial
+profile of each star is plotted on the screen after the center is fit.
 .le
-.ls plotfile = ""
-The name of the file containing radial profile plots of the stars written
-to the output file. If \fIplotfile\fR is
-not equal to null then a radial profile plot is written to \fIplotfile\fR
-every time a record is written to \fIoutput\fR. The user should be
-aware that this can be a time consuming operation.
+.ls verify = yes
+Verify the critical parameters in non-interactive mode?
+.le
+.ls update = no
+Update the critical parameters in non-interactive mode if \fIverify\fR was
+set to yes?
+.le
+.ls verbose = no
+Print messages on the terminal in non-interactive mode?
 .le
 .ls graphics = "stdgraph"
 The default graphics device.
 .le
 .ls display = "stdimage"
-The default display device. This can be set to stdgraph
-in order that CENTER work interactively from a contour plot.
+The default display device. \fIDisplay\fR can be set to "stdgraph"
+to enable CENTER to work interactively from a contour plot.
 .le
-.ls commands = ""
+.ls icommands = ""
 The image display cursor.
 .le
-.ls cursor = ""
+.ls gcommands = ""
 The graphics cursor.
-.le
-.ls interactive = yes
-Interactive or batch mode.
-.le
-.ls verify = yes
-Verify the critical parameters in non-interactive mode.
-.le
-.ls update = no
-Update the critical parameters in non-interactive mode if \fIverify\fR was
-set to yes.
-.le
-.ls verbose = no
-Print messages on the terminal in non-interactive mode.
-.le
-.ls radplots = no
-If \fIradplots\fR is set to yes and CENTER is run in interactive mode a radial
-profile of each star is plotted on the screen after the center is fit.
 .le
 
 .ih
 DESCRIPTION
 CENTER computes accurate centers for a set of objects in the IRAF image
-\fIimage\fR, whose coordinates are listed in the text file \fIcoords\fR or
-read from the image display interactively with the image cursor. 
-The computed x and y coordinates, all the errors plus all the
-fitting commands are written to the text file \fIoutput\fR.
+\fIimage\fR, whose initial coordinates are listed in the text
+file \fIcoords\fR, a cursor command file, or
+read from the image display with the image cursor. 
+The computed x and y coordinates, the errors,  and the
+fitting parameters are written to the text file \fIoutput\fR.
 
 CENTER can be run either interactively or in batch mode by setting the
 parameter \fIinteractive\fR. In interactive mode starting x and y positions
 can either be read directly from the image cursor or read from the text
 file \fIcoords\fR.
-In interactive mode the user can examine, adjust and save  the algorithm
+In interactive mode the user can examine, adjust, and save the algorithm
 parameters,
-change ojects interactively or query for the next or nth object in the list
-and finally fit the entire coordinate list with the chosen parameter set.
-In batch mode the estimated
+change ojects interactively, query for the next or nth object in the list,
+or fit the entire coordinate list with the chosen parameter set.
+In batch mode the 
 positions can be read from the text file \fIcoords\fR or the image 
 cursor can be redirected to a text file containing
-a list of cursor commands as specified by the parameter \fIcommands\fR. 
+a list of cursor commands as specified by the parameter \fIicommands\fR. 
 
 .ih
 CURSOR COMMANDS
@@ -116,53 +117,49 @@ CURSOR COMMANDS
 The following cursor commands are currently available.
 
 .nf
-	Interactive Centering Commands
+	Interactive Keystroke Commands
 
-?	Print help for CENTER commands
-:	CENTER colon escape commands (see below)
-v	Verify critical CENTER parameters
-w	Store the current CENTER parameters in the pset files
-q	Exit
-
-d	Plot the radial profile of current star (cursor or list)
-i	Setup CENTER parameters interactively using current star
-	(cursor or list)
-
-spbar	Fit center of current star (cursor or list), and output results
-f	Fit center of current star (cursor or list)
-e	Print CENTER error messages
-
-:m [n]	Move to next [nth] star in the coordinate list
-:n [n]	Fit center of next [nth]  object in the coordinate list, and
-	output results
-l	Center remainder of the stars in the list, and output results
+?	Print help
+:	Colon commands
+v	Verify the critical parameters
+w	Save the current parameters
+d	Plot radial profile of current star
+i	Interactively set parameters using current star
+f	Fit center of current star
+spbar	Fit center of current star, output results
+m	Move to next star in coordinate list
+n	Center next star in coordinate list, output results
+l	Center remaining stars in coordinate list, output results
+e	Print error messages
 r	Rewind the coordinate list
+q	Exit task
 
 
-Centering parameters are listed or set with the following commands.
+	Colon Commands
 
-# commands
+:show	[data/center]	List the parameters
+:m [n]	Move to next [nth] star in coordinate list
+:n [n]	Center next [nth] star in coordinate list, output results
 
-:show		[data/center]	List the parameters
 
-# file names
+	Colon Parameter Editing Commands
+
+# Image and file name parameters
 
 :image		[string]	Image name
-:coords		[string]	Cordinate file name
+:coords		[string]	Coordinate file name
 :output 	[string]	Output file name
 
-# data dependent parameters
+# Data dependent parameters
 
 :scale		[value]		Image scale (units per pixel)
-:fwhmpsf	[value]		Full width half maximum of PSF (scale units)
+:fwhmpsf	[value]		Full-width half-maximum of PSF (scale units)
 :emission	[y/n]		Emission feature (y), absorption (n)
 :sigma		[value]		Standard deviation of sky (counts)
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
-:threshold	[value]		Detection intensity threshold (counts)
-:cthreshold	[value]		Centering intensity threshold (counts)
 
-# noise parameters
+# Noise parameters
 
 :noise 		[string]	Noise model (constant|poisson)
 :gain		[string]	Gain image header keyword
@@ -170,7 +167,7 @@ Centering parameters are listed or set with the following commands.
 :epadu		[value]		Gain (electrons per adu)
 :readnoise	[value]		Readout noise (electrons)
 
-# observing parameters
+# Observations parameters
 
 :exposure	[string]	Exposure time image header keyword
 :airmass	[string]	Airmass image header keyword
@@ -181,41 +178,40 @@ Centering parameters are listed or set with the following commands.
 :ifilter	[string]	Filter id string
 :otime		[string]	Time of observation (time units)
 
-# centering parameters 
+# Centering parameters 
 
 :calgorithm	[string]	Centering algorithm
-				(centroid| gauss|none|ofilt)
 :cbox		[value]		Width of centering box (scale units)
+:cthreshold	[value]		Centering intensity threshold (sigma)
 :cmaxiter	[value]		Maximum number of iterations
 :maxshift	[value]		Maximum center shift (scale units)
-:minsnratio	[value]		Minimum signalto noise for centering
+:minsnratio	[value]		Minimum signal to noise for centering
 :clean		[y/n]		Clean subraster before centering
 :rclean		[value]		Cleaning radius (scale units)
 :rclip		[value]		Clipping radius (scale units)
 :kclean		[value]		Clean K-sigma rejection limit (sigma)
 
-# plotting and marking parameters
+# Plotting and marking parameters
 
 :mkcenter	[y/n]		Mark computed centers on the display
 :radplot	[y/n]		Plot radial profile of object
 
 
-The following commands are available from the interactive setup menu.
+The following keystroke commands are available from the interactive setup
+menu.
 
+                    Interactive Center Setup Menu
 
-                    Interactive CENTER Setup Menu
+	v	Mark and verify the critical center parameters (f,s,c)
 
-	v	Set and verify the critical CENTER parameters (f,c,s)
+	f	Mark and verify the full-width half-maximum of the psf
+	s	Mark and verify the standard deviation of the background
+	l	Mark and verify the minimum good data value
+	u	Mark and verify the maximum good data value
 
-	f	Set and verify the full width half maximum of the psf
-	h	Set and verify the centering threshold
-	s	Set and verify the standard deviation of the background
-	l	Set and verify the minimum good data value
-	u	Set and verify the maximum good data value
-
-	c	Set and verify the centering box aperture
-	n	Set and verify the cleaning radius
-	p	Set and verify the clipping radius
+	c	Mark and verify the centering box half-width
+	n	Mark and verify the cleaning radius
+	p	Mark and verify the clipping radius
 .fi
 
 .ih
@@ -232,7 +228,7 @@ OUTPUT
 
 In interactive mode the following quantities are written to the terminal
 as each object is measured. Error is a simple string which indicates
-whether an error condition is flagged.  The centers and their errors are
+whether an error condition has been flagged.  The centers and their errors are
 in pixel units.
 
 .nf
@@ -266,11 +262,11 @@ the xshift and yshift definitions is the following.
 ERRORS
 
 If the object centering was error free then the field cier will be zero.
-Non-zero values of cier flag the following error conditions.
+Non-zero values in the cier column flag the following error conditions.
 
 .nf
 	0        # No error
-	101      # The centering box is off image
+	101      # The centering box is off the image
 	102      # The centering box is partially off the image
 	103      # The S/N ratio is low in the centering box
 	104      # There are two few points for a good fit
@@ -284,8 +280,8 @@ Non-zero values of cier flag the following error conditions.
 EXAMPLES
 
 1. Compute the centers for a few  stars in N4147 using the image display
-and the display cursor. Setup the task parameters using the interactive
-setup menu defined by the i key command and a radial profile plot.
+and the image cursor. Setup the task parameters using the interactive
+setup menu defined by the i keystroke command and a radial profile plot.
 
 .nf
 	ap> set stdimcur = stdimage
@@ -301,13 +297,14 @@ setup menu defined by the i key command and a radial profile plot.
 	... type ? for optional help
 
 	... move image cursor to a star
-	... type i to enter the interactive setup menu and the v
-	    key to get the default menu
-	... enter maximum radius in pixels of the radial profile or
+	... type i to enter the interactive setup menu, and v
+	    to get the default menu
+	... enter the maximum radius in pixels for the radial profile or
 	    accept the default with a CR
-	... set the fwhmpsf, centering radius, and sigma,
-	    using the graphics cursor and the stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+	... set the fwhmpsf, sigma, and centering box half-width using the
+	    graphics cursor and the stellar radial profile plot
+	... typing <CR> after a prompt leaves the parameter at its default
+	    value
 
 	... type the w key to save the parameters in the parameter files
 
@@ -343,9 +340,10 @@ setup menu defined by the i key command.
 	... type i to enter the interactive setup menu followed by the
 	    v key to get the default setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, and sigma
-	    using the graphics cursor and the stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+	... set the fwhmpsf, sigma, and centering box half-width
+	    using the graphics cursor and the stellar radial profile plot,
+	    typing <CR> after the prompt leaves the parameter at its
+	    default value
 
 	... type the w key to save the parameters in the parameter files
 
@@ -362,7 +360,7 @@ setup menu defined by the i key command.
 	... full output will appear in the text file m92.ctr.1 
 .fi
 
-3. Setup and run CENTER interactivley on a list of objects,
+3. Setup and run CENTER interactively on a list of objects,
 using a contour plot as the image display and the parameters defined and
 saved in example 2.
 
@@ -383,10 +381,10 @@ saved in example 2.
 
 	... type any key to quit cursor mode
 
-	ap> daofind m92 fw=2.0 thresh==30.
+	ap> daofind m92 
 
 	... make a coordinate list by searching for objects with  the
-	    fwhmpsf and threshold defined in example 1
+	    fwhmpsf and threshold defined in example 2
 
 	... the output will appear in the text file m92.coo.1
 
@@ -400,7 +398,7 @@ saved in example 2.
 
 				or
 
-	... use :m and/or :n, l, r commands to measure objects in the
+	... use m, :m and/or n, :n, l, r commands to measure objects in the
 	    coordinate list
 
 	... a one line summary of results will appear on the standard output
@@ -439,7 +437,7 @@ as input.
 
 	... set the image cursor to the standard input
 
-	ap> center m92 coords=m92.coo.2
+	ap> center m92 coords=m92.coo.1
 
 	... type ? for optional help
 
@@ -449,9 +447,10 @@ as input.
 	... type i to enter the interactive setup menu followed by v to
 	    get the default menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, and sigma
-	    using the graphics cursor and the stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+	... set the fwhmpsf, sigma, centering box half-width
+	    using the graphics cursor and the stellar radial profile plot,
+	    typing <CR> after the prompt leaves the parameter at its default
+	    value
 
 	... type r to rewind the coordinate list
 

@@ -1,0 +1,49 @@
+.help tbconcat Dec92 noao.digiphot.ptools
+.ih
+NAME
+tbconcat -- concatenate a list of APPHOT/DAOPHOT STSDAS databases
+.ih
+USAGE
+tbconcat tables outtable
+.ih
+PARAMETERS
+.ls tables
+The list of APPHOT/DAOPHOT STSDAS databases to be concatenated.
+.le
+.ls outtable
+The name of the output APPHOT/DAOPHOT STSDAS database.
+.le
+.ls task = "TASK"
+The name of the keyword whose value is the name of the task which wrote
+the database.
+.le
+.ih
+DESCRIPTION
+TBCONCAT is a simple task which accepts a list of APPHOT/DAOPHOT STSDAS
+database files and concatenates them into one resultant database.
+TBCONCAT checks that all the file are indeed APPHOT/DAOPHOT STSDAS
+database files and that they were all written by the same task before
+performing the concatenation.
+
+TBCONCAT is a simple script built around the STSDAS TABLES package
+task TMERGE. Users should consult the manual page for TMERGE for
+more details about the inner working of the task.
+
+.ih
+EXAMPLES
+
+1. Concatenate a list of DAOPHOT package GROUP output tables into a
+single file.
+
+.nf
+   pt> tbconcat m92r.grp.1,m92r.grp.2,m92r.grp.3 m92rall.grp.1
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txconcat,ptools.pconcat,tables.tmerge,concatenate
+.endhelp

@@ -10,13 +10,14 @@ update:
 	;
 
 relink:
-	$set   LIBS = "-liminterp -lgsurfit -lcurfit -lllsq -lncar -lgks -lds"
+	$set   LIBS1 = "-liminterp -lncar -lgks -lds"
+	$set   LIBS2 = "-lgsurfit -lnlfit -lcurfit -lllsq"
 	$checkout libds.a lib$
 	$update libds.a
 	$checkin  libds.a lib$
 	$update libpkg.a
 	$omake	x_tv.x
-	$link	x_tv.o libpkg.a $(LIBS) -o xx_tv.e
+	$link	x_tv.o libpkg.a $(LIBS1) $(LIBS2) -o xx_tv.e
 	;
 
 install:
@@ -25,6 +26,7 @@ install:
 
 libds.a:
 	@display
+	@wcslab
 	;
 
 libpkg.a:

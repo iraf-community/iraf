@@ -45,6 +45,8 @@ libpkg.a:
 	gdevices.x
 	getdata.x	<imhdr.h>
 	improject.x	<imhdr.h>
+	impprofile.x	<gset.h> <math/iminterp.h>
+	impstatus.x
 	initmarker.x	<gset.h>
 	perim.x		<gset.h> <mach.h>
 	phistogram.x	<mach.h> <imhdr.h> <gset.h>

@@ -1,4 +1,4 @@
-.help rtar Jun90 softools
+.help rtar Oct92 softools
 .IH
 NAME
 rtar -- read TAR format archive file
@@ -28,7 +28,10 @@ listed in \fIfiles\fR.
 .le
 .ls 4 -f filename
 \fIRtar\fR uses the first filename argument as the host filename of the
-archive instead of reading from \fIstdin\fR.
+archive instead of reading from \fIstdin\fR.   Magtape devices should be
+specified using the host device name, e.g., "/dev/nrmt8" or "MSA0".
+Since \fIrtar\fR is a host level program and does not read the IRAF tapecap
+file, IRAF device names such as "mta" cannot be used.
 .le
 .ls 4 -l
 Do not try to resolve file links by a disk to disk file copy.  By default,
@@ -106,11 +109,10 @@ from the read.  In all cases, appearance of a directory name refers to
 the files and (recursively) subdirectories of that directory.
 
 All \fIrtar\fR filename arguments are IRAF virtual filenames (or host
-filenames), except the prefix strings, which pertain to the tape format
-and hence are UNIX pathnames.  Magtape devices may be specified by
-their IRAF logical device name (if the "dev$devices" file is in place
-and is up to date), or by the host device name, prefixed with a "mt.",
-e.g., "mt.MUA1" or "mt./dev/rmt9".
+filenames), except the prefix strings, which pertain to the tape format and
+hence are UNIX pathnames.  Magtape devices must be specified using a host
+physical or logical device name (i.e., IRAF device names like "mta" will not
+work).
 
 If the input archive file is a tape the blocksize must be a multiple
 of 512 bytes, with a maximum blocksize of 10240 bytes.  Each archived file
@@ -136,13 +138,23 @@ Since \fIrtar\fR is a bootstrap utility implemented as a foreign task in
 the CL, it may be called either from within the CL (as in the examples),
 or at the host system level.  The command syntax is identical on both cases.
 
-1. List the contents of the disk archive file "arc".
+1. List the contents of the disk archive file "foo.tar".
 
-	cl> rtar -tvf arc
+	cl> rtar -tvf foo.tar
 
-2. Unpack the tape archive on drive A in the current directory.
+2. Unpack the tape archive on unix device /dev/nrmt8 in the current
+directory.
 
-	cl> rtar -xf mta
+	cl> rtar -xf /dev/nrmt8
+
+3. Unpack the tape archive on the VMS device MSA0: in the current
+directory.
+
+	cl> rtar -xf msa0
+
+When working within the CL, commands such as \fIrewind\fR may be used
+with \fIrtar\fR, but switching between IRAF and host device names may be
+confusing.
 .IH
 BUGS
 The current limit on file name length is 100 characters (this restriction
