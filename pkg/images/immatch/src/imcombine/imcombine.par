@@ -17,7 +17,7 @@ outtype,s,h,"real","short|ushort|integer|long|real|double",,Output image pixel d
 outlimits,s,h,"",,,Output limits (x1 x2 y1 y2 ...)
 offsets,f,h,"none",,,Input image offsets
 masktype,s,h,"none","",,Mask type
-maskvalue,r,h,0,,,Mask value
+maskvalue,s,h,"0",,,Mask value
 blank,r,h,0.,,,"Value if there are no pixels
 "
 scale,s,h,"none",,,Image scaling

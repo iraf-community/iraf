@@ -31,6 +31,7 @@ extern	wf_tsc_init(), wf_tsc_fwd(), wf_tsc_inv()
 extern	wf_zea_init(), wf_zea_fwd(), wf_zea_inv()
 
 extern	wf_zpx_init(), wf_zpx_fwd(), wf_zpx_inv(), wf_zpx_destroy()
+extern	wf_zpn_init(), wf_zpn_fwd(), wf_zpn_inv(), wf_zpn_destroy()
 extern	wf_tnx_init(), wf_tnx_fwd(), wf_tnx_inv(), wf_tnx_destroy()
 
 bool	first_time
@@ -96,6 +97,9 @@ begin
 	call wf_fnload ("zpx", F_RADEC,
 	    locpr(wf_zpx_init), locpr(wf_zpx_destroy), locpr(wf_zpx_fwd),
 	    locpr(wf_zpx_inv))
+	call wf_fnload ("zpn", F_RADEC,
+	    locpr(wf_zpn_init), locpr(wf_zpn_destroy), locpr(wf_zpn_fwd),
+	    locpr(wf_zpn_inv))
 	call wf_fnload ("tnx", F_RADEC,
 	    locpr(wf_tnx_init), locpr(wf_tnx_destroy), locpr(wf_tnx_fwd),
 	    locpr(wf_tnx_inv))

@@ -433,12 +433,21 @@ observatory = "euo"
         altitude = 795.
         timezone = 2
 
-observatory = "tno"
-        name = "Turkiye National Observatory"
-        longitude = -30:21:11
-        latitude = 36:49:28
-        altitude = 2555.
-        timezone = 2
+# Submitted by Zeki Aslan 8/15/05 who said the "tno" entry was wrong.
+#observatory = "tno"
+#        name = "Turkiye National Observatory"
+#        longitude = -30:21:11
+#        latitude = 36:49:28
+#        altitude = 2555.
+#        timezone = 2
+#
+observatory = "tug"
+        name = "TUBITAK National Observatory, Turkey"
+	longitude = -30:20:00
+	latitude = 36:49:30
+	altitude = 2547.
+	timezone = -2
+
 
 # Submited by Ricky Patterson for Vatican Obs. Research Group, 6/15/04
 observatory = "mgo"
@@ -447,4 +456,22 @@ observatory = "mgo"
         latitude = 32:42:06
         altitude = 3181
         timezone = 7
+
+# Submited by Jeewan C. Bandey 7/28/05
+# Changed to W longitude MJF 4/1/06)
+# 	(E) longitude = 79.45639
+observatory = "aries"
+        name = "Aryabhatta Research Institute of Observational Sciences"
+	longitude = 280.54361
+	latitude = 29.36
+	altitude = 1950.
+	timezone = -5.5
+
+# Submitted by Eduardo Fernández Lajús 10/28/05
+observatory = "oalp"                                                            
+        name = 'Observatorio Astronómico de La Plata'                           
+        longitude = 57:55:56.2782                                               
+        latitude = -34:54:24.3040                                               
+        altitude = 20.                                                          
+        timezone = 3.                                                           
 

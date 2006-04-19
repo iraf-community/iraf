@@ -84,7 +84,7 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec, >> logfile)
+		printf ("Object spectrum not found - %s%s\nCheck setting of imtype\n", spec, imtype, >> logfile)
 		next
 	    }
 	    specms = spec // mstype

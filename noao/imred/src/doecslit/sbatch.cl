@@ -55,7 +55,9 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec, >> logfile)
+		print ("Object spectrum not found - " // spec // imtype,
+		    >> logfile)
+		print ("Check setting of imtype", >> logfile)
 		next
 	    }
 	    specec = spec // ectype

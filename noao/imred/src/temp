@@ -1,0 +1,10 @@
+doslit/sproc.cl
+fibers/batch.cl
+fibers/fibresponse.cl
+fibers/proc.cl
+doecslit/sbatch.cl
+dofoe/batch.cl
+doslit/sbatch.cl
+doecslit/sproc.cl
+dofoe/response.cl
+dofoe/proc.cl

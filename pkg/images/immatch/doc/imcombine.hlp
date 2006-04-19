@@ -308,6 +308,17 @@ threshold rejected pixels.
 .ce
 Environment Variables
 
+.ls imcombine_maxmemory (default = 250000000)
+This task tries to use the maximum possible memory for efficiency when
+dealing with lots of data and is designed to reduce memory usage if
+memory allocation fails.  However, there may be cases where this adjustment
+fails so this variable allows forcing the task to stay within a smaller
+allocation.  This variable is in bytes and the default is the amount
+generally returned by the system.  It is large because of virtual memory
+functionality.  If problems are encountered one should try setting this
+variable to a smaller size until, hopefully, the out of memory errors
+disappear.
+.le
 .ls imcombine_option (default = 1)
 This environment variable is used to select certain experimental or
 diagnostic options.  If this variable has the value 1, the default when the

@@ -44,6 +44,11 @@ time_t	gmt;
 static long
 get_timezone()
 {
+#ifdef CYGWIN
+	extern	long _timezone;
+	tzset();
+	return (_timezone);
+#else
 #ifdef SYSV
 	extern	long timezone;
 	tzset();
@@ -58,6 +63,7 @@ get_timezone()
 	struct timeb time_info;
 	ftime (&time_info);
 	return (time_info.timezone * 60);
+#endif
 #endif
 #endif
 }

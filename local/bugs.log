@@ -7625,3 +7625,305 @@ BUG:	Column interpolation does not work except under special circumstances.
 	interpolation, and then transpose back.
 
 STATUS:	Fixed for the next release.
+
+NUMBER:	538
+MODULE:	mscred.msccmatch
+SYSTEM:	V4.8: November 6, 2003 -
+DATE:	Thu Jul 15 13:59:37 MST 2004
+FROM:	valdes
+
+BUG:	In the November 6th release of MSCRED the task MSCCMATCH calls
+	GEOMAP with the parameter "maxiter".  This parameter was added
+	to GEOMAP in V2.12 IRAF.  Therefore, MSCCMATCH will abort with
+	an error about "maxiter" when a recent version of MSCRED is
+	installed and used with V2.11 IRAF.  The workarounds are to
+	update IRAF, go back to an earlier version of MSCRED, or patch
+	the immatch$geomap.par file to add the line
+
+	maxiter,i,h,0,,,Maximum number of rejection iterations
+
+STATUS:	Currently no changes are planned to maintain recent versions of
+	MSCRED which are compatible with V2.11 IRAF.
+
+NUMBER:	539
+MODULE:	ccmap, ccsetwcs, msctpeak
+SYSTEM:	-V2.12.2a
+DATE:	Tue Aug 31 09:24:53 MST 2004
+FROM:	valdes
+
+BUG:	The code which updates image headers with a TNX/ZPX WCS solution
+	produced by CCMAP could fail so that evaluation of coordinates from
+	the image would not be correct or agree with CCTRAN.  The failure
+	is more likely to occur with small pixel scales and higher order
+	distortion functions.  The problem is due to an incorrect check for
+	a singular matrix when determining the TNX coefficients for the
+	header.  When the code decides the matrix is singular, coefficients
+	are set to zero and the evaluation is wrong.  Since this either
+	happens or doesn't happen it means that there is no problem with
+	accuracy until the bug is triggered.  The problem is in the GSURFIT
+	math library which could also affect other tasks built on it,
+	though no problems related to it are known currently.
+
+STATUS:	The bug was identified and fixed in the math library.
+
+NUMBER:	540
+MODULE:	ecidentify/ecreidentify
+SYSTEM:	-V2.12.2a
+DATE:	Fri Sep 10 13:02:53 MST 2004
+FROM:	valdes
+
+BUG:	ECIDENTIFY and ECREIDENTIFY are supposed to work in terms of "physical"
+	coordinates which are independent of different image sections
+	applied to the data at different stages in the reduction process.
+	However, there was a bug where a transformation was applied in the
+	wrong direction.  A symptom would be that marking a feature would
+	put the tick mark in the wrong place.  The only workaround is to
+	either avoid any image sections in the reduction steps leading up
+	to these tasks or to make the two coordinate systems the same by
+	resetting the physical coordinate system with WCSRESET
+	(i.e. wcsreset <images> wcs=physcial).  For those less familiar
+	with the logical and physical coordinate systems, if there are
+	keywords beginning with LTV and LTM keywords in the header then
+	there is a physical coordinate system defined which would usually
+	be different than the image based logical coordinate system.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	541
+MODULE:	ccsetwcs
+SYSTEM:	-V2.12.2
+DATE:	Fri Oct  8 13:49:01 MST 2004
+FROM:	valdes
+
+BUG:	The help says that one may specify a list of images and a single WCS
+	database record but this does not work.  The workaround is to
+	repeat the record name to match the number of images.
+
+STATUS:	Fixed to work as described in the help for the next release.
+
+NUMBER:	542
+MODULE:	allstar
+SYSTEM:	-V2.12.2a
+DATE:	Thu Nov 18 13:37:44 MST 2004
+FROM:	valdes
+
+BUG:	When a field contains broad objects a divide by zero error can
+	occur when computing the sharpness parameter.  There is no
+	workaround when this happens.
+
+STATUS:	This has been fixed for the next release.  An early release
+	binary is available from the IRAF group (iraf@noao.edu).
+
+NUMBER:	543
+MODULE:	craverage
+SYSTEM:	-V2.12.2
+DATE:	Wed Nov 24 10:26:57 MST 2004
+FROM:	valdes
+
+BUG:	A segmentation violation will occur when the "crmask" parameter is
+	set to an existing mask.  The intent was to allow an existing mask
+	to be used to exclude known bad pixels from the calculation and then
+	add the detected cosmic rays to the mask.  But a bug in the code
+	prevents this from working.  The workaround is to not use an
+	existing mask in "crmask".  If one wants to end up with a mask
+	describing the detected cosmic rays as well as the previously
+	determine bad pixels then specify a new mask and merge the
+	detectected cosmic rays with the previous mask.  There is no
+	workaround to allow using the pre-existing mask to exclude pixels
+	from the calculation.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	544
+MODULE:	echelle.scombine
+SYSTEM:	V2.12.2
+DATE:	Wed Jan 19 08:44:47 MST 2005
+FROM:	valdes
+
+BUG:	Changes to SCOMBINE in V2.12.2a made it a separate executable.  The
+	ECHELLE package definitions, however, failed to be updated so when
+	trying to run SCOMBINE from the echelle package the following error
+	message is produced.
+
+	    ERROR: task `scombine' has no param file
+
+	The solution is editing the echelle$echelle.cl file so that it
+	reads as shown below.  A simpler workaround is to load the onedspec
+	package and run scombine from that package.
+
+STATUS:	Fixed for the next release.
+
+Modifications to echelle$echelle.cl:
+
+...
+task    continuum,
+        deredden,
+        dispcor,
+        dopcor,
+        ecidentify,
+        ecreidentify,
+        refspectra,
+        sapertures,
+        sarith,
+        sflip,
+        slist,
+        specplot,
+        specshift,
+        splot           = "onedspec$x_onedspec.e"
+task    scombine        = "onedspec$scombine/x_scombine.e"
+...
+
+Note that scombine has to be removed from the first block of task
+definitions and added as a separate task statement.
+
+NUMBER:	545
+MODULE:	sarith
+SYSTEM:	-V2.12.2a
+DATE:	Tue Mar  8 10:46:27 MST 2005
+FROM:	valdes
+
+BUG:	When an output wavelength range is selected which does not overlap
+	the input data and the output format is onedspec a segmentaion
+	error occurs.  The correct warning message, "No pixels to extract"
+	is printed but then the error cleanup was not handled correctly.
+	This problem does not occur with multispec output which is,
+	therefore, a workaround.  However, it is likely that the wavelength
+	range was accidentally set incorrectly since an operation outside
+	of the data is probably not intended.  Note that the correct
+	behavior is to not produce an output spectrum in this case.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	546
+MODULE:	mscred.ccdproc, mscred.mscmerge
+SYSTEM:	-V4.8: May 11, 2004
+DATE:	Fri Apr 15 16:55:02 MST 2005
+FROM:	valdes
+
+BUG:	CCDPROC produces a "Pixel subscript out of bounds" error when
+	applying calibrations produced from binned and merged data.
+	In other words, mosaic data with multiple amplifiers per
+	CCD, which are taken with binning, will produce this error
+	after running ZEROCOMBINE with merging enabled and applying
+	this calibration to flat fields or objects.  This problem
+	is caused by CCDPROC incorrectly updating the physical WCS
+	for binned data.  This causes the merging of multiple amplifiers
+	to produce incorrect section keywords.  This is particularly
+	important for the CCDSEC keyword.  Attempting to apply merged
+	calibrations with the invalid CCDSEC keyword causes the error.
+	There are two workarounds.  One is to not merge the amplifiers
+	at all or until all calibrations have been applied.  The other
+	is to edit the CCDSEC keywords for merged calibration images
+	produced by ZEROCOMBINE and FLATCOMBINE to reflect the true
+	CCD section.  The error is normally that the first pixel in
+	CCDSEC is zero rather than one.
+
+STATUS:	Fixed for the next release of MSCRED.
+
+NUMBER:	547 (see also 544)
+MODULE:	argus, ctioslit, hydra, iids, irs, kpnocoude, kpnoslit
+SYSTEM:	V2.12a-V2.12b
+DATE:	Mon Apr 25 10:59:24 MST 2005
+FROM:	valdes
+
+BUG:    Changes to SCOMBINE in V2.12.2a made it a separate executable.  The
+	package definitions for the packages listed above (see also number
+	544 concerning the ECHELLE package) failed to be updated so when
+	trying to run SCOMBINE (or a task that calls SCOMBINE such as
+	DOHYDRA) the following error message is produced.
+
+            ERROR: task `scombine' has no param file
+
+	The solution is editing the <package>$<package>.cl file, where
+	<package> is one of the modules listed above,  so that it reads as
+	shown below.  A simpler workaround is to load the onedspec package
+	and run scombine from that package.
+
+STATUS: Fixed for the next release.
+
+Modifications to <package>$<package>.cl:
+
+...
+task    ...,
+	[scombine,]						<-- Delete line
+	...,
+	...		= onedspec$x_onedspec.e
+task    scombine        = "onedspec$scombine/x_scombine.e"	<-- Add line
+...
+
+Note that scombine has to be removed from the first block of task
+definitions and added as a separate task statement as shown.
+
+
+NUMBER:	548
+MODULE:	specplot
+SYSTEM:	-V2.12.2a
+DATE:	Mon May  2 11:03:20 MST 2005
+FROM:	valdes
+
+BUG:	When using a file for the cursor input the colon commands
+	must include the x, y, and system values even if the spectrum
+	is explicitly selected.  For example:
+
+		0 0 1 :color[2] 2
+
+	If this is not done then a floating exception results.  This is
+	because the search for the nearest spectrum to the cursor position
+	is always done even if the spectrum is specified explicitly.
+
+STATUS:	In the next release the cursor position is optional.
+
+NUMBER:	549
+MODULE:	spectool
+SYSTEM:	SPT V1.2: February 2003
+DATE:	Tue Jun 21 11:35:40 MST 2005
+FROM:	valdes
+
+BUG:	When the arithmetic function needs to interpolate the spectrum it
+	needs a parameter "interp" which was left out.  The workaround is
+	to type 'string interp="poly5"' after loading the SPT package and
+	before running SPECTOOL.
+
+STATUS:	Fixed for a future release.
+
+NUMBER:	550
+MODULE:	spectool
+SYSTEM:	SPT V1.2: February 2003
+DATE:	Tue Jun 21 11:38:36 MST 2005
+FROM:	valdes
+
+BUG:	Use of spectra with the lookup world coordinate system, as produced
+	by RSPECTEXT with "non-linear", causes various failures such as
+	segmentation violations and memory corruption.  the workarounds are
+	to use SPLOT and other equivalent tasks from the ONEDSPEC package.
+
+STATUS:	The task is currently frozen.  This will be studied further if
+	resources allow.
+
+NUMBER:	551
+MODULE:	doecslit
+SYSTEM:	-V2.12.2
+DATE:	Mon Nov 14 14:56:06 MST 2005
+FROM:	valdes
+
+BUG:	The sparams.refit parameter is not actually used during the arc
+	reidentification step.  Instead doecslit will always attempt to
+	refit the dispersion function.  There is no workaround other than
+	fixing the appropriate script task doecslit$sdoarcs.cl to change
+	the refit value from yes to sparams.refit.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	552
+MODULE:	imcombine
+SYSTEM:	V2.12.2
+DATE:	Tue Feb 28 14:07:30 MST 2006
+FROM:	valdes
+
+BUG:	When the combine option is sum and weighting is selected an exception
+	occurs.  The sum option was added as a later feature and a
+	flag needed for weighting was not set.  There is no workaround to
+	combine weighting and summing directly.  One can use "average" and
+	the scale the result to the equivalent of a sum.
+
+STATUS:	Fixed for V2.12.3.

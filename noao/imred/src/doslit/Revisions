@@ -2,6 +2,19 @@
 .nf
 
 =======
+V2.12.3
+=======
+
+doslit$sbatch.cl
+doslit$sproc.cl
+    Error messages now hint to check imtype setting.
+	(4/15/05, Valdes)
+
+========
+V2.12.2b
+========
+
+=======
 V2.12.1
 =======
 

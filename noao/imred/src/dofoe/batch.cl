@@ -78,7 +78,7 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec) | tee (log1)
+		printf ("Object spectrum not found - %s%s\nCheck setting of imtype\n", spec, imtype) | tee (log1)
 		next
 	    }
 	    specec = spec // ectype

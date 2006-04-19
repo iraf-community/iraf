@@ -114,5 +114,6 @@ libex.a:
 	wftnx.x		mwcs.h <math.h>
 	wftsc.x		mwcs.h <math.h>
 	wfzea.x		mwcs.h <math.h>
+	wfzpn.x		mwcs.h <math.h>
 	wfzpx.x		mwcs.h <math.h>
 	;

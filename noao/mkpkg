@@ -230,11 +230,23 @@ freebsd:				# install FREEBSD binaries
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh freebsd -d $(DIRS)
 	;
-macosx:					# install MACOSX binaries
+macosx:					# install MACOSX (PPC) binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh macosx -d $(DIRS)
+	;
+macintel:				# install MACOSX (x86) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh macintel -d $(DIRS)
+	;
+cygwin:					# install WinXP/Cygwin binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh cygwin -d $(DIRS)
 	;
 linux:					# install Slackwkare Linux binaries
 	$verbose off

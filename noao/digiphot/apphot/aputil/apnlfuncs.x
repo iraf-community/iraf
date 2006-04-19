@@ -16,7 +16,10 @@ real	z		# function return
 real	r2
 
 begin
-	r2 = (x[1] - p[2]) ** 2 / (2. * p[3])
+	if (p[3] == 0.)
+	    z = 30.
+	else
+	    r2 = (x[1] - p[2]) ** 2 / (2. * p[3])
 	if (abs (r2) > 25.0)
 	    z = p[4]
 	else
@@ -41,7 +44,10 @@ real	dx, r2
 
 begin
 	dx = x[1] - p[2]
-	r2 = dx * dx / (2.0 * p[3])
+	if (p[3] == 0.)
+	    r2 = 30.
+	else
+	    r2 = dx * dx / (2.0 * p[3])
 	if (abs (r2) > 25.0) {
 	    z = p[4]
 	    der[1] = 0.0
@@ -82,7 +88,10 @@ real	dx, dy, r2
 begin
 	dx = x[1] - p[2]
 	dy = x[2] - p[3]
-	r2 = (dx * dx + dy * dy) / (2.0 * p[4])
+	if (p[4] == 0.)
+	    r2 = 30.
+	else
+	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
 	if (abs (r2) > 25.0)
 	    z = p[5]
 	else
@@ -108,7 +117,10 @@ real	dx, dy, r2
 begin
 	dx = x[1] - p[2]
 	dy = x[2] - p[3]
-	r2 = (dx * dx + dy * dy) / (2.0 * p[4])
+	if (p[4] == 0.)
+	    r2 = 30.
+	else
+	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
 
 	if (abs (r2) > 25.0) {
 	    z = p[5]
@@ -158,7 +170,10 @@ begin
 	srot = sin (p[6])
 	xt = (dx * crot + dy * srot)
 	yt = (-dx * srot + dy * crot)
-	r2 = (xt ** 2 / p[4] + yt ** 2 / p[5]) / 2.0
+	if (p[5] == 0)
+	    r2 = 30.
+	else
+	    r2 = (xt ** 2 / p[4] + yt ** 2 / p[5]) / 2.0
 	if (abs (r2) > 25.0)
 	    z = p[7]
 	else
@@ -189,15 +204,19 @@ begin
 	srot2 = srot ** 2
 	sigx2 = p[4]
 	sigy2 = p[5]
-	a = (crot2 / sigx2 + srot2 / sigy2)
-	b = 2.0 * crot * srot * (1.0 / sigx2 - 1.0 /sigy2)
-	c = (srot2 / sigx2 + crot2 / sigy2)
+	if (sigx2 == 0. || sigy2 == 0.)
+	    r2 = 30.
+	else {
+	    a = (crot2 / sigx2 + srot2 / sigy2)
+	    b = 2.0 * crot * srot * (1.0 / sigx2 - 1.0 /sigy2)
+	    c = (srot2 / sigx2 + crot2 / sigy2)
 
-	dx = x[1] - p[2]
-	dy = x[2] - p[3]
-	dx2 = dx ** 2
-	dy2 = dy ** 2
-	r2 = 0.5 * (a * dx2 + b * dx * dy + c * dy2)
+	    dx = x[1] - p[2]
+	    dy = x[2] - p[3]
+	    dx2 = dx ** 2
+	    dy2 = dy ** 2
+	    r2 = 0.5 * (a * dx2 + b * dx * dy + c * dy2)
+	}
 
 	if (abs (r2) > 25.0) {
 	    z = p[7]
@@ -239,7 +258,10 @@ real	z		# function return
 real	r
 
 begin
-	r = (x[1] - p[2]) / (p[3] * SQRTOF2)
+	if (p[3] == 0.)
+	    r = 30.
+	else
+	    r = (x[1] - p[2]) / (p[3] * SQRTOF2)
 	if (abs (r) > 5.0)
 	    z = 0.0
 	else
@@ -263,7 +285,10 @@ real	der[ARB]	# derivatives
 real	r
 
 begin
-	r = (x[1] - p[2]) / (SQRTOF2 * p[3])
+	if (p[3] == 0.)
+	    r = 30.
+	else
+	    r = (x[1] - p[2]) / (SQRTOF2 * p[3])
 	if (abs (r) > 5.0) {
 	    z = 0.0
 	    der[1] = 0.0
@@ -293,8 +318,12 @@ real	dx, r2, r3
 
 begin
 	dx = (x[1] - p[2])
-	r2 = dx ** 2 / (2.0 * p[3])
-	r3 = r2 * dx / sqrt (2.0 * abs (p[3])) 
+	if (p[3] == 0.)
+	    r2 = 30.
+	else {
+	    r2 = dx ** 2 / (2.0 * p[3])
+	    r3 = r2 * dx / sqrt (2.0 * abs (p[3])) 
+	}
 	if (abs (r2) > 25.0)
 	    z = 0.0
 	else
@@ -319,7 +348,10 @@ real	dx, d1, d2, d3, r, r2, r3, rint
 
 begin
 	dx = x[1] - p[2]
-	r2 = dx ** 2 / (2.0 * p[3])
+	if (p[3] == 0.)
+	    r2 = 30.
+	else
+	    r2 = dx ** 2 / (2.0 * p[3])
 	if (abs (r2) > 25.0) {
 	    z = 0.0
 	    der[1] = 0.0

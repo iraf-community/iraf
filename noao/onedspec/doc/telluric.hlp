@@ -158,7 +158,8 @@ The output corrected spectrum is then computed as
 
 where I' is the corrected spectrum, I is the input spectrum, and <J'> is
 the mean of the shifted and scaled calibration spectrum to keep the output
-intensities comparable to the input spectrum.  If the spectra are
+intensities comparable to the input spectrum.  The value of <J'> is
+printed in the output as the "normalization".  If the spectra are
 dispersion calibrated, possibly with different dispersion parameters, then
 the x values in (2) from the input spectrum are converted to matching
 pixels in the calibration spectrum using the dispersion functions of the
@@ -334,6 +335,9 @@ log the processing:
 .fi
 .ih
 REVISIONS
+.ls TELLURIC V2.12.3
+The normalization is printed.
+.le
 .ls TELLURIC V2.11.2
 Threshold parameter added.
 .le

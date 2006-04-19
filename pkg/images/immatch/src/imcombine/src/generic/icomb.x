@@ -208,7 +208,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE:
+	case AVERAGE, SUM:
 	    if (dowts)
 		keepids = true
 	    else
@@ -680,7 +680,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE:
+	case AVERAGE, SUM:
 	    if (dowts)
 		keepids = true
 	    else
@@ -1152,7 +1152,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE:
+	case AVERAGE, SUM:
 	    if (dowts)
 		keepids = true
 	    else
@@ -1625,7 +1625,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE:
+	case AVERAGE, SUM:
 	    if (dowts)
 		keepids = true
 	    else
@@ -1915,3 +1915,4 @@ begin
 
 	call sfree (sp)
 end
+

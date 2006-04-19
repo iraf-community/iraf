@@ -9,7 +9,9 @@ wcsedit image parameter value axes1
 PARAMETERS
 .ls image
 The list of images for which the WCS is to be edited.  Image sections are
-ignored.
+ignored.  If the image does not exist a data-less image header is first
+created with the default WCS of dimensionality given by the "wcsdim"
+parameter.
 .le
 .ls parameter
 The WCS parameter to be edited. The WCS parameters recognized by
@@ -66,6 +68,9 @@ the old WCS will be destroyed. This option should only be used for creating
 a totally new FITS WCS.
 .le
 .le
+.ls wcsdim = 2
+WCS dimensionality when creating a new data-less image header.
+.le
 .ls interactive = no
 Edit the WCS interactively?
 .le
@@ -82,6 +87,8 @@ to do this in interactive mode.
 
 .ih
 DESCRIPTION
+WCSEDIT modifies the WCS of an existing image or creates a data-less image
+header of the dimensionality given by the \fIwcsdim\fR parameter.
 
 In non-interactive mode WCSEDIT replaces the current value of the WCS
 parameter \fIparameter\fR with the new value \fIvalue\fR in the headers of

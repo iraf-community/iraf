@@ -20,7 +20,7 @@ int	ncoords, logfd, axes[2]
 real	xmin, xmax, ymin, ymax
 pointer	gp, gplog, gt, coords, title, un
 
-int	fntgfntb(), open(), igs_geti(), scan()
+int	imtgetim(), fntgfntb(), open(), igs_geti(), scan()
 real	xgseval()
 pointer	gopen(), gt_init()
 
@@ -42,11 +42,11 @@ begin
 	    call fprintf (logfd, "  Longslit database is %s.\n")
 		call pargstr (database)
 	    call fprintf (logfd, "  Features from images:\n")
-	    while (fntgfntb (list, logfile, SZ_FNAME) != EOF) {
+	    while (imtgetim (list, logfile, SZ_FNAME) != EOF) {
 		call fprintf (logfd, "    %s\n")
 		    call pargstr (logfile)
 	    }
-	    call fntrewb (list)
+	    call imtrew (list)
 	    call close (logfd)
 	}
 	call fntrewb (logfiles)

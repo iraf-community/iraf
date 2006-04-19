@@ -1,5 +1,95 @@
 .help revisions Jan97 images
 .nf
+images$immmatch/src/imcombine/src/icomb.gx
+     The addition of the sum option failed to add a case for selecting how
+     to set the keepids flag.  Add SUM to the switch on line 229.
+     (2/28/06, Fitzpatrick, Valdes)
+
+images$imcoords/src/mkcwcs.cl
+     I can't remember if there was a reason for the first two hedit calls.
+     But if a new image is being created these calls cause a warning error.
+     The safest way to address this without remember if there is a reason
+     for the statements is to put them inside a block that is executed only
+     if the image exists.  (1/27/06, Valdes)
+
+images$imcoords/src/mkcwcs.cl	+
+images$imcoords/src/mkcwwcs.cl	+
+images$imcoords/doc/mkcwcs.hlp	+
+images$imcoords/doc/mkcwwcs.hlp	+
+images$imcoords/imcoords.cl
+images$imcoords/imcoords.men
+images$imcoords/imcoords.hd
+    Two new tasks were added to create or modify simple and standard
+    celestial and celestial/wavelength WCS.  The parameters are designed
+    to make it simpler for a user to specify WCS information in a
+    natural way without understanding the details of the WCS structure.
+    The tasks may be used to make data-less WCS for templates or to
+    add or update a WCS in an image.  These scripts depend on the
+    changes to WCSCOPY and WCSEDIT which are the underlying interfaces
+    to the WCS.
+    (6/24/05, Valdes)
+
+images$imcoords/src/t_wcsedit.x
+images$imcoords/wcsedit.par
+images$imcoords/doc/wcsedit.hlp
+    Modified to allow a new data-less WCS header to be created of
+    dimensionality given by the new parameter "wcsdim".
+    (6/23/05, Valdes)
+
+images$immatch/src/wcsmatch/t_wcscopy.x
+images$immatch/doc/wcscopy.hlp
+    Modified to allow creation of a new data-less WCS header.  Also checking
+    on image sizes and dimensionality was commented out.
+    (6/23/05, Valdes)
+
+=======
+V2.12.3
+=======
+
+images$imfilter/src/t_runmed.x
+images$imfilter/src/runmed.x
+images$imfilter/src/rm_med.x
+images$imfilter/src/mkpkg
+images$imfilter/runmed.par
+images$imfilter/doc/runmed.hlp
+images$imfilter/imfilter.cl
+images$imfilter/imfilter.hd
+images$imfilter/imfilter.men
+images$x_images.x
+    Installed new running median task.  (5/6/05, Valdes)
+
+images$imcoords/src/t_ccsetwcs.x
+    The option to specify a list of images with a single plate solution
+    record, as described in the help, was not working.  This was fixed.
+    (10/8/04, Valdes)
+
+images$immatch/src/wcsmatch/t_wcscopy.x
+    Removed a check that would not allow dataless WCS to be copied.
+    (8/25/04, Cooke & Valdes)
+
+images$imutil/src/imgets.x
+    Modified so that strings with double quotes can be accessed.
+    (7/27/04, Valdes)
+
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/iclog.x
+images$immatch/src/imcombine/src/imcombine.h
+images$immatch/src/imcombine/imcombine.par
+images$immatch/imcombine.par
+    As a special unadvertised feature the "maskvalue" parameter may be
+    specified with a leading '<' or '>'.  Ultimately a full expression
+    should be added and documented.  (7/26/04, Valdes)
+
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/Revisions +
+    Added a feature to allow masks specified without a path to be found
+    either in the current directory or the directory with the image.  This
+    is useful when images to be combined are distributed across multiple
+    directories.  (7/16/04, Valdes)
+
+========
+V2.12.2a
+========
 
 images$immatach/src/imcombine/src/icgdata.gx
     Offset one-dimensional images do not combine correctly because the

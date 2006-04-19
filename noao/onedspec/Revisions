@@ -5,6 +5,37 @@
 V2.12.3
 =======
 
+doc/specplot.hlp
+    Added a quick example illustrating using batch mode plotting.
+    (5/2/05, Valdes)
+
+t_specplot.x
+    To support cursor file input without including the x, y, wcs fields
+    the call to sp_nearest was modified to avoid floating exceptions.
+    (5/2/05, Valdes)
+
+t_sarith.x
+    Error handling was improved for onedspec output.  When no pixels
+    were selected by using w1/w2 the warning was reported but then
+    a segmentation error would occur when trying to close the output
+    image.  (3/8/05, Valdes)
+
+t_tweak.x
+doc/telluric.hlp
+    The normalization used is now printed.  (1/12/05, Valdes)
+
+t_dopcor.x
+doc/dopcor.hlp
+    A keyword is added to log the operation.  (10/29/04, Valdes)
+
+t_deredden.x
+    Adjusted the error reporting to print the warning before closing and
+    deleting the output image.  (9/27/04, Valdes)
+
+ecidentify/ecfitdata.x
+    The EC_FITPT routine used the wrong pointer for the physical to logical
+    coordinate conversion.  (9/10/04, Valdes)
+
 odcombine/		+
 doc/odcombine.hlp	+
 x_onedspec.x

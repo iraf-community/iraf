@@ -57,12 +57,13 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.12.2a"
+set VERSION		= "V2.13"
 set hmach 		= "INDEF"
 set pciraf 		= 0
 set suniraf 		= 0
 set do_tapecaps 	= 0
-set dotapes 		= 1
+set do_tapes 		= 1
+set do_pipes 		= 1
 set hilite    		= 1
 set no_edit		= 0
 
@@ -177,6 +178,10 @@ switch ($UNAME)
         breaksw
     case freebsd: 					    # FreeBSD 4.0
 	set do_tapecaps 	= 1
+        setenv OSVERSION `$uname_cmd -r | cut -c1`
+        if ($OSVERSION == 5) then			    # Sparc Solaris
+	    set do_pipes 	= 0
+	endif
         set mach 		= "freebsd"
         set hmach 		= "freebsd"
 	set TAPES		= "/dev/*st[0-7]*"
@@ -186,12 +191,19 @@ switch ($UNAME)
         breaksw
     case darwin: 					    # Mac OS X
     case macosx:
+    case macintel:
 	# Mac OS X doesn't appear to have tape support 
 	# at this point.
 	set do_tapecaps 	= 0
-	set dotapes 		= 0
-        set mach 		= "macosx"
-        set hmach 		= "macosx"
+	set do_tapes 		= 0
+	set do_pipes 		= 0
+        if (`$uname_cmd -m` == "i386") then		    # LinuxPPC
+            set mach 		= "macintel"
+            set hmach 		= "macintel"
+        else
+            set mach 		= "macosx"
+            set hmach 		= "macosx"
+        endif
 	set TAPES		= "/dev/*st[0-7]*"
 	set shlib		= "no"
 	set LIBFILES    	= ""
@@ -239,9 +251,26 @@ switch ($UNAME)
 	set shlib		= "no"
 	set LIBFILES    	= ""
         breaksw
+
     default:      
-	ERRMSG  "Unable to determine platform architecture."
-	exit 1
+	# We don't want to be limited by the CYGWIN version numbering so
+	# look for a truncated match here before punting.
+	set os_mach = `echo $UNAME | cut -c1-6`
+	if ("$os_mach" == "cygwin") then
+            set mach 		= "cygwin"
+            set hmach 		= "cygwin"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set TAPES		= ""		# no tape support
+	    set do_tapecaps 	= 0
+	    set do_tapes 	= 0
+	    set do_pipes 	= 0
+            breaksw
+
+	else
+	    ERRMSG  "Unable to determine platform architecture."
+	    exit 1
+	endif
 endsw
 
 ##############################################################################
@@ -257,6 +286,7 @@ set W		= '\([ 	"]\)'			# match a blank, tab, or quote
 set TEMP	= "/tmp/iraf_install.$$"
 set exec	= yes
 set user	= iraf
+set port	= 0
 
 set imdir	= ""				# Initialize paths
 set lbin	= ""
@@ -315,6 +345,9 @@ while ("$1" != "")
 	breaksw
     case -noedit:			# no-edit installations
 	set no_edit = 1
+	breaksw
+    case -port:				# do a "port" install
+	set port = 1
 	breaksw
     case -hl:				# disable highlighting
 	set hilite = 0
@@ -431,7 +464,7 @@ end
 #=============================================================================
 # See whether we're gonna work ...
 #=============================================================================
-if ($exec == yes && `whoami` != "root") then
+if ($exec == yes && `whoami` != "root" && $mach != "cygwin") then
   clear
   NEWLINE
   BOLD_ON
@@ -774,7 +807,7 @@ lbin_prompt:
   	    echo "  Creating directory $lbin..."
 	    if ($exec == yes) then
 		mkdir $lbin
-	    endiif
+	    endif
     	    if (! (-e $lbin) && $exec == yes) then
   		ERRMSG  "Cannot create $lbin, please retry..."
 		setenv lbin $d_lbin
@@ -1021,13 +1054,13 @@ endif
 
 # Check iraf user.
 
-if ($mach == "macosx") then
+if ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin") then
     goto _no_user_check
 endif
 
 echo -n "Checking for iraf user account ...				"
 set pass = ""
-if (($pciraf && $mach == "macosx") || (!(-r /etc/passwd)) ) then
+if (($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) || (!(-r /etc/passwd)) ) then
   # Special-case user info check for OS X and systems where the /etc/passwd
   # file may not contain the user info or isn't readable.
 
@@ -1140,26 +1173,28 @@ endif
 _no_user_check:
 
 
+# Skip the ownership check on some platforms.
+if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
 
-# Check file ownership.
-if ($mach == "hp700" || $mach == "rs6000") then
+  # Check file ownership.
+  if ($mach == "hp700" || $mach == "rs6000") then
     set downr = `$LS -lLd $iraf_p/iraf | awk '{print ($4)}'`
     set fownr = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($4)}'`
-else
+  else
     set downr = `$LS -lLd $iraf_p/iraf | awk '{print ($3)}'`
     set fownr = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($3)}'`
-endif
-set dperm = `$LS -lLd $iraf_p/iraf | awk '{print ($1)}'`
-set fperm = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($1)}'`
+  endif
+  set dperm = `$LS -lLd $iraf_p/iraf | awk '{print ($1)}'`
+  set fperm = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($1)}'`
 
 
-echo -n "Checking file ownerships ...					"
-if ("$downr" == "iraf" && "$fownr" == "iraf") then
+  echo -n "Checking file ownerships ...					"
+  if ("$downr" == "iraf" && "$fownr" == "iraf") then
     DO_OK
-else if ("$downr" == "tody" && "$fownr" == "tody") then
+  else if ("$downr" == "tody" && "$fownr" == "tody") then
     # Special exemption for NOAO installations.
     DO_OK
-else 
+  else 
     DO_WARN ; set warn_stat = 1
     NEWLINE
         MSG  "(root dir owned by $downr, iraf files owned by $fownr)"
@@ -1176,8 +1211,9 @@ else
         MSG  '	chmod 4755 alloc.e	# fix permissions'
     NEWLINE
     set warn_count = `expr $warn_count + 1`
-endif
+  endif
 
+endif
 
 # Check file/directory permissions.
 echo -n "Checking file permissions ...					"
@@ -1284,7 +1320,11 @@ endif
 # Check binary dirs are both populated correctly.
 echo -n "Checking Core system binary directory ...			"
 if (! (-e "$iraf_ib/cl.e" && -e "$iraf_ib/x_system.e")) then
-  DO_FAIL ; set err_stat = 1
+  if ($port == 1) then
+      DO_WARN ; set warn_stat = 1
+  else
+      DO_FAIL ; set err_stat = 1
+  endif
   NEWLINE
       MSG  "The core system binary directory, $iraf_ib, does"
       MSG  "not appear to contain the proper binaries.  The IB distribution"
@@ -1297,7 +1337,11 @@ endif
 
 echo -n "Checking NOAO package binary directory ...			"
 if (! (-e "$iraf_nb/x_apphot.e" && -e "$iraf_nb/x_rv.e")) then
-  DO_FAIL ; set err_stat = 1
+  if ($port == 1) then
+      DO_WARN ; set warn_stat = 1
+  else
+      DO_FAIL ; set err_stat = 1
+  endif
   if (-e "$iraf_ib/x_apphot.e" && -e "$iraf_ib/x_rv.e") then
       NEWLINE
           MSG  "The NOAO package binary directory, $iraf_nb, is"
@@ -1396,8 +1440,8 @@ set BINDIRS	= "$hbin $hlib $fbin $host"
 # The following file lists are partially system dependent.
 set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
 set MODEFILES	= "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e"
-set LINKFILES	= "cl.e mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
-set CMDLINKS	= "cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc"
+set LINKFILES	= "ecl.e cl.e mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
+set CMDLINKS	= "ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc"
 
 
 #=============================================================================
@@ -1576,13 +1620,13 @@ if ("$err_seen" == 0) then
 endif
 
 
-# If we're on a Mac OS X system the iraf login directory isn't easy to change
-# and as of OSX 10.1 the default is to create this in /Users/iraf.  If this
-# is how things are set up then link the .login/.cshrc files in this directory
-# so the account has the proper environment.
+# If we're on a Mac OS X or Cygwin system the iraf login directory isn't easy 
+# to change and as of OSX 10.1 the default is to create this in /Users/iraf.  
+# If this is how things are set up then link the .login/.cshrc files in this 
+# directory so the account has the proper environment.
 
 set err_seen = 0
-if ($pciraf && $mach == "macosx") then
+if ($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) then
 echo -n "Creating iraf user .login/.cshrc links ...			"
 
     set v = `finger iraf |& egrep '^Directory'`
@@ -1740,7 +1784,7 @@ endif
 DO_OK
 
 # Initialize permissions of tape devices.
-if ($dotapes) then
+if ($do_tapes) then
 echo -n "Setting tape device permissions ...				"
     if ($exec == yes) then
         chmod 666 $TAPES >& /dev/null
@@ -1976,7 +2020,7 @@ echo "                    Creating Graphics Device Files"
 echo "                    ------------------------------"
 BOLD_OFF
 
-if ($mach == "macosx") then
+if ($do_pipes == 0) then
     goto _no_pipes
 endif
 
@@ -2535,18 +2579,18 @@ net_check_:
             DO_FAIL ; set errstat = 1
             NEWLINE
                 MSG "The NETSTATUS task claims that networking is disabled."
-                MSG "Please contact site support (iraf@noao.edu) with questions"
-	        MSG "or check the Site Manager's Guide for details on how to"
-	        MSG "properly configure networking."
+                MSG "Please contact http://iraf.net with questions or check"
+	        MSG "the Site Manager's Guide for details on how to properly"
+	        MSG "configure networking."
             NEWLINE
         endif
     else
         DO_FAIL ; set errstat = 1
         NEWLINE
             MSG  "The NETSTATUS task binary could not be executed or does not"
-            MSG  "exist.  Please contact site support (iraf@noao.edu) with"
-	    MSG  "questions or check the Site Manager's Guide for details"
-	    MSG  "on how to properly configure networking."
+            MSG  "exist.  Please contact http://iraf.net with questions or"
+	    MSG  "check the Site Manager's Guide for details on how to properly"
+	    MSG  "configure networking."
         NEWLINE
     endif
 
@@ -3023,14 +3067,14 @@ if ($found == 0) then
 	MSG  ""
 	MSG  "    XImtool can be downloaded as part of X11IRAF from:"
 	MSG  ""
-	MSG  "        ftp://iraf.noao.edu/iraf/x11iraf"
+	MSG  "        http://iraf.net/ftp/iraf/x11iraf"
 	MSG  ""
 	MSG  "or it's mirror sites."
 	MSG  "    For information on DS9 please see"
 	MSG  ""
 	MSG  "         http://hea-www.harvard.edu/RD/ds9/"
 	MSG  ""
-	MSG  "Please contact site support (iraf@noao.edu) with questions."
+	MSG  "Please contact http://iraf.net with questions."
 endif
 NEWLINE
 
@@ -3089,7 +3133,7 @@ if ($found == 0) then
         MSG  ""
         MSG  "XGterm can be downloaded as part of X11IRAF from"
         MSG  ""
-        MSG  "        ftp://iraf.noao.edu/iraf/x11iraf"
+	MSG  "        http://iraf.net/ftp/iraf/x11iraf"
         MSG  ""
         MSG  "or it's mirror sites.  Xterm will normally be a part of the"
  	MSG  "system, if not found please check your path."
@@ -3142,13 +3186,11 @@ else
  echo "The 'iraf' user is already configured with a login.cl file so a simple"
  echo "'cl' command is sufficient to start the system."
  NEWLINE
- echo "Additional information can be found at the IRAF web site:"
+ echo "Additional information can be found at the IRAF.NET web site:"
  NEWLINE
- BOLD_ON ; echo "		    http://iraf.noao.edu" ; BOLD_OFF
+ BOLD_ON ; echo "		    http://iraf.net" ; BOLD_OFF
  NEWLINE
- echo "Please contact site support with any questions or problems at "
- NEWLINE
- BOLD_ON ; echo "		    iraf@noao.edu " ; BOLD_OFF
+ echo "Please contact http://iraf.net with any questions or problems."
  NEWLINE
  NEWLINE
 

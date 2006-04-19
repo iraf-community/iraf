@@ -20,6 +20,7 @@ begin
 	string	imtype
 	file	log1, log2, flat2d, flatec, resp
 	int	i, n
+	struct	err
 
 	imtype = "." // envget ("imtype")
 	i = stridx (",", imtype)
@@ -37,8 +38,11 @@ begin
 	    if (i > n && substr (flat2d, i-n+1, i) == imtype)
 		flat2d = substr (flat2d, 1, i-n)
 	    flatec = flat2d // ".ec"
-	    if (!access (flat2d // imtype))
-		error (1, "Flat field spectrum not found - " // flat2d)
+	    if (!access (flat2d // imtype)) {
+		printf ("Flat field spectrum not found - %s%s\n",
+		    flat2d, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	}
 
 	tee.append = yes

@@ -1,5 +1,3 @@
-# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
-
 include	<lexnum.h>
 include	<ctype.h>
 include	<mach.h>
@@ -128,7 +126,7 @@ define	yyerrok		yyerrflag = 0
 define	YYMOVE		call amovi (Memi[$1], Memi[$2], YYOPLEN)
 define	YYERRCODE	256
 
-# line 291 "evexpr.y"
+# line 292 "evexpr.y"
 
 
 
@@ -399,6 +397,8 @@ begin
 	call smark (sp)
 	call salloc (patstr, SZ_FNAME, TY_CHAR)
 	call salloc (patbuf, SZ_LINE,  TY_CHAR)
+	call aclrc (Memc[patstr], SZ_FNAME, TY_CHAR)
+	call aclrc (Memc[patbuf], SZ_LINE,  TY_CHAR)
 
 	# Map pattern, changing '*' into '?*'.
 	op = patstr
@@ -412,7 +412,7 @@ begin
 	}
 
 	# Encode pattern.
-	junk = patmake (pat, Memc[patbuf], SZ_LINE)
+	junk = patmake (Memc[patstr], Memc[patbuf], SZ_LINE)
 
 	# Perform the pattern matching operation.
 	index = patmatch (str, Memc[patbuf])
@@ -1102,6 +1102,8 @@ begin
 end
 define	YYNPROD		33
 define	YYLAST		303
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # Parser for yacc output, translated to the IRAF SPP language.  The contents
 # of this file form the bulk of the source of the parser produced by Yacc.
 # Yacc recognizes several macros in the yaccpar input source and replaces
@@ -1446,7 +1448,7 @@ yyabort_
 	switch (yym) {
 	    
 case 1:
-# line 134 "evexpr.y"
+# line 135 "evexpr.y"
 {
 			# Normal exit.  Move the final expression value operand
 			# into the operand structure pointed to by the global
@@ -1456,18 +1458,18 @@ case 1:
 			return (OK)
 		}
 case 2:
-# line 142 "evexpr.y"
+# line 143 "evexpr.y"
 {
 			call error (1, "syntax error")
 		}
 case 3:
-# line 148 "evexpr.y"
+# line 149 "evexpr.y"
 {
 			# Numeric constant.
 			YYMOVE (yypvt, yyval)
 		    }
 case 4:
-# line 152 "evexpr.y"
+# line 153 "evexpr.y"
 {
 			# The boolean constants "yes" and "no" are implemented
 			# as reserved operands.
@@ -1484,7 +1486,7 @@ case 4:
 			call xev_freeop (yypvt)
 		    }
 case 5:
-# line 167 "evexpr.y"
+# line 168 "evexpr.y"
 {
 			# e.g., @"param"
 			if (ev_getop != NULL)
@@ -1494,115 +1496,115 @@ case 5:
 			call xev_freeop (yypvt)
 		    }
 case 6:
-# line 175 "evexpr.y"
+# line 176 "evexpr.y"
 {
 			# Unary arithmetic minus.
 			call xev_unop (MINUS, yypvt, yyval)
 		    }
 case 7:
-# line 179 "evexpr.y"
+# line 180 "evexpr.y"
 {
 			# Boolean not.
 			call xev_unop (NOT, yypvt, yyval)
 		    }
 case 8:
-# line 183 "evexpr.y"
+# line 184 "evexpr.y"
 {
 			# Addition.
 			call xev_binop (PLUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 9:
-# line 187 "evexpr.y"
+# line 188 "evexpr.y"
 {
 			# Subtraction.
 			call xev_binop (MINUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 10:
-# line 191 "evexpr.y"
+# line 192 "evexpr.y"
 {
 			# Multiplication.
 			call xev_binop (STAR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 11:
-# line 195 "evexpr.y"
+# line 196 "evexpr.y"
 {
 			# Division.
 			call xev_binop (SLASH, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 12:
-# line 199 "evexpr.y"
+# line 200 "evexpr.y"
 {
 			# Exponentiation.
 			call xev_binop (EXPON, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 13:
-# line 203 "evexpr.y"
+# line 204 "evexpr.y"
 {
 			# String concatenation.
 			call xev_binop (CONCAT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 14:
-# line 207 "evexpr.y"
+# line 208 "evexpr.y"
 {
 			# Boolean and.
 			call xev_boolop (AND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 15:
-# line 211 "evexpr.y"
+# line 212 "evexpr.y"
 {
 			# Boolean or.
 			call xev_boolop (OR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 16:
-# line 215 "evexpr.y"
+# line 216 "evexpr.y"
 {
 			# Boolean less than.
 			call xev_boolop (LT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 17:
-# line 219 "evexpr.y"
+# line 220 "evexpr.y"
 {
 			# Boolean greater than.
 			call xev_boolop (GT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 18:
-# line 223 "evexpr.y"
+# line 224 "evexpr.y"
 {
 			# Boolean less than or equal.
 			call xev_boolop (LE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 19:
-# line 227 "evexpr.y"
+# line 228 "evexpr.y"
 {
 			# Boolean greater than or equal.
 			call xev_boolop (GE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 20:
-# line 231 "evexpr.y"
+# line 232 "evexpr.y"
 {
 			# Boolean equal.
 			call xev_boolop (EQ, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 21:
-# line 235 "evexpr.y"
+# line 236 "evexpr.y"
 {
 			# String pattern-equal.
 			call xev_boolop (SE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 22:
-# line 239 "evexpr.y"
+# line 240 "evexpr.y"
 {
 			# Boolean not equal.
 			call xev_boolop (NE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 23:
-# line 243 "evexpr.y"
+# line 244 "evexpr.y"
 {
 			# Conditional expression.
 			call xev_quest (yypvt-6*YYOPLEN, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 24:
-# line 247 "evexpr.y"
+# line 248 "evexpr.y"
 {
 			# Call an intrinsic or external function.
 			ap = O_VALP(yypvt-YYOPLEN)
@@ -1612,36 +1614,36 @@ case 24:
 			call xev_freeop (yypvt-3*YYOPLEN)
 		    }
 case 25:
-# line 255 "evexpr.y"
+# line 256 "evexpr.y"
 {
 			YYMOVE (yypvt-YYOPLEN, yyval)
 		    }
 case 26:
-# line 261 "evexpr.y"
+# line 262 "evexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		    }
 case 27:
-# line 264 "evexpr.y"
+# line 265 "evexpr.y"
 {
 			if (O_TYPE(yypvt) != TY_CHAR)
 			    call error (1, "illegal function name")
 			YYMOVE (yypvt, yyval)
 		    }
 case 28:
-# line 272 "evexpr.y"
+# line 273 "evexpr.y"
 {
 			# Empty.
 			call xev_startarglist (NULL, yyval)
 		    }
 case 29:
-# line 276 "evexpr.y"
+# line 277 "evexpr.y"
 {
 			# First arg; start a nonnull list.
 			call xev_startarglist (yypvt, yyval)
 		    }
 case 30:
-# line 280 "evexpr.y"
+# line 281 "evexpr.y"
 {
 			# Add an argument to an existing list.
 			call xev_addarg (yypvt, yypvt-2*YYOPLEN, yyval)

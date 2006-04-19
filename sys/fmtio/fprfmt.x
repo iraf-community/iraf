@@ -30,11 +30,13 @@ pass the value to be printed).
 # A subsequent call to a PARG_ (with the value of the field we are waiting for
 # as argument) causes FPRFMT to be reentered at the point where we left off.
 
-define	(waitfor,	if (ival_already_used) {
-			    fmt_state = $1
-			    return (NOT_DONE_YET)
-			}
-			$1 ival_already_used = true)
+define	(waitfor,	if (ival_already_used) { fmt_state = $1; return (NOT_DONE_YET) } ; $1 ival_already_used = true)
+
+#define	(waitfor,	if (ival_already_used) {
+#			    fmt_state = $1
+#			    return (NOT_DONE_YET)
+#			}
+#			$1 ival_already_used = true)
 
 # FPRFMT -- Process a %W.Dn format specification.  ALL_DONE is returned when
 # the format specification has been fully processed, else NOT_DONE_YET is

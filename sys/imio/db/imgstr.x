@@ -6,7 +6,8 @@ include	"idb.h"
 
 # IMGSTR -- Get an image header parameter of type string.  If the named
 # parameter is a standard parameter return the value directly, else scan
-# the user area for the named parameter and decode the value.
+# the user area for the named parameter and decode the value.  A special
+# check is required for embedded single quotes as per the FITS standard.
 
 procedure imgstr (im, key, outstr, maxch)
 
@@ -31,6 +32,16 @@ begin
 
 	ip = IDB_STARTVALUE
 	if (ctowrd (Memc[rp], ip, outstr, maxch) > 0) {
+	    # Check for embedded single quotes which are represented as ''.
+	    repeat {
+		if (Memc[rp+ip-1] != '\'')
+		    break
+		call strcat ("'", outstr, maxch)
+		op = strlen (outstr) + 1
+		if (ctowrd (Memc[rp], ip, outstr[op], maxch-op) == 0)
+		    break
+	    }
+
 	    # Strip trailing whitespace.
 	    op = strlen (outstr)
 	    while (op > 0 && (IS_WHITE(outstr[op]) || outstr[op] == '\n'))

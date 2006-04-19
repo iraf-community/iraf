@@ -1,5 +1,13 @@
 #include <stdio.h>
 #include <signal.h>
+#ifdef MACOSX
+#include <math.h>
+#include <fenv.h>
+#endif
+#ifdef CYGWIN
+#include <math.h>
+#include <mingw/fenv.h>
+#endif
 
 #define import_spp
 #define import_knames
@@ -9,11 +17,8 @@
  * ZZEPRO.C -- Code which is executed at the end of every procedure.
  */
 
-#ifdef MACOSX
-
-#define FE_DIVBYZERO      0x04000000     /* divide-by-zero */
-#define FE_OVERFLOW       0x10000000     /* overflow */
-#define FE_INVALID        0x20000000     /* invalid */
+/* NOTE: Following is also picked up by Mac/Intel. */
+#if defined(MACOSX) || defined(CYGWIN)
 
 int macosx_sigmask = (FE_DIVBYZERO|FE_OVERFLOW|FE_INVALID);
 
@@ -24,13 +29,18 @@ int macosx_sigmask = (FE_DIVBYZERO|FE_OVERFLOW|FE_INVALID);
  */
 ZZEPRO()
 {
-	register unsigned int v = gfpscr_();
-	struct sigcontext scp;
+	fexcept_t  flagp;
 
-	if (v & macosx_sigmask) {
-	    scp.sc_psw = (v & macosx_sigmask);
-	    ex_handler (SIGFPE, NULL, &scp);
+	fegetexceptflag (&flagp, macosx_sigmask);
+	if (flagp & macosx_sigmask) {
+	    siginfo_t info;
+	    info.si_code = (flagp & macosx_sigmask);
+	    ex_handler (SIGFPE, &info, NULL);
 	}
+
+	/* Clear the exception. */
+    	flagp = (fexcept_t) NULL;
+    	feclearexcept (FE_ALL_EXCEPT);
 }
 
 /* Mask or unmask the invalid operand exception.  Invalid must be
@@ -44,11 +54,13 @@ mxmask_()
 
 mxumsk_()
 {	
-	register unsigned int v = gfpscr_();
+	fexcept_t  flagp;
 
+	fegetexceptflag (&flagp, macosx_sigmask);
 	macosx_sigmask |=  FE_INVALID;
-	v &= ~FE_INVALID;
-	sfpscr_ (&v);
+	flagp &= ~FE_INVALID;
+	
+	fesetexceptflag (flagp, macosx_sigmask);
 }
 
 

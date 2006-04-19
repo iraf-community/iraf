@@ -80,7 +80,7 @@ pointer	out, st, sp, ie, dims, intype, outtype, ref_im
 pointer	outim, fname, expr, xexpr, output, section, data, imname
 pointer	oplist, opnam, opval, param, io, ip, op, o, im, ia, emsg
 int	len_exprbuf, fd, nchars, noperands, dtype, status, i, j
-int	ndim, npix, ch, percent, nlines, totlines, flags
+int	ndim, npix, ch, percent, nlines, totlines, flags, mapflag
 
 real	clgetr()
 double	imgetd()
@@ -227,6 +227,8 @@ begin
 
 		IO_TYPE(io) = PARAMETER
 		IO_DATA(io) = ip
+		call salloc (IO_DATA(io), SZ_LINE, TY_CHAR)
+		call strcpy (Memc[ip], Memc[IO_DATA(io)], SZ_LINE)
 
 	    } else if (ctod (Memc, ip, dval) > 0) {
 		if (Memc[ip] != EOS)
@@ -328,6 +330,7 @@ image_
 	# point to a valid open image.
 
 	do i = 1, noperands {
+	    mapflag = NO	     
 	    io = IE_IMOP(ie,i)
 	    ip = IO_DATA(io)
 	    if (IO_TYPE(io) != PARAMETER)
@@ -341,15 +344,35 @@ image_
 		    break
 		ia = NULL
 	    }
-	    if (ia == NULL) {
+	    if (ia == NULL && (IS_LOWER(Memc[ip]) && Memc[ip+1] == '.')) {
+		# The parameter operand is something like 'a.foo' however
+		# the image operand 'a' is not in the list derived from the
+		# expression, perhaps because we just want to use a parameter
+		# from a reference image and not the image itself.  In this
+		# case map the image so we can get the parameter.
+
+	        call strcpy (Memc[ip], Memc[opval], 1)
+	        call clgstr (Memc[opval], Memc[opnam], SZ_LINE)
+		call imgimage (Memc[opnam], Memc[fname], SZ_PATHNAME)
+
+		iferr (im = immap (Memc[fname], READ_ONLY, 0)) {
+		    call sprintf (Memc[emsg], SZ_LINE,
+		        "bad image parameter reference %s")
+		        call pargstr (Memc[ip])
+		    call error (5, Memc[emsg])
+		} else 
+		    mapflag = YES
+
+	    } else if (ia == NULL) {
 		call sprintf (Memc[emsg], SZ_LINE,
 		    "bad image parameter reference %s")
 		    call pargstr (Memc[ip])
 		call error (5, Memc[emsg])
-	    }
+
+	    } else
+	        im = IO_IM(ia)
 
 	    # Get the parameter value and set up operand struct.
-	    im = IO_IM(ia)
 	    param = ip + 2
 	    IO_TYPE(io) = NUMERIC
 	    o = IO_OP(io)
@@ -379,6 +402,9 @@ image_
 		    call pargstr (Memc[ip])
 		call error (6, Memc[emsg])
 	    }
+
+	    if (mapflag == YES)
+		call imunmap (im)
 	}
 
 	# Determine the reference image from which we will inherit image

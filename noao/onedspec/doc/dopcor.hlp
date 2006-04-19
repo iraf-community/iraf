@@ -129,6 +129,11 @@ whether a total flux or surface brightness is measured.  To provide the
 range of possible corrections the flux correction factor is defined by
 the \fIfactor\fR parameter as the power of 1+z (where z is the
 redshift) to be multiplied into the observed pixel values.
+
+A keyword DOPCORnn is added to the image header.  The index starts from
+01 and increments if multiple corrections are applied.  The value of
+the keywords gives the redshift applied, the flux factor if used, and
+the apertures which were corrected.
 .ih
 EXAMPLES
 1.  To dispersion and flux correct a quasar spectrum with redshift of
@@ -161,6 +166,9 @@ This task was extended to work on two and three dimensional spatial spectra
 such as long slit and Fabry-Perot spectra.
 
 The \fIadd\fR parameter was added.
+.le
+.ls DOPCOR V2.10.3
+A keyword is added to log the correction applied.
 .le
 .ls DOPCOR V2.10.2
 A sign error in converting velocity to redshift was fixed.  A validity

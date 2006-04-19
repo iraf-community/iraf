@@ -56,8 +56,8 @@ GEOMAP and may be less than but may not exceed those values.
 .ls xscale = 1.0, yscale = 1.0
 The output picture x and y scales in units of
 x and y reference units per output pixel,
-e.g  " / pixel or Angstroms / pixel if the reference coordinates
-are " or Angstroms. If the reference coordinates are in pixels
+e.g  arcsec / pixel or Angstroms / pixel if the reference coordinates
+are arcsec or Angstroms. If the reference coordinates are in pixels
 then xscale and yscale should be 1.0 to preserve the scale of the reference
 image.
 If xscale and yscale are undefined (INDEF), xscale and yscale default to the

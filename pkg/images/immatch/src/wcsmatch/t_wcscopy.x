@@ -12,7 +12,8 @@ pointer	sp, image, refimage, value, str, imr, mwr, im
 real	rval
 double	dval
 bool	clgetb()
-int	imtopen(), imtlen(), imtgetim(), mw_stati(), rg_samesize()
+int	imtopen(), imtlen(), imtgetim()
+#int	mw_stati(), rg_samesize()
 pointer	immap(), mw_openim()
 real	imgetr()
 double	imgetd()
@@ -63,13 +64,12 @@ begin
 		    mwr = NULL
 
 		# Check that the wcs dimensions are rational.
-		if (mwr != NULL) {
-		    if (mw_stati(mwr, MW_NPHYSDIM) < IM_NDIM(imr) || 
-			mw_stati (mwr, MW_NDIM) != IM_NDIM(imr)) {
-			call mw_close (mwr)
-			mwr = NULL
-		    }
-		}
+#		if (mwr != NULL) {
+#		    if (mw_stati(mwr, MW_NPHYSDIM) < IM_NDIM(imr)) {
+#			call mw_close (mwr)
+#			mwr = NULL
+#		    }
+#		}
 	    }
 
 	    # Print message about progress of task
@@ -81,7 +81,10 @@ begin
 
 	    # Remove any image section and open the input image.
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
-	    im = immap (Memc[image], READ_WRITE, 0)
+	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
+	        im = immap (Memc[image], NEW_IMAGE, 0)
+		IM_NDIM(im) = 0
+	    }
 
 	    # Test for valid wcs.
 	    if (mwr == NULL) {
@@ -90,22 +93,22 @@ begin
 		        "\tError: cannot read wcs for reference image %s\n")
 	            call pargstr (Memc[refimage])
 		}
-	    } else if (IM_NDIM(im) != IM_NDIM(imr)) {
-		if (verbose) {
-		    call printf (
-		    "\tError: %s and %s have different number of dimensions\n")
-	                call pargstr (Memc[image])
-	                call pargstr (Memc[refimage])
-		}
+#	    } else if (IM_NDIM(im) != IM_NDIM(imr)) {
+#		if (verbose) {
+#		    call printf (
+#		    "\tError: %s and %s have different number of dimensions\n")
+#	                call pargstr (Memc[image])
+#	                call pargstr (Memc[refimage])
+#		}
 	    } else {
-		if (rg_samesize (imr, im) == NO) {
-		    if (verbose) {
-		        call printf (
-		        "\tWarning: images %s and %s have different sizes\n")
-	                call pargstr (Memc[image])
-	                call pargstr (Memc[refimage])
-		    }
-		}
+#		if (rg_samesize (imr, im) == NO) {
+#		    if (verbose) {
+#		        call printf (
+#		        "\tWarning: images %s and %s have different sizes\n")
+#	                call pargstr (Memc[image])
+#	                call pargstr (Memc[refimage])
+#		    }
+#		}
 		#mw = mw_open (NULL, mw_stati (mwr,MW_NPHYSDIM))
 		#call mw_loadim (mw, imr)
 		#call mw_saveim (mw, im)

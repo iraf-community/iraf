@@ -2,15 +2,89 @@
 # two statements to define the package root directory and package task,
 # then add the package helpdb to the `helpdb' list.
 
+#reset	local		= iraf$local/
+#task	local.pkg	= local$local.cl
+
 reset	noao		= iraf$noao/
 task	noao.pkg	= noao$noao.cl
 
-#reset	tables		= /iraf/extern/tables/
-#task	tables.pkg	= tables$tables.cl
+reset	tables		= /iraf/extern/tables/
+task	tables.pkg	= tables$tables.cl
+
+reset	stsdas		= /iraf/extern/stsdas/
+task    stsdas.pkg      = stsdas$stsdas.cl
+
+reset	nlocal		= /iraf/extern/nlocal/
+task	nlocal.pkg	= nlocal$nlocal.cl
+
+reset	ctio		= /iraf/extern/ctio/
+task	ctio.pkg	= ctio$ctio.cl
+
+reset	dimsum		= /iraf/extern/dimsum/
+task	dimsum.pkg	= dimsum$dimsum.cl
+
+reset	vol		= /iraf/extern/vol/
+task	vol.pkg		= vol$vol.cl
+
+reset	color		= /iraf/extern/color/
+task	color.pkg	= color$color.cl
+
+reset	nmisc		= /iraf/extern/nmisc/
+task	nmisc.pkg	= nmisc$nmisc.cl
+
+reset	mscred		= /iraf/extern/mscred/
+reset	mscdb		= /iraf/extern/mscdb/
+task	mscred.pkg	= mscred$mscred.cl
+
+reset	fitsutil	= /iraf/extern/fitsutil/
+task	fitsutil.pkg	= fitsutil$fitsutil.cl
+
+reset	spectime	= /iraf/extern/spectime/
+reset	spectimedb	= /iraf/extern/noaospectime/
+task	spectime.pkg	= spectime$spectime.cl
+
+reset	gmisc		= /iraf/extern/gmisc/
+task	gmisc.pkg	= gmisc$gmisc.cl
+
+reset	gemini		= /iraf/extern/gemini/
+task	gemini.pkg	= gemini$gemini.cl
+
+reset	mxtools		= /iraf/extern/mxtools/
+task	mxtools.pkg	= mxtools$mxtools.cl
+
+reset	ace		= /iraf/extern/ace/
+task	ace.pkg		= ace$ace.cl
+
+reset	fuzzy		= /iraf/extern/fuzzy/
+task	$fuzzy.pkg	= fuzzy$fuzzy.cl
+
+reset	websvc		= /iraf/extern/websvc/
+task	websvc.pkg	= websvc$websvc.cl
+
+reset	guiapps		= /iraf/extern/guiapps/
+task	guiapps.pkg	= guiapps$guiapps.cl
+
+clpackage
 
 reset	helpdb		= "lib$helpdb.mip\
 			  ,noao$lib/helpdb.mip\
-#			  ,tables$lib/helpdb.mip\
+			  ,nlocal$lib/helpdb.mip\
+			  ,mscred$lib/helpdb.mip\
+			  ,ctio$lib/helpdb.mip\
+			  ,stsdas$lib/helpdb.mip\
+			  ,vol$lib/helpdb.mip\
+			  ,tables$lib/helpdb.mip\
+			  ,color$lib/helpdb.mip\
+			  ,nmisc$lib/helpdb.mip\
+			  ,dimsum$lib/helpdb.mip\
+			  ,fitsutil$lib/helpdb.mip\
+			  ,spectime$lib/helpdb.mip\
+			  ,finder$lib/helpdb.mip\
+			  ,gemini$lib/helpdb.mip\
+			  ,mxtools$lib/helpdb.mip\
+			  ,ace$lib/helpdb.mip\
+			  #,websvc$lib/helpdb.mip\
+			  ,guiapps$lib/helpdb.mip\
 			  "
 
 keep

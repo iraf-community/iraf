@@ -1,6 +1,14 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
 =======
+V2.12.3
+=======
+
+imred$echelle/echelle.cl
+    With the change of SCOMBINE to a separate executable the package
+    file needed to be updated.  (1/19/05)
+
+=======
 V2.12.2
 =======
 

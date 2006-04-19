@@ -8,7 +8,8 @@ implot image [line]
 .ih
 PARAMETERS
 .ls image
-Name of (first) image to be plotted.
+List of images to be plotted.  If more than one image is in the list then
+the 'm' and 'n' keys are used proceed to the previous and next image.
 .le
 .ls line
 If given, the number of the image line to be plotted, otherwise the central
@@ -52,10 +53,11 @@ a colon command.
 .ih
 DESCRIPTION
 Implot is an interactive, cursor driven task for examining images by plotting
-the lines and columns or the averages of lines and columns.  A single image
+the lines and columns or the averages of lines and columns.  An image
 line is plotted when the task is first run, then cursor mode is entered and
 keystrokes may be used to generate additional line and column plots.  'q'
-is typed to exit cursor mode and Implot.
+is typed to exit cursor mode and implot and 'n' is typed to proceed to
+the next image in the input image list.
 
 The following single character keystrokes are recognized by Implot.  Note that
 numerous additional keystrokes are provided by "cursor mode" itself, i.e.,
@@ -74,6 +76,8 @@ documented elsewhere.
 	j		move down within image (moving section)
 	k		move up within image (moving section)
 	l		plot a line
+	m		proceed to the previous image in the list
+	n		proceed to the next image in the list
 	o		overplot next vector
 	p		measure profile (mark region and bkg with 2 pos)
 	q		quit
@@ -116,6 +120,10 @@ column plot.  Each new vector is plotted in place of the previous one
 without clearing the screen, making it easy to compare successive vectors.
 The step between vectors may be defined by a task parameter and
 changed by a colon command.
+
+The 'm' and 'n' commands are used to step through the input image list.
+This is the same as using the 'i' key to switch images and the 'l' key
+to plot the same line or column as the previous image.
 
 There are three keys which print various quantities of interest.
 The space bar key will read the cursor position, find the nearest pixel,

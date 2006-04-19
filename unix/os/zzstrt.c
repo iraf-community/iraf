@@ -6,9 +6,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef CYGWIN
+#  include <mingw/fenv.h>
+#else
 #ifdef LINUX
-#include <fpu_control.h>
-#undef SOLARIS
+# include <fpu_control.h>
+# undef SOLARIS
+#endif
 #endif
 
 #ifdef SHLIB
@@ -35,8 +39,13 @@
 #ifdef LINUXPPC
 #define MACUNIX
 #endif
+
 #ifdef MACOSX
+#include <math.h>
+#include <fenv.h>
+#ifndef MACINTEL
 #define MACUNIX
+#endif
 #endif
 
 #define	import_spp
@@ -433,7 +442,13 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	/* Dummy routine called to indicate that mapping is complete. */
 	ready();
 
-#ifdef LINUX
+#if defined(MACOSX) || defined(CYGWIN)
+        /*  Clears the exception-occurred bits in the FP status register.
+         */
+        feclearexcept (FE_ALL_EXCEPT);
+#else
+
+#if defined(LINUX)
 	/* Enable the common IEEE exceptions.  Newer Linux systems disable
 	 * these by default, the usual SYSV behavior.
 	 */
@@ -447,11 +462,13 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 #ifdef MACUNIX
 	    int fpucw = _FPU_IEEE;
 #else
-	    int fpucw = 0x332;
+	    int fpucw = 0x336;
 #endif
 	    sfpucw_ (&fpucw);
 	}
 #endif
+#endif
+
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
 	 */

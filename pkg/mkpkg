@@ -7,6 +7,7 @@ $exit
 
 update:
 	$call cl
+	$call ecl
 	$call system
 	$call softools
 	$call xtools
@@ -25,6 +26,10 @@ update:
 cl:
 	$echo "--------------------- CL --------------------------"
 	$call update@cl
+	;
+ecl:
+	$echo "--------------------- ECL -------------------------"
+	$call update@ecl
 	;
 system:
 	$echo "--------------------- SYSTEM ----------------------"

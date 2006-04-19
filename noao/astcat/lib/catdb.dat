@@ -181,30 +181,30 @@ nfields 11
     arcdist 10 0 r arcmin %6.1f
     hip 11 0 c INDEF %s
 
-begin tmass@ipac
-address inet:8002:irsadev.ipac.caltech.edu:text
-query GET /cgi-bin/CatRegion/nph-catregion?catalog=pt_src_cat&objstr=%-s,%-s,Equ+J2000&within=%-s+degree&select=designation,+ra,+dec,+j_m,+h_m,+k_m HTTP/1.0\n\n
-nquery 4
-    ra  0.00000 degrees %0.5f
-    dec 0.00000 degrees %0.5f
-    radius 0.100 degrees %0.03f
-    qsystem J2000.0 INDEF %s
-protocol none
-type stext
-    hskip 8
-    tskip 0
-    recsize 0
-    triml 0
-    trimr 0
-nheader 1
-    csystem J2000
-nfields 6
-    id 1 0 c INDEF %14s
-    ra 2 0 d degrees %11.6f
-    dec 3 0 d degrees %11.6f
-    mag1 4 0 r INDEF %7.3f
-    mag2 5 0 r INDEF %7.3f
-    mag3 6 0 r INDEF %7.3f
+#begin tmass@ipac
+#address inet:8002:irsadev.ipac.caltech.edu:text
+#query GET /cgi-bin/CatRegion/nph-catregion?catalog=pt_src_cat&objstr=%-s,%-s,Equ+J2000&within=%-s+degree&select=designation,+ra,+dec,+j_m,+h_m,+k_m HTTP/1.0\n\n
+#nquery 4
+#    ra  0.00000 degrees %0.5f
+#    dec 0.00000 degrees %0.5f
+#    radius 0.100 degrees %0.03f
+#    qsystem J2000.0 INDEF %s
+#protocol none
+#type stext
+#    hskip 8
+#    tskip 0
+#    recsize 0
+#    triml 0
+#    trimr 0
+#nheader 1
+#    csystem J2000
+#nfields 6
+#    id 1 0 c INDEF %14s
+#    ra 2 0 d degrees %11.6f
+#    dec 3 0 d degrees %11.6f
+#    mag1 4 0 r INDEF %7.3f
+#    mag2 5 0 r INDEF %7.3f
+#    mag3 6 0 r INDEF %7.3f
 
 begin gsc2@stsci
 address inet:80:www-gsss.stsci.edu:text

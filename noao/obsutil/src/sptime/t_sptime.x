@@ -123,12 +123,13 @@ begin
 	case CIRCULAR:
 	    if (tabexists (tab, "fiber")) {
 		ST_APSIZE(st,1) = stgetr (st, "diameter", "fiber", INDEFR)
-		if (!IS_INDEFR(ST_APSIZE(st,1)) && ST_APSIZE(st,1) > 0.)
+		if (!IS_INDEFR(ST_APSIZE(st,1)) && ST_APSIZE(st,1) > 0.) {
+		    ST_TELSCALE(st) = stgetr (st, "scale", "telescope", 10.)
 		    ST_APSIZE(st,1) = ST_APSIZE(st,1) * ST_TELSCALE(st)
+		}
 	    }
 	    if (IS_INDEFR(ST_APSIZE(st,1)))
 		ST_APSIZE(st,1) = stgetr (st, "diameter", "aperture", -2.)
-	    ST_APSIZE(st,1) = stgetr (st, "diameter", "aperture", -2.)
 	    ST_APSIZE(st,2) = ST_APSIZE(st,1)
 	case RECTANGULAR:
 	    ST_APSIZE(st,1) = stgetr (st, "width", "aperture", -2.)
@@ -640,7 +641,7 @@ begin
 		    call pargr (ST_APSIZE(st,2) / ST_SCALE(st,2))
 	    }
 	}
-	if (tabexists (tab, "fibers"))
+	if (tabexists (tab, "fiber"))
 	    call st_description (st, fd, "Fibers: ", "fibtitle", "fiber")
 	if (tabexists (tab, "filter"))
 	    call st_description (st, fd, "Filter: ", "ftitle", "filter")
@@ -941,14 +942,14 @@ real	tabinterp1(), tabinterp2(), st_dispeff(), st_w2dw(), st_w2x()
 errchk	tabinterp1, tabinterp2, st_dispeff
 
 begin
-	nobj = 0.
-	nbkg = 0.
-	snr = 0.
-	thruput = 0.
-
 	# Check for reasonable wavlength and source flux.
-	if (wave <= 0. || flux < 0.)
+	if (wave < 0. || flux < 0.) {
+	    nobj = 0.
+	    nbkg = 0.
+	    snr = 0.
+	    thruput = 0.
 	    return
+	}
 
 	# Set observation time.
 	switch (ST_SKYSUB(st)) {
@@ -961,13 +962,9 @@ begin
 	# Compute pixel counts over subsampled pixels.
 	disp = st_w2dw (st, 1, wave) * ST_PIXSIZE(st) * ST_BIN(st,1) /
 	    ST_SUBPIXELS(st)
-	if (IS_INDEFR(disp))
-	    return
 	w1 = wave - disp * (ST_SUBPIXELS(st) + 1) / 2.
 	do i = 1, ST_SUBPIXELS(st) {
 	    w = w1 + disp * i
-	    if (w <= 0.)
-		return
 
 	    # Atmospheric transmission.
 	    iferr {
@@ -1129,11 +1126,11 @@ begin
 
 	    switch (ST_APTYPE(st)) {
 	    case CIRCULAR:
-		bkg = bkg * PI * ST_APSIZE(st,1) ** 2 / ap
+		bkg = bkg * PI * (ST_APSIZE(st,1) / 2) ** 2
 	    case RECTANGULAR:
 		bkg = bkg * ST_APSIZE(st,1) * ST_SCALE(st,1) * ST_NOBJPIX(st)
 	    }
-	    n = bkg * ST_AREA(st) * thruput * tobs * disp
+	    n = bkg * ST_AREA(st) * thruput / ap * tobs * disp
 	    n = max (0., n)
 	    if (n < 100000.)
 		n = int (n)
@@ -1200,7 +1197,7 @@ begin
 	    call pargr (bkg)
 
 	call fprintf (fd, "\nTransmision/Efficiencies:%40t%10s %10s\n")
-	    call pargstr ("indivdual")
+	    call pargstr ("individual")
 	    call pargstr ("cumulative")
 	cum = 1
 	if (!IS_INDEF(ext) && ext < 1) {

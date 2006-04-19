@@ -76,7 +76,7 @@ file on the input list is sensed, or the number of parameters successfully
 scanned.  The function \fInscan\fR also returns the number of parameters
 successfully scanned in the last call to scan or fscan.
 
-A field format specification has the form "%[*][w][lh]C", where '*' indicates
+A field format specification has the form "%[*][W][lh]C", where '*' indicates
 the field should be skipped, W is  the  field width,
 'l' indicates longword output, 'h' indicates halfword output, and
 C is the format code.  The format codes C are as follows:

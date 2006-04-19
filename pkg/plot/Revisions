@@ -4,6 +4,18 @@
 V2.12.2
 =======
 
+pkg/plot/t_implot.x
+pkg/doc/implot.hlp
+lib/scr/implot.key
+    The "image" parameter may now be a list and the 'm' and 'n' keys
+    are used to move through the image.  This is an alternate, and
+    more convenient, version of the 'i' key.
+    (10/29/04, Valdes)
+
+=======
+V2.12.2
+=======
+
 pkg/plot/t_pradprof.x
 pkg/plot/doc/pradprof.hlp
     Added parameters "az1" and "az2" to select a range of azimuths for

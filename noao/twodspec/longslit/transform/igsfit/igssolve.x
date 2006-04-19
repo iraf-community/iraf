@@ -14,7 +14,7 @@ real	z[npts]			# Z points
 real	w[npts]			# Weights
 int	npts			# Number of points
 
-int	i, nfunc
+int	i, nfunc, ix, iy
 pointer	sf1, sf2, resids
 
 int	strdic()
@@ -28,7 +28,9 @@ begin
 
 	# Fit the first surface.
 
-	call xgsinit (sf1, nfunc, 2, 2, NO, xmin, xmax, ymin, ymax)
+	ix = min (2, xorder)
+	iy = min (2, yorder)
+	call xgsinit (sf1, nfunc, ix, iy, NO, xmin, xmax, ymin, ymax)
 	call xgsfit (sf1, x, y, z, w, npts, WTS_USER, i)
 
 	switch (i) {

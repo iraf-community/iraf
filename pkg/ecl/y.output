@@ -1,0 +1,5694 @@
+
+0: shift/reduce conflict (shift 5, red'n 1) on error
+state 0
+	$accept : _block $end 
+	block : _    (1)
+
+	$end  reduce 1
+	error  shift 5
+	Y_OSESC  reduce 1
+	D_D  reduce 1
+	D_PEEK  reduce 1
+	Y_IDENT  reduce 1
+	Y_WHILE  reduce 1
+	Y_IF  reduce 1
+	Y_FOR  reduce 1
+	Y_BREAK  reduce 1
+	Y_NEXT  reduce 1
+	Y_SWITCH  reduce 1
+	Y_CASE  reduce 1
+	Y_DEFAULT  reduce 1
+	Y_RETURN  reduce 1
+	Y_GOTO  reduce 1
+	Y_PROCEDURE  shift 8
+	Y_BEGIN  shift 9
+	Y_BOOL  reduce 1
+	Y_INT  reduce 1
+	Y_REAL  reduce 1
+	Y_STRING  reduce 1
+	Y_FILE  reduce 1
+	Y_STRUCT  reduce 1
+	Y_GCUR  reduce 1
+	Y_IMCUR  reduce 1
+	Y_UKEY  reduce 1
+	Y_PSET  reduce 1
+	Y_IFERR  reduce 1
+	Y_IFNOERR  reduce 1
+	=  reduce 1
+	.  shift 2
+	~  reduce 1
+	{  reduce 1
+	;  reduce 1
+	.  error
+
+	block  goto 1
+	script_params  goto 3
+	script_body  goto 4
+	proc_stmt  goto 6
+	begin_stmt  goto 7
+
+state 1
+	$accept :  block_$end 
+	block :  block_$$3 debug xstmt 
+	$$3 : _    (3)
+
+	$end  accept
+	.  reduce 3
+
+	$$3  goto 10
+
+state 2
+	block :  ._NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 11
+
+state 3
+	block :  script_params_    (5)
+
+	.  reduce 5
+
+
+state 4
+	block :  script_body_    (6)
+
+	.  reduce 6
+
+
+state 5
+	block :  error_NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 13
+
+state 6
+	script_params :  proc_stmt_var_decls begin_stmt 
+	var_decls : _    (25)
+
+	error  shift 19
+	Y_NEWLINE  shift 12
+	Y_BEGIN  reduce 25
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 17
+	var_decls  goto 14
+	var_decl_block  goto 15
+	var_decl_line  goto 16
+	var_decl_stmt  goto 18
+	typedefs  goto 22
+
+state 7
+	script_body :  begin_stmt_$$15 s_list opnl end_stmt 
+	$$15 : _    (15)
+
+	.  reduce 15
+
+	$$15  goto 33
+
+state 8
+	proc_stmt :  Y_PROCEDURE_$$17 param bparam_list EOST 
+	$$17 : _    (17)
+
+	.  reduce 17
+
+	$$17  goto 34
+
+state 9
+	begin_stmt :  Y_BEGIN_NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 35
+
+state 10
+	block :  block $$3_debug xstmt 
+	debug : _    (8)
+
+	D_D  shift 38
+	D_PEEK  shift 39
+	~  shift 40
+	.  reduce 8
+
+	debug  goto 36
+	D_XXX  goto 37
+
+state 11
+	block :  . NL_    (2)
+
+	.  reduce 2
+
+
+state 12
+	NL :  Y_NEWLINE_    (271)
+
+	.  reduce 271
+
+
+state 13
+	block :  error NL_    (7)
+
+	.  reduce 7
+
+
+state 14
+	script_params :  proc_stmt var_decls_begin_stmt 
+
+	Y_BEGIN  shift 9
+	.  error
+
+	begin_stmt  goto 41
+
+state 15
+	var_decls :  var_decl_block_    (26)
+	var_decl_block :  var_decl_block_var_decl_line 
+
+	error  shift 19
+	Y_NEWLINE  shift 12
+	Y_BEGIN  reduce 26
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 17
+	var_decl_line  goto 42
+	var_decl_stmt  goto 18
+	typedefs  goto 22
+
+state 16
+	var_decl_block :  var_decl_line_    (27)
+
+	.  reduce 27
+
+
+state 17
+	var_decl_line :  EOST_    (29)
+
+	.  reduce 29
+
+
+state 18
+	var_decl_line :  var_decl_stmt_    (30)
+
+	.  reduce 30
+
+
+state 19
+	var_decl_line :  error_NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 43
+
+state 20
+	EOST :  NL_    (262)
+
+	.  reduce 262
+
+
+state 21
+	EOST :  ;_    (263)
+
+	.  reduce 263
+
+
+state 22
+	var_decl_stmt :  typedefs_$$32 var_decl_list EOST 
+	$$32 : _    (32)
+
+	.  reduce 32
+
+	$$32  goto 44
+
+state 23
+	typedefs :  Y_BOOL_    (34)
+
+	.  reduce 34
+
+
+state 24
+	typedefs :  Y_STRING_    (35)
+
+	.  reduce 35
+
+
+state 25
+	typedefs :  Y_REAL_    (36)
+
+	.  reduce 36
+
+
+state 26
+	typedefs :  Y_FILE_    (37)
+
+	.  reduce 37
+
+
+state 27
+	typedefs :  Y_GCUR_    (38)
+
+	.  reduce 38
+
+
+state 28
+	typedefs :  Y_IMCUR_    (39)
+
+	.  reduce 39
+
+
+state 29
+	typedefs :  Y_UKEY_    (40)
+
+	.  reduce 40
+
+
+state 30
+	typedefs :  Y_PSET_    (41)
+
+	.  reduce 41
+
+
+state 31
+	typedefs :  Y_INT_    (42)
+
+	.  reduce 42
+
+
+state 32
+	typedefs :  Y_STRUCT_    (43)
+
+	.  reduce 43
+
+
+state 33
+	script_body :  begin_stmt $$15_s_list opnl end_stmt 
+	s_list : _    (150)
+
+	.  reduce 150
+
+	s_list  goto 45
+
+state 34
+	proc_stmt :  Y_PROCEDURE $$17_param bparam_list EOST 
+
+	Y_IDENT  shift 47
+	.  error
+
+	param  goto 46
+
+state 35
+	begin_stmt :  Y_BEGIN NL_    (76)
+
+	.  reduce 76
+
+
+state 36
+	block :  block $$3 debug_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 48
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 37
+	debug :  D_XXX_EOST $$9 debug 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 52
+
+state 38
+	D_XXX :  D_D_    (11)
+
+	.  reduce 11
+
+
+state 39
+	D_XXX :  D_PEEK_Y_CONSTANT 
+
+	Y_CONSTANT  shift 53
+	.  error
+
+
+state 40
+	D_XXX :  ~_    (13)
+
+	.  reduce 13
+
+
+state 41
+	script_params :  proc_stmt var_decls begin_stmt_    (14)
+
+	.  reduce 14
+
+
+state 42
+	var_decl_block :  var_decl_block var_decl_line_    (28)
+
+	.  reduce 28
+
+
+state 43
+	var_decl_line :  error NL_    (31)
+
+	.  reduce 31
+
+
+state 44
+	var_decl_stmt :  typedefs $$32_var_decl_list EOST 
+
+	Y_IDENT  shift 47
+	*  shift 60
+	.  error
+
+	param  goto 59
+	var_decl_list  goto 54
+	var_decl_plus  goto 55
+	var_decl  goto 56
+	var_def  goto 57
+	var_name  goto 58
+
+state 45
+	script_body :  begin_stmt $$15 s_list_opnl end_stmt 
+	s_list :  s_list_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 61
+
+state 46
+	proc_stmt :  Y_PROCEDURE $$17 param_bparam_list EOST 
+	bparam_list : _    (19)
+
+	(  shift 65
+	.  reduce 19
+
+	bparam_list  goto 63
+	LP  goto 64
+
+state 47
+	param :  Y_IDENT_    (260)
+
+	.  reduce 260
+
+
+state 48
+	block :  block $$3 debug xstmt_    (4)
+
+	.  reduce 4
+
+
+state 49
+	xstmt :  $$240_stmt 
+
+	Y_OSESC  shift 93
+	Y_IDENT  shift 105
+	Y_WHILE  shift 96
+	Y_IF  shift 111
+	Y_FOR  shift 97
+	Y_BREAK  shift 102
+	Y_NEXT  shift 101
+	Y_SWITCH  shift 98
+	Y_CASE  shift 99
+	Y_DEFAULT  shift 100
+	Y_RETURN  shift 104
+	Y_GOTO  shift 103
+	Y_IFERR  shift 113
+	Y_IFNOERR  shift 114
+	=  shift 110
+	{  shift 107
+	;  shift 106
+	.  error
+
+	param  goto 108
+	ref  goto 90
+	stmt  goto 66
+	c_stmt  goto 67
+	assign  goto 68
+	cmdlist  goto 69
+	immed  goto 70
+	inspect  goto 71
+	osesc  goto 72
+	popstk  goto 73
+	if  goto 74
+	ifelse  goto 75
+	iferr  goto 76
+	iferr_else  goto 77
+	while  goto 78
+	for  goto 79
+	switch  goto 80
+	case  goto 81
+	default  goto 82
+	next  goto 83
+	break  goto 84
+	goto  goto 85
+	return  goto 86
+	label_stmt  goto 87
+	nullstmt  goto 88
+	c_blk  goto 89
+	equals  goto 92
+	command  goto 91
+	tasknam  goto 109
+	iferr_stat  goto 95
+	iferr_tok  goto 112
+	if_stat  goto 94
+
+state 50
+	xstmt :  var_decl_stmt_    (242)
+
+	.  reduce 242
+
+
+state 51
+	xstmt :  error_NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 115
+
+state 52
+	debug :  D_XXX EOST_$$9 debug 
+	$$9 : _    (9)
+
+	.  reduce 9
+
+	$$9  goto 116
+
+state 53
+	D_XXX :  D_PEEK Y_CONSTANT_    (12)
+
+	.  reduce 12
+
+
+state 54
+	var_decl_stmt :  typedefs $$32 var_decl_list_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 117
+
+state 55
+	var_decl_list :  var_decl_plus_    (44)
+	var_decl_list :  var_decl_plus_DELIM var_decl_list 
+
+	,  shift 119
+	.  reduce 44
+
+	DELIM  goto 118
+
+state 56
+	var_decl_plus :  var_decl_    (46)
+	var_decl_plus :  var_decl_{ options_list ; } 
+
+	{  shift 120
+	.  reduce 46
+
+
+state 57
+	var_decl :  var_def_    (48)
+	var_decl :  var_def_= $$49 init_list 
+
+	=  shift 121
+	.  reduce 48
+
+
+state 58
+	var_def :  var_name_    (51)
+	var_def :  var_name_$$52 [ init_index_list ] 
+	$$52 : _    (52)
+
+	[  reduce 52
+	.  reduce 51
+
+	$$52  goto 122
+
+state 59
+	var_name :  param_    (54)
+
+	.  reduce 54
+
+
+state 60
+	var_name :  *_param 
+
+	Y_IDENT  shift 47
+	.  error
+
+	param  goto 123
+
+state 61
+	script_body :  begin_stmt $$15 s_list opnl_end_stmt 
+	s_list :  s_list opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_END  shift 126
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 125
+	end_stmt  goto 124
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 62
+	opnl :  NL_    (248)
+
+	.  reduce 248
+
+
+state 63
+	proc_stmt :  Y_PROCEDURE $$17 param bparam_list_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 127
+
+state 64
+	bparam_list :  LP_param_list RP 
+	param_list : _    (21)
+
+	Y_IDENT  shift 47
+	.  reduce 21
+
+	param  goto 130
+	param_list  goto 128
+	xparam_list  goto 129
+
+state 65
+	LP :  (_    (269)
+
+	.  reduce 269
+
+
+state 66
+	xstmt :  $$240 stmt_    (241)
+
+	.  reduce 241
+
+
+state 67
+	stmt :  c_stmt_    (123)
+
+	.  reduce 123
+
+
+state 68
+	stmt :  assign_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 131
+
+state 69
+	stmt :  cmdlist_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 132
+
+state 70
+	stmt :  immed_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 133
+
+state 71
+	stmt :  inspect_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 134
+
+state 72
+	stmt :  osesc_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 135
+
+state 73
+	stmt :  popstk_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 136
+
+state 74
+	stmt :  if_    (130)
+
+	.  reduce 130
+
+
+state 75
+	stmt :  ifelse_    (131)
+
+	.  reduce 131
+
+
+state 76
+	stmt :  iferr_    (132)
+
+	.  reduce 132
+
+
+state 77
+	stmt :  iferr_else_    (133)
+
+	.  reduce 133
+
+
+state 78
+	stmt :  while_    (134)
+
+	.  reduce 134
+
+
+state 79
+	stmt :  for_    (135)
+
+	.  reduce 135
+
+
+state 80
+	stmt :  switch_    (136)
+
+	.  reduce 136
+
+
+state 81
+	stmt :  case_    (137)
+
+	.  reduce 137
+
+
+state 82
+	stmt :  default_    (138)
+
+	.  reduce 138
+
+
+state 83
+	stmt :  next_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 137
+
+state 84
+	stmt :  break_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 138
+
+state 85
+	stmt :  goto_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 139
+
+state 86
+	stmt :  return_EOST 
+
+	Y_NEWLINE  shift 12
+	;  shift 21
+	.  error
+
+	NL  goto 20
+	EOST  goto 140
+
+state 87
+	stmt :  label_stmt_    (143)
+
+	.  reduce 143
+
+
+state 88
+	stmt :  nullstmt_    (144)
+
+	.  reduce 144
+
+
+89: shift/reduce conflict (shift 12, red'n 145) on Y_NEWLINE
+state 89
+	c_stmt :  c_blk_    (145)
+	c_stmt :  c_blk_NL 
+
+	Y_NEWLINE  shift 12
+	.  reduce 145
+
+	NL  goto 141
+
+state 90
+	assign :  ref_equals expr0 
+	assign :  ref_equals ref 
+	assign :  ref_$$154 assign_oper expr 
+	inspect :  ref_equals 
+	$$154 : _    (154)
+
+	=  shift 110
+	.  reduce 154
+
+	equals  goto 142
+	$$154  goto 143
+
+state 91
+	cmdlist :  command_$$162 cmdpipe 
+	$$162 : _    (162)
+
+	.  reduce 162
+
+	$$162  goto 144
+
+state 92
+	immed :  equals_expr0 
+	immed :  equals_ref 
+	popstk :  equals_    (196)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 196
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 145
+	ref  goto 146
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 93
+	osesc :  Y_OSESC_    (195)
+
+	.  reduce 195
+
+
+94: shift/reduce conflict (shift 166, red'n 207) on Y_ELSE
+state 94
+	if :  if_stat_    (207)
+	ifelse :  if_stat_Y_ELSE $$210 opnl xstmt 
+
+	Y_ELSE  shift 166
+	.  reduce 207
+
+
+95: shift/reduce conflict (shift 167, red'n 197) on Y_ELSE
+state 95
+	iferr :  iferr_stat_    (197)
+	iferr_else :  iferr_stat_Y_ELSE $$201 opnl xstmt 
+
+	Y_ELSE  shift 167
+	.  reduce 197
+
+
+state 96
+	while :  Y_WHILE_LP $$212 expr RP $$213 opnl xstmt 
+
+	(  shift 65
+	.  error
+
+	LP  goto 168
+
+state 97
+	for :  Y_FOR_LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+
+	(  shift 65
+	.  error
+
+	LP  goto 169
+
+state 98
+	switch :  Y_SWITCH_opnl LP opnl expr opnl RP opnl $$223 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 170
+
+state 99
+	case :  Y_CASE_$$225 const_expr_list : opnl $$226 xstmt 
+	$$225 : _    (225)
+
+	.  reduce 225
+
+	$$225  goto 171
+
+state 100
+	default :  Y_DEFAULT_: opnl $$228 xstmt 
+
+	:  shift 172
+	.  error
+
+
+state 101
+	next :  Y_NEXT_    (230)
+
+	.  reduce 230
+
+
+state 102
+	break :  Y_BREAK_    (231)
+
+	.  reduce 231
+
+
+state 103
+	goto :  Y_GOTO_Y_IDENT 
+
+	Y_IDENT  shift 173
+	.  error
+
+
+state 104
+	return :  Y_RETURN_    (232)
+	return :  Y_RETURN_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 232
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 174
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 105
+	label_stmt :  Y_IDENT_: opnl $$235 xstmt 
+	param :  Y_IDENT_    (260)
+	tasknam :  Y_IDENT_    (261)
+
+	=  reduce 260
+	YOP_AOADD  reduce 260
+	YOP_AOSUB  reduce 260
+	YOP_AOMUL  reduce 260
+	YOP_AODIV  reduce 260
+	YOP_AOCAT  reduce 260
+	[  reduce 260
+	:  shift 177
+	.  reduce 261
+
+
+106: shift/reduce conflict (shift 12, red'n 238) on Y_NEWLINE
+state 106
+	nullstmt :  ;_    (238)
+	nullstmt :  ;_NL 
+
+	Y_NEWLINE  shift 12
+	.  reduce 238
+
+	NL  goto 178
+
+state 107
+	c_blk :  {_$$147 s_list opnl $$148 } 
+	$$147 : _    (147)
+
+	.  reduce 147
+
+	$$147  goto 179
+
+state 108
+	ref :  param_    (249)
+	ref :  param_$$250 [ index_list ] 
+	$$250 : _    (250)
+
+	[  reduce 250
+	.  reduce 249
+
+	$$250  goto 180
+
+state 109
+	command :  tasknam_$$169 BARG $$170 args EARG 
+	$$169 : _    (169)
+
+	.  reduce 169
+
+	$$169  goto 181
+
+state 110
+	equals :  =_    (156)
+
+	.  reduce 156
+
+
+state 111
+	if_stat :  Y_IF_LP expr RP $$208 opnl xstmt 
+
+	(  shift 65
+	.  error
+
+	LP  goto 182
+
+state 112
+	iferr_stat :  iferr_tok_$$198 c_blk $$199 op_then opnl xstmt 
+	$$198 : _    (198)
+
+	.  reduce 198
+
+	$$198  goto 183
+
+state 113
+	iferr_tok :  Y_IFERR_    (203)
+
+	.  reduce 203
+
+
+state 114
+	iferr_tok :  Y_IFNOERR_    (204)
+
+	.  reduce 204
+
+
+state 115
+	xstmt :  error NL_    (243)
+
+	.  reduce 243
+
+
+state 116
+	debug :  D_XXX EOST $$9_debug 
+	debug : _    (8)
+
+	D_D  shift 38
+	D_PEEK  shift 39
+	~  shift 40
+	.  reduce 8
+
+	debug  goto 184
+	D_XXX  goto 37
+
+state 117
+	var_decl_stmt :  typedefs $$32 var_decl_list EOST_    (33)
+
+	.  reduce 33
+
+
+state 118
+	var_decl_list :  var_decl_plus DELIM_var_decl_list 
+
+	Y_IDENT  shift 47
+	*  shift 60
+	.  error
+
+	param  goto 59
+	var_decl_list  goto 185
+	var_decl_plus  goto 55
+	var_decl  goto 56
+	var_def  goto 57
+	var_name  goto 58
+
+state 119
+	DELIM :  ,_    (264)
+
+	.  reduce 264
+
+
+state 120
+	var_decl_plus :  var_decl {_options_list ; } 
+
+	Y_CONSTANT  shift 192
+	Y_IDENT  shift 193
+	+  shift 196
+	-  shift 197
+	.  error
+
+	options_list  goto 186
+	init_list  goto 187
+	const  goto 191
+	init_elem  goto 189
+	number  goto 194
+	sign  goto 195
+	options  goto 188
+	option  goto 190
+
+state 121
+	var_decl :  var_def =_$$49 init_list 
+	$$49 : _    (49)
+
+	.  reduce 49
+
+	$$49  goto 198
+
+state 122
+	var_def :  var_name $$52_[ init_index_list ] 
+
+	[  shift 199
+	.  error
+
+
+state 123
+	var_name :  * param_    (55)
+
+	.  reduce 55
+
+
+state 124
+	script_body :  begin_stmt $$15 s_list opnl end_stmt_    (16)
+
+	.  reduce 16
+
+
+state 125
+	s_list :  s_list opnl xstmt_    (151)
+
+	.  reduce 151
+
+
+state 126
+	end_stmt :  Y_END_NL 
+
+	Y_NEWLINE  shift 12
+	.  error
+
+	NL  goto 200
+
+state 127
+	proc_stmt :  Y_PROCEDURE $$17 param bparam_list EOST_    (18)
+
+	.  reduce 18
+
+
+state 128
+	bparam_list :  LP param_list_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 201
+
+state 129
+	param_list :  xparam_list_    (22)
+	xparam_list :  xparam_list_DELIM param 
+
+	,  shift 119
+	.  reduce 22
+
+	DELIM  goto 203
+
+state 130
+	xparam_list :  param_    (23)
+
+	.  reduce 23
+
+
+state 131
+	stmt :  assign EOST_    (124)
+
+	.  reduce 124
+
+
+state 132
+	stmt :  cmdlist EOST_    (125)
+
+	.  reduce 125
+
+
+state 133
+	stmt :  immed EOST_    (126)
+
+	.  reduce 126
+
+
+state 134
+	stmt :  inspect EOST_    (127)
+
+	.  reduce 127
+
+
+state 135
+	stmt :  osesc EOST_    (128)
+
+	.  reduce 128
+
+
+state 136
+	stmt :  popstk EOST_    (129)
+
+	.  reduce 129
+
+
+state 137
+	stmt :  next EOST_    (139)
+
+	.  reduce 139
+
+
+state 138
+	stmt :  break EOST_    (140)
+
+	.  reduce 140
+
+
+state 139
+	stmt :  goto EOST_    (141)
+
+	.  reduce 141
+
+
+state 140
+	stmt :  return EOST_    (142)
+
+	.  reduce 142
+
+
+state 141
+	c_stmt :  c_blk NL_    (146)
+
+	.  reduce 146
+
+
+state 142
+	assign :  ref equals_expr0 
+	assign :  ref equals_ref 
+	inspect :  ref equals_    (194)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 194
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 204
+	ref  goto 205
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 143
+	assign :  ref $$154_assign_oper expr 
+
+	YOP_AOADD  shift 207
+	YOP_AOSUB  shift 208
+	YOP_AOMUL  shift 209
+	YOP_AODIV  shift 210
+	YOP_AOCAT  shift 211
+	.  error
+
+	assign_oper  goto 206
+
+state 144
+	cmdlist :  command $$162_cmdpipe 
+	cmdpipe : _    (164)
+
+	.  reduce 164
+
+	cmdpipe  goto 212
+
+state 145
+	expr :  expr0_    (77)
+	immed :  equals expr0_    (192)
+
+	Y_NEWLINE  reduce 192
+	;  reduce 192
+	.  reduce 77
+
+
+state 146
+	expr :  ref_    (78)
+	immed :  equals ref_    (193)
+
+	Y_NEWLINE  reduce 193
+	;  reduce 193
+	.  reduce 78
+
+
+state 147
+	expr0 :  expr1_    (79)
+
+	.  reduce 79
+
+
+state 148
+	expr0 :  Y_CONSTANT_    (80)
+
+	.  reduce 80
+
+
+state 149
+	expr0 :  Y_GCUR_    (81)
+
+	.  reduce 81
+
+
+state 150
+	expr0 :  Y_IMCUR_    (82)
+
+	.  reduce 82
+
+
+state 151
+	expr0 :  Y_UKEY_    (83)
+
+	.  reduce 83
+
+
+state 152
+	expr0 :  Y_PSET_    (84)
+
+	.  reduce 84
+
+
+state 153
+	expr1 :  LP_expr RP 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 213
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 154
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  error
+
+
+state 155
+	expr1 :  YOP_NOT_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 229
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 156
+	expr1 :  -_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 230
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 157
+	expr1 :  Y_SCAN_LP $$103 scanarg RP 
+
+	(  shift 65
+	.  error
+
+	LP  goto 231
+
+state 158
+	expr1 :  Y_SCANF_LP $$105 scanfmt DELIM scanarg RP 
+
+	(  shift 65
+	.  error
+
+	LP  goto 232
+
+state 159
+	expr1 :  Y_FSCAN_LP $$107 scanarg RP 
+
+	(  shift 65
+	.  error
+
+	LP  goto 233
+
+state 160
+	expr1 :  Y_FSCANF_LP Y_IDENT DELIM $$109 scanfmt DELIM scanarg RP 
+
+	(  shift 65
+	.  error
+
+	LP  goto 234
+
+state 161
+	expr1 :  intrinsx_LP $$111 intrarg RP 
+
+	(  shift 65
+	.  error
+
+	LP  goto 235
+
+state 162
+	intrins :  Y_IDENT_    (259)
+	param :  Y_IDENT_    (260)
+
+	(  reduce 259
+	.  reduce 260
+
+
+state 163
+	intrinsx :  intrins_    (113)
+
+	.  reduce 113
+
+
+state 164
+	intrinsx :  Y_INT_    (114)
+
+	.  reduce 114
+
+
+state 165
+	intrinsx :  Y_REAL_    (115)
+
+	.  reduce 115
+
+
+state 166
+	ifelse :  if_stat Y_ELSE_$$210 opnl xstmt 
+	$$210 : _    (210)
+
+	.  reduce 210
+
+	$$210  goto 236
+
+state 167
+	iferr_else :  iferr_stat Y_ELSE_$$201 opnl xstmt 
+	$$201 : _    (201)
+
+	.  reduce 201
+
+	$$201  goto 237
+
+state 168
+	while :  Y_WHILE LP_$$212 expr RP $$213 opnl xstmt 
+	$$212 : _    (212)
+
+	.  reduce 212
+
+	$$212  goto 238
+
+state 169
+	for :  Y_FOR LP_opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 239
+
+state 170
+	switch :  Y_SWITCH opnl_LP opnl expr opnl RP opnl $$223 xstmt 
+
+	(  shift 65
+	.  error
+
+	LP  goto 240
+
+state 171
+	case :  Y_CASE $$225_const_expr_list : opnl $$226 xstmt 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 243
+	number  goto 194
+	sign  goto 195
+	const_expr_list  goto 241
+	const_expr  goto 242
+
+state 172
+	default :  Y_DEFAULT :_opnl $$228 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 245
+
+state 173
+	goto :  Y_GOTO Y_IDENT_    (237)
+
+	.  reduce 237
+
+
+state 174
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	return :  Y_RETURN expr_    (233)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 233
+
+
+state 175
+	expr :  expr0_    (77)
+
+	.  reduce 77
+
+
+state 176
+	expr :  ref_    (78)
+
+	.  reduce 78
+
+
+state 177
+	label_stmt :  Y_IDENT :_opnl $$235 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 246
+
+state 178
+	nullstmt :  ; NL_    (239)
+
+	.  reduce 239
+
+
+state 179
+	c_blk :  { $$147_s_list opnl $$148 } 
+	s_list : _    (150)
+
+	.  reduce 150
+
+	s_list  goto 247
+
+state 180
+	ref :  param $$250_[ index_list ] 
+
+	[  shift 248
+	.  error
+
+
+181: shift/reduce conflict (shift 65, red'n 265) on (
+state 181
+	command :  tasknam $$169_BARG $$170 args EARG 
+	BARG : _    (265)
+
+	(  shift 65
+	.  reduce 265
+
+	LP  goto 250
+	BARG  goto 249
+
+state 182
+	if_stat :  Y_IF LP_expr RP $$208 opnl xstmt 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 251
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 183
+	iferr_stat :  iferr_tok $$198_c_blk $$199 op_then opnl xstmt 
+
+	{  shift 107
+	.  error
+
+	c_blk  goto 252
+
+state 184
+	debug :  D_XXX EOST $$9 debug_    (10)
+
+	.  reduce 10
+
+
+state 185
+	var_decl_list :  var_decl_plus DELIM var_decl_list_    (45)
+
+	.  reduce 45
+
+
+state 186
+	var_decl_plus :  var_decl { options_list_; } 
+
+	;  shift 253
+	.  error
+
+
+state 187
+	init_list :  init_list_DELIM init_elem 
+	options_list :  init_list_DELIM options 
+	options_list :  init_list_    (71)
+
+	,  shift 119
+	.  reduce 71
+
+	DELIM  goto 254
+
+state 188
+	options_list :  options_    (72)
+	options :  options_DELIM option 
+
+	,  shift 119
+	.  reduce 72
+
+	DELIM  goto 255
+
+state 189
+	init_list :  init_elem_    (61)
+
+	.  reduce 61
+
+
+state 190
+	options :  option_    (73)
+
+	.  reduce 73
+
+
+state 191
+	init_elem :  const_    (63)
+
+	.  reduce 63
+
+
+state 192
+	init_elem :  Y_CONSTANT_LP const RP 
+	const :  Y_CONSTANT_    (65)
+
+	(  shift 65
+	.  reduce 65
+
+	LP  goto 256
+
+state 193
+	option :  Y_IDENT_= const 
+
+	=  shift 257
+	.  error
+
+
+state 194
+	const :  number_    (66)
+
+	.  reduce 66
+
+
+state 195
+	number :  sign_Y_CONSTANT 
+
+	Y_CONSTANT  shift 258
+	.  error
+
+
+state 196
+	sign :  +_    (68)
+
+	.  reduce 68
+
+
+state 197
+	sign :  -_    (69)
+
+	.  reduce 69
+
+
+state 198
+	var_decl :  var_def = $$49_init_list 
+
+	Y_CONSTANT  shift 192
+	+  shift 196
+	-  shift 197
+	.  error
+
+	init_list  goto 259
+	const  goto 191
+	init_elem  goto 189
+	number  goto 194
+	sign  goto 195
+
+state 199
+	var_def :  var_name $$52 [_init_index_list ] 
+	init_index_list : _    (56)
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  reduce 56
+
+	init_index_list  goto 260
+	init_index_range  goto 261
+	const  goto 262
+	number  goto 194
+	sign  goto 195
+
+state 200
+	end_stmt :  Y_END NL_    (234)
+
+	.  reduce 234
+
+
+state 201
+	bparam_list :  LP param_list RP_    (20)
+
+	.  reduce 20
+
+
+state 202
+	RP :  )_    (270)
+
+	.  reduce 270
+
+
+state 203
+	xparam_list :  xparam_list DELIM_param 
+
+	Y_IDENT  shift 47
+	.  error
+
+	param  goto 263
+
+state 204
+	expr :  expr0_    (77)
+	assign :  ref equals expr0_    (152)
+
+	Y_NEWLINE  reduce 152
+	;  reduce 152
+	)  reduce 152
+	.  reduce 77
+
+
+state 205
+	expr :  ref_    (78)
+	assign :  ref equals ref_    (153)
+
+	Y_NEWLINE  reduce 153
+	;  reduce 153
+	)  reduce 153
+	.  reduce 78
+
+
+state 206
+	assign :  ref $$154 assign_oper_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 264
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 207
+	assign_oper :  YOP_AOADD_    (157)
+
+	.  reduce 157
+
+
+state 208
+	assign_oper :  YOP_AOSUB_    (158)
+
+	.  reduce 158
+
+
+state 209
+	assign_oper :  YOP_AOMUL_    (159)
+
+	.  reduce 159
+
+
+state 210
+	assign_oper :  YOP_AODIV_    (160)
+
+	.  reduce 160
+
+
+state 211
+	assign_oper :  YOP_AOCAT_    (161)
+
+	.  reduce 161
+
+
+state 212
+	cmdlist :  command $$162 cmdpipe_    (163)
+	cmdpipe :  cmdpipe_pipe $$165 command 
+
+	Y_ALLPIPE  shift 267
+	|  shift 266
+	.  reduce 163
+
+	pipe  goto 265
+
+state 213
+	expr1 :  LP expr_RP 
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	)  shift 202
+	.  error
+
+	RP  goto 268
+
+state 214
+	expr1 :  expr +_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 269
+
+state 215
+	expr1 :  expr -_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 270
+
+state 216
+	expr1 :  expr *_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 271
+
+state 217
+	expr1 :  expr /_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 272
+
+state 218
+	expr1 :  expr YOP_POW_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 273
+
+state 219
+	expr1 :  expr %_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 274
+
+state 220
+	expr1 :  expr YOP_CONCAT_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 275
+
+state 221
+	expr1 :  expr <_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 276
+
+state 222
+	expr1 :  expr >_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 277
+
+state 223
+	expr1 :  expr YOP_LE_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 278
+
+state 224
+	expr1 :  expr YOP_GE_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 279
+
+state 225
+	expr1 :  expr YOP_EQ_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 280
+
+state 226
+	expr1 :  expr YOP_NE_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 281
+
+state 227
+	expr1 :  expr YOP_OR_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 282
+
+state 228
+	expr1 :  expr YOP_AND_opnl expr 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 283
+
+state 229
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	expr1 :  YOP_NOT expr_    (101)
+
+	YOP_POW  shift 218
+	.  reduce 101
+
+
+state 230
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	expr1 :  - expr_    (102)
+
+	YOP_POW  shift 218
+	.  reduce 102
+
+
+state 231
+	expr1 :  Y_SCAN LP_$$103 scanarg RP 
+	$$103 : _    (103)
+
+	.  reduce 103
+
+	$$103  goto 284
+
+state 232
+	expr1 :  Y_SCANF LP_$$105 scanfmt DELIM scanarg RP 
+	$$105 : _    (105)
+
+	.  reduce 105
+
+	$$105  goto 285
+
+state 233
+	expr1 :  Y_FSCAN LP_$$107 scanarg RP 
+	$$107 : _    (107)
+
+	.  reduce 107
+
+	$$107  goto 286
+
+state 234
+	expr1 :  Y_FSCANF LP_Y_IDENT DELIM $$109 scanfmt DELIM scanarg RP 
+
+	Y_IDENT  shift 287
+	.  error
+
+
+state 235
+	expr1 :  intrinsx LP_$$111 intrarg RP 
+	$$111 : _    (111)
+
+	.  reduce 111
+
+	$$111  goto 288
+
+state 236
+	ifelse :  if_stat Y_ELSE $$210_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 289
+
+state 237
+	iferr_else :  iferr_stat Y_ELSE $$201_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 290
+
+state 238
+	while :  Y_WHILE LP $$212_expr RP $$213 opnl xstmt 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 291
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 239
+	for :  Y_FOR LP opnl_xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+	xassign : _    (220)
+
+	Y_IDENT  shift 47
+	.  reduce 220
+
+	param  goto 108
+	ref  goto 294
+	assign  goto 293
+	xassign  goto 292
+
+state 240
+	switch :  Y_SWITCH opnl LP_opnl expr opnl RP opnl $$223 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 295
+
+state 241
+	case :  Y_CASE $$225 const_expr_list_: opnl $$226 xstmt 
+
+	:  shift 296
+	.  error
+
+
+state 242
+	const_expr_list :  const_expr_    (244)
+	const_expr_list :  const_expr_DELIM const_expr_list 
+
+	,  shift 119
+	.  reduce 244
+
+	DELIM  goto 297
+
+state 243
+	const_expr :  const_    (246)
+
+	.  reduce 246
+
+
+state 244
+	const :  Y_CONSTANT_    (65)
+
+	.  reduce 65
+
+
+state 245
+	default :  Y_DEFAULT : opnl_$$228 xstmt 
+	$$228 : _    (228)
+
+	.  reduce 228
+
+	$$228  goto 298
+
+state 246
+	label_stmt :  Y_IDENT : opnl_$$235 xstmt 
+	$$235 : _    (235)
+
+	.  reduce 235
+
+	$$235  goto 299
+
+state 247
+	c_blk :  { $$147 s_list_opnl $$148 } 
+	s_list :  s_list_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 300
+
+state 248
+	ref :  param $$250 [_index_list ] 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 306
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	*  shift 305
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 175
+	ref  goto 304
+	expr1  goto 303
+	intrinsx  goto 161
+	intrins  goto 163
+	index_list  goto 301
+	index  goto 302
+
+state 249
+	command :  tasknam $$169 BARG_$$170 args EARG 
+	$$170 : _    (170)
+
+	.  reduce 170
+
+	$$170  goto 307
+
+state 250
+	BARG :  LP_    (266)
+
+	.  reduce 266
+
+
+state 251
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	if_stat :  Y_IF LP expr_RP $$208 opnl xstmt 
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	)  shift 202
+	.  error
+
+	RP  goto 308
+
+state 252
+	iferr_stat :  iferr_tok $$198 c_blk_$$199 op_then opnl xstmt 
+	$$199 : _    (199)
+
+	.  reduce 199
+
+	$$199  goto 309
+
+state 253
+	var_decl_plus :  var_decl { options_list ;_} 
+
+	}  shift 310
+	.  error
+
+
+state 254
+	init_list :  init_list DELIM_init_elem 
+	options_list :  init_list DELIM_options 
+
+	Y_CONSTANT  shift 192
+	Y_IDENT  shift 193
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 191
+	init_elem  goto 311
+	number  goto 194
+	sign  goto 195
+	options  goto 312
+	option  goto 190
+
+state 255
+	options :  options DELIM_option 
+
+	Y_IDENT  shift 193
+	.  error
+
+	option  goto 313
+
+state 256
+	init_elem :  Y_CONSTANT LP_const RP 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 314
+	number  goto 194
+	sign  goto 195
+
+state 257
+	option :  Y_IDENT =_const 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 315
+	number  goto 194
+	sign  goto 195
+
+state 258
+	number :  sign Y_CONSTANT_    (67)
+
+	.  reduce 67
+
+
+259: shift/reduce conflict (shift 119, red'n 50) on ,
+state 259
+	var_decl :  var_def = $$49 init_list_    (50)
+	init_list :  init_list_DELIM init_elem 
+
+	,  shift 119
+	.  reduce 50
+
+	DELIM  goto 316
+
+state 260
+	var_def :  var_name $$52 [ init_index_list_] 
+	init_index_list :  init_index_list_DELIM init_index_range 
+
+	]  shift 317
+	,  shift 119
+	.  error
+
+	DELIM  goto 318
+
+state 261
+	init_index_list :  init_index_range_    (57)
+
+	.  reduce 57
+
+
+state 262
+	init_index_range :  const_    (59)
+	init_index_range :  const_: const 
+
+	:  shift 319
+	.  reduce 59
+
+
+state 263
+	xparam_list :  xparam_list DELIM param_    (24)
+
+	.  reduce 24
+
+
+state 264
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	assign :  ref $$154 assign_oper expr_    (155)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 155
+
+
+state 265
+	cmdpipe :  cmdpipe pipe_$$165 command 
+	$$165 : _    (165)
+
+	.  reduce 165
+
+	$$165  goto 320
+
+state 266
+	pipe :  |_opnl 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 321
+
+state 267
+	pipe :  Y_ALLPIPE_opnl 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 322
+
+state 268
+	expr1 :  LP expr RP_    (85)
+
+	.  reduce 85
+
+
+state 269
+	expr1 :  expr + opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 323
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 270
+	expr1 :  expr - opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 324
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 271
+	expr1 :  expr * opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 325
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 272
+	expr1 :  expr / opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 326
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 273
+	expr1 :  expr YOP_POW opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 327
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 274
+	expr1 :  expr % opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 328
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 275
+	expr1 :  expr YOP_CONCAT opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 329
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 276
+	expr1 :  expr < opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 330
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 277
+	expr1 :  expr > opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 331
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 278
+	expr1 :  expr YOP_LE opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 332
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 279
+	expr1 :  expr YOP_GE opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 333
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 280
+	expr1 :  expr YOP_EQ opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 334
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 281
+	expr1 :  expr YOP_NE opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 335
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 282
+	expr1 :  expr YOP_OR opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 336
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 283
+	expr1 :  expr YOP_AND opnl_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 337
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 284
+	expr1 :  Y_SCAN LP $$103_scanarg RP 
+	scanarg : _    (117)
+
+	Y_IDENT  shift 339
+	.  reduce 117
+
+	scanarg  goto 338
+
+state 285
+	expr1 :  Y_SCANF LP $$105_scanfmt DELIM scanarg RP 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 341
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	scanfmt  goto 340
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 286
+	expr1 :  Y_FSCAN LP $$107_scanarg RP 
+	scanarg : _    (117)
+
+	Y_IDENT  shift 339
+	.  reduce 117
+
+	scanarg  goto 342
+
+state 287
+	expr1 :  Y_FSCANF LP Y_IDENT_DELIM $$109 scanfmt DELIM scanarg RP 
+
+	,  shift 119
+	.  error
+
+	DELIM  goto 343
+
+state 288
+	expr1 :  intrinsx LP $$111_intrarg RP 
+	intrarg : _    (120)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 120
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 345
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrarg  goto 344
+	intrins  goto 163
+
+state 289
+	ifelse :  if_stat Y_ELSE $$210 opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 346
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 290
+	iferr_else :  iferr_stat Y_ELSE $$201 opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 347
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 291
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	while :  Y_WHILE LP $$212 expr_RP $$213 opnl xstmt 
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	)  shift 202
+	.  error
+
+	RP  goto 348
+
+state 292
+	for :  Y_FOR LP opnl xassign_; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+
+	;  shift 349
+	.  error
+
+
+state 293
+	xassign :  assign_    (219)
+
+	.  reduce 219
+
+
+state 294
+	assign :  ref_equals expr0 
+	assign :  ref_equals ref 
+	assign :  ref_$$154 assign_oper expr 
+	$$154 : _    (154)
+
+	=  shift 110
+	.  reduce 154
+
+	equals  goto 350
+	$$154  goto 143
+
+state 295
+	switch :  Y_SWITCH opnl LP opnl_expr opnl RP opnl $$223 xstmt 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 351
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 296
+	case :  Y_CASE $$225 const_expr_list :_opnl $$226 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 352
+
+state 297
+	const_expr_list :  const_expr DELIM_const_expr_list 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 243
+	number  goto 194
+	sign  goto 195
+	const_expr_list  goto 353
+	const_expr  goto 242
+
+state 298
+	default :  Y_DEFAULT : opnl $$228_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 354
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 299
+	label_stmt :  Y_IDENT : opnl $$235_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 355
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 300
+	c_blk :  { $$147 s_list opnl_$$148 } 
+	s_list :  s_list opnl_xstmt 
+	$$148 : _    (148)
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	}  reduce 148
+	.  error
+
+	xstmt  goto 125
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$148  goto 356
+	$$240  goto 49
+
+state 301
+	ref :  param $$250 [ index_list_] 
+
+	]  shift 357
+	.  error
+
+
+state 302
+	index_list :  index_    (252)
+	index_list :  index_$$253 DELIM index_list 
+	$$253 : _    (253)
+
+	,  reduce 253
+	.  reduce 252
+
+	$$253  goto 358
+
+state 303
+	expr0 :  expr1_    (79)
+	index :  expr1_    (255)
+
+	]  reduce 255
+	,  reduce 255
+	.  reduce 79
+
+
+state 304
+	expr :  ref_    (78)
+	index :  ref_    (256)
+
+	]  reduce 256
+	,  reduce 256
+	.  reduce 78
+
+
+state 305
+	index :  *_    (257)
+
+	.  reduce 257
+
+
+state 306
+	expr0 :  Y_CONSTANT_    (80)
+	index :  Y_CONSTANT_    (258)
+
+	]  reduce 258
+	,  reduce 258
+	.  reduce 80
+
+
+307: shift/reduce conflict (shift 119, red'n 177) on ,
+state 307
+	command :  tasknam $$169 BARG $$170_args EARG 
+	arg : _    (177)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_APPEND  shift 369
+	Y_ALLAPPEND  shift 370
+	Y_ALLREDIR  shift 368
+	Y_GSREDIR  shift 371
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	<  shift 366
+	>  shift 367
+	-  shift 156
+	YOP_NOT  shift 155
+	,  shift 119
+	(  shift 65
+	.  reduce 177
+
+	param  goto 365
+	LP  goto 153
+	DELIM  goto 360
+	expr  goto 154
+	expr0  goto 363
+	ref  goto 364
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	args  goto 359
+	arglist  goto 361
+	arg  goto 362
+
+state 308
+	if_stat :  Y_IF LP expr RP_$$208 opnl xstmt 
+	$$208 : _    (208)
+
+	.  reduce 208
+
+	$$208  goto 372
+
+state 309
+	iferr_stat :  iferr_tok $$198 c_blk $$199_op_then opnl xstmt 
+	op_then : _    (205)
+
+	Y_THEN  shift 374
+	.  reduce 205
+
+	op_then  goto 373
+
+state 310
+	var_decl_plus :  var_decl { options_list ; }_    (47)
+
+	.  reduce 47
+
+
+state 311
+	init_list :  init_list DELIM init_elem_    (62)
+
+	.  reduce 62
+
+
+state 312
+	options_list :  init_list DELIM options_    (70)
+	options :  options_DELIM option 
+
+	,  shift 119
+	.  reduce 70
+
+	DELIM  goto 255
+
+state 313
+	options :  options DELIM option_    (74)
+
+	.  reduce 74
+
+
+state 314
+	init_elem :  Y_CONSTANT LP const_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 375
+
+state 315
+	option :  Y_IDENT = const_    (75)
+
+	.  reduce 75
+
+
+state 316
+	init_list :  init_list DELIM_init_elem 
+
+	Y_CONSTANT  shift 192
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 191
+	init_elem  goto 311
+	number  goto 194
+	sign  goto 195
+
+state 317
+	var_def :  var_name $$52 [ init_index_list ]_    (53)
+
+	.  reduce 53
+
+
+state 318
+	init_index_list :  init_index_list DELIM_init_index_range 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	init_index_range  goto 376
+	const  goto 262
+	number  goto 194
+	sign  goto 195
+
+state 319
+	init_index_range :  const :_const 
+
+	Y_CONSTANT  shift 244
+	+  shift 196
+	-  shift 197
+	.  error
+
+	const  goto 377
+	number  goto 194
+	sign  goto 195
+
+state 320
+	cmdpipe :  cmdpipe pipe $$165_command 
+
+	Y_IDENT  shift 379
+	.  error
+
+	command  goto 378
+	tasknam  goto 109
+
+state 321
+	pipe :  | opnl_    (167)
+
+	.  reduce 167
+
+
+state 322
+	pipe :  Y_ALLPIPE opnl_    (168)
+
+	.  reduce 168
+
+
+state 323
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr + opnl expr_    (86)
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 86
+
+
+state 324
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr - opnl expr_    (87)
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 87
+
+
+state 325
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr * opnl expr_    (88)
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_POW  shift 218
+	.  reduce 88
+
+
+state 326
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr / opnl expr_    (89)
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_POW  shift 218
+	.  reduce 89
+
+
+state 327
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr YOP_POW opnl expr_    (90)
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	.  reduce 90
+
+
+state 328
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr % opnl expr_    (91)
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_POW  shift 218
+	.  reduce 91
+
+
+state 329
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr YOP_CONCAT opnl expr_    (92)
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 92
+
+
+state 330
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr < opnl expr_    (93)
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 93
+
+
+state 331
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr > opnl expr_    (94)
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 94
+
+
+state 332
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr YOP_LE opnl expr_    (95)
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 95
+
+
+state 333
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr YOP_GE opnl expr_    (96)
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 96
+
+
+state 334
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr YOP_EQ opnl expr_    (97)
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 97
+
+
+state 335
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr YOP_NE opnl expr_    (98)
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 98
+
+
+state 336
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr YOP_OR opnl expr_    (99)
+	expr1 :  expr_YOP_AND opnl expr 
+
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 99
+
+
+state 337
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	expr1 :  expr YOP_AND opnl expr_    (100)
+
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 100
+
+
+state 338
+	expr1 :  Y_SCAN LP $$103 scanarg_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 380
+
+state 339
+	scanarg :  Y_IDENT_    (118)
+	scanarg :  Y_IDENT_DELIM scanarg 
+
+	,  shift 119
+	.  reduce 118
+
+	DELIM  goto 381
+
+state 340
+	expr1 :  Y_SCANF LP $$105 scanfmt_DELIM scanarg RP 
+
+	,  shift 119
+	.  error
+
+	DELIM  goto 382
+
+state 341
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	scanfmt :  expr_    (116)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 116
+
+
+state 342
+	expr1 :  Y_FSCAN LP $$107 scanarg_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 383
+
+state 343
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM_$$109 scanfmt DELIM scanarg RP 
+	$$109 : _    (109)
+
+	.  reduce 109
+
+	$$109  goto 384
+
+state 344
+	expr1 :  intrinsx LP $$111 intrarg_RP 
+	intrarg :  intrarg_DELIM expr 
+
+	,  shift 119
+	)  shift 202
+	.  error
+
+	RP  goto 385
+	DELIM  goto 386
+
+state 345
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	intrarg :  expr_    (121)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 121
+
+
+state 346
+	ifelse :  if_stat Y_ELSE $$210 opnl xstmt_    (211)
+
+	.  reduce 211
+
+
+state 347
+	iferr_else :  iferr_stat Y_ELSE $$201 opnl xstmt_    (202)
+
+	.  reduce 202
+
+
+state 348
+	while :  Y_WHILE LP $$212 expr RP_$$213 opnl xstmt 
+	$$213 : _    (213)
+
+	.  reduce 213
+
+	$$213  goto 387
+
+state 349
+	for :  Y_FOR LP opnl xassign ;_opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 388
+
+state 350
+	assign :  ref equals_expr0 
+	assign :  ref equals_ref 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 204
+	ref  goto 205
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 351
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	switch :  Y_SWITCH opnl LP opnl expr_opnl RP opnl $$223 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 389
+
+state 352
+	case :  Y_CASE $$225 const_expr_list : opnl_$$226 xstmt 
+	$$226 : _    (226)
+
+	.  reduce 226
+
+	$$226  goto 390
+
+state 353
+	const_expr_list :  const_expr DELIM const_expr_list_    (245)
+
+	.  reduce 245
+
+
+state 354
+	default :  Y_DEFAULT : opnl $$228 xstmt_    (229)
+
+	.  reduce 229
+
+
+state 355
+	label_stmt :  Y_IDENT : opnl $$235 xstmt_    (236)
+
+	.  reduce 236
+
+
+state 356
+	c_blk :  { $$147 s_list opnl $$148_} 
+
+	}  shift 391
+	.  error
+
+
+state 357
+	ref :  param $$250 [ index_list ]_    (251)
+
+	.  reduce 251
+
+
+state 358
+	index_list :  index $$253_DELIM index_list 
+
+	,  shift 119
+	.  error
+
+	DELIM  goto 392
+
+state 359
+	command :  tasknam $$169 BARG $$170 args_EARG 
+	EARG : _    (267)
+
+	)  shift 202
+	.  reduce 267
+
+	RP  goto 394
+	EARG  goto 393
+
+state 360
+	args :  DELIM_$$172 arglist 
+	$$172 : _    (172)
+
+	.  reduce 172
+
+	$$172  goto 395
+
+state 361
+	args :  arglist_    (174)
+	arglist :  arglist_DELIM arg 
+
+	,  shift 119
+	.  reduce 174
+
+	DELIM  goto 396
+
+state 362
+	arglist :  arg_    (175)
+
+	.  reduce 175
+
+
+state 363
+	expr :  expr0_    (77)
+	arg :  expr0_    (178)
+
+	Y_ALLPIPE  reduce 178
+	Y_NEWLINE  reduce 178
+	;  reduce 178
+	|  reduce 178
+	,  reduce 178
+	)  reduce 178
+	.  reduce 77
+
+
+state 364
+	expr :  ref_    (78)
+	arg :  ref_    (179)
+	arg :  ref_= expr0 
+	arg :  ref_= ref 
+
+	Y_ALLPIPE  reduce 179
+	Y_NEWLINE  reduce 179
+	=  shift 397
+	;  reduce 179
+	|  reduce 179
+	,  reduce 179
+	)  reduce 179
+	.  reduce 78
+
+
+365: shift/reduce conflict (shift 398, red'n 249) on +
+365: shift/reduce conflict (shift 399, red'n 249) on -
+state 365
+	arg :  param_+ 
+	arg :  param_- 
+	ref :  param_    (249)
+	ref :  param_$$250 [ index_list ] 
+	$$250 : _    (250)
+
+	+  shift 398
+	-  shift 399
+	[  reduce 250
+	.  reduce 249
+
+	$$250  goto 180
+
+state 366
+	arg :  <_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 400
+
+state 367
+	arg :  >_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 403
+
+state 368
+	arg :  Y_ALLREDIR_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 404
+
+state 369
+	arg :  Y_APPEND_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 405
+
+state 370
+	arg :  Y_ALLAPPEND_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 406
+
+state 371
+	arg :  Y_GSREDIR_file 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 402
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 401
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	file  goto 407
+
+state 372
+	if_stat :  Y_IF LP expr RP $$208_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 408
+
+state 373
+	iferr_stat :  iferr_tok $$198 c_blk $$199 op_then_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 409
+
+state 374
+	op_then :  Y_THEN_    (206)
+
+	.  reduce 206
+
+
+state 375
+	init_elem :  Y_CONSTANT LP const RP_    (64)
+
+	.  reduce 64
+
+
+state 376
+	init_index_list :  init_index_list DELIM init_index_range_    (58)
+
+	.  reduce 58
+
+
+state 377
+	init_index_range :  const : const_    (60)
+
+	.  reduce 60
+
+
+state 378
+	cmdpipe :  cmdpipe pipe $$165 command_    (166)
+
+	.  reduce 166
+
+
+state 379
+	tasknam :  Y_IDENT_    (261)
+
+	.  reduce 261
+
+
+state 380
+	expr1 :  Y_SCAN LP $$103 scanarg RP_    (104)
+
+	.  reduce 104
+
+
+state 381
+	scanarg :  Y_IDENT DELIM_scanarg 
+	scanarg : _    (117)
+
+	Y_IDENT  shift 339
+	.  reduce 117
+
+	scanarg  goto 410
+
+state 382
+	expr1 :  Y_SCANF LP $$105 scanfmt DELIM_scanarg RP 
+	scanarg : _    (117)
+
+	Y_IDENT  shift 339
+	.  reduce 117
+
+	scanarg  goto 411
+
+state 383
+	expr1 :  Y_FSCAN LP $$107 scanarg RP_    (108)
+
+	.  reduce 108
+
+
+state 384
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM $$109_scanfmt DELIM scanarg RP 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 341
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	scanfmt  goto 412
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 385
+	expr1 :  intrinsx LP $$111 intrarg RP_    (112)
+
+	.  reduce 112
+
+
+state 386
+	intrarg :  intrarg DELIM_expr 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 413
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 387
+	while :  Y_WHILE LP $$212 expr RP $$213_opnl xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 414
+
+state 388
+	for :  Y_FOR LP opnl xassign ; opnl_$$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+	$$215 : _    (215)
+
+	.  reduce 215
+
+	$$215  goto 415
+
+state 389
+	switch :  Y_SWITCH opnl LP opnl expr opnl_RP opnl $$223 xstmt 
+
+	)  shift 202
+	.  error
+
+	RP  goto 416
+
+state 390
+	case :  Y_CASE $$225 const_expr_list : opnl $$226_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 417
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 391
+	c_blk :  { $$147 s_list opnl $$148 }_    (149)
+
+	.  reduce 149
+
+
+state 392
+	index_list :  index $$253 DELIM_index_list 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 306
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	*  shift 305
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 175
+	ref  goto 304
+	expr1  goto 303
+	intrinsx  goto 161
+	intrins  goto 163
+	index_list  goto 418
+	index  goto 302
+
+state 393
+	command :  tasknam $$169 BARG $$170 args EARG_    (171)
+
+	.  reduce 171
+
+
+state 394
+	EARG :  RP_    (268)
+
+	.  reduce 268
+
+
+state 395
+	args :  DELIM $$172_arglist 
+	arg : _    (177)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_APPEND  shift 369
+	Y_ALLAPPEND  shift 370
+	Y_ALLREDIR  shift 368
+	Y_GSREDIR  shift 371
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	<  shift 366
+	>  shift 367
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 177
+
+	param  goto 365
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 363
+	ref  goto 364
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	arglist  goto 419
+	arg  goto 362
+
+state 396
+	arglist :  arglist DELIM_arg 
+	arg : _    (177)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_APPEND  shift 369
+	Y_ALLAPPEND  shift 370
+	Y_ALLREDIR  shift 368
+	Y_GSREDIR  shift 371
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	<  shift 366
+	>  shift 367
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 177
+
+	param  goto 365
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 363
+	ref  goto 364
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	arg  goto 420
+
+state 397
+	arg :  ref =_expr0 
+	arg :  ref =_ref 
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  error
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 154
+	expr0  goto 421
+	ref  goto 422
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+
+state 398
+	arg :  param +_    (182)
+
+	.  reduce 182
+
+
+state 399
+	arg :  param -_    (183)
+
+	.  reduce 183
+
+
+state 400
+	arg :  < file_    (184)
+
+	.  reduce 184
+
+
+state 401
+	expr :  expr0_    (77)
+	file :  expr0_    (190)
+
+	Y_ALLPIPE  reduce 190
+	Y_NEWLINE  reduce 190
+	;  reduce 190
+	|  reduce 190
+	,  reduce 190
+	)  reduce 190
+	.  reduce 77
+
+
+state 402
+	file :  param_    (191)
+	ref :  param_    (249)
+	ref :  param_$$250 [ index_list ] 
+	$$250 : _    (250)
+
+	Y_ALLPIPE  reduce 191
+	Y_NEWLINE  reduce 191
+	;  reduce 191
+	[  reduce 250
+	|  reduce 191
+	,  reduce 191
+	)  reduce 191
+	.  reduce 249
+
+	$$250  goto 180
+
+state 403
+	arg :  > file_    (185)
+
+	.  reduce 185
+
+
+state 404
+	arg :  Y_ALLREDIR file_    (186)
+
+	.  reduce 186
+
+
+state 405
+	arg :  Y_APPEND file_    (187)
+
+	.  reduce 187
+
+
+state 406
+	arg :  Y_ALLAPPEND file_    (188)
+
+	.  reduce 188
+
+
+state 407
+	arg :  Y_GSREDIR file_    (189)
+
+	.  reduce 189
+
+
+state 408
+	if_stat :  Y_IF LP expr RP $$208 opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 423
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 409
+	iferr_stat :  iferr_tok $$198 c_blk $$199 op_then opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 424
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 410
+	scanarg :  Y_IDENT DELIM scanarg_    (119)
+
+	.  reduce 119
+
+
+state 411
+	expr1 :  Y_SCANF LP $$105 scanfmt DELIM scanarg_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 425
+
+state 412
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM $$109 scanfmt_DELIM scanarg RP 
+
+	,  shift 119
+	.  error
+
+	DELIM  goto 426
+
+state 413
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	intrarg :  intrarg DELIM expr_    (122)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 122
+
+
+state 414
+	while :  Y_WHILE LP $$212 expr RP $$213 opnl_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 427
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 415
+	for :  Y_FOR LP opnl xassign ; opnl $$215_xexpr ; opnl $$216 xassign RP opnl $$217 stmt 
+	xexpr : _    (222)
+
+	Y_SCAN  shift 157
+	Y_SCANF  shift 158
+	Y_FSCAN  shift 159
+	Y_FSCANF  shift 160
+	Y_CONSTANT  shift 148
+	Y_IDENT  shift 162
+	Y_INT  shift 164
+	Y_REAL  shift 165
+	Y_GCUR  shift 149
+	Y_IMCUR  shift 150
+	Y_UKEY  shift 151
+	Y_PSET  shift 152
+	-  shift 156
+	YOP_NOT  shift 155
+	(  shift 65
+	.  reduce 222
+
+	param  goto 108
+	LP  goto 153
+	expr  goto 429
+	expr0  goto 175
+	ref  goto 176
+	expr1  goto 147
+	intrinsx  goto 161
+	intrins  goto 163
+	xexpr  goto 428
+
+state 416
+	switch :  Y_SWITCH opnl LP opnl expr opnl RP_opnl $$223 xstmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 430
+
+state 417
+	case :  Y_CASE $$225 const_expr_list : opnl $$226 xstmt_    (227)
+
+	.  reduce 227
+
+
+state 418
+	index_list :  index $$253 DELIM index_list_    (254)
+
+	.  reduce 254
+
+
+state 419
+	args :  DELIM $$172 arglist_    (173)
+	arglist :  arglist_DELIM arg 
+
+	,  shift 119
+	.  reduce 173
+
+	DELIM  goto 396
+
+state 420
+	arglist :  arglist DELIM arg_    (176)
+
+	.  reduce 176
+
+
+state 421
+	expr :  expr0_    (77)
+	arg :  ref = expr0_    (180)
+
+	Y_ALLPIPE  reduce 180
+	Y_NEWLINE  reduce 180
+	;  reduce 180
+	|  reduce 180
+	,  reduce 180
+	)  reduce 180
+	.  reduce 77
+
+
+state 422
+	expr :  ref_    (78)
+	arg :  ref = ref_    (181)
+
+	Y_ALLPIPE  reduce 181
+	Y_NEWLINE  reduce 181
+	;  reduce 181
+	|  reduce 181
+	,  reduce 181
+	)  reduce 181
+	.  reduce 78
+
+
+state 423
+	if_stat :  Y_IF LP expr RP $$208 opnl xstmt_    (209)
+
+	.  reduce 209
+
+
+state 424
+	iferr_stat :  iferr_tok $$198 c_blk $$199 op_then opnl xstmt_    (200)
+
+	.  reduce 200
+
+
+state 425
+	expr1 :  Y_SCANF LP $$105 scanfmt DELIM scanarg RP_    (106)
+
+	.  reduce 106
+
+
+state 426
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM $$109 scanfmt DELIM_scanarg RP 
+	scanarg : _    (117)
+
+	Y_IDENT  shift 339
+	.  reduce 117
+
+	scanarg  goto 431
+
+state 427
+	while :  Y_WHILE LP $$212 expr RP $$213 opnl xstmt_    (214)
+
+	.  reduce 214
+
+
+state 428
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr_; opnl $$216 xassign RP opnl $$217 stmt 
+
+	;  shift 432
+	.  error
+
+
+state 429
+	expr1 :  expr_+ opnl expr 
+	expr1 :  expr_- opnl expr 
+	expr1 :  expr_* opnl expr 
+	expr1 :  expr_/ opnl expr 
+	expr1 :  expr_YOP_POW opnl expr 
+	expr1 :  expr_% opnl expr 
+	expr1 :  expr_YOP_CONCAT opnl expr 
+	expr1 :  expr_< opnl expr 
+	expr1 :  expr_> opnl expr 
+	expr1 :  expr_YOP_LE opnl expr 
+	expr1 :  expr_YOP_GE opnl expr 
+	expr1 :  expr_YOP_EQ opnl expr 
+	expr1 :  expr_YOP_NE opnl expr 
+	expr1 :  expr_YOP_OR opnl expr 
+	expr1 :  expr_YOP_AND opnl expr 
+	xexpr :  expr_    (221)
+
+	YOP_OR  shift 227
+	YOP_AND  shift 228
+	YOP_EQ  shift 225
+	YOP_NE  shift 226
+	<  shift 221
+	>  shift 222
+	YOP_LE  shift 223
+	YOP_GE  shift 224
+	YOP_CONCAT  shift 220
+	+  shift 214
+	-  shift 215
+	*  shift 216
+	/  shift 217
+	%  shift 219
+	YOP_POW  shift 218
+	.  reduce 221
+
+
+state 430
+	switch :  Y_SWITCH opnl LP opnl expr opnl RP opnl_$$223 xstmt 
+	$$223 : _    (223)
+
+	.  reduce 223
+
+	$$223  goto 433
+
+state 431
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM $$109 scanfmt DELIM scanarg_RP 
+
+	)  shift 202
+	.  error
+
+	RP  goto 434
+
+state 432
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ;_opnl $$216 xassign RP opnl $$217 stmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 435
+
+state 433
+	switch :  Y_SWITCH opnl LP opnl expr opnl RP opnl $$223_xstmt 
+	$$240 : _    (240)
+
+	error  shift 51
+	Y_OSESC  reduce 240
+	Y_IDENT  reduce 240
+	Y_WHILE  reduce 240
+	Y_IF  reduce 240
+	Y_FOR  reduce 240
+	Y_BREAK  reduce 240
+	Y_NEXT  reduce 240
+	Y_SWITCH  reduce 240
+	Y_CASE  reduce 240
+	Y_DEFAULT  reduce 240
+	Y_RETURN  reduce 240
+	Y_GOTO  reduce 240
+	Y_BOOL  shift 23
+	Y_INT  shift 31
+	Y_REAL  shift 25
+	Y_STRING  shift 24
+	Y_FILE  shift 26
+	Y_STRUCT  shift 32
+	Y_GCUR  shift 27
+	Y_IMCUR  shift 28
+	Y_UKEY  shift 29
+	Y_PSET  shift 30
+	Y_IFERR  reduce 240
+	Y_IFNOERR  reduce 240
+	=  reduce 240
+	{  reduce 240
+	;  reduce 240
+	.  error
+
+	xstmt  goto 436
+	var_decl_stmt  goto 50
+	typedefs  goto 22
+	$$240  goto 49
+
+state 434
+	expr1 :  Y_FSCANF LP Y_IDENT DELIM $$109 scanfmt DELIM scanarg RP_    (110)
+
+	.  reduce 110
+
+
+state 435
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl_$$216 xassign RP opnl $$217 stmt 
+	$$216 : _    (216)
+
+	.  reduce 216
+
+	$$216  goto 437
+
+state 436
+	switch :  Y_SWITCH opnl LP opnl expr opnl RP opnl $$223 xstmt_    (224)
+
+	.  reduce 224
+
+
+state 437
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216_xassign RP opnl $$217 stmt 
+	xassign : _    (220)
+
+	Y_IDENT  shift 47
+	.  reduce 220
+
+	param  goto 108
+	ref  goto 294
+	assign  goto 293
+	xassign  goto 438
+
+state 438
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign_RP opnl $$217 stmt 
+
+	)  shift 202
+	.  error
+
+	RP  goto 439
+
+state 439
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP_opnl $$217 stmt 
+	opnl : _    (247)
+
+	Y_NEWLINE  shift 12
+	.  reduce 247
+
+	NL  goto 62
+	opnl  goto 440
+
+state 440
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl_$$217 stmt 
+	$$217 : _    (217)
+
+	.  reduce 217
+
+	$$217  goto 441
+
+state 441
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217_stmt 
+
+	Y_OSESC  shift 93
+	Y_IDENT  shift 105
+	Y_WHILE  shift 96
+	Y_IF  shift 111
+	Y_FOR  shift 97
+	Y_BREAK  shift 102
+	Y_NEXT  shift 101
+	Y_SWITCH  shift 98
+	Y_CASE  shift 99
+	Y_DEFAULT  shift 100
+	Y_RETURN  shift 104
+	Y_GOTO  shift 103
+	Y_IFERR  shift 113
+	Y_IFNOERR  shift 114
+	=  shift 110
+	{  shift 107
+	;  shift 106
+	.  error
+
+	param  goto 108
+	ref  goto 90
+	stmt  goto 442
+	c_stmt  goto 67
+	assign  goto 68
+	cmdlist  goto 69
+	immed  goto 70
+	inspect  goto 71
+	osesc  goto 72
+	popstk  goto 73
+	if  goto 74
+	ifelse  goto 75
+	iferr  goto 76
+	iferr_else  goto 77
+	while  goto 78
+	for  goto 79
+	switch  goto 80
+	case  goto 81
+	default  goto 82
+	next  goto 83
+	break  goto 84
+	goto  goto 85
+	return  goto 86
+	label_stmt  goto 87
+	nullstmt  goto 88
+	c_blk  goto 89
+	equals  goto 92
+	command  goto 91
+	tasknam  goto 109
+	iferr_stat  goto 95
+	iferr_tok  goto 112
+	if_stat  goto 94
+
+state 442
+	for :  Y_FOR LP opnl xassign ; opnl $$215 xexpr ; opnl $$216 xassign RP opnl $$217 stmt_    (218)
+
+	.  reduce 218
+
+
+79/300 terminals, 133/300 nonterminals
+272/600 grammar rules, 443/1000 states
+10 shift/reduce, 0 reduce/reduce conflicts reported
+133/350 working sets used
+memory: states,etc. 2916/24000, parser 897/12000
+159/600 distinct lookahead sets
+364 extra closures
+1329 shift entries, 304 exceptions
+365 goto entries
+417 entries saved by goto default
+Optimizer space used: input 3257/24000, output 910/12000
+910 table entries, 247 zero
+maximum spread: 313, maximum offset: 441

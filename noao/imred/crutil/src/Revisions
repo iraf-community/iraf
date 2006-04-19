@@ -1,5 +1,11 @@
 .help revisions Nov99 crutil
 .nf
+t_craverage.x
+    The pointer for the input mask buffer when using the same mask for both
+    input and output was not being read to include the edge lines which are
+    used during the computation resulting in a segmentation violation.
+    (11/24/04, Valdes)
+
 =======
 V2.12.2
 =======

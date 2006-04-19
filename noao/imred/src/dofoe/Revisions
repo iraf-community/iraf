@@ -1,5 +1,15 @@
 .help revisions Jan95 noao.imred.src.dofoe
 .nf
+dofoe$batch.cl
+dofoe$proc.cl
+dofoe$response.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+========
+V2.11.3b
+========
+
 dofoe$proc.cl
     Modified code to eliminate goto.  This is for use with pyraf.
     (11/21/00, Valdes)

@@ -794,7 +794,7 @@ bool	verbose			# Verbose output?
 
 bool	select
 int	i, j, k
-int	ap, band, beam, dtype, nw, naps, op1
+int	ap, band, beam, dtype, nw, naps, op1, err
 double	w, wb, dw, z, p1, p2, p3
 real	aplow[2], aphigh[2]
 pointer	ptr, in1, in2, out, mwin1, mwin2, mwout, sh1, sh2, shout
@@ -887,6 +887,7 @@ begin
 		    iferr {
 		    out = NULL
 		    mwout = NULL
+		    err = NO
 
 		    # Open output spectrum
 		    call strcpy (output, Memc[str], SZ_LINE)
@@ -1032,26 +1033,33 @@ begin
 			call sa_verbose (sh1, sh2, shout, Memc[output1],
 			    op1, opstr, const, reverse)
 		    }
-		    } then
+		    } then {
+			err = YES
 			call erract (EA_WARN)
+		    }
 
 		    call shdr_close (shout)
 		    if (mwout != NULL) {
-			call smw_saveim (mwout, out)
+			if (err == NO)
+			    call smw_saveim (mwout, out)
 			call smw_close (mwout)
 		    }
 		    if (out != NULL) {
 			call imunmap (out)
 			if (!streq (Memc[output1], Memc[temp])) {
-			    call imgimage (Memc[input1], Memc[str], SZ_LINE)
-			    if (streq (Memc[output1], Memc[str]))
-				call imunmap (in1)
-			    call imgimage (Memc[input2], Memc[str], SZ_LINE)
-			    if (streq (Memc[output1], Memc[str]))
-				call imunmap (in2)
+			    if (err == NO) {
+				call imgimage (Memc[input1], Memc[str], SZ_LINE)
+				if (streq (Memc[output1], Memc[str]))
+				    call imunmap (in1)
+				call imgimage (Memc[input2], Memc[str], SZ_LINE)
+				if (streq (Memc[output1], Memc[str]))
+				    call imunmap (in2)
+				call imdelete (Memc[output1])
+				call imrename (Memc[temp], Memc[output1])
+			    } else
+				call imdelete (Memc[temp])
+			} else if (err == YES)
 			    call imdelete (Memc[output1])
-			    call imrename (Memc[temp], Memc[output1])
-			}
 		    }
 		}
 	    }

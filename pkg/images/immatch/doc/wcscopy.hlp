@@ -9,6 +9,7 @@ wcscopy images refimages
 PARAMETERS
 .ls images
 The list of input images which will inherit the wcs of the reference image.
+If the image does not exists a datal-less image header is created.
 .le
 .ls reference
 The list of reference images containing the reference wcs. The number of
@@ -26,15 +27,10 @@ reference image \fIreference\fR to the headers of the input images
 \fIimages\fR, replacing any existing world coordinate system information
 in the input image headers in the process. WCSCOPY assumes that the
 world coordinate system information in the header of the reference 
-image is accurate and that all the input image have write permission.
-
-If the world coordinate system of reference image cannot be read from
-the reference image header, the reference and input images do not
-have the same dimensionality, or the input image does not have write
-permission, the input image world coordinate system
-is not modified. If the reference and input images do not have the same
-size a warning message is issued if \fIverbose\fR is "yes", but the
-coordinate system is updated.
+image is accurate and that all the input images have write permission.
+If the input image does not exist a data-less image header is created.
+The WCS is treated as an independent object and
+there is no check made on the dimensionality and sizes of the images.
 
 
 .ih
@@ -68,11 +64,17 @@ are identical to the world coordinate system of the reference image.
 	cl> wcscopy @outlist refimage
 .fi
 
+2.  Create a data-less WCS image by specifying a new image.
+
+.nf
+	cl> wcscopy new dev$wpix
+.fi
+
 .ih
 TIME REQUIREMENTS
 .ih
 BUGS
 .ih
 SEE ALSO
-tprecess,imalign,xregister,geomap,register,geotran,wcsmap,wregister
+tprecess,imalign,xregister,geomap,register,geotran,wcsmap,wregister,wcsedit
 .endhelp

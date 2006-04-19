@@ -1,5 +1,13 @@
 .help revisions May93 noao.lib
 .nf
+noaolib$obsdb.dat
+    Changed the logitude for 'aries' at request of submitter (4/1/06, MJF)
+
+noaolib$obsdb.dat
+    Added OALP psupplied by Eduardo Lajus (10/28/05)
+
+noaolib$obsdb.dat
+    Added TUG and commented out TNO per user request.  (8/15/05, FV)
 
 noaolib$obsdb.dat
     Corrected entry for FMO, added MGO at user suggestion (6/15/04, MJF)

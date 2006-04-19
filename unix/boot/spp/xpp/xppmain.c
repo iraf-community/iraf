@@ -17,6 +17,7 @@
 
 int	errflag;
 int	foreigndefs;
+int	hbindefs = 0;
 char	irafdefs[SZ_PATHNAME];
 char	*pkgenv = NULL;
 char	v_pkgenv[SZ_FNAME];
@@ -67,6 +68,10 @@ char	*argv[];
 			foreigndefs++;
 			strcpy (irafdefs, p);
 		    }
+		    break;
+		case 'A':
+		    /* Use architecture-specific include file. */
+		    hbindefs++;
 		    break;
 		case 'p':
 		    /* Load the environment for the named package. */

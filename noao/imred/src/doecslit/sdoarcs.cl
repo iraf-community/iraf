@@ -82,7 +82,7 @@ begin
 		    verbose=verbose1)
 		ecreidentify (arc2//".ec", arcref//".ec", shift=0.,
 		    cradius=sparams.cradius, threshold=sparams.threshold,
-		    refit=yes, database=database, logfiles=logs)
+		    refit=sparams.refit, database=database, logfiles=logs)
 
 		# If not reextracting arcs based on object apertures
 		# then save the extracted arc to avoid doing it again.

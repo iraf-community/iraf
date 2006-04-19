@@ -149,8 +149,13 @@ switch ($UNAME)
 	set pciraf 		= 1
         breaksw
     case darwin: 					# Mac OS X
-        set mach 		= "macosx"
-        set hmach 		= "macosx"
+        if (`$uname_cmd -m` == "i386") then		# LinuxPPC
+            set mach 		= "macintel"
+            set hmach 		= "macintel"
+	else
+            set mach 		= "macosx"
+            set hmach 		= "macosx"
+	endif
 	set TAPES		= "/dev/*sa[0-7]"
 	set shlib		= "no"
 	set LIBFILES    	= ""
@@ -214,11 +219,28 @@ switch ($UNAME)
 	set LS			= "/bin/ls -s"
 	set LSDF		= "-lLtg"
         breaksw
+
     default:      
-	ERRMSG  "Unable to determine platform architecture.  Please"
-	ERRMSG  "contact IRAF Site Support by writing to iraf@noao.edu"
-	NEWLINE
-	exit 1
+        # We don't want to be limited by the CYGWIN version numbering so
+        # look for a truncated match here before punting.
+        set os_mach = `echo $UNAME | cut -c1-6`
+        if ("$os_mach" == "cygwin") then
+            set mach            = "cygwin"
+            set hmach           = "cygwin"
+            set shlib           = "no"
+            set LIBFILES        = ""
+            set TAPES           = ""            # no tape support
+            set do_tapecaps     = 0
+            set do_tapes        = 0
+            set do_pipes        = 0
+            breaksw
+
+        else
+	    ERRMSG  "Unable to determine platform architecture.  Please"
+	    ERRMSG  "contact the forums at http://forums.iraf.net"
+	    NEWLINE
+	    exit 1
+        else
 endsw
 
 ###################### END OF MACHDEP DEFINITIONS. ########################
@@ -906,7 +928,7 @@ endif
 echo -n "Checking for iraf user account ...    				"
 
 set pass = ""
-if ($pciraf && $mach == "macosx") then
+if ($pciraf && ($mach == "macosx" || $mach == "macintel")) then
   # Special-case user info check for OS X and systems where the /etc/passwd
   # file may not contain the user info.
 
@@ -933,7 +955,7 @@ if ($pciraf && $mach == "macosx") then
       DO_FAIL ; set errstat = 1
       NEWLINE
           MSG  "The iraf user login info appears to be incorrect.  For the"
-          MAG  "given iraf root this path should be '$iraf/local',"
+          MSG  "given iraf root this path should be '$iraf/local',"
           MSG  "please run the 'chpass' command to change this.  The iraf"
           MSG  "user account should also be defined to use a C-shell."
       if ("$iraf_root_ok" == 0) then
@@ -1645,9 +1667,9 @@ if ($found == 0) then
       MSG  ""
       MSG  "XImtool can be downloaded from"
       MSG  ""
-      MSG  "        ftp://iraf.noao.edu/iraf/x11iraf"
+      MSG  "        http://iraf.net/ftp/iraf/x11iraf"
       MSG  ""
-      MSG  "or it's mirror sites.  Contact site support with questions."
+      MSG  "or it's mirror sites.  Contact http://iraf.net with questions."
   NEWLINE
   set err_count = `expr $err_count + 1`
 endif
@@ -1689,7 +1711,7 @@ if ($found == 0) then
       MSG  ""
       MSG  "XGterm can be downloaded from"
       MSG  ""
-      MSG  "        ftp://iraf.noao.edu/iraf/x11iraf"
+      MSG  "        http://iraf.net/ftp/iraf/x11iraf"
       MSG  ""
       MSG  "or it's mirror sites.  Contact site support with questions."
   set err_count = `expr $err_count + 1`
@@ -1760,7 +1782,7 @@ if (-d /usr/local/lib) then
           MSG  "colormap options for XImtool.  The colormaps may be"
           MSG  "be obtained from "
           MSG  ""
-          MSG  "	ftp://iraf.noao.edu/iraf/x11iraf/imtoolcmap.tar"
+          MSG  "	http://iraf.net/ftp/iraf/x11iraf/imtoolcmap.tar"
           MSG  ""
           MSG  "This should be unpacked as the /usr/local/lib/imtoolcmap"
           MSG  "directory.  This is not a fatal error."
@@ -1809,7 +1831,8 @@ endif
 
 # See whether we have fifo pipes installed.
 set errstat = 0
-foreach p (/dev/imt1i /dev/imt1o)
+if ( !($pciraf && ($mach == "macosx" || $mach == "macintel")) ) then
+  foreach p (/dev/imt1i /dev/imt1o)
     echo -n "Checking for $p fifo pipe ...				"
     if (-e $p) then
         if ("`$LS -l $p | grep '.rw.rw.rw.'`" == "") then
@@ -1835,10 +1858,10 @@ foreach p (/dev/imt1i /dev/imt1o)
 	endif
           MSG  "The $p fifo pipe is missing."
     endif
-end
+  end
 
-echo -n "Checking for /dev/imt1 fifo pipe link ...			"
-if (-e /dev/imt1) then
+  echo -n "Checking for /dev/imt1 fifo pipe link ...			"
+  if (-e /dev/imt1) then
     if ("`$LS -l /dev/imt1 | grep imt1o`" != "") then
         DO_OK
         set ok_count = `expr $ok_count + 1`
@@ -1852,7 +1875,7 @@ if (-e /dev/imt1) then
 	endif
           MSG  "The /dev/imt1 fifo pipe link is invalid."
     endif
-else
+  else
     if ($have_sockets == 1) then
         DO_WARN ; set errstat = 1
         set warn_count = `expr $warn_count + 1`
@@ -1863,9 +1886,9 @@ else
       MSG  "The /dev/imt1 fifo pipe link is missing (but is not"
       MSG  "strictly required for proper display).  If it exists it"
       MSG  "should be a symlink pointing to /dev/imt1o."
-endif
-if ($errstat == 1 && $have_sockets == 0) then
-  NEWLINE
+  endif
+  if ($errstat == 1 && $have_sockets == 0) then
+    NEWLINE
       MSG  "The /dev fifo pipes are used only by SAOimage as a default"
       MSG  "communication with IRAF or as a fallback for other display"
       MSG  "servers such as XImtool.  Except for SAOimage or in the case"
@@ -1878,7 +1901,8 @@ if ($errstat == 1 && $have_sockets == 0) then
       MSG  "created by the install script (which can be run on this host)"
       MSG  "or they can be created by hand as root with the 'mknod' or"
       MSG  "'mkfifo' command."
-  NEWLINE
+    NEWLINE
+  endif
 endif
 
 
@@ -2029,7 +2053,7 @@ if ($errstat == 1) then
       MSG  ''
       MSG  '     http://iraf.noao.edu/irafnews/apr98/irafnews.1f.html'
       MSG  ''
-      MSG  'or by contacting site support (iraf@noao.edu).'
+      MSG  'or by contacting http://iraf.net'
   NEWLINE
 endif
 
@@ -2442,7 +2466,7 @@ exit_early:
     echo "    problem with some aspect of the system, or will  reveal the"
     echo "    likely cause of a problem currently being seen."
     NEWLINE
-    echo "    Users should contact  iraf@noao.edu  if help is needed with"
+    echo "    Users should contact  http://iraf.net  if help is needed with"
     echo "    correcting any problems, or with  suggestions/comments  for"
     echo "    future versions of this diagnostic script."
   endif

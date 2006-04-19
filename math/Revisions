@@ -1,6 +1,19 @@
 .help revisions Jun88 math
 .nf
 
+gsurfit/gs_chomat.gx
+	The test for singularity would fail with certain kinds of problems
+	because the test used EPSILON (should have been EPSILOND for the
+	double precision) but this is for distinguishing numbers small
+	numbers from 1 and not from each other.  The test is now done
+	with a comparison against the smallest real or double difference.
+	The place where this was found to be a problem was with CCSETWCS.
+	(8/31/04, Valdes)
+
+========
+V2.12.2a
+========
+
 curfit/cvinit.gx
 	If one of the error checks caused an error return the cv pointer
 	would have been allocated (cv != NULL) but some of the pointer

@@ -108,9 +108,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEF(Mem$t[FP_V1(fp,j)]))
 				data = xt_fpval$t (fp, im, FP_L1(fp,j))
@@ -177,9 +177,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -209,12 +209,12 @@ begin
 			    call parg$t (val)
 			    $endif
 			if (l1 >= line1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (i)
 			    call pargi (l3)
 			}
 			if (l2 <= line2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (i)
 			    call pargi (l4)
 			}

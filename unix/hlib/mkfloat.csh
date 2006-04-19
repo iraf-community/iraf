@@ -13,6 +13,10 @@ set DIRS = "lib pkg sys"
 set FILE = unix/hlib/mkpkg.inc
 set DFL  = _DFL.mkfloat
 set TFL  = _TFL.mkfloat
+
+set mach = `uname -s | tr '[A-Z]' '[a-z]'`
+set os_mach = `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
+
 unalias	ls rm cat grep tar cmp diff echo ln mv zcat gunzip compress which
 unset noclobber
 
@@ -24,7 +28,7 @@ set TARXFLGS = -xpf
 
 # See if we're able to compress the files.
 set do_compress = 1
-if (! -x `which compress`) then
+if (! -x `which compress` || $os_mach == "cygwin") then
     if (! -x `which gzip`) then
         echo "no compress command found, OBJS.arc files will not be compressed"
 	set do_compress = 0
@@ -42,6 +46,7 @@ endif
 if ("`ls -l bin | grep 'l.........'`" == "") then
     echo "'bin' is a directory, should be symbolic link pointing to valid"
     echo "architecture.  Possible error in copying package structure??"
+    echo "Use tar to copy and move directories to preserve links."
     exit 1
 else
     set float = `ls -l bin | sed -e 's+^.*bin\.++'`

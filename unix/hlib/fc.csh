@@ -6,6 +6,7 @@
 # set	echo
 
 # Determine platform architecture.
+set OS_MACH = `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
 if (-f /etc/redhat-release) then
     if (`uname -m` == "ppc") then
         setenv MACH linuxppc
@@ -21,8 +22,15 @@ else
 endif
 
 if ($MACH == "darwin") then
-    setenv MACH macosx
+    if ("`uname -m`" == "i386") then
+        setenv MACH macintel
+    else
+        setenv MACH macosx
+    endif
+else if ($OS_MACH == "cygwin") then
+    setenv MACH cygwin
 endif
+
 
 # Scan the argument list and concatenate all arguments.
 set args = ""
@@ -43,6 +51,10 @@ if (! $?IRAFARCH) then
 	setenv IRAFARCH "freebsd"
     else if ("$MACH" == "macosx") then
 	setenv IRAFARCH "macosx"
+    else if ("$MACH" == "macintel") then
+	setenv IRAFARCH "macintel"
+    else if ("$MACH" == "cygwin") then
+	setenv IRAFARCH "cygwin"
     else if ("$MACH" == "linux") then
 	setenv IRAFARCH "linux"
     else if ("$MACH" == "redhat") then

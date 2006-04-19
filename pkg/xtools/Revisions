@@ -1,9 +1,33 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+xtargs.x	+
+mkpkg
+	Simple interface to parse an argument string consisting of a list
+	of whitespace separated keyword=value pairs.  (8/31/05, Valdes)
+
 =======
 V2.12.3
 =======
+
+rmsorted.x
+lib$pkg/rmsorted.h
+    This implements a sorted running median algorithm.
+    (5/12/05, Valdes)
+
+rmturlach.x
+    This implements the Turlach running median algorithm from the R package.
+    (5/12/05, Valdes)
+
+xtsample.gx
+    Utility to get a sample of pixels from an image.  (5/6/05, Valdes)
+
+xtstat.gx
+    Utility to compute a mean, sigma, median, and mode.  This is commonly
+    used with xt_sample.  (5/6/05, Valdes)
+
+fixpix/xtfp.x
+    Wrong fix was made.  (1/4/05, Valdes)
 
 fixpix/xtfp.x
     For reasons I can't understand, the column interpolation was broken.

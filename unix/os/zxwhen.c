@@ -4,12 +4,16 @@
 #include <stdio.h>
 #include <signal.h>
 
+#ifdef CYGWIN
+#  include <mingw/fenv.h>
+#else
 #ifdef LINUX
-# include <fpu_control.h>
+#  include <fpu_control.h>
 #else
 # ifdef BSD
-# include <floatingpoint.h>
+#  include <floatingpoint.h>
 # endif
+#endif
 #endif
 
 #ifdef SOLARIS
@@ -18,12 +22,19 @@
 # include <ieeefp.h>
 #endif
 
+#ifdef MACOSX
+#include <math.h>
+#include <fenv.h>
+#endif
+
 #ifdef LINUXPPC
 #define MACUNIX
 #endif
 
 #ifdef MACOSX
+#ifndef MACINTEL
 #define MACUNIX
+#endif
 
 /* The following are needed for OS X 10.1 for backward compatability.  The
  * signal sa_flags are set to use them to get signal handling working on
@@ -164,13 +175,11 @@ struct	_hwx {
 #ifdef MACOSX
 #define	FPE_INTDIV	(-2)		/* N/A */
 #define	FPE_INTOVF	(-2)		/* N/A */
-#ifdef OLD_MACOSX
-#define FPE_FLTRES	0x02000000	/* inexact */
-#define FPE_FLTDIV	0x04000000	/* divide-by-zero */
-#define FPE_FLTUND	0x08000000	/* underflow */
-#define FPE_FLTOVF	0x10000000	/* overflow */
-#define FPE_FLTINV	0x20000000	/* invalid */
-#endif
+#define FPE_FLTRES	FE_INEXACT	/* inexact */
+#define FPE_FLTDIV	FE_DIVBYZERO	/* divide-by-zero */
+#define FPE_FLTUND	FE_UNDERFLOW	/* underflow */
+#define FPE_FLTOVF	FE_OVERFLOW	/* overflow */
+#define FPE_FLTINV	FE_INVALID	/* invalid */
 #define	FPE_FLTSUB	(-2)		/* N/A */
 #endif
 
@@ -295,7 +304,11 @@ void *info;
 #else
 siginfo_t *info;
 #endif
+#ifdef MACINTEL
+ucontext_t *scp;
+#else
 struct sigcontext *scp;
+#endif
 
 #else
 
@@ -310,11 +323,7 @@ void *ucp;
 	int *frame, vex;
 
 	last_os_exception = unix_signal;
-#ifdef MACOSX
-        last_os_hwcode = scp->sc_psw;
-#else
         last_os_hwcode = info ? info->si_code : 0;
-#endif
 
 	x_vex = unix_exception[unix_signal].x_vex;
 	vex = x_vex - X_FIRST_EXCEPTION;	
@@ -322,14 +331,11 @@ void *ucp;
 
 	/* Reenable/initialize the exception handler.
 	 */
-#ifdef MACOSX
-	/* Since we don't currently enable hardware exceptions on MacOSX,
-	 * this just clears the exception-occurred bits in the FPSCR.
-	 */
-	{   int v = 0;
-	    sfpscr_ (&v);
-	}
-#endif
+
+#if defined(MACOSX) || defined(CYGWIN)
+        /* Clear the exception bits (ppc and x86). */
+        feclearexcept (FE_ALL_EXCEPT);
+#else
 #ifdef LINUX
 	/* setfpucw (0x1372); */
 	{
@@ -348,11 +354,14 @@ void *ucp;
 
 	    sfpucw_ (&fpucw);
 #else
-	    int fpucw = 0x332;
+	    int fpucw = 0x336;
 	    sfpucw_ (&fpucw);
 #endif
 	}
 #endif
+#endif
+
+
 #ifdef SOLARIS
         fpsetsticky (0x0);
 	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);

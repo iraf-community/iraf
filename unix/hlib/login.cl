@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.2a July 2004"
+    logver = "IRAF V2.13 March 2006"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -12,7 +12,7 @@ set	userid		= "U_USER"
 # Set the terminal type.  We assume the user has defined this correctly 
 # when issuing the MKIRAF and no longer key off the unix TERM to set a
 # default.
-if (!access (".hushiraf"))
+if (access (".hushiraf") == no)
     print "setting terminal type to U_TERM..."
 stty U_TERM
 

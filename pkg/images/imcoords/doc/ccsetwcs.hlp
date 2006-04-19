@@ -33,7 +33,7 @@ image in pixel coordinates, otherwise these parameters are ignored.
 .le
 .ls xmag = INDEF, ymag = INDEF
 The x and y scale factors in arcseconds per pixel. If database is undefined
-xmag and ymag default to 1.0 and 1.0 " / pixel, otherwise these parameters
+xmag and ymag default to 1.0 and 1.0 arcsec / pixel, otherwise these parameters
 are ignored.
 .le
 .ls xrotation = INDEF, yrotation = INDEF

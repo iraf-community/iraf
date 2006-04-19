@@ -1,6 +1,29 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
 
+=====
+V2.13
+=====
+
+getdaxis.x
+    Put an error check to avoid an error when the WCS is 3D.  (9/22/05, Valdes)
+
+transform/igsfit/igsfit.x
+    The computation of the rms was not handling deleted points.
+    (7/14/05, Valdes)
+
+standard.par
+    The file needed to be updated for the changes in the task for supporting
+    IR reductions.  (9/10/04, Valdes)
+
+doc/fitcoords.hlp
+    Fixed wording.  (8/25/04, Cooke & Valdes)
+
+transform/fcgetcoords.x
+transform/icgsfit/igssolve.x
+    It is now possible to do a solution using a single column or line of
+    fiduciary points.  (8/25/04, Cooke & Valdes)
+
 ========
 V2.12.2a
 ========

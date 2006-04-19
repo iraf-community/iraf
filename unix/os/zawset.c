@@ -5,8 +5,10 @@
 #define NORLIMIT
 #endif
 
+#ifndef CYGWIN
 #ifdef LINUX
 #undef NORLIMIT
+#endif
 #endif
 
 #ifdef SOLARIS

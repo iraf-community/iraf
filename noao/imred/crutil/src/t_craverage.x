@@ -144,10 +144,10 @@ begin
 			outbuf = imps2r (out, 1, nc, l1, l2) - (l1 - l3) * nc
 		    if (pm != NULL) {
 			if (pmmode == READ_WRITE) {
-			    pinbuf = imgs2s (pm, 1, nc, l1, l2)
+			    pinbuf = imgs2s (pm, 1, nc, l3, l4)
 			    pbuf = imps2s (pm, 1, nc, l1, l2)
-			    call amovs (Mems[pinbuf], Mems[pbuf], nc*(l2-l1+1))
-			    pinbuf = pinbuf - (l1 - l3) * nc
+			    call amovs (Mems[pinbuf+(l1-l3)*nc],
+				Mems[pbuf], nc*(l2-l1+1))
 			    pbuf = pbuf - (l1 - l3) * nc
 			} else {
 			    pinbuf = NULL

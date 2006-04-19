@@ -367,7 +367,7 @@ begin
 		next
 
 	    # Get the results.
-	    if (IS_INDEFR(mag[i]) || mag[i] <= 0.0) {
+	    if (IS_INDEFR(mag[i]) || mag[i] <= 0.0 || denom[i] == 0.) {
 		mag[i] = INDEFR
 		iter = 0
 		err = INDEFR
@@ -465,7 +465,7 @@ begin
 	    if (IS_INDEFR(x[i]) || IS_INDEFR(y[i]))
 		next
 
-	    if (IS_INDEFR(mag[i]) || mag[i] <= 0.0) {
+	    if (IS_INDEFR(mag[i]) || mag[i] <= 0.0 || denom[i] == 0.) {
 		mag[i] = INDEFR
 		iter = 0
 		err = INDEFR

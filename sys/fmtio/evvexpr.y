@@ -1826,6 +1826,8 @@ begin
 	call smark (sp)
 	call salloc (patstr, SZ_FNAME, TY_CHAR)
 	call salloc (patbuf, SZ_LINE,  TY_CHAR)
+	call aclrc (Memc[patstr], SZ_FNAME)
+	call aclrc (Memc[patbuf], SZ_LINE)
 
 	# Map pattern, changing '*' into '?*'.
 	op = patstr
@@ -1839,7 +1841,7 @@ begin
 	}
 
 	# Encode pattern.
-	junk = patmake (pat, Memc[patbuf], SZ_LINE)
+	junk = patmake (Memc[patstr], Memc[patbuf], SZ_LINE)
 
 	# Perform the pattern matching operation.
 	index = patmatch (str, Memc[patbuf])

@@ -1,7 +1,36 @@
-#! /bin/csh
+#!/bin/csh -f
+#
 # CL.CSH -- Startup the version of the CL executable compiled for the
 # architecture or floating point hardware appropriate for the current
-# machine.
+# machine.  This script can be used to invoke a number of CL flavors 
+# depending on how it is called.  The install script will create a 'cl'
+# and 'ecl' command link to this script with the intent that a different
+# binary would be started for each command.  
+
+
+# Determine CL binary to run based on how we were called.
+
+set cl_binary		= "ecl.e"
+
+if (`echo $0 | egrep ecl` != "") then
+    set cl_binary	= "ecl.e"
+else if (`echo $0 | egrep vo` != "") then
+    set cl_binary	= "vocl.e"
+else if ($#argv > 0) then
+    if ("$argv[1]" == "-old" || "$argv[1]" == "-o") then
+        set cl_binary	= "cl.e"
+    else if ("$argv[1]" == "-vo" || "$argv[1]" == "-o") then
+        set cl_binary	= "vocl.e"
+    else if ("$argv[1]:e" == "c") then
+	# Workaround for autoconf scripts attempting to use this command as
+	# a valid compiler option.  On some systems (mostly Debian) a valid
+	# CC command can't be found and eventually the 'cl' (lisp) compiler
+	# is tried.  It will always apparently have the conftest.c test file,
+	# so simply exit with a code to tell autoconf it won't work.
+	exit 1
+    endif
+endif
+
 
 # Determine IRAF root directory (value set in install script).
 set d_iraf = "/iraf/iraf/"
@@ -16,50 +45,69 @@ if ($?iraf == 0) then
     setenv iraf "$d_iraf"
 endif
 
+
+# Check for a version query.
+if ($#argv > 0) then
+    if ("$argv[1]" == "-v" || "$argv[1]" == "-version" || \
+	"$argv[1]" == "-V" || "$argv[1]" == "--version") then
+            head -1 $iraf/unix/hlib/motd
+	    exit 0
+    endif
+endif
+
+
 # Determine platform architecture.
 if ($?IRAFARCH) then
-    if (-e $iraf/bin.${IRAFARCH}/cl.e) then
+    if (-e $iraf/bin.${IRAFARCH}/${cl_binary}) then
 	set MACH = $IRAFARCH
     endif
 endif
 
 if (! $?MACH) then
+    set os_mach = `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
     if (-f /etc/redhat-release) then
 	if (`uname -m` == "ppc") then
 	    setenv mach linuxppc
 	else
 	    setenv mach redhat
 	endif
-    else if (-f /etc/SuSE-release) then
-	set mach = suse
     else
 	set mach = `uname -s | tr '[A-Z]' '[a-z]'`
     endif
 
     if ($mach == "darwin") then
-	set mach = macosx
+        if ("`uname -m`" == "i386") then
+            setenv mach macintel
+        else
+            setenv mach macosx
+        endif
+    else if ($os_mach == "cygwin") then
+        setenv mach cygwin
     endif
 
-    if (-e $iraf/bin.$mach/cl.e) then
+
+    if (-e $iraf/bin.$mach/$cl_binary) then
 	set MACH = $mach
-    else if (-e $iraf/bin.freebsd/cl.e) then
+    else if (-e $iraf/bin.freebsd/$cl_binary) then
 	set MACH = freebsd
-    else if (-e $iraf/bin.macosx/cl.e) then
+    else if (-e $iraf/bin.macosx/$cl_binary) then
 	set MACH = macosx
-    else if (-e $iraf/bin.linux/cl.e) then
+    else if (-e $iraf/bin.macintel/$cl_binary) then
+	set MACH = macintel
+    else if (-e $iraf/bin.cygwin/$cl_binary) then
+	set MACH = cygwin
+    else if (-e $iraf/bin.linux/$cl_binary) then
 	set MACH = linux
-    else if (-e $iraf/bin.redhat/cl.e) then
+    else if (-e $iraf/bin.redhat/$cl_binary) then
 	set MACH = redhat
-    else if (-e $iraf/bin.suse/cl.e) then
-	set MACH = suse
-    else if (-e $iraf/bin.linuxppc/cl.e) then
+    else if (-e $iraf/bin.linuxppc/$cl_binary) then
 	set MACH = linuxppc
-    else if (-e $iraf/bin.sunos/cl.e) then
+    else if (-e $iraf/bin.sunos/$cl_binary) then
 	set MACH = sunos
-    else if (-e $iraf/bin.linuz/cl.e) then
+    else if (-e $iraf/bin.linuz/$cl_binary) then
 	set MACH = linuz
     else
-	echo "cannot find $iraf/bin.xxx/cl.e!"
+	echo "cannot find $iraf/bin.xxx/$cl_binary"
 	exit 1
     endif
 endif
@@ -83,13 +131,12 @@ if ($?IRAFARCH) then
     # stacksize limit for IRAF processes until this is better understood.
     if ("$IRAFARCH" == "redhat" || \
         "$IRAFARCH" == "linux" || \
-        "$IRAFARCH" == "linuxppc" || \
-        "$IRAFARCH" == "suse") then
+        "$IRAFARCH" == "linuxppc") then
 	    limit stacksize unlimited
     endif
 
     setenv IRAFBIN ${iraf}bin$arch/
-    set file = ${IRAFBIN}cl.e
+    set file = ${IRAFBIN}$cl_binary
     if (-e $file) then
 	exec $file
     else
@@ -105,12 +152,14 @@ else if ("$MACH" == "linux") then
     setenv IRAFARCH "linux"
 else if ("$MACH" == "redhat") then
     setenv IRAFARCH "redhat"
-else if ("$MACH" == "suse") then
-    setenv IRAFARCH "suse"
 else if ("$MACH" == "linuxppc") then
     setenv IRAFARCH "linuxppc"
 else if ("$MACH" == "macosx") then
     setenv IRAFARCH "macosx"
+else if ("$MACH" == "macintel") then
+    setenv IRAFARCH "macintel"
+else if ("$MACH" == "cygwin") then
+    setenv IRAFARCH "cygwin"
 else if ("$MACH" == "sunos") then
     setenv IRAFARCH "sunos"
 else if ("$MACH" == "linuz") then
@@ -122,14 +171,13 @@ endif
 # stacksize limit for IRAF processes until this is better understood.
 if ("$IRAFARCH" == "redhat" || \
     "$IRAFARCH" == "linux" || \
-    "$IRAFARCH" == "linuxppc" || \
-    "$IRAFARCH" == "suse") then
+    "$IRAFARCH" == "linuxppc") then
 	limit stacksize unlimited
 endif
 
 setenv arch .$IRAFARCH
 setenv IRAFBIN ${iraf}bin$arch/
-set file = ${IRAFBIN}cl.e
+set file = ${IRAFBIN}$cl_binary
 
 # Run the desired CL.
 exec $file

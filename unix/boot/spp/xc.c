@@ -121,10 +121,8 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    0};				/* EOF */
 
 char *opt_flags[] = { "-O3",			/*  0  */
-		    "-fstrength-reduce",	/*  1  */
-		    "-fpcc-struct-return",	/*  2  */
 		    0};				/* EOF */
-int  nopt_flags	   = 3;				/* No. optimizer flags */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
 
 #else
 #ifdef SOLARIS
@@ -136,6 +134,23 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lintl",			/*  5  */
 		    "-ldl",			/*  6  */
 		    "-lelf",			/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O",			/*  0  */
+		    0};				/* EOF */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+#ifdef CYGWIN
+char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
+		    "-lf2c",			/*  1  */
+		    "-lm",			/*  2  */
+		    "-lcompat",			/*  3  */
+		    "",				/*  4  */
+		    "",				/*  5  */
+		    "",				/*  6  */
+		    "",				/*  7  */
 		    "",				/*  8  */
 		    "",				/*  9  */
 		    0};				/* EOF */
@@ -161,6 +176,7 @@ char *opt_flags[] = { "-O",			/*  0  */
 		    0};				/* EOF */
 int  nopt_flags	   = 1;				/* No. optimizer flags */
 
+#endif
 #endif
 #endif
 #endif
@@ -233,6 +249,7 @@ int	hostprog 	= NO;
 int	voslibs 	= YES;
 int	nolibc 		= NO;
 int	usef2c 		= YES;
+int	userincs	= NO;
 #ifdef LINUXPPC
 int	useg2c 		= YES;
 #else
@@ -501,6 +518,12 @@ char	*argv[];
 		    /* Force a program to link w/ libg2c.a instead of libf2c.a
 		     */
 		    useg2c++;
+		    break;
+
+		case 'A':
+		    /* Force arch-specific include files.
+		     */
+		    userincs++;
 		    break;
 
 		case 'C':
@@ -941,7 +964,6 @@ passflag:		    mkobject = YES;
 	    if (os_sysfile ("gcc-specs", gcc_specs, SZ_PATHNAME) < 0)
 		arglist[nargs++] = "/iraf/iraf/unix/bin.suse/gcc-specs";
 	    sprintf (cmd, "-specs=%s", gcc_specs);
-
 	    arglist[nargs++] = cmd;
 	}
 #endif
@@ -1200,7 +1222,7 @@ char *arglist[];
 int *p_nargs;
 {
 	register int i, len, nargs = *p_nargs;
-	register char *fp, *fs, lflag[SZ_FNAME];
+	char *fp, *fs, lflag[SZ_FNAME];
 
 	if (flag && *flag) {
 
@@ -1378,10 +1400,17 @@ char	*file;
 	    if (os_sysfile (XPP, xpp_path, SZ_PATHNAME) <= 0)
 		strcpy (xpp_path, XPP);
 
-	if (pkgenv)
-	    sprintf (cmdbuf, "%s %s -R %s", xpp_path, pkgenv, file);
-	else
-	    sprintf (cmdbuf, "%s -R %s", xpp_path, file);
+	if (userincs) {
+	    if (pkgenv)
+	        sprintf (cmdbuf, "%s %s -A -R %s", xpp_path, pkgenv, file);
+	    else
+	        sprintf (cmdbuf, "%s -A -R %s", xpp_path, file);
+	} else {
+	    if (pkgenv)
+	        sprintf (cmdbuf, "%s %s -R %s", xpp_path, pkgenv, file);
+	    else
+	        sprintf (cmdbuf, "%s -R %s", xpp_path, file);
+	}
 
 	if (foreigndefs) {
 	    strcat (cmdbuf, " -h ");

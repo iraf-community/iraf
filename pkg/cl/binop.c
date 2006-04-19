@@ -289,7 +289,8 @@ int	opcode;
 		 * in "string", or ZERO if none found.
 		 */
 		{
-		    char    *ip, *cp, ch, len;
+		    char    *ip, *cp, ch;
+		    int	    len;
 
 		    iresult = 0;
 		    len = strlen (o2.o_val.v_s);
@@ -356,7 +357,8 @@ int	opcode;
 		 * or ZERO if none found.
 		 */
 		{
-		    char    *ip, *cp, *fp, first_char, ch, len;
+		    char    *ip, *cp, *fp, first_char, ch;
+		    int	    len;
 
 		    first_char = o1.o_val.v_s[0];
 		    

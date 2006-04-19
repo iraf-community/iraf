@@ -19,12 +19,12 @@ task	autoidentify,
 	refspectra,
 	reidentify,
 	sarith,
-	scombine,
 	sflip,
 	slist,
 	splot,
 	specplot,
 	specshift	= "onedspec$x_onedspec.e"
+task	scombine	= "onedspec$scombine/x_scombine.e"
 task	aidpars		= "onedspec$aidpars.par"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"

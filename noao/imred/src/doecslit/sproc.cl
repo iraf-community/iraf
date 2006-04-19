@@ -50,6 +50,7 @@ begin
 	string	str1, str2, str3, str4, arcrefs, log1, log2
 	bool	reextract, extract, scat, disp, ext, flux, log, disperr
 	int	i, j, n
+	struct	err
 	str1 = ""
 
 	# Call a separate task to do the listing to minimize the size of
@@ -129,8 +130,11 @@ begin
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
-	    if (!access (apref // imtype))
-		error (1, "Aperture reference spectrum not found - " // apref)
+	    if (!access (apref // imtype)) {
+		printf ("Aperture reference spectrum not found - %s%s\n",
+		    apref, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	    scat = no
 	    if (scattered) {
 		hselect (apref, "apscatte", yes, > temp)
@@ -229,8 +233,11 @@ begin
 	    if (fscan (fd1, arcref) == EOF)
 		error (1, "No reference arcs")
 	    fd1 = ""
-	    if (!access (arcref // imtype))
-		error (1, "Arc reference spectrum not found - " // arcref)
+	    if (!access (arcref // imtype)) {
+		printf ("Arc reference spectrum not found - %s%s\n",
+		    arcref, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	    arcrefec = arcref // ectype
 	    reextract = redo || (update && newaps)
 	    if (reextract && access (arcrefec))
@@ -261,7 +268,10 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec) | tee (log1)
+		printf ("Object spectrum not found - %s%s\n",
+		    spec, imtype) | scan (err)
+		print (err) | tee (log1)
+		print ("Check setting of imtype")
 		next
 	    }
 	    specec = spec // ectype

@@ -1,5 +1,25 @@
 .help revisions Dec94 noao.imred.src.doecslit
 .nf
+
+=======
+V2.12.3
+=======
+
+doecslit$sdoarcs.cl
+    The sparams.refit parameter was being ignored and the ecreidentify
+    step has refit=yes hardwired.  The parameter reference is now used.
+    (11/14/05, Valdes)
+
+doecslit$sbatch.cl
+doecslit$sproc.cl
+doecslit$fibresponse.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+========
+V2.12.2b
+========
+
 doecslit$sproc.cl
     Modified code to eliminate goto.  This is for use with pyraf.
     (11/21/00, Valdes)

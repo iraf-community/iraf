@@ -3,6 +3,7 @@
 
 artdata		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 astrometry	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+astcat		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 astutil		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 digiphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 filterphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
@@ -11,6 +12,7 @@ imred		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 mtlocal		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 nobsolete	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 nproto		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+obsutil		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 onedspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 rv		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 surfphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
@@ -21,9 +23,7 @@ filterphot	-only .hlp
 
 -file bin.f68881/OBJS.arc.Z
 -file bin.ffpa/OBJS.arc.Z
--file bin.sparc/OBJS.arc.Z
 -file bin.i386/OBJS.arc.Z
--file bin.linux/OBJS.arc.Z
 -file bin.ssol/OBJS.arc.Z
 -file bin.alpha/OBJS.arc.Z
 -file bin.sf2c/OBJS.arc.Z
@@ -35,3 +35,14 @@ filterphot	-only .hlp
 -file bin.hp300/OBJS.arc.Z
 -file bin.hp700/OBJS.arc.Z
 -file bin.hp800/OBJS.arc.Z
+
+-file bin.sparc/OBJS.arc.Z
+-file bin.ssun/OBJS.arc.Z
+
+-file bin.redhat/OBJS.arc.Z
+-file bin.linux/OBJS.arc.Z
+-file bin.macosx/OBJS.arc.Z
+-file bin.freebsd/OBJS.arc.Z
+-file bin.suse/OBJS.arc.Z
+-file bin.sunos/OBJS.arc.Z
+-file bin.linuxppc/OBJS.arc.Z

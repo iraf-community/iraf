@@ -2,6 +2,17 @@
 .nf
 
 =======
+V2.12.3
+=======
+
+srcfibers$batch.cl
+srcfibers$proc.cl
+srcfibers$fibresponse.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+
+=======
 V2.12.2
 =======
 

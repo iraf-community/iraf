@@ -14,7 +14,7 @@ int	ndim, dim
 begin
 	for (dim=2;  dim <= ndim;  dim=dim+1) {
 	    v[dim] = v[dim] + vinc[dim]
-	    if (v[dim] - ve[dim] == vinc[dim]) {
+	    if (v[dim] - ve[dim] > 0) {
 		if (dim < ndim)
 		    v[dim] = vs[dim]			# advance to next dim
 		else

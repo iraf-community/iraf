@@ -24,6 +24,8 @@ libpkg.a:
         radcnv.x
         rmedian.x       rmedian.h <imhdr.h> <imset.h>
         rmode.x         rmode.h <imhdr.h> <imset.h>
+	rmmed.x		<pkg/rmsorted.h> <mach.h>
+	runmed.x	<fset.h> <imhdr.h> <imio.h>
         t_boxcar.x      <error.h> <imhdr.h>
         t_convolve.x    <error.h> <imhdr.h> <mach.h> <ctype.h>
         t_fmedian.x     fmedian.h <error.h>
@@ -37,5 +39,6 @@ libpkg.a:
         t_mode.x        mode.h <error.h> <mach.h>
         t_rmedian.x     rmedian.h <imhdr.h> <error.h> <mach.h>
         t_rmode.x       rmode.h <mach.h> <imhdr.h> <error.h>
+	t_runmed.x
         xyconvolve.x    <error.h> <imhdr.h> <imset.h>
 	;

@@ -1367,4 +1367,535 @@ unix/hlib/zzsetenv.def		[+pcix]
 ------------------------------------------------------
 V2.12.2a-EXPORT -- patch generated.  (7/14/04, MJF)
 
+pkg/images/immatch/src/imcombine/src/icmask.x
+pkg/images/immatch/src/imcombine/src/Revisions +
+	Added a feature to allow masks specified without a path to be found
+	either in the current directory or the directory with the image.  This
+	is useful when images to be combined are distributed across multiple
+	directories.  (7/16/04, Valdes, 8/31 removed unused declaration)
 
+pkg/images/imutil/src/imgets.x
+	Modified to allow getting strings with double quotes.
+	(7/27/04, Valdes)
+
+sys/imio/db/imgstr.x
+	Modified to handle strings with embedded single quotes as defined
+	by the FITS standard.  (7/27/04, Valdes)
+
+pkg/images/immatch/src/wcsmatch/t_wcscopy.x
+	Removed a check that would not allow dataless WCS to be copied.
+	(8/25/04, Cooke & Valdes)
+
+math/gsurfit/gs_chomat.gx
+	The test for singularity would fail with certain kinds of problems
+	because the test used EPSILON (should have been EPSILOND for the
+	double precision) but this is for distinguishing numbers small
+	numbers from 1 and not from each other.  The test is now done
+	with a comparison against the smallest real or double difference.
+	The place where this was found to be a problem was with CCSETWCS.
+	(8/31/04, Valdes)
+
+noao/lib/strip.noao
+unix/hlib/strip.iraf
+	Updated with recent architectures and dirs in NOAO (9/2/04, MJF)
+
+local/src/doc/bswap.hlp
+	Removed execute permissions. (9/2/04, MJF)
+
+dev/hosts
+	Added new linux boxes beagle/barium/trout (9/6/04, MJF)
+
+dev/hosts
+	Added new linux boxes baires/marten (9/9/04, MJF)
+
+hlib/install
+	FreeBSD 5 systems now use a devfs /dev directory.  Minor changes
+	to keep from trying to create the /dev/imt1 fifo pipes on these
+	systems (10/7/04, MJF)
+
+pkg/images/imcoords/src/t_ccsetwcs.x
+	The option to specify a list of images with a single plate solution
+	record, as described in the help, was not working.  This was fixed.
+	(10/8/04, Valdes)
+
+pkg/plot/t_implot.x
+pkg/doc/implot.hlp
+lib/scr/implot.key
+	The "image" parameter may now be a list and the 'm' and 'n' keys
+	are used to move through the image.  This is an alternate, and
+	more convenient, version of the 'i' key.
+	(10/29/04, Valdes)
+
+pkg/images/imutil/src/imexpr.gx
+	1) Fixed a bug in which expressions containing multiple parameter
+	operands (e.g. a.foo and b.bar) would be evaluated using only the
+	value of the last operand specified.  This was happening because
+	a pointer was being recycled rather than copied and when the code
+	went back to patch the parameters it used only the last operand
+	specified.
+	2) Added the ability to use a parameter operand which references an
+	image operand not directly in the expression.  For example, expr="b+c"
+	where a='dev$pix', b=a.foo, c=a.bar.  This allows parameters from
+	e.g. a reference image to be used without requiring the image itself
+	to be used.  (11/11/04, MJF)
+
+pkg/cl/binop.c
+	A string length was declared as a signed char for strldx/strlstr
+	and would overflow for long strings.  (11/22/04, MJF)
+
+dev/hosts
+	Added new linux box 'leporis' (12/10/04, MJF)
+
+unix/hlib/install
+	Fixed a typo in a do_tapes flag setting for OSX (4/15/05)
+
+sys/imio/imloop.x
+	The loop construct would only work properly when the increment was
+	set to 1.  Modified as:
+
+		OLD>  if (v[dim] - ve[dim] == vinc[dim]) {
+		NEW>  if (v[dim] - ve[dim] > 0) {
+
+	Now when the counter exceeds the VE by any amount the condition is
+	true.  (5/3/05, Valdes/Fitz)
+
+pkg/images/imfilter/src/t_runmed.x
+pkg/images/imfilter/src/runmed.x
+pkg/images/imfilter/src/rmmed.x
+pkg/images/imfilter/src/mkpkg
+pkg/images/imfilter/runmed.par
+pkg/images/imfilter/doc/runmed.hlp
+pkg/images/imfilter/imfilter.cl
+pkg/images/imfilter/imfilter.hd
+pkg/images/imfilter/imfilter.men
+pkg/images/x_images.x
+pkg/xtools/rmsorted.gx
+pkg/xtools/rmturlach.gx
+pkg/xtools/xtsample.gx
+pkg/xtools/xtstat.gx
+lib/pkg/rmsorted.h
+	Installed new running median task.  (5/6/05, Valdes)
+
+unix/hlib/install
+	Fixed a typo in an 'endiif' statement (6/7/05, MJF)
+
+pkg/ecl/		+
+
+images/imcoords/src/t_wcsedit.x
+images/imcoords/wcsedit.par
+images/imcoords/doc/wcsedit.hlp
+	Modified to allow a new data-less WCS header to be created of
+	dimensionality given by the new parameter "wcsdim".
+	(6/23/05, Valdes)
+
+images/immatch/src/wcsmatch/t_wcscopy.x
+images/immatch/doc/wcscopy.hlp
+	Modified to allow creation of a new data-less WCS header.  Also checking
+	on image sizes and dimensionality was commented out.
+	(6/23/05, Valdes)
+
+images/imcoords/src/mkcwcs.cl   +
+images/imcoords/src/mkcwwcs.cl  +
+images/imcoords/doc/mkcwcs.hlp  +
+images/imcoords/doc/mkcwwcs.hlp +
+images/imcoords/imcoords.cl
+images/imcoords/imcoords.men
+images/imcoords/imcoords.hd
+	Two new tasks were added to create or modify simple and standard 
+	celestial and celestial/wavelength WCS.  The parameters are designed
+	to make it simpler for a user to specify WCS information in a
+	natural way without understanding the details of the WCS structure.
+	The tasks may be used to make data-less WCS for templates or to
+	add or update a WCS in an image.  These scripts depend on the
+	changes to WCSCOPY and WCSEDIT which are the underlying interfaces
+	to the WCS.
+	(6/24/05, Valdes)
+
+unix/os/zfioks.c
+	Added a setsockopt to the file to set the REUSEADDR option on the 
+	socket (2/22/06, MJF)
+
+images/immmatch/src/imcombine/src/icomb.gx
+	 The addition of the sum option failed to add a case for selecting
+	 how to set the keepids flag.  Add SUM to the switch on line 229.
+	 (2/28/06, Fitzpatrick, Valdes)
+
+unix/os/zfioks.c
+        Added few new environment variables designed to control the behavior
+        of the network connections.  Also improved some of the debugging
+        messages and added a 'C' or 'S' to distinguish code marked as
+        'client' or 'server' for easier tracing.
+
+        The first new variable is KS_RETRY which, if defined, is the number 
+        of retry attempts using the default rsh (or KSRSH) protocol.  The 
+        task will sleep for 1 second between attempts and then loop back to 
+        try again to make the connection, this is meant to avoid potential 
+        clashes between multiple machines connecting simultaneously as with 
+        the pipeline.
+
+        The second new variable is KS_NO_RETRY which when defined instructs
+        the task *not* to attempt a retry using the fallback rexec protocol.
+        This test is made after the KS_RETRY checks to allow for various 
+        combinations of settings to allow the code to skip retries entirely
+        (i.e. define only KS_NO_RETRY), retry using the default protocol but
+        not with rexec (i.e. define KS_RETRY as some value and set KS_NO_RETRY),
+        or retry only with rexec (i.e. old behavior, don't define anything).
+        (3/20/06, MJF)
+
+sys/etc/environ.h
+	Increased the size of various environment buffers to allow for longer
+	strings.  This fixes a long-standing problem in XC where an excessively
+	long $PATH would cause a segfault in the envputs() routine.  Should
+	also help with long helpdb strings in user-defined packages. (3/21 MJF)
+
+lib/imio.h
+	Increased SZ_IMNAME from 79 to 128 per pipeline request.  The extra
+	space is already allocated in the LEN_IMDES and this is the most we
+	can do without changing the runtime struct. (3/21/06 MJF)
+
+
+unix/hlib/cl.csh
+        Fixed a bug in detecting the '-old' flag to start the CL rather than
+    	the now-default ECL.
+
+unix/hlib/motd
+	Updated release date.
+
+======================================
+Include Mac/Intel Port Notes
+======================================
+
+Mac/Intel Port Revisions:
+==========================
+
+local/.login
+bin.macintel			+
+bin.macintel/IB.MACX.X86	+
+noao/bin.macintel		+
+noao/bin.macintel/NB.MACX.X86	+
+unix/bin.macintel		+
+unix/as.macintel		+
+unix/os/irafpath.c
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf 
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+	Set up architecture dirs/paths for port, added a '-DMACINTEL' to 
+    HSI_CF.  (1/30/06)
+
+local/.cshrc
+ 	Added some personal preference aliases.
+
+unix/os/zfiond.c
+	Ifdef'd a <sys/select.h> to get the definition of a struct timeval
+    for the select() call (1/30/06)
+
+unix/boot/mkpkg/host.c
+	Had to include "mkpkg.h" to pick up the struct symbol def in 
+    extern.h  (1/30/06)
+
+unix/bin.macintel/rpp.e
+	Issues with nested switch-case, using the macosx version for now
+
+unix/bin.macintel/f2c.[eh]
+	Copied from bin.macosx
+
+pkg/mkpkg
+	Added ECL to package list of directories to be built.
+
+pkg/utilities/mkpkg
+pkg/utilities/pffctn.x
+pkg/utilities/t_polyfit.x
+	Broke out the pf_fctn() to a separate file to work around the
+	extern declaration problems in f2c that couldn't be handled in
+	f2c.h..
+
+unix/as.macintel/zsvjmp.s
+	Implemented the ZSVJMP procedure for this OS/arch.   Appears to
+    be working as expected and according to the zzdebug routine.
+
+unix/as.macintel/zz_zsvjmp.c	+
+	Renamed from zz.c.  This is a demo code of what the zsvjmp.s is
+    supposed to do that can be used in future ports.  Added more comments
+    to the header for reference.
+
+unix/as.macintel/f2c.tar.gz
+	Added a source distro of F2C used in building the binaries on this
+    system.  We hadn't previously kept this in the tree and F2C is normally
+    installed on this platform.  We can move to GFORTRAN at a later point or
+    as an option but that isn't yet ready for Mac/Intel or a standard part 
+    of the Xcode.
+
+unix/bin.macintel/f2c.h
+	Modified typedefs for extern problem.
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-osx.h	+
+	Added the GCC stdarg.h to the libc directory so it will be included
+    properly.  We can't simply include <stdarg.h> because the include chain
+    has hlib$libc at the head and this would lead to a recursive error.  
+    Adding files to the special files list to compile -Inolibc is an option
+    but not for external packages so we compromise with a platform-specific
+    include in the libc directory.
+
+unix/boot/mkpkg/host.c
+	Needed to include "mkpkg.h" to get 'struct symbol' definition
+    properly.
+
+unix/boot/mkpkg/scanlib.c
+	Added support for the "4.4bsd archive extended format #1" used 
+    on this system.  Fixes a problem where everything in an archive would
+    always be rebuilt.
+
+sys/fmtio/evexpr.y
+sys/fmtio/evvexpr.gy
+	Fixed a bug in the string-matching operator '?=' where the patstr
+    pointer wasn't initialized, and then wasn't used after translating a 
+    pattern such as '*foo*' to use '?*foo?*' closures.
+
+sys/mwcs/mkpkg
+sys/mwcs/wfzpn.x
+sys/mwcs/wfinit.x
+	Installed a ZPN projection driver from the Cambridge Astronomical
+    Survey Unit.
+
+local/bugs.log
+local/notes.v212
+unix/os/zfioks.c
+noao/lib/helpdb.mip
+pkg/images/Revisions
+pkg/images/imcoords/src/mkcwcs.cl
+pkg/images/immatch/doc/geotran.hlp
+pkg/images/immatch/doc/imcombine.hlp
+	Sync'd with latest from tucana.
+
+pkg/images/immatch/src/imcombine/src/icomb.gx
+	Installed path for buglog 552.
+
+noao/nproto/Revisions
+noao/nproto/nproto.cl
+noao/nproto/nproto.hd
+noao/nproto/nproto.men
+noao/nproto/skysep.cl		+
+noao/nproto/skygroup.cl		+
+noao/nproto/doc/skygroup.hlp	+
+noao/nproto/doc/skysep.hlp	+
+	Installed new NPROTO tasks.
+
+unix/hlib/cl.csh
+	Made ECL the default in response to the 'cl' command.
+
+local/login.cl
+unix/hlib/login.cl
+	Fixed the problem with the access() error message that sometimes
+    appears.
+
+unix/hlib/install
+unix/hlib/ecl.csh -> cl.csh
+	Modified the install script to create an 'ecl' command.  Needed to
+    create a hlib$ecl.csh symlink to keep this simple.  This is mostly a 
+    nicety as 'ecl' is now the default command language.
+
+unix/boot/spp/rpp/rppfor/caslab.f
+	Initialized the 'caslab' return to be zero.  Previously this procedure
+    was returning a -1 value causing the parent cascod() to read an EOF on
+    multi-value cases such as "case 1,2:" and would return an error message
+    about a missing label that was never generated.  This is a different 
+    behavior than the same code under linux/macosx, and even though this is a 
+    newer version of F2C this was assumed to be a platform issue.  NOTE: the 
+    assciated RATFOR has not been modified.   The RPP binary is now native 
+    Intel rather than using the PPC binary as was done earlier.
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+	Changed the version string to be V2.13.  This was done such that
+    packages like GEMINI could still version-check without failing even
+    though the hlib$motd makes clear this is an iraf.net release.
+
+mkpkg
+noao/mkpkg
+	Added 'macintel' architecture.
+
+unix/os/zxwhen.c
+unix/os/zzepro.c
+unix/os/zzstrt.c
+	Re-implemented the FPE handling for OSX using standard system
+    procedures (e.g. feclearexcept(), fegetexceptflag(), etc).  The usual
+    errors are now caught again.
+
+
+unix/os/zfioks.c
+    Added few new environment variables designed to control the behavior
+    of the network connections.  Also improved some of the debugging
+    messages and added a 'C' or 'S' to distinguish code marked as
+    'client' or 'server' for easier tracing.
+
+    The first new variable is KS_RETRY which, if defined, is the number 
+    of retry attempts using the default rsh (or KSRSH) protocol.  The 
+    task will sleep for 1 second between attempts and then loop back to 
+    try again to make the connection, this is meant to avoid potential 
+    clashes between multiple machines connecting simultaneously as with 
+    the pipeline.
+
+    The second new variable is KS_NO_RETRY which when defined instructs
+    the task *not* to attempt a retry using the fallback rexec protocol.
+    This test is made after the KS_RETRY checks to allow for various 
+    combinations of settings to allow the code to skip retries entirely
+    (i.e. define only KS_NO_RETRY), retry using the default protocol but
+    not with rexec (i.e. define KS_RETRY as some value and set KS_NO_RETRY),
+    or retry only with rexec (i.e. old behavior, don't define anything).
+    (3/20/06, MJF)
+
+sys/etc/environ.h
+    Increased the size of various environment buffers to allow for longer
+    strings.  This fixes a long-standing problem in XC where an excessively
+    long $PATH would cause a segfault in the envputs() routine.  Should
+    also help with long helpdb strings in user-defined packages. (3/21 MJF)
+
+lib/imio.h
+    Increased SZ_IMNAME from 79 to 128 per pipeline request.  The extra
+    space is already allocated in the LEN_IMDES and this is the most we
+    can do without changing the runtime struct. (3/21/06 MJF)
+
+unix/hlib/cl.csh
+	Fixed a bug in detecting the '-old' flag to start the CL rather than
+    the now-default ECL.
+
+
+======================================
+Include Cygwin Port Notes
+======================================
+
+Port start (4/12/06)
+
+Port Revisions:
+===============
+
+local/notes.cygwin		+
+	Started this file.....
+
+mkpkg
+noao/mkpkg
+local/.login
+bin.cygwin                    	+
+bin.cygwin/IB.CYGW.X86        	+
+noao/bin.cygwin               	+
+noao/bin.cygwin/NB.CYGW.X86   	+
+unix/bin.cygwin               	+
+unix/as.cygwin                	+
+unix/os/irafpath.c
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf 
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+        Set up architecture dirs/paths for port, added a '-DCYGWIN' to 
+    HSI_CF.  (4/11/06)
+
+
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	Changed the 'timezone' variable to '_timezone', ifdef'd code.
+
+unix/os/zawset.c
+	Ifdef'd the code definitions for RLIMIT not on this system.
+
+unix/os/zopdir.c
+	Cygwin dirent type doesn't include the 'd_ino' element so the usual
+    way to read directories and look for empty inodes doesn't apply here.  
+    Made a trivial change which should effectively be a no-op since we won't
+    ever expect a null inode anyway.  Need to check on how stat/lstat deals
+    with inodes, there is apparently a define that can be enabled in the dev
+    Cygwin version that will compute an inode hash of the filename to fake this
+    but we apparently don't need it now.
+
+unix/os/zxwhen.c
+unix/os/zzepro.c
+unix/os/zzstrt.c
+	Implemented the FPE handling using the libmingwex.a procedures.  
+
+unix/hlib/libc/varargs.h
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-cygwin.h 	+
+	System uses <stdarg.h> but like on other systems this file is in 
+    the GCC tree and not the public /usr/include.  As before, made a local
+    copy we'll include in the libc directly.
+
+unix/as.cygwin/zsvjmp.s	+
+	Implemented ZSJMP for this system, removed leading underscores on
+    symbol names.
+
+unix/bin.cygwin/f2c.e
+unix/bin.cygwin/libf2c.a
+	Built the F2C libs for this platform.
+
+unix/bin.cygwin/libcompat.a
+	Pulled out the feclearexcept/fe[sg]etexceptflag procedures from the
+    /lib/mingw/libmingwex.a library so we can use the same FPE handling code
+    as for OSX.  This lib isn't part of the base install for Cygwin so rather
+    than add a dependency to the platform we'll use the existing libcompat.a
+
+unix/boot/spp/xpp/decl.c
+	Fixed a problem in the XPP stage where a function as the first procedure
+    in a file would not emit the procedure name properly.  This has been seen
+    sporadically on other platforms in the past and appears to be related to
+    a lexical context problem.  Will investigate more later, did a quick fix
+    for now.
+
+unix/boot/spp/xc.c
+unix/boot/spp/xpp/xppcode.c
+unix/boot/spp/xpp/xppmain.c
+unix/hlib/mkpkg.sf 
+unix/hlib/mkpkg.sf.CYGW		+ 
+unix/bin.cygwin/arch_includes/	+
+	There is apparently a bug in the handling of multi-line define macros
+    such that the popcontext() is called at the end of the first line however
+    the remainder of the macro doesn't get emmitted until sometime later.
+    The buffering issue was too tricky to figure out for now so I took 
+    advantage of the fact irafpath() will look in hbin$ before lib$ to allow
+    for an arch-specific version of a system include like <fio.h> that is
+    causing a problem.  For local includes such as in plio, I added a new
+    '-A' flag to both XC/XPP to force the code to look in a hbin$arch_includes
+    directory first for local include files.  For the plio cases the reference
+    was to e.g. "../pllseg.h" so the files need to be a the correct relative
+    location (TODO: strip path specs from local includes...).  The affected
+    files were put on the special file list for this platform 
+
+unix/bin.cygwin/fio.h		+
+unix/bin.cygwin/pllseg.h	+ 
+unix/bin.cygwin/plrseg.h	+
+	These includes defined multi-line macros.  Made arch_include versions
+    without the newlines.
+
+sys/fmtio/fprfmt.x
+	Crap, multi-line define in this one file we can't work around as 
+    above.  For now just change the macro.....
+
+unix/hlib/mkfloat.csh
+	Check for cygwin arch when defining the $COMPRESS var, cygwin doesn't
+    support the -f flag 
+
+
+
+# ---------------------------------------------------------------------------
+
+Sysgen completes without errors, all seems to be working. (4/14/06)
+
+./zzclean
+./zzmake
+./zzsums
+./zzsysgen
+======================================
+V2.13 Second Beta Release (4/19/06)
+======================================

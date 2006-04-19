@@ -140,7 +140,8 @@ begin
 		if (Memc[cmd] == '/')
 		    call gt_colon (Memc[cmd], gp, gt, redraw)
 		else {
-		    i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		    i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps],
+			nspec)
 		    call sp_colon (Memc[cmd], gp, gt, Memi[sps], nspec,
 			Memc[units], labels, i, step, fraction, redraw)
 		    if (nspec == 0) {
@@ -149,7 +150,7 @@ begin
 		    }
 		}
 	    case 'a', 'i': # Append or insert a new spectrum
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		if (key == 'i')
 		    i = max (0, i - 1)
 		call printf ("Spectrum: ")
@@ -171,7 +172,7 @@ begin
 		if (nspec == 0)
 		    goto nospec_
 
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		sp = Memi[sps+i-1]
 	    	call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp), YES, gp, gt)
 	    	call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
@@ -185,7 +186,8 @@ begin
 #		redraw = YES
 	    case 'e': # Undelete a spectrum
 		if (spsave != NULL) {
-		    i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		    i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps],
+			nspec)
 		    i = max (0, i - 1)
 		    call sp_add (spsave, i, sps, nspec)
 		    call sp_labels (Memi[sps], nspec, labels)
@@ -212,7 +214,7 @@ begin
 		if (nspec == 0)
 		    goto nospec_
 
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		sp = Memi[sps+i-1]
 		call printf (
 		    "Spectrum %d:  Mark position for label ('q' to cancel)")
@@ -264,7 +266,7 @@ begin
 		if (nspec == 0)
 		    goto nospec_
 
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		sp = Memi[sps+i-1]
 		call printf ( "Shift spectrum %d: (q, r, s, t, x, y, z)")
 		    call pargi (SP_INDEX(sp))
@@ -371,7 +373,7 @@ begin
 		if (nspec == 0)
 		    goto nospec_
 
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		sp = Memi[sps+i-1]
 		call printf ("X coordinate (%g): ")
 		    call pargr (wx)
@@ -419,7 +421,7 @@ begin
 		if (nspec == 0)
 		    goto nospec_
 
-		i = sp_nearest (gp, wx, wy, Memi[sps], nspec)
+		i = sp_nearest (gp, wx, wy, key, Memc[cmd], Memi[sps], nspec)
 		sp = Memi[sps+i-1]
 		call printf ("X coordinate (%g): ")
 		    call pargr (wx)
@@ -1760,18 +1762,31 @@ end
 # SP_NEAREST -- Find the nearest spectrum to the cursor and return the element.
 # Return zero if no spectra are defined.  The distance is in NDC.
 
-int procedure sp_nearest (gp, wx1, wy1, sps, nspec)
+int procedure sp_nearest (gp, wx1, wy1, key, cmd, sps, nspec)
 
 pointer	gp			# GIO pointer
 real	wx1, wy1		# Cursor position
+int	key			# Key
+char	cmd[ARB]		# Cursor command
 pointer	sps[ARB]		# Array of structure pointers
 int	nspec			# Number of spectra
 
-int	i, j, k
+int	i, j, k, stridxs()
 real	wx0, wy0, x0, y0, x1, y1, r2, r2min
 pointer	sp, px, py
 
 begin
+	# Check for explicit specification.
+	if (key == ':') {
+	    if (stridxs ("[", cmd) > 0)
+		return (1)
+	}
+
+	if (IS_INDEFR(wx1))
+	    wx1 = 0.
+	if (IS_INDEFR(wy1))
+	    wy1 = 0.
+
 	# Transform world cursor coordinates to NDC.
 	call gctran (gp, wx1, wy1, wx0, wy0, 1, 0)
 

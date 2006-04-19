@@ -7,6 +7,9 @@
 #define PORTAR 1
 #endif
 #include <ar.h>
+#ifdef MACOSX
+#include <ranlib.h>
+#endif
 
 #define import_spp
 #include <iraf.h>
@@ -53,7 +56,7 @@ char	*library;
 	char	lbuf[SZ_LINE];
 	struct	ar_hdr arf;
 	long	length, fdate;
-	int	len_arfmag, nmodules;
+	int	len, len_arfmag, nmodules;
 	FILE	*fp;
 
 	/* Get the library file name. */
@@ -104,27 +107,55 @@ char	*library;
 	    }
 
 	    /* Extract module name.  */
-	    for (ip=arf.ar_name;  *ip == ' ';  ip++)
-		;
-	    for (op=modname;  (*op = *ip++) != ' ' && *op != '/';  op++)
-		;
+	    for (ip=arf.ar_name;  *ip == ' ';  ip++) ;
+	    for (op=modname;  (*op = *ip++) != ' ' && *op != '/';  op++) ;
 	    *op++ = EOS;
 
-	    /* Skip dummy entry with null modname (COFF format). */
+	    /* Skip dummy entry with null modname (COFF format) as well
+	     * as the __SYMDEF from ranlib.
+	     */
+#ifdef MACOSX
+	    if (strncmp (modname, RANLIBMAG, 9) || modname[0] != EOS) {
+#else
 	    if (modname[0] != EOS) {
-		/* Get module date.  */
-		sscanf (arf.ar_date, "%ld", &fdate);
+#endif
+#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+	        /*
+	         * BSD 4.4 extended AR format: #1/<namelen>, with name as the
+	         * first <namelen> bytes of the file
+	         */
+	        if ((arf.ar_name[0] == '#') &&
+		    (arf.ar_name[1] == '1') &&
+		    (arf.ar_name[2] == '/') && (isdigit(arf.ar_name[3]))) {
 
-		/* Insert entry into symbol table. */
-		mlb_setdate (modname, fdate);
-	    }
+		        char p[SZ_PATHNAME];
+
+		        len = atoi(&arf.ar_name[3]);
+	                bzero (p, SZ_PATHNAME);
+		        if (fread(p, len, 1, fp) != 1) {
+		            fprintf (stderr, "%s: premature EOF");
+		        }
+		        sprintf (modname, "%s\0", p);
+	        } else 
+		    len = 0;
+#endif
+	        /* Get module date.  */
+	        sscanf (arf.ar_date, "%ld", &fdate);
+
+	        /* Insert entry into symbol table. */
+	        mlb_setdate (modname, fdate);
+	    } 
 
 	    /* Advance to the next entry.
 	     */
 	    if (sscanf (arf.ar_size, "%ld", &length) == 1) {
 		if (length & 1)				/* must be even */
 		    length++;
+#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+		fseek (fp, length-len, 1);
+#else
 		fseek (fp, length, 1);
+#endif
 	    } else {
 		printf ("could not decode length `%s' of library module\n",
 		    arf.ar_size);

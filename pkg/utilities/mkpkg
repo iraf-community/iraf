@@ -33,6 +33,7 @@ libpkg.a:
 	decod_tablst.x	<ctype.h>
 	lcase.x	
 	pfregres.f
+	pffctn.x
 	split.x		<mach.h>
 	t_curfit.x	<ctype.h> <error.h> <fset.h> <imhdr.h> <pkg/gtools.h>\
 			<pkg/xtanswer.h>

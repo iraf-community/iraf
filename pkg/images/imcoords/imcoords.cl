@@ -20,4 +20,7 @@ task	ccfind,
 	wcsedit,
 	wcsreset	= "imcoords$x_images.e"
 
+task	mkcwcs		= "imcoords$src/mkcwcs.cl"
+task	mkcwwcs		= "imcoords$src/mkcwwcs.cl"
+
 clbye()

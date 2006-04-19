@@ -25,7 +25,7 @@ bool	wc, fc, aplow[2], aphigh[2]
 int	i, j, ap, beam, nw, dtype
 double	w1, dw, zold, znew
 pointer	ptr, in, out, mw, sh, inbuf, outbuf
-pointer	sp, input, output, vkey, apstr, key, coeff
+pointer	sp, input, output, vkey, apstr, key, log, coeff
 
 real	clgetr()
 double	imgetd()
@@ -42,6 +42,7 @@ begin
 	call salloc (vkey, SZ_FNAME, TY_CHAR)
 	call salloc (apstr, SZ_FNAME, TY_CHAR)
 	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (log, SZ_LINE, TY_CHAR)
 	coeff = NULL
 
 	# Parameters
@@ -212,6 +213,26 @@ begin
 			}
 		    }
 		}
+
+		# Document header.
+		do i = 1, 98 {
+		    call sprintf (Memc[key], SZ_FNAME, "DOPCOR%02d")
+			call pargi (i)
+		    iferr (call imgstr (out, Memc[key], Memc[log], SZ_LINE))
+			break
+		}
+		if (fcor) {
+		    call sprintf (Memc[log], SZ_LINE, "%8g %g %s")
+			call pargd (z)
+			call pargr (ffac)
+			call pargstr (Memc[apstr])
+		} else {
+		    call sprintf (Memc[log], SZ_LINE, "%8g %s")
+			call pargd (z)
+			call pargstr (Memc[apstr])
+		}
+		call imastr (out, Memc[key], Memc[log])
+
 
 		# Verbose output
 		if (verbose) {

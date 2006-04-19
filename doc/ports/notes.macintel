@@ -1,0 +1,217 @@
+Notes:
+======
+	- setup Universal Binaries for HSI and method to cross compile
+X	- RPP and multi-valued case statements
+X	- FPE handling revisions
+X	- add new NPROTO tasks
+X	- ZPN mwcs driver
+X	- evexpr/evvexpr fixes from Phil Massey
+X	- Update install script to handle ECL installation
+X	- Make ECL the default
+X	- update hlib$motd
+X	- Buglog 552 - imcombine fix
+
+
+Port Revisions:
+===============
+
+local/.login
+bin.macintel			+
+bin.macintel/IB.MACX.X86	+
+noao/bin.macintel		+
+noao/bin.macintel/NB.MACX.X86	+
+unix/bin.macintel		+
+unix/as.macintel		+
+unix/os/irafpath.c
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf 
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+	Set up architecture dirs/paths for port, added a '-DMACINTEL' to 
+    HSI_CF.  (1/30/06)
+
+local/.cshrc
+ 	Added some personal preference aliases.
+
+unix/os/zfiond.c
+	Ifdef'd a <sys/select.h> to get the definition of a struct timeval
+    for the select() call (1/30/06)
+
+unix/boot/mkpkg/host.c
+	Had to include "mkpkg.h" to pick up the struct symbol def in 
+    extern.h  (1/30/06)
+
+unix/bin.macintel/rpp.e
+	Issues with nested switch-case, using the macosx version for now
+
+unix/bin.macintel/f2c.[eh]
+	Copied from bin.macosx
+
+pkg/mkpkg
+	Added ECL to package list of directories to be built.
+
+pkg/utilities/mkpkg
+pkg/utilities/pffctn.x
+pkg/utilities/t_polyfit.x
+	Broke out the pf_fctn() to a separate file to work around the
+	extern declaration problems in f2c that couldn't be handled in
+	f2c.h..
+
+unix/as.macintel/zsvjmp.s
+	Implemented the ZSVJMP procedure for this OS/arch.   Appears to
+    be working as expected and according to the zzdebug routine.
+
+unix/as.macintel/zz_zsvjmp.c	+
+	Renamed from zz.c.  This is a demo code of what the zsvjmp.s is
+    supposed to do that can be used in future ports.  Added more comments
+    to the header for reference.
+
+unix/as.macintel/f2c.tar.gz
+	Added a source distro of F2C used in building the binaries on this
+    system.  We hadn't previously kept this in the tree and F2C is normally
+    installed on this platform.  We can move to GFORTRAN at a later point or
+    as an option but that isn't yet ready for Mac/Intel or a standard part 
+    of the Xcode.
+
+unix/bin.macintel/f2c.h
+	Modified typedefs for extern problem.
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-osx.h	+
+	Added the GCC stdarg.h to the libc directory so it will be included
+    properly.  We can't simply include <stdarg.h> because the include chain
+    has hlib$libc at the head and this would lead to a recursive error.  
+    Adding files to the special files list to compile -Inolibc is an option
+    but not for external packages so we compromise with a platform-specific
+    include in the libc directory.
+
+unix/boot/mkpkg/host.c
+	Needed to include "mkpkg.h" to get 'struct symbol' definition
+    properly.
+
+unix/boot/mkpkg/scanlib.c
+	Added support for the "4.4bsd archive extended format #1" used 
+    on this system.  Fixes a problem where everything in an archive would
+    always be rebuilt.
+
+sys/fmtio/evexpr.y
+sys/fmtio/evvexpr.gy
+	Fixed a bug in the string-matching operator '?=' where the patstr
+    pointer wasn't initialized, and then wasn't used after translating a 
+    pattern such as '*foo*' to use '?*foo?*' closures.
+
+sys/mwcs/mkpkg
+sys/mwcs/wfzpn.x
+sys/mwcs/wfinit.x
+	Installed a ZPN projection driver from the Cambridge Astronomical
+    Survey Unit.
+
+local/bugs.log
+local/notes.v212
+unix/os/zfioks.c
+noao/lib/helpdb.mip
+pkg/images/Revisions
+pkg/images/imcoords/src/mkcwcs.cl
+pkg/images/immatch/doc/geotran.hlp
+pkg/images/immatch/doc/imcombine.hlp
+	Sync'd with latest from tucana.
+
+pkg/images/immatch/src/imcombine/src/icomb.gx
+	Installed path for buglog 552.
+
+noao/nproto/Revisions
+noao/nproto/nproto.cl
+noao/nproto/nproto.hd
+noao/nproto/nproto.men
+noao/nproto/skysep.cl		+
+noao/nproto/skygroup.cl		+
+noao/nproto/doc/skygroup.hlp	+
+noao/nproto/doc/skysep.hlp	+
+	Installed new NPROTO tasks.
+
+unix/hlib/cl.csh
+	Made ECL the default in response to the 'cl' command.
+
+local/login.cl
+unix/hlib/login.cl
+	Fixed the problem with the access() error message that sometimes
+    appears.
+
+unix/hlib/install
+unix/hlib/ecl.csh -> cl.csh
+	Modified the install script to create an 'ecl' command.  Needed to
+    create a hlib$ecl.csh symlink to keep this simple.  This is mostly a 
+    nicety as 'ecl' is now the default command language.
+
+unix/boot/spp/rpp/rppfor/caslab.f
+	Initialized the 'caslab' return to be zero.  Previously this procedure
+    was returning a -1 value causing the parent cascod() to read an EOF on
+    multi-value cases such as "case 1,2:" and would return an error message
+    about a missing label that was never generated.  This is a different 
+    behavior than the same code under linux/macosx, and even though this is a 
+    newer version of F2C this was assumed to be a platform issue.  NOTE: the 
+    assciated RATFOR has not been modified.   The RPP binary is now native 
+    Intel rather than using the PPC binary as was done earlier.
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+	Changed the version string to be V2.13.  This was done such that
+    packages like GEMINI could still version-check without failing even
+    though the hlib$motd makes clear this is an iraf.net release.
+
+mkpkg
+noao/mkpkg
+	Added 'macintel' architecture.
+
+unix/os/zxwhen.c
+unix/os/zzepro.c
+unix/os/zzstrt.c
+	Re-implemented the FPE handling for OSX using standard system
+    procedures (e.g. feclearexcept(), fegetexceptflag(), etc).  The usual
+    errors are now caught again.
+
+
+unix/os/zfioks.c
+    Added few new environment variables designed to control the behavior
+    of the network connections.  Also improved some of the debugging
+    messages and added a 'C' or 'S' to distinguish code marked as
+    'client' or 'server' for easier tracing.
+
+    The first new variable is KS_RETRY which, if defined, is the number 
+    of retry attempts using the default rsh (or KSRSH) protocol.  The 
+    task will sleep for 1 second between attempts and then loop back to 
+    try again to make the connection, this is meant to avoid potential 
+    clashes between multiple machines connecting simultaneously as with 
+    the pipeline.
+
+    The second new variable is KS_NO_RETRY which when defined instructs
+    the task *not* to attempt a retry using the fallback rexec protocol.
+    This test is made after the KS_RETRY checks to allow for various 
+    combinations of settings to allow the code to skip retries entirely
+    (i.e. define only KS_NO_RETRY), retry using the default protocol but
+    not with rexec (i.e. define KS_RETRY as some value and set KS_NO_RETRY),
+    or retry only with rexec (i.e. old behavior, don't define anything).
+    (3/20/06, MJF)
+
+sys/etc/environ.h
+    Increased the size of various environment buffers to allow for longer
+    strings.  This fixes a long-standing problem in XC where an excessively
+    long $PATH would cause a segfault in the envputs() routine.  Should
+    also help with long helpdb strings in user-defined packages. (3/21 MJF)
+
+lib/imio.h
+    Increased SZ_IMNAME from 79 to 128 per pipeline request.  The extra
+    space is already allocated in the LEN_IMDES and this is the most we
+    can do without changing the runtime struct. (3/21/06 MJF)
+
+unix/hlib/cl.csh
+	Fixed a bug in detecting the '-old' flag to start the CL rather than
+    the now-default ECL.

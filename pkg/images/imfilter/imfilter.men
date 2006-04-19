@@ -11,3 +11,4 @@
            mode - Modal box filter a list of 1D or 2D images
         rmedian - Ring median filter a list of 1D or 2D images
           rmode - Ring modal filter a list of 1D or 2D images
+	 runmed - Running median a list of images at each pixel position

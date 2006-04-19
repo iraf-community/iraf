@@ -1,5 +1,6 @@
 include	<imio.h>
 include	<mach.h>
+include	<mwset.h>
 include	<pkg/dttext.h>
 include	<pkg/igsfit.h>
 
@@ -24,7 +25,7 @@ int	i, j, rec, index, imin, imax, nfeatures, ntotal
 real	value, wt, ltm[2,2], ltv[2]
 pointer	dt, im, mw, ct, x, y, user
 
-int	fc_getim(), dtgeti(), dtscan()
+int	fc_getim(), dtgeti(), dtscan(), mw_stati()
 real	mw_c1tranr()
 bool	strne()
 pointer	dtmap1(), immap(), mw_openim(), mw_sctran(), un_open()
@@ -91,13 +92,15 @@ begin
 		# to "logical" coordinates currently used by TRANSFORM.
 
 		mw = mw_openim (im)
-		call mw_gltermr (mw, ltm, ltv, 2)
+		call mw_seti (mw, MW_USEAXMAP, NO)
+		i = mw_stati (mw, MW_NPHYSDIM)
+		call mw_gltermr (mw, ltm, ltv, i)
 		if (ltm[1,1] == 0. && ltm[2,2] == 0.) {
 		    ltm[1,1] = ltm[2,1]
 		    ltm[2,1] = 0.
 		    ltm[2,2] = ltm[1,2]
 		    ltm[1,2] = 0.
-		    call mw_sltermr (mw, ltm, ltv, 2)
+		    call mw_sltermr (mw, ltm, ltv, i)
 		} else if (ltm[1,2] != 0. || ltm[2,1] != 0.) {
 		    ltv[1] = 0.
 		    ltv[2] = 0.
@@ -105,7 +108,7 @@ begin
 		    ltm[2,1] = 0.
 		    ltm[2,2] = 1.
 		    ltm[1,2] = 0.
-		    call mw_sltermr (mw, ltm, ltv, 2)
+		    call mw_sltermr (mw, ltm, ltv, i)
 		}
 		ct = mw_sctran (mw, "physical", "logical", 1)
 
@@ -156,9 +159,6 @@ begin
 	}
 
 	# Set coordinates.  Take error action if no features are found.
-
-	if (imin == imax)
-	    call error (2, "Only one line or column measured")
 
 	if (ncoords > 0) {
 	    call xt_sort3 (Memr[user], Memr[x], Memr[y], ncoords)

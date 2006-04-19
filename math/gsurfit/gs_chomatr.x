@@ -36,7 +36,7 @@ begin
 	do n = 1, nrows {
 
 	    # test to see if matrix is singular
-	    if (((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= DELTA) {
+	    if (((matfac[1,n]+matrix[1,n])-matrix[1,n]) <= 1000/MAX_REAL) {
 		do j = 1, nbands
 		    matfac[j,n] = 0.
 		ier = SINGULAR

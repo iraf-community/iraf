@@ -1,4 +1,5 @@
 include	<imhdr.h>
+include	<imset.h>
 include	<pmset.h>
 include	"icombine.h"
 include	"icmask.h"
@@ -27,11 +28,11 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 pointer	names			# Pointer to array of string pointers
 
-int	i, j, k, nin, nout, npix, npms, nowhite(), strdic()
-real	clgetr()
-pointer	sp, key, fname, title, pm, pm_open()
+int	i, j, k, nin, nout, npix, npms, nowhite(), strdic(), ctor()
+real	rval
+pointer	sp, key, fname, title, image, pm, pm_open()
 bool	invert, pm_empty()
-errchk	calloc, pm_open, pm_loadf, pm_loadim
+errchk	calloc, pm_open, ic_pmload
 
 include "icombine.com"
 
@@ -44,6 +45,7 @@ begin
 	call salloc (key, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (title, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	# Determine the mask parameters and allocate memory.
 	# The mask buffers are initialize to all excluded so that
@@ -67,7 +69,6 @@ begin
 		call strcpy ("BPM", Memc[key], SZ_FNAME)
 	    }
 	}
-	mvalue = clgetr ("maskvalue")
 	npix = IM_LEN(out[1],1)
 	call calloc (pms, nimages, TY_POINTER)
 	call calloc (bufs, nimages, TY_POINTER)
@@ -82,6 +83,23 @@ begin
 	# not important.  The invert flag is used to indicate that
 	# empty masks are all bad rather the all good.
 
+	# Eventually we want to allow general expressions.  For now we only
+	# allow a special '<' or '>' operator.
+
+	call clgstr ("maskvalue", Memc[title], SZ_FNAME)
+	i = 1
+	if (Memc[title] == '<') {
+	    mtype = M_LTVAL
+	    i = i + 1
+	} else if (Memc[title] == '>') {
+	    mtype = M_GTVAL
+	    i = i + 1
+	}
+	if (ctor (Memc[title], i, rval) == 0)
+	    call error (1, "Bad mask value")
+	if (rval < 0)
+	    call error (1, "Bad mask value")
+	mvalue = rval
 	if (mtype == 0)
 	    mtype = M_NONE
 	if (mtype == M_BADBITS && mvalue == 0) 
@@ -114,10 +132,7 @@ begin
 			Memc[fname] = EOS
 		    else {
 			pm = pm_open (NULL)
-			iferr (call pm_loadf (pm, Memc[fname], Memc[title],
-			    SZ_FNAME))
-			    call pm_loadim (pm, Memc[fname], Memc[title],
-				SZ_FNAME)
+			call ic_pmload (in[i], pm, Memc[fname], SZ_FNAME)
 			call pm_seti (pm, P_REFIM, in[i])
 			if (pm_empty (pm) && !invert)
 			    Memc[fname] = EOS
@@ -154,6 +169,78 @@ begin
 
 	call sfree (sp)
 end
+
+
+# IC_PMLOAD -- Find and load a mask.
+# This is more complicated because we want to allow a mask name specified
+# without a path to be found either in the current directory or in the
+# directory of the image.
+
+procedure ic_pmload (im, pm, fname, maxchar)
+
+pointer	im			#I Image pointer to be associated with mask
+pointer	pm			#O Mask pointer to be returned
+char	fname[ARB]		#U Mask name
+int	maxchar			#I Max size of mask name
+
+pointer	sp, str, imname
+int	i, fnldir(), stridxs()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_PATHNAME, TY_CHAR)
+
+	# First check if the specified file can be loaded.
+	ifnoerr (call pm_loadf (pm, fname, Memc[str], SZ_PATHNAME))
+	    return
+	ifnoerr (call pm_loadim (pm, fname, Memc[str], SZ_PATHNAME))
+	    return
+
+	# Check if the file has a path in which case we return an error.
+	# Must deal with possible [] which is a VMS directory delimiter.
+	call strcpy (fname, Memc[str], SZ_PATHNAME)
+	i = stridxs ("[", Memc[str])
+	if (i > 0)
+	    Memc[str+i-1] = EOS
+	if (fnldir (Memc[str], Memc[str], SZ_PATHNAME) > 0) {
+	    call sprintf (Memc[str], SZ_PATHNAME,
+	        "Bad pixel mask not found (%s)")
+		call pargstr (fname)
+	    call error (1, Memc[str])
+	}
+
+	# Check if the image has a path.  If not return an error.
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	call imstats (im, IM_IMAGENAME, Memc[imname], SZ_PATHNAME)
+	if (fnldir (Memc[imname], Memc[str], SZ_PATHNAME) == 0) {
+	    call sprintf (Memc[str], SZ_PATHNAME,
+	        "Bad pixel mask not found (%s)")
+		call pargstr (fname)
+	    call error (1, Memc[str])
+	}
+
+	# Try using the image path for the mask file.
+	call strcat (fname, Memc[str], SZ_PATHNAME)
+	ifnoerr (call pm_loadf (pm, Memc[str], Memc[imname], SZ_PATHNAME)) {
+	    call strcpy (Memc[str], fname, maxchar)
+	    return
+	}
+	ifnoerr (call pm_loadim (pm, Memc[str], Memc[imname], SZ_PATHNAME)) {
+	    call strcpy (Memc[str], fname, maxchar)
+	    return
+	}
+
+	# No mask found.
+	call sprintf (Memc[str], SZ_PATHNAME,
+	    "Bad pixel mask not found (%s)")
+	    call pargstr (fname)
+	call error (1, Memc[str])
+
+	# This will not be reached and we let the calling program free
+	# the stack.  We include smark/sfree for lint detectors.
+	call sfree (sp)
+end
+
 
 
 # IC_MCLOSE -- Close the mask interface.
@@ -315,6 +402,10 @@ begin
 		    call abeqki (Memi[buf], 0, Memi[buf], npix)
 		} else if (mtype == M_GOODVAL)
 		    call abneki (Memi[buf], mvalue, Memi[buf], npix)
+		else if (mtype == M_LTVAL)
+		    call abgeki (Memi[buf], mvalue, Memi[buf], npix)
+		else if (mtype == M_GTVAL)
+		    call ableki (Memi[buf], mvalue, Memi[buf], npix)
 
 		lflag[i] = D_NONE
 		do j = 1, npix
@@ -327,6 +418,8 @@ begin
 		    call aclri (Memi[buf], npix)
 		} else if ((mtype == M_BADVAL && mvalue != 0) ||
 		    (mtype == M_GOODVAL && mvalue == 0)) {
+		    call aclri (Memi[buf], npix)
+		} else if (mtype == M_LTVAL && mvalue > 0) {
 		    call aclri (Memi[buf], npix)
 		} else {
 		    call amovki (1, Memi[buf], npix)
@@ -430,6 +523,10 @@ begin
 		call abeqki (Memi[buf], 0, Memi[buf], npix)
 	    } else if (mtype == M_GOODVAL)
 		call abneki (Memi[buf], mvalue, Memi[buf], npix)
+	    else if (mtype == M_LTVAL)
+		call abgeki (Memi[buf], mvalue, Memi[buf], npix)
+	    else if (mtype == M_GTVAL)
+		call ableki (Memi[buf], mvalue, Memi[buf], npix)
 
 	    dflag = D_NONE
 	    do i = 1, npix
@@ -442,6 +539,8 @@ begin
 		;
 	    } else if ((mtype == M_BADVAL && mvalue != 0) ||
 		(mtype == M_GOODVAL && mvalue == 0)) {
+		;
+	    } else if (mtype == M_LTVAL && mvalue > 0) {
 		;
 	    } else
 		dflag = D_NONE

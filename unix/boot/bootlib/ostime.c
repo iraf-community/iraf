@@ -90,9 +90,13 @@ long	unix_time;
 static long
 os_timezone()
 {
+#ifdef CYGWIN
+	extern	long _timezone;
+	return (_timezone);
+#else
 #ifdef SYSV
-	extern	long timezone;
-	return (timezone);
+	extern	long time_zone;
+	return (time_zone);
 #else
 #ifdef MACOSX
 	struct tm *tm;
@@ -104,6 +108,7 @@ os_timezone()
 	struct	timeb time_info;
 	ftime (&time_info);
 	return (time_info.timezone * 60);
+#endif
 #endif
 #endif
 }

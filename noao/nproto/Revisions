@@ -1,6 +1,15 @@
 .help revisions Jun88 noao.nproto
 .nf
 
+skygroup.cl		+
+skysep.cl		+
+doc/skygroup.hlp	+
+doc/skysep.hlp		+
+nproto.cl
+nproto.men
+nproto.hd
+    Added two new script tasks.  (2/10/06, Valdes)
+
 ace/catio.x
     An extra argument to tbhgtr() was found by lint.  (5/24/04, Valdes)
 

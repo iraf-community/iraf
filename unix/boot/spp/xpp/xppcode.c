@@ -34,6 +34,7 @@
 
 #define	IRAFLIB		"iraf$lib/"
 #define	HOSTLIB		"host$hlib/"
+#define HBIN_INCLUDES	"hbin$arch_includes/"
 
 /* Size limiting definitions.
  */
@@ -70,6 +71,7 @@ char	*esc_val = "\n\t\f\r\\\"\'";
 extern	char	yytext[];		/* LEX character buffer		*/
 extern	int	yyleng;			/* length of string in yytext	*/
 extern	FILE	*yyin, *yyout;		/* LEX input, output files	*/
+
 extern	char	yytchar, *yysptr, yysbuf[];
 extern	int	yylineno;
 
@@ -78,8 +80,9 @@ extern	int	yylineno;
 ?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 #define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
 
+
 int	context = GLOBAL;		/* lexical context variable	*/
-extern	int foreigndefs;
+extern	int hbindefs, foreigndefs;
 char	*machdefs[] = { "mach.h", "config.h", "" };
 
 /* The task structure is used for TASK declarations.  Since this is a
@@ -132,7 +135,8 @@ int	errchk = NO;			/* set if proc employs error checking */
  */
 skipnl()
 {
-	while (input() != '\n')
+	int c;
+	while ((c=input()) != '\n')
 	    ;
 	unput ('\n');
 }
@@ -518,6 +522,7 @@ char	ch;
 do_include()
 {
 	char    *p, delim, *rindex();
+	char    hfile[SZ_FNAME+1], *op;
 	int	root_len;
 	int	strcmp();
 
@@ -534,7 +539,6 @@ do_include()
 	 * system include file.
 	 */
 	if (yytext[yyleng-1] == '<') {
-	    char   hfile[SZ_FNAME+1], *op;
 
 	    for (op=hfile;  (*op = input()) != EOF;  op++)
 		if (*op == '\n') {
@@ -557,12 +561,23 @@ do_include()
 	     * include statement was found.  Compiler may not have been run
 	     * from the directory containing the source and include file.
 	     */
-	    if ((p = rindex (fname[istkptr-1], '/')) == NULL)
-		root_len = 0;
-	    else
-		root_len = p - fname[istkptr-1] + 1;
+	    if (!hbindefs) {
+	        if ((p = rindex (fname[istkptr-1], '/')) == NULL)
+		    root_len = 0;
+	        else
+		    root_len = p - fname[istkptr-1] + 1;
+	        strncpy (fname[istkptr], fname[istkptr-1], root_len);
 
-	    strncpy (fname[istkptr], fname[istkptr-1], root_len);
+	    } else {
+	        if ((p = vfn2osfn (HBIN_INCLUDES, 0))) {
+		    root_len = strlen (p);
+	            strncpy (fname[istkptr], p, root_len);
+	        } else {
+		    --istkptr;
+		    error (XPP_COMPERR, "cannot find hbin$ directory");
+		    return;
+	        }
+	    }
 	    fname[istkptr][root_len] = EOS;
 
 	    delim = '"';
@@ -1120,6 +1135,7 @@ char	*string;
 {
 	register char *ip;
 
+
 	if (context & (BODY|DATASTMT)) {
 	    /* In body of procedure or in a data statement (which is output
 	     * just preceding the body).
@@ -1134,6 +1150,7 @@ char	*string;
 	    /* Output of a miscellaneous declaration in the declarations
 	     * section.
 	     */
+if (string[0] == '}') bob();
 	    for (ip=string;  (*dp++ = *ip++) != EOS;  )
 		;
 	    if (--dp >= &dbuf[SZ_DBUF]) {
@@ -1146,6 +1163,8 @@ char	*string;
 	    fputs (string, yyout);
 	}
 }
+
+bob() { int i = 0; i++; }
 
 
 /* BEGIN_CODE -- Code that gets executed when the keyword BEGIN is encountered,
@@ -1232,7 +1251,8 @@ end_code()
 	 * data statement declaration.
 	 */
 	*dp++ = EOS;
-	fputs (dbuf, yyout);
+	fputs (dbuf, yyout); fflush (yyout);
+{ int i; for (i=0; i < SZ_DBUF; ) dbuf[i++] = '\0'; }
 	dp = dbuf;
 
 	/* Output the SAVE statement, which must come after all declarations
@@ -1251,8 +1271,9 @@ end_code()
 	 */
 	init_strings();
 	*op++ = EOS;
-	fputs (obuf, yyout);
-	fputs ("end\n", yyout);
+	fputs (obuf, yyout); fflush (yyout);
+{ int i; for (i=0; i < SZ_OBUF; ) obuf[i++] = '\0'; }
+	fputs ("end\n", yyout); fflush (yyout);
 
 	op = obuf;
 	*op = EOS;
@@ -1560,6 +1581,7 @@ char	delim;
 {
 	register char *op, *cp, ch;
 	char	*index();
+
 
 	for (op=yytext;  (*op = input()) != EOF;  op++) {
 	    if (*op == delim) {

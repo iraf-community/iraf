@@ -73,6 +73,9 @@ char *fname;			/* simple filename, no dirs */
 #ifdef LINUXPPC
 	strcat (pathname, "linuxppc");
 #else
+#ifdef CYGWIN
+	strcat (pathname, "cygwin");
+#else
 #ifdef SUSE
 	strcat (pathname, "suse");
 #else
@@ -85,8 +88,11 @@ char *fname;			/* simple filename, no dirs */
 #ifdef BSD
 	strcat (pathname, "freebsd");
 #else
-#ifdef MACOSX
+#if (defined(MACOSX) && !defined(MACINTEL))
 	strcat (pathname, "macosx");
+#else
+#ifdef MACINTEL
+	strcat (pathname, "macintel");
 #else
 #ifdef SOLARIS
 #ifdef X86
@@ -112,6 +118,8 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
+#endif
+#endif
 #endif
 #endif
 #endif

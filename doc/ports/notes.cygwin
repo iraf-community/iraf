@@ -1,0 +1,125 @@
+Notes:
+======
+Port start (4/12/06)
+
+
+Port Revisions:
+===============
+
+local/notes.cygwin		+
+	Started this file.....
+
+mkpkg
+noao/mkpkg
+local/.login
+bin.cygwin                    	+
+bin.cygwin/IB.CYGW.X86        	+
+noao/bin.cygwin               	+
+noao/bin.cygwin/NB.CYGW.X86   	+
+unix/bin.cygwin               	+
+unix/as.cygwin                	+
+unix/os/irafpath.c
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf 
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+        Set up architecture dirs/paths for port, added a '-DCYGWIN' to 
+    HSI_CF.  (4/11/06)
+
+
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	Changed the 'timezone' variable to '_timezone', ifdef'd code.
+
+unix/os/zawset.c
+	Ifdef'd the code definitions for RLIMIT not on this system.
+
+unix/os/zopdir.c
+	Cygwin dirent type doesn't include the 'd_ino' element so the usual
+    way to read directories and look for empty inodes doesn't apply here.  
+    Made a trivial change which should effectively be a no-op since we won't
+    ever expect a null inode anyway.  Need to check on how stat/lstat deals
+    with inodes, there is apparently a define that can be enabled in the dev
+    Cygwin version that will compute an inode hash of the filename to fake this
+    but we apparently don't need it now.
+
+unix/os/zxwhen.c
+unix/os/zzepro.c
+unix/os/zzstrt.c
+	Implemented the FPE handling using the libmingwex.a procedures.  
+
+unix/hlib/libc/varargs.h
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-cygwin.h 	+
+	System uses <stdarg.h> but like on other systems this file is in 
+    the GCC tree and not the public /usr/include.  As before, made a local
+    copy we'll include in the libc directly.
+
+unix/as.cygwin/zsvjmp.s	+
+	Implemented ZSJMP for this system, removed leading underscores on
+    symbol names.
+
+unix/bin.cygwin/f2c.e
+unix/bin.cygwin/libf2c.a
+	Built the F2C libs for this platform.
+
+unix/bin.cygwin/libcompat.a
+	Pulled out the feclearexcept/fe[sg]etexceptflag procedures from the
+    /lib/mingw/libmingwex.a library so we can use the same FPE handling code
+    as for OSX.  This lib isn't part of the base install for Cygwin so rather
+    than add a dependency to the platform we'll use the existing libcompat.a
+
+unix/boot/spp/xpp/decl.c
+	Fixed a problem in the XPP stage where a function as the first procedure
+    in a file would not emit the procedure name properly.  This has been seen
+    sporadically on other platforms in the past and appears to be related to
+    a lexical context problem.  Will investigate more later, did a quick fix
+    for now.
+
+unix/boot/spp/xc.c
+unix/boot/spp/xpp/xppcode.c
+unix/boot/spp/xpp/xppmain.c
+unix/hlib/mkpkg.sf 
+unix/hlib/mkpkg.sf.CYGW		+ 
+unix/bin.cygwin/arch_includes/	+
+	There is apparently a bug in the handling of multi-line define macros
+    such that the popcontext() is called at the end of the first line however
+    the remainder of the macro doesn't get emmitted until sometime later.
+    The buffering issue was too tricky to figure out for now so I took 
+    advantage of the fact irafpath() will look in hbin$ before lib$ to allow
+    for an arch-specific version of a system include like <fio.h> that is
+    causing a problem.  For local includes such as in plio, I added a new
+    '-A' flag to both XC/XPP to force the code to look in a hbin$arch_includes
+    directory first for local include files.  For the plio cases the reference
+    was to e.g. "../pllseg.h" so the files need to be a the correct relative
+    location (TODO: strip path specs from local includes...).  The affected
+    files were put on the special file list for this platform 
+
+unix/bin.cygwin/fio.h		+
+unix/bin.cygwin/pllseg.h	+ 
+unix/bin.cygwin/plrseg.h	+
+	These includes defined multi-line macros.  Made arch_include versions
+    without the newlines.
+
+sys/fmtio/fprfmt.x
+	Crap, multi-line define in this one file we can't work around as 
+    above.  For now just change the macro.....
+
+unix/hlib/mkfloat.csh
+	Check for cygwin arch when defining the $COMPRESS var, cygwin doesn't
+    support the -f flag 
+
+
+
+# ---------------------------------------------------------------------------
+
+Sysgen completes without errors, all seems to be working. (4/14/06)
+
+./zzclean
+./zzmake
+./zzsums
+./zzsysgen

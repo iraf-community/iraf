@@ -47,6 +47,7 @@ begin
 	string	str1, str2, str3, str4, arcrefs, log1, log2
 	bool	reextract, extract, disp, ext, flux, log
 	int	i, j, n, nspec
+	struct	err
 
 	# Call a separate task to do the listing to minimize the size of
 	# this script and improve it's readability.
@@ -176,8 +177,11 @@ begin
 		error (1, "No object spectra for arc reference")
 	    fd2 = ""
 	    i = strlen (arcref1)
-	    if (!access (arcref1 // imtype))
-		error (1, "Arc reference spectrum not found - " // arcref1)
+	    if (!access (arcref1 // imtype)) {
+		printf ("Arc reference spectrum not found - %s%s\n",
+		    arcref1, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	    arcref1ms = arcref1 // mstype
 	    if (redo && access (arcref1ms))
 	        imdelete (arcref1ms, verify=no)
@@ -210,7 +214,9 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec) | tee (log1)
+		print ("Object spectrum not found - " // spec // imtype) |
+		    tee (log1)
+		print ("Check setting of imtype")
 		next
 	    }
 	    specms = spec // mstype

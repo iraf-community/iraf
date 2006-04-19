@@ -105,7 +105,7 @@ begin
 	} else {
 	    dt = dtmap (Memc[database], READ_ONLY)
 	    reclist = imtopenp ("solutions")
-	    if ((imtlen (reclist) > 0) && (imtlen (imlist) !=
+	    if ((imtlen (reclist) > 1) && (imtlen (imlist) !=
 	        imtlen (reclist))) {
 		call eprintf (
 		    " The image and record list lengths are different\n")

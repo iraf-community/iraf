@@ -325,6 +325,19 @@ EXAMPLES
 1. To make a nice plot of a set of spectra with the default layout:
 
 	cl> specplot spec*
+
+2.  To set the colors or line types for multiple spectra in a batch
+mode application create a cursor file like:
+
+	cl> type cursor.dat
+	:color[1] 2
+	:color[2] 3
+	:color[3] 4
+	r
+	cl> specplot im1,im2,im3 cursor=cursor.dat
+
+Note that the 'r' key is necessary redraw the graph with the changed
+attributes.
 .ih
 REVISIONS
 .ls SPECPLOT V2.11

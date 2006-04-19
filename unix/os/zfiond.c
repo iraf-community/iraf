@@ -15,6 +15,9 @@
 #ifdef LINUX
 #include <sys/time.h>
 #endif
+#ifdef MACOSX
+#include <sys/select.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>

@@ -8,3 +8,5 @@
 	   mkms - Create multispec from 1D spectra including associated bands
        objmasks - Detect objects in images and make masks
 	slitpic - Generate IRAF image of aperture slit mask
+       skygroup - Group a list containing RA and Dec into spatial sublists
+         skysep - Compute arc separation of two RA/Dec values

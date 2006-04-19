@@ -12,12 +12,22 @@
  */
 #ifndef D_stdarg
 
-#ifdef MACOSX
+#if (defined(MACOSX) || defined(__CYGWIN__))
 #define USE_STDARG
 #endif
 
 #ifdef USE_STDARG
-#include "/usr/include/stdarg.h"
+
+#ifdef MACOSX
+#include "stdarg-osx.h"
+#else
+#ifdef __CYGWIN__
+#include "stdarg-cygwin.h"
+#else
+#include <stdarg.h>
+#endif
+#endif
+
 #else
 #include "/iraf/iraf/unix/hlib/libc/varargs.h"
 #endif

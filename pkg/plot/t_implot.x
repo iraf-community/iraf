@@ -28,6 +28,8 @@ define	MAX_COLORS	8
 #	j		move down
 #	k		move up
 #	l		plot line at position of cursor
+#	m		previous image
+#	n		next image
 #	p		measure profile (mark region and baseline with 2 pos)
 #	o		overplot next vector
 #	r		redraw
@@ -54,6 +56,7 @@ define	MAX_COLORS	8
 
 procedure t_implot()
 
+int	list
 char	image[SZ_FNAME]
 char	wcstype[SZ_FNAME]
 char	xlabel[SZ_FNAME]
@@ -65,14 +68,15 @@ char	device[SZ_FNAME]
 int	xnticks, ynticks
 bool	overplot, lineplot, logscale, erase, rescale[2], p_rescale[2]
 int	key, wcs, ip, i1, i2, n, linetype, color, nltypes, linestep, navg
-int	npix, nlines, ncols, line, col, shift, step, p_navg, sline
+int	npix, nlines, ncols, line, col, shift, step, p_navg, sline, nim, index
 real	x, y, px, py, qx, qy, x1, x2, y1, y2
 real	median, mean, sigma, sum
-pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl
+pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl, ptr
 
 real	asumr(), amedr(), plt_iformatr()
-int	clgeti(), clgcur(), ctoi(), ctor(), ggeti()
+int	clgeti(), clgcur(), ctoi(), ctor(), ggeti(), imtlen()
 pointer	gopen(), immap(), mw_openim(), mw_sctran(), sl_getstr()
+pointer	imtopenp(), imtrgetim()
 errchk	mw_sctran
 
 define	line_ 91
@@ -83,29 +87,15 @@ string	bell "\007"
 string	again "again:"
 
 begin
-	call clgstr ("image", image, SZ_FNAME)
-	im = immap (image, READ_ONLY, 0)
-	mw = mw_openim (im)
-	call mw_seti (mw, MW_USEAXMAP, NO)
-
-	call clgstr ("wcs", wcstype, SZ_FNAME)
-	ct = mw_sctran (mw, "logical", wcstype, 0)
-
+	list = imtopenp ("image")
 	call clgstr ("device", device, SZ_FNAME)
 	gp = gopen (device, NEW_FILE, STDGRAPH)
-
-	ncols = IM_LEN(im,1)
-	if (IM_NDIM(im) <= 0)
-	    call error (1, "image has no pixels")
-	else if (IM_NDIM(im) > 1)
-	    nlines = IM_LEN(im,2)
-	else
-	    nlines = 1
+	call clgstr ("wcs", wcstype, SZ_FNAME)
 
 	if (clgeti ("$nargs") > 1)
 	    line = clgeti ("line")
 	else
-	    line = max(1, min(nlines, (nlines + 1) / 2))
+	    line = INDEFI
 
 	p_rescale[1] = true
 	rescale[1]   = true
@@ -127,591 +117,713 @@ begin
 	p_navg	  = 1
 	navg	  = 1
 	step	  = clgeti ("step")
-	if (IS_INDEFI(step) || step < 1)
-	    step = max (1, nlines / 10)
 
-	npix = max (ncols, nlines)
-	call malloc (xold, npix, TY_REAL)
-	call malloc (yold, npix, TY_REAL)
-	call malloc (xnew, npix, TY_REAL)
-	call malloc (ynew, npix, TY_REAL)
+	# Loop through the images.  Currently this loop is not actually
+	# used and instead the 'm' and 'n' keys explicitly change the
+	# image.  The 'q' key exits the loop regardless of the position
+	# of the list.
 
-	call imp_getvector (im, mw, ct, wcstype, xnew, ynew, xlabel, fmt,
-	    line, navg, lineplot)
-	if (format[1] == '%')
-	    call strcpy (format, fmt, SZ_FNAME)
-	npix = ncols
+	nim = imtlen (list)
+	index = 1
+	while (imtrgetim (list, index, image, SZ_FNAME) != EOF) {
+	    iferr {
+		im = NULL; mw = NULL; sl = NULL
 
-	call gsets (gp, G_XTICKFORMAT, fmt)
-	if (xnticks >= 0)
-	    call gseti (gp, G_XNMAJOR, xnticks)
-	if (ynticks >= 0)
-	    call gseti (gp, G_YNMAJOR, ynticks)
-	call gseti (gp, G_NMINOR, 0)
-	call gseti (gp, G_PLTYPE, 1)
-	call gseti (gp, G_PLCOLOR, 1)
+		ptr = immap (image, READ_ONLY, 0); im = ptr
+		ptr = mw_openim (im); mw = ptr
+		call mw_seti (mw, MW_USEAXMAP, NO)
 
-	call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], ncols, nlines,
-	    real(line), navg, lineplot, rescale, image, xlabel)
+		ct = mw_sctran (mw, "logical", wcstype, 0)
 
-	call sl_init (sl, 1)
-	while (clgcur ("coords", x, y, wcs, key, command, SZ_FNAME) != EOF) {
-	    if (key == 'q')
-		break
+		ncols = IM_LEN(im,1)
+		if (IM_NDIM(im) <= 0)
+		    call error (1, "image has no pixels")
+		else if (IM_NDIM(im) > 1)
+		    nlines = IM_LEN(im,2)
+		else
+		    nlines = 1
 
-	    switch (key) {
-	    case 'a':
-		# Plot the average over a range of lines or columns marked
-		# interactively with the cursor.
+		if (IS_INDEFI(line))
+		    line = max(1, min(nlines, (nlines + 1) / 2))
 
-		x1 = x; y1 = y
-		call printf (again)
-		if (clgcur ("gcur", x2, y2, wcs, key, command, SZ_FNAME) == EOF)
-		    return
+		if (IS_INDEFI(step) || step < 1)
+		    step = max (1, nlines / 10)
 
-		if (abs(x2-x1) > abs(y2-y1)) {
-		    # Range is in X.
+		npix = max (ncols, nlines)
+		call malloc (xold, npix, TY_REAL)
+		call malloc (yold, npix, TY_REAL)
+		call malloc (xnew, npix, TY_REAL)
+		call malloc (ynew, npix, TY_REAL)
 
-		    navg = abs (x2 - x1) + 1
-		    if (lineplot) {
-			col = nint (min (x1, x2))
-			goto col_
-		    } else {
-			line = nint (min (x1, x2))
-			goto line_
-		    }
-
-		} else {
-		    # Range is in Y.
-
-		    if (lineplot) {
-			call imp_tran (gp, x1, y1, x1, y1, Memr[xnew],
-			    ncols, nlines)
-			call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
-			    ncols, nlines)
-			navg = abs (y2 - y1) + 1
-			line = nint (min (y1, y2))
-			goto line_
-		    } else {
-			call imp_tran (gp, x1, y1, x1, y1, Memr[xnew],
-			    nlines, ncols)
-			call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
-			    nlines, ncols)
-			navg = abs (y2 - y1) + 1
-			col = nint (min (y1, y2))
-			goto col_
-		    }
-		}
-
-	    case 'j', 'k':
-		# Move viewport into image up (k) or down (j).  This is done
-		# by erasing the old data vector and drawing a new one.
-
-		erase = true
-		navg = p_navg
-		overplot = true
-		call amovr (Memr[xnew], Memr[xold], npix)
-		call amovr (Memr[ynew], Memr[yold], npix)
-
-		shift = step
-		if (key == 'j')
-		    shift = -shift
-		    
-		if (lineplot) {
-		    line = line + shift
-		    goto line_
-		} else {
-		    col  = col  + shift
-		    goto col_
-		}
-
-	    case 'l':
-		# Plot a line.
-		if (lineplot) {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols, nlines)
-		    line = max(1, min(nlines, nint(py)))
-		} else {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines, ncols)
-		    line = max(1, min(nlines, nint(px)))
-		}
-		navg = p_navg
-		line = line - (navg - 1) / 2
-line_
-		lineplot = true
-		line = max(1, min(nlines, line))
+		if (!overplot)
+		    call gclear (gp)
 		call imp_getvector (im, mw, ct, wcstype, xnew, ynew, xlabel,
 		    fmt, line, navg, lineplot)
 		if (format[1] == '%')
 		    call strcpy (format, fmt, SZ_FNAME)
 		npix = ncols
-replotline_
-		if (overplot) {
-		    if (erase) {
-			# Erase old vector and replace it with new vector.
 
-			call imp_redraw (gp, Memr[xold], Memr[yold],
-			    Memr[xnew], Memr[ynew], npix)
-			erase = false
+		call gsets (gp, G_XTICKFORMAT, fmt)
+		if (xnticks >= 0)
+		    call gseti (gp, G_XNMAJOR, xnticks)
+		if (ynticks >= 0)
+		    call gseti (gp, G_YNMAJOR, ynticks)
+		call gseti (gp, G_NMINOR, 0)
+		call gseti (gp, G_PLTYPE, 1)
+		call gseti (gp, G_PLCOLOR, 1)
 
-		    } else {
-			# Overplot new vector. 
-
-			linetype = linetype + linestep
-			if (linetype > nltypes)
-			    linetype = 1
-			call gseti (gp, G_PLTYPE, linetype)
-
-			color = color + 1
-			if (color > MAX_COLORS)
-			    color = 1
-			call gseti (gp, G_PLCOLOR, color)
-
-			call gpline (gp, Memr[xnew], Memr[ynew], ncols)
-		    }
-
-		    call imp_markpos (gp, line, nlines)
-		    overplot = false
-
-		} else {
-		    call gclear (gp)
-		    call gsets (gp, G_XTICKFORMAT, fmt)
-		    if (logscale)
-			call gseti (gp, G_YTRAN, GW_LOG)
-		    call gseti (gp, G_NMINOR, 0)
-		    if (xnticks >= 0)
-			call gseti (gp, G_XNMAJOR, xnticks)
-		    if (ynticks >= 0)
-			call gseti (gp, G_YNMAJOR, ynticks)
-		    linetype = 1
-		    color = 1
-		    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], ncols,
-			nlines, real(line), navg, lineplot, rescale, image,
-			xlabel)
-		    rescale[1] = p_rescale[1]
-		    rescale[2] = p_rescale[2]
-		}
-
-	    case 'c':
-		# Plot a column.
-		if (lineplot) {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols, nlines)
-		    col = max(1, min(ncols, nint(px)))
-		} else {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines, ncols)
-		    col = max(1, min(ncols, nint(py)))
-		}
-		navg = p_navg
-		col = col - (navg - 1) / 2
-col_
-		if (nlines == 1) {
-		    call printf (bell)
-		    next
-		}
-		lineplot = false
-		col = max(1, min(ncols, col))
-		call imp_getvector (im, mw, ct, wcstype, xnew, ynew, xlabel,
-		    fmt, col, navg, lineplot)
-		if (format[1] == '%')
-		    call strcpy (format, fmt, SZ_FNAME)
-		npix = nlines
-replotcol_
-		if (overplot) {
-		    if (erase) {
-			# Erase old vector and replace it with new vector.
-
-			call imp_redraw (gp, Memr[xold], Memr[yold],
-			    Memr[xnew], Memr[ynew], npix)
-			erase = false
-
-		    } else {
-			linetype = linetype + linestep
-			if (linetype > nltypes)
-			    linetype = 1
-			call gseti (gp, G_PLTYPE, linetype)
-
-			color = color + 1
-			if (color > MAX_COLORS)
-			    color = 1
-			call gseti (gp, G_PLCOLOR, color)
-
-			call gpline (gp, Memr[xnew], Memr[ynew], nlines)
-		    }
-
-		    call imp_markpos (gp, col, ncols)
-		    overplot = false
-
-		} else {
-		    call gclear (gp)
-		    call gsets (gp, G_XTICKFORMAT, fmt)
-		    if (logscale)
-			call gseti (gp, G_YTRAN, GW_LOG)
-		    call gseti (gp, G_NMINOR, 0)
-		    if (xnticks >= 0)
-			call gseti (gp, G_XNMAJOR, xnticks)
-		    if (ynticks >= 0)
-			call gseti (gp, G_YNMAJOR, ynticks)
-		    linetype = 1
-		    color = 1
-		    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], nlines,
-			ncols, real(col), navg, lineplot, rescale, image,
-			xlabel)
-		    rescale[1] = p_rescale[1]
-		    rescale[2] = p_rescale[2]
-		}
-
-	    case 'e':
-		# Expand plot by marking corners of new window.  We are called
-		# with the coords of the lower left corner.
-
-		x1 = x; y1 = y
-		call printf (again)
-		if (clgcur ("gcur", x2, y2, wcs, key, command, SZ_FNAME) == EOF)
-		    return
-
-		rescale[1] = false
-		rescale[2] = false
-		p_rescale[1] = true
-		p_rescale[2] = true
-
-		# If the cursor moved only in X, with negligible range in Y,
-		# expand only in X.  Do the comparisons in NDC space to avoid
-		# scaling problems.
-
-		call gctran (gp, x1, y1, px, py, wcs, 0)
-		call gctran (gp, x2, y2, qx, qy, wcs, 0)
-
-		if (abs (py - qy) < .01) {
-		    y1 = INDEF;  y2 = INDEF
-		    rescale[2] = true
-		}
-		call imp_swind (x1, x2, y1, y2)
-
-		if (lineplot)
-		    goto replotline_
-		else
-		    goto replotcol_
-
-	    case 'o':
-		overplot = true
-
-	    case 'r':
-		if (lineplot)
-		    goto replotline_
-		else
-		    goto replotcol_
-
-	    case 'p':
-		# Profile analysis.
-		x1 = x
-		y1 = y
-		call printf (again)
-		if (clgcur ("gcur", x2, y2, wcs, key, command, SZ_FNAME) == EOF)
-		    break
-
-		call imp_profile (gp, Memr[xnew], Memr[ynew], npix,
-		    x1, y1, x2, y2, sl, sline)
-		call printf (Memc[sl_getstr(sl,sline)])
-
-	    case 's':
-		# Statistics.
-		x1 = x
-		call printf (again)
-		if (clgcur ("gcur", x2, y, wcs, key, command, SZ_FNAME) == EOF)
-		    break
-
-		i1 = max(1, min(npix, nint(x1)))
-		i2 = max(1, min(npix, nint(x2)))
-		if (i1 > i2) {
-		    n = i1
-		    i1 = i2
-		    i2 = n
-		} else if (i1 == i2)
-		    i2 = i1 + 1
-
-		n = i2 - i1 + 1
-		call aavgr (Memr[ynew+i1-1], n, mean, sigma)
-		median = amedr (Memr[ynew+i1-1], n)
-		sum = asumr (Memr[ynew+i1-1], n)
+		call imp_plotvector (gp, im, Memr[xnew], Memr[ynew], ncols,
+		    nlines, real(line), navg, lineplot, rescale, image, xlabel)
+		overplot = false
 
 		call sl_init (sl, 1)
-		call sprintf (Memc[sl_getstr(sl,1)], SZ_LINE,
-		    "median=%g, mean=%g, rms=%g, sum=%g, npix=%d\n")
-		    call pargr (median)
-		    call pargr (mean)
-		    call pargr (sigma)
-		    call pargr (sum)
-		    call pargi (n)
-		sline = 1
-		call printf (Memc[sl_getstr(sl,sline)])
+		while (clgcur ("coords", x, y, wcs, key, command, SZ_FNAME) !=
+		    EOF) {
+		    if (key == 'q')
+			break
 
-	    case ' ':
-		# Print cursor coordinates.
-		call sl_init (sl, 1)
-		if (lineplot) {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols, nlines)
-		    col = px
-		    call plt_wcscoord (im, mw, ct, wcstype, format, col, line,
-			Memr[ynew+col-1], Memc[sl_getstr(sl,1)], SZ_LINE)
-		} else {
-		    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines, ncols)
-		    line = px
-		    call plt_wcscoord (im, mw, ct, wcstype, format, col, line,
-			Memr[ynew+line-1], Memc[sl_getstr(sl,1)], SZ_LINE)
-		}
-		sline = 1
-		call printf (Memc[sl_getstr(sl,sline)])
+		    switch (key) {
+		    case 'a':
+			# Plot the average over a range of lines or columns
+			# marked interactively with the cursor.
 
-	    case '?':
-		# Print command summary.
-		call gpagefile (gp, KEYSFILE, "implot cursor commands")
+			x1 = x; y1 = y
+			call printf (again)
+			if (clgcur ("gcur", x2, y2, wcs, key, command,
+			    SZ_FNAME) == EOF)
+			    next
 
-	    case ':':
-		# Command mode.
-		for (ip=1;  IS_WHITE (command[ip]);  ip=ip+1)
-		    ;
-		if (command[ip] == 'o') {
-		    overplot = true
-		    ip = ip + 1
-		}
+			if (abs(x2-x1) > abs(y2-y1)) {
+			    # Range is in X.
 
-		switch (command[ip]) {
-		case 'a':
-		    # Set number of lines or columns to average.
-		    ip = ip + 1
-		    if (ctoi (command, ip, p_navg) <= 0) {
-			call printf (bell)
-			p_navg = 1
-		    }
+			    navg = abs (x2 - x1) + 1
+			    if (lineplot) {
+				col = nint (min (x1, x2))
+				goto col_
+			    } else {
+				line = nint (min (x1, x2))
+				goto line_
+			    }
 
-		case 'i':
-		    # Open a different image.
-		    call mw_close (mw)
-		    call imunmap (im)
-		    ip = ip + 1
-		    while (IS_WHITE (command[ip]))
-			ip = ip + 1
+			} else {
+			    # Range is in Y.
 
-		    iferr (im = immap (command[ip], READ_ONLY, 0)) {
-			call erract (EA_WARN)
-			im = immap (image, READ_ONLY, 0)
-			mw = mw_openim (im)
-			call mw_seti (mw, MW_USEAXMAP, NO)
-			ct = mw_sctran (mw, "logical", wcstype, 0)
+			    if (lineplot) {
+				call imp_tran (gp, x1, y1, x1, y1, Memr[xnew],
+				    ncols, nlines)
+				call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
+				    ncols, nlines)
+				navg = abs (y2 - y1) + 1
+				line = nint (min (y1, y2))
+				goto line_
+			    } else {
+				call imp_tran (gp, x1, y1, x1, y1, Memr[xnew],
+				    nlines, ncols)
+				call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
+				    nlines, ncols)
+				navg = abs (y2 - y1) + 1
+				col = nint (min (y1, y2))
+				goto col_
+			    }
+			}
 
-		    } else if (IM_NDIM(im) <= 0) {
-			call eprintf ("image has no pixels\n")
-			im = immap (image, READ_ONLY, 0)
-			mw = mw_openim (im)
-			call mw_seti (mw, MW_USEAXMAP, NO)
-			ct = mw_sctran (mw, "logical", wcstype, 0)
+		    case 'j', 'k':
+			# Move viewport into image up (k) or down (j).  This
+			# is done by erasing the old data vector and drawing
+			# a new one.
 
-		    } else {
-			mw = mw_openim (im)
-			call mw_seti (mw, MW_USEAXMAP, NO)
-			ct = mw_sctran (mw, "logical", wcstype, 0)
+			erase = true
+			navg = p_navg
+			overplot = true
+			call amovr (Memr[xnew], Memr[xold], npix)
+			call amovr (Memr[ynew], Memr[yold], npix)
 
-			ncols = IM_LEN(im,1)
-			if (IM_NDIM(im) > 1)
-			    nlines = IM_LEN(im,2)
-			else
-			    nlines = 1
-
-			npix   = max (ncols, nlines)
-			call strcpy (command[ip], image, SZ_FNAME)
-			call realloc (xold, npix, TY_REAL)
-			call realloc (yold, npix, TY_REAL)
-			call realloc (xnew, npix, TY_REAL)
-			call realloc (ynew, npix, TY_REAL)
-		    }
-
-		case 'w':
-		    # Change wcs type.
-		    call mw_ctfree (ct)
-		    ip = ip + 1
-		    while (IS_WHITE (command[ip]))
-			ip = ip + 1
-
-		    iferr {
-			ct = mw_sctran (mw, "logical", command[ip], 0)
-			call strcpy (command[ip], wcstype, SZ_FNAME)
-		    } then {
-			call erract (EA_WARN)
-			ct = mw_sctran (mw, "logical", wcstype, 0)
-		    } else {
-			# Only replot if WCS command succeeds, otherwise the
-			# error message is lost.
-			if (lineplot)
+			shift = step
+			if (key == 'j')
+			    shift = -shift
+			    
+			if (lineplot) {
+			    line = line + shift
 			    goto line_
-			else
+			} else {
+			    col  = col  + shift
 			    goto col_
-		    }
+			}
 
-		case 'f':
-		    # Change label format.
-		    ip = ip + 1
-		    while (IS_WHITE (command[ip]))
-			ip = ip + 1
-		    if (command[ip] == '%') {
-			call strcpy (command[ip], format, SZ_FNAME)
-			call strcpy (format, fmt, SZ_FNAME)
+		    case 'l':
+			# Plot a line.
+			if (lineplot) {
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols,
+				nlines)
+			    line = max(1, min(nlines, nint(py)))
+			} else {
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines,
+				ncols)
+			    line = max(1, min(nlines, nint(px)))
+			}
+			navg = p_navg
+			line = line - (navg - 1) / 2
+line_
+			lineplot = true
+			line = max(1, min(nlines, line))
+			call imp_getvector (im, mw, ct, wcstype, xnew, ynew,
+			    xlabel, fmt, line, navg, lineplot)
+			if (format[1] == '%')
+			    call strcpy (format, fmt, SZ_FNAME)
+			npix = ncols
+replotline_
+			if (overplot) {
+			    if (erase) {
+				# Erase old vector and replace it with new
+				# vector.
+
+				call imp_redraw (gp, Memr[xold], Memr[yold],
+				    Memr[xnew], Memr[ynew], npix)
+				erase = false
+
+			    } else {
+				# Overplot new vector. 
+
+				linetype = linetype + linestep
+				if (linetype > nltypes)
+				    linetype = 1
+				call gseti (gp, G_PLTYPE, linetype)
+
+				color = color + 1
+				if (color > MAX_COLORS)
+				    color = 1
+				call gseti (gp, G_PLCOLOR, color)
+
+				call gpline (gp, Memr[xnew], Memr[ynew], ncols)
+			    }
+
+			    call imp_markpos (gp, line, nlines)
+			    overplot = false
+
+			} else {
+			    call gclear (gp)
+			    call gsets (gp, G_XTICKFORMAT, fmt)
+			    if (logscale)
+				call gseti (gp, G_YTRAN, GW_LOG)
+			    call gseti (gp, G_NMINOR, 0)
+			    if (xnticks >= 0)
+				call gseti (gp, G_XNMAJOR, xnticks)
+			    if (ynticks >= 0)
+				call gseti (gp, G_YNMAJOR, ynticks)
+			    linetype = 1
+			    color = 1
+			    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew],
+				ncols, nlines, real(line), navg, lineplot,
+				rescale, image, xlabel)
+			    rescale[1] = p_rescale[1]
+			    rescale[2] = p_rescale[2]
+			}
+
+		    case 'm', 'n':
+			if (key == 'm') {
+			    if (index > 1)
+				index = index - 1
+			    else
+				next
+			} else if (key == 'n') {
+			    if (index < nim)
+				index = index + 1
+			    else
+				next
+			}
+
+			if (imtrgetim (list, index, command, SZ_FNAME) == EOF)
+			    break
+
+			# Open a different image.
+			call mw_close (mw)
+			call imunmap (im)
+
+			iferr (im = immap (command, READ_ONLY, 0)) {
+			    call erract (EA_WARN)
+			    im = immap (image, READ_ONLY, 0)
+			    mw = mw_openim (im)
+			    call mw_seti (mw, MW_USEAXMAP, NO)
+			    ct = mw_sctran (mw, "logical", wcstype, 0)
+			    next
+			}
+
+			if (IM_NDIM(im) <= 0) {
+			    call eprintf ("image has no pixels\n")
+			    im = immap (image, READ_ONLY, 0)
+			    mw = mw_openim (im)
+			    call mw_seti (mw, MW_USEAXMAP, NO)
+			    ct = mw_sctran (mw, "logical", wcstype, 0)
+			    next
+
+			} else {
+			    mw = mw_openim (im)
+			    call mw_seti (mw, MW_USEAXMAP, NO)
+			    ct = mw_sctran (mw, "logical", wcstype, 0)
+
+			    ncols = IM_LEN(im,1)
+			    if (IM_NDIM(im) > 1)
+				nlines = IM_LEN(im,2)
+			    else {
+				lineplot = true
+				nlines = 1
+			    }
+
+			    npix   = max (ncols, nlines)
+			    call strcpy (command, image, SZ_FNAME)
+			    call realloc (xold, npix, TY_REAL)
+			    call realloc (yold, npix, TY_REAL)
+			    call realloc (xnew, npix, TY_REAL)
+			    call realloc (ynew, npix, TY_REAL)
+
+			    if (lineplot)
+				goto line_
+			    else
+				goto col_
+			}
+
+		    case 'c':
+			# Plot a column.
+			if (lineplot) {
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols,
+				nlines)
+			    col = max(1, min(ncols, nint(px)))
+			} else {
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines,
+				ncols)
+			    col = max(1, min(ncols, nint(py)))
+			}
+			navg = p_navg
+			col = col - (navg - 1) / 2
+col_
+			if (nlines == 1) {
+			    call printf (bell)
+			    next
+			}
+			lineplot = false
+			col = max(1, min(ncols, col))
+			call imp_getvector (im, mw, ct, wcstype, xnew, ynew,
+			    xlabel, fmt, col, navg, lineplot)
+			if (format[1] == '%')
+			    call strcpy (format, fmt, SZ_FNAME)
+			npix = nlines
+replotcol_
+			if (overplot) {
+			    if (erase) {
+				# Erase old vector and replace it with new
+				# vector.
+
+				call imp_redraw (gp, Memr[xold], Memr[yold],
+				    Memr[xnew], Memr[ynew], npix)
+				erase = false
+
+			    } else {
+				linetype = linetype + linestep
+				if (linetype > nltypes)
+				    linetype = 1
+				call gseti (gp, G_PLTYPE, linetype)
+
+				color = color + 1
+				if (color > MAX_COLORS)
+				    color = 1
+				call gseti (gp, G_PLCOLOR, color)
+
+				call gpline (gp, Memr[xnew], Memr[ynew], nlines)
+			    }
+
+			    call imp_markpos (gp, col, ncols)
+			    overplot = false
+
+			} else {
+			    call gclear (gp)
+			    call gsets (gp, G_XTICKFORMAT, fmt)
+			    if (logscale)
+				call gseti (gp, G_YTRAN, GW_LOG)
+			    call gseti (gp, G_NMINOR, 0)
+			    if (xnticks >= 0)
+				call gseti (gp, G_XNMAJOR, xnticks)
+			    if (ynticks >= 0)
+				call gseti (gp, G_YNMAJOR, ynticks)
+			    linetype = 1
+			    color = 1
+			    call imp_plotvector (gp, im, Memr[xnew], Memr[ynew],
+				nlines, ncols, real(col), navg, lineplot,
+				rescale, image, xlabel)
+			    rescale[1] = p_rescale[1]
+			    rescale[2] = p_rescale[2]
+			}
+
+		    case 'e':
+			# Expand plot by marking corners of new window.  We are
+			# called with the coords of the lower left corner.
+
+			x1 = x; y1 = y
+			call printf (again)
+			if (clgcur ("gcur", x2, y2, wcs, key, command,
+			    SZ_FNAME) == EOF)
+			    next
+
+			rescale[1] = false
+			rescale[2] = false
+			p_rescale[1] = true
+			p_rescale[2] = true
+
+			# If the cursor moved only in X, with negligible range
+			# in Y, expand only in X.  Do the comparisons in NDC
+			# space to avoid scaling problems.
+
+			call gctran (gp, x1, y1, px, py, wcs, 0)
+			call gctran (gp, x2, y2, qx, qy, wcs, 0)
+
+			if (abs (py - qy) < .01) {
+			    y1 = INDEF;  y2 = INDEF
+			    rescale[2] = true
+			}
+			call imp_swind (x1, x2, y1, y2)
+
 			if (lineplot)
 			    goto replotline_
 			else
 			    goto replotcol_
-		    } else if (format[1] == '%') {
-			call strcpy (command[ip], format, SZ_FNAME)
+
+		    case 'o':
+			overplot = true
+
+		    case 'r':
 			if (lineplot)
-			    goto line_
+			    goto replotline_
 			else
-			    goto col_
-		    }
+			    goto replotcol_
 
-		case 'l':
-		    if (command[ip+1] != 'o') {
-			# Plot a line.
-			ip = ip + 1
-			if (ctoi (command, ip, i1) <= 0) {
-			    call printf (bell)
+		    case 'p':
+			# Profile analysis.
+			x1 = x
+			y1 = y
+			call printf (again)
+			if (clgcur ("gcur", x2, y2, wcs, key, command,
+			    SZ_FNAME) == EOF)
 			    next
-			} else if (ctoi (command, ip, i2) <= 0) {
-			    line = max(1, min(nlines, i1))
-			    navg = p_navg
-			    line = line - (navg - 1) / 2
-			    goto line_
+
+			call imp_profile (gp, Memr[xnew], Memr[ynew], npix,
+			    x1, y1, x2, y2, sl, sline)
+			call printf (Memc[sl_getstr(sl,sline)])
+
+		    case 's':
+			# Statistics.
+			x1 = x
+			call printf (again)
+			if (clgcur ("gcur", x2, y, wcs, key, command,
+			    SZ_FNAME) == EOF)
+			    next
+
+			i1 = max(1, min(npix, nint(x1)))
+			i2 = max(1, min(npix, nint(x2)))
+			if (i1 > i2) {
+			    n = i1
+			    i1 = i2
+			    i2 = n
+			} else if (i1 == i2)
+			    i2 = i1 + 1
+
+			n = i2 - i1 + 1
+			call aavgr (Memr[ynew+i1-1], n, mean, sigma)
+			median = amedr (Memr[ynew+i1-1], n)
+			sum = asumr (Memr[ynew+i1-1], n)
+
+			call sl_init (sl, 1)
+			call sprintf (Memc[sl_getstr(sl,1)], SZ_LINE,
+			    "median=%g, mean=%g, rms=%g, sum=%g, npix=%d\n")
+			    call pargr (median)
+			    call pargr (mean)
+			    call pargr (sigma)
+			    call pargr (sum)
+			    call pargi (n)
+			sline = 1
+			call printf (Memc[sl_getstr(sl,sline)])
+
+		    case ' ':
+			# Print cursor coordinates.
+			call sl_init (sl, 1)
+			if (lineplot) {
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols,
+				nlines)
+			    col = px
+			    call plt_wcscoord (im, mw, ct, wcstype, format, col,
+				line, Memr[ynew+col-1], Memc[sl_getstr(sl,1)],
+				SZ_LINE)
 			} else {
-			    i1 = max(1, min(nlines, i1))
-			    i2 = max(1, min(nlines, i2))
-			    line = min (i1, i2)
-			    navg = max (1, abs (i2 - i1) + 1)
-			    goto line_
+			    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines,
+				ncols)
+			    line = px
+			    call plt_wcscoord (im, mw, ct, wcstype, format, col,
+				line, Memr[ynew+line-1], Memc[sl_getstr(sl,1)],
+				SZ_LINE)
 			}
-		    } else {
-			# Enable/disable log scaling.
-			while (IS_ALPHA(command[ip]))
-			    ip = ip + 1
-			logscale = (command[ip] == '+')
-		    }
+			sline = 1
+			call printf (Memc[sl_getstr(sl,sline)])
 
-		case 'c':
-		    # Plot a column.
-		    ip = ip + 1
-		    if (ctoi (command, ip, i1) <= 0) {
-			call printf (bell)
-			next
-		    } else if (ctoi (command, ip, i2) <= 0) {
-			col = max(1, min(ncols, i1))
-			navg = p_navg
-			col = col - (navg - 1) / 2
-			goto col_
-		    } else {
-			i1 = max(1, min(ncols, i1))
-			i2 = max(1, min(ncols, i2))
-			col  = min (i1, i2)
-			navg = max (1, abs (i2 - i1) + 1)
-			goto col_
-		    }
+		    case '?':
+			# Print command summary.
+			call gpagefile (gp, KEYSFILE, "implot cursor commands")
 
-		case 's':
-		    if (command[ip+1] == 'o') {
-			# Use only linetype=1 (solid).
-			linetype = 1
-			linestep = 0
-			color = 1
-		    } else {
-			# Set step size.
-			while (IS_ALPHA (command[ip]))
+		    case ':':
+			# Command mode.
+			for (ip=1;  IS_WHITE (command[ip]);  ip=ip+1)
+			    ;
+			if (command[ip] == 'o') {
+			    overplot = true
 			    ip = ip + 1
-			if (ctoi (command, ip, step) <= 0) {
+			}
+
+			switch (command[ip]) {
+			case 'a':
+			    # Set number of lines or columns to average.
+			    ip = ip + 1
+			    if (ctoi (command, ip, p_navg) <= 0) {
+				call printf (bell)
+				p_navg = 1
+			    }
+
+			case 'i':
+			    # Open a different image.
+			    call mw_close (mw)
+			    call imunmap (im)
+			    ip = ip + 1
+			    while (IS_WHITE (command[ip]))
+				ip = ip + 1
+
+			    iferr (im = immap (command[ip], READ_ONLY, 0)) {
+				call erract (EA_WARN)
+				im = immap (image, READ_ONLY, 0)
+				mw = mw_openim (im)
+				call mw_seti (mw, MW_USEAXMAP, NO)
+				ct = mw_sctran (mw, "logical", wcstype, 0)
+
+			    } else if (IM_NDIM(im) <= 0) {
+				call eprintf ("image has no pixels\n")
+				im = immap (image, READ_ONLY, 0)
+				mw = mw_openim (im)
+				call mw_seti (mw, MW_USEAXMAP, NO)
+				ct = mw_sctran (mw, "logical", wcstype, 0)
+
+			    } else {
+				mw = mw_openim (im)
+				call mw_seti (mw, MW_USEAXMAP, NO)
+				ct = mw_sctran (mw, "logical", wcstype, 0)
+
+				ncols = IM_LEN(im,1)
+				if (IM_NDIM(im) > 1)
+				    nlines = IM_LEN(im,2)
+				else
+				    nlines = 1
+
+				npix   = max (ncols, nlines)
+				call strcpy (command[ip], image, SZ_FNAME)
+				call realloc (xold, npix, TY_REAL)
+				call realloc (yold, npix, TY_REAL)
+				call realloc (xnew, npix, TY_REAL)
+				call realloc (ynew, npix, TY_REAL)
+			    }
+
+			case 'w':
+			    # Change wcs type.
+			    call mw_ctfree (ct)
+			    ip = ip + 1
+			    while (IS_WHITE (command[ip]))
+				ip = ip + 1
+
+			    iferr {
+				ct = mw_sctran (mw, "logical", command[ip], 0)
+				call strcpy (command[ip], wcstype, SZ_FNAME)
+			    } then {
+				call erract (EA_WARN)
+				ct = mw_sctran (mw, "logical", wcstype, 0)
+			    } else {
+				# Only replot if WCS command succeeds,
+				# otherwise the error message is lost.
+				if (lineplot)
+				    goto line_
+				else
+				    goto col_
+			    }
+
+			case 'f':
+			    # Change label format.
+			    ip = ip + 1
+			    while (IS_WHITE (command[ip]))
+				ip = ip + 1
+			    if (command[ip] == '%') {
+				call strcpy (command[ip], format, SZ_FNAME)
+				call strcpy (format, fmt, SZ_FNAME)
+				if (lineplot)
+				    goto replotline_
+				else
+				    goto replotcol_
+			    } else if (format[1] == '%') {
+				call strcpy (command[ip], format, SZ_FNAME)
+				if (lineplot)
+				    goto line_
+				else
+				    goto col_
+			    }
+
+			case 'l':
+			    if (command[ip+1] != 'o') {
+				# Plot a line.
+				ip = ip + 1
+				if (ctoi (command, ip, i1) <= 0) {
+				    call printf (bell)
+				    next
+				} else if (ctoi (command, ip, i2) <= 0) {
+				    line = max(1, min(nlines, i1))
+				    navg = p_navg
+				    line = line - (navg - 1) / 2
+				    goto line_
+				} else {
+				    i1 = max(1, min(nlines, i1))
+				    i2 = max(1, min(nlines, i2))
+				    line = min (i1, i2)
+				    navg = max (1, abs (i2 - i1) + 1)
+				    goto line_
+				}
+			    } else {
+				# Enable/disable log scaling.
+				while (IS_ALPHA(command[ip]))
+				    ip = ip + 1
+				logscale = (command[ip] == '+')
+			    }
+
+			case 'c':
+			    # Plot a column.
+			    ip = ip + 1
+			    if (ctoi (command, ip, i1) <= 0) {
+				call printf (bell)
+				next
+			    } else if (ctoi (command, ip, i2) <= 0) {
+				col = max(1, min(ncols, i1))
+				navg = p_navg
+				col = col - (navg - 1) / 2
+				goto col_
+			    } else {
+				i1 = max(1, min(ncols, i1))
+				i2 = max(1, min(ncols, i2))
+				col  = min (i1, i2)
+				navg = max (1, abs (i2 - i1) + 1)
+				goto col_
+			    }
+
+			case 's':
+			    if (command[ip+1] == 'o') {
+				# Use only linetype=1 (solid).
+				linetype = 1
+				linestep = 0
+				color = 1
+			    } else {
+				# Set step size.
+				while (IS_ALPHA (command[ip]))
+				    ip = ip + 1
+				if (ctoi (command, ip, step) <= 0) {
+				    call printf (bell)
+				    step = 1
+				}
+			    }
+			
+			case 'x':
+			    # Fix window in X and replot vector.  If no args
+			    # are given, unfix the window.
+
+			    ip = ip + 1
+			    if (ctor (command, ip, x1) <= 0) {
+				rescale[1]   = true
+				p_rescale[1] = true
+			    } else if (ctor (command, ip, x2) <= 0) {
+				call printf (bell)
+			    } else {
+				x1 = plt_iformatr (x1, fmt)
+				x2 = plt_iformatr (x2, fmt)
+				call imp_swind (x1, x2, INDEF, INDEF)
+				rescale[1]   = false
+				p_rescale[1] = false
+			    }
+
+			    if (lineplot)
+				goto replotline_
+			    else
+				goto replotcol_
+			
+			case 'y':
+			    # Fix window in Y and replot vector.  If no args
+			    # are given, unfix the window.
+
+			    ip = ip + 1
+			    if (ctor (command, ip, y1) <= 0) {
+				rescale[2]   = true
+				p_rescale[2] = true
+			    } else if (ctor (command, ip, y2) <= 0) {
+				call printf (bell)
+			    } else {
+				y1 = plt_iformatr (y1, fmt)
+				y2 = plt_iformatr (y2, fmt)
+				call imp_swind (INDEF, INDEF, y1, y2)
+				p_rescale[2] = false
+				rescale[2]   = false
+			    }
+
+			    if (lineplot)
+				goto replotline_
+			    else
+				goto replotcol_
+
+			case 'n':
+			    ip = ip + 1
+			    if (command[ip] == 'x') {
+				while (IS_ALPHA(command[ip]))
+				    ip = ip + 1
+				if (ctoi (command, ip, xnticks) <= 0)
+				    xnticks = -1
+			    } else if (command[ip] == 'y') {
+				while (IS_ALPHA(command[ip]))
+				    ip = ip + 1
+				if (ctoi (command, ip, ynticks) <= 0)
+				    ynticks = -1
+			    } else
+				call printf (bell)
+
+			default:
 			    call printf (bell)
-			    step = 1
 			}
-		    }
-		
-		case 'x':
-		    # Fix window in X and replot vector.  If no args are given,
-		    # unfix the window.
 
-		    ip = ip + 1
-		    if (ctor (command, ip, x1) <= 0) {
-			rescale[1]   = true
-			p_rescale[1] = true
-		    } else if (ctor (command, ip, x2) <= 0) {
+		    case '/':
+			# Scroll or rewrite the status line.
+
+			sline = sline + 1
+			call printf (Memc[sl_getstr(sl,sline)])
+
+		    default:
 			call printf (bell)
-		    } else {
-			x1 = plt_iformatr (x1, fmt)
-			x2 = plt_iformatr (x2, fmt)
-			call imp_swind (x1, x2, INDEF, INDEF)
-			rescale[1]   = false
-			p_rescale[1] = false
 		    }
-
-		    if (lineplot)
-			goto replotline_
-		    else
-			goto replotcol_
-		
-		case 'y':
-		    # Fix window in Y and replot vector.  If no args are given,
-		    # unfix the window.
-
-		    ip = ip + 1
-		    if (ctor (command, ip, y1) <= 0) {
-			rescale[2]   = true
-			p_rescale[2] = true
-		    } else if (ctor (command, ip, y2) <= 0) {
-			call printf (bell)
-		    } else {
-			y1 = plt_iformatr (y1, fmt)
-			y2 = plt_iformatr (y2, fmt)
-			call imp_swind (INDEF, INDEF, y1, y2)
-			p_rescale[2] = false
-			rescale[2]   = false
-		    }
-
-		    if (lineplot)
-			goto replotline_
-		    else
-			goto replotcol_
-
-		case 'n':
-		    ip = ip + 1
-		    if (command[ip] == 'x') {
-			while (IS_ALPHA(command[ip]))
-			    ip = ip + 1
-			if (ctoi (command, ip, xnticks) <= 0)
-			    xnticks = -1
-		    } else if (command[ip] == 'y') {
-			while (IS_ALPHA(command[ip]))
-			    ip = ip + 1
-			if (ctoi (command, ip, ynticks) <= 0)
-			    ynticks = -1
-		    } else
-			call printf (bell)
-
-		default:
-		    call printf (bell)
 		}
+	    } then
+		call erract (EA_WARN)
 
-	    case '/':
-		# Scroll or rewrite the status line.
+	    call mfree (xnew, TY_REAL)
+	    call mfree (ynew, TY_REAL)
+	    call mfree (xold, TY_REAL)
+	    call mfree (yold, TY_REAL)
+	    if (sl != NULL)
+		call sl_free (sl)
 
-		sline = sline + 1
-		call printf (Memc[sl_getstr(sl,sline)])
+	    if (mw != NULL)
+		call mw_close (mw)
+	    if (im != NULL)
+		call imunmap (im)
 
-	    default:
-		call printf (bell)
-	    }
+	    if (key == 'q')
+		break
 	}
 
-	call mfree (xnew, TY_REAL)
-	call mfree (ynew, TY_REAL)
-	call mfree (xold, TY_REAL)
-	call mfree (yold, TY_REAL)
-	call sl_free (sl)
-
 	call gclose (gp)
-	call mw_close (mw)
-	call imunmap (im)
+	call imtclose (list)
 end
 
 

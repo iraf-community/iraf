@@ -59,6 +59,7 @@ begin
 	bool	reextract, extract, scat, disp, disperr, log
 	bool	splot1, splot2
 	int	i, j, n, nspec
+	struct	err
 
 	# Call a separate task to do the listing to minimize the size of
 	# this script and improve it's readability.
@@ -145,8 +146,11 @@ begin
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref)) {
-	    if (!access (apref // imtype))
-		error (1, "Aperture reference spectrum not found - " // apref)
+	    if (!access (apref // imtype)) {
+		printf ("Aperture reference spectrum not found - %s%s\n",
+		    apref, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	    print ("Set reference apertures for ", apref) | tee (log1)
 	    if (access (database // "/ap" // apref))
 		delete (database // "/ap" // apref, verify=no)
@@ -244,8 +248,11 @@ begin
 	    i = strlen (arcref)
 	    if (i > n && substr (arcref, i-n+1, i) == imtype)
 	        arcref = substr (arcref, 1, i-n)
-	    if (!access (arcref // imtype))
-		error (1, "Arc reference spectrum not found - " // arcref)
+	    if (!access (arcref // imtype)) {
+		printf ("Arc reference spectrum not found - %s%s\n",
+		    arcref, imtype) | scan (err)
+		error (1, err // "\nCheck setting of imtype")
+	    }
 	    arcrefec = arcref // ectype
 	    reextract = redo || (update && newaps)
 	    if (reextract && access (arcrefec))
@@ -275,7 +282,10 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec) | tee (log1)
+		printf ("Object spectrum not found - %s%s\n",
+		    spec, imtype) | scan (err)
+		print (err) | tee (log1)
+		print ("Check setting of imtype")
 		next
 	    }
 	    specec = spec // ectype

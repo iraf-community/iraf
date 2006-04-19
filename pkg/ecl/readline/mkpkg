@@ -1,0 +1,17 @@
+# Make the GNU Readline/History libraries
+
+$call libs
+$exit
+
+libs:
+	$ifnfile (../libreadline.a)
+	    !./configure --disable-dynamic --enable-static >& spool
+	    !make libreadline.a >& spool
+	    !cp libreadline.a ../ 
+	$endif
+	;
+
+clean:
+	!make clean
+	;
+

@@ -25,12 +25,12 @@ define	WCS_FORMAT	10
 procedure t_wcsedit ()
 
 bool	interactive, verbose, update, install
-int	parno, naxes1, naxes2, ndim
+int	wcsdim, parno, naxes1, naxes2, ndim
 pointer	sp, imtemplate, image, parameter, ax1list, ax2list, axes1, axes2
 pointer	value, wcs, system
 pointer	imlist, im, mwim, r, w, cd, ltm, ltv, iltm, nr, ncd
 bool	clgetb(), streq(), wcs_iedit()
-int	fstati(), wcs_decode_parno(), wcs_decode_axlist(), imtgetim()
+int	clgeti(), fstati(), wcs_decode_parno(), wcs_decode_axlist(), imtgetim()
 int	mw_stati()
 pointer	imtopen(), immap(), mw_openim(), mw_open()
 errchk	mw_newsystem()
@@ -102,6 +102,7 @@ begin
 
 	# Get the remaining parameters.
 	call clgstr ("wcs", Memc[wcs], SZ_FNAME)
+	wcsdim = clgeti ("wcsdim")
 	verbose = clgetb ("verbose")
 	update = clgetb ("update")
 
@@ -113,15 +114,22 @@ begin
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
 
 	    # Open the image and the wcs.
-	    im = immap (Memc[image], READ_WRITE, 0)
-	    mwim = mw_openim (im)
-	    iferr (call mw_ssystem (mwim, Memc[wcs])) {
-	    	ndim = IM_NDIM(im)
-		call mw_close (mwim)
+	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
+	        im = immap (Memc[image], NEW_IMAGE, 0)
+		IM_NDIM(im) = 0
+		ndim = wcsdim
 		mwim = mw_open (NULL, ndim)
 		call mw_newsystem (mwim, Memc[wcs], ndim)
-	    } else
-	        ndim = mw_stati (mwim, MW_NPHYSDIM)
+	    } else {
+		mwim = mw_openim (im)
+		iferr (call mw_ssystem (mwim, Memc[wcs])) {
+		    call mw_close (mwim)
+		    ndim = IM_NDIM(im)
+		    mwim = mw_open (NULL, ndim)
+		    call mw_newsystem (mwim, Memc[wcs], ndim)
+		} else
+		    ndim = mw_stati (mwim, MW_NPHYSDIM)
+	    }
 	    call mw_gsystem (mwim, Memc[system], SZ_FNAME)
 
 	    # Allocate working memory.

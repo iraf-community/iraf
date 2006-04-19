@@ -20,4 +20,7 @@ task	objmasks	= "nproto$ace/objmasks.cl"
 task	objmasks1	= "nproto$ace/objmasks1.par"
 hidetask detect, objmasks1
 
+task	skysep		= "nproto$skysep.cl"
+task	skygroup	= "nproto$skygroup.cl"
+
 clbye

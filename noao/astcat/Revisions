@@ -1,6 +1,9 @@
 .help revisions Sep01 noao.astcat
 .nf
 
+astcat$lib/catdb.dat
+    Removed references to 2Mass catalog.  (9/27/04, Valdes)
+
 =======
 V2.12.2
 =======

@@ -35,4 +35,5 @@ XINT	*maxch;
 
 	for (ip = (char *)instr;  --n >= 0;  )
 	    op[n] = ip[n];
+	op[*maxch] = XEOS;
 }

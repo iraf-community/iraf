@@ -3,6 +3,7 @@
       integer tok(100)
       integer i, s, lev
       integer gnbtok, ctoi
+      caslab=0
       t = gnbtok (tok, 100)
 23000 if (.not.(t .eq. 10))goto 23001
       t = gnbtok (tok, 100)

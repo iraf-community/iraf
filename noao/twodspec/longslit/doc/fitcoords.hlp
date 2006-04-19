@@ -201,14 +201,14 @@ varying fastest:
 	C10
 	C20
 	...
-	C<xorder>0
+	C<xorder-1>0
 	C01
 	C11
 	C21
 	...
-	C<xorder>1
+	C<xorder-1>1
 	...
-	C<xorder><yorder>
+	C<xorder-1><yorder-1>
 .fi
 
 The surface fitting functions have the form

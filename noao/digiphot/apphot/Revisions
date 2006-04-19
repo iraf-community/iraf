@@ -1,5 +1,17 @@
 .HELP revisions Jun88 noao.digiphot.apphot
 .nf
+
+=======
+V2.12.3
+=======
+
+apphot/aputil/apnlfuncs.x
+    Catch error when the input sigma is zero.  (5/2/05, Valdes)
+
+=======
+V2.12.2
+=======
+
 apphot/aputil/aptopt.x
     Catch error when the input sigma is zero.  (2/24/03, Valdes)
 

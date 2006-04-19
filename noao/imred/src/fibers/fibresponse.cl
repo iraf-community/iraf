@@ -24,6 +24,7 @@ begin
 	file	temp1, temp2, log1, log2
 	int	n, ap, naxis
 	real	respval
+	struct	err
 
 	imtype = "." // envget ("imtype")
 	i = stridx (",", imtype)
@@ -49,17 +50,22 @@ begin
 	    i = strlen (flat2d)
 	    if (i > n && substr (flat2d, i-n+1, i) == imtype)
 		flat2d = substr (flat2d, 1, i-n)
-	    if (!access (flat2d // imtype))
-		error (1, "Flat field spectrum not found - " // flat2d)
+	    if (!access (flat2d // imtype)) {
+		printf ("Flat field spectrum not found - %s%s\n",
+		    flat2d, imtype) | scan (err)
+		error (1, err // "\nCheck settting of imtype")
+	    }
 	}
 	if (skyflat2d != "") {
 	    i = strlen (skyflat2d)
 	    if (i > n && substr (skyflat2d, i-n+1, i) == imtype)
 	        skyflat2d = substr (skyflat2d, 1, i-n)
 	    if (!access (skyflat2d // imtype)) {
-		if (!access (skyflat2d))
-		    error (1,
-			"Throughput file or image not found - " // skyflat2d)
+		if (!access (skyflat2d)) {
+		    printf ("Throughput file or image not found - %s%s\n",
+			skyflat2d, imtype) | scan (err)
+		    error (1, err // "\nCheck settting of imtype")
+		}
 
 		if (flat2d == "") {
 		    i = strlen (apref)

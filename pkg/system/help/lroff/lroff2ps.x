@@ -393,7 +393,7 @@ begin
 		} else
 		    goto copy_
 	    case '"':
-		if (format) {
+                if (format && str[i+1] != '/' && str[i+2] != '/') {
 		    if (font == F_TELETYPE) {
 		        # Do a closing quote.
 			if (format) {

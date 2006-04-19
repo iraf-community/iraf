@@ -287,9 +287,14 @@ begin
 			call pargstr (IMNAME(cal))
 			call pargstr (IMSEC(cal))
 			call pargstr (TITLE(cal))
-		    call printf ("  Tweak: shift = %.2f, scale = %.3f\n")
+		    call printf ("  Tweak: shift = %.2f, scale = %.3f")
 			call pargr (shift)
 			call pargr (TWK_SCALE(twk))
+		    if (TWK_TYPE(twk) == 'T') {
+			call printf (", normalization = %.4g\n")
+			    call pargr (mean)
+		    } else
+			call printf ("\n")
 		    if (nout > 0) {
 			call printf (
 			"  WARNING: %d pixels outside of calibration limits\n")

@@ -11,7 +11,7 @@ define	MAX_HGMLEN		2048		# maximum size histogram
 define	IM_MAXSTEP		64		# step size breakpoint
 define	MIN_LENUSERAREA		64000		# user area size (chars)
 define	SZ_UAPAD		5120		# padding at end of UA if copy
-define	SZ_IMNAME		79		# IM_NAME field
+define	SZ_IMNAME		128		# IM_NAME field (prev 79)
 
 define	ENV_BUFSIZE		"IMIO_BUFSIZE"	# envvar for bufsize
 define	ENV_BUFFRAC		"IMIO_BUFFRAC"	# envvar for buffrac

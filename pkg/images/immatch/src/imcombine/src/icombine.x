@@ -32,11 +32,12 @@ int	delete				#I Delete input images?
 
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
-int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
+int	i, j, nimages, intype, bufsize, oldsize, stack1, err
+int	maxsize, maxmemory, memory
 pointer	sp, im, in1, in, out[6], offsets, key, tmp, bpmstack 
 
 char	clgetc()
-int	clgwrd(), imtlen(), imtgetim(), imtrgetim(), getdatatype()
+int	clgwrd(), imtlen(), imtgetim(), imtrgetim(), getdatatype(), envgeti()
 int	begmem(), errget(), open(), ty_max(), sizeof(), strmatch()
 pointer	immap(), xt_immap(), ic_pmmap()
 errchk	ic_imstack, immap, imunmap, xt_immap, ic_pmmap, ic_setout
@@ -268,8 +269,10 @@ retry_
 		# program, memory allocator inefficiencies, and any other
 		# memory requirements besides IMIO.
 
+		iferr (maxmemory = envgeti ("imcombine_maxmemory"))
+		    maxmemory = MAXMEMORY
 		memory = begmem (0, oldsize, maxsize)
-		memory = min (memory, maxsize, MAXMEMORY)
+		memory = min (memory, maxsize, maxmemory)
 		bufsize = FUDGE * memory / (nimages + 1) / sizeof (intype)
 	    }
 

@@ -2,7 +2,29 @@
 .nf
 
 t_sptime.x
+    1.  The use of the fiber diameter to set the aperture was not working.
+    2.  The listing of the fiber information was not working because it was
+	looking for a table "fibers" instead of "fiber".
+    3.  Fixed typo in label "indivdual" -> "individual".
+    (8/13/04, Valdes)
+
+============================
+SPECTIME V2.2: May 15, 2003
+============================
+
+t_sptime.x
+sptime.par
+sptime.h
+    1.  Improved algorithm for handling saturation.
+    2.  Added a minimum exposure parameter.
+    (5/15/03, Valdes)
+
+t_sptime.x
     The thermal background calculation was wrong.  (3/17/03, Valdes)
+
+============================
+SPECTIME V2.1: March 3, 2003
+============================
 
 sptime.h
 t_sptime.x

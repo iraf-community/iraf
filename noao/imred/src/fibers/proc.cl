@@ -74,6 +74,7 @@ begin
 	bool	scat, reextract, extract, disp, disperr, sky, log
 	bool	skyedit1, skyedit2, splot1, splot2
 	int	i, j, n, nspec
+	struct	err
 
 	# Call a separate task to do the listing to minimize the size of
 	# this script and improve it's readability.
@@ -200,8 +201,11 @@ begin
 
 	reextract = redo
 	if (reextract || !access (database // "/ap" // apref // extn)) {
-	    if (!access (apref // imtype))
-		error (1, "Aperture reference spectrum not found - " // apref)
+	    if (!access (apref // imtype)) {
+		printf ("Aperture reference spectrum not found - %s%s\n",
+		    apref, imtype) | scan (err)
+		error (1, err // "\nCheck settting of imtype")
+	    }
 	    print ("Set reference apertures for ", apref) | tee (log1)
 	    if (access (database // "/ap" // apref))
 		delete (database // "/ap" // apref, verify=no)
@@ -363,8 +367,11 @@ begin
 	    if (fscan (fd1, arcref1) == EOF)
 		error (1, "No reference arcs")
 	    fd1 = ""; delete (temp, verify=no)
-	    if (!access (arcref1 // imtype))
-		error (1, "Arc reference spectrum not found - " // arcref1)
+	    if (!access (arcref1 // imtype)) {
+		printf ("Arc reference spectrum not found - %s%s\n",
+		    arcref1, imtype) | scan (err)
+		error (1, err // "\nCheck settting of imtype")
+	    }
 	    arcref1ms = arcref1 // extn
 	    reextract = redo || (update && newaps)
 	    if (reextract && access (arcref1ms//imtype))
@@ -375,8 +382,11 @@ begin
 	    if (fscan (fd1, arcref2) == EOF)
 		arcref2 = ""
 	    else {
-	        if (!access (arcref2 // imtype))
-		    error (1, "Arc reference spectrum not found - " // arcref2)
+	        if (!access (arcref2 // imtype)) {
+		    printf ("Arc reference spectrum not found - %s%s\n",
+			arcref2, imtype) | scan (err)
+		    error (1, err // "\nCheck settting of imtype")
+		}
 	        arcref2ms = arcref2 // extn
 	        if (reextract && access (arcref2ms//imtype))
 	            imdelete (arcref2ms, verify=no)
@@ -410,8 +420,9 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec) | tee (log1)
-		next
+		printf ("Object spectrum not found - %s%s\n",
+		    spec, imtype) | tee (log1)
+		print ("Check settting of imtype")
 	    }
 	    specms = spec // mstype
 

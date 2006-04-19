@@ -15,5 +15,7 @@ linpol		hlp =doc$linpol.hlp,    	src = t_linpol.x
 mkms		hlp =doc$mkms.hlp,	    	src = mkms.cl 
 objmasks	hlp =acedoc$objmasks.hlp,	src = ace$t_objmasks.cl
 slitpic		hlp =doc$slitpic.hlp,		src = t_slitpic.x
+skygroup	hlp =doc$skygroup.hlp,		src = skygroup.cl
+skysep		hlp =doc$skysep.hlp,		src = skysep.cl
 revisions	sys =Revisions
 

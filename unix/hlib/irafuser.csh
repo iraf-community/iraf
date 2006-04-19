@@ -1,6 +1,7 @@
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
+setenv OS_MACH	`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
 if (-f /etc/redhat-release) then
     if (`uname -m` == "ppc") then
 	setenv MACH linuxppc
@@ -16,11 +17,17 @@ else if (-f /etc/SuSE-release) then
 else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
 	setenv MACH linuxppc
 else
-    setenv MACH	`uname -s | tr '[A-Z]' '[a-z]'`
+    setenv MACH		`uname -s | tr '[A-Z]' '[a-z]'`
 endif
 
 if ($MACH == "darwin") then
-    setenv MACH macosx
+    if ("`uname -m`" == "i386") then
+        setenv MACH macintel
+    else
+        setenv MACH macosx
+    endif
+else if ($OS_MACH == "cygwin") then
+    setenv MACH cygwin
 endif
 
 setenv	hostid	unix
@@ -62,6 +69,28 @@ case macosx:
     setenv HSI_LF ""
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
+    setenv HSI_OSLIBS ""
+    set    mkzflags = "'lflags=-z'"
+    breaksw
+
+case macintel:
+    setenv CC cc
+    #setenv F77	gcc
+    setenv CC_f2c cc
+    setenv F2C $hbin/f2c.e
+
+    setenv HSI_CF "-O -DMACOSX -DMACINTEL -w -Wunused"
+    setenv HSI_FF "-O"
+    setenv HSI_LF ""
+    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused"
+    setenv HSI_F77LIBS ""
+    setenv HSI_LFLAGS ""
+    if ($?IRAF_UNIBIN) then
+        setenv HSI_CF "$HSI_CF -arch ppc -arch i386"
+        setenv HSI_FF "$HSI_FF -arch ppc -arch i386"
+        setenv HSI_LF "$HSI_LF"
+        setenv HSI_LFLAGS "$HSI_LFLAGS -arch ppc -arch i386"
+    endif
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
     breaksw
@@ -124,6 +153,18 @@ case linuxppc:
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
+    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
+    breaksw
+
+case cygwin:
+    setenv HSI_CF "-O -DCYGWIN -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused"
+    setenv HSI_XF "-Inolibc -w -/Wunused -/DCYGWIN"
+    setenv HSI_FF "-O"
+    #setenv HSI_LF "-Wl,-Bstatic"
+    setenv HSI_LF ""
+    setenv HSI_F77LIBS ""
+    setenv HSI_LFLAGS ""
+    setenv HSI_OSLIBS "${iraf}unix/bin.cygwin/libcompat.a"
     set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
     breaksw
 

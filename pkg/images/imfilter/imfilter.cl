@@ -18,6 +18,7 @@ task	boxcar,
 	median,
 	mode,
 	rmedian,
-	rmode	= "imfilter$x_images.e"
+	rmode,
+	runmed		= "imfilter$x_images.e"
 
 clbye()

@@ -215,7 +215,11 @@ int	maxch;
 #endif
 
 	for (dp = readdir(dir);  dp != NULL;  dp = readdir(dir))
+#ifdef CYGWIN
+	    if (dp) {
+#else
 	    if (dp->d_ino != 0) {
+#endif
 #ifdef POSIX
 		n = strlen (dp->d_name);
 #else

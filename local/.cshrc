@@ -3,9 +3,8 @@
 
 umask 022
 setenv iraf /iraf/iraf/
-#setenv iraf /iraf/iraf-g77/iraf/
-#source $iraf/unix/hlib/irafuser.csh
-#alias  xc $iraf/unix/bin.redhat/xc.e
+source $iraf/unix/hlib/irafuser.csh
+
 
 switch (`uname`)
 case FreeBSD:
@@ -66,6 +65,14 @@ if ($?prompt) then
 	# make mail(1) happy:
 	setenv	crt	24
 endif
+
+alias   del	'/bin/rm -f'
+alias   ls	'ls -FCs'
+alias   m	'less'
+alias 	p	'vi + ~/_port'
+alias	mk	'mkpkg'
+alias 	po	'popd'
+alias 	pu	'pushd'
 
 alias	new	'find . \! -type d -mtime -7 -print'
 alias	newt	'find . \! -type d -mtime -7 -print | grep -v '\''\.[aoe]$'\'

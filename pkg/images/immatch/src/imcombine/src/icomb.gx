@@ -226,7 +226,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE:
+	case AVERAGE, SUM:
 	    if (dowts)
 		keepids = true
 	    else

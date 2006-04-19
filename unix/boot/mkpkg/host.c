@@ -9,6 +9,7 @@
 #define import_spp
 #define import_error
 #include <iraf.h>
+#include "mkpkg.h"
 #include "extern.h"
 
 #ifdef LINUX

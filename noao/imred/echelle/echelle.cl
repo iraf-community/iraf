@@ -30,12 +30,12 @@ task	continuum,
 	refspectra,
 	sapertures,
 	sarith,
-	scombine,
 	sflip,
 	slist,
 	specplot,
 	specshift,
 	splot		= "onedspec$x_onedspec.e"
+task	scombine	= "onedspec$scombine/x_scombine.e"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
 task	dispcor1	= "onedspec$dispcor1.par"

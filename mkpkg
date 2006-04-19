@@ -256,10 +256,20 @@ linuxppc:				# install Linux PPC binaries
         !$(hlib)/mkfloat.csh linuxppc
         !(cd ./unix; setenv MACH linuxppc; sh -x setarch.sh)
         ;
-macosx:					# install MacOS X binaries
+macosx:					# install MacOS X (PPC) binaries
         $verbose off
         !$(hlib)/mkfloat.csh macosx
         !(cd ./unix; setenv MACH macosx; sh -x setarch.sh)
+        ;
+macintel:				# install MacOS X (Intel) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macintel
+        !(cd ./unix; setenv MACH macintel; sh -x setarch.sh)
+        ;
+cygwin:					# install WinXP/Cygwin binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh cygwin
+        !(cd ./unix; setenv MACH cygwin; sh -x setarch.sh)
         ;
 linuz:					# install linuz binaries
         $verbose off

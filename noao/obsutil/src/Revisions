@@ -1,5 +1,17 @@
 .help Revisions Nov01 obsutuil
 
+=======
+V2.12.3
+=======
+
+t_sptime.x
+    1. For fibers or circular aperture the area of the aperture applied to
+    the sky flux was wrong because the size was treated as a radius instead
+    of a diameter.
+    2. In computing the sky flux reported the way seeing throughput was
+    applied was wrong.  (1/5/05, Valdes)
+
+
 ========
 V2.12.2a
 ========

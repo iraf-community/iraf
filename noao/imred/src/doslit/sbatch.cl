@@ -28,6 +28,7 @@ begin
 	bool	reextract, extract, disp, ext, flux, log
 	string	imtype, mstype, str1, str2, str3, str4
 	int	i
+	struct	err
 
 	imtype = "." // envget ("imtype")
 	i = stridx (",", imtype)
@@ -50,7 +51,10 @@ begin
 	        fd2 = ""
 	    }
 	    if (!access (spec // imtype)) {
-		print ("Object spectrum not found - " // spec, >> logfile)
+		printf ("Object spectrum not found - %s%s\n",
+		    spec, imtype) | scan (err)
+		print (err, >> logfile)
+		print ("Check setting of imtype", >> logfile)
 		next
 	    }
 	    specms = spec // mstype

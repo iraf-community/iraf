@@ -2,8 +2,15 @@
 .nf
 
 ========
-V2.12.2b
+V2.12.3
 ========
+
+daophot/allstar/dpalwrite.x
+    In dl_alxaccum there are conditions where the loop skips a star which
+    are not checked in the write routines when they compute the sharp
+    parameter.  When the loop is not completed the denom value is not
+    computed and defaults to zero which caused a divide by zero error
+    in computing the sharpness.  (11/18/04, Valdes)
 
 daophot/daolib/invers2.x
 daophot/daolib/mkpkg

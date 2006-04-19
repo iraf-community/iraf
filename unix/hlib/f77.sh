@@ -38,7 +38,7 @@ CFLAGS=${CFLAGS:-"-I${iraf}unix/bin.${IRAFARCH}"}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
-F2CFLAGS=${F2CFLAGS:='-ARw8 -Nn802'}
+F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802'}
 warn=1
 xsrc=0
 rc=0
@@ -103,6 +103,10 @@ do
 
 	-O*)
 		CFLAGS="$CFLAGS $1"
+		shift
+		;;
+
+	-U)	CFLAGS="$CFLAGS -arch ppc -arch i386"
 		shift
 		;;
 

@@ -201,11 +201,11 @@ begin
 		    }
 		}
 	    } then {
+		call erract (EA_WARN)
 		if (out != NULL) {
 		    call imunmap (out)
 		    call imdelete (Memc[temp])
 		}
-		call erract (EA_WARN)
 	    }
 
 	    if (mw != NULL) {

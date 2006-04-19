@@ -76,7 +76,7 @@ double	fit, ecf_eval(), smw_c1trand(), shdr_lw()
 
 begin
 	if (EC_ECF(ec) == NULL) {
-	    fit = smw_c1trand (EC_LP(ec), pix)
+	    fit = smw_c1trand (EC_PL(ec), pix)
 	    fit = shdr_lw (EC_SH(ec), fit)
 	} else
 	    fit = ecf_eval (EC_ECF(ec), order, pix)

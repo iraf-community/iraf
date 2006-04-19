@@ -22,6 +22,10 @@ $else $ifeq (MACH, macosx) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
+$else $ifeq (MACH, macintel) then
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, linuxppc) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
@@ -31,6 +35,10 @@ $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"
 $else $ifeq (MACH, sunos) then
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-Nz"		# default XC link flags
+$else $ifeq (MACH, cygwin) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
@@ -50,7 +58,7 @@ $set    USE_IIS         = no		# make the IIS display control package
 $set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
 $set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 
-$ifeq (MACH, linux, redhat, macosx) then
+$ifeq (MACH, linux, redhat, macosx, macintel) then
     $include "hlib$mkpkg.sf.MACX"
 $else $ifeq (MACH, linux, redhat, linuxppc) then
     $include "hlib$mkpkg.sf.LNUX"
@@ -60,4 +68,6 @@ $else $ifeq (MACH, freebsd) then
     $include "hlib$mkpkg.sf.FBSD"
 $else $ifeq (MACH, sunos) then
     $include "hlib$mkpkg.sf.SX86"
+$else $ifeq (MACH, cygwin) then
+    $include "hlib$mkpkg.sf.CYGW"
 $end
