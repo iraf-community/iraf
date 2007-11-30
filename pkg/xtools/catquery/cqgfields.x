@@ -80,6 +80,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (maxch, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])
@@ -142,6 +143,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (SZ_LINE, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])
@@ -210,6 +212,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (SZ_LINE, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])
@@ -278,6 +281,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (SZ_LINE, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])
@@ -346,6 +350,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (SZ_LINE, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])
@@ -413,6 +418,7 @@ begin
 
 	case CQ_STEXT:
 	    fbuf = CQ_RBUF(res) + Memi[CQ_RINDEX(res)+recptr-1] - 1
+	    fnum = Memi[CQ_FOFFSETS(res)+fnum-1]
 	    fip = Memi[CQ_FINDICES(res)+fnum-1]
 	    fsize = min (SZ_LINE, Memi[CQ_FINDICES(res)+fnum] -
 	        Memi[CQ_FINDICES(res)+fnum-1])

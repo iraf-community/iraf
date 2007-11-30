@@ -165,8 +165,8 @@ file name comes from the image header keyword BPM.  If the parameter is
 given as "!<keyword>" where <keyword> is a header keyword, the mask file
 comes from the value of that keyword and the mask value interpretation
 is the same as "goodvalue".  \fBNote\fR, if the
-number of input images becomes too large (currently about 4090 .imh or 2045
-.hhh images) then the images are temporarly stacked and combined by
+number of input images becomes too large (currently about 4090 .imh 
+or 2045 .hhh images) then the images are temporarly stacked and combined by
 projection.  This means all the images must have the same size and
 dimensionality.
 .le

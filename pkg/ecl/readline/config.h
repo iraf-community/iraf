@@ -140,7 +140,7 @@
 #define HAVE_TERMCAP_H 1
 
 /* Define if you have the <termio.h> header file.  */
-#define HAVE_TERMIO_H 1
+/* #undef HAVE_TERMIO_H */
 
 /* Define if you have the <termios.h> header file.  */
 #define HAVE_TERMIOS_H 1
@@ -167,13 +167,13 @@
 
 /* #undef GWINSZ_IN_SYS_IOCTL */
 
-/* #undef STRUCT_WINSIZE_IN_SYS_IOCTL */
+#define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 
-#define STRUCT_WINSIZE_IN_TERMIOS 1
+/* #undef STRUCT_WINSIZE_IN_TERMIOS */
 
-/* #undef TIOCSTAT_IN_SYS_IOCTL */
+#define TIOCSTAT_IN_SYS_IOCTL 1
 
-/* #undef FIONREAD_IN_SYS_IOCTL */
+#define FIONREAD_IN_SYS_IOCTL 1
 
 /* #undef SPEED_T_IN_SYS_TYPES */
 
@@ -193,7 +193,7 @@
 
 #define HAVE_POSIX_SIGSETJMP 1
 
-/* #undef CTYPE_NON_ASCII */
+#define CTYPE_NON_ASCII 1
 
 /* modify settings or make new ones based on what autoconf tells us. */
 

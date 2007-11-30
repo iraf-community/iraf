@@ -66,10 +66,11 @@ is full moon.
 .ls f1 = "U", f2 = "B", f3 = "V", f4 = "R", f5 = "I"
 Filters for which to compute the CCD information.  If given as "?"
 a list of filters in the database is produced.  If the name (ignoring
-case) is not found then it is ignored.  A null name, that is "",
-is used to eliminate listing of a filter.  There may be many filters
-in the database but the task is currently limited to displaying no
-more than five.
+case) is not found then it is ignored.  A null name, that is "", is used
+to eliminate listing of a filter.  If more than five filters is desired
+each of the parameters may be a comma delimited list of desired filters.
+Note that whitespace is preserved so "U, V" will expand to "U" and " V"
+and so will not match "V" in the database.  Use "U,V" instead.
 .le
 .ih
 DESCRIPTION
@@ -333,6 +334,11 @@ mode.  In the following example we want to change the magnitude.
 .fi
 .ih
 REVISIONS
+.ls CCDTIME V2.13
+The f1 to f5 parameters were modified to allow lists of filters so
+that more than five filters can be output without changing the parameter
+interface.
+.le
 .ls CCDTIME V2.12
 Task added to OBSUTIL package.
 .le

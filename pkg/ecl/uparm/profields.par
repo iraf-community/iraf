@@ -1,0 +1,6 @@
+files,s,a,"STDIN",,,"Files from which to extract fields"
+fields,s,q,"3,4,8",,,"Fields to extract"
+lines,s,h,"1-",,,"Lines from which to extract fields"
+quit_if_missing,b,h,no,,,"Quit on missing field?"
+print_file_names,b,h,no,,,"Print file names if multiple files?"
+mode,s,h,"ql",,,

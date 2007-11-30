@@ -1,6 +1,19 @@
 .help Revisions Nov01 obsutuil
 
 =======
+V2.13
+=======
+
+doc/ccdtime.hlp
+ccdtime/t_ccdtime.x
+    In order to get more than five filters while not changing the parameters
+    the f1-f5 input parameters may not be a comma delimited list of
+    desired filters.  Note that whitespace is not stripped and the
+    filter must match the string in the database so "U, V" will match
+    "U" but not "V".  Instead use "U,V".  (9/21/06, Valdes)
+
+
+=======
 V2.12.3
 =======
 

@@ -1,5 +1,19 @@
 .help revisions May92 noao.rv
 .nf
+
+filtpars.x
+	Fixed an error in the filtpars code where missing braces meant
+	that a command such as ":cutoff" would not work when filtering
+	is enabled (4/6/07)
+
+rvfgauss.x
+rvfuncs.x
+	Merged in old changes to include an update to do the Gaussian
+	fitting using double precision.  (3/15/07)
+
+rvwrite.x
+	Increased the HJD output to 5 decimals (8/15/06)
+
 ========
 V2.12.2a
 ========

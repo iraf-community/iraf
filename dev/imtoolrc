@@ -66,6 +66,10 @@
 # WIYN Devices
 50  1 2048  2500        # imt50|imtwttm
 
+55  1 10000  10000      # imt55|imt10k
+56  1 11000  11000      # imt56|imt11k
+57  1 12000  12000      # imt57|imt12k
+
 # User added formats.  (start with #64)
 # (add here)
 

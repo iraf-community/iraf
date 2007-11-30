@@ -46,7 +46,7 @@ begin
 	# Close images which are not needed.
 	nout = IM_LEN(out[1],1)
 	ndim = IM_NDIM(out[1])
-	if (!project) {
+	if (!project && ndim < 3) {
 	    do i = 1, nimages {
 		nin = IM_LEN(in[i],1)
 		j = max (0, offsets[i,1])
@@ -346,7 +346,7 @@ begin
 	# Close images which are not needed.
 	nout = IM_LEN(out[1],1)
 	ndim = IM_NDIM(out[1])
-	if (!project) {
+	if (!project && ndim < 3) {
 	    do i = 1, nimages {
 		nin = IM_LEN(in[i],1)
 		j = max (0, offsets[i,1])
@@ -646,7 +646,7 @@ begin
 	# Close images which are not needed.
 	nout = IM_LEN(out[1],1)
 	ndim = IM_NDIM(out[1])
-	if (!project) {
+	if (!project && ndim < 3) {
 	    do i = 1, nimages {
 		nin = IM_LEN(in[i],1)
 		j = max (0, offsets[i,1])
@@ -946,7 +946,7 @@ begin
 	# Close images which are not needed.
 	nout = IM_LEN(out[1],1)
 	ndim = IM_NDIM(out[1])
-	if (!project) {
+	if (!project && ndim < 3) {
 	    do i = 1, nimages {
 		nin = IM_LEN(in[i],1)
 		j = max (0, offsets[i,1])

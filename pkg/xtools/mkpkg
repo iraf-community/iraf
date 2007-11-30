@@ -7,6 +7,12 @@ update:
 	$purge    lib$
 	;
 
+txtcompile:
+	$omake	t_txtcompile.x
+	$link	t_txtcompile.o -lxtools -o xx_txtcompile.e
+	$move	xx_txtcompile.o bin$x_txtcompile.e
+	;
+
 generic:
 	$set GEN = "$$generic -k"
 	$ifolder (xtsample.x, xtsample.gx)
@@ -25,6 +31,7 @@ libxtools.a:
 	@fixpix		# Mask and pixel fixing routines
 	@skywcs		# Sky coordinates transformation routines
 	@catquery	# Catalog and survey access routines
+	@mef		# MEF handling routines
 
 	center1d.x	<math/iminterp.h> <pkg/center1d.h>
 	clgcurfit.x	<math/curfit.h>
@@ -46,12 +53,14 @@ libxtools.a:
 	rmsorted.x	<pkg/rmsorted.h>
 	rmturlach.x	<mach.h>
 	rngranges.x	<ctype.h> <mach.h>
-	obsdb.x	<error.h> <imset.h>
+	obsdb.x		<error.h> <imset.h>
 	strdetab.x	
 	strentab.x	
+	syshost.x	<clset.h> <ctotok.h>
 	xt21imsum.x	<imhdr.h>
 	xtanswer.x	<pkg/xtanswer.h>
 	xtargs.x	<ctotok.h>
+	xtextns.x       <ctype.h> <error.h> <mach.h> <pkg/mef.h>
 	xtgids.x	<ctotok.h>
 	xtimleneq.x	<imhdr.h>
 	xtimnames.x
@@ -65,4 +74,5 @@ libxtools.a:
 	xtstat.x
 	xtstripwhite.x	<ctype.h>
 	xtsums.x	
+	xttxtfio.x
 	;

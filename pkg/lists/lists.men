@@ -1,6 +1,7 @@
 	average - Compute the mean and standard deviation of a list
 	columns - Convert multicolumn file to separate files
 	lintran - Perform linear transformation of a list
+       raverage - Running average, standar deviation, and envelope
        rgcursor - Read the graphics cursor (makes a list)
       rimcursor - Read the image display cursor (makes a list)
 	  table - Format a list of words into a table

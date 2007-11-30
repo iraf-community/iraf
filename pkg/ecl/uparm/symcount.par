@@ -1,0 +1,2 @@
+files,s,a,"STDIN",,,"list of files to be counted"
+mode,s,h,"ql",,,

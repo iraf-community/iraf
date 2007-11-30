@@ -516,6 +516,306 @@ begin
 end
 
 
+# SIGM2I -- Get a line of type short from a scaled image.  Block averaging is
+# done by a subprocedure; this procedure gets a line from a possibly block
+# averaged image and if necessary interpolates it to the grid points of the
+# output line.
+
+pointer procedure sigm2i (si, lineno)
+
+pointer	si		# pointer to SI descriptor
+int	lineno
+
+pointer	rawline, tempp, gp
+int	i, new_y[2], tempi, curbuf, altbuf
+int	nraw, npix, nblks_y, ybavg, x1, x2
+real	x, y, weight_1, weight_2
+pointer	si_blmavgi()
+errchk	si_blmavgi
+
+begin
+	nraw = IM_LEN(SI_IM(si),1)
+	npix = SI_NPIX(si,1)
+
+	# Determine the range of X (in pixels on the block averaged input image)
+	# required for the interpolator.
+
+	gp = SI_GRID(si,1)
+	x1 = SI_XOFF(si)
+	x = Memr[gp+npix-1]
+	x2 = x1 + int(x)
+	if (INTVAL(x))
+	    x2 = x2 - 1
+	x2 = max (x1 + 1, x2)
+
+	gp = SI_GRID(si,2)
+	y = Memr[gp+lineno-1]
+
+	# The following is an optimization provided for the case when it is
+	# not necessary to interpolate in either X or Y.  Block averaging is
+	# permitted.
+
+	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
+	    return (si_blmavgi (SI_IM(si), SI_FP(si), x1, x2, int(y),
+		SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si)))
+
+	# If we are interpolating in Y two buffers are required, one for each
+	# of the two input image lines required to interpolate in Y.  The lines
+	# stored in these buffers are interpolated in X to the output grid but
+	# not in Y.  Both buffers are not required if we are not interpolating
+	# in Y, but we use them anyhow to simplify the code.
+
+	if (SI_INIT(si) == YES) {
+	    do i = 1, 2 {
+		if (SI_BUF(si,i) != NULL)
+		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
+		call malloc (SI_BUF(si,i), npix, TY_INT)
+		SI_TYBUF(si) = TY_INT
+		SI_BUFY(si,i) = NOTSET
+	    }
+	    if (OUTBUF(si) != NULL)
+		call mfree (OUTBUF(si), SI_TYBUF(si))
+	    call malloc (OUTBUF(si), npix, TY_INT)
+	    SI_INIT(si) = NO
+	}
+
+	# If the Y value of the new line is not in range of the contents of the
+	# current line buffers, refill one or both buffers.  To refill we must
+	# read a (possibly block averaged) input line and interpolate it onto
+	# the X grid.  The X and Y values herein are in the coordinate system
+	# of the (possibly block averaged) input image.
+
+	new_y[1] = int(y)
+	new_y[2] = int(y) + 1
+
+	# Get the pair of lines whose integral Y values form an interval
+	# containing the fractional Y value of the output line.  Sometimes the
+	# desired line will happen to be in the other buffer already, in which
+	# case we just have to swap buffers.  Often the new line will be the
+	# current line, in which case nothing is done.  This latter case occurs
+	# frequently when the magnification ratio is large.
+
+	curbuf = 1
+	altbuf = 2
+
+	do i = 1, 2 {
+	    if (new_y[i] == SI_BUFY(si,i)) {
+		;
+	    } else if (new_y[i] == SI_BUFY(si,altbuf)) {
+		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
+		SWAPI (SI_BUFY(si,1), SI_BUFY(si,2))
+
+	    } else {
+		# Get line and interpolate onto output grid.  If interpolation
+		# is not required merely copy data out.  This code is set up
+		# to always use two buffers; in effect, there is one buffer of
+		# look ahead, even when Y[i] is integral.  This means that we
+		# will go out of bounds by one line at the top of the image.
+		# This is handled by copying the last line.
+
+		ybavg = SI_BAVG(si,2)
+		nblks_y = (IM_LEN (SI_IM(si), 2) + ybavg-1) / ybavg
+		if (new_y[i] <= nblks_y)
+		    rawline = si_blmavgi (SI_IM(si), SI_FP(si), x1, x2,
+			new_y[i], SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si))
+
+		if (SI_INTERP(si,1) == NO) {
+		    call amovi (Memi[rawline], Memi[SI_BUF(si,i)], npix)
+		} else if (SI_ORDER(si) == 0) {
+		    call si_samplei (Memi[rawline], Memi[SI_BUF(si,i)],
+			Memr[SI_GRID(si,1)], npix)
+		} else if (SI_ORDER(si) == -1) {
+		    call si_maxi (Memi[rawline], nraw,
+			Memr[SI_GRID(si,1)], Memi[SI_BUF(si,i)], npix)
+		} else {
+		    call aluii (Memi[rawline], Memi[SI_BUF(si,i)],
+			Memr[SI_GRID(si,1)], npix)
+		}
+
+		SI_BUFY(si,i) = new_y[i]
+	    }
+
+	    SWAPI (altbuf, curbuf)
+	}
+
+	# We now have two line buffers straddling the output Y value,
+	# interpolated to the X grid of the output line.  To complete the
+	# bilinear interpolation operation we take a weighted sum of the two
+	# lines.  If the range from SI_BUFY(si,1) to SI_BUFY(si,2) is repeatedly
+	# interpolated in Y no additional i/o occurs and the linear
+	# interpolation operation (ALUI) does not have to be repeated (only the
+	# weighted sum is required).  If the distance of Y from one of the
+	# buffers is zero then we do not even have to take a weighted sum.
+	# This is not unusual because we may be called with a magnification
+	# of 1.0 in Y.
+
+	weight_1 = 1.0 - (y - SI_BUFY(si,1))
+	weight_2 = 1.0 - weight_1
+
+	if (weight_1 < SI_TOL)
+	    return (SI_BUF(si,2))
+	else if (weight_2 < SI_TOL || SI_ORDER(si) == 0) 
+	    return (SI_BUF(si,1))
+	else if (SI_ORDER(si) == -1) {
+	    call amaxi (Memi[SI_BUF(si,1)], Memi[SI_BUF(si,2)],
+		Memi[OUTBUF(si)], npix)
+	    return (OUTBUF(si))
+	} else {
+	    call awsui (Memi[SI_BUF(si,1)], Memi[SI_BUF(si,2)],
+		Memi[OUTBUF(si)], npix, weight_1, weight_2)
+	    return (OUTBUF(si))
+	}
+end
+
+
+# SI_BLMAVGI -- Get a line from a block averaged image of type integer.
+# For example, block averaging by a factor of 2 means that pixels 1 and 2
+# are averaged to produce the first output pixel, 3 and 4 are averaged to
+# produce the second output pixel, and so on.  If the length of an axis
+# is not an integral multiple of the block size then the last pixel in the
+# last block will be replicated to fill out the block; the average is still
+# defined even if a block is not full.
+
+pointer procedure si_blmavgi (im, fp, x1, x2, y, xbavg, ybavg, order)
+
+pointer	im			# input image
+pointer	fp			# fixpix structure
+int	x1, x2			# range of x blocks to be read
+int	y			# y block to be read
+int	xbavg, ybavg		# X and Y block averaging factors
+int	order			# averaging option
+
+real	sum
+int	blkmax
+pointer	sp, a, b
+int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
+int	first_line, nlines_in_sum, npix, nfull_blks, count
+pointer	xt_fpi()
+errchk	xt_fpi
+
+begin
+	call smark (sp)
+
+	ncols  = IM_LEN(im,1)
+	nlines = IM_LEN(im,2)
+	xoff   = (x1 - 1) * xbavg + 1
+	npix   = min (ncols, xoff + (x2 - x1 + 1) * xbavg - 1) - xoff + 1
+
+	if ((xbavg < 1) || (ybavg < 1))
+	    call error (1, "si_blmavg: illegal block size")
+	else if (x1 < 1 || x2 > ncols)
+	    call error (2, "si_blmavg: column index out of bounds")
+	else if ((xbavg == 1) && (ybavg == 1))
+	    return (xt_fpi (fp, im, y, NULL) + xoff - 1)
+
+	nblks_x = (npix   + xbavg-1) / xbavg
+	nblks_y = (nlines + ybavg-1) / ybavg
+
+	if (y < 1 || y > nblks_y)
+	    call error (2, "si_blmavg: block number out of range")
+
+	if (ybavg > 1) {
+	    call salloc (b, nblks_x, TY_LONG)
+	    call aclrl (Meml[b], nblks_x)
+	    nlines_in_sum = 0
+	}
+
+	# Read and accumulate all input lines in the block.
+	first_line = (y - 1) * ybavg + 1
+
+	do i = first_line, min (nlines, first_line + ybavg - 1) {
+	    # Get line from input image.
+	    a = xt_fpi (fp, im, i, NULL) + xoff - 1
+
+	    # Block average line in X.
+	    if (xbavg > 1) {
+		# First block average only the full blocks.
+		nfull_blks = npix / xbavg
+		if (order == -1) {
+		    blk1 = a
+		    do j = 1, nfull_blks {
+			blk2 = blk1 + xbavg
+			blkmax = Memi[blk1]
+			do k = blk1+1, blk2-1
+			    blkmax = max (blkmax, Memi[k])
+			Memi[a+j-1] = blkmax
+			blk1 = blk2
+		    }
+		} else
+		    call abavi (Memi[a], Memi[a], nfull_blks, xbavg)
+
+		# Now average the final partial block, if any.
+		if (nfull_blks < nblks_x) {
+		    if (order == -1) {
+			blkmax = Memi[blk1]
+			do k = blk1+1, a+npix-1
+			    blkmax = max (blkmax, Memi[k])
+			Memi[a+j-1] = blkmax
+		    } else {
+			sum = 0.0
+			count = 0
+			do j = nfull_blks * xbavg + 1, npix {
+			    sum = sum + Memi[a+j-1]
+			    count = count + 1
+			}
+			Memi[a+nblks_x-1] = sum / count
+		    }
+		}
+	    }
+
+	    # Add line into block sum.  Keep track of number of lines in sum
+	    # so that we can compute block average later.
+
+	    if (ybavg > 1) {
+		if (order == -1) {
+		    do j = 0, nblks_x-1
+			Meml[b+j] = max (Meml[b+j], long (Memi[a+j]))
+		} else {
+		    do j = 0, nblks_x-1
+			Meml[b+j] = Meml[b+j] + Memi[a+j]
+		    nlines_in_sum = nlines_in_sum + 1
+		}
+	    }
+	}
+
+	# Compute the block average in Y from the sum of all lines block
+	# averaged in X.  Overwrite buffer A, the buffer returned by IMIO.
+	# This is kosher because the block averaged line is never longer
+	# than an input line.
+
+	if (ybavg > 1) {
+	    if (order == -1) {
+		do i = 0, nblks_x-1
+		    Memi[a+i] = Meml[b+i]
+	    } else {
+		do i = 0, nblks_x-1
+		    Memi[a+i] = Meml[b+i] / real(nlines_in_sum)
+	    }
+	}
+
+	call sfree (sp)
+	return (a)
+end
+
+
+# SI_MAXI -- Resample a line via maximum value.
+
+procedure si_maxi (a, na, x, b, nb)
+
+int	a[na]                   # input array
+int	na                      # input size
+real	x[nb]                   # sample grid
+int	b[nb]                   # output arrays
+int	nb                      # output size
+
+int	i
+
+begin
+	do i = 1, nb
+	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
+end
+
+
 # SIGM2R -- Get a line of type real from a scaled image.  Block averaging is
 # done by a subprocedure; this procedure gets a line from a possibly block
 # averaged image and if necessary interpolates it to the grid points of the

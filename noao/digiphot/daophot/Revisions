@@ -1,6 +1,9 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
 
+daophot/psf.par
+    Fixed a type in the 'pstfile' prompt (11/24/07)
+
 ========
 V2.12.3
 ========

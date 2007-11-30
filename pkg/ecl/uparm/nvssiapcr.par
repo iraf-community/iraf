@@ -1,0 +1,13 @@
+svc_url,s,a,"http://www-gsss.stsci.edu/gscvo/DSS2R.jsp",,,"Service URL"
+ra,r,a,10.,,,"RA of search"
+dec,r,a,0.,,,"Dec of search"
+rasz,r,a,0.25,,,"RA size"
+decsz,r,a,0.25,,,"Dec size"
+image,s,h,"",,,"Image Name"
+fmt,s,h,"image/fits",,,"Image format type"
+output,s,h,"STDOUT",,,"Output filename"
+otype,s,h,"ascii",ascii|csv|votable|fits,,"Output format"
+insys,s,h,"icrs",,,"Input coordinate system"
+verbose,b,h,no,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

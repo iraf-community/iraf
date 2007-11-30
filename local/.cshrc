@@ -5,6 +5,13 @@ umask 022
 setenv iraf /iraf/iraf/
 source $iraf/unix/hlib/irafuser.csh
 
+#setenv IRAFARCH macintel
+#setenv XC_F77    "g95"
+#setenv XC_LFLAGS "-lg95"
+#setenv XC_XFLAGS "-/mfpmath=sse -/free-vectorize -/msse"
+#setenv XC_FFLAGS "-mfpmath=sse -ftree-vectorize -msse"
+#setenv XC_CFLAGS "-mfpmath=sse -ftree-vectorize -msse"
+
 
 switch (`uname`)
 case FreeBSD:
@@ -19,7 +26,8 @@ case Linux:
     breaksw
 case Darwin:
     set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /usr/local/sbin \
+	/usr/local/bin /opt/local/bin /usr/local/sbin \
+	/usr/local/pvm/pvm3/bin /usr/local/pvm/pvm3/lib \
 	/usr/X11R6/bin)
     breaksw
 case SunOS:
@@ -65,6 +73,9 @@ if ($?prompt) then
 	# make mail(1) happy:
 	setenv	crt	24
 endif
+
+setenv XFILESEARCHPATH ":/usr/lib/X11/%T/%N%S:/usr/x11R6/lib/X11/%T/%N%S:"
+
 
 alias   del	'/bin/rm -f'
 alias   ls	'ls -FCs'

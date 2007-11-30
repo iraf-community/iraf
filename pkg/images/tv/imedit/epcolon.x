@@ -2,8 +2,8 @@ include	"epix.h"
  
 # List of colon commands.
 define	CMDS "|angh|angv|aperture|autodisplay|autosurface|buffer|command|\
-	|display|eparam|graphics|input|output|radius|search|sigma|value|width|\
-	|write|xorder|yorder|"
+	|display|eparam|graphics|input|output|radius|search|sigma|\
+	|value|minvalue|maxvalue|width|write|xorder|yorder|"
  
 define	ANGH		1	# Horizontal viewing angle
 define	ANGV		2	# Vertical viewing angle
@@ -20,11 +20,13 @@ define	OUTPUT		13	# Output image
 define	RADIUS		14	# Aperture radius
 define	SEARCH		15	# Search radius
 define	SIGMA		16	# Noise sigma
-define	VALUE		17	# Constant substitution value
-define	WIDTH		18	# Background width
-define	WRITE		20	# Write output
-define	XORDER		21	# X order
-define	YORDER		22	# Y order
+define	VALUE		18	# Constant substitution value
+define	MINVALUE	19	# Minimum value for replacement
+define	MAXVALUE	20	# Maximum value for replacement
+define	WIDTH		21	# Background width
+define	WRITE		22	# Write output
+define	XORDER		23	# X order
+define	YORDER		24	# Y order
  
 # EP_COLON -- Respond to colon commands.
 # The changed parameters are written to the parameter file and
@@ -236,6 +238,32 @@ begin
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":value %g\n")
 			call pargr (EP_VALUE(ep))
+		}
+	    }
+	case MINVALUE:
+	    call gargr (rval)
+	    if (nscan() == 1) {
+	        call printf ("minvalue %g\n")
+		    call pargr (EP_MINVALUE(ep))
+	    } else {
+		EP_MINVALUE(ep) = rval
+	        call clputr ("minvalue", EP_MINVALUE(ep))
+		if (EP_LOGFD(ep) != NULL) {
+		    call fprintf (EP_LOGFD(ep), ":minvalue %g\n")
+			call pargr (EP_MINVALUE(ep))
+		}
+	    }
+	case MAXVALUE:
+	    call gargr (rval)
+	    if (nscan() == 1) {
+	        call printf ("maxvalue %g\n")
+		    call pargr (EP_MAXVALUE(ep))
+	    } else {
+		EP_MAXVALUE(ep) = rval
+	        call clputr ("maxvalue", EP_MAXVALUE(ep))
+		if (EP_LOGFD(ep) != NULL) {
+		    call fprintf (EP_LOGFD(ep), ":maxvalue %g\n")
+			call pargr (EP_MAXVALUE(ep))
 		}
 	    }
 	case WIDTH:

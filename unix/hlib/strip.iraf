@@ -59,7 +59,6 @@
 -file bin.macintel/OBJS.arc.Z
 -file bin.cygwin/OBJS.arc.Z
 -file bin.freebsd/OBJS.arc.Z
--file bin.suse/OBJS.arc.Z
 -file bin.sunos/OBJS.arc.Z
 -file bin.linuxppc/OBJS.arc.Z
 

@@ -444,11 +444,13 @@ rxtn_
 	}
 
 	# If requested a non supported BINTABLE format, post an error
-	# message.
+	# message and return to the caller.
 
 	if (strcmp(FIT_EXTTYPE(lfit), "BINTABLE") == 0) {
-	    if (strcmp(FIT_EXTSTYPE(lfit), "PLIO_1") != 0)
+	    if (strcmp(FIT_EXTSTYPE(lfit), "PLIO_1") != 0) {
+	        call close (spool)
 		call syserrs (SYS_IKIEXTN, IM_NAME(im))
+            }
 	}
 	
 	# Merge Image Extension header to the user area.

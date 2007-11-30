@@ -462,7 +462,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 #ifdef MACUNIX
 	    int fpucw = _FPU_IEEE;
 #else
-	    int fpucw = 0x336;
+	    int fpucw = 0x332;
 #endif
 	    sfpucw_ (&fpucw);
 	}

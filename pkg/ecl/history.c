@@ -358,10 +358,11 @@ input_:
 
 	/* Save the "raw command" here for use in yy_startblock.  This is
 	 * to handle the problem of procedure script parsing overwriting
-	 * the raw command in cmdblk.
+	 * the raw command in cmdblk.  Save immediate mode and escapes, 
+	 * but don't save newlines.
 	 */
 	strcpy (raw_cmdblk, cmdblk);
-    	if (isalpha (cmdblk[0])) {		/* don't save newlines       */
+    	if (isalpha (cmdblk[0]) || cmdblk[0] == '=' || cmdblk[0] == '!') {
 	    int len = strlen (cmdblk);
 	    char buf[SZ_CMDBLK];
 

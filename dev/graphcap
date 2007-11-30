@@ -113,8 +113,17 @@ clp2p|			:tc=uclp2p:
 clp2t|clp2tl|		:tc=uclp2tl:
 clp2tp|			:tc=uclp2tp:
 
-lpr|lp|lw|		:tc=g-lpr:
+# IRAFNET generic devices
+lp|			:tc=g-lp:
+lpr|			:tc=g-lpr:
+clpr|			:tc=g-clpr:
+clprp|			:tc=g-clprp:
+clp|			:tc=g-clp:
+clpp|			:tc=g-clpp:
+
 psdump|			:tc=g-psdump:
+psport|			:tc=g-psport:
+
 calcomp|ccp|		:tc=ccp_calcomp:
 trilog|tri|		:tc=vtri:
 hpplot|			:tc=vhpp:
@@ -233,7 +242,7 @@ imt44|imt1100|Mosaic block averaged by 8:cn#44:xr#1100:yr#1100:\
 imt45|imtgmosccd|One GMOS CCD full resolution:cn#45:xr#2080:yr#4644:\
         :LC:BS@:z0#1:zr#200:DD=node!imtool,,2080,4644:tc=iism70:
 imt46|imtgmos|imtgmos1|Full-frame GMOS:cn#46:xr#6400:yr#4644:\
-        :LC:BS@:z0#1:zr#200:DD=node!imtool,,6400,4644,tc=iism70:
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,6400,4644:tc=iism70:
 imt47|imtgmos2|GMOS blkavg by 2:cn#47:xr#3200:yr#2322:\
         :LC:BS@:z0#1:zr#200:DD=node!imtool,,3200,2322:tc=iism70:
 imt48|imtgmos4|GMOS blkavg by 4:cn#48:xr#1600:yr#1161:\
@@ -243,6 +252,13 @@ imt49|imtgmos8|GMOS blkavg by 8:cn#49:xr#800:yr#581:\
 
 imt50|imtwttm|WIYN Tip-Tilt CCD:cn#50:xr#2048:yr#2500:\
         :LC:BS@:z0#1:zr#200:DD=node!imtool,,2048,2500:tc=iism70:
+
+imt55|imtwttm|10K frame buffer:cn#55:xr#10000:yr#10000:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,10000,10000:tc=iism70:
+imt56|imtwttm|11K frame buffer:cn#56:xr#11000:yr#11000:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,11000,11000:tc=iism70:
+imt57|imtwttm|12K frame buffer:cn#57:xr#12000:yr#12000:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,12000,12000:tc=iism70:
 
 
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
@@ -307,6 +323,7 @@ uclp2t|uclp2tl|UNIX interface to Tek Phaser 360 color printer (landscape):\
 uclp2tp|UNIX interface to Tek Phaser 360 color printer (portrait):\
         :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
         :DD=psi_def,tmp$psk,!{ lpr -Pclp2t $F ; rm $F ; }&:tc=psi_port:
+
 
 # Generic PSIKERN devices.
 g-psiland|PostScript Kernel output to default printer, (landscape):\
@@ -529,10 +546,33 @@ sgi_image_format|Generic raster file format specification:\
 g-psdump|UNIX generic interface to Postscript file dump:\
         :DD=psdump,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
         -b$(YO) -h$(YW) -p$(PW) > /tmp/irafdmp$$.ps ; rm $F; }&:tc=sgi_apl:
-g-lpr|UNIX generic interface to default printer device (lpr):\
+# End of Joe Harrington entries.
+
+
+# IRAFNET Devices
+g-lpr|glpr|UNIX generic interface to default printer device (lpr):\
         :DD=lpr,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
         -b$(YO) -h$(YW) -p$(PW) | lpr ; rm $F ; }&:tc=sgi_apl:
-# End of Joe Harrington entries.
+
+g-lp|glp|UNIX generic interface to default printer device (lp):\
+        :DD=lpr,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) | lp ; rm $F ; }&:tc=sgi_apl:
+
+g-clprl|gclprl|g-clpr|gclpr|Default color printer device (lpr/psikern/land):\
+	:kf=bin$x_sgikern.e:\
+        :DD=psi_def,tmp$psk,!{ lpr $F; rm $F ;}&:tc=psi_land:
+
+g-clprp|gclprp|Default color printer device (lpr/psikern/port):\
+	:kf=bin$x_sgikern.e:\
+        :DD=psi_def,tmp$psk,!{ lpr $F; rm $F ;}&:tc=psi_port:
+
+g-psport|UNIX generic interface to Postscript file dump (portrait):\
+	:ar#0.762:ys#0.267:xs#0.203:yr#3180:xr#2380:\
+	:MF#1:YO#55:YW#3180:XO#90:XW#2380:PW#2.3:RO:YF:\
+        :DD=psdump,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) > /tmp/irafdmp$$.ps ; rm $F; }&:tc=sgi_apl:
+# End of IRAFNET Devices
+
 
 # SGI/VMS devices.
 vver|VMS generic interface to the versatec:\

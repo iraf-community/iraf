@@ -13,8 +13,6 @@ if (-f /etc/redhat-release) then
     else
         setenv MACH redhat
     endif
-else if (-f /etc/SuSE-release) then
-    set MACH = suse
 else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
     setenv MACH linuxppc
 else
@@ -59,8 +57,6 @@ if (! $?IRAFARCH) then
 	setenv IRAFARCH "linux"
     else if ("$MACH" == "redhat") then
 	setenv IRAFARCH "redhat"
-    else if ("$MACH" == "suse") then
-	setenv IRAFARCH "suse"
     else if ("$MACH" == "linuxppc") then
 	setenv IRAFARCH "linuxppc"
     else if ("$MACH" == "sunos") then

@@ -7,6 +7,8 @@ autodisplay,b,h,yes,,,Automatic image display?
 autosurface,b,h,no,,,Automatic surface plots?
 aperture,s,h,"circular","|circular|square|",,Aperture type
 radius,r,h,2.,,,Substitution radius
+minvalue,r,h,INDEF,,,Minimum value to modify
+maxvalue,r,h,INDEF,,,Maximum value to modify 
 search,r,h,2.,,,Search radius
 buffer,r,h,1.,0.,,Background buffer width
 width,r,h,2.,1.,,Background width

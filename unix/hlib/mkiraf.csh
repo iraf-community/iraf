@@ -49,17 +49,24 @@ endif
 # Edit the login.cl file, setting the user's home directory, default image
 # directory, and terminal.
 
+
 echo $ttymsg
 echo -n 'Enter terminal type: '
+
 
 echo $<	| sed -e "s;.*;s+U_TERM+&+;"		>  _sed
 pwd	| sed -e "s;.*;s+U_HOME+&/+;"		>> _sed
 pwd	| sed -e "s;.*;s+U_UPARM+&/uparm/+;"	>> _sed
-whoami	| sed -e "s;.*;s+U_IMDIR+$imdir/&/+;"	>> _sed
+if (! (-e "$imdir" && -w "$imdir") ) then
+    set imdir = HDR$
+    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/+;"	>> _sed
+else
+    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/&/+;"	>> _sed
+    whoami	| sed -e "s;.*;mkdir $imdir/& 2> /dev/null;" | sh
+endif
 whoami	| sed -e "s;.*;s+U_USER+&+;"		>> _sed
 
 sed -f _sed < $iraf/unix/hlib/login.cl > login.cl; rm _sed
-whoami	| sed -e "s;.*;mkdir $imdir/& 2> /dev/null;" | sh
 
 echo 'A new LOGIN.CL file has been created in the current directory.'
 echo 'You may wish to review and edit this file to change the defaults.'

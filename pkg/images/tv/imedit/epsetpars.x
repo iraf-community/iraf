@@ -33,6 +33,8 @@ begin
 	EP_SEARCH(ep) = clgetr ("search")
 	EP_SIGMA(ep) = clgetr ("sigma")
 	EP_VALUE(ep) = clgetr ("value")
+	EP_MINVALUE(ep) = clgetr ("minvalue")
+	EP_MAXVALUE(ep) = clgetr ("maxvalue")
 	EP_WIDTH(ep) = clgetr ("width")
 	EP_XORDER(ep) = clgeti ("xorder")
 	EP_YORDER(ep) = clgeti ("yorder")

@@ -12,7 +12,7 @@
  */
 #ifndef D_stdarg
 
-#if (defined(MACOSX) || defined(__CYGWIN__))
+#if (defined(MACOSX) || defined(__CYGWIN__) || defined (LINUX))
 #define USE_STDARG
 #endif
 
@@ -24,7 +24,11 @@
 #ifdef __CYGWIN__
 #include "stdarg-cygwin.h"
 #else
+#ifdef LINUX
+#include "stdarg-linux.h"
+#else
 #include <stdarg.h>
+#endif
 #endif
 #endif
 

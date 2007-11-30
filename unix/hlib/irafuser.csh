@@ -8,12 +8,6 @@ if (-f /etc/redhat-release) then
     else
 	setenv MACH redhat
     endif
-else if (-f /etc/SuSE-release) then
-    if (`uname -m` == "ppc") then
-	setenv MACH linuxppc
-    else
-	setenv MACH suse
-    endif
 else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
 	setenv MACH linuxppc
 else
@@ -21,10 +15,21 @@ else
 endif
 
 if ($MACH == "darwin") then
-    if ("`uname -m`" == "i386") then
-        setenv MACH macintel
+    # Let the IRAFARCH override the machine to support cross compilation.
+    if ($?IRAFARCH) then
+        if ("$IRAFARCH" == "macosx") then
+	    setenv MACH macosx
+        else if ("$IRAFARCH" == "macintel") then
+	    setenv MACH macintel
+        endif
     else
-        setenv MACH macosx
+        if ("`uname -m`" == "i386") then
+            setenv MACH macintel
+            setenv IRAFARCH macintel
+        else
+            setenv MACH macosx
+            setenv IRAFARCH macosx
+        endif
     endif
 else if ($OS_MACH == "cygwin") then
     setenv MACH cygwin
@@ -59,14 +64,14 @@ case macosx:
     setenv CC_f2c cc
     setenv F2C $hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -w -Wunused"
+    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch ppc"
     setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused"
     if (`uname -r` == "5.5") then
 	setenv HSI_CF 	"$HSI_CF -DOLD_MACOSX"
 	setenv HSI_XF 	"$HSI_XF -DOLD_MACOSX"
     endif
-    setenv HSI_FF "-O"
-    setenv HSI_LF ""
+    setenv HSI_FF "-O -arch ppc"
+    setenv HSI_LF "-arch ppc"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
@@ -79,9 +84,9 @@ case macintel:
     setenv CC_f2c cc
     setenv F2C $hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -DMACINTEL -w -Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF ""
+    setenv HSI_CF "-O -DMACOSX -DMACINTEL -w -Wunused -arch i386"
+    setenv HSI_FF "-O -arch i386"
+    setenv HSI_LF "-arch i386"
     setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""

@@ -5,6 +5,14 @@ This directory contains generic code used in various tasks that combine
 images.
 
 =======
+V2.13
+=======
+
+icgdata.gx
+    Fixed a problem where 3-D images were closing an image in the case
+    of many bands leading to a slow execution (10/20/06, Valdes)
+
+=======
 V2.12.3
 =======
 

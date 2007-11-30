@@ -128,14 +128,6 @@ switch ($UNAME)
 		set LIBFILES    = ""
 		set LS		= "/bin/ls -s"
 		set LSDF	= "-lLtg"
-            else if (-f /etc/SuSE-release) then		# SuSE Linux
-                set mach 	= "suse"
-                set hmach 	= "suse"
-		set TAPES	= "/dev/*st[0-7]"
-		set shlib	= "no"
-		set LIBFILES    = ""
-		set LS		= "/bin/ls -s"
-		set LSDF	= "-lLtg"
             else					# Other Linux
                 set mach 	= "linux"
                 set hmach 	= "linux"

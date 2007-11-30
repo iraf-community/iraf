@@ -1,0 +1,144 @@
+.help xt_pmmap Mar07 xtools
+.ih
+NAME
+.nf
+xt_pmmap -- map a mask and match it to a reference image
+.fi
+.ih
+SYNOPSIS
+.nf
+# Open a mask.
+pointer procedure xt_pmmap (pmname, refim, mname, sz_mname)
+
+char	pmname[ARB]		#I Pixel mask name
+pointer	refim			#I Reference image pointer
+char	mname[ARB]		#O Expanded mask name
+int	sz_mname		#O Size of expanded mask name
+
+
+# Close the mask.
+procedure xt_pmunmap (im)
+
+pointer im                      #I IMIO pointer for mask
+.fi
+.ih
+DESCRIPTION
+This interface maps (opens) and unmaps (closes) a mask for use in an
+application.  It includes resolving mask files from image header keywords
+in a reference image, inverting masks, matching masks spatially to a
+reference image, and access to non-pixel list formats.
+
+The \fIpmname\fR argument is a file name or a reference to an image header
+keyword using the syntax "!<keyword>".  As a special case the name "BPM"
+is equivalent to "!BPM".  It is also legal for the file name to be a null
+string which returns a NULL pointer for the application to interpret
+as desired.  Most applications will treat this case as all image pixels
+are good.
+
+If the file name, or the file name obtained from a keyword reference,
+begins with the character '^' the mask will be inverted to a boolean mask.
+This means that input mask values which are zero are set to 1 and non-zero
+mask values are set to 0.
+
+The \fIrefim\fR argument is the IMIO image pointer for a reference image
+used to resolve keyword references and for spatial matching.
+
+The map routine returns the mask name through the \fImname\fR argument.
+Typically an application would use the mask name for logging purposes
+since it will expand keyword mask references.
+
+.sh
+SPATIAL MATCHING
+
+The matching of masks to a reference image is a powerful feature though it
+can also cause confusion.  The advantage of matching is that when images
+are modified by trimming or other linear geometric operations the mask,
+often referenced in the image header, will still correctly identify
+the bad pixels.  Note that this does not apply to non-linear coordinate
+transformations.
+
+The matching is based on a "physical" coordinate system.  This is typically
+the image pixel coordinate system prior to any linear transformation.
+IRAF tasks which extract subrasters, subsample, block average, block
+replicate, transpose, etc. update header keywords describing the mapping
+from the image pixel coordinate system (called the "logical" coordinate
+system) to the parent physical coordinate system.  Some applications
+also attach a meaning to the physical coordinate system such as detector
+array coordinates.
+
+The transformation between logical coordinates (lx,ly) and physical
+coordinates (px,py) is defined by the header keywords LTM1_1, LTM2_1,
+LTM1_2, LTM_2_2, LTV1, and LTV2 as shown below.
+
+.nf
+    lx = px * LTM1_1 + py * LTM2_1 + LTV1
+    ly = px * LTM1_2 + py * LTM2_2 + LTV2
+
+    px = ( LTM2_2 * (lx - LTV1) - LTM2_1 * (ly - LTV2)) /
+	 (LTM1_1 * LTM2_2 - LTM1_2 * LTM2_1)
+    py = (-LTM1_2 * (lx - LTV1) + LTM1_1 * (ly - LTV2)) /
+	 (LTM1_1 * LTM2_2 - LTM1_2 * LTM2_1)
+.fi
+
+Note that a missing keyword defaults to a value of zero.  When all
+LTM/LTV keywords are missing then the physical and logical coordinate
+systems are identical.  In other words the implied transformation is
+an identify transformation.  Note that one cannot just have
+LTV keywords because then the implied transformation matrix is
+ill-defined (all matrix elements are assumed zero).
+
+The matching consists of deriving a transformation between the
+logical pixels in the image and the mask by combining the two physical
+transformations.  This means that even if the the logical to physical
+transformations are complex, such as a rotation, if the two are the same
+a identity or a simple offset relative transformation may still exist
+between the two.  In this combined logical-to-logical transformation
+the current version does not allow a rotation though, as just noted, the
+separate logical-to-pixel transformation may be rotated by the same amount.
+
+When the image is sampled more finely than the mask, that is the same mask
+pixel overlaps multiple image pixels, then the nearest mask value (pixel
+center to pixel center) is used for each image pixel.  When the image is
+more coarsely sampled, that is more than one mask pixel overlaps an image
+pixel, then the maximum mask value becomes the mask value for the pixel.
+This latter choice means that if an image pixel is touched by any bad
+pixel then it will be indicated as bad.
+
+If after matching the mask to the image the mask does not cover
+the image, the mask is extended by adding zero mask values.
+
+The above description is fairly general which makes this seem complex.
+However, by far the most common mismatch between an image and its mask
+is that an image has been derived as a subraster of a parent image.
+In this case the LTM values will be LTM1_1=LTM2_2=1 and LTM2_1=LTM1_2=0
+(or missing) and the matching just depends on the origin offset keywords
+LTV1 and LTV2.
+
+Note that to eliminate this matching one resets the physical coordinate
+system to be equivalent to the logical coordinate system.  The task
+\fIwcsreset\fR can be used or the above LTM/LTV keywords can be deleted
+using a header keyword editor.
+
+.sh
+ALTERNATIVE MASK DESCRIPTIONS
+
+This interface accepts alternate mask descriptions that are internally
+converted to the same mask structure for transparent use by the application.
+The preferred input mask description is a pixel mask in either pixel list
+format (.pl extension) or a FITS pixel mask (a binary table representaion).
+The alternate representations are a regular image and a text description.
+
+The pixels values in a regular image are truncated (towards zero) to integers.
+Then negative values are set to 0.
+
+A text description consists of lines in a text file with either two or
+four values.  The values are truncated to integers if needed.  Two values
+define a mask value of 2 at the (x,y) coordinate.  Four values define a
+region, given as (x1,x2,y1,y2) of mask values.  The mask values are 2 if
+the wdith of the region is narrower or equal to the heigth.  Otherwise the
+value is 3.  This is a convention used by task which then interpolate
+across bad pixel regions.
+
+Note that a text description is always tied directly to the input
+image; that is, the physical and logical coordinate systems are the same.
+.endhelp

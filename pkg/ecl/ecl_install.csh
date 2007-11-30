@@ -362,7 +362,7 @@ set iraf = $hlib/../../
 
 set bck = $cwd				# goto a temp directory to work
 mkdir /tmp/_ecl.$$
-tail +$SKIP $0 > /tmp/_ecl.$$/_ecl	# unpack the files
+tail -n +$SKIP $0 > /tmp/_ecl.$$/_ecl	# unpack the files
 chdir /tmp/_ecl.$$
 uudecode _ecl
 cat ecl_tar.gz | $UNCOMPRESS | tar -xf -

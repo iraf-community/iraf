@@ -905,12 +905,12 @@ begin
             yrot = yrot + PIXEL(360.0)
         if (comment == NO) {
             call fprintf (fd,
-            "    X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "    X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call parg$t (xrot)
                 call parg$t (yrot)
         } else {
             call fprintf (fd,
-            "#     X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "#     X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call parg$t (xrot)
                 call parg$t (yrot)
         }

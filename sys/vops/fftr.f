@@ -36,7 +36,7 @@ c
       s22 = sin(pi8)
       pi2 = 2.*pii
       n = 1
-      do 10 i=1,15
+      do 10 i=1,31
         m = i
         n = n*2
         if (n.eq.nfft) go to 20
@@ -125,7 +125,7 @@ c
       s22 = sin(pi8)
       pi2 = 2.*pii
       n = 1
-      do 10 i=1,15
+      do 10 i=1,31
         m = i
         n = n*2
         if (n.eq.nfft) go to 20

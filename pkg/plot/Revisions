@@ -1,6 +1,14 @@
 .help revisions Aug90 pkg.plot
 .nf
 =======
+V2.13
+=======
+
+pkg/plot/t_implot.x
+    Added a check that the image exists to avoid a bus error caused by
+    using a null pointer otherwise (8/15/06, MJF)
+
+=======
 V2.12.2
 =======
 

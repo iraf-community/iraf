@@ -1,0 +1,3 @@
+input_files,s,a,"z",,,"list of files to be printed"
+nlines,i,h,12,0,,"number of lines to be printed from each file"
+mode,s,h,"ql",,,

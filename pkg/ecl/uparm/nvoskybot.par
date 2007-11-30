@@ -1,0 +1,8 @@
+image,s,a,"ecliptic2",,,"Input image"
+display,b,h,yes,,,"Display result?"
+ned,b,h,no,,,"Overlay NED sources?"
+grid,b,h,no,,,"Overlay coordinate grid?"
+nhours,r,h,6.,,,"Number of hours of movement"
+verbose,b,h,yes,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

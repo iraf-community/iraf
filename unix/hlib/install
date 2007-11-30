@@ -57,7 +57,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.13"
+set VERSION		= "V2.14"
 set hmach 		= "INDEF"
 set pciraf 		= 0
 set suniraf 		= 0
@@ -155,19 +155,13 @@ switch ($UNAME)
 		set LIBFILES    = ""
             endif
         else
-            if (-f /etc/redhat-release) then		    # Linux RedHat 6.x
+            if (-f /etc/redhat-release) then		    # RedHat/Fedora
                 set mach 	= "redhat"
                 set hmach 	= "redhat"
 		set TAPES	= "/dev/*st[0-7]"
 		set shlib	= "no"
 		set LIBFILES    = ""
-            else if (-f /etc/SuSE-release) then		    # Linux SuSE 6.x
-                set mach 	= "suse"
-                set hmach 	= "suse"
-		set TAPES	= "/dev/*st[0-7]"
-		set shlib	= "no"
-		set LIBFILES    = ""
-            else					    # Linux (Slackware)
+            else					    # Linux
                 set mach 	= "linux"
                 set hmach 	= "linux"
 		set TAPES	= "/dev/*st[0-7]"
@@ -2094,6 +2088,11 @@ endif
 
 _no_pipes:
 
+if ($mach == "cygwin") then
+ echo -n "Creating special graphcap file ...				"
+ copy $iraf/dev/graphcap.inet $iraf/dev/graphcap
+ DO_OK
+endif
 
 #=============================================================================
 # Install the default IMTOOLRC frame buffer configuration file.  The path
@@ -2106,6 +2105,21 @@ _no_pipes:
 
 # Verify imtoolrc link.
 echo -n "Checking /usr/local/lib directory ...				"
+if (! -e /usr/local) then
+    if ($exec == yes) then
+	mkdir /usr/local
+	if (-d /usr/local) then
+	    DO_OK
+	else
+	    DO_FAIL
+    	    set err_count = `expr $err_count + 1`
+	endif
+    else
+	DO_OK
+    endif
+else
+    DO_OK
+endif
 if (! -e /usr/local/lib) then
     if ($exec == yes) then
 	mkdir /usr/local/lib

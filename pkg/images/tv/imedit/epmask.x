@@ -1,6 +1,9 @@
+include	<mach.h>
 include	"epix.h"
  
 # EP_MASK -- Make a mask array with 1=aperture and 2=background annulus.
+#
+# Exclude values outside a specified range.
  
 procedure ep_mask (ep, mask, ap, xa, ya, xb, yb)
  
@@ -10,7 +13,7 @@ int	ap			# Aperture type
 int	xa, ya, xb, yb		# Aperture
  
 int	xc, yc, i, j
-real	rad, r, a, b, c, d
+real	rad, r, a, b, c, d, minv, maxv
 int	x1a, x1b, x1c, x2a, x2b, x2c, y1a, y1b, y1c, y2a, y2b, y2c
 pointer	sp, line, ptr1, ptr2
  
@@ -146,5 +149,29 @@ begin
 	        call aclri (Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
  
 	    call sfree (sp)
+	}
+
+	# Exclude data values.
+	ptr2 = EP_OUTDATA(ep)
+	if (ptr2 == NULL ||
+	    (IS_INDEFR(EP_MINVALUE(ep)) && IS_INDEFR(EP_MAXVALUE(ep))))
+	    return
+
+	minv = EP_MINVALUE(ep)
+	maxv = EP_MAXVALUE(ep)
+	if (IS_INDEFR(minv))
+	    minv = -MAX_REAL
+	if (IS_INDEFR(maxv))
+	    maxv = MAX_REAL
+	ptr1 = mask
+	do j = EP_Y1(ep), EP_Y2(ep) {
+	    do i = EP_X1(ep), EP_X2(ep) {
+	        if (Memi[ptr1] != 0) {
+		    if (Memr[ptr2] < minv || Memr[ptr2] > maxv)
+		        Memi[ptr1] = 0
+		}
+		ptr1 = ptr1 + 1
+		ptr2 = ptr2 + 1
+	    }
 	}
 end

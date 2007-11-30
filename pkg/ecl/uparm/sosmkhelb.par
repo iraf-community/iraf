@@ -1,0 +1,4 @@
+helpdir,s,a,"nvo$lib/root.hd",,,"root help directory to be compiled"
+helpdb,s,a,"nvo$lib/helpdb.mip",,,"name of help database to be created"
+verbose,b,h,no,,,"detail the structure of the package hierarchy"
+mode,s,h,"ql",,,

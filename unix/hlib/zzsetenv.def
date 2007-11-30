@@ -18,7 +18,7 @@ set	editor		= vi
 set	filewait	= yes
 set	glbcolor	= "pt=3,fr=9,al=3,tl=6,ax=5,tk=5"
 set	graphcap	= dev$graphcap
-set	imtype		= "imh"
+set	imtype		= "fits"
 set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
 set	min_lenuserarea	= 64000
 set	multversions	= no
@@ -35,7 +35,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.13-BETA"
+set	version		= "NOAO/IRAF V2.14EXPORT"
 
 # System directories.
 

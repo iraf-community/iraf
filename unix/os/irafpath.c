@@ -25,7 +25,7 @@ char *
 irafpath (fname)
 char *fname;			/* simple filename, no dirs */
 {
-	static	char pathname[SZ_PATHNAME+1];
+	static	char pathname[SZ_PATHNAME+1], arch[SZ_FNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];
 	PKCHAR	hostdir[SZ_LINE+1];
 	PKCHAR	irafdir[SZ_LINE+1];
@@ -76,9 +76,6 @@ char *fname;			/* simple filename, no dirs */
 #ifdef CYGWIN
 	strcat (pathname, "cygwin");
 #else
-#ifdef SUSE
-	strcat (pathname, "suse");
-#else
 #ifdef REDHAT
 	strcat (pathname, "redhat");
 #else
@@ -88,11 +85,20 @@ char *fname;			/* simple filename, no dirs */
 #ifdef BSD
 	strcat (pathname, "freebsd");
 #else
-#if (defined(MACOSX) && !defined(MACINTEL))
-	strcat (pathname, "macosx");
-#else
-#ifdef MACINTEL
-	strcat (pathname, "macintel");
+#ifdef MACOSX
+	/* Setup for cross-compilation.
+	 */
+	{ char *irafpath;
+
+            if ((irafarch = getenv("IRAFARCH"))) {
+                if (strcmp (irafarch, "macosx") == 0) 
+		    strcat (pathname, "macosx");
+                else if (strcmp (irafarch, "macintel") == 0) 
+		    strcat (pathname, "macintel");
+                else 
+		    strcat (pathname, "macosx");
+            }
+        }
 #else
 #ifdef SOLARIS
 #ifdef X86
@@ -101,30 +107,9 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, "ssol");
 #endif
 #else
-#ifdef mc68010
-	strcat (pathname, "mc68010");
-#else
-#ifdef mc68020
-	strcat (pathname, "mc68020");
-#else
-#ifdef mc68030
-	strcat (pathname, "mc68030");
-#else
 #ifdef sparc
 	strcat (pathname, "sparc");
 #else
-#ifdef i386
-	strcat (pathname, "i386");
-#else
-#ifdef vax
-	strcat (pathname, "vax");
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
 #endif
 #endif
 #endif

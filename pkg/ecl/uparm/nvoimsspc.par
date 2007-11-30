@@ -1,0 +1,15 @@
+image,s,h,"",,,"Image (footprint) name"
+object,s,h,"",,,"Object name"
+ra,r,h,INDEF,,,"RA of Field (hours)"
+dec,r,h,INDEF,,,"Dec of Field (degrees)"
+sr,r,h,0.25,,,"Search size (degrees)"
+maxrecords,i,h,100,,,"Max records to return"
+interactive,b,h,yes,,,"Interactive mode?"
+autosave,b,h,yes,,,"Auto-save downloaded data?"
+verbose,b,h,yes,,,"Verbose output?"
+display,b,h,yes,,,"Display result?"
+size,r,h,15.,,,"Size of marker (pixels)"
+color,i,h,207,,,"Marker color"
+status,i,h,0,,,"Service status code"
+llist,*s,h,"",,,
+mode,s,h,"ql",,,

@@ -5,6 +5,8 @@ set	iis		= "tv$iis/"
 
 package	tv
 
+set	imedit_help	= "tv$imedit/imedit.key"
+
 # Tasks.
 
 task	_dcontrol,
@@ -13,6 +15,8 @@ task	_dcontrol,
 	imexamine,
 	tvmark,
 	wcslab		= "tv$x_tv.e"
+
+task	bpmedit		= "tv$imedit/bpmedit.cl"
 
 # Sub-packages.
 

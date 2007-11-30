@@ -1,17 +1,14 @@
-     IRAFNET PC-IRAF Revision 2.13-BETA2 Wed Apr 19 21:21:13 MST 2006
-     This is the IRAFNET version of IRAF V2.13 supporting PC systems.
-                        _               _   
-       (_) _ _  __ _  / _|   _ _   ___ | |_ 	    http://iraf.net
-       | || '_|/ _` ||  _|  | ' \ / -_)|  _|      IRAF Software and
-       |_||_|  \__,_||_|  ()|_||_|\___| \__|         User Support
+    NOAO/IRAFNET PC-IRAF Revision 2.14 Fri Nov 30 15:27:05 MST 2007
+    This is the RELEASED version of IRAF V2.14 supporting PC systems.
+
 
   Welcome to IRAF.  To list the available commands, type ? or ??.  To get
   detailed information about a command, type `help <command>'.  To run  a
   command  or  load  a  package,  type  its name.   Type  `bye' to exit a
-  package, or `logout' to get out  of the CL.   
+  package, or `logout' to get out  of the CL.    Type `news' to find  out
+  what is new in the version of the system you are using.  
 
-  Please visit http://iraf.net if you have questions, to report problems,
-  or would like to help to support this project.
+  Visit http://iraf.net if you have questions or to report problems.
 
   The following commands or packages are currently defined:
 

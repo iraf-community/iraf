@@ -1,0 +1,5 @@
+images,s,a,"foo",,,"image names"
+imlist,s,h,"*.imh,*.fits,*.pl,*.qp,*.hhh",,,"default image names"
+longheader,b,h,no,,,"print header in multi-line format"
+userfields,b,h,yes,,,"print the user fields (instrument parameters)"
+mode,s,h,"ql",,,

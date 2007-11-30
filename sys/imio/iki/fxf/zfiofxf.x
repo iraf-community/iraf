@@ -54,13 +54,13 @@ begin
 	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
 
 	# Determine if scaling is necessary.
-	bfloat = (!lscale || !lzero)
-	if (bfloat && (FIT_BITPIX(fit) == -32 || FIT_BITPIX(fit) == -64)) {
-	    FIT_IOSTAT(fit) = ERR
-	    #call syserrs (SYS_FXFRDHSC,IM_HDRFILE(im))
-	    status = ERR
-	    return
-	}
+	#bfloat = (!lscale || !lzero)
+	#if (bfloat && (FIT_BITPIX(fit) == -32 || FIT_BITPIX(fit) == -64)) {
+	#    FIT_IOSTAT(fit) = ERR
+	#    #call syserrs (SYS_FXFRDHSC,IM_HDRFILE(im))
+	#    status = ERR
+	#    return
+	#}
 
 	fname[ip] = EOS
 	call strpak (fname, fname, SZ_PATHNAME)
@@ -110,6 +110,8 @@ pointer fit, im
 int	ip, pixtype, nb
 int	status, totpix, npix
 int	datasizeb, pixoffb, nb_skipped, i
+double  dtemp
+real    rtemp, rscale, roffset
 int	sizeof()
 
 begin
@@ -122,8 +124,10 @@ begin
 	    totpix = totpix * IM_PHYSLEN(im,i)
 
 	if (FIT_ZCNV(fit) == YES) {
-	    call fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
-	    return
+	    if (FIT_PIXTYPE(fit) != TY_REAL && FIT_PIXTYPE(fit) != TY_DOUBLE) {
+	       call fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
+	       return
+	    } 
 	}
 
 	pixtype = IM_PIXTYPE(im)
@@ -161,9 +165,50 @@ begin
 	    nb = min (status, datasizeb - nb_skipped)
 	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 
-	call fxf_unpack_data (obuf[ip],
-	    npix, pixtype, FIT_BSCALE(fit), FIT_BZERO(fit)) 
+	if (FIT_ZCNV(fit) == YES) {
+	    if (FIT_PIXTYPE(fit) == TY_REAL) {
+		# This is for scaling -32 (should not be allowed)
+		call fxf_zaltrr(obuf[ip], npix, FIT_BSCALE(fit), FIT_BZERO(fit))
+            } else if (FIT_PIXTYPE(fit) == TY_DOUBLE) {
+	        # This is for scaling -64 data (should not be allowed)
+		call fxf_zaltrd(obuf[ip], npix, FIT_BSCALE(fit), FIT_BZERO(fit))
+            }	    
+        } else {
+	   call fxf_unpack_data (obuf[ip],
+	       npix, pixtype, FIT_BSCALE(fit), FIT_BZERO(fit)) 
+        }
 end
+
+procedure fxf_zaltrr (data, npix, bscale, bzero)
+
+real data[ARB], rt
+int    npix
+double bscale, bzero
+
+int i
+
+begin
+	call ieevupkr (data, data, npix)
+        do i = 1, npix {
+	   data[i] = data[i] * bscale + bzero
+        }
+end
+
+
+procedure fxf_zaltrd (data, npix, bscale, bzero)
+
+double data[ARB]
+int    npix
+double bscale, bzero
+
+int i
+
+begin
+	call ieevupkd (data, data, npix)
+        do i = 1, npix
+	   data[i] = data[i] * bscale + bzero
+end
+
 
  
 # FXFZWR -- Write to the output file. 

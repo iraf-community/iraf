@@ -15,5 +15,6 @@ task	table,
 	words		= "lists$x_lists.e"
 
 task	average		= "lists$average.cl"
+task	raverage	= "lists$raverage.cl"
 
 clbye()

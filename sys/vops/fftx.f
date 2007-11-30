@@ -34,7 +34,7 @@ c-noao
 c
       pi2 = 8.*atan(1.)
       p7 = 1./sqrt(2.)
-      do 10 i=1,15
+      do 10 i=1,31
         m = i
         nt = 2**i
         if (n.eq.nt) go to 20
@@ -81,7 +81,7 @@ c go through the base 4 iteration
 c
   80  call r4tx(nthpo, x(1), x(2), x(3), x(4), y(1), y(2), y(3), y(4))
 c
-  90  do 110 j=1,15
+  90  do 110 j=1,31
         l(j) = 1
         if (j-n2pow) 100, 100, 110
  100    l(j) = 2**(n2pow+1-j)

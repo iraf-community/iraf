@@ -2,7 +2,7 @@
  
 image,f,a,,,,"Input image(s) for which to build PSF"
 photfile,f,a,default,,,"Input photometry file(s) (default: image.mag.?)"
-pstfile,f,a,"",,,"Input psf star list(s) (default: image.pst?)"
+pstfile,f,a,"",,,"Input psf star list(s) (default: image.pst.?)"
 psfimage,f,a,default,,,"Output PSF image(s) (default: image.psf.?)"
 opstfile,f,a,default,,,"Output PSF star list(s) (default:image.pst.?)"
 groupfile,f,a,default,,,"Output PSF star group file(s) (default: image.psg.?)"

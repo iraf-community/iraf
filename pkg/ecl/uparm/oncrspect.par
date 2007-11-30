@@ -1,0 +1,10 @@
+input,s,a,,,,"Input list of text spectra"
+output,s,a,,,,"Output list of image spectra"
+title,s,h,"",,,"Spectrum title"
+flux,b,h,no,,,"Flux calibrated?"
+dtype,s,h,"linear",none|linear|log|nonlinear|interp,,"Dispersion type"
+crval1,r,h,1.,,,"Coordinate of first pixel"
+cdelt1,r,h,1.,,,"Coordinate interval per pixel"
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+mode,s,h,"ql",,,

@@ -14,11 +14,14 @@ int	ndim, dim
 begin
 	for (dim=2;  dim <= ndim;  dim=dim+1) {
 	    v[dim] = v[dim] + vinc[dim]
-	    if (v[dim] - ve[dim] > 0) {
-		if (dim < ndim)
-		    v[dim] = vs[dim]			# advance to next dim
-		else
-		    break
+
+	    if ((vinc[dim] > 0 && v[dim] - ve[dim] > 0) ||
+	        (vinc[dim] < 0 && ve[dim] - v[dim] > 0)) {
+
+		    if (dim < ndim)
+		        v[dim] = vs[dim]		# advance to next dim
+		    else
+		        break
 	    } else
 		return (LOOP_AGAIN)
 	}

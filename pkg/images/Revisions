@@ -1,5 +1,15 @@
 .help revisions Jan97 images
 .nf
+images$imfilter/src/rmmed.x
+     A data structure was allocated with a wrong length (too short) resulting
+     in the possiblity of a segmentation violation.  (1/18/07, Valdes)
+    
+images$immmatch/src/imcombine/src/icgdata.gx
+     The optimization for large numbers of offset images which don't
+     overlap (such as a strip of exposures) caused problems with
+     offsets on 3D images.  The optimization was made to apply only
+     with 1D or 2D output images.  (10/20/06, Valdes)
+
 images$immmatch/src/imcombine/src/icomb.gx
      The addition of the sum option failed to add a case for selecting how
      to set the keepids flag.  Add SUM to the switch on line 229.

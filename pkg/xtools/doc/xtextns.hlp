@@ -1,0 +1,115 @@
+.help xt_extns Mar07 xtools
+.ih
+NAME
+.nf
+xt_extns -- Expand an MEF into a list of image extensions
+.fi
+.ih
+SYNOPSIS
+.nf
+int procedure xt_extns (files, index, extname, extver, lindex, lname, lver,
+	dataless, ikparams, err, imext)
+
+char	files[ARB]		#I List of MEF files
+char	index[ARB]		#I Range list of extension indexes
+char	extname[ARB]		#I Patterns for extension names
+char	extver[ARB]		#I Range list of extension versions
+int	lindex			#I List index number?
+int	lname			#I List extension name?
+int	lver			#I List extension version?
+int	dataless		#I Include dataless image headers?
+char	ikparams[ARB]		#I Image kernel parameters
+int	err			#I Print errors?
+int	imext			#O Image extensions?
+.fi
+.ih
+DESCRIPTION
+A list, \fIfiles\fR,  of regular images and multi-extension FITS (MEF)
+files is returned as a list of images.  In addition a flag, \fIimext\fR,
+is set indicating if image extensions are present.
+
+In order handle regular and MEF extension images in the same way one must
+understand that all images in IRAF may be addressed with a numeric index
+while those that are "regular" images may also be addressed without
+an index.  Non-FITS format images are considered to have an index of 1.
+For example, an image in the IRAF format may be addressed
+as pix.imh, pix, pix.imh[1], and pix[1].  FITS files start with index 0
+in order that index 1 may be used to refer to the first extension.
+So a plain FITS image, say foo.fits may also be addressed as foo, foo[0],
+or foo.fits[0].  If a FITS file has both a primary (index 0) image and
+extensions then the zero index must be explicitly used.
+
+For regular images the index range must include 0 for FITS images (or
+primary images in FITS files with extensions) and 1 for non-FITS images.
+In the resulting list, the index notation is dropped unless it is required;
+i.e. in a FITS file with both a primary image and extensions.
+
+The input set of candidate images may be filtered by index, extension
+name, extension version, and whether images are dataless.
+
+\fIindex\fR is a range list (see \fBranges\fR) of indices to be applied
+to each input file for identifying images.  If a null string is
+specified then all index values bet
+
+\fIindex\fR is a range list (see \fBranges\fR) of indices to be applied
+to each input file for identifying images.  If a null string is
+specified then all non-negative index values are examined.
+
+\fIextname\fR is a comma delimited list of patterns for extension names.
+If no list (a null string) or the string "*" is specified then no
+filtering on the extension name is done.  For a description of pattern
+matching syntax see \fBmatch\fR.  Extension names are those specified
+by the EXTNAME keyword.  For the purpose of explicit pattern matching
+strings a missing EXTNAME keyword is treated as the extension name "none".
+To include a comma in a pattern you must escape it by preceding it with
+'\', however, a comma in an extension name may cause other problems
+because IRAF image extension syntax using the extension name does not
+allow commas or whitespace.  Each pattern has '^' and '$' prepended
+and appended respectively which means the pattern must match the entire
+extension name.  A common mistake is that '*' in a pattern is different
+than '*' in a file template.  In this case use '?*'.
+
+The reasons for a list of patterns matching the entire extension name
+are to allow intuitive explicit lists of names, such as "im1,im11,im13",
+and to deal with names which are difficult to unambiguously specify with
+a single pattern.
+
+\fIextver\fR is a range list for extension version numbers.  If no
+list is given then no filtering on extension versions is performed.
+See \fBranges\fR for more on range lists.
+
+\fIdataless\fR is a boolean parameter that selects whether to filter out
+dataless images.  Dataless images are uncommon except for a class of MEF
+files where the primary image is used only for global inherited header
+keywords.  This parameter may be used to include this global header in
+expansions of this type of MEF files.
+
+The output of the list of selected images for FITS image extensions may
+be expressed either with the index notation (e.g. name[3]) or extension
+name and/or extension version (e.g. name[im3], name[im5,2]).  This is
+controlled by the \fIlindex\fR, \fIlname\fR and \fIlver\fR boolean
+parameters.  If the extension name and or version number are selected
+then that format is used even if \flindex\fR is also selected.  If
+there is no extension name or extension version then the index is used
+even if \fIlindex\fR is not selected.  Also remember that for regular
+images where an index or extension sections is not required none will
+be used.
+
+The output names may also include additional "image kernel" information.
+Different image types, currently mostly for FITS images, have parameters
+that may be specified in the image kernel section.  The \fIikparams\fR
+string may be used to add these additional parameters within the
+kernel section part of the name.
+
+Finally, the input files, including MEF files, in the input file list
+may include "image sections".  During processing image sections are
+stripped and then appended on the output.  For example, name[1:10,1:10]
+might expand to name[im1][1:10,1:10], name[im2][1:10,1:10], etc.
+
+\fIerr\fR may be used to print error messages when a particular image
+index fails to be openned.  Typically this would be to find nonexistant
+or read-protected images and files.
+.ih
+SEE ALSO
+mscextensions, imextensions, match, ranges
+.endhelp

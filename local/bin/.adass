@@ -1,5 +1,0 @@
-#!/bin/csh
-
-setenv NNTPSERVER iraf.noao.edu
-xterm -bg gray84 -fn 7x14 -g 80x50 -T adass -n adass -e \
-    $iraf/bin/rtin -f $iraf/local/.newsrc-adass &

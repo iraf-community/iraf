@@ -1673,6 +1673,13 @@ again_:
 	    } else {
 		if (e_psetok (pset)) {
 		    pfilemerge (e_cx->e_cpfp, pset);
+
+                    /* If we're forcing the new parameters, update
+                     * the pfile on disk so we can execute it immediately.
+                     */
+                    if (force) 
+                        n = pfilewrite (pfilep, pfilep->pf_pfilename);
+
 		    e_repaint();
 		    return (OK);
 		} else

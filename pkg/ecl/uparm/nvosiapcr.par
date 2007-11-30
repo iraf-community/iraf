@@ -1,0 +1,13 @@
+svc_url,s,a,"http://archive.nrao.edu/vo/SIA/query?archive=NVSS",,,"Service URL"
+ra,r,a,217.29675,,,"RA of search"
+dec,r,a,34.3895,,,"Dec of search"
+rasz,r,a,0.2,,,"RA size"
+decsz,r,a,0.2,,,"Dec size"
+image,s,h,"",,,"Image Name"
+fmt,s,h,"image/fits",,,"Image format type"
+output,s,h,"STDOUT",,,"Output filename"
+otype,s,h,"ascii",ascii|csv|votable|fits,,"Output format"
+insys,s,h,"icrs",,,"Input coordinate system"
+verbose,b,h,yes,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

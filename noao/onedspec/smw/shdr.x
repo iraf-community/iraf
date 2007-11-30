@@ -897,7 +897,7 @@ char	interp[10]
 int	i, j, type, ia, ib, n, clgwrd()
 real	a, b, sum, asieval(), asigrl()
 double	x, w, xmin, xmax, shdr_lw(), shdr_wl()
-pointer	unsave, asi, spec
+pointer	unref, unsave, asi, spec
 bool	fp_equalr()
 
 begin
@@ -907,9 +907,10 @@ begin
 	    SN(sh) == SN(shref))
 	    return
 
-	# Do everything in units of MWCS.
+	# Do everything in units of reference WCS.
+	unref = UN(shref)
 	unsave = UN(sh)
-	UN(SH) = MWUN(sh)
+	UN(SH) = unref
 
 	call asiinit (asi, clgwrd ("interp", interp, 10, II_FUNCTIONS))
 	do type = 1, SH_NTYPES {
@@ -1005,7 +1006,7 @@ begin
 
 	# Restore original units
 	UN(sh) = unsave
-	iferr (call un_ctranr (MWUN(sh), UN(sh), Memr[SX(sh)], Memr[SX(sh)],
+	iferr (call un_ctranr (unref, UN(sh), Memr[SX(sh)], Memr[SX(sh)],
 	    SN(sh)))
 	    ;
 end

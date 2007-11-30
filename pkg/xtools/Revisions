@@ -1,6 +1,105 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+=====
+V2.14
+=====
+
+fixpix/setfp.x	+
+    This routine transforms the input mask values into the output mask
+    values.  It allows the input mask to have two classes of bad pixels;
+    those which are interpolated and those which are not.
+
+fixpix/ytpmmap.x
+    Adds a procedure yt_mappm and internal argument to allow control of
+    the WCS matching of masks to images.  The earlier versions always
+    matched masks using the physical coordinate system.  Applications can
+    the new procedure to have some control over this.
+    (11/26/07, Valdes)
+
+t_txtcompile.x	+
+txtcompile	+
+mkpkg
+    This application compiles a text file into an SPP procedure that
+    can be called by the xt_txtopen procedure.  The application is intended
+    to be used as a host preprocessing command in mkpkg files to support
+    things like host callable applications (e.g. see syshost).  The
+    code is in xtools for savvy developers awaiting full integration.
+    (11/26/07, Valdes)
+
+xttxtfio.x	+
+mkpkg
+    The routines xt_txtopen and xt_txtclose follow the usual FIO
+    interface.  They allow calling a procedure that sets a string file as
+    if it was a read-only file.  (See the t_txtcompile.x procedure for a
+    way to create a procedure from a text file.)  The file name for this
+    special case of a procedure uses the syntax "proc:NNNNNN" where NNNNNN
+    is the value returned by locpr.  The application would construct this
+    name for the procedure it declares as extern.  The intended purpose is
+    to allow building in configuration files, including a parameter file,
+    into a host callable executable where unsatisfied parameter values
+    default to a built-in file rather than issuing a prompt (see syshost).
+    When called with an actual file normal read-only FIO is used.
+    (11/26/07, Valdes)
+
+syshost.x	+
+mkpkg
+    This routine may be used by an application to set default
+    parameter values when the executable is called directly by the
+    host.  The routine provides three files to search in order; two
+    keyword=value files and a par file.  These files, primarily the
+    par file, may be encoded as compiled procedures (see txtcompile
+    and xt_txtopen/xt_txtclose) so that the binary can be distributed
+    without any configuration files.  (11/26/07, Valdes)
+
+xtextns.x
+    Further restructuring of these routines to support binary tables.  This
+    makes use the mef routines.  (11/26/07, Valdes)
+
+=====
+V2.13
+=====
+
+catquery/cqgfields.x
+    The documentation says that the offset field in the catalog description
+    file for simple text is the field number.  However, the implementation
+    did not work this way.  The changes makes the catalog parsing work as
+    described.  (7/17/07, Valdes)
+
+xtextns.x		+
+doc/xtextns.hlp		+
+doc/xtools.hd
+mkpkg
+    Routines for expanding MEF image extensions.  The first version of
+    this functionality was developed for proto.imextensions and then
+    expanded for mscred.mscextensions.  Since then these routines have
+    been used in other tasks and so these are now being escalated to
+    generic xtools routines.  (3/20/07, Valdes)
+
+xtmaskname.x
+doc/xtmaskname.hlp	+
+doc/xtools.hd
+    The case where masktype=pl and the input name doesn't have a .pl
+    extension was wrong.  (3/19/07, Valdes)
+
+fixpix/ytfixpix.x	+
+    This version uses an internal copy of the input mask rather than
+    modifying the input mask.  (3/19/07, Valdes)
+
+fixpix/xtpmmap.x
+fixpix/ytpmmap.x	+
+fixpix/mkpkg
+doc/xtpmmap.hlp		+
+doc/xtools.hd
+    1.	Uses xt_maskname to handle mask names.
+    2.	Minor bug fixes.
+    3.	The xt_ and yt_ versions are the same but the yt_version is
+	present to allow external packages to check for the presence
+	of ytpmmap.x and if not present use their own copy of the file.
+	This allows these packages to be compiled with earlier versions.
+	Eventually the yt versions should be obsoleted.
+	(3/19/07, Valdes)
+
 xtargs.x	+
 mkpkg
 	Simple interface to parse an argument string consisting of a list

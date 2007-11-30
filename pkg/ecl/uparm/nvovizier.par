@@ -1,0 +1,7 @@
+tab_id,s,a,"ivo://CDS/VizieR/J/A+A/381/757/table1",,,"Table reference"
+output,s,h,"STDOUT",,,"Output filename"
+otype,s,h,"ascii",ascii|csv|votable|fits,,"Output format"
+all,b,h,yes,,,"Get all matching tables?"
+verbose,b,h,no,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

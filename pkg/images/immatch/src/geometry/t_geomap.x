@@ -852,12 +852,12 @@ begin
             yrot = yrot + real(360.0)
         if (comment == NO) {
             call fprintf (fd,
-            "    X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "    X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call pargr (xrot)
                 call pargr (yrot)
         } else {
             call fprintf (fd,
-            "#     X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "#     X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call pargr (xrot)
                 call pargr (yrot)
         }
@@ -1493,12 +1493,12 @@ begin
             yrot = yrot + double(360.0)
         if (comment == NO) {
             call fprintf (fd,
-            "    X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "    X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call pargd (xrot)
                 call pargd (yrot)
         } else {
             call fprintf (fd,
-            "#     X and Y axis rotation: %0.3f  %0.3f  (degrees  degrees)\n")
+            "#     X and Y axis rotation: %0.5f  %0.5f  (degrees  degrees)\n")
                 call pargd (xrot)
                 call pargd (yrot)
         }

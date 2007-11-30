@@ -75,7 +75,7 @@ begin
 	strval[1] = EOS
 	nitems = clgcur ("cursor", a, b, wcs, key, strval, maxch)
 	switch (key) {
-	case 'a', 'c', 'd', 'l', 'f', 'j':
+	case 'a', 'c', 'd', 'l', 'f', 'j', 'v':
 	    call printf ("again:")
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
@@ -87,7 +87,7 @@ begin
 	        x2 = nint (c)
 	    if (!IS_INDEF(d))
 	        y2 = nint (d)
-	    if (key == 'f') {
+	    if (key == 'f' || key == 'v') {
 	        if (abs (x2-x1) > abs (y2-y1))
 	            ap = APLDIAG
 	        else

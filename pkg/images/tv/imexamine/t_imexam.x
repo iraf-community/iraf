@@ -57,7 +57,7 @@ begin
 	    IE_LISTLEN(ie) = imtlen (IE_LIST(ie))
 	    IE_INDEX(ie) = 1
 
-	    if (nargs > 1) {
+	    if (nargs >= 1) {
 		# Set user specified display frame.
 		IE_DFRAME(ie) = 100 * clgeti ("frame") + 1
 		IE_NEWFRAME(ie) = IE_DFRAME(ie)
@@ -78,6 +78,13 @@ begin
 	    IE_INDEX(ie) = 1
 	    IE_DFRAME(ie) = 101
 	    IE_NEWFRAME(ie) = 101
+		# Set user specified display frame.
+		IE_DFRAME(ie) = 100 * clgeti ("frame") + 1
+		IE_NEWFRAME(ie) = IE_DFRAME(ie)
+		if (IE_USEDISPLAY(ie) == YES) {
+		    nframes = max (IE_NEWFRAME(ie)/100, nframes)
+		    IE_NFRAMES(ie) = nframes
+		}
 	}
  
 	# Set the wcs, logfile and graphics.

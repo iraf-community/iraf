@@ -1,4 +1,4 @@
-.help imedit Feb89 images.tv
+.help imedit Aug07 images.tv
 .ih
 NAME
 imedit -- examine and edit pixels in images
@@ -98,6 +98,10 @@ zero then a median background is used.
 .ls value = 0.
 Value for constant substitution.  One editing command is replacement of
 a region by this value.
+.le
+.ls minvalue = INDEF, maxvalue = INDEF
+Range of values which may be modified.  Value of INDEF map to the minimum
+and maximum possible values.
 .le
 .ls sigma = INDEF
 Sigma of noise to be added to substitution values.  If less than or
@@ -245,6 +249,10 @@ colon command is ":write" which forces the current editor buffer
 to be written.  This can be used to save partial changes.
 .ih
 REPLACEMENT ALGORITHMS
+The parameters "minvalue" and "maxvalue" are may be used to limit the
+range of values modified.  The default is to modify all pixels which
+are selected as described below.
+
 .ls a, b
 Replace rectangular or aperture regions by background values.  A background
 surface is fit the pixels in the background annulus if the x and y orders
@@ -269,9 +277,11 @@ in \fBfixpix\fR or \fBccdred\fR with no buffer.  For "fixpix" type
 input the type of interpolation is automatically selected for the
 narrower dimension with column interpolation for square regions.
 .le
-.ls d, e
-Replace rectangular or aperture regions by the specified constant value.
-This may be used to flag pixels or make masks.
+.ls d, e, v
+Replace rectangular, aperture, or vector regions by the specified
+constant value.  This may be used to flag pixels or make masks.
+The vector option makes a line between two points with a width
+set by the radius value.
 .le
 .ls j, k
 Replace rectangular or aperture regions in the editor buffer by the data
@@ -294,6 +304,12 @@ possible to undo an undo to restore a change.  If any other command is
 used which causes data to be read (including the statistics and surface
 plotting) then the undo is lost.
 .le
+.ls =, <, >
+The all pixels with a value equal to that of the pixel at the cursor
+position are replaced by the specified constant value.  This is intented
+for editing detection masks where detected objects have specific mask
+values.
+.le
 .ih
 COMMANDS
 .ce
@@ -315,13 +331,13 @@ COMMANDS
 	I	Interrupt task immediately
 	Q	Quit without saving changes
 .fi
- 
-The following editing options are available.  Rectangular and line regions
-are specified with two positions and aperture regions are specified by
-one position.  The current aperture type (circular or square) is used
-in the latter case.  The move option takes two positions, the position
-to move from and the position to move to.
- 
+
+The following editing options are available.  Rectangular, line, and
+vector regions are specified with two positions and aperture regions
+are specified by one position.  The current aperture type (circular or
+square) is used in the latter case.  The move option takes two positions,
+the position to move from and the position to move to.
+
 .nf
 	a 	Background replacement (rectangle)
 	b 	Background replacement (aperture)
@@ -335,6 +351,13 @@ to move from and the position to move to.
 	m	Copy by replacement (aperture)
 	n	Copy by addition (aperture)
 	u	Undo last change (see also 'i', 'j', and 'k')
+	v	Constant value substitution (vector)
+	=	Constant value substitution of pixels equal
+		    to pixel at the cursor position
+	<	Constant value substitution of pixels less than or equal
+		    to pixel at the cursor position
+	>	Constant value substitution of pixels greater than or equal
+		    to pixel at the cursor position
 .fi
  
 When the image display provides a fill option then the effect of zoom
@@ -375,6 +398,8 @@ radius [value]		Aperture radius
 search [value]		Search radius
 sigma [value]		Noise sigma (INDEF for histrogram replacement)
 value [value]		Constant substitution value
+minvalue [value]	Minimum value for modification (INDEF=minimum)
+maxvalue [value]	Maximum value for modification (INDEF=maximum)
 width [value]		Background annulus width
 write [name]		Write changes to name (default current output) 
 xorder [value]		X order for background fitting
@@ -420,6 +445,11 @@ EXAMPLES
 .fi
 .ih
 REVISIONS
+.ls IMEDIT V2.13
+The 'v' option was added to allow vector replacement.
+The '=', '<', '>' options were added to replace values matching the pixel
+at the cursor.
+.le
 .ls IMEDIT V2.11.2
 The temporary editor image was changed to use a unique temporary image
 name beginning with "imedit" rather than the fixed name of "epixbuf".

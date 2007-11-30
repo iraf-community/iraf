@@ -368,11 +368,19 @@ observatory = "gemini-north"
 # The coordinates are from GPS measurements and the elevation
 # is from the Gemini Web pages http://www.gemini.edu/public
 
+#observatory = "gemini-south"
+#        name = "Gemini South Observatory"
+#        longitude = 70:43.4
+#        latitude = -30:13.7
+#        altitude = 2737.
+#        timezone = 4
+
+# Corrected coords from Bryan Miller, 5/18/2006
 observatory = "gemini-south"
         name = "Gemini South Observatory"
-        longitude = 70:43.4
-        latitude = -30:13.7
-        altitude = 2737.
+        longitude = 70:44.2016
+        latitude = -30:14.445
+        altitude = 2722.
         timezone = 4
 
 # ESO
@@ -474,4 +482,20 @@ observatory = "oalp"
         latitude = -34:54:24.3040                                               
         altitude = 20.                                                          
         timezone = 3.                                                           
+
+# Submitted by Leslie F. Brown 7/29/06
+observatory = "olin"
+	name = Connecticut College - Olin Observatory"
+	longitude = 72:06:19
+	latitude = 41:22:44
+	altitude = 85
+	timezone = 5
+
+# Submitted by Pat van Heerden 11/20/06
+observatory = "boyden"
+	name = Boyden Observatory
+	longitude = 332:35:40.0
+	latitude = -29:02:20
+	altitude = 1387
+	timezone = -2
 

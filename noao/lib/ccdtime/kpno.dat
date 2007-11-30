@@ -7,7 +7,7 @@
 # 22 Jul 1998 --- dj
 # 12 Aug 1998 --- gj
 # 15 Mar 2004 --- dj
-
+# 21 Sep 2006 --- fv: Mosaic z' based on estimated values from Arjun Dey.
 
 
 # Telescope data:
@@ -105,6 +105,14 @@ filter = "I"
 	sky0 = 19.9 
 	sky1 = -0.0086
 	sky2 = -0.00311
+ 
+filter = "z"
+        extinction = 0.03
+	mag = 20
+	star = 24.0
+	sky0 = 17.98
+	sky1 = 0.
+	sky2 = 0.
 
 filter = "J"
         extinction = 0.08
@@ -153,6 +161,7 @@ detector = "MOSAIC1"
         V = 0.81
         R = 0.86
         I = 0.63
+	z = 0.40
 
 detector = "T1KA"
 	rdnoise = 3.5

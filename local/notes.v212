@@ -1511,6 +1511,12 @@ images/imcoords/imcoords.hd
 	to the WCS.
 	(6/24/05, Valdes)
 
+pkg/xtools/xtargs.x        +
+pkg/xtools/mkpkg
+        Simple interface to parse an argument string consisting of a list
+        of whitespace separated keyword=value pairs.  (8/31/05, Valdes)
+
+
 unix/os/zfioks.c
 	Added a setsockopt to the file to set the REUSEADDR option on the 
 	socket (2/22/06, MJF)
@@ -1899,3 +1905,295 @@ Sysgen completes without errors, all seems to be working. (4/14/06)
 ======================================
 V2.13 Second Beta Release (4/19/06)
 ======================================
+
+
+sys/vops/fftr.f
+sys/vops/fftx.f
+	Increased the check for the power-of-2 dimension to 2^31 from the
+    current 2^15  (4/21/06, MJF)
+
+dev/graphcap
+dev/termcap
+	Created generic devices using lpr/lp commands and the psikern for
+    color printers.  (5/27/06, MJF)
+
+unix/os/zzepro.c
+	Fixed a bug in the FPE handling (7/26/06, MJF)
+
+sys/etc/syserr.x
+	Increased the SZ_ERRMSG from 80 to SZ_LINE for longer system error
+    messages (e.g. full paths to files).  (8/15/06, MJF)
+
+pkg/images/imutil/hselect.par
+pkg/images/imutil/src/hselect.x
+pkg/images/imutil/doc/hselect.hlp
+	Added a 'missing' parameter to be used when keywords isn't in header
+    (8/15/06, MJF)
+
+unix/hlib/zzsetenv.def
+	Made 'fits' the default 'imtype' (8/17/06)
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/glib/login.cl
+	Updated version and date to V2.13-BETA3 on 'August 2006' (8/18/06)
+
+local/bugs.log
+	Updated to latest version (8/18/06)
+
+==============================================
+V2.13 Third Beta Release (8/18/06) (for NVOSS)
+==============================================
+
+local/bugs.log
+	Updated to latest version (11/22/06)
+
+
+
+==============================================
+V2.14 System Merge Notes -- Aug 23, 2007
+==============================================
+
+pkg/lists/raverage.cl             +
+pkg/lists/doc/raverage.hlp        +
+pkg/lists/lists.cl
+pkg/lists/lists.men
+pkg/lists/lists.hd
+        Added a new running average task.  (5/4/07, Valdes)
+
+pkg/proto/t_imext.x
+    Removed supporting procedures which are now in the xtools library
+    in the file xtextns.
+    (3/20/07, Valdes)
+
+pkg/xtools/catquery/cqgfields.x
+    The documentation says that the offset field in the catalog description
+    file for simple text is the field number.  However, the implementation
+    did not work this way.  The changes makes the catalog parsing work as
+    described.  (7/17/07, Valdes)
+
+pkg/xtools/xtextns.x               +
+pkg/xtools/doc/xtextns.hlp         +
+pkg/xtools/doc/xtools.hd
+pkg/xtools/mkpkg
+    Routines for expanding MEF image extensions.  The first version of
+    this functionality was developed for proto.imextensions and then
+    expanded for mscred.mscextensions.  Since then these routines have
+    been used in other tasks and so these are now being escalated to
+    generic xtools routines.  (3/20/07, Valdes)
+
+pkg/xtools/xtmaskname.x
+pkg/xtools/doc/xtmaskname.hlp      +
+pkg/xtools/doc/xtools.hd
+    The case where masktype=pl and the input name doesn't have a .pl
+    extension was wrong.  (3/19/07, Valdes)
+
+pkg/xtools/fixpix/ytfixpix.x       +
+    This version uses an internal copy of the input mask rather than
+    modifying the input mask.  (3/19/07, Valdes)
+
+pkg/xtools/fixpix/xtpmmap.x
+pkg/xtools/fixpix/ytpmmap.x        +
+pkg/xtools/fixpix/mkpkg
+pkg/xtools/doc/xtpmmap.hlp         +
+pkg/xtools/doc/xtools.hd
+    1.  Uses xt_maskname to handle mask names.
+    2.  Minor bug fixes.
+    3.  The xt_ and yt_ versions are the same but the yt_version is
+        present to allow external packages to check for the presence
+        of ytpmmap.x and if not present use their own copy of the file.
+        This allows these packages to be compiled with earlier versions.
+        Eventually the yt versions should be obsoleted.
+        (3/19/07, Valdes)
+
+
+pkg/images/tv/display/maskcolor.x
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/ace.h
+pkg/images/tv/display/mkpkg
+pkg/images/tv/doc/display.hlp
+    The overlay colors may now be set with expressions as well as with
+    the earlier syntax.  (8/16/07, Valdes)
+
+
+pkg/images/tv/imedit/bpmedit.cl     +
+pkg/images/tv/doc/bpmedit.hlp       +
+pkg/images/tv/imedit/bpmedit.key    +
+pkg/images/tv/tv.cl
+pkg/images/tv/tv.hd
+    A new script task for editing masks using imedit as the editing
+    engine was added.  (8/9/07, Valdes)
+
+pkg/images/tv/imedit/t_imedit.x
+pkg/images/tv/imedit/epgcur.x
+pkg/images/tv/imedit/epreplace.gx   +
+pkg/images/tv/imedit/imedit.key     +
+pkg/images/tv/doc/imedit.hlp
+pkg/images/tv/mkpkg
+pkg/images/tv/tv.cl
+    1.  A new option to do vector constant replacement was added.  This is
+        particularly useful for editing bad pixel masks.
+    2.  New options '=', '<', and '>' to replace all pixels with values
+        ==, <=, or >= to the value at the cursor with the constant value
+        was added.  This is useful for editing object masks.
+    3.  The '?' help page is now set by an environment variable rather than
+        hardcoded to a file in lib$src.  The environment variable is
+        imedit_help and is set in tv.cl to point to the file in the
+        source directory.
+    (8/9/07, Valdes)
+
+pkg/images/tv/display/maskcolor.x
+    There was an error that failed to parse the color string as required.
+    (8/10/07, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    Buffers were allocated as TY_SHORT but used and TY_INT.  (8/9/07, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/maskcolors.x
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/display/sigm2.x
+pkg/images/tv/doc/display.x
+    1. Overlay masks are now read as integer to preserve dynamic range.
+    2. Mapped color values less than 0 are transparent.
+    3. A color name of transparent is allowed.
+    (4/10/07, Valdes)
+
+
+==============================================
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+    Changed version to V2.14DEV  Aug07  (8/23/07 MJF)
+
+dev/graphcap.inet		+
+    Added a copy of the dev$graphcap file with inet devices explicitly
+    given for the imt devices.  This is because systems such as Cygwin don't
+    support fifos or unix sockets properly and inet sockets are the only option,
+    but aren't part of the default connection scheme.  This will be installed 
+    as the default dev$graphcap by the install script when it is run.  (8/23)
+
+unix/hlib/install
+    Added code to install dev$graphcap.inet on cygwin. (8/23)
+
+
+unix/os/zopdir.c
+unix/os/irafpath.c
+unix/boot/spp/xc.c
+unix/hlib/cl.csh
+unix/hlib/ecl.csh
+unix/hlib/fc.csh
+unix/hlib/install
+unix/hlib/install.old
+unix/hlib/irafuser.csh
+unix/hlib/mkpkg.inc
+unix/hlib/strip.iraf
+unix/hlib/sysinfo
+unix/hlib/spy.cl
+unix/as.suse			-
+unix/bin.suse			-
+	Removed the SuSE architecture.  We're moving towards a unified 
+    Linux architecture and the special ifdef's didn't apply here so removing
+    the arch was simple.  In the process, found a typo in the ifdef applied
+    in os$zopdir.c that was fixed (8/24/07, MJF)
+
+dev/imtoolrc
+dev/graphcap
+dev/graphcap.inet
+	Added new frame buffers for 10K, 11K and 12K sizes at imt55,
+    imt56, imt57 respectively.  These can exceed the 32-bit limit but are
+    needed for ultra-large-format detectors when using DS9. (10/29/07, MJF)
+
+dev/graphcap
+dev/graphcap.inet
+	In the process of the above changes, noticed an error in the
+    imt46 entry (full-frame GMOS) that would have prevented the config
+    from working. (10/29/07, MJF)
+
+pkg/cl/eparam.c
+pkg/cl/eparam.c
+	Modified the ":r" key in eparam so that if it is used as ":r! file.par"
+    the parameters will be updated to disk automatically.  This allows a 
+    parameter file to be read in for editing and executed immediately with a
+    ":go".  Otherwise, the parameters are simply read in for editing and must
+    be explicitly written back to the pfile to be used (current behavior).
+    (11/12/07, MJF)
+
+unix/hlib/mkiraf.csh
+	Added a check in the mkiraf.csh script that the imdir$ directory
+    exists and is writable to prevent orphaned imh images from being
+    created.  If there is a problem with the imdir$ defined by the system
+    install, HDR is used instead.  (11/12/07, MJF).
+
+unix/gdev/sgidev/sgi2uapl.c
+	Modified the Postscript init string to be '%!PS-Adobe-2.0' since
+    many newer printers still complain about just '%!PS' and don't recognize
+    the file  (11/12/07, MJF).
+
+sys/imio/iki/zfiofxf.x
+   	Added code to support scaled -64 data type on read.  BSCALE and BZERO 
+   will be read and data will be scaled before making it available to the
+   upper level code. Writing scaled -64 is not supported.  (11/12/07 NZ)
+
+sys/imio/iki/fxfrfits.x
+   	Close 'spool' file descriptor before calling syserrs.  (line 451)
+   This was causing problems when reading BINTABLE extensions. (11/12/07, NZ)
+
+sys/imio/dbc			+
+sys/imio/mkpkg
+	Installed the 'dbc' routines from the FITSUTIL package.  This is an
+    extension to the imgead header database routines that allow for a
+    comment field to be created/manipulated in the header.  (11/14/07, NZ/MJF)
+
+pkg/xtools/mef			+
+pkg/xtools/mkpkg
+	Installed the 'mef' library from the FITSUTIL package for doing
+    general MEF manipulation.  This will remove the dependency on FITSUTIL
+    from several external packages.  (11/14/07, NZ/MJF)
+
+unix/os/zzstrt.c
+	Somehow in the porting process, the default FPE flag for linux was
+    changed from 0x332 to 0x336 and effetively disabled the FPE traps.  
+    Restored the old value.  (11/14/07,  MJF)
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-linux.h	+
+	Added some extra code for compiling the stdarg.h stuff on newer GCC
+    compilers.  We don't use this (yet) on tucana, but it's needed for e.g.
+    building the CL on newer systems.  (11/17/07, MJF)
+
+sys/imio/imloop.x
+	An earlier change to this procedure broke the case where the increment
+    was negative.  Changed the code to handle this case properly (11/25/07 MJF)
+
+unix/boot/spp/xc.c
+	There remains an unexplained optimizer bug in the system which has 
+   the effect of disabling FPE handling on Mac Intel/PPC systems.  For the 
+   moment, the optimization on these platforms was disabled until this is 
+   better understood or fixed in future GCC versions.  Quick benchmarks
+   indicate a performance penalty of only ~6-7%, optimized binaries for those 
+   willing to skip the exception handling will be made available as an option.
+   (11/30/07, MJF)
+
+
+
+--------------------------------------------------------
+System Frozen for V2.14 Builds  (11/30/07)
+
+unix/hlib/motd
+	Updated the motd file for the release (11/30/07 MJF)
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+    Changed version to V2.14  Nov07  (11/30/07 MJF)
+
+
+Begin sysgen.....11/30/07
+
+--------------------------------------------------------

@@ -51,7 +51,7 @@ libds.a:
 	imdsetwcs.x	iis.com iis.h <knet.h> <mach.h>
 	imdwcsver.x	iis.com iis.h zdisplay.h
 	imdwcs.x	<imhdr.h>
-	maskcolor.x	<ctotok.h>
+	maskcolor.x	ace.h <ctotok.h> <evvexpr.h>
 	maxmin.x	iis.com iis.h <imhdr.h> <mach.h>
 	sigl2.x		<error.h> <imhdr.h>
 	sigm2.x		<error.h> <imhdr.h>

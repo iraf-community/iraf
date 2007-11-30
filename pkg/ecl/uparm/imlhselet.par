@@ -1,0 +1,5 @@
+images,s,a,"dev$wpix",,,"images from which selection is to be drawn"
+fields,s,a,"date-bs",,,"fields to be extracted"
+expr,s,a,"yes",,,"boolean expression governing selection"
+missing,s,h,INDEF,,,"Value for missing keywords"
+mode,s,h,"ql",,,

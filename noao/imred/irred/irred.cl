@@ -14,7 +14,7 @@ set	nproto		= "noao$nproto/"
 
 package irred
 
-task	irlincor	= "irred$x_irred.x"
+task	irlincor	= "irred$x_irred.e"
 
 task	iralign,
 	irmatch1d,

@@ -1,4 +1,4 @@
-define	NF		5		# Maximum number of filters
+define	NF		25		# Maximum number of filters
 define	SZ_FILTER	7		# Maximum length of filter name
 define	TOL		0.0001		# Convergence tolerance
 
@@ -13,7 +13,7 @@ procedure t_ccdtime()
 pointer	database		# Telescope, detector, filter database
 pointer	telescope		# Telescope
 pointer	detector		# Detector
-pointer	filter[NF]		# Filters
+pointer	fltr[5]			# Filters
 real	time			# Target time (sec)
 real	mag			# Target magnitude
 real	snr			# Target SNR
@@ -22,12 +22,12 @@ real	seeing			# Seeing (arcsec)
 real	phase			# Moon phase (0-28)
 real	airmass			# Airmass
 
-int	i, j, n
+int	i, j, k, nf, n
 real	a, b, c
 real	aper, scale, trans, nread, dark, pixsize, lum, p
 real	star[NF], sky[NF], t, m, s, nstar, nsky, ndark, noise, npix
 real	dqe, ext, starmag, counts, sky0, sky1, sky2
-pointer	sp, tdb, ddb, fdb[NF]
+pointer	sp, tdb, ddb, filter[NF], fdb[NF]
 
 int	clgeti()
 real	clgetr()
@@ -42,6 +42,8 @@ begin
 	call salloc (database, SZ_FNAME, TY_CHAR)
 	call salloc (telescope, SZ_FNAME, TY_CHAR)
 	call salloc (detector, SZ_FNAME, TY_CHAR)
+	do i = 1, 5
+	    call salloc (fltr[i], SZ_LINE, TY_CHAR)
 	do i = 1, NF
 	    call salloc (filter[i], SZ_FILTER, TY_CHAR)
 
@@ -49,11 +51,11 @@ begin
 	call clgstr ("database", Memc[database], SZ_FNAME)
 	call clgstr ("telescope", Memc[telescope], SZ_FNAME)
 	call clgstr ("detector", Memc[detector], SZ_FNAME)
-	call clgstr ("f1", Memc[filter[1]], SZ_FILTER)
-	call clgstr ("f2", Memc[filter[2]], SZ_FILTER)
-	call clgstr ("f3", Memc[filter[3]], SZ_FILTER)
-	call clgstr ("f4", Memc[filter[4]], SZ_FILTER)
-	call clgstr ("f5", Memc[filter[5]], SZ_FILTER)
+	call clgstr ("f1", Memc[fltr[1]], SZ_LINE)
+	call clgstr ("f2", Memc[fltr[2]], SZ_LINE)
+	call clgstr ("f3", Memc[fltr[3]], SZ_LINE)
+	call clgstr ("f4", Memc[fltr[4]], SZ_LINE)
+	call clgstr ("f5", Memc[fltr[5]], SZ_LINE)
 
 	time = clgetr ("time")
 	mag = clgetr ("magnitude")
@@ -62,6 +64,28 @@ begin
 	seeing = clgetr ("seeing")
 	phase = clgetr ("phase")
 	airmass = clgetr ("airmass")
+
+	# The input filter strings may be lists of filters and here
+	# we expand them into all filters.
+
+	nf = 1; k = 0
+	do i = 1, 5 {
+	    for (j = fltr[i]; Memc[j] != EOS; j = j + 1) {
+	        Memc[filter[nf]+k] = Memc[j]
+	        if (Memc[j] == ',') {
+		    Memc[filter[nf]+k] = EOS
+		    if (k > 0) {
+			nf = nf + 1; k = 0
+		    }
+		} else
+		    k = k + 1
+	    }
+	    Memc[filter[nf]+k] = EOS
+	    if (k > 0) {
+		nf = nf + 1; k = 0
+	    }
+	}
+	nf = nf - 1
 
 	i = 0
 	if (IS_INDEFR(time))
@@ -103,8 +127,9 @@ begin
 
 	tdb = dbopen ("", Memc[database], "telescope", Memc[telescope])
 	ddb = dbopen ("", Memc[database], "detector", Memc[detector])
+
 	n = 0
-	do i = 1, NF {
+	do i = 1, nf {
 	    iferr (fdb[n+1]=dbopen("",Memc[database],"filter",Memc[filter[i]]))
 		next
 	    if (fdb[n+1] == NULL)

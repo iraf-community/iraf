@@ -73,6 +73,10 @@
 # 3) Included extinction for IR filters per Dick Joyce's numbers for KPNO
 #    With the idea that we should try to be consistant.
 #
+# Revised 21 Sept 2006 FV
+#
+# Added Mosaic z' based on estimated values from Arjun Dey.
+#
 #------------------------------------------------------------------------------
 #
 # Telescope data:
@@ -176,6 +180,14 @@ filter = "I"
 	sky0 = 19.9
 	sky1 = -0.0086
 	sky2 = -0.00311
+ 
+filter = "z"
+        extinction = 0.03
+	mag = 20
+	star = 24.0
+	sky0 = 17.98
+	sky1 = 0.
+	sky2 = 0.
 
 filter = "J"
         extinction = 0.08
@@ -258,6 +270,7 @@ detector = "MOSAIC2"
         V = 0.81
         R = 0.86
         I = 0.63
+        I = 0.40
 
 detector = "site2k"
 	rdnoise = 4.0

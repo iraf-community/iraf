@@ -60,7 +60,7 @@ mxumsk_()
 	macosx_sigmask |=  FE_INVALID;
 	flagp &= ~FE_INVALID;
 	
-	fesetexceptflag (flagp, macosx_sigmask);
+	fesetexceptflag (&flagp, macosx_sigmask);
 }
 
 

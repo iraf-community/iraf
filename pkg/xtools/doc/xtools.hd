@@ -1,6 +1,7 @@
 # Help directory for the XTOOLS (programming tools) package.
 
 $xtools		= "pkg$xtools/"
+$fixpix		= "pkg$xtools/fixpix/"
 $icfit		= "pkg$xtools/icfit/"
 $gtools		= "pkg$xtools/gtools/"
 $ranges		= "pkg$xtools/ranges/"
@@ -12,10 +13,13 @@ dttext		hlp = xtools$dttext.x,		src = ..
 cogetr		hlp = cogetr.hlp,		src = xtools$cogetr.x
 comap		hlp = cogetr.hlp,		src = xtools$cogetr.x
 counmap		hlp = cogetr.hlp,		src = xtools$cogetr.x
+xt_extns	hlp = xtextns.hlp,		src = xtools$xtextns.x
 xt_lsum		hlp = xtsums.hlp,		src = xtools$xtsums.x
 xt_csum		hlp = xtsums.hlp,		src = xtools$xtsums.x
 xt_lsumb	hlp = xtsums.hlp,		src = xtools$xtsums.x
 xt_lsuml	hlp = xtsums.hlp,		src = xtools$xtsums.x
+xt_maskname	hlp = xtmaskname.hlp,		src = xtools$xtmaskname.x
+xt_pmmap	hlp = xtpmmap.hlp,		src = fixpix$xtpmmap.x
 clgsec		hlp = clgsec.hlp,		src = xtools$clgsec.x
 extrema		hlp = extrema.hlp,		src = xtools$extrema.x
 getdatatype	hlp = getdatatype.hlp,		src = xtools$getdatatype.x

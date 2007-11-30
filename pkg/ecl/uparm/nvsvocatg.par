@@ -1,0 +1,11 @@
+service,s,a,"hst",,,"Service URL"
+ra,r,a,12.,,,"RA of search"
+dec,r,a,12.,,,"Dec of search"
+sr,r,a,0.25,,,"search radius"
+insystem,s,h,"icrs",,,"Input coordinate system"
+image,s,h,"",,,"Image Name"
+output,s,h,"STDOUT",,,"Output filename"
+otype,s,h,"ascii",,,"Output format"
+verbose,b,h,yes,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

@@ -1,6 +1,17 @@
 .help revisions May93 noao.lib
 .nf
 noaolib$obsdb.dat
+    Added entry for Boyden Observatory (11/20/06, MJF)
+
+noaolib$ccdtime/ctio.dat
+noaolib$ccdtime/kpno.dat
+    Added Mosaic z' based on estimated values from Arjun Dey.
+    (9/21/06, FV)
+
+noaolib$obsdb.dat
+    Added entry for Olin Observatory (7/28/06, MJF)
+
+noaolib$obsdb.dat
     Changed the logitude for 'aries' at request of submitter (4/1/06, MJF)
 
 noaolib$obsdb.dat

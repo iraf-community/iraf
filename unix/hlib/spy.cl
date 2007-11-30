@@ -16,7 +16,7 @@ begin
 		!! ps -ef | grep -v root
 	    } else if (mach == "sparc" || mach == "f68881" || mach == "ffpa") {
 		!! ps -axu | grep -v root
-	    } else if (mach == "linux" || mach == "redhat" || mach == "suse") {
+	    } else if (mach == "linux" || mach == "redhat") {
 		!! ps axuf | grep -v root
 	    } else {
 		!! ps -ef | grep -v root

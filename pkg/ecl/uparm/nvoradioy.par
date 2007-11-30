@@ -1,0 +1,8 @@
+image,s,a,"M33small",,,"Input image"
+display,b,h,no,,,"Display image?"
+device,s,h,"imdred",,,"Overlay device"
+ncontours,i,h,10,,,"No. contours to draw"
+append,b,h,yes,,,"Append display?"
+verbose,b,h,yes,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

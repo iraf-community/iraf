@@ -1,9 +1,30 @@
 .help revisions Jun88 noao.onedspec
 .nf
 
+doc/standard.hlp
+    Clarified the equations and formating.  There was an inconsistency
+    between the Vega flux and magnitude given in the text.  Either value
+    could be changed but the old version of this task was based on the
+    specified Vega flux so the magnitude was changes (0.048-0.0336)
+    to make the description consistent.  (4/3/07, Valdes)
+
+splot/wrspect.x
+    For log sampled data (dc-flag=1) that also has a ltv offset the
+    new WCS for the output was wrong.  (12/4/06, Valdes)
+
+smw/shdr.x
+    The shdr_rebin procedure was rebinning the target spectrum to its natural
+    units while the reference spectrum might be in different units.  The
+    correct thing to do is rebin in the reference units.  (10/27/06, Valdes)
+
+
 =======
 V2.12.3
 =======
+
+splot/splot.x
+    Needed to initialize the aperture so that the aperture selection
+    behavior is consistent when calling splot more than once.  (5/16/06, Valdes)
 
 doc/specplot.hlp
     Added a quick example illustrating using batch mode plotting.

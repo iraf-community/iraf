@@ -5,9 +5,19 @@ $exit
 
 libs:
 	$ifnfile (../libreadline.a)
-	    !./configure --disable-dynamic --enable-static >& spool
-	    !make libreadline.a >& spool
-	    !cp libreadline.a ../ 
+	    $ifeq (IRAFARCH, macosx) then
+	        !(set IRAFARCH=macosx  ; ./configure --disable-dynamic --enable-static |& tee spool)
+	        !make libreadline.a >>& spool
+	        !cp libreadline.a ../ 
+	    $else $ifeq (IRAFARCH, macintel) then
+	        !(set IRAFARCH=macintel  ; ./configure --disable-dynamic --enable-static |& tee spool)
+	        !make libreadline.a >>& spool
+	        !cp libreadline.a ../ 
+	    $else
+	        !./configure --disable-dynamic --enable-static >& spool
+	        !make libreadline.a >>& spool
+	        !cp libreadline.a ../ 
+	    $endif
 	$endif
 	;
 

@@ -53,8 +53,12 @@ lwdp|			:tc=sappledp:
 lwti|ti|		:tc=slwti:
 vmsprint|vmslp|		:tc=svprint:
 hplj|			:tc=uhplj:
-lpr|lp|			:tc=glpr:
 enscript|		:tc=genscript:
+
+lpr|			:tc=g-lpr:
+lp|			:tc=g-lp:
+clpr|			:tc=g-lpr:
+clp|			:tc=g-lp:
 
 # AOSVS temporary entries
 laserup|		:DD=solpl!laser,@laser:tc=laser:
@@ -133,9 +137,12 @@ lw16p2|two landscape pages via enscript to lw16:co#80:li#66:os:pt:ta^I:\
 # the setenv PRINTER variable.  The second sends PostScript output generated
 # by the UNIX enscript program to the default printer.  
 
-glpr|Generic Unix line printer, default output device: \
+g-lpr|glpr|Generic Unix line printer, default output device (lpr): \
         :co#80:li#66:os:pt:ta^I:\
         :DD=lpr,/tmp/asfXXXXXX,!{ lpr $F; rm $F; }:
+g-lp|glp|Generic Unix line printer, default output device (lp): \
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpr,/tmp/asfXXXXXX,!{ lp $F; rm $F; }:
 
 genscript|Postscript printed via enscript program to default printer:\
         :co#80:li#66:os:pt:ta^I:\

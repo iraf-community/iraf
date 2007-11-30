@@ -575,7 +575,7 @@ pointer	ds			# output image
 pointer	wdes			# graphics window descriptor
 
 real	z1, z2, dz1, dz2, px1, px2, py1, py2
-int	i, order, zt, wx1, wx2, wy1, wy2, wy, nx, ny, xblk, yblk
+int	i, order, zt, wx1, wx2, wy1, wy2, wy, nx, ny, xblk, yblk, color
 pointer	wdwin, wipix, wdpix, ovrly, bpm, pm, uptr
 pointer	in, out, si, si_ovrly, si_bpovrly, ocolors, bpcolors, rtemp
 bool	unitary_greyscale_transformation
@@ -583,8 +583,10 @@ short	lut1, lut2, dz1_s, dz2_s, z1_s, z2_s
 
 bool	fp_equalr()
 int	imstati(), maskcolor()
-pointer	ds_pmmap(), imps2s(), imps2r(), sigm2s(), sigm2r(), sigm2_setup()
-errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2r, sigm2_setup
+pointer	ds_pmmap(), imps2s(), imps2r()
+pointer	sigm2s(), sigm2i(), sigm2r(), sigm2_setup()
+errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2i, sigm2r, sigm2_setup
+errchk	maskexprn
 
 begin
 	wdwin = W_WC(wdes,W_DWIN)
@@ -715,17 +717,25 @@ begin
 		}
 
 		if (si_ovrly != NULL) {
-		    in = sigm2s (si_ovrly, wy - wy1 + 1)
+		    in = sigm2i (si_ovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Mems[out+i] = maskcolor (ocolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Mems[out+i] = color
+			}
 		    }
 		}
 		if (si_bpovrly != NULL) {
-		    in = sigm2s (si_bpovrly, wy - wy1 + 1)
+		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Mems[out+i] = maskcolor (bpcolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Mems[out+i] = color
+			}
 		    }
 		}
 	    }
@@ -743,17 +753,25 @@ begin
 		call aluts (Mems[out], Mems[out], nx, Mems[uptr])
 
 		if (si_ovrly != NULL) {
-		    in = sigm2s (si_ovrly, wy - wy1 + 1)
+		    in = sigm2i (si_ovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Mems[out+i] = maskcolor (ocolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Mems[out+i] = color
+			}
 		    }
 		}
 		if (si_bpovrly != NULL) {
-		    in = sigm2s (si_bpovrly, wy - wy1 + 1)
+		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Mems[out+i] = maskcolor (bpcolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Mems[out+i] = color
+			}
 		    }
 		}
 	    }
@@ -776,17 +794,25 @@ begin
 		    call amapr (Memr[in], Memr[out], nx, z1, z2, dz1, dz2)
 
 		if (si_ovrly != NULL) {
-		    in = sigm2s (si_ovrly, wy - wy1 + 1)
+		    in = sigm2i (si_ovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Memr[out+i] = maskcolor (ocolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Memr[out+i] = color
+			}
 		    }
 		}
 		if (si_bpovrly != NULL) {
-		    in = sigm2s (si_bpovrly, wy - wy1 + 1)
+		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
+		    call maskexprn (ocolors, in, nx)
 		    do i = 0, nx-1 {
-			if (Mems[in+i] != 0)
-			    Memr[out+i] = maskcolor (bpcolors, int(Mems[in+i]))
+			if (Memi[in+i] != 0) {
+			    color = maskcolor (ocolors, Memi[in+i])
+			    if (color >= 0)
+				Memr[out+i] = color
+			}
 		    }
 		}
 	    }

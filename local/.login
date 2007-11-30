@@ -61,11 +61,13 @@ endif
 
 # Setup the iraf environment.
 setenv iraf /iraf/iraf/
-set file = $iraf/unix/hlib/irafuser.csh
-if (-e $file) then
-    source $file
-endif
-unset file
+
+foreach f ($iraf/unix/hlib/irafuser.csh ~/.alias)
+  if (-e $f) then
+    source $f
+  endif
+  unset f
+end
 
 
 # Pick up C-shell definitions.
@@ -92,3 +94,9 @@ else
 endif
 alias rsync	'rsync -avz'
 alias sp	'clear; tail -33f spool'
+
+
+# Setup for NVOSS
+#setenv NVOSS_HOME	/usr/local/nvoss/
+#setenv JAVA_HOME	/Library/java/Home//
+#source $NVOSS_HOME/bin/setup.csh

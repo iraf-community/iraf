@@ -80,6 +80,7 @@ begin
 	hline = 1
 	nline = 0
 	nband = 0
+	nap = 0
 	if (nowhite (Memc[units], Memc[units1], SZ_FNAME) == 0)
 	    call strcpy ("display", Memc[units], SZ_FNAME)
 	call strcpy (Memc[units], Memc[units1], SZ_FNAME)

@@ -14,8 +14,12 @@ generic:
 libxtools.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 
-	xtfixpix.x	xtfixpix.h <imhdr.h> <imset.h> <pmset.h>
-	xtfp.x		xtfixpix.h <imhdr.h> <pmset.h>
+	setfp.x		<imhdr.h> <imset.h> <pmset.h>
+	xtfixpix.x	<imhdr.h> <imset.h> <pmset.h> xtfixpix.h
+	xtfp.x		<imhdr.h> <pmset.h> xtfixpix.h
 	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<mwset.h> <pmset.h>
+	ytfixpix.x	<imhdr.h> <imset.h> <pmset.h> xtfixpix.h
+	ytpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
 			<mwset.h> <pmset.h>
 	;

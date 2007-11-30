@@ -2,7 +2,7 @@
  
 define	EP_SZFNAME	99			# Length of file name
 define	EP_SZLINE	199			# Length of line
-define	EP_LEN		377			# Length of EP structure
+define	EP_LEN		379			# Length of EP structure
  
 define	EP_INPUT	Memc[P2C($1)]		# Input image name
 define	EP_OUTPUT	Memc[P2C($1+50)]	# Output image name
@@ -24,21 +24,23 @@ define	EP_RADIUS	Memr[$1+359]		# Aperture radius
 define	EP_SEARCH	Memr[$1+360]		# Search radius
 define	EP_SIGMA	Memr[$1+361]		# Added noise sigma
 define	EP_VALUE	Memr[$1+362]		# Substitution value
-define	EP_WIDTH	Memr[$1+363]		# Background width
-define	EP_XORDER	Memi[$1+364]		# Background xorder
-define	EP_YORDER	Memi[$1+365]		# Background xorder
+define	EP_MINVALUE	Memr[$1+363]		# Minimum value for edit
+define	EP_MAXVALUE	Memr[$1+364]		# Maximum value for edit
+define	EP_WIDTH	Memr[$1+365]		# Background width
+define	EP_XORDER	Memi[$1+366]		# Background xorder
+define	EP_YORDER	Memi[$1+367]		# Background xorder
  
-define	EP_LOGFD	Memi[$1+366]		# Log file descriptor
-define	EP_IM		Memi[$1+367]		# IMIO pointer
-define	EP_INDATA	Memi[$1+368]		# Input data pointer
-define	EP_OUTDATA	Memi[$1+369]		# Output data pointer
-define	EP_NX		Memi[$1+370]		# Number of columns in subraster
-define	EP_NY		Memi[$1+371]		# Number of lines in subraster
-define	EP_NPTS		Memi[$1+372]		# Number of pixels in subraster
-define	EP_X1		Memi[$1+373]		# Starting column of subraster
-define	EP_Y1		Memi[$1+374]		# Starting line of subraster
-define	EP_X2		Memi[$1+375]		# Ending column of subraster
-define	EP_Y2		Memi[$1+376]		# Ending line of subraster
+define	EP_LOGFD	Memi[$1+368]		# Log file descriptor
+define	EP_IM		Memi[$1+369]		# IMIO pointer
+define	EP_INDATA	Memi[$1+370]		# Input data pointer
+define	EP_OUTDATA	Memi[$1+371]		# Output data pointer
+define	EP_NX		Memi[$1+372]		# Number of columns in subraster
+define	EP_NY		Memi[$1+373]		# Number of lines in subraster
+define	EP_NPTS		Memi[$1+374]		# Number of pixels in subraster
+define	EP_X1		Memi[$1+375]		# Starting column of subraster
+define	EP_Y1		Memi[$1+376]		# Starting line of subraster
+define	EP_X2		Memi[$1+377]		# Ending column of subraster
+define	EP_Y2		Memi[$1+378]		# Ending line of subraster
  
 define	APTYPES		"|circular|square|"	# Aperture types
 define	APRECTANGLE	0			# Rectangular aperture

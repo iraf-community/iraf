@@ -16,22 +16,24 @@ define	LEN_USERAREA	28800		# allow for the largest possible header
 
 procedure t_hselect()
 
-pointer	sp, im, image, fields, expr, section
+pointer	sp, im, image, fields, expr, missing, section
 int	imlist, ip, min_lenuserarea
 int	imtopenp(), imtgetim(), envfind(), ctoi()
 pointer	immap()
 
 begin
 	call smark (sp)
-	call salloc (image,  SZ_FNAME, TY_CHAR)
-	call salloc (fields, SZ_LINE,  TY_CHAR)
-	call salloc (expr,   SZ_LINE,  TY_CHAR)
+	call salloc (image,   SZ_FNAME, TY_CHAR)
+	call salloc (fields,  SZ_LINE,  TY_CHAR)
+	call salloc (expr,    SZ_LINE,  TY_CHAR)
+	call salloc (missing, SZ_LINE,  TY_CHAR)
 	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
 	call clgstr ("fields", Memc[fields], SZ_LINE)
 	call clgstr ("expr",   Memc[expr],   SZ_LINE)
+	call clgstr ("missing", Memc[missing], SZ_LINE)
 
 	# Main processing loop.  An image is processed in each pass through
 	# the loop.
@@ -55,7 +57,8 @@ begin
 	    }
 
 	    call he_getopsetimage (im, Memc[image], Memc[image])
-	    call hs_select (im, Memc[image], Memc[fields], Memc[expr])
+	    call hs_select (im, Memc[image], Memc[fields], Memc[expr],
+	        Memc[missing])
 
 	    call imunmap (im)
 	    call flush (STDOUT)
@@ -70,12 +73,13 @@ end
 # header parameter values for an image, and print the values of the listed
 # parameters on the standard output if the expression is true.
 
-procedure hs_select (im, image, fields, expr)
+procedure hs_select (im, image, fields, expr, missing)
 
 pointer	im			# image descriptor
 char	image[ARB]		# name of image being evaluated
 char	fields[ARB]		# fields to be passed if record is selected
 char	expr[ARB]		# exression to be evaluated
+char	missing[ARB]		# missing output value
 
 int	fieldno
 pointer	o, sp, field, value, flist
@@ -103,7 +107,8 @@ begin
 		iferr {
 		    call he_gval (im, image, Memc[field], Memc[value], SZ_LINE)
 		} then {
-		    call printf ("\t****")
+		    call printf ("\t%s")
+		        call pargstr (missing)
 		} else {
 		    if (fieldno == 1) {
 			call printf ("%s")

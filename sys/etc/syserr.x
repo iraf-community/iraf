@@ -1,6 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-define	SZ_ERRMSG	80
+define	SZ_ERRMSG	SZ_LINE
 
 # SYSERR -- Process a system error.  No arguments; print only the error
 # message from the system error message file.

@@ -1,4 +1,4 @@
-# MASKNAME -- Make a mask name.
+# XT_MASKNAME -- Make a mask name.
 # 
 # This creates a FITS mask extension if possible, otherwise it creates a
 # pixel list file.  To override this default the environment variable
@@ -55,6 +55,7 @@ begin
 
 	# Check for kernel section and add mask type.
 	else if (i > 0) {
+	    call strcpy (fname, mname, maxchar)
 	    if (mode != READ_ONLY) {
 		call strcpy (fname[i], Memc[temp], maxchar)
 		call sprintf (mname[i], maxchar-i, ",type=mask%s")
@@ -63,18 +64,23 @@ begin
 
 	# Create output from rootname name.
 	} else if (fits == YES) {
-	    call strcpy (fname, Memc[temp], SZ_FNAME)
 	    if (mode == READ_ONLY) {
 		call sprintf (mname, maxchar, "%s[%s]")
-		    call pargstr (Memc[temp])
+		    call pargstr (fname)
 		    call pargstr (Memc[extnm])
 	    } else {
 		call sprintf (mname, maxchar, "%s[%s,type=mask]")
-		    call pargstr (Memc[temp])
+		    call pargstr (fname)
 		    call pargstr (Memc[extnm])
 	    }
-	} else
-	    call strcat (".pl", mname, maxchar)
+	} else if (extname[1] != EOS) {
+	    call sprintf (mname, maxchar, "%s[%s]")
+	        call pargstr (fname)
+		call pargstr (Memc[extnm])
+	} else {
+	    call sprintf (mname, maxchar, "%s.pl")
+	        call pargstr (fname)
+	}
 
 	# Convert extension references to pl form if required.
 	# Extensions are implemented as directories.
@@ -83,18 +89,19 @@ begin
 	if (i > 0 && mode == READ_ONLY)
 	    fits = imaccess (mname, mode)
 	if (fits == NO && i > 0) {
+	    call strcpy (mname, Memc[temp], maxchar)
 	    mname[i] = EOS
 	    if (mode == NEW_IMAGE) {
 		if (access (mname, 0, 0) == NO) {
 		    ifnoerr (call fmkdir (mname))
 			mname[i] =  '/'
 		    else
-			mname[i] = '.'
+			mname[i] = '_'
 		} else
 		    mname[i] =  '/'
 	    } else {
 		if (access (mname, 0, 0) == NO)
-		    mname[i] = '.'
+		    mname[i] = '_'
 		else
 		    mname[i] =  '/'
 	    }
@@ -109,6 +116,9 @@ begin
 		mname[i] = EOS
 	    }
 	    call strcat (".pl", mname, maxchar)
+
+	    if (mode == READ_ONLY && imaccess(mname,0)==NO)
+	        call strcpy (Memc[temp], mname, maxchar)
 	}
 
 	call sfree (sp)

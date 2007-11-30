@@ -239,11 +239,11 @@ int	ival, nscan()
 
 begin
 	call gargi (ival)
-	if (nscan() == 2)
+	if (nscan() == 2) {
 	    RVF_CUTOFF(rv) = ival
 	    if (RV_AUTODRAW(rv) == YES && RV_FILTER(rv) != NONE)
 		RV_NEWGRAPH(rv) = YES
-	else {
+	} else {
 	    call printf ("filtpars.cutoff = %d")
 	        call pargi (RVF_CUTOFF(rv))
 	}
@@ -260,11 +260,11 @@ int	ival, nscan()
 
 begin
 	call gargi(ival)
-	if (nscan() == 2)
+	if (nscan() == 2) {
 	    RVF_CUTON(rv) = ival
 	    if (RV_AUTODRAW(rv) == YES && RV_FILTER(rv) != NONE)
 		RV_NEWGRAPH(rv) = YES
-	else {
+	} else {
 	    call printf ("filtpars.cuton = %d")
 	        call pargi (RVF_CUTON(rv))
 	}
@@ -286,11 +286,11 @@ begin
 	call salloc (bp, SZ_LINE, TY_CHAR)
 
 	call gargstr (Memc[buf], SZ_FNAME)
-	if (Memc[buf] != EOS)
+	if (Memc[buf] != EOS) {
 	    RVF_FILTTYPE(rv) = cod_filttype (Memc[buf+1])
 	    if (RV_AUTODRAW(rv) == YES && RV_FILTER(rv) != NONE)
 		RV_NEWGRAPH(rv) = YES
-	else {
+	} else {
 	    call nam_filttype (rv, Memc[bp])
 	    call printf ("filtpars.filttype = '%s'")
 	    	call pargstr (Memc[bp])
@@ -310,11 +310,11 @@ int	ival, nscan()
 
 begin
 	call gargi (ival)
-	if (nscan() == 2)
+	if (nscan() == 2) {
 	    RVF_FULLOFF(rv) = ival
 	    if (RV_AUTODRAW(rv) == YES && RV_FILTER(rv) != NONE)
 		RV_NEWGRAPH(rv) = YES
-	else {
+	} else {
 	    call printf ("filtpars.fulloff = %d")
 	        call pargi (RVF_FULLOFF(rv))
 	}
@@ -331,11 +331,11 @@ int	ival, nscan()
 
 begin
 	call gargi (ival)
-	if (nscan() == 2)
+	if (nscan() == 2) {
 	    RVF_FULLON(rv) = ival
 	    if (RV_AUTODRAW(rv) == YES && RV_FILTER(rv) != NONE)
 		RV_NEWGRAPH(rv) = YES
-	else {
+	} else {
 	    call printf ("filtpars.fullon = %d")
 	        call pargi (RVF_FULLON(rv))
 	}

@@ -36,6 +36,7 @@ libex.a:
 
 	@tf		# Update datatype expanded files.
 	@db		# Update image database interface.
+	@dbc		# Update image database interface (enhanced).
 	@iki		# Update image kernel interface.
 
 	imaccess.x	

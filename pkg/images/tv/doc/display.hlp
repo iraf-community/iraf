@@ -35,9 +35,9 @@ for the bad pixel mask.
 .le
 .ls bpcolors = "red"
 The mapping between bad pixel values and display colors or intensity values
-when the bad pixels are displayed as an overlay.  The syntax consists of a
-color name, a display value, or maskvalue=color assignments.  This is
-described in the OVERLAY COLOR section.
+when the bad pixels are displayed as an overlay.  There are two forms,
+explicit color assignments for values or ranges of values, and expressions.
+These is described in the OVERLAY COLOR section.
 .le
 
 .ls overlay = ""
@@ -48,10 +48,10 @@ the \fIocolors\fR parameter.  If the overlay cannot be found a warning is
 given and the overlay is not displayed.
 .le
 .ls ocolors = "green"
-The mapping between overlay mask values and display colors or
-intensity values.  The syntax consists of a color name, a display
-value, or maskvalue=color assignments.  This is described in the
-OVERLAY COLOR section.
+The mapping between bad pixel values and display colors or intensity values
+when the bad pixels are displayed as an overlay.  There are two forms,
+explicit color assignments for values or ranges of values, and expressions.
+These is described in the OVERLAY COLOR section.
 .le
 
 .ls erase = yes
@@ -351,11 +351,42 @@ the subsampling.  With block averaging pixel-to-pixel noise is reduced
 and small scale features still contribute to the displayed image.
 .ih
 OVERLAY COLORS
-The overlay mask or the overlay display option for the bad pixel mask map
-the mask values to display colors or intensities.  The mapping is described
-by the parameters \fIbpcolors\fR and \fIocolors\fR.  The syntax consists of
-a comma delimited list where each element of the list may have one of the
-follow forms:
+The masks specified by the \fIbpmask\fR and \fIoverlay\fR parameters may be
+displayed as color overlays on the image data.  The non-zero pixels in the
+mask are assigned integer display values.  The values may fall in the same
+range, 1 to 200, as the mapped image pixel data values and will behave the
+same way as the pixel values when the display map is interactively adjusted.
+Values of 0 and 201 to 255 may be used and depend on the display server and
+display resource definitions.  The expected or standard server behavior is
+that 0 is the background color and 201 to 255 are various colors with the
+lower numbers being the more standard primary colors.  The expected colors
+are:
+
+.nf
+        Value   Color               Value   Color
+        201     white (cursor)      210     coral
+        202     black (background)  211     maroon
+        203     white               212     orange
+        204     red                 213     khaki
+        205     green               214     orchid
+        206     blue                215     turquoise
+        207     yellow              216     violet
+        208     cyan                217     wheat
+        209     magenta
+.fi
+
+The values 201 and 202 are tied to the cursor and background resource
+colors.  These are generally white and black respectively.  Values above 217
+are not defined and depend on the current state of the color table for the
+window system.
+
+The mapping between between mask values and overlay colors are specified
+by the \fIbpcolors\fR and \fIocolors\fR parameters.  There are two mapping
+syntax, a list and an expression.
+
+The list syntax consists of
+a comma delimited set of values and assignments with one of the following
+forms.
 
 .nf
     color
@@ -363,48 +394,26 @@ follow forms:
     maskvalue-maskvalue=color
 .fi
 
-where color is one of a color name, a color value, or value to be added or
-subtracted to the mask value to yield a color value.  The color values are
-unsigned integers (no '+' or '-') and values to be added or subtracted are
-given as signed integers.
+where color may be a color name, a color value, or value to be added or
+subtracted to the mask value to yield a color value.  Color names may be
+black, white, red, green, blue, yellow, cyan, magenta, or transparent with
+case ignored and abbreviations allowed.  Transparent does the obvious of
+being invisible.  These values are based on the default resource colors for
+the display servers (as shown above) and any custom definitions may result
+in incorrect colors.
 
-The first form provides the default intensity or color for all mask values.
-Note that if no default color is provided the default will be white.
-The other forms map a mask value or range of mask values to a color.
-In a list the last color defined for the default or mask value will
-be used.
-
-The color values may be the names black, white, red, green, blue, yellow,
-cyan, or magenta with case ignored and abbreviations allowed.  These values
-are based on the default resource colors for the display servers and any
-custom definitions may result in incorrect colors.  DISPLAY actually loads
-intensity levels as non-negative integers.  The level zero is the
-background, levels 1 to 200 are in the range of grey levels which may be
-adjusted by the user, and values above 200 are overlay colors with the
-range 202-209 being the standard colors in the above order.  The color
-values may be specified as these levels instead of using the color names.
-The values 201 and 202 are tied to the cursor and background resource
-colors.  Values above 217 are not defined and depend on the current state
-of the color table for the window system.  The table below gives the
-standard color assignments as discussed above.
-
-.nf
-        Level   Color           Level   Color
-        201     white           210     coral
-        202     black           211     maroon
-        203     white           212     orange
-        204     red             213     khaki
-        205     green           214     orchid
-        206     blue            215     turquoise
-        207     yellow          216     violet
-        208     cyan            217     wheat
-        209     magenta
-.fi
+The color values are unsigned integers (no '+' or '-') or values to be added
+or subtracted are given as signed integers.  The first form provides the
+default intensity or color for all mask values.  Note that if no default
+color is specified the default will be white.  The other forms map a mask
+value or range of mask values to a color.  In a list the last color defined
+for the default or mask value will be used.
 
 The addition or subtraction from mask values provides a mechanism to have
 the bad pixel or overlay masks encode a variety of overlay colors.  Note
 that to display the mask values directly as colors one would use the color
-value "+0".
+value "+0".  Subtraction may produce values less than zero which then
+are not visible; i.e. equivalent to "transparent".
 
 The following examples illustrate the features of the syntax.
 
@@ -414,12 +423,80 @@ The following examples illustrate the features of the syntax.
     ocolors="+0"        Display mask values as color values
     ocolors="+200"      Display mask values offset by 200
 
-    ocolors="205,1=red,2=yellow,10-20=cyan,30-40=+100"
+    ocolors="205,1=red,2=yellow,10-20=cyan,30-40=+100,50-100=transparent"
 .fi
 
 The last example has a default color of 205, mask values of 1 are
 red, mask values of 2 are yellow, mask values of 10 to 20 are cyan,
-and mask values of 30 to 40 are display as intensities 130 to 140.
+and mask values of 30 to 40 are displayed as intensities 130 to 140.
+
+Expressions are identified by being enclosed in parentheses.
+This uses the general IRAF expression syntax (see \fBexpressions\fR).
+The mask values are referenced by the character $.  The same named
+colors (black, white, red, green, blue, yellow, cyan, magenta,
+and transparent) may be used in place of color values. Expressions
+must evaluate to integer values.  To avoid needing special handling of
+input mask values of zero, all pixels with input mask values of zero
+are not shown regardless of the expression value.
+
+There are currently two function extensions, "colors" and "acenum".
+In both functions the first and only required argument, arg1, is an integer
+value.  Typically this will '$' or a function based on '$'.
+
+The "colors" function maps input values with a modulus type behavior.  The
+optional second argument, arg2, is a color value for mapping zero.  As noted
+above, if the input mask value is zero it will not be displayed.  However,
+functions applied to non-zero input mask values may return a value of zero
+which may then be displayed with the specified color.  The default is
+transparent.  The next two optional arguments (arg3 and arg4) define a color
+range with defaults of 204 to 217.  If only arg3 is specified then
+arg4 takes the value of arg3, thus having the effect of a constant
+output color.  Positive values of the first argument are mapped to a color
+value by
+
+.nf
+    if arg1 is 0:       result = arg2
+    if arg1 greater 0:  result = arg3 + mod ($-1, arg4-arg3+1)
+    otherwise:          result = arg1
+.fi
+
+This function is primarily used to make colorful displays of regions
+defined with different mask values.
+
+The "acenum" function handles \fBace\fR package object detection masks
+which include bit flags.  Each object in the mask has an object number
+with value greater than 10.  Values less than 10 are passed along during
+detection and generally identify detector or saturated bad pixels.
+Along with the the object number there may be zero or more bit flags
+set.  This function removes the bit flags and returns the mask number.
+The optional second argument, arg2, is a string of letters which selects
+pixels with certain sets of bit flags.  The bit flags are:
+
+.nf
+    B -- a bad pixel treated as a good for detection
+    D -- original detection (i.e. without G or S flag)
+    E -- edge pixel used for displaying detection isophotes
+    F -- object contains a bad pixel
+    G -- grown pixel
+    S -- pixel not assigned to an object during splitting
+.fi
+
+The default of arg2 is "BDEG" which essentially returns all pixels
+in an object.
+
+The acenum function also returns 0 for the pixels with values between
+one and ten and -1 for the pixels not selected by the flags.  The value
+of zero may be made visible using the colors function.  The two functions
+are often used in concert:
+
+.nf
+    (colors(acenum($)))
+    (colors(acenum($),black))
+    (colors(acenum($,'E'),red,green)
+.fi
+
+Note that when filling and anti-aliasing the behavior of the overlay
+colors may be different than intended.
 .ih
 EXAMPLES
 For the purpose of these examples we assume a display with four frames,

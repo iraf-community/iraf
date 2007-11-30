@@ -1,5 +1,9 @@
 .help revisions Jun88 noao.imred.irred
 .nf
+irred$irred.cl
+    The IRLINCOR task was mistakenly declared using 'x_irred.x' instead
+    of 'x_irred.e'.  Works fine under the CL but broke Pyraf  (1/18/07, MJF)
+
 irred$center.par
 irred$doc/center.hlp
     Updated the center task parameter file to support the new cache, wcsin,

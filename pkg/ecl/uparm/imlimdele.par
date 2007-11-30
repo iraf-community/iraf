@@ -1,0 +1,5 @@
+images,s,a,"foo.fits",,,"List of images to be deleted"
+verify,b,h,no,,,"Verify operation before deleting each image?"
+default_action,b,h,yes,,,"Default delete action for verify query"
+go_ahead,b,q,yes,,," ?"
+mode,s,h,"ql",,,

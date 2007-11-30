@@ -13,7 +13,7 @@ $set	LFLAGS		= "-z -/static"	# default XC link flags
 $else $ifeq (MACH, linux) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"		# default XC link flags
+$set	LFLAGS		= "-Nz -/static"# default XC link flags
 $else $ifeq (MACH, redhat) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
@@ -30,10 +30,6 @@ $else $ifeq (MACH, linuxppc) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
 $set	LFLAGS		= "-Nz"		# default XC link flags
-$else $ifeq (MACH, suse) then
-$set	XFLAGS		= "-c -w"	# default XC compile flags
-$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz"
 $else $ifeq (MACH, sunos) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
@@ -61,8 +57,6 @@ $set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 $ifeq (MACH, linux, redhat, macosx, macintel) then
     $include "hlib$mkpkg.sf.MACX"
 $else $ifeq (MACH, linux, redhat, linuxppc) then
-    $include "hlib$mkpkg.sf.LNUX"
-$else $ifeq (MACH, linux, suse) then
     $include "hlib$mkpkg.sf.LNUX"
 $else $ifeq (MACH, freebsd) then
     $include "hlib$mkpkg.sf.FBSD"

@@ -170,6 +170,7 @@ pointer	duout, dvout		#O Output coordinate intervals
 int	i, j, step, nu1, nv1
 real	xmin, xmax, ymin, ymax, umin, umax, vmin, vmax
 real	u, v, x, y, du1, dv1, der[8]
+double	dval
 pointer	xgrid, ygrid, zgrid, ptr1, ptr2, ptr3
 
 real	tr_getr(), tr_eval()
@@ -359,9 +360,9 @@ begin
 	call malloc (uout, nu, TY_REAL)
 	call malloc (duout, nu, TY_REAL)
 	if (ulog) {
-	    v = log10 (u1)
+	    dval = log10 (double(u1))
 	    do i = 0, nu - 1
-		Memr[uout+i] = 10. ** (v + i * du)
+		Memr[uout+i] = 10.**(dval+i*du)
 	    call amulkr (Memr[uout], du * LN_10, Memr[duout], nu)
 	} else {
 	    do i = 0, nu - 1
@@ -373,9 +374,9 @@ begin
 	call malloc (vout, nv, TY_REAL)
 	call malloc (dvout, nv, TY_REAL)
 	if (vlog) {
-	    v = log10 (v1)
+	    dval = log10 (double(v1))
 	    do i = 0, nv - 1
-		Memr[vout+i] = 10. ** (v + i * dv)
+		Memr[vout+i] = 10.**(dval+i*dv)
 	    call amulkr (Memr[vout], dv * LN_10, Memr[dvout], nv)
 	} else {
 	    do i = 0, nv - 1
@@ -385,12 +386,12 @@ begin
 	v2 = Memr[vout+nv-1]
 
 	# Convert to interpolation coordinates.
-	call asubkr (Memr[uout], u1, Memr[uout], nu)
-	call adivkr (Memr[uout], du1, Memr[uout], nu)
-	call aaddkr (Memr[uout], 1., Memr[uout], nu)
-	call asubkr (Memr[vout], v1, Memr[vout], nv)
-	call adivkr (Memr[vout], dv1, Memr[vout], nv)
-	call aaddkr (Memr[vout], 1., Memr[vout], nv)
+	umin = 1.; umax = nu
+	do i = 0, nu - 1
+	    Memr[uout+i] = max (umin, min (umax, (Memr[uout+i]-u1)/du1+1))
+	vmin = 1.; vmax = nv
+	do i = 0, nv - 1
+	    Memr[vout+i] = max (vmin, min (vmax, (Memr[vout+i]-v1)/dv1+1))
 end
 
 

@@ -798,7 +798,7 @@ clkeep()
 {
 	register struct	task *tp, *root_task;
 
-	if (strncmp ("keep", currentask->t_ltp->lt_lname) == 0) {
+	if (strncmp ("keep", currentask->t_ltp->lt_lname, 4) == 0) {
 	    if (nargs (newtask->t_pfp) > 0)
 	        cl_error (E_UERR, "`keep' command has no arguments");
 	} else if (prevtask == firstask)

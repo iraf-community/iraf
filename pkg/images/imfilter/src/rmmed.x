@@ -13,7 +13,7 @@ include	<pkg/rmsorted.h>
 
 
 # Method object structure.
-define	RM_LEN		23		# Structure size
+define	RM_LEN		25		# Structure size
 define	RM_RMS		Memi[$1]	# Pointer to RMEDSRT method
 define	RM_BOX		Memi[$1+1]	# Box size
 define	RM_NDATA	Memi[$1+2]	# Number of datasets

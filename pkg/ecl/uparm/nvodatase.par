@@ -1,0 +1,8 @@
+what,s,a,"ndwfs",,,"Object Name or Image"
+service,s,h,"cone",,,"Service Type or list"
+bandpass,s,h,"optical",,,"Bandpass of search"
+sr,r,h,0.25,,,"search radius"
+filter,b,h,yes,,,"Filter results?"
+verbose,b,h,no,,,"Verbose output?"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

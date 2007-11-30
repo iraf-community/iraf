@@ -80,7 +80,7 @@ struct sgi_inst {
 /* Commands to setup Postscript environment.
  */
 static char *ps_init[] = {
-	"%!PS",
+	"%!PS-Adobe-2.0",
 	"/devppi 300 def",
 	"/userppi 72 def",
 	"/pagewidth 8.5 def",

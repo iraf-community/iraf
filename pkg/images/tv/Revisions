@@ -2,6 +2,78 @@
 .help revisions Nov93 nmisc
 .nf
 
+=============
+V2.12.4-V2.14
+=============
+
+doc/bpmedit.hlp
+doc/imedit.hlp
+imedit/bpmedit.cl
+imedit/bpmedit.key
+imedit/epcolon.x
+imedit/epix.h
+imedit/epmask.x
+imedit/epreplace.gx
+imedit/epreplace.x
+imedit/epsetpars.x
+imedit/imedit.key
+    Added new parameters to specify a range of values that may be modified.
+    This is mainly useful with bpmedit to selected mask values to be
+    modified.  (11/16/07, Valdes)
+
+
+display/maskcolor.x
+display/t_display.x
+display/ace.h
+display/mkpkg
+doc/display.hlp
+    The overlay colors may now be set with expressions as well as with
+    the earlier syntax.  (8/16/07, Valdes)
+
+
+imedit/bpmedit.cl	+
+doc/bpmedit.hlp		+
+./imedit/bpmedit.key	+
+tv.cl
+tv.hd
+    A new script task for editing masks using imedit as the editing
+    engine was added.  (8/9/07, Valdes)
+
+imedit/t_imedit.x
+imedit/epgcur.x
+./imedit/epreplace.gx	+
+./imedit/imedit.key	+
+doc/imedit.hlp
+mkpkg
+tv.cl
+    1.	A new option to do vector constant replacement was added.  This is
+	particularly useful for editing bad pixel masks.
+    2.  New options '=', '<', and '>' to replace all pixels with values
+    	==, <=, or >= to the value at the cursor with the constant value
+	was added.  This is useful for editing object masks.
+    3.	The '?' help page is now set by an environment variable rather than
+    	hardcoded to a file in lib$src.  The environment variable is
+	imedit_help and is set in tv.cl to point to the file in the
+	source directory.
+    (8/9/07, Valdes)
+
+pkg/images/tv/display/maskcolor.x
+    There was an error that failed to parse the color string as required.
+    (8/10/07, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    Buffers were allocated as TY_SHORT but used and TY_INT.  (8/9/07, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/maskcolors.x
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/display/sigm2.x
+pkg/images/tv/doc/display.x
+    1. Overlay masks are now read as integer to preserve dynamic range.
+    2. Mapped color values less than 0 are transparent.
+    3. A color name of transparent is allowed.
+    (4/10/07, Valdes)
+
 =======
 V2.12.2
 =======

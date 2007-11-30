@@ -1,0 +1,5 @@
+iname,s,a,,,,"Input filename"
+oname,s,a,"tmp$raw1384ia",,,"Output filename"
+otype,s,a,,,,"Output format"
+status,i,h,0,,,"Service status code"
+mode,s,h,"ql",,,

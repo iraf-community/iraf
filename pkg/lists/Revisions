@@ -1,6 +1,21 @@
 .help revisions Jun88 pkg.lists
 .nf
 =====
+V2.13
+=====
+
+raverage.cl		+
+doc/raverage.hlp	+
+lists.cl
+lists.men
+lists.hd
+	Added a new running average task.  (5/4/07, Valdes)
+
+=======
+V2.12.3
+=======
+
+=====
 V2.12
 =====
 

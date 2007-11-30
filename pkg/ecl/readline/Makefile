@@ -29,13 +29,13 @@ PACKAGE_VERSION = 5.0-rc1
 srcdir = .
 VPATH = .
 top_srcdir = .
-BUILD_DIR = /iraf/iraf/pkg/ecl/readline
+BUILD_DIR = /iraf/iraf.v214/iraf/pkg/ecl/readline
 
-INSTALL = /bin/install -c
+INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA = ${INSTALL} -m 644
 
-CC = gcc
+CC = cc
 RANLIB = ranlib
 AR = ar
 ARFLAGS = cr

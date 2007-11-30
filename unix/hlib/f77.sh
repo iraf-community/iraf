@@ -39,6 +39,7 @@ EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
 F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802'}
+keepc=0
 warn=1
 xsrc=0
 rc=0
@@ -58,6 +59,10 @@ do
 	in
 	-b)	CFLAGS="$CFLAGS -b $2"
 		shift 2
+		;;
+
+	-K)	keepc=1
+		shift
 		;;
 
 	-c)	cOPT=0
@@ -104,6 +109,10 @@ do
 	-O*)
 		CFLAGS="$CFLAGS $1"
 		shift
+		;;
+
+	-arch)	CFLAGS="$CFLAGS -arch $2"
+		shift 2
 		;;
 
 	-U)	CFLAGS="$CFLAGS -arch ppc -arch i386"
@@ -180,7 +189,9 @@ do
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
 		case $rc in 0);; *) exit 5;; esac
-		rm -f $b.c
+		if [ $keepc = 0 ]; then
+		    rm -f $b.c
+		fi
 		OFILES="$OFILES $b.o"
 		case $cOPT in 1) cOPT=2;; esac
 		shift
@@ -205,7 +216,9 @@ do
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
 		case $rc in 0);; *) exit 5;; esac
-		rm -f $b.c
+		if [ $keepc = 0 ]; then
+		    rm -f $b.c
+		fi
 		OFILES="$OFILES $b.o"
 		case $cOPT in 1) cOPT=2;; esac
 		shift
@@ -216,7 +229,6 @@ do
 		case $? in 0);; *) exit;; esac
 		$F2C $F2CFLAGS $b.f
 		case $? in 0);; *) exit;; esac
-ecoh $CC -c $CFLAGS $b.c
                 $CC -c $CFLAGS $b.c
 		case $? in 0);; *) exit;; esac
 		OFILES="$OFILES $b.o"

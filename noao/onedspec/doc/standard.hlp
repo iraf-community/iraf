@@ -62,15 +62,17 @@ of the input spectrum.  In both cases the default bandpasses can be
 changed interactively if desired.
 .le
 .ls fnuzero = 3.68e-20
-The absolute flux per unit frequency at a magnitude of zero.  This is used
-to convert the calibration  magnitudes to absolute flux by the formula
+The absolute flux per unit frequency at an AB magnitude of zero.  This is used
+to convert the calibration  AB magnitudes to absolute flux by the formula
 
-	Flux = fnuzero * 10. ** (-0.4 * magnitude)
+.nf
+    f_nu = fnuzero * 10. ** (-0.4 * m_AB)
+.fi
 
 The flux units are also determined by this parameter.  However, the
 frequency to wavelength interval conversion assumes frequency in hertz.
 The default value is based on a calibration of Vega at 5556 Angstroms of
-3.52e-20 ergs/cm2/s/Hz for a magnitude of 0.048.  This default value
+3.52e-20 ergs/cm2/s/Hz for an AB magnitude of 0.0336.  This default value
 is that used in earlier versions of this task which did not allow the
 user to change this calibration.
 .le
@@ -89,7 +91,9 @@ default value of ")_.caldir" means to use the package parameter "caldir".
 A list of standard calibration directories may be obtained by listing the
 file "onedstds$README"; for example:
 
-	cl> page onedstds$README
+.nf
+    cl> page onedstds$README
+.fi
 
 The user may copy or create their own calibration files and specify the
 directory.  The directory "" refers to the current working directory.  The
@@ -252,17 +256,21 @@ Angstroms.
 The calibration files consist of lines with wavelengths, calibration
 magnitudes, and bandpass widths.  The magnitudes are m_AB defined as
 
+.nf
     m_AB(star) = -2.5 * log10 (f_nu) - 48.60
+.fi
 
 where f_nu is in erg/cm^2/s/Hz.  The m_AB calibration magnitudes
 are converted to absolute flux per unit frequency using the
 parameter \fIfnuzero\fR defined by
 
-    Fnu = fnuzero * 10. ** (-0.4 * magnitude)
+.nf
+    f_nu = fnuzero * 10. ** (-0.4 * m_AB)
+.fi
 
 Thus, \fIfnuzero\fR is the flux at m_AB of zero.  The flux units are
 determined by this number.  The default value was chosen such that Vega
-at 5556 Angstroms has a magnitude of 0.048 and a flux of 3.52e-20
+at 5556 Angstroms has an AB magnitude of 0.0336 and a flux of 3.52e-20
 ergs/cm2/s/Hz.  This is the same value that was used by all previous
 versions of this task.
 .le
@@ -282,7 +290,10 @@ departure from a pure blackbody flux distribution.
 The actual m_AB calibration magnitudes for the star are obtained by
 the relation
 
-    m_AB(star) = mag + m_AB(m=0) - 2.5 * log10 (B(weff,teff)/B(w,teff))
+.nf
+    m_AB(star) = mag + m_AB(m=0) -
+        2.5 * log10 (B(weff,teff)/B(w,teff))
+.fi
 
 where m is the magnitude of the star in the calibration band, m_AB(m=0) is
 the calibration value in the calibration file representing the magnitude of
@@ -437,7 +448,9 @@ appropriate magnitude).  Given the spectral type the relative magnitudes
 for the calibration band, m_1, and the input magnitude band, m_2, are found
 and the calibration magnitude for the star is given by
 
+.nf
     m_calibration = m_input + m_1 - m_2
+.fi
 
 If one of the magnitudes is missing,  given as "INDEF" because the
 transformation is not available for the spectral type, the last spectral
@@ -453,7 +466,9 @@ used in the blackbody calibration files and as specified by the
 separate the various fields in the comment and in the fields of the table.
 For example the file might have the comment
 
+.nf
     # Type    Teff     V      J      H      K      L   Lprime    M
+.fi
 
 identifying the third column of the file as the V magnitude and the
 ninth file as the M magnitude.

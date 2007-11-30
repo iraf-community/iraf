@@ -1,7 +1,8 @@
 include	<error.h>
+include	<imhdr.h>
 include	"epix.h"
  
-define	HELP		"iraf$lib/scr/imedit.key"
+define	HELP		"imedit_help$"
 define	PROMPT		"imedit options"
  
 # T_IMEDIT -- Edit image pixels.
@@ -25,10 +26,12 @@ int	i, key, ap, xa, ya, xb, yb, x1, x2, y1, y2
 int	change, changes, newdisplay, newimage
 bool	erase
 pointer	sp, ep, cmd, temp
+pointer	im
  
-pointer	immap()
+bool	streq()
+pointer	immap(), imgl2r(), impl2r()
 int	imtopenp(), imtlen(), imtgetim(), imaccess(), ep_gcur()
-errchk	immap, imdelete, ep_imcopy, ep_setpars
+errchk	immap, imdelete, ep_imcopy, ep_setpars, imgl2r, impl2r
  
 define	newim_	99
  
@@ -114,7 +117,7 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 			    change = YES
 			    changes = changes + 1
 			}
-		    case 'd', 'e':	# Constant value
+		    case 'd', 'e', 'v':	# Constant value
 			call ep_constant (ep, ap, xa, ya, xb, yb)
 			if (EP_OUTDATA(ep) != NULL) {
 			    change = YES
@@ -125,6 +128,15 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 			    call ep_col (ep, ap, xa, ya, xb, yb)
 			else
 			    call ep_line (ep, ap, xa, ya, xb, yb)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case '=', '<', '>':	# Replace
+			if (IM_PIXTYPE(EP_IM(ep)) == TY_INT)
+			    call ep_replacei (ep, xa, ya, key)
+			else
+			    call ep_replacer (ep, xa, ya, key)
 			if (EP_OUTDATA(ep) != NULL) {
 			    change = YES
 			    changes = changes + 1
@@ -180,7 +192,7 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 			call ep_dosurface (ep)
 		    case 'q':	# Quit and save
 		    case 'u':	# Undo
-			if (EP_OUTDATA(ep) != NULL) {
+			if (EP_OUTDATA(ep) != NULL && EP_INDATA(ep) != NULL) {
 			    call malloc (temp, EP_NPTS(ep), TY_REAL)
 			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
 				EP_NPTS(ep))
@@ -224,7 +236,7 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		# centering.
 		if (EP_LOGFD(ep) != NULL) {
 		    switch (key) {
-		    case 'a', 'c', 'd', 'f', 'j', 'l':
+		    case 'a', 'c', 'd', 'f', 'j', 'l', 'v':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
 			    call pargi (xa)
 			    call pargi (ya)
@@ -256,16 +268,25 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		}
 	    }
  
+	    call imunmap (EP_IM(ep))
 	    # Only create the output if the input has been changed.
 	    if (changes > 0) {
-		if (imaccess (EP_OUTPUT(ep), READ_ONLY) == YES)
-		    call imdelete (EP_OUTPUT(ep))
-	        call imunmap (EP_IM(ep))
-	        call imrename (EP_WORK(ep), EP_OUTPUT(ep))
-	    } else {
-	        call imunmap (EP_IM(ep))
+		if (streq (EP_INPUT(ep), EP_OUTPUT(ep))) {
+		    EP_IM(ep) = immap (EP_OUTPUT(ep), READ_WRITE, 0)
+		    im = immap (EP_WORK(ep), READ_ONLY, 0)
+		    do i = 1, IM_LEN(EP_IM(ep),2)
+		        call amovr (Memr[imgl2r(im,i)],
+			    Memr[impl2r(EP_IM(ep),i)], IM_LEN(im,1))
+		    call imunmap (im)
+		    call imunmap (EP_IM(ep))
+		    call imdelete (EP_WORK(ep))
+		} else {
+		    if (imaccess (EP_OUTPUT(ep), READ_ONLY) == YES)
+			call imdelete (EP_OUTPUT(ep))
+		    call imrename (EP_WORK(ep), EP_OUTPUT(ep))
+		}
+	    } else
 	        call imdelete (EP_WORK(ep))
-	    }
  
 	    # Check for a new image based on a colon command.  This case
 	    # always uses the input image name as output.

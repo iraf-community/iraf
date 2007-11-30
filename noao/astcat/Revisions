@@ -1,6 +1,17 @@
 .help revisions Sep01 noao.astcat
 .nf
 
+=======
+V2.13
+=======
+
+astcat$lib/catdb.dat
+    Added twomass@noao and usnob1@noao using an scat interface.
+    (8/17/07, Valdes)
+
+astcat$lib/catdb.dat
+    Added twomass@irsa using their Gator interface.  (7/17/07, Valdes)
+
 astcat$lib/catdb.dat
     Removed references to 2Mass catalog.  (9/27/04, Valdes)
 

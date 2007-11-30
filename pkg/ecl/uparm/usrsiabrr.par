@@ -1,0 +1,4 @@
+object,s,a,"m64",,,"Object name"
+size,r,a,0.25,,,"Size of search"
+service,s,h,"DSS",,,"SIA Service to query"
+mode,s,h,"ql",,,

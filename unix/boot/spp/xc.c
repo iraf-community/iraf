@@ -25,7 +25,7 @@
  * system.
  */
 
-#define VERSION		"PC-IRAF XC V2.2 Dec 18 2003"
+#define VERSION		"IRAFNET XC V2.3 May 21 2006"
 
 #define	ERR		(-1)
 #define	EOS		'\0'
@@ -122,7 +122,13 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 
 char *opt_flags[] = { "-O3",			/*  0  */
 		    0};				/* EOF */
-int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+/* As of Dec2007 there remains an unexplained optimizer bug in
+** the system which has the effect of disabling FPE handling on
+** Mac Intel/PPC systems.  For the moment, we'll disable the optimization
+** until this is better understood or fixed in future GCC versions.
+*/
+int  nopt_flags	   = 0;				/* No. optimizer flags */
 
 #else
 #ifdef SOLARIS
@@ -249,6 +255,7 @@ int	hostprog 	= NO;
 int	voslibs 	= YES;
 int	nolibc 		= NO;
 int	usef2c 		= YES;
+int	useg95 		= YES;
 int	userincs	= NO;
 #ifdef LINUXPPC
 int	useg2c 		= YES;
@@ -346,6 +353,7 @@ char	*argv[];
 	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77"))) {
 	    strcpy (f77comp, s);
 	    usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
+	    useg95 = (strncmp (f77comp, "g95", 3) == 0 ? 1 : 0);
 	}
 	if ((s = os_getenv ("XC-LINKER")) || (s = os_getenv ("XC_LINKER")))
 	    strcpy (linker, s);
@@ -751,6 +759,18 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = f2cpath;
 	}
 
+#ifdef MACOSX
+	if (useg95 == 0) {
+	    if ((irafarch = os_getenv("IRAFARCH"))) {
+	        arglist[nargs++] = "-arch";
+	        if (strcmp (irafarch, "macosx") == 0) 
+	    	    arglist[nargs++] = "ppc";
+	        else if (strcmp (irafarch, "macintel") == 0) 
+	    	    arglist[nargs++] = "i386";
+	    }
+	}
+#endif
+
 #ifdef LINUXAOUT
 	arglist[nargs++] = "-b";
 	arglist[nargs++] = "i486-linuxaout";
@@ -805,6 +825,18 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = "-f2c";
 	    arglist[nargs++] = f2cpath;
 	}
+
+#ifdef MACOSX
+	if (useg95 == 0) {
+	    if ((irafarch = os_getenv("IRAFARCH"))) {
+	        arglist[nargs++] = "-arch";
+	        if (strcmp (irafarch, "macosx") == 0) 
+	    	    arglist[nargs++] = "ppc";
+	        else if (strcmp (irafarch, "macintel") == 0) 
+	    	    arglist[nargs++] = "i386";
+	    }
+	}
+#endif
 
 #ifdef LINUXAOUT
         arglist[nargs++] = "-b";
@@ -872,9 +904,6 @@ passflag:		    mkobject = YES;
 #ifdef LINUXPPC
 	arglist[nargs++] = "-DLINUXPPC";
 #endif
-#ifdef SUSE
-	arglist[nargs++] = "-DSUSE";
-#endif
 	arglist[nargs++] = "-DPOSIX";
 	arglist[nargs++] = "-DSYSV";
 #endif
@@ -885,6 +914,15 @@ passflag:		    mkobject = YES;
 
 #ifdef MACOSX
 	arglist[nargs++] = "-DMACOSX";
+	if (useg95 == 0) {
+	    if ((irafarch = os_getenv("IRAFARCH"))) {
+	        arglist[nargs++] = "-arch";
+	        if (strcmp (irafarch, "macosx") == 0) 
+	    	    arglist[nargs++] = "ppc";
+	        else if (strcmp (irafarch, "macintel") == 0) 
+	    	    arglist[nargs++] = "i386";
+	    }
+	}
 #endif
 
 #ifdef SOLARIS
@@ -951,18 +989,28 @@ passflag:		    mkobject = YES;
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
+#ifdef MACOSX
+	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
+	    arglist[nargs++] = "-arch";
+	    if (strcmp (irafarch, "macosx") == 0) 
+	    	arglist[nargs++] = "ppc";
+	    else if (strcmp (irafarch, "macintel") == 0) 
+	    	arglist[nargs++] = "i386";
+	}
+#endif
+
 #ifdef SOLARIS
 	arglist[nargs++] = "-Wl,-t";
 #endif
 #ifdef LINUX
 	arglist[nargs++] = "-Wl,--defsym,mem_=0";
 #endif
-#ifdef SUSE
+#ifdef NEED_GCC_SPECS
 	{   char gcc_specs[SZ_PATHNAME];
 	    static char cmd[SZ_CMDBUF];
 
 	    if (os_sysfile ("gcc-specs", gcc_specs, SZ_PATHNAME) < 0)
-		arglist[nargs++] = "/iraf/iraf/unix/bin.suse/gcc-specs";
+		arglist[nargs++] = "/iraf/iraf/unix/bin/gcc-specs";
 	    sprintf (cmd, "-specs=%s", gcc_specs);
 	    arglist[nargs++] = cmd;
 	}

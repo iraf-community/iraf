@@ -74,7 +74,7 @@ real	median, mean, sigma, sum
 pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl, ptr
 
 real	asumr(), amedr(), plt_iformatr()
-int	clgeti(), clgcur(), ctoi(), ctor(), ggeti(), imtlen()
+int	clgeti(), clgcur(), ctoi(), ctor(), ggeti(), imtlen(), imaccess()
 pointer	gopen(), immap(), mw_openim(), mw_sctran(), sl_getstr()
 pointer	imtopenp(), imtrgetim()
 errchk	mw_sctran
@@ -83,6 +83,8 @@ define	line_ 91
 define	col_ 92
 define	replotline_ 93
 define	replotcol_ 94
+define	nextim_ 95
+define	quit_ 96
 string	bell "\007"
 string	again "again:"
 
@@ -129,7 +131,16 @@ begin
 	    iferr {
 		im = NULL; mw = NULL; sl = NULL
 
-		ptr = immap (image, READ_ONLY, 0); im = ptr
+		if (imaccess (image, READ_ONLY) == YES) {
+		    ptr = immap (image, READ_ONLY, 0); 
+		    im = ptr
+	   
+		} else {
+		    call eprintf ("Error opening image '%s'")
+			call pargstr (image)
+		    goto nextim_
+		}
+
 		ptr = mw_openim (im); mw = ptr
 		call mw_seti (mw, MW_USEAXMAP, NO)
 
@@ -180,7 +191,7 @@ begin
 		while (clgcur ("coords", x, y, wcs, key, command, SZ_FNAME) !=
 		    EOF) {
 		    if (key == 'q')
-			break
+quit_			break
 
 		    switch (key) {
 		    case 'a':
@@ -326,7 +337,7 @@ replotline_
 			    else
 				next
 			} else if (key == 'n') {
-			    if (index < nim)
+nextim_		    	if (index < nim)
 				index = index + 1
 			    else
 				next

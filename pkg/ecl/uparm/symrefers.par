@@ -1,0 +1,5 @@
+topic,s,a,"print",,,"topic to find help for"
+quickref,f,h,"uparm$quick.ref",,,"quick-reference file"
+updquick,b,h,no,,,"update quick-reference file"
+usequick,b,h,no,,,"use quick-reference file"
+mode,s,h,"ql",,,

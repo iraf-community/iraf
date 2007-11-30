@@ -340,9 +340,17 @@ begin
 	p2 = (NP2(sh1) - a) / b
 	p3 = (IM_LEN(out,1) - a) / b
 	nw = nint (min (max (p1 ,p3), max (p1, p2))) + NP1(sh1) - 1
-	if (p1 != p2)
-	    dw = (wb - w1) / (p2 - p1) * (1 + z)
-	w1 = w1 * (1 + z) - (p1 - 1) * dw
+	if (dtype == DCLOG) {
+	    if (p1 != p2)
+		dw = (log10(wb*(1+z)) - log10(w1*(1+z))) / (p2 - p1)
+	    w1 = log10 (w1*(1+z)) - (p1 - 1) * dw
+	    w1 = 10. ** w1
+	    dw = (w1 * 10D0 ** ((nw-1)*dw) - w1) / (nw - 1)
+	} else {
+	    if (p1 != p2)
+		dw = (wb - w1) / (p2 - p1) * (1 + z)
+	    w1 = w1 * (1 + z) - (p1 - 1) * dw
+	}
 
 	# Note that this may change the smw pointer.
 	call smw_swattrs (smw2, LINDEX(sh2,1), 1, AP(sh2), beam, dtype,

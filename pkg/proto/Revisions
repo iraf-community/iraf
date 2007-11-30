@@ -1,6 +1,15 @@
 .help revisions Jun88 proto
 .nf
 
+t_imext.x
+    Removed supporting procedures which are now in the xtools library
+    in the file xtextns.
+    (3/20/07, Valdes)
+
+=====
+V2.13
+=====
+
 ========
 V2.12.2a
 ========

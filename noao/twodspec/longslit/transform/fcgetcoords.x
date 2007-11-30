@@ -110,6 +110,7 @@ begin
 		    ltm[1,2] = 0.
 		    call mw_sltermr (mw, ltm, ltv, i)
 		}
+		call mw_seti (mw, MW_USEAXMAP, YES)
 		ct = mw_sctran (mw, "physical", "logical", 1)
 
 		# Allocate memory for the feature information and read

@@ -7927,3 +7927,172 @@ BUG:	When the combine option is sum and weighting is selected an exception
 	the scale the result to the equivalent of a sum.
 
 STATUS:	Fixed for V2.12.3.
+
+NUMBER:	553
+MODULE:	splot
+SYSTEM:	-V2.12.3
+DATE:	Tue May 16 11:08:14 MST 2006
+FROM:	valdes
+
+BUG:	If SPLOT is run more than once without flushing the process (flpr)
+	then the default aperture will be that from the last execution.
+	The consequence is that use of an image section to select an
+	aperture in a multiaperture file may not display the intended
+	spectrum.  The workaround is to use the command "flpr" before
+	using an image section.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	554
+MODULE:	dopcor
+SYSTEM:	V2.13
+DATE:	Tue May 23 16:11:05 MST 2006
+FROM:	valdes
+
+BUG:	The verbose output only prints information based for the last
+	spectrum in a multispec file.  When a single correction is being
+	applied to all apertures this is correct but when different
+	corrections are being generated for different apertures, say when
+	adding a correction to apertures which had different initial
+	corrections applied this can be concerning.  The actual corrections
+	are being applied correctly for each aperture but the verbose output
+	may be misleading.  There is no workaround though it is not a data
+	calibration error just a logging error.
+
+STATUS:	To be fixed in a future release though no fix has yet been implemented.
+
+NUMBER:	555
+MODULE:	longslit.fitcoords
+SYSTEM:	V2.13-Beta[12]
+DATE:	Wed Jun 14 10:41:50 MST 2006
+FROM:	valdes
+
+BUG:	If the fitting axis is 2 (the identify/reidentify features are defined
+	by cuts along the second axis) the y coordinate for the 2D fitting
+	will be wrong.  You will notice this if data are plotted with one
+	axis being the y coordinate.  The other way you would notice this
+	is that the transformation won't correctly remove the distortions
+	and make a correct wavelength solution.
+
+	The only workaround is to transpose the data early before doing
+	the feature identification and tracing.  Note that you must then
+	also reset the physical WCS after the transpose with the command
+	"wcsreset <images> wcs=physical".
+
+STATUS:	Fixed for the next V2.13 release.
+
+NUMBER:	556
+MODULE:	splot, sarith, scombine, standard
+SYSTEM:	-V2.13Beta
+DATE:	Fri Oct 27 09:33:16 MST 2006
+FROM:	valdes
+
+BUG:	When matching one spectrum to another, the reference spectrum,
+	for some operation (e.g. arithmetic, combining, standard star
+	calibration) the first spectrum is converted to its natural
+	WCS units.  If the reference spectrum is in different units
+	the result will be wrong.  This is rare but a particular case
+	is when SPLOT displays a spectrum in some units, possibly set
+	by the display units in the header or by the task parameter,
+	and then a binary arithmetic operation is performed using a
+	second spectrum.  Even if the second spectrum has the same
+	display units it may be resampled to match the reference
+	spectrum in the wrong units.  The code solution is to always
+	resample in the current units of the reference spectrum.
+
+	The workaround for the SPLOT example is to use the ":units"
+	command to put the initial spectrum into the natural units
+	of the second spectrum.  After the arithmetic you can changes
+	the units back if desired.
+
+STATUS:	Fixed for a future release.
+
+NUMBER:	557
+MODULE:	splot
+SYSTEM:	-V2.13beta
+DATE:	Mon Dec  4 15:29:44 MST 2006
+FROM:	valdes
+
+BUG:	When the dispersion function for a spectrum is log sampled,
+	e.g. DC-FLAG=1, and there is also a logical/physical pixel offset,
+	i.e. LTV1 is not zero, then writing out a new spectrum with the
+	'i' key the results in a wrong WCS.  There is no workaround.
+
+STATUS:	Fixed for a future release.
+
+NUMBER:	558
+MODULE:	mscimage
+SYSTEM:	all release up to date
+DATE:	Fri Mar 30 11:04:18 MST 2007
+FROM:	valdes
+
+BUG:	MSCIMAGE defines the resampled output world coordinate system
+	(WCS) using a reference image WCS.  If this reference image
+	has a ZPN projection an error will occur.  This is because when
+	the output WCS is set the ZPN projection is inherited from the
+	reference image but MSCIMAGE does correctly setup the output ZPN
+	projection from the reference image.  So one must use a reference
+	image with another projection such as TAN.
+
+	What is confusing is that wcssource="parameters" implies that
+	the output WCS is entirely defined by the task parameters.
+	This is true for everything but the WCS projection type which is
+	taken from the input image.  There is no parameter to set the
+	projection explicitly and the MSCIMAGE script would need to be
+	edited to access the projection parameter in the underlying call
+	to a hidden task MSCWTEMPLATE.	MSCIMAGE automatically changes
+	input projections of "tnx" and "zpx" (distorted projections) to
+	"tan" since the point of MSCIMAGE is to resample to a simpler
+	undistorted WCS.  A change will be made to also do this for "zpn".
+
+	The workarounds when the input data uses ZPN are to use a reference
+	image that doesn't have a ZPN WCS or edit mscsrc$mscimage.cl
+	to change projection="" to projection="tan" in the call to
+	MSCWTEMPLATE.  The code change to MSCWTEMPLATE could also be
+	made and the MSCRED package recompiled but this is a more complex
+	process and users should contact iraf.net for help.
+
+	The recommendation for users with the most recent version of IRAF
+	is to use the task imcoords.mkcwcs to create a reference WCS.
+	This task creates a dataless image with the desired WCS.  It is
+	basically like defining the WCS using the MSCIMAGE parameters
+	except you have control over the projection and the tangent
+	position.  The only thing that is less obvious is that you must
+	set a reference pixel.	When building a mosaic you might set this
+	to be roughly in the middle of the field.  For instance if the
+	final image will be roughly 4Kx4K you might choose a reference
+	pixel at (2100,2100).
+
+	If you don't have MKCWCS you can call MSCWTEMPLATE directly to do
+	the same thing.  Leave the input and reference image parameters
+	empty, set wcssource="parameters" and fill in the parameters
+	including the projection as "tan".  This will leave the reference
+	pixel at (0,0) so you would use HEDIT to set CRPIX1 and CRPIX2
+	to the desired point.  Alternatively, you could make a list of
+	all the extensions in the input and specify that as the input
+	in MSCWTEMPLATE.  This then does exactly what mscimage would do
+	put give you access to the projection parameter.  In other words
+	making the reference image manually this way is equivalent to
+	editing the mscimage.cl script.
+
+
+STATUS:	Future releases of MSCRED will convert input ZPN WCS to TAN WCS
+	automatically.
+
+NUMBER:	559
+MODULE:	longslit.transform
+SYSTEM:	-V2.12.3
+DATE:	Tue Aug  7 10:39:13 MST 2007
+FROM:	valdes
+
+BUG:	When using log resampling (xlog=yes or ylog=yes) it is possible to
+	get a segmentation error.  This is caused by taking the log and
+	anti-log of coordinates and not getting back exactly the same value
+	due to real precision problems.  This process caused an attempt to
+	go outside the valid range of the interpolator.  This may be a
+	rare problem but if it does happen one may be able to use the
+	x1, x2, y1, y2 values to work around the problem.  The workaround
+	for a future release is to use double precision and to impose
+	range limits on data passed to the interpolator.
+
+STATUS:	Fixed for the next release.
