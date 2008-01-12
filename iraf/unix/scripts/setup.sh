@@ -110,6 +110,13 @@ set_mach () {
     VENDOR="`echo $ARG_MACH | sed -e 's/^.*-//'`"
     #
   fi
+
+  if [ "$ARCHITECTURE" = "x86_64" ]; then
+    #DATA_MODEL="lp64"
+    DATA_MODEL="ilp64"
+  else
+    DATA_MODEL="ilp32"
+  fi
   
   MACH="${ARCHITECTURE}-${OPERATING_SYSTEM}-${VENDOR}"
 }
@@ -120,12 +127,12 @@ set_config () {
 
   # mach.h, iraf.h settings
 
-  if [ "$ARCHITECTURE" = "x86_64" ]; then
-    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.x86_64.h mach.h )
-    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.x86_64.h iraf.h )
+  if [ -f ${hconfig}iraf.${DATA_MODEL}.h ]; then
+    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${DATA_MODEL}.h iraf.h )
+    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${DATA_MODEL}.h mach.h )
   else
-    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.default.h mach.h )
-    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.default.h iraf.h )
+    echo "[ERROR] No such data model: ${DATA_MODEL}"
+    exit 1
   fi
 
   # mkpkg.inc settings
@@ -248,6 +255,7 @@ DESTDIR=$5
 ARCHITECTURE=""
 OPERATING_SYSTEM=""
 VENDOR=""
+DATA_MODEL=""
 
 if [ "$USER" = "" ]; then
     USER=`whoami`
@@ -257,7 +265,7 @@ fi
 
 set_mach "$ARG_MACH"
 
-export ARCHITECTURE OPERATING_SYSTEM VENDOR
+export ARCHITECTURE OPERATING_SYSTEM VENDOR DATA_MODEL
 
 #echo debug: $ARCHITECTURE :: $OPERATING_SYSTEM :: $VENDOR
 #echo debug: $MACH
@@ -279,6 +287,7 @@ case "$COMMAND" in
   echo "Architecture : $ARCHITECTURE"
   echo "OS           : $OPERATING_SYSTEM"
   echo "Vendor       : $VENDOR"
+  echo "Data Model   : $DATA_MODEL"
   sleep 2
   #
   #mkdir -p iraf/unix/bin
