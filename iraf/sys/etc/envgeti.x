@@ -24,3 +24,27 @@ begin
 
 	call syserrs (SYS_ENVNNUM, varname)
 end
+
+# ENVGETL -- Fetch an environment variable and try to interpret its value
+# as an integer.  Abort if variable is not found or cannot be converted to
+# a number.
+
+long procedure envgetl (varname)
+
+char	varname[ARB]
+
+int	ip
+long	lval
+char	val[MAX_DIGITS]
+long	ctol()
+int	envfind()
+errchk	envfind, syserrs
+
+begin
+	ip = 1
+	if (envfind (varname, val, MAX_DIGITS) > 0)
+	    if (ctol (val, ip, lval) > 0)
+		return (lval)
+
+	call syserrs (SYS_ENVNNUM, varname)
+end
