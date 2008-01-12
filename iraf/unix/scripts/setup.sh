@@ -165,26 +165,26 @@ set_config () {
 \$set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
 \$set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 
-\$special "sys\$osb/":		aclrb.c		host\$as.$MACH/aclrb.c
-				bytmov.c	host\$as.$MACH/bytmov.c
+\$special "sys\$osb/":		aclrb.c		host\$c.default/aclrb.c
+				bytmov.c	host\$c.default/bytmov.c
 				ieeer.x		host\$as.$MACH/ieeer.x
 				ieeed.x		host\$as.$MACH/ieeed.x
 				;
 
-\$special "sys\$vops/ak/":	aclrc.x		host\$as.$MACH/aclrc.c
-				aclrs.x		host\$as.$MACH/aclrs.c
-				aclri.x		host\$as.$MACH/aclri.c
-				aclrl.x		host\$as.$MACH/aclrl.c
-				aclrr.x		host\$as.$MACH/aclrr.c
-				aclrd.x		host\$as.$MACH/aclrd.c
+\$special "sys\$vops/ak/":	aclrc.x		host\$c.default/aclrc.c
+				aclrs.x		host\$c.default/aclrs.c
+				aclri.x		host\$c.default/aclri.c
+				aclrl.x		host\$c.default/aclrl.c
+				aclrr.x		host\$c.default/aclrr.c
+				aclrd.x		host\$c.default/aclrd.c
 				;
 
-\$special "sys\$vops/lz/":	amovc.x		host\$as.$MACH/amovc.c
-				amovs.x		host\$as.$MACH/amovs.c
-				amovi.x		host\$as.$MACH/amovi.c
-				amovl.x		host\$as.$MACH/amovl.c
-				amovr.x		host\$as.$MACH/amovr.c
-				amovd.x		host\$as.$MACH/amovd.c
+\$special "sys\$vops/lz/":	amovc.x		host\$c.default/amovc.c
+				amovs.x		host\$c.default/amovs.c
+				amovi.x		host\$c.default/amovi.c
+				amovl.x		host\$c.default/amovl.c
+				amovr.x		host\$c.default/amovr.c
+				amovd.x		host\$c.default/amovd.c
 				;
 
 \$set	XBIG	= '& "\$xc -c -w -/Nx512 -/Ns3072 &"'
