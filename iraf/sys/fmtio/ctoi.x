@@ -29,9 +29,16 @@ begin
 		    return (5)
 		}
 
-	neg = (str[ip] == '-')
-	if (neg)
-	    ip = ip + 1
+#	neg = (str[ip] == '-')
+#	if (neg)
+#	    ip = ip + 1
+	neg = false
+	if (IS_DIGIT (str[ip+1]))
+	    if (str[ip] == '-') {
+		neg = true
+		ip = ip + 1
+	    } else if (str[ip] == '+')
+		ip = ip + 1
 
 	sum = 0
 	while (IS_DIGIT (str[ip])) {

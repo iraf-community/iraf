@@ -7,7 +7,7 @@ include	<mach.h>
 include	<fset.h>
 include	<fio.h>
 
-# FSETI -- Set File I/O options.  FSETI is not intended to be called
+# FSETL -- Set File I/O options.  FSETL is not intended to be called
 # routinely by user code.  To provide maximum flexibility, any FIO parameter
 # can be changed, and no checking is performed.  Hence, the file buffer size,
 # device, device channel, and so on can be changed during i/o to a file,
@@ -17,15 +17,15 @@ include	<fio.h>
 # F_FLUSHNL (flush output at end of every line of text), and occasionally
 # F_ADVICE (sequential or random).
 
-procedure fseti (fd, param, value)
+procedure fsetl (fd, param, lvalue)
 
 int	fd			# file in question
 int	param			# parameter to be set
-int	value			# value of parameter
+long	lvalue			# value of parameter
 
 pointer	bp, ffp
 long	file_offset
-int	i, junk, outfd, flags
+int	i, junk, outfd, flags, value
 bool	blocked_file, setraw, ndelay
 char	set_redraw[LEN_SETREDRAW]
 char	rawcmd[LEN_RAWCMD+1]
@@ -38,6 +38,8 @@ begin
 	if (fd <= 0 || ffp == NULL)
 	    iferr (call syserr (SYS_FILENOTOPEN))
 		call erract (EA_FATAL)
+
+	value = lvalue
 
 	switch (param) {
 
@@ -64,7 +66,7 @@ begin
 
 	case F_BLKSIZE:
 	    # Set the device block size in chars.
-	    FBLKSIZE(ffp) = value
+	    FBLKSIZE(ffp) = lvalue
 
 	case F_BUFPTR, F_BUFSIZE:
 	    # An externally created buffer can be installed by setting F_BUFPTR
@@ -73,7 +75,7 @@ begin
 	    # even after doing i/o on a file. In both cases, the current file
 	    # offset will be retained.
 
-	    if (param == F_BUFSIZE && FBUFSIZE(ffp) == value)
+	    if (param == F_BUFSIZE && FBUFSIZE(ffp) == lvalue)
 		return
 	    else if (bufptr[fd] != NULL) {
 		call flush (fd)
@@ -81,12 +83,12 @@ begin
 	    }
 
 	    if (param == F_BUFSIZE) {
-		FBUFSIZE(ffp) = value
+		FBUFSIZE(ffp) = lvalue
 		if (buftop[fd] == NULL && bufptr[fd] != NULL)
-		    buftop[fd] = bufptr[fd] + value
+		    buftop[fd] = bufptr[fd] + lvalue
 	    } else {
 		file_offset = LNOTE (fd)
-		bufptr[fd] = value
+		bufptr[fd] = lvalue
 		boffset[fd] = NULL
 		LSEEK (fd, file_offset)
 		if (buftop[fd] == NULL && FBUFSIZE(ffp) != NULL)
@@ -95,7 +97,7 @@ begin
 
 	case F_BUFTOP:
 	    # Set a pointer to the top of a buffer (first char after buffer).
-	    buftop[fd] = value
+	    buftop[fd] = lvalue
 	    if (FBUFSIZE(ffp) == NULL && bufptr[fd] != NULL)
 		FBUFSIZE(ffp) = buftop[fd] - bufptr[fd]
 
@@ -105,7 +107,7 @@ begin
 	    # the kernel level, preventing FIO from keeping track of the file
 	    # size.
 
-	    FILSIZE(ffp) = value
+	    FILSIZE(ffp) = lvalue
 
 	case F_FIRSTBUFOFF:
 	    # FIO divides a random access binary file up into a series of
@@ -117,7 +119,7 @@ begin
 
 	    call flush (fd)
 	    call frmbfs (fd)
-	    FIRSTBUFOFF(ffp) = value
+	    FIRSTBUFOFF(ffp) = lvalue
 
 	case F_BUFTYPE:
 	    # Use file-local buffers or the global pool.
@@ -151,11 +153,11 @@ begin
 	    } else
 		boffset[fd] = 1		# causes rewind to set iop=bp
 
-	    FILSTAT(ffp) = value
+	    FILSTAT(ffp) = lvalue
 
 	case F_CHANNEL:
 	    # Kernel i/o channel number.
-	    FCHAN(ffp) = value
+	    FCHAN(ffp) = lvalue
 
 	case F_CLOBBER:
 	    # Allow NEW_FILE files to overwrite old files of the same name.
@@ -198,7 +200,7 @@ begin
 	    # driver for a file.
 
 	    for (i=1;  i < next_dev;  i=i+LEN_DTE)
-		if (value == zdev[i]) {
+		if (lvalue == zdev[i]) {
 		    FDEV(ffp) = i
 		    return
 		}
@@ -252,7 +254,7 @@ begin
 	case F_PBBSIZE:
 	    # Set the push-back buffer size for a file.
 	    if (FPBBUF(ffp) == NULL)
-		FPBBUFSIZE(ffp) = value
+		FPBBUFSIZE(ffp) = lvalue
 
 	case F_TYPE:
 	    # Set the file type (text, binary, etc).
@@ -369,8 +371,8 @@ begin
 	    # in the next call to FILBUF.  This must be the only case for
 	    # which FNCHARS can take on a negative value.
 
-	    FNCHARS(ffp) = -value
-	    FNBYTES(ffp) = value * SZB_CHAR
+	    FNCHARS(ffp) = -lvalue
+	    FNBYTES(ffp) = lvalue * SZB_CHAR
 	    FILSTAT(ffp) = OK
 
 	default:
@@ -380,6 +382,21 @@ begin
 	}
 end
 
+# FSETI -- Set File I/O options.
+
+procedure fseti (fd, param, value)
+
+int	fd			# file in question
+int	param			# parameter to be set
+int	value			# value of parameter
+
+long	lvalue
+
+begin
+	lvalue = value
+
+	call fsetl(fd, param, lvalue)
+end
 
 # FSET_ENV -- Set the value of a boolean environment variable used for file
 # control.  A set environment call affects all programs in the current process
