@@ -1,0 +1,35 @@
+.help cqsetcat Mar00 "Catquery Package"
+.ih
+NAME
+cqsetcat -- set the current catalog / survey by name
+.ih
+SYNOPSIS
+
+catno = cq_setcat (cq, catname)
+
+.nf
+pointer	cq		# the configuration file descriptor
+char	catname		# the name of the catalog to be set
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls catname
+The name of the catalog / survey to be set.
+.le
+.ih
+DESCRIPTION
+Cq_setcat sets the current catalog. Cq_setcat is an integer function
+which returns the sequence number of the requested catalog / survey as
+its function value. Zero is returned if the requested catalog / survey
+cannot be set.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before any catalog or survey query can
+be made.
+.ih
+SEE ALSO
+cqlocate, cqlocaten, cqsetcatn
+.endhelp

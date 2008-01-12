@@ -1,0 +1,376 @@
+GILIB
+
+	The GILIB (Group File Library) was implemented to improve the 
+handling of GEIS files with more than one group. Performance has been
+measured between opening each group using 'immap' and using 'giopengr'
+to be 25 times faster when using the latter (on a VAX 8600 or 8800).
+
+	An example on how an application might read a multigroup file
+is as follows:
+
+	im = immap ("my_geis.hhh",READ_ONLY, 0)
+	# 
+	# Get the number of groups in the image
+	#
+	ngroups = gi_gstfval (im, "GCOUNT")
+
+	# Now loop through the groups
+	#
+
+	do ng = 1, ngroups {
+
+	   # Open next group of the multigroup file
+	   #
+
+	   call gi_opengr (im, gn, datamin, datamax, 0)
+
+	   # Filter the data
+	   #
+	   call myfilter(..)
+
+	}
+	
+	#Finish
+	#
+	call imunmap(im)
+
+
+
+	The main idea of the gilib is to have at the application level the
+STF structure defined in imio/iki/stf interface; the program ask directly
+what is the value of a particular stf structure member without using the 
+imio/db utilities.
+
+	A summary of the present GILIB is as follows:
+
+
+
+===========================================================================
+gi_addpar.x/
+
+# GI_ADDPAR -- Add a parameter in FITS format and add it to the FITS format
+# IMIO user area; initialize the entry for the parameter in the GPB descriptor
+# as well.
+
+procedure gi_addpar (im, pname, dtype, plen, pval, pcomm)
+
+pointer	im			#I image descriptor
+char	pname[ARB]		#I parameter name
+int	dtype			#I SPP datatype of parameter
+int	plen			#I length (> 1 if array)
+char	pval[ARB]		#I string encoded initial parameter value
+char	pcomm[ARB]		#I string comment to the new parameter
+
+===========================================================================
+gi_delpar.x/
+
+# GI_DELPAR -- delete a group parameter from the STF structure. Also delete
+#              the entry from the IMIO user area.
+#	       WARNING: Deleting a TY_SHORT parameter might cause a 
+#		        memory alignment abort. (bus error more likely)
+
+procedure gi_delpar (im, pname)
+
+pointer	im			#I image descriptor
+char	pname[ARB]		#I parameter name
+
+
+===========================================================================
+gi_cpdgpb.x/
+
+
+# GI_CPDGPB -- Procedure to copy the IM_USERAREA from the input image 
+#             given its descriptor 'im', to the output area in 'om'.
+#	      It copies all the keywords except the gpb ones;
+#	      the output image is open mode NEW_IMAGE, so it has a 
+#	      default set of keyword for the gpb.
+
+
+procedure gi_cpdgpb (im, om)
+
+pointer im	# input image descriptor
+pointer om	# output image descriptor
+
+
+===========================================================================
+gi_crgpb.x/
+
+# GI_CRGPB  -- Procedure to extract values from table columns
+# convert them to binary values into character buffer; this buffer will
+# eventually be written to the end of the data portion as a gpb.
+# No provision is made to detect undefined values in the character
+# string.
+
+procedure gi_crgpb (im, buf, tbcol, group)
+
+pointer im
+char	buf[BIGN]	# i: input string buffer
+int	tbcol[BIGN]	# i: table column starting positions.
+int	group		# i: current group number
+
+===========================================================================
+gi_gcomm.x/
+
+define  MAXP	32000
+# GI_GCOMM -- Procedure to get comment from table user parameters
+# store in the array 'buf', which has keyword and a text after the
+# 9 character position.
+
+procedure gi_gcomm (im, npar, buf)
+
+pointer	im		# Image descriptor
+int	npar		# Number of parameters in buffer
+char    buf[FITS_RECLEN,MAXP]	# Has the table user parameters.
+
+
+===========================================================================
+gi_giind.x/
+
+# GI_GIIND -- Find the index of a group parameter keyword
+#
+# This procedure returns the index of a keyword in the group parameter block.
+# If the keyword is not a group parameter, the procedure returns zero.
+#
+# B.Simon	24-Apr-90	Original
+
+int procedure gi_giind (im, keyword)
+
+pointer im		# i: Image descriptor
+char	keyword[ARB] 	# i: Group parameter keyword name
+
+
+===========================================================================
+gi_ggpv.x/
+
+# GI_GGPV -- Procedure to get a group parameter value on a
+# string buffer.
+
+procedure gi_ggpv (im, pn, buff)
+
+pointer im		# image descriptor
+int	pn		# group parameter number 
+char	buff[SZ_LINE] 	# Buffer with the gpv in string form
+
+
+===========================================================================
+gi_gstfval.x/
+
+# GI_GSTFVAL -- Get an stf descriptor value
+
+int procedure gi_gstfval (im, what)
+
+pointer	im	# image descriptor
+char	what[SZ_DATATYPE]
+
+===========================================================================
+gi_pstfval.x/
+
+# GI_PSTFVAL -- Change the value of an stf descriptor
+
+procedure gi_pstfval (im, what, value)
+
+pointer	im	# image descriptor
+char	what[SZ_DATATYPE]
+int	value
+
+
+===========================================================================
+gi_mgtoxdim.x
+
+# GI_MGTOXDIM -- Convert a multigroup image to one group image.  Use sequential
+# routines to permit copying images of any dimension.  Perform pixel i/o in 
+# the datatype of the image, to avoid unnecessary type conversion.
+
+procedure gi_mgtoxdim (image1, image2, verbose)
+
+char	image1[SZ_FNAME]		# Input image
+char	image2[SZ_FNAME]		# Output image
+bool	verbose
+
+
+===========================================================================
+gi_pdes.x/
+
+define  SZ_KEYWORD  8
+# GI_PDES -- Procedure to setup the stf parameter descriptor PDES
+# with parameter name, datatype and parameter number.
+
+procedure gi_pdes (im, pname, dtype, plen, pno)
+
+pointer	im		# Image descriptor
+char    pname[SZ_KEYWORD]	# Parameter name
+int	dtype		# Parameter value datatype
+int	plen		# value len
+int	pno		# Parameter number.
+
+
+===========================================================================
+gi_realloc.x/
+
+# GI_REALLOC -- Procedure to reallocate space to keep the necessary
+# stf parameter descrptor in memory.
+
+procedure gi_realloc (im)
+
+pointer	im		# Image descriptor
+
+
+===========================================================================
+gi_reset.x/
+
+# GI_RESET -- Procedure to reset some of the STF descriptor values
+# to be able to create an multigroup image with a gpb but not
+# writing the latter until all the pixels are in first.
+
+procedure gi_reset (im)
+
+pointer im	# Image descriptor
+
+
+===========================================================================
+gi_rgpbi3e.x/
+
+# GI_RGPB_I3E -- A take from stf_rgpb to read gpb values from an image
+# residing in a remote UNIX node. Each value is read and converted to vms
+# floating point representation or to vms integer.
+# Nelson Zarate Aug 1989
+# Read the group data block into the first few cards of the user
+# area of the IMIO image header.  The GPB is stored as a binary data structure
+# in the STF pixfile.  The values of the standard GPB parameters DATAMIN and
+# DATAMAX are returned as output arguments.
+#
+
+procedure gi_rgpb_i3e (pfd, im, datamin, datamax)
+
+int	pfd			# Pixel file descriptor
+pointer	im			# IMIO image descriptor
+real	datamin, datamax	# min,max pixel values from GPB
+
+
+===========================================================================
+gi_rheader.x/
+
+# GI_RHEADER -- Read the STF format image header for a single group into the
+# IMIO descriptor.  The standard fields are processed into the fields of the
+# descriptor.  The GPB binary parameters are encoded as FITS cards and placed
+# in the IMIO user area, followed by all extra cards in the FITS format STF
+# group header.  Note that no distinction is made between the common FITS
+# keywords and the GPB group parameters at the IMIO level and above.
+
+procedure gi_rheader (fd, im)
+
+int	fd		# input file descriptor
+pointer	im		# image descriptor
+
+
+===========================================================================
+gi_update.x/
+
+# GI_UPDATE -- Procedure to update the STF descriptor before writing the
+# user area to the image header.
+
+procedure gi_update (im)
+
+pointer im
+
+
+===========================================================================
+gi_wgpbi3e.x/
+
+# GI_WGPB_I3E -- A take from stf_wgpb to write the gpb values into
+# a pixel file in ieee floating point format for the input
+# vms floating point number or to UNIX integer order for the input
+# vms integer numbers.
+# Nelson Zarate Aug. 1989
+# STF_WGPB -- Write the group parameter block data back into the pixel file.
+# The GPB is described by a structure member list in the STF descriptor.
+# The values of the GPB parameters are encoded as FITS cards in the user
+# area of the IMIO descriptor.
+#
+
+procedure gi_wgpb_i3e (im, fd, group)
+
+pointer	im			# IMIO image descriptor
+pointer fd			# output file descriptor
+int	group			# group to be accessed
+
+
+===========================================================================
+gixdimtomg.x
+
+# GI_XDIMTOMG -- Convert an image with an extra dimension for the groups and an 
+# attach table with gpb values, into a true sdas/geis multigroup file.
+
+procedure gi_xdimtomg (image1, image2, verbose)
+
+char	image1[SZ_FNAME]		# Input image
+char	image2[SZ_FNAME]		# Output image
+bool	verbose
+
+
+===========================================================================
+giopen_table.x/
+
+# GIOPN_TABLE -- Procedure to open a table and define the columns
+# with the group parameter information from the input geis image
+# descriptor. 
+
+procedure giopn_table (tname, im, tp, colptr)
+
+char	tname[SZ_FNAME]		# i: Table name
+pointer	im			# i: image descriptor (stf format)
+pointer	tp			# o: Table descriptor
+int	colptr[ARB]			# o: pointer to each column
+
+
+===========================================================================
+giopengr.x/
+
+# GIOPENGR --  Procedure to skip onto the next group of a geis image
+#	       already open. The group parameter block information
+#	       is in memory for the previous group and it will be
+#	       necessary only to write the gpb to the image (if the
+#	       access mode is other than READ_ONLY) pixel file.
+#	       If access is NEW_IMAGE we need to skip only after 
+#	       the gpb has been written back to the file.
+
+procedure gi_opengr (im, gn, datamin, datamax, imt)
+
+pointer	im		# i: image descriptor
+int	gn		# i: group number to skip to
+real	datamin		# i,o: image minimun value
+real	datamax		# i,o: image maximum value
+pointer imt		# i: image template descriptor (NEW_COPY only)
+
+
+===========================================================================
+gird_gpb.x/
+
+# GIRD_GPB -- Procedure to read gpb values from the input table columns.
+# The resulting values then replace those in the imuserarea for the 
+# current group number
+
+
+procedure gird_gpb (tp, gn, im)
+
+pointer	tp		# i: table descriptor
+int	gn		# i: group number, or table line number
+pointer	im		# i: output image descriptor
+
+
+===========================================================================
+gistf_setup.x/
+
+# GISTFDES_SETUP -- Procedure to setup the stf group parameter
+# descriptors from the table column information.
+
+procedure gistfdes_setup (tp, stf, im)
+
+pointer	tp			# i: Input table descriptor
+pointer	stf			# i: STF descriptor
+pointer im			# i: image descriptor
+
+==============================
+gi.h/    
+	This include file should be a copy of the actual stf.h file
+	in imio/iki/stf

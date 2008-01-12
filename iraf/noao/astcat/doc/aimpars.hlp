@@ -1,0 +1,141 @@
+.help aimpars Mar00 astcat
+.ih
+NAME
+aimpars -- Edit the standard image header keyword set
+.ih
+USAGE
+aimpars
+.ih
+PARAMETERS
+.ls observat = "OBSERVAT"
+The image header keyword defining the observatory at which the data
+was taken or the name of the observatory. If the observatory is defined then
+the keyword "OBSERVAT" is written to the image header if it does not
+already exist. 
+.le
+.ls esitelng = "INDEF", esitelat = "INDEF"
+The image header keywords defining the longitude and latitude of the
+observatory in degrees or the longitude and latitude values in degrees.
+If the longitude and latitude are defined the keywords "ESITELNG" and
+"ESITELAT" are written to the image header if they do not already exist.
+.le
+.ls esitealt = "INDEF"
+The image header keyword defining the altitude of the observatory in meters
+or the altitude itself in meters. If the altitude is defined the keyword
+"ESITEALT" is written to the image header if it does not already exist.
+.le
+.ls esitetz = "INDEF"
+The image header keyword defining the timezone of the observatory 
+in hours from the Greenwich meridian or the timezone value 
+in hours from the Greenwich meridian. Positive values correspond to time
+zones west of the meridian. If the time zone is defined the keyword
+"ESITETZ" is written to the image header if it does not already exist.
+.le
+.ls emjdobs = "MJD-OBS"
+The image header keyword defining the effective MJD of the observation
+or the MJD. MJD-OBS normally defines the time of the beginning
+of the observation. Users may wish to change this value to represent
+the MJD at mid-exposure.  If the effective MJD is defined the keyword
+"EMJDOBS" is written to the image header if it does not already exist.
+.le
+.ls edatamin = "INDEF", edatamax = "INDEF"
+The image header keywords defining the minimum and maximum good data
+limits in ADU or the minimum and maximum good data values in ADU.
+If these limits are defined the keywords "EDATAMIN" and "EDATAMAX" 
+are written to the image header if they do not already exist.
+.le
+.ls egain = "GAIN", erdnoise = "RDNOISE"
+The image header keywords defining the effective gain in electrons per ADU 
+and readout noise in electrons or the gain and readout noise values in 
+electrons per ADU and electrons. If the gain and readout noise are defined
+the keywords "EGAIN" and "ERDNOISE" are written to the image header if they do
+not already exist.
+.le
+.ls ewavlen = "INDEF"
+The image header keyword defining the effective wavelength in microns or
+the effective wavelength value in microns. If the effective wavelength is
+defined the keyword "EWAVLEN" is written to the image header if it does
+not already exist.
+.le
+.ls etemp = "INDEF"
+The image header keyword defining the effective temperature in degrees
+or the effective temperature values in degrees. If the effective wavelength
+is defined the keyword "ETEMP" is written to the image header it does
+not already exist.
+.le
+.ls epress = "INDEF"
+The image header keyword defining the effective pressure in millibars or
+the effective pressure values in millibars. If the effective pressure is
+defined the keyword "EPRESS" is written to the image header if it does
+not already exist.
+.le
+
+.ih
+DESCRIPTION
+
+The standard image parameter set is used to encode quantities in the image
+headers that may be required by the astrometric analysis tasks. The current
+parameter set divides into two parameter groups: parameters
+concerned with locating stars in an image and computing accurate pixel
+coordinates and instrumental magnitudes \fIedatamin\fR, \fIedatamax\fR,
+\fIegain\fR, and \fIerdnoise\fR, and parameters required to transform
+from mean to observed place \fIobservat\fR, \fIesiteng\fR,
+\fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR, \fIewavlen\fR,
+\fIetem\fR, \fIepress\fR. The latter group of parameter is required for
+astrometric analyses carried out in observed place rather than
+mean place.
+
+If the quantity defined by the aimpars parameter is defined, i.e. the
+parameter value is an image header keyword which defines a valid value,
+or the parameter value is itself a valid value, then a keyword 
+with the same name as the parameter name is inserted into the image
+header, if one with that name does not already exist.
+
+.ih
+EXAMPLES
+
+1. List the default image header parameters.
+
+.nf
+cl> lpar aimpars
+.fi
+
+2. Edit the default image header parameters.
+
+.nf
+cl> aimpars
+... edit the parameters in the usual way
+... type :wq to quit and save the edits
+.fi
+
+3. Edit the default image header parameters from the agetim task.
+
+.nf
+cl> epar agetim
+... edit the agetim parameters
+... move to the agetim parameter line and type :e
+... edit the aimpars parameters
+... type :wq to quit and save the aimpars edits
+... continue editing the remaining aimpars parameters
+... type :go to execute the task
+.fi
+
+4. Save the current awcspars parameter values in a text file called
+aimhdr1.par.  Use the saved parameter set in the next call to the agetim
+task.
+
+.nf
+cl> epar aimpars
+... edit some parameters in the usual way
+... type :w aimhdr1.par
+... type :q to quit
+cl> agetim ... aimpars=aimhdr1.par ...
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+agetim
+.endhelp

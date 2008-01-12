@@ -1,0 +1,19 @@
+# APMASK
+
+input,s,a,,,,List of input images
+output,s,a,,,,List of output masks
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,List of reference images
+
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,no,,,Recenter apertures?
+resize,b,h,no,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,Fit the traced points interactively?
+mask,b,h,yes,,,"Create mask images?
+"
+line,i,h,INDEF,1,,Starting dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum or median
+buffer,r,h,0.,,,Buffer distance from apertures

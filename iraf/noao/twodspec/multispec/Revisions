@@ -1,0 +1,28 @@
+.help revisions Jun88 noao.twodspec.multispec
+.nf
+The multispec package is no longer compiled and defined.  The source code
+will someday be revised and the capabilities of tracing and deblending
+will be returned.  (8/23/90, Valdes)
+
+====
+V2.9
+====
+
+noao$twodspec/multispec/t_fitgauss5.x
+    Valdes, Oct. 3, 1986
+    1.  Missing third argument to msmap.  Found in the AOS port.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+From Valdes Oct. 23, 1985:
+
+1.  Recoded msio.x and dbio.x to remove entry statements and instead use
+separate procedures with a common block.
+------
+From Valdes Oct. 11, 1985:
+
+1.  The MSPLOT script using PLOT.GRAPH has been removed and an interactive
+task based on GIO has replaced it.
+.endhelp

@@ -1,0 +1,36 @@
+.help imdelk Sep86 imfort
+.ih
+NAME
+imdelk -- delete a header keyword
+.ih
+SYNOPSIS
+.nf
+subroutine imdelk (im, keyw, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of keyword to be deleted
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimdelk\fR procedure is used to delete a user defined image header
+keyword, e.g., a keyword previously created with \fIimaddk\fR or with one
+of the \fIimakw\fR procedures.
+.ih
+RETURN VALUE
+A zero status is returned if the named keyword existed, was a user defined
+keyword (rather an a protected system keyword), and was successfully deleted.
+
+.nf
+SYS_IDBNODEL:	cannot delete image header keyword
+SYS_IDBDELNXKW:	attempt to delete a nonexistent image header keyword
+.fi
+.ih
+NOTES
+It is not an error to delete a keyword from the header of an image opened for
+read-only access, but an error status will be returned at \fIimclos\fR or
+\fIimflsh\fR time since the header cannot be updated on disk.
+.ih
+SEE ALSO
+imaddk, imakw, imacck
+.endhelp

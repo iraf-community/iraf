@@ -1,0 +1,21 @@
+# FITSKY
+
+image,f,a,,,,"The input image(s)"
+coords,f,h,"",,,"The input coordinate list(s) (default: image.coo.?)"
+output,f,h,"default",,,"The output sky file(s) (default: image.sky.?)"
+plotfile,f,h,"",,,"The output metacode plot file"
+datapars,pset,h,"",,,"Data dependent parameters"
+fitskypars,pset,h,"",,,"Sky fitting parameters"
+interactive,b,h,yes,,,"Interactive mode ?"
+radplots,b,h,no,,,"Plot radial profiles in interactive mode ?"
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the input image pixels in memory ?"
+verify,b,h,)_.verify,,,"Verify critical parameters in non-interactive mode ?"
+update,b,h,)_.update,,,"Update critical parameters in non-interactive mode ?"
+verbose,b,h,)_.verbose,,,"Print messages in non-interactive mode ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
+mode,s,h,'ql'

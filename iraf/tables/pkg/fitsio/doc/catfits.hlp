@@ -1,0 +1,144 @@
+.help catfits Aug93 tables.fitsio
+.ih
+NAME
+catfits -- Produce a catalog of a FITS tape.
+.ih
+USAGE
+catfits input file_list
+.ih
+DESCRIPTION
+This task quickly catalogs a FITS tape or a group of FITS disk files.
+It reads only the header portion of each file, skipping the data.  An
+optional parameter allows the user to print the full FITS header rather
+than a single line per file. For FITS files with extensions, you can specify
+an extension number to get a listing of that one item.
+.ih
+PARAMETERS
+.ls input = "mta" [file name template or device specification]
+The FITS data source.  This is either a template describing a list of
+disk files, or a tape file specification of the form "mt*[n]", where
+"mt" indicates a magnetic tape device, "*" represents a density, and
+"[n]" is the tape file number (or range of numbers) to be read. If the
+tape file number is specified, then only that file is converted.  If
+the general tape device name is given, e.g., "mta" or "mtb800", then
+the files specified by the 'file_list' parameter will be read from the
+tape.
+.le
+.ls file_list [file name template]
+The files to be read from a tape.  This string consists of any
+sequence of file numbers separated by at least one comma or dash.  A
+comma separates individual files, whereas a dash specifies a range of
+files.  For example the string "1,2,3-5,8-6" will convert files 1
+through 8.
+.le
+.ls (long_header = no) [boolean]
+Print the full FITS header on the standard output?
+.le
+.ls (short_header = yes) [boolean]
+Print only a short header?  Lists files processed, their dimensions,
+size of data type and scaling parameter on the standard output.
+
+The keywords below represent the standard single line of information
+per processed file. You can change this by suplying a filename to the
+parameter 'format_file'. If you want a log file, you can supply a file
+name to the parameter 'log_file'. Up to 80 characters per line are
+sent to the display terminal.
+
+The following information will be listed in short headers by default.
+The first column is a name of an image header keyword or a special name
+the program will process to give you the requested column information.
+
+.nf
+
+	FITSNAME   Input FITS name (Disk filename or tape
+		   file number). (10 character)
+	FILENAME   Original image file, if present.(16 characters)
+	BITPIX	   Bits per pixels of the input data and 
+		   the original datatype. (I,R,D,U,S) 
+	DIMENS     Input FITS file dimensionality.
+	BZERO	   Zero offset
+	BSCALE	   Scale factor
+	EXT#	   Extension number
+
+
+Notes: (I,R,D,U,S) refer to Integer, Real, Double, Unsigned and Short
+       input data types, respectively. If the 'ieee' parameter is set, 
+       a minus (-) sign appears between the letter and the bits figure.
+
+.fi
+'DIMENS' is the number of dimensions in the output FITS file; the  
+format is "NxNxN" If the input file is a table, this keyword indicates
+the number of columns (Fields) and the number of rows in the table
+with the suffix F and R (e.g., 27Fx12R).
+.le
+.ls (format_file = '') [file name]
+If you want to define your own output format--still limited to one line per
+file--you can create an ASCII text file with some of the special
+keywords, in addition to your own image header keyword that you want
+to see in the display terminal or in the log file.
+
+The format of the 'format' file is as follow. One column with the
+keywords and a second with the field width and position of the
+values within the columns. The column format is similar to the
+Fortran print formatted statement.
+
+The following special keywords are available:
+
+.nf
+FITSNAME    -10.10	# (string) The output FITS name or file number.
+FILENAME    -16.16	# (string) The input file name.
+BITPIX	    -5.5	# (string) Bit per pixels and (I,U,R,D,S). 
+DIMENS	    -10.10	# (string) Output FITS file dimensionality.
+DATATYPE    -8.8	# (string) Input file data type.
+BZERO	    -12.6g	# (float)  Scale offset value.
+BSCALE	    -12.6g	# (float)  Scale value.			
+.fi
+
+In addition to these specials keywords, you can add your own that match
+the ones in the input FITS header.
+.le
+.ls (log_file = '') [file name]
+Name of the output log file, if you want one created.  A log file is
+created only when the short_header parameter is selected.  The output
+is the same as 'short_header', but can have up to 132 characters per
+line.
+.le
+.ih
+EXAMPLES
+1. Catalog a set of FITS files on tape at 1600 bpi with short 
+(i.e., one line per file) output.
+.nf
+
+	fi> catfits mtb1600 1-999
+.fi
+
+2. Catalog a list of FITS files whose root is 'fits' with long output.
+.nf
+
+	fi> catfits fits* long+
+
+.fi
+3. Catalog a FITS tape with you own format file; also create a log
+file with up to 132 columns of information. Notice that the format
+file resides in the working directory and the log file will be created
+there as well.
+.nf
+
+	fi> catfits mta 1-999 format="myform.cat" log="fitstape.log"
+.fi
+4. Catalog a FITS file with the extension number. This assumes that
+the file in the 'format' paramater has the entry 'EXT#'.
+.nf
+
+	fi> catfits yfile.fits[3]
+
+.fi
+will list the 2nd extension (The main FITS unit is [1]).
+.ih
+BUGS The 'NX' and 'NY' fields are 4 characters wide. A "*" character
+will be printed if the value in either field is greater than 9999. Use
+long headers in this case.
+.ih
+SEE ALSO
+strfits, stwfits, mtexamine
+.endhelp

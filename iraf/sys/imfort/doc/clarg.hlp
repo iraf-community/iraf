@@ -1,0 +1,42 @@
+.help clarg Sep86 imfort
+.ih
+NAME
+clarg -- fetch and decode the value of a command line argument
+.ih
+SYNOPSIS
+.nf
+subroutine clargc (argno, cval, ier)
+subroutine clargi (argno, ival, ier)
+subroutine clargr (argno, rval, ier)
+subroutine clargd (argno, dval, ier)
+
+integer		argno		#I index of argument to be decoded
+integer		ier		#O status return
+
+character*(*)	cval		#O string value of argument
+integer		ival		#O integer value of argument
+real		rval		#O real value of argument
+doubleprecision	dval		#O double value of argument
+.fi
+.ih
+DESCRIPTION
+The four \fIclarg\fR procedures are used to fetch and decode the value of
+the indexed command line argument; the first argument is number one.
+Any argument may be returned as a string with \fIclargc\fR.
+Numeric arguments are decoded using the IRAF formatted i/o primitives,
+hence octal constants (`B' suffix), hex constants (`X' suffix),
+and sexagesimal numbers are all legal as input.
+.ih
+RETURN VALUE
+A status of zero indicates that the indexed argument was present on the
+command line and could be decoded in the manner specified.
+
+.nf
+IE_GCMDLN:	cannot read command line string
+IE_NEXARG:	nonexistent command line argument referenced
+IE_NONNUMARG:	command line argument cannot be decoded as a number
+.fi
+.ih
+SEE ALSO
+clnarg, clrawc
+.endhelp

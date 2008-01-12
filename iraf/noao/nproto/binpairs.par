@@ -1,0 +1,8 @@
+# BINPAIRS -- Bin data points by log separation
+
+file1,f,a,,,,"File containing (x,y) points to be paired"
+file2,f,a,,,,"File containing (x,y) points to be paired"
+rmin,r,a,,,,Minimum separation for bins
+rmax,r,a,,,,Maximum separation for bins
+nbins,i,a,,,,Number of separation bins
+verbose,b,h,no,,,Print progress information?

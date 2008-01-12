@@ -1,0 +1,36 @@
+# Parameters for reidentify task.
+
+reference,s,a,,,,Reference image
+images,s,a,,,,Images to be reidentified
+interactive,s,h,"no","no|yes|NO|YES",,Interactive fitting?
+section,s,h,"middle line",,,Section to apply to two dimensional images
+newaps,b,h,yes,,,Reidentify apertures in images not in reference?
+override,b,h,no,,,Override previous solutions?
+refit,b,h,yes,,,"Refit coordinate function?
+"
+trace,b,h,no,,,Trace reference image?
+step,s,h,"10",,,Step in lines/columns/bands for tracing an image
+nsum,s,h,"10",,,Number of lines/columns/bands to sum
+shift,s,h,"0.",,,Shift to add to reference features (INDEF to search)
+search,r,h,0.,,,Search radius
+nlost,i,h,0,0,,"Maximum number of features which may be lost
+"
+cradius,r,h,5.,,,Centering radius
+threshold,r,h,0.,0.,,Feature threshold for centering
+addfeatures,b,h,no,,,Add features from a line list?
+coordlist,f,h,linelists$idhenear.dat,,,User coordinate list
+match,r,h,-3.,,,Coordinate list matching limit
+maxfeatures,i,h,50,,,Maximum number of features for automatic identification
+minsep,r,h,2.,0.,,"Minimum pixel separation
+"
+database,f,h,database,,,Database
+logfiles,s,h,"logfile",,,List of log files
+plotfile,s,h,"",,,Plot file for residuals
+verbose,b,h,no,,,Verbose output?
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,"Graphics cursor input
+"
+answer,s,q,"yes","no|yes|NO|YES",,Fit dispersion function interactively?
+crval,s,q,,,,"Approximate coordinate (at reference pixel)"
+cdelt,s,q,,,,"Approximate dispersion"
+aidpars,pset,h,,,,"Automatic identification algorithm parameters"

@@ -1,0 +1,47 @@
+.help cqlocaten Mar00 "Catquery Package"
+.ih
+NAME
+cqlocaten -- locate a catalog / survey record by number
+.ih
+SYNOPSIS
+
+catno = cq_locaten (cq, catno, catname, maxch)
+
+.nf
+pointer	cq		# the configuration file descriptor
+int catno		# the number of the catalog / survey to be located
+char	catname		# the name of the located catalog
+int	maxch		# the maximum size of the name of the located catalog
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls catno
+The sequence number of the catalog / survey record to be located.
+.le
+.ls catname
+The name of the located catalog.
+.le
+.ls maxch
+The maximum size of the name of the located catalog.
+.le
+.ih
+DESCRIPTION
+Cq_locaten locates a catalog / survey record in the configuration file by
+sequence number. Cq_locaten is an integer function which returns the catalog
+/ survey record sequence number as its function value. Zero is returned
+if the catalog record is not located. Cq_locaten also returns the name of the
+located catalog in the array catname.
+
+.ih
+NOTES
+Cq_locaten is used to determine whether the requested record exists. It does
+not set the current catalog / survey. This must be done with a call to
+cq_setcat or cq_setcatn.
+
+.ih
+SEE ALSO
+cqlocate, cqsetcat, cqsetcatn
+.endhelp

@@ -1,0 +1,85 @@
+IMDKERN -
+
+This directory contains the source for the simple GIO/IMD kernel, used to
+draw graphics in a display frame buffer.  It uses the data stream
+interface to open the frame buffer and uses code from SGI to rasterize
+the graphics.
+
+Special graphcap entries used by this kernel:
+
+	CI	Color index of graphics pixels
+	FN	Display frame buffer
+	LO	Width in pixels of line size 1.0
+	LS	Difference in pixels between line sizes
+	DB	Print debug messages?
+
+
+Revision notes...
+----------------
+IMDKERN notes		20 December 1989	Z. G. Levay, STScI
+
+
+  o Make private copy idskern of gio/sgikern.
+
+  o Change "sgi" filename and procedure prefixes to "imd" throughout
+    the code.  Change sgk.x to idk.x.  Changed imd_open to imd_fopen to
+    aviod conflict with a procedure in libds.  The files are:
+
+    font.com, font.h, idk.com, idk.h, idk.x, imd.com, imd.h,
+    imdcancel.x, imdclear.x, imdclose.x, imdclws.x, imdcolor.x,
+    imddrawch.x, imdescape.x, imdfa.x, imdfaset.x, imdflush.x,
+    imdfont.x, imdfopen.x, imdgcell.x, imdinit.x, imdipl.x,
+    imdkern.par, imdline.x, imdopenws.x, imdpcell.x, imdpl.x,
+    imdplset.x, imdpm.x, imdpmset.x, imdreset.x, imdtx.x, imdtxset.x,
+    ltype.dat, mkpkg, t_imdkern.x, x_imdkern.x,
+
+  o Modify mkpkg to build the task locally without updating the system
+    library or install the task.
+
+  o Add global parameters "frame" and "color" to task imdkern.
+    Modified imd_fopen to read task parameters and pass as arguments to
+    imd_openws.  Added these parameters to imd_openws and the call to
+    idk_open.
+
+  o In idk_open, added frame and color to the calling sequence.  Added
+    a call to imd_mapframe to open the frame buffer as an image,
+    changed setting the bitmap size to use the frame buffer size (via
+    IMIO) instead of graphcap parameters.  Set the bits per bitmap word
+    to 8.  Set the maximum bitmap size to 2048x2048 pixels.  Ripped out
+    the code for opening the SGI metacode file, DD string manipulation,
+    etc.  Added ttygeti calls to read the frame and color from the
+    graphcap in case they were passed as INDEF.
+
+    In idk_frame, changed the code to map an input and output section
+    of the frame buffer (via IMIO), read the bitmap line by line,
+    testing each word for any on bits, and writing the color index
+    value to the frame buffer pixel for each on bitmap bit.  Set the
+    I/O buffer sizes to 64 lines (somewhat arbitrarily).
+
+    In idk_open, Changed the code to compute the x and y max (right and
+    top edges) of the bitmap by one pixel to draw to the edge.  In
+    idk_linewidth, changed the code to compute the gap at the frame
+    edges by one pixel.
+
+    Removed sections of code dealing with non-bitmap format, rotated or
+    flipped bitmaps.
+
+
+----------------
+Installation and checkout.  (12/21/89 dct)
+
+Installed code in gio/imdkern.
+Put hooks for new task IMDKERN in the PLOT package.
+Moved imdkern.par to plot, moved frame,color params to after "generic".
+Deleted file imdipl.x, identical to imdpl.x.
+Renamed imdfopen.x to imdopen.x for consistency with other kernels;
+    changed procedure name to imd_opendev to avoid name collision with imdopen.
+Deleted idk.h, contains only SGI metecode defs not used in idk.x.
+In t_imdkern.x, moved the clgeti's for color,frame to after the clgeti for
+    "generic" (required by startup protocol for graphics subkernel).  For the
+    generic case, added initializers to set values to -1 to flag not set.
+    Got rid of the IS_INDEFs in idk.x.  Nothing wrong with these, I just try
+    to avoid using INDEF in low level system code.
+mkpkg - link xx_imdkern.e, not x_imdkern.e, rename in the install (this is
+    necessary to permit local testing of new versions, else the installed BIN
+    version is used).

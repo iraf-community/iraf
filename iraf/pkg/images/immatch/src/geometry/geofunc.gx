@@ -1,0 +1,250 @@
+include <math.h>
+include <math/gsurfit.h>
+
+$for (rd)
+
+# GEO_DROTMAG -- Adjust the coefficients  of the fit using the database file.
+
+procedure geo_drotmag$t (dt, rec, sx1, sy1, xmag, ymag, xrot, yrot)
+
+pointer	dt		#I pointer to the text database file
+int	rec		#I record number
+pointer	sx1, sy1	#I/O pointers to the x and y linear surfaces
+PIXEL	xmag, ymag	#I/O the x and y magnification
+PIXEL	xrot, yrot	#I/O the x and y axis rotation
+
+real	dtgetr()
+
+begin
+	if (IS_$INDEF$T(xmag))
+	    xmag = PIXEL (dtgetr (dt, rec, "xmag"))
+	if (IS_$INDEF$T(ymag))
+	    ymag = PIXEL (dtgetr (dt, rec, "ymag"))
+	if (IS_$INDEF$T(xrot))
+	    xrot = DEGTORAD (PIXEL(dtgetr (dt, rec, "xrotation")))
+	else
+	    xrot = DEGTORAD(xrot)
+	if (IS_$INDEF$T(yrot))
+	    yrot = DEGTORAD (PIXEL (dtgetr (dt, rec, "yrotation")))
+	else
+	    yrot = DEGTORAD(yrot)
+	call geo_rotmag$t (sx1, sy1, xmag, ymag, xrot, yrot)
+end
+
+
+# GEO_DXYSHIFT -- Adjust the fitted xy shift using the database file.
+
+procedure geo_dxyshift$t (dt, rec, sx1, sy1, xout, yout, xref, yref,
+	xshift, yshift)
+
+pointer	dt		#I pointer to the text file database
+int	rec		#I the database record
+pointer	sx1, sy1	#I/O pointers to the x and y linear surfaces
+PIXEL	xout, yout	#I the input coordinate system origin
+PIXEL	xref, yref	#I the reference coordinate system origin
+PIXEL	xshift, yshift	#I the origin shift in input coordinates
+
+$if (datatype == r)
+PIXEL	gsgetr(), gseval()
+$else
+PIXEL	dgsgetd(), dgseval()
+$endif
+
+begin
+$if (datatype == r)
+	if (IS_$INDEF$T(xref))
+	    xref = (gsgetr (sx1, GSXMIN) + gsgetr (sx1, GSXMAX)) / 2.0
+	if (IS_$INDEF$T(yref))
+	    yref = (gsgetr (sy1, GSYMIN) + gsgetr (sy1, GSYMAX)) / 2.0
+
+	if (IS_$INDEF$T(xout))
+	    xout = gseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yout))
+	    yout = gseval (sy1, xref, yref)
+
+	if (IS_$INDEF$T(xshift))
+	    xshift = xout - gseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yshift))
+	    yshift = yout - gseval (sy1, xref, yref)
+$else
+	if (IS_$INDEF$T(xref))
+	    xref = (dgsgetd (sx1, GSXMIN) + dgsgetd (sx1, GSXMAX)) / 2.0d0
+	if (IS_$INDEF$T(yref))
+	    yref = (dgsgetd (sy1, GSYMIN) + dgsgetd (sy1, GSYMAX)) / 2.0d0
+
+	if (IS_$INDEF$T(xout))
+	    xout = dgseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yout))
+	    yout = dgseval (sy1, xref, yref)
+
+	if (IS_$INDEF$T(xshift))
+	    xshift = xout - dgseval (sx1, xref, yref)
+	if (IS_$INDEF$T(yshift))
+	    yshift = yout - dgseval (sy1, xref, yref)
+$endif
+
+	call geo_xyshift$t (sx1, sy1, xshift, yshift)
+end
+
+
+# GEO_ROTMAG -- Edit the coefficients of the linear surface which determine
+# magnification and rotation.
+
+procedure geo_rotmag$t (sx1, sy1, xscale, yscale, xrotation, yrotation)
+
+pointer	sx1, sy1		#I/O pointers to the linear x and y surfaces
+PIXEL	xscale, yscale		#I the x and y scales
+PIXEL	xrotation,yrotation	#I the x and y axis  rotation angles in radians
+
+PIXEL	cosx, sinx, cosy, siny, xrange, yrange
+int	ncoeff
+pointer	sp, xcoeff, ycoeff
+$if (datatype == r)
+real	gsgetr()
+int	gsgeti()
+$else
+double	dgsgetd()
+int	dgsgeti()
+$endif
+
+begin
+	# Get the current solution.
+	call smark (sp)
+$if (datatype == r)
+	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
+$else
+	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
+$endif
+	call salloc (xcoeff, ncoeff, TY_PIXEL)
+	call salloc (ycoeff, ncoeff, TY_PIXEL)
+$if (datatype == r)
+	call gssave (sx1, Mem$t[xcoeff])
+	call gssave (sy1, Mem$t[ycoeff])
+$else
+	call dgssave (sx1, Mem$t[xcoeff])
+	call dgssave (sy1, Mem$t[ycoeff])
+$endif
+
+	# Define the scaling parameters.
+	cosx = cos (xrotation)
+	sinx = sin (xrotation)
+	cosy = cos (yrotation)
+	siny = sin (yrotation)
+
+	# Calculate coefficients.
+	Mem$t[xcoeff+GS_SAVECOEFF+1] =  xscale * cosx
+	Mem$t[xcoeff+GS_SAVECOEFF+2] =  yscale * siny
+	Mem$t[ycoeff+GS_SAVECOEFF+1] = -xscale * sinx
+	Mem$t[ycoeff+GS_SAVECOEFF+2] =  yscale * cosy
+
+	# Normalize coefficients for-non polynomial functions.
+$if (datatype == r)
+	if (gsgeti (sx1, GSTYPE) != GS_POLYNOMIAL) {
+	    xrange = gsget$t (sx1, GSXMAX) - gsget$t (sx1, GSXMIN)
+$else
+	if (dgsgeti (sx1, GSTYPE) != GS_POLYNOMIAL) {
+	    xrange = dgsget$t (sx1, GSXMAX) - dgsget$t (sx1, GSXMIN)
+$endif
+	    Mem$t[xcoeff+GS_SAVECOEFF+1] = Mem$t[xcoeff+GS_SAVECOEFF+1] *
+	        xrange / 2.d0
+	    Mem$t[xcoeff+GS_SAVECOEFF+2] = Mem$t[xcoeff+GS_SAVECOEFF+2] *
+	        yrange / 2.d0
+	}
+$if (datatype == r)
+	if (gsgeti (sy1, GSTYPE) != GS_POLYNOMIAL) {
+	    yrange = gsget$t (sy1, GSYMAX) - gsget$t (sy1, GSYMIN)
+$else
+	if (dgsgeti (sy1, GSTYPE) != GS_POLYNOMIAL) {
+	    yrange = dgsget$t (sy1, GSYMAX) - dgsget$t (sy1, GSYMIN)
+$endif
+	    Mem$t[ycoeff+GS_SAVECOEFF+1] = Mem$t[ycoeff+GS_SAVECOEFF+1] *
+	        xrange / 2.d0
+	    Mem$t[ycoeff+GS_SAVECOEFF+2] = Mem$t[ycoeff+GS_SAVECOEFF+2] *
+	        yrange / 2.d0
+	}
+
+$if (datatype == r)
+	# Free the original fit.
+	call gsfree (sx1)
+	call gsfree (sy1)
+
+	# Restore the edited fit.
+	call gsrestore (sx1, Mem$t[xcoeff])
+	call gsrestore (sy1, Mem$t[ycoeff])
+$else
+	# Free the original fit.
+	call dgsfree (sx1)
+	call dgsfree (sy1)
+
+	# Restore the edited fit.
+	call dgsrestore (sx1, Mem$t[xcoeff])
+	call dgsrestore (sy1, Mem$t[ycoeff])
+$endif
+
+	call sfree (sp)
+end
+
+
+# GEO_XYSHIFT -- Shift the linear part of the fit in x and y.
+
+procedure geo_xyshift$t (sx1, sy1, xshift, yshift)
+
+pointer	sx1, sy1		#I pointers to linear x and y surfaces
+PIXEL	xshift, yshift		#I the input x and y shifts
+
+int	ncoeff
+pointer	sp, xcoeff, ycoeff
+$if (datatype == r)
+int	gsgeti()
+$else
+int	dgsgeti()
+$endif
+
+begin
+	call smark (sp)
+
+	# Allocate working space.
+$if (datatype == r)
+	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
+$else
+	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
+$endif
+	call salloc (xcoeff, ncoeff, TY_PIXEL)
+	call salloc (ycoeff, ncoeff, TY_PIXEL)
+
+	# Get coefficients.
+$if (datatype == r)
+	call gssave (sx1, Mem$t[xcoeff])
+	call gssave (sy1, Mem$t[ycoeff])
+$else
+	call dgssave (sx1, Mem$t[xcoeff])
+	call dgssave (sy1, Mem$t[ycoeff])
+$endif
+
+	# Shift the coefficients.
+	Mem$t[xcoeff+GS_SAVECOEFF] = Mem$t[xcoeff+GS_SAVECOEFF] + xshift
+	Mem$t[ycoeff+GS_SAVECOEFF] = Mem$t[ycoeff+GS_SAVECOEFF] + yshift
+
+$if (datatype == r)
+	# Free original fit.
+	call gsfree (sx1)
+	call gsfree (sy1)
+
+	# Restore fit.
+	call gsrestore (sx1, Mem$t[xcoeff])
+	call gsrestore (sy1, Mem$t[ycoeff])
+$else
+	# Free original fit.
+	call dgsfree (sx1)
+	call dgsfree (sy1)
+
+	# Restore fit.
+	call dgsrestore (sx1, Mem$t[xcoeff])
+	call dgsrestore (sy1, Mem$t[ycoeff])
+$endif
+
+	call sfree (sp)
+end
+
+
+$endfor

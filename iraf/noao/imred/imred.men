@@ -1,0 +1,17 @@
+ 	  argus - CTIO ARGUS reduction package
+	   bias - General bias subtraction tools
+	 crutil - Tasks for detecting and removing cosmic rays
+	 ccdred - Generic CCD reductions
+       ctioslit - CTIO spectrophotometric reduction package
+	   dtoi - Density to Intensity reductions for photographic plates
+	echelle - Echelle spectral reductions (slit and FOE)
+        generic - Generic image reductions tools
+ 	  hydra - KPNO HYDRA (and NESSIE) reduction package
+	   iids - KPNO IIDS spectral reductions
+	  irred - KPNO IR camera reductions
+	    irs - KPNO IRS spectral reductions
+      kpnocoude - KPNO coude reduction package (slit and 3 fiber)
+       kpnoslit - KPNO low/moderate dispersion slits (Goldcam, RCspec, Whitecam)
+	quadred - CCD reductions for QUAD amplifier data
+        specred - Generic slit and fiber spectral reduction package
+	   vtel - NSO Solar vacuum telescope image reductions

@@ -1,0 +1,45 @@
+.help cqstatt Mar00 "Catquery Package"
+.ih
+NAME
+cqstatt -- get a catalog / survey text parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+nlines = cq_statt (cq, parameter, text, maxch)
+
+.nf
+pointer	cq		# the configuration file descriptor
+int	parameter	# the parameter to be returned
+char	text		# the returned text parameter value
+int	maxch		# the maximum size of the returned text parameter
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration catalog / survey file descriptor.
+.le
+.ls parameter
+The parameter to be returned.  The text parameters defined in cq.h are:
+.nf
+define	CQRECLIST	# the catalog configuration file record list
+.fi
+.le
+.ls text
+The returned text parameter value. Text parameters differ
+from string parameters only in that they may contain embedded newline
+characters.
+.le
+.ls maxch
+The maximum size in characters of the returned text.
+.le
+.ih
+DESCRIPTION
+Cq_statt returns the requested catalog / survey text parameters.
+Cq_statt is an integer function which returns the numbers of lines in the
+requested parameter value as its function value.
+
+.ih
+SEE ALSO
+cq_stati, cq_stats
+.endhelp

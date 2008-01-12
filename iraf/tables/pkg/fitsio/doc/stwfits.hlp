@@ -1,0 +1,408 @@
+.help stwfits Nov2001 tables.fitsio
+.ih
+NAME
+stwfits -- Convert image, table and ascii files to FITS files
+.ih
+USAGE
+stwfits iraf_files fits_files
+.ih
+DESCRIPTION
+The 'stwfits' task will accept multigroup GEIS images, STSDAS tables, 
+trailer and ascii files as input and will convert them to standard FITS format,
+writing them out to either tape or disk.  The output can be either a single 
+FITS file with an added dimension for the extra groups and a FITS table 
+with the group parameter block, or it can be a series of FITS files, each 
+representing a single group from the original GEIS image or it can be a main
+FITS unit and a series of IMAGE FITS extensions followed by a TABLE or 
+BINTABLE extension.  
+
+By default, this task writes single or double precision floating 
+point pixels value in the corresponding IEEE format, which 
+preserves (or nearly preserves) the precision of the original data. 
+
+A trailer file is an ASCII file having a fixed record length of up to
+132 characters per row.  Stwfits converts trailer and other ASCII files
+into FITS tables with a single column that is 132 characters wide.
+Stwfits identifies ascii files by their filename extensions.
+Trailer files have the extension 'trl',
+and other ASCII files have one of the extensions
+'txt', 'log', 'ocx', 'pdq', 'pod', 'cmh', 'trx', 'rpt', 'cgr', 'dgr',
+'dta', or 'poa'.
+
+Options are available to write either the full FITS header or just a
+short description to the standard output.  The program can select an
+appropriate `bitpix' value based on the precision of the GEIS data.
+Two scaling options are available: one to automatically calculate the
+appropriate scaling factors, and the other to allow scaling factors to
+be entered directly.  The IEEE option is set with the `ieee' parameter.
+Scaling is not applied using this option.
+
+Short output can now be defined by the user by creating an ascii 
+file containing keywords and field widths.  The name of this format 
+file is then passed to the parameter `format_file'.  A log file can 
+also be created by providing an output file name to be parameter 
+`log_file' (up 132 characters per line).  Short output sent to the 
+screen is truncated to 80 characters.  For more details see 
+the parameters description below.
+
+If the parameter `gftoxdim=yes', then a GEIS file will be written 
+as one FITS file with an extra dimension added for the groups and 
+group parameter blocks will be stored in a separate table.  If the 
+parameter is set to "no" then there will be as many FITS files as 
+groups in the multigroup image.  See examples below.  
+
+If you want to create FITS files with IMAGE extension then the 
+input should have more than one image, and set the parameter 
+`extension=yes'.
+
+WARNING: the IRAF tasks `rfits' and `wfits' in the `dataio' 
+package are NOT designed to handle multi-group GEIS files or binary 
+tables.  Users should be aware that these IRAF FITS tasks may not 
+produce data structures that are compatible with certain STSDAS 
+tasks!  
+.ih
+NOTES ABOUT TABLES
+This task supports a new binary extension standard that is nearing 
+IAU approval.  The STSDAS tables will be written in the IEEE binary 
+standard using the FITS table extension. (Warning: at this time 
+`stwfits' can only write BINTABLE with one element per array 
+entry).
+.ih
+PARAMETERS
+.ls iraf_files [file name template]
+The GEIS file(s) that are to be converted.  This parameter may 
+be a single file name or a list of files, e.g., "file1", 
+file*.hhh", "ftable.tab", "ftable*.tab", "file.txt" or "@filelist". 
+If you want to write a table as a separate file, you will need to 
+specify the extension "tab" to differentiate it from an image file. 
+See the description of the `extensions' parameter for more details.
+.le
+.ls fits_files [file name template or magtape device]
+Destination for the output files.  This parameter takes either 
+an output file name template, a "@filelist", a directory name 
+or the name of a tape drive.  If a file name is passed to this 
+parameter the files will be written to disk.  If more than one 
+file is to be written to disk, the file number will be appended 
+to the value of this parameter; if an extension is given in the 
+filename then the file number is appended only to the root and 
+the extension added.  If a directory name is given, the output 
+FITS filename is the input filename and the extension "fit" added 
+to it; if the input extension is either "hhh" or "imh", these 
+will be replaced by "fit".  Files can be written to magnetic 
+tape by using a tape drive specification rather than a file name.  
+The tape drive specification takes the form "mt*[n]" where "mt" 
+indicates a tape device, "*" represents a density, and "[n]" is 
+a tape file number.  Tape output will be written beginning at the 
+specified file number, e.g., file 5 if `fits_files="mtb1600[5]"'. 
+Data in file 5 and succeeding files will be overwritten.  If no 
+tape file number is specified in `fits_files', the `newtape' 
+parameter can be set to "yes" and tape output  will be written 
+at the beginning of the tape.  If `newtape=no', then the output 
+will be appended to the tape after the last file.  To use the 
+tape you need to allocate it with the `allocate' command, for 
+example, "allocate mta".
+.le
+.ls (newtape) [boolean]
+Is this a new tape?  This parameter is requested only if no tape 
+file number is specified in `fits_files', e.g., `fits_files = "mtb1600"'.  Setting `newtape=yes' will cause files to be written 
+at the beginning of the tape.
+.le
+.ls (long_header = no) [boolean]
+Print the full FITS header on the standard output for each IRAF  
+image converted?
+.le
+.ls (short_header = yes) [boolean]
+Print only a short header?  Lists files processed, their 
+dimensions, size, data type, and scaling parameter on the 
+standard output.
+
+The keywords below represent the standard single line of 
+information per processed file.  You can change this by supplying 
+a filename to the parameter `format_file'.  If you want a log 
+file, you can supply a file name to the parameter `log_file'.  
+Up to 80 characters per line are sent to the display terminal.
+
+The following information will be listed in short headers by 
+default.  The first column is a name of an image header keyword 
+or a special name the program will process to give you the 
+requested column information.
+
+.nf
+	FITSNAME	Output FITS name (Disk filename or tape
+		        file number). (10 character)
+	FILENAME	Input image file  (16 character)
+	BITPIX		(I,R,D,U,S) and bits per pixels of the
+			input data.
+	DIMENS		Output FITS file dimensionality.
+	BZERO		Zero offset
+	BSCALE		Scale factor
+.fi
+
+Notes: (I,R,D,U,S) refer to Integer, Real, Double, Unsigned and 
+Short input data types, respectively.  If the `ieee=yes', a minus 
+(-) sign appears between the letter and the bits figure.  "DIMENS" 
+is the number of dimensions in the output FITS file; the format 
+is "NxNxNg" , where "g" indicates that the output FITS file 
+contains an extra dimension to account for the groups in a 
+multigroup STSDAS file.  This mode is used only when `gftoxdim=yes'. 
+If the input file is a table, this keyword indicates the number 
+of colunms and the number of rows in the table with the suffix 
+"C" and "R" (e.g., 27Cx12R).  
+.le
+.ls (format_file = "default") [file name]
+If you want to define your own output format -- still limited to 
+one line per file--you can create an ascii text file with some of 
+the special keywords, in addition to your own image header keyword 
+that you want to see in the display terminal or in the log file.  If
+you choose not to provide your own a 'default' format is used.
+
+The format of the format file is as follows.  One column with the 
+keywords and a second with the field width and position of the 
+values within the columns.  The column format is similar to the 
+Fortran "PRINT" formatted statement. 
+
+The following special keywords are available:
+
+.nf
+FITSNAME   -10.10	# (string) The output FITS name or file number.
+FILENAME   -16.16	# (string) The input file name.
+BITPIX	   -5.5		# (string) (I,U,R,D,S) and bit per pixels.
+DIMENS	   -10.10	# (string) Output FITS file dimensionality.
+DATATYPE   -8.8		# (string) Input file data type.
+BZERO	   -12.6g	# (float)  Scale offset value.
+BSCALE	   -12.6g	# (float)  Scale value.			
+.fi
+
+In addition to these specials keywords, you can add your own that 
+match the ones in the input image header. 
+.le
+.ls (log_file = "none") [file name]
+Name of the output log file, if you want one created.  The 
+output is the same as `short_header', but can have up to 132 
+characters per line.  The default value is "null" where no log
+file is created.
+
+.le
+.ls (bitpix = 0) [integer]
+A `bitpix' value of 8, 16, or 32 will produce an unsigned byte, 
+a twos-complement 16-bit integer, or a twos-complement 32-bit 
+integer FITS image, respectively.  If `bitpix' is set to any 
+other value, the program will choose  one of these three values 
+based on the precision of the IRAF image.  The default value of 
+zero will let the program choose the value from the input image 
+data type.
+.le
+.ls (extensions = no) [boolean]
+Append FITS extensions to the current output file?  Images, 
+tables or text files will be appended to the current output FITS 
+file with the exception of a multigroup geis image, creating a 
+new output FITS file.  This exception is necessary to allow for 
+easy recovery of the multigroup structure using `strfits'.
+.le
+.ls (binary_table = no) [boolean]
+Write the table value data for each column in binary IEEE 
+standard?  The resulting FITS file will have binary representation 
+for non-ASCII information.  This is the preferred method of writing 
+table data because each cell will occupy 4 bytes for most data 
+types.
+.le
+.ls (gftoxdim = no) [boolean]
+Write a GEIS file as a single FITS file with a table appended 
+to it?  The resulting FITS image will have an extra dimension to 
+account for the groups (if `gcount > 1') and the table will 
+contain the names and values of the group parameter block.  (See 
+the Examples below for more details.)
+.le
+.ls (ieee = yes) [boolean]
+Write the data in IEEE format?  The new FITS IEEE standard allows 
+you to write FITS data in IEEE floating point format.  Single and 
+double precision is supported.  The default is to use IEEE format.
+.le
+.ls (scale = yes) [boolean]
+Scale the image before writing output?  Two types of scaling are 
+available: user-defined scaling, or autoscaling.  The scaling 
+parameters `bscale' and `bzero' may be entered by the user (when 
+`autoscale = no'), or the program can calculate the appropriate 
+`bscale' and `bzero' factors (`autoscale = yes').  If `scale=no', 
+the IRAF image data is converted directly to integers of the 
+specified `bitpix' with possible loss of precision.
+.le
+.ls (autoscale = yes) [boolean]
+Calculate the `bscale' and `bzero' factors based on the IRAF 
+image data type and the maximum and minimum data values? 
+.le
+.ls (bscale = 1.0) [real]
+This is the FITS `bscale' parameter, which is defined as p = i * 
+bscale + bzero, where "p" and "i" are the physical and tape data 
+values respectively.  The `bscale' parameter is only requested if 
+`scale = yes' and `autoscale = no'. 
+.le
+.ls (bzero = 0.0) [real]
+This is the FITS "BZERO" keyword (see `bscale' definition, above). 
+This parameter is only requested if `scale = no' and `autoscale = 
+yes'.
+.le
+.ls (blocking_factor = 1) [integer]
+The tape blocking factor for FITS files.  Record lengths of 
+2,880-bytes are normally assumed.  If the blocking factor is 
+greater than 1 and less than or equal to 10, then records of 
+length blocking * 2,880-byte will be written to a single tape 
+record.  The FITS standard specifies that `blocking_factor' 
+must be less than or equal to 10.  If 'blocking_factor > 10' 
+then the program will interpret  this number as the actual tape 
+block size in bytes.  For example, if `blocking_factor = 1024' 
+then 1,024-byte records will be written to tape.  This is a very 
+dangerous option and has been included to accomodate users with 
+restricted block size devices such as Sun microcassettes.  A 
+warning message will be issued prior to execution if an illegal 
+block size is used.
+.le
+.ls (dadsfile = "null")
+Dadsclas and dadsdate are parameter for internal use at STScI.
+.le
+.ih
+EXAMPLES
+1. Write groups 2 and 5 from the input GEIS file to FITS files. 
+Notice that the tape drive "mta" should be allocated at this time 
+with the command "allocate mta". 
+
+.nf
+	cl> stwfits gfile.hhh[2],gfile.hhh[5]  mta
+.fi
+
+2. Convert a series of GEIS image files to FITS image files and 
+write them on a blank magnetic tape, allowing the program to 
+select the appropriate `bitpix' and scaling parameters.  Notice 
+that the parameter `gftoxdim=no'.  If any of the input files is a 
+multigroup GEIS file then there will be one FITS file per group. 
+
+.nf
+	cl> stwfits iraf_file*.hhh mtb1600[1] gftoxdim=no
+.fi
+
+3. Convert a GEIS image file to a 32-bits per pixel FITS file 
+with no scaling; append the file to a tape that already contains 
+data.
+
+.nf
+	cl> stwfits iraf_file mtb1600[EOT] bi=32 scal-
+.fi
+
+4. Convert a GEIS image to a 16-bit FITS specifying `bscale' and 
+`bzero'; write the FITS file "fits_file" to disk. 
+
+.nf
+	cl> stwfits iraf_file fits_file bi=16 au- bs=4.0 bz=0.0
+.fi
+
+5. Convert an IRAF pixel file 'iraf_file' to a 32-bits per pixel 
+FITS file and append to it (in the same file) the IRAF tables 
+"tab1.tab" and "uvb.tab".
+
+.nf
+	cl> stwfits iraf_file,tab1.tab,uvb.tab fits_file \ 
+	>>> bit=32 extensions=yes
+.fi
+
+6. Write diferent images in the same FITS file.
+
+.nf
+  cl> stwfits g1.hhh,g2.hhh,g4*.hhh bit=32 extensions=yes
+.fi
+
+7. Display a short header (default) and also keep a log in the 
+file "fits.log".
+
+.nf
+	cl> stwfits iraf_file*.hhh short+ log_file="fits_log"
+.fi
+
+8. Display a short header, keep the a log file and use a special 
+format file called "my_format"; also handle all multigroup (GEIS) files as FITS files with an extra dimension. 
+
+.nf
+	cl> stwfits ifi*.hhh log_file="fits_log" for="my_format"  gft+
+
+.fi
+9. Write a FITS tape with 14,400 bytes per record (5 2,880-byte 
+FITS records per tape block).
+
+.nf
+	cl> stwfits images*.hhh mtb[1] block=5
+.fi
+
+10. Write an ASCII files to FITS files.  The only disk file 
+extensions supported for ASCII files are "trl" and "txt".  The 
+maximun line length is up 132 characters.
+
+.nf
+	cl> stwfits asciif.trl,file2.txt mtb
+.fi
+
+11. Write all STSDAS files in your working directory to magnetic 
+tape, putting any multigroup file into an extra dimension and a 
+table.  The floating point images are in the IEEE standard.  
+
+.nf
+	cl> stwfits *.??h mtb 
+.fi
+
+12. Same as above, but this time with as many FITS files as the 
+number of groups in each STSDAS image.  Notice that the tape is on
+a remote machine.
+
+.nf
+	cl> stwfits *.??h rnode!mtb gftoxdim=no
+.fi
+
+13. Use of IMAGE, TABLE and BINTABLE FITS extensions.
+
+.nf
+  	cl> stwfits geis1.hhh,tab1.tab,file2.hhh,file3.hhh \
+	>>> myfits.fit extensions=yes gftoxdim=no
+.fi
+
+If file "geis1.hhh" has GCOUNT>1 it will create "myfits001.fit" 
+with as many IMAGE extensions as the value of GCOUNT, otherwise 
+no extension is present; "tab1.tab" is a table, "file2.hhh" and 
+"file3.hhh" are GEIS files with GCOUNT = 1.  Since `extensions=yes' 
+these last 3 input files will get converted into one FITS file, 
+"myfits002.fit", containing one "TABLE" and two "IMAGE" 
+extensions.
+
+14. Create FITS files with the same filenames as the input files. 
+The extension "fit" will the added to them.  Notice the directory
+specification for the output parameter.  See the `fits_files' 
+explanation above in the PARAMETER section. 
+
+.nf
+	cl> stwfits *.??h  suna!/usr/u1/usera/ 
+.fi
+
+15. Given the input files below, `stwfits' will create 
+"file1.c1h.fit", "goose.fit" and "ftera.fit".  Notice the local 
+working directory specification (".").  See the `fits_files' 
+explanation above in the PARAMETERS section. 
+
+.nf
+        cl> stwfits file1.c1h,goose.hhh,ftera.imh .
+.fi
+.ih
+BUGS
+Blank pixel values are not correctly handled.
+
+.ih
+SEE ALSO
+strfits, allocate, catfits, fits_exampl, geis
+
+Type "help fitsio opt=sys" for a general description of the 
+`fitsio' package.  
+.ih
+REFERENCES 
+This package has been developed by Nelson Zarate (STScI).  The standard
+to which FITSIO adheres is that described in the NOST document from
+the NASA/OSSA Office for Standards and Technology, GSFC, Greenbelt
+Maryland.  A copy of this document is available on node
+nssdca.gsfc.nasa.gov in the anonymous ftp account.
+
+.endhelp

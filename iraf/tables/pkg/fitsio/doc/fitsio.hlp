@@ -1,0 +1,182 @@
+.help fitsio Feb90 tables.fitsio
+.ih
+NAME
+fitsio -- Overview of the 'fitsio' package.
+.ih
+DESCRIPTION
+The 'fitsio' package is a set of tasks that convert files to 
+and from FITS format.
+.ih
+FITS CAPABILITIES IN STSDAS
+The programs under 'fitsio',namely 'stwfits' and 'strfits',handle GEIS
+files in a reasonable way while maintaining consistency with the FITS
+standard.
+
+The default group parameter block (GPB), which is located at the 
+end of each group in the data file, contains values for the 
+following keywords:
+
+.nf
+    DATAMIN    Minimum pixel value for group
+    DATAMAX    Maximum pixel value for group
+    CRPIXn     Pixel position for the 'n' axis
+    CRVALn     Transformation value for the 'n' axis
+               corresponding to the 'CRPIXn' pixel
+    CDmn       Matrix describing scale and orientation 
+               of the axis
+.fi
+
+These keywords names and the value they represent are described
+in the GEIS header file which, for each 
+parameter (i), contains the keywords 'PTYPEi', 'PDTYPEi', and 
+'PSIZEi'.  'PTYPEi' is the parameter name, 'PDTYPEi' is its 
+data type, and 'PSIZEi' is its size in bits.
+
+'stwfits' lets you create one FITS file from a GEIS 
+file, retaining the information in all the groups together 
+with the group parameter block.  In 'stwfits' there is a 
+parameter called 'gftoxdim' which, when set, converts the 
+multigroup file to a FITS file  that has an extra dimension 
+to account for the multiple groups and an appended table that 
+contains the group parameter block.
+
+It is also possible to produce a separate FITS file for every 
+group in the multigroup GEIS source file.  There is then no 
+appended table; instead, group information is contained in 
+the FITS header.  If you want a separate FITS file for every 
+group, then set the parameter 'gftoxdim = no'. (See examples.)
+
+Going the opposite way, 'strfits' can be used to convert a 
+FITS file to a multigroup GEIS file while retaining its group 
+structure. Set the parameter xdimtogf to "yes" to recreate
+the multigroup GEIS file.
+
+If the 'xdimtogf' parameter is set to "no" then from a FITS file
+that was created using the 'gftoxdim' flag to "yes",
+you will get 3 files on disk. A 
+single-group GEIS file with an extra dimension, the GEIS data file 
+and a STSDAS table containing the GPB.
+
+If you have a tape with one FITS file per group, you can reconstruct
+the multigroup file using the GEIS header file with the GPB
+description that you intend to include in your output GEIS file.  For
+example, if the original FITS files were created from a mutigroup HRS
+GEIS file, then you will probably want to have an HRS GEIS header file
+handy, so that you can use it to pass GPB information to 'strfits',
+this is done through the parameter 'template'.  If no header filename
+is given to 'template', then a default GPB will be created for the
+resulting GEIS file.
+
+The template file is a 
+GEIS header file containing the keywords 'PTYPEn', 'PDTYPEn', 
+and 'PSIZEn' for each group parameter, plus the keywords 
+'PCOUNT' and 'PSIZE'. The template is used by passing its file
+name to the 'template' parameter.
+Use a header file appropriate to your FITS
+data, i.e., if the FITS files contain WF/PC data, use a WF/PC
+header file.
+
+A summary of options offered by 'stwfits' and 'strfits' 
+follows.
+
+'stwfits':
+
+.nf
+    - Can write multigroup images in stack mode.
+    - Can write multigroup images as one FITS file 
+      per group.
+    - Can produce standard FITS tables from STSDAS
+      tables, with 'XTENSION', 'TABLE' and 'BINTABLE'.
+    - Can write FITS data in FITS IEEE standard.
+    - Can write a FITS file from an ASCII file.
+
+'strfits':
+
+    - Can read all FITS files produced by 'stwfits'.
+    - Can produced STSDAS images with a user-defined 
+      group parameter block.
+    - Can read FITS files with IUE data.
+.fi
+.ih
+SCALING DATA
+
+The original FITS standard calls for all floating and double data types
+to be converted to 32-bit integer data. Scaling is done by 'stwfits'
+by setting the parameter 'scale=yes', and is automatic when 
+'autoscale=yes',
+i.e., the values of 'bscale' and 'bzero' are determined by the program.
+Hence, there is an associated loss of precision when trying to
+recover the data from FITS files to disk images.
+The new FITS standard now uses the IEEE FITS standard where single and
+double precision data is stored in IEEE floating point format. No loss
+of precision occurred when using this facility. Set the 'ieee' parameter
+to 'yes' in the 'stwfits' task to write your data in this new standard.
+
+.ih
+WRITING MULTIGROUP IMAGES AS FITS FILES AND VICE VERSA
+
+1) Use 'stwfits' with the 'gftoxdim' parameter set to "yes" 
+and the output files directed to a remote Sun machine to create a 
+FITS file with an extra dimension to account for a multigroup 
+GEIS file with a table for the group parameter block 
+information. Be sure to use the 'ieee' parameter to preserve 
+the precision of floating point values. You can use a tape for
+output; the procedure is the same.
+
+For example, use the following command to tranfer all files 
+with extension '.c1h'.
+
+.nf
+  fi> stwfits *.c1h  sol!/sol/u1/user/root gftoxdim=yes ieee+
+.fi
+
+
+If you want to recreate the original multigroup
+file, you can perform the operation in one step with the following
+command:
+.nf
+
+  fi> strfits root*  iraf_file=groot  xdimtogf+ old+ 
+
+.fi
+
+2) Use 'strfits' to read the files and create a GEIS file 
+with an extra dimension and a table. If scaling was performed 
+in the FITS file then set the appropriate parameter to create 
+the GEIS file with a data type other than the FITS file 
+default.
+
+For example:
+.nf
+
+  fi> set imtype=hhh
+  fi> strfits root*  iraf_file=groot  old+  xdimtogf-
+
+.fi
+Notice than you want to set 'imtype=hhh' (for GEIS files)        
+and have the original name on the output files.
+
+With the command above you will end up with 3 files: the header, 
+the data, and the table containing the group parameter block. The 
+resulting GEIS file name will have a suffix '_cvt' appended to the
+root name letting you know the image have an extra dimension and
+that a table filename has been created with the same root name,
+with group parameter block information.
+
+3) Use 'strfits' to read 4 FITS files from tape and create 
+one GEIS image with 4 groups. Assume the FITS files contain
+WF/PC data. Use a template file with a GEIS WF/PC header file,
+e.g., 'twfpc.hhh'.
+
+.nf
+
+  fi> strfits mta 1-4  newpfc.hhh[1/4]  template='twfpc.hhh' xdimtogf-
+
+.fi
+You need to tell 'strfits' that the resulting GEIS file will
+have 4 groups and that you are starting with group 1. The 'xdimtogf'
+is set to "no" since you don't have a FITS file with an extra dimension.
+.ih
+SEE ALSO
+strfits, stwfits
+.endhelp 

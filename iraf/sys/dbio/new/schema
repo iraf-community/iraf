@@ -1,0 +1,307 @@
+1. Database Schema
+
+    A logical database consists of a standard set of system tables describing
+the database, plus any number of user data tables.  The system tables are the
+following:
+
+
+	syscat		System catalog.  Lists all base tables, views, groups,
+			and relations in the database.  The names of all tables,
+			relations, views, and groups must be distinct.  Note
+			that the catalog does not list the attributes composing
+			a particular base table, relation, view, or group.
+
+	REL_atl		Attribute list table.  Descriptor table for the table,
+			relation, view, or group REL.  Lists the attributes
+			comprising REL.  One such table is required for each
+			relation, view, or group defined in the database.
+
+	sysddt		Domain descriptor table.  Describes all user defined
+			domains used in the database.  Note that the scope of
+			a domain definition is the entire database, not one
+			relation.
+
+	sysidt		Index descriptor table.  Lists all of the indexes in
+			the database.
+
+	sysadt		Alias descriptor table.  Defines aliases for the names
+			of tables or attributes.
+
+
+In addition to the standard tables, a table is required for each relation,
+view, or group listing the attributes (fields) comprising the relation, view,
+or group.  A base table which is an instance of a named relation is described
+by the table defining the relation.  If a given base table has been altered
+since its creation, e.g., by the addition of new attributes, then a separate
+table is required listing the attributes of the altered base table.  In effect,
+a new relation type is automatically defined by the database system listing the
+attributes of the altered base table.
+
+Like the user tables, the system tables are themselves described by attribute
+list tables stored in the database.  The database system need only know the
+structure of an attribute list table to decipher the structure of the rest of
+the database.  A single access method can be used to access all database
+structures (excluding the indexes, which are probably not stored as tables).
+
+
+2. Storage Structures
+
+    A database is maintained in a single random access binary file.  This one
+file contains all user tables and indexes and all system tables.  A single
+file is used to minimize the number of file opens and disk accesses required
+to access a record from a "cold start", i.e., after process startup.  Use of
+a single file also simplifies bookeeping for the user, minimizes directory
+clutter, and aids in database backup and transport.  For clarity we shall
+refer to this database file as a "datafile".  A datafile is a DBIO format
+binary file with the extension ".db".
+
+What the user perceives as a database is one or more datafiles plus any
+logically associated non-database files.  While database tasks may
+simultaneously access several databases, access will be much more efficient
+when multiple records are accessed in a single datafile than when a single
+record is accessed in multiple datafiles.
+
+
+2.1 Database Design
+
+    When designing a database the user or applications programmer must consider
+the following issues:
+
+    [1]	The logical structure of the database must be defined, i.e., the
+	organization of the data into tables.  While in many cases this is
+	trivial, e.g., when there is only one type of table, in general this
+	area of database design is nontrivial and will require the services
+	of a database expert familiar with the relational algebra,
+	normalization, the entity/relationship model, etc.
+
+    [2]	The clustering of tables into datafiles must be defined.  Related
+	tables which are fairly static should normally be placed in the same
+	datafile.  Tables which change a lot or which may be used for a short
+	time and then deleted may be best placed in separate datafiles.
+	If the database is to be accessed simultaneously by multiple processes,
+	e.g., when running background jobs, then it may be necessary to place
+	the input tables in read only datafiles and the output tables in
+	separate private access datafiles to permit concurrent access (DBIO
+	does not support record level locking).
+
+    [3] The type and number of indexes required for each table must be defined.
+	Most tables will require some sort of index for efficient retrieval.
+	Maintenance of an index slows insertion, hence output tables may be
+	better off without an index; indexes can be added later when the time
+	comes to read the table.  The type of index (linear, hash, or B-tree)
+	must be defined, and the keys used in the index must be listed.
+
+    [4]	Large text or binary files which are logically associated with the
+    	database may be implemented as physically separate, non-database files,
+	saving only the name of the file in the database, or as variable length
+	attributes, storing the data in the database itself.  Large files may
+	be more efficiently accessed when stored outside the database, while
+	small files consume less storage and are more efficiently accessed when
+	stored in a datafile.  Storing a file outside the database complicates 
+	database management and transport.
+
+
+3. DBIO
+
+    DBIO is the host language interface to the database system.  The interface
+is a procedural rather than query oriented interface; the query facilities
+provided by DBIO are limited to select/project.  DBIO is designed to be fast and
+compact and hence is little more than an access method.  A process typically
+has direct access to a database via a high bandwidth binary file i/o interface.
+
+Although we will not discuss it further here, we note that a compiled
+application which requires query level access to a database can send queries
+to the DBMS query language via the CL, using CLCMD (the query language resides
+in a separate process).  This is much the same technique as is used in
+commercial database packages.  A formal DBIO query language interface will be
+defined when the query language is itself defined.
+
+
+3.1 Database Management Functions
+
+    DBIO provides a range of functions for database management, i.e., operations
+on the database as a whole as opposed to the access functions, used for
+retrieval, update, insertion, etc.  The database management functions are
+summarized below.
+
+
+	open	database
+	close	database
+	create	database	initially empty
+	delete	database
+	change	database	(change default working database)
+
+	create	table		from DDL; from compiled DDT, ALT
+	drop	table
+	alter	table
+	sort	table
+
+	create	view
+	drop	view
+
+	create	index
+	drop	index
+
+
+A database must be opened or created before any other operations can be
+performed on the database (excluding delete).  Several databases may be
+open simultaneously.  New tables are created by any of several methods,
+i.e., from a written specification in the Data Definition Language (DDL),
+by inheriting the attributes of an existing table, or by successive alter
+table operations, adding a new attribute to the table definition in each call.
+
+
+3.2 Data Access Functions
+
+    A program accesses the database record by record via a "cursor".  A cursor
+is a pointer into a virtual table defined by evaluating a select/project
+statement upon a database.  This virtual table, or "selection set", consists of
+a set of record ids referencing actual records in one or more base tables.
+The individual records are not physically accessed by DBIO until a fetch,
+update, insert, or delete operation is performed by the applications program
+upon the record currently pointed to by the cursor.
+
+
+3.2.1 Record Level Access Functions
+
+    The record access functions allow a program to read and write entire records
+in one operation.  For the sake of data independence the program must first
+define the exact format of the logical record to be read or written; this
+format may differ from the physical record format in the number, order, and
+datatype of the fields to be accessed.  The names of the fields in the logical
+record must however match those in the physical record (unless aliased),
+and not all datatype conversions are legal.
+
+
+	open	cursor
+	close	cursor
+	length	cursor
+	next	cursor element
+
+	fetch	record
+	update	record
+	insert	record
+	delete	record
+
+	get/put	scalar field (typed)
+	get/put	vector field (typed)
+
+
+Logical records are passed between DBIO and the calling program in the form
+of a binary data structure via a pointer to the structure.  Storage for the
+structure is allocated by the calling program.  Only fixed size fields may be
+passed in this manner; variable size fields are represented in the static
+structure by an integer count of the current number of elements in the field.
+A separate call is required to read or write the contents of a variable length
+field.
+
+The dynamically allocated binary structure format is flexible and efficient
+and will be the most suitable format for most applications.  A character string
+format is also supported wherein the successive fields are encoded into
+successive ranges of columns.  This format is useful for data entry and
+forms generation, as well as for communication with foreign languages (e.g.,
+Fortran) which do not provide the data structuring facilities necessary for
+binary record transmission.
+
+The functions of the individual record level access operators are discussed
+in more detail below.
+
+	
+	fetch	Read the physical record currently pointed to by the cursor
+		into an internal holding area in DBIO.  Return the fields of
+		the specified logical record to the calling program.  If no
+		logical record was specified the only function is to copy the
+		physical record into the DBIO holding area.
+
+	modify	Update the internal copy of the physical record from the fields
+		of the logical record passed as an argument, but do not update
+		the physical input record.
+
+	update	Update the internal copy of the physical record from the fields
+		of the logical record passed as an argument, then update the
+		physical record in mass storage.  Mass storage will be updated
+		only if the local copy of the record has been modified.
+
+	insert	Update the internal copy of the physical record from the fields
+		of the logical record passed as an argument, then insert the
+		physical record into the specified output table.  The record
+		currently in the holding area is used regardless of its origin,
+		hence an explicit fetch is required to copy a record.
+
+	delete	The record currently pointed to by the cursor is deleted.
+	
+
+For example, to perform a select/project operation on a database one could
+open a cursor on the selection set defined by the indicated select/project
+statement (passed as a character string), then FETCH and print successive
+records until EOF is reached on the cursor.  To perform some operation on
+the elements of a selection set, producing a new table as output, one might
+FETCH each element, use and possibly modify the binary data structure returned
+by the FETCH, and then INSERT the modified record into the output table.
+
+When performing an UPDATE operation on the tuples of a selection set defined
+over multiple input tables, the tuples in separate input tables need not all
+have the same set of attributes.  INSERTion into an output table, however,
+requires that the new output tuples be union compatible with the existing
+tuples in the output table, or the mismatched attributes in the output tuples
+will be either lost or created with null values.  If the output table is a new
+table the attribute list of the new table may be defined to be either the
+union or intersection of the attribute lists of all tables in the selection
+set used as input.
+
+
+3.2.2 Field Level Access Functions
+
+    The record level access functions can be cumbersome when only one or two
+of the fields in a record are to be accessed.  The fields of a record may be
+accessed individually by typed GET and PUT procedures (e.g., DBGETI, DBPUTI)
+after copying the record in question into the DBIO holding area with FETCH.
+
+
+3.3 DBKI
+
+    The DataBase Kernel Interface (DBKI) is the interface between DBIO and
+one or more DataBase Kernels (DBK).  The DBKI supports multiple database
+kernels, each of which may support multiple storage formats.  The DBKI does
+not itself provide any database functionality, rather it provides a level
+of indirection between DBIO and the actual DBK used for a given dataset.
+The syntax and semantics of the procedures forming the DBKI interface are
+those required of a DBK, i.e., there is a one-to-one mapping between DBKI
+procedures and DBK procedures.
+
+A DBIO call to a DBKI procedure will normally be passed on to a DBK procedure
+resident in the same process, providing maximum performance.  If the DBK is
+especially large, e.g., when the DBK is a host database system, it may reside
+in a separate process with the DBK procedures in the local process serving
+only as an i/o interface.  On a system configured with network support DBKI
+will also provide the capability to access a DBK resident on a remote node.
+In all cases when a remote DBK is accessed, the interprocess or network
+interface occurs at the level of the DBKI.  Placing the interface at the
+DBKI level, rather than at the FIO z-routine level, provides a high bandwidth
+between the DBK and mass storage, greatly increasing performance since only
+selected records need be passed over the network interface.
+
+
+3.4 DBK
+
+    A DBIO database kernel (DBK) provides a "record manager" type interface,
+similar to the popular ISAM and VSAM interfaces developed by IBM (the actual
+access method used is based on the DB2 access method which is a variation on
+VSAM).  The DBK is responsible for the storage and retrieval of records from
+tables, and for the maintainance and use of any indexes maintained upon such
+tables.  The DBK is also responsible for arbitrating database access among
+concurrent processes (e.g., record locking, if provided), for error recovery,
+crash recovery, backup, and so on.  All data access via DBIO is routed through
+a DBK.  In no case does DBIO bypass the DBK to directly access mass storage.
+
+The DBK does not have any knowledge of the contents of a record (an exception
+occurs if the DBK is actually an interface to a host database system).
+To the DBK a record is a byte string.  Encoding and decoding of records is
+performed by DBIO.  The actual encoding used is machine independent and space
+efficient (byte packed).  Numeric fields are encoded in such a way that a
+generic comparison procedure may be used for order comparisons of all fields
+regardless of their datatype.  This greatly simplifies both the evaluation of
+predicates (e.g., in a select) and the maintenance of indexes.  The use of a
+machine independent encoding provides equivalent database semantics on all
+machines and transparent network access without redundant encode/decode,
+as well as making it trivial to transport databases between machines.

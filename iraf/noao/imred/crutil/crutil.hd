@@ -1,0 +1,17 @@
+# Help directory for the CRUTIL package.
+
+$doc = "./doc/"
+$crusrc = "./src/"
+
+revisions	sys=crusrc$Revisions
+
+overview	hlp=doc$overview.hlp
+
+cosmicrays	hlp=doc$cosmicrays.hlp,		src=crusrc$t_cosmicrays.x
+craverage	hlp=doc$craverage.hlp,		src=crusrc$t_craverage.x
+crcombine	hlp=doc$crcombine.hlp,		src=crusrc$crcombine.cl
+credit		hlp=doc$credit.hlp,		src=crusrc$credit.cl
+crfix		hlp=doc$crfix.hlp,		src=crusrc$crfix.cl
+crgrow		hlp=doc$crgrow.hlp,		src=crusrc$t_crgrow.x
+crmedian	hlp=doc$crmedian.hlp,		src=crusrc$t_crmedian.x
+crnebula	hlp=doc$crnebula.hlp,		src=crusrc$crnebula.cl

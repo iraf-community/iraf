@@ -1,0 +1,13 @@
+	This directory contains the source code for the 'builtin' formats 
+converted with IMPORT.  Here we implement three formats that require different
+levels of processing: the GIF format uses LZW compression and a colormap for
+pixel storage and requires the most work, Sun Rasterfiles have various formats
+that may require colormap application or RLE decoding, and lastly the X 
+Window Dump format that fits the generic binary raster model with the exception
+of an 8-bit file with a colormap.
+	Because formats are defined in the data base the user is unaware of
+any special processing that occurs unless implementing a new format that
+requires partivular handling.  In the case of colormap files the example of
+XWD can be followed and all that's needed is a routine to read the colormap
+from the image.  'Builtin' formats must, however, be declared in the source
+import$ipbuiltin.x to route execution to the format-specific code.

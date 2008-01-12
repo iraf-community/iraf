@@ -1,0 +1,37 @@
+# axispar.par  plot axes pset
+
+wl,r,h,0.,,,"left  world x-coord if not autoscaling"
+wr,r,h,0.,,,"right world x-coord if not autoscaling"
+wb,r,h,0.,,,"lower world y-coord if not autoscaling"
+wt,r,h,0.,,,"upper world y-coord if not autoscaling"
+
+logx,b,h,no,,,"log scale x-axis?"
+logy,b,h,no,,,"log scale y-axis?"
+
+xflip,b,h,no,,,"flip autoscaled x axis?"
+yflip,b,h,no,,,"flip autoscaled y axis?"
+
+transpose,b,h,no,,,"transpose the x and y axes of the plot"
+
+majrx,i,h,5,,,"number of major divisions along x grid"
+minrx,i,h,5,,,"number of minor divisions along x grid"
+majry,i,h,5,,,"number of major divisions along y grid"
+minry,i,h,5,,,"number of minor divisions along y grid"
+round,b,h,no,,,"round axes to nice values?"
+margin,r,h,INDEF,0,1,"margin between curve and axis"
+
+lintran,b,h,no,,,"perform linear transformation of x axis"
+p1,r,h,0,,,"start input pixel value for lintran"
+p2,r,h,0,,,"end input pixel value for lintran"
+q1,r,h,0,,,"start output pixel value for lintran"
+q2,r,h,1,,,"end output pixel value for lintran"
+
+box,b,h,yes,,,"draw box around periphery of window?"
+grid,b,h,no,,,"draw grid lines on plot"
+ticklabels,b,h,yes,,,"label tick marks?"
+xlabel,s,h,"",,,"x-axis label"
+ylabel,s,h,"",,,"y-axis label"
+title,s,h,"imtitle",,,"title for plot"
+sysid,b,h,yes,,,"write system ID in title?"
+
+version,s,h,"20Jul93",,,"Date of installation"

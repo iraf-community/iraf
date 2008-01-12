@@ -1,0 +1,683 @@
+     This is a description of Fortran-callable subroutines for working with
+STSDAS tables.  There is an example at the end, preceded by information
+about compiling and linking with xc.  The object libraries uttables.a
+and tbtables.a are in the directory stsdas$lib.
+
+     Most programs will not need to use the include file IRAF77.INC, but
+for those who wish to set parameters with UTPPTI or get parameter values with
+UTPGTI the include file is in stsdas$lib.
+
+     The maximum lengths of file names and columns of type character are
+set by the SPP parameters SZ_FNAME and SZ_LINE respectively.  These maximum
+lengths are as follows:
+
+        column name             19 characters
+        column units            19     "
+        column print format      7     "
+        file name               63     "
+        character column       161     "
+
+When declaring character strings in your programs, the strings do not have
+to be as long as the above limits.
+
+     Table names are case sensitive, but column names are not.  Your programs
+should not do case conversion on a table name gotten from the CL, and a name
+given explicitly in your code would normally be in lower case.  You have
+full control over column names; if you convert to upper or lower case the
+user should be informed of this in the help file.  No case conversion is
+done by these routines when getting or putting values of character-type
+columns.
+
+     Print formats for columns and the names of header keywords are not
+case sensitive.  Header keywords are converted to upper case for FITS
+compatibility.  The print format is converted to the equivalent SPP format,
+which is in lower case; if the format is retrieved using UTCINF it will
+be converted back to a Fortran-type format which will be in upper case.
+
+     The print format for a column is the kind of thing that would go in a
+Fortran format statement but with some limitations and some extensions.  It
+must be a single letter followed by a number.  'I5', 'I4.4', 'F12.6' and
+'G15.7' would be OK, for example, but '1PE15.5' and 'BN, I7' would not be OK.
+(The integer format 'I4.2' would be changed to 'I4.4'.)
+Here is a list giving an example of each format that is supported and its
+equivalent in SPP.  Note that some of these are not standard Fortran, but they
+translate into formats that are supported in SPP.
+
+       Fortran    SPP          comments
+        F12.5    %12.5f    floating-point value
+        E12.5    %12.5e    single-precision value
+        D12.5    %12.5e    double-precision value
+        G12.5    %12.5g    general floating-point value
+        I12      %12d      integer
+        I12.12   %012d     integer padded on the left with zeroes
+        I-12     %-12d     integer left-justified in the field
+        L12      %12b      logical (Boolean)
+        A17      %17s      character string
+        H12.2    %12.2h    hh:mm:ss.dd
+        M12.2    %12.2m    mm:ss.dd
+        Z12      %12x      hexadecimal integer
+
+     When defining columns the data type is specified as an integer.  For
+types real, double-precision, integer, and boolean the integer values are
+as given in the iraf77.inc include file, specifically TYREAL=6, TYDOUB=7,
+TYINT=4, and TYBOOL=1.  For character-string columns, however, the data type
+is specified as -N, where N is the maximum number of characters in an element
+of that column.
+
+     There are three different initialization routines.  For an existing
+table UTTOPN initializes and also opens the table.  To create a new table
+use UTTINN or UTTINC to initialize, then set parameters and define columns,
+and then call UTTCRE to open the table.  Don't forget to call UTTCRE when
+creating a new table.  There is an example below that illustrates these
+routines.
+
+     The descriptions of the subroutines follow.  In cases where there is
+a family of routines, one for each data type supported, the data type will
+be indicated by the sixth character of the subroutine name, and the
+possible values for the sixth letter will be given in square brackets.
+For example, UTRGT[TBIRD] means UTRGTT, UTRGTB, UTRGTI, UTRGTR and UTRGTD.
+
+
+1.  Determine whether a table exists:
+        CALL UTTACC (tablename, exists, istat)
+
+The argument EXISTS will be set to true or false depending on whether
+or not the table exists.
+
+Input:
+-----
+character  tablename    name of table
+
+Output:
+------
+boolean    exists       true if table exists; false otherwise
+integer    istat        status
+
+
+2.  Open an existing table:
+        CALL UTTOPN (tablename, iomode, tp, istat)
+
+This routine opens an existing table either readonly or read/write and
+and creates the (internal) data structure which describes the table.
+
+Input:
+-----
+character  tablename    name of table
+integer    iomode       1 for readonly; 2 for read/write
+
+Output:
+------
+integer    tp           pointer to descriptor for tablename; use this for all
+                        subsequent references to the table until it is closed
+integer    istat        status
+
+
+3.  Initialize for a new table:
+        CALL UTTINN (tablename, tp, istat)
+
+This is an initialization routine for a table which is to be created without
+using a template table to define columns.  After calling this routine
+parameters may be set and columns defined using UTPPTI and UTCDEF respectively.
+The table must be explicitly opened using UTTCRE (see below).
+
+Input:
+-----
+character  tablename    name of table
+
+Output:
+------
+integer    tp           pointer to descriptor for tablename; use this for all
+                        subsequent references to the table until it is closed
+integer    istat        status
+
+
+4.  Initialize for a copy of a table:
+        CALL UTTINC (tablename, template, tp, istat)
+
+This is an initialization routine for a table which is to be created
+using a template table to define columns.  Additional columns may be
+defined by calling UTCDEF, preferably before opening the table.  The
+table must be opened using UTTCRE.
+
+Input:
+-----
+character  tablename    name of table
+integer    template     pointer to descriptor of an open table to be
+                        used as a template
+
+Output:
+------
+integer    tp           pointer to descriptor for tablename; use this for all
+                        subsequent references to the table until it is closed
+integer    istat        status
+
+
+5.  Open a new table:
+        CALL UTTCRE (tp, istat)
+
+This is called after calling either UTTINN or UTTINC and is the routine that
+actually opens a new table.  The table will be created, and size information
+and descriptions of whatever columns have already been defined will be
+written into the table.
+
+If the table already exists this routine should not be called.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+
+Output:
+------
+integer    istat        status
+
+
+6.  Set a parameter:
+        CALL UTPPTI (tp, param, value, istat)
+
+This subroutine may be used to specify such things as the row length or
+number of rows for a table, preferably before the table is actually opened.
+At present the most useful parameter is TBIRLN (= 2), which is for increasing
+the record length after defining columns so that there will be room for
+defining new columns later, after the table is opened.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    param        specifies which parameter to set; see below
+integer    value        value of parameter to be set
+
+Output:
+------
+integer    istat        status
+
+The following parameters (and perhaps others) may be set; the numerical
+values are defined in disk$sdas:[sdas.develop.sdasinc]TBSET.INC
+Setting an estimated upper limit for user parameters or number of columns
+does not set a firm upper limit but only sets the amount of space to
+allocate; the table will be expanded if necessary for additional parameters
+or columns.
+
+   parameter                         comment
+   ---------                         -------
+    TBRLEN      length of row (unit = size of a single-precision real number)
+    TBIRLN      increase row length by this amount (unit = size of a real)
+    TBALLR      number of rows to allocate (not needed for row-ordered table)
+    TBIALR      increase allocated number of rows by this amount
+    TBWTYP      specify which type of table; row ordered is the default
+                          (TBTYPR = row ordered; TBTYPC = column ordered)
+    TBMXPR      estimated upper limit for number of user parameters
+    TBMXCL      estimated upper limit for number of columns to be defined
+
+
+7.  Get the value of a parameter:
+        CALL UTPGTI (tp, param, value, istat)
+
+This routine may be used to find (integer-valued) information about the table,
+including those parameters listed below.  The number of rows may be gotten
+by the separate subroutine UTPNRO.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    param        specifies which parameter to find; see below
+
+Output:
+------
+integer    value        value of parameter
+integer    istat        status
+
+   parameter                         comment
+   ---------                         -------
+    TBNROW      the number of rows that have been written to the table
+    TBNCOL      the number of columns that have been defined
+    TBRLEN      allocated length of row (unit = size of a real number)
+    TBRUSD      amount of row length that is used (unit = size of a real)
+    TBALLR      allocated number of rows (may be zero for row-ordered table)
+    TBNPAR      number of user parameters that have been written to the table
+    TBMXPR      number of user parameters for which space has been allocated 
+    TBMXCL      number of column descriptors for which space has been allocated 
+
+
+8.  Define new column(s):
+        CALL UTCDEF (tp, colname, colunits, colfmt,
+                datatype, numcols, colidn, istat)
+
+Use this routine to define new columns.  If the table is new, it will
+generally be faster to define all the columns before opening the table,
+but it will still be possible to call utcdef after opening the table.
+If all columns are defined before opening a new table, it will not be
+necessary to explicitly specify (using UTPPTI) the row length because
+utcdef will determine the row length that is required for those columns.
+The order of the newly created columns in the table will be the same
+as the order of the names in the array colname.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+character  colname      array of column names
+character  colunits     array of units (or blank) for the columns
+character  colfmt       array of formats for display of the columns;
+                        if a format is blank a default will be assigned
+integer    datatype     array of data types for columns, specified as:
+                        6=real, 7=double, 4=integer, 1=boolean,
+                        -n=character string of length n characters
+integer    numcols      number of columns = length of arrays of names, etc.
+
+Output:
+------
+integer    colidn       array of column identifiers
+                        Use these values for all future references to the
+                        columns until the table is closed.
+integer    istat        status
+
+
+9.  Find column(s):
+        CALL UTCFND (tp, colname, numcols, colidn, istat)
+
+This routine looks for column names in a table and returns an identifier
+for each column that was found.  This routine may be called more than once
+for a given column name.  ISTAT will be -1 if not all columns were found.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+character  colname      array of column names
+integer    numcols      the number of names in the array colname
+
+Output:
+------
+integer    colidn       array of column identifiers
+                        For each column the value will be a positive integer
+                        if the column was found or zero if not found.
+                        Use these identifiers for all subsequent references
+                        to the columns until the table is closed.
+integer    istat        status
+
+
+10.  Get column identifier from column number:
+        CALL UTCNUM (tp, colnumber, colidn, istat)
+
+This routine returns a column identifier for column number colnumber, or
+zero if there aren't that many columns.  This routine may be called more
+than once for any given column number.  ISTAT will be -1 if the column
+number is out of range.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colnumber    column number
+
+Output:
+------
+integer    colidn       column identifier
+integer    istat        status
+
+
+11.  Get info about a column:
+        CALL UTCINF (tp, colidn,
+                colname, colunits, colfmt, datatype, istat)
+
+This routine returns information about an existing column.
+The print format COLFMT that is returned will be a valid Fortran format
+and may be different from what was specified when defining the column;
+for example, if the actual format is H12.1 then COLFMT will be F12.5 .
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       column identifier
+
+Output:
+------
+character  colname      column name
+character  colunits     units for the column
+character  colfmt       format for display of the column
+integer    datatype     data type for column, specified as:
+                        6=real, 7=double, 4=integer, 1=boolean,
+                        -n=character string of length n characters
+integer    istat        status
+
+
+The following three routines can be used for an existing column to change
+the column name, units, or format for display respectively:
+
+12.  Change name:
+        CALL UTCNAM (tp, colidn, colname, istat)
+13.  Change units:
+        CALL UTCNIT (tp, colidn, colunits, istat)
+14.  Change format:
+        CALL UTCFMT (tp, colidn, colfmt, istat)
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       column identifier
+character  colname      column name
+character  colunits     units for the column
+character  colfmt       format for display of the column
+
+Output:
+------
+integer    istat        status
+
+
+15.  Get values from row:
+        CALL UTRGT[TBIRD] (tp, colidn, numcols, rownum,
+                        buffer, nullflag, istat)
+
+Get one or more values from a row.  [tbird] means text string, Boolean,
+integer, real, or double.  The buffer to receive the values should be of
+the data type specified by the suffix, and type conversion will be performed
+if the data type of the column in the table does not match.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       array of column identifiers
+integer    numcols      number of column values to get
+integer    rownum       the number of the row containing the values
+
+Output:
+------
+           buffer       array of type [tbird] to receive values
+logical    nullflag     array of flags; true if the element is undefined
+integer    istat        in case of type-conversion errors
+
+
+16.  Put values into a row:
+        CALL UTRPT[TBIRD] (tp, colidn, numcols, rownum, buffer, istat)
+
+Put one or more values of the same data type into a row.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       array of column identifiers
+integer    numcols      number of column values to put
+integer    rownum       the number of the row containing the values
+           buffer       array of type [tbird] to receive values
+
+Output:
+------
+integer    istat        status
+
+17.  Get values from a column:
+        CALL UTCGT[TBIRD] (tp, colidn, firstrow, lastrow,
+                        buffer, nullflag, istat)
+
+Get an array of values from a single column.  Values in rows firstrow
+through lastrow will be gotten; firstrow and lastrow need not be the first
+and last rows in the table.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       column identifier (just one)
+integer    firstrow     the number of the first row from which to get values
+integer    lastrow      the number of the last row from which to get values
+
+Output:
+------
+           buffer       array of type [tbird] and length lastrow-firstrow+1
+                        to receive values
+logical    nullflag     array of flags; true if the element is undefined
+integer    istat        status
+
+
+18.  Put values into a column:
+        CALL UTCPT[TBIRD] (tp, colidn, firstrow, lastrow, buffer, istat)
+
+Put values into rows firstrow through lastrow in the column identified
+by colidn.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       column identifier (just one)
+integer    firstrow     the number of the first row into which to put values
+integer    lastrow      the number of the last row into which to put values
+           buffer       array of type [tbird] and length lastrow-firstrow+1
+                        containing values to put into the table
+
+Output:
+------
+integer    istat        status
+
+
+19.  Set elements to undefined:
+        CALL UTRUDF (tp, colidn, numcols, rownum, istat)
+
+Set to undefined the values for columns identified by colidn in row rownum.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+integer    colidn       array of column identifiers
+integer    numcols      number of elements in array colidn
+integer    rownum       the row number
+
+Output:
+------
+integer    istat        status
+
+
+20.  Get a header parameter:
+        CALL UTHGT[TBIRD] (tp, keyword, value, istat)
+
+This routine gets a parameter from the table header.  It is an error if
+the parameter does not exist.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+character  keyword      keyword name of parameter
+
+Output:
+------
+           value        value of parameter of type [tbird]
+integer    istat        status
+
+
+21.  Add a header parameter:
+        CALL UTHAD[TBIRD] (tp, keyword, value, istat)
+
+Add a parameter to the table header.  If the parameter already exists then
+its value will be replaced.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+character  keyword      keyword name of parameter
+           value        value of parameter of type [tbird]
+
+Output:
+------
+integer    istat        status
+
+
+22.  Put a new header parameter:
+        CALL UTHPT[TBIRD] (tp, keyword, value, istat)
+
+Replace the value of a parameter to the table header.  It is an error
+if the parameter does not already exist; use uthad[] to add a new
+parameter.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+character  keyword      keyword name of parameter
+           value        value of parameter of type [tbird]
+
+Output:
+------
+integer    istat        status
+
+
+23.  Close a table:
+        CALL UTTCLO (tp, istat)
+
+Close a table.  After this is called the value of tp and the values of
+all column identifiers for this table will be undefined.
+
+Input:
+-----
+integer    tp           pointer to table descriptor
+
+Output:
+------
+integer    istat        status
+
+
+     Other capabilities that are needed include the following.  These
+may be implemented as subroutines or as IRAF tasks.
+
+UTTSRT  sort a table according to the values in a column
+UTCSEA  search a column for a value
+UTTCPY  copy a table
+UTTREN  rename a table
+UTTDEL  delete a table
+UTRINS  insert rows
+UTRDEL  delete rows
+
+     Here is a sample program that demonstrates creating a new table,
+opening an existing table, and creating a new table based on a template.
+The example can be compiled and linked using:
+
+xc -p stsdas xtestf.x testf.f -luttables -ltbtables
+
+The file xtestf.x contains the single line "task testf".
+
+        subroutine testf
+
+        integer OK
+        parameter (OK = 0)
+        integer MAXROWS
+        parameter (MAXROWS = 10)        ! just for local buffer size
+
+        integer tp, template            ! pointers to table descriptors
+        integer nrows, k, istat
+        integer outdec          ! column identifier for output column "Dec"
+        integer inra, outra             ! col id's for input & output "RA"
+        logical nullflag(MAXROWS)
+        double precision ra, dec, racol(MAXROWS)
+C
+C--Example for creating a new table (without a template):
+C
+C                                               initialize for a new table
+        CALL UTTINN ('ex1', tp, istat)
+        if (istat .ne. OK) go to 999
+C                                               define column with name "RA"
+        CALL UTCDEF (tp, 'RA', 'degrees', 'H12.1',
+     #                  7, 1, outra, istat)
+        if (istat .ne. OK) go to 999
+C                                               open the table
+        CALL UTTCRE (tp, istat)
+        if (istat .ne. OK) go to 999
+
+        do 10 k = 1, MAXROWS
+C                                               put RA in each row
+            ra = k/60.D0
+            CALL UTRPTD (tp, outra, 1, k, ra, istat)
+            if (istat .ne. OK) go to 999
+ 10     continue
+C                                               close the table
+        CALL UTTCLO (tp, istat)
+        if (istat .ne. OK) go to 999
+C
+C--Example for an existing table:
+C
+C                                               initialize and open the table
+        CALL UTTOPN ('ex1', 1, tp, istat)
+        if (istat .ne. OK) go to 999
+C                                               find column "RA"
+        CALL UTCFND (tp, 'RA', 1, inra, istat)
+        if (inra .le. 0) write (6, 1010)
+ 1010   format (' column not found')
+C                                               how many rows?
+        CALL UTPGTI (tp, 21, nrows, istat)
+
+        do 20 k = 1, nrows
+C                                               read RA from each row
+            CALL UTRGTD (tp, inra, 1, k, ra, nullflag, istat)
+            if (nullflag(1)) then
+                write (6, 1020) k
+ 1020           format (' column is null for row', i10)
+            else
+                write (6, 1030) ra
+ 1030           format (' ra =', g12.5)
+            endif
+ 20     continue
+        CALL UTTCLO (tp, istat)
+C
+C--Example for creating a new table using a template to define column(s):
+C
+C                                       initialize and open the template table
+        CALL UTTOPN ('ex1', 1,
+     #                          template, istat)
+        if (istat .ne. OK) go to 999
+C                                               initialize using template
+        CALL UTTINC ('ex2', template,
+     #                          tp, istat)
+        if (istat .ne. OK) go to 999
+C                                               define new column "Dec"
+        CALL UTCDEF (tp, 'Dec', 'degrees', 'H12.0',
+     #                  7, 1, outdec, istat)
+        if (istat .ne. OK) go to 999
+C                                               open the output table
+        CALL UTTCRE (tp, istat)
+        if (istat .ne. OK) go to 999
+C                                               find column "RA" in input table
+        CALL UTCFND (template, 'RA', 1, inra, istat)
+        if (inra .le. 0) write (6, 1010)
+C                                               find column "RA" in output table
+        CALL UTCFND (tp, 'RA', 1, outra, istat)
+        if (outra .le. 0) write (6, 1010)
+C                                               how many rows in template table?
+        CALL UTPGTI (template, 21, nrows, istat)
+        if (nrows .gt. MAXROWS) then
+            write (6, 1040) nrows
+ 1040       format (' Input table has', I10, ' rows, ',
+     #                  'which would overflow the buffer.')
+            go to 999
+        endif
+C                                               copy column "RA"
+        CALL UTCGTD (template, inra, 1, nrows,
+     #                  racol, nullflag, istat)
+        if (istat .ne. OK) go to 999
+        CALL UTCPTD (tp, outra, 1, nrows, racol, istat)
+        if (istat .ne. OK) go to 999
+C                                               we're done with the template
+        CALL UTTCLO (template, istat)
+
+        do 40 k = 1, nrows
+C                                               put Dec in each row
+            dec = -k/60.D0
+            CALL UTRPTD (tp, outdec, 1, k, dec, istat)
+            if (istat .ne. OK) go to 999
+ 40     continue
+C                                               close the output table
+        CALL UTTCLO (tp, istat)
+        if (istat .ne. OK) go to 999
+
+        return
+ 999    continue
+        write (6, 1050) istat
+ 1050   format (' istat =', i10 / ' ')
+        return
+        end
+
+     The tprint task gave the following output for table ex2.tab:
+
+ex2.tab has 10 rows and 2 columns
+
+ (row)          RA          Dec
+    1    0:01:00.0     -0:01:00
+    2    0:02:00.0     -0:02:00
+    3    0:03:00.0     -0:03:00
+    4    0:04:00.0     -0:04:00
+    5    0:05:00.0     -0:05:00
+    6    0:06:00.0     -0:06:00
+    7    0:07:00.0     -0:07:00
+    8    0:08:00.0     -0:08:00
+    9    0:09:00.0     -0:09:00
+   10    0:10:00.0     -0:10:00

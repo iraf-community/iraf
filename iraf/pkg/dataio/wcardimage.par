@@ -1,0 +1,11 @@
+mode,s,h,"ql",,,
+textfile,s,a,,,,"Text file(s)"
+cardfile,s,a,,,,"Card image file(s)"
+new_tape,b,a,,,,"Blank tape?"
+contn_string,s,h,>>,,,"Marker for oversize lines"
+verbose,b,h,yes,,,"Print messages of actions performed?"
+detab,b,h,yes,,,"Detab string and replace with blanks?"
+card_length,i,h,80,,,"Columns per card"
+cards_per_blk,i,h,50,,,"Card images per block"
+ebcdic,b,h,no,,,"Convert from ASCII to EBCDIC?"
+ibm,b,h,no,,,"Convert from ASCII to IBM(EBCDIC)?"

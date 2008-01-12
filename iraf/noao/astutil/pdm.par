@@ -1,0 +1,13 @@
+infiles,s,a,,,,Input file template
+metafile,s,h,"pdmmeta",,,Metacode file
+batchfile,s,h,"pdmbatch",,,Batch text file
+device,s,h,"stdgraph",,,Graphics device
+interactive,b,h,yes,,,Use interactive graphics?
+flip,b,h,no,,,Flip the y-axis scale?
+minp,r,h,0.0,,,Minimum period to search
+maxp,r,h,0.0,,,Maximum period to search
+ntheta,i,h,200,,,Number of theta points in period window (resolution)
+pluspoint,i,h,50,,,Threshold number of data points after which to use plus
+autoranges,b,h,no,,,Set ranges automatically
+nsigma,r,h,3.0,,,Number of standard deviations for autoranges
+cursor,*gcur,h,,,,graphics cursor input

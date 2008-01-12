@@ -1,0 +1,25 @@
+.help asifree Dec98 "Image Interpolator Package"
+.ih
+NAME
+asifree - free sequential interpolant descriptor
+.ih
+SYNOPSIS
+asifree (asi)
+
+.nf
+pointer	asi	#U interpolant descriptor
+.fi
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ih
+DESCRIPTION
+ASIFREE frees the sequential interpolant descriptor structure allocated by
+ASIINIT or ASISINIT. ASIFREE should be called when interpolation is complete.
+.ih
+NOTES
+.ih
+SEE ALSO
+asiinit, asisinit

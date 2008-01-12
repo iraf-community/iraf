@@ -1,0 +1,32 @@
+.help mktemp Feb86 language
+.ih
+NAME
+mktemp -- make a unique file name
+.ih
+USAGE
+mktemp root
+.ih 
+PARAMETERS
+.ls root
+.br
+The root (prefix) for the generated filename.
+.le
+.ih
+DESCRIPTION
+\fIMktemp\fR returns a unique filename string which may be used to create
+a temporary file name.  The string is the concatenation of three elements: the
+input argument, the process id, and a final character which changes on
+each call.
+.ih
+EXAMPLES
+1. Create a unique filename with the root "sav" in the logical
+directory "tmp".
+
+	savefile = mktemp ("tmp$sav")
+.ih
+BUGS
+Since some time may elapse between the creation of the filename and the
+creation of a file with that name, there is no guarantee that the name
+will still be unique when it is actually used, however the algorithm used
+to generate the name makes filename collisions unlikely.
+.endhelp

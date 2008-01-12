@@ -1,0 +1,106 @@
+	Herein is described how pixel coordinates should be encoded into
+GKI metacode units and how this data is then converted back to pixel numbers
+by the "lower level" code.  For concreteness, the discussion is based on
+a 512 x 512 display, where the pixels are numbered from 1 to 512 (one-based)
+or 0 to 511 ( zero based).  Only the X axis is discussed, the Y axis
+being treated identically.
+	GKI metacode ranges from 0 through 32767, for a total of 32768
+values.  In NDC coordinates, the range is from 0.0 through 1.0.
+These coordinates are show in the diagram following.
+.sp
+.nf
+last GKI coordinate of pixel
+	       63    127   191   255   319        32703  32767(!)
+pixel	        |     |     |     |     |           |      |
+extent--   |<-->||<-->||<-->||<-->||<-->|| ... |<-->||<--->|
+		|     |     |     |     |           |      |
+the	   |-----|-----|-----|-----|-----| ... |-----|-----|
+pixels	   |     |     |     |     |     | ... |     |     |
+	   |-----|-----|-----|-----|-----| ... |-----|-----|
+num-  (1-b)  1      2     3     4     5          511   512
+bers  (0-b)  0      1     2     3     4          510   511
+	   |     |     |     |     |     | ... |     |     |
+GKI	   0    64    128   192   256   320   32640 32704 32767(!)
+	   |     |     |     |     |     | ... |     |     |
+NDC	  0.0  1/512 2/512 3/512 4/512 5/512      511/512 1.0
+.fi
+.sp
+	The pixels are not points, but rather, in GKI/NDC space, have
+"physical" extent.  In NDC coordinates, the pixel boundaries are
+easily calculated as (left boundary = zero-based pixel number / 512)
+and (right boundary = 1-based pixel number / 512).  In GKI coordinates,
+each pixel spans 64 GKI units, with the left boundary given by
+"zero-based pixel number times 64".  The right boundary is then the
+left boundary plus 64 and then actually references the next pixel.
+That is, the left boundary is included in the pixel, while the right
+boundary is not.
+(Pixel 0 goes from 0 through 63, pixel one from 64 through 127, etc.)
+This works for all pixels except the last one, which would have a
+right boundary of 32768; in this special case, the right boundary
+is defined to be 32767.  As will be seen later on, this should cause
+no difficulties.
+	Explicit reference to a particular pixel should, in GKI
+coordinates, refer to the pixel's left (or for Y, lower) edge.  Thus,
+pixel 7 (one-based system) is, in GKI, 6*64 or 384.
+	Cell arrays are denoted by their lower-left and upper-right
+corners, with the understanding that all pixels WITHIN this rectangle
+are to be read/written.  Thus, an array that covers (one-based)
+(4,10) to (18, 29) implies that, in X, pixels 4 through 17 are referenced.
+Therefore, the GKI coordinate range is from 3*64 up to 17*64, where
+3*64 is the GKI coordinate for the left edge of pixel 4 and 17*64 is
+the GKI coordinate for the right edge of pixel 17.  (Remember, the
+right edge of pixel 512 is 32767, not 32768.)
+	The (real) NDC coordinate that is then passed to the interface code
+is determined by dividing the GKI coordinate by 32767.  The interface
+code will, ultimately, multiply by 32767 to give the GKI coordinates
+passed to the lower level.
+	The lower level code translates the GKI coordinate values into
+zero-based pixel numbers by multiplying by 512/32768 ( not 32767).
+The (real) pixel numbers so determined are then truncated,  and become
+the ones to scroll to, zoom to, or put the cursor on.  Therefore,
+when refering to single pixels for such operations, use the left
+boundary of the pixel as the desired GKI/NDC coordinate.
+	Pixel computation for cell arrays is somewhat more complicated.
+The right boundary of a cell array can be the left boundary for
+an adjacent cell array; if the simple truncation scheme were used, that
+coordinate would be included in both cell array operations, which is not
+acceptable (especially for hard copy devices where the resultant overplotting
+would be, at best, objectionable).  This problem gives rise to the following
+algorithm.  Left (and lower) positions are rounded up to the next pixel
+boundary if the fractional position is greater than or equal 0.5.  Right
+(and upper) positions are rounded down to the next pixel boundary if the
+fractional position is less than 0.5; since a fractional pixel value of 0.0
+is less than 0.5, the right/upper pixel will be decreased even if it is
+already on a boundary.  The truncated values are then used as the
+INCLUSIVE range of pixels to read or write.  (If the positions lie
+within the same pixel, that pixel becomes the X (or Y) range.  If the
+positions are in adjacent pixels, the right pixel operation is
+not done if the left pixel moves into the same pixel as the right one.)
+	With this algorithm, the right edge of the display (NDC=1.0,
+GKI=32767) becomes position 511.98, which is not rounded down as the
+fractional part is >= 0.5, and, which, when truncated, turns into 511
+which is what is desired as the (last) included pixel in the range.
+
+	For zoomed (image) displays, fractional pixel coordinates are
+possible in the sense that, for a zoom of 4, pixels 16.0, 16.25,
+16.50, and 16.75, all refer to the same datum.  When setting the cursor,
+the lower level code must distinguish all these cases, which have GKI
+values (from a one-based coordinate system) 960, 976, 992, and 1008.
+The lower level code will return these fractional pixel values when reading
+the cursor, but the integral value is the real reference to the data
+point.  However, calls to the getcell and putcell routines should use
+16 (aka 960) or the cell array rounding will interfere with what is
+wanted. This does restrict getcell calls from starting/ending in the middle
+of a zoomed (replicated) pixel, but makes the behavior of getcell
+the same as putcell, which cannot write into the middle of a zoomed pixel.
+
+	In summary, users should reference individual pixels by
+specifying their left (or lower) boundaries in GKI/NDC.  For cursor
+reference on zoomed displays, fractional (in the sense outlined above)
+pixels may be referenced.  Right (or upper) boundaries are used only
+for cell arrays, and except for the very right-most, are determined by
+the user in an operation similar to that for the left boundaries.  GKI
+coordinates that are a little too large (not more than 31 units for a
+512 resolution device) will be rounded/truncated to the desired
+coordinate.  For cell array operations only, ones a little too small
+will still address the correct pixel.

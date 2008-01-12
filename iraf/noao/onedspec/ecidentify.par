@@ -1,0 +1,26 @@
+# Parameters for ECIDENTIFY task.
+
+images,s,a,,,,Images containing features to be identified
+database,f,h,database,,,Database in which to record feature data
+coordlist,f,h,linelists$thar.dat,,,User coordinate list
+units,s,h,"",,,Coordinate units
+match,r,h,1.,,,Coordinate list matching limit in user units
+maxfeatures,i,h,100,,,Maximum number of features for automatic identification
+zwidth,r,h,10.,,,Zoom graph width in user units
+
+ftype,s,h,"emission","emission|absorption",,Feature type
+fwidth,r,h,4.,,,Feature width in pixels
+cradius,r,h,5.,,,Centering radius in pixels
+threshold,r,h,10.,0.,,Feature threshold for centering
+minsep,r,h,2.,0.,,Minimum pixel separation
+
+function,s,h,"chebyshev","legendre|chebyshev",,Coordinate function
+xorder,i,h,2,1,,Order of coordinate function along dispersion
+yorder,i,h,2,1,,Order of coordinate function across dispersion
+niterate,i,h,0,0,,Rejection iterations
+lowreject,r,h,3.,0.,,Lower rejection sigma
+highreject,r,h,3.,0.,,Upper rejection sigma
+
+autowrite,b,h,no,,,Automatically write to database?
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

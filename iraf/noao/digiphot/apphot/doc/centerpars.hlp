@@ -1,0 +1,206 @@
+.help centerpars May00 noao.digiphot.apphot
+.ih
+NAME
+centerpars -- edit the centering algorithm parameters
+.ih
+USAGE
+centerpars
+.ih
+PARAMETERS
+.ls calgorithm = "centroid"
+The centering algorithm. The "gauss" and "ofilter" options depend critically
+on the value of the fwhmpsf parameter in the DATAPARS task. The centering
+options are:
+.ls none
+The initial positions are assumed to be the true centers. Users
+may select this option if the initial centers are know to be accurate,
+e.g. they were computed by DAOFIND task.
+.le
+.ls centroid
+The object centers are determined by computing the intensity weighted means
+of the marginal profiles in x and y.  This is the recommended default algorithm
+for APPHOT users.
+.le
+.ls gauss
+The object centers are computed by fitting a Gaussian of fixed fwhmpsf,
+specified by the DATAPARS fwhmpsf parameter, to the marginal profiles in
+x and y using non-linear least squares techniques.
+.le
+.ls ofilter
+The object centers are computed using optimal filtering techniques,
+a triangular weighting function of half width equal to fwhmpsf as
+specified by the DATAPARS fwhmpsf parameter, and the marginal distributions
+in x and y.
+.le
+.le
+.ls cbox = 5.0  (scale units)
+The width of the subraster used for object centering in units of the
+DATAPARS scale parameter. Cbox must be big enough to include a reasonable
+number of pixels  for center determination but not so large so as to include
+a lot of noise. Recommended initial values are 2.5-4.0 * the FWHM of the PSF
+value.
+.le
+.ls cthreshold = 0.0 (sigma units)
+Pixels cthreshold * sigma above (emission features) or below (absorption
+features) the data minimum or maximum respectively are used by the centering
+algorithms where sigma is equal to the value of the DATAPARS sigma parameter. 
+Most APPHOT users should leave this value at 0.0 which invokes the appropriate
+default thresholding technique for each centering algorithm. Setting cthreshold
+to INDEF turns off thresholding altogether for all the centering algorithms.
+.le
+.ls minsnratio = 1.0
+The minimum signal to noise ratio for object centering. If the estimated signal
+to noise ratio is less than minsnratio the computed center will be returned
+with an error flag.
+.le
+.ls cmaxiter = 10
+The maximum number of iterations performed by the centering algorithm.
+All the centering algorithms use this parameter.
+.le
+.ls maxshift = 1.0  (scale units)
+The maximum permissible shift of the center with respect to the initial
+coordinates in units of the scale parameter. If the shift produced by the
+centering algorithms is larger than maxshift, the computed center is returned
+with an error flag.
+.le
+.ls clean = no
+Symmetry-clean the centering subrater before centering? APPHOT users should
+leave clean set to "no".
+.le
+.ls rclean = 1.0  (scale units)
+The cleaning radius for the symmetry-clean algorithm in units of the scale
+parameter.
+.le
+.ls rclip = 2.0  (scale units)
+The clipping radius for the symmetry-clean algorithm in units of the scale
+parameter.
+.le
+.ls kclean = 3.0  (sigma)
+The number of sky background standard deviations for the symmetry-clean
+algorithm where sigma is the value of the DATAPARS parameter sigma.
+.le
+.ls mkcenter = no
+Mark the fitted object centers on the displayed image ?
+.le
+.ih
+DESCRIPTION
+
+The centering algorithm parameters control the action of the centering
+algorithms. The default parameters values have been proven to produce
+reasonable results in the majority of cases. Several of the centering
+parameters are defined in terms of the DATAPARS parameter \fIscale\fR,
+the scale of the image, and \fIsigma\fR the standard deviation of
+the sky pixels. 
+
+For each object to be measured a subraster of data \fIcbox\fR / \fIscale\fR
+pixels wide around the initial position supplied by the user is extracted
+from the IRAF image. If scale is defined in units of the number
+the half-width half-maximum of the psf per pixel, then a single value of
+cbox can be used for centering objects in images with different psfs.
+
+If \fIclean\fR is "yes" the symmetry-clean algorithm is applied to the
+centering subraster prior to centering. The cleaning algorithm attempts
+to correct defects in the centering subraster by assuming that the image
+is radially symmetric and comparing pixels on opposite sides of the center
+of symmetry.  The center of symmetry is assumed to be the maximum pixel
+in the subraster, unless the maximum pixel is more than \fImaxshift /
+scale\fR from the initial center, in which case the initial center is used
+as the center of symmetry.  Pixels inside the cleaning radius are not edited.
+Pairs of pixels in the cleaning region, r > \fIrclean\fR / \fIscale\fR
+and r <= \fIrclip\fR / \fIscale\fR and diametrically opposed about the
+center of symmetry are tested for equality. If the difference between the
+pixels is greater than \fIkclean * sigma\fR, the larger value is replaced
+by the smaller.  In the cleaning region the sigma is determined by the
+noise model assumed for the data. Pairs of pixels in the clipping region,
+r > \fIrclip\fR / \fIscale\fR are tested in the same manner as those in
+the cleaning region. However the sigma employed is the sigma of the
+sky background. Most APPHOT users should leave clean set to "no".
+
+New centers are computed using the centering algorithm specified by
+\fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and pixels
+that are some threshold above (below) an estimate of the local minimum
+(maximum). \fICthreshold\fR values of 0.0, a positive number, and INDEF
+invoke the default thresholding algorithm, a threshold equal to the
+local minimum (maximum) plus  (minus) \fIdatapars.sigma * cthreshold\fR,
+and a threshold exactly equal to the local minimum (maximum) respectively.
+
+After thresholding the signal to noise ratio of the subraster is estimated. 
+If the SNR < \fIminsnratio\fR the new center is still computed but an error
+flag is set.
+
+The default centering algorithm is \fIcentroid\fR. Centroid computes the
+intensity weighted mean and mean error of the centering box x and y marginal
+distributions using points in the marginal arrays above (below) the minimum
+(maximum) data pixel plus (minus) a threshold value.
+
+The threshold value is either the mean, \fIdatapars.sigma * cthreshold\fR
+above (below) the local minimum (maximum) if \fIcthreshold\fR is greater
+than zero, or zero above (below) the local minimum (maximum) if
+\fIcthreshold\fR is INDEF.  The centroid algorithm is similar to that
+by the old KPNO Mountain Photometry Code. Note that centroid is the only
+centering algorithm which does not depend on the value of
+\fIdatapars.fwhmpsf\fR.
+
+The centering algorithm \fIgauss\fR computes the new centers by fitting a
+1D Gaussian function to the marginal distributions in x and y using a
+fixed fwhmpsf set by \fIdatapars.fwhmpsf\fR.  Initial guesses for the fit
+parameters are derived from the data. The gauss algorithm iterates until
+a best fit solution is achieved.
+
+The final centering algorithm choice \fIofilter\fR employs a variation of the
+optimal filtering technique in which the profile is simulated by a triangle
+function of width \fIdatapars.fwhmpsf\fR.
+
+The default thresholding algorithm for all centering algorithms other
+than "centroid" is no thresholding.
+
+If the computed shift in either coordinate > \fImaxshift\fR / \fIscale\fR,
+the new center is returned but an error flag is set.
+
+.ih
+EXAMPLES
+1. List the centering parameters.
+
+.nf
+	ap> lpar centerpars
+.fi
+
+2. Edit the centering parameters
+
+.nf
+	ap> centerpars
+.fi
+
+3. Edit the CENTERPARS parameters from with the PHOT task.
+
+.nf
+    da> epar phot
+
+	... edit a few phot parameters
+
+	... move to the centerpars parameter and type :e
+
+	... edit the centerpars parameters and type :wq
+
+	... finish editing the phot parameters and type :wq
+.fi
+
+4. Save the current CENTERPARS parameter set in a text file ctrnite1.par.
+This can also be done from inside a higher level task as in the
+previous example.
+
+.nf
+    da> centerpars
+
+	... edit the parameters
+
+	... type ":w ctrnite1.par"  from within epar
+.fi
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+center,phot,wphot,polyphot,radprof
+.endhelp

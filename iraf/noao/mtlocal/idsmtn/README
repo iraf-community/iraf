@@ -1,0 +1,3 @@
+This directory (dataio$idsmtn) contains code for the mountain format
+IIDS/IRS tapes.  Either raw or mountain reduced data tapes are read
+with task ridsmtn.  This task was installed in dataio 11/84.  SEH

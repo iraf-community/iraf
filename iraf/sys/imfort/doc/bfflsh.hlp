@@ -1,0 +1,26 @@
+.help bfflsh Sep86 imfort.bfio
+.ih
+NAME
+bfflsh -- flush any buffered output data to disk
+.ih
+SYNOPSIS
+.nf
+integer function bfflsh (fd)
+
+integer		fd		#I BFIO file descriptor of open file
+.fi
+.ih
+DESCRIPTION
+The \fIbfflsh\fR procedure flushes any buffered output data to a binary
+file opened for read-write access.
+.ih
+RETURN VALUE
+A negative status indicates failure, e.g., a write error on the file.
+.ih
+NOTES
+If the buffer has already been flushed or the file was opened for read-only
+access, \fIbfflsh\fR is a no-op.
+.ih
+SEE ALSO
+bfwrit
+.endhelp

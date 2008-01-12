@@ -1,0 +1,3 @@
+The UTILITIES package is a place to put programs which should be in the
+mainline system, but which do not logically belong in any other package.
+See also the NOAO.ASTUTIL package, for utilities pertaining to astronomy.

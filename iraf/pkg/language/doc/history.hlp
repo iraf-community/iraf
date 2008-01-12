@@ -1,0 +1,42 @@
+.help history Feb86 language
+.ih
+NAME
+history -- display the last few commands
+.ih
+USAGE
+history [[-]ncommands]
+.ih
+PARAMETERS
+.ls ncommands
+The number of commands to be displayed.
+.le
+.ih
+DESCRIPTION
+The \fIhistory\fR task prints a list of the last few commands executed.
+Only commands which terminated normally are included.
+The number of commands to be printed may be specified on the command line
+if desired.  If the number is preceded by a minus sign the default
+number of lines is not changed, otherwise \fIhistory\fR will take the
+value given as the new default number of commands to be printed.
+.ih
+EXAMPLES
+1. Print the last few commands.
+	
+	cl> history
+
+2. Print the entire history list.
+
+	cl> history -999
+
+3. Change the default number of history lines to be printed to 5 (and print
+the last five commands).
+
+	cl> history 5
+
+4. Save the history in the file "commands".
+
+	cl> history -999 > commands
+.ih
+SEE ALSO
+ehistory
+.endhelp

@@ -1,0 +1,9 @@
+images,s,a,,,,images to be edited
+fields,s,a,,,,fields to be edited
+value,s,a,,,,value expression
+add,b,h,no,,,add rather than edit fields
+addonly,b,h,no,,,add only if field does not exist
+delete,b,h,no,,,delete rather than edit fields
+verify,b,h,yes,,,verify each edit operation
+show,b,h,yes,,,print record of each edit operation
+update,b,h,yes,,,enable updating of the image header

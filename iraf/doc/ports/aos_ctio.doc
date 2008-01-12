@@ -1,0 +1,233 @@
+System notes file for CTIO AOS/VS IRAF installation.
+9-17 April 1987
+
+System installed by Gary Lee Webb on 9 April.
+CL came up and ran with minor problems.
+
+Did not start keeping this notes file until 16 April (D.Tody).
+May have missed some important mods.
+
+Extant Bugs
+------------
+
+1. OS escapes.
+
+	Interrupting an OS escape often causes the escape mechanism to
+	get in a state where subsequent escapes will return immediately,
+	even though the command has been sent to the cli, sh, or whatever.
+	This leads to the CL and the host task reading from the terminal
+	at the same time, seizing alternate lines of input.
+
+2. Magtape i/o problem
+
+	CTIO has a standard DG tape drive and two Cipher tape drives.
+	The standard tape drive will accept transfers up to 32768 bytes
+	(or maybe 32767 bytes), which is what the zfiomt.c driver code
+	is written for.  The Cipher drives, however, have a maximum transfer
+	size of 8192 bytes, hence the max transfer size is device dependent
+	rather than just system dependent.  As a kludge fix for this I
+	added some site dependent logic to zfiomt.c, but a real fix will
+	probably require addition of the max transfer size to the dev$devices
+	file, and changes to the VOS code to deal with this.
+
+3. Path and script problems
+
+	There were a number of problems with missing directories and
+	confusion between executables and macro script tasks, leading to
+	failure of mkpkg, xc, etc.  I will try to get Gary to document these
+	better.
+	    One of the problems (glw) was the use of directories C_DIR and
+	F77_DIR to find the executable C and FORTRAN compilers.  Unfortunately,
+	there are no standard directories for these (other than they should be
+	in :UTIL), perhaps the standard C and F77 macros should be used rather
+	than having IRAF write its own?
+
+4. File dates
+
+	After the system installation, a mkpkg on any package results in
+	compilation of all of the files therein.  Evidently the file modify
+	dates are not being restored properly when a backed up system is
+	restored from tape.
+
+5. Installation (glw)
+
+	   The current link initialization macro will delete /TMP and link it
+	to /DEV. I see no reason to combine these and did not do so.
+	   For a user to be able to generate any processes under IRAF, he also
+	had to be a valid MV/UX user (i.e., have an entry in /ETC/PASSWD).  If
+	this is not a bug, it should be documented in the installation guide!
+	   There are !SOLPLs all over the place: a list of files to be changed
+	would be nice.
+
+6.  Worries... (glw)
+
+	   I note that the editor description files end with a .ed, just like
+	the SED temporary files, making them likely to be deleted accidentally.
+
+
+System Revisions
+--------------------
+
+aosvs/os/zfiomt.c
+	Did a kludge fix to set the max transfer size down to 8192 bytes
+	for devices other than mtb0.  (4/15 dct)
+
+dev/vi.ed
+	Changed the OS escape for VI from "vi" to "!vi" to cause the command
+	to be executed by CSH rather than CLI.  Also added an entry for the
+	vi500 to /etc/termcap, but I could never get VI to find the entry
+	for the device.  Tried setting TERMCAP in .cshrc to point to another
+	file, or directly to the vi500 termcap entry, but none of this made
+	any difference.  (4/16 dct)
+
+aosvs/os/prwait.c
+	The include file <sys/wait.h> was not being found; it turns out to
+	be in /usr/include on this system.  I had to reference the file as
+	"/usr/include/wait.h" rather than the expected <wait.h> to get the
+	module to compile.  It appears that the real include files are
+	coming from some other place (maybe a text library?) and that the
+	wait.h file is missing.  (4/16 dct)
+
+aosvs/boot/rtar/mkpkg
+	Added a "-B" flag to the $link call.  Without this the link fails
+	with a multiple reference to main.o, and unresolved externals for
+	all the bootlib routines.  It looked like this was missing from
+	most of the other boot packages too.  (4/16 dct)
+
+dev/slate.ed  (glw)
+	Added this file (guessing a lot!) to provide Dan's favorite editor.
+	It must work -- that's how I'm adding this comment!
+	Where is the documentation for the *.ed format?
+
+dev/sed.ed  (glw 16 IV 87)
+	Modified the command line to be SED/NOED to avoid leaving *.ed files
+	all over the place.
+
+dev/termcap (glw 16 IV 87)
+	Added lpt1, lpt4, and lpt5 printers, a/k/a adservs, diablo, laser.
+
+pkg/images/imdebug/mktest.x
+	Would integer overflow when creating a large image.  This is harmless
+	on the other systems, but it has to be guarded against on the MV as
+	it causes the task to abort.  (4/17)
+
+pkg/images/iminfo/t_imstat.x
+	Installed an optimized version of the IMSTAT task.  (4/18)
+
+aosvs/boot/mkpkg/*.[ch]
+	AOS/VS evidently cannot restore the modify dates of files when reading
+	a tape onto disk.  This causes mkpkg to try to recompile everything
+	when run for the first time on a newly installed system.  Modified the
+	mkpkg program to add a new flag "-u".  This flag, if present, causes
+	the dates of library modules to be forced to be no less than the date
+	of a magic file (currently hlib$iraf.h).  It is assumed that the date
+	of the magic file is about the same as the date at which the system
+	was installed.  To be precise, the file should be touched after the
+	tape is read in (already done for the CTIO system), and the first
+	time mkpkg is run on a package the -u flag should be used to forcibly
+	update the library module dates.  (4/18)
+
+---------------------------------------------------------------------
+From SKIP@SOLPL.AS.ARIZONA.EDU Thu May 28 12:14:58 1987
+Received: from noao.arpa by noao-lyra.arpa.noao (5.51/SAG.7)
+	id AA08983; Thu, 28 May 87 12:14:53 MST
+Received: from solpl.as.arizona.edu by noao.arpa (5.51/SAG.7)
+	id AA03426; Thu, 28 May 87 12:14:46 MST
+Received: by SOLPL.AS.ARIZONA.EDU (1.00/1.0)
+	  id AA00065; Thu, 28 May 87 12:14:20 mst
+Date: Thu, 28 May 87 12:14:20 mst
+From: Skip Schaller <SKIP@SOLPL.AS.ARIZONA.EDU>
+Message-Id: <8705281714.AA00065@SOLPL.AS.ARIZONA.EDU>
+To: chile@noao, tody@noao
+To: Dan@SOLPL.AS.ARIZONA.EDU, Smith@SOLPL.AS.ARIZONA.EDU,
+        Gary@SOLPL.AS.ARIZONA.EDU, Webb@SOLPL.AS.ARIZONA.EDU
+Fm:  Skip Schaller
+
+	I will be leaving Tucson on June 18 for Chile.  I will call you
+on Monday morning June 22.  I expect to be able to pitch in immediately
+if you so desire.  I will be in Chile until August 16.  Let me know as
+soon as you know what it is exactly that you want me to do for you.  If
+I can prepare anything here ahead of time, so much the better.
+
+	Please send me any AOSVS/IRAF bug reports as soon as possible.  It
+will be much easier for me to fix them here.
+
+
+	The following are my responses to the CTIO AOSVS/IRAF installation
+notes that I got from Doug Tody:
+
+1)  Keyboard interrupt during OS escape.
+	I duplicated this problem at solpl.  I will try to fix during
+this next update.  It may be an AOSVS problem and not fixable.
+
+2)  Magtape maximum record size for certain drives.
+	Doug changed the IRAF VOS just the other to deal with this problem.
+
+3) Pathname problems.
+	As far as I can tell (by looking at other AOSVS systems),
+F77_DIR and C_DIR are the standard DG directories for those languages.
+In any case, the installation manual tells you which scripts to check
+and modify to agree with your system.  (I had to do this for the
+Tenerife installation.  It was trivial.)  Unfortunately, the standard
+scripts cannot be used due to their lack of functionality and interface
+to mkpkg.
+
+4) File dates.
+	Hopefully by the next release, Doug's changes to mkpkg to update
+file dates for library members without recompiling, will be incorporated.
+Many DG sites have complained about AOSVS not restoring the original
+file modification times.
+
+5) Link installation problems.
+	The link installation script does NOT delete /TMP and link it to /DEV.
+Read it again.  With MV/UX installed, that part of the script does nothing.
+
+6) Problems with /etc/passwd.
+	I could not reproduce this problem at solpl.  I did reproduce it
+during the Tenerife installation.  I found out that the minimum needed
+was to have this file present with one entry for user "iraf".
+	Sometime ago I tried to eliminate IRAF dependence on this file
+by avoiding the use of those C subroutines given in the DG documentation
+that access this file.  Apparently, there is at least one more, execl ().
+In any event, the DG C subroutines should do something more graceful when it
+can't access the information it wants.  I will take this matter up with
+DG.  In the meantime, all current AOSVS/IRAF sites now have MV/UX so they
+should really keep this file up to date for all users.
+
+7) Node name changes.
+	There are NOT solpl!'s all over the place.  They are confined to
+the files which may contain site dependence.  In any event, since CTIO
+does not have any networking software, the IRAF networking is automatically
+turned off and the solpl!'s are harmless and need not be changed.  If there
+are any files that particularly bother you, give me their names and I'll
+see what I can do.
+
+8) Editor descriptor files (.ed).
+	The editor descriptor 'edit' was already provided so that SED
+does not generate files with conflicting extensions.
+
+9) Vi.
+	We execute vi directly from the CLI.  We use a slightly different
+entry for the vi500 in /etc/termcap than the one used by IRAF, so as to
+get around some DG bugs.  The user needs a .exrc file in his home directory
+to set the terminal type.
+
+10) Wait.c
+	The include file wait.c is missing from the DG C release and
+should be copied from :usr:include:wait.h to :util:c_dir:sys.
+
+11) Mkpkg -B flag.
+	The -B flag was present in the mkpkg file in the immediately superior
+directory, but I will put it in all the subdirectory mkpkg files as it
+should be.
+
+12) No documentation for dev$*.ed files.
+	I agree with you, Gary.  However it turns out that most of it
+is not necessary to change.
+
+13) image$imdebug/mktest.x
+	I reported the integer overflow problems to Doug some time ago
+when I ran the benchmarks.
+
+
+NNN

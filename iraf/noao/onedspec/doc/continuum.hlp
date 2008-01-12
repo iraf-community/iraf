@@ -1,0 +1,263 @@
+.help continuum Mar92 noao.onedspec
+.ih
+NAME
+continuum -- Continuum normalize spectra
+.ih
+USAGE	
+continuum input output
+.ih
+PARAMETERS
+.ls input
+Input spectra to be continuum normalized.  These may be any combination
+of echelle, multiaperture, one dimensional, long slit, and spectral
+cube images.
+.le
+.ls output
+Output continuum normalized spectra.  The number of output spectra must
+match the number of input spectra.  \fBOutput\fR may be omitted if
+\fBlistonly\fR is yes.
+.le
+.ls lines = "*", bands = "1"
+A range specifications for the image lines and bands to be fit.  Unspecified
+lines and bands will be copied from the original.  If the value is "*", all of
+the currently unprocessed lines or bands will be fit.  A range consists of
+a first line number and a last line number separated by a hyphen.  A
+single line number may also be a range and multiple ranges may be
+separated by commas.
+.le
+.ls type = "ratio"
+Type of output spectra.  The choices are "fit" for the fitted function,
+"ratio" for the ratio of the input spectra to the fit, "difference" for
+the difference between the input spectra and the fit, and "data" for
+the data minus any rejected points replaced by the fit.
+.le
+.ls replace = no
+Replace rejected points by the fit in the difference, ratio, and
+data output types?
+.le
+.ls wavescale = yes
+Wavelength scale the X axis of the plot?  This option requires that the
+spectra be wavelength calibrated.  If \fBwavescale\fR is no, the plots
+will be in "channel" (pixel) space.
+.le
+.ls logscale = no
+Take the log (base 10) of both axes?  This can be used when \fBlistonly\fR
+is yes to measure the exponent of the slope of the continuum.
+.le
+.ls override = no
+Override previously normalized spectra?  If \fBoverride\fR is yes and
+\fBinteractive\fR is yes, the user will be prompted before each order is
+refit.  If \fBoverride\fR is no, previously fit spectra are silently
+skipped.
+.le
+.ls listonly = no
+Don't modify any images?  If \fBlistonly\fR is yes, the \fBoutput\fR
+image list may be skipped.
+.le
+.ls logfiles = "logfile"
+List of log files to which to write the power series coefficients.  If
+\fBlogfiles\fR = NULL (""), the coefficients will not be calculated.
+.le
+.ls interactive = yes
+Perform the fit interactively using the icfit commands?  This will allow
+the parameters for each spectrum to be adjusted independently.  A separate
+set of the fit parameters (below) will be used for each spectrum and any
+interactive changes to the parameters for a specific spectrum will be
+remembered when that spectrum is fit in the next image.
+.le
+.ls sample = "*"
+The ranges of X values to be used in the continuum fits.  The units will vary
+depending on the setting of the \fBwavescale\fR and \fBlogscale\fR
+parameters.  The default units are in wavelength if the spectra have
+been dispersion corrected.
+.le
+.ls naverage = 1
+Number of sample points to combined to create a fitting point.
+A positive value specifies an average and a negative value specifies
+a median.
+.le
+.ls function = spline3
+Function to be fit to the spectra.  The functions are
+"legendre" (legendre polynomial), "chebyshev" (chebyshev polynomial),
+"spline1" (linear spline), and "spline3" (cubic spline).  The functions
+may be abbreviated.  The power series coefficients can only be
+calculated if \fBfunction\fR is "legendre" or "chebyshev".
+.le
+.ls order = 1
+The order of the polynomials or the number of spline pieces.
+.le
+.ls low_reject = 2., high_reject = 0.
+Rejection limits below and above the fit in units of the residual sigma.
+.le
+.ls niterate = 10
+Number of rejection iterations.
+.le
+.ls grow = 1.
+When a pixel is rejected, pixels within this distance of the rejected pixel
+are also rejected.
+.le
+.ls markrej = yes
+Mark rejected points?  If there are many rejected points it might be
+desired to not mark rejected points.
+.le
+.ls graphics = "stdgraph"
+Graphics output device for interactive graphics.
+.le
+.ls cursor = ""
+Graphics cursor input.
+.le
+.ih
+DESCRIPTION
+A one dimensional function is fit to the continuum of spectra in a list of
+echelle, multispec, or onedspec format images and then divided into the
+spectrum to produce continuum normalized spectra.  The first two formats
+will normalize the spectra or orders (i.e. the lines) in each image.  In
+this description the term "spectrum" will refer to a line (in whatever
+band) of an image while "image" will refer to all spectra in an image.  The
+parameters of the fit may vary from spectrum to spectrum within images and
+between images.  The fitted function may be a legendre polynomial,
+chebyshev polynomial, linear spline, or cubic spline of a given order or
+number of spline pieces.  The output image is of pixel type real.
+
+The line/band numbers (for two/three dimensional images) are written to a
+list of previously processed lines in the header keywords \fISFIT\fR and
+\fISFITB\fR of the output image.  A subsequent invocation of SFIT will only
+process those requested spectra that are not in this list.  This ensures
+that even if the output image is the same as the input image that no
+spectra will be processed twice and permits an easy exit from the task in
+the midst of processing many spectra without losing any work or requiring
+detailed notes.
+
+The points to be fit in each spectrum are determined by
+selecting a sample of X values specified by the parameter \fIsample\fR
+and taking either the average or median of the number of points
+specified by the parameter \fInaverage\fR.  The type of averaging is
+selected by the sign of the parameter with positive values indicating
+averaging, and the number of points is selected by the absolute value
+of the parameter.  The sample units will vary depending on the settings
+of the \fBwavescale\fR and the \fBlogscale\fR parameters.  Note that a
+sample that is specified in wavelength units may be entirely outside
+the domain of the data (in pixels) if some of the spectra are not
+dispersion corrected.  The syntax of the sample specification is a comma
+separated, colon delimited list similar to the image section notation.
+For example, the \fBsample\fR, "6550:6555,6570:6575" might be used to
+fit the continuum near H-alpha.
+
+If \fIlow_reject\fR and/or \fIhigh_reject\fR are greater than zero the
+sigma of the residuals between the fitted points and the fitted
+function is computed and those points whose residuals are less than
+\fI-low_reject\fR * sigma and greater than \fIhigh_reject\fR * sigma
+are excluded from the fit.  Points within a distance of \fIgrow\fR
+pixels of a rejected pixel are also excluded from the fit.  The
+function is then refit without the rejected points.  This rejection
+procedure may be iterated a number of times given by the parameter
+\fIniterate\fR.  This is how the continuum is determined.
+
+If \fIreplace\fR is set then any rejected points from the fitting
+are  replaced by the fit in the data before outputing the difference,
+ratio, or data.  For example with replacing the difference will
+be zero at the rejected points and the data output will be cleaned
+of deviant points.
+
+A range specification is used to select the \fIlines\fR and \fIbands\fR to be
+fit.  These parameters may either be specified with the same syntax as the
+\fBsample\fR parameter, or with the "hyphen" syntax used elsewhere in
+IRAF.  Note that a NULL range for \fBlines/bands\fR expands to \fBno\fR
+lines, not to all lines.  An asterisk (*) should be used to represent a
+range of all of the image lines/bands.  The fitting parameters (\fIsample,
+naverage, function, order, low_reject, high_reject, niterate, grow\fR)
+may be adjusted interactively if the parameter \fIinteractive\fR is
+yes.  The fitting is performed with the \fBicfit\fR package.  The
+cursor mode commands for this package are described in a separate help
+entry under "icfit".  Separate copies of the fitting parameters are
+maintained for each line so that interactive changes to the parameter
+defaults will be remembered from image to image.
+.ih
+PROMPTS
+If several images or lines/bands are specified, the user is asked whether
+to perform an interactive fit for each spectrum.  The response
+may be \fByes, no, skip, YES, NO\fR or \fBSKIP\fR.  The meaning of each
+response is:
+
+.nf
+	yes   - Fit the next spectrum interactively.
+	no    - Fit the next spectrum non-interactively.
+	skip  - Skip the next spectrum in this image.
+
+	YES   - Interactively fit all of the spectra of
+		all of the images with no further prompts.
+	NO   	Non-interactively fit all chosen spectra of all images.
+	SKIP  - This will produce a second prompt, "Skip what?",
+		with the choices:
+
+		spectrum - skip this spectrum in all images
+		image    - skip the rest of the current image
+		all      - \fBexit\fR the program
+		           This will \fBunlearn\fR the fit parameters
+			   for all spectra!
+		cancel  - return to the main prompt
+.fi
+.ih
+EXAMPLES
+1.  To normalize all orders of the echelle spectrum for hd221170
+
+	cl> continuum hd221170.ec nhd221170.ec type=ratio
+
+Each order of the spectrum is graphed and the interactive options for
+setting and fitting the continuum are available.  The important
+parameters are low_rejection (for an absorption spectrum), the function
+type, and the order of the function; these fit parameters are
+originally set to the defaults in the \fBcontinuum\fR parameter file.  A
+'?' will display a menu of cursor key options.  Exiting with 'q' will
+update the output normalized order for the current image and proceed to
+the next order or image.
+
+The parameters of the fit for each order are initialized to the current
+values the first time that the order is fit.  In subsequent images, the
+parameters for a order are set to the values from the previous image.
+The first time an order is fit, the sample region is reset to the
+entire order.  Deleted points are ALWAYS forgotten from order to order
+and image to image.
+
+2.  To do several images at the same time
+
+	cl> continuum spec*.imh c//spec*.imh
+
+Note how the image template concatenation operator is used to construct
+the output list of spectra.  Alternatively:
+
+	cl> continuum @inlist @outlist
+
+where the two list files could have been created with the sections
+command or by editing.
+
+3.  To measure the power law slope of the continuum (fluxed data)
+
+	cl> continuum uv.* type=ratio logscale+ listonly+ fun=leg order=2
+.ih
+REVISIONS
+.ls CONTINUUM V2.10.4
+The task was expanded to include fitting specified bands in 3D multispec
+spectra.
+
+The task was expanded to include long slit and spectral cube data.
+.le
+.ls CONTINUUM V2.10
+This task was changed from a script based on \fBimages.fit1d\fR to a
+task based on \fBsfit\fR.  This provides for individual independent
+continuum fitting in multiple spectra images and for additional
+flexibility and record keeping.  The parameters have been largely
+changed.
+.le
+.ih
+BUGS
+The errors are not listed for the power series coefficients.
+
+Spectra that are updated when \fBlogscale\fR is yes are written with a
+linear wavelength scale, but with a log normalized data value.
+
+Selection by aperture number is not supported.
+.ih
+SEE ALSO
+sfit, fit1d, icfit, ranges
+.endhelp

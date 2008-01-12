@@ -1,0 +1,20 @@
+.help revisions Jan92 noao.nobsolete
+.nf
+nobsolete$t_badpixim.x		+
+nobsolete$badpixim.par		+
+nobsolete$doc/badpiximage.hlp	+
+nobsolete$nobsolete.men		+
+nobsolete$nobsolete.cl
+nobsolete$nobsolete.par
+nobsolete$nobsolete.hd
+nobsolete$x_nobsolete.x
+nobsolete$mkpkg
+    Moved BADPIXIMAGE from CCDRED to NOBSOLETE.  (6/17/96, Valdes)
+
+=========
+V2.10.4p2
+=========
+
+nobosolete$* +
+    The NOAO obsolete package, NOBSOLETE, was created.  (1/23/92, Valdes)
+.endhelp

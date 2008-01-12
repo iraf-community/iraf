@@ -1,0 +1,158 @@
+Begin IRIX/IRAF port/upgrade.
+Thu May 30 13:31:15 MST 1996
+------------------------------------------------------------------------------
+Host - almond (WIYN remote observing host)
+IRIX almond 5.3 11091812 IP22 mips
+150 Mhz MIPS R4400
+64 Mb RAM
+Indy 8-bit
+Vino video
+A2 Audio Processor
+IRIX 5.3
+
+Graphics board 0 is "NG1" graphics.
+	Managed (":0.0") 1280x1024 
+	8 bitplanes, NG1 revision 3, REX3 revision B, VC2 revision A
+ 	MC revision C, xmap9 revision A, cmap revision C, bt445 revision A
+	Display 1280x1024 @ 72Hz, monitor id 2
+
+Note - use "iiv" to view CD-ROM documentation.
+------------------------------------------------------------------------------
+The following are notes from the IRIX 5.3 port, which was done mostly during
+June 1-2 1996.  Sun Jul  7 13:01:50 MST 1996
+
+./local/notes.irix		+
+
+./local/.4Dwmrc
+./local/.cshrc
+./local/.exrc
+./local/.login
+	Customized for IRIX.  This includes a workable desktop via .4Dwmrc.
+
+./unix/hlib/extern.pkg
+	Minimal package list for the port.
+
+./unix/hlib/install
+	Changed "mach" (the HSI machine type) from ssol to irix.
+
+./unix/hlib/irafuser.csh
+	1. MACH is generated from uname differently than for Solaris.
+	2. IRIX/IRAF compile flags are -/DSYSV -/DSOLARIS.
+	3. IRIX/IRAF link flags are -lelf -lfpe.
+	4. No -Bstatic flag for IRIX.
+
+./unix/hlib/login.cl
+	FC calls XC directly in the conventional manner rather than using
+	hlib$fc.csh.
+
+./unix/hlib/mkiraf.csh
+./unix/hlib/mkpkg.inc
+./unix/hlib/motd
+	Minor customization.
+
+./unix/hlib/mkpkg.sf.IRIX	+
+	Pretty standard, did need to increase size of compiler tables for
+	fmtio$evvexpr.x and cl$ytab.c.
+
+./unix/os/irafpath.c
+	Added "irix" for #ifdef sgi.
+
+./unix/os/mkpkg
+./unix/os/mkpkg.sh
+	Deleted enbint.s (a solaris special routine).
+	Modified to use $CC to compile the assembler files, as we have done
+	recently on other platforms (allows compile flags to be used).
+
+./unix/os/zawset.c
+	Minor compile time customization (nuke solaris #define RLIMIT_RSS
+	RLIMIT_VMEM).  Poking arount it appears that IRIX handles the
+	set/getrlimit stuff ok.
+
+./unix/os/zxwhen.c
+	The error handler code was remarkably similar to Solaris (i.e. SYSV
+	I suppose), down to the codes for the arithmetic exceptions.  All I
+	had to change was a sigaction structure definition: solaris uses
+	sig.sa_sigaction, IRIX uses sig.sa_handler.
+
+./unix/os/zzstrt.c
+	Include <sigfpe.h> for IRIX.
+	The IEEE exception handling initialization for this platform consists
+	of:
+
+	>       sigfpe_[_UNDERFL].repls = _ZERO;
+	>       handle_sigfpes (_ON, _EN_OVERFL|_EN_DIVZERO |_EN_INVALID,
+	>           0, _ABORT_ON_ERROR, 0);
+
+	This enables exceptions for overflow, divide by zero, and invalid
+	operand.  It is also supposed to be possible to arrange for things
+	to underflow to zero, however it is not clear if it is possible to
+	do this without enabling the underflow exception.  I didn't have
+	time to look into it further, and the system passes all tests with
+	the underflow handling disabled.
+
+./unix/as.irix/zsvjmp.s
+	The DECstation (MIPS) version works also for IRIX - the SGI of course
+	uses a MIPS chip.
+	Checked size of SETJMP/ZSVJMP buffer; the Solaris value is larger than
+	needed for IRIX so I left it unchanged.
+
+./unix/boot/mkpkg/host.c
+	The ELF library code for solaris works fine for IRIX too.  The only
+	problem encountered was that during library updates the link mkpkg
+	creates to the actual library would be clobbered by the updated
+	library file which would subsequently be deleted, causing the mkpkg
+	to be a no-op.  Linux/IRAF had the same problem so I merged in the
+	"resolvefname" code from Linux/IRAF.  This takes a library name and
+	checks to see if it is a link and keeps this up until a fully 
+	resolved filename is obtained.  This is then used to perform the AR
+	updates.
+
+./unix/boot/spp/xc.c
+	Sysbindir (default compiler location) is /usr/bin.
+	System libraries are the conventional U77,F77,I77,U77, plus fpe, isam.
+	Implemented the -// syntax for passing on host switch arguments.
+
+./unix/boot/spp/xpp/xppcode.c
+	Had to declare errflag an external.
+
+./unix/gdev/sgidev/sgi2uapl.c
+./unix/gdev/sgidev/sgi2uhpgl.c
+./unix/gdev/sgidev/sgi2uimp.c
+./unix/gdev/sgidev/sgi2uqms.c
+	Various local variables named "sgi" caused problems here.  Changed
+	the names to "sgip".
+
+./dev/hosts
+	Replaced with newer version.
+
+./dev/pix.imh
+	Someone modified this on Tue 17:56:52 04-Jun-96.  I don't know who or
+	why, but the image appears the same.
+
+./dev/tapecap
+	Modified for IRIX 5.3.  The default configuration should provide
+	variable block size support ("v" in device name) so long as the
+	host level support for the device permits it.  See "man tps" for
+	information on the IRIX SCSI tape driver.
+
+./pkg/cl/globals.c
+./pkg/cl/grammar.h
+	Added global declarations for parse_state, proc_script, parse_pfile,
+	and changed the declarations in grammar.h to extern.
+
+./unix/boot/spp/xc.c.NOSHARE
+./unix/shlib/README
+./unix/shlib/mkpkg
+./unix/shlib/mkshlib.csh
+./unix/shlib/so_locations
+	The shared library code in IRIX looked remarkably similar to that in
+	DEC Alpha OSF/1 (including quickstart etc.) so I did an experiment
+	to implement shared libraries for IRIX/IRAF.  This pretty much worked,
+	but I had to set it aside due to some obscure runtime error occurring
+	during process startup, which I didn't have time to investigate.
+	The code is still there in case we get time to go back and look into
+	this further.
+
+------------------------------
+Fri Jul  5 18:04:26 MST 1996
+IRIX/IRAF distribution built.

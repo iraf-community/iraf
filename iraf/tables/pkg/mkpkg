@@ -1,0 +1,33 @@
+# mkpkg for the Tables applications packages
+# Author: R. L. Williamson II, 12-Aug-93
+#
+#   Special keywords recognized by IRAF mkpkg files:
+#
+#	mkpkg relink		update object library and link
+#	mkpkg linkonly		skip object library updates and just link
+#	mkpkg install		move executable to lib$
+#	mkpkg update		update object library, link, and move to lib$
+
+relink:
+linkonly:
+update:
+install:
+
+$ifeq (hostid, unix)  !(date)  $endif
+$ifeq (hostid, vms)   !(show time)  $endif
+
+$echo "-------------------  FITSIO   ------------------------"
+$call @fitsio
+	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
+$echo "-------------------  TBPLOT  ------------------------"
+$call @tbplot
+	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
+$echo "-------------------  TOBSOLETE  ------------------------"
+$call @tobsolete
+	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
+$echo "-------------------  TTOOLS  -------------------------"
+$call @ttools
+	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
+$ifeq (hostid, unix)  !(date)  $endif
+$ifeq (hostid, vms)   !(show time)  $endif
+$exit

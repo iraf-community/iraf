@@ -1,0 +1,5 @@
+# Help directory for the KPNOCOUDE package.
+
+$doc		 = "./doc/"
+
+do3fiber	hlp=doc$do3fiber.hlp

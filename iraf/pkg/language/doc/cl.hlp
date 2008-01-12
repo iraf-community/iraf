@@ -1,0 +1,126 @@
+.help cl,clbye Jun86 language
+.ih
+NAME
+.nf
+cl    -- call the CL as a task
+clbye -- like cl(), but closes current script file too
+.fi
+.ih
+PARAMETERS
+.ls gcur = ""
+Global graphics cursor.
+.le
+.ls imcur = ""
+Global image cursor.
+.le
+.ls abbreviate = yes
+Permits minimum match abbreviations of task and parameter names (disabled
+within scripts).
+.le
+.ls echo = no
+Echo all commands received by the CL on the terminal.
+.le
+.ls ehinit = "standout eol noverify"
+Ehistory options string.  (See "ehistory")
+.le
+.ls epinit = "standout noshowall"
+Eparam options string.  (See "eparam")
+.le
+.ls keeplog = no
+Keep a log of all CL commands.
+.le
+.ls logfile = "uparm$logfile"
+The name of the logfile, if command logging is enabled.
+.le
+.ls logmode = "commands nobackground noerrors notrace"
+Logging mode control parameter.  (See "logging")
+.le
+.ls lexmodes = yes
+Enable automatic mode switching between "command mode" (used when commands are
+being entered interactively at the terminal), and "compute mode" (used to
+evaluate arithmetic expressions and argument lists).  If \fIlexmodes\fR is
+disabled command mode is disabled.  Command mode is always disabled within
+scripts and within parenthesis, i.e., expressions or formal argument lists.
+.le
+.ls menus = yes
+If \fImenus\fR are enabled, a table will be printed whenever a package is
+entered or exited listing the tasks (or subpackages) in the new package.
+.le
+.ls mode = "ql"
+The parameter mode of the CL, and of any tasks run by the CL which do not
+specify their own mode (i.e., which specify `auto' mode).  A "q" causes a
+query to be generated whenever a parameter is used which was not set explicitly
+on the command line.  An "m" (menu mode) causes \fIeparam\fR to be called to
+edit/check a task's parameters when the task is run interactively.  An "l"
+causes the parameter file for a task to be updated on disk whenever the task
+is run interactively.  Note that changing the mode at the CL level will have
+no affect on the operation of an individual task unless "auto" mode is set
+at the package, task, and parameter level, causing the mode to defer to the
+global CL mode.
+.le
+.ls notify = yes
+If \fInotify\fR is enabled background jobs will print a message on the user
+terminal (or in the logfile for a queued job) notifying the user when the
+job completes.
+.le
+.ls szprcache = (a small number)
+Controls the size of the process cache.  The value may range from 1 to 10.
+A larger number reduces process spawns but the idle processes may consume
+critical system/job resources.
+.le
+.ih
+DESCRIPTION
+The \fIcl\fR and \fIclbye\fR commands are used to call the CL as a task.
+The function of the \fIcl\fR task is to read and execute commands from
+its standard input until \fIbye\fR or end of file is reached.  The \fIcl\fR
+task may be called with arguments or executed in the background like any
+other task.  The \fIcl\fR task may be called from within a procedure or
+script to read commands from the command stream which called that procedure
+or task; this is usually the terminal but may be a another script.
+
+When the \fIcl\fR or \fIclbye\fR command is invoked, the command language
+interpreter stores information about which tasks and packages are currently
+defined.  When the command is finished any tasks or packages which
+have become defined since invocation are lost, unless the user specifically
+overrides this by using the \fIkeep\fR command.
+
+The \fIclbye\fR command performs exactly like a \fIcl\fR followed by a
+\fIbye\fR, except that when called from a script the script file is closed
+immediately, freeing its file descriptor for use elsewhere.  If \fIcl\fR
+is used instead of \fIclbye\fR in a script, the file is not closed until
+after the \fIcl\fR returns.  If a \fIclbye\fR is used in a script, any
+commands following the \fIclbye\fR will not be executed.
+.ih
+EXAMPLES
+1. Execute CL commands from a file.
+
+	cl> cl < cmdfile
+
+2. Execute CL commands from a pipe.
+
+	cl> print ("!type ", fname) | cl
+
+3. Execute \fIcl\fR, taking command input from the terminal.  Since command
+input is already from the terminal, the only effect is to mark the state
+of CL memory, to allow \fItask\fR, \fIset\fR, and other definitions to be
+made temporarily and later freed by terminating the \fIcl\fR with a \fIbye\fR.
+
+.nf
+	cl> cl
+	cl> set pak = "home$tasks/"
+	cl> task $mytask = pak$x_mytask.e
+		(execute the task)
+	cl> bye
+.fi
+
+In the example above, the declarations of the logical directory "pak" and the
+task "mytask" are discarded when the \fIbye\fR is entered, terminating the
+\fIcl\fR.
+.ih
+BUGS
+Beware that any changes made to the global CL parameters during the execution
+of a \fIcl\fR remain in effect after the task terminates.
+.ih
+SEE ALSO
+bye, keep, logout
+.endhelp

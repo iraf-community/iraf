@@ -1,0 +1,132 @@
+ 
+STSDAS Version 3.7 Release Notes 
+  15 June 2007 
+This release of STSDAS contains changes to  ACS, AXE, CALSTIS, CALWP2, MultiDrizzle, PyDrizzle, SYNPHOT, and MSTOOLS as well as minor changes to CVOS and HSTIO.
+ 
+One new task has been added; namely,
+ 
+* rnlincorr (HST_CALIB/NICMOS; PyRAF only)
+ 
+
+The specific changes are detailed in the following sections.
+ 
+
+Platform Support 
+Binaries for this release were built on Red Hat Enterprise Linux 3, Solaris 5.8, and Mac OS X 10.4 (PPC and Intel architecture).
+ Binaries for macintel were built and require iraf 2.13.beta from http://iraf.net. 
+HST_CALIB 
+CALACS 4.6.3
+ 
+CALACS was updated to Version 4.6.3 (14-Dec-2006).  
+
+Bugs fixed in this version include:
+
+   * Problems recognizing wild-card values in the BPIXTAB keyword value were corrected so that the hot pixels will be flagged correctly in SBC data. 
+AXE 
+AXE was updated to version 1.6. See the official aXe site for details related to this update.
+ 
+NICMOS 
+    SAAclean:
+ 
+   *   The NICMOS team at STScI is seeking feedback on users' experience with this task in calibrating NICMOS data. Please contact help@stsci.edu if you have used this task in the course of your science. 
+   * The task was converted to use the numpy array package, rather than numarray and Numeric. The linear algebra routines from the ScientificPython package were consequently updated.
+ 
+
+    rnlincor: 
+      * RNLINCOR is a new task that corrects for countrate-dependent nonlinearity in NICMOS data. The nonlinearity constants depend on the camera/filter combination; it is obtained from the *_nlz.fits file available in CDBS nref, and stored in the header keyword RNLCALPH in the primary header of the output file. The zeropoint corrections (PHOTFNU/PHOTFLAM) are also updated. The algorithm used by this task is described in the NICMOS ISR 2006-003 by de Jong. 
+      * This task is written in python and is available only under PyRAF.
+ 
+STIS 
+This release contains CALSTIS Version 2.24 (23-May-2007) and represents the calibration to be used for the final reprocessing of all STIS data taken prior to SM4. 
+ 
+The following bugs were corrected:
+ 
+         * Failures of CALSTIS4 arising from "invalid floating point operation" exceptions with echelle data. 
+         * CALSTIS tried to process wavecal exposures even if they had exposure time of zero, leading to invalid offsets. 
+         * CALSTIS tried to process science exposures that had exposure time of zero, which failed with a divide by zero error during flux calibration. 
+         * There was a bug in CALSTIS in the BLEVCORR step for CCD data, which resulted in a small offset (of order 0.005 DN).
+ 
+         * SDQFLAGS added a new flag (NOT_CTI_CORR) for pixels that have a gross counts less than or equal to 0 when cticorr= PERFORM. 
+         * ODELAYTIME: a new function was written to derive the FIRSTMJD value from the EPHMSTRT keyword in the primary header if the FIRSTMJD value is not found in the parameter ephemeris.
+         * STISNOISE was incorrectly updating the fwhm parameter due to an uninitialized variable.
+         * WX2D: Changes were made to improve the speed by using array operations when possible.
+
+The code has seen a number of small, additional improvements related to maintainability but otherwise not affecting the algorithms or accuracy. A help file for MKTRACE was added.
+ 
+WFPC2 
+CALWP2 has been updated to Version 2.3.0 (May 24, 2007) in this release.  This new version applies the correction to WF4 data affected by the low-bias readout problems.  This support includes:
+ 
+            * Adding support for a new reference file required for this new calibration step: WF4TFILE 
+            * Adding support for a new calibration switch for this new calibration step: WF4TCORR 
+            * The reference file, WF4TFILE, also includes a keyword which specifies the low bias level limit: WF4TBDQ 
+            * The bias values reported in WFPC2 headers now include both uncorrected and corrected values, with the uncorrected values reported in the new BIASEVNU and BIASODDU keywords for each chip. 
+This new calibration step corrects WF4 data for low bias levels, and flags all the pixels in the WF4 DQ array with a value of 2048 when the original (uncorrected) bias levels fall below the threshhold speecified in the reference file's WF4TBDQ keyword. 
+ 
+This version also corrected a logic problem in computing each chip's statistics by explicitly keeping track of NGOODPIX for each chip and using it for computing the statistics for each chip.
+ 
+Synphot 
+    Data changes:
+ 
+
+            * New wavecat tables were added for COS and WFC3.
+ 
+            * The detectors.dat file was updated to support WFC3 IR modes. 
+            * Two new environment variables, crcoscomp and crwfc3comp, were added to provide access to the throughput files for COS and WFC3.
+ 
+            * A new environmental variable, crgridck04, was added to provide access to the new Castelli and Kurucz (2004) atlas of stellar atmosphere models. The new models can be used in the same way as the older Kurucz models, and is recommended as a replacement for them. The Pickles (1998) atlas of stellar spectra has also been made available for use by synphot. Both new atlases are included in the synphot2.tar.z tarfile; it can be downloaded and installed in the usual way from the synphot data download page, ftp://ftp.stsci.edu/pub/software/stsdas/refdata/synphot/ .
+ 
+
+    Calcphot:
+ 
+               * The efflam function was removed from this task after a bug was discovered in the calculation.
+ 
+               * The new function efflerg correctly calculates the effective wavelength in energy units, according to the definition in the Koornneef et al 1986 paper. It replaces the efflam function. 
+               * The new function efflphot was provided for backwards compatibility. It replicates the incorrect calculation (performed with photon units) that was performed by efflam. It may be used when direct comparisons with old calculations of efflam are necessary, but should otherwise be avoided.
+ 
+ANALYSIS 
+Drizzle 
+The help file for the drizzle task was modified to explain better the pixel values being set in the context image.
+ 
+PyDrizzle 6.0
+ 
+The following changes were made:
+
+                  * Moving target support has been implemented.
+                  * PyDrizzle can now be run without doing a distortion correction.
+
+                  * The in_units parameter has been exposed to select the units of the input image. This parameter defines the units of the input image.  The allowable values are 'counts' (default) and 'cps'.
+                     * The help file was correspondingly updated to describe the new in_units parameter.
+MultiDrizzle 3.0
+ 
+                     * The help file was updated to better explain the usefulness of the ERR opton for the final_wht_type parameter. 
+                     * The help file was updated to explain the updatewcs, final_units, driz_cr_grow and driz_cr_ctegrow parameters.
+                     * A new feature was added to Multidrizzle: automatic generation of inverse variance maps for weighting the final mosaic of ACS and WFPC2 data.  If the user specifies 'IVM' as the final_wht_type but does not supply inverse variance maps, Multidrizzle will automatically generate these images based upon the detector's characteristics and reference flatfield file.  This is an experimental feature that has not been fully tested.
+Several bugs were fixed, including:
+
+                     * Multidrizzle now properly passes the 'output' parameter to PyDrizzle for the single file input case.
+
+New support for using MultiDrizzle with WFPC2 data can also be found online at http://www.stsci.edu/hst/wfpc2/analysis/drizzle.html .
+ 
+TOOLBOX 
+IMGTOOLS/MSTOOLS 
+                     * New versions of MSARITH and MSSTATISTICS now support WFC3 as well as COS. WFC3 IR data is treated like NICMOS data and WFC3 UV data is treated like STIS/ACS/COS data. 
+                     * Support for WFC3 was added to MSCOMBINE, MSDEL, MSJOIN, and MSSPLIT 
+PYTHON 
+A new shell command line task, print_asn, was added to print out the contents of a table to standard out without having to explicitly load IRAF, PyRAF or Python.
+ 
+Libraries 
+CVOS 
+The C interface function c_tbciga was added to the cvos interface (XTABLES.def).  For a table column containing array elements, this function gets the dimension of the array and the length of each axis; this is only relevant if the array dimension is greater than one.  This is called by calstis and calnica, and it makes more sense to include the function in the C interface rather than defining interface functions in calstis and calnica.
+ 
+HSTIO 
+The function putSingleNicmosGroupSect (and supporting routines) were added to HSTIO.
+ 
+ZZSETENV.DEF 
+                     * Three new environmental variables were added for synphot: crcompcos and crcompwfc3 for the new COS and WFC3 instruments, and crgridck04 for the new ck04 atlas.
+ 
+                     * Only sets ref and tab variables if they haven't already been set by the user before loading stsdas.
+ 
+
+
+
+

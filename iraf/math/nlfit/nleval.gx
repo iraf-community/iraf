@@ -1,0 +1,25 @@
+include <math/nlfit.h>
+$if (datatype == r)
+include "nlfitdefr.h"
+$else
+include "nlfitdefd.h"
+$endif
+
+
+# NLEVAL -- Evaluate the fit at a point.
+
+PIXEL procedure nleval$t (nl, x, nvars)
+
+pointer	nl		# nlfit descriptor
+PIXEL	x[ARB]		# x values
+int	nvars		# number of variables
+
+real	zfit
+
+begin
+	# Evaluate the function.
+	call zcall5 (NL_FUNC(nl), x, nvars, PARAM(NL_PARAM(nl)),
+	    NL_NPARAMS(nl), zfit)
+
+	return (zfit)
+end

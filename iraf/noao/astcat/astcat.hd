@@ -1,0 +1,32 @@
+# Help directory for the ASTCAT package.
+
+$doc		= "./doc/"
+$srcdir		= "./src/"
+
+$agetcat	= "srcdir$agetcat/"
+$debug		= "srcdir$debug/"
+
+asttest         hlp=doc$asttest.hlp,            src=srcdir$asttest.cl
+aclist		hlp=doc$aclist.hlp,		src=agetcat$t_aclist.x
+aslist		hlp=doc$aslist.hlp,		src=agetcat$t_aslist.x
+adumpcat	hlp=doc$adumpcat.hlp,		src=debug$t_adumpcat.x
+adumpim		hlp=doc$adumpim.hlp,		src=debug$t_adumpim.x
+agetcat		hlp=doc$agetcat.hlp,		src=agetcat$t_agetcat.x
+afiltcat	hlp=doc$afiltcat.hlp,		src=agetcat$t_afiltcat.x
+agetim		hlp=doc$agetim.hlp,		src=agetcat$t_agetim.x
+ahedit		hlp=doc$ahedit.hlp,		src=agetcat$t_ahedit.x
+aimfind		hlp=doc$aimfind.hlp,		src=agetcat$t_aimfind.x
+
+aregpars	hlp=doc$aregpars.hlp
+afiltpars	hlp=doc$afiltpars.hlp
+acatpars	hlp=doc$acatpars.hlp
+awcspars	hlp=doc$awcspars.hlp
+aimpars		hlp=doc$aimpars.hlp
+
+ccsystems	hlp=doc$ccsystems.hlp
+catalogs	hlp=doc$catalogs.hlp
+surveys		hlp=doc$surveys.hlp
+afiles		hlp=doc$afiles.hlp
+
+revisions	sys=Revisions
+

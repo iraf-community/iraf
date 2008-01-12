@@ -1,0 +1,300 @@
+IKI/STF -- IKI kernel for the STScI SDAS/GEIS image format.  This format stores
+images in a format which resembles FITS group format.  A GROUP FORMAT IMAGE is
+a set of one or more images, all of which are the same size, dimension, and
+datatype, and which share a common FITS header.  The individual images in a
+group each has a binary GROUP PARAMETER BLOCK (GPB).  The image and associated
+group parameter block are commonly referred to as a GROUP.  A group format
+image consists of two files, the FITS format header file for the group,
+and the pixel file containing the image data and GPBs.
+
+
+1. Typical STF group format FITS image header (imname.hhh)
+
+	SIMPLE	=		    F		/ Standard STF keywords
+	BITPIX	=		    32
+	DATATYPE= 'REAL*4	'
+	NAXIS	=		    2
+	NAXIS1	=		    512
+	NAXIS2	=		    512
+	GROUPS	=		    T
+	PSIZE	=		    512
+	GCOUNT	=		    1
+	PCOUNT	=		    12
+
+	PTYPE1	= 'DATAMIN	'		/ Define binary group params
+	PSIZE1	= 		    32
+	PDTYPE1	= 'REAL*4	'
+	    (etc, for a total of 3*PCOUNT entries)
+
+	(special keywords and HISTORY cards)
+
+
+2. Pixel file format (imname.hhd) (byte stream, no alignment, no header)
+
+	[1].pixels
+	[1].group parameter block
+	[2].pixels
+	[2].group parameter block
+		...
+	[GCOUNT].pixels
+	[GCOUNT].group parameter block
+
+
+The chief problems with this format are that the FITS format header can contain
+only parameters which pertain to the group as a whole, while the format of the
+GPBs is fixed at image creation time.  Images may be neither deleted from nor
+added to a group.  It is possible for parameters in the FITS header to have
+the same names as parameters in the GPBs.  Multiple entries for the same
+keyword may appear in the FITS header and the format does not define how
+these are to be handled.  Although the format is general enough to support
+any datatype pixels, in practice only REAL*4 can be used as the SDAS software
+maps the pixfile directly into virtual memory.
+
+CAVEAT -- This is an awkward interface and some liberties have been taken in
+the code (hidden, subtle semantics, etc.).  At least we were able to confine
+the bad code to this one directory; any problems can be fixed without any
+changes to the rest of IMIO.  All of this low level code is expected to be
+thrown out when IMIO is cut over onto DBIO (the upcoming IRAF database
+interface).
+
+
+IKI/STF Pseudocode
+----------------------------
+
+1. Data structures:
+
+	1.1 IMIO image descriptor
+	    header, pixel file descriptors
+	    pointer to additional kernel descriptor, if any
+	    index of IKI kernel in use
+	    pathnames of header, pixel files
+	    IM_NDIM, IM_LEN, etc., physical image parameters
+
+	1.2 STF image descriptor
+	    Pointed to by IM_KDES field of IMIO descriptor.
+	    Contains values of all reserved fields of STF image header,
+		some of which duplicate values in IMIO descriptor.
+	    Group, gcount, size of a group in pixfile, description of
+		the group parameter block, i.e., for each parameter,
+		the offset, datatype type, name, length if array, etc.
+
+	1.3 IMIO user area (FITS cards)
+	    While an image is open, the first few cards in the user area
+		contain the FITS encoded group parameters.
+	    The remainder of the user area contains an exact image of
+		all non-reserved keyword cards found in the STF image
+		header (or in the header of some other type of image
+		when making a new_copy of an image stored in some other
+		format).
+
+
+2. Major Procedures
+
+procedure open_image
+
+begin
+	if (mode is not new_image or new_copy) {
+	    open_existing_image
+	    return
+	}
+
+	We are opening a new_image or new_copy image.  The problem here is
+	that the new image might be a group within an existing group format
+	image.  This ambiguity is resolved by a simple test on the group
+	index, rather than by a context dependent test on the existence of
+	the group format image.  If the mode is new_whatever and the group
+	is 1, a new group format image is created, else if the group is > 1,
+	the indicated group is initialized in an existing group format image.
+
+	if (group > 1) {
+	    We are opening a new group within an existing group format image.
+
+	    Call open_existing_image to open the group without reading the
+		group parameter block, which has not yet been initialized.
+
+	    if (mode is new_image)
+		initialize GPB to pixel coords
+	    else if (mode is new_copy)
+		copy old GPB to new image; transform coords if necessary
+
+	    Note that when opening a new copy of an existing image as a new
+	    group within a group format image, it is not clear what to do
+	    with the FITS header of the old image.  Our solution is to ignore
+	    it, and retain only the GPB, the only part of the old header
+	    pertaining directly to the group being accessed.
+
+	} else if (opening group 1 of a new image) {
+	    We are creating a new group format image.
+
+	    if (mode is new_image)
+		open_new_image
+	    else
+		open_new_copy
+	}
+end
+
+
+procedure open_existing_image
+
+begin
+	Allocate STF descriptor, save pointer in imio descriptor.
+	Open image header.
+
+	Read header:
+		process reserved cards into STF descriptor
+		spool other cards
+
+	Load group data block from pixfile, get datamin/datamax:
+		if (there is a gdb) {
+		    open pixfile
+		    read gdb into buffer
+		    for (each param in gdb) {
+			set up parameter descriptor
+			format FITS card and put in imio user area
+		    }
+		}
+
+		fetch datamin, datamax from user area
+
+	Set IM_MIN, IM_MAX, IM_LIMTIME from DATAMIN, DATAMAX.
+	Mark end of user area.
+	Copy spooled cards to user area.
+		(increase size of user area if necessary)
+
+	Call imioff to set up imio pixel offset parameters
+end
+
+
+procedure open_new_image
+
+begin
+	Upon entry, the imio iminie procedure has already been called to
+	    initialize the imio descriptor for the new image.
+
+	Allocate STF descriptor, save pointer in imio descriptor.
+	Create header file from template dev$pix.hhh.
+	Open new image header.
+
+	(At this point the IMIO header fields IM_NDIM, IM_LEN, etc., and
+	(the STF descriptor fields have not yet been set, and cannot be set
+	(until the image dimensions have been defined by the high level code.
+	(imopix() will later have to fix up the remaining header fields and
+	(set up the default group data block.
+end
+
+
+procedure open_new_copy
+
+begin
+	Upon entry, the imio immaky procedure has already been called to
+	    copy the old header to the new and initialize the data
+	    dependent fields.  This will include the FITS encoded group
+	    parameters in the user area of the old image.
+
+	Allocate STF descriptor, save pointer in imio descriptor.
+	Create header file from template dev$pix.hhh.
+	Open new image header.
+
+	Copy the STF descriptor of the old image to the new.  Preserve
+	    the parameter marking the end of the GPB area of the old
+	    user area, as we do not want to write these cards when the
+	    header is updated.
+
+	(At this point all header information is set up, except that there
+	(is no pixel file and the pixfile offsets have not been set.
+	(Provided the image dimensions do not change, one could simply
+	(set the pixfile name, call imioff, and do i/o to the image.
+end
+
+
+procedure open_pixel_file
+
+begin
+	(We are called when the first i/o is done to an image.  When writing
+	(to a new image, the user may change any of the image header attributes
+	(after the open and before we are called.
+
+	if (pixel file already open)
+	    return
+	else if (opening existing image) {
+	    open pixel file
+	    return
+	}
+
+	if (opening a new image) {
+	    Given the values of IM_NDIM and IM_LEN set by the user, set up the
+	    STF descriptor including the default group parameter block.  Add
+	    the FITS encoded cards for the GPB to the image header.  Mark the
+	    end of the GPB cards, i.e., the start of the real user parameter
+	    area.  Ignore IM_PIXTYPE; always open an image of type real since
+	    that is what the SDAS software requires.  Set up the WCS to linear
+	    pixel coordinates.
+
+	} else if (opening a new_copy image) {
+	    (The STF descriptor and GPB will already have been set up as a
+	    (copy of the data structures used by the old image.  However,
+	    (the user may have changed the values of IM_NDIM and IM_LEN
+	    (since the image was opened, and the value of GCOUNT set when
+	    (the image was opened may be different than that of the old image.
+
+	    Transform the coordinate system of the old image to produce the
+	    WCS for the new image, i.e., if an image section was used to
+	    reference the old image.
+
+	    Make a new STF descriptor using the values of IM_NDIM and IM_LEN
+	    given, as for a new_image, but using the WCS information for the
+	    new image.  The FITS encoded fields in the IMIO user area will be
+	    automatically updated by the IMADD functions, or new cards added
+	    if not present.
+
+	    Merge any additional fields from the old STF descriptor into the
+	    new one, e.g., any instrument dependent parameters stored in the
+	    GPB.
+
+	    (The STF and FITS encoded user area should now contain a full
+	    (description of the GPB for the new image.
+	}
+
+	Allocate the pixel file, using the GCOUNT parameter set in the
+	    STF descriptor at stf_open time.
+	Open the pixel file.
+
+	Set IM_MIN and IM_MAX to zero (not defined).
+	Call IMIOFF to initialize the pixel offsets.
+end
+
+
+procedure update_image_header
+
+begin
+	Update the values of DATAMIN, DATAMAX from the IMIO header fields.
+
+	Update the binary GPB in the pixel file from the FITS encoded GPB
+	    in the IMIO user area, using the GPB structure defined in the
+	    STF descriptor.
+
+	Update the STF image header file:
+	    Open a new, empty header file using FMKCOPY and OPEN.
+	    Format and output FITS cards for the reserved header fields,
+		e.g., SIMPLE, BITPIX, GCOUNT, the GPB information, etc.
+	    Copy the user area to the new header file, excluding the
+		GPB cards at the beginning of the user area.
+	    Close the new header file and replace the old header file
+		with the new one via a rename operation.
+end
+
+
+procedure close_image
+
+begin
+	(We assume that IMIO has already update the image header if such
+	(is necessary.
+
+	if (pixel file open)
+	    close pixel file
+	if (header file open)
+	    close header file
+
+	deallocate STF descriptor
+	(IMIO will deallocate the IMIO descriptor)
+end

@@ -1,0 +1,3 @@
+input,s,a,,,,Input image names
+scale_fact,r,h,1.0,,,Scaling multiplier
+header,b,h,no,,,Include a header field

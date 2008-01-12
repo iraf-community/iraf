@@ -1,0 +1,28 @@
+input,s,a,,,,"Input images"
+reference,s,a,,,,"Reference image"
+coords,s,a,,,,"Reference coordinates file"
+output,s,a,,,,"Output images"
+shifts,s,h,"",,,"Initial shifts file"
+
+boxsize,i,h,7,1,,"Size of the small centering box"
+bigbox,i,h,11,1,,"Size of the big centering box"
+negative,b,h,no,,,"Are the features negative ?"
+background,r,h,INDEF,,,"Reference background level"
+lower,r,h,INDEF,,,"Lower threshold for data"
+upper,r,h,INDEF,,,"Upper threshold for data"
+niterate,i,h,3,2,,"Maximum number of iterations"
+tolerance,i,h,0,0,,"Tolerance for convergence"
+maxshift,r,h,INDEF,,,"Maximum acceptable pixel shift"
+
+shiftimages,b,h,yes,,,"Shift the images ?"
+interp_type,s,h,"linear","|nearest|linear|poly3|poly5|spline3|",,"Interpolant"
+boundary_type,s,h,"nearest","|constant|nearest|reflect|wrap|",,"Boundary type"
+constant,r,h,0.,,,"Constant for constant boundary extension"
+
+trimimages,b,h,yes,,,"Trim the shifted images ?"
+
+verbose,b,h,yes,,,"Print the centers, shifts, and trim section ?"
+
+list,*s,h
+
+mode,s,h,'ql'

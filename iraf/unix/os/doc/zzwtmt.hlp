@@ -1,0 +1,41 @@
+.help zzwtmt May84 "System Interface"
+.ih
+NAME
+zzwtmt -- wait for i/o on a magtape file
+.ih
+SYNOPSIS
+.nf
+zzwtmt (chan, nrecords, nfiles, status)
+
+int	chan			# OS channel of magtape file
+int	nrecords		# nrecords skipped
+int	nfiles			# nfiles skipped
+int	status
+.fi
+.ih
+DESCRIPTION
+If a transfer is in progress on the channel \fIchan\fR process execution
+is suspended until the transfer completes.
+.ih
+RETURN VALUE
+ERR is returned in \fIstatus\fR if a read or write error occurred in the
+last i/o transfer to the magtape device.
+The number of tape records (blocks) and/or filemarks skipped in the last
+read or write operation is returned in \fInrecords\fR and \fInfiles\fR.
+The number of bytes read or written is returned in \fIstatus\fR.
+In an ordinary read or write operation \fInrecords\fR will be positive one,
+\fInfiles\fR will be zero, and \fIstatus\fR will be a positive number.
+An attempt to read at EOF will result in a \fIstatus\fR of zero (zero bytes
+were read).  Repeated calls to \fBzzwtmt\fR will continue to return the
+same values.
+.ih
+NOTES
+The \fInfiles\fR parameter will not necessarily be set to 1 when a filemark
+is read, hence it cannot be used to test for EOF.  Some systems will leave
+the tape positioned to just before a filemark when a filemark is encountered
+in a read operation, while others will leave the tape positioned to just
+after the filemark.
+.ih
+SEE ALSO
+zzrdmt, zzwrmt, zfiomt
+.endhelp

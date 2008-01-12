@@ -1,0 +1,2 @@
+This directory is an example of a small IRAF package, used to benchmark the
+time required to compile and link a small package.

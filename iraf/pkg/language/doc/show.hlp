@@ -1,0 +1,31 @@
+.help show Feb86 language
+.ih
+NAME
+show -- show the current value of an IRAF environment variable
+.ih
+USAGE
+show [varname]
+.ih
+PARAMETERS
+.ls varname
+The name of the environment variable to be displayed.
+.le
+.ih
+DESCRIPTION
+The \fIshow\fR command shows the current values of all defined environment
+variables if called with no arguments, or the value of a specific variable
+if an argument is given.  Unlike \fIset\fR, only current values are shown,
+not the entire history of the definitions of environment variables.
+.ih
+EXAMPLES
+1. Show the current default printer device.
+	
+	cl> show printer
+
+2. Show all "std" (standard i/o stream) related variables.
+
+	cl> show | match std
+.ih
+SEE ALSO
+set
+.endhelp

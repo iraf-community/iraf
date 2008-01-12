@@ -1,0 +1,35 @@
+.help etrms Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slETRM (EP, EV)
+
+     - - - - - -
+      E T R M
+     - - - - - -
+
+  Compute the E-terms (elliptic component of annual aberration)
+  vector (double precision)
+
+  Given:
+     EP      dp      Besselian epoch
+
+  Returned:
+     EV      dp(3)   E-terms as (dx,dy,dz)
+
+  Note the use of the J2000 aberration constant (20.49552 arcsec).
+  This is a reflection of the fact that the E-terms embodied in
+  existing star catalogues were computed from a variety of
+  aberration constants.  Rather than adopting one of the old
+  constants the latest value is used here.
+
+  References:
+     1  Smith, C.A. et al., 1989.  Astr.J. 97, 265.
+     2  Yallop, B.D. et al., 1989.  Astr.J. 97, 274.
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

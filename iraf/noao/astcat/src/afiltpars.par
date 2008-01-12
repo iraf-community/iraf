@@ -1,0 +1,36 @@
+# The AFILTPARS parameter set.
+
+# Standard filtering options. Default is to select all fields in all records.
+
+# Sorting options.
+
+fsort,s,h,"",,,"The sort field or expression"
+freverse,b,h,no,,,"Sort in descending order ?"
+
+# Record selection options.
+
+fexpr,s,h,"yes",,,"The record selection expression"
+
+# The output field parameters.
+
+fields,s,h,"f[*]",,,"The list of output fields and field expressions"
+fnames,s,h,"",,,"The new field names list"
+fntypes,s,h,"",,,"The new field datatype list"
+fnunits,s,h,"",,,"The new field units list"
+fnformats,s,h,"",,,"The new field format list"
+
+# Coordinate transformation options.
+
+fosystem,s,h,"",,,"The filtered output celestial coordinate system"
+fira,s,h,"ra",,,"Field containing the ra / longitude"
+fidec,s,h,"dec",,,"Field containing the dec / latitude"
+foraunits,s,h,"",,,"The filtered output ra / longitude units"
+fodecunits,s,h,"",,, "The filtered ouput dec / latitude units"
+foraformat,s,h,"",,,"The filtered output ra / longitude format"
+fodecformat,s,h,"",,,"The filtered output dec / latitude format"
+fixp,s,h,"xp",,,"Field containing the predicted x coordinate"
+fiyp,s,h,"yp",,,"Field containing the predicted y coordinate"
+fixc,s,h,"xc",,,"Field containing the centered x coordinate"
+fiyc,s,h,"yc",,,"Field containing the centered y coordinate"
+foxformat,s,h,"%10.3f",,,"The filtered output x coordinate format"
+foyformat,s,h,"%10.3f",,,"The filtered output y coordinate format"

@@ -1,0 +1,84 @@
+.help interp Jan85 proto
+.ih
+NAME
+interp -- compute an interpolated value from a table of x,y pairs
+.ih
+USAGE
+interp tbl_file
+.ih
+PARAMETERS
+.ls tbl_file
+Text file containing X,Y pairs comprising the table.
+The pairs must be in either ascending or descending order.
+.le
+.ls curve_gen = no
+If set to no, x-values are read from the file(s) specified by the parameter
+"input". If set to yes, the parameters x1, x2, and dx are used to create
+a list of new x,y pairs interpolated at x1, x1+dx, ... x2.
+.le
+.ls input = STDIN
+File(s) containing x-values for the interpolation
+.le
+.ls int_mode = 'linear'
+The interpolation mode may be either 'linear' or 'spline'.
+.le
+.ls x1
+The starting x-value for generating a series of new x,y pairs.
+.le
+.ls x2
+The ending x-value of the generated series of pairs.
+.le
+.ls dx
+The difference by which the x-values are incremented during the
+series generation.
+.le
+.ih
+DESCRIPTION
+The pairs of X,Y values are read from the tbl_file. There must be
+at least 1 pair in the file. The table is then used to interpolate
+or extrapolate new y-values for given x-values. The x-values may come
+from a file including STDIN (if curve_gen=no), or they may be
+internally generated (if curve_gen=yes) to produce a finely sampled
+version of the table. This may be useful for plotting a smooth curve
+through a series of points.
+
+The table X,Y values must be in a monotonic order, either ascending
+or descending. No restriction is made on spacing.
+
+If only one point is present in the table, all returned interpolated
+values will have the value at that point. If only two points are
+present, linear interpolation (or extrapolation) will be used.
+If additional points are present, an obscure but reliable algorithm
+is used to interpolate (or extrapolate).
+
+.ih
+EXAMPLES
+
+1. The following command reads the X,Y table from file testdata and waits for
+   x-values from the terminal.
+
+.nf
+    cl> interp testdata STDIN
+.fi
+
+
+2. The following command generates points to plot (by piping to graph) in the
+   range from x=10 to x=20 at intervals of 0.1 (10.0, 10.1 ... 19.9, 20.0).
+
+.nf
+    cl> interp testdata curve_gen=yes x1=10 x2=20 dx=.1 | graph
+.fi
+
+3. The curve will be displayed and the original points from the table
+   may be overlaid by:
+
+.nf
+    cl> graph testdata pointmode=yes append=yes
+.fi
+
+.ih
+BUGS
+If a blank (null) table filename is entered, a floating divide error
+occurs.
+
+.endhelp

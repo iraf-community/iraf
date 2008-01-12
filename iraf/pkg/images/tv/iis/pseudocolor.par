@@ -1,0 +1,7 @@
+enhancement,s,a,random,,,"type of pseudocolor enhancement:\n\
+    linear - map greyscale into a spectrum\n\
+    random - a randomly chosen color is assigned to each greylevel\n\
+    8color - use eight colors chosen at random\n\
+enter selection"
+window,b,h,yes,,,window display after enabling pseudocolor
+enhance,s,h

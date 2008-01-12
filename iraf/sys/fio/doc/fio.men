@@ -1,0 +1,50 @@
+	 access - Determine the type or accessibility of a file
+	  aread - Asynchronous read from a binary file
+	 areadb - Asynchronous read from a binary file in byte units
+	  await - Wait for an asynchronous i/o transfer to complete
+	 awaitb - Wait for i/o, and return status in byte units
+	 awrite - Asynchronous write to a binary file
+	awriteb - Asynchronous write to a binary file in byte units
+	  close - Close a file
+	 delete - Delete a file
+	diropen - Open a directory as a text file
+	 falloc - Preallocate (uninitialized) storage for a file
+	  fcopy - Copy a file
+	 fdevbf - Install a new binary device in the FIO device table
+	 fdevtx - Install a new text device in the FIO device table
+	  finfo - Get directory information for a file
+	  flush - Flush any buffered output to a file
+	 fnextn - Extract the extension field of a filename
+	 fnldir - Extract the logical directory field of a filename
+	 fnroot - Extract the root field of a filename
+	 fntcls - Close unbuffered list
+	fntclsb - Close buffered list
+	 fntgfn - Get next filename from unbuffered list
+	fntgfnb - Get next filename from buffered list
+	fntlenb - Get number of filenames in a buffered list
+	 fntopn - Open an unbuffered filename list
+	fntopnb - Expand template and open a buffered filename list
+	fntrewb - Rewind the list
+	 fopnbf - Open a binary file on a special device
+	 fopntx - Open a text file on a special device
+	 fowner - Get the name of the owner of a file
+      fpathname - Get the full pathname of a file
+	  fseti - Set an integer FIO parameter
+	 fstati - Get the value of an integer FIO parameter
+	 fstatl - Get the value of a long integer FIO parameter
+	 fstats - Get the value of a string valued FIO parameter
+	   getc - Get the next character from a file
+	getline - Get the next line from a text file
+	 mktemp - Make a unique temporary filename
+	   note - Note the long integer position in a file for a later seek
+	   open - Open or create a text or binary file
+	protect - Protect a file from deletion
+	   putc - Put a character to a file
+	  putcc - Put only printable characters to a file
+	putline - Put a line to to a text file
+	   read - Read a binary block of data from a file
+	 rename - Change the name of a file
+	 reopen - Reopen a file on another file descriptor
+	   seek - Set the file offset of the next char to be read or written
+	stropen - Open a character string as a file
+	  write - Write a binary block of data to a file

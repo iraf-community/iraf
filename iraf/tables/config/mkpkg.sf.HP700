@@ -1,0 +1,8 @@
+# Mkpkg special file list for HP700.
+
+
+$set XC1 = '& "$xc -c $(XFLAGS) -D_INCLUDE_POSIX_SOURCE &"'
+$set XC2 = '& "$xc -c $(XFLAGS) -DIRAF -Inolibc -D_INCLUDE_POSIX_SOURCE -I. &"'
+
+# Files requiring special compilation due to host compiler bugs.
+

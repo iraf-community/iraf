@@ -1,0 +1,323 @@
+QPOE -- Prototype POE (Position Ordered Event file) Interface.
+See QPOE.hlp for detailed information.
+-----------------------------------------------------------------
+
+
+1. QPOE (General QPOE file access)
+
+		    [ --- external routines --- ]
+
+	       qp_parse (expr, poefile, sz_poefile, paramex, sz_paramex)
+     yes|no = qp_access (poefile, mode)
+	        qp_copy (o_poefile, n_poefile)
+	      qp_rename (o_poefile, n_poefile)
+	     qp_rebuild (poefile)
+	      qp_delete (poefile)
+
+	  ptr = qp_open (poefile, mode, o_qp)
+	     qp_set[ir] (qp, param, value)
+      val = qp_stat[ir] (qp, param)
+	       qp_debug (qp, out, what)
+		qp_sync (qp)
+	       qp_close (qp)
+
+       qp_add[bcsilrdx] (qp, param, value, comment)
+		qp_astr (qp, param, value, comment)
+ val = qp_get[bcsilrdx] (qp, param)
+       nchars = qp_gstr (qp, param, outstr, maxch)
+       qp_put[bcsilrdx] (qp, param, value)
+	        qp_pstr (qp, param, strval)
+
+	    n = qp_read (qp, param, buf, maxelem, first, datatype)
+	       qp_write (qp, param, buf, nelem, first, datatype)
+          fd = qp_popen (qp, param, mode, type)
+	mw = qp_loadwcs (qp)
+	     qp_savewcs (qp, mw)
+
+    yes|no = qp_accessf (qp, param)
+	     qp_deletef (qp, param)
+	     qp_renamef (qp, param, newname)
+	       qp_copyf (o_qp, o_param, n_qp, n_param)
+	        qp_addf (qp, param, datatype, maxelem, comment, flags)
+      nelem = qp_queryf (qp, param, datatype, maxelem, comment, flags)
+        nelem = qp_lenf (qp, param)
+ nchars = qp_expandtext (qp, s1, s2, maxch)
+
+      ptr = qp_ofnl[su] (qp, template)
+	  ptr = qp_ofnl (qp, template, sort)
+	n|EOF = qp_gnfn (fl, outstr, maxch)
+	len = qp_lenfnl (fl)
+	     qp_seekfnl (fl, pos)
+		qp_cfnl (fl)
+
+		    [ --- internal routines --- ]
+
+		qp_bind (qp)
+       dtype = qp_dtype (qp, datatype, dsym)
+nchars = qp_elementsize (qp, datatype)
+     nchars = qp_sizeof (qp, dtype, dsym)
+	     qp_mkfname (poefile, extn, fname, maxch)
+	 ival = qp_ctoi (str, ip, ival)
+	 dval = qp_ctod (str, ip, dval)
+
+	 ptr = qp_gmsym (qp, macro, textp)
+	 ptr = qp_gpsym (qp, param)
+   nfields = qp_parsefl (qp, fieldlist, dd)
+	     qp_inherit (n_qp, o_qp, out)
+    dtype = qp_getparam (qp, param, o_pp)
+    dtype = qp_putparam (qp, param, o_pp)
+	    qp_flushpar (qp)
+
+       gt = qp_opentext (qp, text)			# token i/o
+     token = qp_nexttok (gt)
+      token = qp_gettok (gt, tokbuf, maxch)
+      token = qp_rawtok (gt, outstr, maxch)
+     nargs = qp_arglist (gt, argbuf, maxch)
+	   qp_closetext (gt)
+
+	ptr = qm_access ()				# macros
+	   ch = qm_getc (fd, ch)
+		qm_scan (qm, fname, flags)
+	       qm_scano (qm, fd, flags)
+   qm_[set|upd]defaults (qm, qp)
+	    qm_setparam (qm, param, valstr)
+	ptr = qm_symtab (qm)
+
+
+2. QPIO (Event I/O)
+
+		    [ --- external routines --- ]
+
+         io = qpio_open (qp, paramex, mode)
+	     qpio_close (io)
+
+	  qpio_setrange (io, vs, ve, ndim)
+   ndim = qpio_getrange (io, vs, ve, maxdim)
+	 qpio_setfilter (io, expr)
+nchars = qpio_getfilter (io, outstr, maxch)
+	   qpio_set[ir] (io, param, value)
+    val = qpio_stat[ir] (io, param)
+      mw = qpio_loadwcs (io)
+	   qpio_mkindex (io, key)
+
+	 qpio_putevents (io, i_ev, nevents)
+ n|EOF = qpio_getevents (io, o_ev, maskval, maxev, nev)
+ nev = qpio_readpix[si] (io, obuf, vs, ve, ndim, xblock, yblock)
+
+		    [ --- internal routines --- ]
+
+    ok|err = qpio_parse (io, expr, filter, sz_filter, mask, sz_mask)
+	  qpio_loadmask (io, mask, mergeflg)
+bkno|EOF = qpio_rbucket (io, bkno)
+	   qpio_wbucket (io, n_bkno)
+	      qpio_sync (io)
+
+
+3. QPEX (Event Attribute Filtering)
+
+		    [ --- external routines --- ]
+
+	 ex = qpex_open (qp, expr)
+ok|err = qpex_modfilter (ex, exprlist)
+nchars = qpex_getfilter (ex, outstr, maxch)
+ nc = qpex_getattribute (ex, attribute, outstr, maxch)
+   nr = qpex_attrl[ird] (ex, attribute, xs, xe, xlen)
+    nev = qpex_evaluate (ex, i_ev, o_ev, nev)
+	     qpex_close (ex)
+
+		    [ --- internal routines --- ]
+
+    v = qpex_parse[dir] (expr, xs, xe, xlen)
+  v = qpex_sublist[dir] (x1, x2, xs,xe,nranges,ip, o_xs,o_xe)
+  v = qpex_codegen[dir] (ex, atname, assignop, expr, offset, dtype)
+	    qpex_delete (ex, offset, dtype)
+
+       ptr = qpex_pbpos (ex)
+     offset = qpex_refd (ex, value)
+     ptr = qpex_dballoc (ex, nelem, dtype)
+      ptr = qpex_dbpstr (ex, strval)
+	     qpex_pbpin (ex, opcode, arg1, arg2, arg3)
+	      qpex_mark (ex, pb_save, db_save)
+	      qpex_free (ex, pb_save, db_save)
+
+   nr = qp_rlmerge[dir] (os,oe,olen, xs,xe,nx, ys,ye,ny)
+
+
+4. INTERFACE SYNTAX
+
+Default parameter and domain names:
+
+	"deffilt"	# default event filter (all event lists)
+	"defmask"	# default region mask (all event lists)
+	"deffilt.<evl>"	# default event filter for event list <evl>
+	"defmask.<evl>"	# default region mask for event list <evl>
+	"event"		# default name of user event datatype
+	"events"	# default event-list parameter
+
+QPIO expression syntax:
+
+	[ evl-param ][ `[' [`!'] keyword [(`:='|`='|`+=') expr], ...`]' ]
+
+where <evl-param> defaults to "events" if not given, and where <keyword> may
+be any of the following, or a term of an event attribute expression.
+
+	block		# blocking factor for image matrix
+	debug		# debug level (integer, 0=nodebug)
+	filter		# event attribute filter (expression)
+	key		# event key (Y,X) fields (e.g.(s10,s8))
+	noindex		# don't use index even if present
+	param		# name of event list header parameter
+	mask		# region mask
+	rect		# subregion of image, e.g, rect=[*,100:400]
+
+Any unrecognized keyword=expr terms are passed on to the event attribute
+filter, hence the "filter=(expr)" syntax is optional.
+
+QPEX expression syntax (the <expr> in "filter=<expr>" above):
+
+	'(' attribute=expr [, attribute=expr...] ')'
+
+where <attribute> is the "physical" name (type code plus byte offset) of
+a field of the event structure, and expr is
+
+	%N		bitwise mask test
+	!%N		negated bitwise mask test
+
+or some combination of
+
+	N		equality test
+	:N		open range (less than or equal to N)
+	N:		open range (greater than or equal to N)
+	M:N		range (M to N inclusive)
+	expr,expr,...	list of values or ranges
+	'(' expr ')'	parenthesized expr
+	'!' expr	
+
+MACRO syntax:
+
+	macro		replace <macro> by defined value
+	macro(arg,...)	replace <macro> with argument substitution
+	@file		replace <@file> by contents of file
+	`cmd`		replace <`cmd`> by output of the CL command "cmd",
+			  replacing all newlines by spaces
+	@file(arg,...)	file pushback with argument substitution
+	`cmd`(arg,...)	command output pushback with argument substitution
+
+Macro define syntax:
+
+	define macro replacement-text
+	set parameter value
+
+where <macro> is any identifier, and <replacement-text> is literal text to
+be pushed back into the input and rescanned when <macro> is encountered in
+the input stream.  <replacement-text> may contain symbols of the form '$N'
+denoting places where argument substitution is to be performed during pushback.
+The special builtin macro $DFN will be replaced by the datafile name, returned
+as a string token.
+
+<parameter> denotes a QPOE interface parameter the value of which is to be
+set, e.g., to set the size of a buffer to be created at run time.  The
+following interface parameters are defined:
+
+	"bucketlen"	QPIO bucket length, nevents
+	"cachesize"	number of file descriptors in lfile cache
+	"indexlen"	number of hash entries in symbol table index
+	"maxlfiles"	maximum number of lfiles in datafile
+	"pagesize"	page size, bytes, of datafile
+	"sbufsize"	initial symbol table size, su
+	"stablen"	initial symbol table string buffer size, chars
+	"progbuflen"	QPEX program buffer size (compiled instructions)
+	"databuflen"	QPEX data buffer size (initialized data space)
+	"nodeffilt"	disable the use of any default event filters
+	"nodefmask"	disable the use of any default region masks
+	"maxpushback"	max characters pushback (for macro expansion)
+	"maxfrlutlen"	max full resolution lookup table length
+	"maxrrlutlen"	max reduced resolution lookup table length
+	"lutminranges"	min ranges required before a lookup table is used
+	"lutscale"	scale factor to convert nranges to n LUT bins
+	"blockfactor"	QPIO blocking factor for output pixel arrays
+	"optbufsize"	FIO i/o buffer size for IMIO access to QPOE file, chars
+	"debuglevel"	debug level, 0 for no runtime debug messages
+
+Environment:
+
+	'qmfiles'	an environment variable listing a set of macro
+			define files defining the global macros to be
+			used by QPOE
+
+	'qmsave'	an environment variable defining the name of a
+			file to be used to store the compiled macros
+			(defaults to uparm$qpoe.msv).
+
+
+5. INTERFACE PARAMETERS
+
+# QPSET.H -- User accessible definitions for the QPOE package.
+
+define	SZ_COMMENT		79	# max size comment string
+define	SZ_DATATYPE		79	# max size datatype name string
+
+# QPOE Read-Write Parameters.
+define	QPOE_BLOCKFACTOR	1	# blocking factor for pixel arrays
+define	QPOE_BUCKETLEN		2	# event list bucket length, nevents
+define	QPOE_CACHESIZE		3	# lfile (buffer) cache size, nlfiles
+define	QPOE_DATABUFLEN		4	# QPEX data buffer length, chars
+define	QPOE_DEBUGLEVEL		5	# debug level (0 = no messages)
+define	QPOE_DEFLUTLEN		6	# default lookup table length (bins)
+define	QPOE_INDEXLEN		7	# symbol table hash index length
+define	QPOE_LUTMINRANGES	8	# min ranges before using LUT
+define	QPOE_LUTSCALE		9	# scale nranges to LUT bins
+define	QPOE_MAXFRLUTLEN	10	# max full-res LUT length
+define	QPOE_MAXLFILES		11	# max lfiles in datafile
+define	QPOE_MAXPUSHBACK	12	# max amount of pushed back macro data
+define	QPOE_MAXRRLUTLEN	13	# max reduced-res LUT length
+define	QPOE_OPTBUFSIZE		14	# optimum buffer size for IMIO/QPF/FIO
+define	QPOE_PAGESIZE		15	# page size of datafile, bytes
+define	QPOE_PROGBUFLEN		16	# QPEX program buffer length, ints
+define	QPOE_SBUFSIZE		17	# symtab string buf size, chars (init)
+define	QPOE_STABLEN		18	# symtab data area size, su (init)
+define	QPOE_NODEFFILT		19	# disable use of default filter
+define	QPOE_NODEFMASK		20	# disable use of default mask
+
+# QPOE Read-Only Parameters.
+define	QPOE_FM			21	# FMIO descriptor
+define	QPOE_MODE		22	# poefile access mode
+define	QPOE_ST			23	# SYMTAB symbol table descriptor
+define	QPOE_VERSION		24	# QPOE version number
+
+# Parameter flags (for qp_addf).
+define	QPF_NONE		(-1)	# no flags (0 gives default flags)
+define	QPF_INHERIT		0002B	# copy parameter in a NEW_COPY open
+
+
+# QPIOSET.H -- QPIO User accessible interface parameters.
+
+define	qpio_stati	qpiost		# (name collision with qpio_seti)
+
+# Read-Write Parameters.
+define	QPIO_BLOCKFACTOR	1	# blocking factor for image matrices
+define	QPIO_BUCKETLEN		2	# event list bucket size, nevents
+define	QPIO_DEBUG		3	# debug level, debug=0 for no messages
+define	QPIO_EVXOFF		4	# short offset of X field of event
+define	QPIO_EVYOFF		5	# short offset of Y field of event
+define	QPIO_EX			6	# QPEX descriptor (event attr. filter)
+define	QPIO_NODEFFILT		7	# disable use of default filter
+define	QPIO_NODEFMASK		8	# disable use of default mask
+define	QPIO_NOINDEX		9	# flag to disable use of index
+define	QPIO_OPTBUFSIZE		10	# optimum buffer size for IMIO/QPF/FIO
+define	QPIO_PL			11	# PLIO descriptor (pixel mask)
+
+# Read-Only Parameters.
+define	QPIO_EVENTLEN		12	# length of event struct, shorts
+define	QPIO_FD			13	# file descriptor of event list lfile
+define	QPIO_INDEXLEN		14	# event list index length (0=noindex)
+define	QPIO_IXXOFF		15	# short offset of X field used in index
+define	QPIO_IXYOFF		16	# short offset of Y field used in index
+define	QPIO_LF			17	# lfile in which event list is stored
+define	QPIO_MASKP		18	# char pointer to mask-name buffer
+define	QPIO_MAXEVP		19	# pointer to MAX-event fields struct
+define	QPIO_MINEVP		20	# pointer to MIN-event fields struct
+define	QPIO_NCOLS		21	# number of columns in image
+define	QPIO_NLINES		22	# number of lines in image
+define	QPIO_PARAMP		23	# char pointer to param-name buffer
+define	QPIO_QP			24	# backpointer to QPOE descriptor

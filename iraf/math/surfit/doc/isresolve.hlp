@@ -1,0 +1,45 @@
+.help isresolve Aug85 "Surfit Package"
+.ih
+NAME
+isresolve -- resolve the surface, same lines array
+.ih
+SYNOPSIS
+include <math/surfit.h>
+
+isresolve (sf, lines, ier)
+
+.nf
+pointer	sf		# surface grid descriptor
+int	lines[nlines]	# surface grid line numbers, 1 <= lines[i] <= nlines
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface grid descriptor structure.
+.le
+.ls nlines
+The number of surface grid lines to be fit.
+.le
+.ls ier      
+Error code returned by the fitting routines. The options are OK, SINGULAR,
+and NO_DEG_FREEDOM. If ier = SINGULAR the matrix is singular, ISSOLVE
+will compute a solution to the normal equations but one or more of the
+coefficients will be zero. If ier = NO_DEG_FREEDOM, too few data points
+exist for a reasonable solution to be computed. ISSOLVE returns without
+fitting the data.
+.le
+.ih
+DESCRIPTION
+In some applications it is necessary to refit the same surface several
+times with the same lines array. In this case it is inefficient to reaccumulate
+the matrices and calculate the Cholesky factorization for each fit.
+ISERESOLVE reaccumulates only the right side of the equation.
+.ih
+NOTES
+It is the responsibility of the calling program to check for out of bounds
+lines values.
+.ih
+SEE ALSO
+issolve, isinit, slzero, islfit, islrefit, islaccum, islresolve, isfree
+.endhelp

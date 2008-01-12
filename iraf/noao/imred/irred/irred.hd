@@ -1,0 +1,8 @@
+# Help directory for the IRRED package.
+
+$doc = "./doc/"
+
+center		hlp=doc$center.hlp
+irlincor	hlp=doc$irlincor.hlp,	src=t_irlincor.x
+mosproc		hlp=doc$mosproc.hlp,	src=mosproc.cl
+revisions	sys=Revisions

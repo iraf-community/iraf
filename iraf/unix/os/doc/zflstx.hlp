@@ -1,0 +1,33 @@
+.help zflstx May84 "System Interface"
+.ih
+NAME
+zflstx -- flush any buffered text file output
+.ih
+SYNOPSIS
+.nf
+zflstx (chan, status)
+
+int	chan			# OS channel of text file
+int	status
+.fi
+.ih
+DESCRIPTION
+Any output data buffered within the kernel or host system is flushed to
+the output device.
+.ih
+RETURN VALUE
+ERR is returned in the event of a write error.  OK is returned if the flush
+is successful.  There is no way to tell if any data was actually written to
+the output device.
+.ih
+NOTES
+FIO assumes that text file output is buffered and that \fBzflstx\fR must be
+called to ensure that data written with \fBzputtx\fR is actually sent to
+the device.  When \fBzflstx\fR is called all buffered text should be output
+whether or not a newline has been seen.  FIO assumes that it can build up
+an output line a character at a time, calling \fBzputtx\fR followed by
+\fBzflstx\fR for each individual character.
+.ih
+SEE ALSO
+zfiotx, zputtx
+.endhelp

@@ -1,0 +1,82 @@
+.help background Jul85 noao.imred.generic
+.ih
+NAME
+background -- Fit and subtract a line or column background
+.ih
+USAGE	
+background input output
+.ih
+PARAMETERS
+.ls input
+Images to be background subtracted.  The images may contain image sections.
+.le
+.ls output
+Output images to be created and modified.  The number of output images must
+match the number of input images.
+.le
+.ls axis = 1
+Axis along which to fit the background and subtract.  Axis 1 fits and
+subtracts the background along the lines and axis 2 fits and subtracts
+the background along the columns.
+.le
+.ls interactive = yes
+Set the fitting parameters interactively?
+.le
+.ls sample = "*"
+Lines or columns to be used in the background fits.  The default "*" selects
+all lines or columns.
+.le
+.ls naverage = 1
+Number of sample points to combined to create a fitting point.
+A positive value specifies an average and a negative value specifies
+a median.
+.le
+.ls function = spline3
+Function to be fit to the image lines or columns.  The functions are
+"legendre" (legendre polynomial), "chebyshev" (chebyshev polynomial),
+"spline1" (linear spline), and "spline3" (cubic spline).  The functions
+may be abbreviated.
+.le
+.ls order = 1
+The order of the polynomials or the number of spline pieces.
+.le
+.ls low_reject = 0., high_reject = 0.
+Low and high rejection limits in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 1.
+When a pixel is rejected, pixels within this distance of the rejected pixel
+are also rejected.
+.le
+.ls graphics = "stdgraph"
+Graphics device for interactive graphics output.
+.le
+.ls cursor = ""
+Graphics cursor input
+.le
+.ih
+DESCRIPTION
+For each line or column in the input images a function is fit to the columns
+or lines specified by the sample parameter.  This function is then subtracted
+from the entire line or column to create an output line or column.
+The function fitting parameters may be set interactively.
+This task is a script using \fBfit1d\fR.  For more discussion about
+the parameters see the help text for \fBicfit\fR and \fBfit1d\fR.
+.ih
+EXAMPLES
+A spectrum of an object runs down the center of a 500 x 500 image.  To
+subtract a constant background using columns 10 to 100 and 410 to 500:
+
+	cl> background image image sample="10:100,410:500"
+
+To subtract a quadratic background from the columns of an image in which
+the spectrum lies between lines 50 and 70:
+
+	cl> background image image axis=2 sample="1:40,80:120" o=3
+
+.ih
+SEE ALSO
+fit1d, icfit
+.endhelp

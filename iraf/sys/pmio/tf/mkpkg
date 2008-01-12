@@ -1,0 +1,33 @@
+# Update the type expanded generic files in the PMIO package library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	miogld.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miogli.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miogll.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	mioglr.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miogls.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	mioglx.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miopld.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miopli.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miopll.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	mioplr.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	miopls.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	mioplx.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
+	pmglpi.x	../pmio.com <plio.h> <pmset.h>
+	pmglpl.x	../pmio.com <plio.h> <pmset.h>
+	pmglps.x	../pmio.com <plio.h> <pmset.h>
+	pmglri.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmglrl.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmglrs.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
+	pmplpi.x	../pmio.com <plio.h> <pmset.h>
+	pmplpl.x	../pmio.com <plio.h> <pmset.h>
+	pmplps.x	../pmio.com <plio.h> <pmset.h>
+	pmplri.x	../pmio.com <plio.h> <pmset.h>
+	pmplrl.x	../pmio.com <plio.h> <pmset.h>
+	pmplrs.x	../pmio.com <plio.h> <pmset.h>
+	;

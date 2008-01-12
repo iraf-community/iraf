@@ -1,0 +1,62 @@
+.help powercor Oct86 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+powercor -- Apply power law correction to mountain reduced spectra
+.ih
+USAGE
+powercor input records
+.ih
+PARAMETERS
+.ls input
+The root file name of the input spectra.
+.le
+.ls records
+The range of spectra.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the corrected spectra.
+.le
+.ls start_rec = 1
+The starting record number to be appended to the root name of the
+created spectra.
+.le
+.ls power = )iids.power
+The power law coefficient.
+.le
+.ih
+DESCRIPTION
+A power law correction to the IIDS count rates is applied to the input
+spectra.  The mountain reduction software applies a coincidence correction
+to the observed IIDS count rates but does not correct for a nonlinear effect
+in the image tube chain.  This second correction takes the form of a
+power law
+
+	C(out) = C(in) ** power
+
+where C(in) is the input, coincidence corrected, count rate and C(out)
+is the corrected count rate.  The power is a parameter of the task
+which defaults to the \fBiids\fR package parameter set to the appropriate
+value for the IIDS.  The exposure time, in seconds, is a required
+image header parameter (keyword = EXPOSURE) used to convert the
+total counts to count rates.
+
+Note that if the original raw spectra are being reduced then the either
+\fBcoincor\fR or \fBpowercor\fR may be used to apply both the coincidence
+correction and the power law correction at the same time.  In other words,
+the tasks apply the coincidence correction if the coincidence flag (CO-FLAG) is
+-1 (uncorrected) and the power law correction alone if the flag is zero
+(coincidence corrected only).  The flag is 1 when both the coincidence and
+nonlinear correction have been applied.
+
+This task is a script calling \fBcoincor\fR with \fIccmode\fR = "iids".
+.ih
+EXAMPLES
+The following example corrects a series of IIDS spectra:
+
+	cl> powercor nite1 1-250 output=nite1cc start_rec=1
+.ih
+SEE ALSO
+coincor
+.endhelp

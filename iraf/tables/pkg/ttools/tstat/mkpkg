@@ -1,0 +1,13 @@
+# Update the thistogram application code in the ttools package library
+# Author: Phil Hodge, 2-DEC-1988
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	thistogram.x   		<error.h> <tbset.h> "thistogram.h"
+	thoptions.x		"thistogram.h"
+	tstat.x			<tbset.h> 
+	;

@@ -1,0 +1,12 @@
+input,f,a,,,,input list of files or images
+function,s,h,legendre,,,type of function to fit
+weighting,s,h,uniform,,,'Weighting (uniform,user,statistical,instrumental)'
+order,i,h,4,,,order of the fit
+interactive,b,h,yes,,,interactively tweak fit parameters?
+axis,i,h,1,,,projection axis if input is an image
+listdata,b,h,no,,,two column output list?
+verbose,b,h,no,,,lengthy output format?
+calctype,s,h,"double","|real|double|",,Calculation datatype
+power,b,h,no,,,convert coeffecients to power series?
+device,s,h,"stdgraph",,,name of interactive plotting device
+cursor,*gcur,h,"",,,Graphics cursor input

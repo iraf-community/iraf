@@ -1,0 +1,383 @@
+			Image Kernel Interface (IKI)
+				Doug Tody
+			       08 May 1986
+
+
+1. INTRODUCTION
+
+    The IKI is the interface between IMIO and some particular image storage
+format.  IMIO itself has no knowledge of the storage format.  The primary
+function of the IKI is to access image headers, mapping the host header
+storage format into the IMIO image header descriptor and vice versa.
+The IKI is responsible for all image management operations, including
+opening/creating/updating headers, opening/creating pixfiles (pixel storage
+files), deleting, renaming, and copying images, checking for the existence
+of images, and so on.
+
+The IKI can support an arbitrary number of different storage formats.
+Each format requires a set of format dependent driver subroutines implementing
+the standard IKI functions.  The IKI will dynamically select the driver to be
+used to access a particular format at runtime.  New drivers may be dynamically
+loaded at runtime, in a way similar to that used for FIO.  While IMIO directly
+accesses the pixel storage file via binary FIO for efficiency reasons, the
+pixfile is opened by the IKI driver, hence a special driver may be used if
+desired.  For example, this feature may be used to access image display frame
+as a pixfile, or an image stored in archival format on an optical disk.
+
+
+2. STRUCTURE
+
+    The role played by the IKI and format specific IKI drivers in the image
+i/o subsystem is illustrated in the figure below.
+
+
+	       IMIO		Format independent; primarily does i/o to
+	         | 		the pixel file.  The image header is read
+		 |		into a dynamically allocated descriptor at
+		 |		open time.
+		 |
+		IKI		Selects driver to be used.  Maintains table
+		 |		of open images, handles cleanup during error
+		 |		recovery.
+		 |
+	     (drivers)		Physically accesses/creates/deletes etc. an
+				image stored in a particular format.  Maps
+				the header stored in some particular external
+				format into the standardized IMIO descriptor.
+				Responsible for opening/creating the pixfile,
+				returning a FIO file descriptor to IMIO, which
+				directly accesses the pixel data.
+
+
+The format specific driver packages are written in SPP using only standard
+VOS i/o facilities, e.g., FIO and MEMIO.  This is necessary due to the use
+of an SPP descriptor structure to maintain the incore version of the image
+header, due to the need to return an FIO file descriptor to IMIO, and so on.
+To add support for a new format, one need only add a new driver to the IKI
+and relink the system.
+
+
+3. LOGICAL SCHEMA
+
+    The logical schema of the current IKI is highly constrained by the fact
+that the IKI is an add-on to the existing IMIO interface.  It is not worthwhile
+in this revision to try to address the limitations/design flaws of the initial
+IMIO interface, hence our intention is to add the IKI in such a way that few
+changes are required to IMIO, and no changes are required to programs which
+use IMIO.  One or two further major revisions are planned before the final
+interface is realized.  The concept of the IKI is here to stay, but the current
+interface attempts only to address the immediate need to support multiple
+image formats with the least impact on current software.
+
+An image consists of a header and a pixel array stored in a random access
+binary file.  Images may be grouped together into an array or "cluster" of
+images, with the individual images being accessed by a one indexed subscript
+appended to the cluster name, e.g., "pix[3]" refers to image 3 of the cluster
+"pix".  To create a cluster containing more than one image a / followed by
+the cluster size may be included in the cluster index, e.g., "pix[3/10]" to
+create a cluster of 10 images and write into image 3.  An image section may
+optionally be appended to access some subset of the pixels in the image, e.g.,
+"pix[3][*,5]".  Lastly, if the image is stored as a disk file, the filename
+extension of the header file may be given to explicitly indicate the image
+format (IKI driver) to be used to access the image.
+
+A full specification (referencing an existing image) might therefore be
+"pix.hhh[3][*,5]", where the ".hhh" extension indicates that the cluster is
+physically stored in an SDAS GEIS (group format) data structure, the "[3]"
+indicates image 3, and the "[*,5]" is a conventional IMIO image section.
+If the minimal specification "pix" were given, the IKI would determine that
+"pix" was a GEIS format image, accessing the entire contents of image [1].
+As an aside, note that image sections are handled entirely by IMIO and are
+not seen at the IKI level.  Likewise, the cluster subscript is parsed by
+IMIO and passed to the IKI as an integer argument.
+
+
+	IM_PIXTYPE	int		pixel type (usilrdx)
+	IM_NDIM		int		number of axes (0:7)
+	IM_LEN		long[7]		logical length of each axis (>=1)
+	IM_PHYSLEN	long[7]		physical length of each axis (>=1)
+	IM_CLINDEX	int		index of image in cluster
+	IM_CLSIZE	int		number of images in cluster
+	IM_PIXOFF	long		char file offset to the pixels
+	IM_CTIME	long		image creation time
+	IM_MTIME	long		most recent image modification time
+	IM_LIMTIME	long		time when max/min last updated
+	IM_MAX		real		maximum pixel value
+	IM_MIN		real		minimum pixel value
+	IM_PIXFILE	char*80		pathname of pixel file (optional)
+	IM_TITLE	char*80		image title string
+
+
+The important fields of the IMIO image descriptor are summarized above, along
+with their datatype and length in the case of arrays.  This is from the original
+IMIO design and has not been modified in any way, except for the addition of the
+cluster fields to the runtime descriptor.  The IKI drivers directly read and
+write these fields in the image descriptor.
+
+In addition to these standard fields (for which the IKI driver must supply
+reasonable values at open time) the image descriptor contains a "user area"
+containing an arbitrary sequence of keyword=value parameters encoded in
+FITS character format.  The FITS cards are trimmed at the right and
+concatenated into an EOS delimited string with newline characters delimiting
+each card.  All host format specific header parameters should be passed to
+IMIO in the user area.  In the case of group format images, the user area
+will contain both the group parameters (parameters shared by the entire group
+of images) and the group header parameters (parameters for the individual
+image in the group specified at open time).  IMIO makes no distinction
+between the two types of parameters.  All header parameters are available
+to the high level applications code via the IMIO/IDBI interface.
+
+
+4. IKI INTERFACE PROCEDURES
+
+    The IMIO code calls only the IKI procedures and has no knowledge of the
+IKI drivers, or of which driver has been connected to a particular image
+descriptor.  The high level IKI procedures are summarized below.  The interface
+is fairly small due to the use of the descriptor to maintain all information
+describing the image, and due to the fact that IMIO directly accesses the
+pixel data via FIO.
+
+
+	       iki_open (im, image, group, gcount, acmode, o_im)
+	      iki_close (im)
+	       iki_opix (im)			# open/create pixfile
+	     iki_updhdr (im)			# update image header
+
+	       iki_copy (oldname, newname)	# fast copy of entire group
+	     iki_delete (group)			# delete entire group
+	     iki_rename (oldname, newname)	# rename entire group
+
+         k = iki_access (image, acmode)		# test existence, legal extn
+	   iki_lddriver (open,close,		# install new driver
+			 opix,updhdr, access,copy,delete,rename)
+
+
+The OPEN procedure opens or creates the indicated image in the named cluster.
+In the case of a new image or new copy image, only the header is created by
+the open call; the pixfile is not created until the OPIX routine is called,
+allowing the high level code time to set the image dimensions, datatype,
+number of groups, etc., in the image descriptor.  Once OPIX has been called
+to create a new group, the number of axes, size of each axis, pixel type,
+etc. is fixed.
+
+In the case of image stored in the SDAS/GEIS group format, all of the images
+in a cluster (group) must be of the same size, must have the same header
+parameters, and the header parameters must be defined when the group is
+created (new parameters or images cannot be added to the group later).
+The first open call for a image will allocate space for all images in the
+cluster, but only the indicated image will be initialized in the first call.
+Multiple images may be simultaneously open in the same cluster, and the same
+image may be multiply opened on independent logical FIO file descriptors.
+
+The high level IRAF software has little or no knowledge of the physical
+association of images into clusters.  In particular, the high level software
+is ignorant about the SDAS/GEIS image storage format, but this need not
+prevent processing of these images.  The main limitations of the group
+format derive from the fact that new images can neither be added to nor
+deleted from to a group format cluster, and new parameters cannot be added
+to a group header.  To create a group format image via IMIO, one will normally
+make a NEW_COPY copy of an existing group format image (to define the fields
+of the group headers), specifing the number of images in the new group in
+the cluster size field of the image name specification.  For example, writing
+to the new image "pix[3/10]" will cause a cluster of 10 images to be created
+and image 3 to be initialized.  Subsequent calls to write to either "pix[I]"
+or "pix[I/10]" will be necessary to initialize the remaining images in the
+cluster.
+
+
+5. KERNEL PROCEDURES
+
+    Each supported image format requires a dedicated set of kernel procedures
+to be called by the IKI to access images stored in that format.  The calling
+sequences for these procedures are shown below.
+
+
+               xxx_open (im, root, extn, cl_index, cl_size, acmode, status)
+              xxx_close (im, status)
+               xxx_opix (im, status)
+             xxx_updhdr (im, status)
+
+             xxx_access (root, extn, acmode, status)
+               xxx_copy (old_root, old_extn, new_root, new_extn, status)
+             xxx_delete (root, extn, status)
+             xxx_rename (old_root, old_extn, new_root, new_extn, status)
+
+
+Here, the package prefix "xxx" is OIF for the old IRAF image format, and STF
+for the STScI/SDAS GEIS format.  Note that the OPEN procedure fills in selected
+fields in a preallocated image descriptor rather than allocating the descriptor
+itself.  Image names are parsed into root, extension, cl_index, etc. fields by
+the IKI or higher level code, to further simplify the kernel code.  The IKI
+verifies the existence or nonexistence of all operand images before calling
+a kernel procedure, hence the kernel procedures need not perform these
+functions.  The kernel procedures should return an ERR status if they cannot
+perform their function for some reason (rather than take an error action).
+The locpr() entry point addresses of the kernel procedures are saved in a
+runtime table maintained by the IKI.
+
+The syntax and semantics of the kernel procedures are discussed in detail below.
+Since the interface routines have full access to the IMIO descriptors, it is
+important to realize what does and does not have to be set.
+
+
+5.1 IMAGE OPEN PRIMITIVE
+
+include	<imhdr.h>
+include	<imio.h>
+include	"xxx.h"
+
+# XXX_OPEN -- Open/create an image.
+
+procedure oif_open (im, root, extn, cl_index, cl_size, acmode, status)
+
+pointer	im			# image descriptor (allocated by IMIO)
+char	root[ARB]		# root image name
+char	extn[ARB]		# extension, if any
+int	cl_index		# index of image to be opened
+int	cl_size			# number of images in cluster
+int	acmode			# access mode
+int	status			# return status (OK|ERR)
+
+begin
+	1.  Construct the filename of the header file and open or create the
+	    image header file.
+
+	2.  If opening an existing image, read the image header and fill in
+	    the following fields of the IMIO image header descriptor.  If
+	    creating a new image set only the field IM_HDRFILE.
+
+	    IM_PIXTYPE		# datatype of the pixels		**
+	    IM_NDIM		# number of dimensions			**
+	    IM_LEN		# length of the dimensions		**
+
+	    IM_CTIME		# time of image creation
+	    IM_MTIME		# time of last modify
+	    IM_LIMTIME		# time min,max computed
+	    IM_MAX		# max pixel value
+	    IM_MIN		# min pixel value
+	    IM_PIXFILE		# name of pixel storage file
+	    IM_HDRFILE		# name of header storage file
+	    IM_TITLE		# image name string
+	    IM_HISTORY		# history comment string
+
+	    The really essential fields are marked with a ** at the right.
+	    CTIME, PIXFILE, HDRFILE, TITLE, and HISTORY are for information
+	    only.  MTIME and LIMTIME are used to determine if the min/max
+	    pixel values are up to date, and the actual values do not matter
+	    provided the conclusion about the min/max values is correct.
+
+	3.  If opening an existing image, call IMIO to set those fields of the
+	    image header/descriptor describing the format in which the pixels
+	    are stored in the pixel storage file.
+
+		[] call imioff (im, pixoff, COMPRESS, blklen)
+
+	    where
+		    pixoff	FIO file offset of first pixel.
+		    compress	Set to NO to enable alignment of image
+				  lines on block boundaries, to YES for
+				  compressed byte stream image.
+		    blklen	Device block size, chars.  Set to 1 to
+				  defeat all block alignment.
+
+	    If opening a new image, this step may be left until the OPIX
+	    primitive is called.
+
+	3.  If the kernel procedures use their own internal descriptor,
+	    allocate and initialize the descriptor and save a pointer to
+	    it in IM_KDES(im).
+
+	4.  Set return status.
+end
+
+
+5.2  OPEN PIXEL FILE PRIMITIVE
+
+include	<imhdr.h>
+include	<imio.h>
+include	"xxx.h"
+
+# XXX_OPIX -- Open (or create) the pixel storage file.  Call IMIO to set the
+# file offsets and buffer sizes. 
+
+procedure xxx_opix (im, status)
+
+pointer	im				# image descriptor
+int	status				# return status
+
+begin
+	1.  Opening existing image:
+	    1.1 Open pixel file read only or read write.
+
+	2.  Opening (creating) new image:
+	    2.1 Call IMIO to set the offset parameters, assuming this was not
+		already done in the OPEN primitive:
+
+		    [] call imioff (im, pixoff, COMPRESS, blklen)
+
+	    2.2 Using the file size computed by imioff or determined by more
+		format specific means, open (falloc) the pixel storage file.
+		The IM_HGMOFF field of the image header is set by imioff
+		to the file offset of the end of the image.
+
+	3.  Call IMIO to set the i/o buffer parameters:
+
+		    [] call imsetbuf (pfd, im)
+
+	    This sets the FIO buffer size and the IM_FAST parameter.
+	    The buffer size should be set before doing any i/o on the
+	    pixel file.  If in doubt, skip the call and simply set
+	    IM_FAST(im) = NO (i/o will be suboptimal but not too bad).
+
+	4.  Save the pixfile FIO file descriptor (required for pixel i/o)
+	    in the image descriptor:
+
+		    [] IM_PFD(im) = pfd
+end
+
+
+5.3  UPDATE HEADER PRIMITIVE
+
+include	<imhdr.h>
+include	<imio.h>
+
+# XXX_UPDHDR -- Update the image header.
+
+procedure xxx_updhdr (im, status)
+
+pointer	im			# image descriptor
+int	status			# return status
+
+begin	
+	1.  Update the values of the standard logical image header fields
+	    in the physical image header, e.g., PIXTYPE, NDIM, LEN, and CTIME
+	    (for new images), MTIME, LIMTIME, MIN, MAX (any image).
+
+	2.  Save the "user fields" in the physical image header.  Some of
+	    these may have been inserted in the user area by the kernel open
+	    procedure, others may have been added by IRAF programs or by
+	    the user since the image was opened.
+end
+
+
+5.4  CLOSE IMAGE PRIMITIVE
+
+include <imio.h>
+
+# XXX_CLOSE -- Close an image.
+
+procedure xxx_close (im, status)
+
+pointer	im			# image descriptor
+int	status
+
+begin
+	1.  If the pixel file has been opened, close it.  Note that if no
+	    pixel i/o was done to the image, the pixel file will never have
+	    been opened.
+
+	2.  If the header file is still open, close it.
+
+	3.  If a special kernel descriptor was allocated at image open time
+	    by the kernel, deallocate it.
+end

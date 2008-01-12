@@ -1,0 +1,8 @@
+# Make the package.
+
+$call	update@src
+$exit
+
+update:
+	$call update@src
+	;

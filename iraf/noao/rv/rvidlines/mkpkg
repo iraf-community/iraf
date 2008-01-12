@@ -1,0 +1,47 @@
+# RVIDLINES
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes)
+	    $ifolder (peaks.x, peaks.gx)
+		$generic -k peaks.gx -o peaks.x $endif $endif
+
+	# Version from V2.10.3 ONEDSPEC that conflicts with V2.10.2 RV
+	iddeblend.x	<mach.h>
+
+	idcenter.x	identify.h <gset.h> <smw.h>
+	idcolon.x	identify.h <error.h> <gset.h> <smw.h>
+	iddb.x		identify.h <imset.h> <math/curfit.h> <smw.h>
+	iddelete.x	identify.h
+	iddofit.x	identify.h
+	iddoshift.x	identify.h
+	idfitdata.x	identify.h <smw.h>
+	idfixx.x	<smw.h>
+	idgdata.x	identify.h <imhdr.h> <imio.h> <pkg/gtools.h> <smw.h>
+	idgraph.x	identify.h <gset.h> <pkg/gtools.h> <smw.h>
+	ididentify.x	identify.h <error.h> <gset.h> <imhdr.h> <smw.h>
+	idinit.x	identify.h <gset.h> <math/curfit.h>
+	idlabel.x	
+	idlinelist.x	identify.h <error.h> <mach.h>
+	idlog.x		identify.h <smw.h> <time.h>
+	idmap.x		identify.h <ctype.h> <imhdr.h> <pkg/gtools.h> <smw.h>
+	idmark.x	identify.h <gset.h> <smw.h>
+	idnearest.x	identify.h
+	idnewfeature.x	identify.h <mach.h>
+	idnoextn.x	
+	idpeak.x	identify.h
+	idrms.x		identify.h
+	idshift.x	identify.h
+	idshow.x	identify.h
+	idvelocity.x	identify.h <smw.h> <units.h>
+	idvhelio.x	<error.h>
+	peaks.x	
+	reidentify.x	identify.h <error.h> <gset.h> <imhdr.h>
+	t_identify.x	identify.h <mach.h> <pkg/gtools.h>
+	t_reidentify.x	identify.h <error.h> <fset.h> <gset.h> <pkg/gtools.h>\
+			<smw.h>
+	;

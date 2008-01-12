@@ -1,0 +1,64 @@
+.help istable Aug91 noao.ptools.digiphot
+.ih
+NAME
+istable --  determine the status of a file
+
+.ih
+USAGE
+istable infile
+
+.ih
+PARAMETERS
+
+.ls infile
+The name of the input file whose status is to be determined.
+.le
+.ls table = no
+An output variable which is "yes" if \fIinfile\fR is an STSDAS table
+and "no" otherwise.
+.le
+.ls text = no
+An output variable which is "yes" if \fIinfile\fR is an APPHOT/DAOPHOT
+text database and "no" otherwise.
+.le
+.ls other = no
+An output variable which is "yes" if \fIinfile\fR is neither of the
+above and "no" otherwise.
+.le
+
+.ih
+DESCRIPTION
+ISTABLE is a very simple task which determines whether a specified
+input file is an STSDAS table, an APPHOT/DAOPHOT text database file or 
+neither of the above. ISTABLE first tries to open the input file as an 
+STSDAS table. If successful ISTABLE returns "yes" in the
+variable \fItable\fR and "no" in \fItext\fR and \fIother\fR. Otherwise
+ISTABLE  tries to open the input file as an APPHOT/DAOPHOT text database
+file by checking for the "#K IRAF" keyword.
+If the check is positive ISTABLE return "yes" in
+the variable \fItext\fR and "no" in \fItable\fR and \fIother\fR. If the input
+file is neither an STSDAS table or an APPHOT/DAOPHOT text database
+ISTABLE returns "yes" in the variable \fIother\fR and "no" in \fItext\fR
+and \fItable\fR.
+
+.ih
+EXAMPLES
+
+1. Determine whether the file n4147.mag.1 is an STSDAS table.
+
+.nf
+   pt> istable n4147.mag
+   pt> =istable.table
+
+       ... answer will appear on the screen
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Users should be wary of running ISTABLE in background as the output
+CL parameters may not be properly updated. 
+.ih
+SEE ALSO
+.endhelp

@@ -1,0 +1,4 @@
+intable,s,a,,,,"Input tables"
+outtable,s,a,,,,"Output tables"
+expr,s,a,,,,"Expression used for selection"
+mode,s,h,"a",,,

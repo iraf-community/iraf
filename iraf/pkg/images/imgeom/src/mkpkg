@@ -1,0 +1,35 @@
+# Library for the GEOMETRIC TRANSFORMATION tasks
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+generic:
+        $set    GEN = "$$generic -k"
+
+	$ifolder (generic/blkav.x, blkav.gx)
+	    $(GEN) blkav.gx -o generic/blkav.x		$endif
+	$ifolder (generic/blkrp.x, blkrp.gx)
+	    $(GEN) blkrp.gx -o generic/blkrp.x		$endif
+	$ifolder (generic/imtrans.x, imtrans.gx)
+	    $(GEN) imtrans.gx -o generic/imtrans.x	$endif
+	$ifolder (generic/im3dtran.x, im3dtran.gx)
+	    $(GEN) im3dtran.gx -o generic/im3dtran.x	$endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	@generic
+
+	blkcomp.x	<imhdr.h>
+	shiftlines.x	<imhdr.h> <imset.h> <math/iminterp.h>
+	t_blkavg.x	<imhdr.h>
+	t_blkrep.x	<imhdr.h>
+	t_imshift.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h>
+	t_imtrans.x	<imhdr.h> <error.h> <mwset.h>
+	t_im3dtran.x	<imhdr.h> <error.h> <mwset.h>
+	t_magnify.x	<imhdr.h> <imset.h> <error.h> <math/iminterp.h>
+	t_shiftlines.x	<error.h>
+	;

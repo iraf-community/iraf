@@ -1,0 +1,29 @@
+.help zfchdr May84 "System Interface"
+.ih
+NAME
+zfchdr -- change the current working directory
+.ih
+SYNOPSIS
+.nf
+zfchdr (new_directory, status)
+
+packed	char new_directory[]		# osfn of new directory
+int	status
+.fi
+.ih
+DESCRIPTION
+The current working directory is changed to the directory specified
+by the packed OS pathname given as the first argument.
+.ih
+RETURN VALUE
+ERR is returned if the new directory does not exist or cannot be accessed.
+OK is returned if the operation is successful.
+.ih
+NOTES
+On a host system with a flat directory structure the kernel will have to map
+the hierarchical directory structure assumed by IRAF onto the linear directory
+structure provided by the host.
+.ih
+SEE ALSO
+zfpath, zopdir, zgfdir, zfsubd
+.endhelp

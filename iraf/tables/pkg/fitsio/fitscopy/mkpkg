@@ -1,0 +1,9 @@
+$checkout fitsio.a ../
+$update fitsio.a
+$checkin fitsio.a ../
+$exit
+
+
+fitsio.a:
+	t_fitscopy.x  <fset.h> <error.h> <ctype.h> <mach.h>
+	;

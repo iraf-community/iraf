@@ -1,0 +1,37 @@
+# HDICFIT package.  *** Modified from icgfit package for DTOI applications ***
+
+update:
+	$update libhdic.a
+
+libhdic.a:
+
+	hdicclean.x	hdicfit.h <pkg/rg.h>
+	hdicdeviant.x	<mach.h> <math/curfit.h>
+	hdicdosetup.x	hdicfit.h <math/curfit.h>
+	hdicerrors.x	hdicfit.h <math/curfit.h>
+	hdicfit.x	hdicfit.h <math/curfit.h>
+	hdicgaxes.x	hdicfit.h <pkg/gtools.h>
+	hdicgcolon.x	hdicfit.h <error.h> <gset.h>
+	hdicgdelete.x	hdicfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	hdicgfit.x	hdicfit.h <error.h> <pkg/gtools.h> <mach.h> <gset.h>
+	hdicggraph.x	hdicfit.h hdic.com <gset.h> <pkg/gtools.h> <mach.h>
+	hdicgnearest.x	<mach.h> <pkg/gtools.h>
+	hdicgparams.x	hdicfit.h <pkg/gtools.h>
+	hdicgsample.x	hdicfit.h <gset.h> <pkg/gtools.h> <pkg/rg.h>
+	hdicguaxes.x	hdic.com hdicfit.h
+	hdicgundel.x	hdicfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	hdicguser.x	
+	hdicparams.x	hdicfit.h
+	hdicreject.x	
+	hdicshow.x	hdicfit.h <pkg/gtools.h>
+	hdicvshow.x	hdicfit.h hdic.com <math/curfit.h>
+
+	hdictrans.x	hdicfit.h <mach.h> hdic.com
+	hdicgvec.x	hdicfit.h <mach.h> hdic.com
+	hdicadd.x	hdicfit.h
+	hdicinit.x 	hdic.com hdicfit.h <mach.h>
+	hdicsort.x
+	userfcn.x	<error.h>
+	hdicgredraw.x	<gset.h>
+	hdicebars.x	hdicfit.h hdic.com <pkg/gtools.h> <gset.h> <mach.h>
+	;

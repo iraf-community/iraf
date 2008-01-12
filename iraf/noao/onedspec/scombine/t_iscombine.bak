@@ -1,0 +1,1122 @@
+include	<imhdr.h>
+include	<error.h>
+include	<mach.h>
+include	"../shdr.h"
+include "scombine.h"
+
+
+# SCOMBINE - Combine spectra
+# The input spectra are combined by averaging or summing with optional
+# scaling and weighting.  The input may be grouped by aperture or by
+# image.  The combining may be done interactively to allow adjusting
+# the wavelengths or intensities.  The output spectrum will have
+# linear or log linear wavelengths and may be a "multispec" format
+# spectrum if multiple apertures are present in the input.
+
+procedure t_scombine()
+
+int	ilist			# list of input images
+int	olist			# list of output images
+pointer	wlist			# image name for spectrum weights
+pointer	aps			# aperture ranges
+int	group			# grouping option
+int	combine			# combining option
+pointer	skey			# scaling keyword
+pointer	wkey			# weighting keyword
+bool	interactive		# adjust spectrum interactive?
+int	sort			# sort mode
+
+int	i, j, n, naps
+real	s1, s2
+pointer	im, mw, wt, shin, shout
+pointer	sp, input, output, woutput, str, sh, ns
+
+bool	clgetb(), is_in_range()
+int	clgwrd(), decode_ranges(), nowhite()
+int	imtopenp(), imtgetim()
+real	imgetr()
+pointer	immap(), smw_openim(), impl2r()
+errchk	immap, smw_openim, shdr_open, imgetr, scb_output, scb_combine, scb_edit
+
+begin
+	call smark (sp)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (woutput, SZ_FNAME, TY_CHAR)
+	call salloc (aps, 300, TY_INT)
+	call salloc (skey, SZ_FNAME, TY_CHAR)
+	call salloc (wkey, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	# Get parameters
+	ilist = imtopenp ("input")
+	olist = imtopenp ("output")
+	wlist = imtopenp ("woutput")
+	call clgstr ("apertures", Memc[str], SZ_LINE)
+	group = clgwrd ("group", Memc[input], SZ_FNAME, GROUP)
+	combine = clgwrd ("combine", Memc[input], SZ_FNAME, COMBINE)
+	call clgstr ("scale", Memc[skey], SZ_FNAME)
+	call clgstr ("weight", Memc[wkey], SZ_FNAME)
+	interactive = clgetb ("interactive")
+	sort = clgwrd ("sort", Memc[input], SZ_FNAME, SORT)
+
+	if (decode_ranges (Memc[str], Memi[aps], 100, i) == ERR)
+	    call error (1, "Error in aperture list")
+	i = nowhite (Memc[skey], Memc[skey], SZ_FNAME)
+	i = nowhite (Memc[wkey], Memc[wkey], SZ_FNAME)
+
+	# Loop through input images.
+	while (imtgetim (ilist, Memc[input], SZ_FNAME) != EOF) {
+	    if (imtgetim (olist, Memc[output], SZ_FNAME) == EOF) {
+		call eprintf ("No output image\n")
+		break
+	    }
+	    if (imtgetim (wlist, Memc[woutput], SZ_FNAME) == EOF)
+		Memc[woutput] = EOS
+
+	    # Get spectra to combine
+	    naps = 0
+	    repeat {
+		iferr (im = immap (Memc[input], READ_ONLY, 0)) {
+		    call erract (EA_WARN)
+		    next
+		}
+		mw = smw_openim (im)
+		shin = NULL
+
+		do i = 1, IM_LEN(im,2) {
+		    call shdr_open (im, mw, i, 1, INDEFI, SHDATA, shin)
+		    if (!is_in_range (Memi[aps], AP(shin)))
+			next
+		    if (Memc[skey] != EOS)
+			RA(shin) = imgetr (im, Memc[skey])
+		    if (Memc[wkey] != EOS)
+			DEC(shin) = sqrt (imgetr (im, Memc[wkey]))
+		    else
+			DEC(shin) = 1.
+		    if (group == GRP_APERTURES) {
+			for (j=1; j<=naps; j=j+1)
+			    if (AP(shin) == AP(SH(sh,j,1)))
+				break
+			n = 10
+		    } else {
+			j = 1
+			n = 1
+		    }
+
+		    if (naps == 0) {
+			call calloc (sh, n, TY_POINTER)
+			call calloc (ns, n, TY_INT)
+		    } else if (j > naps && mod (naps, n) == 0) {
+			call realloc (sh, naps+n, TY_POINTER)
+			call realloc (ns, naps+n, TY_INT)
+			call aclri (Memi[sh+naps], n)
+			call aclri (Memi[ns+naps], n)
+		    }
+		    if (j > naps)
+			naps = naps + 1
+		    n = NS(ns,j)
+		    if (n == 0)
+			call malloc (Memi[sh+j-1], 10, TY_POINTER)
+		    else if (mod (n, 10) == 0)
+			call realloc (Memi[sh+j-1], n+10, TY_POINTER)
+
+		    n = n + 1
+		    SH(sh,j,n) = NULL
+		    NS(ns,j) = n
+		    call shdr_copy (shin, SH(sh,j,n), NO)
+		}
+
+		call imunmap (IM(shin))
+		call shdr_close (shin)
+
+		if (group == GRP_IMAGES)
+		    break
+	    } until (imtgetim (ilist, Memc[input], SZ_FNAME) == EOF)
+
+	    if (naps < 1) {
+		call eprintf ("No input spectra to combine")
+		next
+	    }
+
+	    # Set the output and combine the spectra.
+	    call scb_output (sh, ns, naps, Memc[output], Memc[woutput],
+		im, mw, wt)
+	    do j = 1, naps {
+		call shdr_open (im, mw, j, 1, INDEFI, SHHDR, shout)
+		call calloc (SX(shout), SN(shout))
+		call calloc (SY(shout), SN(shout))
+
+		if (Memc[skey] != EOS) {
+		    s1 = RA(SH(sh,j,1))
+		    do i = 2, NS(ns,j) {
+			shin = SH(sh,j,i)
+			s2 = RA(shin)
+			if (s1 != s2)
+			    call amulkr (Memr[SY(shin)], s1 / s2,
+				Memr[SY(shin)], SN(shin))
+		    }
+		}
+
+		if (interactive) {
+		    call scb_sort (SH(sh,j,1), NS(ns,j), sort, naps)
+		    call scb_edit (SH(sh,j,1), NS(ns,j), shout, combine,
+			interactive)
+		} else
+		    call scb_combine (SH(sh,j,1), NS(ns,j), shout, combine)
+
+		call amovr (Memr[SY(shout)], Memr[impl2r(im,j)], SN(shout))
+		if (wt != NULL)
+		    call amovr (Memr[SX(shout)], Memr[impl2r(wt,j)], SN(shout))
+	    }
+
+	    call shdr_close (shout)
+	    call mw_close (mw)
+	    call imunmap (im)
+	    if (wt != NULL)
+		call imunmap (wt)
+
+	    do j = 1, naps {
+		mw = NULL
+		do i = 1, NS(ns,j) {
+		    shin = SH(sh,j,i)
+		    if (MW(shin) != mw) {
+			mw = MW(shin)
+			call mw_close (MW(shin))
+		    }
+		    call shdr_close (shin)
+		}
+		call mfree (Memi[sh+j-1], TY_POINTER)
+	    }
+	    call mfree (sh, TY_POINTER)
+	    call mfree (ns, TY_INT)
+	}
+
+	call imtclose (ilist)
+	call imtclose (olist)
+	call imtclose (wlist)
+
+	call sfree (sp)
+end
+
+
+# SCB_OUTPUT - Set the output spectrum
+
+procedure scb_output (sh, ns, naps, output, woutput, im, mw, wt)
+
+pointer	sh			# spectra structures
+int	ns			# number of spectra
+int	naps			# number of apertures
+char	output[SZ_FNAME]	# output spectrum name
+char	woutput[SZ_FNAME]	# output weight image name
+pointer	im			# output IMIO pointer
+pointer	mw			# output MWCS pointer
+pointer	wt			# weight IMIO pointer
+
+int	i, n, dc, nmax, axis[2], imofnlu(), imgnfn()
+real	w0, w1, wpc
+pointer	sp, key, str, sh1, immap(), mw_open(), smw_openim()
+errchk	immap, smw_openim
+data	axis/1,2/
+
+begin
+	call smark (sp)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	# Create output image using the first input image as a reference
+	wt = immap (SPECTRUM(SH(sh,1,1)), READ_ONLY, 0)
+	im = immap (output, NEW_COPY, wt)
+	call imunmap (wt)
+
+	# Set header
+	i = imofnlu (im, "APFORMAT,APNUM*,APID*")
+	while (imgnfn (i, Memc[str], SZ_LINE) != EOF)
+	    call imdelf (im, Memc[str])
+	call imcfnl (i)
+	
+	IM_PIXTYPE(im) = TY_REAL
+	call strcpy ("Combined image", IM_TITLE(im), SZ_LINE)
+	call scb_default (SH(sh,1,1), NS(ns,1), w0, w1, wpc, n, dc)
+
+	if (naps == 1 && dc == DCLINEAR) {
+	    IM_NDIM(im) = 1
+	    IM_LEN(im, 1) = n
+	    call imaddi (im, "DC-FLAG", dc)
+
+	    mw = mw_open (NULL, 1)
+	    call mw_newsystem (mw, "linear", 1)
+	    call mw_swtype (mw, 1, 1, "linear",
+		"label=Wavelength units=Angstroms")
+	    call mw_swtermr (mw, 1., w0, wpc, 1)
+	    call smw_saveim (mw, im)
+	} else {
+	    call imastr (im, "APFORMAT", "multispec")
+
+	    nmax = 0
+	    do i = 1, naps {
+		call scb_default (SH(sh,i,1), NS(ns,i), w0, w1, wpc, n, dc)
+		nmax = max (nmax, n)
+		sh1 = SH(sh,i,1)
+		call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		    call pargi (i)
+		call sprintf (Memc[str], SZ_LINE, "%d %d %g %g %d %g %g")
+		    call pargi (AP(sh1))
+		    call pargi (BEAM(sh1))
+		    if (dc == DCLOG) {
+			call pargr (log10 (w0))
+			call pargr (log10 (w1/w0)/(n-1))
+		    } else {
+			call pargr (w0)
+			call pargr (wpc)
+		    }
+		    call pargi (n)
+		    call pargr (APLOW(sh1))
+		    call pargr (APHIGH(sh1))
+		call imastr (im, Memc[key], Memc[str])
+	    }
+	    IM_NDIM(im) = 2
+	    IM_LEN(im,1) = nmax
+	    IM_LEN(im,2) = naps
+	    call imaddi (im, "DC-FLAG", dc)
+
+	    mw = mw_open (NULL, 2)
+	    call mw_newsystem (mw, "multispec", 2)
+	    call mw_swtype (mw, axis, 2, "multispec",
+		"label=Wavelength units=Angstroms")
+	    call smw_saveim (mw, im)
+	    call mw_close (mw)
+	    mw = smw_openim (im)
+	}
+
+	# Create weights image
+	if (woutput[1] != EOS) {
+	    wt = immap (woutput, NEW_COPY, im)
+	    call sprintf (IM_TITLE(wt), SZ_LINE, "Weighting array for %s")
+		call pargstr (output)
+	}
+
+	call sfree (sp)
+end
+
+
+# SCB_DEFAULT - Set default values for the starting wavelength, ending
+# wavelength, wavelength increment and spectrum length for the output
+# spectrum.
+
+procedure scb_default (shdr, ns, w0, w1, wpc, npix, dc)
+
+pointer	shdr[ARB]		# spectra structures
+int	ns			# number of spectra
+real	w0, w1			# starting and ending wavelength
+real	wpc			# wavelength increment
+int	npix			# spectrum length
+int	dc			# dispersion type
+
+bool	clgetb()
+int	i, clgeti()
+real	aux, clgetr()
+pointer	sh
+
+begin
+	w0 = clgetr ("w1")
+	w1 = clgetr ("w2")
+	wpc = clgetr ("dw")
+	npix = clgeti ("nw")
+	if (clgetb ("log"))
+	    dc = DCLOG
+	else
+	    dc = DCLINEAR
+
+	# Starting wavelength
+	if (IS_INDEFR (w0)) {
+	    if (IS_INDEFR (wpc) || wpc > 0.) {
+		w0 = MAX_REAL
+		do i = 1, ns {
+		    sh = shdr[i]
+		    if (WP(sh) > 0.)
+			aux = W0(sh)
+		    else
+			aux = W1(sh)
+		    if (aux < w0)
+			w0 = aux
+		}
+	    } else {
+		w0 = -MAX_REAL
+		do i = 1, ns {
+		    sh = shdr[i]
+		    if (WP(sh) > 0.)
+			aux = W1(sh)
+		    else
+			aux = W0(sh)
+		    if (aux > w0)
+			w0 = aux
+		}
+	    }
+	}
+
+	# Ending wavelength
+	if (IS_INDEFR (w1)) {
+	    if (IS_INDEFR (wpc) || wpc > 0.) {
+		w1 = -MAX_REAL
+		do i = 1, ns {
+		    sh = shdr[i]
+		    if (WP(sh) > 0.)
+			aux = W1(sh)
+		    else
+			aux = W0(sh)
+		    if (aux > w1)
+			w1 = aux
+		}
+	    } else {
+		w1 = MAX_REAL
+		do i = 1, ns {
+		    sh = shdr[i]
+		    if (WP(sh) > 0.)
+			aux = W0(sh)
+		    else
+			aux = W1(sh)
+		    if (aux < w1)
+			w1 = aux
+		}
+	    }
+	}
+
+	# Wavelength increment
+	if (IS_INDEFR (wpc)) {
+	    wpc = MAX_REAL
+	    do i = 1, ns {
+		aux = abs (WP(shdr[i]))
+		if (aux < wpc)
+		    wpc = aux
+	    }
+	}
+	if ((w1 - w0) / wpc < 0.)
+	    wpc = -wpc
+
+	# Spectrum length
+	if (IS_INDEFI (npix))
+	    npix = int ((w1 - w0) / wpc + 0.5) + 1
+
+	# Force the ending wavelength
+	w1 = w0 + (npix - 1) * wpc
+end
+
+
+# SCB_SORT - Sort the spectra by starting wavelength according to the sort mode.
+
+procedure scb_sort (shdr, ns, sort)
+
+pointer	shdr[ARB]		# spectra structures
+int	ns			# number of spectra
+int	sort			# sort mode
+
+int	i, j
+pointer	sh
+
+begin
+	if (sort == SORT_INC) {
+	    do i = 1, ns - 1 {
+	        do j = i, ns {
+		    if (W0(shdr[i]) > W0(shdr[j])) {
+			sh = shdr[i]
+			shdr[i] = shdr[j]
+			shdr[j] = sh
+		    }
+		}
+	    }
+	} else if (sort == SORT_DEC) {
+	    do i = 1, ns - 1 {
+	        do j = i, ns {
+		    if (W0(shdr[i]) < W0(shdr[j])) {
+			sh = shdr[i]
+			shdr[i] = shdr[j]
+			shdr[j] = sh
+		    }
+		}
+	    }
+	}
+end
+
+
+# SCB_COMBINE - Combine a list of input spectra
+# The spectra must first be rebinned to the same coordinates as the output
+# apart from a zero point.
+
+procedure scb_combine (sh, ns, shout, combine)
+
+pointer	sh[ARB]			# input spectra structures
+int	ns			# number of spectra
+pointer	shout			# output spectrum structure
+int	combine			# combine option
+
+int	i, n
+real	x1, x2, x3
+pointer	shin
+double	shdr_wl(), shdr_lw()
+	
+begin
+	do i = 1, ns {
+	    shin = sh[i]
+	    x3 = shdr_wl (shout, shdr_lw (shin, double(0.5)))
+	    x2 = shdr_wl (shout, shdr_lw (shin, double(SN(shin)+0.5)))
+	    x1 = max (1, nint (min (x2, x3) + 0.99))
+	    x2 = min (SN(shout), nint (max (x2, x3) - 0.99))
+	    n = x2 - x1 + 1
+	    if (n < 1)
+		next
+	    x1 = shdr_lw (shout, double(x1))
+	    x2 = shdr_lw (shout, double(x2))
+	    call shdr_linear (shin, x1, x2, n, DC(shout))
+	    call scb_combine1 (shin, shout, combine)
+	}
+end
+
+
+# SCB_COMBINE1 -- Combine overlapping pixels of input spectrum with
+# (partially) combined output spectrum according to the combine mode.
+
+procedure scb_combine1 (shin, shout, combine)
+
+pointer	shin		# input spectrum structure
+pointer	shout		# output spectrum structure
+int	combine		# combine option
+
+int	i, i1, i2, scb_wl()
+real	wt
+pointer	in, sum, wts
+
+begin
+	i = scb_wl (shout, W0(shin))
+	i2 = scb_wl (shout, W1(shin))
+	i1 = max (1, min (i, i2))
+	i2 = min (SN(shout), max (i, i2))
+	if (i2 < i1)
+	    return
+
+	in = SY(shin)
+	sum = SY(shout) + i1 - 1
+	wts = SX(shout) + i1 - 1
+	wt = DEC(shin)
+
+	switch (combine) {
+	case CMB_AVERAGE:
+	    do i = i1, i2 {
+		Memr[sum] = (Memr[wts] * Memr[sum] + wt * Memr[in]) /
+		    (wt + Memr[wts])
+		Memr[wts] = Memr[wts] + wt
+		in = in + 1
+		sum = sum + 1
+		wts = wts + 1
+	    }
+	case CMB_SUM:
+	    do i = i1, i2 {
+		Memr[sum] = Memr[sum] + wt * Memr[in]
+		Memr[wts] = Memr[wts] + wt
+		in = in + 1
+		sum = sum + 1
+		wts = wts + 1
+	    }
+	}
+end
+
+***************** Cut here to break up into smaller pieces *********************
+
+include	<pkg/gtools.h>
+include	<pkg/xtanswer.h>
+include	"../shdr.h"
+include "scombine.h"
+
+# Help keys file and prompt
+define	KEY	"onedspec$scombine/scombine.key"
+define	PROMPT	"scombine options"
+
+# Line fugde modes
+define	FL_CURSOR	0
+define	FL_SPECTRUM	1
+
+# Shift modes
+define	SHIFT_CURSOR	0
+define	SHIFT_AVERAGE	1
+define	SHIFT_ACCUM	2
+
+# Edit structure
+define	LEN_EDT		8
+define	S1		Memr[$1+0]
+define	S2		Memr[$1+1]
+define	S1DEF		Memr[$1+2]
+define	S2DEF		Memr[$1+3]
+define	A1		Memr[$1+4]
+define	A2		Memr[$1+5]
+define	A1DEF		Memr[$1+6]
+define	A2DEF		Memr[$1+7]
+
+
+# SCB_EDIT - Edit the input spectrum interactively
+
+procedure scb_edit (sh, ns, shout, combine, interactive)
+
+pointer	sh[ns]			# input spectra
+int	ns			# number of input spectra
+pointer	shout			# output spectrum
+int	combine			# combine option
+bool	interactive		# interactive?
+
+bool	additive
+real	wx, wy, temp
+int	i, j, redraw, key, wcs, p1, p2, p3, answer, clgcur(), scb_wl()
+double	shdr_wl(), shdr_lw()
+pointer	gp, gt, shin, gopen(), gt_init()
+pointer	sp, edt, str
+
+begin
+	# Allocate space for editor structure
+	call smark (sp)
+	call salloc (edt, LEN_EDT, TY_STRUCT)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	# Initialize graphics
+	gp = gopen ("stdgraph", NEW_FILE, STDGRAPH)
+	gt = gt_init ()
+	call gt_sets (gt, GTTYPE, "line")
+	call gt_sets (gt, GTXLABEL, LABEL(shout))
+	call gt_sets (gt, GTXUNITS, UNITS(shout))
+
+	# Clear output
+	call aclrr (Memr[SX(shout)], SN(shout))
+	call aclrr (Memr[SY(shout)], SN(shout))
+
+	for (i=1; i <= ns; i=i+1) {
+	    call shdr_copy (sh[i], shin, NO)
+	    temp = shdr_wl (shout, shdr_lw (shin, double(0.5)))
+	    wy = shdr_wl (shout, shdr_lw (shin, double(SN(shin)+0.5)))
+	    wx = max (1, nint (min (temp, wy) + 0.99))
+	    wy = min (SN(shout), nint (max (temp, wy) - 0.99))
+	    j = wy - wx + 1
+	    if (j < 1)
+		next
+	    wx = shdr_lw (shout, double (wx))
+	    wy = shdr_lw (shout, double (wy))
+	    call shdr_linear (shin, wx, wy, j, DC(shout))
+
+	    # Get editor input and overlap ranges and set graph title
+	    call scb_ranges (shin, shout, edt)
+	    call sprintf (Memc[str], SZ_LINE,
+		"%d of %d   %-10.10s   In: %.1f:%.1f   Ov: %.1f:%.1f" )
+		call pargi (i)
+		call pargi (ns)
+		call pargstr (TITLE(shin))
+		call pargr (S1DEF(edt))
+		call pargr (S2DEF(edt))
+		call pargr (A1DEF(edt))
+		call pargr (A2DEF(edt))
+	    call gt_sets (gt, GTTITLE, Memc[str])
+
+	    # Enter cursor loop with "additive shift" keystroke
+	    key = '+'
+	    redraw = YES
+	    repeat {
+		switch (key) {
+		case 'a': # mark ranges in overlap region
+		    if (IS_INDEFR (A1(edt)) && IS_INDEFR (A2(edt)))
+			call scb_grange (wx, A1(edt), A2(edt),
+			   max (S1(edt), A1DEF(edt)), min (S2(edt), A2DEF(edt)))
+		case 'b': # forget a's
+		    A1(edt) = A1DEF(edt)
+		    A2(edt) = A2DEF(edt)
+		case 'c': # print cursor position
+		    call printf ("cursor x,y: %.2f %.2f  (%d)\n")
+			call pargr (wx)
+			call pargr (wy)
+			call pargd (shdr_wl (shout, double(wx)))
+		case 'd': # replace range in input spectrum by line segment
+		    call scb_fudge (shin, edt, wx, wy, FL_CURSOR)
+		    redraw = YES
+		case 'e' : # replace range in input spectrum by line segment
+		    call scb_fudge (shin, edt, wx, wy, FL_SPECTRUM)
+		    redraw = YES
+		case 'f': # restart
+		    answer = NO
+		    call xt_answer ("Start from the beginning again", answer)
+		    if (answer == YES || answer == ALWAYSYES) {
+			call aclrr (Memr[SX(shout)], SN(shout))
+			call aclrr (Memr[SY(shout)], SN(shout))
+			i = 0
+			break
+		    }
+		case 'j': # replace pixel by vertical cursor value
+		    p1 = max (1, min (SN(shin), scb_wl (shin, wx)))
+		    Memr[SY(shin)+p1-1] = wy
+		    redraw = YES
+		case 'o': # reset input spectrum
+		    answer = NO
+		    call xt_answer ("Reset input spectrum", answer)
+		    if (answer == YES || answer == ALWAYSYES) {
+			i = i - 1
+			break
+		    }
+		case 'p':
+		    answer = NO
+		    call xt_answer ("Skip current spectrum", answer)
+		    if (answer == YES || answer == ALWAYSYES)
+			break
+		case 'n', 'q':
+		    # Update input spectrum data with edit wavelengths
+		    p3 = scb_wl (shin, S1(edt))
+		    p2 = scb_wl (shin, S2(edt))
+		    p1 = min (p2,p3)
+		    p2 = max (p2,p3)
+		    if (p1 > 1)
+			call amovkr (0., Memr[SY(shin)], p1 - 1)
+		    if (p2 < SN(shin))
+			call amovkr (0., Memr[SY(shin)+p2], SN(shin) - p2)
+		    call scb_combine1 (shin, shout, combine)
+
+		    if (key == 'q') {
+			answer = NO
+			if (i == ns)
+			    call xt_answer ("Done", answer)
+			else
+			    call xt_answer ("Continue noninteractively", answer)
+			if (answer == YES || answer == ALWAYSYES) {
+			    call scb_combine (sh[i+1], ns-i, shout, combine)
+			    i = ns
+			    if (answer == ALWAYSYES)
+				interactive = false
+			}
+		    }
+		    break
+		case 'r': # redraw
+		    redraw = YES
+		case 's': # mark ranges in input spectrum
+		    call scb_grange (wx, S1(edt), S2(edt), S1DEF(edt),
+			S2DEF(edt))
+		    if (IS_INDEFR (A1(edt)) && IS_INDEFR (A2(edt))) {
+			A1(edt) = max (S1(edt), A1(edt))
+			A2(edt) = min (S2(edt), A2(edt))
+		    }
+		    redraw = YES
+		case 't': # forget s's
+		    if (S1(edt) == A1(edt))
+			A1(edt) = A1DEF(edt)
+		    if (S2(edt) == A2(edt))
+			A2(edt) = A2DEF(edt)
+		    S1(edt) = S1DEF(edt)
+		    S2(edt) = S2DEF(edt)
+		    redraw = YES
+		case 'v': # shift input spectrum vertically (average)
+		    call scb_vshift (shin, shout, edt, wx, wy, SHIFT_AVERAGE,
+			additive, redraw)
+		case 'w': # window
+		    call gt_window (gt, gp, "cursor", redraw)
+		case 'x': # shift input spectrum vertically
+		    call scb_hshift (shin, wx)
+		    call scb_ranges (shin, shout, edt)
+		    redraw = YES
+		case 'y': # shif input spectrum vertically (cursor)
+		    call scb_vshift (shin, shout, edt, wx, wy, SHIFT_CURSOR,
+			additive, redraw)
+		case 'z': # shift input spectrum vertically (value)
+		    call scb_vshift (shin, shout, edt, wx, wy, SHIFT_ACCUM,
+			additive, redraw)
+		case '+': # set additive scaling in vertical shifts
+		    additive = true
+		case '*': # set multiplicative scaling in vertical shifts
+		    additive = false
+		case '?': # help screen
+		    call gpagefile (gp, KEY, PROMPT)
+		}
+
+		# Redraw
+		if (redraw == YES) {
+		    p3 = scb_wl (shin, S1(edt))
+		    p2 = scb_wl (shin, S2(edt))
+		    p1 = max (1, min (p2,p3))
+		    p2 = min (SN(shin), max (p2,p3))
+		    call scb_plot2 (gp, gt, Memr[SY(shout)],
+			Memr[SY(shin)+p1-1], SN(shout), p2-p1+1, W0(shout),
+			W1(shout), S1(edt), S2(edt))
+		    redraw = NO
+
+		    call printf ("Input: %.1f:%.1f   Overlap: %.1f:%.1f\n")
+			call pargr (S1(edt))
+			call pargr (S2(edt))
+			call pargr (A1(edt))
+			call pargr (A2(edt))
+		}
+
+	    } until (
+		clgcur ("cursor", wx, wy, wcs, key, Memc[str], SZ_LINE) == EOF)
+	}
+
+	call gt_sets (gt, GTTITLE, "Combined image")
+	call scb_plot1 (gp, gt, Memr[SY(shout)], SN(shout), W0(shout),
+	    W1(shout))
+	call gclose (gp)
+	call gt_free (gt)
+	call shdr_close (shin)
+
+	# Free memory
+	call sfree (sp)
+end
+
+
+# SCB_WL -- Return the nearest logical pixel to the specified wavelength
+
+int procedure scb_wl (sh, w)
+
+pointer	sh		# Spectrum pointer
+real	w		# Wavelength
+
+double	shdr_wl()
+
+begin
+	return (nint (shdr_wl (sh, double (w))))
+end
+
+
+# SCB_RANGES - Get the ranges of the input spectrum to be included in the
+# accumulation and overlap region with the accumulated spectrum.
+
+procedure scb_ranges (shin, shout, edt)
+
+pointer	shin			# input spectrum structure
+pointer	shout			# output spectrum structure
+pointer	edt			# editor structure
+
+bool	flag
+int	i, i1, i2, o1, o2, scb_wl()
+pointer	in, out
+double	shdr_lw()
+
+begin
+	# Set flags
+	flag = true
+
+	# Input region
+	S1(edt) = W0(shin)
+	S2(edt) = W1(shin)
+	S1DEF(edt) = S1(edt)
+	S2DEF(edt) = S2(edt)
+
+	# Clear indexes
+	o1 = INDEFI
+	o2 = INDEFI
+
+	# Determine overlap region
+	i = scb_wl (shout, W0(shin))
+	i2 = scb_wl (shout, W1(shin))
+	i1 = max (1, min (i, i2))
+	i2 = min (SN(shout), max (i, i2))
+
+	in = SY(shin)
+	out = SY(shout) + i1 - 1
+
+	do i = i1, i2 {
+	    if (Memr[out] != 0. && Memr[in] != 0. && flag) {
+		o1 = i
+		flag = false
+	    }
+	    if (Memr[out] != 0. && Memr[in] != 0. && !flag)
+		o2 = i
+	    in = in + 1
+	    out = out + 1
+	}
+
+	# Convert indexes to wavelength
+	if (IS_INDEFI (o1))
+	    A1(edt) = INDEFR
+	else
+	    A1(edt) = shdr_lw (shout, double(o1))
+	if (IS_INDEFI (o2))
+	    A2(edt) = INDEFR
+	else
+	    A2(edt) = shdr_lw (shout, double(o2))
+	A1DEF(edt) = A1(edt)
+	A2DEF(edt) = A2(edt)
+end
+
+
+# SCB_GRANGE - Get a range set by the cursor.
+
+procedure scb_grange (wx1, low, high, minval, maxval)
+
+real	wx1			# old x cursor position
+real	low, high		# new range
+real	minval, maxval		# maximum range allowed
+
+char	junkc[1]
+int	junki
+real	wx2			# new x cursor position
+real	junkr
+
+int	clgcur()
+
+begin
+	# Prompt the user for next x position
+	call printf ("x again:\n")
+
+	# Get next cursor position
+	junki = clgcur ("cursor", wx2, junkr, junki, junki, junkc, 1)
+
+	# Swap the values if the first one is
+	# greater than the second one
+	if (wx1 < wx2) {
+	    low = max (wx1, minval)
+	    high = min (wx2, maxval)
+	} else {
+	    low = max (wx2, minval)
+	    high = min (wx1, maxval)
+	}
+end
+
+
+# SCB_FUDGE - Trace a line between two positions marked by the cursor.
+# There are two option to trace the line. The first one will replace the
+# values in the array with a line between the x cursor positions and y
+# array values. The second one will do it between x and y cursor positions.
+
+procedure scb_fudge (shin, edt, wx1, wy1, mode)
+
+pointer	shin			# input spectrum structure
+pointer	edt			# editor spectrum structure
+real	wx1, wy1		# last cursor position
+int	mode			# fudging mode
+
+char	strval[SZ_LINE]
+int	i, junk
+int	cx1, cx2		# cursor position (pixels)
+real	slope, base		# line parameters
+real	wx2, wy2		# new cursor position
+
+int	clgcur(), scb_wl()
+
+begin
+	# Prompt the user for next cursor position
+	if (mode == FL_CURSOR)
+	    call printf ("x,y again:\n")
+	else
+	    call printf ("x again:\n")
+
+	# Get next cursor position
+	junk = clgcur ("cursor", wx2, wy2, junk, junk, strval, SZ_LINE)
+
+	# Evaluate pixel cursor position
+	cx1 = scb_wl (shin, wx1)
+	cx2 = scb_wl (shin, wx2)
+	if (cx1 > cx2) {
+	    i = cx1
+	    cx1 = cx2
+	    cx2 = i
+	    base = wy1
+	    wy1 = wy2
+	    wy2 = base
+	}
+	cx1 = max (cx1, 1)
+	cx2 = min (cx2, SN(shin))
+	  
+	# Evaluate line paramters
+	if (mode == FL_CURSOR) {
+	    slope = (wy2 - wy1) / max (1, cx2 - cx1)
+	    base = wy1
+	} else {
+	    slope = (Memr[SY(shin)+cx2-1] - Memr[SY(shin)+cx1-1]) /
+		max (1, cx2 - cx1)
+	    base = Memr[SY(shin)+cx1-1]
+	}
+
+	# Replace pixel values by line
+	do i = cx1, cx2
+	    Memr[SY(shin)+i-1] = slope * (i - cx1) + base
+end
+
+
+# SCB_HSHIFT -  Shift the current spectrum horizontally
+
+procedure scb_hshift (shin, wx1)
+
+pointer	shin			# input spectrum structure
+real	wx1			# old cursor position
+
+char	strval[SZ_LINE]
+int	junki
+real	junkr
+real	wx2			# new cursor position
+real	dw			# wavelegth difference
+
+int	clgcur()
+
+begin
+	# Get next cursor position
+	call printf ("x again:\n")
+	junki = clgcur ("cursor", wx2, junkr, junki, junki, strval, SZ_LINE)
+
+	# Calculate the starting wavlength difference
+	dw = wx2 - wx1
+
+	# Assign new data
+	W0(shin) = W0(shin) + dw
+	W1(shin) = W1(shin) + dw
+end
+
+
+# SCB_VSHIFT - Shift the current spectrum vertically
+
+procedure scb_vshift (shin, shout, edt, wx, wy, mode, additive, redraw)
+
+pointer	shin			# input spectrum structure
+pointer	shout			# output spectrum structure
+pointer	edt			# editor structure
+real	wx, wy			# cursor position
+int	mode			# shifting mode
+bool	additive		# additive shift?
+int	redraw			# redraw spectrum?
+
+int	cx, cx1, cx2, scb_wl()
+real	avgov, avgin, shift
+real	junk
+
+begin
+	# Decide how to shift image according to the mode selected
+	if (mode == SHIFT_CURSOR) {
+	    # Shift the current spectrum so that the pixel closest to the
+	    # cursor position lies at the vertical cursor position.
+
+	    junk = min (max (wx, S1(edt)), S2(edt))
+	    cx = max (1, min (SN(shin), scb_wl (shin, junk)))
+
+	    if (additive) {
+	        shift = wy - Memr[SY(shin)+cx-1]
+		call aaddkr (Memr[SY(shin)], shift,
+			     Memr[SY(shin)], SN(shin))
+	        redraw = YES
+	    } else if (Memr[SY(shin)+cx-1] != 0) {
+	        shift = wy / Memr[SY(shin)+cx-1]
+		call amulkr (Memr[SY(shin)], shift,
+			     Memr[SY(shin)], SN(shin))
+	        redraw = YES
+	    } else
+	        call printf ("Multiplicative shift on zero level\n")
+
+	} else if (mode == SHIFT_AVERAGE) {
+	    # Shift spectrum so that the average value in the range
+	    # specified with the 'a' key matches that of the accumulated
+	    # spectrum.
+
+	    # Compute overlap average
+	    if (IS_INDEF(A1(edt)) || IS_INDEF(A2(edt)))
+		avgov = 0.
+	    else {
+		cx = scb_wl (shout, A1(edt))
+		cx2 = scb_wl (shout, A2(edt))
+		cx1 = max (1, min (cx, cx2))
+		cx2 = min (SN(shout), max (cx, cx2))
+		if (cx2 < cx1)
+		    avgov = 0.
+		else
+		    call aavgr (Memr[SY(shout)+cx1-1], (cx2-cx1+1), avgov, junk)
+	    }
+
+	    # Compute input average
+	    cx = scb_wl (shin, S1(edt))
+	    cx2 = scb_wl (shin, S2(edt))
+	    cx1 = max (1, min (cx, cx2))
+	    cx2 = min (SN(shin), max (cx, cx2))
+	    if (cx2 < cx1)
+		avgin = 0.
+	    else
+		call aavgr (Memr[SY(shin)+cx1-1], (cx2-cx1+1), avgin, junk)
+
+	    if (additive) {
+	        shift = avgov - avgin
+	        call aaddkr (Memr[SY(shin)], shift,
+			     Memr[SY(shin)], SN(shin))
+		redraw = YES
+	    } else if (avgin != 0) {
+	        shift = avgov / avgin
+	        call amulkr (Memr[SY(shin)], shift,
+			     Memr[SY(shin)], SN(shin))
+		redraw = YES
+	    } else 
+	        call printf ("Multiplicative shift on zero average\n")
+
+	} else if (mode == SHIFT_ACCUM) {
+	    # Shift spectrum vertically so that the pixel closest to the
+	    # cursor position has the same value as the corresponding pixel
+	    # in the accumulated spectrum. This works in the overlap region.
+
+	    if (IS_INDEF(A1(edt)) || IS_INDEF(A2(edt)))
+		junk = wx
+	    else
+		junk = min (max (wx, A1(edt)), A2(edt))
+	    cx1 = max (1, min (SN(shin), scb_wl (shin, junk)))
+	    cx2 = max (1, min (SN(shout), scb_wl (shout, junk)))
+
+	    if (additive) {
+	        shift = Memr[SY(shout)+cx2-1] - Memr[SY(shin)+cx1-1]
+		call aaddkr (Memr[SY(shin)], shift, Memr[SY(shin)], SN(shin))
+	        redraw = YES
+	    } else if (Memr[SY(shin)+cx1-1] != 0) {
+	        shift = Memr[SY(shout)+cx2-1] / Memr[SY(shin)+cx1-1]
+		call amulkr (Memr[SY(shin)], shift, Memr[SY(shin)], SN(shin))
+	        redraw = YES
+	    } else
+	        call printf ("Multiplicative shift on zero level\n")
+
+	}
+end
+
+
+# SCB_PLOT1 - Plot a single spectrum
+
+procedure scb_plot1 (gp, gt, pix, npix, x1, x2)
+
+pointer	gp		# graphics descriptor
+pointer	gt		# GTOOLS graphics descriptor
+real	pix[npix]	# pixels
+int	npix		# number of pixels
+real	x1, x2		# data x limits
+
+begin
+	# Set up graphics window
+	call gclear (gp)
+	call gswind (gp, x1, x2, INDEFR, INDEFR)
+	call gascale (gp, pix, npix, 2)
+	call gt_swind (gp, gt)
+	call gt_labax (gp, gt)
+
+	# Plot spectrum
+	call gt_vplot (gp, gt, pix, npix, x1, x2)
+end
+
+
+# SCB_PLOT2 - Overplot two spectra
+
+procedure scb_plot2 (gp, gt, pix1, pix2, npix1, npix2, x11, x12, x21, x22)
+
+pointer	gp			# graphics descriptor
+pointer	gt			# GTOOLS graphics descriptor
+real	pix1[ARB],pix2[ARB]	# pixels
+int	npix1, npix2		# number of pixels
+real	x11, x12		# data x limits for first array
+real	x21, x22		# data x limits for second array
+
+begin
+	# Set up graphics window
+	call gclear (gp)
+	call gswind (gp, min (x11, x21), max (x12, x22), INDEFR, INDEFR)
+	call gascale (gp, pix2, npix2, 2)
+	call grscale (gp, pix1, npix1, 2)
+	call gt_swind (gp, gt)
+	call gt_labax (gp, gt)
+
+	# Plot first spectrum
+	call gt_seti (gt, GTLINE, 2)
+	call gt_vplot (gp, gt, pix1, npix1, x11, x12)
+
+	# Plot second spectrum
+	if (npix2 > 0) {
+	    call gt_seti (gt, GTLINE, 1)
+	    call gt_vplot (gp, gt, pix2, npix2, x21, x22)
+	}
+end

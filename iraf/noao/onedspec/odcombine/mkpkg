@@ -1,0 +1,18 @@
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$set LIBS1 = "-lsmw -liminterp -lxtools"
+	$update	libpkg.a
+	$omake	x_odcombine.x
+	$link	x_odcombine.o libpkg.a $(LIBS1) -o xx_odcombine.e
+	;
+
+libpkg.a:
+	@src
+
+	t_odcombine.x	src/icombine.h src/icombine.com <imhdr.h> <error.h> \
+			<mach.h> <mwset.h> <smw.h>
+	;

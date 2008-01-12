@@ -1,0 +1,24 @@
+objects,s,a,"",,,"List of object spectra"
+apref,f,h,"",,,"Aperture reference spectrum"
+flat,f,h,"",,,"Flat field spectrum"
+arcs,s,h,"",,,"List of arc spectra"
+arctable,f,h,"",,,"Arc assignment table (optional)
+"
+readnoise,s,h,"0.",,,"Read out noise sigma (photons)"
+gain,s,h,"1.",,,"Photon gain (photons/data number)"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
+norders,i,h,12,,,"Number of orders"
+width,r,h,4.,,,"Width of profiles (pixels)"
+arcaps,s,h,"2x2",,,"Arc apertures
+"
+fitflat,b,h,yes,,,"Fit and ratio flat field spectrum?"
+background,s,h,"none",none|scattered|average|median|minimum|fit,,"Background to subtract"
+clean,b,h,no,,,"Detect and replace bad pixels?"
+dispcor,b,h,yes,,,"Dispersion correct spectra?"
+redo,b,h,no,,,"Redo operations if previously done?"
+update,b,h,no,,,"Update spectra if cal data changes?"
+batch,b,h,no,,,"Extract objects in batch?"
+listonly,b,h,no,,,"List steps but don\'t process?
+"
+params,pset,h,"",,,"Algorithm parameters"
+mode,s,h,"ql",,,

@@ -1,0 +1,14 @@
+# Pdsread library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_pdsread.x		rpds.com <fset.h> <error.h>
+	pds_read.x		rpds.com rpds.h <imhdr.h> <error.h>
+	pds_rimage.x		rpds.com rpds.h <imhdr.h> <mach.h>
+	pds_rheader.x		rpds.com rpds.h <imhdr.h> <mii.h> <mach.h>	
+	pds_rpixels.x		rpds.com rpds.h <mii.h> <mach.h>
+	;

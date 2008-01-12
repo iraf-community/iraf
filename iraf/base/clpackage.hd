@@ -1,0 +1,6 @@
+# Root help directory for the CLPACKAGE branch of the help database.
+
+clpackage	men = clpackage$clpackage.men,
+		hlp = ..,
+		pkg = clpackage$clpackage.hd,
+		src = clpackage$clpackage.cl

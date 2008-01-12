@@ -1,0 +1,22 @@
+input,f,a,,,,Input image file root name
+records,s,a,,,,Spectral records
+output,s,a,std,,,Output flux file (used by SENSFUNC)
+samestar,b,h,yes,,,Same star in all apertures?
+beam_switch,b,h,yes,,,Beam switch spectra?
+apertures,s,h,"",,,Aperture selection list
+bandwidth,r,h,INDEF,,,Bandpass widths
+bandsep,r,h,INDEF,,,Bandpass separation
+fnuzero,r,h,3.68e-20,,,Absolute flux zero point
+extinction,s,h,)_.extinction,,,Extinction file
+caldir,s,h,)_.caldir,,,Directory containing calibration data
+observatory,s,h,)_.observatory,,,Observatory for data
+interact,b,h,yes,,,Graphic interaction to define new bandpasses
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input
+star_name,s,q,,,,Star name in calibration list
+airmass,r,q,,1.,,Airmass
+exptime,r,q,,,,Exposure time (seconds)
+mag,r,q,,,,Magnitude of star
+magband,s,q,,"U|B|V|R|I|J|H|K|L|Lprime|M",,"Magnitude type"
+teff,s,q,,,,Effective temperature or spectral type
+answer,s,q,no,,,"(no|yes|NO|YES|NO!|YES!)"

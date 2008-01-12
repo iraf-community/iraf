@@ -1,0 +1,35 @@
+                  The Aperture Photometry Package
+                 ----------------------------------
+
+The apphot package contains routines which perform aperture
+photometry in circular and polygonal apertures using fractional pixel
+techniques. No point spread function fitting techniques are employed.
+The photometry routines are most suitable for use on uncrowded
+or moderately crowded fields.
+
+The apphot directory structure is listed below. The package organization
+is by task, for example the center subdirectory contains routines
+specific to the center task or by function, for example the nlfit
+directory contains the non-linear least squares fitting routines.
+The wphot task shares alot of code with the phot task. Similarly
+the polymark task shares some code with the polyphot task.
+The .h files are all in lib as many of them are shared by several tasks.
+
+             |-aplib---------apphot routines used by several tasks
+             |-aputil--------miscellaneous useful routines
+             |-center--------routines specific to centering, the center task
+             |-daofind-------routines specific to the daofind task
+             |-doc-----------apphot documentation
+|-apphot-----|-fitpsf--------routines specific to the fitpsf task
+             |-fitsky--------routines specific to sky fitting, the fitsky task
+	     |-lib-----------apphot definitions or .h files
+             |-phot----------routines specific to the qphot/phot tasks
+             |-polyphot------routines specific to the polyphot/polymark tasks
+             |-radprof-------routines specific to the radprof task
+	     |-wphot---------routines specific to the wphot task
+             |-test----------directory of test data
+
+
+Lindsey Davis
+NOAO IRAF GROUP
+November 1991

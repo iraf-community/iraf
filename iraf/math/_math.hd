@@ -1,0 +1,5 @@
+# Root help directory for the MATH branch of the help database.
+
+math		sys = math$README, 
+		hlp = math$math.men,
+		pkg = math$math.hd

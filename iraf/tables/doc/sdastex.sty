@@ -1,0 +1,74 @@
+% SDASTEX.STY -- LaTeX style modifications and additions for SDAS documents
+
+% Set up page dimensions so that there are 1-inch margins all the time
+
+\topmargin 0in
+\oddsidemargin 0in
+\evensidemargin 0in
+\headheight .125in
+\footheight .125in
+\textheight 8.9in
+\textwidth 6.5in
+
+\parindent 0em
+\parskip .75ex
+
+% Macros for convenience and consistency
+
+\newcount\lecurrentfam
+\def\LaTeX{\lecurrentfam=\the\fam \leavevmode L\raise.42ex
+	\hbox{$\fam\lecurrentfam\scriptstyle\kern-.3em A$}\kern-.15em\TeX}
+\newcommand{\SliTeX}{S\kern-.05em\hbox{\sc l}\kern-.05em\hbox{\sc i}\TeX}
+\newcommand{\AMSTeX}{$\cal A$\kern-.1667em\lower.5ex\hbox{$\cal M$}\kern-.075em\hbox{$\cal S$}\TeX}
+\newcommand{\BibTeX}{B\kern-.05em\hbox{\sc ib}\kern-.05em\TeX}
+\newcommand{\lestrut}{\vrule height1.6ex depth.45ex width0pt}
+\newcommand{\key}[1]{\fbox{\scriptsize\tt#1}}
+\newcommand{\task}[1]{{\it#1\/}}
+\newcommand{\emphasize}[1]{{\sl#1\/}}
+\newcommand{\argname}[1]{{\tt#1}}
+\newcommand{\filename}[1]{\mbox{\small#1}}
+\newcommand{\sdasletterhead}[1]{\input sdas$tex:sdasletterhead
+	\selectsdaslhd{#1}}
+
+\mathchardef\lt="313C
+\mathchardef\gt="313E
+
+% Switch for internal vs. external documents
+
+\newif\ifstsci
+
+\hyphenation{ephem-er-is gno-mon-ic mono-chro-mat-ic nau-ti-cal pho-tom-e-try
+	spec-tros-co-py straight-for-ward ty-pog-ra-phy as-ymp-tot-ic
+	at-mos-phere data-base dis-trib-ute En-glish equi-vari-ant Euler-ian
+	ex-tra-or-di-nary fermi-ons flow-chart Gauss-ian geo-met-ric
+	Hamil-ton-ian Her-mit-ian hexa-dec-i-mal idio-syn-cracy Le-gendre
+	man-u-script mar-gin-al mi-cro-fiche mod-el-ling mono-pole mono-spline
+	mul-ti-plic-able par-a-bol-ic phe-nom-e-non Poin-care post-am-ble
+	pre-am-ble qua-drat-ic re-arrange-ment sched-ul-ing Schro-ding-er
+	Schwarz-schild so-le-noid spher-oid sto-chas-tic time-stamp}
+
+% Take \uppercase out of automatic headings
+
+\if@twoside
+\def\ps@headings{\def\@oddfoot{}\def\@evenfoot{}%       No feet.
+\def\@evenhead{\rm \thepage\hfil \sl \leftmark}%        Left heading.
+\def\@oddhead{\hbox{}\sl \rightmark \hfil \rm\thepage}% Right heading.
+\def\sectionmark##1{\markboth {\ifnum \c@secnumdepth >\z@
+    \thesection\hskip 1em\relax \fi ##1}{}}%
+\def\subsectionmark##1{\markright {\ifnum \c@secnumdepth >\@ne
+          \thesubsection\hskip 1em\relax \fi ##1}}}
+\else
+\def\ps@headings{\def\@oddfoot{}\def\@evenfoot{}%     No feet.
+\def\@oddhead{\hbox {}\sl \rightmark \hfil \rm\thepage}% Heading.
+\def\sectionmark##1{\markright {\ifnum \c@secnumdepth >\z@
+    \thesection\hskip 1em\relax \fi ##1}}}
+\fi
+
+% Fix par indentation in first par after sections
+
+\def\section{\@startsection {section}{1}{\z@}{3.5ex plus 1ex minus 
+ .2ex}{2.3ex plus .2ex}{\Large\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{3.25ex plus 1ex minus 
+ .2ex}{1.5ex plus .2ex}{\large\bf}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{3.25ex plus 
+ 1ex minus .2ex}{1.5ex plus .2ex}{\normalsize\bf}}

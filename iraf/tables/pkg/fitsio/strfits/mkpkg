@@ -1,0 +1,30 @@
+$checkout fitsio.a  ../
+$update    fitsio.a
+$checkin fitsio.a ../
+$exit
+
+fitsio.a:
+	t_rfits.x	<error.h>  <fset.h>  <ctype.h>  <clset.h>  "rfits.h" \
+			"rfits.com" 
+	check.x		"rfits.h"
+	fits_read.x	<error.h>  <imhdr.h>  <imio.h>  <imset.h>  <fio.h> \
+			 <tbset.h>  <mach.h>  <fset.h> "rfits.h"  "rfits.com"  
+	fits_reblock.x	<fset.h>  <mach.h>
+	fits_rheader.x	<mach.h>  <imhdr.h>  <ctype.h>  "rfits.h"  "rfits.com"
+	fits_rimage.x	<imio.h>  <imhdr.h>  <mach.h>  <fset.h>  "rfits.h"  \
+			"rfits.com"
+	fits_rpixels.x	<fset.h>  <mii.h>  <mach.h>  "rfits.com"
+	genfname.x	<ctype.h>
+	rf_exit.x	
+	rft_rimext.x	<error.h>  <imhdr.h>  <imio.h>  <imset.h>  <fio.h>  \
+			<tbset.h>  "rfits.h"  "rfits.com"
+	rft_subs.x	<mach.h>  <imhdr.h>  <imio.h>  <imset.h>  <fio.h>  \
+			<math.h>  "rfits.h"
+	tab_gfsub.x	<imhdr.h>  <mach.h>  <fset.h>  <tbset.h>  "rfits.h" \
+			"rfits.com"
+	tab_putrow.x	<tbset.h>  <mii.h>  <mach.h>  "rfits.h"  "rfits.com"  
+	tab_rdata.x	<imhdr.h>  <mach.h>  <tbset.h>  <fset.h>  <ctype.h> \
+			"rfits.h"  "rfits.com"
+	tab_rheader.x	<imhdr.h>  <imio.h>  <tbset.h>  <mach.h>  <lexnum.h> \
+			<ctype.h>  "rfits.h"  "rfits.com"
+	;

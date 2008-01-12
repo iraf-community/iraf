@@ -1,0 +1,31 @@
+# Make the OBSUTIL package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_obsutil.x
+	$link	x_obsutil.o libpkg.a -lxtools -lcurfit -liminterp\
+	    -lsmw -lnlfit -lgsurfit -lds -lasttools -o xx_obsutil.e
+	;
+
+install:
+	$move	xx_obsutil.e noaobin$x_obsutil.e
+	;
+
+
+libpkg.a:
+	@ccdtime
+	@pairmass
+	@specfocus
+	@sptime
+	@starfocus
+
+	t_bitcount.x	<error.h> <imhdr.h> <mach.h>
+        ;

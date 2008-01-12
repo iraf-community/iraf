@@ -1,0 +1,31 @@
+.help pvobs Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPVOB (P, H, STL, PV)
+
+     - - - - - -
+      P V O B
+     - - - - - -
+
+  Position and velocity of an observing station (double precision)
+
+  Given:
+     P     dp     latitude (geodetic, radians)
+     H     dp     height above reference spheroid (geodetic, metres)
+     STL   dp     local apparent sidereal time (radians)
+
+  Returned:
+     PV    dp(6)  position/velocity 6-vector (AU, AU/s, true equator
+                                              and equinox of date)
+
+  Called:  slGEOC
+
+  IAU 1976 constants are used.
+
+  P.T.Wallace   Starlink   14 November 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

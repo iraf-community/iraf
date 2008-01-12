@@ -1,0 +1,39 @@
+.help gscoeff Aug85 "Gsurfit Package"
+.ih
+NAME
+gscoeff - get the number and values of the coefficients
+.ih
+SYNOPSIS
+gscoeff (sf, coeff, ncoeff)
+
+.nf
+pointer	sf		# surface descriptor
+real	coeff[ncoeff]	# coefficient array
+int	ncoeff		# number of coefficients
+.fi
+.ih
+ARGUMENTS
+.ls sf   
+Pointer to the surface descriptor.
+.le
+.ls coeff
+Array of coefficients.
+.le
+.ls ncoeff
+The number of coefficients. Ncoeff may be obtained by a call
+to gsstati.
+.le
+
+.nf
+	ncoeff = gsstati (sf, GSNCOEFF)
+.fi
+.ih
+DESCRIPTION
+GSCOEFF fetches the coefficient array and the number of coefficients from
+the surface descriptor structure.
+.ih
+NOTES
+.ih
+SEE ALSO
+gserrors
+.endhelp

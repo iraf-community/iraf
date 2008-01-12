@@ -1,0 +1,310 @@
+# Initial cut at an astrometric catalog database file.
+begin filename@noao
+address 
+query
+nquery 0
+protocol
+nheader 1
+    csystem J2000
+nfields 0
+
+
+begin usnob1@noao
+address inet:80:archive.tuc.noao.edu:text
+query GET /cgi-bin/scat?catalog=ub1&ra=%-s&dec=%-s&sys=J2000&mrad=%-s&nstar=-1 HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 6.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type btext
+    hskip 12
+nheader 1
+    csystem J2000.0
+nfields 7
+    id 1 12 INDEF %12s
+    ra 14 12 d hours %12.3H
+    dec 27 12 d degrees %12.2h
+    mag1 52 4 r INDEF %4.2f
+    mag2 58 4 r INDEF %4.2f
+    mag3 64 4 r INDEF %4.2f
+    dist 90 6 r minutes %6.2f
+
+begin twomass@noao
+address inet:80:archive.tuc.noao.edu:text
+query GET /cgi-bin/scat?catalog=tmc&ra=%-s&dec=%-s&sys=J2000&mrad=%-s&nstar=-1 HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 6.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 11
+nheader 1
+    csystem J2000.0
+nfields 7
+    id 1 0 INDEF %11s
+    ra 2 0 d hours %12.3H
+    dec 3 0 d degrees %12.2h
+    mag1 4 0 r INDEF %6.3f
+    mag2 5 0 r INDEF %6.3f
+    mag3 6 0 r INDEF %6.3f
+    dist 7 0 r minutes %6.2f
+
+begin twomass@irsa
+address inet:80:irsa.ipac.caltech.edu:text
+query GET /cgi-bin/Gator/nph-query?outfmt=1&objstr=%-s+%-s&spatial=Cone&radius=%-s&radunits=arcmin&catalog=fp_psc HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 1.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type btext
+    hskip 19
+nheader 1
+    csystem J2000.0
+nfields 5
+    ra 2 10 d degrees %12.3H
+    dec 13 10 d degrees %12.2h
+    mag1 58 6 r INDEF %6.3f
+    mag2 75 6 r INDEF %6.3f
+    mag3 92 6 r INDEF %6.3f
+
+begin twomass14@irsa
+address inet:80:irsa.ipac.caltech.edu:text
+query GET /cgi-bin/Gator/nph-query?outfmt=1&objstr=%-s+%-s&spatial=Cone&radius=%-s&radunits=arcmin&catalog=fp_psc&constraints=j_m<14 HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 1.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type btext
+    hskip 19
+nheader 1
+    csystem J2000.0
+nfields 5
+    ra 2 10 d degrees %12.3H
+    dec 13 10 d degrees %12.2h
+    mag1 58 6 r INDEF %6.3f
+    mag2 75 6 r INDEF %6.3f
+    mag3 92 6 r INDEF %6.3f
+
+begin lan92@noao
+address inet:80:www.noao.edu:text
+query GET /cgi-bin/catalogs/ccget?catalog=landolt1992.dat&lngcenter=%-s&latcenter=%-s&width=%-s&columns=c[*] HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    width 10.0 degrees %0.3f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 15
+    tskip 1
+nheader 1
+    csystem J2000.0
+nfields 17
+    id 1 0 c INDEF %11s
+    ra 2 0 d hours %08.0h
+    dec 3 0 d degrees %9.0h
+    v 4 0 r INDEF %6.3f
+    bv 5 0 r INDEF %6.3f
+    ub 6 0 r INDEF %6.3f
+    vr 7 0 r INDEF %6.3f
+    ri 8 0 r INDEF %6.3f
+    vi 9 0 r INDEF %6.3f
+    n 10 0 i INDEF %2d
+    m 11 0 i INDEF %2d
+    ev 12 0 r INDEF %6.4f
+    ebv 13 0 r INDEF %6.4f
+    eub 14 0 r INDEF %6.3f
+    evr 15 0 r INDEF %6.4f
+    eri 16 0 r INDEF %6.4f
+    evi 17 0 r INDEF %6.4f
+
+begin usno2@cadc
+address inet:80:cadcwww.dao.nrc.ca:text
+query GET /cadcbin/getusno2?ra=%-s&dec=%-s&radius=%-s&m=0,21&nout=1000000 HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    radius 5 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 2
+    tskip 1
+    recsize 73
+    triml 0
+    trimr 0
+nheader 1
+    csystem J2000.0
+nfields 9
+    id 1 0 c INDEF %15s
+    ra 2 0 d degrees %10.5f
+    dec 3 0 d degrees %10.5f
+    mag1 4 0 r INDEF %6.2f
+    mag2 5 0 r INDEF %6.2f
+    col1 6 0 r INDEF %6.2f
+    plateno 7 0 i INDEF %4d
+    acsstar 8 0 b INDEF %3b 
+    arcdist 9 0 r asecs %6.1f
+
+
+begin usno1@cadc
+address inet:80:cadcwww.dao.nrc.ca:text
+query GET /cadcbin/getusno?ra=%-s&dec=%-s&radius=%-s&m=0,21&nout=1000000 HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    radius 5 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 2
+    tskip 1
+    recsize 73
+    triml 0
+    trimr 0
+nheader 1
+    csystem J2000
+nfields 9
+    id 1 0 c INDEF %15s
+    ra 2 0 d degrees %10.5f
+    dec 3 0 d degrees %10.5f
+    mag1 4 0 r INDEF %6.2f
+    mag2 5 0 r INDEF %6.2f
+    col1 6 0 r INDEF %6.2f
+    plateno 7 0 i INDEF %4d
+    acsstar 8 0 b INDEF %3b 
+    arcdist 9 0 r asecs %6.1f
+
+
+begin gsc1@cadc
+address inet:80:cadcwww.dao.nrc.ca:text
+query GET /cadcbin/gsc-server?%-s,%-s&r=0,%-s&m=0,21&f=8&s=R HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    radius 5 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 4
+    tskip 1
+    recsize 65
+    triml 0
+    trimr 1
+nheader 1
+    csystem J2000
+nfields 9
+    id 1 0 c INDEF %13s
+    ra 2 0 d degrees %10.5f
+    dec 3 0 d degrees %10.5f
+    epos 4 0 r arcsecs %4.1f
+    mag1 5 0 r INDEF %6.2f
+    emag1 6 0 r INDEF %6.2f
+    acsstar 7 0 c INDEF %3s 
+    arcdist 8 0 r arcmin %6.2f
+    pangle 9 0 r degrees %4d
+
+begin hipp@cadc
+address inet:80:cadcwww.dao.nrc.ca:text
+query GET /cadcbin/hipparcos-server?ra=%-s&dec=%-s&radius=%-s HTTP/1.0\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    radius 5 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 2
+    tskip 1
+    recsize 0
+    triml 0
+    trimr 0
+nheader 1
+    csystem J2000
+nfields 11
+    id 1 0 c INDEF %8s
+    ra 2 0 d degrees %19g
+    dec 3 0 d degrees %19g
+    mag1 4 0 r INDEF %6.2f
+    px 5 0 d marcsec %6.2f
+    pmra 6 0 d marcsec/yr %7.2f
+    pmdec 7 0 d marcsec/yr %7.2f
+    sptype 8 0 c INDEF %5s
+    pangle 9 0 r degrees %3d
+    arcdist 10 0 r arcmin %6.1f
+    hip 11 0 c INDEF %s
+
+#begin tmass@ipac
+#address inet:8002:irsadev.ipac.caltech.edu:text
+#query GET /cgi-bin/CatRegion/nph-catregion?catalog=pt_src_cat&objstr=%-s,%-s,Equ+J2000&within=%-s+degree&select=designation,+ra,+dec,+j_m,+h_m,+k_m HTTP/1.0\n\n
+#nquery 4
+#    ra  0.00000 degrees %0.5f
+#    dec 0.00000 degrees %0.5f
+#    radius 0.100 degrees %0.03f
+#    qsystem J2000.0 INDEF %s
+#protocol none
+#type stext
+#    hskip 8
+#    tskip 0
+#    recsize 0
+#    triml 0
+#    trimr 0
+#nheader 1
+#    csystem J2000
+#nfields 6
+#    id 1 0 c INDEF %14s
+#    ra 2 0 d degrees %11.6f
+#    dec 3 0 d degrees %11.6f
+#    mag1 4 0 r INDEF %7.3f
+#    mag2 5 0 r INDEF %7.3f
+#    mag3 6 0 r INDEF %7.3f
+
+begin gsc2@stsci
+address inet:80:www-gsss.stsci.edu:text
+query GET /cgi-bin/gsc22query.exe?ra=%-s&dec=%-s&r1=0.0&r2=%-s&m1=0.0&m2=19.5&n=100000&submit2=Submit+Request HTTP/1.0\n\n
+nquery 4
+    ra  00:00:00.0 hours %0.2h
+    dec +00:00:00 degrees %0.1h
+    radius 5 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type stext
+    hskip 2
+    tskip 1
+    recsize 0
+    triml 0
+    trimr 1
+nheader 1
+    csystem J2000
+nfields 23
+    id 1 0 c INDEF %12s
+    ra 2 0 d degrees %12.8f
+    dec 3 0 d degrees %12.8f
+    era 4 0 d arcsec %8.6f
+    edec 5 0 d arcsec %8.6f
+    epoch 6 0 d years %11.6f
+    pmra 7 0 d marcsec/yr %10.8f
+    pmdec 8 0 d marcsec/yr %10.8f
+    epmra 9 0 d marcsec/yr %10.8f
+    epmdec 10 0 d marcsec/yr %10.8f
+    mag1 11 0 r INDEF %5.2f
+    emag1 12 0 r INDEF %5.2f
+    mag2 13 0 r INDEF %5.2f
+    emag2 14 0 r INDEF %5.2f
+    mag3 15 0 r INDEF %5.2f
+    emag3 16 0 r INDEF %5.2f
+    mag4 17 0 r INDEF %5.2f
+    emag4 18 0 r INDEF %5.2f
+    smaxis 19 0 r pixels %7.2f
+    ecc 20 0 r INDEF %4.2f
+    pangle 21 0 r degrees %6.2f
+    class 22 0 c INDEF %2s
+    status 23 0 c INDEF %7s

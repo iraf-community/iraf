@@ -1,0 +1,52 @@
+# PTOOLSX libraries
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$omake x_ptools.x
+	$ifdef (tables)
+	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	$else
+	    $call tundefined
+	$endif
+	;
+
+linkonly:
+	$ifdef (tables)
+	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
+	$else
+	    $call tundefined
+	$endif
+	$call install
+	;
+
+install:
+	$move xx_ptools.e noaobin$x_ptools.e
+	;
+
+trelink:
+	$set LIBS = "-lds -lncar -lgks -lxtools -ltbtables"
+	$set XFLAGS = "$(XFLAGS) $(XF)"
+	$set LFLAGS = "$(LFLAGS) $(LF)"
+	$update libpkg.a
+	$link x_ptools.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_ptools.e
+	;
+
+tundefined:
+	$echo "cannot find file tbset.h"
+	$echo "tbtables library is not defined"
+	$echo "cannot build xx_ptools.e"
+	;
+
+libpkg.a:
+	@pconvert
+	@pexamine
+	@ptutils
+	@txtools
+	;

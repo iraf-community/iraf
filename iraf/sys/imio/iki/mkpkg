@@ -1,0 +1,28 @@
+# Make the Image Kernel Interface.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	@oif		# Original IRAF format
+	@fxf		# FITS extension format
+	@plf		# PLIO mask image mini-kernel (partial)
+	@qpf		# QPOE photon image kernel
+	@stf		# ST SDAS/GEIS format
+
+	ikiaccess.x	iki.com iki.h <imhdr.h>
+	ikiclose.x	iki.com iki.h <imhdr.h> <imio.h>
+	ikicopy.x	iki.com iki.h
+	ikidelete.x	iki.com iki.h
+	ikiextn.x	iki.com iki.h <ctype.h> <imhdr.h>
+	ikiinit.x	iki.com iki.h
+	ikildd.x	iki.com iki.h
+	ikimkfn.x	iki.h
+	ikiopen.x	iki.com iki.h <imhdr.h> <imio.h>
+	ikiopix.x	iki.com iki.h <imhdr.h> <imio.h>
+	ikiparse.x	iki.h
+	ikirename.x	iki.com iki.h
+	ikiupdhdr.x	iki.com <imio.h> iki.h <imhdr.h>
+	;

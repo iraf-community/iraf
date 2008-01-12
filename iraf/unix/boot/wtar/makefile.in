@@ -1,0 +1,11 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	wtar.e
+
+wtar.e:	wtar.o
+	$(CC) $(HSI_LF) -o wtar.e $^ $(HSI_LIBS)
+	cp -p wtar.e ../../bin/.
+
+clean::
+	rm -f *.o wtar.e ../../bin/wtar.e

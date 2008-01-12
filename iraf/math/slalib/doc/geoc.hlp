@@ -1,0 +1,33 @@
+.help geoc Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slGEOC (P, H, R, Z)
+
+     - - - - -
+      G E O C
+     - - - - -
+
+  Convert geodetic position to geocentric (double precision)
+
+  Given:
+     P     dp     latitude (geodetic, radians)
+     H     dp     height above reference spheroid (geodetic, metres)
+
+  Returned:
+     R     dp     distance from Earth axis (AU)
+     Z     dp     distance from plane of Earth equator (AU)
+
+  Notes:
+     1)  Geocentric latitude can be obtained by evaluating ATAN2(Z,R).
+     2)  IAU 1976 constants are used.
+
+  Reference:
+     Green,R.M., Spherical Astronomy, CUP 1985, p98.
+
+  P.T.Wallace   Starlink   4th October 1989
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

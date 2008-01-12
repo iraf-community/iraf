@@ -1,0 +1,111 @@
+# Wed 11:02:05 22-Aug-90
+begin	aperture last 1 60.57419 256.
+	image	last
+	aperture	1
+	beam	1
+	center	60.57419 256.
+	low	-3.111816 -255.
+	high	2.949428 256.
+	background
+		xmin -100.
+		xmax 100.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	1
+	curve	6
+		2.
+		2.
+		1.
+		512.
+		0.02659256
+		0.5026957
+
+# Wed 11:02:05 22-Aug-90
+begin	aperture last 2 70.70531 256.
+	image	last
+	aperture	2
+	beam	2
+	center	70.70531 256.
+	low	-2.926423 -255.
+	high	2.899426 256.
+	background
+		xmin -100.
+		xmax 100.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	1
+	curve	6
+		2.
+		2.
+		1.
+		512.
+		-0.002646168
+		0.5073752
+
+# Wed 11:02:05 22-Aug-90
+begin	aperture last 3 80.78613 256.
+	image	last
+	aperture	3
+	beam	3
+	center	80.78613 256.
+	low	-2.953142 -255.
+	high	2.970872 256.
+	background
+		xmin -100.
+		xmax 100.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	1
+	curve	6
+		2.
+		2.
+		1.
+		512.
+		0.01349655
+		0.5075101
+
+# Wed 11:02:05 22-Aug-90
+begin	aperture last 4 90.8806 256.
+	image	last
+	aperture	4
+	beam	4
+	center	90.8806 256.
+	low	-2.823333 -255.
+	high	2.915152 256.
+	background
+		xmin -100.
+		xmax 100.
+		function chebyshev
+		order 1
+		sample -10:-6,6:10
+		naverage -3
+		niterate 0
+		low_reject 3.
+		high_reject 3.
+		grow 0.
+	axis	1
+	curve	6
+		2.
+		2.
+		1.
+		512.
+		0.022075
+		0.5081324

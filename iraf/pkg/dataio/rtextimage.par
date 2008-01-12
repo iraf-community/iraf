@@ -1,0 +1,9 @@
+# Parameter file for t_rtextimage, text file to IRAF image converter
+
+input,f,a,,,,Input text file
+output,f,a,,,,Output image file
+otype,s,h,"",,,Pixel type on output
+header,b,h,yes,,,Read FITS header preceding pixels?
+pixels,b,h,yes,,,Read pixels?
+nskip,i,h,0,,,Number of lines to skip 
+dim,s,h,,,,Image dimension string

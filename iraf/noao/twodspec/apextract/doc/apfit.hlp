@@ -1,0 +1,263 @@
+.help apfit Sep96 noao.twodspec.apextract
+.ih
+NAME
+apfit -- Fit 2D spectra using APEXTRACT profile algorithms
+.ih
+USAGE
+apfit input output fittype
+.ih
+PARAMETERS
+.ls input
+List of input images to be fit.
+.le
+.ls output = ""
+List of output images to be created with the  fitting results.  If the null
+string is given or the end of the output list is reached before the end
+of the input list then the input image name is used and an extension
+of ".fit", ".diff", or ".ratio" is added based on the type of fit.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and fit.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls fittype = "difference"
+Type of fitted output.  The choices are:
+.ls "fit"
+The fitted spectra are output.
+.le
+.ls "difference"
+The difference (or residuals) of the data and the fit (data - fit).
+.le
+.ls "ratio"
+The ratio of the data to the fit.  If a fitted pixel goes below a specified
+threshold the ratio is set to 1.
+.le
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing and trace
+fitting are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls fit = yes
+Fit the spectra and produce a fitted output image?
+.le
+
+The following two parameters are used in the finding, recentering, resizing,
+editing, and tracing operations.
+.ls line = INDEF
+The starting dispersion line (line or column perpendicular to the dispersion
+axis) for the tracing.  A value of INDEF starts at the middle of the image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed or medianed at each step along
+the dispersion.  For tracing only summing is done and the sign is
+ignored.
+.le
+
+.ls threshold = 10.
+Division threshold for ratio fit type.  If a pixel in the fitted spectrum
+is less than this value then a ratio of 1 is output.
+.le
+
+The following parameters control the profile and spectrum fitting.
+.ls background = "none"
+Type of background subtraction.  The choices are "none" for no
+background subtraction, "average" to average the background within the
+background regions, or "fit" to fit across the dispersion using the
+background within the background regions.  Note that the "average"
+option does not do any medianing or bad pixel checking; it is faster
+than fitting however.  Background subtraction also requires that the
+background fitting parameters are properly defined.  For the "average"
+option only the background sample regions parameter is used.
+.le
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level.  During variance weighted extractions
+wavelength points having any pixels above this value are excluded from the
+profile determination.
+.le
+.ls readnoise = 0.
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = 1
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 3., usigma = 3.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+.ih
+DESCRIPTION
+The two dimensional spectra within the defined apertures of the input
+images are fit by a model and new output images are created with either
+the model spectra, the difference between the input and model spectra,
+or the ratio of input and model spectra.  The type of output is
+selected by the parameter \fIfittype\fR which may have one of the
+values "fit", "difference", or "ratio".
+
+Aperture definitions may be inherited from those of other images by
+specifying a reference image with the \fBreferences\fR parameter.
+Images in the reference list are matched with those in the
+input list in order.  If the reference image list is shorter than the
+number of input images, the last reference image is used for all
+remaining input images.  Thus, a single reference image may be given
+for all the input images or different reference images may be given for
+each input image.  The special reference name "last" may be used to
+select the last set apertures used in any of the \fBapextract\fR tasks.
+
+If an aperture reference image is not specified or no apertures are
+found for the specified reference image, previously defined apertures
+for the input image are sought in the aperture database.  Note that
+reference apertures supersede apertures for the input image.  If no
+apertures are defined they may be created automatically, the \fIfind\fR
+option, or interactively in the aperture editor, if the
+\fIinteractive\fR and \fIedit\fR options are set.
+
+The functions performed by the task are selected by a set of flag
+parameters.  The functions are an automatic spectrum finding and
+aperture defining algorithm (see \fBapfind\fR) which is ignored if
+apertures are already defined, automatic recentering and resizing
+algorithms (see \fBaprecenter\fR and \fBapresize\fR), an interactive
+aperture editing function (see \fBapedit\fR), a spectrum position tracing
+and trace function fit (see \fBaptrace\fR), and the main function of
+this task, two dimensional model fitting.
+
+Each function selection will produce a query for each input spectrum if
+the \fIinteractive\fR parameter is set.  The queries are answered by
+"yes", "no", "YES", or "NO", where the upper case responses suppress
+the query for following images.  There are other queries associated
+with tracing which first ask whether the operation is to be done
+interactively and, if yes, lead to queries for each aperture.  If the
+\fIinteractive\fR parameter is not set then aperture editing and
+interactive trace fitting are ignored.
+
+The two dimensional spectrum model consists of a smooth two dimensional
+normalized profile multiplied by the variance weighted one dimensional
+spectrum.  The profile is computed by dividing the data within the aperture
+by the one dimensional spectrum, smoothing with either low order function
+fits parallel to the dispersion axis or a special two dimensional function
+as selected by the \fIpfit\fR parameter.  The smooth profile is then used
+to improve the spectrum estimate using variance weighting and to eliminate
+deviant or cosmic ray pixels by sigma tests.  The profile algorithm is
+described in detail in \fBapprofiles\fR and the variance weighted spectrum
+is described in \fBapvariance\fR.
+
+The process of determining the profile and variance weighted spectrum,
+and hence the two dimensional spectrum model, is identical to that used
+for variance weighted extraction of the one dimensional spectra in the
+tasks \fBapall\fR or \fBapsum\fR.  Most of the parameters of in this
+task are the same as those in the extraction tasks and so further
+information about them may be found in the descriptions of those tasks.
+
+Because of the connection with variance weighted extraction and cleaning
+of one dimensional spectra, this task is useful as a diagnostic tool for
+understanding and evaluating the variance weighting algorithm.
+For example the "difference" image provides the residuals in a
+two dimensional visual form.
+
+The "fit" output image does not include any background determination;
+i.e the fit is background subtracted.  Pixels outside the modeled
+spectra are set to zero.
+
+The "difference" output image is simply the difference between the
+background subtracted "fit" and the data.  Thus the difference within
+the apertures should approximate the background and outside the
+apertures the difference will be identical with the input image.
+
+The "ratio" output image does include any background in the model
+before taking the ratio of the data and model.  If a model pixel
+is less than the given \fIthreshold\fR parameter the output ratio
+is set to one.  This is used to avoid division by zero and set a
+limit to noise in ratio image.  Outside of the apertures the ratio
+output pixels are set to one.
+.ih
+EXAMPLES
+1.  To compute the residuals of a model fit where the image already has
+aperture defined:
+
+	cl> apfit ls1 inter- rec- res- trace- read=3 gain=1 back=fit
+
+.ih
+REVISIONS
+.ls APFIND V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+apbackground, approfile, apvariance,
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apsum, apall
+.endhelp

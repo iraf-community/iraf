@@ -1,0 +1,43 @@
+# STARLIST Parameter File
+
+starlist,f,a,,,,"Output star list file"
+nstars,i,a,5000,,,"Number of stars in the list"
+interactive,b,h,no,,,"Interactive mode?
+
+SPATIAL DISTRIBUTION"
+spatial,s,h,"uniform","uniform|hubble|file",,"Spatial density function (uniform|hubble|file)"
+xmin,r,h,1.0,,,"Minimum x coordinate value"
+xmax,r,h,512.0,,,"Maximum x coordinate value"
+ymin,r,h,1.0,,,"Minimum y coordinate value"
+ymax,r,h,512.0,,,"Maximum y coordinate value"
+xcenter,r,h,INDEF,,,"X coordinate of center of Hubble distribution"
+ycenter,r,h,INDEF,,,"Y coordinate of center of Hubble distribution"
+core_radius,r,h,30.0,,,"Core radius of Hubble distribution"
+base,r,h,0.0,,,"Relative background density of the Hubble distribution"
+sseed,i,h,1,,,"Seed for sampling the spatial density probability function
+
+MAGNITUDE DISTRIBUTION"
+luminosity,s,h,"powlaw","uniform|salpeter|bands|powlaw|file",,"Luminosity function (uniform|salpeter|bands|powlaw|file)"
+minmag,r,h,-7.0,,,"Minimum magnitude"
+maxmag,r,h,0.0,,,"Maximum magnitude"
+mzero,r,h,-4.,,,"Absolute magnitude zero point for salpeter and bands"
+power,r,h,0.6,,,"Power law magnitude distribution coefficient"
+alpha,r,h,0.74,,,"Alpha parameter for bands function"
+beta,r,h,0.04,,,"Beta parameter for bands function"
+delta,r,h,0.294,,,"Delta parameter for bands function"
+mstar,r,h,1.28,,,"Mstar parameter for bands function"
+lseed,i,h,1,,,"Seed for sampling the luminsosity probability function
+
+USER FUNCTIONS"
+sfile,f,a,"",,,"File containing spatial density function"
+nssample,i,h,100,,,"Number of spatial density function sampling points "
+sorder,i,h,10,,,"Number of spline pieces for spatial probability function"
+lfile,f,a,"",,,"File containing luminosity function"
+nlsample,i,h,100,,,"Number of luminosity function sampling points"
+lorder,i,h,10,,,"Number of spline pieces for luminosity probability function
+
+INTERACTIVE PARAMETERS"
+rbinsize,r,h,10.,,,"Bin size of radial density function histogram in pixels"
+mbinsize,r,h,0.5,,,"Bin size of luminosity function in magnitudes"
+graphics,s,h,stdgraph,,,"Standard graphics device"
+cursor,*gcur,h,"",,,"Graphics cursor"

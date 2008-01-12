@@ -1,0 +1,14 @@
+# Update the tsort application code in the ttools package library
+# Author: B.Simon, 25-NOV-1987
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tblextsort.x		<tbset.h>
+	tblintsort.x
+	tblmaxrow.x		<tbset.h>  <mach.h>
+	tsort.x        		<tbset.h> 
+	;

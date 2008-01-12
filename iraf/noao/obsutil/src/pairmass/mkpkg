@@ -1,0 +1,19 @@
+# Make the PAIRMASS task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$update	libpkg.a
+	$omake	x_pairmass.x
+	$link	x_pairmass.o libpkg.a -lxtools -lasttools -o xx_pairmass.e
+	;
+
+libpkg.a:
+	airmass.x	<math.h>
+	drawvector.x	<gset.h> <mach.h>
+	initmarker.x	<gset.h>
+	t_pairmass.x
+	;

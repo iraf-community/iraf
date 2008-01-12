@@ -1,0 +1,163 @@
+.help ccdgroups Jun87 noao.imred.ccdred
+.ih
+NAME
+ccdgroups -- Group CCD images into image lists
+.ih
+USAGE
+ccdgroups images output
+.ih
+PARAMETERS
+.ls images
+List of CCD images to be grouped.
+.le
+.ls output
+Output root group filename.  The image group lists will be put in files
+with this root name followed by a number.
+.le
+.ls group = "ccdtype"
+Group type.  There are currently four grouping types:
+.ls ccdtype
+Group by CCD image type.
+.le
+.ls subset
+Group by subset parameter.
+.le
+.ls position
+Group by position in right ascension (in hours) and declination (in degrees).
+The groups are defined by a radius parameter (in arc seconds).
+.le
+.ls title
+Group by identical titles.
+.le
+.ls date
+Group by identical dates.
+.le
+.le
+.ls radius = 60.
+Grouping radius when grouping by positions.  This is given in arc seconds.
+.le
+.ls ccdtype = ""
+CCD image types to select from the input image list.  If null ("") then
+all image types are used.
+.le
+.ih
+DESCRIPTION
+The input images, possible restricted to a particular CCD image type,
+are grouped into image lists.  The "ccdtype" or "subset" groups
+produce output image lists with the given root name and the CCD type
+or subset as an extension (without a period).  For the other group
+types the
+image lists have file names given by
+the root output name and a numeric extension (without a period).
+If the package parameter \fIccdred.verbose\fR is yes then the
+image name and output group list is printed for each image.  The image lists can
+be used with the @ list feature for processing separate groups of observations.
+Note that grouping by CCD image type and subset is often not necessary since
+the \fBccdred\fR tasks automatically use this information (see
+\fBccdtypes\fR and \fBsubsets\fR).
+
+Besides CCD image type and subsets there are currently three ways to
+group images.  These are by position in the sky, by title, and by
+date.  Further groups may be added as suggested.  The title grouping is
+useful if consistent titles are used when taking data.  The date
+grouping is useful if multiple nights of observations are not organized
+by directories (it is recommended that data from separate nights be
+kept in separate directories).  The position grouping finds
+observations within a given radius on the sky of the first member of
+the group (this is not a clustering algorithm).  The right ascension
+and declination coordinates must be in standard units, hours and
+degrees respectively.  The grouping radius is in arc seconds.  This
+grouping type is useful for making sets of data in which separate
+calibration images are taken at each position.
+
+The date, title, and coordinates are accessed through the instrument
+translation file.  The standard names used are "date-obs", "title", "ra",
+and "dec".
+.ih
+EXAMPLES
+1. For each object 5 exposures were taken to be combined in order to remove
+cosmic rays.  If the titles are the same then (with ccdred.verbose=yes):
+
+.nf
+    cl> ccdgroups *.imh group group=title ccdtype=object
+    ccd005.imh  --> group1
+    ccd006.imh  --> group1
+    ccd007.imh  --> group1
+    ccd008.imh  --> group1
+    ccd009.imh  --> group1
+    ccd012.imh  --> group2
+    ccd013.imh  --> group2
+    ccd014.imh  --> group2
+    ccd015.imh  --> group2
+    ccd016.imh  --> group2
+    [... etc ...]
+    cl> combine @group1 obj1 proc+
+    cl> combine @group2 obj2 proc+
+    [... etc ...]
+.fi
+
+Note the numeric suffixes to the output root name "group".
+ 
+2. CCD observations were made in groups with a flat field, the object, and
+a comparison spectrum at each position.  To group and process this data:
+
+.nf
+    cl> ccdgroups *.imh obs group=position >> logfile
+    cl> ccdproc @obs1
+    cl> ccdproc @obs2
+    cl> ccdproc @obs3
+.fi
+
+Since no flat field is specified for the parameter \fIccdproc.flat\fR
+the flat field is taken from the input image list.
+
+3. If for some reason you want to group by date and position it is possible
+to use two steps.
+
+.nf
+    cl> ccdgroups *.imh date group=date
+    cl> ccdgroups @data1 pos1
+    cl> ccdgroups @data2 pos2
+.fi
+ 
+4. To get groups by CCD image type:
+ 
+.nf
+    cl> ccdgroups *.imh "" group=ccdtype
+    ccd005.imh  --> zero
+    ccd006.imh  --> zero
+    ccd007.imh  --> zero
+    ccd008.imh  --> dark
+    ccd009.imh  --> flat
+    ccd012.imh  --> flat
+    ccd013.imh  --> object
+    ccd014.imh  --> object
+    ccd015.imh  --> object
+    ccd016.imh  --> object
+    [... etc ...]
+.fi
+ 
+Note the use of a null root name and the extension is the standard
+CCDRED types (not necessarily those used in the image header).
+ 
+5. To get groups by subset:
+ 
+.nf
+    cl> ccdgroups *.imh filt group=subset
+    ccd005.imh  --> filt
+    ccd006.imh  --> filtB
+    ccd007.imh  --> filtB
+    ccd008.imh  --> filtB
+    ccd009.imh  --> filtV
+    ccd012.imh  --> filtV
+    ccd013.imh  --> filtV
+    ccd014.imh  --> filtB
+    ccd015.imh  --> filtB
+    ccd016.imh  --> filtB
+    [... etc ...]
+.fi
+ 
+.ih
+SEE ALSO
+ccdlist, ccdtypes, instruments, subsets
+.endhelp

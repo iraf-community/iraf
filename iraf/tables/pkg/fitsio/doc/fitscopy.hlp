@@ -1,0 +1,100 @@
+.help fitscopy Jan93 tables.fitsio
+.ih
+NAME
+fitscopy -- Copy FITS files from disk or tape to a tape.
+.ih
+USAGE
+fitscopy  infiles  outfiles  file_list  newtape
+.ih
+DESCRIPTION
+This task will transfer FITS files from disk to tape with
+optional blocking, tape to disk, or tape to tape with optional
+blocking. To transfer FITS files from disk to disk, use
+the 'copy' command.
+.ih
+PARAMETERS
+.ls infiles [file name template]
+Source file(s) to be transferred. 
+
+This can be a single
+disk filename or the name of a tape drive (e.g., "mta"). It can also be a
+list of files, e.g., 'file1.fit', 'myfile*.fit', or '@filelist'.
+.le
+.ls outfile [file name template]
+Destination for output files. 
+
+This can be a single
+disk filename or the name of a tape drive (e.g., "mta"). It can also be a
+list of files, e.g., 'file1.fit', 'file2.fit', or '@filelist'.
+If a file name is passed to this
+parameter, files will be written to disk.  If more than one file is to be
+written to disk, the file number will be appended to the root of 
+the filename specification plus an extension if one was given.
+Files can be  written to magnetic tape by using a tape drive
+specification rather than a file name.  The tape drive specification
+takes the form "mt*" where "mt" indicates a tape device, "*"
+represents one or more characters.
+The 'newtape' parameter can be set to "yes" and tape output  will be
+written at the beginning of the tape.
+If 'newtape' is not set to "yes",
+then the output will be appended to the tape after the last file.
+To use the tape you need to allocate it with the 'allocate' command,
+for example, "allocate mta".
+.le
+.ls file_list [string]
+The files to be read from a tape. This string can consist of
+any sequence of file numbers separated by at least one comma
+or dash. A comma separates individual file numbers, whereas a
+dash specifies  a range of files.  For example the string
+"1,2,3-5,8-6" will convert tape files 1 through 8.
+.le
+.ls (newtape) [boolean]
+Is the tape blank? 
+ 
+Setting 'newtape=yes' will cause files to be written at the beginning of the
+tape.
+.le
+.ls (blocking_factor = 1) [integer]
+The tape blocking factor for FITS files.  
+
+2,880-byte records are normally assumed.  If the blocking factor is
+greater than 1 and less than or equal to 10, then 2,880-byte records
+will be written to a single tape record. The FITS standard specifies
+that 'blocking_factor' must be less than or equal to 10.
+.le
+.ls offset = 0 [integer]
+Number from which to start counting when generating the number that is
+appended to the file name specified by 'outfiles' to create the output
+file name.  For example if 'file_list = "1-3"', 'outfiles = "out"' and
+'offset = 100', the the three files 'out101', 'out102', 'out103' would
+be produced rather than 'out001', 'out002' and 'out003'.
+.le
+.ls verbose = yes [boolean]
+Print messages to the screen as files are copied?
+.le
+.ih
+EXAMPLES
+1. Transfer all the files that match 'foo' with extension '.fit'
+   to the beginning of the tape 'mta'. Use blocking factor 10.
+
+.nf
+  fi> fitscopy  foo*.fit  mta  newtape=yes  blocking=10
+.fi
+
+2. Copy the first 3 files  from tape 'mte' to the working directory
+   with filename root 'myfile' and extension 'fit'. This will create
+   files 'myfiles001.fit', 'myfile002.fit' and 'myfile003.fit'.
+
+.nf
+ fi> fitscopy  mta  myfile.fit 1-3
+.fi
+
+.ih
+TIME REQUIREMENTS
+Transfer to and from Exabyte tapes are considerably slow.
+.ih
+BUGS
+.ih
+SEE ALSO
+dataio.reblock, dataio.t2d, strfits, stwfits
+.endhelp

@@ -1,0 +1,273 @@
+include	<error.h>
+include	<imhdr.h>
+include	<mwset.h>
+
+
+# AP_WCS -- Set WCS parameters.
+
+pointer procedure ap_wcs (in, out, dispaxis, w1, dw, dtype)
+
+pointer	in		# Input IMIO pointer
+pointer	out		# Output IMIO pointer
+int	dispaxis	# Input dispersion axis
+real	w1		# Output coordinate limits
+real	dw		# Output step
+int	dtype		# Dispersion type
+pointer	mw		# Output MWCS pointer
+
+int	nw, axis[2], axval[2], imgeti()
+real	w2, mw_c1tranr()
+pointer	sp, label, units, ct, mw_openim(), mw_sctran(), mw_open()
+data	axval/0,0/
+errchk	mw_openim, mw_sctran, mw_c1tranr, ap_wcsfix
+
+begin
+	call smark (sp)
+	call salloc (label, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
+
+	# Initialize
+	w1 = 1.
+	dw = 1.
+	dtype = -1
+	call strcpy ("Pixel", Memc[label], SZ_LINE)
+	Memc[units] = EOS
+
+	# Get WCS info from input image
+	iferr {
+	    mw = mw_openim (in)
+	    call ap_wcsfix (in, mw)
+	    ct = mw_sctran (mw, "logical", "world", dispaxis)
+	    nw = IM_LEN(out,1)
+	    w1 = mw_c1tranr (ct, 1.)
+	    w2 = mw_c1tranr (ct, real (nw))
+	    dw = (w2 - w1) / (nw - 1)
+	    iferr (dtype = imgeti (in, "DC-FLAG"))
+		dtype = -1
+	    iferr (call mw_gwattrs (mw, dispaxis, "label",
+		Memc[label], SZ_LINE)) {
+		if (dtype == -1)
+		    call strcpy ("Pixel", Memc[label], SZ_LINE)
+		else
+		    call strcpy ("Wavelength", Memc[label], SZ_LINE)
+	    }
+	    iferr (call mw_gwattrs (mw, dispaxis, "units",
+		Memc[units], SZ_LINE)) {
+		if (dtype == -1)
+		    Memc[units] = EOS
+		else
+		    call strcpy ("Angstroms", Memc[label], SZ_LINE)
+	    }
+	} then
+	    call erract (EA_WARN)
+
+	call mw_close (mw)
+
+	# Write WCS to output image
+	axis[1] = 1
+	axis[2] = 2
+	mw = mw_open (NULL, max (2, IM_NDIM(out)))
+	call mw_newsystem (mw, "multispec", 2)
+	call mw_swtype (mw, axis, 2, "multispec", "")
+	if (Memc[label] != EOS)
+	    call mw_swattrs (mw, 1, "label", Memc[label])
+	if (Memc[units] != EOS)
+	    call mw_swattrs (mw, 1, "units", Memc[units])
+	if (IM_NDIM(out) == 1) {
+	    axis[2] = 0
+	    call mw_saxmap (mw, axis, axval, 2)
+	}
+
+	iferr (call imdelf (out, "dispaxis"))
+	    ;
+	iferr (call imdelf (out, "dc-flag"))
+	    ;
+
+	call sfree (sp)
+	return (mw)
+end
+
+
+# AP_WCSFIX -- Fix up WCS to avoid CDELT=0 which occurs if there are WCS
+# keywords in the header but no CDELT.
+
+procedure ap_wcsfix (im, mw)
+
+pointer	im			# IMIO pointer
+pointer	mw			# MWCS pointer
+
+int	i, ndim, mw_stati()
+double	val
+pointer	sp, r, w, cd
+errchk	mw_gwtermd, mw_swtermd
+
+begin
+	ndim = mw_stati (mw, MW_NDIM)
+
+	call smark (sp)
+	call salloc (r, ndim, TY_DOUBLE)
+	call salloc (w, ndim, TY_DOUBLE)
+	call salloc (cd, ndim*ndim, TY_DOUBLE)
+
+	# Check cd terms.  Assume no rotation.
+	call mw_gwtermd (mw, Memd[r], Memd[w], Memd[cd], ndim)
+	do i = 0, ndim-1 {
+	    val = Memd[cd+i*(ndim+1)]
+	    if (val == 0D0) {
+		Memd[w+i] = 1D0
+	        Memd[cd+i*(ndim+1)] = 1D0
+	    }
+	}
+	call mw_swtermd (mw, Memd[r], Memd[w], Memd[cd], ndim)
+
+	call sfree (sp)
+end
+
+
+# APMW_SAVEIM -- Save WCS in image header
+# This procedure converts multispec WCS which are linear and contain just
+# one spectrum to a simple linear WCS.
+
+procedure apmw_saveim (mw, im)
+
+pointer	mw			# Multispec MWCS pointer
+pointer	im			# Image pointer
+
+int	ap, beam, dtype, nw, wcsdim, axes[3], imaccf()
+double	w1, dw, z, aplow, aphigh
+pointer	mw1, sp, str, wterm, mw_open()
+bool	strne()
+errchk	imdelf
+data	axes/1,2,3/
+
+begin
+	if (IM_LEN(im,2) != 1) {
+	    call mw_saveim (mw, im)
+	    return
+	}
+
+	str = NULL
+	call apmw_gwattrs (mw, 1, ap, beam, dtype, w1, dw, nw, z, aplow,
+	    aphigh, str)
+	call mfree (str, TY_CHAR)
+
+	if (nw < IM_LEN(im,1))
+	    call imaddi (im, "NP2", nw)
+	else if (imaccf (im, "NP2") == YES)
+	    call imdelf (im, "NP2")
+	call imaddi (im, "APNUM", ap)
+	call imaddi (im, "BEAM-NUM", beam)
+	if (dtype != -1)
+	    call imaddi (im, "DC-FLAG", dtype)
+	else if (imaccf (im, "DC-FLAG") == YES)
+	    call imdelf (im, "DC-FLAG")
+	if (z != 0.)
+	    call imaddd (im, "DOPCOR", z)
+	else if (imaccf (im, "DOPCOR") == YES)
+	    call imdelf (im, "DOPCOR")
+	if (!IS_INDEFD(aplow))
+	    call imaddd (im, "APLOW", aplow)
+	else if (imaccf (im, "APLOW") == YES)
+	    call imdelf (im, "APLOW")
+	if (!IS_INDEFD(aphigh))
+	    call imaddd (im, "APHIGH", aphigh)
+	else if (imaccf (im, "APHIGH") == YES)
+	    call imdelf (im, "APHIGH")
+
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (wterm, wcsdim*(wcsdim+2), TY_DOUBLE)
+
+	ifnoerr (call imgstr (im, "APID1", Memc[str], SZ_LINE)) {
+	    if (strne (Memc[str], IM_TITLE(im))) {
+		call imastr (im, "MSTITLE", IM_TITLE(im))
+		call strcpy (Memc[str], IM_TITLE(im), SZ_IMTITLE)
+	    }
+	    call imdelf (im, "APID1")
+	}
+
+	wcsdim = IM_NDIM(im)
+	mw1 = mw_open (NULL, wcsdim)
+	call mw_newsystem (mw1, "linear", wcsdim)
+	call mw_swtype (mw1, axes, wcsdim, "linear", "")
+	ifnoerr (call mw_gwattrs (mw, 1, "label", Memc[str], SZ_LINE))
+	    call mw_swattrs (mw1, 1, "label", Memc[str])
+	ifnoerr (call mw_gwattrs (mw, 1, "units", Memc[str], SZ_LINE))
+	    call mw_swattrs (mw1, 1, "units", Memc[str])
+
+	call mw_gwtermd (mw1, Memd[wterm], Memd[wterm+wcsdim],
+	    Memd[wterm+2*wcsdim], wcsdim)
+	Memd[wterm] = 1.
+	Memd[wterm+wcsdim] = w1
+	Memd[wterm+2*wcsdim] = dw
+	call mw_swtermd (mw1, Memd[wterm], Memd[wterm+wcsdim],
+	    Memd[wterm+2*wcsdim], wcsdim)
+	call mw_saveim (mw1, im)
+	call mw_close (mw1)
+
+	call sfree (sp)
+end
+
+
+# APMW_GWATTRS -- Get spectrum attribute parameters
+
+procedure apmw_gwattrs (mw, line, ap, beam, dtype, w1, dw, nw, z, aplow, aphigh,
+	coeff)
+
+pointer	mw				# MWCS pointer
+int	line				# Physical line number
+int	ap				# Aperture number
+int	beam				# Beam number
+int	dtype				# Dispersion type
+double	w1				# Starting coordinate
+double	dw				# Coordinate interval
+int	nw				# Number of valid pixels
+double	z				# Redshift factor
+double	aplow, aphigh			# Aperture limits
+pointer	coeff				# Nonlinear coeff string (input/output)
+
+int	i, j, sz_coeff, strlen(), ctoi(), ctod()
+pointer	sp, key
+errchk	mw_gwattrs
+
+data	sz_coeff /SZ_LINE/
+
+begin
+	call smark (sp)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+
+	if (coeff == NULL)
+	    call malloc (coeff, sz_coeff, TY_CHAR)
+	else
+	    call realloc (coeff, sz_coeff, TY_CHAR)
+
+	call sprintf (Memc[key], SZ_FNAME, "spec%d")
+	    call pargi (line)
+
+	call mw_gwattrs (mw, 2, Memc[key], Memc[coeff], sz_coeff)
+	while (strlen (Memc[coeff]) == sz_coeff) {
+	    sz_coeff = 2 * sz_coeff
+	    call realloc (coeff, sz_coeff, TY_CHAR)
+	    call mw_gwattrs (mw, 2, Memc[key], Memc[coeff], sz_coeff)
+	}
+
+	i = 1
+	j = ctoi (Memc[coeff], i, ap)
+	j = ctoi (Memc[coeff], i, beam)
+	j = ctoi (Memc[coeff], i, dtype)
+	j = ctod (Memc[coeff], i, w1)
+	j = ctod (Memc[coeff], i, dw)
+	j = ctoi (Memc[coeff], i, nw)
+	j = ctod (Memc[coeff], i, z)
+	j = ctod (Memc[coeff], i, aplow)
+	j = ctod (Memc[coeff], i, aphigh)
+	if (Memc[coeff+i-1] != EOS)
+	    call strcpy (Memc[coeff+i], Memc[coeff], sz_coeff)
+	else
+	    Memc[coeff] = EOS
+
+	if (j == 0)
+	    call error (1, "Syntax error in spectrum attribute parameter")
+
+	call sfree (sp)
+end

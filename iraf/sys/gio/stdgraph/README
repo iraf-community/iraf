@@ -1,0 +1,77 @@
+gio$stdgraph
+
+    This directory contains the source and executables for the STDGRAPH and
+GKIDECODE graphics kernels.  The two kernels are implemented both as libraries
+and as executable tasks.
+
+	gkidecode	This kernel is used standalone to examine GKI
+			metafiles.  The real work is done by the GKIPRINT
+			library module in the GIO package.
+
+	stdgraph	A graphics kernel for graphics terminals.  Implemented
+			both as the library "libstdg.a" and as the kernel task
+			STDGRAPH.  The library is required for this kernel to
+			permit inclusion of the stdgraph kernel in the CL
+			process.
+
+Both kernels are available as CL callable tasks in the executable file
+x_kernel.e.
+
+
+GKIPRINT -- Graphics kernel for decoding metacode.  This graphics kernel
+formats metacode instructions into readable form and prints them on the output
+file.  The gkiprint kernel is useful for examining metafiles and for
+debugging kernels which drive specific devices.  The driver consists of the
+following procedures:
+
+	     gkp_openws (devname, n, mode)
+	    gkp_closews (devname, n)
+	    gkp_mftitle (title, n)			**
+	      gkp_clear (dummy)
+	     gkp_cancel (dummy)
+	      gkp_flush (dummy)
+	   gkp_polyline (p, npts)
+	 gkp_polymarker (p, npts)
+	       gkp_text (x, y, text, n)
+	   gkp_fillarea (p, npts)
+       gkp_getcellarray (m, nx, ny, x1,y1, x2,y2)
+       gkp_putcellarray (m, nx, ny, x1,y1, x2,y2)
+	  gkp_setcursor (x, y, cursor)
+	      gkp_plset (gki)
+	      gkp_pmset (gki)
+	      gkp_txset (gki)
+	      gkp_faset (gki)
+	  gkp_getcursor (cursor)
+	     gkp_escape (fn, instruction, nwords)	**
+	     gkp_setwcs (wcs, nwords)			**
+	     gkp_getwcs (wcs, nwords)			**
+	    gkp_unknown (gki)				**
+
+A GKI driven device driver may implement any subset of these procedures.
+The starred procedures should be omitted by most drivers.  In particular,
+the SETWCS and GETWCS instructions are internal instructions which should
+be ignored by ordinary device drivers.  The procedure names may be anything,
+but the arguments lists must be as shown.  All coordinates are in GKI units,
+0 to 32767.  Character strings are passed in ASCII, one character per metacode
+word.  Whenever a GKI character string appears as an array argument in the
+argument list of a procedure, the count N of the number of characters in the
+string follows as the next argument.  GKI character strings are not EOS
+delimited.  Polyline, polymarker, and fillarea data is passed as an array
+of (x,y) points P, in GKI coordinates, defining the polyline or polygon to
+be plotted.
+
+One additional procedure, GKP_INSTALL, is called by the main program of the
+graphics kernel task to install the debugging driver, i.e., to fill the DD
+array with the entry point addresses of the driver procedures.  For a normal
+driver this function is performed by a user supplied procedure named
+GKOPEN (graphics kernel open).  The user supplied kernel procedures will
+be called to execute each instruction as the instructions are decoded by the
+main routine.  The user supplied procedure GKCLOSE will be called when
+interpretation ends and the task is about to exit.
+
+		 gkopen (dd)
+		gkclose ()
+
+Do not confuse GKOPEN and GKCLOSE, which open and close the graphics kernel,
+with GKI_OPENWS and GKI_CLOSEWS, the metacode instructions used to direct
+an opened kernel to open and close workstations.

@@ -1,0 +1,29 @@
+This directory contains the source for the TTY interface, a device independent
+interface used to control terminals.  We interface to the widely used
+TERMCAP terminal database, thereby gaining the data required to control many
+diverse terminals.  (Written Jan84 dct).
+
+Mar84	Added TTYGDES and the "graphcap" file, used to describe graphics
+	devices.
+
+Jly84	Added capability to compile selected termcap entries to speedup
+	TTYODES.  Added TTYCOMPILE, TTYLOAD, TTYOPEN, TTYCLOSE.  Modified
+	the existing routines TTYODES and TTYGDES.  The new open and close
+	routines are useful for any type of database maintained in termcap
+	format.
+
+Jly84	Entry point TTYCLINE changed to TTYCLEARLN to avoid name conflict
+	with TTYCLOSE.
+
+Jly84	Task MKTTYDATA is used to compile selected entries from TERMCAP
+	files.  The include files "cache_?.dat" are the output of this
+	program.  To tailor the cache of pre-compiled termcap device
+	entries for a site, compile MKTTYDATA and run it to generate
+	the files "cache_t.dat" for "dev$termcap" (default MKTTYDATA params)
+	and "cache_g.dat" for "dev$graphcap", then do a Sysgen to recompile
+	the libraries.  All programs which use the TTY interface, e.g.,
+	the SYSTEM package, must then be relinked to make use of the new
+	cache.
+
+Jun85	Changed filenames to make them more machine independent.
+	Installed MKTTYDATA as a task in the SOFTOOLS package.

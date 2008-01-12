@@ -1,0 +1,25 @@
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update tbplot.a
+
+linkonly:
+	$omake	x_tbplot.x
+	$link	x_tbplot.o tbplot.a -lstxtools -lcurfit -lds -lstg \
+		-ltbtables -lxtools -o xx_tbplot.e
+	;
+
+install:
+	$move	xx_tbplot.e tablesbin$x_tbplot.e
+	;
+
+tbplot.a:
+	@igi
+	@sgraph
+	;

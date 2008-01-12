@@ -1,0 +1,32 @@
+.help imxv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slIMXV (RM, VA, VB)
+
+     - - - - -
+      I M X V
+     - - - - -
+
+  Performs the 3-D backward unitary transformation:
+
+     vector VB = (inverse of matrix RM) * vector VA
+
+  (single precision)
+
+  (n.b.  the matrix must be unitary, as this routine assumes that
+   the inverse and transpose are identical)
+
+  Given:
+     RM       real(3,3)    matrix
+     VA       real(3)      vector
+
+  Returned:
+     VB       real(3)      result vector
+
+  P.T.Wallace   Starlink   November 1984
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,8 @@
+infiles,s,a,,,,Input file
+outfiles,s,a,,,,Output file
+file_list,s,a,,,,Tape file list
+newtape,b,a,,,,Blank tape?
+blocking_factor,i,h,1,1,10,Blocking_factor(1-10)
+offset,i,h,0,,,Tape file number offset
+verbose,b,h,yes,,,Print messages?
+mode,s,h,"ql",,,

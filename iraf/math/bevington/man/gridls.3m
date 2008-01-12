@@ -1,0 +1,41 @@
+.TH GRIDLS 3M
+.SH NAME
+gridls
+.SH DESCRIPTION
+subroutine gridls.f 
+
+source
+  Bevington, pages 212-213.
+
+purpose
+  make grid-search least-squares fit to data with specified
+    function which is not linear in coefficients
+
+usage 
+  call gridls (x, y, sigmay, npts, nterms, mode, a, deltaa,
+    sigmaa, yfit, chisqr)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  sigmay - array of standard deviations for y data points
+  npts   - number of pairs of data points
+  nterms - number of parameters
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  a      - array of parameters
+  deltaa - array of increments for parameters a
+  sigmaa - array of standard deviations for parameters a
+  yfit   - array of calculated values of y
+  chisqr - reduced chi square for fit 
+
+subroutines and function subprograms required 
+  functn (x, i, a)
+    evaluates the fitting function for the ith term
+  fchisq (y, sigmay, npts, nfree, mode, yfit) 
+    evaluates reduced chi squared for fit to data
+
+comments
+  deltaa values are modified by the program

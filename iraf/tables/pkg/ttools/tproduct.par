@@ -1,0 +1,4 @@
+intable1,f,a,,,,the first input table 
+intable2,f,a,,,,the second input table
+outtable,s,a,,,,the output table
+mode,s,h,"a",,,

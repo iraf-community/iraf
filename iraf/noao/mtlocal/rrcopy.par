@@ -1,0 +1,9 @@
+#RCOPY parameters
+rcopy_file,f,a,mta,,,RCOPY data source (mta:mtb)
+raster_list,s,a,,,,raster list
+iraf_file,f,a,,,,IRAF filename
+datafile,i,h,1,,,rrcopy datafile ordinal on tape
+make_image,b,h,yes,,,create IRAF image?
+print_header,b,h,yes,,,print header information?
+data_type,s,h,"",,,IRAF data type
+mode,s,h,ql,,,

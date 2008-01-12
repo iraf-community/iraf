@@ -1,0 +1,8 @@
+To implement a full device save/restore, we need:
+zdev_restore(fd)
+zdev_save(fd)
+zim_save(fd,ipl)
+zgr_save(fd,gpl)
+zim_restore(fd,ipl)
+zgr_restore(fd,gpl)
+...zgr are just entry points into zim_{save,restore}(fd,pl)

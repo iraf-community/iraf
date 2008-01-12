@@ -1,0 +1,18 @@
+input1,s,a,,,,First input table
+input2,s,a,,,,Second input table
+output,s,a,,,,Output table
+match1,s,a,,,,Columns to match in first table
+match2,s,a,,,,Columns to match in second table
+maxnorm,r,a,,0.0,,Maximum distance for allowed match
+incol1,s,h," ",,,Columns copied to output from first table
+incol2,s,h," ",,,Columns copied to output from second table
+factor,s,h," ",,,Weighting factors used in computing distance
+diagfile,s,h," ",,,Diagnostic output file
+nmcol1,s,h," ",,,ID columns in diagnostic output from first table
+nmcol2,s,h," ",,,ID columns in diagnostic output from second table
+sphere,b,h,no,,,Apply spherical correction?
+
+
+
+
+

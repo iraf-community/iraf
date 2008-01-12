@@ -1,0 +1,33 @@
+.help imtypk Sep86 imfort
+.ih
+NAME
+imtypk -- get the type information for a header keyword
+.ih
+SYNOPSIS
+.nf
+subroutine imtypk (im, keyw, dtype, comm, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of the new keyword
+integer		dtype		#O keyword datatype code
+character*(*)	comm		#O comment string describing keyword
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimtypk\fR procedure is used to fetch the information defining
+the type and usage of an image header keyword, i.e., the datatype code
+and comment string.  Knowledge of the keyword datatype may be required
+before accessing the value of a keyword to avoid a format conversion error
+if only the name of the keyword is known (e.g., when using the keyword-list
+package).  The \fIimtypk\fR procedure is the only means currently available
+for retrieving the comment string associated with a header keyword.
+.ih
+RETURN VALUE
+A zero status is returned if the named keyword exists.
+
+SYS_IDBKEYNF:	image header keyword not found
+.ih
+SEE ALSO
+imaddk, imacck
+.endhelp

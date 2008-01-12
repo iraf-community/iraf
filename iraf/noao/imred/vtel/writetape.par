@@ -1,0 +1,5 @@
+
+getmtape,s,a,,,,Mag tape device to write to
+getname,s,a,,,,Root filename for the 5 images
+magtape,s,h
+imname,s,h

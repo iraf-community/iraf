@@ -1,0 +1,41 @@
+.help cqgvals Mar00 "Catquery Package"
+.ih
+NAME
+cqgvals -- get the catalog results field as a short integer
+.ih
+SYNOPSIS
+include <cq.h>
+
+nchars = cq_gvals (res, recno, fname, sval)
+
+.nf
+pointer	res		# the results descriptor
+int	recno		# the record number
+char	fname		# the field name
+short	sval		# the returned field value
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The results descriptor.
+.le
+.ls recno
+The record number.
+.le
+.ls fname
+The field name.
+.le
+.ls sval
+The returned short integer value.
+.le
+.ih
+DESCRIPTION
+Cq_gvals returns the requested field as a short integer value.
+Cq_gvals is an integer function which returns the number of characters
+that were successfully decoded as its function value. Zero is returned
+if the requested field could not be decoded.
+
+.ih
+SEE ALSO
+cqgval[cilrd]
+.endhelp

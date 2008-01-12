@@ -1,0 +1,17 @@
+input,s,a,,,,"List of input spectra"
+output,s,a,,,,"List of output spectra"
+w1,r,h,INDEF,,,"Starting wavelength"
+w2,r,h,INDEF,,,"Ending wavelength"
+apertures,s,h,"",,,"List of input apertures or columns/lines"
+bands,s,h,"",,,"List of input bands or lines/bands"
+beams,s,h,"",,,"List of beams or echelle orders"
+apmodulus,i,h,0,,,"Input aperture modulus (0=none)
+"
+format,s,h,"multispec",multispec|onedspec,,"Output spectra format"
+renumber,b,h,no,,,"Renumber output apertures?"
+offset,i,h,0,,,"Output aperture number offset"
+clobber,b,h,no,,,"Modify existing output images?"
+merge,b,h,no,,,"Merge with existing output images?"
+rebin,b,h,yes,,,"Rebin to exact wavelength region?"
+verbose,b,h,no,,,"Print operations?"
+mode,s,h,"ql",,,

@@ -1,0 +1,4 @@
+input,s,a,"",,,Input image list
+output,s,h,"STDOUT",,,Output image list
+ccdtype,s,h,"",,,CCD image type to be listed
+stop,b,h,"no",,,"Stop, rather than pass, selected images"

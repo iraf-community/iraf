@@ -1,0 +1,29 @@
+.TH XFIT 3M
+.SH NAME
+xfit
+.SH DESCRIPTION
+subroutine xfit.f
+
+source
+  Bevington, page 76.
+
+purpose
+  calculate mean and estimated errors for set of data points
+
+usage
+  call xfit (x, sigmax, npts, mode, xmean, sigmam, sigma)
+
+description of parameters
+  x      - array of data points
+  sigmax - array of standard deviations for data points
+  npts   - number of data points
+  mode   - determines method of weighting
+           +1 (instrumental) weight(i) = 1./sigmax(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1.
+  xmean  - weighted mean
+  sigmam - standard deviation of mean
+  sigma  - standard deviation of data
+
+subroutines and function subprograms required
+  none

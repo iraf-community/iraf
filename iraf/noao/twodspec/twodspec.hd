@@ -1,0 +1,22 @@
+# Help directory for the TWODSPEC package.
+
+$apextract	= "noao$twodspec/apextract/"
+$longslit	= "noao$twodspec/longslit/"
+$multispec	= "noao$twodspec/multispec/"
+
+apextract	men=apextract$apextract.men,
+		hlp=..,
+		sys=apextract$doc/apextract.ms,
+		pkg=apextract$apextract.hd,
+		src=apextract$apextract.cl
+
+longslit	men=longslit$longslit.men,
+		hlp=..,
+		pkg=longslit$longslit.hd,
+		src=longslit$longslit.cl
+
+#multispec	men=multispec$multispec.men,
+#		hlp=..,
+#		sys=multispec$multispec.hlp,
+#		pkg=multispec$multispec.hd,
+#		src=multispec$multispec.cl

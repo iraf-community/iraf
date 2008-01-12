@@ -1,0 +1,62 @@
+# Make the TABLES libraries
+#
+#   Special keywords recognized by IRAF mkpkg files:
+#
+#	mkpkg relink		update object library and link
+#	mkpkg linkonly		skip object library updates and just link
+#	mkpkg install		move executable to lib$
+#	mkpkg update		update object library, link, and move to lib$
+
+relink:
+update:
+
+$ifeq (hostid, unix)  !(date)  $endif
+$ifeq (hostid, vms)   !(show time)  $endif
+
+$echo "------------------------  DISPLAY --------------------------"
+$update libdisplay.a
+$move	libdisplay.a tableslib$libdisplay.a
+$echo "------------------------  GFLIB --------------------------"
+$update libgflib.a
+$move	libgflib.a tableslib$libgflib.a
+$echo "------------------------  GILIB --------------------------"
+$update libgilib.a
+$move	libgilib.a tableslib$libgilib.a
+$echo "------------------------  STXTOOLS --------------------------"
+$update libstxtools.a
+$move	libstxtools.a tableslib$libstxtools.a
+$echo "------------------------  TBTABLES --------------------------"
+$set XFLAGS = "-Inolibc $(XFLAGS)"
+$update libtbtables.a
+$move	libtbtables.a tableslib$libtbtables.a
+$echo "------------------------  UTTABLES --------------------------"
+$update libuttables.a
+$move	libuttables.a tableslib$libuttables.a
+
+$ifeq (hostid, unix)  !(date)  $endif
+$ifeq (hostid, vms)   !(show time)  $endif
+$exit
+
+libdisplay.a:
+	@display
+	;
+
+libgflib.a:
+	@gflib
+	;
+
+libgilib.a:
+	@gilib
+	;
+
+libstxtools.a:
+	@stxtools
+	;
+
+libtbtables.a:
+	@tbtables
+	;
+
+libuttables.a:
+	@uttables
+	;

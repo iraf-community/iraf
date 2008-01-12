@@ -1,0 +1,18 @@
+-- Focusing and PSF measuring tasks --
+     psfmeasure - Measure PSF sizes from stellar images
+      specfocus - Determine spectral focus and alignment variations
+      starfocus - Determine direct focus variations from stellar images
+
+-- Observation planning tasks --
+	ccdtime - CCD photometry exposure time calculator
+       pairmass - Plot airmass vs time for a given coordinate
+	 sptime - Spectroscopic exposure time calculator
+       specpars - Spectrograph instrument parameters for sptime
+
+-- Instrument/detector characterization --
+       bitcount - Accumulate the bit statistics for a list of images
+       findgain - Estimate the gain and readnoise of a CCD 
+        shutcor - Shutter correction from images of varying exposure times
+
+-- Miscellaneous
+       cgiparse - Parse STRING_QUERY environment variable into task parameters

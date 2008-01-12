@@ -1,0 +1,14 @@
+# Ridsmtn Library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	wkeywords.x   idsmtn.h <mach.h> <imhdr.h>
+	rvarian.x     idsmtn.h <mach.h> <error.h> powersof2.com lut.com
+	redflags.x    idsmtn.h <mach.h>
+	t_ridsmtn.x   idsmtn.h <mach.h> <imhdr.h> <error.h> <fset.h> \
+		      powersof2.com lut.com
+	;

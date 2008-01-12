@@ -1,0 +1,26 @@
+.help zfgcwd May84 "System Interface"
+.ih
+NAME
+zfgcwd -- get current working directory
+.ih
+SYNOPSIS
+.nf
+zfgcwd (pathname, maxch, status)
+
+packed	char pathname[maxch]		# receives pathname of cwd
+int	maxch, status
+.fi
+.ih
+DESCRIPTION
+The pathname of the current working directory is returned as a packed string,
+suitable for concatenation with a filename to produce the pathname of the file.
+.ih
+RETURN VALUE
+ERR is returned if the output string overflows or if the name of the current
+working directory cannot be obtained for some reason.  If the operation is
+successful the number of characters in the output string is returned,
+excluding the EOS delimiter.
+.ih
+SEE ALSO
+zfxdir, zfsubd, zfpath
+.endhelp

@@ -1,0 +1,129 @@
+.help revisions Dec94 noao.imred.src.doslit
+.nf
+
+=======
+V2.12.3
+=======
+
+doslit$sbatch.cl
+doslit$sproc.cl
+    Error messages now hint to check imtype setting.
+	(4/15/05, Valdes)
+
+========
+V2.12.2b
+========
+
+=======
+V2.12.1
+=======
+
+doslit$sproc.cl
+doslit$sbatch.cl
+doslit$sarcrefs.cl
+doslit$sfluxcal.cl
+    Added a flpr after dispcor to workaround a bug with the FITS kernel
+    header caching.  (6/24/02, Valdes)
+
+=====
+V2.12
+=====
+
+doslit$sproc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
+doslit$sarcrefs.cl
+     The test for INDEF values on CRVAL/CDELT did not work correctly.
+     (9/24/99, Valdes)
+
+doslit$doslit.cl
+doslit$doslit.par
+doslit$sarcrefs.cl
+doslit$sarcrefs.par
+doslit$sproc.cl
+doslit$sproc.par
+     No change made though dates were modified.  (9/24/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+doslit$sarcrefs.cl
+    The test on CRVAL and CDELT would not work with header keywords.
+    (9/22/98, Valdes)
+
+doslit$sarcrefs.cl
+doslit$sbatch.cl
+doslit$sdoarcs.cl
+doslit$sfluxcal.cl
+doslit$sgetspec.cl
+doslit$slistonly.cl
+doslit$sproc.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+doslit$sgetspec.cl
+    Added the field parameter to the RENAME call.  (8/12/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+doslit$sarcrefs.cl
+    If both crval and cdelt are INDEF then the autoidentify option is not
+    used.  (5/2/97, Valdes)
+
+doslit$apslitproc.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+doslit.cl
+doslit.par
+sproc.cl
+sproc.par
+sarcrefs.cl
+sarcrefs.par
+sparams.par
+    Modified to use autoidentify.  (4/5/96, Valdes)
+
+doslit$sproc.cl
+doslit$sproc.par
+    Added missing parameter declaration.  (5/25/95, Valdes)
+
+doslit$sgetspec.cl
+doslit$doslit.cl
+    The arc table will now be checked for arc spectra. (5/1/95, Valdes)
+
+doslit$sparams.par
+doslit$sdoarcs.cl
+doslit$sarcrefs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+doslit$sproc.cl
+doslit$sbatch.cl
+doslit$sfluxcal.cl
+doslit$sproc.par
+doslit$sbatch.par
+doslit$sfluxcal.par
+    SETAIRMASS and SETJD are only called if the required keywords are
+    present.  Errors from missing airmass or JD are then reported from
+    the task that actually uses them.  (12/31/94, Valdes)
+
+doslit$sgetspec.cl
+doslit$sgetspec.par
+    Added warning and query for missing CCDPROC keyword.  (12/31/94, Valdes)
+
+doslit$sproc.cl
+doslit$sarcrefs.cl
+    1.	If the object apertures used for reference arc contain more than
+	one aperture then after extraction all apertures but the first
+	are removed.  This will be one reference arc aperture for the
+	master dispersion solution.
+    2.  Set ignoreaps=yes so that any new apertures added to the objects
+	will inherit the wavelength scale of the reference arc.
+    (10/12/94, Valdes)
+.endhelp

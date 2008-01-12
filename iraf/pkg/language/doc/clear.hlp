@@ -1,0 +1,22 @@
+.help clear Feb86 language
+.ih
+NAME
+clear -- clear the terminal screen
+.ih
+USAGE
+clear
+.ih
+DESCRIPTION
+The \fIclear\fR command clears the terminal screen.  For this to work properly
+the environment variable \fIterminal\fR must correctly identify the terminal
+currently in use.  If the terminal should get stuck in reverse video mode,
+\fIclear\fR will restore normal video mode as well as clearing the screen.
+.ih
+EXAMPLES
+1. Clear the screen and print the current directory.
+
+	cl> cle;dir
+.ih
+SEE ALSO
+beep, stty
+.endhelp

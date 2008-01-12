@@ -1,0 +1,31 @@
+input,s,a,,,,"List of input spectra"
+output,s,h,"",,,"List of output spectra"
+ap,i,h,1,1,,"Image line"
+rv,r,h,0.,,,"Radial velocity (km/s) or redshift"
+z,b,h,no,,,"Is velocity a redshift?
+
+IF NEW SPECTRUM"
+title,s,h,"",,,"Title of spectrum"
+ncols,i,h,512,1,,"Number of columns"
+naps,i,h,1,1,,"Number of lines (apertures)"
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
+wstart,r,h,4000.,,,"Starting wavelength (Angstroms)"
+wend,r,h,8000.,,,"Ending wavelength (Angstroms)
+
+CONTINUUM"
+continuum,r,h,1000.,,,"Continuum at first pixel"
+slope,r,h,0.,,,"Continuum slope per pixel"
+temperature,r,h,5700.,0.,,"Blackbody temperture (Kelvin)"
+fnu,b,h,no,,,"F-nu or F-lamda?
+
+LINES"
+lines,s,h,"",,,"List of files containing lines"
+nlines,i,h,0,0,,"Number of random lines (if new line list)"
+profile,s,h,"gaussian",|gaussian|lorentzian|voigt,,"Default profile type"
+peak,r,h,-0.5,,,"Default peak strength (relative to continuum)"
+gfwhm,r,h,20.,,,"Default Gaussian FWHM (Angstroms)"
+lfwhm,r,h,20.,,,"Default Lorentzian FWHM (Angstroms)"
+seed,i,h,1,,,"Random number seed
+"
+comments,b,h,yes,,,"Add comments to image?"
+mode,s,h,"ql",,,

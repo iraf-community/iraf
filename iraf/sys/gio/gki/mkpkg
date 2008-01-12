@@ -1,0 +1,46 @@
+# Make the GKI (graphics kernel interface) package.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	gkicancel.x	gki.com <config.h> <gki.h>
+	gkiclear.x	gki.com <config.h> <gki.h>
+	gkiclose.x	gki.com <config.h> <gki.h>
+	gkideact.x	gki.com <config.h> <gki.h>
+	gkieof.x	gki.com <config.h> <gki.h>
+	gkiesc.x	gki.com <config.h> <gki.h>
+	gkiexe.x	<gki.h>
+	gkifa.x		gki.com <config.h> <gki.h>
+	gkifaset.x	gki.com <config.h> <gio.h> <gki.h>
+	gkifetch.x	<gki.h>
+	gkifflush.x	gki.com <config.h> <fio.h> <gki.h>
+	gkiflush.x	gki.com <config.h> <fio.h> <gki.h>
+	gkigca.x	gki.com <config.h> <fio.h> <fset.h> <gki.h>
+	gkigcur.x	gki.com <config.h> <fio.h> <fset.h> <gki.h>
+	gkigetwcs.x	gki.com <config.h> <gki.h>
+	gkiinit.x	gki.com <config.h> <gki.h>
+	gkiinline.x	gki.com <config.h> <gki.h>
+	gkikern.x	gki.com <config.h> <gki.h>
+	gkiopen.x	gki.com <config.h> <gki.h>
+	gkipca.x	gki.com <config.h> <gki.h>
+	gkipl.x		gki.com <config.h> <gki.h>
+	gkiplset.x	gki.com <config.h> <gio.h> <gki.h>
+	gkipm.x		gki.com <config.h> <gki.h>
+	gkipmset.x	gki.com <config.h> <gio.h> <gki.h>
+	gkiprint.x	<config.h> <gio.h> <gki.h> <gset.h> <mach.h>
+	gkirca.x	<gki.h>
+	gkircval.x	<gki.h>
+	gkireact.x	gki.com <config.h> <gki.h>
+	gkiredir.x	gki.com <config.h> <gki.h>
+	gkiscur.x	gki.com <config.h> <gki.h>
+	gkisetwcs.x	gki.com <config.h> <gki.h>
+	gkititle.x	gki.com <config.h> <gki.h>
+	gkitx.x		gki.com <config.h> <gki.h>
+	gkitxset.x	gki.com <config.h> <gio.h> <gki.h>
+	gkiwesc.x	gki.com <config.h> <gki.h>
+	gkiwrite.x	gki.com <config.h> <gki.h>
+	gkptxparg.x	<gset.h>
+	;

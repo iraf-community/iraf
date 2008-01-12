@@ -1,0 +1,27 @@
+# PFCCD.DAT -- Instrument file to be used with quad when reducing direct
+# imageing data obtained with ArCon.
+
+# Uncomment ONE of the following 3 lines to select the
+# header keyword to use when grouping images into subsets by filter.
+#subset			filters
+subset			filter1
+#subset			filter2
+
+exptime 		exptime
+darktime		darktime
+imagetyp		imagetyp
+biassec			biassec
+datasec			datasec
+trimsec			trimsec
+fixfile			fixfile
+ 
+FOCUS			object
+OBJECT			object
+DARK			dark
+"PROJECTOR FLAT"	flat
+"SKY FLAT"		flat
+COMPARISON		other
+ZERO			zero			# New software
+BIAS			zero			# Old software
+"DOME FLAT"		flat
+MASK			other

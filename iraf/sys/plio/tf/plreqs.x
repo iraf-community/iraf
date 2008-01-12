@@ -1,0 +1,27 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<plset.h>
+
+# PLR_EQUAL -- Compare two range lists for equality.
+
+bool procedure plr_equals (r1, r2)
+
+short	r1[3,ARB]			#I range list 1
+short	r2[3,ARB]			#I range list 2
+
+int	i
+int	len1, len2
+
+begin
+	len1 = RL_LEN(r1)
+	len2 = RL_LEN(r2)
+
+	if (len1 != len2)
+	    return (false)
+
+	do i = RL_FIRST, len1
+	    if (r1[1,i] != r2[1,i] || r1[2,i] != r2[2,i] || r1[3,i] != r2[3,i])
+		return (false)
+
+	return (true)
+end

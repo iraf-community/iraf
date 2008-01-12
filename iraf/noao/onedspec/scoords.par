@@ -1,0 +1,5 @@
+images,f,a,,,,List of spectrum image names
+coords,f,a,,,,List of coordinate file names
+label,s,h,"",,,Coordinate axis label
+units,s,h,"",,,Coordinate axis units
+verbose,b,h,yes,,,Verbose output?

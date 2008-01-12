@@ -1,0 +1,67 @@
+.help ehistory Jun86 language
+.ih
+NAME
+ehistory -- edit and re-execute previous commands
+.ih
+USAGE
+ehistory (or just "e")
+.ih
+PARAMETERS
+None.
+.ih
+DESCRIPTION
+The \fIehistory\fR command calls up a screen editor to edit previously
+executed commands, executing the edited command when return is typed.
+Interrupt (e.g., <ctrl/c> may be used to escape from the editor at any time.
+The type of editor commands recognized is determined by the value of the
+CL environment variable \fIeditor\fR, which may currently be set to
+"edt", "emacs", or "vi".
+
+After the \fIehistory\fR command is entered, the previous command is
+displayed at the bottom of the terminal.  If the previous command was
+a compound statement, or if it extended over more than one line,
+all the lines of the command will be displayed.  To reach a different
+command simply enter the appropriate cursor movement keys for the editor type
+being used.  When the cursor attempts to move above the current command
+the previous command will be displayed.  Similarly when it attempts
+to move below, the next command will appear.  Hitting the return
+key will execute the command currently being edited.
+
+The CL parameter "ehinit" may be used to set the following options:
+.ls [no]standout
+Controls whether the command to be edited is displayed in reverse or
+normal video.
+.le
+.ls eol
+The editor is entered with the cursor positioned to be end of the command line.
+.le
+.ls bol
+The editor is entered with the cursor positioned to be beginning of the command
+line.
+.le
+.ls [no]verify
+If \fIverify\fR is specified, \fIehistory\fR will be automatically entered
+when history commands are entered to recall and execute previous commands.
+If \fInoverify\fR is specified, the commands are recalled and immediately
+executed.
+.le
+.ih
+EXAMPLES
+1. Set no standout and verify modes. 
+
+	cl> ehinit = "nostandout verify".
+
+2. Recall the last "xc" command from the history list and edit it.
+If \fIverify\fR were not enabled the command would simply be repeated.
+
+	cl> ^xc
+.ih
+BUGS
+The command editor really only works well for single line commands;
+multiline command blocks are not easily edited at present.
+VI is poorly emulated at present since only control code editor commands
+are possible.
+.ih
+SEE ALSO
+eparam
+.endhelp

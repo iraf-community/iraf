@@ -1,0 +1,48 @@
+EDITOR_ID       \0              memacs
+EDITOR_CMD      memacs          memacs
+EDIT_INIT       \0              enable_keypad
+EDIT_TERM       \0              disable_keypad
+
+MOVE_UP         ^P              ^P
+MOVE_DOWN       ^N              ^N              
+MOVE_RIGHT      ^F              ^F              
+MOVE_LEFT       ^B              ^B              
+
+MOVE_UP         \e[A            UP_ARROW
+MOVE_DOWN       \e[B            DOWN_ARROW  
+MOVE_RIGHT      \e[C            RIGHT_ARROW
+MOVE_LEFT       \e[D            LEFT_ARROW
+
+NEXT_WORD       \eF             ESC-F
+NEXT_WORD       \ef             ESC-f   
+PREV_WORD       \eB             ESC-B   
+PREV_WORD       \eb             ESC-b   
+MOVE_EOL        ^E              ^E              
+MOVE_BOL        ^A              ^A              
+MOVE_START      \e<             ESC-<   
+MOVE_END        \e>             ESC->   
+
+NEXT_PAGE       ^V              ^V
+PREV_PAGE       \eV             ESC-V
+PREV_PAGE       \ev             ESC-v
+
+SET_FWD         \0              undefined               
+SET_AFT         \0              undefined       
+TOGGLE_DIR      \0              undefined
+
+DEL_LEFT        \177            DEL     
+DEL_LEFT        ^H              ^H_or_BS        
+DEL_CHAR        ^D              ^D      
+DEL_WORD        \eD             ESC-D   
+DEL_WORD        \ed             ESC-d   
+DEL_LINE        ^K              ^K              
+UNDEL_CHAR      \e^D            ESC-^D  
+UNDEL_WORD      \e^W            ESC-^W
+UNDEL_LINE      \e^K            ESC-^K  
+
+GET_HELP        \e?             ESC-?
+REPAINT         ^L              ^L      
+EXIT_UPDATE     ^Z              ^Z
+EXIT_NOUPDATE   ^C              ^C              
+
+NOMORE_COMMANDS  \0             none

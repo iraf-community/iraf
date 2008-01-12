@@ -1,0 +1,13 @@
+image,s,a,,,,image or image section to be plotted
+floor,r,h,INDEF,,,minimum value to be plotted (INDEF for min)
+ceiling,r,h,INDEF,,,maximum value to be plotted (INDEF for max)
+angh,r,h,-33.0,,,"horizontal viewing angle, degrees"
+angv,r,h,25.0,,,"vertical viewing angle, degrees"
+device,s,h,stdgraph,,,output device
+title,s,h,"imtitle",,,optional title
+label,b,h,no,,,label corner points of plot
+preserve,b,h,yes,,,preserve aspect ratio when decreasing resolution?
+xres,i,h,64,,,number of pixels resolution in x
+yres,i,h,64,,,number of pixels resolution in y
+subsample,b,h,no,,,subsample (vs block average) to reduce resolution?
+append,b,h,no,,,append to an old plot

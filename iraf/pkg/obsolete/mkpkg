@@ -1,0 +1,41 @@
+# Make the OBSOLETE package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_obsolete.x
+	$link	x_obsolete.o libpkg.a -lxtools -o xx_obsolete.e
+	;
+
+install:
+	$move	xx_obsolete.e bin$x_obsolete.e
+	;
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/fixcol.x,  fixcol.gx)
+	    $(GEN) fixcol.gx  -o generic/fixcol.x  $endif
+        $ifolder (generic/fixline.x, fixline.gx)
+	    $(GEN) fixline.gx -o generic/fixline.x $endif
+        ;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@generic
+	@fits
+	@imcombine
+
+	t_fixpix.x	<fset.h> <imhdr.h>
+	t_imtitle.x	<imhdr.h>
+	t_mkhgm.x	<gset.h> <mach.h>
+	t_oimstat.x	<mach.h> <imhdr.h> "oimstat.h"
+	t_radplt.x	<imhdr.h> <error.h> <mach.h> <gset.h>
+	;

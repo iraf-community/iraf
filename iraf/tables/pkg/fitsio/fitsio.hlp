@@ -1,0 +1,175 @@
+.help fitsio Sep93 tables
+.ih
+NAME
+fitsio -- Overview of the `fitsio' package.
+.ih
+DESCRIPTION
+The `fitsio' package is a set of tasks that translate IRAF and text 
+files to and from FITS standard format.  See the "REFERENCES" 
+section below for more information about the FITS standard adopted 
+for this package.  A brief summary of the tasks in `fitsio' is 
+given in the table below; general information about these FITS 
+utilities can be found in the following sections. 
+
+.nf
+                     Table 1.  FITS Utilities
+ +---------------------------------------------------------------+
+ | Task        | Description                                     |
+ +---------------------------------------------------------------+
+ | fits_exampl | Background information about FITS format files  |
+ | catfits     | Produce a catalog of FITS file contents         |
+ | fitscopy    | Copy a FITS file: disk or tape -> disk or tape  |
+ | geis        | Background information about GEIS format files  |
+ | gftoxdim    | Multigroup GEIS -> one group + extra dimension  |
+ | strfits     | Convert FITS files -> tables and/or images      |
+ | stwfits     | Convert tables and/or images -> FITS files      |
+ | xdimtogf    | One-group GEIS + extra dimension -> multi-group |
+ +---------------------------------------------------------------+
+.fi
+
+Note that the input or output FITS files for these tasks can in 
+general reside either on disk or on tape, but the IRAF files reside 
+strictly on disk.  
+.ih
+READING AND WRITING FITS FILES
+The task `stwfits' can create FITS files from IRAF supported data 
+structures, including both native IRAF (OIF) and Space Telescope 
+(GEIS) image formats, as well as STSDAS binary tables and ASCII
+files.  This task is especially useful for converting multigroup 
+GEIS images to FITS files.  The FITS files are by default written 
+in IEEE format, where the precision of single and double precision 
+floating-point numbers are preserved (or nearly preserved: type 
+"help stwfits" for more details) without the need for scaling the 
+data.  However, this option can be disabled (for images) if scaling 
+is desired for some reason.  
+
+The `stwfits' task can also write STSDAS tables as FITS files with 
+TABLE (ASCII) or BINTABLE (binary) extensions.  Similarly, it can 
+write a text file with up to 132 characters per line as a standard 
+FITS TABLE (ASCII) extension.  However, the input text file MUST 
+have the extension "txt" or "trl".  
+
+The `strfits' task can convert FITS files to IRAF data structures, 
+particularly the FITS files produced by the `stwfits' task. 
+`strfits' can read FITS files with any number of the 
+standard extensions: IMAGE, TABLE, BINTABLE.  If there are one or 
+more IMAGE extensions in the FITS file, and if the FITS header 
+FILENAME keyword is set properly (e.g., FILENAME = 'geis.c1h[1/4]'), 
+`strfits' will attempt to create a multigroup GEIS file; otherwise 
+separate images or tables (as appropriate) will be created.  
+.ih
+FITS FORMAT FOR HST DATA
+Data from the Hubble Space Telescope is stored on disk in 
+Space Telescope Format (STF, also 
+called GEIS) format.  Like the native IRAF (or OIF) format, GEIS 
+images are stored in two files, with default file extentions of 
+".hhh" for the header and ".hhd" for the binary data.  The two 
+biggest differences between OIF and GEIS files, from the users' 
+point of view, are that GEIS format can accomodate multiple images 
+in a single file, and that some of the image descriptors are found 
+in the binary data file, rather than in the header file.  
+
+The GEIS multi-group format was designed to accommodate data such 
+as time-resolved spectroscopy, where many small data arrays share 
+common header information, but also have a certain amount of 
+array-specific information.  That array-specific information is stored in 
+the binary data file just after each image in a special area called 
+the "group parameter block" (GPB).  The description of each group 
+parameter (GP) in the GPB is given in the GEIS header file.  The 
+`strfits' and `stwfits' tasks can preserve this structure when 
+translating GEIS files to and from FITS.  More information about 
+the GEIS format can be found in the `geis' help page or the "STSDAS 
+Users Guide".  
+
+As its name implies, FITS format is very flexible.  Indeed, the 
+various extensions to FITS can yield quite complex data structures. 
+As such, there is more than one legitimate way to map multi-group 
+GEIS files to FITS format.  Each method can be accomodated by the 
+`strfits' and `stwfits' tasks, but each presents different 
+requirements when using `strfits' to recreate the original GEIS 
+image.  The mappings are summarized below; the details can be found 
+in the help files for `fits_exampl', `strfits', and `stwfits'.  
+
+.ls Multi-group -> Multiple FITS Files
+This is perhaps the simplest way to map from GEIS to FITS, in that 
+each group is written to a separate FITS image.  Here each FITS 
+header is composed of the GEIS ASCII header, with the addition of 
+new "keyword = value" pairs to contain the information from the GPB 
+for that group.  Note that the information about which keywords 
+were taken from the GPB is lost with this mapping, so that a 
+template image header will be needed to re-create the original GEIS 
+file with `strfits'.  In this case, it is best to use a header file 
+that has the original GPB description (e.g., if the FITS files 
+contain WF/PC data, use a header file such as "scidata$wfpc.hhh"), 
+rather than the minimal default header if a template is not 
+supplied. 
+.le
+.ls Multi-group -> Stacked Image -> Single FITS File
+This is presently the best way to map between GEIS and FITS files 
+because the GPB information is retained.  In this case an extra 
+dimension is added to the FITS file and the length of that axis is 
+the number of groups in the input GEIS file.  As well, the names of 
+the group parameters are appended to the main FITS header, with 
+values taken from the first group.  The GPB values for each group 
+are stored in a "TABLE" extension in the same FITS file.  The value 
+of the keywords "FILENAME" and "EXTNAME" contain the name of the 
+original GEIS file followed by "_cvt", which indicates to the user 
+that the FITS file originated from a multi-group GEIS file.  
+.le
+.ls Multi-group -> Single FITS File with Extensions
+Instead of adding an extra dimension (as in case 2) to the FITS 
+file, the separate groups are written to a single FITS file with 
+FITS "IMAGE" extensions.  There is no attached table, and the GPB
+keywords and values are part of the header of the corresponding 
+IMAGE extensions.  The major difference with the first case is that 
+there is only one FITS file.  This IMAGE extension capability is 
+useful to avoid losing the logical connection between the separate 
+image groups.  WARNING: It is NOT yet possible to recreate the 
+original GEIS file GPB from a FITS file with multiple "IMAGE" 
+extensions.  This capability is planned for the near future.  
+.le
+
+WARNING: The IRAF tasks `rfits' and `wfits' in the `dataio' 
+package are NOT designed to handle multi-group GEIS files or binary 
+tables.  Users should be aware that these IRAF FITS tasks may not 
+produce data structures that are compatible with certain STSDAS 
+tasks!  
+.ih
+STACKING AND UN-STACKING GEIS FILES
+The `gftoxdim' task in the 'fitsio' package will stack the groups in 
+a multigroup GEIS image to produce a new, single-group GEIS image 
+with one more dimension.  The length of the axis in the highest 
+dimension will be the number of groups in the original image.  A 
+separate STSDAS binary table will also be created which contains 
+the information in the GPB.  
+
+The `xdimtogf' task will do the opposite of `gftoxdim': it will 
+convert a GEIS file with an added dimension (plus an STSDAS table 
+with the GPB information) to the original multigroup GEIS file.  
+Both of these operations, if needed, are done automatically by 
+`strfits' and `stwfits', and so neither `gftoxdim' nor `xdimtogf' 
+is needed for translating to and from FITS format.  These tasks are 
+merely provided as a general tool for users.  
+.ih
+CONTENTS OF FITS FILES
+The `catfits' task will generate a catalog of FITS files, whether 
+on disk or (more commonly) on tape.  The output can be the full 
+FITS header for each file, and each extension within a file; or a 
+summary of the file, including the file name (for disk files) or 
+file number (for tape files), the number and type of extensions (if 
+present), the number of axes and their lengths, the data type, and 
+the scaling parameters.  The specific information in the summary is 
+user-configurable.  
+.ih
+SEE ALSO
+catfits, fits_exampl, fitscopy, geis, gftoxdim, strfits, stwfits, 
+xdimtogf
+.ih
+REFERENCES
+This package was developed by Nelson Zarate (STScI) and is based on 
+the IRAF `dataio' package of FITS utilities.  The FITS standard 
+adopted for this package is that described by the NASA/OSSA Office 
+of Standard and Technology document entitled "Implementation of the 
+Flexible Image Transport System (FITS)" including the appendix.  
+
+.endhelp 

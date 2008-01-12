@@ -1,0 +1,11 @@
+# Make the local DIGIPHOT libraries
+
+relink:
+update:
+
+$update libpttables.a
+$exit
+
+libpttables.a:
+	@pttables
+	;

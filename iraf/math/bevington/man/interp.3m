@@ -1,0 +1,29 @@
+.TH INTERP 3M
+.SH NAME
+interp
+.SH DESCRIPTION
+subroutine interp.f 
+
+source
+  Bevington, pages 266-267.
+
+purpose
+  interpolate between data points to evaluate a function
+
+usage 
+  call interp (x, y, npts, nterms, xin, yout) 
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  npts   - number of pairs of data points
+  nterms - number of terms in fitting polynomial
+  xin    - input value of x
+  yout   - interpolated value of y
+
+subroutines and function subprograms required 
+  none
+
+comments
+  valid for nterms up to 10
+  value of nterms may be modified by the program

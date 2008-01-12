@@ -1,0 +1,8 @@
+# GTY -- This directory contains the generalized termcap style database
+# reader.  Adapted from iraf$sys/tty/.
+
+		  gty = gtyopen (termcap_file, device, ufields)
+		       gtyclose (gty)
+		   cp = gtycaps (gty)
+	     pval = gtyget[bir] (gty, cap)
+	       nchars = gtygets (gty, cap, outstr, maxch)

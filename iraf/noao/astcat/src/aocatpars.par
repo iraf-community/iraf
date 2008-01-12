@@ -1,0 +1,37 @@
+# The AOCATPARS parameter file
+
+# The standard output catalog format parameter set. 
+
+# Global parameters
+
+ocatsystem,s,h,"J2000",,,The output catalog celestial coordinate system
+
+# Standard column / field definitions
+
+oid,s,h,"",,,"The id field"
+
+ora,s,h,"",,,"The ra / longitude field"
+odec,s,h,"",,,"The dec / latitude field"
+oera,s,h,"",,,"The ra / longitude error field"
+oedec,s,h,"",,,"The dec / latitude error field"
+
+opmra,s,h,"",,,"The ra / longitude proper motion field"
+opmdec,s,h,"",,,"The dec / latitude proper motion field"
+oepmra,s,h,"",,,"The ra / longitude proper motion error field"
+oepmdec,s,h,"",,,"The dec / latitude proper motion error field"
+
+ocoosystem,s,h,"",,,"The celestial coordinate system field"
+oequinox,s,h,"",,,"The epoch of the equinox field"
+oepoch,s,h,"",,,"The epoch of the observation field"
+
+opx,s,h,"",,,"The parallax field"
+orv,s,h,"",,,"The radial velocity field"
+oepx,s,h,"",,,"The parallax error field"
+oerv,s,h,"",,,"The radial error velocity field"
+
+omags,s,h,"",,,"The magnitude field(s)"
+ocolors,s,h,"",,,"The color indices field(s)"
+oemags,s,h,"",,,"The magnitude error field(s)"
+oecolors,s,h,"",,,"The color indices error field(s)"
+
+# Additions ....

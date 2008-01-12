@@ -1,0 +1,32 @@
+#  Make file for tables.fitsio package
+#  Revision history:
+#	17-Sep-1993 by RAShaw:	Rename `fits2tape' to `fitscopy'
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update fitsio.a
+linkonly:
+	$omake	x_fitsio.x
+	$link	x_fitsio.o fitsio.a -lgilib -lstxtools -ltbtables -lxtools \
+		-o xx_fitsio.e
+	;
+
+install:
+	$move	xx_fitsio.e tablesbin$x_fitsio.e
+	;
+
+fitsio.a:
+	t_gftoxdim.x   <imhdr.h>
+	t_xdimtogf.x   <imhdr.h>
+	@fitscopy
+	@catfits
+	@strfits
+	@stwfits
+	;

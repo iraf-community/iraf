@@ -1,0 +1,321 @@
+.help geis Aug93 tables.fitsio
+.ih
+NAME
+geis -- Description of the GEIS (or STF) data format.
+.ih
+INTRODUCTION
+To properly analyze data from the Hubble Space Telescope you need
+to understand the basic formats used for HST data.  IRAF and STSDAS
+applications packages can read and write images in multiple formats;
+while this makes it possible to use both NOAO and STScI applications
+on a single data set, users need to be aware of some subtle
+differences between the data formats.
+
+The IRAF system's native data format is known simply as the "IRAF"
+format, or "OIF" (Old IRAF Format).  The OIF image format is
+conceptually quite simple: a header file contains various 
+descriptive information, and a separate binary data file contains
+the actual pixel values.  The header file always has the file
+extension ".imh", and the pixel file always has the extension
+".pix".  Thus, one "image" actually consists of two files.
+
+Data from HST are stored in "GEIS" (or "STF") format.  Like OIF
+format, images are stored in two files, with default file
+extentions of ".hhh" for the header and ".hhd" for the binary data.
+(There are many other valid GEIS file extensions though: see below.)
+The two biggest differences between OIF and GEIS files, from the
+users' point of view, are that GEIS format can accomodate multiple
+images in a single file, and that some of the image descriptors
+are found in the binary data file, rather than in the header file.
+The most important features of GEIS files, and the IRAF utilities 
+for dealing with them, are described in the following sections.
+More detailed information can be found in the "STSDAS Users Guide".
+.ih
+DATA STRUCTURE OVERVIEW
+GEIS data files have a structure that is based on, but significantly
+different from, the FITS group format.  The GEIS group format was
+designed to accommodate data such as time-resolved spectroscopy,
+where many small data arrays share common header information, but
+also have a certain amount of array-specific information.  For
+example, the FOS and HRS instruments aboard HST have observing modes
+for time-resolved spectroscopy which can produce hundreds of
+spectra, all of the same size (in pixels), and all for the same
+observation set.  If these were each stored as separate files, the
+overhead in file size and management would be horrendous.  These
+data are, therefore, combined into single observation sets in GEIS
+group format.  In this case, the descriptors that are common for
+all the spectra (e.g., the size of each spectrum, the instrument
+configuration, etc.) are stored in the header file, but the
+group-specific descriptors (e.g., the offsets for the GIMP
+correction) would be stored with the binary data.
+
+Parameters that are group- (or data subset-) specific parameters
+are called "group parameters," and they are stored in a reserved
+area of the binary data file called the "group parameter block".
+Each group of binary data has a reserved area for the group
+parameter block, allowing each group to have different values for
+group-dependent parameters.  The structure looks something like
+this:
+.nf
+
+           Figure 1: Schematic of GEIS File Structure
+
+    Header (*.hhh) file:
+    ______________
+    |            |              \
+    |            |              | ----  ASCII Header
+    |____________|              /
+
+
+    Binary Data (*.hhd) file:  _                   _
+    -------------------------   \                   \
+    | | | | | | | | | | | | |    \                  |
+    -------------------------    |                  |
+    | | | | | | | | | | | | |    |                  |
+    -------------------------    | --- Pixel Data   |
+    | | | | | | | | | | | | |    |                  |
+    -------------------------    |                  |
+    | | | | | | | | | | | | |    /                  | -- Group 1
+    -------------------------  _/                   |
+    | | |                       \                   |
+    -----                        \     Group        |
+    | | |                        | --- Parameter    |
+    -----                        /     Block        |
+    | | |                      _/                  _/
+    -------------------------   \                   \
+    | | | | | | | | | | | | |    \                  |
+    -------------------------    |                  |
+    | | | | | | | | | | | | |    |                  |
+    -------------------------    | --- Pixel Data   |
+    | | | | | | | | | | | | |    |                  |
+    -------------------------    |                  |
+    | | | | | | | | | | | | |    |                  | -- Group 2
+    -------------------------    |                  |
+    | | | | | | | | | | | | |    /                  | -- Group 2
+    -------------------------  _/                   |
+    | | |                       \                   |
+    -----                        \     Group        |
+    | | |                        | --- Parameter    |
+    -----                        /     Block        |
+    | | |                      _/                  _/
+    -----
+
+.fi
+
+Note that the "group parameter block" (GPB) follows the binary data 
+for each group, and each GPB has the same size (in bytes) for all 
+groups.  The GPB is a binary structure whose elements are described 
+in the header file by the keywords "PTYPEn","PDTYPEn" and "PSIZEn", 
+where "n" is the group parameter number.  There are "PCOUNT" of 
+these group parameters in each block, and the total size of the 
+GPB is given by "PSIZE" in units of bits; the number of groups is 
+given by "GCOUNT".  
+.ih
+IMAGE DESCRIPTORS
+Both IRAF and GEIS data structures have header information that can
+be retrieved by using the associated keyword name.  GEIS data
+headers are very similar to standard FITS format headers, but IRAF
+data headers are a hybrid: the most frequently accessed header
+information (such as the data dimension, length of data axes, etc.)
+is stored in binary form, while  less frequently used information
+is stored in a FITS-style format as "keyword = value" pairs.
+GEIS header files are composed solely of ASCII text, and can be
+printed using standard text-handling facilities (`type', `page',
+etc.).  However, extreme care must be taken if you edit a header
+directly, using the task `edit'.  The lines in GEIS header are
+80-character, fixed-length ASCII records.  Any change you make in
+the text must not change the length of a line from 80 characters.
+
+Since the actual values of group parameters are stored in the group
+parameter block with the binary data, you cannot change their values
+with a text editor.  To modify group parameter values you must use
+the tasks `eheader' or `grpmod' in the `stsdas.toolbox.headers' 
+package.  Similarly, you cannot view the values of group parameters 
+simply by looking at the ASCII text header.  Rather, you must use a 
+header listing tool such as `images.imheader', which will list the 
+full set of header parameters, including both the main header and 
+the group parameter block.  For example, the first several lines of 
+the file "fos.hhh" might look like:
+
+.nf
+cl> imheader fos.hhh long+
+fos.hhh[2064][real]: FOS[1/1]
+No bad pixels, no histogram, min=0., max=11182.
+Line storage mode, physdim [2064], length of user area 3889 s.u.
+Created Fri 10:41:39 3-Feb-90, Last modified Mon 09:22:43 2-Nov-91
+Pixel file 'fos.hhd' [ok]
+GROUPS  =                    T
+GCOUNT  =                    1
+PCOUNT  =                    6
+PSIZE   =                  256
+DATAMIN =                   0.
+DATAMAX =               11182.
+CRPIX1  =                   1.
+CRVAL1  =             3234388.
+CTYPE1  = 'CHANNEL '
+CD1_1   =                   1.
+        :
+        :
+.fi
+
+Note that the six group parameters are listed as part of the normal
+header, by name (DATAMIN, DATAMAX, CRPIX1, CRVAL1, CTYPE1, CD1_1),
+and their values have been extracted from the binary data for the
+listing.  It is not immediately obvious which header parameters are
+from the main ASCII header, and which are from the group parameter
+block, but from the user's (and programmer's) point of view it does
+not matter.  If you need to know the origin of a parameter, just
+search the file header for the string PTYPE, and you will find the
+names of all group parameters:
+
+.nf
+        cl> match PTYPE fos.hhh
+        PTYPE1  = 'DATAMIN '           /
+        PTYPE2  = 'DATAMAX '           /
+        PTYPE3  = 'CRPIX1  '           /
+        PTYPE4  = 'CRVAL1  '           /
+        PTYPE5  = 'CTYPE1  '           /
+        PTYPE6  = 'CD1_1   '           /
+.fi
+.ih
+DISK BINARY FORMATS
+The binary data is stored in the host computer's natural format for 
+all supported data types.  The physical structure of GEIS files is 
+machine dependent.  On VAX/VMS systems, a GEIS file header is a 
+sequential file consisting of fixed-length 80-byte records.  The 
+binary data are written as VAX reals, VAX integers (i.e., byte-
+swapped, or little-Endian format), or whatever the default machine 
+format is for the given data type.
+
+The UNIX file system is much simpler than the VMS file system, and
+all files are treated as byte streams.  The GEIS header file is
+still composed of 80-character card images, with each card image
+terminated by a "\n" (newline).  The binary data is a byte stream
+just as on VMS, but with the data written in the natural binary
+format of the host system.  On most Unix systems (Sun, Alliant, 
+Convex, etc.) the floating point format is the IEEE floating point 
+standard, and data is not byte-swapped (as it is on the VAX); the 
+byte order is big-Endian.  On the DECStation family (based on the 
+MIPS RISC chip) the floating point format is IEEE, but all data is 
+byte-swapped (little Endian).
+.ih
+DATA FILE NAMING CONVENTIONS
+As noted above, IRAF (OIF) images are stored in two different files 
+(possibly in different directories): the header file and the pixel 
+file.  The header file always has the extension ".imh", and the 
+pixel file always has the extension ".pix".  Certain IRAF packages, 
+such as `noao.twodspec', have additional conventions for naming 
+files.  Please refer to the package documentation for details.
+
+GEIS images are also stored in two different files, but ALWAYS in 
+the same directory: the ASCII header file and the binary data file.  
+As with OIF images, the root part of the file name must be identical 
+for both the header and data parts of the image.  The extensions 
+must be three characters long, and the third character must be "h" 
+for header file extensions and "d" for data file.  Other than that, 
+the extensions must be identical.
+
+The default extensions for GEIS files are ".hhh" (header) and ".hhd"
+(data).  However, the data files produced by the HST Routine Science
+Data Pipeline (RSDP) use different conventions.  Usually, the
+raw data (i.e., reformatted data from the spacecraft) have file
+extensions of ".d0h" and ".d0d", and the calibrated data have
+extensions like ".c0h" and ".c0d".  See the specific instrument
+packages for details.
+
+Applications tasks in IRAF and STSDAS can generally figure out what 
+file you want to process without you having to type the file name
+extension, at least if you are using GEIS files with the standard 
+default extensions of ".hhh" and ".hhd".  In such cases, you can 
+drop the explicit reference to ".hhh" or ".imh" when specifying the
+name of the input image.  If the input GEIS file has an extension 
+other than ".hhh" and ".hhd", you must specify it.
+
+File formats can also be controlled by the environment 
+variable "imtype" when, for example, an image is created by a FITS reading
+task.  That is, "imtype" can be used to define the format of the 
+newly-created file without giving an explicit file name extension. 
+To have GEIS format files created by default, type "set imtype=hhh".  
+To have OIF format files created by default, type "set imtype=imh".
+
+Finally, OIF header (.imh) and pixel (.pix) files can reside in
+different directories.  (However, it is ESSENTIAL that GEIS header
+and data files reside in the SAME directory.)  If you want to have 
+your OIF ".pix" files in the same directory as the ".imh" files, 
+change the line near the top of your login.cl file to read:
+
+.nf
+        set imdir = "HDR$"
+.fi
+.ih
+FACILITIES FOR WORKING WITH MULTI-GROUP IMAGES
+Since GEIS files can contain multiple images, one per group, it is
+sometimes necessary to specify a particular group upon 
+which an application program should operate.  This problem is solved through
+a feature of the IRAF image section notation.  In the following
+example:
+
+.nf
+    cl> imarith mydata.hhh[101:200,101:200] + 2. output.hhh
+.fi
+
+the task `imarith' will add 2.0 to a 100x100 pixel subimage of 
+"mydata.hhh" from the first group and store the result in the new 
+image "output.hhh" with one group.  For GEIS image data with 
+multiple groups in the same file, the group number is specified 
+using the same square bracket notation.  For example, if 
+"mydata.hhh" were a 10-group file, the command:
+
+.nf
+    cl> imarith mydata.hhh[2][101:200,101:200] + 2. output.hhh
+.fi
+
+would operate as before, but only on group 2 of the input file, and
+would write the output file as a single-group file.  The bracket 
+notation is unambiguous because to specify an image section you
+need to have more than a single digit in the brackets.  HOWEVER, be
+aware that the group specification MUST preceed the image section!
+
+The output from any operation on a single group of a multigroup GEIS
+file is also a single group output file.  It is possible, however,
+to create multigroup output files if it is done the first time the
+new image is written, for example:
+
+.nf
+        cl> imcopy mydata.hhh[2] newimage.hhh[3/4]
+        cl> imcopy mydata.hhh[3] newimage.hhh[4]
+.fi
+
+The first command copies group 2 of the input image to group 3 of
+the output image, and creates the output image with enough storage
+space to accommodate 4 groups.  The other 3 groups will be empty,
+but you could copy other data into them as long as the image
+dimensions match.  Note that the total group count (4) is not 
+repeated in the second command.  If you were to repeat it, IRAF 
+would think you wanted to create an entirely new file, rather than 
+updating a group in an existing file, and would warn that you were 
+trying to overwrite an existing file.  Similarly, other standard 
+tasks can be used to create multi-group output files:
+
+.nf
+        cl> imarith mydata.hhh[10] * 2. newimage.hhh[2/5]
+.fi
+
+There is currently no automatic way to direct an arbitrary IRAF or
+STSDAS task to process all groups in an input image and write the
+results to corresponding groups in an output image.  However, there
+are a number of STSDAS tasks, particularly in the 'toolbox.imgtools',
+'fitsio', and 'hst_calib.ctools' packages, that simplify using group
+format data.  (Also, the pipeline calibration tasks in the 
+instrument-specific packages explicitly process all groups in a 
+GEIS file.)  For example if you want to get the middle subsection 
+of a WF/PC file for all groups with one command, you can use the 
+`gcopy' task in the 'toolbox.imgtools' package: 
+
+.nf
+        cl> gcopy wfpc.hhh[401:600,401:600] new.hhh groups="*"
+.fi
+.ih
+SEE ALSO
+hst_calib, headers, imgtools, convfile
+.endhelp

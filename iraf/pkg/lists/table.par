@@ -1,0 +1,5 @@
+input_files,s,a,,,,list of files to be formatted as tables
+first_col,i,h,7,0,,offset to first column of table
+last_col,i,h,0,0,,offset to last column of table (0 for right margin)
+ncols,i,h,0,0,,number of columns (0 to get max that will fit)
+maxstrlen,i,h,0,0,,maximum string length for table entry (0 if none)

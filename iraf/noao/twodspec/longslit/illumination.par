@@ -1,0 +1,18 @@
+# ILLUMINATION -- Determine illumination calibrations
+
+images,s,a,,,,Longslit calibration images
+illuminations,s,a,,,,Illumination function images
+interactive,b,h,yes,,,Interactive illumination fitting?
+bins,s,h,"",,,Dispersion bins
+nbins,i,h,5,1,,Number of dispersion bins when bins = ""
+sample,s,h,"*",,,Sample of points to use in fit
+naverage,i,h,1,,,Number of points in sample averaging
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+low_reject,r,h,0.,0.,,Low rejection in sigma of fit
+high_reject,r,h,0.,0.,,High rejection in sigma of fit
+niterate,i,h,1,0,,Number of rejection iterations
+grow,r,h,0.,0.,,Rejection growing radius
+interpolator,s,h,"poly3","nearest|linear|poly3|poly5|spline3",,Interpolation type
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

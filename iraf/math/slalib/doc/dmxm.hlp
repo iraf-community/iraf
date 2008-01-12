@@ -1,0 +1,34 @@
+.help dmxm Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDMXM (A, B, C)
+
+     - - - - -
+      D M X M
+     - - - - -
+
+  Product of two 3x3 matrices:
+
+      matrix C  =  matrix A  x  matrix B
+
+  (double precision)
+
+  Given:
+      A      dp(3,3)        matrix
+      B      dp(3,3)        matrix
+
+  Returned:
+      C      dp(3,3)        matrix result
+
+  To comply with the ANSI Fortran 77 standard, A, B and C must
+  be different arrays.  However, the routine is coded so as to
+  work properly on the VAX and many other systems even if this
+  rule is violated.
+
+  P.T.Wallace   Starlink   5 April 1990
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

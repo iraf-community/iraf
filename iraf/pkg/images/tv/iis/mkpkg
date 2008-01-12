@@ -1,0 +1,25 @@
+# Make the CV (Control Video) display load and control package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_iis.x
+	$link	x_iis.o libpkg.a -o xx_iis.e
+	;
+
+install:
+	$move	xx_iis.e bin$x_iis.e
+	;
+
+libpkg.a:
+	@ids
+	@iism70
+	@src
+	;

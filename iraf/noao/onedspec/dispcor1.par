@@ -1,0 +1,5 @@
+change,s,q,,"yes|no|NO",,"  Change wavelength coordinate assignments?"
+w1,r,q,,,,"  Starting wavelength"
+w2,r,q,,,,"  Ending wavelength"
+dw,r,q,,,,"  Wavelength interval per pixel"
+nw,i,q,,,,"  Number of output pixels"

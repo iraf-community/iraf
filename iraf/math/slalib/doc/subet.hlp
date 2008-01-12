@@ -1,0 +1,41 @@
+.help subet Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slSUET (RC, DC, EQ, RM, DM)
+
+     - - - - - -
+      S U E T
+     - - - - - -
+
+  Remove the E-terms (elliptic component of annual aberration)
+  from a pre IAU 1976 catalogue RA,Dec to give a mean place
+  (double precision)
+
+  Given:
+     RC,DC     dp     RA,Dec (radians) with E-terms included
+     EQ        dp     Besselian epoch of mean equator and equinox
+
+  Returned:
+     RM,DM     dp     RA,Dec (radians) without E-terms
+
+  Called:
+     slETRM, slDS2C, sla_,DVDV, slDC2S, slDA2P
+
+  Explanation:
+     Most star positions from pre-1984 optical catalogues (or
+     derived from astrometry using such stars) embody the
+     E-terms.  This routine converts such a position to a
+     formal mean place (allowing, for example, comparison with a
+     pulsar timing position).
+
+  Reference:
+     Explanatory Supplement to the Astronomical Ephemeris,
+     section 2D, page 48.
+
+  P.T.Wallace   Starlink   10 May 1990
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

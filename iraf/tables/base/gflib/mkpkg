@@ -1,0 +1,45 @@
+# Make the gflib library
+# Author: B.Simon: 9-Sept-98
+
+$checkout libgflib.a ../
+$update   libgflib.a
+$checkin  libgflib.a ../
+
+$exit
+
+libgflib.a:	
+	gf_addpar.x	
+	gf_delpar.x	
+	gf_gcount.x	<imio.h>  "gf.h"
+	gf_geis.x	"gf.h"
+	gf_gfind.x	<imio.h>  <imhdr.h>  "gf.h"  "gf_gfind.com"
+	gf_gstfval.x	<syserr.h>  <imhdr.h>  <mach.h>  "gf.h"
+	gf_map.x	<syserr.h>  <imhdr.h>  <imio.h>  "gf.h"
+	gf_opengr.x	<imio.h>  <imhdr.h>  <syserr.h>  "gf.h"
+	gf_pstfval.x	<syserr.h>  "gf.h"
+	gf_put.x	
+	gf_unmap.x	"gf.h"
+	gfboth.x	<imhdr.h>  "gf.h"
+	gfbuilddb.x	<imhdr.h>  "gf.h"
+	gfchkkey.x	"gf.h"
+	gfdb.x		"gf.h"  "gfdb.com"
+	gfdump.x	<imhdr.h>  "gf.h"  "gfdb.com"
+	gfextend.x	<imhdr.h>  "gf.h"
+	gffixcmt.x	
+	gffreedb.x	
+	gfgetext.x	"gf.h"
+	gfgetgnum.x	<ctype.h>  "gf.h"
+	gfhasgroup.x	<imhdr.h>
+	gfhash.x	<imhdr.h>  "gf.h"
+	gfimname.x	"gf.h"
+	gfimtype.x	<ctype.h>  <imio.h>  <imhdr.h>  "gf.h"
+	gfmakedb.x	<imhdr.h>  "gf.h"
+	gfmergegpb.x	<mach.h>  <imhdr.h>  "gf.h"
+	gfnewcopy.x	"gf.h"
+	gfprimary.x	<imhdr.h>  <imio.h>  "gf.h"
+	gfsplitua.x	<imhdr.h>  <imio.h>  "gf.h"
+	gfupfits.x	<syserr.h>  <imhdr.h>  <imio.h>  "gf.h"
+	gfupuser.x	<syserr.h>  <imhdr.h>  <imio.h>
+	;
+
+

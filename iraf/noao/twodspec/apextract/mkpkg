@@ -1,0 +1,76 @@
+# APEXTRACT
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	apextract
+	;
+
+install:
+	$move	xx_apextract.e noaobin$x_apextract.e
+	;
+
+apextract:
+	$omake	x_apextract.x
+	$link	x_apextract.o libpkg.a -lxtools\
+		-lcurfit -liminterp -lllsq -o xx_apextract.e
+	;
+
+libpkg.a:
+	apalloc.x	apertures.h
+	apanswer.x	
+	apcenter.x	<pkg/center1d.h>
+	apcolon.x	apertures.h <error.h> <gset.h> <imhdr.h>
+	apcopy.x	apertures.h
+	apcveval.x	<math/curfit.h>
+	apcvset.x	apertures.h <math/curfit.h>
+	apdb.x		apertures.h <math/curfit.h> <pkg/dttext.h>
+	apdefault.x	apertures.h <imhdr.h>
+	apdelete.x	
+	apedit.x	apertures.h <gset.h> <imhdr.h> <mach.h> <pkg/gtools.h>
+	apextract.x	apertures.h <error.h> <imhdr.h> <mach.h>\
+			<math/iminterp.h> <pkg/gtools.h>
+	apfind.x	apertures.h <imhdr.h> <mach.h>
+	apfindnew.x	apertures.h <mach.h>
+	apfit.x		apertures.h <imhdr.h> <imset.h> <pkg/gtools.h>
+	apgetdata.x	<imhdr.h>
+	apgetim.x	
+	apgmark.x	apertures.h <pkg/rg.h>
+	apgraph.x	apertures.h <pkg/gtools.h>
+	apgscur.x	apertures.h
+	apicset.x	apertures.h <imhdr.h>
+	apids.x		apertures.h <error.h> <mach.h>
+	apimmap.x	<imhdr.h>
+	apinfo.x	apertures.h
+	apio.x		<time.h>
+	apmask.x	apertures.h <imhdr.h> <pmset.h>
+	apmw.x		<error.h> <imhdr.h> <imio.h> <mwset.h>
+	apnearest.x	apertures.h <mach.h>
+	apnoise.x	apertures.h <gset.h> <pkg/gtools.h>
+	apparams.x	
+	appars.x	<math/iminterp.h>
+	apprint.x	apertures.h
+	approfile.x	apertures.h <gset.h> <mach.h> <math/curfit.h>
+	aprecenter.x	apertures.h
+	apresize.x	apertures.h
+	apscatter.x	apertures.h <error.h> <imhdr.h> <imset.h> <pkg/gtools.h>
+	apselect.x	apertures.h
+	apshow.x	apertures.h
+	apskyeval.x	apertures.h <math/iminterp.h> <mach.h>
+	apsort.x	apertures.h
+	aptrace.x	apertures.h <imhdr.h> <math/curfit.h> <pkg/center1d.h>\
+			<pkg/gtools.h>
+	apupdate.x	apertures.h <gset.h>
+	apvalues.x	apertures.h
+	apvariance.x	apertures.h <gset.h>
+	apylevel.x	
+	peaks.x	
+	t_apall.x	apertures.h <error.h> <imhdr.h> <pkg/gtools.h>
+	;

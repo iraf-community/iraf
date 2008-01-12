@@ -1,0 +1,5 @@
+# Root help directory for the TABLES packages.  This dummy package is necessary
+# in order to have `tables' appear as a module in some package, so that the user
+# can type "help tables" (with the `tables' given as a task).
+
+_tables		pkg = tables$base/roottables.hd

@@ -1,0 +1,11 @@
+# CATFITS parameters
+fits_file,f,a,mta,,,FITS data source
+file_list,s,a,,,,File list
+format_file,s,h,"",,,Output format file?
+log_file,s,h,"",,,Output log file?
+long_header,b,h,no,,,Print FITS header cards?
+short_header,b,h,yes,,,Print short header?
+ext_print,b,h,yes,,,Print extension liners?
+offset,i,h,0,,,Tape file offset
+version,s,h,"08-Mar-2001",,,Catfits version
+mode,s,h,ql,,,

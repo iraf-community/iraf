@@ -1,0 +1,15 @@
+
+# _MSFINDSPEC1 -- Create a new database, find the peaks, trace, and fit a
+# function.
+
+image,f,a,,,,Image
+sample_lines,s,a,"10x50",,,Sample image lines
+start,i,a,1,,,Starting image line
+min_nspectra,i,a,1,,,Minimum number of spectra to be found
+max_nspectra,i,a,100,,,Maximum number of spectra to be found
+separation,i,a,20,,,Minimum separation between spectra
+threshold,r,a,0.,,,Minimum peak threshold for selecting spectra
+contrast,r,a,0.1,,,Maximum contrast between peaks
+width,r,a,10,,,Width of spectra
+naverage,i,a,20,1,,Number of lines to average
+verbose,b,a,no,,,Verbose output?

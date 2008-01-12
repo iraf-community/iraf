@@ -1,0 +1,40 @@
+# ARTDATA
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	artdata
+	;
+
+install:
+	$move	xx_artdata.e noaobin$x_artdata.e
+	;
+
+artdata:
+	$set LIBS = "-lsmw -lxtools -lcurfit -liminterp"
+	$omake	x_artdata.x
+	$link	x_artdata.o libpkg.a $(LIBS) -o xx_artdata.e
+	;
+
+libpkg.a:
+	@lists
+	mkheader.x	<ctype.h> <imhdr.h> <imio.h>
+	mktemplates.x	mktemplates.com <error.h> <imhdr.h> <math.h>\
+			<math/iminterp.h>
+	numrecipes.x	<math.h>
+	t_mk1dspec.x	<error.h> <imhdr.h>
+	t_mk2dspec.x	<error.h> <imhdr.h> <math/iminterp.h>
+	t_mkechelle.x	<error.h> <imhdr.h> <math.h>
+	t_mkheader.x	<ctype.h> <error.h> <imhdr.h>
+	t_mknoise.x	<error.h> <imhdr.h> <mach.h>
+	t_mkobjects.x	<error.h> <imhdr.h> <math.h> <mach.h>
+	t_mkpattern.x	<error.h> <imhdr.h>
+	voigt.x
+	;

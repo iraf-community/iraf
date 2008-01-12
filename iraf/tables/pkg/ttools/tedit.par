@@ -1,0 +1,6 @@
+table,f,a,,,,Input table
+columns,s,h," ",,,List of columns to edit
+silent,b,h,no,,,Don't ring bell?
+rdonly,b,h,no,,,Edit table read only?
+inplace,b,h,no,,,Edit table in place?
+mode,s,h,al

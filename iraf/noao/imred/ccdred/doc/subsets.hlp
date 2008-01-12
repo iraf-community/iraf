@@ -1,0 +1,99 @@
+.help subsets Jun87 noao.imred.ccdred
+.ih
+NAME
+subsets -- Description of CCD subsets
+.ih
+DESCRIPTION
+The \fBccdred\fR package groups observation into subsets.
+The image header parameter used to identify the subsets is defined
+in the instrument translation file (see help for \fBinstruments\fR).
+For example to select subsets by the header parameter "filters" the
+instrument translation file would contain the line:
+
+	subset	filters
+
+Observations are generally grouped into subsets based on a common
+instrument configuration such as a filter, aperture mask,
+grating setting, etc.  This allows combining images from several
+different subsets automatically and applying the appropriate
+flat field image when processing the observations.  For example
+if the subsets are by filter then \fBflatcombine\fR will search
+through all the images, find the flat field images (based on the
+CCD type parameter), and combine the flat field images from
+each filter separately.  Then when processing the images the
+flat field with the same filter as the observation is used.
+
+Each subset is assigned a short identifier.  This is listed when
+using \fBccdlist\fR and is appended to a root name when combining
+images.  Because the subset parameter in the image header may be
+any string there must be a mapping applied to generate unique
+identifiers.  This mapping is defined in the file given by
+the package parameter \fIccdred.ssfile\fR.  The file consists of
+lines with two fields (except that comment lines may be included
+as a line by itself or following the second field):
+
+	'subset string'	subset_id
+
+where the subset string is the image header string and the subset_id is
+the identifier.  A field must be quoted if it contains blanks.  The
+user may create this file but generally it is created by the tasks.  The
+tasks use the first word of the subset string as the default identifier
+and a number is appended if the first word is not unique.  The
+following steps define the subset identifier:
+
+.ls (1)
+Search the subset file, if present, for a matching subset string and
+use the defined subset identifier.
+.le
+.ls (2)
+If there is no matching subset string use the first word of the
+image header subset string and, if it is not unique,
+add successive integers until it is unique.
+.le
+.ls (3)
+If the identifier is not in the subset file create the file and add an
+entry if necessary.
+.le
+.ih
+EXAMPLES
+1. The subset file is "subsets" (the default).  The subset parameter is
+translated to "f1pos" in the image header (the old NOAO CCD parameter)
+which is an integer filter position.  After running a task, say
+"ccdlist *.imh" to cause all filters to be checked, the subset file contains:
+
+.nf
+	'2'	2
+	'5'	5
+	'3'	3
+.fi
+
+The order reflects the order in which the filters were encountered.
+Suppose the user wants to have more descriptive names then the subset
+file can be created or edited to the form:
+
+.nf
+	# Sample translation file.
+	'2'	U
+	'3'	B
+	'4'	V
+.fi
+
+(This is only an example and does not mean these are standard filters.)
+
+2. As another example suppose the image header parameter is "filter" and
+contains more descriptive strings.  The subset file might become:
+
+.nf
+	'GG 385 Filter'	GG
+	'GG 495 Filter'	GG1
+	'RG 610 Filter'	RG
+	'H-ALPHA'	H_ALPHA
+.fi
+
+In this case use of the first word was not very good but it is unique.
+It is better if the filters are encoded with the thought that the first
+word will be used by \fBccdred\fR; it should be short and unique.
+.ih
+SEE ALSO
+instruments
+.endhelp

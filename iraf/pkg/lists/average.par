@@ -1,0 +1,10 @@
+option,s,a,new_sample,,,'Type of sample (new_sample, add, subtract)'
+opstring,s,h
+addsub_flag,i,h
+data_value,r,h
+n,i,h
+sum,r,h
+sumsqrs,r,h
+mean,r,h
+variance,r,h
+sigma,r,h

@@ -1,0 +1,21 @@
+# Help directory for the FITSIO package.
+# Revision history:
+#	17-Sep-1993 by RAShaw:	Rename `fits2tape' to `fitscopy'
+#				Add "fits_exampl" task 
+
+$doc		= "tables$pkg/fitsio/doc/"
+$fitscopy	= "tables$pkg/fitsio/fitscopy/"
+$fitsio		= "tables$pkg/fitsio/"
+$catfits	= "fitsio$catfits/"
+$strfits        = "fitsio$strfits/"
+$stwfits        = "fitsio$stwfits/"
+
+catfits		hlp=doc$catfits.hlp,		src=catfits$catfits.x
+fitscopy	hlp=doc$fitscopy.hlp,		src=fitsio$t_fitscopy.x
+fits_exampl	hlp=doc$fits_exampl.hlp
+geis		hlp=doc$geis.hlp
+gftoxdim	hlp=doc$gftoxdim.hlp,		src=fitsio$t_gftoxdim.x
+mgrfits		hlp=doc$mgrfits.hlp,		src=fitsio$mgrfits.cl
+stwfits		hlp=doc$stwfits.hlp,		src=stwfits$t_wfits.x
+strfits		hlp=doc$strfits.hlp,		src=strfits$t_rfits.x
+xdimtogf	hlp=doc$xdimtogf.hlp,		src=fitsio$t_xdimtogf.x

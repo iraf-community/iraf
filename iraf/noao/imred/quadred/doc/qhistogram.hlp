@@ -1,0 +1,37 @@
+.help qhistogram Aug01 noao.imred.quadred
+.ih
+NAME
+qhistogram -- Compute and print histogram for multi-amp data
+.ih
+USAGE
+qhistogram images
+.ih
+PARAMETERS
+.ls images
+List of image names in \fBquadformat\fR.
+.le
+.ls window = "datasec" (datasec|trimsec|biassec)
+Type of section to use for histogram.  The choices are "datasec" for the
+amplifier section which includes the bias if any is present, "trimsec" for
+the trim section, and "biassec" for the bias section.
+.le
+
+The remaining parameters come from the \fBimhistogram\fR task.
+.ih
+DESCRIPTION
+This script tasks uses the \fBquadsections\fR task to break the
+\fBquadformat\fR data into separate sections and runs the \fBimhistogram\fR
+task on the sections.  The graphics is collected onto a single page.
+.ih
+EXAMPLES
+
+1. To graph the histograms (default behavior).
+
+.nf
+    qu> qhist quad0072
+    [graph appears]
+.fi
+.ih
+SEE ALSO
+quadformat, quadsections, imhistogram
+.endhelp

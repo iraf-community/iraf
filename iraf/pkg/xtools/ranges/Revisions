@@ -1,0 +1,59 @@
+.help revisions Jun88 pkg.xtools.ranges
+.nf
+xtools$ranges/rgranges.x
+    The range parsing would fail for single numbers.  (4/29/94, Valdes)
+
+xtools$ranges/rgranges.x
+xtools$ranges/rgxranges.gx
+    Added @file capability.  Rewrote the parsing logic.  (10/9/91, Valdes)
+
+xtools$ranges/rgwtbin.gx
+    At least one point from each sample region must be included regardless
+    of the size of average.  (6/14/89, Valdes)
+
+xtools$ranges/rgwtbin.gx
+    The remainder bin in a sample region must be at least
+    max (min (N, 3), (N+1)/2) except that a single bin may be any size. 
+    (6/7/89, Valdes)
+ 
+xtools$ranges/rgencode.x, rginverse.x, rgnext.x, rgunion.x
+    Added some missing functionality to convert a range into a string,
+    to invert a range, to get the next higher member of a range (ala
+    xtools$ranges.x) and to take the union of two ranges.
+    (6/2/89, Seaman)
+
+xtools$ranges/rgintersect.x, rgmerge.x
+    Fixed bugs in handling overlapping ranges.  (6/2/89, Seaman)
+
+xtools$ranges/rgxranges.gx
+    Numbers in scientific notation are now recognized.  Based on report
+    from Ivo Busko.  (3/1/89)
+ 
+xtools$ranges/rgwtbin.gx
+    The remainder bin in a sample region must be at least max (3, (N+1)/2)
+    except that a single bin may be any size.  (1/23/89, Valdes)
+ 
+xtools$ranges/rgdump.x +
+xtools$ranges/rgmerge.x
+    Valdes, May 4, 1987
+    1.  Added a debugging procedure for dumping the ranges descriptor.
+    2.  Fixed a bug when merging overlapping ranges.
+
+xtools$ranges/rgbin.gx
+xtools$ranges/rgwtbin.gx
+    Valdes, August 11, 1986
+    1.  Since AMED$T no longer modifies the input array the temporary arrays
+	used to preserve the input array are no longer needed.
+
+xtools$ranges: Valdes, August 11, 1986
+    1.  Reorganized package to have separate modules for each datatype.
+	This allows loading only the required procedures.
+
+xtools$ranges/rgwtbin.gx: Valdes, August 8, 1986
+    1.  If all the weights were zero in a given range then a divide by zero
+	would result.  A check against this was added.
+
+xtools$ranges: Valdes, March 13, 1986
+    1.  The RANGES package has been converted to generic form.  It is compiled
+	into both single and double precision procedures.
+.endhelp

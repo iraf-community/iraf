@@ -1,0 +1,38 @@
+# BATCHRED -- Parameter file for batch reduction prep task
+
+input,s,a,,,,Input root name for spectra
+output,s,a,,,,Output root name for spectra
+start_rec,i,a,,0,9999,Starting record for output spectra
+ttylog,s,a,"ttylog",,,File name to contain a log of terminal output
+standard,b,a,yes,,,Generate commands for STANDARD
+sensfunc,b,a,yes,,,Generate commands for SENSFUNC
+bswitch,b,a,yes,,,Generate commands for BSWITCH
+calibrate,b,a,yes,,,Generate commands for CALIBRATE
+addsets,b,a,yes,,,Generate commands for ADDSETS
+
+std,s,a,"std",,,STANDARD and SENSFUNC standard star file
+star_name,s,q,,,,STANDARD star name
+stats,s,a,"stats",,,SENSFUNC and BSWITCH statistics file
+sensitivity,s,a,sens,,,SENSFUNC and CALIBRATE sensitivity spectra
+weight,b,a,no,,,BSWITCH weighted averages?
+function,s,h,"chebyshev",,,SENSFUNC fitting function
+order,i,h,7,1,,SENSFUNC fitting order
+
+records,s,q,,,,Record string to process
+proceed,b,q,yes,,,Begin batch processing
+query,b,q,no,,,Delete files(s)?
+
+fnu,b,h,no
+wave1,r,h,0.0
+wave2,r,h,0.0
+subset,i,h,32767
+
+rt,s,h
+ot,s,h
+in,s,h
+out,s,h
+stat,s,h
+sns,s,h
+st,s,h
+wt,b,h
+ttl,s,h

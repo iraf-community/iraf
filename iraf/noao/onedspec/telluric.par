@@ -1,0 +1,21 @@
+# TELLURIC
+
+input,s,a,,,,List of input spectra to correct
+output,s,a,,,,List of output corrected spectra
+cal,s,a,,,,List of telluric calibration spectra
+ignoreaps,b,h,no,,,Ignore aperture numbers in calibration spectra?
+xcorr,b,h,yes,,,Cross correlate for shift?
+tweakrms,b,h,yes,,,Tweak to minimize RMS?
+interactive,b,h,yes,,,Interactive tweaking?
+sample,s,h,"*",,,Sample ranges
+threshold,r,h,0.,,,Threshold for calibration
+lag,i,h,10,0,,Cross correlation lag (pixels)
+shift,r,h,0.,,,Initial shift of calibration spectrum (pixels)
+scale,r,h,1.,1e-10,,Initial scale factor multiplying airmass ratio
+dshift,r,h,1.,0.,,Initial shift search step
+dscale,r,h,0.2,0.,0.99,Initial scale factor search step
+offset,r,h,1.,0.,,Initial offset for graphs
+smooth,i,h,1,1,,Smoothing box for graphs
+cursor,*gcur,h,"",,,Cursor input
+airmass,r,q,,1.,,Airmass
+answer,s,q,"yes","no|yes|NO|YES",,Search interactively?

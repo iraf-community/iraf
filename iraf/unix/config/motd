@@ -1,0 +1,14 @@
+    NOAO/IRAFNET PC-IRAF Revision 2.14 Fri Nov 30 15:27:05 MST 2007
+    This is the RELEASED version of IRAF V2.14 supporting PC systems.
+
+
+  Welcome to IRAF.  To list the available commands, type ? or ??.  To get
+  detailed information about a command, type `help <command>'.  To run  a
+  command  or  load  a  package,  type  its name.   Type  `bye' to exit a
+  package, or `logout' to get out  of the CL.    Type `news' to find  out
+  what is new in the version of the system you are using.  
+
+  Visit http://iraf.net if you have questions or to report problems.
+
+  The following commands or packages are currently defined:
+

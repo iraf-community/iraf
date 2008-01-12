@@ -1,0 +1,39 @@
+.help zcall,zcall1,zcall2,zcall3,zcall4,zcall5   May84 "System Interface"
+.ih
+NAME
+zcall -- call an external procedure by reference
+.ih
+SYNOPSIS
+.nf
+zcall1 (procedure, arg1)
+zcall2 (procedure, arg1, arg2)
+zcall3 (procedure, arg1, arg2, arg3)
+zcall4 (procedure, arg1, arg2, arg3, arg4)
+zcall5 (procedure, arg1, arg2, arg3, arg4, arg5)
+
+int	procedure		# reference to external procedure
+arb	arg1, ..., arg\fIn\fR		# arguments for external procedure
+.fi
+.ih
+DESCRIPTION
+The subroutine referenced by the magic integer passed as the first argument
+is called as a subprocedure.  The \fIn\fR arguments to \fBzcall\fR are passed
+to the subprocedure by reference; the datatypes of the actual arguments are
+unknown but the number and datatypes of the arguments must match those
+expected by the subprocedure.  The arguments are restricted to variables,
+constants, arrays, and array elements of datatypes \fBcsilrd\fR.  The magic
+integer \fIprocedure\fR must have been obtained by a prior call to \fBzlocpr\fR.
+.ih
+RETURN VALUE
+Any of the arguments may be used to return a value depending on the
+significance of the argument to the subprocedure called.
+The procedure itself may not return a value, i.e., \fBzcall\fR may not
+be used to call a function.
+.ih
+NOTES
+The arguments to \fIprocedure\fR must not be Fortran CHARACTER variables
+or constants, external procedures, or objects of datatype complex.
+.ih
+SEE ALSO
+zlocpr
+.endhelp

@@ -1,0 +1,57 @@
+.help arbpix Dec98 "Image Interpolator Package"
+.ih
+NAME
+arbpix -- replace INDEF valued pixels with interpolated values
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+arbpix (datain, dataout, npix, interp_type, boundary_type)
+
+.nf
+    real	datain[npix]	#I input data
+    real	dataout[npix]	#O output array, dataout != datain
+    int		npix		#I number of data points
+    int		interp_type	#I type of interpolant
+    int		boundary_type	#I type of boundary condition
+.fi
+.ih
+ARGUMENTS
+.ls datain
+Array of input data containing 0 or more INDEF valued pixels.
+.le
+.ls dataout
+Array of output data with INDEFS replaced by interpolated values.
+The dataout array must be different from the datain array.
+.le
+.ls npix   
+Number of data points.
+.le
+.ls interp_type
+Type of interpolant. Options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3, II_SINC / II_LSINC, and II_DRIZZLE. The look-up table sinc
+interpolant is not supported,  and defaults to the sinc interpolant.
+The sinc interpolant width is 31 pixels. The drizzle interpolant is not
+supported and defaults to the linear interpolant. The interpolant type
+definitions are stored in the file math/iminterp.h.
+.le
+.ls boundary_type
+Type of boundary extension. The only supported option is II_BOUNDARYEXT.
+Polynomial interpolants of lower order are used if there are not enough
+good pixels to define the requested interpolant. Nearest neighbor boundary
+extension is used if there are not enough good points to define the sinc
+interpolant. The boundary type definitions are stored in the header file
+math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+If there are no good points in datain, ARBPIX returns INDEFS in dataout.
+Points below and above the first and last good point are replaced by the
+first and last good point values respectively.
+.ih
+NOTES
+The sinc function actually evaluates the interpolant by computing the
+average of two interpolations at +-0.05 pixels about the bad pixel since
+the interpolant is undefined exactly at a pixel.
+.ih
+SEE ALSO

@@ -1,0 +1,7 @@
+intable,s,a,"",,,"Input tables"
+outtable,s,a,"",,,"Output table"
+template,s,h,"",,,"Template table"
+row,i,h,INDEF,,,"Begin insertion in row"
+verbose,b,h,yes,,,"Print operations performed ?"
+version,s,h,"7Feb2000",,,
+mode,s,h,"al",,,

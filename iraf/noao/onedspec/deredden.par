@@ -1,0 +1,10 @@
+# DEREDDEN parameter file
+
+input,s,a,,,,Input spectra to correct
+output,s,a,,,,Output corrected spectra
+value,r,a,,,,Extinction parameter value
+R,r,h,3.1,,,A(V)/E(B-V)
+type,s,h,"E(B-V)","A(V)|E(B-V)|c",,Type of extinction parameter
+apertures,s,h,"",,,Apertures to correct
+override,b,h,no,,,Override previous correction?
+uncorrect,b,h,yes,,,Uncorrect previous correction?

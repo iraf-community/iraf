@@ -1,0 +1,81 @@
+                      THE NLFIT PACKAGE
+
+This subdirectory contains the routines in the non-linear least squares
+fitting package NLFIT. NLFIT uses the Levenberg-Marquardt method  to
+to solve for the parameters of a user specified non-linear equation.
+The user must supply two routines. The first routine evaluates the function
+in terms of its parameters. The second routine evaluates the function and its
+derivatives in terms of its parameters.  The user must also supply initial
+guesses for the parameters and parameter increments, the list of
+parameters to be varied during the fitting processa, a fitting
+tolerance and the maximum number of iterations.
+
+The principal entry points into the NLFIT are listed below.
+
+	nlinit - Initialize the fitting routines
+       nlstati - Get the value of an integer NLFIT parameter
+        nlstat - Get the value of floating point NLFIT parameter
+	nlpget - Get the values of the fitted parameters
+	nlfree - Free memory allocated by nlinit
+	 nlfit - Fit the function
+	nleval - Evaluate the curve at a given point
+      nlvector - Evaluate the curve at an array of points 
+      nlerrors - Compute the fits statistics and errors in the parameters
+
+The calling sequences for the above routines are listed below. The [ird]
+stand for integer, real and double precision versions of each routine
+respectively.
+
+               nlinit[rd] (nl, address(fnc), address(dfnc), params, dparams,
+	            nparams, plist, nfparams, tol, itmax)
+        ival = nlstati (nl, param)
+     [rd]val = nlstat[rd] (nl, param)
+               nlpget[rd] (nl, params, nparams)
+               nlfree[rd] (nl)
+               nlfit[rd] (nl, x, z, w, npts, nvars, wtflag, ier)
+     [rd]val = nleval[rd] (nl, x, nvars)
+               nlvector[rd] (nl, x, zfit, npts, nvars)
+               nlerrors[rd] (nl, z, zfit, wts, npts, variance, chisqr, errors)
+
+The user supplied functions fnc and dfnc have the following calling
+sequences.
+	
+	       fnc (x, nvars, params, nparams, zfit)
+	      dfnc (x, nvars, params, dparams, nparams, zfit, derivs)
+
+    The address of the user supplied function can be determined with a
+call to locpr as in
+
+	      address = locpr (fnc)
+
+The user definitions for the NLFIT package can be found in the file 
+lib$math/nlfit.h and can be made available to user applications programs
+with the statement "include <math/nlfit.h>".
+
+The permitted values for the param argument in nlstat[ird] are the following.
+
+define	NLNPARAMS	integer		# Number of parameters
+define	NLNFPARAMS	integer         # Number of fitted parameters
+define	NLITMAX		integer		# Maximum number of iterations
+define	NLITER		integer		# Current number of iterations
+define	NLNPTS		integer         # Number of points
+define	NLSUMSQ		real/double	# Current reduced chi-squared
+define	NLOLDSQ		real/double     # Previous reduced chi-squared
+define	NLLAMBDA	real/double     # Value of lambda factor
+define	NLTOL		real/double	# Fitting tolerance in %chi-squared
+define	NLSCATTER	real/double     # Mean scatter in the fit
+
+The permitted values of the wtflag argument in nlfit[rd] are the following.
+
+define	WTS_USER			# User enters weights
+define	WTS_UNIFORM			# Equal weights
+define	WTS_CHISQ 			# Chi-squared weights
+define	WTS_SCATTER			# Weights include scatter term
+
+The permitted error values returned from nlfit[rd] are the following.
+
+define	DONE			0	# Solution converged
+define	SINGULAR		1	# Singular matrix
+define	NO_DEG_FREEDOM		2	# Too few points
+define	NOT_DONE		3	# Solution did not converge
+

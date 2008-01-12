@@ -1,0 +1,26 @@
+.help iszero Aug85 "Surfit Package"
+.ih
+NAME
+iszero -- set up for a new surface fit
+.ih
+SYNOPSIS
+iszero (sf)
+
+.nf
+pointer	sf		# surface grid descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface grid descriptor structure.
+.le
+.ih
+DESCRIPTION
+ISZERO zeros all matrices and vectors used by the fitting program. It
+should be used only if one wishes to refit the surface from scratch.
+.ih
+NOTES
+.ih
+SEE ALSO
+isinit, islzero, islaccum, islfit, islrefit, islsolve, issolve, isfree
+.endhelp

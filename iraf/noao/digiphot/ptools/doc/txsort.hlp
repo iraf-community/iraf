@@ -1,0 +1,61 @@
+.help txsort Aug91 noao.digiphot.ptools
+.ih
+NAME
+txsort -- sort a list of APPHOT/DAOPHOT text database file(s)
+.ih
+USAGE
+txsort textfile field
+.ih
+PARAMETERS
+.ls textfiles 
+The input APPHOT/DAOPHOT text database(s) to be sorted.
+The sort is performed in place.
+.le
+.ls field
+The field to be sorted on. \fIField\fR may be any quantity defined by
+the APPHOT/DAOPHOT #K and #N keywords. The keywords may be
+of type integer or real, in which case a numeric sort is performed,
+boolean, in which case the boolean constant "no" has a smaller value
+than "yes", or character in which case an alphabetic sort is performed.
+.le
+.ls ascend = yes
+Sort in increasing value order.
+.le
+.ih
+DESCRIPTION
+TXSORT is a simple task which accepts a list of APPHOT/DAOPHOT text
+database files
+and sorts them in place based on the value of the selected field
+specifier \fIfield\fR. By default the sort is performed in increasing order
+of the value
+of \fIfield\fR, but a reverse sort can be performed by 
+setting \fIascend\fR = "no".
+
+If \fIfield\fR is a real or integer quantity the sort is numeric; if boolean
+the boolean constant "no" is assumed to have a smaller value than "yes"; if
+character the sort is alphabetic.
+.ih
+EXAMPLES
+
+1.  Sort the output of the APPHOT task PHOT in increasing order of
+the y position.
+
+.nf
+    pt> txsort m92.mag.1 YCENTER
+.fi
+
+2. Sort the output of the DAOPHOT task ALLSTAR in increasing order of
+   magnitude.
+
+.nf
+    pt> txsort m92.al.1 MAG
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.tbsort,tables.tsort,ptools.psort,sort
+.endhelp

@@ -1,0 +1,50 @@
+.help jobs Feb86 language
+.ih
+NAME
+jobs -- display the status of background jobs
+.ih
+USAGE
+jobs
+.ih
+PARAMETERS
+None.
+.ih
+DESCRIPTION
+\fIJobs\fR is used to display the status of background jobs.
+If no job number is specified then all the status of all background
+jobs is displayed.  For each job there is one line of output, e.g.
+
+    [2]  0:14 +Running  copy file1 file2 &
+
+Here 2 is the job number of the job; 0:14 is the clock time in minutes and
+seconds since the job was submitted; `Running' indicates that the task is
+currently running while the `+' indicates that this was the last background
+job started.   The remainder of the line is a copy of the actual command
+used to start the job.
+
+The possible states for a background job are:
+
+.nf
+	Done    -- the job has finished normally
+	Exit N  -- the job terminated with exit code N
+	Stopped -- the job is waiting for input from the user
+			(see the \fIservice\fR command)
+	Running -- the job is currently executing
+.fi
+.ih
+EXAMPLES
+.nf
+cl> jobs
+    [1]  21:13  Done      mkhelp >& dev$null & 
+    [2]   0:05 +Running   count *.hlp > _junk & 
+.fi
+.ih
+BUGS
+Exit codes are rarely displayed when jobs terminate abnormally.
+The CL checks for background job termination only when a command is
+entered, hence the elapsed time shown will often be greater than it
+should be.
+.ih
+SEE ALSO
+kill, service
+.endhelp

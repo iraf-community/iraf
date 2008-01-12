@@ -1,0 +1,18 @@
+# Help directory for the IRS/IIDS tasks.
+
+$doc		= "./doc/"
+
+addsets		hlp=doc$addsets.hlp,		src=t_addsets.x
+batchred	hlp=doc$batchred.hlp,		src=batchred.cl
+bswitch		hlp=doc$bswitch.hlp,		src=t_bswitch.x
+coefs		hlp=doc$coefs.hlp,		src=t_coefs.x
+coincor		hlp=doc$coincor.hlp,		src=t_coincor.x
+extinct		hlp=doc$extinct.hlp,		src=extinct.cl
+flatdiv		hlp=doc$flatdiv.hlp,		src=t_flatdiv.x
+flatfit		hlp=doc$flatfit.hlp,		src=t_flatfit.x
+powercor	hlp=doc$powercor.hlp,		src=powercor.cl
+process		hlp=doc$process.hlp,		src=process.cl
+slist1d		hlp=doc$slist1d.hlp,		src=t_slist1d.x
+subsets		hlp=doc$subsets.hlp,		src=t_subsets.x
+sums		hlp=doc$sums.hlp,		src=t_sums.x
+widstape	hlp=doc$widstape.hlp,		src=x_widstape.x

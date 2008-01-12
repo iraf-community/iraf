@@ -1,0 +1,15 @@
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and the task is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because the task
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.

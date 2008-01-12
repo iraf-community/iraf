@@ -1,0 +1,115 @@
+.help ndprep Mar92 noao.onedspec
+.ih
+NAME
+ndprep -- Make a neutral density filter calibration image
+.ih
+USAGE
+ndprep filter_curve output
+.ih
+PARAMETERS
+.ls filter_curve
+Neutral density filter curve.  The directory specified by the parameter
+\fIdirectory\fR is prepended to this name so if a directory is specified
+then it should not be given here.  If '?' a list of filter curves
+in the specified directory is typed.
+.le
+.ls output
+Output neutral density filter image.
+.le
+.ls w0   
+Starting wavelength for the output image in Angstroms.
+.le
+.ls dw   
+Wavelength increment for the output image in Angstroms.
+.le
+.ls nw   
+Number of wavelength points for the output image (i.e. the size of the
+output image).
+.le
+.ls nspace = 0
+Number of spatial points for a two dimensional image.  If the value is
+zero then a one dimensional image is created.
+.le
+.ls logarithm = no
+Use logarithmic wavelengths and intervals?  If yes then the wavelengths
+will have the same starting and ending points and number of pixels but
+the wavelength intervals will be logarithmic.
+.le
+.ls flux = yes
+Conserve flux when rebinning to logarithmic wavelength intervals?
+.le
+.ls dispaxis = 1
+Dispersion axis for two dimensional images.  Dispersion along the lines
+is 1 and dispersion along the columns is 2.
+.le
+.ls directory = "onedstds$ctio/"
+Directory containing neutral density filter curves.  This directory is
+prepended to the specified fiter curve file (and so must end with '/'
+or '$').
+.le
+.ih
+DESCRIPTION
+A neutral density (ND) filter curve is converted to a calibration image
+with the same size and wavelength range as the images to be calibrated.
+A list of standard neutral density curves is typed if the filter
+curve name is given as '?'.  The ND curves are text files containing
+wavelength and filter transmission pairs.  Comments begin with '#'.
+A plot of the ND curve can be obtained using \fBgraph\fR.
+
+The ND curve is first interpolated to a one dimensional image of
+\fInw\fR wavelength points with starting wavelength \fIwO\fR and
+wavelength increment \fIdw\fR using the task \fBsinterp\fR.  The
+wavelength parameters must be in the same units as the filter curves
+(currently Angstroms) even if the final calibration image is to be in
+logarithmic wavelength intervals.  If logarithmic wavelength format
+is specified the image is rebinned over the same wavelength range with
+the same number of points using the task \fBdispcor\fR.  The rebinning
+may include flux conservation to account for the changing size of
+pixels or simply interpolate.  Note that flux conservation will
+change the apparent shape of the ND curve.
+
+If the number of points across the dispersion, \fInspace\fR is zero then
+the final calibration image is one dimensional.  If it is greater than
+zero the one dimensional ND image is expanded to the specified number
+of spatial points with the dispersion axis specified by the parameter
+\fIdispaxis\fR (1 = dispersion along the lines, 2 = dispersion along
+the columns).
+.ih
+EXAMPLES
+To get a list of standard ND filter curves:
+
+	cl> ndprep ?
+
+To graph the ND filter curve:
+
+	cl> graph onedstds$ctio/nd1m.100mag.dat
+
+Naturally, if a calibration image is made then the image plotting tasks
+such as \fBgraph\fR, \fBimplot\fR, and \fBsplot\fR may also be used.
+
+To make a one dimensional ND calibration spectrum:
+
+.nf
+	cl> ndprep w0=4000 dw=1.2 nw=512
+	Input ND filter curve:  onedstds$ctio/nd1m.100mag.dat
+	Output calibration image: NDimage
+.fi
+
+To make a two dimensional ND calibration spectrum in logarithmic wavelength:
+
+.nf
+	cl> ndprep w0=4000 dw=1.2 nw=512 nspace=200 log+
+	Input ND filter curve:  onedstds$ctio/nd4m.u000mag.dat
+	Output calibration image: NDimage
+.fi
+.ih
+REVISIONS
+.ls NDPREP V2.10
+This task was moved from the \fBproto\fR package.  It was originally
+written at CTIO for CTIO data.  It's functionality is largely unchanged
+though it has been updated for changes in the \fBonedspec\fR package.
+.le
+.ih
+SEE ALSO
+sinterp, dispcor
+.endhelp

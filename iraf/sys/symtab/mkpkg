@@ -1,0 +1,30 @@
+# Make the SYMTAB general symbol table package.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+libsys.a:
+	stalloc.x	symtab.h
+	stclose.x	symtab.h
+	stenter.x	symtab.h
+	stfind.x	symtab.h
+	stfindall.x	symtab.h
+	stfree.x	symtab.h
+	sthash.x	
+	sthead.x	symtab.h
+	stinfo.x	symtab.h
+	stmark.x	symtab.h
+	stname.x	symtab.h
+	stnext.x	symtab.h
+	stnsym.x	symtab.h
+	stopen.x	symtab.h
+	stpstr.x	symtab.h
+	strefsbuf.x	symtab.h
+	strefstab.x	symtab.h
+	strestore.x	symtab.h
+	stsave.x	symtab.h
+	stsize.x	symtab.h <mii.h>
+	stsqueeze.x	symtab.h
+	;

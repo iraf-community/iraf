@@ -1,0 +1,69 @@
+.help polypars May00 noao.digiphot.apphot
+.ih
+NAME
+polypars -- edit the polygonal aperture photometry parameters
+.ih
+USAGE
+polypars
+.ih
+PARAMETERS
+.ls zmag = 25.00
+The zero point offset for the magnitude scale.
+.le
+.ls mkpolygon = no
+Draw the polygons on the screen.
+.le
+.ih
+DESCRIPTION
+The zero point of the magnitude scale is determined by \fIzmag\fR.
+
+If the \fImkpolygon\fR switch is enabled polygons are marked on the screen.
+.ih
+EXAMPLES
+
+1. List the polygonal aperture photometry parameters.
+
+.nf
+	ap> lpar polypars
+.fi
+
+2. Edit the polygonal aperture photometry parameters.
+
+.nf
+	ap> polypars
+.fi
+
+3. Edit the POLYPARS parameters from within the POLYPHOT task.
+
+.nf
+    da> epar polyphot
+
+	... edit a few polyphot parameters
+
+	... move to the polypars parameter and type :e
+
+	... edit the polypars parameters and type :wq
+
+	... finish editing the polyphot parameters and type :wq
+.fi
+
+4. Save the current POLYPARS parameter set in a text file polynite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> polypars
+
+	... edit some parameters
+
+	... type ":w polynite1.par"  from within epar
+
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+polyphot. polymark
+.endhelp

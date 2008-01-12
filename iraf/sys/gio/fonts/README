@@ -1,0 +1,42 @@
+
+FONT Generation Utilities  (August 1997)
+----------------------------------------
+
+This directory contains utilities for building font tables for the GIO
+system executables.  For reference we include here the font tables for
+the standard and greek fonts currently installed in the system:
+
+	font.com		standard text font (Roman)
+	greek.com		greek character font
+	
+These table were built from the Hershey stroke data using the following 
+files:
+
+	mkfont.c		task to build font table
+	hershey.dat		Hershey stroke data table
+
+Once compiled the MKFONT task can be used to build the table with a command
+such as
+
+		% mkfont < romant.txt > font.com
+
+Note that by default the tables are created with a "chr" prefix for the
+index, width, and character tables in the .com file.  When building a new
+Greek or other symbolic font these should be changed appropriately.
+	
+
+Addition input files for fonts supplied here include:
+
+	futural.txt	Futura (light)
+	futuram.txt	Futura (medium)
+	gotheng.txt	Gothic (english)
+	gothger.txt	Gothic (german)
+	gothita.txt	Gothic (italian)
+	greekc.txt	Greek (complex)			(current greek.com)
+	greeks.txt	Greek (simple)
+	math.txt	Math symbols
+	meteor.txt	Meteorological symbols
+	romans.txt	Roman (simple)
+	romant.txt	Roman (Times)			(current font.com)
+	scripts.txt	Script text font
+	timesr.txt	Times-Roman

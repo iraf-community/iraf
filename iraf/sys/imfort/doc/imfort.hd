@@ -1,0 +1,44 @@
+# Helpdir for the IMFORT package.
+
+zawset		hlp = doc$zawset.hlp,	src = os$zawset.c
+
+$imfort	= "sys$imfort/"
+$doc	= "sys$imfort/doc/"
+
+bfaloc		hlp = doc$bfaloc.hlp,	src = imfort$bfaloc.x
+bfbsiz		hlp = doc$bfbsiz.hlp,	src = imfort$bfbsiz.x
+bfchan		hlp = doc$bfchan.hlp,	src = imfort$bfchan.x
+bfclos		hlp = doc$bfclos.hlp,	src = imfort$bfclos.x
+bfflsh		hlp = doc$bfflsh.hlp,	src = imfort$bfflsh.x
+bffsiz		hlp = doc$bffsiz.hlp,	src = imfort$bffsiz.x
+bfopen		hlp = doc$bfopen.hlp,	src = imfort$bfopen.x
+bfread		hlp = doc$bfread.hlp,	src = imfort$bfread.x
+bfwrit		hlp = doc$bfwrit.hlp,	src = imfort$bfwrit.x
+clarg		hlp = doc$clarg.hlp,	src = imfort$clarg.x
+clnarg		hlp = doc$clnarg.hlp,	src = imfort$clnarg.x
+clrawc		hlp = doc$clrawc.hlp,	src = imfort$clrawc.x
+imacck		hlp = doc$imacck.hlp,	src = imfort$imacck.x
+imaddk		hlp = doc$imaddk.hlp,	src = imfort$imaddk.x
+imakw		hlp = doc$imakw.hlp,	src = imfort$imakw.x
+imclos		hlp = doc$imclos.hlp,	src = imfort$imclos.x
+imcrea		hlp = doc$imcrea.hlp,	src = imfort$imcrea.x
+imdele		hlp = doc$imdele.hlp,	src = imfort$imdele.x
+imdelk		hlp = doc$imdelk.hlp,	src = imfort$imdelk.x
+imemsg		hlp = doc$imemsg.hlp,	src = imfort$imemsg.x
+imflsh		hlp = doc$imflsh.hlp,	src = imfort$imflsh.x
+imgkw		hlp = doc$imgkw.hlp,	src = imfort$imgkw.x
+imgl		hlp = doc$imgl.hlp,	src = imfort$imgl.x
+imgs		hlp = doc$imgs.hlp,	src = imfort$imgs.x
+imgsiz		hlp = doc$imgsiz.hlp,	src = imfort$imgsiz.x
+imhcpy		hlp = doc$imhcpy.hlp,	src = imfort$imhcpy.x
+imokwl		hlp = doc$imokwl.hlp,	src = imfort$imokwl.x
+imgnkw		hlp = doc$imokwl.hlp,	src = imfort$imokwl.x
+imckwl		hlp = doc$imokwl.hlp,	src = imfort$imokwl.x
+imopen		hlp = doc$imopen.hlp,	src = imfort$imopen.x
+imopnc		hlp = doc$imopnc.hlp,	src = imfort$imopnc.x
+impixf		hlp = doc$impixf.hlp,	src = imfort$impixf.x
+impkw		hlp = doc$impkw.hlp,	src = imfort$impkw.x
+impl		hlp = doc$impl.hlp,	src = imfort$impl.x
+imps		hlp = doc$imps.hlp,	src = imfort$imps.x
+imrnam		hlp = doc$imrnam.hlp,	src = imfort$imrnam.x
+imtypk		hlp = doc$imtypk.hlp,	src = imfort$imtypk.x

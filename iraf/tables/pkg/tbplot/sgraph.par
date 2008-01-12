@@ -1,0 +1,7 @@
+input,s,a,,,,"list of images, tables, or list files to graph"
+errcolumn,s,h,,,,"errors table column"
+dvpar,pset,h,"",,,"Device parameters"
+pltpar,pset,h,,,,"Plot attributes"
+axispar,pset,h,,,,"Scaling attributes"
+
+version,s,h,"20Jul93",,,"Date of installation"

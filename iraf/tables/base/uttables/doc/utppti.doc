@@ -1,0 +1,60 @@
+     This note describes the use of utppti (or tbpset) to specify character-
+istics of a table, such as whether it should be row-ordered or column-ordered.
+The include file
+        stsdas$lib/iraf77.inc
+
+or the SPP header file
+        <tbset.h>
+
+give parameters and their numerical values for setting such characteristics.
+For example, to specify that a table should be column-ordered you would call
+utppti after calling uttinn:
+
+        include 'stsdaslib:iraf77.inc'		! if stsdaslib is defined
+
+        call uttinn (tblnam, tp, istat)                 ! initialize new table
+        call utppti (tp, TBWTYP, TBTYPC, istat)         ! set column-ordered
+C or    call utppti (tp, 5, 12, istat)                  ! (same as above)
+        call utcdef (tp, ...                            ! define columns
+        call uttcre (tp, istat)                         ! create the table
+
+     The characteristics that may be set (for the moment) and their default
+values are given below.  The first column is the integer parameter as defined
+in the include file tbset.inc (in disk$sdas:[sdas.develop.sdasinc]), and the
+second column gives its numerical value.  This is the value that should be
+passed as the second argument to utppti.  The third argument is the value that
+is to be set.  An (R) or (C) beginning the description means that the parameter
+is relevant only for row-ordered or column-ordered tables respectively.
+Any of these except table type (row- or column-ordered) may be set after
+opening the table, but this will usually entail reorganizing the table, which
+could take some time if the table is large.
+
+parameter     value              description
+---------     -----              -----------
+TBRLEN          1       (R) Length of row (unit = size of real); this is com-
+                        puted automatically as columns are defined, so the
+                        default is the minimum length required for whatever
+                        columns have been defined.
+TBIRLN          2       (R) Increase row length by specified amount; the idea
+                        is that you can define all the columns that you know
+                        you will need, and then use this option to allocate
+                        additional space if you expect to define other columns
+                        later after opening the table.
+TBALLR          3       (C) Number of rows to allocate; the default is 100 rows.
+TBIALR          4       (C) Increase allocated number of rows by the specified
+                        amount beyond the current number of allocated rows.
+TBWTYP          5       Specify row-ordered (the default) or column-ordered;
+                        the value that designates row-ordered is TBTYPR = 11,
+                        while column-ordered is TBTYPC = 12.
+TBMXPR          6       "Maximum" number of user parameters; the default is 5.
+                        This does not set a firm upper limit to the number but
+                        only specifies how much space to allocate.  If more
+                        parameters are written to the table it will be reorgan-
+                        ized to allow more space.
+TBMXCL          7       "Maximum" number of columns; if not specified, the value
+                        may be from zero to five more than the number of columns
+                        that have already been defined, and there is no need to
+                        specify this value if all columns are defined before
+                        opening the table.  As with the maximum number of user
+                        parameters, this is not a firm upper limit but only the
+                        amount of space to be allocated for column descriptors.

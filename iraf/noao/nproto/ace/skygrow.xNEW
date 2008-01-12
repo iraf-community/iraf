@@ -1,0 +1,89 @@
+include	<imhdr.h>
+
+task	skygrow = t_skygrow
+
+procedure t_skygrow ()
+
+int	nc, nl
+pointer	im, sky, immap(), imps2r(), imgs2r()
+
+begin
+	im = immap ("skyblk", READ_WRITE, 0)
+	nc = IM_LEN(im,1)
+	nl = IM_LEN(im,2)
+	sky = imps2r (im, 1, nc, 1, nl)
+	call amovr (Memr[imgs2r(im,1,nc,1,nl)], Memr[sky], nc*nl)
+	call skygrow (sky, nc, nl, 1.5, 0.)
+	call imunmap (im)
+end
+
+
+procedure skygrow (sky, nc, nl, grow, growval)
+
+pointer	sky			# Pointer tor eal sky array to be grown
+int	nc, nl			# Size of sky array
+real	grow			# Grow radius
+real	growval			# Value to be grown
+
+int	i, j, k, l1, l2, ngrow, nbufs
+real	grow2, growval1, val1, val2, y2
+pointer	buf, buf1, buf2, ptr
+errchk	calloc
+
+begin
+	# Initialize.
+	ngrow = int (grow)
+	grow2 = grow * grow
+	nbufs = min (1 + 2 * ngrow, nl)
+	if (growval == 0.) {
+	    growval1 = 1.
+	    call malloc (buf, nc*nbufs, TY_REAL)
+	    call amovkr (growval1, Memr[buf], nc*nbufs)
+	} else {
+	    growval1 = 0.
+	    call calloc (buf, nc*nbufs, TY_REAL)
+	}
+
+	l1 = 1; l2 = 1
+	while (l1 <= nl) {
+	    buf1 = sky + (l1 - 1) * nc
+	    buf2 = buf + mod (l1, nbufs) * nc
+	    do i = 1, nc {
+		val1 = Memr[buf1]
+		val2 = Memr[buf2]
+		if (val1 == growval) {
+		    do j = max(1,l1-ngrow), min (nl,l1+ngrow) {
+			ptr = buf + mod (j, nbufs) * nc - 1
+			y2 = (j - l1) ** 2
+			do k = max(1,i-ngrow), min (nc,i+ngrow) {
+			    if ((k-i)**2 + y2 > grow2)
+				next
+			    Memr[ptr+k] = growval
+			}
+		    }
+		} else if (val2 != growval)
+		    Memr[buf2] = val1
+		buf1 = buf1 + 1
+		buf2 = buf2 + 1
+	    }
+
+	    if (l1 > ngrow) {
+		while (l2 <= nl) {
+		    buf1 = sky + (l2 - 1) * nc
+		    buf2 = buf + mod (l2, nbufs) * nc
+		    do i = 1, nc {
+			Memr[buf1] = Memr[buf2]
+			Memr[buf2] = growval1
+			buf1 = buf1 + 1
+			buf2 = buf2 + 1
+		    }
+		    l2 = l2 + 1
+		    if (l1 != nl)
+			break
+		}
+	    }
+	    l1 = l1 + 1
+	}
+
+	call mfree (buf, TY_REAL)
+end

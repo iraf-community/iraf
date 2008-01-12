@@ -1,0 +1,97 @@
+.help ridsout Sep84 noao.mtlocal
+.ih
+NAME
+ridsout -- convert IDSOUT format text file to IRAF images
+.ih
+USAGE
+ridsout idsout_file iraf_file
+.ih
+PARAMETERS
+.ls idsout_file
+The text file or files containing the IDSOUT format data.  This will most likely
+be the redirected output from task \fBrcardimage\fR.
+.le
+.ls iraf_file
+The IRAF file which will receive the data if the \fImake_image\fR parameter
+is set.  If multiple records are being converted, the output
+filename is concatenated from this parameter and the IDS record number.
+That is, images with these names would be created if \fIiraf_file\fR = "ids":
+ids.1001, ids.1002, ids.1003, ..., ids.2001, ids.2002, ..., ids.3001 ....
+.le
+.ls record_numbers = "1001-9999"
+A string listing the IDS records to be read.
+.le
+.ls make_image = yes
+This switch determines whether the IDS records are converted to IRAF images.
+When \fImake_image\fR = no, only a listing of the headers is produced, 
+no output image is written.
+.le
+.ls print_pixels = no
+When this parameter is set to yes, the values of the ids pixels are printed.
+.le
+.ls long_header = yes
+This parameter determines whether a long or short header is printed.  When
+\fIlong_header\fR = no, a short header is printed.  The
+short header contains only the record number and ID string; the long header
+contains all information available 
+including the RA, Dec, HA, ST, UT, reduction flags, airmass, integration time,
+starting wavelength and wavelength per channel information.
+.le
+.ls data_type = "r"
+The data type of the output IRAF image.  If an incorrect data_type or null
+string is entered, the default data type \fIreal\fR is used.
+.le
+.ih
+DESCRIPTION
+IDSOUT format IDS records are read from a text file and optionally
+converted to a sequence of one dimensional IRAF images.  The text file will
+most likely have been created by reading an IDSOUT tape with \fBrcardimage\fR.
+The IDS records to be read from the file can be specified.
+The IDS header information is printed in either a short or long 
+form.  The pixels values can be listed as well.
+.ih
+EXAMPLES
+[1] Convert all records in the IDSOUT file to IRAF images, with the root image 
+name being "aug83".  The IDSOUT file is the first file on the tape, which is 
+mounted on mtb.
+	
+	cl> rcardimage mtb[1] | ridsout aug83
+
+[2] List the headers from the same IDSOUT file read in example 1, but don't make
+output images.  A \fBlong_header\fR will be listed; sample output is shown.
+
+	cl> rcardimage mtb[1] | ridsout make_image=no
+
+.nf
+
+RECORD = 2317, label = "CALLISTO  2297/2298  CLEAR/2.5ND",
+oflag = OBJECT, beam_number = 0,   alpha_ID = NEW,   companion = 2318,
+airmass = 1.524,        W0 = 3430.735,    WPC = 1.032,     ITM =  960,
+NP1 = 0, NP2 = 1024,    UT = 3:36:20.0,    ST = 15:36:43.0,
+HA = 1:39:48.5,         RA = 13:56:55.5,  DEC = -10:42:37.1,
+df = -1, sm = -1, qf = -1, dc = 0, qd = 0, ex = 0, bs = 1, ca = 0, co = -1
+.fi
+
+[3] Print the pixel values for records 5086 and 5087.  No output image will
+be written, and only the short header listed.  Again, the IDSOUT file is the
+first file on the tape, which is mounted on mtb.
+
+.nf
+	cl> rcard mtb[1] | ridsout make- long- print+ rec = 5086,5087
+.fi
+.ih
+BUGS
+The current version of IRAF magtape I/O does not read beyond the first
+volume of a multivolume tape.
+.sp
+Task \fBridsout\fR allows for converting more than one IDSOUT file per 
+execution.  In cases where a given record number occurs in more than one
+IDSOUT file being read and \fImake_image = yes\fR, this creates a problem, as
+the images being written will have the same name for the duplicate record 
+numbers ("iraf_name.record_number").  The action taken in this situation depends
+on the value of "noclobber"; the user should be aware of the potential
+problem.
+.ih
+SEE ALSO
+ridsfile, ridsmtn
+.endhelp

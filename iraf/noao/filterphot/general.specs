@@ -1,0 +1,242 @@
+The magnitude definition equations are:
+
+.nf
+.ks
+		       / mag1_fil1 - mag1_fil2 \
+    mag1' = -2.5 log10 | --------------------- |
+		       \ mag1_fil3 - mag1_fil4 /
+
+		       / mag1_fil5 - mag1_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag1_fil7 - mag1_fil8 /
+.ke
+
+.ks
+		       / mag2_fil1 - mag2_fil2 \
+    mag2' = -2.5 log10 | --------------------- |
+		       \ mag2_fil3 - mag2_fil4 /
+
+		       / mag2_fil5 - mag2_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag2_fil7 - mag2_fil8 /
+.ke
+
+.ks
+		       / mag3_fil1 - mag3_fil2 \
+    mag3' = -2.5 log10 | --------------------- |
+		       \ mag3_fil3 - mag3_fil4 /
+
+		       / mag3_fil5 - mag3_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag3_fil7 - mag3_fil8 /
+.ke
+
+.ks
+		       / mag4_fil1 - mag4_fil2 \
+    mag4' = -2.5 log10 | --------------------- |
+		       \ mag4_fil3 - mag4_fil4 /
+
+		       / mag4_fil5 - mag4_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag4_fil7 - mag4_fil8 /
+.ke
+
+.ks
+		       / mag5_fil1 - mag5_fil2 \
+    mag5' = -2.5 log10 | --------------------- |
+		       \ mag5_fil3 - mag5_fil4 /
+
+		       / mag5_fil5 - mag5_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag5_fil7 - mag5_fil8 /
+.ke
+
+.ks
+		       / mag6_fil1 - mag6_fil2 \
+    mag6' = -2.5 log10 | --------------------- |
+		       \ mag6_fil3 - mag6_fil4 /
+
+		       / mag6_fil5 - mag6_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag6_fil7 - mag6_fil8 /
+.ke
+
+.ks
+		       / mag7_fil1 - mag7_fil2 \
+    mag7' = -2.5 log10 | --------------------- |
+		       \ mag7_fil3 - mag7_fil4 /
+
+		       / mag7_fil5 - mag7_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag7_fil7 - mag7_fil8 /
+.ke
+
+.ks
+		       / mag8_fil1 - mag8_fil2 \
+    mag8' = -2.5 log10 | --------------------- |
+		       \ mag8_fil3 - mag8_fil4 /
+
+		       / mag8_fil5 - mag8_fil6 \
+            +2.5 log10 | --------------------- |
+		       \ mag8_fil7 - mag8_fil8 /
+.ke
+.fi
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+     mag1 = A + B [mag1' - K1 X - K2 X mag?] + C mag?
+     mag2 = D + E [mag2' - K3 X - K4 X mag?] + F mag?
+     mag3 = G + H [mag3' - K5 X - K6 X mag?] + I mag?
+     mag4 = J + K [mag4' - K7 X - K8 X mag?] + L mag?
+     mag5 = M + N [mag5' - K9 X - K10 X mag?] + O mag?
+     mag6 = P + Q [mag6' - K11 X - K12 X mag?] + R mag?
+     mag7 = S + T [mag7' - K13 X - K14 X mag?] + U mag?
+     mag8 = V + W [mag8' - K15 X - K16 X mag?] + X mag?
+.fi
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    sys_name		string
+    nmags		integer
+    break_point_mag	integer
+    mag1_name		string
+    mag1_fil1		integer
+    mag1_fil2		integer
+    mag1_fil3		integer
+    mag1_fil4		integer
+    mag1_fil5		integer
+    mag1_fil6		integer
+    mag1_fil7		integer
+    mag1_fil8		integer
+    B_usage		boolean
+    B_coeff		real
+    K2_usage		boolean
+    K2_coeff		real
+    K2_mag		integer
+    C_usage		boolean
+    C_coeff		real
+    C_mag		integer
+    mag2_name		string
+    mag2_fil1		integer
+    mag2_fil2		integer
+    mag2_fil3		integer
+    mag2_fil4		integer
+    mag2_fil5		integer
+    mag2_fil6		integer
+    mag2_fil7		integer
+    mag2_fil8		integer
+    E_usage		boolean
+    E_coeff		real
+    K4_usage		boolean
+    K4_coeff		real
+    K4_mag		integer
+    F_usage		boolean
+    F_coeff		real
+    F_mag		integer
+    mag3_name		string
+    mag3_fil1		integer
+    mag3_fil2		integer
+    mag3_fil3		integer
+    mag3_fil4		integer
+    mag3_fil5		integer
+    mag3_fil6		integer
+    mag3_fil7		integer
+    mag3_fil8		integer
+    H_usage		boolean
+    H_coeff		real
+    K6_usage		boolean
+    K6_coeff		real
+    K6_mag		integer
+    I_usage		boolean
+    I_coeff		real
+    I_mag		integer
+    mag4_name		string
+    mag4_fil1		integer
+    mag4_fil2		integer
+    mag4_fil3		integer
+    mag4_fil4		integer
+    mag4_fil5		integer
+    mag4_fil6		integer
+    mag4_fil7		integer
+    mag4_fil8		integer
+    K_usage		boolean
+    K_coeff		real
+    K8_usage		boolean
+    K8_coeff		real
+    K8_mag		integer
+    L_usage		boolean
+    L_coeff		real
+    L_mag		integer
+    mag5_name		string
+    mag5_fil1		integer
+    mag5_fil2		integer
+    mag5_fil3		integer
+    mag5_fil4		integer
+    mag5_fil5		integer
+    mag5_fil6		integer
+    mag5_fil7		integer
+    mag5_fil8		integer
+    N_usage		boolean
+    N_coeff		real
+    K10_usage		boolean
+    K10_coeff		real
+    K10_mag		integer
+    O_usage		boolean
+    O_coeff		real
+    O_mag		integer
+    mag6_name		string
+    mag6_fil1		integer
+    mag6_fil2		integer
+    mag6_fil3		integer
+    mag6_fil4		integer
+    mag6_fil5		integer
+    mag6_fil6		integer
+    mag6_fil7		integer
+    mag6_fil8		integer
+    Q_usage		boolean
+    Q_coeff		real
+    K12_usage		boolean
+    K12_coeff		real
+    K12_mag		integer
+    R_usage		boolean
+    R_coeff		real
+    R_mag		integer
+    mag7_name		string
+    mag7_fil1		integer
+    mag7_fil2		integer
+    mag7_fil3		integer
+    mag7_fil4		integer
+    mag7_fil5		integer
+    mag7_fil6		integer
+    mag7_fil7		integer
+    mag7_fil8		integer
+    T_usage		boolean
+    T_coeff		real
+    K14_usage		boolean
+    K14_coeff		real
+    K14_mag		integer
+    U_usage		boolean
+    U_coeff		real
+    U_mag		integer
+    mag8_name		string
+    mag8_fil1		integer
+    mag8_fil2		integer
+    mag8_fil3		integer
+    mag8_fil4		integer
+    mag8_fil5		integer
+    mag8_fil6		integer
+    mag8_fil7		integer
+    mag8_fil8		integer
+    W_usage		boolean
+    W_coeff		real
+    K16_usage		boolean
+    K16_coeff		real
+    K16_mag		integer
+    X_usage		boolean
+    X_coeff		real
+    X_mag		integer
+.fi
+

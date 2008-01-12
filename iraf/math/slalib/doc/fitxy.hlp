@@ -1,0 +1,76 @@
+.help fitxy Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slFTXY (ITYPE,NP,XYE,XYM,COEFFS,J)
+
+     - - - - - -
+      F T X Y
+     - - - - - -
+
+  Fit a linear model to relate two sets of [X,Y] coordinates.
+
+  Given:
+     ITYPE    i        type of model: 4 or 6 (note 1)
+     NP       i        number of samples (note 2)
+     XYE     d(2,np)   expected [X,Y] for each sample
+     XYM     d(2,np)   measured [X,Y] for each sample
+
+  Returned:
+     COEFFS  d(6)      coefficients of model (note 3)
+     J        i        status:  0 = OK
+                               -1 = illegal ITYPE
+                               -2 = insufficient data
+                               -3 = singular solution
+
+  Notes:
+
+  1)  ITYPE, which must be either 4 or 6, selects the type of model
+      fitted.  Both allowed ITYPE values produce a model COEFFS which
+      consists of six coefficients, namely the zero points and, for
+      each of XE and YE, the coefficient of XM and YM.  For ITYPE=6,
+      all six coefficients are independent, modelling squash and shear
+      as well as origin, scale, and orientation.  However, ITYPE=4
+      selects the "solid body rotation" option;  the model COEFFS
+      still consists of the same six coefficients, but now two of
+      them are used twice (appropriately signed).  Origin, scale
+      and orientation are still modelled, but not squash or shear -
+      the units of X and Y have to be the same.
+
+  2)  For NC=4, NP must be at least 2.  For NC=6, NP must be at
+      least 3.
+
+  3)  The model is returned in the array COEFFS.  Naming the
+      elements of COEFFS as follows:
+
+                  COEFFS(1) = A
+                  COEFFS(2) = B
+                  COEFFS(3) = C
+                  COEFFS(4) = D
+                  COEFFS(5) = E
+                  COEFFS(6) = F
+
+      the model is:
+
+            XE = A + B*XM + C*YM
+            YE = D + E*XM + F*YM
+
+      For the "solid body rotation" option (ITYPE=4), the
+      magnitudes of B and F, and of C and E, are equal.  The
+      signs of these coefficients depend on whether there is a
+      sign reversal between XE,YE and XM,YM;  fits are performed
+      with and without a sign reversal and the best one chosen.
+
+  4)  Error status values J=-1 and -2 leave COEFFS unchanged;
+      if J=-3 COEFFS may have been changed.
+
+  See also slPXY, slINVF, slXYXY, slDCMF
+
+  Called:  slDMAT, slDMXV
+
+  P.T.Wallace   Starlink   11 February 1991
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

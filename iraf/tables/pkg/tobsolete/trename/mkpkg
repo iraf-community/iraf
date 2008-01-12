@@ -1,0 +1,28 @@
+# Update the trename application 
+# Author: B.Simon, 28-May-1997
+
+$call	update
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+relink:
+	$omake	x_trename.x
+	$update trename.a
+linkonly:	
+	$link	x_trename.o trename.a \
+	-lxtools -ltbtables -o trename.e
+
+	;
+
+install:
+	$move trename.e tablesbin$trename.e
+
+	;
+
+trename.a:
+	iswholetab.x
+	trename.x      		<error.h> 
+	;

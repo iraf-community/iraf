@@ -1,0 +1,34 @@
+.LP
+.DS C
+\fBTable of Contents\fR
+.DE
+.sp 3
+1.\h'|0.4i'\fBIntroduction\fP\l'|5.6i.'\0\01
+.sp
+2.\h'|0.4i'\fBDetermining the HD Curve Data \fP\l'|5.6i.'\0\01
+.br
+\h'|0.4i'2.1.\h'|0.9i'SPOTLIST\l'|5.6i.'\0\02
+.br
+\h'|0.4i'2.2.\h'|0.9i'DEMATCH\l'|5.6i.'\0\02
+.sp
+3.\h'|0.4i'\fBFitting the Curve\fP\l'|5.6i.'\0\02
+.br
+\h'|0.4i'3.1.\h'|0.9i'HDFIT\l'|5.6i.'\0\02
+.br
+\h'|0.9i'3.1.1.\h'|1.5i'Interactive Curve Fitting\l'|5.6i.'\0\03
+.sp
+4.\h'|0.4i'\fBApplying the Transform\fP\l'|5.6i.'\0\05
+.br
+\h'|0.4i'4.1.\h'|0.9i'HDTOI\l'|5.6i.'\0\05
+.sp
+5.\h'|0.4i'\fBAligning Related HD curves\fP\l'|5.6i.'\0\06
+.br
+\h'|0.4i'5.1.\h'|0.9i'HDSHIFT\l'|5.6i.'\0\06
+.sp
+6.\h'|0.4i'\fBTesting the Transformation Algorithm\fP\l'|5.6i.'\0\06
+.br
+\h'|0.4i'6.1.\h'|0.9i'SELFTEST\l'|5.6i.'\0\06
+.sp
+7.\h'|0.4i'\fBThe Wedgefile Database\fP\l'|5.6i.'\0\06
+.br
+\h'|0.4i'7.1.\h'|0.9i'Contents of the NOAO Wedgefile\l'|5.6i.'\0\07

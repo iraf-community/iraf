@@ -1,0 +1,11 @@
+# Update the tcalc application code in the ttools package library
+# Author: Bernie Simon, 04-Nov-91
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tcalc.x		"../tabvar.com"  <tbset.h>
+	;

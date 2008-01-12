@@ -1,0 +1,57 @@
+.help radplt Dec85 obsolete
+.ih
+NAME
+radplt -- plot a radial profile of a stellar image
+.ih
+USAGE
+radplt input x_init y_init
+.ih
+PARAMETERS
+.ls input
+the list of images which contain the star whose profile is to be plotted
+.le
+.ls x_init
+the approximate column coordinate as a starting point for the centering
+.le
+.ls y_init
+the approximate line (row) coordinate as a starting point for the centering
+.le
+.ls cboxsize = 5
+the size of the extraction box to be used during the centering process
+.le
+.ls rboxsize = 21
+the size of the extraction box to be used for the radial profile. The
+profile will extend to sqrt(2) * rboxsize / 2. This is the length
+of the diagonal from the box center to a corner, and corresponds to about
+14 pixels for the default value.
+.le
+.ih
+DESCRIPTION
+Given the approximate coordinates of the center of a star, (x_init, y_init),
+RADPLT will compute a more accurate center using the algorithms described in
+the Kitt Peak publication "Stellar Magnitudes from Digital Images" under
+the Mountain Photometry Code section and then plot the intensity values
+in the profile extraction box as a function of distance from the center.
+This is effectively a radial profile.
+
+The values for both box sizes should be odd.
+.ih
+EXAMPLES
+The following example plots the profile of a star near (123, 234):
+.sp 1
+.nj
+.nf
+cl> radplt m92red 123 234
+.fi
+.ju
+.ih
+BUGS
+The routine will probably fail if the desired star is within 2 or 3 pixels
+of the image boundary.
+.ih
+USE INSTEAD
+plot.pradprof
+.ih
+SEE ALSO
+imcntr
+.endhelp

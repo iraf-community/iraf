@@ -1,0 +1,387 @@
+The procedures in this directory are an implementation of the Unix
+curses library, with a few deletions and extensions. The procedures
+have been modified to work in an SPP environment instead of a C
+environment. Unlike the C routines, they do not return an error status
+as a function value. In fact, very few of the procedures call error,
+instead they try to do the most reasonable thing. The mv macros are
+not implemented, instead the program should call move() followed by
+the appropriate procedure. Formatted reads and writes to windows are
+not supported, all reading and writing is done using strings.
+Subwindows are also not supported. The user program does not have
+direct access to the window structure, the function winstat() is
+provided to read fields from the structure. In order to make
+customization of windows easier, each window can have an input
+function and data structure bound to it. The functions bindstruct()
+and getstruct() are provided for this purpose. The forms directory
+gives several examples of binding functions and data structures to a
+window. Two other procedures hidewin() and showwin() are provided to
+hide a window which is currently displayed on the terminal and to
+redisplay it.
+
+The procedure initscr() should be called before using any of the
+procedures in the curses directory. It initializes the terminal and
+creates the first window (referred to as STDSCR), which covers the
+terminal scrren. The procedure endwin() should be called at the end of
+the user program. It closes any windows which are still open and
+resets the terminal. Windows are created by calling newwin() and
+destroyed by calling delwin(). The terminal cursor is moved by the
+procedure move(). Text is written into a window by the procedures
+addch() and addstr(). Text is read from the keyboard and displayed in
+the window by the procedures getch() and getstr(). Changes to the
+window are not displayed until refresh() is called. Fuller
+explanations of these and the other curses procedures is given below.
+
+Many procedures in this directory exist in two forms. The first form
+uses the default window, STDSCR. This window is created when initscr()
+is called and covers the entire screen. The second form uses any
+window and has an extra argument to specify which window to use. The
+names of the two forms are the same, except that the second has the
+letter "w" as the first character. For example, addch() adds a
+character to STDSCR, while waddch() adds a character to any window.
+The macro STDSCR is defined in <curses.h>, so it can be used by your
+program. Many of the procedures in this library operate relative to
+the current cursor position in that window. To set the cursor
+position, the program should call move() or wmove() first. Window
+coordinates are passed row first, column second. The upper left corner
+of a window is (1,1).
+
+procedure addch (ch)
+procedure waddch (win, ch)
+
+pointer	win		# i: Window descriptor
+char	ch		# i: Character to add
+
+This procedure adds a single character at the current cursor position.
+The character currently at that position is overwritten. A linefeed
+character clears the rest of the line and moves the cursor to the next
+row. A tab character inserts the apropriate number of spaces at the
+current position. A carriage return moves the cursor to the first
+character on the current line. A backspace moves the cursor one column
+left unless the cursor is in the first column of the window.
+
+procedure addstr (str)
+procedure waddstr (win, str)
+
+int	win		# i: Window descriptor
+char	str[ARB]	# i: String to add to window
+
+This procedure adds a string at the current cursor position. If part
+of the string extends beyond the right edge of the window, it will be
+truncated. Special characters have the same meaning as those in addch().
+The window will scroll if scrolling is enabled.
+
+procedure bindstruct (func, structure)
+procedure wbindstruct (win, func, structure)
+
+int	win		# i: Window descriptor
+extern	func		# i: Input function
+pointer	structure	# i: Data structure
+
+This procedure binds an input function and a data structure to a
+window. The data structure is used by the input function to maintain
+the window's state. The input function is called by getch() and
+getstr() to process keyboard input instead of the default procedure,
+editfn(). The input function should have the following calling sequence.
+
+procedure func (win, str, maxch)
+
+int	win		#  i: Window descriptor
+char	str[ARB]	# io: String containing line
+int	maxch		#  i: Maximum line length
+
+When writing this procedure, the default procedure, editfn() should be
+used as a guide. The procedure should update the terminal screen,
+string, and data structure appropriately. When the procedure gets a
+character indicating input is complete, the character should be pushed
+back on the input stream with the procedure k_pushbk(). Then the
+procedure should return the string to the calling program. The calling
+program can also call getstruct() to retrieve the contents of the data
+structure.
+
+procedure box (win, vert, hor)
+
+int	win		# i: Window descriptor
+char	vert		# i: Character used for vertical side of window
+char	hor		# i: Character used for horizontal side of window
+
+This procedure draws a box around a window. The box is inside the
+original area of the window, which is then reduced so that subsequent
+writes to the window will not overwrite the box.
+
+procedure clear ()
+procedure wclear (win)
+
+int	win		# i: Window descriptor
+
+This procedure clears a window. It is equivalent to calling clearok()
+with flag set to true, followed by calling erase().
+
+procedure clearok (win, flag)
+
+int	win		# i: Window descriptor
+bool	flag		# i: Flag value
+
+This procedure sets the clear flag for a window. If the clear flag is
+true, the entire window will be redrawn when refresh is called.
+
+procedure clrtobot ()
+procedure wclrtobot (win)
+
+int	win		# i: Window descriptor
+
+This procedure clears a window from the current cursor position to the
+end of the window.
+
+procedure clrtoeol ()
+procedure wclrtoeol (win)
+
+int	win		# i: Window descriptor
+
+This procedure clears a window from the current cursor position to the
+end of the line.
+
+procedure delch ()
+procedure wdelch (win)
+
+pointer	win		# i: Window descriptor
+
+This procedure deletes the character at the current cursor poisition
+in the window. Subsequent characters on the line are moved to the left
+by one.
+
+procedure deleteln ()
+procedure wdeleteln (win)
+
+pointer	win		# i: Window descriptor
+
+This procedure deletes the current line in the window. Subsequent
+lines in the window slide up by one and the last line is left blank.
+
+procedure delwin (win)
+
+This procedure deletes a window created by newwin(). The terminal area
+that was under the window before it was created is redisplayed. The
+data structure associated with the window is freed, including the data
+structure bound by bindstruct(). STDSCR cannot be deleted by this
+procedure, it is deleted by endwin().
+
+procedure echo ()
+procedure noecho ()
+
+These procedures turn character echoing on and off. Character echoing
+is on when the terminal is initialized. If character ecoing is off,
+procedures addch() and addstr() will return immediately after being
+called. 
+
+procedure endwin ()
+
+This procedure should be called at the end of a program which uses the
+curses library. It deletes all windows that are still open (including
+STDSCR) and resets the terminal.
+
+procedure erase ()
+procedure werase (win)
+
+int	win		# i: Window descriptor
+
+This procedure erases a window, filling it with blanks.
+
+int procedure getch ()
+int procedure wgetch (win)
+
+This procedure reads a single character from the keyboard and adds it
+to the window at the current cursor position. If an input function
+has been bound to the window by bindstruct(), the input procedure is
+called to process the character. The procedure returns after calling
+the input function once, regardless of the value of done. The returned
+character is the first character in the string output by the input
+function. 
+
+procedure getstr (str, maxch)
+procedure wgetstr (win, str, maxch)
+
+pointer	win		# i: Window descriptor
+char	str[ARB]	# o: String that was read from the keyboard
+int	maxch		# i: Maximum string length
+
+This procedure reads a string from the keyboard and displays it in the
+window at the current cursor position. Editing keys are recognized;
+however, editing is limited to a single line and keys which change the
+current line cause the procedure to exit. The default behaviour of
+this procedure can be modified by binding an input function to the
+window with bindstruct().
+
+procedure getstruct (structure)
+procedure wgetstruct (win, structure)
+
+int	win		# i: Window descriptor
+pointer	structure	# o: Data structure
+
+This procedure returns a pointer to the data structure that was bound 
+to the window by bindstruct().
+
+procedure getyx (win, row, col)
+
+int	win		# i: Window descriptor
+int	row		# o: Cursor row
+int	col		# o: Cursor column
+
+This procedure returns the location of the cursor in a window. The
+top left corner of a window is (1,1).
+
+procedure hidewin (win)
+
+int	win		# i: Window descriptor
+
+This procedure hides a window that is currently displayed on the
+screen. The terminal area under the window is displayed after the
+window is hidden. The window can be redisplayed by calling showwin().
+
+char procedure inch ()
+char procedure winch (win)
+
+pointer	win		# i: Window descriptor
+
+This procedure returns the character at the current cursor location in
+the window.
+
+procedure initscr ()
+
+This procedure initializes the terminal and creates the default
+window, STDSCR. It should be called before any other procedure in the
+curses library is called.
+
+procedure insch (ch)
+procedure winsch (win, ch)
+
+pointer	win		# i: Window descriptor
+char	ch		# i: Character to insert
+
+This procedure inserts a character at the current cursor position.
+
+procedure insertln ()
+procedure winsertln (win)
+
+pointer	win		# i: Window descriptor
+
+This procedure inserts a blank line on the current row. The current
+line and subsequent lines move down by one and the last line in the
+window is deleted.
+
+procedure leaveok (win, flag)
+
+int	win		# i: Window descriptor
+bool	flag		# i: Flag value
+
+This procedure sets the leave flag for a window. If the leave flag
+is true, procedures that modify the screen will not move the terminal
+cursor to the window's current cursor position when the window is
+modified. If it is false, the terminal cursor position will be moved
+when the window is updated. When a window is created, the leave flag
+is set to false.
+
+procedure move (row, col)
+procedure wmove (win, row, col)
+
+int	win		# i: Window descriptor
+int	row		# i: Cursor row
+int	col		# i: Cursor column
+
+This procedure moves the cursor position in a window. Coordinates are
+relative to those of the window, and the top left corner of a window
+has the coordinates (1,1)
+
+procedure mvwin (win, row, col)
+
+int	win		# i: Window descriptor
+int	row		# i: New top row of window
+int	col		# i: New left column of window
+
+This position moves the position of a window on the screen. The
+position of a window is the position of the top left corner on the
+terminal screen. If the new corrdinates would place part of the window
+off the screen, the coordinates are modified so that the window stays
+on the screen.
+
+int procedure newwin (nrows, ncols, row, col)
+
+int	nrows		# i: Window height
+int	ncols		# i: Window width
+int	row		# i: Top row of window
+int	col		# i: Leftmost column of window
+
+This procedure creates a new window. The returned value is the window
+descriptor, which is used as an argument to the other window
+functions. The window position is relative to the top left corner of
+the terminal, which has the coordinates (1,1). If part of the window
+is off the terminal screen, it will be placed and sized so that the
+entire window fits on the screen.
+
+procedure refresh ()
+procedure wrefresh (win)
+
+int	win		# i: Window descriptor
+
+This procedure causes all changes to a window that have been made by
+other calls in this library to be displayed on the terminal screen. If
+the clear flag has been set to yes by clearok(), the window will be
+cleared and redrawn.
+
+procedure savewin ()
+procedure nosavewin ()
+
+These procedures set and unset the save flag. If the save flag is set,
+whenever a window is created, the area on the terminal screen under is
+saved in a buffer so it can be restored when the window is hidden or
+deleted. If a window will exist throughout the life of a program, the
+save flag can be unset by calling nosavewin() before creating the
+window so that the memory used to hold the buffer will not be wasted.
+The save flag is initially set to yes so that all windows have
+associated screen buffers by default.
+
+procedure scrollok (win, flag)
+
+int	win		# i: Window descriptor
+bool	flag		# i: Flag value
+
+If the scroll flag is set to true, a window will scroll when an
+attempt is made to write beyond the last line of a window. If the
+scroll flag is false, the last line of the window will be overwritten.
+When a new window is created, the scroll flag is set to false.
+
+procedure showwin (win)
+
+int	win		# i: Window descriptor
+
+This procedure shows a window that was previously hidden by a call to
+hidewin(). If the window is not hidden, this procedure has no effect.
+
+procedure standout ()
+procedure standend ()
+procedure wstandout (win)
+procedure wstandend (win)
+
+int	win		# i: Window descriptor
+
+These procedures modify the character attribute of a window. Calling
+standout() causes all characters written to the window after the call
+to be written in standout mode. Calling standend() causes all
+characacters to be written in normal mode. When a window is created,
+the character attribute of the window is normal.
+
+procedure wdimen (win, nrows, ncols)
+
+int	win		# i: Window descriptor
+int	nrows		# o: Window height
+int	ncols		# o: Window width
+
+This procedure returns the height and width of a window.
+
+int procedure winstat (win, what)
+
+int	win		# i: Window descriptor
+int	what		# i: Field to retrieve
+
+This procedure returns a field from the window descriptor. The field
+to retrieve is given by a symbolic constant. These constants are
+listed in the include file <curses.h>.

@@ -1,0 +1,94 @@
+	   aabs - Absolute value of a vector
+	   aadd - Add two vectors
+	  aaddk - Add a vector and a scalar
+	   aand - Bitwise boolean AND of two vectors
+	  aandk - Bitwise boolean AND of a vector and a scalar
+	   aavg - Compute the mean and standard deviation of a vector
+	   abav - Block average a vector
+	   abeq - Vector equals vector
+	  abeqk - Vector equals scalar
+	   abge - Vector greater than or equal to vector
+	  abgek - Vector greater than or equal to scalar
+	   abgt - Vector greater than vector
+	  abgtk - Vector greater than scalar
+	   able - Vector less than or equal to vector
+	  ablek - Vector less than or equal to scalar
+	   ablt - Vector less than vector
+	  abltk - Vector less than scalar
+	   abne - Vector not equal to vector
+	  abnek - Vector not equal to scalar
+	   abor - Bitwise boolean OR of two vectors
+	  abork - Bitwise boolean OR of a vector and a scalar
+	   absu - Block sum a vector
+	   acht - Change datatype of a vector
+	  acjgx - Complex conjugate of a complex vector
+	   aclr - Clear (zero) a vector
+	   acnv - Convolve two vectors
+	  acnvr - Convolve a vector with a real kernel
+	   adiv - Divide two vectors
+	  adivk - Divide a vector by a scalar
+	   adot - Dot product of two vectors
+	   advz - Vector divide with divide by zero detection
+	   aexp - Vector to a real vector exponent
+	  aexpk - Vector to a real scalar exponent
+	  afftr - Forward real discrete fourier transform
+	  afftx - Forward complex discrete fourier transform
+	   aglt - General piecewise linear transformation
+	   ahgm - Accumulate the histogram of a series of vectors
+	   ahiv - Compute the high (maximum) value of a vector
+	  aiftr - Inverse real discrete fourier transform
+	  aiftx - Inverse complex discrete fourier transform
+	   aimg - Imaginary part of a complex vector
+	   alan - Logical AND of two vectors
+	  alank - Logical AND of a vector and a constant
+	   alim - Compute the limits (minimum and maximum values) of a vector
+	   alln - Natural logarithm of a vector
+	   alog - Logarithm of a vector
+	   alor - Logical OR of two vectors
+	  alork - Logical OR of a vector and a constant
+	   alov - Compute the low (minimum) value of a vector
+	   altr - Linear transformation of a vector
+	   alui - Vector lookup and interpolate (linear)
+	   alut - Vector transform via lookup table
+	   amag - Magnitude of two vectors (sqrt of sum of squares)
+	   amap - Linear mapping of a vector with clipping
+	   amax - Vector maximum of two vectors
+	  amaxk - Vector maximum of a vector and a scalar
+	   amed - Median value of a vector
+	  amed3 - Vector median of three vectors
+	  amed4 - Vector median of four vectors
+	  amed5 - Vector median of five vectors
+	   amgs - Magnitude squared of two vectors (sum of squares)
+	   amin - Vector minimum of two vectors
+	  amink - Vector minimum of a vector and a scalar
+	   amod - Modulus of two vectors
+	  amodk - Modulus of a vector and a scalar
+	   amov - Move (copy or shift) a vector
+	  amovk - Move a scalar into a vector
+	   amul - Multiply two vectors
+	  amulk - Multiply a vector and a scalar
+	   aneg - Negate a vector (change the sign of each pixel)
+	   anot - Bitwise boolean NOT of a vector
+	   apkx - Pack a complex vector given the real and imaginary parts
+	   apol - Polynomial evaluation
+	   apow - Vector to an integer vector power
+	  apowk - Vector to an integer scalar power
+	   arav - Mean and standard deviation of a vector with pixel rejection
+	   arcp - Reciprocal of a scalar and a vector
+	   arcz - Reciprocal with detection of divide by zero
+	   arlt - Vector replace pixel if less than scalar
+	   argt - Vector replace pixel if greater than scalar
+	   asel - Vector select from two vectors based on boolean flag vector
+	  aselk - Vector select from vector/scalar based on boolean flag vector
+	   asok - Selection of the Kth smallest element of a vector
+	   asqr - Square root of a vector
+	   asrt - Sort a vector in order of increasing pixel value
+	   assq - Sum of squares of a vector
+	   asub - Subtract two vectors
+	  asubk - Subtract a scalar from a vector
+	   asum - Sum of a vector
+	   aupx - Unpack the real and imaginary parts of a complex vector
+	   awsu - Weighted sum of two vectors
+	   awvg - Mean and standard deviation of a windowed vector
+	   axor - Bitwise boolean XOR (exclusive or) of two vectors
+	  axork -  Bitwise boolean XOR (exclusive or) of a vector and a scalar

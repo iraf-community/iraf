@@ -1,0 +1,5 @@
+gettape,s,a,,,,Tape to read fits headers from (i.e. "mta")
+getout,s,a,,,,File to put output information in
+getsfnum,i,a,,,,File number on tape from which to start logging 
+getefnum,i,a,,,,File number on tape at which logging is to end
+getapp,b,a,,,,Append to existing file?

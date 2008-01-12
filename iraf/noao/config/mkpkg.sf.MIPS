@@ -1,0 +1,13 @@
+# Mkpkg special file list for MIPS/IRAF.
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+# Files optimized for the local host system.
+# -----------------------------------------
+
+# $special "iraf$noao/mtlocal/lib/":	 cyboow.x as$cyboow.s ;
+
+# Files requiring special compilation due to host compiler bugs.
+# -------------------------------------------------------------

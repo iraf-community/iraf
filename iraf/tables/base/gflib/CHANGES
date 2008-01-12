@@ -1,0 +1,177 @@
+Nov-08-2002 Jay T. Miller
+
+I finally identified the caltwp2 **EXPNAME ...* card following 80 char
+ROOTNAME card as caused by the call to gf_fix_cmt in gfsplitua.x.  The
+apparent intent was to add * to the card comment of duplicate
+(ROOTNAME?)  cards, forcing the IRAF kernel to view them as unique and
+therefore suppress duplicate removal.  
+
+Bernie Simon wrote:
+
+"""
+I fixed two problems in the library. Problem one is that the fits
+kernel does not allow a header card in the extension to duplicate a
+card in the primary header. Problem two is that changes made to the
+primary header while an extension is open are lost if other changes
+are made to the primary header when a subsequent extension is opened.
+
+The solution to the first problem was to modify the comment field of
+the duplicate keyword in the extension. This keeps the code in the
+fits kernel which culls cards in the primary header from removing the
+duplicate card in extension. A new function in gifixcmt.x adds an
+asterisk to the end of the comment field if not already
+present. Gfsplitua.x was modified to call this new function. In order
+to support the logic which the new version of gfsplitua requires,
+gfhash.x was modified by adding an integer field (the mark field) and
+two procedures to get and set it.
+
+The cause of the second problem is that the fits kernel updates an
+image opened in new copy mode with the contents of the template image
+when each extension is opened. This wipes out the changes to the
+primary header made when the previous extension was opened. The work
+around for this problem lies in the fact that the cache header for the
+image contains the updated contents of the primary header. By updating
+the user area with the cache header after the image is opened in new
+copy mode, the changes to the primary header are restored. The change
+requires the new procedure in gilib, gi_upuser.x and also a
+modification to gf_opengr.x nter the text in that file's own buffer.
+"""
+
+Unfortunately, a bug in gf_fix_cmt permits the addition of * to cards
+which are already 80 chars.  To "fix" the **EXPNAME problem, I
+commented out the call to gf_fix_cmt.  This change was made under the
+assumption that:
+
+(1) the gf_fix_cmt approach never actually worked
+(2) there was already precedent for tasks *not* to support ROOTNAME in
+all extensions anyway.
+
+Here's a sample of what the EXPNAME problem actually looked like as seen
+through the eyes of "catfits long+":
+
+ROOTNAME= 'u21y0103t                         ' / rootname of the observation set
+**EXPNAME = 'u21y0103t                ' / exposure identifier*
+
+
+
+Jan-10-2002  Jay T. Miller
+
+I modified GFLIB to fix the HISTORY support for FITS files.  The
+missing HISTORY problem was identified in the context of the caltwp2
+task by comparing the output of GEIS format processing with FITS
+format processing of equivalent data.  There was no HISTORY in the
+FITS output.  
+
+The disappearing HISTORY was tracked down to the first gf_opengr
+boundary.  To explain how and where, I need to give some background on
+how GFLIB works.  
+
+GFLIB supports multi-extension fits (GEIS in FITS format) using the
+FITS kernel in IRAF.  A file mapped using gf_map is effectively mapped
+twice using immap:
+
+1. First, the selected extension is immap'ed *without* inheritance.
+GFLIB processes the user area to identify extension header keywords.
+
+2. Second, the selected extension is immap'ed *with* inheritance,
+effectively making both the primary and extension headers available
+simultaneously.
+
+The reason for the two step process is to record to which header,
+primary or secondary, any given keyword belongs to.  It is assumed
+that any newly added keywords will belong to the primary header.
+Pre-existing keywords were either identified in step 1 as belonging to
+the current extension, or not, in which case they must belong to the
+primary.
+
+When GFLIB unmaps a file *or* switches groups, the following happens,
+captured in the gf_split_ua function:
+
+1. The user area of the current extension is scanned.  Each record is
+assigned to either the primary header spool or the extension spool, 
+making use of the extension keyword hash recorded at mapping time.
+
+2. The extension user area is overwritten with the extension spool and
+imunmap'ed.  This effectively updates the extension data and keywords in
+the FITS file.
+
+3. If a "dirty" flag was set, the primary extension is mapped, the
+user area of the primary extension is overwritten with the primary
+header spool, and the primary extension is imunmap'ed.  This
+effectively updates the primary header in the FITS file.  The reason
+the the imput and imadd operations are wrapped in GFLIB is to set the
+"dirty" flag.
+
+When a new group is being opened, gf_opengr then immaps the new group
+extension readying it for access.
+
+With that said, I can describe the problem with HISTORY handling.
+
+HISTORY is not normally inherited by an extension mapped using immap,
+and is therefore omitted from the extension user area.  The IRAF FITS
+kernel views each extension as a "sovereign" image, fully entitled to
+its own HISTORY.  GFLIB policy, in contrast, is that HISTORY *is*
+inheritable; each extension shares the primary header HISTORY. GFLIB
+implements this by promoting added HISTORY to the primary header spool
+in gf_split_ua.
+
+GFLIB assumed (wrongly) that all non-standard keywords (including
+HISTORY) would be present in the user area of an extension mapped with
+inheritance.  Because this aspect of the IRAF FITS kernel was
+overlooked, existing HISTORY is effectively filtered out in a single
+mapping and unmapping cycle (provided that the primary header is
+updated).  Since HISTORY never makes it into the extension user area,
+it is effectively deleted when the extension user area is split to
+overwrite the primary and extension headers.
+
+My solution to the missing HISTORY problem was to add code which scans
+a newly mapped file for HISTORY records and saves them off in a spool
+file associated with the image.  This code is embodied in the function
+gfhist in gf_map.x.  Associating the history spool with an image was
+accomplished by adding a new field (PARAM_HIST) to the image
+"database", in gfdb.com, gf.h, and gfdb.x.  This association permits
+GFLIB to support multiple file mappings concurrently, each supporting
+its own independent instance of the history spool.
+
+When the image is later imunmap'ed in gf_unmap or gf_opengr and the
+extension user area is split in gf_split_ua, the history spool is used
+to append history to the primary header spool.  Newly added HISTORY
+found in the extension user area is appended to the history spool.
+Finally, the history spool is appended to the primary header spool 
+and the primary header is updated.
+
+One final complication exists: the IRAF kernel permits HISTORY to be
+inherited when an image is opened in NEW_COPY mode.  The effect is
+that pre-existing HISTORY ends up in both the history spool and the
+extension user area.  When the image is unmapped, the same HISTORY is
+seen as both pre-existing and newly added, doubling itself.  To fix
+this, I added code to gf_new_copy which deletes HISTORY from the
+extension user area: gfnohist.
+
+Test Data Files:
+
+u21y0103t_d0f.fits
+u21y0103t_q0f.fits
+u21y0103t_q1f.fits
+u21y0103t_x0f.fits
+
+Output files:
+
+u21y0103t_c0f.fits
+u21y0103t_c1f.fits
+u21y0103t.cgr
+
+Reference Files:
+
+f8213081u.r0h  
+f8213081u.r0d  
+dbu1405fu.r1h      
+dbu1405fu.r1d  
+
+References exported from Solaris as:
+
+f8213081u.r0h.fit
+dbu1405fu.r1h.fit  
+
+Then converted to GEIS using strfit/stwfit
+

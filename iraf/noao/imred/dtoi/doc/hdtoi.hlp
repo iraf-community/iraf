@@ -1,0 +1,88 @@
+.help hdtoi May88 imred.dtoi
+.ih
+NAME
+hdtoi -- transform images according to hd curve
+.ih
+USAGE
+hdtoi input output database
+.ih
+PARAMETERS
+.ls input
+List of images to be transformed.
+.le
+.ls output
+List of output image names.
+.le
+.ls database
+Name of text database describing HD curve.
+.le
+.ls fog = ""
+Value of fog level, read from database if unspecified.
+.le
+.ls option = "mean"
+Option for calculating fog density when \fBfog\fR is a file list, can be
+either "mean" or "median".
+.le
+.ls sigma = 3.0
+If \fBfog\fR is a file name, and \fBoption\fR = "mean", the mean fog density
+is iteratively calculated using this rejection criteria.
+.le
+.ls floor = 0.0
+Value assigned to levels below fog, can be either 0.0 or -1.0.  
+.le
+.ls ceiling = 30000.
+The final intensities are scaled to this value, such that a saturated
+input density equals \fBceiling\fR on output.
+.le
+.ls datatype = "r"
+Datatype of output image pixels.
+.le
+.ls verbose = yes
+Print log of processing to STDOUT.
+.le
+.ih
+DESCRIPTION
+Task \fIhdtoi\fR transforms one image to another as described by the 
+\fBdatabase\fR.  There is only one HD curve per run; the same 
+transformation is applied to all input images.
+
+The fog value can be obtained in three ways: read from the database, read
+as a floating point number, or calculated from a list of fog images.  If 
+parameter \fBfog\fR is not specified, the fog value is read from 
+\fBdatabase\fR.  If \fBfog\fR is specified, it can be entered
+as either a floating point number or as a list of file names.  If the
+value cannot be read as a number, it is assumed to be a file name.  In that
+case, the density of each file in the fog list is calculated and the 
+average of these values is subtracted from \fBinput\fR before processing.
+The algorithm used to calculate the fog density is selected by the
+\fBoption\fR parameter, and is either a "mean" or "median" calculation.
+The fog density can be the mean value after pixels more than the specified
+number of sigma have been rejected, or the median value of all the fog spot
+pixels.
+
+The fog value is subtracted from the input image before the transformation
+takes place.  It is possible that some density values will fall below
+the fog level; these values are handled in one of two ways.  Values
+below the fog value are set equal to 0.0 when \fBfloor\fR = 0.0.  If 
+\fBfloor\fR = -1.0, the resulting intensity = -1 * intensity (abs (value)).
+
+A scaling factor is applied to the final intensities, as typically
+they will be < 1.0.  The \fBceiling\fR parameter is used to specify what
+value a saturated density is transformed to; all intensities are scaled
+to this upper limit.  The precision of the transformation is unaffected by 
+this parameter, although caution must be used if the output image pixel
+type is an integer.  The user is responsible for choosing
+a \fBceiling\fR that avoids the truncation of significant digits.
+.ih
+EXAMPLES
+Convert three density images to intensity images as described in database db1.
+
+	cl> hdtoi denin* intim1,intim2,intim3 db1
+.ih
+TIME REQUIREMENTS
+Task \fBhdtoi\fR requires 20 cpu seconds to transform a 512 square image, with
+a 12 bit data range, on a VAX 750
+.ih
+SEE ALSO
+spotlist, dematch, hdfit
+.endhelp

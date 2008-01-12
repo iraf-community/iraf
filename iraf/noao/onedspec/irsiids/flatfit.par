@@ -1,0 +1,24 @@
+# FLATFIT parameter file
+
+input,s,a,,,,Input image root file name
+records,s,a,,,,Range of spectral records
+output,s,a,,,,Output file root name for new spectra
+function,s,h,"chebyshev",,,Function to fit (chebyshev|legendre|spline3|spline1)
+order,i,h,6,1,,Fitting order (number of terms)
+niter,i,h,1,1,,Number of rejection iterations
+lower,r,h,2,0,,Lower rejection criterion in sigmas
+upper,r,h,2,0,,Upper rejection criterion in sigmas
+ngrow,i,h,0,,,Growing region
+div_min,r,h,1.0,,,Value to use if division by zero occurs
+interact,b,h,yes,,,Interact with the first accumulation?
+all_interact,b,h,no,,,Interact with all accumulations?
+coincor,b,h,)_.coincor,,,Apply coincidence correction to flats
+ccmode,s,h,)_.ccmode,,,Correction mode (photo|iids)
+deadtime,r,h,)_.deadtime,,,Deadtime in seconds
+power,r,h,)_.power,,,IIDS power law coefficient
+new_order,i,a,4,1,,enter order
+new_lower,r,a,,,,enter nr sigma
+new_upper,r,a,,,,enter nr sigma
+new_niter,i,a,,,,enter nr of iterations
+confirm,b,a,,,,Exit and save solution?
+cursor,*gcur,h,"",,,Graphics cursor input

@@ -1,0 +1,172 @@
+.help nlfit Feb91 "Math Package"
+.ih
+NAME
+nlfit -- Levenberg-Marquardt non-linear least-squares fitting package
+.ih
+SYNOPSIS
+The principal entry points into the NLFIT package are listed below.
+
+.nf
+	nlinit - Initialize the fitting routines
+        nlstat - Get the value of an NLFIT parameter
+	nlpget - Get the values of the fitted parameters
+	nlfree - Free memory allocated by nlinit
+	 nlfit - Fit the function
+	nleval - Evaluate the curve at a given point
+      nlvector - Evaluate the curve at an array of points 
+      nlerrors - Compute the fits statistics and errors in the parameters
+.fi
+
+The calling sequences for the above routines are listed below. The [ird]
+stand for integer, real and double precision versions of each routine
+respectively.
+
+.nf
+            nlinit[rd] (nl, address(fnc), address(dfnc), params, dparams,
+	        nparams, plist, nfparams, tol, itmax)
+        ival = nlstati (nl, param)
+  [rd]val = nlstat[rd] (nl, param)
+            nlpget[rd] (nl, params, nparams)
+            nlfree[rd] (nl)
+             nlfit[rd] (nl, x, z, w, npts, nvars, wtflag, ier)
+  [rd]val = nleval[rd] (nl, x, nvars)
+          nlvector[rd] (nl, x, zfit, npts, nvars)
+          nlerrors[rd] (nl, z, zfit, wts, npts, variance, chisqr, errors)
+.fi
+
+The user supplied functions fnc and dfnc must have the following form.
+	
+.nf
+	       fnc (x, nvars, params, nparams, zfit)
+	      dfnc (x, nvars, params, dparams, nparams, zfit, derivs)
+.fi
+
+The addresses of these functions can be obtained by a call to lcopr as
+follows.
+
+.nf
+		address = locpr (fnc)
+.fi
+
+.ih
+DESCRIPTION
+The NLFIT package provides a set of routines for fitting data to non-linear
+functions of several variables using least squares techniques.
+NLFIT uses the Levenberg-Marquardt
+method to solve for the parameters of a user specified non-linear equation.
+The user must supply two subroutines. The first subroutine evaluates the
+function in terms of its parameters. The second subroutine evaluates the
+function and its derivatives in terms of its parameters.  The user must
+also supply initial
+guesses for the parameters and parameter increments, the list of
+parameters to be varied during the fitting process, a fitting
+tolerance and the maximum number of iterations. 
+.ih
+NOTES
+The poackage definitions for NLFIT can be found in the file 
+lib$math/nlfit.h. In order to make these definitions available
+to the calling program, the user must insert the statement
+"include <math/nlfit.h>" inside the calling program.
+
+The permitted values for the param argument in nlstat[ird] are the following.
+
+.nf
+define	NLNPARAMS	integer		# Number of parameters
+define	NLNFPARAMS	integer         # Number of fitted parameters
+define	NLITMAX		integer		# Maximum number of iterations
+define	NLITER		integer		# Current number of iterations
+define	NLNPTS		integer         # Number of points
+define	NLSUMSQ		real/double	# Current reduced chi-squared
+define	NLOLDSQ		real/double     # Previous reduced chi-squared
+define	NLLAMBDA	real/double     # Value of lambda factor
+define	NLTOL		real/double	# Fitting tolerance in %chi-squared
+define	NLSCATTER	real/double     # Mean scatter in the fit
+.fi
+
+The permitted values of the wtflag argument in nlfit[rd] are the following.
+
+.nf
+define	WTS_USER			# User enters weights
+define	WTS_UNIFORM			# Equal weights
+define	WTS_CHISQ 			# Chi-squared weights
+define	WTS_SCATTER			# Weights include scatter term
+.fi
+
+The permitted error values returned from nlfit[rd] are the following.
+
+.nf
+define	DONE			0	# Solution converged
+define	SINGULAR		1	# Singular matrix
+define	NO_DEG_FREEDOM		2	# Too few points
+define	NOT_DONE		3	# Solution did not converge
+.fi
+.ih
+REFERENCES
+1. Bevington,P.R., 1969, Data Reduction and Error Analysis for the Physical
+Sciences, Chapter 11, page 235.
+
+2. Press, W.H. et al., 1986, Numerical Recipes: The Art of Scientific
+Computing, Chapter 14, page 523
+.ih
+EXAMPLES
+.nf
+Example 1: Fit a curve to the data using uniform weighting. Fit all the
+parameters.
+
+    # Include nlfit definitions
+    include <math/nlfit.h>
+
+    # Declare the variables
+    int	nparams, nfparams, itmax, npts, nvars, ier
+    int	plist[nparams]
+    real tol, variance, chisqr
+    real params[nparams], dparams[nparams], vars[nvars,npts], z[npts]
+    real w[npts], zfit[npts], errors[nparams]
+
+    # Declare the functions
+    extern fncname(), dfncname()
+    int	locpr()
+
+    begin
+            ... get data, set initial values of all parameters, parameter
+	    ... increments, tol and itmax
+
+            # Define list of variables to be fitted
+            nfparams = nparams
+            do i = 1, nparams
+	        plist[i] = i
+
+	    # Fit only parameters 1,3 and 5
+	    #nfparams = 3
+	    #plist[1] = 1
+	    #plist[2] = 3
+	    #plist[3] = 5
+
+            # Initialize the fitting routines
+            call nlinitr (nl, locpr (fncname), locpr (dfncname),
+	        params, dparams, nparams, plist, nfparams, tol, itmax)
+
+            # Fit the data
+            call nlfitr (nl, x, z, w, npts, nvars, WTS_UNIFORM, ier)
+            if (ier != DONE)
+	        ... take error action
+
+            # Compute the statistics of the fit
+            call nlvectorr (nl, x, zfit, npts, nvars)
+            call nlerrorsr (nl, z, zfit, wts, npts, variance, chisqr,
+	        errors)
+
+            # Get the values of the fitted parameters
+            call nlpgetr (nl, params, nparams)
+            call nlfreer (nl)
+
+            # Print the parameters and their errors.
+            do i = 1, nparams {
+	        call printf ("%d  %g  %g\n")
+	        call pargi (i)
+	        call pargr (params[i])
+	        call pargr (errors[i])
+	    }
+    end
+.fi
+.endhelp

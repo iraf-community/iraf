@@ -1,0 +1,33 @@
+objects,f,a,"",,,"List of object spectra"
+arcs1,f,a,"",,,"List of arc spectra"
+arctable,f,a,"",,,"Arc assignment table (optional)"
+standards,f,a,"",,,"List of standard star spectra
+"
+crval,s,a,"INDEF",,,"Approximate wavelength"
+cdelt,s,a,"INDEF",,,"Approximate dispersion
+"
+dispcor,b,a,yes,,,"Dispersion correct spectra?"
+extcor,b,a,no,,,"Extinction correct spectra?"
+fluxcal,b,a,no,,,"Flux calibrate spectra?"
+resize,b,a,no,,,"Automatically resize apertures?"
+clean,b,a,no,,,"Detect and replace bad pixels?"
+splot,b,a,no,,,"Plot the final spectrum?"
+redo,b,a,no,,,"Redo operations if previously done?"
+update,b,a,no,,,"Update spectra if cal data changes?"
+quicklook,b,a,no,,,"Minimally interactive quick-look?"
+batch,b,a,no,,,"Extract objects in batch?"
+listonly,b,a,no,,,"List steps but don\'t process?
+"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
+anssplot,s,q,,no|yes|NO|YES,,"Splot spectrum?"
+newdisp,b,h,,,,
+newsens,b,h,,,,
+newarcs,b,h,,,,
+fluxcal1,b,h,,,,
+splot1,b,h,,,,
+splot2,b,h,,,,
+dobatch,b,h,,,,
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

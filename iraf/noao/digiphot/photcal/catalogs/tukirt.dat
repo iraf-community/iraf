@@ -1,0 +1,12 @@
+# Sample transformation section for the UKIRT JHK system
+
+transformation
+
+fit   j1=0.0, j2=0.05, j3=0.000
+JFIT : mJ = (K + JK) + j1 + j2 * XJ + j3 * JK
+
+fit   h1=0.0, h2=0.05, h3=0.000
+HFIT : mH = (K + HK) + h1 + h2 * XH + h3 * HK
+
+fit   k1=0.0, k2=0.05, k3=0.000
+KFIT : mK = K + k1 + k2 * XK + k3 * HK

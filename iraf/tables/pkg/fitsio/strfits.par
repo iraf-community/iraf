@@ -1,0 +1,16 @@
+# strfits parameters
+fits_files,f,a,,,,FITS data source
+file_list,s,a,,,,File list
+iraf_files,f,a,,,,IRAF filename
+template,f,h,"none",,,template filename
+long_header,b,h,no,,,Print FITS header cards?
+short_header,b,h,yes,,,Print short header?
+datatype,s,h,"default","|unsigned|short|integer|default|real|double|complex|",,IRAF data type
+blank,r,h,0.0,,,Blank value
+scale,b,h,yes,,,Scale the data?
+xdimtogf,b,h,yes,,,Transform xdim FITS to multigroup?
+oldirafname,b,h,yes,,,Use old IRAF name in place of iraf_file?
+force,b,h,no,,,Force conversion from fits?
+offset,i,h,0,,,Tape file offset
+Version,s,h,"2-Aug-2000",,,Strfits version
+mode,s,h,ql,,,

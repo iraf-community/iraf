@@ -1,0 +1,9 @@
+# Cl parameters for task hdfit are:
+database,f,a,,,,List of database names
+function,s,h,"power",,,Fitting function
+transform,s,h,"logopacitance",,,Independent variable transformation
+order,i,h,4,,,Initial order (ncoeff) of fit
+interactive,b,h,y,,,Interactive fitting flag
+device,s,h,"stdgraph",,,Name of interactive graphics device
+weighting,s,h,"none",,,Type of weighting
+cursor,*gcur,h,"",,,Source of cursor input

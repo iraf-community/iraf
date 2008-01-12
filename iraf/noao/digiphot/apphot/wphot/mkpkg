@@ -1,0 +1,38 @@
+# WPHOT task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbwphot.x	<fset.h>		../lib/apphot.h        \
+			../lib/center.h		../lib/display.h       \
+			../lib/fitsky.h
+	apgwppars.x	../lib/center.h		../lib/fitsky.h        \
+			../lib/phot.h		../lib/display.h       \
+			../lib/noise.h
+	apwconfirm.x	../lib/apphot.h		../lib/noise.h         \
+			../lib/center.h		../lib/fitsky.h	       \
+			../lib/phot.h
+	apwmag.x	<mach.h>		../lib/apphotdef.h     \
+			../lib/noisedef.h	../lib/photdef.h       \
+			../lib/apphot.h         ../lib/phot.h
+	apgmeasure.x	
+	aptmeasure.x
+	apwpars.x	../lib/display.h
+	apwphot.x	<ctype.h>		<gset.h>               \
+			../lib/apphot.h		../lib/display.h       \
+			../lib/center.h		../lib/fitsky.h        \
+			../lib/phot.h		<imhdr.h>
+	apwpcolon.x	../lib/noise.h		../lib/apphot.h        \
+			../lib/display.h	../lib/fitsky.h        \
+			../lib/center.h		../lib/phot.h          \
+			<gset.h>
+	apwremag.x	<mach.h>		../lib/apphotdef.h     \
+			../lib/noisedef.h       ../lib/photdef.h       \
+			../lib/apphot.h         ../lib/phot.h
+	t_wphot.x	<fset.h>		<gset.h>	       \
+			<lexnum.h>		../lib/apphot.h        \
+			../lib/fitsky.h		<imhdr.h>
+	;

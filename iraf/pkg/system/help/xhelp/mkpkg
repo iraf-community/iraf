@@ -1,0 +1,28 @@
+# Make the GUI part of the HELP task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+zzdebug:
+	$omake	zzdebug.x
+	$link	zzdebug.o -l xtools
+	;
+
+libpkg.a:
+	xhelp.x		../help.h xhelp.h
+	xhcmds.x	../help.h xhelp.h
+	xhdir.x		xhelp.h <ctype.h> <diropen.h> <finfo.h>
+	xhfiles.x	../help.h xhelp.h <ctype.h> <fset.h> 
+	xhhelp.x	../help.h xhelp.h <error.h> <finfo.h> <fset.h> 
+	xhinit.x	xhelp.h
+	xhofile.x	xhelp.h <fset.h>
+	xhpkg.x		<error.h> <fset.h> ../helpdir.h ../help.h xhelp.h
+	xhprint.x	xhelp.h ../help.h <ctype.h> <error.h> <ttyset.h> 
+	xhqref.x	../help.h xhelp.h <ctype.h> <finfo.h> 
+	xhroot.x	xhelp.h
+	xhsave.x	../help.h xhelp.h <ctype.h> 
+	xhsearch.x	xhelp.h <ctype.h> <fset.h> 
+	xhsort.x	xhelp.h <ctype.h> 
+	;

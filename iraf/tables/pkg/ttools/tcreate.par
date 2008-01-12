@@ -1,0 +1,12 @@
+table,s,a,"",,,"name of table to be created"
+cdfile,s,a,"STDIN",,,"name of file containing column descriptions"
+datafile,s,a,"STDIN",,,"name of file containing data"
+uparfile,s,h,"",,,"name of file containing header parameters"
+nskip,i,h,0,0,,"number of header lines to skip in data file"
+nlines,i,h,0,0,,"number of lines in data file per row in table"
+nrows,i,h,0,0,,"number of rows [zero for all]"
+hist,b,h,yes,,,"add a history record with creation date?"
+extrapar,i,h,5,0,,"extra space for header parameters"
+tbltype,s,h,"default","default|row|column|text",,"type of table"
+extracol,i,h,0,0,,"number of extra columns to allocate"
+mode,s,h,"al",,,

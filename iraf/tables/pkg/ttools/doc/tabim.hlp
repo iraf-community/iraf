@@ -1,0 +1,98 @@
+.help tabim Mar2000 tables
+.nj
+.ih
+NAME
+tabim -- Copy a table column to an image.
+.ih
+USAGE
+tabim intable output colname ndim n1 n2 n3 n4 n5 n6
+.ih
+DESCRIPTION
+This task writes values from a column of a table to an image.
+If the image does not exist, it will be created.
+The value in the first row is assigned to the first pixel of the image,
+and the value in the last row is assigned to the last pixel of the image.
+Columns containing pixel numbers (optionally written by 'imtab') are ignored,
+but you can specify the axis lengths of a multi-dimensional output image.
+The number of rows in the table must equal the number of pixels in the image.
+.ih
+PARAMETERS
+.ls intable = "" [file name template]
+The names of the input tables.
+.le
+.ls output = "" [file name template]
+The names of the output images.
+If an output image does not exist it will be created.
+If the image does exist it will be overwritten with values from the table.
+A section of an existing image may be specified,
+but note that the size must equal the number of rows in the table.
+.le
+.ls colname = "" [string]
+The name of the column in 'intable' that is to be written to the image.
+The same column name is used for all input tables.
+.le
+.ls ndim = 0 [integer, min=0, max=7]
+If the output image does not exist,
+'ndim' can be used to specify
+the dimension of the image to be created.
+ndim = 0 or 1 results in a one-dimensional image
+which has as many elements as rows in the table.
+If 'ndim' is greater than one
+and the output image does not already exist,
+then the parameters 'n1', 'n2', etc will be taken
+to specify the axis lengths of the output image.
+The lengths of all but the last axis will be gotten from 'n1', 'n2', etc.;
+the last axis length will be computed from
+the number of rows in the table
+and the lengths of the other axes.
+It is an error if the product of the specified axis lengths
+does not divide evenly into the number of rows in the table.
+.le
+.ls n1 = 1 [integer, min=1, max=INDEF]
+Length of first axis.
+'n1', 'n2', etc., are ignored if ndim = 0 or 1.
+.le
+.ls n2 = 1 [integer, min=1, max=INDEF]
+Length of second axis.
+This and the subsequent axis length parameters will be ignored if ndim < 3.
+.le
+.ls n3 = 1 [integer, min=1, max=INDEF]
+Length of third axis.
+.le
+.ls n4 = 1 [integer, min=1, max=INDEF]
+Length of fourth axis.
+.le
+.ls n5 = 1 [integer, min=1, max=INDEF]
+Length of fifth axis.
+.le
+.ls n6 = 1 [integer, min=1, max=INDEF]
+Length of sixth axis.
+.le
+.ih
+EXAMPLES
+1.  Copy column "flux" from table "hr465.tab" to
+the 1-D image "hr465_flux.imh":
+
+.nf
+	ta> tabim hr465.tab hr465_flux.imh flux 1
+.fi
+
+2.  Create a three-dimensional image "ir27.imh" of size 62 x 64 x 4.
+Read the values from column "v1" of table "t18_30.tab",
+which has 62*64*4 rows.
+
+.nf
+	ta> tabim t18_30.tab ir27.imh v1 3 62 64
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+The 'imtab' task copies an image to a column of a table.
+
+Type "help tables option=sys" for a higher-level description of
+the tables package.
+.endhelp

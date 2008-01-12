@@ -1,0 +1,316 @@
+.help strfits Nov2001 tables.fitsio
+.ih
+NAME
+strfits -- Convert FITS files to GEIS images, STSDAS tables or text files
+.ih
+USAGE
+strfits input file_list output
+.ih
+DESCRIPTION
+The `strfits' task reads standard FITS files containing main FITS 
+units and extensions like "TABLE", "BINTABLE" and "IMAGE" -- from 
+either disk or tape -- and converts them to GEIS files, STSDAS 
+tables, or text files.
+
+The `strfits' task can also read files in the IEEE standard format. 
+FITS data written in IEEE standard will be converted to images in 
+the floating point format of the host machine.  The IEEE standard is 
+denoted in the FITS header by a negative "BITPIX" value.
+
+If you want to reproduce a GEIS file with a specific group 
+parameter descriptor, then use the "template" parameter with the 
+name of a GEIS image header file; the program can reproduce the 
+specified output image with the same group parameter descriptor as 
+the one specified by "template".  If no template is passed to 
+`strfits', then a default descriptor is set up in the image header 
+that contains the fields "DATAMAX", "DATAMIN", "CRPIXn", "CRVALn", 
+and  "CDn_m".  A warning will be issued if there is no data file 
+corresponding to the template file name; however, this warning can 
+be ignored because only the header file is needed.
+
+WARNING: the IRAF tasks `rfits' and `wfits' in the `dataio' 
+package are NOT designed to handle multi-group GEIS files or binary 
+tables.  Users should be aware that these IRAF FITS tasks may not 
+produce data structures that are compatible with certain STSDAS 
+tasks!  
+
+Notice that when using a template header with an input FITS file,
+you are matching the name of the keywords that belong to the 
+group parameter block; your FITS header should have the name and
+value of those keyword in the template file, for each FITS file
+you are reading.
+
+The FITS long blocks option is supported---up to 10 blocks of 
+2,880 bytes.  If "SIMPLE=F", a warning message is printed to the 
+standard output.
+
+.ih
+FITS FILES WITH AN EXTRA DIMENSION
+The `stwfits' task can write a multigroup image to a FITS file that 
+will contain an extra dimension to accommodate the groups.  This 
+file will have the keywords "OPSIZE" (which takes its value from 
+the input image keyword "PSIZE") and the keyword "SDASMGNU", whose 
+value is the number of groups in the input multigroup image.
+
+If the input FITS file includes the above keywords, then setting 
+the parameter "xdimtogf=yes" will recreate the original multigroup 
+file.  If no such keywords exist a warning message: "Warning: FITS 
+file cannot be converted to multigroup" will be issued.
+.ih
+PARAMETERS
+.ls fits_files [file name template or magtape device]
+The FITS data source.  This is either a template describing a 
+list of disk files, or a tape file specification of the form 
+"mt*[n]", where "mt" indicates a magnetic tape device, "*" 
+represents a density, and "[n]" is the tape file number to be 
+read.  If the tape file number is specified, only that file is 
+converted.  If the tape device name is given without a tape 
+file number, e.g., "mta" or "mtb800",  then the files 
+specified by the `file_list' parameter will be read from the 
+tape.
+If you want to use an input tape you will need to allocate it
+before running `strfits', this can be done with the `allocate'
+command, for example, "allocate mta".
+
+For disk FITS files that contain extensions and want to extract an
+specified extension; you can do so by appending extension number
+after the name, e.g. "disk_file.fit[2]" will extract second extension
+in "disk_file.fit"; disk_file.fit[0] will extract the main FITS unit
+only.  Warning:  This facility is available with one input FITS file
+at a time, (i.e. you cannot specify a list as input).
+.le
+.ls file_list [string]
+The files to be read from a tape.  This string can consist of 
+any sequence of file numbers separated by at least one comma 
+or dash.  A comma separates individual file numbers, whereas a 
+dash specifies  a range of files.  For example the string 
+"1,2,3-5,8-6" will convert tape files 1 through 8.
+.le
+.ls iraf_files [string]
+The IRAF file that is to be created from the FITS data.  This can be a
+single file name, a list file (e.g., "@flis") or the null file (i.e.,
+"").  When handling multiple files, this parameter will be used as a
+prefix and the file number will be appended.  If only a single file is
+being converted, the file will be named as specified.  For example,
+reading files 1 and 3 from a FITS tape and using a file name of "data"
+for this parameter will produce the files "data001" and "data003".  If
+the disk or tape files contain more than one table per file then this
+parameter will be used as a root name and a sequential number will be
+appended to it, e.g., "tab01.tab", "tab02.tab" and "tab03.tab" will be
+created when 3 tables are contained in one file.  
+
+If the FITS file contains a TABLE extension, the filename in the
+EXTNAME keyword has one of the recognized ASCII extensions and only a 
+single column, the resulting iraf file will be an ASCII file.  The
+recognized ASCII filename extensions are
+'trl', 'txt', 'log', 'ocx', 'pdq',
+'pod', 'cmh', 'trx', 'rpt', 'cgr', 'dgr', 'dta', 'poa'.
+
+.le
+.ls (template = "none") [string]
+This is the header file (a data file is not needed) containing 
+the group parameter descriptor for the output GEIS file.  See 
+the Description section above for more information.  For this parameter
+to be read you need to set 'xdimtogf=no'.
+.le
+.ls (long_header = no) [boolean]
+Print the full FITS header on the standard output?
+.le
+.ls (short_header = yes) [boolean]
+Print shortened headers on the standard output? If 
+"short_header = yes", the task will print one line 
+information with the following columns:
+
+.nf
+	IRAFNAME  Output image name
+	DIMENSION Image dimensionality
+	BP        Output image bits/pixel
+	DATE      Creation date
+	OBJECT    Content of OBJECT FITS keyword
+
+.fi
+.le
+.ls (datatype = "default") [string]
+This is the data type for the IRAF image file, which may be a 
+different  data type than the FITS image file. 
+
+The allowed values are "unsigned" (16bits), "short",  "integer", 
+"real", and "double".  Truncation problems may occur if an 
+inappropriate data type is specified.  Incorrect data types or 
+null strings in this parameter will cause the default datatype 
+to be used.  The default data type is determined by the minimum 
+size required to represent the input pixel values.  If the 
+"bscale" and "bzero" parameters in the FITS header are 
+undefined, or if "bscale=1.0" and "bzero=0.0", then the data 
+type will be either short or long--otherwise it will be real.
+.le
+.ls (xdimtogf = yes) [boolean]
+Convert an extra dimension FITS file to a multigroup image
+file? 
+
+To do this you should have written the FITS file with the 
+task `stwfits'.  For more details see the Description section 
+above.
+.le
+.ls (scale = yes) [boolean]
+Scale the data based on the values of `bscale' and `bzero'? 
+This parameter is also used to scale the FITS extension.  For 
+types "TABLE"and "BINTABLE" it will apply the values of TSCAL 
+and TZERO to the data in the respective columns.
+
+If "scale = no", then the integers are read directly from the 
+tape, otherwise the program checks the values of "bscale" and 
+"bzero".  If these numbers are not 1.0 and 0.0, respectively, 
+the program scales the data before output.
+.le
+.ls (blank = 0.0) [real]
+The IRAF image value of a blank pixel.
+.le
+.ls (offset = 0) [integer]
+This parameter specifies the offset to be used in assigning a 
+name to the resulting GEIS file.  For example, if "offset = 
+100",  `iraf_file = "fits"', and `file_list = "1-3"', the 
+output file names will be "fits101", "fits102" and "fits103"  
+rather than "fits001", "fits002", and "fits003".
+.le
+.ls (oldirafname = no) [boolean]
+When restoring images to disk, should the task use the old file 
+name from the header and restore the file's original name?  The 
+old file name is in the keyword value "FILENAME" or "IRAFNAME".  
+If FITS "TABLE" or "BINTABLE" extensions are present, the program 
+will try to restore the table to disk using the filename defined 
+by the "EXTNAME" keyword in the standard  extension FITS 
+parameter header.  If the `output' parameter is NULL (i.e., "") 
+or the FITS file does not have an extension, the filename 
+extension will be taken from the "imtype" CL variable; if 
+"imtype" is undefined, the extension will be set to "hhh".  
+If the `output' parameter value has a root plus an extension, 
+the extension takes precedence over the "imtype" value.
+
+If FITS IMAGE extensions are present, the program will try to 
+restore the GEIS image(s) to disk using the filename defined 
+by the FILENAME keyword.
+.le
+.ls (force = no) [boolean]
+There are certain fits files which strfits cannot convert, because the
+fits standard is more general than either the geis or tables standard
+and some fits files have no representation as either type of
+file.  Generally these are fits files with extensions that were not
+originally converted from images or tables.  Strfits tries to detect
+thes files and leave them as fits files, but sometimes it guesses
+wrong and leaves a file unconverted which should have been
+converted.  If this task parameter is set to `yes', strfits will try to
+convert all files into either an image or table.  But it may not
+succeed, and may crash in the attempt.
+.le
+.ih
+EXAMPLES
+1. Convert a set of FITS files on tape to a set of IRAF image 
+files, allowing the program to select the output data type. 
+Blanks will be set to zero.  Notice that there is no explicit
+extensio in 'images', the value of imtype will be taken.
+
+.nf
+	cl> strfits mtb1600 1-999 images
+
+	  if imtype is 'imh' then you will need to add 'xdim-'
+	
+	cl> strfits mtb1600 1-999 images xdim-
+.fi
+
+2. Convert a set of FITS files on disk to a set of IRAF images with 
+the image type set to GEIS (".hhh").
+
+.nf
+	cl> set imtype=hhh
+	cl> strfits fits* 1 images
+.fi
+
+3. Convert a set of FITS files directly to IRAF images 
+without scaling.
+
+.nf
+	cl> strfits mtb1600 1-999 images scal-
+.fi
+
+4. Convert the first three FITS files on tape to IRAF files 
+setting blanks to -1.
+
+.nf
+	cl> strfits mta 1-3 images blan=-1
+.fi
+
+5. Create a GEIS file with a non-default group parameter 
+descriptor contained in file "fi_template.hhh".  Notice that
+xdimtogf is set to 'no'.
+
+.nf
+	cl> strfits file.fits "" images xdimtogf=no \
+	    >>> template="fi_template.hhh" 
+.fi
+
+6. Create a multigroup image (GEIS file) from a set of input files 
+using a template file containing the group parameter descriptor.  
+Notice that you cannot use wild card specifications for the input 
+FITS file and that the template header file is only needed when 
+creating the multigroup file the first time. 
+
+.nf
+	cl> set imtype=hhh
+	cl> strfits file1.fits "" outf.hhh[1/3] \ 
+	>>> template="file_temp.hhh" xdimtogf=no
+	cl> strfits file2.fits "" outf.hhh[2]
+	cl> strfits file1.fits "" outf.hhh[3]
+.fi
+
+7. Same as example 6, but with the input from tape.
+
+.nf
+	cl> strfits mta 1-3 outf[1/3] template="file_temp.hhh" \
+	   >>> xdimtogf=no
+	
+	or
+
+	cl> strfits mta 1 outf[1/3] xdimtogf=no \
+	    >>> template="file_temp.hhh"
+	cl> strfits mta 2 outf[2] 
+	cl> strfits mta 3 outf[3] 
+.fi
+
+Notice that the tape fits files 1 thru 3 should have the same 
+physical specification, i.e., the same dimensionality and same 
+number of group parameters.  Also, if you create a multigroup 
+file -- like in examples 6 and 7 -- you cannot also specify 
+`oldirafname=yes'.
+
+8. Read 4 FITS files from tape and create 
+one GEIS image with 4 groups.  Assume the FITS files contain
+WF/PC data.  Use a template file with a GEIS WF/PC header file,
+e.g., 'twfpc.hhh'.
+
+.nf
+  	cl> strfits mta 1-4 newpfc.hhh[1/4] template="twfpc.hhh" \ 
+	>>> xdimtogf-
+.fi
+
+Notice that you need to tell 'strfits' that the resulting GEIS file will
+have 4 groups and that you are starting with group 1.  The 'xdimtogf'
+is set to "no" since you don't have a FITS file with an extra dimension.
+
+9. Read 3 FITS files from tape and create 3 GEIS files with names in
+the list file 'outlist'.
+
+.nf
+  cl> strfits mta 1-3 @outlist 
+.fi
+.ih
+BUGS
+The BINTABLE extension is limited to 1 element per cell on a table.
+The program cannot yet read images that have excessively long lines 
+because the image I/O has memory allocation restrictions.  Blank 
+pixels are counted and set to a user-determined value, but are not 
+flagged in the image header.
+.ih
+SEE ALSO
+fitscopy, fits_exampl, stwfits , geis
+.endhelp

@@ -1,0 +1,15 @@
+# Help directory for the OBSOLETE package.
+
+$doc		= "pkg$obsolete/doc/"
+$fits		= "pkg$obsolete/fits/"
+
+imtitle		hlp =doc$imtitle.hlp,		src = t_imtitle.x
+mkhistogram     hlp =doc$mkhistogram.hlp,	src = t_mkhistogram.x
+ofixpix		hlp =doc$ofixpix.hlp,		src = t_fixpix.x
+oimcombine	hlp =doc$oimcombine.hlp
+oimstatistics	hlp =doc$oimstat.hlp
+orfits		hlp =doc$orfits.hlp,		src = fits$t_rfits.x
+owfits		hlp =doc$owfits.hlp,		src = fits$t_wfits.x
+radplt		hlp =doc$radplt.hlp,		src = t_radplt.x
+
+revisions	sys=Revisions

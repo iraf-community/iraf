@@ -1,0 +1,34 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
+#define import_spp
+#define import_knames
+#include <iraf.h>
+
+/* ACHT_U -- Pack an SPP datatype array into an unsigned short integer.
+ * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
+ */
+int ACHT$TU ( XPIXEL *a, XUSHORT *b, XINT *npix )
+{
+	XPIXEL *ip;
+	XUSHORT *op, *maxop;
+
+	if (sizeof(*op) > sizeof(*ip)) {
+	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
+		$if (datatype == x)
+		    *--op = (int) (--ip)->r;
+		$else
+		    *--op = *--ip;
+		$endif
+	} else {
+	    maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; )
+		$if (datatype == x)
+		    *op++ = (int) (ip++)->r;
+		$else
+		    *op++ = *ip++;
+		$endif
+	}
+
+	return 0;
+}

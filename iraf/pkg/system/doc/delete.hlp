@@ -1,0 +1,57 @@
+.help delete Nov84 system
+.ih
+NAME
+delete -- delete a file or files
+.ih
+USAGE
+delete files
+.ih
+PARAMETERS
+.ls files
+The list of files to be deleted.
+.le
+.ls verify = no
+Check with the user before deleting a file.  If verify is enabled the file
+name is printed and the user is queried before the default action is taken.
+.le
+.ls default_action = yes
+This is the default action to take when operating in "verify" mode.
+For example, if the default action is "yes", one need only type RETURN in
+response to the verify prompt to delete the file.
+.le
+.ls allversions = yes
+Delete all versions of a file.  This parameter has no effect on systems like
+UNIX which do not support multiple file versions.
+.le
+.ls subfiles = yes
+Delete subfiles.  Not currently used.
+.le
+.ih
+DESCRIPTION
+\fIDelete\fR destroys a file or files and returns the space they occupied to
+the host system, to be reused for other files.  Once a file has been deleted,
+it is gone forever (unless a copy exists somewhere).  Enabling \fIverify\fR
+gives one the opportunity to say yes or no before each file is deleted; this
+is particularly useful when \fIfiles\fR is a template.  Note that
+\fIprotect\fR can be used to protect files from deletion, accidental or
+otherwise.  Imagefiles are automatically protected by the system to remind
+the user to use \fIimdelete\fR to delete images (this is necessary because
+an image is stored in more than one physical file).
+.ih
+EXAMPLES
+
+1. Delete all files with extension ".x", verifying each file deletion before
+it is performed.
+
+	cl> delete *.x ver+
+
+2. List all files in the current directory, deleting only those files for
+which the user responds to the verify prompt with "yes" or "y".  Note that
+"delete *" is a very dangerous operation.
+
+	cl> delete * ver+ def=no
+
+.ih
+SEE ALSO
+protect, unprotect, imdelete
+.endhelp

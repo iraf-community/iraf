@@ -1,0 +1,786 @@
+include <imhdr.h>
+include <mach.h>
+include <math.h>
+
+$for (rd)
+
+# IF_LOG10 -- Compute the base 10 logarithm of image1 and write the results to
+# image2.
+
+procedure if_log10$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+PIXEL	if_elog$t()
+extern	if_elog$t()
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call alog$t (Mem$t[buf1], Mem$t[buf2], npix, if_elog$t)
+end
+
+
+# IF_ELOG -- The error function for log10. Note that MAX_EXPONENT is
+# currently an integer so it is converted to the appropriate data type
+# before being returned.
+
+PIXEL procedure if_elog$t (x)
+
+PIXEL	x				# the input pixel value
+
+begin
+	return (PIXEL(-MAX_EXPONENT))
+end
+
+
+# IF_ALOG10 -- Take the power of 10 of image1 and write the results to image2.
+
+procedure if_alog10$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_va10$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VA10 -- Take the antilog (base 10) of a vector.
+
+procedure if_va10$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of points
+
+int	i
+PIXEL	maxexp, maxval
+
+begin
+	maxexp = MAX_EXPONENT
+	maxval = MAX_REAL
+
+	do i = 1, n {
+	   if (a[i] >= maxexp)
+		b[i] = maxval
+	   else if (a[i] <= (-maxexp))
+		b[i] = 0$f
+	   else
+		b[i] = 10$f ** a[i]
+	}
+end
+
+
+# IF_LN -- Take the natural log of the pixels in image1 and write the results
+# to image2. 
+
+procedure if_ln$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+
+PIXEL	if_eln$t()
+extern	if_eln$t()
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call alln$t (Mem$t[buf1], Mem$t[buf2], npix, if_eln$t)
+end
+
+
+# IF_ELN -- The error function for the natural logarithm.
+
+PIXEL	procedure if_eln$t (x)
+
+PIXEL	x				# input value
+
+begin
+	return (PIXEL (LN_10) * PIXEL(-MAX_EXPONENT))
+end
+
+
+# IF_ALN -- Take the natural antilog of the pixels in image1 and write the
+# results to image2. 
+
+procedure if_aln$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_valn$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VALN -- Take the natural antilog of a vector.
+
+procedure if_valn$t (a, b, n)
+
+PIXEL	a[n]			# the input vector
+PIXEL	b[n]			# the output vector
+int	n			# the number of pixels
+
+int	i
+PIXEL	maxexp, maxval, eval
+
+begin
+	maxexp = log (10$f ** PIXEL (MAX_EXPONENT))
+	maxval = MAX_REAL
+	eval = PIXEL (BASE_E)
+
+	do i = 1, n {
+	   if (a[i] >= maxexp)
+		b[i] = maxval
+	   else if (a[i] <= -maxexp)
+		b[i] = 0$f
+	   else
+		b[i] = eval ** a[i]
+	}
+end
+
+
+# IF_SQR -- Take the square root of pixels in image1 and write the results
+# to image2.
+
+procedure if_sqr$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+PIXEL	if_esqr$t()
+extern	if_esqr$t()
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call asqr$t (Mem$t[buf1], Mem$t[buf2], npix, if_esqr$t)
+end
+
+
+# IF_ESQR -- Error function for the square root.
+
+PIXEL procedure if_esqr$t (x)
+
+PIXEL	x			        # input value
+
+begin
+	return (0$f)
+end
+
+
+# IF_SQUARE -- Take the square of the pixels in image1 and write to image2. 
+procedure if_square$t (im1, im2)
+
+pointer	im1				# the input image pointer
+pointer	im2				# the output image pointer
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call apowk$t (Mem$t[buf1], 2, Mem$t[buf2], npix)
+end
+
+
+# IF_CBRT -- Take the cube root of the pixels in image1 and write the results
+# to image2. 
+
+procedure if_cbrt$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vcbrt$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VCBRT -- Compute the cube root of a vector.
+
+procedure if_vcbrt$t (a, b, n)
+
+PIXEL	a[n]			# the input vector
+PIXEL	b[n]			# the output vector
+int	n			# the number of pixels
+
+int	i
+PIXEL	onethird
+
+begin
+	onethird = 1$f / 3$f
+	do i = 1, n {
+	    if (a[i] >= 0$f) {
+	        b[i] = a[i] ** onethird
+	    } else {
+		b[i] = -a[i]
+	        b[i] = - (b[i] ** onethird)
+	    }
+	}
+end
+
+
+# IF_CUBE  -- Take the cube of the pixels in image1 and write the results to
+# image2. 
+
+procedure if_cube$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call apowk$t (Mem$t[buf1], 3, Mem$t[buf2], npix)
+end
+
+
+# IF_COS -- Take cosine of pixels in image1 and write the results to image2.
+
+procedure if_cos$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vcos$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VCOS - Compute the cosine of a vector.
+
+procedure if_vcos$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+
+begin
+	do i = 1, n
+	    b[i] = cos(a[i])
+end
+
+
+# IF_SIN -- Take sine of the pixels in image1 and write the results to image2.
+
+procedure if_sin$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+pointer	buf1, buf2
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vsin$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VSIN - Take the sine of a vector.
+
+procedure if_vsin$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+
+begin
+	do i = 1, n
+	    b[i] = sin(a[i])
+end
+
+
+# IF_TAN -- Take tangent of pixels in image1 and write the results to image2.
+
+procedure if_tan$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vtan$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VTAN - Take the tangent of a vector.
+
+procedure if_vtan$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+
+begin
+	do i = 1, n 
+	    b[i] = tan(a[i])
+end
+
+
+# IF_ACOS -- Take arccosine of pixels in image1 and write the results to image2.
+
+procedure if_acos$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+pointer	buf1, buf2
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vacos$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VACOS - Take the arccosine of a vector.
+
+procedure if_vacos$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+
+begin
+	do i = 1, n {
+	    if (a[i] > 1$f)
+		b[i] = acos (1$f)
+	    else if (a[i] < -1$f)
+		b[i] = acos (-1$f)
+	    else
+	        b[i] = acos(a[i])
+	}
+end
+
+
+# IF_ASIN -- Take arcsine of pixels in image1 and write the results to image2.
+
+procedure if_asin$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+pointer	buf1, buf2
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vasin$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VASIN - Take arcsine of vector
+
+procedure if_vasin$t (a, b, n)
+
+PIXEL	a[n]
+PIXEL	b[n]
+int	n
+
+int	i
+
+begin
+	do i = 1, n {
+	    if (a[i] > 1$f)
+		b[i] = asin (1$f)
+	    else if (a[i] < -1$f)
+		b[i] = asin (-1$f)
+	    else
+	        b[i] = asin(a[i])
+	}
+end
+
+
+# IF_ATAN -- Take arctangent of pixels in image1 and write the results to
+# image2.
+
+procedure if_atan$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vatan$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VATAN - Take the arctangent of a vector.
+
+procedure if_vatan$t (a, b, n)
+
+PIXEL	a[n]
+PIXEL	b[n]
+int	n
+
+int	i
+
+begin
+	do i = 1, n
+	    b[i] = atan(a[i])
+end
+
+
+# IF_HCOS -- Take the hyperbolic cosine of pixels in image1 and write the
+# results to image2.
+
+procedure if_hcos$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vhcos$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VHCOS - Take the hyperbolic cosine of a vector.
+
+procedure if_vhcos$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+PIXEL	maxexp, maxval
+
+begin
+	maxexp = log (10$f ** PIXEL(MAX_EXPONENT))
+	maxval = MAX_REAL
+
+	do i = 1, n {
+	    if (abs (a[i]) >= maxexp)
+		b[i] = maxval
+	    else
+	        b[i] = cosh (a[i])
+	}
+end
+
+
+# IF_HSIN -- Take the hyperbolic sine of pixels in image1 and write the
+# results to image2.
+
+procedure if_hsin$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+pointer	buf1, buf2
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vhsin$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VHSIN - Take the hyperbolic sine of a vector.
+
+procedure if_vhsin$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+PIXEL	maxexp, maxval
+
+begin
+	maxexp = log (10$f ** PIXEL(MAX_EXPONENT))
+	maxval = MAX_REAL
+
+	do i = 1, n {
+	    if (a[i] >= maxexp)
+		b[i] = maxval
+	    else if (a[i] <= -maxexp)
+		b[i] = -maxval
+	    else
+	        b[i] = sinh(a[i])
+	}
+end
+
+
+# IF_HTAN -- Take the hyperbolic tangent of pixels in image1 and write the
+# results to image2.
+
+procedure if_htan$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+pointer	buf1, buf2
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call if_vhtan$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_VHTAN - Take the hyperbolic tangent of a vector.
+
+procedure if_vhtan$t (a, b, n)
+
+PIXEL	a[n]				# the input vector
+PIXEL	b[n]				# the output vector
+int	n				# the number of pixels
+
+int	i
+
+begin
+	do i = 1, n
+	    b[i] = tanh(a[i])
+end
+
+
+# IF_RECIP -- Take the reciprocal of the pixels in image1 and write the 
+# results to image2. 
+
+procedure if_recip$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+PIXEL	if_erecip$t()
+extern	if_erecip$t()
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call arcz$t (1.0, Mem$t[buf1], Mem$t[buf2], npix, if_erecip$t)
+end
+
+
+# IF_ERECIP -- Error function for the reciprocal computation.
+
+PIXEL procedure if_erecip$t (x)
+
+PIXEL	x
+
+begin
+	return (0$f)
+end
+
+$endfor
+
+$for (lrd)
+
+# IF_ABS -- Take the absolute value of pixels in image1 and write the results
+# to image2.
+
+procedure if_abs$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call aabs$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+
+# IF_NEG -- Take negative of pixels in image1 and write the results to image2. 
+
+procedure if_neg$t (im1, im2)
+
+pointer	im1				# pointer to the input image
+pointer	im2				# pointer to the output image
+
+int	npix
+long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+pointer	buf1, buf2
+int	imgnl$t(), impnl$t()
+
+begin
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
+
+	npix = IM_LEN(im1, 1)
+	while ((imgnl$t (im1, buf1, v1) != EOF) &&
+	    (impnl$t (im2, buf2, v2) != EOF))
+	    call aneg$t (Mem$t[buf1], Mem$t[buf2], npix)
+end
+
+$endfor

@@ -1,0 +1,31 @@
+	addstar - Add artificial stars to an image using the computed psf
+	allstar - Group and fit psf to multiple stars simultaneously
+     centerpars - Edit the centering algorithm parameters
+        daoedit - Review/edit algorithm parameters interactively
+	daofind - Find stars in an image using the DAO algorithm
+	daopars	- Edit the daophot algorithms parameter set
+        daotest - Run basic tests on the daophot package tasks
+       datapars - Edit the image data dependent parameters
+       findpars - Edit the star detection parameters
+     fitskypars - Edit the sky fitting algorithm parameters
+	  group	- Group stars based on positional overlap and signal/noise
+	  nstar - Fit the psf to predefined groups of stars 
+	   peak	- Fit the psf to single stars
+	   phot - Compute sky values and initial magnitudes for a list of stars
+       photpars - Edit the aperture photometry parameters
+	    psf - Compute the point spread function
+         seepsf - Compute an image from the point spread function
+      setimpars - Save/restore parameter sets for a particular image
+	substar - Subtract the fitted stars from the original image
+
+	  pcalc - Do arithmetic operations on a list of daophot databases
+	pconcat - Concatenate a list of daophot databases
+       pconvert	- Convert a text database to a tables database
+	  pdump - Print selected fields from a list of daophot databases
+        pfmerge - Merge a list of photometry databases
+      pstselect - Select candidate psf stars based on proximity
+      grpselect - Select groups of a specified size from a daophot database
+       pexamine - Interactively examine and edit a daophot database
+      prenumber - Renumber stars in a daophot database
+	pselect - Select records from a daophot database
+	  psort - Sort a daophot database

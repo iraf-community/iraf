@@ -1,0 +1,20 @@
+These directories contain the codes described in the book "A Practical Guide
+to Splines", by Carl DeBoor, Springer-Verlag, 1978.  The directory math/deboor
+contains the single precision routines.  The same routines, edited to provide
+double precision, are in the directory "dblprec", which may disappear at some
+point in the future if we decide we don't need these.  The directory "progs"
+contains a number of example programs from the book.
+
+A number of the routines herein write error messages using Fortran i/o,
+violating our convention that numerical routines should not perform i/o.
+These routines have been flagged by adding the suffix "_io".  These routines
+have not been compiled and installed in the library "deboor.a".  The most useful
+routines either did not do i/o, or have had the i/o removed (e.g., splint.f).
+
+Note: use the new SPLLSQ for smoothing with splines, instead of L2APPR, if a
+uniform knot sequence is desired.  Use BSPLN to evaluate the coefficient array
+from SPLLSQ.
+
+Oct 85	Rearranged the order of argument declarations in cwidth.f, dtblok.f,
+	factrb.f, fcblok.f, sbblok.f, shiftb.f, slvblk.f, subbak.f, subfor.f
+	to conform with Fortran standard

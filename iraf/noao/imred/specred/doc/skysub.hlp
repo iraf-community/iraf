@@ -1,0 +1,98 @@
+.help skysub Mar94 noao.imred.specred
+.ih
+NAME
+skysub -- Sky subtract extracted multispec spectra
+.ih
+USAGE
+skysub input
+.ih
+PARAMETERS
+.ls input
+List of input multispec spectra to sky subtract.
+.le
+.ls output = ""
+List of output sky subtracted spectra.  If no output is specified then
+the output replaces the input spectra.
+.le
+.ls objaps = "", objbeams = ""
+Object aperture and beam numbers.  An empty list selects all aperture
+or beam numbers.  Only the selected apertures are sky subtracted.
+Other apertures are left unmodified.  Note that it is valid to include
+the sky apertures in the object selection which results in residual
+sky spectra after subtraction by a mean sky.
+.le
+.ls skyaps = "", skybeams = ""
+Sky aperture and beam numbers.  An empty list selects all aperture or
+beam numbers.
+.le
+.ls skyedit = yes
+Edit the sky spectra?  If yes the sky spectra are graphed using the
+task \fBspecplot\fR and the user may delete contaminated sky spectra with
+the 'd' key and exit with 'q'.
+.le
+.ls combine = "average" (average|median|sum)
+Option for combining pixels at the same dispersion coordinate after any
+rejection operation.  The options are to compute the  "average", "median",
+or "sum" of the pixels.  The median uses the average of the two central
+values when the number of pixels is even.
+.le
+.ls reject = "none" (none|minmax|avsigclip)
+Type of rejection operation performed on the pixels which overlap at each
+dispersion coordinate.  The algorithms are discussed in the
+DESCRIPTION section.  The rejection choices are:
+
+.nf
+      none - No rejection
+    minmax - Reject the nlow and nhigh pixels
+ avsigclip - Reject pixels using an averaged sigma clipping algorithm
+.fi
+
+.le
+.ls scale = no
+Scale the sky spectra by the mode?
+.le
+.ls saveskys = yes
+Save the sky spectra?  If no then the mean sky spectra will be deleted after
+sky subtraction is completed.  Otherwise a one dimensional image with
+the prefix "sky" and then the output name is created.
+.le
+.ls logfile = ""
+Logfile for making a record of the sky subtraction operation.
+.le
+.ih
+DESCRIPTION
+This task selects a subset of aperture spectra from a multispec
+format image, called sky spectra though they could be anything,
+and combines them into a master spectrum which is subtracted
+from another subset of spectra called the objects.  Options include
+saving the master sky spectrum and reviewing the selected sky spectra
+graphically and deleting some of them.
+
+The sky apertures are selected using the aperture and beam numbers
+defined during extraction (see the \fBapextract\fR package).  In
+some applications the beam numbers are used to code object and sky
+apertures and selection by beam number is quite easy.  Otherwise one
+must list the aperture numbers explicitly.
+
+The object apertures are also selected using an aperture and beam
+number list.  Spectra not selected to be objects are not modified
+by the sky subtraction.  Note that it is perfectly valid to include
+the sky spectra in the object list to produce residual sky spectra.
+
+When interactively editing the sky spectra the task \fBspecplot\fR
+is used.  To delete a spectrum type 'd'.  To undelete the last deleted
+spectrum type 'e'.  When finished type 'e'.
+
+The sky spectra are combined using one of combining and rejection options from
+the task \fBscombine\fR except for the option "none".
+.ih
+EXAMPLES
+1.  To median and subtract apertures 1,10,15,20 from all apertures:
+
+.nf
+    ms> skysub obj010.ms out=skysub010.ms skyaps="1,10,15,20"
+.fi
+.ih
+SEE ALSO
+specplot, scombine
+.endhelp

@@ -1,0 +1,7 @@
+table,f,a,,,,"Input table"
+outcol,s,a,,,,"Output column name"
+equals,s,a,,"",,"Arithmetic expression"
+datatype,s,h,"real","real|double|short|int",,"Output column data type, if new column"
+colunits,s,h,"",,,"Units for output column"
+colfmt,s,h,"",,,"Display format for output column"
+mode,s,h,al

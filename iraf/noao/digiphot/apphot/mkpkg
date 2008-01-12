@@ -1,0 +1,39 @@
+# Make the APPHOT package
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$set LIBS = "-lnlfit -liminterp -lcurfit -lds -lxtools"
+	$update libpkg.a
+	$omake x_apphot.x
+	$link x_apphot.o libpkg.a $(LIBS) -o xx_apphot.e
+	;
+
+linkonly:
+	$set LIBS = "-lnlfit -liminterp -lcurfit -lds -lxtools"
+	$link x_apphot.o libpkg.a $(LIBS) -o xx_apphot.e
+	$call install
+	;
+
+install:
+	$move xx_apphot.e noaobin$x_apphot.e
+	;
+
+libpkg.a:
+	@aplib
+	@aputil
+	@center
+	@daofind
+	@fitpsf
+	@fitsky
+	@phot
+	@polyphot
+	@radprof
+	@wphot
+	;

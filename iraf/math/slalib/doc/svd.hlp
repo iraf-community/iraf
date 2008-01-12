@@ -1,0 +1,73 @@
+.help svd Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slSVD (M, N, MP, NP, A, W, V, WORK, JSTAT)
+
+     - - - -
+      S V D
+     - - - -
+
+  Singular value decomposition  (double precision)
+
+  This routine expresses a given matrix A as the product of
+  three matrices U, W, V:
+
+     A = U x W x VT
+
+  Where:
+
+     A   is any M (rows) x N (columns) matrix, where M.GE.N
+     U   is an M x N column-orthogonal matrix
+     W   is an N x N diagonal matrix with W(I,I).GE.0
+     VT  is the transpose of an N x N orthogonal matrix
+
+     Note that M and N, above, are the LOGICAL dimensions of the
+     matrices and vectors concerned, which can be located in
+     arrays of larger PHYSICAL dimensions, given by MP and NP.
+
+  Given:
+     M,N    i         numbers of rows and columns in matrix A
+     MP,NP  i         physical dimensions of array containing matrix A
+     A      d(MP,NP)  array containing MxN matrix A
+
+  Returned:
+     A      d(MP,NP)  array containing MxN column-orthogonal matrix U
+     W      d(N)      NxN diagonal matrix W (diagonal elements only)
+     V      d(NP,NP)  array containing NxN orthogonal matrix V
+     WORK   d(N)      workspace
+     JSTAT  i         0 = OK, -1 = A wrong shape, >0 = index of W
+                      for which convergence failed.  See note 2, below.
+
+   Notes:
+
+   1)  V contains matrix V, not the transpose of matrix V.
+
+   2)  If the status JSTAT is greater than zero, this need not
+       necessarily be treated as a failure.  It means that, due to
+       chance properties of the matrix A, the QR transformation
+       phase of the routine did not fully converge in a predefined
+       number of iterations, something that very seldom occurs.
+       When this condition does arise, it is possible that the
+       elements of the diagonal matrix W have not been correctly
+       found.  However, in practice the results are likely to
+       be trustworthy.  Applications should report the condition
+       as a warning, but then proceed normally.
+
+  References:
+     The algorithm is an adaptation of the routine SVD in the EISPACK
+     library (Garbow et al 1977, EISPACK Guide Extension, Springer
+     Verlag), which is a FORTRAN 66 implementation of the Algol
+     routine SVD of Wilkinson & Reinsch 1971 (Handbook for Automatic
+     Computation, vol 2, ed Bauer et al, Springer Verlag).  These
+     references give full details of the algorithm used here.  A good
+     account of the use of SVD in least squares problems is given in
+     Numerical Recipes (Press et al 1986, Cambridge University Press),
+     which includes another variant of the EISPACK code.
+
+  P.T.Wallace   Starlink   22 December 1993
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

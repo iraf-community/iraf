@@ -1,0 +1,32 @@
+.help zpanic May84 "System Interface"
+.ih
+NAME
+zpanic -- terminate process execution unconditionally
+.ih
+SYNOPSIS
+.nf
+zpanic (errcode, errmsg)
+
+int	errcode			# exit status
+packed	char errmsg[]		# error message
+.fi
+.ih
+DESCRIPTION
+The error message \fIerrmsg\fR is written to the process standard error
+output and the process terminates, returning \fIerrcode\fR to the parent
+process as the exit status.
+.ih
+RETURN VALUE
+This procedure does not return.
+.ih
+NOTES
+The process standard error output is not well-defined.  The kernel implementor
+may hook the process standard error stream to whatever device seems most
+appropriate on the host system.  If the process was spawned interactively
+this will probably be the user terminal.  If the process is running in a
+batch queue a file might be a better choice.  Do not confuse the process
+standard error output with the pseudofile STDERR.
+.ih
+SEE ALSO
+zclcpr, zcldpr
+.endhelp

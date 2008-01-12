@@ -1,0 +1,42 @@
+------
+# GETDATATYPE -- Convert a character to an IRAF data type (one of TY_*)
+# Recognized character codes "bcusilrdx"
+
+int procedure getdatatype (c)
+
+char	c
+______
+DECODE_RANGES:  See help text in source code or ranges.doc.
+______
+GET_NEXT_NUMBER:   See help text in source code or ranges.doc.
+______
+IS_IN_RANGE:   See help text in source code or ranges.doc.
+______
+# EXTREMA -- Find the extrema in a set of x and y data points
+
+Help text is in the source code
+______
+# PEAKS -- Find the peaks in a set of x and y data points
+
+Help text is in the source code
+______
+# CLGSEC -- Get an image section and decode it.
+#
+# A section string may be either a null string or bracketed by [].
+# The arrays x1, x2, and step are initialized to FIRST, LAST, and STEP.
+# The number of subscripts decoded is returned in nsubscripts.
+# This routine uses the same decode routine as IMIO.
+
+
+define	FIRST	1
+define	LAST	MAX_LONG
+define	STEP	1
+
+procedure clgsec (prompt, section, x1, x2, step, nsubscripts)
+
+char	prompt[ARB]
+char	section[ARB]
+long	x1[IM_MAXDIM]
+long	x2[IM_MAXDIM]
+long	step[IM_MAXDIM]
+int	nsubscripts

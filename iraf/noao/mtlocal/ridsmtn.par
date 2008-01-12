@@ -1,0 +1,14 @@
+#Parameter file for the IDS mountain format reader
+ids_file,f,a,mta,,,IDS data source
+iraf_file,f,a,,,,IRAF filename
+reduced_data,b,h,yes,,,mtn reduced data?
+file_number,i,h,1,,,IDS tape file to be read
+record_numbers,s,h,"1-99999",,,record numbers
+make_image,b,h,yes,,,create IRAF image?
+np1,i,h,0,,,Starting pixel in spectrum
+np2,i,h,0,,,Ending pixel in spectrum
+print_pixels,b,h,no,,,print pixel values?
+long_header,b,h,no,,,print full IDS header?
+data_type,s,h,r,,,IRAF data type
+offset,i,h,0,,,offset added to output filename
+mode,s,h,ql,,,

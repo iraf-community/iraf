@@ -1,0 +1,325 @@
+Begin Sat Apr 29 21:05:25 MST 1995  Linux 1.1.93.
+Files actually set up initially last weekend.
+-----------------------------------------------------
+
+unix/hlib/irafuser.csh MACH is "linux", architecture is "linux" compiler is
+	GCC.  Set up generic compile and link flags for the moment.  (4/23)
+
+unix/hlib/mach.h
+	x86 boxes are little-endian so all the SWAP flags are set to YES
+	on this platform.  (4/23)
+
+unix/os/mkpkg.sh
+	1. Was using HSI_LIBS to link alloc.e, but the iraf libraries are not
+	used in this file.  Changed to use HSI_OSLIBS instead.
+	2. Deleted the reference to as$enbint.s, not used for Linux.  (4/29)
+
+(linux)
+	1. After booting typing "cd unix", which uses cdpath to go to
+	$iraf/unix, would hang the xterm.  The problem went away following
+	a reboot.
+	2. Got a bunch of failures to compile when doing a reboot of the 
+	HSI, no apparent reason (message said couldn't write .o files).
+	Started another reboot and the problem went away.
+	3. Manpages can be very brief and do not fully specify system or
+	library routines.
+	4. Problems with cut and past, not resolved.
+
+unix/os/zfiomt.c
+	The structure "mtpos" used in this file redefines a different
+	structure defined in <sys/mtio.h>.  Changed zfiomt.c to use _mtpos
+	for its internal structure.  (4/30)
+
+unix/os/zfiomt.c
+	Linux doesn't have SIGEMT.  Changed to use SIGABRT.  (4/30)
+
+unix/os/mkpkg
+	Commented out enbinit.s.  (4/30)
+
+unix/boot/gdev/sgidev/sgi2uapl.c
+	Added a #undef SOLARIS to cause the routine to use gethostname()
+	rather than sysinfo which is implemented differently in Solaris 
+	and Linux.  (4/30)
+
+unix/hlib/install
+	Minor changes for Linux.  (4/30)
+
+unix/hlib/motd
+	Modified for Linux/IRAF V2.10.4BETA.  (4/30)
+
+unix/boot/mkpkg/host.c
+	Added #undefs for SYSV and i386 to cause this code to use ranlib.
+	(4/30)
+
+----------------------------------------------
+Completed HSI bootstrap.  (4/30)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.LINUX	+
+	Modified mkpkg.inc for Linux, no compile/link flags of note yet at
+	this point.  Add a base special file list for Linux, currently only
+	references the C files in AS.  (4/30)
+
+unix/boot/spp/xc.c
+	Modified the code which compiles "other" files (not .x or .f) to
+	explicitly compile only .c and .s files.  This prevents unrecognized
+	command line flags from confusing the code and causing a command to
+	be issued that contains nothing to be compiled.  (5/03)
+
+(linux)
+	Another Linux oddity with libraries: on linking the CL _zawrim_ would
+	always come up undefined, even though an "ar tv" of libds.a showed
+	it looked fine.  Deleting zawrim.o and updating the library made the
+	problem go away.  (5/03)
+
+unix/os/zfiond.c
+	Added a #include <sys/time.h>, needed to pick up the FD_SET etc.
+	definitions on Linux.  (5/03)
+
+unix/as.linux/ieee.gx
+	Installed the little-endian version (from OSF/1).  F2C complained
+	about statements following DATA so I had to rearrange the code in
+	ieemap$t a bit.  (5/03)
+
+unix/hlib/cl.csh
+unix/hlib/fc.csh
+	Deleted the uname stuff and just fixed MACH=linux.  Added linux
+	case code where needed.  (5/03)
+
+
+unix/as.linux/zsvjmp.s
+	I had to change the reference to `__setjmp' to `___setjmp' (3 under-
+	scores) to get the routine to call the function `__setjmp'.  (5/03)
+
+unix/os/zawset.c
+unix/hlib/libc/kernel.h
+	Installed the zawset (begmem) changes from tucana.  (5/03)
+
+
+Begin Sat Jul 22 20:24:16 MST 1995
+The Linux port was set aside for a time while IRAF V2.10.4 was prepared
+and our Linux system was upgraded to Slackware 2.3 and Linux 1.2.11.
+The port is being redone using Solaris/IRAF V2.10.4.  The above revisions
+will be merged before we resume taking notes.
+---------------------------------------------------------------------------
+
+unix/hlib/spy.cl
+	Added a Linux clause and set this to use "ps -axuf" for Linux.  The
+	"-f" option provides a parent/child ordering similar to sps.  (7/22)
+
+unis/os/zawset.c
+	Added an ifdef for Linux to cause it to uset {set|get}rlimit.  (7/22)
+
+unix/os/zgtime.c
+	Modified to use CLK_TCK (100 Hz), as on Solaris.  (7/22)
+
+unix/os/zpanic.c
+	Use SIGABRT on Linux rather than SIGEMT, which doesn't exist.
+	The Linux documentation doesn't specify which signals cannot be
+	caught, hopefully ABRT will do it.  (7/22)
+
+unix/boot/mkpkg/host.c
+	Linux uses the GNU "ar" to maintain object libraries.  This turns out
+	to have a bug which prevents it from properly updating a library which
+	is a symbolic link to the actual library.  The library is updated in
+	the current directory, and the symbolic link is replaced by the
+	updated library, hence the actual (remote) library is never updated.
+	To work around this a new internal function "resolvefname" was added
+	to host.c  This back traces any symbolic links and returns a fully
+	resolved library name.  (7/24)
+
+unix/os/zxwhen.c
+	I noticed during testing that when interrupting the cl or a task
+	run stand alone, while waiting for command input, that following
+	the interrupt processing the most recent block of input would be
+	reread and executed.  Evidently what happens is that Linux stdio
+	partially initializes the stdin file descriptor before the read,
+	and then never finishes initializing it since the read is interrupted
+	and never returns (in other words no critical section protection for
+	stdio).  The workaround was to extend the fcancel() macro in zxwhen
+	to reset both the input and output buffer pointers, and add a fcancel
+	for stdin to the error handler to cancel the input buffer if an
+	interrupt occurs.  (7/24)
+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	These routines were further modified to implement exception handling
+	for Linux.  This turned out to be hard to do properly as about all
+	Linux provides is a simple signal() interface.
+
+	1. The first problem was that interrupts were being disabled after
+	the first interrupt, as signals are "one-shot" by default.  The fix
+	here was to re-register the signal handler after each signal, and
+	to reinitialize the FPU control register during process startup and
+	during exception recovery.
+
+	2. After getting some Intel hardware manuals and some time digging
+	around in the Linux kernel to see how signals are handled I finally
+	found that the kernel pushes a frame on the stack before entering the
+	user exception handler.  The EBP register can be used to get the
+	address of this frame.  This frame describes the cpu state at the
+	time that the exception occurred and includes the hardware trap
+	number.  This is sufficient to identify all system traps but only
+	identifies floating point exceptions to the coprocessor trap level.
+	The floating point unit status register has been cleared by the time
+	the user exception handler is entered and so far I haven't discovered
+	how to differentiate the floating point exceptions, but at least
+	things like the integer divide by zero and overflow exceptions are
+	properly diagnosed.  The kernel is saving the information on the
+	FPU status internally, but so far I haven't found out how to access
+	this information from the application.  (7/29)
+
+unix/boot/spp/xc.c
+	The f77 command on Linux, which is a shell script based on F2C,
+	erroneously returns an exit status of 4 when successfully compiling
+	a Fortran file.  This would cause commands such as "xc foo.x" to
+	fail to link the output program thinking that the compilation had
+	abort on an error.  To workaround this bug XC was modified to ignore
+	an exit status of 4 when calling f77 under Linux.  (7/30)
+
+unix/os/zgcmdl.c
+	Linux also uses xargc,xargv.  (7/30)
+
+dev/termcap
+	Added "lp" alias for "lpr", as used in zzsetenv.def.  (7/30)
+
+-------------------------
+Downloaded and built TABLES without incident.  (8/01)
+Built NOAO packages without incident.  (8/01)
+
+unix/os/zmain.c
+	Changed the call to exit() to _exit() for Linux.  I was having trouble
+	with tasks in NOAO and TABLES doing horrible things during process
+	shutdown (hanging up the console for minutes with the disk thrashing
+	heavily, or doing a panic shutdown).  Although I did not check it out
+	fully, this appeared to be due to an "onexit" feature of the GNU exit() calling
+	calling random parts of process memory with essentially unpredicable
+	results.  The simplest solution was to simply use _exit instead, which
+	avoids this feature.  (8/01)
+
+unix/hlib/f77.sh		+
+	Copied the default "f77" script that comes with Linux to $hlib/f77.sh.
+	The script was modified to eliminate the "f2ctmp_" prefix that it was
+	prepending to Fortran file names before compiling with GCC.  This
+	feature (used by the script to implement Fortran includes) breaks 
+	source code debugging since the file which is actually compiled has
+	the f2ctmp prefix and this file no longer exists after compilation.
+	This fix also eliminated the "exit 4" problem mentioned above in the
+	xc.c fix.  (8/02)
+
+unix/boot/spp/xc.c
+	Modified XC to use the f77.sh script as the Fortran compiler, instead
+	of "f77".  It will still fall back and use f77 if it can't find
+	f77.sh.  (8/02)
+
+unix/hlib/f77.sh
+	1. Modified so that the -w flag inhibits warning messages from both f2c
+	and gcc.  This is necessary to get rid of a few warning messages seen
+	when compiling the IRAF code which do not indicate any real problems.
+	2. Added a call to sed in the f2c call to workaround a bug in f2c
+	where -w fails to strip out all the lines of a multiline warning
+	message.  (8/02)
+
+-----------------
+Wed Aug 16 13:00:13 MST 1995
+System has been in testing since last thursday.
+
+dev/tapecap
+	Modified this file for Linux.  Linux has a nice tape interface
+	supporting variable block sizes, behavior is very standard, however
+	there is no support for compression or any non-generic tape features,
+	and the default maximum block size on a read is 32K.  (8/15)
+
+local/
+	Installed a Linux specific set of startup files for the IRAF
+	account.  (8/24)
+
+mkpkg
+noao/mkpkg
+	Added "linux" targets.  (8/28)
+
+unix/hlib/irafuser.csh
+	Added "-static" to the link flags for the HSI.  (8/28)
+
+unix/os/zfiotx.c
+	Added #ifdef LINUX code in a couple of places to cancel the input
+	stream if an interrupt occurs (workaround for same bug as in zxwhen
+	above).  (9/02)
+
+---------------------------------------
+Installed V2.10.4 patch1.  Bootstrap, sysgen-update.  (9/02)
+
+unix/hlib/install
+	Added "chmod -t /tmp" to allow multiuser deletion of files, e.g.
+	magtape lock files, in /tmp.  (9/03)
+
+local/*
+	Configured the login files for the IRAF account, including setting
+	up the window system.  Installed gzexe-compressed binaries for xgterm,
+	ximtool, and the tin newsreader in $iraf/local/bin.  Set up window
+	system to start up by default 5 seconds after logging in, using fvwm
+	as the window manager.  An "ADASS news" entry in the root menu accesses
+	the ADASS news using the tin executable provided.  (9/03)
+
+unix/boot/bootlib/osfiletype.c
+	Added ".gz" to the list of source file types.  (9/03)
+
+doc/rev2.hlp
+	Renamed this file to rev2.txt, it is not a help file.  (9/03)
+
+unix/hlib/strip.iraf
+noao/lib/strip.noao
+	Various minor enhancements and updates.  (9/03)
+
+bin.linuz		+
+noao.bin.linuz		+
+unix/hlib/cl.csh
+mkpkg
+noao/mkpkg
+	Added a new architecture "linuz", which is a gzexe (gzip compressed)
+	version of bin.linux.  (9/03)
+
+----------------------------------------------------------------
+V2.10.4 Linux/IRAF release cut.  (9/04)
+
+unix/hlib/install
+	Deleted reference to edsym.e, which is not used on Linux/IRAF.  (9/18)
+
+unix/boot/rtar/rtar.c
+	RTAR would immediately die on a segvio.  This was traced to the use
+	of a local variable "setuid" which evidently conflicts with some
+	Linux include file definitions.  Changed a number of local variables
+	in the program to static local variables and this fixed the problem.
+	(9/20)
+
+unix/hlib/f77.sh
+	Added a -b flag to allow calling f77 with the "-b i486-linuxaout" flag
+	to build a.out executables on ELF systems.  (1/03/96)
+
+unix/hlib/irafuser.csh
+	Added "-b -i486-linuxaout" to the HSI compile and link flags.  (1/03)
+
+unix/boot/spp/xc.c
+	Added "-b -i486-linuxaout" flags to all compile and link instances.
+	(1/03)
+
+unix/bin.linux/libf2c.a		+
+	Added a copy of the a.out version of libf2c.a to HBIN since this is
+	not present on Slackware ELF systems, and possibly other Linux
+	verisons.  (1/03)
+
+unix/os/mkpkg.sh
+	Changed the call to "as" to use $CC -c $HSI_CF instead, to cause any
+	platform specific flags to be used to assemble the files.  (5/29 1996)
+
+
+----------------------------
+TODO
+
+*** Provide sh/bash equivalent of irafuser.csh.
+
+Wed May 29 11:11:00 MST 1996
+	New version of spp/xpp/xppcode.c does not work on Linux - some problem
+	with tokens.  Using old version for now.
+
+

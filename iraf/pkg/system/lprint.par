@@ -1,0 +1,5 @@
+files,s,a,,,,"list of files to be printed"
+device,s,h,"printer",,,"name of output device"
+map_cc,b,h,yes,,,"make unknown control chars printable"
+paginate,s,h,"auto",,,"break pages (auto, yes, no)"
+label,s,h,"STDIN",,,"file name label if input redirected"

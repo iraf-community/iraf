@@ -1,0 +1,104 @@
+                                                        1988 February 24
+
+
+    opening and closing tables:
+
+        uttinn - initialize for making a new table
+        uttinc - initialize for making a table using another table as template
+        uttcre - create a new table (after initializing with uttinn or uttinc)
+        uttopn - open an existing table
+        uttclo - close a table
+
+    columns:
+
+        utcdef - define columns
+        utcfnd - find a column from its name
+
+    table parameters:
+
+        utppti - set a table parameter
+        utpgti - get the value of a table parameter (e.g. number of rows)
+
+    get and put:
+
+        utrgt[tbird] - get values from a row
+        utrpt[tbird] - put values into a row
+        utcgt[tbird] - get values from a column
+        utcpt[tbird] - put values into a column
+        uthgt[tbird] - get a header parameter
+        uthad[tbird] - add a new header parameter or replace an existing one
+        uthpt[tbird] - replace an existing header parameter
+        utrudf - set values in a row to undefined
+
+    table files:
+
+        uttacc - check whether a table exists
+        uttcpy - copy a table
+        uttdel - delete a table
+        uttren - rename a table
+
+    miscellaneous:
+
+        utcinf - get information about a column
+        utcnam - change the name of a column
+        utcfmt - change the format for printing a column
+        utcnit - change the units for a column
+        utcnum - get the column identifier from the column number
+
+    Calling sequences:
+
+        call utcdef (tp, colname, colunts, colfmt, datatype, numcols,
+                        colidn, istat)
+
+        call utcfmt (tp, colidn, colfmt, istat)
+
+        call utcfnd (tp, colname, numcols, colidn, istat)
+
+        call utcgt[tbird] (tp, colidn, firstrow, lastrow,
+                        buffer, nullflag, istat)
+
+        call utcinf (tp, colidn,
+                        colname, colunits, colfmt, datatype, istat)
+
+        call utcnam (tp, colidn, colname, istat)
+
+        call utcnit (tp, colidn, colunits, istat)
+
+        call utcnum (tp, colnum, colidn, istat)
+
+        call utcpt[tbird] (tp, colidn, firstrow, lastrow, buffer, istat)
+
+        call uthad[tbird] (tp, keyname, value, istat)
+
+        call uthgt[tbird] (tp, keyname, value, istat)
+
+        call uthpt[tbird] (tp, keyname, value, istat)
+
+        call utpgti (tp, param, value, istat)
+
+        call utppti (tp, setwhat, value, istat)
+
+        call utrgt[tbird] (tp, colidn, numcols, rownum,
+                        buffer, nullflag, istat)
+
+        call utrpt[tbird] (tp, colidn, numcols, rownum, buffer, istat)
+
+        call utrudf (tp, colidn, numcols, rownum, istat)
+
+        call uttacc (tablename, table_exists, istat)
+
+        call uttclo (tp, istat)
+
+        call uttcpy (inname, outname, istat)
+
+        call uttcre (tp, istat)
+
+        call uttdel (tablename, istat)
+
+        call uttinc (tablename, template, tp, istat)
+
+        call uttinn (tablename, tp, istat)
+
+        call uttopn (tablename, iomode, tp, istat)
+
+        call uttren (oldname, newname, istat)

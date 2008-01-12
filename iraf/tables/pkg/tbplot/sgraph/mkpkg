@@ -1,0 +1,31 @@
+# Make the sgraph task
+
+$checkout tbplot.a ../
+$update tbplot.a
+$checkin tbplot.a ../
+$exit
+
+tbplot.a:
+	axmarg.x	<gset.h>
+	fhglin.x
+	fmsize.x
+	getimtitle.x	<tbset.h> <imhdr.h> "sgraph.h"
+	getpat.x
+	ggoptype.x	<ctype.h> "sgraph.h"
+	ggplot.x	<gset.h> "sgraph.h"
+	ggrd1col.x	<tbset.h>
+	ggrd2col.x	<tbset.h>
+	ggrdcurve.x	<error.h> <tbset.h> "sgraph.h"
+	ggrdimage2.x	<imhdr.h>
+	ggrdlist2.x	<ctype.h> "sgraph.h"
+	ggrdxycol.x	<tbset.h>
+	ggrser.x	<tbset.h>
+	hgline.x
+	improjection.x	<imhdr.h>
+	initdashpat.x	"sgraph.h"
+	initmarker.x	<gset.h>
+	lintran.x
+	relindef.x
+	setdashpat.x	<gset.h>
+	t_sgraph.x	<config.h> <fset.h> "sgraph.h"
+;

@@ -1,0 +1,79 @@
+.help tbcalc May93 noao.digiphot.ptools
+.ih
+NAME
+tbcalc - perform an arithmetic operation on a column in a list of apphot/daophot
+	 ST tables databases
+.ih
+USAGE
+tbcalc textfiles column value
+.ih
+PARAMETERS
+.ls textfiles
+The APPHOT/DAOPHOT ST tables database(s) containing the column to be recomputed.
+.le
+.ls column
+The column to be recomputed. Column must be an integer or real column
+in the input file(s).
+.le
+.ls value
+The arithmetic expression used to recompute the specified column.
+Value may be an integer or real expression but must match the data
+type of column.
+.le
+
+.ih
+DESCRIPTION
+
+TBCALC reads in the value of the \fIcolumn\fR 
+from a set of  APPHOT/DAOPHOT ST tables databases, replaces it with a new
+value specified by the arithmetic expression \fIvalue\fR,
+and updates the ST tables databases(s).
+
+The expression \fIvalue\fR consists of variables which are column names
+in the APPHOT/DAOPHOT ST tables database.
+TBCALC uses the TABLES package task TCALC to actually perform the
+arithmetic operation.
+
+The supported
+arithmetic operators and functions are briefly described below.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
+
+.ih
+EXAMPLES
+
+1. Change the XCENTER and YCENTER fields to XCENTER + 5.4 and YCENTER + 10.3
+respectively in a file produced by the daophot package allstar task.
+
+.nf
+	pt> tbcalc m92.als.1 xcenter "xcenter+5.4"
+	pt> tbcalc m92.als.1 ycenter "ycenter+10.3"
+.fi
+
+2.  Add a constant to the computed magnitudes produced by the daophot
+package nstar task.
+
+.nf
+	pt> tbcalc n4147.nst.2 mag "mag+3.457"
+.fi
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+ptools.txcalc,tables.tcalc,ptools.pcalc
+.endhelp

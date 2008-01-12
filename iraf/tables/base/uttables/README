@@ -1,0 +1,11 @@
+This directory contains the source for the Fortran-callable SDAS table I/O
+routines.  All procedure names begin with "ut".  The next letter gives some
+idea of the kind of object the procedure deals with (t - table in general,
+r - row, c - column, p - parameter, h - header parameter).
+
+The doc subdirectory contains further information in the following files:
+
+UTTABLES.DOC	a description of each routine and a simple example program
+CALLS.DOC	a list of routines and their calling sequences
+USERPAR.DOC	characteristics of "header" parameters (i.e. user parameters)
+UTPPTI.DOC	a note about using utppti

@@ -1,0 +1,6 @@
+# TXSELECT Parameters
+
+textfiles,s,a,,,,Input apphot/daophot text database(s)
+outfiles,s,a,,,,Output apphot/daophot text databases(s)
+expr,s,a,"yes",,,Boolean expression for record selection
+mode,s,h,"ql",,,Mode of task

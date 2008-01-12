@@ -1,0 +1,113 @@
+# Update the igi application code in the stplot package library
+# Author: SDAS, 10-FEB-1989
+# 15 March 1993 Add version.h to t_igi.x and ig_id.x
+# 2 July 1993 Add ig_wcslab.x for the WCSLAB command
+# 13 July 1993 Add igopen.x and igclose.x
+
+$checkout tbplot.a ../
+$update   tbplot.a
+$checkin  tbplot.a ../
+$exit
+
+tbplot.a:
+	arrow.x			igi.h
+	axis.x         		<gset.h> <math.h> igi.h 
+	cmdcat.x       		<fset.h> igi.h 
+	defmac.x       		<ctype.h> igi.h commands.h 
+	gettok.x       		<ctype.h> igi.h 
+	get_int.x      		igi.h 
+	get_real.x     		igi.h 
+	gtokst.x       		igi.h cmdict.h 
+	igprompt.x     		<fset.h> igi.h 
+	igstarg.x      		<ctype.h> igi.h 
+	ig_angle.x     		igi.h 
+	ig_axis.x      		<gset.h> <math.h> igi.h 
+	ig_box.x       		<gset.h> igi.h 
+	ig_column.x    		<tbset.h> igi.h commands.h 
+	ig_color.x		<gset.h> igi.h
+	ig_connect.x   		<gset.h> igi.h 
+	ig_curses.x    		igi.h commands.h 
+	ig_data.x      		igi.h 
+	ig_define.x    		igi.h 
+	ig_dlist.x     		igi.h 
+	ig_dot.x       		<gset.h> igi.h 
+	ig_edit.x      		<fset.h> igi.h commands.h 
+	ig_ellipse.x   		<gset.h> <math.h> igi.h 
+	ig_end.x       		igi.h 
+	ig_erase.x     		igi.h 
+	ig_errorbar.x  		<gset.h> igi.h 
+	ig_escape.x    		igi.h 
+	ig_etype.x     		igi.h 
+	ig_evaluate.x  		<evexpr.h> igi.h commands.h 
+	ig_expand.x    		igi.h 
+	ig_fillpat.x      	igi.h 
+	ig_flip.x      		igi.h commands.h 
+	ig_fmtick.x		igi.h
+	ig_fontset.x		igi.h
+	ig_gctran.x		<gio.h>
+	ig_grid.x 		<gset.h> igi.h 
+	ig_help.x      		igi.h commands.h 
+	ig_histogram.x 		<gset.h> igi.h 
+	ig_history.x   		igi.h 
+	ig_id.x        		<gset.h> igi.h 
+	ig_imgwcs.x     	igi.h 
+	ig_input.x     		igi.h 
+	ig_justify.x   		igi.h 
+	ig_label.x     		<gset.h> igi.h 
+	ig_limits.x    		igi.h 
+	ig_lines.x     		igi.h 
+	ig_list.x      		igi.h <fset.h> 
+	ig_logarithm.x 		igi.h commands.h 
+	ig_logo.x      		<gset.h> <math.h> igi.h 
+	ig_ltype.x     		igi.h 
+	ig_lweight.x   		<gset.h> igi.h 
+	ig_margin.x    		igi.h 
+	ig_minmax.x    		igi.h 
+	ig_mlist.x     		igi.h 
+	ig_mode.x      		igi.h 
+	ig_move.x      		<gset.h> igi.h commands.h 
+	ig_notation.x  		igi.h
+	ig_number.x		<gset.h> igi.h
+	ig_pixmap.x    		<gset.h> igi.h 
+	ig_playback.x  		igi.h 
+	ig_points.x    		<gset.h> igi.h 
+	ig_polygon.x		<gset.h> igi.h
+	ig_ptype.x     		igi.h 
+	ig_putlabel.x  		<gset.h> igi.h 
+	ig_read.x      		igi.h 
+	ig_reset.x     		igi.h 
+	ig_saocmap.x		<psiescape.h> igi.h
+	ig_scale.x     		<gset.h> igi.h commands.h 
+	ig_section.x		<imhdr.h> igi.h commands.h
+	ig_show.x      		igi.h 
+	ig_sixty.x     		igi.h commands.h 
+	ig_step.x      		<gset.h> igi.h 
+	ig_ticksize.x  		igi.h 
+	ig_ullim.x     		<gset.h> igi.h 
+	ig_undo.x      		igi.h commands.h
+	ig_wcslab.x		<imhdr.h> igi.h commands.h
+	ig_window.x    		<gset.h> igi.h 
+	ig_write.x     		igi.h 
+	ig_xylabel.x   		<gset.h> igi.h commands.h 
+	ig_zsection.x		<imhdr.h> igi.h
+	ig_zrange.x		igi.h
+	igclose.x		igi.h
+	igopen.x		igi.h
+	lcmdcat.x      		<fset.h> igi.h
+	listout.x
+	mgostr.x       		<gset.h> <math.h> igi.h 
+	number.x
+	mgpoint.x      		<math.h> <gset.h> igi.h 
+	readtok.x      		<lexnum.h> <ctype.h> igi.h 
+	setltype.x     		<gset.h> igi.h 
+	spshfd.x       		igi.h 
+	tkapst.x       		
+	t_igi.x        		<fset.h> <tbset.h> <gio.h> \
+				igi.h commands.h
+	vpage.x        		igi.h 
+	wrtcmd.x       		<fset.h> 
+#	gctran.x		<gio.h>
+	rd_relrow.x		<tbset.h> <imhdr.h>
+	ig_psfnt.x		<gset.h> igi.h
+	ig_blkavg.x		<imhdr.h> <error.h>
+	;

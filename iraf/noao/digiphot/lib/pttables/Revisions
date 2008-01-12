@@ -1,0 +1,10 @@
+.help revisions Jun94 noao.digiphot.pttables
+.nf
+pttables/ptkeywords.x
+    Fixed a memory allocation bug which occured when the number of
+    header keywords was greater the 50. A pointer array was not being
+    correctly updated after memory reallocation.
+
+    (Davis, Feb 2, 1994)
+
+.endhelp

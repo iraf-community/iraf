@@ -1,0 +1,10 @@
+input,s,a,,,,List of input spectra
+output,s,a,,,,List of output spectra
+redshift,s,a,,,,Redshift or velocity (Km/s)
+isvelocity,b,h,no,,,Is the redshift parameter a velocity?
+add,b,h,no,,,Add to previous dispersion correction?
+dispersion,b,h,yes,,,Apply dispersion correction?
+flux,b,h,no,,,Apply flux correction?
+factor,r,h,3.,,,Flux correction factor (power of 1+z)
+apertures,s,h,"",,,List of apertures to correct
+verbose,b,h,no,,,Print corrections performed?

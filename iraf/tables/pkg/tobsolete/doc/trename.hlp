@@ -1,0 +1,88 @@
+.help trename Jun97 tobsolete
+.nj
+.ih
+NAME
+trename -- Rename tables.
+.ih
+USAGE
+trename intable outtable
+.ih
+DESCRIPTION
+This task is used to rename tables.
+The input may be a general filename template,
+including wildcard characters or the name of a list file
+(preceded by an "@" character) containing table names.
+The output may be either a directory specification or a list of table names.
+If the output is a list of tables
+then there must be the same number of names in the output list as there
+were in the input list--the names are taken in pairs,
+one from the input list and one from the output list.
+
+In order to protect against accidental renaming of files other than tables,
+text tables may not be renamed by 'trename'.
+Use 'rename' instead.
+.ih
+PARAMETERS
+.ls intable [file name template]
+A list of one or more tables to be renamed.
+.le
+.ls outtable [file name template]
+Either a directory name or a list of output table names.
+.le
+.ls (verbose = yes) [boolean]
+Display a message on STDOUT each time a table is renamed?  This message
+will give the old and new names.
+.le
+.ih
+EXAMPLES
+1. Rename a single table:
+
+.nf
+	tt> trename table newname
+	tt> trename table ../table
+.fi
+
+2. Rename several tables:
+
+.nf
+	tt> trename table1,table2,tab67 a,b,c
+	tt> trename tab*.tab a,b,c
+
+.fi
+In the latter case the extension is given explicitly in case there
+are other files beginning with "tab" that are not tables; there must
+be exactly three tables beginning with "tab" because the output list
+has three names.
+
+3. Rename all tables beginning with "nite1*" to "nite1_c".  The "%"
+characters are used to edit file names; the "%" character delimits
+the old string and the new string--but in this case the old string
+is null, so the new string "_c" is appended to each file name.
+
+.nf
+	tt> trename nite1.*.tab nite1%%_c%.*.tab
+.fi
+
+4. Use 'trename' to move a set of tables to a new directory:
+
+.nf
+	tt> trename table*.tab directory
+			or
+	tt> trename table*.tab directory$
+			or
+	tt> trename table*.tab osdirectory
+.fi
+
+where "directory" is an IRAF environment variable for a directory name,
+and "osdirectory" is an operating system directory name
+(e.g., "/user/me/" in UNIX).
+.ih
+BUGS
+Text tables may not be renamed using 'trename'.
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+rename, tcopy, tdelete
+.endhelp

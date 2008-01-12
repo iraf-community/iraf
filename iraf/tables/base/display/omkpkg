@@ -1,0 +1,14 @@
+# Update the display library.
+# Author: B.Simon 26-SEP-90
+
+$checkout libdisplay.a ../
+$update   libdisplay.a
+$checkin  libdisplay.a ../
+$exit
+
+libdisplay.a:
+$call @curses
+$call @forms
+$call @screen
+$exit
+

@@ -1,0 +1,16 @@
+# Help directory for the IMGEOM package
+
+$doc		= "images$imgeom/doc/"
+$src		= "images$imgeom/src/"
+
+blkavg          hlp=doc$blkavg.hlp,     src=src$t_blkavg.x
+blkrep          hlp=doc$blkrep.hlp,     src=src$t_blkrep.x
+imlintran       hlp=doc$imlintran.hlp,  src=imgeom$imlintran.cl
+imshift         hlp=doc$imshift.hlp,    src=src$t_imshift.x
+imtranspose     hlp=doc$imtrans.hlp,    src=src$t_imtrans.x
+im3dtran        hlp=doc$im3dtran.hlp,   src=src$t_im3dtran.x
+magnify         hlp=doc$magnify.hlp,    src=src$t_magnify.x
+rotate          hlp=doc$rotate.hlp,     src=imgeom$rotate.cl
+shiftlines      hlp=doc$shiftlines.hlp, src=src$t_shiftlines.x
+revisions	sys=Revisions
+

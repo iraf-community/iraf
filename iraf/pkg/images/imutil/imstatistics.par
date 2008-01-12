@@ -1,0 +1,10 @@
+images,s,a,,,,List of input images
+fields,s,h,"image,npix,mean,stddev,min,max",,,Fields to be printed
+lower,r,h,INDEF,,,Lower limit for pixel values
+upper,r,h,INDEF,,,Upper limit for pixel values
+nclip,i,h,0,0,,Number of clipping iterations
+lsigma,r,h,3.0,0,,Lower side clipping factor in sigma
+usigma,r,h,3.0,0,,Upper side clipping factor in sigma
+binwidth,r,h,0.1,,,Bin width of histogram in sigma
+format,b,h,yes,,,Format output and print column labels ?
+cache,b,h,no,,,Cache image in memory ?

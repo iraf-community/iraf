@@ -1,0 +1,18 @@
+input,f,a,,,,Input text file containing data to be fit
+image,f,h,,,,Output surface image (optional)
+coordinates,f,h,"",,,Text file of coordinates to be evaluated (optional)
+fit,f,h,"",,,"Text file for output evaluated fit
+"
+function,s,h,"polynomial","chebyshev|legendre|polynomial",,Surface function
+xorder,i,h,2,1,,X order of surface
+yorder,i,h,2,1,,Y order of surface
+xterms,s,h,"full","|none|full|half|",,Cross-terms type
+weighting,s,h,"user","uniform|user|statistical|instrumental",,Weighting type
+xmin,r,h,INDEF,,,Minimum X value over which surface is defined
+xmax,r,h,INDEF,,,Maximum X value over which surface is defined
+ymin,r,h,INDEF,,,Minimum Y value over which surface is defined
+ymax,r,h,INDEF,,,Maximum Y value over which surface is defined
+zmin,r,h,INDEF,,,Minimum Z value to include in fit
+zmax,r,h,INDEF,,,Maximum Z value to include in fit
+ncols,i,h,100,1,,Number of columns in output image
+nlines,i,h,100,1,,Number of lines in output image

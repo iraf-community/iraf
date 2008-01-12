@@ -1,0 +1,31 @@
+# pltpar.par  plot attributes pset
+
+stack,b,h,no,,,"stack multiple curves on separate vertical axes?"
+axis,i,h,1,1,7,"axis along which projection is to be taken"
+
+pointmode,b,h,no,,,"plot points only?"
+marker,s,h,"box","point|box|plus|cross|circle|diamond|hline|vline|hebar|vebar",\
+,"point marker character: \n\
+    point, box, plus, cross, circle,\n\
+    diamond, hline, vline, hebar, vebar"
+szmarker,r,h,5E-3,,,"marker size (0 => list input; > 0 => NDC)"
+
+erraxis,i,h,0,0,2,"error bars (1 => X, 2 => Y)"
+errtype,s,h,"bartck","bartck|bar|tick|limit",,\
+"error bar style:\n\
+    bartck, bar, tick, limit"
+
+pattern,s,h,"solid","solid|dashed|dotted|dotdash",,\
+"starting line pattern:\n\
+    solid, dashed, dotted, dotdash"
+crvstyle,s,h,"straight","straight|pseudohist|fullhist",,\
+"curve style:  straight, pseudohist, fullhist"
+rejectlog,b,h,yes,,,"replace invalid log values with INDEF?"
+
+barpat,s,h,"hollow","|hollow|solid|ahatch|bhatch|chatch|dhatch|",,"Fill pattern for bar plot [device-dependent]"
+
+crvcolor,i,h,INDEF,1,,"Color of data curve(s) [device-dependent]"
+color,i,h,INDEF,1,,"Color of axis and labels [device-dependent]"
+cycolor,b,h,no,,,"Cycle colors instead of line style for multiple curves?"
+
+version,s,h,"20July1993",,,"Date of installation"

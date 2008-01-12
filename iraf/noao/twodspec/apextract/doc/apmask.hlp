@@ -1,0 +1,123 @@
+.help apmask Sep96 noao.twodspec.apextract
+.ih
+NAME
+apmask -- Make pixel mask from apertures definitions
+.ih
+USAGE
+apfind input
+.ih
+PARAMETERS
+.ls input
+List of input images with aperture definitions.
+.le
+.ls output
+List of output mask names.  As a convention the extension ".pl" (pixel
+list) should be used.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and create a mask.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls interactive = no
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing is
+disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database and the
+parameter \fInfind\fR must be greater than zero.
+.le
+.ls recenter = no
+Recenter the apertures?
+.le
+.ls resize = no
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace apertures?
+.le
+.ls fittrace = yes
+Fit the traced points interactively?  The \fIinteractive\fR parameter
+must also be yes.
+.le
+.ls mask = yes
+Create mask images?
+.le
+
+.ls line = INDEF
+The dispersion line (line or column perpendicular to the dispersion axis) to
+be used in finding, recentering, resizing, editing, and starting to
+trace spectra.  A value of INDEF selects the middle of the image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value takes the
+sum and a negative value selects a median.
+.le
+.ls buffer = 0.
+Buffer to add to aperture limits.  One use for this is to increase
+the width of the apertures when a mask is used to fit data between
+the apertures.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+.ih
+DESCRIPTION
+Pixel list masks are created from the aperture definitions in the input
+images.  Pixel list masks are a compact way to define arbitrary
+regions of an image.  The masks may be used directly as an image with values
+of 1 (in an aperture) and 0 (outside an aperture).  Alternatively,
+some tasks may use a mask to define regions to be operated upon.
+When this task was written there were no such tasks though eventually
+some tasks will be converted to use this general format.  The intent
+of making an aperture mask is to someday allow using it with the task
+\fBimsurfit\fR to fit a background or scattered light surface.
+(See \fBapscatter\fR for an alternative method).
+.ih
+EXAMPLES
+1. To replace all data outside the apertures by zero:
+
+.nf
+	cl> apmask image image.pl nfind=10
+	cl> imarith image * image.pl image1
+.fi
+.ih
+REVISIONS
+.ls APMASK V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+apdefault, aprecenter, apresize, apedit, aptrace, apall
+.endhelp

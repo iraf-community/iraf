@@ -1,0 +1,27 @@
+# Help directory for the APEXTRACT package.
+
+$doc		 = "./doc/"
+
+apall		hlp=doc$apall.hlp
+apdefault	hlp=doc$apdefault.hlp
+apdemos		hlp=doc$apdemos.hlp
+apedit		hlp=doc$apedit.hlp
+apfind		hlp=doc$apfind.hlp
+apfit		hlp=doc$apfit.hlp
+apflatten	hlp=doc$apflatten.hlp
+apmask		hlp=doc$apmask.hlp
+apnoise		hlp=doc$apnoise.hlp
+apnormalize	hlp=doc$apnormalize.hlp
+aprecenter	hlp=doc$aprecenter.hlp
+apresize	hlp=doc$apresize.hlp
+apscatter	hlp=doc$apscatter.hlp
+apsum		hlp=doc$apsum.hlp
+aptrace		hlp=doc$aptrace.hlp
+
+package		hlp=doc$apextract.hlp,		 sys=doc$apextractsys.hlp
+apbackground	hlp=doc$apbackground.hlp
+approfiles	hlp=doc$approfiles.hlp
+apvariance	hlp=doc$apvariance.hlp
+extras		hlp=doc$apextras.hlp
+
+revisions	sys=Revisions

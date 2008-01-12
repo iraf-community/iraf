@@ -1,0 +1,33 @@
+.help eqeqx Jun99 "Slalib Package"
+.nf
+
+      DOUBLE PRECISION FUNCTION slEQEX (DATE)
+
+     - - - - - -
+      E Q E X
+     - - - - - -
+
+  Equation of the equinoxes  (IAU 1994, double precision)
+
+  Given:
+     DATE    dp      TDB (loosely ET) as Modified Julian Date
+                                          (JD-2400000.5)
+
+  The result is the equation of the equinoxes (double precision)
+  in radians:
+
+     Greenwich apparent ST = GMST + slEQEX
+
+  References:  IAU Resolution C7, Recommendation 3 (1994)
+               Capitaine, N. & Gontier, A.-M., Astron. Astrophys.,
+               275, 645-650 (1993)
+               
+  Called:  slNUTC
+
+  Patrick Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

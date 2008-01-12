@@ -1,0 +1,30 @@
+.help envget Feb86 language
+.ih
+NAME
+envget -- get the string value of an environment variable
+.ih
+USAGE
+envget varname
+.ih 
+PARAMETERS
+.ls varname
+The environment variable whose value is to be returned.
+.le
+.ih
+DESCRIPTION
+\fIEnvget\fR returns the string value of the named environment variable.
+The user is prompted for the value if the variable has not yet been defined.
+.ih
+EXAMPLES
+1. Construct a filename using the value of the environment variable
+"editor", and page the file thus named.
+
+	cl> page ("dev$" // envget ("editor") // ".ed")
+
+2. Compute and print the center line on the terminal screen.
+
+	cl> = ((int (envget ("ttynlines")) + 1) / 2)
+.ih
+SEE ALSO
+set, show
+.endhelp

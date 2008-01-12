@@ -1,0 +1,7 @@
+4.2BSD UNIX IRAF Kernel.
+
+    This directory contains the machine dependent routines comprising the IRAF
+system interface to UNIX 4.2BSD.  Some additional potentially machine dependent
+routines (the bit and byte primitives) are in sys$osb.  Documentation is in
+the System Interface Reference manual doc$Os.ms and the manual pages for the
+individual routines are in the subdirectory ./doc.

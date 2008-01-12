@@ -1,0 +1,10 @@
+$checkout fitsio.a ../
+$update fitsio.a
+$checkin fitsio.a ../
+$exit
+
+fitsio.a:
+	catfits.x	<error.h> <fset.h> "catfits.com"  "catf.h"
+	cat_rtonly.x	"catfits.com" <mach.h> <fset.h>  "catf.h"
+	cat_prt.x       "catfits.com" "catf.h"
+	;

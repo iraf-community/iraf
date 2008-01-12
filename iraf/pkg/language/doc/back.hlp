@@ -1,0 +1,28 @@
+.help back Feb86 language
+.ih
+NAME
+back -- return to the previous directory
+.ih
+USAGE
+back
+.ih
+PARAMETERS
+None.
+.ih
+DESCRIPTION
+\fIBack\fR is used after a call to \fIchdir\fR or \fIcd\fR to return to the
+previous directory.  Repetitive calls to \fIback\fR may be used to toggle
+between two directories.
+.ih
+EXAMPLES
+1. Go to the logical directory "dataio".
+
+	cl> cd dataio
+
+2. Return to the previous directory, and then go back to the dataio directory.
+
+	cl> back;back
+.ih
+SEE ALSO
+chdir, pathnames
+.endhelp

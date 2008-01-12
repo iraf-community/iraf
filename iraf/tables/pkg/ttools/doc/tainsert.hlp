@@ -1,0 +1,132 @@
+.help tainsert Jan98 tables
+.nj
+.ih
+NAME
+tainsert -- Copy a column of scalars from one table
+to an array entry in another.
+.ih
+USAGE
+tainsert intable outtable row column
+.ih
+DESCRIPTION
+This task reads an entire column from one table
+and inserts those values (presumably more than one)
+at a specified row and column in an output table.
+If the output table exists it will be written to in-place;
+otherwise, it will be created.
+
+By default, the same column name is used in both tables.
+If the column does not exist in the output table, the column will be created.
+If the output table and the row and column already exist,
+the array of values at that location will be overwritten.
+The number of elements copied will be the minimum of
+the number of input rows and the output column array size.
+If the number of input rows is larger than the array size,
+a warning message will be printed,
+and the extra rows will be ignored.
+If the number of input rows is smaller than the array size,
+the remaining array elements will be set to INDEF.
+
+If the specified row number is less than one or is INDEF,
+'tainsert' looks for the header keyword ORIG_ROW in the input table.
+ORIG_ROW is written by 'taextract'.
+If that keyword exists, its value is used as the row number.
+.ih
+PARAMETERS
+.ls intable [file name]
+Name of the input table.
+.le
+.ls outtable [file name]
+Name of the output table.
+If this table doesn't exist it will be created.
+.le
+.ls row = -1 [integer]
+This is the row number in the output table.
+The default means that 'tainsert' should use
+the value of the header keyword ORIG_ROW.
+.le
+.ls column [string]
+Column name in the input table and, by default, also in the output table.
+If this column does not exist in the output table, it will be created,
+and the array size will be set to the number of rows in the input table.
+See the descriptions for 'outcolumn' and 'size', however.
+
+It is an error if this column in the input table contains array entries.
+.le
+.ls outcolumn = "" [string]
+If 'outcolumn' is specified,
+that name will be used for the output table;
+otherwise, 'column' will be used for both input and output tables.
+This provides an easier way to change the name of the output column
+than by running 'tchcol' after running 'taextract'.
+Note that if 'outcolumn' is specified,
+it is used not only for finding the column in the output table
+but also for creating the column if it wasn't found.
+The 'size', 'datatype', 'colunits', and 'colfmt' parameters,
+by contrast, are only used when creating a new column.
+.le
+.ls (size = INDEF) [int]
+When creating a new column in the output table,
+the default is for the array size of that column to be set to
+the number of rows in the input table.
+This may be overridden by specifying a value for 'size'.
+If 'size' is a positive integer, not INDEF,
+this will be used as the array size when creating the new column.
+.le
+.ls (datatype = "") [string]
+When creating a new column in the output table,
+the default is to use the same data type as the column in the input table.
+However, if 'datatype' is specified (i.e. not null or blank),
+this will be used as the data type when creating the new column.
+For numeric and boolean columns, only the first character is used:
+"r" and "d" for single and double precision floating point,
+"s" and "i" for short integer and integer,
+"b" for boolean.
+For a character string of maximum length 12 (for example), use "ch*12".
+.le
+.ls (colunits = "") [string]
+When creating a new column in the output table,
+the units will be set to 'colunits' if it has been specified;
+otherwise, the units will be copied from the column in the input table.
+.le
+.ls (colfmt = "") [string]
+When creating a new column in the output table,
+the print format will be set to 'colfmt' if it has been specified;
+otherwise, the print format will be copied from the column in the input table.
+.le
+.ih
+EXAMPLES
+1. Copy the entire column "polar" from table "scalar.tab",
+and insert the values into row 5, column "polar", of table "array.tab".
+If "array.tab" does not exist it will be created.
+If column "polar" does not exist in "array.tab",
+that column will be created.
+
+.nf
+at> tainsert scalar.tab array.tab 5 polar
+.fi
+
+2. Copy the arrays from row 5, columns "wavelength" and "flux",
+from "array.tab" to a temporary table,
+sort them on the wavelength,
+and insert them back where they came from.
+
+.nf
+at> taextract array temp 5 wavelength
+at> taextract array temp 5 flux
+at> tsort temp wavelength
+at> tainsert temp array 0 wavelength
+at> tainsert temp array 0 flux
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+taextract
+
+Type "help ttools opt=sysdoc" for a higher-level description of the 'ttools'
+package.
+.endhelp

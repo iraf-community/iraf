@@ -1,0 +1,24 @@
+.help clnarg Sep86 imfort
+.ih
+NAME
+clnarg -- get the number of arguments on the command line
+.ih
+SYNOPSIS
+.nf
+subroutine clnarg (nargs)
+
+integer		nargs		#O the number of arguments
+.fi
+.ih
+DESCRIPTION
+The \fIclnarg\fR subroutine returns the number of whitespace delimited
+(or quoted) arguments given on the command line when the calling program
+was invoked.
+.ih
+RETURN VALUE
+The number of arguments, or zero if there were no arguments or if the
+command line cannot be accessed for some reason (there is no error return).
+.ih
+SEE ALSO
+clarg, clrawc
+.endhelp

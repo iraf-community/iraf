@@ -1,0 +1,23 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AXOR -- Compute the exclusive or of two vectors (generic).
+
+procedure axor$t (a, b, c, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+$if (datatype == i)
+int	xor()
+$else
+PIXEL	xor$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		c[i] = xor (a[i], b[i])
+	    $else
+		c[i] = xor$t (a[i], b[i])
+	    $endif
+	}
+end

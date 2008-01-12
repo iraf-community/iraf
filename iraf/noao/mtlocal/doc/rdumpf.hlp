@@ -1,0 +1,89 @@
+.help rdumpf Jul87 noao.mtlocal
+.ih
+NAME
+rdumpf -- convert IPPS rasters from DUMPF tapes to IRAF images
+.ih
+USAGE
+rdumpf dumpf_file file_list iraf_file
+.ih
+PARAMETERS
+.ls dumpf_file
+The dumpf data source, i.e., the name of a magtape device.
+.le
+.ls file_list
+A string listing the permanent files to be read from the DUMPF tape.  
+.le
+.ls iraf_file
+The IRAF file which will receive the image data if the \fImake_image\fR
+parameter
+is set.  If more then one raster is being read, the output
+filename is concatenated from the \fIiraf_file\fR parameter, the tape
+file number and the raster sequence number.  That is, reading rasters 1 - 3
+from files 3 and 4 with iraf_file = \fIpic\fR would generate a sequence of 
+files:
+pic3.001, pic3.002, pic3.003, pic4.001, pic4.002, pic4.003.
+.le
+.ls raster_list = "1-999"
+A string listing the IPPS rasters to be read from each file specified by
+the \fIfile_list\fR parameter.
+.le
+.ls make_image = yes
+This switch determines whether the IPPS rasters are converted to IRAF images.
+When this switch is set to \fIno\fR, only a listing of the IPPS rasters is 
+produced, no output image is written.
+.le
+.ls print_header = yes
+This switch determines if the IPPS header information will be listed for those
+rasters being read.
+.le
+.ls data_type = ""
+The data type of the output IRAF image.  If an incorrect data_type or null
+string is entered, the default data type used is determined by the number
+of bits per pixel in the IPPS raster.
+.le
+.ih
+DESCRIPTION
+IPPS rasters stored in DUMPF format are read and optionally converted to
+IRAF images.  The IPPS ID and other header information is printed.
+The rasters to be converted are specified by both a file
+number and then a raster number within that file.  It may be helpful to
+first run task \fBldumpf\fR to list the contents of the DUMPF tape; only
+IPPS rasters can be converted.  
+.sp
+Some dumpf volumes are written on more than one tape.
+Task \fIrdumpf\fR cannot recover a file that is split across two tapes on 
+a "multi-volume-set" dumpf tape.  It is, however, possible to read the files
+beyond the leading partial file; this is done by incrementing the 
+\fBfile_list\fR parameter by 1.  For example, the first complete file 
+on the second tape of a multi-volume-set is indicated by \fBfile_list\fR = 2.
+.ih
+EXAMPLES
+[1] Convert all rasters in the 3rd permanent file on tape:
+
+	cl> rdumpf mta 3 ipps
+
+[2] Convert all rasters in all permanent files:
+
+	cl> rdumpf mta 1-999 ipps
+
+[3] List the first 10 IPPS rasters of the first permanent file:
+
+	cl> rdumpf mta 1 raster_list=1-10 make_image=no
+
+.ih
+BUGS
+The Cyber format readers, including \fIrdumpf\fR, have not been implemented
+on SUN/IRAF and AOS/IRAF.
+
+The current version of IRAF magtape I/O does not read beyond the first
+volume of a multivolume tape.  As described above, \fIrdumpf\fR cannot
+read a file split across two tapes.
+.sp
+The record structure of a DUMPF tape is used to
+filter out noise records and extraneous bits that fill out a tape byte;
+this tape structure information is lost when the tape is copied to disk,
+and so \fBrdumpf\fR may not be able to convert some DUMPF format disk files.
+.ih
+SEE ALSO
+ldumpf
+.endhelp

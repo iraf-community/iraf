@@ -1,0 +1,215 @@
+GIM -- GIO graphics imaging library.  This is a developmental library based
+on GIO escapes, providing IRAF applications with access to the Gterm widget
+imaging functions.  This library is tied directly to the Gterm widget and is
+expected to be replaced by a more general imaging library in the future.
+
+This library is intended only for clients that need to directly access the
+imaging functions in the Gterm widget for full control over the imaging
+capabilities of the Gterm widget.  Applications which merely need to display
+an image as part of a more complex graphic would probably be better off
+using the more device independent gpcell (put cell-array) and gpcmap (put
+colormap) calls.
+
+
+The following functions are direct RPC calls to the corresponding Gt-prefixed
+imaging functions in the Gterm widget.
+
+            gim_rasterinit (gp)
+          gim_createraster (gp, raster, type, width, height, depth)
+         gim_destroyraster (gp, raster)
+  exists = gim_queryraster (gp, raster, type, width, height, depth)
+	     gim_setraster (gp, raster)		# see gseti(gp,G_RASTER,n)
+
+           gim_writepixels (gp, raster, data, nbits, x1, y1, nx, ny)
+            gim_readpixels (gp, raster, data, nbits, x1, y1, nx, ny)
+	    gim_refreshpix (gp, raster, ct, x1, y1, nx, ny)
+	     gim_setpixels (gp, raster, ct, x1, y1, nx, ny, color, rop)
+
+         gim_writecolormap (gp, colormap, first, nelem, r, g, b)
+  nelem = gim_readcolormap (gp, colormap, first, maxelem, r, g, b)
+          gim_loadcolormap (gp, colormap, offset, slope)
+          gim_freecolormap (gp, colormap)
+	    gim_iomapwrite (gp, iomap, first, nelem)
+	     gim_iomapread (gp, iomap, first, nelem)
+
+          gim_initmappings (gp)
+	   gim_freemapping (gp, mapping)
+            gim_copyraster (gp, rop, src,st,sx,sy,sw,sh, dst,dt,dx,dy,dw,dh)
+            gim_setmapping (gp, mapping, rop, 
+				src,st,sx,sy,sw,sh, dst,dt,dx,dy,dw,dh)
+   status = gim_getmapping (gp, mapping, rop,
+			        src,st,sx,sy,sw,sh, dst,dt,dx,dy,dw,dh)
+         gim_enablemapping (gp, mapping, refresh)
+        gim_disablemapping (gp, mapping, erase)
+        gim_refreshmapping (gp, mapping)
+
+The following Gterm widget imaging functions have no analogue in the GIM
+imaging interface, but can be called from within GUI code.  These functions
+are not implemented at the GIM level either because they are not essential
+and would be too inefficient to be worth using via RPC, or because they
+access resources available only to GUI code.
+
+            GtAssignRaster (gt, raster, drawable)
+  pixmap = GtExtractPixmap (gt, src, ct, x, y, width, height)
+            GtInsertPixmap (gt, pixmap, dst, ct, x, y, width, height)
+   raster = GtSelectRaster (gt, dras, dt, dx, dy, rt, rx, ry, mapping)
+     raster = GtNextRaster (gt)
+      raster = GtGetRaster (gt)
+            n = GtNRasters (gt)
+  pixel = GtGetClientPixel (gt, gterm_pixel)
+   mapping = GtNextMapping (gt)
+  active = GtActiveMapping (gt, mapping)
+
+
+The following messaging routines are also defined by the GIO interface.
+These are used to set the values of UI parameters (i.e., send messages to
+the user interface).
+
+		      gmsg (gp, object, message)
+	    gmsg[bcsilrdx] (gp, object, value)
+		  gmprintf (gp, object, format)
+
+
+The imaging model of the Gterm widget defines the following key object or
+data types: rasters, mappings, and colors.
+
+    raster	A raster is a MxN array of pixels.  At present pixels are 8
+		bits deep but hooks are built in to the interface to expand
+		this in the future.  Pixel values are indices into the Gterm
+		virtual colormap, with values starting at zero.  A raster
+		may be any size.  A raster is merely a two-dimensional array
+		in the graphics server; it is not displayed unless mapped.
+		An exception is raster zero, which is the graphics window.
+		Rasters are referred to by number, starting with zero.
+		Initially only raster zero exists; new rasters are created
+		with gim_createraster.  Space for rasters may be allocated
+		either in the graphics server, or in the X server.  This has
+		implications on performance but is otherwise transparent to
+		the client.  By default rasters are allocated in the
+		graphics server, i.e., in the X client.
+
+    mapping	A mapping defines a projection of a rectangle of the source
+		raster onto a rectangle of the destination raster.  Mappings
+		may be either enabled (active) or disabled.  When a mapping
+		is enabled, any change to a pixel in the source rect will
+		cause the corresponding pixels in the destination rect to be
+		updated.  Mappings are referred to by number starting with
+		one.  Initially no mappings are defined.  If the size of the
+		input and output rect is not the same the input rect will be
+		scaled by pixel replication or subsampling to fill the
+		output rect.  If the argument DW or DH of the destination
+		rect is negative, the image will be flipped around the
+		corresponding axis when copied to the destination; the
+		region of the destination drawn into is the same in either
+		case.  Multiple mappings may reference the same source or
+		destination raster.  Mappings are refreshed in order by the
+		mapping number.  Modifying a mapping causes the changed
+		regions of the destination rect to be refreshed.
+
+    color	The gterm widget provides a fixed number of preassigned colors
+		corresponding to pixel values 0 through 9.  0 is the background
+		color, 1 is the foreground color, and 2-9 (8 colors) are
+		arbitrary colors defined by Gterm widget resources.  These
+		static colors are normally used to draw the background, frame,
+		axes, titles, etc. of a plot, or to draw color graphics within
+		the drawing area.  The advantage of static colors is that they
+		are shared with other X clients, and the values of these
+		colors may be assigned by the user to personalize the way
+		plots look.
+
+		The gterm widget also allows any number (up to about 200 or
+		so) additional colors to be defined at runtime by the client
+		application.  These color values start at pixel value 10 and
+		go up to the maximum pixel value assigned by the client.  The
+		client application allocates colors with gim_writecolormap.
+		Attempts to overwrite the values of the static colors are
+		ignored.  The values of already allocated colors may be
+		changed dynamically at runtime using gim_writecolormap to
+		write the desired range of color values.
+
+		Applications should not assume that there are 10 static
+		colors and 200 or so allocatable colors.  The graphcap entry
+		for the logical device in use defines these parameters for
+		the device.  Alternatively, the readcolormap call may be
+		used to dynamically determine how many colors the server has
+		preallocated when the application starts up.
+
+		An image may use either static and dyamic pixel values or
+		both types of values, but in most cases imaging applications
+		involve smoothly shaded surfaces hence will require
+		dyamically assigned private colors.
+
+		If for some reason the client application cannot use the
+		gterm widget color model, the IOMAP feature can be used to
+		make the widget appear to have some externally defined
+		(i.e., client defined) color model.
+
+
+The maximum number of rasters and maximum number of mappings is defined by
+Gterm widget resources (e.g. in the GUI file) when the graphics application
+starts up.  The maximum values should be much larger than most applications
+require.  Applications should allocate raster or mapping numbers
+sequentially starting at 1 (more or less) to avoid running out of raster or
+mapping descriptors.
+
+The {read|write}pixels routines in the GIM interface operate directly on
+raster pixels.  The mapping routines support two alternative coordinate
+systems, raster pixels and NDC (normalized device coordinates), as indicated
+by the ST or DT argument (source or destination coordinate type).  Note
+that the origin of the pixel coordinate system is the upper left corner of
+the display window (consistent with most graphics systems), whereas the origin
+of the NDC coordinate system is the lower left corner (consistent with IRAF).
+
+Pixel coordinates allow precise control of imaging but require the
+application to know the window size, and may result in complications e.g. if
+the window is resized.  NDC coordinates pretty much guarantee that a mapping
+will involve sampling, hence are not the most efficient, but the graphics
+will be drawn correctly no matter how the window is resized and for most
+applications the performance difference is negligible.  Most applications
+should use NDC coordinates for raster 0 (the display window), and pixel
+coordinates for rasters 1-N.
+
+Although the size of rasters 1 and higher are defined by the client
+application, the size of raster zero, the actual gterm display window, is
+subject to the constraints of the window system.  The client can attempt to
+reset the size of the gterm window using gim_createraster with raster=0,
+however the Gterm widget, UI containing the gterm widget, and the window
+manager are all free to deny such a request.  gim_queryraster should be
+called to determine the actual size of the window one will be drawing into.
+
+
+EXAMPLE
+
+    A simple example of an imaging application might download an image and
+display it in the gterm window, filling the window.  This could be done as
+follows (following a GOPEN and other GIO calls to prepare the drawing surface).
+
+	gim_createraster	Create raster 1 the size of the pixel array
+				to be displayed.  This need not be the same
+				as the size of the gterm display window.
+
+	gim_setmapping		Define a mapping between raster 1 and raster 0,
+				the display window, using NDC coordinates to
+				define the region of the display window to be
+				filled.  The mapping number is arbitrary but
+				mappings should normally be allocated starting
+				with 1.  The mapping is automatically enabled
+				when first defined.
+
+	gim_writecolormap	(Optional).  Define the pixel value to RGB
+				color assignments for the image pixels.
+
+	gim_writepixels		This routine is called one or more times to
+				write pixels into raster 1.  At most 32K
+				pixels (minus a bit for the GKI headers) can
+				be written in each call.  As each write is
+				made the affected region of the display
+				window will be updated.
+
+Alternatively, one could write the pixels and then define the mapping, to
+cause the entire image to be displayed at once.
+
+Note that the GIM calls can be combined with normal GIO graphics to draw text
+and graphics around or on top of an image region.  The order in which drawing
+operations occur is important, e.g., to draw graphics or text on top of an
+image the image should be drawn first.

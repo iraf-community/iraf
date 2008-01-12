@@ -1,0 +1,11 @@
+# Update the tintegrate application code in the ttools package library
+# Author: GIARETTA, 7-DEC-1987
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tintegrate.x   		<error.h> <ctype.h> <tbset.h> 
+	;

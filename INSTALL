@@ -1,0 +1,22 @@
+
+[HOW TO BUILD]
+
+Edit the Makefile and set PREFIX and BINDIR, and type make xxx as follows:
+
+$ make boot
+$ make iraf
+$ make reboot
+$ make tables
+$ make noao
+
+[HOW TO INSTALL]
+
+$ su
+# make install         (analysis environment only)
+# make install_devel   (development environment only)
+
+You can use DESTDIR=... to make your IRAF packages:
+
+# make install DESTDIR=rootdir
+# make install_devel DESTDIR=rootdir
+

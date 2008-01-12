@@ -1,0 +1,35 @@
+objects,f,a,"",,,"List of object spectra"
+apref,f,a,"",,,"Aperture reference spectrum"
+arcs,f,a,"",,,"List of arc spectra"
+arctable,f,a,"",,,"Arc assignment table (optional)"
+standards,f,a,"",,,"List of standard star spectra
+"
+recenter,b,a,,,,"Recenter object apertures?"
+resize,b,a,,,,"Resize object apertures?"
+quicklook,b,a,,,,"Edit/review object apertures?"
+trace,b,a,,,,"Trace object spectra?"
+scattered,b,a,,,,"Subtract scattered light?"
+arcap,b,a,,,,"Use object apertures for arcs?"
+dispcor,b,a,,,,"Dispersion correct spectra?"
+extcor,b,a,,,,"Extinction correct spectra?"
+fluxcal,b,a,,,,"Flux calibrate spectra?"
+splot,b,a,,,,"Plot the final spectrum?"
+redo,b,a,,,,"Redo operations if previously done?"
+update,b,a,,,,"Update spectra if cal data changes?"
+batch,b,a,,,,"Extract objects in batch?"
+listonly,b,a,,,,"List steps but don\'t process?
+"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
+anssplot,s,q,"yes",no|yes|NO|YES,,"Splot spectrum?"
+newaps,b,h,,,,
+newdisp,b,h,,,,
+newsens,b,h,,,,
+newarcs,b,h,,,,
+fluxcal1,b,h,,,,
+splot1,b,h,,,,
+splot2,b,h,,,,
+dobatch,b,h,,,,
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

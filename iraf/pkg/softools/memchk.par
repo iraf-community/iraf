@@ -1,0 +1,2 @@
+fname,s,h,STDIN,,,input file
+passall,b,h,yes,,,pass good input lines as well as bad

@@ -1,0 +1,91 @@
+                                                           1999 August 17
+
+     This note describes the file format for STSDAS tables.  See
+text_tables.doc for information on support for text tables in the
+TABLES package.
+
+There are four sections to an STSDAS table:
+
+(1)  a size-information record which gives the number of rows, etc
+(2)  optional header-parameter records
+(3)  a record for each column that describes the column
+(4)  the table data
+
+
+1.   The size-information record is 12 integers in length.  Only the first
+ten are used at the moment, and these have the following meanings:
+
+  1  The number of header parameters that have been written to the table.
+  2  The maximum number of header parameters for which space has been allocated.
+  3  The number of rows that have been written to the table.
+  4  The allocated number of rows (relevant only for a column-ordered table).
+  5  The number of columns that have been defined.
+  6  The maximum number of column descriptors for which space has been
+        allocated.
+  7  The length of the portion of the row that is used by columns that have
+        been defined; unit = SZ_CHAR (= two bytes).
+  8  The allocated row length; unit = SZ_CHAR.  This is relevant only for
+        a row-ordered table.
+  9  Table type:  11 implies row-ordered; 12 implies column-ordered.
+ 10  Table software version number.  Originally this was zero, and the
+        current value is three.  The differences between versions are
+        described in the file "versions.doc".
+
+
+2.  The header parameters are FITS-like records for storing information such
+as comments or numerical values.  They are not used by the table routines
+at all.  There need not be any header parameters, and there need not be any
+space allocated for them; that is, words one and two of the size-information
+record may be zero.  Each header-parameter record is 80 bytes in length and
+contains the following:
+
+bytes                   description
+-----                   -----------
+ 1-8    Keyword; from one to eight characters padded on the right with blanks.
+        All letters will be in upper case.
+  9     Data type; a single lower-case letter:  t, b, i, r, d indicating a
+        type of text, boolean, integer, real, or double-precision respectively.
+        The data type has little real meaning since the value is ASCII.
+10-80   The value, a left-justified ASCII string terminated by an ASCII null
+        and followed by garbage.  Boolean true and false are represented by
+        one and zero respectively.
+
+
+3.  There is a column descriptor for each column that has been defined.  Each
+column-descriptor record has a length of 16 integer words and contains the
+following:
+
+ word                   description
+ ----                   -----------
+   1    The column number.
+   2    The offset from the start of the row; unit = SZ_CHAR (= two bytes).
+        This is the sum of the widths of all previous columns, or zero for
+        the first column.
+   3    The amount of space (unit = SZ_CHAR) required to store one element.
+   4    The data type:
+                6 = single-precision real
+                7 = double-precision real
+                4 = integer
+                3 = short integer
+                1 = boolean
+               -n = character string containing up to n characters
+  5-9   The column name, up to 20 characters, left justified.  If the name
+	is shorter than 20 characters, it will be terminated by an ASCII
+	NULL; otherwise, the NULL will be omitted.  Upper and lower case
+	are allowed, but they are not distinguished.
+ 10-14  The units, up to 20 characters, left justified.  If the units string
+	is shorter than 20 characters, it will be terminated by an ASCII
+	NULL; otherwise, the NULL will be omitted.  Upper and lower case
+	are allowed.
+ 15-16  The format for printing the column, up to eight characters.  If the
+	string is shorter than eight characters, it will be terminated by
+	an ASCII NULL; otherwise, the NULL will be omitted.  This format
+	string is an SPP-style format without the leading %.
+
+
+4.  The table data may be either row-ordered or column-ordered.  Integer,
+single- and double-precision reals, and boolean (logical) are stored in the
+Fortran binary format of the host machine.  For character data type, each
+element will be terminated with an ASCII null if there is room for the null;
+if an element fills the entire column width (a multiple of two bytes) then
+the null will not be present.

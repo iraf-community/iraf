@@ -1,0 +1,29 @@
+     background - Fit and subtract a line or column background
+          bplot - Batch plots of spectra
+      calibrate - Apply extinction and flux calibrations to spectra
+       deredden - Apply interstellar extinction correction
+         dopcor - Apply doppler corrections
+	 fceval - Evaluate coordinates using the FITSCOORDS solutions
+      fitcoords - Fit user coordinates to image coordinates
+       identify - Identify features
+   illumination - Determine illumination calibration
+         lcalib - List calibration file data
+      lscombine - Combine longslit images
+     reidentify - Reidentify features
+       response - Determine response calibration
+         sarith - Spectrum arithmetic
+          scopy - Sum and extract spectra from long slit to 1D format
+       sensfunc - Create sensitivity function
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
+	  sflip - Flip data and/or dispersion coordinates in spectra
+       specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
+          splot - Preliminary spectral plot/analysis
+       standard - Identify standard stars to be used in sensitivity calc
+      transform - Transform longslit images to user coordinates
+
+     extinction - Apply atmospheric extinction corrections to images (obsolete)
+      fluxcalib - Apply flux calibration to images (obsolete)
+
+	  demos - Demonstration and test playbacks

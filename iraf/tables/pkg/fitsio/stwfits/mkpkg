@@ -1,0 +1,25 @@
+$checkout fitsio.a  ../
+$update    fitsio.a
+$checkin fitsio.a ../
+$exit
+ 
+fitsio.a:
+
+	t_wfits.x		wfits.com wfits.h <fset.h> <error.h> <fset.h>\
+				dfits.h dfits.com
+	fits_write.x		wfits.com wfits.h <error.h> <mach.h> <imhdr.h>\
+			   	dfits.h dfits.com
+	tab_write.x		wfits.com wfits.h <error.h>
+	tab_wdata.x		wfits.com wfits.h <tbset.h> 
+	tab_wheader.x		wfits.com wfits.h <mach.h> <imhdr.h>
+	txt_wfits.x		wfits.com wfits.h
+	fits_wheader.x		wfits.com wfits.h <imhdr.h> <mach.h>
+	fits_scale.x		wfits.com wfits.h <imhdr.h> <mach.h>	
+	fits_wimage.x		wfits.com wfits.h <imhdr.h>
+	fits_wpixels.x		<fset.h>
+	fits_cards.x		wfits.com wfits.h <imhdr.h>
+	fits_params.x		wfits.com wfits.h <time.h>
+	fits_gfsub.x		<imio.h> <imhdr.h> wfits.h \
+				wfits.com <fset.h>
+	fits_prtsub.x		wfits.com wfits.h dfits.com dfits.h <imhdr.h>
+	;

@@ -1,0 +1,5 @@
+images,s,a,,,,"List of images"
+output,f,a,,,,"Output file of images"
+ccdproc,b,q,,,,"Add CCDPROC keyword and continue?"
+fd,*struct,h,"",,,
+mode,s,h,"ql",,,

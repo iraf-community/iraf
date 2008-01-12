@@ -1,0 +1,32 @@
+These directories contain tasks for working with tables.  The various
+subdirectories and the tasks that they contain are as follows:
+
+copyone		keypar, keytab, parkey, partab, tabkey, tabpar
+doc		help files
+gtedit		gtedit
+keyselect	keyselect
+lib		subroutines used by more than one task
+tcalc		tcalc
+tchcol		tchcol
+tchsize		tchsize
+tcopy		tcopy, tdelete
+tcreate		tcreate
+tdiffer		tdiffer
+tedit		tedit, tread
+texpand		texpand
+thedit		thedit, thselect
+tinfo		tinfo, tlcol
+tintegrate	tintegrate
+tjoin		tjoin
+tlinear		tlinear 
+tmerge		tmerge 
+tprint		tdump, tprint
+tproduct	tproduct
+tproject	tproject
+tquery		tquery
+trebin		trebin
+tselect		tselect
+tsort		tsort
+tstat		thistogram, tstat
+tunits		tunits
+tupar		tupar

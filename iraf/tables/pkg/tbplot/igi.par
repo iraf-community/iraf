@@ -1,0 +1,14 @@
+# igi.par
+
+initcmd,s,h,"",,,Initial command string
+wlpars,pset,h,"",,,"World coordinate labeling parameters"
+usewcs,b,h,n,,,"Use user-specified WCS?"
+wcspars,pset,h,"",,,"User-specified WCS
+"
+device,s,h,"stdgraph",,,Output device
+metacode,f,h,,,,Output metacode file
+append,b,h,no,,,Append to existing graphics?
+debug,b,h,no,,,Print debug output?
+cursor,*gcur,h,,,,Graphics cursor input
+
+Version,s,h,"20Feb98",,,"Date of installation"

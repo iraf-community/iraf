@@ -1,0 +1,29 @@
+# Parameter file for the SKYCOORDS task.
+
+input,s,a,"STDIN",,,The input coordinate files(s)
+output,s,a,"STDOUT",,,The output coordinate file(s)
+insystem,s,a,"fk4",,,The input coordinate system
+outsystem,s,a,"fk5",,,The output coordinate system
+transform,s,h,no,,,Transform the input coordinate file ?
+lngcolumn,i,h,1,,,The input file column containing the x/ra/longitude
+latcolumn,i,h,2,,,The input file column containing the y/dec/latitude
+plngcolumn,i,h,INDEF,,,The input file column containing the x/ra/longitude pm
+platcolumn,i,h,INDEF,,,The input file column containing the y/dec/latitude pm
+pxcolumn,i,h,INDEF,,,The input file column contain the parallax
+rvcolumn,i,h,INDEF,,,The input file column contain the radial velocity
+ilngmin,r,h,INDEF,,,The input grid x/ra/longitude minimum
+ilngmax,r,h,INDEF,,,The input grid x/ra/longitude maximum
+ilatmin,r,h,INDEF,,,The input grid y/dec/latitude minimum
+ilatmax,r,h,INDEF,,,The input grid y/dec/latitude maximum
+nilng,i,h,10,1,,Number of grid points in x/ra/longitude
+nilat,i,h,10,1,,Number of grid points in y/dec/latitude
+ilngunits,s,h,"",,,The input ra/longitude units
+ilatunits,s,h,"",,,The input dec/latitude units
+ilngformat,s,h,"",,,The input grid x/ra/longitude format
+ilatformat,s,h,"",,,The input grid y/dec/latitude format
+olngunits,s,h,"",,,The output ra/longitude units
+olatunits,s,h,"",,,The output dec/latitude units
+olngformat,s,h,"",,,The output x/ra/longitude format
+olatformat,s,h,"",,,The output y/dec/latitude format
+icommands,*imcur,h,"",,,The image display cursor
+verbose,b,h,yes,,,Print messages about actions taken by the task ?

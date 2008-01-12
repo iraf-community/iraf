@@ -1,0 +1,49 @@
+.TH LEGFIT 3M
+.SH NAME
+legfit
+.SH DESCRIPTION
+subroutine legfit.f
+
+source
+  Bevington, pages 155-157.
+
+purpose
+  make least-squares fit to data with a Legendre polynomial
+    y = a(1) + a(2)*x + a(3)*(3x**2-1)/2 + ...
+      = a(1) * (1. + b(2)*x + b(3)*(3x**2-1)/2 + ... )
+      where x = cos(theta)
+
+usage
+  call legfit (theta, y, sigmay, npts, norder, neven, mode,
+    ftest, yfit, a, sigmaa, b, sigmab, chisqr)
+
+description of parameters
+  theta  - array of angles (in degrees) of the data points
+  y      - array of data points for dependent variable
+  sigmay - array of standard deivations for y data points
+  npts   - number of pairs of data points
+  norder - highest order of polynomial (number of terms - 1)
+  neven  - determines odd or even character of polynomial
+           +1 fits only to even terms
+            0 fits to all terms
+           -1 fits only to odd terms (plus constant term)
+  mode   - determines mode of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  ftest  - array of values of f(l) for an f test
+  yfit   - array of calculated values of y
+  a      - array of coefficients of polynomial
+  sigmaa - array of standard deviations for coefficients
+  b      - array of normalized relative coefficients
+  sigmab - array of std. deviations of relative coefficients
+  chisqr - reduced chi square for fit
+
+subroutines and function subprograms required
+  matinv (array, nterms, det)
+    inverts symmetric two-dimension matrix of degree nterms
+      and calculates its determinant
+
+comments
+  valid for npts up to 100 and order up to 9
+  one source line modified - cos substituted for dcos

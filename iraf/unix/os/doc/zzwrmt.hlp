@@ -1,0 +1,36 @@
+.help zzwrmt May84 "System Interface"
+.ih
+NAME
+zzwrmt -- asynchronous write to a magtape file
+.ih
+SYNOPSIS
+.nf
+zzwrmt (chan, buf, nbytes)
+
+int	chan			# OS channel of magtape file
+char	buf[nbytes]		# buffer containing the data
+int	nbytes			# number of bytes to be written
+.fi
+.ih
+DESCRIPTION
+Initiate a write of exactly \fInbytes\fR bytes from the buffer \fIbuf\fR to
+the magtape channel \fIchan\fR.  Each call to \fBzzwrmt\fR writes one tape
+block.  Successive tape blocks may vary in size.  A request to write zero
+bytes is ignored.
+.ih
+RETURN VALUE
+The wait primitive \fBzzwtmt\fR must be called after every asynchronous write
+to get the transfer status.  ERR is returned if a write error occurs or if the
+channel number is illegal.  If the write operation is successful the actual
+number of bytes written is returned.
+.ih
+NOTES
+The transfer is NOT guaranteed to be asynchronous and the calling program
+must not assume that \fBzzwrmt\fR will return immediately.
+The \fBzzwtmt\fR primitive must be called and the status checked before
+issuing another i/o request to the channel.  Only a single request may be
+pending on a channel at a time.
+.ih
+SEE ALSO
+zzopmt, zzwtmt, zfiomt
+.endhelp

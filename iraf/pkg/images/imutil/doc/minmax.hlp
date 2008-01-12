@@ -1,0 +1,84 @@
+.help minmax May91 images.imutil
+.ih
+NAME
+minmax -- compute the minimum and maximum pixel values of an image
+.ih
+USAGE
+minmax images
+.ih
+PARAMETERS
+.ls images
+Image template specifying the images to be examined.
+.le
+.ls force = no
+Force recomputation of the minimum and maximum pixel and pixel values even if
+they are noted as up to date in the image header.
+.le
+.ls update = yes
+Update the image header with the new values (requires write permission).
+.le
+.ls verbose = yes
+Print the image name, minimum value, and maximum value of each image
+processed.
+.le
+.ls minval = INDEF
+Set to the minimum pixel value of the last image processed.
+If the pixel type of the last input image was complex, this is the real
+part of the minimum value.
+.le
+.ls maxval = INDEF
+Set to the maximum pixel value of the last image processed.
+If the pixel type of the last input image was complex, this is the real
+part of the maximum value.
+.le
+.ls iminval = INDEF
+Set to the minimum imaginary part of the pixel value of the last image
+processed. Only used if the pixel type of the last input image was complex.
+.le
+.ls imaxval = INDEF
+Set to the maximum imaginary part of the pixel value of the last image
+processed. Only used if the pixel type of the last input image was complex.
+.le
+.ls minpix = ""
+Set to the minimum pixel specification of the last image processed.
+.le
+.ls maxpix = ""
+Set to the maximum pixel specification of the last image processed.
+.le
+.ih
+DESCRIPTION
+
+    The \fIminmax\fR task computes the minimum and maximum pixel and pixel
+values of
+each of the images or image sections listed in the image template \fIimages\fR.
+If the \fIforce\fR option is set the extreme values will be recomputed by
+physical examination of the data, otherwise the image is examined only if the
+extreme values stored in the image header are flagged as invalid.
+The minimum and maximum pixel will be printed only if the force option
+is enabled or if the image minimum and maximum is out of date. 
+If the \fIupdate\fR option is set the image header will be updated with the
+newly computed values.  Updating is not allowed when a section is used to
+compute the new values.
+.ih
+EXAMPLES
+1. Compute and print the minimum and maximum values of the images \fIimage1\fR
+and \fIimage2\fR, updating the image header with the new values when done.
+
+.nf
+	cl> minmax image1,image2
+.fi
+
+2. Force update the minimum and maximum values in the image headers of all
+images matching the template in the background, without printing the computed
+values on the terminal.
+
+	cl> minmax nite1.* force+ verbose- &
+.ih
+BUGS
+The minimum and maximum pixel values are stored in the image header as values
+of type real, hence some precision may be lost for images of type long integer
+or double precision floating.
+.ih
+SEE ALSO
+imheader, hedit
+.endhelp

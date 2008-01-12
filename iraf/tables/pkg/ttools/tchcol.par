@@ -1,0 +1,7 @@
+table,s,a,"",,,"tables to be modified in-place"
+oldname,s,a,"",,,"current column name"
+newname,s,a,"",,,"new column name, or null"
+newfmt,s,a,"",,,"new print format for column, or null"
+newunits,s,a,"",,,"new column units, or null"
+verbose,b,h,yes,,,"print operations performed?"
+mode,s,h,"al"

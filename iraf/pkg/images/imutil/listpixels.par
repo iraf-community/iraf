@@ -1,0 +1,4 @@
+images,f,a,,,,Images to be converted to list form
+wcs,s,h,"logical",,,Output world coordinate system name
+formats,s,h,"",,,List of pixel coordinate formats
+verbose,b,h,no,,,Print banner for each input image

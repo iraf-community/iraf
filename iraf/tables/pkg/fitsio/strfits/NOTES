@@ -1,0 +1,87 @@
+Problem solved in recent versions are:
+
+9 June 97 version
+
+Strfits was rewritten so that fits files with ascii file extensions
+buried in their rootnames are now converted to ascii even if they do
+not contain the flag that would mark them as tables. Several new
+functions were written: chk_adcname and chk_tabname in check.x, which
+check to see if a file is convertable to an ascii table by checking
+its extension, and gen_fname in genfname.x, which generates the output
+filename from the name encoded in the fits file. Change_name, which
+creates the filename for diagnostic prints and prt_tabinfo, which
+renames the table from its temporary name, both in fits_read.x, were
+also significantly modified. Smaller changes were made to
+tab_read_header and t_rfits.
+
+14 May 97 version
+
+o Force parameter added
+
+A new task parameter, force, was added to strfits. There are certain
+fits files which strfits cannot convert, because the fits standard is
+more general than either the geis or tables standard and some fits
+files have no representation as either type of file. Generally these
+are fits files with extensions that were not originally converted from
+images or tables. Strfits tries to detect thes files and leave them as
+fits files, but sometimes it guesses wrong and leaves a file
+unconverted which should have been converted. If this task parameter
+is set to yes, strfits will try to convert all files into either an
+image or table. But it may not succeed, and may crash in the attempt.
+
+o Table format string changed
+
+Strfits was modifying the print format by sticking a negative sign in
+front of the format for string columns. A recent change to the tables
+library has it set print formats for string columns so that they start
+with a negative sign. As a result, print formats were winding up with
+two negative signs in front. I deleted the code in strfits which added
+a negative sign, so now the print format only gets one ngative sign.
+
+11 May 97 version
+
+o Puzzling strfits error message
+
+Strfits would crash with a mysterious error message when the output
+file name was specified without an extension and intype was set to
+fits. The problem was that strfits cannot convert fits files to fits
+files. The code now checks the value of imtype when there is no
+filename and prints an error message if imtype is not imh or hhh. The
+only code change was two lines added to see_extn in t_rfits.x.
+
+o Strfits header info fixed 
+
+The output from strfits was not printing the number of columns in an
+ascii file correctly (it should always be one.) This is because the
+variable ncols was left undefined in fits_read.x when the file was an
+ascii file. I modified the code to set ncols to one.
+
+o Argument list mismatch in strfits
+
+One of the fixes in the change to increase the maximum length of a
+string parameter in stwfits was to eliminate the length argument from
+wft_encodec in fits_params.x. This change was made for all the calling
+sequences in stwfits; however, strfits calls the same procedure and I
+did not make the changes there. This led to a segmentation violation
+in some cases. I have now corrected the calling sequences in strfits
+as well. Fortunately,the changes to the calling sequence were limited
+to rft_create_gpb in rft_subs.x.
+
+o Extension length increase
+
+I discovered that fitscopy, strfits, and r49fits all assumed that the
+extension length (SZ_EXTN) was only three characters. So I increased
+the length to 31 characters in all these programs to match stwfits and
+changed the call of strncmp to strcmp, just as I previously did in
+stwfits.
+
+o Strfits now handles fits file with extensions
+
+The former version of strfits would often crash when asked to convert
+fits files with complex sets of extensions. This is because fits files
+with extensions often have no equivalent geis image or sdas
+table. This presents a problem when reading files from tape. To
+resolve the problem, strfits now looks to see if a fits file has
+extensions and only converts files with extensions of the were
+originally derived from multigroup images or sdas tables. Otherwise,
+the fits file is copied as is.

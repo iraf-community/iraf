@@ -1,0 +1,98 @@
+CLIO - Command Language I/O.
+
+This is the interface between IRAF applications and the IRAF command
+language.  To an application, the CL appears to be a database managing named
+"psets" (parameter sets) containing parameters.  CLIO is used by the
+application to read and write these parameters.  The parameter sets are
+predefined at the CL level rather than being dynamically defined by the
+application.
+
+
+EXTERNAL ROUTINES
+
+			 clseti (clio-param, value)
+		value = clstati (clio-param)
+
+        value = clget[bcsilrdx] (param)
+		clput[bcsilrdx] (param, value)
+			 clgstr (param, outstr, maxch)
+			 clpstr (param, value)
+     nelem|EOF = clgl[bcsilrdx] (param, value)
+	   nchars|EOF = clglstr (param, outstr, maxch)
+
+	       key|EOF = clgcur (param, wx, wy, wcs, key, strval, maxch)
+		nitems = clgkey (param, key, strval, maxch)
+	       kwindex = clgwrd (param, keyword, maxchar, dictionary)
+
+		   pp = clopset (pset)
+			clcpset (pp)
+       pval = clgpset[bcsilrdx] (pp, param)
+	      clppset[bcsilrdx] (pp, param, pval)
+		       clgpseta (pp, pname, outstr, maxch)
+		       clppseta (pp, pname, sval)
+			cllpset (pp, fd, format)
+			clepset (pp)
+
+
+OBSOLETE ROUTINES
+
+	     list = clpopn[isu] (param)
+			 clpcls (list)
+			 clprew (list)
+		 nelem = clplen (list)
+		nchars = clgfil (list, fname, maxch)
+
+			clgpset (pp, pname, outstr, maxch)
+			clppset (pp, pname, sval)
+
+
+RESTRICTED ROUTINES
+
+			  clcmd (cmd)
+			 clcmdw (cmd)
+
+			 clopen (stdin, stdout, stderr, device, devtype)
+			 zclsps (chan, status)
+			 zardps (ps, buf, maxbytes, offset)
+			 zawrps (ps, buf, nbytes, offset)
+			 zawtps (ps, status)
+			 zsttps (ps, what, lvalue)
+
+		       clc_init ()
+		   clc_compress ()
+		       clc_free (marker)
+		       clc_mark (marker)
+		    clc_newtask (taskname)
+		      clc_enter (param, value)
+	     nchars = clc_fetch (param, outstr, maxch)
+		 sym = clc_find (param, outstr, maxch)
+		       clc_list (fd, pset, format)
+		       clc_scan (cmd)
+
+			 gexfls ()
+		     gexfls_set (stream, gp_value, epa_gflush)
+		   gexfls_clear (stream)
+
+
+INTERNAL ROUTINES
+
+	       key|EOF = rdukey (keystr, maxch)
+	 charp = clpset_parname (pp, parname)
+       status = cl_psio_request (cmd, arg1, arg2)
+		       clreqpar (param)
+
+
+INTERFACE PARAMETERS
+
+	# clstati parameters (read only).
+	CL_PRTYPE	# parent process type (see below)
+	CL_PCACHE	# symtab descriptor of param cache
+
+	# Process type codes.
+	PR_CONNECTED	# connected subprocess
+	PR_DETACHED	# detached subprocess
+	PR_HOST		# subprocess spawned by host
+
+	# Process interpreter mode codes (used by ONENTRY and the iraf main).
+	PR_NOEXIT	# run interpreter in Iraf Main
+	PR_EXIT		# skip interpreter, shutdown process

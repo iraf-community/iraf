@@ -1,0 +1,48 @@
+images,s,a,,,,"List of echelle spectra to be created"
+clobber,b,q,no,,,"Modify existing image?"
+ncols,i,h,512,1,,"Number of columns (across dispersion)"
+nlines,i,h,512,1,,"Number of lines (along dispersion)"
+norders,i,h,23,1,,"Number of orders"
+title,s,h,"Artificial Echelle Spectrum",,,"Title of spectrum"
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
+list,b,h,no,,,"List grating parameters?"
+make,b,h,yes,,,"Make spectra?"
+comments,b,h,yes,,,"Add comments to image?
+
+FORMAT PARAMETERS"
+xc,r,h,INDEF,,,"Blaze peak column (pixel)"
+yc,r,h,INDEF,,,"Blaze peak line (pixel)"
+pixsize,r,h,0.027,,,"Pixel size (mm)"
+profile,s,h,"gaussian","extracted|gaussian|slit",,"Type of order profile"
+width,r,h,5.,0.,,"Width of orders (pixels)"
+scattered,r,h,0.,0.,,"Scattered light peak flux
+
+ECHELLE GRATING PARAMETERS"
+f,r,h,590.,,,"Focal length (mm|pixel)"
+gmm,r,h,31.6,,,"Grooves per mm"
+blaze,r,h,63.,,,"Blaze angle (degrees)"
+theta,r,h,69.,,,"Incidence angle (degrees)"
+order,i,h,112,,,"Reference order"
+wavelength,r,h,5007.49,,,"Blaze wavelength (Angstroms)"
+dispersion,r,h,2.61,,,"Blaze dispersion (Angstroms/(mm|pixel))
+
+CROSSDISPERSER PARAMETERS"
+cf,r,h,590.,,,"Focal length (mm|pixel)"
+cgmm,r,h,226.,,,"Grooves per mm"
+cblaze,r,h,4.53,,,"Blaze angle (degrees)"
+ctheta,r,h,-11.97,,,"Incidence angle (degrees)"
+corder,i,h,1,,,"Order (0 = prism)"
+cwavelength,r,h,6700.,,,"Blaze wavelength (Angstroms)"
+cdispersion,r,h,70.,,,"Blaze dispersion (Angstroms/(mm|pixel))
+
+SPECTRA PARAMETERS"
+rv,r,h,0.,,,"Radial velocity (km/s) or redshift"
+z,b,h,no,,,"Is velocity a redshift?"
+continuum,r,h,1000.,,,"Continuum at reference wavelength"
+temperature,r,h,5700,0.,,"Blackbody temperture (Kelvin)
+"
+lines,s,h,"",,,"List of files containing lines"
+nrandom,i,h,0,0,,"Number of random spectral lines"
+peak,r,h,-0.5,,,"Peak of lines (relative to continuum)"
+sigma,r,h,1.,,,"Sigma of lines (Angstroms)"
+seed,i,h,1,,,"Random number seed"

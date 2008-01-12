@@ -1,0 +1,60 @@
+# Make the gilib library
+# Author: L. Richmond, 26-JAN-1990
+# Modified to include gf_gfind: B.Simon 21-MAY-1990
+# Changed name from stieee to gflib, R. Williamson 18-Jan-1991
+# Copy stf.h include file to this directory into the file gf.h 21-April-93 NZ
+# Change function prefix to gi_  B.Simon 2-Sept-1998
+
+$call update
+$exit
+
+relink:
+	$call update
+	;
+
+linkonly:
+	;
+
+install:
+	;
+
+update:
+	$checkout libgilib.a ../
+	$update   libgilib.a
+	$checkin  libgilib.a ../
+	;
+
+libgilib.a:	
+	gi_addpar.x	<imhdr.h>  <imio.h>  <mach.h>  "gi.h"
+	gi_cpdgpb.x	<imio.h>  <imhdr.h>  "gi.h"
+	gi_crgpb.x	<imio.h>  <mach.h>  "gi.h"
+	gi_delpar.x	<imio.h>  <mach.h>  "gi.h"
+	gi_fixpsize.x	<mach.h>  <imio.h>  "gi.h"
+	gi_gcomm.x	<imio.h>  "gi.h"
+	gi_geis.x	<imio.h>  <imhdr.h>  <mach.h>  "gi.h"
+	gi_gfind.x	<imio.h>  "gi.h"
+	gi_gfitval.x	<imio.h>  "gi.h"
+	gi_ggpn.x	<imio.h>  "gi.h"
+	gi_ggpv.x	<imio.h>  "gi.h"
+	gi_gstfval.x	<imio.h>  "gi.h"
+	gi_mgtoxdim.x	<mach.h>  <imio.h>  <imhdr.h>  "gi.h"
+	gi_opix.x	<syserr.h>  <imhdr.h>  <imio.h>  <fset.h>  <mach.h>  \
+			"gi.h"
+	gi_pdes.x	<imhdr.h>  <imio.h>  <mach.h>  "gi.h"
+	gi_pstfval.x	<imio.h>  "gi.h"
+	gi_realloc.x	<imio.h>  "gi.h"
+	gi_reset.x	<imio.h>  <imhdr.h>  <mach.h>  "gi.h"
+	gi_rgpbi3e.x	<imhdr.h>  <imio.h>  <mach.h>  "gi.h"
+	gi_rheader.x	<finfo.h>  <imhdr.h>  <imio.h>  <fset.h>  <mach.h>  \
+			"gi.h"
+	gi_update.x	<imio.h>  <imhdr.h>  <mach.h>  "gi.h"
+	gi_wgpbi3e.x	<error.h>  <imhdr.h>  <imio.h>  <mach.h>  "gi.h"
+	gi_xdimtomg.x	<mach.h>  <imio.h>  <imhdr.h>  <error.h>  "gi.h"
+	giopen_table.x	<imio.h>  <tbset.h>  "gi.h"
+	giopengr.x	<fset.h>  <imio.h>  <imhdr.h>  "gi.h"  <error.h>  \
+			<mach.h>
+	gird_gpb.x	<imio.h>  <tbset.h>  "gi.h"
+	gistf_setup.x	<imio.h>  <imhdr.h>  <tbset.h>  <mach.h>  "gi.h"
+	;
+
+

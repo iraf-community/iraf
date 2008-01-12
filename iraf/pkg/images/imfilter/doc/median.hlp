@@ -1,0 +1,109 @@
+.help median May95 images.imfilter
+.ih
+NAME
+median -- median filter a list of images
+.ih
+USAGE
+median input output xwindow ywindow
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output
+List of filtered images. The number of input images must be the same as
+the number of output images. If the input image name is the same as the
+output image name the original image is replaced by the filtered image.
+.le
+.ls xwindow, ywindow
+The size of the median filter. Xwindow and ywindow are assumed to be
+odd integers. If either xwindow or ywindow are even they will be rounded
+up to the nearest odd integer.
+.le
+.ls zloreject = INDEF, zhireject = INDEF
+The minimum and maximum good pixel values. Zloreject and zhireject default to 
+-MAX_REAL and MAX_REAL respectively.
+.le
+.ls boundary = "nearest"
+The type of boundary extension. The options are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Reflect pixel values around the boundary.
+.le
+.ls wrap
+Wrap pixel values around the boundary.
+.le
+.le
+.ls constant = 0.
+The value for constant value boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+MEDIAN takes a list of input images \fIinput\fR and produces a set of filtered
+output images \fIoutput\fR. The median filter consists of a sliding
+rectangular window  of dimensions \fIxwindow\fR
+by \fIywindow\fR. The center pixel in the window is replaced by the median
+of all the pixels in the
+window, where the median of a sequence of numbers is defined to be  the value
+of the (n + 1) /2 pixel.  If even the window dimensions are rounded up
+to odd integers.  Out of bounds
+pixel references are handled by setting the parameter \fIboundary\fR.
+
+The \fIzloreject\fR and \fIzhireject\fR parameters may be used to reject
+bad data from the median filtering box. If no good 
+data is left in the filtering box, the median is set to zloreject
+if the majority of the pixels are less than zloreject, or to zhireject
+if the majority of pixels are greater than zhireject.
+
+.ih
+EXAMPLES
+
+1. Median filter an image using a 5 by 5 window and nearest pixel boundary
+extension.
+
+.nf
+   im> median m74 m74.5by5 5 5
+.fi
+
+2. Median filter an image using a 3 by 3 window and constant boundary extension.
+
+.nf
+   im> median m74 m74.5by5 3 3 boun=const const=0.
+.fi
+
+3. Median filter the test image dev$pix, removing all pixels less than 5 or
+greater than 19935 from the filtering box.
+
+.nf
+   im> median dev$pix pix77 7 7 zlo=5 zhi=19935
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+Median requires approximately 11 and 19 CPU seconds to filter a 512 by
+512 integer image using a 5 by 5 and 7 by 7 filter window respectively
+(SPARCStation2).
+
+.ih
+BUGS
+
+The sort routine for the smaller kernels has been optimized. It may be
+desirable to optimize higher order kernels in future.
+
+The IRAF task FMEDIAN is significantly more efficient than MEDIAN
+and should be used if the image is integer or can be quantized without
+significant loss of precision. 
+
+.ih
+SEE ALSO
+
+fmedian, rmedian, frmedian
+.endhelp

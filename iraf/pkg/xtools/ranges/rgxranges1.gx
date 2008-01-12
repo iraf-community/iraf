@@ -1,0 +1,146 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<ctype.h>
+include	<pkg/rg.h>
+
+# RG_XRANGES -- Parse a range string corrsponding to a real set of values.
+# Return a pointer to the ranges.
+
+pointer procedure rg_xranges$t (rstr, rvals, npts)
+
+char	rstr[ARB]		# Range string
+PIXEL	rvals[npts]		# Range values (sorted)
+int	npts			# Number of range values
+
+pointer	rg
+int	i, j, k, nrgs
+PIXEL	rval1, rval2, a, b
+
+int	cto$t()
+
+begin
+	# Check for valid arguments.
+
+	if (npts < 1)
+	    call error (0, "No data points for range determination")
+
+	# Check for a valid string and determine the number of ranges.
+
+	i = 1
+	nrgs = 0
+
+	while (rstr[i] != EOS) {
+
+	    # Skip delimiters
+	    while (IS_WHITE(rstr[i]) || (rstr[i] == ',') || (rstr[i]=='\n'))
+	        i = i + 1
+
+	    # Check for EOS.
+
+	    if (rstr[i] == EOS)
+		break
+
+	    # First character must be a *, -, ., or digit.
+
+	    if ((rstr[i] == '*') || (rstr[i] == '-') || (rstr[i] == '.') ||
+		    IS_DIGIT(rstr[i])) {
+		i = i + 1
+	        nrgs = nrgs + 1
+
+ 		# Remaining characters must be :, -, ., E, D, e, d, or digits.
+		# Replace : with ! to avoid sexigesimal interpretation.
+
+	        while ((rstr[i]==':') || (rstr[i]=='-') || (rstr[i]=='.') ||
+ 		       (rstr[i]=='E') || (rstr[i]=='D') ||
+ 		       (rstr[i]=='e') || (rstr[i]=='d') ||
+			IS_DIGIT(rstr[i])) {
+		    if (rstr[i] == ':')
+			rstr[i] = '!'
+		    i = i + 1
+		}
+	    } else
+		call error (0, "Syntax error in range string")
+	}
+
+	# Allocate memory for the ranges.
+
+	call malloc (rg, LEN_RG + 2 * max (1, nrgs), TY_STRUCT)
+
+	# Rescan the string and set the ranges.
+
+	i = 1
+	nrgs = 0
+
+	while (rstr[i] != EOS) {
+
+	    # Skip delimiters.
+	    while (IS_WHITE(rstr[i]) || (rstr[i]==',') || (rstr[i]=='\n'))
+	        i = i + 1
+
+	    # Check for EOS.
+
+	    if (rstr[i] == EOS)
+		break
+
+	    # If first character is * then set range to full range.
+	    # Otherwise parse the range.
+
+	    if (rstr[i] == '*') {
+		i = i + 1
+		rval1 = rvals[1]
+		rval2 = rvals[npts]
+
+	    } else {
+		# First digit is starting value.
+		if (cto$t (rstr, i, rval1) == 0) {
+		    nrgs = 0
+		    break
+		}
+		rval2 = rval1
+
+		# Check for an ending value for the range and restore ':'.
+		if (rstr[i] == '!') {
+		    rstr[i] = ':'
+		    i = i + 1
+		    if (cto$t (rstr, i, rval2) == 0) {
+			nrgs = 0
+			break
+		    }
+		}
+	    }
+
+	    # Check limits.
+
+	    a = min (rval1, rval2)
+	    b = max (rval1, rval2)
+	    if ((b >= rvals[1]) && (a <= rvals[npts])) {
+		rval1 = max (rvals[1], min (rvals[npts], rval1))
+		rval2 = max (rvals[1], min (rvals[npts], rval2))
+	    	a = min (rval1, rval2)
+	    	b = max (rval1, rval2)
+		for (k = 1; (k <= npts) && (rvals[k] < a); k = k + 1)
+		    ;
+		for (j = k; (j <= npts) && (rvals[j] <= b); j = j + 1)
+		    ;
+		j = j - 1
+		if (k <= j) {
+		    nrgs = nrgs + 1
+		    if (rval1 <= rval2) {
+		    	RG_X1(rg, nrgs) = k
+		    	RG_X2(rg, nrgs) = j
+		    } else {
+		    	RG_X1(rg, nrgs) = j
+		    	RG_X2(rg, nrgs) = k
+		    }
+		}
+	    }
+	}
+
+	RG_NRGS(rg) = nrgs
+	RG_NPTS(rg) = 0
+	do i = 1, RG_NRGS(rg)
+	    RG_NPTS(rg) = RG_NPTS(rg) +
+		abs (RG_X1(rg, i) - RG_X2(rg, i)) + 1
+
+	return (rg)
+end

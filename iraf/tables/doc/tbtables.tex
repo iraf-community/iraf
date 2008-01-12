@@ -1,0 +1,1335 @@
+\documentstyle[11pt,twoside,sdastex,f77]{article}
+\begin{document}
+
+\section{Table I/O} \label{tab-sec}
+\typeout{Table I/O}
+
+These notes describe a set of SPP-callable subroutines for working
+with STSDAS tables, FITS tables, or simple text files in tabular format.
+
+Information placed in tables can be of six different data types,
+namely, single- and double-precision real, integer, short integer,
+boolean, and text (character strings).
+When data are acquired from or deposited into tables,
+type conversion is done by the routine used for the data transfer in
+the event that the data type of the table element does not match the buffer
+supplied by the program.
+
+STSDAS format tables may be row-ordered (the default) or column-ordered.
+Row-ordered tables are conceptually like sequential files;
+additional rows may simply be appended to the table,
+and there is never a need to specify the maximum number of rows.
+The addition of new columns after the creation of a table
+requires rewriting the table unless
+space was allocated for new columns;
+this is handled within the interface, however,
+and is transparent to the user and to the programmer
+aside from the time delay while the file is being rewritten.
+There is no intrinsic limit on the number of columns or rows.
+
+Tables in FITS files can also be read and written.
+This option uses the HEASARC FITSIO package of subroutines.
+A FITS table can be in any extension of the file
+(but not the primary header/data unit);
+the first extension is number one.
+Both BINTABLE (binary) and TABLE (ASCII) extensions
+can be read or modified,
+but only BINTABLE can be created.
+For FITS tables there is a limit of 999 on the number of columns,
+due to the eight-character limit on the names of keywords
+used for defining column properties.
+
+In addition to binary tables,
+this interface can also read and write text files in row and column format.
+The column names are fixed at ``c1'', ``c2'', ``c3'', etc.,
+the data type and print format for each column of an input table
+are determined by the contents of the file,
+and there are no units.
+While the file name of a binary table must have an extension
+(the default is ``.tab''),
+the name of a text table need not have an extension.
+Text tables may be read from STDIN and written to STDOUT.
+
+Expressions can be appended to a table name
+in order to restrict the rows and/or columns
+that the table appears to have.
+Typically, it is the user who includes these expressions with the table name,
+and the applications code does not need any modification
+to take advantage of this feature.
+The option to specify an array section
+(similar to an image section)
+for a column that contains arrays
+is implemented in the column selector code,
+but it is not supported by most of the table I/O routines.
+See the ``row and column selectors'' section for further information.
+
+The object library containing these subroutines
+is located in the TABLES external package,
+which is specified by the flag ``-p tables''
+when using either mkpkg or xc.
+This also allows xc to find the include file $<$tbset.h$>$.
+The library should be specified as ``-ltbtables''
+in the link statement in a mkpkg file or when using xc directly.
+For example, if you have a source file ``testtab.x'',
+you could compile and link using ``mkpkg -p tables'',
+where the mkpkg file contains the following three lines~:
+\begin{center}
+\begin{tabular}{l}
+\$omake testtab.x \\
+\$link testtab.o -ltbtables \\
+\$exit \\
+\end{tabular}
+\end{center}
+
+Undefined elements are flagged with special values
+that are internal to the interface.
+IEEE NaN is used for floating point columns
+in FITS BINTABLE extensions.
+Presently, it is not possible to specify an indefinite boolean element;
+the default boolean value is false.
+An integer or short integer column
+can be used instead of boolean,
+with zero for false and one for true;
+this allows undefined values as well.
+An empty (null) character string is considered undefined.
+
+When columns are defined (created), five characteristics may be specified~:
+\begin{center}
+\begin{tabular}{ll}
+name & string \\
+data type & symbolic integer \\
+number of elements & integer \\
+units & string \\
+print format & string \\
+\end{tabular}
+\end{center}
+
+The column name and data type are required,
+but null strings may be given for the print format and units.
+
+The data type is specified as an integer.
+For types real, double, int, short and boolean the integer values are
+the IRAF symbolic values
+TY\_REAL, TY\_DOUBLE, TY\_INT, TY\_SHORT and TY\_BOOL.
+For character-string columns, however, the data type is specified as -N,
+where N is the maximum number of char in an element of that column.
+
+The number of elements should be set to one for ordinary scalar columns.
+A value greater than one means that each table ``cell''
+(i.e.~at the intersection of a row and column)
+contains an array of that many elements.
+The arrays are fixed in length for a given column,
+though not all elements need to be populated.
+A character string is regarded as a single element,
+and a column may contain arrays of character strings.
+For example, if a columns was defined with data type -8
+and array length 2,
+the value of the column at a particular row could be
+the pair of strings ``RA---TAN'', ``DEC--TAN''.
+
+The print format for table elements is specified as an SPP format,
+including the leading percent sign.
+The {\it w\/} field of most formats may be negative,
+which results in a left-justified value.
+
+It is important to note that some character information is
+\emphasize{case sensitive} and some is not.
+In particular, table names are case sensitive.
+It is therefore important that user programs not perform
+case conversion on table names retrieved from the CL;
+table names given explicitly in code
+would typically be in \emphasize{lower} case.
+Column names are case insensitive in the sense that when searching for
+a column in a table, the search will be done without regard for case.
+When creating a column, however, the column name may be given in
+upper, lower, or mixed case according to the preference of the user,
+and the name will be displayed the same way.
+This is in contrast to table header parameters, whose names are converted
+to upper case when the parameters are added to the table.
+Case conversion is \emphasize{not} done by any interface routine when
+getting or putting values of type character string.
+
+The lengths and case sensitivity of character strings
+used in tables and in these interface routines are as follows~:
+\begin{center} \tabcolsep 8pt
+\begin{tabular}{lr@{\space characters\hspace{2\tabcolsep}case\space}l}
+table filename & SZ\_FNAME (255) & sensitive \lestrut\\
+keyword name & SZ\_KEYWORD (8) & insensitive \lestrut\\
+column name & SZ\_COLNAME (20) & insensitive \lestrut\\
+column units & SZ\_COLUNITS (20) & sensitive \lestrut\\
+column print format & SZ\_COLFMT (8) & sensitive \lestrut\\
+character column & 1022 & sensitive \lestrut\\
+\end{tabular}
+\end{center}
+
+Other routines that are provided
+(and are listed in ``tables\$doc/calls.doc'')
+but are not described in this document include~:
+\begin{center}
+\begin{tabular}{ll}
+\task{tbtflu} & flush FIO buffer for table \\
+\task{tbrcpy} & copy an entire row (only for tables with identical columns) \\
+\task{tbrswp} & swap two rows \\
+\task{tbrdel} & delete a range of rows \\
+\task{tbrnll} & set all columns in a range of rows to INDEF \\
+\task{tbtsrt} & sort a table by values in column\lestrut\\
+\end{tabular}
+\end{center}
+
+\subsection{Table initialization routines}
+
+For existing tables, \task{tbtopn} is the only call required;
+when a new table is being created,
+\task{tbtcre} must also be called to actually open the table.
+
+Table header parameters and column description information are stored in
+the table together with the data, so if more parameters are written or
+more columns are defined than there is space in the table for, the table
+will be rewritten to allocate more room.  If the table is large, this can
+be a nuisance either due to the time involved or because of disk space
+limitations.  When a new table is created, it is wise to specify the amount
+of space allocated for header parameters and column descriptions carefully.
+
+%------------------------------------------------------------------------------
+\subroutine{tbtopn}{Initialize a table}
+\begin{callseq}
+\callseqitem{tablename}{string}{i}{name of table}
+\callseqitem{iomode}{int}{o}{I/O mode}
+\callseqitem{template}{pointer}{i}{pointer to descriptor for template}
+\end{callseq}
+
+This function initializes the data structure for a table and returns a
+pointer to that structure.
+If the I/O mode is NEW\_FILE or NEW\_COPY,
+then after calling this routine
+parameters may be set using \task{tbpset} and columns may be defined using
+\task{tbcdef}, and the table must be opened explicitly using \task{tbtcre}.
+If the I/O mode is NEW\_COPY then the column definitions from the template
+table will be copied to the new table,
+and the table must actually be created by a subsequent call to tbtcre.
+Since a new table is not opened by tbtopn, the header parameters
+are \emphasize{not} copied by specifying the I/O mode as NEW\_COPY.
+There is a procedure \task{tbhcal} that copies all header parameters
+from one open table to another.
+If the I/O mode is not NEW\_COPY, then the template is ignored.
+If the I/O mode is READ\_ONLY or READ\_WRITE, then \task{tbtopn}
+opens the table.
+
+The table descriptor that is returned as the function value should be used in
+all subsequent calls until the table is closed.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbtcre}{Create a new table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\end{callseq}
+
+After calling \task{tbtopn}
+(and optionally \task{tbpset} and \task{tbcdef}),
+this routine must be called to actually create the table.
+If the table already exists, this routine should not be called.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtclo}{Close a table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\end{callseq}
+
+Close a table.  After \task{tbtclo} is called, the value of the table
+descriptor and the values of
+all column pointers for the table will be undefined.
+
+\callseqtable
+
+\subsection{Getting and setting table parameters}
+
+The functions provided by these routines permit a user to modify parameters
+that characterize the table itself or the behavior of the interface.
+
+%------------------------------------------------------------------------------
+\subroutine{tbpsta}{Get the value of a parameter}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{tparm}{int}{i}{symbolic code; specifies parameter to get}
+\end{callseq}
+
+This function returns the value of a table description parameter or an
+internal table interface parameter, such as
+the number of rows or columns in the table.
+
+\callseqfcn
+
+The symbolic parameters to specify table parameters are given in $<$tbset.h$>$.
+
+%------------------------------------------------------------------------------
+\subroutine{tbpset}{Set a parameter}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{tparm}{int}{i}{symbolic code; specifies parameter to set}
+\callseqitem{buffer}{int}{i}{value of parameter to be set}
+\end{callseq}
+
+Change the value of a table description parameter or an internal table
+interface parameter.  This routine may be used to specify such things as
+the row length or number of rows for a table, preferably before the table
+is actually opened.
+
+\callseqtable
+
+The symbolic parameters to specify table parameters are given in $<$tbset.h$>$.
+
+\subsection{Defining columns and managing column descriptors}
+
+%------------------------------------------------------------------------------
+\subroutine{tbcdef}{Define new column(s)}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{o}{array of column pointers}
+\callseqitem{colname}{string}{i}{array [SZ\_COLNAME,numcols] of column names}
+\callseqitem{colunits}{string}{i}{array [SZ\_COLUNITS,numcols] of units
+	for the columns}
+\callseqitem{colfmt}{string}{i}{array [SZ\_COLFMT,numcols] of formats for
+	display of the columns}
+\callseqitem{datatype}{int}{i}{array of data types for
+        columns (note:  -N for char strings)}
+\callseqitem{nelem}{int}{i}{array of lengths of each item}
+\callseqitem{numcols}{int}{i}{number of columns}
+\end{callseq}
+
+Define (create) new columns.
+Note that all but the first and last items in the calling sequence are arrays.
+The parameters SZ\_COLNAME, SZ\_COLUNITS, and SZ\_COLFMT
+are defined in $<$tbset.h$>$.
+The table data types are specified as
+TY\_REAL, TY\_DOUBLE, TY\_INT, TY\_SHORT, TY\_BOOL;
+for a character string column use -N,
+where N is the maximum number of char in one element.
+The value of \argname{nelem} for a column should be one
+if the column is to contain ordinary scalar values.
+In order to define a column such that the value in each row is an array,
+set \argname{nelem} to the (fixed) number of elements in the array.
+
+If the table is new,
+it is preferable to define all the columns before opening the table,
+i.e.~after calling \task{tbtopn} but before calling \task{tbtcre}.
+This approach is faster and makes it unnecessary to specify
+the row length explicitly (which can be done by calling \task{tbpset}).
+It is still possible to call \task{tbcdef} after the table is open,
+but it will take additional time
+if the table needs to be reorganized to allocate more space.
+
+Use the \argname{colptr} pointer(s) for all subsequent references
+to column(s) until the table is closed.
+
+\callseqtable
+
+Column units and print formats may be specified as null strings.
+If a null print format is given, a sensible default will be assigned.
+
+%------------------------------------------------------------------------------
+\subroutine{tbcdef1}{Define a new column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{o}{column pointer}
+\callseqitem{colname}{string}{i}{column name}
+\callseqitem{colunits}{string}{i}{units for the column}
+\callseqitem{colfmt}{string}{i}{print format for display of the column}
+\callseqitem{datatype}{int}{i}{data type of the column
+        (note:  -n for char strings)}
+\callseqitem{nelem}{int}{i}{array length, or one for a scalar column}
+\end{callseq}
+
+Define (create) a new column.
+This is similar to \task{tbcdef} except that it creates a single column.
+This avoids the complication of using arrays of character strings.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcfnd}{Get column pointer(s) from column name(s)}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colname}{string}{i}{array [SZ\_COLNAME,numcols] of column names}
+\callseqitem{colptr}{pointer}{o}{array of column pointers}
+\callseqitem{numcols}{int}{i}{number of names in \argname{colname}}
+\end{callseq}
+
+For each column name, this procedure returns a column-descriptor pointer
+if the column was found in the table,
+and it returns NULL if the column was not found.
+Note that it is not an error for a column to be not found.
+Use the \argname{colptr} pointer(s) for all subsequent references
+to column(s) until the table is closed.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+
+\subroutine{tbcfnd1}{Get a column pointer from a column name}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colname}{string}{i}{column name}
+\callseqitem{colptr}{pointer}{o}{column pointer}
+\end{callseq}
+
+This is similar to \task{tbcfnd} except that it takes a single column
+name and returns a single column pointer.
+This avoids the complication of using an array of character strings.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcnum}{Get column pointer from column number}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colnumber}{int}{i}{column number}
+\end{callseq}
+
+This function returns a column pointer for a column, based on column number.
+
+\callseqfcn
+
+The value of \argname{colptr} will be NULL if the column number is out
+of range.
+
+%------------------------------------------------------------------------------
+\subroutine{tbcinf}{Get info about a column}
+\begin{callseq}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{colnum}{int}{o}{column number}
+\callseqitem{colname}{string}{o}{column name}
+\callseqitem{colunits}{string}{o}{units for the column}
+\callseqitem{colfmt}{string}{o}{format for display of the column}
+\callseqitem{datatype}{int}{o}{symbolic code; data types for column}
+\callseqitem{nelem}{int}{o}{number of items in table element;
+this will be one for scalar columns, more than one for arrays}
+\callseqitem{lenfmt}{int}{o}{number of char for printing using colfmt}
+\end{callseq}
+
+Return all available information about an existing column.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcigi}{Get integer information about a table column}
+\begin{callseq}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{cparm}{int}{i}{symbolic code; specifies parameter to get}
+\end{callseq}
+
+This function gets information about a column
+and returns it as the function value, which is of type integer.
+The corresponding subroutine for text string information is \task{tbcigt}.
+
+\callseqfcn
+
+The symbolic codes are defined in $<$tbset.h$>$;
+the codes and their meaning are as follows~:
+\begin{center}
+\begin{tabular}{ll}
+TBL\_COL\_DATATYPE & data type of column \\
+TBL\_COL\_FMTLEN   & width of field needed for printing \\
+TBL\_COL\_NUMBER   & column number \\
+TBL\_COL\_LENDATA  & number of array elements, \\
+                 & ~~~~or one if a scalar column \\
+\end{tabular}
+\end{center}
+
+%------------------------------------------------------------------------------
+\subroutine{tbcigt}{Get text string information about a table column}
+\begin{callseq}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{cparm}{int}{i}{symbolic code; specifies parameter to get}
+\callseqitem{info}{string}{o}{buffer to receive value}
+\callseqitem{maxch}{int}{i}{allocated length of output string}
+\end{callseq}
+
+This subroutine gets information about a table column.
+The value returned as \argname{info} is a character string.
+The corresponding function for integer information is \task{tbcigi}.
+
+\callseqtable
+
+The symbolic codes are defined in $<$tbset.h$>$;
+the codes and their meaning are as follows~:
+\begin{center}
+\begin{tabular}{ll}
+TBL\_COL\_NAME  & column name \\
+TBL\_COL\_FMT   & print format for column \\
+TBL\_COL\_UNITS & column units \\
+\end{tabular}
+\end{center}
+
+%------------------------------------------------------------------------------
+\subroutine{tbcnam}{Change column name}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{colname}{string}{i}{column name}
+\end{callseq}
+
+Change the name of an existing column.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcnit}{Change column units}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{colunits}{string}{i}{units for the column}
+\end{callseq}
+
+Change the units of an existing column.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcfmt}{Change column format}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{colfmt}{string}{i}{format for display of the column}
+\end{callseq}
+
+Change the print format of an existing column.
+
+\callseqtable
+
+\subsection{Table header I/O routines}
+
+Table header parameters (keywords) are used to store information
+that is generic for an entire table.
+The data can serve as identification, be flags for processing, etc.
+Parameters giving table size, column data types, etc.~that are used by
+routines in this interface are \emphasize{not} stored in the same area;
+these parameters may be set and
+retrieved by routines described in previous sections.
+
+Five data types are supported for table header keywords,
+real, double precision, integer, boolean, and text,
+although character strings are limited to 70 characters in length.
+The distinction means little, however,
+since the values are stored as text strings
+and data type conversion is performed as needed.
+These routines get and put \emphasize{single} keywords, not arrays.
+A user program may construct array
+elements by appending numbers to a root portion of a keyword,
+and the array elements may be gotten or put one at a time.
+The names of table header keywords
+are always converted to upper case for FITS compatibility.
+
+%------------------------------------------------------------------------------
+\subroutine{tbhcal}{Copy all header keywords}
+\begin{callseq}
+\callseqitem{itp}{pointer}{i}{descriptor for input table}
+\callseqitem{otp}{pointer}{i}{descriptor for output table}
+\end{callseq}
+
+This routine copies all header keywords
+from the input table to the output table.
+This would be used after creating a new table
+if the header keywords in an existing table are relevant to the new table,
+e.g.~after opening a table NEW\_COPY.
+Both tables must be open (not just initialized) before calling this routine.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhgt[bird]}{Get a header keyword}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\end{callseq}
+
+This function returns the value of a keyword from the table header.
+A character-string keyword may be gotten by the procedure \task{tbhgtt}.
+
+Note that the comment (if any) associated with the header keyword
+will not be returned.
+Use \task{tbhgcm} to get the comment.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbhgtt}{Get a header keyword}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\callseqitem{buffer}{string}{o}{output buffer}
+\callseqitem{maxch}{int}{i}{maximum number of characters to get}
+\end{callseq}
+
+Get a character-string keyword from the table header.
+See \task{tbhgcm} for getting an associated comment, if any.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhad[tbird]}{Add a header keyword}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\callseqitem{buffer}{---}{i}{buffer of appropriate data type}
+\end{callseq}
+
+Add a keyword to the table header and put its value.
+If the keyword already exists, its value will be replaced.
+See \task{tbhpcm} for adding or replacing a comment.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhpt[tbird]}{Put a header keyword}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\callseqitem{buffer}{---}{i}{buffer of appropriate data type}
+\end{callseq}
+
+Replace the value of a keyword in the table header.
+It is an error if the keyword does not exist;
+use \task{tbhad[]} to \emphasize{add} keywords to a table header.
+See \task{tbhpcm} for adding or replacing a comment.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhgcm}{Get associated comment}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\callseqitem{comment}{string}{o}{comment}
+\callseqitem{maxch}{int}{i}{maximum size of comment string}
+\end{callseq}
+
+This routine returns the comment associated with a header keyword.
+If there is no comment, a null string will be returned.
+It is an error if the keyword is not found in the table.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhpcm}{Add or replace a comment}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keyword}{string}{i}{keyword name}
+\callseqitem{comment}{string}{i}{comment}
+\end{callseq}
+
+This routine adds or replaces a comment for a header keyword.
+It is an error if the keyword is not found in the table.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbhgnp}{Get Nth header keyword}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{keynum}{int}{i}{keyword number}
+\callseqitem{keyword}{string}{o}{keyword name}
+\callseqitem{dtype}{char}{o}{data type of keyword}
+\callseqitem{buffer}{string}{o}{string containing keyword value}
+\end{callseq}
+
+Get a keyword by number from the table header.
+The data type is a single char:  t, b, i, r, d.
+If the keyword number is out of range then null strings will be
+returned for the keyword name and value.
+
+\callseqtable
+
+\subsection{Row and column selectors}
+
+Of the routines in this section,
+only the first two, \task{tbsirow} and \task{tbcdes},
+really depend on the row or column selectors.
+\task{tbcnel} is intended to be used in conjunction with \task{tbcga[rd]},
+and the latter can be applied to any table,
+but its usefulness is greatly enhanced by the row and column selectors.
+\task{tbcga[rd]} supports the column array section feature
+(similar to image sections)
+by calling \task{tcs\_rdary[rd]} instead of \task{tbagt[rd]}
+to get the data.
+
+%------------------------------------------------------------------------------
+\subroutine{tbsirow}{Get row number from selected row}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{selrow}{int}{i}{selected row number}
+\callseqitem{rownum}{int}{o}{actual row number}
+\end{callseq}
+
+If a row selector was specified when the table was opened,
+the table appears to have fewer rows than does the underlying table.
+Rows that were not selected are simply not visible to the application.
+The term ``selected row number'' refers to a row number
+in this smaller table;
+the selected row numbers run from one to the total number of selected rows.
+When referring to a row in the table,
+the row number specified should always be the selected row number.
+There may be times, however,
+when it is desired to know the actual row number,
+the number in the underlying table.
+This subroutine returns that actual row number.
+
+If no row selector was specified when the table was opened,
+then \argname{rownum} will be set equal to \argname{selrow}.
+
+It is an error if \argname{selrow} is greater than
+the number of rows in the table.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcdes}{Get column selector descriptor}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{cp}{pointer}{i}{column pointer}
+\end{callseq}
+
+This function returns the pointer to the column selector descriptor.
+This descriptor is needed for use of such routines as \task{tcs\_rdary[]}.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbcnel}{Get number of elements in a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{cp}{pointer}{i}{column pointer}
+\end{callseq}
+
+This function returns the total number of elements in a column.
+This is simply the number of rows multiplied by
+the array size for the column
+(the array size is one for ordinary scalar columns).
+The number of rows in the table may have been reduced
+by the use of a row selector,
+and the array size for the column may have been reduced
+by the use of an array section.
+
+The main purpose of this routine is to
+determine how large an array to allocate
+before calling \task{tbcga[rd]}.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbcga[rd]}{Get all elements in a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{cp}{pointer}{i}{column pointer}
+\callseqitem{buffer}{---}{o}{buffer to receive values}
+\callseqitem{nelem}{int}{i}{buffer size}
+\end{callseq}
+
+This function gets all elements in all rows of a column.
+The idea is that this one routine can be used
+to get either a column of values for all rows
+or an array of values at one row.
+In the latter case,
+the user would typically have used the row selector syntax
+to limit the table to just one row.
+This simplifies applications code
+for the case that an array of values is to be gotten from a table,
+because the application does not need to check
+whether the column contains scalars or arrays.
+
+For a column of scalars,
+this routine returns the same values as
+would be gotten by \task{tbcgt[rd]}.
+For a column of arrays,
+this routine effectively returns the values gotten by \task{tbagt[rd]},
+concatenating the arrays if more than one row was selected.
+In the case of a column of arrays, however,
+a column array section may have been used when the table was opened,
+in which case only the specified sections will be gotten.
+The \task{tcs\_rdary[rd]} routine is actually used
+instead of \task{tbagt[rd]} in order to take advantage of this feature.
+Note that the other I/O routines described in this document
+do not support the column array section feature;
+the \task{tcs\_} routines such as \task{tcs\_rdary[]} (see below)
+can be called by applications code for this option.
+
+\argname{nelem} is the allocated size of \argname{buffer},
+and \argname{nelem} can be larger than
+the number of elements which will be gotten.
+The function \task{tbcnel} can be used to get the number of elements,
+and the buffer can be allocated with that size.
+It is an error if the buffer size is too small
+(i.e.~less than the value returned by \task{tbcnel}).
+
+The function value is the total number of elements that were actually gotten.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tcs\_rdary[birds]}{Read an array using the column selector}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{descrip}{pointer}{i}{column selector descriptor}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{maxbuf}{int}{i}{maximum number of elements to read}
+\callseqitem{nbuf}{int}{o}{actual number of elements read}
+\callseqitem{buffer}{---}{o}{array of appropriate data type}
+\end{callseq}
+
+This routine reads one or more elements
+at one row and column of a table.
+If the column contains arrays,
+the number of elements may have been reduced
+by the use of a column array section (similar to an image section);
+only the elements in the section will be returned.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tcs\_rdaryt}{Read an array using the column selector}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{descrip}{pointer}{i}{column selector descriptor}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{lenstring}{int}{i}{size of first axis of buffer}
+\callseqitem{maxbuf}{int}{i}{maximum number of elements to read}
+\callseqitem{nbuf}{int}{o}{actual number of elements read}
+\callseqitem{buffer}{string}{o}{output buffer; array of character strings}
+\end{callseq}
+
+This routine reads one or more character strings
+at one row and column of a table.
+If the column contains arrays,
+the number of elements may have been reduced
+by the use of a column array section (similar to an image section);
+only the elements in the section will be returned.
+
+\callseqtable
+
+\subsection{Table data I/O routines}
+
+\task{tbcga[rd]} could have been included in this section,
+but it was described just above,
+in the ``row and column selectors'' section.
+
+%------------------------------------------------------------------------------
+\subroutine{tbrcsc}{Copy selected columns of a row}
+\begin{callseq}
+\callseqitem{itp}{pointer}{i}{descriptor for input table}
+\callseqitem{otp}{pointer}{i}{descriptor for output table}
+\callseqitem{icolptr}{pointer}{i}{array of column pointers in input table}
+\callseqitem{ocolptr}{pointer}{i}{array of column pointers in output table}
+\callseqitem{irow}{int}{i}{row number in input table}
+\callseqitem{orow}{int}{i}{row number in output table}
+\callseqitem{ncols}{int}{i}{number of columns to be copied}
+\end{callseq}
+
+This procedure copies a row from one table to another
+or to another location in the same table.
+Only the specified columns are copied,
+but all columns may be selected, of course.
+To copy an entire row,
+the pointers to column descriptors could be obtained as follows:
+\begin{center}
+\begin{tabular}{l}
+do i = 1, tbpsta (itp, TBL\_NCOLS) \{ \\
+~~~~icolptr[i] = tbcnum (itp, i) \\
+~~~~ocolptr[i] = tbcnum (otp, i) \\
+\} \\
+\end{tabular}
+\end{center}
+
+\callseqtable
+
+The \task{tbrcpy} routine copies an entire row
+without the need to get the column pointers,
+but it can only be used under certain conditions.
+\task{tbrcpy} would be appropriate for copying rows within one table,
+or to an output table which was opened NEW\_COPY.
+
+%------------------------------------------------------------------------------
+\subroutine{tbegt[birds]}{Get an element from the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{buffer}{---}{o}{buffer of appropriate data type}
+\end{callseq}
+
+Get an element from the specified row and column.
+The buffer to receive the value should be of
+the data type specified by the routine name suffix;
+type conversion will be performed
+if the data type of the column in the table is not the same.
+If the element is undefined in the table
+and the data type is real, double, int or short,
+the buffer value will be INDEFR, INDEFD, INDEFI or INDEFS respectively.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbegtt}{Get an element from the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{buffer}{string}{o}{char string buffer}
+\callseqitem{maxch}{int}{i}{size of buffer}
+\end{callseq}
+
+Get an element from the specified row and column.
+Type conversion will be performed if the column in the table is not
+a character string.
+A null string will be returned if the entry in the table is not defined.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbept[tbirds]}{Put an element into the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number into which to put data}
+\callseqitem{buffer}{---}{i}{buffer of appropriate data type}
+\end{callseq}
+
+Put an element into the specified row and column.
+The buffer containing the value should be of
+the data type specified by the routine name suffix;
+type conversion will be performed
+if the data type of the column in the table is not the same.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbagt[birds]}{Get an array of elements from the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{buffer}{---}{o}{array of appropriate data type}
+\callseqitem{first}{int}{i}{number of the first array element to read}
+\callseqitem{nelem}{int}{i}{maximum number of elements to read}
+\end{callseq}
+
+This function gets an array of elements from the specified row and column.
+If the table column contains arrays rather than scalar elements,
+then this function will read an array of up to \argname{nelem} values
+starting with element number \argname{first}.
+The function value is the actual number of elements read.
+It is not an error for \argname{nelem} to be greater than
+the number of elements in the array (starting with \argname{first}).
+This function may be used for getting scalar elements
+by setting both \argname{first} and \argname{nelem} to one.
+Type conversion will be performed
+if the column in the table is not the same type as the buffer.
+An INDEF value of the appropriate type
+will be returned for each element of the array which is not defined.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbagtt}{Get an array of character strings from the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\callseqitem{buffer}{string}{o}{array of character strings}
+\callseqitem{lenstring}{int}{i}{number of char in each element of buffer}
+\callseqitem{first}{int}{i}{number of the first array element to read}
+\callseqitem{nelem}{int}{i}{maximum number of elements to read}
+\end{callseq}
+
+This function gets an array of character strings
+from the specified row and column.
+The function value is the actual number of elements read.
+This is similar to \task{tbagt[]} except for the \argname{lenstring} argument.
+The buffer to receive the values should be an array of character strings;
+the size of the first dimension should be \argname{lenstring}.
+If the column in the table has a numerical or boolean data type,
+the values will be written into the output buffer
+using the print format for the column;
+values may be truncated if \argname{lenstring} is too small.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbapt[birds]}{Put an array of elements into the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number into which to put data}
+\callseqitem{buffer}{---}{i}{array of values of appropriate data type}
+\callseqitem{first}{int}{i}{number of the first array element to write}
+\callseqitem{nelem}{int}{i}{number of elements to write}
+\end{callseq}
+
+This routine puts an array of elements into the specified row and column.
+Note that this puts the array into one column in one row.
+The buffer containing the values should be an array
+of the data type specified by the routine name suffix;
+type conversion will be performed
+if the data type of the column in the table is not the same.
+It \emphasize{is} an error if the column in the table
+contains fewer elements than \argname{nelem}$+$\argname{first}$-$1.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbaptt}{Put an array of character strings into the table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{rownum}{int}{i}{row number into which to put data}
+\callseqitem{buffer}{string}{i}{array of character strings}
+\callseqitem{lenstring}{int}{i}{number of char in each element of buffer}
+\callseqitem{first}{int}{i}{number of the first array element to write}
+\callseqitem{nelem}{int}{i}{number of elements to write}
+\end{callseq}
+
+This routine puts an array of character strings
+into the specified row and column.
+Note that this puts the array into one column in one row.
+The buffer containing the values should be an array of character strings;
+the size of the first dimension should be \argname{lenstring}.
+If the column in the table has a numerical or boolean data type,
+values will be read from the input strings
+and written into the table.
+It \emphasize{is} an error if the column in the table
+contains fewer elements than \argname{nelem}$+$\argname{first}$-$1.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbrgt[birds]}{Get values from row}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{array of column pointers}
+\callseqitem{buffer}{---}{o}{buffer of appropriate data type}
+\callseqitem{nullflag}{boolean}{o}{array of flags;
+        true if the element is undefined}
+\callseqitem{numcols}{int}{i}{number of column values to get}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\end{callseq}
+
+Get one or more values from a row.
+The buffer to receive the values should be
+of the data type specified by the routine name suffix;
+type conversion will be performed
+if the data type of the column in the table does not match.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbrgtt}{Get values from row}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{array of column pointers}
+\callseqitem{buffer}{string}{o}{array of strings for output buffer}
+\callseqitem{nullflag}{boolean}{o}{array of flags;
+        true if the element is undefined}
+\callseqitem{lenstring}{int}{i}{number of char in each element of buffer}
+\callseqitem{numcols}{int}{i}{number of column values to get}
+\callseqitem{rownum}{int}{i}{row number from which to get data}
+\end{callseq}
+
+Get one or more character-string values from a row.
+If the data type of a column in the table is numeric or Boolean, the value
+will be written into the output buffer using the print format for that column;
+a portion of the value will be lost if the buffer is not large enough.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbrpt[birds]}{Put values into a row}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{array of column pointers}
+\callseqitem{buffer}{---}{i}{buffer of appropriate data type}
+\callseqitem{numcols}{int}{i}{number of column values to put}
+\callseqitem{rownum}{int}{i}{row number into which to put data}
+\end{callseq}
+
+Put one or more values of the same data type into a row.
+The buffer containing the values should be of
+the data type specified by the routine name suffix; type conversion will be
+performed if the data type of a column in the table does not match.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbrptt}{Put values into a row}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{array of column pointers}
+\callseqitem{buffer}{string}{i}{input buffer; array of char strings}
+\callseqitem{lenstring}{int}{i}{number of char in each element of buffer}
+\callseqitem{numcols}{int}{i}{number of column values to put}
+\callseqitem{rownum}{int}{i}{row number into which to put data}
+\end{callseq}
+
+Put one or more character-string values into a row.
+If the data type of a column in the table is numeric or Boolean, the
+value will be read from the character string.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbcgt[birds]}{Get values from a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{buffer}{---}{o}{buffer of appropriate data type}
+\callseqitem{nullflag}{boolean}{o}{array of flags;
+        true if the element is undefined}
+\callseqitem{firstrow}{int}{i}{number of the first row from which to get data}
+\callseqitem{lastrow}{int}{i}{number of the last row from which to get data}
+\end{callseq}
+
+Get an array of values from a single column.  Values in rows \argname{firstrow}
+through \argname{lastrow} (inclusive) will be returned.
+The buffer to receive the values should be of
+the data type specified by the routine name suffix; type conversion will be
+performed if the data type of a column in the table does not match.
+
+\callseqtable
+
+Note that \argname{colptr} is a single column pointer,
+not an array of pointers.
+
+%------------------------------------------------------------------------------
+\subroutine{tbcgtt}{Get values from a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{buffer}{string}{o}{output buffer; array of char strings}
+\callseqitem{nullflag}{boolean}{o}{array of flags;
+        true if the element is undefined}
+\callseqitem{lenstring}{int}{i}{number of char in each element of the buffer}
+\callseqitem{firstrow}{int}{i}{number of the first row from which to get data}
+\callseqitem{lastrow}{int}{i}{number of the last row from which to get data}
+\end{callseq}
+
+Get an array of character-string values from a single column.
+Values in rows \argname{firstrow}
+through \argname{lastrow} (inclusive) will be returned.
+If the data type of the column in the table is numeric or Boolean, the value
+will be written into the output buffer using the print format for that column;
+a portion of the value will be lost if the buffer is not large enough.
+
+\callseqtable
+
+Note that \argname{colptr} is a single column pointer,
+not an array of pointers.
+
+%------------------------------------------------------------------------------
+\subroutine{tbcpt[birds]}{Put values into a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{buffer}{---}{i}{buffer of appropriate data type}
+\callseqitem{firstrow}{int}{i}{number of the first row into which to put data}
+\callseqitem{lastrow}{int}{i}{number of the last row into which to put data}
+\end{callseq}
+
+Put an array of values into a column.  Values in rows \argname{firstrow}
+through \argname{lastrow} (inclusive) will be set.
+The buffer containing the values should be of
+the data type specified by the routine name suffix; type conversion will be
+performed if the data type of a column in the table does not match.
+
+\callseqtable
+
+Note that \argname{colptr} is a single column pointer,
+not an array of pointers.
+
+%------------------------------------------------------------------------------
+\subroutine{tbcptt}{Put values into a column}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{column pointer}
+\callseqitem{buffer}{string}{i}{input buffer; array of char strings}
+\callseqitem{lenstring}{int}{i}{number of char in each element of buffer}
+\callseqitem{firstrow}{int}{i}{number of the first row into which to put data}
+\callseqitem{lastrow}{int}{i}{number of the last row into which to put data}
+\end{callseq}
+
+Put an array of character-string values into a column.
+Values in rows \argname{firstrow}
+through \argname{lastrow} (inclusive) will be set.
+If the data type of a column in the table is numeric or Boolean, the
+value will be read from the character string.
+
+\callseqtable
+
+Note that \argname{colptr} is a single column pointer,
+not an array of pointers.
+
+%------------------------------------------------------------------------------
+\subroutine{tbrudf}{Set elements to undefined}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{colptr}{pointer}{i}{array of column pointers}
+\callseqitem{numcols}{int}{i}{number of elements in array colptr}
+\callseqitem{rownum}{int}{i}{row number}
+\end{callseq}
+
+Mark table elements in column(s) in given row as indefinite.
+Note that indefinite is the default, so it is not necessary to call this
+routine unless definite value(s) have already been set in the table.
+
+\callseqtable
+
+\subsection{Table files}
+
+%------------------------------------------------------------------------------
+\subroutine{tbtcpy}{Copy a table}
+\begin{callseq}
+\callseqitem{inname}{string}{i}{name of input table}
+\callseqitem{outname}{string}{i}{name of output table}
+\end{callseq}
+
+This routine copies a table.
+The extensions may be absent from the input and output names,
+but the names must be otherwise complete;
+i.e.~they must not include wild-card characters
+or be directory names without file names.
+The input table should not be open for writing,
+and the input and output names
+should not be the same.
+
+To a certain extent,
+the table type can be changed by calling this routine.
+If \argname{outname} is ``STDOUT'',
+the output will be a text table
+and will be sent to the standard output.
+If the filename extension for \argname{outname}
+is recognized as implying a FITS file
+(``.fits'', ``.fit'', or ``.??f''),
+that file will be written as a FITS table.
+If \argname{inname} is a text table or ``STDIN'',
+the output will also be a text table unless
+the filename extension in \argname{outname}
+is a FITS extension or is ``.tab''.
+Otherwise, the output will be an STSDAS format table.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtren}{Rename a table}
+\begin{callseq}
+\callseqitem{oldname}{string}{i}{old name of table}
+\callseqitem{newname}{string}{i}{new name of table}
+\end{callseq}
+
+This routine renames a table.
+The extensions may be absent from the old and new names,
+but the names must be otherwise complete;
+i.e.~they must not include wild-card characters
+or be directory names without file names.
+The table should not be open for writing.
+
+This is simply \task{tbtcpy} followed by \task{tbtdel}.
+For a table in a FITS file, therefore,
+this routine moves only the table extension.
+Even if the table is the only extension in the file,
+the primary header will still remain.
+Use \task{rename} to rename an entire file.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtdel}{Delete a table}
+\begin{callseq}
+\callseqitem{tablename}{string}{i}{name of the table}
+\end{callseq}
+
+This routine deletes a table.
+The extensions may be absent from the table name,
+but the name must be otherwise complete;
+i.e.~it must not include wild-card characters.
+The table should not be open.
+
+For a table in a FITS file,
+this routine deletes only the table extension.
+Even if the table is the only extension in the file,
+the primary header will still remain.
+Use \task{delete} to delete an entire file.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtchs}{Change the size of a table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{maxpar}{int}{i}{new maximum number of header parameters}
+\callseqitem{maxcols}{int}{i}{new maximum number of columns}
+\callseqitem{rowlen}{int}{i}{new value for row length}
+\callseqitem{allrows}{int}{i}{new value for number of allocated rows}
+\end{callseq}
+
+This routine changes the sizes of the various sections of a table.
+The table does not have to be open, just initialized.
+If the table is open it will be rewritten (if necessary) by copying
+to a scratch file, deleting the original table,
+and renaming the scratch file to the original name.
+
+A negative value for any of the new table size parameters is taken to
+mean that that parameter should not be changed.
+A value (e.g.~zero) that is smaller than the minimum allowed value
+results in the truncation of unused space.
+
+The row length is relevant only for row-ordered tables, and the
+number of rows to allocate is relevant only for column-ordered tables.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtext}{Append default extension}
+\begin{callseq}
+\callseqitem{inname}{string}{i}{name of the table}
+\callseqitem{outname}{string}{o}{name including extension}
+\callseqitem{maxch}{int}{i}{maximum number of char in name of table}
+\end{callseq}
+
+If the input table name does not include an extension
+then the default extension will be appended.
+The same actual argument may be used for both the input and output names.
+
+\callseqtable
+
+%------------------------------------------------------------------------------
+\subroutine{tbtacc}{Test for the existence of a table}
+\begin{callseq}
+\callseqitem{tablename}{string}{i}{name of the table}
+\end{callseq}
+
+This integer function returns YES if the table exists, NO if not.
+The test is performed by opening the table READ\_ONLY,
+and if that fails, the function returns NO.
+Thus, there may be a file of the given name,
+but if it is not a table, or if it is read protected,
+then it is not considered to exist.
+
+\callseqfcn
+
+%------------------------------------------------------------------------------
+\subroutine{tbtnam}{Get the name of a table}
+\begin{callseq}
+\callseqitem{tp}{pointer}{i}{table descriptor}
+\callseqitem{tablename}{string}{o}{name of the table}
+\callseqitem{maxch}{int}{i}{maximum number of char in name of table}
+\end{callseq}
+
+This routine may be used to get the name of an open table,
+e.g.~for constructing a message for the user.
+If a binary table was opened using a file name without an extension,
+the default extension would have been appended by \task{tbtopn},
+and the name returned by this subroutine will include the extension.
+
+\callseqtable
+
+\end{document}

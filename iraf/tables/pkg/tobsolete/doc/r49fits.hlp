@@ -1,0 +1,46 @@
+.help r49fits Jan97 tobsolete
+.ih
+NAME
+r49fits -- A fits reader for obsolete versions of iraf
+.ih
+USAGE
+r49fits input file_list output
+.ih
+DESCRIPTION
+This task is a fits reader designed to work around a bug in old
+versions of iraf. Old versions of iraf placed an upper limit of 46
+group parameters in stf images. Attempts to process images with more
+than 46 group parameters leads to a corrupted image. This bug was
+discovered when wfpc2 images were first introduced, since wfpc2 images
+have 49 group parameters. We diagnosed the problem and gave the fix to
+the iraf group at noao, but since we have no control over what
+versions of iraf people use at other sites, we needed to introduce a
+temporary work around. The fits reader was modified to produce this
+task. It deletes three relatively unimportant group parameters from
+wfpc2 images, producing an image with 45 group parameters, which
+evades the bug in the stf kernel.
+
+Since the fix to the stf was made early in 1994, if you are running a
+recent version of iraf you have no reason to use this task. Even if
+you are running an older version of iraf, you only need to use this
+task on wfpc2 images and I strongly advise you to get the most recent
+version of iraf from noao.
+
+In operation, this task is identical to strfits except that several
+group parameters are deleted (MEANC25, MEANC100, and MEANC300). The
+task parameters and their meanings are identical.
+
+.ih
+PARAMETERS
+See strfits
+
+.ih
+EXAMPLES
+See strfits
+
+.ih
+SEE ALSO
+strfits
+
+.endhelp
+

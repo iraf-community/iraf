@@ -1,0 +1,146 @@
+.help sinterp Mar92 noao.onedspec
+.ih
+NAME
+sinterp -- Interpolate a tables of x,y pairs to produce a spectrum
+.ih
+USAGE
+sinterp tbl_file
+.ih
+PARAMETERS
+.ls tbl_file
+The name of a file which contains the x,y pairs to be used as
+the basis for interpolation. The pairs must be in order of
+increasing x.
+.le
+
+The following parameters may or may not be necessary, depending
+on the options selected.
+
+.ls input
+If a few single elements are desired, rather than a full
+array of elements, the user may enter a sequence of x values
+from the terminal or a file to be used to interpolate into
+the x,y table (parameter curve_gen=no).
+.le
+.ls image
+If parameter make_image=yes, then an image file name is needed
+.le
+.ls order = 5
+If the interpolator is a polynomial fit or spline (interp_mode=
+chebyshev, legnedre, spline3, spline1), the order of the fit
+is required.
+.le
+.ls x1
+If parameter curve_gen=yes, this is the starting x value to
+begin the curve generation.
+.le
+
+Of the following three parameters, two must be specified, and the
+third will be derived.
+
+.ls x2 = 0.0
+As above, but x2 determines the endpoint of the curve.
+.le
+.ls dx = 0.0
+As above, but dx determines the pixel-to-pixel increment
+to be used during the curves generation.
+.le
+.ls npts = 0
+As above, but this determines the number of pixels to be generated.
+.le
+
+.ls curve_gen = no
+If this parameter is set to yes, then parameters x1, and two of
+the three x2, dx, npts are required. The output is in the form
+of new x,y pairs and may be redirected to a text file.
+But if parameter make_image is also yes, the output is
+in the form of an IRAF image file having the name given by
+the parameter image. If curve_gen=no, the user must supply
+a set of x values and interpolation is performed on those values.
+.le
+.ls make_image = no
+If set to yes, then curve_gen=yes is implied and an image file name
+is requied. A one dimensional IRAF image is created.
+.le
+.ls tbl_size = 1024
+This parameter defines the maximum size to be set aside for
+memory storage of the input x,y pairs.
+.le
+.ls interp_mode = "chebyshev"
+This parameter controls the method of interpolation. The linear
+and curve options are true interpolators, while chebyshev,
+legendre, spline3, and splin1 are fits to the data.
+.le
+.ih
+DESCRIPTION
+The specified file is read assuming it is a text file containing
+pairs of x,y values in the form: xxx yyy. The table is used
+to define the function y(x). The pairs must be entered in the file
+in increasing order of x.
+
+The user specifies either specific x values for which the function
+is to be evaluated, or specifies that a sequence of values beginning
+with x1 are to be generated. In the former case, the explicit x values
+may come either from the keyboard or from a file. In the latter case
+the user must also specify the sequence by defining the increment, dx,
+the endpoint, x2, and the number of points to generate in the sequence.
+Then y(x) is evaluated at x1, x1+dx, x1+2*dx, ...  , x1+(n-2)*dx, x2.
+Only 2 of the 3 parameters (x2, dx, npts) are needed to fully
+specify the sequence.
+
+The output of the function evaluation is either new x,y pairs written
+to STDOUT, or an IRAF image.
+
+The function used to evaluated the tabular data may be any of the following
+forms:
+
+.ls (1)
+Linear interpolation between points.
+.le
+.ls (2)
+Smooth interpolation between points.
+.le
+.ls (3)
+A polynomial fit of either Legendre or Chebyshev types.
+.le
+.ls (4)
+A cubic or linear spline.
+.le
+
+If the table of x,y pairs is very large, the parameter tbl_size
+should be set to the number of pairs. For example, if a spectrum
+is available as a text file of x,y pairs (such as might be
+obtained from IUE), and the number of pairs is 4096, then tbl_size
+should be set to 4096. This provides for sufficient memory to
+contain the table.
+
+.ih
+EXAMPLES
+The following shows how a text file may be used to generate a spectrum:
+
+.nf
+	cl> sinterp textfile make+ x1=4000 x2=5000 npts=1024 \
+	>>> image=testimage interp_mode=curve
+.fi
+
+The following sequence shows how to generate a spectrum of an IRS
+standard star using the calibration file data as the source.
+
+.nf
+	cl> lcalib flam feige34 caldir=onedstds$irscal/ >textfile
+	cl> sinterp textfile make+ x1=3550 dx=1.242 npts=1024 \
+	>>> interp_mode=linear image=feige34
+.fi
+.ih
+REVISIONS
+.ls SINTERP V2.10.3+
+The image header dispersion coordinate system has been updated to the
+current system.
+.le
+.ls SINTERP V2.10
+This task is unchanged.
+.le
+.ih
+SEE ALSO
+lcalib
+.endhelp

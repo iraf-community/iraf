@@ -1,0 +1,78 @@
+.help cqfquery Mar00 "Catquery Package"
+.ih
+NAME
+cqfquery -- query a catalog file and return the results
+.ih
+SYNOPSIS
+
+res = cq_fquery (cq, catfile, hdrtxt)
+
+.nf
+pointer	cq		# the configuration file descriptor
+char	catfile		# the catalog file name
+char	hdrtext		# the catalog file header text
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls catfile
+The catalog file name.
+.le
+.ls hdrtext
+Text describing the format of the catalog file.
+.le
+.ih
+DESCRIPTION
+Cq_fquery is a pointer function which returns the results descriptor as its
+function value. NULL is returned if an error occurs in the catalog file query.
+
+Cq_fquery is used to make a catalog file emulate the results of
+a catalog query. The calling program must supply the catalog format
+description. A sample catalog file and catalog description are shown below.
+.ih
+NOTES
+Cq_setcat with the catalog name set to the reserved record name "filename@noao"
+must be called before any catalog file query is made.
+
+A sample catalog file is shown below.
+
+.nf
+ 00:00:01.443   -0:06:57.52  13.5  15.2
+ 00:00:01.574   -0:05:33.26  16.1  18.0
+ 00:00:01.904   -0:09:48.51  18.2  19.6
+ 00:00:02.529   -0:04:21.53  13.4  14.4
+ 00:00:04.154   -0:01:56.32  17.1  18.3
+ 00:00:04.438   -0:05:00.03  11.4  13.5
+ 00:00:04.697   -0:03:24.59  16.9  17.7
+ 00:00:05.989   -0:02:46.36  15.1  17.6
+ 00:00:07.118   -0:09:03.53  19.1  19.8
+ 00:00:07.260   -0:06:47.95  17.0  17.7
+ 00:00:07.314   -0:00:22.35  15.3  16.8
+.fi
+
+The accompanying catalog file header is shown below.
+
+.nf
+type stext
+nheader 1
+    csystem J2000
+nfields 4
+    ra 1 0 d hours %12.3h
+   dec 2 0 d degrees %12.2h
+  mag1 3 0 r INDEF %4.1f
+  mag2 4 0 r INDEF %4.1f
+.fi
+
+The catalog header specifies the type of file, "stext" for simple text in
+this example, the number of header parameters, the number of fields in each
+record, and the individual field descriptions. 
+
+More information about the catalog header shown here can be found by typing
+"help catalogs".
+
+.ih
+SEE ALSO
+cqquery, cqrclose
+.endhelp

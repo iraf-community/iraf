@@ -1,0 +1,32 @@
+.help gscopy Aug85 "Gsurfit Package"
+.ih
+NAME
+gscopy -- copy a surface fit
+.ih
+SYNOPSIS
+gscopy (sf1, sf2)
+
+.nf
+pointer	sf1		# old surface descriptor
+pointer	sf2		# new surface descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf1    
+Pointer to the old surface descriptor structure.
+.le
+.ls sf2   
+Pointer to the new surface descriptor structure.
+.le
+.ih
+DESCRIPTION
+The surface fit and parameters are copied for later use by
+GSEVAL or GSVECTOR.
+.ih
+NOTES
+The matrices and vectors used by the numerical fitting routines are not
+stored.
+.ih
+SEE ALSO
+gsadd, gssub
+.endhelp

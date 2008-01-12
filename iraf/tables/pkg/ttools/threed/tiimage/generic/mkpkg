@@ -1,0 +1,14 @@
+# Update the generic routines.
+
+default:
+	$checkout threed.a ../../
+	$update   threed.a
+	$checkin  threed.a ../../
+$exit
+
+threed.a:
+	tmcp1s.x
+	tmcp1i.x
+	tmcp1r.x
+	tmcp1d.x
+	;

@@ -1,0 +1,8 @@
+Space Telescope Science Data Analysis TABLES Package
+
+    fitsio + Convert iamges and tables to and from the fits standard
+    tbplot + General purpose plotting tasks for stsdas data formats
+ tobsolete + Tasks formerly in other packages and now considered obsolete
+    ttools + Tasks for working with stsdas tables
+
+Type "help selectors" for information about row and column selector syntax.

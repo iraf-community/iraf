@@ -1,0 +1,184 @@
+.help wcspars Jul93 tables
+.ih
+NAME
+wcspars -- Edit the parameter set that defines a world coordinate
+system.
+.ih
+USAGE
+wcspars
+.ih
+DESCRIPTION
+The parameters in this pset are used to define a simple world
+coordinate system (WCS) for use by various tasks that require such
+information, such as 'wcslab' or 'siaper'.
+
+Note that this is a pset, not an executable task; it defines a set of
+parameters used by other tasks.  Invoking the pset by name runs 'eparm'
+on the parameter set, allowing the user to modify the parameters.
+Alternatively, the parameters may be modified on the command linne by
+specifying the pset name and parameter name.  For example, you can
+type 'wcspars.ctype="ra---tan"'.  Parameters may also be edited by
+using 'eparam' on the calling task.  An example is the task 'wcslab'.  By
+typing 'eparam wcslab', positioning the cursor on the parameter
+'wcspars', and type ':e', the user would then be editing the parameters
+in this pset.
+
+A WCS is used to transform coordinates from one system to another.
+For example, for converting from pixel coordinates to celestial
+coordinates.  To perform such transformations, certain information is
+required, such as the type of system.  Below is a brief description of
+the IRAF implementation of WCS and how to the parameters in this pset
+to define a WCS.
+
+The IRAF implementation defines a transformation from some "logical"
+system (e.g., pixel space) to some "world" system (e.g., RA and DEC).
+The first piece of information required is the type of world system is
+being dealt with.  At the moment, there are two general systems
+defined: 'linear' which provides a linear mapping from the logical to
+world systems, and the celestial projects which provide a mapping from
+pixel space to celestial coordinate space.  The parameters 'crtype1' and
+'ctype2' are used to specify the type of system.  If a linear system is
+desired, both parameters will have the value "linear".  If the TANGENT
+plane projection is desired where the first axis represents RA and the
+second represents DEC, then the parameters would have the values,
+'ctype1 = "ra---tan"', 'ctype2 = "dec--tan"'.  There are also a sine
+projection (SIN) and arc (ARC) projection provided.
+
+The scale factor and rotation between the two systems are defined by
+a coordinate transformation (CD) matrix.  Through matrix
+multiplication, the logical coordinates are multiplied by the CD
+matrix to produce the world coordinates.  The matrix is represented in
+the parameters as follows:
+.nf
+
+        |---------------|
+        | cd1_1  cd1_2  |
+        |               |
+        | cd2_1  cd2_2  |
+        |---------------|
+
+.fi
+To construct the CD matrix, the following definitions may be used:
+.nf
+
+        cd1_1 =  Sx * cos(PA)
+        cd1_2 = -Sy * sin(PA)
+        cd2_1 =  Sx * sin(PA)
+        cd2_2 =  Sy * cos(PA)
+
+.fi
+where Sx and Sy are the scale factors from the logical to world
+systems and PA is the angle of rotation between the two systems
+(positive rotation is counterclockwise).
+
+There is a special case for the transformation to RA and DEC.  Since RA
+increases "to the left", opposite of standard convention,  -1 needs
+to be multiplied through the CD matrix for the first axis.  This
+results in the formulas below:
+.nf
+
+        cd1_1 = -Sx * cos(PA)
+        cd1_2 =  Sy * sin(PA)
+        cd2_1 =  Sx * sin(PA)
+        cd2_2 =  Sy * cos(PA)
+
+.fi
+
+Finally, the origins of the logical and world systems must be defined.
+The parameters 'crpix1' and 'crpix2' define the coordinate in the logical
+space that corresponds to the coordinate in world space defined by the
+parameters 'crval1' and 'crval2'.  Quite simply, the coordinate (crpix1,
+crpix2) in the logical space, when transformed to the world space,
+would be the coordinate (crval1, crval2).
+
+The last set of parameters, 'log_x1', 'log_x2', 'log_y1', 'log_y2', define a
+region in the logical space over which the transformation is valid.
+.ih
+PARAMETERS
+.ls (crtype1 = "linear") [string]
+The system type of the first axis.  Possible values depend on what
+transformations have been implemented in the IRAF system.  To date the
+following values represent valid transformations: linear, xxx--tan,
+xxx-sin, xxx-arc (where xxx is either "ra-" or "dec").  Note that if any
+of the celestial transformations are used, the "ra" must appear in one
+of 'crtype1' or 'crtype2' and "dec" must appear in the other parameter.
+.le
+.ls (crtype2 = "linear") [string]
+The system type of the second axis.  See above for values.
+.le
+.ls (crpix1 = 0.) [real]
+The X coordinate of the reference point in logical space that
+corresponds to the reference point in the world space.
+.le
+.ls (crpix2 = 0.) [real]
+The Y coordinate of the reference point in logical space that
+corresponds to the reference point in the world space.
+.le
+.ls (crval1 = 0.) [real]
+The X coordinate of the reference point in world space that
+corresponds to the reference point in the logical space.
+.le
+.ls (crval2 = 0.) [real]
+The Y coordinate of the reference point in world space that
+corresponds to the reference point in the logical space.
+.le
+.ls (cd1_1 = 1.) [real]
+Entry in the CD matrix.  Usually has the value <xscale * cos(angle)>,
+or for RA and DEC systems, <-xscale * cos(angle)>.
+.le
+.ls (cd1_2 = 0.) [real]
+Entry in the CD matrix.  Usually has the value <-yscale * sin(angle)>,
+or for RA and DEC systems, <yscale * sin(angle)>.
+.le
+.ls (cd2_1 = 0.) [real]
+Entry in the CD matrix.  Usually has the value <xscale * sin(angle)>.
+.le
+.ls (cd2_2 = 1.) [real]
+Entry in the CD matrix.  Usually has the value <yscale * cos(angle)>.
+.le
+.ls (log_x1 = 0.) [real]
+The lower X axis extent in logical space over which the transformation
+is valid.
+.le
+.ls (log_x2 = 0.) [real]
+The upper X axis extent in logical space over which the transformation
+is valid.
+.le
+.ls (log_y1 = 0.) [real]
+The lower Y axis extent in logical space over which the transformation
+is valid.
+.le
+.ls (log_y2 = 0.) [real]
+The upper Y axis extent in logical space over which the transformation
+is valid.
+.le
+.ih
+EXAMPLES
+1.  The following example 
+is for an image that does not contain any WCS information.
+The image is 512x512 pixels, where the pixels are approximately 1/10th
+an arcsecond in size, whose center pixel is located at 9h 22m 30.5s
+and -15o 5m 42s and is rotated 30 degrees towards the west:
+.nf
+
+	ctype1 = 'ra---tan'
+	ctype2 = 'dec--tan'
+	crpix1 = 256.0
+	crpix2 = 256.0
+	crval1 = 140.62708
+	crval2 = -15.09500
+	cd1_1  = -2.405626e-5
+	cd1_2  = 1.388889e-5
+	cd2_1  = 1.388889e-5
+	cd2_2  = 2.405626e-5
+        log_x1 = 1.
+        log_x2 = 512.
+        log_y1 = 1.
+        log_y2 = 512.
+
+.fi
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

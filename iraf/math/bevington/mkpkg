@@ -1,0 +1,35 @@
+# Make the Bevington library.
+
+$checkout libbev.a lib$
+$update   libbev.a
+$checkin  libbev.a lib$
+$exit
+
+libbev.a:
+	agauss.f
+	area.f
+	chifit.f
+	curfit.f
+	determ.f
+	factor.f
+	fchisq.f
+	fderiv.f
+	gamma.f
+	gradls.f
+	gridls.f
+	integ.f
+	interp.f
+	legfit.f
+	linfit.f
+	matinv.f
+	pbinom.f
+	pchisq.f
+	pcorre.f
+	pgauss.f
+	ploren.f
+	polfit.f
+	ppoiss.f
+	regres.f
+	smooth.f
+	xfit.f
+	;

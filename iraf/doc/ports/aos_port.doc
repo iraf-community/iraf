@@ -1,0 +1,223 @@
+/iraf/lib
+        clpackage.cl            Changed terminal name
+        config.h                AOSVS changes (HOST_CASE, etc.)
+        iraf.h                  AOSVS changes (added defines for and, or, etc.)
+        mach.h                  MV/10000 changes
+        make.h                  MV/UX changes
+/iraf/lib/libc
+        iraf.h                  AOSVS changes
+        kernel.h                AOSVS changes
+                                The buffer size for IPC was changed from 4096
+                                to 1024, because of the error:
+                                Warning: File Read Error (STDIN) when doing
+                                set | match tty ... or ... type x | type
+                                where x was 1024 or more bytes long.  This error                                was followed by a hangup on logout, apparently
+                                waiting for the sub-process to die after sending                                it 'bye'.  The kernel routine ZFIOPR was tested
+                                to record lengths of 4096 with no problems.  I
+                                don't understand this; it looks like a weird
+                                problem in FIO.
+        knames.h                AOSVS changes
+        libc.h                  AOSVS changes
+        math.h                  Added conditional for C math functions (nint)
+        spp.h                   AOSVS changes
+        xnames.h                AOSVS changes
+/iraf/math/bevington
+        chifit.f line 103       Ambiguous transfer of control to statement 70
+/iraf/math/curfit
+        OK
+/iraf/math/deboor
+        cwidth.f line 112       Dummy argument declaration order
+        dtblok.f line 18        "
+        factrb.f line 25        "
+        fcblok.f line 29        "
+        sbblok.f line 15        "
+        shiftb.f line 33        "
+        slvblk.f line 119       "
+        subbak.f line 16        "
+        subfor.f line 21        "
+/iraf/math/gsurfit
+        OK
+/iraf/math/iminterp
+        Makelib                 ii_spline mentioned twice
+/iraf/math/interp
+        interp.h                Renamed to interpdef.h
+        clginterp.x             Not found
+/iraf/math/llsq
+        sva.f lines 179 & 181   Comma needed after P edit descriptor
+/iraf/math/surfit
+        OK
+/iraf/pkg/cl
+        bkg.c 2 places          Declaration added for long c_clktime()
+        grammar.y               Yacc conflicts: 8 shift/reduce
+        main.c                  The declarations for "rootpackage" & "clpackage"                                were made consistent with those in builtin.c so
+                                that the "btbl" static table of builtins could
+                                be properly initialized.
+        main.c  envinit()       'lib/' changed to 'lib:' ?????
+        pfiles.c line 563       In addparam() prevent dereferencing a possibly
+                                NULL pointer.
+        task.h                  prevtask and tp++ (or ++tp) didn't work due to
+         builtin.c (2 places)   AOSVS alignment of pointers.  Note: the fix for
+         debug.c                VMS was not machine independent.
+         errs.c
+         exec.c (2 places)
+         pfiles.c
+        mem.h dereference()     Changed to be machine independent.  Previous
+                                definition assumed byte addressing.
+/iraf/pkg/help
+        nomore.x .f line 39     Relational operator with logical operands.
+        manout.x                In man_breakpage(), identifier "nlines_per_page"                                was changed to "n_per_page" to shorten length of                                subroutine statement.  (RPP maximum output line
+                                length is set to 74.)
+/iraf/pkg/help/lroff
+        output.x (3 places)     'col' multiply defined
+/iraf/pkg/softools/boot/mklib
+        makefile                AOSVS changes
+        mklib.c                 AOSVS changes
+        scanlib.c               AOSVS changes
+/iraf/pkg/softools/boot/spp
+        makefile                AOSVS changes
+        readme                  AOSVS comments added
+        xc.c                    AOSVS changes
+        xc.c procedure "fatal"  Missing argument to fprintf
+/iraf/pkg/softools/boot/spp/rpp
+        makefile                AOSVS changes
+/iraf/pkg/softools/boot/spp/rpp/ratlibc
+        amove.c                 Changed link/unlink to amove for AOSVS
+        getnow.c                Removed milliseconds
+        initst.c                Changed _NFILE to 16
+        makefile                AOSVS changes
+        ratdef.h                Added RF defines
+        readf.c                 Removed declaration for fread
+        writef.c                Removed declaration for fwrite
+/iraf/pkg/softools/boot/spp/rpp/ratlibf
+        caslab.f line 32        Warning: unreachable code
+        ctomn.f                 Changed and to iand
+        gitoc.f                 Changed and to iand
+        makefile                AOSVS changes
+/iraf/pkg/softools/boot/spp/rpp/rppfor
+        baderr.f                Declared argument to be character*(*)
+        errchk.f line 78        Missing argument to call to GNBTOK
+        gtok.f line 132         Commented out B = 10 * B + C - 48
+                                to avoid fixed point overflows.
+                                Not needed since radix conversion is done in XPP        makefile                AOSVS changes
+        synerr.f                Declared argument to be character*(*)
+/iraf/pkg/softools/boot/spp/xpp
+        decl.c                  Set MAXSYM = 200.  Needed to compile
+                                /iraf/sys/gio/nsppkern/gktopenws.x because of
+                                include file nspp.com.  Note: the overflow
+                                check in d_enter is wrong.
+        makefile                AOSVS changes
+        xppcode.c               After MACHDEP, changed int to int2, int4, etc.
+        xppmain.c               Check for NULL after calling getenv
+/iraf/pkg/system
+        delete.x line 48        Relational operator with logical operands
+        match.x  line 42        Relational operator with logical operands
+                 line 76        Relational operator with logical operands
+        page.x   line 204       Relational operator with logical operands
+        sort.x   line 290       "answer" declared twice
+/iraf/sys
+        OK
+        tsort cycle: libex.a    gamove, gadraw, elogr
+        tsort cycle: libsys.a   error,  erract, xerfmt, environ, realloc,
+                                        malloc, syserr, itoc
+                                environ, realloc, malloc, xerpop, erract,
+                                         xerfmt, gstrcpy
+                                xerpop, erract, putci,  flsbuf, fexbuf,
+                                        realloc, malloc
+                                putci,  flsbuf, fexbuf, realloc, xerpop,
+                                        erract, putline
+/iraf/sys/clio
+        OK
+/iraf/sys/etc
+        environ                 envgets broken out, to avoid tsort cycle
+/iraf/sys/fio
+        fclobber.x  .f line 67  Relational operator with logical operands
+        vfnmap.x  .f line 546   Relational operator with logical operands
+/iraf/sys/fmtio
+        dtoc3.x .f line 118     Parentheses needed for unary arithmetic operator        evexpr.x .f line 393    Relational operator with logical operands
+/iraf/sys/gio
+        elogd.x  .f line 29     Parentheses needed for unary arithmetic operator        elogr.x  .f line 29     Parentheses needed for unary arithmetic operator/iraf/sys/gio/cursor
+        OK
+        tsort cycle : libcur.a  gtrctrl, gtropenws, prpsio, giotr.
+/iraf/sys/gio/gki
+        OK
+/iraf/sys/gio/glabax
+        OK
+/iraf/sys/gio/nspp
+        i1mach.f                Copied from /iraf/sys/osb
+        r1mach.f                Copied from /iraf/sys/osb
+        ibit.s                  substituted ishift.f
+                                IAND - ignored
+                                IOR - ignored
+                                ISHIFT - calls ishiftc
+/iraf/sys/gio/nspp/mctr
+        OK
+/iraf/sys/gio/nspp/nspp
+        OK
+/iraf/sys/gio/nspp/utilities
+        conrec.f line 387       Character constant broken over 2 lines
+        conterp.f line 1518     Compilier warning: padded short constant: 2HLO
+                  line 1656     "
+/iraf/sys/gio/nsppkern
+        nspp.com                Changed all () to [].
+        pixels.f line 58        Arguments to intrinsic function not of same type/iraf/sys/gio/stdgraph
+        stgrcur.x .f line 66    Relational operator with logical operands
+/iraf/sys/imio
+        OK
+/iraf/sys/imio/db
+        idbpstr.x  .f line 77   IM_NAXIS not defined in imio.h
+/iraf/sys/imio/tf
+        OK
+/iraf/sys/ki
+        kinode.com              Added arrays n_local and n_nrefs.
+/iraf/sys/libc
+        mathc.c                 Added conditional for C math functions (nint)
+        printf.c &              The machine dependent technique of handling
+        scanf.c                         a variable number of arguments was only
+                                        very obscurely documented.  All the
+                                        appropriate references of argp++ (sic)
+                                        were changed to argp-- for AOSVS.
+        OK
+/iraf/sys/memio
+        OK
+/iraf/sys/mtio
+        OK
+/iraf/sys/os
+        MANY like zfaloc, zfiomt, zfiopr, zfrnam, zlocva, zmaloc, zmfree,
+                  zopdir, zopdpr, zraloc :      return (*status = XERR);   etc.
+                                C returning a value when CALLed by F77 causes
+                                        problems, at least with OPTimized code.
+        MANY                    AOSVS versions: zawset, zfacss, zfaloc, zfchdr,
+                zfgcwd, zfinfo, zfiomt, zfiopr, zfiost, zfmkcp, zfmkdr, zfpath,
+                zfprot, zfrnam, zfsubd, zfxdir, zglobl, zgtenv, zgtime, zinit,
+                zmain,  zmaloc, zopdir, zoscmd, zsvjmp, zxwhen
+        makelib                 Dependencies corrected, and updated for AOSVS
+        zcall.c                 Dereference usage of PFI
+                                Declare all arguments to be pointers
+        zfiolp.c line 116       Defererence "dispose"
+                 line 129       ZOSCMD called with character arguments
+        zfiopl.c line 101       Same as zfiolp line 116
+                 line 114       Same as zfiolp line 129
+        zfiopr.c line 55        Cast osfn as (char *)
+        zfiotx.c line 376       Dereference "status"
+        zlocpr.c                An extra dereference was needed for AOSVS
+        zmain.c  line 118       Cast osfn as (char *)
+        zopdir.c                Modified input argument
+/iraf/sys/osb
+        acht??.c                Modification of input argument
+        bytmov.c                Bug concerning undefined variable "otop"
+        bytmov.s                MV/10000 version
+        d1mach.f                Added entries for Data General MV/10000
+        i1mach.f                "
+        r1mach.f                "
+        makelib                 AOSVS version
+        mii.x                   Removed call to high level routine "error"
+/iraf/sys/tty
+        ttyopen.x  .f line 208  Relational operator with logical operands
+        ttyputs.x  .f line 43   Arguments to intrinsic function not of same type/iraf/sys/vops
+        OK
+/iraf/sys/vops/achtgen
+        OK
+/iraf/sys/vops/ak
+        Makelib                 Replaced .s modules with .x
+/iraf/sys/vops/lz
+        Makelib                 Replaced .s modules with .x

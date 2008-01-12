@@ -1,0 +1,32 @@
+.help cvrestore Aug84 "Curfit Package"
+.ih
+NAME
+cvrestore -- restore fit parameters
+.ih
+SYNOPSIS
+cvrestore (cv, fit)
+
+.nf
+pointer	cv		# pointer to curve descriptor
+real	fit[]		# array containing curve parameters
+.fi
+.ih
+ARGUMENTS
+.ls cv    
+Pointer to curve descriptor structure. Returned by CVRESTORE.
+.le
+.ls fit  
+Array containing the curve parameters. Must have at least 7 + order
+elements, where order is the parameter set in CVINIT.
+.le
+.ih
+DESCRIPTION
+CVRESTORE returns oldcv the pointer to the curve descriptor and
+stores the curve parameters in fit in the structure ready for
+use by cveval or cvvector.
+.ih
+NOTES
+.ih
+SEE ALSO
+cvsave
+.endhelp

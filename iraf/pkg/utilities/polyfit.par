@@ -1,0 +1,5 @@
+input,f,a,STDIN,,,input files
+order,i,a,,1,20,order of polynomial
+weighting,s,h,"uniform",,,"Type of weighting (instrumental|uniform|statistical)"
+verbose,b,h,no,,,list calculated fit to data
+listdata,b,h,no,,,list X-Y pairs only

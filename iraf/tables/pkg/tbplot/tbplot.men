@@ -1,0 +1,9 @@
+Menu for the package tables.tbplot
+
+         axispar - Specify scaling attributes (pset for 'sgraph')
+         devpar - Specify device parameters (pset for 'sgraph')
+            igi - Interactive Graphics Interpreter.
+	 pltpar - Specify graph parameters (pset for 'sgraph').
+	 sgraph - Graph one or more image sections or lists.
+
+(Type "help tbplot option=sysdoc" for detailed information about 'tbplot').

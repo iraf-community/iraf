@@ -1,0 +1,85 @@
+.help tximage Jan97 tables
+.ih
+NAME
+tximage -- Extract 1-D images from cells of a 3-D table.
+.ih
+USAGE
+tximage intable output
+.ih
+DESCRIPTION
+This task extracts one or more 1-D images from cells of a 3-D table.
+The input may be a filename template, including wildcard characters, 
+or the name of a file (preceded by an @ sign) containing table names. 
+The output may be either a directory specification or a list of image names. 
+If the output is a list of images then there must be the same number of names 
+in the input and output lists, and the names are taken in pairs, one from 
+input and one from output.
+
+Images can be extracted only from a single column in the input table.
+That column must be designated by an appropriate column selector appended to 
+the table name. Type 'help selectors' to get more information on row/column 
+selector syntax.
+
+Row selectors may be used to select subsets of rows from the input table.
+If no row selector is used, all rows will be extracted, and the number
+of output images will be the number of rows in the input table.
+
+Since one input table may generate several output images, the task adopts
+the following naming scheme for these output images: their names are
+built by appending a suffix to the name given in parameter "output".
+The suffix has the form "_rXXXX", where XXXX stands for the row number 
+in the input table. The suffix is appended before the file name extension.
+The task recognizes as valid image name extensions the values ".??h",
+".fits" and ".fit". Any other extension is assumed to be part of the root
+file name. If only one row is extracted, no suffixing takes place.
+
+NOTE: Be careful when using a wildcard for the extension.
+If you have the files "table.tab" and "table.lis" in the current directory,
+for example, then the command "tximage tab* test/" would expand both files 
+to the subdirectory "test".
+
+Basic column information describing the column where the image came from
+is written into the image header in the "COLDATA" keyword. This information
+can be used later by task 'tiimage' to re-insert the image into a cell of 
+a 3-D table.
+
+The task does not propagate array dimensionality when extracting arrays
+into images. If dimensionality information exists in the 3-D table, that 
+information is lost, that is, the table cell from the input table is written 
+as a structureless, plain 1-D image.
+
+The input row number is written to the header of the output image in
+keyword ORIG_ROW. This allows 'tiimage' to put the data back where 
+'tximage' got them from.
+.ih
+PARAMETERS
+.ls intable [file name list/template]
+A list of one or more tables to be expanded. A column selector selecting
+a single column is mandatory. Row selectors are supported as well.
+.le
+.ls output [file name template]
+Either a directory name or a list of output image names.
+.le
+.ls (verbose = yes) [boolean]
+Display names of input and output files ?
+.le
+.ih
+EXAMPLES
+Extract 1-D images from a column named FLUX from rows 11 to 13 of a 3-D 
+table:
+
+.nf
+cl> tximage "table.tab[c:FLUX][r:row=(11:13)]" image
+.fi
+
+This will generate three images named "image_r0011", "image_r0012"
+and "image_r0013".
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by I. Busko.
+.ih
+SEE ALSO
+tiimage, selectors
+.endhelp

@@ -1,0 +1,16 @@
+# The MKPKG file for the io subdirectory.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	iocat.x		"../lib/io.h" <time.h> <error.h>
+	iocoeffs.x	"../lib/parser.h"  "../lib/fitparams.h"\
+			"../lib/io.h"
+	iogetline.x	"../lib/io.h"
+	iolineid.x	<ctype.h>
+	ioobs.x	        "../lib/io.h"
+	iostrwrd.x
+	;

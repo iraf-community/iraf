@@ -1,0 +1,11 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	xpp.e
+
+xpp.e:	xppmain.o lexyy.o xppcode.o decl.o
+	$(CC) $(HSI_LF) -o xpp.e $^ $(HSI_LIBS)
+	cp -p xpp.e ../../../bin/.
+
+clean::
+	rm -f *.o xpp.e ../../../bin/xpp.e

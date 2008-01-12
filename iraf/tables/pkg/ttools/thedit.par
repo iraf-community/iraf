@@ -1,0 +1,7 @@
+table,s,a,"",,,tables to be edited
+keywords,s,a,"",,,keywords to be edited
+value,s,a,".",,,value expression
+delete,b,h,no,,,delete rather than edit keywords?
+show,b,h,yes,,,print record of each edit operation?
+Version,s,h,"8Sept2000",,,"date of installation"
+mode,s,h,"al"

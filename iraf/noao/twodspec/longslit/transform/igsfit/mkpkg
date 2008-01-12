@@ -1,0 +1,21 @@
+# Interactive General Surface Fitting Package
+
+$checkout libpkg.a ../../
+$update	  libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	igscolon.x	igsfit.com <gset.h>
+	igsdelete.x	<gset.h> <mach.h> <pkg/gtools.h> <pkg/igsfit.h>
+	igsfit.x	igsfit.com <mach.h> <pkg/gtools.h> <pkg/igsfit.h>
+	igsget.x	igsfit.com <pkg/igsfit.h>
+	igsgraph.x	<gset.h> <mach.h> <pkg/gtools.h> <pkg/igsfit.h>
+	igsinit.x	<pkg/igsfit.h>
+	igsnearest.x	<gset.h> <mach.h> <pkg/igsfit.h>
+	igsparams.x	igsfit.com <pkg/gtools.h>
+	igsset.x	igsfit.com <pkg/igsfit.h>
+	igssolve.x	igsfit.com <math/gsurfit.h>
+	igsundelete.x	<gset.h> <mach.h> <pkg/gtools.h> <pkg/igsfit.h>
+	xgs.x		<math/gsurfit.h>
+	;

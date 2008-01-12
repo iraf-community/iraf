@@ -1,0 +1,190 @@
+                                                        1999 April 20
+opening and closing tables:
+
+    tbtopn - initialize (and open the table if not NEW_FILE or NEW_COPY)
+    tbtcre - create a new table (after initializing with tbtopn)
+    tbtclo - close a table
+
+table parameters:
+
+    tbpset - set a table parameter
+    tbpsta - get the value of a table parameter (e.g. number of rows)
+
+row and column selectors:
+
+    tbcdes - get the pointer to a column selector descriptor
+    tbsirow - get the actual row number from the selected row number
+
+columns:
+
+    tbcdef - define columns
+    tbcdef1 - define one column
+    tbcfnd - find columns from their names
+    tbcfnd1 - find a column from its name
+    tbcinf - get information about a column
+    tbcig[ti] - get specific info about a column (e.g. name or data type)
+    tbcnel - get number of elements in column
+    tbcga[rd] - get all elements in column
+
+get and put:
+
+    tbegt[tbirds] - get a value from the table
+    tbept[tbirds] - put a value into the table
+    tbagt[tbirds] - get an array from a row and column location
+    tbapt[tbirds] - put an array at a row and column location
+    tbrgt[tbirds] - get values from a row
+    tbrpt[tbirds] - put values into a row
+    tbcgt[tbirds] - get values from a column
+    tbcpt[tbirds] - put values into a column
+    tbrudf - set values in a row to undefined
+
+header parameters:
+
+    tbhgt[tbird] - get a header parameter
+    tbhad[tbird] - add a new header parameter or replace existing one
+    tbhpt[tbird] - replace an existing header parameter
+    tbhcal - copy all header parameters
+    tbhgnp - get Nth header parameter as a string
+    tbhgcm - get a comment associated with a header parameter
+    tbhpcm - add or replace a comment for a header parameter
+
+table files:
+
+    tbtcpy - copy a table
+    tbtdel - delete a table
+    tbtren - rename a table
+    tbtacc - test for the existence of a table
+    tbtext - append default extension (if it's not already there)
+    tbtnam - get the name (including extension) of the table
+    tbtflu - flush FIO buffer for table
+    tbfpri - copy primary header of FITS table, if appropriate
+    tbparse - get file name from table name
+
+miscellaneous:
+
+    tbtchs - change allocated space of any/all portions of a table
+    tbrcpy - copy an entire row (only for tables with identical columns)
+    tbrcsc - copy a row, but copy only selected columns
+    tbrswp - swap two rows
+    tbtsrt - sort an index for the table rows
+    tbrdel - delete a range of rows
+    tbrnll - set all columns in a range of rows to INDEF
+    tbcnam - change the name of a column
+    tbcfmt - change the format for printing a column
+    tbcnit - change the units for a column
+    tbcnum - get the column pointer from the column number
+
+Calling sequences:
+
+      nret = tbagt[] (tp, cp, rownum, buffer, first, nelem)
+      nret = tbagtt  (tp, cp, rownum, buffer, lenstr, first, nelem)
+             tbapt[] (tp, cp, rownum, buffer, first, nelem)
+             tbaptt  (tp, cp, rownum, buffer, lenstr, first, nelem)
+
+             tbcdef  (tp, cptr,
+                      colnames, colunits, colfmt, datatype, nelem, numcols)
+             tbcdef1  (tp, cp,
+                      colname, colunits, colfmt, datatype, nelem)
+
+   descrip = tbcdes (tp, cp)
+
+             tbcfmt  (tp, cp, colfmt)
+
+             tbcfnd  (tp, colnames, cptr, numcols)
+             tbcfnd1  (tp, colname, cp)
+
+    int    = tbcga[rd] (tp, cp, buffer, nelem)
+
+             tbcgt[] (tp, cp, buffer, nullflag,         firstrow, lastrow)
+             tbcgtt  (tp, cp, buffer, nullflag, lenstr, firstrow, lastrow)
+
+             tbcinf  (cp,
+                colnum, colname, colunits, colfmt, datatype, lendata, lenfmt)
+
+    int    = tbcigi  (cp, param)
+             tbcigt  (cp, param, outstr, maxch)
+
+             tbcnam  (tp, cp, colname)
+
+    int    = tbcnel (tp, cp)
+
+             tbcnit  (tp, cp, colunits)
+
+    cp     = tbcnum  (tp, colnum)
+
+             tbcpt[] (tp, cp, buffer,         firstrow, lastrow)
+             tbcptt  (tp, cp, buffer, lenstr, firstrow, lastrow)
+
+             tbegt[] (tp, cp, rownum, buffer)
+             tbegtt  (tp, cp, rownum, buffer, maxch)
+
+             tbept[] (tp, cp, rownum, buffer)
+
+             tbfpri (inname, outname, copied)
+
+             tbhad[] (tp, keyword, value)
+
+             tbhcal  (itp, otp)
+
+             tbhgcm  (tp, keyword, comment, maxch)
+             tbhpcm  (tp, keyword, comment)
+
+             tbhgnp  (tp, parnum, keyword, datatype, str)
+
+    bool   = tbhgtb  (tp, keyword)
+    double = tbhgtd  (tp, keyword)
+    int    = tbhgti  (tp, keyword)
+    real   = tbhgtr  (tp, keyword)
+             tbhgtt  (tp, keyword, text, maxch)
+
+             tbhpt[] (tp, keyword, value)
+
+    int    = tbparse (tablename, filename, extname, maxch, hdu)
+
+             tbpset  (tp, param, value)
+
+    int    = tbpsta  (tp, param)
+
+             tbrcpy  (itp, otp, irownum, orownum)
+
+             tbrcsc  (itp, otp, icptr, ocptr, irownum, orownum, numcols)
+
+             tbrdel  (tp, firstrow, lastrow)
+
+             tbrgt[] (tp, cptr, buffer, nullflag,         numcols, rownum)
+             tbrgtt  (tp, cptr, buffer, nullflag, lenstr, numcols, rownum)
+
+             tbrnll  (tp, firstrow, lastrow)
+
+             tbrpt[] (tp, cptr, buffer,         numcols, rownum)
+             tbrptt  (tp, cptr, buffer, lenstr, numcols, rownum)
+
+             tbrswp  (tp, row1, row2)
+
+             tbrudf  (tp, cptr, numcols, rownum)
+
+             tbsirow (tp, selrow, rownum)
+
+    int    = tbtacc  (tablename)
+
+             tbtchs  (tp, maxpar, maxcols, rowlen, allrows)
+
+             tbtclo  (tp)
+
+             tbtcpy  (inname, outname)
+
+             tbtcre  (tp)
+
+             tbtdel  (tablename)
+
+             tbtext  (inname, outname, maxch)
+
+             tbtflu  (tp)
+
+             tbtnam  (tp, tblname, maxch)
+
+    tp     = tbtopn  (tablename, iomode, template)
+
+             tbtren  (oldname, newname)
+
+             tbtsrt (tp, numcols, cp, fold, nindex, index)

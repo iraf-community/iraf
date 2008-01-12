@@ -1,0 +1,45 @@
+# Help directory for the XTOOLS (programming tools) package.
+
+$xtools		= "pkg$xtools/"
+$fixpix		= "pkg$xtools/fixpix/"
+$icfit		= "pkg$xtools/icfit/"
+$gtools		= "pkg$xtools/gtools/"
+$ranges		= "pkg$xtools/ranges/"
+$skywcs		= "pkg$xtools/skywcs/doc/"
+$catquery	= "pkg$xtools/catquery/doc/"
+
+revisions	sys = xtools$Revisions
+dttext		hlp = xtools$dttext.x,		src = ..
+cogetr		hlp = cogetr.hlp,		src = xtools$cogetr.x
+comap		hlp = cogetr.hlp,		src = xtools$cogetr.x
+counmap		hlp = cogetr.hlp,		src = xtools$cogetr.x
+xt_extns	hlp = xtextns.hlp,		src = xtools$xtextns.x
+xt_lsum		hlp = xtsums.hlp,		src = xtools$xtsums.x
+xt_csum		hlp = xtsums.hlp,		src = xtools$xtsums.x
+xt_lsumb	hlp = xtsums.hlp,		src = xtools$xtsums.x
+xt_lsuml	hlp = xtsums.hlp,		src = xtools$xtsums.x
+xt_maskname	hlp = xtmaskname.hlp,		src = xtools$xtmaskname.x
+xt_pmmap	hlp = xtpmmap.hlp,		src = fixpix$xtpmmap.x
+clgsec		hlp = clgsec.hlp,		src = xtools$clgsec.x
+extrema		hlp = extrema.hlp,		src = xtools$extrema.x
+getdatatype	hlp = getdatatype.hlp,		src = xtools$getdatatype.x
+gstrdetab	hlp = gstrdetab.hlp,		src = xtools$gstrdetab.x
+gstrentab	hlp = gstrentab.hlp,		src = xtools$gstrentab.x
+gstrsettab	hlp = gstrsettab.hlp,		src = xtools$gstrsettab.x
+peaks		hlp = peaks.hlp,		src = xtools$peaks.x
+ranges		hlp = ranges.hlp,		src = xtools$ranges.x
+strdetab	hlp = strdetab.hlp,		src = xtools$strdetab.x
+strentab	hlp = strentab.hlp,		src = xtools$strentab.x
+center1d	hlp = center1d.hlp,		src = xtools$center1d.x
+icfit		hlp = icfit$icfit.hlp
+inlfit		hlp = xtools$doc/inlfit.hlp
+#gtools		hlp = gtools$gtools.hlp,	pkg = gtools$gtools.hd
+gtools		hlp = gtools$gtools.hlp
+
+skywcs		hlp = skywcs$skywcs.men,
+		sys = skywcs$skywcs.hlp,
+		pkg = skywcs$skywcs.hd
+
+catquery	hlp = catquery$catquery.men,
+		sys = catquery$catquery.hlp,
+		pkg = catquery$catquery.hd

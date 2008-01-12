@@ -1,0 +1,362 @@
+<MML -- created by la2mml>
+<!DefineFont rm
+	<Family Times>
+	<pts 10>
+    <Plain><Normal>
+>
+<!DefineFont tt
+	<Family Courier>
+	<pts 10>
+    <Plain><Normal>
+>
+<!DefineFont h1
+	<Family Times>
+	<pts 18>
+    <Plain><Normal><Bold>
+>
+<!DefineFont h2
+	<Family Times>
+	<pts 14>
+    <Plain><Normal><Bold>
+>
+<!DefineFont h3
+	<Family Times>
+	<pts 12>
+    <Plain><Normal><Bold>
+>
+<!DefinePar Body
+	<rm>
+	<Alignment LeftRight>
+	<LeftIndent 0.00">
+        <FirstIndent 0.0pt>
+	<RightIndent 0.00">
+	<Leading 2pt>
+	<SpaceBefore 12pt>
+	<SpaceAfter 6pt>
+	<Autonumber No>
+	<Hyphenate Yes>
+>
+<!DefinePar ModDate
+     <tt>
+     <Alignment LeftRight>
+     <LeftIndent 0.00pt>
+     <RightIndent 0.00pt>
+     <Leading 2pt>
+     <SpaceBefore 12pt>
+     <SpaceAfter 0pt>
+     <Autonumber No>
+     <Hyphenate No>
+>
+<!DefinePar Path
+     <tt>
+     <Alignment LeftRight>
+     <LeftIndent 0.00pt>
+     <RightIndent 0.00pt>
+     <Leading 2pt>
+     <SpaceBefore 12pt>
+     <SpaceAfter 0pt>
+     <Autonumber No>
+     <Hyphenate No>
+>
+<!DefinePar Code
+	<tt>
+	<Alignment Left>
+	<LeftIndent 0.00">
+	<FirstIndent 0.00">
+	<RightIndent 0.00">
+	<Leading 2pt>
+	<SpaceBefore 0pt>
+	<SpaceAfter 0pt>
+	<Autonumber No>
+	<Hyphenate No>
+	<TabStops <TabStop 0.5"><TabStop 1.0"><TabStop 1.5"><TabStop 2.0">
+	<TabStop 2.5"><TabStop 3.0"><TabStop 3.5"><TabStop 4.0">
+	<TabStop 4.5"><TabStop 5.0"><TabStop 5.5"><TabStop 6.0">
+	<TabStop 6.5">>
+>
+<!DefinePar FirstBody
+	<rm>
+	<Alignment LeftRight>
+	<LeftIndent 0.00">
+	<FirstIndent 0.00">
+	<RightIndent 0.00">
+	<Leading 2pt>
+	<SpaceBefore 6pt>
+	<SpaceAfter 6pt>
+	<Autonumber No>
+	<Hyphenate Yes>
+>
+<!DefinePar 1Heading*
+	<h1>
+	<Alignment Left>
+	<LeftIndent 0.00">
+	<FirstIndent 0.00">
+	<RightIndent 0.00">
+	<Leading 6pt>
+	<SpaceBefore 12pt>
+	<SpaceAfter 10pt>
+	<Autonumber No>
+	<Hyphenate No>
+>
+<!DefinePar 2Heading*
+	<h2>
+	<Alignment Left>
+	<LeftIndent 0.00">
+	<FirstIndent 0.00">
+	<RightIndent 0.00">
+	<Leading 2pt>
+	<SpaceBefore 12pt>
+	<SpaceAfter 8pt>
+	<Autonumber No>
+	<Hyphenate No>
+>
+<!DefinePar 3Heading
+	<h3>
+	<Alignment Left>
+	<LeftIndent 0.50">
+	<FirstIndent 0.00">
+	<RightIndent 0.00">
+	<Leading 2pt>
+	<SpaceBefore 12pt>
+	<SpaceAfter 2pt>
+	<Autonumber No>
+	<NumberFormat "H:<n\>.<n\>.+\t">
+	<Hyphenate No>
+	<TabStops <TabStop 0.5">>
+>
+
+ 
+ 
+<HeaderFont <tt>>
+<HeaderTopMargin 36pt><FirstPageHeader Yes>
+<LeftHeader "fitsio">
+<CenterHeader "stsdas">
+<RightHeader "Feb90">
+
+ 
+<1Heading*>
+fitsio
+
+<3Heading>
+Feb90
+
+<3Heading>
+stsdas
+
+<2Heading*>
+NAME
+
+<FirstBody>
+<tt>fitsio<rm> \xd0  Overview of the <tt>fitsio<rm> package. 
+
+<2Heading*>
+DESCRIPTION
+
+<FirstBody>
+The <tt>fitsio<rm> package is a set of tasks that convert files to 
+and from FITS format.
+
+<2Heading*>
+FITS CAPABILITIES IN STSDAS
+
+<FirstBody>
+The programs under <tt>fitsio\xd5 <rm>\xd0 <tt>namely stwfits and
+strfits\xd5 <rm>\xd0 <tt>handle
+GEIS files in a reasonable
+way while maintaining consistency with the FITS standard.
+
+<Body>
+The default group parameter block (GPB), which is located at the 
+end of each group in the data file, contains values for the 
+following keywords:
+<Body>
+<Code>
+<Code>\x11  \x11  \x11  \x11  DATAMIN\x11  \x11  \x11  \x11  Minimum\x11  pixel\x11  value\x11  for\x11  group.
+<Code>\x11  \x11  \x11  \x11  DATAMAX\x11  \x11  \x11  \x11  Maximum\x11  pixel\x11  value\x11  for\x11  group.
+<Code>\x11  \x11  \x11  \x11  CRPIXn\x11  \x11  \x11  \x11  \x11  Pixel\x11  position\x11  for\x11  the\x11  'n'\x11  axis.
+<Code>\x11  \x11  \x11  \x11  CRVALn\x11  \x11  \x11  \x11  \x11  Transformation\x11  value\x11  for\x11  the\x11  'n'\x11  axis
+<Code>\x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  corresponding\x11  to\x11  the\x11  'CRPIXn'\x11  pixel.
+<Code>\x11  \x11  \x11  \x11  CDmn\x11  \x11  \x11  \x11  \x11  \x11  \x11  Matrix\x11  describing\x11  scale\x11  and\x11  orientation\x11  
+<Code>\x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  \x11  of\x11  the\x11  axis.
+<Code>
+
+<Body>
+These keywords names and the value they represent are described
+in the GEIS header file which, for each 
+parameter (i), contains the keywords <tt>PTYPEi<rm>, <tt>PDTYPEi<rm>, and 
+<tt>PSIZEi<rm>.  <tt>PTYPEi<rm> is the parameter name, <tt>PDTYPEi<rm> is its 
+data type, and <tt>PSIZEi<rm> is its size in bits.
+
+<Body>
+<tt>stwfits<rm>  lets you create one FITS file from a GEIS 
+file, retaining the information in all the groups together 
+with the group parameter block.  In <tt>stwfits<rm> there is a 
+parameter called <tt>gftoxdim<rm> which, when set, converts the 
+multigroup file to a FITS file  that has an extra dimension 
+to account for the multiple groups and an appended table that 
+contains the group parameter block.
+
+<Body>
+It is also possible to produce a separate FITS file for every 
+group in the multigroup GEIS source file.  There is then no 
+appended table; instead, group information is contained in 
+the FITS header.  If you want a separate FITS file for every 
+group, then set the parameter <tt>gftoxdim = no<rm>. (See examples.)
+
+<Body>
+Going the opposite way, <tt>strfits<rm> can be used to convert a 
+FITS file to a multigroup GEIS file while retaining its group 
+structure. Set the parameter xdimtogf to \xd2 yes" to recreate
+the multigroup GEIS file.
+
+<Body>
+If the <tt>xdimtogf<rm> parameter is set to \xd2 no" then from a FITS file
+that was created using the <tt>gftoxdim<rm> flag to \xd2 yes",
+you will get 3 files on disk. A 
+single-group GEIS file with an extra dimension, the GEIS data file 
+and a STSDAS table containing the GPB.
+
+<Body>
+If you have a tape with one FITS file per group, 
+you can reconstruct the multigroup file using the GEIS header
+file with the GPB description that you intend to include
+in your output GEIS file.
+For example, if the original
+FITS files were created from a mutigroup HRS GEIS file, then
+you will probably want to have an HRS GEIS header file handy,
+so that you can use it to pass GPB information to <tt>strfits<rm>,
+this is done through the parameter <tt>template<rm>.
+If no header filename is given to 
+<tt>template<rm>, then a default GPB will be created for the resulting
+GEIS file.
+
+<Body>
+The template file is a 
+GEIS header file containing the keywords <tt>PTYPEn<rm>, <tt>PDTYPEn<rm>, 
+and <tt>PSIZEn<rm> for each group parameter, plus the keywords 
+<tt>PCOUNT<rm> and <tt>PSIZE<rm>. The template is used by passing its file
+name to the <tt>template<rm> parameter.
+Use a header file appropriate to your FITS
+data, i.e., if the FITS files contain WF/PC data, use a WF/PC
+header file.
+
+<Body>
+A summary of options offered by <tt>stwfits<rm> and <tt>strfits<rm> 
+follows.
+
+<Body>
+<tt>stwfits<rm>:
+<Body>
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  write\x11  multigroup\x11  images\x11  in\x11  stack\x11  mode.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  write\x11  multigroup\x11  images\x11  as\x11  one\x11  FITS\x11  file\x11  
+<Code>\x11  \x11  \x11  \x11  \x11  \x11  per\x11  group.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  produce\x11  standard\x11  FITS\x11  tables\x11  from\x11  STSDAS
+<Code>\x11  \x11  \x11  \x11  \x11  \x11  tables,\x11  with\x11  'XTENSION',\x11  'TABLE'\x11  and\x11  'BINTABLE'.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  write\x11  FITS\x11  data\x11  in\x11  FITS\x11  IEEE\x11  standard.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  write\x11  a\x11  FITS\x11  file\x11  from\x11  an\x11  ASCII\x11  file.
+<Code>
+<Code>'strfits':
+<Code>
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  read\x11  all\x11  FITS\x11  files\x11  produced\x11  by\x11  'stwfits'.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  produced\x11  STSDAS\x11  images\x11  with\x11  a\x11  user-defined\x11  
+<Code>\x11  \x11  \x11  \x11  \x11  \x11  group\x11  parameter\x11  block.
+<Code>\x11  \x11  \x11  \x11  -\x11  Can\x11  read\x11  FITS\x11  files\x11  with\x11  IUE\x11  data.
+<Code>
+
+<2Heading*>
+SCALING DATA
+
+<FirstBody>
+The original FITS standard calls for all floating and double data types
+to be converted to 32-bit integer data. Scaling is done by <tt>stwfits
+<rm>by setting the parameter <tt>scale=yes<rm>, and is automatic when 
+<tt>autoscale=yes<rm>,
+i.e., the values of <tt>bscale<rm> and <tt>bzero<rm> are determined by the program.
+Hence, there is an associated loss of precision when trying to
+recover the data from FITS files to disk images.
+The new FITS standard now uses the IEEE FITS standard where single and
+double precision data is stored in IEEE floating point format. No loss
+of precision occurred when using this facility. Set the <tt>ieee<rm> parameter
+to <tt>yes<rm> in the <tt>stwfits<rm> task to write your data in this new standard.
+
+<2Heading*>
+WRITING MULTIGROUP IMAGES AS FITS FILES AND VICEVERSA
+
+<FirstBody>
+1) Use <tt>stwfits<rm> with the <tt>gftoxdim<rm> parameter set to \xd2 yes" 
+and the output files directed to a remote Sun machine to create a 
+FITS file with an extra dimension to account for a multigroup 
+GEIS file with a table for the group parameter block 
+information. Be sure to use the <tt>ieee<rm> parameter to preserve 
+the precision of floating point values. You can use a tape for
+output; the procedure is the same.
+
+<Body>
+For example, use the following command to tranfer all files 
+with extension <tt>.c1h<rm>.
+<Body>
+<Code>\x11  \x11  fi\>\x11  stwfits\x11  *.c1h\x11  \x11  sol!/sol/u1/user/root\x11  gftoxdim=yes\x11  ieee+
+<Code>
+
+<Body>
+If you want to recreate the original multigroup
+file, you can perform the operation in one step with the following
+command:
+<Body>
+<Code>
+<Code>\x11  \x11  fi\>\x11  strfits\x11  root*\x11  \x11  iraf_file=groot\x11  \x11  xdimtogf+\x11  old+\x11  
+<Code>
+<Code>
+
+<Body>
+2) Use <tt>strfits<rm> to read the files and create a GEIS file 
+with an extra dimension and a table. If scaling was performed 
+in the FITS file then set the appropriate parameter to create 
+the GEIS file with a data type other than the FITS file 
+default.
+
+<Body>
+For example:
+<Body>
+<Code>
+<Code>\x11  \x11  fi\>\x11  set\x11  imtype=hhh
+<Code>\x11  \x11  fi\>\x11  strfits\x11  root*\x11  \x11  iraf_file=groot\x11  \x11  old+\x11  \x11  xdimtogf-
+<Code>
+<Code>
+
+<Body>
+Notice than you want to set <tt>imtype=hhh<rm> (for GEIS files)        
+and have the original name on the output files.
+
+<Body>
+With the command above you will end up with 3 files: the header, 
+the data, and the table containing the group parameter block. The 
+resulting GEIS file name will have a suffix <tt>_cvt<rm> appended to the
+root name letting you know the image have an extra dimension and
+that a table filename has been created with the same root name,
+with group parameter block information.
+
+<Body>
+3) Use <tt>strfits<rm> to read 4 FITS files from tape and create 
+one GEIS image with 4 groups. Assume the FITS files contain
+WF/PC data. Use a template file with a GEIS WF/PC header file,
+e.g., <tt>twfpc.hhh<rm>.
+<Body>
+<Code>
+<Code>\x11  \x11  fi\>\x11  strfits\x11  mta\x11  1-4\x11  \x11  newpfc.hhh[1/4]\x11  \x11  template='twfpc.hhh'\x11  xdimtogf-
+<Code>
+<Code>
+
+<Body>
+You need to tell <tt>strfits<rm> that the resulting GEIS file will
+have 4 groups and that you are starting with group 1. The <tt>xdimtogf
+<rm>is set to \xd2 no" since you don\xd5 t have a FITS file with an extra dimension.
+
+<2Heading*>
+SEE ALSO
+
+<FirstBody>
+strfits, stwfits
+
+<Body>
+document

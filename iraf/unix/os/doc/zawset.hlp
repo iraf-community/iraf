@@ -1,0 +1,42 @@
+.help zawset May84 "System Interface"
+.ih
+NAME
+zawset -- adjust working set size
+.ih
+SYNOPSIS
+.nf
+zawset (requested_size, newsize, oldsize, textsize)
+
+int	requested_size		# desired working set size, bytes
+int	newsize			# working set allocated, bytes
+int	oldsize			# old working set size, bytes
+int	textsize		# size of text segment
+.fi
+.ih
+DESCRIPTION
+Adjust the amount of physical memory allocated to a process, i.e., the
+working set size on a virtual memory machine.  The amount of additional
+data space that can be allocated and used by a process without thrashing
+on a virtual memory machine is \fInewsize\fR bytes minus some fraction
+of the text segment size (executable instructions) and minus the data space
+already in use.
+
+The actual working set size returned in \fInewsize\fR need not be what was
+requested.  The old working set size \fIoldsize\fR may be used to reset the
+working set size of the process to its original value when the space is no
+longer needed.  If \fIrequested_size\fR is negative or zero the current size is
+returned in both output arguments and the working set size is not changed.
+On a nonvirtual memory machine the "working set size" is a machine constant
+fixed by the addressing range of the hardware, hence the requested size is
+ignored.
+.ih
+RETURN VALUE
+Valid \fInewsize\fR, \fIoldsize\fR and \fBtextsize\fR are always returned.
+.ih
+NOTES
+It is up to the high level code to supply the necessary heuristics to avoid
+thrashing on a virtual memory machine.
+.ih
+SEE ALSO
+zmalloc, zmfree, zraloc
+.endhelp

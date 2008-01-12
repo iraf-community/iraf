@@ -1,0 +1,5 @@
+intable,s,a,"",,,">Input tables"
+output,s,a,"",,,">Output images or directory"
+verbose,b,h,yes,,,">Print operations performed ?"
+version,s,h,"03Jan97",,,
+mode,s,h,"al",,,

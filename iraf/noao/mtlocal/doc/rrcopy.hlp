@@ -1,0 +1,65 @@
+.help rrcopy Jun87 noao.mtlocal
+.ih
+NAME
+rrcopy -- Convert IPPS rasters from RCOPY tapes to IRAF images
+.ih
+USAGE
+rrcopy rcopy_file raster_list iraf_file
+.ih
+PARAMETERS
+.ls rcopy_file
+The RCOPY data source, i.e., the name of a magtape device or a RCOPY
+format disk file.
+.le
+.ls raster_list
+A string listing the IPPS rasters to be read from the rcopy file.
+.le
+.ls iraf_file
+The IRAF file which will receive the RCOPY data if the make_image parameter
+is set.  If more than one raster is being read, the output filenames
+will be concatenated from this
+parameter and the raster sequence number on the RCOPY tape.  That
+is, reading rasters 1 thru 8 from tape into iraf_file 'pic'
+would generate a sequence of files: pic001, pic002, ..., pic008.
+.le
+.ls make_image = yes
+This switch determines whether RCOPY image data is converted to an IRAF image
+file.  When this switch it set to no, only a listing is produced, no output
+image is written. 
+.le
+.ls print_header = yes
+This switch determines if the header information will be printed for those
+rasters in "raster_list".  (It might be appropriate to set print_header=no, or
+redirect the output, if RRCOPY is being run as a background task.)
+.le
+.ls data_type = ""
+The data type of the output IRAF image.  If an incorrect data_type or null 
+string is entered, the default data type used is
+determined by the number of bits per pixel in the IPPS raster.
+.le
+.ih
+DESCRIPTION
+IPPS rasters stored on RCOPY tapes are read from the specified source.
+IPPS raster header information is listed.  The image data may optionally
+be converted to an IRAF image file.  It takes RRCOPY about 16 cpu seconds
+to read a 256 x 256 30-bit IPPS raster; 42 cpu seconds for a 320 x 512
+30-bit raster; 34 cpu seconds for a 320 x 512 20-bit raster.
+.ih
+EXAMPLES
+
+[1] List all IPPS headers from an RCOPY tape:
+
+	cl> rrcopy mtb 1-999 make_image=no
+
+[2] Read the first 5 rasters from tape into IRAF images ipps001 
+through ipps005 with default data types:
+
+	cl> rrcopy mtb 1-5 ipps
+.ih
+BUGS
+The Cyber format readers, including \fIrrcopy\fR, have not been implemented
+on SUN/IRAF and AOS/IRAF.
+
+The current version of IRAF magtape I/O does not read beyond the first 
+volume of a multivolume tape.
+.endhelp

@@ -1,0 +1,52 @@
+Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+The IRAF software is publicly available, but is NOT in the public domain.
+The difference is that copyrights granting rights for unrestricted use and
+redistribution have been placed on all of the software to identify its authors.
+You are allowed and encouraged to take this software and use it as you wish,
+subject to the restrictions outlined below.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation is hereby granted without fee, provided that the above copyright
+notice appear in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that references to
+the Association of Universities for Research in Astronomy Inc. (AURA),
+the National Optical Astronomy Observatories (NOAO), or the Image Reduction
+and Analysis Facility (IRAF) not be used in advertising or publicity
+pertaining to distribution of the software without specific, written prior
+permission from NOAO.  NOAO makes no representations about the suitability
+of this software for any purpose.  It is provided "as is" without express or
+implied warranty.
+
+NOAO DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL NOAO
+BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN 
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+NCARGRAPHICS Software Copyright Information
+
+The IRAF plot package includes four tasks (contour, surface, hafton, velvect)
+which call subroutines from the NCARGRAPHICS GKS-compatible graphics software
+package, version 1.0.  The source for the NCARGRAPHICS software package has
+been modified for use within IRAF and is included on our source distribution
+tapes. Under new guidelines from the NSF, the NCARGRAPHICS software
+package is not in the public domain.  We have been granted permission
+by UCAR to redistribute the NCARGRAPHICS software by agreeing to
+inform our users of the following terms and conditions.
+
+"Under new guidelines from the National Science Foundation, this NCAR
+software package is copyrighted and, therefore, not in the public domain.
+Distribution by NCAR does not include the right of the recipient or user 
+to redistribute this software or to copy this software, except for one
+copy for archival purposes only.  Distribution is permitted only under
+agreement with the University Corporation for Atmospheric Research
+(UCAR).  Requests for redistribution and/or copying of the software
+must be submitted in writing to: NCAR Contracts Office, Software
+Distribution, P.O. Box 3000, Boulder, CO 80307.  We request that NCAR
+be acknowledged as the source of software used in any resulting
+research, publications, or sub-distributions.  UCAR does not indemnify any
+infringement of copyright, patent or trademark through use or
+modification of this software."

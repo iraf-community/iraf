@@ -1,0 +1,8 @@
+# GRADIENT FILTER
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+gradient,s,a,,,,'Gradient filter (0,45,90,135,180,225,270,315)'
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+mode,s,h,'ql'

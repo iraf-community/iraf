@@ -1,0 +1,12 @@
+SIMPLE  =                    F /                                                
+BITPIX  =                   32 /                                                
+DATATYPE= 'REAL*4          '   /                                                
+NAXIS   =                    1 /                                                
+NAXIS1  =                   12 /                                                
+GROUPS  =                    F /                                                
+PSIZE   =                  0   /                                                
+GCOUNT  =                    1 /                                                
+PCOUNT  =                   0  /                                                
+COMMENT  This File is used by Fitsio/read fits program when trying to           
+COMMENT  create an image (geis file) with no gpb.                               
+END                                                                             

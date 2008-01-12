@@ -1,0 +1,90 @@
+Some notes on the fio system.
+    Binary files.
+	open the binary file with
+    fio_fd = fopnbf(dev_name, mode, zopn_dev, zard_dev, zawr_dev,
+		zawt_dev, zstt_dev, zcl_dev)
+	where dev_name is a char string, terminated with EOS,
+	mode is READ_ONLY, READ_WRITE, WRITE_ONLY, NEW_FILE, APPEND,
+		TEMP_FILE, NEW_COPY
+	and the z routines are for open, read, write, wait, get status,
+	and close ( see system interface reference manual).
+    
+    The fio_fd that is returned is then used in calls to read, write, and flush.
+    They have the form   write(fio_fd, buffer, #_of_chars)
+			 read (fio_fd, buffer, #_of_chars)
+			 flush(fio_fd)
+			 seek (fio_fd, loffset)
+		long =   note (fio_fd)
+    The output data will be buffered in a buffer of CHAR size as set by
+    a kernel call to zstt().  This can be overridden by
+	fsetl(fio_fd, F_BUFSIZE, buffer_size_in_char)
+    Partially filled buffers can be forced out by "flush".
+    Input data is buffered up before being made available to the
+    user;  if an i/o call is needed to fill the buffer and it returns with
+    an inadequate number of data items, then the read returns with fewer
+    than requested itmes.
+    The file system can be made to use an external (local) buffer by
+	fseti(fio_fd, F_BUFPTR, new_buffer)
+    For general image i/o, it is desirable to set the ASYNC parameter to YES
+	fseti(fio_fd, F_ASYNC, YES)
+    If the device has a specific block size, this can be set by
+	fseti(fio_fd, F_BLKSIZE, value);
+    the file system will use this value for checking validity of block offsets
+    in reads and writes.  If the value is zero, the device is considered a
+    "streaming" device, and no checks are done.
+
+(from Doug)
+The device block size parameter is set at open time by all call to ZSTT__.
+FIO is permissive and allows one to set almost anything with FSET, but some
+of the parameters are best considered read only.  This is documented at the
+parameter level in <fset.h>.
+
+Image displays are NOT streaming devices, they are random access, block
+structured devices.  If you wish to defeat block alignment checking then
+ZSTT__ may return a block size of 1 char.  Note that not all image displays
+are addressable at the pixel level.  Even those that are are may be most
+efficiently accessed using line at a time i/o (block size equals 1 line).
+
+If the block size is set to 1 FIO will still access the device in chunks
+the size of the FIO buffer.  The file area is partitioned up into a series
+of "pages" the size of the FIO buffer and FIO will fault these pages in and
+out when doing i/o.  The only advantages of a block size of 1 are that the
+FIO buffers may be any size (not much of an advantage), and more significantly,
+AREAD and AWRITE calls may be used to randomly access the device.  The latter
+are asynchronous and are not buffered, and are the lowest level of i/o
+provided by FIO.
+
+    The form for the z routines is
+	zopn_dev(dev_name, mode, channel)
+	zard_dev(channel, buffer, length, offset)
+	zawr_dev(channel, buffer, length, offset)
+	zawt_dev(channel, bytes_read/written)
+	zstt_dev(channel, what, lvalue)
+	zcl_dev (channel, status)
+
+    where channel is some number to be used however the z routines want, but
+    in the simplest case and under UNIX, would be the file descriptor of the
+    open file as determined by zopn_dev, or, in case of error, is ERR.
+    length and offset are in BYTES.  zstt_dev() will be handled locally.
+
+Bytes, yes, but the file offsets are one-indexed.  See the System Interface
+reference manual.
+ 
+    Each of the z*_dev routines above, with the exception of zstt_dev, will
+    ultimately result in a call to one of the system z routines for binary
+    files: zopnbf, zardbf, zawrbf, zawtbf, zclsbf.  These routines take
+    the same arguments as the z*_dev routines, with the exception that
+    unix_fd is to be substituted for channel.  "unix_fd" is the actual
+    file descriptor that results from the "real" open of the device by
+    zopnbf.  It does not need to be visible above the z*_dev routines.
+
+The FIO z-routines for a device do not necessarily resolve into calls to the
+ZFIOBF driver.  It is desirable to structure things this way if we can since
+it reduces the size of the kernel, but if necessary the z-routines can be
+system dependent.  Since the IIS is data driven and is interfaced in UNIX
+as a file we were able to use the existing ZFIOBF driver, resulting in a
+very clean interface.  New devices should also be interfaced this way if
+possible.  For various reasons a data stream interface is almost always
+preferable to a control interface (like Sebok's Peritek driver).  I would
+seriously consider adding a layer on a control driven device driver to make
+it appear to be data driven, if the driver itself could not be modified.

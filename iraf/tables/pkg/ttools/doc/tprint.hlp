@@ -1,0 +1,276 @@
+.help tprint Aug1999 tables
+.nj
+.ih
+NAME
+tprint -- Convert an STSDAS table to a readable ASCII file.
+.ih
+USAGE
+tprint table
+.ih
+DESCRIPTION
+This task is similar to the 'tdump' task in that it takes an STSDAS
+table and produces a file in ASCII format;
+however, this task offers more control over the appearance
+of the final product and better prepares it for printing.
+Formatting options are available
+to control the width and length of a page,
+and to produce the output in HTML, TeX or LaTeX format.
+
+By default, all rows and columns in the input tables will be printed,
+but the 'rows' and 'columns' parameters can be used
+to limit the range of rows and columns, respectively, that will be used.
+When using the TeX or LaTeX options,
+the number of output columns is limited to 52.
+For the HTML option,
+all the rows and columns that are to be printed
+will be written to one HTML table,
+rather than broken into pages.
+There is no limit to the number of columns in ASCII format;
+however, if the aggregate column width exceeds the page width
+the output will be produced in sections
+with columns kept together on a page--lines will not wrap.
+If different columns for each row are printed on separate pages,
+the row number will appear on each page, if 'showrow = yes'.
+
+The output will be printed to the standard output.
+.ih
+PARAMETERS
+.ls table [file name template]
+The file names of tables to be printed.
+This parameter will accept a general file name template,
+containing wildcard characters,
+individual file names with each file name separated by a comma,
+or the name of a list file (preceded by the "@" character)
+containing the file names of all tables to be processed.
+If more than one table is to be processed,
+a blank line will be printed between tables.
+.le
+.ls (prparam = no) [boolean]
+Should the header parameters be printed?
+.le
+.ls (prdata = yes) [boolean]
+Should the table data be printed?
+.le
+.ls (pwidth = 80) [integer, min=40, max=INDEF]
+If the output is redirected,
+'pwidth' specifies the width of the output page;
+otherwise, the screen size is taken from the environment variable 'ttyncols'.
+Columns that are too wide to fit within this page size
+(allowing also for the row number) will be truncated.
+
+This parameter is not used if option = "html".
+.le
+.ls (plength = 0) [integer, min=0, max=INDEF]
+Lines of data per page.
+This is the number of rows from the table to be printed on each page;
+it does not include the line of column names.
+It does, however, include any blank lines inserted in the data
+because the user specified a value for 'lgroup'.
+The default of zero gives no page breaks.
+
+This parameter is not used if option = "html".
+
+If the 'sp_col' parameter is not null
+or if the 'lgroup' parameter is greater than zero,
+the blank lines between groups are included in the count of lines per page.
+Thus 'lgroup = 50' and 'plength = 51' would be consistent
+and would give the same result as 'lgroup = 0', 'plength = 50'.
+.le
+.ls (showrow = yes) [boolean]
+Print the number of each row?
+
+If more than one page is needed in order to print all the columns specified,
+then the row numbers will be printed on each page.
+If 'showrow = no' then row numbers are not printed.
+.le
+.ls (orig_row = yes) [boolean]
+Print row numbers of the underlying table?
+
+This parameter only has an effect if a row selector expression
+was included with the table name,
+in which case the table appears to have fewer rows
+than are actually present in the underlying table
+(the complete table, including all rows).
+When 'orig_row' is yes, the default,
+the row numbers printed are those in the underlying table;
+when 'orig_row' is no,
+the selected rows are numbered sequentially starting with one,
+as if those were the only rows in the table.
+.le
+.ls (showhdr = yes) [boolean]
+Print header information?
+
+The table name, date of last modification,
+and column names are printed only if 'showhdr = yes'.
+If the 'option' parameter (see below) is set to either "latex" or "tex",
+then 'showhdr' will affect the printing of
+the default macro definitions for column separators
+and the end-of-line string as well as the begin-table string
+(i.e., "\begin{tabular}..." or "\halign...").
+.le
+.ls (showunits = yes) [boolean]
+Print the units for each column?  If 'showunits = yes'
+then the column units will be printed on the line below the column names.
+.le
+.ls (columns = "") [string]
+The names of the columns to be printed.
+An alternative way to do this
+is to use a column selector with the table name
+(type "help selectors" for more information).
+
+A null or blank string means print all columns.
+This parameter is a column template--that is,
+either a list of column names
+or a template that can contain wildcard characters.
+The column names should be separated by commas or white space.
+The list of column names can be placed in a file
+and the name of the file preceded by "@" passed to 'columns'.
+If the first character in the column template
+is the negation character (either "~" or "!"),
+all columns NOT named will be printed.
+
+If you want to use a list file for this parameter,
+the 'tlcol' task can be used to make the list
+(be sure to set the 'nlist' parameter to 1).
+Using the 'tlcol' task can eliminate potential problems
+caused by incorrect spelling.
+The list produced by 'tlcol' can also be edited to
+rearrange column names (to change the order for printing)
+or to delete unwanted columns.
+.le
+.ls (rows = "-") [string]
+The range of rows which are to be printed.
+An alternative way to do this
+is to use a row selector with the table name
+(type "help selectors" for more information).
+
+This parameter takes a character string
+defining either specific rows to be printed,
+a range of rows, or upper or lower limits on row numbers.
+The default value "-" means print all rows.
+The first ten rows could be specified as rows="1-10" or just rows="-10".
+To print the first ten rows
+and all rows from 900 through the last (inclusive), use rows="-10,900-".
+Setting rows="1,3,7,23" will print only those four rows.
+It is not an error to specify rows larger than the largest row number;
+excess row numbers will simply be ignored.
+(For more information type "help ranges".)
+.le
+.ls (option = "plain") [string, allowed values: plain | html | latex | tex]
+The format in which output will be produced.
+If option = "plain", the output will be ordinary ASCII text which may
+be read or printed directly.
+(See also the 'align' parameter, below.)
+
+If option = "html",
+the output will be formatted with HTML tags,
+and the output should be redirected to a file having the extension ".html".
+
+If option = "latex",
+the output will be formatted for use as input to LaTeX,
+and if option = "tex",
+the output will be formatted for use as input to TeX.
+In these two cases the output should be redirected to a file having
+the extension ".tex".
+Each value in each row will be preceded by a column-separator of the
+form "\cola" through "\colz", "\colA" through "\colZ".
+(Yes, there
+is a limit of 52 columns to be printed on one page.)  If the row number
+is printed (i.e., by using the 'showrow' parameter) it will
+be preceded by the string "\colzero"; the string "\cola" always
+precedes the first column from the table.
+The default definitions assign "\null" to the first of these
+(either "\colzero" or "\cola") and assign "&" to all the rest.
+Each row may span several physical rows and is terminated by "\eol",
+which has the default definition of "\\" or "\cr" as appropriate.
+(See also the description of the parameter 'showhdr').
+.le
+.ls (align = yes) [boolean]
+Increase column width to align with header?  This parameter is only useful
+when option = "plain".
+If 'align = no', the print format stored in the table for each column
+will be used without modification.
+This can cause a problem in that some
+column names may be longer that the field width for those columns,
+consequently, the column names and their values will be misaligned
+(this is especially true of subsequent columns).
+The default value 'align = yes' will force the columns to be aligned
+with the column names regardless of the print format.
+Note that you can set 'showhdr = no' but 'align = yes', in which case the
+column names will not be printed, but the columns will be spaced the
+same as if the names were printed.
+.le
+.ls (sp_col = "") [string]
+This is the name of a column in the table.
+If it is specified (non-null),
+and if the column is found in the input table,
+a blank line will be printed
+whenever the value in this column changes
+from the value in the preceding row
+(or from the preceding element,
+if 'sp_col' contains arrays).
+
+The equality test is made on formatted
+values in the column so that the user has more control over spacing
+when the data type of 'sp_col' is either real or double.
+The print format may be changed using either the 'tedit' or 'tchcol' tasks.
+Both 'sp_col' and 'lgroup' may be used together,
+which may be useful if the 'sp_col' column does not change very often.
+.le
+.ls (lgroup = 0) [integer, min=0, max=INDEF]
+Print a blank line after each 'lgroup' lines.
+If 'lgroup' is greater than zero,
+a blank line will be printed between each block of 'lgroup' lines.
+These blank lines are included in the count for 'plength' (page length).
+For example, if lgroup = 10 and plength = 55,
+five groups of ten lines will be produced for each page;
+lgroup = 5, plength = 60 will
+give ten groups of five lines per page.
+The count of lines for these groups is reset at the beginning of each page,
+so even if lgroup+1 does not divide into 'plength',
+the first group on each page will have 'lgroup' lines.
+
+If any column that is being printed contains array elements
+rather than just scalar values,
+grouping by 'lgroup' will be applied to array elements
+rather than to row numbers.
+If option = "plain"
+and the window width (or 'pwidth' if output is redirected)
+is not large enough for all the columns,
+the spacing can be by row number on some pages
+and element number on other pages,
+depending on which columns fit on those pages
+(i.e. whether the columns contain arrays).
+.le
+.ih
+EXAMPLES
+1.  Print all tables in the default directory.
+
+.nf
+	tt> tprint *.tab
+.fi
+
+2.  Print 'junk.tab', but rearrange the columns.
+
+.nf
+	tt> tlcol junk nlist=1 >colnames.lis
+	tt> edit colnames.lis
+        (Rearrange the column names and perhaps delete some of them.)
+	tt> tprint junk columns=@colnames.lis
+.fi
+
+3.  After using the 'tinfo' task to find that 'big.tab' has 100000 rows,
+print the first five and last five rows.
+
+.nf
+	tt> tprint big rows="1-5,99996-"
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tdump, ranges
+.endhelp

@@ -1,0 +1,42 @@
+# Parameter file for the XREGISTER task
+
+input,s,a,,,,Input images to be registered
+reference,s,a,,,,Input reference images 
+regions,s,a,"",,,Reference image regions used for registration
+shifts,f,a,"",,,Input/output shifts database file
+output,s,h,"",,,Output registered images
+databasefmt,b,h,yes,,,Write the shifts file in database format ?
+append,b,h,no,,,Open shifts database for writing in append mode ?
+records,s,h,"",,,List of shifts database records
+coords,f,h,"",,,Input coordinate files defining the initial shifts
+xlag,i,h,0,,,Initial shift in x
+ylag,i,h,0,,,Initial shift in y
+dxlag,i,h,0,,,Incremental shift in x
+dylag,i,h,0,,,Incremental shift in y
+
+background,s,h,"none","|none|mean|median|plane|",,Background fitting function
+border,i,h,INDEF,,,Width of border for background fitting
+loreject,r,h,INDEF,,,Low side k-sigma rejection factor
+hireject,r,h,INDEF,,,High side k-sigma rejection factor
+apodize,r,h,0.0,0.0,0.5,Fraction of endpoints to apodize
+filter,s,h,"none","|none|laplace|",,Spatially filter the data
+
+correlation,s,h,"discrete","|discrete|fourier|difference|file|",,Cross-correlation function
+xwindow,i,h,11,3,,Width of correlation window in x
+ywindow,i,h,11,3,,Width of correlation window in y
+
+function,s,h,"centroid","|none|centroid|sawtooth|parabola|mark|",,Correlation peak centering function
+xcbox,i,h,5,3,,X box width for centering correlation peak
+ycbox,i,h,5,3,,Y box width for fitting correlation peak
+
+interp_type,s,h,"linear",,,'Interpolant'
+boundary_type,s,h,"nearest","|constant|nearest|reflect|wrap|",,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0.0,,,Constant for constant boundary extension
+
+interactive,b,h,no,,,Interactive mode ?
+verbose,b,h,yes,,,Verbose mode ?
+graphics,s,h,"stdgraph",,,The standard graphics device
+display,s,h,"stdimage",,,The standard image display device
+gcommands,*gcur,h,"",,,The graphics cursor
+icommands,*imcur,h,"",,,The image display cursor
+mode,s,h,ql,,,

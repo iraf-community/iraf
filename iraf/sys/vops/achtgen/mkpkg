@@ -1,0 +1,25 @@
+# The files in this directory are the higher level type conversion routines.
+# The most general routine is ACHT, which can convert an array of any of the
+# nine datatypes UBcsilrdx to any of the other types (it will cause 100
+# additional subroutines to be linked).  One level down in the structure tree
+# are the ACHTx routines, which will convert an array of type X to any other
+# type.  At the bottom are the ACHTxy routines, which convert from type X
+# to type Y; these procedures are in vops$ak and osb$.
+
+$checkout libvops.a lib$
+$update   libvops.a
+$checkin  libvops.a lib$
+$exit
+
+libvops.a:
+	acht.x
+	achtb.x
+	achtc.x
+	achtd.x
+	achti.x
+	achtl.x
+	achtr.x
+	achts.x
+	achtu.x
+	achtx.x
+	;

@@ -1,0 +1,15 @@
+# CTYPE.H -- Character type definitions.
+
+define	IS_UPPER	($1>='A'&&$1<='Z')
+define	IS_LOWER	($1>='a'&&$1<='z')
+define	IS_DIGIT	($1>='0'&&$1<='9')
+define	IS_PRINT	($1>=' '&&$1<177B)
+define	IS_CNTRL	($1>0&&$1<' ')
+define	IS_ASCII	($1>0&&$1<=177B)
+define	IS_ALPHA	(IS_UPPER($1)||IS_LOWER($1))
+define	IS_ALNUM	(IS_ALPHA($1)||IS_DIGIT($1))
+define	IS_WHITE	($1==' '||$1=='\t')
+define	TO_UPPER	($1+'A'-'a')
+define	TO_LOWER	($1+'a'-'A')
+define	TO_INTEG	($1-'0')
+define	TO_DIGIT	($1+'0')

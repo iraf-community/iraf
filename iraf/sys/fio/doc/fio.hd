@@ -1,0 +1,54 @@
+# Help directory for the FIO (file i/o) system package.
+
+$fio	= "sys$fio/"
+
+access		hlp = access.hlp,		src = fio$access.x
+aread		hlp = aread.hlp,		src = fio$aread.x
+areadb		hlp = areadb.hlp,		src = fio$areadb.x
+await		hlp = await.hlp,		src = fio$await.x
+awaitb		hlp = awaitb.hlp,		src = fio$awaitb.x
+awrite		hlp = awrite.hlp,		src = fio$awrite.x
+awriteb		hlp = awriteb.hlp,		src = fio$awriteb.x
+close		hlp = close.hlp,		src = fio$close.x
+delete		hlp = delete.hlp,		src = fio$delete.x
+diropen		hlp = diropen.hlp,		src = fio$diropen.x
+falloc		hlp = falloc.hlp,		src = fio$falloc.x
+fcopy		hlp = fcopy.hlp,		src = fio$fcopy.x
+fdevbf		hlp = fdevbf.hlp,		src = fio$fdevbf.x
+fdevtx		hlp = fdevtx.hlp,		src = fio$fdevtx.x
+finfo		hlp = finfo.hlp,		src = fio$finfo.x
+flush		hlp = flush.hlp,		src = fio$flush.x
+fnextn		hlp = fnextn.hlp,		src = fio$fnextn.x
+fnldir		hlp = fnldir.hlp,		src = fio$fnldir.x
+fnroot		hlp = fnroot.hlp,		src = fio$fnroot.x
+fntcls		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntclsb		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntgfn		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntgfnb		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntlenb		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntopn		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntopnb		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fntrewb		hlp = fntgfn.hlp,		src = fio$fntgfn.x
+fopnbf		hlp = fopnbf.hlp,		src = fio$fopnbf.x
+fopntx		hlp = fopntx.hlp,		src = fio$fopntx.x
+fowner		hlp = fowner.hlp,		src = fio$fowner.x
+fpathname	hlp = fpathname.hlp,		src = fio$fpathname.x
+fseti		hlp = fseti.hlp,		src = fio$fseti.x
+fstati		hlp = fstati.hlp,		src = fio$fstati.x
+fstatl		hlp = fstatl.hlp,		src = fio$fstatl.x
+fstats		hlp = fstats.hlp,		src = fio$fstats.x
+getc		hlp = getc.hlp,			src = fio$getc.x
+getline		hlp = getline.hlp,		src = fio$getline.x
+mktemp		hlp = mktemp.hlp,		src = fio$mktemp.x
+note		hlp = note.hlp,			src = fio$note.x
+open		hlp = open.hlp,			src = fio$open.x
+protect		hlp = protect.hlp,		src = fio$protect.x
+putc		hlp = putc.hlp,			src = fio$putc.x
+putcc		hlp = putcc.hlp,		src = fio$putcc.x
+putline		hlp = putline.hlp,		src = fio$putline.x
+read		hlp = read.hlp,			src = fio$read.x
+rename		hlp = rename.hlp,		src = fio$rename.x
+reopen		hlp = reopen.hlp,		src = fio$reopen.x
+seek		hlp = seek.hlp,			src = fio$seek.x
+stropen		hlp = stropen.hlp,		src = fio$stropen.x
+write		hlp = write.hlp,		src = fio$write.x

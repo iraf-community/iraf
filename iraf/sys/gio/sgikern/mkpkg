@@ -1,0 +1,53 @@
+# Make the GIO/SGIKERN simple graphics kernel.
+
+$checkout libsgi.a lib$
+$update   libsgi.a
+$checkin  libsgi.a lib$
+$call     relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:	
+	$omake  x_sgikern.x
+	$link	x_sgikern.o -lsgi
+	;
+
+install:				# install in system library
+	$move	x_sgikern.e bin$
+	;
+
+libsgi.a:
+	sgicancel.x	sgi.com sgi.h
+	sgiclear.x	sgi.com sgi.h <mach.h>
+	sgiclose.x	sgi.com sgi.h
+	sgiclws.x	sgi.h sgi.com
+	sgicolor.x	sgi.com sgi.h
+	sgidrawch.x	font.com font.h greek.com sgi.com sgi.h \
+			<gki.h> <gset.h> <math.h>
+	sgiescape.x	
+	sgifa.x		sgi.com sgi.h
+	sgifaset.x	sgi.com sgi.h <gki.h>
+	sgiflush.x	sgi.com sgi.h
+	sgifont.x	sgi.com sgi.h <gki.h> <gset.h>
+	sgigcell.x	
+	sgiinit.x	sgi.com sgi.h <ctype.h> <gki.h> <mach.h>
+	sgiline.x	sgi.com sgi.h <gset.h>
+	sgiopen.x	sgi.com sgi.h <gki.h>
+	sgiopenws.x	sgi.com sgi.h <error.h> <gki.h> <mach.h>
+	sgipcell.x	sgi.com sgi.h <gki.h>
+	sgipl.x		ltype.dat sgi.com sgi.h <gki.h> <gset.h>
+	sgiplset.x	sgi.com sgi.h <gki.h>
+	sgipm.x		sgi.com sgi.h <gki.h>
+	sgipmset.x	sgi.com sgi.h <gki.h>
+	sgireset.x	sgi.com sgi.h <gset.h> <gki.h>
+	sgitx.x		font.com font.h greek.com sgi.com sgi.h \
+			<gki.h> <gset.h> <math.h>
+	sgitxset.x	sgi.com sgi.h <gki.h> <gset.h>
+	sgk.x		sgk.com sgk.h <chars.h> <gki.h> <mach.h>
+	t_sgideco.x	sgk.h <error.h> <gki.h>
+	t_sgikern.x	<error.h> <gki.h>
+	;

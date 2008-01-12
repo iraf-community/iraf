@@ -1,0 +1,10 @@
+#  Declare the Odewahn BVR standards catalog variables
+
+catalog
+
+V 	  2		# the V magnitude	
+error(V)  3 		# the V magnitude error
+BV	  4		# the (B-V) color
+error(BV) 5 		# the (B-V) color error
+VR	  6		# the (V-R) color
+error(VR) 7 		# the (V-R) color error

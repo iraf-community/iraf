@@ -1,0 +1,12 @@
+Menu for the package tables.fitsio
+
+    catfits - Produce a catalog of FITS files on tape or on disk 
+   fitscopy - Copy FITS files: disk <--> tape and disk <--> disk
+fits_exampl - Detailed examples of `fitsio' tasks
+       geis - Provide background information about GEIS format files
+   gftoxdim - Convert a GEIS file to one with xtra dimension plus a table
+    stwfits - Convert tables and/or GEIS files to FITS files
+    strfits - Convert FITS files to tables or to GEIS files
+   xdimtogf - Convert a GEIS file with xtra dimension plus a table to GEIS
+
+(Type "help fitsio opt=sys" for more information about the fitsio package)

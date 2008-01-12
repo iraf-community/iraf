@@ -1,0 +1,68 @@
+# DEVICES.HLP -- Edit this file to describe the devices available on your
+# local host or network.
+
+.help devices Jan99 "NOAO/Tucson Devices"
+.nf
+    \fBDevice      Aliases 	Description+Location\fR
+
+    lw1		apl		HP LaserJet-4M, outside Rm B50-A
+    lw1p2			lw1 with 2 landscape pages per page
+    lw2		apl2		HP LaserJet-4000N, Rm 135
+    lw2p2			lw2 with 2 landscape pages per page
+    lw3		apl3		HP LaserJet-5M, Engineering Mezzanine
+    lw4		apl4		Apple LaserWriter, Rm 192
+    lw6		apl6		HP LaserJet-4MV, Drafting
+    lw7		apl7|tops	Apple Laserwriter, NSO mail room, Rm 152
+    lw8		apple8		Apple Laserwriter, Employee's Lounge
+    lw9				Apple Laserwriter, hallway near NSO Dir. office
+    lw10			HP LaserJet-5M, Rm 101 (computer room)
+    lw14                        HP LaserJet-5N, DMAC
+    lw16			HP LaserJet 4M Plus, Rm 72
+    lw20                        HP LaserJet-4M Plus, DMAC
+    lw29                        HP LaserJet-4M, Rm 27 (visitor office)
+    lwdp                        HP LaserJet-5M, duplex printer, Rm 101 
+    clp                         Tektronix Phaser 200e, color PS printer, Rm 101
+    clp2                        Tektronix Phaser 360, color printer, Rm 101
+    clp2t                       Tektronix Phaser 360, transparency tray for clp2
+    vmsprint	vmslp	        VMS cluster lineprinter, Rm 101 (computer room)
+    vapl			DECLaser 1100, VMS only
+    lw		lp|lpr		Default UNIX `lpr' printer(*)
+    psdump			PostScript file named /tmp/irafdmp$$.ps
+    epsf	eps		EPS file ./sgi$$.eps, portrait mode
+    epsfl	epsl		EPS file ./sgi$$.eps, landscape mode
+    epshalf	epsh		halfpage portrait EPS file, ./sgi$$.eps
+
+    (*)This device is available on UNIX systems only.  A specific output
+    device may be selected by defining PRINTER in the user environment.
+
+    All the ``lw'' devices can be specified as shown above with a trailing 
+    `s' to indicate a finer linewidth will be used, intended for small, dense
+    plots, e.g., lw1s.
+
+    gemini!mta=mta6250,mta1600     HP 1/2" tapedrive, Rm 101
+    gemini!mtb        [8500]       Exabyte Eliant 820, Rm 101
+    gemini!mtc        [8200]       Exabyte 8200, Rm 101
+    gemini!mtd        [8200]       Exabyte 8200, Rm 101
+    gemini!mte,mtehi  [8200|8500]  Exabyte 8505, Rm 101
+    gemini!mtj        [READ only]  HP DAT, RM 101
+    gemini!mtm                     Seagate DAT, Rm 101
+    ursa!mta=mta1600,mta6250       HP 1/2" tapedrive, Rm 101
+    ursa!mtb=mtb1600,mtb6250       HP 1/2" tapedrive, Rm 101 
+    ursa!mtd,mtdhi    [8200|8500]  Exabyte 8505XL, Rm 101
+    ursa!mte,mtehi    [8200|8500]  Exabyte 8505XL, Rm 101
+    ursa!mtf          [READ only]  HP DAT, Rm 101
+    ursa!mtm=mtmhi                 DLT-7000, Rm 101
+    ursa!mtn                       Seagate DAT, Rm 101
+    ursa!mto          [8500]       Exabyte Eliant 820, Rm 101
+    ursa!mtp=mtphi                 DLT-7000, Rm 101
+    bigx!mtb,mtbhi    [8200|8500]  Exabyte 8505XL, Rm 101
+    bigx!mtc                       Seagate DAT, Rm 101
+    orion!mta                      Seagate DAT, Rm 101
+    argo!mta,mtahi    [8200|8500]  Exabyte 8505XL, Argo lab in basement
+    argo!mtb          [8500]       Exabyte Eliant 820, Argo lab in basement
+    pandora!mtr       [8200]       Exabyte 8200, Library
+    draco!mtg                      WANG DAT
+    draco!mti			   HP 1/2" tapedrive, Rm 101 [VMS cluster only]
+    draco!mtj			   Exabyte 8200, Rm 101 [VMS cluster only]
+
+.endhelp

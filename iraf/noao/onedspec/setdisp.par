@@ -1,0 +1,6 @@
+# Parameter file for SETDISP
+
+images,s,a,,,,List of images to be set
+dispaxis,i,h,1,1,7,Dispersion axis
+disptype,s,h,"lambda",,,Dispersion type
+dispunit,s,h,"angstroms",,,Dispersion units

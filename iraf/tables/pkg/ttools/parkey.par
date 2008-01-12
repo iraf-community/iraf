@@ -1,0 +1,5 @@
+value,s,a,"",,,"Value of header keyword"
+output,f,a,"",,,"Name of file containing header keyword"
+keyword,s,a,"",,,"Name of header keyword"
+add,b,h,no,,,"Is it OK to create a new keyword?"
+mode,s,h,"al",,,

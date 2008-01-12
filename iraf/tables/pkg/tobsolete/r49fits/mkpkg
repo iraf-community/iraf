@@ -1,0 +1,40 @@
+$call	update
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+relink:
+	$omake	x_rfits.x
+	$omake gf_crgpb.x
+	$update rfits.a
+linkonly:
+	$link	x_rfits.o gf_crgpb.o rfits.a \
+	-lxtools -ltbtables -lgilib -o r49fits.e
+
+	;
+
+install:
+	$move r49fits.e tablesbin$r49fits.e
+
+	;
+rfits.a:
+
+	t_rfits.x		rfits.com rfits.h <error.h> <fset.h>
+	fits_read.x		rfits.com rfits.h <error.h> <imhdr.h> \
+				<imio.h> <imset.h> <fio.h> <tbset.h> 
+	rft_rimext.x		rfits.com rfits.h <error.h> <imhdr.h> \
+				<imio.h> <imset.h> <fio.h> <tbset.h> 
+	fits_rheader.x		rfits.com rfits.h <mach.h> <imhdr.h>
+	fits_rimage.x		rfits.com rfits.h <imhdr.h> <mach.h> <fset.h>
+	fits_rpixels.x		<mii.h> <mach.h> rfits.com
+	rft_subs.x		rfits.com rfits.h <imhdr.h> <imio.h> \
+				<mach.h>
+	tab_r49header.x		rfits.com tab.com rfits.h <imhdr.h> \
+				<imio.h> <tbset.h> <mach.h>
+	tab_rdata.x		rfits.com rfits.h tab.com <imhdr.h> <mach.h> \
+				<tbset.h>
+	tab_putrow.x		rfits.h rfits.com tab.com
+	tab_gfsub.x		tab.com rfits.com rfits.h
+	;

@@ -1,0 +1,45 @@
+MTIO -- Magtape i/o.  This directory contains the FIO device driver for the
+magtape devices plus MTOPEN (used to open a magtape device and hook it to
+FIO) plus a few other routines.  See ./doc for additional info.
+
+
+USER ROUTINES
+
+		yes|no = mtfile (fname)		# Is fname a magtape device?
+	  yes|no = mtneedfileno (mtname)	# No file number given?
+		    gty = mtcap (mtname)
+			mtfname (mtname, file, outstr, maxch)
+
+		        mtparse (mtname, device, fileno, recno, attrl, maxch)
+		       mtencode (mtname, maxch, device, fileno, recno, attrl)
+
+		    fd = mtopen (mtname, acmode, bufsize)
+		       mtrewind (mtname, initcache)
+		     mtposition (mtname, file, record)
+
+	Use CLOSE to close a file descriptor opened with mtopen.
+	Use GTYCLOSE to close a termcap descriptor opened with mtcap.
+	MTNAME is the full magtape device specification, i.e, "mt[...]".
+
+
+
+SYSTEM ROUTINES
+
+		     mtallocate (mtname)
+		   mtdeallocate (mtname, rewind_tape)
+		       mtstatus (out, mtname)
+		        mtclean (level, stale, out)
+
+
+
+FIO DRIVER
+
+			 zopnmt (iodev, acmode, mtchan)
+			 zclsmt (mtchan, status)
+			 zardmt (mtchan, buf, maxbytes, offset)
+			 zawrmt (mtchan, buf, nbytes, offset)
+			 zawtmt (mtchan, status)
+			 zsttmt (mtchan, what, lvalue)
+
+
+All other procedures are internal to the interface.

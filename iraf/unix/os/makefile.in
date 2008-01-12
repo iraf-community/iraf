@@ -1,0 +1,29 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	alloc.e libos.a
+
+alloc.e:	alloc.o getproc.o
+	$(CC) $(HSI_LF) -o alloc.e $^
+	chmod 4755 alloc.e
+	cp -p alloc.e ../bin/.
+
+libos.a:	gmttolst.o irafpath.o prwait.o \
+		zalloc.o zfaloc.o zfiobf.o zfiopl.o zfmkcp.o zfprot.o \
+		zfxdir.o zgtenv.o zlocva.o zopdpr.o zwmsec.o zzsetk.o \
+		zawset.o zfchdr.o zfioks.o zfiopr.o zfmkdr.o zfrnam.o \
+		zgcmdl.o zgtime.o zoscmd.o zxwhen.o zzstrt.o zcall.o \
+		zfdele.o zfiolp.o zfiosf.o zfnbrk.o zfsubd.o zghost.o \
+		zgtpid.o zmaloc.o zpanic.o zzepro.o zdojmp.o zfgcwd.o \
+		zfiomt.o zfiotx.o zfpath.o zfunc.o zglobl.o zintpr.o \
+		zmfree.o zraloc.o zzexit.o zfacss.o zfinfo.o zfiond.o \
+		zfioty.o zfpoll.o zfutim.o zgmtco.o zlocpr.o zopdir.o \
+		zshlib.o zzpstr.o
+	$(CC) $(HSI_CF) -o zsvjmp.o -c ../as.$(MACH)/zsvjmp.s
+	ar r libos.a $^ zsvjmp.o
+	$(RANLIB) libos.a
+	cp -p libos.a ../lib/.
+
+clean::
+	rm -f *.o alloc.e libos.a ../bin/alloc.e ../lib/libos.a
+

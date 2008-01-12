@@ -1,0 +1,24 @@
+.help putlog Mar86 language
+.ih
+NAME
+putlog -- put a message to the logfile
+.ih
+USAGE
+putlog logmsg
+.ih
+PARAMETERS
+.ls logmsg
+A message to append to the logfile.
+.le
+.ih
+DESCRIPTION
+\fIPutlog\fR is used to add user messages to the logfile.  The CL parameter
+\fIkeeplog\fR must be set to `yes' for this to take effect.
+.ih
+BUGS
+For executable tasks, the only way to call \fIputlog\fR currently is via
+the low-level CLIO routine clcmd().
+.ih
+SEE ALSO
+cl, logging
+.endhelp

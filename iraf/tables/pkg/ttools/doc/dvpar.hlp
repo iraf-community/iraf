@@ -1,0 +1,68 @@
+.help dvpar Jul93 tables
+.ih
+NAME
+dvpar -- Edit the parameter set that describes the graphics device.
+.ih
+USAGE
+dvpar
+.ih
+DESCRIPTION
+The 'dvpar' parameter set (pset) specifies device-related parameters.
+These include the device name, whether plots should be appended to
+existing plots, and the edges of the device viewport--that part of the
+display device on which to draw the plot.
+
+Note that this is a parameter set (pset)--not an executable task.  That
+means that if the task is invoked by name on the command line, it will
+start the 'eparam' task to edit the 'dvpar' parameters.  Individual
+parameters may be assigned using CL assignment statements from the
+command line, or through the task parameters for 'fieldplot'.
+.ih
+PARAMETERS
+.ls (device = "stdgraph") [string]
+The graphics device name.  The default, "stdgraph", uses the CL 
+environment parameter `stdgraph' to find the device name.  For 
+example, if you are using gterm in SunView, you could have set 
+`stdgraph=gterm' or `device=gterm'.  To overlay graphics on an image 
+display, use an "imd" device, "imdr" for red, "imdg" for green, etc.
+.le
+.ls (append = no) [boolean]
+Append the graph to an existing plot?
+.le
+.ls (left = 0) [real, min = 0, max = 1]
+The NDC coordinates of the left edge of the plot.
+.le
+.ls (right = 0) [real, min = 0, max = 1]
+The NDC coordinates of the right edge of the plot.
+.le
+.ls (bottom = 0) [real, min = 0, max = 1]
+The NDC coordinates of the bottom edge of the plot.
+.le
+.ls (top = 0) [real, min = 0, max = 1]
+The NDC coordinates of the top edge of the plot.
+.le
+.ls (fill = yes) [boolean]
+Fill the viewport?  
+
+If set to "yes", the plot will fill the area specified by
+the 'left', 'right', 'bottom', and 'top' viewport parameters.  Otherwise, the
+shape of the plot will reflect the aspect of the input data, but will
+not be larger than the specified viewport.  Note that this does not
+apply to all tasks using the 'dvpar' pset.
+.le
+.ls (coords) [*gcur]
+Graphics cursor file.
+This is used if the task supports interaction via the graphics cursor.
+.le
+.ls (image_coord) [*imcur]
+Used if the task supports interaction via the image display cursor.
+.le
+.ih
+EXAMPLES
+.ih
+BUGS
+.ih
+SEE ALSO
+fieldplot, newcont, sgraph, siaper, wcslab,
+cursor, plot
+.endhelp

@@ -1,0 +1,48 @@
+
+# Update the newdisp library.
+# Author: B.Simon 26-SEP-90
+
+$set XFLAGS = "-fgq $(XFLAGS)"
+$call default
+$exit
+
+debug:
+	$set XFLAGS = "-fgq $(XFLAGS)"
+	$call default
+	;
+
+strip:
+	$delete newdisp.a
+	$call default
+	;
+
+update:
+default:
+	$checkout newdisp.a ../../
+	$update   newdisp.a
+	$checkin  newdisp.a ../../
+	;
+
+newdisp.a:
+	kbegin.x	<fset.h>  <curses.h>  "screen.com"
+	kcompile.x	<ctype.h>  <curses.h>  "screen.com"
+	kconvert.x	<ctype.h>
+	kdoline.x	<ctype.h>
+	kend.x		<fset.h>  "screen.com"
+	kget.x		<ctype.h>  "screen.com"
+	khelp.x		"screen.com"
+	psbegin.x	<ttyset.h>  "screen.com"
+	psbeep.x
+	psend.x		"screen.com"
+	psfill.x	<ctype.h>  <curses.h>  "screen.com"
+	psheight.x	"screen.com"
+	psintersect.x	<curses.h>
+	psscreen.x	"screen.com"
+	pssendcap.x	"screen.com"
+	pssetcur.x	"screen.com"
+	psslide.x	<curses.h>  "screen.com"
+	pssynch.x	"screen.com"
+	pswidth.x	"screen.com"
+	pswrite.x	<ctype.h>  <curses.h>  "screen.com"
+	pswrtcells.x	<ctype.h>  <curses.h>  "screen.com"
+	;

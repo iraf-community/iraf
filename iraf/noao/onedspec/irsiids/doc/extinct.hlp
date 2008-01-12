@@ -1,0 +1,49 @@
+.help extinct Apr85 noao.onedspec
+.ih
+NAME
+extinct -- Correct spectra for atmospheric extinction
+.ih
+USAGE
+extinct root records output
+.ih
+PARAMETERS
+.ls root
+The root name for the input spectra to be corrected.
+.le
+.ls records
+The range of spectra to be included in the extinction operation.
+.le
+.ls output
+The root name for the output corrected spectra
+.le
+.ls start_rec
+The starting record number for the output corrected spectra.
+.le
+.ls nr_aps = 2
+The number of instrument apertures for this data set.
+.le
+.ih
+DESCRIPTION
+The input spectra are corrected for atmospheric extinction. 
+EXTINCT redirects the spectra through the task BSWITCH so all
+procedures are identical to those described for that task.
+
+Because BSWITCH attempts to perform a beam-switch operation
+unless the subset parameter is equal to the number of
+instrument apertures (in which case beam-switching degenerates
+to a copy operation), the hidden parameter nr_aps should be set
+appropriately to the instrument. For IIDS and IRS data, this
+is 2.
+.ih
+EXAMPLES
+
+	cl> extinct  nite1 1001-1032 nite1ex
+.ih
+BUGS
+The input string of spectra must be ordered so that only
+one spectrum from each aperture is present among substrings
+of length nr_aps.
+.ih
+SEE ALSO
+bswitch
+.endhelp

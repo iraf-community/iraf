@@ -1,0 +1,34 @@
+# Make the GEOMAP/GEOXYTRAN and CCMAP/CCSETWCS/CCTRAN tasks
+
+$checkout libpkg.a ../../../
+$update libpkg.a
+$checkin libpkg.a ../../../
+$exit
+
+generic:
+        $set    GEN = "$$generic -k"
+
+	$ifolder (geofunc.x, geofunc.gx)
+	    $(GEN) geofunc.gx -o geofunc.x $endif
+	$ifolder (t_geomap.x, t_geomap.gx)
+	    $(GEN) t_geomap.gx -o t_geomap.x $endif
+	$ifolder (geoxytran.x,geoxytran.gx)
+            $(GEN) geoxytran.gx -o geoxytran.x $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	geofunc.x	<math.h> <math/gsurfit.h>
+        geotimtran.x    <imhdr.h> <imset.h> <mach.h> <math/gsurfit.h> \
+                        <math/iminterp.h> geotran.h
+        geotran.x       <imhdr.h> <imset.h> <mach.h> <math/gsurfit.h> \
+                        <math/iminterp.h> geotran.h
+	geoxytran.x	<mach.h> <ctype.h> <math.h> <math/gsurfit.h>
+	t_geomap.x	<fset.h> <error.h> <mach.h> <math/gsurfit.h> \
+			<math.h> "../../../lib/geomap.h"
+        t_geotran.x     <imhdr.h> <mwset.h> <math.h> <math/gsurfit.h> \
+                        geotran.h
+	t_geoxytran.x	<fset.h> <ctype.h>
+	trinvert.x
+	;

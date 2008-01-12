@@ -1,0 +1,65 @@
+.help "if,else" Feb86 language
+.ih
+NAME
+if else -- conditional execution of a statement
+.ih
+SYNTAX
+\fIif\fR (expression) statement1 [\fIelse\fR statement2]
+.ih
+ELEMENTS
+.ls expression
+A boolean valued expression.
+.le
+.ls statement1, statement2
+The statements to be executed (possibly compound, i.e., enclosed in
+curly braces).
+.le
+.ih
+DESCRIPTION
+The \fIif\fR statement is used to execute a statement only if the
+specified condition is true.  An optional \fIelse\fR clause may be given
+to execute a different statement if the condition is false.
+.ih
+EXAMPLES
+1. Add X to Y only if X is less than Y.
+
+.nf
+	if (x < y)
+	    y += x
+.fi
+
+2. If X is less than 10 print "small", else print "big".
+
+.nf
+	if (x < 10)
+	    print ("small")
+	else
+	    print ("big")
+.fi
+
+3. The \fIelse if\fR construct.
+
+.nf
+	if (str == "+")
+	    val += x
+	else if (str == "-")
+	    val -= x
+	else if
+	    ...
+.fi
+
+4. Nesting, use of braces.
+
+.nf
+	if (i > 0) {
+	    if (i < 10) {
+		print ("0")
+		sum = sum * 10 + i
+	    } else
+		print (" ")
+	}
+.fi
+.ih
+SEE ALSO
+for, case, break, next
+.endhelp

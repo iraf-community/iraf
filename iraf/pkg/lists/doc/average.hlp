@@ -1,0 +1,49 @@
+.help average Jul86 lists
+.ih
+NAME
+average -- compute the average and standard deviation
+.ih
+USAGE
+average option
+.ih
+PARAMETERS
+.ls option
+Chosen from "add", "subtract" or "new_sample", 
+in which case the numbers averaged are those in STDIN.
+If no argument is given on the command line, "new_sample" is assumed.
+.le
+.ih
+DESCRIPTION
+Task \fIaverage\fR computes the average and standard deviation of a list
+of numbers.  Numeric input is read from STDIN with one number per line.
+The mean, sigma and number of samples are written to the standard
+output.
+
+By default, the sample is taken to be
+the set of numbers in the standard input when \fIaverage\fR is run. 
+Additional points can be added to or deleted from the sample by rerunning
+\fIaverage\fR with \fBoption\fR equal to one of the following:
+.nf
+
+	add -- add points to the sample, recalculate mean and sigma
+	sub -- subtract points from the sample
+.fi
+
+The sample is reinitialized by setting \fBoption\fR = "new_sample".
+.ih
+EXAMPLES
+Run \fIaverage\fR on the list of numbers in file "numbers".
+.nf
+	
+	cl> type numbers | average
+.fi
+
+Add in to the sample the list of numbers in file "numbers.2".
+.nf
+
+	cl> average add < numbers.2
+.fi
+.ih
+SEE ALSO
+lintran
+.endhelp

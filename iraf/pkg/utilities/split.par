@@ -1,0 +1,6 @@
+input,f,a,,,,input file
+output,s,a,seg,,,root name for output (segment) files
+nlines,i,h,1000,1,,maximum number of lines of text per segment file
+nbytes,i,h,16384,1,,maximum number of bytes per segment file
+maxfiles,i,h,999,,,maximum number of output files
+verbose,b,h,yes,,,print output file names and sizes as they are generated

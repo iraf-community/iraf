@@ -1,0 +1,75 @@
+# IMTOOLRC -- Predefined frame buffer configurations.  The value of nframes
+# given is the initial number of frame buffers allocated; more frames can be
+# added at runtime.  The configuration numbers may be given in any order but
+# must be unique and in the range 1-128.  NOTE - corresponding entries must be
+# present in the dev$graphcap file, for use with IRAF.  This file is used by
+# both the IMTOOL and SAOIMAGE display servers.
+#
+# Format:  configno nframes width height
+
+ 1  2  512  512		# imt1|imt512
+ 2  2  800  800		# imt2|imt800
+ 3  2 1024 1024		# imt3|imt1024
+ 4  1 1600 1600		# imt4|imt1600
+ 5  1 2048 2048		# imt5|imt2048
+ 6  1 4096 4096		# imt6|imt4096
+ 7  1 8192 8192		# imt7|imt8192
+ 8  1 1024 4096		# imt8|imt1x4
+ 9  2 1144  880		# imt9|imtfs	full screen (1152x900 minus frame)
+10  2 1144  764		# imt10|imtfs35	full screen at 35mm film aspect ratio
+11  2  128  128		# imt11|imt128
+12  2  256  256		# imt12|imt256
+13  2  128 1056		# imt13|imttall128	tall & narrow for spectro.
+14  2  256 1056		# imt14|imttall256	tall & wider for spectro.
+15  2 1056  128		# imt15|imtwide128	wide & thin for spectro.
+16  2 1056  256		# imt16|imtwide256	wide & fatter for spectro.
+17  2 1008  648		# imt17|imtssy	Solitaire fmt w/ imtool border
+18  2 1024  680		# imt18|imtssn	Solitaire fmt w/out imtool border
+19  1 4096 1024		# imt19|imt4x1
+
+# Some site specific formats for NOAO.
+20  2  388  576		# imt20|imtgec	GEC CCD detector format
+21  1 3040  976		# imt21|imtkpca	KPCA detector format (also 2D-Frutti)
+22  1  128 1520		# imt22|imt2df1 2D-Frutti
+23  1  256 1520		# imt23|imt2df2 2D-Frutti
+24  1  512 1520		# imt24|imt2df5 2D-Frutti
+25  1  960 1520		# imt25|imt2df9 2D-Frutti
+26  1 1232  800		# imt26|imtcryo Cryogenic Camera
+27  1 3104  512		# imt27|imtgcam Gold Camera with Ford chip
+28  1  976 3040		# imt28|imt2df9x3 2D-Frutti 
+29  1  800  256         # imt29|imtgong Gong Cache Monitor
+30  1  256  800         # imt30|imtgong Gong Cache Monitor
+31  1 1240  400		# imt31|imtret Reticon CCD detector format
+32  2  832  800		# imt32|imtti|imtti2|imtti3|imtti4|imtti5
+33  2  544  512		# imt33|imtt5ha
+34  1 1056 1024		# imt34|imtt1ka
+35  1 2080 2048		# imt35|imts2kaf|imtt2kaf|imtt2kbf
+36  2  832  820		# imt36|imts2ka|imtt2ka|imtt2kb|imt2k40
+37  2  520  512		# imt37|imts2kas|imtt2kas|imtt2kbs|imt2k25
+38  1 3104 1024		# imt38|imtf3ka|imtf3kb|imtfo3k
+39  1 1232  800		# imt39|imtf1ka
+40  4 1200  600		# imt40|imtweather
+
+# Mosaic formats.
+41  1 8800  8800	# imt41|imt8800
+42  1 4400  4400	# imt42|imt4400
+43  1 2200  2200	# imt43|imt2200
+44  1 1100  1100	# imt44|imt1100
+
+# Gemini - GMOS Devices
+45  1 2080  4644        # imt45|imtgmosccd
+46  1 6400  4644        # imt46|imtgmos
+47  1 3200  2322        # imt47|imtgmos2
+48  1 1600  1161        # imt48|imtgmos4
+49  1  800   581        # imt49|imtgmos8
+
+# WIYN Devices
+50  1 2048  2500        # imt50|imtwttm
+
+55  1 10000  10000      # imt55|imt10k
+56  1 11000  11000      # imt56|imt11k
+57  1 12000  12000      # imt57|imt12k
+
+# User added formats.  (start with #64)
+# (add here)
+

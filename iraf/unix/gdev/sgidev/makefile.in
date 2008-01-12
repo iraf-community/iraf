@@ -1,0 +1,52 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	sgidispatch.e sgi2uimp.e sgi2uapl.e sgi2uqms.e sgi2uptx.e sgi2uhplj.e \
+	sgi2uhpgl.e sgi2ueps.e sgi2gif.e sgi2xbm.e
+
+sgidispatch.e:	sgidispatch.o
+	$(CC) $(HSI_LF) -o sgidispatch.e $^ $(HSI_LIBS)
+	cp -p sgidispatch.e ../../bin/.
+
+sgi2uimp.e:	sgi2uimp.o
+	$(CC) $(HSI_LF) -o sgi2uimp.e $^ $(HSI_LIBS)
+	cp -p sgi2uimp.e ../../bin/.
+
+sgi2uapl.e:	sgi2uapl.o
+	$(CC) $(HSI_LF) -o sgi2uapl.e $^ $(HSI_LIBS)
+	cp -p sgi2uapl.e ../../bin/.
+
+sgi2uqms.e:	sgi2uqms.o
+	$(CC) $(HSI_LF) -o sgi2uqms.e $^ $(HSI_LIBS)
+	cp -p sgi2uqms.e ../../bin/.
+
+sgi2uptx.e:	sgi2uptx.o
+	$(CC) $(HSI_LF) -o sgi2uptx.e $^ $(HSI_LIBS)
+	cp -p sgi2uptx.e ../../bin/.
+
+sgi2uhplj.e:	sgi2uhplj.o
+	$(CC) $(HSI_LF) -o sgi2uhplj.e $^ $(HSI_LIBS)
+	cp -p sgi2uhplj.e ../../bin/.
+
+sgi2uhpgl.e:	sgi2uhpgl.o
+	$(CC) $(HSI_LF) -o sgi2uhpgl.e $^ $(HSI_LIBS)
+	cp -p sgi2uhpgl.e ../../bin/.
+
+sgi2ueps.e:	sgi2ueps.o
+	$(CC) $(HSI_LF) -o sgi2ueps.e $^ $(HSI_LIBS)
+	cp -p sgi2ueps.e ../../bin/.
+
+sgi2gif.e:	sgi2gif.o
+	$(CC) $(HSI_LF) -o sgi2gif.e $^ $(HSI_LIBS)
+	cp -p sgi2gif.e ../../bin/.
+
+sgi2xbm.e:	sgi2xbm.o
+	$(CC) $(HSI_LF) -o sgi2xbm.e $^ $(HSI_LIBS)
+	cp -p sgi2xbm.e ../../bin/.
+
+clean::
+	rm -f *.o *.e ../../bin/sgidispatch.e ../../bin/sgi2uimp.e \
+		../../bin/sgi2uapl.e ../../bin/sgi2uqms.e \
+		../../bin/sgi2uptx.e ../../bin/sgi2uhplj.e \
+		../../bin/sgi2uhpgl.e ../../bin/sgi2ueps.e \
+		../../bin/sgi2gif.e ../../bin/sgi2xbm.e

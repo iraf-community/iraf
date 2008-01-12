@@ -1,0 +1,57 @@
+.help coefs May85 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+coefs -- Extract dispersion coefs from mtn HeNeAr headers
+.ih
+USAGE
+coefs input records database
+.ih
+PARAMETERS
+.ls input
+The input image root name for the spectral images containing the
+dispersion coefficients.
+.le
+.ls records
+The range of records for which the root name applies.
+.le
+.ls database
+The database file name which will contain the coefficients.
+.le
+.ih
+DESCRIPTION
+The spectra specified by the combination of the root name
+and the records are scanned for the presence of dispersion
+coefficients. If present, the coefficients and necessary
+information are written to the file indicated by the database
+parameter. This file an then be used by the linearization
+program DISPCOR to correct any spectra for which the
+database is appropriate.
+
+Each invocation of COEFS appends to the database file, or
+creates a new file if necessary.
+
+The following assumptions are made concerning the coefficients,
+which are always correct for IIDS and IRS mountain reduced
+data at Kitt Peak.
+.ls  5 (1)
+The coefficients represent Legendre polynomials.
+.le
+.ls (2)
+The coefficients apply to pixels 1 through 1024 in the original data.
+.le
+.ih
+EXAMPLES
+The following example reads the coefficients from the headers
+for nite1 arc spectra taken near the beginning and end of the
+night and creates a database file called nite1.db:
+
+	cl> coefs nite1 3-4,201-202 nite1.db
+
+.ih
+TIME REQUIREMENTS
+Approximately 1 second per spectrum is required. This is primarily
+overhead due to file access.
+.ih
+SEE ALSO
+dispcor, identify
+.endhelp

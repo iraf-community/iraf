@@ -1,0 +1,21 @@
+stwfits version 0.1  11-May-1995.
+
+The following problems have been resolved from the March 10, 1995 version.
+
+fits_cards.x/chgfmt()
+	If the column datatype is negative, then it indicates the number
+	of characters of storage for that characters type column. The
+	previous version was taken the display format rather that the
+	column datatype. Solved by taking the abs(datatype) as the width
+	of the newly created column.
+
+stwfits.par
+	Add Version parameter to keep track of revisions.
+
+t_wfits.x
+	Update 'version' string to '11-May-1995'.
+
+tab_wheader.x 
+	Add ORIGIN keyword to the dummy header when creating a FITS
+	file out of an STSDAS table. This keyword contain the site and
+	date of the FITSIO version.

@@ -1,0 +1,19 @@
+# The MKPKG file for the mkobsfile subdirectory.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_obsfile.x	"../lib/obsfile.h"  <fset.h>  <ctotok.h> <ctype.h>
+	t_mkphotcors.x	"../lib/obsfile.h"
+	phimtable.x	"../lib/obsfile.h"  <fset.h>
+	phsort.x	"../lib/obsfile.h"
+	phmatch.x	<mach.h> "../lib/obsfile.h"
+	t_apfile.x      "../lib/apfile.h"   <fset.h>  <ctotok.h> <ctype.h> 
+	phaimtable.x	"../lib/apfile.h"   <fset.h>
+	phagrow.x	"../lib/apfile.h"   <time.h>  <mach.h>   <fset.h>
+	phaigrow.x	"../lib/apfile.h"   <time.h>  <mach.h>   <gset.h>
+	dinvers.f
+	;

@@ -1,0 +1,7 @@
+# Help directory for the TOBSOLETE package
+
+$tobsolete      = "tables$pkg/tobsolete/"
+$doc            = "tables$pkg/tobsolete/doc/"
+
+#r49fits         hlp=doc$r49fits.hlp,    src=tobsolete$r49fits/t_rfits.x
+trename         hlp=doc$trename.hlp,    src=tobsolete$trename/trename.x

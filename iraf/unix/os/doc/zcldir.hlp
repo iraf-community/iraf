@@ -1,0 +1,28 @@
+.help zcldir May84 "System Interface"
+.ih
+NAME
+zcldir -- close a directory file
+.ih
+SYNOPSIS
+.nf
+zcldir (chan, status)
+
+int	chan			# OS channel of directory file
+int	status
+.fi
+.ih
+DESCRIPTION
+Close a directory file previously opened for reading with \fBzopdir\fR.
+.ih
+RETURN VALUE
+ERR is returned in \fIstatus\fR for an illegal \fIchan\fR.  OK is returned
+if the operation is successful.
+.ih
+NOTES
+A directory file is not accessed as an ordinary file; the significance of
+\fIchan\fR is unknown to the high level code and need not refer to a physical
+host i/o channel.
+.ih
+SEE ALSO
+zopdir, zgfdir
+.endhelp

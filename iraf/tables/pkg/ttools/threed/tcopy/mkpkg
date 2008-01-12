@@ -1,0 +1,14 @@
+# Update the tcopy application code in the threed package library.
+# Author: I.Busko, 21-Nov-1996
+
+$checkout threed.a ../
+$update   threed.a
+$checkin  threed.a ../
+$exit
+
+threed.a:
+	tcopy.x		<error.h>
+	tcpyone.x	<tbset.h>
+	tcpyrow.x	<tbset.h>
+	;
+

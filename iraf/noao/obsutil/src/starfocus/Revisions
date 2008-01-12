@@ -1,0 +1,162 @@
+.help revisions Nov01 obsutil
+.nf
+t_starfocus.x
+starfocus.par
+psfmeasure.par
+starfocus.hlp
+psfmeasure.hlp
+    Added a "wcs" parameter to allow specifying the coordinate system type
+    for cursor input.  (10/7/98, Valdes)
+
+stfprofile.x
+    The logic in STF_FIT for determining the points to fit and the point
+    to use for the initial width estimate was faulty allowing some bad
+    cases to get through.  (7/31/98, Valdes)
+
+t_starfocus.x
+    There was an error in the changes to allow focus sequences to go
+    up or down such that simple PSF measurement failed.
+    (6/11/97, Valdes)
+
+stfmeasure.x
+stfprofile.x
+    Changes were need to better deal with error conditions.
+    (6/11/97, Valdes)
+
+stfmeasure.x
+    Changes to deal with error conditions.
+    (6/11/97, Valdes)
+
+t_starfocus.x
+    Fixed a typo error in an earlier change which left out the pointer
+    variable in a macro.  (5/8/97, Valdes)
+
+t_starfocus.x
+    1.  Added a minimum radius of 3 to the input and to interative setting.
+    2.  The estimate for the next focus position is not based on the previous
+	center plus the step.
+    3.  Added commented out code to allow setting the selected star to always
+	be the top or bottom, etc.
+    (2/7/97, Valdes)
+
+stfprofile.x
+    1.  Added a minimum radius of 3 to stf_find.
+    2.  Added a error return if sum2 <= 0 in stf_find
+    3.  Added errchks in stf_widths for called procedures.
+    4.  Added error returns in stf_fit for bad profile or parameters.
+    (2/6/97, Valdes)
+
+t_starfocus.x
+    The parabola fitting routine would fail if the independent variable
+    (the focus values) became too large because a) use of real and b)
+    unscaled variables.  The routine was revised for both these problems.
+    (10/24/96, Valdes)
+
+stfprofile.x
+stfmeasure.x
+    Fixed bug in evaluation of enclosed flux profile in which the scaled
+    radius was used for the gaussian subtraction stage instead of pixels.
+    This does not currently affect IMEXAM because the scale is fixed
+    at 1.  (8/29/96, Valdes)
+
+stfmeasure.x
+stfprofile.x
+    Fixed incorrect datatype declaration "real np" -> "int np" in various
+    related places.  (4/9/96, Valdes)
+
+stfmeasure.x -
+    1. Restricted the peak pixel to be within the specified radius.
+    2. Renamed file and procedures to avoid library conflict.
+    (3/14/96, Valdes)
+
+stfprofile.x
+    Minor bug fix that does not affect anything.  (3/14/96, Valdes)
+
+kpnofocus.cl
+starfocus.par
+psfmeasure.par
+    Changed the defaults for radius=5, sbuffer=5, swidth=5 to try and make
+    IMEXAMINE and the PSF tasks measure the same thing by default.
+    (3/13/96, Valdes)
+
+stfprofile.x
+    Changed the centering routine to only use the data in the specified
+    radius rather than the extended region including the sky.  (11/7/95, Valdes)
+
+stfmeasure.x
+mkpkg
+    Added a routine which can be called separately to compute the
+    enclosed flux width or radius and the direct FWHM.  (11/6/95, Valdes)
+
+stfprofile.x
+starfocus.h
+    Added a computation of the direct FWHM.   (11/6/95, Valdes)
+
+t_starfocus.x
+    Make a change to avoid reloading the image display when the specified
+    image name and the image name in the display are same apart from
+    the image extension.  (6/26/95, Valdes)
+
+stfprofile.h
+t_starfocus.x
+stfprofile.x
+starfocus.par
+psfmeasure.par
+kpnofocus.cl
+starfocus.par
+psfmeasure.par
+kpnofocus.cl
+    Added saturation and ignore_sat parameters to allow flagging measurements
+    with saturated pixels and either ignoring them or including them but
+    showing them in the output log.  (10/28/94, Valdes)
+
+t_starfocus.x
+    Fixed bug in interpreting the focus parameter.  (9/15/94, Valdes)
+
+starfocus.h
+t_starfocus.x
+stfprofile.x
+stfgraph.x
+psfmeasure.par
+starfocus.par
+kpnofocus.cl
+psfmeasure.hlp
+starfocus.hlp
+kpnofocus.hlp
+    Added an "iteration" parameter that, if greater than 1, uses the
+    previous FWHM estimate to adjust the "radius" parameter.  (8/5/94, Valdes)
+
+psfmeasure.hlp
+starfocus.hlp
+    Clarified the description of the imagecur parameter.  (2/1/94, Valdes)
+
+t_starfocus.x
+starfocus.h
+starfocus.par
+psfmeasure.par
+kpnofocus.cl	+
+starfocus.hlp
+psfmeasure.hlp
+kpnofocus.hlp
+    1.  A new parameter, fstep, was added to STARFOCUS to allow specifying
+	the focus sequence as a starting value, by the focus parameters,
+	and a step.
+    2.  STARFOCUS was modified to allow specification of header keywords
+	for the focus (this was true previously), the focus step,
+	the number of exposures, and the multiple exposure shift.
+	This allows multiple exposure images to be completely header
+	drivien if the appropriate keywords are present.
+    3.  A new task KPNOFOCUS was added.  This is a script calling
+	STARFOCUS with parameters set specifically for Kitt Peak
+	headers containing the focus parameters in the header.
+	Many of the parameters are fixed in the script and the task
+	parameters are then simpler.
+    4.  STARFOCUS/PSFMEASURE were modified to search all display frames
+	for the requested image rather than just frame 1.
+    5.  A new parameters, frame, was added to STARFOCUS/PSFMEASURE
+	to specify the display frame to load if necessary.  Previously
+	it was always frame 1.
+    7.  In STARFOCUS the default number of steps was changed to 7 and
+	the default step size to 30.
+    (11/13/93, Valdes)
+.endhelp

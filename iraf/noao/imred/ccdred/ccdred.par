@@ -1,0 +1,12 @@
+# CCDRED package parameter file
+
+pixeltype,s,h,"real real",,,Output and calculation pixel datatypes
+verbose,b,h,no,,,Print log information to the standard output?
+logfile,f,h,"logfile",,,Text log file
+plotfile,f,h,"",,,Log metacode plot file
+backup,s,h,"",,,Backup directory or prefix
+instrument,s,h,"",,,CCD instrument file
+ssfile,s,h,"subsets",,,Subset translation file
+graphics,s,h,"stdgraph",,,Interactive graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input
+version,s,h,"2: October 1987"

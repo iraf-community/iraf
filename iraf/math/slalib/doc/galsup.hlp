@@ -1,0 +1,43 @@
+.help galsup Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slGASU (DL, DB, DSL, DSB)
+
+     - - - - - - -
+      G A S U
+     - - - - - - -
+
+  Transformation from IAU 1958 galactic coordinates to
+  de Vaucouleurs supergalactic coordinates (double precision)
+
+  Given:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  Returned:
+     DSL,DSB     dp       supergalactic longitude and latitude
+
+  (all arguments are radians)
+
+  Called:
+     slDS2C, slDMXV, slDC2S, slDA2P, slDA1P
+
+  References:
+
+     de Vaucouleurs, de Vaucouleurs, & Corwin, Second Reference
+     Catalogue of Bright Galaxies, U. Texas, page 8.
+
+     Systems & Applied Sciences Corp., Documentation for the
+     machine-readable version of the above catalogue,
+     Contract NAS 5-26490.
+
+    (These two references give different values for the galactic
+     longitude of the supergalactic origin.  Both are wrong;  the
+     correct value is L2=137.37.)
+
+  P.T.Wallace   Starlink   25 January 1999
+
+  Copyright (C) 1999 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

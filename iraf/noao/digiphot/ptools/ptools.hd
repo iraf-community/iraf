@@ -1,0 +1,34 @@
+# Help directory for the PTOOLS package
+
+$doc		= "./doc/"
+
+$pconvert	= "ptools$pconvert/"
+$ptutils	= "ptools$ptutils/"
+$pexamine	= "ptools$pexamine/"
+$txtools	= "ptools$txtools/"
+
+pcalc		hlp=doc$pcalc.hlp,		src=ptools$pcalc.cl
+pconcat		hlp=doc$pconcat.hlp,		src=ptools$pconcat.cl
+pconvert	hlp=doc$pconvert.hlp,		src=pconvert$t_pconvert.x
+pdump		hlp=doc$pdump.hlp,		src=ptools$pdump.cl
+istable		hlp=doc$istable.hlp,		src=ptutils$t_istable.x
+prenumber	hlp=doc$prenumber.hlp,		src=ptools$prenumber.cl
+pexamine	hlp=doc$pexamine.hlp,		src=pexamine$t_pexamine.x
+pttest		hlp=doc$pttest.hlp,		src=ptools$pttest.cl
+pselect		hlp=doc$pselect.hlp,		src=ptools$pselect.cl
+psort		hlp=doc$psort.hlp,		src=ptools$psort.cl
+tbcalc		hlp=doc$tbcalc.hlp,		src=ptools$tbcalc.cl
+tbconcat	hlp=doc$tbconcat.hlp,		src=ptools$tbconcat.cl
+tbcrename	hlp=doc$tbcrename.hlp,		src=ptutils$t_tbcrename.x
+tbdump		hlp=doc$tbdump.hlp,		src=ptools$t_tbdump.cl
+tbkeycol	hlp=doc$tbkeycol.hlp,		src=ptutils$t_tbkeycol.x
+tbrenumber	hlp=doc$tbrenumber.hlp,		src=ptools$tbrenumber.cl
+tbselect	hlp=doc$tbselect.hlp,		src=ptools$tbselect.cl
+tbsort		hlp=doc$tbsort.hlp,		src=ptools$tbsort.cl
+txconcat	hlp=doc$txconcat.hlp,		src=txtools$t_txconcat.x
+txcalc		hlp=doc$txcalc.hlp,		src=txtools$t_txcalc.x
+txdump		hlp=doc$txdump.hlp,		src=txtools$t_txdump.x
+txrenumber	hlp=doc$txrenumber.hlp,		src=txtools$t_txrenumber.x
+txselect	hlp=doc$txselect.hlp,		src=txtools$t_txselect.x
+txsort		hlp=doc$txsort.hlp,		src=txtools$t_txsort.x
+revisions	sys=ptoolsx$Revisions

@@ -1,0 +1,4 @@
+images,s,a,,,,List of images to be modified
+headers,s,a,,,,List of images or header keyword files
+append,b,h,yes,,,Append to existing header?
+verbose,b,h,no,,,Verbose output?

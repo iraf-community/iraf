@@ -1,0 +1,114 @@
+.help oapqk Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slOAPQ (TYPE, OB1, OB2, AOPRMS, RAP, DAP)
+
+     - - - - - -
+      O A P Q
+     - - - - - -
+
+  Quick observed to apparent place
+
+  Given:
+     TYPE   c*(*)  type of coordinates - 'R', 'H' or 'A' (see below)
+     OB1    d      observed Az, HA or RA (radians; Az is N=0,E=90)
+     OB2    d      observed ZD or Dec (radians)
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1)      geodetic latitude (radians)
+       (2,3)    sine and cosine of geodetic latitude
+       (4)      magnitude of diurnal aberration vector
+       (5)      height (HM)
+       (6)      ambient temperature (T)
+       (7)      pressure (P)
+       (8)      relative humidity (RH)
+       (9)      wavelength (WL)
+       (10)     lapse rate (TLR)
+       (11,12)  refraction constants A and B (radians)
+       (13)     longitude + eqn of equinoxes + sidereal DUT (radians)
+       (14)     local apparent sidereal time (radians)
+
+  Returned:
+     RAP    d      geocentric apparent right ascension
+     DAP    d      geocentric apparent declination
+
+  Notes:
+
+  1)  Only the first character of the TYPE argument is significant.
+      'R' or 'r' indicates that OBS1 and OBS2 are the observed Right
+      Ascension and Declination;  'H' or 'h' indicates that they are
+      Hour Angle (West +ve) and Declination;  anything else ('A' or
+      'a' is recommended) indicates that OBS1 and OBS2 are Azimuth
+      (North zero, East is 90 deg) and zenith distance.  (Zenith
+      distance is used rather than elevation in order to reflect the
+      fact that no allowance is made for depression of the horizon.)
+
+  2)  The accuracy of the result is limited by the corrections for
+      refraction.  Providing the meteorological parameters are
+      known accurately and there are no gross local effects, the
+      predicted apparent RA,Dec should be within about 0.1 arcsec
+      for a zenith distance of less than 70 degrees.  Even at a
+      topocentric zenith distance of 90 degrees, the accuracy in
+      elevation should be better than 1 arcmin;  useful results
+      are available for a further 3 degrees, beyond which the
+      slRFRO routine returns a fixed value of the refraction.
+      The complementary routines slAOP (or slAOPQ) and slOAP
+      (or slOAPQ) are self-consistent to better than 1 micro-
+      arcsecond all over the celestial sphere.
+
+  3)  It is advisable to take great care with units, as even
+      unlikely values of the input parameters are accepted and
+      processed in accordance with the models used.
+
+  5)  "Observed" Az,El means the position that would be seen by a
+      perfect theodolite located at the observer.  This is
+      related to the observed HA,Dec via the standard rotation, using
+      the geodetic latitude (corrected for polar motion), while the
+      observed HA and RA are related simply through the local
+      apparent ST.  "Observed" RA,Dec or HA,Dec thus means the
+      position that would be seen by a perfect equatorial located
+      at the observer and with its polar axis aligned to the
+      Earth's axis of rotation (n.b. not to the refracted pole).
+      By removing from the observed place the effects of
+      atmospheric refraction and diurnal aberration, the
+      geocentric apparent RA,Dec is obtained.
+
+  5)  Frequently, mean rather than apparent RA,Dec will be required,
+      in which case further transformations will be necessary.  The
+      slAMP etc routines will convert the apparent RA,Dec produced
+      by the present routine into an "FK5" (J2000) mean place, by
+      allowing for the Sun's gravitational lens effect, annual
+      aberration, nutation and precession.  Should "FK4" (1950)
+      coordinates be needed, the routines slFK54 etc will also
+      need to be applied.
+
+  6)  To convert to apparent RA,Dec the coordinates read from a
+      real telescope, corrections would have to be applied for
+      encoder zero points, gear and encoder errors, tube flexure,
+      the position of the rotator axis and the pointing axis
+      relative to it, non-perpendicularity between the mounting
+      axes, and finally for the tilt of the azimuth or polar axis
+      of the mounting (with appropriate corrections for mount
+      flexures).  Some telescopes would, of course, exhibit other
+      properties which would need to be accounted for at the
+      appropriate point in the sequence.
+
+  7)  The star-independent apparent-to-observed-place parameters
+      in AOPRMS may be computed by means of the slAOPA routine.
+      If nothing has changed significantly except the time, the
+      slAOPT routine may be used to perform the requisite
+      partial recomputation of AOPRMS.
+
+  8) The azimuths etc used by the present routine are with respect
+     to the celestial pole.  Corrections from the terrestrial pole
+     can be computed using slPLMO.
+
+  Called:  slDS2C, slDC2S, slRFRO, slDA2P
+
+  P.T.Wallace   Starlink   23 June 1997
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

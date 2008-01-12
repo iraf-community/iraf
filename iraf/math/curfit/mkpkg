@@ -1,0 +1,87 @@
+# Curve fitting tools library.
+
+$checkout libcurfit.a lib$
+$update libcurfit.a
+$checkin libcurfit.a lib$
+$exit
+
+tfiles:
+	$set	GEN = "$$generic -k -t rd"
+
+	$ifolder (cv_b1evalr.x, cv_b1eval.gx)	$(GEN) cv_b1eval.gx $endif
+	$ifolder (cv_bevalr.x, cv_beval.gx)	$(GEN) cv_beval.gx  $endif
+	$ifolder (cv_fevalr.x, cv_feval.gx)	$(GEN) cv_feval.gx  $endif
+	$ifolder (cv_userfncr.x, cv_userfnc.gx) $(GEN) cv_userfnc.gx $endif
+	$ifolder (cvaccumr.x, cvaccum.gx)	$(GEN) cvaccum.gx  $endif
+	$ifolder (cvacptsr.x, cvacpts.gx)	$(GEN) cvacpts.gx   $endif
+	$ifolder (cvchomatr.x, cvchomat.gx)	$(GEN) cvchomat.gx  $endif
+	$ifolder (cvcoeffr.x, cvcoeff.gx)	$(GEN) cvcoeff.gx   $endif
+	$ifolder (cverrorsr.x, cverrors.gx)	$(GEN) cverrors.gx  $endif
+	$ifolder (cvevalr.x, cveval.gx)		$(GEN) cveval.gx    $endif
+	$ifolder (cvfitr.x, cvfit.gx)		$(GEN) cvfit.gx     $endif
+	$ifolder (cvfreer.x, cvfree.gx)		$(GEN) cvfree.gx    $endif
+	$ifolder (cvinitr.x, cvinit.gx)		$(GEN) cvinit.gx    $endif
+	$ifolder (cvpowerr.x, cvpower.gx)	$(GEN) cvpower.gx   $endif
+	$ifolder (cvrefitr.x, cvrefit.gx)	$(GEN) cvrefit.gx   $endif
+	$ifolder (cvrejectr.x, cvreject.gx)	$(GEN) cvreject.gx  $endif
+	$ifolder (cvrestorer.x, cvrestore.gx)	$(GEN) cvrestore.gx $endif
+	$ifolder (cvsaver.x, cvsave.gx)		$(GEN) cvsave.gx    $endif
+	$ifolder (cvsetr.x, cvset.gx)		$(GEN) cvset.gx     $endif
+	$ifolder (cvsolver.x, cvsolve.gx)	$(GEN) cvsolve.gx   $endif
+	$ifolder (cvstatr.x, cvstat.gx)		$(GEN) cvstat.gx    $endif
+	$ifolder (cvvectorr.x, cvvector.gx)	$(GEN) cvvector.gx  $endif
+	$ifolder (cvzeror.x, cvzero.gx)		$(GEN) cvzero.gx    $endif
+	;
+
+libcurfit.a:
+
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	cvaccumr.x	curfitdef.h <math/curfit.h>
+	cvacptsr.x	curfitdef.h <math/curfit.h>
+	cv_bevalr.x	
+	cv_b1evalr.x	
+	cvchomatr.x	curfitdef.h <mach.h> <math/curfit.h>
+	cvcoeffr.x	curfitdef.h
+	cverrorsr.x	curfitdef.h <mach.h>
+	cvevalr.x	curfitdef.h <math/curfit.h>
+	cv_fevalr.x	
+	cvfitr.x	curfitdef.h <math/curfit.h>
+	cvfreer.x	curfitdef.h
+	cvinitr.x	curfitdef.h <math/curfit.h> <mach.h>
+	cvpowerr.x	curfitdef.h <math/curfit.h> <mach.h>
+	cvrefitr.x	curfitdef.h <math/curfit.h>
+	cvrejectr.x	curfitdef.h <math/curfit.h>
+	cvrestorer.x	curfitdef.h <math/curfit.h>
+	cvsaver.x	curfitdef.h <math/curfit.h>
+	cvsetr.x	curfitdef.h <math/curfit.h>
+	cvsolver.x	curfitdef.h <math/curfit.h>
+	cvstatr.x	curfitdef.h <math/curfit.h>
+	cv_userfncr.x	curfitdef.h <math/curfit.h>
+	cvvectorr.x	curfitdef.h <math/curfit.h>
+	cvzeror.x	curfitdef.h
+
+	cvaccumd.x	dcurfitdef.h <math/curfit.h>
+	cvacptsd.x	dcurfitdef.h <math/curfit.h>
+	cv_bevald.x	
+	cv_b1evald.x	
+	cvchomatd.x	dcurfitdef.h <mach.h> <math/curfit.h>
+	cvcoeffd.x	dcurfitdef.h
+	cverrorsd.x	dcurfitdef.h <mach.h>
+	cvevald.x	dcurfitdef.h <math/curfit.h>
+	cv_fevald.x	
+	cvfitd.x	dcurfitdef.h <math/curfit.h>
+	cvfreed.x	dcurfitdef.h
+	cvinitd.x	dcurfitdef.h <math/curfit.h> <mach.h>
+	cvpowerd.x	dcurfitdef.h <math/curfit.h> <mach.h>
+	cvrefitd.x	dcurfitdef.h <math/curfit.h>
+	cvrejectd.x	dcurfitdef.h <math/curfit.h>
+	cvrestored.x	dcurfitdef.h <math/curfit.h>
+	cvsaved.x	dcurfitdef.h <math/curfit.h>
+	cvsetd.x	dcurfitdef.h <math/curfit.h>
+	cvsolved.x	dcurfitdef.h <math/curfit.h>
+	cvstatd.x	dcurfitdef.h <math/curfit.h>
+	cv_userfncd.x	dcurfitdef.h <math/curfit.h>
+	cvvectord.x	dcurfitdef.h <math/curfit.h>
+	cvzerod.x	dcurfitdef.h
+	;

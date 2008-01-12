@@ -1,0 +1,50 @@
+.help tbkeycol Aug91 noao.ptools.digiphot
+.ih
+NAME
+tbkeycol -- create new table columns from table header keywords
+
+.ih
+USAGE
+tbkeycol table keywords
+
+.ih
+PARAMETERS
+
+.ls table
+The list of input ST tables.
+.le
+.ls keywords
+The list of ST table header keywords, separated by commas, whose values will be
+copied into the newly created ST table columns.
+.le
+
+.ih
+DESCRIPTION
+
+TBKEYCOL takes a list of ST tables \fItable\fR and copies the values of the
+header keywords \fIkeywords\fR into newly created columns of the same name.
+If the input file is not an ST table, an output column of the same name as the
+keyword already exists, or the keyword does not exist, no action is
+taken. Otherwise a new column of the same name as the keyword is created,
+and the value of the keyword is copied into all rows of the table.
+
+.ih
+EXAMPLES
+
+1. For the list of ST tables in tablelist, copy the values of the header
+keywords "IMAGE", "ITIME", "IFILTER", and "XAIRMASS" into table columns
+of the same name.
+
+.nf
+   pt> tbkeycol @tablelist "IMAGE,ITIME,IFILTER,XAIRMASS"
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Since the structure of the ST table is altered the user must have
+write permission on the table in order to run TBKEYCOL.
+.ih
+SEE ALSO
+.endhelp

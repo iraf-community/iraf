@@ -1,0 +1,33 @@
+This directory contains a collection of routines for solving linear least
+squares problems by the Singular Value Decomposition (SVD) method, as
+described in "Solving Least Squares Problems", by Charles L. Lawson and
+Richard J. Hanson, Prentice Hall, 1974.  The appendix of this book contains
+full listings of the Fortran codes, as well as a users guide.
+
+The numerical subroutines are in this directory.  The directory "progs"
+contains a number of examples of the use of these routines in Fortran programs.
+
+The numerical routines have been modified to eliminate the use of Fortran
+i/o for error conditions.  The integer status return IER has been added to
+all such routines, and the Fortran write statement(s) removed.  A successful
+call returns zero in IER, while an unsucessful call returns a positive integer
+error code, identifying the error.  The original codes are in the directory
+"original_f".
+
+The affected routines and the new calling sequences are as follows:
+
+      subroutine BNDSOL (mode,g,mdg,nb,ip,ir,x,n,rnorm,ier)
+      subroutine LDP	(g,mdg,m,n,h,x,xnorm,w,index,ier)
+      subroutine NNLS	(a,mda,m,n,b,x,rnorm,w,zz,index,ier)
+      subroutine SVDRS	(a,mda,mm,nn,b,mdb,nb,s,ier)
+
+The routines SVA and MFEOUT were not installed in the library, since they
+do extensive i/o, but have been modified to reflect the changes to the
+above subroutines.
+
+See "lsq.x" and "band.x" in progs/ for examples demonstrating the use
+of these routines in IRAF spp programs.
+
+20Nov82 D.Tody
+
+Oct85	Added comma after P edit descriptor in sva.f

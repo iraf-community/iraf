@@ -1,0 +1,7 @@
+input,f,a,"",,,"Name of file containing header keyword"
+keyword,s,a,"",,,"Name of header keyword"
+table,f,a,"",,,"Name of table"
+column,s,a,"",,,"Name of column"
+row,i,a,,1,,"Number of row"
+silent,b,h,no,,,"Do not print any warning messages?"
+mode,s,h,"al",,,

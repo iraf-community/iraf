@@ -1,0 +1,7 @@
+tbl_file,f,a,,,,File containing table of x-y pairs
+input,f,a,STDIN,,,input for x-interpolant values
+int_mode,s,h,spline,,,Use linear or spline interpolator
+curve_gen,b,h,no,,,Generate a curve between specified limits
+x1,r,a,,,,First point in range of generated curve
+x2,r,a,,,,Last point in range of generated curve
+dx,r,a,,,,Interval between generated points

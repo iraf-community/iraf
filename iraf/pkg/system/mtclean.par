@@ -1,0 +1,3 @@
+all,b,h,no,,,delete all lok files unconditionally
+stale,i,h,3600,,,threshold (seconds) after which old lok files are deleted
+verbose,b,h,no,,,print names of lok files as they are deleted

@@ -1,0 +1,32 @@
+.help zfpath May84 "System Interface"
+.ih
+NAME
+zfpath -- convert an OSFN into an absolute pathname
+.ih
+SYNOPSIS
+.nf
+zfpath (osfn, pathname, maxch, status)
+
+char	osfn[ARB]		# OS filename
+char	pathname[maxch]		# absolute pathname equiv. of OSFN
+int	maxch, status
+.fi
+.ih
+DESCRIPTION
+Return the absolute pathname equivalent of an OS filename.  An absolute pathname
+is an OSFN which does not depend on the current working directory.
+If the argument \fIosfn\fR is null the pathname of the current working
+directory is returned.
+.ih
+RETURN VALUE
+ERR is returned if the translation cannot be performed for any reason,
+or if the output string overflows.  If the operation is successful the
+number of characters in the output string is returned.
+.ih
+NOTES
+This primitive is normally coded in SPP since it does not communicate
+with the host system.  Character string arguments are therefore not packed.
+.ih
+SEE ALSO
+zfxdir, zfsubd
+.endhelp

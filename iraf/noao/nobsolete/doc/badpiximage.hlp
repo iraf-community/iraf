@@ -1,0 +1,51 @@
+.help badpiximage Jun87 noao.nobsolete
+.ih
+NAME
+badpiximage -- Create a bad pixel mask image from a bad pixel file
+.ih
+USAGE
+badpiximage fixfile template image
+.ih
+PARAMETERS
+.ls fixfile
+Bad pixel file.
+.le
+.ls template
+Template image used to define the size of the bad pixel mask image.
+.le
+.ls image
+Bad pixel mask image to be created.
+.le
+.ls goodvalue = 1
+Integer value assigned to the good pixels.
+.le
+.ls badvalue = 0
+Integer value assigned to the bad pixels.
+.le
+.ih
+DESCRIPTION
+A bad pixel mask image is created from the specified bad pixel file.
+The format of the bad pixel file is that used by \fBccdproc\fR to
+correct CCD defects (see instruments).  The bad pixel image is of pixel type short and
+has the value given by the parameter \fBgoodvalue\fR for the good
+pixels and the value given by the parameter \fBbadvalue\fR for the bad pixels.
+The image size and header parameters are taken from the specified
+template image.  The bad pixel mask image may be used to view the
+location of the bad pixels and blink against an data image using an
+image display, to mask or flag bad pixels later by image arithmetic,
+and to propagate the positions of the bad pixels through the
+reductions.
+.ih
+EXAMPLES
+1. To make a bad pixel mask image from the bad pixel file "cryocambp.dat"
+using the image "ccd005" as the template:
+
+	cl> badpiximage cryocambp.dat ccd005 cryocambp
+
+2. To make the bad pixel mask image with good values of 0 and bad values of 1:
+
+	cl> badpixim cryomapbp.dat ccd005 cryocambp good=0 bad=1
+.ih
+SEE ALSO
+text2image
+.endhelp

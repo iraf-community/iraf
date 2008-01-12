@@ -1,0 +1,35 @@
+.help tobsolete Jun97 tables.tobsolete
+.ih
+NAME
+tobsolete -- Tables packages that are obsolete or are no longer needed
+.ih
+INTRODUCTION
+The `table.tobsolete' package contains tasks that are no longer useful
+or needed. While these tasks will no longer be supported, they have 
+been placed in `sobsolete' to give users a chance to switch to the 
+replacement tasks.  Generally, tasks in this package will disappear 
+from STSDAS completely with the next major release.
+.ih
+TASKS
+#.ls r49fits
+#This task is a workaround for a bug in an old version of iraf that
+#could not read wfpc2 iamges because they had too many group
+#parameters. It is not needed if you have a recent version of iraf.
+#.le
+.ls trename
+The task was declared obsolete because it does little more than the
+iraf rename task.
+.le
+.endhelp
+
+
+
+
+
+
+
+
+
+
+
+

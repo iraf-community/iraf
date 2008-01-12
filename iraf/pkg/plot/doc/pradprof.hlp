@@ -1,0 +1,132 @@
+.help pradprof Aug91 plot
+.ih
+NAME
+pradprof -- plot or list the radial profile of a stellar object
+.ih
+USAGE
+pradprof input xinit yinit
+.ih
+PARAMETERS
+.ls input
+The list of images containing the object of interest.
+.le
+.ls xinit, yinit
+The initial guess for the  x and y coordinates of the object whose
+profile is to be computed.  If \fIcenter\fR
+is yes, \fIxinit\fR and \fIyinit\fR are the initial input to the centering 
+algorithm, otherwise \fIxinit\fR and \fIyinit\fR are passed directly to the
+radial profiling algorithm.
+.le
+.ls radius = 11
+The plotting radius in pixels.
+.le
+.ls az1 = 0., az2 = 360.
+Azimuth limits for the profile points in degrees.  The azimuth is
+measured from the x or first image axis towards the y or second image
+axis.  Negative azimuths are allowed as are any multiples of 360.
+.le
+.ls center = yes 
+Center the initial coordinates before computing the profile?
+.le
+.ls cboxsize = 5
+The size of the extraction box of pixels to be used by the centering
+algorithm.
+.le
+.ls list = no
+Make a list of the radial profile, instead of a plot?
+.le 
+.ls graphics = "stdgraph"
+The graphics device for plotting.
+.le
+.ls append = no
+Append to an existing plot?
+.le
+.ls title = "imtitle"
+The plot title. If title = "imtitle", the image name, \fIxinit\fR, and
+\fIyinit\fR are
+used to construct a default title, otherwise the user specified title is
+used.
+.le
+.ls xlabel = "Radius", ylabel = "Intensity"
+The default labels for the X and Y axes.
+.le
+.ls wx1 = INDEF, wx2 = INDEF, wy1 = INDEF, wy2 = INDEF
+The range of user coordinates spanned by the plot. By default the data is
+used to determine the range.
+.le
+.ls logx = no, logy = yes
+Use log scaling on the x or y axes of the plot?
+.le
+.ls round = no
+Round the axes minimum and maximum values up to "nice" values?
+.le
+.ls box = yes
+Draw axes at the perimeter of the plotting window?
+.le
+.ls majrx = 5, minrx = 5, majry = 5, minry = 5
+Number of major tick marks on each axis and number of minor tick marks between
+major tick marks. These quantities are ignored if log scaling is in effect
+for an axis.
+.le
+.ls ticklabels = yes
+Label the tick marks?
+.le
+.ls fill = yes
+Fill the output viewport regardless of the device aspect ratio ?
+.le
+.ls vx1 = 0.0, vx2 = 1.0, vy1 = 0.0, vy2 = 1.0
+The NDC coordinates (0.0:1.0) of the device plotting viewport.
+.le
+.ls pointmode = yes
+Plot points instead of lines?
+.le
+.ls marker = "plus"
+Type of marker used in pointmode.
+.le
+.ls szmarker = 1.
+Size of markers used in pointmode.
+.le
+
+.ih
+DESCRIPTION
+
+PRADPROF computes a radial profile of length \fIradius\fR pixels
+with a range of azimuths (\fIaz1\fR to \fIaz2\fR),
+for the object near (\fIxinit\fR, \fIyinit\fR) in the input image(s) 
+\fIinput\fR, and plots it on the graphics device \fIgraphics\fR.
+If the parameter \fIcenter\fR is
+"yes", then pixels in a box \fIcboxwidth\fR wide around the initial
+coordinates and a simple centroiding algorithm  are used to
+compute a more accurate center, before the radial profile is computed.
+
+The azimuths are measured from the first image axis towards the second
+image axis.  The limits may be given in any multiple of 360 degrees
+including negative azimuths.
+
+If the parameter
+\fIappend\fR is yes then the new plot will be appended to an existing plot,
+otherwise the device is cleared and a new plot is made. The
+remainder of the parameters control the details of how
+the plot is displayed. If the parameter \fBlist\fR is "yes" 
+the radial profile is listed on the standard output instead of plotted.
+
+.ih
+EXAMPLES
+1. Plot the radial profile of a star near (123, 234).
+
+    cl> pradprof m92red 123 234 
+
+2. Plot the profile around (123, 234) with centering turned off.
+
+    cl> pradprof m92red 123 234 center=no
+
+3. List the radial profile and redirect it to a file.
+
+    cl> pradprof m92red 123 234 list=yes > profile 
+
+.ih
+BUGS
+.ih
+SEE ALSO
+proto.imcntr, imexamine
+.endhelp

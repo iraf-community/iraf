@@ -1,0 +1,45 @@
+.help normalize Sep84 noao.imred.generic
+.ih
+NAME
+normalize -- Normalize images
+.ih
+USAGE	
+normalize images
+.ih
+PARAMETERS
+.ls images
+Images to be normalized.
+.le
+.ls norm = INDEF
+Normalization factor to be used if not INDEF.  If INDEF the normalization
+factor is determined by sampling the images.
+.le
+.ls sample_section = "[]"
+Section of the image to be sampled in determining the image mean.
+.le
+.ls lower = INDEF
+Lower limit of pixel values for calculating the normalization.
+INDEF corresponds to the minimum possible pixel value.
+.le
+.ls upper = INDEF
+Upper limit of pixel values for calculating the normalization.
+INDEF corresponds to the maximum possible pixel value.
+.le
+.ih
+DESCRIPTION
+Each of the images is normalized.  The normalization is specified by the
+parameter \fInorm\fR.  If the value of \fInorm\fR is INDEF then a normalization
+is determined by sampling the image.  The normalization is then the mean
+of the pixels in the sample section with values in the range \fIlower\fR
+to \fIupper\fR.  The default sample section selects all pixels in the image.
+The normalized images are of datatype "real" and replace the original images.
+.ih
+EXAMPLES
+To normalize a set of two dimensional images excluding deviant pixels below
+1000 and above 5000 and subsampling every fifth pixel in each dimension:
+
+	cl> normalize frame* sample=[*:5,*:5] low=1000 up=5000
+.ih
+SEE ALSO
+imstatistics, normflat
+.endhelp

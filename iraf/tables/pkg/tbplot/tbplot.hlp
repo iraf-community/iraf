@@ -1,0 +1,18 @@
+.help tbplot Aug93 tables
+The 'tbplot' package includes general purpose plotting tasks
+tailored toward STSDAS data formats; that is, tables and group format
+image files.
+
+.ls sgraph
+The 'sgraph' task 
+includes all of the functions of the IRAF 'plot.graph' task, but adds
+the ability to plot from STSDAS tables (images and text files were supported
+by 'graph'). In 'sgraph', you can plot a single column against a row, or
+a column against another column.
+.le
+.ls igi
+The 'igi' task is an interactive interpreter for producing
+arbitrary plots.  The syntax of the commands is based on Mongo, but 'igi'
+operates within IRAF and is device independent.
+.le
+.endhelp

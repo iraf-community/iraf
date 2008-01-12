@@ -1,0 +1,49 @@
+.help subsets May85 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+subsets - Subtract pairs of spectra in a string
+.ih
+USAGE
+subsets input records
+.ih
+PARAMETERS
+.ls input
+The root file name for the input spectra in the string.
+.le
+.ls records
+The range of spectra indicating the elements of the string.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the names of the spectra which will
+be created by the subtraction operation.
+.le
+.ls start_rec
+The starting record number to be appended to the root name of the
+created spectra.
+.le
+.ih
+DESCRIPTION
+Pairs of spectra are formed from the input string in the order that
+the record numbers would suggest. 
+The first spectrum in the pair is assumed to be the
+principle spectrum and the second spectrum in the pair is subtracted
+from the first. The result is written out as a new spectrum.
+
+No compensation is made for exposure time during the subtraction.
+The header from the principle spectrum is assigned to the output
+spectrum.
+
+.ih
+EXAMPLES
+The following example forms 50 new spectra from nite1.2001-nite1.2002,
+nite1.2003-nite1.2004, ...
+
+	cl> subsets nite1 2001-2100
+
+The following example creates new spectra from the pairs nite2.2001-nite2.2002,
+nite2.2003-nite2.2004 in spite of the order of the record numbers entered.
+
+	cl> subsets nite2 2001,2003,2002,2004
+.endhelp

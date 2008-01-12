@@ -1,0 +1,11 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	generic.e
+
+generic.e:	lexyy.o chario.o generic.o yywrap.o
+	$(CC) $(HSI_LF) -o generic.e $^
+	cp -p generic.e ../../bin/.
+
+clean::
+	rm -f *.o generic.e ../../bin/generic.e

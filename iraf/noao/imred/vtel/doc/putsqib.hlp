@@ -1,0 +1,38 @@
+.help putsqib Jan85 noao.imred.vtel
+.ih
+NAME
+putsqib -- Merge a full disk image with a squibby brightness image
+.ih
+USAGE
+putsqib inputimage sqibimage outputimage
+.ih
+PARAMETERS
+.ls inputimage
+Name of data image to merge with squibby brightness image.
+.le
+.ls sqibimage
+Name of squibby brightness image to merge with data image.
+.le
+.ls outputimage
+Name of new, merged, output image.
+.le
+.ih
+DESCRIPTION
+Putsqib accepts as input a data image and a squibby brightness image.  It
+multiplies each pixel in the input data image by 16 and adds the associated
+pixel from the squibby brightness input image.  The pixel is then written
+to the new, output image.
+.ih
+EXAMPLES
+1. To merge a data image called 'data' and a squibby brightness image called
+'sqib' and store the result in an image called 'complete', the command
+would be:
+
+.nf
+	vt> putsqib data sqib complete
+.fi
+
+.ih
+SEE ALSO
+getsqib
+.endhelp

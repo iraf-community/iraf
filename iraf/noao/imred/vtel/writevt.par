@@ -1,0 +1,4 @@
+imagefile,s,q,,,,Image file descriptor
+outputfile,s,q,,,,Output file descriptor
+verbose,b,h,no,,,Print out header data and give progress reports
+new_tape,b,q,,,,Are you using a new tape?

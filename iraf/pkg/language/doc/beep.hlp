@@ -1,0 +1,19 @@
+.help beep Feb86 language
+.ih
+NAME
+beep -- beep the terminal
+.ih
+USAGE
+beep
+.ih
+DESCRIPTION
+Beep sends the bell character (^G) to the terminal.
+.ih
+EXAMPLES
+1. Wait for a background job to complete, ringing the terminal bell when done.
+
+	cl> wait;beep
+.ih
+SEE ALSO
+clear
+.endhelp

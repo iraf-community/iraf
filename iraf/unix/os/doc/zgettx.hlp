@@ -1,0 +1,57 @@
+.help zgettx May84 "System Interface"
+.ih
+NAME
+zgettx -- get next line from a text file
+.ih
+SYNOPSIS
+.nf
+zgettx (chan, text, maxch, status)
+
+int	chan			# OS channel of file
+char	text[maxch]		# output record buffer
+int	maxch			# capacity of buffer
+int	status
+.fi
+.ih
+DESCRIPTION
+At most \fImaxch\fR chars are read from the next line of the text file
+connected to channel \fIchan\fR into the buffer \fItext\fR.
+A line of text is a sequence of zero or more characters terminated by the
+\fBnewline\fR character (normally linefeed).  If \fImaxch\fR is less than
+the length of the line the next read will return the remainder of the line
+or \fImaxch\fR characters, whichever is smaller.  The newline character
+counts as one character and is returned as the final character in \fItext\fR
+when end of line is reached.  The \fBzgettx\fR primitive always returns ASCII
+character data unpacked into the SPP char array \fItext\fR.  The \fItext\fR
+array is not EOS delimited.
+.ih
+RETURN VALUE
+ERR is returned for a read error or for an illegal call.  If the read is
+successful the number of characters read (including the newline) is returned
+in \fIstatus\fR.  When EOF is reached successive reads will return nothing,
+i.e., the number of characters read will be zero.
+.ih
+NOTES
+There is no fixed upper limit on the length of a line.  In normal usage FIO
+calls \fBzputtx\fR to write out the internal FIO fixed size line buffer
+whenever it sees a newline in the output.  If an applications program writes
+a very long line, the line buffer in FIO will overflow and \fBzputtx\fR will
+be called to write out the contents of the buffer without a newline terminator.
+FIO will also write out a partial line when the output is explicitly flushed.
+On input FIO uses the same fixed size line buffer, and several calls to
+\fBzgettx\fR may be required to read a full line.
+
+If the host system does not use the ASCII character set \fBzgettx\fR will
+convert characters to ASCII upon input.  The full ASCII character set is
+permitted, i.e., control characters may be embedded in the text.
+.ih
+BUGS
+Individual IRAF and host system utilities may place their own limits on the
+maximum length of a line of text.  The lower bound on the size of a line
+of text in IRAF programs is globally defined by the parameter SZ_LINE in
+\fBiraf.h\fR and may easily be adjusted by the system installer.  A sysgen
+of the entire system is required as SZ_LINE is used everywhere.
+.ih
+SEE ALSO
+zfiotx, zputtx
+.endhelp

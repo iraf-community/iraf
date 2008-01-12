@@ -1,0 +1,141 @@
+SUN/IRAF V2.3 Installation, 17 April 1986	Sun-2, software floating point
+------------------------------------------------------------------------------
+
+/usr/iraf/*****
+/usr/iraf
+	Located IRAF root directory at /usr/iraf, created iraf/local
+	for personal file storage.  Unpacked tar archive of v2.3, 17 Apr
+	version, from master VAX/UNIX system "lyra".  (4/17)
+
+unix/as
+unix/as/ishift.s
+unix/as/zsvjmp.s
+	Moved the VAX as/ to unix/vaxas.  Created an empty unix/as and
+	copied the two SUN .s files into it from unix/mc68000.  (4/17)
+
+unix/hlib/mach.h
+unix/hlib/libc/spp.h
+	Set EPSILONR and EPSILOND for the SUN as in unix/mc68000/README.
+	Set BYTE_SWAP2 and BYTE_SWAP4 to NO in mach.h.  (4/17)
+
+unix/hlib/mkmlist.csh
+	Changed bgrep to grep, since bgrep not available in standard
+	UNIX.  (Not important, doesn't have to work, so the efficiency
+	of bgrep on the development machine is worth the mach. dependence.)
+	(4/17)
+
+home$.login
+unix/hlib/mkiraf.csh
+unix/hlib/libc/iraf.h
+	Changed all occurrences of iraf root directory pathname.  (4/17)
+
+unix/hlib/mkpkg.inc
+	Set USE_CALCOMP to no.  (4/17)
+
+/usr/include/iraf.h	-> $hlib/libc/iraf.h
+	Establish this symbolic link as superuser (i.e. %su; cd /usr/include; 
+	ln -s $hlib/libc/iraf.h iraf.h).  This is necessary for compiling
+	IRAF programs.	(4/17)
+
+unix/hlib/[dir]1mach.f
+	Commented out the VAX data statements, and uncommented the IEEE/
+	68000 data statements.  (4/17)
+
+TODO: unix/as/*.x
+	It would be nice to have some additional assembler modules for 
+	efficiency reasons.  See unix/vaxas.  Coding of these can be left
+	for later.
+
+/usr/iraf/hlib/libc/kernel.h
+    Commented out DEBUGMEM in order to use the standard UNIX malloc rather
+    than IRAF's version.  This is necessary for some reason on the Sun for
+    SunCGI programs to be callable from SPP programs.  (4/17)
+
+------------------------------------------------------------------------------
+That completes the initial setup.  Now we bootstrap the system.
+
+	% cd $iraf/unix
+	% sh -x mkpkg.csh >& spool &
+
+This builds all the bootstrap utilities, then as a final step compiles the
+portion of LIBSYS in host/gdev, which exercises MKPKG, XC, etc.  If all that
+works things are in excellent shape.  (4/17)
+
+/usr/bin/alloc		-> $hlib/alloc.e
+/usr/bin/generic	-> $hlib/generic.e
+/usr/bin/mkpkg		-> $hlib/mkpkg.e
+/usr/bin/rmbin		-> $hlib/rmbin.e
+/usr/bin/rmfiles	-> $hlib/rmfiles.e
+/usr/bin/rtar		-> $hlib/rtar.e
+/usr/bin/wtar		-> $hlib/wtar.e
+/usr/bin/xc		-> $hlib/xc.e
+/usr/bin/cl		-> $hlib/cl.e
+	Establish these symbolic links as superuser (e.g. cd /usr/include; 
+	ln -s $hlib/mkiraf.csh mkiraf).  These are required for regular
+	users who do not have a .cshrc or .login which sources
+	$iraf/unix/hlib/irafuser.csh, for running the cl or mkiraf.
+	Ordinarily we only link xc, mkiraf, and mkpkg here, but since we're
+	doing development on the Sun outside IRAF, the rest are useful. (4/17)
+
+unix/hlib/alloc.e
+	This file must belong to root, since it needs root permissions at
+	runtime to allocate devices.  Do the following:
+
+	% cd $hlib
+	% su
+	% /etc/chown 0 alloc.e		(4/17)
+
+-------------------------------------------
+The bootstrap is now complete.  The next step is to do a full system compile.
+
+There are 5 files that need to be hand-compiled without optimization (from
+previous experience on the SUN) to avoid getting in an infinite loop in pass
+c2 of the compiler.  "xc -c" each file to create an object file in its
+directory; mkpkg will then avoid recompiling it.  Note:  see local/bugs
+README for description of "-P" for partial optimization instead.
+
+	sys/fio/fstati.x
+	math/bevington/matinv.f
+	sys/gio/nspp/portlib/gridal.f
+	sys/ki/irafks.x
+	pkg/twodspec/longslit/transform/igsfit/igsfit.f
+
+    (The following two entries are from the previous NOTES file on tucana;
+    I'm not sure if this ishift is the correct one:  Doug indicated that
+    the fixed ishift on tucana hadn't made it back to lyra, but DIFF showed
+    only half of a comment line difference between the lyra version and the
+    version unpacked from the $iraf/unix directory in the tucana archive.
+    The stgdrawch.x fix also hadn't made it back to lyra prior to cutting
+    the tape for this installation.)
+
+    unix/as/ishift.s
+	    Would not do a right shift, since the 68010 uses two different
+	    instructions to do left and right shifts, unlike the vax, which
+	    allows the shift argument to be negative.  Changed to use the ROL
+	    and ROR instructions.
+
+    sys/gio/stdgraph/stgdrawch.x
+	    When stdgraph kernel attempted to draw high-quality text, it 
+	    began drawing lines and garbage text all over the screen until it
+	    hit a segmentation violation.  Traced to module sgch_flush(),
+	    "call stg_polyline (pl, op / 2)", (SHORT op), where stg_polyline
+	    wanted an INT for the 2nd argument.  Changed to "int (op / 2)".
+
+Now perform the full system compile (sysgen).
+
+	% cd $iraf
+	% mkpkg >& spool &				(4/17)
+
+	Begun at Thu Apr 17 13:13:22 MST 1986; ended at Fri Apr 18 06:35:16
+	MST 1986, for a sysgen time of 17h22m.  The only suspicious thing in
+	the spoolfile was in XTOOLS, where mkpkg could not find module or
+	label "generic".  (4/20)
+
+$iraf/bin/x_cv.e
+$iraf/bin/x_display.e
+$iraf/vms/
+	Removed these files and directories to free up disk space.  (4/20)
+
+(help database)
+	Ran MKHELPDB from the CL, having neglected to do so immediately
+	after the sysgen.  (4/23)

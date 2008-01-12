@@ -1,0 +1,150 @@
+#!/bin/sh
+# cl.sh -- Startup the version of the CL executable compiled for the
+# architecture or floating point hardware appropriate for the current
+# machine.
+
+# Determine CL binary to run based on how we were called.
+
+cl_binary="cl.e"
+
+# Determine IRAF root directory (value set in install script).
+d_iraf="/iraf/iraf/"
+if [ ! "$iraf" = "" ]; then
+    iraf="`echo $iraf/ | tr -s '/'`"
+    if [ ! -d $iraf ]; then
+	echo "Warning: iraf=$iraf does not exist (check .bashrc, .cshrc, etc.)"
+	echo "Session will default to iraf=$d_iraf"
+	iraf=""
+	sleep 3
+    fi
+fi
+if [ "$iraf" = "" ]; then
+    iraf="$d_iraf"
+    export iraf
+fi
+
+# Check for a version query.
+if [ "$1" != "" ]; then
+    if [ "$1" = "-v" -o "$1" = "-version" -o \
+	 "$1" = "-V" -o "$1" = "--version" ]; then
+	head -1 $iraf/unix/hlib/motd
+	exit 0
+    fi
+fi
+
+# Determine platform architecture.
+if [ ! "$IRAFARCH" = "" ]; then
+    if [ -x $iraf/bin.${IRAFARCH}/$cl_binary ]; then
+	MACH="$IRAFARCH"
+	export MACH
+    fi
+fi
+
+if [ "$MACH" = "" ]; then
+    os_mach="`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`"
+    if [ "`uname -m`" = "x86_64" ]; then
+	mach="x86_64-linux-generic"
+    elif [ -f /etc/redhat-release ]; then
+	if [ "`uname -m`" = "ppc" ]; then
+	    mach="linuxppc"
+	else
+	    mach="redhat"
+	fi
+    else
+	mach="`uname -s | tr '[A-Z]' '[a-z]'`"
+    fi
+
+    if [ "$mach" = "darwin" ]; then
+        if [ "`uname -m`" = "i386" ]; then
+            mach="macintel"
+        else
+            mach="macosx"
+        fi
+    elif [ "$os_mach" = "cygwin" ]; then
+        mach="cygwin"
+    fi
+
+
+    if [ -x $iraf/bin.$mach/$cl_binary ]; then
+	MACH="$mach"
+    elif [ -x $iraf/bin.freebsd/$cl_binary ]; then
+	MACH="freebsd"
+    elif [ -x $iraf/bin.macosx/$cl_binary ]; then
+	MACH="macosx"
+    elif [ -x $iraf/bin.macintel/$cl_binary ]; then
+	MACH="macintel"
+    elif [ -x $iraf/bin.cygwin/$cl_binary ]; then
+	MACH="cygwin"
+    elif [ -x $iraf/bin.linux/$cl_binary ]; then
+	MACH="linux"
+    elif [ -x $iraf/bin.redhat/$cl_binary ]; then
+	MACH="redhat"
+    elif [ -x $iraf/bin.linuxppc/$cl_binary ]; then
+	MACH="linuxppc"
+    elif [ -x $iraf/bin.macosx/$cl_binary ]; then
+	MACH="macosx"
+    elif [ -x $iraf/bin.sunos/$cl_binary ]; then
+	MACH="sunos"
+    elif [ -x $iraf/bin.linuz/$cl_binary ]; then
+	MACH="linuz"
+    elif [ -x $iraf/bin.x86_64-linux-generic/$cl_binary ]; then
+	MACH="x86_64-linux-generic"
+    else
+	echo "cannot find $iraf/bin.xxx/$cl_binary!"
+	exit 1
+    fi
+    export MACH
+fi
+
+# Check for obsolete IRAFBIN definition.
+if [ "$IRAFBIN" != "" -a "$IRAFARCH" = "" ]; then
+    echo "Use IRAFARCH rather than IRAFBIN to specify the machine architecture"
+    echo "IRAFARCH, if defined, should be one of ffpa,f68881,i386,sparc, etc."
+fi
+
+# Just run the CL if IRAFARCH already defined.
+if [ "$IRAFARCH" = "" ]; then
+    # Determine the architecture to be used.
+    if [ "$MACH" = "freebsd" ]; then
+	IRAFARCH="freebsd"
+    elif [ "$MACH" = "linux" ]; then
+	IRAFARCH="linux"
+    elif [ "$MACH" = "redhat" ]; then
+	IRAFARCH="redhat"
+    elif [ "$MACH" = "linuxppc" ]; then
+	IRAFARCH="linuxppc"
+    elif [ "$MACH" = "macosx" ]; then
+	IRAFARCH="macosx"
+    elif [ "$MACH" = "macintel" ]; then
+	IRAFARCH="macintel"
+    elif [ "$MACH" = "cygwin" ]; then
+	IRAFARCH="cygwin"
+    elif [ "$MACH" = "sunos" ]; then
+	IRAFARCH="sunos"
+    elif [ "$MACH" = "linuz" ]; then
+	IRAFARCH="linuz"
+    elif [ "$MACH" = "x86_64-linux-generic" ]; then
+	IRAFARCH="x86_64-linux-generic"
+    fi
+    export IRAFARCH
+fi
+arch=".$IRAFARCH"
+
+# Recent linux systems display a problem in how pointer addresses 
+# interact with the stack and can result in a segfault.  Remove the
+# stacksize limit for IRAF processes until this is better understood.
+if [ "$IRAFARCH" = "redhat" -o \
+    "$IRAFARCH" = "linux" -o \
+    "$IRAFARCH" = "x86_64-linux-generic" -o \
+    "$IRAFARCH" = "linuxppc" ]; then
+    ulimit -s unlimited
+fi
+
+IRAFBIN=${iraf}bin$arch/
+export IRAFBIN
+file=${IRAFBIN}$cl_binary
+if [ -x $file ]; then
+    exec $file $@
+else
+    echo "$file not found"
+fi

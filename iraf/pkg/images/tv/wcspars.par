@@ -1,0 +1,19 @@
+# WCSPARS pset for WCSLAB containing user WCS
+
+ctype1,s,h,"linear",,,"X axis type"
+ctype2,s,h,"linear",,,"Y axis type"
+
+crpix1,r,h,0.,,,"X reference coordinate in the logical system"
+crpix2,r,h,0.,,,"Y reference coordinate in the logical system"
+crval1,r,h,0.,,,"X reference coordinate in the world system"
+crval2,r,h,0.,,,"Y reference coordinate in the world system"
+
+cd1_1,r,h,1.,,,"CD matrix"
+cd1_2,r,h,0.,,,"CD matrix"
+cd2_1,r,h,0.,,,"CD matrix"
+cd2_2,r,h,1.,,,"CD matrix"
+
+log_x1,r,h,0.,,,"The lower X-extent of the logical space"
+log_x2,r,h,1.,,,"The upper X-extent of the logical space"
+log_y1,r,h,0.,,,"The lower Y-extent of the logical space"
+log_y2,r,h,1.,,,"The upper Y-extent of the logical space"

@@ -1,0 +1,41 @@
+.help gmst Jun99 "Slalib Package"
+.nf
+
+      DOUBLE PRECISION FUNCTION slGMST (UT1)
+
+     - - - - -
+      G M S T
+     - - - - -
+
+  Conversion from universal time to sidereal time (double precision)
+
+  Given:
+    UT1    dp     universal time (strictly UT1) expressed as
+                  modified Julian Date (JD-2400000.5)
+
+  The result is the Greenwich mean sidereal time (double
+  precision, radians).
+
+  The IAU 1982 expression (see page S15 of 1984 Astronomical
+  Almanac) is used, but rearranged to reduce rounding errors.
+  This expression is always described as giving the GMST at
+  0 hours UT.  In fact, it gives the difference between the
+  GMST and the UT, which happens to equal the GMST (modulo
+  24 hours) at 0 hours UT each day.  In this routine, the
+  entire UT is used directly as the argument for the
+  standard formula, and the fractional part of the UT is
+  added separately;  note that the factor 1.0027379... does
+  not appear.
+
+  See also the routine slGMSA, which delivers better numerical
+  precision by accepting the UT date and time as separate arguments.
+
+  Called:  slDA2P
+
+  P.T.Wallace   Starlink   14 September 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

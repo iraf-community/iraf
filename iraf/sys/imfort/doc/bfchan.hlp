@@ -1,0 +1,27 @@
+.help bfchan Sep86 imfort.bfio
+.ih
+NAME
+bfchan -- return the kernel i/o channel of an open BFIO file
+.ih
+SYNOPSIS
+.nf
+integer function bfchan (fd)
+
+integer		fd		#I BFIO file descriptor of open file
+.fi
+.ih
+DESCRIPTION
+The \fIbfchan\fR procedure is used to get the i/o channel assigned to the
+file at open time by the binary file driver in the IRAF kernel.
+This may be used as input to the \fIzfiobf\fR binary file driver primitives
+if the lowest possible level of binary file i/o is desired (short of talking
+directly to the host system).  The \fIzfiobf\fR procedures provide a direct
+(unbuffered), block oriented, asynchronous binary file i/o interface.
+.ih
+RETURN VALUE
+The i/o channel assigned to the file by the \fIzfiobf\fR binary file driver
+at open time is returned as the function value.
+.ih
+SEE ALSO
+The manual pages for the binary file driver.
+.endhelp

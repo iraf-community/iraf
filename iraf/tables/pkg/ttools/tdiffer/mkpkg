@@ -1,0 +1,12 @@
+# Update the tdiffer application code in the ttools package library
+# Author: B.Simon, 14-JUN-88
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tbldiff.x     		<tbset.h>
+	tdiffer.x     		<tbset.h>
+	;

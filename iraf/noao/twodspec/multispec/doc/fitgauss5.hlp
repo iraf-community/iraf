@@ -1,0 +1,148 @@
+.help fitgauss5 Jul84 noao.twodspec.multispec
+.ih
+NAME
+fitgauss5 -- Fit spectra profiles with five parameter Gaussian model
+.ih
+USAGE
+fitgauss5 image start
+.ih
+PARAMETERS
+.ls image
+Image to be modeled.
+.le
+.ls start
+Starting sample line containing the initial model parameters.
+.le
+.ls lower = -10
+Lower limit for the profile fit relative to each spectrum position.
+.le
+.ls upper = 10
+Upper limit for the profile fit relative to each spectrum position.
+.le
+.ls lines = "*"
+Sample image lines to be fit.
+.le
+.ls spectra = "*"
+Spectra to be fit.
+.le
+.ls naverage = 20
+Number of data lines to be averaged about each sample image line before
+model fitting.
+.le
+.ls factor = 0.05
+The model fit to each line is iterated until the RMS error between the
+model line and the data line improves by less than this factor.
+.le
+.ls track = yes
+Track the model solution from the starting line to the other sample lines?
+.le
+.ls algorithm = 1
+Parameter fitting algorithm to use.  Legal values are 1 and 2.
+.le
+.ls fit_i0 = yes
+Fit the profile scale parameters i0?
+.le
+.ls fit_x0 = yes
+Fit the spectra position parameters x0?
+.le
+.ls fit_s0 = yes
+Fit the spectra shape parameters s0?
+.le
+.ls fit_s1 = no
+Fit the spectra shape parameters s1?
+.le
+.ls fit_s2 = no
+Fit the spectra shape parameters s2?
+.le
+.ls smooth_s0 = yes
+Fit a smoothing spline to the shape parameters s0 after each iteration?
+.le
+.ls smooth_s1 = yes
+Fit a smoothing spline to the shape parameters s1 after each iteration?
+.le
+.ls smooth_s2 = yes
+Fit a smoothing spline to the shape parameters s2 after each iteration?
+.le
+.ls spline_order = 4
+Order of the smoothing spline to be fit to the shape parameters.
+.le
+.ls spline_pieces = 3
+Number of polynomial pieces for the smoothing spline.
+.le
+.ls verbose = no
+Print general information about the progress of the model fitting.
+.le
+.ih
+DESCRIPTION
+The spectra profiles in the interval (\fIlower, upper\fR) about each
+spectrum position are fit with a five parameter Gaussian model for
+the specified sample lines of the image.  For a description of
+the model see \fBgauss5\fR.  The model fitting is performed using 
+simultaneous linearized least squares on the selected model profile
+parameters as determined by the \fIalgorithm\fR for the specified
+\fIspectra\fR.  The parameter fitting technique computes correction
+vectors for the parameters until the RMS error of the model image line
+to the data image line, which is an average of \fInaverage\fR lines
+about the sample line, improves by less than \fIfactor\fR.
+A solution which increases the RMS error of the model is not allowed.
+
+If the parameter \fItrack\fR is yes then the initial model parameters are
+those given in the database for the sample line \fIstart_line\fR.  From
+this starting point the model parameters are iterated to a best fit at
+each specified sample line and then the best fit is used as the starting
+point at the next line.  The tracking sequence is from the starting line
+to the last line and then, starting again from the starting line, to
+the first line.  Note that the model parameters, including the starting
+spectra positions, need be set only at the starting line.
+
+If \fItrack\fR is no then each specified sample line is fitted independently
+from the initial model parameters previously set for that line.  This option
+is used to add additional parameters to the model after an
+initial solution has been obtained or to refit a new image whose database
+was created as a copy of the database of a previously fit image.
+
+The shape parameters s0, s1, and s2 can be smoothed by fitting a spline of
+specified \fIorder\fR and number of spline pieces, \fInpp\fR to the
+parameters as a function of spectra position.
+The smoothing is performed after each iteration and before
+computing the next RMS error.  The smoothing is a form of local constraint
+to keep neighboring spectra from having greatly different shapes.
+The possibility of such erroneous solutions being obtained is present in
+very blended data.
+
+In \fIverbose\fR mode the RMS errors of each iteration are printed on the
+standard output.
+
+The selection of the parameters to be fit and the order in which they are
+fit is determined by \fIalgorithm\fR.  These algorithms are:
+
+.ls 4 1
+This algorithm fits the selected parameters (\fIfit_i0, fit_x0,
+fit_s0, fit_s1, fit_s2\fR) for the selected \fIspectra\fR simultaneously.
+.le
+.ls 4 2
+This algorithm begins by fitting the parameters i0, x0, and s0
+simultaneously.  Note that the values of s1 and s2 are used but are
+kept fixed.  Next the parameters s0 and s1 (the shape) are fit simultaneously
+keeping i0, x0, and s2 fixed followed by fitting i0 and x0 while
+keeping s0, s1, and s2 (the shape) fixed.  If either of these fits
+fails to improve the RMS then the algorithm terminates.
+Also, if after the two steps (the fit of s0 and s1 followed by the fit
+of i0 and x0), the RMS of the fit has not improved by more than the
+user specified factor the algorithm also terminates.  This algorithm has been
+found to be the best way to fit highly blended spectra.
+.le
+.ih
+EXAMPLES
+The default action is to fit Gaussian profiles to the spectra and trace
+the fit from the starting line.  An example of this is:
+
+	cl> fitgauss5 image 1
+
+To fit heavily blended spectra with the four parameter model (i0, x0, s0, s1):
+
+	cl> fitgauss5 image 1 algorithm=2
+.ih
+SEE ALSO
+findspectra
+.endhelp

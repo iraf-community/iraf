@@ -1,0 +1,117 @@
+.help gtpar May92 tables
+.ih
+NAME
+pltpar -- Parameters describing plot attributes.
+.ih
+USAGE
+pltpar
+.ih
+DESCRIPTION
+Parameters in the 'gtpar' pset specify the attributes of plots drawn with the
+'gtedit' task.
+
+Note that this is a pset, not an executable task.  Invoking the pset by name
+runs 'eparam', enabling the parameters to be interactively edited. 
+Parameters can also be modified on the
+CL command line by specifying the pset name and parameter name,
+for example, "gtpar.box = no").
+The pset name will also appear as one of
+the task parameters in the 'gtedit' task;
+to change values in the pset,
+position the cursor to the 'gtpar' pset name and type ":e" to invoke 'eparam'.
+.ih
+PARAMETERS
+.ls (wx1 = 0) [real]
+Left world X-coordinate (if autoscaling is not used).
+.le
+.ls (wx2 = 0.) [real]
+Right world X-coordinate (if autoscaling is not used).
+.le
+.ls (wy1 = 0.) [real]
+Lower world Y-coordinate (if no autoscaling is used).
+.le
+.ls (wy2 = 0.) [real]
+Upper world Y-coord (if not autoscaling).
+.le
+.ls (marker = box) [string, allowed values:  point | box | plus | 
+cross | circle | diamond | hline | vline | hebar | vebar]
+
+The name of the style of marker plotted at each point if 'pointmode=yes'.
+.le
+.ls (szmarker = 0.005) [real]
+The size of the markers if 'pointmode = yes'.  If this parameter is greater 
+than 0, its value represents the marker size in world coordinates (WC).  If it 
+is less than zero, the absolute value will be used, representing size in 
+normalized device coordinates (NDC).  If it is set to exactly zero, and the
+input is from a list file,
+then the third column in the input data is used as the marker size.
+.le
+.ls (logx = no) [boolean]
+Scale the X axis logarithmically?
+.le
+.ls (logy = no) [boolean]
+Scale the Y axis logarithmically?
+.le
+.ls (box = yes) [boolean]
+Draw the box containing the axes and labels around periphery of the 
+window?
+.le
+.ls (ticklabels = yes) [boolean]
+Label major tick marks?
+.le
+.ls (grid = no) [boolean]
+Draw grid lines on plot?
+.le
+.ls (xlabel) [string]
+X-axis label.
+.le
+.ls (ylabel) [string]
+Y-axis label.
+.le
+.ls (title = imtitle)
+The plot title consists of a standard system-supplied string containing
+the user's name, date, etc.  If the 'title' parameter contains the string
+"imtitle" (the default), then the plot title will contain a second line
+made up from the input file or table name.  Otherwise, the title will
+contain the string value.
+.le
+.ls (vx1 = 0.) [real, min = 0, max = 1]
+Left limit of device viewport.
+.le
+.ls (vx2 = 0.) [real, min = 0, max = 1]
+Right limit of device viewport.
+.le
+.ls (vy1 = 0.) [real, min = 0, max = 1]
+Bottom limit of device viewport.
+.le
+.ls (vy2 = 0.) [real], min = 0, max = 1]
+Upper limit of device viewport.
+.le
+.ls (majrx = 5) [integer]
+Number of major divisions along the X grid.
+.le
+.ls (minrx = 5) [integer]
+Number of minor divisions along the X grid.
+.le
+.ls (majry = 5) [integer]
+Number of major divisions along the Y grid.
+.le
+.ls (minry = 5) [integer]
+Number of minor divisions along the Y grid.
+.le
+.ls (round = no) [boolean]
+Round axes to nice values?
+.le
+.ls (fill = yes) [boolean]
+Fill the viewport rather than enforcing unity aspect ratio?
+.ih
+EXAMPLES
+.ih
+BUGS
+.ih
+SEE ALSO
+sgraph
+
+Type "help tables opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

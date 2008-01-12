@@ -1,0 +1,25 @@
+# Parameters for autoidentify task.
+
+reflist,s,h,"",,,Reference coordinate list
+refspec,s,h,"",,,Reference spectrum
+#crval,s,h,"INDEF",,,Coordinate reference value
+#cdelt,s,h,"INDEF",,,Coordinate interval per pixel
+crpix,s,h,"INDEF",,,Coordinate reference pixel
+crquad,s,h,"INDEF",,,Quadratic pixel distortion at reference pixel
+cddir,s,h,"sign","unknown|sign|increasing|decreasing",,Dispersion direction
+crsearch,s,h,"INDEF",,,Coordinate value search radius
+cdsearch,s,h,"INDEF",,,Coordinate interval search radius
+ntarget,i,h,100,,,Number of target features
+#nreference,i,h,40,,,Number of reference features
+npattern,i,h,5,3,10,Number of lines in patterns
+nneighbors,i,h,10,2,,Number of nearest neighbors in patterns
+nbins,i,h,6,1,,Maximum number of search bins
+ndmax,i,h,500,1,,Maximum number of dispersions to evaluate
+aidord,i,h,3,2,,Dispersion fitting order
+maxnl,r,h,0.02,0.,,Maximum non-linearity
+nfound,i,h,6,3,,Minimum number of lines in final solution
+sigma,r,h,.05,0.,,Sigma of line centering (pixels)
+minratio,r,h,0.1,0., 1.,Minimum spacing ratio to use
+rms,r,h,0.1,0.,,RMS goal (fwidths)
+fmatch,r,h,0.2,0.,1.,Matching goal (fraction unmatched)
+debug,s,h,"",,,Print debugging information

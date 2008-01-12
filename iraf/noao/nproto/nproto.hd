@@ -1,0 +1,21 @@
+# Help directory for the NPROTO package.
+
+$doc		= "noao$nproto/doc/"
+$ace		= "noao$nproto/ace/"
+$acedoc		= "noao$nproto/ace/doc/"
+$ir		= "noao$nproto/ir/"
+
+binpairs	hlp =doc$binpairs.hlp,		src = x_binpairs.x
+findthresh	hlp =doc$findthresh.hlp,	src = findthresh.cl
+iralign		hlp =doc$iralign.hlp,		src = ir$t_iralign.x
+irmatch1d	hlp =doc$irmatch1d.hlp, 	src = ir$t_irmatch1d.x
+irmatch2d	hlp =doc$irmatch2d.hlp, 	src = ir$t_irmatch2d.x
+irmosaic	hlp =doc$irmosaic.hlp,		src = ir$t_irmosaic.x
+linpol		hlp =doc$linpol.hlp,    	src = t_linpol.x
+mkms		hlp =doc$mkms.hlp,	    	src = mkms.cl 
+objmasks	hlp =acedoc$objmasks.hlp,	src = ace$t_objmasks.cl
+slitpic		hlp =doc$slitpic.hlp,		src = t_slitpic.x
+skygroup	hlp =doc$skygroup.hlp,		src = skygroup.cl
+skysep		hlp =doc$skysep.hlp,		src = skysep.cl
+revisions	sys =Revisions
+

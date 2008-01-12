@@ -1,0 +1,11 @@
+objects,s,a,,,,"List of object images"
+arcs,s,a,,,,"List of arc images"
+arctable,f,a,"",,,"Arc table"
+standards,s,a,,,,"List of standard images"
+obj,f,a,"",,,"File of object images"
+arc,f,a,"",,,"File of arc images"
+std,f,a,"",,,"File of standard images"
+ccdproc,b,q,,,,"Add CCDPROC keyword and continue?"
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+mode,s,h,"ql",,,

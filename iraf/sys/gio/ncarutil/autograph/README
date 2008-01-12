@@ -1,0 +1,46 @@
+AUTOGRAPH -- This directory contains the contents of the NCAR file
+autograph.f, unpacked one subroutine per file.  Here is the revision file 
+supplied by NCAR for the autograph package.  For NOAO specific enhancements, 
+see gio$ncarutil/README.
+
+ Revision history:
+
+ February, 1979   Added a revision history and enhanced machine
+                  independency.
+
+ September, 1979  Fixed a couple of problems which caused the code to
+                  bomb when core was pre-set to indefinites and the
+                  1st graph drawn was peculiar in some way and another
+                  which caused it to set the default dashed-line-speci-
+                  fier length wrong.  Added new documentation.
+
+ October, 1979    Changed the way IDIOT behaves when NPTS is negative.
+
+ March, 1980      Fixed a couple of small errors, one which prevented
+                  an error exit in AGSETP from ever being reached and
+                  another which caused AUTOGRAPH to blow up when given
+                  a zero or negative on a logarithmic axis.  Changed
+                  the way in which NBPF is computed by AGSTR1.
+
+ August, 1981     Removed all calls setting the plotter intensity and
+                  made the computation of the variable SMRL portable.
+
+ April, 1984      Made the code strictly FORTRAN-77 compatible, taking
+                  out all dependency on support routines (such as LOC).
+                  This required some changes in the user interface.
+
+ February, 1985   Put code in AGSETP to reclaim character-store space
+                  used by character-string dash patterns when they are
+                  redefined using binary patterns.  Also changed AGGTCH
+                  to return a single blank for a non-existent string.
+
+ August, 1985     Put code in AGGETP so that the label-name identifier
+                  is now returned properly.  Among other things, this
+                  cures a problem which caused the character-storage
+                  space to be eaten up.
+
+ December, 1985   Fixed AGSETP to zero the current-line pointer when
+                  the current-label pointer is changed.
+
+ January, 1986    Fixed AGAXIS to respond properly to the zeroing of
+                  NCIM by AGCHNL.

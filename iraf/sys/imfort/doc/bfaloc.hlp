@@ -1,0 +1,32 @@
+.help bfaloc Sep86 imfort.bfio
+.ih
+NAME
+bfaloc -- create and preallocate storage for a binary file
+.ih
+SYNOPSIS
+.nf
+subroutine bfaloc (fname, nchars, status)
+
+character*(*)	fname		#I host name of new file
+integer		nchars		#I size of file in "chars"
+integer		status		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIbfaloc\fR procedure creates a new file \fIfname\fR and preallocates
+space for at least \fInchars\fR SPP char units of storage.  The contents of
+the file are unitialized.
+.ih
+RETURN VALUE
+A negative status value indicates either that the file could not be created
+(e.g., due to insufficient permission), or that the requested amount of space
+could not be allocated.  A positive or zero status indicates that the operation
+succeeded.
+.ih
+NOTES
+On some systems, storage may not physically be allocated until the file is
+written into.
+.ih
+SEE ALSO
+bfopen
+.endhelp

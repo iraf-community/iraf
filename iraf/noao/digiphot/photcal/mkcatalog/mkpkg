@@ -1,0 +1,11 @@
+# The MKPKG file for the mkcatalog subdirectory.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_catalog.x   "../lib/io.h"  <fset.h>  <ctotok.h>  <ctype.h>
+	phrecord.x   "../lib/io.h"
+	;

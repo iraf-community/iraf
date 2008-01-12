@@ -1,0 +1,48 @@
+.help gsder Aug85 "Gsurfit Package"
+.ih
+NAME
+gsder -- evaluate the derivatives of the fitted surface
+.ih
+SYNOPSIS
+gsder (sf, x, y, zfit, npts, nxder, nyder)
+
+.nf
+pointer	sf		# surface descriptor
+real	x[npts]		# x array, xmin <= x[i] <= xmax
+real	y[npts]		# y array, ymin <= x[i] <= ymax
+real	zfit[npts]	# data values
+int	npts		# number of data points
+int	nxder		# order of x derivative, 0 = function
+int	nyder		# order of y derivative, 0 = function
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+Array of x and y values.
+.le
+.ls zfit
+Array of fitted values.
+.le
+.ls npts
+The number of points to be fit.
+.le
+.ls nxder, nyder
+The order of derivative to be fit. GSDER is the same as GSVECTOR if nxder = 0
+and nyder = 0. If nxder = 1 and nyder = 0 GSDER calculates the first
+derivatives of the surface with respect to x.
+.le
+.ih
+DESCRIPTION
+Evaluate the derivatives of a surface at a set of data points.
+GSDER uses the coefficients stored in the surface descriptor structure.
+.ih
+NOTES
+Checking for out of bounds x and y values is the responsibility of the
+calling program.
+.ih
+SEE ALSO
+gseval, gsvector
+.endhelp

@@ -1,0 +1,456 @@
+# Begin AIX IRAF configuration.  30Mar91.
+# RS/6000 Model 530, deskside, 24 Mb RAM 355+670 Mb disk, 24bit color.
+
+# lslpp -h bos.obj says the following.  This means our current OS is
+# 3001.  From the net I see that the latest release is 3003, so we
+# are a bit behind.  Also, the system was configured on 19-20 Sep 90.
+
+Option Name          State      Event      Date/Time Release         User Name
+-------------------- ---------- ---------- --------- --------------- ----------
+bos.obj              INACTIVE   COMMIT     02/02/90  03.01.0000.0000 root
+                     INACTIVE   APPLY      09/19/90  03.01.0001.0003 root
+                     ACTIVE     COMMIT     09/19/90  03.01.0001.0003 root
+
+unix/as
+unix/as.rs6000			+
+unix/bin
+unix/bin.rs6000			+
+	Set up AS and BIN directories for the machine architecture "rs6000.
+	(3/30)
+
+unix/as.rs6000/zsvjmp.c		+
+unix/os/mkpkg.sh
+unix/os/mkpkg
+	It won't be easy to generate the assembler version of zsvjmp.s for
+	the RS6000, so I set up a C version temporarily just to get things
+	to link.  The AIX CC doesn't have a -S flag and neither the AIX
+	assembler or architecture is simple, so it will take some work to
+	generate the assembler version.  (3/30)
+
+unix/hlib/libc/iraf.h
+	Set the iraf root to point to /u1/iraf.  (3/30)
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Checked that LEN_JUMPBUF was big enough for this machine; it wasn't,
+	had to increase it from 64 to 65.  (3/30)
+
+unix/hlib/irafuser.csh
+unix/hlib/mkiraf.csh
+unix/hlib/fc.csh
+unix/hlib/cl.csh
+	Made changes to reflect the new iraf root and architecture.  (3/30)
+
+unix/shlib/mkpkg.sh
+unix/gdev/sgidev/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/bootlib/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+unix/boot/generic/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/rpp/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+unix/boot/spp/rpp/ratlibc/mkpkg.sh
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/xyacc/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/os/mkpkg.sh
+	Replaced all the "cc" calls by $CC, the "f77" calls by $F77, and the
+	"ranlib" calls by $RANLIB.  (3/30)
+
+unix/hlib/irafuser.csh
+	Set the architecture (MACH) to rs6000.  Added definitions for CC, F77,
+	RANLIB.  (3/30)
+
+---------------
+Begin bootstrap attempts.  (3/30)
+
+unix/os/mkpkg.sh
+	Changed the "rm alloc.o" to "rm -rf alloc.o".  The AIX CC doesn't
+	leave the .o file behind.  (3/30)
+
+unix/hlib/irafuser.csh
+	Added compile time switches -D_BSD -D_NO_PROTO -D_BSDINCLUDES to
+	make the port go a little easier.  (3/30)
+
+unix/os/zfiomt.c
+	AIX has modified the unix tape interface as follows: 1) mtio.h is
+	not tape.h, 2) MTIOCTOP is STIOCTOP (ST = streaming tape), 3) struct
+	mtop is struct stop, 4) all the MTfoo ioctls are now STfoo, 5),
+	BSF/BSR are RSF/RSR.  Other than that things look very much the
+	same, just a few gratuitous name changes.  (3/30)
+
+unix/os/zfiopl.c
+unix/os/zfiolp.c
+	AIX CC insists that initializers be enclosed in { }.  Added brackets
+	to the initializers for the variable xnullstr in these two files.
+	(3/30)
+
+unix/os/zgtime.c
+unix/hlib/libc/kernel.h
+	Changed the macro define HZ to CLKFREQ.  The former is defined in
+	AIX and was causing a redefined symbol warning.  (3/30)
+
+unix/os/zxhwen.c
+	Modified the fcancel macro for the AIX stdio.h.  (3/30)
+
+AIX
+	1. The problem with pwd hanging the process in an infinite loop
+	recurred.  Once this happens any pwd will hang.  Evidently the only
+	way to clear the problem is to reboot.
+	2. Once a task hung and after a while I get an error message about
+	an NFS timeout, server felis not responding.  felis is the system I
+	am working on, the file access should be direct rather than NFS.
+	(3/31)
+
+unix/os/zwmsec.c
+	AIX likes signal handers to be declared type void rather than int.
+	Changed the #ifdef SUNOS4 to #ifdef _AIX.  (3/31)
+
+unix/boot/spp/rpp/ratlibc/ratdef.h
+	Removed the trailing underscores from all the Fortran callable C
+	externals.  AIX C and Fortran externals share the same name space
+	and both are preceeded by a leading period (rather than underscore)
+	in the host level symbol table.  (3/31)
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/knames.h
+unix/hlib/libc/xnames.h
+	Same as above.  (3/31)
+
+unix/hlib/libc/setjmp.h
+	Commented out some SunOS #pragma stuff.  (3/31)
+
+unix/mkpkg.sh
+	Commented out shared library stuff.  (3/31)
+
+unix/hlib/libc/knames.h
+	Restored the trailing underscore to ushlib_,vshlib_,vshend_ to avoid
+	a name conflict on vshlib in zzstrt.c.  Since these are not Fortran
+	generated externals we can have a trailing underscore or not as we
+	wish.  (3/31)
+
+unix/boot/mkpkg/scanlib.c
+	AIX uses COFF libraries (actually something called extended COFF)
+	but for some reason they changed the <ar.h> symbols ARMAG, SARMAG,
+	and SARAMAG to AIAMAG, SAIAMAG, and SAIAAMAG (they changed the R to
+	IA in each name).  It was not clear what was the reason for this
+	change.  A perhaps more justifiable one was that ar_fmag and ar_name
+	are now elements of the union _ar_name.  With these changes the file
+	at least compiles.  (3/31)
+
+unix/os/irafpath.c
+	Added #ifdef _AIX conditional to cause bin.rs6000 to be searched.
+	(3/31)
+
+unix/boot/spp/xc.c
+	Modified for AIX.  The fortran compiler is xlf, host libraries are
+	-lxlf, -lm, [-lbsd].  Default no shared library (yet).  (3/31)
+
+unix/hlib/iraf.h
+	Bitwise intrinsic functions are AND,OR,NOT,XOR (same as SPP!) no
+	changes needed.  (3/31)
+
+unix/hlib/mach.h
+	An "od" test appears to indicate that the RS6000 byte ordering is
+	big-endian (same as Sun) so no byte swapping needed.  (3/31)
+
+AIX
+	The system IS pretty fast - only takes about 10min for a bootstrap.
+	(3/31)
+
+unix/hlib/install
+	1. Added #!/bin/csh at the top of the file.  The default root shell
+	is ksh and ksh was trying to exec the file.
+	2. Commented out the line with `mach` and added one set to rs6000.
+	3. Uncommented the exit 0 to skip the Suntools stuff.  (3/31)
+
+---------------------------
+Start sysgen attempts.  (3/31)
+
+unix/boot/spp/xpp/decl.c
+	XLF cannot compile integer*[2|4] functions (types char, short, and
+	long in SPP).  Upon enountering a routine declared, e.g.,
+
+		integer*4 function foo (args)
+
+	the compiler returns the message
+
+	        1.17   1514-105: (S) Variable functionfoo was declared as
+		array of type OBJECT-TIME.  This type of array is not
+		permitted in a main program.
+		1516-036: (S) Variable foo has undefined type.
+
+	this only happens for integer*2 and integer*4 functions.  The
+	Fortran manual states that only integer functions are allowed
+	(excluding the other types such as real etc.).  The compiler is
+	clearly treating the declaration as that of a variable rather
+	than a function.
+
+	This is potentially a very serious problem - we may not be able to
+	use integer*2 if it is not fully implemented.  As a workaround I am
+	going to try modifying the preprocessor to declare all integer-like
+	(char,short,int,long) functions as type integer.  This should
+	almost work, but will probably fail at runtime if char or short
+	functions are passed in the argument list to another procedure.
+	(3/31)
+
+unix/boot/mkpkg/scanlib.c
+	The archive file changes for AIX turned out to be far more extensive
+	than mere name changes, and I ended up spending several hours
+	figuring out how AIX archives work and rewriting this file.  A major
+	misconception that it took me some time to get over was that AIX
+	archives have a linked list of members, whereas UNIX systems have
+	a sequential list of members.  You HAVE to follow the links.  (3/31)
+
+AIX
+	The AIX implementation of symbolic links is funny, or at least the
+	"ls" task is.  A while back I had to add the -L flag to ls to get
+	it to list directories pointed to by symbolic links, but with that
+	flag set it will always follow links, and a command such as "ls -l"
+	on a link lists the pointed to file, not the link.  So far I have
+	not figured out how to get it to behave like "other" unix systems I
+	am familiar with (it is not clear AIX is really a unix variant so
+	I am not sure the "other" is accurate).  (3/31)
+
+unix/gdev/iism75/zrdm75.x
+	Towards the end of the file there were a couple of calls to MOD
+	with mixed type arguments (short and int).  It was necessary to
+	add an INT to the short arguments to make both argments integer
+	before XLF would accept the statements.  (3/31)
+
+-----------------
+Completed the first sysgen, although with many errors which I haven't begun
+to check out yet.  This thing IS fast - the full core system sysgen took
+only 2:26.  (4/1)
+
+AIX
+	A funny thing about the initial sysgen is that it produced libraries
+	and executables even in cases where there were serious errors.  This
+	may be big system policy (VMS is like this too to some extent) but
+	it is not standard for unix.  It causes problems because the objects,
+	even though broken, were produced with recent file, dates which
+	causes utilities like make/mkpkg to be useless for recompilation
+	following errors.  Maybe I can find a way around this but I shouldn't
+	have to.  (4/1)
+
+unix/hlib/iraf.h
+unix/hlib/libc/xnames.h
+	Added definitions to map the VOS name "getpid" to "xgtpid" at the
+	host library level.  On AIX Fortran and C names share the same name
+	space, and a name collision on getpid was causing infinite recursion.
+	(4/1)
+
+pkg/system/help/lroff/textout.x
+	This file failed to compile due to a complaint about the declaration
+	for the argument out to the ENTRY point textout.  Rather than look
+	into this I installed a version of the file from the AUX port which
+	eliminates the entry point, and the problem went away.  (4/1)
+
+dev/hosts
+	Added columba to hosts table.  (5/22/91 SRo)
+
+-------------------------------------
+Begin AIX/IRAF update to V2.10.  (8/10/92)
+AIX version 3.2.2.  Fortran version 2.2.
+
+unix/as.rs6000/zsvjmp.s
+	Added the RS/6000 version of zsvjmp.s.  It took over a day to learn
+	how to program in assembler on this machine (do to limited and
+	misleading documentation and tools) and about 20 minutes to write the
+	routine...  (8/09)
+
+-------------------------------------
+Performed a diff/merge of the HSI and merged changes into the V2.10 HSI.
+The bootstrap proceeded with only minor problems.  Started sysgen.  (8/10)
+
+unix/hlib/mkpkg.inc
+	Still tuning default fortran compilation switches.  Current set is
+	as follows: "-/qhalt=e -/qflttrap -/NQ20000".  (8/10)
+
+sys/gio/gki/gkiclosews.x
+	In the call to zcall2, "Mems[...]" was changed to "Mems[gki+...]".
+	(8/10)
+
+sys/imio/imsetr.x
+	There were a couple of occurrences of IM_PLFLAGS(im) where the (im)
+	was missing.  (8/10)
+
+lib/plio.h
+sys/plio/*
+	Assorted changes to resolve type clashes; see notes above from
+	original port.  (8/10)
+
+sys/qpoe/qpiomkidx.x
+	Type clash in two calls to min, referencing type short field of
+	bucket header.   (8/10)
+
+sys/mwcs/mwtransd.x
+	The AIX compiler did not like a "... * -ltv_1[i]" expression, had to
+	put parens around the -ltv_1[i] term.  (8/10)
+
+sys/vops/fftx.f
+	This routine contained a declaration "x(2), y(2)" where the arrays
+	X,Y are of arbitrary length.  Later on in the code the third and
+	fourth elements of each array were referenced and this caused a
+	compiler message about an incorrect constant array subscript.
+	Changed the declaration to "x(*), y(*)".  (8/10)
+
+sys/gio/ncarutil/agdflt.f
+sys/gio/ncarutil/agdash.f
+sys/gio/ncarutil/aglbls.f
+sys/gio/ncarutil/agsetp.f
+	The AIX compiler doesn't like the CHARACTER*504 declarations in these
+	files.   Had to change these to CHARACTER*500 to get the files to
+	compile.  That could be incorrect, but IRAF doesn't use this code
+	anyhow (but we will keep it around until the ncar stuff is phased
+	out).  (8/10)
+
+pkg/images/tv/display/iisofm.x
+	Added the "int" in "max (int(y[i]),..." to fix a type clash.  (8/10)
+
+pkg/images/tv/iis/ids/idsinit.x
+	Fixed a type clash in two calls to MIN.  (8/10)
+
+pkg/images/tv/iis/iism70/iissplit.x
+	Another type clash in a call to MIN.  (8/10)
+
+pkg/images/tv/imexamine/iejimexam.x
+	Type clash - same one as seen earlier on cephus with the DEC
+	compiler.  (8/10)
+
+pkg/images/imarith/iccclip.x
+pkg/images/imarith/icsclip.x
+pkg/images/imarith/icstat.x
+pkg/images/imarith/icaclip.x
+	More type clashes, again the same as seen on cephus.  (8/10)
+
+pkg/plot/t_gkidir.x
+	Another short/int type mismatch for MIN (that has been that way since
+	the dawn of time).  (8/11)
+
+noao/lib/mkpkg.inc
+noao/lib/mkpkg.sf.AIX3		+
+	Added artdata/t_mkechelle.x and astutil/t_gratings.x to the NOAO
+	package special file list.  These files have to be compiled with the
+	optimizer turned off on the RS/6000 or the compiler generates the
+	following message.
+
+	    1500-008: (S) COMPILER LIMIT EXCEEDED in astgrg: Program too
+	    complicated to be compiled. Compilation ended. Reduce the
+	    complexity of the program and recompile, or lower the level of
+	    optimization and recompile.
+	(8/11)
+
+noao/digiphot/daophot/daolib/erf.x
+noao/digiphot/daophot/daolib/dpevalpsf.x
+noao/digiphot/daophot/psf/dpgaussfit.x
+noao/digiphot/daophot/psf/dpsubgauss.x
+noao/digiphot/daophot/psf/dpwritepsf.x
+	This code defines and uses a function called ERF, but ERF is a
+	Fortran intrinsic function (at least on the IBM compiler).  Changed
+	the name to DAOERF.  (8/11)
+
+noao/onedspec/dispcor/refgspec.x
+	Mixed real/double in call to MOD.  (8/11)
+
+noao/onedspec/splot/fixx.x
+noao/onedspec/shdr.x
+noao/onedspec/t_deredden.x
+	Type clashes in intrinsics, already found and fixed on decstation.
+	(8/11)
+
+noao/onedspec/t_deredden.x
+	This file had another problem on the RS/6000 - syntax error in
+	expression.  Had to add parens in "y * (-2.09002)".  (8/11)
+
+noao/rv/coloncmds.x
+	The IBM compiler (like the decstation) also complained about cmd_write
+	being a function but no value was being returned.  (8/11)
+
+noao/rv/fftutil.x
+	The IBM compiler generated the following messages for this file:
+
+	    1514-047: (S) No initializations for this DATA statement will be
+	    done because of presence of syntax error.
+	    1515-019: (S) Syntax is incorrect.
+
+	Evidently this was due to the use of the name "data" for an argument
+	to the procedure fft_fixwrap.  There was nothing wrong with the code,
+	the compiler was in error in this case.  To workaround the problem
+	I changed the name of the data vector "data" to "v" in fft_fixwrap
+	and in the previous procedure.  (8/11)
+
+noao/imred/ccdred/src/icstat.x
+	Type mismatch problems, already run into on cephus.  (8/11)
+
+noao/imred/vtel/mscan.x
+	The function mtneedfileno() was declared boolean but used as an integer
+	function (which it is).  (8/11)
+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	Added #ifdef _AIX code to these routines to enable and handle the
+	IEEE exceptions.  This is quite difficult on the RS/6000, compared
+	to most systems.  There really aren't any IEEE exceptions on this
+	machine.  To catch things like floating divide by zero it is necessary
+	to compile code -qflttrap, which causes a test-and-branch and trap
+	instruction to be compiled in line *after every floating point
+	instruction*.  If the floating instruction overflows, underflows,
+	or whatever, the branch will be skipped and the application generates
+	a SIGTRAP.  The ex_handler routine in zxwhen gets called by the trap.
+	At that point the floating point status register can be examined to
+	determine what "exception" occurred.  This appears to work but I
+	am still a bit uncomfortable about all this; the IBM documentation
+	is not very definitive and thus far I am unable to determine exactly 
+	how the RS/6000 hardware works (e.g., no where does it say exactly
+	what happens when, for example, floating underflow occurs).  (8/11)
+
+unix/boot/mkpkg/scanlib.c
+	While relinking the CL to test the exception handling code I noticed
+	a problem with mkpkg not reading the libpkg.a file.  This was traced
+	to a problem in scanlib.c, used to read AIX archive files.  The code
+	assumed that the first library member followed the file header.  This
+	is normally, but not always the case.  In reality the library member
+	list is a linked list and the offset to the list head is stored in
+	the file header.  (8/12)
+
+unix/hlib/mkpkg.sf.AIX3
+	I had a lot of trouble getting the integer divide-by-zero exception
+	to work.  Finally I determined (by studying assembled code with adb,
+	not from the info-hider) that the compiler needs to generate extra
+	instructions to check for a divide by zero.  The Fortran compiler
+	does this by default but the C compiler does not.  Studying the
+	C compiler documentation I could not find a switch to enable this
+	option, but fortunately a query to usenet revealed that "-qcheck"
+	was what I was looking for.  I inserted this in hlib$mkpkg.inc and
+	tried to rebuild the CL and got a number of messages such as the
+	following.
+
+	compile.c:
+	*** PROGRAM ERROR *** No OTHERWISE or WHEN for execution in SELECT...
+	*** PROGRAM ERROR *** No OTHERWISE or WHEN for execution in SELECT...
+	*** PROGRAM ERROR *** No OTHERWISE or WHEN for execution in SELECT...
+	cc: 1501-230 Internal compiler error; please contact your IBM repr...
+
+	Obviously some sort of compiler bug (C doesn't have these statements).
+	The workaround was to add only unop.c and binop.c, the CL files that
+	evaluate arithmetic expressions in scripts, to mkpkg.sf.AIX3.
+	Fortunately these files compile without the error messages.  (8/12)
+
+unix/os/zgcmdl.c
+	Modified this file to pick up the argument list on AIX systems.
+	There is no portable way to do this, one does it by linking an
+	executable and studying the symbol table with nm and adb, looking
+	for something which will give the address of the argument list.
+	So far every system has proved to have a way to do this (on AIX
+	there is a symbol called p_argv).  (8/12)
+
+unix/os/alloc.c
+	AIX magtape devices have names like "rmt.1", so I had to change
+	the code which checks for simple filenames to permit period.
+	This still excludes names like ../path, since / is not permitted.
+	(10/17)

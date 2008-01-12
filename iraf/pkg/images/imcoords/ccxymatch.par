@@ -1,0 +1,41 @@
+# Parameter file for CCXYMATCH
+
+input,f,a,,,,The input pixel coordinate lists
+reference,f,a,,,,The input celestial coordinate lists
+output,f,a,,,,The output matched coordinate lists
+tolerance,r,a,1,,,The matching tolerance in arcseconds
+ptolerance,r,a,3,,,The matching tolerance in pixels
+
+refpoints,f,h,"",,,The optional list of reference points
+xin,r,h,INDEF,,,The X coordinate of the reference point
+yin,r,h,INDEF,,,The Y coordinate of the reference point
+xmag,r,h,INDEF,,,The X axis scale in arcseconds / pixel
+ymag,r,h,INDEF,,,The Y  axis scale in arcseconds / pixel
+xrotation,r,h,INDEF,,,The X axis rotation in degrees
+yrotation,r,h,INDEF,,,The Y axis rotation in degrees
+projection,s,h,"tan",,,The sky projection geometry
+lngref,r,h,INDEF,,,The ra / longitude of the reference point
+latref,r,h,INDEF,,,The dec / latitude of the reference point
+
+lngcolumn,i,h,1,1,,The reference list ra / longitude coordinate column
+latcolumn,i,h,2,1,,The reference list dec / latitude coordinate column
+xcolumn,i,h,1,1,,The pixel list x coordinate column
+ycolumn,i,h,2,1,,The pixel list y coordinate column
+lngunits,s,h,"hours","|degrees|radians|hours|",,The ra / longitude units
+latunits,s,h,"degrees","|degrees|radians|",,The dec / latitude units
+
+separation,r,h,3.0,,,The minimum object separation in arcseconds
+pseparation,r,h,9.0,,,The minimum object separation in pixels
+matching,s,h,"triangles","|tolerance|triangles|",,The matching algorithm
+nmatch,i,h,30,,,The maximum number of points for triangles algorithm
+ratio,r,h,10.0,5.0,10.0,The maximum ratio of longest to shortest side of triangle
+nreject,i,h,10,,,The maximum number of rejection iterations
+
+lngformat,s,h,"",,,The format of the output ra / longitude coordinate
+latformat,s,h,"",,,The format of the output dec / latitude coordinate
+xformat,s,h,"%13.3f",,,The format of the output x coordinate
+yformat,s,h,"%13.3f",,,The format of the output y coordinate
+
+verbose,b,h,yes,,,Verbose mode ?
+
+mode,s,h,ql,,,

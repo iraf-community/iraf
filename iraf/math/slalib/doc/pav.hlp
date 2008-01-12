@@ -1,0 +1,40 @@
+.help pav Jun99 "Slalib Package"
+.nf
+
+      REAL FUNCTION slPAV ( V1, V2 )
+
+     - - - -
+      P A V
+     - - - -
+
+  Position angle of one celestial direction with respect to another.
+
+  (single precision)
+
+  Given:
+     V1    r(3)    direction cosines of one point
+     V2    r(3)    direction cosines of the other point
+
+  (The coordinate frames correspond to RA,Dec, Long,Lat etc.)
+
+  The result is the bearing (position angle), in radians, of point
+  V2 with respect to point V1.  It is in the range +/- pi.  The
+  sense is such that if V2 is a small distance east of V1, the
+  bearing is about +pi/2.  Zero is returned if the two points
+  are coincident.
+
+  V1 and V2 do not have to be unit vectors.
+
+  The routine slBEAR performs an equivalent function except
+  that the points are specified in the form of spherical
+  coordinates.
+
+  Called:  slDPAV
+
+  Patrick Wallace   Starlink   23 May 1997
+
+  Copyright (C) 1997 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,74 @@
+.help xdimtogf Jan93 tables.fitsio
+.ih
+NAME
+xdimtogf -- Convert a single group (N+1)-dimensional GEIS file to a 
+multigroup GEIS file.
+.fi
+.ih
+USAGE
+xdimtogf input output
+.ih
+DESCRIPTION
+This program will take as input, a one-group file that has an extra 
+dimension to account for groups, and a table with the names and 
+values of the parameters for each group. The output is a multigroup 
+GEIS file with as many groups as the dimensionality of the last 
+dimension of the last  input file.
+
+The input file should have the following keywords and values:
+.nf
+
+	GROUPS   =	F	/No groups
+	PSIZE    =	0	/Size of the GPB
+	PCOUNT   =	0	/Number of parameters
+	GCOUNT   =	1	/One group file
+	SDASMGNU =	12	/12 is the value of the extra
+			        /dimension
+.fi
+.ih
+PARAMETERS
+.ls input [file name template]
+Name of file, list of files, or template to be used as input. This 
+parameter  is the name of the special file that has no group 
+parameter block and having an extra dimension for the groups. 
+There should also be a table file  that has the same rootname as the 
+input file and having an extension '.tab'; this table contains the group 
+parameter values.
+.le
+.ls output [file name template]
+Name of file, list of files, or directory where the output is to be 
+written. If a list of files is used, the number of output files should 
+match the number of input files.  If a directory is used, the resulting 
+file names will be the same as the input file names. The output will 
+be a true multigroup file with a group parameter descriptor in the 
+file header and a group parameter block after each data portion of 
+each group in the data file.
+.le
+.ls (verbose = no) [boolean]
+Display messages about the program's progress?  This option will 
+produce one line per file.
+.le
+.ih
+EXAMPLES
+1. Create a multigroup file from a FITS file and table. Notice that the 
+table is not present in the arguments. The program will look for 
+'ifile.tab'.
+.nf
+
+	fi> xdimtogf  ifile.hhh  outfile.hhh  verbose+
+
+.fi
+.ih
+BUGS
+The combination <root>_cvt.??h and <root>_cvt.tab, where the '??' are
+2 characters different from 'hh', is not allowed.
+
+At this time the suffix '_cvt' is special and it will work only if the
+filename extension is 'hhh', e.g. <root>_cvt.hhh and <root_cvt>.tab.
+
+The input file name can have only one extension, e.g., a file name 
+such as 'file.c0h.hhh' would not be allowed. 
+.ih
+SEE ALSO
+gftoxdim
+.endhelp

@@ -1,0 +1,21 @@
+# APRESIZE
+
+input,s,a,,,,List of input images
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,"Reference images
+"
+interactive,b,h,no,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,no,,,Recenter apertures?
+resize,b,h,yes,,,Resize apertures?
+edit,b,h,yes,,,"Edit apertures?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,1,,,Number of dispersion lines to sum or median
+llimit,r,h,INDEF,,,Lower aperture limit relative to center
+ulimit,r,h,INDEF,,,Upper aperture limit relative to center
+ylevel,r,h,0.1,,,Fraction of peak or intensity for automatic width
+peak,b,h,yes,,,Is ylevel a fraction of the peak?
+bkg,b,h,yes,,,Subtract background in automatic width?
+r_grow,r,h,0.,,,"Grow limits by this factor"
+avglimits,b,h,no,,,Average limits over all apertures?

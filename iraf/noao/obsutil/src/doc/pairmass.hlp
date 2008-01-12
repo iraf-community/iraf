@@ -1,0 +1,132 @@
+.help pairmass Nov01 noao.obsutil
+.ih
+NAME
+pairmass -- plot the airmass for a given object
+.ih
+USAGE
+pairmass
+.ih
+PARAMETERS
+.ls ra
+The right ascension of the object in hours.
+.le
+.ls dec
+The declination of the object in degrees.
+.le
+.ls epoch=INDEF
+The epoch of the coordinates in years.
+.le
+.ls year
+The year of the observation.
+.le
+.ls month
+The month of the observation (a number from 1 to 12).
+.le
+.ls day
+The day of the month of the observation.
+.le
+.ls observatory = "observatory"
+The observatory identifier in the observatory database.  See the
+help for \fBobservatory\fR task for more information.
+.le
+.ls timesys = "Standard" (Universal|Standard|Siderial)
+Time system for the plot or output list.  The choices are
+"Universal" for universal time, "Standard" for standard time (where
+the time zone is determined from the observatory database), and "Siderial"
+for the siderial time.
+.le
+
+.ls resolution=4
+The number of UT points per hour for which to calculate the airmass.
+.le
+.ls listout=no
+List, rather than plot, the airmass versus time?  Only airmasses
+below that given by the \fIwy2\fR parameters are listed.
+.le
+.ih
+PLOT PARAMETERS
+.ls wx1=-7., wx2=7., wy1=0., wy2=5.
+The range of window (user) coordinates to be included in the plot.
+If the range of values in x or y = 0, the plot is automatically
+scaled from the minimum to maximum data values along that axis.
+The times are available from -24 hours to 48 hours so one can use
+negative numbers to plot hours from midnight or in actual hours.
+.le
+.ls pointmode = no
+Plot individual points instead of a continuous line?
+.le
+.ls marker="box"
+If \fBpointmode\fR = yes, the marker drawn at each point is set with this
+parameter.  The acceptable choices are "point", "box", "plus", "cross",
+"circle", "hebar", "vebar", "hline", "vline", and "diamond".
+.le
+.ls szmarker = 0.005
+The size of the marker drawn when \fBpointmode\fR = yes.  A value of 0
+(zero) indicates that the task should read the size from the input list.
+.le
+.ls logx = no, logy = no
+Draw the x or y axis in log units, versus linear?
+.le
+.ls xlabel="default"
+Label for the X-axis.  The value "default" uses the specified time system.
+.le
+.ls ylabel="Airmass"
+Labels for the Y-axis.
+.le
+.ls title="default"
+Title for plot.  If not changed from "default", a title string consisting
+of the date, observatory, and  object position is used.
+.le
+.ls vx1=0., vx2=0., vy1=0., vy2=0.
+NDC coordinates (0-1) of the plotting device viewport.  If not set
+by the user, a suitable viewport which allows sufficient room for all
+labels is used.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5
+The number of major and minor divisions along the x or y axis.
+.le
+.ls round = no
+Round axes up to nice values?
+.le
+.ls fill = yes
+Fill the plotting viewport regardless of the device aspect ratio?
+.le
+.bp
+.ls append = no
+Append to an existing plot?
+.le
+.ls device="stdgraph"
+Output device.
+.le
+.ih
+DESCRIPTION
+The airmass is plotted over a specified set of hours for a given
+observatory.  The observatory is specified by an identifier as given
+in the observatory database.  See the help for "observatory" for more
+information about the database and identifiers.
+
+The results can be shown in universal, standard, or siderial time.
+The standard time simply adds the time zone from the observatory
+database tothe universal time and so there is no explicit facility
+for daylight savings time.  The times are computed in the range
+-24 hours to +48 hours.  By setting the \fIwx1\fR and \fIwx2\fR
+parameters one can plot either in hours relative to 0 in the specified
+time system or as positive hours.  This simple task does not support
+axis labeling which wraps around.
+
+The list output prints date, observatory, object coordinates, and
+the time system.  This is followed by the time sorted between 0 and 24
+and the airmasses.  The list only includes airmasses below the
+value specified by \fIwy2\fR.
+.ih
+EXAMPLES
+To plot the airmass for M82 from Kitt Peak for Groundhog's Day in 1992:
+
+.nf
+    pairmass ra=9:51:42 dec=69:56 epoch=1950 year=1992 month=2 day=2
+.fi
+
+.ih
+SEE ALSO
+observatory, airmass, setairmass, graph
+.endhelp

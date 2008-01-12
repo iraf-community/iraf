@@ -1,0 +1,12 @@
+# PDS read parameters
+pds_file,f,a,mta,,,PDS data source
+file_list,s,a,,,,File list
+iraf_file,f,a,,,,IRAF filename
+make_image,b,h,yes,,,Create an IRAF image?
+long_header,b,h,no,,,Print full PDS header?
+short_header,b,h,yes,,,Print short PDS header?
+datatype,s,h,s,,,IRAF data type
+tenbit,b,h,no,,,Ten bit data?
+ninetrack,b,h,yes,,,Ninetrack tape?
+offset,i,h,0,,,Tape file number offset
+mode,s,h,ql,,,

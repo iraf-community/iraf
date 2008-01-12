@@ -1,0 +1,9 @@
+# Parameter list for the IM3DTRAN task
+
+input,s,a,,,,Input 3d image
+output,s,a,,,,Output 3d image
+new_x,i,a,3,1,3,"New x axis"
+new_y,i,a,2,1,3,"New y axis"
+new_z,i,a,1,1,3,"New z axis"
+len_blk,i,h,128,,,Working block size in pixels
+verbose,b,h,yes,,,Print messages about actions taken by the task ?

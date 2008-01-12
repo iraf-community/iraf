@@ -1,0 +1,19 @@
+.help time Feb86 language
+.ih
+NAME
+time -- display the current time
+.ih
+USAGE
+time
+.ih
+DESCRIPTION
+\fITime\fR writes the current time and date on the standard output.
+.ih
+EXAMPLE
+.nf
+cl> time
+Fri 12:50:29 14-Feb-86
+.fi
+.ih
+SEE ALSO
+sleep, wait, jobs

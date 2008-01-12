@@ -1,0 +1,26 @@
+.help spy Feb85 system
+.ih
+NAME
+spy -- tell who is logged in and what they are doing
+.ih
+USAGE
+spy [v]
+.ih
+DESCRIPTION
+\fISpy\fR prints a summary of who is on the system and what they are doing.
+The optional argument \fIv\fR (short for \fIverbose\fR) causes more detailed
+information to be given.  The operation of this task is machine dependent,
+as is the quantity and format of the information returned.
+.ih
+EXAMPLES
+.nf
+cl> spy
+  4:36pm  up 24 days,  5:42,  2 users,  load average: 0.29, 0.15, 0.18
+User     tty       login@  idle   JCPU   PCPU  what
+roger    ttyh8     4:21pm    15      8      5  -csh 
+alice    ttyh9     4:26pm           44     27  w 
+.fi
+.ih
+SEE ALSO
+diskspace
+.endhelp

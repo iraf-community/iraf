@@ -1,0 +1,35 @@
+.help gssub Aug85 "Gsurfit Package"
+.ih
+NAME
+gssub -- subtract surface 1 from surface 2
+.ih
+SYNOPSIS
+gssub (sf1, sf2, sf3)
+
+.nf
+pointer	sf1		# first surface descriptor
+pointer	sf2		# second surface descriptor
+pointer	sf3		# resultant surface descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf1    
+Pointer to the first surface descriptor.
+.le
+.ls sf2   
+Pointer to the second surface descriptor.
+.le
+.ls sf3    
+Pointer to the resultant surface descriptor.
+.le
+.ih
+DESCRIPTION
+The coefficients of surface 2 are subtracted from surface 1. GSSUB checks
+that the surface_types are the same and that the fits are normalized over
+the same range of data.
+.ih
+NOTES
+.ih
+SEE ALSO
+gscopy, gsadd
+.endhelp

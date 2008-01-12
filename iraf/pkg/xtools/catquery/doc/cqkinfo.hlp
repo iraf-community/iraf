@@ -1,0 +1,65 @@
+.help cqkinfo Mar00 "Catquery Package"
+.ih
+NAME
+cqkinfo -- get the results standard image parameter description by name
+.ih
+SYNOPSIS
+
+ipno = cq_kinfo (imres, pname, pkname, max_pkname, pkvalue, max_pkvalue,
+	pktype, pkunits, max_pkunits)
+
+.nf
+pointer	imres		# the survey results descriptor
+char	pname		# the image parameter name
+char	pkname		# the default image keyword name (INDEF if undefined)
+int	max_pkname	# the maximum size of the keyword name
+char	pkvalue		# the default parameter value (INDEF if undefined)
+int	max_pkvalue	# the maximum size of the parameter value
+int	pktype		# the parameter data type
+char	pkunits		# the parameter units (INDEF if undefined)
+int	max_wpunits	# the maximum size of the parameter units
+.fi
+.ih
+ARGUMENTS
+.ls imres    
+The image results descriptor.
+.le
+.ls pname
+The name of the image parameter for which the description is to be returned.
+.le
+.ls pkname
+The returned image parameter keyword name. Pkname is "INDEF" if undefined. 
+.le
+.ls max_pkname
+The maximum size of the returned image parameter keyword name.
+.le
+.ls pkvalue
+The returned image parameter value. Pkvalue is "INDEF" if undefined.
+.le
+.ls max_pkvalue
+The maximum size of the returned image parameter value.
+.le
+.ls pktype
+The image parameter data type. The options are TY_DOUBLE, TY_REAL, TY_LONG,
+TY_INT, TY_SHORT, and TY_CHAR.
+.le
+.ls pkunits
+The returned image parameter units. Pkunits is "INDEF" if undefined.
+.le
+.ls max_pkunits
+The maximum size of the returned image parameter units.
+.le
+.ih
+DESCRIPTION
+Cq_kinfo returns the keyword name, default value, data type, and units
+of the requested standard image parameter. Cq_kinfo is an integer function
+which returns the sequence number of the standard image parameter as its
+function value. Zero is returned if the standard image parameter is not found.
+.ih
+NOTES
+For more information about the standard image parameters and their relationship
+to the image surveys configuration file type "help surveys".
+.ih
+SEE ALSO
+cqkinfon
+.endhelp

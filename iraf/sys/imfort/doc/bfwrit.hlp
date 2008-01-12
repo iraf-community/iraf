@@ -1,0 +1,38 @@
+.help bfwrit Sep86 imfort.bfio
+.ih
+NAME
+bfwrit -- write to a binary file at the specified offset
+.ih
+SYNOPSIS
+.nf
+integer function bfwrit (fd, buf, nchars, offset)
+
+integer		fd		#I BFIO file descriptor of open file
+typeless	buf(*)		#I buffer containing file data
+integer		nchars		#I number of SPP chars to be written
+integer		offset		#I 1-indexed char offset into file
+
+.fi
+.ih
+DESCRIPTION
+The \fIbfwrit\fR procedure writes \fInchars\fR char units of storage from
+the user supplied buffer to the file opened on file descriptor \fIfd\fR
+starting at the one-indexed char file offset \fIoffset\fR.  Any number of
+chars may be written starting at any char file offset.
+.ih
+RETURN VALUE
+The actual number of char units of storage written is returned as the function
+value; it is probably an error if this is not equal to \fInchars\fR.
+A negative function value indicates that the write failed for some reason,
+e.g., the file descriptor was invalid, the file offset was out of range,
+or an actual physical write error occurred.
+.ih
+NOTES
+The entire contents of the internal BFIO file buffer are always written,
+even when writing at the end of file, hence it is not possible to write
+odd-sized files with the BFIO interface (partial blocks can however be
+read with \fIbfread\fR).
+.ih
+SEE ALSO
+bfread
+.endhelp

@@ -1,0 +1,346 @@
+.help dbio Jul85 "Database I/O Design"
+.ce
+\fBIRAF Database I/O\fR
+.ce
+Conceptual Design
+.ce
+Doug Tody
+.ce
+July 1985
+.sp 3
+.nh
+Introduction
+    The DBIO (database i/o) interface is a library of SPP callable procedures
+used to access data structures maintained in mass storage.  While DBIO is at
+the heart of the IRAF database subsystem, it is only a part of that subsystem.
+Other major components of the database subsystem include the IMIO interface
+(image i/o), a higher level interface used to access bulk data maintained
+in part under DBIO, and the DBMS package (data base management system), a CL
+level package providing the user with direct access to any database maintained
+under DBIO.  Additional structure is found beneath DBIO; this is for the most
+part invisible to both the programmer and the user but is of fundamental
+importance to the design, as we shall see later.
+.ks
+.nf
+                   DBMS                               (cl)
+                     \                              ---------
+                      \     IMIO                     
+                       \    /  \       
+                        \  /    \                                  
+                         \/      \                    (vos)
+                        DBIO     FIO
+                         |
+                         |                          ---------
+                         |
+                    (DB kernel)                    (vos or host)    
+.fi
+.ce
+Figure 1.  Major Interfaces
+.ke
+                       
+.nh
+Requirements
+    The requirements for the DBIO interface are driven by its intended usage
+for image and catalog storage.  It is arguable whether the same interface
+should be used for both types of data, but development of an interface such
+as DBIO with all the associated DBMS utilities is expensive, hence we would
+prefer to have to develop only one such interface.  Furthermore, it is desirable
+for the user to only have to learn one such interface.  The primary functional
+and performance requirements which DBIO must meet are the following (in no
+particular order).
+.ls
+.ls [1]
+DBIO shall provide a high degree of data independence, i.e., a program
+shall be able to access a data structure maintained under DBIO without
+detailed knowledge of its contents.
+.le
+.ls [2]
+A DBIO datafile shall be self describing and self contained, i.e., it shall
+be possible to examine the structure and contents of a DBIO datafile without
+prior knowledge of its structure or contents.
+.le
+.ls [3]
+DBIO shall be able to deal efficiently with records containing up to N fields
+and with data groups containing up to M records, where N and M are at least
+sysgen configurable and are order of magnitude N=10**2 and M=10**6.
+.le
+.ls [4]
+The time required to access an image header under DBIO must be comparable
+to the time currently required for the equivalent operation under IMIO.
+.le
+.ls [5]
+It shall be possible for an image header maintained under DBIO to contain
+application or user defined fields in addition to the standard fields
+required by IMIO.
+.le
+.ls [6]
+It shall be possible to dynamically add new fields to an existing image header
+(or to any DBIO record).
+.le
+.ls [7]
+It shall be possible to group similar records together in the database
+and to perform global operations upon all or part of the records in a
+group.
+.le
+.ls [8]
+It shall be possible for a field of a record to be a one-dimensional array
+of any of the primitive types.
+.le
+.ls [9]
+Variant records (records containing variable size fields) shall be supported,
+ideally without penalizing efficient access to databases which do not contain
+such records.
+.le
+.ls [A]
+It shall be possible to copy a record without knowledge of its contents.
+.le
+.ls [B]
+It shall be possible to merge (join) two records containing disjoint sets of
+fields.
+.le
+.ls [C]
+It shall be possible to update a record in place.
+.le
+.ls [D]
+It shall be possible to simultaneously access (retrieve, update, or insert)
+multiple records from the same data group.
+.le
+.le
+To summarize, the primary requirements are data independence, efficient access
+to both large and small databases, and flexibility in the contents of the
+database.
+.nh
+Conceptual Design
+    
+    The DBIO database faciltities shall be based upon the relational model.
+The relational model is preferred due to its simplicity (to the user)
+and due to the demonstrable fact that relational databases can efficiently
+handle large amounts of data.  In the relational model the database appears
+to be nothing more than a set of \fBtables\fR, with no builtin connections
+between separate tables.  The operations defined upon these tables are based
+upon the relational algebra, which is in turn based upon set theory.
+The major advantages claimed for relational databases are the simplicity
+of the concept of a database as a collection of tables, and the predictability
+of the relational operators due to their being based on a formal theoretical
+model.
+None of the requirements listed in section 2 state that DBIO must implement
+a relational database.  Most of our needs can be met by structuring our data
+according to the relational data model (i.e., as tables), and providing a
+good \fBselect\fR operator for retrieving records from the database.  If a
+semirelational database is sufficient to meet our requirements then most
+likely that is what will be built (at least initially; the relational operators
+are very attractive for data analysis).  DBIO is not expected to be competitive
+with any commercial relational database; to try to make it so would probably
+compromise the requirement that the interface be compact.
+On the other hand, the database requirements of IRAF are similar enough to
+those addressed by commercial databases that we would be foolish not to try
+to make use of some of the same technology.
+.ks
+.nf
+	\fBformal relational term\fR		    \fBinformal equivalents\fR
+		relation			table
+		tuple				record, row
+		attribute			field, column
+		domain				datatype
+		primary key			record id
+.fi
+.ke
+A DBIO \fBdatabase\fR shall consist of one or more \fBrelations\fR (tables).
+Each relation shall contain zero or more \fBrecords\fR (rows of the table).
+Each record shall contain one or more \fBfields\fR (columns of the table).
+All records in a relation shall share the same set of fields,
+but all of the fields in a record need not have been assigned values.
+When a new \fBattribute\fR (column) is added to an existing relation a default
+valued field is added to each current and future record in the relation.
+Each attribute is defined upon a particular \fBdomain\fR, e.g., the set of
+all nonnegative integer values less than or equal to 100.  It shall be possible 
+to specify minimum and maximum values for integer and real attributes
+and to enumerate the permissible values of a string type attribute.
+It shall be possible to specify a default value for an attribute.
+If no default value is given INDEF is assumed.
+One dimensional arrays shall be supported as attribute types; these will be
+treated as atomic datatypes by the relational operators.  Array valued
+attributes shall be either fixed in size (the most efficient form) or variant.
+There need be no special character string datatype since one dimensional
+arrays of type character are supported.
+Each relation shall be implemented as a separate file.  If the relations
+comprising a database are stored in a directory then the directory can
+be thought of as the database.  Public databases will be stored in well
+known public (write protected) directories, private databases in user
+directories.  The logical directory name of each public database will be
+the name of the database.  Physical storage for a database need not necessarily
+be allocated locally, i.e., a database may be centrally located and remotely
+accessed if the host computer is part of a local area network.
+Locking shall be at the level of entire relations rather than at the record
+level, at least in the initial implementation.  There shall be no support for
+indices in the initial implementation except possibly for the primary key.
+It should be possible to add either or both of these features to a future
+implementation without changing the basic DBIO interface.  Modifications to
+the internal data structures used in database files will likely be necessary
+when adding such a major feature, making a save and restore operation
+necessary for each database file to convert it to the new format.
+The save format chosen (e.g. FITS table) should be independent of the
+internal format used at a particular time on a particular host machine.
+Images shall be stored in the database as individual records.
+All image records shall share a common subset of attributes.  
+Related images (image records) may be grouped together to form relations.
+The IRAF image operators shall support operations upon relations
+(sets of images) much as the IRAF file operators support operations upon
+sets of files.
+A unary image operator shall take as input a relation (set of one or more
+images), inserting the processed images into the output relation.  
+A binary image operator shall take as input either two relations or a
+relation and a record, inserting the processed images into the output
+relation.  In all cases the output relation can be an input relation as
+well.  The input relation will be defined either by a list or by selection
+using a theta-join (operationally similar to a filename template).
+.nh 2
+Relational Operators
+    DBIO shall support two basic types of database operations: operations upon
+relations and operations upon records.  The basic relational operators
+are the following.  All of these operators produce as output a new relation.
+.ls
+.ls create
+Create a new base relation (physical relation as stored on disk) by specifying
+an initial set of attributes and the (file)name for the new relation.
+Attributes and domains may be specified via a data definition file or by
+reference to an existing relation.
+A primary key (limited to a single attribute) should be identified.
+The new relation initially contains no records.
+.le
+.ls drop
+Delete a (possibly nonempty) base relation and any associated indices.
+.le
+.ls alter 
+Add a new attribute or attributes to an existing base relation.
+Attributes may be specified explicitly or by reference to another relation.
+.le
+.ls select
+Create a new relation by selecting records from one or more existing base
+relations.  Input consists of an algebraic expression defining the output
+relation in terms of the input relations (usage will be similar to filename
+templates).  The output relation need not have the same set of attributes as
+the input relations.  The \fIselect\fR operator shall ultimately implement
+all the basic operations of the relational algebra, i.e., select, project,
+join, and the set operations.  At a minimum, selection and projection are
+required in the initial interface.  The output of \fBselect\fR is not a
+named relation (base relation), but is instead intended to be accessed
+by the record level operators discussed in the next section.
+.le
+.ls edit
+Edit a relation.  An interactive screen editor is entered allowing the user
+to add, delete, or modify tuples (not required in the initial version of
+the interface).  Field values are verified upon input.
+.le
+.ls sort
+Make the storage order of the records in a relation agree with the order
+defined by the primary key (the index associated with the primary key is
+always sorted but index order need not agree with storage order).
+In general, retrieval on a sorted relation is more efficient than on an
+unsorted relation.  Sorting also eliminates deadspace left by record
+deletion or by updates involving variant records.
+.le
+.le
+Additional nonalgebraic operators are required for examining the structure
+and contents of relations, returning the number of records or attributes in
+a relation, and determining whether a given relation exists.
+The \fIselect\fR operator is the primary user interface to DBIO.
+Since most of the relational power of DBIO is bound up in the \fIselect\fR
+operator and since \fIselect\fR will be driven by an algebraic expression
+(character string) there is considerable scope for future enhancement
+of DBIO without affecting existing code.
+.nh 2
+Record (Tuple) Level Operators
+    While the user should see primarily operations on entire relations,
+record level processing is necessary at the program level to permit
+data entry and implementation of special operators.  The basic record
+level operators are the following.
+.ls
+.ls retrieve
+Retrieve the next record from the relation defined by \fBselect\fR.
+While the tuples in a relation theoretically form an unordered set,
+tuples will normally be returned in either storage order or in the sort
+order of the primary key.  Although all fields of a retrieved record are
+accessible, an application will typically have knowledge of only a few fields.
+.le
+.ls update
+Rewrite the (possibly modified) current record.  The updated record is
+written back into the base table from which it was read.  Not all records
+produced by \fBselect\fR can be updated.
+.le
+.ls insert
+Insert a new record into an output relation.  The output relation may be an
+input relation as well.  Records added to an output relation which is also
+an input relation do not become candidates for selection until another
+\fBselect\fR occurs.  A retrieve followed by an insert copies a record without
+knowledge of its contents.  A retrieve followed by modification of selected
+fields followed by an insert copies all unmodified fields of the record.
+The attributes of the input and output relations need not match; unmatched
+output attributes take on their default values and unmatched input attributes
+are discarded.  \fBInsert\fR returns a pointer to the output record,
+allowing insertions of null records to be followed by initialization of
+the fields of the new record.
+.le
+.ls delete
+Delete the current record.
+.le
+.le
+Additional operators are required to close or open a relation for record
+level access and to count the number of records in a relation.
+.nh 3
+Constructing Special Relational Operators
+    The record level operations may be combined with \fBselect\fR in compiled
+programs to implement arbitrary operations upon entire relations.
+The basic scenario is as follows:
+.ls
+.ls [1]
+The set of records to be operated upon, defined by the \fBselect\fR
+operator, is opened as an unordered set (list) of records to be processed.
+.le
+.ls [2]
+The "next" record in the relation is accessed with \fBretrieve\fR.
+.le
+.ls [3]
+The application reads or modifies a subset of the fields of the record,
+updating modified records or inserting the record in the output relation.
+.le
+.ls [4]
+Steps [2] and [3] are repeated until the entire relation has been processed.
+.le
+.le
+Examples of such operators are conversion to and from DBIO and LIST file
+formats, column extraction, mimimum or maximum of an attribute (domain
+algebra), and all of the DBMS and IMAGES operators.
+.nh 2
+Field (Attribute) Level Operators
+    Substantial processing of the contents of a database is possible without
+ever accessing the individual fields of a record.  If field level access is
+required the record must first be retrieved or inserted.  Field level access
+requires knowledge of the names of the attributes of the parent relation,
+but not their exact datatypes.  Automatic type conversion occurs when field
+values are queried or set.
+.ls
+.ls get
+.sp
+Get the value of the named scalar or vector field (typed).
+.le
+.ls put
+.sp
+Put the value of the named scalar or vector field (typed).
+.le
+.ls read
+Read the named fields into an SPP data structure, given the name, datatype,
+and length (if vector) of each field in the output structure.
+There must be an attribute in the parent relation for each field in the
+output structure.
+.le
+.ls write
+Copy an SPP data structure into the named fields of a record, given the
+name, datatype, and length (if vector) of each field in the input structure.
+There must be an attribute in the parent relation for each field in the
+input structure.
+.le
+.ls access
+Determine whether a relation has the named attribute.
+.le
+.le

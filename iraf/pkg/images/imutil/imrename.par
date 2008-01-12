@@ -1,0 +1,3 @@
+oldnames,s,a,,,,images to be renamed
+newnames,s,a,,,,new image names
+verbose,b,h,no,,,report each rename operation

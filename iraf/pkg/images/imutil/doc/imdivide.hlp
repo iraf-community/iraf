@@ -1,0 +1,65 @@
+.help imdivide Sep86 images.imutil
+.ih
+NAME
+imdivide -- image division with zero checking and rescaling
+.ih
+USAGE	
+imdivide numerator denominator resultant
+.ih
+PARAMETERS
+.ls numerator
+Numerator image.
+.le
+.ls denominator
+Denominator image.
+.le
+.ls resultant
+Resultant image.  This image will be of datatype real.
+.le
+.ls title = '*'
+Title for resultant image.  The special character '*' defaults the title
+to that of the numerator image.
+.le
+.ls constant = 0
+The constant value for the zero division constant option.
+.le
+.ls rescale = norescale
+After the image division the resultant image may be rescaled with the following
+options:
+.ls norescale
+Do not rescale the resultant image.
+.le
+.ls mean
+Scale the resultant image to the specified mean value.
+.le
+.ls numerator
+Scale the resultant image to have the same mean value as the numerator image.
+.le
+.le
+.ls mean = 1
+The mean value used rescale the resultant image under 'mean' option of
+\fIrescale\fR.
+.le
+.ls verbose = no
+Print the means of each image?
+.le
+.ih
+DESCRIPTION
+The \fInumerator\fR image is divided by the \fIdenominator\fR image to
+form the \fIresultant\fR image.  The division is checked for division by
+zero and replaces the result with the value of the parameter \fIconstant\fR.
+After the division the resultant image may be rescaled.
+The rescaling option is selected with \fIrescale\fR.  The options are
+not to rescale, rescale to the specified \fImean\fR value, and rescale to
+the mean of the numerator.  The means of the three images are calculated
+and may be printed with the verbose option.
+.ih
+EXAMPLES
+1. To divide a object image by a flat field and then rescale the division
+back to the mean of the object image:
+
+    cl> imdivide object image final rescale=numerator
+.ih
+SEE ALSO
+imarith
+.endhelp

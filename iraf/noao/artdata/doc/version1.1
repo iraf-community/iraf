@@ -1,0 +1,49 @@
+		Changes to the ARTDATA Package: Version 1.1
+
+Since the first release of the ARTDATA package with V2.9 there have been
+several bugs found and documented, as is natural, and some new features
+and tasks have been added.  This note summarizes these changes.
+
+The bugs (log numbers 127, 130, 131, and 135) are all in the main task
+MKOBJECTS.  Two of these concern the size of the PSF as specified by
+the "radius" parameter.  The radius parameter for the gaussian PSF
+is interpreted as a FWHM instead of the intended HWHM (radius at half
+maximum).  This leads to very narrow stars until one compensates for the
+error.  The size of the moffat PSF are off by a small factor (~10%)
+depending on the beta parameter.  Another bug causes objects near the edge
+to be off by 1 pixel from the specified coordinates.  The last bug
+prevents use of a user supplied profile function for the PSF.  A
+distributed patch for the above problems is planned.  Thanks go to
+Lindsey Davis and Steven Perry for the careful studies which identified
+the first three bugs.
+
+The artificial one dimensional spectra produced by MK1DSPEC have new
+parameters allowing addition of a velocity shift specified either as
+a velocity or redshift.  This is a useful addition for tests of radial
+velocity programs.
+
+The initial version of the package provided minimal headers; mostly
+just the wavelengths for 1D spectra and the dispersion axis for 2D
+spectra.  People then need to HEDIT keywords to make the images
+work well with some packages.  Four things have been done to
+make useful headers for the artificial data.  First, a detailed
+log of parameters used to generate the images is included as COMMENT
+cards.  This includes task parameters and information from data files
+such as those in the star and galaxy list files produced by
+STARLIST and GALLIST.  Second, the gain, read noise, exposure
+time, and dispersion correction flag have been added to the header
+when appropriate.  Third, each task has a new parameter for specifying
+a header keyword data file containing a list of keywords and values
+to be automatically added.  A default file is supplied but any set
+for a particular type of data may be substituted.  Finally, a new
+task called MKHEADER has been added which applies header keyword
+data files to images.
+
+A new task called MKEXAMPLES has been added.  Given the name of an
+example from a menu an image is created.  This task is intended to
+provide examples for the ARTDATA package as well as test and
+demonstration images for the various packages.  The initial menu
+includes long slit and multifiber spectra, a globular cluster,
+a star field, a galaxy field, and a galaxy cluster.  Additional
+examples will be added as demonstrations and test procedures are
+developed for various packages.

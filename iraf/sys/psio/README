@@ -1,0 +1,339 @@
+PSIO -- The Postscript I/O package.
+
+	The PSIO interface is used to format a block of text as Postscript
+output on a page of a given size (Letter, Legal, A4 or B5).  Once initialized
+by a ps_open() call, programs can set various options related to the page
+size or properties, preferred fonts, etc.  Output is begun with a call to
+the ps_write_prolog() routine to initialize the PS prolog.  Afterwards,
+text may be fed to a buffer using ps_deposit() to fill the output page to
+a right justified margin, inserting linebreaks where needed.  Other routines
+permit specific linebreaks or text positioning as required.
+
+
+1) PSIO Interface Summary
+-------------------------
+
+		     include  <psset.h>
+
+		ps = ps_open  (fd, default_footer)
+	          ps_setfont  (ps, font)
+	        ps_page_size  (ps, page)
+	        ps_font_size  (ps, font_size)
+		   ps_header  (ps, ledge, center, redge)
+		   ps_footer  (ps, ledge, center, redge)
+	       ps_setmargins  (ps, left, right, top, bottom)
+	     ps_write_prolog  (ps)
+		    ps_close  (ps)
+
+	             ps_xpos  (ps, xpos)
+	             ps_ypos  (ps, ypos)
+	           ps_indent  (ps, nchars)
+	         ps_testpage  (ps, nlines)
+	          ps_deposit  (ps, line)
+	        ps_linebreak  (ps, fill_flag)
+	        ps_pagebreak  (ps, fill_flag)
+	          ps_newline  (ps)
+	           ps_output  (ps, line)
+	           ps_center  (ps, line)
+	     ps_rightjustify  (ps, text)
+
+	width = ps_textwidth  (ps, string)
+	  pos = ps_centerpos  (ps, text)
+	      pos = ps_rjpos  (ps, text)
+
+
+
+2) PSIO Interface Description
+-----------------------------
+
+    ps = ps_open (fd, default_footer)
+	Initialize the PS structure with default page size and margins,
+	set output file descriptor. Returns the PS struct pointer initialized
+	with defaults.  If the 'default_footer' int flag is enabled a default
+	footer containing the string "NOAO/IRAF" in the bottom left corner,
+	the IRAF version string in the center, and the page number in the 
+	bottom right will be created for each page.  Otherwise only a page
+	number will appear unless a different footer is defined with the
+	ps_footer() command.
+
+
+    ps_setfont (ps, font)
+	Set the current font to be used.  Allowable values for 'font' are set
+	in the <psset.h> include file as
+
+	    define F_ROMAN         1           	# times-roman font
+	    define F_ITALIC        2           	# times-roman italic font
+	    define F_BOLD          3           	# times-roman bold font
+	    define F_TELETYPE      4           	# fixed-width font
+	    define F_PREVIOUS      5           	# previous font
+
+	The default font will be a 10-point Times-Roman.
+
+    ps_font_size (ps, font_size)
+	Set the font size in points to be used.  Font sizes are not changeable
+	once the interface has been opened so this routine must be called
+	before the Postscript prolog is written.
+
+    ps_page_size (ps, page)
+
+	Set the default page size to be used.  Allowable values for 'page'
+	are set in the <psset.h> include file as
+
+	    define PAGE_LETTER     1        # US Letter (612x792  @ 300 dpi)
+	    define PAGE_LEGAL      2	    # US Legal  (612x1008 @ 300 dpi)
+	    define PAGE_A4         3	    # A4 size   (595x850  @ 300 dpi)
+	    define PAGE_B5         4	    # B5 size   (524x765  @ 300 dpi)
+
+	The default page size will be US Letter but can be overridden in the
+	environment by defining a 'pspage' variable as e.g.
+
+	    cl> reset pspage = "legal"
+
+    ps_header (ps, ledge, center, redge)
+	Set header text tags.  The header will appear on each page, empty
+	strings are allowed to indicate no text is to be written in that
+	part of the header.
+
+    ps_footer (ps, ledge, center, redge)
+	Set footer text tags.  The footer will appear on each page, empty
+	strings are allowed to indicate no text is to be written in that
+	part of the header.  A running page number will always be written
+	to the 'redge' field unless a non-empty value is defined, a white-
+	space character can be used to indicate no text should be written
+	to that part of the footer.
+
+    ps_setmargins (ps, left, right, top, bottom)
+	Set/Change page margins from defaults set by ps_open().  Values are
+	defined in units of inches given as a floating point number.
+
+    ps_write_prolog (ps)
+	Write the PS prolog given the current postscript struct.  This
+	initializes a flag preventing subsequent changes from taking effect
+	once called.
+
+    ps_close (ps)
+	Close the struct, flush the page, and free memory
+
+
+    ps_xpos (ps, xpos)
+    ps_ypos (ps, ypos)
+	Set current X or Y position on page
+
+    ps_indent  (ps, nchars)
+	Set a temporary indenture of the page from the permanent left margin.
+	Value is given as a number of fixed-width characters, negative values
+	are not permitted, a value of zero may be used to reset to the left
+	margin.
+	         
+    ps_testpage  (ps, nlines)
+	Test whether the output is within the specified number of line of
+	the end of the page, if so do a page break.  This routine can be used
+	to force a page break when a certain number of lines is to be reserved
+	to e.g. keep a group of text together on a page.
+
+    ps_deposit (ps, line)
+	Deposit a line of text to the output buffer.  When the output width
+	exceeds the permanent right margin the line is flushed to the output
+	file and the x-position reset to the current left margin, the y-pos
+	is moved to the next line determined by the font size.   Remaining
+	words in the line buffer to added to the next line buffer. 
+	    Width of the line is computed from the width of each word plus
+	a space char, including font changes.  The line buffer outputs each
+	word plus spacing individually,  font changes are handled in the
+	output routine.
+
+    ps_linebreak (ps, fill_flag)
+	Break the current line regardless of whether it has been filled.  
+	The int 'fill_flag' says whether to fill the current line to be right 
+	justified.  May be called to simply flush the current line buffer.
+
+    ps_output (ps, line, fill_flag)
+	Output the given line and break, fill to be right justified if the
+	int 'fill_flag' is set.
+	
+    ps_center (ps, line)
+	Center the line on the page and break.
+
+    ps_rightjustify (ps, text)
+	Right justfify text on the current line.
+
+
+    width = ps_textwidth (ps, string)
+	Get the width of the given string.  Width is returned in terms of
+	Postscript pixels assuming a 72 point, 300 dpi page.
+
+    pos = ps_centerpos (ps, text)
+    pos = ps_rjpos (ps, text)
+	Get the X position of the centered and right-justified strings.
+
+
+3) Postscript Prolog
+--------------------
+
+	Example prolog for the postscript output.  The actual prolog is
+created based on parameters specified such as the page size, header/footer
+text, etc.  Lines with '***' indicate those which are set dependent upon 
+PS structure values.
+
+
+%!PS-Adobe-1.0
+%%Creator: IRAF postscript translator
+%%CreationDate: Wed May 19 14:34:47 1999
+%%Pages: (atend)
+%%DocumentFonts: (atend)
+%%EndComments
+%%BeginProlog
+
+/inch	{ 72 mul    } def		% 72 points per inch
+/PL 	{ 792  	    } def		% set page height	     	   ***
+/FtrY	{ 20	    } def		% footer Y position
+/HdrY	{ PL 40 sub } def		% header Y position
+/xOrg	72 	   def			% 1 inch left margin         	   ***
+/yOrg	720    	   def			% 1 inch top margin          	   ***
+/yDelta 12 	   def			% line spacing		     	   ***
+/Line	1 	   def			% line number
+/Page	0 	   def			% page number
+/pnum   4 string   def			% sizeof page number cvs buffer
+/res	10.00	   def			% pixel resolution factor    	   ***
+
+/TA { 	newpath 			% Draw a box around our text
+    xOrg yOrg moveto 			% area as a debugging procedure.
+       0 -664 rlineto                   %                                  ***
+     467    0 rlineto                   %                                  ***
+       0  664 rlineto                   %                                  ***
+    closepath 
+    stroke
+} bind def
+
+/FS 	{ findfont exch scalefont } bind def 	% find and scale a font
+/Fonts [					% create an array of fonts
+    10 /Times-Roman FS 				%		     	   ***
+    10 /Times-Bold FS 				%		     	   ***
+    10 /Times-Italic FS 			%			   ***
+    10 /Courier FS 				%			   ***
+    12 /Times-Bold FS 				%		     	   ***
+] def
+/R  {	Fonts 0 get setfont } bind def 		% set roman font
+/B  {	Fonts 1 get setfont } bind def 		% set bold font
+/I  {	Fonts 2 get setfont } bind def 		% set italic font
+/T  {	Fonts 3 get setfont } bind def 		% set teletype font
+/H  {	Fonts 4 get setfont } bind def 		% set header font
+
+/NL {	Line 1 add SL 	} bind def 		% newline
+/H  {	res div 
+	currentpoint exch pop 
+	moveto 		} def			% horizontal position
+/S  {	exch H show 	} bind def 		% show
+/SL {	/Line exch def 				% set line position
+	xOrg yOrg Line yDelta mul sub moveto
+} bind def
+
+
+/BP {	 					% Begin page (header).
+    xOrg HdrY moveto R (TEE \(Nov97\)) show	% write the header         ***
+     280 HdrY moveto R (system) show            %                          ***
+     485 HdrY moveto R (TEE \(Nov97\)) show     %                          ***
+    1 SL R
+} bind def
+
+/EP {	     					% End page (footer).
+    /Page Page 1 add def			% increment page number
+    xOrg FtrY moveto R (NOAO/IRAF) show	% write the footer                 ***
+    250  FtrY moveto R (IRAF V2.11 May 1997) show                          ***
+    530  FtrY moveto R Page pnum cvs show                                  ***
+    showpage					% show the page
+} bind def
+
+%%EndProlog
+%%Page: 1 1
+%-----------------------------------------------------------------------------
+
+initgraphics
+TA
+BP
+	...<postscript generated by translator>...
+EP
+	...<repeat above as needed>...
+
+% end of listing
+%%Trailer
+%%DocumentFonts: Times-Roman Times-Bold Times-Italic Courier
+%%Pages: <N>								   ***
+
+
+
+4) Example Program
+------------------
+
+include <time.h>
+include <psset.h>
+
+task   pstest        = t_pstest
+
+# PSTEST -- Test the PSIO package.  This test program pretty-prints a file
+# with a header message and page number suitable for output to a printer.
+
+procedure t_pstest()
+
+pointer	ps
+int     fd, ip, op
+char    fname[SZ_FNAME], date[SZ_TIME], line[SZ_LINE], outline[SZ_LINE]
+
+pointer ps_open()
+int     open(), getline()
+long    clktime()
+
+begin
+        # Get the file to format and date string.
+        call clgstr ("filename", fname, SZ_FNAME)
+        call cnvtime (clktime(0), date, SZ_TIME)
+
+        # Open the file.
+        fd = open (fname, READ_ONLY, TEXT_FILE)
+
+        # Initialize the PSIO interface.
+        ps = ps_open (STDOUT, NO)
+        call ps_header (ps, fname, "NOAO/IRAF", date)
+        call ps_footer (ps, "PSIO Test Page", "", "")
+        call ps_write_prolog (ps)
+
+        # Output the text in a fixed-width font.
+        call ps_setfont (ps, F_TELETYPE)
+
+        call ps_linebreak (ps, NO)
+        while (getline (fd, line) != EOF) {
+	
+            if (line[1] == EOS) {
+		# Simple break on a newline.
+                call ps_linebreak (ps, NO)
+
+            } else {
+	        # Detab the line.
+	        ip = 1
+	        op = 1
+                while (line[ip] != EOS && op <= SZ_LINE) {
+                    if (line[ip] == '\t') {
+                        repeat {
+                            outline[op] = ' '
+                            op = op + 1
+                        } until (mod(op,8) == 1)
+                        ip = ip + 1
+                    } else {
+                        outline[op] = line [ip]
+                        ip = ip + 1
+                        op = op + 1
+                    }
+                }
+                outline[op] = EOS
+
+                # Output the line and a newline.
+                call ps_output (ps, outline, NO)            
+                call ps_newline (ps)
+            }
+        }
+
+        # Close the file and PSIO interface.
+        call close (fd)
+        call ps_close (ps)
+end
+

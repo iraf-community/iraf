@@ -1,0 +1,126 @@
+ZFIOGD -- FIO device driver for binary graphics devices.
+	  Note: this code is part of library LIBSYS.
+
+The purpose of this driver is to provide a low level i/o interface to the
+interactive binary graphics devices supported on a particular system.  This
+includes devices such as image displays and bit mapped vector graphics devices
+(e.g., the Versatec plotters).  The ZFIOGD driver is not intended for graphics
+devices with a text interface, e.g., the Tektronix compatible graphics
+terminals.  A third interface, i.e., the ZFIOPL driver, is used for devices
+accessed via the NCAR system plot package.
+
+By using a ZFIO level driver to talk to the binary graphics devices we can
+isolate the system dependencies of the interface to a small amount of code.
+We gain the ability to access the device over the network, since the kernel
+server can be used once the i/o interface to the device is part of the kernel.
+
+The ZFIOGD driver is implemented in LIBSYS rather than LIBOS since the
+interface code, while system dependent, is generally written at least partially
+in SPP to access header files shared with the GIO graphics kernel for the
+device, as well as to gain access to the LIBSYS library functions for ease
+of coding.  ZFIOGD is used only by the graphics kernels hence is not needed
+to bootstrap the system; it is added to LIBSYS after the system is up and
+running.
+
+The code is made as follows:
+
+    [1]	In a bootstrap, the commands in the mkpkg.csh file are executed by
+	the root mkpkg.csh file in host$.
+
+    [2] In a sysgen, the mkpkg file in this directory is called by an entry
+	in sys$mkpkg to to update the libsys.a library.
+
+
+ARCHITECTURE
+
+    The single FIO device driver ZFIOGD is used to access all binary graphics
+devices.  This simplifies the KI and VOS interfaces and maximally isolates
+knowledge of the devices supported on a particular system.  New devices can
+be added to ZFIOGD without any changes to the kernel interface or the VOS.
+When a device is opened via the ZFIOGD driver the name of the device is
+specified as follows:
+	
+	node!device:hostdevname
+e.g.,
+	lyra!iis,/dev/iis
+	vela!iis,iia0
+
+where
+	device		identifies the bottom level driver to be used
+
+	hostdevname	is the host system name for the particular
+			    device to be accessed (there may be
+			    multiple copies of a device on a single
+			    system)
+
+The task of ZOPNGD is to look up device name in an internal table and call
+the appropriate lower level device open procedure to physically open the
+device.  If the device resides on a remote node the kernel interface will
+have have spawned a remote kernel server which will call ZOPNGD on the host
+which actually owns the device.
+
+
+                                 ZFIOGD
+                                                                   
+                                                                   
+               iism7X   deanza    peritek   versatec    (etc.)
+
+
+The ZFIOGD interface is a data driven interface, i.e., all control and status
+readback functions are performed by ZARDGD and ZAWRGD calls to read and write
+binary packets of data.  This is ideal for a device such as the IIS which is
+also data driven, but is less convenient for devices which have a control
+type interface (in a control type interface, a subroutine is called to do
+something to the device, rather than writing to the device).  Even when the
+device is control driven at the host system level, a data driven interface is
+desirable to isolate the system dependence of the OS device driver, as well
+as to provide network access.
+
+
+PROTOCOLS
+
+    When building a ZFIOGD sub-driver for a control driven device, it is
+suggested that a control packet be defined for the device which is capable
+of encoding all control functions.  The high level code (GIO graphics device
+driver) will encode control functions in this packet (which should have a
+machine independent external representation), and send it along via ZAWRGD
+to the sub-kernel, which will decode the packet and poke the host system device
+driver as necessary to perform the indicated function.
+
+There is no predefined protocol for encoding control packets for binary
+graphics devices.  Conceivably such an interface could be defined, but our
+goal with the ZFIOGD interface is to isolate the host system dependence of
+the interface and provide network access capabilities; we are NOT trying to
+address the problems of device independence in this interface.  That is the
+function of the GIO device driver, which should be machine independent and
+portable, but addresses the problems of providing a device independent
+interface.
+
+A control packet and communications protocol should therefore be defined
+separately for each device.  One possibility is to use the OFFSET argument
+in the ZAWRGD call as a function code, rather than placing the function code
+in a generic packet header.  This is possible since the OFFSET argument is not
+used for streaming devices.  The only disadvantage to using the OFFSET field
+in this way is that doing so would prevent use of FIO to buffer i/o to the
+device, since FIO always sets OFFSET to zero when calling ZAWRGD for a
+streaming device.  The alternative is the generic packet approach, wherein
+each i/o or control operation is preceded by a packet defining the operation
+to be performed (this can simplify the interface, since a single set of
+subroutines can be used to encode/transmit and receive/decode packet headers).
+Yet another possibilty is to combine the two approaches, using a generic
+packet header for most operations, but a special "offset" or function code
+for special operations such as master clear or device reset (as well as to
+reset the communications protocol).  
+
+See the send/receive procedures in the KI (kernel interface) for an example
+of how to encode packets in a machine independent form for transmission over
+the network.
+
+
+ADDING NEW DEVICES
+
+    To add a new device to ZFIOGD, create a subdirectory with the name of the
+device and implement the six driver subroutines therein.  Add an entry to the
+mkpkg to compile the new subdirectory.  Add a new entry to the device table
+and to each switch-case statement in zfiogd.x.  Relink all affected graphics
+executables, and relink the kernel server executable.

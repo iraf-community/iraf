@@ -1,0 +1,12 @@
+       binpairs - Bin pairs of (x,y) points in log separation
+     findthresh - Estimate a CCD's sky noise from the gain and readnoise
+        iralign - Align the mosaiced image produced by irmosaic
+      irmatch1d - Align and intensity match image produced by irmosaic (1D)
+      irmatch2d - Align and intensity match image produced by irmosaic (2D)
+       irmosaic - Mosaic an ordered list of images onto a grid
+         linpol - Calculate polarization frames and Stoke's parameters
+	   mkms - Create multispec from 1D spectra including associated bands
+       objmasks - Detect objects in images and make masks
+	slitpic - Generate IRAF image of aperture slit mask
+       skygroup - Group a list containing RA and Dec into spatial sublists
+         skysep - Compute arc separation of two RA/Dec values

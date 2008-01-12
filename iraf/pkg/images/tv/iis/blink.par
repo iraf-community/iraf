@@ -1,0 +1,5 @@
+frame1,i,a,,,,Frame1
+frame2,i,a,,,,Frame2
+frame3,i,a,,,,Frame3
+frame4,i,a,,,,Frame4
+rate,r,h,1.,,,Blink rate (sec per frame)

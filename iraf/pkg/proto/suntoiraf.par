@@ -1,0 +1,6 @@
+names,s,a,,,,Files to convert / images to create
+apply_lut,b,h,yes,,,Apply the lookup table for the rasterfile?
+delete,b,h,no,,,Delete the raster files after making the images?
+verbose,b,h,yes,,,Verbose output?
+listonly,b,h,no,,,List the rasterfile headers only?
+yflip,b,h,yes,,,Flip the output image top to bottom?

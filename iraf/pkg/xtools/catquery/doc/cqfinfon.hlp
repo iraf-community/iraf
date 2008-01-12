@@ -1,0 +1,79 @@
+.help cqfinfon Mar00 "Catquery Package"
+.ih
+NAME
+cqfinfon -- get the catalog results field description by number
+.ih
+SYNOPSIS
+
+fieldno = cq_finfon (res, fieldno, fname, max_fname, foffset, fsize,  ftype,
+		     funits, max_funits, format, max_format)
+
+.nf
+pointer	res		# the results descriptor
+int	fieldno		# the sequence number of the field to be returned
+char	fname		# the returned field name
+int	max_fname	# the maximum size of the returned field name
+int	foffset		# the field offset 
+int	fsize		# the field size
+int	ftype		# the field data type
+char	funits		# the field units
+int	max_funits	# the maximum size of the returned field units
+char	format		# the field format
+int	max_format	# the maximum size of the returned field format
+.fi
+.ih
+ARGUMENTS
+.ls res    
+The results descriptor.
+.le
+.ls fieldno
+The sequence number of the field for which information is to be returned.
+.le
+.ls fname
+The returned field name.
+.le
+.ls max_fname
+The maximum size of the returned field name.
+.le
+.ls foffset
+The field offset. Foffset is the field or column number if the
+results are in simple text format, or the one-indexed field offset in chars
+if the results are in blocked text format.
+.le
+.ls fsize
+The field size. Fsize is zero if the results are in simple text file format,
+the field width in characters if results are in blocked file format.
+.le
+.ls ftype
+The field data type. The options are TY_DOUBLE, TY_REAL, TY_LONG, TY_INT,
+TY_SHORT, and TY_CHAR.
+.le
+.ls units
+The returned field units string.
+.le
+.ls max_units
+The maximum size of the returned field units string.
+.le
+.ls format
+The returned field format string.
+.le
+.ls max_format
+The maximum size of the returned field format string.
+.le
+.ih
+DESCRIPTION
+Cq_finfon returns the name, offset, size, data type, units, and format of
+the requested field. Cq_finfon is an integer function which returns
+the field number of the requested field as its function value.
+
+.ih
+NOTES
+Related routines of interest are:
+
+.nf
+call cq_fname (res, fieldno, name, max_name)
+.fi
+.ih
+SEE ALSO
+cqfinfo
+.endhelp

@@ -1,0 +1,21 @@
+	gsaccum	- Accumulate point into data set
+	gsacpts - Accumulate points into a data set
+	  gsadd - Add two surfaces
+	gscoeff - Get coefficients 
+	 gscopy - Copy one surface to another
+	  gsder - Evaluate the derivatives of a surface
+       gserrors	- Calculate chi-square and errors in coefficients
+	 gseval	- Evaluate surface at x and y
+	  gsfit	- Fit surface
+	 gsfree - Free space allocated by gsinit
+	 gsinit - Make ready to fit a surface; set up parameters of fit
+	gsrefit	- Refit surface, same x, y and weight, different z
+       gsreject	- Reject point from data set
+      gsrestore - Restore surface parameters and coefficients
+	 gssave - Save surface parameters and coefficients
+	gssolve	- Solve matrix for coefficients
+	gsstati - Get integer parameter
+	gsstatr - Get real parameter
+	  gssub - Subtract one surface from another
+       gsvector - Evaluate surface at an array of x and y
+	 gszero - Zero arrays for new fit

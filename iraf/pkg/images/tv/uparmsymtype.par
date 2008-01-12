@@ -1,0 +1,4 @@
+input_files,s,a,"tv.cl",,,"list of files to be typed"
+map_cc,b,h,yes,,,"make unknown control chars printable"
+device,s,h,"terminal",,,"output device"
+mode,s,h,"ql",,,

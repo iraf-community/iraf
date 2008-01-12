@@ -1,0 +1,44 @@
+#   MKPKG file for the SDAS libuttables.application
+#   Author: HODGE, 15-JUL-1987
+#           P.E.Hodge, 14-AUG-1987, add uthad[] & replace utpset, utpsta.
+#           P.E.Hodge, 11-SEP-1987, use relative location for object library.
+#           P.E.Hodge, 15-SEP-1987, delete utbftf, utbftp, utbtyp.
+#           P.E.Hodge, 28-DEC-1987, routines for different data types are
+#					combined into single files
+
+
+uttables:
+$checkout libuttables.a ../
+$update	libuttables.a		# update the uttables library
+$checkin libuttables.a ../
+$exit
+
+libuttables.a:
+	utbptf.x       		<tbset.h> 
+	utcdef.x       		<tbset.h> 
+	utcfmt.x       		<tbset.h> 
+	utcfnd.x       		<tbset.h> 
+	utcgt.x       		
+	utcinf.x       		<tbset.h> 
+	utcnam.x       		<tbset.h> 
+	utcnit.x       		<tbset.h> 
+	utcnum.x       		
+	utcpt.x       		
+	uthad.x       		<tbset.h> 
+	uthgt.x       		
+	uthpt.x       		
+	utpgti.x       		
+	utppti.x       		
+	utrgt.x       		
+	utrpt.x       		
+	utrudf.x       		
+	uttacc.x       		
+	uttclo.x       		
+	uttcpy.x
+	uttcre.x       		
+	uttdel.x
+	uttinc.x       		
+	uttinn.x       		
+	uttopn.x       		
+	uttren.x
+	;

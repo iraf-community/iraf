@@ -1,0 +1,48 @@
+.help imgl Sep86 imfort
+.ih
+NAME
+.nf
+imgl -- get (read) an image line
+.fi
+.ih
+SYNOPSIS
+.nf
+subroutine imgl1r (im, rbuf, ier)
+subroutine imgl1s (im, sbuf, ier)
+subroutine imgl2r (im, rbuf, lineno, ier)
+subroutine imgl2s (im, sbuf, lineno, ier)
+subroutine imgl3r (im, rbuf, lineno, bandno, ier)
+subroutine imgl3s (im, sbuf, lineno, bandno, ier)
+
+integer		im		#I image descriptor of open image
+real		rbuf(*)		#O output pixel buffer, type real
+integer*2	sbuf(*)		#O output pixel buffer, type short
+integer		lineno		#I line (row) number (1:axlen(2))
+integer		bandno		#I band number (1:axlen(3))
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimgl\fR procedures are used to get a line (row) from an image.
+Procedures are provided for images of from one to three dimensions,
+of pixel type short integer or real.  The type real procedures may be
+applied to images of either type, but the type short procedures may only
+be used to access images of type short.  The output buffer must provide
+storage for at least \fIaxlen(1)\fR pixels or a buffer overrun will occur.
+.ih
+RETURN VALUE
+A zero status is returned if the referenced image line is in-bounds and
+the actual pixel datatype of the image is one of the types permitted by
+the particular operator called.
+
+.nf
+IE_NOTSHORT:	imfort short integer i/o requires a type short image
+IE_PIXTYPE:	image pixel type must be short or real
+IE_RDPIX:	error reading image pixel file
+IE_YOOB:	image y coordinates out of range
+IE_ZOOB:	image z coordinates out of range
+.fi
+.ih
+SEE ALSO
+impl, imgs, imps
+.endhelp

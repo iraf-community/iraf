@@ -1,0 +1,44 @@
+.help sums Jul85 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+sums -- Generate sums of the sky and object spectra for each aperture
+.ih
+USAGE
+sums input records
+.ih
+PARAMETERS
+.ls input
+The root file name for the input spectra in the string.
+.le
+.ls records
+The range of spectra indicating the elements of the string.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the names of the spectra which will
+be created by the summation operation.
+.le
+.ls start_rec
+The starting record number to be appended to the root name of the
+created spectra.
+.le
+.ih
+DESCRIPTION
+All the object spectra for each aperture are summed, and the
+sky spectra are also summed to produce two new spectra for
+each observing aperture. Exposure times are accumulated.
+No tests are made to check whether the object is consistent
+among the specified spectra. This could be accomplished by
+checking the titles or telescope positions, but it isn't.
+
+The header parameters OFLAG and BEAM-NUM must be properly
+set in the headers.
+.ih
+EXAMPLES
+The following example forms 4 new spectra from nite1.2001-nite1.2002,
+nite1.2003-nite1.2004, ... assuming this string is derived from
+IIDS spectra.
+
+	cl> sums nite1 2001-2100
+.endhelp

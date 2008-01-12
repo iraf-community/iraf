@@ -1,0 +1,14 @@
+# The MKPKG file for the DEBUG task.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	dginl.x		debug.h
+	dgparser.x	../lib/parser.h ../lib/preval.h \
+			../lib/prstruct.h debug.h
+	dgtable.x	debug.h <time.h>
+	dgptime.x	<time.h>
+	;

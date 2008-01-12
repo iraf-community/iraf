@@ -1,0 +1,32 @@
+                  The Daophot Photometry Package
+                 ----------------------------------
+
+The daophot package contains routines which perform crowded-filed
+photometry using point spread functions fitting techniques.
+The aperture photometry package routines are used to provide initial
+estimates for the magnitudes of these objects.
+
+The daophot directory structure is listed below. The package organization
+is by task, for example the nstar subdirectory contains routines
+specific to the nstar task or by function.
+The .h files are all in lib as many of them are shared by several tasks.
+
+             |-addstar-------routines specific to the addstar task
+             |-allstar-------routines specific to the allstar task
+	     |-daoedit-------routines specific to the daoedit task
+             |-daolib--------routines common to many daophot tasks
+             |-doc-----------daophot documentation
+             |-group---------routines specific to the group task
+|-daophot----|-lib-----------daophot definitions or .h files
+             |-nstar---------routines specific to the nstar task
+             |-peak----------routines specific to the peak task
+	     |-psf-----------routines specific to the psf/pstselect tasks
+	     |-seepsf--------routines specific to the seepsf task
+	     |-select--------routines specific to the grpselect/psfmerge tasks
+             |-substar-------routines specific to the substar task
+	     |-test----------directory of test data
+
+
+Lindsey Davis
+NOAO IRAF GROUP
+May 1993

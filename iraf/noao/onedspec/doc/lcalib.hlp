@@ -1,0 +1,125 @@
+.help lcalib Mar92 noao.onedspec
+.ih
+NAME
+lcalib -- List information about the spectral calibration data
+.ih
+USAGE
+lcalib option star_name
+.ih
+PARAMETERS
+.ls option
+Chooses calibration data to be listed.  Option
+may be: "bands" to list the bandpasses at each wavelength, "ext" to
+list the extinction at each wavelength, "mags", "fnu", or "flam"
+to list the magnitude, or flux of
+the star (selected by the star_name parameter) at each wavelength, or
+"stars" to list the star names available in the calibration directory.
+.le
+.ls star_name
+Selects which star's magnitude list is chosen if the option parameter
+is "mags", "fnu", "flam", or "bands".  Also if '?' a list of available
+stars in the specified calibration directory is given.
+.le
+
+The following three queried parameters apply if the selected calibration
+file is for a blackbody.  See \fBstandard\fR for further details.
+.ls mag
+The magnitude of the observed star in the band given by the
+\fImagband\fR parameter.  If the magnitude is not in the same band as
+the blackbody calibration file then the magnitude may be converted to
+the calibration band provided the "params.dat" file containing relative
+magnitudes between the two bands is in the calibration directory
+.le
+.ls magband
+The standard band name for the input magnitude.  This should generally
+be the same band as the blackbody calibration file.  If it is
+not the magnitude will be converted to the calibration band.
+.le
+.ls teff
+The effective temperature (deg K) or the spectral type of the star being
+calibrated.  If a spectral type is specified a "params.dat" file must exist
+in the calibration directory.  The spectral types are specified in the same
+form as in the "params.dat" file.  For the standard blackbody calibration
+directory the spectral types are specified as A0I, A0III, or A0V, where A
+can be any letter OBAFGKM, the single digit subclass is between 0 and 9,
+and the luminousity class is one of I, III, or V.  If no luminousity class
+is given it defaults to dwarf.
+.le
+
+.ls extinction
+Extinction file.  The current standard extinction files:
+.nf
+	onedstds$kpnoextinct.dat - KPNO standard extinction
+	onedstds$ctioextinct.dat - CTIO standard extinction
+.fi
+.le
+.ls caldir
+Calibration directory containing standard star data.  The directory name
+must end with /.  The current calibration directories available in the
+onedstds$ may be listed with the command:
+
+.nf
+	cl> page onedstds$README
+.fi
+.le
+.ls fnuzero = 3.68e-20
+The absolute flux per unit frequency at a magnitude of zero.  This is used
+to convert the calibration  magnitudes to absolute flux by the formula
+
+	Flux = fnuzero * 10. ** (-0.4 * magnitude)
+
+The flux units are also determined by this parameter.  However, the
+frequency to wavelength interval conversion assumes frequency in hertz.
+The default value is based on a calibration of Vega at 5556 Angstroms of
+3.52e-20 ergs/cm2/s/hz for a magnitude of 0.048.  This default value
+is that used in earlier versions of this task which did not allow the
+user to change this calibration.
+.le
+.ih
+DESCRIPTION
+LCALIB provides a means of checking the flux calibration data.  The calibration
+data consists of extinction, bandpasses, and stellar magnitudes.
+
+The extinction is given in an extinction file consisting of lines with
+wavelength and extinction.  The wavelengths must be order in increasing
+wavelength and the wavelengths must be in Angstroms.  There are two
+standard extinction files currently available, "onedstds$kpnoextinct.dat",
+and "onedstds$ctioextinct.dat".
+
+The standard star data are in files in a calibration
+directory specified with the parameter \fIcaldir\fR.  A standard star
+file is selected by taking the star name given, by the parameter
+\fIstar_name\fR, removing blanks, +'s and -'s, appending ".dat", and converting
+to lower case.  This file name is appended to the specified calibration
+directory.  A calibration file consists of lines containing a wavelength,
+a stellar magnitude, and a bandpass full width.  The wavelengths are in
+Angstroms.  Comment lines beginning with # may be included in the file.
+The star names printed by this task are just the first line of each file
+in the calibration directory with the first character (#) removed.
+The calibration files may be typed, copied, and printed.  \fBLcalib\fR
+may also be used to list data from the calibration files.
+.ih
+EXAMPLES
+
+.nf
+	# List the extinction table
+	cl> lcalib ext
+	# Plot the extinction table
+	cl> lcalib ext | graph
+	# Plot the energy distribution
+	cl> lcalib mags "bd+28 4211" | graph
+	# List the names of all the stars
+	cl> lcalib stars caldir=onedstds$irscal/
+	# As above but for IIDS file
+	cl> lcalib stars calib_file=onedstds$iidscal/
+.fi
+.ih
+REVISIONS
+.ls LCALIB V2.10
+This task has a more compact listing for the "stars" option and allows
+paging a list of stars when the star name query is not recognized.
+.le
+.ih
+SEE ALSO
+standard, sensfunc, onedstds$README
+.endhelp

@@ -1,0 +1,13 @@
+# Parameter file for WCSEDIT
+
+image,f,a,,,,"List of input images"
+parameter,s,a,,,,"The wcs parameter to be edited"
+value,s,a,,,,"The new parameter value"
+axes1,s,a,"",,,"Independent axes for which parameter is to be edited"
+axes2,s,a,"",,,"Dependent axes for which parameter is to be edited"
+wcs,s,h,"world",,,"Default world coordinate system to be edited"
+wcsdim,i,h,2,1,,"WCS dimensionality for new images"
+interactive,b,h,no,,,"Interactive mode ?"
+commands,*s,h,,,,"wcsedit"
+verbose,b,h,yes,,,"Print messages about actions taken ?"
+update,b,h,yes,,,"Update the image header ?"

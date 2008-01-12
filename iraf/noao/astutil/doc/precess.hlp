@@ -1,0 +1,63 @@
+.help precess Oct87 noao.astutil
+.ih
+NAME
+precess -- general astronomical coordinate precession
+.ih
+USAGE
+precess files startyear endyear
+.ih
+PARAMETERS
+.ls files
+The name of a file (or a file list or template) containing the coordinates
+to be precessed.
+.le
+.ls startyear
+The default equinox of the input coordinates.
+.le
+.ls endyear
+The default target year to which the coordinates will be precessed.
+.le
+.ls stdepoch = 0
+If nonzero, coordinates will be output precessed to both \fBendyear\fR
+and the specified standard epoch.
+.le
+.ih
+DESCRIPTION
+Coordinates are read from the input file as RA and DEC pairs,
+one pair per input line.  Each coordinate pair may optionally be followed
+by the equinox of the input coordinates (if different from the default)
+and the epoch of the output coordinates.
+Coordinates may be entered in either decimal or sexagesimal notation.
+The given coordinates are rotated according to the
+precession rates to the requested year and printed on the standard output.
+Basic data is taken from the Explanation to the American Ephemeris.
+.ih
+EXAMPLES
+Precess coordinate entered interactively from 1950 to 1990, except where
+the dates are specified otherwise on the command line (lines input by the
+user are marked:
+
+.nf
+	cl> precess STDIN 1950 1990			[input]
+	12:30:10.12 10:18:27.5				[input]
+	  12:32:11.79   10:05:13.09  1990.0
+	12:30 10:18					[input]
+	  12:32:01.68   10:04:45.51  1990.0
+	12:30 -20 1900					[input]
+	  12:34:42.89  -20:29:46.29  1990.0
+	12:30 -20 1900 2000				[input]
+	  12:35:14.40  -20:33:04.40  2000.0
+	(eof=<ctrl/z>)					[input]
+.fi
+
+The following is equivalent, except that coordinate input is taken from
+the file "coords", rather than from the terminal:
+
+.nf
+	cl> precess coords 1950 1990			[input]
+	  12:32:11.79   10:05:13.09  1990.0
+	  12:32:01.68   10:04:45.51  1990.0
+	  12:34:42.89  -20:29:46.29  1990.0
+	  12:35:14.40  -20:33:04.40  2000.0
+.fi
+.endhelp

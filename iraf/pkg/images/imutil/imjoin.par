@@ -1,0 +1,5 @@
+input,s,a,,,,"Input images"
+output,s,a,,,,"Output image"
+join_dimension,i,a,,1,,"Dimension to be joined"
+pixtype,s,h,"",,,"Output image pixel type"
+verbose,s,h,yes,,,Print messages about progress of task ?

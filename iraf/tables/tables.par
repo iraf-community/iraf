@@ -1,0 +1,4 @@
+# Package parameters for the TABLES package
+version,s,h,"V3.7 - June 2007"
+motd,b,h,yes,,,type the welcome banner?
+mode,s,h,"al"

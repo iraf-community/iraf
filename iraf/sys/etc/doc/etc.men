@@ -1,0 +1,24 @@
+	brktime - Convert a long integer time into year, month, day, etc.
+	   btoi - Boolean to integer
+	clktime - Get the clock time
+	cnvdate - Convert long integer time to date string (short format)
+	cnvtime - Convert long integer time to time string (long format)
+	cputime - Get the CPU time consumed by the process
+    envget[bis] - Get a boolean, integer, or string valued environment variable
+	 erract - Take an error action for a previously posted error
+	errcode - Get the error code of the posted error
+	  error - Post an error and take an error action
+	 getuid - Get the name of the runtime user of a program
+	   itob - Convert integer to boolean
+	 lpopen - Open the line printer as a file
+	   main - The IRAF Main
+	onerror - Post a procedure to be executed if error recovery occurs
+	 onexit - Post a procedure to be executed upon process shutdown
+	  oscmd - Send a command to the host operating system
+	  qsort - General quick sort for any data structure
+      sys_mtime - Mark the time (for timing programs)
+      sys_ptime - Print the elapsed time since last mark
+	 syserr - Post a system error and take an error action
+	 tsleep - Delay process execution
+	  urand - Uniform random number generator
+	  xwhen - Post an exception handler

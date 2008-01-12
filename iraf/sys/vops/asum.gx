@@ -1,0 +1,32 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ASUM -- Vector sum.  Take care to prevent integer overflow by returning
+# a floating point sum.
+
+$if (datatype == csir)
+real procedure asum$t (a, npix)
+$else $if (datatype == ld)
+double procedure asum$t (a, npix)
+$else
+PIXEL procedure asum$t (a, npix)
+$endif $endif
+
+PIXEL	a[ARB]
+int	npix
+int	i
+
+$if (datatype == csir)
+real	sum
+$else $if (datatype == ld)
+double	sum
+$else
+PIXEL	sum
+$endif $endif
+
+begin
+	sum = 0$f
+	do i = 1, npix
+	    sum = sum + a[i]
+	
+	return (sum)
+end

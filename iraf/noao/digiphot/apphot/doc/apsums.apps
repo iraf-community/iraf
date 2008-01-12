@@ -1,0 +1,19 @@
+The apphot and daophot package aperture photometry tasks have been modified
+to compute the aperture sums and areas in double precision instead of real
+precision.  This change minimizes machine precision errors that can become
+significant for large apertures and very low noise or synthetic data.
+
+These tasks have also been modified to output negative values of the total
+flux should they occur. Formerly these values were being artificially set to 
+0.0. This change makes it easier to see the effects of any sky value and machine
+errors.
+
+The modified apertures photometry tasks are available as part of the
+external addon package digiphotx.  To retrieve and install digiphotx, ftp
+to 140.252.1.1, login as anonymous, cd to iraf/extern, retrieve the file
+digiphotx.readme, and follow the installation instructions.
+
+
+
+					      Lindsey Davis
+					      davis@noao.edu

@@ -1,0 +1,30 @@
+.help ds2tp Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDSTP (RA, DEC, RAZ, DECZ, XI, ETA, J)
+
+     - - - - - -
+      D S T P
+     - - - - - -
+
+  Projection of spherical coordinates onto tangent plane:
+  "gnomonic" projection - "standard coordinates" (double precision)
+
+  Given:
+     RA,DEC      dp   spherical coordinates of point to be projected
+     RAZ,DECZ    dp   spherical coordinates of tangent point
+
+  Returned:
+     XI,ETA      dp   rectangular coordinates on tangent plane
+     J           int  status:   0 = OK, star on tangent plane
+                                1 = error, star too far from axis
+                                2 = error, antistar on tangent plane
+                                3 = error, antistar too far from axis
+
+  P.T.Wallace   Starlink   18 July 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

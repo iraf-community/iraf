@@ -1,0 +1,59 @@
+.help aclist Feb00 astcat
+.ih
+NAME
+aclist -- list the supported astrometric catalogs
+.ih
+USAGE
+aclist catalogs
+.ih
+PARAMETERS
+.ls catalogs
+The names of the astrometric catalogs to be listed. If catalogs = "*" then
+all the astrometric catalogs in the catalog configuration file are listed.
+.le
+.ls verbose = no
+List the catalog query and output formats after the catalog name ?
+.le
+.ls catdb = ")_.catdb"
+The catalog configuration file. The value of catdb defaults to the value
+of the package parameter of the same name. The default catalog configuration
+file is "astcat$lib/catdb.dat".
+.le
+.ih
+DESCRIPTION
+Aclist lists the supported astrometric catalogs specified by the
+\fIcatalogs\fR parameter. If catalogs = "*" then all the supported catalogs
+are listed, otherwise only the catalog names specified by the user are
+listed. Valid catalog names have the form "catalog@site", e.g. "usno2@noao".
+If \fIverbose\fR = "yes", then the catalog query and output formats are
+listed after the catalog name.
+
+The catalog names, addresses, query formats, and query output formats are
+specified in the catalog configuration file \fIcatdb\fR. By default the catalog
+configuration file name defaults to the value of the package parameter catdb.
+The default catalog configuration file is "astcat$lib/catdb.dat".
+Users can add records to this file or create their own configuration
+file using catdb as a model.
+.ih
+EXAMPLES
+
+1. List all the astrometric catalogs in the catalog configuration file.
+
+.nf
+cl> aclist *
+.fi
+
+2. List the query format and the output format for the usno2@noao catalog.
+
+.nf
+cl> aclist usno2@noao verbose+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+aslist
+.endhelp

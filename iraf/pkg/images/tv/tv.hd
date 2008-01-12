@@ -1,0 +1,23 @@
+# Help directory for the TV package
+
+$doc		= "images$tv/doc/"
+$display	= "images$tv/display/"
+$imedit		= "images$tv/imedit/"
+$imexamine	= "images$tv/imexamine/"
+$tvmark		= "images$tv/tvmark/"
+$wcslab		= "images$tv/wcslab/"
+$iis		= "images$tv/iis/"
+
+_dcontrol	hlp=doc$dcontrol.hlp,		sys=..
+bpmedit		hlp=doc$bpmedit.hlp,		src=imedit$bpmedit.cl
+display		hlp=doc$display.hlp,		src=display$t_display.x
+imedit		hlp=doc$imedit.hlp,		src=imedit$t_imedit.x
+imexamine	hlp=doc$imexamine.hlp,		src=imexamine$t_imexam.x
+tvmark		hlp=doc$tvmark.hlp,		src=tvmark$t_tvmark.x
+wcslab		hlp=doc$wcslab.hlp,		src=wcslab$t_wcslab.x
+revisions	sys=Revisions
+
+iis		men=iis$iis.men,
+		hlp=..,
+		src=iis$iis.cl,
+		pkg=iis$iis.hd

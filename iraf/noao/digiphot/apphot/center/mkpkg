@@ -1,0 +1,54 @@
+# CENTER task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbcenter.x	../lib/apphot.h		../lib/display.h	\
+			<fset.h>
+	apcconfirm.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/center.h
+	apcencolon.x	../lib/apphot.h		../lib/center.h         \
+			../lib/display.h	../lib/noise.h
+	apcenter.x	../lib/apphot.h		../lib/center.h		\
+			../lib/display.h	<ctype.h>		\
+			<gset.h>                <imhdr.h>
+	apcerrors.x	../lib/center.h
+	apcfree.x	../lib/apphotdef.h	../lib/centerdef.h
+	apictr.x
+	apcinit.x	../lib/apphotdef.h	../lib/center.h		\
+			../lib/centerdef.h
+	apclean.x	../lib/apphot.h		../lib/center.h		\
+			../lib/noise.h
+	appcpars.x	../lib/display.h
+	apcplot.x	../lib/apphot.h		../lib/apphotdef.h	\
+			../lib/center.h		../lib/centerdef.h	\
+			../lib/noise.h		<gset.h>		\
+			<pkg/gtools.h>		<mach.h>
+	apcpshow.x	../lib/center.h		../lib/display.h
+	apcshow.x	../lib/display.h
+	apcsnratio.x	../lib/center.h		../lib/noise.h          \
+			<mach.h>
+	apctr1d.x	../lib/center.h		<mach.h>
+	apctrbuf.x	../lib/apphotdef.h	../lib/center.h         \
+			../lib/centerdef.h	<imhdr.h> <math.h>      \
+			<mach.h>
+	apmctr1d.x	../lib/center.h		<mach.h>
+	apfitcen.x	../lib/apphotdef.h	../lib/center.h         \
+			../lib/centerdef.h	../lib/noisedef.h	\
+			../lib/apphot.h         <mach.h>
+	apgcpars.x	../lib/center.h		../lib/display.h        \
+			../lib/noise.h
+	apgctr1d.x	../lib/center.h		<math/nlfit.h>
+	aplgctr1d.x	../lib/center.h		<math.h>
+	appcenter.x	../lib/apphot.h		../lib/center.h
+	apcradsetup.x	../lib/display.h
+	aprefitcen.x	../lib/apphotdef.h	../lib/center.h         \
+			../lib/centerdef.h	../lib/noisedef.h	\
+			../lib/apphot.h         <mach.h>
+	t_center.x	../lib/apphot.h		../lib/noise.h          \
+			<fset.h>		<gset.h>                \
+			<imhdr.h>
+	;

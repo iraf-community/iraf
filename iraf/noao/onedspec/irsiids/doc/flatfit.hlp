@@ -1,0 +1,188 @@
+.help flatfit Dec86 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+flatfit -- Sum and normalize flat field spectra
+.ih
+USAGE
+flatfit root records
+.ih
+PARAMETERS
+.ls root
+The root file name for the input names of the flat field
+spectra to be accumulated and fit for normalization.
+.le
+.ls records
+The range of spectra indicating the elements of the string.
+The names of the spectra will be formed by appending the range
+elements to the input root name.
+.le
+.ls output
+This is the root file name for the names of the spectra which will
+be created during normalization. The aperture number for the observation
+will be appended to the root in form "root.nnnn" where nnnn is the aperture
+number with leading 0's.
+.le
+.ls function = "chebyshev"
+The accumulated spectra are fit by this function type - either
+chebyshev or legendre polynomials, or spline3 or spline1 interpolators.
+.le
+.ls order = 4
+The order of the fit using the above function. This should generally be
+a low order fit to avoid introduction of high spatial frequency wiggles.
+.le
+.ls niter = 1
+The number of iterations to reject discrepant pixels upon initial
+startup of the solution.
+.le
+.ls lower = 2.0
+The number of sigmas for which data values less than this cutoff are
+rejected.
+.le
+.ls upper = 2.0
+The number of sigmas for which data values greater than this cutoff are
+rejected.
+.le
+.ls ngrow = 0
+The number of pixels on either side of a rejected pixel to also be rejected.
+.le
+.ls div_min = 1.0
+During the normalization process, a division by zero will produce
+this value as a result.
+.le
+.ls interact = yes
+If set to yes, graphical interaction with the normalization process
+is provided for at least the first aperture for which sums are available.
+If set to no, no interaction is provided.
+.le
+.ls all_interact = no
+If set to yes, then interaction will be provided for all apertures
+for which sums have been accumulated. If set to no then the parameter interact
+will determine if the first aperture data is to be interactive.
+.le
+.ls coincor = )_.coincor
+If set to yes, coincidence correction is applied to the data during
+the summation process, and the following three parameters are required.
+See \fBcoincor\fR for more about this correction.
+.ls ccmode = )_.ccmode
+The mode by which the coincidence correction is to be performed.
+This may be "iids" or "photo".
+.le
+.ls deadtime = )_.deadtime
+The detector deadtime in seconds.
+.le
+.ls power = )_.power
+Power law IIDS non-linear correction exponent.
+.le
+.le
+.ls cursor = ""
+Graphics cursor input.  When null the standard cursor is used otherwise
+the specified file is used.
+.le
+.ih
+DESCRIPTION
+The specified spectra are added by aperture number to produce
+summations which are then fit by a specified fitting function.
+The fitting function is then divided into the sum to produce a
+normalized (to 1.0) sum in which the low frequency spatial
+response has been removed.
+
+The resultant normalized images may then be divided into all other
+data to remove the pixel-to-pixel variations without introducing
+any color terms. The spectra may be used directly if they happen
+to be object spectra in which the low frequency response is to be
+removed.
+
+During the accumulation process the spectra may be corrected for
+coincidence losses if the detector is subject to the phenomenon.
+
+After accumulating all input spectra, the pixels in each sum are
+fit according to
+the specified function. If the interactive switches are set, then
+graphical interaction is made available. If only the interact parameter
+is set to yes, then only the data from the first aperture will
+be available for interaction. Data from subsequent apertures will
+be fit using the same parameters and number of iterations as the
+first. If the all_interact parameter is also
+set, then data from each aperture will be presented for interaction.
+
+At each step in the fit, pixels which are discrepant by more than
+"upper" sigmas above the fit, or "lower" sigmas below the fit, are
+rejected. The rejection process may be applied many times (iterations)
+to continue rejecting pixels. If the upper and lower sigmas are
+not equal, the resulting fit will be biased slightly above the mean
+(for lower < upper) or below the mean (upper < lower). This is useful
+when the spectrum being fit is that of a star having either absorption
+or emission lines.
+ 
+A display is presented of the sum and the fit through the data.
+A status line is printed containing the fit type, the order of
+the fit, the rms residual from the fit, and the number of data
+points in the fit after one iteration of rejection.
+
+The following cursor keystrokes are then active:
+.ls ?
+Clear the screen and display the active keystrokes
+.le
+.ls /
+Indicate active keystrokes on the status line
+.le
+.ls e
+Change plot mode to an error plot. This display is defined
+as the deviation from the fit divided by the data values [ (data - fit)/ data]
+at each pixel
+.le
+.ls f
+Change plot mode back to the fit through the data display
+.le
+.ls o
+Change the order of the fit.
+.le
+.ls l
+Change the lower rejection criterion (in units of sigma).
+.le
+.ls u
+Change the upper rejection criterion.
+.le
+.ls s
+Change both rejection criteria to the same value.
+.le
+.ls r
+Reinstate rejected pixels.
+.le
+.ls i
+Iterate one more time.
+.le
+.ls n
+Iterate several more times - the user is prompted for the count.
+.le
+.ls q
+Quit and accept the solution
+.le
+.ls <CR>
+RETURN is the same as 'q' but a confirmation request to exit must be
+answered as yes.
+.le
+
+All keystrokes but ?,/,e,f, and q force another iteration which will
+reject additional pixels. To fully inhibit pixel rejection, the sigmas
+should be set to a large value (e.g. 100).
+.ih
+EXAMPLES
+The following example will accumulate 8 spectra and fit the first
+aperture data interactively but not the second, and apply coincidence
+corrections to the sums. The upper and lower rejection criteria
+have been altered to bias the seventh order fit to a higher level.
+
+	cl> flatfit nite1 1-4,201-204 coin+ low=1.4 up=3 order=7
+.ih
+BUGS
+For some reason, the error plot is supposed to have a zero level line
+drawn, but none appears.
+
+As in most of the IRAF software, the order of a fit refers to the number
+of terms in the fit, so that a fit of order 1 implies a constant and order
+2 implies a linear fit.
+.ih
+SEE ALSO
+coincor, flatdiv
+.endhelp

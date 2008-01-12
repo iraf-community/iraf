@@ -1,0 +1,41 @@
+.help gsvector Aug85 "Gsurfit Package"
+.ih
+NAME
+gsvector -- evaluate the fitted surface at a set of points
+.ih
+SYNOPSIS
+gsvector (sf, x, y, zfit, npts)
+
+.nf
+pointer	sf		# surface descriptor
+real	x[npts]		# x array, xmin <= x <= xmax
+real	y[npts]		# y array, ymin <= y <= ymax
+real	zfit[npts]	# data values
+int	npts		# number of data points
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+Array of x and y values.
+.le
+.ls zfit
+Array of fitted values.
+.le
+.ls npts
+The number of points to be fit.
+.le
+.ih
+DESCRIPTION
+Fit the surface to an array of data points. GSVECTOR uses the coefficients
+stored in the surface descriptor structure.
+.ih
+NOTES
+Checking for out of bounds x and y values is the responsibility of the
+calling program.
+.ih
+SEE ALSO
+gseval, gsder
+.endhelp

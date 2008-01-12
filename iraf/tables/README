@@ -1,0 +1,14 @@
+This directory contains the files needed to define the TABLES system.
+These include:
+
+tables.cl	master CL file; defines tasks within TABLES
+tables.hd	master help database definition file for TABLES
+tables.men	menu file for tasks in the TABLES package
+tables.par	TABLES parameter file
+mkpkg		IRAF mkpkg file to rebuild the TABLES package
+
+and the applications directory containing:
+
+    FITS input/output for images and tables
+    STScI graphics task for images and tables
+    table manipulation tools

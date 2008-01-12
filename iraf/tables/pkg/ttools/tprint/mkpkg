@@ -1,0 +1,15 @@
+# Update tprint and tdump in the ttools package library.
+# Author: HODGE, 2-FEB-1988
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tdump.x        		<tbset.h> 
+	tprint.x       		<time.h> <finfo.h> <tbset.h> 
+	tprhtml.x        	<tbset.h> tprint.h
+	tprplain.x        	<tbset.h> tprint.h
+	tprlatex.x        	<tbset.h> tprint.h
+	;

@@ -1,0 +1,11 @@
+# 2DF read parameters
+r2df_file,f,a,mta,,,2DF data source
+file_list,s,a,,,,File list
+iraf_file,f,a,,,,IRAF filename
+make_image,b,h,yes,,,Create an IRAF image?
+long_header,b,h,no,,,Print full 2DF header?
+short_header,b,h,yes,,,Print short 2DF header?
+datatype,s,h,s,,,IRAF data type
+standard_format,b,h,yes,,,2DF standard format?
+offset,i,h,0,,,Tape offset number
+mode,s,h,ql,,,

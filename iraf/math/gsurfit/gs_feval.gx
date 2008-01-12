@@ -1,0 +1,332 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include <math/gsurfit.h>
+
+# GS_EVPOLY -- Procedure to evluate the polynomials
+
+procedure $tgs_evpoly (coeff, x, y, zfit, npts, xterms, xorder, yorder, k1x,
+    k2x, k1y, k2y)
+
+PIXEL	coeff[ARB]		# 1D array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	y[npts]
+PIXEL	zfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	xterms			# cross terms ?
+int	xorder,yorder		# order of the polynomials in x and y
+PIXEL	k1x, k2x		# normalizing constants
+PIXEL	k1y, k2y
+
+int	i, k, cptr, maxorder, xincr
+pointer	sp, xb, yb, xbptr, ybptr, accum
+
+begin
+	# fit a constant
+	if (xorder == 1 && yorder == 1) {
+	    call amovk$t (coeff[1], zfit, npts)
+	    return
+	}
+
+	# fit first order in x and y
+	if (xorder == 2 && yorder == 1) {
+	    call altm$t (x, zfit, npts, coeff[2], coeff[1])
+	    return
+	}
+	if (yorder == 2 && xorder == 1) {
+	    call altm$t (x, zfit, npts, coeff[2], coeff[1])
+	    return
+	}
+	if (xorder == 2 && yorder == 2 && xterms == NO) {
+	    do i = 1, npts
+		zfit[i] = coeff[1] + x[i] * coeff[2] + y[i] * coeff[3]
+	    return
+	}
+
+	# allocate temporary space for the basis functions
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
+	$else
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
+	$endif
+
+	# calculate basis functions
+	call $tgs_bpol (x, npts, xorder, k1x, k2x, Mem$t[xb])
+	call $tgs_bpol (y, npts, yorder, k1y, k2y, Mem$t[yb])
+
+	# accumulate the output vector
+	cptr = 0
+	call aclr$t (zfit, npts)
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
+	    ybptr = yb
+	    do i = 1, yorder {
+	        call aclr$t (Mem$t[accum], npts)
+	        xbptr = xb
+	        do k = 1, xincr {
+		    $if (datatype == r)
+		    call awsu$t (Mem$t[accum], Mem$t[xbptr], Mem$t[accum], npts,
+		        1.0, coeff[cptr+k])
+		    $else
+		    call awsu$t (Mem$t[accum], Mem$t[xbptr], Mem$t[accum], npts,
+		        1.0d0, coeff[cptr+k])
+		    $endif
+		    xbptr = xbptr + npts
+	        }
+	        call gs_asumvp$t (Mem$t[accum], Mem$t[ybptr], zfit, zfit, npts)
+	        cptr = cptr + xincr
+	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
+	    }
+	} else {
+	    xbptr = xb
+	    do k = 1, xorder {
+		$if (datatype == r)
+		call awsur (zfit, Memr[xbptr], zfit, npts, 1.0, coeff[k])
+		$else
+		call awsud (zfit, Memd[xbptr], zfit, npts, 1.0d0, coeff[k])
+		$endif
+		xbptr = xbptr + npts
+	    }
+	    ybptr = yb + npts
+	    do k = 1, yorder - 1 {
+		$if (datatype == r)
+		call awsur (zfit, Memr[ybptr], zfit, npts, 1.0, coeff[xorder+k])
+		$else
+		call awsud (zfit, Memd[ybptr], zfit, npts, 1.0d0,
+		    coeff[xorder+k])
+		$endif
+		ybptr = ybptr + npts
+	    }
+	}
+
+
+	call sfree (sp)
+end
+
+# GS_EVCHEB -- Procedure to evaluate a Chebyshev polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tgs_evcheb (coeff, x, y, zfit, npts, xterms, xorder, yorder, k1x,
+    k2x, k1y, k2y)
+
+PIXEL	coeff[ARB]		# 1D array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	y[npts]
+PIXEL	zfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	xterms			# cross terms ?
+int	xorder,yorder		# order of the polynomials in x and y
+PIXEL	k1x, k2x		# normalizing constants
+PIXEL	k1y, k2y
+
+int	i, k, cptr, maxorder, xincr
+pointer	sp, xb, yb, xbptr, ybptr, accum
+
+begin
+	# fit a constant
+	if (xorder == 1 && yorder == 1) {
+	    call amovk$t (coeff[1], zfit, npts)
+	    return
+	}
+
+	# allocate temporary space for the basis functions
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
+	$else
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
+	$endif
+
+	# calculate basis functions
+	call $tgs_bcheb (x, npts, xorder, k1x, k2x, Mem$t[xb])
+	call $tgs_bcheb (y, npts, yorder, k1y, k2y, Mem$t[yb])
+
+	# accumulate thr output vector
+	cptr = 0
+	call aclr$t (zfit, npts)
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
+	    ybptr = yb
+	    do i = 1, yorder {
+	        call aclr$t (Mem$t[accum], npts)
+	        xbptr = xb
+	        do k = 1, xincr {
+		    $if (datatype == r)
+		    call awsur (Memr[accum], Memr[xbptr], Memr[accum], npts,
+		        1.0, coeff[cptr+k])
+		    $else
+		    call awsud (Memd[accum], Memd[xbptr], Memd[accum], npts,
+		        1.0d0, coeff[cptr+k])
+		    $endif
+		    xbptr = xbptr + npts
+	        }
+	        call gs_asumvp$t (Mem$t[accum], Mem$t[ybptr], zfit, zfit, npts)
+	        cptr = cptr + xincr
+	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
+	    }
+	} else {
+	    xbptr = xb
+	    do k = 1, xorder {
+		$if (datatype == r)
+		call awsur (zfit, Memr[xbptr], zfit, npts, 1.0, coeff[k])
+		$else
+		call awsud (zfit, Memd[xbptr], zfit, npts, 1.0d0, coeff[k])
+		$endif
+		xbptr = xbptr + npts
+	    }
+	    ybptr = yb + npts
+	    do k = 1, yorder - 1 {
+		$if (datatype == r)
+		call awsur (zfit, Memr[ybptr], zfit, npts, 1.0, coeff[xorder+k])
+		$else
+		call awsud (zfit, Memd[ybptr], zfit, npts, 1.0d0,
+		    coeff[xorder+k])
+		$else
+		$endif
+		ybptr = ybptr + npts
+	    }
+	}
+
+	# free temporary space
+	call sfree (sp)
+end
+
+
+# GS_EVLEG -- Procedure to evaluate a Chebyshev polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tgs_evleg (coeff, x, y, zfit, npts, xterms, xorder, yorder, k1x, k2x,
+    k1y, k2y)
+
+PIXEL	coeff[ARB]		# 1D array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	y[npts]
+PIXEL	zfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	xterms			# cross terms ?
+int	xorder,yorder		# order of the polynomials in x and y
+PIXEL	k1x, k2x		# normalizing constants
+PIXEL	k1y, k2y
+
+int	i, k, cptr, maxorder, xincr
+pointer	sp, xb, yb, accum, xbptr, ybptr
+
+begin
+	# fit a constant
+	if (xorder == 1 && yorder == 1) {
+	    call amovk$t (coeff[1], zfit, npts)
+	    return
+	}
+
+	# allocate temporary space for the basis functions
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
+	$else
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
+	$endif
+
+	# calculate basis functions
+	call $tgs_bleg (x, npts, xorder, k1x, k2x, Mem$t[xb])
+	call $tgs_bleg (y, npts, yorder, k1y, k2y, Mem$t[yb])
+
+	cptr = 0
+	call aclr$t (zfit, npts)
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
+	    ybptr = yb
+	    do i = 1, yorder {
+	        xbptr = xb
+	        call aclr$t (Mem$t[accum], npts)
+	        do k = 1, xincr {
+		    $if (datatype == r)
+		    call awsur (Memr[accum], Memr[xbptr], Memr[accum], npts,
+		        1.0, coeff[cptr+k])
+		    $else
+		    call awsud (Memd[accum], Memd[xbptr], Memd[accum], npts,
+		        1.0d0, coeff[cptr+k])
+		    $endif
+		    xbptr = xbptr + npts
+	        }
+	        call gs_asumvp$t (Mem$t[accum], Mem$t[ybptr], zfit, zfit, npts)
+	        cptr = cptr + xincr
+	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
+	    }
+	} else {
+	    xbptr = xb
+	    do k = 1, xorder {
+		$if (datatype == r)
+		call awsur (zfit, Memr[xbptr], zfit, npts, 1.0, coeff[k])
+		$else
+		call awsud (zfit, Memd[xbptr], zfit, npts, 1.0d0, coeff[k])
+		$endif
+		xbptr = xbptr + npts
+	    }
+	    ybptr = yb + npts
+	    do k = 1, yorder - 1 {
+		$if (datatype == r)
+		call awsur (zfit, Memr[ybptr], zfit, npts, 1.0, coeff[xorder+k])
+		$else
+		call awsud (zfit, Memd[ybptr], zfit, npts, 1.0d0,
+		    coeff[xorder+k])
+		$endif
+		ybptr = ybptr + npts
+	    }
+	}
+
+	# free temporary space
+	call sfree (sp)
+end
+
+# GS_ASUMVP -- Procedure to add the product of two vectors to another vector
+
+procedure gs_asumvp$t (a, b, c, d, npts)
+
+PIXEL	a[ARB]		# first input vector
+PIXEL	b[ARB]		# second input vector
+PIXEL	c[ARB]		# third vector
+PIXEL	d[ARB]		# output vector
+int	npts		# number of points
+
+int	i
+
+begin
+	do i = 1, npts
+	    d[i] = c[i] + a[i] * b[i]
+end

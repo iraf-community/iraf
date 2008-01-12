@@ -1,0 +1,15 @@
+input,s,a,,,,List of images in which to detect cosmic rays
+output,s,a,,,,List of cosmic ray replaced output images (optional)
+badpix,s,h,"",,,"List of bad pixel files (optional)
+"
+ccdtype,s,h,"",,,CCD image type to select (optional)
+threshold,r,h,25.,,,Detection threshold above mean
+fluxratio,r,h,2.,,,Flux ratio threshold (in percent)
+npasses,i,h,5,1,,Number of detection passes
+window,s,h,"5","5|7",,"Size of detection window
+"
+interactive,b,h,yes,,,Examine parameters interactively?
+train,b,h,no,,,Use training objects?
+objects,*imcur,h,"",,,Cursor list of training objects
+savefile,f,h,"",,,File to save train objects
+answer,s,q,,"no|yes|NO|YES",,Review parameters for a particular image?

@@ -1,0 +1,29 @@
+               Photometric Calibrations Package
+	    -------------------------------------
+
+    The photometry calibration package contains a set for tasks for converting
+from the instrumental magnitude system to the standard photometric system.
+
+    The PHOTCAL directory structure is listed below. The package organization
+is by task and/or function.
+
+
+            |-catalogs----------library of standard photometric catalogs
+	    |-debug-------------debugging routines
+	    |-doc---------------the package documentation
+	    |-evaluate----------routines to evaluate the transformations
+	    |-fitparams---------routines to compute the transformations
+	    |-io----------------package io routines
+|-photcal---|-lib---------------include files
+            |-mctable-----------package table routines
+	    |-mkcatalog---------routines for typing in catalog files
+	    |-mkconfig----------routines for creating the config files
+	    |-mkimsets----------routines for creating the image set files
+	    |-mkobsfile---------routines for preprocessing ap/daophot output
+	    |-parser------------the parser code
+	    |-test--------------directory of test data
+
+
+Lindsey Davis
+NOAO IRAF GROUP
+August 1991

@@ -1,0 +1,111 @@
+.help revisions Jun88 noao.imred.irs
+.nf
+
+=====
+V2.12
+=====
+
+imred$irs/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
+imred$irs/identify.par
+    Added new units parameters.  (3/11/97, Valdes)
+
+=========
+V2.10.4p2
+=========
+
+imred$irs/
+   Updated to new version of ONEDSPEC (7/11/91, Valdes)
+
+================
+
+imred$irs/standard.par
+   Removed ennumerated list.  (4/10/89, Valdes)
+
+imred$irs/irs.cl
+imred$irs/irs.men
+specplot.par+
+	Task SPECPLOT added.  (4/3/89 ShJ)
+
+imred$irs/batchred.cl
+imred$irs/batchred.par
+imred$irs/irs.cl
+imred$irs/irs.men
+   1. New BATCHRED script. (4/27/88 Valdes)
+   2. Eliminated EXTINCT. (4/27/88 Valdes)
+
+imred$irs/sensfunc.par
+    Added aperture selection and query parameters.  (4/15/88 Valdes)
+
+imred$irs/irs.cl
+imred$irs/refspectra.par +
+    Refer to new ONEDSPEC executable and tasks.  (4/7/88 Valdes)
+
+noao$imred/irs/reidentify.par
+    Valdes, Jan 4, 1988
+    Updated parameter file for new REIDENTIFY parameter.
+
+noao$imred/irs/dispcor.par
+    Valdes, March 5, 1987
+    1.  The DISPCOR default parameter file has been updated because of
+	changes to the task; most notable being that wstart and wpc are
+	list structured.
+
+noao$imred/irs/flatdiv.par
+noao$imred/irs/flatfit.par
+    Valdes, December, 2, 1986
+    1.  New parameter "power" added to these tasks.
+
+noao$imred/irs/coincor.par
+    Valdes, October 20, 1986
+    1.  New parameter "checkdone" added to COINCOR to allow overriding
+	coincidence correction checking.
+
+noao$imred/irs/irs.par
+noao$imred/irs/coincor.par
+noao$imred/irs/irs.men
+    Valdes, October 13, 1986
+    1.  Added new COINCOR parameter "power".
+
+noao$imred/irs/irs.cl
+noao$imred/irs/irs.men
+noao$imred/irs/shedit.par +
+    Valdes, October 6, 1986
+    1.  Added new task SHEDIT.
+
+noao$imred/irs/identify.par
+    Valdes, October 3, 1986
+    1.  Added new IDENTIFY parameter "threshold".
+
+irs:  Valdes, July 3, 1986:
+    1.  New coordlist name in IDENTIFY parameter file.
+    2.  New calibration file name in package parameter file.
+
+=====================================
+STScI Pre-release and SUN 2.3 Release
+=====================================
+
+irs$bswitch.par:  Valdes, May 19, 1986
+    1.  The parameter "add_const" in BSWITCH is directed to the parameter
+	in SENSFUNC of the same name.
+
+irs:  Valdes, May 12, 1986:
+    1.  SPLOT updated.  New parameters XMIN, XMAX, YMIN, YMAX.
+
+irs:  Valdes, April 7, 1986:
+    1.  Package parameter file changed to delete latitude.
+    2.  DISPCOR, BSWITCH, and STANDARD latitude parameter now obtained from
+	OBSERVATORY.
+
+irs:  Valdes, March 27, 1986:
+    1.  New task SETDISP added.
+
+===========
+Release 2.2
+===========
+.endhelp

@@ -1,0 +1,181 @@
+20 Feb 1998 - WJH
+
+	Fixed a major bug related to image mapping and tbuf.  Remember to
+	keep an image mapped until all pointers referencing data from that
+	image are de-allocated.  This caused major problems with memory
+	and buffers getting corrupted.  Moved 'imunmap' to end of task,
+	and added additional calls where errors are trapped.  Also, cleaned
+	up a host of minor problems.
+
+18 Nov 1997 - WJH
+
+	Added two new parameters to ZSECTION: pixel and rotation.  The pixel
+	parameter sets number of pixels to use for either block averaging
+	the image or block summing the image on the fly.  A negative value
+	will block sum, while a positive value will block average.  The 
+	rotation is either 90 or -90, and will cause the input image to
+	be rotated by 90 or -90 degrees (positive being counterclockwise) on
+	the fly. 
+
+	The files 'ig_zsection.x' and 'mkpkg' were modified for these changes
+	while 'ig_blkavg.x' was added to perform the block averaging/summing.
+
+	The block averaging is based on code from 'blkavg', while the rotation
+	is based on 'imtranspose'.
+
+25 Sept 1997 - WJH
+
+	Fixed a bug in reading graphcap entries that don't contain the
+	scale information for the device.  It will default to scale
+	values of 1 for X and Y, instead of 0.
+
+
+23 Sept 1997 - WJH
+	Fixed a bug in ig_column.x.  Only writes out second parameter whenb
+	using playback when a second parameter was originally requested.
+
+
+21 May 1997 - WJH
+
+	This revision involves the creation of the new command "PSFONT".
+	The command sets up a user-specified PostScript font for use
+	in labels.  This user font is accessed with a new escape sequence,
+	"\fP", however, only after 'FONTSET' has been set to use the 'GIO'
+	hardware fonts.  The syntax for using these commands are:
+		PSFONT 		<font-name>
+		label 		\fP<label-text>
+		[xyze]label	\fP<label-text>
+	A sample IGI script which creates a very simple plot, then labels
+	it using both IGI soft fonts and PostScript fonts is:
+	
+		limits 0 1 0 1
+		box
+		relocate 0.2 0.2 
+		draw 0.6 0.6
+		relocate 0.5 1.0
+		justify 8
+		label This title is written using an IGI font...
+		psfont Helvetica-bold
+		fontset hard
+		xlabel \fPThis label uses the Helvetica-Bold font. 
+		psfont ZapfDingbats
+		relocate 0.2 0.4
+		ylabel Y-label of \fGD(a) = \fP4W}\fRWow
+	
+	This script demonstrates that more than one user-specified font
+	can be used in a single IGI script, simply by re-issuing the
+	PSFONT command to redefine the user font.
+
+	This revision involved not only IGI source code, but also necessitated
+	changes in the PSIKERN software as well.  Changes were made to
+	the following IGI source code files:
+
+	- t_igi.x : Added PSFONT command to the list of recognized commands,
+		and created the call to the function to handle this command,
+		ig_psfnt().
+
+	- commands.h: Added PSFONT to the list of command definitions. It is
+		defined to be 117.
+	
+	- cmdict.h: Added PSFONT to the list of commands IGI recognizes.
+
+	- mkpkg: Added 'ig_psfnt.x' to the mkpkg file so it could be compiled
+		into the code.
+
+	- ig_psfnt.x: New function based on the 'ig_label' function, to
+		write out the IGI command '\\fU/PF /<font-name> def' 
+		directly to the gio kernel.  The new PSIKERN will recognize
+		the new escape sequence, '\\fU', as a setup command and
+		pass the rest of the string '/PF /<font-name> def' to
+		the PostScript output without modification.  Since this 
+		function does not result in any text being output to the
+		user, the information regarding text position/scale/... was
+		set to fixed values.  Furthermore, the code from 'mgostr.x'
+		for sending the label to the 'gio' kernel was incorporated
+		directly for the case where 'FONTSET=HARD'.  This insures that
+		this string gets processed by PSIKERN properly.  
+
+	Changes were also made to the following PSIKERN source code files in
+	order to properly recognize the new escape sequences:
+
+	- psi.h: Added two new definitions, PS_USER = 100 and PS_SETUP = 101,
+	for the two new escape sequences.  These are used in the same manner
+	as GT_ROMAN/GT_ITALIC/...
+
+	- stxseg.x: Two new cases were added to this routine to recognize
+	the new escape codes.  '\fU' gets set to PS_SETUP, and '\fP' (as
+	used by the user in the 'label/[xyz]label' commands) gets set to
+	PS_USER.  Also, the include file 'psi.h' was added for this 
+	function to use.
+
+	- psitx.x: The section which interprets the font information 
+	associated with each label string was expanded to include PS_USER
+	and PS_SETUP.  The PS_SETUP case directly outputs the string created
+	by 'ig_psfnt.x' (PSFONT command) to the PostScript device, and
+	then the following lines which format the text for Postscript is 
+	skipped.  The PS_USER case inserts the 'PF' command to use the 
+	definition inserted by the PS_SETUP string.  
+
+	
+	Summary:
+	The following files were changed to support this revision:
+		igi/t_igi.x
+		igi/commands.h
+		igi/cmdict.h
+		igi/ig_psfnt.x
+		igi/mkpkg
+		psikern/psi.h
+		psikern/stxseg.x
+		psikern/psitx.x
+
+
+12 May 1997 - WJH
+
+	Revisions were made to incorporate the row selector criteria into
+	IGI, allowing a row to be selected from a 3-D table either from
+	the 'data' or 'column' command now.  The following files were 
+	edited for this revision:
+		- ig_data.x: Code was added to check for the
+		presence of a row selector in the filename.  This is then
+		stripped off and the rootname is used to open the appropriate
+		data file.  The entire filename is then passed along.
+
+		- ig_column.x: Code was added to check for the 
+		presence of a row selector in the filename.  The conditions
+		for determining whether we are working with a 3-D table
+		was then expanded to the following:
+			+ either a row number was provided in the 'column'
+			command itself as a second parameter
+			+ a row selector was provided in the filename in the
+			'data' command
+		If the row number is provided in the column command, then
+		the previous revision is used.  If a row selector is 
+		found, then any row number given in the column command 
+		is assumed to be relative to the rows given in the 
+		row selector.  If a row selector is given without a row
+		number in the 'column' command, then the FIRST matching
+		row is used.  The function 'rd_relrow', found in 'rd_relrow.x',
+		handles reading in the right row from the given column. 
+		The pointer 'scrdat' was changed to a global variable, and
+		'malloc' is used to set aside the memory for the the column
+		data.  This is then freed at the end of 'gstcol' function
+		where all the other changes are located.
+
+		- rd_relrow.x: This function reads in the relative row 
+		from the given column based on the rows chosen in the
+		row selector.  
+		
+		- igi.par: The version number (date) was changed to 
+		"12May97" to reflect when these changes were implemented.
+
+	Summary:
+		 The following files were changed for this revision:
+			ig_data.x
+			ig_column.x
+			rd_relrow.x
+			mkpkg
+			igi.par
+
+		The revisions have been implemented in 'stlocal$testplot',
+		and are available for testing.
+

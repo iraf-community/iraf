@@ -1,0 +1,44 @@
+.help msplot Oct85 noao.twodspec.multispec
+.ih
+NAME
+msplot -- Plot data and model image line
+.ih
+USAGE
+msplot image line
+.ih
+PARAMETERS
+.ls image
+Image to be plotted.
+.le
+.ls line
+The image line to be plotted.  Actually the nearest sample line will be
+plotted.
+.le
+.ls naverage = 20
+Number of image lines to average about the specified line.
+.le
+.ls lower = -10., upper = 10.
+Limits of the model profiles relative to the center of each profile.
+.le
+.ls graphics = "stdgraph"
+Graphics output device.
+.le
+.ls cursor = ""
+Graphics cursor input.  If a file is given then the cursor input is taken
+from the file.  If no file is given then the standard graphics cursor will
+be used.
+.le
+.ih
+DESCRIPTION
+A line of image data and the profile model for the line is graphed.
+The model is graphed with a dashed line.  The graph may be then expanded,
+manipulated, and printed with the standard cursor mode commands.
+.ih
+EXAMPLES
+To plot the model fit for image sample for image line 400:
+
+	cl> msplot sample 400
+.ih
+SEE ALSO
+modellist
+.endhelp

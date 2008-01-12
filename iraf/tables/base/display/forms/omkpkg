@@ -1,0 +1,37 @@
+
+# Update the newdisp library.
+# Author: B.Simon 26-SEP-90
+
+$set XFLAGS = "-fgq $(XFLAGS)"
+$call default
+$exit
+
+debug:
+	$set XFLAGS = "-fgq $(XFLAGS)"
+	$call default
+	;
+
+strip:
+	$delete newdisp.a
+	$call default
+	;
+
+update:
+default:
+	$checkout newdisp.a ../../
+	$update   newdisp.a
+	$checkin  newdisp.a ../../
+	;
+
+newdisp.a:
+	fmbegin.x	"forms.com"
+	fmcheck.x	<lexnum.h>  <ctype.h>  <mach.h>
+	fmend.x
+	fmhelp.x	<curses.h>  "forms.com"
+	fmgetform.x	"formfn.h"
+	fmmkform.x	"formfn.h"
+	fmprompt.x	"promptfn.h"
+	fmredraw.x	"formfn.h"
+	formfn.x	<curses.h>  "formfn.h"
+	promptfn.x	<curses.h>  "formfn.h"
+	;

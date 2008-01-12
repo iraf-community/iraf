@@ -1,0 +1,488 @@
+.help fits_exampl Sep93 tables.fitsio
+.ih
+NAME
+fits_exampl -- Detailed examples of `fitsio' tasks.
+.ih
+DESCRIPTION
+The FITS data format is quite general and offers many options,
+which makes the 'fitsio' tasks 'strfits' and 'stwfits' two
+of the most complicated tasks in STSDAS. This help
+file will expand on some of the examples found in the `fitsio' help 
+files, and will describe in detail the effect of many of the 
+parameter settings upon the structure of the output files.  
+
+Data from the Hubble Space Telescope is stored on disk in STF or 
+GEIS format.  Like the native IRAF (or OIF) format, GEIS images are 
+stored in two files, with default file extentions of ".hhh" for the 
+header and ".hhd" for the binary data.  The two biggest differences 
+between OIF and GEIS files, from the users' point of view, are that 
+GEIS format can accomodate multiple images in a single file, and 
+that some of the image descriptors are found in the binary data 
+file, rather than in the header file.  
+
+The GEIS multi-group format was designed to accommodate data such 
+as time-resolved spectroscopy, where many small data arrays share 
+common header information, but also have a certain amount of 
+array-specific information.  That array-specific information is stored in 
+the binary data file just after each image in a special area called 
+the "group parameter block" (GPB).  The description of each group 
+parameter (GP) in the GPB is given in the GEIS header file.  The 
+keywords "PTYPEn", "PDTYPEn" and "PSIZEn" describe the name, the 
+datatype and the size in bits of the N'th GP. The `strfits' and 
+`stwfits' tasks can preserve this structure when translating GEIS 
+files to and from FITS.  For more information about the GEIS format 
+type "help geis" or see the STSDAS Users Guide.  
+
+WARNING: The IRAF tasks `rfits' and `wfits' in the `dataio' 
+package are NOT designed to handle multi-group GEIS files or binary 
+tables.  Users should be aware that these IRAF FITS tasks may not 
+produce data structures that are compatible with certain STSDAS 
+tasks!  
+.ih
+STWFITS
+The task `stwfits' will create FITS files from all supported IRAF 
+image formats, but it is particularly useful for converting GEIS 
+multigroup images to FITS files.  The options offered by `stwfits' 
+are:
+
+.nf
+    1) Write multigroup images in stack mode. 
+    2) Write multigroup images as separate FITS files for each 
+       group. 
+    3) Write multigroup images as one FITS file with "IMAGE" 
+       extensions for the groups.
+    4) Produce standard FITS tables from STSDAS tables, 
+       with "TABLE" or "BINTABLE" FITS extensions.
+    5) Write a FITS file from an ASCII file.
+    6) Write FITS data in FITS IEEE standard.
+.fi
+
+1)  `stwfits' can write multigroup images in stack mode.
+.ls
+The default mode for `stwfits' is to stack the groups into the
+output FITS file.  The parameter `gftoxdim' is set to "yes" by 
+default, which means that an extra dimension will be added to the 
+FITS file to accommodate the individual groups.  The input GEIS and 
+output FITS headers for the file "ypoltest.x1h" would look 
+something like:
+
+.nf
+GEIS header 
+-----------
+
+SIMPLE  =                    F / Is not FITS, its GEIS
+BITPIX  =                   32 /  
+DATATYPE= 'REAL*4  '           /
+NAXIS   =                    1 / Number of dimensions
+NAXIS1  =                 2064 / Lenght of the first axis
+GROUPS  =                    T / The Geis file has a Group Block
+GCOUNT  =                    3 / This is the number of groups
+PCOUNT  =                    2 / The number of parameter in the 
+			       / 'Group Parameter Block'
+PSIZE   =                   64 / Bits size of the GPB
+PTYPE1  = 'FILLCNT '           / Name if the 1st Group Parameter
+PDTYPE1 = 'INTEGER*4'          / Datatype of this Parameter
+PSIZE1  =                   32 / Size in bits of parameter value
+PTYPE2  = 'ERR     '           / Name of 2nd Group Parameter
+PDTYPE2 = 'REAL*4  '           /
+PSIZE2  =                   32 /
+	:
+	:
+END
+
+Main FITS and extension headers created by stwfits.
+--------------------------------------------------
+
+SIMPLE  =                    T / Fits standard
+BITPIX  =                  -32 / Fits bits/pixel, IEEE format
+NAXIS   =                    2 / No. of axes (added one dimension)
+NAXIS1  =                 2064 / Length of the first axis
+NAXIS2  =                    3 / Length of second axis (GCOUNT)
+EXTEND  =                    T / There is a FITS 'TABLE' extension
+FILENAME= 'ypoltest_cvt.x1h'   / Name of original filename
+ODATTYPE= 'FLOATING'           / Orig. datatype: Single precision 
+			       / real
+OPSIZE  =                   64 / PSIZE of original GEIS image
+SDASMGNU=                    4 / Number of groups in original image
+FILLCNT =                    1 / Value of 1st Group Parameter from  
+			       / the first group
+ERR     =                1.111 / Value of 2nd Group Parameter from 
+			       / the first group
+	:
+	:
+END
+
+[Main data of size NAXIS1*NAXIS2 pixels]
+
+XTENSION= 'TABLE   '           / Ascii table extension
+BITPIX  =                    8 / 8-bits per 'pixels'
+NAXIS   =                    2 / Simple 2-D matrix
+NAXIS1  =                   30 / Number of characters per row
+NAXIS2  =                    3 / The number of rows (is GCOUNT on GEIS)
+TFIELDS =                    2 / Columns per row (is PCOUNT on GEIS)
+EXTNAME = 'ypoltest_cvt.x1h.tab' / Name of table
+TTYPE1  = 'FILLCNT '           / Name of the 1st column
+TBCOL1  =                    1 / Value starts on or at this position
+TFORM1  = 'I11     '           / FORTRAN format of ascii value
+TUNIT1  = 'Counts  '           / Units for column 1 values
+TTYPE2  = 'ERR     '           / Name of the 2nd column
+TBCOL2  =                   13 /
+TFORM2  = 'E15.7   '           /
+TUNIT2  = 'Ergs    '           /
+	:
+	:
+END
+
+[Table data]
+.fi
+
+Notice that we have added an extra dimension to the FITS file and 
+that the NAXIS2 length in the main header is the number of groups 
+(GCOUNT) in the input GEIS file. Notice also that the name and 
+value of the Group Parameters appear in the main FITS header with 
+the values corresponding to the first group. The GPB values are 
+stored in the FITS "TABLE" extension; here, there are PCOUNT 
+columns (the value of TFIELDS) with GCOUNT lines (the value of 
+NAXIS2). The value of the keywords "FILENAME" and "EXTNAME" contain 
+the name of the original GEIS file followed by "_cvt". This suffix 
+indicates that the FITS file came from a multi-group GEIS file.
+.le
+
+2) `stwfits' can write multigroup images as one FITS file per group.
+.ls
+If you set "gftxdim = no" then each group from the GEIS file will 
+be in a separate FITS file.  The name and value of the GP keywords 
+will be part of the main header and THERE IS NO DISTINCTION between 
+regular FITS keywords and the latter.  This is particularly 
+important when you want to re-create the original multigroup GEIS 
+structure; to do so, you will need to use `strfits' with a template 
+GEIS header file that has the original GPB description.  Otherwise 
+a default GPB is created when using `strfits' with no template.
+When using this mode there is no added dimension to the FITS file
+and no attached FITS "TABLE" extension.  
+
+The following is part of the FITS header for the resulting FITS
+file from the GEIS file in case 1):
+
+.nf
+*** First FITS file header.
+
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 /
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[1/3]'  / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    1 /
+ERR     =                1.111 /
+	:
+	:
+
+*** Second FITS file header.
+
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 /
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[2]'    / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    2 /
+ERR     =                2.222 /
+	:
+	:
+
+*** Third FITS file header.
+
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 /
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[3]'    / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    3 /
+ERR     =                3.333 /
+	:
+	:
+
+.fi
+Notice that FILENAME value does not contain "_cvt" but it has the
+group number appended to the extension: "[1/3]" (1st group of 3), 
+"[2]" and "[3]".  The GP name and value are written into the main 
+FITS header.
+
+.le
+
+3) `stwfits' can write multigroup images as one FITS file with
+IMAGE extension for the groups.
+
+.ls
+Instead of adding an extra dimension as in case 1) to the FITS file 
+we can write separate FITS units in the same FITS file by using the 
+FITS "IMAGE" extension.  In this case use "extension = yes" and 
+"gftoxdim = no".  There is no attached table and the GP keywords 
+and values are part of each FITS header units.  The only difference 
+with case 2) is that there is only one FITS file.  This IMAGE 
+extension capability is handy when you want to have images, STSDAS 
+tables and/or ASCII files in the same FITS file.  
+
+The following is part of the FITS file created on the file 
+"ypoltest.x1h":
+
+.nf
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 /
+EXTEND  =                    T / There maybe standard extensions
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[1/3]'  / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    1 /
+ERR     =                1.111 /
+	:
+	:
+
+XTENSION= 'IMAGE   '           / IMAGE extension
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 / 
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[2]'    / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    2 /
+ERR     =                2.222 /
+	:
+	:
+
+XTENSION= 'IMAGE   '           / IMAGE extension
+BITPIX  =                   32 / FITS BITS/PIXEL
+NAXIS   =                    1 / NUMBER OF AXES
+NAXIS1  =                 2064 /
+ORIGIN  = 'STScI-STSDAS'       / Fitsio version June 1993
+FITSDATE= '26/08/93'           / Date FITS file was created
+FILENAME= 'ypoltest.x1h[3]'    / Name of original filename
+ODATTYPE= 'FLOATING'           / Original datatype: Single 
+			       / precision real
+FILLCNT =                    3 /
+ERR     =                3.333 /
+	:
+	:
+ 
+.fi
+You can use the "IMAGE", "TABLE" and "BINTABLE" extensions to 
+produce one FITS file that is an aggregate of image, text files, 
+and binary tables.  However, at the moment it is NOT possible to 
+re-create an original GEIS file if it has been mapped to a FITS file 
+with multiple "IMAGE" extensions using the `strfits' task.  However,
+this capability is planned for the near future.  
+.le
+
+4) `stwfits' can produce standard FITS tables from STSDAS tables 
+and ASCII files.
+
+.ls
+If you have an STSDAS table, you can create a FITS "TABLE" or 
+"BINTABLE", depending upon the value of the parameter 
+`binary_table'.  The FITS header will have a dataless main header 
+and the keyword "XTENSION" in the header, as in the following 
+example:
+
+.nf
+The input STSDAS table has the following characteristics:
+
+# ttr.tab
+WAVELENGTH       R        %15.7g  angstroms
+FLUX             R        %15.7g  counts
+
+The corresponding FITS header is:
+
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                    8 / Character information
+NAXIS   =                    0 / No image data array present
+EXTEND  =                    T / There maybe standard extensions
+DATE    = '26/08/93'           / Date tape was written
+FILENAME= 'null_image '        / ZERO LENGTH DUMMY IMAGE
+END
+
+XTENSION= 'TABLE   '           / Ascii table extension
+BITPIX  =                    8 / 8-bits per 'pixels'
+NAXIS   =                    2 / Simple 2-D matrix
+NAXIS1  =                   32 / Number of characters per row
+NAXIS2  =                  500 / The number of rows
+PCOUNT  =                    0 / No 'random' parameters
+GCOUNT  =                    1 / Only one group
+TFIELDS =                    2 / Number of fields per row
+EXTNAME = 'ttr.tab '           / Name of table
+TTYPE1  = 'WAVELENGTH'         / Name of column 1
+TBCOL1  =                    1 /
+TFORM1  = 'E15.7   '           /
+TUNIT1  = 'angstroms'          / Units of column 1
+TTYPE2  = 'FLUX    '           / Name of column 2
+TBCOL2  =                   17 /
+TFORM2  = 'E15.7   '           /
+TUNIT2  = 'counts  '           / Units of column 1
+EXPTIME =           1.000000E2 /
+END
+
+.fi
+.le
+5) `stwfits' can write a FITS file from an ASCII file.
+.ls
+If we have a text file with upto 132 columns per line, `stwfits'
+creates a FITS file with a "TABLE" extension. The only requirement
+for the input filename is that its extension must be "txt" or "trl".
+This is the FITS file header for a text file:
+
+.nf
+SIMPLE  =                    T / FITS STANDARD
+BITPIX  =                    8 / Character information
+NAXIS   =                    0 / No image data array present
+EXTEND  =                    T / There maybe standard extensions
+DATE    = '26/08/93'           / Date tape was written
+FILENAME= 'null_image '        / ZERO LENGTH DUMMY IMAGE
+END
+XTENSION= 'TABLE   '           / FITS STANDARD
+BITPIX  =                    8 / 8-bits per 'pixels'
+NAXIS   =                    2 / Simple 2-D matrix
+NAXIS1  =                  132 / No of characters per row
+NAXIS2  =                   45 / The number of rows
+PCOUNT  =                    0 / No 'random' parameters
+GCOUNT  =                    1 / Only one group
+TFIELDS =                    1 / Number of fields per row
+EXTNAME = 'ros.txt '           / Name of table
+TTYPE1  = 'TEXT_FILE'          / One column per line
+TBCOL1  =                    1 / Starting column number
+TFORM1  = 'A132    '           / Format
+END
+
+.fi
+.le
+
+6) `stwfits' can write FITS data in FITS IEEE standard.
+.ls
+The FITS IEEE standard allows `stwfits' to write single and double 
+precision GEIS files to be written in single and double precision 
+IEEE standard format.
+
+It is important to note when converting VAX double precision GEIS 
+files to double precision IEEE format that there is going to be 
+a loss of one digit of precision. The default VAX real*8 has 3 more 
+bits of fraction than the IEEE real*8; but for the new DEC OpenVMS 
+system under the AXP architecture, the default VAX real*8 has the 
+same number of fractional bits as the IEEE real*8. ("On Alpha 
+systems, D_Floating has less fractional precision, since it is 
+converted to G_Floating format during computations." Reference: 
+DEC Fortran, User Manual for VMS Alpha Systems.)
+.le
+
+.ih
+STRFITS
+Going the opposite way, `strfits' can read all the FITS files that
+`stwfits' produces.  The options offered by `strfits' are:
+
+.nf
+    1) Re-create a multigroup GEIS file from a single FITS file 
+    2) Re-create a multigroup GEIS file from a set of FITS files 
+    3) Read FITS files with one or more "IMAGE" extensions
+    4) Re-create an STSDAS table from a FITS file with a "TABLE" 
+       or "BINTABLE" extension 
+    5) Re-create a text file from a FITS file with a "TABLE"
+       extension 
+.fi
+
+1) `strfits' can re-create a multigroup GEIS file from one or a set 
+of FITS files. 
+.ls
+The default setup is to re-create the GEIS file if the specific 
+information is in the FITS header as case 1) of `stwfits' above.  
+If you do not want to have a multigroup GEIS file but rather have a 
+one group (GCOUNT = 1) GEIS file with the extra dimension then use 
+the parameter `xdimtogf = no'.  You will also have an STSDAS table 
+with the GP information; the GPB for the resulting GEIS image is 
+the default.
+.le
+
+2) `strfits' can re-create a multigroup GEIS file from a set of FITS 
+files. 
+.ls
+Strfits can reconstruct a multigroup file from a set of input FITS 
+files provided that you have the following: One FITS file per 
+group, and a template header file; this last requirement is not 
+mandatory unless you want to create a non-default GPB.  To create a 
+GEIS file with a GPB structure other than the default, you will 
+need a GEIS header file containing the keywords "PTYPEn", 
+"PDTYPEn", and "PSIZEn" for each group parameter, plus the keywords 
+"PCOUNT" and "PSIZE".  The template is used by passing its file 
+name to the "template" parameter.  Use a header file appropriate 
+to your FITS data, i.e., if the FITS files contain WF/PC data, use 
+a WF/PC header file. 
+
+Example:
+.nf
+  cl> strfits mta 1-4 newpfc.hhh[1/4] template="twfpc.hhh" \
+  >>> xdimtogf-
+.fi
+
+Use a header file appropriate to your FITS data, e.g., if the FITS 
+files contain WF/PC data, use a WF/PC header file.  In this example, 
+you are specifing that the resulting GEIS file will have 4 groups 
+and that you are starting with group 1.  The `xdimtogf' parameter 
+is set to "no" since you don't have a FITS file with an extra 
+dimension. 
+.le
+
+3) `strfits' can read FITS files with "IMAGE" extension.
+.ls
+If there one or more IMAGE extension in the FITS file, `strfits' 
+will attempt to create a multigroup geis file (with the default 
+GPB) if the FITS FILENAME value has the syntax described in 
+`stwfits' case 3 above; otherwise separate GEIS files will be 
+generated, one for each "IMAGE" extension.
+.le
+
+4) `strfits' can re-create an STSDAS table from a FITS file with a 
+"TABLE" or "BINTABLE" extension.
+.ls
+`strfits' allows you to read a FITS table extension, either in 
+ASCII ("TABLE") or binary ("BINTABLE") mode; the numeric format for 
+binary tables is IEEE format, and there is support for "NAN" (not a 
+number) values.  Each NAN will be converted to INDEF values in the 
+output STSDAS table.
+.le
+
+5) `strfits' can re-create a text file from a FITS "TABLE".
+.ls
+If you have used `stwfits' to create a FITS file from an ASCII 
+file, then the EXTNAME keyword value should have the original 
+filename with extension "txt" or "trl".  This is a flag for 
+`strfits' to read to FITS file and convert it to an ASCII file 
+without first translating to an STSDAS table.
+.le
+.ih
+SEE ALSO
+strfits, stwfits, catfits, fitscopy, geis, gftoxdim, xdimtogf
+
+Type "help fitsio opt=sys" for more information about the `fitsio' 
+package.  
+.ih
+REFERENCES 
+This package was developed by Nelson Zarate (STScI), and is based on
+the IRAF `dataio' package.  The FITS standard adopted for this package
+is that described in the NASA/OSSA Office of Standard and Technology
+document entitled: "Implementation of the Flexible Image Transport
+System (FITS)".
+
+.endhelp 

@@ -1,0 +1,61 @@
+.help gftoxdim Jan93 tables.fitsio
+.ih
+NAME
+gftoxdim -- Convert a multigroup GEIS file to a single group GEIS 
+file.
+.ih
+USAGE
+gftoxdim input output
+.ih
+DESCRIPTION
+A multigroup GEIS file does not use IRAF's image I/O capabilities as
+efficiently as does a single image file.  Converting a multigroup
+GEIS file to a single group file allows the entire 
+multigroup file to be treated as one image. The 'gftoxdim' task 
+converts a multigroup GEIS file to a single group GEIS file that 
+contains only the data portion of the group, and not the
+group parameter block (GPB).  The GPB will go in an STSDAS table 
+with one column for each group parameter and a row for each group.
+
+The header file created by 'gftoxdim' will inherit the group 
+parameter
+names and values of the last group.  It will also have keywords
+appended to it that describe the table with its extra dimension.
+If there was only one group in the GEIS file, there will be no extra
+dimension, but the table will still be created with only one row.
+.ih
+PARAMETERS
+.ls input [file name template]
+The input file specification can be a template for a group of
+files, e.g., 'z00*.*h', or a list of files, separated by commas.
+.le
+.ls output [file name template]
+Output file specification. This is a single file specification,
+or a directory
+name where the single output file will be copied using the same
+name as the input file.  If more than one output file name is
+specified, the number of output files must match the number of input
+files.
+.le
+.ls (verbose = yes) [boolean]
+Display progress of the program?  
+
+One line per file, indicating 
+progress of the conversion program, will be printed to the 
+terminal screen.
+.le
+.ih
+EXAMPLES
+1. Convert a set of multigroup files to a group file and table, 
+copying the resulting files to a subdirectory.
+
+.nf
+   fi> gftoxdim z00*902?.*h  cvdir/  verbose+
+
+.fi
+.ih
+BUGS
+.ih
+SEE ALSO
+xdimtogf
+.endhelp

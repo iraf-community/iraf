@@ -1,0 +1,24 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	"names.h"
+
+# IC_ERRORS -- Compute and error diagnositic information.
+
+procedure ic_errors$t (ic, file, cv, x, y, wts, npts)
+
+pointer	ic		# ICFIT pointer
+char	file[ARB]	# Output file
+pointer	cv		# Curfit pointer
+PIXEL	x[ARB]		# Ordinates
+PIXEL	y[ARB]		# Abscissas
+PIXEL	wts[ARB]	# Weights
+int	npts		# Number of data points
+
+int	fd, open()
+errchk	open, ic_ferrors$t
+
+begin
+	fd = open (file, APPEND, TEXT_FILE)
+	call ic_ferrors$t (ic, cv, x, y, wts, npts, fd)
+	call close (fd)
+end

@@ -1,0 +1,90 @@
+.help thselect Jul2000 ttools
+.nj
+.ih
+NAME
+thselect -- Print table keyword values.
+.ih
+USAGE
+thselect table keywords expr
+.ih
+DESCRIPTION
+This task was based on 'hselect',
+and it behaves in a very similar manner,
+except that it works on tables rather than images.
+
+Keyword values will be printed to the standard output,
+one line per input table,
+with the values separated by tabs.
+String values that contain whitespace will be enclosed in quotes.
+.ih
+PARAMETERS
+.ls table [file name template]
+A list of tables for which keywords are to be printed.
+These will be opened read-only and will not be modified.
+.le
+.ls keywords [string]
+One or more keywords, separated by commas and/or blanks.
+The special keywords such as "i_table"
+that are supported by 'thedit' can also be used with 'thselect'.
+
+For each input table,
+the values of these keywords in the current input table will be printed,
+if 'expr' is a true expression for the current table.
+Any keyword that is not found will be silently ignored.
+
+Wildcards are supported; however,
+the "@filename" syntax is not supported.
+.le
+.ls expr = "yes" [string]
+This is a boolean expression
+to be evaluated for each table in the list.
+The default value may be used to unconditionally print keyword values.
+
+The expression may include constants and/or keyword names.
+.le
+.ih
+EXAMPLES
+1.  Compare 'thselect' with 'thedit' for displaying a single keyword value.
+
+.nf
+    tt> thselect timetag.fits[events,7] rootname yes
+
+    O57P03030
+
+    tt> thedit timetag.fits[events,7] rootname .
+
+    timetag.fits[events,7],ROOTNAME = O57P03030 / rootname of the obser
+    vation set
+.fi
+
+2.  Compare i_file with i_table for a FITS table
+($I and i_table are equivalent).
+
+.nf
+    tt> thselect timetag.fits[events,7] i_file,i_table yes   
+
+    timetag.fits      timetag.fits[EVENTS,7]
+.fi
+
+3.  Find all FITS files with DETECTOR = 'CCD' in the primary header.
+Since the primary header of a FITS file can be opened
+either as an image or as a table,
+either 'hselect' or 'thselect' could be used for this example.
+
+.nf
+    tt> thselect *.fits[0] $I "detector == 'CCD'"
+
+    h1v11148o_1dx.fits[0]
+    h4s13500o_1dx.fits[0]
+    i1c1615po_1dx.fits[0]
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge,
+based on 'hselect'.
+.ih
+SEE ALSO
+hselect, thedit
+.endhelp

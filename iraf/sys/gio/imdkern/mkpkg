@@ -1,0 +1,50 @@
+# Make the GIO/IMDKERN image display device graphics kernel.
+
+$checkout libimd.a lib$
+$update   libimd.a
+$checkin  libimd.a lib$
+$call     relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:	
+	$omake  x_imdkern.x
+	$link	x_imdkern.o -limd -lds -lstg -o xx_imdkern.e
+	;
+
+install:
+	$move	xx_imdkern.e bin$x_imdkern.e
+	;
+
+libimd.a:
+	idk.x		idk.com <chars.h> <gki.h> <imhdr.h> <mach.h>
+	imdcancel.x	imd.com imd.h
+	imdclear.x	imd.com imd.h <mach.h>
+	imdclose.x	imd.com imd.h
+	imdclws.x	imd.h imd.com
+	imdcolor.x	imd.com imd.h
+	imddrawch.x	font.com font.h imd.com imd.h <gki.h> <gset.h> <math.h>
+	imdescape.x	
+	imdfa.x		imd.com imd.h
+	imdfaset.x	imd.com imd.h <gki.h>
+	imdflush.x	imd.com imd.h
+	imdfont.x	imd.com imd.h <gki.h> <gset.h>
+	imdgcell.x	
+	imdinit.x	imd.com imd.h <ctype.h> <gki.h> <mach.h>
+	imdline.x	imd.com imd.h <gset.h>
+	imdopen.x	imd.com imd.h <gki.h>
+	imdopenws.x	imd.com imd.h <error.h> <gki.h> <mach.h>
+	imdpcell.x	imd.com imd.h <gki.h>
+	imdpl.x		imd.com imd.h ltype.dat <gki.h> <gset.h>
+	imdplset.x	imd.com imd.h <gki.h>
+	imdpm.x		imd.com imd.h <gki.h>
+	imdpmset.x	imd.com imd.h <gki.h>
+	imdreset.x	imd.com imd.h <gset.h> <gki.h>
+	imdtx.x		imd.com imd.h <gki.h> <gset.h> <math.h>
+	imdtxset.x	imd.com imd.h <gki.h> <gset.h>
+	t_imdkern.x	<error.h> <gki.h>
+	;

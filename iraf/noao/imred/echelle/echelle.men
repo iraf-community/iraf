@@ -1,0 +1,40 @@
+          apall - Extract 1D spectra (all parameters in one task)
+      apdefault - Set the default aperture parameters and apidtable
+         apedit - Edit apertures interactively
+	 apfind - Automatically find spectra and define apertures
+	  apfit - Fit 2D spectra and output the fit, difference, or ratio
+      apflatten - Remove overall spectral and profile shapes from flat fields
+         apmask - Create and IRAF pixel list mask of the apertures
+    apnormalize - Normalize 2D apertures by 1D functions
+     aprecenter - Recenter apertures
+       apresize - Resize apertures
+      apscatter - Fit and subtract scattered light
+          apsum - Extract 1D spectra
+	aptrace - Trace positions of spectra
+
+          bplot - Batch plots of spectra
+      calibrate - Apply extinction and flux calibrations to spectra
+      continuum - Fit the continuum in spectra
+       deredden - Apply interstellar extinction corrections
+        dispcor - Dispersion correct spectra
+	 dopcor - Doppler correct spectra
+     ecidentify - Identify features in spectrum for dispersion solution
+   ecreidentify - Automatically identify features in spectra
+     refspectra - Assign wavelength reference spectra to other spectra
+     sapertures - Set or change aperture header information
+	 sarith - Spectrum arithmetic
+       scombine - Combine spectra
+          scopy - Select and copy apertures in different spectral formats
+       sensfunc - Create sensitivity function
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
+	  sflip - Flip data and/or dispersion coordinates in spectra
+          slist - List spectrum header parameters
+       specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
+          splot - Preliminary spectral plot/analysis
+       standard - Identify standard stars to be used in sensitivity calc
+
+       doecslit - Process Echelle slit spectra
+	  dofoe - Process Fiber Optic Echelle (FOE) spectra
+	  demos - Demonstrations and tests

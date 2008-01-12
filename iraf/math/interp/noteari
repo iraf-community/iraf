@@ -1,0 +1,64 @@
+	Using the Random One Dimensional Interpolation Routines
+	A Quick Note for Programmers 
+
+
+I. GENERAL NOTES:
+
+	1. Defines are found in file interpdef.h.  The routines
+	   are in library interplib.a.
+
+	2. All pixels are assumed to be good. Except for routine
+	   arbpix.
+
+	3. This is for uniformly spaced data -- thus for the i-th
+	   data value, y[i], the corresponding x[i] = i by assumption.
+
+	4. All x references are assumed to land in the closed interval
+	   1 <= x <= NPTS, where NPTS is the number of points in the
+	   data array.  If x is outside this range, the result is
+	   not specified.
+
+
+II. PROCEDURES:
+
+
+  **** Subroutine to replace INDEF's with interpolated values.
+  *
+  *	arbpix (datain, n, dataout, interpolator_type)
+  *
+  *	real	datain[ARB]		# data_in array
+  *	int	n			# number of points in data_in
+  *	real	dataout[ARB]		# array out, may not be same as
+  *					# data_in
+  *	int	interpolator_type
+  *
+  *	    The interpolator type can be set to:
+  *
+  *		IT_NEAREST		nearest neighbor
+  *		IT_LINEAR		linear interpolation
+  *		IT_POLY3		interior polynomial 3rd order
+  *		IT_POLY5		interior polynomial 5th order
+  ****		IT_SPLINE3		cubic natural spline
+
+
+  **** Subroutine to return interpolated value
+  *
+  *	real arival (x, datain, n , interpolator_type)
+  *	
+  *	real	x
+  *	real	datain[ARB]		# data array
+  *	int	n			# number of points in data array
+  ****	int	interpolator_type	# see above
+  
+  
+  **** Subroutine to evaluate derivatives at a point.
+  *
+  *	arider (x, datain, n, derivs, nder, interpolator_type)
+  *
+  *	real	x
+  *	real	datain[ARB]		# data array
+  *	int	n			# number of points in data array
+  *	real	derivs[ARB]		# output array containing derivatives
+  *					# derivs[1] is function value
+  *	int	nder			# input:  nder - 1 derivs are evaluated
+  ****	int	interpolator_type	# see above

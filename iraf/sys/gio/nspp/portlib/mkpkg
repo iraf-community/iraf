@@ -1,0 +1,56 @@
+# Make the NCAR system plot package.
+
+$checkout libnspp.a lib$
+$update   libnspp.a
+$checkin  libnspp.a lib$
+$exit
+
+libnspp.a:
+	axes.f
+	curve.f
+	dashln.f
+	fl2int.f
+	flash1.f
+	flash2.f
+	flash3.f
+	flash4.f
+	flush.f
+	flushb.f
+	frame.f
+	frstpt.f
+	getopt.f
+	getset.f
+	getsi.f
+	grid.f
+	gridal.f
+	gridl.f
+	halfax.f
+	jlm2.f
+	justfy.f
+	labmod.f
+	line.f
+	mxmy.f
+	option.f
+	optn.f
+	perim.f
+	periml.f
+	plotit.f
+	point.f
+	points.f
+	porgn.f
+	preout.f
+	pscale.f
+	psym.f
+	put42.f
+	putins.f
+	pwrit.f
+	pwrt.f
+	set.f
+	seti.f
+	tick4.f
+	ticks.f
+	trans.f
+	vector.f
+	z8zpbd.f
+	z8zpii.f
+	;

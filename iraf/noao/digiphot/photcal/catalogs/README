@@ -1,0 +1,109 @@
+This directory contains the supported standard star catalogs, format
+description files, and a template transformation equation set for each
+catalog.
+
+The following standard star catalogs are supported.
+
+	  elias.dat - the Elias JHKL standards catalog
+	landolt.dat - the Landolt UBVRI standards catalog
+       nlandolt.dat - the new Landolt UBVRI standards catalog
+	odewahn.dat - the Odewahn BVR cluster standards catalog        (1)
+	 porter.dat - the Porter UBVRI standards catalog               (2)
+	  ukirt.dat - the UKIRT JHK standards                          (3)
+         nicmos.dat - the NICMOS JHKKs standards catalog               (4)
+         arnica.dat - the ARNICA JHK standards catalog                 (4)
+
+Each supported catalog has an accompanying format description file which
+describes which photometric indices are stored in which column. This file is
+used by the MKCONFIG task to construct the user's configuration file. The
+following format files are defined.
+
+        felias.dat - format file for Elias JHKL standards
+      flandolt.dat - format file for Landolt UBVRI standards
+     fnlandolt.dat - format file for new Landolt UBVRI standards
+      fodewahn.dat - format file for Odewahn BVR cluster standards
+       fporter.dat - format file for Porter UBVRI cluster standards
+        fukirt.dat - format file for UKIRT JHK standards
+       fnicmos.dat - format file for NICMOS JHKKs standards
+       farnica.dat - format file for ARNICA JHK standards
+
+Each supported catalog has an accompanying template transformation file
+which defines a default set of transformations equations. This file is
+used as a template by the MKCONFIG task to guide the user in the construction
+of a set of transformation equations. The following transformation equations
+sets are defined.
+
+     telias.dat - template trnasformations for Elias JHKL standards
+   tlandolt.dat - template transformations for Landolt UBVRI standards
+  tnlandolt.dat - template transformations for new Landolt UBVRI standards
+   todewahn.dat - template transformations for Odewahn BVR cluster standards
+    tporter.dat - template transformations for Porter UBVRI cluster standards
+     tukirt.dat - template transformations for UKIRT JHK standards
+    tnicmos.dat - template transformations for the NICMOS JHKKs standards
+    tarnica.dat - template transformations for the ARNICA JHK standards
+
+The references for the supported catalogs are listed below.
+
+	   
+	      elias.dat - Elias, et. al 1982, A.J. 87, 1029
+	    landolt.dat - Landolt, A. U. 1983, A.J.  88, 439
+	   nlandolt.dat - Landolt, A. U. 1992, A.J. 104, 340 
+	    odewahn.dat - Odewahn, S. C. 1992 PASP 104,553
+	     porter.dat - unpublished
+	      ukirt.dat - Casali, M. and Hawarden, T. 1992, JCMT-UKIRT
+			  Newsletter, 4, 33
+	     nicmos.dat - Persson et al. 1998, A.J. 116, 2475
+	     arnica.dat - Hunt et al. 1998, A.J. 115, 2594
+
+Notes:
+
+(1) The Odewahn catalog contains data for the clusters NGC4147, NGC7006
+    and NGC7790. The data was kindly formatted for use with photcal by Pat
+    Hall (Steward Observatory).
+
+(2) The Porter catalog contains unpublished UBVRI data and data compiled from
+    the literature for the clusters M67, M92, NGC2264, NGC2419, NGC4147,
+    NGC7006, and NGC7790 kindly provided by Alain Porter (KPNO) and formatted
+    for use with photcal by Pat Hall (Steward Observatory). The following
+    notes describe how the the catalog was compiled.
+
+   Porter.dat contains unpublished UBVRI (**KRON-COUSINS** RI) photometry
+   compiled by Alain Porter (KPNO) from personal data, photometry from the
+   literature, and photmetry supplied by Lindsey Davis (KPNO).  It is
+   basically intended to supplement BVRI data from Christian et.al. (1985).
+   The differences between this data and Christian's, and between this data
+   and the BVR data of Odewahn et.al. (1992), are well within the errors.
+   The only exception is that for stars in common with Odewahn's NGC 7790
+   data, this data is ~0.05 mag fainter than Odewahn's data, a difference
+   at the 3-sigma level.
+
+   Notes on individual clusters follow, giving the source of the ID numbers
+   and references where finding charts can be found.
+
+   M67     ID numbers are from Schild (1983), Eggen & Sandage (1964), or
+	   Johnson & Sandage (1955).
+   M92     ID numbers are from Christian et.al. or from Sandage (1966).
+   NGC2264 ID numbers are from Christian et.al. or from Adams et.al. (1983).
+   NGC2419 These values come straight from Christian et.al. and thus there
+           is no U information for this cluster.
+   NGC4147 ID numbers are from Odewahn et.al.
+   NGC7006 ID numbers are from Christian et.al. or from Sandage & Wildey
+           (1967).
+   NGC7790 ID numbers are from Odewahn et.al., except for C-25 which is star
+           25 of Christian et.al.
+
+    REFERENCES
+        Adams, M., et. al. 1983, ApJS 53, 893. (field P2 or 2P)
+        Christian, C.A., et. al. 1985, PASP 97, 363.
+        Eggen, O. and Sandage, A. 1964, ApJ 140, 130.
+        Johnson, H. and Sandage, A. 1955, ApJ 121, 616.
+        Odewahn, S.C., et. al. 1992, PASP 104, 553.
+        Sandage, A. 1966, ApJ 143, 313.
+        Sandage, A. and Wildey, R. 1967, ApJ 150, 469
+        Schild, R.E. 1983, PASP 95, 1021.
+
+(3) The UKIRT JHK catalog was formatted for use with photcal by Pat Hall
+    (Steward Observatory).
+
+(1) The NICMOS and ARNICAL catalogs were kindly formatted for use with photcal
+by Pat Hall (University or Toronto).

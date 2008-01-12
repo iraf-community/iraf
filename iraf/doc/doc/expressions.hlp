@@ -1,0 +1,149 @@
+.help expressions Feb07 "IRAF Expressions"
+
+.sh
+Introduction
+
+Many
+.hr #s_see_also IRAF tasks
+use expressions.  These all go through the same basic expression evaluator.
+This provides a standard set of operators and functions with a 
+common syntax similar to the CL.  However, each application can customize
+
+.ls *
+how expressions are input; e.g. from files or with special prefixes
+.le
+.ls *
+how variables (called operands) are specified; e.g. with leading
+special characters such as '$' or with single letter capitals
+.le
+.ls *
+where the values are obtained; e.g. from image header keywords or
+from data files
+.le
+.ls *
+special, application specific functions; e.g. airmass or arcsep
+.le
+
+This help topic covers the common features of expressions.  The
+individual task help descriptions may also include this material or
+just descripe the customization.
+
+.sh
+Expressions
+
+Expressions consist of operands, numeric and string constants, operators,
+and functions.  Parentheses are also used to control the evaluation order
+as in standard algebraic expressions.  String constants are quoted strings
+and numeric constants are pure unquoted numbers.  Numbers may be given in
+sexagesimal notation and are automatically converted to decimal numbers.
+The operators are arithmetic, logical, and string.
+
+.sh
+Operands
+
+The way applications refer to operands is generally unique to that task.
+Sometimes they are simply alphanumeric identifiers, sometimes they
+have prefixes such '$', sometimes they are limited to specific
+identifiers, and sometimes they have additional structure such as
+<image>.<keyword> where <image> is an identifier for an image
+and <keyword> refers to a keyword in the image.  Common types of
+operands refer to images, table columns, and keywords.
+
+There is one special common syntax for operands that include characters that
+correspond to the operators in expressions.  In this case the operand
+identifier must be quoted as a string and then referenced using a leading @
+character; e.g.  @'mjd-obs'.
+
+.sh
+Operators
+
+The following operators are recognized in expressions.  With the exception
+of the operators "?", "?=", and "@", the operator set is equivalent to that
+available in the CL.
+
+.nf
+        +  -  *  /              arithmetic operators
+        **                      exponentiation
+        //                      string concatenation
+        !  -                    boolean not, unary negation
+        <  <= >  >=             order comparision (works for strings)
+        == != && ||             equals, not equals, and, or
+        ?=                      string equals pattern
+        ? :                     conditional expression (ternary operator)
+        @                       reference a operand
+.fi
+
+The operators "==", "&&", and "||" may be abbreviated as "=", "&", and "|"
+if desired.  The ?= operator performs pattern matching upon strings.
+The pattern syntax is that described for the task
+.hr match \fBmatch\fR.
+The @ operator is required to reference keywords with
+one of the operator characters.  This is most likely to be used as:
+
+.nf
+        @"date-obs"
+.fi
+
+A point to be aware of is that in the ?: conditional expression both
+possible result values are evaluated though the result of the expression
+is only one of them.
+
+.sh
+Functions
+
+A number of standard intrinsic functions are recognized within
+expressions.  Many of these may not be useful in the context of the
+application but are part of the language.  The set of
+functions currently supported is shown below.
+
+.nf
+	abs     atan2   deg     log     min     real    sqrt
+	acos    bool    double  log10   mod     short   str
+	asin    cos     exp     long    nint    sin     tan
+	atan    cosh    int     max     rad     sinh    tanh
+.fi
+
+The trigonometric functions operate in units of radians.
+The \fImin\fR and \fImax\fR functions may have any number of arguments up
+to a maximum of sixteen or so (configurable).  The arguments need not all
+be of the same datatype.
+
+A function call may take either of the following forms:
+
+.nf
+        <identifier> '(' arglist ')'
+        <string_expr> '(' arglist ')'
+.fi
+
+The first form is the conventional form found in all programming languages.
+The second permits the generation of function names by string valued
+expressions and might be useful on rare occasions.
+
+.sh
+SEE ALSO
+
+.hr imexpr \fBimexpr\fR
+.hr hedit \fBhedit\fR
+.hr hselect \fBhselect\fR
+.hr asthedit \fBasthedit\fR
+.hr astcalc \fBastcalc\fR
+.hr irproc \fBirproc\fR
+.hr ircatalog \fBircatalog\fR
+.hr ccget \fBccget\fR
+.hr mskexpr \fBmskexpr\fR
+.hr mskreg \fBmskreg\fR
+.hr import \fBimport\fR
+.hr export \fBexport\fR
+.hr agetcat \fBagetcat\fR
+.hr pcalc \fBpcalc\fR
+.hr pconvert \fBpconvert\fR
+.hr pdump \fBpdump\fR
+.hr pselect \fBpselect\fR
+.hr tbcalc \fBtbcalc\fR
+.hr tbdump \fBtbdump\fR
+.hr tbselect \fBtbselect\fR
+.hr txcalc \fBtxcalc\fR
+.hr txdump \fBtxdump\fR
+.hr txselect \fBtxselect\fR
+
+.endhelp

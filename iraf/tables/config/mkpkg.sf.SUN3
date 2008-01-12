@@ -1,0 +1,10 @@
+# Mkpkg special file list for SUN/IRAF, Sun-3/OS-4.
+
+$set	XNO	= '& "$xc -cq -/$(MACH) -p tables &"'
+$set	XO1	= '& "$xc -cq -/O1 -/$(MACH) -p tables &"'
+$set	XO2	= '& "$xc -cq -/O2 -/$(MACH) -p tables &"'
+
+$special "tables$pkg/fitsio/strfits/":    rf_exit.x    tablesbase$rf_exit.c     
+$special "tables$base/stxtools/":   	  errxit.x     tablesbase$errxit.c 
+    
+# Files requiring special compilation due to host compiler bugs.

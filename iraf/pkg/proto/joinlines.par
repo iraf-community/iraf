@@ -1,0 +1,9 @@
+#input,s,a,,,,List of input files to be joined
+list1,s,a,,,,List of input files to be joined
+list2,s,a,,,,List of input files to be joined
+output,f,h,"STDOUT",,,Output file
+delim,s,h," ",,,Delimiter between file lines
+missing,s,h,"Missing",,,Marker for missing lines
+maxchars,i,h,161,,,Maximum number of output characters per line
+shortest,b,h,yes,,,Quit at end of shortest file?
+verbose,b,h,yes,,,Print verbose warnings?

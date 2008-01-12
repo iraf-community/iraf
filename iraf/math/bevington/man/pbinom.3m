@@ -1,0 +1,23 @@
+.TH PBINOM 3M
+.SH NAME
+pbinom
+.SH DESCRIPTION
+function pbinom.f
+
+source
+  Bevington, page 31.
+
+purpose
+  evaluate binomial probability coefficient
+
+usage
+  result = pbinom (nobs, ntotal, prob)
+
+description of parameters
+  nobs   - number of items observed
+  ntotal - total number of items
+  prob   - probability of observing each item
+
+subroutines and function subprograms required
+  factor (n)
+    calculates n factorial for integers

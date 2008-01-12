@@ -1,0 +1,3 @@
+This subdirectory contains the code for evaluatin the fit found by FITCOEFFS
+either in the forward sense using the EVALUATE task or in the inverse sense
+using the INVEVAL task.

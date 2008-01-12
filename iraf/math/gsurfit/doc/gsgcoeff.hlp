@@ -1,0 +1,31 @@
+.help gsgcoeff Aug85 "Gsurfit Package"
+.ih
+NAME
+gsgcoeff -- Procedure to fetch a coefficient
+.ih
+SYNOPSIS
+rval = gsgcoeff (sf, xorder, yorder)
+
+.nf
+    pointer	sf	# surface descriptor	
+    int		xorder	# x order of desired coefficient
+    int		yorder	# y order of desired coefficient
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor.
+.le
+.ls xorder, yorder
+The x and y order of the desired coefficient.
+.le
+.ih
+DESCRIPTION
+GSGCOEFF fetches the coefficient of x ** (xorder - 1) * y ** (yorder - 1).
+INDEF is returned if xorder and yorder are out of range.
+.ih
+NOTES
+.ih
+SEE ALSO
+gsscoeff
+.endhelp

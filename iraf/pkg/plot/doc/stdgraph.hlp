@@ -1,0 +1,72 @@
+.help stdgraph Jan86 plot
+.ih
+NAME
+stdgraph -- draws a plot on the terminal
+.ih
+USAGE
+stdgraph input
+.ih
+PARAMETERS
+.ls input
+The input metacode, may be a list of files or redirected STDIN.
+.le
+.ls device = "stdgraph"
+The terminal type.
+.le
+.ls generic = no
+The remaining parameters are ignored if \fBgeneric\fR = yes.
+.le
+.ls debug = no
+When \fBdebug\fR = yes, the decoded plotting instructions are printed
+during processing.
+.le
+.ls verbose = no
+If \fBverbose\fR = yes, elements of polylines and cell array calls are 
+printed in debug mode.
+.le
+.ls gkiunits = no
+In debug mode, coordinates can be printed in GKI rather than NDC units.
+.le
+.ls txquality = "normal"
+The character drawing quality.
+.le
+.ls xres = 0, yres= 0
+The number of resolution elements in x and y
+.le
+.ih
+DESCRIPTION
+Task \fIstdgraph\fR translates GKI metacode and draws a plot on a
+graphics terminal.  Input to
+\fIstdgraph\fR is GKI metacode, which can be read from one or more 
+metacode files or redirected from the standard input.  
+
+Parameters 
+\fBtxquality\fR, \fBxres\fR, and \fByres\fR are used to override the
+values for text quality, and x and y resolution already in the metacode.
+Values for \fBtxquality\fR are chosen from normal, low, medium or high.
+High quality characters are software generated, and can be of any size.
+
+If \fBdebug\fR is set to yes, the plotting instructions are printed in
+readable form as the metacode is processed.  In debug mode, GKI 
+instructions can be printed in verbose mode, where the elements of
+polylines and cell arrays are printed in addition to the default output.
+Coordinates can be printed in either GKI (0 - 32767) or NDC (0.0 - 1.0)
+units.
+
+.ih
+EXAMPLES
+1. Extract the fourth frame from metacode file "plots.mc" and plot it.
+
+    cl> gkiextract plots.mc 4 | stdgraph
+
+2. Process file "one.mc" in debug mode.
+
+    cl> stdgraph oned.mc debug+
+
+3. Plot file "oned.mc" with high quality text generation.
+
+    cl> stdgraph oned.mc txquality=high
+.ih
+SEE ALSO
+gkiextract,  stdplot
+.endhelp

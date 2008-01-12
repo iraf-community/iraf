@@ -1,0 +1,191 @@
+.help listpixels Apr92 images.imutil
+.ih
+NAME
+listpixels -- print the pixel values for a list of images
+.ih
+USAGE
+listpixels images
+.ih
+PARAMETERS
+.ls images
+Images or list of image sections whose pixels are to be printed.
+.le
+.ls wcs = "logical"
+The world coordinate system to be used for coordinate output. The following
+standard systems are defined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the input
+image. For example the pixel coordinates of the lower left corner
+of an image section will always be (1,1) in logical units regardless of
+their values in the original image.
+.le
+.ls physical
+Physical coordinates are image pixel coordinates with respect to the original
+image. For example the pixel coordinates of the lower left corner
+of an image section will be its coordinates in the original image,
+including the effects of any linear transformations done on that image.
+Physical coordinates are invariant with respect to transformations
+of the physical image matrix.
+.le
+.ls world
+World coordinates are image pixel coordinates with respect to the
+current default world coordinate system. For example in the case
+of spectra world coordinates would most likely be in angstroms.
+The default world coordinate system is the system named by the environment
+variable \fIdefwcs\fR if defined in the user environment and present in
+the image world coordinate system description, else it is the first user
+world coordinate system defined for the image, else physical coordinates
+are returned.
+.le
+
+In addition to these three reserved world coordinate system names, the names
+of any user world coordinate system defined for the image may be given.
+.le
+.ls formats = ""
+The default output formats for the pixel coordinates, one format
+per axis, with the individual formats separated by whitespace .
+If formats are undefined, listpixels uses the formatting options
+stored with the WCS in the image header. If the WCS formatting options
+are not stored in the image header, then listpixels uses a default
+value.
+.le
+.ls verbose = no
+Print a title line for each image whose pixels are to be listed.
+.le
+.ih
+DESCRIPTION
+The pixel coordinates in the world coordinates system specified by
+\fIwcs\fR and using the formats specified by \fIformats\fR are
+printed on the standard output on the standard output followed by
+the pixel value.
+.ih
+FORMATS
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+    
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer 
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+    
+    
+Conventions for w (field width) specification:
+    
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+    
+    
+Escape sequences (e.g. "\n" for newline):
+    
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+    
+Examples
+    
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+    
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h	    format as nn:nn:nn.n
+%15h	    right justify nn:nn:nn.n in field of 15 characters
+%-15h	    left justify nn:nn:nn.n in a field of 15 characters
+%12.2h	    right justify nn:nn:nn.nn
+%-12.2h	    left justify nn:nn:nn.nn
+    
+%H	    / by 15 and format as nn:nn:nn.n
+%15H	    / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H	    / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H	    / by 15 and right justify nn:nn:nn.nn
+%-12.2H	    / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+.ih
+EXAMPLES
+1. List the pixels of an image on the standard output.
+
+.nf
+	cl> listpix m81
+.fi
+
+2. List a subraster of the above image in logical coordinates.
+
+.nf
+	cl> listpix m81[51:55,151:155]
+	    1. 1. ...
+	    2. 1. ...
+	    3. 1. ...
+	    4. 1. ...
+	    5. 1. ...
+	    1. 2. ...
+	    .. .. ...
+.fi
+
+3. List the same subraster in physical coordinates.
+
+.nf
+	cl> listpix m81[51:55,151:155] wcs=physical
+	    51. 151. ...
+	    52. 151. ...
+	    53. 151. ...
+	    54. 151. ...
+	    55. 151. ...
+	    51. 152. ...
+	    ... .... ...
+.fi
+
+4. List a spectrum that has been dispersion corrected in angstrom units.
+
+.nf
+	cl> listpix n7027 wcs=world
+.fi
+
+5. List the RA and DEC coordinates in hms and dms format and pixels value
+for an image section where axis 1 is RA and axis 2 is DEC.
+
+.nf
+	cl> listpix m51 wcs=world formats="%H %h"
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imheader, imgets, imhistogram
+.endhelp

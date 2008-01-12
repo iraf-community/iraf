@@ -1,0 +1,11 @@
+	  blink - Blink two frames
+	     cv - Control image device, display "snapshot"
+	    cvl - Load image display (newer version of 'display')
+	  erase - Erase an image frame
+	  frame - Select the frame to be displayed
+	lumatch - Match the lookup tables of two frames
+     monochrome - Select monochrome enhancement
+    pseudocolor - Select pseudocolor enhancement
+	    rgb - Select true color mode (red, green, and blue frames)
+	 window - Adjust the contrast and dc offset of the current frame
+	   zoom - Zoom in on the image (change magnification)

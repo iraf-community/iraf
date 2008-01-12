@@ -1,0 +1,24 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+xlabel,s,h,"Vector Distance",,,"X-axis label"
+ylabel,s,h,"Pixel Value",,,"Y-axis label"
+naverage,i,h,1,1,,"averaging width of strip"
+boundary,s,h,"constant",constant|nearest|reflect|wrap|project,,"type of boundary extension to use"
+constant,r,h,0.,,,"the constant for constant-valued boundary extension"
+
+x1,r,h,INDEF,,,X-axis window limit
+x2,r,h,INDEF,,,X-axis window limit
+y1,r,h,INDEF,,,Y-axis window limit
+y2,r,h,INDEF,,,Y-axis window limit
+pointmode,b,h,no,,,plot points instead of lines?
+marker,s,h,"plus",,,point marker character?
+szmarker,r,h,1.,,,marker size
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?

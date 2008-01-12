@@ -1,0 +1,17 @@
+input,s,a,,,,"List of input spectra"
+records,s,a,,,,Record number extensions
+references,s,h,"*.imh",,,"List of reference spectra"
+apertures,s,h,"",,,"Input aperture selection list"
+refaps,s,h,"",,,"Reference aperture selection list"
+ignoreaps,b,h,no,,,Ignore input and reference apertures?
+select,s,h,"interp","match|nearest|preceding|following|interp|average",,"Selection method for reference spectra"
+sort,s,h,"ut",,,"Sort key"
+group,s,h,"none",,,"Group key"
+time,b,h,yes,,,"Is sort key a time?"
+timewrap,r,h,17.,0.,24.,"Time wrap point for time sorting"
+override,b,h,no,,,"Override previous assignments?"
+confirm,b,h,yes,,,"Confirm reference spectrum assignments?"
+assign,b,h,yes,,,"Assign the reference spectra to the input spectrum?"
+logfiles,s,h,"STDOUT,logfile",,,"List of logfiles"
+verbose,b,h,no,,,"Verbose log output?"
+answer,s,q,,"no|yes|YES",,"Accept assignment?"

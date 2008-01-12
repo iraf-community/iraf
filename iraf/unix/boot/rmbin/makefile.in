@@ -1,0 +1,11 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	rmbin.e
+
+rmbin.e:	rmbin.o
+	$(CC) $(HSI_LF) -o rmbin.e $^ $(HSI_LIBS)
+	cp -p rmbin.e ../../bin/.
+
+clean::
+	rm -f *.o rmbin.e ../../bin/rmbin.e

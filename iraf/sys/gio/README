@@ -1,0 +1,6 @@
+GIO
+
+    This directory contains the source for the IRAF GIO (graphics i/o)
+interface.  The interface is documented in the file "Gio.hlp".  Source for
+the STDGRAPH kernel will be found in the subdirectory "stdgraph".  Source
+for the NSPP kernel will be found in the subdirectory "nspp".

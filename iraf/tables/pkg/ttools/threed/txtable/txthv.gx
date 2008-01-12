@@ -1,0 +1,55 @@
+#
+# TXTHV  --  Write scalar value into header.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#
+#  22-Nov-96  -  Task created (I.Busko)
+
+$if (datatype == c)
+procedure txthvt (otp, col, buf)
+$else
+procedure txthv$t (otp, col, buf)
+$endif
+
+pointer	otp		# i: table descriptor
+int	col		# i: column number in input table
+$if (datatype == c)
+char	buf[ARB]	# i: value to be written
+$else
+PIXEL	buf
+$endif
+#--
+pointer	keyword
+
+begin
+	# Use original column number to build keyword name.
+	call malloc (keyword, SZ_LINE, TY_CHAR)
+	call sprintf (Memc[keyword], SZ_LINE, "TCV_%03d")
+	    call pargi (col)
+
+	$if (datatype == c)
+	call tbhadt (otp, Memc[keyword], buf)
+	$endif
+	$if (datatype == i)
+	call tbhadi (otp, Memc[keyword], buf)
+	$endif
+	$if (datatype == s)
+	call tbhadi (otp, Memc[keyword], int(buf))
+	$endif
+	$if (datatype == b)
+	call tbhadb (otp, Memc[keyword], buf)
+	$endif
+	$if (datatype == r)
+	call tbhadr (otp, Memc[keyword], buf)
+	$endif
+	$if (datatype == d)
+	call tbhadd (otp, Memc[keyword], buf)
+	$endif
+
+	call mfree (keyword, TY_CHAR)
+end
+

@@ -1,0 +1,120 @@
+.help revisions Jan92 pkg.obsolete
+.nf
+=====
+V2.12
+=====
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/oimstatistics.par
+obsolete/oimstat.h
+obsolete/t_oimstat
+obsolete/doc/oimstat.hlp
+    Added IMSTATISTICS from V2.11.3b.  (8/30/01, Davis)
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/oimcombine.par		+
+obsolete$doc/oimcombine.hlp	+
+obsolete$imcombine/		+
+    Added IMCOMBINE from V2.11.3b.  (8/17/01, Valdes)
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/odisplay.par		-
+obsolete$doc/odisplay.hlp	-
+obsolete$display/		-
+    Removed ODISPLAY task.  (8/17/01, Valdes)
+
+=======
+V2.11.3
+=======
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/odisplay.par		+
+obsolete$doc/odisplay.hlp	+
+obsolete$display/		+
+    Moved the V2.10.4 versions of DISPLAY to OBSOLETE and renamed
+    it to ODISPLAY. (5/29/97, Valdes)
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/orfits.par
+obsolete/owfits.par
+obsolete$doc/orfits.par
+obsolete$doc/owfits.par
+obsolete$fits/README
+obsolete$fits/fits_cards.x
+obsolete$fits/fits_params.x
+obsolete$fits/fits_read.x
+obsolete$fits/fits_rheader.x
+obsolete$fits/fits_rimage.x
+obsolete$fits/fits_rpixels.x
+obsolete$fits/fits_wheader.x
+obsolete$fits/fits_wimage.x
+obsolete$fits/fits_wpixels.x
+obsolete$fits/fits_write.x
+obsolete$fits/mkpkg
+obsolete$fits/ranges.x
+obsolete$fits/rfits.com
+obsolete$fits/rfits.h
+obsolete$fits/structure.hlp
+obsolete$fits/t_rfits.x
+obsolete$fits/t_wfits.x
+obsolete$fits/wfits.com
+obsolete$fits/wfits.h
+    Moved the V2.10.4 versions of RFITS and WFITS to OBSOLETE and renamed
+    them to ORFITS and OWFITS. (5/29/97, Davis)
+
+obsolete$doc/ofixpix.hlp
+    Fixed errors in formating.  (4/22/97, Valdes)
+
+obsolete$t_fixpix.x +
+obsolete$fixcol.gx +
+obsolete$t_fixline.gx +
+obsolete$ofixpix.par +
+obsolete$doc/ofixpix.hlp +
+obsolete$mkpkg
+obsolete$x_obsolete.x
+obsolete$obsolete.cl
+obsolete$obsolete.hd
+obsolete$obsolete.men
+    Moved the V2.10.4 version of FIXPIX and renamed to OFIXPIX.
+    (6/14/96, Valdes)
+
+obsolete$<imcombine> -
+    The old imcombine task was removed. (6/14/96, Valdes)
+
+=========
+V2.10.4p2
+=========
+
+obsolete$<imcombine>
+    The old imcombine task was added and renamed to oimcombine.
+    (1/30/92, Valdes)
+
+obsolete$* +
+    The obsolete package, PKG.OBSOLETE, was created.
+
+    The tasks MKHISTOGRAM, IMTITLE, and RADPLT were moved out of the old
+    NOAO.PROTO package into the OBSOLETE package as they have been
+    superseded by the PHISTOGRAM, HEDIT, and PRADPROF tasks respectively.
+
+    (1/23/92, Valdes Davis)
+.endhelp

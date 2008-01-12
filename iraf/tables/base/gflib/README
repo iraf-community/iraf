@@ -1,0 +1,178 @@
+The files in this directory implement the gflib library, a front end
+to the gilib library. The gilib library allows programmers to
+manipulate the internals of geis files. This library allows programs to
+call the gilib library for geis files, but also performs the equivalent
+function for other image types. Not all functions in gilib are
+supported, only those currently used by tasks outside the fitsio and
+convert packages. Some functions not in gilib have been added to make
+modifying existing tasks to support all image types easier. 
+
+Since the functions in gilib operate on a group, the notion of "group" 
+has been extended so that each extension of a fits file is considered
+a "group" and all other files, including simple fits files are
+considered to have a single group. Fits files with extensions and data
+in the primary data unit and fits files with table extensions are not
+supported by this library.
+
+Functions in file beginning with gf (rather than gf_) are not part of
+the interface and may be changed without notice.  Tasks linking with
+this library must also link with the gilib library.
+
+Emulation of functions in gilib library
+---------------------------------------
+
+gf_addpar	Add a parameter to the group parameter block
+gf_delpar	Delete a parameter from the group parameter block
+gf_geis		Return true if image is in STF format
+gf_gfind	Return YES if a keyword is from the GPB or extension header
+gf_gstfval	Get an integer value stored in the stf descriptor
+gf_opengr	Open another group in an already open image
+gf_pstfval	Change an integer value in the stf descriptor
+
+Functions not in gilib library
+------------------------------
+
+gf_gcount	Count the number of groups in an image
+gf_map		Run immap transparently on images of all types
+gf_unmap	Close image opend with gf_map
+
+gf_ipstr	Wrappers for the imput* functions which check
+gf_iputb	to see if the keyword is added to the extension
+gf_iputd	or primary header and set a flag to update the 
+gf_iputh	primary header accordingly
+gf_iputi
+gf_iputl
+gf_iputr
+gf_iputs
+
+gf_iaddb	Wrappers for the imadd* functions 
+gf_iaddd
+gf_iaddi
+gf_iaddl
+gf_iaddr
+gf_iadds
+gf_iastr
+
+Support functions (not part of interface)
+-----------------------------------------
+
+gf_fitsname	Construct a fits file name from its parts
+gf_groups	Return YES if image has multiple groups or extensions
+gf_hasgroup	Return YES if image contains the specified group
+gf_hash		Create a hash table of keywords in the primary header
+gf_imtype	Determine image type from name stored in image descriptor
+
+
+Updating existing code
+----------------------
+
+This new version of gflib is meant as a replacement for the old geis
+dependent library, which was renamed gilib. All code linking with this 
+library must also link with gilib. Tasks which are not instrument
+specific and loop over all groups of an geis file or extensions of a
+fits file are good candidates for conversion. In order to convert
+code, change calls to immap to gf_map and replace calls that read
+gcount with calls to gf_gcount. 
+
+The following code shows how to loop over all the groups of a geis file
+or extensions of a fits file using the procedures in this library:
+
+	# Transparently open an image of any type
+	im = gf_map (Memc[input], READ_ONLY, NULL)
+
+	# Get the number of groups in the image
+	ngroup = gf_gcount (im)
+
+	do igroup = 1, ngroup {
+	    if (igroup > 1) 
+		# Open each group after the first
+		call gf_opengr (im, igroup, datamin, datamax, NULL)
+
+	    # Do something with the group here
+	}
+
+
+Interface violations
+--------------------
+
+Gf_imtype calls the procedure iki_debug to get the character string
+that identifies each of the image types supported by iraf. It parses
+the output produced by this procedure, which makes for a double
+violation: not only does it call a non-interface function, but it
+depends on the output produced by this function to be in a certain
+format. My only excuse for doing things this way is there is no other
+way of getting the information from the imio library.
+
+
+Calling sequences of interface functions
+----------------------------------------
+
+# GF_ADDPAR -- Add a parameter to the group parameter block
+
+procedure gf_addpar (im, pname, dtype, plen, pval, pcomm)
+
+pointer	im			# i: image descriptor
+char	pname[ARB]		# i: parameter name
+int	dtype			# i: SPP datatype of parameter
+int	plen			# i: length (> 1 if array)
+char	pval[ARB]		# i: string encoded initial parameter value
+char	pcomm[ARB]		# i: string comment to the new parameter
+
+# GF_DELPAR -- Delete a parameter from the group parameter block
+
+procedure gf_delpar (im, pname)
+
+pointer	im		# i: image descriptor
+char	pname[ARB]	# i: parameter name
+
+# GF_GCOUNT -- Count the number of groups in an image
+
+int procedure gf_gcount (im)
+
+pointer	im		# i: image descriptor
+
+# GF_GEIS -- Return true if image is in STF format
+
+bool procedure gf_geis (im)
+
+pointer	im		# i: Image descriptor
+
+# GF_GFIND -- Determine if a keyword is from the GPB or extension header
+
+int procedure gf_gfind (im, keyword)
+
+pointer im              # i: Image descriptor
+char    keyword[ARB]    # i: Group parameter keyword name
+
+# GF_GSTFVAL -- Get an integer value stored in the stf descriptor
+
+int procedure gf_gstfval (im, keyword)
+
+pointer	im		# i: image descriptor
+char	keyword[ARB]	# i: keyword to retrieve
+
+# GF_MAP -- Run immap transparently on images of all types
+
+pointer procedure gf_map (image, acmode, oldim)
+
+char	image[ARB]	# i: image name
+int	acmode		# i: access mode
+pointer	oldim		# i: old image descriptor
+
+# GF_OPENGR -- Open another group in an already open image
+	    
+procedure gf_opengr (im, gn, datamin, datamax, imt)
+
+pointer	im		# u: image descriptor
+int	gn		# i: group number to skip to
+real	datamin		# u: image minimun value
+real	datamax		# u: image maximum value
+pointer imt		# i: image template descriptor (NEW_COPY only)
+
+# GF_PSTFVAL -- Change an integer value in the stf descriptor
+
+procedure gf_pstfval (im, keyword, value)
+
+pointer	im		# i: image descriptor
+char	keyword[ARB]	# i: keyword name
+int	value		# i: keyword value

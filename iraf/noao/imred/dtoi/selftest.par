@@ -1,0 +1,8 @@
+# Parameters for task selftest
+nbits,i,q,12,,,Test data range
+device,s,h,"stdgraph",,,Output device
+verbose,b,h,no,,,"Print density, intensity values?"
+ceiling,r,h,30000.,,,Scale densest point to this intensity
+max_raw,i,q,0,,,Max raw data value
+scale,r,q,,0.0,,Raw value to density scale factor
+mode,s,h,ql

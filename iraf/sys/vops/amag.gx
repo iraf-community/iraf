@@ -1,0 +1,19 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AMAG -- Return the magnitude of two vectors.
+
+procedure amag$t (a, b, c, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+
+begin
+	do i = 1, npix
+	    $if (datatype == sir)
+		c[i] = sqrt (real(a[i] ** 2) + real(b[i] ** 2))
+	    $else $if (datatype == dl)
+		c[i] = sqrt (double(a[i] ** 2) + double(b[i] ** 2))
+	    $else
+		c[i] = sqrt (a[i] ** 2 + b[i] ** 2)
+	    $endif $endif
+end

@@ -1,0 +1,29 @@
+# THE AOBSPARS parameter set
+
+# The observing parameters.
+
+csystem,s,h,"RADECSYS",,,"The image coordinate system"
+equinox,s,h,"EQUINOX",,,"The equinox of the reference ra and dec"
+epoch,s,h,"DATE-OBS",,,"The epoch of the observation"
+
+xref,s,h,"INDEF",,,"The x reference pixel"
+yref,s,h,"INDEF",,,"The y reference pixel"
+xmag,s,h,"SCALE",,,"The x axis image scale in arcseconds per pixel"
+ymag,s,h,"SCALE",,,"The y axis image scale in arcseconds per pixel"
+xrotation,s,h,"0.0",,,"The x axis rotation in degrees"
+yrotation,s,h,"0.0",,,"The y axis rotation in degrees"
+raref,s,h,"RA",,,"The ra of the image reference point in hours"
+decref,s,h,"DEC",,,"The dec of the image reference point in degrees"
+projection,s,h,"tan",,,"The image projection geometry"
+raaxis,i,h,1,,,"The image ra axis"
+decaxis,i,h,2,,,"The image dec axis"
+
+gain,s,h,"GAIN",,,"The image gain"
+rdnoise,s,h,"RDNOISE",,,"The image readout noise"
+
+observatory,s,h,"OBSERVAT",,,"The site of the observation"
+temperature,s,h,"INDEF",,,"The ambient temperature during observation"
+pressure,s,h,"INDEF",,,"The ambient pressure during the observation"
+elambda,s,h,"INDEF",,,"The effective wavelength of the bandpass"
+
+mode,s,h,"ql",,,

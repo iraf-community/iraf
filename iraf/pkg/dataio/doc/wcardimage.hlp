@@ -1,0 +1,74 @@
+.help wcardimage Jun86 dataio
+.ih
+NAME
+wcardimage -- convert IRAF text files to card image files
+.ih
+USAGE	
+wcardimage infiles outfiles
+.ih
+PARAMETERS
+.ls textfile
+A character string identifying the file (s) on disk to be processed.
+The string acts as a "template" so that multiple files can be pro-
+cessed.
+.le
+.ls cardfile
+Name of the output tape device of the form "mta800" or "mta800[#]"
+or name of disk file (s). EOT and BOT are acceptable tape file numbers.
+The file number will be appended to
+the output file name in the case of multiple file disk output.
+.le
+.ls new_tape
+Specifies whether the output tape is blank or contains data.
+.le
+.ls contn_string = ">>"
+Character string which will be inserted at the beginning of
+card image lines which have been split from a single text line.
+.le
+.ls verbose = yes
+Print messages of actions performed?
+.le
+.ls detab = yes
+Remove tabs?
+.le
+.ls card_length = 80
+Number of columns per card.
+.le
+.ls cards_per_blk = 50
+Number of card images per physical record.
+.le
+.ls ebcdic = no
+Translate ascii characters to ebcdic?
+.le
+.ls ibm = no
+Translate ascii characters to ibm ebcdic?
+.le
+.ih
+DESCRIPTION
+If multiple file disk output is requested, ".crd" is appended to the input
+file name. Oversize lines are split and prefixed by the string ">>".
+.ih
+EXAMPLES
+1. Convert a set of IRAF text files to a set of blocked ASCII cardimage files
+on tape, replacing tabs with blanks and prefixing the leftover portions
+of oversize lines with ">>".
+
+.nf
+
+	cl> wcardimage files* mtb1600[1]
+.fi
+
+2. Convert a set of IRAF text files to a set of blocked EBCDIC cardimage files
+on tape, replacing tabs with blanks and prefixing the leftover portions
+of oversize lines with ">>".
+
+	cl> wcardimage files* mtb1600[1] eb+
+.ih
+BUGS
+The card_length in bytes must be an integral number of chars.
+At present WCARDIMAGE can only handle lines with less than or equal to
+161 characters.
+.ih
+SEE ALSO
+rcardimage
+.endhelp

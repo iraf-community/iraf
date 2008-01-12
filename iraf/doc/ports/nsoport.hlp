@@ -1,0 +1,193 @@
+.help
+NOAO/NSO IRAF/UNIX installation, Nov. 14-15 1985, S. Rooke
+.br
+
+     A full binary copy of lyra!/iraf (in two tapes) was loaded into the
+sunspot! VAX-11/750 running UNIX at NSO.  The following notes describe the
+various steps taken in the installation.
+
+
+.nf
+1.  Leonard Sitongia selected his /u1/ root directory for IRAF as it contained
+    about 100 Mb in its disk partition.
+
+	% mv /u1 /iraf
+	% vi /etc/fstab		# replace "u1" with "iraf" for ra1d
+	% mount /iraf
+	% vi /etc/group		# add IRAF group members so we can see who
+				# owns the various IRAF files
+	% vipw 			# yanked IRAF group members' entries from
+				# /etc/passwd/aquila
+    Now have /iraf with 100000 bytes available; IRAF developers have accounts
+    for the duration of the installation, mainly so we can easily look at
+    file ownerships.
+
+2.  Read the two tapes into /iraf.
+
+	% cd /iraf
+	% tar -xpf /dev/rmt0	# 1st tape contains /iraf... minus sys/*
+	  (load second tape)
+	% mkdir /iraf/sys
+	% cd sys
+	% tar xp
+
+	    TAPE READ ERROR AFTER libsys.a
+	    tu0: hard error bn25780 mbsr=13080 <ATTN, DTCMP, DTABT, MBEXC>
+	    cr=100 <INCUPE>
+	    ds=54640 <ERR, MOL, WRL, DPR, DRY, PES>
+	
+3.  At this point we looked at the tar listing, and saw that the only files
+    that didn't make it were the following six:
+
+	    Mkpkg.sh
+	    libcur.a
+	    libmain.o
+	    libstg.a
+	    prelink.e
+	    zzsetenv.def
+
+    Not realizing immediately that the 2 libraries must have been development
+    ones (the real ones were already in /iraf/lib), we attempted to bring 
+    them across from Tucson using TIP(xmodem).  
+
+	% vi /etc/remote	# set Tucson baud rate (1200) for Robotics modem
+	% tip us-0		# (U.S. Robotics modem looks in /etc/remote)
+	    (now talking to modem)
+	    atdp 1,602,3259251
+	    (got message from micom at remote, in Tucson)
+	    (had to request class "102" rather than class "2").
+	2% xmodem -sb filename <cr>
+	    (got xmodem message)
+	~? 			# to get help from sunspot! tip; look for 
+				# "receive xmodem binary"
+	~(			# (got prompt for local file name)
+
+    Thus we copied the 2 libraries and Mkpkg.sh over (we would rebuild the
+    other files from files already present).  We also brought over some files
+    from lyra!/u2/rooke... for working on graphcap and stdgraph.
+
+4.  We now have almost the full binary IRAF under root directory /iraf/.
+    Now proceed to set up links outside the /iraf/ directories into a few
+    critical files within it so that all users can access them from a unix
+    shell.
+
+	% su
+	% cd /usr/include
+	% ln -s $iraf/lib/libc/iraf.h iraf.h
+	% cd /local/bin
+	% ln -s $iraf/lib/mkiraf.csh	mkiraf
+	% ln -s $iraf/lib/cl.e		cl
+	% ln -s $iraf/lib/mklib.e	mklib
+	% ln -s $iraf/lib/xc.e		xc
+
+5.  We now configure the magtape device tables and give the KI a real host
+    name then do a "sysgen".
+
+	% vi /iraf/dev/hosts	# create entries for "sunspot!" and "penumbra!"
+	% vi /iraf/lib/libc/kernel.h	# find "TAPEDRIVE_TABLE"; enter correct
+					# magtape devices for sunspot!
+	% su
+	% cd /iraf/sys
+	% make >& spool &
+
+	    (inspecting the spool file found a phase error on envscan.o
+	    from ranlib: libsys.a; mangled string table.
+
+	    % cd /iraf/sys/etc
+	    % rm envscan.o
+	    % touch envscan.x
+	    % cd ..
+	    % make >& spool &		# this time it was OK.
+
+    We have now completed the sysgen; however, there had been a minor stdgraph
+    kernel bug which was removed in a development version of stg_encode I had
+    tip'd over; I replaced /iraf/sys/gio/stdgraph/stgencode.x and rebuilt the
+    stdgraph kernel manually:
+
+	% cd /iraf/sys/gio/stdgraph
+	% make >& spool &
+
+	    (Make wouldn't work; it turned out there was a spurious SPACE
+	    character in the Makefile: "make lib" rather than "makelib" on
+	    the "all: " line; fixed this and rebuilt.)
+
+6.  By analogy with the Johns Hopkins installation, since the system
+    libraries had been modified, I went ahead with relinking the applications
+    packages; furthermore, I had a development version of showcap which I
+    used to replace /iraf/pkg/plot/tshowcap.x with in order to debug the
+    vt240 graphcap entries later on.
+
+	% su
+	% cd /iraf
+	% csh -x Mkpkg.sh >& spool &
+
+    However, talking with Doug Tody during this relink, I found out we only
+    needed to rebuild the DATAIO package.  To save time, I killed the relink,
+    observed that it had been in the middle of the IMAGES package, and 
+    manually completed the IMAGES rebuild:
+
+	% cd /iraf/pkg/images
+	% make >& spool &
+
+    (DATAIO had already successfully built, along with several others.  I made
+    sure that the PLOT package had built successfully with the showcap
+    change.)
+
+7.  All compile-time operations are now complete; we need only modify the
+    run-time environment for terminal and graphcap entries and set up for
+    local "mkiraf"'s.
+
+	% cd /iraf/dev
+	% vi termcap		# provide vt240 entry
+	% vi graphcap		# provide vt240 entry; this was yanked from
+				# my development ReGIS graphcap file which
+				# I had previously "tip"'d over.
+	% cd /iraf/lib
+	% vi mkiraf.csh		# setenv users /u2/compsup/mother/irafusers
+				# and directory names at the bottom (prob. no
+				# changes in these); changed 2 lines about
+				# vt100 vs vt640 to vt240 vs some other term.
+
+	% vi clpackage.cl	# change default device names, version, site:
+
+	    set	printer		= "imagen"		--> "tp"
+	    set	stdgraph	= "vt640"		--> "vt240"
+	    set	stdimage	= "iism70"		--> "? (I forget)"
+	    set	stdplot		= "versatec"		--> "tp"
+	    set	terminal	= "vt100"		--> "vt240"
+	    set	version		= "NOAO/IRAF V2.0"	--> "NOAO/NSO/IRAF V2.0"
+
+	% vi login.cl		# uncommented printer, stdimage, stdplot and
+				# gave them the local names.
+				
+    We also "bgrep"'d some zzsetenv.def files to make sure they weren't 
+    pointing to Tucson pathnames.
+
+8.  This completed the non-graphics part of the installation.  We were now able
+    to bring up the cl successfully:
+
+	% cd (user's main iraf directory)
+	% mkiraf
+	% vi login.cl		# modify as desired
+	% cl
+
+9.  The remainder of the installation involved setting up a workable ReGIS
+    graphcap for NSO's vt240's.  I copied the development graphcap entry I
+    had previously created for the ENCORE HostStation100, and went through
+    the vt240 Programmer's Summary capability by capability.  There were
+    about six changes from the hs100.  Graphics output then worked correctly,
+    but we had the same problem reading the cursor that I had had with the
+    hs100 in Tucson.  It turned out later, back in Tucson, that the problem
+    was that I was directing the cl to "lib$xstdgraph.e" (the "kf" parameter)
+    in graphcap, rather than to "cl" itself.  The precedence for the cl
+    process, when it receives a read-cursor request, is to take the kernel
+    name from the graphcap entry, regardless of the fact that the cl (or
+    any other process) was linked directly with the stdgraph kernel code
+    and calls gki_inline_kernel().  Thus the "kf" parameter in graphcap
+    must point to the cl itself in order to use the inline kernel.  At
+    present, cursor readback does not work with an external kernel.
+
+    Several days after the installation (Nov. 20) I called the "kf" change
+    in to Leonard at NSO.  He made the change and checked out "implot" and
+    "=gcur", and said they worked correctly with no further changes to our
+    ReGIS graphcap.

@@ -1,0 +1,20 @@
+# The PEXAMINE task parameter set
+
+input,s,a,,,,"Name of the input catalog"
+output,s,a,"",,,"Name of the edited output catalog"
+image,s,a,"",,,Name of the image corresponding to the input catalog
+deletions,s,h,"",,,"Name of the output catalog for deleted entries"
+photcolumns,s,h,"apphot",,,"Names of the standard photometry columns"
+xcolumn,s,h,mag,,,"Catalog column which is the X axis of X-Y plot"
+ycolumn,s,h,merr,,,"Catalog column which is the Y axis of X-Y plot"
+hcolumn,s,h,mag,,,"Catalog column which is to be binned"
+xposcolumn,s,h,"xcenter",,,"Name of the x coordinate column"
+yposcolumn,s,h,"ycenter",,,"Name of the y coordinate column"
+usercolumns,s,h,"",,,"Names of additional user selected columns"
+first_star,i,h,1,1,,First star in the catalog to load
+max_nstars,i,h,5000,1,,Maximum number of stars to load
+match_radius,r,h,2.0,,,Matching radius for positional coincidence on display
+graphics,s,h,"stdgraph",,,The graphics device
+use_display,b,h,yes,,,Use the image display ?
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"

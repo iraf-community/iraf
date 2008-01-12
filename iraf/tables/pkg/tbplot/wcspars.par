@@ -1,0 +1,22 @@
+# Parameters to specify a user-defined WCS.
+
+ctype1,s,h,"linear",,,"Type of axis 1"
+ctype2,s,h,"linear",,,"Type of axis 2"
+
+crpix1,r,h,0.,,,"Reference coordinate in the logical system"
+crpix2,r,h,0.,,,"Reference coordinate in the logical system"
+
+crval1,r,h,0.,,,"Reference coordinate in the world system"
+crval2,r,h,0.,,,"Reference coordinate in the world system"
+
+cd1_1,r,h,1.,,,"CD matrix"
+cd1_2,r,h,0.,,,"CD matrix"
+cd2_1,r,h,0.,,,"CD matrix"
+cd2_2,r,h,1.,,,"CD matrix"
+
+log_x1,r,h,0.,,,"The lower X-extent of the logical space"
+log_x2,r,h,1.,,,"The upper X-extent of the logical space"
+log_y1,r,h,0.,,,"The lower Y-extent of the logical space"
+log_y2,r,h,1.,,,"The upper Y-extent of the logical space"
+
+version,s,h,"12Dec91",,,"Date of Installation"

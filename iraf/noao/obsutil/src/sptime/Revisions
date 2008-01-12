@@ -1,0 +1,81 @@
+.help revisions Jun01 spectime
+.nf
+
+t_sptime.x
+    1.  The use of the fiber diameter to set the aperture was not working.
+    2.  The listing of the fiber information was not working because it was
+	looking for a table "fibers" instead of "fiber".
+    3.  Fixed typo in label "indivdual" -> "individual".
+    (8/13/04, Valdes)
+
+============================
+SPECTIME V2.2: May 15, 2003
+============================
+
+t_sptime.x
+sptime.par
+sptime.h
+    1.  Improved algorithm for handling saturation.
+    2.  Added a minimum exposure parameter.
+    (5/15/03, Valdes)
+
+t_sptime.x
+    The thermal background calculation was wrong.  (3/17/03, Valdes)
+
+============================
+SPECTIME V2.1: March 3, 2003
+============================
+
+sptime.h
+t_sptime.x
+sptime.par
+../doc/sptime.hlp
+    Added a "shuffle" option for the sky subtraction.  This assumes half
+    the cycle is object and half is sky and the same number of pixels are
+    used for both.  The times in the calculator are the total time
+    (object+sky).  (2/10/03)
+
+specpars.par
+    The choices for aperture type listed "cicle" instead of the correct
+    "circular".  (2/10/03, Valdes)
+
+t_cgiparse.x	+
+mkpkg
+x_spectime.x
+../../obsutil.cl
+    Task to parse the CGI QUERY_STRING and set task parameters.
+    (4/19/02, Valdes)
+
+============================
+SPECTIME V2.0: August 15, 2001
+============================
+
+Greatly revised version.
+
+t_sptime.x
+    Fixed a type mismatch in a max() function.  (6/13/02, Valdes)
+
+============================
+SPECTIME V1.2: June 13, 2001
+============================
+
+mkpkg
+    Added missing dependencies for t_sptime.x and tabinterp.x  (12/13/01, MJF)
+
+t_sptime.x
+sptime.par
+sptime.h
+mkpkg
+    1. Added "units" parameter to allow different dispersion units.
+       This requires linking with libsmw.a from the noao package.
+    2. Added IR bands.
+    3. Changed so that transmisions of 1 are not reported.
+    4. Added a parameter to the filter to override order overlap message.
+       The idea is that a single filter function can be used without requiring
+       the user to chose the filter.
+    (6/13/01, Valdes)
+
+================================
+SPECTIME V1.1: February 11, 2000
+================================
+.endhelp

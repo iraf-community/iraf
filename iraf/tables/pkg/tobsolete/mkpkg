@@ -1,0 +1,11 @@
+# Mkpkg for the tobsolete package
+# B.Simon 16-June-97
+
+relink:
+linkonly:
+update:
+install:
+
+#$call @r49fits
+$call @trename
+$exit

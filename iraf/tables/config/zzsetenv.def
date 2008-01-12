@@ -1,0 +1,17 @@
+# Global environment definitions for the TABLES packages.
+
+set	sppincludes	= "tables$base/"
+set	tablesbin	= "tables$bin/"  
+set	tableslib	= "tables$lib/"
+set	tablesbase	= "tables$base/"
+set	tablespkg	= "tables$pkg/"
+
+set	fitsio		= "tablespkg$fitsio/"
+set	tbplot		= "tablespkg$tbplot/"
+set	tobsolete	= "tablespkg$tobsolete/"
+set	ttools		= "tablespkg$ttools/"
+
+# IGI environment
+set	igi_buflen	= 10000
+
+keep

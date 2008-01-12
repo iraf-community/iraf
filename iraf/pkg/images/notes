@@ -1,0 +1,341 @@
+
+Doug,
+
+   I have finished the initial IMAGES package reorganization. The following
+notes should give a pretty good sumary of what I have done to date.
+
+						   Lindsey
+
+IMAGES PACKAGE REORGANIZATION
+
+I. GENERAL COMMENTS
+
+The first version of the revised IMAGES package is now available for review.
+At present the revised package is called IMAGESX annd can be loaded and
+executed on tucana by creating the following environment and package
+definitions.
+
+	set imagesx = /d1/davis/imagesx/
+	task imagesx.pkg = imagesx$imagesx.cl
+
+IMAGESX is not an external package so the help database has not been built.
+However all the .hd, .men, and .hlp files should have proper entries and
+be in their proper places.
+
+The old TV subpackage is not yet installed in IMAGESX as I did not alter
+its organization or appearance to the user.
+
+II. PACKAGE STRUCTURE AND SUBPACKAGE NAMES
+
+IMAGESX contains 83 (29 are new to the images package) tasks divided into
+the following 8 logical subpackages.
+
+IMALGEBRA - Image expression evaluation package	     # e.g. imarith, imexpr
+ IMCOORDS - Image coordinates package		     # e.g. ccmap, ccsetwcs
+    IMFIT - Image fitting package	             # e.g. fit1d, imsurfit
+ IMFILTER - Image filtering package		     # e.g. boxcar, gauss
+IMGEOTRAN - Image geometric transformation package   # e.g. rotate, magnify
+  IMMATCH - Image matching and combining package     # e.g. xregister, imcombine
+     IMTV - Image display utilities package          # e.g. display, imexamine
+   IMUTIL - Image utilities package                  # e.g. hedit, imcopy
+
+The subpackage names have been prefixed with IM for consistency and to
+minimize possible name conflicts with tasks in other packages (e.g. IMMATCH
+and MATCH, IMGEOTRAN and GEOTRAN, IMCOORDS and COORDS) and for consistency
+with other package names (IMUTIL and ASTUTIL). They were also chosen to avoid
+conflict with the names of existing tasks. These names should be reviewed
+carefully as we want to live with them for awhile.
+
+Using the IM prefix implies that the existing images subpackage TV should be
+renamed to IMTV in the new scheme.
+
+The only subpackage name conflict I am aware of is that of IMMATCH with the
+CTIO.IMMATCH task which is a 1D version of the current XREGISTER task.
+
+
+III. PACKAGE DIRECTORY STRUCTURE
+
+The main IMAGESX directory stucture currently looks like the following
+
+drwxr-xr-x  4 davis         512 Jan 22 10:39 imalgebra
+drwxr-xr-x  4 davis         512 Jan 20 15:18 imcoords
+drwxr-xr-x  4 davis         512 Jan 13 14:30 imfilter
+drwxr-xr-x  4 davis         512 Jan 13 09:36 imfit
+drwxr-xr-x  4 davis         512 Jan 23 13:53 imgeotran
+drwxr-xr-x  4 davis        1024 Jan 23 14:06 immatch
+drwxr-xr-x  2 davis         512 Jan 23 14:29 imtv
+drwxr-xr-x  4 davis        1024 Jan 23 14:06 imutil
+drwxr-xr-x  2 davis        1024 Jan 20 12:22 lib
+
+The subdirectory names mimic the names of the subpackages with the exception
+of LIB which contains source that is either used by tasks in more than one
+subpackage or is of sufficiently general interest that it might make an XTOOLS
+package or routine at some point.
+
+IV. PACKAGE EXECUTABLE
+
+All the tasks except the IMTV tasks (which are not hooked up yet) are
+currently in the same executable as is the case for the current IMAGES
+package.
+
+
+V. REORGANIZATION RELATED CHANGES TO EXISTING IMAGES PACKAGE TASKS
+
+The undocumented tasks in the IMDEBUG package have been removed. These
+are CUBE, DUMP, GSUBRAS, MAXMIN, MKIMAGE, and MKTEST. All of these tasks except
+DUMP have been superseded by tasks in the IMAGES or ARTDATA packages. 
+DUMP is occasionally useful for diagnosing problems with pathological image
+headers and could be documented and moved to PROTO.
+
+The script task REGISTER (a simple script task on top of GEOTRAN) has
+been renamed GREGISTER to indicate is close ties to GEOMAP/GEOTRAN and
+to make it look less generic when listed with other REGISTRATION tasks like
+XREGISTER (x-correlation registration) and SREGISTER (celestial coordinate
+wcs registration).
+
+
+VI. SUBPACKAGES
+
+The tasks in each subpackage are described below. New tasks are starred and
+their origins described in the notes section.
+
+In some cases a task appears in the listing for more than one subpackage. For
+example WCSCOPY appears in IMMATCH but is also included in IMCOORDS because
+it is part of the image matching process but can also be a useful utility.
+In all cases where this occurs there is only one version of the parameter file.
+
+VI.I IMALGEBRA
+
+This subpackage contains various image arithmetic, function, and expression
+evaluation routines. This package should eventually include the image
+calculator is also a good place to put various other simple image operator
+routines as they are written.
+
+images.imalgebra:
+
+    imarith - Simple image arithmetic
+   imdivide - Image division with zero checking and rescaling
+     imexpr - Evaluate a general image expression
+*imfunction - Apply a single argument function to a list of images
+      imsum - Compute the sum, average, or median of a set of images
+
+Notes:
+
+[1] IMFUNCTION is the PROTO package task of the same name. I have included it
+here because provides a very simple interface for doing things like computing
+the square or square root of an image amd hence complements the IMEXPR task
+as IMARITH does. 
+[2] I chose the subpackage name IMALGEBRA instead of IMCALC to avoid
+conflicts with the existing IMCALC tasks (in XRAY and STSDAS) and to leave
+the name open for the eventual definitive version of the IMCALC task.
+
+VI.II IMCOORDS
+
+This subpackage contains tasks for setting, editing, and transforming image
+coordinate systems, and for transforming coordinate lists from one
+coordinate system to another using the image coordinate system. All these
+tasks are new and either derive from the IMMATCH or PROTO packages. I thought
+IMCOORDS was a reasonable name for the subpackage but IMWCS is another
+possibility.
+
+images.imcoords:
+
+*     ccmap - Compute image plate solutions using matched coordinate lists
+*  ccsetwcs - Create an image celestial wcs from the ccmap plate solution
+*    cctran - Transform coordinate lists using the ccmap plate solution
+* ccxymatch - Match celestial and pixel coordinate lists
+*  imcctran - Transform image header from one celestial wcs to another
+*  skyctran - Transform coordinates from one celestial wcs to another
+*   wcscopy - Replace the  wcs of one image with that of another
+*  wcsctran - Transform coordinates from one iraf image wcs to another
+*   wcsedit - Edit an image wcs parameter
+*  wcsreset - Reset the specified image wcs
+
+Notes:
+
+[1]. WCSRESET and WCSEDIT are the PROTO package tasks of the same name. They
+are very general tasks and work on images of any size and any supported wcs
+type. WCSRESET in particular is very useful for removing a world or physical
+wcs.
+[2]. The remaining tasks were all part of the current IMMATCH package.
+[3]. WCSCOPY also appears in immatch package
+
+VI.III IMFILTER
+
+This subpackage contains the image filtering tasks. I expect this package
+could grow in the future. All of the tasks are in the current IMAGES
+package although some like the ring median filters will be new with 2.11.
+
+images.imfilter:
+
+     boxcar - Boxcar smooth a list of 1 or 2-D images
+   convolve - Convolve a list of 1 or 2-D images with a rectangular filter
+    fmedian - Quantize and box median filter a list of 1D or 2D images
+      fmode - Quantize and box modal filter a list of 1D or 2D images
+   frmedian - Quantize and ring median filter a list of 1D or 2D images
+     frmode - Quantize and ring modal filter a list of 1D or 2D images
+      gauss - Convolve a list of 1 or 2-D images with an elliptical Gaussian
+   gradient - Convolve a list of 1 or 2-D images with a gradient operator
+    laplace - Laplacian filter a list of 1 or 2-D images
+     median - Median box filter a list of 1D or 2D images
+       mode - Modal box filter a list of 1D or 2D images
+    rmedian - Ring median filter a list of 1D or 2D images
+      rmode - Ring modal filter a list of 1D or 2D images
+
+VI.IV IMFIT
+
+This subpackage contains the current line and surface fitting tasks. This is
+a small package but one which could grow substantially in the future. Examples
+of new tasks are a more sophisticated background fitting and surface fitting
+tasks, etc.
+
+images.imfit:
+
+      fit1d - Fit a function to image lines or columns
+   imsurfit - Fit a surface to a 2-D image
+  lineclean - Replace deviant pixels in image lines
+
+
+VI.V IMGEOTRAN
+
+This subpackage contains a set of geometric tranformation operatores which
+move pixel and may alter their values via image interpolation. All these
+tasks update the wcs information as well.
+
+imgeotran:
+
+      blkavg - Block average or sum a list of N-D images
+      blkrep - Block replicate a list of N-D images
+     geotran - Geometrically transform a list of 1-D or 2-D images
+   imlintran - Linearly transform a list of 2-D images
+     imshift - Shift a list of 1-D or 2-D images
+ imtranspose - Transpose a list of 2-D images
+*   im3dtran - Transpose a list of 3-D images
+     magnify - Magnify a list of 1-D or 2-D images
+      rotate - Rotate and shift a list of 2-D images
+  shiftlines - Shift the lines of a list of N-D images
+
+Notes:
+
+[1]. GEOTRAN also appears in the IMMATCH package.
+[2]. IM3DTRAN comes from Steve Rook's VOL package. I added mwcs support.  
+
+
+VI.VI IMMATCH
+
+This subpackage contains tasks for registering or combining images spatially
+and for match their psfs and intensity scales.
+
+
+images.immatch:
+
+     geomap - Compute geometric transforms using matched coordinate lists
+    geotran - Transform 1-D or 2-D images using the [geo|sky|wcs]map transforms
+* geoxytran - Transform coordinate lists using the geomap transforms
+  gregister - Register 1-D or 2-D images using the geomap transforms
+*   imalign - Align and register 2-D images using a reference x-y list
+*imcentroid - Compute and print relative shifts for a list of 2-D images
+  imcombine - Combine images pixel-by-pixel using various algorithms
+*  linmatch - Match the linear intensity scales of 1-D or 2-D images
+*  psfmatch - Match the point-spread functions of 1-D or 2-D images
+*    skymap - Compute geometric transforms using the image celestial wcs
+*skyxymatch - Generate matched x-y lists using the image celestial wcs
+* sregister - Register 1-D or 2-D images using the image celestial wcs
+*   wcscopy - Copy the wcs from one image to another
+*    wcsmap - Compute geometric transforms using the image wcs
+*wcsxymatch - Generate matched x-y lists using the image wcs
+* wregister - Register 1-D or 2-D images using the image wcs 
+* xregister - Register 1-D or 2-D images using x-correlation techniques
+* xyxymatch - Match pixel coordinate lists 
+
+Notes:
+
+[1]. Most of the new tasks come from the IMMATCH package. IMCENTROID and
+IMALIGN are the PROTO package image registration tasks of the same name
+which I have modified slightly and included in the IMMATCH package as
+they offer a useful alternative to XREGISTER.
+[2]. The registration tasks (GREGISTER, SREGISTER, and WREGISTER) are
+script tasks which call the GEOTRAN task to compute the output image. 
+They set up the transformation in different ways depending on whether
+a matched pixel list, a celestial coordinate system image wcs, or a general
+image wcs is to be used. SREGISTER in particular is capable of registering
+images which have coordinate systems at different epochs (e.g. 1950 and 2000)
+or in different systems (e.g. equatorial and galactic). 
+[3]. WCSCOPY also appears in the IMCOORDS package.
+
+
+VI.VII IMTV
+
+This subpackage contains tasks which load and/or interact with the image
+display.  The package is unchanged except for being called IMTV in the new
+scheme.
+
+images.imtv
+
+  display - Load an image or image section into the display
+      iis - IIS image display control package
+   imedit - Examine and edit pixels in images
+imexamine - Examine images using image display, graphics, and text
+   tvmark - Mark objects on the image display
+   wcslab - Overlay a displayed image with a world coordinat
+
+VI.VIII IMUTIL
+
+This subpackage contains the basic images utilities package.
+
+images.imutil
+
+    chpixtype - Change the pixel type of a list of images
+        hedit - Header editor
+      hselect - Select a subset of images satisfying a boolean expression
+       imcopy - Copy an image
+     imdelete - Delete a list of images
+       imgets - Return the value of an image header parameter as a string
+     imheader - Print an image header
+  imhistogram - Compute and plot or print an image histogram
+*      imjoin - Join images along a given dimension
+     imrename - Rename one or more images
+*   imreplace - Replace a range of pixel values with a constant
+      imslice - Slice images into images of lower dimension
+      imstack - Stack images into a single image of higher dimension
+*      imtile - Tile same sized 2D images into a 2D mosaic
+ imstatistics - Compute and print statistics for a list of images
+   listpixels - Convert an image section into a list of pixels
+       minmax - Compute the minimum and maximum pixel values in an image
+     sections - Expand an image template on the standard output
+
+
+Notes:
+
+[1]. IMJOIN comes from Steve Rooke's VOL package. It joins images of the
+same dimension efficiently and complements the IMSTACK task. The wcs of
+the resulting image is the wcs of the first image.
+[2]. IMREPLACE is the proto package task of the same name. It is a simple
+general purpose task that is very useful.
+[3]. IMTILE is the old IRMOSAIC task with the database code removed making
+it a simple useful 2D image mosaicing task. Often used for combining
+before and after pictures of the same field or a time sequence of small images. 
+
+
+VII. TASK NAME CONFLICTS WITH EXTERNAL PACKAGES
+
+The only task name conflict that I am aware concerns the SKYMAP task. There
+is a SKYMAP task in STSDAS.GRAPHICS.STPLOT which basically creates a sky
+chart for the GSC. Since I would really like to maintain the use
+of MAP for my transformation computing tasks (e.g. GEOMAP),  I wonder
+whether STSDAS would mind renaming this task to SKYCHART... I ran into the name
+conflict when I had IMMATCH and GASP loaded at the same time, as GASP uses
+the STSDAS version of SKYMAP in some scripts.
+
+
+VIII. WORK STILL TO BE DONE
+
+I still need to review and if possible implement some changes to the
+CCMAP and GEOTRAN tasks requested by Frank. These are mosaic support
+related changes. (COMPLETED 8/2/97)
+
+When and if the new wcs function drivers are installed I will need
+to release the contraints I currently have on the CCXYMATC, CCMAP, CCSETWCS,
+IMCTRAN, CCTRAN, etc tasks ability to handle various sky projections. At
+present only tan, sin, and arc are fully supported. In general
+this involves changing parameter file constraints and documentation.

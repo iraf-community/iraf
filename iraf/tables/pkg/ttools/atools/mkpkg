@@ -1,0 +1,10 @@
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	taextract.x		<tbset.h> 
+	tainsert.x		<tbset.h> 
+	taincr.x
+	;

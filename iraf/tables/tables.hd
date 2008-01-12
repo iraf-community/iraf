@@ -1,0 +1,37 @@
+# Help directory for the TABLES package
+
+tables		men = tables$tables.men,
+		sys = tables$pkg/tables.hlp,
+		src = tables$tables.cl
+
+$doc		= "tables$pkg/doc/"
+$fitsio		= "tables$pkg/fitsio/"
+$tbplot		= "tables$pkg/tbplot/"
+$tobsolete	= "tables$pkg/tobsolete/"
+$ttools		= "tables$pkg/ttools/"
+
+
+fitsio		men = fitsio$fitsio.men,
+		hlp = ..,
+		sys = fitsio$fitsio.hlp,
+		pkg = fitsio$fitsio.hd,
+		src = fitsio$fitsio.cl
+
+tbplot		men = tbplot$tbplot.men,
+		hlp = ..,
+		sys = tbplot$tbplot.hlp,
+		pkg = tbplot$tbplot.hd,
+		src = tbplot$tbplot.cl
+
+tobsolete	men = tobsolete$tobsolete.men,
+		hlp = ..,
+		sys = tobsolete$tobsolete.hlp,
+		pkg = tobsolete$tobsolete.hd,
+		src = tobsolete$tobsolete.cl
+
+ttools		men = ttools$ttools.men,
+		hlp = ..,
+		sys = ttools$ttools.hlp,
+		pkg = ttools$ttools.hd,
+		src = ttools$ttools.cl
+

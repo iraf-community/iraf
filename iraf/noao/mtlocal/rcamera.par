@@ -1,0 +1,12 @@
+# CAMERA read parameters
+camera_file,f,a,mta,,,CAMERA data source
+file_list,s,a,,,,File list
+iraf_file,f,a,,,,IRAF filename
+make_image,b,h,yes,,,Create an IRAF image?
+image_list,s,h,"1",,,Image list
+long_header,b,h,no,,,Print full CAMERA header?
+short_header,b,h,yes,,,Print short CAMERA header?
+datatype,s,h,s,,,IRAF data type
+standard_format,b,h,yes,,,CAMERA standard format?
+offset,i,h,0,,,Tape offset no
+mode,s,h,ql,,,

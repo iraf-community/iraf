@@ -1,0 +1,34 @@
+.help mkdir May85 system
+.ih
+NAME
+mkdir -- make a new directory
+.ih
+USAGE
+mkdir newdir
+.ih
+PARAMETERS
+.ls newdir
+New directory or subdirectory to be made.
+.le
+.ih
+DESCRIPTION
+\fIMkdir\fR creates a new directory with the given name.
+\fINewdir\fR may be an IRAF virtual directory name (not a logical name)
+or a host directory name.
+.ih
+EXAMPLES
+
+1. Make a subdirectory named "sub1".
+
+	cl> mkdir sub1
+
+2. Make a subdirectory "sub2" below "sub1".  The subdirectory "sub1" must
+already exist.
+
+	cl> mkdir sub1/sub2
+
+3. Make a directory "blue" at the same level in the directory hierarchy as
+the current directory (".." is a synonym for the previous directory).
+
+	cl> mkdir ../blue
+.endhelp

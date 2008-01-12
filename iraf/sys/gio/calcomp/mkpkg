@@ -1,0 +1,52 @@
+# Make the CALCOMP GIO graphics kernel.  Requires the host system library
+# LIB_CALCOMP, which must be callable from an IRAF program (which is not the
+# same as a Fortran program).
+
+$checkout libccp.a lib$
+$update   libccp.a
+$checkin  libccp.a lib$
+$call     relink
+$exit
+
+update:					# update lib$x_calcomp.e
+	$call	relink
+	$call	install
+	;
+
+relink:					# make x_calcomp.e in local directory
+	$omake  x_calcomp.x
+	$link	x_calcomp.o -lccp $(LIB_CALCOMP)
+	;
+
+install:				# install in system library
+	$move	x_calcomp.e bin$
+	;
+
+libccp.a:
+	ccpclear.x	ccp.com ccp.h <mach.h>
+	ccpclose.x	ccp.com ccp.h
+	ccpclws.x	ccp.com ccp.h
+	ccpcolor.x	ccp.com ccp.h
+	ccpcseg.x	ccp.com ccp.h <gki.h> <gset.h> <mach.h>
+	ccpdrawch.x	ccp.com ccp.h font.com font.h <gki.h> <gset.h>\
+			<math.h>
+	ccpdseg.x	ccp.com ccp.h <math.h>
+	ccpescape.x	ccp.com ccp.h <gescape.h>
+	ccpfa.x		ccp.com ccp.h
+	ccpfaset.x	ccp.com ccp.h <gki.h>
+	ccpfont.x	ccp.com ccp.h <gki.h> <gset.h>
+	ccpinit.x	ccp.com ccp.h <ctype.h> <gki.h> <mach.h>
+	ccpltype.x	ccp.com ccp.h <gset.h>
+	ccplwidth.x	ccp.com ccp.h
+	ccpopen.x	ccp.com ccp.h <gki.h>
+	ccpopenws.x	ccp.com ccp.h <error.h> <gki.h> <mach.h>
+	ccppl.x		ccp.com ccp.h <gki.h> <gset.h>
+	ccpplset.x	ccp.com ccp.h <gki.h>
+	ccppm.x		ccp.com ccp.h <gki.h> <math.h>
+	ccppmset.x	ccp.com ccp.h <gki.h>
+	ccpreset.x	ccp.com ccp.h <gset.h> <gki.h>
+	ccptx.x		ccp.com ccp.h <gki.h> <gset.h> <math.h>
+	ccptxset.x	ccp.com ccp.h <gki.h> <gset.h>
+	rptheta4.x	<math.h>
+	t_calcomp.x	<error.h> <gki.h> ccp.com ccp.h <gset.h> <mach.h>
+	;

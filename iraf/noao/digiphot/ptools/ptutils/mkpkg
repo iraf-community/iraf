@@ -1,0 +1,12 @@
+# miscellaneous useful tasks
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_istable.x	../../lib/ptkeysdef.h
+	t_tbkeycol.x	<tbset.h>
+	t_tbcrename.x	<tbset.h>
+	;

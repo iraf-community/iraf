@@ -1,0 +1,39 @@
+# ECIDENTIFY Task
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	@ecffit
+
+	eccenter.x	ecidentify.h
+	eccolon.x	ecidentify.h <error.h> <gset.h> <pkg/center1d.h>
+	ecdb.x		ecidentify.h <math/gsurfit.h> <smw.h> <units.h>
+	ecdelete.x	ecidentify.h
+	ecdofit.x	ecidentify.h <smw.h>
+	ecdoshift.x	ecidentify.h
+	ecfitdata.x	ecidentify.h <pkg/gtools.h> <smw.h> <units.h>
+	ecgdata.x	ecidentify.h <imhdr.h> <imio.h> <pkg/gtools.h> <smw.h>\
+			<units.h>
+	ecgetim.x	
+	ecgline.x	ecidentify.h <smw.h>
+	ecgraph.x	ecidentify.h <gset.h> <pkg/gtools.h>
+	ecidentify.x	ecidentify.h <error.h> <gset.h> <imhdr.h> <smw.h>
+	ecinit.x	ecidentify.h <gset.h>
+	ecline.x	ecidentify.h <smw.h>
+	eclinelist.x	ecidentify.h <error.h> <mach.h> <smw.h> <units.h>
+	eclog.x		ecidentify.h <time.h>
+	ecmark.x	ecidentify.h <gset.h> <pkg/center1d.h>
+	ecnearest.x	ecidentify.h <mach.h>
+	ecnewfeature.x	ecidentify.h <mach.h> <smw.h>
+	ecnext.x	ecidentify.h
+	ecpeak.x	ecidentify.h
+	ecprevious.x	ecidentify.h
+	ecrms.x		ecidentify.h
+	ecshift.x	ecidentify.h <smw.h>
+	ecshow.x	ecidentify.h <pkg/center1d.h>
+	t_eciden.x	ecidentify.h <mach.h> <pkg/center1d.h> <pkg/gtools.h>
+	t_ecreid.x	ecidentify.h <error.h> <smw.h>
+	;

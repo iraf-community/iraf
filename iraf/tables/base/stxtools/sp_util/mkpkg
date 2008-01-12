@@ -1,0 +1,16 @@
+# Make the wcslab package
+
+$checkout libstxtools.a ../
+$update libstxtools.a
+$checkin libstxtools.a ../
+$exit
+
+libstxtools.a:
+	spchag.x
+	spdise.x
+	spmapt.x	<gset.h>
+	sprote.x	<math.h>
+	spstry.x
+	sptras.x
+	spw2ld.x
+        spwcss.x        <ctype.h>

@@ -1,0 +1,21 @@
+# Make the PSFMATCH task
+
+$checkout libpkg.a ../../../
+$update   libpkg.a
+$checkin  libpkg.a ../../../
+$exit
+
+libpkg.a:
+	rgpbckgrd.x		<math.h> <math/gsurfit.h> "psfmatch.h"
+	rgpcolon.x		<imhdr.h> <imset.h> <error.h> "psfmatch.h"
+	rgpconvolve.x		<error.h> <imhdr.h> <imset.h>
+	rgpisfm.x		<imhdr.h> <gset.h> <ctype.h> "psfmatch.h"
+	rgpfft.x
+	rgpfilter.x		<math.h>
+	rgppars.x		"psfmatch.h"
+	rgpregions.x		<imhdr.h> <fset.h> "psfmatch.h"
+	rgpsfm.x		<imhdr.h> <math/gsurfit.h> "psfmatch.h"
+	rgpshow.x		"psfmatch.h"
+	rgptools.x		"psfmatch.h"
+	t_psfmatch.x		<fset.h> <imhdr.h> "psfmatch.h"
+	;

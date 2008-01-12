@@ -1,0 +1,9 @@
+This directory contains the source for GIOTR and cursor mode, i.e., the code
+required to process the graphics output of a graphics task, spooling and/or
+applying the workstation transformation and passing the transformed metacode
+instructions on to the builtin STDGRAPH kernel or to an external kernel.  The
+procedure RCURSOR is the main entry point for cursor mode.  RCURSOR is called
+by the CL to service a query for a cursor type parameter when query mode is
+in effect.  The workstation transformation is used to zoom and pan on a frame
+buffer and consists of a viewport transformation in GKI coordinates with
+clipping at the viewport boundary.

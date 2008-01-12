@@ -1,0 +1,22 @@
+image,s,a,,,,image or image section to be plotted
+floor,r,h,INDEF,,,minimum value to be contoured (INDEF for min)
+ceiling,r,h,INDEF,,,maximum value to be contoured (INDEF for max)
+zero,r,h,0,,,greyscale value of zero contour
+ncontours,i,h,0,,,number of contours to be drawn (0 for default)
+interval,r,h,0,,,contour interval (0 for default)
+nhi,i,h,-1,,,"hi/low marking option: -1=omit, 0=mark h/l, 1=mark each pix"
+dashpat,i,h,528,,,bit pattern for generating dashed lines
+device,s,h,stdgraph,,,output device
+title,s,h,"imtitle",,,optional title
+preserve,b,h,yes,,,preserve aspect ratio of image?
+label,b,h,yes,,,label major contours with their values?
+fill,b,h,no,,,fill viewport regardless of device aspect ratio?
+xres,i,h,64,,,resolution in x
+yres,i,h,64,,,resolution in y
+perimeter,b,h,yes,,,draw labelled perimeter around plot?
+vx1,r,h,0.,,,NDC viewport x1
+vx2,r,h,0.,,,NDC viewport x2
+vy1,r,h,0.,,,NDC viewport y1
+vy2,r,h,0.,,,NDC viewport y2
+subsample,b,h,no,,,Subsample (vs blockaverage) to decrease resolution?
+append,b,h,no,,,append to an old plot

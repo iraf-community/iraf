@@ -1,0 +1,9 @@
+table,s,a,"",,,"list of tables"
+same,b,h,no,,,"apply same instructions to all tables?"
+verbose,b,h,yes,,,"print name of each table?"
+readonly,b,h,no,,,"open tables readonly?"
+inplace,b,h,no,,,"edit tables inplace?"
+quit_default,b,h,no,,,"default action for quit vs exit"
+delete_default,b,h,yes,,,"default action for delete or replace"
+go_ahead,b,q,no,,," ?"
+mode,s,h,"al",,,

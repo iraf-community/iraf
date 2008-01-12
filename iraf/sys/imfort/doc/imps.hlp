@@ -1,0 +1,54 @@
+.help imps Sep86 imfort
+.ih
+NAME
+.nf
+imps -- put (rewrite) an image section
+.fi
+.ih
+SYNOPSIS
+.nf
+subroutine imps1r (im, rbuf, i1,i2, ier)
+subroutine imps1s (im, sbuf, i1,i2, ier)
+subroutine imps2r (im, rbuf, i1,i2, j1,j2, ier)
+subroutine imps2s (im, sbuf, i1,i2, j1,j2, ier)
+subroutine imps3r (im, rbuf, i1,i2, j1,j2, k1,k2, ier)
+subroutine imps3s (im, sbuf, i1,i2, j1,j2, k1,k2, ier)
+
+integer		im		#I image descriptor of open image
+real		rbuf(*)		#I output pixel buffer, type real
+integer*2	sbuf(*)		#I output pixel buffer, type short
+integer		i1, i2		#I range of columns to be updated
+integer		j1, j2		#I range of lines to be updated
+integer		k1, k2		#I range of bands to be updated
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimps\fR procedures are used to rewrite a section (subraster) of an image.
+Procedures are provided for images of from one to three dimensions,
+of pixel type short integer or real.  The type real procedures may be
+applied to images of either type, but the type short procedures may only
+be used to access images of type short.  The output buffer should contain
+at least (i1-i2+1) pixels (\fIps1\fR), ((j2-j1+1) * (i2-i1+1)) pixels
+(\fIps2\fR), or ((k2-k1+1) * (j2-j1+1) * (i2-i1+1)) pixels (\fIps3\fR).
+The pixels are assumed to be in Fortran storage order.  The column index
+\fIi2\fR must be greater than or equal to \fIi1\fR, but the remaining
+subscripts may be swapped if desired.
+.ih
+RETURN VALUE
+A zero status is returned if the referenced image line is in-bounds and
+the actual pixel datatype of the image is one of the types permitted by
+the particular operator called.
+
+.nf
+IE_NOTSHORT:	imfort short integer i/o requires a type short image
+IE_PIXTYPE:	image pixel type must be short or real
+IE_WRPIX:	error writing image pixel file
+IE_XOOB:	image x coordinates out of range or out of order
+IE_YOOB:	image y coordinates out of range
+IE_ZOOB:	image z coordinates out of range
+.fi
+.ih
+SEE ALSO
+imgs, imgl, impl
+.endhelp

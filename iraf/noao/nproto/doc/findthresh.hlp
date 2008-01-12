@@ -1,0 +1,128 @@
+.help findthresh Apr92 noao.nproto
+.ih
+NAME
+findthresh -- Estimate the background noise level of a CCD
+.ih
+USAGE
+findthresh data
+.ih
+PARAMETERS
+.ls data
+The level of the sky (or any other data level, for that matter) in A/D
+units, for which the random error is to be estimated.  If this is not
+given on the command line and a list of \fBimages\fR is specified then
+the data level will be measured from the images.
+.le
+.ls images = ""
+If not NULL ("") and if \fBdata\fR is not specified, this is a list of
+images whose random background error per pixel is to be estimated.
+.le
+.ls section = "[*,*]"
+The selected image section for the statistics.  This should be chosen
+to exclude bad columns or rows, cosmic rays, and other blemishes.
+.le
+.ls gain
+The CCD gain in electrons/ADU.
+This may be estimated using the FINDGAIN task.
+.le
+.ls readnoise
+The CCD read noise in electrons.
+This may be estimated using the FINDGAIN task.
+.le
+.ls nframes = 1
+The number of raw data frames that were coadded or averaged
+to produce the \fBimages\fR.  If this is not set to 1, the
+\fBcoaddtype\fR parameter must also be set to the proper value.
+.le
+.ls coaddtype = "average"
+For coadded frames (\fBnframes\fR > 1) the type of combination
+that was done, either "average" or "sum".
+.le
+.ls center = "mean"
+The statistical measure of central tendency that is used to estimate
+the data level of each image.  This can have the values:  \fBmean\fR,
+\fBmidpt\fR, or \fBmode\fR.  These are calculated using the same
+algorithm as the IMSTATISTICS task.
+.le
+.ls binwidth = 0.1
+The bin width of the histogram (in sigma) that is used to estimate the
+\fBmidpt\fR or \fBmode\fR of the data section in each image.
+The default case of center=\fBmean\fR does not use this parameter.
+.le
+.ls verbose = yes
+Label the computed and measured background noise on output,
+rather than print them two per line?
+.le
+.ih
+DESCRIPTION
+FINDTHRESH can be used to estimate the expected random error per pixel
+(in ADU) of the sky background of a CCD image, given the \fBgain\fR (in
+electrons per ADU) and \fBreadnoise\fR (in electrons) of the CCD.  The
+sky background (or any other data level of interest) can be specified
+directly with the \fBdata\fR parameter, or the representative values can
+be measured from a specified list of \fBimages\fR as also governed by
+the \fBsection\fR, \fBcenter\fR, and \fBbinwidth\fR parameters.
+FINDTHRESH can be used with processed frames that are the coaddition or
+average of several raw images by choosing the correct values for the
+\fBnframes\fR and \fBcoaddtype\fR parameters.  In this case
+(\fBnframes\fR > 1), the effective gain and effective readnoise of the
+coadded frames will also be printed out.
+
+The section over which the statistics of the \fBimages\fR are computed
+should be chosen carefully.  The frames may be displayed and perhaps
+blinked, and IMSTATISTICS, IMHISTOGRAM, IMPLOT, and other tasks may be
+used to compare the statistics of various sections of the images directly.
+.ih
+ALGORITHM
+The formula used by the task is:
+
+.nf
+    random error in 1 pixel = sqrt (data*p(N) + r(N)**2) / p(N)
+.fi
+
+Where the effective gain, p(N), is given in electrons per ADU and
+the effective readnoise, r(N), is given in electrons.  The effective
+gain and readnoise are calculated from the intrinsic \fBgain\fR and
+\fBreadnoise\fR, specified as parameters to the task, by the relations:
+
+.nf
+    p(N) =      N  * \fBgain\fR        (only if the frames were \fBaveraged\fR)
+    r(N) = sqrt(N) * \fBreadnoise\fR   (whether averaged \fBor\fR summed frames)
+.fi
+
+In our implementation, the level of the sky can be calculated using any
+of the \fBmean\fR, \fBmidpt\fR (an estimate of the median), or \fBmode\fR
+as determined by the \fBcenter\fR parameter.  For the \fBmidpt\fR or
+\fBmode\fR choices only, the value of the \fBbinwidth\fR parameter
+determines the bin width (in sigma) of the histogram that is used in
+the calculation.  FINDTHRESH uses the IMSTATISTICS task to measure the
+statistics.
+.ih
+EXAMPLES
+To estimate the CCD background noise at a specified data level, gain and
+readnoise (note that you will be prompted for the gain and the readnoise
+if you don't set them either explicitly on the command line, or previously
+using, for example, eparam):
+
+.nf
+    lo> findthresh 100 gain=2.3 readnoise=13.
+.fi
+
+To estimate the CCD background noise within a 100x100 section
+of a list of images, data*.imh:
+
+.nf
+    lo> findthresh data*.imh section="[271:370,361:460]"
+.fi
+
+To estimate the CCD background noise using the mode to estimate the
+sky level for each image section:
+
+.nf
+    lo> findthresh.section="[271:370,361:460]"
+    lo> findthresh data*.imh center=mode
+.fi
+.ih
+SEE ALSO
+findgain, imstatistics, imhistogram
+.endhelp

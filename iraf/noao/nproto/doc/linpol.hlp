@@ -1,0 +1,164 @@
+.help linpol Apr92 noao.nproto
+.ih
+NAME
+linpol -- Calculate linear polarization, angle, and Stokes images
+.ih
+USAGE
+linpol input output
+.ih
+PARAMETERS
+.ls input
+A list of input images.  There must be either three or four input
+images taken with the polarizer at even multiples of a 45 degree
+position angle.
+.le
+.ls output
+The output data cube which will contain as separate bands the
+fractional linear polarization and angle frames, and optionally the
+Stokes parameter frames.
+.le
+.ls degrees = yes
+Report the polarization angle in degrees?  If \fBdegrees\fR = no, the
+polarization angle will be reported in radians.
+.le
+.ls stokes = yes
+Output the Stokes parameter images?  If \fBstokes\fR = yes, the three
+linear Stokes parameters, I, Q, and U, will be included in the
+\fBoutput\fR data cube as separate bands.  If \fBstokes\fR = no, only
+the fractional linear polarization and angle frames will appear in the
+output.
+.le
+.ls normalize = no
+Normalize the Q and U frames?  This is appropriate when using a tool
+such as VELVECT to plot the polarization vectors.  If \fBnormalize\fR =
+yes, the Q and U Stokes parameter frames will be normalized by dividing
+by the I parameter frame.  This parameter has no effect on either the
+fractional polarization or angle frames.
+.le
+.ls keyword = "polangle"
+This must be set to the name of a header keyword that contains the
+polarizer angle for each of the \fBinput\fR images.  LINPOL will only
+accept polarizer angles at even 45 degree separations.  Either four such
+frames, at 0-45-90-135 degrees, or three frames with any one of the
+0-45-90-135 degree frames omitted, may be specified.
+.le
+.ih
+DESCRIPTION
+LINPOL calculates the pixel-by-pixel fractional linear polarization and
+polarization angle for a set of either three or four images taken with
+polarizer set at even multiples of a 45 degree position angle.  At least
+three different frames with the header \fBkeyword\fR set to one of
+0, 45, 90, or 135 degrees must be specified in the \fBinput\fR list.
+
+If \fBdegrees\fR = yes, the output polarization angle band of the image
+will be in units of degrees, if \fBdegrees\fR = no, the angle will be
+reported as radians.  If \fBstokes\fR = yes, the output image
+will consist of five separate bands, one each for the pixel-by-pixel
+fractional linear polarization and the corresponding polarization angle,
+and one for each of the I, Q, and U pixel-by-pixel Stokes parameters.
+If \fBstokes\fR = no, only the fractional polarization and the polarization
+angle will be saved in the output.
+
+The \fBnormalize\fR parameter is useful for plotting purposes.
+If \fBnormalize\fR = yes, the Q and U Stokes parameter frames will be
+normalized by dividing by the I parameter frame.  This may be appropriate
+when using a tool such as VELVECT to plot the polarization vectors.
+This parameter has no effect on either the fractional polarization or
+angle frames.
+
+Each input image must contain the corresponding polarizer angle
+in the header keyword specified by the parameter \fBkeyword\fR
+Linpol will only accept polarizer angles at even 45 degree separations.
+Either four such frames, at 0-45-90-135 degrees, or three frames with
+any one of the 0-45-90-135 degree frames omitted, may be specified.
+
+The output image header will include information describing the particular
+input images that went into its generation and the particular nature of
+each band of the output.
+.ih
+EXAMPLES
+An observer obtained four exposures of a particular field through a
+polarizer set at a position angle of 0-45-90-135 degrees.  The first
+step in producing a good map of the polarized light from (extended
+or point-like) sources in the field is always to register these frames
+very precisely.  A slight mismatch in the positioning of each pixel
+relative to the shoulders of nearby sources or extended emission will
+result in large errors in the determination of the polarization quantities.
+
+Another preprocessing step that may be desirable is to match the PSFs
+(Point Spread Functions) of the various frames.  Ideally, these are
+stable in the raw data (i.e., the seeing at the telescope was constant),
+but if not they must be matched to avoid the same errors as above.  Note
+that it may also be a good idea to "smooth" the raw images before
+applying linpol to increase the signal-to-noise of the output.
+
+After guaranteeing the integrity of the input images, the image header
+\fBkeyword\fR must be created to contain the position angle.  The hedit
+task can be used to do this:
+
+.nf
+    hedit im.00 polangle 0 add+
+    hedit im.45 polangle 45 add+
+    hedit im.90 polangle 90 add+
+    hedit im.135 polangle 135 add+
+.fi
+
+At this point, the input images are ready to be processed by linpol.
+
+To generate an output image containing the fractional linear
+polarization and polarization angle in separate bands, along with the
+pixel-by-pixel Stokes parameter frames:
+
+.nf
+    np> linpol im.*.imh polar
+.fi
+
+To omit the Stokes parameter frames:
+
+.nf
+    np> linpol im.*.imh polar stokes-
+.fi
+
+To represent the pixel-by-pixel polarization angle in radians, rather
+than degrees:
+
+.nf
+    np> linpol im.*.imh polar degrees-
+.fi
+
+To normalize the Q and U Stokes frames and plot the result with velvect:
+
+.nf
+    np> linpol im.*.imh polar normalize+
+    np> imhead polar lo+
+    polar[100,100,5][short]: Linear polarization image
+	No bad pixels, no histogram, min=unknown, max=unknown
+	Line storage mode, physdim [100,100,5], length of user area 2147 s.u.
+	Created Wed 10:15:05 29-Apr-92, Last modified Wed 10:15:05 29-Apr-92
+	Pixel file 'ursa!/ursa/scr3/iraf/seaman/polar.pix' [ok]
+	...
+
+	POL0    = 'im.00.imh'
+	POL45   = 'im.45.imh'
+	POL90   = 'im.90.imh'
+	POL135  = 'im.135.imh'
+	POLAR   = 'Band 1 is the percent polarization'
+	ANGLE   = 'Band 2 is the polarization angle'
+	I-STOKES= 'Band 3 is the Stokes I parameter'
+	Q-STOKES= 'Band 4 is the normalized Stokes Q parameter'
+	U-STOKES= 'Band 5 is the normalized Stokes U parameter'
+    np> velvect polar[*,*,4] polar[*,*,5]
+.fi
+
+Note that the current version of the velvect task is not particularly
+appropriate for this use.  It has no support for reducing the pixel
+resolution of the output plot:  each pixel will generate a plotted vector
+so that to produce an uncrowded (and low "noise") plot, the input images
+or output bands must be manually block averaged or otherwise smoothed.
+In addition, the plotted vectors are directed (little arrows) not
+undirected line segments, and the length of the vectors are not easily
+adjusted.
+.ih
+SEE ALSO
+velvect, imalign, hedit
+.endhelp

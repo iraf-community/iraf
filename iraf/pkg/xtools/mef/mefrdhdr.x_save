@@ -1,0 +1,529 @@
+include <error.h>
+include <mach.h>
+include <ctype.h> 
+include <fset.h>
+include <mef.h>
+
+# MEFRDHR.X -- Routines to read FITS header units.
+#
+# 	         mef_rdhdr (mef, group, extname, extver)
+# 	         mef_rdblk (in, spp_buf)
+# 	         mef_skip_data_unit (mef)
+#	totpix = mef_totpix (mef)
+# 	         mef_rd2end (mef, read_next_group)
+# 	         mef_rdhdr_gn (mef,gn)
+# 	         mef_rdhdr_exnv (mef,extname, extver)
+
+
+# MEF_RDHR -- Read FITS header on a mef file that matches EXTNAME/EXTVER or 
+# GROUP number. If both are specified, the former takes procedence.
+
+procedure mef_rdhdr (mef, group, extname, extver)
+
+pointer	mef		#I Mef descriptor
+int	group 		#I Group number to read
+char    extname[ARB]    #I Extname to read		
+int	extver		#I Extver to read
+
+int	open(),in, cur_extn, note(), gnum
+int	spool
+char	spp_buf[FITS_BLKSZ_NL]
+bool	extnv, end_card, read_next_group, mef_rd1st()
+bool    mef_cmp_extnv
+errchk	open, read, mef_rd1st, mef_load_header
+
+begin
+	if (group == MEF_CGROUP(mef))
+	    return
+
+	gnum = group
+	if (MEF_FD(mef) == NULL) {
+	    MEF_FD(mef) = open (MEF_FNAME(mef), READ_ONLY, BINARY_FILE)
+	    MEF_ENUMBER(mef) = -1 
+	    MEF_CGROUP(mef) = -1 
+	} 
+	MEF_SKDATA(mef) = NO  
+
+	in = MEF_FD(mef)
+
+	extnv = extname[1] != EOS || extver != INDEFL
+	if (extnv)
+	   spool = open ("spool", NEW_FILE, SPOOL_FILE)
+
+	if (gnum == -1 || extnv)
+	    gnum = 0
+#	else if (gnum != -1 && extnv)
+#	    gnum = -1			# EXTNAME/EXTVER takes precedence
+	   
+	cur_extn = MEF_CGROUP(mef)
+#	if (cur_extn < 0) 
+#	    cur_extn = -1	        # Ready to read PHU
+	read_next_group = true
+
+	repeat {
+	   # If we need to read the next group
+	   if (read_next_group) {
+	       # Read 1st block 
+	       cur_extn = cur_extn+1
+
+	       # See if this extension contains the correct 
+	       # extname/extver values.
+
+	       if (extnv) {
+		   end_card = true
+		   # We are not sure if extname or extver are in the
+		   # 1st block.
+	           call fseti (spool, F_CANCEL, YES)
+		   call mef_load_header (mef, spool)
+#		   iferr (call mef_load_header (mef, spool)) {
+#		       call erract(EA_WARN)
+#		   }
+
+		   read_next_group = mef_cmp_extnv (mef, extname, extver)
+		   MEF_POFF(mef) = note(in)
+		   call mef_skip_data_unit (mef)
+		   next
+	       } else {
+	           end_card = mef_rd1st (mef, spp_buf) 
+		   if (gnum == cur_extn) 
+		       read_next_group = false
+	       }
+
+	       if (read_next_group) {
+		   if (!end_card)
+		       call mef_rd2end (mef, read_next_group)
+		   call mef_skip_data_unit (mef)
+	       }
+	   } else {			# This is the group we want
+	       if (MEF_HDRP(mef) != NULL)
+		   call mfree (MEF_HDRP(mef), TY_CHAR)
+	       if (end_card) {
+		   if (extnv) {
+		       call mef_cp_spool (spool, mef)
+                       cur_extn = cur_extn + 1
+		   } else {
+		       call malloc (MEF_HDRP(mef), MEF_HSIZE(mef)+1, TY_CHAR)
+		       call amovc (spp_buf, Memc[MEF_HDRP(mef)], MEF_HSIZE(mef))
+		       Memc[MEF_HDRP(mef)+MEF_HSIZE(mef)] = EOS
+		   }
+	       } else {
+		   call malloc (MEF_HDRP(mef), FITS_BLKSZ_NL, TY_CHAR)
+		   call amovc (spp_buf, Memc[MEF_HDRP(mef)], FITS_BLKSZ_NL)
+		   call mef_rd2end (mef, read_next_group)
+	       }
+	       if (!extnv) {
+		   if (MEF_NDIM(mef) != 0 || MEF_PCOUNT(mef) > 0) 
+		       MEF_POFF(mef) = note(in)
+		   else
+		       MEF_POFF(mef) = INDEFL
+	           call mef_skip_data_unit (mef)
+	       }
+	       MEF_CGROUP(mef) = cur_extn
+
+	       # To indicate that data has been skipped.
+	       MEF_SKDATA(mef) = YES  
+
+	       return
+	   }
+	}
+end
+
+
+# MEF_RD1ST -- Handle the 1st FITS header block.
+# Return true if the END card is in this 1st block.
+
+bool procedure	mef_rd1st (mef, hbuf)
+
+pointer mef		#I Mef descriptor
+char	hbuf[ARB]	#O Buffer containing the first block of a unit
+
+int	in, k, i, index, mef_kctype()
+int	strncmp(), note()
+pointer	sp, errmsg
+
+errchk  mef_rdblk
+
+begin
+	in = MEF_FD(mef)
+
+	# Read 1st block.
+ 	MEF_HOFF(mef) = note(in)
+	call mef_rdblk (in, hbuf)
+
+	MEF_EXTNAME(mef) = EOS
+	MEF_EXTVER(mef) = INDEFL
+	k = 1
+        # Verify FITS header
+	if (strncmp (hbuf[k], "SIMPLE  ", 8) != 0 &&
+	    strncmp (hbuf[k], "XTENSION", 8) != 0 ) {
+            call smark (sp)
+            call salloc (errmsg, SZ_LINE, TY_CHAR)
+            call sprintf (Memc[errmsg], SZ_LINE, "Extension %s[%d] is not FITS.")
+                call pargstr(MEF_FNAME(mef))
+                call pargi(MEF_CGROUP(mef))
+            call error (13, Memc[errmsg])
+#            iferr (call error (13, Memc[errmsg])) {
+#                call sfree (sp)
+#                call erract (EA_ERROR)
+#            }
+	} else {
+	    call mef_gvalt (hbuf[k], MEF_EXTTYPE(mef), MEF_SZVALSTR)
+	    if (strncmp (hbuf[k], "SIMPLE  ", 8) == 0)
+	        call strcpy (MEF_FNAME(mef), MEF_EXTTYPE(mef), MEF_SZVALSTR)
+	}
+	k = k + LEN_CARDNL
+
+	MEF_PCOUNT(mef) = 0
+
+	for (i=2; i< 37; i=i+1) {
+           switch (mef_kctype(hbuf[k], index)) {
+	   case NAXIS:
+	      MEF_NDIM(mef) = index
+	   case NAXISN:
+	      call mef_gvali (hbuf[k], MEF_NAXIS(mef,index))
+	   case BITPIX:
+	      call mef_gvali (hbuf[k], MEF_BITPIX(mef))
+	   case EXTNAME:
+	      call mef_gvalt (hbuf[k], MEF_EXTNAME(mef), MEF_SZVALSTR)
+	   case EXTVER:
+	      call mef_gvali (hbuf[k], MEF_EXTVER(mef))
+	   case PCOUNT:
+	      call mef_gvali (hbuf[k], MEF_PCOUNT(mef))
+	   case OBJECT:
+	      call mef_gvalt (hbuf[k], MEF_OBJECT(mef), MEF_SZVALSTR)
+	   case END:
+	      MEF_HSIZE(mef) = i*LEN_CARDNL
+              return(true)	
+	      break
+	   default:
+	      ;
+	   }
+	   k = k + LEN_CARDNL
+	}
+	return(false)
+	    
+end
+
+
+# MEF_RDBLK -- Read one header FITS block from disk and add a newline 
+# after each fits record (80 chars).
+
+procedure mef_rdblk (in, spp_buf)
+
+int	in		#I File descriptor
+char    spp_buf[ARB]	#O Buffer with header
+
+char    ibuf[FITS_BLKSZ_CHAR]
+int     nchar, i, read(), k, j
+char    line[LEN_CARD]
+
+begin
+	nchar = read (in, ibuf, FITS_BLKSZ_CHAR)
+	if (nchar == EOF) 
+	   call error(13, "EOF encountered")
+
+	# Unpack the input buffer to spp char with new_line delimited records.
+	line[LEN_CARDNL] = '\n'
+	k = 1
+	j = 1
+	for (i=1; i<37; i=i+1) {
+   	   call achtbc(ibuf[k], line, LEN_CARD)
+	   call amovc (line, spp_buf[j], LEN_CARDNL)
+	   k = k + 40		
+	   j = j + LEN_CARDNL
+	}
+end	 
+
+
+# MEF_CMP_EXTNV -- Compare the EXTNAME and EXTVER header values with the
+#		  ones passed as arguments. Return false if matched.
+
+bool procedure mef_cmp_extnv (mef, extname, extver)
+pointer	mef
+char	extname[ARB] 	#I extname value
+int	extver		#I extver value
+
+int	mef_strcmp_lwr()
+bool	bxtn, bxtv, bval, bxtn_eq, bxtv_eq
+
+begin
+	bxtn = extname[1] != EOS
+	bxtv = extver != INDEFL
+
+	if (bxtn)
+	    bxtn_eq = (mef_strcmp_lwr(MEF_EXTNAME(mef), extname) == 0)
+	if (bxtv)
+	    bxtv_eq = (MEF_EXTVER(mef) == extver)
+	
+	if (bxtn && bxtv)
+	    # Both EXTNAME and EXTVER are defined.
+	    bval = bxtn_eq && bxtv_eq
+	else if (bxtn && !bxtv)
+	    # Only EXTNAME is defined.
+	    bval = bxtn_eq
+	else if (!bxtn && bxtv)
+	    # Only EXTVER is defined.
+	    bval = bxtv_eq 
+	else
+	    bval = false
+
+	return (!bval)
+end
+
+# MEF_SKIP_DATA_UNIT -- Skip data unit. The file is already position at the
+# end of the last header block.
+
+procedure mef_skip_data_unit (mef)
+
+pointer	mef	#I Input mef descriptor
+
+int	in, ndim, off, note(), mef_totpix()
+errchk  seek
+
+begin
+	# See if data portion has already been skipped.
+	if (MEF_SKDATA(mef) == YES)
+	    return
+
+	in = MEF_FD(mef)
+	ndim = MEF_NDIM (mef)
+        if (ndim > 0 || MEF_PCOUNT(mef) > 0) {
+	   # Skip to the beginning of next extension
+	   off = note(in)
+	   if (off == EOF)
+	      return
+	   off = off + mef_totpix(mef)
+	   call seek (in, off)
+	}
+end
+
+
+# MEF_TOTPIX -- Returns the number of pixels in the data area in units
+#		of chars.
+
+int procedure mef_totpix (mef)
+
+pointer	mef		#I Mef descriptor
+
+int	ndim, totpix, i, bitpix
+
+begin
+	ndim = MEF_NDIM (mef)
+	if (ndim == 0 && MEF_PCOUNT(mef) <= 0)
+	    return (0)
+
+	if (ndim == 0)
+	    totpix = 0
+	else {
+	    totpix = MEF_NAXIS(mef,1) 
+	    do i = 2, ndim
+		  totpix = totpix *  MEF_NAXIS(mef,i)
+	}
+	bitpix = abs(MEF_BITPIX(mef))
+
+	# If PCOUNT is not zero, add it to totpix
+	totpix = MEF_PCOUNT(mef) + totpix
+
+	if (bitpix <= NBITS_BYTE)
+	    totpix = (totpix + 1) / SZB_CHAR
+	else
+	    totpix = totpix * (bitpix / (SZB_CHAR * NBITS_BYTE))
+
+	# Set the number of characters in multiple of 1440.
+	totpix = ((totpix + 1439)/1440) * 1440
+	return (totpix)
+end
+
+
+# MEF_RD2END --  Read from block 2 to the end.
+
+procedure mef_rd2end (mef, read_next_group)
+
+pointer	mef			#I mef descriptor	
+bool	read_next_group		#I if true, read current header to END
+
+char	hbuf[FITS_BLKSZ_NL] 
+int	in, k,i, nblks, strncmp(), size_last_block, hoffset
+errchk  mef_rdblk
+
+begin
+	in = MEF_FD(mef)
+	# We need to read the header only.
+        if (read_next_group)
+	   repeat {
+	      k = 1
+	      call mef_rdblk (in, hbuf)
+	      for (i=1; i<37; i=i+1) {
+	          if (strncmp (hbuf[k], "END     " , 8) == 0)
+		     return
+	          else
+		     k = k + LEN_CARDNL
+	      }
+	   }
+	   
+
+	# This is the requested header, copy to user area.
+	nblks = 2
+	repeat {
+	   k = 1
+	   call mef_rdblk (in, hbuf)
+	   # Copy the buffer into the user area.
+	   for (i=1; i<37; i=i+1) {
+	       if (strncmp (hbuf[k], "END     " , 8) == 0) {
+                  size_last_block = i*LEN_CARDNL
+	          call realloc (MEF_HDRP(mef), FITS_BLKSZ_NL*nblks+1, TY_CHAR)
+	          hoffset = MEF_HDRP(mef)+FITS_BLKSZ_NL*(nblks-1)
+		  call amovc (hbuf, Memc[hoffset], size_last_block)
+		  Memc[hoffset+size_last_block] = EOS
+		  MEF_HSIZE(mef) = (nblks-1)*FITS_BLKSZ_NL + size_last_block
+		  return
+	       } else
+		  k = k + LEN_CARDNL
+	   }
+	   call realloc (MEF_HDRP(mef), FITS_BLKSZ_NL*nblks, TY_CHAR)
+	   hoffset = MEF_HDRP(mef)+FITS_BLKSZ_NL*(nblks-1)
+	   call amovc (hbuf, Memc[hoffset], FITS_BLKSZ_NL)
+	   nblks = nblks + 1
+	}
+end
+
+
+# MEF_STRCMP_LWR -- Compare 2 strings in lower case
+
+int procedure mef_strcmp_lwr (s1, s2)
+
+char s1[ARB], s2[ARB]
+
+pointer sp, l1, l2
+int	strcmp(), istat
+
+begin
+	call smark(sp)
+	call salloc (l1, SZ_FNAME, TY_CHAR)
+	call salloc (l2, SZ_FNAME, TY_CHAR)
+
+	call strcpy (s1, Memc[l1], SZ_FNAME)
+	call strcpy (s2, Memc[l2], SZ_FNAME)
+	call strlwr(Memc[l1])
+	call strlwr(Memc[l2])
+	istat = strcmp (Memc[l1], Memc[l2])
+
+	call sfree(sp)
+	return (istat)
+end
+
+
+# MEF_KCTYPE -- Find the type of card that is based on the keyword name.
+
+int procedure mef_kctype (card, index)
+
+char	card[ARB]	#I FITS card
+int	index		#O index value
+
+int	strncmp()
+
+begin
+	if (strncmp (card, "SIMPLE  ", 8) == 0)
+	   return (SIMPLE)
+	if (strncmp (card, "NAXIS", 5) == 0) {
+	   if (card[6] == ' ') {
+	      call mef_gvali (card, index)
+	      return (NAXIS)
+    	   } else  if (IS_DIGIT(card[6])) {
+	       index = TO_INTEG(card[6])
+	       return (NAXISN)                      # NAXISn
+     	   }
+	}
+	if (strncmp (card, "BITPIX  ", 8) == 0)
+	   return (BITPIX)
+	if (strncmp (card, "EXTNAME ", 8) == 0)
+	   return (EXTNAME)
+	if (strncmp (card, "EXTVER  ", 8) == 0)
+	   return (EXTVER)
+	if (strncmp (card, "EXTEND  ", 8) == 0)
+	   return (EXTEND)
+	if (strncmp (card, "PCOUNT  ", 8) == 0)
+	   return (PCOUNT)
+	if (strncmp (card, "FILENAME", 8) == 0)
+	   return (FILENAME)
+	if (strncmp (card, "INHERIT ", 8) == 0)
+	   return (INHERIT)
+	if (strncmp (card, "GCOUNT  ", 8) == 0)
+	   return (GCOUNT)
+	if (strncmp (card, "OBJECT  ", 8) == 0)
+	   return (OBJECT)
+	if (strncmp (card, "XTENSION", 8) == 0)
+	   return (XTENSION)
+	if (strncmp (card, "END     ", 8) == 0)
+	   return (END)
+
+        return(ERR)
+end
+
+
+# MEF_RDHDR_GN -- Read group based on group number
+
+procedure mef_rdhdr_gn (mef,gn)
+
+pointer	mef 		#I mef descriptor
+int	gn		#I group number to read
+
+char	extname[MEF_SZVALSTR]
+int	extver
+
+errchk  mef_rdhdr
+
+begin
+	extname[1] =EOS
+	extver=INDEFL
+	call mef_rdhdr (mef, gn, extname, extver)
+end
+
+
+# MEF_RDHDR_EXNV -- Read group based on the Extname and Extver values
+
+procedure mef_rdhdr_exnv (mef,extname, extver)
+
+pointer	mef		#I, mef descriptor
+char	extname[ARB]	#I, extname value
+int	extver		#I, extver value
+
+errchk  mef_rdhdr
+
+begin
+	call mef_rdhdr (mef, 0, extname, extver)
+end
+
+
+# MEF_CP_SPOOL -- 
+
+procedure mef_cp_spool (spool, mef)
+
+int	spool 		#I spool file descriptor
+pointer mef		#
+
+pointer	hdr, lbuf, sp
+int	fitslen, fstatl, user
+int	stropen(), getline()
+
+begin
+	call smark (sp)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+
+	call seek (spool, BOFL)
+	fitslen = fstatl (spool, F_FILESIZE)
+	fitslen = max (fitslen, MEF_HSIZE(mef))
+	call malloc (hdr, fitslen, TY_CHAR)
+	user = stropen (Memc[hdr], fitslen, NEW_FILE)
+
+	# Append the saved FITS cards to saved cache.
+	while (getline (spool, Memc[lbuf]) != EOF)
+	    call putline (user, Memc[lbuf])
+
+	call close (user)
+	call close (spool)
+
+	MEF_HDRP(mef) = hdr
+
+	call sfree(sp)
+end

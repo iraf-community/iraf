@@ -1,0 +1,304 @@
+.help apflatten Sep96 noao.twodspec.apextract
+.ih
+NAME
+apflatten -- Create flat fields for fiber or narrow aperture spectra
+.ih
+USAGE
+apflatten input output
+.ih
+PARAMETERS
+.ls input
+List of input flat field observations.
+.le
+.ls output = ""
+List of output flat field images.  If no output name is given then the
+input name is used as a root with the extension ".flat".
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and flatten.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing and trace
+fitting are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls flatten = yes
+Remove the profile shape and flat field spectrum leaving only
+sensitivity variations?
+.le
+.ls fitspec = yes
+Fit normalization spectrum interactively?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+
+.ls line = INDEF, nsum = 1
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, recentering, resizing,
+and editing operations.  For tracing this is the starting line and
+the same number of lines are summed at each tracing point.  A line of
+INDEF selects the middle of the image along the dispersion axis.
+A positive nsum sums the lines and a negative value takes the median.
+However, for tracing only sums are allowed and the absolute value
+is used.
+.le
+.ls threshold = 10.
+Division threshold.  If a pixel in the two dimensional normalization spectrum
+is less than this value then a flat field value of 1 is output.
+.le
+
+The following parameters control the profile and spectrum fitting.
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level.  During variance weighted extractions
+wavelength points having any pixels above this value are excluded from the
+profile determination.
+.le
+.ls readnoise = 0.
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = 1
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 3., usigma = 3.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+
+The following parameters are used to fit the normalization spectrum using
+the ICFIT routine.
+.ls function = "legendre"
+Fitting function for the normalization spectra.  The choices are "legendre"
+polynomial, "chebyshev" polynomial, linear spline ("spline1"), and
+cubic spline ("spline3").
+.le
+.ls order = 1
+Number of polynomial terms or number of spline pieces for the fitting function.
+.le
+.ls sample = "*"
+Sample regions for fitting points.  Intervals are separated by "," and an
+interval may be one point or a range separated by ":".
+.le
+.ls naverage = 1
+Number of points within a sample interval to be subaveraged or submedianed to
+form fitting points.  Positive values are for averages and negative points
+for medians.
+.le
+.ls niterate = 0
+Number of sigma clipping rejection iterations.
+.le
+.ls low_reject = 3. , high_reject = 3.
+Lower and upper sigma clipping rejection threshold in units of sigma determined
+from the RMS sigma of the data to the fit.
+.le
+.ls grow = 0.
+Growing radius for rejected points (in pixels).  That is, any rejected point
+also rejects other points within this distance of the rejected point.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+.ih
+DESCRIPTION
+It is sometimes the case that it is undesirable to simply divide
+two dimensional format spectra taken through fibers, aperture masks
+with small apertures such as holes and slitlets, or small slits in
+echelle formats by a flat field observation of a lamp.  This is due
+to the sharp dropoff of the flat field and object profiles and
+absence of signal outside of the profile.  Slight shifts or changes
+in profile shape introduce bad edge effects, unsightly "grass" is
+produced where there is no signal (which may also confuse extraction
+programs), and the division will also remove the characteristic
+profile of the object which might be needed for tracking the
+statistical significance, variance weighted extraction, and more.
+A straight flat field division also has the problem of changing the
+shape of the spectrum in wavelength, again compromising the
+poisson statistics and artificially boosting low signal regions.
+
+There are three approaches to consider.  First, the
+flat field correction can be done after extraction to one dimension.
+This is valid provided the flat field and object profiles don't shift
+much.  However, for extractions that depend on a smooth profile,
+such as the variance weighting algorithms of this package, the sensitivity
+corrections must remain small; i.e. no large fringes or other
+small scale variations that greatly perturb the true photon profile.
+The second approach is to divide out the overall spectral shape of
+the flat field spectrum, fill regions outside of the signal with
+one and leave the profile shape intact.  This will still cause profile
+division problems described earlier but is mentioned here since it
+implemented in a related task called \fBapnormalize\fR.  The last
+approach is to model both the profile and overall spectrum shape and
+remove it from the flat field leaving only the sensitivity variations.
+This is what the task \fBapflatten\fR does.
+
+The two dimensional flat field spectra within the defined apertures of
+the input images are fit by a model having the profile of the data and
+a smooth spectral shape.  This model is then divided into the flat
+field image within the aperture, replacing points of low signal, set
+with the \fIthreshold\fR parameter, within the aperture and all points
+outside the aperture by one to produce an output sensitivity variation
+only flat field image.
+
+A two dimensional normalized profile is computed by dividing the data
+within the aperture by the one dimensional spectrum and smoothing with
+low order function fits parallel to the dispersion axis if the aperture
+is well aligned with the axis or parallel to the traced aperture center
+if the trace is tilted relative to the dispersion axis.  The smooth
+profile is then used to improve the spectrum estimate using variance
+weighting and to eliminate deviant or cosmic ray pixels by sigma
+tests.  The profile algorithm is described in detail in
+\fBapprofiles\fR and the variance weighted spectrum is described in
+\fBapvariance\fR.
+
+The process of determining the profile and variance weighted spectrum,
+and hence the two dimensional spectrum model, is identical to that used
+for variance weighted extraction of the one dimensional spectra in the
+tasks \fBapall\fR or \fBapsum\fR and in making a two dimensional
+spectrum model in the task \fBapfit\fR.  Most of the parameters in
+this task are the same in those tasks and so further information about
+them may be found in their descriptions.  In fact, up to this point the
+task is the same as \fBapfit\fR and, if the flat field were normalized
+by this model it would produce the "ratio" output of that task.
+
+This task deviates from \fBapfit\fR in that the final variance weighted
+one dimensional spectrum of the flat field is subjected to a smoothing
+operation.  This is done by fitting a function to the spectrum using
+the \fBicfit\fR routine.  This may be done interactively or
+noninteractively depending on the \fBinteractive\fR parameter.  The
+default fitting parameters are part of this task.  The goal of the
+fitting is to follow the general spectral shape of the flat field light
+(usually a lamp) but not the small bumps and wiggles which are the one
+dimensional projection of sensitivity variations.  When the fitted
+function is multiplied into the normalize profile and then the two
+dimensional model divided into the data the sensitivity variations not
+part of the fitted spectrum are what is left in the final output flat
+field.
+
+The remainder of this description covers the basic steps defining the
+apertures to be used.  These steps and parameter are much the same as
+in any of the other \fBapextract\fR tasks.
+
+Aperture definitions may be inherited from those of other images by
+specifying a reference image with the \fBreferences\fR parameter.
+Images in the reference list are matched with those in the input list
+in order.  If the reference image list is shorter than the number of
+input images, the last reference image is used for all remaining input
+images.  Thus, a single reference image may be given for all the input
+images or different reference images may be given for each input
+image.  The special reference name "last" may be used to select the
+last set apertures used in any of the \fBapextract\fR tasks.
+
+If an aperture reference image is not specified or no apertures are
+found for the specified reference image, previously defined apertures
+for the input image are sought in the aperture database.  Note that
+reference apertures supersede apertures for the input image.  If no
+apertures are defined they may be created automatically, the \fIfind\fR
+option, or interactively in the aperture editor, if the
+\fIinteractive\fR and \fIedit\fR options are set.
+
+The functions performed by the task are selected by a set of flag
+parameters.  The functions are an automatic spectrum finding and
+aperture defining algorithm (see \fBapfind\fR) which is ignored if
+apertures are already defined, automatic recentering and resizing
+algorithms (see \fBaprecenter\fR and \fBapresize\fR), an interactive
+aperture editing function (see \fBapedit\fR), a spectrum position tracing
+and trace function fit (see \fBaptrace\fR), and the main function of
+this task, the flat field profile and spectral shape modeling and removal.
+
+Each function selection will produce a query for each input spectrum if
+the \fIinteractive\fR parameter is set.  The queries are answered by
+"yes", "no", "YES", or "NO", where the upper case responses suppress
+the query for following images.  There are other queries associated
+with tracing which first ask whether the operation is to be done
+interactively and, if yes, lead to queries for each aperture.  If the
+\fIinteractive\fR parameter is not set then aperture editing
+interactive trace fitting, and interactive spectrum shape fitting are ignored.
+.ih
+REVISIONS
+.ls APFLATTEN V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+EXAMPLES
+1.  To make a two dimensional flat field from a lamp observation:
+
+.nf
+	cl> apflatten fiber1 flat read=3 gain=1 back=fit
+	Yes find
+	No resize
+	No edit
+	Yes trace
+	Yes trace interactively
+	NO
+	Yes flatten
+	Yes fit interactively
+.fi
+.ih
+SEE ALSO
+apbackground, approfile, apvariance, apfit, icfit,
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apsum
+.endhelp

@@ -1,0 +1,220 @@
+.help revisions Jun88 noao.imred.generic
+.nf
+
+generic$generic.cl
+generic$generic.men
+generic$cosmicrays.par	-
+    Removed the cosmicrays task which is now in crutil.  (6/12/02, Valdes)
+
+=====
+V2.12
+=====
+
+generic$mkpkg
+    Added missing <error.h> dependency for flat1d.x  (12/13/01, MJF)
+
+generic$normalize.cl
+generic$normalize.par	-
+    Rewrote as modern cl procedure script with possiblity to extend to
+    MEF extensions.  (5/13/99, Valdes)
+
+generic$flatten.cl
+generic$normalize.cl
+    Changed use of FILES for image list expansion to SECTIONS.
+    (5/13/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+generic$normalize.cl
+generic$normflat.cl
+    Added CCDMEAN = 1 to final image header.  (4/16/93, Valdes)
+
+generic$flat1d.x
+generic$doc/flat1d.hlp
+    CCDMEAN is set to 1.  (3/15/93, Valdes)
+
+=======
+V2.10.2
+=======
+=======
+V2.10.1
+=======
+=======
+V2.10.0
+=======
+=====
+V2.10
+=====
+generic$flatten.par
+    Changed the default values of the keeplog and logfile parameters from
+    ")_.keeplog" and ")_.logfile" to ")generic.keeplog" and ")generic.logfile" 
+    respectively. This change avoids a parameter redirection in the irred
+    package. (8/26/91 LED)
+
+generic$darksub.cl
+    Included all parameters in IMARITH calls due to complaint about title
+    being changed.  (12/9/91)
+
+====
+V2.9
+====
+
+generic$normalize.cl
+generic$normflat.cl
+generic$normalize.par
+generic$normflat.par
+    Modified use of IMSTATISTICS for additional fields parameter.  If the
+    user redefined the defaults for IMSTAT then NORMALIZE and NORMFLAT
+    will fail.  (11/30/89, Valdes)
+
+generic$flatten.par
+generic$normalize.par
+generic$normflat.par
+    Change parameter reference from )generic. to )_. to allow defining
+    tasks in other packages.
+
+generic$darksub.cl
+    The last change caused the nscan to have the wrong value causing an
+    improper error (exposure time for ... not found).  The value of nscan()
+    is now saved before scanning the output list which must be done before
+    any error breaks to avoid out of sync lists.  (7/1/88 Valdes)
+
+generic$darksub.cl
+    The fscan on the output list must immediately follow the fscan on the
+    input list to prevent the lists getting out of sync.  (2/4/88 Valdes)
+
+generic$cosmicrays.par	+
+generic$generic.cl
+generic$generic.men
+    Added link to COSMICRAY program in CCDRED. (12/11/87 Valdes)
+
+====
+V2.5
+====
+
+====
+V2.3
+====
+
+generic$flat1d.x:  Valdes, July 3, 1986
+    1.  FLAT1D modified to use new ICFIT package.
+
+=========================================
+STScI Pre-release and 1st SUN 2.3 Release
+=========================================
+
+generic$darksub.cl:  Valdes, April 8, 1986
+    1.  DARKSUB rewritten to use exposure times from the image headers and
+	to allow input and output images.
+
+===========
+Release 2.2
+===========
+
+From Valdes Feb 12, 1986:
+
+1.  The GENERIC package script was inadvertently defining CMDSTR which
+was moved to the SYSTEM package.  This caused MKSCRIPT to fail if
+and only if GENERIC was loaded.  This has now been fixed.
+------
+From Valdes Feb 10, 1986:
+
+1.  The scripts DARKSUB, NORMFLAT, and NORMALIZE have been changed so
+that calls to IMCOPY have VERBOSE=NO when dealing with temporary images.
+Previously, output from imcopy was being printed but, of course, the
+temporary image filenames were meaningless to the user.
+------
+From Valdes Nov 7, 1985:
+
+1.  The generally useful task MKSCRIPT has been moved to the system
+package.
+------
+From Valdes Nov 1, 1985:
+
+1.  A general image reduction tool for creating command scripts has
+been added.  The task is called MKSCRIPT.  See the help page for
+this task.  An improved version of this task may eventually replace
+MKSCRIPT as a system task.  (As a technical detail a hidden task CMDSTR
+used by MKSCRIPT has also been added)
+------
+From Valdes Oct 17, 1985:
+
+1.  Flat1d and background now allow averaging of image lines or columns
+when interactively setting the fitting parameters.  The syntax is
+"Fit line = 10 30"; i.e.  blank separated line or column numbers.  A
+single number selects just one line or column.  Be aware however, that
+the actual fitting of the image is still done on each column or line
+individually.
+
+2.  The zero line in the interactive curve fitting graphs has been removed.
+This zero line interfered with fitting data near zero.
+------
+From Valdes Oct 4, 1985:
+
+1.  Flat1d and background modified to allow lower and upper rejection
+limits and rejection iteration.  This means the parameter file has changed.
+------
+From Valdes Oct 1, 1985:
+
+1.  Task revisions renamed to revs.
+-----
+From Valdes on August 26, 1985:
+
+1.  Flat1d was modified to eliminate fitting of lines or columns in which
+all the data is below minflat.  Also if all the data is greater than minflat
+then the ratio is computed without checking each data point which is more
+efficient (particularly with the vector operators).  Thus, flat1d should
+be somewhat faster; particularly for applications like multi-slits where
+many parts of the data are less than minflat.
+
+------
+From Valdes on August 7, 1985:
+
+1.  Flat1d and background have new parameters to select the graphics
+output device and the graphics cursor input.
+
+2.  Flat1d and background (fit1d) have been recompiled to use the "improved"
+icfit and gtools packages.
+
+------
+From Valdes on July 26, 1985:
+
+1.  Help page available for flat1d.
+
+2.  Background has been modified to use new fit1d task.  It now does
+column backgrounds without transposes and allows image sections.
+
+------
+From Valdes on July 25, 1985:
+
+1.  A new task called flat1d replaces lineflat and colflat.  It is
+essentially the same as lineflat except for an extra parameter "axis"
+which selects the axis along which the 1D functions are to be fit.
+Axis 1 is lines and axis 2 is columns.  The advantages of this change are:
+
+	a.  Column fitting is done without transposing the image.
+	b.  The colflat script using image transpositions would not
+	    work the same as lineflat when used with sections.  Now
+	    it is possible to mosaic several flat fields as need with
+	    multiple slits or apertures.
+	c.  Because no transpose is needed and it is not a script
+	    flat1d should work faster than colflat.
+	d.  The prompts for interactive fitting are now correct when
+	    doing column fits.
+
+------
+From Valdes on July 23, 1985:
+
+1.  The task revisions has been added to page revisions to the generic
+package.  The intent is that each package will have a revisions task.
+Note that this means there may be multiple tasks named revisions loaded
+at one time.  Typing revisions alone will give the revisions for the
+current package.  To get the system revisions type system.revisions.
+
+2.  The tasks linebckgrnd and colbckgrnd have been combined into one
+task with the extra hidden parameter "axis".  With axis=1 the task
+is the same as linebckgrnd and with axis=2 the task is the same as
+colbckgrnd.
+.endhelp

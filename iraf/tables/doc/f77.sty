@@ -1,0 +1,276 @@
+% F77.STY -- LaTeX substyle parameters for F77/VOS interface description
+
+% Hacked from SDAS Greenbook SDASIO.STY - 7/21/87, CB
+
+% Redefine section headings
+
+\if@twoside
+\def\ps@headings{\let\@mkboth\markboth
+\def\@oddfoot{}\def\@evenfoot{}
+\def\@evenhead{\rm \thepage\hfil \sl \leftmark}
+\def\@oddhead{\hbox{}\sl \rightmark \hfil \rm\thepage}
+\def\sectionmark##1{\markboth{F77/VOS Interface Description}{##1}}
+\def\subsectionmark##1{\markboth{F77/VOS Interface Description}{##1}}}
+\else
+\def\ps@headings{\let\@mkboth\markboth
+\def\@oddfoot{}\def\@evenfoot{}
+\def\@oddhead{\hbox {}\sl \rightmark \hfil \rm\thepage}
+\def\sectionmark##1{\markright{F77/VOS Interface Description}}}
+\fi
+
+% Add \typeout to section headings
+
+\def\@sect#1#2#3#4#5#6[#7]#8{\typeout{#8}\ifnum #2>\c@secnumdepth
+     \def\@svsec{}\else 
+     \refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname\hskip 1em }\fi
+     \@tempskipa #5\relax
+      \ifdim \@tempskipa>\z@ 
+        \begingroup #6\relax
+          \@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M #8\par}
+        \endgroup
+       \csname #1mark\endcsname{#7}\addcontentsline
+         {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                      \protect\numberline{\csname the#1\endcsname}\fi
+                    #7}\else
+        \def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+                      {#7}\addcontentsline
+                           {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                             \protect\numberline{\csname the#1\endcsname}\fi
+                       #7}}\fi
+     \@xsect{#5}}
+
+% Editorial comments for STScI eyes only (local drafts)
+
+\def\edcomment#1{\ifstsci\marginpar{\raggedright\sl #1\/}\else\relax\fi}
+\marginparwidth .75in
+\marginparsep .125in
+\marginparpush .25in
+
+% The macros that are used to format the calling sequence details for each
+% support subroutine description have the capability to write out a VMS
+% command procedure that will generate VMS help text for the calling
+% sequences.  The calling sequences for which information is written out
+% in VMS-usable format is determined by placing those subroutine descriptions
+% within an \opensupporthlp -- \closesupporthlp pair.
+
+\def\opensupporthlp{\if@filesw \immediate\newwrite\tf@hlp
+	\immediate\openout\tf@hlp=\jobname hlp.com
+	\@writefile{hlp}{open/write hlpfile \jobname .hlp} \fi}
+
+\def\closesupporthlp{\@writefile{hlp}{close hlpfile}
+	\@writefile{hlp}{$ library/help/replace/log \jobname.hlb \jobname.hlp}
+	\@writefile{hlp}{$ help/nolibl/out=\jobname.help/libr=\jobname helpdir:\jobname.hlb *}
+	\if@filesw \immediate\closeout\tf@hlp \fi}
+
+% Subroutine descriptions are contained in separate little subsections.  Each
+% of these is started with a \subroutine declaration (Oh, my !  It's almost
+% like Fortran !) that does some initialization and writes some stuff in the
+% LaTeX index, supporthlp, and subroutine index files.
+%
+% \subroutine{CNAME}{PNAME}
+%
+%	CNAME is the compiler name.  For F77/VOS, this is the 6 character name.
+%	PNAME is the PDL name.  This should be some short, descriptive name
+%	      that is essentially the natural language expansion of CNAME.
+
+\newif\iffirstcsparm
+
+\long\def\subroutine#1#2{\par\gdef\subrname{#1}\index{#1}\firstcsparmtrue
+	\@writefile{hlp}{write hlpfile 2," #1"}
+	\@writefile{hlp}{write hlpfile "#2"}
+	\@writefile{hlp}{write hlpfile ""}
+	\if@filesw \immediate\write\@auxout{\string\@writefile{srx}
+		{\string\string\string\srxline{#1}{#2}{\thepage}}} \fi
+	\addvspace{4ex}
+	\mbox{\normalsize\bf\fbox{\uppercase{#1}} \hspace{1.4em} #2}
+	\vspace*{2ex}}
+
+% The calling sequence parameters for the subroutine are defined in the
+% callseq environment.  The environment prepares a calling sequence parameters
+% table, and puts together the list of calling sequence arguments as they
+% would appear in an actual call in code.  Note that the callseq environment
+% only buffers these things; they must actually be placed on the page with
+% other commands, but this is actually nice because you can put them where you
+% want them.
+%
+% The format of the calling sequence parm table is defined in the \@cstabfmt
+% declaration.  Note that the table is a modified LaTeX \tabular with no
+% arguments (the modified commands are \@tabular, \@endtabular, \@array,
+% and \@arrayrule).
+
+\newenvironment{callseq}{\def\@halignto{}\def\@cstabfmt{lclp{3.75in}}
+	\@cstabular}{\@endcstabular}
+
+% Calling sequence items are defined with the \callseqitem macro.  Each
+% parameter has four things that describe it.
+%
+% \callseqitem{NAME}{TYPE}{I/O}{DESCRIPTION}
+%
+%	NAME          The name of the calling sequence parameter
+%	TYPE          The data type of the argument
+%	I/O           Indicator that parm is used for input (I) or output (O)
+%	DESCRIPTION   Short description of parameter
+%
+% The \callseqitem macro places these four items in the calling sequence
+% parameters description table, appends the NAME to a buffer containing
+% the calling sequence, and writes the info to the command procedure for
+% later formatting as VMS help.
+%
+% The number of parameters added to the calling sequence table by this macro
+% must agree with the format template defined by \@cstabfmt.
+%
+% Note that the calling sequence and the parm description table are assembled
+% and placed in boxes for later use.  The callseq environment does not add
+% this stuff to the vertical page list.
+
+\def\callseqitem#1#2#3#4{\tt #1&\footnotesize\uppercase{#3}&#2&#4\@arstrut\\
+	\noalign{\iffirstcsparm \gdef\callseqparm{#1}
+	\global\firstcsparmfalse
+	\else \xdef\callseqparm{\callseqparm, #1}
+	\fi
+	\@writefile{hlp}{write hlpfile f$fao("!9AS   !9AS  !3AS  !AS","#1","#2","#3","#4")}}}
+
+\newsavebox{\@callseqtab}
+
+\def\@cstabular{\leavevmode \global\sbox{\@callseqtab}
+   \bgroup $\let\end\@endcstabular%$ MATCHING
+   \let\@acol\@tabacol \let\@classz\@tabclassz
+   \let\@classiv\@tabclassiv \let\\\@tabularcr\@cstabarray}
+
+\def\@endcstabular#1{\crcr\egroup\egroup $\egroup %$ MATCHING
+      \@checkend{#1}\endgroup}
+
+\def\@cstabarray{\setbox\@arstrutbox=\hbox{\vrule 
+     height\arraystretch \ht\strutbox
+     depth\arraystretch \dp\strutbox
+     width\z@}\@mkpream{\@cstabfmt}\edef\@preamble{\halign \noexpand\@halignto
+\bgroup \tabskip\z@ \@arstrut \@preamble \tabskip\z@ \cr}%
+\let\@startpbox\@@startpbox \let\@endpbox\@@endpbox
+  \vcenter
+  \bgroup \let\par\relax
+  \tabcolsep 9pt
+  \let\@sharp##\let\protect\relax \lineskip\z@\baselineskip\z@\@preamble}
+
+\def\@csarrayrule{\hskip -.5\arrayrulewidth 
+   \vrule \@width \arrayrulewidth\hskip -.5\arrayrulewidth}
+
+% The calling sequence and the argument description table are added to the
+% vertical page list with the \callseqtable command.  It also writes out the
+% calling sequence to a file called \jobname.CSL so that all the calling
+% sequences can be collected in one place in the document.
+
+\newif\ifcsl
+\def\makecallseqlist{\csltrue}
+
+\def\callseqlist{\section{F77/VOS Calling Sequences}
+	\begin{flushleft}\tt\ttraggedright
+	\@input{\jobname.csl}
+	\end{flushleft}
+	\ifcsl \if@filesw \immediate\newwrite\tf@csl
+		\immediate\openout\tf@csl=\jobname.csl \fi \fi}
+
+% Once the calling sequence has been defined in the callseq environment,
+% the calling sequence itself can be constructed
+
+\newsavebox{\@callseq}
+\newlength{\@callseqwidth}
+
+\long\def\callseqtable{\par\vskip 4ex plus.5ex minus1ex
+	\if@filesw \immediate\write\@auxout{\string\@writefile{csl}
+		{\subrname\space (\callseqparm)\string\string\string\\}}\fi
+	\sbox\@callseq{\tt \hskip 2em call \subrname\space (}
+	\setlength{\@callseqwidth}{\textwidth}
+	\addtolength{\@callseqwidth}{-\wd\@callseq}
+	\addtolength{\@callseqwidth}{-2em}
+	\usebox\@callseq
+	\parbox[t]{\@callseqwidth}{\tt\ttraggedright\callseqparm)}
+	\vskip 2ex plus.5ex minus .5ex
+	\makebox[\textwidth][c]{\usebox\@callseqtab}
+	\vskip 2ex plus.5ex minus .5ex}
+
+% This is identical to callseqtable except that it omits the word "call".
+
+\long\def\callseqfcn{\par\vskip 4ex plus.5ex minus1ex
+	\if@filesw \immediate\write\@auxout{\string\@writefile{csl}
+		{\subrname\space (\callseqparm)\string\string\string\\}}\fi
+	\sbox\@callseq{\tt \hskip 2em \subrname\space (}
+	\setlength{\@callseqwidth}{\textwidth}
+	\addtolength{\@callseqwidth}{-\wd\@callseq}
+	\addtolength{\@callseqwidth}{-2em}
+	\usebox\@callseq
+	\parbox[t]{\@callseqwidth}{\tt\ttraggedright\callseqparm)}
+	\vskip 2ex plus.5ex minus .5ex
+	\makebox[\textwidth][c]{\usebox\@callseqtab}
+	\vskip 2ex plus.5ex minus .5ex}
+
+% The \subroutine macro writes entries in the subroutine index file called
+% \jobname.SRX in such a way that they can be sorted (by a standard ASCII
+% file sorting program) after which they form an alphabetized subroutine
+% index.  The index is placed in the document with the \subroutineindex
+% command, which inputs the subroutine index file.  That file will contain
+% a bunch of \srxline commands; these format the lines.
+
+\newif\ifsrx
+\def\makesubroutineindex{\srxtrue}
+
+\def\subroutineindex{\section{Subroutine Index}
+	\begin{tabbing}
+	\hspace*{1.5in}\=\kill
+	\@input{\jobname.srx}
+	\end{tabbing}
+	\ifsrx \if@filesw \immediate\newwrite\tf@srx
+		\immediate\openout\tf@srx=\jobname.srx \fi \fi}
+
+\newdimen\@srxwidth
+\@srxwidth\textwidth
+\advance\@srxwidth by-1.5in
+
+\def\srxline#1#2#3{#1\>\hbox to\@srxwidth{#2 \dotfill #3}\\}
+
+% 25-JAN-1988  CB, Add some macros to do the symbolic parameter tables.
+%
+% I have to modify \@cstabular (which was a modified \@tabular to begin with)
+% because I don't want this stuff buffered.  It is supposed to be included
+% in the document as it is specified.  (The calling sequence was different
+% because I had to save the argument list to assemble the call statement.)
+% We also want a centered tabular, so we put it in a \@imakebox.
+
+\newenvironment{symparmtable}{\def\@halignto{}\def\@cstabfmt{llrp{3.25in}}
+	\@sptabular}{\@endsptabular}
+
+\def\@sptabular{\vskip 2ex plus .5ex minus .3ex
+   \@imakebox[\textwidth][c] \bgroup
+   $\let\end\@endcstabular%$ MATCHING
+   \let\@acol\@tabacol \let\@classz\@tabclassz
+   \let\@classiv\@tabclassiv \let\\\@tabularcr\@cstabarray}
+
+\def\@endsptabular#1{\crcr\egroup\egroup $\egroup %$ MATCHING
+      \@checkend{#1}\endgroup\vskip 2ex plus .5ex minus .3ex}
+
+% Each calling sequence argument is defined once in a \csargument, and then
+% all the relevant symbolic parameters for that argument are listed in a
+% number of \symparm statements.
+%
+% \csargument{NAME}
+%
+%	NAME	The name of the calling sequence argument
+%
+% \symparm{PNAME}{VALUE}{DESCR}
+%
+%	PNAME	The symbolic parameter name (the F77/VOS name)
+%	VALUE	The integer value of this parameter
+%	DESCR	Description of what this means
+
+\def\csargument#1{\noalign{\gdef\@csarg{#1}}}
+
+\def\symparm#1#2#3{\tt\@csarg&\tt\uppercase{#1}&#2&#3\@arstrut\\
+	\noalign{\gdef\@csarg{\null}}}
+
+% The GIO parms that can be queried and set must have some indication of the
+% data type of the actual parm so that the correct routine can be used.  This
+% is done by adding the data type flush right in the description column.  The
+% data type is indicated with a single letter.
+
+\def\gptyp#1{\hspace{\fill}\ifx#1i\emphasize{integer}\else
+	\ifx#1b\emphasize{y/n integer}\else
+	\emphasize{real}\fi\fi}

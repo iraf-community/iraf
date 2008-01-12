@@ -1,0 +1,29 @@
+.help mxv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slMXV (RM, VA, VB)
+
+     - - - -
+      M X V
+     - - - -
+
+  Performs the 3-D forward unitary transformation:
+
+     vector VB = matrix RM * vector VA
+
+  (single precision)
+
+  Given:
+     RM       real(3,3)    matrix
+     VA       real(3)      vector
+
+  Returned:
+     VB       real(3)      result vector
+
+  P.T.Wallace   Starlink   March 1986
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,7 @@
+# Mkpkg special file list for SUN/IRAF, Sun-4.
+
+$set	XNO	= '& "$xc -cq -/$(MACH) -p tables &"'
+$set	XOSF	= '& "$xc -c -/$(MACH) -p tables -/DOSF1 &"'
+
+# Files requiring special compilation due to host compiler bugs.
+

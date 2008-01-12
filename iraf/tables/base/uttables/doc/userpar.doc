@@ -1,0 +1,19 @@
+     This memo describes the characteristics of the I/O routines for user
+parameters ("header" parameters) for tables.  Please note that these have
+nothing to do with column descriptors or table info such as the number of
+rows.
+
+     Parameters are stored in a manner very similar to the FITS style:
+a keyword (up to eight characters, case-insensitive) followed by a value.
+Each parameter takes 80 bytes of storage in the table.  The data types
+supported are text string, Boolean, integer, real, and double precision.
+A parameter written as a text string may only be read as a text string,
+but a parameter written as Boolean or numeric may be read as any data type
+(true and false correspond to 1 and 0 respectively).  The data type of an
+existing parameter can be changed simply by rewriting the parameter.
+There are subroutines (uth... and tbh...) for getting or putting parameters
+using keywords, and there is a tbhgnp routine (get Nth parameter) for getting
+the keyword and value (as a text string) of a parameter by number.  If the
+keyword is blank or is "COMMENT" or "HISTORY" then the put-text routine will
+always add a new parameter rather than overwrite an existing one.  The
+get-text routine, however, will always retrieve the first such parameter.

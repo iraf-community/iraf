@@ -1,0 +1,7 @@
+# Parameter file for FLUXCALIB
+
+input,s,a,,,,Images to be flux calibrated
+output,s,a,,,,Flux calibrated images
+fluxfile,f,a,,,,Flux calibration file
+fnu,b,h,no,,,Flux in units of F-nu?
+exposure,s,h,otime,,,Exposure time keyword in image headers

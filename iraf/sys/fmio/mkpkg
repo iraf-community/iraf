@@ -1,0 +1,52 @@
+# Make the FMIO (file manager i/o) library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+zzdebug:
+zzdebug.e:
+	$omake	zzdebug.x <error.h> <ctype.h> fmset.h
+	$link	zzdebug.o
+	;
+
+libsys.a:
+	fmaccess.x	
+	fmclose.x	fmio.h <error.h> <knet.h>
+	fmcopy.x	fmset.h <error.h>
+	fmcopyo.x	fmio.h <mach.h>
+	fmdebug.x	fmio.h fmset.h
+	fmdelete.x	
+	fmfcache.x	fmio.h fmset.h <error.h> <fset.h>
+	fmfopen.x	
+	fmiobind.x	fmio.h <mach.h>
+	fmioerr.x	fmio.h
+	fmioextnd.x	fmio.h <mach.h>
+	fmiopost.x	fmio.h
+	fmiorhdr.x	fmio.h <knet.h> <mach.h>
+	fmiosbuf.x	fmio.h <config.h> <fio.h>
+	fmiotick.x	fmio.h
+	fmlfard.x	fmio.h <mach.h>
+	fmlfawr.x	fmio.h <mach.h>
+	fmlfawt.x	fmio.h <mach.h>
+	fmlfbrd.x	fmio.h <knet.h> <mach.h>
+	fmlfbwr.x	fmio.h <knet.h> <mach.h>
+	fmlfbwt.x	fmio.h <knet.h>
+	fmlfcls.x	fmio.h
+	fmlfcopy.x	fmio.h <mach.h>
+	fmlfdel.x	fmio.h
+	fmlfname.x	fmio.h <fmset.h>
+	fmlfopen.x	fmio.h
+	fmlfparse.x	<fmset.h>
+	fmlfstat.x	fmio.h <fmlfstat.h>
+	fmlfstt.x	fmio.h <config.h> <fio.h> <mach.h>
+	fmlfundel.x	fmio.h
+	fmnextlf.x	fmio.h
+	fmopen.x	fmio.h <error.h> <knet.h>
+	fmrebuild.x	
+	fmrename.x	
+	fmseti.x	fmio.h fmset.h
+	fmstati.x	fmio.h fmset.h
+	fmsync.x	fmio.h <knet.h> <mach.h>
+	;

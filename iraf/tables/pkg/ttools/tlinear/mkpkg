@@ -1,0 +1,11 @@
+# Update tlinear in the ttools package library.
+# Author: STOBIE, 15-FEB-1989
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tlinear.x     		<tbset.h> 
+	;

@@ -1,0 +1,57 @@
+.help goto Feb86 language
+.ih
+NAME
+goto -- branch to a label
+.ih
+USAGE
+.nf
+goto label
+  .
+  .
+  .
+label: statement
+
+.fi
+.ih
+PARAMETERS
+.ls label
+The destination label.  Label names have the same syntax as variable names
+and can duplicate the names of existing variables.
+.le
+.ls statement
+The statement executed after the goto statement.  It may be any executable
+statement.
+.le
+.ih
+DESCRIPTION
+The \fIgoto\fR statement interrupts the normal flow of program execution by
+transferring control to the statement following the label.  It may also be
+used to exit from nested loops where the break statement is not adequate.
+.ih
+EXAMPLES
+1. The most common use of the \fIgoto\fR statement is to branch to an error
+handler if an abnormal condition is detected.
+
+.nf
+begin
+	for (i=1;  i <= 100;  i += 1)
+	    for (j=1;  j <= 100;  j += 1)
+		for (k=1;  k <= 100;  k += 1)
+		    if (pixel[i,j,k] < 0)
+			goto err
+		    else
+			total += pixel[i,j,k]
+
+	print ("total = ", total)
+	return
+err:
+	print ("Invalid pixel value at ",i,j,k)
+end
+.fi
+.ih
+BUGS
+No checking is done to see if a jump is made into a loop.
+.ih
+SEE ALSO
+break, next
+.endhelp

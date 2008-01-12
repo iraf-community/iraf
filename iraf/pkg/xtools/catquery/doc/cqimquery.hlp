@@ -1,0 +1,44 @@
+.help cqimquery Mar00 "Catquery Package"
+.ih
+NAME
+cqimquery -- query the image survey and return the results
+.ih
+SYNOPSIS
+
+imres = cq_imquery (cq, imname)
+
+.nf
+pointer	cq		# the configuration file descriptor
+pointer	imname		# the name of the output image file
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls imname
+The name of the output image file. At the output image produced by an
+image survey query must be a single FITS image. The image name
+should include the suffix ".fits" in order to make the image
+visible to IRAF image i/o.
+.le
+.ih
+DESCRIPTION
+Cq_imquery queries the image survey, creates an output image file, and
+returns the survey results descriptor. Cq_imquery is a pointer function
+which returns the survey results descriptor as its function value.
+Null is returned if an error occurs in the survey query.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before any catalog or image
+survey query can be made.
+
+Cq_nqpars and either cq_gqpar or cq_gqparn must be called to determine
+the number of query parameters and get each query parameter description.
+
+Cq_sqpar or cq_sqparn must be called to replace the default query parameter
+values with the calling program values.
+.ih
+SEE ALSO
+cqfimquery, cqimclose
+.endhelp

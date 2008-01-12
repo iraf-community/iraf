@@ -1,0 +1,30 @@
+.help dc62s Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDC6S (V, A, B, R, AD, BD, RD)
+
+     - - - - - -
+      D C 6 S
+     - - - - - -
+
+  Conversion of position & velocity in Cartesian coordinates
+  to spherical coordinates (double precision)
+
+  Given:
+     V      d(6)   Cartesian position & velocity vector
+
+  Returned:
+     A      d      longitude (radians)
+     B      d      latitude (radians)
+     R      d      radial coordinate
+     AD     d      longitude derivative (radians per unit time)
+     BD     d      latitude derivative (radians per unit time)
+     RD     d      radial derivative
+
+  P.T.Wallace   Starlink   28 April 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

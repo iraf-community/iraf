@@ -1,0 +1,14 @@
+     This directory contains the IEEE routines from Chapter 1 -
+Discrete Fourier Transform Programs.  Some of the routines are
+provided here as separete files (fourea.f, wfta.f, ...) but are
+purposely not put into the library, as these routines are not for
+general use (fourea.f is an inefficient, demonstration version;
+wfta.f is the Winograd DFT which is slower than the regular DFT
+and uses far too much memory ona  16-bit machine to be of
+practical use; ...).
+     The directory "test" contains the test routines from the chapter.
+The directory "time" contains some routines to time various of the
+routines.
+     The file "compall" compiles the appropiate routines and then
+"mklib" will make the library, which one will probably want to
+move to "/usr/lib/libieee.a".

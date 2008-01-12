@@ -1,0 +1,153 @@
+.RP
+.ND
+.TL
+\s+3IRAF PHOTOMETRY PACKAGE\s-3
+.sp
+Differential Reduction Equations
+.AU
+Paul C. Schmidtke
+.AI
+.K2
+.TU
+.sp
+August 3, 1983
+.br
+Last Revision: August 24, 1983
+.AB
+.PP
+This paper discusses
+the standard reduction equations for differential photometry
+as used in the IRAF Photometry Package.
+Specific examples for the UBV photometric system are presented.
+.AE
+.TL
+IRAF PHOTOMETRY PACKAGE
+.sp 2
+.NH 
+Differential Reduction Equations
+.PP
+As presented in
+\fIIRAF Photometry Package: Reduction Equations and Methods
+of Calculation\fP (hereafter Paper I),
+the standard equations for photometric data reduction are:
+.sp
+.EQ
+delim @@
+define = '~"="~'
+define + '~"+"~'
+define - '~"-"~'
+define x '^\(bu^'
+define Qi 'Q sub i'
+define Qn 'Q sub n'
+define Qs 'Q sub s'
+define Ci 'C sub i'
+define Cs 'C sub s'
+define k1 'kappa sub 1'
+define k2 'kappa sub 2'
+.EN
+.EQ I (1)
+Qn = Qi - k1 x X - k2 x X x Ci
+.EN
+.EQ I (2)
+Qs = eta x Qn + xi x Cs + zeta
+.EN
+where
+.IP
+@Qi@, @Qn@, and @Qs@ are the instrumental, natural,
+and standard system magnitudes of a particular photometric quantity.
+This quantity can be the result of a measurement through a single filter
+(i.e. a magnitude),
+the ratio of measurements through two filters
+(i.e. a color index),
+or a combination of measurements through three or more filters
+(i.e. a complex index).
+.IP
+@Ci@ and @Cs@ are the instrumental and standard system magnitudes
+of another photometric quantity, usually a color index.
+@Ci@ may refer to the same quantity as @Qi@,
+but @Cs@ cannot refer to the quantity as @Qs@.
+Examples are given the in next section.
+.IP
+@X@ is the air mass of a observation.
+.IP
+@k1@ and @k2@ are the first- and second-order extinction coefficients,
+respectively.
+.IP
+@eta@, @xi@, and @zeta@ are the transformation coefficients
+(@zeta@ is the nightly zero point).
+.LP
+Equations (1) and (2) are used for the reduction of all-sky photometry.
+In differential photometry, however,
+two stars are observed: a variable (i.e. program) star and
+a comparison (i.e. a psuedo-standard) star.
+They ought to be relatively close to each other in the sky,
+have approximately the same photometric colors,
+and be observed in rapid succession.
+If these conditions are met,
+it can be assumed that the atmospheric and instrumental conditions
+effecting both stars are nearly identical
+and that the accuracy of the results is increased by
+measuring the variable star relative to the comparison.
+That is, differential magnitudes between the two stars can be
+measured more precisely than separate all-sky magnitudes for each star.
+The differential reduction equations, found by subtracting the
+all-sky relationship for one star from the other, are:
+.EQ I (3)
+DELTA Qn = DELTA Qi - k1 x DELTA X - k2 x X bar x DELTA Ci
+.EN
+.EQ I (4)
+DELTA Qs = eta x DELTA Qn + xi x DELTA Cs
+.EN
+where the order of subtraction is not important,
+but it must be consistent.
+In Paper I, an equation similar to equation (3) is used
+in the determination of @k2@.
+In that case, the stars (i.e. blue-red pairs) are sufficiently close
+in the sky that the term @k1 x DELTA X@ can be ignored.
+In the general case, however, the term must be included.
+Values for all coefficients are found by means of the methods
+described in Paper I,
+using data explicitly obtained for such calculations.
+.PP
+It is common to insert an additional star into the observing
+sequence: a check (i.e. another psuedo-standard) star.
+This star is also reduced differentially, relative to the designated
+comparison star.
+If the differential magnitudes are not constant
+(from night to night or from observing run to observing run),
+then one of these supposed-constant stars is in fact variable.
+That is, the check star is used to check the constancy of the comparison star.
+.NH
+Examples of Differential Reduction Equations
+.PP
+In this section,
+examples of differential reduction equations are given for
+the UBV photometric system.
+The notation is adopted from Hardie
+(1962, \fIBasic Astronomical Techniques\fP, p. 178).
+The differential extinction equations are:
+.EQ I (5.a)
+DELTA v sub 0 = DELTA v - k prime sub v x DELTA X
+- k prime prime sub v x X bar x DELTA (b-v)
+.EN
+.EQ I (5.b)
+DELTA (b-v) sub 0 = DELTA (b-v) - k prime sub bv x DELTA X
+- k prime prime sub by x X bar x DELTA (b-v)
+.EN
+.EQ I (5.c)
+DELTA (u-b) sub 0 = DELTA (u-b) - k prime sub ub x DELTA X
+.EN
+The transformation equations are:
+.EQ I (6.a)
+DELTA V = DELTA v sub 0 + epsilon x DELTA (B-V)
+.EN
+.EQ I (6.b)
+DELTA (B-V) = mu x DELTA (b-v) sub 0
+.EN
+.EQ I (6.c)
+DELTA (U-B) = psi x DELTA (u-b) sub 0
+.EN
+These sets of extinction and transformation equations are
+readily expanded to include the additional colors in
+UBVR or UBVRI differential photometry.
+

@@ -1,0 +1,12 @@
+# Make the ZFIOGD (binary graphics) device driver and install it in libsys.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+libsys.a:
+	zfiogd.x	<fio.h> <mach.h>
+	@iism70
+	@iism75
+	;

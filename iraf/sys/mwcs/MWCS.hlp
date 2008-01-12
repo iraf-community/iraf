@@ -1,0 +1,1026 @@
+.help MWCS Oct89 "Mini-WCS Interface"
+
+.ce
+\fBMini-WCS Interface\fR
+.ce
+Doug Tody
+.ce
+October 1989
+
+
+.nh
+Introduction
+
+    The mini-WCS interface represents a first cut at the general problem
+of representing a linear or nonlinear world coordinate system (WCS).
+While some of the harder problems are avoided and the general WCS problem
+remains to be solved, the current interface should be largely upwards
+compatible with future versions of the interface.  The main items omitted
+from this initial version of the interface are support for general nonlinear
+world coordinate systems, particularly support for modeling of geometric
+distortions and arbitrary application defined coordinate mapping functions.
+Limited support is provided for the projective geometries.
+
+.nh
+WCS Definition
+.nh 2
+Linear Transformations
+
+    Any linear transformation consisting of some combination of a shift,
+rotate, axis-flip, scale change, etc. can be expressed as
+
+.ks
+.nf
+	|x'|   |a b|   |x|   |u|
+	|  | = |   | * | | + | |                                   [2.1]
+	|y'|   |c d|   |y|   |v|
+.fi
+.ke
+
+where [x,y] are the input coordinates, [x',y'] are the transformed
+coordinates, [a,b,c,d] is a rotation matrix, and [u,v] is a shift vector.
+
+For example, the X term of a combination of a rotation about a point [x0,y0]
+plus a shift to an offset [x1,y1] may be expressed as
+
+.ks
+.nf
+	x' = a(x - x0) + b(y - y0) + x1
+	   = ax - ax0 + by - by0 + x1
+	   = ax + by + u
+.fi
+.ke
+whence
+.nf
+	 u = x1 - ax0 - by0
+and                                                                [2.2]
+	 v = y1 - cx0 - dy0
+.fi
+
+Another way of expressing this is to note that [U,V] is the transform
+of the origin [x,y]=[0,0] of the original coordinate system.
+There is nothing special about the rotation point; a rotation about
+any point [x,y] is equivalent to a rotation about the origin followed
+by a translation equal to the distance of the rotation point from the origin.
+
+The inverse transformation is given by
+
+.nf
+	|x|   |  -1|    / |x'|   |u| \
+	| | = | A  | * <  |  | - | |  >                            [2.3]
+	|y|   |    |    \ |y'|   |v| /
+.fi
+
+where A**(-1) is the inverse of the rotation matrix [a,b,c,d].
+
+.nh 2
+World Coordinate Systems
+
+    A world coordinate system (WCS) defines the transformation between
+a physical coordinate system (e.g., pixel coordinates in a reference image),
+and world coordinates expressed in some arbitrary units.  A two dimensional
+WCS can be expressed as
+
+.ks
+.nf
+	(x',y') = F (l,m, Wx,Wy)
+	(l,m) = [CD] * (x-Rx, y-Ry)                                [2.4]
+
+where
+
+	x,y	Are the coordinates of a point in the physical system.
+	l,m	Is a linearly transformed representation of the point.
+	x',y'	Are the coordinates of the same point in the world system.
+	F	Is the WCS function, possibly a nonlinear function.
+	Rx,Ry	Define the reference point in the physical system.
+	Wx,Wy	Are the world coordinates of the reference point.
+	[CD]	Is the coefficient determination (CD) matrix.
+.fi
+.ke
+
+The notation [CD]*(x,y) denotes a matrix multiply of the CD matrix [CD] and
+the vector (x,y), i.e., a linear transformation of the vector (x,y).
+If the WCS contains a nonlinear component, as for a sky projection,
+this is described by the function F in terms of the intermediate
+coordinates (l,m), e.g., the displacement in degrees from the reference
+point.  Separation of the WCS into linear and nonlinear components allows
+full specification of linear systems using only the basic interface,
+and simplifies the representation of the nonlinear part of the WCS.
+The nonlinear component itself (F) may be an object of arbitrary complexity.
+
+In the case of a simple 2D linear WCS with no rotation this reduces to
+
+.ks
+.nf
+	x' = (x - Rx) * CD[1,1] + Wx
+	y' = (y - Ry) * CD[2,2] + Wy
+.fi
+.ke
+
+In the general case the world system may be rotated with respect to the
+physical system (original image matrix), hence the WCS must include a
+rotation term.  Specifying this as a general linear transformation expressed
+as a matrix multiplication allows the representation of such transformations
+as conversion between skewed and cartesian coordinates as well as the
+more conventional rotation and scale transformation.
+
+The CD matrix representation (developed by STScI and now also associated
+with FITS), in addition to allowing specification of a linear transformation,
+is responsible for converting between the coordinate units used in the
+physical system and those used in the world system (more precisely,
+in the general case the units of (l,m) may differ from those of the
+world system, since F can also change the units).
+It is even possible for the world system to use different units on
+different axes, so long as a rotation is not defined between axes with
+different units.
+
+For example, if the WCS is used to describe an image cube, following
+application of the CD matrix axes 1 and 2 might have units of arc seconds,
+and axis 3 frequency.  In this case rotation would be defined only between
+axes 1 and 2, i.e., the off-diagonal CD matrix terms CD[1:2,3] and CD[3,1:2]
+must be zero, with CD[3,3] giving the scale for axis 3 independently of any
+rotation between axes 1 and 2.  This restriction on rotation between
+dissimilar axes applies only to the world system described by the CD matrix.
+As we shall see in the next section, when the WCS refers to an image,
+arbitrary rotations of the raw pixel matrix are still possible by using
+a separate pixel space transformation to describe transformations
+of the image matrix.
+
+.nh 3
+WCS Rotation Between Dissimilar Axes
+
+    To see why rotation between dissimilar axes is disallowed in some
+circumstances, note that the CD matrix, since it combines a rotation
+(or other pixel space linear transformation) and units conversion in one
+operation, can be expressed as follows in the case of a two dimensional system.
+
+The CD matrix is used as follows:
+
+.ks
+.nf
+	| l |   |    |   | x |
+	|   | = | CD | * |   |
+	| m |   |    |   | y |
+.fi
+.ke
+
+The CD matrix is constructed as follows:
+
+.ks
+.nf
+	|    |   | Dx   0 |   | a  b |
+	| CD | = |        | * |      |
+	|    |   | 0   Dy |   | c  d |
+.fi
+.ke
+
+where (Dx,Dy) is the units conversion matrix, and (a,b,c,d) is the
+rotation matrix.  This is a completely general representation, i.e.,
+any linear transformation may be specified by the matrix (a,b,c,d)
+and combined with the units conversion matrix, since the rotation
+matrix rotates the physical system to align the axes with those of
+the world coordinate system.
+
+The problem comes if we try to \fIrotate the CD matrix\fR.
+Although the CD matrix can express any
+rotation between the physical and world system, once the CD matrix
+has been formed the units conversion and rotation matrices cannot
+be recovered.  In general, further rotation of the system described by
+the CD matrix requires that we rotate the matrix (a,b,c,d), rather than
+the CD matrix itself.  The only exception occurs when Dx=Dy (similar axes),
+in which case the CD matrix and rotation matrix are equivalent except
+for a constant.  Hence, rotations between dissimilar axes of the system
+described by the (already formed) CD matrix are disallowed.  A special
+case is rotation is some multiple of 90 degrees, which can be represented
+by an axis swap or flip.
+
+.nh 2
+MWCS Coordinate System Representation
+
+    The coordinate system representation used by the MWCS interface consists of
+two components called the \fBLterm\fR and \fBWterm\fR, specifying independent
+logical and world transformations relative to a physical, cartesian coordinate
+system.  Three types of coordinate systems are defined, as outlined below.
+
+.ls
+.ls PHYSICAL
+The physical coordinate system is the raw coordinate system of the data.
+In the case of an image, the physical coordinate system refers to the pixel
+coordinates of the original data frame.  All other coordinates systems are
+defined in terms of the physical system (reference frame).
+.le
+.ls LOGICAL
+The logical coordinate system is defined by the \fILterm\fR in terms of the
+physical coordinate system.  In the case of an image, the logical coordinate
+system specifies raw pixel coordinates relative to some image section or
+derived image, i.e., the coordinates used for image i/o.  In the MWCS the
+Lterm specifies a simple linear transformation, in pixel units, between
+the original physical image matrix and the current image section.
+.le
+.ls WORLD
+The world coordinate system is defined by the \fIWterm\fR in terms of the
+physical coordinate system.  Any number of different kinds of world coordinate
+systems are conceivable.  Examples are the tangent (gnonomic) projection,
+specifying right ascension and declination relative to the original data
+image, or any linear WCS, e.g., a linear dispersion relation for spectral
+data.  Multiple world coordinate systems may be simultaneously defined in
+terms of the same physical system.
+.le
+.le
+
+The following observations apply to the behavior of MWCS as applied
+to image data.
+.ls
+.ls 4 1.
+Any linear transformation of the image matrix (shift, scale change,
+axis flip, etc.) affects only the Lterm.  The revised MWCS for the new
+image or image section may be computed merely by doing a linear
+transformation of the Lterm.
+.le
+.ls 4 2.
+If multiple world coordinate systems are associated with an image,
+all share the same Lterm.
+.le
+.ls 4 3.
+Geometric distortion of an image (not currently supported by MWCS) is
+a pixel space operation, i.e. a generalization of the Lterm, hence is
+independent of the WCS.
+.le
+.le
+
+In general, the physical and world coordinate systems are defined whenever
+a new image is created, e.g., by a task such as RFITS.  A new-copy type
+operation, such as most transformations performed by IMAGES tasks, affects
+only the Lterm.
+
+Although we normally speak in terms of images, MWCS is not
+limited to applications involving images.  For example, the physical
+coordinate system could just as well be a graphics frame buffer, and the
+logical coordinate system a pixrect.  A greyscale transformation is
+an example of a non-image WCS.  MWCS, or the successor interface,
+will eventually be used in GIO, e.g., for cursor readback.
+
+Since the Wterm includes the CD matrix, which defines a linear
+transformation, and linear transformations can be combined, in principle
+it is possible to combine the Lterm and Wterm to define a single
+transformation from logical to world coordinates.  In practice this
+can run into problems, as not all pixel space rotations may be
+representable by the CD matrix (since the latter may define different
+world space units on different axes).  Furthermore, if multiple WCS
+are defined, and the WCS are defined in terms of the logical system,
+it would be inefficient to have to transform each WCS to the new logical
+system each time a linear transformation of the data is performed
+(e.g., every time an image is opened with an image section).
+
+For images, the common coordinate transformations are image section (logical)
+coordinates to world coordinates and vice versa, and section coordinates
+to physical coordinates and vice versa.  The physical coordinate system
+can be regarded as a special case of a world coordinate system (the "pixel"
+coordinate system) defined relative to logical image section coordinates.
+
+For example, to convert IMIO image coordinates to world coordinates,
+the interface will first apply the inverse of the Lterm to determine the
+coordinates in the physical system, then apply the Wterm for the desired WCS
+to compute the world coordinates.  If the Wterm is linear and the Lterm
+does not define any rotations between dissimilar axes, the two operations
+can be combined for a more efficient coordinate transformation.
+
+An arbitrary number of world coordinate systems may be defined over the
+same domain in the physical coordinate system.  Every WCS has a name
+uniquely specifying the WCS type.  A WCS may also have attributes such as
+units, axis labels, and numeric output formats specified independently for
+each axis, as well as arbitrary user defined WCS attributes.
+
+.nh 3
+Lterm Representation
+
+    The Lterm is defined by the terms of a general linear transformation,
+as shown in equation [2.1].  For example, in the case of a 2D system the
+following quantities must be given to define the Lterm.
+
+.ks
+.nf
+	[CD] = [a,b,c,d]	rotation matrix
+	tv[] = [u,v]		translation vector
+.fi
+.ke
+
+This defines the transformation between the physical and logical coordinate
+systems, i.e., applying the transformation to a pair of physical coordinates
+[x,y] yields the corresponding logical coordinates [x',y'].  MWCS will
+automatically compute the inverse transformation when asked to convert
+between logical coordinates and physical or world coordinates.
+
+.nh 3
+Wterm Representation
+
+    The Wterm defines the transformation between the physical system and
+some arbitrary world coordinate system.  The Wterm is defined by the
+following quantities:
+
+.nf
+	R[]		reference coordinates in physical system
+	W[]		world coordinates at the reference point
+	[CD]		coordinate determination matrix
+	wtype		type of WCS (function name string)
+	wattr		WCS attributes (string, opaque outside interface)
+.fi
+
+The point R, also known as the \fIreference pixel\fR when dealing
+with image data, defines the origin of the world coordinate system in
+the physical system.  The world coordinates at the reference point are
+given by the vector W (at least for a linear WCS; in general the meaning
+of the W term depends upon the WCS type).  The CD matrix defines any
+rotation between the physical and world systems, as well as the scale
+conversion needed to convert between physical and world (or linear world)
+coordinates.
+
+Although the function name or type \fIwtype\fR is
+accessible to applications, the details of what the WCS means, and how
+it is evaluated, are intended to be internal to the interface, hence
+the use of strings to pass in the WCS information.  Functions complex
+enough to require coefficients should pass the extra information in via
+the \fIwattr\fR term.  WCS attributes such as the axis units and labels
+are also passed in via \fIwattr\fR.
+
+In the general case there may be any number of different WCS types.
+In the case of MWCS, however, only a predefined set of WCS types are
+supported, since the code for each WCS is wired into the interface.
+The predefined WCS types (as selected by \fIwtype\fR) are the following.
+
+.ks
+.nf
+	\fIWtype\fR			\fIDescription\fR
+
+	linear			simple linear WCS
+	sampled			sampled WCS function
+	(TAN etc.)		the sky projections
+.fi
+.ke
+
+A \fIlinear\fR WCS is specified by the physical and world coordinates of the
+reference point, and the row or rows of the CD matrix pertaining to the axes
+to which the WCS is assigned.  A linear WCS is completely specified by the
+linear term of the standard WCS representation.
+  
+A \fIsampled\fR WCS is specified by an array of (physical, world) coordinate
+pairs, i.e., an array of reference points, sampling the linear WCS function
+for that axis.  In the limiting case, for sampled (pixel) data, there is one
+(physical, world) point on the WCS curve for each data point.  If the WCS
+function is smooth a coarser sampling can be used to approximate the curve,
+using some form of interpolation to evaluate the function.  In the MWCS,
+a sampled function must be one-dimensional, i.e., associated with a single
+axis (higher dimensional surfaces can be represented so long as the axes
+are independent).
+
+Note that the sampled function is expressed in terms of the \fIoffset\fR
+from the reference point in both the physical and world systems.
+Any analytic function, e.g., polynomial or spline, can be sampled and
+later reconstructed from the sampled curve with no significant error,
+provided the function type and order are known and there are sufficient
+sample points to determine the system.
+The advantage of the sampled representation is that it is independent of
+the function type, and can be used to fit any analytic function when the
+time comes to evaluate the curve.
+
+The sky projections are a special case used with astronomical direct images. 
+The principal example is the gnomonic projection, the projection of the
+celestial sphere onto a plane tangent at the reference point.
+The sky projections are completely specified by the reference point and the
+standard CD matrix, plus the WCS name which specifies the type of projection,
+e.g., "gnomonic", "sine", "arc", and so on.
+
+The WCS attributes which can be set by the \fIwattr\fR string consist of
+a number of standard attributes, plus an arbitrary number of additional
+WCS specific attributes.  Examples of standard attributes include "system",
+"wtype", "units", "label", etc.  A list of the standard WCS attributes is
+given in section 3.3.1.
+
+.nh
+Interface Overview
+
+    The MWCS interface is a stand-alone interface implementing the linear
+and world coordinate transformation abstractions.  While the interface
+is designed with the typical application to image data in mind, MWCS is
+intended as a general coordinate transformation facility for use with any
+type of data, as an embedded interface in other software, including system
+interfaces such as IMIO and GIO as well as user applications.
+
+.nh 2
+Object Creation and Storage
+
+    The MWCS interface routines used to create or access MWCS objects, or
+save and restore MWCS objects in external storage, are summarized below.
+
+.nf
+		   mw = mw_open (bufptr|NULL, ndim)
+		 mw = mw_openim (im)
+		mw = mw_newcopy (mw)
+		       mw_close (mw)
+
+			mw_load (mw, bufptr)
+		  len = mw_save (mw, bufptr, buflen)
+	       mw_[load|save]im (mw, im)
+.fi
+
+A new MWCS object, initialized either to a unitary transformation of
+dimension \fIndim\fR or to the encoded MWCS in the input buffer,
+is created with \fImw_open\fR.  A MWCS object is be
+created and initialized from an image with \fImw_openim\fR; if the referenced
+image does not currently have any WCS information associated with it,
+a unitary pixel WCS will be created.  The \fImw_newcopy\fR operation
+creates a new MWCS object as a copy of an existing one, as one might wish
+to do prior to modifying a WCS.  When a descriptor is no longer needed it
+should be returned with \fImw_close\fR.
+
+A MWCS object (descriptor) is a memory object.  To encode a MWCS in an opaque
+machine independent binary array, e.g., for storage in a file or transmission
+through a datastream, \fImw_save\fR is called with the \fIchar\fR pointer of
+the buffer in which the encoded MWCS is to be placed.  If the buffer pointer is
+NULL a buffer will be created and the pointer returned, and if a valid buffer
+is passed it will be resized as necessary to store the encoded object.
+An encoded MWCS object is reloaded into a descriptor with \fImw_load\fR.
+A MWCS may be stored or updated in an image header with \fImw_saveim\fR,
+or loaded from the image header into a descriptor with \fImw_loadim\fR.
+These are the only interface routines with knowledge of the parameter names,
+etc., used to store WCS information in image headers.
+
+.nh 2
+Coordinate Transformation Procedures
+
+    The MWCS procedures used to perform coordinate transformations,
+and to modify or examine the Lterm and Wterm, are summarized below.
+
+.nf
+		 ct = mw_sctran (mw, system1, system2, axes)
+	  ndim = mw_gctran[r|d] (ct, ltm, ltv, axtype1, axtype2, maxdim)
+		      mw_ctfree (ct)
+
+	    x2 = mw_c1tran[r|d] (ct, x1)
+		 mw_v1tran[r|d] (ct, x1, x2, npts)
+		 mw_c2tran[r|d] (ct, x1,y1, x2,y2)
+		 mw_v2tran[r|d] (ct, x1,y1, x2,y2, npts)
+		  mw_ctran[r|d] (ct, p1, p2, ndim)
+		  mw_vtran[r|d] (ct, v1, v2, ndim, npts)
+.fi
+
+The procedures \fImw_[cv][12]tran[rd]\fR perform coordinate
+transformations for individual coordinates or coordinate vectors,
+for one or two dimensional systems, for coordinates of type real or double.
+The general N dimensional case is handled by the \fImw_[cv]tran[rd]\fR
+procedures, which transform \fIndim\fR-dimensional points (\fImw_ctran\fR)
+or point vectors (\fImw_vtran\fR).  A single point is specified as a
+vector of length \fIndim\fR; a point vector is expressed as an array of
+points, i.e., a 2-dimensional array V[I,J], where the index I refers to
+the axis within a point vector, and where the index J refers to the point.
+The notation V[1,j] references the 1-dimensional point vector for point J.
+
+The direction of the transformation, and the axes for which the transformation
+is to be performed, is determined by a prior call to \fImw_sctran\fR,
+which specifies the input and output coordinate systems, and performs the
+initialization necessary for efficient evaluation of a series of
+transformations.  A pointer to the optimized transformation descriptor is
+returned, to allow two or more transformations to be prepared and used
+simultaneously without having to repeat the setup, which can be considerably
+more expensive than coordinate evaluation.  The transformation descriptor
+should be freed when no longer needed, else it will be freed automatically
+when the MWCS is closed.
+
+A coordinate system is specified to \fImw_sctran\fR by its name.
+The following standard systems are predefined.
+Additional WCS names may be defined by the application.
+
+.ks
+.nf
+	"logical"		The logical system
+	"physical"		The physical system
+	"world"			The default world system
+	(user-wcs)		User defined systems
+.fi
+.ke
+
+Strings are used to specify the coordinate systems in order to allow user
+defined and named systems to be added at runtime.
+The use of a setup procedure to specify the desired transformation allows
+new types of coordinate transformations to be easily added, for example
+mixed conversions, as for a 2-dimensional system where the X and Y components
+of a coordinate pair belong to different coordinate systems, or computation
+of the derivative at a point.  In MWCS, only simple conversions between any
+two of the physical, logical, and world coordinate systems are supported.
+
+Specification of the axes for which the coordinate transformation is desired
+is necessary for the more complex systems, since there may be different,
+often quite independent coordinate systems defined on different axes.
+The axes for which the transformation is to be prepared are specified as
+a bitmask.  The default, if the mask is zero, is to use axes starting with
+1, up to the number required to satisfy the given dimension transformation.
+
+For example, to convert two dimensional image coordinates (section relative)
+to world coordinates in the default WCS:
+
+.nf
+	call mw_sctran (mw, "logical", "world", 3B)
+	call mw_c2tranr (mw, px,py, wx,wy)
+.fi
+
+Multiple independent world coordinate systems may be defined relative to
+the same physical system.  Most applications, however, are best written
+as if there were only one world system, with the coordinate system to be
+used being switched about transparently to the application.  For this
+reason there is no WCS number argument to the MWCS procedures, and
+the "world" system specifies the \fIcurrent default\fR WCS.  If a MWCS object
+defines multiple world coordinate systems, a \fImw_ssystem\fR call is used
+to select the WCS to be used.  This could be used, for example, to change
+the units appearing on plots in a graphics application, transparently
+to the application.
+
+.nh 2
+Coordinate System Specification
+
+    The MWCS procedures used to enter, modify, or inspect the MWCS
+logical and world coordinate transformations are summarized in the figure
+below.
+
+The procedures \fImw_[sg]lterm\fR are used to directly enter
+or inspect the Lterm, which consists of the linear transformation matrix
+\fIltm\fR and the translation vector \fItv\fR, both of dimension \fIndim\fR,
+defining the transformation from the physical system to the logical system.
+If the logical system undergoes successive linear transformations,
+\fImw_translate\fR may be used to translate, rather than replace,
+the current Lterm, where the given transformation matrix and translation
+vector refer to the relative transformation undergone by the logical system.
+This will always work since the Lterm is initialized to the identity matrix
+when a new MWCS object is created.  The routines \fImw_rotate\fR,
+\fImw_scale\fR, and \fImw_shift\fR provide a convenient front-end to
+\fImw_translate\fR for the more common types of translations.
+
+Specification of the Wterm is somewhat more complicated.  The Wterm for
+a new WCS should first be created and initialized for a system of the given
+dimensionality with \fImw_newsystem\fR.  The linear portion of the Wterm,
+i.e., the CD matrix and the coordinates of the reference point
+in the physical and world systems, and the WCS dimension, may then be entered
+with \fImw_swterm\fR and queried with \fImw_gwterm\fR.
+
+.nf
+	     mw_[s|g]lterm[r|d] (mw, ltm, ltv, ndim)
+	      mw_translate[r|d] (mw, ltv_1, ltm, ltv_2, ndim)
+		      mw_rotate (mw, theta, center, axes)
+		       mw_scale (mw, scale, axes)
+		       mw_shift (mw, shift, axes)
+
+		   mw_newsystem (mw, system, ndim)
+		 mw_[s|g]system (mw, system[, maxch])
+		  mw_[s|g]axmap (mw, axno, axval, ndim)
+		    mw_bindphys (mw)
+
+	     mw_[s|g]wterm[r|d] (mw, r, w, cd, ndim)
+		      mw_swtype (mw, axis, naxes, wtype, wattr)
+	     mw_[s|g]wsamp[r|d] (mw, axis, pv, wv, npts)
+		 mw_[s|g]wattrs (mw, axis, attribute, valstr[, maxch])
+.fi
+
+The world portion of the Wterm is unusual in that the type of WCS may be
+specified independently for each axis.  The WCS function type \fIwtype\fR,
+and any attributes \fIwattr\fR, are specified for the indicated \fIaxes\fR
+with \fImw_swtype\fR.  The axes specified are those required to evaluate
+the named function.
+
+In the case of an axis of type "sampled", the sampled WCS function must
+also be entered via a call to \fImw_swsamp\fR, and may later be retrieved
+with \fImw_gwsamp\fR.  The WCS function is defined as an \fIoffset\fR from
+the reference point in both the physical and world systems, e.g.,
+the vector \fIWv\fR will be added to the world coordinates
+produced by interpolating the sampled function (this can of course be
+defeated by setting R or W to zero).
+
+A WCS always has a number of predefined \fIattributes\fR, and may also
+have any number of user defined, or WCS specific, attributes.  These are
+defined when the WCS is created, in the \fIwattr\fR argument input to
+\fImw_swtype\fR, or in a subsequent call to \fImw_swattrs\fR.  The WCS
+attributes for a specific axis may be queried with the function
+\fImw_gwattrs\fR.  Attribute values may be modified, or new attributes defined,
+with \fImw_swattrs\fR.  The issue of WCS attributes is discussed further
+in the next section.
+
+.nh 3
+WCS Types and Attributes
+
+    The WCS attributes which can be set by the \fIwattr\fR term consist of
+a number of standard attributes, plus an arbitrary number of additional
+WCS specific (application defined) attributes.  The following standard
+attributes are reserved (but not necessarily defined) for each WCS:
+
+.nf
+	"units"		axis units ("pixels", etc.)
+	"label"		axis label, for plots
+	"format"	axis numeric format, for tick labels
+	"wtype"		WCS type, e.g., "linear"
+.fi
+
+In addition, the following are defined for the entire WCS,
+regardless of the axis:
+
+.nf
+	"system"	system name (logical, physical, etc.)
+	"object"	external object with which WCS is associated
+.fi
+
+For example, to determine the WCS type for axis 1:
+
+	call mw_gwattrs (mw, 1, "wtype", wtype, SZ_WTYPE)
+
+The (world coordinate) system name \fIsystem\fR is what is used, e.g.,
+to select a WCS in a call to \fImw_ssystem\fR, or define a coordinate
+transformation in a call to \fImw_sctran\fR.  Note that the system name
+"world" is actually only an alias for the \fIdefault world system\fR.
+This may be any primary system, i.e., the logical or physical system,
+or a user defined world system.  The initial default world system may
+be specified by the user by predefining the environment variable
+\fBdefwcs\fR, otherwise the first-defined user world system is used,
+else the physical system is used.
+
+If the MWCS is associated with an image then the "object" attribute of
+the physical system will return the name of the image or image section
+defined as the physical coordinate system for the MWCS.
+This is not necessarily the full image, e.g., in the case of
+a multidimensional image, the physical system might be any 2D plane of the
+image.  In the case of an event file image, the image name may include a
+filter or blocking factor.  References back to the raw data image based on
+MWCS physical coordinates will work so long as the raw image is opened
+using the name returned by the interface.  If the image is already open
+and was accessed by descriptor via MWCS, the descriptor may be retrieved
+by a \fImw_stati\fR call to fetch MW_IMDES.
+
+All MWCS coordinate systems have the standard attributes, with default values
+being supplied by the interface if not set by the application.  In particular,
+the logical and physical coordinate systems have attributes and may be
+treated as a special case of a world coordinate system by the application.
+
+.nh 3
+Axis Mapping
+
+    The coordinate transformation procedures (section 3.2) include support
+for a feature called \fIaxis mapping\fR, used to implement \fIdimensional
+reduction\fR.  A example of dimensional reduction occurs in IMIO, when
+an image section is used to specify a subraster of an image of dimension
+less than the full physical image.  For example, the section might specify
+a 1 dimensional line or column of a 2 or higher dimensional image, or a
+2 dimensional section of a 3 dimensional image.  When this occurs the
+applications sees a logical image of dimension equal to that of the image
+section, since logically an image section \fIis\fR an image.
+
+Dimensional reduction is implemented in MWCS by a transformation on the
+input and output coordinate vectors.  The internal MWCS coordinate system
+is unaffected by either dimensional reduction or axis mapping; axis mapping
+affects only the view of the WCS as seen by the application using the
+coordinate transformation procedures.
+
+For example, if the physical image is an image cube and we access the
+logical image section "[*,5,*]", an axis mapping may be set up which
+maps \fIphysical\fR axis 1 to logical axis 1, physical axis 2 to the
+constant 5, and physical axis 3 to logical axis 2.  The internal system
+remains 3 dimensional, but the application sees a 2 dimensional system.
+Upon input, the missing axis y=5 is added to the 2 dimensional input
+coordinate vectors, producing a 3 dimensional coordinate vector for
+internal use.  During output axis 2 is dropped and replaced by axis 3.
+
+The axis map is entered with \fImw_saxmap\fR and queried with \fImw_gaxmap\fR.
+Here, \fIaxno\fR is a vector, with \fIaxno[i]\fR specifying the logical axis
+to be mapped onto physical axis I.  If zero is specified the constant
+\fIaxval[i]\fR is used instead.  Axis mapping may be enabled or disabled
+with a call to \fImw_seti\fR.
+
+Axis mapping affects all of the coordinate transformation procedures,
+plus \fImw_translate\fR (since it defines a translation in terms of the
+logical system), and all of the coordinate system specification procedures
+having an "axis" parameter, e.g., \fImw_gwattrs\fR.
+Axis mapping is not used with those procedures which directly access or
+modify the physical or world systems (e.g., \fImw_slterm\fR or
+\fImw_swterm\fR) since full knowledge of the physical system is necessary
+for such operations.
+
+.nh 3
+Binding the Physical System
+
+    Recall that all coordinate systems are defined in terms of the physical
+system, and that the Lterm defines the mapping between the physical system
+and the logical system.  Transformations of the logical system leave the
+physical and world systems unaffected.  The only exception to this is the
+procedure \fImw_bindphys\fR, which binds the physical system to the current
+logical system, i.e., makes the current logical system the new physical system.
+This involves a transformation of the linear term (CD matrix) of each world
+system, since a world system is defined in terms of the physical system,
+and initialization of the Lterm to (normally) the identity matrix and zero
+translation vector.  This operation is irreversible, i.e., once
+\fImw_bindphys\fR is executed the original physical system is lost.
+
+In the case of an MWCS which is associated with an image opened with an image
+section, the new physical system is not strictly speaking the logical system,
+but the image matrix of the image being accessed, i.e,. the current image
+ignoring the image section.  Hence, following a call to \fImw_bindphys\fR,
+the Lterm will always describe the translation between the physical image
+matrix currently being accessed, and the logical system (image section).
+
+.nh 2
+Set/Stat Procedures
+
+    The MWCS status procedures, used to query or set the MWCS parameters,
+are as follows.
+
+.nf
+			mw_seti (mw, what, ival)
+		ival = mw_stati (mw, what)
+			mw_show (mw, outfd, what)
+.fi
+
+The currently defined interface parameters are the following.
+
+.nf
+	   Name       Type          Description
+
+	MW_AXMAP	b	enable or disable axis mapping
+	MW_IMDES	i	descriptor of associated image
+	MW_INTERP	i	interpolator type for sampled wcs
+	MW_NDIM		i	dimensionality of logical system
+	MW_NPHYSDIM	i	dimensionality of physical system
+	MW_NWCS		i	number of wcs defined
+	MW_WCS		i	currently active wcs
+.fi
+
+MW_NDIM may differ from MW_NPHYSDIM if dimensional reduction has been
+specified and axis mapping is enabled.  MW_NWCS returns the number of
+WCS currently defined; at least two WCS are always defined, i.e., the
+logical and physical systems (the world system will default to the
+physical system if not otherwise defined).  The index of the current
+default WCS is given by MW_WCS.  In the case of a sampled WCS, the
+interpolator type used by the coordinate transformation procedures is
+specified by MW_INTERP.
+
+.nh 2
+Utility Routines
+
+    The following routines are used internally within the interface to
+compile or evaluate transformations, and may be useful in applications
+code as well.
+
+.nf
+		 mw_invert[r|d] (o_ltm, n_ltm, ndim)
+		   mw_mmul[r|d] (ltm_1, ltm_2, ltm_out, ndim)
+		   mw_vmul[r|d] (ltm, ltv_in, ltv_out, ndim)
+		    mw_glt[r|d] (v1, v2, ltm, ltv, ndim)
+.fi
+
+These routines perform matrix inversion, multiplication of a matrix by another
+matrix, multiplication of a vector by a matrix, and general linear
+transformation (matrix multiply and addition of translation vector).
+
+.nh 2
+Datatypes and Precision
+
+    All floating point data is stored internally in MWCS using double
+precision.  Most of the interface procedures have both type real and type
+double versions, e.g., for entering Lterm or Wterm data.
+The single precision versions should be normally used unless double
+precision is required to represent the data.
+
+Although all floating point data is stored internally as type double,
+coordinate transformations performed at runtime may be carried out using
+either single or double precision computations, depending upon, e.g., whether
+\fImw_ctranr\fR or \fImw_ctrand\fR is called to perform the transformation.
+What happens is that when the transformation is compiled by \fImw_sctran\fR,
+two transformation descriptors are prepared, one for type real and the other
+for type double, with the appropriate descriptor being selected at runtime
+to carry out the transformation.  Hence the precision appropriate for the
+problem at hand can be employed without requiring that the worst case
+precision be used for all applications.
+
+.nh
+IMIO Interface to MWCS
+.nh 2
+Image Header Representation
+
+    When MWCS is used with image data, the encoded MWCS object is stored
+in the image header, and loaded into an MWCS descriptor when the image is
+accessed by an applications program.  The format in which the MWCS is
+stored in the image header depends upon the type of image.  If the image
+has a "flex-header" (as for QPOE and the new image structures) the MWCS
+is encoded in a machine independent binary format and stored in the image
+header as a variable length byte array.  This provides full generality
+and is the most efficient approach.
+
+For the older image formats which use a FITS header (OIF and STF) it is
+necessary to encode the MWCS as a series of FITS cards.  The proposed FITS
+WCS format, already in use for STF format images (with minor deviations
+from the standard), is used to represent the MWCS Wterm.  Additional FITS
+cards are necessary to represent the Lterm.  The (P,W) array for sampled
+WCS can also be represented in a FITS header, although this is awkward and
+inefficient if the number of samples is large.
+
+The FITS header keywords used to represent the Wterm, Lterm, and sampled
+WCS are the following.
+
+.nf
+	WCSDIM		WCS dimension (may differ from image)
+
+	CTYPEn		coordinate type
+	CRPIXn		reference pixel
+	CRVALn		world coords of reference pixel
+	CDi_j		CD matrix
+
+	CDELTn		CDi_i if CD matrix not used (input only)
+	CROTA2		rotation angle if CD matrix not used
+
+	LTVi		Lterm translation vector
+	LTMi_j		Lterm rotation matrix
+
+	WSVi_LEN	Number of sample points for axis I
+	WSVi_jjj	Sampled WCS array for axis I
+
+	WATi_jjj	WCS attributes for axis I
+.fi
+
+Contrary to MWCS convention, the WCS stored in a FITS format header
+defines the transformation from the logical system (image matrix)
+to the world system, rather than the physical system.  The MWCS Wterm
+is computed from the FITS representation by transforming the FITS WCS
+by the stored Lterm when the stored MWCS is loaded.
+
+The name format CDi_j varies slightly from the proposed FITS standard, but is
+backwards compatible with STF (and more readable than the FITS nomenclature).
+The keywords LTVECn, LTi_j, WSVi_LEN, WSVi_jjj, and WATi_jjj are peculiar
+to MWCS.  A sampled WCS is represented as a series of WSVi_jjj cards,
+wherein the sample points are stored as character strings, storing as
+many sample points as possible on each card, ignoring the card boundaries
+(i.e., a card may end in the middle of a number).  WCS attributes are likewise
+encoded as a series of WATi_jjj cards, giving the attributes for axis I as
+string data of the form "attribute = value", ignoring card boundaries.
+Multiple world coordinate systems (other than the physical and one world
+system) cannot be used with old format image headers.
+
+.nh 2
+Handling of the WCS by IMIO
+
+    When an image is opened by IMIO the image header is read, an MWCS
+descriptor is opened, and the stored MWCS is loaded into the MWCS descriptor
+from the image header.  If an image section has been opened the Lterm
+is then updated to reflect the additional linear transformation defined
+by the section.  The correct logical to physical or world transformation
+is then seen at the IMIO level, and will be propagated to a new image
+in a NEW_COPY image operation when the MWCS is copied to the new image.
+
+In the case of an image format which uses a FITS header, application of
+the section transform during an image open \fIdoes not\fR include updating
+of the FITS representation of the WCS.  There are two problems with doing
+so: all this editing of the FITS image of the header is inefficient
+unless absolutely necessary, and more seriously, if the image is opened
+READ_WRITE with an image section and the header is later updated, the
+stored WCS will be incorrect.  So, while the WCS as represented by the
+MWCS will always be correct, the FITS header parameters will reflect
+the WCS of the raw image ignoring the image section.  If it is necessary
+for some reason to update the FITS header in memory to reflect the image
+section, \fImw_saveim\fR may be called to perform the udpate.
+
+Propagation of the correct logical system in a NEW_COPY operation works
+because once the FITS header is copied, \fImw_saveim\fR is called to
+edit the header of the new image.
+
+.nh
+Implementation
+.nh 2
+Restrictions
+
+    Since there was not time to solve the general WCS problem with the MWCS
+interface, several restrictions were accepted for this version.  These are
+the following.
+.ls
+.ls o
+All WCS functions are built in (hard coded), hence the interface is not
+extensible at runtime and the only way to support new applications is
+through modification of the interface (by adding new function drivers).
+.le
+.ls o
+There is no support for modeling geometric distortions, except possibly
+in one dimension.
+.le
+.ls o
+There is no provision for storing more than one world coordinate system
+in FITS oriented image headers, although multiple WCS are supported internally
+by the interface, and are preserved and restored across \fImw_save\fR and
+\fImw_load\fR operations.
+.le
+.ls o
+Coordinate transforms involving dependent axes must includes all such axes
+explicitly in the transform.  Dependent axes are axes which are related,
+either by a rotation, or by a WCS function.  Operations which could subset
+dependent axis groups, and which are therefore disallowed, include setting
+up a transform with an AXES bitmap which excludes dependent axes, or more
+importantly, an image section involving dimensional reduction, where the
+axis to be removed is not independent.  This could happen, for example,
+if a two-dimensional image were rotated and one tried to open a
+one-dimensional section of the rotated image.
+.le
+.le
+
+All these problems can be solved given enough time, although the last problem
+mentioned becomes very complicated (perhaps intractable) when nonlinear world
+systems of dimension greater than three are involved.
+
+.nh 2
+Function Drivers
+
+    World coordinate systems are implemented in MWCS by providing something
+called a \fIfunction driver\fR for each function type, as specified by the
+\fIwtype\fR argument to \fImw_swtype\fR.  The \fIwtype\fR is the name of
+the function, and the name of the function driver.
+
+A function driver consists of the following procedures.  A given driver
+need not implement all driver procedures; procedures which are not used
+by a driver are set to NULL in the function driver table.
+
+.nf
+        operation                       syntax
+
+        FN_INIT                 wf_FCN_init (fc, dir)
+        FN_DESTROY           wf_FCN_destroy (fc)
+        FN_FWD                   wf_FCN_fwd (fc, pv, wv)
+        FN_INV                   wf_FCN_inv (fc, wv, pv)
+.fi
+
+where FCN is replaced by a 3 letter abbreviation for the function name,
+e.g., "smp" for the sampled WCS function, "tan" for the tangent plane
+projection etc.  This is only a suggested naming convention; the actual
+driver procedure names are arbitrary so long as name conflicts are
+avoided.
+
+The argument FC to each driver procedure is a pointer to the function call
+descriptor set up by \fImw_sctran\fR.  This consists of a number of standard
+fields followed by an area which is reserved for fields which are private
+to the function driver.  During compilation of a transformation, the function
+driver initialization procedure FN_INIT will be called to perform any function
+dependent initialization, e.g., processing of the attribute list for the
+axes assigned to the function, to input any function specific parameters.
+
+During runtime evaluation of a function call, FN_FWD will be called for a
+forward transformation (physical to world), and FN_INV for an inverse
+transformation (world to physical).  Note that the linear portion of the
+WCS, i.e., the CD matrix and all other linear terms except W (the CRVAL
+vector) are handled the same for all WCS functions, outside of the driver.
+Hence when the driver is called for a forward transformation, for example,
+the CD matrix and R vector (defining the reference point) will already
+have been applied to the input vector PV.
+
+To fully understand how function drivers are implemented it is probably
+simplest to study the existing drivers.
+
+.tp 40
+.sh
+Appendix A:  Interface Summary
+
+.nf
+		   mw = mw_open (bufptr|NULL, ndim)
+		 mw = mw_openim (im)
+		mw = mw_newcopy (mw)
+		       mw_close (mw)
+
+			mw_load (mw, bufptr)
+		  len = mw_save (mw, bufptr, buflen)
+	       mw_[load|save]im (mw, im)
+
+		 ct = mw_sctran (mw, system1, system2, axes)
+	  ndim = mw_gctran[r|d] (ct, ltm, ltv, axtype1, axtype2, maxdim)
+		      mw_ctfree (ct)
+
+	    x2 = mw_c1tran[r|d] (ct, x1)
+		 mw_v1tran[r|d] (ct, x1, x2, npts)
+		 mw_c2tran[r|d] (ct, x1,y1, x2,y2)
+		 mw_v2tran[r|d] (ct, x1,y1, x2,y2, npts)
+		  mw_ctran[r|d] (ct, p1, p2, ndim)
+		  mw_vtran[r|d] (ct, v1, v2, ndim, npts)
+
+	     mw_[s|g]lterm[r|d] (mw, ltm, ltv, ndim)
+	      mw_translate[r|d] (mw, ltv_1, ltm, ltv_2, ndim)
+		      mw_rotate (mw, theta, center, axes)
+		       mw_scale (mw, scale, axes)
+		       mw_shift (mw, shift, axes)
+
+		   mw_newsystem (mw, system, ndim)
+		 mw_[s|g]system (mw, system[, maxch])
+		  mw_[s|g]axmap (mw, axno, axval, ndim)
+		    mw_bindphys (mw)
+
+	     mw_[s|g]wterm[r|d] (mw, r, w, cd, ndim)
+		      mw_swtype (mw, axis, naxes, wtype, wattr)
+	     mw_[s|g]wsamp[r|d] (mw, axis, pv, wv, npts)
+		 mw_[s|g]wattrs (mw, axis, attribute, valstr[, maxch])
+
+		 mw_invert[r|d] (o_ltm, n_ltm, ndim)
+		   mw_mmul[r|d] (ltm_1, ltm_2, ltm_out, ndim)
+		   mw_vmul[r|d] (ltm, ltv_in, ltv_out, ndim)
+		    mw_glt[r|d] (v1, v2, ltm, ltv, ndim)
+
+			mw_seti (mw, what, ival)
+		ival = mw_stati (mw, what)
+			mw_show (mw, outfd, what)
+.fi
+.sp
+.endhelp

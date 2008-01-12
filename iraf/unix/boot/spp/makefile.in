@@ -1,0 +1,11 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	xc.e
+
+xc.e:	xc.o
+	$(CC) $(HSI_LF) -o xc.e $^ $(HSI_LIBS)
+	cp -p xc.e ../../bin/.
+
+clean::
+	rm -f *.o xc.e ../../bin/xc.e

@@ -1,0 +1,14 @@
+images,s,a,"",,,Input image name
+window,s,h,"datasec","|datasec|trimsec|biassec|reflect|duplicate|",,Window to apply to section
+section,s,h,"",,,Default Image section
+template,s,h,"",,,Template for formating results
+#
+## TRIM AND OVERSCAN MARGINS (override header values)"
+#xskip1,i,h,INDEF,0,,X pixels to skip at start of overscan
+#xskip2,i,h,INDEF,0,,X pixels to skip at end of overscan
+#xtrim1,i,h,INDEF,0,,X pixels to trim at start of data
+#xtrim2,i,h,INDEF,0,,X pixels to trim at end   of data
+#ytrim1,i,h,INDEF,0,,Y pixels to trim at start of data
+#ytrim2,i,h,INDEF,0,,"Y pixels to trim at end   of data
+#"
+#mode,s,h,"ql"

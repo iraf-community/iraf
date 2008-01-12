@@ -1,0 +1,36 @@
+.help zoscmd May84 "System Interface"
+.ih
+NAME
+zoscmd -- send a command to the host operating system
+.ih
+SYNOPSIS
+.nf
+zoscmd (cmd, stdout, stderr, status)
+
+packed	char cmd[]		# command for host JCL
+packed	char stdout[]		# standard output filename
+packed	char stderr[]		# standard error filename
+int	status			# termination status
+.fi
+.ih
+DESCRIPTION
+The machine dependent command \fIcmd\fR is executed by the standard host
+command interpreter.  Control does not return until the host has finished
+executing the command.  If either of the filenames \fIstdout\fR or \fIstderr\fR
+is nonnull the kernel will attempt to append the referenced output stream
+to the named textfile, which will be created if necessary.
+.ih
+RETURN VALUE
+ERR is returned if an error occurred during execution of the command.
+OK is returned if the command was executed successfully.
+.ih
+NOTES
+This primitive may not be available in all implementations and any program
+which uses it is nonportable.
+.ih
+BUGS
+The output spooling feature cannot be relied upon.
+.ih
+SEE ALSO
+clio.clcmd
+.endhelp

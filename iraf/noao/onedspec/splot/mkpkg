@@ -1,0 +1,38 @@
+# SPLOT task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	anshdr.x	<smw.h> <time.h>
+	autoexp.x	<gset.h> <mach.h> <pkg/gtools.h>
+	avgsnr.x	
+	conflam.x	<error.h> <smw.h>
+	confnu.x	<error.h> <smw.h>
+	deblend.x	<mach.h> <math.h>
+	eqwidth.x	
+	eqwidthcp.x	<gset.h>
+	fixx.x		<smw.h>
+	flatten.x	<pkg/gtools.h>
+	fudgept.x	
+	fudgex.x	
+	getimage.x	<error.h> <imhdr.h> <pkg/gtools.h> <smw.h>
+	gfit.x		<error.h> <gset.h> <mach.h>
+	mktitle.x	<pkg/gtools.h> <smw.h> <units.h>
+	plotstd.x	<error.h> <gset.h> <smw.h>
+	replot.x	<gset.h>
+	smooth.x	
+	spdeblend.x	<error.h> <gset.h>
+	splabel.x	<gset.h> <smw.h>
+	splot.x		<error.h> <gset.h> <imhdr.h> <pkg/gtools.h> <units.h>\
+			<smw.h>
+	splotcolon.x	<ctype.h> <error.h> <pkg/gtools.h> <smw.h> <units.h>
+	splotfun.x	<mach.h> <smw.h> <error.h>
+	stshelp.x	<error.h>
+	sumflux.x	
+	usercoord.x	<error.h> <smw.h> <units.h>
+	voigt.x	
+	wrspect.x	<error.h> <imhdr.h> <imio.h> <smw.h> <units.h>
+	;

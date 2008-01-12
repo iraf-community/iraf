@@ -1,0 +1,234 @@
+                Text Tables                                1999 August 17
+
+The TABLES package I/O routines support text tables (ascii files in row
+and column format) as well as FITS binary tables and STSDAS format binary
+tables.  There are limitations on size because the entire file is read
+into memory when a text table is opened.  Text tables are not as flexible
+and certainly not as fast as binary tables, but for small files the ability
+to use the table tools and other tasks can be very handy.
+
+Text tables can be plain ascii files with default column names (c1, c2, c3,
+etc.) and no header keywords.  However, the text table I/O routines now also
+support explicit column definitions and/or header keywords.
+
+Header keywords have the following syntax:
+
+#k keyword = value comment
+
+The "#k " must be the first three characters of the line, and the space
+following "k" is required.  The "k" is not case sensitive.  Header keywords
+can be added to any text table, and they can appear anywhere in the file.
+For a text string keyword, quotes around the value are needed if there is
+a comment, in order to distinguish value from comment.  Everything following
+the value is considered to be the comment.
+
+Column definitions have the following syntax:
+
+#c column_name data_type print_format units
+
+The "#c " must be the first three characters of the line, and the space
+following "c" is required.  The "c" is not case sensitive.  Aside from the
+"#c ", the syntax is the same as the output from tlcol or the input cdfile
+for tcreate.  Only the column name is required, although in most cases you
+will also need to give the data type (the default is d, double precision).
+
+Adding column definitions to a text table makes it a different "subtype"
+(tinfo now prints this).  If any column is defined this way, all columns
+in the file must be defined, and all column definitions must precede the
+table data.
+
+The print format is used for displaying the table or writing it back out
+if the table was modified.  The file is still read in free format, with
+whitespace (blank or tab) separated columns.  This means that text string
+columns must be enclosed in quotes if they contain embedded blanks.
+
+A task that opens a simple text table read-write may change the table to one
+with explicit column definitions.  This will happen if the task changes a
+column name to something other than "c" followed by an integer, or sets the
+units to a non-null value, or if it creates a new column with non-default
+name or units.  In this case, column definitions will be written for all
+columns, but the names for columns that weren't modified will still be c1,
+c2, c3, etc.  Tasks such as tchcol, tcalc and tedit can do this, for example.
+Therefore, an easy way to add this information to a simple text table is to
+run tchcol and change a column name, say from "c1" to "x".  You can then edit
+those "#c " lines to set the column names, print format and units.  You can
+change the data type, too, though it must be consistent with the data in the
+file; for example, you could change i to d (integer to double), or ch*3 to
+ch*8.
+
+Here are a couple of examples.
+
+#This is a simple text table (no column definitions), but it does have
+#keywords.  Some of the keywords have comments; anything following the
+#value is a comment.
+#k pi 3.14
+#k keywords "rootname opt_elem cenwave" these are the keywords we need
+#k rootname = "o47s01k7m" rootname of the observation set
+#k cenwave = 1307 Angstroms
+#k opt_elem "E140H" grating name
+1 2 3
+4 5 6
+
+# This example has explicit column definitions as well as a header keyword.
+#c rootname ch*9
+#c description ch*15 "" notes
+#c cenwave i i4 angstrom
+#c texpstrt d f20.8 "Modified Julian Date"
+#k opt_elem = E140H
+o47s01k9m "lost data" 1234 5.067942601191E+04
+o47s01kbm "" 1416 5.067945625487E+04
+o47s01kdm OK 1598 5.067949325747E+04
+
+For a text table that does not contain explicit column definitions (referred
+to as a simple text table), the column names are c1, c2, c3, etc., the data
+types and print format are inferred from the data, and there are no units.
+Columns should be separated by blanks or tabs.  The supported data types are
+double precision, integer and character string.  Use a ":" to separate parts
+of a sexagesimal value, e.g. 3:18:26.2.  Except as described above, the "#"
+sign is the comment character.  Each line of the file is treated as a separate
+table row (unless the newline is escaped with a backslash), and the total row
+length may be as long as 4096 characters.
+
+The table routines determine the data type of each column in a simple text
+table by examining the values in the column.  If the value is numerical but
+doesn't contain a decimal point, colon, or exponent, the column is taken to
+be integer.  You can use INDEF for undefined elements in numerical columns
+and "" (or quotes enclosing blanks) for undefined string elements.  For an
+integer column, however, use INDEFI to indicate the data type.  All columns
+must be defined in the first line; that is, no other line may have more
+columns than the first line has.  To a certain extent, this serves as a check
+to distinguish ordinary text files from text tables.
+
+For a simple text table, the print format for each column is determined from
+the values in that column.  (This is a good reason for using explicit column
+definitions.)  The precision is set by counting digits in each value, including
+trailing zeroes.  The field width of a column may be increased by inserting
+spaces in front of a value in any row, and the precision may be increased by
+appending zeroes to any value in the column.  An output table or one opened
+read-write is written out using this format, and the intention is that the
+result should closely resemble the input table, rather than being reformatted
+with a lot of extra space and more digits than are useful.  G format is used
+for floating point data, except that h and m formats (for HH:MM:SS.d and
+HH:MM.d respectively) are also supported.  This usually works well for tables
+containing only numerical data or when the string columns follow the numerical
+columns.  Problems determining the field width typically arise when a floating
+point column follows a string column, and the strings vary in length.  In this
+case, each time you open the table read-write the width of the floating point
+column expands because of the extra space after the shortest string in the
+previous string column.  A hard upper limit to the width of about 25 stops
+the expansion eventually.
+
+A character string in an input text table must be quoted if the string
+contains whitespace, so that the table I/O routines will be able to tell
+that the whole phrase is one table element.  This is the case regardless
+of whether the table contains explicit column definitions or not.  Strings
+in an output (or read-write) text table will be enclosed in quotes if they
+contain whitespace, when the table is written back to disk.  Strings in text
+tables may not contain embedded quotes.  The upper limit for the length of
+a string is 1023 characters (SZ_LINE).
+
+Blank lines and lines beginning with # are comments (except for the #c and
+#k cases described above) and will be ignored on input.  For files opened
+read-write or new-copy, the comments will be saved and written out at the
+beginning of the file.  In-line comments are not saved; they will be lost
+if a table is opened read-write.
+
+While the name of a binary table must include an extension, with ".tab" as
+the default, the name of a text table need not include an extension.  For
+this reason it is necessary to specify the extension explicitly for a text
+table, even if it is ".tab".  STDIN and STDOUT are acceptable names for input
+and output text tables, but not for tables opened read-write.  Thus you
+cannot use STDIN or STDOUT for tcalc because it opens the table read-write.
+Other table tools such as tquery, tselect, and tproject can read from STDIN
+and write to STDOUT, so you can pipe text through these tasks.
+
+When running tcalc on a text table, it is generally advisable to create a new
+column because the table is modified in-place, and it is possible to clobber
+values when changing an existing column.  For example, suppose a floating
+point column contains three-digit values, and you add 1000000 to that column
+using tcalc.  The print format could be G6.3, which would be OK for the
+original values, but you would need seven digits of precision for the modified
+values.  The result would be displayed as "1.00E6".  Putting the output in a
+new column, however, gives you full control over the print format.  The
+default print format (tcalc.colfmt = "") displays full precision.
+
+To prevent accidental deletion of text files, tdelete will not delete
+text tables unless verify=yes.  Tcopy will copy text tables, but it makes
+more sense to use copy.
+
+
+Notes about the system subroutines:
+
+While a text table is being read into memory (by tbzopn), tbcadd is called
+to "create" columns, which means that column descriptors are allocated and
+filled in, and memory is allocated for the column data.  This may be done
+even if the table is opened read-only, but we can't call tbcdef for a
+read-only table.
+
+The upper limit on the line length for an input text table is set to 4096
+in tbltext.h.  The macro SZ_TEXTBUF is SZ_LINE longer than 4096 because of
+the way getlline works.
+
+BUGS:
+
+Get text, put text for a non-text input column but text output column does not
+work very well.  The value is sometimes lost off the end of the string.
+
+Summary of the text table routines:
+
+tbzgt.x		get element; called by tbegt, tbzcg.
+tbzpt.x		put element; called by tbept, tbzcp.
+
+tbzopn.x	read an existing text table into memory;
+		called by tbuopn; calls tbzsub, tbzrds, tbzrdx.
+tbzsub.x	determines table subtype (explicit or simple);
+		called by tbzopn; calls tbzlin, tbzkey, tbbcmt.
+tbzrds.x	read a simple text table into memory;
+		called by tbzopn; calls tbzlin, tbbcmt, tbzkey, tbzcol, tbzmem.
+tbzrdx.x	read a text table with explicit column definitions into memory;
+		called by tbzopn; calls tbzlin, tbbcmt, tbzkey,
+		tbbecd, tbcadd, tbzmex.
+tbzlin.x	read (getlline) a line of text, check if comment;
+		called by tbzsub, tbzrds, tbzrdx.
+tbzcol.x	define columns (except for print format) based on
+		values in first row; called by tbzrds; calls tbbwrd, tbcadd.
+tbzmem.x	read values from line and copy to memory; update info
+		for print format; called by tbzrds; calls tbbwrd,
+		tbzt2t, tbzd2t, tbzi2t, tbzi2d, tbzpbt.
+tbzmex (in tbzmem.x)	reads values from one line, for a table with explicit
+		column definitions; called by tbzrdx; calls tbzpbt.
+
+tbbwrd.x	read one "word" from input line; interpret as to data type,
+		field width and precision.
+tbzd2t.x	change data type of a column from double to text, used
+		when actual data type was not clear from first row;
+		called by tbzmem.
+tbzi2d.x	change data type of a column from integer to double;
+		called by tbzmem.
+tbzi2t.x	change data type of a column from integer to character;
+		called by tbzmem.
+tbzt2t.x	increase allocated width of a character column;
+		called by tbzmem.
+
+tbznew.x	open a new text file and call tbzadd to allocate memory
+		for each column for which we have a descriptor;
+		called by tbtcre; calls tbzadd.
+
+tbzadd.x	check (& correct) data type; allocate memory for column
+		values and assign INDEF to each element;
+		called by tbcadd and tbznew.
+
+tbzsiz.x	reallocate buffers for column values to change the
+		allocated size (number of rows) of a text table;
+		called by tbtchs.
+
+tbzsft.x	shift a set of rows either up or down;
+		called by tbrsft; calls tbznll.
+
+tbznll.x	set all columns in a range of rows to INDEF; called by tbzsft
+tbzudf.x	set specified columns to INDEF in one row; called by tbrudf.
+
+tbzclo.x	call tbzwrt and deallocate memory;
+		called by tbtclo; calls tbzwrt.
+tbzwrt.x	write column values back to text file, and close the file;
+		called by tbzclo.

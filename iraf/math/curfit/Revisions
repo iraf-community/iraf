@@ -1,0 +1,118 @@
+.help revisions Jun89 math.curfit
+.nf
+From Davis, September 20, 1999
+
+Added some missing file dependices to the mkpkg file.
+pkg/math/curfit/mkpkg
+
+From Davis, March 20, 1997
+
+The weights computed by the WTS_CHISQ option in the routines cvacpts[rd]
+were not being forced to be positive as intended.
+math/curfit/cvacpts.gx
+math/curfit/cvacptsr.x
+math/curfit/cvacptsd.x
+
+There was an inconsistency in the way the ncoeff argument to the cvpower[rd]
+routines was being used. Ncoeff was intended to be an output argument.
+pkg/math/curfit/doc/cvpower.hlp
+pkg/math/curfit/cvpower.gx
+pkg/math/curfit/cvpowerr.x
+pkg/math/curfit/cvpowerd.x
+
+From Davis, June 13, 1995
+
+Added a new routine cvepower to the curfit math package. Cvepower computes
+errors of the equivalent power series coefficients for the fitted Legendre
+and Chebyshev polynomials and has the same calling sequence as the 
+cverrors routine.
+math/curfit/cvpower.gx
+math/curfit/cvpowerr.x
+math/curfit/cvpowerd.x
+math/curfit/doc/curfit.hd
+math/curfit/doc/curfit.men
+math/curfit/doc/cvepower.hlp
+
+From Davis, May, 6, 1990
+
+Finished cleaning up the .gx files in curfit.
+math/curfit/cverrors.gx
+math/curfit/cvpower.gx
+math/curfit/cvrefit.gx
+math/curfit/cvpower.gx
+
+From Davis, May 6, 1990
+
+Changed the constant from INDEFR to INDEF in the amov$t call in cvpower.gx.
+This was causing a problem for the Mac compiler.
+
+From Davis, April 23, 1991
+
+Did some cleaning up in the following .gx files to make the code easier to read.
+math/curfit/cv_b1eval.gx
+math/curfit/cv_beval.gx
+math/curfit/cv_feval.gx
+math/curfit/cvaccum.gx
+math/curfit/cvacpts.gx
+math/curfit/cvchomat.gx
+math/curfit/cvfree.gx
+math/curfit/cvinit.gx
+
+From Davis, September 18, 1990
+
+Changed the int calls in cvrestore.gx to nint calls. This is a totally
+safe way to do the conversion from double precision to integer
+quantities in the curfit package and removes any potential precision
+problems for task which must read the curfit structure back from a
+text database file.
+
+From Davis, July 14, 1988:
+
+The calling sequence for the cverrors routine as been changed to include
+an npts argument. This edition removesd the possibility for error when
+points have been rejected by setting w[i] = 0.
+
+-----------------------------------------------------------------------------
+
+From Davis, April 30, 1986:
+
+1. Several bugs involving double precision constants in the double precision
+version of curfit detected on the SUN have been fixed.
+
+-----------------------------------------------------------------------------
+
+From Davis, March 13, 1986:
+
+1. A double precision version of CURFIT has been installed in IRAF. The entry
+points for the double precision version are identical to those of the real
+version with the addition of a preceeding d (e.g. cveval and dcveval). All
+internal arithmetic is done in double and the data is entered in double.
+
+2. A user function facility has been added to CURFIT. The user may enter
+any linear function in the following manner.
+
+	extern func
+
+	...
+
+	call cvinit (cv, USERFNC, nterms, xmin, xmax)
+	call cvuser (cv, func)
+	call cvfit (cv, x, y, w, npts, WTS_USER, ier)
+	call cvvector (cv, x, yfit, npts)
+	call cvfree (cv)
+
+	...
+
+The user function must have the following form.
+
+	procedure func (x, nterms, k1, k2, basis)
+
+where
+
+	real	x		x value
+	int	nterms		number of basis functions
+	real	k1, k2		optional normalization parameters
+	real	basis[ARB]	computed basis functions
+
+-------------------------------------------------------------------------------
+.endhelp

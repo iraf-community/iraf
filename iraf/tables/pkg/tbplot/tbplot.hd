@@ -1,0 +1,10 @@
+# Help directory for the tbplot package.
+
+$doc	= "tables$pkg/tbplot/doc/"
+$tbplot	= "tables$pkg/tbplot/"
+
+axispar		hlp=doc$axispar.hlp,	src=tbplot$axispar.par
+dvpar		hlp=doc$dvpar.hlp,	src=tbplot$dvpar.par
+igi		hlp=doc$igi.hlp,	src=tbplot$igi/t_igi.x
+pltpar		hlp=doc$pltpar.hlp,	src=tbplot$pltpar.par
+sgraph		hlp=doc$sgraph.hlp,	src=tbplot$sgraph.x

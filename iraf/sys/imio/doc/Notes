@@ -1,0 +1,177 @@
+IMIO modifications to support SDAS format imagefiles
+----------------------------------------------------------------
+
+1. EXISTING DATA FORMATS
+
+
+1.1 IRAF Data Format (pre-DBIO)
+
+Characteristics:
+
+    o	Header: binary data structure + fits card image string buffer
+    o	Pixels: binary pixhdr + pixels (can be block aligned)
+    o	Many datatypes supported
+    o	One image per imagefile
+    o	Pixel file may be stored in different directory than header file
+    o	Header file is protected from deletion
+
+Disadvantages:
+
+    o	Can lose track of pixel file if header is deleted.
+    o	Since each image is stored in a separate pair of files,
+	    directories can be large.
+    o	The storage format is machine dependent.
+
+Modifications in this release:
+
+    o	Add .imh extension to image header file
+    o	Add .pix extension to pixel file, make root name same as that
+	    of the header file
+    o	If IMDIR = "", put pixel file in same directory as the header.
+	    This avoids use a pathname in the header, hence the images
+	    are relocatable, but forces one to work on a scratch device.
+
+
+
+1.2 SDAS Data Format
+
+Characteristics:
+
+    o	Images are physically stored in group format
+    o   FITS group header + binary image headers
+    o   Pixfile format: [pixels + group header] * ngroups
+	    nothing is aligned on block boundaries
+    o   Pixel and header files stored in same directory
+    o	Header file extension .hhh, pixel file extension .hhd
+
+Disadvantages:
+
+    o	Images cannot be added to a group; the number of images in a
+	    group must be specified when the group is created.
+    o	The individual images in a group cannot be deleted; only the
+	    entire group can be deleted.
+    o	The format of the image headers for the individual images in
+	    a group is fixed at create time; new parameters cannot be
+	    added to the individual image headers (new parameters can
+	    however be added which apply to the group as a whole).
+    o	The images in a group must all be of the same size and datatype
+	    (this is probably not a serious disadvantage).
+    o	The storage format is machine dependent.
+
+
+2. IMAGEFILE ACCESS
+
+    o   Open/create image
+    o	Make new_copy image
+    o   Access pixel segment
+    o   Close image
+    o	Test if image exists (and determine type)
+    o   Delete image
+    o   Rename image
+
+
+2.1 Open Image
+
+	generate header filename
+	open/create header file
+	allocate image descriptor
+	if (existing image)
+	    read image header into descriptor
+	else
+	    initialize descriptor
+	return pointer to descriptor
+
+
+2.2 Access Pixel Segment
+
+	All image size parameters must be determined at pixfile creation
+	time.
+
+	if (new segment) {
+	    fill in descriptor
+	    if (new pixel file)
+		allocate pixel file
+	    else
+		open pixel file r/w
+	    update header
+	} else
+	    open pixel file
+
+
+2.3 Close Image
+
+	if (header has been modified)
+	    update header
+	close pixfile
+	close header
+
+
+
+3. SPECIFICATIONS
+
+3.1 Image Header Access
+
+    To minimize changes to existing code, the IMIO internal data structures
+will not be modified.  The principal change to the structure of the existing
+interface is the replacement of the direct calls to the FIO open, close, read,
+write, etc. procedures called to access the image header in mass storage by
+calls to a new interface IH (Image Header access).  The new interface will
+hide the disk image format from IMIO.  Interface subroutines will be provided
+only for the IRAF and SDAS image formats, although in principle the interface
+will be extensible to other formats as well.
+
+Ideally the IH interface should be coded using only relatively low level
+VOS and kernel facilities (i.e., no high level FIO, no error handling) so that
+it may be used by the IMFORT interface and called from host Fortran programs,
+as well as by IMIO.
+
+
+	im =     ihopen (image, group, acmode)
+		 ihopix (im)
+		ihclose (im)
+
+
+IHOPEN returns the standard IMIO image descriptor, consisting of the internal
+IMIO fields, the binary image header structure IMHDR, and the "user area",
+a sequence of FITS card images stored in memory a string buffer, i.e.,
+each card image is represented as a stripped, newline delimited sequence of
+characters, with an EOS following the last card.
+
+The GROUP argument to IHOPEN permits access to the individual elements of
+a group format imagefile.  Group format is supported for both imagefile
+formats, the principal difference being that the individual images are
+stored in separate files in the old IRAF format, and in a single pair of
+images in the SDAS format.
+
+The individual images in a group format imagefile appear as separate,
+independent images in IMIO.  Several images in a group format imagefile may
+be simultaneously open (the files are physically opened only once).
+The group header parameters are duplicated for each image in the group.
+If the images are stored in the old IRAF format on disk the values of these
+parameters may vary from image to image, otherwise (SDAS format) they are
+the same for all members of the group.  The number of images in a group is
+fixed at image creation time.
+
+
+3.2 Image Sections and Templates
+
+    The image section notation recognized by IMMAP may include a group
+specifier (set selection expression) as well as a section specifier.
+The full syntax is "image{group}[section]", e.g.,
+
+	pix{3}[*,5]
+
+where { is the set selection operator, and [ is the familiar array subscript
+or subsection operator.
+
+The image template notation has also been generalized to support group format
+image data.  The general form of a template element is
+
+	image{groups}[section]
+
+where [section] applies to each image in the group.  For example, the template
+
+	aa{4},bb{1,3:5},cc{12:15}[*,-*]
+
+expands as image 4 of group AA, images 1, 3, 4, and 5 of group BB, and images
+12 through 15 of group CC flipped in Y.

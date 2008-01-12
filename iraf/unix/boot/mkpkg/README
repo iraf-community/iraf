@@ -1,0 +1,54 @@
+MKPKG -- Package maintenance utility.
+
+    The MKPKG utility is used to maintain the IRAF system libraries as well
+as the system executables and the applications packages.  The file "mkpkg.csh"
+in this directory will make and install the initial mkpkg.e executable.
+The libraries lib$libboot.a and lib$libos.a must have been made first.
+Once MKPKG is up it can be used to remake itself.
+
+
+NOTES
+
+    The MKPKG utility is used to keep libraries and/or packages up to date.
+The dates of the library modules are compared to the corresponding SOURCE
+(not object) files in the directories contributing to the library.
+Any source files newer than their corresponding library modules are
+compiled and the library is updated.  Note that the sources contributing
+to the library may reside in multiple subdirectories as well as in the
+current directory.  Each source file may depend on zero or more other files.
+If any of these files are newer than the source file, the source file is
+recompiled and replaced in the library.
+
+MKPKG is built upon a preprocessor front end providing macro replacement
+and conditional interpretation facilities.  These facilities, in combination
+with the OS escape mechanism used to send commands to the host system,
+make it possible to use MKPKG for more than just updating libraries.
+
+As far as possible, the system dependent functions required by MKPKG have
+been isolated and placed in separate small files.  The bulk of the code is
+machine independent.  Additional system dependent functions are provided
+by the BOOTLIB library (LIBBOOT) and by the IRAF kernel (LIBOS).  The MKPKG
+specific functions required are the following:
+ 
+	[1] Given the NAME of a source file, return the date of the
+	    corresponding object module in a library.
+	[2] Replace (or add) a series of object modules in a library,
+	    creating the library if it does not already exist.
+	[3] "Rebuild" the library after all updates are complete.
+
+The library functions are normally implemented by formatting a command
+for the host librarian utility and sending it to the host with the ZOSCMD
+utility.  Note that an entire command script can be built in a temporary
+file if the ZOSCMD interface is too inefficient for multiple small calls
+on your system.
+
+All filenames in the portable code (and in the Makelib files) are in the
+IRAF format, which is very similar to UNIX format.  Do not change the high
+level code to manipulate host system filenames directly.  All filename
+mapping should be performed in the host interface code; the VFN2OSFN
+function is convenient to use for this purpose.
+
+For simplicity, most buffers are fixed in size.  Dynamically allocating
+everything is less efficient and is not warranted since the memory
+requirements of this program are modest.  If a buffer overflows simply
+increase the allocation below and remake mkpkg.

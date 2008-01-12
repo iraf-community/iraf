@@ -1,0 +1,73 @@
+# This describes the currently available catalog definition entries
+# available and the format.
+
+# Comments begining with '#' are ignored.
+# Order of lines determines order in catalog.
+# Case is ignored though labels in catalog will be as given in file.
+
+ACE_NAME		[OPTIONAL USER NAME FOR CATALOG]
+
+# There are a few functions currently available.
+
+MAG(ACE_NAME)
+APFLUX(radius_in_pixels)
+MAG(APFLUX(radius_in_pixels))
+
+
+# Basic quantities.
+NUM		Object number
+PNUM		Parent number (0 if original detection)
+NPIX		Number of pixels
+NDETECT		Number of detected pixels (before growing)
+FLAGS		Flags (currently on M for multiple object)
+
+# Fluxes
+FLUX		Isophotal flux
+FRACFLUX	Apportioned flux (TOTMAG)
+APFLUX(radius)	Aperture fluxes (radius in pixels)
+SKY		Mean sky
+PEAK		Peak pixel value above sky
+ISIGAVG		Average (I - sky) / sig
+ISIGMAX		Maximum (I - sky) / sig
+
+# Positions
+WX		X world coordinate (requires WCS in header)
+WY		Y world coordinate (requires WCS in header)
+X1		X centroid (pixels)
+Y1		Y centroid (pixels)
+XAP		X aperture coordinate (centroid initially then not changed)
+YAP		Y aperture coordinate (centroid initially then not changed)
+XMIN		Minimum X (pixels)
+XMAX		Maxium X (pixels)
+YMIN		Minimum Y (pixels)
+YMAX		Maxium Y (pixels)
+
+# Miscellaneous
+SIG		Mean sky sigma
+FRAC		Apportioned fraction
+
+X2		X 2nd moment (pixels)
+Y2		Y 2nd moment (pixels)
+XY		X 2nd cross moment (pixels)
+
+# Derived quantities.
+A		Semimajor axis
+B		Semiminor axis
+THETA		Position angle (degrees)
+ELONG		Elongation = A/B
+ELLIP		Ellipticity = 1 - B/A
+R		Second moment radius (pixels)
+CXX		Second moment ellipse (pixels)
+CYY		Second moment ellipse (pixels)
+CXY		Second moment ellipse (pixels)
+
+# Error estimates.
+FLUXERR		Error in flux
+XERR		Error in X centroid (pixels)
+YERR		Error in Y centroid (pixels)
+AERR		Error in A
+BERR		Error in B
+THETAERR	Error in THETA (degrees)
+CXXERR		Error in CXX (pixels)
+CYYERR		Error in CYY (pixels)
+CXYERR		Error in CXY (pixels)

@@ -1,0 +1,21 @@
+# Make the LINMATCH  task
+
+$checkout libpkg.a ../../../
+$update libpkg.a
+$checkin libpkg.a ../../../
+$exit
+
+libpkg.a:
+	rglcolon.x	<imhdr.h> <error.h> linmatch.h
+	rgldbio.x	linmatch.h
+	rgldelete.x	<gset.h> <mach.h> linmatch.h
+	rgliscale.x	<imhdr.h> <gset.h> <ctype.h> linmatch.h
+	rglpars.x	<lexnum.h> linmatch.h
+	rglplot.x	<mach.h> <gset.h> linmatch.h
+	rglregions.x	<fset.h> <imhdr.h> <ctype.h> linmatch.h
+	rglscale.x	<mach.h> <imhdr.h> linmatch.h lsqfit.h
+	rglshow.x	linmatch.h
+	rglsqfit.x	<mach.h> lsqfit.h
+	rgltools.x	linmatch.h
+	t_linmatch.x	<fset.h>  <imhdr.h> <imset.h> <error.h> linmatch.h
+	;

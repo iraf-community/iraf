@@ -1,0 +1,1474 @@
+
+NUMBER:	1
+KEYWORDS:	splot, scopy, imslice, multispec
+DATE:	Mon Jan  3 14:22:09 MST 2005
+FROM:	valdes
+
+Q:	I have spectra that have been produced by 'apall', with 4 bands
+	and 2 apertures, with 3071 data points, thus have dimension
+	[3071,2,4].  I want to shift from band to band simply by
+	using the ')' and '(' within 'splot', I actually have to exit
+	'splot' each time, and specify the band at the prompt or on the
+	command line.
+
+	What I tried to do is separate the 2 apertures into 2 distinct
+	files, each one of them being [3071,1,4].  Naturally, I can
+	accomplish this more or less with 'imslice', in which case I end up
+	with 2 files, each [3071,4].  In principle, this is perfectly OK,
+	but the problem is that when I try to use 'splot' on these [3071,4]
+	files, I still cannot shift from band to band simply by using the
+	')' and '(' within 'splot'.
+
+A:	The '%' key in SPLOT can be used to go to a new band.  You have to
+	enter the band so it is not quite as convenient as '(' and ')'
+	which is for apertures.  The ')' and '(' keys do have a special
+	feature that if there is only one aperture then it steps through
+	the bands which is why you thought of splitting the apertures.
+
+	For the approach of separating the apertures you cannot use
+	IMSLICE because it automatically changes the dimension of the
+	multispec image.  There are ways to add the dimension back but they
+	are not easy.  Instead use SCOPY to copy out each spectrum with its
+	extra bands.  This task can split multispec formats to single
+	spectra but it doesn't naturally split things into multispec
+	organized by aperture.  However, with a simple loop you can do what
+	you want.  The solution is
+
+	    on> for (i=1; i<=2; i+=1)
+	    scopy ("abc.ms", "abc"//i//".ms", aperture=i)
+
+	Of course with just two spectra you could just do the command twice
+	without the loop and the generation of output names based on the
+	line number.
+
+NUMBER:	2
+KEYWORDS:	tables, binary, fits, tprint, tdump
+DATE:	Tue Jan  4 02:44:51 MST 2005
+FROM:	fpierfed
+
+Q:	How do I convert a table in FITS binary format to ASCII using IRAF?
+
+A:	Converting a table in FITS format to ASCII is pretty simple. All you need is the TABLES package, developed and distributed by STScI (http://www.stsci.edu/resources/software_hardware/tables). Within TABLES, the tasks that you might want to use are tdump and tprint. The first one is pretty simple to use. tprint on the other hand offers more control on the output. At the minimum, you can do something like this:
+
+tt> tdump combined_dr2_062404.fits > my_ascii_table.dat
+
+Please, keep in mind that any further support on the TABLES package is handled by STScI directly (help@stsci.edu). 
+
+
+-
+
+NUMBER:	3
+KEYWORDS: filesize largest 64bit	
+DATE:	Wed Jan  5 10:47:47 MST 2005
+FROM:	zarate
+
+Q:
+I'm working with some large images (1-2 GB), and IRAF has a problem with
+this. Any tool I try to run gives me the message:
+
+ERROR: Attempt to write out of bounds on file
+
+This is an example from an 'imarith' attempt, but it seems to happen with
+all tools. It seems to me that IRAF isn't allocating enough memory in
+some sort of buffer to be able to work with the images. Does this sound
+correct? And if so, do you know how I can fix it?
+
+I'm running this on a UNIX system (Solaris 8) with 4 GB of RAM, running
+IRAF version 2.12.2a. Let me know if you need any more info.
+
+A:
+ Iraf file size is limited to the 32 bit range which
+ is about 2GB. When an IRAF task like imarith opens an
+ input image and tries to creates another one near this
+ limit you migth get this kind of problems. The same
+ limitation applies to memory requirements of a task.
+
+ To find out if this is your problem, you could you
+ can operate on a subsection of the big image and see if it
+ goes to completion.
+
+ This will be addressed with the 64 bit extension of IRAF which is
+ still pending.
+
+NUMBER:	4
+KEYWORDS:	vertical labels specplot txset
+DATE:	Wed Jan  5 15:12:05 MST 2005
+FROM:	valdes
+
+Q:	How do I write vertical labels in SPECPLOT?
+
+A:	Unless the application, such as IGI or SPECTOOL, provide features for
+	adjusting the text attributes, or an application like IDENTIFY
+	automatically writes vertical text, the only control you have is
+	with the "cursor mode" capability.  To learn about this type
+	"help cursors" in IRAF.  Cursor mode is quite a nice feature since
+	it applies to all graphs but it has the drawback that any redraw of
+	the screen (by the application) will lose the changes and it is not
+	possible to put the cursor mode commands in a file to be executed
+	again.
+
+	Before describing what to do with SPECPLOT I will point out that
+	you might investigate the tasks noted above.  In particular,
+	SPECTOOL is a powerful alternative to the tasks in the standard
+	NOAO  spectroscopy packages.  It has features for stacking, like
+	SPECPLOT, and for marking and labeling things, like IDENTIFY, and
+	general interactions like SPLOT.  There are GUI control panels to
+	do things like set the graphics attributes.
+
+	Now for SPECTOOL start up the program.  As described in the cursor
+	mode help page, to get the graphics on your screen to look like
+	they will look (approximately) in a postscript file you should type
+	":.txq h".  Then do a 'r' to redraw the SPECPLOT graph. This allows
+	the lettering to be drawn with strokes rather than hardware fonts.
+
+	Next rotate the lettering path with ":.txset up=180".  Then start
+	adding the labeling with the 'T' key available in cursor mode.  You
+	can save intermediate states with ":.w <filename>" which you
+	restore with ".r <filename>".  Note that if you write to the same
+	file more than once it will append.  When you read it back the
+	screen will flash with all of the past saves.  Finally dump the
+	graph with something like ":.snap eps".  Again, if you do a redraw
+	SPECPLOT will forget about the changes you made with 'T'.
+
+NUMBER:	5
+KEYWORDS:	encapsulated postscript snap
+DATE:	Wed Jan  5 15:16:12 MST 2005
+FROM:	valdes
+
+Q:	How do I make a postscript file from the SPECPLOT?
+
+A:	
+	When you have the graph you want type one of the following
+
+	    :.snap eps
+	    :.snap epsl
+	    :.snap psdump
+
+	The first two produce a file sgiXXXXXX.eps in your working
+	directory and the last produces a file irafdmpXXXXX.ps in /tmp.
+	Because of buffering you might need to type ".gflush" from the
+	cursor mode or "gflush" from the CL command line.  The two EPS
+	files are in portrait and landscape.  You would probably want to
+	rename the files so you remember what they are.
+
+	Note that postscript in IRAF is black and white only.  To get color
+	postscript see
+
+	    http://iraf.noao.edu/iraf/web/faq/FAQsec08.html#8005
+
+	Another task to call your attention to is "igi" in the
+	tables.tbplot package.  This is a Mongo-like graphics language
+	interpreter that understands IRAF files.  While you need to learn
+	the language it is what I use if I really need complex graphics
+	with lots of labels and spectra.  It is convenient because you can
+	keep the commands in a text file.  If you are happy with SPECPLOT
+	for what you are doing then this would be overkill.
+
+
+NUMBER:	6
+KEYWORDS:	longslit fitcoords transform fceval
+DATE:	Thu Jan  6 12:44:12 MST 2005
+FROM:	valdes
+
+Q:	I would like to generate a mapping from (x,y) pixels of an image
+	to a wavelength and a spatial axis coordinate.  I know this is
+	what TRANSFORM through the FITCOORDS database.  Can I do the
+	evaluation directly from the CL?  I found that the IRAF math
+	libraries include routines for evaluating the FITSCOORDS mappings
+	but I can't find a CL interface for them.  Is there a way to use
+	the math routines to evaluate the FITCOORDS mappings?
+
+A:	You are in luck because a task to do what you want was added to
+	V2.12.2 (and following patches).  So if you have the latest IRAF
+	then the task you want is LONGSLIT.FCEVAL.
+
+	As far as accessing the functions in the math package these are
+	purely for SPP programming.  In future there will be language
+	bindings for access from other languages but it will still be
+	largely intended for software developers rather than users.  While
+	it might be an interesting idea to wrap these functions into CL
+	callable tasks it might not be so useful depending on how the input
+	is defined.  Anyway, this is a low priority at this time.  We do
+	welcome suggestions such as the one that led to FCEVAL which was
+	basically similar to your request.
+
+
+NUMBER:	7
+KEYWORDS: VMS Platform Support
+DATE:	Tue Jan 11 12:12:33 MST 2005
+FROM:	fitz
+
+Q:	Is IRAF still available for VMS?
+
+A:	We haven't supported VMS in a few years so the most recent version
+	we have is IRAF V2.11.3 (Dec99) which was prepared under VMS 7.1.
+	You can still download this from the archive directory:
+
+		ftp://iraf.noao.edu/iraf/v211/VMS7
+
+	If it works you're in luck, but if there are problems I'm afraid
+	there's not much we can do to help as all our VMS systems were
+	abandoned a while ago.
+
+NUMBER:	8
+KEYWORDS:	xgterm, RedHat Enterprise WS3, ncurses, garbage on screen
+DATE:	Wed Jan 12 10:31:17 MST 2005
+FROM:	valdes
+
+Q:	We are running RedHat Enterprise WS3 (Taroon update 4)
+	and implot produces garbage on the screen.  We are not using xgterm
+	because it requires curses 4 and we only have curses 5
+
+A:	Be sure that you aren't using konsole or gnome-terminal, as neither
+	of these implement the textronix tools.  You must use xterm or
+	xgterm.  Garbage on the screen is typically due to a mismatch in
+	the terminal setting.  If you see the garbled text when usign an
+	xterm, then you probably have the terminal set to 'xgterm'.  Edit
+	your login.cl file.
+
+	To get xgterm working, there are two things you can try.  There is
+	version of x11iraf that is linked against ncurses version 5.  You can
+	get that from the following link:
+
+	    ftp://iraf.noao.edu/pub/fitz/x11iraf-v1.3.2-bin.redhat.tar.gz
+
+	The alternative is to create a symbolic link as follows:
+
+	    cd /usr/lib
+	    ln -s libncurses.so.5 libncurses.so.4
+
+
+NUMBER:	9
+KEYWORDS:	DS9, color problem
+DATE:	Wed Jan 12 10:42:01 MST 2005
+FROM:	valdes
+
+Q:	We are using DS9 with RedHat Enterprise WS3 and when we use the
+	IRAF display task we only see a pink box though directly loading
+	by DS9 works fine.
+
+A:	The user reported that upgrading from DS9 V3 to DS9 V3.03 fixed
+	the problem.
+
+NUMBER:	10
+KEYWORDS:	DS9, display, WCS, coordinate display
+DATE:	Wed Jan 19 09:02:12 MST 2005
+FROM:	valdes
+
+Q:	When I load a fits image (say, a 2Mass image) from within DS9 (with
+	file->open), the cursor on the DS9 display provides the x,y and
+	RA,DEC position on the image.
+
+	If instead I use the IRAF/display command to load the same image on
+	DS9, then I only get x,y from the cursor, no RA-DEC. Why can't DS9
+	read the world coordinates of the image when displayed from IRAF cl?
+
+	Is there a parameter I should update somewhere? 
+
+A:	 When IRAF sends the image WCS to the display server it includes the
+	pathname to the image, however DS9 doesn't currently do anything
+	with this filename and so only displays the x,y coords and
+	approximate pixel value based on the z1/z2 scaling.  When DS9 loads
+	the image standalone it's able to read the image pixels/wcs
+	directly and makes use of them.  There is no parameter you can set,
+	this is a change that needs to be made in DS9 to have it access the
+	image when displayed from IRAF.
+
+NUMBER:	11
+KEYWORDS:	Debian, LNUX, IRAF platforms
+DATE:	Wed Jan 19 09:07:38 MST 2005
+FROM:	fitz
+
+Q:	Is there any distribution of IRAF compatible with the Debian linux?
+
+A:	The standard PC-IRAF system supports Debian using the LNUX 
+	architecture.  You'll need the as.pcix.gen source distribution, and
+	the ib.lnux.x86 (core IRAF) and nb.lnux.x86 (NOAO package) binaries
+	as well as the pciraf.ps installation guide (all files compressed so
+	note the .gz extensions).  See also the README file.  You can download
+	the files from our archive in ftp://iraf.noao.edu/iraf/v212/PCIX.
+
+NUMBER:	12
+KEYWORDS:	cosmic rays, crutil
+DATE:	Fri Jan 21 11:38:07 MST 2005
+FROM:	valdes
+
+Q:	Last year, Wojtek Pych (Copernicus Center, Poland; also Dunlap Obs.)
+	published an interesting paper on a fast algorithm for CR removal
+	from single CCD images, suited especially for 2-D spectral images
+	(Pych, PASP 116, 148, 2004 Feb).  His C code is available at
+
+	    http://www.camk.edu.pl/~pych/
+
+	Do you by any chance know whether anyone has written an IRAF task
+	that runs this code?  (I have asked Pych directly, who does not
+	know of any such task.)
+
+	If that hasn't been done yet, I'll try to have one written, since
+	Pych's code seems to be very efficient and good at CR removal from
+	single 2-D spectra.
+
+A:	I am not aware of anyone that has implemented this in an IRAF task.
+	I just quickly read the paper and the method is simple enough that
+	it should not be hard, particularly with the code available.  It
+	would be a interesting addition to the suite of tasks recently
+	collected together in a CRUTIL package.
+
+NUMBER:	13
+KEYWORDS:	mosaic astrometry, WCS solutions for multiple amps/CCD
+DATE:	Fri Jan 21 11:51:46 MST 2005
+FROM:	valdes
+
+Q:	I am trying to derive a WCS for a new mosaic camera.
+	I have used CCMAP to derive a fair WCS using ten bright stars on
+	one amplifier of one ccd.  To simplify the situation, I have cut
+	three of the CCD's out of the mosaic, so I have only two amplifiers
+	(and two extensions) to work with.  My first question deals with
+	how to treat both amps at once.  CCMAP seems to want only one
+	extension at a time, or a frame that has been put into a simple
+	fits format.  I can create the simple format by copying the two
+	extensions into one simple fits file (but I lose the header info
+	from extension [0]), but I don't think this is what I should be
+	doing.  I assume I derive a WCS for the mosiac and then make a
+	simple fits file which is corrected and shifted to a point common
+	with the other dithered images of the same object.  Am I right?
+	How do I treat the two amps (extensions) with CCMAP?
+
+A:	Your are right that you should derive a single WCS for a CCD since
+	multiple amplifiers are geometrically linked.  This is what is done
+	with the CTIO mosaic that has 2 amplifiers per CCD and I do a
+	single WCS solution for each CCD which are then divided across the
+	amplifiers.  The way this is done is to derive a database solution
+	for the merged single CCD using MSCTPEAK.  In the database it
+	should say pixsystem is physical.
+
+	Then the other thing is setting up the mapping between physical
+	coordinates (think of this as CCD coordinates) and the pixels in
+	the amplifier images correctly.  This is done with the LTV1
+	keyword.  Normally you would have no LTV or LTM keywords in the raw
+	data but it might depend on the presence of any over/pre scans on
+	the left side of the image.
+
+	LTV1 should be the offset from the first pixel of the real data,
+	i.e. the merged CCD image and the first pixel in the amplifier
+	image.  An example is best here.  Suppose you have two amplifier
+	image extensions called im1 and im2.  In im1 there is nothing on
+	the left.  This means pixel (1,1) is the first CCD pixel
+	corresponding to (1,1) in the image you used for MSCTPEAK.  Then
+	the offset in x is 0 and you can either set LTV1=0 or leave it out
+	because the default for a missing LTV keyword is 0.  Now the first
+	amplifer reads out the first 1024 pixels of the CCD.  The second
+	amplifier reads out the second 1024 pixels.  Again, if there is no
+	dummy data on the left of the image for im2 then the first image
+	pixel maps to pixel (1025,1) in the merged CCD image.  Then the
+	offset is LTV1=1024.
+
+	Once you have this setup to define this "physical" or CCD
+	coordinate system then MSCSETWCS will apply a database solution
+	appropriately.  This only modifies the WCS keywords and will set
+	CRVAL1/CRVAL2 to some real point on the sky for the exposure based
+	on a keyword in the header.  That is, the one solution for the CCD
+	will be set appropriately for each of the two amplifiers.  Note
+	that what this really means is that the keywords will be the same
+	except that the CRPIX1 keywords will differ by some amount.  As a
+	reminder CRPIX1 is the pixel relative to the image that corresponds
+	to the "tangent point" where the CRVAL1 keyword gives the RA (in
+	degrees).  As noted in the astrometry write up the celestial point
+	on the sky needs to be the same for all the pieces of a mosaic and
+	then the CRPIX keywords define the different distances of a WCS to
+	that point on the sky in terms of the origin of the particular
+	image.
+
+	To illustrate what I do for the CTIO mosaic I make 8 solutions for
+	the 8 CCDs.  These are labeled im1, im3, im5, etc in the database.
+	I then copy the first 8 to the end of the file and change the
+	labels to im2, im4, etc.  There is nothing else changed in terms of
+	the WCS.
+
+	Once you have the database file then running MSCSETWCS to populate
+	the WCS in the mosaic data will preserve the headers and only
+	change the WCS keywords.
+
+	References:
+
+	http://iraf.noao.edu/projects/ccdmosaic/astrometry/astrom.html
+	http://iraf.noao.edu/projects/ccdmosaic/generic/generic.html
+
+
+NUMBER:	14
+KEYWORDS:	binary tables, spectra, splot, rspectext
+DATE:	Fri Jan 21 12:19:28 MST 2005
+FROM:	valdes
+
+Q:	I have at my disposal spectra in FITS format, but with a binary
+	table extension.  The extension contains the following:
+
+	    WAVELENGTH       R          %10.3f ANGSTROMS       
+	    FUNNORM          R          %10.4e ""              
+	    FNORM            R          %10.4e ""              
+	    SNR              R          %10.1f ""              
+	    ORDER            I             %3d ""              
+
+	I am wondering how I can use IRAF NOAO tasks such as SPLOT (to
+	examine, e.g.  'fnorm' vs 'wavelength') or CONTINUUM (to continuum
+	normalize 'funnorm') on these data.
+
+A:	We would like to eventually have SPLOT, and other ONEDSPEC tasks,
+	operate directly on this table format.  A table format for spectra
+	is a reasonable thing but in the IRAF NOAO packages we use an image
+	format with a WCS in the header to handle the coordinates.
+
+	The current solution is to extract the data you want into a two
+	column text file.  The tasks in the TABLES package provide the
+	ability to convert a FITS table into text.  The TABLES package must
+	be installed separately from the STSDAS distribution which is also
+	available at
+
+	    http://iraf.noao.edu/contrib.html
+
+	You could also use TABLES tools for plotting and GRAPH for the text
+	files.  But all of the analysis features in SPLOT require use of
+	image format.
+
+	The columns would be wavelength and one of the flux columns.  You
+	would then use the task ONEDSPEC.RSPECTEXT to convert the text file
+	into an image spectrum.  In this task there are choices about how
+	to create the wavelength coordinate system.  If the coordinates
+	vary smoothly a fit is a compact description.  But you can also use
+	the non-linear mode to store each wavelength in a list in the
+	header.  Note that this method has a limitation that the list,
+	which is stored as text, has to fit in less than 999 68 character
+	strings.  So a very long spectrum could not be handled in this
+	way.
+
+NUMBER:	15
+KEYWORDS:	spectra, continuum	
+DATE:	Mon Jan 31 09:35:44 MST 2005
+FROM:	valdes
+
+Q:	I am having a strong continuum in my extracted blackbody corrected
+	spectra of which I want to get rid off ( I am looking for a faint
+	emission on this continuum). Can you suggest me a way to do it
+	effeciently, since I am having 100 such spectra.
+
+A:	The task CONTINUUM in the ONEDSPEC package may be used.  Defining
+	the continuum can be hard if there are many lines.  Thie method in
+	CONTINUUM (which is also available with the '/' key in SPLOT) is to
+	fit a function with rejection of the high and low points.  It
+	primarily works well with spectra that are either all absorption or
+	emission so that a one sided clipping can be used.  For your
+	question about emission you should use something like a 1-sigma
+	threshold below and 4-sigma (or higher) above.  This will then
+	approach the continuum from below removing the absorption lines
+	while not removing emission lines.
+
+NUMBER:	16
+KEYWORDS:	spectra, smoothing, filtering, boxcar
+DATE:	Mon Jan 31 09:37:58 MST 2005
+FROM:	valdes
+
+Q:	Is there any way in IRAF by which I can take a 5 point running
+	average for a given specta (say spectra.imh).
+
+A:	This can be done either with the SPLOT 's' key or with the task
+	BOXCAR.  In both cases a moving average is also called "boxcar
+	smoothing".  In SPLOT it is interactive for visual interaction.
+	The result can be saved from SPLOT if you want.  Note that other
+	tasks in the IMFILT package (see help imfilt) can be applied to 1D
+	spectra as well as 2D.  The most common alternative to boxcar
+	filtering is gaussian filtering.
+
+NUMBER:	17
+KEYWORDS:	crosstalk, MiniMosaic
+DATE:	Thu Feb  3 16:32:20 MST 2005
+FROM:	valdes
+
+Q:	Where can I find the latest MiniMosaic crosstalk files?
+
+A:	As far as we know, there are no crosstalk files for MiMo. Users
+	generally are more concerned if a bright star is present for issues
+	of saturation bleeding and ghosting (ghosting is described in the
+	MiMo manula).  As to crosstalk, it is assumed to be low (an old
+	measurement is "a few adu in multiple 10,000 adu".
+
+
+NUMBER:	18
+KEYWORDS:	photometry, DAOFIND, CENTERPARS
+DATE:	Thu Feb  3 16:43:14 MST 2005
+FROM:	valdes
+
+Q:	We are doing variability photometry and occasionally get about
+	700 CCD images per night.  I do the reductions in IRAF, and mostly
+	it goes pretty quickly, except dealing with coordinate files.  Is
+	there any way to specify the positions of the stars to do
+	photometry on, so you don't have to edit 700 coodrdinate files that
+	come out of DAOFIND?  The drift of the objects during the night is
+	fairly small, but not zero, but the fields are not crowded, so if
+	there is so me way to define a coordinate box where DAOFIND looks,
+	that would save alot of editing and messing around with S/N
+	cutoffs, and max brightness levels to try and reduce the number of
+	stars DAO finds to a manageable level.
+
+
+A:	There is no need to use DAOFIND before every exposure when the
+	images have only small shifts.  Once you have a list of pixel
+	positions of the stars, say from DAOFIND, in one exposure all you
+	should have to do is recenter the pixel coordinates for each
+	exposure rather than "find" them again?  The DAO package photometry
+	tools have options to center on the sources provided by the input
+	coordinates.  The centering option would be controled by the
+	CENTERPARS parameter set.  So consult the CENTERPARS help file.
+
+	Centering works when the shifts are fairly small and the field is
+	not too crowed.  The CENTERPARS options work within a box around
+	the starting coordinate.  So the box should be big enough for the
+	shift but not so big as to include another star within a couple of
+	magnitudes fainter (very faint stars should not affect the
+	centroid).
+
+NUMBER:	19
+KEYWORDS:	spectra, convolution, multispec, 3D
+DATE:	Fri Feb  4 13:02:22 MST 2005
+FROM:	valdes
+
+Q:	I have a set of multispec FITS that I need to convolve (gauss,
+	boxcar, ...).  Each multispec FITS has 3 spectrum with the same
+	dispersion and all of them need to be convolved. The gauss or
+	boxcar tasks complain about the higher dimensions. Is there a way
+	to convolve the multispec without having to extract each aperture,
+	convolve, and them combining them again?
+
+A:	The BOXCAR, GAUSS, ..., tasks will work on 1D and 2D data.  If you
+	have multiple apertures in the multipec format, that is more than
+	one line, then you would set the convolution size in y to 1.  Now
+	if you have the third dimension, the "extras" information from
+	APALL, then you do have to do something because the tasks are not
+	designed for 3D data.  You can do things fairly easily as follows.
+
+	Let me assume you have multispec data which is [*,3,4].  There are
+	some number of wavelength points along the first dimension which
+	you want to convolve, there are 3 spectra, and each spectrum has
+	the primary spectrum and 3 associated spectra.  Note whether it
+	makes sense to convolve the sigma spectrum I won't address.  For
+	this example suppose you want to do a boxcar convolution of 5
+	pixels.
+
+	    cl> boxcar spec.ms[*,*,1] band1 5 1
+	    cl> boxcar spec.ms[*,*,2] band2 5 1
+	    ...
+	    cl> imstack band1.band2,band3,band4 newspec.ms
+
+	You could also do this with a loop:
+
+	    cl> for (i=1; i<=4; i+=1)
+	    >>> boxcar ("spec.ms[*,*,"//i//"]", "band"//i, 5, 1)
+	    cl> imstack band1.band2,band3,band4 newspec.ms
+
+	In summary, you want to use image sections to select bands of the
+	3D multispec file and use IMSTACK to rebuild the 3D multispec
+	format.
+
+
+NUMBER:	20
+KEYWORDS:	apall, long slit, dispaxis
+DATE:	Fri Feb  4 13:15:40 MST 2005
+FROM:	valdes
+
+Q:	I am attempting to run apall to extract spectra from images that
+	have the dispersion axis running horizontally (along x-direction)
+	and the spatial axis running vertically (y-direction).  However, it
+	seems that this IRAF task is hard-wired to interpret data with the
+	oppsite orientation, and I am having a difficult time finding the
+	parameter which can be changed so that the program recognizes the
+	orientation of my dispersion axis.  Currently, it chooses a
+	dispersion line which runs parallel to my dispersion axis...i.e. it
+	chooses a line that misses my object spectrum all together! I think
+	that the program should be choosing a line that runs perpendicular
+	to my dispersion axis (and consequently my object specrum) so that
+	eventually the dispersion line will run across my object, from
+	which I can define an aperture window from there.
+
+
+A:	I think you are asking about defining the dispersion axis.  This is
+	done either by a header keyword DISPAXIS or the parameter
+	"dispaxis" in the parent package parameters.  For example, if you
+	load APEXTRACT then use "epar apextract".  If you use KPNOSLIT then
+	do "epar kpnoslit".  The values of dispaxis are 1 for dispersion
+	increasing/decreasing with the column (first image axis), which is
+	horizontal when viewed in an image display, and 2 for the opposite
+	orientation.  From what you describe you want dispaxis=1.
+
+
+NUMBER:	21
+KEYWORDS:	Gemini, SALT, crosstalk, xtalkcor
+DATE:	Mon Feb  7 08:47:35 MST 2005
+FROM:	valdes
+
+Q:	I am using the GEMINI package convention of using EXTNAME and
+	EXTVER, so that the image extensions are named [SCI,1], [SCI,2],
+	etc.  This would have worked with the old xtalkcor.cl, but with the
+	new one I am getting an error message:
+
+	Warning: FXF: extname and/or extver value already exists
+	    in extension ('SCI')
+
+
+A:	I did manage to use xtalkcor on Gemini-convention data.  I thought
+	you might be interested in how in case anyone else asks.  By the
+	way, the reason I am doing this is that I am adapting the Gemini
+	package (with their approval) to use on the Southern African Large
+	Telescope (SALT); I am PI on the first major instrument, Prime
+	Focus Imaging Spectrograph (PFIS), which has a similar CCD layout
+	and mode set to GMOS.  I wanted to graft your xtalkclcor into it,
+	since they say their crosstalk is too small to bother with a
+	correction, and ours is not.
+
+	The only incompatibility arises from the Gemini extension names,
+	which are [SCI,1], [SCI,2], etc.  Xtalkcor appears to slice the MEF
+	into individual fits files named xxx_SCI,1.fits, xxx_SCI,2.fits,
+	etc.  The comma in the fits name confuses those tasks that
+	interpret image lists, where "," denotes a new image.  The
+	crosstalk correction is correctly applied, it just trips up trying
+	to glue the fits files back into an MEF.  So I used your "split"
+	option and glued them back together myself, begin careful to not
+	use routines that use image lists, or by escaping the "'" with a
+	"\".  It works fine, and is nice and fast, even for unbinned data:
+
+	----------------
+	# do crosstalk correction using mscred.xtalkcor
+	# ignore bpm for now
+	# get around xtalkcor bug by splitting extensions 
+	#   and re-assembling them with fxcopy
+
+	if (canxtalk) {
+	     mscred.verbose=l_verbose; mscred.logfile=l_logfile
+	     xtalkcor(output[ii],output[ii],output[ii],
+		   xtalkfiles=tmpxfile,bpmthreshold=-10.,split+,
+		   fextn="fits",noproc-)
+
+	     tmpfile=mktemp("tmpfile")//".fits"
+	     fxcopy(output[ii],tmpfile,groups="0",new_file+,verbose-)
+		   imdelete(output[ii]//".fits",verify-)
+		   imrename(tmpfile,output[ii]//".fits",verbose-)
+
+	     for (jj=1;jj<=n_ext[ii];jj+=1) {
+		   fxcopy(output[ii]//"_"//l_sci_ext//"\,"//jj//".fits",
+			    output[ii]//".fits", groups="", new_file-, verbose-)
+		   salhedit(output[ii]//"["//jj//"]","EXTNAME",l_sci_ext,
+			    "Extension name")
+		   salhedit(output[ii]//"["//jj//"]","EXTVER",jj,
+		   "Extension version")       
+	     }
+
+	     salhedit(output[ii]//"[0]","XTALKCOR ","yes",
+		   "Corrected for amplifier crosstalk")
+	     print (output[ii]//"_"//l_sci_ext//"*.fits")
+	     delete (output[ii]//"_"//l_sci_ext//"*.fits", verify-)
+	     delete (output[ii]//"*.pl", verify-)
+	     delete ("pfisxtalk_*", verify-)
+	 }
+	-----------------------------------
+
+
+NUMBER:	22
+KEYWORDS:	graphics, windowing, zooming, gtools, identify
+DATE:	Mon Feb  7 09:01:45 MST 2005
+FROM:	valdes
+
+Q:	I've been able to get to the wavelength calibration part of
+	my spectral reduction, and am currently assigning wavelengths to my
+	arc..however there was a bad column in the chip, and thus there is
+	one segment of my plot that has a horrendous spike...now I have
+	tried to find a way to remove that spike and re-plot my arc
+	spectrum (after extraction, naturally), but haven't found a way...I
+	also tried to find a way to change the y-axis (i.e. :y 300 500) but
+	that doesn't seem to work when I am executing the task IDENTIFY.
+
+A:	There are two questions here.  One is editing the data in an
+	applicatation graph, what you called "remove that spike".  There is
+	no generic way to edit data in a graph though some applications
+	such as SPLOT and SPECPLOT let you do that.
+
+	The second question about replotting the data is very common.  This
+	is how one "expands" the plot to see finer detail.  In many of the
+	science applications, though not all and not in the core PLOT or
+	IMAGES package, there is an interface called GTOOLS.  If you type
+	"help gtools" you can read about it.  These are commands to tell
+	the application how to redraw the graph.  So in IDENTIFY you would
+	do something like 'w' 'e' 'e' to expand the graph.  Also 'w' 't' to
+	put an upper limit in order to chop off the spike.  It is important
+	to know that 'w' 'a' will return you to autoscale which is what the
+	applications usually do by default.  So there are lots of
+	keystrokes available.  Note also that the 'z' and 'p' keystrokes in
+	IDENTIFY let you zoom around the marked features and then cancel
+	the zoom.  But what I most often use with IDENTIFY are the e and a
+	window commands.
+
+
+NUMBER:	23
+KEYWORDS:	apall, upper/lower, aperture widths
+DATE:	Mon Feb  7 09:12:06 MST 2005
+FROM:	valdes
+
+Q:	One thing I did want to clarify under the APALL parameters,
+	numerous as they be...the actual extraction aperture is defined by
+	the "upper" and "lower" parameters, true?  The profile centering
+	width, nsum, etc are simply for centering purposes, as far as I can
+	discern...though this is my first time reducing spectra.
+
+A:	In APALL when you first type 'm' or use the automatic find the
+	application needs to have a default aperture width.  You are
+	correct that upper and lower define the default.  If you edit an
+	aperture in the edit mode and then mark a new aperture it will use
+	the last defined aperture.  But for most purposes you need only to
+	be concerned with "upper" and "lower".  You are also right that the
+	widths used for centering on a feature for setting an aperture and
+	tracing are not the same as the aperture width.
+
+NUMBER:	24
+KEYWORDS:	implot, splot, graphics, windowing
+DATE:	Tue Mar 29 10:19:29 MST 2005
+FROM:	valdes
+
+Q:	When I inspect a reduced spectrum (an image file) of DN vs.
+	wavelength with IMPLOT I can use 'e' and 'e' to mark the lower
+	left and upper right corners of a window.  But with SPLOT that
+	doesn't work at all: nothing happens.
+
+	I can use 'a' and 'a' to define the left and right sides of a
+	window in SPLOT, but then the lower and upper edges are set by the
+	bottom and top DN values in that window.  This is very limiting.
+	Can you suggest a solution?
+
+
+A:	For various reasons a distinction is made between "core" image
+	processing tasks and astronomical applications tasks concerning
+	features and standards for windowing graphics.  Many of the
+	applications tasks, such as SPLOT, use a layer called "gtools".  If
+	you type "help gtools" you can get info about the many functions.
+	The help for the application, such as typing '?', should tell you
+	that the commands are extended with the gtools commands.  The
+	extensions are done using a precusor which is 'w' for cursor
+	windowing and '/' for colon commands.  The equivalent of the 'e'
+	key in IMPLOT is 'w'+'e'.
+
+	SPLOT not only has the gtools functions but it has a few of its own
+	windowing commands such as 'a' and 'b'.  The 'a' key, along with
+	the keys that slide the window, are actually pretty useful since
+	they "autoscale" with the data in the window.  But since you don't
+	want this behavior what you are looking for is 'w'+'e'+'e'.
+
+	There is no equivalent standard for the core tasks such as IMPLOT.
+	So the 'e' is simply a part of IMPLOT.  What is standard in all
+	graphics, both core and application, are the cursor mode functions
+	(see "help cursors").  Note that this applies to the rendering of
+	the graph so you lose the axes with something like 'E'.  The
+	distinction is whether the application redraws the graph of the
+	rendering layer simply replays the graphics stream with zooming or
+	whatever.
+
+	In windowing graphics there is usually the ability to use colon
+	commands to explicitly set limits rather than just using the
+	cursor.  In IMPLOT this is the :x and :y commands.  In the gtools
+	functions these are the :/xwind and :/ywind commands.  It may be
+	that you want these to, for instance, force the bottom to be zero
+	for spectra.  The 'b' key in SPLOT does this for you.
+
+	So it is possible to do exactly the same thing in SPLOT as in
+	IMPLOT but the keystrokes are not the same and the set of windowing
+	options are much greater in SPLOT.
+
+
+NUMBER:	25
+KEYWORDS:	doslit, doecslit, dofiber, dohydra, doargus, dofoe, imtype
+DATE:	Fri Apr 15 10:56:47 MST 2005
+FROM:	valdes
+
+Q:	I'm getting the error message:
+
+	cc> doslit
+	List of object spectra (a0134):
+	Edit apertures for a0134? (yes):
+	ERROR on line 58: Arc reference spectrum not found - a0135
+	doslit ()
+
+	However, the file a0135.fits does exist.  What's wrong?
+
+A:	This error is usually caused by a mismatch between the image extension
+	you have set as the default and the type of your data.  Because
+	the installation default is "imh" but now it is more common to use
+	FITS files this mostly occurs when imtype="imh".  You can change the
+	default imtype value by editing your login.cl, uncommenting the line
+	for imtype and changing the value to "fits" (or whatever
+	extension you use).
+
+	This dependence on imtype is a "gotcha".  The task needs to
+	manipulate the image names and uses the imtype variable to do
+	this.  This is described in
+
+	    http://iraf.noao.edu/irafnews/apr98/irafnews.1d.html
+
+	The reason this is not more general is that this program preceded
+	the changes which allowed people to use different image types and
+	the quick way to modify this complex task was to use the imtype
+	variable to tell the script what extensions to look for.
+
+	I have made a changes to various related task to help with this
+	occasional "gotcha".  The new behavior will be to show the full
+	name the task is looking for and to add a hint to check the imtype
+	variable.
+
+	kp> doslit
+	...
+	ERROR on line 58: Arc reference spectrum not found - demoarc1.imh
+	Check setting of imtype
+	kp> dir demoarc1*
+	demoarc1.fits   
+
+
+NUMBER:	26
+KEYWORDS:	echelle, multispec, crpix, cdelt, slist, scopy
+DATE:	Fri Apr 15 12:53:32 MST 2005
+FROM:	valdes
+
+Q:	I have reduced, extracted, linear dispersion echelle data with
+	headers similar to that in Figure 3 of section 5.1 of phelp
+	onedspec.specwcs
+
+	I want to extract the "specN" data for each aperture.
+	Specifically, I am interested in getting w1 and dw for each order
+	for use in an alternate application which requires specification of
+	CRVAL and CDELT.
+
+A:	What you want is the task SLIST:
+
+	on> slist test.ec
+	test.ec 1 1 108 0 5174.281 0.07307974 512 Artificial Echelle Spectrum
+	test.ec 2 2 109 0 5126.81 0.07240991 512 Artificial Echelle Spectrum
+	test.ec 3 3 110 0 5080.203 0.07175154 512 Artificial Echelle Spectrum
+	test.ec 4 4 111 0 5034.435 0.07110465 512 Artificial Echelle Spectrum
+	test.ec 5 5 112 0 4989.485 0.07047016 512 Artificial Echelle Spectrum
+	test.ec 6 6 113 0 4945.33 0.0698462 512 Artificial Echelle Spectrum
+	test.ec 7 7 114 0 4901.95 0.06923369 512 Artificial Echelle Spectrum
+	test.ec 8 8 115 0 4859.324 0.0686317 512 Artificial Echelle Spectrum
+	test.ec 9 9 116 0 4817.434 0.06804022 512 Artificial Echelle Spectrum
+	test.ec 10 10 117 0 4776.259 0.0674583 512 Artificial Echelle Spectrum
+
+	The sixth and seventh columns give the starting wavelength and
+	reciprocal dispersion.
+
+	Note that you could also copy the
+	orders to separate 1D images that will have the simple FITS keywords
+	you want:
+
+	on> scopy test.ec test format=onedspec verb+
+	test.ec[*,1](1)  -->  test.0001(1)
+	test.ec[*,2](2)  -->  test.0002(2)
+	test.ec[*,3](3)  -->  test.0003(3)
+	test.ec[*,4](4)  -->  test.0004(4)
+	test.ec[*,5](5)  -->  test.0005(5)
+	test.ec[*,6](6)  -->  test.0006(6)
+	test.ec[*,7](7)  -->  test.0007(7)
+	test.ec[*,8](8)  -->  test.0008(8)
+	test.ec[*,9](9)  -->  test.0009(9)
+	test.ec[*,10](10)  -->  test.0010(10)
+	on> imhead test.0001 l+
+	test.0001[512][real]: Artificial Echelle Spectrum
+	[...]
+	CTYPE1  = 'LINEAR  '
+	CDELT1  =   0.0730799958109856
+	CD1_1   =   0.0730799958109856
+	CRVAL1  =      5174.2807617188
+	CRPIX1  =                   1.
+	[...]
+
+
+NUMBER:	27
+KEYWORDS:	long slit, transform, fceval, S-distortion
+DATE:	Tue Apr 26 09:01:38 MST 2005
+FROM:	valdes
+
+Q:	I have just installed the latest version of IRAF in order to use
+	your recently introduced fceval package.  It is a very useful
+	addition.  Thank you!
+
+	Anyway, I have a question regarding its use.
+
+	In the first example you give:
+	cl> fceval STDIN STDOUT arcfit,std
+
+	where, I assume, "arcfit" and "std" are the database fits produced
+	by "fitcoords", such that you have two separate, distinct fits for
+	each axis (dispersion (arcfit) and spatial (std)).
+
+	I can understand how you came by the dispersion fit (ie. via
+	"identify" --> "reidentify" --> "fitcoords"), but I am unclear
+	about what you did to obtain the spatial fit.
+
+	Any help you can give me would be very welcome.
+
+
+A:	The spatial distortion function is sometimes called the
+	"S-distortion".  It is meassured either by tracing a bright star,
+	tracing a calibration obtained by moving the star to different points
+	on the slit in one exposure, or with a special comb slit.  The tracing
+	is done with IDENTIFY/REIDENTIFY/FITCOORDS just as for the dispersion.
+
+	Note that during the spatial IDENTIFY one can either specify a pixel
+	position or use some system like arcsec.  The effect of all this is to
+	make the spatial coordinate be that put in during the initial IDENITFY
+	at some point along the dispersion be the same at all dispersion points
+	(i.e.  straighten the traced features to be exactly aligned with the
+	rows or columns.
+
+	Note also that one can specify more than one fit along the same axis.
+	This would normally be a before and after calibration. This averages
+	the flexture.
+
+	The reason TRANSFORM and FCEVAL allow multiple functions at once is to
+	allow a single transformation rather than multiple transformation to
+	minimize interpolation degradation.
+
+
+NUMBER:	28
+KEYWORDS:	sarith, ignoreaps
+DATE:	Mon May  2 10:01:18 MST 2005
+FROM:	valdes
+
+Q:	I am using iraf version 2.12.2a . I am trying to use 'sarith' to
+	sum two spectra. They are both wavelength calibrated. It doesn't
+	add the two spectra together, but just copies input1 to the output
+	spectrum. Do you have any idea what may be going wrong?  I am
+	trying to effectively sum two rows of a multi-object 2d frame (or
+	actually, subtract them as one will be negative)
+
+A:	I thing the problem you are having is that you must set
+	ignoreaps=yes.  When your input consists of columns from 2D images,
+	SARITH assigns the "extracted" 1D spectra to have aperture numbers
+	corresponding to the central column.  (Note that the "nsum"
+	parameter in the package parameters may be summing neighboring
+	columns in this extraction.) By default SARITH only wants to
+	operate on 1D spectra with the same aperture numbers.  To change
+	this you use the ignoreaps parameter mentioned previously.  Other
+	tasks such as SCOMBINE also generally have an "ignoreaps" parameter
+	that you should be aware of.
+
+
+NUMBER:	29
+KEYWORDS:	spectra, overplotting, splot, specplot, spectool, bplot
+DATE:	Mon May  2 11:43:50 MST 2005
+FROM:	valdes
+
+Q:	I am producing many plots of 5 or more superposed spectra over a
+	small wavelength range using:
+
+	  on> splot spn1c001_01_133 xmin=3900 xmax=4100 ymin=0 ymax=2.5e-16 \
+	  >>> opt="wr"
+
+	and then interactively typing:  o g spn1c001_01_134
+					o g spn1c001_01_141
+					o g spn1c001_01_143
+					o g spn1c001_01_144
+	The five plotted spectra are uniquely defined by
+	"spn1c001_01_1??.fits".
+
+	To save myself all this interactive typing, I would like to simply
+	type:
+
+	  on> splot spn1c001_01_1??.fits xmin=3900 xmax=4100 ymin=0\
+	  >>> ymax=2.5e-16 opt="wr,o"
+
+	and then four times interactively type "q".  As I understand the
+	help file for `splot', this should produce the same graph ("o" in
+	options for overplot).
+
+	However, when I do this, each new spectrum appears by itself, and I
+	have been unable to achieve overplotting in this mode?  How do I
+	prevent the erasing of the previously plotted spectra?  Is there a
+	way to achieve it?  Will be grateful for any help or pointer you
+	may provide, since I am producing dozens of such superposition
+	plots in the first, inefficient way.
+
+A:	The cycling through images which are specified as the input list
+	and using 'q' to go to the next spectrum does not work the way you
+	want.  It is equivalent to doing SPLOT separately on each input.
+	The option setting you tried with the 'o' specification is to avoid
+	having to type 'o' before every 'g'.  It does not apply to a 'q' as
+	you found.
+
+	The answer to what you want to do is to use the task SPECPLOT.
+	This task was specifically designed for overplotting types of work
+	which is common with spectra.  It has a number of options,
+	including scaling and color coding.  It may take you a short while
+	to learn how to use this and the cursor and colon commands but it
+	is worth learning.
+
+	To do a batch type of graphics with colors and plotting types use a
+	cursor input file in place of the interactive cursor.  For
+	example:
+
+	    on> type cursor.dat
+	    0 0 1 :ptype[1] 1
+	    0 0 1 :ptype[2] 2
+	    0 0 1 :ptype[3] 3
+	    0 0 1 :color[1] 1
+	    0 0 1 :color[2] 2
+	    0 0 1 :color[3] 3
+	    r
+	    q
+	    on> specplot test* xmin=6000 xmax=6250 cursor=cursor.dat
+
+	Note that you must put the "0 0 1" on the colon command lines to
+	workaround a bug which will be fixed in the next release.  You also
+	need the 'r' to get the plot to redraw.
+
+	You can redirect the graphics to a printer or metacode file if you
+	want.  See BPLOT for some help on how to use cursor input
+	redirection in IRAF tasks.
+
+	Another reference is that the SPECTOOL graphical tool has many
+	sophisticated options for stacking, etc.  It is a separate add-on
+	package.  You may or may not want to investigate this new tool as
+	alternatives to SPLOT, SPECPLOT, and other ONEDSPEC tasks.
+
+
+	PS You might think BPLOT could do what you want.  But because the
+	spectrum name specified for the 'g' option comes from a parameter
+	rather than the cursor input you can't use cursor input redirection
+	for this purpose.
+
+NUMBER:	30
+KEYWORDS:	splot, signal-to-noise, S/N, batch
+DATE:	Thu Jun 16 16:33:27 MST 2005
+FROM:	valdes
+
+Q:	I need to find the signal to noise of a great deal of HST/NICMOS3
+	spectra.  I know I can use splot and the 'm' key to get signal to noise
+	interactively.  However, I need to make sure that I am using the same
+	region for signal to noise in each spectra.  If I do it interactively,
+	I can't tell if I am getting the same wavelength range each time.
+
+	Is there another command similar to splot that I can use to get the
+	signal to noise of a region of a spectra over the same region like in a
+	batch mode?  Or is there some hidden epar file for m in splot that I
+	can define the wavelength range it uses to calculate signal to noise.
+
+A:	If you like what SPLOT does then the batch version is BPLOT.  To give
+	an example, suppose the wavelength region is 5000A to 5500A (with
+	the spectra dispersion calibrated in Angstroms).  Create a file,
+	for example cursor.dat, that contains the one line "5000 5500 1
+	m".  The use BPLOT:
+
+	on> bplot spec* cursor=cursor.dat >G dev$null
+	m again:avg:      94.28  rms:      16.73   snr:     5.63
+	m again:avg:      94.86  rms:      17.83   snr:     5.32
+	m again:avg:      94.28  rms:      16.73   snr:     5.63
+	on> type splot.log
+
+	Jun 16 16:25 [spec1.fits]: Artificial Spectrum
+	avg:      94.28  rms:      16.73   snr:     5.63
+
+	Jun 16 16:25 [spec2.fits]: Artificial Spectrum
+	avg:      94.86  rms:      17.83   snr:     5.32
+
+	Jun 16 16:25 [spec3.fits]: Artificial Spectrum
+	avg:      94.28  rms:      16.73   snr:     5.63
+
+	The ">G" redirects the graphs to a file (the null file in the
+	example).  If you don't want the "m again:..." output also add ">
+	dev$null" to send this to the null file.
+
+	Note that the example used the same spectrum with three different
+	names which is why the answers are the same.
+
+
+NUMBER:	31
+KEYWORDS:	mknoise, synthetic spectra, S/N, SNR, artdata
+DATE:	Tue Jun 28 15:09:11 MST 2005
+FROM:	valdes
+
+Q:	I have a question about the task MKNOISE in artdata package.
+	I would like to inject some noise in synthetic spectra.  What I
+	wonder is how I can relate the read noise and gain in the
+	parameters in the task to the signal to noise (S/N)? And what are
+	the reasonable values for background, gain, and readnoise?
+
+	I will use the synthetic spectra for estimating stellar atmospheric
+	parameters(Metallicity, surface gravity, and temperature ) for SDSS
+	spectra.
+
+A:	If you are adding noise to existing synthetic spectra then you
+	probably do not want to add a background.  The gain parameter is
+	used to convert your data numbers to photons for the purpose of
+	including a Poisson noise.  The read noise parameter, on the other
+	hand, is used to define a constant noise which is independent of
+	the number of photons.
+
+	The easiest thing is to set "poisson=no" and use a constant
+	noise.   In this case the "gain" parameter is ignored and the
+	"rdnoise" parameter specifies the constant noise sigma.  If you
+	want to simulate a particular signal-to-noise ratio, SNR,  then
+	determine the average continuum level, <CONT>, in the synthetic
+	spectrum.   Then the "rdnoise" value you want is <CONT>/SNR.
+
+	If instead you want to use Poisson statistics set the read noise to
+	zero, set "poisson" to yes, and set the gain to (SNR)^2/<CONT> (the
+	desired S/N at the continuum squared divided by the mean continuum
+	value).
+
+	This all assumes your synthetic spectrum is purely positive (i.e.
+	it is not continuum or sky subtracted).  If instead you have just
+	the source spectrum and you want to simulate an observation with a
+	non-zero sky you would use the background to add a background or
+	continuum.  It would be simplest if you first add the background
+	without noise and then follow the suggestions I gave earlier about
+	setting rdnoise or gain.  Then you could subtract the same
+	noise-less background to return the simulated spectrum to source
+	only.
+
+	Note that to compare to SDSS spectra you really need to understand
+	all the details of the SDSS spectra though if you are just matching
+	a S/N then adding noise as described above may be a reasonable
+	thing to do.
+
+
+NUMBER:	32
+KEYWORDS:	uncertainties, errors, sarith
+DATE:	Mon Aug  1 09:06:52 MST 2005
+FROM:	valdes
+
+Q:	I have a question about the behavior of sarith in noao.onedspec
+	package.  I have a so-called 3D multispec format fits files,
+	with basically the standard contents: optimally-extracted,
+	no-weighting, sky, and sigma vectors.  When I tried to do an
+	arithmetic globally on this fits file, this is what I get:
+
+	cl> sarith f1672.oii / 2.38e-18 f1672.oii clobber+ format="multispec"
+	f1672.oii.fits[*,1,1](1)  /  2.38E-18  -->  f1672.oii.fits[*,1,1](1)
+	f1672.oii.fits[*,1,2](1)  /  2.38E-18  -->  f1672.oii.fits[*,1,2](1)
+	f1672.oii.fits[*,1,3](1)  /  2.38E-18  -->  f1672.oii.fits[*,1,3](1)
+	f1672.oii.fits[*,1,4](1)  -->  f1672.oii.fits[*,1,4](1)
+
+	I'm wondering why sarith does not do the intended computation on
+	the 4th vector.  I've tried explicitly specifying the band 4 within
+	the task option, but for some reason operation on that band does
+	not yield intended results (which is dividing by 2.38e-18 here).
+
+	Is this a bug, or the behavior is intended?
+
+	Also, to make sure I'm interpreting the multispec format.  The 4th
+	vector is an error vector, which means the error/uncertainty
+	associated with the particular pixel for the optimally-extracted
+	spectrum (1st vector).	So basically if x1, x2, ... , xN are the
+	optimally extracted pixel values, then the 4th vector contains dx1,
+	dx2, ..., dxN, such that
+
+	x1 +/- dx1
+	x2 +/- dx2
+	..
+	xN +/- dxN
+
+	are the array of pair (best estimates, uncertainty).  I hope
+	I'm interpreting the format correctly here, but if I'm not,
+	I'd appreciate if you could let me know.
+
+A:	The behavior with the error or uncertainty vectors is intended though
+	it raises a common question.  The reason for the behavior is
+	that since SARITH can be doing arbitrary operations, as well
+	as possibly resampling the spectra, it was decided that rather
+	than do the incorrect thing to uncertainty it was better to
+	do nothing.  SARITH is not sophisticated enough to due correct
+	error propagation.
+
+	Your understanding of the meaning of the error array is correct.
+	In the more constrained situation of extraction from a 2D CCD image
+	with specified noise model (the readout noise and gain with Poisson
+	statistics) the uncertainty is the formal 1 sigma error estimation.
+
+	Correct and, more important, meaningful error propagation in a
+	general image and spectral processing environment is hard and
+	IRAF task have generally avoided this for some indefinite future.
+
+
+NUMBER:	33
+KEYWORDS:	quadformat, quadred, quadproc, gain and readout noise
+DATE:	Mon Aug 15 09:24:13 MST 2005
+FROM:	valdes
+
+Q:	Settings for the read noise and gain appear in the parameter sets
+	for zerocombine, flatcombine, qzerocombine and qflatcombine
+	[maybe elsewhere, too??]
+
+	I've got data with one chip from Tololo, but each quadrant is
+	read out separately.  So, there are four gain readings and four
+	read noise readings in the header.  I've been averaging these four
+	gain and four noise reading values, and entering the average read
+	noise and gain in the qzerocombine nad qflatcombine parameter sets.
+
+	Is that correct, or does quadproc automatically pick the four
+	noise readings and four gain readings from the header, and enter
+	them into quadproc?
+
+	Do I have my parameter files etc., straight?
+
+A:	The gain and read  noise parameters are used by the underlying
+	combine task to try and identify cosmic rays or other transient
+	noise.	While this could be potentially useful in the tasks
+	you mention, there are other rejection methods, I recommend
+	"avsigclip",  that work just as well and don't require the gain or
+	read noise.  The reason I say this is that the current software
+	doesn't know about the keywords in the quadformat (see "help
+	quadformat") which define the gains of the individual amplifiers;
+	though they should be present as GTGAINij and GTRONij in your data.
+	So I suggest you not worry about this since CCDPROC doesn't need
+	this and there are other rejection methods in the combining tasks
+	that should be fine.  After flat fielding the issue of the gain
+	and readout noise is put off to applications such as photometry
+	which don't understand the quadformat anyway.
+
+	If you want to do more than I suggest there are two approaches
+	you could try.	One is the task QUADSCALE which can scale the data
+	to a common gain.  The other is to split the data with QUADSPLIT
+	and treat each quadrant (or half) as separate data sets.
+
+	I need to qualify my response by saying that I have never reduced
+	CTIO quadformat data and some of the tools were written by others
+	at CTIO.  If you want more guidance on reducing this data you
+	might contact the instrument scientists at CTIO that support the
+	instrument you used.
+
+
+NUMBER:	34
+KEYWORDS:	mscred, msccmatch, mef, single images
+DATE:	Fri Aug 26 11:47:31 MST 2005
+FROM:	valdes
+
+Q:	I've been using mscred for a long time and have grown used to
+	the efficiency of msccmatch for WCS fitting and installation.
+	Is there anything like it for single CCD images?  I'm aware of
+	the imcoords package, but it seems like it would be a lot of work
+	compared to msccmatch, which just runs by itself.
+
+A:	Msccmatch will work with single images.  So you need to have an
+	initial WCS.  Note that msccmatch is not a general matching method
+	so the assumption is that the WCS is off by a zero point shift,
+	possibly a small (~1deg) rotation and have some linear distortion.
+
+	In general many of the useful mscred tasks will work on single
+	images (mscdisplay, msczero, msccmatch, mscfinder, and mscimage
+	are examples).
+
+	You are right that a general solution would involve imcoords
+	package.  The task ccxymatch is one of the tasks for finding
+	WCS from scratch but it is sensitive to parameters settings.
+
+
+NUMBER:	35
+KEYWORDS:	identify, scripts	
+DATE:	Fri Nov  4 12:35:45 MST 2005
+FROM:	valdes
+
+Q:	I am writing some IRAF scripts involving the use of the task
+	"identify".  I would like to use the task interactively, as
+	when it is launched from the command line.	Everything works
+	fine at the beginning: the task is launched and the graphical
+	window pops up, waiting for the interactive commands. The
+	problem is that whenever I try to mark some features using the
+	"m" key the task does not allow me to type in the wavelength,
+	just as if the enter key is automatically hit, so that
+	the feature wavelength remains INDEF. Trying to hit "u"
+	to enter the wavelength is of no help.  The keystrokes and
+	colon commands work fine, but there is no way of typing in
+	the wavelength for marked features.  I also tried to launch
+	identify through a simple script with just a line: "identify",
+	and I noticed that at the end (being the "autowrite" parameter
+	set to "no") the script does not stop waiting for my answer,
+	but it gets the last entry and directly exits; also this
+	behaviour suggests that it is just like an enter command
+	is automatically sent to the task.	Could you give me any
+	suggestion on how to solve this problem?  Thank you for all
+	the help you may provide.
+
+A:	This is a common "gotcha" (FAQ) with using IDENTIFY.  The
+	IDENTIFY task reads input from the cursor, from parameters,
+	and from the standard input of the task.  It is this last part,
+	where it asks for such things as the wavelength, that causes
+	problems with the simplest way to invoke a script.  I suspect
+	you are doing something like:
+
+	    cl> cl < myscript.cl
+
+	In this case you are redirecting the standard input of the CL
+	from the terminal to the script file which then causes the problem
+	you have.  There is an easy solution.  You must declare the script
+	as a task as follows:
+
+	    cl> task $myscript = <path>myscript.cl
+	    cl> myscript		# This runs the script
+
+	The script must use the .cl extension.	The path, such as
+	home$, is optional but if you don't specify a path then the
+	script will only run in the directory where the script file
+	is located.  The first $ in the task statement says that the
+	script does not have parameters.  Note there are other ways to
+	write scripts, which also use the task statement to define them,
+	that include parameters and is more like a programing language
+	(see http://iraf.noao.edu/iraf/ftp/iraf/docs/script.pdf).
+
+	To repeat, IDENTIFY cannot be used in a script that is executed
+	by redirection to the cl but can be used in other forms script
+	invocations.
+
+
+NUMBER:	36
+KEYWORDS:	psfmeasure, ellipticities, position angles, imexamine
+DATE:	Mon Nov 14 12:53:53 MST 2005
+FROM:	valdes
+
+Q:	I have a (long) list of x and y positions of stars in an image.  I
+	would like to measure the ellipticities and position angles of
+	the images non-interactively.  How should I do this?
+
+A:	IMEXAM I suggest you look at the task PSFMEASURE.  In the current
+	version of IRAF it is part of the OBSUTIL package.  To do the
+	non-interactive job you want you would make a text file of x/y
+	for all your stars.
+
+	ob> psfmeasure starfield imagecur=mystars.dat >G dev$null
+	** Select stars to measure with 'm' and finish with 'q'.
+	** Additional options are '?', 'g', and :show.
+	NOAO/IRAF V2.12.2a-EXPORT valdes Mon 12:47:40 14-Nov-2005
+
+		  Image  Column    Line     Mag    FWHM   Ellip      PA SAT
+	      starfield  164.79  184.59    0.00   2.206    0.06     -23
+
+	  Full width at half maximum (FWHM) of 2.2061
+
+	This is with the default parameters.  Note the redirection of
+	the graphics to null file.  You could redirect the graphics to a
+	metacode file viewable with (e.g.) GKIMOSAIC.  However for 30,000
+	stars I don't think you want that.
+
+	The algorithms in PSFMEASURE are largely the same as in IMEXAM.
+
+NUMBER:	37
+KEYWORDS:	colbias, ccdproc, fit1d, prescan, overscan
+DATE:	Mon Nov 14 14:13:04 MST 2005
+FROM:	valdes
+
+Q:	I have a question concerning the colbias command in the noao.bias
+	package of IRAF. I am working with a telescope which uses columns
+	1-48 and 2096-2158 as overscan regions. The bias is found by the
+	colbias command. I was wondering if it is poissible to set up the
+	parameters in such a way that both sections (so 1-48 and 2096-2158)
+	are used for this purpose. Could you help me with this question?
+
+A:	It is not common to use both the prescan and overscan columns at
+	the same time.	The standard IRAF tasks for handling bias (colbias
+	and ccdproc) do not allow use of more than one contiguous region
+	for bias.  However, if you wish to do so you can use FIT1D to do
+	what you want.	The parameters I recommend are:
+
+
+					   I R A F
+			    Image Reduction and Analysis Facility
+	PACKAGE = imfit
+	   TASK = fit1d
+
+	input   =                       Images to be fit
+	output  =                       Output images
+	(axis   =                    1) Axis to be fit
+	type    =           difference  Type of output (fit, difference, ratio)
+	(interac=                   no) Set fitting parameters interactively?
+	(sample =       1-48,2096-2158) Sample points to use in fit
+	(naverag=                 -100) Number of points in sample averaging
+	(functio=            chebyshev) Fitting function
+	(order  =                    2) Order of fitting function
+	(low_rej=                   0.) Low rejection in sigma of fit
+	(high_re=                   0.) High rejection in sigma of fit
+	(niterat=                    1) Number of rejection iterations
+	(grow   =                   0.) Rejection growing radius in pixels
+	(graphic=             stdgraph) Graphics output device
+	(cursor =                     ) Graphics cursor input
+	(mode   =                   ql)
+
+	The type of "difference" subtracts the bias, the "sample"
+	parameter defines the data to use for the bias.  The value of
+	-100 says to take the median of each bias region (a median is
+	good to avoid bad pixels and cosmic rays), and the function and
+	order fit a line between the two regions.  The value of the fit
+	is subtracted from each pixel in the image.   Read the help page
+	for this task for the various options.
+
+	To later trim away the bias regions you would use imcopy with image
+	sections.
+
+	cl> imcopy <image>[49:2095,*] <newimage>
+
+
+NUMBER:	38
+KEYWORDS:	zscale, display, autoscaling
+DATE:	Mon Dec  5 15:37:00 MST 2005
+FROM:	valdes
+
+Q:	I can't find a description of the 'zscale' scaling algorithm anywhere.
+	Do you have a reference for how it determines the proper scaling of
+	the pixels?
+
+
+A:	The algorithm is described in the IRAF help for the DISPLAY task
+	in a section on the algorithm.  I include the section below for your
+	convenience.  In summary,  the algorithm consists of selecting a subset
+	of pixels (using masks if defined to exclude data), sorting the values,
+	chopping off the ends, and fitting a linear function.
+
+
+From the DISPLAY help page:
+
+ZSCALE ALGORITHM
+    The zscale algorithm is designed to display the  image  values  near
+    the  median  image  value  without  the  time  consuming  process of
+    computing a full image histogram.  This is particularly  useful  for
+    astronomical  images  which  generally  have a very peaked histogram
+    corresponding to  the  background  sky  in  direct  imaging  or  the
+    continuum in a two dimensional spectrum.
+
+    The  sample  of pixels, specified by values greater than zero in the
+    sample mask zmask or by an  image  section,  is  selected  up  to  a
+    maximum  of nsample pixels.  If a bad pixel mask is specified by the
+    bpmask parameter then any pixels with mask values which are  greater
+    than  zero  are not counted in the sample.  Only the first pixels up
+    to the limit are selected where the order is by line beginning  from
+    the  first line.  If no mask is specified then a grid of pixels with
+    even spacing along lines and columns that  make  up  a  number  less
+    than or equal to the maximum sample size is used.
+
+    If  a  contrast of zero is specified (or the zrange flag is used and
+    the image does not have a  valid  minimum/maximum  value)  then  the
+    minimum  and maximum of the sample is used for the intensity mapping
+    range.
+
+    If the contrast  is  not  zero  the  sample  pixels  are  ranked  in
+    brightness  to  form  the  function  I(i) where i is the rank of the
+    pixel and I is its value.  Generally the midpoint of  this  function
+    (the  median) is very near the peak of the image histogram and there
+    is a well defined slope about the midpoint which is related  to  the
+    width  of the histogram.  At the ends of the I(i) function there are
+    a few very bright and dark pixels due to objects and defects in  the
+    field.   To  determine  the  slope  a  linear  function  is fit with
+    iterative rejection;
+
+            I(i) = intercept + slope * (i - midpoint)
+
+    If more than half of the points are rejected then there is  no  well
+    defined  slope  and  the full range of the sample defines z1 and z2.
+    Otherwise the endpoints of the linear function  are  used  (provided
+    they are within the original range of the sample):
+
+            z1 = I(midpoint) + (slope / contrast) * (1 - midpoint)
+            z2 = I(midpoint) + (slope / contrast) * (npoints - midpoint)
+
+    As  can  be  seen,  the parameter contrast may be used to adjust the
+    contrast produced by this algorithm.
+
+

@@ -1,0 +1,23 @@
+# FITS parameters
+iraf_files,f,a,,,,IRAF image
+fits_files,f,a,,,,FITS filename
+newtape,b,a,,,,Blank tape?
+long_header,b,h,no,,,Print FITS header cards?
+short_header,b,h,yes,,,Print short header?
+format_file,s,h,"default",,,Format filename
+log_file,s,h,"none",,,Log filename
+bitpix,i,h,0,,,IRAF data type
+blocking_factor,i,h,1,1,10,FITS tape blocking factor
+extensions,b,h,no,,,Allow FITS extensions in the same file?
+binary_tables,b,h,no,,,Binary FITS tables?
+gftoxdim,b,h,yes,,,Multigroup to xtra dimension?
+ieee,b,h,yes,,,Convert to ieee standard?
+scale,b,h,yes,,,Scale data?
+autoscale,b,h,yes,,,Auto_scaling?
+bscale,r,h,1.0,,,FITS bscale
+bzero,r,h,0.0,,,FITS bzero
+dadsfile,s,h,"null",,,Internal use.
+dadsclas,s,h,"null",,,Internal use.
+dadsdate,s,h,"null",,,Internal use.
+Version,s,h,"22-Feb-1999",,,Stwfits version
+mode,s,h,ql,,,

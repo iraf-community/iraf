@@ -1,0 +1,45 @@
+.help txconcat Dec92 noao.digiphot.ptools
+.ih
+NAME
+txconcat -- concatenate a list of APPHOT/DAOPHOT text databases
+.ih
+USAGE
+txconcat textfiles outfile
+.ih
+PARAMETERS
+.ls textfiles
+The list of APPHOT/DAOPHOT text databases to be concatenated.
+.le
+.ls outfile
+The name of the output APPHOT/DAOPHOT text database.
+.le
+.ls task = "TASK"
+The name of the keywords whose value is the name of the task which wrote
+the database.
+.le
+.ih
+DESCRIPTION
+TXCONCAT is a simple task which accepts a list of APPHOT/DAOPHOT text
+database files and concatenates them into one resultant output file.
+TXCONCAT checks that all the file are indeed APPHOT/DAOPHOT text
+database files and that they were all written by the same task before
+performing the concatenation.
+
+.ih
+EXAMPLES
+
+1. Concatenate a list of DAOPHOT PHOT task result files into a single
+output file.
+
+.nf
+   pt> txconcat m92r.mag.1,m92r.mag.2,m92r.mag.3 m92rall.mag.1
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.tbconcat,ptools.pconcat,tables.tmerge,concatenate
+.endhelp

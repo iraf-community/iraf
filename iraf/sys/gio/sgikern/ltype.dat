@@ -1,0 +1,28 @@
+# LTYPE.DAT -- Initialize the builtin line types for the SGI kernel.  Data
+# is given in GKI units (1.0 = 32768 units).  A segment of 32 GKI units is
+# resolved on a device with 1024 resolved pixels.
+
+data	p_seg		/1, 1, 1/
+data	p_segleft	/320, 32, 512/
+
+data	p_nseg[1]	/2/		# PL_DASHED
+data	p_penup[1,1]	/false/
+data	p_penup[1,2]	/true/
+data	p_seglen[1,1]	/320/
+data	p_seglen[1,2]	/128/
+
+data	p_nseg[2]	/2/		# PL_DOTTED
+data	p_penup[2,1]	/false/
+data	p_penup[2,2]	/true/
+data	p_seglen[2,1]	/32/
+data	p_seglen[2,2]	/128/
+
+data	p_nseg[3]	/4/		# PL_DOTDASH
+data	p_penup[3,1]	/false/
+data	p_penup[3,2]	/true/
+data	p_penup[3,3]	/false/
+data	p_penup[3,4]	/true/
+data	p_seglen[3,1]	/512/
+data	p_seglen[3,2]	/128/
+data	p_seglen[3,3]	/32/
+data	p_seglen[3,4]	/128/

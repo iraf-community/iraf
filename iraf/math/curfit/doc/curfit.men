@@ -1,0 +1,20 @@
+	cvaccum	- Accumulate point into data set
+	cvacpts - Accumulate points into a data set
+	cvcoeff - Get coefficients 
+       cvepower - Convert errors to power series equivalents
+       cverrors	- Calculate chi-squared and errors in coefficients
+	 cveval	- Evaluate curve at x
+	  cvfit	- Fit curve
+	 cvfree - Free space allocated by cvinit
+	 cvinit - Make ready to fit a curve; set up parameters of fit
+	cvpower - Convert coefficients to power series coefficients
+	cvrefit	- Refit curve, same x and weight, different y
+       cvreject	- Reject point from data set
+      cvrestore - Restore curve parameters and coefficients
+	 cvsave - Save curve parameters and coefficients
+	  cvset - Input coefficients derived external to the CURFIT package
+	cvsolve	- Solve matrix for coefficients
+	cvstati - Get integer parameter
+	cvstatr - Get real parameter
+       cvvector - Evaluate curve at an array of x
+	 cvzero - Zero arrays for new fit

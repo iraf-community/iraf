@@ -1,0 +1,25 @@
+# Make the XREGISTER task
+
+$checkout libpkg.a ../../../
+$update   libpkg.a
+$checkin  libpkg.a ../../../
+$exit
+
+libpkg.a:
+	rgxbckgrd.x	"xregister.h" <math/gsurfit.h>
+	rgxcolon.x	"xregister.h" <imhdr.h> <imset.h> <error.h>
+	rgxcorr.x	"xregister.h" <imhdr.h> <math/gsurfit.h> <math.h>
+	rgxdbio.x	"xregister.h"
+	rgxfft.x
+	rgxfit.x	"xregister.h" <math/iminterp.h> <mach.h> <math/nlfit.h>
+	rgxgpars.x	"xregister.h"
+	rgxicorr.x	"xregister.h" <ctype.h> <imhdr.h> <fset.h>
+	rgximshift.x	<imhdr.h> <imset.h> <math/iminterp.h>
+	rgxplot.x	<imhdr.h> <gset.h>
+	rgxppars.x	"xregister.h"
+	rgxregions.x	"xregister.h" <fset.h> <imhdr.h> <ctype.h>
+	rgxshow.x	"xregister.h"
+	rgxtools.x	"xregister.h"
+	rgxtransform.x	"xregister.h" <imhdr.h> <math.h>
+	t_xregister.x	"xregister.h" <fset.h> <gset.h> <imhdr.h> <imset.h>
+	;

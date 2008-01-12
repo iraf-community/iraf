@@ -1,0 +1,133 @@
+# Make the QPOE (position ordered event file) library.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+zzdebug:
+zzdebug.e:
+	$checkout libex.a lib$
+	$update   libex.a
+	$checkin  libex.a lib$
+
+	$omake	zzdebug.x <error.h> <ctype.h> <qpset.h> <qpexset.h> "qpoe.h"
+	$link	-z zzdebug.o
+	;
+
+generic:
+	$set GFLAGS = "-k -t  csilrd  -p gen/"
+	$ifolder (gen/qpgeti.x, qpget.gx) $generic $(GFLAGS) qpget.gx $endif
+	$ifolder (gen/qpputi.x, qpput.gx) $generic $(GFLAGS) qpput.gx $endif
+
+	$set GFLAGS = "-k -t bcsilrdx -p gen/"
+	$ifolder (gen/qpaddb.x, qpadd.gx) $generic $(GFLAGS) qpadd.gx $endif
+
+	$set GFLAGS = "-k -t ird -p gen/"
+	$ifolder (gen/qpexattrli.x, qpexattrl.gx)
+	    $generic $(GFLAGS) qpexattrl.gx		$endif
+	$ifolder (gen/qpexcodei.x, qpexcode.gx)
+	    $generic $(GFLAGS) qpexcode.gx		$endif
+	$ifolder (gen/qpexparsei.x, qpexparse.gx)
+	    $generic $(GFLAGS) qpexparse.gx		$endif
+	$ifolder (gen/qpexsubi.x, qpexsub.gx)
+	    $generic $(GFLAGS) qpexsub.gx		$endif
+
+	$ifolder (gen/qprlmergei.x, qprlmerge.gx)
+	    $generic $(GFLAGS) qprlmerge.gx		$endif
+
+	$set GFLAGS = "-k -t si -p gen/"
+	$ifolder (gen/qpiorpixi.x, qpiorpix.gx)
+	    $generic $(GFLAGS) qpiorpix.gx		$endif
+	$ifolder (gen/qpiogetev.x, qpiogetev.gx)
+	    $generic -k -o gen/qpiogetev.x qpiogetev.gx	$endif
+	;
+
+libex.a:
+	# Retranslate any recently modified generic sources.
+	$ifeq (hostid, unix)
+	    $call generic
+	$endif
+
+	@gen		# Update datatype expanded files.
+
+	qpaccess.x	qpoe.h
+	qpaccessf.x	qpoe.h
+	qpaddf.x	qpoe.h <error.h> <qpset.h>
+	qpastr.x	qpoe.h
+	qpbind.x	qpoe.h <fmset.h>
+	qpclose.x	qpoe.h
+	qpcopy.x	qpoe.h
+	qpcopyf.x	qpoe.h <qpset.h>
+	qpctod.x	
+	qpctoi.x	<lexnum.h>
+	qpdelete.x	qpoe.h
+	qpdeletef.x	qpoe.h
+	qpdsym.x	qpoe.h
+	qpdtype.x	qpoe.h <ctype.h>
+	qpelsize.x	
+	qpexclose.x	qpex.h <mach.h>
+	qpexdata.x	qpex.h <mach.h>
+	qpexdebug.x	qpex.h qpoe.h <mach.h> <qpexset.h>
+	qpexdel.x	qpex.h <mach.h>
+	qpexeval.x	qpex.h <mach.h>
+	qpexgetat.x	qpex.h <mach.h>
+	qpexgetfil.x	qpex.h <mach.h>
+	qpexmodfil.x	qpex.h qpoe.h <mach.h>
+	qpexopen.x	qpex.h qpoe.h <mach.h>
+	qpexpand.x	qpoe.h
+	qpgetb.x	qpoe.h
+	qpgettok.x	qpoe.h <ctype.h> <error.h> <fset.h>
+	qpgetx.x	qpoe.h
+	qpgmsym.x	qpoe.h
+	qpgnfn.x	qpoe.h
+	qpgpar.x	qpoe.h <ctype.h>
+	qpgpsym.x	qpoe.h
+	qpgstr.x	qpoe.h
+	qpinherit.x	qpoe.h <error.h>
+	qpioclose.x	qpio.h
+	qpiogetfil.x	qpio.h qpoe.h <mach.h>
+	qpiogetrg.x	qpio.h
+	qpiolmask.x	<plset.h> qpio.h qpoe.h
+	qpiolwcs.x	qpio.h
+	qpiomkidx.x	qpio.h qpoe.h <error.h> <fset.h> <mach.h>
+	qpioopen.x	qpex.h qpio.h qpoe.h <error.h> <fset.h> <mach.h>\
+			<plset.h>
+	qpioparse.x	qpex.h qpio.h qpoe.h <ctype.h> <mach.h>
+	qpioputev.x	qpio.h qpoe.h <mach.h>
+	qpiorb.x	qpio.h
+	qpiosetfil.x	qpex.h qpio.h
+	qpioseti.x	qpio.h <plset.h> <qpioset.h>
+	qpiosetr.x	qpio.h <qpioset.h>
+	qpiosetrg.x	qpio.h
+	qpiostati.x	qpio.h <qpioset.h>
+	qpiostatr.x	qpio.h <qpioset.h>
+	qpiosync.x	qpio.h qpoe.h <fset.h> <mach.h>
+	qpiowb.x	qpio.h qpoe.h <fset.h> <mach.h>
+	qplenf.x	qpoe.h
+	qploadwcs.x	qpoe.h
+	qpmacro.x	qpex.h qpoe.h <ctype.h> <error.h> <finfo.h>
+	qpmkfname.x	qpoe.h
+	qpopen.x	qpio.h qpoe.h <fmset.h>
+	qpparse.x	<ctype.h>
+	qpparsefl.x	qpex.h qpoe.h
+	qppclose.x	<fset.h>
+	qppopen.x	qpoe.h
+	qpppar.x	qpoe.h <ctype.h>
+	qppstr.x	qpoe.h
+	qpputb.x	qpoe.h
+	qpputx.x	qpoe.h
+	qpqueryf.x	qpoe.h <qpset.h>
+	qpread.x	qpoe.h
+	qprebuild.x	qpoe.h
+	qprename.x	qpoe.h
+	qprenamef.x	qpoe.h
+	qpsavewcs.x	qpoe.h
+	qpseti.x	qpoe.h <qpset.h>
+	qpsetr.x	qpoe.h <qpset.h>
+	qpsizeof.x	qpoe.h
+	qpstati.x	qpoe.h <qpset.h>
+	qpstatr.x	qpoe.h <qpset.h>
+	qpsync.x	qpoe.h
+	qpwrite.x	qpoe.h
+	;

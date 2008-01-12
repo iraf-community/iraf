@@ -1,0 +1,61 @@
+.help msisinit Dec98 "Image Interpolator Package"
+.ih
+NAME
+msisinit -- initialize the sequential interpolant descriptor using user parameters
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+msisinit (msi, interp_type, nsinc, nxincr, nyincr, pixfrac1, pixfrac2, badval)
+
+.nf
+    pointer	msi		  #O interpolant descriptor
+    int		interp_type	  #I interpolant type
+    int		nsinc		  #I sinc interpolant width in pixels
+    int		nxincr,nyincr	  #I sinc look-up table resolution
+    real	pixfrac1,pixfrac2 #I sinc or drizzle pixel fractions 
+    real	badval		  #I drizzle undefined pixel value
+.fi
+
+.ih
+ARGUMENTS
+.ls msi   
+Pointer to sequential interpolant descriptor.
+.le
+.ls interp_type
+Interpolant type. The options are II_BINEAREST, II_BILINEAR, II_BIPOLY3,
+II_BIPOLY5, II_BISPLINE3, II_BISINC, II_BILSINC, and II_BIDRIZZLE for the
+nearest neighbour, linear, 3rd order polynomial, 5th order polynomial,
+cubic spline, sinc, look-up table sinc, and drizzle interpolants respectively.
+The interpolant type definitions are found in the package header file
+math/iminterp.h.
+.le
+.ls nsinc
+The sinc and look-up table sinc interpolant width in pixels. Nsinc is
+rounded up internally to the nearest odd number.
+.le
+.ls nxincr, nyincr
+The look-up table sinc resolution in x and y in number of entries. Nxincr = 10
+implies a pixel resolution of 0.1 pixels in x, nxincr = 20 a pixel resolution
+of 0.05 pixels in x, etc. The default value of nxincr and nyincr are 20 and 20
+.le
+.ls pixfrac1, pixfrac2
+The look-up table sinc fractional pixel shifts in x and y if nincr = 1 in
+which case -0.5 <= rparam[1/2] <= 0.5 , or the drizzle pixel fractions in
+which case 0.0 <= rparam[1/2] <= 1.0.
+.le
+.ls badval
+The undefined pixel value for the drizzle interpolant. Pixels within
+the boundaries of the input image which do not overlap the input image
+pixels are assigned a value of badval.
+.le
+.ih
+DESCRIPTION
+The interpolant descriptor is allocated and initialized. The pointer msi is
+returned by MSISINIT.
+.ih
+NOTES
+MSIINIT or MSISINIT must be called before using any other MSI routines.
+.ih
+SEE ALSO
+msisinit, msifree

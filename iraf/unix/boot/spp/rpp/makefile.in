@@ -1,0 +1,24 @@
+
+.c.o:	; $(CC) $(HSI_CF) -c $*.c
+
+all:	rpp.e
+
+librpp.a::
+	make -C rppfor
+
+libf.a::
+	make -C ratlibf
+
+libc.a::
+	make -C ratlibc
+
+rpp.e:	rpp.o librpp.a libf.a libc.a
+	$(CC) $(HSI_LF) $^ $(HSI_F77LIBS) -o rpp.e
+	cp -p rpp.e ../../../bin/.
+
+clean::
+	make -C rppfor clean
+	make -C ratlibf clean
+	make -C ratlibc clean
+	rm -f *.o rpp.e ../../../bin/rpp.e
+

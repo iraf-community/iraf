@@ -1,0 +1,33 @@
+.help isreplace Apr1985 "Surfit Package"
+.ih
+NAME
+isreplace -- restore a surface fit saved by issave
+.ih
+SYNOPSIS
+isreplace (sf, fit)
+
+.nf
+pointer	sf		# surface grid descriptor
+real	fit[ARB]	# fit array
+.fi
+
+.ih
+ARGUMENTS
+
+.ls sf
+The pointer to the surface grid descriptor.
+.le
+.ls fit
+The array containing the fit parameters and coefficients.
+.le
+
+.ih
+DESCRIPTION
+
+ISREPLACE restores the fit saved by ISSAVE for use by ISEVAL or ISVECTOR.
+.ih
+NOTES
+.ih
+SEE ALSO
+issave
+.endhelp

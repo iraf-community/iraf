@@ -1,0 +1,28 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ADOT -- Vector inner or dot product.  The function value is the sum of the
+# products of each pair of elements of the input vectors.
+
+$if (datatype == ld)
+double procedure adot$t (a, b, npix)
+$else
+real procedure adot$t (a, b, npix)
+$endif
+
+PIXEL	a[ARB], b[ARB]
+
+$if (datatype == ld)
+double	sum
+$else
+real	sum
+$endif
+
+int	npix, i
+
+begin
+	sum = 0$f
+	do i = 1, npix
+	    sum = sum + a[i] * b[i]
+
+	return (sum)
+end

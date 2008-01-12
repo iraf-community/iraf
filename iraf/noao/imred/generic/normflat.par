@@ -1,0 +1,15 @@
+# NORMFLAT -- Make a flat field by normalizing and replacing low values.
+
+image,f,a,,,,Calibration image
+flatfield,f,a,,,,Flat field image
+norm,r,h,INDEF,,,Normalization if not INDEF
+minflat,r,h,INDEF,,,Minimum data value to use in the flat field
+sample_section,s,h,"[]",,,Sample section for determining normalization
+keeplog,b,h,)_.keeplog,,,Keep log of processing?
+logfile,f,h,)_.logfile,,,Log file
+img,f,h
+flt,f,h
+tmp,f,h
+rlist,*s,h
+mean,r,h
+stat,i,h

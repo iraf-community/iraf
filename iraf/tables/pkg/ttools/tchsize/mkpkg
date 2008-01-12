@@ -1,0 +1,11 @@
+# Update the tchsize application code in the ttools package library
+# Author: HODGE, 2-FEB-1988
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	tchsize.x      		<tbset.h>
+	;

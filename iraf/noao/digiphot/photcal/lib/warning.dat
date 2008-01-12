@@ -1,0 +1,11 @@
+
+
+      $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                  WARNING FROM THE PHOTCAL PACKAGE LOADER                       
+      $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                                                                               
+      The SDAS external package TABLES optionally used by some of the
+      PHOTCAL  tasks is  not  available.  The  tasks  MKNOBSFILE  and
+      MKOBSFILE  will run only on APPHOT/DAOPHOT output files written
+      in  text  database  format (the default),  but  will not run on
+      files written in ST tables format.

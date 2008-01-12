@@ -1,0 +1,13 @@
+# Update the tcheck application code in the ttools package library
+# Author: B.Simon, 22-AUG-1990
+
+$checkout ttools.a ../
+$update   ttools.a
+$checkin  ttools.a ../
+$exit
+
+ttools.a:
+	cmdsplit.x	"tcheck.h"
+	tcheck.x	<tbset.h>  "tcheck.h"
+	wrtcheck.x
+	;

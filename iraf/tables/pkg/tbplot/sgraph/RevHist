@@ -1,0 +1,46 @@
+22 April 1997 - WJH
+	The code in 'ggrdcurve.x' was modified to handle tables with
+	arrays as an element (ie, 3-D tables).  This code will process
+	row selectors appended to the filename.  The basic code was
+	originally developed by B. Simon, adapted by I. Busko, and fit
+	in place here. The cases dealing with the number of words have
+	been modified to include branching to handle (in one case)
+	normal SDAS/text tables and (in the other case) 3-D tables.  
+	Summary: Files updated were---
+		ggrdcurve.x
+		getimtitle.x
+
+7/13/93
+
+axmarg.x +
+fhglin.x +
+fmsize.x +
+getimtitle.x +
+getpat.x +
+gglintran.x +
+ggoptype.x +
+ggplot.x +
+ggrd1col.x +
+ggrd2col.x +
+ggrdcurve.x +
+ggrdimage2.x +
+ggrdlist2.x +
+ggrdxycol.x +
+ggrser.x +
+hgline.x +
+improjection.x +
+initdashpat.x +
+initmarker.x +
+lintran.x +
+relindef.x +
+setdashpat.x +
+t_sgraph.x +
+sgraph.h +
+
+Created the sgraph subdirectory of the stplot package.  Separated the
+former t_sgraph.x into multiple files, mostly by individual
+procedures.  The file names largely reflect the procedure names, with
+no "_".  Created a new mkpkg that still checks the objects into the
+stplot library.
+
+Created the include file sgraph.h to contain defines local to sgraph.

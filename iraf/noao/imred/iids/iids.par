@@ -1,0 +1,17 @@
+# PARAMETERS FOR KPNO IIDS SPECTRAL REDUCTION PACKAGE
+
+observatory,s,h,"kpno",,,Observatory for data
+interp,s,h,"poly5","nearest|linear|poly3|poly5|spline3|sinc",,Interpolation type
+extinction,s,h,"onedstds$kpnoextinct.dat",,,Extinction file
+caldir,s,h,"iidscal$",,,Directory containing calibration data
+coincor,b,h,yes,,,Apply coincidence correction to flats
+ccmode,s,h,"iids",,,Correction mode (photo|iids|power)
+deadtime,r,h,1.424e-3,0,,Deadtime in seconds
+power,r,h,0.975,,,IIDS power law coefficient
+
+dispaxis,i,h,1,1,3,Image axis for 2D/3D images
+nsum,s,h,"1",,,Number of lines/columns/bands to sum for 2D/3D images
+
+next_rec,i,h,1,,,"Next output record"
+
+version,s,h,"IRS V3: July 1991"

@@ -1,0 +1,127 @@
+.help artobs Oct87 noao.imred.ccdred.ccdtest
+.ih
+NAME
+artobs -- Make a demonstration CCD observation
+.ih
+USAGE
+artobs image exptime ccdtype
+.ih
+PARAMETERS
+.ls image
+Observation to be created.
+.le
+.ls exptime
+Exposure time of observation.
+.le
+.ls ccdtype
+CCD image type of observation.  This type is one of the standard types
+for the CCDRED package.
+.le
+.ls ncols = 132, nlines = 100
+The number of columns and lines in the full image created including
+bias section.
+.le
+.ls filter = ""
+Filter string for the observation.
+.le
+.ls datasec = "[1:100,1:100]"
+Data section of the observation.
+.le
+.ls trimsec = "[3:98,3:98]"
+Trim section for later processing.
+.le
+.ls biassec = "[103:130,*]"
+Prescan or overscan bias section.
+.le
+.ls imdata = ""
+Image to be used as source of observation if specified.  The image must
+be at least as large as the data section.
+.le
+.ls skyrate = 0.
+Sky counting rate.  The total sky value will be scaled by the exposure time.
+.le
+.ls badpix = ""
+Bad pixel region file in the standard CCDRED bad pixel file format.
+.le
+.ls biasval = 500.
+Mean bias value of the entire image.
+.le
+.ls badval = 500.
+Bad pixel value placed at the specified bad pixel regions.
+.le
+.ls zeroval = 100.
+Zero level of the data section.
+.le
+.ls darkrate = 1.
+Dark count rate.  The total dark count will be scaled by the exposure time
+.le
+.ls zeroslope = 0.01
+Slope of the zero level per pixel.
+.le
+.ls darkslope = 0.002
+Slope of the dark count rate per pixel.  This is also scaled by the exposure
+time.
+.le
+.ls flatslope = 3.0000000000000E-4
+The mean flat field response is 1 with a slope given by this value.
+.le
+.ls sigma = 5.
+Gaussian noise sigma per pixel.
+.le
+.ls seed = 0
+Random number seed.  If zero new values are used for every observation.
+.le
+.ls overwrite = no
+Overwrite an existing image?  If no a new observation is not created.
+There is no warning message.
+.le
+.ih
+DESCRIPTION
+This script task generates artificial CCD observations which include
+bad pixels, bias and zero levels, dark counts, flat field response
+variations and sky brightness levels.  Optionally, image data from
+a reference image may be included.  This task is designed to be used
+with the \fBccdred\fR package and includes appropriate image header
+information.
+
+First the task checks whether the requested image exists.  If it does
+exist and the overwrite flag is no then a new observations is not created.
+If the overwrite flag is set then the old image is deleted and a new
+observation is created.
+
+An empty image of the specified size and of pixel data type short is
+first created.  If a noise sigma is specified it is added to the entire
+image.  If a reference image is specified then image section given by
+the \fIdatasec\fR parameter is copied into the data section of the
+observation.  Next a sky level, specified by the \fIskyrate\fR
+parameter times the exposure time, is added to the data section.
+The flat field response with a mean of one and a slope given by the
+\fIflatslope\fR parameter is multiplied into the data section.  If
+a dark count rate and/or a zero level is specified then these effects
+are added to the data section.  Then the specified bias level
+is added to the entire image; i.e. including the bias section.
+Finally, the pixels specified in the bad pixel region file, if one
+is specified, are set to the bad pixel value.
+
+The CCD reduction parameters for the data section, the trim section,
+the bias section, exposure time, the CCD image type, and the filter
+are added to the image header (if they are specified) using \fBccdhedit\fR
+to apply any keyword translation.
+.ih
+EXAMPLES
+1. To create some test CCD images first set the task parameters such as
+number of columns and lines, data, bias, and trim sections, and data
+values.  The images are then created as follows:
+
+	cl> artobs.filter = "V"		# Set the filter
+	cl> artobs zero 0. zero		# Zero level image
+	cl> artobs dark 1000. dark skyrate=0.	# Dark count image
+	cl> artobs flat 1. flat skyrate=1000.	# Flat field image
+	cl> artobs obj 10. object		# Object image
+
+Note that the CCD image type is not used explicitly so that for a
+dark count image you must set the sky count rate to zero.
+.ih
+SEE ALSO
+mkimage, subsection, demo
+.endhelp

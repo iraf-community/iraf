@@ -1,0 +1,23 @@
+                  The Photometry Tools Package
+                 -------------------------------
+
+The ptools package contains routines which perform oerations on the
+text database files and/or ST binary tables files produced by the APPHOT
+and DAOPHOT packages, and scripts which make the fact that any given database
+is a table or a text file transparent to the user.
+
+The ptools directory structure is listed below. The .h files are all in lib 
+as many of them are shared by several tasks.
+
+             |-pconvert------routines to the pconvert task
+             |-doc-----------ptools documentation
+|-ptools-----|-lib-----------ptools definitions or .h files
+	     |-pexamine------routines specific to the pexamine task
+             |-ptutils-------routines specific to miscellneous utility tasks
+	     |-txtools-------routines specific to the text file operators
+	     |-test----------directory of test data
+
+
+Lindsey Davis
+NOAO IRAF GROUP
+August 1991

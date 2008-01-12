@@ -1,0 +1,27 @@
+.help isfree Apr85 "Surfit Package"
+.ih
+NAME
+isfree -- free the surface grid descriptor structure
+.ih
+SYNOPSIS
+isfree (sf)
+
+.nf
+pointer	sf		# surface descriptor
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ih
+DESCRIPTION
+Frees the surface descriptor structure and all the vectors and arrays used
+by the numerical routines.
+.ih
+NOTES
+ISFREE should be called after the surface fit is complete.
+.ih
+SEE ALSO
+isinit
+.endhelp

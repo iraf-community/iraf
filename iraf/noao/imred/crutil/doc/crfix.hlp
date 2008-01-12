@@ -1,0 +1,48 @@
+.help crfix Apr98 noao.imred.crutil
+.ih
+NAME
+crfix -- fix cosmic rays in images using cosmic ray masks
+.ih
+USAGE	
+.nf
+crfix input output masks
+.fi
+.ih
+PARAMETERS
+.ls input
+Input two dimensional image to be "fixed" (modified) by linear interpolation.
+.le
+.ls output
+Output image.  If the output image name exactly matches the input
+image name (including extensions) then the image will be modified in place.
+.le
+.ls crmask
+Cosmic ray mask identifying the cosmic rays to be fixed.  The mask
+values are zero for good data and non-zero for cosmic rays.
+.le
+.ih
+DESCRIPTION
+The input and output images are specified by the \fIinput\fR and
+\fIoutput\fR parameters.  If the input and output image names are
+identifical (including extensions) then image is modified in place.  Cosmic
+rays, identified in a cosmic ray mask specified by the \fIcrmask\fR
+parameter, are replaced in the output image by linear interpolation along
+lines or columns using the nearest good pixels.  The special mask name
+"BPM" may be used to select a mask name given in the input image header
+under the keyword "BPM".
+
+Cosmic ray pixels are "fixed" by replacing them with values
+by linear interpolation to the nearest pixels not identified as bad.
+The interpolation direction is the shortest length between good pixels
+along columns or lines.
+.ih
+EXAMPLES
+1.  To replace cosmic rays in an image:
+
+.nf
+    cl> crfix obj012 crobj012 crmask012
+.fi
+.ih
+SEE ALSO
+fixpix, crmedian, crnebula, cosmicrays, credit, epix
+.endhelp

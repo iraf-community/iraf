@@ -1,0 +1,9 @@
+# Mkpkg special file list for SUN/IRAF, SUN 386i.
+
+$set	XNO	= '& "$xc -cq -/$(MACH) -p tables &"'
+$set	XO1	= '& "$xc -cq -/O1 -/$(MACH) -p tables &"'
+$set	XO2	= '& "$xc -cq -/O2 -/$(MACH) -p tables &"'
+
+$special "tables$pkg/fitsio/strfits/":    rf_exit.x    tableslib$rf_exit.c     
+# Files requiring special compilation due to host compiler bugs.
+

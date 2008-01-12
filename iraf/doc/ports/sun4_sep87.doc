@@ -1,0 +1,296 @@
+Begin port of Sun/IRAF to the Sun-4 (RISC/sparc cpu).
+Beginning Saturday, 26 Sep 1987 (dct).
+=========================================
+
+V2.5 release was installed on the disk at /usr/iraf and stripped of all m68x
+binaries, by Skip before I started.
+
+/etc/termcap
+/usr/local/* +
+/local -> /usr/local +
+	The first step was to add some local utilities to the standard Sun
+	release.  Added entries for terminals sun{24,34,40,54},unixpc to the
+	termcap (unixpc is so I can work from home).  Added a bunch of stuff
+	in local, e.g., less, egrep, top, sps, mon, a modified 'man' which
+	uses less, etc.  (9/26)
+
+cd $iraf/unix
+sh -x mkpkg.sh >& spool &
+	Did a trial bootstrap just to see what would fail.  The only files
+	giving problems were, as expected, as$zsvjmp.s and os$zxwhen.c. (9/26)
+
+unix/os/zxwhen.c
+	Replaced the entire hardware exception initialization list by a
+	version which will work on any sun (680XX or sparc) or a Vax.  (9/26)
+
+unix/hlib/libc/iraf.h
+	Deleted the BSD42 and BSD43 entries, which were never used.  Replaced
+	with BSDUNIX (which has still not been used but will be, along with
+	a SYSVUNIX or some such).  In zxwhen.c, the #ifdefs use the system
+	type names defined by the C compiler, e.g., vax, sparc, m68k, etc.
+	(9/26)
+
+bin
+bin.sparc +
+bin.ffpa -
+bin.f68881 -
+	Deleted the .ffpa and .f68881 binaries for this host, and added a
+	bin.sparc directory for the sparc binaries.  Set bin to point to this.
+	(9/26)
+
+unix/mkpkg.sh
+unix/as -> unix/as.`mach`
+unix/as.vax
+unix/as.sparc +
+unix/as.mc68020 +
+	The different assemblers are quite incompatible, even on a Sun.
+	To make it possible to maintain sources for all Suns in one Sun/IRAF
+	source, I set up as.XX directories for the assembler sources for
+	each main hardware type, and made as a symbolic link to the particular
+	version in use.  The value of as is set automatically by mkpkg.sh
+	during a bootstrap.  Note that this does not necessarily work when
+	using a single source to maintain multiple versions of the system;
+	I will wait and resolve that later.  (9/26)
+
+unix/as.sparc/zsvjmp.s
+	Wrote a zsvjmp/zdojmp for the sparc architecture.  This was not
+	difficult, except for the time required to figure out the machine
+	architecture and assembler, which is not very well documented in the
+	gamma release of the SunOS for the Sun-4.  (9/26-27)
+
+cd $iraf/unix
+sh -x mkpkg.sh >& spool &
+	Did a real bootstrap, this time it completed with no errors.  (9/27)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf
+	In mkpkg.inc, set the FPU option to 'sparc'.  Added some $ifeq code
+	to set the XFLAGS,LFLAGS,XVFLAGS different for sparc than anything
+	else, since no -/fparc is tolerated on the commands to the compiler
+	programs.  In the mkpkg.sf, deleted all the old special file entries
+	having to do with compiler bugs, since we have a completely new set
+	of compilers to deal with on this machine (they really are very
+	different, especially in the optimization and code generation).  (9/27)
+
+local/.login
+	Commented out the code which sets FLOAT_OPTION, since the compilers
+	give errors if this is set to 'sparc', even on a sparc cpu (this is
+	inconsistent).  (9/27)
+
+unix/hlib/cl.csh
+	Added support for machine type 'sparc'.  (9/27)
+
+cd $iraf
+mkpkg >& spool &
+	Tried to do a sysgen of the full system.  This died on the very first
+	file, with rpp.e going into an infinite loop.  This was traced to an
+	optimizer bug in rpp.e, see below.  (9/27)
+
+unix/boot/spp/rpp/mkpkg.sh
+	Added some code to compile rpp/rppfor/outch.f without optimization,
+	to work around an optimizer bug which would cause an infinite loop.
+	(9/27)
+
+cd $iraf
+mkpkg >& spool &
+	Successfully started up a sysgen of the full system and went home
+	for the day.  (9/27)
+
+unix/hlib/mkpkg.sf
+	When I checked the next day, the sysgen was hung in an infinite loop
+	in the optimizer (iropt), trying to compile pkg$lists/unique.x.
+	Added an entry with flags "-cq -P" to the special file list, allowing
+	the file to be compiled.  Checking back over the spooled output,
+	I found that the only other file giving problems was pkg$cl/ytab.c,
+	which produced the following error message when compiled:
+
+	    Routine  _yyparse  too big: 
+		use a lower level of optimization or 
+		increase stack limit and / or 
+		size of swap space 
+
+	    compiler(iropt) error:	alloca: out of memory 
+
+	This was due to the static control flow analysis perfomed by the 
+	fancy new 3 level C code optimizer that comes with the Sun-4.
+	The yyparse routine (the parser) in the CL is a very large function,
+	and it is not surprising that it overflows something.  In this case
+	the runtime data structures required for the static flow analysis
+	exceeded something like 10 Mb (!), causing the compiler to run out
+	of memory.  Added the file to the special file list with the flags
+	"-cq -/O2" (the default -O gives -O3 or third level optimization).
+	(9/28)
+
+-------------------
+With these changes, the sysgen completed normally.  Some brief testing showed
+that x_system.e would run stand alone, but the CL would die on a bus error.
+Some interesting comparisons of object and executable sizes:
+
+                                BSD(11/750)     Sun-3      Sun-4
+                du -s bin          17345        16801      20593
+                du -s lib           3234         2932       3787
+
+	Hence, it turns out that the binaries for the Sun-4 with its RISC cpu 
+	are not that much larger than for the CISC machines, after all.
+	The slighly larger disk file size of the BSD VAX compared to the Sun-3
+	was due to the symbol table in the (unstripped) executables being
+	larger for BSD than for the Sun.  (9/28)
+
+sys/etc/envreset.x
+	The bus error in the CL turned out to be due to a short being passed
+	as an int in a procedure call in the above routine.  It took me a
+	while to figure this out, due to the time required to learn to use
+	ADB on a RISC machine.  Most of this was just becoming familiar with
+	the machine architecture, but it is a bit harder to match the
+	assembler up with the high level code on a RISC machine, due to the
+	many similar looking simple little instructions, and the heavy
+	optimization performed by the compiler.  A lot of little ADB things
+	are different - the register set in the sparc architecture is like
+	nothing you have ever seen before, the pipelining is visible (the
+	instruction after a branch or function call is always executed
+	even if the branch is taken, and is shown AFTER the branch!),
+	the arguments to a procedure seem to be always passed in registers
+	(haven't tried any procedures with very long argument lists yet),
+	so on.  One interesting discovery was that there are no MUL and DIV
+	instructions in the RISC cpu!.  These are implemented as subroutines,
+	but seem to be pretty fast nonetheless (but about 6 times slower than
+	an add).  (9/28)
+
+	[With this change the CL now comes up fine, and all the little system
+	[things I tried work.  zdojmp/zsvjmp are not working correctly in
+	[the CL, although they worked fine in a C test program I wrote, and
+	[they work fine in x_system.e run stand alone.]
+
+unix/hlib/libc/setjmp.h
+	Added a "#pragma unknown_control_flow", #ifdef-ed for the sparc.
+	This is necessary to tell the C optimizer that any routine which calls
+	setjmp (zsvjmp_) may trash the registers or do other strange things.
+	This was the cause of the zsvjmp failure in the CL (C) code.  (9/29)
+
+dev/help.db
+	Rebuilt the help datbase - all is well.  (9/29)
+
+----------------------------
+A little further testing immediately shows further problems, although a lot
+of stuff is working correctly now.  We still have a very buggy system here.
+Did not get much time to work on this today.  (9/29)
+
+pkg/cl/unop.c
+pkg/cl/binop.c
+pkg/cl/opcodes.c
+	The problem with the CL getting confused about whether certain files
+	existed or not turned out to be due to another IRAF bug, rather than
+	a Sun bug.  The problem was the macro VALU(o) in the CL.  This checks
+	the operand type and conditionally accesses and returns either the
+	integer or real value.  This was being used to fetch the value of a
+	boolean operand, and it was natural for the code to assume that VALU
+	would return an integer value for a boolean operand.  Not so, however.
+	The datatype of the conditional expression used in this macro is
+	evaluated at compile time, hence is double rather than int, and the
+	CL was doing boolean operations on double floating quantities.
+
+	This has gone undetected up until now, but for some reason zero values
+	were testing not zero-floating on the sparc cpu.  Integer 0 was being
+	loaded into a floating register, and the floating result after a
+	convert integer to double instruction was a very small floating point
+	number (exponent -212), with value exactly 0 when printing the binary
+	floating number in hex.  Evidently binary zero is not the same as
+	floating zero on this cpu.  (9/30)
+
+----------------------------
+Did a new sysgen to relink all executables to pick up bug fixes.
+Things seem to be working pretty well now.  Known problems:
+
+	Contour dies on a segmentation violation every time,
+	    and ERROR RECOVER IS NOT WORKING (the latter is true
+	    on all systems I think, and must be due to a bug in
+	    this program)
+
+local/sun
+local/sun/Makefile
+	Deleted this code and replaced by the new (3.4) version from tucana.
+	Rebuilt suntools.e.  This died on the first attempt due to a symbol
+	CPUTYPE=-mc68010 in the Makefile that came with the suntools code
+	from Sun, on the Sun-4!  Modified the Makefile in local/sun to call
+	the suntool Makefile with CPUTYPE="", and suntools.e was built
+	successfully.  (9/30)
+
+cd $hlib
+install
+	Installed the custom suntools software.  This has not yet been tested,
+	since I am working remotely.  (9/30)
+
+
+Begin IRAF Installation on ORION (NOAO/Tucson Sun-4)
+SunOS Release Sys4BETA1 (ORION) #1: Fri Oct 23 13:09:29 PDT 1987
+----------------------------------------------------------------
+
+Did a little UNIX level configuring, as orion only just came up:
+	Replaced termcap by tucana version.
+	Replaced /etc/group by tucana version.
+	Created /usr/local; someone else installed sources; I compiled and
+	    installed sps, man, less, etc.
+	NOTE: the f77 compiler is back-ordered, so we nabbed the GAMMA
+	    release compiler from hercules, until ours comes in.
+
+Created directory on /usr, read in V2.6 export version from lyra (same as
+	prepared for the Convex Port).
+
+Configured Sun-3 kernel from tucana for the Sun-4:
+	Made as a link to as.sparc.
+	Replaced mkpkg.inc and mkpkg.sf by the Sun-4 versions.
+	Uncommented #pragma in hlib/libc/setjmp.h.
+	Fixed a bug in boot/spp/rpp/mkpkg.sh (mach -> `mach`).
+
+Booted the system successfully.
+Started a full sysgen and went home.  (10/23)
+
+Examine spooled output from Sysgen (10/24):
+--------------------------------------------
+
+sys/fmtio/evexpr.x
+	Failed with the message:
+	    f77: Fatal error in iropt: Segmentation fault (core dumped)
+	But it compiled just fine when I ran mkpkg on the directory. (??)
+
+noao/onedspec/sensfunc/mkpkg
+noao/onedspec/sensfunc/sfgraphs.x
+	Deleted the junk file (zero length) sfgraphs.x, and its entry in
+	the mkpkg file list.  (10/24)
+
+local/tasks
+	There was a problem here caused by my forgetting to delete the binaries
+	when I moved the Sun/IRAF version of local over from tucana.  (10/24)
+
+local/sun/mksuntools.csh
+	Contained the statement "rm -rf *", used to delete the old 'suntool'
+	subdirectory before building a new one.  If the directory already
+	happended to be empty, this would cause rm to return an error exit
+	status, causing the script to terminate prematurely.  The suntools
+	executable would appear to be built correctly, but gterm and imtool
+	would not run.  (10/24)
+
+unix/hlib/mkpkg.sf
+unix/hlib/libc/setjmp.h
+	Had problems with register allocation again in the CL main, where
+	setjmp (ZSVJMP) is used.  Unlike the case with the gamma release,
+	the #pragmas in <libc/setjmp.h> did not fix things this time, so I
+	had to add the affected files to the special file list to be
+	compiled with no optimization.  (10/24)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.SUN3
+unix/hlib/mkpkg.sf.SUN4
+	Replaced mkpkg.sf by two versions, one each for the Sun-3 and Sun-4.
+	The one to be used is conditionally loaded via a $ifeq statement in
+	the mkpkg.inc file.  (10/24)
+
+local/sun/imtool.c
+	There is a bug in the C library SCANF routines: scanning a perfectly
+	legal input string with a format such as "%f%f%f..." results in the
+	scan terminating after processing only the first floating point number.
+	I had to rewrite a section of code in IMTOOL to use the lower level
+	ATOF conversion routine to read the wcs file.  (10/25)
+
+	[The above was due to us getting a BETA release of the OS, and went
+	[away when we got the GAMMA release.]

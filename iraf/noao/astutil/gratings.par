@@ -1,0 +1,8 @@
+echelle,b,h,no,,,"Echelle grating?"
+f,r,h,590.,,,"Focal length (mm)"
+gmm,r,h,226.,,,"Grating grooves per mm"
+blaze,r,h,4.5,,,"Blaze angle (degrees)"
+theta,r,h,-10.5,,,"Incidence angle (degrees)"
+order,i,h,1,,,"Reference order"
+wavelength,r,h,INDEF,,,"Blaze wavelength (Angstroms)"
+dispersion,r,h,INDEF,,,"Blaze dispersion (Angstroms/mm)"
