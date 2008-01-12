@@ -22,6 +22,24 @@ begin
 end
 
 
+# TTSETL -- Set special terminal driver options.  The regular FIO options
+# are set using FSETI.
+
+procedure ttsetl (fd, param, lvalue)
+
+int	fd			# file descriptor
+int	param			# parameter to be set
+long	lvalue			# new value
+
+int	channel
+int	fstati()
+
+begin
+	channel = fstati (fd, F_CHANNEL)
+	call zsettt (channel, param, lvalue)
+end
+
+
 # TTSETI -- Set special terminal driver options.  The regular FIO options
 # are set using FSETI.
 
@@ -29,20 +47,19 @@ procedure ttseti (fd, param, value)
 
 int	fd			# file descriptor
 int	param			# parameter to be set
-int	value			# new value
+long	value			# new value
 
-int	channel
-int	fstati()
+long	lvalue
 
 begin
-	channel = fstati (fd, F_CHANNEL)
-	call zsettt (channel, param, value)
+	lvalue = value
+	call ttsetl (fd, param, lvalue)
 end
 
 
-# TTSTATI -- Stat special terminal driver options.
+# TTSTATL -- Stat special terminal driver options.
 
-int procedure ttstati (fd, param)
+long procedure ttstatl (fd, param)
 
 int	fd			# file descriptor
 int	param			# parameter to be set
@@ -55,6 +72,24 @@ begin
 	channel = fstati (fd, F_CHANNEL)
 	call zstttt (channel, param, lvalue)
 	return (lvalue)
+end
+
+
+# TTSTATI -- Stat special terminal driver options.
+
+int procedure ttstati (fd, param)
+
+int	fd			# file descriptor
+int	param			# parameter to be set
+
+long	lvalue
+int	value
+long	ttstatl()
+
+begin
+	lvalue = ttstatl (fd, param)
+	value = lvalue
+	return (value)
 end
 
 

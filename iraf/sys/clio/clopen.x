@@ -20,6 +20,7 @@ int	stderr_chan		# OS channel for the standard error output
 int	device			# zlocpr EPA of the driver read routine
 int	devtype			# device type (text or binary)
 
+long	lvalue
 int	fd, psmode, chan, devepa
 int	fsetfd(), locpr()
 extern	zardps(), zardnu(), zgetty(), zgettt()
@@ -55,8 +56,10 @@ begin
 
 	if (device == locpr (zgetty)) {
 	    devepa = locpr (zgettt)
-	    call zsettt (stdin_chan,  TT_KINCHAN, stdin_chan)
-	    call zsettt (stdout_chan, TT_KOUTCHAN, stdout_chan)
+	    lvalue = stdin_chan
+	    call zsettt (stdin_chan,  TT_KINCHAN, lvalue)
+	    lvalue = stdout_chan
+	    call zsettt (stdout_chan, TT_KOUTCHAN, lvalue)
 	} else
 	    devepa = device
 

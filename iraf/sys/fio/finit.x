@@ -14,6 +14,7 @@ include	<fio.h>
 procedure finit()
 
 int	fd, first_time
+long	lval
 
 extern	zgettx(), zputtx(), zflstx(), zstttx(), zclstx(), zsektx(), znottx()
 extern	zgetty(), zputty(), zflsty(), zsttty(), zclsty(), zsekty(), znotty()
@@ -66,5 +67,6 @@ begin
 	call fsvtfn ("")
 
 	# Initialize the TT logical terminal driver.
-	call zsettt (0, TT_INITIALIZE, 0)
+	lval = 0
+	call zsettt (0, TT_INITIALIZE, lval)
 end

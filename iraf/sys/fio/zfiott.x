@@ -969,18 +969,20 @@ end
 # ZSETTT -- Set TT terminal driver options.  Must be called before any i/o is
 # done via the TT driver, e.g., by fio$finit.
 
-procedure zsettt (chan, param, value)
+procedure zsettt (chan, param, lvalue)
 
 int	chan			# kernel i/o channel (not used)
 int	param			# parameter to be set
-int	value			# new value
+long	lvalue			# new value
 
+int	value
 bool	itob()
 bool	first_time
 data	first_time /true/
 include	"zfiott.com"
 
 begin
+	value = lvalue
 	switch (param) {
 	case TT_INITIALIZE:
 	    if (!first_time) {
