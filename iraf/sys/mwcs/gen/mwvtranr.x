@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # MW_VTRAN -- Transform an array of N-dimensional points, expressed as a
 # 2D vector where v[1,i] is point I of vector V.
 

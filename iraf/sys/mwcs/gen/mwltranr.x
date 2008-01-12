@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # MW_LTRAN -- Perform a general N-dimensional linear transformation, i.e.,
 # matrix multiply and translation.
 

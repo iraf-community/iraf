@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # MW_MMUL -- Matrix multiply.
 
 procedure mw_mmulr (a, b, c, ndim)
