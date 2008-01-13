@@ -34,7 +34,7 @@ set_irafenv() {
   HSI_CF="-O -Wall -I$hinclude -DPREFIX=\\\"$PREFIX\\\""
   HSI_XF="-Inolibc -w -/Wunused"
   HSI_XF="-Wall"
-  HSI_FF="-O"
+  HSI_FF="-O -Wall"
   HSI_LF=""
   HSI_F77LIBS=""
   HSI_LFLAGS=""
@@ -65,7 +65,7 @@ set_irafenv() {
   #
   #
   XC_CFLAGS="-Wall"
-  XC_FFLAGS=""
+  XC_FFLAGS="-Wall"
   #XC_CFLAGS="-I$hinclude -Wall"
   #XC_FFLAGS="-Ns1602 -Nx512"
   export XC_CFLAGS XC_FFLAGS
@@ -112,10 +112,10 @@ set_mach () {
   fi
 
   if [ "$ARCHITECTURE" = "x86_64" ]; then
-    #DATA_MODEL="lp64"
-    DATA_MODEL="ilp64"
+    #SPP_DATA_MODEL="lp64"
+    SPP_DATA_MODEL="ilp64"
   else
-    DATA_MODEL="ilp32"
+    SPP_DATA_MODEL="ilp32"
   fi
   
   MACH="${ARCHITECTURE}-${OPERATING_SYSTEM}-${VENDOR}"
@@ -127,11 +127,11 @@ set_config () {
 
   # mach.h, iraf.h settings
 
-  if [ -f ${hconfig}iraf.${DATA_MODEL}.h ]; then
-    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${DATA_MODEL}.h iraf.h )
-    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${DATA_MODEL}.h mach.h )
+  if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
+    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
+    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
   else
-    echo "[ERROR] No such data model: ${DATA_MODEL}"
+    echo "[ERROR] No such data model: ${SPP_DATA_MODEL}"
     exit 1
   fi
 
@@ -255,7 +255,7 @@ DESTDIR=$5
 ARCHITECTURE=""
 OPERATING_SYSTEM=""
 VENDOR=""
-DATA_MODEL=""
+SPP_DATA_MODEL=""
 
 if [ "$USER" = "" ]; then
     USER=`whoami`
@@ -265,7 +265,7 @@ fi
 
 set_mach "$ARG_MACH"
 
-export ARCHITECTURE OPERATING_SYSTEM VENDOR DATA_MODEL
+export ARCHITECTURE OPERATING_SYSTEM VENDOR SPP_DATA_MODEL
 
 #echo debug: $ARCHITECTURE :: $OPERATING_SYSTEM :: $VENDOR
 #echo debug: $MACH
@@ -284,10 +284,10 @@ case "$COMMAND" in
   set_irafenv novos
   set_config
   #
-  echo "Architecture : $ARCHITECTURE"
-  echo "OS           : $OPERATING_SYSTEM"
-  echo "Vendor       : $VENDOR"
-  echo "Data Model   : $DATA_MODEL"
+  echo "Architecture   : $ARCHITECTURE"
+  echo "OS             : $OPERATING_SYSTEM"
+  echo "Vendor         : $VENDOR"
+  echo "SPP Data Model : $SPP_DATA_MODEL"
   sleep 2
   #
   #mkdir -p iraf/unix/bin
@@ -300,7 +300,8 @@ case "$COMMAND" in
   ( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../f2c/src/f2c.h . )
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
-  ( cd iraf/unix/f2c/src    ; cat makefile.u > Makefile )
+  ( cd iraf/unix/f2c/src    ; cat makefile.u | \
+    sed -e 's/^\(CFLAGS = \)\(.*\)/\1\2 -DDEF_C_LINE_LENGTH=1920/' > Makefile )
   echo Makeing iraf/unix/f2c/libf2c/Makefile.
   ( cd iraf/unix/f2c/libf2c ; cat makefile.u > Makefile )
   #

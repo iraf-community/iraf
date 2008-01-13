@@ -40,7 +40,7 @@ CFLAGS=${CFLAGS:-"-I${iraf}unix/include"}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
-F2CFLAGS=${F2CFLAGS:='-KRw8 -Nn802'}
+F2CFLAGS=${F2CFLAGS:='-ARw8 -Nn802'}
 keepc=0
 warn=1
 xsrc=0
@@ -187,6 +187,44 @@ do
 		if [ $xsrc = 1 ]; then
 		    sed -e "s/$b\\.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
 		fi
+		#
+		# erase "/* Subroutine */ " comments
+		#
+		cat $b.c | sed -e 's|/\* Subroutine \*/ ||' > $b.t
+		mv $b.t $b.c
+		#
+		# split comma-separated extern functions
+		# i.e., extern int foo(...), boo(...);
+		#       -> extern int foo(...); extern int boo(...);
+		#
+		while [ "`cat $b.c | grep 'extern [a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*([^()]*),'`" != "" ]; do
+		  cat $b.c | sed -e 's/\(extern [a-zA-Z0-9_][a-zA-Z0-9_]* \)\([a-zA-Z0-9_][a-zA-Z0-9_]*([^()]*)\)\(, \)/\1\2; \1/g' > $b.t
+		  mv $b.t $b.c
+		done
+		#
+		# erase args of extern prototypes
+		# i.e., extenr int foo( int ); -> extern int foo();
+		#
+		cat $b.c | sed -e 's/\(extern [a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*(\)\([^()]*\)\()\)/\1\3/g' > $b.t
+		mv $b.t $b.c
+		#
+		# construct prototype declarations
+		#
+		NEW_PROTOS="`cat $b.c | grep -e '^[a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*_(.*)$'`"
+		FUNC_GLIST="`echo \"$NEW_PROTOS\" | sed -e 's/^\([a-zA-Z0-9_][a-zA-Z0-9_]* \)\([a-zA-Z0-9_][a-zA-Z0-9_]*\)\((.*\)/\-e \2(/'`"
+		if [ "$FUNC_GLIST" != "" ]; then
+		  touch c_proto.h
+		  cat c_proto.h | grep -v $FUNC_GLIST > c_proto.t
+		  echo "$NEW_PROTOS" | sed -e 's/\(.*\)/extern \1;/' >> c_proto.t
+		  mv c_proto.t c_proto.h
+		fi
+		#
+		# display constant arguments on function
+		#
+		#grep -e 'static integer c__[0-9]' -e 'static integer c_n[0-9]' $b.c
+		#
+		# Compile
+		#
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
