@@ -7,7 +7,7 @@
 #include <iraf/spp.h>
 #include <iraf/knames.h>
 
-typedef	XINT	jmp_buf[LEN_JUMPBUF];
+typedef	XPOINTER	jmp_buf[LEN_JUMPBUF];
 extern	XINT	u_jmpstat;
 
 #ifndef NOLIBCNAMES
@@ -21,8 +21,6 @@ extern	XINT	u_jmpstat;
 /* The following is necessary to prevent to prevent the optimizer from
  * doing unwise things with setjmp on a Sun-4.
  */
-extern int ZSVJMP( XINT *, XINT * );
-extern void ZDOJMP ( XINT *, XINT * );
 /* #pragma unknown_control_flow(zsvjmp_) */
 
 #endif

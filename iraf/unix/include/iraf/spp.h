@@ -7,6 +7,8 @@
 #ifndef D_spp
 #define	D_spp
 
+#include <iraf/spptypes.h>
+
 /* Assorted machine constants. [MACHDEP]
  * Use osb$zzeps.f to compute the machine epsilon.
  */
@@ -84,56 +86,8 @@
 #define	BOFL		(-3L)
 #define EOFL		(-2L)
 
-/* SPP datatypes. (potentially MACHDEP)
+/* SPP datatypes.
  */
-
-#if defined(SPP_LP64) || defined(SPP_ILP64)
-
-#ifdef SPP_LP64
-#define	XINT		int
-#define	XBOOL		int
-#define	XLONG		long int
-#define	XSTRUCT		long int
-#define	XPOINTER	long int
-#else	/* ILP64 */
-#define	XINT		long int
-#define	XBOOL		long int
-#define	XLONG		long int
-#define	XSTRUCT		long int
-#define	XPOINTER	long int
-#endif
-
-#else	/* ILP32 */
-
-#define	XINT		int
-#define	XBOOL		int
-#define	XLONG		int
-#define	XSTRUCT		int
-#define	XPOINTER	int
-
-#endif
-
-#define	XCHAR		short int
-#define	PKCHAR		XCHAR
-#define XUBYTE		unsigned char
-#define	XSHORT		short int
-#define	XUSHORT		unsigned short
-#define	XREAL		float
-#define	XDOUBLE		double
-#define XCOMPLEX	struct cplx
-
-struct cplx {
-	float	r;
-	float	i;
-};
-
-typedef	void  (*PFV)();
-typedef	int   (*PFU)();
-typedef	XINT  (*PFI)();
-
-/* Signal handler in IRAF SPP */
-typedef	void (*XSIGFUNC)(XINT *,void (**)());
-
 #define	TY_BOOL		1		/* SPP datatype codes		*/
 #define	TY_CHAR		2
 #define	TY_SHORT	3
