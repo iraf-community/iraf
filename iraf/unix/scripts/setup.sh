@@ -42,10 +42,24 @@ set_irafenv() {
   #
   mkzflags="'lflags=-Nxz -/Wl,-Bstatic'"
   #
+  XC_CFLAGS="-Wall"
+  XC_FFLAGS="-Wall"
+  #XC_CFLAGS="-I$hinclude -Wall"
+  #XC_FFLAGS="-Ns1602 -Nx512"
+  #
   # architecture-dependent settings
   #
   if [ "$ARCHITECTURE" = "x86_64" ]; then
     HSI_CF="$HSI_CF -DX86_64"
+  fi
+  if [ "$SPP_DATA_MODEL" = "ilp64" ]; then
+    HSI_CF="$HSI_CF -DSPP_ILP64"
+    XC_CFLAGS="$XC_CFLAGS -DSPP_ILP64"
+    XC_FFLAGS="$XC_FFLAGS -DSPP_ILP64"
+  elif [ "$SPP_DATA_MODEL" = "lp64" ]; then
+    HSI_CF="$HSI_CF -DSPP_LP64"
+    XC_CFLAGS="$XC_CFLAGS -DSPP_LP64"
+    XC_FFLAGS="$XC_FFLAGS -DSPP_LP64"
   fi
   #
   # OS-dependent settings
@@ -62,12 +76,6 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export mkzflags HSI_LIBS
-  #
-  #
-  XC_CFLAGS="-Wall"
-  XC_FFLAGS="-Wall"
-  #XC_CFLAGS="-I$hinclude -Wall"
-  #XC_FFLAGS="-Ns1602 -Nx512"
   export XC_CFLAGS XC_FFLAGS
 
   # see tables/lib/zzsetenv.def
@@ -130,6 +138,7 @@ set_config () {
   if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
     ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
     ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
+    ( cd ${hconfig} ; rm -f f2c.h ; ln -s f2c.${SPP_DATA_MODEL}.h f2c.h )
   else
     echo "[ERROR] No such data model: ${SPP_DATA_MODEL}"
     exit 1
@@ -297,7 +306,9 @@ case "$COMMAND" in
   #
   #( cd iraf/unix/include ; rm -f iraf ; ln -s ../hlib/libc iraf )
   #( cd iraf/unix/include ; rm -f iraf.h ; ln -s ../hlib/libc/iraf.h . )
-  ( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../f2c/src/f2c.h . )
+  ( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../config/f2c.h . )
+  ( cd iraf/unix/f2c/src ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
+  ( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \

@@ -36,7 +36,8 @@ s=/tmp/stderr_$$
 t=/tmp/f77_$$
 #CC=${CC_f2c:-'/usr/bin/cc -m486'}
 CC=${CC_f2c:-'gcc'}
-CFLAGS=${CFLAGS:-"-I${iraf}unix/include"}
+#CFLAGS=${CFLAGS:-"-I${iraf}unix/include"}
+CFLAGS=${CFLAGS}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
@@ -225,6 +226,7 @@ do
 		#
 		# Compile
 		#
+		echo "$CC $CPPFLAGS -c $CFLAGS $b.c"
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?
 		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2

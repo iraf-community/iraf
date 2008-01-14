@@ -14,7 +14,7 @@
 #define	LEN_JUMPBUF	1024		/* C "jmp_buf" len + 1 (or larger) */
 #define	EPSILON		(1.192e-7)	/* smallest real E s.t. (1.0+E > 1.0) */
 #define EPSILOND	(2.220d-16)	/* double precision epsilon */
-#ifdef X86_64
+#if defined(SPP_LP64) || defined(SPP_ILP64)
 #define	MAX_LONG	9223372036854775807
 #else
 #define	MAX_LONG	2147483647
@@ -23,13 +23,20 @@
 
 /* Indefinite valued numbers. (potentially MACHDEP)
  */
-#define	INDEFS		(-32767)
-#ifdef X86_64
+#if defined(SPP_LP64) || defined(SPP_ILP64)
+#ifdef SPP_LP64
+#define	INDEFI		(0x80000001)
 #define	INDEFL		(0x8000000000000001)
-#else
+#else	/* ILP64 */
+#define	INDEFI		(0x8000000000000001)
+#define	INDEFL		(0x8000000000000001)
+#endif
+#else	/* ILP32 */
+#define	INDEFI		(0x80000001)
 #define	INDEFL		(0x80000001)
 #endif
-#define	INDEFI		INDEFL
+
+#define	INDEFS		(-32767)
 #define	INDEFR		1.6e38
 #define	INDEFD		1.6e308
 #define	INDEFX		(INDEF,INDEF)
@@ -79,25 +86,41 @@
 
 /* SPP datatypes. (potentially MACHDEP)
  */
-#ifndef XCHAR
-#define	XCHAR		short int
-#endif
 
-#ifndef XINT
+#if defined(SPP_LP64) || defined(SPP_ILP64)
+
+#ifdef SPP_LP64
+#define	XINT		int
+#define	XBOOL		int
+#define	XLONG		long int
+#define	XSTRUCT		long int
+#define	XPOINTER	long int
+#else	/* ILP64 */
 #define	XINT		long int
+#define	XBOOL		long int
+#define	XLONG		long int
+#define	XSTRUCT		long int
+#define	XPOINTER	long int
 #endif
 
+#else	/* ILP32 */
+
+#define	XINT		int
+#define	XBOOL		int
+#define	XLONG		int
+#define	XSTRUCT		int
+#define	XPOINTER	int
+
+#endif
+
+#define	XCHAR		short int
 #define	PKCHAR		XCHAR
 #define XUBYTE		unsigned char
-#define	XBOOL		long int
 #define	XSHORT		short int
 #define	XUSHORT		unsigned short
-#define	XLONG		long int
 #define	XREAL		float
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
-#define	XSTRUCT		long int
-#define	XPOINTER	long int
 
 struct cplx {
 	float	r;
