@@ -139,6 +139,7 @@ set_config () {
     ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
     ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
     ( cd ${hconfig} ; rm -f f2c.h ; ln -s f2c.${SPP_DATA_MODEL}.h f2c.h )
+    ( cd ${hconfig} ; rm -f entxkw.f ; ln -s entxkw.${SPP_DATA_MODEL}.f entxkw.f )
   else
     echo "[ERROR] No such data model: ${SPP_DATA_MODEL}"
     exit 1
@@ -309,6 +310,7 @@ case "$COMMAND" in
   ( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../config/f2c.h . )
   ( cd iraf/unix/f2c/src ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
   ( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
+  ( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
