@@ -8,7 +8,8 @@
 
 /* ACLRC -- Clear a block of memory.
  */
-void ACLRC ( XCHAR *a, XINT *n )
+int ACLRC ( XCHAR *a, XINT *n )
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
+	return 0;
 }

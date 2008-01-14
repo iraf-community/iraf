@@ -12,7 +12,7 @@
 /* ZDOJMP -- Restore the saved processor context (non-local goto).  See also
  * as$zsvjmp.s, where most of the work is done.
  */
-void ZDOJMP ( XINT *jmpbuf, XINT *status )
+void ZDOJMP ( XPOINTER *jmpbuf, XINT *status )
 {
 	register XINT stat = *status ? *status : 1;
 	register XINT *status_ptr = ((XINT **)jmpbuf)[0];

@@ -5,7 +5,7 @@
 #define import_spp
 #include <iraf.h>
 
-int zsvjmp_( XINT *buf, XINT *status )
+int zsvjmp_( XPOINTER *buf, XINT *status )
 {
 	*status = 0;
 	((XINT **)buf)[0] = status;

@@ -8,7 +8,8 @@
 
 /* ACLRI -- Clear a block of memory.
  */
-void ACLRI ( XINT *a, XINT *n )
+int ACLRI ( XINT *a, XINT *n )
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
+	return 0;
 }

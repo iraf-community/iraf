@@ -28,15 +28,19 @@ static const unsigned XINT bitmask[] = {	0,		/* MACHDEP */
 /* BITPAK -- Pack an unsigned integer value into a bitfield in a longword.
  * The size of the bitfield may not exceed the number of bits in an integer.
  */
-/* ival   : value to be placed in bitfield	*/
-/* wordp  : longword to be written into		*/
-/* offset : one-indexed offset of first bit	*/
-/* nbits  : number of bits to be set		*/
-int BITPAK ( unsigned XINT *ival, unsigned XINT *wordp, XINT *offset, 
-	     XINT *nbits )
+/* arg_ival  : value to be placed in bitfield	*/
+/* arg_wordp : longword to be written into		*/
+/* offset    : one-indexed offset of first bit	*/
+/* nbits     : number of bits to be set		*/
+int BITPAK ( XINT *arg_ival, XINT *arg_wordp, XINT *offset, XINT *nbits )
 {
+	unsigned XINT *ival;
+	unsigned XINT *wordp;
 	unsigned XINT shift;
 	unsigned XINT mask;
+
+	ival = (unsigned XINT *)arg_ival;
+	wordp = (unsigned XINT *)arg_wordp;
 
 	shift = *offset - 1;
 	mask = bitmask[*nbits] << shift;
@@ -48,10 +52,12 @@ int BITPAK ( unsigned XINT *ival, unsigned XINT *wordp, XINT *offset,
 
 /* BITUPK -- Unpack an unsigned integer bit field from a longword.
  */
-/* wordp  : longword to be examined		*/
-/* offset : one-indexed offset of first bit	*/
-/* nbits  : number of bits to be set		*/
-XINT BITUPK ( unsigned XINT *wordp, XINT *offset, XINT *nbits )
+/* arg_wordp : longword to be examined		*/
+/* offset    : one-indexed offset of first bit	*/
+/* nbits     : number of bits to be set		*/
+XINT BITUPK ( XINT *arg_wordp, XINT *offset, XINT *nbits )
 {
+	unsigned XINT *wordp;
+	wordp = (unsigned XINT *)arg_wordp;
 	return ((*wordp >> (*offset-1)) & bitmask[*nbits]);
 }

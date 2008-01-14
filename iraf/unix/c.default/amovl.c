@@ -8,8 +8,9 @@
 
 /* AMOVL -- Copy a block of memory.
  */
-void AMOVL ( XLONG *a, XLONG *b, XINT *n )
+int AMOVL ( XLONG *a, XLONG *b, XINT *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));
+	return 0;
 }

@@ -8,7 +8,8 @@
 
 /* ACLRD -- Clear a block of memory.
  */
-void ACLRD ( XDOUBLE *a, XINT *n )
+int ACLRD ( XDOUBLE *a, XINT *n )
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
+	return 0;
 }

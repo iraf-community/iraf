@@ -8,8 +8,9 @@
 
 /* AMOVD -- Copy a block of memory.
  */
-void AMOVD ( XDOUBLE *a, XDOUBLE *b, XINT *n )
+int AMOVD ( XDOUBLE *a, XDOUBLE *b, XINT *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));
+	return 0;
 }
