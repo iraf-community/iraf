@@ -60,7 +60,7 @@ begin
 	    call amovl (Meml[px_src], px_dst, npix)
 	else {
 	    call salloc (px_out, npix, TY_LONG)
-	    call pl_pixropl (Meml[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
+	    call pl_pixropl (Meml[px_src], 1, PL_MAXVAL(pl), px_dst,
 		MV(px_depth), Meml[px_out], npix, rop)
 	    call amovl (Meml[px_out], px_dst, npix)
 	}

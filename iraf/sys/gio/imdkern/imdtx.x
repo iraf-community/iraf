@@ -69,13 +69,13 @@ begin
 	# Break the text string into segments at font boundaries and count
 	# the total number of printable characters.
 
-	totlen = stx_segment (text, n, Memc[seg], TX_FONT(tx))
+	totlen = stx_segment (text, n, Memc[seg], TX_FONT(tx), 0, 0)
 
 	# Compute the text drawing parameters, i.e., the coordinates of the
 	# first character to be drawn, the step between successive characters,
 	# and the polytext flag (GKI coords).
 
-	call stx_parameters (xc,yc, totlen, x0,y0, gki_dx,gki_dy, polytext,
+	call stx_parameters (xc,yc, totlen, 0, x0,y0, gki_dx,gki_dy, polytext,
 	    orien)
 
 	# No discreet character sizes, so just scale the base sizes.
@@ -197,12 +197,14 @@ end
 # marks the end of the segment list.  The output string is assumed to be
 # large enough to hold the segmented text string.
 
-int procedure stx_segment (text, n, out, start_font)
+int procedure stx_segment (text, n, out, start_font, cw, totwidth)
 
 short	text[ARB]		# input text
 int	n			# number of characters in text
 char	out[ARB]		# output string
 int	start_font		# initial font code
+int	cw			# default character width
+int	totwidth		# seg width in GKI units
 
 int	ip, op
 int	totlen, font
@@ -257,10 +259,12 @@ end
 # defining the character size, justification in X and Y of the coordinates,
 # and orientation of the string.  All coordinates are in GKI units.
 
-procedure stx_parameters (xc, yc, totlen, x0, y0, dx, dy, polytext, orien)
+procedure stx_parameters (xc, yc, totlen, totwidth, x0, y0, dx, dy, polytext,
+   orien)
 
 int	xc, yc			# coordinates at which string is to be drawn
 int	totlen			# number of characters to be drawn
+int	totwidth		# width of characters to be drawn (unused)
 int	x0, y0			# lower left corner of first char to be drawn
 int	dx, dy			# step in X and Y between characters
 int	polytext		# OK to output text segment all at once

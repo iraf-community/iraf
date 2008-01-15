@@ -1423,7 +1423,7 @@ C
 C
         DO 103 I=1,NO
           CALL GQOPWK (I,IE,NO,ID)
-          CALL GSCR (ID,II,FR,FG,FB)
+C          CALL GSCR (ID,II,FR,FG,FB)
   103   CONTINUE
 C
 C Check for variable resetting the color index.
