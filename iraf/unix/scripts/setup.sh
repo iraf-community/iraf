@@ -281,6 +281,12 @@ export ARCHITECTURE OPERATING_SYSTEM VENDOR SPP_DATA_MODEL
 #echo debug: $MACH
 #echo $ARCHITECTURE
 
+if [ "`echo $COMMAND | grep '^make_check_'`" != "" ]; then
+  COMMAND="`echo $COMMAND | sed -e 's/^make_check_/make_/'`"
+  F2C_AUTO_INCLUDE="true"
+  export F2C_AUTO_INCLUDE
+fi
+
 case "$COMMAND" in
 "set_env")
   #
@@ -313,8 +319,9 @@ case "$COMMAND" in
   ( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
+  # See also MAX_OUTPUT_SIZE in niceprintf.h
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
-    sed -e 's/^\(CFLAGS = \)\(.*\)/\1\2 -DDEF_C_LINE_LENGTH=1920/' > Makefile )
+    sed -e 's/^\(CFLAGS = \)\(.*\)/\1\2 -DDEF_C_LINE_LENGTH=5120/' > Makefile )
   echo Makeing iraf/unix/f2c/libf2c/Makefile.
   ( cd iraf/unix/f2c/libf2c ; cat makefile.u > Makefile )
   #

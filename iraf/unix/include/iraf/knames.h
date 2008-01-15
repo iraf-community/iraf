@@ -26,9 +26,14 @@
 
 extern XINT IRAF_MAIN ( XCHAR *, XINT *, XINT *, XINT *, XINT *, XINT *, XINT *, XCHAR *, XINT *, PFI, PFI );
 /* zshlib.c */
+#ifndef F2C_INCLUDE		/* for native C code */
 extern unsigned XINT VSHLIB[];	/* shared library descriptor */
 extern unsigned XINT USHLIB[];
 extern unsigned XINT VSHEND;
+#endif
+
+int gfpucw_( XINT * );
+int sfpucw_( XINT * );
 
 #define	ZARDBF		zardbf_
 #define	ZARDGD		zardgd_
@@ -267,7 +272,6 @@ extern unsigned XINT VSHEND;
 #define zzwrmt_	kzwrmt_
 #define zzwtmt_	kzwtmt_
 
-
 #endif
 
 extern int ZARDBF ( XINT *, XCHAR *, XINT *, XLONG * );
@@ -403,7 +407,7 @@ extern int ZWMSEC ( XINT * );
 extern int ZXGMES ( XINT *, PKCHAR *, XINT * );
 extern int ZXWHEN ( XINT *, XINT *, XINT * );
 extern int ZZCLMT ( XINT *, XINT *, XINT * );
-extern int ZZEPRO( void );
+extern int ZZEPRO ( void );
 extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XINT *, XINT *, XINT * );
 extern int ZZRDMT ( XINT *, XCHAR *, XINT *, XLONG * );
 extern int ZZRWMT ( PKCHAR *, PKCHAR *, XINT * );
@@ -413,6 +417,184 @@ extern int ZZSTOP ( void );
 extern int ZZSTRT ( void );
 extern int ZZWRMT ( XINT *, XCHAR *, XINT *, XLONG * );
 extern int ZZWTMT ( XINT *, XINT *, XINT * );
+
+
+#ifdef F2C_INCLUDE	/* for C code written by f2c */
+
+#ifndef NOKNET
+
+#undef zardnd_
+#undef zawrnd_
+#undef zawtnt_
+#undef zclsnd_
+#undef zfchdr_
+#undef zfgcwd_
+#undef zfpath_
+#undef zfsubd_
+#undef zopnnd_
+#undef zsttnd_
+#undef zardbf_
+#undef zardlp_
+#undef zardpl_
+#undef zardpr_
+#undef zardsf_
+#undef zawrbf_
+#undef zawrlp_
+#undef zawrpl_
+#undef zawrpr_
+#undef zawrsf_
+#undef zawtbf_
+#undef zawtlp_
+#undef zawtpl_
+#undef zawtpr_
+#undef zawtsf_
+#undef zclcpr_
+#undef zcldir_
+#undef zcldpr_
+#undef zclsbf_
+#undef zclslp_
+#undef zclspl_
+#undef zclspr_
+#undef zclssf_
+#undef zclstx_
+#undef zclsty_
+#undef zdvall_
+#undef zdvown_
+#undef zfacss_
+#undef zfaloc_
+#undef zfdele_
+#undef zfinfo_
+#undef zflstx_
+#undef zflsty_
+#undef zfmkcp_
+#undef zfmkdr_
+#undef zfprot_
+#undef zfrnam_
+#undef zfutim_
+#undef zgettx_
+#undef zgetty_
+#undef zgfdir_
+#undef zintpr_
+#undef znottx_
+#undef znotty_
+#undef zopcpr_
+#undef zopdir_
+#undef zopdpr_
+#undef zopnbf_
+#undef zopnlp_
+#undef zopnpl_
+#undef zopnpr_
+#undef zopnsf_
+#undef zopntx_
+#undef zopnty_
+#undef zoscmd_
+#undef zputtx_
+#undef zputty_
+#undef zsektx_
+#undef zsekty_
+#undef zsttbf_
+#undef zsttlp_
+#undef zsttpl_
+#undef zsttpr_
+#undef zsttsf_
+#undef zstttx_
+#undef zsttty_
+#undef zzclmt_
+#undef zzopmt_
+#undef zzrdmt_
+#undef zzrwmt_
+#undef zzstmt_
+#undef zzwrmt_
+#undef zzwtmt_
+
+/* Dummy prototypes for C code written by f2c */
+extern int ZARDND ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRND ( XINT *, XCHAR *, XINT *, XLONG * );
+/* ??? ZAWTNT ??? */
+extern int ZCLSND ( XINT *, XINT * );
+extern int ZFCHDR ( PKCHAR *, XINT *);
+extern int ZFGCWD ( PKCHAR *, XINT *, XINT * );
+extern int ZFPATH ( XCHAR *, XCHAR *, XINT *, XINT * );
+extern int ZFSUBD ( XCHAR *, XINT *, XCHAR *, XINT * );
+extern int ZOPNND ( PKCHAR *, XINT *, XINT * );
+extern int ZSTTND ( XINT *, XINT *, XLONG * );
+extern int ZARDBF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDLP ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDPL ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDPR ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDSF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRBF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRLP ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRPL ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRPR ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRSF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWTBF ( XINT *, XINT * );
+extern int ZAWTLP ( XINT *, XINT * );
+extern int ZAWTPL ( XINT *, XINT * );
+extern int ZAWTPR ( XINT *, XINT * );
+extern int ZAWTSF ( XINT *, XINT * );
+extern int ZCLCPR ( XINT *, XINT * );
+extern int ZCLDIR ( XINT *, XINT * );
+extern int ZCLDPR ( XINT *, XINT *, XINT * );
+extern int ZCLSBF ( XINT *, XINT * );
+extern int ZCLSLP ( XINT *, XINT * );
+extern int ZCLSPL ( XINT *, XINT * );
+/* ??? ZCLSPR ??? */
+extern int ZCLSSF ( XINT *, XINT * );
+extern int ZCLSTX ( XINT *, XINT * );
+extern int ZCLSTY ( XINT *, XINT * );
+extern int ZDVALL ( PKCHAR *, XINT *, XINT * );
+extern int ZDVOWN ( PKCHAR *, PKCHAR *, XINT *, XINT * );
+extern int ZFACSS ( PKCHAR *, XINT *, XINT *, XINT * );
+extern int ZFALOC ( PKCHAR *, XLONG *, XINT * );
+extern int ZFDELE ( PKCHAR *, XINT * );
+extern int ZFINFO ( PKCHAR *, XLONG *, XINT * );
+extern int ZFLSTX ( XINT *, XINT * );
+extern int ZFLSTY ( XINT *, XINT * );
+extern int ZFMKCP ( PKCHAR *, PKCHAR *, XINT * );
+extern int ZFMKDR ( PKCHAR *, XINT * );
+extern int ZFPROT ( PKCHAR *, XINT *, XINT * );
+extern int ZFRNAM ( PKCHAR *, PKCHAR *, XINT * );
+extern int ZFUTIM ( PKCHAR *, XLONG *, XLONG *, XINT * );
+extern int ZGETTX ( XINT *, XCHAR *, XINT *, XINT * );
+extern int ZGETTY ( XINT *, XCHAR *, XINT *, XINT * );
+extern int ZGFDIR ( XINT *, PKCHAR *, XINT *, XINT * );
+extern int ZINTPR ( XINT *, XINT *, XINT * );
+extern int ZNOTTX ( XINT *, XLONG * );
+extern int ZNOTTY ( XINT *, XLONG * );
+extern int ZOPCPR ( PKCHAR *, XINT *, XINT *, XINT * );
+extern int ZOPDIR ( PKCHAR *, XINT * );
+extern int ZOPDPR ( PKCHAR *, PKCHAR *, PKCHAR *, XINT * );
+extern int ZOPNBF ( PKCHAR *, XINT *, XINT * );
+extern int ZOPNLP ( PKCHAR *, XINT *, XINT * );
+extern int ZOPNPL ( PKCHAR *, XINT *, XINT * );
+/* ??? ZOPNPR ??? */
+extern int ZOPNSF ( PKCHAR *, XINT *, XINT * );
+extern int ZOPNTX ( PKCHAR *, XINT *, XINT * );
+extern int ZOPNTY ( PKCHAR *, XINT *, XINT * );
+extern int ZOSCMD ( PKCHAR *, PKCHAR *, PKCHAR *, PKCHAR *, XINT * );
+extern int ZPUTTX ( XINT *, XCHAR *, XINT *, XINT * );
+extern int ZPUTTY ( XINT *, XCHAR *, XINT *, XINT * );
+extern int ZSEKTX ( XINT *, XLONG *, XINT * );
+extern int ZSEKTY ( XINT *, XLONG *, XINT * );
+extern int ZSTTBF ( XINT *, XINT *, XLONG * );
+extern int ZSTTLP ( XINT *, XINT *, XLONG * );
+extern int ZSTTPL ( XINT *, XINT *, XLONG * );
+extern int ZSTTPR ( XINT *, XINT *, XLONG * );
+extern int ZSTTSF ( XINT *, XINT *, XLONG * );
+extern int ZSTTTX ( XINT *, XINT *, XLONG * );
+extern int ZSTTTY ( XINT *, XINT *, XLONG * );
+extern int ZZCLMT ( XINT *, XINT *, XINT * );
+extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XINT *, XINT *, XINT * );
+extern int ZZRDMT ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZZRWMT ( PKCHAR *, PKCHAR *, XINT * );
+extern int ZZSTMT ( XINT *, XINT *, XLONG * );
+extern int ZZWRMT ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZZWTMT ( XINT *, XINT *, XINT * );
+
+#endif
+
+#endif
 
 
 /* Procedure names of miscellaneous potentially machine dependent Bit and Byte
@@ -453,6 +635,72 @@ extern int ZZWTMT ( XINT *, XINT *, XINT * );
 #define	XORI		xori_
 #define	XORL		xorl_
 #define	XORS		xors_
+
+#define	ACLRC		aclrc_
+#define	ACLRD		aclrd_
+#define	ACLRI		aclri_
+#define	ACLRL		aclrl_
+#define	ACLRR		aclrr_
+#define	ACLRS		aclrs_
+#define	AMOVC		amovc_
+#define	AMOVD		amovd_
+#define	AMOVI		amovi_
+#define	AMOVL		amovl_
+#define	AMOVR		amovr_
+#define	AMOVS		amovs_
+
+
+/* Procedure names for the potentially machine dependent VOPS vector
+ * primitives.  The ACHT stands for change datatype, the B suffix refers
+ * to primitives which deal with unsigned machine bytes, and the U suffix
+ * refers to primitives which deal with unsigned short (16 bit) integers.
+ */
+#define	ACHTBB		achtbb_
+#define	ACHTBC		achtbc_
+#define	ACHTBD		achtbd_
+#define	ACHTBI		achtbi_
+#define	ACHTBL		achtbl_
+#define	ACHTBR		achtbr_
+#define	ACHTBS		achtbs_
+#define	ACHTBU		achtbu_
+#define	ACHTBX		achtbx_
+#define	ACHTCB		achtcb_
+#define	ACHTCU		achtcu_
+#define	ACHTDB		achtdb_
+#define	ACHTDU		achtdu_
+#define	ACHTIB		achtib_
+#define	ACHTIU		achtiu_
+#define	ACHTLB		achtlb_
+#define	ACHTLU		achtlu_
+#define	ACHTRB		achtrb_
+#define	ACHTRU		achtru_
+#define	ACHTSB		achtsb_
+#define	ACHTSU		achtsu_
+#define	ACHTUB		achtub_
+#define	ACHTUC		achtuc_
+#define	ACHTUD		achtud_
+#define	ACHTUI		achtui_
+#define	ACHTUL		achtul_
+#define	ACHTUR		achtur_
+#define	ACHTUS		achtus_
+#define	ACHTUU		achtuu_
+#define	ACHTUX		achtux_
+#define	ACHTXB		achtxb_
+#define	ACHTXU		achtxu_
+
+
+extern int ACLRC ( XCHAR *, XINT * );
+extern int ACLRD ( XDOUBLE *, XINT * );
+extern int ACLRI ( XINT *, XINT * );
+extern int ACLRL ( XLONG *, XINT * );
+extern int ACLRR ( XREAL *, XINT * );
+extern int ACLRS ( XSHORT *, XINT * );
+extern int AMOVC ( XCHAR *, XCHAR *, XINT * );
+extern int AMOVD ( XDOUBLE *, XDOUBLE *, XINT * );
+extern int AMOVI ( XINT *, XINT *, XINT * );
+extern int AMOVL ( XLONG *, XLONG *, XINT * );
+extern int AMOVR ( XREAL *, XREAL *, XINT * );
+extern int AMOVS ( XSHORT *, XSHORT *, XINT * );
 
 extern int ACHTBB ( XCHAR *, XCHAR *, XINT * );
 extern int ACHTBC ( XCHAR *, XCHAR *, XINT * );
@@ -512,68 +760,5 @@ extern XLONG SHIFTL ( XLONG *, XLONG * );
 extern int STRPAK ( XCHAR *, PKCHAR *, XINT * );
 extern int STRUPK ( PKCHAR *, XCHAR *, XINT * );
 
-#define	ACLRC		aclrc_
-#define	ACLRD		aclrd_
-#define	ACLRI		aclri_
-#define	ACLRL		aclrl_
-#define	ACLRR		aclrr_
-#define	ACLRS		aclrs_
-#define	AMOVC		amovc_
-#define	AMOVD		amovd_
-#define	AMOVI		amovi_
-#define	AMOVL		amovl_
-#define	AMOVR		amovr_
-#define	AMOVS		amovs_
-
-extern int ACLRC ( XCHAR *, XINT * );
-extern int ACLRD ( XDOUBLE *, XINT * );
-extern int ACLRI ( XINT *, XINT * );
-extern int ACLRL ( XLONG *, XINT * );
-extern int ACLRR ( XREAL *, XINT * );
-extern int ACLRS ( XSHORT *, XINT * );
-extern int AMOVC ( XCHAR *, XCHAR *, XINT * );
-extern int AMOVD ( XDOUBLE *, XDOUBLE *, XINT * );
-extern int AMOVI ( XINT *, XINT *, XINT * );
-extern int AMOVL ( XLONG *, XLONG *, XINT * );
-extern int AMOVR ( XREAL *, XREAL *, XINT * );
-extern int AMOVS ( XSHORT *, XSHORT *, XINT * );
-
-/* Procedure names for the potentially machine dependent VOPS vector
- * primitives.  The ACHT stands for change datatype, the B suffix refers
- * to primitives which deal with unsigned machine bytes, and the U suffix
- * refers to primitives which deal with unsigned short (16 bit) integers.
- */
-#define	ACHTBB		achtbb_
-#define	ACHTBC		achtbc_
-#define	ACHTBD		achtbd_
-#define	ACHTBI		achtbi_
-#define	ACHTBL		achtbl_
-#define	ACHTBR		achtbr_
-#define	ACHTBS		achtbs_
-#define	ACHTBU		achtbu_
-#define	ACHTBX		achtbx_
-#define	ACHTCB		achtcb_
-#define	ACHTCU		achtcu_
-#define	ACHTDB		achtdb_
-#define	ACHTDU		achtdu_
-#define	ACHTIB		achtib_
-#define	ACHTIU		achtiu_
-#define	ACHTLB		achtlb_
-#define	ACHTLU		achtlu_
-#define	ACHTRB		achtrb_
-#define	ACHTRU		achtru_
-#define	ACHTSB		achtsb_
-#define	ACHTSU		achtsu_
-#define	ACHTUB		achtub_
-#define	ACHTUC		achtuc_
-#define	ACHTUD		achtud_
-#define	ACHTUI		achtui_
-#define	ACHTUL		achtul_
-#define	ACHTUR		achtur_
-#define	ACHTUS		achtus_
-#define	ACHTUU		achtuu_
-#define	ACHTUX		achtux_
-#define	ACHTXB		achtxb_
-#define	ACHTXU		achtxu_
 
 #endif

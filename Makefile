@@ -56,6 +56,9 @@ boot_make::
 iraf::
 	$(SETUP) make_iraf $(MACH)
 
+check_iraf:: clean_iraf
+	$(SETUP) make_check_iraf $(MACH)
+
 tables::
 	$(SETUP) make_tables $(MACH)
 

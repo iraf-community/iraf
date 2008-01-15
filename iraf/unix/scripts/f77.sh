@@ -203,21 +203,30 @@ do
 		  mv $b.t $b.c
 		done
 		#
-		# erase args of extern prototypes
-		# i.e., extenr int foo( int ); -> extern int foo();
-		#
-		cat $b.c | sed -e 's/\(extern [a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*(\)\([^()]*\)\()\)/\1\3/g' > $b.t
-		mv $b.t $b.c
+		if [ "$F2C_AUTO_INCLUDE" = "true" -a -f f2c_include.h ]; then
+		  # erase extern prototypes
+		  cat $b.c | sed -e 's/\(extern [a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*(\)\([^()]*\)\()\)//g' \
+			         -e 's/#include [<"]f2c.h[>"]/#include "f2c_include.h"/' > $b.t
+		  mv $b.t $b.c
+		else
+		  if [ "$F2C_AUTO_INCLUDE" = "true" ]; then
+		    echo "WARNING: f2c_include.h is not found."
+		  fi
+		  # erase args of extern prototypes
+		  # i.e., extenr int foo( int ); -> extern int foo();
+		  cat $b.c | sed -e 's/\(extern [a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*(\)\([^()]*\)\()\)/\1\3/g' > $b.t
+		  mv $b.t $b.c
+		fi
 		#
 		# construct prototype declarations
 		#
 		NEW_PROTOS="`cat $b.c | grep -e '^[a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*_(.*)$'`"
-		FUNC_GLIST="`echo \"$NEW_PROTOS\" | sed -e 's/^\([a-zA-Z0-9_][a-zA-Z0-9_]* \)\([a-zA-Z0-9_][a-zA-Z0-9_]*\)\((.*\)/\-e \2(/'`"
+		FUNC_GLIST="`echo \"$NEW_PROTOS\" | sed -e 's/^\([a-zA-Z0-9_][a-zA-Z0-9_]* \)\([a-zA-Z0-9_][a-zA-Z0-9_]*\)\((.*\)/\-e \[^a-zA-Z0-9_\]\2(/'`"
 		if [ "$FUNC_GLIST" != "" ]; then
-		  touch c_proto.h
-		  cat c_proto.h | grep -v $FUNC_GLIST > c_proto.t
-		  echo "$NEW_PROTOS" | sed -e 's/\(.*\)/extern \1;/' >> c_proto.t
-		  mv c_proto.t c_proto.h
+		  touch f2c_proto.h
+		  cat f2c_proto.h | grep -v $FUNC_GLIST > f2c_proto.t
+		  echo "$NEW_PROTOS" | sed -e 's/\(.*\)/extern \1;/' >> f2c_proto.t
+		  mv f2c_proto.t f2c_proto.h
 		fi
 		#
 		# display constant arguments on function
