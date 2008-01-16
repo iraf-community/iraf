@@ -1,5 +1,4 @@
-#include "../../../f2c_sys.h"
-#include "../../../f2c_vops.h"
-#include "../../../f2c_ncar.h"
-
+#include <f2c/sys/sys.h>
+#include <f2c/sys/vops.h>
+#include <f2c/sys/ncar.h>
 

@@ -1,3 +1,2 @@
-#include "../f2c_c.h"
-
+#include <f2c/sys/c.h>
 
