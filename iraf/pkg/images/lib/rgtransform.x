@@ -477,7 +477,7 @@ end
 # RG_INTERSECT -- Compute the intersection of two sorted lists given a
 # matching tolerance.
 
-int procedure rg_intersect (ofd, xref, yref, refindex, rlineno, nrefstars,
+int procedure rg_intersection (ofd, xref, yref, refindex, rlineno, nrefstars,
 	xlist, ylist, xtrans, ytrans, listindex, ilineno, nliststars,
 	tolerance, xformat, yformat)
 
