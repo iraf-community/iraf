@@ -8,3 +8,5 @@
 #include "../../../../pkg/xtools/skywcs/f2c_proto.h"
 #include "../../../../pkg/xtools/catquery/f2c_proto.h"
 #include "../../../../pkg/xtools/mef/f2c_proto.h"
+#include "../../../../pkg/xtools/f2c_proto.h"
+
