@@ -14,8 +14,9 @@
 #endif
 
 /* Location of the parser text file */
-# define PARSER1 PREFIX "/iraf/iraf/base/yaccpar.x"	/* [MACHDEP] */
-# define PARSER2 "/usr/iraf/base/yaccpar.x"		/* [MACHDEP] */
+# define PARSER "base/yaccpar.x"
+# define PARSER1 PREFIX "/iraf/iraf/" PARSER	/* [MACHDEP] */
+# define PARSER2 "/usr/iraf/" PARSER		/* [MACHDEP] */
 
 /* Basic size of the Yacc implementation */
 # define HUGE

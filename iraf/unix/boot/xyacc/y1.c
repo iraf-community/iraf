@@ -78,12 +78,25 @@ int main( int argc, char *argv[] )
 static void others( void )
 {	/* put out other arrays, copy the parsers */
 	int c, i, j;
+	char parser_path[BUFSIZ] = { '\0' };
+	const char *irafvar;
 
-	finput = fopen (PARSER1, "r");
+	irafvar = getenv("iraf");
+	if ( irafvar != NULL ) {
+	    snprintf(parser_path, BUFSIZ, "%s%s", irafvar, PARSER);
+	}
+
+	finput = fopen (parser_path, "r");
 	if (finput == NULL) {
-	    finput = fopen (PARSER2, "r");
-	    if (finput == NULL)
-		error ("cannot find parser %s", PARSER2);
+	    finput = fopen (PARSER1, "r");
+	    if (finput == NULL) {
+		finput = fopen (PARSER2, "r");
+		if (finput == NULL) {
+		    error ("cannot find parser '%s'", parser_path);
+		    error ("cannot find parser '%s'", PARSER1);
+		    error ("cannot find parser '%s'", PARSER2);
+		}
+	    }
 	}
 
 	warray( "yyr1", levprd, nprod );
