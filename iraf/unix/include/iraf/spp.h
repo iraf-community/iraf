@@ -134,7 +134,6 @@
 #define	VFN_UPDATE	1
 
 #define	MEMCOM		mem_
-#define	c_main		cmain_
 
 /* SPP/C pointer conversions.
  */

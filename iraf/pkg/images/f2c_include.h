@@ -1,0 +1,15 @@
+#include <f2c/sys/sys.h>
+#include "imcoords/src/f2c_proto.h"
+#include "imfilter/src/f2c_proto.h"
+#include "imfit/src/f2c_proto.h"
+#include "imgeom/src/f2c_proto.h"
+#include "immatch/src/geometry/f2c_proto.h"
+#include "immatch/src/imcombine/f2c_proto.h"
+#include "immatch/src/linmatch/f2c_proto.h"
+#include "immatch/src/listmatch/f2c_proto.h"
+#include "immatch/src/psfmatch/f2c_proto.h"
+#include "immatch/src/wcsmatch/f2c_proto.h"
+#include "immatch/src/xregister/f2c_proto.h"
+#include "imutil/src/f2c_proto.h"
+#include "f2c_proto.h"
+

@@ -66,9 +66,8 @@ int	ufcn_epa		# user supplied function call procedure
 int	junk
 bool	debug
 pointer	sp, ip
-int	xev_gettok()
+int	xev_gettok(), strlen(), xev_parse()
 extern	xev_gettok()
-int	strlen(), xev_parse()
 
 errchk	xev_parse, calloc
 include	"evexpr.com"

@@ -14,6 +14,7 @@
 
 #include <iraf/spptypes.h>
 
+#define	c_main		cmain_
 #define	IRAF_MAIN	irafmn_
 #define	USHLIB		ushlib_
 #define	VSHLIB		vshlib_
@@ -25,6 +26,7 @@
 #define	KI_RECEIVE	kirece_
 
 extern XINT IRAF_MAIN ( XCHAR *, XINT *, XINT *, XINT *, XINT *, XINT *, XINT *, XCHAR *, XINT *, PFI, PFI );
+extern XINT c_main ( XINT *, PKCHAR *, PKCHAR * );
 /* zshlib.c */
 #ifndef F2C_INCLUDE		/* for native C code */
 extern unsigned XINT VSHLIB[];	/* shared library descriptor */
