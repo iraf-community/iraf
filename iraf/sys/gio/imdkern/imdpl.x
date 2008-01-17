@@ -86,7 +86,7 @@ bool	penup
 int	len_p, i
 real	vlen, vpos, seglen, dx, dy
 int	oldx, oldy, newx, newy, penx, peny
-int	imd_getseg()
+int	imd_getsegment()
 
 begin
 	len_p = npts * 2
@@ -120,7 +120,7 @@ begin
 	    # vertices with concern only for the total length traversed.
 
 	    while (vlen - vpos >= 1.0) {
-		seglen = imd_getseg (int (vlen - vpos), penup, ltype)
+		seglen = imd_getsegment (int (vlen - vpos), penup, ltype)
 		if (seglen < 1.0)
 		    break
 
@@ -140,13 +140,13 @@ begin
 end
 
 
-# IMD_GETSEG -- Get a segment of a line style pattern.  The segment extends
+# IMD_GETSEGMENT -- Get a segment of a line style pattern.  The segment extends
 # from the current position in the pattern to either the next penup/pendown
 # breakpoint in the pattern, or to the point MAXLEN units further along in
 # the pattern.  When the end of the pattern is reached wrap around and
 # duplicate the pattern indefinitely.
 
-int procedure imd_getseg (maxlen, penup, ltype)
+int procedure imd_getsegment (maxlen, penup, ltype)
 
 int	maxlen			# max length segment to be returned
 bool	penup			# [out] pen up or pen down type segment?
