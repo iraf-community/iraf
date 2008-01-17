@@ -1,4 +1,4 @@
-        subroutine intrp (itab, xtab, ytab, ntab, x, y, ierr)
+        subroutine intrpc (itab, xtab, ytab, ntab, x, y, ierr)
 c
 c Interpolator using CODIM1 algorithm which is admittedly
 c obscure  but works well.
@@ -27,7 +27,7 @@ c----- Only 1 pt in table
 c
 c-----
 c Locate search index
-        call srch (itab, x, xtab, ntab, index, ierr)
+        call search (itab, x, xtab, ntab, index, ierr)
 c       if (index .eq. savind) go to 2000
 c       savind = index
 c
@@ -57,13 +57,13 @@ c Load interpolation arrays
 c
 c-----
 c Get interpolated value
-2000    call codim1 (x, t, u, i1, i2, y)
+2000    call cdim1 (x, t, u, i1, i2, y)
         return
         end
 c
 c--------------------------------------------------------------
 c
-        subroutine srch (itab, x, xtab, ntab, index, ierr)
+        subroutine search (itab, x, xtab, ntab, index, ierr)
 c
 c Search table of x-values to bracket the desired interpolant, x
 c
@@ -202,7 +202,7 @@ c
 c
 c-------------------------------------------------------------------
 c
-        subroutine codim1 (x, t, u, i1, i2, y)
+        subroutine cdim1 (x, t, u, i1, i2, y)
 c
 c this subroutine performs an interposlation in a fashion
 c not really understandable, but it works well.
@@ -284,7 +284,7 @@ c
 c
 c----------------------------------------------------------------------
 c
-        subroutine lintrp (itab, xtab, ytab, ntab, x, y, ierr)
+        subroutine lintr (itab, xtab, ytab, ntab, x, y, ierr)
 c
 c Linear interpolator with last index save
 c
@@ -303,7 +303,7 @@ c----- Only 1 pt in table
         endif
 c
 c-----locate search index
-        call srch (itab, x, xtab, ntab, index, ierr)
+        call search (itab, x, xtab, ntab, index, ierr)
 c
 c----- index points just above x
         y = ytab(index-1) + (x - xtab(index-1)) * 

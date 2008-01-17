@@ -22,7 +22,7 @@ define	SPLINE		2
 # a file or STDIN.
 
 
-procedure t_interp()
+procedure t_interpolate()
 
 double	x, y, x1, x2, dx
 pointer	xtab, ytab
@@ -91,7 +91,7 @@ begin
 		call error (1, "Interval paramater dx implies infinite loop.")
 
 	    for (x=x1; x <= x2; x = x+dx) {
-		call intrp (1, Memd[xtab], Memd[ytab], npts, x, y, ierr)
+		call intrpc (1, Memd[xtab], Memd[ytab], npts, x, y, ierr)
 		call printf ("%12.5g  %12.5g\n")
 		    call pargd (x)
 		    call pargd (y)
@@ -111,9 +111,9 @@ begin
 		while (fscan(in) != EOF) {
 		    call gargd (x)
 		    if (imode == LINEAR)
-			call lintrp (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
+			call lintr (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
 		    else
-			call intrp  (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
+			call intrpc  (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
 
 		    call printf ("%12.5g  %12.5g\n")
 			call pargd (x)

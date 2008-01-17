@@ -968,7 +968,7 @@ pointer	sp, ip, plot_title, op
 bool	fp_equalr()
 
 real	x1, x2, y1, y2
-common	/impcom/ x1, x2, y1, y2
+common	/comimp/ x1, x2, y1, y2
 
 begin
 	call smark (sp)
@@ -1104,7 +1104,7 @@ real	n_x1, n_x2		# range of world coords in X
 real	n_y1, n_y2		# range of world coords in Y
 
 real	x1, x2, y1, y2
-common	/impcom/ x1, x2, y1, y2
+common	/comimp/ x1, x2, y1, y2
 
 begin
 	if (!IS_INDEF(n_x1))
