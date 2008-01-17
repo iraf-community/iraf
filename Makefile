@@ -56,7 +56,7 @@ boot_make::
 iraf::
 	$(SETUP) make_iraf $(MACH)
 
-check_iraf:: clean_iraf
+check_iraf::
 	$(SETUP) make_check_iraf $(MACH)
 
 tables::
@@ -66,6 +66,7 @@ noao::
 	$(SETUP) make_noao $(MACH)
 
 clean::	clean_tmp_bin clean_f2c clean_unix clean_iraf clean_tables clean_noao
+	find iraf -name 'f2c_proto.h' -exec rm -f {} \;
 
 clean_tmp_bin::
 	rm -rf tmp_bin
