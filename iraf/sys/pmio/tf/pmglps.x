@@ -60,8 +60,8 @@ begin
 	    call amovs (Mems[px_src], px_dst, npix)
 	else {
 	    call salloc (px_out, npix, TY_SHORT)
-	    call pl_pixrops (Mems[px_src], 1, PL_MAXVAL(pl), px_dst,
-		MV(px_depth), Mems[px_out], npix, rop)
+	    call pl_pixrops (Mems[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
+		MV(px_depth), npix, rop)
 	    call amovs (Mems[px_out], px_dst, npix)
 	}
 

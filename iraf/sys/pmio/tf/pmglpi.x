@@ -60,8 +60,8 @@ begin
 	    call amovi (Memi[px_src], px_dst, npix)
 	else {
 	    call salloc (px_out, npix, TY_INT)
-	    call pl_pixropi (Memi[px_src], 1, PL_MAXVAL(pl), px_dst,
-		MV(px_depth), Memi[px_out], npix, rop)
+	    call pl_pixropi (Memi[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
+		MV(px_depth), npix, rop)
 	    call amovi (Memi[px_out], px_dst, npix)
 	}
 
