@@ -40,7 +40,7 @@ bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
 errchk  set_cache_time, syserr, syserrs, imerr
-int	clktime()
+long	clktime()
 begin
 	call smark (sp)
 	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
@@ -1281,7 +1281,8 @@ pointer sp, hdrfile
 int	fd, fdout, i, nch, nc, cfit
 char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
 bool	streq()
-int	open(), naxis, read(), strncmp(), note(), fnroot()
+int	open(), naxis, read(), strncmp(), fnroot()
+long	note()
 
 include "fxfcache.com"
 define	cfit_ 91
