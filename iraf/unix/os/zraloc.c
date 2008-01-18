@@ -13,11 +13,11 @@
 /* buf    : receives address of buffer	*/
 /* nbytes : buffer size, machine bytes	*/
 /* status : status return: XOK or XERR	*/
-int ZRALOC ( XINT *buf, XINT *nbytes, XINT *status )
+int ZRALOC ( XPOINTER *buf, XINT *nbytes, XINT *status )
 {
 	char *bufptr;
 
-	bufptr = realloc (LOC_TO_ADDR (*buf, char), (XINT)*nbytes);
+	bufptr = realloc (LOC_TO_ADDR (*buf, char), *nbytes);
 	if (bufptr != NULL) {
 	    *buf = ADDR_TO_LOC (bufptr);
 	    *status = XOK;

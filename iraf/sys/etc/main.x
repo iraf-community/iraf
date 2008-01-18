@@ -130,7 +130,7 @@ char	a_cmd[ARB]		# command to be executed or null string
 int	a_inchan		# process standard input
 int	a_outchan		# process standard output
 int	a_errchan		# process standard error output
-int	a_driver		# ZLOCPR address of device driver
+pointer	a_driver		# ZLOCPR address of device driver
 int	a_devtype		# device type (text or binary)
 int	prtype			# process type (connected, detached, host)
 char	bkgfile[ARB]		# packed filename of bkg file if detached

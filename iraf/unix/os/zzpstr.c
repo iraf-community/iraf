@@ -171,7 +171,7 @@ void spp_printstr ( XCHAR *s )
 /* SPP_PRINTMEMC -- GDB callable debug function to print an EOS terminated SPP
  * string passed as a pointer to char.
  */
-void spp_printmemc ( XINT memc_ptr )
+void spp_printmemc ( XPOINTER memc_ptr )
 {
 	spp_printstr ((XCHAR *) ((memc_ptr - 1) * 2 - 2));
 }

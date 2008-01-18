@@ -50,7 +50,7 @@
 
 /* ZLOCVA style pointer to address conversions.
  */
-#define	ADDR_TO_LOC(addr)	(((unsigned XINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
+#define	ADDR_TO_LOC(addr)	(((unsigned XPOINTER)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
 #define	LOC_TO_ADDR(loc,type)	((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
 
 /* Kernel file descriptor for accessing UNIX files.  A static array ZFD of

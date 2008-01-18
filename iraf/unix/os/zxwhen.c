@@ -250,7 +250,7 @@ static struct _hwx hwx_exception[] = {
 /* ??? Related files are sys/etc/xwhen.x and sys/libc/cxwhen.c. ??? */
 /* epa     : EPA of new exception handler	*/
 /* old_epa : receives EPA of old handler	*/
-int ZXWHEN ( XINT *sig_code, XINT *epa, XINT *old_epa )
+int ZXWHEN ( XINT *sig_code, XPOINTER *epa, XPOINTER *old_epa )
 {
 	static int first_call = 1;
 	int vex, uex;
@@ -271,7 +271,7 @@ int ZXWHEN ( XINT *sig_code, XINT *epa, XINT *old_epa )
 	    kernel_panic ("zxwhen: bad exception code");
 	}
 	    
-	*old_epa = (XINT)(handler_epa[vex]);
+	*old_epa = (XPOINTER)(handler_epa[vex]);
 	handler_epa[vex] = (XSIGFUNC)(*epa);
 #ifdef OLD_MACOSX
 	vvector = &ex_handler;
@@ -288,7 +288,7 @@ int ZXWHEN ( XINT *sig_code, XINT *epa, XINT *old_epa )
 	    vvector.sa__handler = SIG_IGN;
 #endif
 	} else if (*epa == *old_epa)
-	    *old_epa = (XINT)X_IGNORE;
+	    *old_epa = (XPOINTER)X_IGNORE;
 
 	/* Set all hardware vectors in the indicated exception class.
 	 * If interrupt (SIGINT) was disabled when we were spawned (i.e.,

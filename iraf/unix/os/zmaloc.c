@@ -15,11 +15,11 @@
 /* buf    : receives address of buffer		*/
 /* nbytes : buffer size, machine bytes		*/
 /* status : status return: XOK or XERR		*/
-int ZMALOC ( XINT *buf, XINT *nbytes, XINT *status )
+int ZMALOC ( XPOINTER *buf, XINT *nbytes, XINT *status )
 {
 	char *bufptr;
 
-	bufptr = malloc ((XINT)*nbytes);
+	bufptr = malloc (*nbytes);
 	if (bufptr != NULL) {
 	    *buf = ADDR_TO_LOC (bufptr);
 	    *status = XOK;

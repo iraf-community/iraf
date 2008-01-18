@@ -52,7 +52,7 @@ int main ( int argc, char *argv[] )
 {
 	XINT inchan=0, outchan=1;	/* process stdin, stdout	*/
 	XINT errchan=2;			/* process std error output	*/
-	XINT driver;			/* EPA i/o chan device driver	*/
+	XPOINTER driver;		/* EPA i/o chan device driver	*/
 	XINT devtype;			/* device type (text or binary)	*/
 	XINT jobcode;			/* bkg jobcode, if detached pr	*/
 	XINT errstat;
@@ -62,9 +62,9 @@ int main ( int argc, char *argv[] )
 
 	int arg = 1;
 
-	if ( sizeof(XINT) < sizeof(void *) ) {
-	    fprintf(stderr,"[ERROR] ZLOCPR:\n");
-	    fprintf(stderr,"The sizeof(XINT) is not equal to the address size.\n");
+	if ( sizeof(XPOINTER) < sizeof(void *) ) {
+	    fprintf(stderr,"[ERROR] main():\n");
+	    fprintf(stderr,"The sizeof(XPOINTER) is smaller than address size.\n");
 	    fprintf(stderr,"Sorry, the IRAF cannot work on your machine.\n");
 	    exit (1);
 	}

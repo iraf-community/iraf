@@ -1,3 +1,5 @@
+	.file	"zsvjmp.s"
+
 # ZSVJMP, ZDOJMP -- Set up a jump (non-local goto) by saving the processor
 # registers in the buffer jmpbuf.  A subsequent call to ZDOJMP restores
 # the registers, effecting a call in the context of the procedure which

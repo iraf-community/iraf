@@ -12,7 +12,7 @@
  * The manual page for FREE says nothing about error checking, so we do
  * not look at the return value.
  */
-int ZMFREE ( XINT *buf, XINT *status )
+int ZMFREE ( XPOINTER *buf, XINT *status )
 {
 
 	free (LOC_TO_ADDR (*buf, char));

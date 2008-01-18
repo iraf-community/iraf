@@ -18,11 +18,11 @@
  */
 /* proc  : procedure for which we desire address */
 /* o_epa : entry point address */
-int ZLOCPR ( PFU proc, XINT *o_epa )
+int ZLOCPR ( PFU proc, XPOINTER *o_epa )
 {
 	void *epa = (void *) proc;
 
-	*o_epa = (XINT) epa;
+	*o_epa = (XPOINTER) epa;
 
 #ifdef SUNOS
 	/* Return immediately if the shared library is not in use. */
@@ -35,20 +35,20 @@ int ZLOCPR ( PFU proc, XINT *o_epa )
 	 * is called to reference the same procedure in both the shared
 	 * library image and the client process.
 	 */
-	if ( (unsigned int *)epa < VSHLIB || (unsigned int *)epa >= (unsigned int *)&VSHEND)
+	if ( (unsigned XPOINTER *)epa < VSHLIB || (unsigned XPOINTER *)epa >= (unsigned XPOINTER *)&VSHEND)
 	    return XOK;
 
 	/* Disassemble the JMP instruction in the transfer vector to get the
 	 * address of the referenced procedure in the shared library. [MACHDEP]
 	 */
 #ifdef i386
-	*o_epa = (XINT)((unsigned int)epa + *((unsigned int *)((char *)epa + 1)) + 5);
+	*o_epa = (XPOINTER)((unsigned XPOINTER)epa + *((unsigned XPOINTER *)((char *)epa + 1)) + 5);
 #else
 #ifdef mc68000
-	*o_epa = (XINT)(*((unsigned int *)((char *)epa + 2)));
+	*o_epa = (XPOINTER)(*((unsigned XPOINTER *)((char *)epa + 2)));
 #else
 #ifdef sparc
-	*o_epa = (XINT)(((*epa & 0x3fffff) << 10) | (*((unsigned int *)epa+1) & 0x3ff));
+	*o_epa = (XPOINTER)(((*epa & 0x3fffff) << 10) | (*((unsigned XPOINTER *)epa+1) & 0x3ff));
 #endif
 #endif
 #endif

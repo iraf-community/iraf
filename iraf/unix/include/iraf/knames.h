@@ -25,7 +25,7 @@
 #define	KI_SEND		kisend_
 #define	KI_RECEIVE	kirece_
 
-extern XINT IRAF_MAIN ( XCHAR *, XINT *, XINT *, XINT *, XINT *, XINT *, XINT *, XCHAR *, XINT *, PFI, PFI );
+extern XINT IRAF_MAIN ( XCHAR *, XINT *, XINT *, XINT *, XPOINTER *, XINT *, XINT *, XCHAR *, XINT *, PFI, PFI );
 extern XINT c_main ( XINT *, PKCHAR *, PKCHAR * );
 /* zshlib.c */
 #ifndef F2C_INCLUDE		/* for native C code */
@@ -367,11 +367,11 @@ extern int ZGTENV ( PKCHAR *, PKCHAR *, XINT *, XINT * );
 extern int ZGTIME ( XLONG *, XLONG * );
 extern int ZGTPID ( XINT * );
 extern int ZINTPR ( XINT *, XINT *, XINT * );
-extern int ZLOCPR ( PFU, XINT * );
-extern int ZLOCVA ( XCHAR *, XINT * );
-extern int ZMALOC ( XINT *, XINT *, XINT * );
+extern int ZLOCPR ( PFU, XPOINTER * );
+extern int ZLOCVA ( XCHAR *, XPOINTER * );
+extern int ZMALOC ( XPOINTER *, XINT *, XINT * );
 /* ??? ZMEMCK ??? */
-extern int ZMFREE ( XINT *, XINT * );
+extern int ZMFREE ( XPOINTER *, XINT * );
 extern int ZNOTTX ( XINT *, XLONG * );
 extern int ZNOTTY ( XINT *, XLONG * );
 extern int ZOPCPR ( PKCHAR *, XINT *, XINT *, XINT * );
@@ -390,7 +390,7 @@ extern int ZOSCMD ( PKCHAR *, PKCHAR *, PKCHAR *, PKCHAR *, XINT * );
 extern int ZPANIC ( XINT *, PKCHAR * );
 extern int ZPUTTX ( XINT *, XCHAR *, XINT *, XINT * );
 extern int ZPUTTY ( XINT *, XCHAR *, XINT *, XINT * );
-extern int ZRALOC ( XINT *, XINT *, XINT * );
+extern int ZRALOC ( XPOINTER *, XINT *, XINT * );
 extern int ZSEKTX ( XINT *, XLONG *, XINT * );
 extern int ZSEKTY ( XINT *, XLONG *, XINT * );
 extern int ZSTTBF ( XINT *, XINT *, XLONG * );
@@ -407,7 +407,7 @@ extern int ZSVJMP ( XPOINTER *, XINT * );
 /* ??? ZTSLEE ??? */
 extern int ZWMSEC ( XINT * );
 extern int ZXGMES ( XINT *, PKCHAR *, XINT * );
-extern int ZXWHEN ( XINT *, XINT *, XINT * );
+extern int ZXWHEN ( XINT *, XPOINTER *, XPOINTER * );
 extern int ZZCLMT ( XINT *, XINT *, XINT * );
 extern int ZZEPRO ( void );
 extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XINT *, XINT *, XINT * );
