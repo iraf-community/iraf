@@ -133,8 +133,11 @@ set_mach () {
 
 set_config () {
 
+  # zsvjmp.s settings
+  if [ -f ${host}as.${MACH}/zsvjmp.${SPP_DATA_MODEL}.s ]; then
+    ( cd ${host}as.${MACH} ; rm -f zsvjmp.s ; ln -s zsvjmp.${SPP_DATA_MODEL}.s zsvjmp.s )
+  fi
   # mach.h, iraf.h settings
-
   if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
     ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
     ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
@@ -323,7 +326,12 @@ case "$COMMAND" in
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
     sed -e 's/^\(CFLAGS = \)\(.*\)/\1\2 -DDEF_C_LINE_LENGTH=5120/' > Makefile )
   echo Makeing iraf/unix/f2c/libf2c/Makefile.
-  ( cd iraf/unix/f2c/libf2c ; cat makefile.u > Makefile )
+  if [ "$SPP_DATA_MODEL" = "lp64" ]; then
+    ( cd iraf/unix/f2c/libf2c ; cat makefile.u | \
+    sed -e 's/^\(OFILES = \)\(.*\)/\1$(QINT) \2/' > Makefile )
+  else
+    ( cd iraf/unix/f2c/libf2c ; cat makefile.u > Makefile )
+  fi
   #
   output_makefile iraf/unix/os makefile.in
   output_makefile iraf/unix/gdev/sgidev makefile.in
