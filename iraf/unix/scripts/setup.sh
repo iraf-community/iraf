@@ -49,18 +49,22 @@ set_irafenv() {
   #
   # architecture-dependent settings
   #
-  if [ "$ARCHITECTURE" = "x86_64" ]; then
-    HSI_CF="$HSI_CF -DX86_64"
+  F=""
+  if [ "$ARCHITECTURE" = "i386" ]; then
+    F="$F -DI386"
+  elif [ "$ARCHITECTURE" = "x86_64" ]; then
+    F="$F -DX86_64"
   fi
+  #
   if [ "$SPP_DATA_MODEL" = "ilp64" ]; then
-    HSI_CF="$HSI_CF -DSPP_ILP64"
-    XC_CFLAGS="$XC_CFLAGS -DSPP_ILP64"
-    XC_FFLAGS="$XC_FFLAGS -DSPP_ILP64"
+    F="$F -DSPP_ILP64"
   elif [ "$SPP_DATA_MODEL" = "lp64" ]; then
-    HSI_CF="$HSI_CF -DSPP_LP64"
-    XC_CFLAGS="$XC_CFLAGS -DSPP_LP64"
-    XC_FFLAGS="$XC_FFLAGS -DSPP_LP64"
+    F="$F -DSPP_LP64"
   fi
+  HSI_CF="$HSI_CF $F"
+  XC_CFLAGS="$XC_CFLAGS $F"
+  XC_FFLAGS="$XC_FFLAGS $F"
+  F=""
   #
   # OS-dependent settings
   #
@@ -134,9 +138,9 @@ set_mach () {
 set_config () {
 
   # zsvjmp.s settings
-  if [ -f ${host}as.${MACH}/zsvjmp.${SPP_DATA_MODEL}.s ]; then
-    ( cd ${host}as.${MACH} ; rm -f zsvjmp.s ; ln -s zsvjmp.${SPP_DATA_MODEL}.s zsvjmp.s )
-  fi
+  #if [ -f ${host}as.${MACH}/zsvjmp.${SPP_DATA_MODEL}.s ]; then
+  #  ( cd ${host}as.${MACH} ; rm -f zsvjmp.s ; ln -s zsvjmp.${SPP_DATA_MODEL}.s zsvjmp.s )
+  #fi
   # mach.h, iraf.h settings
   if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
     ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
@@ -180,8 +184,6 @@ set_config () {
 
 \$special "sys\$osb/":		aclrb.c		host\$c.default/aclrb.c
 				bytmov.c	host\$c.default/bytmov.c
-				ieeer.x		host\$as.$MACH/ieeer.x
-				ieeed.x		host\$as.$MACH/ieeed.x
 				;
 
 \$special "sys\$vops/ak/":	aclrc.x		host\$c.default/aclrc.c

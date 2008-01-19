@@ -1,5 +1,7 @@
 # NULL pointer
 
-pointer	nullptr
-data	nullptr /NULL/
+define	NULLPTR	nullpo
+
+pointer	nullpo
+data	nullpo /NULL/
 

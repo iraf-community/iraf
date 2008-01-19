@@ -148,3 +148,8 @@
 #undef import_stdarg
 #endif
 
+#ifdef import_endian
+#include <iraf/endian.h>
+#undef import_endian
+#endif
+

@@ -34,8 +34,65 @@ extern unsigned XINT USHLIB[];
 extern unsigned XINT VSHEND;
 #endif
 
-int gfpucw_( XINT * );
-int sfpucw_( XINT * );
+#define	IEEVPAKR	ieevpr_
+#define IEEVPAKD	ieevpd_
+#define	IEEVUPKR	ieevur_
+#define	IEEVUPKD	ieevud_
+#define	IEEPAKR		ieepar_
+#define	IEEPAKD		ieepad_
+#define	IEEUPKR		ieeupr_
+#define	IEEUPKD		ieeupd_
+#define	IEESNANR	ieesnr_
+#define	IEESNAND	ieesnd_
+#define	IEEGNANR	ieegnr_
+#define	IEEGNAND	ieegnd_
+#define	IEESTATR	ieestr_
+#define	IEESTATD	ieestd_
+#define	IEEZSTATR	ieezsr_
+#define	IEEZSTATD	ieezsd_
+#define	IEEMAPR		ieemar_
+#define	IEEMAPD		ieemad_
+#define	IEEGMAPR	ieegmr_
+#define	IEEGMAPD	ieegmd_
+#define	IEESMAPR	ieesmr_
+#define	IEESMAPD	ieesmd_
+#define	IEEE_SIGMASK	ieeesk_
+#define	IEEE_SIGRESTORE	ieeese_
+
+int IEEVPAKR ( XREAL *, XREAL *, XINT * );
+int IEEVPAKD ( XDOUBLE *, XDOUBLE *, XINT * );
+int IEEVUPKR ( XREAL *, XREAL *, XINT * );
+int IEEVUPKD ( XDOUBLE *, XDOUBLE *, XINT * );
+int IEEPAKR ( XREAL * );
+int IEEPAKD ( XDOUBLE * );
+int IEEUPKR ( XREAL * );
+int IEEUPKD ( XDOUBLE * );
+int IEESNANR ( XREAL * );
+int IEESNAND ( XDOUBLE * );
+int IEEGNANR ( XREAL * );
+int IEEGNAND ( XDOUBLE * );
+int IEESTATR ( XINT *, XINT * );
+int IEESTATD ( XINT *, XINT * );
+int IEEZSTATR ( void );
+int IEEZSTATD ( void );
+int IEEMAPR ( XINT *, XINT * );
+int IEEMAPD ( XINT *, XINT * );
+int IEEGMAPR ( XINT *, XINT * );
+int IEEGMAPD ( XINT *, XINT * );
+int IEESMAPR ( XINT *, XINT * );
+int IEESMAPD ( XINT *, XINT * );
+int IEEE_SIGMASK ( void );
+int IEEE_SIGRESTORE ( void );
+
+#define	GFPUCW		gfpucw_
+#define	SFPUCW		sfpucw_
+#define	MXMASK		mxmask_
+#define	MXUMSK		mxumsk_
+
+int GFPUCW ( XINT * );
+int SFPUCW ( XINT * );
+int MXMASK ( void );
+int MXUMSK ( void );
 
 #define	ZARDBF		zardbf_
 #define	ZARDGD		zardgd_

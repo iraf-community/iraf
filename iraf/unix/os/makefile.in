@@ -18,9 +18,8 @@ libos.a:	gmttolst.o irafpath.o prwait.o \
 		zfiomt.o zfiotx.o zfpath.o zfunc.o zglobl.o zintpr.o \
 		zmfree.o zraloc.o zzexit.o zfacss.o zfinfo.o zfiond.o \
 		zfioty.o zfpoll.o zfutim.o zgmtco.o zlocpr.o zopdir.o \
-		zshlib.o zzpstr.o
-	$(CC) $(HSI_CF) -o zsvjmp.o -c ../as.$(MACH)/zsvjmp.s
-	ar r libos.a $^ zsvjmp.o
+		zshlib.o zzpstr.o zsvjmp.o
+	ar r libos.a $^
 	$(RANLIB) libos.a
 	cp -p libos.a ../lib/.
 
