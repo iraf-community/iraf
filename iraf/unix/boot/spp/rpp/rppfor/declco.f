@@ -63,18 +63,31 @@
       integer errstk
       integer mem( 60000)
       common/cdsmem/mem
-      integer xptyp(9)
+      common/spptyp/ dbool(64), dchar(64), dshort(64), dint(64), 
+     *               dlong(64), dreal(64), ddble(64),  dcplx(64),
+     *               dpntr(64)
+      integer dbool
+      integer dchar
+      integer dshort
+      integer dint
+      integer dlong
+      integer dreal
+      integer ddble
+      integer dcplx
+      integer dpntr
+      integer space(2)
+      integer xptyp(128)
       integer xpntr(7)
       integer xfunc(7)
       integer xsubr(7)
-      data xptyp(1)/105/,xptyp(2)/110/,xptyp(3)/116/,xptyp(4)/101/,xptyp
-     *(5)/103/,xptyp(6)/101/,xptyp(7)/114/,xptyp(8)/32/,xptyp(9)/-2/
+      data space(1)/32/,space(2)/-2/
       data xpntr(1)/120/,xpntr(2)/36/,xpntr(3)/112/,xpntr(4)/110/,xpntr(
      *5)/116/,xpntr(6)/114/,xpntr(7)/-2/
       data xfunc(1)/120/,xfunc(2)/36/,xfunc(3)/102/,xfunc(4)/117/,xfunc(
      *5)/110/,xfunc(6)/99/,xfunc(7)/-2/
       data xsubr(1)/120/,xsubr(2)/36/,xsubr(3)/115/,xsubr(4)/117/,xsubr(
      *5)/98/,xsubr(6)/114/,xsubr(7)/-2/
+      call concat (dpntr, space, xptyp)
       if (.not.(ludef (id, newid, xpptbl) .eq. 1))goto 23000
       if (.not.(equal (id, xpntr) .eq. 1))goto 23002
       tokbl = gettok (newid, 100)
