@@ -86,13 +86,20 @@ int IEEE_SIGRESTORE ( void );
 
 #define	GFPUCW		gfpucw_
 #define	SFPUCW		sfpucw_
+
+#define	GFPUSW		gfpusw_
+
 #define	MXMASK		mxmask_
 #define	MXUMSK		mxumsk_
 
 int GFPUCW ( XINT * );
 int SFPUCW ( XINT * );
+
+int GFPUSW ( XINT * );
+
 int MXMASK ( void );
 int MXUMSK ( void );
+
 
 #define	ZARDBF		zardbf_
 #define	ZARDGD		zardgd_

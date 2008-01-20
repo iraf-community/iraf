@@ -6,16 +6,18 @@
 #include <string.h>
 #include <signal.h>
 
-#ifdef CYGWIN
-#  include <mingw/fenv.h>
-#else
 #ifdef LINUX
-#  include <fpu_control.h>
-#else
-# ifdef BSD
-#  include <floatingpoint.h>
-# endif
+# include <fpu_control.h>
 #endif
+#ifdef BSD
+# include <floatingpoint.h>
+#endif
+#ifdef CYGWIN
+# include <mingw/fenv.h>
+#endif
+#ifdef MACOSX
+# include <math.h>
+# include <fenv.h>
 #endif
 
 #ifdef SOLARIS
@@ -24,44 +26,6 @@
 # include <ieeefp.h>
 #endif
 
-#ifdef MACOSX
-#include <math.h>
-#include <fenv.h>
-#endif
-
-#ifdef LINUXPPC
-#define MACUNIX
-#endif
-
-#ifdef MACOSX
-#ifndef MACINTEL
-#define MACUNIX
-#endif
-
-/* The following are needed for OS X 10.1 for backward compatability.  The
- * signal sa_flags are set to use them to get signal handling working on
- * 10.2 and later systems.
- */
-#ifdef OLD_MACOSX
-#ifndef SA_NODEFER
-#define SA_NODEFER      0x0010  /* don't mask the signal we're delivering */
-#endif
-#ifndef SA_NOCLDWAIT
-#define SA_NOCLDWAIT    0x0020  /* don't keep zombies around */
-#endif
-#ifndef SA_SIGINFO
-#define SA_SIGINFO      0x0040  /* signal handler with SA_SIGINFO args */
-#endif
-#endif	/* OLD_MACOSX */
-
-#else
-
-#ifdef OLD_MACOSX
-#undef OLD_MACOSX
-#endif
-
-#endif	/* MACOSX */
-
 #define import_spp
 #define import_kernel
 #define import_knames
@@ -69,6 +33,34 @@
 #include <iraf.h>
 
 #include "zos.h"
+
+
+#ifdef MACOSX
+
+/* The following are needed for OS X 10.1 for backward compatability.  The
+ * signal sa_flags are set to use them to get signal handling working on
+ * 10.2 and later systems.
+ */
+#ifdef OLD_MACOSX
+# ifndef SA_NODEFER
+#  define SA_NODEFER	0x0010	/* don't mask the signal we're delivering */
+# endif
+# ifndef SA_NOCLDWAIT
+#  define SA_NOCLDWAIT	0x0020	/* don't keep zombies around */
+# endif
+# ifndef SA_SIGINFO
+#  define SA_SIGINFO	0x0040	/* signal handler with SA_SIGINFO args */
+# endif
+#endif	/* OLD_MACOSX */
+
+#else
+
+#ifdef OLD_MACOSX
+# undef OLD_MACOSX
+#endif
+
+#endif	/* MACOSX */
+
 
 /* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
  * customized for PC-IRAF, i.e., LINUX and FreeBSD.
@@ -85,18 +77,15 @@ int debug_sig = 0;
 
 #ifdef LINUX
 # define	fcancel(fp)
-#else
-# ifdef BSD
+#endif
+#ifdef BSD
 # define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
-# ifdef MACOSX
+#endif
+#ifdef MACOSX
 # define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-#else
-# ifdef SOLARIS
+#endif
+#ifdef SOLARIS
 # define	fcancel(fp)     ((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
-#endif
-#endif
-#endif
 #endif
 
 static int ignore_sigint = 0;
@@ -121,25 +110,6 @@ void ex_handler ( int, int, struct sigcontext * );
 void ex_handler ( int, siginfo_t *, void * );
 #endif
 
-
-#ifdef LINUX
-#ifndef MACUNIX
-int gfpucw_( XINT *xcw )
-{
-	fpu_control_t cw;
-	_FPU_GETCW(cw);
-	*xcw = cw;
-	return cw;
-}
-
-int sfpucw_( XINT *xcw )
-{
-	fpu_control_t cw = *xcw;
-	_FPU_SETCW(cw);
-	return cw;
-}
-#endif
-#endif
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
  *
@@ -386,36 +356,36 @@ void ex_handler ( int unix_signal, siginfo_t *info, void *uap )
 #if defined(MACOSX) || defined(CYGWIN)
         /* Clear the exception bits (ppc and x86). */
         feclearexcept (FE_ALL_EXCEPT);
-#else
+#endif
+
 #ifdef LINUX
 	/* setfpucw (0x1372); */
 	{
-#ifdef MACUNIX
+#ifdef POWERPC
 	/* This is for Linux on a Mac, e.g., LinuxPPC (not MacOSX). */
-	    int fpucw = _FPU_IEEE;
+	    XINT fpucw = _FPU_IEEE;
 
 	    /*
 	    if (unix_signal == SIGFPE)
 		kernel_panic ("unrecoverable floating exception");
 	    else
-		sfpucw_ (&fpucw);
+		SFPUCW (&fpucw);
 	    if (unix_signal == SIGPIPE && !ignore_sigint)
 		sigset (SIGINT, (SIGFUNC) ex_handler);
 	     */
 
-	    sfpucw_ (&fpucw);
+	    SFPUCW (&fpucw);
 #else
 	    /*
-	    int fpucw = 0x336;
-	    sfpucw_ (&fpucw);
+	    XINT fpucw = 0x336;
+	    SFPUCW (&fpucw);
 	    */
 	    fpu_control_t cw = 
 		(_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_ZM | _FPU_MASK_DM);
 	    _FPU_SETCW(cw);
-#endif
+#endif	/* POWERPC */
 	}
-#endif
-#endif
+#endif	/* LINUX */
 
 
 #ifdef SOLARIS

@@ -1,4 +1,8 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
+
 #define import_kernel
 #define import_knames
 #define import_spp
@@ -6,7 +10,7 @@
 
 extern	char *environ[];
 
-#ifdef LINUXPPC
+#if defined(LINUX) && defined(POWERPC)
 #define xargc	f__xargc
 #define xargv	f__xargv
 #endif

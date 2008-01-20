@@ -10,13 +10,15 @@
 #include <time.h>
 #include <errno.h>
 
-#ifdef CYGWIN
-#  include <mingw/fenv.h>
-#else
 #ifdef LINUX
 # include <fpu_control.h>
-# undef SOLARIS
 #endif
+#ifdef CYGWIN
+# include <mingw/fenv.h>
+#endif
+#ifdef MACOSX
+# include <math.h>
+# include <fenv.h>
 #endif
 
 #ifdef SHLIB
@@ -38,18 +40,6 @@
 
 #ifdef SOLARIS
 #include <ieeefp.h>
-#endif
-
-#ifdef LINUXPPC
-#define MACUNIX
-#endif
-
-#ifdef MACOSX
-#include <math.h>
-#include <fenv.h>
-#ifndef MACINTEL
-#define MACUNIX
-#endif
 #endif
 
 #define import_spp
@@ -455,7 +445,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
         /*  Clears the exception-occurred bits in the FP status register.
          */
         feclearexcept (FE_ALL_EXCEPT);
-#else
+#endif	/* MACOSX || CYGWIN */
 
 #if defined(LINUX)
 	/* Enable the common IEEE exceptions.  Newer Linux systems disable
@@ -468,21 +458,20 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	 */
 	{   
 	    /* 0x332: round to nearest, 64 bit precision, mask P-U-D. */
-#ifdef MACUNIX
-	    int fpucw = _FPU_IEEE;
-	    sfpucw_ (&fpucw);
+#ifdef POWERPC
+	    XINT fpucw = _FPU_IEEE;
+	    SFPUCW (&fpucw);
 #else
 	    /*
-	    int fpucw = 0x332;
-	    sfpucw_ (&fpucw);
+	    XINT fpucw = 0x332;
+	    SFPUCW (&fpucw);
 	    */
 	    fpu_control_t cw = 
-		(_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_ZM | _FPU_MASK_DM);
+		(_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_DM);
 	    _FPU_SETCW(cw);
-#endif
+#endif	/* POWERPC */
 	}
-#endif
-#endif
+#endif	/* LINUX */
 
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
