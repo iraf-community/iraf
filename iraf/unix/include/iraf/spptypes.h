@@ -42,6 +42,8 @@
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
 
+#define	XSIZE_T		XLONG
+
 struct cplx {
 	float	r;
 	float	i;
@@ -92,6 +94,8 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XREAL		real
 #define	XDOUBLE		doublereal
 #define XCOMPLEX	complex
+
+#define	XSIZE_T		XLONG
 
 #define PFU U_fp
 #define PFI I_fp

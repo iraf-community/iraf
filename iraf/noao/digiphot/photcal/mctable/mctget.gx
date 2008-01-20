@@ -38,7 +38,7 @@ begin
 
 	# Return value.
 	$if (datatype == p)
-	return (MEMP[mct_getrow (table, row) + col - 1])
+	return (Memp[mct_getrow (table, row) + col - 1])
 	$else
 	return (Mem$t[mct_getrow (table, row) + col - 1])
 	$endif

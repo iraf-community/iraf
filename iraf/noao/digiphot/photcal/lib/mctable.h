@@ -1,8 +1,5 @@
 # Multicolumn table structure.
 
-# Pointer Mem
-define	MEMP	Memi
-
 # Magic number
 define	MAGIC		1989
 
@@ -25,4 +22,4 @@ define	MCT_NPROWS	Memi[P2I($1+5)]		# highest row entered
 define	MCT_NPCOLS	Memi[P2I($1+6)]		# highest column entered
 define	MCT_NGROWS	Memi[P2I($1+7)]		# highest row gotten
 define	MCT_NGCOLS	Memi[P2I($1+8)]		# highest column gotten
-define	MCT_DATA	MEMP[$1+9]		# data buffer pointer
+define	MCT_DATA	Memp[$1+9]		# data buffer pointer

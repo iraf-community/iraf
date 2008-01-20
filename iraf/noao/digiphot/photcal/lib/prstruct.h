@@ -1,10 +1,6 @@
 # PRSTRUCT.H -- Parser symbol table structure.
 
 
-# Pointer access
-define	MEMP		Memi
-
-
 # ----------------------------------------------------------------------
 # Parser symbol structure. The symbol table is handled by the SYMTAB
 # procedures. The following is the definition of the structure associated
@@ -28,7 +24,7 @@ define	LEN_PSYM	3
 # Symbol structure definition
 define	PSYM_TYPE	Memi[P2I($1+0)]	# type
 define	PSYM_NUM	Memi[P2I($1+1)]	# sequential number
-define	PSYM_SUB	MEMP[$1+2]	# symbol substructure
+define	PSYM_SUB	Memp[$1+2]	# symbol substructure
 # next free location	    ($1 + 3) == LEN_PSYM !!!
 
 
@@ -133,13 +129,13 @@ define	PSEQ_ERRMAX	Memi[P2I($1 + 3)]	# max error equation string offset
 define	PSEQ_WEIGHT	Memi[P2I($1 + 4)]	# weight equation string offset
 define	PSEQ_WTSMIN	Memi[P2I($1 + 5)]	# min weight equation string offset
 define	PSEQ_WTSMAX	Memi[P2I($1 + 6)]	# max weight equation string offset
-define	PSEQ_RPNEQ	MEMP[$1 + 7]	# equation code
-define	PSEQ_RPNERROR	MEMP[$1 + 8] 	# error equation code
-define	PSEQ_RPNERRMIN	MEMP[$1 + 9]	# min error equation code
-define	PSEQ_RPNERRMAX	MEMP[$1 + 10]	# max error equation code
-define	PSEQ_RPNWEIGHT	MEMP[$1 + 11]	# weigt equation code
-define	PSEQ_RPNWTSMIN	MEMP[$1 + 12]	# min weight equation code
-define	PSEQ_RPNWTSMAX	MEMP[$1 + 13]	# max weight equation code
+define	PSEQ_RPNEQ	Memp[$1 + 7]	# equation code
+define	PSEQ_RPNERROR	Memp[$1 + 8] 	# error equation code
+define	PSEQ_RPNERRMIN	Memp[$1 + 9]	# min error equation code
+define	PSEQ_RPNERRMAX	Memp[$1 + 10]	# max error equation code
+define	PSEQ_RPNWEIGHT	Memp[$1 + 11]	# weigt equation code
+define	PSEQ_RPNWTSMIN	Memp[$1 + 12]	# min weight equation code
+define	PSEQ_RPNWTSMAX	Memp[$1 + 13]	# max weight equation code
 # next free location	    ($1 + 14) == LEN_PSEQ !!!
 
 
@@ -297,19 +293,19 @@ define	PTEQ_YPLOT	Memi[P2I($1 + 2 * PTEQ_NVAR($1) + 3 * PTEQ_NPAR($1) + 18)]
 # - derivative equation string offsets
 define	PTEQ_SDER	    ($1 + 2 * PTEQ_NVAR($1) + 3 * PTEQ_NPAR($1) + 19)
 # - fitting and reference equation codes
-define	PTEQ_RPNFIT	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 19]
-define	PTEQ_RPNREF	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 20]
+define	PTEQ_RPNFIT	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 19]
+define	PTEQ_RPNREF	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 20]
 # - error equation, minimum error, and maximum error codes
-define	PTEQ_RPNERROR	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 21] 
-define	PTEQ_RPNERRMIN	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 22]
-define	PTEQ_RPNERRMAX	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 23]
+define	PTEQ_RPNERROR	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 21] 
+define	PTEQ_RPNERRMIN	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 22]
+define	PTEQ_RPNERRMAX	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 23]
 # - weigth, minimum weight, maximum weight equation codes
-define	PTEQ_RPNWEIGHT	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 24]
-define	PTEQ_RPNWTSMIN	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 25]
-define	PTEQ_RPNWTSMAX	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 26]
+define	PTEQ_RPNWEIGHT	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 24]
+define	PTEQ_RPNWTSMIN	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 25]
+define	PTEQ_RPNWTSMAX	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 26]
 # - plot equation code3
-define	PTEQ_RPNXPLOT	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 27]
-define	PTEQ_RPNYPLOT	MEMP[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 28]
+define	PTEQ_RPNXPLOT	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 27]
+define	PTEQ_RPNYPLOT	Memp[$1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 28]
 # - start of derivarive equation codes
 define	PTEQ_SRPNDER	    ($1 + 2 * PTEQ_NVAR($1) + 4 * PTEQ_NPAR($1) + 29)
 # - next free location == LEN_PTEQ
@@ -324,7 +320,7 @@ define	PTEQ_APAR	Memi[P2I(PTEQ_SPAR($1))]	    # parameter sym. offsets
 define	PTEQ_APARVAL	Memr[P2R(PTEQ_SPARVAL($1))]	    # parameter values
 define	PTEQ_APLIST	Memi[P2I(PTEQ_SPLIST($1))]	    # fitting parameter list
 define	PTEQ_ADER	Memi[P2I(PTEQ_SDER($1))]	    # derivative string offsets
-define	PTEQ_ARPNDER	MEMP[PTEQ_SRPNDER($1)]	    # derivative code
+define	PTEQ_ARPNDER	Memp[PTEQ_SRPNDER($1)]	    # derivative code
 
 # Individual access for variable symbols and counters.
 define	PTEQ_REFVAR	Memi[P2I(PTEQ_SREFVAR($1)) + $2 - 1]	# ref. var. symbol off.

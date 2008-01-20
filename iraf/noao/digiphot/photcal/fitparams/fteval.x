@@ -32,9 +32,6 @@ Entry points:
 include	<error.h>
 include	"../lib/parser.h"
 
-# Pointer Mem
-define	MEMP	Memi
-
 
 # FT_EVINIT - Initialize fit by copying fitting function, its derivative,
 # and plotting function codes into the fit common.
@@ -69,8 +66,8 @@ begin
 
 	call malloc (dercode, npars, TY_POINTER)
 	do np = 1, npars {
-	    MEMP[dercode + np - 1] = pr_gderp (sym, np, PTEQRPNDER)
-	    #if (MEMP[dercode + np - 1] == NULL)
+	    Memp[dercode + np - 1] = pr_gderp (sym, np, PTEQRPNDER)
+	    #if (Memp[dercode + np - 1] == NULL)
 		#call error (0, "ft_evinit: Null derivative equation code")
 	}
 
@@ -85,7 +82,7 @@ begin
 	    #do np = 1, npars {
 	        #call eprintf (" (dercode%d=%d)")
 		    #call pargi (np)
-		    #call pargi (MEMP[dercode + np - 1])
+		    #call pargi (Memp[dercode + np - 1])
 	    #}
 	    #call eprintf (" (xpcode=%d) (ypcode=%d)\n")
 		#call pargi (xpcode)
@@ -173,7 +170,7 @@ begin
 
 	# Evaluate each one of the derivatives.
 	do i = 1, npars {
-	    code = MEMP[dercode+i-1]
+	    code = Memp[dercode+i-1]
 	    if (code != NULL)
 	        der[i] = pr_eval (code, x, p)
 	    else {

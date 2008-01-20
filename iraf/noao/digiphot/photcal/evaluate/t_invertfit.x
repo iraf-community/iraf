@@ -4,8 +4,6 @@ include	"../lib/io.h"
 include	"../lib/parser.h"
 include "../lib/preval.h"
 
-# Define the pointer Mem
-define	MEMP	Memi
 
 # T_INVERTFIT - INVERTFIT converts intrumental photometric indices into
 # standard indices by using the configuration file, the coefficients
@@ -197,18 +195,18 @@ begin
 	    # current equation, and read them from the coefficient file.
 
 	    nparams = pr_gsymi (sym, PTEQNPAR)
-	    call salloc (MEMP[params+i-1], nparams, TY_REAL)
-	    call salloc (MEMP[errors+i-1], nparams, TY_REAL)
+	    call salloc (Memp[params+i-1], nparams, TY_REAL)
+	    call salloc (Memp[errors+i-1], nparams, TY_REAL)
 	    iferr {
 	        if (io_gcoeffs (Memc[paramfile], sym, stat, chisqr, rms,
-	            Memr[MEMP[params+i-1]], Memr[MEMP[errors+i-1]], nparams) !=
+	            Memr[Memp[params+i-1]], Memr[Memp[errors+i-1]], nparams) !=
 		    nparams) {
 		    call eprintf ("Warning: Error reading parameters for ")
 		    call eprintf ("equation %s from %s\n")
 			call pargstr (Memc[pr_xgetname(sym)])
 			call pargstr (Memc[paramfile])
-		    call amovkr (INDEFR, Memr[MEMP[params+i-1]], nparams)
-		    call amovkr (INDEFR, Memr[MEMP[errors+i-1]], nparams)
+		    call amovkr (INDEFR, Memr[Memp[params+i-1]], nparams)
+		    call amovkr (INDEFR, Memr[Memp[errors+i-1]], nparams)
 		}
 	    } then {
 		call erract (EA_WARN)
@@ -415,7 +413,7 @@ begin
 			pval = Memr[vars+pindex-1]
 		    else
 			pval = pr_eval (Memi[psym+i-1], Memr[vars],
-			    Memr[MEMP[params]])
+			    Memr[Memp[params]])
 		    call pargr (pval)
 		}
 
@@ -424,7 +422,7 @@ begin
 		call amovr (Memr[avtvars],  Memr[tvars+nobsvars], nstdvars)
 
 		# Invert the transformations and compute the errors.
-		if (ph_objcheck (MEMP[params], Memr[tvars], Memi[eqvartable],
+		if (ph_objcheck (Memp[params], Memr[tvars], Memi[eqvartable],
 		    nstdvars, ntrneqs, Memi[eqset], maxnset,
 		    Memi[varindex], nustdvars, Memi[eqindex],
 		    nueq) == ERR) {
@@ -435,7 +433,7 @@ begin
 		    if (nset > 0)
 			call amovkr (INDEFR, Memr[servars], nset)
 
-		} else if (ph_invert (MEMP[params], Memr[tvars], nobsvars,
+		} else if (ph_invert (Memp[params], Memr[tvars], nobsvars,
 		    Memr[dtvars], Memi[varindex], nstdvars,
 		    nustdvars, Memi[eqindex], nueq) == ERR) {
 
@@ -458,7 +456,7 @@ begin
 		    if (nset > 0) {
 		        do i = 1, nset
 		            Memr[svars+i-1] = pr_eval (Memi[userset+i-1],
-			        Memr[tvars], Memr[MEMP[params+i-1]])
+			        Memr[tvars], Memr[Memp[params+i-1]])
 		    }
 
 		    # Evaluate the errors.
@@ -468,7 +466,7 @@ begin
 			if (nset > 0)
 			    call amovkr (INDEFR, Memr[servars], nset)
 		    case ERR_EQUATIONS:
-		        if (ph_iereqn (MEMP[params], Memr[tvars], nobsvars,
+		        if (ph_iereqn (Memp[params], Memr[tvars], nobsvars,
 		            Memr[dtvars], Memi[varindex], Memr[ervars],
 			    nstdvars, Memi[userset], Memr[svars],
 			    Memr[servars], nset, nustdvars, Memi[eqindex],
@@ -478,7 +476,7 @@ begin
 			        call amovkr (INDEFR, Memr[servars], nset)
 			}
 		    case ERR_OBSERRORS:
-		        if (ph_ierval (MEMP[params], Memr[tvars],
+		        if (ph_ierval (Memp[params], Memr[tvars],
 			    Memi[usererrs], nobsvars, Memr[dtvars],
 			    Memi[varindex], Memr[ervars], nstdvars,
 			    Memi[userset], Memr[svars], Memr[servars], nset,
@@ -537,7 +535,7 @@ begin
 		    if (getid == NO || (matchid == YES &&
 		        type != TYPE_PROGRAM)) {
 		        resid = pr_eval (Memi[userset+i-1], Memr[vars],
-		            Memr[MEMP[params+i-1]])
+		            Memr[Memp[params+i-1]])
 		        if (IS_INDEFR (Memr[svars+i-1]) || IS_INDEFR (resid))
 			    resid = INDEFR
 		        else

@@ -303,5 +303,5 @@ begin
 	MCT_NGCOLS (table) = col
 
 	# Return value.
-	return (MEMP[mct_getrow (table, row) + col - 1])
+	return (Memp[mct_getrow (table, row) + col - 1])
 end

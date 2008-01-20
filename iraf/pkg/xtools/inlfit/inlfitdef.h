@@ -1,9 +1,5 @@
 # The INLFIT data structure and private definitions.
 
-# Pointer Mem
-
-#define	MEMP		Memi
-
 
 # Default help file and prompt
 
@@ -30,9 +26,9 @@ define	IN_FUNC		Memi[P2I($1+1)]	# fitting function
 define	IN_DFUNC	Memi[P2I($1+2)]	# derivative function
 define	IN_NPARAMS	Memi[P2I($1+3)]	# number of parameters
 define	IN_NFPARAMS	Memi[P2I($1+4)]	# number of fitted parameters
-define	IN_PARAM	MEMP[$1+5]	# pointer to parameter vector
-define	IN_DPARAM	MEMP[$1+6]	# pointer to par. change vector
-define	IN_PLIST	MEMP[$1+7]	# parameter list
+define	IN_PARAM	Memp[$1+5]	# pointer to parameter vector
+define	IN_DPARAM	Memp[$1+6]	# pointer to par. change vector
+define	IN_PLIST	Memp[$1+7]	# parameter list
 define	IN_MAXITER	Memi[P2I($1+8)]	# max number of iterations
 
 # INLFIT parameters used to keep track of the number of variables and
@@ -46,7 +42,7 @@ define	IN_NPTS		Memi[P2I($1+10)]	# number of points
 # store a pointer to a separate buffer, containing floating point
 # numbers.
 
-define	IN_SFLOAT	MEMP[$1+11]	# pointer to subs. with reals/doubles
+define	IN_SFLOAT	Memp[$1+11]	# pointer to subs. with reals/doubles
 
 # INLFIT parameters used for automatic data rejection. The rejection
 # limits and the grow radius are stored in the floating point substructure.
@@ -57,7 +53,7 @@ define	IN_NREJECT	Memi[P2I($1+12)]	# number of rejection iteration
 # pointer to the rejected point list.
 
 define	IN_NREJPTS	Memi[P2I($1+13)]	# number of rejected points
-define	IN_REJPTS	MEMP[$1+14]	# pointer to buffer with rejected pts.
+define	IN_REJPTS	Memp[$1+14]	# pointer to buffer with rejected pts.
 
 # INLFIT parameters used to store user defined procedures addresses.
 # These parameters are used by the zcall*() procedures.
@@ -70,8 +66,8 @@ define	IN_UFIT		Memi[P2I($1+17)]	# default interactive fit command
 # the minimum and maximum values of all the input variables. The number
 # of variables is kept as well.
 
-define	IN_XMIN		MEMP[$1+18]	# pointer to buffer with min. values
-define	IN_XMAX		MEMP[$1+19]	# pointer to buffer with max. values
+define	IN_XMIN		Memp[$1+18]	# pointer to buffer with min. values
+define	IN_XMAX		Memp[$1+19]	# pointer to buffer with max. values
 
 # INLFIT flags.
 
@@ -82,23 +78,23 @@ define	IN_FITERROR	Memi[P2I($1+22)]	# error fit code
 # INLFIT string parameters used for interactive graphics. These are
 # pointers to the actual strings.
 
-define	IN_LABELS	MEMP[$1+23]	# standard axis labels
-define	IN_UNITS	MEMP[$1+24]	# standard axis units
-define	IN_FLABELS	MEMP[$1+25]	# function and fit labels
-define	IN_FUNITS	MEMP[$1+26]	# function and fit units
-define	IN_PLABELS	MEMP[$1+27]	# parameter labels
-define	IN_PUNITS	MEMP[$1+28]	# parameter units
-define	IN_VLABELS	MEMP[$1+29]	# variable labels
-define	IN_VUNITS	MEMP[$1+30]	# variable units
-define	IN_USERLABELS	MEMP[$1+31]	# user plot labels
-define	IN_USERUNITS	MEMP[$1+32]	# user plot units
-define	IN_HELP		MEMP[$1+33]	# help file name
-define	IN_PROMPT	MEMP[$1+34]	# help prompt
+define	IN_LABELS	Memp[$1+23]	# standard axis labels
+define	IN_UNITS	Memp[$1+24]	# standard axis units
+define	IN_FLABELS	Memp[$1+25]	# function and fit labels
+define	IN_FUNITS	Memp[$1+26]	# function and fit units
+define	IN_PLABELS	Memp[$1+27]	# parameter labels
+define	IN_PUNITS	Memp[$1+28]	# parameter units
+define	IN_VLABELS	Memp[$1+29]	# variable labels
+define	IN_VUNITS	Memp[$1+30]	# variable units
+define	IN_USERLABELS	Memp[$1+31]	# user plot labels
+define	IN_USERUNITS	Memp[$1+32]	# user plot units
+define	IN_HELP		Memp[$1+33]	# help file name
+define	IN_PROMPT	Memp[$1+34]	# help prompt
 
 # INLFIT graph key definitions.
 
 define	IN_GKEY		Memi[P2I($1+35)]	# current graph key
-define	IN_SGAXES	MEMP[$1+36]	# pointer to subs. with graph keys 
+define	IN_SGAXES	Memp[$1+36]	# pointer to subs. with graph keys 
 
 # next free location	($1 + 37) == LEN_INLSTRUCT
 

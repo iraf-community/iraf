@@ -3,8 +3,6 @@ include <math/nlfit.h>
 include	"../lib/io.h"
 include	"../lib/parser.h"
 
-# Define the pointer Mem
-define	MEMP	Memi
 
 # T_EVALFIT - Main photometry processing task. This task will convert 
 # intrumental photometric indices into standard indices, by using the 
@@ -177,18 +175,18 @@ begin
 	    # for the current equation, and read them from the
 	    # parameters file.
 
-	    call salloc (MEMP[params+i-1], nparams, TY_REAL)
-	    call salloc (MEMP[errors+i-1], nparams, TY_REAL)
+	    call salloc (Memp[params+i-1], nparams, TY_REAL)
+	    call salloc (Memp[errors+i-1], nparams, TY_REAL)
 	    iferr {
 	        if (io_gcoeffs (Memc[paramfile], sym, stat, chisqr, rms,
-		    Memr[MEMP[params+i-1]], Memr[MEMP[errors+i-1]],
+		    Memr[Memp[params+i-1]], Memr[Memp[errors+i-1]],
 		    nparams) != nparams) {
 		    call eprintf ("Warning: Error reading parameters for ")
 		    call eprintf ("equation %s from %s\n")
 			call pargstr (Memc[pr_xgetname (sym)])
 			call pargstr (Memc[paramfile])
-		    call amovkr (INDEFR, Memr[MEMP[params+i-1]], nparams)
-		    call amovkr (INDEFR, Memr[MEMP[errors+i-1]], nparams)
+		    call amovkr (INDEFR, Memr[Memp[params+i-1]], nparams)
+		    call amovkr (INDEFR, Memr[Memp[errors+i-1]], nparams)
 		}
 	    } then {
 		call erract (EA_WARN)
@@ -292,7 +290,7 @@ begin
 			pval = Memr[vars+pindex-1]
 		    else
 			pval = pr_eval (Memi[psym+i-1], Memr[vars],
-			    Memr[MEMP[params]])
+			    Memr[Memp[params]])
 		    call pargr (pval)
 		}
 
@@ -304,7 +302,7 @@ begin
 
 		    # Compute the fit. 
 		    fit = pr_eval (Memi[fsym+i-1], Memr[vars],
-		        Memr[MEMP[params+i-1]])
+		        Memr[Memp[params+i-1]])
 		    call pargr (fit)
 
 		    # Compute the error.
@@ -317,14 +315,14 @@ begin
 			        errval = INDEFR
 			    else
 			        errval = ph_erval (Memi[fsym+i-1], fit,
-			            Memr[MEMP[params+i-1]], Memr[vars],
+			            Memr[Memp[params+i-1]], Memr[vars],
 				    Memi[uservars], Memi[usererrs], nobsvars)
 		        case ERR_EQUATIONS:
 			    if (Memi[esym+i-1] == NULL)
 			        errval = INDEFR
 			    else
 			        errval = pr_eval (Memi[esym+i-1], Memr[vars],
-			            Memr[MEMP[params+i-1]])
+			            Memr[Memp[params+i-1]])
 		        default:
 			    errval = INDEFR
 			}
@@ -338,7 +336,7 @@ begin
 			    resid = INDEFR
 		        else {
 		            ref = pr_eval (Memi[rsym+i-1], Memr[vars],
-		                Memr[MEMP[params+i-1]])
+		                Memr[Memp[params+i-1]])
 			    if (IS_INDEFR(ref))
 			        resid = INDEFR
 			    else

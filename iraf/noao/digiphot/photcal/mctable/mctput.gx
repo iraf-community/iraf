@@ -60,7 +60,7 @@ begin
 	# Enter variable.
 	base = MCT_DATA (table) + (row - 1) * MCT_MAXCOL (table)
 	$if (datatype == p)
-	MEMP[base + col - 1] = value
+	Memp[base + col - 1] = value
 	$else
 	Mem$t[base + col - 1] = value
 	$endif

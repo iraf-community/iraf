@@ -100,7 +100,9 @@ define	P2R	($1)
 define	P2D	((($1)-1)/2+1)
 define	P2X	((($1)-1)/2+1)
 
-define	MEMP	Meml
+define	Memp	Meml
+
+define	size_t	long
 
 # Map the following onto host Fortran intrinsic functions if possible,
 # else onto the andi, ori, etc. portable VOS functions.
