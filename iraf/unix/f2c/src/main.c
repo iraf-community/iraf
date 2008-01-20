@@ -247,8 +247,14 @@ set_externs(Void)
 	typesize[TYINLIST] = 26*chars_per_wd;
 	}
 
-    if (wordalign)
+    if (wordalign) {
 	typealign[TYDREAL] = typealign[TYDCOMPLEX] = typealign[TYREAL];
+#ifdef TYQUAD
+	if ( use_tyquad == YES ) {
+	    typealign[TYQUAD] = typealign[TYDREAL];
+	}
+#endif
+    }
     if (!tyioint) {
 	tyioint = TYSHORT;
 	szleng = typesize[TYSHORT];
