@@ -9,7 +9,8 @@ include	<fio.h>
 
 procedure fdevbf (zard, zawr, zawt, zstt, zcls)
 
-int	i, dev_epa
+int	i
+pointer	 dev_epa
 extern	zard(), zawr(), zawt(), zstt(), zcls()
 include	<fio.com>
 

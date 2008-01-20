@@ -33,7 +33,8 @@ char	bkgfile[ARB]		#I osfn of bkg file, if detached process
 char	cmd[ARB]		#I command argument string, if any
 
 char	osfn[SZ_FNAME]
-int	chan, loc_zgettx, i, fd[NFD]
+int	chan, i, fd[NFD]
+pointer	loc_zgettx
 data	fd[1] /CLIN/, fd[2] /STDIN/
 extern	zgettx()
 
@@ -53,7 +54,7 @@ begin
 
 	    do i = 1, NFD {
 		call fseti (fd[i], F_CHANNEL, chan)
-		call fseti (fd[i], F_DEVICE, loc_zgettx)
+		call fsetp (fd[i], F_DEVICE, loc_zgettx)
 		call fseti (fd[i], F_TYPE, TEXT_FILE)
 	    }
 	}

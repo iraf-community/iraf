@@ -33,6 +33,8 @@ errchk	syserr, pl_open, pl_create, pl_loadf, pl_loadim
 string	s_empty	"EMPTY"		# the empty mask
 string	s_bpl	"BPM"		# the reference image bad pixel list
 
+include <nullptr.com>
+
 begin
 	call smark (sp)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
@@ -49,7 +51,7 @@ begin
 	} else
 	    call strcpy (mask, Memc[fname], SZ_FNAME)
 
-	pl = pl_open (NULL)
+	pl = pl_open (NULLPTR)
 
 	# Open the named mask.
 	if (acmode != NEW_IMAGE && acmode != NEW_COPY) {
@@ -62,7 +64,7 @@ begin
 	    } else {
 		iferr (call pl_loadf (pl, Memc[fname], title, maxch)) {
 		    call pl_close (pl)
-		    pl = pl_open (NULL)
+		    pl = pl_open (NULLPTR)
 		    iferr (call pl_loadim (pl, Memc[fname], title, maxch)) {
 			call pl_close (pl)
 		        call erract (EA_ERROR)

@@ -23,7 +23,7 @@ extern	sgf_ttyfilter()
 
 begin
 	# Install stdgraph filter in terminal driver.
-	call ttseti (fd, TT_FILTER, locpr(sgf_ttyfilter))
+	call ttsetp (fd, TT_FILTER, locpr(sgf_ttyfilter))
 	call ttseti (fd, TT_FILTERKEY, ESC)
 
 	# Register escapes with terminal.
@@ -49,6 +49,7 @@ bool	streq()
 int	sgf_getchar(), fstati()
 include	"stdgraph.com"
 define	failed_ 91
+include <nullptr.com>
 
 begin
 	# Disable the filter if reading from the terminal in nonblocking
@@ -102,7 +103,7 @@ begin
 	# Process the escape.
 	if (streq (escape, RESET)) {
 	    call stg_reset()
-	    call ttseti (fd, TT_FILTER, NULL)
+	    call ttsetp (fd, TT_FILTER, NULLPTR)
 	    if (g_sg != NULL)
 		SG_UIFDATE(g_sg) = 0
 	} else				# add additional escapes here

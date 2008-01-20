@@ -27,7 +27,8 @@ extern	zopen_proc(), device()
 
 pointer	vp
 bool	standard_device
-int	ip, fd, dev_epa, junk, status, vfnmode
+int	ip, fd, junk, status, vfnmode
+pointer	dev_epa
 
 pointer	vfnopen()
 int	fgetfd(), fstdfile(), vfnadd(), vfnmap(), locpr()
@@ -68,7 +69,7 @@ begin
 
 	# Allocate and initialize the file descriptor.
 	fd = fgetfd (fname[ip], mode, type)
-	call fseti (fd, F_DEVICE, dev_epa)
+	call fsetp (fd, F_DEVICE, dev_epa)
 	fp = fiodes[fd]
 
 	# Get OS pathname of file.

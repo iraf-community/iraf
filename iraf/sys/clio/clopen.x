@@ -17,11 +17,12 @@ procedure clopen (stdin_chan, stdout_chan, stderr_chan, device, devtype)
 int	stdin_chan		# OS channel for the process standard input
 int	stdout_chan		# OS channel for the process standard output
 int	stderr_chan		# OS channel for the standard error output
-int	device			# zlocpr EPA of the driver read routine
+pointer	device			# zlocpr EPA of the driver read routine
 int	devtype			# device type (text or binary)
 
 long	lvalue
-int	fd, psmode, chan, devepa
+int	fd, psmode, chan
+pointer	 devepa
 int	fsetfd(), locpr()
 extern	zardps(), zardnu(), zgetty(), zgettt()
 
@@ -63,22 +64,22 @@ begin
 	} else
 	    devepa = device
 
-	call fseti (CLIN,  F_DEVICE, devepa)
-	call fseti (CLOUT, F_DEVICE, devepa)
+	call fsetp (CLIN,  F_DEVICE, devepa)
+	call fsetp (CLOUT, F_DEVICE, devepa)
 
 	if (devtype == TEXT_FILE) {
 	    # Set device drivers for the textual pseudofiles.
 	    do fd = STDIN, STDERR
-		call fseti (fd, F_DEVICE, devepa)
+		call fsetp (fd, F_DEVICE, devepa)
 	    
 	    # Connect the graphics streams to the null file.
 	    do fd = STDGRAPH, PSIOCTRL
-		call fseti (fd, F_DEVICE, locpr(zardnu))
+		call fsetp (fd, F_DEVICE, locpr(zardnu))
 
 	} else {
 	    # Connect the pseudofiles to the pseudofile driver.
 	    do fd = STDIN, PSIOCTRL
-		call fseti (fd, F_DEVICE, locpr(zardps))
+		call fsetp (fd, F_DEVICE, locpr(zardps))
 	}
 
 	# Associate a device channel with the two IPC streams and with each

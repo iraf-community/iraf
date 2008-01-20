@@ -8,9 +8,10 @@ include	<fset.h>
 int procedure xisatty (fd)
 
 int	fd			# file descriptor of candidate device
-int	epa, epa_tt, epa_ty
+pointer	epa, epa_tt, epa_ty
 extern	zgettt(), zgetty()
 int	fstati(), clstati()
+pointer	fstatp()
 
 begin
 	# If we are a connected subprocess, the referenced file is a standard
@@ -27,7 +28,7 @@ begin
 	# Otherwise, the use of the terminal driver tells us if the file is
 	# open on a terminal device.
 
-	epa = fstati (fd, F_DEVICE)
+	epa = fstatp (fd, F_DEVICE)
 	call zlocpr (zgettt, epa_tt)
 	call zlocpr (zgetty, epa_ty)
 

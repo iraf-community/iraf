@@ -74,7 +74,7 @@ define	CQ_FUNITS	Memi[P2I($1+18)]     # The record field units
 define	CQ_FFMTS	Memi[P2I($1+19)]     # The record field formats
 
 define	CQ_RFD		Memi[P2I($1+20)]     # The results file descriptor
-define	CQ_RBUF		Memi[P2I($1+21)]     # The results data descriptor
+define	CQ_RBUF		Memp[$1+21]     # The results data descriptor
 define	CQ_RNRECS	Memi[P2I($1+22)]     # The number of results records
 define	CQ_RINDEX	Memi[P2I($1+23)]	# The results record index pointer
 

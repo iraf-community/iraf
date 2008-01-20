@@ -19,6 +19,7 @@ pointer	w, sp, devname
 
 extern	zardbf()
 int	fstati(), grdwcs(), and(), locpr()
+pointer	fstatp()
 errchk	gki_openws, gki_getwcs, gki_reactivatews
 
 begin
@@ -61,7 +62,7 @@ begin
 
 	if (GP_ACMODE(gp) == APPEND) {
 	    w = GP_WCSPTR(gp,1)
-	    if (fstati (fd, F_DEVICE) != locpr (zardbf))
+	    if (fstatp (fd, F_DEVICE) != locpr (zardbf))
 		call gki_getwcs (fd, Memi[w], LEN_WCSARRAY)
 	    else iferr (junk = grdwcs(GP_DEVNAME(gp), Memi[w], LEN_WCSARRAY))
 		;

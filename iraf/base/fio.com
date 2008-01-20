@@ -9,7 +9,7 @@ pointer	otop[LAST_FD]		# top of buffer for output
 pointer	fiodes[LAST_FD]		# pointer to file descriptor
 int	fflags[LAST_FD]		# bit flags
 int	redir_fd[LAST_FD]	# fd of redir file if i/o redirected locally
-int	zdev[LEN_DEVTBL]	# device table
+pointer	zdev[LEN_DEVTBL]	# device table
 int	next_dev		# next slot in device table
 pointer	fp			# file pointer of file most recently accessed
 char	pathname[SZ_PATHNAME]	# buffer for mapping file names

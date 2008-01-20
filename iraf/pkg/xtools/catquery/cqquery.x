@@ -17,7 +17,8 @@ int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
 long	note()
 pointer	cq_rinit()
-int	ndopen(), strlen(), read(), open(), getline(), fstati()
+int	ndopen(), strlen(), read(), open(), getline()
+pointer	 fstatp()
 errchk	ndopen(), fprintf(), areadb(), awriteb(), open(), read()
 
 begin
@@ -90,7 +91,7 @@ begin
 	    # Cleanup.
 	    call flush (CQ_RFD(res))
 	    call mfree (inbuf, TY_CHAR)
-	    CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
+	    CQ_RBUF(res) = fstatp (CQ_RFD(res), F_BUFPTR)
 	    call close (fd)
 
 	} then {
@@ -183,7 +184,8 @@ int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
 pointer	cq_frinit()
 long	note()
-int	access(), open(), read(), fstati(), getline()
+int	access(), open(), read(), getline()
+pointer	fstatp()
 errchk	open(), read()
 
 begin
@@ -242,7 +244,7 @@ begin
 	    # Cleanup.
 	    call flush (CQ_RFD(res))
 	    call mfree (inbuf, TY_CHAR)
-	    CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
+	    CQ_RBUF(res) = fstatp (CQ_RFD(res), F_BUFPTR)
 	    call close (fd)
 
 	} then {

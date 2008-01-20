@@ -17,8 +17,10 @@ char	value[maxch]		# string value (output)
 int	maxch
 
 char	buf[SZ_FNAME]
-int	nchars, ttydriver, junk, in, out, ip
+int	nchars, junk, in, out, ip
+pointer	ttydriver
 int	gstrcpy(), envfind(), fstati(), strlen(), envputs()
+pointer	fstatp()
 extern	zgetty()
 
 begin
@@ -38,7 +40,7 @@ begin
 	} then
 	    return (0)
 
-	if (fstati (CLIN, F_DEVICE) == ttydriver) {
+	if (fstatp (CLIN, F_DEVICE) == ttydriver) {
 	    # Issue prompt, format "env.key: "
 	    call zputty (out, "env.", 4, junk)
 	    call zputty (out, key, strlen(key), junk)

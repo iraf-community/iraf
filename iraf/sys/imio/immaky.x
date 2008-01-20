@@ -22,6 +22,8 @@ pointer	mw_open()
 bool	strne(), envgetb()
 errchk	imerr, realloc, mw_open, mw_loadim, mw_saveim, mw_close
 
+include <nullptr.com>
+
 begin
 	if (strne (IM_MAGIC(o_im), "imhdr"))
 	    call imerr (IM_NAME(im), SYS_IMMAGNCPY)
@@ -54,7 +56,7 @@ begin
 
 	if (IM_SECTUSED(o_im) == YES)
 	    if (!envgetb ("nomwcs")) {
-		iferr (mw = mw_open (NULL, IM_NPHYSDIM(o_im)))
+		iferr (mw = mw_open (NULLPTR, IM_NPHYSDIM(o_im)))
 		    call erract (EA_WARN)
 		else {
 		    call mw_loadim (mw, o_im)
