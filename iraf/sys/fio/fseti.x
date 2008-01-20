@@ -398,6 +398,74 @@ begin
 	call fsetl(fd, param, lvalue)
 end
 
+# FSETP -- Set File I/O options (pointer).
+
+procedure fsetp (fd, param, pvalue)
+
+int	fd			# file in question
+int	param			# parameter to be set
+pointer	pvalue			# value of parameter
+
+pointer	bp, ffp
+long	file_offset
+int	i
+
+int	await(), xisatty()
+include	<fio.com>
+
+begin
+	ffp = fiodes[fd]
+	if (fd <= 0 || ffp == NULL)
+	    iferr (call syserr (SYS_FILENOTOPEN))
+		call erract (EA_FATAL)
+
+	switch (param) {
+
+	case F_BUFPTR:
+	    # An externally created buffer can be installed by setting F_BUFPTR
+	    # and either F_BUFSIZE or F_BUFTOP (do NOT forget to set both).
+	    # The file buffer size can be changed by a call to F_BUFSIZE,
+	    # even after doing i/o on a file. In both cases, the current file
+	    # offset will be retained.
+
+	    if (bufptr[fd] != NULL) {
+		call flush (fd)
+		call frmbfs (fd)
+	    }
+
+	    file_offset = LNOTE (fd)
+	    bufptr[fd] = pvalue
+	    boffset[fd] = NULL
+	    LSEEK (fd, file_offset)
+	    if (buftop[fd] == NULL && FBUFSIZE(ffp) != NULL)
+	        buftop[fd] = bufptr[fd] + FBUFSIZE(ffp)
+
+	case F_BUFTOP:
+	    # Set a pointer to the top of a buffer (first char after buffer).
+	    buftop[fd] = pvalue
+	    if (FBUFSIZE(ffp) == NULL && bufptr[fd] != NULL)
+		FBUFSIZE(ffp) = buftop[fd] - bufptr[fd]
+
+	case F_DEVICE:
+	    # Set entry point address of the read entry point of the device
+	    # driver for a file.
+
+	    for (i=1;  i < next_dev;  i=i+LEN_DTE)
+		if (pvalue == zdev[i]) {
+		    FDEV(ffp) = i
+		    return
+		}
+	    iferr (call filerr (FNAME(ffp), SYS_FDEVNOTFOUND))
+		call erract (EA_FATAL)
+
+	default:
+	    # This is a fatal error to prevent error recursion.
+	    iferr (call filerr (FNAME(ffp), SYS_FSETUKNPAR))
+		call erract (EA_FATAL)
+	}
+end
+
+
 # FSET_ENV -- Set the value of a boolean environment variable used for file
 # control.  A set environment call affects all programs in the current process
 # and in all subprocesses, unless overriden by another SET statement or

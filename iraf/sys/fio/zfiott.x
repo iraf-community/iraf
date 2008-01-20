@@ -1060,9 +1060,31 @@ begin
 	    tty_delay = value
 
 	case TT_FILTER:
-	    tty_filter = value
+	    tty_filter = lvalue
 	case TT_FILTERKEY:
 	    tty_filter_key = value
+
+	default:
+	    # (ignore)
+	}
+end
+
+
+# ZSETTTP -- Set TT terminal driver options.  Must be called before any i/o is
+# done via the TT driver, e.g., by fio$finit.
+
+procedure zsetttp (chan, param, pvalue)
+
+int	chan			# kernel i/o channel (not used)
+int	param			# parameter to be set
+pointer	pvalue			# new value
+
+include	"zfiott.com"
+
+begin
+	switch (param) {
+	case TT_FILTER:
+	    tty_filter = pvalue
 
 	default:
 	    # (ignore)
@@ -1122,6 +1144,28 @@ begin
 	    lvalue = tty_filter_key
 	default:
 	    call zsttty (fd, param, lvalue)
+	}
+end
+
+
+# ZSTTTTP -- Stat TT terminal driver options.  Check for the special TT params,
+# else pass the request to the hardware driver.
+
+procedure zsttttp (fd, param, pvalue)
+
+int	fd			# file number (not used)
+int	param			# parameter to be set
+pointer	pvalue			# new value
+
+include	"zfiott.com"
+
+begin
+	switch (param) {
+	case TT_FILTER:
+	    pvalue = tty_filter
+
+	default:
+	    pvalue = NULL
 	}
 end
 

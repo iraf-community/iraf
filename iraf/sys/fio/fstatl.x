@@ -151,3 +151,40 @@ begin
 	else
 	    return (NO)
 end
+
+
+# FSTATP -- Get information on the status and characteristics of an open
+# file.  Returns an integer value.  See also FSTATI and FSTATS (for long
+# integer and string status values).
+
+pointer procedure fstatp (fd, what)
+
+int	fd				#I file descriptor
+int	what				#I parameter to be returned
+
+pointer	ffp
+include	<fio.com>
+
+begin
+	ffp = fiodes[fd]
+	if (fd <= 0 || ffp == NULL)
+	    iferr (call syserr (SYS_FILENOTOPEN))
+		call erract (EA_FATAL)
+
+	switch (what) {
+	case F_BUFPTR:
+	    return (bufptr[fd])
+	case F_BUFTOP:
+	    return (buftop[fd])
+	case F_DEVICE:
+	    return (zdev[FDEV(ffp)])
+	case F_FIODES:
+	    return (ffp)
+	default:
+	    return (NULL)
+#	    iferr (call filerr (FNAME(ffp), SYS_FSTATUNKPAR))
+#		call erract (EA_FATAL)
+	}
+
+	return (NULL)
+end
