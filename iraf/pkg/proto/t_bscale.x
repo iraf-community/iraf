@@ -257,7 +257,8 @@ real    upper			# upper limit for statistics
 real	lower			# lower limit for statistics 
 
 int	i, n, nx, ndim
-pointer	sp, x1, x2, xs, v, v1, dv, data, ptr1, ptr2, imgnlr()
+pointer	sp, x1, x2, xs, v, v1, dv, data, ptr1, ptr2
+int	imgnlr()
 
 begin
 	call smark (sp)

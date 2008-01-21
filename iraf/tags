@@ -1136,7 +1136,7 @@ fntgfn	sys/fio/fntgfn.x	/^int procedure fntgfn (pp, outstr, maxch)$/
 fntgfnb	sys/fio/fntgfn.x	/^int procedure fntgfnb (list, fname, maxch)$/
 fntlenb	sys/fio/fntgfn.x	/^int procedure fntlenb (list)$/
 fntopn	sys/fio/fntgfn.x	/^pointer procedure fntopn (template)$/
-fntopnb	sys/fio/fntgfn.x	/^int procedure fntopnb (template, sort)$/
+fntopnb	sys/fio/fntgfn.x	/^pointer procedure fntopnb (template, sort)$/
 fntrewb	sys/fio/fntgfn.x	/^procedure fntrewb (list)$/
 fntrfnb	sys/fio/fntgfn.x	/^int procedure fntrfnb (list, index, fname, maxch)$/
 fnullfile	sys/fio/fnullfile.x	/^bool procedure fnullfile (fname)$/

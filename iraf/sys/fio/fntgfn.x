@@ -97,7 +97,7 @@ define	LEN_INDEXVECTOR		256		# initial length of index vector
 # FNTOPNB -- General open buffered list routine, for any type of filename list.
 # Expand template into string buffer, sort if so indicated.
 
-int procedure fntopnb (template, sort)
+pointer procedure fntopnb (template, sort)
 
 char	template[ARB]		# filename template
 int	sort			# sort expanded patterns
@@ -107,7 +107,8 @@ bool	is_template[MAX_PATTERNS], is_edit[MAX_PATTERNS], sortlist
 pointer	sp, pbuf, fname, rname, extn, ebuf, sbuf, list, ip, op, ep, pp
 pointer	patp[MAX_PATTERNS], flist[MAX_PATTERNS], editp[MAX_EDIT]
 int	nlists, npat, nstr, maxstr, nextch, sz_sbuf, ix, first_string, ch, i
-int	fntopn(), fntgfn(), fnt_getpat(), gstrcpy(), fnt_edit(), stridx()
+int	fntgfn(), fnt_getpat(), gstrcpy(), fnt_edit(), stridx()
+pointer	fntopn()
 int	patmake(), patmatch()
 errchk	fntopn, fntgfn, syserr, malloc, realloc
 

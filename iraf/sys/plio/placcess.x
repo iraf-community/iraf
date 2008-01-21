@@ -13,7 +13,7 @@ pointer procedure pl_access (pl, v)
 pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I coordinates of desired line
 
-pointer	pl_reference()
+int	pl_reference()
 
 begin
 	return (Ref (pl, pl_reference(pl,v)))

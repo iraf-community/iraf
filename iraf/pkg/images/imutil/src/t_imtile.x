@@ -236,7 +236,8 @@ int	opixtype	# output image pixel type
 
 int	ijunk, nc, nr
 pointer	sp, imname, im, outim
-pointer	imtgetim(), immap()
+int	imtgetim()
+pointer	immap()
 
 begin
 	call smark (sp)
@@ -306,7 +307,8 @@ int	subtract	# subtract the median off each subraster
 
 int	i, j, noutcols, noutlines, olineptr, ll1, ll2
 pointer	sp, inimage, imptrs, buf
-pointer	imtrgetim(), immap(), impl2r()
+int	imtrgetim()
+pointer	immap(), impl2r()
 
 begin
 	# Allocate temporary space.

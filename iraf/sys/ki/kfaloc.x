@@ -8,7 +8,7 @@ include	"ki.h"
 procedure kfaloc (osfn, nbytes, status)
 
 char	osfn[ARB]		# packed os filename
-int	nbytes			# nbytes of storage to allocate
+long	nbytes			# nbytes of storage to allocate
 int	status			# answer; ok or err
 
 int	server

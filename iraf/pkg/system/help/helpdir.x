@@ -66,7 +66,7 @@ int	fd, junk
 
 bool	streq()
 int	open(), getline(), fnroot(), fnldir(), ctowrd()
-pointer	hd_putstr()
+int	hd_putstr()
 errchk	salloc, open, calloc, malloc, getline, hd_putstr
 errchk	hd_putldiry, hd_putmodule, hd_sort_modules
 
