@@ -100,8 +100,6 @@ define	P2R	($1)
 define	P2D	((($1)-1)/2+1)
 define	P2X	((($1)-1)/2+1)
 
-define	Memp	Meml
-
 define	size_t	long
 
 # Map the following onto host Fortran intrinsic functions if possible,
