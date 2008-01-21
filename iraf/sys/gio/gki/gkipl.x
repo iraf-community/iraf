@@ -17,7 +17,7 @@ int	fd			# output file
 short	points[ARB]		# polyline
 int	npts			# number of (x,y) points in polyline
 
-int	epa
+pointer	epa
 short	gki[GKI_POLYLINE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_POLYLINE/
 include	"gki.com"

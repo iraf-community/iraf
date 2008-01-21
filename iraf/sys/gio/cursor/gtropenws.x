@@ -30,7 +30,8 @@ pointer	sp, op, tr, tty, kernfname, taskname, device
 
 bool	streq()
 pointer	ttygdes()
-int	pr_getredir(), ttygets(), gtr_connect(), pr_findproc(), locpr()
+int	pr_getredir(), ttygets(), gtr_connect(), pr_findproc()
+pointer	locpr()
 extern	gtr_reset(), prpsio()
 
 errchk	syserr, syserrs, fseti, ttygdes, ttycdes, pr_redir, stg_close, stg_open

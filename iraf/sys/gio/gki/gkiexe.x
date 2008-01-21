@@ -14,9 +14,9 @@ include	<gki.h>
 procedure gki_execute (gki, dd)
 
 short	gki[ARB]		# graphics kernel instruction
-int	dd[ARB]			# device driver
+pointer	dd[ARB]			# device driver
 
-int	kp			# kernel procedure
+pointer	kp			# kernel procedure
 int	m, n, cn, fn, dummy, flags
 int	x, y, x1, y1, x2, y2
 

@@ -13,7 +13,7 @@ procedure iki_lddriver (kname, ex_open, ex_close, ex_opix, ex_updhdr,
 char	kname[ARB]
 extern	ex_open(), ex_close(), ex_opix(), ex_updhdr()
 extern	ex_access(), ex_copy(), ex_delete(), ex_rename()
-int	locpr()
+pointer	locpr()
 int	flags
 
 include	"iki.com"

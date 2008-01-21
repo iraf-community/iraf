@@ -22,7 +22,7 @@ short	m[nx,ny]		# pixel array
 int	x1, y1			# lower left corner of window to be written
 int	x2, y2			# upper right corner of window to be written
 
-int	epa
+pointer	epa
 short	gki[GKI_PUTCELLARRAY_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_PUTCELLARRAY/
 include	"gki.com"

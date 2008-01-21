@@ -17,7 +17,7 @@ extern	writep()		#I	"		"
 extern	readtty()		#I	"		"
 extern	writetty()		#I	"		"
 
-int	locpr()
+pointer	locpr()
 include	"prc.com"
 
 begin

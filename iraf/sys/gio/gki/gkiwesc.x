@@ -26,7 +26,8 @@ short	data[ARB]	#I escape instruction data
 int	datalen		#I data length, shorts
 
 pointer	sp, buf
-int	epa, nwords
+pointer	epa
+int	nwords
 short	gki[GKI_ESCAPE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_ESCAPE/
 include	"gki.com"

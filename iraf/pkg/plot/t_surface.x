@@ -22,8 +22,8 @@ char	device[SZ_FNAME], title[SZ_LINE]
 bool	label, sub, pre
 pointer	im, subras, work
 int	ncols, nlines, mode, wkid, nx, ny, npix
-int	epa, status, old_onint, tsujmp[LEN_JUMPBUF]
-int	xres, yres, first
+pointer	epa, old_onint, tsujmp[LEN_JUMPBUF]
+int	xres, yres, first, status
 real	angh, angv, imcols, imlines
 real	floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
@@ -149,9 +149,9 @@ end
 procedure tsu_onint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
-int	tsujmp[LEN_JUMPBUF]
+pointer	tsujmp[LEN_JUMPBUF]
 common	/tsucom/ tsujmp
 
 begin

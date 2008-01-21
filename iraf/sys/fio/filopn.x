@@ -31,7 +31,8 @@ int	ip, fd, junk, status, vfnmode
 pointer	dev_epa
 
 pointer	vfnopen()
-int	fgetfd(), fstdfile(), vfnadd(), vfnmap(), locpr()
+int	fgetfd(), fstdfile(), vfnadd(), vfnmap()
+pointer	locpr()
 errchk	fwtacc, seek, fclobber, fgetfd
 include	<fio.com>
 define	cleanup_ 91

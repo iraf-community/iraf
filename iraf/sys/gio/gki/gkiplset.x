@@ -18,7 +18,7 @@ procedure gki_plset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to polyline attribute structure
 
-int	epa
+pointer	epa
 short	gki[GKI_PLSET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_PLSET/, gki[3] /GKI_PLSET_LEN/
 include	"gki.com"

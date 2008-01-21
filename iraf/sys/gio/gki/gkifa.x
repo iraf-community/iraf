@@ -17,7 +17,7 @@ int	fd			# output file
 short	points[ARB]		# polygon defining area to be filled
 int	npts			# number of (x,y) points in polygon
 
-int	epa
+pointer	epa
 short	gki[GKI_FILLAREA_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_FILLAREA/
 include	"gki.com"

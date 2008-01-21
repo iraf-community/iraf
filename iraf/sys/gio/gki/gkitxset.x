@@ -26,7 +26,7 @@ procedure gki_txset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to attribute structure
 
-int	epa
+pointer	epa
 short	gki[GKI_TXSET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_TXSET/, gki[3] /GKI_TXSET_LEN/
 include	"gki.com"

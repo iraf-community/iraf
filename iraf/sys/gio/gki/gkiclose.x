@@ -16,7 +16,7 @@ procedure gki_closews (fd, device)
 int	fd			# output file
 char	device[ARB]		# device name
 
-int	epa
+pointer	epa
 int	ip, nchars, n
 pointer	sp, gki, op
 int	strlen()

@@ -57,7 +57,7 @@ define	FAFD		Memi[P2I(FCD($1)+3)]		# active fd
 define	FBLKSIZE	Memi[P2I(FCD($1)+4)]		# device block size
 define	FOPTBUFSIZE	Memi[P2I(FCD($1)+5)]		# "optimum" buffer size
 define	FMAXBUFSIZE	Memi[P2I(FCD($1)+6)]		# maximum buffer size
-define	FDEVOPEN	Memi[P2I(FCD($1)+7)]		# device zopen proc
+define	FDEVOPEN	Memp[FCD($1)+7]			# device zopen proc
 define	FILSZ_PTR	FCD($1)+8
 define	FILSIZE		Meml[P2L(FILSZ_PTR($1))]	# file size, chars
 define	FPKOSFN		Memc[P2C(FCD($1)+10)]	# packed osfn of file

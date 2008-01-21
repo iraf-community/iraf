@@ -9,7 +9,8 @@ include	<fio.h>
 
 procedure fdevtx (zget, zput, zfls, zstt, zcls, zsek, znot)
 
-int	i, dev_epa
+int	i
+pointer	dev_epa
 extern	zget(), zput(), zfls(), zstt(), zcls(), zsek(), znot()
 include	<fio.com>
 

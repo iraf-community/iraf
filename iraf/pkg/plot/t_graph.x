@@ -29,7 +29,8 @@ int	npix[MAX_CURVES], ncurves
 
 bool	append, overplot
 char	device[SZ_FNAME]
-int	tgrjmp[LEN_JUMPBUF], epa, old_onint, status, i
+pointer	tgrjmp[LEN_JUMPBUF], epa, old_onint
+int	status, i
 
 bool	clgetb()
 int	fstati()
@@ -91,9 +92,9 @@ end
 procedure tgr_onint (vex, next_handler)
 
 int	vex			# Virtual exception
-int	next_handler		# not used
+pointer	next_handler		# not used
 
-int	tgrjmp[LEN_JUMPBUF]
+pointer	tgrjmp[LEN_JUMPBUF]
 common	/tgrcom/ tgrjmp
 
 begin

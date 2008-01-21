@@ -18,7 +18,7 @@ int	fd			# output file
 int	x, y			# position at which text is to be drawn
 char	text[ARB]		# text string to be drawn
 
-int	epa
+pointer	epa
 int	ip, n
 pointer	sp, gki, op
 int	strlen()

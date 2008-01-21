@@ -14,7 +14,8 @@ int	nelems			# number of elements of storage required
 int	dtype			# datatype of the storage elements
 
 extern	kmalloc(), krealloc(), mfree(), realloc(), salloc(), vmalloc()
-int	first_time, locpr()
+int	first_time
+pointer	locpr()
 
 int	sz_align, fwa_align
 int	malloc1()

@@ -18,7 +18,8 @@ int	fd			# output file
 char	device[ARB]		# device name
 int	mode			# access mode
 
-int	ip, n, epa, nchars
+int	ip, n, nchars
+pointer	epa
 pointer	sp, gki, op
 int	strlen()
 include	"gki.com"

@@ -18,7 +18,7 @@ procedure sgf_post_filter (fd)
 
 int	fd			#I terminal file
 
-int	locpr()
+pointer	locpr()
 extern	sgf_ttyfilter()
 
 begin

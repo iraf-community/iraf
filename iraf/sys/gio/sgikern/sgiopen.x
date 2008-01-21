@@ -12,11 +12,12 @@ include	"sgi.h"
 procedure sgi_open (devname, dd)
 
 char	devname[ARB]		# nonnull for forced output to a device
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 
 pointer	sp, devns
 int	len_devname
-int	locpr(), strlen()
+pointer	locpr()
+int	strlen()
 extern	sgi_openws(), sgi_closews(), sgi_clear(), sgi_cancel()
 extern	sgi_flush(), sgi_polyline(), sgi_polymarker(), sgi_text()
 extern	sgi_fillarea(), sgi_putcellarray(), sgi_plset()

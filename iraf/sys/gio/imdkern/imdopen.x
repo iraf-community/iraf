@@ -14,11 +14,12 @@ procedure imd_opendev (devname, frame, color, dd)
 char	devname[ARB]		# nonnull for forced output to a device
 int	frame			# display frame buffer number
 int	color			# graphics overlay color index
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 
 pointer	sp, devns
 int	len_devname
-int	locpr(), strlen()
+pointer	locpr()
+int	strlen()
 extern	imd_openws(), imd_closews(), imd_clear(), imd_cancel()
 extern	imd_flush(), imd_polyline(), imd_polymarker(), imd_text()
 extern	imd_fillarea(), imd_putcellarray(), imd_plset()

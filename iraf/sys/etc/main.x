@@ -142,7 +142,8 @@ bool	networking
 int	inchan, outchan, errchan, driver, devtype
 char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
-int	jumpbuf[LEN_JUMPBUF], status, errstat, state, interpret, i
+pointer	jumpbuf[LEN_JUMPBUF]
+int	status, errstat, state, interpret, i
 long	save_time[2]
 pointer	sp
 

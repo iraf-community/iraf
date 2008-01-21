@@ -17,7 +17,7 @@ procedure gki_faset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to fillarea attribute structure
 
-int	epa
+pointer	epa
 short	gki[GKI_FASET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_FASET/, gki[3] /GKI_FASET_LEN/
 include	"gki.com"

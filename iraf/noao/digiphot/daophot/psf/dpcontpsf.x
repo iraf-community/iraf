@@ -29,7 +29,9 @@ pointer	gp				# pointer to graphics descriptor
 
 bool	perimeter
 char	system_id[SZ_LINE], label[SZ_LINE]
-int	epa, status, old_onint, tcojmp[LEN_JUMPBUF]
+pointer	epa, old_onint
+int	status
+pointer	tcojmp[LEN_JUMPBUF]
 int	wkid, nset, ncontours, dashpat, nhi
 pointer	sp, temp, psf
 real	interval, floor, ceiling, zero, finc, ybot
@@ -201,7 +203,7 @@ procedure dp_conint (vex, next_handler)
 int	vex		# virtual exception
 int	next_handler	# not used
 
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 begin

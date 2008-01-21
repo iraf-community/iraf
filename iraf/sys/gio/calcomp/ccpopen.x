@@ -11,11 +11,12 @@ include	"ccp.h"
 procedure ccp_open (devname, dd)
 
 char	devname[ARB]		# ignored if only one plotter on system
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 
 pointer	sp, devns
 int	len_devname
-int	locpr(), strlen()
+pointer	locpr()
+int	strlen()
 extern	ccp_openws(), ccp_closews(), ccp_clear()
 extern	ccp_polyline(), ccp_polymarker(), ccp_text()
 extern	ccp_plset()

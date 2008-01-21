@@ -13,7 +13,7 @@ procedure gki_cancel (fd)
 
 int	fd			# output file
 
-int	epa
+pointer	epa
 short	gki[GKI_CANCEL_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_CANCEL/, gki[3] /LEN_GKIHDR/
 include	"gki.com"

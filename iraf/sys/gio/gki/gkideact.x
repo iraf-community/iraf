@@ -15,7 +15,8 @@ procedure gki_deactivatews (fd, flags)
 int	fd			# output file
 int	flags			# action modifier flags
 
-int	epa, nchars
+pointer	epa
+int	nchars
 short	gki[GKI_DEACTIVATEWS_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_DEACTIVATEWS/, gki[3] /GKI_DEACTIVATEWS_LEN/
 include	"gki.com"

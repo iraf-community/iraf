@@ -13,13 +13,13 @@ int	pr_pstofd[MAX_CHILDPROCS,MAX_PS]	# pseudofile -> FD
 int	pr_last_exit_code		# exit code of last process closed
 int	pr_lastio			# index of last active process
 int	pr_index			# index of current process
-int	pr_oldipc			# old X_IPC handler
-int	epa_giotr			# gio.cursor driver entry points
-int	epa_control			#	"	"
-int	epa_gflush			#	"	"
-int	epa_writep			#	"	"
-int	epa_readtty			#	"	"
-int	epa_writetty			#	"	"
+pointer	pr_oldipc			# old X_IPC handler
+pointer	epa_giotr			# gio.cursor driver entry points
+pointer	epa_control			#	"	"
+pointer	epa_gflush			#	"	"
+pointer	epa_writep			#	"	"
+pointer	epa_readtty			#	"	"
+pointer	epa_writetty			#	"	"
 
 common	/prccom/ pr_pid, pr_status, pr_inchan, pr_infd, pr_outchan, pr_outfd,
 	pr_nopen, pr_pstofd, pr_lastio, pr_last_exit_code, pr_index, pr_oldipc,

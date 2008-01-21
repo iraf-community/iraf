@@ -7,7 +7,8 @@
 procedure amovs (a, b, npix)
 
 short	a[ARB], b[ARB]
-int	npix, i, a_first, b_first
+int	npix, i
+pointer	a_first, b_first
 
 begin
 	call zlocva (a, a_first)

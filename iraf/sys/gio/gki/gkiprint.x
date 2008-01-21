@@ -78,7 +78,7 @@ an opened kernel to open and close workstations.
 
 procedure gkp_install (dd, out_fd, verbose_output, use_gkiunits)
 
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 int	out_fd			# output file
 int	verbose_output		# verbose output desired
 int	use_gkiunits		# print coords in GKI units rather than NDC

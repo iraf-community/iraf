@@ -24,7 +24,8 @@ short	m[nx,ny]		# output array
 int	x1, y1			# lower left corner of window to be read
 int	x2, y2			# upper right corner of window to be read
 
-int	epa, nchars, npts
+pointer	epa
+int	nchars, npts
 short	ca[GKI_CELLARRAY_LEN]
 short	gki[GKI_GETCELLARRAY_LEN]
 int	read()

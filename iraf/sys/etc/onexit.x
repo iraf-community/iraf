@@ -11,8 +11,10 @@ procedure onexit (user_proc)
 
 extern	user_proc()			#I procedure to be posted
 bool	first_time
-int	epa, i
-int	proc_list[MAX_ONEXIT], nprocs
+pointer	epa
+int	i
+pointer	proc_list[MAX_ONEXIT]
+int	nprocs
 common	/onexcm/ nprocs, proc_list
 data	first_time /true/
 
@@ -50,8 +52,10 @@ procedure onexit_remote (user_proc)
 
 extern	user_proc()			#I procedure to be posted
 
-int	epa, i
-int	proc_list[MAX_ONERROR], nprocs
+pointer	epa
+int	i
+pointer	proc_list[MAX_ONERROR]
+int	nprocs
 common	/onexcm/ nprocs, proc_list
 
 begin
@@ -73,7 +77,8 @@ procedure xonexit (exit_code)
 
 int	exit_code			#I passed to exit handlers
 int	nprocs_to_execute, i
-int	proc_list[MAX_ONEXIT], nprocs
+pointer	proc_list[MAX_ONEXIT]
+int	nprocs
 common	/onexcm/ nprocs, proc_list
 errchk	zcall1
 

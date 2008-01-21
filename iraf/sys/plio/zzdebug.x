@@ -133,7 +133,8 @@ procedure t_pltest()
 long	time[2]
 int	x, y, r
 bool	timer, bval
-int	px[MAXARGS], py[MAXARGS], old_onint, width, mval
+int	px[MAXARGS], py[MAXARGS], width, mval
+pointer	old_onint, pstatus
 pointer	pl, pl_1, pl_2, def_pl, pl_src, pl_dst, pl_stn, tty, plr
 char	cmd[SZ_LINE], kwname[SZ_FNAME], title[SZ_LINE], fname[SZ_FNAME]
 int	what, rop, v_arg, x1, x2, y1, y2, ip, op, ch, i, j, cmdlog, status
@@ -141,14 +142,16 @@ int	opcode, save_fd[MAXINCL], in, fd, o_fd, maskno, depth, naxes, npts
 int	v1[PL_MAXDIM], v2[PL_MAXDIM], v3[PL_MAXDIM], v4[PL_MAXDIM], v[PL_MAXDIM]
 
 int	plr_getpix(), pl_compare()
-int	fstati(), strdic(), open(), getline(), strncmp(), locpr()
+int	fstati(), strdic(), open(), getline(), strncmp()
+pointer	locpr()
 pointer	pl_create(), ttyodes(), plr_open()
 bool	pl_sectnotempty(), pl_sectnotconst()
 extern	onint()
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG], jmpbuf[LEN_JUMPBUF]
+int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf
 define	argerr_ 91
@@ -1226,7 +1229,7 @@ argerr_
 	    call eprintf ("invalid argument list\n")
 	}
 
-	call zxwhen (X_INT, old_onint, status)
+	call zxwhen (X_INT, old_onint, pstatus)
 	if (cmdlog != 0)
 	    call close (cmdlog)
 
@@ -1240,11 +1243,12 @@ end
 procedure onint (signal, next_handler)
 
 int	signal			#I signal code
-int	next_handler		#O epa of next handler
+pointer	next_handler		#O epa of next handler
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG], jmpbuf[LEN_JUMPBUF]
+int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf
 
@@ -1270,7 +1274,8 @@ int	ctowrd(), stridx(), gctod(), strlen()
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG], jmpbuf[LEN_JUMPBUF]
+int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf
 

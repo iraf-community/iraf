@@ -29,7 +29,8 @@ pointer	errmsg, bad_column
 int	npix
 int	window			# note:  this is apparently not used
 int	phu_copied		# set by tbfpri and ignored
-int	tgrjmp[LEN_JUMPBUF], epa, old_onint, status
+pointer	tgrjmp[LEN_JUMPBUF], epa, old_onint
+int	status
 bool	do_delete, do_quit
 
 bool	clgetb()

@@ -39,7 +39,7 @@ int	npix[MAX_CURVES], ncurves
 
 char	device[SZ_FNAME]
 int	mode, i, window
-#int	sgrjmp[LEN_JUMPBUF], epa, old_onint
+#pointer	sgrjmp[LEN_JUMPBUF], epa, old_onint
 #int	status
 
 bool	clgetb()
@@ -106,9 +106,9 @@ end
 procedure sgr_onint (vex, next_handler)
 
 int	vex			# Virtual exception
-int	next_handler		# not used
+pointer	next_handler		# not used
 
-int	sgrjmp[LEN_JUMPBUF]
+pointer	sgrjmp[LEN_JUMPBUF]
 common	/sgrcom/ sgrjmp
 
 begin

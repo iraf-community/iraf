@@ -11,7 +11,8 @@ int	marker		# stack pointer returned by ENVMARK
 
 int	ev_pid
 common	/prvcom/ ev_pid
-int	locpr(), envfree()
+pointer	locpr()
+int	envfree()
 extern	prv_reset()
 
 begin

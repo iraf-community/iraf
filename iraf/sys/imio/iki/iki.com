@@ -2,7 +2,7 @@
 
 int	k_nkernels, k_nextn, k_sbufused, k_defimtype, k_inherit
 int	k_kernel[MAX_IMEXTN], k_extn[MAX_IMEXTN], k_pattern[MAX_IMEXTN]
-int	k_table[LEN_KERNEL,MAX_KERNELS]
+pointer	k_table[LEN_KERNEL,MAX_KERNELS]
 char	k_kname[SZ_KNAME,MAX_KERNELS]
 char	k_sbuf[SZ_IKISBUF]
 

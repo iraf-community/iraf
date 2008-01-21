@@ -25,13 +25,15 @@ procedure giotr (stream)
 int	stream			# graphics stream
 
 pointer	tr, gki
-int	jmpbuf[LEN_JUMPBUF], fn
-int	mode, xint, status, junk, nwords
+pointer	jmpbuf[LEN_JUMPBUF]
+int	fn, mode, status, nwords
+pointer	xint, junk
 common	/gtrvex/ jmpbuf
 
 pointer	gtr_init(), coerce()
 extern	giotr_onint(), gtr_delete()
-int	gtr_fetch_next_instruction(), locpr()
+int	gtr_fetch_next_instruction()
+pointer	locpr()
 errchk	gtr_init, gtr_fetch_next_instruction, gki_write
 data	status /OK/, xint /NULL/
 include	"gtr.com"
@@ -173,8 +175,8 @@ end
 procedure giotr_onint (vex, next_handler)
 
 int	vex			# virtual exception
-int	next_handler		# next exception handler in chain
-int	jmpbuf[LEN_JUMPBUF]
+pointer	next_handler		# next exception handler in chain
+pointer	jmpbuf[LEN_JUMPBUF]
 common	/gtrvex/ jmpbuf
 
 begin

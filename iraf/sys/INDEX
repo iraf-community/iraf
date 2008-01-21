@@ -2479,7 +2479,7 @@ lno_fetch          89 ./etc/lineoff.x    int procedure lno_fetch (lp, line, loff
 lno_open           26 ./etc/lineoff.x    pointer procedure lno_open (maxlines)
 lno_save           62 ./etc/lineoff.x    procedure lno_save (lp, line, loffset, ltag)
 loci               13 ./gio/nspp/sysint/loc.x int procedure loci (x)
-locpr               6 ./etc/locpr.x      int procedure locpr (proc)
+locpr               6 ./etc/locpr.x      pointer procedure locpr (proc)
 locva               5 ./etc/locva.x      int procedure locva (variable)
 loggedin            4 ../unix/os/alloc.c loggedin (uid)
 lp_zaread          53 ./etc/lpopen.x     procedure lp_zaread (chan, buf, maxbytes, offset)

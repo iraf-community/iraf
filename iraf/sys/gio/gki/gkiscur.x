@@ -17,7 +17,7 @@ int	fd			# output file
 int	x, y			# new cursor position
 int	cursor			# cursor to be set
 
-int	epa
+pointer	epa
 short	gki[GKI_SETCURSOR_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_SETCURSOR/, gki[3] /GKI_SETCURSOR_LEN/
 include	"gki.com"

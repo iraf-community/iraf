@@ -41,7 +41,7 @@ define	IM_VTYBNDRY	Memi[P2I($1+11)]		# type of boundary extension
 define	IM_VFLAGBADPIX	Memi[P2I($1+12)]		# flag bad pixels upon input
 define	IM_FLUSH	Memi[P2I($1+13)]		# flush outbuf?
 define	IM_UPDATE	Memi[P2I($1+14)]		# update header?
-define	IM_FLUSHEPA	Memi[P2I($1+15)]		# epa of imfls? routine
+define	IM_FLUSHEPA	Memp[$1+15]			# epa of imfls? routine
 define	IM_IBDES	Memi[P2I($1+16)]		# input bufdes
 define	IM_OBDES	Memi[P2I($1+17)]		# output bufdes
 define	IM_LASTBDES	Memi[P2I($1+18)]		# last buffer accessed

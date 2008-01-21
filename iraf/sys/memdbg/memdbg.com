@@ -1,4 +1,4 @@
 # MEMDBG.COM -- Memory debug common.
 
-int	retaddr
+pointer	retaddr
 common	/memdbg/ retaddr

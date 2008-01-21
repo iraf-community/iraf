@@ -1,4 +1,4 @@
-int	jumpbuf[LEN_JUMPBUF]
+pointer	jumpbuf[LEN_JUMPBUF]
 common	/jmpcom/	jumpbuf
 
 bool	constant

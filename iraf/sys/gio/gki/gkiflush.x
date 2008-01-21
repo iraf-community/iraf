@@ -14,7 +14,7 @@ procedure gki_flush (fd)
 
 int	fd			# output file
 
-int	epa
+pointer	epa
 short	gki[GKI_FLUSH_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_FLUSH/, gki[3] /LEN_GKIHDR/
 errchk	write, seek

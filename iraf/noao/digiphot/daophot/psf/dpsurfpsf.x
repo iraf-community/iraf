@@ -22,7 +22,9 @@ char	title[ARB]			# title string
 pointer	gd				# pointer to graphics stream
 
 char	sysidstr[SZ_LINE]
-int	first, wkid, epa, status, old_onint, tsujmp[LEN_JUMPBUF]
+int	first, wkid, status
+pointer	epa, old_onint
+pointer	tsujmp[LEN_JUMPBUF]
 pointer	sp, temp, work, psf
 real	angh, angv, imcols, imlines, floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
@@ -111,7 +113,7 @@ procedure dp_sonint (vex, next_handler)
 int	vex		# virtual exception
 int	next_handler	# not used
 
-int	tsujmp[LEN_JUMPBUF]
+pointer	tsujmp[LEN_JUMPBUF]
 common	/tsucom/ tsujmp
 
 begin

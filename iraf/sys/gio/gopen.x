@@ -31,7 +31,8 @@ pointer	sp, devname, envname, kfname
 bool	streq()
 extern	gflush()
 pointer	ttygdes()
-int	envgets(), envfind(), open(), locpr(), access(), ttygets()
+int	envgets(), envfind(), open(), access(), ttygets()
+pointer	locpr()
 errchk	syserr, syserrs, ttygdes
 errchk	greset, gki_openws, calloc
 

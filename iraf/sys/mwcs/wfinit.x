@@ -38,7 +38,7 @@ bool	first_time
 data	first_time /true/
 errchk	wf_fnload
 include	"mwcs.com"
-int	locpr()
+pointer	locpr()
 
 begin
 	# Only do this once.
@@ -111,8 +111,8 @@ end
 procedure wf_fnload (name, flags, init, destroy, fwd, inv)
 
 char	name[ARB]			#I function name
-int	init				#I initialize procedure
 int	flags				#I function type flags
+int	init				#I initialize procedure
 int	destroy				#I destroy procedure
 int	fwd				#I forward transform procedure
 int	inv				#I inverse transform procedure

@@ -14,10 +14,10 @@ include	<gki.h>
 procedure gki_inline_kernel (stream, dd)
 
 int	stream			# graphics stream to be redirected
-int	dd[ARB]			# device driver for the kernel
+pointer	dd[ARB]			# device driver for the kernel
 include	"gki.com"
 
 begin
 	gk_type[stream] = TY_INLINE
-	call amovi (dd, gk_dd, LEN_GKIDD)
+	call amovp (dd, gk_dd, LEN_GKIDD)
 end

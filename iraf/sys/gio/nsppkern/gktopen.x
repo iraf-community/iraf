@@ -12,11 +12,12 @@ include	"gkt.h"
 procedure gkt_open (devname, dd)
 
 char	devname[ARB]		# nonnull for forced output to a device
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 
 pointer	sp, devns
 int	len_devname
-int	locpr(), strlen()
+pointer	locpr()
+int	strlen()
 extern	gkt_openws(), gkt_closews(), gkt_clear(), gkt_cancel()
 extern	gkt_flush(), gkt_polyline(), gkt_polymarker(), gkt_text()
 extern	gkt_fillarea(), gkt_putcellarray(), gkt_plset()

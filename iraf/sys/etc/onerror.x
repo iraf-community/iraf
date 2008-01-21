@@ -13,9 +13,11 @@ procedure onerror (user_proc)
 
 extern	user_proc()			#I procedure to be posted
 
-int	epa, i
+int	i
+pointer	epa
 bool	first_time
-int	proc_list[MAX_ONERROR], nprocs
+pointer	proc_list[MAX_ONERROR]
+int	nprocs
 common	/onercm/ nprocs, proc_list
 data	first_time /true/
 
@@ -53,8 +55,10 @@ procedure onerror_remove (user_proc)
 
 extern	user_proc()			#I procedure to be posted
 
-int	epa, i
-int	proc_list[MAX_ONERROR], nprocs
+pointer	epa
+int	i
+pointer	proc_list[MAX_ONERROR]
+int	nprocs
 common	/onercm/ nprocs, proc_list
 
 begin
@@ -76,7 +80,8 @@ procedure xonerror (status)
 int	status			#I task termination status (OK or error code)
 
 int	nprocs_to_execute, i
-int	proc_list[MAX_ONERROR], nprocs
+pointer	proc_list[MAX_ONERROR]
+int	nprocs
 common	/onercm/ nprocs, proc_list
 errchk	zcall1
 

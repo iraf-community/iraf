@@ -156,7 +156,7 @@ pointer	iobuf, op, top
 long	fi[LEN_FINFO]
 char	curdir[SZ_PATHNAME]
 int	len_iobuf, status, i, nchars, opcode, subcode, arg1, arg2, arg3
-int	bfdd[LEN_BFDD], txdd[LEN_TXDD]
+pointer	bfdd[LEN_BFDD], txdd[LEN_TXDD]
 
 char	txbuf[SZ_TXBUF], queue[SZ_FNAME]
 char	osfn1[SZ_PATHNAME], osfn2[SZ_PATHNAME], temp[SZ_PATHNAME]
@@ -671,7 +671,7 @@ procedure ks_zfiobf (in, out, iobuf, len_iobuf, bfdd)
 int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
-int	bfdd[ARB]		# loaded device drivers
+pointer	bfdd[ARB]		# loaded device drivers
 
 long	lval, ks_maxbufsize
 int	dd, status, nchars, arg1, arg2, arg3
@@ -876,7 +876,7 @@ procedure ks_zfiotx (in, out, iobuf, len_iobuf, txdd)
 int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer (not used)
 int	len_iobuf		# current length of buffer (not used)
-int	txdd[ARB]		# loaded device drivers
+pointer	txdd[ARB]		# loaded device drivers
 
 long	lval, reclen
 bool	buffer_full
@@ -1277,8 +1277,9 @@ end
 
 procedure ks_loadbf (bfdd)
 
-int	bfdd[ARB]			# device table
-int	off, locpr()
+pointer	bfdd[ARB]			# device table
+int	off
+pointer	locpr()
 extern	zopnbf(), zclsbf(), zardbf(), zawrbf(), zawtbf(), zsttbf()
 extern	zopnlp(), zclslp(), zardlp(), zawrlp(), zawtlp(), zsttlp()
 extern	zopnpl(), zclspl(), zardpl(), zawrpl(), zawtpl(), zsttpl()
@@ -1342,8 +1343,9 @@ end
 
 procedure ks_loadtx (txdd)
 
-int	txdd[ARB]			# device table
-int	off, locpr()
+pointer	txdd[ARB]			# device table
+int	off
+pointer	locpr()
 extern	zopntx(), zclstx(), zgettx(), zputtx(), zflstx(), zsektx(), znottx(),
 	zstttx()
 extern	zopnty(), zclsty(), zgetty(), zputty(), zflsty(), zsekty(), znotty(),

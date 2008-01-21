@@ -22,9 +22,10 @@ char	device[SZ_FNAME], title[SZ_LINE], system_id[SZ_LINE]
 
 pointer	im, subras
 int	xres, yres, nx, ny
-int	tcojmp[LEN_JUMPBUF]
-int	ncols, nlines, epa, status, wkid
-int	nset, ncontours, dashpat, mode, nhi, old_onint
+pointer	tcojmp[LEN_JUMPBUF]
+int	ncols, nlines, status, wkid
+int	nset, ncontours, dashpat, mode, nhi
+pointer	epa, old_onint
 real	interval, floor, ceiling, zero, finc, ybot
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 real	xs, xe, ys, ye, dmin, dmax
@@ -244,9 +245,9 @@ end
 procedure tco_onint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 begin

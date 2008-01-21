@@ -49,7 +49,7 @@ int	sx, sy			#O screen coordinates of cursor
 int	raster			#O raster number
 int	rx, ry			#O raster coordinates of cursor
 
-int	epa
+pointer	epa
 int	nchars, read()
 short	gki[GKI_GETCURSOR_LEN]
 short	cur[GKI_CURSORVALUE_LEN]

@@ -36,7 +36,8 @@ trying to send error messages to the CL.
 procedure erract (severity)
 
 int	severity
-int	op, jumpbuf[LEN_JUMPBUF]
+int	op
+pointer	jumpbuf[LEN_JUMPBUF]
 char	wmsg[SZ_LINE]
 int	gstrcpy()
 include	"error.com"

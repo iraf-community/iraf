@@ -23,7 +23,8 @@ int	devtype			# device type (text or binary)
 long	lvalue
 int	fd, psmode, chan
 pointer	 devepa
-int	fsetfd(), locpr()
+int	fsetfd()
+pointer	locpr()
 extern	zardps(), zardnu(), zgetty(), zgettt()
 
 begin

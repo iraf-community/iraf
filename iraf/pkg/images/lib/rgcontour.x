@@ -26,9 +26,10 @@ real	data[ncols,ARB]		#I input data
 int	ncols, nlines		#I dimensions of data
 
 bool	perimeter
-int	tcojmp[LEN_JUMPBUF]
-int	epa, status, wkid
-int	nset, ncontours, dashpat, nhi, old_onint
+pointer	tcojmp[LEN_JUMPBUF]
+int	status, wkid
+int	nset, ncontours, dashpat, nhi
+pointer	epa, old_onint
 int	isizel, isizem, isizep, nrep, ncrt, ilab, nulbll, ioffd
 int	ioffm, isolid, nla, nlm, first
 pointer	sp, label, temp
@@ -198,9 +199,9 @@ end
 procedure rg_onint (vex, next_handler)
 
 int	vex		#I virtual exception
-int	next_handler	#U not used
+pointer	next_handler	#U not used
 
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 begin

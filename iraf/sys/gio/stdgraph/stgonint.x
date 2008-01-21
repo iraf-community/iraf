@@ -11,8 +11,8 @@ include	"stdgraph.h"
 procedure stg_onint (vex, next_handler)
 
 int	vex			# virtual exception
-int	next_handler		# next exception handler in chain
-int	jmpbuf[LEN_JUMPBUF]
+pointer	next_handler		# next exception handler in chain
+pointer	jmpbuf[LEN_JUMPBUF]
 common	/stgxin/ jmpbuf
 
 begin

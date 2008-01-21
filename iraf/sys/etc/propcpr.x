@@ -21,7 +21,8 @@ int	in			# fd of IPC input from child (output)
 int	out			# fd of IPC output to child (output)
 
 bool	first_time
-int	pr, loc_onipc
+int	pr
+pointer	loc_onipc
 pointer	sp, fname
 int	fopnbf()
 extern	pr_onipc(), pr_dummy_open(), pr_zclspr()

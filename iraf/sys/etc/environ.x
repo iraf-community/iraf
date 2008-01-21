@@ -241,7 +241,7 @@ end
 int procedure envfree (old_top, userfcn)
 
 int	old_top			# top of envbuf stack
-int	userfcn			# epa of function called for uncovered redefs
+pointer	userfcn			# epa of function called for uncovered redefs
 
 int	nredefs, head, i, j, t
 pointer	sp, start, namep, el1, el2, ep1, ep2

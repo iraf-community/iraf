@@ -20,10 +20,11 @@ procedure t_hafton()
 int	sign
 bool	sub, pre
 pointer	im, subras, gp
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 char	imsect[SZ_FNAME], mapping_function[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE], system_id[SZ_LINE]
-int	ncols, nlines, epa, status, wkid, mode, old_onint
+int	ncols, nlines, status, wkid, mode
+pointer	epa, old_onint
 int	nlevels, nprm, nopt, xres, yres, nfunction, nx, ny
 real	z1, z2, wx1, wx2, wy1, wy2, contrast
 real	xs, xe, ys, ye, vx1, vx2, vy1, vy2
@@ -221,9 +222,9 @@ end
 procedure hf_tco_onint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 begin

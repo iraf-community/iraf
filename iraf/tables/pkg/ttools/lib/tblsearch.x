@@ -23,8 +23,9 @@ int	last		# i: Last row to look at
 #--
 include	"tblterm.com"
 
-int	old_handler, tbl_term_adr, tbl_func_adr
-int	status, found, dir, iary, junk
+int	tbl_term_adr, tbl_func_adr
+int	status, found, dir, iary
+pointer	old_handler, junk
 pointer	sp, op, newexp
 bool	done
 

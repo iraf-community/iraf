@@ -9,7 +9,7 @@
 
 procedure gexfls()
 
-int	gflush
+pointer	gflush
 pointer	gp[2]
 common	/gxflcm/ gp, gflush
 
@@ -29,9 +29,9 @@ procedure gexfls_set (stream, gp_value, epa_gflush)
 
 int	stream			# graphics stream
 pointer	gp_value		# graphics descriptor
-int	epa_gflush		# EPA of the gflush procedure
+pointer	epa_gflush		# EPA of the gflush procedure
 
-int	gflush
+pointer	gflush
 pointer	gp[2]
 common	/gxflcm/ gp, gflush
 
@@ -48,7 +48,7 @@ end
 procedure gexfls_clear (stream)
 
 int	stream			# graphics stream
-int	gflush
+pointer	gflush
 pointer	gp[2]
 common	/gxflcm/ gp, gflush
 

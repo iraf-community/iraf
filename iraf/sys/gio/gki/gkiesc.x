@@ -19,7 +19,7 @@ int	fn			# function code
 short	instruction[ARB]	# instruction sequence of unknown format
 int	nwords			# number of shorts in instruction
 
-int	epa
+pointer	epa
 short	gki[GKI_ESCAPE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_ESCAPE/
 include	"gki.com"

@@ -9,8 +9,8 @@ procedure xmjbuf (bp)
 
 pointer	bp			#O pointer to jumpbuf
 
-int	a_jb, a_mem
-int	jumpbuf[LEN_JUMPBUF]
+pointer	a_jb, a_mem
+pointer	jumpbuf[LEN_JUMPBUF]
 common	/JUMPCOM/ jumpbuf
 
 begin

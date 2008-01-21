@@ -17,10 +17,10 @@ procedure ki_init (inchan, outchan, errchan, device, devtype)
 int	inchan			#RW process input channel
 int	outchan			#RW process output channel
 int	errchan			#RW process error output channel
-int	device			#RW device driver epa
+pointer	device			#RW device driver epa
 int	devtype			#R  device type (not modified)
 
-int	locpr()
+pointer	locpr()
 extern	zgettx(), zgetty(), zardbf(), zardpr()
 extern	kgettx(), kgetty(), kardbf(), kardpr()
 include	"kichan.com"

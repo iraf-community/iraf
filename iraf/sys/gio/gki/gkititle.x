@@ -16,7 +16,7 @@ procedure gki_mftitle (fd, title)
 int	fd			# output file
 char	title[ARB]		# title string
 
-int	epa
+pointer	epa
 int	ip, n
 pointer	sp, gki, op
 int	strlen()

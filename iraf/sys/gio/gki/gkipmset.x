@@ -18,7 +18,7 @@ procedure gki_pmset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to polymarker attribute structure
 
-int	epa
+pointer	epa
 short	gki[GKI_PMSET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_PMSET/, gki[3] /GKI_PMSET_LEN/
 include	"gki.com"

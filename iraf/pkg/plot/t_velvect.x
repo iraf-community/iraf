@@ -21,9 +21,10 @@ procedure t_velvect()
 char	u_imsect[SZ_FNAME], v_imsect[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE]
 pointer	u_im, v_im, u_subras, v_subras
-int	tcojmp[LEN_JUMPBUF]
-int	u_ncols, v_ncols, u_nlines, v_nlines, epa, status, wkid
-int	mode, old_onint
+pointer	tcojmp[LEN_JUMPBUF]
+int	u_ncols, v_ncols, u_nlines, v_nlines, status, wkid
+int	mode
+pointer	epa, old_onint
 
 pointer	gp, gopen()
 
@@ -113,9 +114,9 @@ end
 procedure vl_tco_onint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
-int	tcojmp[LEN_JUMPBUF]
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 begin

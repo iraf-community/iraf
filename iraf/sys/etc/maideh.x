@@ -12,7 +12,9 @@ define	SZ_ERRMSG	SZ_LINE
 procedure ma_ideh()
 
 extern	xstdexh()
-int	junk, i, epa_standard_handler
+pointer	junk
+int	i
+pointer	epa_standard_handler
 int	exception[4]
 data	exception /X_ACV, X_INT, X_ARITH, X_IPC/
 

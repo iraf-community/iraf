@@ -20,7 +20,7 @@ procedure gki_subkernel (stream, pid, prpsio_epa)
 
 int	stream			# graphics stream to be redirected
 int	pid			# process id of kernel process
-int	prpsio_epa		# epa of the etc$prpsio procedure.
+pointer	prpsio_epa		# epa of the etc$prpsio procedure.
 include	"gki.com"
 
 begin

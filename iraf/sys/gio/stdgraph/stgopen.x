@@ -13,7 +13,7 @@ include	"stdgraph.h"
 procedure stg_open (devname, dd, in, out, xres, yres, hardchar)
 
 char	devname[ARB]		# if nonnull, force output to device
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 int	in			# input file
 int	out			# output file
 int	xres			# number of resolved pixels in X
@@ -23,7 +23,8 @@ int	hardchar		# use hardware character generator
 bool	first_time
 pointer	sp, devns
 int	len_devname
-int	locpr(), strlen()
+pointer	locpr()
+int	strlen()
 
 extern	stg_openws(), stg_closews(), stg_clear(), stg_cancel()
 extern	stg_flush(), stg_polyline(), stg_polymarker(), stg_text()
