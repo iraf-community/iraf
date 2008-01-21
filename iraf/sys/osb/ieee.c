@@ -51,12 +51,6 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 .endhelp -------------------------------------------------------------------
 */
 
-#if __FLOAT_WORD_ORDER == __LITTLE_ENDIAN
-static const XINT IEEE_SWAP = XYES;
-#else
-static const XINT IEEE_SWAP = XNO;
-#endif
-
 #ifdef DATATYPE_REAL
 # define	BSWAP	BSWAP4
 # define	NSWAP	4
@@ -98,7 +92,7 @@ int IEEVPAKD ( PIXEL *native, PIXEL *ieee, XINT *nelem )
     XINT i;
 
     if (mapout == XNO) {
-	if (IEEE_SWAP == XYES) {
+	if (IEEE_SWAP == YES) {
 	    XINT c_1 = 1;
 	    XINT x_n = *nelem * NSWAP;
 	    BSWAP (native, &c_1, ieee, &c_1, &x_n);
@@ -117,7 +111,7 @@ int IEEVPAKD ( PIXEL *native, PIXEL *ieee, XINT *nelem )
 	    }
 	}
 	/* Byteswap if necessary. */
-	if (IEEE_SWAP == XYES) {
+	if (IEEE_SWAP == YES) {
 	    XINT c_1 = 1;
 	    XINT x_n = *nelem * NSWAP;
 	    BSWAP (ieee, &c_1, ieee, &c_1, &x_n);
@@ -147,7 +141,7 @@ int IEEVUPKD ( PIXEL *ieee, PIXEL *native, XINT *nelem )
     XINT *ival = (XINT *)fval;
     XINT expon, i;
 
-    if (IEEE_SWAP == XYES) {
+    if (IEEE_SWAP == YES) {
 	XINT c_1 = 1;
 	XINT x_n = *nelem * NSWAP;
 	BSWAP (ieee, &c_1, native, &c_1, &x_n);
@@ -213,7 +207,7 @@ int IEEPAKD ( PIXEL *x )
 	}
 	IEEE_SIGRESTORE();
     }
-    if (IEEE_SWAP == XYES) {
+    if (IEEE_SWAP == YES) {
 	XINT c_1 = 1;
 	XINT x_n = NSWAP;
 	BSWAP (x, &c_1, x, &c_1, &x_n);
@@ -238,7 +232,7 @@ int IEEUPKD ( PIXEL *x )
     XINT *ival = (XINT *)fval;
     XINT expon;
 
-    if (IEEE_SWAP == XYES) {
+    if (IEEE_SWAP == YES) {
 	XINT c_1 = 1;
 	XINT x_n = NSWAP;
 	BSWAP (x, &c_1, x, &c_1, &x_n);
