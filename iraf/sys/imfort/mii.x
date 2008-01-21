@@ -6,22 +6,22 @@ include <mii.h>
 # MII.X -- This is a stand-alone port of the miiread/miiwrite routines from
 # etc/osb, modified for IMFORT to use bfio.
 #
-#	status = miirdi (fp, spp, maxelem)
-#	status = miirdl (fp, spp, maxelem)
-#	status = miirdr (fp, spp, maxelem)
+#	status = imiirdi (fp, spp, maxelem)
+#	status = imiirdl (fp, spp, maxelem)
+#	status = imiirdr (fp, spp, maxelem)
 #
-#	status = miiwri (fp, spp, nelem)
-#	status = miiwrl (fp, spp, nelem)
-#	status = miiwrr (fp, spp, nelem)
+#	status = imiiwri (fp, spp, nelem)
+#	status = imiiwrl (fp, spp, nelem)
+#	status = imiiwrr (fp, spp, nelem)
 #
-#	status = miirdc (fp, spp, maxchars)
-#	status = miiwrc (fp, spp, nchars)
+#	status = imiirdc (fp, spp, maxchars)
+#	status = imiiwrc (fp, spp, nchars)
 
 
-# MIIRDI -- Read a block of data stored externally in MII integer format.
+# IMIIRDI -- Read a block of data stored externally in MII integer format.
 # Data is returned in the format of the local host machine.
 
-int procedure miirdi (fp, spp, maxelem)
+int procedure imiirdi (fp, spp, maxelem)
 
 pointer	fp			#I input file
 int	spp[ARB]		#O receives data
@@ -63,10 +63,10 @@ begin
 end
 
 
-# MIIRDL -- Read a block of data stored externally in MII long integer format.
+# IMIIRDL -- Read a block of data stored externally in MII long integer format.
 # Data is returned in the format of the local host machine.
 
-int procedure miirdl (fp, spp, maxelem)
+int procedure imiirdl (fp, spp, maxelem)
 
 pointer	fp			#I input file
 long	spp[ARB]		#O receives data
@@ -108,10 +108,10 @@ begin
 end
 
 
-# MIIRDR -- Read a block of data stored externally in MII real format.
+# IMIIRDR -- Read a block of data stored externally in MII real format.
 # Data is returned in the format of the local host machine.
 
-int procedure miirdr (fp, spp, maxelem)
+int procedure imiirdr (fp, spp, maxelem)
 
 pointer	fp			#I input file
 real	spp[ARB]		#O receives data
@@ -153,10 +153,10 @@ begin
 end
 
 
-# MIIWRI -- Write a block of data to a file in MII integer format.
+# IMIIWRI -- Write a block of data to a file in MII integer format.
 # The input data is in the host system native binary format.
 
-int procedure miiwri (fp, spp, nelem)
+int procedure imiiwri (fp, spp, nelem)
 
 pointer	fp			#I output file
 int	spp[ARB]		#I native format data to be written
@@ -182,10 +182,10 @@ begin
 end
 
 
-# MIIWRL -- Write a block of data to a file in MII long integer format.
+# IMIIWRL -- Write a block of data to a file in MII long integer format.
 # The input data is in the host system native binary format.
 
-int procedure miiwrl (fp, spp, nelem)
+int procedure imiiwrl (fp, spp, nelem)
 
 pointer	fp			#I output file
 long	spp[ARB]		#I native format data to be written
@@ -211,10 +211,10 @@ begin
 end
 
 
-# MIIWRR -- Write a block of data to a file in MII real format.
+# IMIIWRR -- Write a block of data to a file in MII real format.
 # The input data is in the host system native binary format.
 
-int procedure miiwrr (fp, spp, nelem)
+int procedure imiiwrr (fp, spp, nelem)
 
 pointer	fp			#I output file
 real	spp[ARB]		#I native format data to be written
@@ -240,10 +240,10 @@ begin
 end
 
 
-# MIIRDC -- Read a block of character data stored externally in MII format.
+# IMIIRDC -- Read a block of character data stored externally in MII format.
 # Data is returned in the machine independent character format.
 
-int procedure miirdc (fp, spp, maxchars)
+int procedure imiirdc (fp, spp, maxchars)
 
 pointer	fp			#I input file
 char	spp[ARB]		#O receives data
@@ -285,10 +285,10 @@ begin
 end
 
 
-# MIIWRC -- Write a block of character data to a file in MII format.
+# IMIIWRC -- Write a block of character data to a file in MII format.
 # The input data is assumed to be in a machine independent format. 
 
-int procedure miiwrc (fp, spp, nchars)
+int procedure imiiwrc (fp, spp, nchars)
 
 pointer	fp			#I output file
 char	spp[ARB]		#I data to be written
