@@ -190,6 +190,7 @@ set_config () {
 				aclrs.x		host\$c.default/aclrs.c
 				aclri.x		host\$c.default/aclri.c
 				aclrl.x		host\$c.default/aclrl.c
+				aclrp.x		host\$c.default/aclrp.c
 				aclrr.x		host\$c.default/aclrr.c
 				aclrd.x		host\$c.default/aclrd.c
 				;
@@ -198,6 +199,7 @@ set_config () {
 				amovs.x		host\$c.default/amovs.c
 				amovi.x		host\$c.default/amovi.c
 				amovl.x		host\$c.default/amovl.c
+				amovp.x		host\$c.default/amovp.c
 				amovr.x		host\$c.default/amovr.c
 				amovd.x		host\$c.default/amovd.c
 				;

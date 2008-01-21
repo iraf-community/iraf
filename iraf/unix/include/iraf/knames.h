@@ -432,7 +432,7 @@ extern int ZGTIME ( XLONG *, XLONG * );
 extern int ZGTPID ( XINT * );
 extern int ZINTPR ( XINT *, XINT *, XINT * );
 extern int ZLOCPR ( PFU, XPOINTER * );
-extern int ZLOCVA ( XCHAR *, XPOINTER * );
+extern int ZLOCVA ( void *, XPOINTER * );
 extern int ZMALOC ( XPOINTER *, XINT *, XINT * );
 /* ??? ZMEMCK ??? */
 extern int ZMFREE ( XPOINTER *, XINT * );
@@ -706,12 +706,14 @@ extern int ZZWTMT ( XINT *, XINT *, XINT * );
 #define	ACLRD		aclrd_
 #define	ACLRI		aclri_
 #define	ACLRL		aclrl_
+#define	ACLRP		aclrp_
 #define	ACLRR		aclrr_
 #define	ACLRS		aclrs_
 #define	AMOVC		amovc_
 #define	AMOVD		amovd_
 #define	AMOVI		amovi_
 #define	AMOVL		amovl_
+#define	AMOVP		amovp_
 #define	AMOVR		amovr_
 #define	AMOVS		amovs_
 
@@ -759,12 +761,14 @@ extern int ACLRC ( XCHAR *, XINT * );
 extern int ACLRD ( XDOUBLE *, XINT * );
 extern int ACLRI ( XINT *, XINT * );
 extern int ACLRL ( XLONG *, XINT * );
+extern int ACLRP ( XPOINTER *, XINT * );
 extern int ACLRR ( XREAL *, XINT * );
 extern int ACLRS ( XSHORT *, XINT * );
 extern int AMOVC ( XCHAR *, XCHAR *, XINT * );
 extern int AMOVD ( XDOUBLE *, XDOUBLE *, XINT * );
 extern int AMOVI ( XINT *, XINT *, XINT * );
 extern int AMOVL ( XLONG *, XLONG *, XINT * );
+extern int AMOVP ( XPOINTER *, XPOINTER *, XINT * );
 extern int AMOVR ( XREAL *, XREAL *, XINT * );
 extern int AMOVS ( XSHORT *, XSHORT *, XINT * );
 

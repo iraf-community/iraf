@@ -191,6 +191,7 @@ libvops.a:
 	aclrd.x	
 	aclri.x	
 	aclrl.x	
+	aclrp.x	
 	aclrr.x	
 	aclrs.x	
 	aclrx.x	
