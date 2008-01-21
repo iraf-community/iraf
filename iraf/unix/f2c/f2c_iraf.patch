@@ -1,0 +1,54 @@
+*** src_org/format.h	Wed Feb 23 08:30:41 1994
+--- src/format.h	Sun Jan 13 21:37:06 2008
+***************
+*** 1,4 ****
+--- 1,6 ----
++ #ifndef DEF_C_LINE_LENGTH
+  #define DEF_C_LINE_LENGTH 77
++ #endif
+  /* actual max will be 79 */
+  
+  extern int c_output_line_length;	/* max # chars per line in C source
+*** src_org/main.c	Sun May  7 01:31:56 2006
+--- src/main.c	Mon Jan 21 16:54:39 2008
+***************
+*** 256,263 ****
+  	typesize[TYINLIST] = 26*chars_per_wd;
+  	}
+  
+!     if (wordalign)
+  	typealign[TYDREAL] = typealign[TYDCOMPLEX] = typealign[TYREAL];
+      if (!tyioint) {
+  	tyioint = TYSHORT;
+  	szleng = typesize[TYSHORT];
+--- 256,269 ----
+  	typesize[TYINLIST] = 26*chars_per_wd;
+  	}
+  
+!     if (wordalign) {
+  	typealign[TYDREAL] = typealign[TYDCOMPLEX] = typealign[TYREAL];
++ #ifdef TYQUAD
++ 	if ( use_tyquad == YES ) {
++ 	    typealign[TYQUAD] = typealign[TYDREAL];
++ 	}
++ #endif
++     }
+      if (!tyioint) {
+  	tyioint = TYSHORT;
+  	szleng = typesize[TYSHORT];
+*** src_org/niceprintf.h	Sat Feb  3 15:48:17 1990
+--- src/niceprintf.h	Mon Jan 21 16:29:39 2008
+***************
+*** 2,10 ****
+--- 2,12 ----
+     for the generated C code.  We use macros for increased speed, less
+     function overhead.  */
+  
++ #ifndef MAX_OUTPUT_SIZE
+  #define MAX_OUTPUT_SIZE 6000	/* Number of chars on one output line PLUS
+  				   the length of the longest string
+  				   printed using   nice_printf   */
++ #endif
+  
+  
+  
