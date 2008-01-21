@@ -103,6 +103,7 @@ char **xargv;
 	}
 #endif
 
+ int
 #ifdef KR_headers
 main(argc, argv) int argc; char **argv;
 #else

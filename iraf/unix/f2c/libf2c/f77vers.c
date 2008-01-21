@@ -1,5 +1,5 @@
  char 
-_libf77_version_f2c[] = "\n@(#) LIBF77 VERSION (f2c) 20021004\n";
+_libf77_version_f2c[] = "\n@(#) LIBF77 VERSION (f2c) 20051004\n";
 
 /*
 2.00	11 June 1980.  File version.c added to library.
@@ -90,4 +90,8 @@ _libf77_version_f2c[] = "\n@(#) LIBF77 VERSION (f2c) 20021004\n";
 			systems (such as Intel IA32 systems).  Compile with
 			-DNO_DOUBLE_EXTENDED to omit the new logic.
 	4 Oct. 2002: uninit.c: on IRIX systems, omit use of shell variables.
+	10 Oct 2005: uninit.c: on IA32 Linux systems, leave the rounding
+			precision alone rather than forcing it to 53 bits;
+			compile with -DUNINIT_F2C_PRECISION_53 to get the
+			former behavior.
 */

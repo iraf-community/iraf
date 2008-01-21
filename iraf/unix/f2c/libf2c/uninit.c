@@ -253,7 +253,7 @@ ieee0(Void)
 /* Reported 20010705 by Alan Bain <alanb@chiark.greenend.org.uk> */
 /* Note that IEEE 754 IOP (illegal operation) */
 /* = Signaling NAN (SNAN) + operation error (OPERR). */
-#ifdef Can_use__setfpucw /* Has __setfpucw gone missing from S.u.S.E. 6.3? */
+#ifdef Can_use__setfpucw
 	__setfpucw(_FPU_IEEE + _FPU_DOUBLE + _FPU_MASK_OPERR + _FPU_MASK_DZ + _FPU_MASK_SNAN+_FPU_MASK_OVFL);
 #else
 	__fpu_control = _FPU_IEEE + _FPU_DOUBLE + _FPU_MASK_OPERR + _FPU_MASK_DZ + _FPU_MASK_SNAN+_FPU_MASK_OVFL;
@@ -288,11 +288,20 @@ which we want*/
 #ifndef _FPU_DOUBLE
 #define _FPU_DOUBLE 0
 #endif
-#ifdef Can_use__setfpucw /* Has __setfpucw gone missing from S.u.S.E. 6.3? */
-	__setfpucw(_FPU_IEEE - _FPU_EXTENDED + _FPU_DOUBLE - _FPU_MASK_IM - _FPU_MASK_ZM - _FPU_MASK_OM);
+#ifdef Can_use__setfpucw /* pre-1997 (?) Linux */
+	__setfpucw(_FPU_IEEE - _FPU_MASK_IM - _FPU_MASK_ZM - _FPU_MASK_OM);
 #else
+#ifdef UNINIT_F2C_PRECISION_53 /* 20051004 */
+	/* unmask invalid, etc., and change rounding precision to double */
 	__fpu_control = _FPU_IEEE - _FPU_EXTENDED + _FPU_DOUBLE - _FPU_MASK_IM - _FPU_MASK_ZM - _FPU_MASK_OM;
 	_FPU_SETCW(__fpu_control);
+#else
+	/* unmask invalid, etc., and keep current rounding precision */
+	fpu_control_t cw;
+	_FPU_GETCW(cw);
+	cw &= ~(_FPU_MASK_IM | _FPU_MASK_ZM | _FPU_MASK_OM);
+	_FPU_SETCW(cw);
+#endif
 #endif
 
 #else /* !_FPU_IEEE */

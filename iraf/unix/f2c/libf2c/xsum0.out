@@ -1,7 +1,7 @@
 Notice	76f23b4	1212
 README	16a3882f	16876
 abort_.c	1ef378f2	298
-arithchk.c	efc0d389	4669
+arithchk.c	fae7c666	5171
 backspac.c	10ebf554	1328
 c_abs.c	fec22c59	272
 c_cos.c	18fc0ea3	354
@@ -53,7 +53,7 @@ exit_.c	ff4baa3a	543
 f2c.h0	e770b7d8	4688
 f2ch.add	ef66bf17	6060
 f77_aloc.c	f74c1f61	678
-f77vers.c	13362f51	4740
+f77vers.c	ed1c96fa	4933
 fio.h	f9389f5f	2932
 fmt.c	cdfb2a1	8361
 fmt.h	f5dd2afb	1970
@@ -99,7 +99,7 @@ libf2c.sy	fd5f568f	2051
 lio.h	a087b39	1564
 lread.c	eb3c2be3	14705
 lwrite.c	f80da63f	4616
-main.c	dc8ce96	2219
+main.c	5473c59	2224
 makefile.sy	f00a3a30	2976
 makefile.u	e8714bfc	7019
 makefile.vc	45bfc77	2928
@@ -163,7 +163,7 @@ sysdep1.h0	1812022d	1202
 system_.c	eae6254c	646
 typesize.c	eee307ae	386
 uio.c	e354a770	1619
-uninit.c	eb6313dd	7395
+uninit.c	fe760fb0	7584
 util.c	e526349d	902
 wref.c	17bbfb7b	4747
 wrtfmt.c	113fc4f9	7506

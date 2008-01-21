@@ -27,7 +27,7 @@ io.c	1739e50	30664
 iob.h	ece45655	548
 lex.c	1b0d5df9	34746
 machdefs.h	4950e5b	659
-main.c	12e801a2	19844
+main.c	e2fad403	20921
 makefile.u	e0dd1cab	3710
 makefile.vc	eb8aae7c	2685
 malloc.c	40d2ad0	3975
@@ -48,12 +48,12 @@ pccdefs.h	1b4fbbee	1195
 pread.c	1fbd30ab	17831
 proc.c	649db52	39174
 put.c	af0be95	10345
-putpcc.c	4d278f	45996
+putpcc.c	7669b2f	46093
 sysdep.c	14398cd6	15829
 sysdep.h	e7826434	2755
 sysdeptest.c	4370183	388
 tokens	188b7c5d	733
 usignal.h	1c4ce909	124
 vax.c	8b21b83	12436
-version.c	e3163b9c	107
-xsum.c	f9db02a0	6648
+version.c	e8eb5e17	107
+xsum.c	e05654a7	6653
