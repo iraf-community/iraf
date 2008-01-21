@@ -29,7 +29,7 @@ define	PL_LLFREE	Memi[P2I($1+23)]	# amount of free space in list
 define	PL_LLNUPDATES	Memi[P2I($1+24)]	# number of list modifications
 define	PL_LLINC	Memi[P2I($1+25)]	# current llbuf increment on overflow
 define	PL_NLP		Memi[P2I($1+26)]	# number of line pointers
-define	PL_LPP		Memi[P2I($1+27)]	# ptr to array of LL offsets
+define	PL_LPP		Memp[$1+27]		# ptr to array of LL offsets
 
 define	PM_REFIM	PL_PRIVATE1($1)	# reference image
 define	PM_MAPXY	PL_PRIVATE2($1)	# need to transform coords
