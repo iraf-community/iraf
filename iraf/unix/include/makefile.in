@@ -1,0 +1,9 @@
+
+all:	f2c.h
+
+f2c.h::
+	rm -f f2c.h
+	cpp -traditional-cpp -undef -C -P $(HSI_CF) f2c.h.in | tr '%' '#' > f2c.h
+
+clean::
+	rm -f f2c.h

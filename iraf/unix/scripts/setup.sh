@@ -327,6 +327,8 @@ case "$COMMAND" in
   #( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../include/f2c.h . )
   #( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
   #
+  output_makefile iraf/unix/include makefile.in
+  #
   # F2C
   F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h

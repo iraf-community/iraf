@@ -24,7 +24,7 @@ librpp.a:	addchr.o allblk.o alldig.o baderr.o balpar.o beginc.o \
 
 entxkw.f::
 	rm -f entxkw.f
-	cpp -traditional-cpp -P $(HSI_CF) entxkw.f.in > entxkw.f
+	cpp -traditional-cpp -undef -P $(HSI_CF) entxkw.f.in > entxkw.f
 
 clean::
 	rm -f *.o *.c librpp.a ../librpp.a entxkw.f

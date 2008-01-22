@@ -35,6 +35,7 @@ reboot_makefiles::
 	$(SETUP) reboot_makefiles $(MACH) $(PREFIX)
 
 boot_make::
+	make -C iraf/unix/include
 	make -C iraf/unix/config
 	make -C iraf/unix/f2c/src f2c
 	cp -p iraf/unix/f2c/src/f2c iraf/unix/bin/f2c.e
@@ -79,6 +80,8 @@ clean_f2c::
 	rm -f iraf/unix/lib/libf2c.a
 
 clean_unix::
+	make -C iraf/unix/include clean
+	make -C iraf/unix/config clean
 	make -C iraf/unix/os clean
 	make -C iraf/unix/boot/bootlib clean
 	make -C iraf/unix/boot/generic clean
