@@ -112,10 +112,10 @@ procedure wf_fnload (name, flags, init, destroy, fwd, inv)
 
 char	name[ARB]			#I function name
 int	flags				#I function type flags
-int	init				#I initialize procedure
-int	destroy				#I destroy procedure
-int	fwd				#I forward transform procedure
-int	inv				#I inverse transform procedure
+pointer	init				#I initialize procedure
+pointer	destroy				#I destroy procedure
+pointer	fwd				#I forward transform procedure
+pointer	inv				#I inverse transform procedure
 
 errchk	syserrs
 include	"mwcs.com"
