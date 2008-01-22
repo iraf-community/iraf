@@ -330,9 +330,9 @@ case "$COMMAND" in
   output_makefile iraf/unix/include makefile.in
   #
   # F2C
-  F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
+  #F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
-  F="$F -DDEF_C_LINE_LENGTH=5120"
+  F="-DDEF_C_LINE_LENGTH=5120"
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
