@@ -24,6 +24,8 @@ libvops.a:
 	# Generic preprocessing is normally done only on the development system,
 	# and need not be available on all systems.
 
+	$checkout ieee.c host$sys/
+
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 
 	# The following contain machine dependent constants.
