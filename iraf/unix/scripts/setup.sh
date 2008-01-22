@@ -142,15 +142,15 @@ set_config () {
   #  ( cd ${host}as.${MACH} ; rm -f zsvjmp.s ; ln -s zsvjmp.${SPP_DATA_MODEL}.s zsvjmp.s )
   #fi
   # mach.h, iraf.h settings
-  if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
-    ( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
-    ( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
-    ( cd ${hconfig} ; rm -f f2c.h ; ln -s f2c.${SPP_DATA_MODEL}.h f2c.h )
-    ( cd ${hconfig} ; rm -f entxkw.f ; ln -s entxkw.${SPP_DATA_MODEL}.f entxkw.f )
-  else
-    echo "[ERROR] No such data model: ${SPP_DATA_MODEL}"
-    exit 1
-  fi
+  #if [ -f ${hconfig}iraf.${SPP_DATA_MODEL}.h ]; then
+    #( cd ${hconfig} ; rm -f iraf.h ; ln -s iraf.${SPP_DATA_MODEL}.h iraf.h )
+    #( cd ${hconfig} ; rm -f mach.h ; ln -s mach.${SPP_DATA_MODEL}.h mach.h )
+  #  ( cd ${hconfig} ; rm -f f2c.h ; ln -s f2c.${SPP_DATA_MODEL}.h f2c.h )
+    #( cd ${hconfig} ; rm -f entxkw.f ; ln -s entxkw.${SPP_DATA_MODEL}.f entxkw.f )
+  #else
+  #  echo "[ERROR] No such data model: ${SPP_DATA_MODEL}"
+  #  exit 1
+  #fi
 
   # mkpkg.inc settings
 
@@ -220,6 +220,7 @@ output_makefile () {
 
   ARG_DIR=$1
   ARG_INFILE=$2
+  ARG_ADDITIONAL_DEFS=$3
 
   echo Making $ARG_DIR/Makefile.
   cat <<EOF > $ARG_DIR/Makefile
@@ -234,6 +235,7 @@ HSI_LF      = $HSI_LF
 HSI_F77LIBS = $HSI_F77LIBS
 RANLIB      = $RANLIB
 HSI_LIBS    = $HSI_LIBS
+$ARG_ADDITIONAL_DEFS
 
 EOF
 
@@ -311,7 +313,7 @@ case "$COMMAND" in
   echo "OS             : $OPERATING_SYSTEM"
   echo "Vendor         : $VENDOR"
   echo "SPP Data Model : $SPP_DATA_MODEL"
-  sleep 2
+  sleep 1
   #
   #mkdir -p iraf/unix/bin
   #mkdir -p iraf/unix/include
@@ -320,21 +322,28 @@ case "$COMMAND" in
   #
   #( cd iraf/unix/include ; rm -f iraf ; ln -s ../hlib/libc iraf )
   #( cd iraf/unix/include ; rm -f iraf.h ; ln -s ../hlib/libc/iraf.h . )
-  ( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../config/f2c.h . )
-  ( cd iraf/unix/f2c/src ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
-  ( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../config/f2c.h . )
-  ( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
+  #( cd iraf/unix/include ; rm -f f2c.h ; ln -s ../config/f2c.h . )
+  #( cd iraf/unix/f2c/src ; rm -f f2c.h ; ln -s ../../include/f2c.h . )
+  #( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../include/f2c.h . )
+  #( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
+  #
+  # F2C
+  F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
+  # See also MAX_OUTPUT_SIZE in niceprintf.h
+  F="$F -DDEF_C_LINE_LENGTH=5120"
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
-  # See also MAX_OUTPUT_SIZE in niceprintf.h
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
-    sed -e 's/^\(CFLAGS = \)\(.*\)/\1\2 -DDEF_C_LINE_LENGTH=5120/' > Makefile )
+    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
+  #
   echo Makeing iraf/unix/f2c/libf2c/Makefile.
   if [ "$SPP_DATA_MODEL" = "lp64" ]; then
     ( cd iraf/unix/f2c/libf2c ; cat makefile.u | \
-    sed -e 's/^\(OFILES = \)\(.*\)/\1$(QINT) \2/' > Makefile )
+    sed -e 's/^\(OFILES = \)\(.*\)/\1$(QINT) \2/' \
+        -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
   else
-    ( cd iraf/unix/f2c/libf2c ; cat makefile.u > Makefile )
+    ( cd iraf/unix/f2c/libf2c ; cat makefile.u | \
+    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
   fi
   #
   output_makefile iraf/unix/os makefile.in
@@ -354,6 +363,36 @@ case "$COMMAND" in
   output_makefile iraf/unix/boot/spp/rpp makefile.in
   output_makefile iraf/unix/boot/xyacc makefile.in
   output_makefile iraf/unix/gdev/sgidev makefile.in
+  #
+  F="iraf/unix/config/Makefile"
+  D="DEFS ="
+  cat <<EOF | cpp -P $HSI_CF > $F 
+#include <iraf/endian.h>
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+X_MARK_X foo;
+#endif
+EOF
+  S=$?
+  if [ ! $S = 0 ]; then
+    exit $S
+  fi
+  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    D="$D -DBYTE_LITTLE"
+  fi
+  cat <<EOF | cpp -P $HSI_CF > $F
+#include <iraf/endian.h>
+#if __FLOAT_WORD_ORDER == __LITTLE_ENDIAN
+X_MARK_X foo;
+#endif
+EOF
+  S=$?
+  if [ ! $S = 0 ]; then
+    exit $S
+  fi
+  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    D="$D -DFLOAT_LITTLE"
+  fi
+  output_makefile iraf/unix/config makefile.in "$D"
   #
   ;;
 

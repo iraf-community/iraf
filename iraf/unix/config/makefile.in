@@ -1,0 +1,13 @@
+
+all:	iraf.h mach.h
+
+iraf.h::
+	rm -f iraf.h
+	cpp -traditional-cpp -P $(HSI_CF) $(DEFS) iraf.h.in | tr ';' '#' > iraf.h
+
+mach.h::
+	rm -f mach.h
+	cpp -traditional-cpp -P $(HSI_CF) $(DEFS) mach.h.in | tr ';' '#' > mach.h
+
+clean::
+	rm -f iraf.h mach.h
