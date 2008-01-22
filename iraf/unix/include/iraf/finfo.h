@@ -1,7 +1,8 @@
+#ifndef	_IRAF_FINFO_H
+#define	_IRAF_FINFO_H
+
 /* File info structure definitions (c_finfo).
  */
-#ifndef D_finfo
-#define D_finfo
 
 #include <iraf/spp.h>
 
@@ -24,4 +25,4 @@ struct _finfo {
 /* ../../../sys/libc/ */
 extern int c_finfo ( const char *, struct _finfo * );
 
-#endif
+#endif	/* ! _IRAF_FINFO_H */

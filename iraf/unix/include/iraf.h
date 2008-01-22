@@ -5,8 +5,8 @@
  * scans this file at run time to get the logical directory definitions.
  */
 
-#ifndef D_iraf
-#define D_iraf
+#ifndef	_IRAF_H
+#define	_IRAF_H
 
 #ifndef PREFIX
 #define PREFIX ""
@@ -23,7 +23,8 @@
 /* #define BSDUNIX */
 /* #define SUNOS4 */
 
-#endif
+#endif	/* ! _IRAF_H */
+
 
 /* Include any header files specified in "#define import_XXX" statements
  * before we were called.

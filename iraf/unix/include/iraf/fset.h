@@ -1,3 +1,6 @@
+#ifndef	_IRAF_FSET_H
+#define	_IRAF_FSET_H
+
 /*
  * FSET.H -- FSET/FSTATUS parameters (r = read_only, * = internal to FIO).
  * Some of these parameters provide access to the guts of the i/o system and
@@ -5,8 +8,6 @@
  * inner workings of FIO.  Parameters affecting the file buffer number, types,
  * or sizes are read-only after the first i/o to the file.
  */
-#ifndef	D_fset
-#define	D_fset
 
 #define	F_ADVICE	1	/*  advice on type of access (rand,seq,def) */
 #define	F_ASYNC		2	/*  enable asynchronous i/o [y/n] */
@@ -63,4 +64,4 @@
 #define	IO_RAW		001B		/* enables raw mode i/o */
 #define	IO_NDELAY	100B		/* enables nonblocking i/o */
 
-#endif
+#endif	/* ! _IRAF_FSET_H */

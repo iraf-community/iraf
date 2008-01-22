@@ -1,7 +1,8 @@
+#ifndef	_IRAF_XWHEN_H
+#define	_IRAF_XWHEN_H
+
 /* Exception handling.
  */
-#ifndef	D_xwhen
-#define	D_xwhen
 
 #include <iraf/spp.h>
 
@@ -14,4 +15,4 @@
 
 void c_xwhen ( int, XSIGFUNC, XSIGFUNC * );
 
-#endif
+#endif	/* ! _IRAF_XWHEN_H */

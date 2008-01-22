@@ -1,10 +1,10 @@
+#ifndef	_IRAF_LIBC_H
+#define	_IRAF_LIBC_H
+
 /*
  * LIBC.H -- Definitions which should be included by all C source files which
  * use the IRAF runtime C library.
  */
-
-#ifndef D_libc
-#define	D_libc
 
 #include <iraf/spp.h>
 
@@ -230,7 +230,7 @@ extern int c_stgputline ( int, const char * );
 /* Symbols defined in the standard libc. 
  */
 #ifndef NOLIBCNAMES
-#define	D_libc_libcnames
+#define	_IRAF_LIBC_LIBCNAMES
 
 # ifndef NULL
 #define	NULL		((void*)0)
@@ -294,6 +294,6 @@ extern char *strncpy ( char *, const char *, size_t );
 extern int system ( const char * );
 
 
-#endif	/* NOLIBCNAMES */
+#endif	/* ! NOLIBCNAMES */
 
-#endif
+#endif	/* ! _IRAF_LIBC_H */

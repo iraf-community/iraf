@@ -1,9 +1,10 @@
+#ifndef	_IRAF_VARARGS_H
+#define	_IRAF_VARARGS_H
+
 /* VARARGS.H -- Pick up the local UNIX definitions for dealing with a variable
  * number of arguments.  This is done via indirection through this file so
  * that any problems can be dealt with by changing only this file.
  */
-#ifndef D_varargs
-#define	D_varargs
 
 #ifdef SUNOS
 
@@ -48,4 +49,4 @@ typedef char *va_list;
 #endif
 #endif
 
-#endif
+#endif	/* ! _IRAF_VARARGS_H */

@@ -1,11 +1,11 @@
+#ifndef	_IRAF_SPP_H
+#define	_IRAF_SPP_H
+
 /*
  * SPP.H -- Language definitions for interfacing SPP to C and C to UNIX.
  * Note that many of the definitions must agree with those in the SPP
  * compiler and with <iraf.h> and <mach.h>.
  */
-
-#ifndef D_spp
-#define	D_spp
 
 #include <iraf/spptypes.h>
 
@@ -151,4 +151,4 @@ extern XCHAR *c_sppstr( const char * );
 extern XCHAR *c_strupk ( const char *, XCHAR *, iraf_size_t );
 extern char *c_strpak ( const XCHAR *, char *, iraf_size_t );
 
-#endif
+#endif	/* ! _IRAF_SPP_H */

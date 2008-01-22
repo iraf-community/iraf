@@ -1,8 +1,8 @@
+#ifndef	_IRAF_FPOLL_H
+#define	_IRAF_FPOLL_H
+
 /* File poll structure definitions (c_fpoll).
  */
-
-#ifndef D_fpoll
-#define D_fpoll
 
 #include <iraf/spp.h>
 
@@ -24,7 +24,7 @@ struct _fpoll {
 } poll_fds[MAX_POLL_FD];
 
 #ifndef NOLIBCNAMES
-#define	D_fpoll_libcnames
+#define	_IRAF_FPOLL_LIBCNAMES
 
 #define POLLIN      IRAF_POLLIN
 #define POLLPRI     IRAF_POLLPRI
@@ -33,8 +33,8 @@ struct _fpoll {
 #define POLLHUP     IRAF_POLLHUP
 #define POLLNVAL    IRAF_POLLNVAL
 
-#endif	/* NOLIBCNAMES */
+#endif	/* ! NOLIBCNAMES */
 
 extern XINT ZFPOLL ( XINT *, XINT *, XINT *, XINT *, XINT * );
 
-#endif
+#endif	/* ! _IRAF_FPOLL_H */

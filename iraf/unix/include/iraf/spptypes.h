@@ -1,5 +1,5 @@
-#ifndef D_spptypes
-#define	D_spptypes
+#ifndef	_IRAF_SPPTYPES_H
+#define	_IRAF_SPPTYPES_H
 
 /* SPP datatypes. (potentially MACHDEP)
  */
@@ -104,4 +104,4 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #endif	/* ! F2C_INCLUDE */
 
 
-#endif	/* D_spptypes */
+#endif	/* ! _IRAF_SPPTYPES_H */

@@ -1,11 +1,11 @@
+#ifndef	_IRAF_STDIO_H
+#define	_IRAF_STDIO_H
+
 /*
  * U_STDIO.H -- C defines used to emulate the UNIX standard i/o package upon
  * IRAF file i/o.  These definitions are portable, but highly dependent on
  * the guts of IRAF FIO.
  */
-
-#ifndef D_stdio
-#define	D_stdio
 
 #include <iraf/libc.h>
 #include <iraf/stdarg.h>
@@ -85,9 +85,9 @@ extern int eprintf ();
 /* Symbols defined in the standard libc. 
  */
 #ifndef NOLIBCNAMES
-#define	D_stdio_libcnames
+#define	_IRAF_STDIO_LIBCNAMES
 
-#ifdef	D_kernel
+#ifdef	_IRAF_KERNEL_H
 #error "Do not include iraf/stdio.h without NOLIBCNAMES when using iraf/kernel.h."
 #endif
 
@@ -193,6 +193,6 @@ extern int snprintf ();
 extern int sprintf ();
 #endif
 
-#endif	/* NOLIBCNAMES */
+#endif	/* ! NOLIBCNAMES */
 
-#endif
+#endif	/* ! _IRAF_STDIO_H */

@@ -1,5 +1,5 @@
-#ifndef D_endian
-#define D_endian
+#ifndef	_IRAF_ENDIAN_H
+#define	_IRAF_ENDIAN_H
 
 #ifdef LINUX
 # include <endian.h>
@@ -15,10 +15,10 @@
 #endif
 
 #ifndef __BYTE_ORDER
-# error "Cannot get __BYTE_ORDER macro"
+# error "Cannot get __BYTE_ORDER macro symbol"
 #endif
 #ifndef __FLOAT_WORD_ORDER
-# error "Cannot get __FLOAT_WORD_ORDER macro"
+# error "Cannot get __FLOAT_WORD_ORDER macro symbol"
 #endif
 
 #include <iraf/spp.h>
@@ -35,4 +35,4 @@
 #define IEEE_SWAP NO
 #endif
 
-#endif	/* D_endian */
+#endif	/* ! _IRAF_ENDIAN_H */

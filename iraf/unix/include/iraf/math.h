@@ -1,9 +1,11 @@
+#ifndef	_IRAF_MATH_H
+#define	_IRAF_MATH_H
+
 /*
  * MATH.H -- Math functions for C.
  */
 
-#ifndef D_math
-#define	D_math
+#include <iraf/spptypes.h>
 
 #define	XNINT		xnint_
 #define	XEXP		xexp_
@@ -20,18 +22,18 @@
 #define	XATAN2		xatan2_
 
 /* sys/libc/mathf.f */
-long int XNINT(double *);
-double	XEXP(double *), XLOG(double *), XLOG10(double *);
-double	XPOW(double *,double *), XSQRT(double *);
-double	XSIN(double *), XCOS(double *), XASIN(double *), XACOS(double *);
-double	XTAN(double *), XATAN(double *), XATAN2(double *,double *);
+XINT XNINT(XDOUBLE *);
+XDOUBLE	XEXP(XDOUBLE *), XLOG(XDOUBLE *), XLOG10(XDOUBLE *);
+XDOUBLE	XPOW(XDOUBLE *,XDOUBLE *), XSQRT(XDOUBLE *);
+XDOUBLE	XSIN(XDOUBLE *), XCOS(XDOUBLE *), XASIN(XDOUBLE *), XACOS(XDOUBLE *);
+XDOUBLE	XTAN(XDOUBLE *), XATAN(XDOUBLE *), XATAN2(XDOUBLE *,XDOUBLE *);
 
 extern	double um_x, um_y;
 
 #define nint(x)		XNINT((um_x=(x),&um_x))
 
 #ifndef NOLIBCNAMES
-#define	D_math_libcnames
+#define	_IRAF_MATH_LIBCNAMES
 
 #define	exp(x)		XEXP((um_x=(x),&um_x))
 #define	log(x)		XLOG((um_x=(x),&um_x))
@@ -46,6 +48,6 @@ extern	double um_x, um_y;
 #define	atan(x)		XATAN((um_x=(x),&um_x))
 #define	atan2(x,y)	XATAN2((um_x=(x),&um_x),(um_y=(y),&um_y))
 
-#endif	/* NOLIBCNAMES */
+#endif	/* ! NOLIBCNAMES */
 
-#endif
+#endif	/* ! _IRAF_MATH_H */

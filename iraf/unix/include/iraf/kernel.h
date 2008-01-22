@@ -1,3 +1,6 @@
+#ifndef	_IRAF_KERNEL_H
+#define	_IRAF_KERNEL_H
+
 /*
  * KERNEL.H -- Machine dependent definitions for the 4.1BSD UNIX IRAF Kernel.
  * The UNIX include file <stdio.h> must also be loaded by any program which
@@ -5,10 +8,7 @@
  * the (generally) machine independent kernel definitions.
  */
 
-#ifndef	D_kernel
-#define	D_kernel
-
-#ifdef D_stdio_libcnames
+#ifdef _IRAF_STDIO_LIBCNAMES
 #error "Do not include iraf/stdio.h without NOLIBCNAMES when using iraf/kernel.h."
 #endif
 
@@ -106,4 +106,4 @@ typedef void (*sa_sigaction_t)(int, siginfo_t *, void *);
 
 extern const char *irafpath( const char * );
 
-#endif	/* D_kernel */
+#endif	/* ! _IRAF_KERNEL_H */

@@ -1,3 +1,6 @@
+#ifndef	_IRAF_STDARG_H
+#define	_IRAF_STDARG_H
+
 /* STDARG.H -- Interface to the Unix variable argument-list interface.
  * This version replaces <varargs.h>, but is NOT backwards compatible.
  *
@@ -10,8 +13,6 @@
  * interface (ifdef the code accordingly).  Old code which uses
  * varargs directly is unaffected.
  */
-#ifndef D_stdarg
-#define	D_stdarg
 
 #define USE_STDARG
 /*
@@ -43,4 +44,4 @@
 #include <iraf/varargs.h>
 #endif
 
-#endif
+#endif	/* ! _IRAF_STDARG_H */

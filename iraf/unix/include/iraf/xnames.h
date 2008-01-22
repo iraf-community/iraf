@@ -1,3 +1,6 @@
+#ifndef	_IRAF_XNAMES_H
+#define	_IRAF_XNAMES_H
+
 /*
  * XNAMES.H -- C callable external names of the SPP library procedures.
  * The C version of the name is identical to the SPP name except that it is
@@ -18,10 +21,8 @@
  * The external names defined herein MUST agree with those in 
  * "hinclude$iraf.h".
  */
-#ifndef	D_xnames
-#define	D_xnames
 
-#include <iraf/spp.h>
+#include <iraf/spptypes.h>
 
 /* Error handling.
  */
@@ -32,7 +33,10 @@
 extern int XERPSH( void );
 extern XBOOL XERPOP( void );
 extern XINT XERPOPI( void );
+
+#ifndef F2C_INCLUDE		/* for native C code */
 #define	iferr(stmt)	{XERPSH();stmt;}if(XERPOPI())
+#endif
 
 #define	ACCESS		xfaccs_		/* to avoid name collisions */
 #define	CALLOC		xcallc_
@@ -479,7 +483,7 @@ extern int XTTYSIZE ( XINT *, XINT * );
 extern int XWHEN ( XINT *, XINT *, XINT * );
 /* ../../../sys/etc/onentry.x */
 extern XINT ONENTRY ( XINT *, XCHAR *, XCHAR * );
-/* ../../../lib/sysruk.x */
+/* ../../../base/sysruk.x */
 extern XINT SYSRUK ( XCHAR *, XCHAR *, XINT *, XINT * );
 /* ../../../sys/fio/vfnmap.x */
 extern XPOINTER VFNOPEN ( XCHAR *, XINT * );
@@ -505,4 +509,4 @@ extern int XMJBUF ( XPOINTER * );
 /* ../../../sys/gio/cursor/prpsinit.x */
 extern int PRPSINIT( void );
 
-#endif
+#endif	/* ! _IRAF_XNAMES_H */

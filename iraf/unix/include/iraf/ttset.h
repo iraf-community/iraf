@@ -1,7 +1,8 @@
+#ifndef	_IRAF_TTSET_H
+#define	_IRAF_TTSET_H
+
 /* TTSET.H -- Set terminal control options (TT logical terminal driver).
  */
-#ifndef	D_ttset
-#define	D_ttset
 
 #define	TT_INITIALIZE	0	/* initialize TT driver status */
 #define	TT_KINCHAN	101	/* kernel tty input channel */
@@ -27,4 +28,4 @@
 #define	TT_TDEVICE	121	/* terminal device at record time */
 #define	TT_GDEVICE	122	/* stdgraph device at record time */
 
-#endif
+#endif	/* ! _IRAF_TTSET_H */

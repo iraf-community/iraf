@@ -1,7 +1,8 @@
+#ifndef	_IRAF_ERROR_H
+#define	_IRAF_ERROR_H
+
 /* Error handling.
  */
-#ifndef	D_error
-#define	D_error
 
 #include <iraf/spp.h>
 
@@ -23,4 +24,4 @@ extern int c_errget ( char *, iraf_size_t );
 /* ../../../sys/libc/cerrcode.c */
 extern int c_errcode( void );
 
-#endif
+#endif	/* ! _IRAF_ERROR_H */

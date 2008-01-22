@@ -1,3 +1,6 @@
+#ifndef	_IRAF_KNAMES_H
+#define	_IRAF_KNAMES_H
+
 /*
  * KNAMES.H -- External names of the kernel procedures.  These are defined
  * because the trailing underscore is peculiar to this version of UNIX.
@@ -8,9 +11,6 @@
  * some of the names will have to be changed.  To change the external name
  * change the define given here.
  */
-
-#ifndef D_knames
-#define D_knames
 
 #include <iraf/spptypes.h>
 
@@ -831,4 +831,4 @@ extern int STRPAK ( XCHAR *, PKCHAR *, XINT * );
 extern int STRUPK ( PKCHAR *, XCHAR *, XINT * );
 
 
-#endif
+#endif	/* ! _IRAF_KNAMES_H */

@@ -1,10 +1,11 @@
+#ifndef	_IRAF_PRTYPE_H
+#define	_IRAF_PRTYPE_H
+
 /* Process control.
  */
-#ifndef D_prtype
-#define	D_prtype
 
 #define	PR_CONNECTED		1	/* types of processes		*/
 #define	PR_DETACHED		2
 #define	PR_HOST			3
 
-#endif
+#endif	/* ! _IRAF_PRTYPE_H */

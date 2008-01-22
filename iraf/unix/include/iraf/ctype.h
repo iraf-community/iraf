@@ -1,5 +1,5 @@
-#ifndef D_ctype
-#define D_ctype
+#ifndef	_IRAF_CTYPE_H
+#define	_IRAF_CTYPE_H
 
 #ifdef vms
 globalvalue   vms_ctype_defs;
@@ -7,7 +7,7 @@ globalvalue   vms_ctype_defs;
 extern	char	u_ctype_[];
 
 #ifndef NOLIBCNAMES
-#define	D_ctype_libcnames
+#define	_IRAF_CTYPE_LIBCNAMES
 
 #define	_U	01
 #define	_L	02
@@ -33,9 +33,9 @@ extern	char	u_ctype_[];
 #define tolower(c)	((c)-'A'+'a')
 #define toascii(c)	((c)&0177)
 
-#endif	/* NOLIBCNAMES */
+#endif	/* ! NOLIBCNAMES */
 
 #define	tointeg(c)	((c)-'0')
 #define	todigit(c)	((c)+'0')
 
-#endif
+#endif	/* ! _IRAF_CTYPE_H */
