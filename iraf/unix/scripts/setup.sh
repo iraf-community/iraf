@@ -182,26 +182,28 @@ set_config () {
 \$set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
 \$set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 
-\$special "sys\$osb/":		aclrb.c		host\$c.default/aclrb.c
-				bytmov.c	host\$c.default/bytmov.c
+\$special "sys\$osb/":		aclrb.c		host\$sys/aclrb.c
+				bytmov.c	host\$sys/bytmov.c
+				ieeer.x		host\$sys/ieeer.c
+				ieeed.x		host\$sys/ieeed.c
 				;
 
-\$special "sys\$vops/ak/":	aclrc.x		host\$c.default/aclrc.c
-				aclrs.x		host\$c.default/aclrs.c
-				aclri.x		host\$c.default/aclri.c
-				aclrl.x		host\$c.default/aclrl.c
-				aclrp.x		host\$c.default/aclrp.c
-				aclrr.x		host\$c.default/aclrr.c
-				aclrd.x		host\$c.default/aclrd.c
+\$special "sys\$vops/ak/":	aclrc.x		host\$sys/aclrc.c
+				aclrs.x		host\$sys/aclrs.c
+				aclri.x		host\$sys/aclri.c
+				aclrl.x		host\$sys/aclrl.c
+				aclrp.x		host\$sys/aclrp.c
+				aclrr.x		host\$sys/aclrr.c
+				aclrd.x		host\$sys/aclrd.c
 				;
 
-\$special "sys\$vops/lz/":	amovc.x		host\$c.default/amovc.c
-				amovs.x		host\$c.default/amovs.c
-				amovi.x		host\$c.default/amovi.c
-				amovl.x		host\$c.default/amovl.c
-				amovp.x		host\$c.default/amovp.c
-				amovr.x		host\$c.default/amovr.c
-				amovd.x		host\$c.default/amovd.c
+\$special "sys\$vops/lz/":	amovc.x		host\$sys/amovc.c
+				amovs.x		host\$sys/amovs.c
+				amovi.x		host\$sys/amovi.c
+				amovl.x		host\$sys/amovl.c
+				amovp.x		host\$sys/amovp.c
+				amovr.x		host\$sys/amovr.c
+				amovd.x		host\$sys/amovd.c
 				;
 
 \$set	XBIG	= '& "\$xc -c -w -/Nx512 -/Ns3072 &"'
