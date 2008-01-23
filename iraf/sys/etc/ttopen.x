@@ -47,7 +47,7 @@ procedure ttseti (fd, param, value)
 
 int	fd			# file descriptor
 int	param			# parameter to be set
-long	value			# new value
+int	value			# new value
 
 long	lvalue
 

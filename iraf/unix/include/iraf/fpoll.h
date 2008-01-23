@@ -35,6 +35,4 @@ struct _fpoll {
 
 #endif	/* ! NOLIBCNAMES */
 
-extern XINT ZFPOLL ( XINT *, XINT *, XINT *, XINT *, XINT * );
-
 #endif	/* ! _IRAF_FPOLL_H */

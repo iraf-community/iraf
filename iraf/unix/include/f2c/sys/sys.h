@@ -1,5 +1,6 @@
 #include <f2c.h>
 #include <iraf/knames.h>
+#include <iraf/xnames.h>
 /* libsys.a */
 #include "../../../../sys/fio/f2c_proto.h"
 #include "../../../../sys/fmio/f2c_proto.h"

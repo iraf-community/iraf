@@ -284,7 +284,7 @@ extern XLONG CPUTIME ( XLONG * );
 extern XINT ENVFIND ( XCHAR *, XCHAR *, XINT * );
 extern XINT ENVPUTS ( XCHAR *, XCHAR * );
 extern int ENVMARK ( XINT * );
-extern XINT ENVFREE ( XINT *, XINT * );
+extern XINT ENVFREE ( XINT *, XPOINTER * );
 /* ../../../sys/etc/envgets.x */
 extern XINT ENVGETS ( XCHAR *, XCHAR *, XINT * );
 /* ../../../sys/etc/envgetb.x */
@@ -308,7 +308,7 @@ extern XINT ERRGET ( XCHAR *, XINT * );
 /* ../../../sys/etc/error.x */
 extern int FATAL ( XINT *, XCHAR * );
 /* ../../../sys/fio/fchdir.x */
-extern void FCHDIR ( XCHAR * );
+extern int FCHDIR ( XCHAR * );
 /* ../../../sys/etc/prenvfree.x */
 extern XINT PRENVFREE ( XINT *, XINT * );
 /* ../../../sys/etc/prfilbuf.x */

@@ -1,4 +1,5 @@
 #include <f2c.h>
+#include <iraf/xnames.h>
 /* libex.a */
 #include "../../../../sys/gio/glabax/f2c_proto.h"
 #include "../../../../sys/gio/gki/f2c_proto.h"
