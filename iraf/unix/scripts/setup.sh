@@ -47,30 +47,65 @@ set_irafenv() {
   #XC_CFLAGS="-I$hinclude -Wall"
   #XC_FFLAGS="-Ns1602 -Nx512"
   #
-  # architecture-dependent settings
+  XC_LFLAGS=""
+  #
+  # Architecture-dependent settings
   #
   F=""
-  if [ "$ARCHITECTURE" = "i386" ]; then
+  case "$ARCHITECTURE" in
+  i386)
     F="$F -DI386"
-  elif [ "$ARCHITECTURE" = "x86_64" ]; then
+    ;;
+  x86_64)
     F="$F -DX86_64"
-  fi
+    ;;
+  *)
+    echo "[ERROR] Unknown Architecture: $ARCHITECTURE"
+    echo "To support new architecture, edit iraf/unix/scripts/setup.sh and"
+    echo "modify source files in iraf/unix/{os,sys,include/iraf} directories."
+    exit 1
+    ;;
+  esac
   #
-  if [ "$SPP_DATA_MODEL" = "ilp64" ]; then
-    F="$F -DSPP_ILP64"
-  elif [ "$SPP_DATA_MODEL" = "lp64" ]; then
+  if [ "$SPP_DATA_MODEL" = "lp64" ]; then
     F="$F -DSPP_LP64"
+  elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
+    F="$F -DSPP_ILP64"
   fi
   HSI_CF="$HSI_CF $F"
   XC_CFLAGS="$XC_CFLAGS $F"
   XC_FFLAGS="$XC_FFLAGS $F"
-  F=""
   #
   # OS-dependent settings
   #
-  if [ "$OPERATING_SYSTEM" = "linux" ]; then
+  case "$OPERATING_SYSTEM" in
+  linux)
     HSI_CF="$HSI_CF -DLINUX -DPOSIX -DSYSV"
-  fi
+    XC_LFLAGS="$XC_LFLAGS -Nz"
+    ;;
+  freebsd)
+    HSI_CF="$HSI_CF -DBSD"
+    XC_LFLAGS="$XC_LFLAGS -z -/static"
+    ;;
+  macosx)
+    HSI_CF="$HSI_CF -DMACOSX"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
+    ;;
+  solaris)
+    HSI_CF="$HSI_CF -DSOLARIS -DPOSIX -DSYSV"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
+    ;;
+  cygwin)
+    HSI_CF="$HSI_CF -DCYGWIN -DLINUX -DPOSIX -DSYSV"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
+    ;;
+  *)
+    echo "[ERROR] Unknown operating system: $OPERATING_SYSTEM"
+    echo "To support new operating system, edit iraf/unix/scripts/setup.sh and"
+    echo "modify source files in iraf/unix/{os,sys,include/iraf} directories."
+    exit 1
+    ;;
+  esac
   #
   if [ "$1" = "novos" ]; then
     HSI_CF="$HSI_CF -DNOVOS"
@@ -81,6 +116,7 @@ set_irafenv() {
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export mkzflags HSI_LIBS
   export XC_CFLAGS XC_FFLAGS
+  export XC_LFLAGS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -123,6 +159,15 @@ set_mach () {
     #
   fi
 
+  #         ILP32  LP64  LLP64 ILP64
+  # short    16     16    16    16
+  # int      32     32    32    64
+  # long     32     64    32    64
+  # pointer  32     64    64    64
+  #
+  # IRAF's default model is ILP32. Set LP64 for 64-bit OS.
+  # ILP64 is used for development only.
+
   if [ "$ARCHITECTURE" = "x86_64" ]; then
     #SPP_DATA_MODEL="lp64"
     SPP_DATA_MODEL="ilp64"
@@ -152,68 +197,7 @@ set_config () {
   #  exit 1
   #fi
 
-  # mkpkg.inc settings
-
-  LFLAGS="-Nz"
-  #if [ "$OPERATING_SYSTEM" = "freebsd" ]; then
-  #  LFLAGS="-z -/static"
-  #fi
-
-  cat <<EOF > ${hconfig}mkpkg.inc
-# Global (possibly system dependent) definitions for MKPKG.
-
-\$verbose
-
-\$set	MACH		= \$(IRAFARCH)	# machine/fpu type
-\$set	HOSTID		= unix		# host system name
-\$set	SITEID		= noao		# site name
-
-\$set	XFLAGS		= "-c"		# default XC compile flags
-\$set	XVFLAGS		= "-c"		# VOPS XC compile flags
-\$set	LFLAGS		= "$LFLAGS"		# default XC link flags
-
-\$set	USE_LIBMAIN	= yes		# update lib\$libmain.o (root object)
-\$set	USE_KNET	= yes		# use the KI (network interface)
-\$set	USE_SHLIB	= no		# use (update) the shared library
-\$set	USE_CCOMPILER	= yes		# use the C compiler
-\$set	USE_GENERIC	= yes		# use the generic preprocessor
-\$set	USE_NSPP	= no		# make the NCAR/NSPP graphics kernel
-\$set	USE_IIS         = no		# make the IIS display control package
-\$set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
-\$set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
-
-\$special "sys\$osb/":		aclrb.c		host\$sys/aclrb.c
-				bytmov.c	host\$sys/bytmov.c
-				ieeer.x		host\$sys/ieeer.c
-				ieeed.x		host\$sys/ieeed.c
-				;
-
-\$special "sys\$vops/ak/":	aclrc.x		host\$sys/aclrc.c
-				aclrs.x		host\$sys/aclrs.c
-				aclri.x		host\$sys/aclri.c
-				aclrl.x		host\$sys/aclrl.c
-				aclrp.x		host\$sys/aclrp.c
-				aclrr.x		host\$sys/aclrr.c
-				aclrd.x		host\$sys/aclrd.c
-				;
-
-\$special "sys\$vops/lz/":	amovc.x		host\$sys/amovc.c
-				amovs.x		host\$sys/amovs.c
-				amovi.x		host\$sys/amovi.c
-				amovl.x		host\$sys/amovl.c
-				amovp.x		host\$sys/amovp.c
-				amovr.x		host\$sys/amovr.c
-				amovd.x		host\$sys/amovd.c
-				;
-
-\$set	XBIG	= '& "\$xc -c -w -/Nx512 -/Ns3072 &"'
-\$special "sys\$fmtio/":		evvexpr.x	\$(XBIG)	;
-
-\$set    XNL     = '& "\$xc -c -/NL400 &"'
-\$special "math\$slalib/":        obs.f           \$(XNL)  ;
-
-EOF
-
+  return
 }
 
 ########################################################################
@@ -237,6 +221,7 @@ HSI_LF      = $HSI_LF
 HSI_F77LIBS = $HSI_F77LIBS
 RANLIB      = $RANLIB
 HSI_LIBS    = $HSI_LIBS
+XC_LFLAGS   = $XC_LFLAGS
 $ARG_ADDITIONAL_DEFS
 
 EOF
@@ -331,6 +316,36 @@ case "$COMMAND" in
   #
   output_makefile iraf/unix/include makefile.in
   #
+  F="iraf/unix/config/Makefile"
+  D="DEFS ="
+  cat <<EOF | cpp -P $HSI_CF > $F 
+#include <iraf/endian.h>
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+X_MARK_X foo;
+#endif
+EOF
+  S=$?
+  if [ ! $S = 0 ]; then
+    exit $S
+  fi
+  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    D="$D -DBYTE_LITTLE"
+  fi
+  cat <<EOF | cpp -P $HSI_CF > $F
+#include <iraf/endian.h>
+#if __FLOAT_WORD_ORDER == __LITTLE_ENDIAN
+X_MARK_X foo;
+#endif
+EOF
+  S=$?
+  if [ ! $S = 0 ]; then
+    exit $S
+  fi
+  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    D="$D -DFLOAT_LITTLE"
+  fi
+  output_makefile iraf/unix/config makefile.in "$D"
+  #
   # F2C
   #F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
@@ -367,36 +382,6 @@ case "$COMMAND" in
   output_makefile iraf/unix/boot/spp/rpp makefile.in
   output_makefile iraf/unix/boot/xyacc makefile.in
   output_makefile iraf/unix/gdev/sgidev makefile.in
-  #
-  F="iraf/unix/config/Makefile"
-  D="DEFS ="
-  cat <<EOF | cpp -P $HSI_CF > $F 
-#include <iraf/endian.h>
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-X_MARK_X foo;
-#endif
-EOF
-  S=$?
-  if [ ! $S = 0 ]; then
-    exit $S
-  fi
-  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
-    D="$D -DBYTE_LITTLE"
-  fi
-  cat <<EOF | cpp -P $HSI_CF > $F
-#include <iraf/endian.h>
-#if __FLOAT_WORD_ORDER == __LITTLE_ENDIAN
-X_MARK_X foo;
-#endif
-EOF
-  S=$?
-  if [ ! $S = 0 ]; then
-    exit $S
-  fi
-  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
-    D="$D -DFLOAT_LITTLE"
-  fi
-  output_makefile iraf/unix/config makefile.in "$D"
   #
   ;;
 

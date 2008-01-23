@@ -1,5 +1,5 @@
 
-all:	iraf.h mach.h
+all:	iraf.h mach.h mkpkg.inc
 
 iraf.h::
 	rm -f iraf.h
@@ -9,5 +9,9 @@ mach.h::
 	rm -f mach.h
 	cpp -traditional-cpp -undef -P $(HSI_CF) $(DEFS) mach.h.in | tr ';' '#' > mach.h
 
+mkpkg.inc::
+	rm -f mkpkg.inc
+	cat mkpkg.inc.in | sed -e "s|@LFLAGS@|$(XC_LFLAGS)|" > mkpkg.inc
+
 clean::
-	rm -f iraf.h mach.h
+	rm -f iraf.h mach.h mkpkg.inc

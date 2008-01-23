@@ -78,6 +78,7 @@ clean_f2c::
 	rm -f iraf/unix/bin/f2c.e
 	make -C iraf/unix/f2c/libf2c clean
 	rm -f iraf/unix/lib/libf2c.a
+	find iraf/unix/f2c -type l -exec rm -f {} \;
 
 clean_unix::
 	make -C iraf/unix/include clean
@@ -96,27 +97,39 @@ clean_unix::
 	make -C iraf/unix/boot/xyacc clean
 	make -C iraf/unix/gdev/sgidev clean
 	rm -f iraf/unix/config/mkpkg.inc
+	find iraf/unix/include -type l -exec rm -f {} \;
+	find iraf/unix/config -type l -exec rm -f {} \;
+	find iraf/unix/os -type l -exec rm -f {} \;
+	find iraf/unix/boot -type l -exec rm -f {} \;
+	find iraf/unix/gdev -type l -exec rm -f {} \;
 
 clean_iraf::
+	find iraf/bin -type l -exec rm -f {} \;
 	find iraf/bin -name '*.e' -exec rm -f {} \;
+	find iraf/lib -type l -exec rm -f {} \;
 	find iraf/lib -name '*.a' -exec rm -f {} \;
 	find iraf/lib -name '*.o' -exec rm -f {} \;
+	find iraf/math -type l -exec rm -f {} \;
 	find iraf/math -name '*.a' -exec rm -f {} \;
 	find iraf/math -name '*.e' -exec rm -f {} \;
 	find iraf/math -name '*.o' -exec rm -f {} \;
+	find iraf/pkg -type l -exec rm -f {} \;
 	find iraf/pkg -name '*.a' -exec rm -f {} \;
 	find iraf/pkg -name '*.e' -exec rm -f {} \;
 	find iraf/pkg -name '*.o' -exec rm -f {} \;
+	find iraf/sys -type l -exec rm -f {} \;
 	find iraf/sys -name '*.a' -exec rm -f {} \;
 	find iraf/sys -name '*.e' -exec rm -f {} \;
 	find iraf/sys -name '*.o' -exec rm -f {} \;
 
 clean_tables::
+	find iraf/tables -type l -exec rm -f {} \;
 	find iraf/tables -name '*.a' -exec rm -f {} \;
 	find iraf/tables -name '*.e' -exec rm -f {} \;
 	find iraf/tables -name '*.o' -exec rm -f {} \;
 
 clean_noao::
+	find iraf/noao -type l -exec rm -f {} \;
 	find iraf/noao -name '*.a' -exec rm -f {} \;
 	find iraf/noao -name '*.e' -exec rm -f {} \;
 	find iraf/noao -name '*.o' -exec rm -f {} \;

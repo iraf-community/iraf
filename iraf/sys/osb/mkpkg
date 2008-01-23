@@ -29,9 +29,9 @@ libvops.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 
 	# The following contain machine dependent constants.
-	hconfig$i1mach.f
-	hconfig$d1mach.f
-	hconfig$r1mach.f
+	host$sys/i1mach.f
+	host$sys/d1mach.f
+	host$sys/r1mach.f
 
 	# The following should normally be optimized in assembler (see the
 	# special file list in "hconfig$mkpkg.sf").
