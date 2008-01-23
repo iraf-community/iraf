@@ -116,7 +116,6 @@ set_irafenv() {
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export mkzflags HSI_LIBS
   export XC_CFLAGS XC_FFLAGS
-  export XC_LFLAGS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -165,12 +164,12 @@ set_mach () {
   # long     32     64    32    64
   # pointer  32     64    64    64
   #
-  # IRAF's default model is ILP32. Set LP64 for 64-bit OS.
+  # IRAF's default data model of SPP is ILP32. Set LP64 for 64-bit OS.
   # ILP64 is used for development only.
 
   if [ "$ARCHITECTURE" = "x86_64" ]; then
-    #SPP_DATA_MODEL="lp64"
-    SPP_DATA_MODEL="ilp64"
+    SPP_DATA_MODEL="lp64"
+    #SPP_DATA_MODEL="ilp64"
   else
     SPP_DATA_MODEL="ilp32"
   fi
