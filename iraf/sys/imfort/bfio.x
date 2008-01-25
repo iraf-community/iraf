@@ -68,7 +68,7 @@ define	WRITE		1
 
 # BFOPEN -- Fortran callable version of BFOPNX.
 
-int procedure bfopen (fname, acmode, advice)
+pointer procedure bfopen (fname, acmode, advice)
 
 %	character*(*) fname
 int	acmode			# SPP access mode, as in FIO

@@ -33,7 +33,8 @@ pointer	sp, title, boundary, im, x_vec, y_vec, pp
 real	x1, y1, x2, y2, zmin, zmax, bconstant
 
 bool	fp_equalr()
-int	clgpseti(), clgwrd(), clopset()
+int	clgpseti(), clgwrd()
+pointer	clopset()
 real	clgpsetr()
 pointer	ie_gimage()
 errchk	malloc

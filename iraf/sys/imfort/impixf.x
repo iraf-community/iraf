@@ -16,10 +16,10 @@ include	"imfort.h"
 # in the future if the image storage format changes, e.g., if an IMFORT
 # interface is implemented for some storage format other than OIF.
 
-procedure impixf (im, pixfd, pixfil, pixoff, szline, ier)
+procedure impixf (im, pixfp, pixfil, pixoff, szline, ier)
 
 pointer	im			# image descriptor
-int	pixfd			# receives BFIO file descriptor of pixel file
+pointer	pixfp			# receives file pointer of pixel file
 %	character*(*) pixfil
 int	pixoff			# one-indexed char offset to the pixels
 int	szline			# nchars used to store each image line
@@ -41,7 +41,7 @@ begin
 	    ip = osfn + stridxs ("!", Memc[osfn])
 	    call f77pak (Memc[ip], pixfil, len(pixfil))
 
-	    pixfd  = IM_PIXFP(im)
+	    pixfp  = IM_PIXFP(im)
 	    pixoff = IM_PIXOFF(im)
 	    szline = IM_LINESIZE(im)
 	    ier = OK

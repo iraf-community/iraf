@@ -41,22 +41,22 @@ define	IS_RIGHTD	(($1) >=  MAX_DOUBLE)
 # to allow use of absolute pointers to reference structures within the buffers.
 
 define	LEN_EXDES	16
-define	EX_QP		Memi[P2I($1)]	# back pointer to QPOE descriptor
+define	EX_QP		Memp[$1]	# back pointer to QPOE descriptor
 define	EX_DEBUG	Memi[P2I($1+1)]	# debug level
-define	EX_START	Memi[P2I($1+2)]	# pointer to first instruction
-define	EX_PB		Memi[P2I($1+3)]	# pointer to program buffer (int)
-define	EX_PBTOP	Memi[P2I($1+4)]	# pointer to top+1 of pb
-define	EX_PBOP		Memi[P2I($1+5)]	# pointer to next avail. cell in pb
-define	EX_DB		Memi[P2I($1+6)]	# data buffer pointer (char)
-define	EX_DBTOP	Memi[P2I($1+7)]	# pointer to top+1 of db
-define	EX_DBOP		Memi[P2I($1+8)]	# pointer to next avail. cell in db
+define	EX_START	Memp[$1+2]	# pointer to first instruction
+define	EX_PB		Memp[$1+3]	# pointer to program buffer (int)
+define	EX_PBTOP	Memp[$1+4]	# pointer to top+1 of pb
+define	EX_PBOP		Memp[$1+5]	# pointer to next avail. cell in pb
+define	EX_DB		Memp[$1+6]	# data buffer pointer (char)
+define	EX_DBTOP	Memp[$1+7]	# pointer to top+1 of db
+define	EX_DBOP		Memp[$1+8]	# pointer to next avail. cell in db
 define	EX_MAXFRLUTLEN	Memi[P2I($1+9)]	# max full-res lut length
 define	EX_MAXRRLUTLEN	Memi[P2I($1+10)]	# max reduced-res lut length
 define	EX_LUTMINRANGES	Memi[P2I($1+11)]	# min ranges required for a LUT
 define	EX_LUTSCALE	Memi[P2I($1+12)]	# scale nranges to frlutlen
-define	EX_ETHEAD	Memi[P2I($1+13)]	# offset of first expr term descriptor
-define	EX_ETTAIL	Memi[P2I($1+14)]	# offset of last expr term descriptor
-define	EX_LTHEAD	Memi[P2I($1+15)]	# offset of first LUT descriptor
+define	EX_ETHEAD	Memp[$1+13]	# offset of first expr term descriptor
+define	EX_ETTAIL	Memp[$1+14]	# offset of last expr term descriptor
+define	EX_LTHEAD	Memp[$1+15]	# offset of first LUT descriptor
 
 # Expression terms descriptor.  Stored in the data buffer and maintained
 # as a linked list.
@@ -64,7 +64,7 @@ define	EX_LTHEAD	Memi[P2I($1+15)]	# offset of first LUT descriptor
 define	LEN_ETDES	9
 define	ET_ATTTYPE	Memi[P2I($1)]	# datatype of attribute
 define	ET_ATTOFF	Memi[P2I($1+1)]	# *typed* offset of attribute
-define	ET_PROGPTR	Memi[P2I($1+2)]	# pointer to program segment 
+define	ET_PROGPTR	Memp[$1+2]	# pointer to program segment 
 define	ET_NINSTR	Memi[P2I($1+3)]	# program segment size, instructions
 define	ET_DELETED	Memi[P2I($1+4)]	# set if term is deleted
 define	ET_ATNAME	Memi[P2I($1+5)]	# attribute name used in expr
@@ -76,9 +76,9 @@ define	ET_NEXT		Memi[P2I($1+8)]	# databuf offset of next ET struct
 # linked list.  The table itself is separately allocated.
 
 define	LEN_LTDES	10
-define	LT_NEXT		Memi[P2I($1)]	# pointer to next stored LUT
+define	LT_NEXT		Memp[$1]	# pointer to next stored LUT
 define	LT_TYPE		Memi[P2I($1+1)]	# TY_SHORT pointer to stored LUT
-define	LT_LUTP		Memi[P2I($1+2)]	# TY_SHORT pointer to stored LUT
+define	LT_LUTP		Memp[$1+2]	# TY_SHORT pointer to stored LUT
 define	LT_NBINS	Memi[P2I($1+3)]	# number of lookup table entries
 define	LT_LEFT		Memi[P2I($1+4)]	# lut value if index off left end
 define	LT_RIGHT	Memi[P2I($1+5)]	# lut value if index off right end

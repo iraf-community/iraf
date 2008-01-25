@@ -16,8 +16,8 @@ define	WO		2		# write only
 define	RW		3		# read write
 define	NF		5		# new file
 
-define	IM_HDRFP	Memi[P2I($1)]	# header file descriptor
-define	IM_PIXFP	Memi[P2I($1+1)]	# pixel file descriptor
+define	IM_HDRFP	Memp[$1]	# header file descriptor
+define	IM_PIXFP	Memp[$1+1]	# pixel file descriptor
 define	IM_ACMODE	Memi[P2I($1+2)]	# image access mode
 define	IM_UPDATE	Memi[P2I($1+3)]	# need to update image header on disk
 define	IM_LINESIZE	Memi[P2I($1+4)]	# image physical line length, chars

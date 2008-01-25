@@ -8,7 +8,7 @@ pointer procedure msvfwa (fwa, dtype, sz_align, fwa_align)
 
 int	fwa, dtype, sz_align, fwa_align
 pointer	bufptr, mgdptr()
-int	coerce()
+pointer	coerce()
 
 begin
 	# Compute the pointer to the data area which satisfies the desired

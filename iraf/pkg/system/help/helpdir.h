@@ -12,7 +12,7 @@ define	LEN_MODSTRUCT	6
 
 # Helpdir descriptor structure.
 
-define	HD_SBUF		Memi[P2I($1)]		# string buffer
+define	HD_SBUF		Memp[$1]		# string buffer
 define	HD_NEXTCH	Memi[P2I($1+1)]		# index of next char in sbuf
 define	HD_SZSBUF	Memi[P2I($1+2)]		# size of string buffer
 define	HD_DEFDIR	Memi[P2I($1+3)]		# offset to defdir

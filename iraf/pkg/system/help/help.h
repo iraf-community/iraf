@@ -15,7 +15,7 @@ define	SZ_HELPDB	1024		# max chars in helpdb file list
 define	H_IN		Memi[P2I($1)]	# input file descriptor
 define	H_OUT		Memi[P2I($1+1)]	# output file descriptor
 define	H_OPTION	Memi[P2I($1+2)]	# option code (see below)
-define	H_TTY		Memi[P2I($1+3)]	# TTY device descriptor
+define	H_TTY		Memp[$1+3]	# TTY device descriptor
 define	H_LMARGIN	Memi[P2I($1+4)]	# permanent left margin for Lroff
 define	H_RMARGIN	Memi[P2I($1+5)]	# permanent right margin for Lroff
 define	H_RAWIN		Memi[P2I($1+6)]	# if YES, do not look at input

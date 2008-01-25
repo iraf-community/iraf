@@ -13,7 +13,7 @@ int procedure mgtfwa (ptr, dtype)
 pointer	ptr, bufptr
 int	dtype
 int	locbuf, fwa
-int	coerce()
+pointer	coerce()
 
 begin
 	bufptr = coerce (ptr, dtype, TY_INT)

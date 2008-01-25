@@ -20,7 +20,8 @@ int	naxis			#I number of axes
 int	pixtype			#I pixel type
 int	ier			#O receives error status
 
-int	fp, status, ip, i
+pointer	fp
+int	status, ip, i
 long	pfsize, clktime, cputime
 pointer	sp, hdrfile, pixfile, osfn, root, extn, sval, im
 

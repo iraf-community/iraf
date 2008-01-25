@@ -9,13 +9,13 @@ define	IE_SZFNAME	99			# length of file name
 define	IE_SZFORMAT	9			# length of format strings
 define	IE_SZTITLE	512			# length of multiline title
  
-define	IE_IM		Memi[P2I($1)]		# IMIO pointer
-define	IE_MW		Memi[P2I($1+1)]		# MWCS pointer
-define	IE_CTLW		Memi[P2I($1+2)]		# CT-MWCS pointer (L -> W)
-define	IE_CTWL		Memi[P2I($1+3)]		# CT-MWCS pointer (W -> L)
-define	IE_DS		Memi[P2I($1+4)]		# display frame pointer
-define	IE_GP		Memi[P2I($1+5)]		# GIO pointer
-define	IE_PP		Memi[P2I($1+6)]		# pset pointer
+define	IE_IM		Memp[$1]		# IMIO pointer
+define	IE_MW		Memp[$1+1]		# MWCS pointer
+define	IE_CTLW		Memp[$1+2]		# CT-MWCS pointer (L -> W)
+define	IE_CTWL		Memp[$1+3]		# CT-MWCS pointer (W -> L)
+define	IE_DS		Memp[$1+4]		# display frame pointer
+define	IE_GP		Memp[$1+5]		# GIO pointer
+define	IE_PP		Memp[$1+6]		# pset pointer
 define	IE_LIST		Memi[P2I($1+7)]		# image list
 define	IE_LISTLEN	Memi[P2I($1+8)]		# number of images in list
 define	IE_USEDISPLAY	Memi[P2I($1+9)]		# use image display?
