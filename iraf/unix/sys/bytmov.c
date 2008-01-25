@@ -11,14 +11,16 @@
  * few bytes, hence comparison of the addresses of the arrays is necessary
  * to determine if they overlap.
  */
-/* a      : input byte array			*/
+/* arg_a  : input byte array			*/
 /* aoff   : first byte in A to be moved		*/
-/* b      : output byte array			*/
+/* arg_b  : output byte array			*/
 /* boff   : first byte in B to be written	*/
 /* nbytes : number of bytes to move		*/
-int BYTMOV ( XCHAR *a, XINT *aoff, XCHAR *b, XINT *boff, XINT *nbytes )
+int BYTMOV ( void *arg_a, XINT *aoff, void *arg_b, XINT *boff, XINT *nbytes )
 {
+	char *a = (char *)arg_a;
+	char *b = (char *)arg_b;
 	if ((a + *aoff) != (b + *boff))
-	    memmove ((char *)b + (*boff-1), (char *)a + (*aoff-1), *nbytes);
+	    memmove (b + (*boff-1), a + (*aoff-1), *nbytes);
 	return 0;
 }

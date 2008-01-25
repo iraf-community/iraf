@@ -5,17 +5,25 @@
 #define import_knames
 #include <iraf.h>
 
-/* ACHTB_ -- Unpack an unsigned byte array into an SPP array.
- * The loop runs in the reverse direction so that the unpack can be
- * performed in place (a and b can be the same array).
+/* ACHTBB -- Unpack an unsigned byte array into an SPP array.
  */
-int ACHTBB ( XCHAR *a, XCHAR *b, XINT *npix )
+int ACHTBB ( XUBYTE *a, XUBYTE *b, XINT *npix )
 {
-	XUBYTE *ip, *first = (XUBYTE *)a;
+	XUBYTE *ip;
 	XUBYTE *op;
 
-	for (ip = &first[*npix], op = &((XUBYTE *)b)[*npix];  ip > first;  )
-		*--op = *--ip;
+	if ( a < b ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = *ip;
+	    }
+	}
+	else {
+	    XUBYTE *maxop = b + *npix -1;
+	    for ( ip = a, op = b ; op <= maxop ; ip++, op++ ) {
+		*op = *ip;
+	    }
+	}
 
 	return 0;
 }

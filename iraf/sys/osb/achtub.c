@@ -5,17 +5,25 @@
 #define import_knames
 #include <iraf.h>
 
-/* ACHT_B -- Pack SPP array into an unsigned byte array.
+/* ACHTU_ -- Unpack an unsigned short integer array into an SPP datatype.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-int ACHTUB ( XUSHORT *a, XCHAR *b, XINT *npix )
+int ACHTUB ( XUSHORT *a, XUBYTE *b, XINT *npix )
 {
 	XUSHORT *ip;
-	XUBYTE *op, *maxop;
+	XUBYTE *op;
 
-	maxop = (XUBYTE *)b + *npix -1;
-	for ( ip=(XUSHORT *)a, op=(XUBYTE *)b ; op <= maxop ; )
-		*op++ = *ip++;
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = *ip;
+	    }
+	} else {
+	    XUBYTE *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+		*op = *ip;
+	    }
+	}
 
 	return 0;
 }

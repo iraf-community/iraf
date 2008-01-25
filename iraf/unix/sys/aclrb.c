@@ -8,8 +8,8 @@
 
 /* ACLRB -- Clear a block of memory.
  */
-int ACLRB ( XCHAR *a, XINT *n )
+int ACLRB ( void *a, XINT *n )
 {
-	memset ((char *)a, 0, *n);
+	memset (a, 0, *n);
 	return 0;
 }

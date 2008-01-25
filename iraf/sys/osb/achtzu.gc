@@ -11,23 +11,26 @@
 int ACHT$TU ( XPIXEL *a, XUSHORT *b, XINT *npix )
 {
 	XPIXEL *ip;
-	XUSHORT *op, *maxop;
+	XUSHORT *op;
 
-	if (sizeof(*op) > sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		$if (datatype == x)
-		    *--op = (int) (--ip)->r;
-		$else
-		    *--op = *--ip;
-		$endif
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+	    $if (datatype == x)
+		*op = (XUSHORT) (ip->r);
+	    $else
+		*op = *ip;
+	    $endif
+	    }
 	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		$if (datatype == x)
-		    *op++ = (int) (ip++)->r;
-		$else
-		    *op++ = *ip++;
-		$endif
+	    XUSHORT *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+	    $if (datatype == x)
+		*op = (XUSHORT) (ip->r);
+	    $else
+		*op = *ip;
+	    $endif
+	    }
 	}
 
 	return 0;

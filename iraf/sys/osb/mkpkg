@@ -7,15 +7,14 @@ $exit
 
 generic:
 	# Convert the generic files into typed files.
-	$set GFLAGS = "-k -t UBcsilrdx"
 	$ifolder (achtiu.c, achtzu.gc)
-	    $generic $(GFLAGS) achtzu.gc -o acht\$$tu.c		$endif
+	    $generic -k -t Bcsilrdx achtzu.gc -o acht\$$tu.c		$endif
 	$ifolder (achtib.c, achtzb.gc)
-	    $generic $(GFLAGS) achtzb.gc -o acht\$$tb.c		$endif
+	    $generic -k -t Ucsilrdx achtzb.gc -o acht\$$tb.c		$endif
 	$ifolder (achtui.c, achtu.gc)
-	    $generic $(GFLAGS) achtu.gc				$endif
+	    $generic -k -t Bcsilrdx achtu.gc				$endif
 	$ifolder (achtbi.c, achtb.gc)
-	    $generic $(GFLAGS) achtb.gc				$endif
+	    $generic -k -t Ucsilrdx achtb.gc				$endif
 	$ifolder (ieeer.x, ieee.gx)
 	    $generic -k -t rd ieee.gx				$endif
 	;
@@ -86,6 +85,10 @@ libvops.a:
 	achtux.c
 	achtxb.c
 	achtxu.c
+	achtbp.c
+	achtpb.c
+	achtpu.c
+	achtup.c
 	and.c
 	not.c
 	or.c
@@ -120,19 +123,19 @@ libvops.a:
 	ieeed.x
 	miilen.x	<mach.h>
 	miinelem.x	<mach.h>
-	miipak.x	<mii.h>
-	miipak16.x	<mach.h>
-	miipak32.x	<mach.h>
-	miipak8.x	
-	miipakd.x	<mach.h>
-	miipakr.x	<mach.h>
+	miipak.c	
+	miipak16.c	
+	miipak32.c	
+	miipak8.c	
+	miipakd.c	
+	miipakr.c	
 	miipksize.x	<mach.h>
-	miiupk.x	<mii.h>
-	miiupk16.x	<mach.h>
-	miiupk32.x	<mach.h>
-	miiupk8.x	
-	miiupkd.x	<mach.h>
-	miiupkr.x	<mach.h>
+	miiupk.c	
+	miiupk16.c	
+	miiupk32.c	
+	miiupk8.c	
+	miiupkd.c	
+	miiupkr.c	
 
 	f77pak.f
 	f77upk.f

@@ -11,15 +11,18 @@
 int ACHTUS ( XUSHORT *a, XSHORT *b, XINT *npix )
 {
 	XUSHORT *ip;
-	XSHORT *op, *maxop;
+	XSHORT *op;
 
-	if (sizeof(*op) >= sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		    *--op = *--ip;
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = *ip;
+	    }
 	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		    *op++ = *ip++;
+	    XSHORT *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+		*op = *ip;
+	    }
 	}
 
 	return 0;

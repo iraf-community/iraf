@@ -5,21 +5,24 @@
 #define import_knames
 #include <iraf.h>
 
-/* ACHTU_ -- Unpack an unsigned short integer array into an SPP datatype.
- * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
+/* ACHTUU -- Unpack an unsigned short integer array into an SPP datatype.
  */
 int ACHTUU ( XUSHORT *a, XUSHORT *b, XINT *npix )
 {
 	XUSHORT *ip;
-	XUSHORT *op, *maxop;
+	XUSHORT *op;
 
-	if (sizeof(*op) >= sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		    *--op = *--ip;
-	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		    *op++ = *ip++;
+	if ( a < b ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = *ip;
+	    }
+	}
+	else {
+	    XUSHORT *maxop = b + *npix -1;
+	    for ( ip = a, op = b ; op <= maxop ; ip++, op++ ) {
+		*op = *ip;
+	    }
 	}
 
 	return 0;

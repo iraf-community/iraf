@@ -186,6 +186,21 @@ libvops.a:
 	achtxr.x	
 	achtxs.x	
 	achtxx.x	
+	achtcp.c	
+	achtsp.c	
+	achtip.c	
+	achtdp.c	
+	achtpp.c	
+	achtpx.c	
+	achtpi.c	
+	achtlp.c	
+	achtpr.c	
+	achtpc.c	
+	achtrp.c	
+	achtps.c	
+	achtpd.c	
+	achtpl.c	
+	achtxp.c	
 	acjgx.x	
 	aclrc.x	
 	aclrd.x	

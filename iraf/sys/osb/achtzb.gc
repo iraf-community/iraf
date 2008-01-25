@@ -8,22 +8,19 @@
 /* ACHT_B -- Pack SPP array into an unsigned byte array.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-$if (datatype == B)
-int ACHT$TB ( XCHAR *a, XCHAR *b, XINT *npix )
-$else
-int ACHT$TB ( XPIXEL *a, XCHAR *b, XINT *npix )
-$endif
+int ACHT$TB ( XPIXEL *a, XUBYTE *b, XINT *npix )
 {
 	XPIXEL *ip;
 	XUBYTE *op, *maxop;
 
-	maxop = (XUBYTE *)b + *npix -1;
-	for ( ip=(XPIXEL *)a, op=(XUBYTE *)b ; op <= maxop ; )
-	    $if (datatype == x)
-		*op++ = (int) (ip++)->r;
-	    $else
-		*op++ = *ip++;
-	    $endif
+	maxop = b + *npix -1;
+	for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+	$if (datatype == x)
+	    *op = (XUBYTE) ip->r;
+	$else
+	    *op = *ip;
+	$endif
+	}
 
 	return 0;
 }

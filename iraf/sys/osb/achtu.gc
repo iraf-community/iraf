@@ -11,23 +11,28 @@
 int ACHTU$T ( XUSHORT *a, XPIXEL *b, XINT *npix )
 {
 	XUSHORT *ip;
-	XPIXEL *op, *maxop;
+	XPIXEL *op;
 
-	if (sizeof(*op) >= sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		$if (datatype == x)
-		    (--op)->r = (float) *--ip;
-		$else
-		    *--op = *--ip;
-		$endif
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+	    $if (datatype == x)
+		op->r = (float) *ip;
+		op->i = 0;
+	    $else
+		*op = *ip;
+	    $endif
+	    }
 	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		$if (datatype == x)
-		    (op++)->r = (float) *ip++;
-		$else
-		    *op++ = *ip++;
-		$endif
+	    XPIXEL *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+	    $if (datatype == x)
+		op->r = (float) *ip;
+		op->i = 0;
+	    $else
+		*op = *ip;
+	    $endif
+	    }
 	}
 
 	return 0;

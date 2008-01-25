@@ -13,13 +13,11 @@
 #define	XINT		int
 #define	XBOOL		int
 #define	XLONG		long int
-#define	XSTRUCT		long int
 #define	XPOINTER	long int
 #else	/* ILP64 */
 #define	XINT		long int
 #define	XBOOL		long int
 #define	XLONG		long int
-#define	XSTRUCT		long int
 #define	XPOINTER	long int
 #endif
 
@@ -28,7 +26,6 @@
 #define	XINT		int
 #define	XBOOL		int
 #define	XLONG		int
-#define	XSTRUCT		int
 #define	XPOINTER	int
 
 #endif
@@ -41,6 +38,8 @@
 #define	XREAL		float
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
+
+#define	XSTRUCT		XPOINTER
 
 #define	XSIZE_T		XLONG
 

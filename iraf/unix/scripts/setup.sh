@@ -59,6 +59,12 @@ set_irafenv() {
   x86_64)
     F="$F -DX86_64"
     ;;
+  powerpc)
+    F="$F -DPOWERPC"
+    ;;
+  sparc)
+    F="$F -DSPARC"
+    ;;
   *)
     echo "[ERROR] Unknown Architecture: $ARCHITECTURE"
     echo "To support new architecture, edit iraf/unix/scripts/setup.sh and"
@@ -87,11 +93,11 @@ set_irafenv() {
     HSI_CF="$HSI_CF -DBSD"
     XC_LFLAGS="$XC_LFLAGS -z -/static"
     ;;
-  macosx)
+  darwin)
     HSI_CF="$HSI_CF -DMACOSX"
     XC_LFLAGS="$XC_LFLAGS -Nz"
     ;;
-  solaris)
+  sunos)
     HSI_CF="$HSI_CF -DSOLARIS -DPOSIX -DSYSV"
     XC_LFLAGS="$XC_LFLAGS -Nz"
     ;;
@@ -145,8 +151,11 @@ set_mach () {
   
   if [ "$ARG_MACH" = "auto" ]; then
     #
-    UNAME_M="`uname -m | tr 'A-Z' 'a-z'`"
-    ARCHITECTURE="`echo $UNAME_M | sed -e 's/^i[3456]86$/i386/'`"
+    UNAME_P="`uname -p | tr 'A-Z' 'a-z'`"
+    if [ "$UNAME_P" = "unknown" -o "$UNAME_P" = "" ]; then
+      UNAME_P="`uname -m | tr 'A-Z' 'a-z'`"
+    fi
+    ARCHITECTURE="`echo $UNAME_P | sed -e 's/^i[3456]86$/i386/' -e 's/\(^cygwin\)\(_.*\)/\1/'`"
     OPERATING_SYSTEM="`uname -s | tr 'A-Z' 'a-z'`"
     VENDOR="generic"
     #

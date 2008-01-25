@@ -12,14 +12,15 @@ $checkin  libvops.a lib$
 $exit
 
 libvops.a:
-	acht.x
-	achtb.x
-	achtc.x
-	achtd.x
-	achti.x
-	achtl.x
-	achtr.x
-	achts.x
-	achtu.x
-	achtx.x
+	acht.c
+	achtb.c
+	achtc.c
+	achtd.c
+	achti.c
+	achtl.c
+	achtp.c
+	achtr.c
+	achts.c
+	achtu.c
+	achtx.c
 	;

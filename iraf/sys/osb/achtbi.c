@@ -9,13 +9,15 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-int ACHTBI ( XCHAR *a, XINT *b, XINT *npix )
+int ACHTBI ( XUBYTE *a, XINT *b, XINT *npix )
 {
-	XUBYTE *ip, *first = (XUBYTE *)a;
+	XUBYTE *ip;
 	XINT *op;
 
-	for (ip = &first[*npix], op = &((XINT *)b)[*npix];  ip > first;  )
-		*--op = *--ip;
+	for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+	    --op; --ip;
+	    *op = *ip;
+	}
 
 	return 0;
 }

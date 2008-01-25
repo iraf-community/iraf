@@ -17,7 +17,7 @@
 #define	EPSILON		(1.192e-7)	/* smallest real E s.t. (1.0+E > 1.0) */
 #define EPSILOND	(2.220d-16)	/* double precision epsilon */
 #if defined(SPP_LP64) || defined(SPP_ILP64)
-#define	MAX_LONG	9223372036854775807
+#define	MAX_LONG	9223372036854775807L
 #else
 #define	MAX_LONG	2147483647
 #endif
@@ -28,10 +28,10 @@
 #if defined(SPP_LP64) || defined(SPP_ILP64)
 #ifdef SPP_LP64
 #define	INDEFI		(0x80000001)
-#define	INDEFL		(0x8000000000000001)
+#define	INDEFL		(0x8000000000000001L)
 #else	/* ILP64 */
-#define	INDEFI		(0x8000000000000001)
-#define	INDEFL		(0x8000000000000001)
+#define	INDEFI		(0x8000000000000001L)
+#define	INDEFL		(0x8000000000000001L)
 #endif
 #else	/* ILP32 */
 #define	INDEFI		(0x80000001)
@@ -78,13 +78,13 @@
 #define	XEOS		0
 #define	XERR		(-1)
 #define	XEOF		(-2)
-#define XBOF		(-3)
+#define	XBOF		(-3)
 #define	XOK		0
 #define	XNO		0
 #define	XYES		1
 
 #define	BOFL		(-3L)
-#define EOFL		(-2L)
+#define	EOFL		(-2L)
 
 /* SPP datatypes.
  */
@@ -98,7 +98,17 @@
 #define	TY_COMPLEX	8
 #define	TY_STRUCT	9
 #define	TY_POINTER	10
+#define	TY_USHORT	11
+#define	TY_UBYTE	12
 
+/* Definitions for the MII Machine Independent Integer package.
+ */
+#define	MII_BYTE	8
+#define	MII_SHORT	16
+#define	MII_LONG	32
+#define	MII_REAL	-32
+#define	MII_DOUBLE	-64
+#define	MII_INT		MII_LONG
 
 /* File I/O constants.
  */
@@ -139,9 +149,23 @@
  */
 extern	char		MEMCOM[];
 #define	Memc		(((XCHAR *)MEMCOM)-1)
+#define	Mems		(((XSHORT *)MEMCOM)-1)
 #define	Memi		(((XINT *)MEMCOM)-1)
+#define	Memb		(((XBOOL *)MEMCOM)-1)
+#define	Meml		(((XLONG *)MEMCOM)-1)
+#define	Memp		(((XPOINTER *)MEMCOM)-1)
+#define	Memr		(((XREAL *)MEMCOM)-1)
+#define	Memd		(((XDOUBLE *)MEMCOM)-1)
+#define	Memx		(((XCOMPLEX *)MEMCOM)-1)
 #define	Memcptr(addr)	((XCHAR *)(addr) - Memc)
+#define	Memsptr(addr)	((XSHORT *)(addr) - Mems)
 #define	Memiptr(addr)	((XINT *)(addr) - Memi)
+#define	Membptr(addr)	((XBOOL *)(addr) - Memb)
+#define	Memlptr(addr)	((XLONG *)(addr) - Meml)
+#define	Mempptr(addr)	((XPOINTER *)(addr) - Memp)
+#define	Memrptr(addr)	((XREAL *)(addr) - Memr)
+#define	Memdptr(addr)	((XDOUBLE *)(addr) - Memd)
+#define	Memxptr(addr)	((XCOMPLEX *)(addr) - Memx)
 
 typedef unsigned long iraf_size_t;
 

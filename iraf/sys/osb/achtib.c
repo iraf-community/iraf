@@ -8,14 +8,15 @@
 /* ACHT_B -- Pack SPP array into an unsigned byte array.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-int ACHTIB ( XINT *a, XCHAR *b, XINT *npix )
+int ACHTIB ( XINT *a, XUBYTE *b, XINT *npix )
 {
 	XINT *ip;
 	XUBYTE *op, *maxop;
 
-	maxop = (XUBYTE *)b + *npix -1;
-	for ( ip=(XINT *)a, op=(XUBYTE *)b ; op <= maxop ; )
-		*op++ = *ip++;
+	maxop = b + *npix -1;
+	for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+	    *op = *ip;
+	}
 
 	return 0;
 }

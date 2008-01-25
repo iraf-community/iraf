@@ -9,13 +9,16 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-int ACHTBX ( XCHAR *a, XCOMPLEX *b, XINT *npix )
+int ACHTBX ( XUBYTE *a, XCOMPLEX *b, XINT *npix )
 {
-	XUBYTE *ip, *first = (XUBYTE *)a;
+	XUBYTE *ip;
 	XCOMPLEX *op;
 
-	for (ip = &first[*npix], op = &((XCOMPLEX *)b)[*npix];  ip > first;  )
-		(--op)->r = (float) *--ip;
+	for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+	    --op; --ip;
+	    op->r = (float) *ip;
+	    op->i = 0;
+	}
 
 	return 0;
 }

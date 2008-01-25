@@ -84,9 +84,9 @@ static XINT mapin = 0, mapout = 0, nin = 0, nout = 0, NaNmask = 0;
 */
 
 #ifdef DATATYPE_REAL
-int IEEVPAKR ( PIXEL *native, PIXEL *ieee, XINT *nelem )
+int IEEVPAKR ( PIXEL *native, void *ieee, XINT *nelem )
 #else
-int IEEVPAKD ( PIXEL *native, PIXEL *ieee, XINT *nelem )
+int IEEVPAKD ( PIXEL *native, void *ieee, XINT *nelem )
 #endif
 {
     XINT i;
@@ -98,16 +98,16 @@ int IEEVPAKD ( PIXEL *native, PIXEL *ieee, XINT *nelem )
 	    BSWAP (native, &c_1, ieee, &c_1, &x_n);
 	}
 	else {
-	    AMOVE (native, ieee, nelem);
+	    AMOVE (native, (PIXEL *)ieee, nelem);
 	}
     } else {
 	IEEE_SIGMASK();
 	for ( i=0 ; i < *nelem ; i++ ) {
 	    if (native[i] == native_NaN) {
-		ieee[i] = ieee_NaN;
+		((PIXEL *)ieee)[i] = ieee_NaN;
 		nout = nout + 1;
 	    } else {
-		ieee[i] = native[i];
+		((PIXEL *)ieee)[i] = native[i];
 	    }
 	}
 	/* Byteswap if necessary. */
@@ -132,9 +132,9 @@ int IEEVPAKD ( PIXEL *native, PIXEL *ieee, XINT *nelem )
 */
 
 #ifdef DATATYPE_REAL
-int IEEVUPKR ( PIXEL *ieee, PIXEL *native, XINT *nelem )
+int IEEVUPKR ( void *ieee, PIXEL *native, XINT *nelem )
 #else
-int IEEVUPKD ( PIXEL *ieee, PIXEL *native, XINT *nelem )
+int IEEVUPKD ( void *ieee, PIXEL *native, XINT *nelem )
 #endif
 {
     static PIXEL fval[1];
@@ -163,14 +163,14 @@ int IEEVUPKD ( PIXEL *ieee, PIXEL *native, XINT *nelem )
 	}
     } else {
 	if (mapin == XNO) {
-	    AMOVE (ieee, native, nelem);
+	    AMOVE ((PIXEL *)ieee, native, nelem);
 	}
 	else {
 	    /* Check for IEEE exceptional values and map NaN to the native  */
 	    /* NaN value, and denormalized numbers (zero exponent) to zero. */
 	    IEEE_SIGMASK();
 	    for ( i=0 ; i < *nelem ; i++ ) {
-		fval[0] = ieee[i];
+		fval[0] = ((PIXEL *)ieee)[i];
 		expon = (ival[IOFF] & NaNmask);
 		if (expon == 0) {
 		    native[i] = 0;
@@ -178,7 +178,7 @@ int IEEVUPKD ( PIXEL *ieee, PIXEL *native, XINT *nelem )
 		    native[i] = native_NaN;
 		    nin = nin + 1;
 		} else
-		    native[i] = ieee[i];
+		    native[i] = ((PIXEL *)ieee)[i];
 	    }
 	    IEEE_SIGRESTORE();
 	}

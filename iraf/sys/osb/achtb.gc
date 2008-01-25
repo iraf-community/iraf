@@ -9,21 +9,20 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-$if (datatype == B)
-int ACHTB$T ( XCHAR *a, XCHAR *b, XINT *npix )
-$else
-int ACHTB$T ( XCHAR *a, XPIXEL *b, XINT *npix )
-$endif
+int ACHTB$T ( XUBYTE *a, XPIXEL *b, XINT *npix )
 {
-	XUBYTE *ip, *first = (XUBYTE *)a;
+	XUBYTE *ip;
 	XPIXEL *op;
 
-	for (ip = &first[*npix], op = &((XPIXEL *)b)[*npix];  ip > first;  )
-	    $if (datatype == x)
-		(--op)->r = (float) *--ip;
-	    $else
-		*--op = *--ip;
-	    $endif
+	for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+	    --op; --ip;
+	$if (datatype == x)
+	    op->r = (float) *ip;
+	    op->i = 0;
+	$else
+	    *op = *ip;
+	$endif
+	}
 
 	return 0;
 }

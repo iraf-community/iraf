@@ -59,10 +59,10 @@ extern unsigned XINT VSHEND;
 #define	IEEE_SIGMASK	ieeesk_
 #define	IEEE_SIGRESTORE	ieeese_
 
-int IEEVPAKR ( XREAL *, XREAL *, XINT * );
-int IEEVPAKD ( XDOUBLE *, XDOUBLE *, XINT * );
-int IEEVUPKR ( XREAL *, XREAL *, XINT * );
-int IEEVUPKD ( XDOUBLE *, XDOUBLE *, XINT * );
+int IEEVPAKR ( XREAL *, void *, XINT * );
+int IEEVPAKD ( XDOUBLE *, void *, XINT * );
+int IEEVUPKR ( void *, XREAL *, XINT * );
+int IEEVUPKD ( void *, XDOUBLE *, XINT * );
 int IEEPAKR ( XREAL * );
 int IEEPAKD ( XDOUBLE * );
 int IEEUPKR ( XREAL * );
@@ -681,11 +681,21 @@ extern int ZZWTMT ( XINT *, XINT *, XINT * );
 #define	CHRUPK		chrupk_
 #define	D1MACH		d1mach_
 #define	I1MACH		i1mach_
-#define I32TO64		i32to4_
-#define I64TO32		i64to2_
+#define	I32TO64		i32to4_
+#define	I64TO32		i64to2_
 #define	MIILEN		miilen_
 #define	MIIPAK		miipak_
 #define	MIIUPK		miiupk_
+#define	MIIPAK8		miipa8_
+#define	MIIPAK16	miipa6_
+#define	MIIPAK32	miipa2_
+#define	MIIPAKR		miipar_
+#define	MIIPAKD		miipad_
+#define	MIIUPK8		miiup8_
+#define	MIIUPK16	miiup6_
+#define	MIIUPK32	miiup2_
+#define	MIIUPKR		miiupr_
+#define	MIIUPKD		miiupd_
 #define	NOTI		noti_
 #define	NOTL		notl_
 #define	NOTS		nots_
@@ -723,38 +733,117 @@ extern int ZZWTMT ( XINT *, XINT *, XINT * );
  * to primitives which deal with unsigned machine bytes, and the U suffix
  * refers to primitives which deal with unsigned short (16 bit) integers.
  */
+#define	ACHT		acht_
+#define	ACHTB		achtb_
 #define	ACHTBB		achtbb_
 #define	ACHTBC		achtbc_
 #define	ACHTBD		achtbd_
 #define	ACHTBI		achtbi_
 #define	ACHTBL		achtbl_
+#define	ACHTBP		achtbp_
 #define	ACHTBR		achtbr_
 #define	ACHTBS		achtbs_
 #define	ACHTBU		achtbu_
 #define	ACHTBX		achtbx_
+#define	ACHTC		achtc_
 #define	ACHTCB		achtcb_
+#define	ACHTCC		achtcc_
+#define	ACHTCD		achtcd_
+#define	ACHTCI		achtci_
+#define	ACHTCL		achtcl_
+#define	ACHTCP		achtcp_
+#define	ACHTCR		achtcr_
+#define	ACHTCS		achtcs_
 #define	ACHTCU		achtcu_
+#define	ACHTCX		achtcx_
+#define	ACHTD		achtd_
 #define	ACHTDB		achtdb_
+#define	ACHTDC		achtdc_
+#define	ACHTDD		achtdd_
+#define	ACHTDI		achtdi_
+#define	ACHTDL		achtdl_
+#define	ACHTDP		achtdp_
+#define	ACHTDR		achtdr_
+#define	ACHTDS		achtds_
 #define	ACHTDU		achtdu_
+#define	ACHTDX		achtdx_
+#define	ACHTI		achti_
 #define	ACHTIB		achtib_
+#define	ACHTIC		achtic_
+#define	ACHTID		achtid_
+#define	ACHTII		achtii_
+#define	ACHTIL		achtil_
+#define	ACHTIP		achtip_
+#define	ACHTIR		achtir_
+#define	ACHTIS		achtis_
 #define	ACHTIU		achtiu_
+#define	ACHTIX		achtix_
+#define	ACHTL		achtl_
 #define	ACHTLB		achtlb_
+#define	ACHTLC		achtlc_
+#define	ACHTLD		achtld_
+#define	ACHTLI		achtli_
+#define	ACHTLL		achtll_
+#define	ACHTLP		achtlp_
+#define	ACHTLR		achtlr_
+#define	ACHTLS		achtls_
 #define	ACHTLU		achtlu_
+#define	ACHTLX		achtlx_
+#define	ACHTP		achtp_
+#define	ACHTPB		achtpb_
+#define	ACHTPC		achtpc_
+#define	ACHTPD		achtpd_
+#define	ACHTPI		achtpi_
+#define	ACHTPL		achtpl_
+#define	ACHTPP		achtpp_
+#define	ACHTPR		achtpr_
+#define	ACHTPS		achtps_
+#define	ACHTPU		achtpu_
+#define	ACHTPX		achtpx_
+#define	ACHTR		achtr_
 #define	ACHTRB		achtrb_
+#define	ACHTRC		achtrc_
+#define	ACHTRD		achtrd_
+#define	ACHTRI		achtri_
+#define	ACHTRL		achtrl_
+#define	ACHTRP		achtrp_
+#define	ACHTRR		achtrr_
+#define	ACHTRS		achtrs_
 #define	ACHTRU		achtru_
+#define	ACHTRX		achtrx_
+#define	ACHTS		achts_
 #define	ACHTSB		achtsb_
+#define	ACHTSC		achtsc_
+#define	ACHTSD		achtsd_
+#define	ACHTSI		achtsi_
+#define	ACHTSL		achtsl_
+#define	ACHTSP		achtsp_
+#define	ACHTSR		achtsr_
+#define	ACHTSS		achtss_
 #define	ACHTSU		achtsu_
+#define	ACHTSX		achtsx_
+#define	ACHTU		achtu_
 #define	ACHTUB		achtub_
 #define	ACHTUC		achtuc_
 #define	ACHTUD		achtud_
 #define	ACHTUI		achtui_
 #define	ACHTUL		achtul_
+#define	ACHTUP		achtup_
 #define	ACHTUR		achtur_
 #define	ACHTUS		achtus_
 #define	ACHTUU		achtuu_
 #define	ACHTUX		achtux_
+#define	ACHTX		achtx_
 #define	ACHTXB		achtxb_
+#define	ACHTXC		achtxc_
+#define	ACHTXD		achtxd_
+#define	ACHTXI		achtxi_
+#define	ACHTXL		achtxl_
+#define	ACHTXP		achtxp_
+#define	ACHTXR		achtxr_
+#define	ACHTXS		achtxs_
 #define	ACHTXU		achtxu_
+#define	ACHTXX		achtxx_
 
 
 extern int ACLRC ( XCHAR *, XINT * );
@@ -772,52 +861,146 @@ extern int AMOVP ( XPOINTER *, XPOINTER *, XINT * );
 extern int AMOVR ( XREAL *, XREAL *, XINT * );
 extern int AMOVS ( XSHORT *, XSHORT *, XINT * );
 
-extern int ACHTBB ( XCHAR *, XCHAR *, XINT * );
-extern int ACHTBC ( XCHAR *, XCHAR *, XINT * );
-extern int ACHTBD ( XCHAR *, XDOUBLE *, XINT * );
-extern int ACHTBI ( XCHAR *, XINT *, XINT * );
-extern int ACHTBL ( XCHAR *, XLONG *, XINT * );
-extern int ACHTBR ( XCHAR *, XREAL *, XINT * );
-extern int ACHTBS ( XCHAR *, XSHORT *, XINT * );
-extern int ACHTBU ( XCHAR *, XUSHORT *, XINT * );
-extern int ACHTBX ( XCHAR *, XCOMPLEX *, XINT * );
-extern int ACHTCB ( XCHAR *, XCHAR *, XINT * );
+extern int ACHT ( void *, void *, XINT *, XINT *, XINT * );
+extern int ACHTB ( XUBYTE *, void *, XINT *, XINT * );
+extern int ACHTBB ( XUBYTE *, XUBYTE *, XINT * );
+extern int ACHTBC ( XUBYTE *, XCHAR *, XINT * );
+extern int ACHTBD ( XUBYTE *, XDOUBLE *, XINT * );
+extern int ACHTBI ( XUBYTE *, XINT *, XINT * );
+extern int ACHTBL ( XUBYTE *, XLONG *, XINT * );
+extern int ACHTBP ( XUBYTE *, XPOINTER *, XINT * );
+extern int ACHTBR ( XUBYTE *, XREAL *, XINT * );
+extern int ACHTBS ( XUBYTE *, XSHORT *, XINT * );
+extern int ACHTBU ( XUBYTE *, XUSHORT *, XINT * );
+extern int ACHTBX ( XUBYTE *, XCOMPLEX *, XINT * );
+extern int ACHTC ( XCHAR *, void *, XINT *, XINT * );
+extern int ACHTCB ( XCHAR *, XUBYTE *, XINT * );
+extern int ACHTCC ( XCHAR *, XCHAR *, XINT * );
+extern int ACHTCD ( XCHAR *, XDOUBLE *, XINT * );
+extern int ACHTCI ( XCHAR *, XINT *, XINT * );
+extern int ACHTCL ( XCHAR *, XLONG *, XINT * );
+extern int ACHTCP ( XCHAR *, XPOINTER *, XINT * );
+extern int ACHTCR ( XCHAR *, XREAL *, XINT * );
+extern int ACHTCS ( XCHAR *, XSHORT *, XINT * );
 extern int ACHTCU ( XCHAR *, XUSHORT *, XINT * );
-extern int ACHTDB ( XDOUBLE *, XCHAR *, XINT * );
+extern int ACHTCX ( XCHAR *, XCOMPLEX *, XINT * );
+extern int ACHTD ( XDOUBLE *, void *, XINT *, XINT * );
+extern int ACHTDB ( XDOUBLE *, XUBYTE *, XINT * );
+extern int ACHTDC ( XDOUBLE *, XCHAR *, XINT * );
+extern int ACHTDD ( XDOUBLE *, XDOUBLE *, XINT * );
+extern int ACHTDI ( XDOUBLE *, XINT *, XINT * );
+extern int ACHTDL ( XDOUBLE *, XLONG *, XINT * );
+extern int ACHTDP ( XDOUBLE *, XPOINTER *, XINT * );
+extern int ACHTDR ( XDOUBLE *, XREAL *, XINT * );
+extern int ACHTDS ( XDOUBLE *, XSHORT *, XINT * );
 extern int ACHTDU ( XDOUBLE *, XUSHORT *, XINT * );
-extern int ACHTIB ( XINT *, XCHAR *, XINT * );
+extern int ACHTDX ( XDOUBLE *, XCOMPLEX *, XINT * );
+extern int ACHTI ( XINT *a, void *, XINT *, XINT * );
+extern int ACHTIB ( XINT *, XUBYTE *, XINT * );
+extern int ACHTIC ( XINT *, XCHAR *, XINT * );
+extern int ACHTID ( XINT *, XDOUBLE *, XINT * );
+extern int ACHTII ( XINT *, XINT *, XINT * );
+extern int ACHTIL ( XINT *, XLONG *, XINT * );
+extern int ACHTIP ( XINT *, XPOINTER *, XINT * );
+extern int ACHTIR ( XINT *, XREAL *, XINT * );
+extern int ACHTIS ( XINT *, XSHORT *, XINT * );
 extern int ACHTIU ( XINT *, XUSHORT *, XINT * );
-extern int ACHTLB ( XLONG *, XCHAR *, XINT * );
+extern int ACHTIX ( XINT *, XCOMPLEX *, XINT * );
+extern int ACHTL ( XLONG *, void *, XINT *, XINT * );
+extern int ACHTLB ( XLONG *, XUBYTE *, XINT * );
+extern int ACHTLC ( XLONG *, XCHAR *, XINT * );
+extern int ACHTLD ( XLONG *, XDOUBLE *, XINT * );
+extern int ACHTLI ( XLONG *, XINT *, XINT * );
+extern int ACHTLL ( XLONG *, XLONG *, XINT * );
+extern int ACHTLP ( XLONG *, XPOINTER *, XINT * );
+extern int ACHTLR ( XLONG *, XREAL *, XINT * );
+extern int ACHTLS ( XLONG *, XSHORT *, XINT * );
 extern int ACHTLU ( XLONG *, XUSHORT *, XINT * );
-extern int ACHTRB ( XREAL *, XCHAR *, XINT * );
+extern int ACHTLX ( XLONG *, XCOMPLEX *, XINT * );
+extern int ACHTP ( XPOINTER *, void *, XINT *, XINT * );
+extern int ACHTPB ( XPOINTER *, XUBYTE *, XINT * );
+extern int ACHTPC ( XPOINTER *, XCHAR *, XINT * );
+extern int ACHTPD ( XPOINTER *, XDOUBLE *, XINT * );
+extern int ACHTPI ( XPOINTER *, XINT *, XINT * );
+extern int ACHTPL ( XPOINTER *, XLONG *, XINT * );
+extern int ACHTPP ( XPOINTER *, XPOINTER *, XINT * );
+extern int ACHTPR ( XPOINTER *, XREAL *, XINT * );
+extern int ACHTPS ( XPOINTER *, XSHORT *, XINT * );
+extern int ACHTPU ( XPOINTER *, XUSHORT *, XINT * );
+extern int ACHTPX ( XPOINTER *, XCOMPLEX *, XINT * );
+extern int ACHTR ( XREAL *, void *, XINT *, XINT * );
+extern int ACHTRB ( XREAL *, XUBYTE *, XINT * );
+extern int ACHTRC ( XREAL *, XCHAR *, XINT * );
+extern int ACHTRD ( XREAL *, XDOUBLE *, XINT * );
+extern int ACHTRI ( XREAL *, XINT *, XINT * );
+extern int ACHTRL ( XREAL *, XLONG *, XINT * );
+extern int ACHTRP ( XREAL *, XPOINTER *, XINT * );
+extern int ACHTRR ( XREAL *, XREAL *, XINT * );
+extern int ACHTRS ( XREAL *, XSHORT *, XINT * );
 extern int ACHTRU ( XREAL *, XUSHORT *, XINT * );
-extern int ACHTSB ( XSHORT *, XCHAR *, XINT * );
+extern int ACHTRX ( XREAL *, XCOMPLEX *, XINT * );
+extern int ACHTS ( XSHORT *, void *, XINT *, XINT * );
+extern int ACHTSB ( XSHORT *, XUBYTE *, XINT * );
+extern int ACHTSC ( XSHORT *, XCHAR *, XINT * );
+extern int ACHTSD ( XSHORT *, XDOUBLE *, XINT * );
+extern int ACHTSI ( XSHORT *, XINT *, XINT * );
+extern int ACHTSL ( XSHORT *, XLONG *, XINT * );
+extern int ACHTSP ( XSHORT *, XPOINTER *, XINT * );
+extern int ACHTSR ( XSHORT *, XREAL *, XINT * );
+extern int ACHTSS ( XSHORT *, XSHORT *, XINT *);
 extern int ACHTSU ( XSHORT *, XUSHORT *, XINT * );
-extern int ACHTUB ( XUSHORT *, XCHAR *, XINT * );
+extern int ACHTSX ( XSHORT *, XCOMPLEX *, XINT * );
+extern int ACHTU ( XUSHORT *, void *, XINT *, XINT * );
+extern int ACHTUB ( XUSHORT *, XUBYTE *, XINT * );
 extern int ACHTUC ( XUSHORT *, XCHAR *, XINT * );
 extern int ACHTUD ( XUSHORT *, XDOUBLE *, XINT * );
 extern int ACHTUI ( XUSHORT *, XINT *, XINT * );
 extern int ACHTUL ( XUSHORT *, XLONG *, XINT * );
+extern int ACHTUP ( XUSHORT *, XPOINTER *, XINT * );
 extern int ACHTUR ( XUSHORT *, XREAL *, XINT * );
 extern int ACHTUS ( XUSHORT *, XSHORT *, XINT * );
 extern int ACHTUU ( XUSHORT *, XUSHORT *, XINT * );
 extern int ACHTUX ( XUSHORT *, XCOMPLEX *, XINT * );
-extern int ACHTXB ( XCOMPLEX *, XCHAR *, XINT * );
+extern int ACHTX ( XCOMPLEX *, void *, XINT *, XINT * );
+extern int ACHTXB ( XCOMPLEX *, XUBYTE *, XINT * );
+extern int ACHTXC ( XCOMPLEX *, XCHAR *, XINT * );
+extern int ACHTXD ( XCOMPLEX *, XDOUBLE *, XINT * );
+extern int ACHTXI ( XCOMPLEX *, XINT *, XINT * );
+extern int ACHTXL ( XCOMPLEX *, XLONG *, XINT * );
+extern int ACHTXP ( XCOMPLEX *, XPOINTER *, XINT * );
+extern int ACHTXR ( XCOMPLEX *, XREAL *, XINT * );
+extern int ACHTXS ( XCOMPLEX *, XSHORT *, XINT * );
 extern int ACHTXU ( XCOMPLEX *, XUSHORT *, XINT * );
-extern int ACLRB ( XCHAR *, XINT * );
+extern int ACHTXX ( XCOMPLEX *, XCOMPLEX *, XINT * );
+
+extern int ACLRB ( void *, XINT * );
 extern XINT ANDI ( XINT *, XINT * );
 extern XSHORT ANDS ( XSHORT *, XSHORT * );
 extern XLONG ANDL ( XLONG *, XLONG * );
 extern int BITPAK ( XINT *, XINT *, XINT *, XINT * );
 extern XINT BITUPK ( XINT *, XINT *, XINT * );
-extern int BSWAP2 ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int BSWAP4 ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int BSWAP8 ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int BYTMOV ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
+extern int BSWAP2 ( void *, XINT *, void *, XINT *, XINT * );
+extern int BSWAP4 ( void *, XINT *, void *, XINT *, XINT * );
+extern int BSWAP8 ( void *, XINT *, void *, XINT *, XINT * );
+extern int BYTMOV ( void *, XINT *, void *, XINT *, XINT * );
 extern int CHRPAK ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
 extern int CHRUPK ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int I32TO64 ( XCHAR *, XCHAR *, XINT * );
-extern int I64TO32 ( XCHAR *, XCHAR *, XINT * );
+extern int I32TO64 ( void *, void *, XINT * );
+extern int I64TO32 ( void *, void *, XINT * );
+
+extern int MIIPAK ( void *, void *, XINT *, XINT *, XINT * );
+extern int MIIUPK ( void *, void *, XINT *, XINT *, XINT * );
+extern int MIIPAK8 ( void *, void *, XINT *, XINT * );
+extern int MIIPAK16 ( void *, void *, XINT *, XINT * );
+extern int MIIPAK32 ( void *, void *, XINT *, XINT * );
+extern int MIIPAKR ( void *, void *, XINT *, XINT * );
+extern int MIIPAKD ( void *, void *, XINT *, XINT * );
+extern int MIIUPK8 ( void *, void *, XINT *, XINT * );
+extern int MIIUPK16 ( void *, void *, XINT *, XINT * );
+extern int MIIUPK32 ( void *, void *, XINT *, XINT * );
+extern int MIIUPKR ( void *, void *, XINT *, XINT * );
+extern int MIIUPKD ( void *, void *, XINT *, XINT * );
+
 extern XINT NOTI ( XINT * );
 extern XSHORT NOTS ( XSHORT * );
 extern XLONG NOTL ( XLONG * );

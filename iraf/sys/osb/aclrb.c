@@ -7,7 +7,7 @@
 
 /* ACLRB -- Clear a block of memory.
  */
-int ACLRB ( XCHAR *a, XINT *nbytes )
+int ACLRB ( void *a, XINT *nbytes )
 {
 	char *p;
 	char *maxp;

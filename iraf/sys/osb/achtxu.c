@@ -11,15 +11,18 @@
 int ACHTXU ( XCOMPLEX *a, XUSHORT *b, XINT *npix )
 {
 	XCOMPLEX *ip;
-	XUSHORT *op, *maxop;
+	XUSHORT *op;
 
-	if (sizeof(*op) > sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		    *--op = (int) (--ip)->r;
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = (XUSHORT) (ip->r);
+	    }
 	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		    *op++ = (int) (ip++)->r;
+	    XUSHORT *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+		*op = (XUSHORT) (ip->r);
+	    }
 	}
 
 	return 0;

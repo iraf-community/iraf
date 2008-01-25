@@ -11,15 +11,18 @@
 int ACHTUR ( XUSHORT *a, XREAL *b, XINT *npix )
 {
 	XUSHORT *ip;
-	XREAL *op, *maxop;
+	XREAL *op;
 
-	if (sizeof(*op) >= sizeof(*ip)) {
-	    for ( ip = &a[*npix], op = &b[*npix] ; a < ip ; )
-		    *--op = *--ip;
+	if ( sizeof(*ip) < sizeof(*op) ) {
+	    for ( ip = a + *npix, op = b + *npix ; b < op ; ) {
+		--op; --ip;
+		*op = *ip;
+	    }
 	} else {
-	    maxop = b + *npix -1;
-	    for ( ip=a, op=b ; op <= maxop ; )
-		    *op++ = *ip++;
+	    XREAL *maxop = b + *npix -1;
+	    for ( ip=a, op=b ; op <= maxop ; op++, ip++ ) {
+		*op = *ip;
+	    }
 	}
 
 	return 0;

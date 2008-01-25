@@ -15,7 +15,7 @@
 /* b      : output byte array			*/
 /* boff   : first byte in B to be written	*/
 /* nbytes : number of bytes to move		*/
-int BYTMOV ( XCHAR *a, XINT *aoff, XCHAR *b, XINT *boff, XINT *nbytes )
+int BYTMOV ( void *a, XINT *aoff, void *b, XINT *boff, XINT *nbytes )
 {
 	long n;
 	char *ap, *bp;
