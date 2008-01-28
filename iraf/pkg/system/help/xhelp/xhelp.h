@@ -8,17 +8,17 @@ define  HDB_MAGICVAL    110104B
 
 define  HDB_MAGIC       Memi[P2I($1)]        # helpdb file type code
 define  HDB_RAW         Memi[P2I($1+1)]      # access compiled or raw database
-define  HDB_RHD         Memi[P2I($1+2)]      # if raw, HP of root help directory
+define  HDB_RHD         Memp[$1+2]      # if raw, HP of root help directory
 define  HDB_INDEX       Memi[P2I($1+3)]      # index of root help directory
 define  HDB_CRDATE      Meml[P2L($1+4)]      # creation date
 define  HDB_NENTRIES    Memi[P2I($1+5)]      # number of help directories in db
 define  HDB_MAXENTRIES  Memi[P2I($1+6)]      # maximum no. of help directories in db
 define  HDB_NMODULES    Memi[P2I($1+7)]      # count of the total number of modules
 define  HDB_INDEXOFFSET Meml[P2L($1+8)]      # file offset of index, chars
-define  HDB_INDEXPTR    Memi[P2I($1+9)]      # pointer to loaded index, ty_struct
+define  HDB_INDEXPTR    Memp[$1+9]      # pointer to loaded index, ty_struct
 define  HDB_INDEXLEN    Memi[P2I($1+10)]     # length of index structure, su
 define  HDB_DATAOFFSET  Meml[P2L($1+11)]     # file offset of data area, chars
-define  HDB_DATAPTR     Memi[P2I($1+12)]     # pointer to loaded data area, ty_struct
+define  HDB_DATAPTR     Memp[$1+12]     # pointer to loaded data area, ty_struct
 define  HDB_DATALEN     Memi[P2I($1+13)]     # length of data area, struct units
 
 # Index structure.  Identifies the contents of the database and tells where
@@ -44,20 +44,20 @@ define  MAX_NAMELEN     20              # max chars in a module name in table
 define	SZ_HELPLIST	20480
 define	SZ_XHELPSTRUCT	45
 
-define	XH_GP		Memi[P2I($1)]	# graphics descriptor
-define	XH_LPTR		Memi[P2I($1+1)]	# ptr for pkg list
-define	XH_TEMPLATE	Memi[P2I($1+2)]	# initial help topic
-define	XH_OPTION	Memi[P2I($1+3)]	# help option
-define	XH_PRINTER	Memi[P2I($1+4)]	# printer name
-define	XH_CURTASK	Memi[P2I($1+5)]	# current task name
-define	XH_CURPACK	Memi[P2I($1+6)]	# current package name
-define	XH_QUICKREF	Memi[P2I($1+7)]	# quick-reference filen
-define	XH_HOMEPAGE	Memi[P2I($1+8)]	# startup page
-define	XH_CURDIR	Memi[P2I($1+9)]	# current directory
-define	XH_PATTERN	Memi[P2I($1+10)]	# current filename template
-define	XH_HELPDB	Memi[P2I($1+11)]	# help database string
+define	XH_GP		Memp[$1]	# graphics descriptor
+define	XH_LPTR		Memp[$1+1]	# ptr for pkg list
+define	XH_TEMPLATE	Memp[$1+2]	# initial help topic
+define	XH_OPTION	Memp[$1+3]	# help option
+define	XH_PRINTER	Memp[$1+4]	# printer name
+define	XH_CURTASK	Memp[$1+5]	# current task name
+define	XH_CURPACK	Memp[$1+6]	# current package name
+define	XH_QUICKREF	Memp[$1+7]	# quick-reference filen
+define	XH_HOMEPAGE	Memp[$1+8]	# startup page
+define	XH_CURDIR	Memp[$1+9]	# current directory
+define	XH_PATTERN	Memp[$1+10]	# current filename template
+define	XH_HELPDB	Memp[$1+11]	# help database string
 define	XH_SHOWTYPE	Memi[P2I($1+12)]	# indicate packages in list
-define	XH_STP		Memi[P2I($1+13)]	# package list symtab ptr
+define	XH_STP		Memp[$1+13]	# package list symtab ptr
 
 # Helpful macros
 define	LIST		Memc[XH_LPTR($1)]

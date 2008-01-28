@@ -10,7 +10,7 @@ procedure t_srftest()
 
 char	device[SZ_FNAME]
 int	error_code, wkid
-int	gp, gopen()
+pointer	gp, gopen()
 
 begin
 	call clgstr ("device", device, SZ_FNAME)

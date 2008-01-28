@@ -210,8 +210,10 @@ end
 procedure t_many()
 
 char	fname[SZ_FNAME]
-int	list, nfiles, fd
-int	open(), fntopn(), fntgfn()
+pointer	list
+int	nfiles, fd
+int	open(), fntgfn()
+pointer	fntopn()
 
 begin
 	list = fntopn ("fio$*.x")

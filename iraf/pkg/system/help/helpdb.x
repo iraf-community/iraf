@@ -59,17 +59,17 @@ define	HDB_MAGICVAL	110104B
 
 define	HDB_MAGIC	Memi[P2I($1)]	# helpdb file type code
 define	HDB_RAW		Memi[P2I($1+1)]	# access compiled or raw database
-define	HDB_RHD		Memi[P2I($1+2)]	# if raw, HP of root help directory
+define	HDB_RHD		Memp[$1+2]	# if raw, HP of root help directory
 define	HDB_INDEX	Memi[P2I($1+3)]	# index of root help directory
 define	HDB_CRDATE	Meml[P2L($1+4)]	# creation date
 define	HDB_NENTRIES	Memi[P2I($1+5)]	# number of help directories in db
 define	HDB_MAXENTRIES	Memi[P2I($1+6)]	# maximum no. of help directories in db
 define	HDB_NMODULES	Memi[P2I($1+7)]	# count of the total number of modules
 define	HDB_INDEXOFFSET	Meml[P2L($1+8)]	# file offset of index, chars
-define	HDB_INDEXPTR	Memi[P2I($1+9)]	# pointer to loaded index, ty_struct
+define	HDB_INDEXPTR	Memp[$1+9]	# pointer to loaded index, ty_struct
 define	HDB_INDEXLEN	Memi[P2I($1+10)]	# length of index structure, su
 define	HDB_DATAOFFSET	Meml[P2L($1+11)]	# file offset of data area, chars
-define	HDB_DATAPTR	Memi[P2I($1+12)]	# pointer to loaded data area, ty_struct
+define	HDB_DATAPTR	Memp[$1+12]	# pointer to loaded data area, ty_struct
 define	HDB_DATALEN	Memi[P2I($1+13)]	# length of data area, struct units
 
 # Index structure.  Identifies the contents of the database and tells where
