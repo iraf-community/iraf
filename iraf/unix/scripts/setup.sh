@@ -44,10 +44,11 @@ set_irafenv() {
   #
   XC_CFLAGS="-Wall"
   XC_FFLAGS="-Wall"
+  XC_LFLAGS=""
   #XC_CFLAGS="-I$hinclude -Wall"
   #XC_FFLAGS="-Ns1602 -Nx512"
   #
-  XC_LFLAGS=""
+  MKPKG_XC_LFLAGS=""
   #
   # Architecture-dependent settings
   #
@@ -87,23 +88,23 @@ set_irafenv() {
   case "$OPERATING_SYSTEM" in
   linux)
     HSI_CF="$HSI_CF -DLINUX -DPOSIX -DSYSV"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
     ;;
   freebsd)
     HSI_CF="$HSI_CF -DBSD"
-    XC_LFLAGS="$XC_LFLAGS -z -/static"
+    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -z -/static"
     ;;
   darwin)
     HSI_CF="$HSI_CF -DMACOSX"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
     ;;
   sunos)
     HSI_CF="$HSI_CF -DSOLARIS -DPOSIX -DSYSV"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
     ;;
   cygwin)
     HSI_CF="$HSI_CF -DCYGWIN -DLINUX -DPOSIX -DSYSV"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
     ;;
   *)
     echo "[ERROR] Unknown operating system: $OPERATING_SYSTEM"
@@ -121,7 +122,7 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export mkzflags HSI_LIBS
-  export XC_CFLAGS XC_FFLAGS
+  export XC_CFLAGS XC_FFLAGS XC_LFLAGS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -229,7 +230,7 @@ HSI_LF      = $HSI_LF
 HSI_F77LIBS = $HSI_F77LIBS
 RANLIB      = $RANLIB
 HSI_LIBS    = $HSI_LIBS
-XC_LFLAGS   = $XC_LFLAGS
+MKPKG_XC_LFLAGS   = $MKPKG_XC_LFLAGS
 $ARG_ADDITIONAL_DEFS
 
 EOF
