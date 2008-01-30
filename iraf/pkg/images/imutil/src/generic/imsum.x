@@ -52,7 +52,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -65,7 +65,7 @@ begin
 	    repeat {
 		n = 0
 		while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 		    n = n + 1
 		    if (n == IMS_MAX)
 			break
@@ -100,7 +100,7 @@ begin
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
 			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-			if (imgnls (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+			if (imgnls (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aadds (Mems[buf_in], Mems[buf_out],
 			    Mems[buf_out], npix)
@@ -116,7 +116,7 @@ begin
 		}
 
 		do i = 1, n
-		    call imunmap (Memi[im+i-1])
+		    call imunmap (Memp[im+i-1])
 	    } until (ndone == nimages)
 
 	    # Finish up.
@@ -129,14 +129,14 @@ begin
 	# will be mapped during each line.
 	n = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	    Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 	    n = n + 1
 	    if (n == IMS_MAX - 1)
 		break
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 	if (nimages - n > 0)
 	    call salloc (buf1, (nimages-n)*npix, TY_SHORT)
 
@@ -149,7 +149,7 @@ begin
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnls (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnls (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
 
@@ -159,17 +159,17 @@ begin
 	    for (; i <= nimages; i = i + 1) {
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
-		Memi[im+i-1] = immap (Memc[input], READ_ONLY, 0)
+		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnls (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnls (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		Memi[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovs (Mems[buf_in], Mems[Memi[buf+i-1]], npix)
-		call imunmap (Memi[im+i-1])
+		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
+		call amovs (Mems[buf_in], Mems[Memp[buf+i-1]], npix)
+		call imunmap (Memp[im+i-1])
 	    }
 		
 	    # Reject pixels.
-	    call imrejs (Memi[buf], nimages, Mems[buf_out], npix, nlow, nhigh)
+	    call imrejs (Memp[buf], nimages, Mems[buf_out], npix, nlow, nhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if ((naccept > 1) && streq (option, "average")) {
@@ -182,7 +182,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 
@@ -428,7 +428,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -441,7 +441,7 @@ begin
 	    repeat {
 		n = 0
 		while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 		    n = n + 1
 		    if (n == IMS_MAX)
 			break
@@ -476,7 +476,7 @@ begin
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
 			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-			if (imgnli (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+			if (imgnli (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddi (Memi[buf_in], Memi[buf_out],
 			    Memi[buf_out], npix)
@@ -492,7 +492,7 @@ begin
 		}
 
 		do i = 1, n
-		    call imunmap (Memi[im+i-1])
+		    call imunmap (Memp[im+i-1])
 	    } until (ndone == nimages)
 
 	    # Finish up.
@@ -505,14 +505,14 @@ begin
 	# will be mapped during each line.
 	n = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	    Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 	    n = n + 1
 	    if (n == IMS_MAX - 1)
 		break
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 	if (nimages - n > 0)
 	    call salloc (buf1, (nimages-n)*npix, TY_INT)
 
@@ -525,7 +525,7 @@ begin
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnli (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnli (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
 
@@ -535,17 +535,17 @@ begin
 	    for (; i <= nimages; i = i + 1) {
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
-		Memi[im+i-1] = immap (Memc[input], READ_ONLY, 0)
+		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnli (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnli (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		Memi[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovi (Memi[buf_in], Memi[Memi[buf+i-1]], npix)
-		call imunmap (Memi[im+i-1])
+		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
+		call amovi (Memi[buf_in], Memi[Memp[buf+i-1]], npix)
+		call imunmap (Memp[im+i-1])
 	    }
 		
 	    # Reject pixels.
-	    call imreji (Memi[buf], nimages, Memi[buf_out], npix, nlow, nhigh)
+	    call imreji (Memp[buf], nimages, Memi[buf_out], npix, nlow, nhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if ((naccept > 1) && streq (option, "average")) {
@@ -558,7 +558,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 
@@ -804,7 +804,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -817,7 +817,7 @@ begin
 	    repeat {
 		n = 0
 		while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 		    n = n + 1
 		    if (n == IMS_MAX)
 			break
@@ -852,7 +852,7 @@ begin
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
 			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-			if (imgnll (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+			if (imgnll (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddl (Meml[buf_in], Meml[buf_out],
 			    Meml[buf_out], npix)
@@ -868,7 +868,7 @@ begin
 		}
 
 		do i = 1, n
-		    call imunmap (Memi[im+i-1])
+		    call imunmap (Memp[im+i-1])
 	    } until (ndone == nimages)
 
 	    # Finish up.
@@ -881,14 +881,14 @@ begin
 	# will be mapped during each line.
 	n = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	    Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 	    n = n + 1
 	    if (n == IMS_MAX - 1)
 		break
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 	if (nimages - n > 0)
 	    call salloc (buf1, (nimages-n)*npix, TY_LONG)
 
@@ -901,7 +901,7 @@ begin
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnll (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnll (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
 
@@ -911,17 +911,17 @@ begin
 	    for (; i <= nimages; i = i + 1) {
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
-		Memi[im+i-1] = immap (Memc[input], READ_ONLY, 0)
+		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnll (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnll (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		Memi[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovl (Meml[buf_in], Meml[Memi[buf+i-1]], npix)
-		call imunmap (Memi[im+i-1])
+		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
+		call amovl (Meml[buf_in], Meml[Memp[buf+i-1]], npix)
+		call imunmap (Memp[im+i-1])
 	    }
 		
 	    # Reject pixels.
-	    call imrejl (Memi[buf], nimages, Meml[buf_out], npix, nlow, nhigh)
+	    call imrejl (Memp[buf], nimages, Meml[buf_out], npix, nlow, nhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if ((naccept > 1) && streq (option, "average")) {
@@ -934,7 +934,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 
@@ -1180,7 +1180,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1193,7 +1193,7 @@ begin
 	    repeat {
 		n = 0
 		while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 		    n = n + 1
 		    if (n == IMS_MAX)
 			break
@@ -1228,7 +1228,7 @@ begin
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
 			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-			if (imgnlr (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+			if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddr (Memr[buf_in], Memr[buf_out],
 			    Memr[buf_out], npix)
@@ -1244,7 +1244,7 @@ begin
 		}
 
 		do i = 1, n
-		    call imunmap (Memi[im+i-1])
+		    call imunmap (Memp[im+i-1])
 	    } until (ndone == nimages)
 
 	    # Finish up.
@@ -1257,14 +1257,14 @@ begin
 	# will be mapped during each line.
 	n = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	    Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 	    n = n + 1
 	    if (n == IMS_MAX - 1)
 		break
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 	if (nimages - n > 0)
 	    call salloc (buf1, (nimages-n)*npix, TY_REAL)
 
@@ -1277,7 +1277,7 @@ begin
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnlr (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnlr (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
 
@@ -1287,17 +1287,17 @@ begin
 	    for (; i <= nimages; i = i + 1) {
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
-		Memi[im+i-1] = immap (Memc[input], READ_ONLY, 0)
+		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnlr (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		Memi[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovr (Memr[buf_in], Memr[Memi[buf+i-1]], npix)
-		call imunmap (Memi[im+i-1])
+		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
+		call amovr (Memr[buf_in], Memr[Memp[buf+i-1]], npix)
+		call imunmap (Memp[im+i-1])
 	    }
 		
 	    # Reject pixels.
-	    call imrejr (Memi[buf], nimages, Memr[buf_out], npix, nlow, nhigh)
+	    call imrejr (Memp[buf], nimages, Memr[buf_out], npix, nlow, nhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if ((naccept > 1) && streq (option, "average")) {
@@ -1310,7 +1310,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 
@@ -1556,7 +1556,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1569,7 +1569,7 @@ begin
 	    repeat {
 		n = 0
 		while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 		    n = n + 1
 		    if (n == IMS_MAX)
 			break
@@ -1604,7 +1604,7 @@ begin
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
 			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-			if (imgnld (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+			if (imgnld (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddd (Memd[buf_in], Memd[buf_out],
 			    Memd[buf_out], npix)
@@ -1620,7 +1620,7 @@ begin
 		}
 
 		do i = 1, n
-		    call imunmap (Memi[im+i-1])
+		    call imunmap (Memp[im+i-1])
 	    } until (ndone == nimages)
 
 	    # Finish up.
@@ -1633,14 +1633,14 @@ begin
 	# will be mapped during each line.
 	n = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
-	    Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
 	    n = n + 1
 	    if (n == IMS_MAX - 1)
 		break
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 	if (nimages - n > 0)
 	    call salloc (buf1, (nimages-n)*npix, TY_DOUBLE)
 
@@ -1653,7 +1653,7 @@ begin
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnld (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnld (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
 
@@ -1663,17 +1663,17 @@ begin
 	    for (; i <= nimages; i = i + 1) {
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
-		Memi[im+i-1] = immap (Memc[input], READ_ONLY, 0)
+		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnld (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnld (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		Memi[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovd (Memd[buf_in], Memd[Memi[buf+i-1]], npix)
-		call imunmap (Memi[im+i-1])
+		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
+		call amovd (Memd[buf_in], Memd[Memp[buf+i-1]], npix)
+		call imunmap (Memp[im+i-1])
 	    }
 		
 	    # Reject pixels.
-	    call imrejd (Memi[buf], nimages, Memd[buf_out], npix, nlow, nhigh)
+	    call imrejd (Memp[buf], nimages, Memd[buf_out], npix, nlow, nhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if ((naccept > 1) && streq (option, "average")) {
@@ -1686,7 +1686,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 

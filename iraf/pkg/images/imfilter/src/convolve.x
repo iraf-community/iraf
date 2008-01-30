@@ -51,7 +51,7 @@ begin
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
 	do i = 1 , nyk - 1 {
-	    Memi[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
+	    Memp[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
 	    inline = inline + 1
 	}
 
@@ -61,10 +61,10 @@ begin
 
 	    # Scroll the input buffers
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line
-	    Memi[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline,
 	        inline)
 
 	    # Get output image line
@@ -76,17 +76,17 @@ begin
 	    call aclrr (Memr[outbuf], ncols)
 	    if (radsym == YES) {
 		do i = 1, nyk / 2 {
-		    call aaddr (Memr[Memi[lineptrs+i-1]],
-		        Memr[Memi[lineptrs+nyk-i]], Memr[linebuf], nincols)
+		    call aaddr (Memr[Memp[lineptrs+i-1]],
+		        Memr[Memp[lineptrs+nyk-i]], Memr[linebuf], nincols)
 	            call cnv_radcnvr (Memr[linebuf], Memr[outbuf], ncols,
 		        kernel[1,i], nxk)
 		}
 		if (mod (nyk, 2) == 1)
-	            call cnv_radcnvr (Memr[Memi[lineptrs+nyk/2]], Memr[outbuf],
+	            call cnv_radcnvr (Memr[Memp[lineptrs+nyk/2]], Memr[outbuf],
 		        ncols, kernel[1,nyk/2+1], nxk)
 	    } else {
 	        do i = 1, nyk
-	            call acnvr (Memr[Memi[lineptrs+i-1]], Memr[outbuf], ncols,
+	            call acnvr (Memr[Memp[lineptrs+i-1]], Memr[outbuf], ncols,
 		        kernel[1,i], nxk)
 	    }
 

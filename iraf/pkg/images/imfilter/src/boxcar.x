@@ -52,8 +52,8 @@ begin
 	# Initialize the accumulator
 	inline = 1 - nyk / 2
 	do i = 1, nyk - 1 {
-	    Memi[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
-	    call aaddr (Memr[accum], Memr[Memi[lineptrs+i]], Memr[accum],
+	    Memp[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
+	    call aaddr (Memr[accum], Memr[Memp[lineptrs+i]], Memr[accum],
 	        ncols + nxk - 1)
 	    inline = inline + 1
 	}
@@ -63,11 +63,11 @@ begin
 
 	    # Scroll buffers
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line, accumulate
-	    Memi[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline, inline)
-	    call aaddr (Memr[accum], Memr[Memi[lineptrs+nyk-1]], Memr[accum],
+	    Memp[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline, inline)
+	    call aaddr (Memr[accum], Memr[Memp[lineptrs+nyk-1]], Memr[accum],
 		ncols + nxk - 1)
 
 	    # Write output image line
@@ -78,7 +78,7 @@ begin
 	    call adivkr (Memr[outbuf], real (nxk * nyk), Memr[outbuf], ncols)
 
 	    # Subtract last line
-	    call asubr (Memr[accum], Memr[Memi[lineptrs]], Memr[accum],
+	    call asubr (Memr[accum], Memr[Memp[lineptrs]], Memr[accum],
 	        ncols + nxk - 1)
 
 	    inline = inline + 1

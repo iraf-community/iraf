@@ -31,9 +31,9 @@ define	EP_XORDER	Memi[P2I($1+366)]		# Background xorder
 define	EP_YORDER	Memi[P2I($1+367)]		# Background xorder
  
 define	EP_LOGFD	Memi[P2I($1+368)]		# Log file descriptor
-define	EP_IM		Memi[P2I($1+369)]		# IMIO pointer
-define	EP_INDATA	Memi[P2I($1+370)]		# Input data pointer
-define	EP_OUTDATA	Memi[P2I($1+371)]		# Output data pointer
+define	EP_IM		Memp[$1+369]			# IMIO pointer
+define	EP_INDATA	Memp[$1+370]			# Input data pointer
+define	EP_OUTDATA	Memp[$1+371]			# Output data pointer
 define	EP_NX		Memi[P2I($1+372)]		# Number of columns in subraster
 define	EP_NY		Memi[P2I($1+373)]		# Number of lines in subraster
 define	EP_NPTS		Memi[P2I($1+374)]		# Number of pixels in subraster

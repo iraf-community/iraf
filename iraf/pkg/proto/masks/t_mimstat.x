@@ -16,7 +16,8 @@ int	nbins, in_invert, nbad, cache, old_size
 
 real	clgetr()
 pointer	mp_open(), mp_miopen()
-int	imtopenp(), imtopen(), imtlen(), imtgetim(), immap(), clgeti()
+int	imtlen(), imtgetim(), clgeti()
+pointer	imtopenp(), imtopen(), immap()
 int	mst_fields(), btoi(), mio_glsegr(), mst_ihist(), imstati()
 int	mst_umask(), strmatch()
 bool	clgetb()

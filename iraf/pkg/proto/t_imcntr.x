@@ -66,7 +66,7 @@ int	x1, x2, y1, y2, half_box
 int	ncols, nrows, nx, ny, try
 real	xinit, yinit
 pointer	bufptr, sp, x_vect, y_vect
-int	imgs2r()
+pointer	imgs2r()
 
 begin
 	half_box = (boxsize - 1) / 2

@@ -336,14 +336,14 @@ begin
 	    do j = i, i + nxsub - 1 {
 		if (isnull[index[j]] <= 0) {
 		    Memc[inimage] = EOS
-		    Memi[imptrs+j-i] = NULL
+		    Memp[imptrs+j-i] = NULL
 		} else {
 		    if (imtrgetim (imlist, isnull[index[j]], Memc[inimage],
 		        SZ_FNAME) == EOF)
-			Memi[imptrs+j-i] = NULL
+			Memp[imptrs+j-i] = NULL
 		    else {
 			call strcat (trimsection, Memc[inimage], SZ_FNAME)
-			Memi[imptrs+j-i] = immap (Memc[inimage], READ_ONLY, 0)
+			Memp[imptrs+j-i] = immap (Memc[inimage], READ_ONLY, 0)
 		    }
 		}
 	    }
@@ -356,15 +356,15 @@ begin
 	    }
 
 	    # Write the output lines.
-	    call it_mklines (Memi[imptrs], outim, index, c1, c2, ll1, ll2,
+	    call it_mklines (Memp[imptrs], outim, index, c1, c2, ll1, ll2,
 	        median, i, nxsub, oval, subtract)
 	    olineptr = ll2 + 1
 
 	    # Close up the images.
 	    # Open the nxsub input images.
 	    do j = i, i + nxsub - 1 {
-		if (Memi[imptrs+j-i] != NULL)
-		    call imunmap (Memi[imptrs+j-i])
+		if (Memp[imptrs+j-i] != NULL)
+		    call imunmap (Memp[imptrs+j-i])
 	    }
 
 	}

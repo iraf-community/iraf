@@ -21,7 +21,7 @@ pointer	ip					# task structure pointer
 int	binfiles				# binary files list pointer
 pointer	imfiles					# output image list pointer
 int	fdb					# format database descriptor
-int	im					# image pointer
+pointer	im					# image pointer
 pointer	sp, bfname, imname			# local storage
 pointer	format, output, fmt, idstr
 

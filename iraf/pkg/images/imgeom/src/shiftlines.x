@@ -27,7 +27,8 @@ real	dx, deltax, cx
 pointer	sp, x, asi, junk, buf1, buf2
 
 bool	fp_equalr()
-int	imggsr(), impnlr(), asigeti()
+int	impnlr(), asigeti()
+pointer	imggsr()
 
 begin
 	# Check for out of bounds shifts.
@@ -140,7 +141,7 @@ int	i, ncols, nlines, junk
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 pointer	buf1, buf2
 
-int	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
+pointer	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 
 begin

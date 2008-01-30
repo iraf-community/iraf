@@ -52,7 +52,7 @@ begin
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
 	do i = 1 , nyk - 1 {
-	    Memi[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
+	    Memp[lineptrs+i] = imgs2r (im1, col1, col2, inline, inline)
 	    inline = inline + 1
 	}
 
@@ -62,10 +62,10 @@ begin
 
 	    # Scroll the input buffers
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line
-	    Memi[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im1, col1, col2, inline,
 	        inline)
 
 	    # Get output image line
@@ -76,7 +76,7 @@ begin
 	    # Generate output image line
 	    call aclrr (Memr[outbuf], ncols)
 	    do i = 1, nyk
-	        call acnvr (Memr[Memi[lineptrs+i-1]], Memr[outbuf], ncols,
+	        call acnvr (Memr[Memp[lineptrs+i-1]], Memr[outbuf], ncols,
 	    	    Memr[nkern+(i-1)*nxk], nxk)
 
 	    inline = inline + 1

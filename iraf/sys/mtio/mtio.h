@@ -19,21 +19,22 @@ define	MT_DEVICE	mtnam[1,$1+1]	# drive name
 define	MT_IODEV	mtosn[1,$1+1]	# i/o device
 define	MT_LKNAME	mtlkn[1,$1+1]	# lock file name
 
-define	LEN_MTIODES	11
+define	LEN_MTIODES	10
 define	MT_DEVPOS	MT_FILNO	# devpos struct (passed to driver)
 define	LEN_DEVPOS	5
 
 define	MT_OSCHAN	mtdev[1,$1+1]	# OS channel or 0
 define	MT_ACMODE	mtdev[2,$1+1]	# new access mode
-define	MT_DEVCAP	mtdev[3,$1+1]	# pointer to tapecap entry for device
-define	MT_FILE		mtdev[4,$1+1]	# new file number
-define	MT_RECORD	mtdev[5,$1+1]	# new record number
-define	MT_ATEOF	mtdev[6,$1+1]	# reached end of file on a read
-define	MT_FILNO	mtdev[7,$1+1]	# old file number at open
-define	MT_RECNO	mtdev[8,$1+1]	# old record number at open
-define	MT_NFILES	mtdev[9,$1+1]	# nfiles on tape
-define	MT_TAPEUSED	mtdev[10,$1+1]	# total tape used, bytes
-define	MT_PFLAGS	mtdev[11,$1+1]	# i/o flags returned by driver
+define	MT_FILE		mtdev[3,$1+1]	# new file number
+define	MT_RECORD	mtdev[4,$1+1]	# new record number
+define	MT_ATEOF	mtdev[5,$1+1]	# reached end of file on a read
+define	MT_FILNO	mtdev[6,$1+1]	# old file number at open
+define	MT_RECNO	mtdev[7,$1+1]	# old record number at open
+define	MT_NFILES	mtdev[8,$1+1]	# nfiles on tape
+define	MT_TAPEUSED	mtdev[9,$1+1]	# total tape used, bytes
+define	MT_PFLAGS	mtdev[10,$1+1]	# i/o flags returned by driver
+
+define	MT_DEVCAP	mtdevcap[$1+1]	# pointer to tapecap entry for device
 
 # PFLAGS bitflags.
 define	MF_ERR		001B		# i/o error in last operation

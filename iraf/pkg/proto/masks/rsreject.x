@@ -44,8 +44,8 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (im, nimages, TY_INT)
-	call salloc (mpim, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (mpim, nimages, TY_POINTER)
 	call salloc (norm, nimages, TY_REAL)
 	call salloc (vs, IM_MAXDIM, TY_LONG)
 	call salloc (ve, IM_MAXDIM, TY_LONG)
@@ -65,10 +65,10 @@ begin
 	    do i = 1, finish - start + 1 {
 		if (imids[i] == current)
 		    next
-	        Memi[im+n] = imptrs[i]
+	        Memp[im+n] = imptrs[i]
 		iferr (Memr[norm+n] = imgetr (imptrs[i], skyscale))
 		    Memr[norm+n] = 1.0
-		Memi[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES),
+		Memp[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES),
 		        imptrs[i])
 		n = n + 1
 	    }
@@ -90,10 +90,10 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call mio_setrange (Memi[mpim+i-1], Meml[vs], Meml[ve],
-			IM_NDIM(Memi[im+i-1]))
+		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
+			IM_NDIM(Memp[im+i-1]))
 		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpim+i-1], buf_in, mval,
+		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
 			    Memr[buf_out+Meml[vin]-1], npts, Memr[norm+i-1],
@@ -119,7 +119,7 @@ begin
 
 	    # Unmap the images.
 	    do i = 1, n 
-		call mio_close (Memi[mpim+i-1])
+		call mio_close (Memp[mpim+i-1])
 
 	    # Finish up.
 	    call sfree (sp)
@@ -133,10 +133,10 @@ begin
 	do i = 1, finish - start + 1 {
 	    if (imids[i] == current)
 		next
-	    Memi[im+n] = imptrs[i]
+	    Memp[im+n] = imptrs[i]
 	    iferr (Memr[norm+n] = imgetr (imptrs[i], skyscale))
 	        Memr[norm+n] = 1.0
-	    Memi[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES), imptrs[i])
+	    Memp[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES), imptrs[i])
 	   n = n + 1
 	}
 
@@ -159,10 +159,10 @@ begin
 
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
-		call mio_setrange (Memi[mpim+i-1], Meml[vs], Meml[ve],
-		    IM_NDIM(Memi[im+i-1]))
+		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
+		    IM_NDIM(Memp[im+i-1]))
 		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
-		while (mio_glsegr (Memi[mpim+i-1], buf_in, mval, Meml[vin],
+		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
 		        Memr[norm+i-1], Memr[pbuf], Memi[buf_msk], npix)
@@ -188,7 +188,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call mio_close (Memi[mpim+i-1])
+	    call mio_close (Memp[mpim+i-1])
 
 	call sfree (sp)
 end
@@ -234,9 +234,9 @@ begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (im, nimages, TY_INT)
-	call salloc (mkim, nimages, TY_INT)
-	call salloc (mpim, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (mkim, nimages, TY_POINTER)
+	call salloc (mpim, nimages, TY_POINTER)
 	call salloc (norm, nimages, TY_REAL)
 	call salloc (vs, IM_MAXDIM, TY_LONG)
 	call salloc (ve, IM_MAXDIM, TY_LONG)
@@ -257,27 +257,27 @@ begin
 		if (i == current)
 		    next
 	        if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
-		    iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+		    iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 			Memr[norm+n] = 1.0
                     if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                         if (msk_invert) {
                             Memc[str] = '^'
-                            Memi[mkim+n] = mp_open (Memc[str], Memi[im+n],
+                            Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
 			        Memc[input], SZ_FNAME)
                         } else
-                            Memi[mkim+n] = mp_open (Memc[str+1], Memi[im+n],
+                            Memp[mkim+n] = mp_open (Memc[str+1], Memp[im+n],
 				Memc[input], SZ_FNAME)
                     } else if (imtrgetim (msklist, 1, Memc[str],
 			SZ_FNAME) != EOF) {
-                        Memi[mkim+n] = mp_open (Memc[str], Memi[im+n],
+                        Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
 			    Memc[input], SZ_FNAME)
                     } else {
-                        Memi[mkim+n] = mp_open ("", Memi[im+n], Memc[input],
+                        Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
 			    SZ_FNAME)
                     }
-		    Memi[mpim+n] = mio_openo (imstati(Memi[mkim+n], IM_PLDES),
-		        Memi[im+n])
+		    Memp[mpim+n] = mio_openo (imstati(Memp[mkim+n], IM_PLDES),
+		        Memp[im+n])
 		    n = n + 1
 		}
 	    }
@@ -299,10 +299,10 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call mio_setrange (Memi[mpim+i-1], Meml[vs], Meml[ve],
-			IM_NDIM(Memi[im+i-1]))
+		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
+			IM_NDIM(Memp[im+i-1]))
 		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpim+i-1], buf_in, mval,
+		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
 			    Memr[buf_out+Meml[vin]-1], npts, Memr[norm+i-1],
@@ -328,9 +328,9 @@ begin
 
 	    # Unmap the images.
 	    do i = 1, n {
-		call mio_close (Memi[mpim+i-1])
-	        call imunmap (Memi[mkim+i-1])
-	        call imunmap (Memi[im+i-1])
+		call mio_close (Memp[mpim+i-1])
+	        call imunmap (Memp[mkim+i-1])
+	        call imunmap (Memp[im+i-1])
 	    }
 
 	    # Finish up.
@@ -346,26 +346,26 @@ begin
 	    if (i == current)
 		next
 	    if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	        Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
-		iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	        Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+		iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		    Memr[norm+n] = 1.0
                 if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                     if (msk_invert) {
                         Memc[str] = '^'
-                        Memi[mkim+n] = mp_open (Memc[str], Memi[im+n],
+                        Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
 		            Memc[input], SZ_FNAME)
                     } else
-                        Memi[mkim+n] = mp_open (Memc[str+1], Memi[im+n],
+                        Memp[mkim+n] = mp_open (Memc[str+1], Memp[im+n],
 			    Memc[input], SZ_FNAME)
                 } else if (imtrgetim (msklist, 1, Memc[str], SZ_FNAME) != EOF) {
-                    Memi[mkim+n] = mp_open (Memc[str], Memi[im+n],
+                    Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
 		        Memc[input], SZ_FNAME)
                 } else {
-                    Memi[mkim+n] = mp_open ("", Memi[im+n], Memc[input],
+                    Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
 		        SZ_FNAME)
                 }
-		Memi[mpim+n] = mio_openo (imstati(Memi[mkim+n], IM_PLDES),
-		    Memi[im+n])
+		Memp[mpim+n] = mio_openo (imstati(Memp[mkim+n], IM_PLDES),
+		    Memp[im+n])
 	        n = n + 1
 	    }
 	}
@@ -389,10 +389,10 @@ begin
 
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
-		call mio_setrange (Memi[mpim+i-1], Meml[vs], Meml[ve],
-		    IM_NDIM(Memi[im+i-1]))
+		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
+		    IM_NDIM(Memp[im+i-1]))
 		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
-		while (mio_glsegr (Memi[mpim+i-1], buf_in, mval, Meml[vin],
+		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
 		        Memr[norm+i-1], Memr[pbuf], Memi[buf_msk], npix)
@@ -418,9 +418,9 @@ begin
 
 	# Finish up.
 	do i = 1, n {
-	    call mio_close (Memi[mpim+i-1])
-	    call imunmap (Memi[mkim+i-1])
-	    call imunmap (Memi[im+i-1])
+	    call mio_close (Memp[mpim+i-1])
+	    call imunmap (Memp[mkim+i-1])
+	    call imunmap (Memp[im+i-1])
 	}
 	call sfree (sp)
 end
@@ -477,7 +477,7 @@ begin
 	call smark (sp)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 	call salloc (norm, nimages, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
@@ -492,8 +492,8 @@ begin
 	    do i = 1, finish - start + 1 {
 		if (imids[i] == current)
 		    next
-	        Memi[im+n] = imptrs[i]
-		iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	        Memp[im+n] = imptrs[i]
+		iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		    Memr[norm+n] = 1.0
 		n = n + 1
 	    }
@@ -511,7 +511,7 @@ begin
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
 		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		    if (imgnlr (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call awsur (Memr[buf_in], Memr[buf_out], Memr[buf_out],
 			npix, Memr[norm+i-1], 1.0)
@@ -539,14 +539,14 @@ begin
 	do i = 1, finish - start + 1 {
 	    if (imids[i] == current)
 		next
-	    Memi[im+n] = imptrs[i]
-	    iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	    Memp[im+n] = imptrs[i]
+	    iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		Memr[norm+n] = 1.0
 	    n = n + 1
 	}
 
 	# Allocate additional buffer space.
-	call salloc (pbuf, nimages, TY_INT)
+	call salloc (pbuf, nimages, TY_POINTER)
 	call salloc (rbuf, nimages * npix, TY_REAL)
 
 	# Initialize the i/o.
@@ -558,16 +558,16 @@ begin
 
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
-		Memi[pbuf+i-1] = rbuf + (i - 1) * npix
+		Memp[pbuf+i-1] = rbuf + (i - 1) * npix
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnlr (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[Memi[pbuf+i-1]],
+		call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[Memp[pbuf+i-1]],
 		    npix)
 	    }
 
 	    # Reject pixels. Sum the remaining pixels.
-	    call rs_rejr (Memi[pbuf], nimages, Memr[buf_out], npix, nl, nh)
+	    call rs_rejr (Memp[pbuf], nimages, Memr[buf_out], npix, nl, nh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if (naccept > 1) {
@@ -634,7 +634,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_INT)
+	call salloc (im, nimages, TY_POINTER)
 	call salloc (norm, nimages, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
@@ -650,8 +650,8 @@ begin
 		if (i == current)
 		    next
 	        if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	            Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
-		    iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+		    iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 			Memr[norm+n] = 1.0
 		    n = n + 1
 		}
@@ -670,7 +670,7 @@ begin
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
 		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		    if (imgnlr (Memi[im+i-1], buf_in, Meml[v2]) == EOF)
+		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[buf_in],
 		        npix)
@@ -687,7 +687,7 @@ begin
 
 	    # Unmap the images.
 	    do i = 1, n
-	        call imunmap (Memi[im+i-1])
+	        call imunmap (Memp[im+i-1])
 
 	    # Finish up.
 	    call sfree (sp)
@@ -701,15 +701,15 @@ begin
 	    if (i == current)
 		next
 	    if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	        Memi[im+n] = immap (Memc[input], READ_ONLY, 0)
-		iferr (Memr[norm+n] = imgetr (Memi[im+n], skyscale))
+	        Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+		iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		    Memr[norm+n] = 1.0
 	        n = n + 1
 	    }
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_INT)
+	call salloc (buf, nimages, TY_POINTER)
 
 	# Initialize the i/o.
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
@@ -721,14 +721,14 @@ begin
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
-		if (imgnlr (Memi[im+i-1], Memi[buf+i-1], Meml[v2]) == EOF)
+		if (imgnlr (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
-		call amulkr (Memr[Memi[buf+i-1]], Memr[norm+i-1],
-		    Memr[Memi[buf+i-1]], npix)
+		call amulkr (Memr[Memp[buf+i-1]], Memr[norm+i-1],
+		    Memr[Memp[buf+i-1]], npix)
 	    }
 
 	    # Reject pixels. Sum the remaining pixels.
-	    call rs_rejr (Memi[buf], nimages, Memr[buf_out], npix, nl, nh)
+	    call rs_rejr (Memp[buf], nimages, Memr[buf_out], npix, nl, nh)
 
 	    # If averaging divide the sum by the number of images averaged.
 	    if (naccept > 1) {
@@ -741,7 +741,7 @@ begin
 
 	# Finish up.
 	do i = 1, n
-	    call imunmap (Memi[im+i-1])
+	    call imunmap (Memp[im+i-1])
 	call sfree (sp)
 end
 

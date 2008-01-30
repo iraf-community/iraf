@@ -362,15 +362,15 @@ begin
 	    # Determine which images are to be open at any given time.
 
 	    if (imno == first) {
-		call rs_iptrs (inlist, Memi[imptrs], Memi[imids], start,
+		call rs_iptrs (inlist, Memp[imptrs], Memi[imids], start,
 		    finish, cache, oldsize)
-		IM_NDIM(tmpim) = IM_NDIM(Memi[imptrs])
-		call amovl (IM_LEN(Memi[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
+		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), finish - start + 2, tmpim,
 		    bufsize)
 	    } else {
-		call rs_asptrs (inlist, Memi[imptrs], Memi[imids],
+		call rs_asptrs (inlist, Memp[imptrs], Memi[imids],
 		    start, finish, ostart, ofinish, cache)
 	    }
 
@@ -379,7 +379,7 @@ begin
 	    do i = 1, finish - start + 1 {
 		if (Memi[imids+i-1] != imno)
 		    next
-		im = Memi[imptrs+i-1]
+		im = Memp[imptrs+i-1]
 		break
 	    }
 
@@ -396,11 +396,11 @@ begin
 
 	        # Combine images with rejection.
 	        if (RS_COMBINE(rs) == RS_MEAN)
-	            call rs_asumr (Memi[imptrs], Memi[imids], tmpim, start,
+	            call rs_asumr (Memp[imptrs], Memi[imids], tmpim, start,
 		        finish, imno, RS_NLOREJ(rs), RS_NHIREJ(rs),
 			RS_KYFSCALE(rs))
 	        else
-	            call rs_asumr (Memi[imptrs], Memi[imids], tmpim, start,
+	            call rs_asumr (Memp[imptrs], Memi[imids], tmpim, start,
 		        finish, imno, INDEFI, INDEFI, RS_KYFSCALE(rs))
 
 	        # Compute the normalization factor.
@@ -416,7 +416,7 @@ begin
 	    # Unmap the remaining image pointers.
 	    if (imno == last) {
 		do i = 1, finish - start + 1
-		    call imunmap (Memi[imptrs+i-1])
+		    call imunmap (Memp[imptrs+i-1])
 	    }
 
 	    ostart = start
@@ -671,8 +671,8 @@ begin
 	do i = start, finish {
 	    if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) == EOF)
 		;
-	    Memi[imptrs+j-1] = immap (Memc[image], READ_ONLY, 0)
-	    iferr (Memr[imnorm+j-1] = imgetr (Memi[imptrs+j-1], skyscale))
+	    Memp[imptrs+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    iferr (Memr[imnorm+j-1] = imgetr (Memp[imptrs+j-1], skyscale))
 		Memr[imnorm+j-1] = 1.0
 		#normsum = normsum + 1.0
 	    #else
@@ -686,7 +686,7 @@ begin
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF) {
 	    call amovkr (0.0, Memr[obuf], npix)
 	    do j = 1, nin {
-		if (imgnlr (Memi[imptrs+j-1], ibuf,
+		if (imgnlr (Memp[imptrs+j-1], ibuf,
 		    Meml[vin+(j-1)*IM_MAXDIM]) == EOF)
 		    ;
 		call amulkr (Memr[ibuf], Memr[imnorm+j-1], Memr[ibuf], npix) 
@@ -696,7 +696,7 @@ begin
 
 	# Close the input images.
 	do j = 1, nin
-	    call imunmap (Memi[imptrs+j-1])
+	    call imunmap (Memp[imptrs+j-1])
 
 	call sfree (sp)
 end
@@ -849,10 +849,10 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (vin, IM_MAXDIM, TY_LONG)
 	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (imsub, nsub, TY_INT)
+	call salloc (imsub, nsub, TY_POINTER)
 	call salloc (norms, nsub, TY_REAL)
 	call salloc (vsub, nsub * IM_MAXDIM, TY_LONG)
-	call salloc (imadd, nadd, TY_INT)
+	call salloc (imadd, nadd, TY_POINTER)
 	call salloc (vadd, nadd * IM_MAXDIM, TY_LONG)
 	call salloc (norma, nadd, TY_REAL)
 
@@ -863,8 +863,8 @@ begin
 	    j = 1
 	    do i = ostart, start - 1 {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	    	    Memi[imsub+j-1] = immap (Memc[image], READ_ONLY, 0)
-	    	    iferr (Memr[norms+j-1] = imgetr (Memi[imsub+j-1], skyscale))
+	    	    Memp[imsub+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    	    iferr (Memr[norms+j-1] = imgetr (Memp[imsub+j-1], skyscale))
 			Memr[norms+j-1] = 1.0
 	    	    #normsum = normsum - Memr[norms+j-1]
 	        }
@@ -880,8 +880,8 @@ begin
 	    j = 1
 	    do i = ofinish + 1, finish {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	            Memi[imadd+j-1] = immap (Memc[image], READ_ONLY, 0)
-	            iferr (Memr[norma+j-1] = imgetr (Memi[imadd+j-1], skyscale))
+	            Memp[imadd+j-1] = immap (Memc[image], READ_ONLY, 0)
+	            iferr (Memr[norma+j-1] = imgetr (Memp[imadd+j-1], skyscale))
 			Memr[norma+j-1] = 1.0
 	            #normsum = normsum + Memr[norma+j-1]
 		}
@@ -900,7 +900,7 @@ begin
 	    imgnlr (tmpim, ibuf, Meml[vin]) != EOF) {
 	    if (dosub == YES && doadd == YES) {
 		do i = 1, nsub {
-		    if (imgnlr (Memi[imsub+i-1], sbuf,
+		    if (imgnlr (Memp[imsub+i-1], sbuf,
 		        Meml[vsub+(i-1)*nsub]) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
 			    npix)
@@ -913,7 +913,7 @@ begin
 		    }
 		}
 		do i = 1, nadd {
-		    if (imgnlr (Memi[imadd+i-1], abuf,
+		    if (imgnlr (Memp[imadd+i-1], abuf,
 		        Meml[vadd+(i-1)*nadd]) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
 			    npix)
@@ -922,7 +922,7 @@ begin
 		}
 	    } else if (dosub == YES) {
 		do i = 1, nsub {
-		    if (imgnlr (Memi[imsub+i-1], sbuf,
+		    if (imgnlr (Memp[imsub+i-1], sbuf,
 		        Meml[vsub+(i-1)*nsub]) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
 			    npix)
@@ -936,7 +936,7 @@ begin
 		}
 	    } else if (doadd == YES) {
 		do i = 1, nadd {
-		    if (imgnlr (Memi[imadd+i-1], abuf,
+		    if (imgnlr (Memp[imadd+i-1], abuf,
 		        Meml[vadd+(i-1)*nadd]) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
 			    npix)
@@ -953,10 +953,10 @@ begin
 
 	# Close the images to be added or subtracted.
 	do i = 1, nsub {
-	    call imunmap (Memi[imsub+i-1])
+	    call imunmap (Memp[imsub+i-1])
 	}
 	do i = 1, nadd {
-	    call imunmap (Memi[imadd+i-1])
+	    call imunmap (Memp[imadd+i-1])
 	}
 
 	call sfree (sp)

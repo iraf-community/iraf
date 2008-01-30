@@ -15,7 +15,7 @@ define	IP_LSKIP 	Memi[P2I($1+4)]	    # bytes to skip at front of line
 define	IP_LPAD 	Memi[P2I($1+5)]	    # bytes to skip at end of line
 define	IP_SWAP 	Memi[P2I($1+6)]	    # type of byte swapping
 define	IP_NPIXT	Memi[P2I($1+7)]	    # number of pixtypes
-define	IP_PIXTYPE	Memi[P2I($1+8)]	    # pixtype ptr to operands
+define	IP_PIXTYPE	Memp[$1+8]	    # pixtype ptr to operands
 define  IP_NDIM 	Memi[P2I($1+9)]	    # number of input axes
 define  IP_AXLEN 	Memi[P2I(($1+10))+$2-1]  # input axis dimension
 
@@ -23,51 +23,51 @@ define  IP_AXLEN 	Memi[P2I(($1+10))+$2-1]  # input axis dimension
 define	IP_OUTPUT 	Memi[P2I($1+20)]	    # type of output generated
 define	IP_OUTTYPE 	Memi[P2I($1+21)]	    # output pixel type
 define	IP_NBANDS 	Memi[P2I($1+22)]	    # no. of outbands expr string
-define	IP_OUTBANDS 	Memi[P2I($1+23)]	    # outbands expr string (ptr)
-define	IP_IMHEADER 	Memi[P2I($1+24)]	    # file w/ header info (ptr)
+define	IP_OUTBANDS 	Memp[$1+23]		    # outbands expr string (ptr)
+define	IP_IMHEADER 	Memp[$1+24]		    # file w/ header info (ptr)
 define	IP_VERBOSE 	Memi[P2I($1+25)]	    # verbose output flag
 
 define	IP_FORMAT 	Memi[P2I($1+26)]	    # format param
 define	IP_BLTIN 	Memi[P2I($1+27)]	    # format is a 'builtin'
 define	IP_FCODE	Memi[P2I($1+28)]	    # builtin format code
-define	IP_FSYM 	Memi[P2I($1+29)]	    # symtab pointer to db record
-define	IP_IM 		Memi[P2I($1+30)]	    # output image pointer
-define	IP_FD 		Memi[P2I($1+31)]	    # binary file pointer
+define	IP_FSYM 	Memp[$1+29]		    # symtab pointer to db record
+define	IP_IM 		Memp[$1+30]		    # output image pointer
+define	IP_FD 		Memi[P2I($1+31)]	    # binary file descripter
 define	IP_OFFSET	Memi[P2I($1+32)]	    # binary file offset
 define	IP_FLIP		Memi[P2I($1+33)]	    # output image orientation flag
-define	IP_COMPTR	Memi[P2I($1+34)]	    # comment block pointer
+define	IP_COMPTR	Memp[$1+34]		    # comment block pointer
 
-define	IP_BUFPTR	Memi[P2I($1+35)]   	    # array of image buffers (ptr)
+define	IP_BUFPTR	Memp[$1+35]		    # array of image buffers (ptr)
 define	IP_NPTRS	Memi[P2I($1+36)]   	    # number of image buffer
 define	IP_SZBUF	Memi[P2I($1+37)]   	    # size of image buffer (lines)
 
-define	IP_CMAP		Memi[P2I($1+38)]   	    # image colormap (ptr)
+define	IP_CMAP		Memp[$1+38]		    # image colormap (ptr)
 define	IP_USE_CMAP	Memi[P2I($1+39)]   	    # use the image colormap?
 
 # Useful Macros
-define	PTYPE		Memi[P2I(IP_PIXTYPE($1))+$2-1]
-define	OBANDS		Memi[P2I(IP_OUTBANDS($1))+$2-1]
+define	PTYPE		Memp[IP_PIXTYPE($1)+$2-1]
+define	OBANDS		Memp[IP_OUTBANDS($1)+$2-1]
 define	COMMENT		Memc[IP_COMPTR($1)]
-define	BUFFER		Memi[P2I(IP_BUFPTR($1))+$2-1]
+define	BUFFER		Memp[IP_BUFPTR($1)+$2-1]
 
 
 #-----------------------------------------------------------------------------
 
 # Outbands structure
 define  LEN_OUTBANDS    2
-define	OB_EXPR		Memi[P2I($1)]		# expression string
-define	OB_OP		Memi[P2I($1+1)]		# operand struct pointer
+define	OB_EXPR		Memp[$1]		# expression string
+define	OB_OP		Memp[$1+1]		# operand struct pointer
 define	O_EXPR		Memc[OB_EXPR(OBANDS($1,$2))]
 define	O_OP		OB_OP(OBANDS($1,$2))
 
 # Operand structure
 define	SZ_TAG		15
 define  LEN_OPERAND     6
-define  IO_TAG          Memi[P2I($1)]                # operand tag name
+define  IO_TAG          Memp[$1]                # operand tag name
 define  IO_TYPE         Memi[P2I($1+1)]              # operand type
 define  IO_NBYTES       Memi[P2I($1+2)]              # number of bytes
 define  IO_NPIX         Memi[P2I($1+3)]              # number of pixels
-define  IO_DATA         Memi[P2I($1+4)]              # line of pixels
+define  IO_DATA         Memp[$1+4]              # line of pixels
 define	OP_TAG		Memc[IO_TAG($1)]
 
 

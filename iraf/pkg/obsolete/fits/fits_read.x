@@ -14,7 +14,8 @@ char	iraffile[ARB]		# IRAF file name
 
 int	fits_fd, stat, min_lenuserarea, ip
 pointer	im, sp, fits, envstr
-int	rft_read_header(), mtopen(), immap(), strlen(), envfind(), ctoi()
+int	rft_read_header(), mtopen(), strlen(), envfind(), ctoi()
+pointer	immap()
 errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof()
 errchk	rft_scan_file, mtopen, immap, imdelete, close, imunmap
 

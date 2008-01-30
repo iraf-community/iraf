@@ -190,20 +190,20 @@ begin
 	    # input image. It is probably not necessary to cache the mask
 	    # since it is already in memory ...
 	    if (imno == start) {
-		call rs_piptrs (inlist, msklist, Memi[imptrs], Memi[mskptrs],
+		call rs_piptrs (inlist, msklist, Memp[imptrs], Memp[mskptrs],
 		    Memi[imids], start, finish, msk_invert, cache, old_size)
-		IM_NDIM(tmpim) = IM_NDIM(Memi[imptrs])
-		call amovl (IM_LEN(Memi[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
+		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), (finish - start + 2), tmpim,
 		    new_size)
-		IM_NDIM(tmpmsk) = IM_NDIM(Memi[imptrs])
-		call amovl (IM_LEN(Memi[imptrs],1), IM_LEN(tmpmsk,1), IM_MAXDIM)
+		IM_NDIM(tmpmsk) = IM_NDIM(Memp[imptrs])
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpmsk,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), (finish - start + 3), tmpmsk,
 		    new_size)
 	    } else {
-		call rs_pasptrs (inlist, msklist, Memi[imptrs], Memi[mskptrs],
+		call rs_pasptrs (inlist, msklist, Memp[imptrs], Memp[mskptrs],
 		    Memi[imids], start, finish, ostart, ofinish, msk_invert,
 		    cache)
 	    }
@@ -214,8 +214,8 @@ begin
 	    do i = 1, finish - start + 1 {
 		if (Memi[imids+i-1] != imno)
 		    next
-		im = Memi[imptrs+i-1]
-		pmim = Memi[mskptrs+i-1]
+		im = Memp[imptrs+i-1]
+		pmim = Memp[mskptrs+i-1]
 		break
 	    }
 
@@ -251,11 +251,11 @@ begin
 		        fhigh = fhigh / (finish - start)
 		    else
 		        fhigh = 0.0
-	            call rs_apsumr (Memi[imptrs], Memi[mskptrs], Memi[imids],
+	            call rs_apsumr (Memp[imptrs], Memp[mskptrs], Memi[imids],
 		        tmpim, tmpmsk, start, finish, imno, flow, fhigh,
 		        RS_KYFSCALE(rs))
 	        } else {
-	            call rs_apsumr (Memi[imptrs], Memi[mskptrs], Memi[imids],
+	            call rs_apsumr (Memp[imptrs], Memp[mskptrs], Memi[imids],
 		        tmpim, tmpmsk, start, finish, imno, INDEFR, INDEFR,
 		        RS_KYFSCALE(rs))
 	        }
@@ -282,8 +282,8 @@ begin
 	    # Close up remaining buffered images
 	    if (imno == last) {
 		do i = 1, finish - start + 1
-		    call imunmap (Memi[mskptrs+i-1])
-		    call imunmap (Memi[imptrs+i-1])
+		    call imunmap (Memp[mskptrs+i-1])
+		    call imunmap (Memp[imptrs+i-1])
 	    }
 
 	    ostart = start
@@ -880,10 +880,10 @@ begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR) 
 	call salloc (imask, SZ_FNAME, TY_CHAR) 
-	call salloc (imptrs, nin, TY_INT) 
+	call salloc (imptrs, nin, TY_POINTER) 
 	call salloc (imnorm, nin, TY_REAL) 
-	call salloc (mkptrs, nin, TY_INT) 
-	call salloc (mpptrs, nin, TY_INT) 
+	call salloc (mkptrs, nin, TY_POINTER) 
+	call salloc (mpptrs, nin, TY_POINTER) 
 	call salloc (vout, IM_MAXDIM, TY_LONG) 
 	call salloc (mvout, IM_MAXDIM, TY_LONG) 
 	call salloc (vs, IM_MAXDIM, TY_LONG) 
@@ -897,26 +897,26 @@ begin
 	do i = start, finish {
 	    if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) == EOF)
 		;
-	    Memi[imptrs+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    Memp[imptrs+j-1] = immap (Memc[image], READ_ONLY, 0)
 	    if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                 if (msk_invert) {
                     Memc[str] = '^'
-                    Memi[mkptrs+j-1] = mp_open (Memc[str], Memi[imptrs+j-1],
+                    Memp[mkptrs+j-1] = mp_open (Memc[str], Memp[imptrs+j-1],
 		        Memc[imask], SZ_FNAME)
                 } else {
-                    Memi[mkptrs+j-1] = mp_open (Memc[str+1], Memi[imptrs+j-1],
+                    Memp[mkptrs+j-1] = mp_open (Memc[str+1], Memp[imptrs+j-1],
 		        Memc[imask], SZ_FNAME)
 	        }
 	    } else if (imtrgetim (msklist, 1, Memc[str], SZ_FNAME) != EOF) {
-                Memi[mkptrs+j-1] = mp_open (Memc[str], Memi[imptrs+j-1],
+                Memp[mkptrs+j-1] = mp_open (Memc[str], Memp[imptrs+j-1],
 		    Memc[imask], SZ_FNAME)
 	    } else {
-                Memi[mkptrs+j-1] = mp_open ("", Memi[imptrs+j-1], Memc[imask],
+                Memp[mkptrs+j-1] = mp_open ("", Memp[imptrs+j-1], Memc[imask],
 		    SZ_FNAME)
 	    }
-	    Memi[mpptrs+j-1] = mio_openo (imstati(Memi[mkptrs+j-1], IM_PLDES),
-	        Memi[imptrs+j-1])
-	    iferr (Memr[imnorm+j-1] = imgetr (Memi[imptrs+j-1], skyscale))
+	    Memp[mpptrs+j-1] = mio_openo (imstati(Memp[mkptrs+j-1], IM_PLDES),
+	        Memp[imptrs+j-1])
+	    iferr (Memr[imnorm+j-1] = imgetr (Memp[imptrs+j-1], skyscale))
 		Memr[imnorm+j-1] = 1.0
 		#normsum = normsum + 1.0
 	    #else
@@ -938,10 +938,10 @@ begin
 	    call amovkr (0.0, Memr[obuf], npix)
 	    call amovki (0, Memi[ombuf], npix)
 	    do j = 1, nin {
-	        call mio_setrange (Memi[mpptrs+j-1], Meml[vs], Meml[ve],
-		    IM_NDIM(Memi[imptrs+j-1])) 
+	        call mio_setrange (Memp[mpptrs+j-1], Meml[vs], Meml[ve],
+		    IM_NDIM(Memp[imptrs+j-1])) 
 		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
-		while (mio_glsegr (Memi[mpptrs+j-1], ibuf, mval,
+		while (mio_glsegr (Memp[mpptrs+j-1], ibuf, mval,
 		    Meml[vin], npts) != EOF) {
 		    call amulkr (Memr[ibuf], Memr[imnorm+j-1], Memr[ibuf],
 		        npts) 
@@ -959,9 +959,9 @@ begin
 
 	# Close the input images.
 	do j = 1, nin {
-	    call mio_close (Memi[mpptrs+j-1])
-	    call imunmap (Memi[mkptrs+j-1])
-	    call imunmap (Memi[imptrs+j-1])
+	    call mio_close (Memp[mpptrs+j-1])
+	    call imunmap (Memp[mkptrs+j-1])
+	    call imunmap (Memp[imptrs+j-1])
 	}
 
 	call sfree (sp)
@@ -1203,13 +1203,13 @@ begin
 	call salloc (ve, IM_MAXDIM, TY_LONG)
 	call salloc (v, IM_MAXDIM, TY_LONG)
 
-	call salloc (imsub, nsub, TY_INT)
-	call salloc (mksub, nsub, TY_INT)
-	call salloc (mpsub, nsub, TY_INT)
+	call salloc (imsub, nsub, TY_POINTER)
+	call salloc (mksub, nsub, TY_POINTER)
+	call salloc (mpsub, nsub, TY_POINTER)
 	call salloc (norms, nsub, TY_REAL)
-	call salloc (imadd, nadd, TY_INT)
-	call salloc (mkadd, nadd, TY_INT)
-	call salloc (mpadd, nadd, TY_INT)
+	call salloc (imadd, nadd, TY_POINTER)
+	call salloc (mkadd, nadd, TY_POINTER)
+	call salloc (mpadd, nadd, TY_POINTER)
 	call salloc (norma, nadd, TY_REAL)
 
 	# Open the images to be subtracted. In most cases there will be
@@ -1219,26 +1219,26 @@ begin
 	    j = 1
 	    do i = ostart, start - 1 {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	    	    Memi[imsub+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    	    Memp[imsub+j-1] = immap (Memc[image], READ_ONLY, 0)
                     if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                         if (msk_invert) {
                             Memc[str] = '^'
-                            Memi[mksub+j-1] = mp_open (Memc[str],
-				Memi[imsub+j-1], Memc[imask], SZ_FNAME)
+                            Memp[mksub+j-1] = mp_open (Memc[str],
+				Memp[imsub+j-1], Memc[imask], SZ_FNAME)
                         } else
-                            Memi[mksub+j-1] = mp_open (Memc[str+1],
-			        Memi[imsub+j-1], Memc[imask], SZ_FNAME)
+                            Memp[mksub+j-1] = mp_open (Memc[str+1],
+			        Memp[imsub+j-1], Memc[imask], SZ_FNAME)
                     } else if (imtrgetim (msklist, 1, Memc[str],
 			SZ_FNAME) != EOF) {
-                        Memi[mksub+j-1] = mp_open (Memc[str], Memi[imsub+j-1],
+                        Memp[mksub+j-1] = mp_open (Memc[str], Memp[imsub+j-1],
                             Memc[imask], SZ_FNAME)
                     } else {
-                        Memi[mksub+j-1] = mp_open ("", Memi[imsub+j-1],
+                        Memp[mksub+j-1] = mp_open ("", Memp[imsub+j-1],
 			    Memc[imask], SZ_FNAME)
                     }
-                    Memi[mpsub+j-1] = mio_openo (imstati(Memi[mksub+j-1],
-			IM_PLDES), Memi[imsub+j-1])
-	    	    iferr (Memr[norms+j-1] = imgetr (Memi[imsub+j-1], skyscale))
+                    Memp[mpsub+j-1] = mio_openo (imstati(Memp[mksub+j-1],
+			IM_PLDES), Memp[imsub+j-1])
+	    	    iferr (Memr[norms+j-1] = imgetr (Memp[imsub+j-1], skyscale))
 			Memr[norms+j-1] = 1.0
 	    	    #normsum = normsum - Memr[norms+j-1]
 	        }
@@ -1254,26 +1254,26 @@ begin
 	    j = 1
 	    do i = ofinish + 1, finish {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	            Memi[imadd+j-1] = immap (Memc[image], READ_ONLY, 0)
+	            Memp[imadd+j-1] = immap (Memc[image], READ_ONLY, 0)
                     if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                         if (msk_invert) {
                             Memc[str] = '^'
-                            Memi[mkadd+j-1] = mp_open (Memc[str],
-				Memi[imadd+j-1], Memc[imask], SZ_FNAME)
+                            Memp[mkadd+j-1] = mp_open (Memc[str],
+				Memp[imadd+j-1], Memc[imask], SZ_FNAME)
                         } else
-                            Memi[mkadd+j-1] = mp_open (Memc[str+1],
-			        Memi[imadd+j-1], Memc[imask], SZ_FNAME)
+                            Memp[mkadd+j-1] = mp_open (Memc[str+1],
+			        Memp[imadd+j-1], Memc[imask], SZ_FNAME)
                     } else if (imtrgetim (msklist, 1, Memc[str],
 			SZ_FNAME) != EOF) {
-                        Memi[mkadd+j-1] = mp_open (Memc[str], Memi[imadd+j-1],
+                        Memp[mkadd+j-1] = mp_open (Memc[str], Memp[imadd+j-1],
                             Memc[imask], SZ_FNAME)
                     } else {
-                        Memi[mkadd+j-1] = mp_open ("", Memi[imadd+j-1],
+                        Memp[mkadd+j-1] = mp_open ("", Memp[imadd+j-1],
 			    Memc[imask], SZ_FNAME)
                     }
-                    Memi[mpadd+j-1] = mio_openo (imstati(Memi[mkadd+j-1],
-			IM_PLDES), Memi[imadd+j-1])
-	            iferr (Memr[norma+j-1] = imgetr (Memi[imadd+j-1], skyscale))
+                    Memp[mpadd+j-1] = mio_openo (imstati(Memp[mkadd+j-1],
+			IM_PLDES), Memp[imadd+j-1])
+	            iferr (Memr[norma+j-1] = imgetr (Memp[imadd+j-1], skyscale))
 			Memr[norma+j-1] = 1.0
 	            #normsum = normsum + Memr[norma+j-1]
 		}
@@ -1300,10 +1300,10 @@ begin
 	    call amovi (Memi[mibuf], Memi[mobuf], npix)
 	    if (dosub == YES && doadd == YES) {
 		do i = 1, nsub {
-		    call mio_setrange (Memi[mpsub+i-1], Meml[vs], Meml[ve],
-		        IM_NDIM(Memi[imsub+i-1]))
+		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
+		        IM_NDIM(Memp[imsub+i-1]))
 		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpsub+i-1], sbuf, mval, Meml[v],
+		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
 			    npts)
@@ -1314,10 +1314,10 @@ begin
 		    }
 		}
 		do i = 1, nadd {
-		    call mio_setrange (Memi[mpadd+i-1], Meml[vs], Meml[ve],
-		        IM_NDIM(Memi[imadd+i-1]))
+		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
+		        IM_NDIM(Memp[imadd+i-1]))
 		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpadd+i-1], abuf, mval, Meml[v],
+		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
 			    npts)
@@ -1329,10 +1329,10 @@ begin
 		}
 	    } else if (dosub == YES) {
 		do i = 1, nsub {
-		    call mio_setrange (Memi[mpsub+i-1], Meml[vs], Meml[ve],
-		        IM_NDIM(Memi[imsub+i-1]))
+		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
+		        IM_NDIM(Memp[imsub+i-1]))
 		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpsub+i-1], sbuf, mval, Meml[v],
+		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
 			    npts)
@@ -1344,10 +1344,10 @@ begin
 		}
 	    } else if (doadd == YES) {
 		do i = 1, nadd {
-		    call mio_setrange (Memi[mpadd+i-1], Meml[vs], Meml[ve],
-		        IM_NDIM(Memi[imadd+i-1]))
+		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
+		        IM_NDIM(Memp[imadd+i-1]))
 		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
-		    while (mio_glsegr (Memi[mpadd+i-1], abuf, mval, Meml[v],
+		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
 			    npts)
@@ -1366,14 +1366,14 @@ begin
 
 	# Close the images to be added or subtracted.
 	do i = 1, nsub {
-	    call mio_close (Memi[mpsub+i-1])
-	    call imunmap (Memi[mksub+i-1])
-	    call imunmap (Memi[imsub+i-1])
+	    call mio_close (Memp[mpsub+i-1])
+	    call imunmap (Memp[mksub+i-1])
+	    call imunmap (Memp[imsub+i-1])
 	}
 	do i = 1, nadd {
-	    call mio_close (Memi[mpadd+i-1])
-	    call imunmap (Memi[mkadd+i-1])
-	    call imunmap (Memi[imadd+i-1])
+	    call mio_close (Memp[mpadd+i-1])
+	    call imunmap (Memp[mkadd+i-1])
+	    call imunmap (Memp[imadd+i-1])
 	}
 
 	call sfree (sp)

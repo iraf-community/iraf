@@ -67,7 +67,7 @@ retry_
 	nimages = 0
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
 	    nimages = nimages + 1
-	    Memi[in+nimages-1] = immap (Memc[input], READ_ONLY, 0)
+	    Memp[in+nimages-1] = immap (Memc[input], READ_ONLY, 0)
 	}
 
 	# Determine the dimensionality, size, and pixel type of the output
@@ -76,7 +76,7 @@ retry_
 	# remainder of the code permits stacking the images into a higher
 	# dimension.
 
-	im = Memi[in]
+	im = Memp[in]
 	inpixtype = IM_PIXTYPE(im)
 	if (joindim > IM_NDIM(im)) {
 	    call eprintf (
@@ -99,7 +99,7 @@ retry_
 	# but the one being joined.
 
 	do i = 2, nimages {
-	    im1 = Memi[in+i-1]
+	    im1 = Memp[in+i-1]
 	    if (IM_NDIM(im1) != IM_NDIM(im))
 		call error (0, "The input images have different dimensions")
 	    ndim = max (ndim, IM_NDIM(im1))
@@ -118,7 +118,7 @@ retry_
 	# Open the output image and set its pixel data type, number of
 	# dimensions, and length of each of the dimensions.
 
-	out = immap (Memc[output], NEW_COPY, Memi[in])
+	out = immap (Memc[output], NEW_COPY, Memp[in])
 	if (outpixtype == ERR || outpixtype == TY_BOOL)
 	    IM_PIXTYPE(out) = inpixtype
 	else
@@ -153,23 +153,23 @@ retry_
 	iferr {
 	    switch (inpixtype) {
 	    case TY_SHORT:
-		call imjoins (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoins (Memp[in], nimages, out, joindim, outpixtype)
 	    case TY_INT:
-		call imjoini (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoini (Memp[in], nimages, out, joindim, outpixtype)
 	    case TY_USHORT, TY_LONG:
-		call imjoinl (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoinl (Memp[in], nimages, out, joindim, outpixtype)
 	    case TY_REAL:
-		call imjoinr (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoinr (Memp[in], nimages, out, joindim, outpixtype)
 	    case TY_DOUBLE:
-		call imjoind (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoind (Memp[in], nimages, out, joindim, outpixtype)
 	    case TY_COMPLEX:
-		call imjoinx (Memi[in], nimages, out, joindim, outpixtype)
+		call imjoinx (Memp[in], nimages, out, joindim, outpixtype)
 	    }
 	} then {
 	    switch (errcode()) {
 	    case SYS_MFULL:
 		do j = 1, nimages
-		    call imunmap (Memi[in+j-1])
+		    call imunmap (Memp[in+j-1])
 		call imunmap (out)
 		call imdelete (Memc[output])
 		call imtrew (list)
@@ -181,12 +181,12 @@ retry_
 	}
 
 	if (verbose == YES)
-	    call ij_verbose (Memi[in], nimages, out, joindim)
+	    call ij_verbose (Memp[in], nimages, out, joindim)
 
 	# Unmap all the images.
 	call imunmap (out)
 	do i = 1, nimages
-	    call imunmap (Memi[in+i-1])
+	    call imunmap (Memp[in+i-1])
 
 	# Restore memory.
 	call sfree (sp)

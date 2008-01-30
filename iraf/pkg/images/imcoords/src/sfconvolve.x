@@ -157,8 +157,8 @@ begin
 	# input the data buffer. 
 	inline = l1 - bwidth - nyk / 2
 	do index = 1 , nyk - 1 {
-	    Memi[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
-	    call amovr (Memr[Memi[lineptrs+index]], imbuf[1,index], ncols)
+	    Memp[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
+	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], ncols)
 	    inline = inline + 1
 	}
 
@@ -171,19 +171,19 @@ begin
 
 	    # Scroll the input buffers.
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line and copy it into the image buffer.
-	    Memi[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
 	        inline)
 
 	    # Compute the input image line into the data buffer.
-	    call amovr (Memr[Memi[lineptrs+nyk-1]], imbuf[1,index], ncols)
+	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], ncols)
 
 	    # Generate first output image line.
 	    call aclrr (denbuf[1,outline+nyk/2], ncols)
 	    do i = 1, nyk
-		call sf_skcnvr (Memr[Memi[lineptrs+i-1]],
+		call sf_skcnvr (Memr[Memp[lineptrs+i-1]],
 		    denbuf[1+nxk/2,outline+nyk/2], c2 - c1 + 2 * bwidth + 1,
 		        kernel[1,i], skip[1,i], nxk)
 
@@ -246,8 +246,8 @@ begin
 	# Initialise the line buffers.
 	inline = l1 - bwidth - nyk / 2
 	do index = 1 , nyk - 1 {
-	    Memi[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
-	    call amovr (Memr[Memi[lineptrs+index]], imbuf[1,index], ncols)
+	    Memp[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
+	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], ncols)
 	    inline = inline + 1
 	}
 
@@ -260,14 +260,14 @@ begin
 
 	    # Scroll the input buffers.
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line.
-	    Memi[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
 	        inline)
 
 	    # Compute the input image line into the data buffer.
-	    call amovr (Memr[Memi[lineptrs+nyk-1]], imbuf[1,index], ncols)
+	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], ncols)
 
 	    # Generate first output image line.
 	    call aclrr (denbuf[1,outline+nyk/2], ncols)
@@ -277,7 +277,7 @@ begin
 	    call amovkr (gsums[GAUSS_PIXELS], Memr[p], nc)
 
 	    do i = 1, nyk
-		call sf_gdsum (Memr[Memi[lineptrs+i-1]],
+		call sf_gdsum (Memr[Memp[lineptrs+i-1]],
 		    denbuf[1+nxk/2,outline+nyk/2], Memr[sd],
 		    Memr[sg], Memr[sgsq], Memr[p], nc, kernel[1,i],
 		    skip[1,i], nxk, datamin, datamax)

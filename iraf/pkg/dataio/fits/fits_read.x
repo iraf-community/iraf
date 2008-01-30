@@ -23,7 +23,8 @@ int	fits_fd, stat, min_lenuserarea, ip, len_elist, oshort_header
 int	olong_header, ext_count, ext_number, max_extensions, naxes
 pointer	im, gim, sp, fits, axes, extensions, imname, gimname, gfname, str
 pointer	himname
-int	rft_read_header(), mtopen(), immap(), strlen(), envfind(), ctoi()
+int	rft_read_header(), mtopen(), strlen(), envfind(), ctoi()
+pointer	immap()
 int	rft_ext_skip()
 real	asumi()
 errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof()

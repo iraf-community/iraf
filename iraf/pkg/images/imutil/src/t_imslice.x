@@ -80,7 +80,7 @@ real	shifts[IM_MAXDIM]
 pointer	immap(), mw_openim()
 int	mw_stati()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
+pointer	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 bool	envgetb()
 
