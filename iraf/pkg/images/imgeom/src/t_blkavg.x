@@ -27,13 +27,13 @@ char	image1[SZ_FNAME]			# Input image name
 char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
 
-int	list1, list2, i
-pointer	im1, im2, mw
+int	i
+pointer	list1, list2, im1, im2, mw
 real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 
 bool	envgetb()
-int	imtopen(), imtgetim(), imtlen(), clgeti(), clgwrd()
-pointer	immap(), mw_openim()
+int	imtgetim(), imtlen(), clgeti(), clgwrd()
+pointer	imtopen(), immap(), mw_openim()
 
 string	blk_param	"bX"
 

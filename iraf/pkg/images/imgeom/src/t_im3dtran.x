@@ -23,12 +23,13 @@ define	ZYX	6	# xyz -> zyx
 procedure t_im3dtran ()
 
 bool	verbose
-int	list1, list2, len_blk, new_ax[3], which3d
+int	len_blk, new_ax[3], which3d
+pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, im1, im2, mw
 
 bool	clgetb(), envgetb()
-int	clgeti(), imtopen(), imtgetim(), imtlen(), whichtran()
-pointer	immap(), mw_openim()
+int	clgeti(), imtgetim(), imtlen(), whichtran()
+pointer	imtopen(), immap(), mw_openim()
 errchk	im3dtranpose(), mw_openim(), mw_saveim(), mw_close(), im3dtrmw()
 
 begin

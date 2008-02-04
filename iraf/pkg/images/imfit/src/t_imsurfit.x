@@ -26,12 +26,12 @@ char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
 char	str[SZ_LINE], region_str[SZ_LINE]
-int	list1, list2, region_type
-pointer	im1, im2, imfit, gl, sp
+int	region_type
+pointer	list1, list2, im1, im2, imfit, gl, sp
 
 bool	clgetb()
-int	imtopen(), imtgetim(), imtlen(), btoi(), clgeti(), clgwrd()
-pointer	immap()
+int	imtgetim(), imtlen(), btoi(), clgeti(), clgwrd()
+pointer	imtopen(), immap()
 real	clgetr()
 
 begin

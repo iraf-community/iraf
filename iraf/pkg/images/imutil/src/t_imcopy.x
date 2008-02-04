@@ -23,9 +23,11 @@ char	image2[SZ_PATHNAME]			# Output image name
 char	dirname1[SZ_PATHNAME]			# Directory name
 char	dirname2[SZ_PATHNAME]			# Directory name
 
-int	list1, list2, root_len
+pointer	list1, list2
+int	root_len
 
-int	imtopen(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
+pointer	imtopen()
 int	fnldir(), isdirectory()
 bool	clgetb()
 

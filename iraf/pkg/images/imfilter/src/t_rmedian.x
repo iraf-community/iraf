@@ -10,15 +10,15 @@ include "rmedian.h"
 procedure t_rmedian()
 
 bool	verbose
-int	list1, list2, boundary, nxk, nyk
-pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str
+int	boundary, nxk, nyk
+pointer	list1, list2, sp, imtlist1, imtlist2, image1, image2, imtemp, str
 pointer	med, im1, im2, kernel
 real	rinner, router, ratio, theta, constant, a1, b1, c1, f1, a2, b2, c2, f2
 
 bool	clgetb(), fp_equalr()
-int	imtopen(), imtgetim(), imtlen(), clgwrd()
+int	imtgetim(), imtlen(), clgwrd()
 int	med_mkring()
-pointer	immap()
+pointer	imtopen(), immap()
 real	clgetr()
 errchk	med_ell_gauss, med_mkring, med_medring
 

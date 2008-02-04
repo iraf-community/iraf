@@ -28,13 +28,15 @@ pointer	fields			# template listing fields to be processed
 pointer	valexpr			# the value expression (if op=edit|add)
 
 bool	noupdate, quit
-int	imlist, flist, nfields, up, min_lenuserarea
-pointer	sp, field, sections, s_fields, s_valexpr, im, ip, image, buf
+int	nfields, up, min_lenuserarea
+pointer	imlist
+pointer	flist, sp, field, sections, s_fields, s_valexpr, im, ip, image, buf
 int	operation, verify, show, update
 
 pointer	immap()
 bool	clgetb(), streq()
-int	btoi(), imtopenp(), imtgetim(), imofnlu(), imgnfn(), getline()
+int	btoi(), imtgetim(), imgnfn(), getline()
+pointer	imtopenp(), imofnlu()
 int	envfind(), ctoi()
 
 begin
@@ -228,9 +230,9 @@ int	goahead, nl
 pointer	sp, ip, oldval, newval, defval, o
 
 bool	streq()
-pointer	evexpr()
+pointer	evexpr(), locpr()
 extern	he_getop()
-int	getline(), imaccf(), strldxs(), locpr()
+int	getline(), imaccf(), strldxs()
 errchk	evexpr, getline, imaccf, he_gval
 
 begin
@@ -346,8 +348,8 @@ int	update			# enable updating of the image
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
-pointer	evexpr()
-int	imaccf(), locpr(), strlen(), lexnum()
+pointer	evexpr(), locpr()
+int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imaddb, imastr, imaddi, imaddr
 
@@ -432,8 +434,8 @@ int	update			# enable updating of the image
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
-pointer	evexpr()
-int	imaccf(), locpr(), strlen(), lexnum()
+pointer	evexpr(), locpr()
+int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imaddb, imastr, imaddi, imaddr
 

@@ -33,11 +33,11 @@ pointer	output			# output images
 int	func			# function
 int	verbose			# verbose mode
 
-int	list1, list2
+pointer	list1, list2
 pointer	sp, image1, image2, image3, function, im1, im2
 bool	clgetb()
-int	clgwrd(), imtopen(), imtgetim(), imtlen(), btoi()
-pointer	immap()
+int	clgwrd(), imtgetim(), imtlen(), btoi()
+pointer	imtopen(), immap()
 
 begin
 	# Allocate working space.

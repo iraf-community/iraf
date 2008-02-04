@@ -25,9 +25,9 @@ define	MAX	6
 
 procedure t_imarith ()
 
-int	list1				# Operand1 list
-int	list2				# Operand2 list
-int	list3				# Result list
+pointer	list1				# Operand1 list
+pointer	list2				# Operand2 list
+pointer	list3				# Result list
 int	op				# Operator
 bool	verbose				# Verbose option
 bool	noact				# Noact option
@@ -39,13 +39,14 @@ int	calctype			# Datatype for calculations
 
 int	i, j, pixtype1, pixtype2
 short	sc1, sc2, sdz
-int	hlist
+pointer	hlist
 double	dval1, dval2
 pointer	im1, im2, im3
 pointer	sp, operand1, operand2, result, imtemp
 pointer	opstr, dtstr, field, title, hparams
 
-int	imtopenp(), imtgetim(), imtlen(), imofnlu(), imgnfn()
+int	imtgetim(), imtlen(), imgnfn()
+pointer	imtopenp(), imofnlu()
 double	clgetd(), imgetd()
 bool	clgetb(), streq()
 int	clgwrd()

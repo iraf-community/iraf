@@ -34,12 +34,11 @@ long	axlen[ARB]		#I the size of the output mask
 int	depth			#I the pixel depth of the output mask
 
 pointer	sp, tmpname, pm, pmim, me, obuf, oexpr
-pointer pm_create(), im_pmmap(), evvexpr(), immap()
 int	i, npix, nlines, pmaxval
+pointer pm_create(), im_pmmap(), evvexpr(), immap(), locpr()
 int	imstati()
 int	imgnli(), imgnll(), imgnlr(), imgnld()
 int	impnli(), impnls(), impnll()
-int	locpr()
 extern	me_getop(), me_fcn()
 
 begin

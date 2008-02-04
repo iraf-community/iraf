@@ -27,13 +27,13 @@ define	NADD		20	# Number of points that can be added by ICFIT
 
 procedure t_curfit ()
 
-pointer	x, y, w, gt, fcn, fname, flist, dev, str, sp, ic
+pointer	x, y, w, gt, fcn, fname, flist, dev, str, sp, ic, fd
 bool	listdata, verbose, power, redir
-int	fd, ofmt, interactive, datatype
+int	ofmt, interactive, datatype
 int	axis, nvalues, nmax, weighting
-pointer	gt_init()
+pointer	gt_init(), imtopen()
 bool	clgetb()
-int	imtopen(), clgeti(), cf_operand(), cf_rimage(), cf_rlist()
+int	clgeti(), cf_operand(), cf_rimage(), cf_rlist()
 int	imtgetim(), clgwrd()
 int	fstati()
 

@@ -13,8 +13,8 @@ define	MAXBUF	(512*100)		# Maximum number of pixels per block
 
 procedure t_fit1d ()
 
-int	listin				# Input image list
-int	listout				# Output image list
+pointer	listin				# Input image list
+pointer	listout				# Output image list
 bool	interactive			# Interactive?
 
 char	sample[SZ_LINE]			# Sample ranges
@@ -34,7 +34,8 @@ pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
 bool	same, clgetb()
-int	imtopen(), imtgetim(), imtlen(), strdic(), gt_init()
+int	imtgetim(), imtlen(), strdic(), gt_init()
+pointer	imtopen()
 int	clgeti()
 real	clgetr()
 

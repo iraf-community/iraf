@@ -28,7 +28,8 @@ int	fd, i, j, nelem, nlines, v[PL_MAXDIM], maxoff, nbytes
 
 long	note()
 bool	streq()
-int	imgeti(), pl_create(), miireadi(), miireads()
+int	imgeti(), miireadi(), miireads()
+pointer	pl_create()
 errchk	imgeti, pl_create, miireadi, miireads, seek, pl_update, syserrs
 
 begin

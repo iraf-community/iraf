@@ -14,8 +14,8 @@ define	SZ_RANGE	100		# Size of range list
 # This differs from XT_EXTNS1 in that extension zero is not returned
 # unless it is a simple image and, in that case, the extension is removed.
 
-int procedure xt_extns (files, exttype, index, extname, extver, lindex, lname,
-	lver, dataless, ikparams, err, imext)
+pointer procedure xt_extns (files, exttype, index, extname, extver, lindex,
+			    lname, lver, dataless, ikparams, err, imext)
 
 char	files[ARB]		#I List of MEF files
 char	exttype[ARB]		#I Extension type (or null for all)
@@ -29,11 +29,12 @@ int	dataless		#I Include dataless image headers?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 int	imext			#O Image extensions?
-int	list			#O Image list
+pointer	list			#O Image list
 
 int	i, j, nphu, nextns, fd
-pointer	sp, temp, patbuf, fname, image, im, immap()
-int	xt_extns1(), patmake(), gpatmatch(), imtopen(), imtgetim(), open()
+pointer	sp, temp, patbuf, fname, image, im
+pointer	immap(), imtopen(), xt_extns1()
+int	patmake(), gpatmatch(), imtgetim(), open()
 errchk	xt_extns1, open, immap, delete
 
 begin
@@ -94,8 +95,8 @@ end
 
 # XT_IMEXTNS -- Expand a template of MEF files into a list of image extensions.
 
-int procedure xt_imextns (files, index, extname, extver, lindex, lname, lver,
-	ikparams, err)
+pointer procedure xt_imextns (files, index, extname, extver, lindex, lname,
+			      lver, ikparams, err)
 
 char	files[ARB]		#I List of MEF files
 char	index[ARB]		#I Range list of extension indexes
@@ -106,9 +107,9 @@ int	lname			#I List extension name?
 int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
-int	list			#O Image list
+pointer	list			#O Image list
 
-int	xt_extns1()
+pointer	xt_extns1()
 errchk	xt_extns1
 
 begin
@@ -120,8 +121,8 @@ end
 
 # XT_EXTNS1 -- Expand a template of MEFs into a list of extensions.
 
-int procedure xt_extns1 (files, exttype, index, extname, extver, lindex,
-	lname, lver, ikparams, err)
+pointer procedure xt_extns1 (files, exttype, index, extname, extver, lindex,
+			     lname, lver, ikparams, err)
 
 char	files[ARB]		#I List of MEFs
 char	exttype[ARB]		#I Desired extension type (or null for all)
@@ -133,11 +134,12 @@ int	lname			#I List extension name?
 int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
-int	list			#O Image list
+pointer	list			#O Image list
 
 int	i, fd
 pointer	sp, temp, fname, rindex, rextver, ikp, str
-int	imtopen(), imtgetim()
+pointer	imtopen()
+int	imtgetim()
 int	ix_decode_ranges(), nowhite(), open()
 errchk	open, xt_extn, delete
 

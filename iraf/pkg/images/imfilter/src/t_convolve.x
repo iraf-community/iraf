@@ -23,13 +23,14 @@ int	radsym					# Radially symmetric kernel?
 int	delim					# record delimiter for files
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, kxdim, kydim, dummy
+int	kxdim, kydim, dummy
+pointer	list1, list2
 pointer	sp, im1, im2, kername, xkername, ykername, kernel, xkernel, ykernel
 
 bool	clgetb()
 char	clgetc()
-int	imtopen(), imtgetim(), imtlen(), clgwrd(), btoi()
-pointer	immap()
+int	imtgetim(), imtlen(), clgwrd(), btoi()
+pointer	imtopen(), immap()
 real	clgetr()
 errchk	cnv_convolve
 

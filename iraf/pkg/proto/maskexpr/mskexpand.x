@@ -245,8 +245,8 @@ char	expr[ARB]		#I input expression
 
 pointer	buf, gt
 int	buflen, nchars
-int	locpr(), gt_expand()
-pointer	gt_opentext()
+int	gt_expand()
+pointer	locpr(), gt_opentext()
 pointer	me_gsym()
 extern	me_gsym()
 

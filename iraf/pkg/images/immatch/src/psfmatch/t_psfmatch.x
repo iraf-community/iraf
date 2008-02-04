@@ -18,13 +18,13 @@ int	verbose			# verbose mode ?
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
-int	list1, listr, psflist, listk, list2
 int	nregions, newref, stat
+pointer	list1, listr, psflist, listk, list2
 pointer	sp, imtemp, str, pm, gd, id, imr, im1, impsf, imk, im2
 bool	clgetb()
-int	imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb(), clgwrd(), btoi()
+int	imtlen(), imtgetim(), fntopnb(), fntlenb(), clgwrd(), btoi()
 int	rg_pstati(), rg_ptmpimage(), rg_pregions(), rg_psfm(), rg_pisfm()
-pointer	gopen(), immap(), rg_pstatp()
+pointer	imtopen(), gopen(), immap(), rg_pstatp()
 real	clgetr()
 errchk	fntopnb(), fntclsb()
 

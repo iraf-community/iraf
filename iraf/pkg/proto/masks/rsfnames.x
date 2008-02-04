@@ -5,17 +5,18 @@ define	RS_EXTNLIST "|imh|fits|pl|qpoe|hhh|"
 # RS_IMLIST -- Create a list of input masks using the input image list and an
 # output template string.
 
-int procedure rs_imlist (inlist, output, defaultstr, extstr)
+pointer procedure rs_imlist (inlist, output, defaultstr, extstr)
 
 int	inlist			#I the input image list descriptor
 char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
-pointer	sp, fname, image, dirname, otemplate
-int	i, outlist, len_dir, len_otemplate, strfd
-int	imtopen(), imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
+pointer	sp, fname, image, dirname, otemplate, outlist
+int	i, len_dir, len_otemplate, strfd
+int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
 int	stropen(), strmatch()
+pointer	imtopen()
 errchk	imtopen()
 
 begin
@@ -118,17 +119,18 @@ end
 # RS_OLIST -- Create a list of output images using the input image list and an
 # output template string.
 
-int procedure rs_olist (inlist, output, defaultstr, extstr)
+pointer procedure rs_olist (inlist, output, defaultstr, extstr)
 
 int	inlist			#I the input image list descriptor
 char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
-pointer	sp, fname, image, dirname, otemplate
-int	i, outlist, len_dir, len_otemplate, strfd
-int	imtopen(), imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
+pointer	sp, fname, image, dirname, otemplate, outlist
+int	i, len_dir, len_otemplate, strfd
+int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
 int	stropen()
+pointer	imtopen()
 errchk	imtopen()
 
 begin
@@ -227,17 +229,18 @@ end
 # RS_OMLIST -- Create a list of output masks using the input image list and an
 # output template string.
 
-int procedure rs_omlist (inlist, output, defaultstr, extstr)
+pointer procedure rs_omlist (inlist, output, defaultstr, extstr)
 
 int	inlist			#I the input image list descriptor
 char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
-pointer	sp, fname, image, dirname, otemplate
-int	i, outlist, len_dir, len_otemplate, strfd
-int	imtopen(), imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
+pointer	sp, fname, image, dirname, otemplate, outlist
+int	i, len_dir, len_otemplate, strfd
+int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
 int	stropen(), strmatch()
+pointer	imtopen()
 errchk	imtopen()
 
 begin
@@ -517,7 +520,8 @@ int     maxch                           #I the maximum number of characters
 char    period
 int     newversion, version, len
 pointer sp, list, name
-int     imtopen(), imtgetim(), strldx(), ctoi()
+int     imtgetim(), strldx(), ctoi()
+pointer	imtopen()
 
 begin
         # Allocate temporary space

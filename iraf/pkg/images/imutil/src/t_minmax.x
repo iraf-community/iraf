@@ -18,15 +18,15 @@ bool	update			# update values in image header
 bool	verbose			# print values as they are computed
 
 bool	section
-int	list, pixtype
+int	pixtype
 long	vmin[IM_MAXDIM], vmax[IM_MAXDIM]
-pointer	im, sp, pixmin, pixmax, imname, imsect
+pointer	list, im, sp, pixmin, pixmax, imname, imsect
 double	minval, maxval, iminval, imaxval
 
 bool	clgetb()
 long	clktime()
-int	imtopen(), imtgetim()
-pointer	immap()
+int	imtgetim()
+pointer	imtopen(), immap()
 define	tryagain_ 91
 
 begin

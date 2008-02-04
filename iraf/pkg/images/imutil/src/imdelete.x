@@ -9,11 +9,11 @@ include	<error.h>
 procedure t_imdelete()
 
 bool	verify
-int	list, nchars
-pointer	sp, tty, imname, im
+int	nchars
+pointer	list, sp, tty, imname, im
 
-pointer	ttyodes(), immap()
-int	imtopenp(), imtgetim(), imaccess(), strlen()
+pointer	ttyodes(), immap(), imtopenp()
+int	imtgetim(), imaccess(), strlen()
 bool	clgetb()
 
 begin

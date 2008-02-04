@@ -15,11 +15,13 @@ include	"icombine.h"
 procedure t_imcombine ()
 
 pointer	sp, input, output, rmask, sigma, plfile, logfile
-int	ilist, olist, rlist, slist, plist, n
+pointer	ilist, olist, rlist, slist, plist
+int	n
 
 bool	clgetb()
 real	clgetr()
-int	clgwrd(), clgeti(), imtopenp(), imtgetim(), imtlen()
+int	clgwrd(), clgeti(), imtgetim(), imtlen()
+pointer	imtopenp()
 
 include	"icombine.com"
 

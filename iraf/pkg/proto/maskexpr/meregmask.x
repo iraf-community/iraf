@@ -29,8 +29,8 @@ pointer	pmim			#I the pixel mask imio descriptor
 pointer	sp, rg, oexpr, expr, obuf
 int	i, npix, nlines, depth, pmaxval, stat
 
-pointer	evvexpr()
-int	imstati(), locpr(), pm_stati()
+pointer	evvexpr(), locpr()
+int	imstati(), pm_stati()
 int	imgnli(), impnli(), impnls(), impnll()
 extern	rg_getop(), rg_fcn()
 

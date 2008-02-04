@@ -12,9 +12,9 @@ include	"../lib/ids.h"
 procedure ids_open (devname, dd)
 
 char	devname[ARB]		# nonnull for forced output to device
-int	dd[ARB]			# device table to be initialized
+pointer	dd[ARB]			# device table to be initialized
 
-int	locpr()
+pointer	locpr()
 extern	ids_openws(), ids_closews(), ids_clear(), ids_cancel()
 extern	ids_flush(), ids_polyline(), ids_polymarker(), ids_text()
 extern	ids_fillarea(), ids_putcellarray(), ids_plset()

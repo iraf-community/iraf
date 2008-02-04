@@ -11,7 +11,8 @@ procedure t_mimstatistics()
 real	lower, upper, lsigma, usigma, binwidth, low, up, hwidth, hmin, hmax
 pointer	sp, inmasks, fieldstr, fields, image, imask, omask, masktemp, str, str2
 pointer	mst, vs, ve, im, pmim, pmout, opm, mp, buf, hgm, smsk
-int	i, imlist, inlist, outlist, nclip, nfields, format, mval, npts, npix
+pointer	imlist, inlist, outlist
+int	i, nclip, nfields, format, mval, npts, npix
 int	nbins, in_invert, nbad, cache, old_size
 
 real	clgetr()

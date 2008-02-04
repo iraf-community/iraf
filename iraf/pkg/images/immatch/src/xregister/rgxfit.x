@@ -232,7 +232,7 @@ real	xshift, yshift		#O the x and y shift of the peak
 extern	rg_polyfit, rg_dpolyfit
 int	i,  xindex, yindex, xlo, xhi, ylo, yhi, nx, ny, npar, ier
 pointer	sp, x, w, xmarg, ymarg, params, eparams, list, nl
-int	locpr()
+pointer	locpr()
 
 begin
 	call smark (sp)

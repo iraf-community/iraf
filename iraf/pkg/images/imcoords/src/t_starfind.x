@@ -6,16 +6,16 @@ include <fset.h>
 
 procedure t_starfind ()
 
-int	imlist, olist, limlist, lolist, boundary, verbose
+int	olist, limlist, lolist, boundary, verbose
 int	stat, root, out, nxblock, nyblock
-pointer	sp, image, output, outfname, str, wcs, wxformat, wyformat
+pointer	imlist, sp, image, output, outfname, str, wcs, wxformat, wyformat
 pointer	im, sf
 real	constant
 
 bool	clgetb()
-int	imtopenp(), clpopnu(), imtlen(), clplen(), clgwrd(), btoi(), open()
+int	clpopnu(), imtlen(), clplen(), clgwrd(), btoi(), open()
 int	clgeti(), imtgetim(), clgfil(), fnldir(), strncmp(), strlen()
-pointer	immap()
+pointer	immap(), imtopenp()
 real	clgetr()
 
 begin

@@ -14,12 +14,13 @@ procedure t_imcombine ()
 
 pointer	sp, fname, output, headers, bmask, rmask, sigma, nrmask, emask, logfile
 pointer	scales, zeros, wts, im
-int	n, input, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
+int	n
+pointer	input, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
 
 bool	clgetb()
 real	clgetr()
-int	clgwrd(), clgeti(), imtopenp(), imtopen(), imtgetim(), imtlen()
-pointer	immap()
+int	clgwrd(), clgeti(), imtgetim(), imtlen()
+pointer	imtopenp(), imtopen(), immap()
 errchk	immap, icombine
 
 include	"src/icombine.com"

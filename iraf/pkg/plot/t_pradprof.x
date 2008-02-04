@@ -7,7 +7,7 @@ include	<math.h>
 
 procedure t_pradprof()
 
-int	images 			# the list of images
+pointer	images 			# the list of images
 real	xinit, yinit		# the initial guess for the profile center
 real	pradius			# the plotting radius
 real	paz1, paz2		# azimuth limits
@@ -20,8 +20,8 @@ pointer	sp, imname, im, radius, azimuth, intensity
 real	xcntr, ycntr
 
 bool	clgetb()
-int	imtopenp(), imtgetim(), clgeti(), rp_radius()
-pointer	immap()
+int	imtgetim(), clgeti(), rp_radius()
+pointer	imtopenp(), immap()
 real	clgetr()
 
 begin

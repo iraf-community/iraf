@@ -6,7 +6,7 @@ include	<imhdr.h>
 
 procedure t_imsum ()
 
-int	list			# Input image list
+pointer	list			# Input image list
 pointer	image			# Output image
 pointer	hparams			# Header parameter list
 pointer	option  		# Output option
@@ -20,8 +20,8 @@ pointer	sp, str, im_in, im_out
 
 bool	clgetb(), streq()
 real	clgetr()
-int	imtopenp(), imtlen(), imtgetim(), clgwrd()
-pointer	immap()
+int	imtlen(), imtgetim(), clgwrd()
+pointer	imtopenp(), immap()
 
 errchk	imsum_set, immap, imunmap
 
@@ -263,10 +263,11 @@ char	output[ARB]		# Output image
 char	hparams[ARB]		# List of header parameters
 char	option[ARB]		# Sum option
 
-int	i, nfields, flist
-pointer	sp, field, dvals, image, in, out
+int	i, nfields
+pointer	flist, sp, field, dvals, image, in, out
 
-int	imofnlu(), imgnfn(), imtgetim(), imtlen()
+pointer	imofnlu()
+int	imgnfn(), imtgetim(), imtlen()
 bool	strne(), streq()
 double	imgetd()
 pointer	immap()

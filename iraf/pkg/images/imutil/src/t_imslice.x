@@ -20,10 +20,11 @@ int	sdim			# Dimension to be sliced
 int	verbose			# Verbose mode
 
 pointer sp
-int     list1, list2
+pointer	list1, list2
 
 bool    clgetb()
-int     imtopen(), imtgetim(), imtlen(), btoi(), clgeti()
+int     imtgetim(), imtlen(), btoi(), clgeti()
+pointer	imtopen()
 errchk	sl_slice
 
 begin

@@ -14,15 +14,15 @@ define	TABSIZE		8		# Spacing of tab stops
 procedure t_ccstd()
 
 bool	forward, polar
-int	inlist, outlist, reclist, infd, outfd
+int	inlist, outlist, infd, outfd
 int	xcolumn, ycolumn, lngcolumn, latcolumn, lngunits, latunits
 int	geometry, min_sigdigits
 pointer	sp, infile, outfile, record, str, dt, sx1, sy1, sx2, sy2, coo, mw
-pointer	xformat, yformat, lngformat, latformat
+pointer	reclist, xformat, yformat, lngformat, latformat
 bool	clgetb(), streq()
-int	fntopnb(), imtopenp(), fntlenb(), imtlen(), fntgfnb(), imtgetim()
+int	fntopnb(), fntlenb(), imtlen(), fntgfnb(), imtgetim()
 int	open(), clgwrd(), clgeti()
-pointer	dtmap()
+pointer	dtmap(), imtopenp()
 
 begin
 	# Allocate memory for transformation parameters structure

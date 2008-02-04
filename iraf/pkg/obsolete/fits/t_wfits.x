@@ -16,13 +16,14 @@ bool	newtape			# new or used tape ?
 char	in_fname[SZ_FNAME]	# input file name
 char	out_fname[SZ_FNAME]	# output file name
 
-int	imlist, flist, nimages, nfiles, file_number
+pointer	imlist
+int	flist, nimages, nfiles, file_number
 bool	clgetb()
 double	clgetd()
-int	imtopen(), imtlen (), wft_get_bitpix(), clgeti(), imtgetim()
+int	imtlen(), wft_get_bitpix(), clgeti(), imtgetim()
 int	mtfile(), btoi(), fstati(), fntlenb(), fntgfnb(), mtneedfileno()
 int	wft_blkfac(), fntrfnb(), strlen()
-pointer	fntopnb()
+pointer	imtopen(), fntopnb()
 
 include "wfits.com"
 
@@ -174,7 +175,8 @@ int	ublkfac			# the user supplied blocking factor
 
 int	bs, fb, blkfac
 pointer	gty
-int	mtfile(), mtcap(), gtygeti()
+int	mtfile(), gtygeti()
+pointer	mtcap()
 errchk	mtcap(), gtygeti()
 
 begin

@@ -9,12 +9,13 @@ include "mode.h"
 procedure t_mode()
 
 bool	verbose
-int	list1, list2, xwindow, ywindow, boundary
+int	xwindow, ywindow, boundary
+pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str, im1, im2, mde
 real	constant
 bool	clgetb()
-int	clgeti(), imtopen(), imtgetim(), imtlen(), clgwrd()
-pointer	immap()
+int	clgeti(), imtgetim(), imtlen(), clgwrd()
+pointer	imtopen(), immap()
 real	clgetr()
 errchk	mde_modbox
 

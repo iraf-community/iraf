@@ -419,8 +419,10 @@ char	wcs[ARB]		# WCS type
 bool	rdmarks			# Read marks from list?
 
 char	operand[SZ_FNAME]
-int	ncurves, i, fd
-int	gg_rdcurve(), imtopen(), imtgetim()
+int	ncurves, i
+pointer	fd
+int	gg_rdcurve(), imtgetim()
+pointer	imtopen()
 
 begin
 	ncurves = 0

@@ -32,13 +32,13 @@ real	x1, y1				# Starting coordinates
 real	x2, y2				# Ending coordinates
 int	flux				# Flux conserve
 
-int	list1, list2, btype, logfd
-pointer	sp, in, out, image1, image2, image3, mw, errmsg
+int	btype, logfd
+pointer	list1, list2, sp, in, out, image1, image2, image3, mw, errmsg
 real	a, b, c, d, shifts[2], scale[2]
 
 bool	clgetb(), envgetb(), fp_equalr()
-int	clgwrd(), imtopen(), imtgetim(), imtlen(), open(), btoi(), errget()
-pointer	mw_openim(), immap()
+int	clgwrd(), imtgetim(), imtlen(), open(), btoi(), errget()
+pointer	imtopen(), mw_openim(), immap()
 real	clgetr()
 errchk	open(), mg_magnify1(), mg_magnify2()
 

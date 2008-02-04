@@ -89,8 +89,8 @@ bool	clgetb(), imgetb(), streq(), strne()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
 int	impnls(), impnli(), impnll(), impnlr(), impnld()
 int	open(), getci(), ie_getops(), lexnum(), stridxs()
-int	imgeti(), ctoi(), btoi(), locpr(), clgeti(), strncmp()
-pointer	ie_getexprdb(), ie_expandtext(), immap()
+int	imgeti(), ctoi(), btoi(), clgeti(), strncmp()
+pointer	locpr(), ie_getexprdb(), ie_expandtext(), immap()
 pointer	ie_getop(), ie_fcn()
 extern	ie_getop(), ie_fcn()
 pointer	evvexpr()
@@ -1174,8 +1174,8 @@ char	expr[ARB]		#I input expression
 
 pointer	buf, gt
 int	buflen, nchars
-int	locpr(), gt_expand()
-pointer	gt_opentext()
+int	gt_expand()
+pointer	locpr(), gt_opentext()
 pointer	ie_gsym()
 extern	ie_gsym()
 
@@ -1207,8 +1207,8 @@ pointer	gt, sp, tokbuf, op
 
 pointer	ie_gsym()
 extern	ie_gsym()
-pointer	gt_opentext()
-int	locpr(), gt_rawtok(), gt_nexttok()
+pointer	gt_opentext(), locpr()
+int	gt_rawtok(), gt_nexttok()
 errchk	gt_opentext, gt_rawtok
 
 begin

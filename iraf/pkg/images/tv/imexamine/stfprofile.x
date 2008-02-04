@@ -1001,7 +1001,7 @@ real	beta, z, params[3]
 pointer	asi, nl
 pointer	sp, x, y, w
 
-int	locpr()
+pointer	locpr()
 real	asieval(), stf_i2r()
 extern	stf_gauss1(), stf_gauss2(), stf_moffat1(), stf_moffat2()
 errchk	nlinitr, nlfitr

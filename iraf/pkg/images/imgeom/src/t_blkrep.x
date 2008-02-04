@@ -13,13 +13,13 @@ include	<imhdr.h>
 
 procedure t_blkrep()
 
-int	i, list1, list2
-pointer	sp, image1, image2, image3, blkfac, im1, im2, mw
+int	i
+pointer	list1, list2, sp, image1, image2, image3, blkfac, im1, im2, mw
 real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 
 bool	envgetb()
-int	imtopenp(), imtgetim(), imtlen(), clgeti()
-pointer	immap(), mw_openim()
+int	imtgetim(), imtlen(), clgeti()
+pointer	imtopenp(), immap(), mw_openim()
 string	blk_param	"bX"
 
 begin

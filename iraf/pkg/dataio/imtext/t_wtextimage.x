@@ -21,14 +21,14 @@ procedure t_wtextimage ()
 
 bool	header
 bool	pixels
-pointer	im
+pointer	im, input
 char	output[SZ_FNAME], format[SZ_FORMAT], imlist[SZ_LINE]
 char	image[SZ_FNAME], out_fname[SZ_FNAME]
-int	maxll, file_num, out, input, nfiles
+int	maxll, file_num, out, nfiles
 
-pointer	immap()
+pointer	immap(), imtopen()
 bool	clgetb(), strne()
-int	clgeti(), imtgetim(), open(), imtopen(), fstati(), imtlen()
+int	clgeti(), imtgetim(), open(), fstati(), imtlen()
 
 begin
 	# Open template of input image filenames.

@@ -22,12 +22,12 @@ char	image1[SZ_FNAME]			# Input image name
 char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
 
-int	list1, list2
+pointer	list1, list2
 pointer	im1, im2, mw
 
 bool	envgetb()
-int	clgeti(), imtopen(), imtgetim(), imtlen()
-pointer	immap(), mw_openim()
+int	clgeti(), imtgetim(), imtlen()
+pointer	imtopen(), immap(), mw_openim()
 
 begin
 	# Get input and output image template lists and the size of

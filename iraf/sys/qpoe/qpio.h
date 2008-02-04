@@ -31,7 +31,7 @@ define	NDIM		2		# all QPOE images are 2-dim
 define	LEN_IODES	82
 
 # general
-define	IO_QP		Memi[P2I($1)]	# backpointer to QPOE descriptor
+define	IO_QP		Memp[$1]	# backpointer to QPOE descriptor
 define	IO_MODE		Memi[P2I($1+1)]	# read_only or new_file
 define	IO_DEBUG	Memi[P2I($1+2)]	# debug level
 define	IO_NLINES	Memi[P2I($1+3)]	# number of image lines (physical)
@@ -42,26 +42,26 @@ define	IO_OPTBUFSIZE	Memi[P2I($1+7)]	# optbufsize for FIO (qpio_readpix)
 define	IO_NOINDEX	Memi[P2I($1+8)]	# don't use indexed extraction
 define	IO_NODEFFILT	Memi[P2I($1+9)]	# disable use of default filter
 define	IO_NODEFMASK	Memi[P2I($1+10)]	# disable use of default mask
-define	IO_PARAM	Memi[P2I($1+11)]	# pointer to buffer with param name
-define	IO_PSYM		Memi[P2I($1+12)]	# symbol table entry for parameter
-define	IO_MASK		Memi[P2I($1+13)]	# pointer to buffer with mask name
+define	IO_PARAM	Memp[$1+11]	# pointer to buffer with param name
+define	IO_PSYM		Memp[$1+12]	# symbol table entry for parameter
+define	IO_MASK		Memp[$1+13]	# pointer to buffer with mask name
 define	IO_MDEPTH	Memi[P2I($1+14)]	# mask depth, bits
 define	IO_EXCLOSE	Memi[P2I($1+15)]	# qpex was opened by qpio
 define	IO_PLCLOSE	Memi[P2I($1+16)]	# mask was opened by qpio
-define	IO_PL		Memi[P2I($1+17)]	# PLIO (mask) pointer
-define	IO_EX		Memi[P2I($1+18)]	# QPEX (event attribute filter) pointer
+define	IO_PL		Memp[$1+17]	# PLIO (mask) pointer
+define	IO_EX		Memp[$1+18]	# QPEX (event attribute filter) pointer
 define	IO_FD		Memi[P2I($1+19)]	# file descriptor of open lfile
 define	IO_LF		Memi[P2I($1+20)]	# lfile where event list is stored
 define	IO_CHAN		Memi[P2I($1+21)]	# i/o channel of open lfile
 # events
-define	IO_DD		Memi[P2I($1+22)]	# pointer to domain descriptor
+define	IO_DD		Memp[$1+22]	# pointer to domain descriptor
 define	IO_EVXOFF	Memi[P2I($1+23)]	# offset of X field used for extraction
 define	IO_EVXTYPE	Memi[P2I($1+24)]	# datatype of X field
 define	IO_EVYOFF	Memi[P2I($1+25)]	# offset of Y field used for extraction
 define	IO_EVYTYPE	Memi[P2I($1+26)]	# datatype of Y field
 define	IO_EVENTLEN	Memi[P2I($1+27)]	# length of event struct, shorts
-define	IO_MINEVL	Memi[P2I($1+28)]	# pointer to min event for full list
-define	IO_MAXEVL	Memi[P2I($1+29)]	# pointer to max event for full list
+define	IO_MINEVL	Memp[$1+28]	# pointer to min event for full list
+define	IO_MAXEVL	Memp[$1+29]	# pointer to max event for full list
 # buckets
 define	IO_SZBBUCKET	Memi[P2I($1+30)]	# event file bucket size, bytes
 define	IO_BUCKETLEN	Memi[P2I($1+31)]	# nevents per bucket (excl. min/max)
@@ -75,8 +75,8 @@ define	IO_IXXOFF	Memi[P2I($1+39)]	# offset of X field used in index
 define	IO_IXXTYPE	Memi[P2I($1+40)]	# datatype of X field used in index
 define	IO_IXYOFF	Memi[P2I($1+41)]	# offset of Y field used in index
 define	IO_IXYTYPE	Memi[P2I($1+42)]	# datatype of Y field used in index
-define	IO_YOFFVP	Memi[P2I($1+43)]	# pointer to Y-index array (len=nlines)
-define	IO_YLENVP	Memi[P2I($1+44)]	# pointer to Y-line length array
+define	IO_YOFFVP	Memp[$1+43]	# pointer to Y-index array (len=nlines)
+define	IO_YLENVP	Memp[$1+44]	# pointer to Y-line length array
 define	IO_YOFFVOFF	Memi[P2I($1+45)]	# lfile offset of stored YOFFV
 define	IO_YOFFVLEN	Memi[P2I($1+46)]	# length, words, of compressed YOFFV
 define	IO_YLENVOFF	Memi[P2I($1+47)]	# lfile offset of stored YLENV
@@ -87,13 +87,13 @@ define	IO_IOTYPE	Memi[P2I($1+51)]	# type of i/o selected for BB
 define	IO_LINEIO	Memi[P2I($1+52)]	# flag - BB width is full line width
 define	IO_RMUSED	Memi[P2I($1+53)]	# flag - region mask used in this BB
 define	IO_BBUSED	Memi[P2I($1+54)]	# flag - bounding box in use
-define	IO_BBMASK	Memi[P2I($1+55)]	# BB region mask subras, nonindexed i/o
-define	IO_RL		Memi[P2I($1+56)]	# range list pointer
+define	IO_BBMASK	Memp[$1+55]		# BB region mask subras, nonindexed i/o
+define	IO_RL		Memp[$1+56]		# range list pointer
 define	IO_RLI		Memi[P2I($1+57)]	# range list index
 define	IO_EVI		Memi[P2I($1+58)]	# event index into event list (for i/o)
 define	IO_EV1		Memi[P2I($1+59)]	# event index of first event on line
 define	IO_EV2		Memi[P2I($1+60)]	# event index of last event on line
-define	IO_BP		Memi[P2I($1+61)]	# pointer to bucket buffer
+define	IO_BP		Memp[$1+61]		# pointer to bucket buffer
 define	IO_BKNO		Memi[P2I($1+62)]	# bucket number
 define	IO_BKFIRSTEV	Memi[P2I($1+63)]	# event index of first event in bucket
 define	IO_BKLASTEV	Memi[P2I($1+64)]	# event index of last event in bucket

@@ -121,8 +121,7 @@ char	expr[ARB]				#i expression to be evaluated
 
 pointer	o					# operand pointer to result
 
-int     locpr()
-pointer evvexpr()
+pointer locpr(), evvexpr()
 extern  ip_getop(), ip_obfcn()
 errchk  evvexpr
 

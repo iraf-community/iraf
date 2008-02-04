@@ -123,72 +123,72 @@ define WL_REMEMBER               Memi[P2I($1+31)]
 define WL_TICK_IN                Memi[P2I($1+32)]
 
 # Titles to label each axis.
-define WL_AXIS_TITLE_PTR         Memi[P2I($1+33)]
+define WL_AXIS_TITLE_PTR         Memp[$1+33]
 define WL_AXIS_TITLE             Memc[WL_AXIS_TITLE_PTR($1)+(($2-1)*SZ_LINE)] 
 
 # The sides the axis titles will appear.
-define WL_AXIS_TITLE_SIDE_PTR    Memi[P2I($1+34)]
+define WL_AXIS_TITLE_SIDE_PTR    Memp[$1+34]
 define WL_AXIS_TITLE_SIDE        Memi[WL_AXIS_TITLE_SIDE_PTR($1)+$2-1]
 
 # Beginning values to start labeling the axes.
-define WL_BEGIN_PTR              Memi[P2I($1+35)]
+define WL_BEGIN_PTR              Memp[$1+35]
 define WL_BEGIN                  Memd[WL_BEGIN_PTR($1)+$2-1]
 
 # The name of the graphics device.
-#define WL_DEVICE_PTR             Memi[P2I($1+36)]
+#define WL_DEVICE_PTR             Memp[$1+36]
 #define WL_DEVICE                 Memc[WL_DEVICE_PTR($1)]
 
 # Value to stop labeling the axes.
-define WL_END_PTR                Memi[P2I($1+37)]
+define WL_END_PTR                Memp[$1+37]
 define WL_END                    Memd[WL_END_PTR($1)+$2-1]
 
 # The graphics descriptor.
-define WL_GP                     Memi[P2I($1+38)]
+define WL_GP                     Memp[$1+38]
 
 # The angle of text at this label point.
-define WL_LABEL_ANGLE_PTR        Memi[P2I($1+40)]
+define WL_LABEL_ANGLE_PTR        Memp[$1+40]
 define WL_LABEL_ANGLE            Memd[WL_LABEL_ANGLE_PTR($1)+$2-1]
 
 # Which axis the label represents.
-define WL_LABEL_AXIS_PTR         Memi[P2I($1+41)]
+define WL_LABEL_AXIS_PTR         Memp[$1+41]
 define WL_LABEL_AXIS             Memi[WL_LABEL_AXIS_PTR($1)+$2-1]
 
 # The positions of tick mark/grid labels.
-define WL_LABEL_POSITION_PTR     Memi[P2I($1+42)]
+define WL_LABEL_POSITION_PTR     Memp[$1+42]
 define WL_LABEL_POSITION         Memd[WL_LABEL_POSITION_PTR($1)+$2-1+(($3-1)*MAX_LABEL_POINTS)]
 #
 # NOTE:  If the axis are transposed, the positions represented here are
 #        the corrected, transposed values.
 
 # The sides the labels for each axis should appear on.
-define WL_LABEL_SIDE_PTR         Memi[P2I($1+43)]
+define WL_LABEL_SIDE_PTR         Memp[$1+43]
 define WL_LABEL_SIDE             Memb[WL_LABEL_SIDE_PTR($1)+$2-1+(($3-1)*N_SIDES)]
 
 # The value of the label.
-define WL_LABEL_VALUE_PTR        Memi[P2I($1+44)]
+define WL_LABEL_VALUE_PTR        Memp[$1+44]
 define WL_LABEL_VALUE            Memd[WL_LABEL_VALUE_PTR($1)+$2-1]
 
 # The center of the transformations in the logical system.  
-define WL_LOGICAL_CENTER_PTR     Memi[P2I($1+45)]
+define WL_LOGICAL_CENTER_PTR     Memp[$1+45]
 define WL_LOGICAL_CENTER         Memd[WL_LOGICAL_CENTER_PTR($1)+$2-1]
 
 # The coordinate transformation from Logical to World.
-define WL_LWCT                   Memi[P2I($1+46)]
+define WL_LWCT                   Memp[$1+46]
 
 # Major grid intervals for the axis.
-define WL_MAJ_I_PTR              Memi[P2I($1+47)]
+define WL_MAJ_I_PTR              Memp[$1+47]
 define WL_MAJOR_INTERVAL         Memd[WL_MAJ_I_PTR($1)+$2-1]
 
 # The minor intervals for the axis.
-define WL_MIN_I_PTR              Memi[P2I($1+48)]
+define WL_MIN_I_PTR              Memp[$1+48]
 define WL_MINOR_INTERVAL         Memi[WL_MIN_I_PTR($1)+$2-1]
 
 # Remember the extent of the labels around the plot box.
-define WL_NV_PTR                 Memi[P2I($1+49)]
+define WL_NV_PTR                 Memp[$1+49]
 define WL_NEW_VIEW               Memr[WL_NV_PTR($1)+$2-1]
 
 # The MWL structure.
-define WL_MW                     Memi[P2I($1+50)]
+define WL_MW                     Memp[$1+50]
 
 # The values of the sides of the screen.  The indexes are defined as follows:
 #
@@ -197,18 +197,18 @@ define WL_MW                     Memi[P2I($1+50)]
 #   RIGHT  -> X-axis value at right of display.
 #   LEFT   -> X-axis value at left of display.
 #
-define WL_SCREEN_BOUNDARY_PTR    Memi[P2I($1+51)]
+define WL_SCREEN_BOUNDARY_PTR    Memp[$1+51]
 define WL_SCREEN_BOUNDARY        Memd[WL_SCREEN_BOUNDARY_PTR($1)+$2-1]
 
 # The title that will be placed on the plot.
-define WL_TITLE_PTR              Memi[P2I($1+52)]
+define WL_TITLE_PTR              Memp[$1+52]
 define WL_TITLE                  Memc[WL_TITLE_PTR($1)]
 
 # The coordinate transformation from World to Logical.
-define WL_WLCT                   Memi[P2I($1+53)]
+define WL_WLCT                   Memp[$1+53]
 
 # The center of the transformations in the world system.
-define WL_WORLD_CENTER_PTR       Memi[P2I($1+54)]
+define WL_WORLD_CENTER_PTR       Memp[$1+54]
 define WL_WORLD_CENTER           Memd[WL_WORLD_CENTER_PTR($1)+$2-1]
 
 # The length of this structure.

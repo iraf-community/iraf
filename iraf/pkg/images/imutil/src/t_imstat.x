@@ -12,12 +12,12 @@ procedure t_imstatistics ()
 
 real	lower, upper, binwidth, lsigma, usigma, low, up, hwidth, hmin, hmax
 pointer	sp, fieldstr, fields, image, ist, v
-pointer	im, buf, hgm
-int	i, list, nclip, format, nfields, nbins, npix, cache, old_size
+pointer	im, buf, hgm, list
+int	i, nclip, format, nfields, nbins, npix, cache, old_size
 
 real	clgetr()
-pointer	immap()
-int	imtopenp(), btoi(), ist_fields(), imtgetim(), imgnlr(), ist_ihist()
+pointer	immap(), imtopenp()
+int	btoi(), ist_fields(), imtgetim(), imgnlr(), ist_ihist()
 int	clgeti()
 bool	clgetb()
 errchk	immap()

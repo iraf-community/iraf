@@ -16,13 +16,13 @@ include	"crtpict.h"
 procedure t_crtpict ()
 
 bool	redir
-pointer	sp, cl, gp, im, command, image, word, title, output, ofile, dev
+pointer	sp, cl, gp, im, command, image, word, title, output, ofile, dev, list
 int	cmd, stat, fd
 
-pointer	immap(), gopen()
+pointer	immap(), gopen(), imtopenp()
 bool	clgetb(), streq()
 int	strncmp(), clgeti(), btoi(), fstati(), open(), getline()
-int	imtopenp(), list, imtgetim()
+int	imtgetim()
 real	clgetr()
 
 begin

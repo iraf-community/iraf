@@ -27,9 +27,9 @@ pointer	format, output, fmt, idstr
 
 int	clpopni(), clplen(), imtlen()		# function definitions
 int	clgfil(), open()
-int	locpr(), imtgetim(), fdb_opendb()
+int	imtgetim(), fdb_opendb()
 int	ip_fcode(), ip_is_builtin()
-pointer	imtopenp(), ip_init(), fdb_scan_records(), immap()
+pointer	locpr(), imtopenp(), ip_init(), fdb_scan_records(), immap()
 
 extern	ip_getop(), ip_dbfcn()
 errchk	clpopni, clgfil, imtopenp, open, immap

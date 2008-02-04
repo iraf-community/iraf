@@ -15,15 +15,15 @@ define	FUDGE			0.8		# fudge factor
 
 procedure t_imjoin()
 
-int	i, j, joindim, list, nimages, inpixtype, ndim, nelems[IM_MAXDIM]
+int	i, j, joindim, nimages, inpixtype, ndim, nelems[IM_MAXDIM]
 int	bufsize, maxsize, memory, oldsize, outpixtype, verbose
-pointer	sp, in, out, im, im1, input, output
+pointer	list, sp, in, out, im, im1, input, output
 
 bool	clgetb()
 #char	clgetc()
-int	imtopenp(), imtlen(), imtgetim(), clgeti(), btoi()
+int	imtlen(), imtgetim(), clgeti(), btoi()
 int	getdatatype(), ij_tymax(), sizeof(), begmem(), errcode()
-pointer	immap()
+pointer	imtopenp(), immap()
 errchk	immap
 
 define	retry_	99

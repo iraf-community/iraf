@@ -7,14 +7,14 @@ include <mwset.h>
 procedure t_wcscopy()
 
 bool	verbose
-int	ilist, rlist
+pointer	ilist, rlist
 pointer	sp, image, refimage, value, str, imr, mwr, im
 real	rval
 double	dval
 bool	clgetb()
-int	imtopen(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 #int	mw_stati(), rg_samesize()
-pointer	immap(), mw_openim()
+pointer	imtopen(), immap(), mw_openim()
 real	imgetr()
 double	imgetd()
 errchk	mw_openim(), imgstr(), imgetr(), imgetd(), imdelf()

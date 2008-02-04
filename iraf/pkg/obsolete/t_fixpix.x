@@ -12,11 +12,12 @@ bool	verbose				# Print image names and regions?
 char	imname[SZ_FNAME]		# Image name
 pointer	image				# Image pointer
 
-int	list, badpix
+pointer	list
+int	badpix
 
-int	open(), imtopen(), imtgetim()
+int	open(), imtgetim()
 bool	clgetb()
-pointer	immap()
+pointer	imtopen(), immap()
 
 begin
 	# Get the image template and expand.

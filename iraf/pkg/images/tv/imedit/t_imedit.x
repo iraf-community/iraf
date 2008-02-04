@@ -19,8 +19,8 @@ define	PROMPT		"imedit options"
  
 procedure t_imedit ()
  
-int	inlist		# List of input images
-int	outlist		# List of output images
+pointer	inlist		# List of input images
+pointer	outlist		# List of output images
  
 int	i, key, ap, xa, ya, xb, yb, x1, x2, y1, y2
 int	change, changes, newdisplay, newimage
@@ -29,8 +29,8 @@ pointer	sp, ep, cmd, temp
 pointer	im
  
 bool	streq()
-pointer	immap(), imgl2r(), impl2r()
-int	imtopenp(), imtlen(), imtgetim(), imaccess(), ep_gcur()
+pointer	immap(), imgl2r(), impl2r(), imtopenp()
+int	imtlen(), imtgetim(), imaccess(), ep_gcur()
 errchk	immap, imdelete, ep_imcopy, ep_setpars, imgl2r, impl2r
  
 define	newim_	99

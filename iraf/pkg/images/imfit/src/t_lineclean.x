@@ -9,8 +9,8 @@ include	<pkg/gtools.h>
 
 procedure t_lineclean ()
 
-int	listin				# Input image list
-int	listout				# Output image list
+pointer	listin				# Input image list
+pointer	listout				# Output image list
 char	sample[SZ_LINE]			# Sample ranges
 int	naverage			# Sample averaging size
 char	function[SZ_LINE]		# Curve fitting function
@@ -26,7 +26,8 @@ pointer	in, out				# IMIO pointers
 pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
-int	imtopen(), imtgetim(), imtlen(), gt_init()
+pointer	imtopen()
+int	imtgetim(), imtlen(), gt_init()
 int	clgeti()
 real	clgetr()
 bool	clgetb()

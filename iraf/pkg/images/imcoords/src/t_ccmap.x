@@ -33,19 +33,20 @@ procedure t_ccmap ()
 
 pointer	sp, infile, image, database, insystem, lngref, latref, refsystem, str
 pointer	graphics, coo, refcoo, tcoo, mw, fit, im, out, gd, projstr
+pointer	imlist, reclist
 double	dlngref, dlatref, tdlngref, tdlatref, xmin, xmax, ymin, ymax, reject
-int	inlist, ninfiles, imlist, nimages, coostat, refstat, in, nchars, ip 
+int	inlist, ninfiles, nimages, coostat, refstat, in, nchars, ip 
 int	xcolumn, ycolumn, lngcolumn, latcolumn, lngunits, latunits, res, pfd
 int	lngrefunits, latrefunits, refpoint_type, projection, reslist, nresfiles
 int	geometry, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
-int	reclist, nrecords, pixsys, maxiter
+int	nrecords, pixsys, maxiter
 bool	verbose, update, interactive
 
 double	clgetd()
-pointer	dtmap(), immap(), gopen(), cc_utan(), cc_imtan()
-int	clpopnu(), clplen(), imtopenp(), imtlen(), clgeti(), clgwrd(), strlen()
+pointer	dtmap(), immap(), gopen(), cc_utan(), cc_imtan(), imtopenp(), imtopen()
+int	clpopnu(), clplen(), imtlen(), clgeti(), clgwrd(), strlen()
 int	sk_decwcs(), sk_stati(), imtgetim(), clgfil(), open(), ctod()
-int	errget(), imtopen(), strncmp(), cc_rdproj(), strdic()
+int	errget(), strncmp(), cc_rdproj(), strdic()
 bool	clgetb()
 errchk	open(), cc_map()
 

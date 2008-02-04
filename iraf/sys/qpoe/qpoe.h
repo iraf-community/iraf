@@ -38,11 +38,11 @@ define	LEN_QPDES	160
 define	QP_MAGIC	Memi[P2I($1)]	# descriptor type code
 define	QP_VERSION	Memi[P2I($1+1)]	# QPOE version number
 define	QP_ACTIVE	Memi[P2I($1+2)]	# descriptor fully activated
-define	QP_FM		Memi[P2I($1+3)]	# datafile handle
-define	QP_ST		Memi[P2I($1+4)]	# datafile symbol table handle
-define	QP_QM		Memi[P2I($1+5)]	# global QPOE symbol table handle
+define	QP_FM		Memp[$1+3]	# datafile handle
+define	QP_ST		Memp[$1+4]	# datafile symbol table handle
+define	QP_QM		Memp[$1+5]	# global QPOE symbol table handle
 define	QP_MODE		Memi[P2I($1+6)]	# datafile access mode
-define	QP_OQP		Memi[P2I($1+7)]	# o_qp, if new copy file
+define	QP_OQP		Memp[$1+7]	# o_qp, if new copy file
 define	QP_EXPBLEN	Memi[P2I($1+8)]	# QPEX program buffer length
 define	QP_EXDBLEN	Memi[P2I($1+9)]	# QPEX data buffer length
 define	QP_EXMAXFRLLEN	Memi[P2I($1+10)]	# QPEX max FRLUT length

@@ -22,7 +22,8 @@ real	xrotation, yrotation		# rotation angle
 int	nxblock, nyblock		# block size of image to be used
 
 bool	verbose
-int	list1, list2, tflist, ndim, nc, nl, mode
+int	ndim, nc, nl, mode
+pointer	list1, list2, tflist
 pointer	sp, imtlist1, imtlist2, database, transform, record
 pointer	image1, image2, imtemp, imroot, section, str
 pointer	geo, sx1, sy1, sx2, sy2, in, out, mw
@@ -30,8 +31,8 @@ real	xs, ys, txshift, tyshift, txmag, tymag, txrot, tyrot
 double	oltv[2], nltv[2], oltm[2,2], nltm[2,2]
 
 bool	clgetb(), envgetb(), streq()
-int	imtopen(), imtlen(), clgeti(), imtgetim(), clgwrd(), btoi()
-pointer	immap(), mw_openim()
+int	imtlen(), clgeti(), imtgetim(), clgwrd(), btoi()
+pointer	imtopen(), immap(), mw_openim()
 real	clgetr()
 errchk	immap()
 

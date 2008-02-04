@@ -24,8 +24,8 @@ pointer imtemp			# Temporary file
 pointer	sfile			# Text file containing list of shifts
 pointer	interpstr		# Interpolant string
 
-int	list1, list2, boundary_type, ixshift, iyshift, nshifts, interp_type
-pointer	sp, str, xs, ys, im1, im2, sf, mw
+int	boundary_type, ixshift, iyshift, nshifts, interp_type
+pointer	list1, list2, sp, str, xs, ys, im1, im2, sf, mw
 real	constant, shifts[2]
 double	txshift, tyshift, xshift, yshift
 

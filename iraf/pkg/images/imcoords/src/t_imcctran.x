@@ -12,13 +12,13 @@ double	olongpole, olatpole, nlongpole, nlatpole
 pointer	sp, imtemplate, insystem, outsystem, image, str
 pointer	im, mwin, cooin, mwout, cooout, ctin, ctout
 pointer	r, w, cd, ltm, ltv, iltm, nr, ncd, jr
-pointer	ix, iy, ox, oy, ilng, ilat, olng, olat
-int	imlist, nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
+pointer	ix, iy, ox, oy, ilng, ilat, olng, olat, imlist
+int	nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
 bool	uselp, verbose, update, usecd
 
 double	rg_rmsdiff()
-pointer	immap(), rg_xytoxy(), mw_newcopy()
-int	fstati(), imtopen(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
+pointer	immap(), rg_xytoxy(), mw_newcopy(), imtopen()
+int	fstati(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
 int	clgeti(), sk_stati(), rg_cdfit()
 bool	clgetb(), rg_longpole()
 

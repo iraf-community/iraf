@@ -19,12 +19,13 @@ procedure t_ccsetwcs ()
 bool	transpose, verbose, update
 double	xref, yref, xscale, yscale, xrot, yrot, lngref, latref
 double	txref, tyref, txscale, tyscale, txrot, tyrot, tlngref, tlatref
-int	imlist, reclist, lngunits, latunits, coostat, recstat, proj, pixsys, pfd
-pointer	sp, image, database, record, insystem, projstr, str
+int	lngunits, latunits, coostat, recstat, proj, pixsys, pfd
+pointer	imlist, reclist, sp, image, database, record, insystem, projstr, str
 pointer	dt, im, coo, tcoo, mw, sx1, sy1, sx2, sy2
 bool	clgetb()
 double	clgetd()
-int	imtopenp(), clgwrd(), sk_decwcs(), sk_stati(), imtlen()
+pointer	imtopenp()
+int	clgwrd(), sk_decwcs(), sk_stati(), imtlen()
 int	imtgetim(), cc_dtwcs(), strdic(), cc_rdproj(), open()
 pointer	dtmap(), immap()
 errchk	open()

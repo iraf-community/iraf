@@ -30,13 +30,14 @@ define	WT_WORLD	4
 procedure t_wcsctran()
 
 bool	verbose
-int	i, csp, imlist,inlist, outlist, limlist, linlist, loutlist
+int	i, csp, inlist, outlist, limlist, linlist, loutlist
 int	icl, ocl, ndim, wcsndim, ncolumns, nunits, inwcs, outwcs, min_sigdigits
-pointer	sp, image, columns, units, iwcs, owcs, fmtstr, fmtptrs
+pointer	imlist, sp, image, columns, units, iwcs, owcs, fmtstr, fmtptrs
 pointer	str, name, im, mw, ct, tmp
 
 bool	clgetb()
-int	imtopenp(), imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
+pointer	imtopenp()
+int	imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
 int	open(), mw_stati(), wt_getlabels(), ctoi(), strdic(), clgeti(), nscan()
 int	errget()
 pointer	immap(), mw_openim(), mw_sctran()

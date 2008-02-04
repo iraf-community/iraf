@@ -8,16 +8,17 @@ include <imhdr.h>
 procedure t_imcntr()
 
 char	ifile[SZ_FNAME]
-int	infile, nfiles
+pointer	infile
+int	nfiles
 
 real	xinit, yinit, xcntr, ycntr
 int	cboxsize
 pointer	im
 
-int	imtopenp (), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 int	clgeti()
 real	clgetr()
-pointer	immap()
+pointer	immap(), imtopenp()
 
 begin
 	# Get file names

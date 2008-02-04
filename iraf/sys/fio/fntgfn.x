@@ -58,7 +58,7 @@ sorting or determination of the length of the list.
 define	LEN_FNTBHDR		5
 define	FNTB_MAGIC		5164
 define	B_MAGIC			Memi[P2I($1)]
-define	B_SBUFPTR		Memi[P2I($1+1)]	# string buffer pointer
+define	B_SBUFPTR		Memp[$1+1]	# string buffer pointer
 define	B_NSTR			Memi[P2I($1+2)]	# number of strings
 define	B_STRNUM		Memi[P2I($1+3)]	# used to read list
 define	B_STRINDX		Memi[P2I($1+$2-1+4)]	# index of string

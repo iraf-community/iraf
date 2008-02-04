@@ -8,8 +8,8 @@ include	<pmset.h>
 
 procedure t_fixpix ()
 
-int	ilist			# List of images
-int	mlist			# List of masks
+pointer	ilist			# List of images
+pointer	mlist			# List of masks
 int	linterp			# Mask code for line interpolation
 int	cinterp			# Mask code for column interpolation
 bool	verbose			# Verbose output?
@@ -20,9 +20,9 @@ long	v[IM_MAXDIM]
 pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
 
 bool	clgetb(), pm_linenotempty()
-int	imtopenp(), imtgetim(), imtlen(), clgeti(), imaccf(), imstati()
+int	imtgetim(), imtlen(), clgeti(), imaccf(), imstati()
 long	clktime()
-pointer	immap(), xt_pmmap(), xt_fpinit()
+pointer	imtopenp(), immap(), xt_pmmap(), xt_fpinit()
 pointer	xt_fps(), xt_fpi(), xt_fpl(), xt_fpr(), xt_fpd()
 pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
 errchk	immap, xt_pmmap, xt_fpinit

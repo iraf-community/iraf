@@ -25,11 +25,11 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, nxk, nyk
-pointer	sp, im1, im2, kernel
+int	nxk, nyk
+pointer	list1, list2, sp, im1, im2, kernel
 
-int	imtopen(), imtgetim(), imtlen(), clgwrd()
-pointer	immap()
+int	imtgetim(), imtlen(), clgwrd()
+pointer	imtopen(), immap()
 real	clgetr()
 
 errchk	cnv_convolve

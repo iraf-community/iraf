@@ -8,8 +8,10 @@ procedure t_sections()
 char	images[SZ_LINE]				# Image template
 char	image[SZ_FNAME]
 char	str[SZ_LINE]
-int	option, list
-int	clgwrd(), imtopen(), imtgetim(), imtlen()
+int	option
+pointer	list
+int	clgwrd(), imtgetim(), imtlen()
+pointer	imtopen()
 
 begin
 	call clgstr ("images", images, SZ_LINE)

@@ -61,10 +61,10 @@ begin
 	    if (pms == NULL) {
 		call malloc (pms, nimages, TY_POINTER)
 		do i = 1, nimages
-		    Memi[pms+i-1] = pm_newmask (out, 1)
+		    Memp[pms+i-1] = pm_newmask (out, 1)
 	    }
 	    do i = 1, nimages {
-		pm = Memi[pms+i-1]
+		pm = Memp[pms+i-1]
 		v[2] = line - l
 		if (v[2] > 0)
 		    call pmplpi (pm, v, buf[1,i], 1, npts, rop)
@@ -99,7 +99,7 @@ include	"../icombine.com"
 
 begin
 	do k = 1, nimages {
-	    pm = Memi[pms+k-1]
+	    pm = Memp[pms+k-1]
 	    if (!pl_linenotempty (pm, v))
 		next
 	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
@@ -142,7 +142,7 @@ include	"../icombine.com"
 
 begin
 	do k = 1, nimages {
-	    pm = Memi[pms+k-1]
+	    pm = Memp[pms+k-1]
 	    if (!pl_linenotempty (pm, v))
 		next
 	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
@@ -185,7 +185,7 @@ include	"../icombine.com"
 
 begin
 	do k = 1, nimages {
-	    pm = Memi[pms+k-1]
+	    pm = Memp[pms+k-1]
 	    if (!pl_linenotempty (pm, v))
 		next
 	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
@@ -228,7 +228,7 @@ include	"../icombine.com"
 
 begin
 	do k = 1, nimages {
-	    pm = Memi[pms+k-1]
+	    pm = Memp[pms+k-1]
 	    if (!pl_linenotempty (pm, v))
 		next
 	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)

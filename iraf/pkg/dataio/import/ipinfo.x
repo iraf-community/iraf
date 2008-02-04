@@ -12,7 +12,8 @@ int	verbose					#i verbose output?
 pointer	sp, buf
 pointer	fmt
 int	fdb
-int	locpr(), fdb_opendb()
+pointer	locpr()
+int	fdb_opendb()
 
 pointer	fdb_scan_records()
 extern	ip_getop(), ip_dbfcn()

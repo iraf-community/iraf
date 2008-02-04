@@ -26,10 +26,10 @@ int	imdim				# dimensionality of images
 int	imtype				# datatype of images
 int	i
 
-pointer	ex_init(), immap()
+pointer	ex_init(), immap(), imtopenp()
 int	ex_getpars()
 int	clgfil(), access(), fntopnb()
-int	imtlen(), imtopenp(), open(), imtgetim()
+int	imtlen(), open(), imtgetim()
 bool	streq()
 
 errchk	open, immap, ex_chkimlist

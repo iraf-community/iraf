@@ -10,17 +10,17 @@ define	NTYPES	7
 
 procedure t_imstack ()
 
-int	i, j, npix, list, pdim, lmax, lindex
+int	i, j, npix, pdim, lmax, lindex
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
-pointer	sp, input, output, in, out, buf_in, buf_out, mwin, mwout
+pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
 
 bool	envgetb()
-int	imtopenp(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 int	mw_stati()
-pointer	immap(), mw_open(), mw_openim()
+pointer	imtopenp(), immap(), mw_open(), mw_openim()
 
 begin
 	call smark (sp)

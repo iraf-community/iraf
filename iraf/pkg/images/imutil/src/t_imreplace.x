@@ -11,11 +11,11 @@ real	value				# Replacement value
 real	radius				# Radius
 real	img				# Imaginary part for complex
 
-int	list
 char	image[SZ_FNAME]
-pointer	im
+pointer	list, im
 
-int	imtopen(), imtgetim()
+pointer	imtopen()
+int	imtgetim()
 real	clgetr()
 pointer	immap()
 

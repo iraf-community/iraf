@@ -150,7 +150,8 @@ extern	onint()
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	v_mask[MAXMREG]
+int	v_reg[PL_MAXDIM,MAXVREG]
 pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf
@@ -1247,7 +1248,8 @@ pointer	next_handler		#O epa of next handler
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	v_mask[MAXMREG]
+int	v_reg[PL_MAXDIM,MAXVREG]
 pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf
@@ -1274,7 +1276,8 @@ int	ctowrd(), stridx(), gctod(), strlen()
 
 char	sbuf[SZ_SBUF]
 int	nargs, argno, argtype[MAXARGS], argval[MAXARGS], s_op
-int	v_mask[MAXMREG], v_reg[PL_MAXDIM,MAXVREG]
+pointer	v_mask[MAXMREG]
+int	v_reg[PL_MAXDIM,MAXVREG]
 pointer	jmpbuf[LEN_JUMPBUF]
 common	/plzcom/ v_mask, v_reg, nargs, argno, argtype, argval, s_op,
 	jmpbuf, sbuf

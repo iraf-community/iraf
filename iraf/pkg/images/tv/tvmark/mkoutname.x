@@ -160,7 +160,8 @@ int     maxch                           # maximum number of characters
 char    period
 int     newversion, version, len
 pointer sp, list, name
-int     imtopen(), imtgetim(), strldx(), ctoi()
+pointer	imtopen()
+int     imtgetim(), strldx(), ctoi()
 
 begin
         # Allocate temporary space

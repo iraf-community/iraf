@@ -209,7 +209,7 @@ int	i
 pointer	op, o, evvexpr()
 errchk	evvexpr
 
-int	locpr
+pointer	locpr()
 extern	maskoperand, maskfunc
 
 begin

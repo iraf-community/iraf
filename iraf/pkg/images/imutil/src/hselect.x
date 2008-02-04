@@ -16,10 +16,10 @@ define	LEN_USERAREA	28800		# allow for the largest possible header
 
 procedure t_hselect()
 
-pointer	sp, im, image, fields, expr, missing, section
-int	imlist, ip, min_lenuserarea
-int	imtopenp(), imtgetim(), envfind(), ctoi()
-pointer	immap()
+pointer	sp, im, image, fields, expr, missing, section, imlist
+int	ip, min_lenuserarea
+int	imtgetim(), envfind(), ctoi()
+pointer	imtopenp(), immap()
 
 begin
 	call smark (sp)
@@ -83,8 +83,8 @@ char	missing[ARB]		# missing output value
 
 int	fieldno
 pointer	o, sp, field, value, flist
-pointer	evexpr(), imofnlu()
-int	locpr(), imgnfn()
+pointer	evexpr(), imofnlu(), locpr()
+int	imgnfn()
 extern	he_getop()
 errchk	evexpr, imofnlu, imgnfn
 

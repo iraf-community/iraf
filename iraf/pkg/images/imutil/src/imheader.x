@@ -17,10 +17,11 @@ define	LMARGIN		0
 
 procedure t_imheader()
 
-int	list, nimages, errcode
+int	nimages, errcode
 bool	long_format, user_fields
-pointer	sp, template, image, errmsg
-int	imtopen(), imtgetim(), imtlen(), clgeti(), errget()
+pointer	list, sp, template, image, errmsg
+int	imtgetim(), imtlen(), clgeti(), errget()
+pointer	imtopen()
 bool	clgetb()
 
 begin

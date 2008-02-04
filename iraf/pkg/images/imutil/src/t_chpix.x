@@ -31,11 +31,11 @@ pointer image1                  # Input image
 pointer image2                  # Output image
 pointer imtemp                  # Temporary file
 
-int     list1, list2, intype, outtype, verbose
-pointer im1, im2, sp, instr, outstr, imstr
+int     intype, outtype, verbose
+pointer list1, list2, im1, im2, sp, instr, outstr, imstr
 bool    clgetb()
-int     imtopen(), imtgetim(), imtlen(), clgwrd(), chp_gettype(), btoi()
-pointer immap()
+int     imtgetim(), imtlen(), clgwrd(), chp_gettype(), btoi()
+pointer imtopen(), immap()
 
 errchk	xt_mkimtemp, immap, imunmap, xt_delimtemp, chp_pixtype
 

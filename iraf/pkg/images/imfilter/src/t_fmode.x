@@ -8,13 +8,14 @@ include "fmode.h"
 procedure t_fmode()
 
 bool	verbose
-int	list1, list2, xwindow, ywindow, boundary
+int	xwindow, ywindow, boundary
+pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str, fmd, im1, im2
 real	constant
 
 bool	clgetb(), fp_equalr()
-int	clgeti(), imtopen(), imtgetim(), imtlen(), clgwrd(), btoi()
-pointer	immap()
+int	clgeti(), imtgetim(), imtlen(), clgwrd(), btoi()
+pointer	imtopen(), immap()
 real	clgetr()
 errchk	fmd_modbox
 

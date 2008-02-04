@@ -572,8 +572,8 @@ int	maxch					#i max length of string
 
 pointer sp, expr, o
 
-int     locpr(), strlen()
-pointer evvexpr()
+int     strlen()
+pointer locpr(), evvexpr()
 extern  ip_getop(), ip_dbfcn()
 errchk  evvexpr
 
@@ -622,8 +622,7 @@ char	param[ARB]				#i requested parameter
 int	val
 pointer	sp, expr, o
 
-int	locpr()
-pointer	evvexpr()
+pointer	locpr(), evvexpr()
 extern	ip_getop(), ip_dbfcn()
 errchk	evvexpr
 
@@ -678,8 +677,7 @@ char	param[ARB]				#i requested parameter
 real	val
 pointer	sp, expr, o
 
-int	locpr()
-pointer	evvexpr()
+pointer	locpr(), evvexpr()
 extern	ip_getop(), ip_dbfcn()
 errchk	evvexpr
 
@@ -733,8 +731,7 @@ char    expr[ARB]                               #i error string
 
 pointer o
 
-int     locpr()
-pointer evvexpr()
+pointer locpr(), evvexpr()
 extern  ip_getop(), ip_dbfcn()
 bool    strne()
 errchk  evvexpr

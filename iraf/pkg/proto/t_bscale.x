@@ -34,8 +34,8 @@ real	mean, median, mode, sigma, tlower, tupper
 pointer	sp, str, image1, image2, imtemp, inim, outim
 
 bool	clgetb()
-int	btoi(), imtopenp(), strdic(), gctod(), clgeti(), imtgetim(), imtlen()
-pointer	immap()
+int	btoi(), strdic(), gctod(), clgeti(), imtgetim(), imtlen()
+pointer	imtopenp(), immap()
 real	clgetr()
 
 begin

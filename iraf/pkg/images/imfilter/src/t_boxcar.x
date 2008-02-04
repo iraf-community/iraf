@@ -17,11 +17,11 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, kxdim, kydim
-pointer	im1, im2
+int	kxdim, kydim
+pointer	list1, list2, im1, im2
 
-int	imtopen(), imtgetim(), imtlen(), clgeti(), clgwrd()
-pointer	immap()
+int	imtgetim(), imtlen(), clgeti(), clgwrd()
+pointer	imtopen(), immap()
 real	clgetr()
 
 errchk	cnv_boxcar

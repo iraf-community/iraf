@@ -15,20 +15,20 @@ bool	usewcs, center, verbose
 double	xref, yref, xmag, ymag, xrot, yrot, tlngref, tlatref, txref, tyref
 double	txmag, tymag, txrot, tyrot
 int	ip, nchars, sbox, cbox, min_sigdigits, ncenter, maxiter, tol
-int	inlist, ninfiles, outlist, noutfiles, imlist, nimages, in, out
+int	inlist, ninfiles, outlist, noutfiles, nimages, in, out
 int	lngcolumn, latcolumn, lngunits, latunits, coostat, refstat
 int	lngrefunits, latrefunits, proj, pfd
 pointer	sp, insystem, refsystem, infile, outfile, image, projstr, str
-pointer	slngref, slatref, xformat, yformat, coo, refcoo, im, mw
+pointer	slngref, slatref, xformat, yformat, coo, refcoo, im, mw, imlist
 real	datamin, datamax, back
 
 bool	clgetb()
 double	clgetd(), imgetd()
-int	clpopnu(), clplen(), imtopenp(), imtlen(), clgeti(), clgwrd(), strlen()
+int	clpopnu(), clplen(), imtlen(), clgeti(), clgwrd(), strlen()
 int	sk_decwcs(), open(), clgfil(), imtgetim(), strncmp(), ctod()
 int	cc_listran(), strdic(), cc_rdproj()
 real	clgetr()
-pointer	immap(), cc_mkwcs()
+pointer	immap(), cc_mkwcs(), imtopenp()
 errchk	imgstr(), imgetd(), open()
 
 begin

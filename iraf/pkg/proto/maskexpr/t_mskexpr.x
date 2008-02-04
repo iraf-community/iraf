@@ -23,13 +23,14 @@ procedure t_mskexpr()
 
 pointer	expr, st, xexpr, refim, pmim, refmsk
 pointer	sp, exprdb, dims, uaxlen, mskname, imname, refname
-int	i, ip, op, msklist, imlist, rmsklist, len_exprbuf, fd, nchars, ch
+pointer	msklist, imlist, rmsklist
+int	i, ip, op, len_exprbuf, fd, nchars, ch
 int	undim, npix, depth
 bool	verbose
 
-pointer	me_getexprdb(), me_expandtext(), immap(), me_mkmask()
+pointer	me_getexprdb(), me_expandtext(), immap(), me_mkmask(), imtopenp()
 long	fstatl()
-int	imtopenp(), imtlen(), open(), getci(), imtgetim(), ctoi()
+int	imtlen(), open(), getci(), imtgetim(), ctoi()
 int	clgeti(), strmatch(), imaccess()
 bool	clgetb(), strne()
 errchk	immap()

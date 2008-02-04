@@ -23,17 +23,17 @@ procedure t_geomap ()
 
 bool	verbose, interactive
 double	xmin, xmax, ymin, ymax, reject
-int	geometry, function, calctype, nfiles, list, in, reclist, nrecords
+int	geometry, function, calctype, nfiles, list, in, nrecords
 int	xxorder, xyorder, xxterms, yxorder, yyorder, yxterms, maxiter
 int	reslist, nresfiles, res
-pointer	sp, in_name, str, out, fit, gd, graphics
+pointer	reclist, sp, in_name, str, out, fit, gd, graphics
 real	rxmin, rxmax, rymin, rymax
 
 bool	clgetb()
 double	clgetd()
-int	clgeti(), clgwrd(), clplen(), errget(), imtopenp(), imtlen()
+int	clgeti(), clgwrd(), clplen(), errget(), imtlen()
 int	imtgetim()
-pointer	clpopnu(), clgfil(), dtmap(), gopen(), open()
+pointer	imtopenp(), clpopnu(), clgfil(), dtmap(), gopen(), open()
 
 errchk	geo_mapr(), geo_mapd()
 

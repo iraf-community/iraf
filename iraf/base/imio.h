@@ -42,10 +42,10 @@ define	IM_VFLAGBADPIX	Memi[P2I($1+12)]		# flag bad pixels upon input
 define	IM_FLUSH	Memi[P2I($1+13)]		# flush outbuf?
 define	IM_UPDATE	Memi[P2I($1+14)]		# update header?
 define	IM_FLUSHEPA	Memp[$1+15]			# epa of imfls? routine
-define	IM_IBDES	Memi[P2I($1+16)]		# input bufdes
-define	IM_OBDES	Memi[P2I($1+17)]		# output bufdes
-define	IM_LASTBDES	Memi[P2I($1+18)]		# last buffer accessed
-define	IM_OHDR		Memi[P2I($1+19)]		# if newcopy, ptr to old header
+define	IM_IBDES	Memp[$1+16]			# input bufdes
+define	IM_OBDES	Memp[$1+17]			# output bufdes
+define	IM_LASTBDES	Memp[$1+18]			# last buffer accessed
+define	IM_OHDR		Memp[$1+19]			# if newcopy, ptr to old header
 define	IM_NPHYSDIM	Memi[P2I($1+20)]		# number of physical dims
 define	IM_SECTUSED	Memi[P2I($1+21)]		# image section in use
 define	IM_FAST		Memi[P2I($1+22)]		# fast i/o permitted
@@ -53,15 +53,15 @@ define	IM_SWAP		Memi[P2I($1+23)]		# byte swapping required
 define	IM_SVMTIME	Meml[P2L($1+24)]		# new time of last modify
 define	IM_OOBPIX	Memr[P2R($1+25)]		# value for out of bounds pixels
 define	IM_KERNEL	Memi[P2I($1+26)]		# IKI kernel assigned (runtime)
-define	IM_KDES		Memi[P2I($1+27)]		# IKI kernel descriptor
+define	IM_KDES		Memp[$1+27]			# IKI kernel descriptor
 define	IM_HFD		Memi[P2I($1+28)]		# header file descriptor
 define	IM_PFD		Memi[P2I($1+29)]		# pixel file descriptor
 define	IM_LENHDRMEM	Memi[P2I($1+30)]		# descr. length, IM_MAGIC to end
 define	IM_UABLOCKED	Memi[P2I($1+31)]		# user area blocked, 80 chars
 define	IM_CLINDEX	Memi[P2I($1+32)]		# index of image in cluster
 define	IM_CLSIZE	Memi[P2I($1+33)]		# no. images in cluster
-define	IM_PL		Memi[P2I($1+34)]		# PL descriptor if mask image
-define	IM_PLREFIM	Memi[P2I($1+35)]		# PL reference image if any
+define	IM_PL		Memp[$1+34]			# PL descriptor if mask image
+define	IM_PLREFIM	Memp[$1+35]			# PL reference image if any
 define	IM_PLFLAGS	Memi[P2I($1+36)]		# PL mask i/o flags
 			# (extra space)
 define	IM_SVLEN	Meml[P2L($1+$2+40-1)]	# save true axis lengths

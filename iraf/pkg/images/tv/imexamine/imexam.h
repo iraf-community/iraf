@@ -16,7 +16,7 @@ define	IE_CTWL		Memp[$1+3]		# CT-MWCS pointer (W -> L)
 define	IE_DS		Memp[$1+4]		# display frame pointer
 define	IE_GP		Memp[$1+5]		# GIO pointer
 define	IE_PP		Memp[$1+6]		# pset pointer
-define	IE_LIST		Memi[P2I($1+7)]		# image list
+define	IE_LIST		Memp[$1+7]		# image list
 define	IE_LISTLEN	Memi[P2I($1+8)]		# number of images in list
 define	IE_USEDISPLAY	Memi[P2I($1+9)]		# use image display?
 define	IE_INDEX	Memi[P2I($1+10)]		# image index

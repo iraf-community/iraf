@@ -7,13 +7,13 @@ include "rskysub.h"
 procedure t_rskysub()
 
 pointer	sp, imasks, str
-pointer	rs
-int	inlist, imsklist, outlist, omsklist, hmsklist, sclist, tmplist
+pointer	rs, inlist, imsklist, omsklist, tmplist, outlist, hmsklist, sclist
 bool	msk_invert, useimasks, cache, verbose
 
 real	clgetr()
-int	imtopenp(), imtopen(), imtlen(), fntopnb(), fntlenb()
-int	clgeti(), btoi(), clgwrd(), rs_imlist(), rs_olist(), rs_omlist()
+pointer	imtopenp(), imtopen(), rs_imlist(), rs_olist(), rs_omlist(), fntopnb()
+int	imtlen(), fntlenb()
+int	clgeti(), btoi(), clgwrd()
 bool	clgetb(), strne()
 
 begin

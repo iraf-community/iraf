@@ -26,13 +26,13 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, kbilinear, nxk1, nyk1, nxk2, nyk2, radsym
-pointer	sp, im1, im2, kernel1, kernel2
+int	kbilinear, nxk1, nyk1, nxk2, nyk2, radsym
+pointer	list1, list2, sp, im1, im2, kernel1, kernel2
 real	a1, b1, c1, f1, a2, b2, c2, f2
 
 bool	clgetb(), fp_equalr()
-int	imtopen(), imtgetim(), imtlen(), clgwrd(), btoi()
-pointer	immap()
+int	imtgetim(), imtlen(), clgwrd(), btoi()
+pointer	imtopen(), immap()
 real	clgetr()
 
 errchk	cnv_ell_gauss, cnv_gauss_kernel, cnv_convolve

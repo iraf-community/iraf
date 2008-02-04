@@ -13,9 +13,11 @@ pointer	sp, old_list, new_list
 pointer	old_name, new_name, old_dir, new_dir
 bool	verbose
 
-int	list1, list2, root_len
-int	imtopen(), imtgetim(), imtlen()
+pointer	list1, list2
+int	root_len
+int	imtgetim(), imtlen()
 int	fnldir(), isdirectory()
+pointer	imtopen()
 bool	clgetb()
 
 begin

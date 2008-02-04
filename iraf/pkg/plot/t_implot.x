@@ -56,7 +56,7 @@ define	MAX_COLORS	8
 
 procedure t_implot()
 
-int	list
+pointer	list
 char	image[SZ_FNAME]
 char	wcstype[SZ_FNAME]
 char	xlabel[SZ_FNAME]

@@ -24,12 +24,12 @@ char	image2[SZ_FNAME]		# Output image name
 char	imtemp[SZ_FNAME]		# Temporary file
 
 char	str[SZ_LINE], interpstr[SZ_FNAME]
-int	list1, list2, ishift
-pointer	im1, im2, mw
+int	ishift
+pointer	list1, list2, im1, im2, mw
 
 bool	fp_equalr(), envgetb()
-int	clgwrd(), imtopen(), imtgetim(), imtlen()
-pointer	immap(), mw_openim()
+int	clgwrd(), imtgetim(), imtlen()
+pointer	imtopen(), immap(), mw_openim()
 real	clgetr()
 errchk	sh_lines, sh_linesi, mw_openim, mw_shift, mw_saveim, mw_close
 

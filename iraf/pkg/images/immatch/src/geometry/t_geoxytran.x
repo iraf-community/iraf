@@ -14,14 +14,14 @@ define	GEO_DOUBLE	2		# Computation type is double
 
 procedure t_geoxytran()
 
-int	inlist, outlist, reclist, calctype, geometry, dir, xcolumn, ycolumn
+int	inlist, outlist, calctype, geometry, dir, xcolumn, ycolumn
 int	min_sigdigits, infd, outfd
-pointer	sp, in_fname, out_fname, record, xformat, yformat, str, dt
+pointer	reclist, sp, in_fname, out_fname, record, xformat, yformat, str, dt
 pointer	sx1, sy1, sx2, sy2
 int	clgwrd(), clgeti(), open()
 bool	streq()
-int	fntopnb(), fntlenb(), fntgfnb(), imtopenp(), imtlen(), imtgetim()
-pointer	dtmap()
+int	fntopnb(), fntlenb(), fntgfnb(), imtlen(), imtgetim()
+pointer	imtopenp(), dtmap()
 
 begin
 	# Allocate memory for transformation parameters structure
