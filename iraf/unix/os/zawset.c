@@ -63,7 +63,16 @@ int ZAWSET ( XINT *best_size, XINT *new_size, XINT *old_size, XINT *max_size )
 #endif
 
 	/* Get the page size in kilobytes. */
+#ifdef _SC_PAGESIZE
+	kb_page = sysconf(_SC_PAGESIZE) / KB;
+#else
+#ifdef _SC_PAGE_SIZE
+	kb_page = sysconf(_SC_PAGE_SIZE) / KB;
+#else
+	/* legacy... */
 	kb_page = getpagesize() / KB;
+#endif	/* _SC_PAGE_SIZE */
+#endif	/* _SC_PAGESIZE */
 
 #ifdef _SC_PHYS_PAGES
 	/* On recent POSIX systems (including Solaris, Linux, and maybe
