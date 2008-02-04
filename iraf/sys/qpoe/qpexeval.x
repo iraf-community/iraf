@@ -105,7 +105,7 @@ begin
 		case NOP:				# null operation
 		    ;
 		case GOTO:				# go-to prog offset
-		    ip = IARG1(ip)
+		    ip = PARG1(ip)
 		    next
 		case XIFT: 				# exit if true
 		    if (pass) {
@@ -271,22 +271,22 @@ ret_		    if (level > 0) {
 
 		case LUTXS:				# lookup tables
 		    i0 = Mems[ev_s+IARG1(ip)]
-		    lt = IARG2(ip)
+		    lt = PARG2(ip)
 		    rbin = (i0 - int(LT_I0(lt))) * LT_IS(lt)
 		    goto lut_
 		case LUTXI:
 		    i0 = Memi[ev_i+IARG1(ip)]
-		    lt = IARG2(ip)
+		    lt = PARG2(ip)
 		    rbin = (i0 - int(LT_I0(lt))) * LT_IS(lt)
 		    goto lut_
 		case LUTXR:
 		    r0 = Memr[ev_r+IARG1(ip)]
-		    lt = IARG2(ip)
+		    lt = PARG2(ip)
 		    rbin = (r0 - LT_R0(lt)) * LT_RS(lt)
 		    goto lut_
 		case LUTXD:
 		    d0 = Memd[ev_d+IARG1(ip)]
-		    lt = IARG2(ip)
+		    lt = PARG2(ip)
 		    rbin = (d0 - LT_D0(lt)) * LT_DS(lt)
 lut_
 		    # Common code for any lookup table.
@@ -323,8 +323,8 @@ lut_
 			level = level + 1
 			pv_save[level] = pass
 
-			if (IARG3(ip) != NULL)
-			    ip_save[level] = IARG3(ip)
+			if (PARG3(ip) != NULL)
+			    ip_save[level] = PARG3(ip)
 			else
 			    ip_save[level] = ip + LEN_INSTRUCTION
 
@@ -341,8 +341,8 @@ lut_
 		    # to skip over any subprograms that may have been compiled
 		    # after the LUTX.
 
-		    if (IARG3(ip) != NULL) {
-			ip = IARG3(ip)
+		    if (PARG3(ip) != NULL) {
+			ip = PARG3(ip)
 			next
 		    }
 		}

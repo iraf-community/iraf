@@ -67,9 +67,9 @@ define	ET_ATTOFF	Memi[P2I($1+1)]	# *typed* offset of attribute
 define	ET_PROGPTR	Memp[$1+2]	# pointer to program segment 
 define	ET_NINSTR	Memi[P2I($1+3)]	# program segment size, instructions
 define	ET_DELETED	Memi[P2I($1+4)]	# set if term is deleted
-define	ET_ATNAME	Memi[P2I($1+5)]	# attribute name used in expr
-define	ET_ASSIGNOP	Memi[P2I($1+6)]	# type of assignment ("=", "+=")
-define	ET_EXPRTEXT	Memi[P2I($1+7)]	# saved expr text
+define	ET_ATNAME	Memp[$1+5]	# attribute name used in expr
+define	ET_ASSIGNOP	Memp[$1+6]	# type of assignment ("=", "+=")
+define	ET_EXPRTEXT	Memp[$1+7]	# saved expr text
 define	ET_NEXT		Memi[P2I($1+8)]	# databuf offset of next ET struct
 
 # Lookup table descriptor.  Stored in the data buffer and maintained as a
@@ -97,15 +97,18 @@ define	LT_LUT		Mems[LT_LUTP($1)+$2-1]		# LT_LUT(lt,i)
 define	LEN_INSTRUCTION		4	# instruction length, ints
 
 define	OPCODE		Memi[P2I($1)]	# instruction opcode.
+define	PARG1		Memp[$1+1]	# first integer argument
+define	PARG2		Memp[$1+2]	# second integer argument
+define	PARG3		Memp[$1+3]	# third integer argument
 define	IARG1		Memi[P2I($1+1)]	# first integer argument
 define	IARG2		Memi[P2I($1+2)]	# second integer argument
 define	IARG3		Memi[P2I($1+3)]	# third integer argument
 define	RARG1		Memr[P2R($1+1)]	# first real argument
 define	RARG2		Memr[P2R($1+2)]	# second real argument
 define	RARG3		Memr[P2R($1+3)]	# third real argument
-define	DARG1		Memd[IARG1($1)]	# first double argument
-define	DARG2		Memd[IARG2($1)]	# second double argument
-define	DARG3		Memd[IARG3($1)]	# third double argument
+define	DARG1		Memd[PARG1($1)]	# first double argument
+define	DARG2		Memd[PARG2($1)]	# second double argument
+define	DARG3		Memd[PARG3($1)]	# third double argument
 
 # Instruction opcodes.
 

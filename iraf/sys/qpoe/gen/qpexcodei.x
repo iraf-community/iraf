@@ -3,6 +3,9 @@
 include <mach.h>
 include "../qpex.h"
 
+define	qpex_d_pbpin_0	qpex_p_pbpin_0
+define	qpex_d_pbpin_1	qpex_p_pbpin_1
+
 # QPEX_CODEGEN -- Generate interpreter metacode to evaluate the given
 # expression.  The new code is appended to the current compiled program,
 # adding additional constraints which a data event will have to meet to
@@ -21,14 +24,14 @@ int	nbins, bin, xp
 pointer	lt, lut, lutx, pb
 int	x1, x2, xmin, xmax
 int	xlen, nranges, n_nranges, level, opcode, ip, i
-pointer	pb_save, db_save, xs_buf, xe_buf, xs, xe, n_xs, n_xe, et, prev
+pointer	pb_save, db_save, xs_buf, xe_buf, xs, xe, n_xs, n_xe, et, prev, p_zero
 
 int	sv_xs[MAX_LEVELS], sv_xe[MAX_LEVELS]
 pointer	sv_lt[MAX_LEVELS], sv_lut[MAX_LEVELS], sv_lutx[MAX_LEVELS]
 int	sv_xp[MAX_LEVELS], sv_nranges[MAX_LEVELS], sv_bin[MAX_LEVELS]
 int	sv_nbins[MAX_LEVELS]
 
-int	d_x1, d_x2
+int	d_x1, d_x2, d_zero
 real	xoffset, xscale
 real	sv_xoffset[MAX_LEVELS], sv_xscale[MAX_LEVELS]
 
@@ -41,7 +44,8 @@ int	qp_ctoi()
 int	qpex_parsei()
 int	stridxs(), btoi(), qpex_sublisti()
 pointer	qpex_dballoc(), qpex_dbpstr(), qpex_pbpos()
-errchk	qpex_dballoc, qpex_pbpin, malloc, calloc, realloc, qpex_parsei
+errchk	qpex_i_pbpin_0, qpex_i_pbpin_1
+errchk	qpex_dballoc, malloc, calloc, realloc, qpex_parsei
 
 string	qpexwarn "QPEX Warning"
 define	error_ 91
@@ -54,6 +58,9 @@ define	XS Memi[xs+($1)-1]
 define	XE Memi[xe+($1)-1]
 
 begin
+	d_zero = 0
+	p_zero = 0
+
 	pb = EX_PB(ex)
 
 	# Save the program state in case we have to abort.
@@ -121,9 +128,9 @@ bbmask_		    call eprintf ("%s: bad bitmask expression `%s'\n")
 		if (complement)
 		    maskval = not(maskval)
 		if (dtype == TY_SHORT)
-		    call qpex_pbpin (ex, BTTXS, offset, maskval, 0)
+		    call qpex_i_pbpin_1 (ex, BTTXS, offset, maskval, d_zero)
 		else
-		    call qpex_pbpin (ex, BTTXI, offset, maskval, 0)
+		    call qpex_i_pbpin_1 (ex, BTTXI, offset, maskval, d_zero)
 
 		# Finish setting up the eterm descriptor.
 		ET_NINSTR(et)  = 1
@@ -162,7 +169,7 @@ next_
 		# This shouldn't happen.
 null_		call eprintf ("%s: null range list\n")
 		    call pargstr (qpexwarn)
-		call qpex_pbpin (ex, PASS, 0, 0, 0)
+		call qpex_i_pbpin_1 (ex, PASS, 0, d_zero, d_zero)
 
 	    } else if (nranges == 1) {
 		# Output an instruction to load the data, perform the range
@@ -176,24 +183,24 @@ null_		call eprintf ("%s: null range list\n")
 		    if (IS_LEFTI(x1) && IS_RIGHTI(x2))
 			; # pass everything (no tests)
 		    else if (IS_LEFTI(x1))
-			call qpex_pbpin (ex, LEQXS, offset, d_x2, 0)
+			call qpex_i_pbpin_1 (ex, LEQXS, offset, d_x2, d_zero)
 		    else if (IS_RIGHTI(x2))
-			call qpex_pbpin (ex, GEQXS, offset, d_x1, 0)
+			call qpex_i_pbpin_1 (ex, GEQXS, offset, d_x1, d_zero)
 		    else if (fp_equali (x1, x2))
-			call qpex_pbpin (ex, EQLXS, offset, d_x1, d_x2)
+			call qpex_i_pbpin_1 (ex, EQLXS, offset, d_x1, d_x2)
 		    else
-			call qpex_pbpin (ex, RNGXS, offset, d_x1, d_x2)
+			call qpex_i_pbpin_1 (ex, RNGXS, offset, d_x1, d_x2)
 		} else {
 		    if (IS_LEFTI(x1) && IS_RIGHTI(x2))
 			; # pass everything (no tests)
 		    else if (IS_LEFTI(x1))
-			call qpex_pbpin (ex, LEQXI, offset, d_x2, 0)
+			call qpex_i_pbpin_1 (ex, LEQXI, offset, d_x2, d_zero)
 		    else if (IS_RIGHTI(x2))
-			call qpex_pbpin (ex, GEQXI, offset, d_x1, 0)
+			call qpex_i_pbpin_1 (ex, GEQXI, offset, d_x1, d_zero)
 		    else if (fp_equali (x1, x2))
-			call qpex_pbpin (ex, EQLXI, offset, d_x1, d_x2)
+			call qpex_i_pbpin_1 (ex, EQLXI, offset, d_x1, d_x2)
 		    else
-			call qpex_pbpin (ex, RNGXI, offset, d_x1, d_x2)
+			call qpex_i_pbpin_1 (ex, RNGXI, offset, d_x1, d_x2)
 		}
 
 	    } else if (nranges < EX_LUTMINRANGES(ex)) {
@@ -215,7 +222,7 @@ null_		call eprintf ("%s: null range list\n")
 				opcode = NEQXS
 			    else
 				opcode = NEQXI
-			    call qpex_pbpin (ex, opcode, offset, XE(1)+1, 0)
+			    call qpex_i_pbpin_1 (ex, opcode, offset, XE(1)+1, d_zero)
 			    goto resume_
 			}
 
@@ -229,7 +236,7 @@ null_		call eprintf ("%s: null range list\n")
 			    opcode = LDSI
 			else
 			    opcode = LDII
-		    call qpex_pbpin (ex, opcode, offset, 0, 0)
+		    call qpex_i_pbpin_1 (ex, opcode, offset, d_zero, d_zero)
 		}
 
 		# Compile a series of equality or range tests.
@@ -239,17 +246,17 @@ null_		call eprintf ("%s: null range list\n")
 			d_x2 = x2
 
 		    if (IS_LEFTI(x1))
-			call qpex_pbpin (ex, LEQI, d_x2, 0, 0)
+			call qpex_i_pbpin_0 (ex, LEQI, d_x2, d_zero, d_zero)
 		    else if (IS_RIGHTI(x2))
-			call qpex_pbpin (ex, GEQI, d_x1, 0, 0)
+			call qpex_i_pbpin_0 (ex, GEQI, d_x1, d_zero, d_zero)
 		    else if (fp_equali (x1, x2))
-			call qpex_pbpin (ex, EQLI, d_x1, d_x2, 0)
+			call qpex_i_pbpin_0 (ex, EQLI, d_x1, d_x2, d_zero)
 		    else
-			call qpex_pbpin (ex, RNGI, d_x1, d_x2, 0)
+			call qpex_i_pbpin_0 (ex, RNGI, d_x1, d_x2, d_zero)
 		}
 
 		# Compile a test and exit instruction.
-		call qpex_pbpin (ex, XIFF, 0, 0, 0)
+		call qpex_i_pbpin_1 (ex, XIFF, 0, d_zero, d_zero)
 
 	    } else {
 		# Compile a lookup table test. Lookup tables may be
@@ -305,9 +312,9 @@ null_		call eprintf ("%s: null range list\n")
 
 		lutx = qpex_pbpos (ex)
 		if (dtype == TY_SHORT)
-		    call qpex_pbpin (ex, LUTXS, offset, lt, 0)
+		    call qpex_p_pbpin_1 (ex, LUTXS, offset, lt, p_zero)
 		else
-		    call qpex_pbpin (ex, LUTXI, offset, lt, 0)
+		    call qpex_p_pbpin_1 (ex, LUTXI, offset, lt, p_zero)
 
 		xp = 1
 		bin = 1
@@ -378,7 +385,7 @@ continue_
 		# subprograms.
 
 		if (qpex_pbpos(ex) - lutx > LEN_INSTRUCTION)
-		    call qpex_pbpin (ex, XIFF, 0, 0, 0)
+		    call qpex_i_pbpin_1 (ex, XIFF, 0, d_zero, d_zero)
 	    }
 resume_
 	    # Resume lookup table compilation if exiting due to LUT-bin
@@ -399,12 +406,12 @@ resume_
 		lutx = sv_lutx[level]
 
 		# Compile a return from subprogram.
-		call qpex_pbpin (ex, RET, 0, 0, 0)
+		call qpex_i_pbpin_1 (ex, RET, 0, d_zero, d_zero)
 
 		# Patch up the original LUTX instruction to jump over the
 		# subprogram we have just finished compiling.
 
-		IARG3(lutx) = qpex_pbpos (ex)
+		PARG3(lutx) = qpex_pbpos (ex)
 
 		# Resume compilation at the next LUT bin.
 		bin = bin + 1

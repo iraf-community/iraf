@@ -27,7 +27,7 @@ begin
 
 	# Allocate the program buffer.
 	pb_len = QP_EXPBLEN(qp)
-	call calloc (pb, pb_len, TY_INT)
+	call calloc (pb, pb_len, TY_STRUCT)
 
 	# Allocate the data buffer.
 	db_len = QP_EXDBLEN(qp)

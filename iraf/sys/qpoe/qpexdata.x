@@ -23,10 +23,10 @@ objects to the program and data buffers:
 		      qpex_free (ex, pb_save, db_save)
 
 	        ip = qpex_pbpos (ex)
-		     qpex_pbpin (ex, opcode, arg1, arg2, arg3)
+		     qpex_[ipr]_pbpin_[01] (ex, opcode, arg1, arg2, arg3)
 
 	      ptr = qpex_dbpstr (ex, strval)
-	     intval = qpex_refd (ex, dval)
+	     ptrval = qpex_refd (ex, dval)
 	     ptr = qpex_dballoc (ex, nelem, dtype)
 
 QPEX_MARK and QPEX_FREE are used to mark the current tops of the two buffers
@@ -110,13 +110,14 @@ begin
 end
 
 
-# QPEX_PBPIN -- Add an insruction at the end of the program buffer.
+# QPEX_I_PBPIN_[01] -- Add an insruction at the end of the program buffer.
+#                      args: I-I-I
 
-procedure qpex_pbpin (ex, opcode, arg1, arg2, arg3)
+procedure qpex_i_pbpin_0 (ex, opcode, arg1, arg2, arg3)
 
 pointer	ex			#I QPEX descriptor
 int	opcode			#I instruction opcode
-int	arg1,arg2,arg3		#I instruction data fields (typeless)
+int	arg1,arg2,arg3		#I instruction data fields
 
 pointer	op
 errchk	syserr
@@ -130,6 +131,132 @@ begin
 	IARG1(op)  = arg1
 	IARG2(op)  = arg2
 	IARG3(op)  = arg3
+
+	EX_PBOP(ex) = op + LEN_INSTRUCTION
+end
+
+procedure qpex_i_pbpin_1 (ex, opcode, arg1, arg2, arg3)
+
+pointer	ex			#I QPEX descriptor
+int	opcode			#I instruction opcode
+int	arg1,arg2,arg3		#I instruction data fields
+
+pointer	op
+errchk	syserr
+
+begin
+	op = EX_PBOP(ex)
+	if (op >= EX_PBTOP(ex))
+	    call syserr (SYS_QPEXPBOVFL)
+
+	OPCODE(op) = opcode
+	IARG1(op)  = arg1
+	IARG2(op)  = arg2
+	IARG3(op)  = arg3
+
+	EX_PBOP(ex) = op + LEN_INSTRUCTION
+end
+
+
+# QPEX_R_PBPIN_0 -- Add an insruction at the end of the program buffer.
+#                   args: R-R-R
+
+procedure qpex_r_pbpin_0 (ex, opcode, arg1, arg2, arg3)
+
+pointer	ex			#I QPEX descriptor
+int	opcode			#I instruction opcode
+real	arg1,arg2,arg3		#I instruction data fields
+
+pointer	op
+errchk	syserr
+
+begin
+	op = EX_PBOP(ex)
+	if (op >= EX_PBTOP(ex))
+	    call syserr (SYS_QPEXPBOVFL)
+
+	OPCODE(op) = opcode
+	RARG1(op)  = arg1
+	RARG2(op)  = arg2
+	RARG3(op)  = arg3
+
+	EX_PBOP(ex) = op + LEN_INSTRUCTION
+end
+
+# QPEX_R_PBPIN_1 -- Add an insruction at the end of the program buffer.
+#                   args: I-R-R
+
+procedure qpex_r_pbpin_1 (ex, opcode, arg1, arg2, arg3)
+
+pointer	ex			#I QPEX descriptor
+int	opcode			#I instruction opcode
+int	arg1			#I instruction data fields
+real	arg2,arg3		#I instruction data fields
+
+pointer	op
+errchk	syserr
+
+begin
+	op = EX_PBOP(ex)
+	if (op >= EX_PBTOP(ex))
+	    call syserr (SYS_QPEXPBOVFL)
+
+	OPCODE(op) = opcode
+	IARG1(op)  = arg1
+	RARG2(op)  = arg2
+	RARG3(op)  = arg3
+
+	EX_PBOP(ex) = op + LEN_INSTRUCTION
+end
+
+
+# QPEX_P_PBPIN_0 -- Add an insruction at the end of the program buffer.
+#                   args: P-P-P
+
+procedure qpex_p_pbpin_0 (ex, opcode, arg1, arg2, arg3)
+
+pointer	ex			#I QPEX descriptor
+int	opcode			#I instruction opcode
+pointer	arg1,arg2,arg3		#I instruction data fields
+
+pointer	op
+errchk	syserr
+
+begin
+	op = EX_PBOP(ex)
+	if (op >= EX_PBTOP(ex))
+	    call syserr (SYS_QPEXPBOVFL)
+
+	OPCODE(op) = opcode
+	PARG1(op)  = arg1
+	PARG2(op)  = arg2
+	PARG3(op)  = arg3
+
+	EX_PBOP(ex) = op + LEN_INSTRUCTION
+end
+
+# QPEX_P_PBPIN_1 -- Add an insruction at the end of the program buffer.
+#                   args: I-P-P
+
+procedure qpex_p_pbpin_1 (ex, opcode, arg1, arg2, arg3)
+
+pointer	ex			#I QPEX descriptor
+int	opcode			#I instruction opcode
+int	arg1			#I instruction data fields
+pointer	arg2,arg3		#I instruction data fields
+
+pointer	op
+errchk	syserr
+
+begin
+	op = EX_PBOP(ex)
+	if (op >= EX_PBTOP(ex))
+	    call syserr (SYS_QPEXPBOVFL)
+
+	OPCODE(op) = opcode
+	IARG1(op)  = arg1
+	PARG2(op)  = arg2
+	PARG3(op)  = arg3
 
 	EX_PBOP(ex) = op + LEN_INSTRUCTION
 end
@@ -165,7 +292,7 @@ end
 # QPEX_REFD -- Reference a type DOUBLE datum, returning (as an integer) a
 # pointer to the double value, which is stored in the data buffer.
 
-int procedure qpex_refd (ex, value)
+pointer procedure qpex_refd (ex, value)
 
 pointer	ex			#I QPEX descriptor
 double	value			#I double value

@@ -37,16 +37,16 @@ begin
 	    ninstr = ET_NINSTR(et)
 
 	    OPCODE(ip) = GOTO
-	    IARG1(ip)  = ip + ninstr * LEN_INSTRUCTION
-	    IARG2(ip)  = NULL
-	    IARG3(ip)  = NULL
+	    PARG1(ip)  = ip + ninstr * LEN_INSTRUCTION
+	    PARG2(ip)  = NULL
+	    PARG3(ip)  = NULL
 
 	    do i = 2, ninstr {
 		ip = ET_PROGPTR(et) + (i-1) * LEN_INSTRUCTION
 		OPCODE(ip) = NOP
-		IARG1(ip)  = NULL
-		IARG2(ip)  = NULL
-		IARG3(ip)  = NULL
+		PARG1(ip)  = NULL
+		PARG2(ip)  = NULL
+		PARG3(ip)  = NULL
 	    }
 
 	    # Flag the eterm as deleted.
