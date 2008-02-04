@@ -31,8 +31,8 @@ int	ip, lp, stmt, marker, fd, indexlen, stablen, sbuflen, junk
 
 bool	clgetb()
 int	ctowrd(), strlen(), getline(), strmatch()
-int	stpstr(), sthead(), stnext(), open(), clgeti()
-pointer	stopen(), stfind(), stenter(), strestore()
+int	stpstr(), open(), clgeti()
+pointer	stnext(), sthead(), stopen(), stfind(), stenter(), strestore()
 
 begin
 	indexlen = clgeti ("indexlen")

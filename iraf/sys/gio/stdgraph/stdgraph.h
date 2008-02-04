@@ -21,24 +21,24 @@ define	GUIDIR		"guidir"
 
 define	LEN_SG		91
 
-define	SG_SBUF		Memi[P2I($1)]		# string buffer
+define	SG_SBUF		Memp[$1]		# string buffer
 define	SG_SZSBUF	Memi[P2I($1+1)]		# size of string buffer
-define	SG_NEXTCH	Memi[P2I($1+2)]		# next char pos in string buf
+define	SG_NEXTCH	Memp[$1+2]		# next char pos in string buf
 define	SG_NCHARSIZES	Memi[P2I($1+3)]		# number of character sizes
 define	SG_POLYLINE	Memi[P2I($1+4)]		# polyline output permitted
 define	SG_POLYMARKER	Memi[P2I($1+5)]		# device supports polymarker
 define	SG_FILLAREA	Memi[P2I($1+6)]		# device supports fillarea
-define	SG_ENCODEXY	Memi[P2I($1+7)]		# format for encoding coords
-define	SG_STARTDRAW	Memi[P2I($1+8)]		# pointer to DS string
-define	SG_ENDDRAW	Memi[P2I($1+9)]		# pointer to DE string
-define	SG_STARTMOVE	Memi[P2I($1+10)]		# pointer to VS string
-define	SG_ENDMOVE	Memi[P2I($1+11)]		# pointer to VE string
-define	SG_STARTMARK	Memi[P2I($1+12)]		# pointer to MS string
-define	SG_ENDMARK	Memi[P2I($1+13)]		# pointer to ME string
-define	SG_STARTFILL	Memi[P2I($1+14)]		# pointer to FS string
-define	SG_ENDFILL	Memi[P2I($1+15)]		# pointer to FE string
-define	SG_STARTTEXT	Memi[P2I($1+16)]		# start text draw
-define	SG_ENDTEXT	Memi[P2I($1+17)]		# end text draw
+define	SG_ENCODEXY	Memp[$1+7]		# format for encoding coords
+define	SG_STARTDRAW	Memp[$1+8]		# pointer to DS string
+define	SG_ENDDRAW	Memp[$1+9]		# pointer to DE string
+define	SG_STARTMOVE	Memp[$1+10]		# pointer to VS string
+define	SG_ENDMOVE	Memp[$1+11]		# pointer to VE string
+define	SG_STARTMARK	Memp[$1+12]		# pointer to MS string
+define	SG_ENDMARK	Memp[$1+13]		# pointer to ME string
+define	SG_STARTFILL	Memp[$1+14]		# pointer to FS string
+define	SG_ENDFILL	Memp[$1+15]		# pointer to FE string
+define	SG_STARTTEXT	Memp[$1+16]		# start text draw
+define	SG_ENDTEXT	Memp[$1+17]		# end text draw
 define	SG_CURSOR	Memi[P2I($1+18)]		# last cursor accessed
 define	SG_UPDCURSOR	Memi[P2I($1+19)]		# update cursor pos before read
 define	SG_CURSOR_X	Memi[P2I($1+20)]		# current cursor X position
@@ -49,8 +49,8 @@ define	SG_TXFONT	Memi[P2I($1+24)]		# last text font set
 define	SG_PLTYPE	Memi[P2I($1+25)]		# last line type set
 define	SG_FASTYLE	Memi[P2I($1+26)]		# last fill area style set
 define	SG_PLWIDTH	Memi[P2I($1+27)]		# last line width set
-define	SG_DEVNAME	Memi[P2I($1+28)]		# name of open device
-define	SG_UIFNAME	Memi[P2I($1+29)]		# user interface file name
+define	SG_DEVNAME	Memp[$1+28]		# name of open device
+define	SG_UIFNAME	Memp[$1+29]		# user interface file name
 define	SG_UIFDATE	Memi[P2I($1+30)]		# UI file date
 			# empty
 define	SG_CHARHEIGHT	Memi[P2I($1+40+$2-1)]	# character height
