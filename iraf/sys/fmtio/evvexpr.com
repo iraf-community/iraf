@@ -1,7 +1,7 @@
 # EVVEXPR common.
 
 pointer	ev_oval				# pointer to expr value operand
-int	ev_st				# symbol table
+pointer	ev_st				# symbol table
 int	ev_getop			# user supplied get operand procedure
 int	ev_getop_data			# client data for above
 int	ev_ufcn				# user supplied function call procedure

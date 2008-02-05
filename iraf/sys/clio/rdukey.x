@@ -22,8 +22,8 @@ char	keystr[ARB]	 	# receives keystroke command string
 int	maxch			# max chars out
 
 int	junk, ch
-int	delay, key, tty
-pointer	sp, buf, ip, op
+int	delay, key
+pointer	sp, buf, ip, op, tty
 bool	rawmode_set, ucasein_set
 bool	playback_set, pbverify_set
 
