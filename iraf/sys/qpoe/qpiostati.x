@@ -3,9 +3,9 @@
 include	<qpioset.h>
 include	"qpio.h"
 
-# QPIO_STATI -- Stat a QPIO interface integer valued parameter.
+# QPIO_STAT[ILP] -- Stat a QPIO interface integer valued parameter.
 
-int procedure qpio_stati (io, param)
+long procedure qpio_statl (io, param)
 
 pointer	io			#I QPIO descriptor
 int	param			#I parameter code
@@ -81,4 +81,45 @@ begin
 	}
 
 	return (ERR)
+end
+
+
+int procedure qpio_stati (io, param)
+
+pointer	io			#I QPIO descriptor
+int	param			#I parameter code
+
+int	value
+long	qpio_statl()
+
+begin
+	value = qpio_statl(io,param)
+	return (value)
+end
+
+
+pointer procedure qpio_statp (io, param)
+
+pointer	io			#I QPIO descriptor
+int	param			#I parameter code
+
+begin
+	switch (param) {
+	case QPIO_EX:
+	    return (IO_EX(io))
+	case QPIO_PL:
+	    return (IO_PL(io))
+	case QPIO_MASKP:			# PLIO descriptor
+	    return (IO_MASK(io))
+	case QPIO_MAXEVP:			# pointer to short
+	    return (IO_MAXEVL(io))
+	case QPIO_MINEVP:			# pointer to short
+	    return (IO_MINEVL(io))
+	case QPIO_PARAMP:			# pointer to char
+	    return (IO_PARAM(io))
+	case QPIO_QP:
+	    return (IO_QP(io))			# QPOE descriptor
+	}
+
+	return (NULL)
 end

@@ -5,20 +5,22 @@ include	<syserr.h>
 include	<plset.h>
 include	"qpio.h"
 
-# QPIO_SETI -- Set a QPIO interface integer valued parameter.  This procedure
-# represents the lowest level interface by which an applications program can
-# control QPIO.
+# QPIO_SET[ILP] -- Set a QPIO interface integer valued parameter.  This 
+# procedure represents the lowest level interface by which an applications 
+# program can control QPIO.
 
-procedure qpio_seti (io, param, value)
+procedure qpio_setl (io, param, lvalue)
 
 pointer	io			#I QPIO descriptor
 int	param			#I parameter code
-int	value			#I new parameter value
+long	lvalue			#I new parameter value
 
-int	naxes, axlen[PL_MAXDIM], sv_active
+int	naxes, axlen[PL_MAXDIM], sv_active, value
 errchk	pl_close, syserr, realloc
 
 begin
+	value = lvalue
+
 	# Almost everything here cancels any active i/o.
 	sv_active = IO_ACTIVE(io)
 	IO_ACTIVE(io) = NO
@@ -63,7 +65,7 @@ begin
 	    # Set the event attribute filter.
 	    if (IO_EX(io) != NULL && IO_EXCLOSE(io) == YES)
 		call qpex_close (IO_EX(io))
-	    IO_EX(io) = value
+	    IO_EX(io) = lvalue
 	    IO_EXCLOSE(io) = NO
 
 	case QPIO_PL:
@@ -71,7 +73,7 @@ begin
 	    if (IO_PL(io) != NULL && IO_PLCLOSE(io) == YES)
 		call pl_close (IO_PL(io))
 
-	    IO_PL(io) = value
+	    IO_PL(io) = lvalue
 	    IO_PLCLOSE(io) = NO
 	    call pl_gsize (IO_PL(io), naxes, axlen, IO_MDEPTH(io))
 	    if (axlen[1] != IO_NCOLS(io) || axlen[2] != IO_NLINES(io))
@@ -84,7 +86,71 @@ begin
 	    # Update the mask name, such as it is...
 	    if (IO_MASK(io) != NULL) {
 		call sprintf (Memc[IO_MASK(io)], SZ_FNAME, "%xX")
-		    call pargi (value)
+		    call pargl (lvalue)
+	    }
+	}
+end
+
+
+procedure qpio_seti (io, param, value)
+
+pointer	io			#I QPIO descriptor
+int	param			#I parameter code
+int	value			#I new parameter value
+
+long	lvalue
+
+begin
+	lvalue = value
+	call qpio_setl (io,param,lvalue)
+end
+
+
+procedure qpio_setp (io, param, pvalue)
+
+pointer	io			#I QPIO descriptor
+int	param			#I parameter code
+pointer	pvalue			#I new parameter value
+
+int	naxes, axlen[PL_MAXDIM], sv_active
+long	lvalue
+errchk	pl_close, syserr, realloc
+
+begin
+	lvalue = pvalue
+
+	# Almost everything here cancels any active i/o.
+	sv_active = IO_ACTIVE(io)
+	IO_ACTIVE(io) = NO
+
+	# Set the named parameter.
+	switch (param) {
+	case QPIO_EX:
+	    # Set the event attribute filter.
+	    if (IO_EX(io) != NULL && IO_EXCLOSE(io) == YES)
+		call qpex_close (IO_EX(io))
+	    IO_EX(io) = pvalue
+	    IO_EXCLOSE(io) = NO
+
+	case QPIO_PL:
+	    # Set the PLIO region mask.
+	    if (IO_PL(io) != NULL && IO_PLCLOSE(io) == YES)
+		call pl_close (IO_PL(io))
+
+	    IO_PL(io) = pvalue
+	    IO_PLCLOSE(io) = NO
+	    call pl_gsize (IO_PL(io), naxes, axlen, IO_MDEPTH(io))
+	    if (axlen[1] != IO_NCOLS(io) || axlen[2] != IO_NLINES(io))
+		call syserr (SYS_QPPLSIZE)
+
+	    # Allocate a range list buffer if i/o is indexed.
+	    if (IO_INDEXLEN(io) > 0)
+		call realloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+
+	    # Update the mask name, such as it is...
+	    if (IO_MASK(io) != NULL) {
+		call sprintf (Memc[IO_MASK(io)], SZ_FNAME, "%xX")
+		    call pargl (lvalue)
 	    }
 	}
 end

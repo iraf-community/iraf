@@ -484,8 +484,8 @@ pointer	qp, io, dd, ev
 char	poefile[SZ_FNAME], param[SZ_FNAME]
 char	datatype[SZ_DATATYPE], comment[SZ_COMMENT]
 int	offset, dtype, size, nelem, maxelem, flags, i, j
-pointer	qp_open(), qpio_open(), qpio_stati(), coerce()
-int	qp_queryf(), sizeof()
+pointer	qp_open(), qpio_open(), qpio_statp(), coerce()
+int	qpio_stati(), qp_queryf(), sizeof()
 
 begin
 	call clgstr ("poefile", poefile, SZ_FNAME)
@@ -534,7 +534,7 @@ begin
 
 	call printf ("%s=%xX ")
 	    call pargstr ("ex")
-	    call pargi (qpio_stati(io, QPIO_EX))
+	    call pargl (qpio_statp(io, QPIO_EX))
 	call printf ("%s=%d ")
 	    call pargstr ("noindex")
 	    call pargi (qpio_stati(io, QPIO_NOINDEX))
@@ -543,7 +543,7 @@ begin
 	    call pargi (qpio_stati(io, QPIO_OPTBUFSIZE))
 	call printf ("%s=%xX ")
 	    call pargstr ("pl")
-	    call pargi (qpio_stati(io, QPIO_PL))
+	    call pargl (qpio_statp(io, QPIO_PL))
 	call printf ("%s=%d ")
 	    call pargstr ("eventlen")
 	    call pargi (qpio_stati(io, QPIO_EVENTLEN))
@@ -572,15 +572,15 @@ begin
 	    call pargi (qpio_stati(io, QPIO_LF))
 	call printf ("%s=%xX ")
 	    call pargstr ("maskp")
-	    call pargi (qpio_stati(io, QPIO_MASKP))
+	    call pargl (qpio_statp(io, QPIO_MASKP))
 	call printf ("\n")
 
 	call printf ("%s=%xX ")
 	    call pargstr ("maxevp")
-	    call pargi (qpio_stati(io, QPIO_MAXEVP))
+	    call pargl (qpio_statp(io, QPIO_MAXEVP))
 	call printf ("%s=%xX ")
 	    call pargstr ("minevp")
-	    call pargi (qpio_stati(io, QPIO_MINEVP))
+	    call pargl (qpio_statp(io, QPIO_MINEVP))
 	call printf ("%s=%d ")
 	    call pargstr ("ncols")
 	    call pargi (qpio_stati(io, QPIO_NCOLS))
@@ -589,10 +589,10 @@ begin
 	    call pargi (qpio_stati(io, QPIO_NLINES))
 	call printf ("%s=%xX ")
 	    call pargstr ("paramp")
-	    call pargi (qpio_stati(io, QPIO_PARAMP))
+	    call pargl (qpio_statp(io, QPIO_PARAMP))
 	call printf ("%s=%xX ")
 	    call pargstr ("qp")
-	    call pargi (qpio_stati(io, QPIO_QP))
+	    call pargl (qpio_statp(io, QPIO_QP))
 	call printf ("\n")
 
 	# Print domain attributes.
@@ -608,10 +608,10 @@ begin
 	do j = 1, 2 {
 	    if (j == 1) {
 		call printf ("minevl: ")
-		ev = qpio_stati (io, QPIO_MINEVP)
+		ev = qpio_statp (io, QPIO_MINEVP)
 	    } else {
 		call printf ("maxevl: ")
-		ev = qpio_stati (io, QPIO_MAXEVP)
+		ev = qpio_statp (io, QPIO_MAXEVP)
 	    }
 
 	    do i = 1, DD_NFIELDS(dd) {
@@ -1221,6 +1221,8 @@ bool	clgetb()
 int	qpio_getevents(), qpex_attrld(), open()
 pointer	qp_open(), qpio_open(), qpex_open()
 
+include <nullptr.com>
+
 begin
 	call smark (sp)
 	call salloc (poefile, SZ_FNAME, TY_CHAR)
@@ -1258,7 +1260,7 @@ begin
 	call printf ("scan event list using optimized filter: ")
 	call flush (STDOUT)
 
-	call qpio_seti (io, QPIO_EX, ex)
+	call qpio_setp (io, QPIO_EX, ex)
 	while (qpio_getevents (io, Memi[evl], mval, LEN_EVBUF, nev) != EOF) {
 	    do i = 1, nev {
 		ev = Memi[evl+i-1]
@@ -1287,7 +1289,7 @@ begin
 	}
 
 	# Scan the event list, applying a brute force time filter.
-	call qpio_seti (io, QPIO_EX, NULL)
+	call qpio_setp (io, QPIO_EX, NULLPTR)
 	call printf ("scan event list using brute force filter: ")
 	call flush (STDOUT)
 

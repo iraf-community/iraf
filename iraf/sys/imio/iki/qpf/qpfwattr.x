@@ -38,7 +38,7 @@ int	dtype, i, j, xlen, nranges, i1, i2, isum
 pointer	sp, io, qp, ex, kwname, kwval, pname, funame, atname, ip, xs, xe
 
 bool	strne()
-pointer	qpio_stati()
+pointer	qpio_statp()
 int	qp_gstr(), ctowrd(), qp_accessf()
 int	qpex_attrli(), qpex_attrlr(), qpex_attrld()
 errchk	qpex_attrli, qpex_attrlr, qpex_attrld, imaddi, imaddr, imaddd
@@ -49,7 +49,7 @@ begin
 	    return
 
 	qp = QPF_QP(qpf)
-	ex = qpio_stati (io, QPIO_EX)
+	ex = qpio_statp (io, QPIO_EX)
 
 	call smark (sp)
 	call salloc (kwname, SZ_FNAME, TY_CHAR)
