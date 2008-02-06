@@ -13,8 +13,8 @@ define	RTOD		(($1)*57.2957795)
 
 # Arglist structure.
 define	LEN_ARGSTRUCT	(1+MAX_ARGS+(MAX_ARGS*LEN_OPERAND))
-define	A_NARGS		Memi[$1]	# number of arguments
-define	A_ARGP		Memi[$1+$2]	# array of pointers to operand structs
+define	A_NARGS		Memi[P2I($1)]	# number of arguments
+define	A_ARGP		Memp[$1+$2]	# array of pointers to operand structs
 define	A_OPS		($1+MAX_ARGS+1)	# offset to operand storage area
 
 # Intrinsic functions.
@@ -60,8 +60,8 @@ define	F_TAN 		21
 pointer procedure evexpr (expr, getop_epa, ufcn_epa)
 
 char	expr[ARB]		# expression to be evaluated
-int	getop_epa		# user supplied get operand procedure
-int	ufcn_epa		# user supplied function call procedure
+pointer	getop_epa		# user supplied get operand procedure
+pointer	ufcn_epa		# user supplied function call procedure
 
 int	junk
 bool	debug

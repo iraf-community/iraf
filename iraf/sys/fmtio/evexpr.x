@@ -13,7 +13,7 @@ define	RTOD		(($1)*57.2957795)
 # Arglist structure.
 define	LEN_ARGSTRUCT	(1+MAX_ARGS+(MAX_ARGS*LEN_OPERAND))
 define	A_NARGS		Memi[P2I($1)]	# number of arguments
-define	A_ARGP		Memi[P2I($1+$2)]	# array of pointers to operand structs
+define	A_ARGP		Memp[$1+$2]	# array of pointers to operand structs
 define	A_OPS		($1+MAX_ARGS+1)	# offset to operand storage area
 
 # Intrinsic functions.
@@ -59,15 +59,14 @@ define	F_TAN 		21
 pointer procedure evexpr (expr, getop_epa, ufcn_epa)
 
 char	expr[ARB]		# expression to be evaluated
-int	getop_epa		# user supplied get operand procedure
-int	ufcn_epa		# user supplied function call procedure
+pointer	getop_epa		# user supplied get operand procedure
+pointer	ufcn_epa		# user supplied function call procedure
 
 int	junk
 bool	debug
 pointer	sp, ip
-int	xev_gettok()
+int	xev_gettok(), strlen(), xev_parse()
 extern	xev_gettok()
-int	strlen(), xev_parse()
 
 errchk	xev_parse, calloc
 include	"evexpr.com"
@@ -124,7 +123,7 @@ define	GE		279
 define	UMINUS		280
 define	yyclearin	yychar = -1
 define	yyerrok		yyerrflag = 0
-define	YYMOVE		call amovi (Memi[P2I($1)], Memi[P2I($2)], YYOPLEN)
+define	YYMOVE		call amovp (Memp[$1], Memp[$2], YYOPLEN)
 define	YYERRCODE	256
 
 # line 292 "evexpr.y"

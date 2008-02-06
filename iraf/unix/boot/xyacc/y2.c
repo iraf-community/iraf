@@ -288,7 +288,7 @@ void setup( int argc, char *argv[] )
 	fprintf (fsppout, "define\tyyclearin\tyychar = -1\n");
 	fprintf (fsppout, "define\tyyerrok\t\tyyerrflag = 0\n");
 	fprintf (fsppout,
-		 "define\tYYMOVE\t\tcall amovi (Memi[$1], Memi[$2], YYOPLEN)\n");
+		 "define\tYYMOVE\t\tcall amovp (Memp[$1], Memp[$2], YYOPLEN)\n");
 
 	prdptr[0]=mem;
 	/* added production */

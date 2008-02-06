@@ -73,7 +73,7 @@ define	yyparse		xvv_parse
 # Arglist structure.
 define	LEN_ARGSTRUCT	(1+MAX_ARGS+(MAX_ARGS*LEN_OPERAND))
 define	A_NARGS		Memi[P2I($1)]	# number of arguments
-define	A_ARGP		Memi[P2I($1+$2)]	# array of pointers to operand structs
+define	A_ARGP		Memp[$1+$2]	# array of pointers to operand structs
 define	A_OPS		($1+MAX_ARGS+1)	# offset to operand storage area
 
 # Intrinsic functions.
@@ -168,9 +168,8 @@ int	flags			#I flag bits
 int	junk
 pointer	sp, ip
 bool	debug, first_time
-int	strlen(), xvv_parse()
+int	strlen(), xvv_parse(), xvv_gettok()
 pointer	xvv_loadsymbols()
-int	xvv_gettok()
 extern	xvv_gettok()
 
 errchk	xvv_parse, calloc
@@ -254,7 +253,7 @@ define	GE		283
 define	UMINUS		284
 define	yyclearin	yychar = -1
 define	yyerrok		yyerrflag = 0
-define	YYMOVE		call amovi (Memi[P2I($1)], Memi[P2I($2)], YYOPLEN)
+define	YYMOVE		call amovp (Memp[$1], Memp[$2], YYOPLEN)
 define	YYERRCODE	256
 
 # line 454 "evvexpr.y"
