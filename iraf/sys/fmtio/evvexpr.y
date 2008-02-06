@@ -73,8 +73,8 @@ define	yyparse		xvv_parse
 
 # Arglist structure.
 define	LEN_ARGSTRUCT	(1+MAX_ARGS+(MAX_ARGS*LEN_OPERAND))
-define	A_NARGS		Memi[$1]	# number of arguments
-define	A_ARGP		Memi[$1+$2]	# array of pointers to operand structs
+define	A_NARGS		Memi[P2I($1)]	# number of arguments
+define	A_ARGP		Memp[$1+$2]	# array of pointers to operand structs
 define	A_OPS		($1+MAX_ARGS+1)	# offset to operand storage area
 
 # Intrinsic functions.
@@ -84,7 +84,7 @@ define	LEN_SBUF	256
 define	LEN_INDEX	97
 
 define	LEN_SYM		1		# symbol data
-define	SYM_CODE	Memi[$1]
+define	SYM_CODE	Memi[P2I($1)]
 
 define	KEYWORDS	"|abs|acos|asin|atan|atan2|bool|cos|cosh|deg|double|\
 			 |exp|hiv|int|len|log|log10|long|lov|max|mean|median|\
@@ -169,7 +169,7 @@ int	flags			#I flag bits
 int	junk
 pointer	sp, ip
 bool	debug, first_time
-int	strlen(), xvv_parse()
+int	strlen(), xvv_parse(), xvv_gettok()
 pointer	xvv_loadsymbols()
 extern	xvv_gettok()
 
@@ -645,6 +645,7 @@ extern	xvv_nulld()
 
 pointer	sp, otemp, p1, p2, po
 int	dtype, nelem, len1, len2
+short	zero
 include	"evvexpr.com"
 
 int	xvv_newtype(), strlen()
@@ -654,6 +655,8 @@ string	s_boolop "binop: bitwise boolean operands must be an integer type"
 define	done_ 91
 
 begin
+	zero = 0
+
 	# Set the datatype of the output operand, taking an error action if
 	# the operands have incompatible datatypes.
 
@@ -921,12 +924,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALS(in2) == 0)
-			    O_VALS(out) = xvv_nulls(0)
+			    O_VALS(out) = xvv_nulls(zero)
 			else
 			    O_VALS(out) = O_VALS(in1) / O_VALS(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALS(in2) == 0)
-			    call amovks (xvv_nulls(0), Mems[po], nelem)
+			    call amovks (xvv_nulls(zero), Mems[po], nelem)
 			else {
 			    call adivks (Mems[p1], O_VALS(in2), Mems[po],
 				nelem)
