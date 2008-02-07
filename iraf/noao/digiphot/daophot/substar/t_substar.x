@@ -12,15 +12,16 @@ pointer	exfile				# input exclude file
 pointer	psfimage			# name of the output PSF
 pointer	subimage			# subtracted image
 
-pointer	sp, input, output, dao, outfname, str, alist, elist
+pointer	sp, input, output, dao, outfname, str
+pointer	alist, elist, imlist, pimlist, simlist
 int	psffd, photfd, root, verify, update, wcs
-int	imlist, limlist, lalist, pimlist, lpimlist, simlist, lsimlist
+int	limlist, lalist, lpimlist, lsimlist
 int	exfd, lelist, cache, req_size, old_size, buf_size, memstat
 bool	ap_text, ex_text
 
-pointer	immap(), tbtopn(), fntopnb()
+pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	open(), fnldir(), strlen(), strncmp(), access(), fstati(), btoi()
-int	imtopen(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
+int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
 

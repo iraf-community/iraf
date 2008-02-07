@@ -14,7 +14,7 @@ define  SAMPLE          6       # sampled coordinates
  
 procedure t_sshift ()
  
-int	list			# Input list of spectra
+pointer	list			# Input list of spectra
 double	shift			# Shift to apply
 pointer	aps			# Aperture list
 bool	verbose			# Verbose?
@@ -26,8 +26,8 @@ pointer	sp, image, coeff, tmp, im, mw
 
 bool	clgetb()
 double	clgetd()
-int	imtopenp(), imtgetim()
-pointer	rng_open(), immap(), smw_openim()
+int	imtgetim()
+pointer	imtopenp(), rng_open(), immap(), smw_openim()
 errchk	immap, smw_openim, smw_gwattrs, smw_swattrs, sshift
  
 begin

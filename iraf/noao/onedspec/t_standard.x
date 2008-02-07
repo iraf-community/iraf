@@ -57,7 +57,7 @@ define	YES3	8	# Yes for all spectra
 
 procedure t_standard()
 
-int	list			# List of input spectra
+pointer	list			# List of input spectra
 pointer	output			# Output standard file
 pointer	observatory		# Observatory
 pointer	aps			# Aperture list

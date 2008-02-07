@@ -18,8 +18,8 @@ include	<math/iminterp.h>
 
 procedure t_fluxcalib()
 
-int	list1			# List of images to be calibrated
-int	list2			# List of calibrated images
+pointer	list1			# List of images to be calibrated
+pointer	list2			# List of calibrated images
 char	fluxfile[SZ_FNAME]	# Name of flux file
 bool	fnu			# Convert to fnu?
 
@@ -27,9 +27,9 @@ char	image1[SZ_FNAME], image2[SZ_FNAME], history[SZ_LINE]
 bool	fluxcor
 pointer	im1, im2, ff, fluxdata
 
-int	imtopen(), imtgetim()
+int	imtgetim()
 bool	clgetb(), imgetb(), streq()
-pointer	immap()
+pointer	imtopen(), immap()
 errchk	get_fluxdata(), do_fluxcalib()
 
 data	fluxdata/NULL/

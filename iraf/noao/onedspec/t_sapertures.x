@@ -20,14 +20,16 @@ define	TITLE	Memc[P2C($1+12)]	# Title
  
 procedure t_sapertures()
  
-int	list			# Input list
+pointer	list			# Input list
 bool	wcsreset		# Reset WCS?
 bool	verbose			# Verbose?
 pointer	saps			# Pointer to array of aperture structures
  
-int	imtopenp(), imtgetim()
+pointer	sp, input, ranges, tmp, im, mw
+
+int	imtgetim()
 bool	clgetb()
-pointer	sp, input, ranges, tmp, im, mw, rng_open(), immap(), smw_openim()
+pointer	imtopenp(), rng_open(), immap(), smw_openim()
 errchk	sap_gids, immap, smw_openim
  
 begin

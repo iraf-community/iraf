@@ -33,18 +33,21 @@ procedure t_wfits()
 bool	newtape
 char	fits_files[SZ_FNAME], in_fname[SZ_FNAME], out_fname[SZ_FNAME]
 char	log_file[SZ_FNAME], format_file[SZ_FNAME]
-int	list, nfiles, fits_record, open(), clstati()
+int	nfiles, fits_record
 
 char	line[SZ_LINE], iextn[SZ_EXTN]
-bool	clgetb(), table
-double	clgetd()
-int	imtopenp(), imtlen(), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
-int	mtfile(), strmatch(), btoi(), fnextn(), strcmp()
+bool	table
 int	save_sdasmg, save_ieee, tape, save_scale
-pointer	flist
-int	fntgfnb(), fntlenb(), nimages, strldxs(), access(), strncmp()
-pointer	fntopnb()
 int     nch, fits_fd, nerrors, ip
+pointer	list, flist
+
+int	open(), clstati()
+int	fntgfnb(), fntlenb(), nimages, strldxs(), access(), strncmp()
+int	imtlen(), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
+int	mtfile(), strmatch(), btoi(), fnextn(), strcmp()
+bool	clgetb()
+double	clgetd()
+pointer	imtopenp(), fntopnb()
 
 data	fits_record/2880/
 string	version "STSDAS-FITSIO 21-Feb-1996"

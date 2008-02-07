@@ -5,8 +5,8 @@ include	<imhdr.h>
 
 procedure t_crgrow ()
 
-int	input				# Input masks
-int	output				# Output masks
+pointer	input				# Input masks
+pointer	output				# Output masks
 real	radius				# Radius
 int	inval				# Input mask value to grow
 int	outval				# Output grown mask value
@@ -14,11 +14,11 @@ int	outval				# Output grown mask value
 pointer	sp, inmask, outmask, temp1, temp2
 pointer	im, ptr
 
-int	imtopenp(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 bool	strne()
 int	clgeti()
 real	clgetr()
-pointer	immap()
+pointer	imtopenp(), immap()
 errchk	immap, crgrow
 
 begin

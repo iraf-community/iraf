@@ -25,9 +25,9 @@ bool	eval
 int	i, ip, sz_cmd, fdcmd, ncmds, nim, tm[LEN_TMSTRUCT]
 long	pos
 pointer	sp, image, key, expr, keys, exprs, ast
-pointer	stopen(), immap()
+pointer	stopen(), immap(), imtopenp()
 int	open(), fscan(), fstati(), nowhite(), ctotok()
-int	imtopenp(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 int	strlen(), stridxs()
 long	note(), clktime(), lsttogmt()
 bool	clgetb(), streq()

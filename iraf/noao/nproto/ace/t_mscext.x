@@ -34,11 +34,12 @@ int	lname			# List extension name?
 int	lver			# List extension version?
 pointer	ikparams		# Image kernel parameters
 
-pointer	sp, image, listout
-int	list, nimages, fd, imext
-int	clgwrd(), btoi(), mscextensions(), stropen()
+pointer	sp, image, listout, list
+int	nimages, fd, imext
+int	clgwrd(), btoi(), stropen()
 int	imtgetim(), imtlen()
 bool	clgetb()
+pointer	mscextensions()
 errchk	stropen, fprintf, strclose
 
 begin
@@ -109,7 +110,7 @@ end
 # This differs from IMEXTENSIONS in that extension zero is not returned
 # unless it is a simple image and, in that case, the extension is removed.
 
-int procedure mscextensions (files, index, extname, extver, lindex, lname, lver,
+pointer procedure mscextensions (files, index, extname, extver, lindex, lname, lver,
 	ikparams, err, imext)
 
 char	files[ARB]		#I List of ME files
@@ -122,11 +123,13 @@ int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 int	imext			#O Image extensions?
-int	list			#O Image list
+pointer	list			#O Image list
 
 int	i, j, nphu, nimages, fd
-pointer	sp, temp, image, im, immap()
-int	imextensions(), gstrmatch(), imtopen(), imtgetim(), open()
+pointer	sp, temp, image, im
+
+int	gstrmatch(), imtgetim(), open()
+pointer	immap(), imtopen(), imextensions()
 errchk	imextensions, open, immap, delete
 
 begin

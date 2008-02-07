@@ -29,8 +29,8 @@ define	SQUARE		6	# Square root checkerboard
 procedure t_mkpattern ()
 
 
-int	ilist				# Input image list
-int	olist				# Output image list
+pointer	ilist				# Input image list
+pointer	olist				# Output image list
 int	op				# Operation option
 int	pat				# Pattern
 real	v1				# Pattern value 1
@@ -47,9 +47,9 @@ pointer	sp, input, output, header, in, out, indata, outdata, pat1, pat2
 char	clgetc()
 bool	streq()
 int	clgwrd(), clgeti()
-int	imtopenp(), imtlen(), imtgetim(), imgnlr(), impnlr()
+int	imtlen(), imtgetim(), imgnlr(), impnlr()
 real	clgetr()
-pointer	immap()
+pointer	imtopenp(), immap()
 errchk	immap
 
 begin

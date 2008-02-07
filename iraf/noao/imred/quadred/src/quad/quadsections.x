@@ -32,7 +32,8 @@ int	xskip2			#TI X pixels to skip at end   of overscan
  
 char	buffer[SZ_LINE], input[SZ_LINE]
 
-int	clgwrd(), imtopenp(), imtgetim()
+int	clgwrd(), imtgetim()
+pointer	imtopenp()
 
 begin
 	# Open input image

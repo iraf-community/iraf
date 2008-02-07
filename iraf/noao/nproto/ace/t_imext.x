@@ -30,11 +30,12 @@ int	lname			# List extension name?
 int	lver			# List extension version?
 pointer	ikparams		# Image kernel parameters
 
-pointer	sp, image, listout
-int	list, nimages, fd
-int	clgwrd(), btoi(), imextensions(), stropen()
+pointer	sp, image, listout, list
+int	nimages, fd
+int	clgwrd(), btoi(), stropen()
 int	imtgetim(), imtlen()
 bool	clgetb()
+pointer	imextensions()
 errchk	stropen, fprintf, strclose
 
 begin
@@ -101,7 +102,7 @@ end
 
 # IMEXTENSIONS -- Expand a template of ME files into a list of image extensions.
 
-int procedure imextensions (files, index, extname, extver, lindex, lname, lver,
+pointer procedure imextensions (files, index, extname, extver, lindex, lname, lver,
 	ikparams, err)
 
 char	files[ARB]		#I List of ME files
@@ -113,12 +114,14 @@ int	lname			#I List extension name?
 int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
-int	list			#O Image list
+pointer	list			#O Image list
 
 int	i, fd
 pointer	sp, temp, fname, imname, section, rindex, rextver, ikp, str
-int	imtopen(), imtgetim()
+
+int	imtgetim()
 int	ix_decode_ranges(), nowhite(), open()
+pointer	imtopen()
 errchk	open, imextension, delete
 
 begin

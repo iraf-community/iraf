@@ -120,12 +120,12 @@ bool	scat			# Subtract scattered light?
 bool	mask			# Aperture mask?
 bool	noise			# Noise calculation?
 
-int	input			# List of input spectra
-int	refs			# List of reference spectra
-int	out			# List of output spectra
+pointer	input			# List of input spectra
+pointer	refs			# List of reference spectra
+pointer	out			# List of output spectra
 pointer	format			# Output format or fit type
-int	scatout			# List of scattered light images
-int	profs			# List of profile spectra
+pointer	scatout			# List of scattered light images
+pointer	profs			# List of profile spectra
 int	line			# Dispersion line
 int	nsum			# Lines to sum
 
@@ -137,7 +137,8 @@ int	i
 pointer	sp, image, output, reference, profiles, str, str1
 
 bool	clgetb(), apgetb(), streq(), ap_answer(), apgans(), apgansb()
-int	imtopenp(), clgeti(), ap_getim(), ap_dbaccess(), strncmp()
+int	clgeti(), ap_getim(), ap_dbaccess(), strncmp()
+pointer	imtopenp()
 
 errchk	ap_dbacess, ap_dbread, ap_find, ap_recenter, ap_resize, ap_edit
 errchk	ap_trace, ap_plot, ap_extract, ap_scatter, ap_mask, ap_dbwrite

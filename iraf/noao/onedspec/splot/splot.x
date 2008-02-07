@@ -25,7 +25,7 @@ define	OVERPLOT	8	# Overplot toggle
 
 procedure splot ()
 
-int	list
+pointer	list
 int	i, j, npts, nline, nband, nap
 int	wc, key, keyu
 real	wx, wy
@@ -38,8 +38,8 @@ pointer	sp, image, units, units1, units2, units3, cmd, save1, save2
 pointer	gp, gt, im, mw, x, y, sh, xg, yg, sg, lg, pg, hptr
 bool	wave_scl, fnu
 
-pointer	gopen(), gt_init()
-int	clgcur(), imtopen(), imtgetim(), imaccess(), gt_geti(), nowhite()
+pointer	gopen(), gt_init(), imtopen()
+int	clgcur(), imtgetim(), imaccess(), gt_geti(), nowhite()
 real	clgetr(), gt_getr()
 double	clgetd(), shdr_wl()
 bool	streq(), fp_equald()

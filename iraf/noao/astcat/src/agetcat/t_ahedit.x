@@ -4,12 +4,12 @@ include <pkg/cq.h>
 procedure t_ahedit()
 
 pointer	sp, images, str1, str2
-pointer	at, cq, res, im
-int	j, imlist, catno, wcstype
+pointer	at, cq, res, im, imlist
+int	j, catno, wcstype
 bool	hupdate, wcsedit, hdredit, update, verbose
 bool	clgetb()
-pointer	cq_map(), cq_fimquery(), immap()
-int	imtopen(), imtlen(), cq_setcat(), imtrgetim(), imaccess(), strdic()
+pointer	cq_map(), cq_fimquery(), immap(), imtopen()
+int	imtlen(), cq_setcat(), imtrgetim(), imaccess(), strdic()
 errchk	immap(), imaccess()
 
 begin

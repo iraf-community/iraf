@@ -32,7 +32,7 @@ procedure starfocus (type)
 
 int	type		#I Task type
 
-int	list		# List of images
+pointer	list		# List of images
 pointer	fvals		# Focus values
 pointer	fstep		# Focus step
 pointer	nexposures	# Number of exposures
@@ -53,9 +53,9 @@ pointer	sfds, sfd
 
 bool	clgetb(), streq()
 real	clgetr(), imgetr(), stf_r2i()
-int	clgeti(), clgwrd(), clgcur(), imtopenp(), imtgetim(), imgeti()
+int	clgeti(), clgwrd(), clgcur(), imtgetim(), imgeti()
 int	nowhite(), open(), rng_index(), strdic(), ctoi(), ctor()
-pointer	rng_open(), immap(), mw_openim(), mw_sctran()
+pointer	imtopenp(), rng_open(), immap(), mw_openim(), mw_sctran()
 errchk	immap, open, imgetr, imgeti, mw_openim, mw_sctran
 errchk	stf_find, stf_bkgd, stf_profile, stf_widths, stf_fwhms, stf_radius
 errchk	stf_organize, stf_graph, stf_display

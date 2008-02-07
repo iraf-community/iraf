@@ -19,8 +19,8 @@ define  VOIGT           3       # Voigt profile
 
 procedure t_mk1dspec()
 
-int	ilist			# List of input spectra (input param)
-int	olist			# List of output spectra (output param)
+pointer	ilist			# List of input spectra (input param)
+pointer	olist			# List of output spectra (output param)
 
 int	line			# Line number
 int	ap			# Aperture
@@ -35,7 +35,7 @@ double	slope			# Continuum slope per pixel
 double	temp			# Blackbody temperture (Kelvin)
 int	fnu			# F-nu flux?
 
-int	llist			# List of files containing lines (lines param)
+pointer	llist			# List of files containing lines (lines param)
 pointer	profile			# Profile type
 double	peak			# Peak/continuum
 double	gfwhm			# Sigma of Gaussian (Angstroms)
@@ -55,11 +55,11 @@ pointer	sp, input, output, lines, comment, coeff
 pointer	in, out, mw, ptypes, waves, peaks, gfwhms, lfwhms, spec, buf
 
 long	clgetl(), clktime()
-int	clgeti(), clgwrd(), imtopenp(), imtgetim()
+int	clgeti(), clgwrd(), imtgetim()
 int	nowhite(), access(), open(), fscan(), nscan(), strdic()
 real	urand()
 double	clgetd()
-pointer	immap(), mw_open(), smw_openim(), imgl2d(), impl2d()
+pointer	imtopenp(), immap(), mw_open(), smw_openim(), imgl2d(), impl2d()
 bool	clgetb(), streq()
 errchk	open()
 

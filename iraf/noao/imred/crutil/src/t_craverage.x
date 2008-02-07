@@ -17,11 +17,11 @@ define	PHSIG		84.13	# High percentile
 
 procedure t_craverage ()
 
-int	inlist			# Input image list
-int	outlist			# Output image list
-int	crlist			# Output mask list
-int	avglist			# Output average list
-int	siglist			# Output sigma list
+pointer	inlist			# Input image list
+pointer	outlist			# Output image list
+pointer	crlist			# Output mask list
+pointer	avglist			# Output average list
+pointer	siglist			# Output sigma list
 int	crval			# Output cosmic ray mask value
 int	objval			# Output object mask value
 int	navg			# Averaging box size
@@ -42,8 +42,8 @@ pointer	in, out, pm, aim, sim
 pointer	inbuf, pinbuf, outbuf, pbuf, abuf, sbuf
 
 real	clgetr()
-int	clgeti(), imtopenp(), imtgetim()
-pointer	immap(), imgs2s(), imgs2r(), imps2r(), imps2s()
+int	clgeti(), imtgetim()
+pointer	imtopenp(), immap(), imgs2s(), imgs2r(), imps2r(), imps2s()
 errchk	immap, imgs2s, imgs2r, imps2r, imps2s, craverage, crgrow, imgstr
 
 begin

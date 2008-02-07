@@ -26,8 +26,8 @@ procedure t_illumination ()
 
 pointer	image1
 pointer	image2
-int	list1				# Calibration image list
-int	list2				# Illumination image list
+pointer	list1				# Calibration image list
+pointer	list2				# Illumination image list
 int	interactive			# Interactive?
 int	naverage			# Sample averaging size
 int	order				# Order of curve fitting function
@@ -39,9 +39,10 @@ int	answer
 char	history[SZ_LINE]
 pointer	in, out, ic, gt, sp, str
 
-int	clgeti(), imtopen(), imtgetim(), imtlen(), gt_init()
+int	clgeti(), imtgetim(), imtlen(), gt_init()
 bool	clgetb()
 real	clgetr()
+pointer	imtopen()
 errchk	il_make
 
 begin

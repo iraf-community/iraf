@@ -9,7 +9,7 @@ include	<pkg/xtanswer.h>
 
 procedure t_fitcoords ()
 
-int	list1			# Image list
+pointer	list1			# Image list
 char	fitname[SZ_FNAME]	# Database name for coordinate fit
 char	database[SZ_FNAME]	# Database
 pointer	logfiles		# List of log files
@@ -17,11 +17,11 @@ bool	combine			# Combine input data?
 int	interactive		# Interactive?
 
 char	image[SZ_FNAME], prompt[SZ_LINE]
-int	list2
+pointer	list2
 
-int	clgeti(), imtopen(), fc_getim()
+int	clgeti(), fc_getim()
 bool	clgetb()
-pointer	clpopnu()
+pointer	imtopen(), clpopnu()
 
 begin
 	# Get the task parameters.

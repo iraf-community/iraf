@@ -17,7 +17,7 @@ define	SPECIAL	"|if|else|endif|print|printf|quit|"
 
 procedure t_asthedit()
 
-int	imlist			# list of images
+pointer	imlist			# list of images
 pointer	cmd			# command file
 pointer	table			# data table
 pointer	col			# column names
@@ -30,8 +30,8 @@ bool	eval
 int	i, ip, sz_cmd, fdcmd, ncmds, acmode, nim, tm[LEN_TMSTRUCT]
 long	pos
 pointer	sp, image, key, expr, keys, exprs, ast
-pointer	stopen()
-int	imtopenp(), imtlen(), imtgetim(), immap()
+pointer	stopen(), imtopenp()
+int	imtlen(), imtgetim(), immap()
 int	open(), fscan(), fstati(), nowhite(), ctowrd(), ctotok()
 int	strlen(), stridxs(), strdic()
 bool	clgetb(), streq()

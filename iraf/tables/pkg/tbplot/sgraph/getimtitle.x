@@ -33,9 +33,9 @@ pointer	im
 int	iw
 char	errmsg[SZ_LINE]		# Error message
 
-int	imtopen(), imtgetim(), gg_optype(), stridxs(), imtlen()
+int	imtgetim(), gg_optype(), stridxs(), imtlen()
 int	nscan(), strlen()
-pointer	immap(), tbtopn()
+pointer	imtopen(), immap(), tbtopn()
 pointer tbnopen()
 int	tbnget()
 bool	streq()

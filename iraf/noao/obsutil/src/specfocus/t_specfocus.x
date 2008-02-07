@@ -11,7 +11,7 @@ include	"specfocus.h"
 
 procedure t_specfocus ()
 
-int	list		# List of images
+pointer	list		# List of images
 pointer	fvals		# List of focus values
 int	dispaxis	# Default dispersion axis
 int	amin		# Lower edge of data along slit
@@ -30,8 +30,8 @@ int	c1, dc, nc
 int	l1, dl, nl
 pointer	sp, image, sys
 pointer	rg, sfs, sf, sfd, sfavg, sfbest, im, mw, data, buf1, buf2
-pointer	rng_open(), immap(), imgl2r(), mw_openim()
-int	clgeti(), imgeti(), imtopenp(), imtlen(), imtgetim(), nowhite()
+pointer	rng_open(), immap(), imgl2r(), mw_openim(), imtopenp()
+int	clgeti(), imgeti(), imtlen(), imtgetim(), nowhite()
 int	rng_index(), open()
 real	rval, clgetr(), imgetr(), asumr()
 bool	ms, clgetb(), streq()

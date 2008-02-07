@@ -13,10 +13,10 @@ define	ITYPES	"|nearest|linear|poly3|poly5|spline3|"
 
 procedure t_transform ()
 
-int	input			# List of input images
-int	output			# List of output images
-int	minput			# List of input masks
-int	moutput			# List of output masks
+pointer	input			# List of input images
+pointer	output			# List of output images
+pointer	minput			# List of input masks
+pointer	moutput			# List of output masks
 pointer	fitnames		# List of user coordinate fits
 pointer	database		# Database
 char	interp[10]		# Interpolation type
@@ -28,10 +28,10 @@ pointer	un[2], mw, ct, usf, vsf, xmsi, ymsi, jmsi, xout, yout, dxout, dyout
 pointer	sp, image1, image2, image3, minname, moutname, mname, str
 
 int	clgfil(), clplen(), clgeti(), clgwrd(), open()
-int	imtopenp(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 bool	clgetb()
 real	clgetr()
-pointer	clpopnu(), immap(), mw_openim(), xt_mappm()
+pointer	imtopenp(), clpopnu(), immap(), mw_openim(), xt_mappm()
 errchk	tr_gsf, tr_setup, open, mw_openim, xt_mappm
 
 data	itypes /II_BINEAREST, II_BILINEAR, II_BIPOLY3, II_BIPOLY5,

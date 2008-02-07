@@ -47,7 +47,7 @@ real	pos				# Profile position (center of image)
 real	dpos				# Deriviative of position
 
 bool	new
-int	ilist, olist, mlist
+pointer	ilist, olist, mlist
 int	i, j, k, k1, k2, fd, npts, nmods, nalloc
 real	pcen[2], fwhm[2], flux[2], peak, pstep, pstart, pend, x1, x2, dx
 pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
@@ -55,8 +55,8 @@ pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
 bool	streq(), clgetb()
 real	asigrl()
 int	clgeti(), access(),  open(), fscan(), nscan(), strdic()
-int	imtopenp(), imtlen(), imtgetim(), clktime()
-pointer	immap(), imgl1r(), imgl2r(), impl2r()
+int	imtlen(), imtgetim(), clktime()
+pointer	imtopenp(), immap(), imgl1r(), imgl2r(), impl2r()
 errchk	open, immap
 
 begin

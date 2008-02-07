@@ -58,13 +58,13 @@ int	i, j, index, naps
 pointer	im, mw, refim, shout
 pointer	sp, input, output, headers, bmask, rmask, nrmask, emask, sigma, logfile
 pointer	tmp, str, s, b, ns
-int	ilist1, ilist2, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
+pointer	ilist1, ilist2, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
 
 bool	clgetb()
 int	clgeti(), clgwrd()
-int	imtopen(), imtopenp(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
 real	clgetr()
-pointer	rng_open()
+pointer	imtopen(), imtopenp(), rng_open()
 errchk	shdr_open, odc_gspec, odc_rebin, odc_output, odc_combine
 
 include	"src/icombine.com"

@@ -20,7 +20,7 @@ bool	robust			# if set, ignore wrong observation type
 pointer	files			# file list for multiple tape files
 
 pointer	listin			# list of input images
-int	listout			# list of output images
+pointer	listout			# list of output images
 bool	selfbuf, rootflag
 int	nfiles, filenumber, stat
 pointer	bp, sp, tapename, dfilename, diskfile, root
@@ -29,9 +29,9 @@ int	filerange[2 * MAX_RANGES + 1]
 bool	clgetb()
 int	get_next_number(), mtneedfileno()
 int	strlen(), decode_ranges()
-int	imtopenp(), clgfil(), imtgetim(), clplen(), imtlen()
+int	clgfil(), imtgetim(), clplen(), imtlen()
 int	mtfile()
-pointer	fntopnb()
+pointer	imtopenp(), fntopnb()
 errchk	vt_rfd
 
 begin

@@ -14,14 +14,14 @@ char	instrument[SZ_FNAME]	#TI Instrument translation file.
 char	procflag[SZ_LINE]	#TI List of proc flags.
 char	ccdtype[SZ_LINE]	#TI ccdtype to select.
 
-int	flag, ip, type
+int	flag, ip, type, fdout
 char	image[SZ_LINE], buffer[SZ_LINE]
-pointer	fdout, im
+pointer	im
 
-int	strdic(), imtopenp(), imtgetim(), hdmaccf(), ctowrd(), imaccess()
-int	ccdtypei()
+int	strdic(), imtgetim(), hdmaccf(), ctowrd(), imaccess()
+int	ccdtypei(), open()
 
-pointer	open(), immap()
+pointer	imtopenp(), immap()
 
 begin
 	# Open input and output image lists

@@ -9,9 +9,9 @@ include	"ecidentify.h"
 
 procedure t_ecidentify ()
 
-int	images
-pointer	ec, gopen(), gt_init(), un_open()
-int	clgeti(), clgwrd(), imtopenp(), ec_getim()
+pointer	images
+pointer	ec, gopen(), gt_init(), un_open(), imtopenp()
+int	clgeti(), clgwrd(), ec_getim()
 real	clgetr()
 double	clgetd()
 

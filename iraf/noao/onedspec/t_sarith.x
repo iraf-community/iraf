@@ -34,10 +34,10 @@ define	POW	18
  
 procedure t_sarith()
  
-int	inlist1			# List of input spectra
+pointer	inlist1			# List of input spectra
 int	op			# Operation
-int	inlist2			# List of input spectra or operands
-int	outlist			# List of output spectra
+pointer	inlist2			# List of input spectra or operands
+pointer	outlist			# List of output spectra
 double	w1			# Starting wavelength
 double	w2			# Ending wavelength
 bool	rebin			# Rebin wavelength region?
@@ -56,14 +56,14 @@ bool	renumber		# Renumber apertures?
 bool	verbose			# Verbose?
 real	errval			# Error value
  
-int	list1, list2
+pointer	list1, list2
 pointer	sp, input1, opstr, input2, output, ptr
  
 double	clgetd()
-int	imtopenp(), imtopen(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 int	clgwrd(), clgeti()
 bool	clgetb()
-pointer	rng_open()
+pointer	imtopenp(), imtopen(), rng_open()
 common	/sarith/ errval
  
 begin

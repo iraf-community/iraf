@@ -19,9 +19,9 @@ define	MKO_SORT	Memi[P2I($1+3)]		# Sort index
 
 procedure t_mknoise ()
 
-int	ilist				# Input image list
-int	olist				# Output image list
-int	objects				# List of cosmic ray files
+pointer	ilist				# Input image list
+pointer	olist				# Output image list
+pointer	objects				# List of cosmic ray files
 int	nl				# Number of lines
 int	nc				# Number of columns
 real	background			# Background level
@@ -44,10 +44,10 @@ pointer	mko, mkt
 
 long	clgetl(), clktime()
 bool	clgetb(), streq()
-int	imtopenp(), imtlen(), imtgetim()
+int	imtlen(), imtgetim()
 int	clgeti(), access(), nowhite(), open(), fscan(), nscan()
 real	clgetr(), urand()
-pointer	immap(), imgl2r(), impl2r()
+pointer	imtopenp(), immap(), imgl2r(), impl2r()
 pointer	mkt_star()
 errchk	open, immap, imgl2r, impl2r, malloc, realloc, mkt_gstar
 

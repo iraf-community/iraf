@@ -9,7 +9,7 @@ include <smw.h>
 
 procedure t_slist1d ()
 
-int	root
+pointer	root
 int	long_header
 pointer	sp, image, im, mw, sh, ptr
 int	i, nl, df, sm, qf, qd, bs, co

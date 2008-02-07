@@ -19,8 +19,8 @@ include	<pkg/xtanswer.h>
 
 procedure colbias ()
 
-int	listin				# List of input images
-int	listout				# List of output images
+pointer	listin				# List of input images
+pointer	listout				# List of output images
 pointer	logfiles			# List of log files
 char	biassec[SZ_FNAME]		# Bias section
 char	trimsec[SZ_FNAME]		# Trim section
@@ -42,10 +42,10 @@ int	logfd
 pointer	in, bias, out, ic, gt
 
 int	clgeti(), clgfil(), open(), gt_init(), nowhite()
-int	imtopen(), imtlen(), imtgetim(), btoi()
+int	imtlen(), imtgetim(), btoi()
 bool	clgetb()
 long	clktime()
-pointer	immap(), clpopnu()
+pointer	imtopen(), immap(), clpopnu()
 real	clgetr()
 
 begin

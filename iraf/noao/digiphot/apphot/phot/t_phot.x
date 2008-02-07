@@ -24,14 +24,14 @@ int	update			# update the critical parameters
 int	verbose			# type messages on the terminal
 
 pointer	sp, cname, outfname, str, ap, im, gd, mgd, id
-pointer	clist, olist, slist
+pointer	clist, olist, slist, imlist
 int	limlist, lclist, lolist, lslist, sid, lid, sd, out, cl, root, stat, pfd
-int	imlist, memstat, old_size, wcs, req_size
+int	memstat, old_size, wcs, req_size
 int	buf_size
 
-pointer	immap(), gopen(), clpopnu()
+pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), apstati(), strncmp()
-int	fnldir(), strlen(), apphot(), imtopenp(), open(), clgwrd()
+int	fnldir(), strlen(), apphot(), open(), clgwrd()
 int	ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen

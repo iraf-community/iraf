@@ -41,7 +41,7 @@ define  NSUB    3       # Number of pixel subsamples
  
 procedure t_fitprofs()
  
-int	inlist			# List of input spectra
+pointer	inlist			# List of input spectra
 pointer	aps			# Aperture list
 pointer	bands			# Band list
 
@@ -59,7 +59,7 @@ pointer	components		# List of components
 bool	verbose			# Verbose?
 int	log			# Log file
 int	plot			# Plot file
-int	outlist			# List of output spectra
+pointer	outlist			# List of output spectra
 int	option			# Output image option
 bool	clobber			# Clobber existing images?
 bool	merge			# Merge with existing images?
@@ -72,9 +72,9 @@ pointer	sp, input, output, ptr
 real	clgetr()
 bool	clgetb()
 int	clgeti(), clgwrd(), clscan()
-int	imtopenp(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
 int	open(), fscan(), nscan(), strdic(), nowhite()
-pointer	rng_open()
+pointer	imtopenp(), rng_open()
 errchk	open
  
 begin

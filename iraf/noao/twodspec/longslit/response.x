@@ -22,9 +22,9 @@ include <pkg/xtanswer.h>
 
 procedure t_response ()
 
-int	list1				# List of calibration images
-int	list2				# List of normalization images
-int	list3				# List of response images
+pointer	list1				# List of calibration images
+pointer	list2				# List of normalization images
+pointer	list3				# List of response images
 real	threshold			# Response threshold
 int	naverage			# Sample averaging size
 int	order				# Order of curve fitting function
@@ -36,10 +36,10 @@ int	interactive			# Interactive?
 pointer	cal, norm, resp, ic, gt
 pointer	sp, image1, image2, image3, history
 
-int	clgeti(), imtopen(), imtgetim(), imtlen(), gt_init(), ic_geti()
+int	clgeti(), imtgetim(), imtlen(), gt_init(), ic_geti()
 bool	clgetb()
 real	clgetr(), ic_getr()
-pointer	immap()
+pointer	imtopen(), immap()
 
 errchk	immap, ls_immap
 

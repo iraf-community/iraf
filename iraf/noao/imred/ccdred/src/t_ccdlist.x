@@ -15,12 +15,13 @@ define	SZ_CCDLINE	80	# Size of line for output
 
 procedure t_ccdlist ()
 
-int	list, ccdtype
+int	ccdtype
 bool	names, lformat
-pointer	sp, image, im
+pointer	sp, image, im, list
 
 bool	clgetb()
-int	imtopenp(), imtgetim()
+int	imtgetim()
+pointer	imtopenp()
 
 begin
 	call smark (sp)

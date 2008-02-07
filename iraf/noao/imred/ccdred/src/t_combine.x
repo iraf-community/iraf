@@ -166,16 +166,16 @@ pointer	subsets		# Subset names (allocated)
 pointer	nimages		# Number of images in subset (allocated)
 int	nsubsets	# Number of subsets
 
-int	list		# List of input images
+pointer	list		# List of input images
 bool	doamps		# Divide input into subsets by amplifier?
 bool	dosubsets	# Divide input into subsets by subset parameter?
 bool	extend		# Add extensions to output image names?
 
 int	i, nimage, ccdtype
 pointer	sp, type, image, extn, subset, str, ptr, im
-#int	imtopenp(), imtlen(), imtgetim(), ccdtypecl(), ccdtypes()
-int	imtopenp(), imtlen(), imtgetim()
-pointer	immap()
+#int	imtlen(), imtgetim(), ccdtypecl(), ccdtypes()
+int	imtlen(), imtgetim()
+pointer	imtopenp(), immap()
 bool	clgetb(), streq()
 
 begin

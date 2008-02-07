@@ -17,8 +17,8 @@ define	ECHELLE		2
  
 procedure t_dispcor ()
  
-int	in			# List of input spectra
-int	out			# List of output spectra
+pointer	in			# List of input spectra
+pointer	out			# List of output spectra
 bool	linearize		# Linearize spectra?
 bool	log			# Log scale?
 bool	flux			# Conserve flux?
@@ -28,9 +28,11 @@ int	fd1			# Log file descriptor
 int	fd2			# Log file descriptor
  
 int	i, format, naps
-int	open(), nowhite(), imtopenp(), imtgetim(), errcode(), btoi()
 pointer	sp, input, output, str, err, stp, table
-pointer	im, im1, smw, smw1, ap, immap(), smw_openim()
+pointer	im, im1, smw, smw1, ap
+
+int	open(), nowhite(), imtgetim(), errcode(), btoi()
+pointer	imtopenp(), immap(), smw_openim()
 bool	clgetb()
 real	clgetr()
 errchk	open, immap, smw_openim, dc_gms, dc_gec, dc_multispec, dc_echelle

@@ -8,7 +8,7 @@ include	<smw.h>
 
 procedure t_slist ()
 
-int	list			# Input list
+pointer	list			# Input list
 pointer	aps			# Aperture range list
 int	long_header		# Long header?
 
@@ -16,8 +16,8 @@ int	i
 pointer	sp, image, im, mw, sh, ptr
 
 bool	clgetb(), rng_elementi()
-int	 imtopenp(), imtgetim(), btoi()
-pointer	rng_open(), immap(), smw_openim()
+int	imtgetim(), btoi()
+pointer	imtopenp(), rng_open(), immap(), smw_openim()
 errchk	immap, smw_openim, shdr_open
 
 begin

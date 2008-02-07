@@ -18,14 +18,14 @@ pointer	display			# pointer to display device name
 pointer	graphics		# pointer to the graphics device
 
 pointer	sp, cfname, pfname, im, py, id, gd, str
-pointer	plist, clist
+pointer	plist, clist, imlist
 int	limlist, lplist, lclist, stat, pl, cl, root, pid, cid, wcs
-int	imlist, newpy, newcoo, memstat, req_size, old_size
+int	newpy, newcoo, memstat, req_size, old_size
 int	buf_size
 
-pointer	gopen(), immap(), clpopnu()
+pointer	gopen(), immap(), clpopnu(), imtopenp()
 int	imtlen(), clplen(), imtgetim(), clgfil(), strncmp(), strlen()
-int	fnldir(), ap_mkpylist(), imtopenp(), open(), clgwrd()
+int	fnldir(), ap_mkpylist(), open(), clgwrd()
 int	access(), btoi(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen()

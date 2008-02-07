@@ -8,8 +8,8 @@ include <pkg/gtools.h>
 
 procedure flat1d ()
 
-int	listin				# Input image list
-int	listout				# Output image list
+pointer	listin				# Input image list
+pointer	listout				# Output image list
 int	axis				# Image axis to fit
 real	minflat				# Minimum fit value for ratio
 bool	interactive			# Interactive?
@@ -28,10 +28,11 @@ pointer	in, out				# IMIO pointers
 pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
-int	imtopen(), imtgetim(), imtlen(), gt_init()
+int	imtgetim(), imtlen(), gt_init()
 int	clgeti()
 real	clgetr()
 bool	clgetb()
+pointer	imtopen()
 
 begin
 	# Get input and output lists and check that the number of images

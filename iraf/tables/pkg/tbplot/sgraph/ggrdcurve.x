@@ -52,8 +52,8 @@ int	ncurves, i, iw
 pointer fi, ft, ftx, fty
 
 
-int	gg_rdcurve(), imtopen(), imtgetim(), nscan()
-pointer tbnopen()
+int	gg_rdcurve(), imtgetim(), nscan()
+pointer imtopen(), tbnopen()
 int	tbnget()
 int	gg_rd1col(), gg_rd2col(), gg_rdxycol()
 

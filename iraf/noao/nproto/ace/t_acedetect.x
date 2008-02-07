@@ -18,8 +18,8 @@ pointer	par			# Parameters
 pointer	sp, str
 
 bool	clgetb()
-int	clgwrd(), imtopenp(), imtopen()
-pointer	fntopnb(), clpopnu()
+int	clgwrd()
+pointer	imtopenp(), imtopen(), fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -117,8 +117,7 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen()
-pointer	fntopnb(), clpopnu()
+pointer	imtopenp(), imtopen(), fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -206,8 +205,7 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen()
-pointer	fntopnb(), clpopnu()
+pointer	imtopenp(), imtopen(), fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -288,8 +286,7 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen()
-pointer	clpopnu()
+pointer	imtopenp(), imtopen(), clpopnu()
 
 begin
 	call smark (sp)
@@ -377,16 +374,16 @@ procedure aceall (par)
 
 pointer	par			#I Parameters
 
-int	i, j, k, list, imext
-pointer	sp, str
+int	i, j, k, imext
+pointer	sp, str, list
 pointer	image[4], bpmask[4], skyname[4], signame[4], expname[4], gainname[4]
 pointer	incat[2], outcat[2], objmask[2], outsky[2], outsig[2], scalestr[2]
 pointer	catdef, logfile
 pointer	im, ptr
 
-int	nowhite(), mscextensions(), strldxs(), strlen()
+int	nowhite(), strldxs(), strlen()
 int	imtlen(), imtgetim(), clplen(), clgfil()
-pointer	immap()
+pointer	immap(), mscextensions()
 errchk	immap
 
 begin

@@ -24,8 +24,8 @@ pointer	list			# List of input spectra
 char	table[ARB]		# Reference table
 int	select			# Selection method
 
-int	i, fd, input, refs
-pointer	stp, sym
+int	i, fd
+pointer	input, refs, stp, sym
 pointer	sp, image, ref1, ref2
 
 pointer	stopen(), strefsbuf(), stenter(), stpstr(), stfind(), imtopen()

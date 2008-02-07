@@ -21,13 +21,13 @@ int	update		# update the critical parameter
 int	verbose		# verbose mode
 
 pointer	sp, outfname, cname, ap, im, mgd, gd, id, str
-pointer	clist, olist
+pointer	clist, olist, imlist
 int	sid, lid, limlist, lclist, lolist, out, cl, pfd, root, stat, memstat
-int	imlist, wcs, req_size, old_size, buf_size
+int	wcs, req_size, old_size, buf_size
 
-pointer	immap(), gopen(), clpopnu()
+pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
-int	strlen(), apsky(), imtopenp(), open(), clgwrd(), ap_memstat()
+int	strlen(), apsky(), open(), clgwrd(), ap_memstat()
 int	sizeof()
 bool	clgetb(), streq()
 errchk	gopen

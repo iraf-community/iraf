@@ -17,17 +17,18 @@ int	nstar				# number of artificial stars
 int	nimage				# number of new images
 int	cache				# cache the output image pixels
 
-pointer	sp, outfname, im, psffd, oim, dao, str, plist
-int	imlist, limlist, lplist, pimlist, lpimlist, oimlist, loimlist
+pointer	sp, outfname, im, psffd, oim, dao, str
+pointer	plist, imlist, pimlist, oimlist
+int	limlist, lplist, lpimlist, loimlist
 int	ifd, ofd, j, simple, idoffset, root, verbose, verify, update, wcs
 int	req_size, old_size, buf_size, memstat
 int	seed, iseed[NSEED]
 bool	coo_text
 
 real	clgetr()
-pointer	immap(), tbtopn(), fntopnb()
+pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	clgeti(), fstati(), btoi(), fnldir(), strlen(), strncmp()
-int	access(), open(), imtopen(), imtlen(), imtgetim(), fntlenb()
+int	access(), open(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	itob(), clgetb()
 

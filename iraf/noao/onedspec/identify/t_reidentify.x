@@ -29,7 +29,7 @@ define	ICFITHELP	"noao$base/scr/idicgfit.key"
 procedure t_reidentify ()
 
 pointer	reference		# Reference image
-int	list			# List of images
+pointer	list			# List of images
 char	ans[3]			# Interactive?
 double	crsearch		# Search radius
 
@@ -37,10 +37,10 @@ int	i, fd, nlogfd
 pointer	sp, logfile, str, id, logfd, pd
 
 int	clscan(), clgeti(), clgfil(), clgwrd()
-int	nscan(), open(), btoi(), nowhite(), imtopenp(), imtgetim()
+int	nscan(), open(), btoi(), nowhite(), imtgetim()
 bool	clgetb(), strne()
 double	clgetd()
-pointer	clpopnu(), gopen(), gt_init()
+pointer	imtopenp(), clpopnu(), gopen(), gt_init()
 
 begin
 	call smark (sp)

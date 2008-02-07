@@ -19,13 +19,15 @@ procedure t_lscombine ()
 
 pointer	sp, fname, output, headers, bmask, rmask, sigma, nrmask, emask, logfile
 pointer	scales, zeros, wts, im
-int	n, input, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
-int	input1, mask1, delete
+pointer	ilist, olist, hlist, blist, rlist, slist, nrlist, elist
+pointer	input, input1, mask1
+int	n
+int	delete
 
 bool	clgetb()
 real	clgetr()
-int	clgwrd(), clgeti(), imtopenp(), imtopen(), imtgetim(), imtlen()
-pointer	immap()
+int	clgwrd(), clgeti(), imtgetim(), imtlen()
+pointer	imtopenp(), imtopen(), immap()
 errchk	immap, icombine, lsc_transform
 
 include	"src/icombine.com"
@@ -281,10 +283,10 @@ pointer un[2], usf, vsf, xmsi, ymsi, jmsi, xout, yout, dxout, dyout
 
 bool	streq()
 int	clgeti(), clgwrd(), errget()
-int	imtopen(), imtgetim(), imtrgetim(), imtlen()
+int	imtgetim(), imtrgetim(), imtlen()
 real	clgetr()
 real	mw_c1tranr()
-pointer	immap(), mw_openim(), mw_sctran(), xt_mappm()
+pointer	imtopen(), immap(), mw_openim(), mw_sctran(), xt_mappm()
 errchk	immap, mw_openim, mw_sctran, xt_mappm
 
 include "../transform/transform.com"

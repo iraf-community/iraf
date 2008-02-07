@@ -15,16 +15,17 @@ include	"hdicfit/hdicfit.h"
 procedure t_hdtoi ()
 
 pointer	sp, cv, fog, db, im_in, lut, im_out, imageout, imagein, option
+pointer	in_list, out_list, fog_list
 bool	verbose
-int	minval, maxval, in_list, rec, ip, out_list, fog_list, ngpix
+int	minval, maxval, rec, ip, ngpix
 int	datatype, nluv, updatedb
 real	sigma, floor, scale, fog_val, sdev
 
 char	clgetc()
 bool	streq(), clgetb()
-pointer	ddb_map(), immap()
-int	imtopenp(), ddb_locate(), ctor(), imtlen(), imtgetim()
-int	get_data_type(), imtopen()
+pointer	ddb_map(), immap(), imtopenp(), imtopen()
+int	ddb_locate(), ctor(), imtlen(), imtgetim()
+int	get_data_type()
 real	clgetr(), ddb_getr()
 
 begin

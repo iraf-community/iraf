@@ -9,8 +9,8 @@ define	VLIGHT	2.997925e5	# Speed of light, Km/sec
 
 procedure t_dopcor ()
 
-int	inlist			# List of input spectra
-int	outlist			# List of output spectra
+pointer	inlist			# List of input spectra
+pointer	outlist			# List of output spectra
 double	z			# Doppler redshift or velocity
 bool	isvel			# Is redshift parameter a velocity?
 bool	add			# Add to existing correction?
@@ -30,8 +30,8 @@ pointer	sp, input, output, vkey, apstr, key, log, coeff
 real	clgetr()
 double	imgetd()
 bool	clgetb(), streq(), rng_elementi()
-int	imtopenp(), imtgetim(), ctod()
-pointer	rng_open(), immap(), smw_openim(), imgl3r(), impl3r()
+int	imtgetim(), ctod()
+pointer	imtopenp(), rng_open(), immap(), smw_openim(), imgl3r(), impl3r()
 errchk	immap, imgetd, imgstr,imgl3r, impl3r
 errchk	smw_openim, shdr_open, smw_gwattrs
 

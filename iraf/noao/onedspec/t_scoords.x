@@ -16,9 +16,9 @@ int	n, fd
 bool	verbose
 pointer	sp, spec, coords, values, im, tmp
 int	open(), fscan(), nscan()
-int	imtopenp(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
+int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 bool	clgetb()
-pointer	clpopnu(), immap()
+pointer	imtopenp(), clpopnu(), immap()
 
 errchk	immap, open, scoords
 

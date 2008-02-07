@@ -11,12 +11,12 @@ char	instrument[SZ_FNAME]	#TI Instrument translation file.
 char	subset[SZ_LINE]		#TI Subset required.
 char	ccdtype[SZ_LINE]	#TI ccdtype required.
 
-int	type
+int	type, fdout
 char	image[SZ_LINE], buffer[SZ_LINE]
-pointer	fdout, im
+pointer	im
 
-int	strdic(), imtopenp(), imtgetim(), ccdtypei(), imaccess()
-pointer	open(), immap()
+int	strdic(), imtgetim(), ccdtypei(), imaccess(), open()
+pointer	imtopenp(), immap()
 bool	strne()
 
 begin

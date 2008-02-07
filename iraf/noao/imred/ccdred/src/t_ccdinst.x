@@ -63,8 +63,11 @@ define	NEXT		41	# Next image
 
 procedure t_ccdinst ()
 
-int	list, level, ncmd, imtopenp(), imtgetim(), scan(), access(), clgwrd()
-pointer	sp, image, inst, ssfile, im, immap()
+int	level, ncmd
+pointer	sp, image, inst, ssfile, im, list
+
+int	imtgetim(), scan(), access(), clgwrd()
+pointer	imtopenp(), immap()
 bool	update, clgetb()
 errchk	delete, hdmwrite
 

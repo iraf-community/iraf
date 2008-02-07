@@ -20,16 +20,17 @@ int	verify			# verify critical task parameters ?
 int	update			# update the task parameters ?
 int	version			# version number
 
-pointer	sp, outfname, im, subim, dao, str, alist, olist, rlist
-int	imlist, limlist, lalist, pimlist, lpimlist, lolist
-int	simlist, lsimlist, lrlist, photfd, psffd, allfd, root, savesub
+pointer	sp, outfname, im, subim, dao, str
+pointer	alist, olist, rlist, imlist, pimlist, simlist
+int	limlist, lalist, lpimlist, lolist
+int	lsimlist, lrlist, photfd, psffd, allfd, root, savesub
 int	rejfd, wcs
 bool	ap_text
 
-pointer	immap(), tbtopn(), fntopnb()
+pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	clgwrd(), clgeti()
 int	open(), fnldir(), strncmp(), strlen(), btoi(), access()
-int	fstati(), imtopen, imtlen(), imtgetim(), fntlenb()
+int	fstati(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb()
 bool	itob(), clgetb()
 

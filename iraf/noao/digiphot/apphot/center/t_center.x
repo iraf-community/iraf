@@ -24,12 +24,12 @@ int	verbose			# verbose mode
 
 pointer	sp, str, cname, outfname, ap, im, id, gd, mgd
 int	limlist, lclist, lolist, sid, lid, cl, pfd, out, root, stat, memstat
-int	imlist, wcs, req_size, old_size, buf_size
-pointer	clist, olist
+int	wcs, req_size, old_size, buf_size
+pointer	imlist, clist, olist
 
-pointer	immap(), gopen(), clpopnu()
+pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
-int	open(), strlen(), apcenter(), imtopenp(), clgwrd()
+int	open(), strlen(), apcenter(), clgwrd()
 int	ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen

@@ -18,7 +18,7 @@ define	NALLOC		10	# Allocate memory in this size block
 
 procedure t_ccdgroups ()
 
-int	images			# List of images
+pointer	images			# List of images
 pointer	root			# Output group root name
 int	group			# Group type
 real	radius			# Position radius
@@ -30,7 +30,8 @@ pointer	im, sp, image, output, suffix, titles, positions, dates
 bool	clgetb()
 real	clgetr()
 int	position_group(), title_group(), date_group()
-int	imtopenp(), imtgetim(), open(), clgwrd()
+int	imtgetim(), open(), clgwrd()
+pointer	imtopenp()
 errchk	set_input, position_group, title_group, date_group, open
 
 begin

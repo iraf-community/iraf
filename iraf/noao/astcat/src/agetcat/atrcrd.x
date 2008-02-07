@@ -12,11 +12,11 @@ int procedure at_rclist (at, rcsource)
 pointer	at			#I the astrometry descriptor
 char	rcsource[ARB]		#I the source of the regions list
 
-pointer	sp, symname, st, sym
-int	nfields, fd, imlist
+pointer	sp, symname, st, sym, imlist
+int	nfields, fd
 double	at_statd()
-pointer	at_statp(), stopen(), stenter()
-int	at_stati(), access(), open(), imtopen(), at_rcread(), at_rcwcsim()
+pointer	at_statp(), stopen(), stenter(), imtopen()
+int	at_stati(), access(), open(), at_rcread(), at_rcwcsim()
 bool	streq()
 
 begin
@@ -186,7 +186,7 @@ end
 
 int procedure at_rcwcsim (imlist, at, st)
 
-int	imlist			#I the image list descriptor
+pointer	imlist			#I the image list descriptor
 pointer	at			#I the astrometry descriptor
 pointer	st			#I the field center symbol table descriptor.
 

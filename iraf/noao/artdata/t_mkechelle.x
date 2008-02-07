@@ -25,7 +25,7 @@ define	SLIT		3		# Slit (pexp = 10)
 
 procedure t_mkechelle()
 
-int	images			# List of echelle spectra to be created
+pointer	images			# List of echelle spectra to be created
 int	nc			# Number of columns (across dispersion)
 int	nl			# Number of lines (along dispersion)
 int	norders			# Number of orders
@@ -46,7 +46,7 @@ real	disp[2]			# Central dispersion
 real	z			# Redshift
 real	cont			# Continuum at central wavelength
 real	temp			# Blackbody temperture (Kelvin)
-int	lines			# List of files containing lines
+pointer	lines			# List of files containing lines
 int	nrandom			# Number of spectral lines
 real	peak			# Peak/continuum
 real	sigma			# Sigma of lines (Angstroms)
@@ -67,11 +67,11 @@ pointer	sp, image, fname, apnum, comment
 pointer	im, mw, waves, peaks, sigmas, buf, spec, bf1, bf2, asi, data
 
 long	clgetl(), clktime()
-int	clgeti(), clgwrd(), imtopenp(), imtgetim()
+int	clgeti(), clgwrd(), imtgetim()
 int	nowhite(), access(), open(), fscan(), nscan()
 real	clgetr(), urand(), asigrl()
 real	ecx2w(), ecxdx(), ecw2x(), ecw2xr, ecdelta()
-pointer	immap(), mw_open(), impl2r(), imgl2r()
+pointer	imtopenp(), immap(), mw_open(), impl2r(), imgl2r()
 bool	clgetb()
 errchk	open(), ecgrating()
 

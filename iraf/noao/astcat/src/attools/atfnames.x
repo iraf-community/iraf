@@ -181,10 +181,10 @@ char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 int     append                  #I test for existence of file ?
 
-pointer	sp, dirname, fname, fcname, symlist, symbol, otemplate, st
-int	i, j, imlist, len_dir, len_otemplate, strfd
-pointer	sthead(), stnext(), at_statp()
-int	imtopen(), fntlenb(), stnsymbols(), fnldir(), strncmp()
+pointer	sp, dirname, fname, fcname, symlist, symbol, otemplate, st, imlist
+int	i, j, len_dir, len_otemplate, strfd
+pointer	sthead(), stnext(), at_statp(), imtopen()
+int	fntlenb(), stnsymbols(), fnldir(), strncmp()
 int	strlen(), stropen(), access(), imtlen(), imtrgetim()
 errchk	imtopen()
 
@@ -717,7 +717,8 @@ int     maxch                           #I the maximum number of characters
 char    period
 int     newversion, version, len
 pointer sp, list, name
-int     imtopen(), imtgetim(), strldx(), ctoi()
+int     imtgetim(), strldx(), ctoi()
+pointer	imtopen()
 
 begin
         # Allocate temporary space

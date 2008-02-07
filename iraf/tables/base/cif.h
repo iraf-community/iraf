@@ -58,27 +58,27 @@ define	CIF_SAME_ROOT	4
 #====
 # The CIF object structure.
 #====
-define	CIF_p			Memi[P2I($1)]
-define	CIF_in_ptr		Memi[P2I($1+1)]
+define	CIF_p			Memp[$1]
+define	CIF_in_ptr		Memp[$1+1]
 define	CIF_n_in		Memi[P2I($1+2)]
-define	CIF_out_ptr		Memi[P2I($1+3)]
+define	CIF_out_ptr		Memp[$1+3]
 define	CIF_n_out		Memi[P2I($1+4)]
 define	CIF_loop		Memi[P2I($1+5)]
 define	CIF_SZ			6
 
-define	CIF_in			Memi[P2I(CIF_in_ptr($1))+$2-1]
-define	CIF_out			Memi[P2I(CIF_out_ptr($1))+$2-1]
+define	CIF_in			Memp[CIF_in_ptr($1)+$2-1]
+define	CIF_out			Memp[CIF_out_ptr($1)+$2-1]
 
 #====
 # CIF File Object Structure
 #====
-define	CIF_list		Memi[P2I($1)]
-define	CIF_group		Memi[P2I($1+1)]
+define	CIF_list		Memp[$1]
+define	CIF_group		Memp[$1+1]
 define	CIF_status		Memi[P2I($1+2)]
 define	CIF_nloop		Memi[P2I($1+3)]
 define	CIF_cg			Memi[P2I($1+5)]
 define	CIF_type		Memi[P2I($1+6)]
-define	CIF_cbuf		Memi[P2I($1+7)]
+define	CIF_cbuf		Memp[$1+7]
 define	CIF_SZ_FILE		8
 
 define	CIF_file_list		Memc[CIF_cbuf($1)]

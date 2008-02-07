@@ -11,13 +11,13 @@ include	<fset.h>
 
 procedure t_spotlist ()
 
-pointer	db, sp, den, ngpix, sdev, dloge, option, npix
-int	spot_fd, fog_fd, fngpix, nspots, maxad, fnpix
+pointer	db, sp, den, ngpix, sdev, dloge, option, npix, spot_fd, fog_fd
+int	fngpix, nspots, maxad, fnpix
 real	scale, sigma, fsdev, fog
 double	maxden
 
-pointer	ddb_map()
-int	imtopenp(), imtlen(), clgeti(), strncmp()
+pointer	ddb_map(), imtopenp()
+int	imtlen(), clgeti(), strncmp()
 real	clgetr()
 
 begin
@@ -89,7 +89,7 @@ end
 
 procedure hd_mean (spot_fd, den, sdev, ngpix, nspots, scale, sigma, npix)
 
-int	spot_fd		# File descriptor for list of spots
+pointer	spot_fd		# File descriptor for list of spots
 real	den[ARB]	# Mean density values - filled on return
 real	sdev[ARB]	# Standard deviation array - filled on return
 int	ngpix[ARB]	# Number of unrejected pixels - filled on return
@@ -137,7 +137,7 @@ end
 
 procedure hd_median (spot_fd, den, sdev, ngpix, nspots, scale, npix)
 
-int	spot_fd		# File descriptor for list of spots
+pointer	spot_fd		# File descriptor for list of spots
 real	den[ARB]	# Mean density values - filled on return
 real	sdev[ARB]	# Standard deviation of input spots
 int	ngpix[ARB]	# Number of pixels not rejected
@@ -189,7 +189,7 @@ end
 
 procedure hd_fogcalc (fog_fd, fog, fsdev, fngpix, scale, sigma, option, nfpix)
 
-int	fog_fd		# File descriptor for list of fog spots
+pointer	fog_fd		# File descriptor for list of fog spots
 real	fog		# Mean fog value - returned
 real	fsdev		# Standard deviation - returned
 int	fngpix		# Number of pixels used - returned

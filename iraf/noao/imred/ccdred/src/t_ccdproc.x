@@ -22,16 +22,18 @@ define	CACHEUNIT	1000000.	# Units of max_cache parameter
 
 procedure t_ccdproc ()
 
-int	list			# List of CCD images to process
-int	outlist			# LIst of output images
+pointer	list			# List of CCD images to process
+pointer	outlist			# LIst of output images
 int	ccdtype			# CCD image type
 int	interactive		# Fit overscan interactively?
 int	max_cache		# Maximum image cache size
 
+pointer	sp, input, output, str, in, out, ccd
+
 bool	clgetb()
 real	clgetr()
-int	imtopenp(), imtgetim(), imtlen()
-pointer	sp, input, output, str, in, out, ccd
+int	imtgetim(), imtlen()
+pointer	imtopenp()
 errchk	set_input, set_output, ccddelete, cal_open
 errchk	set_fixpix, set_zero, set_dark, set_flat, set_illum, set_fringe
 

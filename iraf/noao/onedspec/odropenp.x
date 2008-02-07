@@ -8,7 +8,7 @@ define	MAXRECS	1000	#  Maximum number of records
 
 procedure odr_openp (list, records)
 
-int	list			# Image list
+pointer	list			# Image list
 char	records[ARB]		# Record string
 
 int	i, n, nalloc, rec

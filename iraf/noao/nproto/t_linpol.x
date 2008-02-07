@@ -41,8 +41,9 @@ pointer	inlist, output, in[MAX_IMAGES], out, key, sp
 bool	dflag, sflag, nflag
 int	len
 
-int     imtopenp(), imtlen()
+int     imtlen()
 bool	clgetb()
+pointer	imtopenp()
 
 errchk	lp_map, lp_polarize
 

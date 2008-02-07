@@ -13,10 +13,10 @@ int	header			# Print header?
 int	input			# Print input data?
 int	imupdate		# Update image headers?
 
-int	btoi(), clplen(), imtopenp(), imtlen()
+int	btoi(), clplen(), imtlen()
 bool	clgetb()
 double	clgetd()
-pointer	clpopnu()
+pointer	imtopenp(), clpopnu()
 
 include	"rvcorrect.com"
 

@@ -45,12 +45,13 @@ char	table2[SZ_PATHNAME]		# Output table name
 char	rootname[SZ_PATHNAME]		# Root name
 char	dirname[SZ_PATHNAME]		# Directory name
 
-int	list1, list2, root_len
-pointer	sp
+int	root_len
+pointer	sp, list1, list2
 
-int	imtopen(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
 int	fnldir(), isdirectory()
 bool	clgetb(), streq()
+pointer	imtopen()
 
 begin
 	# Get input and output table template lists.

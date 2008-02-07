@@ -25,8 +25,8 @@ define	VAC2AIR	3		# Correct vacuum to air
 
 procedure t_disptrans ()
 
-int	inlist			# List of input spectra
-int	outlist			# List of output spectra
+pointer	inlist			# List of input spectra
+pointer	outlist			# List of output spectra
 pointer	units			# Output dispersion units
 double	maxerr			# Maximum error (in pixels)
 bool	linearize		# Linearize ouptut dispersion?
@@ -43,9 +43,9 @@ pointer	ptr, in, out, mwin, mwout, ctin, ctout, sh, cv, inbuf, outbuf
 pointer	sp, input, output, title, coeff, x, y, w, nx
 
 bool	clgetb(), streq()
-int	clgwrd(), imtopenp(), imtgetim()
+int	clgwrd(), imtgetim()
 double	clgetd(), shdr_lw(), dcveval()
-pointer	immap(), smw_openim(), smw_sctran(), mw_open(), imgl3r(), impl3r()
+pointer	imtopenp(), immap(), smw_openim(), smw_sctran(), mw_open(), imgl3r(), impl3r()
 errchk	immap, impl3r
 errchk	smw_openim, smw_gwattrs, shdr_open, mw_open
 errchk	dt_airvac, dt_cvfit, dt_setwcs, dispcor

@@ -26,9 +26,11 @@ procedure identify (taskid)
 
 int	taskid			#I Task ID
 
-int	list, clscan(), clgeti(), clgwrd(), nscan(), imtopenp(), imtgetim()
+pointer	sp, str, id, list
+
+int	clscan(), clgeti(), clgwrd(), nscan(), imtgetim()
 real	clgetr()
-pointer	sp, str, id, gt_init()
+pointer	imtopenp(), gt_init()
 
 begin
 	call smark (sp)

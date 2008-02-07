@@ -50,17 +50,17 @@ procedure reiden (taskid)
 int	taskid			#I Task ID
 
 pointer	reference		# Reference image
-int	list			# List of images
+pointer	list			# List of images
 char	ans[3]			# Interactive?
 
 int	i, fd, nlogfd
 pointer	sp, logfile, str, id, logfd, pd
 
 int	clscan(), clgeti(), clgfil(), clgwrd(), btoi()
-int	nscan(), open(), nowhite(), imtopenp(), imtgetim()
+int	nscan(), open(), nowhite(), imtgetim()
 bool	clgetb()
 real	clgetr()
-pointer	clpopnu(), gopen(), gt_init()
+pointer	imtopenp(), clpopnu(), gopen(), gt_init()
 
 begin
 	call smark (sp)

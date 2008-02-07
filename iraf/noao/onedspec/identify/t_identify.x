@@ -6,9 +6,12 @@ include	"identify.h"
 
 procedure t_identify ()
 
-int	list, clscan(), clgeti(), clgwrd(), nscan(), imtopenp(), imtgetim()
+pointer	list
+pointer	sp, str, id
+
+int	clscan(), clgeti(), clgwrd(), nscan(), imtgetim()
 real	clgetr()
-pointer	sp, str, id, gt_init(), un_open()
+pointer	imtopenp(), gt_init(), un_open()
 
 begin
 	call smark (sp)

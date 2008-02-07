@@ -11,16 +11,19 @@ define	IVAL	3	# Integer value
 
 procedure t_ccdhedit ()
 
-int	list			# List of CCD images
+pointer	list			# List of CCD images
 pointer	param			# Parameter name
 int	type			# Parameter type
 pointer	sval			# Parameter value
 pointer	instrument		# Instrument file
 
-int	ip, ival, imtopenp(), imtgetim(), clgwrd(), ctoi(), ctor()
+int	ip, ival
 real	rval
+pointer	sp, im
+
+int	imtgetim(), clgwrd(), ctoi(), ctor()
 bool	streq()
-pointer	sp, im, immap()
+pointer	imtopenp(), immap()
 errchk	hdmpstr, hdmputr, hdmputi
 
 begin

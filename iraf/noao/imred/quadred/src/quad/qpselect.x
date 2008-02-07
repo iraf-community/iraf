@@ -18,15 +18,15 @@ char	instrument[SZ_FNAME]	#TI Instrument translation file.
 char	ccdtype[SZ_LINE]	#TI ccdtype to select.
 bool	stop			#TI stop rather than pass selected images
 
-int	type, nampx, nampy
+int	type, nampx, nampy, fdout
 char	image[SZ_LINE], nampsyx[SZ_LINE]
-pointer	fdout, im
+pointer	im
 
-int	strdic(), imtopenp(), imtgetim(), hdmaccf(), imaccess()
-int	ccdtypei()
+int	strdic(), imtgetim(), hdmaccf(), imaccess()
+int	ccdtypei(), open()
 bool	clgetb()
 
-pointer	open(), immap()
+pointer	imtopenp(), immap()
 
 begin
 	# Open input and output image lists

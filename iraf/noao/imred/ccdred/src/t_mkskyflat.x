@@ -8,14 +8,17 @@ include	"ccdtypes.h"
 
 procedure t_mkskyflat()
 
-int	listin			# List of input CCD images
-int	listout			# List of output CCD images
+pointer	listin			# List of input CCD images
+pointer	listout			# List of output CCD images
 int	ccdtype			# CCD image type
 int	interactive		# Fit overscan interactively?
 
-bool	flatcor, ccdflag(), clgetb(), streq()
-int	imtopenp(), imtgetim()
+bool	flatcor
 pointer	sp, input, output, tmp, str, in, out, ccd
+
+int	imtgetim()
+bool	ccdflag(), clgetb(), streq()
+pointer	imtopenp()
 errchk	set_input, set_output, ccddelete
 
 begin

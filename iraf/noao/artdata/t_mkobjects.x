@@ -24,9 +24,9 @@ define	MKO_SORT	Memi[P2I($1+8)]		# Sort index
 
 procedure t_mkobjects ()
 
-int	ilist				# Input image list
-int	olist				# Output image list
-int	objects				# List of model files
+pointer	ilist				# Input image list
+pointer	olist				# Output image list
+pointer	objects				# List of model files
 real	xo				# X offset
 real	yo				# Y offset
 int	nl				# Number of lines
@@ -53,10 +53,10 @@ pointer	mko, mkt
 
 long	clgetl(), clktime()
 bool	clgetb(), streq()
-int	imtopenp(), imtlen(), imtgetim(), btoi()
+int	imtlen(), imtgetim(), btoi()
 int	clgeti(), open(), fscan(), nscan()
 real	clgetr()
-pointer	immap(), imgl2r(), impl2r()
+pointer	imtopenp(), immap(), imgl2r(), impl2r()
 pointer	mkt_star(), mkt_object()
 errchk	open, immap, imgl2r, impl2r, malloc, realloc, mkt_star, mkt_object
 

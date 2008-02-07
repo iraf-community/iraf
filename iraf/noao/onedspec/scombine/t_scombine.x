@@ -13,8 +13,8 @@ include "icombine.h"
 
 procedure t_scombine()
 
-int	ilist			# list of input images
-int	olist			# list of output images
+pointer	ilist			# list of input images
+pointer	olist			# list of output images
 pointer	nlist			# image name for number combined
 pointer	aps			# aperture ranges
 int	group			# grouping option
@@ -32,8 +32,8 @@ pointer	sp1, d, id, nc, m, lflag, scales, zeros, wts
 real	clgetr(), imgetr()
 bool	clgetb(), rng_elementi()
 int	clgeti(), clgwrd(), ctor()
-int	imtopenp(), imtgetim(), open(), nowhite()
-pointer	rng_open(), immap(), smw_openim(), impl2i(), impl2r()
+int	imtgetim(), open(), nowhite()
+pointer	imtopenp(), rng_open(), immap(), smw_openim(), impl2i(), impl2r()
 errchk	open, immap, smw_openim, shdr_open, imgetr
 errchk	scb_output, scb_combine, ic_combiner
 

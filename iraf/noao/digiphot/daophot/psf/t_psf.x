@@ -27,17 +27,18 @@ pointer	plottype			# type of psf plot
 bool	mkstars				# mark deleted and accepted psf stars
 
 pointer	sp, im, apd, psfim, dao, mgd, gd, id
-pointer	outfname, curfile, str, alist, clist, olist, oclist
-int	imlist, limlist, lalist, lclist, pimlist, lpimlist
+pointer	outfname, curfile, str
+pointer	alist, clist, olist, oclist, imlist, pimlist
+int	limlist, lalist, lclist, lpimlist
 int	lolist, loclist, up, verify, update, wcs
 int	root, min_lenuserarea, pltype, pfd, pst, psfgr, opst
 int	req_size, old_size, buf_size, memstat
 bool	ap_text, pst_text
 
-pointer	immap(), tbtopn(), gopen(), fntopnb()
+pointer	immap(), tbtopn(), gopen(), fntopnb(), imtopen()
 int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctoi(), clgwrd()
 int	strdic(), open(), access(), fstati(), dp_stati(), dp_pstati()
-int	imtopen(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
+int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	sizeof(), dp_memstat()
 bool	streq(), clgetb(), itob(), dp_updatepsf()
 errchk 	gopen

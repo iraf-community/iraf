@@ -165,12 +165,13 @@ end
 
 procedure cal_open (list)
 
-int	list		# List of input images
-int	list1		# List of calibration images
+pointer	list		# List of input images
+pointer	list1		# List of calibration images
 
 pointer	sp, str
-int	ccdtype, strdic(), imtopenp()
+int	ccdtype, strdic()
 bool	clgetb()
+pointer	imtopenp()
 
 pointer	ccdtypes	# Pointer to array of calibration ccdtypes
 pointer	subsets		# Pointer to array of calibration subset numbers

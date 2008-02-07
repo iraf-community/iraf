@@ -9,13 +9,13 @@ pointer	image				# name of the output image
 int	dimen				# size of the image
 real	magnitude			# magnitude of star
 
-int	psffd, pimlist, lpimlist, imlist, limlist
-pointer	im, sp, dao
+int	psffd, lpimlist, limlist
+pointer	im, sp, dao, pimlist, imlist
 real	xpsf, ypsf
 
-int	clgeti(), fstati(), imtopen(), imtlen(), imtgetim()
+int	clgeti(), fstati(), imtlen(), imtgetim()
 real	clgetr()
-pointer	immap()
+pointer	immap(), imtopen()
 
 begin
 	# Set the standard output to flush on newline.

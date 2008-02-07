@@ -12,15 +12,16 @@ pointer	psfimage			# the PSF image
 pointer	peakfile			# output PEAK photometry file
 pointer	rejfile				# output PEAK rejections file
 
-pointer	sp, im, psfim, outfname, dao, str, alist, olist, rlist
+pointer	sp, im, psfim, outfname, dao, str
+pointer	alist, olist, rlist, imlist, pimlist
 int	apd, root, verbose, verify, cache, update, pkfd, rejfd
-int	imlist, limlist, lalist, pimlist, lpimlist, lolist
+int	limlist, lalist, lpimlist, lolist
 int	lrlist, wcs, req_size, old_size, buf_size, memstat
 bool	ap_text
 
-pointer	immap(), tbtopn(), fntopnb()
+pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
-int	access(), imtopen(), imtlen(), imtgetim(), fntlenb()
+int	access(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
 

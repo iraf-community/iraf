@@ -12,7 +12,7 @@ define	ICFITHELP	"noao$base/scr/idicgfit.key"
 
 procedure t_autoidentify ()
 
-int	list			# List of images
+pointer	list			# List of images
 int	interactive		# Examine identifications interactively?
 int	dbwrite			# Write database results?
 
@@ -20,10 +20,10 @@ int	i, fd, hdr, hdr1
 pointer	sp, str, aid, id
 
 int	clgeti(), clgwrd(), nscan(), open(), nowhite()
-int	imtopenp(), imtgetim(), id_dbcheck()
+int	imtgetim(), id_dbcheck()
 bool	clgetb(), aid_autoid()
 real	clgetr()
-pointer	gopen(), gt_init(), un_open()
+pointer	imtopenp(), gopen(), gt_init(), un_open()
 errchk	open, id_mapll, aid_autoid, aid_init, reidentify
 
 define	done_	10

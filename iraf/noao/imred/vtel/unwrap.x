@@ -22,7 +22,7 @@ int	step				# number of steps to perform
 bool	verbose				# verbose flag
 
 int	i, j 
-int	listin, listout
+pointer	listin, listout
 int	length, nlines
 int	badlines[MAXBADLINES]
 int	diff, nbad
@@ -30,8 +30,8 @@ char	tempimage[SZ_FNAME]
 pointer	im, imout, lgp, lgp2, lpp, cck, sp
 
 bool	clgetb()
-int	imtopenp(), imtlen(), imtgetim(), clgeti()
-pointer	immap(), imgl2s(), impl2s()
+int	imtlen(), imtgetim(), clgeti()
+pointer	imtopenp(), immap(), imgl2s(), impl2s()
 errchk	immap, imgl2s, impl2s
 
 begin
