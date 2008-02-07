@@ -17,17 +17,17 @@ pointer	interpstr		# interpolant type
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
-int	reglist, reflist, reclist, tfd, stat, nregions
+int	tfd, stat, nregions
 int	c1, c2, l1, l2, ncols, nlines
-pointer	list1, listr, list2
+pointer	reglist, reflist, reclist, list1, listr, list2
 pointer	sp, image1, image2, imtemp, str, coords
 pointer	gd, id, imr, im1, im2, sdb, xc, mw
 real	shifts[2]
 bool	clgetb()
-int	imtlen(), imtgetim(), fntopnb(), clgwrd(), btoi()
+int	imtlen(), imtgetim(), clgwrd(), btoi()
 int	rg_xregions(), fntlenb(), rg_gxtransform(), rg_xstati()
 int	rg_xcorr(), rg_xicorr(), fntgfnb(), access(), open()
-pointer	imtopen(), gopen(), immap(), dtmap(), mw_openim()
+pointer	fntopnb(), imtopen(), gopen(), immap(), dtmap(), mw_openim()
 real	clgetr(), rg_xstatr()
 errchk	fntopnb(), gopen()
 

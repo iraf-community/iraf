@@ -17,21 +17,21 @@ int	input			# List of input images
 int	output			# List of output images
 int	minput			# List of input masks
 int	moutput			# List of output masks
-int	fitnames		# List of user coordinate fits
+pointer	fitnames		# List of user coordinate fits
 pointer	database		# Database
 char	interp[10]		# Interpolation type
-int	logfiles		# List of log files
+pointer	logfiles		# List of log files
 
 int	itypes[II_NTYPES2D], logfd, nusf, nvsf
 pointer	in, out, pmin, pmout
 pointer	un[2], mw, ct, usf, vsf, xmsi, ymsi, jmsi, xout, yout, dxout, dyout
 pointer	sp, image1, image2, image3, minname, moutname, mname, str
 
-int	clpopnu(), clgfil(), clplen(), clgeti(), clgwrd(), open()
+int	clgfil(), clplen(), clgeti(), clgwrd(), open()
 int	imtopenp(), imtlen(), imtgetim()
 bool	clgetb()
 real	clgetr()
-pointer	immap(), mw_openim(), xt_mappm()
+pointer	clpopnu(), immap(), mw_openim(), xt_mappm()
 errchk	tr_gsf, tr_setup, open, mw_openim, xt_mappm
 
 data	itypes /II_BINEAREST, II_BILINEAR, II_BIPOLY3, II_BIPOLY5,

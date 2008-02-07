@@ -10,9 +10,10 @@ pointer	tp_in		# pointer to the input table
 pointer	tp_out		# pointer to the output table
 pointer	id		# name of the id column
 
-int	inlist, nrecs, idoffset
-pointer	sp, infile, outfile
-int	clpopnu(), clgeti(), clgfil(), access(), open(), fstati(), pt_renumber()
+int	nrecs, idoffset
+pointer	sp, infile, outfile, inlist
+int	clgeti(), clgfil(), access(), open(), fstati(), pt_renumber()
+pointer	clpopnu()
 
 begin
 	# Set the standard output to flush on newline.

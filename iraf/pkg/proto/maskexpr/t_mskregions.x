@@ -31,8 +31,8 @@ define	RG_NUMBER	2
 procedure t_mskregions()
 
 pointer	sp, exprdb, dims, regnumber, uaxlen, mskname, imname, regfname
-pointer	st, refim, pmim, expr, xexpr, msklist, imlist
-int	reglist, undim, regval, depth, regfd, pregval
+pointer	st, refim, pmim, expr, xexpr, msklist, imlist, reglist
+int	undim, regval, depth, regfd, pregval
 int	ip, npix, ch, regno, pregno
 char	lbrackett
 bool	verbose, append
@@ -40,7 +40,8 @@ bool	verbose, append
 pointer	pl
 
 pointer	me_getexprdb(), immap(), me_expandtext(), pl_create(), imtopenp()
-int	clpopnu(), clplen(), imtlen(), clgeti(), ctoi(), clgfil()
+pointer	clpopnu()
+int	clplen(), imtlen(), clgeti(), ctoi(), clgfil()
 int	imtgetim(), imaccess(), strmatch(), imstati(), fscan(), open()
 int	strdic(), stridx()
 bool	clgetb(), strne()

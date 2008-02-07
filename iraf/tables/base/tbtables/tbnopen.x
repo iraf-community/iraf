@@ -43,7 +43,8 @@ char	template[ARB]		# i: table name template
 int	sort, level, ip, ch
 pointer	sp, listp, fnt, op
 define	output {Memc[op]=$1;op=op+1}
-int	fntopnb(), strlen()
+pointer	fntopnb()
+int	strlen()
 
 begin
 	call smark (sp)

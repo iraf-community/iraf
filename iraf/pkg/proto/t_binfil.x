@@ -22,17 +22,17 @@ define	LEN_USER_AREA	720
 procedure t_binfil()
 
 char	ifile[SZ_FNAME], header[64], out_image[SZ_FNAME]
-int	infile, nfiles, fd, i, file_nr, ncols, nrows, ptype
+int	nfiles, fd, i, file_nr, ncols, nrows, ptype
 short	space[10], sncols, snrows, sptype
 long	v1[IM_MAXDIM]
 real	scale_fact, temp
 bool	add_header
-pointer	im, pix, sp, inpix
+pointer	infile, im, pix, sp, inpix
 
-int	clpopni(), clplen(), clgfil(), open(), imgnlr(), strlen()
+int	clplen(), clgfil(), open(), imgnlr(), strlen()
 real	clgetr()
 bool	clgetb()
-pointer	immap()
+pointer	immap(), clpopni()
 
 begin
 	# Get file names
@@ -123,16 +123,16 @@ end
 procedure t_irafil()
 
 char	ifile[SZ_FNAME], out_image[SZ_FNAME]
-int	infile, nfiles, fd, i, j, file_nr, ncols, nrows, ptype, krow
+int	nfiles, fd, i, j, file_nr, ncols, nrows, ptype, krow
 int	nr_bits, nr_chars, nr_skip, nc_skip, ival
 long	offset
 bool	flip, sign16
-pointer	im, pix, sp, temp, opix, sp1, hdr, src
+pointer	infile, im, pix, sp, temp, opix, sp1, hdr, src
 
-int	clpopni(), clplen(), clgfil(), clgeti()
+int	clplen(), clgfil(), clgeti()
 int	open(), read()
 bool	clgetb()
-pointer	immap(), impl2s(), impl2l()
+pointer	clpopni(), immap(), impl2s(), impl2l()
 
 begin
 	# Get file names

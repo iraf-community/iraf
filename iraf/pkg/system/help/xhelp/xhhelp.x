@@ -116,14 +116,13 @@ char	helpdb[ARB]				#i help database
 char	section[ARB]				#i section on which to get help
 char	opt[ARB]				#i type of help
 
-int	list
 long	fi[LEN_FINFO], db_ctime
-pointer	sp, ctrl, optn, db, fname
+pointer	list, sp, ctrl, optn, db, fname
 
 long	clktime()
-pointer	hdb_open()
+pointer	hdb_open(), fntopnb()
 bool	strne(), streq()
-int	stridxs(), finfo(), fntopnb(), fntgfnb(), get_option()
+int	stridxs(), finfo(), fntgfnb(), get_option()
 
 errchk	hdb_open
 

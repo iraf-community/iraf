@@ -9,10 +9,11 @@ include	<error.h>
 procedure t_movefiles()
 
 bool	verbose
-int	list, root_len
-pointer	sp, fname, newdir, pathname, newname, junkstr
+int	root_len
+pointer	sp, fname, newdir, pathname, newname, junkstr, list
 bool	clgetb()
-int	clpopni(), clgfil(), fnldir(), isdirectory()
+int	clgfil(), fnldir(), isdirectory()
+pointer	clpopni()
 
 begin
 	call smark (sp)

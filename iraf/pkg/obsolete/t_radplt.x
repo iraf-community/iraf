@@ -11,16 +11,17 @@ define	SZ_TITLE	512
 procedure t_radplt()
 
 char	ifile[SZ_FNAME]
-int	infile, nfiles
+int	nfiles
+pointer	infile
 
 pointer	im
 int	cboxsize, rboxsize
 real	xinit, yinit, xcntr, ycntr
 
-int	clpopni(), clplen(), clgfil()
+int	clplen(), clgfil()
 int	clgeti()
 real	clgetr()
-pointer	immap()
+pointer	immap(), clpopni()
 
 begin
 	# Get file names

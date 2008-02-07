@@ -21,9 +21,10 @@ long	ref[LEN_FINFO]
 long	t_atime, t_mtime, ltime
 
 long	clktime()
-int	clpopni(), clgfil()
+int	clgfil()
 int	finfo(), dtm_ltime()
 bool	clgetb()
+pointer	clpopni()
 
 begin
 	# Initialize.

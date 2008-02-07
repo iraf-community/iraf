@@ -21,13 +21,15 @@ char	padchar[SZ_PADCHAR]	# character for padding blocks and records
 bool	verbose			# print messages ?
 
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME], cval
-int	inlist, outlist, len_inlist, len_outlist, file_number, file_cnt
+int	len_inlist, len_outlist, file_number, file_cnt
 int	range[2 * MAX_RANGES + 1]
 int	outparam[LEN_OUTPARAM], offset, ip
+pointer	inlist, outlist
 
 bool	clgetb()
-int	fstati(), mtfile(), mtneedfileno(), fntopnb(), fntlenb(), fntgfnb()
+int	fstati(), mtfile(), mtneedfileno(), fntlenb(), fntgfnb()
 int	decode_ranges(), btoi(), clgeti(), get_next_number(), cctoc()
+pointer	fntopnb()
 include "reblock.com"
 
 begin

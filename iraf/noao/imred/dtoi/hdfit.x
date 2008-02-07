@@ -18,15 +18,16 @@ include	"hdicfit/hdicfit.h"
 procedure t_hdfit ()
 
 pointer	sp, fcn, device, db, gt, exp, wts, save, trans, weight
-pointer	dbfile, ic, den, errs
-int	db_list, order, interactive, nsave, nvals, wt_type, update
+pointer	dbfile, ic, den, errs, db_list
+int	order, interactive, nsave, nvals, wt_type, update
 real	ref_fog, real_fog
 double	fog, maxden
 
 pointer	ddb_map(), gt_init()
 bool	clgetb(), fp_equalr(), fp_equald()
-int	clpopni(), clgeti(), strncmp(), clgfil(), hd_fit()
+int	clgeti(), strncmp(), clgfil(), hd_fit()
 real	ic_getr()
+pointer	clpopni()
 
 begin
 	call smark  (sp)

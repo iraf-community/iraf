@@ -21,11 +21,12 @@ int	i, j, fd, nfeatures1, nfeatures2
 double	shift1, pix, fit, pix_shift, fit_shift, z_shift
 pointer	sp, log, ec
 
-int	imtopenp(), ec_getim(), clpopnu(), clgfil(), open(), btoi()
+int	imtopenp(), ec_getim(), clgfil(), open(), btoi()
 double	ec_fitpt(), ec_fittopix(), ec_shift(), ec_center(), ec_rms()
 double	clgetd()
 bool	clgetb()
 real	clgetr()
+pointer	clpopnu()
 errchk	ec_dbread(), ec_gdata(), ec_fitdata()
 
 begin

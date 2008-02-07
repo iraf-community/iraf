@@ -16,11 +16,12 @@ procedure t_ccxymatch()
 
 bool	verbose
 double	lngin, latin, tlngin, tlatin
-int	ilist, rlist, olist, xcol, ycol, lngcol, latcol, lngunits, latunits
+int	xcol, ycol, lngcol, latcol, lngunits, latunits
 int	match, maxntriangles, nreject, rfd, rpfd, ifd, ofd, pfd
 int	ntrefstars, nreftie, nrefstars, nrmaxtri, nreftri, nintie, ntie
 int	ntliststars, nliststars, ninter, ninmaxtri, nintri, proj
 pointer	sp, inname, refname, outname, refpoints, xreftie, yreftie
+pointer	ilist, rlist, olist
 pointer	xintie, yintie, coeff, projection, str
 pointer	xformat, yformat, lngformat, latformat
 pointer	lngref, latref, xref, yref, rlineno, rsindex, reftri, reftrirat
@@ -30,11 +31,12 @@ real	pseparation, separation, ratio
 
 bool	clgetb()
 double	clgetd()
-int	fstati(), clpopnu(), clplen(), clgeti(), clgwrd(), open(), clgfil()
+int	fstati(), clplen(), clgeti(), clgwrd(), open(), clgfil()
 int	rg_getrefcel(), rg_rdlli(), rg_sort(), rg_factorial(), rg_triangle()
 int	rg_getreftie(), rg_lincoeff(), rg_rdxyi(), rg_llintersect()
 int	rg_match(), rg_mlincoeff(), cc_rdproj(), strdic()
 real	clgetr()
+pointer	clpopnu()
 errchk	open()
 
 begin

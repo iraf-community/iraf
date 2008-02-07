@@ -16,15 +16,15 @@ int	verify				# verify the critical parameters
 int	update				# update the parameter set
 int	cache				# cache the input image pixels
 
-pointer	sp, outfname, im, psfim, dao, str
-int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
-int	rlist, lrlist, root, grp, nst, rejfd, wcs, req_size, old_size
+pointer	sp, outfname, im, psfim, dao, str, alist, olist, rlist
+int	imlist, limlist, lalist, pimlist, lpimlist, lolist
+int	lrlist, root, grp, nst, rejfd, wcs, req_size, old_size
 int	buf_size, memstat
 bool	ap_text
 
-pointer	immap(), tbtopn()
+pointer	immap(), tbtopn(), fntopnb()
 int	strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
-int	access(), imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb()
+int	access(), imtopen(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
 

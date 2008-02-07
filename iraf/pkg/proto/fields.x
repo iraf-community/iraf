@@ -8,13 +8,14 @@ include "fi.h"
 
 procedure t_fields ()
 
-pointer	sp, f_str, l_str, fin
+pointer	sp, f_str, l_str, fin, list
 bool	quit, name
-int	list, fields[MAX_FIELDS], lines[3, MAX_LINES], nfields, nlines
+int	fields[MAX_FIELDS], lines[3, MAX_LINES], nfields, nlines
 int	ranges[3,MAX_RANGES], nranges
 
 bool	clgetb()
-int	decode_ranges(), fi_decode_ranges(), clpopni(), clgfil()
+int	decode_ranges(), fi_decode_ranges(), clgfil()
+pointer	clpopni()
 
 begin
 	# Allocate space on stack for char buffers

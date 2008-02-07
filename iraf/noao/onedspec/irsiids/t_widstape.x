@@ -22,13 +22,13 @@ pointer	idsout			# IDSOUT file or root name to be written
 int	block_size		# Block size
 bool	ebcdic			# ASCII or EBCDIC
 
-int	i, mfd, root, nrecs
-pointer	sp, im, mw, sh, ptr
+int	i, mfd, nrecs
+pointer	sp, im, mw, sh, ptr, root
 
-int	open(), mtopen(), clgeti(), clpopni()
+int	open(), mtopen(), clgeti()
 int	get_next_image(), decode_ranges(), mtfile(), mtneedfileno()
 bool	clgetb()
-pointer	immap(), smw_openim()
+pointer	clpopni(), immap(), smw_openim()
 errchk	immap, smw_openim, shdr_open, wrt_ids_rec
 
 begin

@@ -14,7 +14,7 @@ pointer	im1			#I pointer to the input image
 pointer	im2			#I pointer to the output image
 pointer	db			#I pointer to the databas file
 int	dformat			#I the database file format
-int	reglist			#I the regions / photometry file descriptor
+pointer	reglist			#I the regions / photometry file descriptor
 int	rpfd			#I the reference photometry file descriptor
 int	ipfd			#I the input photometry file descriptor
 int	sfd			#I the shifts file descriptor
@@ -28,9 +28,9 @@ int	ncmd, nref, nim, ival, fd
 pointer	sp, cmd, str
 real	rval
 bool	streq()
-int	strdic(), rg_lstati(), rg_lregions(), open(), fntopnb(), nscan()
+int	strdic(), rg_lstati(), rg_lregions(), open(), nscan()
 int	rg_lrphot(), access(), rg_lmkxy(), rg_lmkregions()
-pointer	immap(), dtmap()
+pointer	fntopnb(), immap(), dtmap()
 real	rg_lstatr()
 errchk	immap(), open(), fntopnb()
 

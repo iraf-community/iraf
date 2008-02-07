@@ -14,8 +14,10 @@ procedure t_head()
 
 char	fname[SZ_FNAME]
 bool	multiple_files
-int	nlines, list
-int	clpopni(), clplen(), clgfil(), clgeti()
+int	nlines
+pointer	list
+int	clplen(), clgfil(), clgeti()
+pointer	clpopni()
 
 begin
 	list = clpopni ("input_files")

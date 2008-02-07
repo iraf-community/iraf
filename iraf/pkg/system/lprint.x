@@ -18,14 +18,15 @@ define	SZ_DDSTR	256
 
 procedure t_lprint()
 
-int	out, list, map_cc
+int	out, map_cc
 bool	input_redirected, one_file
 bool	print_heading, auto_header
-pointer	sp, fname, device, label, lp, ddstr
+pointer	sp, fname, device, label, lp, ddstr, list
 
 pointer	ttyodes()
 bool	streq(), clgetb()
-int	clpopni(), clplen(), envgets(), lpopen(), clgfil(), ttygets(), btoi()
+int	clplen(), envgets(), lpopen(), clgfil(), ttygets(), btoi()
+pointer	clpopni()
 string	printer "printer"
 errchk	clgfil, lp_print_file
 

@@ -19,7 +19,7 @@ bool	headeronly		# if set, just print the header
 bool	robust			# if set, ignore wrong observation type
 pointer	files			# file list for multiple tape files
 
-int	listin			# list of input images
+pointer	listin			# list of input images
 int	listout			# list of output images
 bool	selfbuf, rootflag
 int	nfiles, filenumber, stat
@@ -29,8 +29,9 @@ int	filerange[2 * MAX_RANGES + 1]
 bool	clgetb()
 int	get_next_number(), mtneedfileno()
 int	strlen(), decode_ranges()
-int	fntopnb(), imtopenp(), clgfil(), imtgetim(), clplen(), imtlen()
+int	imtopenp(), clgfil(), imtgetim(), clplen(), imtlen()
 int	mtfile()
+pointer	fntopnb()
 errchk	vt_rfd
 
 begin

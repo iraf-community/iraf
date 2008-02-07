@@ -13,10 +13,10 @@ procedure t_skyxymatch()
 
 bool	verbose
 double	xmin, xmax, ymin, ymax, x1, x2, y1, y2
-int	olist, clist, cfd, ofd
+int	cfd, ofd
 int	nx, ny, wcs, min_sigdigits, xcolumn, ycolumn, xunits, yunits
 int	rstat, stat, npts
-pointer	ilist, rlist
+pointer	olist, clist, ilist, rlist
 pointer	sp, refimage, image, xformat, yformat, rxformat, ryformat
 pointer	rwxformat, rwyformat, txformat, tyformat, twxformat, twyformat, str
 pointer	imr, im, mwr, mw, coor, coo, ctr, ct
@@ -24,10 +24,10 @@ pointer	rxl, ryl, rxw, ryw, trxw, tryw, ixl, iyl
 
 bool	clgetb(), streq()
 double	clgetd()
-int	fntopnb(), clgeti(), clgwrd(), strdic(), imtlen()
+int	clgeti(), clgwrd(), strdic(), imtlen()
 int	fntlenb(), imtgetim(), fntgfnb(), open(), mw_stati(), sk_decim()
 int	rg_rdxy(), rg_xytoxy(), sk_stati()
-pointer	imtopen(), immap()
+pointer	fntopnb(), imtopen(), immap()
 errchk	mw_gwattrs()
 
 begin

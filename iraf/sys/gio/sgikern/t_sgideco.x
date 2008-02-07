@@ -12,11 +12,12 @@ define	LEN_MCBUF	3000
 
 procedure t_sgidecode()
 
-pointer	sp, fname, mcbuf, ip, itop
-int	fd, list, verbose, gkiunits, nwords
+pointer	sp, fname, mcbuf, ip, itop, list
+int	fd, verbose, gkiunits, nwords
 
 bool	clgetb()
-int	clpopni(), clgfil(), clplen(), open(), btoi(), miireads()
+int	clgfil(), clplen(), open(), btoi(), miireads()
+pointer	clpopni()
 
 begin
 	call smark (sp)

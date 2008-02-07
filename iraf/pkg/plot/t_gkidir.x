@@ -10,9 +10,10 @@ define	SZ_TEXT		(5 * SZ_LINE)
 
 procedure t_gkidir () 
 
-pointer	sp, mc_fname
-int	list, mfd
-int	clpopni(), open(), clgfil()
+pointer	sp, mc_fname, list
+int	mfd
+int	open(), clgfil()
+pointer	clpopni()
 
 begin
 	call smark (sp)

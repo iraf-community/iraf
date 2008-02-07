@@ -13,7 +13,7 @@ include "../lib/apfile.h"
 
 procedure t_apfile ()
 
-int	photfiles	# pointer to the list of photometry files
+pointer	photfiles	# pointer to the list of photometry files
 pointer	columnstr	# pointer to the list of columns
 int	naperts		# number of apertures to extract
 int	mode		# the file mode for the log and plot files
@@ -29,9 +29,9 @@ int	incat, apcat, magfd, logfd, plotfd, obs, csp, cp, nincolumns, npts
 pointer	sp, column, incolumns, obscolumns, fname, params
 pointer	imtable, imid, id, x, y, nap, rap, mag, merr, sortimid, gd, mgd
 bool	clgetb()
-int	clpopnu(), clplen(), ph_agrange(), open(), btoi(), clgeti()
+int	clplen(), ph_agrange(), open(), btoi(), clgeti()
 int	ctoi(), clgfil(), ph_amkimtable(), fstati()
-pointer	stopen(), gopen()
+pointer	clpopnu(), stopen(), gopen()
 real	clgetr()
 
 begin

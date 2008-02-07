@@ -36,11 +36,11 @@ double	crsearch		# Search radius
 int	i, fd, nlogfd
 pointer	sp, logfile, str, id, logfd, pd
 
-int	clscan(), clgeti(), clpopnu(), clgfil(), clgwrd()
+int	clscan(), clgeti(), clgfil(), clgwrd()
 int	nscan(), open(), btoi(), nowhite(), imtopenp(), imtgetim()
 bool	clgetb(), strne()
 double	clgetd()
-pointer	gopen(), gt_init()
+pointer	clpopnu(), gopen(), gt_init()
 
 begin
 	call smark (sp)

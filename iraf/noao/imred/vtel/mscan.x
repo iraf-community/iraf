@@ -20,12 +20,14 @@ bool	brief			# flag to make brief file names
 char	tapename[SZ_FNAME]
 char	diskfile[SZ_LINE]
 int	filerange[2 * MAX_RANGES + 1]
-int	nfiles, filenumber, recsize, listin
+int	nfiles, filenumber, recsize
+pointer	listin
 
 bool	clgetb()
 int	decode_ranges(), get_next_number(), mscan()
-int	fntopnb(), clgfil(), mtneedfileno()
+int	clgfil(), mtneedfileno()
 int	mtfile()
+pointer	fntopnb()
 errchk	mscan
 
 begin

@@ -15,11 +15,13 @@ char	in_file[SZ_FNAME]		# output file name list
 bool    verbose				# verbose mode ?
 
 char	out_fname[SZ_FNAME]
-int	ncards, file_number, nlines, list, len_list
+int	ncards, file_number, nlines, len_list
+pointer	list
 
 bool	clgetb()
-int	fstati(), clpopni(), clplen(), mtfile(), mtneedfileno()
+int	fstati(), clplen(), mtfile(), mtneedfileno()
 int	clgeti(), clgfil(), strlen(), btoi()
+pointer	clpopni()
 include "wcardimage.com"
 
 begin

@@ -15,7 +15,7 @@ include "../lib/obsfile.h"
 
 procedure t_obsfile ()
 
-int	photfiles	# pointer to the list of photometry files
+pointer	photfiles	# pointer to the list of photometry files
 pointer	columnstr	# pointer to the list of input columns
 pointer	infilters	# pointer to the input list of filter ids
 int	normtime	# normalize to an exposure time of 1 time unit
@@ -31,10 +31,10 @@ pointer	objid, x, y, mag, merr, imid, id
 real	minmagerr
 
 bool	clgetb()
-int	clpopnu(), clgfil(), open(), clplen(), ph_filters(), ph_getlabels()
+int	clgfil(), open(), clplen(), ph_filters(), ph_getlabels()
 int	ctoi(), ph_setimtable(), ph_esetimtable(), ph_mkimtable(), btoi()
 int	access()
-pointer	stopen()
+pointer	clpopnu(), stopen()
 real	clgetr()
 
 begin

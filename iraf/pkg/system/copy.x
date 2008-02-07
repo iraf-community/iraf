@@ -10,11 +10,12 @@ include	<error.h>
 
 procedure t_copy()
 
-int	list, root_len
+int	root_len
 bool	verbose
-pointer	sp, infile, destination, outfile, junkstr, dirname
+pointer	sp, infile, destination, outfile, junkstr, dirname, list
 bool	clgetb()
-int	clpopni(), clgfil(), clplen(), fnldir(), isdirectory()
+int	clgfil(), clplen(), fnldir(), isdirectory()
+pointer	clpopni()
 
 begin
 	call smark (sp)

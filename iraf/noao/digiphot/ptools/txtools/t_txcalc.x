@@ -10,9 +10,10 @@ pointer	outfile		# the output file list
 pointer	field		# pointer to the field to be edited
 pointer	value		# pointer to the value expression string
 
-int	inlist, tp_in, tp_out, nrecs
-pointer	sp
-int	clpopnu(), access(), open(), fstati(), clgfil(), pt_xcalc()
+int	tp_in, tp_out, nrecs
+pointer	sp, inlist
+int	access(), open(), fstati(), clgfil(), pt_xcalc()
+pointer	clpopnu()
 
 begin
 	# Set the standard output to flush on newline.

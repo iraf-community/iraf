@@ -81,8 +81,8 @@ define	C		2.99792456E18
 define	ST_SZSTRING	99			# Length of strings
 define	ST_LEN		154			# Structure length
 
-define	ST_TAB		Memi[P2I($1)]		# Tables pointer
-define	ST_SEARCH	Memi[P2I($1+1)]		# Search list
+define	ST_TAB		Memp[$1]		# Tables pointer
+define	ST_SEARCH	Memp[$1+1]		# Search list
 define	ST_SPEC		Memi[P2I($1+2)]		# Spectrum type
 define	ST_PARAM	Memr[P2R($1+3)]		# Spectrum parameter
 define	ST_THERMAL	Memr[P2R($1+4)]		# Thermal background temperature

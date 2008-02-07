@@ -17,12 +17,12 @@ define	MAX_WIDTH	10	# Maximum format width for pixel data
 
 procedure t_ridsout ()
 
-pointer	sp, cp
-int	fd
+pointer	sp, cp, fd
 char	in_fname[SZ_FNAME]
-int	get_data_type(), clpopni(), clgfil(), btoi()
+int	get_data_type(), clgfil(), btoi()
 bool	clgetb()
 char	clgetc()
+pointer	clpopni()
 errchk	clpopni
 
 begin

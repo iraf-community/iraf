@@ -37,15 +37,16 @@ define	PROMPT		"Gkimosaic Options"
 
 procedure t_gkimosaic ()
 
-pointer	sp, device, output, input, vp, ip, wcs
+pointer	sp, device, output, input, vp, ip, wcs, inlist
 bool	fill, rotate, clear_screen
-int	in, nx, ny, inlist, out, interactive, nwcs, buflen
+int	in, nx, ny, out, interactive, nwcs, buflen
 int	nplots_page, index, lastp, nplot, nfiles, nf, pcounter
 long	fpos, length_mc
 bool	clgetb(), streq()
-int	open(), clgeti(), clpopni(), clgfil(), btoi(), fstati(), gm_interact()
+int	open(), clgeti(), clgfil(), btoi(), fstati(), gm_interact()
 int	clplen()
 long	gm_rwframe()
+pointer	clpopni()
 
 
 begin

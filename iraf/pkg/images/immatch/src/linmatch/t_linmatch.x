@@ -16,16 +16,16 @@ int	dformat			#I write the output file in database format
 int	interactive		#I interactive mode ?
 int	verbose			#I verbose mode
 
-int	reglist, reclist, stat, nregions, shiftslist
+int	stat, nregions
 int	rpfd, ipfd, sfd
-pointer	list1, listr, list2
+pointer	reglist, reclist, shiftslist, list1, listr, list2
 pointer	sp, reference, imager, image1, imtemp, image2, str, str1, shifts
 pointer	ls, db, gd, id, imr, im1, im2
 bool	clgetb()
-int	fntopnb(), imtlen(), fntlenb(), access(), btoi(), open()
+int	imtlen(), fntlenb(), access(), btoi(), open()
 int	rg_lstati(), imtgetim(), fntgfnb(), rg_lregions(), rg_lscale()
 int	rg_lrphot(), rg_liscale()
-pointer	imtopen(), dtmap(), gopen(), immap()
+pointer	fntopnb(), imtopen(), dtmap(), gopen(), immap()
 real	rg_lstatr()
 errchk	gopen()
 

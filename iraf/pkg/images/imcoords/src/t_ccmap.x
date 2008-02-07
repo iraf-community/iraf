@@ -33,18 +33,19 @@ procedure t_ccmap ()
 
 pointer	sp, infile, image, database, insystem, lngref, latref, refsystem, str
 pointer	graphics, coo, refcoo, tcoo, mw, fit, im, out, gd, projstr
-pointer	imlist, reclist
+pointer	imlist, reclist, inlist, reslist
 double	dlngref, dlatref, tdlngref, tdlatref, xmin, xmax, ymin, ymax, reject
-int	inlist, ninfiles, nimages, coostat, refstat, in, nchars, ip 
+int	ninfiles, nimages, coostat, refstat, in, nchars, ip 
 int	xcolumn, ycolumn, lngcolumn, latcolumn, lngunits, latunits, res, pfd
-int	lngrefunits, latrefunits, refpoint_type, projection, reslist, nresfiles
+int	lngrefunits, latrefunits, refpoint_type, projection, nresfiles
 int	geometry, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int	nrecords, pixsys, maxiter
 bool	verbose, update, interactive
 
 double	clgetd()
 pointer	dtmap(), immap(), gopen(), cc_utan(), cc_imtan(), imtopenp(), imtopen()
-int	clpopnu(), clplen(), imtlen(), clgeti(), clgwrd(), strlen()
+pointer	clpopnu()
+int	clplen(), imtlen(), clgeti(), clgwrd(), strlen()
 int	sk_decwcs(), sk_stati(), imtgetim(), clgfil(), open(), ctod()
 int	errget(), strncmp(), cc_rdproj(), strdic()
 bool	clgetb()

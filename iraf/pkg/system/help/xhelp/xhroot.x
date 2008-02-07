@@ -12,11 +12,11 @@ procedure xh_root_pkg (xh)
 
 pointer	xh				#i struct pointer.
 
-pointer sp, fname, buf, ip, op, lp
-int     list
+pointer sp, fname, buf, ip, op, lp, list
 
 int     xh_pkglist()
-int     gstrcpy(), fntopnb(), fntgfnb()
+int     gstrcpy(), fntgfnb()
+pointer	fntopnb()
 bool    strne()
 
 begin

@@ -23,9 +23,10 @@ pointer	formatstr		# pointer to the output format string
 pointer	catdir			# pointer to the standard star directory
 
 int	i, j, vcol, ecol, pindex, dummy, stat, getid, matchid
-int	obslist, stdlist, plist, ofd, ifd, sym, symvar, ncols, nstd, nset
+int	ofd, ifd, sym, symvar, ncols, nstd, nset
 int	ntrneqs, nparams, nstdvars, nustdvars, nobsvars, nvars, nueq, maxnset
 int	len_plist, refcode
+pointer	obslist, stdlist, plist
 pointer	sp, input, starname, dummyname, stdtable, omap, cmap
 pointer	vars, eqvartable, uservars, usererrs, userset, eqset, tvars
 pointer	dtvars, avtvars, ervars, svars, servars, params, errors, psym, pcols
@@ -33,11 +34,11 @@ pointer	varindex, eqindex
 real	resid, chisqr, rms, pval
 
 bool	clgetb()
-int	fntopnb(), fntgfnb(), clgwrd(), open(), io_gcoeffs(), io_gobs()
+int	fntgfnb(), clgwrd(), open(), io_gcoeffs(), io_gobs()
 int	pr_parse(), pr_geti(), pr_gsym(), pr_gsymi(), pr_gvari(), ph_objcheck()
 int	ph_invert(), pr_findmap1(), ph_iereqn(), ph_ierval(), ph_seteqn()
 int	ph_mkplist(), fntlenb(), ph_ofields(), ph_iheader(), ph_setvar()
-pointer	pr_xgetname(), pr_gsymp()
+pointer	fntopnb(), pr_xgetname(), pr_gsymp()
 real	pr_eval()
 errchk	io_gcoeffs()
 
@@ -587,11 +588,12 @@ int	nset			# number of set equations
 int	etype			# type of error output
 int	matchid			# is it possible to match ids ?
 
-int	i, olist, slist, ncols
+int	i, ncols
+pointer	olist, slist
 pointer sp, time, name, sym
-int	fntopnb(), fntgfnb(), pr_gsym()
+int	fntgfnb(), pr_gsym()
 long	clktime()
-pointer	pr_xgetname(), pr_gsymp()
+pointer	fntopnb(), pr_xgetname(), pr_gsymp()
 
 begin
 	# Allocate some working space.

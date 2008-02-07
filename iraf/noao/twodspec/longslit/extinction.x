@@ -20,8 +20,8 @@ include	<error.h>
 
 procedure t_extinction()
 
-int	list1			# List of images to be corrected
-int	list2			# List of extinction corrected images
+pointer	list1			# List of images to be corrected
+pointer	list2			# List of extinction corrected images
 char	table[SZ_FNAME]		# Extinction table filename
 
 bool	extcor
@@ -30,9 +30,9 @@ int	fd, nalloc, len_table
 real	wavelen, ext
 pointer	im1, im2, w, e
 
-int	clpopnu(), fscan(), nscan(), open(), clgfil()
+int	fscan(), nscan(), open(), clgfil()
 bool	imgetb(), streq()
-pointer	immap()
+pointer	clpopnu(), immap()
 
 errchk	ext_cor()
 

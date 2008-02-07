@@ -8,10 +8,10 @@ int procedure at_svlist (surveys, imdb)
 char	surveys[ARB]		#I the input image survey list
 char	imdb[ARB]		#I the input image survey database file
 
-pointer	sp, stemplate, svname, cq
-int	i, svlist, len_stemplate, strfd, svno
-pointer	cq_map()
-int	fntopnb(), fntlenb(), fntrfnb(), stropen(), cq_setcat(), strlen()
+pointer	sp, stemplate, svname, cq, svlist
+int	i, len_stemplate, strfd, svno
+pointer	cq_map(), fntopnb()
+int	fntlenb(), fntrfnb(), stropen(), cq_setcat(), strlen()
 int	cq_stati(), cq_locaten()
 errchk	fntopnb()
 
@@ -87,10 +87,10 @@ int procedure at_catlist (catalogs, catdb)
 char	catalogs[ARB]		#I the input catalog list
 char	catdb[ARB]		#I the input catalog database file
 
-pointer	sp, ctemplate, catname, hdrtext, cq
-int	i, catlist, len_ctemplate, strfd, catno, tmpfd
-pointer	cq_map()
-int	fntopnb(), fntlenb(), fntrfnb(), stropen(), cq_setcat(), strlen()
+pointer	sp, ctemplate, catname, hdrtext, cq, catlist
+int	i, len_ctemplate, strfd, catno, tmpfd
+pointer	cq_map(), fntopnb()
+int	fntlenb(), fntrfnb(), stropen(), cq_setcat(), strlen()
 int	cq_stati(), cq_locaten(), access(), open(), at_gcathdr()
 bool	streq()
 errchk	fntopnb()
@@ -370,10 +370,10 @@ char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 int     append                  #I test for existence of file ?
 
-pointer	sp, dirname, fname, fcname, symlist, symbol, otemplate, st
-int	i, j, olist, len_dir, len_otemplate, strfd
-pointer	sthead(), stnext(), at_statp()
-int	fntopnb(), fntlenb(), stnsymbols(), fntrfnb(), fnldir(), strncmp()
+pointer	sp, dirname, fname, fcname, symlist, symbol, otemplate, st, olist
+int	i, j, len_dir, len_otemplate, strfd
+pointer	sthead(), stnext(), at_statp(), fntopnb()
+int	fntlenb(), stnsymbols(), fntrfnb(), fnldir(), strncmp()
 int	strlen(), stropen(), access()
 errchk	fntopnb()
 
@@ -612,7 +612,8 @@ int     maxch                           #I the  maximum number of characters
 char    period
 int     newversion, version, len
 pointer sp, list, name
-int     fntgfnb() strldx(), ctoi(), fntopnb()
+int     fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
 errchk  fntopnb()
 
 begin

@@ -17,7 +17,7 @@ procedure t_cosmicrays ()
 
 int	list1			# List of input images to be cleaned
 int	list2			# List of output images
-int	list3			# List of output bad pixel files
+pointer	list3			# List of output bad pixel files
 real	threshold		# Detection threshold
 real	fluxratio		# Luminosity boundary for stars
 int	npasses			# Number of cleaning passes
@@ -34,9 +34,9 @@ pointer	x, y, z, w, sf1, sf2, cr, data, ptr
 
 bool	clgetb(), ccdflag(), streq(), strne()
 char	clgetc()
-int	imtopenp(), imtlen(), imtgetim(), clpopnu(), clgfil(), clgeti()
+int	imtopenp(), imtlen(), imtgetim(), clgfil(), clgeti()
 real	clgetr()
-pointer	immap(), impl2r(), imgs2r(), gopen(), gt_init()
+pointer	clpopnu(), immap(), impl2r(), imgs2r(), gopen(), gt_init()
 errchk	immap, impl2r, imgs2r
 errchk	cr_find, cr_examine, cr_replace, cr_plot, cr_badpix
 

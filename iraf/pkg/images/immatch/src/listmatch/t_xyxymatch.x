@@ -14,11 +14,12 @@ include "../../../lib/xyxymatch.h"
 procedure t_xyxymatch()
 
 bool	interactive, verbose
-int	ilist, rlist, olist, rfd, rpfd, ifd, ofd
+int	rfd, rpfd, ifd, ofd
 int	xcol, ycol, xrefcol, yrefcol, maxntriangles, nreftie, nintie
 int	ntie, match, nrefstars, nliststars, ninter, nrmaxtri, nreftri
 int	ninmaxtri, nintri, ntrefstars, ntliststars, nreject
 pointer	sp, inname, refname, outname, refpoints, str, xreftie, yreftie
+pointer	ilist, rlist, olist
 pointer	xintie, yintie, coeff, xref, yref, rlineno, rsindex, reftri, reftrirat
 pointer	xlist, ylist, listindex, ilineno, xtrans, ytrans, intri, intrirat
 pointer	xformat, yformat
@@ -26,11 +27,12 @@ real	tolerance, separation, xin, yin, xmag, ymag, xrot, yrot, xout, yout
 real	ratio
 
 bool	clgetb()
-int	clpopnu(), clplen(), clgeti(), clgfil(), open(), clgwrd()
+int	clplen(), clgeti(), clgfil(), open(), clgwrd()
 int	rg_getreftie(), rg_lincoeff(), fstati(), rg_rdxyi(), rg_sort()
 int	rg_intersection(), rg_factorial(), rg_triangle(), rg_match()
 int	rg_mlincoeff()
 real	clgetr()
+pointer	clpopnu()
 
 begin
 	if (fstati (STDOUT, F_REDIR) == NO)

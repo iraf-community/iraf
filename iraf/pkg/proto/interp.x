@@ -25,15 +25,16 @@ define	SPLINE		2
 procedure t_interpolate()
 
 double	x, y, x1, x2, dx
-pointer	xtab, ytab
+pointer	xtab, ytab, filelist
 int	npts, ierr, tbsize
-int	filelist, tbl, in, imode
+int	tbl, in, imode
 char	fname[SZ_FNAME], tbl_file[SZ_FNAME], mode[SZ_FNAME]
 bool	gen
 
-int	clpopni(), clgfil(), open(), fscan(), strncmp(), nscan()
+int	clgfil(), open(), fscan(), strncmp(), nscan()
 real	clgetr()
 bool	clgetb()
+pointer	clpopni()
 
 begin
 	# Initialize interpolator

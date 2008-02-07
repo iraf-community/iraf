@@ -545,14 +545,14 @@ pointer procedure hdb_open (database)
 char	database[ARB]		#I name of database to be opened
 
 bool	no_entries_interchanged
-pointer	sp, fname, files, hp, db, d_op, i_op, ix, p1, p2, db_save
-int	nfiles, nints, list, fd, d_len, i_len, i, temp[LEN_HDBINDEX]
+pointer	sp, fname, files, hp, db, d_op, i_op, ix, p1, p2, db_save, list
+int	nfiles, nints, fd, d_len, i_len, i, temp[LEN_HDBINDEX]
 
 long	clktime()
 bool	streq(), strgt()
-pointer	hd_open(), hdb_make_rhd()
+pointer	hd_open(), hdb_make_rhd(), fntopnb()
 int	open(), mii_readi(), mii_readc()
-int	envgets(), access(), fntopnb(), fntgfnb()
+int	envgets(), access(), fntgfnb()
 errchk	calloc, realloc, malloc, open, seek, syserrs
 errchk	hd_open, fntopnb, fntgfnb, hdb_make_rhd, hdb_getdata
 define	rejectfile_ 91
@@ -943,13 +943,13 @@ int	fd			# output file
 char	helpdb[ARB]		# filename of database to be examined
 bool	verbose			# print menus as well
 
-int	list, i
+int	i
 long	fi[LEN_FINFO]
-pointer	sp, fname, date, db, ixoff, ix
+pointer	list, sp, fname, date, db, ixoff, ix
 
 bool	strne()
-pointer	hdb_open()
-int	finfo(), fntopnb(), fntgfnb()
+pointer	hdb_open(), fntopnb()
+int	finfo(), fntgfnb()
 errchk	hdb_open, hdb_printpack, fntopnb, fntgfnb
 
 begin

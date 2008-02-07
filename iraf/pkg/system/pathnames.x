@@ -8,10 +8,10 @@
 
 procedure t_pathnames()
 
-int	list
-pointer	sp, fname, osfname
+pointer	sp, fname, osfname, list
 bool	streq(), clgetb()
-int	clgeti(), clpopni(), clpopnu(), clgfil(), fscan()
+int	clgeti(), clgfil(), fscan()
+pointer	clpopni(), clpopnu()
 
 begin
 	call smark (sp)

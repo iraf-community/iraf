@@ -9,9 +9,10 @@ int	tp_in		# input file descriptor
 int	tp_out		# output file descriptor
 pointer	expr		# pointer to the expression string
 
-int	inlist, outlist
+pointer	inlist, outlist
 pointer	sp, infile, outfile
-int	clpopnu(), clplen(), access(), open(), fstati(), clgfil(), pt_xselect()
+int	clplen(), access(), open(), fstati(), clgfil(), pt_xselect()
+pointer	clpopnu()
 
 begin
 	# Set the standard output to flush on newline.

@@ -7,10 +7,12 @@ procedure t_entab()
 
 char	tablist[SZ_LINE], line[SZ_LINE], outline[SZ_LINE]
 char	in_fname[SZ_FNAME]
-int	list, in, nchars
+int	in, nchars
+pointer	list
 
-int	clpopni(), decode_tablist(), tabs[SZ_LINE], clgfil(), getline()
+int	decode_tablist(), tabs[SZ_LINE], clgfil(), getline()
 int	gstrentab(), open()
+pointer	clpopni()
 
 begin
 	list = clpopni ("files")

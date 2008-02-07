@@ -6,14 +6,14 @@ include	<imhdr.h>
 
 procedure t_coincor ()
 
-int	root, start_rec, ccmode, npts, nrecs, coflag
+int	start_rec, ccmode, npts, nrecs, coflag
 real	dtime, power, expo
-pointer	sp, image, ofile, str, recs, imin, imout, pixin, pixout
+pointer	sp, image, ofile, str, recs, imin, imout, pixin, pixout, root
 
-int	clpopni(), clgeti(), clgwrd(), imgeti()
+int	clgeti(), clgwrd(), imgeti()
 int	get_next_image(), decode_ranges()
 real	clgetr(), imgetr()
-pointer	immap(), imgl1r(), impl1r()
+pointer	clpopni(), immap(), imgl1r(), impl1r()
 errchk	coincor
 
 begin

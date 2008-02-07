@@ -41,8 +41,9 @@ double	clgetd()
 int	imtopenp(), imtlen(), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
 int	mtfile(), strmatch(), btoi(), fnextn(), strcmp()
 int	save_sdasmg, save_ieee, tape, save_scale
-int	fntopnb(), flist, fntgfnb() 
-int	fntlenb(), nimages, strldxs(), access(), strncmp()
+pointer	flist
+int	fntgfnb(), fntlenb(), nimages, strldxs(), access(), strncmp()
+pointer	fntopnb()
 int     nch, fits_fd, nerrors, ip
 
 data	fits_record/2880/

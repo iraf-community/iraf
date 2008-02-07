@@ -10,20 +10,20 @@ procedure t_wcsxymatch()
 
 bool	verbose, transpose
 double	xmin, xmax, ymin, ymax, x1, x2, y1, y2
-int	olist, clist, cfd, ofd
+int	cfd, ofd
 int	nx, ny, npts, wcs, xcolumn, ycolumn
 int	xunits, yunits, min_sigdigits, axstat, projstat
-pointer	ilist, rlist
+pointer	olist, clist, ilist, rlist
 pointer	sp, refimage, image, xformat, yformat, rxformat, ryformat
 pointer	wxformat, wyformat, str, paxno, rlaxno, laxno
 pointer	im, imr, mw, mwr, rxl, ryl, rxw, ryw, ixl, iyl, ctr, ct
 
 bool	clgetb(), streq()
 double	clgetd()
-int	fntopnb(), imtlen(), fntlenb(), imtgetim(), open(), clgeti()
+int	imtlen(), fntlenb(), imtgetim(), open(), clgeti()
 int	clgwrd(), rg_rdxy(), fntgfnb(), rg_axstat(), rg_projstat(), mw_stati()
 int	strdic()
-pointer	imtopen(), immap(), mw_openim(), rg_xytoxy()
+pointer	fntopnb(), imtopen(), immap(), mw_openim(), rg_xytoxy()
 errchk	mw_openim(), mw_gwattrs()
 
 begin

@@ -19,10 +19,12 @@ char	from_string[NCHARS], to_string[NCHARS]
 char	to[NCHARS], from[NCHARS], lut[NCHARS], infile[SZ_FNAME], endto
 char	line[SZ_LINE], lastchar
 int	del[NCHARS], collap[NCHARS]
-int	list, delete, allbut, lastfrom, lastto, collapse, in, i, op, nchars
+int	delete, allbut, lastfrom, lastto, collapse, in, i, op, nchars
+pointer	list
 
 bool	clgetb()
-int	clpopni(), makeset(), strlen(), clgfil(), open(), getline()
+int	makeset(), strlen(), clgfil(), open(), getline()
+pointer	clpopni()
 
 begin
 	call fseti (STDOUT, F_FLUSHNL, YES)

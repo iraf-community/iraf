@@ -78,7 +78,8 @@ pointer	sp, fname, buf
 pointer	dbfiles
 
 int	open()
-int	clpopni(), clplen(), clgfil()
+int	clplen(), clgfil()
+pointer	clpopni()
 
 errchk	open, clpopni
 

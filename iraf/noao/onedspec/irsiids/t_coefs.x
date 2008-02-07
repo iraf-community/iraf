@@ -4,7 +4,7 @@ include	<error.h>
 
 procedure t_coefs ()
 
-int	root			# List of input root names
+pointer	root			# List of input root names
 pointer	database		# Output database directory
 
 int	i, nrecs, ncoefs
@@ -12,8 +12,8 @@ real	coef
 pointer	sp, image, dtname, recs, im, dt
 
 real	imgetr()
-int	clpopni(), imgeti(), get_next_image(), decode_ranges()
-pointer	immap(), dtmap1()
+int	imgeti(), get_next_image(), decode_ranges()
+pointer	clpopni(), immap(), dtmap1()
 errchk	imgetr, dtmap1
 
 begin

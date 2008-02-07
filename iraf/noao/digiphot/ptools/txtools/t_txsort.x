@@ -8,10 +8,12 @@ procedure t_txsort ()
 int	tp_in		# input file descriptor
 int	tp_out		# input file descriptor
 
-int	inlist, ascend, nrecs
+int	ascend, nrecs
+pointer	inlist
 pointer	sp, infile, outfile, column
 bool	clgetb()
-int	clpopnu(), clgfil(), access(), btoi(), open(), fstati(), pt_sortnum()
+int	clgfil(), access(), btoi(), open(), fstati(), pt_sortnum()
+pointer	clpopnu()
 
 begin
 	# Set the standard output to flush on newline.

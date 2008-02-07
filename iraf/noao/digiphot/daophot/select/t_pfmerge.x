@@ -14,11 +14,11 @@ pointer	inphotfiles		# the input photometry files
 pointer	outphotfile		# the output photometry file
 bool	verbose			# verbose output ?
 
-int	plist, lplist, infd, outfd, first_file, in_text, out_text
-pointer	sp, infname
+int	lplist, infd, outfd, first_file, in_text, out_text
+pointer	plist, sp, infname
 bool	clgetb()
-int	fstati(), fntopnb(), fntlenb(), fntgfnb(), access(), open()
-pointer	tbtopn()
+int	fstati(), fntlenb(), fntgfnb(), access(), open()
+pointer	tbtopn(), fntopnb()
 
 begin
 	# Set the standard output to flush on newline.

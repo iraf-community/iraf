@@ -6,10 +6,11 @@
 
 procedure t_unique()
 
-int	list, fd
-pointer	sp, fname, old_line, new_line, temp
+int	fd
+pointer	sp, fname, old_line, new_line, temp, list
 bool	streq()
-int	getline(), clpopni(), clgfil(), clplen(), open()
+int	getline(), clgfil(), clplen(), open()
+pointer	clpopni()
 
 begin
 	call smark (sp)

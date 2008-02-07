@@ -10,12 +10,13 @@ procedure t_match()
 
 bool	stop_matched_lines		# pass or stop matched lines?
 char	chset[2]
-int	fd, list
-pointer	sp, ip, line, fname, patbuf, pattern
+int	fd
+pointer	sp, ip, line, fname, patbuf, pattern, list
 bool	line_matches, encode_pattern, print_file_names, match_pattern
 bool	clgetb()
 int	strmatch(), strsearch(), patmatch(), patmake(), stridxs()
-int	open(), getline(), clpopni(), clplen(), clgfil()
+int	open(), getline(), clplen(), clgfil()
+pointer	clpopni()
 
 begin
 	call smark (sp)

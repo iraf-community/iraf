@@ -25,16 +25,17 @@ int	verbose			# verbose mode
 int	cache			# cache the image pixels
 
 pointer	im, cnv, sky, sp, outfname, denname, skyname, str
-pointer	ap, cname, display, graphics, id, gd
-int	limlist, lolist, densave, skysave, out, root, stat, imlist, olist
+pointer	ap, cname, display, graphics, id, gd, olist
+int	limlist, lolist, densave, skysave, out, root, stat, imlist
 int	wcs, req_size, old_size, buf_size, memstat
 
 real	clgetr()
 pointer	gopen(), immap(), ap_immap()
 int	imtlen(), clplen(), btoi(), clgwrd(), aptmpimage()
 int	open(), strncmp(), strlen(), fnldir(), ap_fdfind()
-int	imtopenp(), clpopnu(), clgfil(), imtgetim(), ap_memstat(), sizeof()
+int	imtopenp(), clgfil(), imtgetim(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
+pointer	clpopnu()
 
 begin
 	# Flush STDOUT on a new line.

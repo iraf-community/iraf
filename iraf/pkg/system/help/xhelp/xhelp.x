@@ -124,11 +124,11 @@ procedure xh_ghelpdb (xh)
 
 pointer	xh					# task descriptor
 
-pointer	sp, hdb, hdbstr, name
-int	list
-int	fntopnb(), fntgfnb()
+pointer	sp, hdb, hdbstr, name, list
+int	fntgfnb()
 int	access(), envgets()
 bool	streq()
+pointer	fntopnb()
 
 begin
 	call smark (sp)

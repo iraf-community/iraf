@@ -23,12 +23,13 @@ The CLPOPNI procedure creates a dummy list containing the single filename
 # input has been redirected, create a dummy list containing the single file
 # name "STDIN", and do not try to access the template parameter.
 
-int procedure clpopni (param)
+pointer procedure clpopni (param)
 
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
-int	fntopnb(), fstati()
+pointer	fntopnb()
+int	fstati()
 
 begin
 	call smark (sp)
@@ -51,12 +52,12 @@ end
 # CLPOPNS -- Open a sorted list (sorted list of files, not associated with any
 # particular byte stream).
 
-int procedure clpopns (param)
+pointer procedure clpopns (param)
 
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
-int	fntopnb()
+pointer	fntopnb()
 
 begin
 	call smark (sp)
@@ -75,12 +76,12 @@ end
 # CLPOPNU -- Open an unsorted list (unsorted list of files, not associated
 # with any particular stream).
 
-int procedure clpopnu (param)
+pointer procedure clpopnu (param)
 
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
-int	fntopnb()
+pointer	fntopnb()
 
 begin
 	call smark (sp)

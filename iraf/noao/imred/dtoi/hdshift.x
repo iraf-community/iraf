@@ -8,12 +8,12 @@ include	<math/curfit.h>
 
 procedure t_hdshift ()
 
-pointer	sp, de, fun, save, db, cv, ps_coeff, den, exp, cvf
-int	fd, rec, nsave, ncoeff, nvalues, i, nfile, junk
+pointer	sp, de, fun, save, db, cv, ps_coeff, den, exp, cvf, fd
+int	rec, nsave, ncoeff, nvalues, i, nfile, junk
 real	a0, ref_a0
 
-pointer	ddb_map()
-int	clpopni(), ddb_locate(), ddb_geti(), cvstati(), strncmp(), clgfil()
+pointer	ddb_map(), clpopni()
+int	ddb_locate(), ddb_geti(), cvstati(), strncmp(), clgfil()
 
 begin
 	# Allocate space on stack for string buffers

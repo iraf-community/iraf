@@ -11,7 +11,7 @@ define	LEN_UA		20000			# Maximum user header
 procedure t_mkheader ()
 
 int	imlist			# List of images
-int	flist			# List of data files
+pointer	flist			# List of data files
 bool	append			# Append to existing keywords?
 bool	verbose			# Verbose output?
 
@@ -19,8 +19,8 @@ int	stat
 pointer	im, sp, image, fname
 
 bool	clgetb()
-int	imtopenp(), clpopnu(), clplen(), imtgetim(), clgfil()
-pointer	immap()
+int	imtopenp(), clplen(), imtgetim(), clgfil()
+pointer	clpopnu(), immap()
 
 begin
 	call smark (sp)

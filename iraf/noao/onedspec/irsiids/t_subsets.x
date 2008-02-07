@@ -10,16 +10,16 @@ procedure t_subsets ()
 
 pointer	image
 pointer	recstr, ofile
-int	root, start_rec, subset
+int	start_rec, subset
 int	nrecs
 int	npts, nrem, ifile, tog
 real	expo, wtsum
-pointer	sp, recs, im[2], cur_pix, sp_sum
+pointer	sp, recs, im[2], cur_pix, sp_sum, root
 
 real	imgetr()
-int	clpopni(), clgeti()
+int	clgeti()
 int	get_next_image(), decode_ranges()
-pointer	immap(), imgl1r()
+pointer	clpopni(), immap(), imgl1r()
 
 begin
 	call smark (sp)

@@ -16,8 +16,8 @@ bool	newtape			# new or used tape ?
 char	in_fname[SZ_FNAME]	# input file name
 char	out_fname[SZ_FNAME]	# output file name
 
-pointer	imlist
-int	flist, nimages, nfiles, file_number
+pointer	imlist, flist
+int	nimages, nfiles, file_number
 bool	clgetb()
 double	clgetd()
 int	imtlen(), wft_get_bitpix(), clgeti(), imtgetim()

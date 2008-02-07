@@ -17,14 +17,15 @@ define	swap		{temp=$1;$1=$2;$2=temp}
 
 procedure t_sort()
 
-pointer	linbuf, linptr
+pointer	linbuf, linptr, list
 int	infil[MERGEORDER], nlines
 char	name[SZ_FNAME], source_file[SZ_FNAME]
-int	high, lim, low, fd, outfil, t, list, junk
+int	high, lim, low, fd, outfil, t, junk
 
 bool	clgetb()
 int	ss_gtext(), ss_mkfile()
-int	open(), clpopni(), clplen(), clgfil(), clgeti(), btoi()
+int	open(), clplen(), clgfil(), clgeti(), btoi()
+pointer	clpopni()
 include	"sort.com"
 
 begin

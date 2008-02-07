@@ -8,16 +8,17 @@ include	<gki.h>
 
 procedure t_imdkern()
 
-int	fd, list, dbfd
-pointer	gki, sp, fname, devname, dbfname
+int	fd, dbfd
+pointer	list, gki, sp, fname, devname, dbfname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 int	color, frame
 
 bool	clgetb()
 int	clgeti(), envfind()
-int	clpopni(), clgfil(), open(), btoi()
+int	clgfil(), open(), btoi()
 int	gki_fetch_next_instruction()
+pointer	clpopni()
 
 begin
 	call smark (sp)

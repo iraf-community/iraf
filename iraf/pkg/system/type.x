@@ -9,10 +9,11 @@ procedure t_type()
 
 char	fname[SZ_FNAME], device[SZ_FNAME]
 bool	multiple_files
-int	map_cc, list
-pointer	tty, ttyodes()
+int	map_cc
+pointer	list
+pointer	tty, ttyodes(), clpopni()
 bool	clgetb()
-int	clpopni(), clplen(), clgfil(), btoi()
+int	clplen(), clgfil(), btoi()
 
 begin
 	list = clpopni ("input_files")

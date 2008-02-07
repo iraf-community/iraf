@@ -12,15 +12,15 @@ pointer	apfile				# aperture photometry file
 pointer	psfimage			# name of the output PSF
 pointer	groupfile			# output group table
 
-pointer	sp, im, dao, outfname, str
+pointer	sp, im, dao, outfname, str, alist, olist
 int	apd, root, cache, verbose, verify, update, grp, tp, wcs
-int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
+int	imlist, limlist, lalist, pimlist, lpimlist, lolist
 int	req_size, old_size, buf_size, memstat
 bool	ap_text
 
-pointer	immap(), tbtopn()
+pointer	immap(), tbtopn(), fntopnb()
 int	access(), fnldir(), strlen(), strncmp(), fstati(), btoi()
-int	imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
+int	imtopen(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	open(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
 

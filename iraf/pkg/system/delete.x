@@ -11,12 +11,12 @@ bool	verify			# verify before deleting
 bool	allversions		# delete all versions of each file
 bool	subfiles		# delete any subfiles of a file
 char	fname[SZ_FNAME]
-int	list
+pointer	list
 pointer	tty
 
 bool	clgetb()
-int	clpopns(), clgfil(), access(), btoi()
-pointer	ttyodes()
+int	clgfil(), access(), btoi()
+pointer	clpopns(), ttyodes()
 
 begin
 	list = clpopns ("files")

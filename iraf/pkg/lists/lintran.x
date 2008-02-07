@@ -26,11 +26,12 @@ define	SIN_THETA	Memr[P2R($1+8)]
 procedure t_lintran()
 
 char	in_fname[SZ_FNAME]
-int	list
+pointer	list
 pointer	sp, tr
 int	xfield, yfield, min_sigdigits
 
-int 	clgeti(), clpopni(), clgfil()
+int 	clgeti(), clgfil()
+pointer	clpopni()
 
 begin
 	# Allocate memory for transformation parameters structure

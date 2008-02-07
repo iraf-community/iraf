@@ -10,7 +10,7 @@ procedure t_fitparams()
 
 pointer	observations		# list of observations files
 pointer	catalogs		# list of standard catalogs
-int	stdlist			# file list of standards
+pointer	stdlist			# file list of standards
 pointer	config			# pointer to configuration file name
 pointer	output			# pointer to output file name
 pointer	logfile			# pointer to the output log file
@@ -25,13 +25,15 @@ bool	interactive		# interactive fit ?
 pointer	catdir			# the standard catalogs directory
 pointer graphics		# pointer to the graphics device name
 
-int	obslist, nstd, nobs, nstdvars, getid
+int	nstd, nobs, nstdvars, getid
+pointer	obslist
 pointer	sp, dir, str, otable, ntable, stable
 
 bool	clgetb()
-int	fntopnb(), fntlenb(), clgeti(), clgwrd(), btoi(), pr_parse(), pr_geti()
+int	fntlenb(), clgeti(), clgwrd(), btoi(), pr_parse(), pr_geti()
 int	fnldir(), access()
 real	clgetr()
+pointer	fntopnb()
 
 begin
 	# Allocate working space.

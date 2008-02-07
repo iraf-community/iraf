@@ -125,10 +125,10 @@ bool	redirin, useroot
 pointer	sp, fname, newfname, tty, lbuf
 int	spoolfd, list, nfiles, cmd, i, j, n, o
 
-pointer	ttyodes()
+pointer	ttyodes(), fntopnb()
 bool	ttygetb()
 int	strncmp(), strlen()
-int	fntopnb(), fntrfnb(), fntlenb(), fnldir()
+int	fntrfnb(), fntlenb(), fnldir()
 int	pg_getcmd(), pg_pagefile(), fstati()
 errchk	fntopnb, ttyodes, ttygetb, fntrfnb, pg_pagefile, pg_getcmd
 define	err_ 91

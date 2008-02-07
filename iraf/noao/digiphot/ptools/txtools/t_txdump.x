@@ -11,10 +11,11 @@ pointer	expr			# boolean expression to be evaluated
 int	headers			# format the output
 int	parameters		# print the headers
 
-int	list, fd
-pointer	sp
+int	fd
+pointer	sp, list
 bool	clgetb()
-int	clpopnu(), clgfil(), open(), btoi()
+int	clgfil(), open(), btoi()
+pointer	clpopnu()
 
 begin
 	# Allocate working space.

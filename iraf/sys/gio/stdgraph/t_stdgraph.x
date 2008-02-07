@@ -11,14 +11,15 @@ define	SZ_TXQUALITY	1
 
 procedure t_stdgraph()
 
-int	fd, list
+int	fd
 char	txquality[SZ_TXQUALITY]
-pointer	gki, sp, fname, devname
+pointer	list, gki, sp, fname, devname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits, xres, yres, quality
 bool	clgetb()
-int	clpopni(), clgfil(), open(), btoi(), clgeti()
+int	clgfil(), open(), btoi(), clgeti()
 int	gki_fetch_next_instruction()
+pointer	clpopni()
 
 begin
 	call smark (sp)

@@ -5,9 +5,11 @@ include	<fset.h>
 procedure t_galactic ()
 
 char	fname[SZ_FNAME]
-int	filelist, prt_coords, in_coords
+int	prt_coords, in_coords
+pointer	filelist
 bool	streq(), clgetb()
-int	clpopni(), clgfil(), btoi(), clgwrd()
+int	clgfil(), btoi(), clgwrd()
+pointer	clpopni()
 
 begin
 	# Input can come from the standard input, a file, or a list of files.

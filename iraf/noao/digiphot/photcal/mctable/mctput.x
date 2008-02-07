@@ -488,3 +488,4 @@ begin
 	base = MCT_DATA (table) + (row - 1) * MCT_MAXCOL (table)
 	Memp[base + col - 1] = value
 end
+

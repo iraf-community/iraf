@@ -28,16 +28,16 @@ define	SZ_TEMPBUF	SZ_HELPDB
 
 procedure t_help()
 
-int	ncols, nlines, list, out_device
+int	ncols, nlines, out_device
 long	fi[LEN_FINFO], db_ctime
 char	helpdb[SZ_HELPDB], device[SZ_FNAME]
 bool	output_is_not_redirected, file_template
-pointer	sp, ctrl, option, tempbuf, db, tty, fname, tempdev
+pointer	list, sp, ctrl, option, tempbuf, db, tty, fname, tempdev
 
 long	clktime()
-pointer	ttyodes(), hdb_open()
+pointer	ttyodes(), hdb_open(), fntopnb()
 bool	strne(), streq(), clgetb()
-int	btoi(), stridxs(), finfo(), fntopnb(), fntgfnb(), strdic()
+int	btoi(), stridxs(), finfo(), fntgfnb(), strdic()
 int	clgeti(), get_option(), fstati(), envgets(), envgeti()
 
 data	tty /NULL/, db_ctime /0/

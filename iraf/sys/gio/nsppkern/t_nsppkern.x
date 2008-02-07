@@ -8,13 +8,14 @@ include	<gki.h>
 
 procedure t_nsppkern()
 
-int	fd, list
-pointer	gki, sp, fname, devname
+int	fd
+pointer	list, gki, sp, fname, devname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 bool	clgetb()
-int	clpopni(), clgfil(), open(), btoi()
+int	clgfil(), open(), btoi()
 int	gki_fetch_next_instruction()
+pointer	clpopni()
 
 begin
 	call smark (sp)

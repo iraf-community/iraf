@@ -116,7 +116,9 @@ end
 procedure t_fnl()
 
 char	fname[SZ_FNAME]
-int	list, clpopns(), clgfil(), clplen()
+pointer	list
+int	clgfil(), clplen()
+pointer	clpopns()
 
 begin
 	list = clpopns ("files")

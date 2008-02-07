@@ -9,7 +9,7 @@ procedure t_fceval ()
 
 pointer	input			# File of input coordinates
 pointer	output			# File of output coordinates
-int	fitnames		# List of user coordinate fits
+pointer	fitnames		# List of user coordinate fits
 pointer	database		# Database
 
 int	i, j, in, out, nsf[2]
@@ -18,8 +18,9 @@ pointer	sp, fitname, sf[2], un[2], sf1, un1
 
 bool	un_compare()
 int	open(), fscan(), nscan()
-int	clpopnu(), clplen(), clgfil()
+int	clplen(), clgfil()
 double	dgseval()
+pointer	clpopnu()
 errchk	open, lm_dbread
 
 begin

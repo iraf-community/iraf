@@ -16,7 +16,8 @@ pointer	images					# Image name to be added
 pointer	ofile					# Output image file name
 pointer	recstr					# Record number string
 int	recs					# Spectral record numbers
-int	root, nrecs				# CL and ranges flags
+pointer	root					# CL and ranges flags
+int	nrecs
 real	expo					# Exposure time
 pointer	bstat[2]				# Status of each aperture
 pointer	npts[2]					# Length of spectrum
@@ -30,9 +31,9 @@ int	i, j
 pointer	sp, work, im
 
 real	imgetr()
-int	clgeti(), clpopni(), imgeti()
+int	clgeti(), imgeti()
 int	get_next_image(), decode_ranges()
-pointer	immap()
+pointer	clpopni(), immap()
 
 begin
 	call smark (sp)

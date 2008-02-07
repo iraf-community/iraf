@@ -12,15 +12,16 @@ procedure t_fitcoords ()
 int	list1			# Image list
 char	fitname[SZ_FNAME]	# Database name for coordinate fit
 char	database[SZ_FNAME]	# Database
-int	logfiles		# List of log files
+pointer	logfiles		# List of log files
 bool	combine			# Combine input data?
 int	interactive		# Interactive?
 
 char	image[SZ_FNAME], prompt[SZ_LINE]
 int	list2
 
-int	clgeti(), clpopnu(), imtopen(), fc_getim()
+int	clgeti(), imtopen(), fc_getim()
 bool	clgetb()
+pointer	clpopnu()
 
 begin
 	# Get the task parameters.

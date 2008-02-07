@@ -24,14 +24,14 @@ pointer	graphics		# the graphics device
 pointer	display			# the display device
 bool	mkstars			# mark deleted and accepted psf stars
 
-pointer	sp, pfd, dao, outfname, curfile, str, im, gd, id, mgd
-int	imlist, limlist, alist, lalist, olist, lolist, root, apd, pmgd, pltype
+pointer	sp, pfd, dao, outfname, curfile, str, im, gd, id, mgd, alist, olist
+int	imlist, limlist, lalist, lolist, root, apd, pmgd, pltype
 int	wcs, req_size, old_size, buf_size, memstat()
 bool	ap_text
 
-pointer	immap(), gopen()
+pointer	immap(), gopen(), fntopnb()
 int	tbtopn(), open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
-int	access(), fntopnb(), fntlenb(), clgeti(), imtopen(), imtlen()
+int	access(), fntlenb(), clgeti(), imtopen(), imtlen()
 int	fntgfnb(), imtgetim(), strdic(), dp_stati(), clgwrd(), sizeof()
 int	dp_memstat()
 bool	clgetb(), itob(), streq()

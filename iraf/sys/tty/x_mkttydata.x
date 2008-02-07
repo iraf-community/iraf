@@ -64,11 +64,12 @@ define	TC_CAPLIST	Memi[TC_CAPLIST_P($1)+$2-1]
 procedure t_mkttydata()
 
 bool	verbose
-int	devlist, fd, ndev, buflen
+int	fd, ndev, buflen
+pointer	devlist
 pointer	sp, termcap_file, output_file, devname, tc, tty
 bool	clgetb()
-int	clpopnu(), clgfil(), tc_putstr(), open(), tc_dummy_ttyload()
-pointer	ttyopen()
+int	clgfil(), tc_putstr(), open(), tc_dummy_ttyload()
+pointer	clpopnu(), ttyopen()
 extern	tc_dummy_ttyload()
 errchk	open, tc_write_data_declarations, clgfil, tc_putstr, malloc, realloc
 

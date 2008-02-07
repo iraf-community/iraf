@@ -2,7 +2,7 @@
 
 procedure t_joinlines ()
 
-int	list			# List of input files
+pointer	list			# List of input files
 int	out			# Output file descriptor
 pointer	delim			# Delimiter string
 pointer	missing			# Missing string
@@ -14,7 +14,8 @@ char	c
 pointer	sp, fname, fds
 int	i, j, in
 int	nfiles, nlines, neof, nchars, ntruncate, nlong, ndelim, nmissing
-int	fntopnb(), clplen(), clgfil(), clgeti(), open(), strlen()
+int	clplen(), clgfil(), clgeti(), open(), strlen()
+pointer	fntopnb()
 char	getc()
 bool	clgetb()
 

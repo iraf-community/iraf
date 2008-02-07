@@ -6,8 +6,8 @@ include <tbset.h>
 
 procedure t_tbkeycol ()
 
-int	tlist				# the tables list descriptor
-int	klist				# the keywords list descriptor
+pointer	tlist				# the tables list descriptor
+pointer	klist				# the keywords list descriptor
 
 bool	bval
 double	dval
@@ -16,9 +16,9 @@ pointer	sp, table, keyword, keyvalue, format, tp, colptr
 real	rval
 
 bool	itob()
-int	clpopnu(), clgfil(), clplen(), tbpsta(), strlen(), access()
+int	clgfil(), clplen(), tbpsta(), strlen(), access()
 int	ctoi(), ctor(), ctod()
-pointer	tbtopn()
+pointer	clpopnu(), tbtopn()
 errchk	tbtopn()
 
 begin

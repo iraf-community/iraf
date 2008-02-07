@@ -10,8 +10,9 @@ define	NTYPES		7		# the number of image data types
 
 procedure t_rfits()
 
-int	inlist, outlist, len_inlist, len_outlist
+int	len_inlist, len_outlist
 int	file_number, offset, stat, first_file, last_file
+pointer	inlist, outlist
 pointer	sp, infile, file_list, outfile, ext_list, in_fname, out_fname
 pointer	pl, axes
 

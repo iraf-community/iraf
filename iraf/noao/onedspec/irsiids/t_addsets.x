@@ -17,8 +17,8 @@ include	<imhdr.h>
 procedure t_addsets ()
 
 pointer	image
-pointer	recstr, ofile
-int	root, start_rec, subset
+pointer	recstr, ofile, root
+int	start_rec, subset
 int	nrecs
 int	nrem, ifile, ca_flag
 real	itm, expo, wt, wtsum
@@ -26,10 +26,10 @@ bool	weight
 pointer	sp, recs, im, cur_pix, sp_sum
 
 real	imgetr()
-int	clpopni(), clgeti(), imgeti()
+int	clgeti(), imgeti()
 int	get_next_image(), decode_ranges()
 bool	clgetb()
-pointer	immap(), imgl1r()
+pointer	clpopni(), immap(), imgl1r()
 
 begin
 	call smark (sp)

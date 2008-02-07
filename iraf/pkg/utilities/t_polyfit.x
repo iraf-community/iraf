@@ -36,9 +36,11 @@ procedure t_polyfit()
 
 char	fname[SZ_FNAME], weights[SZ_FNAME]
 bool	verbose, listdata
-int	filelist, order, weighting
-int	clpopni(), clgfil(), clgeti(), clgwrd()
+int	order, weighting
+pointer	filelist
+int	clgfil(), clgeti(), clgwrd()
 bool	clgetb()
+pointer	clpopni()
 define	exit_ 91
 
 begin

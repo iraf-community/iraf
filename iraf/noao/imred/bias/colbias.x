@@ -21,7 +21,7 @@ procedure colbias ()
 
 int	listin				# List of input images
 int	listout				# List of output images
-int	logfiles			# List of log files
+pointer	logfiles			# List of log files
 char	biassec[SZ_FNAME]		# Bias section
 char	trimsec[SZ_FNAME]		# Trim section
 int	median				# Use median of bias section?
@@ -41,11 +41,11 @@ char	title[SZ_LINE]
 int	logfd
 pointer	in, bias, out, ic, gt
 
-int	clgeti(), clpopnu(), clgfil(), open(), gt_init(), nowhite()
+int	clgeti(), clgfil(), open(), gt_init(), nowhite()
 int	imtopen(), imtlen(), imtgetim(), btoi()
 bool	clgetb()
 long	clktime()
-pointer	immap()
+pointer	immap(), clpopnu()
 real	clgetr()
 
 begin

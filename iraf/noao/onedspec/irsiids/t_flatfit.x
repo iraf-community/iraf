@@ -40,7 +40,8 @@ pointer	ofile					# Output image file name
 int	function				# Fitting function
 int	order					# Order of fitting function
 int	recs					# Spectral record numbers
-int	root, nrecs				# CL and ranges flags
+pointer	root					# CL and ranges flags
+int	nrecs
 real	expo					# Exposure time
 real	dtime					# Deadtime
 real	power					# Power law coin. correction
@@ -61,11 +62,11 @@ int	niter
 int	i
 pointer	sp, str, im
 
-int	clgeti(), clgwrd(), clpopni(), imgeti()
+int	clgeti(), clgwrd(), imgeti()
 int	get_next_image(), decode_ranges()
 real	clgetr(), imgetr()
 bool	clgetb()
-pointer	immap()
+pointer	clpopni(), immap()
 
 begin
 	call smark (sp)

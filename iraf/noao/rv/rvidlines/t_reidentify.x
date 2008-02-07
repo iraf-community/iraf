@@ -56,11 +56,11 @@ char	ans[3]			# Interactive?
 int	i, fd, nlogfd
 pointer	sp, logfile, str, id, logfd, pd
 
-int	clscan(), clgeti(), clpopnu(), clgfil(), clgwrd(), btoi()
+int	clscan(), clgeti(), clgfil(), clgwrd(), btoi()
 int	nscan(), open(), nowhite(), imtopenp(), imtgetim()
 bool	clgetb()
 real	clgetr()
-pointer	gopen(), gt_init()
+pointer	clpopnu(), gopen(), gt_init()
 
 begin
 	call smark (sp)

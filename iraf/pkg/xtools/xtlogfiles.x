@@ -15,10 +15,11 @@ char	prefix[ARB]		#I String to preceed sysid info
 pointer	logfd			#O Pointer to array of open file descriptors
 int	stdflag			#O Flag that STDOUT or ERR is in the list
 
-int	loglist, nlogfd, fd, i
-pointer	linebuf, fname, sp
+int	nlogfd, fd, i
+pointer	loglist, linebuf, fname, sp
 
-int	clpopnu(), clplen(), clgfil(), open()
+int	clplen(), clgfil(), open()
+pointer	clpopnu()
 errchk	open
 
 begin

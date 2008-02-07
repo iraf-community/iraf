@@ -4,19 +4,21 @@ include <pkg/skywcs.h>
 procedure t_skyctran()
 
 bool	verbose, transform, first_file
-int	inlist, outlist, linlist, loutlist, lngcolumn, latcolumn, infd, outfd
+int	linlist, loutlist, lngcolumn, latcolumn, infd, outfd
 int	ilngunits, ilatunits, olngunits, olatunits, min_sigdigits, optype
 int	instat, outstat, nilng, nilat, plngcolumn, platcolumn, pxcolumn
 int	rvcolumn
 double	ilngmin, ilngmax, ilatmin, ilatmax
 int	fstati()
 pointer	sp, inname, outname, insystem, outsystem, olngformat, olatformat
+pointer	inlist, outlist
 pointer	ilngformat, ilatformat, str, mwin, mwout, cooin, cooout
 
 bool	clgetb(), streq()
 double	clgetd()
-int	clpopnu(), clplen(), clgfil(), open(), sk_decwcs()
+int	clplen(), clgfil(), open(), sk_decwcs()
 int	clgeti(), clgwrd(), sk_stati()
+pointer	clpopnu()
 errchk	clgwrd()
 
 begin

@@ -8,9 +8,11 @@ include	<error.h>
 procedure t_protect()
 
 char	fname[SZ_FNAME]
-int	list, status
+int	status
+pointer	list
 
-int	clpopns(), clgfil(), protect()
+int	clgfil(), protect()
+pointer	clpopns()
 
 begin
 	list = clpopns ("files")

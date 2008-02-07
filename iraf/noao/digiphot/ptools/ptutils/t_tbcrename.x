@@ -4,13 +4,13 @@ include <tbset.h>
 
 procedure t_tbcrename ()
 
-int	tlist			# the tables list descriptor
-int	columns			# the input columns list descriptor
-int	names			# the output column names list descriptor
+pointer	tlist			# the tables list descriptor
+pointer	columns			# the input columns list descriptor
+pointer	names			# the output column names list descriptor
 
 pointer	sp, table, incname, outcname, tp, colptr
-int	clpopnu(), clplen(), clgfil(), access(), tbpsta()
-pointer	tbtopn()
+int	clplen(), clgfil(), access(), tbpsta()
+pointer	tbtopn(), clpopnu()
 
 begin
 	# Open the lists of tables and keywords.

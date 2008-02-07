@@ -7,9 +7,11 @@
 procedure t_detab ()
 
 char	tablist[SZ_LINE], line[SZ_LINE], outline[SZ_LINE], in_fname[SZ_FNAME]
-int	list, nchars, in, tabs[SZ_LINE]
-int	clpopni(), decode_tablist(), clgfil(), getline()
+int	nchars, in, tabs[SZ_LINE]
+pointer	list
+int	decode_tablist(), clgfil(), getline()
 int	gstrdetab(), open()
+pointer	clpopni()
 
 begin
 	list = clpopni ("files")

@@ -23,8 +23,8 @@ procedure refopen ()
 
 bool	clgetb()
 real	clgetr()
-pointer	rng_open(), stopen()
-int	fd, btoi(), clpopnu(), clgfil(), open(), nowhite()
+pointer	rng_open(), stopen(), clpopnu()
+int	fd, btoi(), clgfil(), open(), nowhite()
 errchk	open()
 
 include	"refspectra.com"

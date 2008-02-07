@@ -11,7 +11,7 @@ procedure rg_pcolon (gd, pm, imr, reglist, impsf, im1, imk, imfourier, im2,
 pointer	gd			#I pointer to the graphics stream
 pointer	pm			#I pointer to psfmatch structure
 pointer	imr			#I pointer to the reference image
-int	reglist			#I the regions / psf list descriptor
+pointer	reglist			#I the regions / psf list descriptor
 pointer	impsf			#I pointer to the regions list
 pointer	im1			#I pointer to the input image
 pointer	imk			#I pointer to kernel image
@@ -29,9 +29,9 @@ pointer	sp, cmd, str
 real	rval
 bool	itob()
 bool	streq()
-int	strdic(), nscan(), rg_pstati(), btoi(), rg_pregions(), fntopnb()
+int	strdic(), nscan(), rg_pstati(), btoi(), rg_pregions()
 int	access(), rg_pmkregions(), open(), ctor()
-pointer	immap()
+pointer	fntopnb(), immap()
 real	rg_pstatr()
 errchk	immap(), fntopnb()
 

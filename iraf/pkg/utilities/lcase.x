@@ -4,10 +4,11 @@
 
 procedure t_lcase()
 
-pointer sp, line, in_file, out_file
-int	list, in, out
+pointer sp, line, in_file, out_file, list
+int	in, out
 bool	strne()
-int	open(), clpopni(), clgfil(), getline(), clplen()
+int	open(), clgfil(), getline(), clplen()
+pointer	clpopni()
 
 begin
 	call smark (sp)

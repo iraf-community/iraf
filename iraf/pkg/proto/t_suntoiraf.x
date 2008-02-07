@@ -55,12 +55,12 @@ define	BADVALUE	0	# row value for bad read
 
 procedure t_suntoiraf ()
 
-int	infile, fd, fdtmp, i, krow, nlut, nchars, junk, nread
-pointer	fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
+int	fd, fdtmp, i, krow, nlut, nchars, junk, nread
+pointer	infile, fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
 bool	apply_lut, delete_file, verbose, listonly, yflip
 
-int	clpopni(), clgfil(), open(), strcmp(), fnroot(), fnextn(), read()
-pointer	immap(), impl2s()
+int	clgfil(), open(), strcmp(), fnroot(), fnextn(), read()
+pointer	clpopni(), immap(), impl2s()
 bool	clgetb()
 
 errchk	open, read, immap

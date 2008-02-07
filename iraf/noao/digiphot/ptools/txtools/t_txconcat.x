@@ -8,13 +8,14 @@ include "../../lib/ptkeysdef.h"
 
 procedure t_txconcat()
 
-int	list		# input file list descriptor
+pointer	list		# input file list descriptor
 int	tp_in		# input file descriptor
 int	tp_out		# output file descriptor
 
 int	len_list, first_file, stat
 pointer	sp, infile, outfile, task, task1, task2
-int	fstati(), clpopnu(), clplen(), open(), clgfil(), strncmp()
+int	fstati(), clplen(), open(), clgfil(), strncmp()
+pointer	clpopnu()
 
 begin
 	# Set the standard output to flush on newline.

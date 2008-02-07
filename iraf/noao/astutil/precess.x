@@ -6,11 +6,12 @@ include	<fset.h>
 procedure t_precess()
 
 char	fname[SZ_FNAME]
-int	filelist
+pointer	filelist
 double	default_year1, default_year2, stdepoch
 bool	streq()
 double	clgetd()
-int	clpopni(), clgfil()
+int	clgfil()
+pointer	clpopni()
 
 begin
 	# Input can come from the standard input, a file, or a list of files.

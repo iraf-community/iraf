@@ -24,12 +24,13 @@ procedure t_rename()
 bool	isdir
 pointer	sp, oldfile, newname, field
 pointer	o_ldir, o_root, o_extn, n_ldir, n_root, n_extn
-pointer	pathname, newfile, junkstr
-int	list, len, modfield
+pointer	pathname, newfile, junkstr, list
+int	len, modfield
 
 bool	streq()
-int	clpopni(), clgfil(), clplen(), stridxs()
+int	clgfil(), clplen(), stridxs()
 int	access(), fnldir(), fnroot(), fnextn(), isdirectory()
+pointer	clpopni()
 string	s_clobber "Warning: %s would overwrite existing file %s - skipping\n"
 
 begin

@@ -30,19 +30,19 @@ procedure t_sinterp()
 
 real	x, y, x1, x2, dx
 int	npts, i
-int	filelist, tbl, in
+int	tbl, in
 int	user_mode, imlen, order, maxpts
 char	fname[SZ_FNAME], tbl_file[SZ_FNAME]
 char	image[SZ_FNAME]
 char	interp[SZ_LINE]
 bool	gen, make_image
-pointer	im, pix, sp, xtab, ytab, cv
+pointer	filelist, im, pix, sp, xtab, ytab, cv
 
-int	clpopni(), clgfil(), open(), fscan(), nscan()
+int	clgfil(), open(), fscan(), nscan()
 int	clgeti(), clgwrd()
 real	clgetr()
 bool	clgetb()
-pointer	immap(), impl1r()
+pointer	clpopni(), immap(), impl1r()
 
 begin
 	# Initialize interpolator

@@ -45,17 +45,18 @@ procedure t_ccget ()
 
 double	dlngcenter, dlatcenter, dlngwidth, dlatwidth, tlngcenter, tlatcenter
 double	dlng1, dlng2, dlat1, dlat2
-int	ip, inlist, ninfiles, outlist, noutfiles, fclngunits, fclatunits
-int	fldstat, catstat, outstat, catlngunits, catlatunits, olngunits
+int	ip, ninfiles, outlist, noutfiles, fclngunits, fclatunits
+int	fldstat, catstat, catlngunits, catlatunits, olngunits
 int	olatunits, in, out
+pointer	inlist, outstat
 pointer	sp, lngcenter, latcenter, fcsystem, catsystem, outsystem, olngformat
 pointer	olatformat, lngcolumn, latcolumn, colnames, exprs, formats
 pointer	infile, outfile, str
 pointer	fldcoo, catcoo, outcoo, mw, dc, ec
 bool	verbose
 double	clgetd()
-pointer	cc_dinit(), cc_einit()
-int	clpopnu(), clplen(), ctod(), strncmp(), clgwrd(), sk_decwcs()
+pointer	cc_dinit(), cc_einit(), clpopnu()
+int	clplen(), ctod(), strncmp(), clgwrd(), sk_decwcs()
 int	sk_stati(), clgfil(), open()
 bool	clgetb(), streq()
 errchk	clgwrd()

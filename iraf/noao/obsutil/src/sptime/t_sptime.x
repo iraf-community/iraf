@@ -11,17 +11,17 @@ include	"sptime.h"
 procedure t_sptime ()
 
 bool	interactive
-int	i, j, nexp, niter, npix, nw, fd, outlist
+int	i, j, nexp, niter, npix, nw, fd
 real	nobj[4], nsky[4], time, minexp, maxexp, snr, sngoal
 real	wave, x, x1, dx, thruput, sat, dnmax
-pointer sp, str, err, st, tab, waves, counts, snrs, gp
+pointer outlist, sp, str, err, st, tab, waves, counts, snrs, gp
 
 bool	streq(), tabexists(), fp_equalr()
 int	stgeti(), strdic()
-int	clpopnu(), fntopnb(), fntgfnb(), nowhite(), open(), tabgeti()
+int	fntgfnb(), nowhite(), open(), tabgeti()
 real	stgetr(), tabgetr(), tabinterp1(), gr_mag(), gr_getr()
 real	st_x2w()
-pointer tabopen(), gopen(), un_open()
+pointer clpopnu(), fntopnb(), tabopen(), gopen(), un_open()
 errchk	tabopen, tabgeti, tabgetr, tabinterp1
 errchk	st_gtable, st_gtable1, stgeti, stgetr, st_snr, st_disperser
 errchk	open, gopen

@@ -22,17 +22,18 @@ pointer	formatstr		# pointer to the output format string
 pointer	catdir			# pointer to the standard catalogs directory
 
 int	i, j, getid, matchid, vcol, ecol, pindex, dummy, stat
-int	obslist, stdlist, plist, ofd, ifd, sym, symvar, ncols
+int	ofd, ifd, sym, symvar, ncols
 int	ntrneqs, nparams, nstd, nobsvars, nvars, len_plist
+pointer	plist, obslist, stdlist
 pointer	sp, input, starname, dummyname, stdtable, cmap, omap
 pointer	vars, uservars, usererrs, fsym, rsym, esym, params, errors, psym, pcols
 real	ref, fit, errval, resid, chisqr, rms, pval
 
 bool	clgetb()
 int	clgwrd(), open(), io_gcoeffs(), io_gobs(), pr_parse(), pr_geti()
-int	pr_gsym(), pr_gsymi(), pr_findmap1(), pr_gvari(), fntopnb()
+int	pr_gsym(), pr_gsymi(), pr_findmap1(), pr_gvari()
 int	fntgfnb(), fntlenb(), ph_mkplist(), ph_header(), ph_ofields()
-pointer	pr_gsymp(), pr_xgetname()
+pointer	fntopnb(), pr_gsymp(), pr_xgetname()
 real	pr_eval(), ph_erval()
 errchk	io_gcoeffs()
 
@@ -383,11 +384,12 @@ int	len_plist		# length of symbol list
 int	etype			# type of error output
 int	matchid			# is it possible to match ids
 
-int	i, olist, slist, ncols
+int	i, ncols
+pointer	olist, slist
 pointer sp, time, name
-int	fntopnb(), fntgfnb(), pr_geti(), pr_gsym()
+int	fntgfnb(), pr_geti(), pr_gsym()
 long	clktime()
-pointer	pr_gsymc(), pr_gsymp(), pr_xgetname()
+pointer	fntopnb(), pr_gsymc(), pr_gsymp(), pr_xgetname()
 
 begin
 	# Allocate working space.

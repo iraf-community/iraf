@@ -19,13 +19,13 @@ pointer	display			# display device
 int	cache			# cache input image pixels in memory
 int	verbose			# verbose mode	
 
-pointer	sp, outfname, cname, ap, im, gd, mgd, id, str
+pointer	sp, outfname, cname, ap, im, gd, mgd, id, str, olist, clist
 int	limlist, lclist, lolist, cl, sid, lid, out, root, stat, pfd, interactive
-int	imlist, olist, clist, memstat, wcs, req_size, old_size, buf_size
+int	imlist, memstat, wcs, req_size, old_size, buf_size
 
-pointer	immap(), gopen()
+pointer	immap(), gopen(), clpopnu()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()
-int	fnldir(), strlen(), apqphot(), imtopenp(), clpopnu(), open()
+int	fnldir(), strlen(), apqphot(), imtopenp(), open()
 int	clgwrd(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen

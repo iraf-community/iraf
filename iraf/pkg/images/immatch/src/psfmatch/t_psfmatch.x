@@ -22,9 +22,9 @@ int	nregions, newref, stat
 pointer	list1, listr, psflist, listk, list2
 pointer	sp, imtemp, str, pm, gd, id, imr, im1, impsf, imk, im2
 bool	clgetb()
-int	imtlen(), imtgetim(), fntopnb(), fntlenb(), clgwrd(), btoi()
+int	imtlen(), imtgetim(), fntlenb(), clgwrd(), btoi()
 int	rg_pstati(), rg_ptmpimage(), rg_pregions(), rg_psfm(), rg_pisfm()
-pointer	imtopen(), gopen(), immap(), rg_pstatp()
+pointer	fntopnb(), imtopen(), gopen(), immap(), rg_pstatp()
 real	clgetr()
 errchk	fntopnb(), fntclsb()
 

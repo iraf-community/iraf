@@ -12,10 +12,13 @@ pointer	coordlist	# List of coordinate file names
 pointer	label		# Coordinate axis label
 pointer	units		# Coordinate axis units
 
-int	n, fd, open(), fscan(), nscan()
-int	imtopenp, imtlen(), imtgetim(), clpopnu(), fntlenb(), fntgfnb()
-bool	verbose, clgetb()
-pointer	sp, spec, coords, values, im, tmp, immap()
+int	n, fd
+bool	verbose
+pointer	sp, spec, coords, values, im, tmp
+int	open(), fscan(), nscan()
+int	imtopenp(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
+bool	clgetb()
+pointer	clpopnu(), immap()
 
 errchk	immap, open, scoords
 

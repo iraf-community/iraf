@@ -12,7 +12,7 @@ define	ID_SAVEID	Memc[P2C($1+250)]# ID for save structure
 define	ID_LINE		Memi[P2I($1+$2+299)]	# Image line or column [2]
 define	ID_MAXLINE	Memi[P2I($1+$2+301)]	# Maximum line or column [2]
 define	ID_AP		Memi[P2I($1+$2+303)]	# Aperture if appropriate [2]
-define	ID_APS		Memi[P2I($1+306)]	# Array of apertures (pointer)
+define	ID_APS		Memp[$1+306]	# Array of apertures (pointer)
 define	ID_NSUM		Memi[P2I($1+$2+306)]	# Number of lines to sum [2]
 define	ID_MAXFEATURES	Memi[P2I($1+309)]	# Maximum number of features
 define	ID_FTYPE	Memi[P2I($1+310)]	# Feature type
@@ -22,45 +22,45 @@ define	ID_FWIDTH	Memr[P2R($1+313)]	# Feature width in pixels
 define	ID_CRADIUS	Memr[P2R($1+314)]	# Centering radius in pixels
 define	ID_THRESHOLD	Memr[P2R($1+315)]	# Centering threshold
 define	ID_ZWIDTH	Memr[P2R($1+316)]	# Zoom window width in fit units
-define	ID_LL		Memi[P2I($1+317)]	# Pointer to coordinate list lines
-define	ID_LLL		Memi[P2I($1+318)]	# Pointer to coordinate list labels
+define	ID_LL		Memp[$1+317]	# Pointer to coordinate list lines
+define	ID_LLL		Memp[$1+318]	# Pointer to coordinate list labels
 define	ID_NLL		Memi[P2I($1+319)]	# Number of coordinate list lines
 define	ID_LABELS	Memi[P2I($1+320)]	# Type of feature labels
-define	ID_LOGFILES	Memi[P2I($1+321)]	# List of logfiles
+define	ID_LOGFILES	Memp[$1+321]	# List of logfiles
 
 # Common image data
 
 define	ID_SHIFT	Memd[P2D($1+322)]# Wavelength shift
-define	ID_IMDATA	Memi[P2I($1+324)]	# Image data (pointer)
-define	ID_PIXDATA	Memi[P2I($1+325)]	# Pixel coordinates (pointer)
-define	ID_FITDATA	Memi[P2I($1+326)]	# Fit coordinates (pointer)
+define	ID_IMDATA	Memp[$1+324]	# Image data (pointer)
+define	ID_PIXDATA	Memp[$1+325]	# Pixel coordinates (pointer)
+define	ID_FITDATA	Memp[$1+326]	# Fit coordinates (pointer)
 define	ID_NPTS		Memi[P2I($1+327)]	# Number of points
 
 # Features
 
 define	ID_NFEATURES	Memi[P2I($1+328)]	# Number of features
 define	ID_NALLOC	Memi[P2I($1+329)]	# Length of allocated feature arrays
-define	ID_PIX		Memi[P2I($1+330)]	# Feature pixel coordinates (pointer)
-define	ID_FIT		Memi[P2I($1+331)]	# Feature fit coordinates (pointer)
-define	ID_USER		Memi[P2I($1+332)]	# Feature user coordinates (pointer)
-define	ID_WTS		Memi[P2I($1+333)]	# Feature weights (pointer)
-define	ID_FWIDTHS	Memi[P2I($1+334)]	# Feature width (pointer)
-define	ID_FTYPES	Memi[P2I($1+335)]	# Feature type (pointer)
-define	ID_LABEL	Memi[P2I($1+336)]	# Feature label (pointer)
+define	ID_PIX		Memp[$1+330]	# Feature pixel coordinates (pointer)
+define	ID_FIT		Memp[$1+331]	# Feature fit coordinates (pointer)
+define	ID_USER		Memp[$1+332]	# Feature user coordinates (pointer)
+define	ID_WTS		Memp[$1+333]	# Feature weights (pointer)
+define	ID_FWIDTHS	Memp[$1+334]	# Feature width (pointer)
+define	ID_FTYPES	Memp[$1+335]	# Feature type (pointer)
+define	ID_LABEL	Memp[$1+336]	# Feature label (pointer)
 define	ID_CURRENT	Memi[P2I($1+337)]	# Current feature
 
 # Pointers for other packages and to save data
 
-define	ID_SH		Memi[P2I($1+338)]	# SHDR pointer
-define	ID_LP		Memi[P2I($1+339)]	# Logical to physical transformation
-define	ID_PL		Memi[P2I($1+340)]	# Physical to logical transformation
-define	ID_IC		Memi[P2I($1+341)]	# ICFIT pointer
-define	ID_CV		Memi[P2I($1+342)]	# Curfit pointer
-define	ID_GP		Memi[P2I($1+343)]	# GIO pointer
-define	ID_GT		Memi[P2I($1+344)]	# Gtools pointer
-define	ID_STP		Memi[P2I($1+345)]	# Symbol table of saved data
-define	ID_DT		Memi[P2I($1+346)]	# Database pointer
-define	ID_UN		Memi[P2I($1+347)]	# Units pointer
+define	ID_SH		Memp[$1+338]	# SHDR pointer
+define	ID_LP		Memp[$1+339]	# Logical to physical transformation
+define	ID_PL		Memp[$1+340]	# Physical to logical transformation
+define	ID_IC		Memp[$1+341]	# ICFIT pointer
+define	ID_CV		Memp[$1+342]	# Curfit pointer
+define	ID_GP		Memp[$1+343]	# GIO pointer
+define	ID_GT		Memp[$1+344]	# Gtools pointer
+define	ID_STP		Memp[$1+345]	# Symbol table of saved data
+define	ID_DT		Memp[$1+346]	# Database pointer
+define	ID_UN		Memp[$1+347]	# Units pointer
 
 # Flags
 

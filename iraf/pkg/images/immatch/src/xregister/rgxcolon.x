@@ -27,9 +27,9 @@ bool	streq()
 int	ncmd, creg, nreg, ival, stat
 pointer	sp, cmd, str
 real	rval
-int	strdic(), open(), nscan(), rg_xstati(), fntopnb()
+int	strdic(), open(), nscan(), rg_xstati()
 int	rg_xregions(), rg_xmkregions(), strlen()
-pointer	immap(), dtmap(), rg_xstatp()
+pointer	fntopnb(), immap(), dtmap(), rg_xstatp()
 real	rg_xstatr()
 errchk	immap(), dtmap(), open(), fntopnb()
 

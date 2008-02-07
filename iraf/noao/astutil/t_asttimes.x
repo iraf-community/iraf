@@ -4,7 +4,7 @@ include	<error.h>
 
 procedure t_asttimes ()
 
-int	list			# List of files
+pointer	list			# List of files
 int	header			# Print header?
 int	year			# Year
 int	month			# Month
@@ -22,11 +22,11 @@ int	fd
 char	file[SZ_FNAME]
 pointer	obs
 
-int	clpopnu(), clplen(), clgfil(), clgeti(), btoi()
+int	clplen(), clgfil(), clgeti(), btoi()
 int	open(), fscan(), nscan()
 bool	clgetb()
 double	clgetd(), obsgetd()
-pointer	obsopen()
+pointer	clpopnu(), obsopen()
 
 begin
 	# Get parameters other than date.

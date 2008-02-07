@@ -8,14 +8,15 @@ include	<time.h>
 
 procedure t_rvcorrect ()
 
-int	list			# List of files or images
+pointer	list			# List of files or images
 int	header			# Print header?
 int	input			# Print input data?
 int	imupdate		# Update image headers?
 
-int	btoi(), clpopnu(), clplen(), imtopenp(), imtlen()
+int	btoi(), clplen(), imtopenp(), imtlen()
 bool	clgetb()
 double	clgetd()
+pointer	clpopnu()
 
 include	"rvcorrect.com"
 

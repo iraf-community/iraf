@@ -31,11 +31,12 @@ procedure t_tokens()
 bool	ignore_comments, comment_delimiter_is_eol
 bool	in_comment, pass_newlines
 char	begin_comment[SZ_COMDELIMSTR], end_comment[SZ_COMDELIMSTR]
-int	fd, list, token, last_token, last_nscan
-pointer	sp, fname, tokbuf, outstr, ip, op
+int	fd, token, last_token, last_nscan
+pointer	sp, fname, tokbuf, outstr, ip, op, list
 
 bool	streq(), clgetb()
-int	clpopni(), clgfil(), fscan(), nscan(), open(), ctocc()
+int	clgfil(), fscan(), nscan(), open(), ctocc()
+pointer	clpopni()
 
 begin
 	call smark (sp)

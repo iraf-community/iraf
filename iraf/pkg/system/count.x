@@ -26,8 +26,10 @@ procedure t_count()
 char	fname[SZ_FNAME]
 long	nlines, nwords, nchars
 long	totlines, totwords, totchars
-int	nfiles, list
-int	clpopni(), clgfil()
+int	nfiles
+pointer	list
+int	clgfil()
+pointer	clpopni()
 
 begin
 	totlines = 0

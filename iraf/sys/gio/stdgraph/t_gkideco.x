@@ -8,13 +8,14 @@ include	<gki.h>
 
 procedure t_gkidecode()
 
-int	fd, list, verbose, gkiunits
-pointer	gki, sp, fname
+int	fd, verbose, gkiunits
+pointer	list, gki, sp, fname
 int	dd[LEN_GKIDD]
 
 bool	clgetb()
-int	clpopni(), clgfil(), clplen(), open(), btoi()
+int	clgfil(), clplen(), open(), btoi()
 int	gki_fetch_next_instruction()
+pointer	clpopni()
 
 begin
 	call smark (sp)

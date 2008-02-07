@@ -19,13 +19,14 @@ define	WS_MODE		Mems[$1+GKI_OPENWS_M - 1]
 procedure t_gkiextract ()
 
 char	mc_fname[SZ_FNAME], frames_list[SZ_LINE]
-int	list, mfd, verify, nframes, junk
+int	mfd, verify, nframes, junk
 int	this_frame, frames[3,MAX_RANGES]
-pointer	index, sp
+pointer	list, index, sp
 
 bool	clgetb()
-int	clpopni(), clgfil(), open(), get_next_number()
+int	clgfil(), open(), get_next_number()
 int	decode_ranges(), btoi(), gke_user_go_ahead()
+pointer	clpopni()
 
 begin
 	# Allocate space for the index array.

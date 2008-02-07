@@ -15,16 +15,16 @@ bool	setbgnd				# flag, should we set the background?
 bool	ref				# flag, are we using a ref image
 
 int	obstime, obsdate, hour, minute, second
-int	list, nfiles
+int	nfiles
 int	month, day, year
 char	dt[DTSTRING]
 bool	istime, isdate, date, time
-pointer	imp, rimp
+pointer	list, imp, rimp
 
 bool	clgetb(), imaccf()
 int	clgeti(), imgeti()
-int	clpopni(), clplen(), clgfil()
-pointer	immap()
+int	clplen(), clgfil()
+pointer	clpopni(), immap()
 errchk	immap
 
 begin

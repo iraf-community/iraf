@@ -18,18 +18,18 @@ define	DEBUG	false
 procedure t_import ()
 
 pointer	ip					# task structure pointer
-int	binfiles				# binary files list pointer
+pointer	binfiles				# binary files list pointer
 pointer	imfiles					# output image list pointer
 int	fdb					# format database descriptor
 pointer	im					# image pointer
 pointer	sp, bfname, imname			# local storage
 pointer	format, output, fmt, idstr
 
-int	clpopni(), clplen(), imtlen()		# function definitions
+int	clplen(), imtlen()		# function definitions
 int	clgfil(), open()
 int	imtgetim(), fdb_opendb()
 int	ip_fcode(), ip_is_builtin()
-pointer	locpr(), imtopenp(), ip_init(), fdb_scan_records(), immap()
+pointer	clpopni(), locpr(), imtopenp(), ip_init(), fdb_scan_records(), immap()
 
 extern	ip_getop(), ip_dbfcn()
 errchk	clpopni, clgfil, imtopenp, open, immap

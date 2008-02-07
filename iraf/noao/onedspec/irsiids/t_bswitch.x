@@ -52,12 +52,12 @@ char	image[SZ_FNAME,MAX_NR_BEAMS+1]
 char	rec_numbers[SZ_LINE], title[SZ_LINE,MAX_NR_BEAMS]
 char	ofile[SZ_FNAME], stat_fil[SZ_FNAME]
 int	sfd, nrecsx
-int	i, infile, nrecs, def_beam, start_rec, nimage, sub_rate
+int	i, nrecs, def_beam, start_rec, nimage, sub_rate
 int	records[300], beam_stat[MAX_NR_BEAMS], ncols[MAX_NR_BEAMS]
 bool	idsmode, extinct, stat, weight, eof_test
 pointer	ids[MAX_NR_BEAMS+1] 
 pointer	imnames[MAX_NR_BEAMS]	# Hold pointers to pointers of image names
-pointer	imin, sp, obs
+pointer	infile, imin, sp, obs
 
 # The following arrays are suffixed by either 'o' for object or 's' for sky
 
@@ -66,9 +66,9 @@ real	expo  [MAX_NR_BEAMS],   exps  [MAX_NR_BEAMS]	# exposure times
 pointer	accumo[MAX_NR_BEAMS+1], accums[MAX_NR_BEAMS+1]	# beam accumulators
 pointer	counto[MAX_NR_BEAMS],   counts[MAX_NR_BEAMS]	# counts in each obs
 
-int	clpopni(), clgeti(), get_next_image(), decode_ranges()
+int	clgeti(), get_next_image(), decode_ranges()
 int	open(), mod()
-pointer	immap()
+pointer	clpopni(), immap()
 bool	clgetb(), streq()
 
 begin

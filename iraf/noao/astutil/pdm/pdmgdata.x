@@ -12,12 +12,10 @@ int procedure pdm_gdata (pdmp, infile)
 pointer	pdmp			# pointer to PDM data structure
 char	infile[SZ_LINE]		# input data file name
 
-int	fntopnb(), list, clgfil()
-int	n, ncols, lineno, buflen
-int	open(), getline(), nscan()
-int	fd
-pointer	nextfile
-pointer	lbuf, ip, sp
+int	n, ncols, lineno, buflen, fd
+pointer	nextfile, list, lbuf, ip, sp
+int	clgfil(), open(), getline(), nscan()
+pointer	fntopnb()
 errchk	realloc, fntopnb, open
 
 begin

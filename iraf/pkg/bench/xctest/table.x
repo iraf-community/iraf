@@ -16,11 +16,12 @@ define	MAXSTR_INCREMENT	128
 
 procedure t_table()
 
-int	list, first_col, last_col, ncols, maxstrlen
+int	first_col, last_col, ncols, maxstrlen
 int	fd, nextch, nstrings, maxch, sz_strbuf, max_strings, ip
-pointer	sp, strbuf, fname, stroff
-int	strlen(), fscan(), nscan(), clpopni()
+pointer	sp, strbuf, fname, stroff, list
+int	strlen(), fscan(), nscan()
 int	clgfil(), open(), envgeti(), clplen(), clgeti()
+pointer	clpopni()
 
 begin
 	# Allocate buffers.  The string buffer "strbuf", and associated list

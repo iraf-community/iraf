@@ -8,7 +8,7 @@ int	select		# Selection type
 int	time		# Is sort keyword a time?
 real	timewrap	# Timewrap parameter
 int	verbose		# Verbose output?
-int	logfiles	# List of log files
+pointer	logfiles	# List of log files
 pointer	stp		# Symbol table for previously mapped spectra
 
 common	/refcom/ aps, raps, sort, group, select, time, timewrap, verbose,

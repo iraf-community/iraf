@@ -42,14 +42,15 @@ define	FL_FNAME	Memc[FL_SBUFP($1)+(FL_OFFSET($1,$2))-1]
 
 procedure t_directory()
 
-pointer	sp, files, fname, dirname, patp, fp, ip, op, ep
+pointer	sp, files, fname, dirname, patp, fp, ip, op, ep, list
 int	ncols, maxch, dirmode, fd, n, i, patlen, len_dir
 bool	long_format, is_template, is_pattern, is_dir, sort_list, match_extension
 
 bool	clgetb(), strne()
-int	clgeti(), fntopnb(), fntgfnb()
+int	clgeti(), fntgfnb()
 int	diropen(), getline(), stridx(), strlen(), strncmp(), stridxs()
 int	isdirectory(), access(), envgeti(), btoi()
+pointer	fntopnb()
 string	patchars PATCHARS
 define	template_ 91
 define	done_ 92
@@ -227,9 +228,9 @@ begin
 	    # memory.  This also handles the cases of a single filename or
 	    # a simple list of filenames.
 template_
-	    fd = fntopnb (Memc[files], btoi(sort_list))
+	    list = fntopnb (Memc[files], btoi(sort_list))
 
-	    n  = fntgfnb (fd, Memc[fname], SZ_PATHNAME)
+	    n  = fntgfnb (list, Memc[fname], SZ_PATHNAME)
 	    while (n != EOF) {
 		ip = fname
 		if (!is_template && is_pattern)
@@ -238,10 +239,10 @@ template_
 		    call dir_putstr (fp, Memc[ip], n)
 		else if (access (Memc[fname],0,0) == YES)
 		    call dir_putstr (fp, Memc[ip], n)
-		n = fntgfnb (fd, Memc[fname], SZ_PATHNAME)
+		n = fntgfnb (list, Memc[fname], SZ_PATHNAME)
 	    }
 
-	    call fntclsb (fd)
+	    call fntclsb (list)
 	}
 
 	# All done if no files were found.

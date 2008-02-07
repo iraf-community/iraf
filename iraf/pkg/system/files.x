@@ -5,11 +5,12 @@
 
 procedure t_files()
 
-int	list
+pointer	list
 pointer	sp, template, fname
 
 bool	clgetb()
-int	fntopnb(), fntgfnb(), clgeti(), btoi()
+int	fntgfnb(), clgeti(), btoi()
+pointer	fntopnb()
 
 begin
 	call smark (sp)

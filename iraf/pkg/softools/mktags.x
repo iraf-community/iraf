@@ -28,14 +28,15 @@ procedure t_mktags()
 
 char	fname[SZ_FNAME], lbuf[SZ_LBUF], tag[SZ_FNAME]
 bool	listing, mktags
-int	fd, list, ip, ip1, ip2, op, linenum, i, j, out
+int	fd, ip, ip1, ip2, op, linenum, i, j, out
+pointer	list
 
 bool	clgetb()
 int	tg_compare()
 extern	tg_compare()
-int	clpopni(), clgfil()
+int	clgfil()
 int	open(), tg_getlongline(), gstrmatch(), stridxs()
-pointer	tg_putstr()
+pointer	clpopni(), tg_putstr()
 
 int	ntags
 pointer	tg_op

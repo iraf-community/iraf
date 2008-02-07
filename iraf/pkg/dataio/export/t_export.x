@@ -21,14 +21,14 @@ pointer	sp, blist, bfname		# stack pointers
 pointer	imname[MAX_OPERANDS]
 pointer	imlist				# image list pointer
 pointer	im				# image descriptor
-int	binlist				# binary file list pointer
+pointer	binlist				# binary file list pointer
 int	imdim				# dimensionality of images
 int	imtype				# datatype of images
 int	i
 
-pointer	ex_init(), immap(), imtopenp()
+pointer	ex_init(), immap(), imtopenp(), fntopnb()
 int	ex_getpars()
-int	clgfil(), access(), fntopnb()
+int	clgfil(), access()
 int	imtlen(), open(), imtgetim()
 bool	streq()
 

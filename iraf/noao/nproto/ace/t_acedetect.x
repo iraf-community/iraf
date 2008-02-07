@@ -18,7 +18,8 @@ pointer	par			# Parameters
 pointer	sp, str
 
 bool	clgetb()
-int	clgwrd(), imtopenp(), imtopen(), clpopnu(), fntopnb()
+int	clgwrd(), imtopenp(), imtopen()
+pointer	fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -116,7 +117,8 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen(), clpopnu(), fntopnb()
+int	imtopenp(), imtopen()
+pointer	fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -204,7 +206,8 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen(), clpopnu(), fntopnb()
+int	imtopenp(), imtopen()
+pointer	fntopnb(), clpopnu()
 
 begin
 	call smark (sp)
@@ -285,7 +288,8 @@ pointer	par			# Parameters
 
 pointer	sp, str
 
-int	imtopenp(), imtopen(), clpopnu()
+int	imtopenp(), imtopen()
+pointer	clpopnu()
 
 begin
 	call smark (sp)

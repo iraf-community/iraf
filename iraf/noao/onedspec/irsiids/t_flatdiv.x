@@ -15,20 +15,20 @@ define	MAX_NR_BEAMS	100	# Max number of instrument apertures
 
 procedure t_flatdiv ()
 
-int	root, start_rec
+int	start_rec
 int	nrecs
 int	len_flat
 int	ccmode, qd_flag
 real	dtime
 real	power
 bool	coincidence
-pointer	sp, image, str, ofile, flat, recs, bstat, flatsp, im
+pointer	sp, image, str, ofile, flat, recs, bstat, flatsp, im, root
 
-int	clpopni(), clgeti(), clgwrd(), imgeti()
+int	clgeti(), clgwrd(), imgeti()
 int	get_next_image(), decode_ranges()
 real	clgetr()
 bool	clgetb()
-pointer	immap()
+pointer	clpopni(), immap()
 errchk	get_flatsp
 
 begin

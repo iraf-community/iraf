@@ -7,11 +7,11 @@ define	SZ_HDRTEXT	5 * SZ_LINE
 procedure t_afiltcat()
 
 pointer	sp, input, output, catdb, catname, infname, outfname, tmpfname, hdrtext
-pointer	at, cq, res
-int	icatlist, ocatlist, catno, infd, outfd, nlines
+pointer	at, cq, res, icatlist, ocatlist
+int	catno, infd, outfd, nlines
 bool	standard, filter, update, verbose
-pointer	cq_map(), cq_fquery()
-int	fntopnb(), fntlenb(), fntgfnb(), cq_setcat(), open(), at_gcathdr()
+pointer	cq_map(), cq_fquery(), fntopnb()
+int	fntlenb(), fntgfnb(), cq_setcat(), open(), at_gcathdr()
 int	at_pcathdr()
 bool	streq(), clgetb()
 errchk	open()

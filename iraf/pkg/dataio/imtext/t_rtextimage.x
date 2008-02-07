@@ -13,15 +13,15 @@ procedure t_rtextimage ()
 
 char	output[SZ_FNAME], text_file[SZ_FNAME], temp[SZ_FNAME]
 char	out_fname[SZ_FNAME]
-pointer	im
-int	header, pixels, nskip, nfiles, ntext, format, data_type, tf, i, input
-int	fd_dim, junk, ndim, ip
+pointer	im, input, fd_dim
+int	header, pixels, nskip, nfiles, ntext, format, data_type, tf, i
+int	junk, ndim, ip
 
 bool	clgetb()
 #char	clgetc()
-pointer	immap()
-int	btoi(), clgeti(), clpopni(), clplen(), clgfil(), get_data_type()
-int	open(), rt_skip_lines(), clpopnu(), ctoi()
+pointer	immap(), clpopni(), clpopnu()
+int	btoi(), clgeti(), clplen(), clgfil(), get_data_type()
+int	open(), rt_skip_lines(), ctoi()
 
 begin
 	# Determine the input and output file names

@@ -6,16 +6,16 @@ include <fset.h>
 
 procedure t_starfind ()
 
-int	olist, limlist, lolist, boundary, verbose
+int	limlist, lolist, boundary, verbose
 int	stat, root, out, nxblock, nyblock
-pointer	imlist, sp, image, output, outfname, str, wcs, wxformat, wyformat
+pointer	olist, imlist, sp, image, output, outfname, str, wcs, wxformat, wyformat
 pointer	im, sf
 real	constant
 
 bool	clgetb()
-int	clpopnu(), imtlen(), clplen(), clgwrd(), btoi(), open()
+int	imtlen(), clplen(), clgwrd(), btoi(), open()
 int	clgeti(), imtgetim(), clgfil(), fnldir(), strncmp(), strlen()
-pointer	immap(), imtopenp()
+pointer	clpopnu(), immap(), imtopenp()
 real	clgetr()
 
 begin
@@ -194,7 +194,8 @@ int     maxch                           #I maximum number of characters
 char    period
 int     newversion, version, len
 pointer sp, list, name
-int     fntgfnb() strldx(), ctoi(), fntopnb()
+int     fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
 
 begin
         # Allocate temporary space

@@ -13,16 +13,17 @@ define	SZ_TXQUALITY	1
 
 procedure t_calcomp()
 
-int	fd, list
-pointer	gki, sp, fname, devname
+int	fd
+pointer	list, gki, sp, fname, devname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 char	txquality[SZ_TXQUALITY]
 bool	clgetb()
 char	clgetc()
 real	clgetr()
-int	clpopni(), clgfil(), open(), btoi()
+int	clgfil(), open(), btoi()
 int	gki_fetch_next_instruction()
+pointer	clpopni()
 
 include "ccp.com"
 

@@ -208,7 +208,8 @@ int	maxch				# maximum number of characters
 char	period
 int	newversion, version, len
 pointer	sp, list, name
-int	fntgfnb() strldx(), ctoi(), fntopnb()
+int	fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
 
 begin
 	# Allocate temporary space
@@ -250,7 +251,8 @@ int	maxch				# maximum number of characters
 char	period
 int	newversion, version, len
 pointer	sp, list, name
-int	fntgfnb() strldx(), ctoi(), fntopnb()
+int	fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
 
 begin
 	# Allocate temporary space

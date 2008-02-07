@@ -7,9 +7,10 @@
 
 procedure t_words()
 
-int	fd, list, last_nscan
-pointer	sp, fname, word
-int	clpopni(), clgfil(), fscan(), nscan(), open()
+int	fd, last_nscan
+pointer	sp, fname, word, list
+int	clgfil(), fscan(), nscan(), open()
+pointer	clpopni()
 
 begin
 	call smark (sp)

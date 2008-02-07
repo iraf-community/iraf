@@ -18,8 +18,8 @@ char	out_fname[SZ_FNAME]	# output file name
 char	fextn[SZ_FNAME]		# the fits extension
 
 char	ch
-pointer	imlist
-int	flist, nimages, nfiles, file_number, addext, index
+pointer	imlist, flist
+int	nimages, nfiles, file_number, addext, index
 bool	clgetb(), streq()
 double	clgetd()
 int	imtlen(), wft_get_bitpix(), clgeti(), imtgetim()

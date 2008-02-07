@@ -10,11 +10,13 @@ procedure t_concatenate()
 
 char	infile[SZ_FNAME], outfile[SZ_FNAME]
 char	out_type_string[SZ_FNAME]
-int	in, out, list, out_type
+int	in, out, out_type
+pointer	list
 
-int	clpopni(), clgfil()
+int	clgfil()
 int	open(), access(), strmatch(), clgeti()
 bool	clgetb()
+pointer	clpopni()
 
 begin
 	# Open the input file list, and read in the name of the first file

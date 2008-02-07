@@ -11,10 +11,12 @@ bool	verbose
 char	outfile[SZ_FNAME]
 
 char	infile[SZ_FNAME], out_fname[SZ_FNAME]
-int	list, len_list, in, out, file_number
+int	len_list, in, out, file_number
+pointer	list
 
 bool	clgetb()
-int	strlen(), open(), clpopni(), clplen(), clgfil()
+int	strlen(), open(), clplen(), clgfil()
+pointer	clpopni()
 
 begin
         # Get input files

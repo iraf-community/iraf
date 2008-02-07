@@ -13,12 +13,13 @@ int	min_group			# the minimum group size
 int	max_group			# the maximum group size
 
 bool	gr_text
-int	ilist, lilist, olist, lolist, verbose
-pointer sp, tp_in, tp_out, dao
+int	lilist, lolist, verbose
+pointer ilist, olist, sp, tp_in, tp_out, dao
 
 bool	clgetb(), itob()
 int	open(), tbtopn(), clgeti(), fstati(), btoi(), access()
-int	fntopnb(), fntlenb(), fntgfnb()
+int	fntlenb(), fntgfnb()
+pointer	fntopnb()
 
 begin
 	# Set the standard output to flush on newline.
