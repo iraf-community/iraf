@@ -408,7 +408,7 @@ pointer	itp[ARB]	# o: Array of table descriptors
 int	itab
 pointer	sp, tmpname
 
-int	tbtopn()
+pointer	tbtopn()
 
 begin
 	call smark (sp)

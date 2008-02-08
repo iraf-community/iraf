@@ -43,8 +43,8 @@ int	blkfac[5]	# blocking factor for each dimension
 int	option		# block operation (average or sum)
 pointer rotbuf		# temporary storage of rotated image
 
-int	immap(), imaccess(), ctowrd(), ctoi()
-pointer	imgl1r(), imgs2r()
+int	imaccess(), ctowrd(), ctoi()
+pointer	immap(), imgl1r(), imgs2r()
 
 begin
 

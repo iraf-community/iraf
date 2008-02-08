@@ -13,7 +13,8 @@ pointer cname, cunits, cfmt	# pointers to scratch space for column info
 pointer	ctext, cp
 int	i, colnum, datatype, lendata, lenfmt, ncols
 
-pointer tbpsta(), tbcnum()
+int	tbpsta()
+pointer tbcnum()
 
 begin
 	# Allocate some space

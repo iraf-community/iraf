@@ -13,12 +13,14 @@ pointer	tp			# i: Input table descriptor
 pointer	stf			# i: STF descriptor
 pointer im			# i: image descriptor
 
-int	ncols, total, i, pp, colp
-int	tbpsta(), tbcnum(), tbcigi(), totpix
+int	ncols, total, i, pp
+int	totpix, pfd, parnum
 long	sz_pixfile
-int	open(), pfd
-int	parnum
 char	dtype, cbuf[SZ_LINE], uparm[SZ_KEYWORD]
+pointer	colp
+
+int	open(), tbpsta(), tbcigi()
+pointer	tbcnum()
 
 string badtype "illegal group data parameter datatype"
 

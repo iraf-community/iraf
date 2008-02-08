@@ -86,7 +86,8 @@ string	pownames  "sq,square,cu,cubic"
 data	powers    / Y_SQ, Y_SQ, Y_CU, Y_CU /
 
 bool	streq()
-int	getc(), word_match()
+char	getc()
+int	word_match()
 
 begin
 	call smark (sp)

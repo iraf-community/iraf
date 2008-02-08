@@ -9,7 +9,7 @@ int	in		# Input command source descriptor
 pointer	ifds		# Input file stack descriptor 
 pointer	sp, filename
 
-pointer	open()
+int	open()
 
 begin
 	call smark (sp)

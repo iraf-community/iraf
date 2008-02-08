@@ -15,7 +15,7 @@ int	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
 real	asumr()
-pointer	imgnlr()
+int	imgnlr()
 
 #errchk	imgnlr
 

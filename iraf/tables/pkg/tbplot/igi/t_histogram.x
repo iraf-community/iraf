@@ -171,12 +171,14 @@ char	name[ARB]		# o: name of file used
 int	lenname			# i: max length of name
 #--
 
-pointer	tbtopn(), immap(), pt, imgnlr(), buf
+pointer	pt, buf
 pointer	txcoord, tcoord, xnull, colptr
 long	npts, i, v[IM_MAXDIM]
-int	tbpsta(), nrows, gtextcoord(), line, naxis1
+int	nrows, line, naxis1
 char	col[SZ_LINE]
 
+int	tbpsta(), gtextcoord(), imgnlr()
+pointer	tbtopn(), immap()
 errchk	tbtopn, tbcfnd, tbcgtr, gtextcoord, immap, imgnlr
 
 begin
@@ -261,15 +263,15 @@ char	input[SZ_FNAME]	# i: input name
 pointer	data		# o: pointers to real array
 #--
 
-pointer	open()
-pointer	fdcoord			# text file pointer
+int	fdcoord			# text file descriptor
 char	line[SZ_LINE]
 long	i_in_line, ip
-real	dval
-int	ctor()
 long	init_size
-int	getline()
+real	dval
 
+int	open()
+int	ctor()
+int	getline()
 errchk	getline, ctor, open
 
 begin

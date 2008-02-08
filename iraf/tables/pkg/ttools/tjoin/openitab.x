@@ -18,8 +18,8 @@ string	badcolnam "Column name not found in table (%s[c:%s])"
 string  notopen   "Could not open table (%s)"
 
 bool	strne()
-int	tbpsta(), tbcnum(), word_count(), word_fetch()
-pointer	tbtopn()
+int	tbpsta(), word_count(), word_fetch()
+pointer	tbtopn(), tbcnum()
 
 begin
 	# Allocate memory for temporary strings
@@ -30,7 +30,7 @@ begin
 
 	# Allocate memory for data structure
 
-	call calloc (tj, LEN_TJSTRUCT, TY_INT)
+	call calloc (tj, LEN_TJSTRUCT, TY_STRUCT)
 
 	# Open table and put descriptor in structure
 
@@ -45,7 +45,7 @@ begin
 	# Create array of data columns
 
 	TJ_DNUM(tj) = tbpsta (TJ_TAB(tj), TBL_NCOLS)
-	call malloc (TJ_DPTR(tj), TJ_DNUM(tj), TY_INT)
+	call malloc (TJ_DPTR(tj), TJ_DNUM(tj), TY_POINTER)
 
 	do icol = 1, TJ_DNUM(tj)
 	    TJ_DCOL(tj,icol) = tbcnum (TJ_TAB(tj), icol)
@@ -56,7 +56,7 @@ begin
 	if (TJ_JNUM(tj) == 0)
 	    call error (1, nojoincol)
 
-	call malloc (TJ_JPTR(tj), TJ_JNUM(tj), TY_INT)
+	call malloc (TJ_JPTR(tj), TJ_JNUM(tj), TY_POINTER)
 
 	ic = 1
 	icol = 1

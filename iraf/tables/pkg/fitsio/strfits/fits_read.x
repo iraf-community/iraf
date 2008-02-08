@@ -33,13 +33,16 @@ char	root[SZ_FNAME], cluster[SZ_FNAME]
 char	tempf[SZ_FNAME], extn[SZ_FNAME]
 char	tabfile[SZ_FNAME], seqfile[SZ_FNAME]
 int	fits_fd, istat, pos1, pos2, ntab, nch, junk
-int	rft_read_header(), mtopen(), strlen()
-int	tbtopn(), tab_read_header(), gstrmatch()
-int	open(), gi_gstfval(), strcmp(), chk_tabname()
-int	strldx(), tbpsta(), rft_image_ext(), fnroot()
-int	nread, fd_usr, ncols, first_im, stat, bitpix_to_imtype()
+int	nread, fd_usr, ncols, first_im, stat
 bool    trl
 pointer	im, imt, fits, tp, ext
+
+int	rft_read_header(), mtopen(), strlen()
+int	tab_read_header(), gstrmatch()
+int	open(), gi_gstfval(), strcmp(), chk_tabname()
+int	strldx(), tbpsta(), rft_image_ext(), fnroot()
+int	bitpix_to_imtype()
+pointer	tbtopn()
 
 data	uscore / '_' /
 errchk	smark, sfree, salloc, fits_reblock, rft_read_header, rft_read_image
@@ -511,7 +514,8 @@ int	i, fd, maxlines, max_lenuser, cl_index,cl_size
 char	cluster[SZ_FNAME], tmp[SZ_FNAME], root[SZ_FNAME] 
 
 bool	gi_geis()
-int	immap(), stropen(), strlen(), chk_tabname()
+int	stropen(), strlen(), chk_tabname()
+pointer	immap()
 
 errchk  immap
 include "rfits.com"

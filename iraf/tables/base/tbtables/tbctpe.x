@@ -41,7 +41,8 @@ int	k			# loop index
 int	colnum			# column number, a loop index
 int	offset			# for recomputing COL_OFFSET
 long	tbtbod()
-int	tbpsta(), tbcnum()
+int	tbpsta()
+pointer	tbcnum()
 errchk	calloc
 
 begin

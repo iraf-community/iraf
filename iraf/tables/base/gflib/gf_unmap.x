@@ -14,13 +14,13 @@ pointer	im		# i: image descriptor
 int	oldim, prim, ext
 pointer	db
 
-int	gf_find_db()
+pointer	gf_find_db_p()
 
 begin
 	# Update the extension header
 
 	oldim = im
-	db = gf_find_db (im, PARAM_DB)
+	db = gf_find_db_p (im, PARAM_DB)
 
 	call gf_split_ua (im, db, prim, ext)
 	call gf_upfits (im, prim, ext)

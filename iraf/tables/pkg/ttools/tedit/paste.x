@@ -67,8 +67,8 @@ int	try, junk, ncol
 pointer	sp, oldtab, newtab, newdir, tab, tp, pp
 pointer	fname
 
-int	tbpsta(), tbparse()
-pointer	fnldir(), tbtopn()
+int	tbpsta(), tbparse(), fnldir()
+pointer	tbtopn()
 
 string	nopaste  "Cannot create paste table. Command aborted."
 

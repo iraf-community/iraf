@@ -16,7 +16,8 @@ data	nl  / '\n' /
 data	eq  / '=' /
 
 int	stridx()
-int	gf_inithash(), gf_imtype(), gi_gstfval(), gi_ggpn()
+int	gf_imtype(), gi_gstfval(), gi_ggpn()
+pointer	gf_inithash()
 
 begin
 	# Allocate memory for temporary strings

@@ -12,12 +12,13 @@ char	keyword[ARB]	# i: keyword name
 #--
 pointer	db
 
-int	gf_find_db(), gf_findhash()
+pointer	gf_find_db_p()
+int	gf_findhash()
 
 begin
 	# Nothing to check if image is not in database cache
 
-	db = gf_find_db (im, PARAM_DB) 
+	db = gf_find_db_p (im, PARAM_DB) 
 	if (db == NULL)
 	    return
 

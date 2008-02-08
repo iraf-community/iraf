@@ -148,7 +148,8 @@ int	param		# i: either TBL_ROWLEN or TBL_ROWLEN_USED
 #--
 pointer cp
 int	value
-int	colnum, tcs_column()
+int	colnum
+pointer	tcs_column()
 
 begin
 	if (TB_COLUMN_SELECT(tp) == YES) {

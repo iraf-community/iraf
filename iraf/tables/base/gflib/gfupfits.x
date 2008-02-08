@@ -17,7 +17,7 @@ int	ext		# i: spool file with extension header keywords
 int	acmode, gn
 pointer	sp, primary
 
-int	gf_find_db()
+int	gf_find_db_i()
 pointer	immap()
 
 begin
@@ -35,7 +35,7 @@ begin
 	# If inherit is off, the primary header only
 	# contains changes and should be appended
 
-	if (gf_find_db (im, PARAM_INHERIT) == NO) {
+	if (gf_find_db_i (im, PARAM_INHERIT) == NO) {
 	    acmode = APPEND
 	} else {
 	    acmode = WRITE_ONLY

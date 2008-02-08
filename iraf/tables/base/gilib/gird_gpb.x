@@ -12,8 +12,8 @@ pointer	tp		# i: table descriptor
 int	gn		# i: group number, or table line number
 pointer	im		# i: output image descriptor
 
-pointer	pp
-int	stf, i, ncols, tbpsta(), tbcnum(), colp
+int	stf, i, ncols
+pointer	pp, colp
 
 bool	bbuf
 short	sbuf
@@ -22,6 +22,10 @@ long	lbuf
 real	rbuf
 double	dbuf
 char	cbuf[SZ_LINE]
+
+int	tbpsta()
+pointer	tbcnum()
+
 string	badtype "illegal group data parameter datatype"
 
 begin

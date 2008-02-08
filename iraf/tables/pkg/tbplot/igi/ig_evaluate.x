@@ -190,7 +190,8 @@ common	/igsopm/ igp_struct, vec_index, vec_npts
 
 extern	igget_op()
 pointer	evexpr()
-int	locpr(), errcode()
+pointer	locpr()
+int	errcode()
 
 errchk	evexpr
 

@@ -105,13 +105,14 @@ int	size				# Data elements per vector
 char	units[ARB]			# Data units
 int	maxch
 
-int	im				# Input image descriptor
+pointer	im				# Input image descriptor
 int	nclust				# Number of group members (clusters)
 int	nvals
 int	nrngs
 
-int	immap(), imaccf(), imgeti(), decode_ranges()
+int	imaccf(), imgeti(), decode_ranges()
 bool	imgetb()
+pointer	immap()
 
 begin
 
@@ -210,14 +211,13 @@ int	nclust
 int	size
 
 int	clust
-int	im
-pointer	sp, imname
+pointer	sp, imname, im
 int	ncrv
 
 #real	wl, wr, wb, wt
 
-int	immap(), get_next_number()
-pointer	imgl1r()
+int	get_next_number()
+pointer	immap(), imgl1r()
 
 begin
 	call smark (sp)

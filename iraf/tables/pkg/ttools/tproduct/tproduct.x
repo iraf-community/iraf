@@ -18,8 +18,8 @@ int	colnum[1], datatype[1], lendata[1], lenfmt[1]
 pointer	sp, tp1, tp2, otp, icp, ocp, oldcol, newcol
 pointer	colname, colunits, colfmt
 
-int	tbpsta(), tbcnum()
-pointer	tbtopn()
+int	tbpsta()
+pointer	tbtopn(), tbcnum()
 
 begin
 	# Allocate stack memory for strings
@@ -60,28 +60,28 @@ begin
 	nrow2 = tbpsta (tp2, TBL_NROWS)
 
 	numcol = ncol1 + ncol2
- 	call malloc (oldcol, numcol, TY_INT)
- 	call malloc (newcol, numcol, TY_INT)
+ 	call malloc (oldcol, numcol, TY_POINTER)
+ 	call malloc (newcol, numcol, TY_POINTER)
 
 	# Copy column pointers to old column array.
 
 	do icol = 1, ncol1
-	    Memi[oldcol+icol-1] = tbcnum (tp1, icol)
+	    Memp[oldcol+icol-1] = tbcnum (tp1, icol)
 
 	do icol = 1, ncol2
-	    Memi[oldcol+ncol1+icol-1] = tbcnum (tp2, icol)
+	    Memp[oldcol+ncol1+icol-1] = tbcnum (tp2, icol)
 
 	# Copy column information from the input tables to the output table
 
  	do icol = 1, numcol {
-	    icp = Memi[oldcol+icol-1]
+	    icp = Memp[oldcol+icol-1]
     	    call tbcinf (icp, colnum, Memc[colname], Memc[colunits],
 			 Memc[colfmt], datatype[1], lendata[1], lenfmt[1])
-	    call newcolnam (numcol, Memi[oldcol], icol,
+	    call newcolnam (numcol, Memp[oldcol], icol,
 			    Memc[colname], SZ_COLNAME)
 	    call tbcdef (otp, ocp, Memc[colname], Memc[colunits], Memc[colfmt],
 			 datatype[1], lendata[1], 1)
-	    Memi[newcol+icol-1] = ocp    
+	    Memp[newcol+icol-1] = ocp    
 	}
 
 	# Copy the table columns a row at a time
@@ -94,9 +94,9 @@ begin
 	do idx = 1, nrow1 {
 	    do jdx = 1, nrow2 {
 		kdx = kdx + 1
-		call tbrcsc (tp1, otp, Memi[oldcol], Memi[newcol],
+		call tbrcsc (tp1, otp, Memp[oldcol], Memp[newcol],
 			     idx, kdx, ncol1)
-		call tbrcsc (tp2, otp, Memi[oldcol+ncol1], Memi[newcol+ncol1],
+		call tbrcsc (tp2, otp, Memp[oldcol+ncol1], Memp[newcol+ncol1],
 			     jdx, kdx, ncol2)
 	    }
 	}
@@ -107,7 +107,7 @@ begin
 	call tbtclo (tp2)
 	call tbtclo (otp)
 
-	call mfree (oldcol, TY_INT)
-	call mfree (newcol, TY_INT)
+	call mfree (oldcol, TY_POINTER)
+	call mfree (newcol, TY_POINTER)
 
 end

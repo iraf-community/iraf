@@ -55,9 +55,10 @@ real	vl, vr, vb, vt		# Viewport edges
 bool	margin			# Add margin to avoid truncating?
 real	hsize			# Arrow head size (NDC)
 pointer	indata			# Input data file name
-pointer	fd			# Data
+int	fd			# Data
 
-pointer	open(), gopen()
+int	open()
+pointer	gopen()
 real	clgetr()
 int	clgeti(), markpos()
 bool	streq(), clgetb()
@@ -132,7 +133,7 @@ end
 
 procedure getfield (fd, rtheta, xcoord, ycoord, xmag, ymag, npts)
 
-pointer	fd			# Data source
+int	fd			# Data source
 bool	rtheta			# Magnitude and direction? (instead of dx, dy)
 pointer	xcoord, ycoord		# Coordinates of field value
 pointer	xmag, ymag		# Magnitude of field

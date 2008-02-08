@@ -457,11 +457,12 @@ char	card[ARB]	# FITS card image
 pointer colpp
 char	nullstr[SZ_LINE], keyword[LEN_KEYWORD]
 int	i
-int	tbcnum(), tbcigi()
 char	colname[SZ_COLNAME], colunits[SZ_COLUNITS], colfmt[SZ_COLFMT]
 char	forfmt[SZ_COLFMT]
 int	type, lenfmt, coloff, nelem
 
+int	tbcigi()
+pointer	tbcnum()
 errchk	wft_encoded, wft_encodec, wft_encode_blank, wft_encoder, wft_encodei
 errchk	wft_encode_date, tcbnum, tbcinf
 

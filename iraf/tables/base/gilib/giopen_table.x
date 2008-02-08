@@ -15,7 +15,9 @@ pointer	tp			# o: Table descriptor
 int	colptr[ARB]			# o: pointer to each column
 
 pointer	pp
-int	i, pcount, tbtopn(), stf
+int	i, pcount, stf
+
+pointer	tbtopn()
 
 begin
 

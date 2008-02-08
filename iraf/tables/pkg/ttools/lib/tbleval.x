@@ -36,12 +36,13 @@ pointer	nulptr		#  o: Array of null flags
 include	"tblterm.com"
 
 int	iary, status, junk
-int	old_handler, tbl_term_adr, tbl_func_adr
+pointer	old_handler, tbl_term_adr, tbl_func_adr
 pointer	op
 
 string	badtype		"Character expressions not allowed"
 
-int	locpr(), errcode()
+pointer	locpr()
+int	errcode()
 pointer	evexpr()
 
 extern	tbl_handler(), tbl_term(), tbl_func()

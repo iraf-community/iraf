@@ -46,7 +46,8 @@ int	ncols			# number of columns in table
 int	nlist			# number of items to list (from one to four)
 int	k			# loop index
 int	colnum			# column number (ignored)
-pointer tbtopn(), tbpsta(), tbcnum()
+pointer tbtopn(), tbcnum()
+int	tbpsta()
 int	clgeti()
 int	fstati()
 pointer tbnopenp(), tbnopen()

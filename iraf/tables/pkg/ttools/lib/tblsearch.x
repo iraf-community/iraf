@@ -23,13 +23,14 @@ int	last		# i: Last row to look at
 #--
 include	"tblterm.com"
 
-int	tbl_term_adr, tbl_func_adr
+pointer	tbl_term_adr, tbl_func_adr
 int	status, found, dir, iary
 pointer	old_handler, junk
 pointer	sp, op, newexp
 bool	done
 
-int	locpr(), errcode()
+pointer	locpr()
+int	errcode()
 pointer	evexpr()
 
 extern	tbl_handler(), tbl_term(), tbl_func()

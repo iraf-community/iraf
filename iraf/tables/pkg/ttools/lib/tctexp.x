@@ -61,15 +61,15 @@ bool	negate		# true if template starts with negation character
 int	fd_ptr		# pointer to stack of open list file descriptors
 int	ic		# first non-white character in template
 
-pointer fd_stack[MAX_STACK]
+int	fd_stack[MAX_STACK]
 			# stack of file descriptors for open list files
 
-pointer	sp, colpat, pattern, auxcol, fd
+pointer	sp, colpat, pattern, auxcol
+int	fd
 
 string	stkovflerr	"List files are nested too deeply, stack overflow"
 
-int	strlen(), tctgetpat()
-pointer	stropen(), open()
+int	strlen(), tctgetpat(), open(), stropen()
 
 errchk	salloc, stropen, open, close
 errchk	tctgetpat, tctmakpat, tctstrmatch, tctpatmatch
@@ -93,7 +93,7 @@ begin
 
 	    call allcolumns (tp, numptr, auxcol)
 	    call amovi (Memi[auxcol], colptr, numptr)
-	    call mfree (auxcol, TY_INT)
+	    call mfree (auxcol, TY_POINTER)
 	    fd_ptr = 0
 
 	} else {
@@ -177,7 +177,7 @@ end
 
 int procedure tctgetpat (fd, colpat, maxch)
 
-pointer	fd		# i: template file descriptor
+int	fd		# i: template file descriptor
 char	colpat[ARB]	# o: pattern from column name template
 int	maxch		# i: maximum number of characters in field
 #--
@@ -391,7 +391,8 @@ pointer	colname
 
 string	maxcolerr "Maximum number of columns in table exceeded (%d)"
 
-int	tbpsta(), tbcnum(), patmatch()
+int	tbpsta(), patmatch()
+pointer	tbcnum()
 
 errchk	tbpsta, tbcnum, tbcinf, patmatch
 

@@ -18,7 +18,8 @@ int	top, nrow, irow
 pointer	work
 
 int	tbpsta()
-int	initstack(), numstack(), find_rule(), apply_rule()
+int	numstack(), find_rule(), apply_rule()
+pointer	initstack()
 
 string	tgtname "The following is the target table:"
 string	actname "The following is the action table:"
@@ -169,8 +170,8 @@ pointer	sp, tarptr, wrkptr, colname, tarval, wrkval
 pointer	use_ptr, fst_ptr, tgt_ptr, idx_ptr, iw
 
 bool	strne()
-int	tbpsta(), strlen()
-pointer	tbcnum(), numstack()
+int	tbpsta(), strlen(), numstack()
+pointer	tbcnum()
 
 begin
 	# Get number of columns in tables

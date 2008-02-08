@@ -15,7 +15,8 @@ bool	match
 int	numcol, icol, iptr, jptr
 pointer newptr, cp
 
-int	tbpsta(), tbcnum()
+int	tbpsta()
+pointer	tbcnum()
 
 begin
 	# Create a temporary array to hold the pointers

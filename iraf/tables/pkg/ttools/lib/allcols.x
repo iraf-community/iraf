@@ -14,16 +14,17 @@ pointer	colptr		# o: Pointer to array of indices
 
 int	icol
 
-int	tbpsta(), tbcnum()
+int	tbpsta()
+pointer	tbcnum()
 
 errchk	tbpsta, malloc
 
 begin
 	
 	numcol = tbpsta (tp, TBL_NCOLS)
-	call malloc (colptr, numcol, TY_INT)
+	call malloc (colptr, numcol, TY_POINTER)
 
 	do icol = 1, numcol
-		Memi[colptr+icol-1] = tbcnum (tp, icol)
+		Memp[colptr+icol-1] = tbcnum (tp, icol)
 
 end

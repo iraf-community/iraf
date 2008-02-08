@@ -23,13 +23,13 @@ int	in, fd, oldfd, hist
 pointer	ua, sp, record, keyword, both
 
 int	open(), stropen(), getline(), strncmp()
-int	gf_imtype(), gf_find_db(), gf_findhash(), gf_getmkhash()
+int	gf_imtype(), gf_find_db_i(), gf_findhash(), gf_getmkhash()
 
 begin
 	# Only update fits images with extensions that have been written to
 	
 	if (IM_ACMODE(im) == READ_ONLY || gf_imtype (im) != FITS_FMT || 
-	    gf_find_db (im, PARAM_EXTEND) == NO) {
+	    gf_find_db_i (im, PARAM_EXTEND) == NO) {
 
 	    prim = NULL
 	    ext = NULL
@@ -42,7 +42,7 @@ begin
 	call salloc (record, SZ_LINE, TY_CHAR)
 	call salloc (keyword, SZ_KEYWORD, TY_CHAR)
 
-	if (gf_find_db (im, PARAM_UPDATE) == NO) {
+	if (gf_find_db_i (im, PARAM_UPDATE) == NO) {
 	    prim = NULL
 	} else {
 	    prim = open ("primary", READ_WRITE, SPOOL_FILE)
@@ -65,7 +65,7 @@ begin
 	    oldfd = ext
 	    has_extend = false
 
-	    hist = gf_find_db(im, PARAM_HIST)
+	    hist = gf_find_db_i (im, PARAM_HIST)
 	    if (hist != -1) {
 	       call seek(hist, EOF) # Append new HISTORY to existing spool.
 	    }
@@ -154,7 +154,7 @@ pointer	newprim
 string	format  "EXTEND  =                    %s / %s"
 string	comment "File may contain standard extensions           \n"
 
-int	open(), gf_find_db()
+int	open(), gf_find_db_i()
 
 begin
 	# Don't need to update if no primary file
@@ -168,7 +168,7 @@ begin
 
 	# Add the EXTEND record to the new spool file
 
-	extend = gf_find_db (im, PARAM_EXTEND)
+	extend = gf_find_db_i (im, PARAM_EXTEND)
 
 	call fprintf (newprim, format)
 	if (extend == NO) {

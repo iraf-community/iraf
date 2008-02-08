@@ -13,11 +13,12 @@ pointer	igs		# igi parameters structure
 pointer	tokvals		# Token value structure
 int	token
 int	igps
-int	tdp
+pointer	tdp
 
 char	root[SZ_FNAME]
 
-int	gettok(), access(), tbtopn()
+int	gettok(), access()
+pointer	tbtopn()
 
 errchk	tbtopn
 

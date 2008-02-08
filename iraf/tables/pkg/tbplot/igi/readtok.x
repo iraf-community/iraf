@@ -23,7 +23,8 @@ int	nchars, token, junk
 pointer	ctoken
 int	maxch
 
-int	getc(), lexnum(), gctod(), gctol(), strlen()
+char	getc()
+int	lexnum(), gctod(), gctol(), strlen()
 
 begin
 	while (getc (in, ch) != EOF)
@@ -207,7 +208,7 @@ int	nchars			# IO: Number of valid chars in line.
 # Declarations
 int	argnum			# Argument number.
 int	ctoi()			# Character to integer.
-int	getc()			# Read character.
+char	getc()			# Read character.
 int	ip			# Character pointer.
 int	junk			# Exactly that.
 int	ns			# # chars in s.

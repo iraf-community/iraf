@@ -15,7 +15,8 @@ int	wrow		# i: Row number of table written to
 int	ncol, icol
 pointer	sp, rcp, wcp, colname
 
-pointer	tbpsta(), tbcnum()
+int	tbpsta()
+pointer	tbcnum()
 
 begin
 	call smark (sp)

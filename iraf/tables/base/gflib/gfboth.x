@@ -17,7 +17,8 @@ pointer	ua, sp, keyword, once
 
 data	nl  / '\n' /
 
-int	stridx(), gf_sizehash(), gf_inithash(), gf_findhash()
+int	stridx(), gf_sizehash(), gf_findhash()
+pointer	gf_inithash()
 
 begin
 	# Allocate memory for temporary string

@@ -113,22 +113,22 @@ define	CMD_STATE	Memi[P2I(($1)+1)]		# Command state
 define	CMD_BUFFER	Memi[P2I(($1)+2)]		# Command buffer (spool) file descriptor
 define	ALL_COMMANDS	Memi[P2I(($1)+3)]		# Full command buffer (spool) file descriptor
 define	CMD_SEQUENCE	Memi[P2I(($1)+4)]		# Command number
-define	LAST_CMD_PNT	Memi[P2I(($1)+5)]		# Last command buffer location
+define	LAST_CMD_PNT	Memp[($1)+5]		# Last command buffer location
 define	LAST_COMMAND	Memc[LAST_CMD_PNT($1)]	# Last command 
-define	PLOT_CMD_PNT	Memi[P2I(($1)+6)]		# Last plot command buffer loc
+define	PLOT_CMD_PNT	Memp[($1)+6]		# Last plot command buffer loc
 define	PLOT_COMMAND	Memc[PLOT_CMD_PNT($1)]	# Last graphics output command 
 define	WRITE_CMD	Memi[P2I(($1)+7)]		# Write command to buffer?
-define	SPOOL_OUT_PNT	Memi[P2I(($1)+8)]		# Temp output file name pointer
+define	SPOOL_OUT_PNT	Memp[($1)+8]		# Temp output file name pointer
 define	SPOOL_OUTPUT	Memc[SPOOL_OUT_PNT($1)]	# Temp output file name
 
-define	SYM_TABLE	Memi[P2I(($1)+11)]		# Symbol table pointer
-define	TOKEN_VALUE	Memi[P2I(($1)+12)]		# Token value structure
+define	SYM_TABLE	Memp[($1)+11]		# Symbol table pointer
+define	TOKEN_VALUE	Memp[($1)+12]		# Token value structure
 define	INPUT_SOURCE	Memi[P2I(($1)+13)]		# Input stream descriptor
-define	INPUT_STACK	Memi[P2I(($1)+14)]		# Input stream stack
-define	STATE_STACK	Memi[P2I(($1)+15)]		# Command state stack
-define	GIO_GP		Memi[P2I(($1)+16)]		# Graphics pointer
+define	INPUT_STACK	Memp[($1)+14]		# Input stream stack
+define	STATE_STACK	Memp[($1)+15]		# Command state stack
+define	GIO_GP		Memp[($1)+16]		# Graphics pointer
 define	DEBUG_OUTPUT	Memi[P2I(($1)+17)]		# Debug output?
-define	PLOT_PARMS	Memi[P2I(($1)+18)]		# Plot parameters structure ptr
+define	PLOT_PARMS	Memp[($1)+18]		# Plot parameters structure ptr
 define	STDOUT_REDIR	Memi[P2I(($1)+19)]		# STDOUT redirected?
 define	PRINT_ERROR	Memi[P2I(($1)+20)]		# Print error?
 
@@ -147,7 +147,7 @@ define	SYM_MARGOFF	Memi[P2I(($1)+3)]	# SBUF offset to macro arguments
 # Lexical analyser output structure
 define	LEN_LOPS	5			# Size of structure
 define	LOP_TYPE	Memi[P2I(($1))]		# Data type
-define	LOP_VALP	Memi[P2I(($1)+1)]		# Pointer
+define	LOP_VALP	Memp[($1)+1]		# Pointer
 define	LOP_VALC	Memc[LOP_VALP($1)]	# String value
 define	LOP_VALI	Memi[P2I(($1)+2)]		# Integer value
 define	LOP_VALR	Memr[P2R(($1)+2)]		# Real value
@@ -159,7 +159,7 @@ define	LOP_PUSHED	Memi[P2I(($1)+4)]		# Text pushed back on input?
 define	LEN_STKS	3			# Structure size
 define	STK_DEF_SIZE	10			# Starting stack depth
 define	STK_DEPTH	Memi[P2I(($1))]		# Depth of stack
-define	STK_STACK	Memi[P2I(($1)+1)]		# File descriptor stack
+define	STK_STACK	Memp[($1)+1]		# File descriptor stack
 define	STK_INDEX	Memi[P2I(($1)+2)]		# Input file index
 define	STK_VALUE	Memi[STK_STACK($1)+STK_INDEX($1)-1]
 
@@ -190,9 +190,9 @@ define	LEN_MGSTR	127			# Size of structure
 
 # Data parameters
 define	MG_DATASRC	Memi[P2I(($1)+1)]		# Type of input data
-define	MG_DATAFN_P	Memi[P2I(($1)+2)]		# Input data file name location
+define	MG_DATAFN_P	Memp[($1)+2]		# Input data file name location
 define	MG_FILE_NAME	Memc[MG_DATAFN_P($1)]	# Input data file name 
-define	MG_COLNAME_P	Memi[P2I(($1)+3)]		# Table column name
+define	MG_COLNAME_P	Memp[($1)+3]		# Table column name
 define	MG_COLNAME	Memc[MG_COLNAME_P($1)]	# Table column name
 define	MG_COLNUM	Memi[P2I(($1)+4)]		# Text column number
 define	MG_FROW		Memi[P2I(($1)+5)]		# Starting row number
@@ -201,21 +201,21 @@ define	MG_NPTS		Memi[P2I(($1)+7)]		# Number of data values
 define	MG_DRAW		Memi[P2I(($1)+8)]		# Draw (or erase) lines YES|NO
 
 define	MG_SNPTS	Memi[P2I(($1)+9)]		# Size of Scratch data vector
-define	MG_SDATAP	Memi[P2I(($1)+10)]		# Pointer to Scratch data vector
+define	MG_SDATAP	Memp[($1)+10]		# Pointer to Scratch data vector
 define	MG_XNPTS	Memi[P2I(($1)+11)]		# Size of X data vector
-define	MG_XDATAP	Memi[P2I(($1)+12)]		# Pointer to X data vector
+define	MG_XDATAP	Memp[($1)+12]		# Pointer to X data vector
 define	MG_YNPTS	Memi[P2I(($1)+13)]		# Size of Y data vector
-define	MG_YDATAP	Memi[P2I(($1)+14)]		# Pointer to Y data vector
+define	MG_YDATAP	Memp[($1)+14]		# Pointer to Y data vector
 define	MG_ENPTS	Memi[P2I(($1)+15)]		# Size of Error data vector
-define	MG_EDATAP	Memi[P2I(($1)+16)]		# Pointer to Error data vector
+define	MG_EDATAP	Memp[($1)+16]		# Pointer to Error data vector
 define	MG_PNPTS	Memi[P2I(($1)+17)]		# Size of Marker data vector
-define	MG_PDATAP	Memi[P2I(($1)+18)]		# Pointer to Marker data vector
+define	MG_PDATAP	Memp[($1)+18]		# Pointer to Marker data vector
 define	MG_LNPTS	Memi[P2I(($1)+19)]		# Size of Limits data vector
-define	MG_LDATAP	Memi[P2I(($1)+20)]		# Pointer to Limits data vector
+define	MG_LDATAP	Memp[($1)+20]		# Pointer to Limits data vector
 
 # Plot attributes
 define	MG_LTYPEN	Memi[P2I(($1)+21)]		# Line style code
-define	MG_LTYPE_P	Memi[P2I(($1)+22)]		# Line style string pointer
+define	MG_LTYPE_P	Memp[($1)+22]		# Line style string pointer
 define	MG_LTYPE	Memc[MG_LTYPE_P($1)]	# Line style
 define	MG_LWEIGHT	Memr[P2R(($1)+23)]		# Line weight (width)
 define	MG_CHARSIZE	Memr[P2R(($1)+24)]		# Text and point size (NDC)
@@ -231,7 +231,7 @@ define	MG_PTYPS	Memi[P2I(($1)+32)]		# Marker style code
 define	MG_PNTSIZE	Memr[P2R(($1)+33)]		# Point size
 define	MG_PNTFILL	Memr[P2R(($1)+34)]		# Solid point fill factor
 define	MG_STELLAR	Memr[P2R(($1)+35)]		# Stellar point factor
-define	MG_PTYPE_P	Memi[P2I(($1)+36)]		# Point type string pointer
+define	MG_PTYPE_P	Memp[($1)+36]		# Point type string pointer
 define	MG_PTYPE	Memc[MG_PTYPE_P($1)]	# Point type string 
 define	MG_EBTYPE	Memi[P2I(($1)+37)]		# Error bar style
 
@@ -287,25 +287,25 @@ define	MG_NDECIM	Memi[P2I(($1)+86)]		# Precision of sex. label
 
 define	MG_GSTEP	Memr[P2R(($1)+90)]		# Last major tick spacing
 
-define	MG_TITLE_P	Memi[P2I(($1)+91)]		# Plot title
+define	MG_TITLE_P	Memp[($1)+91]		# Plot title
 define	MG_TITLE	Memc[MG_TITLE_P($1)]	# Plot title
-define	MG_XLABEL_P	Memi[P2I(($1)+92)]		# X axis label
+define	MG_XLABEL_P	Memp[($1)+92]		# X axis label
 define	MG_XLABEL	Memc[MG_XLABEL_P($1)]	# X axis label
-define	MG_YLABEL_P	Memi[P2I(($1)+93)]		# Y axis label
+define	MG_YLABEL_P	Memp[($1)+93]		# Y axis label
 define	MG_YLABEL	Memc[MG_YLABEL_P($1)]	# Y axis label
 
-define	MG_TICKFMT_P	Memi[P2I(($1)+94)]		# Axis tick format
+define	MG_TICKFMT_P	Memp[($1)+94]		# Axis tick format
 define	MG_TICKFMT	Memc[MG_TICKFMT_P($1)]	# Axis tick format
 
-define	MG_ZDATAP	Memi[P2I(($1)+101)]		# Pointer to Z data buffer
+define	MG_ZDATAP	Memp[($1)+101]		# Pointer to Z data buffer
 define	MG_ZNPTS	Memi[P2I(($1)+102)]		# Size of Z data buffer
 define	MG_ZNPTSX	Memi[P2I(($1)+103)]		# X size of Z data buffer
 define	MG_ZNPTSY	Memi[P2I(($1)+104)]		# Y size of Z data buffer
 define	MG_ZMIN		Memr[P2R(($1)+106)]		# Minimum z value
 define	MG_ZMAX		Memr[P2R(($1)+107)]		# Maximum z value
-define	MG_CMAPP	Memi[P2I(($1)+108)]		# Color map buffer
+define	MG_CMAPP	Memp[($1)+108]		# Color map buffer
 define	MG_CMNPTS	Memi[P2I(($1)+109)]		# Size of color map buffer
-define	MG_ZFUNC	Memi[P2I(($1)+110)]		# Pixmap filter function
+define	MG_ZFUNC	Memp[($1)+110]		# Pixmap filter function
 define	MG_CMMIN	Memi[P2I(($1)+111)]		# Minimum cmap value
 define	MG_CMMAX	Memi[P2I(($1)+112)]		# Maximum cmap value
 

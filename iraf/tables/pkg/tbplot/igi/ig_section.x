@@ -42,8 +42,8 @@ define	IMG_VECT	0
 define	SUM_VECT	1
 define	AVG_VECT	2
 
-int	immap(), imaccess(), ctowrd(), ctoi()
-pointer	imggsr()
+int	imaccess(), ctowrd(), ctoi()
+pointer	immap(), imggsr()
 
 begin
 	call lcmdcat (igs, YES)

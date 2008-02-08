@@ -19,10 +19,11 @@ int	dbg		# i: File descriptor of debug file
 bool	nullflg
 double	dblval
 int	pwidth, ncol, irow, icol, jcol, collen, totlen, intval
-pointer	sp, col,strval, colname, colptr, typptr, lenptr
+pointer	sp, col, strval, colname, colptr, typptr, lenptr
 real	realval
 
-int	tbpsta(), tbcnum(), tbcigi(), envgeti(), strlen()
+int	tbpsta(), tbcigi(), envgeti(), strlen()
+pointer	tbcnum()
 
 begin
 	# First, make sure there is something to print

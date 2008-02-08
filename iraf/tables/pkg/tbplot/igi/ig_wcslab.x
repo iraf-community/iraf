@@ -27,8 +27,8 @@ bool	wsactive
 pointer	gp
 bool	edit		# Edit psets?
 
-int	gettok(), immap(), imaccess(), and()
-pointer	mw_openim(), clopset()
+int	gettok(), imaccess(), and()
+pointer	immap(), mw_openim(), clopset()
 
 begin
 	call lcmdcat (igs, YES)

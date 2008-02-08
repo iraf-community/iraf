@@ -13,10 +13,10 @@ begin
 	call tbtclo (TJ_TAB(tj))
 
 	if (TJ_JPTR(tj) != NULL)
-	    call mfree (TJ_JPTR(tj), TY_INT)
+	    call mfree (TJ_JPTR(tj), TY_POINTER)
 
 	if (TJ_DPTR(tj) != NULL)
-	    call mfree (TJ_DPTR(tj), TY_INT)
+	    call mfree (TJ_DPTR(tj), TY_POINTER)
 
-	call mfree (tj, TY_INT)
+	call mfree (tj, TY_STRUCT)
 end

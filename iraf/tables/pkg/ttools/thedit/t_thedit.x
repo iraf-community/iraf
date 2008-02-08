@@ -49,11 +49,10 @@ int	ip, ctowrd()
 int	nkw, tkw_len()		# number of keywords that match the template
 int	dtype			# data type of expression
 
-pointer	tbtopn()
-pointer tkw_open()
+pointer	tbtopn(), tkw_open(), tbnopenp()
 bool	clgetb(), streq()
 bool	tbhisc()
-int	btoi(), tbnopenp(), tbnget()
+int	btoi(), tbnget()
 int	i, strlen()
 errchk	he_print, he_delete, he_add_keyword, he_put_keyword, he_evaluate
 
@@ -550,7 +549,7 @@ int	dtype			# o: data type of expression
 #--
 pointer o			# evexpr pointer
 pointer evexpr()
-int	locpr()
+pointer	locpr()
 bool	streq()
 int	he_dtype()
 extern	he_getop()

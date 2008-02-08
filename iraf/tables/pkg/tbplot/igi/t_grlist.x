@@ -7,7 +7,7 @@ pointer	imroot, inimnm, imsect
 pointer	templt
 int	nclust				# Number of group members (clusters)
 pointer	imname
-int	im				# Input image descriptor
+pointer	im				# Input image descriptor
 pointer	clist
 int	clust
 int	nvals
@@ -18,9 +18,9 @@ pointer	itmpl
 int	nrngs
 int	status
 
-int	immap(), imaccf(), imgeti(), imtgetim()
+int	imaccf(), imgeti(), imtgetim()
 int	decode_ranges(), get_next_number()
-pointer	imtopen()
+pointer	immap(), imtopen()
 bool	clgetb(), imgetb(), streq()
 
 begin

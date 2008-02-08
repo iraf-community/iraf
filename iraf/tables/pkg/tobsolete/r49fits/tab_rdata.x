@@ -18,9 +18,10 @@ pointer	tp 		# IRAF table descriptor
 
 int	i, rowlen, blksize, nch
 long	nlines, il, ncols
-pointer	sp, bfp, tcp, ip,cp
+pointer	sp, bfp, tcp, ip, cp
 int	rft_init_read_pixels(), rft_read_pixels()
-int	tbpsta(), npix_record, fstati(), tbcnum()
+int	tbpsta(), npix_record, fstati()
+pointer	tbcnum()
 int	rec_count
 
 errchk	salloc, sfree, rft_init_read_pixels, rft_read_pixels, rft_scale_pix
@@ -43,10 +44,10 @@ begin
 	call smark (sp)
 	if (!trl) {
 	   ncols  = tbpsta (tp, TBL_MAXCOLS)
-	   call salloc (cp, ncols, TY_INT)
+	   call salloc (cp, ncols, TY_POINTER)
 	   call salloc (bfp, rowlen, TY_CHAR)
 	   do i = 1, ncols
-	      Memi[cp+i-1] = tbcnum (tp, i)
+	      Memp[cp+i-1] = tbcnum (tp, i)
 	} else
 	   call salloc (bfp, rowlen+1, TY_CHAR)    # to put EOL
 
@@ -94,7 +95,7 @@ begin
 	       # DO NOT WRITE TABLE DATA IF IT CONTAINS 3D DATA, i.e.
 	       # more than one element per cell
 	       if (!BIN_DTYNSP) {
-	         call rft_p3d_table_row (tp, ext, Memi[cp], Memc[bfp],
+	         call rft_p3d_table_row (tp, ext, Memp[cp], Memc[bfp],
 					Memc[tcp], Memc[ip], ncols, il)
 	       }
 	   }
@@ -106,7 +107,7 @@ begin
 	       if (nch != rowlen)
 		   call printf ("Error reading FITS data\n")
    
-	       call rft_put_table_row (tp, ext, Memi[cp], Memc[bfp],
+	       call rft_put_table_row (tp, ext, Memp[cp], Memc[bfp],
 					rowlen,ncols, il)
 	   }
 	}

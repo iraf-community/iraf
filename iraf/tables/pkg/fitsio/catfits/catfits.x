@@ -27,11 +27,13 @@ char    log_file[SZ_FNAME]	# Name of output log file
 pointer	list, fi
 int	lenlist, junk
 int	range[MAX_RANGES*2+1], nfiles, file_number, stat, fits_record
+int	fits_fd, ext_number
 
 bool	clgetb()
 int	btoi(), decode_ranges(), get_next_number(), fntgfnb()
-int	fntlenb(), read_tape_only(), mtfile(), open(), ext_number
-pointer	fntopnb(), fits_fd, mtopen(), mtneedfileno(), get_ext_number()
+int	fntlenb(), read_tape_only(), mtfile(), open(), mtopen()
+int	mtneedfileno(), get_ext_number()
+pointer	fntopnb()
 data	fits_record/2880/
 include	"catfits.com"
 include "../stwfits/dfits.com"

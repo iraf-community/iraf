@@ -31,7 +31,7 @@ begin
 
 	# Allocate memory for data structure
 
-	call malloc (tjo, LEN_TJSTRUCT, TY_INT)
+	call malloc (tjo, LEN_TJSTRUCT, TY_STRUCT)
 
 	# Open table and put descriptor in structure
 
@@ -58,7 +58,7 @@ begin
 	# Allocate array to hold output table data columns
 
 	TJ_DNUM(tjo) = TJ_DNUM(tj1) + TJ_DNUM(tj2)
-	call malloc (TJ_DPTR(tjo), TJ_DNUM(tjo), TY_INT)
+	call malloc (TJ_DPTR(tjo), TJ_DNUM(tjo), TY_POINTER)
 
 	# Copy column information from the input tables to the output table
 

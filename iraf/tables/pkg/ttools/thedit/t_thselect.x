@@ -22,8 +22,8 @@ pointer sp, table
 pointer tp			# pointer to table struct
 int	i
 
-pointer tbtopn()
-int	tbnopenp(), tbnget()
+pointer tbtopn(), tbnopenp()
+int	tbnget()
 int	strlen()
 errchk	he_select
 
@@ -92,7 +92,7 @@ pointer value, comment
 char	keyword[SZ_KEYWORD]	# current keyword name
 pointer o
 pointer evexpr()
-int	locpr()
+pointer	locpr()
 extern	he_getop()
 pointer kw, tkw_open()
 int	ip, ctowrd()

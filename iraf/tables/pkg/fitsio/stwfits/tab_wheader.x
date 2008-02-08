@@ -108,11 +108,12 @@ int	ncount		# Counter for user parameter cards
 int	nstandard	# Number of standard cards in header
 
 int	rowlen, lenfmt, npar, nuserp, stat, ncols, i, ndesc
-int	tab_standard_card(), tab_column_card(), tbcnum(), tbpsta()
-int	wft_last_card(), tab_user_card(), tbcigi()
 int	datatype, num_tabdesc, nelem
 char	sppfmt[SZ_COLFMT], fntfmt[SZ_COLFMT]
 
+int	tab_standard_card(), tab_column_card(), tbpsta()
+int	wft_last_card(), tab_user_card(), tbcigi()
+pointer	tbcnum()
 errchk	tab_standard_card, tab_column_card, wft_last_card
 
 include "wfits.com"

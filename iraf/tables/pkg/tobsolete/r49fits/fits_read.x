@@ -31,14 +31,16 @@ char	tempf[SZ_FNAME]
 char	extn[SZ_EXTN]
 char	tabfile[SZ_FNAME], seqfile[SZ_FNAME]
 int	fits_fd, istat, stat, pos1, pos2, ntab, nch, junk
+int	nread, fd_usr, ncols, first_im
+bool    trl
+pointer	im, imt, fits, tp, ext
+
 int	rft_read_header(), mtopen(), strlen()
-int	tbtopn(), tab_read_header(), gstrmatch()
+int	tab_read_header(), gstrmatch()
 int	open(), gi_gstfval(), strncmp(), strcmp()
 int	strldx(), tbpsta(), rft_image_ext(), fnroot()
-int	nread, fd_usr, ncols, first_im
-bool    trl, gi_geis()
-
-pointer	im, imt, fits, tp, ext
+bool	gi_geis()
+pointer	tbtopn()
 
 errchk	smark, sfree, salloc, rft_read_header, rft_read_image, mtopen
 errchk	close, imunmap, frename, rft_opnim
@@ -415,7 +417,8 @@ pointer	imt			# o: template image pointer
 pointer	ua
 bool	gi_geis()
 int	i, fd, maxlines, max_lenuser, stropen()
-int	immap(), strncmp(), cl_index,cl_size, strlen()
+int	strncmp(), cl_index,cl_size, strlen()
+pointer	immap()
 char	cluster[SZ_FNAME], tmp[SZ_FNAME], root[SZ_FNAME] 
 errchk  immap
 

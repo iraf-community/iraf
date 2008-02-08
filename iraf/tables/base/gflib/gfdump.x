@@ -64,10 +64,10 @@ int	fd		# i: file descriptor
 pointer	im		# i: image descriptor
 #--
 pointer	db
-int	gf_find_db()
+pointer	gf_find_db_p()
 
 begin
-	db = gf_find_db (im, PARAM_DB)
+	db = gf_find_db_p (im, PARAM_DB)
 
 	call fprintf (fd, "== %s keyword db ==\n\n")
 	call pargstr (IM_HDRFILE(im))

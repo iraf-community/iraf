@@ -10,25 +10,24 @@ include	"gf.h"
 # descriptor and the database descriptor. The database contains extra 
 # information needed to support the gf library.
 
-# GF_FIND_DB -- Return cache parameter associated with an image
+# GF_FIND_DB_[IP] -- Return cache parameter associated with an image
 
-int procedure gf_find_db (im, param)
+int procedure gf_find_db_i (im, param)
 
 pointer	im		# i: image descriptor
 int	param		# i: symbolic constant indicating parameter to fetch
 #--
 include	"gfdb.com"
 
-int	idb, value
-string	badparam  "gf_find_db: unrecognized parameter"
+int	idb
+int	value
+string	badparam  "gf_find_db_i: unrecognized parameter"
 
 begin
 	value = 0
 	do idb = 1, high {
 	    if (imcache[idb] == im) {
 		switch (param) {
-		case PARAM_DB:
-		    value = dbcache[idb]
 		case PARAM_GN:
 		    value = gncache[idb]
 		case PARAM_EXTEND:
@@ -39,6 +38,34 @@ begin
 		    value = upcache[idb] 
 		case PARAM_HIST:
 		    value = hscache[idb]
+		default:
+		    call error (1, badparam)
+		}
+		break
+	    }
+	}
+
+	return (value)
+end
+
+pointer procedure gf_find_db_p (im, param)
+
+pointer	im		# i: image descriptor
+int	param		# i: symbolic constant indicating parameter to fetch
+#--
+include	"gfdb.com"
+
+int	idb
+pointer	value
+string	badparam  "gf_find_db_p: unrecognized parameter"
+
+begin
+	value = NULL
+	do idb = 1, high {
+	    if (imcache[idb] == im) {
+		switch (param) {
+		case PARAM_DB:
+		    value = dbcache[idb]
 		default:
 		    call error (1, badparam)
 		}

@@ -15,8 +15,7 @@ char	newl, semic
 data	newl /'\n'/
 data	semic /';'/
 
-int	getline(), gettok(), stridx()
-pointer	open()
+int	getline(), gettok(), stridx(), open()
 
 begin
 	in = INPUT_SOURCE(igs)

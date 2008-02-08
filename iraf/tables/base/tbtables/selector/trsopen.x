@@ -332,7 +332,7 @@ char	ch		# o: character read from input
 #--
 include	"trsopen.com"
 
-int	getc()
+char	getc()
 
 begin
 	Memc[tokbuf+itok] = getc (fd, ch)

@@ -18,8 +18,8 @@ pointer	buf1, buf2, im1, im2
 pointer	sp
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
-int	impnls(), impnli(), impnll(), impnlr(), impnld()
-pointer	immap(), imaccf()
+int	impnls(), impnli(), impnll(), impnlr(), impnld(), imaccf()
+pointer	immap()
 
 pointer	tp, cp, pp
 char	line[SZ_LINE], tname[SZ_FNAME], extn[MAX_LENEXTN]

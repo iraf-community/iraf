@@ -229,7 +229,7 @@ int	status		#U returned error status
 
 int	itime
 int	tm[LEN_TMSTRUCT]
-int	clktime()
+long	clktime()
 
 begin
 	if (status > 0)

@@ -18,8 +18,8 @@ int	inherit		# o: do extensions inherit primary header keywords?
 int	code, gn, gcount
 pointer	sp, im, cluster, ksection, section, primary, fullname
 
-int	btoi(), gf_find_db(), gf_filetype(), gi_gfitval()
-pointer	immap()
+int	btoi(), gf_find_db_i(), gf_filetype(), gi_gfitval()
+pointer	immap(), gf_find_db_p()
 
 begin
 	# Allocate memory for temporary strings
@@ -68,7 +68,7 @@ begin
 	    }
 
 	} else {
-	    if (gf_find_db (oldim, PARAM_DB) == NULL) {
+	    if (gf_find_db_p (oldim, PARAM_DB) == NULL) {
 		# Only copies of geis templates have extensions
 
 		code = gf_filetype (IM_HDRFILE(oldim))
@@ -76,8 +76,8 @@ begin
 		inherit = extend
 
 	    } else {
-		extend = gf_find_db (oldim, PARAM_EXTEND)
-		inherit = gf_find_db (oldim, PARAM_INHERIT)
+		extend = gf_find_db_i (oldim, PARAM_EXTEND)
+		inherit = gf_find_db_i (oldim, PARAM_INHERIT)
 
 		if (extend == NO) {
 		    # Explicit copy into an extension of an image 

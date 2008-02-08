@@ -21,20 +21,20 @@ pointer oldim		# i: image template descriptor (NEW_COPY only)
 int	gn, code, mode, lastim, pixtype, ext, prim, hist
 pointer	sp, db, fullname, extra
 
-int	gf_find_db(), gf_gstfval(), gf_imtype(), gfhist()
-pointer	immap()
+int	gf_find_db_i(), gf_gstfval(), gf_imtype(), gfhist()
+pointer	immap(), gf_find_db_p()
 
 errchk	gi_opengr, immap
 
 begin
 	# Avoid opening the same group twice
 
-	db = gf_find_db (im, PARAM_DB)
+	db = gf_find_db_p (im, PARAM_DB)
 
 	if (db  == NULL) {
 	    gn = gf_gstfval (im, "GROUP")
 	} else {
-	    gn = gf_find_db (im, PARAM_GN)
+	    gn = gf_find_db_i (im, PARAM_GN)
 	}
 
 	if (gn == gnum)
@@ -76,7 +76,7 @@ begin
 	# For fits files, emulate the open group call with an immap call
 	# The parameters are determined by the access mode
 
-	if (gf_find_db (im, PARAM_INHERIT) == YES) {
+	if (gf_find_db_i (im, PARAM_INHERIT) == YES) {
 	    call strcpy ("inherit", Memc[extra], SZ_SHORTSTR)
 	} else {
 	    Memc[extra] = EOS

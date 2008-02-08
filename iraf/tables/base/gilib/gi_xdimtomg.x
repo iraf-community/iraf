@@ -24,12 +24,15 @@ pointer	immap()
 pointer	tp
 char	tname[SZ_FNAME]
 char	temp[SZ_FNAME]
-int	dim1, dim2, nlines, lenu, strlen()
-int	stf, gn, tbtopn(), tbtacc(), pp
+int	dim1, dim2, nlines, lenu
+int	stf, gn, pp
 int	ngroups, blklen, compress, pixoff
-real	datamin, datamax, imgetr()
-int	nch, sizeof(), imgeti(), strcmp(), pcount, strldx()
-int     nlen
+int	nch, pcount, nlen
+real	datamin, datamax
+
+int	sizeof(), strlen(), strcmp(), strldx()
+int	tbtacc(), imgeti(), imgetr()
+pointer	tbtopn()
 
 begin
 	call smark (sp)

@@ -21,7 +21,8 @@ int	row, i, colnum, datatype, lendata, lenfmt, ncols
 int	ip
 real	r2min, r2, x0, y0
 
-pointer tbpsta(), tbcnum()
+int	tbpsta()
+pointer tbcnum()
 
 begin
 	# Allocate some space

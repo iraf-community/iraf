@@ -13,11 +13,13 @@ procedure gi_update (im)
 
 pointer im
 
-int	sizeof()
-int	pixtype, bitpix, nbytes, clktime()
-int     xdim, imaccf(), i
+int	pixtype, bitpix, nbytes
+int     xdim, i
 char    keyw[SZ_KEYWORD]
 pointer stf
+
+int	sizeof(), imaccf()
+long	clktime()
 
 begin
 

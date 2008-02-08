@@ -26,7 +26,8 @@ pointer	cline
 int	maxch
 int	lastchar
 
-pointer	stenter(), stalloc()
+pointer	stenter()
+int	stalloc()
 int	readtok(), gtokst(), stnsymbols(), stpstr(), strlen(), spopfd()
 
 common	/symcom/sym

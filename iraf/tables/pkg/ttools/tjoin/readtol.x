@@ -23,7 +23,7 @@ begin
 	call salloc (value, SZ_VALUE, TY_CHAR)
 	call salloc (errtxt, SZ_LINE, TY_CHAR)
 
-	call malloc (tol, LEN_TOLSTRUCT, TY_INT)
+	call malloc (tol, LEN_TOLSTRUCT, TY_STRUCT)
 
 	TOL_NUM(tol) = word_count (tolerance)
 	call malloc (TOL_PTR(tol), TOL_NUM(tol), TY_DOUBLE)

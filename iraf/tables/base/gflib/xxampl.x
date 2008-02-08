@@ -16,7 +16,8 @@ int	ic, igroup, ngroup
 real	datamin, datamax
 pointer	sp, im, key, value
 
-int	word_fetch(), gf_gcount(), gf_map()
+int	word_fetch(), gf_gcount()
+pointer	gf_map()
 
 begin
 	call smark (sp)

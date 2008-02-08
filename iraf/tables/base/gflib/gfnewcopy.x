@@ -10,10 +10,10 @@ int	prim		# i: spool file with primary header keywords
 #--
 pointer	db, old_prim, ext
 
-pointer	gf_find_db()
+pointer	gf_find_db_p()
 
 begin
-	db = gf_find_db (im, PARAM_DB)
+	db = gf_find_db_p (im, PARAM_DB)
 
 	if (db == NULL || prim == NULL)
 	    return

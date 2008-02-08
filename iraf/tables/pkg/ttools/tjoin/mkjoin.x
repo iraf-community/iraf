@@ -27,8 +27,8 @@ int	colnum[1], datatype[1], lendata[1], lenfmt[1]
 pointer	sp, icp, ocp, oldcol, newcol
 pointer	colname, colunits, colfmt
 
-int	tbpsta(), tbcnum(), tbcigi()
-pointer	tbtopn()
+int	tbpsta(), tbcigi()
+pointer	tbtopn(), tbcnum()
 
 begin
 	# Set up arrays in dynamic memory

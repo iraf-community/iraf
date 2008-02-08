@@ -17,7 +17,8 @@ long	v[IM_MAXDIM], nlines, il
 pointer	tempbuf, buf, ext
 real	linemax, linemin, rmax, rmin, datamin, datamax
 
-long	clktime(), gi_gstfval()
+long	clktime()
+int	gi_gstfval()
 int	fstati(), rft_init_read_pixels(), rft_read_pixels(), open()
 int	rft_ieee_read(), tab_read_header(), noop
 data	tempbuf /NULL/

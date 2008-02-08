@@ -11,5 +11,5 @@ pointer	tol		# i: Vector of tolerance values
 
 begin
 	call mfree (TOL_PTR(tol), TY_DOUBLE)
-	call mfree (tol, TY_INT)
+	call mfree (tol, TY_STRUCT)
 end
