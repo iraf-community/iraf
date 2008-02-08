@@ -103,8 +103,8 @@ int	coostat, proj, tlngunits, tlatunits, pfd
 pointer	sp, projstr
 double	clgetd()
 double	dgseval()
-int	sk_decwcs(), sk_stati(), strdic(), open()
-pointer	cc_celwcs(), cc_rdproj()
+int	sk_decwcs(), sk_stati(), strdic(), open(), cc_rdproj()
+pointer	cc_celwcs()
 errchk	open()
 
 begin

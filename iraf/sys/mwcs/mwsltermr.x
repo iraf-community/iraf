@@ -18,7 +18,7 @@ real	ltv[ndim]		#I translation vector
 int	ndim			#I dimensionality of system
 
 int	nelem
-pointer	mw_allocd()
+int	mw_allocd()
 errchk	syserrs, mw_allocd
 
 begin

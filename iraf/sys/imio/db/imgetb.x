@@ -12,7 +12,7 @@ pointer	im			# image descriptor
 char	key[ARB]		# parameter to be returned
 
 pointer	rp
-pointer	idb_findrecord()
+int	idb_findrecord()
 
 begin
 	if (idb_findrecord (im, key, rp) == 0)

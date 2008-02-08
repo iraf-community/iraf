@@ -16,7 +16,7 @@ int	group			#I Currrent group
 pointer lbuf, sp, fb
 int	nchars, index, ncards, pcount, in
 int	mef_read_card(), mef_kctype()
-int	note()
+long	note()
 
 errchk  mef_read_card
 begin
@@ -25,7 +25,7 @@ begin
 	call salloc (fb, FITS_BLOCK_BYTES, TY_CHAR)
 
 	MEF_EXTNAME(mef) = EOS
-	MEF_EXTVER(mef) = INDEFL
+	MEF_EXTVER(mef) = INDEFI
 
 	in = MEF_FD(mef)
 	MEF_HOFF(mef) = note(in)

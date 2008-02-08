@@ -716,7 +716,8 @@ pointer	sp, exp, expr
 int	fd, nchars, nexpr
 int	j, ip, plevel
 
-int	open(), fstatl(), strlen()
+int	open(), strlen()
+long	fstatl()
 char	getc()
 
 errchk	open

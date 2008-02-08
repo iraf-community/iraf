@@ -32,7 +32,8 @@ int	newimage, i, gn, ksinh, type, fmode
 pointer	sp, path, fit_extn, ua, o_fit, fit
 bool    pre_read, fks_extn_or_ver, dyh, fsec, plio
 int	fxf_check_dup_extnv(), itoc(), strcmp(), strncmp()
-int     open(), access(), imgeti(), fstatl(), finfo(), fxf_header_size()
+int     open(), access(), imgeti(), finfo(), fxf_header_size()
+long	fstatl()
 pointer pl_open()
 
 errchk	fmkcopy, calloc, open, fxf_rheader, fxf_prhdr, fxf_gaccess

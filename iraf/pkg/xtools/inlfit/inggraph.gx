@@ -136,7 +136,7 @@ pointer	sp, xr, yr, gt1
 pointer	rejpts
 
 int	in_geti()
-int	in_getp()
+pointer	in_getp()
 
 begin
 	# Don't plot if there are no rejected points

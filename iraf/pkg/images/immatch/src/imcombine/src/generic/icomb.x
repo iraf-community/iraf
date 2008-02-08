@@ -186,8 +186,10 @@ int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
-pointer	immap(), impnli()
-pointer	impnlr(), imgnlr()
+pointer	immap()
+int	impnli()
+int	impnlr()
+int	imgnlr()
 errchk	immap, ic_scale, imgetr, ic_grow, ic_grows, ic_rmasks, ic_gdatas
 
 include	"../icombine.com"
@@ -658,8 +660,10 @@ int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
-pointer	immap(), impnli()
-pointer	impnlr(), imgnlr()
+pointer	immap()
+int	impnli()
+int	impnlr()
+int	imgnlr()
 errchk	immap, ic_scale, imgetr, ic_grow, ic_growi, ic_rmasks, ic_gdatai
 
 include	"../icombine.com"
@@ -1130,8 +1134,10 @@ int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
-pointer	immap(), impnli()
-pointer	impnlr(), imgnlr
+pointer	immap()
+int	impnli()
+int	impnlr()
+int	imgnlr
 errchk	immap, ic_scale, imgetr, ic_grow, ic_growr, ic_rmasks, ic_gdatar
 
 include	"../icombine.com"
@@ -1603,8 +1609,10 @@ int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
-pointer	immap(), impnli()
-pointer	impnld(), imgnld
+pointer	immap()
+int	impnli()
+int	impnld()
+int	imgnld
 errchk	immap, ic_scale, imgetr, ic_grow, ic_growd, ic_rmasks, ic_gdatad
 
 include	"../icombine.com"

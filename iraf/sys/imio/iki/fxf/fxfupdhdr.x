@@ -35,7 +35,8 @@ int	nchars_ua, hdr_fd, group, hdr_off, size
 int	npad, nlines, pixoff, grp_pix_off, nbks
 int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
 int	read(), fxf_hdr_offset(), access(), strncmp()
-int	open(), fnroot(), fstatl(), fnldir()
+int	open(), fnroot(), fnldir()
+long	fstatl()
 bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy

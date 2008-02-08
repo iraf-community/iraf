@@ -75,8 +75,9 @@ pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl, ptr
 
 real	asumr(), amedr(), plt_iformatr()
 int	clgeti(), clgcur(), ctoi(), ctor(), ggeti(), imtlen(), imaccess()
+int	imtrgetim()
 pointer	gopen(), immap(), mw_openim(), mw_sctran(), sl_getstr()
-pointer	imtopenp(), imtrgetim()
+pointer	imtopenp()
 errchk	mw_sctran
 
 define	line_ 91

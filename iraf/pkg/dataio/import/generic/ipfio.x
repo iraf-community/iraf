@@ -222,7 +222,8 @@ int     len					#i length of array
 
 pointer sp, buf
 int     fp, nval, nstat
-int     ip_lnote(), read()
+int	read()
+long	ip_lnote()
 
 begin
         fp = ip_lnote(fd)
@@ -534,7 +535,7 @@ end
 
 # IP_LNOTE -- Note the file position as a byte offset.
 
-int procedure ip_lnote (fd)
+long procedure ip_lnote (fd)
 
 int     fd					#i file descriptor (unused)
 

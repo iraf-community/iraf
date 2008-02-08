@@ -22,10 +22,9 @@ pointer	im, list, ist, buf, hgm
 real	hwidth, hmin, hmax
 
 bool	clgetb()
-int	ist_fields(), ist_isfield, imtgetim(), ist_ihist(), btoi()
-pointer	imtopenp(), imgnlr()
+int	ist_fields(), ist_isfield, imtgetim(), ist_ihist(), btoi(), imgnlr()
 real	clgetr()
-pointer	immap()
+pointer	imtopenp(), immap()
 
 begin
 	call smark (sp)

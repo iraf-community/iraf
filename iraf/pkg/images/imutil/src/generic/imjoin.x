@@ -18,8 +18,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnls()
-pointer	impnls()
+int	imgnls()
+int	impnls()
 
 begin
 	# Allocate working space.
@@ -105,8 +105,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnli()
-pointer	impnli()
+int	imgnli()
+int	impnli()
 
 begin
 	# Allocate working space.
@@ -192,8 +192,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnll()
-pointer	impnll()
+int	imgnll()
+int	impnll()
 
 begin
 	# Allocate working space.
@@ -279,8 +279,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnlr()
-pointer	impnlr()
+int	imgnlr()
+int	impnlr()
 
 begin
 	# Allocate working space.
@@ -366,8 +366,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnld()
-pointer	impnld()
+int	imgnld()
+int	impnld()
 
 begin
 	# Allocate working space.
@@ -453,8 +453,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-pointer	imgnlx()
-pointer	impnlx()
+int	imgnlx()
+int	impnlx()
 
 begin
 	# Allocate working space.

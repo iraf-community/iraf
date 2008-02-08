@@ -24,7 +24,8 @@ int	compress, blklen, pixoff, filesize
 int	i, hdr_size, sz_pixfile, sz_fitfile, junk, npix
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
 int	strncmp(), fxf_header_size(), fxf_totpix(), sizeof()
-int     strlen(), fopnbf(), fstatl(), itoc()
+int     strlen(), fopnbf(), itoc()
+long	fstatl()
 
 define  err_ 91
 define  endowr_ 92
@@ -442,7 +443,8 @@ int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
 int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
 int	fnroot(), open(), read(), fxf_totpix(), strncmp(), itoc()
-int	strlen(), fopnbf(), fstatl(), sizeof(), fxf_header_size()
+int	strlen(), fopnbf(), sizeof(), fxf_header_size()
+long	fstatl()
 
 errchk	syserr, syserrs
 define  err_ 91

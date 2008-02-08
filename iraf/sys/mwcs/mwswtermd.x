@@ -16,7 +16,7 @@ double	cd[ndim,ndim]		#I CD matrix
 int	ndim			#I dimension of Wterm
 
 pointer	wp
-pointer	mw_allocd()
+int	mw_allocd()
 errchk	mw_allocd, syserrs
 string	s_name "mw_swtermd"
 

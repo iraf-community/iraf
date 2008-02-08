@@ -8,7 +8,8 @@ procedure t_pwrity()
 
 char	device[SZ_FNAME]
 int	error_code, wkid
-int	gp, gopen()
+pointer	gp
+pointer	gopen()
 
 begin
 	call clgstr ("device", device, SZ_FNAME)

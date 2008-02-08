@@ -99,7 +99,8 @@ procedure t_encode()
 
 int	v, ip
 char	xnum[8]
-int	ki_decode(), clgeti()
+int	clgeti()
+long	ki_decode()
 
 begin
 	repeat {
@@ -115,6 +116,6 @@ begin
 	    }
 
 	    call printf (" --> %d\n")
-		call pargi (ki_decode (xnum, 8))
+		call pargl (ki_decode (xnum, 8))
 	}
 end

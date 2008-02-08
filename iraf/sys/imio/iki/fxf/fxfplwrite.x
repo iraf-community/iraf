@@ -270,7 +270,8 @@ int	datasize	#I New FITS unit size
 
 pointer sp, tempfile, outname
 int	nchars, junk, inoff, out_fd, size
-int	fnldir(), fnroot(), open(), note()
+int	fnldir(), fnroot(), open()
+long	note()
 errchk	open, note, seek, close, delete, rename
 errchk	fxf_make_adj_copy, fxf_write_blanks
 

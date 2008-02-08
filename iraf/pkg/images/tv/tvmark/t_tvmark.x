@@ -25,8 +25,8 @@ int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete, bufsize
 
 bool	clgetb()
 int	access(), btoi(), clgeti(), imstati(), mk_mark()
-int	imd_wcsver()
-pointer	immap(), open(), imd_mapframe(), iw_open()
+int	imd_wcsver(), open()
+pointer	immap(), imd_mapframe(), iw_open()
 
 begin
 	# Set standard output to flush on newline.
@@ -193,7 +193,7 @@ pointer	out		# pointe to the output image
 
 int	i, ncols, nlines
 pointer	sp, vin, vout, inbuf, outbuf
-pointer	imgnls(), impnls()
+int	imgnls(), impnls()
 errchk	imgnls(), impnls()
 
 begin

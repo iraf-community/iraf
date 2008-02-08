@@ -32,8 +32,8 @@ real	rxmin, rxmax, rymin, rymax
 bool	clgetb()
 double	clgetd()
 int	clgeti(), clgwrd(), clplen(), errget(), imtlen()
-int	imtgetim()
-pointer	imtopenp(), clpopnu(), clgfil(), dtmap(), gopen(), open()
+int	imtgetim(), open(), clgfil()
+pointer	imtopenp(), clpopnu(), dtmap(), gopen()
 
 errchk	geo_mapr(), geo_mapd()
 

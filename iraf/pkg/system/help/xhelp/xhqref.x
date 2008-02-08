@@ -21,7 +21,7 @@ pointer	xh
 long	fiq[LEN_FINFO], fie[LEN_FINFO]
 
 int	access()
-long	finfo()
+int	finfo()
 errchk	access, finfo
 
 begin

@@ -36,7 +36,7 @@ char	varname[ARB]
 int	ip
 long	lval
 char	val[MAX_DIGITS]
-long	ctol()
+int	ctol()
 int	envfind()
 errchk	envfind, syserrs
 

@@ -9,11 +9,14 @@ pointer	mefi		#I input mef descriptor
 pointer	mefo		#I output mef descriptor
 bool	in_phdu		#I true if input header is Primary Header Unit.
 
-pointer hb, sp, ln
-int	output_lines, out, offset
-int	i, index, naxis, mef_kctype(), strncmp(), note()
-bool    endk, new_outf
-errchk  open, fcopyo
+pointer	hb, sp, ln
+int	output_lines, out
+int	i, index, naxis
+bool	endk, new_outf
+long	offset
+int	mef_kctype(), strncmp()
+long	note()
+errchk	open, fcopyo
 
 define	nextb_ 99
 

@@ -201,10 +201,12 @@ int	fd					#i input binary file descriptor
 
 pointer	sp, format, idstr, alias
 pointer	fmt, ap[5]
-int	i, nsym, cur_offset
+int	i, nsym
+long	cur_offset
 
-int	note()
-pointer	stfindall(), fdb_next_rec()
+long	note()
+int	stfindall()
+pointer	fdb_next_rec()
 
 begin
 	# Save current file offset.

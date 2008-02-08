@@ -73,7 +73,8 @@ int	wcs, key, frame, color
 
 bool	ttygetb()
 real	ttygetr()
-int	imd_mapframe(), ttygeti(), shifti(), imdrcur()
+int	ttygeti(), shifti(), imdrcur()
+pointer	imd_mapframe()
 errchk	imd_mapframe, ttygetr, ttygeti, ttygetb
 include	"idk.com"
 

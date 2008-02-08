@@ -30,7 +30,8 @@ long	v1[ARB], v2[ARB]	# Line vectors
 
 int	i, j, k, l, ndim, nused
 real	a, b
-pointer	buf, dp, ip, mp, imgnls()
+pointer	buf, dp, ip, mp
+int	imgnls()
 
 include	"../icombine.com"
 
@@ -258,7 +259,8 @@ long	v1[ARB], v2[ARB]	# Line vectors
 
 int	i, j, k, l, ndim, nused
 real	a, b
-pointer	buf, dp, ip, mp, imgnli()
+pointer	buf, dp, ip, mp
+int	imgnli()
 
 include	"../icombine.com"
 
@@ -486,7 +488,8 @@ long	v1[ARB], v2[ARB]	# Line vectors
 
 int	i, j, k, l, ndim, nused
 real	a, b
-pointer	buf, dp, ip, mp, imgnlr()
+pointer	buf, dp, ip, mp
+int	imgnlr()
 
 include	"../icombine.com"
 
@@ -714,7 +717,8 @@ long	v1[ARB], v2[ARB]	# Line vectors
 
 int	i, j, k, l, ndim, nused
 real	a, b
-pointer	buf, dp, ip, mp, imgnld()
+pointer	buf, dp, ip, mp
+int	imgnld()
 
 include	"../icombine.com"
 

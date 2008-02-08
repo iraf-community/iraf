@@ -59,7 +59,7 @@ int	ier
 
 int	nchars
 pointer	sp, kp, ip
-pointer	imgnfn()
+int	imgnfn()
 int	errcode(), strncmp()
 
 begin

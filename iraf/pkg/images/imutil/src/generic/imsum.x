@@ -35,7 +35,8 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
-pointer	immap(), imgnls(), impnls()
+pointer	immap()
+int	imgnls(), impnls()
 errchk	immap, imunmap, imgnls, impnls
 
 begin
@@ -411,7 +412,8 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
-pointer	immap(), imgnli(), impnli()
+pointer	immap()
+int	imgnli(), impnli()
 errchk	immap, imunmap, imgnli, impnli
 
 begin
@@ -787,7 +789,8 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
-pointer	immap(), imgnll(), impnll()
+pointer	immap()
+int	imgnll(), impnll()
 errchk	immap, imunmap, imgnll, impnll
 
 begin
@@ -1163,7 +1166,8 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
-pointer	immap(), imgnlr(), impnlr()
+pointer	immap()
+int	impnlr(), imgnlr()
 errchk	immap, imunmap, imgnlr, impnlr
 
 begin
@@ -1539,7 +1543,8 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
-pointer	immap(), imgnld(), impnld()
+pointer	immap()
+int	imgnld(), impnld()
 errchk	immap, imunmap, imgnld, impnld
 
 begin

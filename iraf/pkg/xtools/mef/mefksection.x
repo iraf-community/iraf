@@ -26,7 +26,7 @@ int	lex_type, mef_klex(), ctoi()
 begin
 	
         extname[1] = EOS
-        extver = INDEFL
+        extver = INDEFI
 	ip = 1
 	nident = 0
 	nexpr = 0

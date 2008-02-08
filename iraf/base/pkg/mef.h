@@ -13,15 +13,15 @@ define  FITS_ORIGIN  "NOAO-IRAF FITS MEF utility Sep99"
 define	LEN_MEF		 271
 
 define	MEF_FD           Memi[P2I($1)] 		# File descriptor
-define	MEF_HOFF         Memi[P2I($1+2)] 		# Header offset in chars
+define	MEF_HOFF         Meml[P2L($1+2)] 		# Header offset in chars
 define	MEF_ACMODE       Memi[P2I($1+3)] 		# Access mode
 define	MEF_ENUMBER      Memi[P2I($1+4)]		# Absolute extension number
 define	MEF_EXTVER       Memi[P2I($1+5)]		# Extension version
 define	MEF_CGROUP       Memi[P2I($1+6)]		# Current group read
 define	MEF_HFLAG        Memi[P2I($1+7)] 		# Header update flag
 define	MEF_HSIZE        Memi[P2I($1+8)] 		# Header size
-define	MEF_HDRP         Memi[P2I($1+9)] 		# Header area pointer
-define  MEF_POFF         Memi[P2I($1+10)] 		# Offset to pixel area (chars)
+define	MEF_HDRP         Memp[$1+9] 		# Header area pointer
+define	MEF_POFF         Meml[P2L($1+10)] 		# Offset to pixel area (chars)
 define	MEF_NDIM         Memi[P2I($1+11)] 		# Unit dimensionality
 define	MEF_NAXIS        Memi[P2I($1+$2+12-1)] 	# Upto 7 axis
 define	MEF_BITPIX     	 Memi[P2I($1+18)] 		# Unit datatype 

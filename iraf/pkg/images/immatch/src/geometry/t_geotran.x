@@ -491,9 +491,10 @@ char	transform[ARB]		#I name of transform
 pointer	sx1, sy1		#O pointer to linear part of surface fit
 pointer	sx2, sy2		#O pointer to higher order surface
 
-int	i, dt, rec, ncoeff, junk
-pointer	xcoeff, ycoeff, newsx1, newsy1
-int	dtmap(), dtlocate(), dtgeti(), dtscan()
+int	i, rec, ncoeff, junk
+pointer	dt, xcoeff, ycoeff, newsx1, newsy1
+int	dtlocate(), dtgeti(), dtscan()
+pointer	dtmap()
 errchk	gsrestore
 
 begin

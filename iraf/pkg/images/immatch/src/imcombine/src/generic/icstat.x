@@ -28,8 +28,9 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnls()
+pointer	data, mask, dp, lp, mp
 
+int	imgnls()
 real	asums()
 short	ic_modes()
 
@@ -250,8 +251,9 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnli()
+pointer	data, mask, dp, lp, mp
 
+int	imgnli()
 real	asumi()
 int	ic_modei()
 
@@ -472,8 +474,9 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnlr()
+pointer	data, mask, dp, lp, mp
 
+int	imgnlr()
 real	asumr()
 real	ic_moder()
 
@@ -692,8 +695,9 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnld()
+pointer	data, mask, dp, lp, mp
 
+int	imgnld()
 double	asumd()
 double	ic_moded()
 

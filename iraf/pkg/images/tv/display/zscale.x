@@ -68,9 +68,11 @@ real	contrast		#I contrast parameter
 int	maxpix			#I maximum number of pixels in sample
 real	z1, z2			#O output min and max greyscale values
 
-int	i, ndim, nc, nl, npix, nbp, imstati()
+int	i, ndim, nc, nl, npix, nbp
 pointer	sp, section, v, sample, zmask, bp, zim, pmz, pmb, buf
-pointer	zsc_pmsection(), imgnlr()
+
+int	imstati(), imgnlr()
+pointer	zsc_pmsection()
 bool	pm_linenotempty()
 errchk	zsc_pmsection, zsc_zlimits
 

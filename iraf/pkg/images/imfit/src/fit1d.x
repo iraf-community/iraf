@@ -34,8 +34,8 @@ pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
 bool	same, clgetb()
-int	imtgetim(), imtlen(), strdic(), gt_init()
-pointer	imtopen()
+int	imtgetim(), imtlen(), strdic()
+pointer	imtopen(), gt_init()
 int	clgeti()
 real	clgetr()
 

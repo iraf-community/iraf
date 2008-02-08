@@ -26,8 +26,8 @@ bool	clgetb(), streq()
 double	clgetd()
 int	clgeti(), clgwrd(), strdic(), imtlen()
 int	fntlenb(), imtgetim(), fntgfnb(), open(), mw_stati(), sk_decim()
-int	rg_rdxy(), rg_xytoxy(), sk_stati()
-pointer	fntopnb(), imtopen(), immap()
+int	rg_rdxy(), sk_stati()
+pointer	fntopnb(), imtopen(), immap(), rg_xytoxy()
 errchk	mw_gwattrs()
 
 begin

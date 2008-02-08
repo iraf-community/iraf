@@ -17,7 +17,7 @@ int	ndim			#I dimension of Wterm
 
 pointer	wp
 int	nelem
-pointer	mw_allocd()
+int	mw_allocd()
 errchk	mw_allocd, syserrs
 string	s_name "mw_swtermr"
 

@@ -200,11 +200,14 @@ int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
-pointer	immap(), impnli()
+pointer	immap()
+int	impnli()
 $if (datatype == sil)
-pointer	impnlr(), imgnlr()
+int	impnlr()
+int	imgnlr()
 $else
-pointer	impnl$t(), imgnl$t
+int	impnl$t()
+int	imgnl$t
 $endif
 errchk	immap, ic_scale, imgetr, ic_grow, ic_grow$t, ic_rmasks, ic_gdata$t
 

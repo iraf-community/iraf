@@ -272,7 +272,8 @@ procedure t_maxmin()
 char	imname[SZ_FNAME]
 real	minval, maxval
 long	v[IM_MAXDIM], clktime()
-pointer	im, buf, immap(), imgnlr()
+pointer	im, buf, immap()
+int	imgnlr()
 
 begin
 	call clgstr ("imname", imname, SZ_FNAME)

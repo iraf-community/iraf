@@ -269,7 +269,7 @@ real	x[npts], y[npts]			#I Vector to write
 int	npts					#I Npts in vector
 
 int	i
-pointer	fd, open()
+int	fd, open()
 bool	streq()
 errchk	open
 

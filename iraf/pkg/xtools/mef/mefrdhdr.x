@@ -23,11 +23,11 @@ int	group 		#I Group number to read
 char    extname[ARB]    #I Extname to read		
 int	extver		#I Extver to read
 
-int	open(),in, cur_extn, note(), gnum
-int	spool
-bool	extnv, read_next_group
-int	mef_load_header(), mef_pixtype()
-bool    mef_cmp_extnv
+int	in, cur_extn, gnum, spool
+bool	extnv, read_next_group, mef_cmp_extnv
+
+int	open(), mef_load_header(), mef_pixtype()
+long	note()
 errchk	open, read, mef_load_header
 
 begin
@@ -44,7 +44,7 @@ begin
 
 	in = MEF_FD(mef)
 
-	extnv = extname[1] != EOS || extver != INDEFL
+	extnv = extname[1] != EOS || extver != INDEFI
 	spool = open ("spool", NEW_FILE, SPOOL_FILE)
 
 	if (gnum == -1 || extnv)
@@ -167,7 +167,7 @@ bool	bxtn, bxtv, bval, bxtn_eq, bxtv_eq
 
 begin
 	bxtn = extname[1] != EOS
-	bxtv = extver != INDEFL
+	bxtv = extver != INDEFI
 
 	if (bxtn)
 	    bxtn_eq = (mef_strcmp_lwr(MEF_EXTNAME(mef), extname) == 0)
@@ -196,7 +196,10 @@ procedure mef_skip_data_unit (mef)
 
 pointer	mef	#I Input mef descriptor
 
-int	in, ndim, off, note(), mef_totpix()
+int	in, ndim
+long	off
+int	mef_totpix()
+long	note()
 errchk  seek
 
 begin
@@ -342,7 +345,7 @@ errchk  mef_rdhdr
 
 begin
 	extname[1] =EOS
-	extver=INDEFL
+	extver=INDEFI
 	return (mef_rdhdr (mef, gn, extname, extver))
 end
 

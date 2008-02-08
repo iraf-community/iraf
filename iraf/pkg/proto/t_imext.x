@@ -25,10 +25,11 @@ int	lname			# List extension name?
 int	lver			# List extension version?
 pointer	ikparams		# Image kernel parameters
 
-pointer	sp, image, listout
-int	list, nimages, fd
-int	clgwrd(), btoi(), xt_imextns(), imtgetim(), imtlen(), stropen()
+pointer	sp, image, listout, list
+int	nimages, fd
+int	clgwrd(), btoi(), imtgetim(), imtlen(), stropen()
 bool	clgetb()
+pointer	xt_imextns()
 errchk	stropen, fprintf, strclose
 
 begin

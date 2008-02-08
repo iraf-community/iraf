@@ -26,8 +26,8 @@ pointer	in, out				# IMIO pointers
 pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
-pointer	imtopen()
-int	imtgetim(), imtlen(), gt_init()
+pointer	imtopen(), gt_init()
+int	imtgetim(), imtlen()
 int	clgeti()
 real	clgetr()
 bool	clgetb()

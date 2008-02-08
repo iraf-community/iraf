@@ -28,8 +28,10 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnls()
-short	ic_modes(), asums()
+pointer	data, mask, dp, lp, mp
+int	imgnls()
+short	ic_modes()
+real	asums()
 
 include	"../icombine.com"
 
@@ -245,8 +247,10 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnli()
-int	ic_modei(), asumi()
+pointer	data, mask, dp, lp, mp
+int	imgnli()
+int	ic_modei()
+real	asumi()
 
 include	"../icombine.com"
 
@@ -462,7 +466,8 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnlr()
+pointer	data, mask, dp, lp, mp
+int	imgnlr()
 real	ic_moder(), asumr()
 
 include	"../icombine.com"
@@ -677,7 +682,8 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnld()
+pointer	data, mask, dp, lp, mp
+int	imgnld()
 double	ic_moded(), asumd()
 
 include	"../icombine.com"

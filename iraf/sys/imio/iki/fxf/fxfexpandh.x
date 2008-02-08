@@ -32,7 +32,8 @@ int	gn, newc, k, nchars, nbk, hsize
 int	fxf_xaddl(), read()
 
 int	bufsize, psize, rem, hoffset, poffset
-int	note(), fstati()
+int	fstati()
+long	note()
 errchk	malloc, read, write
 
 begin
@@ -157,7 +158,8 @@ int	hsize		#O Number of cards read in header
 
 pointer	sp, hb
 int	nblks, totpix, i, j, ip, nchars
-int	strncmp(), note(), read()
+int	strncmp(), read()
+long	note()
 bool	end_card, fxf_xn_decode_blk1()
 
 include "fxfcache.com"

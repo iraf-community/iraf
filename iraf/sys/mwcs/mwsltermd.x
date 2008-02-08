@@ -13,7 +13,7 @@ double	ltm[ndim,ndim]		#I linear transformation matrix
 double	ltv[ndim]		#I translation vector
 int	ndim			#I dimensionality of system
 
-pointer	mw_allocd()
+int	mw_allocd()
 errchk	syserrs, mw_allocd
 
 begin

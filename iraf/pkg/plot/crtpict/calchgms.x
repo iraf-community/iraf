@@ -24,7 +24,7 @@ long	v[IM_MAXDIM]
 int	dz1, dz2, high_zi, low_zi
 real	high_z, low_z
 bool	ggetb()
-pointer	imgnlr(), imgnli()
+int	imgnlr(), imgnli()
 int	ggeti()
 errchk 	im_minmax, ggeti, imgnli, imgnlr
 
@@ -122,7 +122,7 @@ int	npix
 long	v[IM_MAXDIM]
 short	high_zi, low_zi
 real	high_z, low_z
-pointer	imgnlr(), imgnls()
+int	imgnlr(), imgnls()
 errchk 	im_minmax, imgnls, imgnlr
 
 begin
