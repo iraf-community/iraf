@@ -69,7 +69,7 @@ procedure dcvuserfnc (cv, fnc)
 pointer	cv
 extern	fnc()
 
-int	locpr()
+pointer	locpr()
 
 begin
 	CV_USERFNC(cv) = locpr (fnc)

@@ -16,15 +16,15 @@ define	CV_NPIECES	Memi[P2I($1+14)]	# Number of polynomial pieces - 1
 define	CV_NCOEFF	Memi[P2I($1+15)]	# Number of coefficients
 define	CV_NPTS		Memi[P2I($1+16)]	# Number of data points
 
-define	CV_XBASIS	Memi[P2I($1+17)]	# Pointer to non zero basis for single x
-define	CV_MATRIX	Memi[P2I($1+18)]	# Pointer to original matrix
-define	CV_CHOFAC	Memi[P2I($1+19)]	# Pointer to Cholesky factorization
-define	CV_VECTOR	Memi[P2I($1+20)]	# Pointer to  vector
-define	CV_COEFF	Memi[P2I($1+21)]	# Pointer to coefficient vector
-define	CV_BASIS	Memi[P2I($1+22)]	# Pointer to basis functions (all x)
-define	CV_LEFT		Memi[P2I($1+23)]	# Pointer to first non-zero basis
-define	CV_WY		Memi[P2I($1+24)]	# Pointer to y * w (cvrefit)
-define	CV_USERFNC	Memi[P2I($1+25)]	# Pointer to external user subroutine
+define	CV_XBASIS	Memp[$1+17]	# Pointer to non zero basis for single x
+define	CV_MATRIX	Memp[$1+18]	# Pointer to original matrix
+define	CV_CHOFAC	Memp[$1+19]	# Pointer to Cholesky factorization
+define	CV_VECTOR	Memp[$1+20]	# Pointer to  vector
+define	CV_COEFF	Memp[$1+21]	# Pointer to coefficient vector
+define	CV_BASIS	Memp[$1+22]	# Pointer to basis functions (all x)
+define	CV_LEFT		Memp[$1+23]	# Pointer to first non-zero basis
+define	CV_WY		Memp[$1+24]	# Pointer to y * w (cvrefit)
+define	CV_USERFNC	Memp[$1+25]	# Pointer to external user subroutine
 					# one free slot left
 
 # matrix and vector element definitions

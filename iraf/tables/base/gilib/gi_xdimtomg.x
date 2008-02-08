@@ -31,7 +31,8 @@ int	nch, pcount, nlen
 real	datamin, datamax
 
 int	sizeof(), strlen(), strcmp(), strldx()
-int	tbtacc(), imgeti(), imgetr()
+int	tbtacc(), imgeti()
+real	imgetr()
 pointer	tbtopn()
 
 begin
