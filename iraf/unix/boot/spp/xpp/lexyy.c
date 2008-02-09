@@ -1,4 +1,5 @@
-# include <stdio.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "xpp.h"
 
@@ -66,6 +67,17 @@ int yylex( void )
 	if ( yyout==NULL ) yyout = stdout;
 
 	while ( (nstr = yylook()) >= 0 ) {
+	    if ( nstr == 27 && strcmp(yytext,"size_t")==0 ) {
+#if defined(SPP_LP64) || defined(SPP_ILP64)
+#ifdef SPP_LP64
+		nstr = 5;	/* long */
+#else	/* ILP64 */
+		nstr = 5;	/* long */
+#endif
+#else	/* ILP32 */
+		nstr = 5;	/* long */
+#endif
+	    }
 	    /* yyfussy: */
 	    switch ( nstr ) {
 	    case 0:

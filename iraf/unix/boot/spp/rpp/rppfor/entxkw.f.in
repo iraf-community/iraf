@@ -75,7 +75,7 @@
       integer sextn(7)
       common/spptyp/ dbool(64), dchar(64), dshort(64), dint(64), 
      *               dlong(64), dreal(64), ddble(64),  dcplx(64),
-     *               dpntr(64)
+     *               dpntr(64), dsizet(64)
       integer dbool(64)
       integer dchar(64)
       integer dshort(64)
@@ -85,6 +85,7 @@
       integer ddble(64)
       integer dcplx(64)
       integer dpntr(64)
+      integer dsizet(64)
       integer dfchr(10)
       integer dfunc(9)
       integer dsubr(11)
@@ -133,6 +134,9 @@
       data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
      *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/42/,dpntr(9)/56/,dpn
      *tr(10)/-2/
+      data dsizet(1)/105/,dsizet(2)/110/,dsizet(3)/116/,dsizet(4)/101/,d
+     *sizet(5)/103/,dsizet(6)/101/,dsizet(7)/114/,dsizet(8)/42/,dsizet(9
+     *)/56/,dsizet(10)/-2/
 #else	/* ILP64 */
       data dbool(1)/108/,dbool(2)/111/,dbool(3)/103/,dbool(4)/105/,dbool
      *(5)/99/,dbool(6)/97/,dbool(7)/108/,dbool(8)/-2/
@@ -148,6 +152,8 @@
      *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/-2/
       data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
      *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/-2/
+      data dsizet(1)/105/,dsizet(2)/110/,dsizet(3)/116/,dsizet(4)/101/,d
+     *sizet(5)/103/,dsizet(6)/101/,dsizet(7)/114/,dsizet(8)/-2/
 #endif
 #else	/* ILP32 */
       data dbool(1)/108/,dbool(2)/111/,dbool(3)/103/,dbool(4)/105/,dbool
@@ -164,6 +170,8 @@
      *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/-2/
       data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
      *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/-2/
+      data dsizet(1)/105/,dsizet(2)/110/,dsizet(3)/116/,dsizet(4)/101/,d
+     *sizet(5)/103/,dsizet(6)/101/,dsizet(7)/114/,dsizet(8)/-2/
 #endif
       data dreal(1)/114/,dreal(2)/101/,dreal(3)/97/,dreal(4)/108/,dreal(
      *5)/-2/

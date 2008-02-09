@@ -14,11 +14,13 @@
 #define	XBOOL		int
 #define	XLONG		long int
 #define	XPOINTER	long int
+#define	XSIZE_T		long int
 #else	/* ILP64 */
 #define	XINT		long int
 #define	XBOOL		long int
 #define	XLONG		long int
 #define	XPOINTER	long int
+#define	XSIZE_T		long int
 #endif
 
 #else	/* ILP32 */
@@ -27,6 +29,7 @@
 #define	XBOOL		int
 #define	XLONG		int
 #define	XPOINTER	int
+#define	XSIZE_T		int
 
 #endif
 
@@ -40,8 +43,6 @@
 #define XCOMPLEX	struct cplx
 
 #define	XSTRUCT		XPOINTER
-
-#define	XSIZE_T		XLONG
 
 struct cplx {
 	float	r;
@@ -65,14 +66,14 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XINT		integer
 #define	XBOOL		logical
 #define	XLONG		longint
-#define	XSTRUCT		longint
 #define	XPOINTER	longint
+#define	XSIZE_T		longint
 #else	/* ILP64 */
 #define	XINT		integer
 #define	XBOOL		logical
 #define	XLONG		integer
-#define	XSTRUCT		integer
 #define	XPOINTER	integer
+#define	XSIZE_T		integer
 #endif
 
 #else	/* ILP32 */
@@ -80,8 +81,8 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XINT		integer
 #define	XBOOL		logical
 #define	XLONG		integer
-#define	XSTRUCT		integer
 #define	XPOINTER	integer
+#define	XSIZE_T		integer
 
 #endif
 
@@ -94,7 +95,7 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XDOUBLE		doublereal
 #define XCOMPLEX	complex
 
-#define	XSIZE_T		XLONG
+#define	XSTRUCT		XPOINTER
 
 #define PFU U_fp
 #define PFI I_fp

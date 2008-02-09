@@ -65,7 +65,7 @@
       common/cdsmem/mem
       common/spptyp/ dbool(64), dchar(64), dshort(64), dint(64), 
      *               dlong(64), dreal(64), ddble(64),  dcplx(64),
-     *               dpntr(64)
+     *               dpntr(64), dsizet(64)
       integer dbool
       integer dchar
       integer dshort
