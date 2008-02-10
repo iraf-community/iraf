@@ -20,8 +20,9 @@ pointer	graphics		# pointer to the graphics device
 pointer	sp, cfname, pfname, im, py, id, gd, str
 pointer	plist, clist, imlist
 int	limlist, lplist, lclist, stat, pl, cl, root, pid, cid, wcs
-int	newpy, newcoo, memstat, req_size, old_size
+int	newpy, newcoo, memstat
 int	buf_size
+size_t	req_size, old_size
 
 pointer	gopen(), immap(), clpopnu(), imtopenp()
 int	imtlen(), clplen(), imtgetim(), clgfil(), strncmp(), strlen()

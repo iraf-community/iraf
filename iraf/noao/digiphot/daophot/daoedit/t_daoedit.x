@@ -19,7 +19,8 @@ pointer	display			# the image display
 real	wx, wy, xlast, ylast
 pointer	sp, cmd, im, gd, id
 int	wcs, key, redraw, gcurtype, curtype, xwcs, ywcs, lastkey
-int	req_size, memstat, old_size, buf_size
+int	memstat, buf_size
+size_t	req_size, old_size
 
 pointer	immap(), gopen()
 int	dp_gcur(), btoi(), sizeof(), dp_memstat()

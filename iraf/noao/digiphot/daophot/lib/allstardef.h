@@ -5,13 +5,13 @@ define	LEN_ALLSTARSTRUCT (80)
 define	DP_ISCACHE	Memi[P2I($1)]	# is data cached (default no)
 define	DP_ALLCACHE	Memi[P2I($1+2)]	# is all the data cached ? (yes)
 define	DP_CACHE	Memi[P2I($1+3+$2-1)] # which data is cached ?
-define	DP_SZCACHE	Memi[P2I($1+6)]	# current working set size
-define	DP_SZOLDCACHE	Memi[P2I($1+7)]	# old working set size
-define	DP_DATA		Memi[P2I($1+8)]	# pointer to data
-define	DP_SUBT		Memi[P2I($1+9)]	# pointer to subt
-define	DP_WEIGHTS	Memi[P2I($1+10)]	# pointer to weights
+define	DP_SZCACHE	Memz[P2Z($1+6)]	# current working set size
+define	DP_SZOLDCACHE	Memz[P2Z($1+7)]	# old working set size
+define	DP_DATA		Memp[$1+8]	# pointer to data
+define	DP_SUBT		Memp[$1+9]	# pointer to subt
+define	DP_WEIGHTS	Memp[$1+10]	# pointer to weights
 
-define	DP_SBUF		Memi[P2I($1+13)]	# local subt buffer
+define	DP_SBUF		Memp[$1+13]	# local subt buffer
 define	DP_SNX		Memi[P2I($1+14)]	# subt x dimension
 define	DP_SNY		Memi[P2I($1+15)]	# subt y dimension
 define	DP_SLX		Memi[P2I($1+16)]	# subt lower left x coord
@@ -21,7 +21,7 @@ define	DP_SMY		Memi[P2I($1+19)]	# subt lower right y coord
 define	DP_SXOFF	Memi[P2I($1+20)]	# subt lower left x offset
 define	DP_SYOFF	Memi[P2I($1+21)]	# subt lower left y offset
 
-define	DP_WBUF		Memi[P2I($1+23)]	# local weight buffer
+define	DP_WBUF		Memp[$1+23]	# local weight buffer
 define	DP_WNX		Memi[P2I($1+24)]	# weight x dimension
 define	DP_WNY		Memi[P2I($1+25)]	# weight y dimension
 define	DP_WLX		Memi[P2I($1+26)]	# weight lower left x coord
@@ -31,7 +31,7 @@ define	DP_WMY		Memi[P2I($1+29)]	# weight lower right y coord
 define	DP_WXOFF	Memi[P2I($1+30)]	# weight lower left x offset
 define	DP_WYOFF	Memi[P2I($1+31)]	# weight lower left y offset
 
-define	DP_DBUF		Memi[P2I($1+33)]	# local weight buffer
+define	DP_DBUF		Memp[$1+33]	# local weight buffer
 define	DP_DNX		Memi[P2I($1+34)]	# weight x dimension
 define	DP_DNY		Memi[P2I($1+35)]	# weight y dimension
 define	DP_DLX		Memi[P2I($1+36)]	# weight lower left x coord
@@ -41,21 +41,21 @@ define	DP_DMY		Memi[P2I($1+39)]	# weight lower right y coord
 define	DP_DXOFF	Memi[P2I($1+40)]	# weight lower left x offset
 define	DP_DYOFF	Memi[P2I($1+41)]	# weight lower left y offset
 
-define	DP_ANUMER	Memi[P2I($1+55)]	# pointer to the anumer1 directory
-define	DP_ADENOM	Memi[P2I($1+57)]	# pointer to the adenom1 directory
-define	DP_ARPIXSQ	Memi[P2I($1+59)]	# pointer to the rpixsq directory
-define	DP_ASUMWT	Memi[P2I($1+60)]	# pointer to the sumwt directory
-define	DP_ASKIP	Memi[P2I($1+61)]	# pointer to the skip directory
-define	DP_ALAST	Memi[P2I($1+62)]	# pointer to the last directory
-define	DP_AXOLD	Memi[P2I($1+63)]	# pointer to the xold array
-define	DP_AYOLD	Memi[P2I($1+64)]	# pointer to the yold array
-define	DP_AXCLAMP	Memi[P2I($1+65)]	# pointer to the xclamp array
-define	DP_AYCLAMP	Memi[P2I($1+66)]	# pointer to the yclamp array
-define	DP_AX		Memi[P2I($1+67)]	# pointer to the x array
-define	DP_AV		Memi[P2I($1+68)]	# pointer to the v array
-define	DP_AC		Memi[P2I($1+69)]	# pointer to the c array
-define	DP_ANPIX	Memi[P2I($1+70)]	# pointer to the npix array
-define	DP_AIER		Memi[P2I($1+71)]	# pointer to the error array
+define	DP_ANUMER	Memp[$1+55]	# pointer to the anumer1 directory
+define	DP_ADENOM	Memp[$1+57]	# pointer to the adenom1 directory
+define	DP_ARPIXSQ	Memp[$1+59]	# pointer to the rpixsq directory
+define	DP_ASUMWT	Memp[$1+60]	# pointer to the sumwt directory
+define	DP_ASKIP	Memp[$1+61]	# pointer to the skip directory
+define	DP_ALAST	Memp[$1+62]	# pointer to the last directory
+define	DP_AXOLD	Memp[$1+63]	# pointer to the xold array
+define	DP_AYOLD	Memp[$1+64]	# pointer to the yold array
+define	DP_AXCLAMP	Memp[$1+65]	# pointer to the xclamp array
+define	DP_AYCLAMP	Memp[$1+66]	# pointer to the yclamp array
+define	DP_AX		Memp[$1+67]	# pointer to the x array
+define	DP_AV		Memp[$1+68]	# pointer to the v array
+define	DP_AC		Memp[$1+69]	# pointer to the c array
+define	DP_ANPIX	Memp[$1+70]	# pointer to the npix array
+define	DP_AIER		Memp[$1+71]	# pointer to the error array
 
 define	A_SUBT		1
 define	A_WEIGHT	2

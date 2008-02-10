@@ -84,7 +84,7 @@ begin
 
 	# Check if the image is cached.
 	for (i=1; i<=ccd_ncache; i=i+1) {
-	    pcache = Memi[ccd_pcache+i-1]
+	    pcache = Memp[ccd_pcache+i-1]
 	    im = CCD_IM(pcache)
 	    call imstats (im, IM_IMAGENAME, Memc[str], SZ_LINE)
 	    if (streq (image, Memc[str]))
@@ -95,9 +95,9 @@ begin
 	if (i > ccd_ncache) {
 	    im = immap (image, READ_ONLY, 0)
 	    ccd_ncache = i
-	    call realloc (ccd_pcache, ccd_ncache, TY_INT)
+	    call realloc (ccd_pcache, ccd_ncache, TY_STRUCT)
 	    call malloc (pcache, CCD_LENCACHE, TY_STRUCT)
-	    Memi[ccd_pcache+i-1] = pcache
+	    Memp[ccd_pcache+i-1] = pcache
 	    CCD_IM(pcache) = im
 	    CCD_NACCESS(pcache) = 0
 	    CCD_SZDATA(pcache) = 0
@@ -130,7 +130,7 @@ begin
 	# Free memory not in use.
 	if (ccd_szcache + nbytes > ccd_maxcache) {
 	    for (i=1; i<=ccd_ncache; i=i+1) {
-	        pcache1 = Memi[ccd_pcache+i-1]
+	        pcache1 = Memp[ccd_pcache+i-1]
 	        if (CCD_NACCESS(pcache1) == 0) {
 		    if (CCD_SZDATA(pcache1) > 0) {
 		        ccd_szcache = ccd_szcache - CCD_SZDATA(pcache1)
@@ -178,18 +178,20 @@ procedure ccd_open (max_cache)
 
 int	max_cache	# Maximum cache size in bytes
 
-int	max_size, begmem()
+size_t	max_size, sz_0
+size_t	begmem()
 include	"ccdcache.com"
 
 begin
 	ccd_ncache = 0
 	ccd_maxcache = max_cache
 	ccd_szcache = 0
-	call malloc (ccd_pcache, 1, TY_INT)
+	call malloc (ccd_pcache, 1, TY_STRUCT)
 
 	# Ask for the maximum physical memory.
 	if (ccd_maxcache > 0) {
-	    ccd_oldsize = begmem (0, ccd_oldsize, max_size)
+	    sz_0 = 0
+	    ccd_oldsize = begmem (sz_0, ccd_oldsize, max_size)
 	    call fixmem (max_size)
 	}
 end
@@ -208,7 +210,7 @@ include	"ccdcache.com"
 
 begin
 	for (i=1; i<=ccd_ncache; i=i+1) {
-	    pcache = Memi[ccd_pcache+i-1]
+	    pcache = Memp[ccd_pcache+i-1]
 	    if (CCD_IM(pcache) == im) {
 		CCD_NACCESS(pcache) = CCD_NACCESS(pcache) - 1
 		return
@@ -231,7 +233,7 @@ include "ccdcache.com"
 
 begin
 	for (i=1; i<=ccd_ncache; i=i+1) {
-	    pcache = Memi[ccd_pcache+i-1]
+	    pcache = Memp[ccd_pcache+i-1]
 	    if (CCD_IM(pcache) == im) {
 		ccd_ncache = ccd_ncache - 1
 	        ccd_szcache = ccd_szcache - CCD_SZDATA(pcache)
@@ -239,7 +241,7 @@ begin
 	        call mfree (CCD_BUFS(pcache), TY_SHORT)
 		call mfree (pcache, TY_STRUCT)
 		for (; i<=ccd_ncache; i=i+1)
-		    Memi[ccd_pcache+i-1] = Memi[ccd_pcache+i]
+		    Memp[ccd_pcache+i-1] = Memp[ccd_pcache+i]
 		break
 	    }
 	}
@@ -258,13 +260,13 @@ include "ccdcache.com"
 
 begin
 	for (i=1; i<=ccd_ncache; i=i+1) {
-	    pcache = Memi[ccd_pcache+i-1]
+	    pcache = Memp[ccd_pcache+i-1]
 	    call imunmap (CCD_IM(pcache))
 	    call mfree (CCD_BUFR(pcache), TY_REAL)
 	    call mfree (CCD_BUFS(pcache), TY_SHORT)
 	    call mfree (pcache, TY_STRUCT)
 	}
-	call mfree (ccd_pcache, TY_INT)
+	call mfree (ccd_pcache, TY_POINTER)
 
 	# Restore memory.
 	call fixmem (ccd_oldsize)
@@ -294,7 +296,7 @@ begin
 	# Return cached data.
 	if (IM_PIXTYPE(im) == TY_REAL) {
 	    for (i=1; i<=ccd_ncache; i=i+1) {
-		pcache = Memi[ccd_pcache+i-1]
+		pcache = Memp[ccd_pcache+i-1]
 		if (CCD_IM(pcache) == im) {
 		    if (CCD_SZDATA(pcache) > 0)
 		        return (CCD_DATA(pcache)+(line-1)*IM_LEN(im,1)+col1-1)
@@ -304,7 +306,7 @@ begin
 	    }
 	} else {
 	    for (i=1; i<=ccd_ncache; i=i+1) {
-		pcache = Memi[ccd_pcache+i-1]
+		pcache = Memp[ccd_pcache+i-1]
 		if (CCD_IM(pcache) == im) {
 		    if (CCD_SZDATA(pcache) > 0) {
 		        data = CCD_DATA(pcache)+(line-1)*IM_LEN(im,1)+col1-1
@@ -349,7 +351,7 @@ begin
 	# Return cached data.
 	if (IM_PIXTYPE(im) == TY_SHORT) {
 	    for (i=1; i<=ccd_ncache; i=i+1) {
-		pcache = Memi[ccd_pcache+i-1]
+		pcache = Memp[ccd_pcache+i-1]
 		if (CCD_IM(pcache) == im) {
 		    if (CCD_SZDATA(pcache) > 0)
 		        return (CCD_DATA(pcache)+(line-1)*IM_LEN(im,1)+col1-1)
@@ -359,7 +361,7 @@ begin
 	    }
 	} else {
 	    for (i=1; i<=ccd_ncache; i=i+1) {
-		pcache = Memi[ccd_pcache+i-1]
+		pcache = Memp[ccd_pcache+i-1]
 		if (CCD_IM(pcache) == im) {
 		    if (CCD_SZDATA(pcache) > 0) {
 		        data = CCD_DATA(pcache)+(line-1)*IM_LEN(im,1)+col1-1

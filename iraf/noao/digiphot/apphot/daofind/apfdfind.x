@@ -26,8 +26,9 @@ int	cache			# cache the input image pixels
 
 real	wx, wy
 pointer	sp, cmd, root, den, sky
-int	wcs, key, newimage, newden, newfit, stid, memstat, req_size, old_size
+int	wcs, key, newimage, newden, newfit, stid, memstat
 int	buf_size
+size_t	req_size, old_size
 
 real	apstatr()
 pointer	ap_immap()

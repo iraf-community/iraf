@@ -51,7 +51,7 @@ static unsigned long max_wss = 0;
 /* best_size          : requested working set size, bytes.	*/
 /* new_size, old_size : actual new and old sizes, bytes.	*/
 /* max_size           : max working set size, bytes		*/
-int ZAWSET ( XINT *best_size, XINT *new_size, XINT *old_size, XINT *max_size )
+int ZAWSET ( XSIZE_T *best_size, XSIZE_T *new_size, XSIZE_T *old_size, XSIZE_T *max_size )
 {
 	long physmem=0, kb_page;
 	int debug = (getenv(ENV_DEBUG) != NULL);

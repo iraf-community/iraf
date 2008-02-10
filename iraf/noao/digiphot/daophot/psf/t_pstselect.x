@@ -27,8 +27,9 @@ bool	mkstars			# mark deleted and accepted psf stars
 pointer	sp, pfd, dao, outfname, curfile, str, im, gd, id, mgd
 pointer	alist, olist, imlist
 int	limlist, lalist, lolist, root, apd, pmgd, pltype
-int	wcs, req_size, old_size, buf_size, memstat()
+int	wcs, buf_size, memstat()
 bool	ap_text
+size_t	req_size, old_size
 
 pointer	immap(), gopen(), fntopnb(), imtopen()
 int	tbtopn(), open(), fnldir(), strlen(), strncmp(), fstati(), btoi()

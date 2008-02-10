@@ -172,13 +172,15 @@ char	logfile[ARB]		# Logfile (optional)
 int	stack			# Stack input images?
 
 char	errstr[SZ_LINE]
-int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
+int	i, j, nimages, intype, stack1, err, bufsize_i
 pointer	sp, in, out[4], icm, offsets, key, tmp
+size_t	bufsize, memory, maxsize, oldsize, sz_fg
 
 char	clgetc()
 int	imtlen(), imtgetim(), imtrgetim(), getdatatype()
-int	begmem(), errget(), open(), ty_max(), sizeof()
+int	errget(), open(), ty_max(), sizeof()
 pointer	immap(), ic_pmmap()
+size_t	begmem()
 errchk	ic_imstack, immap, ic_pmmap, ic_setout
 
 include	"icombine.com"
@@ -344,7 +346,8 @@ retry_
 		bufsize = bufsize * sizeof (intype)
 		bufsize = min (bufsize, DEFBUFSIZE)
 		memory = begmem ((nimages + 1) * bufsize, oldsize, maxsize)
-		memory = min (memory, int (FUDGE * maxsize))
+		sz_fg = maxsize * FUDGE
+		memory = min (memory, sz_fg)
 		bufsize = memory / (nimages + 1)
 	    }
 
@@ -353,17 +356,18 @@ retry_
 	    # again.  The integer types are not support because scaling is
 	    # done on  the input data vectors.
 
+	    bufsize_i = bufsize
 	    switch (ty_max (intype, IM_PIXTYPE(out[1]))) {
 	    case TY_SHORT:
-		call icombines (Memi[in], out, Memi[offsets], nimages, bufsize)
+		call icombines (Memi[in], out, Memi[offsets], nimages, bufsize_i)
 	    case TY_USHORT, TY_INT, TY_LONG:
-		call icombinei (Memi[in], out, Memi[offsets], nimages, bufsize)
+		call icombinei (Memi[in], out, Memi[offsets], nimages, bufsize_i)
 	    case TY_DOUBLE:
-		call icombined (Memi[in], out, Memi[offsets], nimages, bufsize)
+		call icombined (Memi[in], out, Memi[offsets], nimages, bufsize_i)
 	    case TY_COMPLEX:
 		call error (1, "Complex images not allowed")
 	    default:
-		call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize)
+		call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize_i)
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)

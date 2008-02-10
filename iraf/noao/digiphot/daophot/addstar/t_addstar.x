@@ -21,9 +21,10 @@ pointer	sp, outfname, im, psffd, oim, dao, str
 pointer	plist, imlist, pimlist, oimlist
 int	limlist, lplist, lpimlist, loimlist
 int	ifd, ofd, j, simple, idoffset, root, verbose, verify, update, wcs
-int	req_size, old_size, buf_size, memstat
+int	buf_size, memstat
 int	seed, iseed[NSEED]
 bool	coo_text
+size_t	req_size, old_size
 
 real	clgetr()
 pointer	immap(), tbtopn(), fntopnb(), imtopen()

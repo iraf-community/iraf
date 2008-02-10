@@ -28,7 +28,8 @@ real	wx, wy, xlist, ylist
 pointer	sp, cmd
 int	newskybuf, newsky, newcenterbuf, newcenter, newmagbuf, newmag
 int	newimage, newlist, ip, wcs, key, colonkey, cier, sier, pier
-int	ltid, oid, prev_num, req_num, req_size, old_size, buf_size, memstat
+int	ltid, oid, prev_num, req_num, buf_size, memstat
+size_t	req_size, old_size
 
 real	apstatr()
 int	clgcur(), apfitsky(), aprefitsky(), apfitcenter(), aprefitcenter()

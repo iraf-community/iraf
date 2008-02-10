@@ -21,8 +21,9 @@ int	verbose		# verbose mode
 
 pointer	sp, outfname, ap, im, gd, id, cname, str
 int	cl, out, limlist, lclist, lolist, lid, sid, root, stat, memstat
-int	wcs, req_size, buf_size, old_size
+int	wcs, buf_size
 pointer	imlist, clist, olist
+size_t	req_size, old_size
 
 pointer	gopen(), immap(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), btoi(), clgfil(), fnldir()

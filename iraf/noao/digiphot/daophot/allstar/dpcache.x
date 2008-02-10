@@ -15,9 +15,11 @@ pointer	im			# pointer to the input image
 pointer	subim			# pointer to the output subtracted image
 int	cache			# cache the data ?
 
-int	npix, req_mem1, req_mem2, req_mem3, old_mem, max_mem
+int	npix
 pointer	sp, temp, allstar, data, weights, subt
-int	sizeof(), begmem()
+size_t	req_mem1, req_mem2, req_mem3, old_mem, max_mem, sz_0
+int	sizeof()
+size_t	begmem()
 pointer	immap()
 errchk	begmem(), calloc()
 
@@ -30,7 +32,8 @@ begin
 	allstar = DP_ALLSTAR(dao)
 
 	# Store the old working set size.
-	DP_SZOLDCACHE(allstar) = begmem (0, old_mem, max_mem)
+	sz_0 = 0
+	DP_SZOLDCACHE(allstar) = begmem (sz_0, old_mem, max_mem)
 
 	# Figure out the memory requirements.
 	npix = IM_LEN(im,1) * IM_LEN(im,2)

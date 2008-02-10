@@ -32,8 +32,9 @@ pointer	alist, clist, olist, oclist, imlist, pimlist
 int	limlist, lalist, lclist, lpimlist
 int	lolist, loclist, up, verify, update, wcs
 int	root, min_lenuserarea, pltype, pfd, pst, psfgr, opst
-int	req_size, old_size, buf_size, memstat
+int	buf_size, memstat
 bool	ap_text, pst_text
+size_t	req_size, old_size
 
 pointer	immap(), tbtopn(), gopen(), fntopnb(), imtopen()
 int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctoi(), clgwrd()

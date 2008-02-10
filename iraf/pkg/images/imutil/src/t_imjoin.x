@@ -16,14 +16,16 @@ define	FUDGE			0.8		# fudge factor
 procedure t_imjoin()
 
 int	i, j, joindim, nimages, inpixtype, ndim, nelems[IM_MAXDIM]
-int	bufsize, maxsize, memory, oldsize, outpixtype, verbose
+int	outpixtype, verbose
 pointer	list, sp, in, out, im, im1, input, output
+size_t	bufsize, maxsize, memory, oldsize, sz_fg
 
 bool	clgetb()
 #char	clgetc()
 int	imtlen(), imtgetim(), clgeti(), btoi()
-int	getdatatype(), ij_tymax(), sizeof(), begmem(), errcode()
+int	getdatatype(), ij_tymax(), sizeof(), errcode()
 pointer	imtopenp(), immap()
+size_t	begmem()
 errchk	immap
 
 define	retry_	99
@@ -142,7 +144,8 @@ retry_
 	    bufsize = bufsize * sizeof (inpixtype)
 	    bufsize = min (bufsize, DEFBUFSIZE)
 	    memory = begmem ((nimages + 1) * bufsize, oldsize, maxsize)
-	    memory = min (memory, int (FUDGE * maxsize))
+	    sz_fg = maxsize * FUDGE
+	    memory = min (memory, sz_fg)
 	    bufsize = memory / (nimages + 1)
 	}
 

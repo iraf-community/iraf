@@ -16,8 +16,9 @@ pointer	sp, input, output, dao, outfname, str
 pointer	alist, elist, imlist, pimlist, simlist
 int	psffd, photfd, root, verify, update, wcs
 int	limlist, lalist, lpimlist, lsimlist
-int	exfd, lelist, cache, req_size, old_size, buf_size, memstat
+int	exfd, lelist, cache, buf_size, memstat
 bool	ap_text, ex_text
+size_t	req_size, old_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	open(), fnldir(), strlen(), strncmp(), access(), fstati(), btoi()

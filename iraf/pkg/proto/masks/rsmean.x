@@ -15,8 +15,9 @@ bool	verbose			#I print task statistics
 real	fscale
 pointer	sp, image, outimage, tmpimage, str
 pointer	im, outim, tmpim
-int	i, nimages, nlo, nhi, ostart, ofinish, start, finish, imno, oldsize
-int	bufsize, first, last
+int	i, nimages, nlo, nhi, ostart, ofinish, start, finish, imno
+int	first, last
+size_t	oldsize, bufsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap()
@@ -225,7 +226,8 @@ real	fscale
 pointer	sp, image, outimage, tmpimage, imptrs, imids, str
 pointer	im, tmpim, outim
 int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
-int	oldsize, bufsize, first, last
+int	first, last
+size_t	oldsize, bufsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap(), imgstr()
@@ -447,8 +449,9 @@ bool	verbose			#I print task statistics
 real	fscale
 pointer	sp, image, outimage, tmpimage, str
 pointer	im, outim, tmpim
-int	i, nimages, nlo, nhi, ostart, ofinish, start, finish, imno, oldsize
-int	newsize, first, last
+int	i, nimages, nlo, nhi, ostart, ofinish, start, finish, imno
+int	first, last
+size_t	oldsize, newsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap()
@@ -973,10 +976,11 @@ int	imids[ARB]			#O the input image ids
 int	start				#I the starting image in the series
 int	finish				#I the ending image in the serious
 bool	cache				#I cache the image in memory ?
-int	oldsize				#O the original working set size
+size_t	oldsize				#O the original working set size
 
 pointer	sp, image
-int	n, i, bufsize
+int	n, i
+size_t	bufsize
 pointer	immap()
 int	imtrgetim(), btoi()
 
@@ -1016,7 +1020,8 @@ int	ofinish				#I the old ending image in the serious
 bool	cache				#I cache image buffers ?
 
 pointer	sp, image
-int	i, n, nold, nsub, nadd, bufsize
+int	i, n, nold, nsub, nadd
+size_t	bufsize
 pointer	immap()
 int	imtrgetim(), btoi()
 

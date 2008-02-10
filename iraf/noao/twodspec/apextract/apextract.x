@@ -97,8 +97,8 @@ int	nsubaps			# Number of subapertures
 int	interptype		# Edge interpolation type
 
 int	i, j, k, napsex, aaxis, baxis, namax, na, nb, na1, interpbuf
-int	amin, amax, bmin, bmax
-int	new_size, old_size, max_size, best_size
+int	amin, amax, bmin, bmax, nmx_i
+size_t	new_size, old_size, max_size, best_size, sz_0
 real	cmin, cmax, xmin, xmax, shift
 pointer	sp, str, bkgstr, wtstr, cleanstr, apsex
 pointer	a, b, c, astart, spec, specsky, specsig, raw, profile
@@ -106,9 +106,10 @@ pointer	a1, a2, b1, b2, c1, c2, im, pim, ap, cv, ic, dbuf, pbuf, sbuf, svar, ptr
 pointer	asi
 
 bool	clgetb(), apgetb(), strne()
-int	apgeti(), apgwrd(), begmem(), ap_check()
+int	apgeti(), apgwrd(), ap_check()
 real	apgimr(), ap_cveval(), ic_getr()
 pointer	ap_immap(), imgs2r(), imgl2r()
+size_t	begmem()
 errchk	salloc, malloc, ap_immap, imgs2r, imgl2r, asiinit
 errchk	ap_check, ap_skyeval, ap_profile, ap_variance, ap_output, apgimr
 
@@ -297,13 +298,18 @@ begin
 	# is used.  Later I/O may exceed this since at least one
 	# aperture + background is needed in memory.
 
-	new_size = begmem (0, old_size, max_size)
+	sz_0 = 0
+	new_size = begmem (sz_0, old_size, max_size)
 	namax = (amax - amin + 1)
 	nb = (bmax - bmin + 1)
-	if (pim == NULL)
-	    namax = min (namax, int (0.8 * max_size / SZ_REAL / nb))
-	else
-	    namax = min (namax, int (0.8 * max_size / SZ_REAL / nb / 2))
+	if (pim == NULL) {
+	    nmx_i = 0.8 * max_size / SZ_REAL / nb
+	    namax = min (namax, nmx_i)
+	}
+	else {
+	    nmx_i = 0.8 * max_size / SZ_REAL / nb / 2
+	    namax = min (namax, nmx_i)
+	}
 	best_size = 1.2 * namax * nb * SZ_REAL
 	new_size = begmem (best_size, old_size, max_size)
 

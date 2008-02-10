@@ -301,14 +301,16 @@ int	stack				# Stack input images?
 bool	delete				# Delete input images?
 
 char	errstr[SZ_LINE]
-int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
+int	i, j, nimages, intype, stack1, err, bufsize_i
+size_t	bufsize, maxsize, memory, oldsize, sz_fg
 pointer	sp, sp1, in, out[3], offsets, temp, key, tmp
 
 int	getdatatype()
 real	clgetr()
 char	clgetc()
-int	clgeti(), begmem(), errget(), open(), ty_max(), sizeof()
+int	clgeti(), errget(), open(), ty_max(), sizeof()
 pointer	immap(), ic_plfile()
+size_t	begmem()
 errchk	ic_imstack, immap, ic_plfile, ic_setout, ccddelete
 
 include	"icombine.com"
@@ -484,7 +486,8 @@ retry_
 		bufsize = bufsize * sizeof (intype)
 		bufsize = min (bufsize, DEFBUFSIZE)
 		memory = begmem ((nimages + 1) * bufsize, oldsize, maxsize)
-		memory = min (memory, int (FUDGE * maxsize))
+		sz_fg = maxsize * FUDGE
+		memory = min (memory, sz_fg)
 		bufsize = memory / (nimages + 1)
 	    }
 
@@ -492,13 +495,14 @@ retry_
 	    # images and files, divide the IMIO buffer size in half and try
 	    # again.
 
+	    bufsize_i = bufsize
 	    switch (intype) {
 	    case TY_SHORT:
 		call icombines (Memi[in], out, Memi[offsets], nimages,
-		    bufsize)
+		    bufsize_i)
 	    default:
 		call icombiner (Memi[in], out, Memi[offsets], nimages,
-		    bufsize)
+		    bufsize_i)
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)

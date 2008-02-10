@@ -28,7 +28,8 @@ pointer	sp, x, y, xout, yout, cmd
 int	nvertices, cier, sier, pier, wcs, key, ip, colonkey
 int	prev_num, req_num, ptid, ltid, delim, newlist, newimage
 int	newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag
-int	req_size, old_size, buf_size, memstat
+int	buf_size, memstat
+size_t	req_size, old_size
 
 real	apstatr()
 int	ap_ymkpoly(), ap_yfit(), clgcur(), apfitsky(), aprefitsky()

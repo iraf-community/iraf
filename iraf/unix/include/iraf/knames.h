@@ -356,7 +356,7 @@ extern int ZAWRND ( XINT *, XCHAR *, XINT *, XLONG * );
 extern int ZAWRPL ( XINT *, XCHAR *, XINT *, XLONG * );
 extern int ZAWRPR ( XINT *, XCHAR *, XINT *, XLONG * );
 extern int ZAWRSF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWSET ( XINT *, XINT *, XINT *, XINT * );
+extern int ZAWSET ( XSIZE_T *, XSIZE_T *, XSIZE_T *, XSIZE_T * );
 extern int ZAWTBF ( XINT *, XINT * );
 /* ZAWTGD -> gdev/ */
 extern int ZAWTKS ( XINT *, XINT * );

@@ -29,8 +29,9 @@ int	cache			# cache the input image pixels
 real	wx, wy, xlist, ylist
 pointer	sp, cmd
 int	newimage, newskybuf, newsky, newcenterbuf, newcenter, newmagbuf, newmag
-int	colonkey, prev_num, req_num, ip, cier, sier, pier, oid, req_size
-int	old_size, buf_size, memstat, wcs, key, ltid, newlist
+int	colonkey, prev_num, req_num, ip, cier, sier, pier, oid
+int	buf_size, memstat, wcs, key, ltid, newlist
+size_t	req_size, old_size
 
 real	apstatr()
 int	clgcur(), apfitsky(), aprefitsky(), apfitcenter(), aprefitcenter()

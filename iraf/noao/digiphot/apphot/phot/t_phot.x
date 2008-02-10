@@ -26,8 +26,9 @@ int	verbose			# type messages on the terminal
 pointer	sp, cname, outfname, str, ap, im, gd, mgd, id
 pointer	clist, olist, slist, imlist
 int	limlist, lclist, lolist, lslist, sid, lid, sd, out, cl, root, stat, pfd
-int	memstat, old_size, wcs, req_size
+int	memstat, wcs
 int	buf_size
+size_t	req_size, old_size
 
 pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), apstati(), strncmp()

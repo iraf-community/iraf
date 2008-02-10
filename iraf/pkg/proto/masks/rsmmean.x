@@ -22,8 +22,9 @@ bool	verbose			#I print task statistics
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, imptrs, mskptrs, str
 pointer	hmask, imids, tmpim, tmpmsk, im, pmim, outim, hmim
-int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages, old_size
-int	new_size, first, last, hstat
+int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
+int	first, last, hstat
+size_t	old_size, new_size
 pointer	immap(), im_pmmap()
 int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
@@ -321,8 +322,9 @@ bool	verbose			#I print task statistics
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, hmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
-int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages, old_size
-int	new_size, first, last, hstat
+int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
+int	first, last, hstat
+size_t	old_size, new_size
 pointer	immap(), im_pmmap(), mp_open()
 int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
@@ -601,8 +603,9 @@ bool	verbose			#I print task statistics
 real	fscale
 pointer	sp, image,  imask, outimage, hmask, tmpimage, tmpmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
-int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages, old_size
-int	new_size, first, last, hstat
+int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
+int	first, last, hstat
+size_t	new_size, old_size
 pointer	immap(), mp_open(), im_pmmap()
 int	imtlen(), imtrgetim(), btoi(), imaccess(), imstati(), rs_pmout()
 
@@ -1543,10 +1546,11 @@ int     start                           #I the starting image in the series
 int     finish                          #I the ending image in the serious
 bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache the image in memory ?
-int     old_size                        #O the original working set size
+size_t	old_size                        #O the original working set size
 
 pointer sp, image, str
-int     n, i, bufsize
+int     n, i
+size_t	bufsize
 pointer immap(), mp_open()
 int     imtrgetim(), btoi()
 
@@ -1604,7 +1608,8 @@ bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache image buffers ?
 
 pointer sp, image, str
-int     i, n, nold, nsub, nadd, bufsize
+int     i, n, nold, nsub, nadd
+size_t	bufsize
 pointer immap(), mp_open()
 int     imtrgetim(), btoi()
 

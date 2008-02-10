@@ -23,7 +23,8 @@ int	verbose			# print messages
 pointer	sp, outfname, cname, im, py, id, gd, str
 pointer	plist, olist, clist, imlist
 int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
-int	memstat, wcs, req_size, old_size, buf_size
+int	memstat, wcs, buf_size
+size_t	req_size, old_size
 
 pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()

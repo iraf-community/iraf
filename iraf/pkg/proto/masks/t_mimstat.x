@@ -13,7 +13,8 @@ pointer	sp, inmasks, fieldstr, fields, image, imask, omask, masktemp, str, str2
 pointer	mst, vs, ve, im, pmim, pmout, opm, mp, buf, hgm, smsk
 pointer	imlist, inlist, outlist
 int	i, nclip, nfields, format, mval, npts, npix
-int	nbins, in_invert, nbad, cache, old_size
+int	nbins, in_invert, nbad, cache
+size_t	old_size
 
 real	clgetr()
 pointer	mp_open(), mp_miopen()

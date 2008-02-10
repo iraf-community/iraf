@@ -23,7 +23,8 @@ bool	verbose			#I print image statistics ?
 real	fscale
 pointer	sp, image, imaskname, omaskname, masktemp, str
 pointer	im, ims, pmim, pmout
-int	ip, old_size
+int	ip
+size_t	old_size
 real	imgetr()
 pointer	immap(), im_pmmap(), mp_open()
 int	imtgetim(), imtlen(), imtrgetim(), ctor(), ctowrd(), btoi()

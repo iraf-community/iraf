@@ -35,16 +35,18 @@ value for the base text+data size required to execute a program is 150Kb.
 # returned in SPP chars.  If BEST_SIZE is zero the working set size is not
 # changed, i.e., the current working set parameters are returned.
 
-int procedure begmem (best_size, old_size, max_size)
+size_t procedure begmem (best_size, old_size, max_size)
 
-int	best_size		# desired working set size
-int	old_size		# former working set size
-int	max_size		# max physical memory available to this process
+size_t	best_size		# desired working set size
+size_t	old_size		# former working set size
+size_t	max_size		# max physical memory available to this process
 
-int	new_size
+size_t	new_size
+size_t	best_sz
 
 begin
-	call zawset (best_size * SZB_CHAR, new_size, old_size, max_size)
+	best_sz = best_size * SZB_CHAR
+	call zawset (best_sz, new_size, old_size, max_size)
 	new_size = new_size / SZB_CHAR
 	old_size = old_size / SZB_CHAR
 	max_size = max_size / SZB_CHAR
@@ -57,9 +59,12 @@ end
 
 procedure fixmem (old_size)
 
-int	old_size
-int	j1, j2, j3
+size_t	old_size
+
+size_t	j1, j2, j3
+size_t	best_sz
 
 begin
-	call zawset (old_size * SZB_CHAR, j1, j2, j3)
+	best_sz = old_size * SZB_CHAR
+	call zawset (best_sz, j1, j2, j3)
 end

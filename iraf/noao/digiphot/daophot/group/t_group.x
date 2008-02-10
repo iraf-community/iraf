@@ -15,8 +15,9 @@ pointer	groupfile			# output group table
 pointer	sp, im, dao, outfname, str, alist, olist, imlist, pimlist
 int	apd, root, cache, verbose, verify, update, grp, tp, wcs
 int	limlist, lalist, lpimlist, lolist
-int	req_size, old_size, buf_size, memstat
+int	buf_size, memstat
 bool	ap_text
+size_t	req_size, old_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	access(), fnldir(), strlen(), strncmp(), fstati(), btoi()

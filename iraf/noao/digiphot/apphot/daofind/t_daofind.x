@@ -27,7 +27,8 @@ int	cache			# cache the image pixels
 pointer	im, cnv, sky, sp, outfname, denname, skyname, str
 pointer	ap, cname, display, graphics, id, gd, olist, imlist
 int	limlist, lolist, densave, skysave, out, root, stat
-int	wcs, req_size, old_size, buf_size, memstat
+int	wcs, buf_size, memstat
+size_t	req_size, old_size
 
 real	clgetr()
 pointer	gopen(), immap(), ap_immap()

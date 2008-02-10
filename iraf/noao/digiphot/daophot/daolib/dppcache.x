@@ -8,15 +8,16 @@ include <imset.h>
 int procedure dp_memstat (cache, req_size, old_size)
 
 int	cache			#I cache memory ?
-int	req_size		#I the requested working set size in chars 
-int	old_size		#O the original working set size in chars 
+size_t	req_size		#I the requested working set size in chars 
+size_t	old_size		#O the original working set size in chars 
 
-int	cur_size, max_size
-int	begmem()
+size_t	cur_size, max_size, sz_0
+size_t	begmem()
 
 begin
         # Find the default working set size.
-        cur_size = begmem (0, old_size, max_size)
+	sz_0 = 0
+        cur_size = begmem (sz_0, old_size, max_size)
 
 	# If cacheing is disabled return NO regardless of the working set size.
 	if (cache == NO)

@@ -32,14 +32,16 @@ int	delete				#I Delete input images?
 
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
-int	i, j, nimages, intype, bufsize, oldsize, stack1, err
-int	maxsize, maxmemory, memory
+int	i, j, nimages, intype, stack1, err, bufsize_i
 pointer	sp, im, in1, in, out[6], offsets, key, tmp, bpmstack 
+size_t	bufsize, oldsize, maxsize, maxmemory, memory, sz_0
 
 char	clgetc()
-int	clgwrd(), imtlen(), imtgetim(), imtrgetim(), getdatatype(), envgeti()
-int	begmem(), errget(), open(), ty_max(), sizeof(), strmatch()
+int	clgwrd(), imtlen(), imtgetim(), imtrgetim(), getdatatype()
+long	envgetl()
+int	errget(), open(), ty_max(), sizeof(), strmatch()
 pointer	immap(), xt_immap(), ic_pmmap()
+size_t	begmem()
 errchk	ic_imstack, immap, imunmap, xt_immap, ic_pmmap, ic_setout
 
 include	"icombine.com"
@@ -269,9 +271,10 @@ retry_
 		# program, memory allocator inefficiencies, and any other
 		# memory requirements besides IMIO.
 
-		iferr (maxmemory = envgeti ("imcombine_maxmemory"))
+		iferr (maxmemory = envgetl ("imcombine_maxmemory"))
 		    maxmemory = MAXMEMORY
-		memory = begmem (0, oldsize, maxsize)
+		sz_0 = 0
+		memory = begmem (sz_0, oldsize, maxsize)
 		memory = min (memory, maxsize, maxmemory)
 		bufsize = FUDGE * memory / (nimages + 1) / sizeof (intype)
 	    }
@@ -280,21 +283,22 @@ retry_
 	    # images and files, divide the IMIO buffer size in half and try
 	    # again. 
 
+	    bufsize_i = bufsize
 	    switch (ty_max (intype, IM_PIXTYPE(out[1]))) {
 	    case TY_SHORT:
 		call icombines (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize)
+		    wts, Memi[offsets], nimages, bufsize_i)
 	    case TY_USHORT, TY_INT, TY_LONG:
 		call icombinei (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize)
+		    wts, Memi[offsets], nimages, bufsize_i)
 	    case TY_DOUBLE:
 		call icombined (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize)
+		    wts, Memi[offsets], nimages, bufsize_i)
 	    case TY_COMPLEX:
 		call error (1, "Complex images not allowed")
 	    default:
 		call icombiner (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize)
+		    wts, Memi[offsets], nimages, bufsize_i)
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)

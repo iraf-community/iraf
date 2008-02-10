@@ -19,9 +19,10 @@ int	cache				# cache the input image pixels
 pointer	sp, outfname, im, psfim, dao, str
 pointer	alist, olist, rlist, imlist, pimlist
 int	limlist, lalist, lpimlist, lolist
-int	lrlist, root, grp, nst, rejfd, wcs, req_size, old_size
+int	lrlist, root, grp, nst, rejfd, wcs
 int	buf_size, memstat
 bool	ap_text
+size_t	req_size, old_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
