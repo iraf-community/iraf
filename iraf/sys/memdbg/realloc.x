@@ -9,11 +9,11 @@ include	<syserr.h>
 procedure realloc (ubufp, nelems, dtype)
 
 pointer	ubufp			# buffer to be reallocated
-int	nelems			# new size of buffer
+size_t	nelems			# new size of buffer
 int	dtype			# buffer datatype
 
 int	krealloc()
-int	zrtadr()
+pointer	zrtadr()
 include	"memdbg.com"
 
 begin

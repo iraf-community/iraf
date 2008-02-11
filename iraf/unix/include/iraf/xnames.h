@@ -75,9 +75,9 @@ extern int FLUSH ( XINT * );
 /* ../../../sys/memio/mfree.x */
 extern int MFREE ( XPOINTER *, XINT * );
 /* ../../../sys/memio/malloc.x */
-extern int MALLOC ( XPOINTER *, XINT *, XINT * );
+extern int MALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 /* ../../../sys/memio/realloc.x */
-extern int REALLOC ( XPOINTER *, XINT *, XINT * );
+extern int REALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 
 
 #define	AREAD		aread_		/* other VOS names */
@@ -418,7 +418,7 @@ extern int RENAME ( XCHAR *, XCHAR * );
 /* ../../../sys/fio/reopen.x */
 extern XINT REOPEN ( XINT *, XINT * );
 /* ../../../sys/memio/salloc.x */
-extern int SALLOC ( XPOINTER *, XINT *, XINT * );
+extern int SALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 extern int SMARK ( XPOINTER * );
 extern int SFREE ( XPOINTER * );
 /* ../../../sys/fio/seek.x */

@@ -11,7 +11,7 @@
  * and normally written in assembler.
  */
 
-XINT zrtadr_( void )
+XPOINTER zrtadr_( void )
 {
 	return (0);
 }

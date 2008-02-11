@@ -8,19 +8,25 @@ include	<mach.h>
 # If physical address of buffer does not seem reasonable, memory has probably
 # been overwritten, a fatal error.
 
-int procedure mgtfwa (ptr, dtype)
+pointer procedure mgtfwa (ptr, dtype)
 
-pointer	ptr, bufptr
+pointer	ptr
 int	dtype
-int	locbuf, fwa
+
+pointer	bufptr, locbuf, fwa
+size_t	almf
 pointer	coerce()
 
 begin
-	bufptr = coerce (ptr, dtype, TY_INT)
-	fwa = Memi[bufptr-1]
-	call zlocva (Memi[bufptr-1], locbuf)
+	bufptr = coerce (ptr, dtype, TY_POINTER)
+	fwa = Memp[bufptr-1]
+	call zlocva (Memp[bufptr-1], locbuf)
 
-	if (abs (locbuf - fwa) > SZ_VMEMALIGN)
+	almf = locbuf - fwa
+	if ( almf < 0 ) {
+	    almf = 0 - almf
+	}
+	if (almf > SZ_VMEMALIGN)
 	    call sys_panic (SYS_MCORRUPTED, "Memory has been corrupted")
 
 	return (fwa)

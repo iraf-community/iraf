@@ -58,20 +58,22 @@ TODO:	- Add debugging routine to summarize allocated buffer space and
 int procedure malloc1 (output_pointer, nelems, dtype, sz_align, fwa_align)
 
 pointer	output_pointer		# buffer pointer (output)
-int	nelems			# number of elements of storage required
+size_t	nelems			# number of elements of storage required
 int	dtype			# datatype of the storage elements
 int	sz_align		# number of chars of alignment required
-int	fwa_align		# address to which buffer is to be aligned
+size_t	fwa_align		# address to which buffer is to be aligned
 
-int	fwa, nchars, status
+pointer	fwa
+size_t	nchars
+int	status
 int	sizeof()
 pointer	msvfwa()
 
 begin
 	if (dtype == TY_CHAR)
-	    nchars = nelems + 1 + SZ_INT + sz_align	# add space for EOS
+	    nchars = nelems + 1 + SZ_POINTER + sz_align	# add space for EOS
 	else
-	    nchars = nelems * sizeof (dtype) + SZ_INT + sz_align
+	    nchars = nelems * sizeof (dtype) + SZ_POINTER + sz_align
 
 	call zmaloc (fwa, nchars * SZB_CHAR, status)
 

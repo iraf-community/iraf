@@ -26,18 +26,19 @@ include	<syserr.h>
 int procedure krealloc (ptr, a_nelems, a_dtype)
 
 pointer	ptr			# buffer to be reallocated
-int	a_nelems		# new size of buffer
+size_t	a_nelems		# new size of buffer
 int	a_dtype			# buffer datatype
 
-pointer	dataptr
-int	nelems, dtype, nchars, old_fwa, new_fwa
-int	char_shift, old_char_offset, new_char_offset
-int	status, locbuf, loc_Mem
+int	dtype, status
+pointer	dataptr, old_fwa, new_fwa
+pointer	locbuf, loc_Mem, src_ptr, dest_ptr, src_adr, dest_adr
+size_t	nelems, nchars, npix, i
+size_t	char_shift, old_char_offset, new_char_offset
 
-int	mgtfwa(), sizeof(), kmalloc()
-pointer	mgdptr(), msvfwa(), coerce()
+int	sizeof(), kmalloc()
+pointer	mgtfwa(), mgdptr(), msvfwa(), coerce()
 data	loc_Mem /NULL/
-int	zrtadr()
+pointer	zrtadr()
 include	"memdbg.com"
 
 begin
@@ -52,9 +53,9 @@ begin
 
 	} else {
 	    if (dtype == TY_CHAR)
-		nchars = nelems + 1 + SZ_INT + SZ_MEMALIGN
+		nchars = nelems + 1 + SZ_POINTER + SZ_MEMALIGN
 	    else
-		nchars = nelems * sizeof(dtype) + SZ_INT + SZ_MEMALIGN
+		nchars = nelems * sizeof(dtype) + SZ_POINTER + SZ_MEMALIGN
 	    old_fwa = mgtfwa (ptr, dtype)
 	    new_fwa = old_fwa
 
@@ -104,8 +105,18 @@ begin
 
 	    char_shift = (new_char_offset - old_char_offset)
 	    if (char_shift != 0) {
-		call amovc (Memc[dataptr - char_shift], Memc[dataptr],
-		    nelems * sizeof(dtype))
+		npix = nelems * sizeof(dtype)
+		src_ptr  = dataptr - char_shift
+		dest_ptr = dataptr
+		call zlocva (Memc[src_ptr],  src_adr)
+		call zlocva (Memc[dest_ptr], dest_adr)
+		if ( src_adr < dest_adr ) {
+		    do i = npix-1, 0, -1
+			Memc[dest_ptr + i] = Memc[src_ptr + i]
+		} else if ( dest_adr < src_adr ) {
+		    do i = 0, npix-1
+			Memc[dest_ptr + i] = Memc[src_ptr + i]
+		}
 	    }
 
 	    # Save the fwa of the OS buffer in the buffer header, and return

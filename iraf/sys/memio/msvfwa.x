@@ -6,7 +6,11 @@
 
 pointer procedure msvfwa (fwa, dtype, sz_align, fwa_align)
 
-int	fwa, dtype, sz_align, fwa_align
+pointer	fwa
+int	dtype
+int	sz_align
+pointer	fwa_align
+
 pointer	bufptr, mgdptr()
 pointer	coerce()
 
@@ -15,9 +19,9 @@ begin
 	# alignment criteria.  Store the fwa of the actual OS allocated buffer
 	# in the integer cell preceeding the data area.
 
-	bufptr = mgdptr (fwa, TY_INT, sz_align, fwa_align)
-	Memi[bufptr-1] = fwa
+	bufptr = mgdptr (fwa, TY_POINTER, sz_align, fwa_align)
+	Memp[bufptr-1] = fwa
 
 	# Return pointer of type dtype to the first cell of the data area.
-	return (coerce (bufptr, TY_INT, dtype))
+	return (coerce (bufptr, TY_POINTER, dtype))
 end

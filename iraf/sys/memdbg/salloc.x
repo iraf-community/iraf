@@ -15,9 +15,9 @@ include	<syserr.h>
 # in <config.h> because it is potentially machine dependent.  SZ_STKHDR
 # must be chosen such that the maximum alignment criteria is maintained.
 
-define	SH_BASE		Memi[P2I($1)]	# char pointer to base of segment
-define	SH_TOP		Memi[P2I($1+1)]	# char pointer to top of segment + 1
-define	SH_OLDSEG	Memi[P2I($1+2)]	# struct pointer to header of prev.seg.
+define	SH_BASE		Memp[$1]	# char pointer to base of segment
+define	SH_TOP		Memp[$1+1]	# char pointer to top of segment + 1
+define	SH_OLDSEG	Memp[$1+2]	# struct pointer to header of prev.seg.
 
 
 # SALLOC -- Allocate space on the stack.
@@ -25,10 +25,11 @@ define	SH_OLDSEG	Memi[P2I($1+2)]	# struct pointer to header of prev.seg.
 procedure salloc (output_pointer, nelem, datatype)
 
 pointer	output_pointer		# buffer pointer (output)
-int	nelem			# number of elements of storage required
+size_t	nelem			# number of elements of storage required
 int	datatype		# datatype of the storage elements
 
-int	nchars, dtype
+size_t	nchars
+int	dtype
 include	<szdtype.inc>
 pointer	sp, cur_seg
 common	/salcom/ sp, cur_seg
@@ -72,18 +73,21 @@ end
 procedure smark (old_sp)
 
 pointer	old_sp			# value of the stack pointer (output)
+
+size_t	sz_sk
 bool	first_time
 pointer	sp, cur_seg
 common	/salcom/ sp, cur_seg
 data	first_time /true/
 include	"memdbg.com"
-int	zrtadr()
+pointer	zrtadr()
 
 begin
 	if (first_time) {
 	    sp = NULL
 	    cur_seg = NULL
-	    call stk_mkseg (cur_seg, sp, SZ_STACK)
+	    sz_sk = SZ_STACK
+	    call stk_mkseg (cur_seg, sp, sz_sk)
 	    first_time = false
 	}
 
@@ -104,7 +108,7 @@ pointer	old_seg
 pointer	sp, cur_seg
 common	/salcom/ sp, cur_seg
 include	"memdbg.com"
-int	zrtadr()
+pointer	zrtadr()
 
 begin
 	# The following is needed to avoid recursion when SFREE is called
@@ -139,9 +143,10 @@ procedure stk_mkseg (cur_seg, sp, segment_size)
 
 pointer	cur_seg			# current segment
 pointer	sp			# salloc stack pointer
-int	segment_size		# size of new stack segment
+size_t	segment_size		# size of new stack segment
 
-int	nchars, new_seg
+size_t	nchars
+pointer	new_seg
 pointer	coerce() 
 int	kmalloc()
 

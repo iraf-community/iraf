@@ -7,10 +7,13 @@
 
 pointer procedure mgdptr (fwa, dtype, sz_align, fwa_align)
 
-int	fwa, dtype, sz_align, fwa_align
-long	bufadr
-pointer	bufptr
-int	modulus, loc_Mem
+pointer	fwa
+int	dtype
+int	sz_align
+pointer	fwa_align
+
+pointer	bufadr, bufptr, loc_Mem
+size_t	modulus, quot
 int	sizeof()
 data	loc_Mem /NULL/
 
@@ -20,9 +23,10 @@ begin
 
 	if (loc_Mem == NULL)
 	    call zlocva (Memc, loc_Mem)
-	bufadr = fwa + SZ_INT
+	bufadr = fwa + SZ_POINTER
 
-	modulus = mod (bufadr - fwa_align, sz_align)
+	quot = (bufadr - fwa_align) / sz_align
+	modulus = (bufadr - fwa_align) - sz_align * quot
 	if (modulus != 0)
 	    bufadr = bufadr + (sz_align - modulus)
 

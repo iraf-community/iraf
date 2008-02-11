@@ -8,12 +8,13 @@ include	<config.h>
 int procedure kmalloc (ubufp, nelems, dtype)
 
 pointer	ubufp			# user buffer pointer (output)
-int	nelems			# number of elements of storage required
+size_t	nelems			# number of elements of storage required
 int	dtype			# datatype of the storage elements
 
-int	sz_align, fwa_align
+int	sz_align
+pointer	fwa_align
 int	malloc1()
-int	zrtadr()
+pointer	zrtadr()
 include	"memdbg.com"
 
 begin

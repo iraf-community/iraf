@@ -10,8 +10,11 @@ include	<syserr.h>
 procedure mfree (ptr, dtype)
 
 pointer	ptr
-int	fwa, dtype, status
-int	mgtfwa()
+int	dtype
+
+pointer	fwa
+int	status
+pointer	mgtfwa()
 errchk	mgtfwa
 
 begin

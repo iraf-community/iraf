@@ -10,16 +10,17 @@ include	<config.h>
 procedure malloc (ubufp, nelems, dtype)
 
 pointer	ubufp			# user buffer pointer (output)
-int	nelems			# number of elements of storage required
+size_t	nelems			# number of elements of storage required
 int	dtype			# datatype of the storage elements
 
 extern	kmalloc(), krealloc(), mfree(), realloc(), salloc(), vmalloc()
 int	first_time
 pointer	locpr()
 
-int	sz_align, fwa_align
+int	sz_align
+pointer	fwa_align
 int	malloc1()
-int	zrtadr()
+pointer	zrtadr()
 include	"memdbg.com"
 data	first_time /0/
 

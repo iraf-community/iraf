@@ -5,10 +5,11 @@
 procedure calloc (ubufp, buflen, dtype)
 
 pointer	ubufp			# user buffer pointer [OUTPUT]
-int	buflen			# nelements of space required,
+size_t	buflen			# nelements of space required,
 int	dtype		# of this data type
 
 pointer	char_ptr
+size_t	npix, i
 pointer	coerce()
 int	sizeof()
 errchk	malloc
@@ -16,5 +17,7 @@ errchk	malloc
 begin
 	call malloc (ubufp, buflen, dtype)
 	char_ptr = coerce (ubufp, dtype, TY_CHAR)
-	call aclrc (Memc[char_ptr], buflen * sizeof (dtype))
+	npix = buflen * sizeof (dtype)
+	do i = 0, npix-1
+	    Memc[char_ptr + i] = 0
 end
