@@ -7,8 +7,8 @@ procedure amed3$t (a, b, c, m, npix)
 
 PIXEL	a[ARB], b[ARB], c[ARB]	# input vectors
 PIXEL	m[ARB]				# output vector (median)
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

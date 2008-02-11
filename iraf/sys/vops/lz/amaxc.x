@@ -5,7 +5,7 @@
 procedure amaxc (a, b, c, npix)
 
 char	a[ARB], b[ARB], c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

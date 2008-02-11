@@ -5,9 +5,9 @@
 short procedure ahivs (a, npix)
 
 short	a[ARB]
-int	npix
+size_t	npix
 short	high, pixval
-int	i
+size_t	i
 
 begin
 	high = a[1]

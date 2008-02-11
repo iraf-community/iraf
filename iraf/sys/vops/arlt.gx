@@ -5,9 +5,9 @@
 procedure arlt$t (a, npix, floor, newval)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 PIXEL	floor, newval
-int	i
+size_t	i
 $if (datatype == x)
 real	abs_floor
 $endif

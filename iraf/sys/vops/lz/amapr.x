@@ -13,7 +13,7 @@ real	minout, maxout, aoff, boff, pixval
 
 real	scalar
 
-int	npix, i
+size_t	npix, i
 
 begin
 	    scalar = (real (b2) - real (b1)) / (real (a2) - real (a1))

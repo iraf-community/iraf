@@ -5,9 +5,9 @@
 real procedure ahivr (a, npix)
 
 real	a[ARB]
-int	npix
+size_t	npix
 real	high, pixval
-int	i
+size_t	i
 
 begin
 	high = a[1]

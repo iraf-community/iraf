@@ -8,7 +8,7 @@
 
 /* AMOVI -- Copy a block of memory.
  */
-int AMOVI ( XINT *a, XINT *b, XINT *n )
+int AMOVI ( XINT *a, XINT *b, XSIZE_T *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

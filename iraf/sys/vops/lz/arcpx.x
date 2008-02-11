@@ -8,8 +8,8 @@ procedure arcpx (a, b, c, npix)
 complex	a		# constant numerator
 complex	b[ARB]		# vector denominator
 complex	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == (0.0,0.0)) {

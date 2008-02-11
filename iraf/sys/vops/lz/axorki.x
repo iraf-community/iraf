@@ -7,7 +7,7 @@ procedure axorki (a, b, c, npix)
 int	a[ARB]
 int	b
 int	c[ARB]
-int	npix, i
+size_t	npix, i
 int	xor()
 
 begin

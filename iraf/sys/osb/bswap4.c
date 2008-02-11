@@ -14,7 +14,7 @@
 /* b      : output array		*/
 /* boff   : first byte in output array	*/
 /* nbytes : number of bytes to swap	*/
-int BSWAP4 ( void *a, XINT *aoff, void *b, XINT *boff, XINT *nbytes )
+int BSWAP4 ( void *a, XSIZE_T *aoff, void *b, XSIZE_T *boff, XSIZE_T *nbytes )
 {
 	static char temp[4];
 	char *ip, *op, *tp;

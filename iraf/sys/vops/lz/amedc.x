@@ -8,7 +8,7 @@
 char procedure amedc (a, npix)
 
 char	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 char	median

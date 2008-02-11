@@ -6,8 +6,8 @@ double procedure assqd (a, npix)
 double	sum
 
 double	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	sum = 0.0D0

@@ -5,9 +5,9 @@
 double procedure ahivd (a, npix)
 
 double	a[ARB]
-int	npix
+size_t	npix
 double	high, pixval
-int	i
+size_t	i
 
 begin
 	high = a[1]

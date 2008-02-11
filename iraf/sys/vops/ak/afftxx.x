@@ -14,17 +14,19 @@ int	npix
 
 int	ier
 pointer	sp, xr, xi
+size_t	sz_val
 
 begin
+	sz_val = npix
 	call smark (sp)
-	call salloc (xr, npix, TY_REAL)
-	call salloc (xi, npix, TY_REAL)
+	call salloc (xr, sz_val, TY_REAL)
+	call salloc (xi, sz_val, TY_REAL)
 
 	# Rearrange the elements of the A array as required by FFT842.
 	# Convert the array A of complex values into an array of reals
 	# and an array of imaginaries.
 
-	call aupxr (a, Memr[xr], Memr[xi], npix)
+	call aupxr (a, Memr[xr], Memr[xi], sz_val)
 
 	# Compute the forward transform.
 	call fft842 (0, npix, Memr[xr], Memr[xi], ier)
@@ -33,7 +35,7 @@ begin
 
 	# Repack the real and imaginary arrays to form the complex output
 	# array.
-	call apkxr (Memr[xr], Memr[xi], b, npix)
+	call apkxr (Memr[xr], Memr[xi], b, sz_val)
 
 	call sfree (sp)
 end

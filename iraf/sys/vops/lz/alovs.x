@@ -5,9 +5,9 @@
 short procedure alovs (a, npix)
 
 short	a[ARB]
-int	npix
+size_t	npix
 short	low, pixval
-int	i
+size_t	i
 
 begin
 	low = a[1]

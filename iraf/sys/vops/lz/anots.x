@@ -5,7 +5,7 @@
 procedure anots (a, b, npix)
 
 short	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 short	nots()
 
 begin

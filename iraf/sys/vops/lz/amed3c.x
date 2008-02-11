@@ -7,8 +7,8 @@ procedure amed3c (a, b, c, m, npix)
 
 char	a[ARB], b[ARB], c[ARB]	# input vectors
 char	m[ARB]				# output vector (median)
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

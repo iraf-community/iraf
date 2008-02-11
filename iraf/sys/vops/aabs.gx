@@ -5,9 +5,17 @@
 procedure aabs$t (a, b, npix)
 
 PIXEL	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
+$if (datatype == sil)
+PIXEL	abs$t()
+$endif
 
 begin
+$if (datatype == sil)
+	do i = 1, npix
+	    b[i] = abs$t(a[i])
+$else
 	do i = 1, npix
 	    b[i] = abs(a[i])
+$endif
 end

@@ -10,9 +10,9 @@ procedure amed4r (a, b, c, d, m, npix)
 real	a[ARB], b[ARB]		# input vectors
 real	c[ARB], d[ARB]		# input vectors
 real	m[ARB]				# output vector (median)
-int	npix
+size_t	npix
 
-int	i
+size_t	i
 real	temp
 define	swap {temp=$1;$1=$2;$2=temp}
 

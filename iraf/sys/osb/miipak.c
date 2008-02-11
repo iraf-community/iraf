@@ -44,7 +44,7 @@ formats is defined by the machine constants IEEE_SWAP4 and IEEE_SWAP8.
   spp_datatype : #I SPP datatype code
   mii_datatype : #I MII datatype code
  */
-int MIIPAK ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype, XINT *mii_datatype )
+int MIIPAK ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype, XINT *mii_datatype )
 {
 	switch ( *mii_datatype ) {
 	case MII_BYTE:

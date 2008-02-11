@@ -7,9 +7,10 @@ procedure amodki (a, b, c, npix)
 int	a[ARB]
 int	b
 int	c[ARB]
-int	npix, i
+size_t	npix, i
+int	modi()
 
 begin
 	do i = 1, npix
-	    c[i] = mod (a[i], b)
+	    c[i] = modi (a[i], b)
 end

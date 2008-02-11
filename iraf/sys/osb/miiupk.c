@@ -16,7 +16,7 @@
   spp_datatype : #I SPP datatype code
 */
 
-int MIIUPK ( void *mii, void *spp, XINT *nelems, XINT *mii_datatype, XINT *spp_datatype )
+int MIIUPK ( void *mii, void *spp, XSIZE_T *nelems, XINT *mii_datatype, XINT *spp_datatype )
 {
 	switch ( *mii_datatype ) {
 	case MII_BYTE:

@@ -15,7 +15,7 @@
   spp_datatype : #I SPP datatype code
 */
 
-int MIIUPK8 ( void *mii, void *spp, XINT *nelems, XINT *spp_datatype )
+int MIIUPK8 ( void *mii, void *spp, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	ACHTB ((XUBYTE *)mii, spp, nelems, spp_datatype);
 	return 0;

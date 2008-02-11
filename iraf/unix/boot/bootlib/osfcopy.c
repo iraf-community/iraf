@@ -1,9 +1,10 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#include "bootlib.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "bootlib.h"
 
 /* OS_FCOPY -- Copy a file.  Used by RTAR to resolve links.
  */

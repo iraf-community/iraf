@@ -7,9 +7,9 @@ real procedure apolr (x, coeff, ncoeff)
 
 real	x		# point at which the polynomial is to be evaluated
 real	coeff[ncoeff]	# coefficients of the polynomial, lower orders first
-int	ncoeff
+size_t	ncoeff
 
-int	i
+size_t	i
 real	pow, sum
 
 begin

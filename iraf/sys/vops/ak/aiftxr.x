@@ -12,13 +12,15 @@ real	fr[ARB], fi[ARB]	# transform, frequency domain (input)
 real	sr[ARB], si[ARB]	# data, spatial domain (output)
 int	npix
 int	ier
+size_t	sz_val
 
 begin
 	# The following are no-ops if the transform is being performed
 	# in place.
 
-	call amovr (fr, sr, npix)
-	call amovr (fi, si, npix)
+	sz_val = npix
+	call amovr (fr, sr, sz_val)
+	call amovr (fi, si, sz_val)
 
 	# Compute the inverse transform.
 	call fft842 (1, npix, sr, si, ier)

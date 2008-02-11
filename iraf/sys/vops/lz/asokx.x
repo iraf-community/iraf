@@ -24,10 +24,10 @@ include <mach.h>
 complex procedure asokx (a, npix, ksel)
 
 complex	a[ARB]			# input array
-int	npix			# number of pixels
-int	ksel			# element to be selected
+size_t	npix			# number of pixels
+size_t	ksel			# element to be selected
 
-int	lo, up, i, j, k, dummy
+size_t	lo, up, i, j, k, dummy
 complex	temp, wtemp
 real	abs_temp
 

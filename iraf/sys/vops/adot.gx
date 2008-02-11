@@ -17,7 +17,7 @@ $else
 real	sum
 $endif
 
-int	npix, i
+size_t	npix, i
 
 begin
 	sum = 0$f

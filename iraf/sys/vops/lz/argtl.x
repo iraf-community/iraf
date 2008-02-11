@@ -6,9 +6,9 @@
 procedure argtl (a, npix, ceil, newval)
 
 long	a[ARB]
-int	npix
+size_t	npix
 long	ceil, newval
-int	i
+size_t	i
 
 begin
 

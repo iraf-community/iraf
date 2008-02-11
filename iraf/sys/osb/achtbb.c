@@ -7,7 +7,7 @@
 
 /* ACHTBB -- Unpack an unsigned byte array into an SPP array.
  */
-int ACHTBB ( XUBYTE *a, XUBYTE *b, XINT *npix )
+int ACHTBB ( XUBYTE *a, XUBYTE *b, XSIZE_T *npix )
 {
 	XUBYTE *ip;
 	XUBYTE *op;

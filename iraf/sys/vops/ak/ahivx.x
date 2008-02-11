@@ -5,10 +5,10 @@
 complex procedure ahivx (a, npix)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 complex	high, pixval
 real	abs_high
-int	i
+size_t	i
 
 begin
 	high = a[1]

@@ -6,9 +6,9 @@
 procedure argti (a, npix, ceil, newval)
 
 int	a[ARB]
-int	npix
+size_t	npix
 int	ceil, newval
-int	i
+size_t	i
 
 begin
 

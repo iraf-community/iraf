@@ -8,14 +8,14 @@ include	<mach.h>
 procedure ahgml (data, npix, hgm, nbins, z1, z2)
 
 long 	data[ARB]		# data vector
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	hgm[ARB]		# output histogram
-int	nbins			# number of bins in histogram
+size_t	nbins			# number of bins in histogram
 long	z1, z2			# greyscale values of first and last bins
 
 long	z
 real	dz
-int	bin, i
+size_t	bin, i
 
 begin
 	dz = real (nbins - 1) / real (z2 - z1)
@@ -23,7 +23,8 @@ begin
 	    do i = 1, npix {
 		z = data[i]
 		if (z >= z1 && z <= z2) {
-		    bin = int (z - z1) + 1
+		    bin = z - z1
+		    bin = bin + 1
 		    hgm[bin] = hgm[bin] + 1
 		}
 	    }
@@ -31,7 +32,8 @@ begin
 	    do i = 1, npix {
 		z = data[i]
 		if (z >= z1 && z <= z2) {
-		    bin = int ((z - z1) * dz) + 1
+		    bin = (z - z1) * dz
+		    bin = bin + 1
 		    hgm[bin] = hgm[bin] + 1
 		}
 	    }

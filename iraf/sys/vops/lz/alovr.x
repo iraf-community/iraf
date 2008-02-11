@@ -5,9 +5,9 @@
 real procedure alovr (a, npix)
 
 real	a[ARB]
-int	npix
+size_t	npix
 real	low, pixval
-int	i
+size_t	i
 
 begin
 	low = a[1]

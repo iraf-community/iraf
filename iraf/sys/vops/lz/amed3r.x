@@ -7,8 +7,8 @@ procedure amed3r (a, b, c, m, npix)
 
 real	a[ARB], b[ARB], c[ARB]	# input vectors
 real	m[ARB]				# output vector (median)
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

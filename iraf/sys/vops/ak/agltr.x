@@ -8,10 +8,10 @@
 procedure agltr (a, b, npix, low, high, kmul, kadd, nrange)
 
 real	a[ARB], b[ARB], pixval
-int	npix, i
+size_t	npix, i
 real	low[nrange], high[nrange]	# range limits
 real	kmul[nrange], kadd[nrange]
-int	nrange, nr
+size_t	nrange, nr
 
 begin
 	do i = 1, npix {

@@ -8,7 +8,7 @@
 
 /* ACLRP -- Clear a block of memory.
  */
-int ACLRP ( XPOINTER *a, XINT *n )
+int ACLRP ( XPOINTER *a, XSIZE_T *n )
 {
 	memset ((char *)a, 0, *n * sizeof(*a));
 	return 0;

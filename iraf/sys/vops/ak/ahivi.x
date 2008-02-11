@@ -5,9 +5,9 @@
 int procedure ahivi (a, npix)
 
 int	a[ARB]
-int	npix
+size_t	npix
 int	high, pixval
-int	i
+size_t	i
 
 begin
 	high = a[1]

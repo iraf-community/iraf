@@ -8,9 +8,9 @@ procedure acht$t$$t (a, b, npix)
 
 PIXEL	a[ARB]
 $PIXEL	b[ARB]
-int	npix
+size_t	npix
 $$if (datatype != $t)
-int	i
+size_t	i
 $$endif
 
 begin

@@ -10,7 +10,7 @@
   Data types are BUcsilrdx.
 */
 
-int ACHTC ( XCHAR *a, void *b, XINT *nelem, XINT *ty_b )
+int ACHTC ( XCHAR *a, void *b, XSIZE_T *nelem, XINT *ty_b )
 {
 	switch ( *ty_b ) {
 	case TY_UBYTE:

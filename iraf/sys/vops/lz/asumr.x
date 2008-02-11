@@ -6,8 +6,8 @@
 real procedure asumr (a, npix)
 
 real	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 real	sum
 

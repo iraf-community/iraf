@@ -8,10 +8,11 @@ define	LOGPTR	32			# log2(maxpts) (4e9)
 procedure asrtc (a, b, npix)
 
 char	a[ARB], b[ARB]		# input, output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 
 char	pivot, temp
-int	i, j, k, p, lv[LOGPTR], uv[LOGPTR]
+size_t	i, j, k, lv[LOGPTR], uv[LOGPTR]
+int	p
 define	swap {temp=$1;$1=$2;$2=temp}
 
 begin

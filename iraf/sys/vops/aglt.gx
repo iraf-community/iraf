@@ -8,7 +8,7 @@
 procedure aglt$t (a, b, npix, low, high, kmul, kadd, nrange)
 
 PIXEL	a[ARB], b[ARB], pixval
-int	npix, i
+size_t	npix, i
 PIXEL	low[nrange], high[nrange]	# range limits
 $if (datatype == dl)
 double	kmul[nrange], kadd[nrange]	# linear transformation
@@ -18,7 +18,7 @@ $endif
 $if (datatype == x)
 real	abs_pixval
 $endif
-int	nrange, nr
+size_t	nrange, nr
 
 begin
 	do i = 1, npix {

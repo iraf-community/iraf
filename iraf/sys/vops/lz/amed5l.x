@@ -9,9 +9,9 @@ procedure amed5l (a, b, c, d, e, m, npix)
 long	a[ARB], b[ARB]		# input vectors
 long	c[ARB], d[ARB], e[ARB]	# input vectors
 long	m[ARB]				# output vector (median)
-int	npix
+size_t	npix
 
-int	i
+size_t	i
 long	temp
 define	swap {temp=$1;$1=$2;$2=temp}
 

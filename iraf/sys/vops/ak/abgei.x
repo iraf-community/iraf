@@ -7,8 +7,8 @@ procedure abgei (a, b, c, npix)
 
 int	a[ARB], b[ARB]
 int	c[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

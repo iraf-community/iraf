@@ -15,7 +15,7 @@
   nelems       : #I number of integers to be converted
   spp_datatype : #I SPP datatype code
 */
-int MIIPAK16 ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
+int MIIPAK16 ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	switch ( *spp_datatype ) {
 	case TY_UBYTE:
@@ -56,8 +56,8 @@ int MIIPAK16 ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
 	}
 
 	if (BYTE_SWAP == YES) {
-	    XINT c_1 = 1;
-	    XINT x_n = *nelems * 2;
+	    XSIZE_T c_1 = 1;
+	    XSIZE_T x_n = *nelems * 2;
 	    BSWAP2 (mii, &c_1, mii, &c_1, &x_n);
 	}
 

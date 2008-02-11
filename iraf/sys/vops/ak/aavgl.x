@@ -6,9 +6,10 @@
 procedure aavgl (a, npix, mean, sigma)
 
 long	a[ARB]
-int	npix
+size_t	npix
 double	mean, sigma, lcut, hcut
-int	junk, awvgl()
+size_t	junk
+size_t	awvgl()
 data	lcut /0./, hcut /0./
 
 begin

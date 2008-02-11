@@ -8,7 +8,7 @@
 long procedure amedl (a, npix)
 
 long	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 long	median

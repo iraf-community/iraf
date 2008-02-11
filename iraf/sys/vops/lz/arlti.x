@@ -5,9 +5,9 @@
 procedure arlti (a, npix, floor, newval)
 
 int	a[ARB]
-int	npix
+size_t	npix
 int	floor, newval
-int	i
+size_t	i
 
 begin
 

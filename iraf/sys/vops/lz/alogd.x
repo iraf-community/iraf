@@ -7,7 +7,7 @@
 procedure alogd (a, b, npix, errfcn)
 
 double	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 double	errfcn()
 errchk	errfcn

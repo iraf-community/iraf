@@ -6,7 +6,7 @@ procedure amovkl (a, b, npix)
 
 long	a
 long	b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

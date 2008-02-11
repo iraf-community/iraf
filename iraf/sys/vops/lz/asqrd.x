@@ -6,7 +6,7 @@
 procedure asqrd (a, b, npix, errfcn)
 
 double	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 double	errfcn()
 errchk	errfcn

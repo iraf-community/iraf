@@ -7,9 +7,9 @@ include	<mach.h>
 #
 # THIS PROCEDURE HAS BEEN OBSOLETED BY MIIPAKLEN.
 
-int procedure miilen (nelems, mii_datatype)
+size_t procedure miilen (nelems, mii_datatype)
 
-int	nelems			#I number of MII data elements
+size_t	nelems			#I number of MII data elements
 int	mii_datatype		#I datatype of MII data
 
 begin

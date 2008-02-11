@@ -6,7 +6,7 @@ procedure apows (a, b, c, npix)
 
 short	a[ARB], c[ARB]
 int	b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

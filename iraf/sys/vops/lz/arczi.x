@@ -14,10 +14,10 @@ procedure arczi (a, b, c, npix, errfcn)
 
 int	a			# numerator
 int	b[ARB], c[ARB]		# divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 int	divisor
 extern	errfcn()
 errchk	errfcn

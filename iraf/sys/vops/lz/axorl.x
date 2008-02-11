@@ -5,7 +5,7 @@
 procedure axorl (a, b, c, npix)
 
 long	a[ARB], b[ARB], c[ARB]
-int	npix, i
+size_t	npix, i
 long	xorl()
 
 begin

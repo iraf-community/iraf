@@ -7,7 +7,7 @@ procedure amaxkd (a, b, c, npix)
 double	a[ARB]
 double	b
 double	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 

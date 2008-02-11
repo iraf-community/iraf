@@ -6,7 +6,7 @@
 # checking is performed.  The number of pixels in the sample is returned as the
 # function value.
 
-int procedure awvg$t (a, npix, mean, sigma, lcut, hcut)
+size_t procedure awvg$t (a, npix, mean, sigma, lcut, hcut)
 
 PIXEL	a[ARB]
 $if (datatype == dl)
@@ -15,7 +15,7 @@ $else
 real	mean, sigma, lcut, hcut
 $endif
 double	sum, sumsq, value, temp
-int	npix, i, ngpix
+size_t	npix, i, ngpix
 
 begin
 	sum = 0.0

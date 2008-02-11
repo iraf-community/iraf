@@ -7,9 +7,9 @@ double procedure apold (x, coeff, ncoeff)
 
 double	x		# point at which the polynomial is to be evaluated
 double	coeff[ncoeff]	# coefficients of the polynomial, lower orders first
-int	ncoeff
+size_t	ncoeff
 
-int	i
+size_t	i
 double	pow, sum
 
 begin

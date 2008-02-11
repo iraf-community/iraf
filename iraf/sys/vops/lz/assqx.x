@@ -6,8 +6,8 @@ complex procedure assqx (a, npix)
 complex	sum
 
 complex	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	sum = (0.0,0.0)

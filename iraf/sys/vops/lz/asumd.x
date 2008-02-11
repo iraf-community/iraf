@@ -6,8 +6,8 @@
 double procedure asumd (a, npix)
 
 double	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 double	sum
 

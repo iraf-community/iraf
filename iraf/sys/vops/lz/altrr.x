@@ -8,7 +8,7 @@ procedure altrr (a, b, npix, k1, k2, k3)
 
 real	a[ARB], b[ARB]
 real	k1, k2, k3
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

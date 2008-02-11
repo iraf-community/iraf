@@ -8,7 +8,7 @@ procedure aborks (a, b, c, npix)
 short	a[ARB]
 short	b
 short	c[ARB]
-int	npix, i
+size_t	npix, i
 short	ors()
 
 begin

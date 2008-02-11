@@ -13,10 +13,10 @@
 procedure advzi (a, b, c, npix, errfcn)
 
 int	a[ARB], b[ARB], c[ARB]	# numerator, divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 int	divisor
 extern	errfcn()
 errchk	errfcn

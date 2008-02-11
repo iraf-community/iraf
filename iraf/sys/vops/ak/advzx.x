@@ -13,10 +13,10 @@
 procedure advzx (a, b, c, npix, errfcn)
 
 complex	a[ARB], b[ARB], c[ARB]	# numerator, divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 complex	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 complex	divisor
 extern	errfcn()
 errchk	errfcn

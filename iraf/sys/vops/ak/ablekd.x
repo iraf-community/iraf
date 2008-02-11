@@ -8,8 +8,8 @@ procedure ablekd (a, b, c, npix)
 double	a[ARB]
 double	b
 int	c[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	# The case b==0 is perhaps worth optimizing.  On many machines this

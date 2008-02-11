@@ -5,17 +5,19 @@
 procedure apowkx (a, b, c, npix)
 
 complex	a[ARB], c[ARB]
+complex	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = (1.0,1.0)
 	switch (b) {
 	case 0:
-	    call amovkx ((1.0,1.0), c, npix)
+	    call amovkx (c_1, c, npix)
 	case 1:
 	    call amovx (a, c, npix)
 	case 2:

@@ -7,7 +7,7 @@
 procedure amov$t (a, b, npix)
 
 PIXEL	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 pointer	a_first, b_first
 
 begin

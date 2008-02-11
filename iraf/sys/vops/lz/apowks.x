@@ -5,17 +5,19 @@
 procedure apowks (a, b, c, npix)
 
 short	a[ARB], c[ARB]
+short	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1
 	switch (b) {
 	case 0:
-	    call amovks (1, c, npix)
+	    call amovks (c_1, c, npix)
 	case 1:
 	    call amovs (a, c, npix)
 	case 2:

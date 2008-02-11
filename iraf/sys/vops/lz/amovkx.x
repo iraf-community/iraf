@@ -6,7 +6,7 @@ procedure amovkx (a, b, npix)
 
 complex	a
 complex	b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

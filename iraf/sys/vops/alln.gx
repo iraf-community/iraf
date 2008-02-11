@@ -7,7 +7,7 @@
 procedure alln$t (a, b, npix, errfcn)
 
 PIXEL	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 PIXEL	errfcn()
 errchk	errfcn

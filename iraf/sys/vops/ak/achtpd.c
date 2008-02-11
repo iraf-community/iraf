@@ -7,7 +7,7 @@
 
 /* ACHTP_ -- Pack an SPP datatype array.
  */
-int ACHTPD ( XPOINTER *a, XDOUBLE *b, XINT *npix )
+int ACHTPD ( XPOINTER *a, XDOUBLE *b, XSIZE_T *npix )
 {
 	XPOINTER *ip;
 	XDOUBLE *op;

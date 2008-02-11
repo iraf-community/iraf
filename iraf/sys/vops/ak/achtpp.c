@@ -7,7 +7,7 @@
 
 /* ACHTPP -- Pack an SPP datatype array.
  */
-int ACHTPP ( XPOINTER *a, XPOINTER *b, XINT *npix )
+int ACHTPP ( XPOINTER *a, XPOINTER *b, XSIZE_T *npix )
 {
 	XPOINTER *ip;
 	XPOINTER *op;

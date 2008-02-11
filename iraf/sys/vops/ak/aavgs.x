@@ -6,9 +6,10 @@
 procedure aavgs (a, npix, mean, sigma)
 
 short	a[ARB]
-int	npix
+size_t	npix
 real	mean, sigma, lcut, hcut
-int	junk, awvgs()
+size_t	junk
+size_t	awvgs()
 data	lcut /0./, hcut /0./
 
 begin

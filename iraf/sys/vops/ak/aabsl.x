@@ -5,9 +5,10 @@
 procedure aabsl (a, b, npix)
 
 long	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
+long	absl()
 
 begin
 	do i = 1, npix
-	    b[i] = abs(a[i])
+	    b[i] = absl(a[i])
 end

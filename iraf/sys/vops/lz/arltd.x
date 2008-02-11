@@ -5,9 +5,9 @@
 procedure arltd (a, npix, floor, newval)
 
 double	a[ARB]
-int	npix
+size_t	npix
 double	floor, newval
-int	i
+size_t	i
 
 begin
 

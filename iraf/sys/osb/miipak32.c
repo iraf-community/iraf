@@ -55,13 +55,13 @@
 	    } \
 	}
 
-int MIIPAK32 ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
+int MIIPAK32 ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	XINT buf[1] = { 0 };
 	unsigned char *buf_ptr = (unsigned char *)buf;
 	unsigned char (*mii_ptr)[4] = (unsigned char (*)[4])mii;
 	XINT i0, i1, i2, i3;
-	XINT i;
+	XSIZE_T i;
 
 	if (BYTE_SWAP == YES) {
 	    i0=3; i1=2; i2=1; i3=0;

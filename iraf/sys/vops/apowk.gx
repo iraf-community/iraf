@@ -5,17 +5,19 @@
 procedure apowk$t (a, b, c, npix)
 
 PIXEL	a[ARB], c[ARB]
+PIXEL	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1$f
 	switch (b) {
 	case 0:
-	    call amovk$t (1$f, c, npix)
+	    call amovk$t (c_1, c, npix)
 	case 1:
 	    call amov$t (a, c, npix)
 	case 2:

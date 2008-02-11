@@ -6,8 +6,8 @@
 double procedure asuml (a, npix)
 
 long	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 double	sum
 

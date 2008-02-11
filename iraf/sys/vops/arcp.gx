@@ -8,8 +8,8 @@ procedure arcp$t (a, b, c, npix)
 PIXEL	a		# constant numerator
 PIXEL	b[ARB]		# vector denominator
 PIXEL	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0$f) {

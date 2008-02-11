@@ -9,13 +9,15 @@ define	MAXPIX		4096
 procedure xft
 
 complex	x[MAXPIX]
-int	npix, ntrip
+size_t	npix
+int	ntrip
 long	seed
-int	i, clgeti()
+size_t	i
+long	clgetl()
 real	urand()
 
 begin
-	npix  = max(1, min(MAXPIX, clgeti ("npix")))
+	npix  = max(1, min(MAXPIX, clgetl ("npix")))
 	ntrip = clgeti ("ntrip")
 	seed = 1
 

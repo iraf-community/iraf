@@ -6,9 +6,10 @@
 procedure aavgi (a, npix, mean, sigma)
 
 int	a[ARB]
-int	npix
+size_t	npix
 real	mean, sigma, lcut, hcut
-int	junk, awvgi()
+size_t	junk
+size_t	awvgi()
 data	lcut /0./, hcut /0./
 
 begin

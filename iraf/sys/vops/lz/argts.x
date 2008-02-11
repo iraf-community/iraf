@@ -6,9 +6,9 @@
 procedure argts (a, npix, ceil, newval)
 
 short	a[ARB]
-int	npix
+size_t	npix
 short	ceil, newval
-int	i
+size_t	i
 
 begin
 

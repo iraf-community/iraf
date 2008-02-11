@@ -5,17 +5,19 @@
 procedure apowkr (a, b, c, npix)
 
 real	a[ARB], c[ARB]
+real	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1.0
 	switch (b) {
 	case 0:
-	    call amovkr (1.0, c, npix)
+	    call amovkr (c_1, c, npix)
 	case 1:
 	    call amovr (a, c, npix)
 	case 2:

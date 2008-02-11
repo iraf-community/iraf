@@ -6,9 +6,9 @@
 procedure argt$t (a, npix, ceil, newval)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 PIXEL	ceil, newval
-int	i
+size_t	i
 $if (datatype == x)
 real	abs_ceil
 $endif

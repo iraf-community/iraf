@@ -6,8 +6,8 @@
 complex procedure asumx (a, npix)
 
 complex	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 complex	sum
 

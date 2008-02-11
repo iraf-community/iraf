@@ -20,8 +20,8 @@
 #define MII2SMALL(x_type) { \
 	    XREAL buf[TMP_BUFSIZE]; \
 	    XREAL *mii_ptr = (XREAL *)mii; \
-	    XINT x_n = TMP_BUFSIZE; \
-	    XINT i,j; \
+	    XSIZE_T x_n = TMP_BUFSIZE; \
+	    XSIZE_T i,j; \
 	    for ( i=0 ; i < *nelems ; i += TMP_BUFSIZE ) { \
 		if (*nelems-i < TMP_BUFSIZE) x_n = *nelems-i; \
 		IEEVUPKR (mii_ptr + i, buf, &x_n); \
@@ -31,7 +31,7 @@
 	    } \
 	}
 
-int MIIUPKR ( void *mii, void *spp, XINT *nelems, XINT *spp_datatype )
+int MIIUPKR ( void *mii, void *spp, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	switch ( *spp_datatype ) {
 	/* large to small */

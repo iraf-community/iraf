@@ -6,7 +6,7 @@ procedure awsux (a, b, c, npix, k1, k2)
 
 complex	a[ARB], b[ARB], c[ARB]
 complex	k1, k2
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

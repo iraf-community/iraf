@@ -8,7 +8,7 @@
 double procedure amedd (a, npix)
 
 double	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 double	median

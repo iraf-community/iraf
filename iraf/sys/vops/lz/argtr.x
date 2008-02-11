@@ -6,9 +6,9 @@
 procedure argtr (a, npix, ceil, newval)
 
 real	a[ARB]
-int	npix
+size_t	npix
 real	ceil, newval
-int	i
+size_t	i
 
 begin
 

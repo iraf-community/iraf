@@ -12,8 +12,10 @@ include	<mach.h>
 int procedure aravr (a, npix, mean, sigma, ksig)
 
 real	a[ARB]			# input data array
+size_t	npix
 real	mean, sigma, ksig, deviation, lcut, hcut, lgpx
-int	npix, ngpix, old_ngpix, awvgr()
+size_t	ngpix, old_ngpix
+size_t	awvgr()
 
 begin
 	lcut = -MAX_REAL				# no rejection to start

@@ -9,7 +9,7 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-int ACHTBC ( XUBYTE *a, XCHAR *b, XINT *npix )
+int ACHTBC ( XUBYTE *a, XCHAR *b, XSIZE_T *npix )
 {
 	XUBYTE *ip;
 	XCHAR *op;

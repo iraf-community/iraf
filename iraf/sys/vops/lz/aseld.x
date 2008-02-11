@@ -9,8 +9,8 @@ procedure aseld (a, b, c, sel, npix)
 
 double	a[ARB], b[ARB], c[ARB]
 int	sel[ARB]			# IF sel[i] THEN a[i] ELSE b[i]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

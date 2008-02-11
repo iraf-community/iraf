@@ -10,9 +10,9 @@ procedure amed4s (a, b, c, d, m, npix)
 short	a[ARB], b[ARB]		# input vectors
 short	c[ARB], d[ARB]		# input vectors
 short	m[ARB]				# output vector (median)
-int	npix
+size_t	npix
 
-int	i
+size_t	i
 short	temp
 define	swap {temp=$1;$1=$2;$2=temp}
 

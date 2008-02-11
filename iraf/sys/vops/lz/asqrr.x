@@ -6,7 +6,7 @@
 procedure asqrr (a, b, npix, errfcn)
 
 real	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 real	errfcn()
 errchk	errfcn

@@ -7,8 +7,8 @@ procedure aupxr (a, b, c, npix)
 
 complex	a[ARB]			# input vector
 real	b[ARB], c[ARB]	# output vectors
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix {

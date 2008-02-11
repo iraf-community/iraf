@@ -5,7 +5,7 @@
 procedure alim$t (a, npix, minval, maxval)
 
 PIXEL	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

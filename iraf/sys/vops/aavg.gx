@@ -6,13 +6,14 @@
 procedure aavg$t (a, npix, mean, sigma)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 $if (datatype == dl)
 double	mean, sigma, lcut, hcut
 $else
 real	mean, sigma, lcut, hcut
 $endif
-int	junk, awvg$t()
+size_t	junk
+size_t	awvg$t()
 data	lcut /0./, hcut /0./
 
 begin

@@ -10,7 +10,7 @@ char	a[ARB]
 
 char	b[ARB]				# output data array
 char	lut[ARB]			# lookup table
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

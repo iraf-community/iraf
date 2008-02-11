@@ -5,9 +5,9 @@
 int procedure alovi (a, npix)
 
 int	a[ARB]
-int	npix
+size_t	npix
 int	low, pixval
-int	i
+size_t	i
 
 begin
 	low = a[1]

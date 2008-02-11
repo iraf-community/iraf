@@ -5,17 +5,19 @@
 procedure apowkd (a, b, c, npix)
 
 double	a[ARB], c[ARB]
+double	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1.0D0
 	switch (b) {
 	case 0:
-	    call amovkd (1.0D0, c, npix)
+	    call amovkd (c_1, c, npix)
 	case 1:
 	    call amovd (a, c, npix)
 	case 2:

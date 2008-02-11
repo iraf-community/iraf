@@ -7,7 +7,7 @@ procedure aminkc (a, b, c, npix)
 char	a[ARB]
 char	b
 char	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 

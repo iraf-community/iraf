@@ -5,7 +5,7 @@
 procedure anotl (a, b, npix)
 
 long	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 long	notl()
 
 begin

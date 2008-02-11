@@ -14,10 +14,10 @@ procedure arczd (a, b, c, npix, errfcn)
 
 double	a			# numerator
 double	b[ARB], c[ARB]		# divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 double	divisor
 double	tol
 extern	errfcn()

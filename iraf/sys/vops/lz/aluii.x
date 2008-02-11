@@ -13,14 +13,15 @@ procedure aluii (a, b, x, npix)
 
 int	a[ARB], b[ARB]
 real	x[ARB], fraction, tol
-int	npix, i, left_pixel
+size_t	npix, i
+long	left_pixel
 
 begin
 	tol = EPSILONR * 5.0
 
 	do i = 1, npix {
-	    left_pixel = int (x[i])
-	    fraction = x[i] - real(left_pixel)
+	    left_pixel = x[i]
+	    fraction = x[i] - left_pixel
 	    if (fraction < tol)
 		b[i] = a[left_pixel]
 	    else

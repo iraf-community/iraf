@@ -8,10 +8,10 @@
 procedure aglts (a, b, npix, low, high, kmul, kadd, nrange)
 
 short	a[ARB], b[ARB], pixval
-int	npix, i
+size_t	npix, i
 short	low[nrange], high[nrange]	# range limits
 real	kmul[nrange], kadd[nrange]
-int	nrange, nr
+size_t	nrange, nr
 
 begin
 	do i = 1, npix {

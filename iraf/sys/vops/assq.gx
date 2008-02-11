@@ -14,8 +14,8 @@ PIXEL	sum
 $endif $endif
 
 PIXEL	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	sum = 0$f

@@ -13,10 +13,10 @@
 procedure advzr (a, b, c, npix, errfcn)
 
 real	a[ARB], b[ARB], c[ARB]	# numerator, divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 real	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 real	divisor
 real	tol
 extern	errfcn()

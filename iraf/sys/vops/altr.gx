@@ -12,7 +12,7 @@ double	k1, k2, k3
 $else
 real	k1, k2, k3
 $endif
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

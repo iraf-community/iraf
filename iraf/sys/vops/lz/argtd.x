@@ -6,9 +6,9 @@
 procedure argtd (a, npix, ceil, newval)
 
 double	a[ARB]
-int	npix
+size_t	npix
 double	ceil, newval
-int	i
+size_t	i
 
 begin
 

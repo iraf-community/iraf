@@ -5,7 +5,7 @@
 procedure alimi (a, npix, minval, maxval)
 
 int	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

@@ -7,8 +7,8 @@ procedure amed3d (a, b, c, m, npix)
 
 double	a[ARB], b[ARB], c[ARB]	# input vectors
 double	m[ARB]				# output vector (median)
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

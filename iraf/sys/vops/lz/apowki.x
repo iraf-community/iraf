@@ -5,17 +5,19 @@
 procedure apowki (a, b, c, npix)
 
 int	a[ARB], c[ARB]
+int	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1
 	switch (b) {
 	case 0:
-	    call amovki (1, c, npix)
+	    call amovki (c_1, c, npix)
 	case 1:
 	    call amovi (a, c, npix)
 	case 2:

@@ -9,7 +9,7 @@ complex	a[ARB], b[ARB]
 
 real	sum
 
-int	npix, i
+size_t	npix, i
 
 begin
 	sum = (0.0,0.0)

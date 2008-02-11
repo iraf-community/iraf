@@ -15,7 +15,7 @@
   spp_datatype : #I SPP datatype code
 */
 
-int MIIPAKD ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
+int MIIPAKD ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	if ( *spp_datatype == TY_DOUBLE ) {
 	    IEEVPAKD ((XDOUBLE *)spp, mii, nelems);

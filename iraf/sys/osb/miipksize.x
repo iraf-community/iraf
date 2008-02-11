@@ -7,9 +7,9 @@ include	<mach.h>
 # in mii.h; we assume here that the integer codes are the sizes of the MII
 # types in bits.
 
-int procedure miipksize (nelems, mii_type)
+size_t procedure miipksize (nelems, mii_type)
 
-int	nelems			#I number of MII elements of type mii_type
+size_t	nelems			#I number of MII elements of type mii_type
 int	mii_type		#I <mii.h> type code (=8,16,32,-32,-64)
 
 begin

@@ -6,9 +6,9 @@
 procedure argtx (a, npix, ceil, newval)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 complex	ceil, newval
-int	i
+size_t	i
 real	abs_ceil
 
 begin

@@ -6,8 +6,8 @@ double procedure assql (a, npix)
 double	sum
 
 long	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	sum = 0

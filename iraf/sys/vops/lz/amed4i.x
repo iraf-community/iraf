@@ -10,9 +10,9 @@ procedure amed4i (a, b, c, d, m, npix)
 int	a[ARB], b[ARB]		# input vectors
 int	c[ARB], d[ARB]		# input vectors
 int	m[ARB]				# output vector (median)
-int	npix
+size_t	npix
 
-int	i
+size_t	i
 int	temp
 define	swap {temp=$1;$1=$2;$2=temp}
 

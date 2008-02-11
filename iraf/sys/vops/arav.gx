@@ -12,12 +12,14 @@ include	<mach.h>
 int procedure arav$t (a, npix, mean, sigma, ksig)
 
 PIXEL	a[ARB]			# input data array
+size_t	npix
 $if (datatype == dl)
 double	mean, sigma, ksig, deviation, lcut, hcut, lgpx
 $else
 real	mean, sigma, ksig, deviation, lcut, hcut, lgpx
 $endif
-int	npix, ngpix, old_ngpix, awvg$t()
+size_t	ngpix, old_ngpix
+size_t	awvg$t()
 
 begin
 	lcut = -MAX_REAL				# no rejection to start

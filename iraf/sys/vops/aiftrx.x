@@ -19,10 +19,11 @@ complex	a[ARB]			# transform, npix/2+1 elements
 real	b[ARB]			# output data array
 int	npix
 int	ier
+size_t	sz_val
 
 begin
 	# The following is a no-op if A and B are the same array.
-	call amovx (a, b, npix / 2 + 1)
+	sz_val = npix / 2 + 1;  call amovx (a, b, sz_val)
 
 	# Compute the inverse real transform.
 	call ffs (b, npix, ier)

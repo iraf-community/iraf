@@ -8,8 +8,8 @@ procedure arcpr (a, b, c, npix)
 real	a		# constant numerator
 real	b[ARB]		# vector denominator
 real	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0.0) {

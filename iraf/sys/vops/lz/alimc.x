@@ -5,7 +5,7 @@
 procedure alimc (a, npix, minval, maxval)
 
 char	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

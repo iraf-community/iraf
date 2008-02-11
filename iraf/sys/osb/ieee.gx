@@ -68,11 +68,12 @@ procedure ieevpak$t (native, ieee, nelem)
 
 PIXEL	native[ARB]		#I input native floating format array
 PIXEL	ieee[ARB]		#O output IEEE floating format array
-int	nelem			#I number of floating point numbers
+size_t	nelem			#I number of floating point numbers
 
-int	i
+size_t	i
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -103,9 +104,10 @@ procedure ieevupk$t (ieee, native, nelem)
 
 PIXEL	ieee[ARB]		#I input IEEE floating format array
 PIXEL	native[ARB]		#O output native floating format array
-int	nelem			#I number of floating point numbers
+size_t	nelem			#I number of floating point numbers
 
-int	expon, i
+size_t	i
+int	expon
 $if (datatype == r)
 real	fval
 int	ival[1]
@@ -117,7 +119,8 @@ int	ival[2]
 $endif
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -168,7 +171,8 @@ procedure ieepak$t (x)
 PIXEL	x			#U datum to be converted
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -200,7 +204,8 @@ int	ival[2]
 $endif
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -232,7 +237,8 @@ procedure ieesnan$t (x)
 PIXEL	x			#I native value which will replace NaN
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -249,7 +255,8 @@ procedure ieegnan$t (x)
 PIXEL	x			#O native value which will replace NaN
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -262,11 +269,12 @@ end
 
 procedure ieestat$t (o_nin, o_nout)
 
-int	o_nin				#O number of NaN seen on input
-int	o_nout				#O number of NaN values output
+size_t	o_nin				#O number of NaN seen on input
+size_t	o_nout				#O number of NaN values output
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -280,7 +288,8 @@ end
 procedure ieezstat$t ()
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -310,7 +319,8 @@ int	inval				#O get input mapping enable flag
 int	outval				#O get output mapping enable flag
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -342,7 +352,8 @@ int	outval				#I enable NaN mapping for output?
 #$endif
 
 PIXEL	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin

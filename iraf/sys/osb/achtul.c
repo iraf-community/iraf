@@ -8,7 +8,7 @@
 /* ACHTU_ -- Unpack an unsigned short integer array into an SPP datatype.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-int ACHTUL ( XUSHORT *a, XLONG *b, XINT *npix )
+int ACHTUL ( XUSHORT *a, XLONG *b, XSIZE_T *npix )
 {
 	XUSHORT *ip;
 	XLONG *op;

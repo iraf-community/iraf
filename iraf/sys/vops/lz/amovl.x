@@ -7,7 +7,7 @@
 procedure amovl (a, b, npix)
 
 long	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 pointer	a_first, b_first
 
 begin

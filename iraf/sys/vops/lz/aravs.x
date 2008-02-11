@@ -12,8 +12,10 @@ include	<mach.h>
 int procedure aravs (a, npix, mean, sigma, ksig)
 
 short	a[ARB]			# input data array
+size_t	npix
 real	mean, sigma, ksig, deviation, lcut, hcut, lgpx
-int	npix, ngpix, old_ngpix, awvgs()
+size_t	ngpix, old_ngpix
+size_t	awvgs()
 
 begin
 	lcut = -MAX_REAL				# no rejection to start

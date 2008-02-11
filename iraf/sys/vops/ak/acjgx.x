@@ -5,8 +5,8 @@
 procedure acjgx (a, b, npix)
 
 complex	a[ARB], b[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

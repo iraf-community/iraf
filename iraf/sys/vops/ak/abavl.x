@@ -8,13 +8,13 @@ procedure abavl (a, b, nblocks, npix_per_block)
 
 long	a[ARB]			# input vector
 long	b[nblocks]		# output vector
-int	nblocks			# number of blocks (pixels in output vector)
-int	npix_per_block		# number of input pixels per block
+size_t	nblocks			# number of blocks (pixels in output vector)
+size_t	npix_per_block		# number of input pixels per block
 
 real	sum, width
 
-int	i, j
-int	block_offset, next_block, block_length
+size_t	i, j
+size_t	block_offset, next_block, block_length
 
 begin
 	block_offset = 1

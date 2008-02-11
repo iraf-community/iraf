@@ -8,7 +8,7 @@ procedure alani (a, b, c, npix)
 int	a[ARB], b[ARB]
 int	c[ARB]
 
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

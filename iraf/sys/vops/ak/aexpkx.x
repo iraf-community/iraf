@@ -7,7 +7,7 @@ procedure aexpkx (a, b, c, npix)
 complex	a[ARB]
 complex	b
 complex	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

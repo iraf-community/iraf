@@ -5,7 +5,7 @@
 procedure aliml (a, npix, minval, maxval)
 
 long	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

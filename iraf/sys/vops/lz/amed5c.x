@@ -9,9 +9,9 @@ procedure amed5c (a, b, c, d, e, m, npix)
 char	a[ARB], b[ARB]		# input vectors
 char	c[ARB], d[ARB], e[ARB]	# input vectors
 char	m[ARB]				# output vector (median)
-int	npix
+size_t	npix
 
-int	i
+size_t	i
 char	temp
 define	swap {temp=$1;$1=$2;$2=temp}
 

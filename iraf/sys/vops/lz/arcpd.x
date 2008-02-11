@@ -8,8 +8,8 @@ procedure arcpd (a, b, c, npix)
 double	a		# constant numerator
 double	b[ARB]		# vector denominator
 double	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0.0D0) {

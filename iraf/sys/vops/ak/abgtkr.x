@@ -8,8 +8,8 @@ procedure abgtkr (a, b, c, npix)
 real	a[ARB]
 real	b
 int	c[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	# The case b==0 is perhaps worth optimizing.  On many machines this

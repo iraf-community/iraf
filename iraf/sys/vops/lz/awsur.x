@@ -6,7 +6,7 @@ procedure awsur (a, b, c, npix, k1, k2)
 
 real	a[ARB], b[ARB], c[ARB]
 real	k1, k2
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

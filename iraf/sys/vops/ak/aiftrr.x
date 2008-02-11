@@ -14,14 +14,15 @@ real	sr[ARB], si[ARB]	# spatial data (output).  SI NOT USED.
 int	npix
 int	ier
 pointer	sp, work
+size_t	sz_val
 
 begin
 	call smark (sp)
-	call salloc (work, npix + 2, TY_REAL)
+	sz_val = npix + 2;  call salloc (work, sz_val, TY_REAL)
 
 	# Pack the real and imaginary parts into a complex array as required
 	# by FFS.
-	call apkxr (fr, fi, Memr[work], npix / 2 + 1)
+	sz_val = npix / 2 + 1;  call apkxr (fr, fi, Memr[work], sz_val)
 
 	# Compute the inverse transform.
 	call ffs (Memr[work], npix, ier)
@@ -30,7 +31,7 @@ begin
 
 	# The work array now contains the real part of the transform; merely
 	# copy it to the output array.
-	call amovr (Memr[work], sr, npix)
+	sz_val = npix;  call amovr (Memr[work], sr, sz_val)
 
 	call sfree (sp)
 end

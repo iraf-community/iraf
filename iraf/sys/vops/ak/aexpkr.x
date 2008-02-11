@@ -7,7 +7,7 @@ procedure aexpkr (a, b, c, npix)
 real	a[ARB]
 real	b
 real	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

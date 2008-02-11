@@ -5,7 +5,7 @@
 procedure anegx (a, b, npix)
 
 complex	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

@@ -8,10 +8,10 @@
 procedure agltl (a, b, npix, low, high, kmul, kadd, nrange)
 
 long	a[ARB], b[ARB], pixval
-int	npix, i
+size_t	npix, i
 long	low[nrange], high[nrange]	# range limits
 double	kmul[nrange], kadd[nrange]	# linear transformation
-int	nrange, nr
+size_t	nrange, nr
 
 begin
 	do i = 1, npix {

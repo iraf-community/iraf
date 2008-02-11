@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
+
 #define	import_spp
 #define	NOKNET
 #define	import_knames
@@ -72,7 +72,7 @@ extern int os_filetype ( const char * );
 /* oswrite.c */
 extern ssize_t os_write ( int, const char *, size_t );
 /* osamovb.c */
-extern void os_amovb ( const char *, char *, int );
+extern void os_amovb ( const char *, char *, size_t );
 /* osclose.c */
 extern int os_close ( int );
 /* osfcopy.c */

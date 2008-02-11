@@ -8,8 +8,8 @@ procedure abltkx (a, b, c, npix)
 complex	a[ARB]
 complex	b
 int	c[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 real	abs_b
 
 begin

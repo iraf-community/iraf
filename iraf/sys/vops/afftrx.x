@@ -21,10 +21,11 @@ real	a[ARB]		# data (input)
 complex	b[ARB]		# transform (output).  Dim npix/2+1
 int	npix
 int	ier
+size_t	sz_val
 
 begin
 	# The following is a no-op if A and B are the same array.
-	call amovr (a, b, npix)
+	sz_val = npix;  call amovr (a, b, sz_val)
 
 	# Compute the forward real transform.
 	call ffa (b, npix, ier)

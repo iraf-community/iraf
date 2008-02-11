@@ -5,10 +5,10 @@
 complex procedure alovx (a, npix)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 complex	low, pixval
 real	abs_low
-int	i
+size_t	i
 
 begin
 	low = a[1]

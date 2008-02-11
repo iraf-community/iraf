@@ -8,7 +8,7 @@
 int procedure amedi (a, npix)
 
 int	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 int	median

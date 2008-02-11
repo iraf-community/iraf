@@ -21,7 +21,7 @@ $else
 real	scalar
 $endif
 
-int	npix, i
+size_t	npix, i
 
 begin
 	$if (datatype == ld)

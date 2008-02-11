@@ -19,11 +19,11 @@ procedure acnvd (in, out, npix, kernel, knpix)
 
 double	in[npix+knpix-1]	# input vector, including boundary pixels
 double	out[ARB]		# output vector
-int	npix			# length of output vector
+size_t	npix			# length of output vector
 double	kernel[knpix]		# convolution kernel
-int	knpix			# size of convolution kernel
+size_t	knpix			# size of convolution kernel
 
-int	i, j
+size_t	i, j
 double	sum, k1, k2, k3, k4, k5
 
 begin

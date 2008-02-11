@@ -8,7 +8,7 @@
 
 /* AMOVC -- Copy a block of memory.
  */
-int AMOVC ( XCHAR *a, XCHAR *b, XINT *n )
+int AMOVC ( XCHAR *a, XCHAR *b, XSIZE_T *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

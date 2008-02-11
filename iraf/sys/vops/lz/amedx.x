@@ -8,7 +8,7 @@
 complex procedure amedx (a, npix)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 complex	median

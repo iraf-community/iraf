@@ -14,7 +14,7 @@
   nelems       : #I number of integers to be converted
   spp_datatype : #I SPP datatype code
 */
-int MIIPAK8 ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
+int MIIPAK8 ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	switch ( *spp_datatype ) {
 	case TY_UBYTE:

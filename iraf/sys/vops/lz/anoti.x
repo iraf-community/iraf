@@ -5,7 +5,7 @@
 procedure anoti (a, b, npix)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 int	not()
 
 begin

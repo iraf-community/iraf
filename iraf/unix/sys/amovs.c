@@ -8,7 +8,7 @@
 
 /* AMOVS -- Copy a block of memory.
  */
-int AMOVS ( XSHORT *a, XSHORT *b, XINT *n )
+int AMOVS ( XSHORT *a, XSHORT *b, XSIZE_T *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

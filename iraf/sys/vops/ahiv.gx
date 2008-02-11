@@ -5,12 +5,12 @@
 PIXEL procedure ahiv$t (a, npix)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 PIXEL	high, pixval
 $if (datatype == x)
 real	abs_high
 $endif
-int	i
+size_t	i
 
 begin
 	high = a[1]

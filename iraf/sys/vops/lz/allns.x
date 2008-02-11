@@ -7,7 +7,7 @@
 procedure allns (a, b, npix, errfcn)
 
 short	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 short	errfcn()
 errchk	errfcn

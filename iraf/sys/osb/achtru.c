@@ -8,7 +8,7 @@
 /* ACHT_U -- Pack an SPP datatype array into an unsigned short integer.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-int ACHTRU ( XREAL *a, XUSHORT *b, XINT *npix )
+int ACHTRU ( XREAL *a, XUSHORT *b, XSIZE_T *npix )
 {
 	XREAL *ip;
 	XUSHORT *op;

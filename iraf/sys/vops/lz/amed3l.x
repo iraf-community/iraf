@@ -7,8 +7,8 @@ procedure amed3l (a, b, c, m, npix)
 
 long	a[ARB], b[ARB], c[ARB]	# input vectors
 long	m[ARB]				# output vector (median)
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

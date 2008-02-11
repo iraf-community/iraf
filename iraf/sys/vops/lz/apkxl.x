@@ -8,7 +8,7 @@ procedure apkxl (a, b, c, npix)
 long	a[ARB]			# real component
 long	b[ARB]			# imaginary component
 complex	c[ARB]			# output vector
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

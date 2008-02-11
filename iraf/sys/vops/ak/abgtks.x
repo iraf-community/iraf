@@ -8,8 +8,8 @@ procedure abgtks (a, b, c, npix)
 short	a[ARB]
 short	b
 int	c[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	# The case b==0 is perhaps worth optimizing.  On many machines this

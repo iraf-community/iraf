@@ -7,7 +7,7 @@
 procedure alogx (a, b, npix, errfcn)
 
 complex	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 complex	errfcn()
 errchk	errfcn

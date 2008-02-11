@@ -12,8 +12,8 @@ PIXEL procedure asum$t (a, npix)
 $endif $endif
 
 PIXEL	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 $if (datatype == csir)
 real	sum

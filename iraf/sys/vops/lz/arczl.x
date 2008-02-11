@@ -14,10 +14,10 @@ procedure arczl (a, b, c, npix, errfcn)
 
 long	a			# numerator
 long	b[ARB], c[ARB]		# divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 long	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 long	divisor
 extern	errfcn()
 errchk	errfcn

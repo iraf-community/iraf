@@ -7,7 +7,7 @@
 procedure allni (a, b, npix, errfcn)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 int	errfcn()
 errchk	errfcn

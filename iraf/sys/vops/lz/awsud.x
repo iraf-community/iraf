@@ -6,7 +6,7 @@ procedure awsud (a, b, c, npix, k1, k2)
 
 double	a[ARB], b[ARB], c[ARB]
 double	k1, k2
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

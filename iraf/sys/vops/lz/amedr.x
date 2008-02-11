@@ -8,7 +8,7 @@
 real procedure amedr (a, npix)
 
 real	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 real	median

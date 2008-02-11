@@ -5,9 +5,9 @@
 procedure arltx (a, npix, floor, newval)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 complex	floor, newval
-int	i
+size_t	i
 real	abs_floor
 
 begin

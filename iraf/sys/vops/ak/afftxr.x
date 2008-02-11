@@ -12,13 +12,15 @@ real	sr[ARB], si[ARB]	# data, spatial domain (input)
 real	fr[ARB], fi[ARB]	# transform, frequency domain (output)
 int	npix
 int	ier
+size_t	sz_val
 
 begin
 	# The following are no-ops if the transform is being performed
 	# in place.
 
-	call amovr (sr, fr, npix)
-	call amovr (si, fi, npix)
+	sz_val = npix
+	call amovr (sr, fr, sz_val)
+	call amovr (si, fi, sz_val)
 
 	# Compute the forward transform.
 	call fft842 (0, npix, fr, fi, ier)

@@ -19,11 +19,11 @@ procedure acnvr (in, out, npix, kernel, knpix)
 
 real	in[npix+knpix-1]	# input vector, including boundary pixels
 real	out[ARB]		# output vector
-int	npix			# length of output vector
+size_t	npix			# length of output vector
 real	kernel[knpix]		# convolution kernel
-int	knpix			# size of convolution kernel
+size_t	knpix			# size of convolution kernel
 
-int	i, j
+size_t	i, j
 real	sum, k1, k2, k3, k4, k5
 
 begin

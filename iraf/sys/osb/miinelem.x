@@ -7,9 +7,9 @@ include	<mach.h>
 # The mii_type codes are defined in mii.h; we assume here that the codes
 # used are the number of bits in each MII type.
 
-int procedure miinelem (nchars, mii_type)
+size_t procedure miinelem (nchars, mii_type)
 
-int	nchars			#I size in chars of packed array
+size_t	nchars			#I size in chars of packed array
 int	mii_type		#I MII type of packed data
 
 int	nbits

@@ -5,9 +5,9 @@
 procedure arltr (a, npix, floor, newval)
 
 real	a[ARB]
-int	npix
+size_t	npix
 real	floor, newval
-int	i
+size_t	i
 
 begin
 

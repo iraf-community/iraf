@@ -16,7 +16,7 @@
 /* arg_b  : output byte array			*/
 /* boff   : first byte in B to be written	*/
 /* nbytes : number of bytes to move		*/
-int BYTMOV ( void *arg_a, XINT *aoff, void *arg_b, XINT *boff, XINT *nbytes )
+int BYTMOV ( void *arg_a, XSIZE_T *aoff, void *arg_b, XSIZE_T *boff, XSIZE_T *nbytes )
 {
 	char *a = (char *)arg_a;
 	char *b = (char *)arg_b;

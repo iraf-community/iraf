@@ -14,10 +14,10 @@ procedure arczs (a, b, c, npix, errfcn)
 
 short	a			# numerator
 short	b[ARB], c[ARB]		# divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 short	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 short	divisor
 extern	errfcn()
 errchk	errfcn

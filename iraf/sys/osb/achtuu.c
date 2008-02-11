@@ -7,7 +7,7 @@
 
 /* ACHTUU -- Unpack an unsigned short integer array into an SPP datatype.
  */
-int ACHTUU ( XUSHORT *a, XUSHORT *b, XINT *npix )
+int ACHTUU ( XUSHORT *a, XUSHORT *b, XSIZE_T *npix )
 {
 	XUSHORT *ip;
 	XUSHORT *op;

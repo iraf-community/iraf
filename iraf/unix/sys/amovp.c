@@ -8,7 +8,7 @@
 
 /* AMOVP -- Copy a block of memory.
  */
-int AMOVP ( XPOINTER *a, XPOINTER *b, XINT *n )
+int AMOVP ( XPOINTER *a, XPOINTER *b, XSIZE_T *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

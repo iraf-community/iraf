@@ -8,7 +8,7 @@
 short procedure ameds (a, npix)
 
 short	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 short	median

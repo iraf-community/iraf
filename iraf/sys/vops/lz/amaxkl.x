@@ -7,7 +7,7 @@ procedure amaxkl (a, b, c, npix)
 long	a[ARB]
 long	b
 long	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 

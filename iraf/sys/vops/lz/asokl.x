@@ -24,10 +24,10 @@ include <mach.h>
 long procedure asokl (a, npix, ksel)
 
 long	a[ARB]			# input array
-int	npix			# number of pixels
-int	ksel			# element to be selected
+size_t	npix			# number of pixels
+size_t	ksel			# element to be selected
 
-int	lo, up, i, j, k, dummy
+size_t	lo, up, i, j, k, dummy
 long	temp, wtemp
 
 begin

@@ -14,10 +14,10 @@ procedure arcz$t (a, b, c, npix, errfcn)
 
 PIXEL	a			# numerator
 PIXEL	b[ARB], c[ARB]		# divisor, and output arrays
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 PIXEL	errfcn()		# user function, called on divide by zero
 
-int	i
+size_t	i
 PIXEL	divisor
 $if (datatype == rd)
 PIXEL	tol

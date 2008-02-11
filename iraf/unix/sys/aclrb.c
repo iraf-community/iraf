@@ -8,7 +8,7 @@
 
 /* ACLRB -- Clear a block of memory.
  */
-int ACLRB ( void *a, XINT *n )
+int ACLRB ( void *a, XSIZE_T *n )
 {
 	memset (a, 0, *n);
 	return 0;

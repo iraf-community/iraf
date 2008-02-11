@@ -5,9 +5,9 @@
 long procedure alovl (a, npix)
 
 long	a[ARB]
-int	npix
+size_t	npix
 long	low, pixval
-int	i
+size_t	i
 
 begin
 	low = a[1]

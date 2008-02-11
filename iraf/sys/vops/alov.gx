@@ -5,12 +5,12 @@
 PIXEL procedure alov$t (a, npix)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 PIXEL	low, pixval
 $if (datatype == x)
 real	abs_low
 $endif
-int	i
+size_t	i
 
 begin
 	low = a[1]

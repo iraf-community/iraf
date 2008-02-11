@@ -6,7 +6,7 @@ procedure apowx (a, b, c, npix)
 
 complex	a[ARB], c[ARB]
 int	b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

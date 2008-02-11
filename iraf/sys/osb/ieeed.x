@@ -61,11 +61,12 @@ procedure ieevpakd (native, ieee, nelem)
 
 double	native[ARB]		#I input native floating format array
 double	ieee[ARB]		#O output IEEE floating format array
-int	nelem			#I number of floating point numbers
+size_t	nelem			#I number of floating point numbers
 
-int	i
+size_t	i
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -96,15 +97,17 @@ procedure ieevupkd (ieee, native, nelem)
 
 double	ieee[ARB]		#I input IEEE floating format array
 double	native[ARB]		#O output native floating format array
-int	nelem			#I number of floating point numbers
+size_t	nelem			#I number of floating point numbers
 
-int	expon, i
+size_t	i
+int	expon
 double	fval
 int	ival[2]
 %	equivalence (fval, ival)
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -155,7 +158,8 @@ procedure ieepakd (x)
 double	x			#U datum to be converted
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -181,7 +185,8 @@ int	ival[2]
 %	equivalence (fval, ival)
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -213,7 +218,8 @@ procedure ieesnand (x)
 double	x			#I native value which will replace NaN
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -230,7 +236,8 @@ procedure ieegnand (x)
 double	x			#O native value which will replace NaN
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -243,11 +250,12 @@ end
 
 procedure ieestatd (o_nin, o_nout)
 
-int	o_nin				#O number of NaN seen on input
-int	o_nout				#O number of NaN values output
+size_t	o_nin				#O number of NaN seen on input
+size_t	o_nout				#O number of NaN values output
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -261,7 +269,8 @@ end
 procedure ieezstatd ()
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -291,7 +300,8 @@ int	inval				#O get input mapping enable flag
 int	outval				#O get output mapping enable flag
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
@@ -323,7 +333,8 @@ int	outval				#I enable NaN mapping for output?
 #$endif
 
 double	native_NaN, ieee_NaN
-int	mapin, mapout, nin, nout, NaNmask
+int	mapin, mapout, NaNmask
+size_t	nin, nout
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin

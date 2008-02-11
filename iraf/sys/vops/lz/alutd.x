@@ -10,7 +10,7 @@ int	a[ARB]				# input array of indices
 
 double	b[ARB]				# output data array
 double	lut[ARB]			# lookup table
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

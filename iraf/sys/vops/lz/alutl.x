@@ -10,7 +10,7 @@ long	a[ARB]
 
 long	b[ARB]				# output data array
 long	lut[ARB]			# lookup table
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

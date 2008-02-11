@@ -6,8 +6,8 @@
 real procedure asumi (a, npix)
 
 int	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 real	sum
 

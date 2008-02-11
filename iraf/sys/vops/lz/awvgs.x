@@ -6,12 +6,12 @@
 # checking is performed.  The number of pixels in the sample is returned as the
 # function value.
 
-int procedure awvgs (a, npix, mean, sigma, lcut, hcut)
+size_t procedure awvgs (a, npix, mean, sigma, lcut, hcut)
 
 short	a[ARB]
 real	mean, sigma, lcut, hcut
 double	sum, sumsq, value, temp
-int	npix, i, ngpix
+size_t	npix, i, ngpix
 
 begin
 	sum = 0.0

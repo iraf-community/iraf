@@ -7,9 +7,10 @@ procedure amodkl (a, b, c, npix)
 long	a[ARB]
 long	b
 long	c[ARB]
-int	npix, i
+size_t	npix, i
+long	modl()
 
 begin
 	do i = 1, npix
-	    c[i] = mod (a[i], b)
+	    c[i] = modl (a[i], b)
 end

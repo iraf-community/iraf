@@ -6,7 +6,7 @@ procedure amovki (a, b, npix)
 
 int	a
 int	b[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

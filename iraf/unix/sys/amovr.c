@@ -8,7 +8,7 @@
 
 /* AMOVR -- Copy a block of memory.
  */
-int AMOVR ( XREAL *a, XREAL *b, XINT *n )
+int AMOVR ( XREAL *a, XREAL *b, XSIZE_T *n )
 {
 	if (a != b)
 	    memmove ((char *)b, (char *)a, *n * sizeof(*a));

@@ -5,9 +5,9 @@
 double procedure alovd (a, npix)
 
 double	a[ARB]
-int	npix
+size_t	npix
 double	low, pixval
-int	i
+size_t	i
 
 begin
 	low = a[1]

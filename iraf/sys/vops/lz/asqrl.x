@@ -6,7 +6,7 @@
 procedure asqrl (a, b, npix, errfcn)
 
 long	a[ARB], b[ARB]
-int	npix, i
+size_t	npix, i
 extern	errfcn()
 long	errfcn()
 errchk	errfcn

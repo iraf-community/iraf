@@ -4,11 +4,11 @@
 
 /* I64TO32 - Convert big endian 64bit integer array into 32bit.
  */
-int I64TO32 ( void *a, void *b, XINT *nelems )
+int I64TO32 ( void *a, void *b, XSIZE_T *nelems )
 {
 	char *ip;
 	char *op;
-	long i;
+	XSIZE_T i;
 
 	ip = (char *)a;
 	op = (char *)b;

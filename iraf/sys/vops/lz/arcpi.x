@@ -8,8 +8,8 @@ procedure arcpi (a, b, c, npix)
 int	a		# constant numerator
 int	b[ARB]		# vector denominator
 int	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0) {

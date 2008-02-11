@@ -8,7 +8,7 @@
 PIXEL procedure amed$t (a, npix)
 
 PIXEL	a[ARB]
-int	npix
+size_t	npix
 
 pointer	sp, aa
 PIXEL	median

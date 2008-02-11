@@ -13,7 +13,7 @@ long	minout, maxout, aoff, boff, pixval
 
 double	scalar
 
-int	npix, i
+size_t	npix, i
 
 begin
 	    scalar = (double (b2) - double (b1)) / (double (a2) - double (a1))

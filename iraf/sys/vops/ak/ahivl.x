@@ -5,9 +5,9 @@
 long procedure ahivl (a, npix)
 
 long	a[ARB]
-int	npix
+size_t	npix
 long	high, pixval
-int	i
+size_t	i
 
 begin
 	high = a[1]

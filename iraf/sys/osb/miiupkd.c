@@ -20,8 +20,8 @@
 #define MII2SMALL(x_type) { \
 	    XDOUBLE buf[TMP_BUFSIZE]; \
 	    XDOUBLE *mii_ptr = (XDOUBLE *)mii; \
-	    XINT x_n = TMP_BUFSIZE; \
-	    XINT i,j; \
+	    XSIZE_T x_n = TMP_BUFSIZE; \
+	    XSIZE_T i,j; \
 	    for ( i=0 ; i < *nelems ; i += TMP_BUFSIZE ) { \
 		if (*nelems-i < TMP_BUFSIZE) x_n = *nelems-i; \
 		IEEVUPKD (mii_ptr + i, buf, &x_n); \
@@ -31,7 +31,7 @@
 	    } \
 	}
 
-int MIIUPKD ( void *mii, void *spp, XINT *nelems, XINT *spp_datatype )
+int MIIUPKD ( void *mii, void *spp, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	switch ( *spp_datatype ) {
 	/* large to small */

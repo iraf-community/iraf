@@ -15,7 +15,7 @@
   spp_datatype : #I SPP datatype code
 */
 
-int MIIPAKR ( void *spp, void *mii, XINT *nelems, XINT *spp_datatype )
+int MIIPAKR ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype )
 {
 	if ( *spp_datatype == TY_REAL ) {
 	    IEEVPAKR ((XREAL *)spp, mii, nelems);

@@ -5,7 +5,7 @@
 procedure alims (a, npix, minval, maxval)
 
 short	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

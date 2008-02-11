@@ -5,17 +5,19 @@
 procedure apowkl (a, b, c, npix)
 
 long	a[ARB], c[ARB]
+long	c_1
 int	b
-int	npix, i
+size_t	npix, i
 
 begin
 	# Optimize the code for the various special cases.  We assume that the
 	# compiler is intelligent enough to recognize the special cases if the
 	# power is expressed as an integer constant.
 
+	c_1 = 1
 	switch (b) {
 	case 0:
-	    call amovkl (1, c, npix)
+	    call amovkl (c_1, c, npix)
 	case 1:
 	    call amovl (a, c, npix)
 	case 2:

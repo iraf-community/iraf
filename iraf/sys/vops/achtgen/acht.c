@@ -10,7 +10,7 @@
   The data types are BUcsilrdx.
 */
 
-int ACHT ( void *a, void *b, XINT *nelem, XINT *ty_a, XINT *ty_b )
+int ACHT ( void *a, void *b, XSIZE_T *nelem, XINT *ty_a, XINT *ty_b )
 {
  	switch ( *ty_a ) {
 	case TY_UBYTE:

@@ -5,9 +5,9 @@
 bool procedure aveqs (a, b, npix)
 
 short	a[ARB], b[ARB]		#I vectors to be compared
-int	npix			#I number of pixels to be compared
+size_t	npix			#I number of pixels to be compared
 
-int	i
+size_t	i
 
 begin
 	do i = 1, npix

@@ -9,8 +9,8 @@ procedure aselkx (a, b, c, sel, npix)
 
 complex	a[ARB], b, c[ARB]
 int	sel[ARB]			# IF sel[i] THEN a[i] ELSE b
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix

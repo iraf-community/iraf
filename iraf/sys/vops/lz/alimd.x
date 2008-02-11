@@ -5,7 +5,7 @@
 procedure alimd (a, npix, minval, maxval)
 
 double	a[ARB], minval, maxval, value
-int	npix, i
+size_t	npix, i
 
 begin
 	minval = a[1]

@@ -8,7 +8,7 @@
 /* ACHT_B -- Pack SPP array into an unsigned byte array.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-int ACHTCB ( XCHAR *a, XUBYTE *b, XINT *npix )
+int ACHTCB ( XCHAR *a, XUBYTE *b, XSIZE_T *npix )
 {
 	XCHAR *ip;
 	XUBYTE *op, *maxop;

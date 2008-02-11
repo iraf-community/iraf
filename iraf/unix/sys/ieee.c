@@ -72,7 +72,8 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 
 /* common /ieenan$t/ */
 static PIXEL native_NaN = 0, ieee_NaN = 0;
-static XINT mapin = 0, mapout = 0, nin = 0, nout = 0, NaNmask = 0;
+static XINT mapin = 0, mapout = 0, NaNmask = 0;
+static XSIZE_T nin = 0, nout = 0;
 
 /*
   IEEVPAK -- Convert an array in the native floating point format into an
@@ -84,17 +85,17 @@ static XINT mapin = 0, mapout = 0, nin = 0, nout = 0, NaNmask = 0;
 */
 
 #ifdef DATATYPE_REAL
-int IEEVPAKR ( PIXEL *native, void *ieee, XINT *nelem )
+int IEEVPAKR ( PIXEL *native, void *ieee, XSIZE_T *nelem )
 #else
-int IEEVPAKD ( PIXEL *native, void *ieee, XINT *nelem )
+int IEEVPAKD ( PIXEL *native, void *ieee, XSIZE_T *nelem )
 #endif
 {
-    XINT i;
+    XSIZE_T i;
 
     if (mapout == XNO) {
 	if (IEEE_SWAP == YES) {
-	    XINT c_1 = 1;
-	    XINT x_n = *nelem * NSWAP;
+	    XSIZE_T c_1 = 1;
+	    XSIZE_T x_n = *nelem * NSWAP;
 	    BSWAP (native, &c_1, ieee, &c_1, &x_n);
 	}
 	else {
@@ -112,8 +113,8 @@ int IEEVPAKD ( PIXEL *native, void *ieee, XINT *nelem )
 	}
 	/* Byteswap if necessary. */
 	if (IEEE_SWAP == YES) {
-	    XINT c_1 = 1;
-	    XINT x_n = *nelem * NSWAP;
+	    XSIZE_T c_1 = 1;
+	    XSIZE_T x_n = *nelem * NSWAP;
 	    BSWAP (ieee, &c_1, ieee, &c_1, &x_n);
 	}
 	IEEE_SIGRESTORE();
@@ -132,18 +133,19 @@ int IEEVPAKD ( PIXEL *native, void *ieee, XINT *nelem )
 */
 
 #ifdef DATATYPE_REAL
-int IEEVUPKR ( void *ieee, PIXEL *native, XINT *nelem )
+int IEEVUPKR ( void *ieee, PIXEL *native, XSIZE_T *nelem )
 #else
-int IEEVUPKD ( void *ieee, PIXEL *native, XINT *nelem )
+int IEEVUPKD ( void *ieee, PIXEL *native, XSIZE_T *nelem )
 #endif
 {
     static PIXEL fval[1];
     XINT *ival = (XINT *)fval;
-    XINT expon, i;
+    XINT expon;
+    XSIZE_T i;
 
     if (IEEE_SWAP == YES) {
-	XINT c_1 = 1;
-	XINT x_n = *nelem * NSWAP;
+	XSIZE_T c_1 = 1;
+	XSIZE_T x_n = *nelem * NSWAP;
 	BSWAP (ieee, &c_1, native, &c_1, &x_n);
 	if (mapin != XNO) {
 	    /* Check for IEEE exceptional values and map NaN to the native  */
@@ -208,8 +210,8 @@ int IEEPAKD ( PIXEL *x )
 	IEEE_SIGRESTORE();
     }
     if (IEEE_SWAP == YES) {
-	XINT c_1 = 1;
-	XINT x_n = NSWAP;
+	XSIZE_T c_1 = 1;
+	XSIZE_T x_n = NSWAP;
 	BSWAP (x, &c_1, x, &c_1, &x_n);
     }
     ZZEPRO();
@@ -233,8 +235,8 @@ int IEEUPKD ( PIXEL *x )
     XINT expon;
 
     if (IEEE_SWAP == YES) {
-	XINT c_1 = 1;
-	XINT x_n = NSWAP;
+	XSIZE_T c_1 = 1;
+	XSIZE_T x_n = NSWAP;
 	BSWAP (x, &c_1, x, &c_1, &x_n);
     }
 
@@ -302,9 +304,9 @@ int IEEGNAND ( PIXEL *x )
   o_nout : #O number of NaN values output
 */
 #ifdef DATATYPE_REAL
-int IEESTATR ( XINT *o_nin, XINT *o_nout )
+int IEESTATR ( XSIZE_T *o_nin, XSIZE_T *o_nout )
 #else
-int IEESTATD ( XINT *o_nin, XINT *o_nout )
+int IEESTATD ( XSIZE_T *o_nin, XSIZE_T *o_nout )
 #endif
 {
     *o_nin = nin;

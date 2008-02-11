@@ -7,7 +7,7 @@ procedure aexpkd (a, b, c, npix)
 double	a[ARB]
 double	b
 double	c[ARB]
-int	npix, i
+size_t	npix, i
 
 begin
 	do i = 1, npix

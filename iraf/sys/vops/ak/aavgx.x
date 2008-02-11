@@ -6,9 +6,10 @@
 procedure aavgx (a, npix, mean, sigma)
 
 complex	a[ARB]
-int	npix
+size_t	npix
 real	mean, sigma, lcut, hcut
-int	junk, awvgx()
+size_t	junk
+size_t	awvgx()
 data	lcut /0./, hcut /0./
 
 begin

@@ -8,8 +8,8 @@ procedure arcpl (a, b, c, npix)
 long	a		# constant numerator
 long	b[ARB]		# vector denominator
 long	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0) {

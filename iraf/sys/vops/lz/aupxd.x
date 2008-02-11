@@ -7,8 +7,8 @@ procedure aupxd (a, b, c, npix)
 
 complex	a[ARB]			# input vector
 double	b[ARB], c[ARB]	# output vectors
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	do i = 1, npix {

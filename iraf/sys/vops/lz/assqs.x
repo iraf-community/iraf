@@ -6,8 +6,8 @@ real procedure assqs (a, npix)
 real	sum
 
 short	a[ARB]
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	sum = 0

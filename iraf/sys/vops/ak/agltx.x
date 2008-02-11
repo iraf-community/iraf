@@ -8,11 +8,11 @@
 procedure agltx (a, b, npix, low, high, kmul, kadd, nrange)
 
 complex	a[ARB], b[ARB], pixval
-int	npix, i
+size_t	npix, i
 complex	low[nrange], high[nrange]	# range limits
 real	kmul[nrange], kadd[nrange]
 real	abs_pixval
-int	nrange, nr
+size_t	nrange, nr
 
 begin
 	do i = 1, npix {

@@ -8,8 +8,8 @@ procedure arcps (a, b, c, npix)
 short	a		# constant numerator
 short	b[ARB]		# vector denominator
 short	c[ARB]		# output vector
-int	npix
-int	i
+size_t	npix
+size_t	i
 
 begin
 	if (a == 0) {
