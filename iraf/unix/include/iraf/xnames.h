@@ -509,4 +509,32 @@ extern int XMJBUF ( XPOINTER * );
 /* ../../../sys/gio/cursor/prpsinit.x */
 extern int PRPSINIT( void );
 
+#define	IMPAKD		impakd_
+#define	IMPAKI		impaki_
+#define	IMPAKL		impakl_
+#define	IMPAKR		impakr_
+#define	IMPAKS		impaks_
+#define	IMPAKX		impakx_
+
+#define	IMUPKD		imupkd_
+#define	IMUPKI		imupki_
+#define	IMUPKL		imupkl_
+#define	IMUPKR		imupkr_
+#define	IMUPKS		imupks_
+#define	IMUPKX		imupkx_
+
+extern int IMPAKD ( XDOUBLE *, void *, XSIZE_T *, XINT * );
+extern int IMPAKI ( XINT *, void *, XSIZE_T *, XINT * );
+extern int IMPAKL ( XLONG *, void *, XSIZE_T *, XINT * );
+extern int IMPAKR ( XREAL *, void *, XSIZE_T *, XINT * );
+extern int IMPAKS ( XSHORT *, void *, XSIZE_T *, XINT * );
+extern int IMPAKX ( XCOMPLEX *, void *, XSIZE_T *, XINT * );
+
+extern int IMUPKD ( void *, XDOUBLE *, XSIZE_T *, XINT * );
+extern int IMUPKI ( void *, XINT *, XSIZE_T *, XINT * );
+extern int IMUPKL ( void *, XLONG *, XSIZE_T *, XINT * );
+extern int IMUPKR ( void *, XREAL *, XSIZE_T *, XINT * );
+extern int IMUPKS ( void *, XSHORT *, XSIZE_T *, XINT * );
+extern int IMUPKX ( void *, XCOMPLEX *, XSIZE_T *, XINT * );
+
 #endif	/* ! _IRAF_XNAMES_H */

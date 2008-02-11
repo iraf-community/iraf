@@ -60,12 +60,12 @@ libex.a:
 	imgs3r.x	<imhdr.h>
 	imgs3s.x	<imhdr.h>
 	imgs3x.x	<imhdr.h>
-	impakd.x	
-	impaki.x	
-	impakl.x	
-	impakr.x	
-	impaks.x	
-	impakx.x	
+	impakd.c	
+	impaki.c	
+	impakl.c	
+	impakr.c	
+	impaks.c	
+	impakx.c	
 	impgsd.x	<imhdr.h> <imio.h>
 	impgsi.x	<imhdr.h> <imio.h>
 	impgsl.x	<imhdr.h> <imio.h>
@@ -114,10 +114,10 @@ libex.a:
 	imps3r.x	<imhdr.h>
 	imps3s.x	<imhdr.h>
 	imps3x.x	<imhdr.h>
-	imupkd.x	
-	imupki.x	
-	imupkl.x	
-	imupkr.x	
-	imupks.x	
-	imupkx.x	
+	imupkd.c	
+	imupki.c	
+	imupkl.c	
+	imupkr.c	
+	imupks.c	
+	imupkx.c	
 	;

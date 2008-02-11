@@ -7,7 +7,7 @@ $exit
 
 tfiles:
 	$set GFLAGS = "-k -t silrdx -p tf/"
-	$ifolder (tf/imupkr.x, imupk.gx) $generic $(GFLAGS) imupk.gx $endif
+	$ifolder (tf/imupkr.c, imupk.gc) $generic $(GFLAGS) imupk.gc $endif
 	$ifolder (tf/imps3r.x, imps3.gx) $generic $(GFLAGS) imps3.gx $endif
 	$ifolder (tf/imps2r.x, imps2.gx) $generic $(GFLAGS) imps2.gx $endif
 	$ifolder (tf/imps1r.x, imps1.gx) $generic $(GFLAGS) imps1.gx $endif
@@ -16,7 +16,7 @@ tfiles:
 	$ifolder (tf/impl2r.x, impl2.gx) $generic $(GFLAGS) impl2.gx $endif
 	$ifolder (tf/impl1r.x, impl1.gx) $generic $(GFLAGS) impl1.gx $endif
 	$ifolder (tf/impgsr.x, impgs.gx) $generic $(GFLAGS) impgs.gx $endif
-	$ifolder (tf/impakr.x, impak.gx) $generic $(GFLAGS) impak.gx $endif
+	$ifolder (tf/impakr.c, impak.gc) $generic $(GFLAGS) impak.gc $endif
 	$ifolder (tf/imgs3r.x, imgs3.gx) $generic $(GFLAGS) imgs3.gx $endif
 	$ifolder (tf/imgs2r.x, imgs2.gx) $generic $(GFLAGS) imgs2.gx $endif
 	$ifolder (tf/imgs1r.x, imgs1.gx) $generic $(GFLAGS) imgs1.gx $endif
