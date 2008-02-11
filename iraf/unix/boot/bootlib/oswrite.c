@@ -11,11 +11,12 @@
 /* fd     : output file			*/
 /* buf    : data to be written		*/
 /* nbytes : num bytes to be written	*/
-int os_write ( int fd, const char *buf, int nbytes )
+ssize_t os_write ( int fd, const char *buf, size_t nbytes )
 {
 	const char *ip;
 	XCHAR *op, *otop;
-	int ch, n;
+	int ch;
+	size_t n;
 	XINT nchars, status, x_fd;
 
 	if (osfiletype == BINARY_FILE)
@@ -29,7 +30,7 @@ int os_write ( int fd, const char *buf, int nbytes )
 	/* Accumulate an output line of text and pass it on to the system when
 	 * newline is seen or when the output buffer fills (unlikely).
 	 */
-	for ( ; n > 0 ; n-- ) {
+	for ( ; 0 < n ; n-- ) {
 	    *op++ = ch = *ip++;
 	    if (ch == '\n' || op >= otop) {
 		nchars = op - text;

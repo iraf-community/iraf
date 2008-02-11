@@ -177,7 +177,7 @@ int ZCLSBF ( XINT *fd, XINT *status )
 /* buf      : output buffer			*/
 /* maxbytes : max bytes to read			*/
 /* offset   : 1-indexed file offset to read at	*/
-int ZARDBF ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZARDBF ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
 	struct fiodes *kfp;
 	off_t fileoffset;
@@ -224,7 +224,7 @@ int ZARDBF ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 /* buf    : buffer containing data	*/
 /* nbytes : nbytes to be written	*/
 /* offset : 1-indexed file offset	*/
-int ZAWRBF ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZAWRBF ( XINT *chan, XCHAR *buf, XSIZE_T *nbytes, XLONG *offset )
 {
 	struct fiodes *kfp;
 	off_t fileoffset;
@@ -277,7 +277,7 @@ int ZAWRBF ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 /* ZAWTBF -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-int ZAWTBF ( XINT *fd, XINT *status )
+int ZAWTBF ( XINT *fd, XLONG *status )
 {
 	if ((*status = zfd[*fd].nbytes) == ERR)
 	    *status = XERR;
@@ -405,7 +405,7 @@ static char vm_client[SZ_CNAME+1];
 static void vm_initialize( void );
 static void vm_shutdown( void );
 static void vm_identify( void );
-static int vm_write ( int, const char *, int );
+static int vm_write ( int, const char *, size_t );
 static int vm_connect( void );
 static int getstr ( const char **, char *, size_t, int );
 
@@ -848,7 +848,7 @@ static void vm_shutdown( void )
  * SIGPIPE can be disabled for the duration of the write.  We don't want the
  * calling process to abort if the VMcache server goes away.
  */
-static int vm_write ( int fd, const char *buf, int nbytes )
+static int vm_write ( int fd, const char *buf, size_t nbytes )
 {
 	int status;
 #ifdef USE_SIGACTION

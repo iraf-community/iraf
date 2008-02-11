@@ -951,14 +951,16 @@ int ZCLSKS ( XINT *chan, XINT *status )
 /* buf      : output buffer			*/
 /* totbytes : total number of bytes to read	*/
 /* loffset  : not used				*/
-int ZARDKS ( XINT *chan, XCHAR *buf, XINT *totbytes, XLONG *loffset )
+int ZARDKS ( XINT *chan, XCHAR *buf, XSIZE_T *totbytes, XLONG *loffset )
 {
 #ifdef ANSI
 	volatile char	*op;
-	volatile int	fd, nbytes;
+	volatile int	fd;
+	volatile long	nbytes;
 #else
 	char	*op;
-	int	fd, nbytes;
+	int	fd;
+	long	nbytes;
 #endif
 	signal_handler_t sigint, sigterm;
 	int	status;
@@ -967,7 +969,7 @@ int ZARDKS ( XINT *chan, XCHAR *buf, XINT *totbytes, XLONG *loffset )
 	op = (char *)buf;
 	zfd[fd].nbytes = nbytes = *totbytes;
 	if (debug_ks > 1)
-	    dbgmsg ("initiate read of %d bytes from KS channel %d\n",
+	    dbgmsg ("initiate read of %ld bytes from KS channel %d\n",
 		nbytes, fd);
 
 	/* Now read exactly nbytes of data from channel into user buffer.
@@ -1016,14 +1018,16 @@ int ZARDKS ( XINT *chan, XCHAR *buf, XINT *totbytes, XLONG *loffset )
 /* buf      : output buffer			*/
 /* totbytes : number of bytes to write		*/
 /* loffset  : not used				*/
-int ZAWRKS ( XINT *chan, XCHAR *buf, XINT *totbytes, XLONG *loffset )
+int ZAWRKS ( XINT *chan, XCHAR *buf, XSIZE_T *totbytes, XLONG *loffset )
 {
 	signal_handler_t sigint, sigterm, sigpipe;
 #ifdef ANSI
-	volatile int fd, nbytes;
+	volatile int fd;
+	volatile long nbytes;
 	volatile int ofd;
 #else
-	int	fd, nbytes;
+	int	fd;
+	long	nbytes;
 	int	ofd;
 #endif
 
@@ -1106,7 +1110,7 @@ static void ks_reaper ( int sig /*, int *arg1, int *arg2 */ )
  * we do not really wait, rather we return the status value (byte count) from
  * the last read or write to the channel.
  */
-int ZAWTKS ( XINT *chan, XINT *status )
+int ZAWTKS ( XINT *chan, XLONG *status )
 {
 	if ((*status = zfd[*chan].nbytes) == ERR)
 	    *status = XERR;

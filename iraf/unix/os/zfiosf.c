@@ -77,7 +77,7 @@ int ZCLSSF ( XINT *fd, XINT *status )
 /* buf      : output buffer			*/
 /* maxbytes : max bytes to read			*/
 /* offset   : 1-indexed file offset to read at	*/
-int ZARDSF ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZARDSF ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
 	return ZARDBF (chan, buf, maxbytes, offset);
 }
@@ -91,7 +91,7 @@ int ZARDSF ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 /* buf    : buffer containing data	*/
 /* nbytes : nbytes to be written	*/
 /* offset : 1-indexed file offset	*/
-int ZAWRSF ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZAWRSF ( XINT *chan, XCHAR *buf, XSIZE_T *nbytes, XLONG *offset )
 {
 	return ZAWRBF (chan, buf, nbytes, offset);
 }
@@ -100,7 +100,7 @@ int ZAWRSF ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 /* ZAWTSF -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-int ZAWTSF ( XINT *fd, XINT *status )
+int ZAWTSF ( XINT *fd, XLONG *status )
 {
 	return ZAWTBF (fd, status);
 }

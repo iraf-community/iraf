@@ -189,7 +189,7 @@ int ZCLSLP ( XINT *chan, XINT *status )
  * level code; our function is merely to move the data to the device.  The read
  * primitive is not likely to be needed for a printer, but you never know...
  */
-int ZARDLP ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZARDLP ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
 	XLONG	dummy_offset = 0;
 
@@ -201,7 +201,7 @@ int ZARDLP ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
  * of bytes written so we know whether or not to dispose of the spoolfile
  * at close time.
  */
-int ZAWRLP ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZAWRLP ( XINT *chan, XCHAR *buf, XSIZE_T *nbytes, XLONG *offset )
 {
 	XLONG	dummy_offset = 0;
 
@@ -213,7 +213,7 @@ int ZAWRLP ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 /* ZAWTLP -- Wait for i/o and return the status of the channel, i.e., the
  * number of bytes read or written or XERR.
  */
-int ZAWTLP ( XINT *chan, XINT *status )
+int ZAWTLP ( XINT *chan, XLONG *status )
 {
 	return ZAWTBF (chan, status);
 }

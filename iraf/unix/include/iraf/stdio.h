@@ -35,15 +35,16 @@
  * maintained in the common as an array of length _NFILE, hence in terms of
  * C the structures are interleaved.  The file pointers are indices into
  * the array Memc, an array of XCHAR.
+ * See base/fio.com.
  */
 struct _iobuf {
-	XLONG	_boffset, _F1;		/* XCHAR file offset of buffer	*/
-	XINT	_bufptr,  _F2;		/* buffer pointer		*/
-	XINT	_buftop,  _F3;		/* pointer to top of buffer + 1	*/
-	XINT	_iop,     _F4;		/* pointer to next XCHAR	*/
-	XINT	_itop,    _F5;		/* call filbuf when _iop >=	*/
-	XINT	_otop,    _F6;		/* call flsbuf when _iop >=	*/
-	XINT	_fiodes,  _F7;		/* FIO file descriptor		*/
+	XLONG    _boffset, _F1;		/* XCHAR file offset of buffer	*/
+	XPOINTER _bufptr,  _F2;		/* buffer pointer		*/
+	XPOINTER _buftop,  _F3;		/* pointer to top of buffer + 1	*/
+	XPOINTER _iop,     _F4;		/* pointer to next XCHAR	*/
+	XPOINTER _itop,    _F5;		/* call filbuf when _iop >=	*/
+	XPOINTER _otop,    _F6;		/* call flsbuf when _iop >=	*/
+	XPOINTER _fiodes,  _F7;		/* FIO file descriptor		*/
 	XINT	_fflags;		/* bit flags			*/
 };
 

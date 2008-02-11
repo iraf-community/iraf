@@ -97,7 +97,7 @@ int ready( void );
  */
 int ZZSTRT( void )
 {
-	XINT	wsetsize=0L, junk;
+	XSIZE_T	wsetsize=0L, junk;
 #ifdef SHLIB
 	static	int fd = 0;
 	struct  stat fi;

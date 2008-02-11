@@ -61,7 +61,7 @@ struct fiodes {
 	FILE	*fp;			/* file pointer if text file	*/
 	long	fpos;			/* file offset, bytes		*/
 	long	filesize;		/* file size at open time	*/
-	int	nbytes;			/* last nbytes r|w		*/
+	long	nbytes;			/* last nbytes r|w		*/
 	int	io_flags;		/* fcntl flags			*/
 	short	flags;			/* access mode flags		*/
 	char	*port;			/* tty port if tty		*/

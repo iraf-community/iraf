@@ -42,11 +42,11 @@
 
 /* Tape position structure (V?.??). */
 struct mtpos {
-        XINT     filno;                  /* current file (1=first) */
-        XINT     recno;                  /* current record (1=first) */
-        XINT     nfiles;                 /* number of files on tape */
-        XINT     tapeused;               /* total tape used (Kb) */
-        XINT     pflags;                 /* i/o status bitflags (output) */
+        XLONG    filno;                  /* current file (1=first) */
+        XLONG    recno;                  /* current record (1=first) */
+        XLONG    nfiles;                 /* number of files on tape */
+        XLONG    tapeused;               /* total tape used (Kb) */
+        XLONG    pflags;                 /* i/o status bitflags (output) */
 };
 
 /* MTPOS bitflags. */
@@ -103,7 +103,7 @@ int tape_open ( const char *fname, int mode )
 	    else
 		acmode = WRITE_ONLY;
 
-	    ZZOPMT (osfn, &acmode, (XCHAR *)tapecap, (XINT *)(&devpos), &newfile, &chan);
+	    ZZOPMT (osfn, &acmode, (XCHAR *)tapecap, (XLONG *)(&devpos), &newfile, &chan);
 
 	} else {
 	    /* Open a binary disk file.
@@ -139,7 +139,7 @@ int tape_close ( int fd )
 	if (ftype == TF_BINARY)
 	    ZCLSBF (&x_fd, &status);
 	else if (ftype == TF_TAPE)
-	    ZZCLMT (&x_fd, (XINT *)(&devpos), &status);
+	    ZZCLMT (&x_fd, (XLONG *)(&devpos), &status);
 	else
 	    status = XOK;
 
@@ -152,10 +152,13 @@ int tape_close ( int fd )
 /* fd       : input file	*/
 /* buf      : output buffer	*/
 /* maxbytes : max bytes to read	*/
-int tape_read ( int fd, char *buf, int maxbytes )
+long tape_read ( int fd, char *buf, long maxbytes )
 {
 	struct	mtpos devpos;
-	XINT	x_fd, x_maxbytes, status;
+	long status;
+	XINT	x_fd;
+	XLONG	x_status;
+	XSIZE_T	x_maxbytes;
 
 	if (ateof)
 	    return (0);
@@ -166,14 +169,16 @@ int tape_read ( int fd, char *buf, int maxbytes )
 	    status = read (0, buf, maxbytes);
 	} else if (ftype == TF_BINARY) {
 	    ZARDBF (&x_fd, (XCHAR *)buf, &x_maxbytes, &offset);
-	    ZAWTBF (&x_fd, &status);
-	    if (status > 0)
-		offset += status;
+	    ZAWTBF (&x_fd, &x_status);
+	    if (x_status > 0)
+		offset += x_status;
+	    status = x_status;
 	} else if (ftype == TF_TAPE){
 	    ZZRDMT (&x_fd, (XCHAR *)buf, &x_maxbytes, &offset);
-	    ZZWTMT (&x_fd, (XINT *)(&devpos), &status);
+	    ZZWTMT (&x_fd, (XLONG *)(&devpos), &x_status);
 	    if (devpos.pflags & MF_EOF)
 		ateof++;
+	    status = x_status;
 	} else
 	    status = XERR;
 
@@ -186,10 +191,13 @@ int tape_read ( int fd, char *buf, int maxbytes )
 /* fd     : output file		*/
 /* buf    : input bufferr	*/
 /* nbytes : nbytes to write	*/
-int tape_write ( int fd, const char *buf, int nbytes )
+long tape_write ( int fd, const char *buf, long nbytes )
 {
 	struct	mtpos devpos;
-	XINT	x_fd, x_nbytes, status;
+	long	status;
+	XINT	x_fd;
+	XLONG	x_status;
+	XSIZE_T	x_nbytes;
 
 	x_fd = fd;
 	x_nbytes = nbytes;
@@ -197,12 +205,14 @@ int tape_write ( int fd, const char *buf, int nbytes )
 	    status = write (1, buf, nbytes);
 	} else if (ftype == TF_BINARY) {
 	    ZAWRBF (&x_fd, (XCHAR *)buf, &x_nbytes, &offset);
-	    ZAWTBF (&x_fd, &status);
-	    if (status > 0)
-		offset += status;
+	    ZAWTBF (&x_fd, &x_status);
+	    if (x_status > 0)
+		offset += x_status;
+	    status = x_status;
 	} else if (ftype == TF_TAPE) {
 	    ZZWRMT (&x_fd, (XCHAR *)buf, &x_nbytes, &offset);
-	    ZZWTMT (&x_fd, (XINT *)(&devpos), &status);
+	    ZZWTMT (&x_fd, (XLONG *)(&devpos), &x_status);
+	    status = x_status;
 	} else
 	    status = XERR;
 

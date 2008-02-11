@@ -340,31 +340,31 @@ int MXUMSK ( void );
 
 #endif
 
-extern int ZARDBF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDBF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 /* ZARDGD -> gdev/ */
-extern int ZARDKS ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDLP ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDND ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDPL ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDPR ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDSF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRBF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDKS ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDLP ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDND ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDPL ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDPR ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDSF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRBF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 /* ZAWRGD -> gdev/ */
-extern int ZAWRKS ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRLP ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRND ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRPL ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRPR ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRSF ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZAWRKS ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRLP ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRND ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRPL ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRPR ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRSF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 extern int ZAWSET ( XSIZE_T *, XSIZE_T *, XSIZE_T *, XSIZE_T * );
-extern int ZAWTBF ( XINT *, XINT * );
+extern int ZAWTBF ( XINT *, XLONG * );
 /* ZAWTGD -> gdev/ */
-extern int ZAWTKS ( XINT *, XINT * );
-extern int ZAWTLP ( XINT *, XINT * );
-extern int ZAWTND ( XINT *, XINT * );
-extern int ZAWTPL ( XINT *, XINT * );
-extern int ZAWTPR ( XINT *, XINT * );
-extern int ZAWTSF ( XINT *, XINT * );
+extern int ZAWTKS ( XINT *, XLONG * );
+extern int ZAWTLP ( XINT *, XLONG * );
+extern int ZAWTND ( XINT *, XLONG * );
+extern int ZAWTPL ( XINT *, XLONG * );
+extern int ZAWTPR ( XINT *, XLONG * );
+extern int ZAWTSF ( XINT *, XLONG * );
 extern int ZCALL0 ( XPOINTER * );
 extern int ZCALL1 ( XPOINTER *, void * );
 extern int ZCALL2 ( XPOINTER *, void *, void * );
@@ -433,7 +433,7 @@ extern int ZGTPID ( XINT * );
 extern int ZINTPR ( XINT *, XINT *, XINT * );
 extern int ZLOCPR ( PFU, XPOINTER * );
 extern int ZLOCVA ( void *, XPOINTER * );
-extern int ZMALOC ( XPOINTER *, XINT *, XINT * );
+extern int ZMALOC ( XPOINTER *, XSIZE_T *, XINT * );
 /* ??? ZMEMCK ??? */
 extern int ZMFREE ( XPOINTER *, XINT * );
 extern int ZNOTTX ( XINT *, XLONG * );
@@ -454,7 +454,7 @@ extern int ZOSCMD ( PKCHAR *, PKCHAR *, PKCHAR *, PKCHAR *, XINT * );
 extern int ZPANIC ( XINT *, PKCHAR * );
 extern int ZPUTTX ( XINT *, XCHAR *, XINT *, XINT * );
 extern int ZPUTTY ( XINT *, XCHAR *, XINT *, XINT * );
-extern int ZRALOC ( XPOINTER *, XINT *, XINT * );
+extern int ZRALOC ( XPOINTER *, XSIZE_T *, XINT * );
 extern int ZSEKTX ( XINT *, XLONG *, XINT * );
 extern int ZSEKTY ( XINT *, XLONG *, XINT * );
 extern int ZSTTBF ( XINT *, XINT *, XLONG * );
@@ -472,17 +472,17 @@ extern int ZSVJMP ( XPOINTER *, XINT * );
 extern int ZWMSEC ( XINT * );
 extern int ZXGMES ( XINT *, PKCHAR *, XINT * );
 extern int ZXWHEN ( XINT *, XPOINTER *, XPOINTER * );
-extern int ZZCLMT ( XINT *, XINT *, XINT * );
+extern int ZZCLMT ( XINT *, XLONG *, XINT * );
 extern int ZZEPRO ( void );
-extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XINT *, XINT *, XINT * );
-extern int ZZRDMT ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XLONG *, XINT *, XINT * );
+extern int ZZRDMT ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 extern int ZZRWMT ( PKCHAR *, PKCHAR *, XINT * );
 extern int ZZSETK ( XCHAR *, XCHAR *, XINT *, XINT *, XINT *, XINT * );
 extern int ZZSTMT ( XINT *, XINT *, XLONG * );
 extern int ZZSTOP ( void );
 extern int ZZSTRT ( void );
-extern int ZZWRMT ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZZWTMT ( XINT *, XINT *, XINT * );
+extern int ZZWRMT ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 
 
 #ifdef F2C_INCLUDE	/* for C code written by f2c */
@@ -574,8 +574,8 @@ extern int ZZWTMT ( XINT *, XINT *, XINT * );
 #undef zzwtmt_
 
 /* Dummy prototypes for C code written by f2c */
-extern int ZARDND ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRND ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZARDND ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRND ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 /* ??? ZAWTNT ??? */
 extern int ZCLSND ( XINT *, XINT * );
 extern int ZFCHDR ( PKCHAR *, XINT *);
@@ -584,21 +584,21 @@ extern int ZFPATH ( XCHAR *, XCHAR *, XINT *, XINT * );
 extern int ZFSUBD ( XCHAR *, XINT *, XCHAR *, XINT * );
 extern int ZOPNND ( PKCHAR *, XINT *, XINT * );
 extern int ZSTTND ( XINT *, XINT *, XLONG * );
-extern int ZARDBF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDLP ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDPL ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDPR ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZARDSF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRBF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRLP ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRPL ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRPR ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWRSF ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZAWTBF ( XINT *, XINT * );
-extern int ZAWTLP ( XINT *, XINT * );
-extern int ZAWTPL ( XINT *, XINT * );
-extern int ZAWTPR ( XINT *, XINT * );
-extern int ZAWTSF ( XINT *, XINT * );
+extern int ZARDBF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDLP ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDPL ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDPR ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZARDSF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRBF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRLP ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRPL ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRPR ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWRSF ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZAWTBF ( XINT *, XLONG * );
+extern int ZAWTLP ( XINT *, XLONG * );
+extern int ZAWTPL ( XINT *, XLONG * );
+extern int ZAWTPR ( XINT *, XLONG * );
+extern int ZAWTSF ( XINT *, XLONG * );
 extern int ZCLCPR ( XINT *, XINT * );
 extern int ZCLDIR ( XINT *, XINT * );
 extern int ZCLDPR ( XINT *, XINT *, XINT * );
@@ -650,13 +650,13 @@ extern int ZSTTPR ( XINT *, XINT *, XLONG * );
 extern int ZSTTSF ( XINT *, XINT *, XLONG * );
 extern int ZSTTTX ( XINT *, XINT *, XLONG * );
 extern int ZSTTTY ( XINT *, XINT *, XLONG * );
-extern int ZZCLMT ( XINT *, XINT *, XINT * );
-extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XINT *, XINT *, XINT * );
-extern int ZZRDMT ( XINT *, XCHAR *, XINT *, XLONG * );
+extern int ZZCLMT ( XINT *, XLONG *, XINT * );
+extern int ZZOPMT ( PKCHAR *, XINT *, PKCHAR *, XLONG *, XINT *, XINT * );
+extern int ZZRDMT ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
 extern int ZZRWMT ( PKCHAR *, PKCHAR *, XINT * );
 extern int ZZSTMT ( XINT *, XINT *, XLONG * );
-extern int ZZWRMT ( XINT *, XCHAR *, XINT *, XLONG * );
-extern int ZZWTMT ( XINT *, XINT *, XINT * );
+extern int ZZWRMT ( XINT *, XCHAR *, XSIZE_T *, XLONG * );
+extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 
 #endif
 

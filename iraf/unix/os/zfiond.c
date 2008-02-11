@@ -671,7 +671,7 @@ int ZCLSND ( XINT *fd, XINT *status )
 /* buf      : output buffer			*/
 /* maxbytes : max bytes to read			*/
 /* offset   : 1-indexed file offset to read at	*/
-int ZARDND ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZARDND ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
 	int fd = *chan;
 	struct fiodes *kfp = &zfd[fd];
@@ -679,7 +679,7 @@ int ZARDND ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 	struct timeval timeout;
 	const char *ip;
 	XCHAR *op;
-	int nbytes, maxread, n;
+	long nbytes, maxread, n;
 #ifdef POSIX
 	fd_set readfds;
 	FD_ZERO (&readfds);
@@ -747,7 +747,7 @@ int ZARDND ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 /* buf    : buffer containing data	*/
 /* nbytes : nbytes to be written	*/
 /* offset : 1-indexed file offset	*/
-int ZAWRND ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZAWRND ( XINT *chan, XCHAR *buf, XSIZE_T *nbytes, XLONG *offset )
 {
 	int fd = *chan;
 	struct fiodes *kfp = &zfd[fd];
@@ -755,7 +755,7 @@ int ZAWRND ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 	const char *text, *ip = (const char *)buf;
 	char obuf[SZ_OBUF];
 	signal_handler_t sigpipe;
-	int nwritten, maxbytes, n;
+	long nwritten, maxbytes, n;
 
 
 	/* Enable a signal mask to catch SIGPIPE when the server has died. 
@@ -832,7 +832,7 @@ static void nd_onsig ( int sig /*, int *arg1, int *arg2 */ )
 /* ZAWTND -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-int ZAWTND ( XINT *fd, XINT *status )
+int ZAWTND ( XINT *fd, XLONG *status )
 {
 	if ((*status = zfd[*fd].nbytes) == ERR)
 	    *status = XERR;

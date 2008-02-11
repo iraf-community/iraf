@@ -134,11 +134,11 @@
  *
  * The devpos structure (struct _mtpos) has the following fields:
  *
- *	XINT	filno		file number
- *	XINT	recno		record number
- *	XINT	nfiles		number of files on tape
- *	XINT	tapeused	total amount of storage used (Kb)
- *	XINT	pflags		bitflags describing last i/o operation
+ *	XLONG	filno		file number
+ *	XLONG	recno		record number
+ *	XLONG	nfiles		number of files on tape
+ *	XLONG	tapeused	total amount of storage used (Kb)
+ *	XLONG	pflags		bitflags describing last i/o operation
  *
  * FILNO and RECNO are negative if the position is undefined (unknown).  File
  * number 1 is the first file.  NFILES is the total number of files on the
@@ -179,11 +179,11 @@ typedef unsigned int U_int;
  * by the client at open time and is only modified locally by the driver.
  */
 struct _mtpos {
-	XINT	filno;			/* current file (1=first) */
-	XINT	recno;			/* current record (1=first) */
-	XINT	nfiles;			/* number of files on tape */
-	XINT	tapeused;		/* total tape used (Kb) */
-	XINT	pflags;			/* i/o status bitflags (output) */
+	XLONG	filno;			/* current file (1=first) */
+	XLONG	recno;			/* current record (1=first) */
+	XLONG	nfiles;			/* number of files on tape */
+	XLONG	tapeused;		/* total tape used (Kb) */
+	XLONG	pflags;			/* i/o status bitflags (output) */
 };
 
 /* MTPOS bitflags. */
@@ -195,14 +195,14 @@ struct _mtpos {
 /* General magtape device information, for status output. */
 struct mtdev {
 	FILE	*statusout;		/* status out or NULL */
-	int	blksize;		/* device block size */
-	int	recsize;		/* last record size */
-	int	maxrec;			/* maximum record size */
-	int	optrec;			/* optimum record size */
-	int	tapesize;		/* tape capacity (Kb) */
-	int	eofsize;		/* filemark size, bytes */
-	int	gapsize;		/* interrecord gap size, bytes */
-	int	maxbsf;			/* BSF vs rewind-FSF threshold */
+	long	blksize;		/* device block size */
+	long	recsize;		/* last record size */
+	long	maxrec;			/* maximum record size */
+	long	optrec;			/* optimum record size */
+	long	tapesize;		/* tape capacity (Kb) */
+	long	eofsize;		/* filemark size, bytes */
+	long	gapsize;		/* interrecord gap size, bytes */
+	long	maxbsf;			/* BSF vs rewind-FSF threshold */
 	char	density[SZ_FNAME];	/* tape density, bpi */
 	char	devtype[SZ_FNAME];	/* drive type */
 	char	tapetype[SZ_FNAME];	/* tape type */
@@ -220,8 +220,8 @@ struct mtdesc {
 	int	flags;			/* device characteristics */
 	int	acmode;			/* access mode */
 	int	errcnt;			/* i/o error count */
-	int	nbytes;			/* status of last i/o transfer */
-	int	tbytes;			/* byte portion of tapeused */
+	long	nbytes;			/* status of last i/o transfer */
+	long	tbytes;			/* byte portion of tapeused */
 	int	mtrew;			/* REW ioctl code */
 	int	mtbsr, mtfsr;		/* BSR,FSR ioctl codes */
 	int	mtbsf, mtfsf;		/* BSF,FSF ioctl codes */
@@ -352,7 +352,7 @@ static	int zmtfsf ( int, int );
 static	int zmtopen ( const char *, int );
 static	int zmtclose ( int );
 static	void zmtfree ( struct mtdesc * );
-static	int zmtfpos ( struct mtdesc *, int );
+static	long zmtfpos ( struct mtdesc *, long );
 static	int zmtrew ( int );
 
 static	void zmtdbgopen ( struct mtdesc * );
@@ -371,7 +371,7 @@ static	void zmtdbgn ( struct mtdesc *, const char *, ... );
 /* devpos  : pointer to tape position info struct		*/
 /* newfile : file to be opened or EOT				*/
 /* chan    : OS channel of opened file				*/
-int ZZOPMT ( PKCHAR *device, XINT *acmode, PKCHAR *devcap, XINT *devpos, 
+int ZZOPMT ( PKCHAR *device, XINT *acmode, PKCHAR *devcap, XLONG *devpos, 
 	     XINT *newfile, XINT *chan )
 {
 	struct mtdesc *mp;
@@ -423,10 +423,10 @@ int ZZOPMT ( PKCHAR *device, XINT *acmode, PKCHAR *devcap, XINT *devpos,
 	/* Status output. */
 	zmtdbgn (mp, "devtype = %s", mp->mtdev.devtype);
 	zmtdbgn (mp, "tapetype = %s", mp->mtdev.tapetype);
-	zmtdbgn (mp, "tapesize = %d", mp->mtdev.tapesize);
+	zmtdbgn (mp, "tapesize = %ld", mp->mtdev.tapesize);
 	zmtdbgn (mp, "density = %s",
 	    mp->mtdev.density[0] ? mp->mtdev.density : "na");
-	zmtdbgn (mp, "blksize = %d", mp->mtdev.blksize);
+	zmtdbgn (mp, "blksize = %ld", mp->mtdev.blksize);
 	zmtdbgn (mp, "acmode = %s", mp->acmode == READ_ONLY ? "read" :
 	    ((*newfile < 0) ? "append" : "write"));
 	zmtdbgn (mp, "file = %ld%s", (long)(pp->filno), ateot(pp) ? " (EOT)" : "");
@@ -502,7 +502,7 @@ err:
  * if tape is open for writing, leaving tape positioned ready to write the
  * next file.
  */
-int ZZCLMT ( XINT *chan, XINT *devpos, XINT *o_status )
+int ZZCLMT ( XINT *chan, XLONG *devpos, XINT *o_status )
 {
 	int fd;
 	struct mtdesc *mp;
@@ -574,8 +574,8 @@ int ZZCLMT ( XINT *chan, XINT *devpos, XINT *o_status )
 	     * rewind and space forward, or abort on an error.
 	     */
 	    int flags = mp->flags;
-	    int blksize = mp->mtdev.blksize;
-	    int bufsize;
+	    long blksize = mp->mtdev.blksize;
+	    long bufsize;
 	    char *bufp;
 
 	    if ((flags & NB) || ((flags & BO) && !(flags & RF))) {
@@ -634,7 +634,7 @@ int ZZCLMT ( XINT *chan, XINT *devpos, XINT *o_status )
 	    pp->recno++;
 	    if (mp->acmode == WRITE_ONLY || spaceused(pp))
 		mp->tbytes += mp->mtdev.gapsize;
-	    zmtdbgn (mp, "record = %d", pp->recno);
+	    zmtdbgn (mp, "record = %ld", (long)(pp->recno));
 	}
 	
 	pp->tapeused += ((mp->tbytes + 512) / 1024);
@@ -656,12 +656,13 @@ int ZZCLMT ( XINT *chan, XINT *devpos, XINT *o_status )
  * tape mark.
  */
 /* offset : fixed block devices only */
-int ZZRDMT ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZZRDMT ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
-	int fd = *chan, mb = (int)*maxbytes;
+	int fd = *chan;
+	long mb = *maxbytes;
 	struct mtdesc *mp = get_mtdesc(fd);
 	struct _mtpos *pp = &mp->mtpos;
-	int status;
+	long status;
 
 	if (mp->mtdev.blksize && (mb % mp->mtdev.blksize)) {
 	    zmtdbgn (mp,
@@ -672,11 +673,11 @@ int ZZRDMT ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 	/* Position to the desired record (fixed block devices only). */
 /*
 	if (mp->mtdev.blksize && *offset > 0) {
-	    int    blkno, oldblk;
+	    XLONG    blkno, oldblk;
 	    blkno = *offset / mp->mtdev.blksize + 1;
 	    oldblk = mp->mtpos.recno;
 	    if (blkno != oldblk) {
-		zmtdbgn (mp, "position to block %d\n", blkno);
+		zmtdbgn (mp, "position to block %ld\n", (long)blkno);
 		if (blkno > oldblk) {
 		    if (zmtfsr (fd, blkno - oldblk) == ERR) {
 			status = ERR;
@@ -724,7 +725,7 @@ int ZZRDMT ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
 /* done: */ 
 	mp->nbytes = status;
 	if (status >= 0 && mp->mtdev.recsize != status)
-	    zmtdbgn (mp, "recsize = %d", mp->mtdev.recsize = status);
+	    zmtdbgn (mp, "recsize = %ld", mp->mtdev.recsize = status);
 	zmtfls (mp);
 
 	return XOK;	/* always OK ??? */
@@ -735,26 +736,27 @@ int ZZRDMT ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
  * so save write status for return by next call to ZZWTMT.
  */
 /* offset : ignored on a write */
-int ZZWRMT ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZZWRMT ( XINT *chan, XCHAR *buf, XSIZE_T *nbytes, XLONG *offset )
 {
 	XINT x_status = XOK;
-	int fd = *chan, nb = *nbytes;
+	int fd = *chan;
+	long nb = *nbytes;
 	struct mtdesc *mp = get_mtdesc(fd);
-	int blksize = mp->mtdev.blksize;
+	long blksize = mp->mtdev.blksize;
 
 	/* If writing to a blocked device, promote partial blocks to a
 	 * full device block.
 	 */
 	if (blksize > 0 && (nb % blksize)) {
 	    nb += blksize - (nb % blksize);
-	    zmtdbgn (mp, "partial record promoted from %ld to %d bytes\n",
+	    zmtdbgn (mp, "partial record promoted from %ld to %ld bytes\n",
 		(long)(*nbytes), nb);
 	}
 
 	if (mp->mtdev.recsize != nb)
-	    zmtdbgn (mp, "recsize = %d", mp->mtdev.recsize = nb);
+	    zmtdbgn (mp, "recsize = %ld", mp->mtdev.recsize = nb);
 	if ((mp->nbytes = write (fd, (const char *)buf, nb)) != nb) {
-	    zmtdbgn (mp, "write error, status=%d, errno=%d\n",
+	    zmtdbgn (mp, "write error, status=%ld, errno=%d\n",
 		mp->nbytes, errno);
 	    mp->nbytes = ERR;
 	    x_status = XERR;
@@ -768,13 +770,14 @@ int ZZWRMT ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 /* ZZWTMT -- "Wait" for i/o transfer to complete, and return the number of
  * bytes transferred or XERR.  A read at EOF returns a byte count of zero.
  */
-int ZZWTMT ( XINT *chan, XINT *devpos, XINT *o_status )
+int ZZWTMT ( XINT *chan, XLONG *devpos, XLONG *o_status )
 {
 	int fd = *chan;
 	struct mtdesc *mp = get_mtdesc(fd);
 	struct _mtpos *pp = &mp->mtpos;
 	int flags = mp->flags;
-	int status, eof_seen, eor_seen, eot_seen;
+	int eof_seen, eor_seen, eot_seen;
+	long status;
 
 	eof_seen = 0;
 	eor_seen = 0;
@@ -790,8 +793,8 @@ int ZZWTMT ( XINT *chan, XINT *devpos, XINT *o_status )
 		 */
 		pp->nfiles = pp->filno - 1;
 		zmtdbgn (mp, "nfiles = %ld", (long)(pp->nfiles));
-		zmtdbgn (mp, "file = %d%s",
-		    pp->filno, ateot(pp) ? " (EOT)" : "");
+		zmtdbgn (mp, "file = %ld%s",
+			 (long)(pp->filno), ateot(pp) ? " (EOT)" : "");
 		zmtfls (mp);
 		eot_seen = 1;
 
@@ -838,7 +841,7 @@ int ZZWTMT ( XINT *chan, XINT *devpos, XINT *o_status )
 		pp->recno++;
 	    if (spaceused(pp))
 		mp->tbytes += mp->mtdev.gapsize;
-	    zmtdbgn (mp, "record = %d", pp->recno);
+	    zmtdbgn (mp, "record = %ld", (long)(pp->recno));
 	}
 
 	if (status >= 0 && spaceused(pp)) {
@@ -1188,7 +1191,7 @@ static struct mtdesc *zmtdesc ( const char *device, int acmode,
 
 		    } else if (*ip != ':') {
 			/* Numeric parameters. */
-			int     n = 0;
+			long     n = 0;
 
 			while (*ip && *ip != ':') {
 			    if (isdigit (*ip))
@@ -1248,19 +1251,20 @@ static void zmtfree ( struct mtdesc *mp )
  * A negative newfile number signifies EOT.
  */
 /* newfile : file we want to position to */
-static int zmtfpos ( struct mtdesc *mp, int newfile )
+static long zmtfpos ( struct mtdesc *mp, long newfile )
 {
 	struct _mtpos *pp = &mp->mtpos;
 	int flags = mp->flags;
-	int oldfile, oldrec, maxrec;
+	XLONG oldfile, oldrec;
+	long maxrec, n;
 	char *buf = NULL;
-	int fd, status, n;
+	int fd, status;
 
 	oldfile = pp->filno;
 	oldrec  = pp->recno;
 
 	if (newfile > 0)
-	    zmtdbgn (mp, "position to file %d\n", newfile);
+	    zmtdbgn (mp, "position to file %ld\n", newfile);
 	else if (newfile < 0)
 	    zmtdbg (mp, "position to end of tape\n");
 	else
@@ -1272,7 +1276,7 @@ static int zmtfpos ( struct mtdesc *mp, int newfile )
 	 */
 	if (newfile < 0 && !(flags&UE) && pp->nfiles > 0) {
 	    newfile = pp->nfiles + 1;
-	    zmtdbgn (mp, "end of tape is file %d\n", newfile);
+	    zmtdbgn (mp, "end of tape is file %ld\n", newfile);
 	}
 	zmtfls (mp);
 
@@ -1305,7 +1309,7 @@ static int zmtfpos ( struct mtdesc *mp, int newfile )
 		if (zmtrew(fd) < 0)
 		    return (ERR);
 		oldfile = oldrec = 1;
-		zmtdbgn (mp, "file = %d", oldfile);
+		zmtdbgn (mp, "file = %ld", (long)oldfile);
 		zmtfls (mp);
 		goto fwd;
 	    } else if (flags & BO) {
@@ -1452,7 +1456,7 @@ err:			free (buf);
 
 		oldfile++;
 		oldrec = 1;
-		zmtdbgn (mp, "file = %d", oldfile);
+		zmtdbgn (mp, "file = %ld", (long)oldfile);
 		zmtfls (mp);
 	    }
 

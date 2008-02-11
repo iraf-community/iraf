@@ -12,6 +12,7 @@
 #define	FI_EXECUTABLE		3
 #define	FI_SPECIAL		4
 
+/* see base/finfo.h */
 struct _finfo {
 	XLONG	fi_type;		/* file type			*/
 	XLONG	fi_size;		/* file size, machine bytes	*/

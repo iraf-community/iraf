@@ -9,7 +9,7 @@
 /* fd     : input file		*/
 /* buf    : output buffer	*/
 /* nbytes : max bytes to read	*/
-int os_read ( int fd, char *buf, int nbytes )
+ssize_t os_read ( int fd, char *buf, size_t nbytes )
 {
 	return (read (fd, buf, nbytes));
 }

@@ -41,6 +41,8 @@
  * the plotter device.
  */
 
+#define REC_HEADER_T	int
+
 #define SZ_OSCMD	512		/* buffer for dispose cmd	*/
 #define SZ_PLSTR	256		/* zopnpl plotter argument	*/
 
@@ -53,7 +55,7 @@ struct dplotter {
 struct oplotter {
 	long	wbytes;			/* nbytes written to device	*/
 	struct	dplotter *pl;		/* device code as above		*/
-	int	status;			/* status of last write		*/
+	long	status;			/* status of last write		*/
 	char	spoolfile[SZ_PATHNAME+1];
 };
 
@@ -181,7 +183,7 @@ int ZCLSPL ( XINT *chan, XINT *status )
  * move the data to the device.  The read primitive is not likely to be needed
  * for a plotter, but you never know...
  */
-int ZARDPL ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
+int ZARDPL ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *offset )
 {
 	return ZARDBF (chan, buf, maxbytes, offset);
 }
@@ -200,25 +202,30 @@ int ZARDPL ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset )
  * record, i.e., 1440 bytes or 720 chars on the VAX.
  */
 /* offset : not used		*/
-int ZAWRPL ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
+int ZAWRPL ( XINT *chan, XCHAR *buf, XSIZE_T *a_nbytes, XLONG *offset )
 {
-	static	XINT hdrlen=sizeof(int);
-	static	XLONG noffset=0L;
-	XINT	status,tmp_status;
-	int	reclen;
+	static	XLONG noffset = 0L;
+	static	XSIZE_T hdrlen = sizeof(REC_HEADER_T);
+	REC_HEADER_T reclen;
+	XLONG	status,tmp_status;
+	unsigned REC_HEADER_T maxrec = (unsigned REC_HEADER_T)(-1) >> 1;
+	XSIZE_T nbytes;
 
 	/* Write out the integer record header.  Set the file offset to zero
 	 * since the file is sequential, and the offsets do not include the
 	 * record headers anyhow so are wrong.
 	 */
-	reclen = *nbytes;
+	if ( sizeof(REC_HEADER_T) < sizeof(XSIZE_T) && 
+	     (XSIZE_T)maxrec < *a_nbytes ) nbytes = (XSIZE_T)maxrec;
+	else nbytes = *a_nbytes;
+	reclen = nbytes;
 	ZAWRBF (chan, (XCHAR *)&reclen, &hdrlen, &noffset);
 	ZAWTBF (chan, &status);
 
 	/* Write the metacode data.
 	 */
-	pltr.wbytes += *nbytes;
-	ZAWRBF (chan, buf, nbytes, &noffset);
+	pltr.wbytes += nbytes;
+	ZAWRBF (chan, buf, &nbytes, &noffset);
 	ZAWTBF (chan, &tmp_status);
 	pltr.status = tmp_status;
 
@@ -226,7 +233,7 @@ int ZAWRPL ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
 	 * since the file is sequential, and the offsets do not include the
 	 * record headers anyhow so are wrong.
 	 */
-	reclen = *nbytes;
+	reclen = nbytes;
 	ZAWRBF (chan, (XCHAR *)&reclen, &hdrlen, &noffset);
 	ZAWTBF (chan, &status);
 
@@ -239,7 +246,7 @@ int ZAWRPL ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset )
  * record header, since that was written with a separate write unbeknownst
  * to FIO, so the status value returned refers only to the metacode data.
  */
-int ZAWTPL ( XINT *chan, XINT *status )
+int ZAWTPL ( XINT *chan, XLONG *status )
 {
 	ZAWTBF (chan, status);
 	if (*status > 0)

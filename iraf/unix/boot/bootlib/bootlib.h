@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <ctype.h>
 #define	import_spp
 #define	NOKNET
@@ -69,7 +70,7 @@ extern int os_gfdir ( int, char *, size_t );
 /* osfiletype.c */
 extern int os_filetype ( const char * );
 /* oswrite.c */
-extern int os_write ( int, const char *, int );
+extern ssize_t os_write ( int, const char *, size_t );
 /* osamovb.c */
 extern void os_amovb ( const char *, char *, int );
 /* osclose.c */
@@ -91,9 +92,9 @@ extern long os_utime ( long );
 /* osopen.c */
 extern int os_open ( const char *, int, int );
 /* osread.c */
-extern int os_read ( int, char *, int );
+extern ssize_t os_read ( int, char *, size_t );
 /* tape.c */
 extern int tape_open ( const char *, int );
-extern int tape_read ( int, char *, int );
+extern long tape_read ( int, char *, long );
 extern int tape_close ( int );
-extern int tape_write ( int, const char *, int );
+extern long tape_write ( int, const char *, long );

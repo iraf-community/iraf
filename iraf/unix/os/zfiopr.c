@@ -43,6 +43,8 @@
  * which do not communicate with the parent.
  */
 
+#define IPC_HEADER_T	short
+
 #define IPC_MAGIC	01120		/* First 2 bytes of IPC block	  */
 #define SZ_TTYIBUF	512		/* buffer size if reading TTY	  */
 #define SZ_TTYOBUF	2048		/* buffer size if writing TTY	  */
@@ -50,7 +52,7 @@
 
 #define mask(s)		(1 << ((s) - 1))
 
-static int pr_ionbytes[MAXOFILES];	/* nbytes read|written on channel */
+static long pr_ionbytes[MAXOFILES];	/* nbytes read|written on channel */
 static int debug_ipc = 0;		/* print debug info on stderr	  */
 int	ipc_in = 0;			/* logfile for IPC input	  */
 int	ipc_out = 0;			/* logfile for IPC output	  */
@@ -214,13 +216,14 @@ int ZCLCPR ( XINT *pid, XINT *exit_status )
  * writes to an IPC channel.
  */
 /* loffset : not used */
-int ZARDPR ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset )
+int ZARDPR ( XINT *chan, XCHAR *buf, XSIZE_T *maxbytes, XLONG *loffset )
 {
 	XINT x_status = XOK;
 	char *op;
-	int record_length, status;
-	int fd, nbytes;
-	short temp;
+	int status;
+	int fd;
+	long record_length, nbytes;
+	IPC_HEADER_T temp;
 #ifdef POSIX
 	sigset_t sigmask_save, set;
 #else
@@ -244,7 +247,7 @@ int ZARDPR ( XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *loffset )
 	    char	ibuf[SZ_TTYIBUF];
 	    const char	*ip;
 	    XCHAR	*op, *maxop;
-	    int		maxch = min (SZ_TTYIBUF, *maxbytes / sizeof(XCHAR));
+	    long	maxch = min (SZ_TTYIBUF, *maxbytes / sizeof(XCHAR));
 	    int		ntrys = MAX_TRYS;
 
 	    do {
@@ -353,15 +356,17 @@ reenab_:
 /* ZAWRPR -- Write to an IPC channel.  Write the IPC block header followed by
  * the data block.
  */
-int ZAWRPR ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *loffset )
+int ZAWRPR ( XINT *chan, XCHAR *buf, XSIZE_T *a_nbytes, XLONG *loffset )
 {
 	int fd;
-	short temp;
+	IPC_HEADER_T temp;
 #ifdef POSIX
 	sigset_t sigmask_save, set;
 #else
 	int sigmask_save;
 #endif
+	unsigned IPC_HEADER_T maxrec = (unsigned IPC_HEADER_T)(-1) >> 1;
+	XSIZE_T nbytes;
 
 	fd = *chan;
 
@@ -372,9 +377,9 @@ int ZAWRPR ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *loffset )
 	if (ipc_isatty) {
 	    char	obuf[SZ_TTYOBUF], *op, *maxop;
 	    XCHAR	*ip;
-	    int		nchars;
+	    long	nchars;
 
-	    nchars = min (SZ_TTYOBUF, *nbytes / sizeof(XCHAR));
+	    nchars = min (SZ_TTYOBUF, *a_nbytes / sizeof(XCHAR));
 	    maxop = obuf + nchars -1;
 	    for ( ip=buf, op=obuf ; op <= maxop ; op++, ip++ )
 		*op = *ip;
@@ -394,20 +399,24 @@ int ZAWRPR ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *loffset )
 	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
 #endif
 
+	if ( sizeof(IPC_HEADER_T) < sizeof(XSIZE_T) && 
+	     (XSIZE_T)maxrec < *a_nbytes ) nbytes = (XSIZE_T)maxrec;
+	else nbytes = *a_nbytes;
+
 	temp = IPC_MAGIC;
 	write (fd, &temp, 2);
 	if (ipc_out > 0)
 	    write (ipc_out, &temp, 2);
-	temp = *nbytes;
+	temp = nbytes;
 	write (fd, &temp, 2);
 	if (ipc_out > 0)
 	    write (ipc_out, &temp, 2);
 
 	/* Write data block.
 	 */
-	pr_ionbytes[fd] = write (fd, (const char *)buf, (int)*nbytes);
+	pr_ionbytes[fd] = write (fd, (const char *)buf, nbytes);
 	if (ipc_out > 0)
-	    write (ipc_out, (const char *)buf, (int)*nbytes);
+	    write (ipc_out, (const char *)buf, nbytes);
 
 #ifdef POSIX
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
@@ -417,8 +426,8 @@ int ZAWRPR ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *loffset )
 
 	if (debug_ipc) {
 	    fprintf (stderr, "[%d] wrote %d bytes to IPC channel %d:\n",
-		getpid(), (int)*nbytes, fd);
-	    write (2, (const char *)buf, (int)*nbytes);
+		     getpid(), (int)nbytes, fd);
+	    write (2, (const char *)buf, nbytes);
 	}
 
 	return XOK;	/* always OK ??? */
@@ -429,7 +438,7 @@ int ZAWRPR ( XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *loffset )
  * asynchronous we do not really wait, rather we return the status value
  * (byte count) from the last read or write to the channel.
  */
-int ZAWTPR ( XINT *chan, XINT *status )
+int ZAWTPR ( XINT *chan, XLONG *status )
 {
 	if ((*status = pr_ionbytes[*chan]) == ERR)
 	    *status = XERR;
