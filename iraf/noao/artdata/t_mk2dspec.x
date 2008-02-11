@@ -48,9 +48,9 @@ real	dpos				# Deriviative of position
 
 bool	new
 pointer	ilist, olist, mlist
-int	i, j, k, k1, k2, fd, npts, nmods, nalloc
+int	i, j, k, k1, k2, fd, npts, npmods, nalloc
 real	pcen[2], fwhm[2], flux[2], peak, pstep, pstart, pend, x1, x2, dx
-pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
+pointer	sp, comment, mod, pmods, asi, asis[2], data, in, out, temp, pname
 
 bool	streq(), clgetb()
 real	asigrl()
@@ -135,7 +135,7 @@ begin
 
 	    # Read the models file.
 	    fd = open (Memc[models], READ_ONLY, TEXT_FILE)
-	    nmods = 0
+	    npmods = 0
 	    while (fscan (fd) != EOF) {
 	        call gargwrd (Memc[template], SZ_FNAME)
 	        call gargr (scale)
@@ -162,18 +162,18 @@ begin
 	        POS(mod) = pos - 1 - nl / 2. * dpos
 	        DPOS(mod) = dpos
 
-	        if (nmods == 0) {
+	        if (npmods == 0) {
 		    nalloc = NALLOC
-		    call malloc (mods, nalloc, TY_POINTER)
-	        } else if (nmods == nalloc) {
+		    call malloc (pmods, nalloc, TY_POINTER)
+	        } else if (npmods == nalloc) {
 		    nalloc = nalloc + NALLOC
-		    call realloc (mods, nalloc, TY_POINTER)
+		    call realloc (pmods, nalloc, TY_POINTER)
 	        }
-	        Memi[mods+nmods] = mod
-	        nmods = nmods + 1
+	        Memi[pmods+npmods] = mod
+	        npmods = npmods + 1
 	    }
 	    call close (fd)
-	    if (nmods == 0) {
+	    if (npmods == 0) {
 	        call imunmap (out)
 	        call sfree (sp)
 	        call error (1, "No model spectra defined")
@@ -187,8 +187,8 @@ begin
 	            call aclrr (Memr[data], nc)
 	        else
 		    call amovr (Memr[imgl2r(in,i)], Memr[data], nc)
-	        do j = 1, nmods {
-	            mod = Memi[mods+j-1]
+	        do j = 1, npmods {
+	            mod = Memi[pmods+j-1]
 	            if (NPTS(mod) < i)
 		        next
 		    ptype = PTYPE(mod)
@@ -241,9 +241,9 @@ begin
 	    if (in != out)
 	        call imunmap (in)
 	    call imunmap (out)
-	    do i = 0, nmods-1
-		call mfree (SPEC(Memi[mods+i]), TY_REAL)
-	    call mfree (mods, TY_POINTER)
+	    do i = 0, npmods-1
+		call mfree (SPEC(Memi[pmods+i]), TY_REAL)
+	    call mfree (pmods, TY_POINTER)
 	}
 
 	call asifree (asis[1])

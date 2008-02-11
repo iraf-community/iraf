@@ -141,4 +141,6 @@ libvops.a:
 	f77upk.f
 	bitmov.x	<mach.h>
 	xor.x
+	abs.c
+	mod.c
 	;
