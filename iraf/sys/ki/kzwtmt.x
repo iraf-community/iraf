@@ -9,8 +9,8 @@ include	"ki.h"
 procedure kzwtmt (chan, devpos, status)
 
 int	chan			#I active magtape channel
-int	devpos[ARB]		#O device position structure
-int	status			#O receives nbytes transferred or ERR
+long	devpos[ARB]		#O device position structure
+long	status			#O receives nbytes transferred or ERR
 
 pointer	bd
 include	"kichan.com"
@@ -21,6 +21,6 @@ begin
 	else {
 	    bd = k_bufp[chan]
 	    status = k_status[chan]
-	    call amovi (Memi[bd], devpos, LEN_MTDEVPOS)
+	    call amovl (Memi[bd], devpos, LEN_MTDEVPOS)
 	}
 end

@@ -49,7 +49,7 @@ procedure kardpr (chan, buf, max_bytes, offset)
 
 int	chan
 char	buf[ARB]
-int	max_bytes
+size_t	max_bytes
 long	offset
 include	"kichan.com"
 
@@ -65,7 +65,7 @@ procedure kawrpr (chan, buf, nbytes, offset)
 
 int	chan
 char	buf[ARB]
-int	nbytes
+size_t	nbytes
 long	offset
 include	"kichan.com"
 
@@ -80,7 +80,7 @@ end
 procedure kawtpr (chan, status)
 
 int	chan
-int	status
+long	status
 include	"kichan.com"
 
 begin

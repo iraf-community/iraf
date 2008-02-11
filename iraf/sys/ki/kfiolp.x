@@ -53,7 +53,7 @@ procedure kardlp (chan, buf, max_bytes, offset)
 
 int	chan
 char	buf[ARB]
-int	max_bytes
+size_t	max_bytes
 long	offset
 include	"kichan.com"
 
@@ -69,7 +69,7 @@ procedure kawrlp (chan, buf, nbytes, offset)
 
 int	chan
 char	buf[ARB]
-int	nbytes
+size_t	nbytes
 long	offset
 include	"kichan.com"
 
@@ -84,7 +84,7 @@ end
 procedure kawtlp (chan, status)
 
 int	chan
-int	status
+long	status
 include	"kichan.com"
 
 begin

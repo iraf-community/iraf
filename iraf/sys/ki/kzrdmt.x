@@ -11,7 +11,7 @@ procedure kzrdmt (chan, obuf, max_bytes, offset)
 
 int	chan			#I magtape channel
 char	obuf[ARB]		#O buffer to receive data
-int	max_bytes		#I max bytes to read
+size_t	max_bytes		#I max bytes to read
 long	offset			#I file offset
 
 pointer	bd

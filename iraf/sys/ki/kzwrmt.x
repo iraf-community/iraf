@@ -10,7 +10,7 @@ procedure kzwrmt (chan, buf, nbytes, offset)
 
 int	chan			#I magtape channel
 char	buf[ARB]		#I buffer containing data
-int	nbytes			#I nbytes to write
+size_t	nbytes			#I nbytes to write
 long	offset			#I file offset
 
 int	server

@@ -12,7 +12,7 @@ procedure kzopmt (device, mode, devcap, devpos, newfile, chan)
 char	device[ARB]		#I logical device name
 int	mode			#I access mode
 char	devcap[ARB]		#I tapecap entry for device
-int	devpos[ARB]		#I tape position information
+long	devpos[ARB]		#I tape position information
 int	newfile			#U receives new file number
 int	chan			#O channel assigned for reading filenames
 
@@ -56,7 +56,7 @@ begin
 	    p_arg[3] = dc_off
 	    p_arg[4] = dc_len
 	    p_arg[5] = newfile
-	    call amovi (devpos, p_arg[6], LEN_MTDEVPOS)
+	    call amovl (devpos, p_arg[6], LEN_MTDEVPOS)
 
 	    if (ki_send (server, KI_ZFIOMT, MT_OP) == ERR)
 		k_oschan[chan] = ERR

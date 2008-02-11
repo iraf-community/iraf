@@ -10,7 +10,7 @@ include	"ki.h"
 procedure kzclmt (chan, devpos, status)
 
 int	chan			#I channel to be closed
-int	devpos[ARB]		#O receives position information
+long	devpos[ARB]		#O receives position information
 int	status			#O close status
 
 int	server
