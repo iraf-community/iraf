@@ -73,6 +73,7 @@
       integer ddble
       integer dcplx
       integer dpntr
+      integer dsizet
       integer space(2)
       integer spoin0(128)
 c     " Memp(1)"

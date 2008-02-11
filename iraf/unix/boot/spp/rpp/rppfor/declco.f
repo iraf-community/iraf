@@ -75,6 +75,7 @@
       integer ddble
       integer dcplx
       integer dpntr
+      integer dsizet
       integer space(2)
       integer xptyp(128)
       integer xpntr(7)
