@@ -32,7 +32,7 @@ int main( int argc, char *argv[] )
 
     for ( i=3 ; i < argc ; i++ ) {
 	int status;
-	printf("[INFO] target = %s\n",argv[i]);
+	//printf("[INFO] target = %s\n",argv[i]);
 	status = add_sz_val(proc_name,target_arg,argv[i]);
 	if ( status != 0 ) {
 	    fprintf(stderr,"[ERROR] add_sz_val() failed\n");
@@ -45,6 +45,11 @@ int main( int argc, char *argv[] )
     return return_status;
 }
 
+static int is_valchar( int ch )
+{
+    return ( isalpha(ch) || isdigit(ch) || ch=='_' );
+}
+
 static int add_sz_val( const char *proc_name, int target_arg, 
 		       const char *file_name )
 {
@@ -54,6 +59,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
     int num_lines = 0;
     char **lines = NULL;
     int num_proc;
+    bool needs_update = false;
     /* line indices */
     int proc_decl[SZ_NUM_PROC];
     int proc_begin[SZ_NUM_PROC];
@@ -101,7 +107,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	ip = lines[i];
 	while ( *ip == ' ' || *ip == '\t' ) ip++;
 	if ( strncmp(ip,"procedure",9) == 0 &&
-	     (ip[9] == ' ' || ip[9] == '\t') && isalpha(ip[10]) ) {
+	     (ip[9] == ' ' || ip[9] == '\t') && is_valchar(ip[10]) ) {
 	    proc_decl[num_proc] = i;
 	}
 	else if ( strncmp(ip,"begin",5) == 0 &&
@@ -122,10 +128,10 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    }
 	}
 	else {
-	    while ( isalpha(*ip) ) ip++;
+	    while ( is_valchar(*ip) ) ip++;
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
 	    if ( strncmp(ip,"procedure",9) == 0 &&
-		 (ip[9] == ' ' || ip[9] == '\t') && isalpha(ip[10]) ) {
+		 (ip[9] == ' ' || ip[9] == '\t') && is_valchar(ip[10]) ) {
 		proc_decl[num_proc] = i;
 	    }
 	}
@@ -141,30 +147,30 @@ static int add_sz_val( const char *proc_name, int target_arg,
 
     /* decide insert_idx */
     for ( i=0 ; i < num_proc ; i++ ) {
-	int j;
+	int j, j0;
 	int last_decl = -1;
 	int fix_last_decl = 0;
 	const char *comm_ptr;
 
-	j = proc_decl[i];
+	j0 = proc_decl[i];
 	do {
-	    comm_ptr = strrchr(lines[j],',');
+	    comm_ptr = strrchr(lines[j0],',');
 	    if ( comm_ptr != NULL ) {
 		comm_ptr++;
 		while ( *comm_ptr==' ' || *comm_ptr=='\t' || *comm_ptr=='\n' )
 		    comm_ptr++;
 		if ( *comm_ptr != '\0' ) comm_ptr = NULL;
 	    }
-	    j++;
+	    j0++;
 	} while ( comm_ptr != NULL );
 
-	for ( ; j < proc_begin[i] ; j++ ) {
+	for ( j=j0 ; j < proc_begin[i] ; j++ ) {
 	    const char *ip;
 	    bool contain_alpha = false;
 	    ip = lines[j];
-	    while ( isalpha(*ip) || isdigit(*ip) || *ip==' ' || *ip=='\t'||
-		    *ip=='_'  || *ip==',' || *ip=='[' || *ip==']' ) {
-		if ( isalpha(*ip) ) contain_alpha = true;
+	    while ( is_valchar(*ip) || *ip==' ' || *ip=='\t'||
+		    *ip==',' || *ip=='[' || *ip==']' ) {
+		if ( is_valchar(*ip) ) contain_alpha = true;
 		ip++;
 	    }
 	    if ( contain_alpha == true ) {
@@ -184,10 +190,10 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    fprintf(stderr,"debug: insert_idx[i]=%d\n",insert_idx[i]);
 	}
 	/* check sz_val decl. */
-	for ( j=proc_decl[i]+1 ; j < proc_begin[i] ; j++ ) {
+	for ( j=j0 ; j < proc_begin[i] ; j++ ) {
 	    const char *ip;
 	    ip = strstr(lines[j],"\tsz_val");
-	    if ( ip != NULL && ( isalpha(ip[7]) == 0 && ip[7] != '_' ) ) {
+	    if ( ip != NULL && is_valchar(ip[7]) == 0 ) {
 		/* already exists */
 		insert_idx[i] = -1;
 	    }
@@ -295,7 +301,9 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			    if ( op < maxop ) *op = *ip2;
 			}
 			ip2 = current_arg;
-			if ( *ip2 == ' ' ) ip2++;
+			while ( *ip2 == ' ' || *ip2 == '\t' ) ip2++;
+			if ( strncmp(ip2,"sz_val",6) == 0 && 
+			     is_valchar(ip2[6]) == 0 ) break;
 			for ( ; ip2 < next_arg ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
@@ -341,18 +349,28 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    } while ( *ip != ')' );
 	}
 	if ( target_found == false ) insert_idx[i] = -1;
+	else needs_update = true;
     }
 
-    for ( i=0 ; i < num_lines ; i++ ) {
-	int j;
-	for ( j=0 ; j < num_proc ; j++ ) {
-	    if ( i == insert_idx[j] ) {
-		fprintf(stdout,"size_t\tsz_val\n");
-	    }
+    if ( needs_update == true ) {
+	fp = fopen(file_name,"w");
+	if ( fp == NULL ) {
+	    fprintf(stderr,"[ERROR] file not found: %s\n",file_name);
+	    goto quit;
 	}
-	fprintf(stdout,"%s",lines[i]);
+	printf("updating: %s\n",file_name);
+	for ( i=0 ; i < num_lines ; i++ ) {
+	    int j;
+	    for ( j=0 ; j < num_proc ; j++ ) {
+		if ( i == insert_idx[j] ) {
+		    fprintf(fp,"size_t\tsz_val\n");
+		}
+	    }
+	    fprintf(fp,"%s",lines[i]);
+	}
+	fclose(fp);
+	fp = NULL;
     }
-
 
     return_status = 0;
  quit:
