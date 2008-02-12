@@ -87,9 +87,12 @@ static int add_sz_val( const char *proc_name, int target_arg,
     fclose(fp);
     fp = NULL;
 
-    //for ( i=0 ; i < num_lines ; i++ ) {
-    //	printf("%s",lines[i]);
-    //}
+    for ( i=0 ; i < SZ_NUM_PROC ; i++ ) {
+	proc_decl[i] = -1;
+	proc_begin[i] = -1;
+	proc_end[i] = -1;
+	insert_idx[i] = -1;
+    }
 
     /* detect `procedure' `begin' and `end' */
     num_proc = 0;
@@ -112,7 +115,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		fprintf(stderr,"debug: decl=%d  begin=%d  end=%d\n",
 	          proc_decl[num_proc],proc_begin[num_proc],proc_end[num_proc]);
 	    }
-	    num_proc++;
+	    if ( 0 <= proc_decl[num_proc] &&
+		 proc_decl[num_proc] < proc_begin[num_proc] &&
+		 proc_begin[num_proc] < proc_end[num_proc] ) {
+		num_proc++;
+	    }
 	}
 	else {
 	    while ( isalpha(*ip) ) ip++;
@@ -126,6 +133,10 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    fprintf(stderr,"[Warning] Max num_proc\n");
 	    break;
 	}
+    }
+
+    if ( DEBUG ) {
+	fprintf(stderr,"debug: decide insert_idx\n");
     }
 
     /* decide insert_idx */
@@ -181,6 +192,10 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		insert_idx[i] = -1;
 	    }
 	}
+    }
+
+    if ( DEBUG ) {
+	fprintf(stderr,"debug: modify: call ...\n");
     }
 
     /* modify: call salloc(a,b,c) -> sz_val = b;  call salloc(a,sz_val,c) */
