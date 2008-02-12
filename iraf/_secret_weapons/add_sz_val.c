@@ -240,11 +240,15 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		const char *ip1;
 		const char *next_arg = NULL;
 		const char *current_arg = NULL;
+		const char *current_arg_str = NULL;
 		int br_in_0 = 0;	/* [] */
 		int br_in_1 = 0;	/* () */
 		ip++;			/* skip '(', or ',' */
 		ip1 = ip;
 		current_arg = ip;
+		current_arg_str = ip;
+		while ( *current_arg_str==' ' || *current_arg_str=='\t' )
+		    current_arg_str++;
 		if ( DEBUG ) {
 		    fprintf(stderr,"debug: current_arg = [%s]\n",current_arg);
 		}
@@ -272,10 +276,20 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    size_t len_target;
 		    bool skip_ok;
 		    /* */
-		    len_target = next_arg - current_arg;
+		    if ( strncmp(current_arg_str,"sz_val",6) == 0 && 
+			 is_valchar(current_arg_str[6]) == 0 ) {
+			break;
+		    }
+		    /* */
+		    len_target = next_arg - current_arg_str;
+		    while ( 0 < len_target && 
+			    (current_arg_str[len_target-1]==' ' ||
+			     current_arg_str[len_target-1]=='\t') ) {
+			len_target--;
+		    }
 		    if ( prev_line_idx + 1 == j && 
 			 strlen(prev_arg_str) == len_target &&
-			 strncmp(prev_arg_str,current_arg,len_target)==0 ) {
+			 strncmp(prev_arg_str,current_arg_str,len_target)==0 ){
 			skip_ok = true;
 			prev_line_idx++;
 		    }
@@ -283,7 +297,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    /* [tab]sz_val = ... */
 		    if ( skip_ok == false ) {
 			if ( len_target < SZ_LINE_BUF ) {
-			    strncpy(prev_arg_str,current_arg,len_target);
+			    strncpy(prev_arg_str,current_arg_str,len_target);
 			    prev_arg_str[len_target] = '\0';
 			    prev_line_idx = j;
 			}
@@ -300,10 +314,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			for ( ; *ip2 != '\0' ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
-			ip2 = current_arg;
-			while ( *ip2 == ' ' || *ip2 == '\t' ) ip2++;
-			if ( strncmp(ip2,"sz_val",6) == 0 && 
-			     is_valchar(ip2[6]) == 0 ) break;
+			ip2 = current_arg_str;
 			for ( ; ip2 < next_arg ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
