@@ -35,7 +35,7 @@ int main( int argc, char *argv[] )
 	//printf("[INFO] target = %s\n",argv[i]);
 	status = add_sz_val(proc_name,target_arg,argv[i]);
 	if ( status != 0 ) {
-	    fprintf(stderr,"[ERROR] add_sz_val() failed\n");
+	    fprintf(stderr,"[ERROR] add_sz_val() failed: file = %s\n",argv[i]);
 	    goto quit;
 	}
     }
