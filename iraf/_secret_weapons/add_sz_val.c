@@ -64,7 +64,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
     int proc_decl[SZ_NUM_PROC];
     int proc_begin[SZ_NUM_PROC];
     int proc_end[SZ_NUM_PROC];
-    int insert_idx[SZ_NUM_PROC];	/* index to insert sz_val */
+    int insert_idx[SZ_NUM_PROC];	/* index to insert `size_t sz_val' */
     /* */
     int i;
 
@@ -152,17 +152,29 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	int fix_last_decl = 0;
 	const char *comm_ptr;
 
+	/* for long procedure declarations */
 	j0 = proc_decl[i];
-	do {
+	while ( j0 < proc_begin[i] ) {
 	    comm_ptr = strrchr(lines[j0],',');
 	    if ( comm_ptr != NULL ) {
 		comm_ptr++;
 		while ( *comm_ptr==' ' || *comm_ptr=='\t' || *comm_ptr=='\n' )
 		    comm_ptr++;
-		if ( *comm_ptr != '\0' ) comm_ptr = NULL;
+		if ( *comm_ptr != '\0' ) break;
 	    }
+	    else break;
 	    j0++;
-	} while ( comm_ptr != NULL );
+	}
+	j0++;
+
+	/* skip `$endif' or `$else' in foo.gx  */
+	while ( j0 < proc_begin[i] ) {
+	    const char *ip;
+	    ip = lines[j0];
+	    while ( *ip==' ' || *ip=='\t' || *ip=='\n' ) ip++;
+	    if ( *ip != '$' && *ip != '\0' ) break;
+	    j0++;
+	}
 
 	for ( j=j0 ; j < proc_begin[i] ; j++ ) {
 	    const char *ip;
@@ -363,6 +375,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	else needs_update = true;
     }
 
+    /* update the source file */
     if ( needs_update == true ) {
 	fp = fopen(file_name,"w");
 	if ( fp == NULL ) {
