@@ -34,7 +34,7 @@ end
 procedure xstdexh (exception, next_handler)
 
 int	exception			# code for exception
-int	next_handler			# EPA of next handler to be called
+pointer	next_handler			# EPA of next handler to be called
 
 char	os_errmsg[SZ_ERRMSG]
 int	os_errcode
