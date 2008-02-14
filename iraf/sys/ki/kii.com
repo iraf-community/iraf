@@ -8,7 +8,7 @@ int	p_packet[SZB_PACKET/SZB_CHAR/SZ_INT]	# packed packet
 
 int	p_opcode		# instruction opcode
 int	p_subcode		# subcode, if device driver
-int	p_arg[MAX_ARGS]		# procedure arguments
+long	p_arg[MAX_ARGS]		# procedure arguments
 int	p_sbuflen		# nchars in use in string buffer
 char	p_sbuf[SZ_SBUF]		# string buffer
 
