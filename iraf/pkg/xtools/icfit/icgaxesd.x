@@ -18,6 +18,7 @@ double	y[npts]				# Dependent variable
 double	z[npts]				# Output values
 int	npts				# Number of points
 
+size_t	sz_val
 int	i, axistype, gtlabel[2], gtunits[2]
 double 	a, b, xmin, xmax
 pointer	label, units
@@ -71,8 +72,9 @@ begin
 	    do i = 1, npts
 	        z[i] = (z[i] - y[i]) / y[i] * 300000.
 	default:	# User axes types.
-	    call malloc (label, SZ_LINE, TY_CHAR)
-	    call malloc (units, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (label, sz_val, TY_CHAR)
+	    call malloc (units, sz_val, TY_CHAR)
 	    if (axis == 1) {
 		call strcpy (Memc[IC_LABELS(ic,1)], Memc[label], SZ_LINE)
 		call strcpy (Memc[IC_UNITS(ic,1)], Memc[units], SZ_LINE)

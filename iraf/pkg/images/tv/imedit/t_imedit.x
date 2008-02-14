@@ -196,7 +196,8 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		    case 'q':	# Quit and save
 		    case 'u':	# Undo
 			if (EP_OUTDATA(ep) != NULL && EP_INDATA(ep) != NULL) {
-			    call malloc (temp, EP_NPTS(ep), TY_REAL)
+			    sz_val = EP_NPTS(ep)
+			    call malloc (temp, sz_val, TY_REAL)
 			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
 				EP_NPTS(ep))
 			    call amovr (Memr[EP_INDATA(ep)],

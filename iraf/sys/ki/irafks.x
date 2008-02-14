@@ -152,6 +152,7 @@ int	in		# input channel, a binary stream
 int	out		# output channel, a binary stream
 int	buflen		# iobuf size or 0
 
+size_t	sz_val
 pointer	iobuf, op, top
 long	fi[LEN_FINFO]
 char	curdir[SZ_PATHNAME]
@@ -185,7 +186,8 @@ begin
 	    len_iobuf = buflen / SZB_CHAR
 	else
 	    len_iobuf = DEF_LENIOBUF / SZB_CHAR
-	call malloc (iobuf, len_iobuf, TY_CHAR)
+	sz_val = len_iobuf
+	call malloc (iobuf, sz_val, TY_CHAR)
 
 	if (debug == YES) {
 	    call fprintf (spy, "kernel server, len_iobuf=%d\n")

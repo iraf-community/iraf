@@ -213,6 +213,7 @@ pointer	db			# database descriptor
 pointer	index			# database index
 bool	verbose			# print notes on structure of database
 
+size_t	sz_val
 bool	found_a_subpackage
 pointer	hp_stk[MAX_DEPTH]	# help directory pointer stack
 int	pk_stk[MAX_DEPTH]	# subpackage index stack
@@ -377,7 +378,8 @@ begin
 
 			# Load the database into memory.
 			call seek (fd, HDB_DATAOFFSET(db))
-			call malloc (data, HDB_DATALEN(db), TY_STRUCT)
+			sz_val = HDB_DATALEN(db)
+			call malloc (data, sz_val, TY_STRUCT)
 			call hdb_getdata (fd, data, HDB_DATALEN(db))
 
 			hp = hdb_make_rhd (db, data, index)
@@ -428,6 +430,7 @@ pointer	db			#I database descriptor
 pointer	data			#I data buffer (compiled help directories)
 pointer	index			#I database index
 
+size_t	sz_val
 int	i, j, len_modlist, pos
 pointer	hp, o_hp, mp, ix, sbuf, o_mp, c_modlist, hdfile
 
@@ -441,7 +444,8 @@ begin
 	# nextch to 1 because 0 is the null index.
 
 	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_SBUF, TY_CHAR)
+	sz_val = SZ_SBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	HD_SBUF(hp)   = sbuf
 	HD_DEFDIR(hp) = NULL
@@ -489,7 +493,8 @@ begin
 	# in the new modlist.
 
 	len_modlist = HD_NMODULES(hp) * LEN_MODSTRUCT
-	call malloc (c_modlist, len_modlist, TY_STRUCT)
+	sz_val = len_modlist
+	call malloc (c_modlist, sz_val, TY_STRUCT)
 	call amovi (Memi[HD_MODULE(hp,1)], Memi[c_modlist], len_modlist)
 
 	pos = 0

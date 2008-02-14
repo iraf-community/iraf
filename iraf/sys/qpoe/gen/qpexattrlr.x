@@ -65,11 +65,13 @@ begin
 	if (nchars > 0) {
 	    # Get range list storage.
 	    plen = DEF_XLEN
-	    call malloc (ps, plen, TY_REAL)
-	    call malloc (pe, plen, TY_REAL)
+	    sz_val = plen
+	    call malloc (ps, sz_val, TY_REAL)
+	    call malloc (pe, sz_val, TY_REAL)
 	    qlen = DEF_XLEN
-	    call malloc (qs, qlen, TY_REAL)
-	    call malloc (qe, qlen, TY_REAL)
+	    sz_val = qlen
+	    call malloc (qs, sz_val, TY_REAL)
+	    call malloc (qe, sz_val, TY_REAL)
 
 	    # Parse each subexpression and merge into output range list.
 	    for (ip=expr;  Memc[ip] != EOS;  ) {

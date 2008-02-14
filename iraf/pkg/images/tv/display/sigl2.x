@@ -215,6 +215,7 @@ pointer procedure sigl2s (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
+size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, buf_y[2], new_y[2], tempi, curbuf, altbuf
 int	npix, nblks_y, ybavg, x1, x2
@@ -257,13 +258,15 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		call malloc (SI_BUF(si,i), npix, TY_SHORT)
+		sz_val = npix
+		call malloc (SI_BUF(si,i), sz_val, TY_SHORT)
 		SI_TYBUF(si) = TY_SHORT
 		buf_y[i] = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    call malloc (OUTBUF(si), npix, TY_SHORT)
+	    sz_val = npix
+	    call malloc (OUTBUF(si), sz_val, TY_SHORT)
 	    SI_INIT(si) = NO
 	}
 
@@ -475,6 +478,7 @@ pointer procedure sigl2i (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
+size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, buf_y[2], new_y[2], tempi, curbuf, altbuf
 int	npix, nblks_y, ybavg, x1, x2
@@ -517,13 +521,15 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		call malloc (SI_BUF(si,i), npix, TY_INT)
+		sz_val = npix
+		call malloc (SI_BUF(si,i), sz_val, TY_INT)
 		SI_TYBUF(si) = TY_INT
 		buf_y[i] = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    call malloc (OUTBUF(si), npix, TY_INT)
+	    sz_val = npix
+	    call malloc (OUTBUF(si), sz_val, TY_INT)
 	    SI_INIT(si) = NO
 	}
 
@@ -735,6 +741,7 @@ pointer procedure sigl2r (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
+size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, buf_y[2], new_y[2], tempi, curbuf, altbuf
 int	npix, nblks_y, ybavg, x1, x2
@@ -777,13 +784,15 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		call malloc (SI_BUF(si,i), npix, TY_REAL)
+		sz_val = npix
+		call malloc (SI_BUF(si,i), sz_val, TY_REAL)
 		SI_TYBUF(si) = TY_REAL
 		buf_y[i] = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    call malloc (OUTBUF(si), npix, TY_REAL)
+	    sz_val = npix
+	    call malloc (OUTBUF(si), sz_val, TY_REAL)
 	    SI_INIT(si) = NO
 	}
 

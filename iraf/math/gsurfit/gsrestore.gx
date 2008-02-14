@@ -25,6 +25,7 @@ pointer	sf		# surface descriptor
 PIXEL	fit[ARB]	# array containing the surface parameters and
 			# coefficients
 
+size_t	sz_val
 int	surface_type, xorder, yorder, order
 PIXEL	xmin, xmax, ymin, ymax	
 
@@ -92,9 +93,11 @@ begin
 	GS_WZ(sf) = NULL
 
 	$if (datatype == r)
-	call malloc (GS_COEFF(sf), GS_NCOEFF(sf), TY_REAL)
+	sz_val = GS_NCOEFF(sf)
+	call malloc (GS_COEFF(sf), sz_val, TY_REAL)
 	$else
-	call malloc (GS_COEFF(sf), GS_NCOEFF(sf), TY_DOUBLE)
+	sz_val = GS_NCOEFF(sf)
+	call malloc (GS_COEFF(sf), sz_val, TY_DOUBLE)
 	$endif
 
 	# restore coefficient array

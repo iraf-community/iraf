@@ -41,7 +41,8 @@ begin
 
 		O_TYPE(o) = TY_CHAR
 		O_LEN(o) = strlen (Memc[buf]) + 1
-		call malloc (O_VALP(o), O_LEN(o), TY_CHAR)
+		sz_val = O_LEN(o)
+		call malloc (O_VALP(o), sz_val, TY_CHAR)
 		call strcpy (Memc[buf], O_VALC(o), i)
 		call sfree (sp)
 	    }
@@ -74,13 +75,15 @@ begin
 	    case TY_UBYTE, TY_USHORT, TY_SHORT:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_SHORT
-                call malloc (O_VALP(o), IO_NPIX(op), TY_SHORT)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_SHORT)
 		call amovs (Mems[IO_DATA(op)], Mems[O_VALP(o)], IO_NPIX(op))
 	    $for (ilrd)
 	    case TY_PIXEL:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_PIXEL
-                call malloc (O_VALP(o), IO_NPIX(op), TY_PIXEL)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_PIXEL)
 		call amov$t (Mem$t[IO_DATA(op)], Mem$t[O_VALP(o)], IO_NPIX(op))
 	    $endfor
 	    }
@@ -192,7 +195,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_REAL
-            call malloc (O_VALP(o), len+1, TY_REAL)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_REAL)
 	    gray = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -220,7 +224,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -242,7 +247,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -264,7 +270,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -291,13 +298,15 @@ setop_      switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_SHORT
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_SHORT)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_SHORT)
                 call amovs (Mems[O_VALP(ARGS[1])], Mems[O_VALP(o)], O_LEN(o))
             $for (ilrd)
             case TY_PIXEL:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_PIXEL
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_PIXEL)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_PIXEL)
                 call amov$t (Mem$t[O_VALP(args[1])], Mem$t[O_VALP(o)], O_LEN(o))
             $endfor
             }

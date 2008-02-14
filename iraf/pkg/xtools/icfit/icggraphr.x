@@ -21,12 +21,14 @@ real	y[npts]				# Dependent variable
 real	wts[npts]			# Weights
 int	npts				# Number of points
 
+size_t	sz_val
 pointer	xout, yout
 real	size
 
 begin
-	call malloc (xout, npts, TY_REAL)
-	call malloc (yout, npts, TY_REAL)
+	sz_val = npts
+	call malloc (xout, sz_val, TY_REAL)
+	call malloc (yout, sz_val, TY_REAL)
 	call icg_axesr (ic, gt, cv, 1, x, y, Memr[xout], npts)
 	call icg_axesr (ic, gt, cv, 2, x, y, Memr[yout], npts)
 	call icg_paramsr (ic, cv, x, y, wts, npts, gt)

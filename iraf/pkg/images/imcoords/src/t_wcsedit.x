@@ -137,14 +137,17 @@ begin
 	    call mw_gsystem (mwim, Memc[system], SZ_FNAME)
 
 	    # Allocate working memory.
-	    call malloc (r, ndim * ndim, TY_DOUBLE)
-	    call malloc (w, ndim * ndim, TY_DOUBLE)
-	    call malloc (cd, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltv, ndim, TY_DOUBLE)
-	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (nr, ndim * ndim, TY_DOUBLE)
-	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (r, sz_val, TY_DOUBLE)
+	    call malloc (w, sz_val, TY_DOUBLE)
+	    call malloc (cd, sz_val, TY_DOUBLE)
+	    call malloc (ltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (ltv, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (iltm, sz_val, TY_DOUBLE)
+	    call malloc (nr, sz_val, TY_DOUBLE)
+	    call malloc (ncd, sz_val, TY_DOUBLE)
 
 	    # Compute the original world to logical transformation.
 	    call mw_gwtermd (mwim, Memd[r], Memd[w], Memd[cd], ndim)

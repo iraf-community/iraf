@@ -12,6 +12,7 @@ procedure gt_labax (gp, gt)
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 
+size_t	sz_val
 int	nl, len
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 pointer	title, xlabel, ylabel
@@ -33,7 +34,8 @@ begin
 		vy2 = GT_VYMAX(gt)
 	    call gsview (gp, vx1, vx2, vy1, vy2)
 
-	    call malloc (title, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (title, sz_val, TY_CHAR)
 	    len = SZ_LINE
 	    Memc[title] = EOS
 	    if (GT_DRWTITLE(gt) == YES) {
@@ -78,7 +80,8 @@ begin
 		}
 	    }
 
-	    call malloc (xlabel, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (xlabel, sz_val, TY_CHAR)
 	    Memc[xlabel] = EOS
 	    if (GT_DRWXLABELS(gt) == YES) {
 		if (GT_XLABEL(gt) != NULL)
@@ -92,7 +95,8 @@ begin
 	    if (GT_XFORMAT(gt) != NULL)
 		call gsets (gp, G_XTICKFORMAT, Memc[GT_XFORMAT(gt)])
 
-	    call malloc (ylabel, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (ylabel, sz_val, TY_CHAR)
 	    Memc[ylabel] = EOS
 	    if (GT_DRWYLABELS(gt) == YES) {
 		if (GT_YLABEL(gt) != NULL)

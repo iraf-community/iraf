@@ -268,7 +268,8 @@ begin
 	    fitslen = fstatl (spool, F_FILESIZE)
 
 	    # Prepare cache area to store the FITS header.
-	    call malloc (hdr, fitslen, TY_CHAR)
+	    sz_val = fitslen
+	    call malloc (hdr, sz_val, TY_CHAR)
 	    user = stropen (Memc[hdr], fitslen, NEW_FILE)
 	    rf_hdr[slot] = hdr
 	    rf_fitslen[slot] = fitslen
@@ -469,7 +470,8 @@ rxtn_
 
 	if (po != NULL)
 	    call mfree(po, TY_CHAR)
-	call malloc(po, fitslen+1, TY_CHAR)
+	sz_val = fitslen+1
+	call malloc(po, sz_val, TY_CHAR)
 
 	i = po
 	call seek (spool, BOFL)
@@ -778,8 +780,10 @@ begin
 		    call mfree (FIT_TFORMP(fit), TY_CHAR)
 		    call mfree (FIT_TTYPEP(fit), TY_CHAR)
 	        }
-		call malloc (FIT_TFORMP(fit), ncols*LEN_FORMAT, TY_CHAR)
-		call malloc (FIT_TTYPEP(fit), ncols*LEN_OBJECT, TY_CHAR)
+		sz_val = ncols*LEN_FORMAT
+		call malloc (FIT_TFORMP(fit), sz_val, TY_CHAR)
+		sz_val = ncols*LEN_OBJECT
+		call malloc (FIT_TTYPEP(fit), sz_val, TY_CHAR)
 	    case KW_TFORM:
 		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
 		if (index == 1) {

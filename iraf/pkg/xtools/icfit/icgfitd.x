@@ -47,7 +47,8 @@ begin
 	x1 = NULL
 	y1 = NULL
 	w1 = NULL
-	call malloc (userwts, n, TY_DOUBLE)
+	sz_val = n
+	call malloc (userwts, sz_val, TY_DOUBLE)
 	call amovd (wts, Memd[userwts], n)
 
 	# Initialize
@@ -109,9 +110,10 @@ begin
 		}
 
 		if (x1 == NULL) {
-		    call malloc (x1, n+1, TY_DOUBLE)
-		    call malloc (y1, n+1, TY_DOUBLE)
-		    call malloc (w1, n+1, TY_DOUBLE)
+		    sz_val = n+1
+		    call malloc (x1, sz_val, TY_DOUBLE)
+		    call malloc (y1, sz_val, TY_DOUBLE)
+		    call malloc (w1, sz_val, TY_DOUBLE)
 		    call amovd (x, Memd[x1], n)
 		    call amovd (y, Memd[y1], n)
 		    call amovd (wts, Memd[w1], n)

@@ -41,7 +41,8 @@ begin
 
 		O_TYPE(o) = TY_CHAR
 		O_LEN(o) = strlen (Memc[buf]) + 1
-		call malloc (O_VALP(o), O_LEN(o), TY_CHAR)
+		sz_val = O_LEN(o)
+		call malloc (O_VALP(o), sz_val, TY_CHAR)
 		call strcpy (Memc[buf], O_VALC(o), i)
 		call sfree (sp)
 	    }
@@ -74,31 +75,36 @@ begin
 	    case TY_UBYTE, TY_USHORT, TY_SHORT:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_SHORT
-                call malloc (O_VALP(o), IO_NPIX(op), TY_SHORT)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_SHORT)
 		call amovs (Mems[IO_DATA(op)], Mems[O_VALP(o)], IO_NPIX(op))
 
 	    case TY_INT:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_INT
-                call malloc (O_VALP(o), IO_NPIX(op), TY_INT)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_INT)
 		call amovi (Memi[IO_DATA(op)], Memi[O_VALP(o)], IO_NPIX(op))
 
 	    case TY_LONG:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_LONG
-                call malloc (O_VALP(o), IO_NPIX(op), TY_LONG)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_LONG)
 		call amovl (Meml[IO_DATA(op)], Meml[O_VALP(o)], IO_NPIX(op))
 
 	    case TY_REAL:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_REAL
-                call malloc (O_VALP(o), IO_NPIX(op), TY_REAL)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_REAL)
 		call amovr (Memr[IO_DATA(op)], Memr[O_VALP(o)], IO_NPIX(op))
 
 	    case TY_DOUBLE:
                 O_LEN(o) = IO_NPIX(op)
                 O_TYPE(o) = TY_DOUBLE
-                call malloc (O_VALP(o), IO_NPIX(op), TY_DOUBLE)
+                sz_val = IO_NPIX(op)
+                call malloc (O_VALP(o), sz_val, TY_DOUBLE)
 		call amovd (Memd[IO_DATA(op)], Memd[O_VALP(o)], IO_NPIX(op))
 
 	    }
@@ -210,7 +216,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_REAL
-            call malloc (O_VALP(o), len+1, TY_REAL)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_REAL)
 	    gray = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -259,7 +266,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -285,7 +293,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -311,7 +320,8 @@ begin
 	    len = O_LEN(args[1]) - 1
             O_LEN(o) = len + 1
             O_TYPE(o) = TY_SHORT
-            call malloc (O_VALP(o), len+1, TY_SHORT)
+            sz_val = len+1
+            call malloc (O_VALP(o), sz_val, TY_SHORT)
 	    color = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -342,31 +352,36 @@ setop_      switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_SHORT
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_SHORT)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_SHORT)
                 call amovs (Mems[O_VALP(ARGS[1])], Mems[O_VALP(o)], O_LEN(o))
 
             case TY_INT:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_INT
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_INT)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_INT)
                 call amovi (Memi[O_VALP(args[1])], Memi[O_VALP(o)], O_LEN(o))
 
             case TY_LONG:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_LONG
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_LONG)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_LONG)
                 call amovl (Meml[O_VALP(args[1])], Meml[O_VALP(o)], O_LEN(o))
 
             case TY_REAL:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_REAL
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_REAL)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_REAL)
                 call amovr (Memr[O_VALP(args[1])], Memr[O_VALP(o)], O_LEN(o))
 
             case TY_DOUBLE:
                 O_LEN(o) = O_LEN(args[1])
                 O_TYPE(o) = TY_DOUBLE
-                call malloc (O_VALP(o), O_LEN(args[1]), TY_DOUBLE)
+                sz_val = O_LEN(args[1])
+                call malloc (O_VALP(o), sz_val, TY_DOUBLE)
                 call amovd (Memd[O_VALP(args[1])], Memd[O_VALP(o)], O_LEN(o))
 
             }

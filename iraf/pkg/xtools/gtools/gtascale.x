@@ -14,6 +14,7 @@ pointer	gt			# GTOOLS pointer
 real	x[npts], y[npts]	# Data to scale
 int	npts			# Number of data points
 
+size_t	sz_val
 int	i, j, k, n
 real	xmin, xmax, ymin, ymax, x1, x2, y1, y2, temp
 pointer	buf
@@ -68,7 +69,8 @@ begin
 	    n = n + 1
 	}
 	if ((GT_LCLIP(gt) > 0. || GT_HCLIP(gt) > 0.) && n > 0) {
-	    call malloc (buf, n, TY_REAL)
+	    sz_val = n
+	    call malloc (buf, sz_val, TY_REAL)
 	    n = 0
 	    do i = 1, npts {
 		if ((x[i]<xmin)||(x[i]>xmax)||(y[i]<ymin)||(y[i]>ymax))

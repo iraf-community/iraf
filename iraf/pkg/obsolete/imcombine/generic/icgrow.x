@@ -18,6 +18,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
+size_t	sz_val
 int	i, j, k, l, line, nl, rop, igrow, nset, or()
 real	grow2, i2
 pointer	mp, pm, pm_newmask()
@@ -59,7 +60,8 @@ begin
 		return
 
 	    if (pms == NULL) {
-		call malloc (pms, nimages, TY_POINTER)
+		sz_val = nimages
+		call malloc (pms, sz_val, TY_POINTER)
 		do i = 1, nimages
 		    Memp[pms+i-1] = pm_newmask (out, 1)
 	    }

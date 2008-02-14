@@ -62,7 +62,8 @@ begin
 	call salloc (modstr, sz_val, TY_CHAR)
 
 	call calloc (tl, LEN_TLSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_TLSBUF, TY_CHAR)
+	sz_val = SZ_TLSBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	TL_CTRL(tl)    = ctrl
 	TL_SBUF(tl)    = sbuf

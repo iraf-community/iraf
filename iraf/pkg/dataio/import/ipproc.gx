@@ -167,6 +167,7 @@ int	fd					#i inpout file descriptor
 pointer	im					#i output image pointer
 pointer	cmap					#i colormap pointer
 
+size_t	sz_val
 pointer	op, data
 int	i, swap, optype, nlines
 int	percent, npix, totpix
@@ -191,11 +192,15 @@ begin
 	    op = PTYPE(ip,i)
 	    optype = ip_ptype (IO_TYPE(op),IO_NBYTES(op))
 	    IO_NPIX(op) = npix
-	    if (IO_DATA(op) == NULL)
-	        if (optype == TY_UBYTE)
-		    call malloc (IO_DATA(op), npix, TY_SHORT)
-		else
-		    call malloc (IO_DATA(op), npix, optype)
+	    if (IO_DATA(op) == NULL) {
+	        if (optype == TY_UBYTE) {
+		    sz_val = npix
+		    call malloc (IO_DATA(op), sz_val, TY_SHORT)
+		} else {
+		    sz_val = npix
+		    call malloc (IO_DATA(op), sz_val, optype)
+		}
+	    }
 	}
 
         # Loop over the image lines.

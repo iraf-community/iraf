@@ -158,7 +158,8 @@ begin
 	    j = mod (iindex, window)
 	    hdr = Memi[hdrs+j]
 	    call mfree (hdr, TY_STRUCT)
-	    call malloc (hdr, LEN_IMDES+IM_HDRLEN(in)+1, TY_STRUCT)
+	    sz_val = LEN_IMDES+IM_HDRLEN(in)+1
+	    call malloc (hdr, sz_val, TY_STRUCT)
 	    call amovi (Memi[in], Memi[hdr], LEN_IMDES)
 	    call amovi (IM_MAGIC(in), IM_MAGIC(hdr), IM_HDRLEN(in)+1)
 	    call strcpy (Memc[inname], IM_NAME(hdr), SZ_IMNAME)

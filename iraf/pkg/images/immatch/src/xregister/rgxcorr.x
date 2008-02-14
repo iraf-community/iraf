@@ -492,7 +492,8 @@ begin
 
 	# Allocate space for the cross-correlation function.
 	if (rg_xstatp (xc, XCOR) == NULL) {
-	    call malloc (xcor, xwindow * ywindow, TY_REAL)
+	    sz_val = xwindow * ywindow
+	    call malloc (xcor, sz_val, TY_REAL)
 	    call rg_xsetp (xc, XCOR, xcor)
 	} else {
 	    xcor = rg_xstatp (xc, XCOR)
@@ -798,7 +799,8 @@ begin
 
 	# Allocate space for the correlation function.
 	if (rg_xstatp (xc, XCOR) == NULL) {
-	    call malloc (xcor, xwindow * ywindow, TY_REAL)
+	    sz_val = xwindow * ywindow
+	    call malloc (xcor, sz_val, TY_REAL)
 	    call rg_xsetp (xc, XCOR, xcor)
 	} else {
 	    xcor = rg_xstatp (xc, XCOR)
@@ -832,6 +834,7 @@ pointer	im		#I pointer to the iraf image
 int	c1, c2		#I column limits in the input image
 int	l1, l2		#I line limits in the input image
 
+size_t	sz_val
 int	i, ncols, nlines, npts
 pointer	ptr, index, buf
 pointer	imgs1r(), imgs2r()
@@ -840,7 +843,8 @@ begin
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
 	npts = ncols * nlines
-	call malloc (ptr, npts, TY_REAL)
+	sz_val = npts
+	call malloc (ptr, sz_val, TY_REAL)
 
 	index = ptr
 	do i = l1, l2 {

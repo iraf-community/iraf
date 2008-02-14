@@ -38,7 +38,8 @@ errchk	immap()
 
 begin
 	# Get the expression parameter.
-	call malloc (expr, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call malloc (expr, sz_val, TY_CHAR)
 	call clgstr ("expr", Memc[expr], SZ_COMMAND)
 
 	# Get the output mask list.

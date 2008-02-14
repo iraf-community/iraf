@@ -48,7 +48,8 @@ begin
 
 	# Allocate or resize the output buffer.
 	if (bp == NULL) {
-	    call malloc (bp, n_buflen, TY_SHORT)
+	    sz_val = n_buflen
+	    call malloc (bp, sz_val, TY_SHORT)
 	    buflen = n_buflen
 	} else if (n_buflen > buflen) {
 	    call realloc (bp, n_buflen, TY_SHORT)

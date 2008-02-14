@@ -14,6 +14,7 @@ pointer	x			# Vector ordinates
 pointer	y			# Vector abscissa
 int	npts			# Number of points in vector
 
+size_t	sz_val
 int	i, line, ncols, nlines
 
 real	asumr()
@@ -31,7 +32,8 @@ begin
 	switch (axis) {
 	case 1:
 	    npts = ncols
-	    call malloc (x, ncols, TY_REAL)
+	    sz_val = ncols
+	    call malloc (x, sz_val, TY_REAL)
 	    call calloc (y, ncols, TY_REAL)
 
 	    do i = 1, ncols
@@ -44,8 +46,9 @@ begin
 	    }
 	case 2:
 	    npts = nlines
-	    call malloc (x, nlines, TY_REAL)
-	    call malloc (y, nlines, TY_REAL)
+	    sz_val = nlines
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (y, sz_val, TY_REAL)
 
 	    do i = 1, nlines {
 		line = line1 + i - 1
@@ -70,6 +73,7 @@ pointer	x			# Vector ordinates
 pointer	y			# Vector abscissa
 int	npts			# Number of points in vector
 
+size_t	sz_val
 int	i, j, k, n, line, ncols, nlines, maxncols
 pointer	buf1, buf2
 
@@ -88,9 +92,11 @@ begin
 	switch (axis) {
 	case 1:
 	    npts = ncols
-	    call malloc (x, ncols, TY_REAL)
+	    sz_val = ncols
+	    call malloc (x, sz_val, TY_REAL)
 	    call calloc (y, ncols, TY_REAL)
-	    call malloc (buf1, nlines, TY_REAL)
+	    sz_val = nlines
+	    call malloc (buf1, sz_val, TY_REAL)
 
 	    maxncols = MAXPIX / nlines
 	    j = 0
@@ -111,8 +117,9 @@ begin
 	        Memr[x+i-1] = col1 + i - 1
 	case 2:
 	    npts = nlines
-	    call malloc (x, nlines, TY_REAL)
-	    call malloc (y, nlines, TY_REAL)
+	    sz_val = nlines
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (y, sz_val, TY_REAL)
 
 	    do i = 1, nlines {
 		line = line1 + i - 1

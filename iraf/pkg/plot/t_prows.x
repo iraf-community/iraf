@@ -44,8 +44,9 @@ begin
 	}
 
 	# Get the requested rows from the image.
-	call malloc (x_vec, ncols, TY_REAL)
-	call malloc (y_vec, ncols, TY_REAL)
+	sz_val = ncols
+	call malloc (x_vec, sz_val, TY_REAL)
+	call malloc (y_vec, sz_val, TY_REAL)
 	call plt_grows (im, mw, ct, min(row1,row2), max(row1,row2),
 	    Memr[x_vec], Memr[y_vec], zmin, zmax, Memc[wcslab], Memc[fmt],
 	    SZ_LINE)

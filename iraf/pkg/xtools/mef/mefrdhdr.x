@@ -388,7 +388,8 @@ begin
 	call seek (spool, BOFL)
 	fitslen = fstatl (spool, F_FILESIZE)
 	fitslen = max (fitslen, MEF_HSIZE(mef))
-	call malloc (hdr, fitslen, TY_CHAR)
+	sz_val = fitslen
+	call malloc (hdr, sz_val, TY_CHAR)
 	user = stropen (Memc[hdr], fitslen, NEW_FILE)
 
 	# Append the saved FITS cards to saved cache.

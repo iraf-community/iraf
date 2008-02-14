@@ -89,7 +89,8 @@ begin
 	rotate = clgetb ("rotate")
 
 	# Calculate initial viewport corner points and store in array vp.
-	call malloc (vp, nplots_page * 4, TY_REAL)
+	sz_val = nplots_page * 4
+	call malloc (vp, sz_val, TY_REAL)
 	call gm_getvp (vp, nx, ny, fill)
 
 	# Initialize flag for clearing screen and plot and file counters.
@@ -533,6 +534,7 @@ int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
 int	nchars_total		# number of chars read from input stream
 
+size_t	sz_val
 int	len_ibuf, nchars, nchars_read
 pointer	ibuf
 int	read()
@@ -544,7 +546,8 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
+	    sz_val = LEN_DEFIBUF
+	    call malloc (ibuf, sz_val, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 

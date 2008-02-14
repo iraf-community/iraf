@@ -53,9 +53,10 @@ begin
  	list = clgetb ("list")
 
 	# Allocate memory for vectors. 
-	call malloc (radius, rboxsize * rboxsize, TY_REAL)
-	call malloc (azimuth, rboxsize * rboxsize, TY_REAL)
-	call malloc (intensity, rboxsize * rboxsize, TY_REAL)
+	sz_val = rboxsize * rboxsize
+	call malloc (radius, sz_val, TY_REAL)
+	call malloc (azimuth, sz_val, TY_REAL)
+	call malloc (intensity, sz_val, TY_REAL)
 
 	# Loop over all images
 	while (imtgetim (images, Memc[imname], SZ_FNAME) != EOF) {

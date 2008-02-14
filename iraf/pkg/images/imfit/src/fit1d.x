@@ -317,6 +317,7 @@ int	maxbuf			# Maximum buffer size for column axis
 pointer	indata			# Input data pointer
 pointer	outdata			# Output data pointer
 
+size_t	sz_val
 int	i, index, last_index, col1, col2, nc, ncols, nlines, ncols_block
 pointer	inbuf, outbuf, ptr
 pointer	imgl1r(), impl1r(), imgl2r(), impl2r(), imgs2r(), imps2r()
@@ -344,8 +345,9 @@ begin
 	        ncols_block = max (1, min (ncols, maxbuf / nlines))
 		col2 = 0
 
-	        call malloc (indata, nlines, TY_REAL)
-	        call malloc (outdata, nlines, TY_REAL)
+	        sz_val = nlines
+	        call malloc (indata, sz_val, TY_REAL)
+	        call malloc (outdata, sz_val, TY_REAL)
 	    }
 	}
 
@@ -419,6 +421,7 @@ int	axis			# Image axis
 char	title[ARB]		# Title
 pointer	data			# Image data
 
+size_t	sz_val
 pointer	x
 char	line[SZ_LINE]
 int	i, j, stat, imlen
@@ -436,7 +439,8 @@ begin
 	    	    call pargstr (IM_TITLE(im))
 		call gt_sets (gt, GTTITLE, title)
 		call mfree (data, TY_REAL)
-		call malloc (data, IM_LEN(im, 1), TY_REAL)
+		sz_val = IM_LEN(im, 1)
+		call malloc (data, sz_val, TY_REAL)
 		call amovr (Memr[imgl1r(im)], Memr[data], IM_LEN(im, 1))
 		stat = OK
 	    } else

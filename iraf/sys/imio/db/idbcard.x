@@ -40,12 +40,14 @@ pointer procedure idb_open (im, ualen)
 pointer	im			#I image descriptor
 int	ualen			#O size of storage area
 
+size_t	sz_val
 int	n
 pointer	idb, ip
 errchk	malloc
 
 begin
-	call malloc (idb, LEN_IDB, TY_STRUCT)
+	sz_val = LEN_IDB
+	call malloc (idb, sz_val, TY_STRUCT)
 
 	IDB_IM(idb) = im
 	IDB_UA(idb) = IM_USERAREA(im)

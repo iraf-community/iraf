@@ -14,13 +14,15 @@ procedure cvrestore (cv, fit)
 pointer	cv		# curve descriptor
 real	fit[ARB]	# array containing fit parameters
 
+size_t	sz_val
 int	curve_type, order
 
 errchk malloc
 
 begin
 	# allocate space for curve descriptor
-	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
+	sz_val = LEN_CVSTRUCT
+	call malloc (cv, sz_val, TY_STRUCT)
 
 	order = nint (CV_SAVEORDER(fit))
 	if (order < 1)

@@ -107,6 +107,7 @@ pointer xs			#U pointer to array of start-range values
 pointer xe			#U pointer to array of	 end-range values
 int	xlen			#U allocated length of XS, XE arrays
 
+size_t	sz_val
 bool	range
 pointer xv, uv, sv
 double	xstart, xend, xmin, temp, x, n_xs, n_xe
@@ -121,9 +122,10 @@ int	qp_ctod()
 
 begin
 	vlen = DEF_VLEN
-	call malloc (xv, vlen, TY_DOUBLE)
-	call malloc (uv, vlen, TY_INT)
-	call malloc (sv, vlen, TY_INT)
+	sz_val = vlen
+	call malloc (xv, sz_val, TY_DOUBLE)
+	call malloc (uv, sz_val, TY_INT)
+	call malloc (sv, sz_val, TY_INT)
 
 	lev = 0
 	nrg = 0
@@ -300,8 +302,9 @@ pop_
 	# Initialize the output arrays if they were passed in as null.
 	if (xlen <= 0) {
 	    xlen = DEF_XLEN
-	    call malloc (xs, xlen, TY_DOUBLE)
-	    call malloc (xe, xlen, TY_DOUBLE)
+	    sz_val = xlen
+	    call malloc (xs, sz_val, TY_DOUBLE)
+	    call malloc (xe, sz_val, TY_DOUBLE)
 	}
 
 	# Collapse sequences of redundant breakpoints into a single

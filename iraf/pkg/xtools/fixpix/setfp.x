@@ -16,6 +16,7 @@ procedure set_fp (im, fp)
 pointer	im			#I Input mask image pointer
 pointer	fp			#O FIXPIX interpolation pointer
 
+size_t	sz_val
 int	i, j, nc, nl
 long	v[2]
 pointer	data1, data2, pm, pmi
@@ -28,8 +29,9 @@ begin
 	# Set the image size and data buffers.
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
-	call malloc (data1, nc, TY_SHORT)
-	call malloc (data2, nc, TY_SHORT)
+	sz_val = nc
+	call malloc (data1, sz_val, TY_SHORT)
+	call malloc (data2, sz_val, TY_SHORT)
 
 	# Get the pixel mask from the image.
 	pm = imstati (im, IM_PMDES)

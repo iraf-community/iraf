@@ -19,6 +19,7 @@ int	newwts				# New weights?
 int	newfunction			# New function?
 int	refit				# Use cvrefit?
 
+size_t	sz_val
 int	ord
 PIXEL	xmin, xmax
 
@@ -34,13 +35,16 @@ begin
 
 	    call mfree (IC_XFIT(ic), TY_PIXEL)
 	    call mfree (IC_YFIT(ic), TY_PIXEL)
-	    call malloc (IC_XFIT(ic), npts, TY_PIXEL)
+	    sz_val = npts
+	    call malloc (IC_XFIT(ic), sz_val, TY_PIXEL)
 
 	    call mfree (IC_WTSFIT(ic), TY_PIXEL)
-	    call malloc (IC_WTSFIT(ic), npts, TY_PIXEL)
+	    sz_val = npts
+	    call malloc (IC_WTSFIT(ic), sz_val, TY_PIXEL)
 
 	    call mfree (IC_REJPTS(ic), TY_INT)
-	    call malloc (IC_REJPTS(ic), npts, TY_INT)
+	    sz_val = npts
+	    call malloc (IC_REJPTS(ic), sz_val, TY_INT)
 	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
 	    IC_NREJECT(ic) = 0
 
@@ -64,7 +68,8 @@ begin
 		IC_WTSFIT(ic) = NULL
 		call alim$t (x, npts, xmin, xmax)
 	    } else {
-	        call malloc (IC_YFIT(ic), IC_NFIT(ic), TY_PIXEL)
+	        sz_val = IC_NFIT(ic)
+	        call malloc (IC_YFIT(ic), sz_val, TY_PIXEL)
 		if (IC_NFIT(ic) == 1)
 		    call alim$t (x, npts, xmin, xmax)
 		else

@@ -28,7 +28,8 @@ begin
 
 	# Make a guess at the size of buffer needed to hold the header.
 	buflen = DEF_DFHDRLEN
-	call malloc (buf, buflen, TY_STRUCT)
+	sz_val = buflen
+	call malloc (buf, sz_val, TY_STRUCT)
 
 	# Read the full datafile header area into BUF.
 	repeat {
@@ -95,7 +96,8 @@ begin
 	FM_PTINPTI(fm)		= DH_PTINPTI(dh)
 
 	ip = buf + FM_PTIOFF(fm) - 1
-	call malloc (pti, FM_PTILEN(fm), TY_INT)
+	sz_val = FM_PTILEN(fm)
+	call malloc (pti, sz_val, TY_INT)
 	call miiupk32 (Memi[ip], Memi[pti], FM_PTILEN(fm), TY_INT)
 	FM_PTINDEX(fm)		= pti
 
@@ -104,7 +106,8 @@ begin
 	FM_PTNPTE(fm)		= DH_PTNPTE(dh)
 	FM_PTLUPTE(fm)		= DH_PTNPTE(dh)
 
-	call malloc (pt, FM_PTLEN(fm), TY_SHORT)
+	sz_val = FM_PTLEN(fm)
+	call malloc (pt, sz_val, TY_SHORT)
 	FM_PTABLE(fm)		= pt
 
 	maxpages = FM_MAXBUFSIZE(fm) / FM_SZBPAGE(fm)

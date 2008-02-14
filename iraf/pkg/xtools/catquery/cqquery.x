@@ -61,7 +61,8 @@ begin
 	    call sfree (sp)
 
 	    # Get the data.
-	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+	    sz_val = DEF_SZ_INBUF
+	    call malloc (inbuf, sz_val, TY_CHAR)
 	    call fseti (fd, F_CANCEL, OK)
 
 	    switch (CQ_HFMT(cc)) {
@@ -113,7 +114,8 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (line, sz_val, TY_CHAR)
 	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
@@ -233,7 +235,8 @@ begin
 	    call sfree (sp)
 
 	    # Get the data.
-	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+	    sz_val = DEF_SZ_INBUF
+	    call malloc (inbuf, sz_val, TY_CHAR)
 	    repeat {
 	        nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
 	        if (nchars > 0) {
@@ -268,7 +271,8 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (line, sz_val, TY_CHAR)
 	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
@@ -386,13 +390,16 @@ begin
 	# Copy the query parameters to the results descriptor.
 	CQ_RNQPARS(res) = CQ_NQPARS(cc)
 	fsize = strlen (Memc[CQ_PQPNAMES(cc)])
-	call malloc (CQ_RQPNAMES(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_RQPNAMES(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPNAMES(cc)], Memc[CQ_RQPNAMES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPVALUES(cc)])
-	call malloc (CQ_RQPVALUES(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_RQPVALUES(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPVALUES(cc)], Memc[CQ_RQPVALUES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPUNITS(cc)])
-	call malloc (CQ_RQPUNITS(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_RQPUNITS(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPUNITS(cc)], Memc[CQ_RQPUNITS(res)], fsize)
 
 	# Get the input data type.
@@ -646,9 +653,10 @@ begin
 	call strcpy ("", CQ_RADDRESS(res), SZ_LINE)
 	call strcpy ("", CQ_RQUERY(res), SZ_LINE)
 	CQ_RNQPARS(res) = 0
-	call malloc (CQ_RQPNAMES(res), 1, TY_CHAR)
-	call malloc (CQ_RQPVALUES(res), 1, TY_CHAR)
-	call malloc (CQ_RQPUNITS(res), 1, TY_CHAR)
+	sz_val = 1
+	call malloc (CQ_RQPNAMES(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPVALUES(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPUNITS(res), sz_val, TY_CHAR)
 	Memc[CQ_RQPNAMES(res)] = EOS
 	Memc[CQ_RQPVALUES(res)] = EOS
 	Memc[CQ_RQPUNITS(res)] = EOS

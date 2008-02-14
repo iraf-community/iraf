@@ -27,8 +27,9 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	call malloc (x, bufsize, TY_DOUBLE)
-	call malloc (y, bufsize, TY_DOUBLE)
+	sz_val = bufsize
+	call malloc (x, sz_val, TY_DOUBLE)
+	call malloc (y, sz_val, TY_DOUBLE)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0

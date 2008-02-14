@@ -964,6 +964,7 @@ char	formats[ARB]		#I the input formats list
 char	lngformat[ARB]		#I the input output ra / longitude format
 char	latformat[ARB]		#I the input output dec / latitude format
 
+size_t	sz_val
 int	i, ip, nexpr
 pointer	ec, cptr, fptr
 int	cc_enames()
@@ -972,7 +973,8 @@ begin
 	call calloc (ec, EC_ELENGTH, TY_STRUCT)
 
 	# Define the column names.
-	call malloc (EC_ELIST(ec), MAX_NEXPR * (SZ_EXPR + 1), TY_CHAR)
+	sz_val = MAX_NEXPR * (SZ_EXPR + 1)
+	call malloc (EC_ELIST(ec), sz_val, TY_CHAR)
 	Memc[EC_ELIST(ec)] = EOS
 
 	# Create list of expressions.

@@ -187,11 +187,13 @@ end
 
 procedure ist_allocate (ist)
 
+size_t	sz_val
 pointer	ist		#O the statistics descriptor
 
 begin
     	call calloc (ist, LEN_IMSTAT, TY_STRUCT)
-	call malloc (IST_SW(ist), LEN_NSWITCHES, TY_INT)
+	sz_val = LEN_NSWITCHES
+	call malloc (IST_SW(ist), sz_val, TY_INT)
 end
 
 
@@ -851,6 +853,7 @@ pointer hgm             #O pointer to the histogram
 int     nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
+size_t	sz_val
 real    hmax            #O maximum histogram value
 
 begin
@@ -869,7 +872,8 @@ begin
         hmin = IST_MIN(ist)
         hmax = IST_MAX(ist)
 
-        call malloc (hgm, nbins, TY_INT)
+        sz_val = nbins
+        call malloc (hgm, sz_val, TY_INT)
 
         return (YES)
 end

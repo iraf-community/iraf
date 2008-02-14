@@ -147,6 +147,7 @@ int	geometry		#I the type of geometry to be computed
 pointer	sx1, sy1		#O pointers to the linear x and y surfaces
 pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 
+size_t	sz_val
 int	i, rec, ncoeff, junk
 PIXEL	xmag, ymag, xrot, yrot, xref, yref, xout, yout, xshift, yshift
 pointer	newsx1, newsy1, xcoeff, ycoeff
@@ -164,8 +165,9 @@ begin
 
 	# Get linear part of fit.
 	ncoeff = dtgeti (dt, rec, "surface1")
-	call malloc (xcoeff, ncoeff, TY_PIXEL)
-	call malloc (ycoeff, ncoeff, TY_PIXEL)
+	sz_val = ncoeff
+	call malloc (xcoeff, sz_val, TY_PIXEL)
+	call malloc (ycoeff, sz_val, TY_PIXEL)
 	do i = 1, ncoeff {
 	    junk = dtscan (dt)
 	    call garg$t (Mem$t[xcoeff+i-1])

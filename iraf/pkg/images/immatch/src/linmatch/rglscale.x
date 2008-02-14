@@ -433,6 +433,7 @@ procedure rg_lgmmm (ls, i)
 pointer	ls		#I pointer to the intensity scaling structure
 int	i		#I the current region
 
+size_t	sz_val
 int	npts
 pointer	rbuf, ibuf, buf
 real	sigma, dmin, dmax
@@ -457,7 +458,8 @@ begin
 	    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 	    return
 	}
-	call malloc (buf, npts, TY_REAL)
+	sz_val = npts
+	call malloc (buf, sz_val, TY_REAL)
 
 	# Compute the mean, median, and mode of the reference region but
 	# don't recompute the reference region statistics needlessly.
@@ -967,6 +969,7 @@ int     l1, l2          #I the line limits
 int     lstep           #I the line step size
 pointer ptr             #I the pointer to the output buffer
 
+size_t	sz_val
 int	i, j, ncols, nlines, npts
 pointer	iptr, buf
 pointer imgs2r()
@@ -975,7 +978,8 @@ begin
 	ncols = (c2 - c1) / cstep + 1
 	nlines = (l2 - l1) / lstep + 1
 	npts = ncols * nlines
-        call malloc (ptr, npts, TY_REAL)
+        sz_val = npts
+        call malloc (ptr, sz_val, TY_REAL)
 
         iptr = ptr
         do j = l1, l2, lstep {
@@ -1068,6 +1072,7 @@ real	bserr			#O the estimated error in bscale
 real	bzerr			#O the estimated error in bzero
 real	chi			#O the output chi at unit weight
 
+size_t	sz_val
 int	j, npts
 pointer	rbuf, ibuf, rerr, ierr, weight
 real	rgain, igain, rrnoise, irnoise, answers[MAX_NFITPARS]
@@ -1083,9 +1088,10 @@ begin
 
 	# Allocate space for the error and weight arrays.
 	npts = Memi[rg_lstatp(ls,RNPTS)+i-1]
-	call malloc (rerr, npts, TY_REAL)
-	call malloc (ierr, npts, TY_REAL)
-	call malloc (weight, npts, TY_REAL)
+	sz_val = npts
+	call malloc (rerr, sz_val, TY_REAL)
+	call malloc (ierr, sz_val, TY_REAL)
+	call malloc (weight, sz_val, TY_REAL)
 
 	# Compute the errors. 
 	rgain = rg_lstatr (ls, RGAIN)

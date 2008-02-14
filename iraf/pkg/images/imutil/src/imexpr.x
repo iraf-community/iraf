@@ -139,7 +139,8 @@ begin
 	# or macro references.
 
 	len_exprbuf = SZ_COMMAND
-	call malloc (expr, len_exprbuf, TY_CHAR)
+	sz_val = len_exprbuf
+	call malloc (expr, sz_val, TY_CHAR)
 	call clgstr ("expr", Memc[expr], len_exprbuf)
 
 	if (Memc[expr] == '@') {
@@ -393,7 +394,8 @@ image_
 	    case TY_CHAR:
 		O_TYPE(o) = TY_CHAR
 		O_LEN(o)  = SZ_LINE
-		call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call malloc (O_VALP(o), sz_val, TY_CHAR)
 		call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
 
 	    case TY_INT:
@@ -868,7 +870,8 @@ begin
 		O_LEN(o) = SZ_LINE
 		O_FLAGS(o) = O_FREEVAL
 		iferr {
-		    call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call malloc (O_VALP(o), sz_val, TY_CHAR)
 		    call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
 		} then
 		    goto err_
@@ -904,7 +907,8 @@ begin
 		    # Line length not known yet.
 		    O_LEN(o) = DEF_LINELEN
 		}
-		call malloc (data, O_LEN(o), TY_INT)
+		sz_val = O_LEN(o)
+		call malloc (data, sz_val, TY_INT)
 		do i = 1, O_LEN(o)
 		    Memi[data+i-1] = i
 		O_VALP(o) = data
@@ -922,7 +926,8 @@ begin
 		else 
 		    # Line length not known yet.
 		    O_LEN(o) = DEF_LINELEN
-		call malloc (data, O_LEN(o), TY_INT)
+		sz_val = O_LEN(o)
+		call malloc (data, sz_val, TY_INT)
 		if (axis < 1 || axis > IM_MAXDIM)
 		    call amovki (1, Memi[data], O_LEN(o))
 		else
@@ -1183,6 +1188,7 @@ pointer procedure ie_expandtext (st, expr)
 pointer	st			#I symbol table (macros)
 char	expr[ARB]		#I input expression
 
+size_t	sz_val
 pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
@@ -1192,7 +1198,8 @@ extern	ie_gsym()
 
 begin
 	buflen = SZ_COMMAND
-	call malloc (buf, buflen, TY_CHAR)
+	sz_val = buflen
+	call malloc (buf, sz_val, TY_CHAR)
 
 	gt = gt_opentext (expr, locpr(ie_gsym), st, 0, GT_NOFILE)
 	nchars = gt_expand (gt, buf, buflen)

@@ -154,6 +154,7 @@ int	nfit			# Number of parameters to fit
 real	mr			# MR parameter
 real	chisq			# Chi square of fit
 
+size_t	sz_val
 int	i
 real	chisq1
 pointer	new, a1, a2, delta1, delta2
@@ -169,11 +170,14 @@ begin
 	    call mfree (delta1, TY_REAL)
 	    call mfree (delta2, TY_REAL)
 
-	    call malloc (new, np, TY_REAL)
-	    call malloc (a1, nfit*nfit, TY_REAL)
-	    call malloc (a2, nfit*nfit, TY_REAL)
-	    call malloc (delta1, nfit, TY_REAL)
-	    call malloc (delta2, nfit, TY_REAL)
+	    sz_val = np
+	    call malloc (new, sz_val, TY_REAL)
+	    sz_val = nfit*nfit
+	    call malloc (a1, sz_val, TY_REAL)
+	    call malloc (a2, sz_val, TY_REAL)
+	    sz_val = nfit
+	    call malloc (delta1, sz_val, TY_REAL)
+	    call malloc (delta2, sz_val, TY_REAL)
 
 	    call amovr (params, Memr[new], np)
 	    call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a2],
@@ -530,13 +534,15 @@ int	np
 int	indx[n]
 real	d
 
+size_t	sz_val
 int	i, j, k, imax
 real	aamax, sum, dum
 pointer	vv
 
 begin
 	# Allocate memory.
-	call malloc (vv, n, TY_REAL)
+	sz_val = n
+	call malloc (vv, sz_val, TY_REAL)
 	
 	# Loop over rows to get the implict scaling information.
 	d = 1.
@@ -663,6 +669,7 @@ real	a[np,np]
 int	n
 int	np
 
+size_t	sz_val
 int	i, j
 real	d
 pointer	y, indx
@@ -670,7 +677,8 @@ pointer	y, indx
 begin
 	# Allocate working memory.
 	call calloc (y, n*n, TY_REAL)
-	call malloc (indx, n, TY_INT)
+	sz_val = n
+	call malloc (indx, sz_val, TY_INT)
 
 	# Setup identify matrix.
 	do i = 0, n-1

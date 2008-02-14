@@ -51,7 +51,8 @@ begin
 	# Open files.  Quit on an error.
 	out = open (Memc[fname], APPEND, TEXT_FILE)
 	nfiles = clplen (list)
-	call malloc (fds, nfiles, TY_INT)
+	sz_val = nfiles
+	call malloc (fds, sz_val, TY_INT)
 	do i = 1, nfiles {
 	    j = clgfil (list, Memc[fname], SZ_FNAME)
 	    Memi[fds+i-1] = open (Memc[fname], READ_ONLY, TEXT_FILE)

@@ -14,6 +14,7 @@ procedure ids_init (tty, devname)
 pointer	tty			# graphcap descriptor
 char	devname[ARB]		# device name
 
+size_t	sz_val
 pointer	nextch
 int	maxch, i
 real	char_height, char_width, char_size
@@ -28,8 +29,10 @@ begin
 	# Allocate the ids descriptor and the string buffer.
 	if ( i_kt == NULL) {
 	    call calloc (i_kt, LEN_IDS, TY_STRUCT)
-	    call malloc (IDS_SBUF(i_kt), SZ_SBUF, TY_CHAR)
-	    call malloc (IDS_BITPL(i_kt), IDS_MAXBITPL+1, TY_SHORT)
+	    sz_val = SZ_SBUF
+	    call malloc (IDS_SBUF(i_kt), sz_val, TY_CHAR)
+	    sz_val = IDS_MAXBITPL+1
+	    call malloc (IDS_BITPL(i_kt), sz_val, TY_SHORT)
 	} else {
 	    call mfree (IDS_FRAME(i_kt), TY_SHORT)
 	}
@@ -123,7 +126,8 @@ begin
 	# the "2" accounts for possible graphics channel ( see ids_expand.x)
 	# and the trailing IDS_EOD
 
-	call malloc (IDS_FRAME(i_kt), max(i_maxframes,i_maxgraph)+2, TY_SHORT)
+	sz_val = max(i_maxframes,i_maxgraph)+2
+	call malloc (IDS_FRAME(i_kt), sz_val, TY_SHORT)
 
 	# Initialize the input parameters: last cursor used.
 

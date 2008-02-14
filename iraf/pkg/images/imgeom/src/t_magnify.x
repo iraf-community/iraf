@@ -519,6 +519,7 @@ int	line1		# First image line of buffer
 int	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
+size_t	sz_val
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 pointer	buf1, buf2
 
@@ -534,7 +535,8 @@ begin
 	# a full buffer image read.
 
 	if (buf == NULL) {
-	    call malloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buf, sz_val, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

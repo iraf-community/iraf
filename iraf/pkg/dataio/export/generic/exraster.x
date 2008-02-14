@@ -266,6 +266,7 @@ procedure ex_getpix (ex, line)
 pointer	ex				#i task struct pointer
 int	line				#i current line number
 
+size_t	sz_val
 pointer	im, op, data
 int	nptrs, i, band
 
@@ -286,7 +287,8 @@ begin
 	        IO_NPIX(op) = IM_LEN(im,1)
 		next
 	    } else if (IO_DATA(op) == NULL)
-	        call malloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
+	        sz_val = IM_LEN(im,1)
+	        call malloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
 
 	    switch (IM_PIXTYPE(im)) {
             case TY_USHORT:

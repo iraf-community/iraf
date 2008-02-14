@@ -352,7 +352,8 @@ begin
 
         # Copy in the atrributes of the other axes.
         szatstr = SZ_LINE
-        call malloc (atstr, szatstr, TY_CHAR)
+        sz_val = szatstr
+        call malloc (atstr, sz_val, TY_CHAR)
         do l = 1, ndim {
             if (l == ax1 || l == ax2)
                 next

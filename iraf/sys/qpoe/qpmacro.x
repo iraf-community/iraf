@@ -160,7 +160,8 @@ begin
 	# Open the QM descriptor only once (per process).
 	if (qm == NULL) {
 	    # Allocate descriptor.
-	    call malloc (qm, LEN_QM, TY_STRUCT)
+	    sz_val = LEN_QM
+	    call malloc (qm, sz_val, TY_STRUCT)
 
 	    # Initialize symbol table.
 	    st = stopen (QMSTNAME, DEF_LENINDEX, DEF_LENSTAB, DEF_SZSBUF)
@@ -380,7 +381,8 @@ begin
 	call smark (sp)
 	sz_val = SZ_MNAME
 	call salloc (mname, sz_val, TY_CHAR)
-	call malloc (mvbuf, SZ_MVBUF, TY_CHAR)
+	sz_val = SZ_MVBUF
+	call malloc (mvbuf, sz_val, TY_CHAR)
 
 	st = QM_ST(qm)
 	junk = qm_getc (NULL, ch)

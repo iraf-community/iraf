@@ -49,6 +49,7 @@ pointer	procedure cq_imquery (cq, imname)
 pointer	cq			#I the catalog database descriptor
 char	imname[ARB]		#I the image name
 
+size_t	sz_val
 pointer	res, inbuf
 int	cc, fd, outfd, nchars
 bool	done
@@ -115,7 +116,8 @@ begin
 	iferr {
 
 	    # Allocate the maximum buffer size.
-	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+	    sz_val = DEF_SZ_INBUF
+	    call malloc (inbuf, sz_val, TY_CHAR)
 
 	    # Skip a fixed number of bytes. Dangerous unless the header
 	    # is always the same size.
@@ -559,13 +561,16 @@ begin
 	# Copy the query parameters to the results descriptor.
 	CQ_INQPARS(res) = CQ_NQPARS(cc)
 	fsize = strlen (Memc[CQ_PQPNAMES(cc)])
-	call malloc (CQ_IQPNAMES(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_IQPNAMES(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPNAMES(cc)], Memc[CQ_IQPNAMES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPVALUES(cc)])
-	call malloc (CQ_IQPVALUES(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_IQPVALUES(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPVALUES(cc)], Memc[CQ_IQPVALUES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPUNITS(cc)])
-	call malloc (CQ_IQPUNITS(res), fsize, TY_CHAR)
+	sz_val = fsize
+	call malloc (CQ_IQPUNITS(res), sz_val, TY_CHAR)
 	call strcpy (Memc[CQ_PQPUNITS(cc)], Memc[CQ_IQPUNITS(res)], fsize)
 
 	# Get the input image data type.

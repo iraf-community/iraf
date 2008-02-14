@@ -229,7 +229,8 @@ begin
 	call salloc (wout, sz_val, TY_DOUBLE)
 	sz_val = SZ_FNAME
 	call salloc (attribute, sz_val, TY_CHAR)
-	call malloc (atstr, szatstr, TY_CHAR)
+	sz_val = szatstr
+	call malloc (atstr, sz_val, TY_CHAR)
 
 	# Set the system name.
 	call mw_gsystem (mwin, Memc[wcs], SZ_FNAME)

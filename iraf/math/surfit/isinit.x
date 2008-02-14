@@ -25,7 +25,8 @@ errchk	malloc, calloc
 
 begin
 	# allocate space for the surface descriptor
-	call malloc (sf, LEN_SFSTRUCT, TY_STRUCT)
+	sz_val = LEN_SFSTRUCT
+	call malloc (sf, sz_val, TY_STRUCT)
 
 	if (xorder < 1 || yorder < 1)
 	    call error (0, "SFLINIT: Illegal order.")

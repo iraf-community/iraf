@@ -36,31 +36,38 @@ begin
 	# if first call to gsefit calculate basis functions
 	if (GS_XBASIS(sf) == NULL || GS_YBASIS(sf) == NULL) {
 
-	    call malloc (GS_WZ(sf), GS_NPTS(sf), TY_REAL)
+	    sz_val = GS_NPTS(sf)
+	    call malloc (GS_WZ(sf), sz_val, TY_REAL)
 
 	    switch (GS_TYPE(sf)) {
 	    case GS_LEGENDRE:
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 	        call rgs_bleg (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	        call rgs_bleg (y, GS_NPTS(sf), GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	    case GS_CHEBYSHEV:
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 	        call rgs_bcheb (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	        call rgs_bcheb (y, GS_NPTS(sf), GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	    case GS_POLYNOMIAL:
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 	        call rgs_bpol (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))

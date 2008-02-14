@@ -9,6 +9,7 @@ pointer procedure rg_intersect (rg1, rg2)
 pointer	rg1				# First set of ranges
 pointer	rg2				# Second set of ranges
 
+size_t	sz_val
 pointer	rg3				# Pointer to intersection
 
 int	i, j, k
@@ -22,7 +23,8 @@ begin
 	# Allocate the range points array.
 
 	k = RG_NRGS(rg1) + RG_NRGS(rg2) - 1
-	call malloc (rg3, LEN_RG + 2 * max (1, k), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, k)
+	call malloc (rg3, sz_val, TY_STRUCT)
 
 	# Set the ranges.
 

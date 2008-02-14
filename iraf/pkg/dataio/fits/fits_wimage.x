@@ -13,6 +13,7 @@ pointer	im			# IRAF image descriptor
 pointer	fits			# FITS data structure
 int	fits_fd			# FITS file descriptor
 
+size_t	sz_val
 int	npix, nlines, npix_record, i, stat, nrecords
 long	v[IM_MAXDIM]
 pointer	tempbuf, buf
@@ -44,7 +45,8 @@ begin
 	case FITS_REAL:
 
 	    # Allocate temporary space.
-	    call malloc (tempbuf, npix, TY_REAL)
+	    sz_val = npix
+	    call malloc (tempbuf, sz_val, TY_REAL)
 
 	    # Initialize the pixel write.
 	    call wft_init_write_pixels (npix_record, TY_REAL,
@@ -79,7 +81,8 @@ begin
 	case FITS_DOUBLE:
 
 	    # Allocate temporary space.
-	    call malloc (tempbuf, npix, TY_DOUBLE)
+	    sz_val = npix
+	    call malloc (tempbuf, sz_val, TY_DOUBLE)
 
 	    # Initialize the pixel write.
 	    call wft_init_write_pixels (npix_record, TY_DOUBLE,
@@ -115,7 +118,8 @@ begin
 	default:
 
 	    # Allocate temporary space.
-	    call malloc (tempbuf, npix, TY_LONG)
+	    sz_val = npix
+	    call malloc (tempbuf, sz_val, TY_LONG)
 
 	    # Scale the line, deal with the blanks, and write the output
 	    # record. At the moement blanks are not dealt with.

@@ -692,7 +692,8 @@ begin
 	    optype = TY_CHAR
 	    switch (O_TYPE(ap)) {
 	    case TY_BOOL:
-		call malloc (iresult, 3, TY_CHAR)
+		sz_val = 3
+		call malloc (iresult, sz_val, TY_CHAR)
 		oplen = 3
 		if (O_VALB(ap))
 		    call strcpy ("yes", Memc[iresult], 3)
@@ -700,16 +701,19 @@ begin
 		    call strcpy ("no",  Memc[iresult], 3)
 	    case TY_CHAR:
 		oplen = strlen (O_VALC(ap))
-		call malloc (iresult, oplen, TY_CHAR)
+		sz_val = oplen
+		call malloc (iresult, sz_val, TY_CHAR)
 		call strcpy (O_VALC(ap), Memc[iresult], ARB)
 	    case TY_INT:
 		oplen = MAX_DIGITS
-		call malloc (iresult, oplen, TY_CHAR)
+		sz_val = oplen
+		call malloc (iresult, sz_val, TY_CHAR)
 		call sprintf (Memc[iresult], SZ_FNAME, "%d")
 		    call pargi (O_VALI(ap))
 	    case TY_REAL:
 		oplen = MAX_DIGITS
-		call malloc (iresult, oplen, TY_CHAR)
+		sz_val = oplen
+		call malloc (iresult, sz_val, TY_CHAR)
 		call sprintf (Memc[iresult], SZ_FNAME, "%g")
 		    call pargr (O_VALR(ap))
 	    default:
@@ -768,11 +772,13 @@ pointer	arg			# pointer to first argument, or NULL
 pointer	out			# output operand pointing to arg descriptor
 pointer	ap
 
+size_t	sz_val
 errchk	malloc
 
 begin
 	call xev_initop (out, 0, TY_POINTER)
-	call malloc (ap, LEN_ARGSTRUCT, TY_STRUCT)
+	sz_val = LEN_ARGSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 	O_VALP(out) = ap
 
 	if (arg == NULL)
@@ -1072,6 +1078,7 @@ pointer	o		# pointer to operand structure
 int	o_len		# length of operand (zero if scalar)
 int	o_type		# datatype of operand
 
+size_t	sz_val
 errchk	malloc
 
 begin
@@ -1086,7 +1093,8 @@ begin
 
 	# Allocate array storage if nonscalar operand.
 	if (o_len > 0) {
-	    call malloc (O_VALP(o), o_len, o_type)
+	    sz_val = o_len
+	    call malloc (O_VALP(o), sz_val, o_type)
 	    O_LEN(o) = o_len
 	}
 end

@@ -63,7 +63,8 @@ begin
 	# Allocate text buffer if the user hasn't already done so.
 	if (bp == NULL || sz_buf <= 0) {
 	    sz_buf = DEF_SZBUF
-	    call malloc (bp, sz_buf, TY_CHAR)
+	    sz_val = sz_buf
+	    call malloc (bp, sz_val, TY_CHAR)
 	}
 
 	# Store title string in buffer.

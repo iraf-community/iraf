@@ -4526,6 +4526,7 @@ pointer	o		#I pointer to operand structure
 int	o_len		#I length of operand (zero if scalar)
 int	o_type		#I datatype of operand
 
+size_t	sz_val
 errchk	malloc
 
 begin
@@ -4544,10 +4545,13 @@ begin
 
 	# Allocate array storage if nonscalar operand.
 	if (o_len > 0) {
-	    if (o_type == TY_BOOL)
-		call malloc (O_VALP(o), o_len, TY_INT)
-	    else
-		call malloc (O_VALP(o), o_len, o_type)
+	    if (o_type == TY_BOOL) {
+		sz_val = o_len
+		call malloc (O_VALP(o), sz_val, TY_INT)
+	    } else {
+		sz_val = o_len
+		call malloc (O_VALP(o), sz_val, o_type)
+	    }
 	    O_LEN(o) = o_len
 	}
 

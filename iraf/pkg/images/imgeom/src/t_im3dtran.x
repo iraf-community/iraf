@@ -637,9 +637,10 @@ begin
 	}
 
 	# Copy the axis attributes.
-	call malloc (atstr1, szatstr, TY_CHAR)
-	call malloc (atstr2, szatstr, TY_CHAR)
-	call malloc (atstr3, szatstr, TY_CHAR)
+	sz_val = szatstr
+	call malloc (atstr1, sz_val, TY_CHAR)
+	call malloc (atstr2, sz_val, TY_CHAR)
+	call malloc (atstr3, sz_val, TY_CHAR)
 
 	for (i =  1; ; i = i + 1) {
 

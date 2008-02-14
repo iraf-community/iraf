@@ -5,11 +5,13 @@ include "linmatch.h"
 procedure rg_linit (ls, max_nregions)
 
 pointer	ls		#I/O pointer to the intensity scaling structure
+size_t	sz_val
 int	max_nregions	#I the maximum number of regions
 
 begin
 	# Allocate the temporary space.
-	call malloc (ls, LEN_LSSTRUCT, TY_STRUCT)
+	sz_val = LEN_LSSTRUCT
+	call malloc (ls, sz_val, TY_STRUCT)
 
 	# Set up the regions parameters.
 	LS_NREGIONS(ls) = 0
@@ -106,6 +108,7 @@ end
 
 procedure rg_lrinit (ls)
 
+size_t	sz_val
 pointer	ls		#I pointer to the intensity scaling structure
 
 begin
@@ -113,40 +116,44 @@ begin
 	call rg_lrfree (ls)
 
 	# Allocate region definition pointers.
-	call malloc (LS_RC1(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RC2(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RL1(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RL2(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RXSTEP(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RYSTEP(ls), LS_MAXNREGIONS(ls), TY_INT)
+	sz_val = LS_MAXNREGIONS(ls)
+	call malloc (LS_RC1(ls), sz_val, TY_INT)
+	call malloc (LS_RC2(ls), sz_val, TY_INT)
+	call malloc (LS_RL1(ls), sz_val, TY_INT)
+	call malloc (LS_RL2(ls), sz_val, TY_INT)
+	call malloc (LS_RXSTEP(ls), sz_val, TY_INT)
+	call malloc (LS_RYSTEP(ls), sz_val, TY_INT)
 
 	# Allocate region statistics pointers.
-	call malloc (LS_RMEAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RMEDIAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RMODE(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RSIGMA(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RSKY(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RSKYERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RMAG(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RMAGERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RNPTS(ls), LS_MAXNREGIONS(ls), TY_INT)
+	sz_val = LS_MAXNREGIONS(ls)
+	call malloc (LS_RMEAN(ls), sz_val, TY_REAL)
+	call malloc (LS_RMEDIAN(ls), sz_val, TY_REAL)
+	call malloc (LS_RMODE(ls), sz_val, TY_REAL)
+	call malloc (LS_RSIGMA(ls), sz_val, TY_REAL)
+	call malloc (LS_RSKY(ls), sz_val, TY_REAL)
+	call malloc (LS_RSKYERR(ls), sz_val, TY_REAL)
+	call malloc (LS_RMAG(ls), sz_val, TY_REAL)
+	call malloc (LS_RMAGERR(ls), sz_val, TY_REAL)
+	call malloc (LS_RNPTS(ls), sz_val, TY_INT)
 
-	call malloc (LS_IMEAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_IMEDIAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_IMODE(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_ISIGMA(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_ISKY(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_ISKYERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_IMAG(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_IMAGERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_INPTS(ls), LS_MAXNREGIONS(ls), TY_INT)
+	sz_val = LS_MAXNREGIONS(ls)
+	call malloc (LS_IMEAN(ls), sz_val, TY_REAL)
+	call malloc (LS_IMEDIAN(ls), sz_val, TY_REAL)
+	call malloc (LS_IMODE(ls), sz_val, TY_REAL)
+	call malloc (LS_ISIGMA(ls), sz_val, TY_REAL)
+	call malloc (LS_ISKY(ls), sz_val, TY_REAL)
+	call malloc (LS_ISKYERR(ls), sz_val, TY_REAL)
+	call malloc (LS_IMAG(ls), sz_val, TY_REAL)
+	call malloc (LS_IMAGERR(ls), sz_val, TY_REAL)
+	call malloc (LS_INPTS(ls), sz_val, TY_INT)
 
-	call malloc (LS_RBSCALE(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RBSCALEERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RBZERO(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RBZEROERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RDELETE(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RCHI(ls), LS_MAXNREGIONS(ls), TY_REAL)
+	sz_val = LS_MAXNREGIONS(ls)
+	call malloc (LS_RBSCALE(ls), sz_val, TY_REAL)
+	call malloc (LS_RBSCALEERR(ls), sz_val, TY_REAL)
+	call malloc (LS_RBZERO(ls), sz_val, TY_REAL)
+	call malloc (LS_RBZEROERR(ls), sz_val, TY_REAL)
+	call malloc (LS_RDELETE(ls), sz_val, TY_INT)
+	call malloc (LS_RCHI(ls), sz_val, TY_REAL)
 
 	# Initialize region definitions.
 	call amovi (INDEFI, Memi[LS_RC1(ls)], LS_MAXNREGIONS(ls))

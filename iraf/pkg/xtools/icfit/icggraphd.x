@@ -21,12 +21,14 @@ double	y[npts]				# Dependent variable
 double	wts[npts]			# Weights
 int	npts				# Number of points
 
+size_t	sz_val
 pointer	xout, yout
 real	size
 
 begin
-	call malloc (xout, npts, TY_DOUBLE)
-	call malloc (yout, npts, TY_DOUBLE)
+	sz_val = npts
+	call malloc (xout, sz_val, TY_DOUBLE)
+	call malloc (yout, sz_val, TY_DOUBLE)
 	call icg_axesd (ic, gt, cv, 1, x, y, Memd[xout], npts)
 	call icg_axesd (ic, gt, cv, 2, x, y, Memd[yout], npts)
 	call icg_paramsd (ic, cv, x, y, wts, npts, gt)

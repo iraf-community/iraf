@@ -13,6 +13,7 @@ pointer	im			# image descriptor
 real	buf[ARB]		# user data buffer
 int	ier
 
+size_t	sz_val
 pointer	bp
 long	offset
 int	nchars, npix
@@ -24,7 +25,8 @@ begin
 	if (IM_PIXTYPE(im) == TY_SHORT) {
 	    bp = IM_LINEBUFP(im)
 	    if (bp == NULL) {
-		call malloc (bp, IM_LEN(im,1), TY_SHORT)
+		sz_val = IM_LEN(im,1)
+		call malloc (bp, sz_val, TY_SHORT)
 		IM_LINEBUFP(im) = bp
 	    }
 	}

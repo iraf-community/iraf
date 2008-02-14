@@ -442,6 +442,7 @@ int	fits_fd			# fits file descriptor
 pointer	fits			# pointer to the fits structure
 pointer	im			# pointer to the output image
 
+size_t	sz_val
 int	i, nbits, nblocks, sz_rec, blksize, stat
 pointer	buf
 int	fstati(), rft_getbuf()
@@ -456,7 +457,8 @@ begin
 	nblocks = int ((nbits + 23039) / 23040)
 
 	sz_rec = FITS_RECORD / SZB_CHAR
-	call malloc (buf, sz_rec, TY_CHAR)
+	sz_val = sz_rec
+	call malloc (buf, sz_val, TY_CHAR)
 	blksize = fstati (fits_fd, F_SZBBLK)
         if (mod (blksize, FITS_RECORD) == 0)
             blksize = blksize / FITS_RECORD

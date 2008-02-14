@@ -87,8 +87,10 @@ begin
 
 	# Allocate the list descriptor.
 	call calloc (fl, LEN_FL, TY_STRUCT)
-	call malloc (offv, DEF_LENOFFV, TY_INT)
-	call malloc (sbuf, DEF_SZSBUF, TY_CHAR)
+	sz_val = DEF_LENOFFV
+	call malloc (offv, sz_val, TY_INT)
+	sz_val = DEF_SZSBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	len_offv = DEF_LENOFFV
 	sz_sbuf = DEF_SZSBUF

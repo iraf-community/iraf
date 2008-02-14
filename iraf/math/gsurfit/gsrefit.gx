@@ -45,22 +45,28 @@ begin
 	if (GS_XBASIS(sf) == NULL || GS_YBASIS(sf) == NULL) {
 
 	    $if (datatype == r)
-	    call malloc (GS_WZ(sf), GS_NPTS(sf), TY_REAL)
+	    sz_val = GS_NPTS(sf)
+	    call malloc (GS_WZ(sf), sz_val, TY_REAL)
 	    $else
-	    call malloc (GS_WZ(sf), GS_NPTS(sf), TY_DOUBLE)
+	    sz_val = GS_NPTS(sf)
+	    call malloc (GS_WZ(sf), sz_val, TY_DOUBLE)
 	    $endif
 
 	    switch (GS_TYPE(sf)) {
 	    case GS_LEGENDRE:
 		$if (datatype == r)
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 		$else
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_DOUBLE)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_DOUBLE)
 		$endif
 	        call $tgs_bleg (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),
@@ -69,14 +75,18 @@ begin
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	    case GS_CHEBYSHEV:
 		$if (datatype == r)
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 		$else
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_DOUBLE)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_DOUBLE)
 		$endif
 	        call $tgs_bcheb (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),
@@ -85,14 +95,18 @@ begin
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	    case GS_POLYNOMIAL:
 		$if (datatype == r)
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_REAL)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_REAL)
 		$else
-	        call malloc (GS_XBASIS(sf), GS_NPTS(sf) * GS_XORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_XORDER(sf)
+	        call malloc (GS_XBASIS(sf), sz_val,
 		    TY_DOUBLE)
-	        call malloc (GS_YBASIS(sf), GS_NPTS(sf) * GS_YORDER(sf),
+	        sz_val = GS_NPTS(sf) * GS_YORDER(sf)
+	        call malloc (GS_YBASIS(sf), sz_val,
 		    TY_DOUBLE)
 		$endif
 	        call $tgs_bpol (x, GS_NPTS(sf), GS_XORDER(sf), GS_XMAXMIN(sf),

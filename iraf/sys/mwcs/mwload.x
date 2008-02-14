@@ -106,7 +106,8 @@ begin
 	nelem = SV_DBUFLEN(sv)
 	if (nelem > 0) {
 	    ip = coerce (bp + SV_DBUFOFF(sv), TY_CHAR, TY_DOUBLE)
-	    call malloc (MI_DBUF(mw), nelem, TY_DOUBLE)
+	    sz_val = nelem
+	    call malloc (MI_DBUF(mw), sz_val, TY_DOUBLE)
 	    call miiupkd (Memd[ip], D(mw,1), nelem, TY_DOUBLE)
 	    MI_DBUFUSED(mw) = nelem
 	    MI_DBUFLEN(mw) = nelem
@@ -116,7 +117,8 @@ begin
 	nelem = SV_SBUFLEN(sv)
 	if (nelem > 0) {
 	    ip = coerce (bp + SV_SBUFOFF(sv), TY_CHAR, TY_CHAR)
-	    call malloc (MI_SBUF(mw), nelem, TY_CHAR)
+	    sz_val = nelem
+	    call malloc (MI_SBUF(mw), sz_val, TY_CHAR)
 	    call miiupk8 (Memc[ip], S(mw,1), nelem, TY_CHAR)
 	    MI_SBUFUSED(mw) = nelem
 	    MI_SBUFLEN(mw) = nelem

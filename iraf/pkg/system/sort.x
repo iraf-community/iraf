@@ -22,6 +22,7 @@ int	infil[MERGEORDER], nlines
 char	name[SZ_FNAME], source_file[SZ_FNAME]
 int	high, lim, low, fd, outfil, t, junk
 
+size_t	sz_val
 bool	clgetb()
 int	ss_gtext(), ss_mkfile()
 int	open(), clplen(), clgfil(), clgeti(), btoi()
@@ -52,8 +53,10 @@ begin
 	    use_strsrt = YES
 
 	# Allocate buffer space.
-	call malloc (linbuf, SZ_LINBUF, TY_CHAR)
-	call malloc (linptr, MAXPTR, TY_INT)
+	sz_val = SZ_LINBUF
+	call malloc (linbuf, sz_val, TY_CHAR)
+	sz_val = MAXPTR
+	call malloc (linptr, sz_val, TY_INT)
 
 	# Perform the sort. 
 	junk = clgfil (list, source_file, SZ_FNAME)

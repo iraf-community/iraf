@@ -14,6 +14,7 @@ pointer	bp
 int	dev_blksz
 long	offset
 errchk	malloc
+size_t	sz_val
 include	<fio.com>
 
 begin
@@ -43,10 +44,12 @@ begin
 	# restore seek offset (which depends on buffer pointer, buf offset).
 
 	offset = LNOTE(fd)
-	if (FTYPE(fp) == TEXT_FILE)
-	    call malloc (bp, FBUFSIZE(fp), TY_CHAR)
-	else
+	if (FTYPE(fp) == TEXT_FILE) {
+	    sz_val = FBUFSIZE(fp)
+	    call malloc (bp, sz_val, TY_CHAR)
+	} else {
 	    call FBUF_ALLOC (bp, FBUFSIZE(fp), TY_CHAR)
+	}
 
 	boffset[fd] = NULL
 	bufptr[fd] = bp

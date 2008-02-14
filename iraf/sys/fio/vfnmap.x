@@ -136,6 +136,7 @@ pointer procedure vfnopen (vfn, mode)
 char	vfn[ARB]		# virtual filename
 int	mode			# access mode for VFN database
 
+size_t	sz_val
 bool	first_time
 int	n_open_vfns, root_offset, extn_offset
 pointer	def_vfd, vfd
@@ -149,7 +150,8 @@ begin
 	# call.
 
 	if (first_time) {
-	    call malloc (def_vfd, LEN_VFD, TY_STRUCT)
+	    sz_val = LEN_VFD
+	    call malloc (def_vfd, sz_val, TY_STRUCT)
 	    n_open_vfns = 0
 	    first_time = false
 	}

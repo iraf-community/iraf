@@ -12,6 +12,7 @@ char	rstr[ARB]		# Range string
 PIXEL	rvals[npts]		# Range values (sorted)
 int	npts			# Number of range values
 
+size_t	sz_val
 pointer	rg
 int	i, j, k, nrgs
 PIXEL	rval1, rval2, a, b
@@ -64,7 +65,8 @@ begin
 
 	# Allocate memory for the ranges.
 
-	call malloc (rg, LEN_RG + 2 * max (1, nrgs), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, nrgs)
+	call malloc (rg, sz_val, TY_STRUCT)
 
 	# Rescan the string and set the ranges.
 

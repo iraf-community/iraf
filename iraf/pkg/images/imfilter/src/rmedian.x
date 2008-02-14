@@ -17,6 +17,7 @@ short	kernel[nxk,ARB]	#I the ring filter kernel
 int	nxk, nyk	#I dimensions of the kernel
 
 
+size_t	sz_val
 int	col1, col2, ncols, line, line1, line2, nlines
 pointer	inbuf, outbuf, filter
 pointer	impl2r()
@@ -29,7 +30,8 @@ begin
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the points to be medianed.
-	call malloc (filter, RMED_NRING(med), TY_REAL)
+	sz_val = RMED_NRING(med)
+	call malloc (filter, sz_val, TY_REAL)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)

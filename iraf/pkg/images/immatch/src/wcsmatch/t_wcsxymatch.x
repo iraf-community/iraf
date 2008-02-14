@@ -226,10 +226,11 @@ begin
 			cfd = open (Memc[str], READ_ONLY, TEXT_FILE)
 			npts = rg_rdxy (cfd, rxw, ryw, wcs, xcolumn, ycolumn,
 			    xunits, yunits)
-		        call malloc (rxl, npts, TY_DOUBLE)
-		        call malloc (ryl, npts, TY_DOUBLE)
-		        call malloc (ixl, npts, TY_DOUBLE)
-		        call malloc (iyl, npts, TY_DOUBLE)
+		        sz_val = npts
+		        call malloc (rxl, sz_val, TY_DOUBLE)
+		        call malloc (ryl, sz_val, TY_DOUBLE)
+		        call malloc (ixl, sz_val, TY_DOUBLE)
+		        call malloc (iyl, sz_val, TY_DOUBLE)
 			if (wcs == RG_WORLD)
 		    	    ctr = rg_xytoxy (mwr, Memd[rxw], Memd[ryw],
 			        Memd[rxl], Memd[ryl], npts, "world",
@@ -246,12 +247,13 @@ begin
 			npts = nx
 		    else
 		        npts = nx * ny
-		    call malloc (rxl, npts, TY_DOUBLE)
-		    call malloc (ryl, npts, TY_DOUBLE)
-		    call malloc (rxw, npts, TY_DOUBLE)
-		    call malloc (ryw, npts, TY_DOUBLE)
-		    call malloc (ixl, npts, TY_DOUBLE)
-		    call malloc (iyl, npts, TY_DOUBLE)
+		    sz_val = npts
+		    call malloc (rxl, sz_val, TY_DOUBLE)
+		    call malloc (ryl, sz_val, TY_DOUBLE)
+		    call malloc (rxw, sz_val, TY_DOUBLE)
+		    call malloc (ryw, sz_val, TY_DOUBLE)
+		    call malloc (ixl, sz_val, TY_DOUBLE)
+		    call malloc (iyl, sz_val, TY_DOUBLE)
 		    if (IM_NDIM(imr) == 1)
 		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, x1, x2,
 			    y1, y2)

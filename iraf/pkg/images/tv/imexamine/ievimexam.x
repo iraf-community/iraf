@@ -82,8 +82,9 @@ begin
 	nzvals = int (sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))) + 1
 
 	# Check for cases which should be handled by pcols or prows.
-	call malloc (x_vec, nzvals, TY_REAL)
-	call malloc (y_vec, nzvals, TY_REAL)
+	sz_val = nzvals
+	call malloc (x_vec, sz_val, TY_REAL)
+	call malloc (y_vec, sz_val, TY_REAL)
 	if (fp_equalr (x1, x2))
 	    call ie_get_col (im, x1, y1, x2, y2, nzvals, width, btype,
 	        bconstant, Memr[x_vec], Memr[y_vec], zmin, zmax)
@@ -536,6 +537,7 @@ int	line1		# First image line of buffer
 int	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
+size_t	sz_val
 pointer	buf1, buf2
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 errchk	malloc, realloc, imgs2r
@@ -551,7 +553,8 @@ begin
 	# a full buffer image read.
 
 	if (buf == NULL) {
-	    call malloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buf, sz_val, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

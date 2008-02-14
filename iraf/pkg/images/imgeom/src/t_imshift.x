@@ -464,6 +464,7 @@ int	col1, col2	#I column range of input buffer
 int	line1, line2	#I line range of input buffer
 pointer	buf		#U buffer
 
+size_t	sz_val
 pointer	buf1, buf2
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 errchk	malloc, realloc
@@ -475,7 +476,8 @@ begin
 
 	# Make sure the buffer is large enough.
 	if (buf == NULL) {
-	    call malloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buf, sz_val, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

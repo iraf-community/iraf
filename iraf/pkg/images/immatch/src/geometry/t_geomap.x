@@ -289,9 +289,10 @@ begin
 	GM_YREFPT(fit) = INDEFD
 
 	# Compute the weights.
-	call malloc (xfit, npts, TY_REAL)
-	call malloc (yfit, npts, TY_REAL)
-	call malloc (wts, npts, TY_REAL)
+	sz_val = npts
+	call malloc (xfit, sz_val, TY_REAL)
+	call malloc (yfit, sz_val, TY_REAL)
+	call malloc (wts, sz_val, TY_REAL)
 	call amovkr (real(1.), Memr[wts], npts)
 
 	# Determine the x max and min.
@@ -459,15 +460,17 @@ pointer	yin			# the y coordinates
 real	xmin, xmax		# the range of the x coordinates
 real	ymin, ymax		# the range of the y coordinates
 
+size_t	sz_val
 int	npts, bufsize
 int	fscan(), nscan()
 
 begin
 	bufsize = GEO_DEFBUFSIZE
-	call malloc (xref, bufsize, TY_REAL)
-	call malloc (yref, bufsize, TY_REAL)
-	call malloc (xin, bufsize, TY_REAL)
-	call malloc (yin, bufsize, TY_REAL)
+	sz_val = bufsize
+	call malloc (xref, sz_val, TY_REAL)
+	call malloc (yref, sz_val, TY_REAL)
+	call malloc (xin, sz_val, TY_REAL)
+	call malloc (yin, sz_val, TY_REAL)
 
 	npts = 0
 	while (fscan (fd) != EOF) {
@@ -942,9 +945,10 @@ begin
 	GM_YREFPT(fit) = INDEFD
 
 	# Compute the weights.
-	call malloc (xfit, npts, TY_DOUBLE)
-	call malloc (yfit, npts, TY_DOUBLE)
-	call malloc (wts, npts, TY_DOUBLE)
+	sz_val = npts
+	call malloc (xfit, sz_val, TY_DOUBLE)
+	call malloc (yfit, sz_val, TY_DOUBLE)
+	call malloc (wts, sz_val, TY_DOUBLE)
 	call amovkd (double(1.), Memd[wts], npts)
 
 	# Determine the x max and min.
@@ -1112,15 +1116,17 @@ pointer	yin			# the y coordinates
 double	xmin, xmax		# the range of the x coordinates
 double	ymin, ymax		# the range of the y coordinates
 
+size_t	sz_val
 int	npts, bufsize
 int	fscan(), nscan()
 
 begin
 	bufsize = GEO_DEFBUFSIZE
-	call malloc (xref, bufsize, TY_DOUBLE)
-	call malloc (yref, bufsize, TY_DOUBLE)
-	call malloc (xin, bufsize, TY_DOUBLE)
-	call malloc (yin, bufsize, TY_DOUBLE)
+	sz_val = bufsize
+	call malloc (xref, sz_val, TY_DOUBLE)
+	call malloc (yref, sz_val, TY_DOUBLE)
+	call malloc (xin, sz_val, TY_DOUBLE)
+	call malloc (yin, sz_val, TY_DOUBLE)
 
 	npts = 0
 	while (fscan (fd) != EOF) {

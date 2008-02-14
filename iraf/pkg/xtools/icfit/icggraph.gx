@@ -21,12 +21,14 @@ PIXEL	y[npts]				# Dependent variable
 PIXEL	wts[npts]			# Weights
 int	npts				# Number of points
 
+size_t	sz_val
 pointer	xout, yout
 real	size
 
 begin
-	call malloc (xout, npts, TY_PIXEL)
-	call malloc (yout, npts, TY_PIXEL)
+	sz_val = npts
+	call malloc (xout, sz_val, TY_PIXEL)
+	call malloc (yout, sz_val, TY_PIXEL)
 	call icg_axes$t (ic, gt, cv, 1, x, y, Mem$t[xout], npts)
 	call icg_axes$t (ic, gt, cv, 2, x, y, Mem$t[yout], npts)
 	call icg_params$t (ic, cv, x, y, wts, npts, gt)

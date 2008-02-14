@@ -88,7 +88,8 @@ begin
         gs = NULL
         npar = 0
         szcoeff = SZ_GSCOEFFBUF
-        call malloc (coeff, szcoeff, TY_DOUBLE)
+        sz_val = szcoeff
+        call malloc (coeff, sz_val, TY_DOUBLE)
 
         call sscan (atstr)
         repeat {
@@ -433,6 +434,7 @@ pointer	sf		#O surface descriptor
 double	fit[ARB]	#I array containing the surface parameters and
 			#I coefficients
 
+size_t	sz_val
 int	surface_type, xorder, yorder, order
 double	xmin, xmax, ymin, ymax	
 
@@ -485,9 +487,12 @@ begin
 	# Set remaining curve parameters.
 	WF_TYPE(sf) = surface_type
 
-	call malloc (WF_COEFF(sf), WF_NCOEFF(sf), TY_DOUBLE)
-	call malloc (WF_XBASIS(sf), WF_XORDER(sf), TY_DOUBLE)
-	call malloc (WF_YBASIS(sf), WF_YORDER(sf), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf)
+	call malloc (WF_COEFF(sf), sz_val, TY_DOUBLE)
+	sz_val = WF_XORDER(sf)
+	call malloc (WF_XBASIS(sf), sz_val, TY_DOUBLE)
+	sz_val = WF_YORDER(sf)
+	call malloc (WF_YBASIS(sf), sz_val, TY_DOUBLE)
 
 	# restore coefficient array
 	call amovd (fit[WF_SAVECOEFF+1], Memd[WF_COEFF(sf)], WF_NCOEFF(sf))

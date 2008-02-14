@@ -63,6 +63,7 @@ char	key[ARB]		#I Exposure time keyword
 real	default			#I Default exposure time
 int	maxval			#I Maximum mask value
 
+size_t	sz_val
 int	i
 real	exp, emin, emax, efrac, imgetr()
 
@@ -74,8 +75,10 @@ int	einit			# Initialization flag
 common	/emask/ exps, ev, ezero, escale, einit
 
 begin
-	call malloc (ev, IM_MAXDIM, TY_LONG)
-	call malloc (exps, nimages, TY_REAL)
+	sz_val = IM_MAXDIM
+	call malloc (ev, sz_val, TY_LONG)
+	sz_val = nimages
+	call malloc (exps, sz_val, TY_REAL)
 
 	emax = 0.
 	emin = MAX_REAL

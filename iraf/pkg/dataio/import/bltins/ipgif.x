@@ -353,6 +353,7 @@ int	width, height				#i image dimensions
 pointer	cmap					#i colormap pointer
 int	interlace				#i interlace flag
 
+size_t	sz_val
 pointer	im, op, out, data
 char	csize, pix, val
 int	i, v, xpos, ypos, pass
@@ -377,7 +378,8 @@ begin
 
 	im = IP_IM(ip)
 	op = PTYPE(ip,GIF_IMNUM(gif))
-	call malloc (data, width, TY_CHAR)
+	sz_val = width
+	call malloc (data, sz_val, TY_CHAR)
 	IO_DATA(op) = data
 	IO_NPIX(op) = width
 

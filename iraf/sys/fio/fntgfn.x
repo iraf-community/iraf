@@ -124,8 +124,10 @@ begin
 	call salloc (ebuf, sz_val, TY_CHAR)
 
 	# Allocate list descriptor.
-	call malloc (list, LEN_FNTBHDR + LEN_INDEXVECTOR, TY_STRUCT)
-	call malloc (sbuf, SZ_DEFSTRBUF, TY_CHAR)
+	sz_val = LEN_FNTBHDR + LEN_INDEXVECTOR
+	call malloc (list, sz_val, TY_STRUCT)
+	sz_val = SZ_DEFSTRBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	B_MAGIC(list) = FNTB_MAGIC
 	maxstr = LEN_INDEXVECTOR
@@ -939,6 +941,7 @@ pointer procedure fntopn (template)
 
 char	template[ARB]
 
+size_t	sz_val
 pointer	pp
 int	nchars
 int	strlen()
@@ -948,7 +951,8 @@ begin
 	nchars = strlen (template)
 
 	call calloc (pp, LEN_FNTUHDR, TY_STRUCT)
-	call malloc (U_TEMPLATE(pp), nchars, TY_CHAR)
+	sz_val = nchars
+	call malloc (U_TEMPLATE(pp), sz_val, TY_CHAR)
 
 	call strcpy (template, Memc[U_TEMPLATE(pp)], nchars)
 	U_TEMPLATE_INDEX(pp) = U_TEMPLATE(pp)

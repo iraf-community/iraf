@@ -51,7 +51,8 @@ begin
 	if (!(cl_index < 0 || cl_index == 1))
 	    goto err_
 
-	call malloc (qpf, LEN_QPFDES, TY_STRUCT)
+	sz_val = LEN_QPFDES
+	call malloc (qpf, sz_val, TY_STRUCT)
 
 	# Open the QPOE file.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
