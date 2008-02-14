@@ -27,6 +27,7 @@ pointer	xc		#I pointer to the cross-corrrelation structure
 pointer	gd		#I the graphics stream pointer
 pointer	id		#I the display stream pointer
 
+size_t	sz_val
 int	newdata, newcross, newcenter, wcs, key, cplottype, newplot
 int	ip, ncolr, nliner
 pointer	sp, cmd
@@ -38,7 +39,8 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize.
 	newdata = YES
@@ -263,6 +265,7 @@ int	nreg		#I the current region number
 pointer	imr		#I pointer to the reference image
 pointer	im1		#I pointer to the input image
 
+size_t	sz_val
 int	ip, wcs, key, ixlag, iylag, ixshift, iyshift
 int	nrimcols, nrimlines, nimcols, nimlines, ncolr, ncoli, nliner, nlinei
 pointer	sp, cmd
@@ -298,7 +301,8 @@ begin
 	yshift = -Memr[rg_xstatp(xc,YSHIFTS)+nreg-1]
 
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd],
 	    SZ_LINE) != EOF) {
@@ -416,6 +420,7 @@ int	col		#I column of cross-correlation function to plot
 int	line		#I line of cross-correlation function to plot
 int	plottype	#I the default plot type
 
+size_t	sz_val
 int	nreg, xwindow, ywindow
 pointer	sp, title, str, prc1, prc2, prl1, prl2
 int	rg_xstati(), strlen()
@@ -427,8 +432,9 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the regions.
 	nreg = rg_xstati (xc, CREGION)
@@ -526,6 +532,7 @@ int	dformat		#I is the shifts file in database format
 pointer	rg		#I pointer to the task structure
 int	ch		#I the input keystroke command
 
+size_t	sz_val
 int	wcs, stat
 pointer	sp, cmd
 real	wx, wy
@@ -534,7 +541,8 @@ int	clgcur()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Print the status line query in reverse video and get the keystroke.
 	call printf (QUERY)

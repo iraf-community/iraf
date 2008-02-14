@@ -113,6 +113,7 @@ int procedure cq_ccrquery (cq)
 
 pointer	cq			#I the catalog database descriptor
 
+size_t	sz_val
 pointer	cc, sp, str
 int	i, catno, nqpars, npars, sz1, sz2, sz3, sz4, sz5
 int	op1, op2, op3, op4, op5
@@ -129,7 +130,8 @@ begin
 	catno = CQ_CATNO(cq)
 
 	call smark (sp)
-	call salloc (str, 4 * (SZ_LINE + 1), TY_CHAR)
+	sz_val = 4 * (SZ_LINE + 1)
+	call salloc (str, sz_val, TY_CHAR)
 
 	iferr {
 

@@ -106,6 +106,7 @@ short	gim[ARB]		#I escape instruction data
 real	rx1,ry1			#I NDC coords of display rect
 real	rx2,ry2			#I NDC coords of display rect
 
+size_t	sz_val
 real	scale
 pointer	sp, n_gim
 bool	status, xflip, yflip
@@ -144,7 +145,8 @@ begin
 
 	    if (dst == 0 && src != dst) {
 		call smark (sp)
-		call salloc (n_gim, GIM_SETMAPPING_LEN, TY_SHORT)
+		sz_val = GIM_SETMAPPING_LEN
+		call salloc (n_gim, sz_val, TY_SHORT)
 
 		xflip = false
 		yflip = false
@@ -446,6 +448,7 @@ procedure sgm_writepixels (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 char	bias
 pointer	sp, bp
 int	nx, ny, npix, i
@@ -461,7 +464,8 @@ begin
 	npix = nx * ny
 
 	call smark (sp)
-	call salloc (bp, npix, TY_CHAR)
+	sz_val = npix
+	call salloc (bp, sz_val, TY_CHAR)
 	bias = 040B
 
 	# Send the pixel data encoded in printable ASCII.
@@ -482,6 +486,7 @@ procedure sgm_readpixels (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp
 int	sv_iomode, ch
 int	npix, nx, ny, i
@@ -504,7 +509,8 @@ begin
 	npix = nx * ny
 
 	call smark (sp)
-	call salloc (bp, npix, TY_CHAR)
+	sz_val = npix
+	call salloc (bp, sz_val, TY_CHAR)
 
 	# Get the pixel data.  This is a block of pixel data encoded as for
 	# writepixels (040 bias), bracked by ESC at the front and a single
@@ -541,6 +547,7 @@ procedure sgm_writecmap (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 short	mask
 pointer	sp, bp, op
 int	ncells, nchars, ip, i
@@ -556,7 +563,8 @@ begin
 	ncells = gim[GIM_WRITECMAP_NC]
 	nchars = ncells * 3 * 2
 
-	call salloc (bp, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (bp, sz_val, TY_CHAR)
 	ip = GIM_WRITECMAP_DATA
 	op = bp
 
@@ -580,6 +588,7 @@ procedure sgm_readcmap (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp, cm, ip
 int	sv_iomode, ncells, nchars, ch, i
 short	retval[GIM_RET_RCMAP_LEN]
@@ -600,8 +609,10 @@ begin
 	nchars = ncells * 3 * 2
 
 	call smark (sp)
-	call salloc (bp, nchars, TY_CHAR)
-	call salloc (cm, ncells * 3, TY_SHORT)
+	sz_val = nchars
+	call salloc (bp, sz_val, TY_CHAR)
+	sz_val = ncells * 3
+	call salloc (cm, sz_val, TY_SHORT)
 
 	# Get the colormap data.  This is a block of RGB colormap triplets
 	# encoded 2 bytes per color, bracked by a ESC at the front and a
@@ -644,6 +655,7 @@ procedure sgm_iomapwrite (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 short	mask
 pointer	sp, bp, op
 int	ncells, nchars, ip, i
@@ -661,7 +673,8 @@ begin
 	ncells = gim[GIM_WRITEIOMAP_NC]
 	nchars = ncells * 2
 
-	call salloc (bp, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (bp, sz_val, TY_CHAR)
 	ip = GIM_WRITEIOMAP_DATA
 	op = bp
 
@@ -685,6 +698,7 @@ procedure sgm_iomapread (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp, data, ip
 int	sv_iomode, ncells, nchars, ch, i
 short	retval[GIM_RET_RIOMAP_LEN]
@@ -705,8 +719,10 @@ begin
 	nchars = ncells * 2
 
 	call smark (sp)
-	call salloc (bp, nchars, TY_CHAR)
-	call salloc (data, ncells, TY_SHORT)
+	sz_val = nchars
+	call salloc (bp, sz_val, TY_CHAR)
+	sz_val = ncells
+	call salloc (data, sz_val, TY_SHORT)
 
 	# Get the iomap data.  This is a block of iomap values encoded
 	# 2 bytes per value, bracked by a ESC at the front and a single
@@ -768,6 +784,7 @@ char	cap[ARB]			#I graphcap capability name
 short	gim[ARB]			#I instruction (array of int args)
 int	nargs				#I number of arguments
 
+size_t	sz_val
 int	ival, i
 pointer	sp, fmt, ctrl
 include	"stdgraph.com"
@@ -776,8 +793,9 @@ errchk	ttygets
 
 begin
 	call smark (sp)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
-	call salloc (ctrl, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (ctrl, sz_val, TY_CHAR)
 
 	if (ttygets (g_tty, cap, Memc[fmt], SZ_LINE) > 0) {
 	    call sprintf (Memc[ctrl], SZ_LINE, Memc[fmt])
@@ -807,6 +825,7 @@ char	retval_cap[ARB]			#I cap name for return value format
 short	retval[ARB]			#O decoded output arguments
 int	nout				#I number of output arguments
 
+size_t	sz_val
 int	index[MAX_ARGS]
 pointer	sp, ctrl, patbuf, pat, buf, ip, op
 int	sv_iomode, arg, ch, nchars, start, value, ival, i
@@ -818,10 +837,12 @@ errchk	ttygets
 
 begin
 	call smark (sp)
-	call salloc (ctrl, SZ_LINE, TY_CHAR)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (pat, SZ_LINE, TY_CHAR)
-	call salloc (patbuf, SZ_PATBUF, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ctrl, sz_val, TY_CHAR)
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (pat, sz_val, TY_CHAR)
+	sz_val = SZ_PATBUF
+	call salloc (patbuf, sz_val, TY_CHAR)
 
 	call aclrs (retval, nout)
 

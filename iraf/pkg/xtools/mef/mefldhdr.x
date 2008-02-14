@@ -13,6 +13,7 @@ pointer mef			#I FITS descriptor
 int	spool			#I spool output file descriptor
 int	group			#I Currrent group
 
+size_t	sz_val
 pointer lbuf, sp, fb
 int	nchars, index, ncards, pcount, in
 int	mef_read_card(), mef_kctype()
@@ -21,8 +22,10 @@ long	note()
 errchk  mef_read_card
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (fb, FITS_BLOCK_BYTES, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call salloc (fb, sz_val, TY_CHAR)
 
 	MEF_EXTNAME(mef) = EOS
 	MEF_EXTVER(mef) = INDEFI

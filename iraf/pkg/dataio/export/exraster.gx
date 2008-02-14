@@ -164,6 +164,7 @@ procedure ex_px_interleave (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	sp, pp, op
 pointer	o, outptr
 int	i, j, line, npix, outtype
@@ -180,7 +181,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (pp, EX_NEXPR(ex), TY_POINTER)
+	sz_val = EX_NEXPR(ex)
+	call salloc (pp, sz_val, TY_POINTER)
 
 	# Process each line in the image.
 	fd = EX_FD(ex)

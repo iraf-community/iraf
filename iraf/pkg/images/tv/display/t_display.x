@@ -25,6 +25,7 @@ char	image[SZ_FNAME]		# Image to display
 int	frame			# Display frame
 int	erase			# Erase frame?
 
+size_t	sz_val
 int	i
 pointer	sp, wdes, im, ds
 
@@ -36,7 +37,8 @@ errchk	ds_getparams, ds_setwcs, ds_load_display, ds_erase_border
 
 begin
 	call smark (sp)
-	call salloc (wdes, LEN_WDES, TY_STRUCT)
+	sz_val = LEN_WDES
+	call salloc (wdes, sz_val, TY_STRUCT)
 	call aclri (Memi[wdes], LEN_WDES)
 
 	# Open input imagefile.
@@ -103,6 +105,7 @@ procedure ds_getparams (im, ds, wdes)
 
 pointer	im, ds, wdes		#I Image, display, and graphics descriptors
 
+size_t	sz_val
 bool	fill, zscale_flag, zrange_flag, zmap_flag
 real	xcenter, ycenter, xsize, ysize
 real	xmag, ymag, xscale, yscale, pxsize, pysize
@@ -120,8 +123,10 @@ errchk	maskcolor_map, ds_pmmap, zsc_pmsection, mzscale
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (ztrans, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ztrans, sz_val, TY_CHAR)
 
 	# Get overlay mask and colors.
 	call clgstr ("overlay", W_OVRLY(wdes), W_SZSTRING)
@@ -266,7 +271,8 @@ begin
 	    W_ZT(wdwin) = W_UNITARY
 	else if (streq (Memc[ztrans], "user")) {
 	    W_ZT(wdwin) = W_USER
-	    call salloc (lutfile, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (lutfile, sz_val, TY_CHAR)
 	    call clgstr ("lutfile", Memc[lutfile], SZ_FNAME)
 	    W_UPTR(wdwin) = ds_ulutalloc (Memc[lutfile], z1, z2)
 	} else {
@@ -378,6 +384,7 @@ pointer	im, ds, wdes		# image, display, and coordinate descriptors
 char	image[SZ_FNAME]		# image section name
 int	frame			# frame
 
+size_t	sz_val
 real	a, b, c, d, tx, ty
 int	ip, i, j, axis[2]
 real	sx, sy
@@ -390,10 +397,13 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (title,  SZ_LINE,  TY_CHAR)
-        call salloc (region, SZ_FNAME, TY_CHAR)
-        call salloc (objref, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val,  TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (region, sz_val, TY_CHAR)
+        call salloc (objref, sz_val, TY_CHAR)
 
 	# Compute the rotation matrix needed to transform screen pixel coords
 	# to image section coords.
@@ -503,6 +513,7 @@ char	input[ARB]		#I Input image name
 char	output[maxchar]		#O Output image name
 int	maxchar			#I Maximum characters in output name.
 
+size_t	sz_val
 int	i, fd
 pointer	sp, section, lv, pv1, pv2
 
@@ -511,10 +522,12 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (lv, IM_MAXDIM, TY_LONG)
-	call salloc (pv1, IM_MAXDIM, TY_LONG)
-	call salloc (pv2, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (lv, sz_val, TY_LONG)
+	call salloc (pv1, sz_val, TY_LONG)
+	call salloc (pv2, sz_val, TY_LONG)
 
 	# Get endpoint coordinates in original image.
 	call amovkl (long(1), Meml[lv], IM_MAXDIM)
@@ -574,6 +587,7 @@ pointer	im			# input image
 pointer	ds			# output image
 pointer	wdes			# graphics window descriptor
 
+size_t	sz_val
 real	z1, z2, dz1, dz2, px1, px2, py1, py2
 int	i, order, zt, wx1, wx2, wy1, wy2, wy, nx, ny, xblk, yblk, color
 pointer	wdwin, wipix, wdpix, ovrly, bpm, pm, uptr
@@ -741,7 +755,8 @@ begin
 	    }
 
 	} else if (zt == W_USER) {
-	    call salloc (rtemp, nx, TY_REAL)
+	    sz_val = nx
+	    call salloc (rtemp, sz_val, TY_REAL)
 
 	    for (wy=wy1;  wy <= wy2;  wy=wy+1) {
 		in  = sigm2r (si, wy - wy1 + 1)

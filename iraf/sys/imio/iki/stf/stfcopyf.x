@@ -15,6 +15,7 @@ int	spool			#I spooled header to read
 int	gpb			#I stream to receive GPB cards, or NULL
 int	user			#I stream to receive user cards, or NULL
 
+size_t	sz_val
 bool	keyword
 int	p_ch[MAX_PCOUNT+NKW]
 pointer	p_len[MAX_PCOUNT+NKW]
@@ -26,8 +27,9 @@ errchk	getline, putline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (sbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (sbuf, sz_val, TY_CHAR)
 
 	# The following reserved keywords describing the GPB are added to
 	# the user area by stf_rdheader, and must be filtered out along with

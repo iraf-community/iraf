@@ -13,7 +13,6 @@ pointer	asi		# interpolant descriptor
 real	datain[ARB]	# data array
 int	npix		# nunber of data points
 
-size_t	sz_val
 int	i
 pointer	c0ptr, cdataptr, cnptr, temp
 
@@ -31,9 +30,8 @@ begin
 		ASI_OFFSET(asi) = 1
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-		sz_val = ASI_NCOEFF(asi)
-		call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
-		call malloc (temp, sz_val, TY_REAL)
+		call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
+		call malloc (temp, ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	case II_POLY5:
@@ -44,8 +42,7 @@ begin
 		ASI_OFFSET(asi) = 2
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-		sz_val = ASI_NCOEFF(asi)
-		call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
+		call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	case II_POLY3:
@@ -56,8 +53,7 @@ begin
 		ASI_OFFSET(asi) = 1
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-		sz_val = ASI_NCOEFF(asi)
-		call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
+		call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	case II_DRIZZLE, II_LINEAR:
@@ -68,8 +64,7 @@ begin
 		ASI_OFFSET(asi) = 0
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-	        sz_val = ASI_NCOEFF(asi)
-	        call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
+	        call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	case II_SINC, II_LSINC:
@@ -80,8 +75,7 @@ begin
 		ASI_OFFSET(asi) = 0
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-	        sz_val = ASI_NCOEFF(asi)
-	        call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
+	        call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	default:
@@ -92,8 +86,7 @@ begin
 		ASI_OFFSET(asi) = 0
 		if (ASI_COEFF(asi) != NULL)
 		    call mfree (ASI_COEFF(asi), TY_REAL)
-		sz_val = ASI_NCOEFF(asi)
-		call malloc (ASI_COEFF(asi), sz_val, TY_REAL)
+		call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
 	}

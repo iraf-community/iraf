@@ -10,13 +10,15 @@ procedure qp_pclose (fd)
 
 int	fd		#I file descriptor of QP_POPEN-ed parameter
 
+size_t	sz_val
 int	lfile, type
 pointer	sp, lfname, fm
 int	fm_lfparse()
 
 begin
 	call smark (sp)
-	call salloc (lfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lfname, sz_val, TY_CHAR)
 
 	call fstats (fd, F_FILENAME, Memc[lfname], SZ_FNAME)
 	if (fm_lfparse (Memc[lfname], fm, lfile, type) != ERR)

@@ -7,11 +7,13 @@ procedure prchdir (pid, newdir)
 
 int	pid		# process id of child, or 0 for all subprocesses
 char	newdir[ARB]	# new directory
+size_t	sz_val
 pointer	sp, cmd
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call strcpy ("chdir ", Memc[cmd], SZ_COMMAND)
 	call strcat (newdir, Memc[cmd], SZ_COMMAND)

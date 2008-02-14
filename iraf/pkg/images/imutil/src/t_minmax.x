@@ -17,6 +17,7 @@ bool	force			# force recomputation of values
 bool	update			# update values in image header
 bool	verbose			# print values as they are computed
 
+size_t	sz_val
 bool	section
 int	pixtype
 long	vmin[IM_MAXDIM], vmax[IM_MAXDIM]
@@ -31,11 +32,13 @@ define	tryagain_ 91
 
 begin
 	call smark (sp)
-	call salloc (images, SZ_LINE, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (imsect, SZ_FNAME, TY_CHAR)
-	call salloc (pixmin, SZ_FNAME, TY_CHAR)
-	call salloc (pixmax, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (images, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imsect, sz_val, TY_CHAR)
+	call salloc (pixmin, sz_val, TY_CHAR)
+	call salloc (pixmax, sz_val, TY_CHAR)
 
 	# Get list of input images.
 

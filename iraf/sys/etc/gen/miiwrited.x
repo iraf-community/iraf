@@ -11,6 +11,7 @@ int	fd			#I output file
 double	spp[ARB]		#I native format data to be written
 int	nelem			#I number of data elements to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize()
@@ -20,7 +21,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nelem, MII_DOUBLE)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipakd (spp, Memc[bp], nelem, TY_DOUBLE)
 	call write (fd, Memc[bp], bufsize)

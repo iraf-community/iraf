@@ -12,6 +12,7 @@ int procedure ie_getnframes (ie)
 
 pointer	ie			#I imexamine descriptor
 
+size_t	sz_val
 pointer	sp, imname, ds, iw
 int	server, nframes, status, i
 
@@ -21,7 +22,8 @@ errchk	imd_mapframe, clgeti
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	nframes = clgeti ("nframes")
 	if (nframes == 0) {

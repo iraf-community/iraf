@@ -16,6 +16,7 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 int	mode			# access mode
 
+size_t	sz_val
 pointer	sp, buf
 pointer	ttygdes()
 bool	streq()
@@ -24,7 +25,8 @@ include	"ccp.com"
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# If a particular plotter was named when the kernel was opened then 
 	# output will always go to that plotter (g_device) regardless of the 

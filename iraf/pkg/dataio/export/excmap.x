@@ -33,6 +33,7 @@ procedure ex_read_cmap (ex, cmname)
 pointer	ex					#i colormap pointer
 char	cmname[ARB]				#i colormap file name
 
+size_t	sz_val
 pointer	cmap
 pointer	sp, line
 real	r, g, b, scale
@@ -67,7 +68,8 @@ begin
 	} else if (nscan() == 3) {
 	    call seek (fd, BOF)
 rdmap_	    call smark (sp)
-	    call salloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (line, sz_val, TY_CHAR)
 	    stat = getline (fd, Memc[line])
 	    i = 1
 	    ncolors = 256
@@ -113,6 +115,7 @@ int	ncolors				#i number of colors in map
 real	brightness			#i brightness offset
 real	contrast			#i contrast scale
 
+size_t	sz_val
 pointer	sp, ctmp
 int	i, c1, c2
 short 	r, g, b
@@ -120,7 +123,8 @@ real	x, y, z, frac, slope, offset
 
 begin
 	call smark (sp)
-	call salloc (ctmp, 3*CMAP_SIZE, TY_CHAR)
+	sz_val = 3*CMAP_SIZE
+	call salloc (ctmp, sz_val, TY_CHAR)
 	call aclrc (Memc[ctmp], 3*CMAP_SIZE)
 
 	slope = max (-7.0, min (7.0, contrast))

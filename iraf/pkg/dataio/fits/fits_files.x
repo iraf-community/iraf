@@ -16,6 +16,7 @@ int	first_file		# the first file in the list
 int	last_file		# the last file in the list
 int	nfiles			# the number of files in the list
 
+size_t	sz_val
 int	i, j, maxncols, maxnlines, nrfiles, rp, rbegin, rend, rstep
 int	last_ext, ebegin, eend, estep, ep, nefiles
 pointer	sp, extensions, str, axes, pl
@@ -27,9 +28,11 @@ pointer	pl_create()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (extensions, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (axes, 2, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (extensions, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = 2
+	call salloc (axes, sz_val, TY_INT)
 
 	# Initialize the file list.
 	pl = NULL

@@ -24,6 +24,7 @@ int	x,y			#I center coords of circle
 int	radius			#I radius of circle
 int	rop			#I rasterop
 
+size_t	sz_val
 int	y1, y2
 pointer	sp, ufd
 bool	pl_ucircle()
@@ -32,7 +33,8 @@ extern	pl_ucircle()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	call salloc (ufd, LEN_CIRCLEDES, TY_STRUCT)
+	sz_val = LEN_CIRCLEDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
 	y1 = max ( 1, min (PL_AXLEN(pl,2), y - radius))
 	y2 = max (y1, min (PL_AXLEN(pl,2), y + radius))

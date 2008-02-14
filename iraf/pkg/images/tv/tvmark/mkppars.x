@@ -7,6 +7,7 @@ procedure mk_ppars (mk)
 
 pointer	mk		# pointer to the immark structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	mk_stati()
@@ -15,7 +16,8 @@ real	mk_statr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Store the mark type.
 	call mk_stats (mk, MARK, Memc[str], SZ_LINE)

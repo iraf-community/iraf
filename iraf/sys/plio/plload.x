@@ -14,6 +14,7 @@ procedure pl_load (pl, bp)
 pointer	pl			#I mask descriptor
 pointer	bp			#I buffer pointer (to short)
 
+size_t	sz_val
 pointer	sp, index, ex, ip
 int	o_lllen, o_nlp, sz_index, flags, nlp, i
 errchk	malloc, realloc, syserr
@@ -22,7 +23,8 @@ pointer	coerce()
 
 begin
 	call smark (sp)
-	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
+	sz_val = LEN_PLEXTERN
+	call salloc (ex, sz_val, TY_STRUCT)
 
 	o_lllen = PL_LLLEN(pl)
 	o_nlp = PL_NLP(pl)
@@ -57,7 +59,8 @@ begin
 	else if (nlp != o_nlp)
 	    call realloc (PL_LPP(pl), nlp, TY_INT)
 
-	call salloc (index, sz_index, TY_SHORT)
+	sz_val = sz_index
+	call salloc (index, sz_val, TY_SHORT)
 	ip = bp + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
 	call miiupk16 (Mems[ip], Mems[index], sz_index, TY_SHORT)
 	PL_NLP(pl) = pl_l2pi (Mems[index], 1, PL_LP(pl,1), nlp)

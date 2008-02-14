@@ -220,6 +220,7 @@ char	ibuf[ARB]		#O data buffer
 int	nbytes			#I nbytes to be written
 int	boffset			#I file offset
 
+size_t	sz_val
 pointer fit, im, sp, obuf
 bool	noconvert, lscale, lzero, bfloat
 int	ip, op, pixtype, npix, totpix, nb, nchars, i
@@ -313,7 +314,8 @@ begin
 	obufsize = (nbytes + SZB_CHAR-1) / SZB_CHAR
 
 	call smark (sp)
-	call salloc (obuf, obufsize, TY_CHAR)
+	sz_val = obufsize
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	# Preserve any leading non-pixel data.
 	op = 1
@@ -430,6 +432,7 @@ char    obuf[ARB]		#O Output data buffer
 int	nbytes			#I Size in bytes of the output buffer
 int	boffset			#I Byte offset into the virtual image
 
+size_t	sz_val
 pointer sp, buf, fit, op
 double	bscale, bzero
 int	ip, nelem, pfactor
@@ -496,7 +499,8 @@ begin
 
 	# Allocate space for TY_SHORT
 	call smark(sp)
-	call salloc (buf, buf_size/SZB_CHAR, TY_SHORT)
+	sz_val = buf_size/SZB_CHAR
+	call salloc (buf, sz_val, TY_SHORT)
 	    
 	call zardbf (FIT_IO(fit), Mems[buf], buf_size, offset)
 	call zawtbf (FIT_IO(fit), status)

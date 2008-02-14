@@ -32,6 +32,7 @@ procedure qpf_wattr (qpf, im)
 pointer	qpf				#I QPF descriptor
 pointer	im				#I image descriptor
 
+size_t	sz_val
 real	r1, r2, rsum
 double	d1, d2, dsum
 int	dtype, i, j, xlen, nranges, i1, i2, isum
@@ -52,11 +53,14 @@ begin
 	ex = qpio_statp (io, QPIO_EX)
 
 	call smark (sp)
-	call salloc (kwname, SZ_FNAME, TY_CHAR)
-	call salloc (kwval, SZ_LINE, TY_CHAR)
-	call salloc (pname, SZ_FNAME, TY_CHAR)
-	call salloc (funame, SZ_FNAME, TY_CHAR)
-	call salloc (atname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kwname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (kwval, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pname, sz_val, TY_CHAR)
+	call salloc (funame, sz_val, TY_CHAR)
+	call salloc (atname, sz_val, TY_CHAR)
 
 	# Process a sequence of "defattrN" header parameter definitions.
 	# Each defines a parameter to be computed and added to the output

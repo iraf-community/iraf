@@ -36,6 +36,7 @@ procedure wl_wcslab (wd)
 
 pointer wd 	 # I: the WCSLAB descriptor
 
+size_t	sz_val
 int	old_clip, old_pltype, old_txquality, old_wcs
 pointer	sp, wcs_save_block
 real	old_plwidth, old_txsize, old_txup
@@ -45,7 +46,8 @@ real	gstatr()
 begin
 	# Allocate working space.
 	call smark(sp)
-	call salloc(wcs_save_block, SAVE_BLOCK_SIZE, TY_STRUCT)
+	sz_val = SAVE_BLOCK_SIZE
+	call salloc(wcs_save_block, sz_val, TY_STRUCT)
 
 	# Store certain graphics parameters.
 	old_plwidth = gstatr (WL_GP(wd), G_PLWIDTH)

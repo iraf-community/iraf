@@ -138,6 +138,7 @@ pointer	tty			# TTY descriptor
 char	text[ARB]		# line of text to be output
 int	map_cc			# enable mapping of SO, SE control chars
 
+size_t	sz_val
 pointer	sp, ostrike, op
 bool	so_seen, so_mode_in_effect
 int	ip, so_type, ocol, junk, ch, tabchar
@@ -146,7 +147,8 @@ errchk	tty_break_line, putci, ttyctrl, ttyso
 
 begin
 	call smark (sp)
-	call salloc (ostrike, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ostrike, sz_val, TY_CHAR)
 
 	so_mode_in_effect = false
 	so_type = T_SOTYPE(tty)

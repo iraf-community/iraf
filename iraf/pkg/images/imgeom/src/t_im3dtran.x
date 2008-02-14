@@ -27,6 +27,7 @@ int	len_blk, new_ax[3], which3d
 pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, im1, im2, mw
 
+size_t	sz_val
 bool	clgetb(), envgetb()
 int	clgeti(), imtgetim(), imtlen(), whichtran()
 pointer	imtopen(), immap(), mw_openim()
@@ -35,11 +36,13 @@ errchk	im3dtranpose(), mw_openim(), mw_saveim(), mw_close(), im3dtrmw()
 begin
 	# Get some working space.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
 
 	# Get input and output image template lists, the size of the transpose
 	# block, and the transpose mapping.
@@ -368,6 +371,7 @@ procedure im3dtrmw (mw, which3d)
 pointer	mw			#I pointer to the mwcs structure
 int	which3d			#I type of 3D transpose
 
+size_t	sz_val
 int	i, axes[IM_MAXDIM], axval[IM_MAXDIM]
 int	naxes, pdim, nelem, axmap, ax1, ax2, ax3, szatstr
 pointer	sp, ltr, ltm, ltv, cd, r, w, ncd, nr
@@ -392,17 +396,24 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ltr, nelem, TY_DOUBLE)
-	call salloc (cd, nelem, TY_DOUBLE)
-	call salloc (r, pdim, TY_DOUBLE)
-	call salloc (w, pdim, TY_DOUBLE)
-	call salloc (ltm, nelem, TY_DOUBLE) 
-	call salloc (ltv, pdim, TY_DOUBLE)
-	call salloc (ncd, nelem, TY_DOUBLE)
-	call salloc (nr, pdim, TY_DOUBLE)
-	call salloc (attribute1, SZ_FNAME, TY_CHAR)
-	call salloc (attribute2, SZ_FNAME, TY_CHAR)
-	call salloc (attribute3, SZ_FNAME, TY_CHAR)
+	sz_val = nelem
+	call salloc (ltr, sz_val, TY_DOUBLE)
+	call salloc (cd, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (r, sz_val, TY_DOUBLE)
+	call salloc (w, sz_val, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (ltm, sz_val, TY_DOUBLE) 
+	sz_val = pdim
+	call salloc (ltv, sz_val, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (ncd, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (nr, sz_val, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (attribute1, sz_val, TY_CHAR)
+	call salloc (attribute2, sz_val, TY_CHAR)
+	call salloc (attribute3, sz_val, TY_CHAR)
 
 	# Get the wterm which corresponds to the original logical to
 	# world transformation.

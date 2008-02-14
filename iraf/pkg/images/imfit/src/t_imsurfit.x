@@ -25,6 +25,7 @@ char	imtlist2[SZ_LINE]			# Output image list
 char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
+size_t	sz_val
 char	str[SZ_LINE], region_str[SZ_LINE]
 int	region_type
 pointer	list1, list2, im1, im2, imfit, gl, sp
@@ -37,7 +38,8 @@ real	clgetr()
 begin
 	# Allocate space for imfit structure.
 	call smark (sp)
-	call salloc (imfit, LEN_IMSFSTRUCT, TY_STRUCT)
+	sz_val = LEN_IMSFSTRUCT
+	call salloc (imfit, sz_val, TY_STRUCT)
 
 	# Get task parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
@@ -155,6 +157,7 @@ pointer	gl			# good pixel list descriptor
 int	region_type		# type of good region
 char	region_string[ARB]	# region parameters
 
+size_t	sz_val
 int	i, ip, zero, nvals, range_min, r2, xdist, max_nranges
 int	x1, x2, y1, y2, temp, border, xcenter, ycenter, radius
 int	columns[7]
@@ -170,7 +173,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
+	sz_val = 3 * max_nranges + 1
+	call salloc (ranges, sz_val, TY_INT)
 
 	# Compute the good pixel list.
 	switch (region_type) {

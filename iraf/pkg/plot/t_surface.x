@@ -238,6 +238,7 @@ real	z[ncols, nlines]	# Array of intensity values
 real	angh			# Angle of horizontal inclination
 real	angv			# Angle of vertical inclination
 
+size_t	sz_val
 pointer	sp, x_val, y_val, kvec
 char	tlabel[SZ_TLABEL]
 real	xmin, ymin, delta, fact1, flo, hi, xcen, ycen
@@ -251,9 +252,12 @@ common	/noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
 	call smark (sp)
-	call salloc (x_val,   ncols + 2,  TY_REAL)
-	call salloc (y_val,  nlines + 2, TY_REAL)
-	call salloc (kvec, max (ncols, nlines) + 2, TY_REAL)
+	sz_val = ncols + 2
+	call salloc (x_val, sz_val,  TY_REAL)
+	sz_val = nlines + 2
+	call salloc (y_val, sz_val, TY_REAL)
+	sz_val = max (ncols, nlines) + 2
+	call salloc (kvec, sz_val, TY_REAL)
 
 	# Get window coordinates set up in calling procedure.
 	call ggwind (gp, wc1, wc2, wl1, wl2)
@@ -425,12 +429,14 @@ real	yvals[nvals]
 real	zval
 pointer	sp, xt, yt
 int	i
+size_t	sz_val
 real	dum
 
 begin
 	call smark (sp)
-	call salloc (xt, nvals, TY_REAL)
-	call salloc (yt, nvals, TY_REAL)
+	sz_val = nvals
+	call salloc (xt, sz_val, TY_REAL)
+	call salloc (yt, sz_val, TY_REAL)
 
 	do i = 1, nvals 
 	    call trn32s (xvals[i], yvals[i], zval, Memr[xt+i-1], Memr[yt+i-1], 

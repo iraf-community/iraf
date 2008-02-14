@@ -17,6 +17,7 @@ int	wktype			#O the output field datatype
 char	wkunits[ARB]		#O the outpit field units string
 int	sz_wkunits		#I the maximum size of the units string
 
+size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic(), cq_wrdstr()
@@ -27,7 +28,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
+	sz_val = CQ_SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (wfield, Memc[fname], CQ_SZ_FNAME,
@@ -126,6 +128,7 @@ int	iktype			#O the output field datatype
 char	ikunits[ARB]		#O the outpit field units string
 int	sz_ikunits		#I the maximum size of the units string
 
+size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic(), cq_wrdstr()
@@ -136,7 +139,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
+	sz_val = CQ_SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (kfield, Memc[fname], CQ_SZ_FNAME,

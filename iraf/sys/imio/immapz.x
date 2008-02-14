@@ -15,6 +15,7 @@ char	imspec[ARB]		# image specification
 int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
+size_t	sz_val
 pointer	sp, imname, root, cluster, ksection, section, im
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
 int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti()
@@ -22,11 +23,13 @@ errchk	im_make_newcopy, im_init_newimage, malloc
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_PATHNAME, TY_CHAR)
-	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
-	call salloc (ksection, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (cluster, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ksection, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	call salloc (root, sz_val, TY_CHAR)
 
 	# The user or system manager can specify the minimum user area size
 	# as an environment variable, if the IRAF default is too small.

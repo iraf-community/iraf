@@ -28,6 +28,7 @@ int	len_name		# length of an object name
 int	wtflag			# type of weighting
 int	stat			# Error code (output)
 
+size_t	sz_val
 int	i, wcs, key, gkey, newgraph
 int	xtype, xvar, ytype, yvar, xt, xv, yt, yv
 real	fit
@@ -40,19 +41,22 @@ real	nlevalr()
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate and initialize a copy of the weights. A new copy
 	# of the weights is used because it is necessary to have the
 	# original values to restore them back when the user deletes
 	# and undeletes points.
 
-	call salloc (oldwts, npts, TY_REAL)
+	sz_val = npts
+	call salloc (oldwts, sz_val, TY_REAL)
 	call amovr (wts, Memr[oldwts], npts)
 
 	# Allocate space for help page and prompt, and get them.
-	call salloc (help, SZ_LINE, TY_CHAR)
-	call salloc (prompt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (help, sz_val, TY_CHAR)
+	call salloc (prompt, sz_val, TY_CHAR)
 	call in_gstr (in, INLHELP, Memc[help], SZ_LINE)
 	call in_gstr (in, INLPROMPT, Memc[prompt], SZ_LINE)
 

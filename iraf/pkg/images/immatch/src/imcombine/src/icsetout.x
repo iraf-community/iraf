@@ -19,6 +19,7 @@ pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
+size_t	sz_val
 int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd, offtype
 real	val
 bool	proj, reloff, flip, streq(), fp_equald()
@@ -34,17 +35,23 @@ define	newscan_ 10
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (ltv, IM_MAXDIM, TY_DOUBLE)
-	call salloc (ltm, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
-	call salloc (lref, IM_MAXDIM, TY_DOUBLE)
-	call salloc (wref, IM_MAXDIM, TY_DOUBLE)
-	call salloc (cd, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
-	call salloc (coord, IM_MAXDIM, TY_DOUBLE)
-	call salloc (shift, IM_MAXDIM, TY_REAL)
-	call salloc (axno, IM_MAXDIM, TY_INT)
-	call salloc (axval, IM_MAXDIM, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (ltv, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM*IM_MAXDIM
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM
+	call salloc (lref, sz_val, TY_DOUBLE)
+	call salloc (wref, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM*IM_MAXDIM
+	call salloc (cd, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM
+	call salloc (coord, sz_val, TY_DOUBLE)
+	call salloc (shift, sz_val, TY_REAL)
+	call salloc (axno, sz_val, TY_INT)
+	call salloc (axval, sz_val, TY_INT)
 
 	# Check and set the image dimensionality.
 	indim = IM_NDIM(in[1])
@@ -120,7 +127,8 @@ begin
 	    }
 	    reloff = true
 	case PHYSICAL:
-	    call salloc (section, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (section, sz_val, TY_CHAR)
 
 	    call mw_gltermd (mw, Memd[ltm], Memd[coord], indim)
 	    do i = 2, nimages {

@@ -17,6 +17,7 @@ int	npts				# Number of points
 int	nvars				# Number of variables
 real	wx, wy				# Cursor position
 
+size_t	sz_val
 int	pt
 pointer	sp, xout, yout
 
@@ -25,8 +26,9 @@ int	ing_nd(), gt_geti()
 begin
 	# Allocate memory for axes data
 	call smark (sp)
-	call salloc (xout, npts, TY_DOUBLE)
-	call salloc (yout, npts, TY_DOUBLE)
+	sz_val = npts
+	call salloc (xout, sz_val, TY_DOUBLE)
+	call salloc (yout, sz_val, TY_DOUBLE)
 
 	# Set axes data
 	call ing_axesd (in, gt, nl, 1, x, y, Memd[xout], npts, nvars)

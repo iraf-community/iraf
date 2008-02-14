@@ -21,6 +21,7 @@ real	xmag, ymag			# input picture scale
 real	xrotation, yrotation		# rotation angle
 int	nxblock, nyblock		# block size of image to be used
 
+size_t	sz_val
 bool	verbose
 int	ndim, nc, nl, mode
 pointer	list1, list2, tflist
@@ -39,18 +40,22 @@ errchk	immap()
 begin
 	# Set up  the geotran structure.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (transform, SZ_FNAME, TY_CHAR)
-	call salloc (record, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (imroot, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (geo, LEN_GEOSTRUCT, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (transform, sz_val, TY_CHAR)
+	call salloc (record, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (imroot, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = LEN_GEOSTRUCT
+	call salloc (geo, sz_val, TY_STRUCT)
 
 	# Get the input and output lists and database file.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -286,6 +291,7 @@ procedure geo_imzero (im, constant)
 pointer	im			#I pointer to the input image
 real	constant		#I the constant value to insert in the imagw
 
+size_t	sz_val
 int	npix
 pointer	sp, v, buf
 int	impnls(), impnll(), impnlr(), impnld(), impnlx()
@@ -293,7 +299,8 @@ int	impnls(), impnll(), impnlr(), impnld(), impnlx()
 begin
         # Setup start vector for sequential reads and writes.
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
         call amovkl (long(1), Meml[v], IM_MAXDIM)
 
         # Initialize the image.
@@ -748,6 +755,7 @@ pointer	sy1		# pointer to the linear y coordinate surface
 double	ltm[2,2]	# rotation matrix
 double	ltv[2]		# shift vector
 
+size_t	sz_val
 double	xscale, yscale, xmin, ymin
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -759,8 +767,9 @@ begin
 	# Allocate space for the coefficients.
 	call smark (sp)
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
-	call salloc (xcoeff, ncoeff, TY_REAL)
-	call salloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call salloc (xcoeff, sz_val, TY_REAL)
+	call salloc (ycoeff, sz_val, TY_REAL)
 
 	# Fetch the coefficients.
 	call gssave (sx1, Memr[xcoeff])
@@ -829,6 +838,7 @@ double	gltm[ldim,ldim]		# the input cd matrix from geotran
 double	gltv[ldim]		# the input shift vector from geotran
 int	ldim			# number of logical dimensions
 
+size_t	sz_val
 int	axes[IM_MAXDIM], naxes, pdim, nelem, axmap, ax1, ax2
 pointer	sp, ltm, ltv_1, ltv_2
 int	mw_stati()
@@ -853,9 +863,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ltm, nelem, TY_DOUBLE)
-	call salloc (ltv_1, pdim, TY_DOUBLE)
-	call salloc (ltv_2, pdim, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (ltv_1, sz_val, TY_DOUBLE)
+	call salloc (ltv_2, sz_val, TY_DOUBLE)
 
 	# Initialize the vectors and matrices.
 	call mw_mkidmd (Memd[ltm], pdim)

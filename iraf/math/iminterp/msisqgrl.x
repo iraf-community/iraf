@@ -13,7 +13,6 @@ pointer	msi		# pointer to the interpolant descriptor structure
 real	x1, x2		# x integration limits
 real	y1, y2		# y integration limits
 
-size_t	sz_val
 int	i, interp_type, nylmin, nylmax, offset 
 pointer	xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
@@ -41,8 +40,7 @@ begin
 	}
 
 	# set up temporary storage for x integrals
-	sz_val = MSI_NYCOEFF(msi)
-	call calloc (xintegrl, sz_val, TY_REAL)
+	call calloc (xintegrl, MSI_NYCOEFF(msi), TY_REAL)
 
 	# switch order of x integration at the end
 	xmin = x1

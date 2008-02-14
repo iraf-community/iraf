@@ -34,8 +34,7 @@ begin
 	}
 
 	# allocate space for new surface
-	sz_val = LEN_GSSTRUCT
-	call calloc (sf2, sz_val, TY_STRUCT)
+	call calloc (sf2, LEN_GSSTRUCT, TY_STRUCT)
 
 	# check the order of the derivatives and return 0 if the order is
 	# high
@@ -140,8 +139,7 @@ begin
 	GS_WZ(sf2) = NULL
 
 	# allocate space for coefficients
-	sz_val = GS_NCOEFF(sf2)
-	call calloc (GS_COEFF(sf2), sz_val, TY_REAL)
+	call calloc (GS_COEFF(sf2), GS_NCOEFF(sf2), TY_REAL)
 
 	# get coefficients
 	call smark (sp)

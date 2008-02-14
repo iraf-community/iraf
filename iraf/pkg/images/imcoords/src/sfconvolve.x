@@ -136,6 +136,7 @@ real	kernel[nxk,nyk]		#I the convolution kernel
 int	skip[nxk,nyk]		#I the skip array
 int	nxk, nyk		#I dimensions of the kernel
 
+size_t	sz_val
 int	i, col1, col2, inline, index, outline
 pointer	sp, lineptrs
 pointer	imgs2r()
@@ -144,7 +145,8 @@ errchk	imgs2r
 begin
 	# Set up an array of linepointers.
 	call smark (sp)
-	call salloc (lineptrs, nyk, TY_POINTER)
+	sz_val = nyk
+	call salloc (lineptrs, sz_val, TY_POINTER)
 
 	# Set the number of image buffers.
 	call imseti (im, IM_NBUFS, nyk)
@@ -219,6 +221,7 @@ int	nxk, nyk		#I dimensions of the kernel
 real	gsums[ARB]		#U array of kernel sums
 real	datamin, datamax	#I the good data minimum and maximum
 
+size_t	sz_val
 int	i, nc, col1, col2, inline, index, outline
 pointer	sp, lineptrs, sd, sgsq, sg, p
 pointer	imgs2r()
@@ -227,17 +230,19 @@ errchk	imgs2r()
 begin
 	# Set up an array of linepointers.
 	call smark (sp)
-	call salloc (lineptrs, nyk, TY_POINTER)
+	sz_val = nyk
+	call salloc (lineptrs, sz_val, TY_POINTER)
 
 	# Set the number of image buffers.
 	call imseti (im, IM_NBUFS, nyk)
 
 	# Allocate some working space.
 	nc = c2 - c1 + 2 * bwidth + 1
-	call salloc (sd, nc, TY_REAL)
-	call salloc (sgsq, nc, TY_REAL)
-	call salloc (sg, nc, TY_REAL)
-	call salloc (p, nc, TY_REAL)
+	sz_val = nc
+	call salloc (sd, sz_val, TY_REAL)
+	call salloc (sgsq, sz_val, TY_REAL)
+	call salloc (sg, sz_val, TY_REAL)
+	call salloc (p, sz_val, TY_REAL)
 
 	# Set input image column limits.
 	col1 = c1 - nxk / 2 - bwidth

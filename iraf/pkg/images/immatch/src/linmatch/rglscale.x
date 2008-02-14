@@ -14,6 +14,7 @@ pointer	db		#I pointer to the database file
 int	dformat		#I write the output file in database format
 pointer	ls		#I pointer to the linscale structure
 
+size_t	sz_val
 pointer	sp, image, imname
 real	bscale, bzero, bserr, bzerr
 bool	streq()
@@ -26,8 +27,9 @@ int	rg_lstati(), fscan(), nscan()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
 	call rg_lstats (ls, IMAGE, Memc[image], SZ_FNAME)
 
 	# Initialize.
@@ -236,6 +238,7 @@ pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to image
 int	i		#I the region id
 
+size_t	sz_val
 int	stat, nrimcols, nrimlines, nimcols, nimlines, nrcols, nrlines, ncols 
 int	nlines, rc1, rc2, rl1, rl2, c1, c2, l1, l2, xstep, ystep, npts
 pointer	sp, str, ibuf, rbuf, prc1, prc2, prxstep, prl1, prl2, prystep
@@ -253,7 +256,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Delete the data of the previous region if any.
 	rbuf = rg_lstatp (ls, RBUF)
@@ -737,6 +741,7 @@ real	tbzero		#O the computed bzero factor
 real	tbserr		#O the computed error in bscale
 real	tbzerr		#O the computed error in bzero
 
+size_t	sz_val
 int	i, bsalg, bzalg, nregions
 pointer	sp, weight
 real	answers[MAX_NFITPARS]
@@ -750,7 +755,8 @@ begin
 	nregions = rg_lstati (ls, NREGIONS)
 
 	call smark (sp)
-	call salloc (weight, nregions, TY_REAL)
+	sz_val = nregions
+	call salloc (weight, sz_val, TY_REAL)
 
 	if (bsalg == LS_MEAN || bzalg == LS_MEAN) {
 	    do i = 1, nregions {
@@ -920,6 +926,7 @@ real	bzero		#O the average offset parameter
 real	bserr		#O the error in bscale
 real	bzerr		#O the error in bzero
 
+size_t	sz_val
 int	rec
 pointer	sp, record
 int	dtlocate()
@@ -927,7 +934,8 @@ real	dtgetr()
 
 begin
 	call smark (sp)
-	call salloc (record, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (record, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, RECORD, Memc[record], SZ_FNAME)
 	iferr {

@@ -10,6 +10,7 @@ define	SZ_OPNAME	64
 
 procedure imemsg (ier, errmsg)
 
+size_t	sz_val
 int	ier			# error code
 %	character*(*) errmsg
 
@@ -113,7 +114,8 @@ begin
 
 	if (ier == e_ier && e_opname[1] != EOS) {
 	    call smark (sp)
-	    call salloc (ostr, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (ostr, sz_val, TY_CHAR)
 
 	    call f77upk (errmsg, Memc[ostr], SZ_LINE)
 	    call strcat (" (", Memc[ostr], SZ_LINE)
@@ -153,13 +155,15 @@ procedure im_seterrim (ier, im)
 int	ier			# current error code
 pointer	im			# image descriptor
 
+size_t	sz_val
 int	junk
 pointer	sp, opname
 int	fnroot()
 
 begin
 	call smark (sp)
-	call salloc (opname, SZ_OPNAME, TY_CHAR)
+	sz_val = SZ_OPNAME
+	call salloc (opname, sz_val, TY_CHAR)
 
 	junk = fnroot (IM_HDRFILE(im), Memc[opname], TY_CHAR)
 	call im_seterrop (ier, Memc[opname])

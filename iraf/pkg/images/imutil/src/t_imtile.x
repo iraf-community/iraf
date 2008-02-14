@@ -12,6 +12,7 @@ int	nimages, nmissing, subtract, verbose
 pointer	it, sp, outimage, trimsection, medsection, nullinput, ranges
 pointer	str, index, c1, c2, l1, l2, isnull, median, imlist, outim
 
+size_t	sz_val
 bool	clgetb()
 char	clgetc()
 int	btoi(), clgwrd(), imtlen(), clgeti(), decode_ranges(), it_get_imtype()
@@ -24,12 +25,15 @@ begin
 
 	# Allocate temporary working space.
 	call smark (sp)
-	call salloc (outimage, SZ_FNAME, TY_CHAR)
-	call salloc (trimsection, SZ_FNAME, TY_CHAR)
-	call salloc (medsection, SZ_FNAME, TY_CHAR)
-	call salloc (nullinput, SZ_FNAME, TY_CHAR)
-	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outimage, sz_val, TY_CHAR)
+	call salloc (trimsection, sz_val, TY_CHAR)
+	call salloc (medsection, sz_val, TY_CHAR)
+	call salloc (nullinput, sz_val, TY_CHAR)
+	sz_val = 3 * MAX_NRANGES + 1
+	call salloc (ranges, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input image list and the output image name.
 	imlist = imtopenp ("input")
@@ -81,13 +85,14 @@ begin
 	    "opixtype")))
 
 	# Allocate space for and setup the section descriptors.
-	call salloc (index, nimages, TY_INT)
-	call salloc (c1, nimages, TY_INT)
-	call salloc (c2, nimages, TY_INT)
-	call salloc (l1, nimages, TY_INT)
-	call salloc (l2, nimages, TY_INT)
-	call salloc (isnull, nimages, TY_INT)
-	call salloc (median, nimages, TY_REAL)
+	sz_val = nimages
+	call salloc (index, sz_val, TY_INT)
+	call salloc (c1, sz_val, TY_INT)
+	call salloc (c2, sz_val, TY_INT)
+	call salloc (l1, sz_val, TY_INT)
+	call salloc (l2, sz_val, TY_INT)
+	call salloc (isnull, sz_val, TY_INT)
+	call salloc (median, sz_val, TY_REAL)
 
 	call it_setup (it, imlist, Memi[ranges], Memc[trimsection],
 	    Memc[medsection], outim, Memi[index], Memi[c1], Memi[c2],
@@ -155,6 +160,7 @@ int	l2[ARB]			# array of ending line limits
 int	isnull[ARB]		# output input image order number
 real	median[ARB]		# output median of input image
 
+size_t	sz_val
 int	i, j, k, nimrows, nimcols, imcount, next_null
 pointer	sp, imname, im, buf
 int	get_next_number(), imtgetim()
@@ -166,7 +172,8 @@ begin
 	nimrows = IM_LEN(outim,2)
 
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	imcount = 1
 	next_null = 0
@@ -234,6 +241,7 @@ int	nimcols		# number of output image columns
 int	nimrows		# number of output image rows
 int	opixtype	# output image pixel type
 
+size_t	sz_val
 int	ijunk, nc, nr
 pointer	sp, imname, im, outim
 int	imtgetim()
@@ -241,7 +249,8 @@ pointer	immap()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	# Get the size of the first subraster.
 	if (imtgetim (list, Memc[imname], SZ_FNAME) != EOF) {
@@ -305,6 +314,7 @@ int	nysub		# number of subrasters per output image row
 real	oval		# pixel value of undefined output image regions
 int	subtract	# subtract the median off each subraster
 
+size_t	sz_val
 int	i, j, noutcols, noutlines, olineptr, ll1, ll2
 pointer	sp, inimage, imptrs, buf
 int	imtrgetim()
@@ -313,8 +323,10 @@ pointer	immap(), impl2r()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (imptrs, nxsub, TY_POINTER)
-	call salloc (inimage, SZ_FNAME, TY_CHAR)
+	sz_val = nxsub
+	call salloc (imptrs, sz_val, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (inimage, sz_val, TY_CHAR)
 
 	# Sort the subrasters on the yindex.
 	do i = 1, nxsub * nysub
@@ -580,13 +592,15 @@ real    median[ARB]     # array of medians
 int     nsub            # number of subrasters
 int     subtract        # subtract the median from the subraster
 
+size_t	sz_val
 int     i
 pointer sp, imname
 int     imtrgetim()
 
 begin
         call smark (sp)
-        call salloc (imname, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (imname, sz_val, TY_CHAR)
 
         do i = 1, nsub {
 

@@ -111,6 +111,7 @@ real	z1,z2			# range of input greylevels to be mapped.
 int	zt			# log or linear greylevel transformation
 pointer uptr			# pointer to user transformation table
 
+size_t	sz_val
 bool	unitary_greyscale_transformation
 short	lut1, lut2, z1_s, z2_s, dz1_s, dz2_s
 real	dz1, dz2
@@ -137,7 +138,8 @@ begin
 
 	# Output array, and limiting x values in NDC
 
-	call salloc (out, nx, TY_SHORT)
+	sz_val = nx
+	call salloc (out, sz_val, TY_SHORT)
 	xs = real(wx1 - 1) * cv_xcon / GKI_MAXNDC
 	# Don't subtract 1 from wx2 as we want it to be first one not filled
 	xe = real(wx2) * cv_xcon / GKI_MAXNDC
@@ -210,7 +212,8 @@ begin
 		}
 	    }
 	} else {
-	    call salloc (outr, nx, TY_REAL)
+	    sz_val = nx
+	    call salloc (outr, sz_val, TY_REAL)
 	    for (wy=wy1;  wy <= wy2;  wy=wy+1) {
 		in  = sigl2r (si, wy - wy1 + 1)
 		y = real(wy - 1) * cv_ycon / GKI_MAXNDC
@@ -253,6 +256,7 @@ pointer	im			# input image
 pointer	wdes			# window descriptor
 int	wx1,wx2,wy1,wy2		# section of display window filled by image data
 
+size_t	sz_val
 int	dx1,dx2,dy1,dy2		# coords of full display window in device pixels
 int	j, n, n1
 pointer	w0
@@ -263,7 +267,8 @@ include	"cv.com"
 
 begin
 	call smark (sp)
-	call salloc (zero, cv_xres, TY_SHORT)
+	sz_val = cv_xres
+	call salloc (zero, sz_val, TY_SHORT)
 	call aclrs (Mems[zero], cv_xres)
 
 	# Compute device pixel coordinates of the full display window.

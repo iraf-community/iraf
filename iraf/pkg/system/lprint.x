@@ -23,6 +23,7 @@ bool	input_redirected, one_file
 bool	print_heading, auto_header
 pointer	sp, fname, device, label, lp, ddstr, list
 
+size_t	sz_val
 pointer	ttyodes()
 bool	streq(), clgetb()
 int	clplen(), envgets(), lpopen(), clgfil(), ttygets(), btoi()
@@ -32,10 +33,12 @@ errchk	clgfil, lp_print_file
 
 begin
 	call smark (sp)
-	call salloc (fname,  SZ_FNAME, TY_CHAR)
-	call salloc (label,  SZ_FNAME, TY_CHAR)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (ddstr,  SZ_DDSTR, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (label, sz_val, TY_CHAR)
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = SZ_DDSTR
+	call salloc (ddstr, sz_val, TY_CHAR)
 
 	# Open list of files to be printed.
 	list = clpopni ("files")
@@ -121,6 +124,7 @@ char	label[ARB]
 int	map_cc
 bool	print_heading
 
+size_t	sz_val
 bool	one_tab_in, streq()
 int	pageno, lineno, maxlines, totlines, status, in
 long	fi[LEN_FINFO], time, clktime()
@@ -130,8 +134,10 @@ errchk	salloc, finfo, cnvtime, open, ttystati, getline, ttyputline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE+1, TY_CHAR)
-	call salloc (timebuf, SZ_TIME, TY_CHAR)
+	sz_val = SZ_LINE+1
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_TIME
+	call salloc (timebuf, sz_val, TY_CHAR)
 
 	# Get time and date file was last modified.
 	if (print_heading) {

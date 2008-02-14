@@ -16,6 +16,7 @@ procedure ids_putcellarray (m, nc, nr, ax1,ay1, ax2,ay2)
 short	m[ARB]			# cell array
 int	nc, nr			# number of pixels in X and Y
 				# (number of columns[x], rows[y]
+size_t	sz_val
 int	ax1, ay1		# lower left corner of output window
 int	ax2, ay2		# upper right corner of output window
 
@@ -104,7 +105,8 @@ begin
 	    use_orig = false
 	    new_row  = true
 	    # allocate storage for a row of pixels.
-	    call salloc ( cell, nx, TY_SHORT)
+	    sz_val = nx
+	    call salloc ( cell, sz_val, TY_SHORT)
 	}
 
 	# do it

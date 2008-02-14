@@ -15,6 +15,7 @@ int	rl_depth		#I range list depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
+size_t	sz_val
 int	mr, nr
 pointer	sp, rl_out, rl_src, ll_src
 pointer	pl_access()
@@ -28,8 +29,9 @@ begin
 	else {
 	    call smark (sp)
 	    mr = min (RL_MAXLEN(pl), npix * 3)
-	    call salloc (rl_src, mr, TY_INT)
-	    call salloc (rl_out, mr, TY_INT)
+	    sz_val = mr
+	    call salloc (rl_src, sz_val, TY_INT)
+	    call salloc (rl_out, sz_val, TY_INT)
 
 	    nr = pl_l2ri (Mems[ll_src], v[1], Memi[rl_src], npix)
 	    call pl_rangeropi (Memi[rl_src], 1, PL_MAXVAL(pl),

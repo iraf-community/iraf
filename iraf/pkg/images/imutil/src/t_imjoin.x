@@ -20,6 +20,7 @@ int	outpixtype, verbose
 pointer	list, sp, in, out, im, im1, input, output
 size_t	bufsize, maxsize, memory, oldsize, sz_fg
 
+size_t	sz_val
 bool	clgetb()
 #char	clgetc()
 int	imtlen(), imtgetim(), clgeti(), btoi()
@@ -33,8 +34,9 @@ define	retry_	99
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
 
 	# Get the parameters. Note that clgetc no longer accepts a blank
 	# string as input so clgstr is used to fetch the pixtype parameter
@@ -54,7 +56,8 @@ begin
 	    call sfree (sp)
 	    call error (0, "The input image list is empty")
 	} else
-	    call salloc (in, nimages, TY_POINTER)
+	    sz_val = nimages
+	    call salloc (in, sz_val, TY_POINTER)
 
 	# Check the the join dimension is not too large.
 	if (joindim > IM_MAXDIM)

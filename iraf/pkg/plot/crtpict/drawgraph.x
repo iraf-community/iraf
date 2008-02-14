@@ -17,6 +17,7 @@ pointer	im	# Pointer to input image
 pointer	cl	# Pointer to cl parameter structure
 pointer	wdes	# Pointer to window descriptor
 
+size_t	sz_val
 pointer	w1, w0
 char	text[SZ_LINE],  system_id[SZ_LINE]
 int	ndev_rows, ndev_cols
@@ -141,7 +142,8 @@ begin
 	# addition to the sequence number written by the 11/23 program.
 
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	if (envfind ("userid", Memc[buf], SZ_LINE) <= 0) {
 	    call getuid (Memc[buf], SZ_LINE)

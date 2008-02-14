@@ -34,6 +34,7 @@ char	system1[ARB]		#I input coordinate system
 char	system2[ARB]		#I output coordinate system
 int	axbits			#I bitmap defining axes to be transformed
 
+size_t	sz_val
 bool	newfunc
 int	naxes, axis[MAX_DIM], wfno, fn, epa
 int	i, j, k , matlen, ndata, ctlen, pdim
@@ -114,12 +115,18 @@ begin
 	pdim = min (MI_NDIM(mw), pdim)
 
 	i = pdim * pdim
-	call salloc (i_ltm, i, TY_DOUBLE)
-	call salloc (i_ltv, pdim, TY_DOUBLE)
-	call salloc (o_ltm, i, TY_DOUBLE)
-	call salloc (o_ltv, pdim, TY_DOUBLE)
-	call salloc (t_ltm, i, TY_DOUBLE)
-	call salloc (t_ltv, pdim, TY_DOUBLE)
+	sz_val = i
+	call salloc (i_ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (i_ltv, sz_val, TY_DOUBLE)
+	sz_val = i
+	call salloc (o_ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (o_ltv, sz_val, TY_DOUBLE)
+	sz_val = i
+	call salloc (t_ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (t_ltv, sz_val, TY_DOUBLE)
 
 	# Compute the transformation.  A transformation between any two
 	# world systems W1 and W2 consists of the transformation W1->P

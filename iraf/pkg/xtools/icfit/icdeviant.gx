@@ -26,6 +26,7 @@ int	refit				# Refit the curve?
 int	nreject				# Number of points rejected
 int	newreject			# Number of new points rejected
 
+size_t	sz_val
 int	i, j, i_min, i_max, ilast
 PIXEL	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
@@ -39,7 +40,8 @@ begin
 	# Allocate memory for the residuals.
 
 	call smark (sp)
-	call salloc (residuals, npts, TY_PIXEL)
+	sz_val = npts
+	call salloc (residuals, sz_val, TY_PIXEL)
 
 	# Compute the residuals.
 

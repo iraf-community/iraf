@@ -20,7 +20,6 @@ int	lineno		# line number
 real	z[ARB]		# surface values
 real	w[ARB]		# weight values
 
-size_t	sz_val
 int	i, j
 pointer	xbzptr, xczptr, xcindex, xlzptr
 
@@ -34,8 +33,7 @@ begin
 	call aclrr (XCOEFF(xczptr+1), SF_NXCOEFF(sf))
 
 	if (SF_WZ(sf) == NULL)
-	    sz_val = SF_NXPTS(sf)
-	    call malloc (SF_WZ(sf), sz_val, MEM_TYPE)
+	    call malloc (SF_WZ(sf), SF_NXPTS(sf), MEM_TYPE)
 
 	# calculate new right sides
 	call amulr (w, z, Memr[SF_WZ(sf)], SF_NXPTS(sf))
@@ -54,8 +52,7 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 
 	    if (SF_TLEFT(sf) == NULL)
-	        sz_val = SF_NXPTS(sf)
-	        call malloc (SF_TLEFT(sf), sz_val, TY_INT)
+	        call malloc (SF_TLEFT(sf), SF_NXPTS(sf), TY_INT)
 
 	    do i = 1, SF_NXPTS(sf)
 		Memi[SF_TLEFT(sf)+i-1] = XLEFT(xlzptr+cols[i]) + xczptr

@@ -23,6 +23,7 @@ int	mfd, verify, nframes, junk
 int	this_frame, frames[3,MAX_RANGES]
 pointer	list, index, sp
 
+size_t	sz_val
 bool	clgetb()
 int	clgfil(), open(), get_next_number()
 int	decode_ranges(), btoi(), gke_user_go_ahead()
@@ -31,7 +32,8 @@ pointer	clpopni()
 begin
 	# Allocate space for the index array.
 	call smark (sp)
-	call salloc (index, 4 * MAX_FRAMES, TY_INT)
+	sz_val = 4 * MAX_FRAMES
+	call salloc (index, sz_val, TY_INT)
 
 	list = clpopni ("input")
 	call clgstr ("frames", frames_list, SZ_LINE)
@@ -112,6 +114,7 @@ int	mf			# Metacode file descriptor
 int	index[4,ARB]		# Index of metacode frames
 int	this_frame		# Current frame number
 
+size_t	sz_val
 int	mc_begin, nchars
 pointer	metacode, sp
 int	read()
@@ -121,7 +124,8 @@ begin
 	# Allocate space for the metacode instructions
 	call smark (sp)
 	nchars = index[3,this_frame] * SZ_SHORT
-	call salloc (metacode, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (metacode, sz_val, TY_CHAR)
 
 	# Position to proper place in metacode file
 	mc_begin = index[2,this_frame]

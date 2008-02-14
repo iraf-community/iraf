@@ -21,6 +21,7 @@ int	stream			# graphics stream
 short	gki[ARB]		# encoded graphics control instruction
 int	source_pid		# pid of requesting process
 
+size_t	sz_val
 bool	redirected
 pointer	tr, sp, devname, gki_out
 int	flags, mode, nwords, fd, p_fd
@@ -31,10 +32,12 @@ include	"gtr.com"
 
 begin
 	call smark (sp)
-	call salloc (devname, SZ_TRDEVNAME, TY_CHAR)
+	sz_val = SZ_TRDEVNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	nwords = gki[GKI_HDR_LENGTH]
-	call salloc (gki_out, nwords, TY_SHORT)
+	sz_val = nwords
+	call salloc (gki_out, sz_val, TY_SHORT)
 	call amovs (gki, Mems[gki_out], nwords)
 
 	tr = gtr_init (stream)

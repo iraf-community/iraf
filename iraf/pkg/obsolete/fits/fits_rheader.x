@@ -154,6 +154,7 @@ int	fd_usr		# file descriptor of user area
 char	card[ARB]	# FITS card
 int	ndiscard	# Number of cards for which no space available
 
+size_t	sz_val
 char	cval, str[LEN_CARD]
 double	dval
 int	nchar, ival, i, j, k, len
@@ -167,7 +168,8 @@ include	"rfits.com"
 
 begin
 	call smark (sp)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (comment, sz_val, TY_CHAR)
 
 	i = COL_VALUE
 	if (strmatch (card, "^END     ") != 0) {

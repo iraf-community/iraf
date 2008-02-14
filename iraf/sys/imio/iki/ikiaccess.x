@@ -20,6 +20,7 @@ char	root[ARB]		#O image/group file name
 char	extn[ARB]		#O image/group file extension
 int	acmode
 
+size_t	sz_val
 bool	first_time
 int	i, k, status, op
 pointer	sp, osroot, fname, textn, fextn, ip
@@ -32,10 +33,12 @@ include	"iki.com"
 
 begin
 	call smark (sp)
-	call salloc (osroot, SZ_PATHNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (textn, MAX_LENEXTN, TY_CHAR)
-	call salloc (fextn, MAX_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osroot, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (textn, sz_val, TY_CHAR)
+	call salloc (fextn, sz_val, TY_CHAR)
 
 	# The first call makes sure the IKI kernels are loaded into the kernel
 	# table.

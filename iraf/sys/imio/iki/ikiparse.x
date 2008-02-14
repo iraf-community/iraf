@@ -12,6 +12,7 @@ char	image[ARB]			#I input image name
 char	root[SZ_PATHNAME]		#U output root pathname
 char	extn[MAX_LENEXTN]		#O output extension
 
+size_t	sz_val
 pointer	sp, imname
 int	ip, op, dot
 int	strlen(), iki_validextn()
@@ -19,7 +20,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	dot = 0
 	op  = 1

@@ -12,6 +12,7 @@ int	list		#I List of images
 char	output[ARB]	#I Name of output image
 char	mask[ARB]	#I Name of output mask
 
+size_t	sz_val
 int	i, j, npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM], line_outbpm[IM_MAXDIM]
 pointer	sp, input, bpmname, key, in, out, inbpm, outbpm, buf_in, buf_out, ptr
@@ -26,9 +27,10 @@ errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (bpmname, SZ_FNAME, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (bpmname, sz_val, TY_CHAR)
+	call salloc (key, sz_val, TY_CHAR)
 
 	iferr {
 	    # Add each input image to the output image.

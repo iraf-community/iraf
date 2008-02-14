@@ -93,6 +93,7 @@ char	fname[ARB]
 int	nlines
 int	insert
 
+size_t	sz_val
 char	line[IDB_RECLEN+1], blk, lf
 pointer	sp, ln, buf, urp
 int 	ip, op, fd, in_last_blank, out_last_blank, blen, len, w, k
@@ -101,8 +102,9 @@ int	open(), getline(), strlen()
 
 begin
 	call smark(sp)
-	call salloc (ln, SZ_LINE, TY_CHAR)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (buf, sz_val, TY_CHAR)
 
 	fd = open(fname, READ_ONLY, TEXT_FILE)
         nlines= 0

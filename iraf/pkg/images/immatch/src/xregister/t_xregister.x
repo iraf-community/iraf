@@ -17,6 +17,7 @@ pointer	interpstr		# interpolant type
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
+size_t	sz_val
 int	tfd, stat, nregions
 int	c1, c2, l1, l2, ncols, nlines
 pointer	reglist, reflist, reclist, list1, listr, list2
@@ -38,14 +39,17 @@ begin
 	# Allocate temporary working space.
 	call smark (sp)
 
-	call salloc (freglist, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (interpstr, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (freglist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (interpstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters and open lists.
 	call clgstr ("input", Memc[str], SZ_LINE)

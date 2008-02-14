@@ -6,6 +6,7 @@ include	"imfort.h"
 
 procedure imtypk (im, keyw, dtype, comm, ier)
 
+size_t	sz_val
 pointer	im			# image descriptor
 %	character*(*) keyw
 int	dtype			# receives datatype code
@@ -17,8 +18,10 @@ int	errcode()
 
 begin
 	call smark (sp)
-	call salloc (kp, SZ_KEYWORD, TY_CHAR)
-	call salloc (cp, SZ_VALSTR, TY_CHAR)
+	sz_val = SZ_KEYWORD
+	call salloc (kp, sz_val, TY_CHAR)
+	sz_val = SZ_VALSTR
+	call salloc (cp, sz_val, TY_CHAR)
 
 	call f77upk (keyw, Memc[kp], SZ_KEYWORD)
 	iferr (call imgatr (im, Memc[kp], dtype, Memc[cp], len(comm))) {

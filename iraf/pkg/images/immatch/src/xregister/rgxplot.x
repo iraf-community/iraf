@@ -12,6 +12,7 @@ int	nliner		#I the reference line
 int	xshift		#I x shift
 int	yshift		#I y shift
 
+size_t	sz_val
 int	i, rncols, rnlines, incols, inlines
 pointer	sp, title, xr, xi, ptrr, ptri
 real	ymin, ymax, tymin, tymax
@@ -41,9 +42,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
-	call salloc (xr, rncols, TY_REAL)
-	call salloc (xi, rncols, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = rncols
+	call salloc (xr, sz_val, TY_REAL)
+	call salloc (xi, sz_val, TY_REAL)
 
 	# Initialize the x data data.
 	do i = 1, rncols {
@@ -104,6 +107,7 @@ int	ncolr		#I the line number
 int	xshift		#I xshift to be applied
 int	yshift		#I yshift to be applied
 
+size_t	sz_val
 int	i, rncols, rnlines, incols, inlines
 pointer	sp, title, xr, xi, ptrr, ptri
 real	ymin, ymax, tymin, tymax
@@ -133,9 +137,12 @@ begin
 
 	# Allocate valid working space.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
-	call salloc (xr, rnlines, TY_REAL)
-	call salloc (xi, inlines, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = rnlines
+	call salloc (xr, sz_val, TY_REAL)
+	sz_val = inlines
+	call salloc (xi, sz_val, TY_REAL)
 
 	# Initialize the data.
 	do i = 1, rnlines {
@@ -192,6 +199,7 @@ real	data[nx,ARB]	#I the input data array
 int	nx, ny		#I dimensions of the input data array
 int	nline		#I the line number
 
+size_t	sz_val
 int	i
 pointer	sp, str, x
 real	ymin, ymax
@@ -207,8 +215,10 @@ begin
 
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (x, nx, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = nx
+	call salloc (x, sz_val, TY_REAL)
 
 	# Initialize the data.
 	do i = 1, nx
@@ -239,6 +249,7 @@ real	data[nx,ARB]	#I the input data array
 int	nx, ny		#I the dimensions of the input data array
 int	ncol		#I line number
 
+size_t	sz_val
 int	i
 pointer	sp, x, y
 real	ymin, ymax
@@ -254,8 +265,9 @@ begin
 
 	# Initialize.
 	call smark (sp)
-	call salloc (x, ny, TY_REAL)
-	call salloc (y, ny, TY_REAL)
+	sz_val = ny
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
 
 	# Get the data to be plotted.
 	do i = 1, ny {
@@ -289,6 +301,7 @@ int	ywindow		#I y dimension of correlation function
 real	xshift		#O x shift
 real	yshift		#O y shift
 
+size_t	sz_val
 int	wcs, key
 pointer	sp, cmd
 real	wx, wy
@@ -299,7 +312,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call printf ("Mark peak of the cross correlation function\n")
 	if (clgcur ("gcommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) == EOF)

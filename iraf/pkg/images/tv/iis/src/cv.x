@@ -16,6 +16,7 @@ pointer	gp
 char	device[SZ_FNAME]
 char	command[SZ_LINE]
 
+size_t	sz_val
 pointer	gopen(), sp
 int	dd[LEN_GKIDD]
 
@@ -25,7 +26,8 @@ include	"cv.com"
 
 begin
 	call smark (sp)
-	call salloc (cv_stack, CVLEN, TY_SHORT)
+	sz_val = CVLEN
+	call salloc (cv_stack, sz_val, TY_SHORT)
 
 	if (envgets ("stdimage", device, SZ_FNAME) == 0)
 	    call error (EA_FATAL,

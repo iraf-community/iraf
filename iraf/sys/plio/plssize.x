@@ -13,6 +13,7 @@ int	naxes			#I number of axes (dimensionality of mask)
 long	axlen[ARB]		#I length of each axis
 int	depth			#I mask depth, bits
 
+size_t	sz_val
 int	npix, i
 pointer	sp, px, lp
 int	pl_p2ls()
@@ -21,7 +22,8 @@ errchk	malloc, calloc, mfree
 begin
 	npix = axlen[1]
 	call smark (sp)
-	call salloc (px, npix, TY_SHORT)
+	sz_val = npix
+	call salloc (px, sz_val, TY_SHORT)
 
 	# Initialize the old descriptor.
 	if (PL_LPP(pl) != NULL)

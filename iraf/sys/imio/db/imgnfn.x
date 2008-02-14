@@ -101,6 +101,7 @@ pointer	im			# image descriptor
 char	template[ARB]		# field name template
 int	sort			# sort flag
 
+size_t	sz_val
 bool	escape
 int	tp, nstr, ch, junk, first_string, nstrings, nmatch, i
 pointer	sp, ip, op, fn, kwname, sbuf, pattern, patcode, nextch
@@ -109,9 +110,11 @@ errchk	syserr
 
 begin
 	call smark (sp)
-	call salloc (kwname, SZ_FNAME, TY_CHAR)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (patcode, SZ_LINE,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kwname, sz_val, TY_CHAR)
+	call salloc (pattern, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patcode, sz_val,  TY_CHAR)
 
 	# Allocate field list descriptor.
 	call calloc (fn, LEN_FNSTRUCT, TY_STRUCT)
@@ -253,6 +256,7 @@ int	nstr			# current number of strings
 pointer	nextch			# next available char in string buffer
 pointer	sbuf			# string buffer
 
+size_t	sz_val
 pointer	sp, op, key
 bool	validfield, match
 int	ip, index, nmatch
@@ -264,7 +268,8 @@ errchk	imfn_putkey
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	call strcpy ("i_", Memc[key], SZ_FNAME)
 	index = 1

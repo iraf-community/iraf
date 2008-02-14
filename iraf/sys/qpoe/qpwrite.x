@@ -17,6 +17,7 @@ int	nelem			#I number of data elements to write
 int	first			#I first data element to write to
 char	datatype[ARB]		#I datatype of input data
 
+size_t	sz_val
 pointer	sp, fm, sym, tbuf, isym, osym
 int	fd, sz_itype, sz_otype, last, otype, itype
 errchk	qp_bind, qp_gpsym, fm_getfd, seek, syserrs
@@ -62,7 +63,8 @@ begin
 	# Output the data.
 	if (otype != itype) {
 	    call smark (sp)
-	    call salloc (tbuf, nelem * sz_otype, TY_CHAR)
+	    sz_val = nelem * sz_otype
+	    call salloc (tbuf, sz_val, TY_CHAR)
 	    call acht (buf, Memc[tbuf], nelem, itype, otype)
 	    call write (fd, Memc[tbuf], nelem * sz_otype)
 	    call sfree (sp)

@@ -19,6 +19,7 @@ int	decpl		# number of decimal places of precision
 int	fmtchar		# format character (efg)
 int	width		# field width of each number (0=free format)
 
+size_t	sz_val
 char	numbuf[MAX_DIGITS]
 int	npix, ip, j, ndigits, nspaces, maxch
 pointer	sp, obuf, op, pix, cp
@@ -28,7 +29,8 @@ errchk	imgnlx, putline
 
 begin
 	call smark (sp)
-	call salloc (obuf, maxll+1, TY_CHAR)
+	sz_val = maxll+1
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	call amovkl (long(1), v, IM_MAXDIM)
 	npix = IM_LEN(im,1)

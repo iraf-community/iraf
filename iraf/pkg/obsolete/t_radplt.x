@@ -71,6 +71,7 @@ real	xstart, ystart
 int	boxsize
 real	xcntr, ycntr
 
+size_t	sz_val
 int	x1, x2, y1, y2, half_box
 int	ncols, nrows, nx, ny, try
 real	xinit, yinit
@@ -100,8 +101,10 @@ begin
 
 	    # Collapse to two 1-D arrays
 	    call smark (sp)
-	    call salloc (x_vect, nx, TY_REAL)
-	    call salloc (y_vect, ny, TY_REAL)
+	    sz_val = nx
+	    call salloc (x_vect, sz_val, TY_REAL)
+	    sz_val = ny
+	    call salloc (y_vect, sz_val, TY_REAL)
 
 	    call aclrr (Memr[x_vect], nx)
 	    call aclrr (Memr[y_vect], ny)
@@ -142,6 +145,7 @@ char	imname[ARB]
 real	xcntr, ycntr
 int	rboxsize
 
+size_t	sz_val
 int	x1, x2, y1, y2, half_box
 pointer	bufptr, title, sp, gp, op
 int	ncols, nrows, nx, ny, i, j
@@ -152,7 +156,8 @@ pointer	gopen()
 
 begin
 	call smark (sp)
-	call salloc (title, SZ_TITLE, TY_CHAR)
+	sz_val = SZ_TITLE
+	call salloc (title, sz_val, TY_CHAR)
 
 	half_box = (rboxsize - 1) / 2
 	xinit = xcntr

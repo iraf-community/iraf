@@ -23,12 +23,14 @@ procedure rg_xnshow (xc)
 
 pointer	xc	#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set the object characteristics.
 	call printf ("\nInput/output data\n")
@@ -81,6 +83,7 @@ procedure rg_xbshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 int	back
 pointer	sp, str
 int	rg_xstati()
@@ -88,7 +91,8 @@ real	rg_xstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	back = rg_xstati (xc, BACKGRD)
 	call printf ("Background fitting parameters:\n")
@@ -122,12 +126,14 @@ procedure rg_xxshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("Cross correlation function:\n")
 	call rg_xstats (xc, CSTRING, Memc[str], SZ_LINE)
@@ -150,12 +156,14 @@ procedure rg_xpshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("Peak centering parameters:\n")
 	call rg_xstats (xc, PSTRING, Memc[str], SZ_LINE)

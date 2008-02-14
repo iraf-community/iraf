@@ -10,6 +10,7 @@ int	maxchars		# Maximum characters per line
 bool	shortest		# Stop of shortest file?
 bool	verbose			# Verbose warnings?
 
+size_t	sz_val
 char	c
 pointer	sp, fname, fds
 int	i, j, in
@@ -21,9 +22,11 @@ bool	clgetb()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (delim, SZ_FNAME, TY_CHAR)
-	call salloc (missing, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (delim, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (missing, sz_val, TY_CHAR)
 
 	# Task parameters
 

@@ -23,6 +23,7 @@ char	pakname[ARB]		# name of package
 int	paknum			# package number in root directory
 pointer	ctrl			# help control params
 
+size_t	sz_val
 bool	multiple_directories
 int	m, fd
 pointer	sp, indices, hdr, fname, hp_pak, lbuf, obuf
@@ -33,11 +34,15 @@ errchk	hd_getname, ttystati
 
 begin
 	call smark (sp)
-	call salloc (indices, MAX_MODULES, TY_POINTER)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (hdr, SZ_FNAME, TY_CHAR)
-	call salloc (obuf, SZ_OBUF, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = MAX_MODULES
+	call salloc (indices, sz_val, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (hdr, sz_val, TY_CHAR)
+	sz_val = SZ_OBUF
+	call salloc (obuf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Get the filename of the help directory for the package.
 	if (hd_getname (hp,paknum,TY_PKG,Memc[fname],SZ_FNAME) == 0) {
@@ -57,7 +62,8 @@ begin
 	# in an array for the table print routine.
 
 	for (m=0;  m < MAX_MODULES;  m=m+1) {
-	    call salloc (Memi[indices+m], MAX_NAMELEN, TY_CHAR)
+	    sz_val = MAX_NAMELEN
+	    call salloc (Memi[indices+m], sz_val, TY_CHAR)
 	    if (hd_getname (hp_pak, m+1, TY_MODNAME, Memc[Memi[indices+m]],
 		MAX_NAMELEN) == 0)
 		    break

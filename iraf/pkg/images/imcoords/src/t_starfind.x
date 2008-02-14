@@ -12,6 +12,7 @@ pointer	olist, imlist, sp, image, output, outfname, str, wcs, wxformat, wyformat
 pointer	im, sf
 real	constant
 
+size_t	sz_val
 bool	clgetb()
 int	imtlen(), clplen(), clgwrd(), btoi(), open()
 int	clgeti(), imtgetim(), clgfil(), fnldir(), strncmp(), strlen()
@@ -24,13 +25,15 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
-	call salloc (wxformat, SZ_FNAME, TY_CHAR)
-	call salloc (wyformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (wcs, sz_val, TY_CHAR)
+	call salloc (wxformat, sz_val, TY_CHAR)
+	call salloc (wyformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the image and output file lists.
 	imlist = imtopenp ("image")
@@ -124,14 +127,16 @@ char    ext[ARB]                #I extension
 char    name[ARB]               #O output name
 int     maxch                   #I maximum size of name
 
+size_t	sz_val
 int     ndir, nimdir, clindex, clsize
 pointer sp, root, str
 int     fnldir(), strlen()
 
 begin
         call smark (sp)
-        call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (root, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
         ndir = fnldir (output, name, maxch)
         if (strlen (output) == ndir) {
@@ -191,6 +196,7 @@ char    template[ARB]                   #I name template
 char    filename[ARB]                   #O output name
 int     maxch                           #I maximum number of characters
 
+size_t	sz_val
 char    period
 int     newversion, version, len
 pointer sp, list, name
@@ -200,7 +206,8 @@ pointer	fntopnb()
 begin
         # Allocate temporary space
         call smark (sp)
-        call salloc (name, maxch, TY_CHAR)
+        sz_val = maxch
+        call salloc (name, sz_val, TY_CHAR)
         period = '.'
         list = fntopnb (template, NO)
 

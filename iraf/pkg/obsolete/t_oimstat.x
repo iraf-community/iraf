@@ -15,6 +15,7 @@ real	upper				# Upper limit of data value window
 real	binwidth			# Width of histogram bin in sigma
 int	format				# Format the output
 
+size_t	sz_val
 int	nfields, nbins
 int	minmax, npix, mean, median, mode, stddev, skew, kurtosis
 pointer	sp, fields, image, v
@@ -28,11 +29,16 @@ pointer	imtopenp(), immap()
 
 begin
 	call smark (sp)
-	call salloc (fieldstr, SZ_LINE, TY_CHAR)
-	call salloc (fields, NFIELDS, TY_INT)
-	call salloc (ist, LEN_IMSTAT, TY_STRUCT)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_LINE
+	call salloc (fieldstr, sz_val, TY_CHAR)
+	sz_val = NFIELDS
+	call salloc (fields, sz_val, TY_INT)
+	sz_val = LEN_IMSTAT
+	call salloc (ist, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Open the list of input images, the fields and the data value limits.
 	list = imtopenp ("images")
@@ -149,6 +155,7 @@ char	fieldstr[ARB]		# string containing the list of fields
 int	fields[ARB]		# fields array
 int	max_nfields		# maximum number of fields
 
+size_t	sz_val
 int	nfields, flist, field
 pointer	sp, fname
 int	fntopenb(), fntgfnb(), strdic()
@@ -157,7 +164,8 @@ begin
 	nfields = 0
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	flist = fntopenb (fieldstr, NO)
 	while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF && 
@@ -717,6 +725,7 @@ real	hwidth		# resolution of the histogram
 real	hmin		# minimum histogram value
 real	hmax		# maximum histogram value
 
+size_t	sz_val
 int	i, lo, hi
 pointer	sp, ihgm
 real	h1, hdiff, hnorm
@@ -724,7 +733,8 @@ bool	fp_equalr()
 
 begin
 	call smark (sp)
-	call salloc (ihgm, nbins, TY_REAL)
+	sz_val = nbins
+	call salloc (ihgm, sz_val, TY_REAL)
 
 	# Integrate the histogram and normalize.
 	Memr[ihgm] = hgm[1]

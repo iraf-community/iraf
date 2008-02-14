@@ -25,13 +25,15 @@ real	contrast		# adj. to slope of transfer function
 int	optimal_sample_size	# desired number of pixels in sample
 int	len_stdline		# optimal number of pixels per line
 
+size_t	sz_val
 int	nc, nl
 pointer	sp, section, zpm, zsc_pmsection()
 errchk	zsc_pmsection, mzscale
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Make the sample image section.
 	switch (IM_NDIM(im)) {
@@ -68,6 +70,7 @@ real	contrast		#I contrast parameter
 int	maxpix			#I maximum number of pixels in sample
 real	z1, z2			#O output min and max greyscale values
 
+size_t	sz_val
 int	i, ndim, nc, nl, npix, nbp
 pointer	sp, section, v, sample, zmask, bp, zim, pmz, pmb, buf
 
@@ -78,9 +81,12 @@ errchk	zsc_pmsection, zsc_zlimits
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call salloc (sample, maxpix, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = maxpix
+	call salloc (sample, sz_val, TY_REAL)
 	zmask = NULL
 	bp = NULL
 
@@ -116,13 +122,17 @@ begin
 	call amovkl (long(1), Memi[v], IM_MAXDIM)
 	repeat {
 	    if (pm_linenotempty (pmz, Meml[v])) {
-		if (zmask == NULL)
-		    call salloc (zmask, nc, TY_INT)
+		if (zmask == NULL) {
+		    sz_val = nc
+		    call salloc (zmask, sz_val, TY_INT)
+		}
 		call pmglpi (pmz, Meml[v], Memi[zmask], 0, nc, 0)
 		if (pmb != NULL) {
 		    if (pm_linenotempty (pmb, Meml[v])) {
-			if (bp == NULL)
-			    call salloc (bp, nc, TY_INT)
+			if (bp == NULL) {
+			    sz_val = nc
+			    call salloc (bp, sz_val, TY_INT)
+			}
 			call pmglpi (pmb, Meml[v], Memi[bp], 0, nc, 0)
 			nbp = nc
 		    } else
@@ -384,6 +394,7 @@ real	krej			# k-sigma pixel rejection factor
 int	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
+size_t	sz_val
 int	i, ngoodpix, last_ngoodpix, minpix, niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
@@ -405,9 +416,10 @@ begin
 	# Allocate a buffer for data minus fitted curve, another for the
 	# normalized X values, and another to flag rejected pixels.
 
-	call salloc (flat, npix, TY_REAL)
-	call salloc (normx, npix, TY_REAL)
-	call salloc (badpix, npix, TY_SHORT)
+	sz_val = npix
+	call salloc (flat, sz_val, TY_REAL)
+	call salloc (normx, sz_val, TY_REAL)
+	call salloc (badpix, sz_val, TY_SHORT)
 	call aclrs (Mems[badpix], npix)
 
 	# Compute normalized X vector.  The data X values [1:npix] are

@@ -6,6 +6,7 @@ include	"imfort.h"
 
 procedure imgkwr (im, keyw, rval, ier)
 
+size_t	sz_val
 pointer	im			# imfort image descriptor
 %       character*(*) keyw
 real	rval
@@ -17,7 +18,8 @@ int	errcode()
 
 begin
 	call smark (sp)
-	call salloc (kp, SZ_KEYWORD, TY_CHAR)
+	sz_val = SZ_KEYWORD
+	call salloc (kp, sz_val, TY_CHAR)
 
 	call f77upk (keyw, Memc[kp], SZ_KEYWORD)
 	iferr (rval = imgetr (im, Memc[kp])) {

@@ -27,6 +27,7 @@ pointer	ie
 int	mode
 real	x, y
 
+size_t	sz_val
 bool	center, background, medsky, fitplot, clgpsetb()
 real	radius, buffer, width, magzero, rplot, beta, clgpsetr()
 int	fittype, xorder, yorder, clgpseti(), strdic()
@@ -50,9 +51,11 @@ string	mlabel "#\
 
 begin
 	call smark (sp)
-	call salloc (fittypes, SZ_FNAME, TY_CHAR)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (coords, IE_SZTITLE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fittypes, sz_val, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
 
 	iferr (im = ie_gimage (ie, NO)) {
 	    call erract (EA_WARN)
@@ -133,14 +136,16 @@ begin
 	ny = y2 - y1 + 1
 	npts = nx * ny
 
-	call salloc (xs, npts, TY_REAL)
-	call salloc (ys, npts, TY_REAL)
-	call salloc (ws, npts, TY_REAL)
+	sz_val = npts
+	call salloc (xs, sz_val, TY_REAL)
+	call salloc (ys, sz_val, TY_REAL)
+	call salloc (ws, sz_val, TY_REAL)
 
 	# Extract the background data if background subtracting.
 	ns = 0
 	if (background && width > 0.) {
-	    call salloc (zs, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (zs, sz_val, TY_REAL)
 
 	    r1 = radius ** 2
 	    r2 = (radius + buffer) ** 2

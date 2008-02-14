@@ -82,15 +82,17 @@ char	output[ARB]			#U Output image to use
 char	original[ARB]			#O Root of original output image
 int	sz_fname			#I Maximum size of image names
 
+size_t	sz_val
 pointer	sp, inname, outname, extn
 int	i, j, k, gstrmatch(), strncmp(), fnextn()
 bool	xt_imnameeq()
 
 begin
 	call smark (sp)
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
 
 	# Strip image sections leaving only the path and root image name
 	# (with group and image kernel parameters).  To change to

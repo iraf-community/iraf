@@ -260,11 +260,13 @@ int	value			# I Keyword value (YES, NO)
 char	comment[ARB]		# I Comment
 pointer pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
 	call smark (sp)
-	call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (pc, sz_val, TY_CHAR)
 
 	call fxf_encodeb (keyword, value, Memc[pc], comment)
 	call amovc (Memc[pc], Memc[pn], LEN_CARD)
@@ -284,11 +286,13 @@ int	value			# I Keyword value
 char	comment[ARB]		# I Comment
 pointer pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
 	call smark (sp)
-	call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (pc, sz_val, TY_CHAR)
 
 	call fxf_encodei (keyword, value, Memc[pc], comment)
 	call amovc (Memc[pc], Memc[pn], LEN_CARD)
@@ -309,11 +313,13 @@ char	comment[ARB]		# I Comment
 int	precision
 pointer pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
 	call smark (sp)
-	call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (pc, sz_val, TY_CHAR)
 
 	call fxf_encoder (keyword, value, Memc[pc], comment, precision)
 	call amovc (Memc[pc], Memc[pn], LEN_CARD)
@@ -334,11 +340,13 @@ char	comment[ARB]		# I Comment
 int	precision
 pointer pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
 	call smark (sp)
-	call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (pc, sz_val, TY_CHAR)
 
 	call fxf_encoded (keyword, value, Memc[pc], comment, precision)
 	call amovc (Memc[pc], Memc[pn], LEN_CARD)

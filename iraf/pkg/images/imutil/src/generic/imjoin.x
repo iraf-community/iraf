@@ -15,6 +15,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -24,13 +25,16 @@ int	impnls()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 
@@ -102,6 +106,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -111,13 +116,16 @@ int	impnli()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 
@@ -189,6 +197,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -198,13 +207,16 @@ int	impnll()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 
@@ -276,6 +288,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -285,13 +298,16 @@ int	impnlr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 
@@ -363,6 +379,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -372,13 +389,16 @@ int	impnld()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 
@@ -450,6 +470,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
@@ -459,13 +480,16 @@ int	impnlx()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (vin, nimages, TY_INT)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (vin, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	do image = 1, nimages {
-	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
 	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
 	}
 

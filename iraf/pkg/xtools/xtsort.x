@@ -7,6 +7,7 @@ procedure xt_sort2 (a1, a2, npts)
 real	a1[npts], a2[npts]		# Arrays to be sorted
 int	npts				# Number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, index, ptr
 
@@ -15,8 +16,9 @@ extern	xts_compare
 
 begin
 	call smark (sp)
-	call salloc (index, npts, TY_INT)
-	call salloc (ptr, npts, TY_REAL)
+	sz_val = npts
+	call salloc (index, sz_val, TY_INT)
+	call salloc (ptr, sz_val, TY_REAL)
 
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
@@ -47,6 +49,7 @@ procedure xt_sort3 (a1, a2, a3, npts)
 real	a1[npts], a2[npts], a3[npts]	# Arrays to be sorted
 int	npts				# Number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, index, ptr
 
@@ -55,8 +58,9 @@ extern	xts_compare
 
 begin
 	call smark (sp)
-	call salloc (index, npts, TY_INT)
-	call salloc (ptr, npts, TY_REAL)
+	sz_val = npts
+	call salloc (index, sz_val, TY_INT)
+	call salloc (ptr, sz_val, TY_REAL)
 
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
@@ -93,6 +97,7 @@ procedure xt_sort4 (a1, a2, a3, a4, npts)
 real	a1[npts], a2[npts], a3[npts], a4[npts]	# Arrays to be sorted
 int	npts					# Number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, index, ptr
 
@@ -101,8 +106,9 @@ extern	xts_compare
 
 begin
 	call smark (sp)
-	call salloc (index, npts, TY_INT)
-	call salloc (ptr, npts, TY_REAL)
+	sz_val = npts
+	call salloc (index, sz_val, TY_INT)
+	call salloc (ptr, sz_val, TY_REAL)
 
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
@@ -161,6 +167,7 @@ procedure xt_sort3d (a1, a2, a3, npts)
 double	a1[npts], a2[npts], a3[npts]	# Arrays to be sorted
 int	npts				# Number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, index, ptr
 
@@ -169,8 +176,9 @@ extern	xts_compared
 
 begin
 	call smark (sp)
-	call salloc (index, npts, TY_INT)
-	call salloc (ptr, npts, TY_DOUBLE)
+	sz_val = npts
+	call salloc (index, sz_val, TY_INT)
+	call salloc (ptr, sz_val, TY_DOUBLE)
 
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1

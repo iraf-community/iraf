@@ -16,13 +16,15 @@ char	device[ARB]		# full device specification
 char	ldevice[maxch]		# logical device name
 int	maxch
 
+size_t	sz_val
 pointer	sp, nodename
 int	ip, op, ch
 int	ki_extnode()
 
 begin
 	call smark (sp)
-	call salloc (nodename, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (nodename, sz_val, TY_CHAR)
 
 	ip = ki_extnode (device, Memc[nodename], maxch, op) + 1
 

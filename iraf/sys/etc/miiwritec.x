@@ -11,6 +11,7 @@ int	fd			# output file
 char	spp[ARB]		# data to be written
 int	nchars			# number of chars units to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize()
@@ -20,7 +21,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nchars, MII_BYTE)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipak8 (spp, Memc[bp], nchars, TY_CHAR)
 	call write (fd, Memc[bp], bufsize)

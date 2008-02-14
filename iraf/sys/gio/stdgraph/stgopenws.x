@@ -18,6 +18,7 @@ short	devname[ARB]		#I device name (actually device[,uifname])
 int	n			#I length of device name
 int	mode			#I access mode
 
+size_t	sz_val
 bool	reinit
 long	fi[LEN_FINFO]
 int	dummy, init_file
@@ -33,8 +34,10 @@ define	ow_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, max (SZ_PATHNAME, n), TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = max (SZ_PATHNAME, n)
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Open a termcap descriptor for the terminal too, in case we need
 	# to talk to the terminal as a terminal.

@@ -21,6 +21,7 @@ int procedure prgetline (fd, lbuf)
 int	fd			# parent's input IPC from child process
 char	lbuf[SZ_LINE]		# output line buffer
 
+size_t	sz_val
 char	ch
 int	nchars, maxchars, nchars_read, raw_mode_set, ndigits
 int	bufsize, outfd, destfd, pr, pseudofile, line_type, offset
@@ -141,7 +142,8 @@ begin
 
 	    if (buf == NULL) {
 		bufsize = fstati (fd, F_BUFSIZE)
-		call salloc (buf, bufsize, TY_CHAR)
+		sz_val = bufsize
+		call salloc (buf, sz_val, TY_CHAR)
 	    }
 	    
 	    offset = 8

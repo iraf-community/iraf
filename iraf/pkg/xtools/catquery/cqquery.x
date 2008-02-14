@@ -12,6 +12,7 @@ pointer	procedure cq_query (cq)
 
 pointer	cq			#I the catalog database descriptor
 
+size_t	sz_val
 pointer	cc, res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
@@ -53,7 +54,8 @@ begin
 	    call flush (fd)
 
 	    # Open the output spool file.
-	    call salloc (spfname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (spfname, sz_val, TY_CHAR)
 	    call mktemp ("query", Memc[spfname], SZ_FNAME)
 	    CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
 	    call sfree (sp)
@@ -179,6 +181,7 @@ pointer	cq			#I the catalog database descriptor
 char	catfile[ARB]		#I the input catalog file
 char	catfmt[ARB]		#I the input catalog description
 
+size_t	sz_val
 pointer	res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
@@ -222,7 +225,8 @@ begin
 
 	    # Open the output spool file.
 	    call smark (sp)
-	    call salloc (spfname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (spfname, sz_val, TY_CHAR)
 	    call mktemp ("query", Memc[spfname], SZ_FNAME)
 	    #CQ_RFD(res) = open ("dev$null", READ_WRITE, SPOOL_FILE)
 	    CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
@@ -340,6 +344,7 @@ pointer procedure cq_rinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
+size_t	sz_val
 pointer	cc, res, sp, query, value, kname, fname, funits, ffmt
 int	i, ncount, sz1, sz2, sz3, op1, op2, op3, foffset, fsize
 char	ftype
@@ -360,8 +365,10 @@ begin
 
 	# Format the query.
 	call smark (sp)
-	call salloc (query, SZ_LINE, TY_CHAR)
-	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (query, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPVALUE
+	call salloc (value, sz_val, TY_CHAR)
 	call sprintf (Memc[query], SZ_LINE, CQ_QUERY(cc))
 	do i = 1, CQ_NQPARS(cc) {
 	    if (cq_wrdstr (i, Memc[value], CQ_SZ_QPVALUE,
@@ -429,7 +436,8 @@ begin
 	    call strcpy ("|", Memc[CQ_HKNAMES(res)], sz1)
 	    call strcpy ("|", Memc[CQ_HKVALUES(res)], sz2)
 
-	    call salloc (kname, CQ_SZ_FNAME, TY_CHAR)
+	    sz_val = CQ_SZ_FNAME
+	    call salloc (kname, sz_val, TY_CHAR)
 	    do i = 1, CQ_NHEADER(res) {
 
 		# Get the keyword and value.
@@ -493,9 +501,12 @@ begin
 	ncount = 0
 	if (CQ_NFIELDS(res) > 0) {
 
-	    call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
-	    call salloc (funits, CQ_SZ_FUNITS, TY_CHAR)
-	    call salloc (ffmt, CQ_SZ_FFMTS, TY_CHAR)
+	    sz_val = CQ_SZ_FNAME
+	    call salloc (fname, sz_val, TY_CHAR)
+	    sz_val = CQ_SZ_FUNITS
+	    call salloc (funits, sz_val, TY_CHAR)
+	    sz_val = CQ_SZ_FFMTS
+	    call salloc (ffmt, sz_val, TY_CHAR)
 
 	    # Initialize the name, units, and format string dictionaries.
 	    sz1 = SZ_LINE; op1 = 2
@@ -611,6 +622,7 @@ pointer procedure cq_frinit (cq, catfmt)
 pointer	cq			#I Initialize the results structure.
 char	catfmt[ARB]		#I the catalog format desciption
 
+size_t	sz_val
 pointer	res, sp, fname, funits, ffmt, fvalue
 int	i, ncount, sz1, sz2, sz3, op1, op2, op3, fd, foffset, fsize
 int	fscan(), nscan(), strdic(), strlen(), cq_dtype(), gstrcpy()
@@ -651,10 +663,14 @@ begin
 	CQ_NFIELDS(res) = 0
 
 	call smark(sp)
-	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
-	call salloc (funits, CQ_SZ_FUNITS, TY_CHAR)
-	call salloc (ffmt, CQ_SZ_FFMTS, TY_CHAR)
-	call salloc (fvalue, SZ_LINE, TY_CHAR)
+	sz_val = CQ_SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_FUNITS
+	call salloc (funits, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_FFMTS
+	call salloc (ffmt, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fvalue, sz_val, TY_CHAR)
 
 	# Read in the defined file formats.
 	fd = stropen (catfmt, strlen (catfmt), READ_ONLY)

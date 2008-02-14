@@ -23,6 +23,7 @@ include	"cv.h"
 procedure t_load()
 
 char	image[SZ_FNAME]
+size_t	sz_val
 short	frame[IDS_MAXIMPL+1]
 bool	frame_erase, border_erase
 pointer	im, wdes, sp
@@ -41,8 +42,10 @@ errchk	immap, imunmap, ds_getparams
 
 begin
 	call smark (sp)
-	call salloc (cv_stack, CVLEN, TY_SHORT)
-	call salloc (wdes, LEN_WDES, TY_STRUCT)
+	sz_val = CVLEN
+	call salloc (cv_stack, sz_val, TY_SHORT)
+	sz_val = LEN_WDES
+	call salloc (wdes, sz_val, TY_STRUCT)
 
 	if (envgets ("stdimage", device, SZ_FNAME) == 0)
 	    call error (EA_FATAL,
@@ -151,6 +154,7 @@ pointer	im, wdes		# Image and graphics descriptors
 char	image[SZ_FNAME]		# Should be determined from im
 short	frame[ARB]
 
+size_t	sz_val
 bool	fill, zscale_flag, zrange_flag, zmap_flag
 real	xcenter, ycenter
 real	xsize, ysize, pxsize, pysize
@@ -168,7 +172,8 @@ include	"cv.com"
 
 begin
 	call smark (sp)
-	call salloc (ztrans, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ztrans, sz_val, TY_CHAR)
 
 	# Set up a new graphics descriptor structure defining the coordinate
 	# transformation used to map the image into the display frame.
@@ -297,7 +302,8 @@ begin
 	    W_ZT(w) = W_UNITARY
 	else if (streq (Memc[ztrans], "user")) {
 	    W_ZT(w) = W_USER
-	    call salloc (lutfile, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (lutfile, sz_val, TY_CHAR)
 	    call clgstr ("lutfile", Memc[lutfile], SZ_FNAME)
 	    call cv_ulut (Memc[lutfile], z1, z2, lut)
 	    W_UPTR(w) = lut

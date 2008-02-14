@@ -29,6 +29,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 short	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -50,10 +51,13 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -137,9 +141,12 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
-	if (nimages - n > 0)
-	    call salloc (buf1, (nimages-n)*npix, TY_SHORT)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
+	if (nimages - n > 0) {
+	    sz_val = (nimages-n)*npix
+	    call salloc (buf1, sz_val, TY_SHORT)
+	}
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
@@ -406,6 +413,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 int	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -427,10 +435,13 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -514,9 +525,12 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
-	if (nimages - n > 0)
-	    call salloc (buf1, (nimages-n)*npix, TY_INT)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
+	if (nimages - n > 0) {
+	    sz_val = (nimages-n)*npix
+	    call salloc (buf1, sz_val, TY_INT)
+	}
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
@@ -783,6 +797,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 long	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -804,10 +819,13 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -891,9 +909,12 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
-	if (nimages - n > 0)
-	    call salloc (buf1, (nimages-n)*npix, TY_LONG)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
+	if (nimages - n > 0) {
+	    sz_val = (nimages-n)*npix
+	    call salloc (buf1, sz_val, TY_LONG)
+	}
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
@@ -1160,6 +1181,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 real	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -1181,10 +1203,13 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1268,9 +1293,12 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
-	if (nimages - n > 0)
-	    call salloc (buf1, (nimages-n)*npix, TY_REAL)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
+	if (nimages - n > 0) {
+	    sz_val = (nimages-n)*npix
+	    call salloc (buf1, sz_val, TY_REAL)
+	}
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
@@ -1537,6 +1565,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 double	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -1558,10 +1587,13 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1645,9 +1677,12 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
-	if (nimages - n > 0)
-	    call salloc (buf1, (nimages-n)*npix, TY_DOUBLE)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
+	if (nimages - n > 0) {
+	    sz_val = (nimages-n)*npix
+	    call salloc (buf1, sz_val, TY_DOUBLE)
+	}
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)

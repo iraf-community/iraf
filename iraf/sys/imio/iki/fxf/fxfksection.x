@@ -204,6 +204,7 @@ char	ksection[ARB]		#I Ksection
 int	ip			#I Current parsing pointer in ksection
 pointer	fit			#U Update the values in the FKS structure
 
+size_t	sz_val
 pointer sp, ln
 int     jp, token
 int	ctotok()
@@ -213,7 +214,8 @@ begin
 	jp = ip
 
 	call smark (sp)
-	call salloc (ln, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	# See if the parameter value is given as par=<value> or '+/-'
 	if (ctotok (ksection, jp, Memc[ln], LEN_CARD) == TOK_OPERATOR) {

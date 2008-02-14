@@ -13,6 +13,7 @@ int	cl		# coordinate file descriptor
 int	ltid		# current number in the list
 int	fnt		# font file descriptor
 
+size_t	sz_val
 int	ncols, nlines, nr, nc, x1, x2, y1, y2
 pointer	sp, str, lengths, radii, label
 real	x, y, fx, fy, ofx, ofy, xmag, ymag, lmax, lratio, rmax, ratio
@@ -23,8 +24,9 @@ real	mk_statr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (label, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (label, sz_val, TY_CHAR)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
@@ -35,7 +37,8 @@ begin
 	# Define the rectangles in terms of device coordinates.
 	if (mk_stati (mk, MKTYPE) == MK_RECTANGLE) {
 	    nr = mk_stati (mk, NRECTANGLES)
-	    call salloc (lengths, nr, TY_REAL) 
+	    sz_val = nr
+	    call salloc (lengths, sz_val, TY_REAL) 
 	    if (xmag <= 0.0) {
 	        lmax = 0.0
 	        call amovkr (0.0, Memr[lengths], nr)
@@ -53,7 +56,8 @@ begin
 	# Define the circles in terms of device coordinates.
 	if (mk_stati (mk, MKTYPE) == MK_CIRCLE) {
 	    nc = mk_stati (mk, NCIRCLES)
-	    call salloc (radii, nc, TY_REAL)
+	    sz_val = nc
+	    call salloc (radii, sz_val, TY_REAL)
 	    if (xmag <= 0) {
 	        rmax = 0.0
 	        call amovkr (0.0, Memr[radii], nc)

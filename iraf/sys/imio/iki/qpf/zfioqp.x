@@ -24,13 +24,15 @@ char	pkfn[ARB]		#I packed virtual filename from FIO
 int	mode			#I file access mode (ignored)
 int	status			#O output status - i/o channel if successful
 
+size_t	sz_val
 int	ip
 pointer	sp, fn, qpf
 int	ctoi()
 
 begin
 	call smark (sp)
-	call salloc (fn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fn, sz_val, TY_CHAR)
 
 	# The QPF descriptor is passed encoded in the pseudo filename as
 	# "QPFxxxx" (decimal).  Extract this and return it as the i/o
