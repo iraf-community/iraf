@@ -8,7 +8,6 @@ procedure ex_miff (ex)
 
 pointer	ex					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, hdr, cmap
 int	i, j, flags
 char	ncols[6]
@@ -26,8 +25,7 @@ begin
 
         # Write the header to the file.
         call smark (sp)
-        sz_val = SZ_COMMAND
-        call salloc (hdr, sz_val, TY_CHAR)
+        call salloc (hdr, SZ_COMMAND, TY_CHAR)
         call aclrc (Memc[hdr], SZ_COMMAND)
 
 	call sprintf (ncols, 6, "%d")
@@ -63,8 +61,7 @@ begin
 
 	if (bitset (flags,OF_CMAP)) {
 	    # Write out the colormap.
-            sz_val = 3*CMAP_SIZE
-            call salloc (cmap, sz_val, TY_CHAR)
+            call salloc (cmap, 3*CMAP_SIZE, TY_CHAR)
 	    j = 1
 	    do i = 0, (3*CMAP_SIZE-1), 3 {
 		Memc[cmap+i+0] = CMAP(EX_CMAP(ex), EX_RED,   j)

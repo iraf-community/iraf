@@ -34,7 +34,6 @@ real	a, d			#O x, y scale factors
 real	b, c			#O cross terms (rotations)
 real	tx, ty			#O x, y offsets
 
-size_t	sz_val
 char	ch
 int	fd, chan, status, wcs_status, zt
 real	z1, z2
@@ -45,13 +44,10 @@ include "iis.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (dir, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	sz_val = SZ_WCSTEXT
-	call salloc (wcstext, sz_val, TY_CHAR)
+	call salloc (dir, SZ_PATHNAME, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
 
 	wcs_status = OK
 

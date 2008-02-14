@@ -36,7 +36,6 @@ pointer procedure xtargs_open (argstr)
 
 char	argstr[ARB]			#I Argument string
 
-size_t	sz_val
 int	i, tok
 pointer	sp, key, val, stp, sym
 
@@ -46,10 +45,8 @@ pointer	stopen(), stfind(), stenter()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (key, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (val, sz_val, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (val, SZ_LINE, TY_CHAR)
 
 	# Open symbol table.
 	stp = stopen ("xtargs", 10, 100, 1000)

@@ -106,7 +106,6 @@ char	cmdstr[ARB]		# Colon command
 pointer	gp			# GIO pointer
 int	redraw			# Redraw graph?
  
-size_t	sz_val
 char	gtype
 bool	bval
 real	rval1
@@ -122,8 +121,7 @@ errchk	clopset, clppsetb, clppsetr, clputb, clputi, clputr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
  
 	# Scan the command string and get the first word.
 	call sscan (cmdstr)
@@ -440,7 +438,6 @@ pointer	pp			# Pset pointer
 char	gtype			# Graph type
 int	redraw			# Redraw graph?
  
-size_t	sz_val
 int	ival
 real	rval1, rval2
 bool	bval
@@ -453,8 +450,7 @@ errchk	ie_gimage, clppseti
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	switch (ncmd) {
 	case MAJRX:
@@ -788,7 +784,6 @@ pointer	pp			# Pset pointer
 char	gtype			# Graph type
 int	redraw			# Redraw graph?
  
-size_t	sz_val
 int	ival
 real	rval1
 bool	bval
@@ -800,8 +795,7 @@ int	nscan(), clgeti(), btoi(), strdic()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	switch (ncmd) {
 	case YLABEL:

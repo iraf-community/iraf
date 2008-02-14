@@ -32,7 +32,6 @@ char	xerrmsg[ARB]	#O the output x fit error message
 char	yerrmsg[ARB]	#O the output x fit error message 
 int	maxch		#I the size of the error messages
 
-size_t	sz_val
 char	errstr[SZ_LINE]
 int	newgraph, delete, wcs, key, errcode
 pointer	sp, w, gfit, xresid, yresid, cmd
@@ -49,14 +48,11 @@ errchk	geo_fmagnifyr(), geo_flinearr()
 begin
 	# Initialize gfit structure and working space.
 	call smark (sp)
-	sz_val = LEN_GEOGRAPH
-	call salloc (gfit, sz_val, TY_STRUCT)
-	sz_val = npts
-	call salloc (xresid, sz_val, TY_REAL)
-	call salloc (yresid, sz_val, TY_REAL)
-	call salloc (w, sz_val, TY_REAL)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (gfit, LEN_GEOGRAPH, TY_STRUCT)
+	call salloc (xresid, npts, TY_REAL)
+	call salloc (yresid, npts, TY_REAL)
+	call salloc (w, npts, TY_REAL)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Do initial fit.
 	iferr {
@@ -364,7 +360,6 @@ real   yscale          #O output y scale
 real   xrot            #O rotation of point on x axis
 real   yrot            #O rotation of point on y axis
 
-size_t	sz_val
 int     nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer sp, xcoeff, ycoeff
 real   xxrange, xyrange, xxmaxmin, xymaxmin
@@ -378,10 +373,8 @@ real    gsgetr()
 begin
         # Allocate working space.
         call smark (sp)
-        sz_val = gsgeti (sx, GSNCOEFF)
-        call salloc (xcoeff, sz_val, TY_REAL)
-        sz_val = gsgeti (sy, GSNCOEFF)
-        call salloc (ycoeff, sz_val, TY_REAL)
+        call salloc (xcoeff, gsgeti (sx, GSNCOEFF), TY_REAL)
+        call salloc (ycoeff, gsgeti (sy, GSNCOEFF), TY_REAL)
 
         # Get coefficients and numbers of coefficients.
         call gscoeff (sx, Memr[xcoeff], nxxcoeff)
@@ -485,7 +478,6 @@ char	xerrmsg[ARB]	#O the output x fit error message
 char	yerrmsg[ARB]	#O the output x fit error message 
 int	maxch		#I the size of the error messages
 
-size_t	sz_val
 char	errstr[SZ_LINE]
 int	newgraph, delete, wcs, key, errcode
 pointer	sp, w, gfit, xresid, yresid, cmd
@@ -502,14 +494,11 @@ errchk	geo_fmagnifyd(), geo_flineard()
 begin
 	# Initialize gfit structure and working space.
 	call smark (sp)
-	sz_val = LEN_GEOGRAPH
-	call salloc (gfit, sz_val, TY_STRUCT)
-	sz_val = npts
-	call salloc (xresid, sz_val, TY_DOUBLE)
-	call salloc (yresid, sz_val, TY_DOUBLE)
-	call salloc (w, sz_val, TY_DOUBLE)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (gfit, LEN_GEOGRAPH, TY_STRUCT)
+	call salloc (xresid, npts, TY_DOUBLE)
+	call salloc (yresid, npts, TY_DOUBLE)
+	call salloc (w, npts, TY_DOUBLE)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Do initial fit.
 	iferr {
@@ -817,7 +806,6 @@ double   yscale          #O output y scale
 double   xrot            #O rotation of point on x axis
 double   yrot            #O rotation of point on y axis
 
-size_t	sz_val
 int     nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer sp, xcoeff, ycoeff
 double   xxrange, xyrange, xxmaxmin, xymaxmin
@@ -831,10 +819,8 @@ double  dgsgetd()
 begin
         # Allocate working space.
         call smark (sp)
-        sz_val = dgsgeti (sx, GSNCOEFF)
-        call salloc (xcoeff, sz_val, TY_DOUBLE)
-        sz_val = dgsgeti (sy, GSNCOEFF)
-        call salloc (ycoeff, sz_val, TY_DOUBLE)
+        call salloc (xcoeff, dgsgeti (sx, GSNCOEFF), TY_DOUBLE)
+        call salloc (ycoeff, dgsgeti (sy, GSNCOEFF), TY_DOUBLE)
 
         # Get coefficients and numbers of coefficients.
         call dgscoeff (sx, Memd[xcoeff], nxxcoeff)

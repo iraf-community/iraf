@@ -18,19 +18,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_REAL)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_REAL)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_REAL)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
 
 	# calculate basis functions
 	call rgs_dpol (x, npts, xorder, nxder, k1x, k2x, Memr[xb])
@@ -97,19 +93,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_REAL)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_REAL)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_REAL)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
 
 	# calculate basis functions
 	call rgs_dcheb (x, npts, xorder, nxder, k1x, k2x, Memr[xb])
@@ -177,19 +169,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, accum, xbptr, ybptr
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_REAL)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_REAL)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_REAL)
+	call salloc (xb, xorder * npts, TY_REAL)
+	call salloc (yb, yorder * npts, TY_REAL)
+	call salloc (accum, npts, TY_REAL)
 
 	# calculate basis functions
 	call rgs_dleg (x, npts, xorder, nxder, k1x, k2x, Memr[xb])

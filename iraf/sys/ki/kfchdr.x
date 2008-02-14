@@ -13,7 +13,6 @@ procedure kfchdr (dirname, status)
 char	dirname[ARB]		# directory name
 int	status
 
-size_t	sz_val
 pointer	sp, fname, defnode
 int	server, junk
 int	ki_gnode(), ki_connect(), ki_findnode()
@@ -23,10 +22,8 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_ALIAS
-	call salloc (defnode, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (defnode, SZ_ALIAS, TY_CHAR)
 
 	server = ki_connect (dirname)
 

@@ -6,7 +6,6 @@ procedure rg_xgpars (xc)
 
 pointer	xc		#I pointer to the main structure
 
-size_t	sz_val
 int	xlag, ylag, xwindow, ywindow, xcbox, ycbox
 pointer	sp, str
 int	clgwrd(), clgeti()
@@ -15,8 +14,7 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Initialize the correlation structure.
 	call rg_xinit (xc, clgwrd ("correlation", Memc[str], SZ_LINE,

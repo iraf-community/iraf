@@ -10,7 +10,6 @@ procedure gt_uivalues (gp, gt)
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 
-size_t	sz_val
 int	fd, stropen()
 pointer	sp, msg, str1, str2
 
@@ -19,11 +18,9 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = 20 * SZ_LINE
-	call salloc (msg, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (msg, 20 * SZ_LINE, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	fd = stropen (Memc[msg], 20 * SZ_LINE, WRITE_ONLY)
 

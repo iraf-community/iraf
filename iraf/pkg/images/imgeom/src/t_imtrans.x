@@ -163,7 +163,6 @@ procedure imtrmw (mw)
 
 pointer	mw			# pointer to the mwcs structure
 
-size_t	sz_val
 int	i, axes[IM_MAXDIM], axval[IM_MAXDIM]
 int	naxes, pdim, nelem, axmap, ax1, ax2, szatstr
 pointer	sp, ltr, ltm, ltv, cd, r, w, ncd, nr
@@ -188,23 +187,16 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nelem
-	call salloc (ltr, sz_val, TY_DOUBLE)
-	call salloc (cd, sz_val, TY_DOUBLE)
-	sz_val = pdim
-	call salloc (r, sz_val, TY_DOUBLE)
-	call salloc (w, sz_val, TY_DOUBLE)
-	sz_val = nelem
-	call salloc (ltm, sz_val, TY_DOUBLE) 
-	sz_val = pdim
-	call salloc (ltv, sz_val, TY_DOUBLE)
-	sz_val = nelem
-	call salloc (ncd, sz_val, TY_DOUBLE)
-	sz_val = pdim
-	call salloc (nr, sz_val, TY_DOUBLE)
-	sz_val = SZ_FNAME
-	call salloc (attribute1, sz_val, TY_CHAR)
-	call salloc (attribute2, sz_val, TY_CHAR)
+	call salloc (ltr, nelem, TY_DOUBLE)
+	call salloc (cd, nelem, TY_DOUBLE)
+	call salloc (r, pdim, TY_DOUBLE)
+	call salloc (w, pdim, TY_DOUBLE)
+	call salloc (ltm, nelem, TY_DOUBLE) 
+	call salloc (ltv, pdim, TY_DOUBLE)
+	call salloc (ncd, nelem, TY_DOUBLE)
+	call salloc (nr, pdim, TY_DOUBLE)
+	call salloc (attribute1, SZ_FNAME, TY_CHAR)
+	call salloc (attribute2, SZ_FNAME, TY_CHAR)
 
 	# Get the wterm which corresponds to the original logical to
 	# world transformation.

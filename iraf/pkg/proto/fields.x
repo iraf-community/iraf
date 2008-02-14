@@ -13,7 +13,6 @@ bool	quit, name
 int	fields[MAX_FIELDS], lines[3, MAX_LINES], nfields, nlines
 int	ranges[3,MAX_RANGES], nranges
 
-size_t	sz_val
 bool	clgetb()
 int	decode_ranges(), fi_decode_ranges(), clgfil()
 pointer	clpopni()
@@ -21,10 +20,9 @@ pointer	clpopni()
 begin
 	# Allocate space on stack for char buffers
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (f_str, sz_val, TY_CHAR)
-	call salloc (l_str, sz_val, TY_CHAR)
-	call salloc (fin, sz_val, TY_CHAR)
+	call salloc (f_str,  SZ_LINE, TY_CHAR)
+	call salloc (l_str,  SZ_LINE, TY_CHAR)
+	call salloc (fin,    SZ_LINE, TY_CHAR)
 
 	# Open template of input files
 	list = clpopni ("files")
@@ -224,7 +222,6 @@ int	nfields				# Number of fields to extract
 bool	quit				# Quit if missing field (y/n)?
 bool	name				# Print file name in each line (y/n)?
 
-size_t	sz_val
 pointer	sp, lbuf
 int	in, in_line
 
@@ -235,8 +232,7 @@ errchk	salloc, open, getlongline, fi_precord
 begin
 	# Allocate space for line buffer
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	# Open input file
 	in = open (in_fname, READ_ONLY, TEXT_FILE)

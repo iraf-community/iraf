@@ -21,7 +21,6 @@ int	wrt_image, wrt_text
 int	btype, ndim, nxvals, nyvals, nzvals, width
 real	xc, yc, x1, y1, x2, y2, theta, length, zmin, zmax, bconstant
 
-size_t	sz_val
 bool	streq(), fp_equalr()
 int	clgeti(), clgwrd(), nowhite()
 pointer	immap()
@@ -29,13 +28,10 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_BTYPE
-	call salloc (boundary, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (outtype, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (boundary, SZ_BTYPE, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_FNAME, TY_CHAR)
 
 	# Get boundary extension parameters.
 	btype  = clgwrd ("boundary", Memc[boundary], SZ_BTYPE, BTYPES)
@@ -145,7 +141,6 @@ int	nzvals, width					#I Plot parameters
 real	x1, x2, y1, y2, zmin, zmax			#I Plot parameters
 char	image[SZ_FNAME]					#I Image name
 
-size_t	sz_val
 pointer	sp, gp
 int	mode, imark
 pointer	device, marker, xlabel, ylabel, title, suffix, hostid
@@ -160,18 +155,13 @@ errchk 	gopen
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (marker, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (xlabel, sz_val, TY_CHAR)
-	call salloc (ylabel, sz_val, TY_CHAR)
-	sz_val = 2 * SZ_LINE
-	call salloc (hostid, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (suffix, sz_val, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (marker, SZ_FNAME, TY_CHAR)
+	call salloc (xlabel, SZ_LINE, TY_CHAR)
+	call salloc (ylabel, SZ_LINE, TY_CHAR)
+	call salloc (hostid, 2 * SZ_LINE, TY_CHAR)
+	call salloc (title, SZ_LINE, TY_CHAR)
+	call salloc (suffix, SZ_FNAME, TY_CHAR)
 
 	# Open the graphics stream.
 	call clgstr ("device", Memc[device], SZ_FNAME)
@@ -318,7 +308,6 @@ int	npts					#I Npts in vector
 real	x1, x2, y1, y2				#I Endpoints of vector
 int	width					#I Width of sampled points
 
-size_t	sz_val
 pointer	sp, comment, imo
 pointer	immap(), impl2r()
 bool	streq()
@@ -333,8 +322,7 @@ begin
 	    call error (0, "Error opening output image.")
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (comment, sz_val, TY_CHAR)
+	call salloc (comment, SZ_LINE, TY_CHAR)
 
 	# Do some header manipulations
 	IM_NDIM(imo) = 1
@@ -483,7 +471,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, dpx, dpy, ratio, xoff, yoff, noff, xv, yv
 int	i, j, k, nedge, col1, col2, line1, line2
 int	colb, colc, line, linea, lineb, linec
@@ -493,12 +480,11 @@ pointer	imgs2r()
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oxs, sz_val, TY_REAL)
-	call salloc (oys, sz_val, TY_REAL)
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oxs, width, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Determine sampling perpendicular to vector.
 	dx = (x2 - x1) / (nvals - 1)
@@ -619,7 +605,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 real	sum
 int	line, linea, lineb, linec
 pointer sp, xs, ys, msi, yvals, buf
@@ -629,10 +614,9 @@ pointer	imgs2r()
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]
@@ -729,7 +713,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, yoff, noff, xv, yv
 int	i, j, nedge, col1, col2, line1, line2
 int	line, linea, lineb, linec
@@ -739,12 +722,10 @@ errchk	imgs2r, msifit
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oys, sz_val, TY_REAL)
-	sz_val = nvals
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, nvals, TY_REAL)
+	call salloc (ys, nvals, TY_REAL)
+	call salloc (yvals, nvals, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]
@@ -852,7 +833,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, xv
 int	i, nedge, col1, col2
 pointer sp, xs,  asi, buf
@@ -861,8 +841,7 @@ errchk	imgs1r
 
 begin
 	call smark (sp)
-	sz_val = nvals
-	call salloc (xs, sz_val, TY_REAL)
+	call salloc (xs, nvals, TY_REAL)
 
 	# Initialize the interpolator.
 	call asiinit (asi, II_LINEAR]

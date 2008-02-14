@@ -8,18 +8,15 @@ procedure t_unique()
 
 int	fd
 pointer	sp, fname, old_line, new_line, temp, list
-size_t	sz_val
 bool	streq()
 int	getline(), clgfil(), clplen(), open()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (old_line, sz_val, TY_CHAR)
-	call salloc (new_line, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (old_line, SZ_LINE, TY_CHAR)
+	call salloc (new_line, SZ_LINE, TY_CHAR)
 
 	list = clpopni ("files")
 

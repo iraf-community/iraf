@@ -8,7 +8,6 @@ procedure ex_ppm (ex)
 
 pointer	ex					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, hdr
 int	len, flags
 
@@ -25,8 +24,7 @@ begin
 
         # Write the header to the file.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (hdr, sz_val, TY_CHAR)
+        call salloc (hdr, SZ_LINE, TY_CHAR)
         call aclrc (Memc[hdr], SZ_LINE)
 
 	# If we have an odd number of pixels we can't correctly write the

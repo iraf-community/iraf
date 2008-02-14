@@ -19,7 +19,6 @@ procedure t_table()
 int	first_col, last_col, ncols, maxstrlen
 int	fd, nextch, nstrings, maxch, sz_strbuf, max_strings, ip
 pointer	sp, strbuf, fname, stroff, list
-size_t	sz_val
 int	strlen(), fscan(), nscan()
 int	clgfil(), open(), envgeti(), clplen(), clgeti()
 pointer	clpopni()
@@ -28,8 +27,7 @@ begin
 	# Allocate buffers.  The string buffer "strbuf", and associated list
 	# of offsets "stroff" will be reallocated later if they fill up.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	call malloc (strbuf, INIT_STRBUF, TY_CHAR)
 	call malloc (stroff, INIT_MAXSTR, TY_INT)

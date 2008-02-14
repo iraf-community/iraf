@@ -19,7 +19,6 @@ pointer	in[nimages]		#I Input images
 pointer	out[3]			#I Output images
 int	nimages			#I Number of images
 
-size_t	sz_val
 int	i, npix, npms, clgwrd()
 real	clgetr()
 pointer	sp, fname, title, pm, pm_open()
@@ -31,9 +30,8 @@ include "icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (title, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (title, SZ_FNAME, TY_CHAR)
 
 	# Determine the mask parameters and allocate memory.
 	# The mask buffers are initialize to all excluded so that

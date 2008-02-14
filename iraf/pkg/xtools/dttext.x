@@ -613,7 +613,6 @@ char	database[ARB]		# Database
 char	key[ARB]		# Key
 int	mode			# Mode
 
-size_t	sz_val
 pointer	sp, dbfile, dt
 
 int	isdirectory(), access(), stridxs()
@@ -623,8 +622,7 @@ errchk	dtmap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME + SZ_FNAME
-	call salloc (dbfile, sz_val, TY_CHAR)
+	call salloc (dbfile, SZ_PATHNAME + SZ_FNAME, TY_CHAR)
 
 	# Check if the database does not exist create it as a directory.
 

@@ -15,15 +15,13 @@ procedure mtrewind (mtname, initcache)
 char	mtname[ARB]		#I device to be rewound
 int	initcache		#I discard positional information?
 
-size_t	sz_val
 pointer	sp, fname
 int	fd, mtopen()
 errchk	mtfname
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	# Init position cache.
 	if (initcache == YES) {

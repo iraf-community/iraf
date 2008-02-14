@@ -27,7 +27,6 @@ procedure t_chpixtype()
 pointer imtlist1                # Input image list
 pointer imtlist2                # Output image list
 
-size_t	sz_val
 pointer image1                  # Input image
 pointer image2                  # Output image
 pointer imtemp                  # Temporary file
@@ -45,16 +44,14 @@ begin
 
         # Allocate temporary space.
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (imtlist1, sz_val, TY_CHAR)
-        call salloc (imtlist2, sz_val, TY_CHAR)
-        call salloc (image1, sz_val, TY_CHAR)
-        call salloc (image2, sz_val, TY_CHAR)
-        call salloc (imtemp, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (instr, sz_val, TY_CHAR)
-        call salloc (outstr, sz_val, TY_CHAR)
-        call salloc (imstr, sz_val, TY_CHAR)
+        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
+        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
+        call salloc (image1, SZ_FNAME, TY_CHAR)
+        call salloc (image2, SZ_FNAME, TY_CHAR)
+        call salloc (imtemp, SZ_FNAME, TY_CHAR)
+        call salloc (instr, SZ_LINE, TY_CHAR)
+        call salloc (outstr, SZ_LINE, TY_CHAR)
+        call salloc (imstr, SZ_LINE, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)

@@ -45,7 +45,6 @@ pointer	ex				#i task struct pointer
 char	opname[ARB]			#i operand name to retrieve
 pointer	o				#o output operand pointer
 
-size_t	sz_val
 int	i, nops, found, optype, imnum
 pointer	sp, buf
 pointer	op, param, emsg
@@ -60,12 +59,9 @@ define	getpar_		99
 
 begin
         call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (param, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (emsg, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+	call salloc (emsg, SZ_LINE, TY_CHAR)
 	call aclrc (Memc[buf], SZ_LINE)
 	call aclrc (Memc[param], SZ_FNAME)
 	call aclrc (Memc[emsg], SZ_LINE)
@@ -200,7 +196,6 @@ pointer args[ARB]                       #i argument list
 int     nargs                           #i number of arguments
 pointer o                               #o operand pointer
 
-size_t	sz_val
 pointer	sp, buf
 pointer	r, g, b, gray
 pointer	scaled, data
@@ -216,8 +211,7 @@ define	setop_		99
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
         # Lookup function in dictionary.
         func = strdic (fcn, Memc[buf], SZ_LINE, OB_FUNCTIONS)

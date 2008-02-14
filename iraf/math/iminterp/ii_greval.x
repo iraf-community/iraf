@@ -23,7 +23,6 @@ int	nxpts			# number of x values
 int	nypts			# number of y values
 int	len_zfit		# row length of zfit
 
-size_t	sz_val
 int	ny
 int	index
 int	i, j
@@ -33,8 +32,7 @@ errchk	smark, salloc, sfree
 
 begin
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (nx, sz_val, TY_INT)
+	call salloc (nx, nxpts, TY_INT)
 
 	# calculate the nearest x
 	do i = 1, nxpts
@@ -76,7 +74,6 @@ int	nxpts			# number of x values
 int	nypts			# number of y values
 int	len_zfit		# row length of zfit
 
-size_t	sz_val
 int	i, j, ny
 int	nymin, nymax, nylines
 int	row_index, xindex
@@ -93,12 +90,10 @@ begin
 
 	# allocate storage for work array
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (nx, sz_val, TY_INT)
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	sz_val = nxpts * nylines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (nx, nxpts, TY_INT)
+	call salloc (sx, nxpts, TY_REAL)
+	call salloc (tx, nxpts, TY_REAL)
+	call salloc (work, nxpts * nylines, TY_REAL)
 
 	# initialize
 	call achtri (x, Memi[nx], nxpts)
@@ -165,7 +160,6 @@ int	nxpts			# number of x points
 int	nypts			# number of y points
 int	len_zfit		# row length of zfit
 
-size_t	sz_val
 int	nymin, nymax, nylines
 int	nxold, nyold
 int	row_index, xindex
@@ -185,14 +179,12 @@ begin
 
 	# allocate work space
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (nx, sz_val, TY_INT)
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (sx2m1, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	call salloc (tx2m1, sz_val, TY_REAL) 
-	sz_val = nxpts * nylines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (nx, nxpts, TY_INT)
+	call salloc (sx, nxpts, TY_REAL)
+	call salloc (sx2m1, nxpts, TY_REAL)
+	call salloc (tx, nxpts, TY_REAL)
+	call salloc (tx2m1, nxpts, TY_REAL) 
+	call salloc (work, nxpts * nylines, TY_REAL)
 
 	# initialize
 	call achtri (x, Memi[nx], nxpts)
@@ -302,7 +294,6 @@ int	nxpts			# number of x points
 int	nypts			# number of y points
 int	len_zfit		# row length of zfit
 
-size_t	sz_val
 int	nymax, nymin, nylines, nxold, nyold
 int	row_index, xindex
 int	i, j, ny
@@ -322,16 +313,14 @@ begin
 
 	# allocate space
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (nx, sz_val, TY_INT)
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (sx2m1, sz_val, TY_REAL)
-	call salloc (sx2m4, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	call salloc (tx2m1, sz_val, TY_REAL)
-	call salloc (tx2m4, sz_val, TY_REAL)
-	sz_val = nxpts * nylines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (nx, nxpts, TY_INT)
+	call salloc (sx, nxpts, TY_REAL)
+	call salloc (sx2m1, nxpts, TY_REAL)
+	call salloc (sx2m4, nxpts, TY_REAL)
+	call salloc (tx, nxpts, TY_REAL)
+	call salloc (tx2m1, nxpts, TY_REAL)
+	call salloc (tx2m4, nxpts, TY_REAL)
+	call salloc (work, nxpts * nylines, TY_REAL)
 
 	# intialize
 	call achtri (x, Memi[nx], nxpts)
@@ -477,7 +466,6 @@ int	nxpts			# number of x values
 int	nypts			# number of y values
 int	len_zfit		# row length of zfit
 
-size_t	sz_val
 int	ny, nymin, nymax, nylines
 int	row_index, xindex
 int	i, j
@@ -494,14 +482,12 @@ begin
 
 	# allocate space for work array
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (nx, sz_val, TY_INT)
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (sx3, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	call salloc (tx3, sz_val, TY_REAL)
-	sz_val = nylines * nxpts
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (nx, nxpts, TY_INT)
+	call salloc (sx, nxpts, TY_REAL)
+	call salloc (sx3, nxpts, TY_REAL)
+	call salloc (tx, nxpts, TY_REAL)
+	call salloc (tx3, nxpts, TY_REAL)
+	call salloc (work, nylines * nxpts, TY_REAL)
 
 	# intialize
 	call achtri (x, Memi[nx], nxpts)
@@ -589,7 +575,6 @@ int	len_zfit		# row length of zfit
 int	nsinc			# sinc interpolant truncation length
 real	mindx, mindy		# the precision of the interpolant.
 
-size_t	sz_val
 int	i, j, k, nconv, nymin, nymax, nylines
 int	ixy, index, minj, maxj, offj
 pointer	sp, taper, ac, ixn, work, pac, pwork, ppwork
@@ -606,14 +591,10 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nconv
-	call salloc (taper, sz_val, TY_REAL)
-	sz_val = nconv * max (nxpts, nypts)
-	call salloc (ac, sz_val, TY_REAL)
-	sz_val = max (nxpts, nypts)
-	call salloc (ixn, sz_val, TY_INT)
-	sz_val = nxpts * nylines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (taper, nconv, TY_REAL)
+	call salloc (ac, nconv * max (nxpts, nypts), TY_REAL)
+	call salloc (ixn, max (nxpts, nypts), TY_INT)
+	call salloc (work, nxpts * nylines, TY_REAL)
 
 	# Compute the parameters of the cosine bell taper.
 	sconst = (HALFPI / nsinc) ** 2
@@ -753,15 +734,13 @@ int	nconv					# sinc trunction full-width
 int	nxincr, nyincr				# resolution of look-up table
 real	mindx, mindy				# the precision of interpolant
 
-size_t	sz_val
 int	j
 pointer	sp, ytmp
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nxpts
-	call salloc (ytmp, sz_val, TY_REAL)
+	call salloc (ytmp, nxpts, TY_REAL)
 
 	do j = 1, nypts {
 	    call amovkr (y[j], Memr[ytmp], nxpts)
@@ -794,7 +773,6 @@ int	len_zfit		# row length of zfit
 real	xfrac, yfrac		# the x and y pixel fractions
 real	badval			# bad value
 
-size_t	sz_val
 int	i, j, jj, nylmin, nylmax, nylines
 int	cindex, neara, nearb
 pointer	sp, work, xindex
@@ -808,8 +786,7 @@ begin
 	nylines = nylmax - nylmin + 1
 
 	call smark (sp)
-	sz_val = nxpts * nylines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (work, nxpts * nylines, TY_REAL)
 
 	# For each in range y integrate in x.
 	cindex = 1 + first_point + (nylmin - 1) * len_coeff

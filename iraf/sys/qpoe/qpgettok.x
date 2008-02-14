@@ -125,7 +125,6 @@ pointer	gt			#I gettok descriptor
 char	tokbuf[maxch]		#O receives the text of the token
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, bp, qp, cmd, ibuf, obuf, argbuf, fname, sym, textp
 int	fd, token, level, nargs, nchars, i_fd, o_fd, ftemp
 
@@ -142,8 +141,7 @@ begin
 
 	# Allocate some buffer space.
 	nchars = SZ_CMD + SZ_IBUF + SZ_OBUF + SZ_ARGBUF + SZ_FNAME + 5
-	sz_val = nchars
-	call salloc (bp, sz_val, TY_CHAR)
+	call salloc (bp, nchars, TY_CHAR)
 
 	cmd = bp
 	ibuf = cmd + SZ_CMD + 1
@@ -587,14 +585,12 @@ procedure qp_closetext (gt)
 
 pointer	gt			#I gettok descriptor
 
-size_t	sz_val
 int	level, fd
 pointer	sp, fname
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	for (level=GT_LEVEL(gt);  level >= 0;  level=level-1) {
 	    fd = GT_FD(gt)

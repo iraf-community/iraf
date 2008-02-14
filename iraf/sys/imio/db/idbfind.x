@@ -14,19 +14,16 @@ pointer	im			# image descriptor
 char	key[ARB]		# record key
 pointer	rp			# char record pointer (output)
 
-size_t	sz_val
 pointer	sp, pat, patbuf, ukey, lkey, ip, ua
 int	recno, nchars, lch, uch, ch, junk, n, i
 int	patmake(), patmatch(), stridxs(), gstrcpy()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pat, sz_val, TY_CHAR)
-	call salloc (ukey, sz_val, TY_CHAR)
-	call salloc (lkey, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (pat, SZ_FNAME, TY_CHAR)
+	call salloc (ukey, SZ_FNAME, TY_CHAR)
+	call salloc (lkey, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Prepare U/L FITS keywords, truncated to 8 chars.
 	nchars = gstrcpy (key, Memc[lkey], IDB_SZFITSKEY)

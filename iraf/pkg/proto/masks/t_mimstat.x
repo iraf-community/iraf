@@ -16,7 +16,6 @@ int	i, nclip, nfields, format, mval, npts, npix
 int	nbins, in_invert, nbad, cache
 size_t	old_size
 
-size_t	sz_val
 real	clgetr()
 pointer	mp_open(), mp_miopen()
 int	imtlen(), imtgetim(), clgeti()
@@ -29,23 +28,18 @@ errchk	immap()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (inmasks, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (fieldstr, sz_val, TY_CHAR)
-	sz_val = MIS_NFIELDS
-	call salloc (fields, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (omask, sz_val, TY_CHAR)
-	call salloc (masktemp, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (inmasks, SZ_FNAME, TY_CHAR)
+	call salloc (fieldstr, SZ_LINE, TY_CHAR)
+	call salloc (fields, MIS_NFIELDS, TY_INT)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (omask, SZ_FNAME, TY_CHAR)
+	call salloc (masktemp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (str2, SZ_FNAME, TY_CHAR)
 
-	sz_val = IM_MAXDIM
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
 
 	# Open the input image list.
 	imlist = imtopenp ("images")

@@ -17,7 +17,6 @@ int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	radsym		# does the kernel have radial symmetry ?
 
-size_t	sz_val
 int	i, ncols, nlines, col1, col2, nincols, inline, outline
 pointer	sp, lineptrs, linebuf, outbuf
 pointer	imgs2r(), impl2r()
@@ -26,8 +25,7 @@ errchk	imgs2r, impl2r
 begin
 	# Set up an array of line pointers.
 	call smark (sp)
-	sz_val = nyk
-	call salloc (lineptrs, sz_val, TY_POINTER)
+	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
 	call imseti (im1, IM_NBUFS, nyk)
@@ -58,8 +56,7 @@ begin
 	}
 
 	# Generate the output image line by line
-	sz_val = nincols
-	call salloc (linebuf, sz_val, TY_REAL)
+	call salloc (linebuf, nincols, TY_REAL)
 	do outline = 1, nlines {
 
 	    # Scroll the input buffers

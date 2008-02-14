@@ -15,7 +15,6 @@ pointer xh                                      #i task struct pointer
 char    topic[ARB]                           	#i help topic
 char    curpack[ARB]                           	#i current package
 
-size_t	sz_val
 pointer sp, bp, buf
 pointer	opt, val, line
 int	fd
@@ -30,12 +29,10 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
-	call salloc (opt, sz_val, TY_CHAR)
-	call salloc (val, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
+	call salloc (opt, SZ_FNAME, TY_CHAR)
+	call salloc (val, SZ_FNAME, TY_CHAR)
 
 	# Get a temp file name.
 	call mktemp ("tmp$xhelpi", fname, SZ_FNAME)

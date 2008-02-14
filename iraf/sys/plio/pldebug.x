@@ -21,7 +21,6 @@ int	fd			#I output file
 int	width			#I max width of formatted output, columns
 int	what			#I flags defining what to print
 
-size_t	sz_val
 pointer	sp, buf, rng, rl, pp
 int	line_1, line_2, nne, nv, v, lp, i
 int	naxes, axlen, nlp, firstcol, maxcol, col, rlen
@@ -36,12 +35,9 @@ define	llout_ 94
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (rng, sz_val, TY_CHAR)
-	sz_val = RL_MAXLEN(pl)
-	call salloc (rl, sz_val, TY_INT)
+	call salloc (buf, SZ_LINE, TY_CHAR)
+	call salloc (rng, SZ_FNAME, TY_CHAR)
+	call salloc (rl, RL_MAXLEN(pl), TY_INT)
 
 	call pl_valid (pl)
 	naxes = PL_NAXES(pl)

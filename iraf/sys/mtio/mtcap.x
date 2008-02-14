@@ -11,7 +11,6 @@ pointer procedure mtcap (mtname)
 
 char	mtname[ARB]			#I magtape device specification
 
-size_t	sz_val
 int	fileno, recno
 pointer	sp, device, devcap, cache_gty, gty
 pointer	mt_gtyopen(), gtycaps(), gtyopen()
@@ -19,10 +18,8 @@ errchk	mtparse, mt_gtyopen
 
 begin
 	call smark (sp)
-	sz_val = SZ_DEVICE
-	call salloc (device, sz_val, TY_CHAR)
-	sz_val = SZ_DEVCAP
-	call salloc (devcap, sz_val, TY_CHAR)
+	call salloc (device, SZ_DEVICE, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
 	call mtparse (mtname, Memc[device], SZ_DEVICE, fileno, recno,
 	    Memc[devcap], SZ_DEVCAP)

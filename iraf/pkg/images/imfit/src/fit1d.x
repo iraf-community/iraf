@@ -125,7 +125,6 @@ int	axis				# Image axis to fit
 int	ntype				# Type of output
 bool	interactive			# Interactive?
 
-size_t	sz_val
 char	graphics[SZ_FNAME]		# Graphics device
 int	i, nx, new
 real	div
@@ -147,9 +146,8 @@ begin
 
 	nx = IM_LEN (in, axis)
 	call smark (sp)
-	sz_val = nx
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (wts, sz_val, TY_REAL)
+	call salloc (x, nx, TY_REAL)
+	call salloc (wts, nx, TY_REAL)
 
 	do i = 1, nx
 	    Memr[x+i-1] = i
@@ -222,7 +220,6 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 bool	same			# Same image?
 
-size_t	sz_val
 int	i
 pointer	sp, iroot, isect, oroot, osect, line, data
 
@@ -235,11 +232,10 @@ begin
 	# Get the root name and section of the input image.
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (iroot, sz_val, TY_CHAR)
-	call salloc (isect, sz_val, TY_CHAR)
-	call salloc (oroot, sz_val, TY_CHAR)
-	call salloc (osect, sz_val, TY_CHAR)
+	call salloc (iroot, SZ_FNAME, TY_CHAR)
+	call salloc (isect, SZ_FNAME, TY_CHAR)
+	call salloc (oroot, SZ_FNAME, TY_CHAR)
+	call salloc (osect, SZ_FNAME, TY_CHAR)
 
 	call imgimage (input, Memc[iroot], SZ_FNAME)
 	call imgsection (input, Memc[isect], SZ_FNAME)
@@ -255,8 +251,7 @@ begin
 	    out = immap (Memc[oroot], NEW_COPY, in)
 	    IM_PIXTYPE(out) = TY_REAL
 
-	    sz_val = IM_MAXDIM
-	    call salloc (line, sz_val, TY_LONG)
+	    call salloc (line, IM_MAXDIM, TY_LONG)
 	    call amovkl (long (1), Meml[line], IM_MAXDIM)
 
 	    switch (ntype) {

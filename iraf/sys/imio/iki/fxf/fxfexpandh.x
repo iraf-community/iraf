@@ -156,7 +156,6 @@ int	hoffset		#O Header offset for next group
 int	poffset		#O Data offset for current group
 int	hsize		#O Number of cards read in header
 
-size_t	sz_val
 pointer	sp, hb
 int	nblks, totpix, i, j, ip, nchars
 int	strncmp(), read()
@@ -168,8 +167,7 @@ errchk  syserr, read, write
 
 begin
 	call smark (sp)
-	sz_val = 1440
-	call salloc (hb, sz_val, TY_CHAR)
+	call salloc (hb, 1440, TY_CHAR)
 
 	hoffset = note (in)
 

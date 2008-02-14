@@ -64,7 +64,6 @@ bool	sort_modules
 pointer	sp, hp, ip, lbuf, defdir, word
 int	fd, junk
 
-size_t	sz_val
 bool	streq()
 int	open(), getline(), fnroot(), fnldir(), ctowrd()
 int	hd_putstr()
@@ -73,12 +72,9 @@ errchk	hd_putldiry, hd_putmodule, hd_sort_modules
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (defdir, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (word, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (defdir, SZ_PATHNAME, TY_CHAR)
+	call salloc (word, SZ_FNAME, TY_CHAR)
 
 	# If helpdir file is not yet installed, print warning message
 	# and return the NULL pointer, indicating that the help directory
@@ -200,7 +196,6 @@ procedure hd_putldiry (hp, decl)
 pointer	hp
 char	decl[ARB]
 
-size_t	sz_val
 int	ip, nldir, strp
 pointer	sp, buf, op
 char	hd_getc()
@@ -209,8 +204,7 @@ errchk	salloc, hd_getc, hd_putstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	# Do nothing if null declaration.
 	for (ip=1;  IS_WHITE(decl[ip]);  ip=ip+1)
@@ -257,7 +251,6 @@ pointer	hp
 int	fd
 char	lbuf[ARB]
 
-size_t	sz_val
 char	ch
 int	ip, junk, m, ftype, strp
 pointer	sp, buf, op, sbuf, mp
@@ -269,8 +262,7 @@ errchk	salloc, getline, hd_putstr, hd_getc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 	sbuf = HD_SBUF(hp)
 
 	# Fetch module name.  Cannot be null or line is blank and we would
@@ -563,7 +555,6 @@ int	field				# field code
 char	outstr[ARB]
 int	maxch
 
-size_t	sz_val
 int	len_ldir, op
 pointer	mp, sp, ldir, sbuf, fname_ptr, ip, subdir
 int	strncmp(), gstrcpy(), hd_getldir(), fnldir()
@@ -571,10 +562,8 @@ errchk	salloc, hd_getldir
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (ldir, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (subdir, sz_val, TY_CHAR)
+	call salloc (ldir, SZ_PATHNAME, TY_CHAR)
+	call salloc (subdir, SZ_FNAME, TY_CHAR)
 
 	if (hp == NULL)
 	    call error (12, "hd_getname: bad helpdir descriptor")
@@ -659,7 +648,6 @@ char	ldir[ARB]
 char	outstr[ARB]
 int	maxch
 
-size_t	sz_val
 int	i
 pointer	sp, ip, op, sbuf, envvar, filvar
 bool	streq()
@@ -667,9 +655,8 @@ int	gstrcpy()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (envvar, sz_val, TY_CHAR)
-	call salloc (filvar, sz_val, TY_CHAR)
+	call salloc (envvar, SZ_FNAME, TY_CHAR)
+	call salloc (filvar, SZ_FNAME, TY_CHAR)
 
 	sbuf = HD_SBUF(hp)
 

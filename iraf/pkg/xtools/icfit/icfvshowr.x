@@ -16,7 +16,6 @@ real	wts[ARB]	# Weights
 int	npts		# Number of data points
 int	fd		# Output descriptor
 
-size_t	sz_val
 int	i, n, deleted, ncoeffs
 real	chisqr, rms
 pointer	sp, fit, wts1, coeffs, errors
@@ -37,17 +36,15 @@ begin
 
 	ncoeffs = rcvstati (cv, CVNCOEFF)
 	call smark (sp)
-	sz_val = ncoeffs
-	call salloc (coeffs, sz_val, TY_REAL)
-	call salloc (errors, sz_val, TY_REAL)
+	call salloc (coeffs, ncoeffs, TY_REAL)
+	call salloc (errors, ncoeffs, TY_REAL)
 
 	if (npts == IC_NFIT(ic)) {
 	    # Allocate memory for the fit.
 
 	    n = npts
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_REAL)
-	    call salloc (wts1, sz_val, TY_REAL)
+	    call salloc (fit, n, TY_REAL)
+	    call salloc (wts1, n, TY_REAL)
 
 	    # Eliminate rejected points and count deleted points.
 
@@ -75,9 +72,8 @@ begin
 	    # Allocate memory for the fit.
 
 	    n = IC_NFIT(ic)
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_REAL)
-	    call salloc (wts1, sz_val, TY_REAL)
+	    call salloc (fit, n, TY_REAL)
+	    call salloc (wts1, n, TY_REAL)
 
 	    # Eliminate rejected points and count deleted points.
 

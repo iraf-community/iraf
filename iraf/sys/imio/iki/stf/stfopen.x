@@ -22,7 +22,6 @@ int	gc_arg			#I number of groups in STF image
 int	acmode			#I access mode
 int	status			#O return value
 
-size_t	sz_val
 bool	subimage
 pointer	sp, fname, stf, stf_extn, ua, o_stf
 int	group, gcount, newimage, gpb, hdr, o_stflen
@@ -34,10 +33,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = MAX_LENEXTN
-	call salloc (stf_extn, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (stf_extn, MAX_LENEXTN, TY_CHAR)
 
 	ua = IM_USERAREA(im)
 

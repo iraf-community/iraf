@@ -16,7 +16,6 @@ int	fd			#I header file descriptor
 pointer	im			#I image descriptor
 int	htype			#I TY_IMHDR or TY_PIXHDR
 
-size_t	sz_val
 pointer	sp, v1, fname
 int	status, hdrlen, len_userarea
 errchk	write, miiwritec, miiwritei, miiwritel, miiwriter
@@ -34,8 +33,7 @@ begin
 
 	    status = ERR
 	    call smark (sp)
-	    sz_val = LEN_V1IMHDR
-	    call salloc (v1, sz_val, TY_STRUCT)
+	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
 
 	    # Initialize the output image header.
 	    switch (htype) {
@@ -107,8 +105,7 @@ v1done_
 v2start_
 	    status = ERR
 	    call smark (sp)
-	    sz_val = SZ_PATHNAME
-	    call salloc (fname, sz_val, TY_CHAR)
+	    call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	    call seek (fd, BOFL)
 

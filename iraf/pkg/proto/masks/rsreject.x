@@ -28,7 +28,6 @@ real	flow				#I Number of low pixels to reject
 real	fhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
-size_t	sz_val
 pointer	sp, im, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
 int	i, n, nimages, npix, npts, mval
@@ -45,16 +44,14 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
-	call salloc (mpim, sz_val, TY_POINTER)
-	call salloc (norm, sz_val, TY_REAL)
-	sz_val = IM_MAXDIM
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (mvout, sz_val, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (mpim, nimages, TY_POINTER)
+	call salloc (norm, nimages, TY_REAL)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (mvout, IM_MAXDIM, TY_LONG)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -144,8 +141,7 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages * npix
-	call salloc (pbuf, sz_val, TY_REAL)
+	call salloc (pbuf, nimages * npix, TY_REAL)
 
 	# Initialize the i/o.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
@@ -220,7 +216,6 @@ real	fhigh				#I Number of high pixels to reject
 bool	msk_invert			#I inver the input mask ?
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
-size_t	sz_val
 pointer	sp, input, str, im, mkim, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
 int	i, n, nimages, npix, npts, mval
@@ -237,20 +232,17 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
-	call salloc (mkim, sz_val, TY_POINTER)
-	call salloc (mpim, sz_val, TY_POINTER)
-	call salloc (norm, sz_val, TY_REAL)
-	sz_val = IM_MAXDIM
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (mvout, sz_val, TY_LONG)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (mkim, nimages, TY_POINTER)
+	call salloc (mpim, nimages, TY_POINTER)
+	call salloc (norm, nimages, TY_REAL)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (mvout, IM_MAXDIM, TY_LONG)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -379,8 +371,7 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages * npix
-	call salloc (pbuf, sz_val, TY_REAL)
+	call salloc (pbuf, nimages * npix, TY_REAL)
 
 	# Initialize the i/o.
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
@@ -456,7 +447,6 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
-size_t	sz_val
 real	const
 pointer	sp, v1, v2, im, norm, buf_out, buf_in, pbuf, rbuf
 int	i, n, nl, nh, nimages, naccept, npix
@@ -485,12 +475,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
-	call salloc (norm, sz_val, TY_REAL)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (norm, nimages, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -558,10 +546,8 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (pbuf, sz_val, TY_POINTER)
-	sz_val = nimages * npix
-	call salloc (rbuf, sz_val, TY_REAL)
+	call salloc (pbuf, nimages, TY_POINTER)
+	call salloc (rbuf, nimages * npix, TY_REAL)
 
 	# Initialize the i/o.
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
@@ -616,7 +602,6 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
-size_t	sz_val
 real	const
 pointer	sp, input, v1, v2, im, norm, buf_out, buf_in, buf
 int	i, n, nimages, naccept, npix, nl, nh
@@ -646,14 +631,11 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
-	call salloc (norm, sz_val, TY_REAL)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
+	call salloc (norm, nimages, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -727,8 +709,7 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
+	call salloc (buf, nimages, TY_POINTER)
 
 	# Initialize the i/o.
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)

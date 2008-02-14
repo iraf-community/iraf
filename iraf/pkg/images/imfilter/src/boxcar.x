@@ -15,7 +15,6 @@ int	nxk, nyk	# dimensions of the kernel
 int	boundary	# type of boundary extnsion
 real	constant	# constant for constant boundary extension
 
-size_t	sz_val
 int	i, ncols, nlines, col1, col2, inline, outline
 pointer	sp, lineptrs, accum, outbuf
 
@@ -37,10 +36,8 @@ begin
 
 	# Set up an array of linepointers and accumulators
 	call smark (sp)
-	sz_val = nyk
-	call salloc (lineptrs, sz_val, TY_POINTER)
-	sz_val = ncols + nxk - 1
-	call salloc (accum, sz_val, TY_REAL)
+	call salloc (lineptrs, nyk, TY_POINTER)
+	call salloc (accum, ncols + nxk - 1, TY_REAL)
 
 	# Set boundary conditions on input image
 	call imseti (im1, IM_NBUFS, nyk)

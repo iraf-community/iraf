@@ -21,7 +21,6 @@ int procedure envscan (cmd)
 
 char	cmd[ARB]		# command text to begin scan
 
-size_t	sz_val
 char	ch
 int	fd, in, nset, lev, sv_fd[MAXLEV]
 pointer	sp, ip, op, op_top, lbuf, name, value
@@ -33,12 +32,9 @@ define	again_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LBUF
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = MAX_SZKEY
-	call salloc (name, sz_val, TY_CHAR)
-	sz_val = MAX_SZVALUE
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LBUF, TY_CHAR)
+	call salloc (name, MAX_SZKEY, TY_CHAR)
+	call salloc (value, MAX_SZVALUE, TY_CHAR)
 
 	# Position to after the set or reset.
 	in = strmatch (cmd, s_set)

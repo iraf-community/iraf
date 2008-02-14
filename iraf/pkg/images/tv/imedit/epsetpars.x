@@ -8,7 +8,6 @@ procedure ep_setpars (ep)
  
 pointer	ep		# EPIX structure
  
-size_t	sz_val
 int	fd, clgeti(), btoi(), clgwrd(), nowhite(), open()
 char	clgetc()
 bool	clgetb()
@@ -18,9 +17,8 @@ errchk	open
  
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (aperture, sz_val, TY_CHAR)
-	call salloc (logfile, sz_val, TY_CHAR)
+	call salloc (aperture, SZ_FNAME, TY_CHAR)
+	call salloc (logfile, SZ_FNAME, TY_CHAR)
  
 	EP_ANGH(ep) = clgetr ("angh")
 	EP_ANGV(ep) = clgetr ("angv")

@@ -442,7 +442,6 @@ pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
-size_t	sz_val
 int	rp, ntemp
 pointer	sp, rtemp
 int	fnldir(), mk_gmarks()
@@ -476,8 +475,7 @@ begin
 
 	case CSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_CSTRING(mk), SZ_FNAME)
@@ -490,8 +488,7 @@ begin
 
 	case RSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_RSTRING(mk), SZ_FNAME)

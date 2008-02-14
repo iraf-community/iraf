@@ -19,7 +19,6 @@ define	NFORMATS	5
 procedure t_mtexamine()
 
 int	nfiles, file_number, ndumps, nrecords
-size_t	sz_val
 int	file_range[2*MAX_RANGES+1], rec_range[2*MAX_RANGES+1]
 pointer	sp, tape_name, tape_file, file_list, rec_list
 
@@ -32,12 +31,10 @@ include "mtexamine.com"
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (tape_name, sz_val, TY_CHAR)
-	call salloc (tape_file, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (file_list, sz_val, TY_CHAR)
-	call salloc (rec_list, sz_val, TY_CHAR)
+	call salloc (tape_name, SZ_FNAME, TY_CHAR)
+	call salloc (tape_file, SZ_FNAME, TY_CHAR)
+	call salloc (file_list, SZ_LINE, TY_CHAR)
+	call salloc (rec_list,  SZ_LINE, TY_CHAR)
 
 	# Flush STDOUT on a newline only if output is not redirected.
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -110,7 +107,6 @@ int procedure mt_examine (tape_file, dump_range)
 char	tape_file[ARB]		# input file name
 int	dump_range[ARB]		# range of records to be dumped
 
-size_t	sz_val
 pointer	sp, inbuf, pchar, junk
 int	in, bufsize, totrecords, nrecords, totbytes, last_recsize, nbadrec
 int	stat, rec_number, next_dump, recsize, nelems, vals_per_line, field_len
@@ -122,13 +118,11 @@ include "mtexamine.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (junk, sz_val, TY_CHAR)
+	call salloc (junk, SZ_FNAME, TY_CHAR)
 
 	in = mtopen (tape_file, READ_ONLY, 0)
 	bufsize = fstati (in, F_BUFSIZE)
-	sz_val = bufsize
-	call salloc (pchar, sz_val, TY_CHAR)
+	call salloc (pchar, bufsize, TY_CHAR)
 
 	call printf ("File %s:\n")
 	    call pargstr (tape_file)
@@ -141,8 +135,7 @@ begin
 
 	# Prepare formatting parameters for dumping records.
 	if (dump_records == YES) {
-	    sz_val = bufsize * SZB_CHAR
-	    call salloc (inbuf, sz_val, TY_LONG)
+	    call salloc (inbuf, bufsize * SZB_CHAR, TY_LONG)
 	    rec_number = 0
 	    next_dump = get_next_number (dump_range, rec_number)
 	    maxval = 2 ** (byte_chunk * TAPE_BYTE - 1) - 1

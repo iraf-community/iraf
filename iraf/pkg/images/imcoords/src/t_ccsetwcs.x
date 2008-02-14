@@ -22,7 +22,6 @@ double	txref, tyref, txscale, tyscale, txrot, tyrot, tlngref, tlatref
 int	lngunits, latunits, coostat, recstat, proj, pixsys, pfd
 pointer	imlist, reclist, sp, image, database, record, insystem, projstr, str
 pointer	dt, im, coo, tcoo, mw, sx1, sy1, sx2, sy2
-size_t	sz_val
 bool	clgetb()
 double	clgetd()
 pointer	imtopenp()
@@ -34,14 +33,12 @@ errchk	open()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (database, sz_val, TY_CHAR)
-	call salloc (record, sz_val, TY_CHAR)
-	call salloc (insystem, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (projstr, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (database, SZ_FNAME, TY_CHAR)
+	call salloc (record, SZ_FNAME, TY_CHAR)
+	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (projstr, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	imlist = imtopenp ("images")
 	call clgstr ("database", Memc[database], SZ_FNAME)
@@ -274,7 +271,6 @@ double  xscale, yscale          #I the x and y scale in arcsec / pixel
 double  xrot, yrot              #I the x and y axis rotation angles in degrees
 bool    transpose               #I transpose the wcs
 
-size_t	sz_val
 double  tlngref, tlatref
 int     l, i, ndim, naxes, axmap, wtype, ax1, ax2, szatstr
 pointer mw, sp, r, w, cd, ltm, ltv, iltm, nr, ncd, axes, axno, axval
@@ -288,29 +284,20 @@ begin
         ndim = mw_stati (mw, MW_NPHYSDIM)
         # Allocate working memory for the vectors and matrices.
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (projstr, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (projpars, sz_val, TY_CHAR)
-        call salloc (wpars, sz_val, TY_CHAR)
-        sz_val = ndim
-        call salloc (r, sz_val, TY_DOUBLE)
-        call salloc (w, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (cd, sz_val, TY_DOUBLE)
-        call salloc (ltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (ltv, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (iltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (nr, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (ncd, sz_val, TY_DOUBLE)
-        sz_val = IM_MAXDIM
-        call salloc (axes, sz_val, TY_INT)
-        call salloc (axno, sz_val, TY_INT)
-        call salloc (axval, sz_val, TY_INT)
+        call salloc (projstr, SZ_FNAME, TY_CHAR)
+        call salloc (projpars, SZ_LINE, TY_CHAR)
+        call salloc (wpars, SZ_LINE, TY_CHAR)
+        call salloc (r, ndim, TY_DOUBLE)
+        call salloc (w, ndim, TY_DOUBLE)
+        call salloc (cd, ndim * ndim, TY_DOUBLE)
+        call salloc (ltm, ndim * ndim, TY_DOUBLE)
+        call salloc (ltv, ndim, TY_DOUBLE)
+        call salloc (iltm, ndim * ndim, TY_DOUBLE)
+        call salloc (nr, ndim, TY_DOUBLE)
+        call salloc (ncd, ndim * ndim, TY_DOUBLE)
+        call salloc (axes, IM_MAXDIM, TY_INT)
+        call salloc (axno, IM_MAXDIM, TY_INT)
+        call salloc (axval, IM_MAXDIM, TY_INT)
 
         # Open the new wcs
         mwnew = mw_open (NULL, ndim)
@@ -487,18 +474,15 @@ double	xscale, yscale		#I the x and y scale in arcsec / pixel
 double	xrot, yrot		#I the x and y axis rotation angles in degrees
 bool	transpose		#I transpose the wcs
 
-size_t	sz_val
 pointer	sp, str, keyword, value
 int	sk_stati()
 
 begin
         # Allocate temporary space.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (str, sz_val, TY_CHAR)
-        sz_val = SZ_FNAME
-        call salloc (keyword, sz_val, TY_CHAR)
-        call salloc (value, sz_val, TY_CHAR)
+        call salloc (str, SZ_LINE, TY_CHAR)
+        call salloc (keyword, SZ_FNAME, TY_CHAR)
+        call salloc (value, SZ_FNAME, TY_CHAR)
 
         call printf ("Coordinate mapping parameters\n")
         call printf ("    Sky projection geometry: %s\n")
@@ -613,7 +597,6 @@ double  xref, yref              #O the reference point in pixels
 double  xscale, yscale          #O the x and y scale factors
 double  xrot, yrot              #O the x and y axis rotation angles
 
-size_t	sz_val
 int     i, op, ncoeff, junk, rec, coostat, lngunits, latunits, pixsys
 double  xshift, yshift, a, b, c, d, denom
 pointer sp, xcoeff, ycoeff, nxcoeff, nycoeff, mw, projpar, projvalue
@@ -674,9 +657,8 @@ begin
         iferr (ncoeff = dtgeti (dt, rec, "surface1"))
             return (ERR)
         call smark (sp)
-        sz_val = ncoeff
-        call salloc (xcoeff, sz_val, TY_DOUBLE)
-        call salloc (ycoeff, sz_val, TY_DOUBLE)
+        call salloc (xcoeff, ncoeff, TY_DOUBLE)
+        call salloc (ycoeff, ncoeff, TY_DOUBLE)
         do i = 1, ncoeff {
             junk = dtscan(dt)
             call gargd (Memd[xcoeff+i-1])
@@ -690,9 +672,8 @@ begin
         # Get and restore the distortion part of the fit.
         ncoeff = dtgeti (dt, rec, "surface2")
         if (ncoeff > 0) {
-            sz_val = ncoeff
-            call salloc (nxcoeff, sz_val, TY_DOUBLE)
-            call salloc (nycoeff, sz_val, TY_DOUBLE)
+            call salloc (nxcoeff, ncoeff, TY_DOUBLE)
+            call salloc (nycoeff, ncoeff, TY_DOUBLE)
             do i = 1, ncoeff {
                 junk = dtscan(dt)
                 call gargd (Memd[nxcoeff+i-1])
@@ -747,9 +728,8 @@ begin
             yrot = yrot + 360.0d0
 
         # Read in up to 10 projection parameters.
-        sz_val = SZ_FNAME
-        call salloc (projpar, sz_val, TY_CHAR)
-        call salloc (projvalue, sz_val, TY_CHAR)
+        call salloc (projpar, SZ_FNAME, TY_CHAR)
+        call salloc (projvalue, SZ_FNAME, TY_CHAR)
         op = strlen (projection) + 1
         do i = 0, 9 {
             call sprintf (Memc[projpar], SZ_FNAME, "projp%d")

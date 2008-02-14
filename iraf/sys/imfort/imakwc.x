@@ -6,7 +6,6 @@ include	"imfort.h"
 
 procedure imakwc (im, keyw, sval, comm, ier)
 
-size_t	sz_val
 pointer	im			# imfort image descriptor
 %       character*(*) keyw
 %	character*(*) sval
@@ -18,11 +17,9 @@ int	errcode()
 
 begin
 	call smark (sp)
-	sz_val = SZ_KEYWORD
-	call salloc (kp, sz_val, TY_CHAR)
-	sz_val = SZ_VALSTR
-	call salloc (vp, sz_val, TY_CHAR)
-	call salloc (cp, sz_val, TY_CHAR)
+	call salloc (kp, SZ_KEYWORD, TY_CHAR)
+	call salloc (vp, SZ_VALSTR, TY_CHAR)
+	call salloc (cp, SZ_VALSTR, TY_CHAR)
 
 	call f77upk (keyw, Memc[kp], SZ_KEYWORD)
 	call f77upk (sval, Memc[vp], SZ_VALSTR)

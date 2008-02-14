@@ -13,7 +13,6 @@ pointer	tr			# graphics descriptor
 int	stream			# graphics stream
 char	fname[ARB]		# metacode file
 
-size_t	sz_val
 pointer	sp, lbuf, op
 int 	fd, nchars, filelen
 long	fstatl()
@@ -24,8 +23,7 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	iferr (fd = open (fname, READ_ONLY, BINARY_FILE)) {
 	    call grc_message (stream, " - cannot open file")

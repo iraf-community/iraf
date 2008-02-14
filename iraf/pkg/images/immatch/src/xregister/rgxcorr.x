@@ -14,7 +14,6 @@ pointer	db		#I pointer to the shifts database
 int	dformat		#I write shifts file in database format ?
 pointer	xc		#I pointer to the cross-correlation structure
 
-size_t	sz_val
 pointer	sp, image, imname
 real	xshift, yshift
 bool	streq()
@@ -24,9 +23,8 @@ errchk	rg_cross(), rg_xfile()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call rg_xstats (xc, IMAGE, Memc[image], SZ_FNAME)
 
 	# Initialize.
@@ -186,7 +184,6 @@ pointer	xc		#I pointer to the cross correlation structure
 real	xshift		#O shift in x
 real	yshift		#O shift in y
 
-size_t	sz_val
 int	rec
 pointer	sp, str
 int	dtlocate()
@@ -195,8 +192,7 @@ errchk	dtlocate(), dtgetr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	call rg_xstats (xc, RECORD, Memc[str], SZ_LINE)
 	iferr {
@@ -267,7 +263,6 @@ pointer	imr		#I pointer to the reference image
 pointer	im1		#I pointer to input image image
 int	i		#I index of region
 
-size_t	sz_val
 int	stat, xwindow, ywindow, nrimcols, nrimlines, nimcols, nimlines
 int	nrcols, nrlines, ncols, nlines
 int	xlag, ylag, nborder, rc1, rc2, rl1, rl2, c1, c2, l1, l2
@@ -282,10 +277,8 @@ define	nextregion_	10
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = max (GS_SAVECOEFF + 6, 9)
-	call salloc (coeff, sz_val, TY_REAL)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (coeff, max (GS_SAVECOEFF + 6, 9), TY_REAL)
 	rbuf = NULL
 	ibuf = NULL
 
@@ -538,7 +531,6 @@ pointer	imr		#I pointer to the reference image
 pointer	im1		#I pointer to the input image
 int	i		#I index of the current region
 
-size_t	sz_val
 int	rc1, rc2, rl1, rl2, nrcols, nrlines, c1, c2, l1, l2, ncols, nlines
 int	nrimcols, nrimlines, nimcols, nimlines
 int	xwindow, ywindow, xlag, nxfft, nyfft, ylag, stat, nborder
@@ -553,10 +545,8 @@ define	nextregion_	11
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = max (GS_SAVECOEFF+6, 9)
-	call salloc (coeff, sz_val, TY_REAL)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (coeff, max (GS_SAVECOEFF+6, 9), TY_REAL)
 
 	# Check for number of regions.
 	if (i > rg_xstati (xc, NREGIONS)) {
@@ -864,7 +854,6 @@ real	data[nx,ARB]		#I the input array
 int	nx, ny			#I the size of the input/output data array
 real	rho			#I the pixel to pixel correlation factor
 
-size_t	sz_val
 int	i, inline, outline, nxk, nyk, nxc
 pointer	sp, lineptrs, ptr
 real	rhosq, kernel[3,3]
@@ -885,15 +874,12 @@ begin
 
 	# Set up an array of line pointers.
 	call smark (sp)
-	sz_val = nyk
-	call salloc (lineptrs, sz_val, TY_POINTER)
+	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Allocate working space.
 	nxc = nx + 2 * (nxk / 2)
-	do i = 1, nyk {
-	    sz_val = nxc
-	    call salloc (Memi[lineptrs+i-1], sz_val, TY_REAL)
-	}
+	do i = 1, nyk
+	    call salloc (Memi[lineptrs+i-1], nxc, TY_REAL) 
 
 	inline = 1 - nyk / 2
 	do i = 1, nyk - 1 {

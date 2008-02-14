@@ -13,7 +13,6 @@ pointer procedure maskcolor_map (colorstring)
 char	colorstring		#I Color specification string
 pointer	colors			#O Mask colormap object
 
-size_t	sz_val
 int	i, j, ip, ncolors, token, lasttoken, maskval1, maskval2, color, offset
 int	strdic(), ctoi(), nowhite()
 pointer	sp, str, op
@@ -25,8 +24,7 @@ define	err_	10
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# If the colorstring is an expression just save the string
 	# and set the number of colors to 0.

@@ -66,7 +66,6 @@ procedure wf_zpn_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
-size_t	sz_val
 int	i, j, np, szatstr, maxorder, ualen, index, ip
 double	dec, zd1, d1, zd2, d2, zd, d, r, tol, dval
 pointer	sp, atname, atvalue, ct, mw, wp, wv, im, idb, rp
@@ -80,10 +79,8 @@ errchk	wf_decaxis(), mw_gwattrs()
 begin
 	# Allocate space for the attribute string.
 	call smark (sp)
-	sz_val = SZ_ATNAME
-	call salloc (atname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (atvalue, sz_val, TY_CHAR)
+	call salloc (atname, SZ_ATNAME, TY_CHAR)
+	call salloc (atvalue, SZ_LINE, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)

@@ -6,7 +6,6 @@ procedure rg_pxpars (xc)
 
 pointer	xc		#I pointer to the cross-correlation structure
 
-size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
 real	rg_xstatr()
@@ -14,8 +13,7 @@ real	rg_xstatr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Define the regions.
 	call rg_xstats (xc, REGIONS, Memc[str], SZ_LINE)

@@ -15,7 +15,6 @@ double	y[npts]				# Abscissas
 double	w[npts]				# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i, nclean, newreject
 pointer	sp, xclean, yclean, wclean
 
@@ -71,10 +70,9 @@ begin
 	} else {
 	    call smark (sp)
 	    nclean = RG_NPTS(IC_RG(ic))
-	    sz_val = nclean
-	    call salloc (xclean, sz_val, TY_DOUBLE)
-	    call salloc (yclean, sz_val, TY_DOUBLE)
-	    call salloc (wclean, sz_val, TY_DOUBLE)
+	    call salloc (xclean, nclean, TY_DOUBLE)
+	    call salloc (yclean, nclean, TY_DOUBLE)
+	    call salloc (wclean, nclean, TY_DOUBLE)
 	    call rg_packd (IC_RG(ic), x, Memd[xclean])
 	    call rg_packd (IC_RG(ic), y, Memd[yclean])
 	    call rg_packd (IC_RG(ic), w, Memd[wclean])

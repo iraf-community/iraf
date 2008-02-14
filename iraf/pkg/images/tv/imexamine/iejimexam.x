@@ -19,7 +19,6 @@ int	mode
 real	x, y
 int	axis
 
-size_t	sz_val
 int	navg, order, clgpseti()
 bool	center, background, clgpsetb()
 real	sigma, width, rplot, clgpsetr()
@@ -91,13 +90,10 @@ begin
 	yc = (y1 + y2) / 2.
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	sz_val = IE_SZTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (avstr, sz_val, TY_CHAR)
+	call salloc (xs, nx, TY_REAL)
+	call salloc (ys, nx, TY_REAL)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (avstr, SZ_LINE, TY_CHAR)
 
 	ptr = data
 	if (axis == 1) {
@@ -415,15 +411,13 @@ real	delta[nfit]		# Delta array
 int	nfit			# Number of parameters to fit
 real	chisq			# Chi square of fit
 
-size_t	sz_val
 int	i, j, k
 real	ymod, dy, dydpj, dydpk
 pointer	sp, dydp
 
 begin
 	call smark (sp)
-	sz_val = np
-	call salloc (dydp, sz_val, TY_REAL)
+	call salloc (dydp, np, TY_REAL)
 
 	do j = 1, nfit {
 	   do k = 1, j
@@ -462,17 +456,15 @@ real	a[n,n]		# Input matrix and returned inverse
 real	b[n]		# Input RHS vector and returned solution
 int	n		# Dimension of input matrices
 
-size_t	sz_val
 int	krank
 real	rnorm
 pointer	sp, h, g, ip
 
 begin
 	call smark (sp)
-	sz_val = n
-	call salloc (h, sz_val, TY_REAL)
-	call salloc (g, sz_val, TY_REAL)
-	call salloc (ip, sz_val, TY_INT)
+	call salloc (h, n, TY_REAL)
+	call salloc (g, n, TY_REAL)
+	call salloc (ip, n, TY_INT)
 
 	call hfti (a, n, n, n, b, n, 1, 1E-10, krank, rnorm,
 	    Memr[h], Memr[g], Memi[ip])

@@ -16,7 +16,6 @@ pointer	io			#I QPIO descriptor
 char	outstr[maxch]		#O where to put the filter text
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, buf, bp
 int	op, dtype[2], offset[2], i
 int	sizeof(), gstrcpy(), qpex_getfilter()
@@ -24,8 +23,7 @@ define	ovfl_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_TEXTBUF
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_TEXTBUF, TY_CHAR)
 
 	op = 1
 

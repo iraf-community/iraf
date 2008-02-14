@@ -10,7 +10,6 @@ int procedure mt_skip_record (fd, nrecords)
 int	fd				#I magtape device
 int	nrecords			#I number of records to skip
 
-size_t	sz_val
 pointer	sp, buf
 int	n, bufsize
 errchk	aread, await
@@ -19,8 +18,7 @@ int	await(), fstati()
 begin
 	call smark (sp)
 	bufsize = fstati (fd, F_BUFSIZE)
-	sz_val = bufsize
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, bufsize, TY_CHAR)
 
 	for (n=1;  n <= nrecords;  n=n+1) {
 	    call aread (fd, Memc[buf], bufsize, 0)

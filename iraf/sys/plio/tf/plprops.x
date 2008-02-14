@@ -16,7 +16,6 @@ int	dst_maxval		#I max pixel value in dst mask
 int	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, src
 int	opcode, i
 short	data, ceil, src_value
@@ -110,8 +109,7 @@ begin
 	    # mask pixel is set.
 
 	    call smark (sp)
-	    sz_val = npix
-	    call salloc (src, sz_val, TY_SHORT)
+	    call salloc (src, npix, TY_SHORT)
 
 	    do i = 1, npix
 		if (px_src[xs+i-1] > 0)

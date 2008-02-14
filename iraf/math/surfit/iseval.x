@@ -15,7 +15,6 @@ pointer	sf		# pointer to surface descriptor structure
 real	x		# x value
 real	y		# y value
 
-size_t	sz_val
 real	sum, accum
 int	i, k, leftx, lefty, yorder
 pointer	sp, xb, xzb, yb, yzb, czptr
@@ -23,11 +22,9 @@ pointer	sp, xb, xzb, yb, yzb, czptr
 begin
 	# allocate space for the basis functions
 	call smark (sp)
-	sz_val = SF_XORDER(sf)
-	call salloc (xb, sz_val, MEM_TYPE)
+	call salloc (xb, SF_XORDER(sf), MEM_TYPE)
 	xzb = xb - 1
-	sz_val = SF_YORDER(sf)
-	call salloc (yb, sz_val, MEM_TYPE)
+	call salloc (yb, SF_YORDER(sf), MEM_TYPE)
 	yzb = yb - 1
 
 	# calculate the basis functions

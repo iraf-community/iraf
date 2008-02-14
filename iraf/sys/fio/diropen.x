@@ -21,7 +21,6 @@ int procedure diropen (fname, mode)
 char	fname[ARB]		# directory file to be opened
 int	mode			# pass or skip hidden filenames
 
-size_t	sz_val
 int	fd, dirf
 bool	first_time
 int	dirmode[MAX_OPENDIR]
@@ -38,8 +37,7 @@ data	first_time /true/
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	# Free up all descriptor slots.
 	if (first_time) {
@@ -159,7 +157,6 @@ char	outline[maxch]		# buffer which receives the VFN
 int	maxch			# maxchars to return
 int	status
 
-size_t	sz_val
 int	nchars
 pointer	vp, sp, osfn
 int	dirmode[MAX_OPENDIR]
@@ -173,8 +170,7 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_FNAME, TY_CHAR)
 
 	status = ERR
 	if (chan < 1 || chan > MAX_OPENDIR)

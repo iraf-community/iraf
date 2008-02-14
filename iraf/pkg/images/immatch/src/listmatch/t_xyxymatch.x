@@ -26,7 +26,6 @@ pointer	xformat, yformat
 real	tolerance, separation, xin, yin, xmag, ymag, xrot, yrot, xout, yout
 real	ratio
 
-size_t	sz_val
 bool	clgetb()
 int	clplen(), clgeti(), clgfil(), open(), clgwrd()
 int	rg_getreftie(), rg_lincoeff(), fstati(), rg_rdxyi(), rg_sort()
@@ -41,22 +40,18 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (inname, sz_val, TY_CHAR)
-	call salloc (refname, sz_val, TY_CHAR)
-	call salloc (outname, sz_val, TY_CHAR)
-	call salloc (refpoints, sz_val, TY_CHAR)
-	sz_val = MAX_NTIE
-	call salloc (xreftie, sz_val, TY_REAL)
-	call salloc (yreftie, sz_val, TY_REAL)
-	call salloc (xintie, sz_val, TY_REAL)
-	call salloc (yintie, sz_val, TY_REAL)
-	sz_val = MAX_NCOEFF
-	call salloc (coeff, sz_val, TY_REAL)
-	sz_val = SZ_FNAME
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (inname, SZ_FNAME, TY_CHAR)
+	call salloc (refname, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (refpoints, SZ_FNAME, TY_CHAR)
+	call salloc (xreftie, MAX_NTIE, TY_REAL)
+	call salloc (yreftie, MAX_NTIE, TY_REAL)
+	call salloc (xintie, MAX_NTIE, TY_REAL)
+	call salloc (yintie, MAX_NTIE, TY_REAL)
+	call salloc (coeff, MAX_NCOEFF, TY_REAL)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the input, output, and reference lists.
 	ilist = clpopnu ("input")

@@ -24,7 +24,6 @@ real	w[ncols]	# weight of the data points
 int	ncols		# number of data points
 int	wtflag		# type of weighting desired
 
-size_t	sz_val
 int	i, ii, j, k
 pointer	xbzptr, xbptr
 pointer	xlzptr
@@ -49,10 +48,9 @@ begin
 
 	# set up temporary storage
 	call smark (sp)
-	sz_val = ncols
-	call salloc (bw, sz_val, TY_REAL)
-	call salloc (left, sz_val, TY_INT)
-	call salloc (rows, sz_val, TY_INT)
+	call salloc (bw, ncols, TY_REAL)
+	call salloc (left, ncols, TY_INT)
+	call salloc (rows, ncols, TY_INT)
 
 	# set up the pointers
 	xbzptr = SF_XBASIS(sf) - 1

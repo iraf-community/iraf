@@ -20,7 +20,6 @@ int	ier		# ier = OK, everything OK
 			# coefficients are 0.
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
 
-size_t	sz_val
 int	k, l
 int	xorder, nfree, maxorder
 pointer	sp, vzptr, vindex, bxptr, byptr, bwz
@@ -73,8 +72,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = GS_NPTS(sf)
-	call salloc (bwz, sz_val, TY_DOUBLE)
+	call salloc (bwz, GS_NPTS(sf), TY_DOUBLE)
 
 	# index the pointers
 	vzptr = GS_VECTOR(sf) - 1

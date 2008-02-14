@@ -21,7 +21,6 @@ procedure t_gradient()
 char	imtlist1[SZ_LINE]			# Input image list
 char	imtlist2[SZ_LINE]			# Output image list
 
-size_t	sz_val
 char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
@@ -91,8 +90,7 @@ begin
 
 		# Make the kernel.
 		call smark (sp)
-		sz_val = nxk * nyk
-		call salloc (kernel, sz_val, TY_REAL)
+		call salloc (kernel, nxk * nyk, TY_REAL)
 		call cnv_gradient_kernel (Memr[kernel], nxk, nyk, filter)
 
 		# Gradient filter the image.

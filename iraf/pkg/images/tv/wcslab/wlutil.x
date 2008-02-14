@@ -14,7 +14,6 @@ pointer	im			# I:   pointer to the input image
 real	c1, c2, l1, l2		# I/O: input/output window
 real	vl, vr, vb, vt		# I/O: input/output viewport
 
-size_t	sz_val
 int	wcs_status, dim1, dim2, step1, step2
 pointer	sp, frimage, frim, iw
 real	x1, x2, y1, y2, fx1, fx2, fy1, fy2, junkx, junky
@@ -31,8 +30,7 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (frimage, sz_val, TY_CHAR)
+	call salloc (frimage, SZ_FNAME, TY_CHAR)
 
 	# Open the requested display frame and get the loaded image name.
 	# If this name is blank, use the default viewport and window.
@@ -372,15 +370,13 @@ int	npts                # I: the number of points in the vectors
 real	angle               # I: the angle to rotate (radians)
 real	nx[npts], ny[npts]  # O: the transformed vectors
 
-size_t	sz_val
 pointer sp, center, mw
 pointer mw_open(), mw_sctran()
 
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = N_DIM
-	call salloc (center, sz_val, TY_REAL)
+	call salloc (center, N_DIM, TY_REAL)
 
 	mw = mw_open (NULL, N_DIM)
 	ONER(center,1) = 0.

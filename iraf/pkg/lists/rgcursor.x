@@ -6,14 +6,12 @@
 procedure t_rgcursor 
 
 pointer sp, buf, gp
-size_t	sz_val
 pointer	gopen()
 int	clglstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	iferr (gp = gopen ("stdgraph", APPEND, STDGRAPH))
 	    gp = NULL

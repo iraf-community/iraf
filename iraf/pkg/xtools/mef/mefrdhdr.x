@@ -263,15 +263,13 @@ int procedure mef_strcmp_lwr (s1, s2)
 
 char s1[ARB], s2[ARB]
 
-size_t	sz_val
 pointer sp, l1, l2
 int	strcmp(), istat
 
 begin
 	call smark(sp)
-	sz_val = SZ_FNAME
-	call salloc (l1, sz_val, TY_CHAR)
-	call salloc (l2, sz_val, TY_CHAR)
+	call salloc (l1, SZ_FNAME, TY_CHAR)
+	call salloc (l2, SZ_FNAME, TY_CHAR)
 
 	call strcpy (s1, Memc[l1], SZ_FNAME)
 	call strcpy (s2, Memc[l2], SZ_FNAME)
@@ -375,15 +373,13 @@ procedure mef_cp_spool (spool, mef)
 int	spool 		#I spool file descriptor
 pointer mef		#
 
-size_t	sz_val
 pointer	hdr, lbuf, sp
 int	fitslen, fstatl, user
 int	stropen(), getline()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	call seek (spool, BOFL)
 	fitslen = fstatl (spool, F_FILESIZE)

@@ -19,7 +19,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, s1, r, one
 data	one /1.0/
@@ -39,10 +38,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (sums, sz_val, TY_REAL)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (sums, npts, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Since the unweighted average is computed here possibly skip combining
 	if (dowts || combine != AVERAGE)
@@ -311,7 +308,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
 real	med, low, high, r, s, s1, one
@@ -331,8 +327,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute the poisson scaled average sigma about the median.
 	# There must be at least three pixels at each point to define
@@ -574,7 +569,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, s1, r, one
 data	one /1.0/
@@ -594,10 +588,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (sums, sz_val, TY_REAL)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (sums, npts, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Since the unweighted average is computed here possibly skip combining
 	if (dowts || combine != AVERAGE)
@@ -866,7 +858,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
 real	med, low, high, r, s, s1, one
@@ -886,8 +877,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute the poisson scaled average sigma about the median.
 	# There must be at least three pixels at each point to define
@@ -1129,7 +1119,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
-size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, s1, r, one
 data	one /1.0/
@@ -1149,10 +1138,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (sums, sz_val, TY_REAL)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (sums, npts, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Since the unweighted average is computed here possibly skip combining
 	if (dowts || combine != AVERAGE)
@@ -1421,7 +1408,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
-size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
 real	med, low, high, r, s, s1, one
@@ -1441,8 +1427,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute the poisson scaled average sigma about the median.
 	# There must be at least three pixels at each point to define
@@ -1684,7 +1669,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	average[npts]		# Average
 
-size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 double	d1, low, high, sum, a, s, s1, r, one
 data	one /1.0D0/
@@ -1704,10 +1688,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (sums, sz_val, TY_REAL)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (sums, npts, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Since the unweighted average is computed here possibly skip combining
 	if (dowts || combine != AVERAGE)
@@ -1976,7 +1958,6 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	median[npts]		# Median
 
-size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
 double	med, low, high, r, s, s1, one
@@ -1996,8 +1977,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = nimages+1
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute the poisson scaled average sigma about the median.
 	# There must be at least three pixels at each point to define

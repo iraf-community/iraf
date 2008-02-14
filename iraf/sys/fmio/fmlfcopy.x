@@ -12,7 +12,6 @@ procedure fm_lfcopy (old, o_lfile, new, n_lfile)
 pointer	old, new		#I FMIO descriptors of source and destination
 int	o_lfile, n_lfile	#I lfile numbers of source and dest. lfiles
 
-size_t	sz_val
 long	offset
 int	n_szbpage
 pointer	sp, o_ft, n_ft, o_lf, n_lf, o_lfname, n_lfname, buf
@@ -54,11 +53,9 @@ begin
 
 	# Allocate buffers.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (o_lfname, sz_val, TY_CHAR)
-	call salloc (n_lfname, sz_val, TY_CHAR)
-	sz_val = maxbytes / SZB_CHAR
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (o_lfname, SZ_FNAME, TY_CHAR)
+	call salloc (n_lfname, SZ_FNAME, TY_CHAR)
+	call salloc (buf, maxbytes / SZB_CHAR, TY_CHAR)
 
 	# Open old lfile.
 	call fm_lfname (old, o_lfile, type, Memc[o_lfname], SZ_FNAME)

@@ -334,17 +334,14 @@ procedure clc_scan (cmd)
 
 char	cmd[ARB]		#I command to be scanned
 
-size_t	sz_val
 int	ip
 pointer	sp, param, value, op, nchars
 int	stridx(), ctowrd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (param, sz_val, TY_CHAR)
-	sz_val = SZ_COMMAND
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_COMMAND, TY_CHAR)
 
 	# Skip any leading whitespace.
 	for (ip=1;  IS_WHITE(cmd[ip]);  ip=ip+1)
@@ -389,7 +386,6 @@ int	fd			#I output file
 char	pset[ARB]		#I pset to be listed, or EOS for full cache
 char	format[ARB]		#I output format - one %s each for param,value
 
-size_t	sz_val
 int	nsyms, i
 pointer	sp, syms, sympset, ip, op, sym, np
 
@@ -404,10 +400,8 @@ begin
 	    nsyms = nsyms + 1
 
 	call smark (sp)
-	sz_val = nsyms
-	call salloc (syms, sz_val, TY_POINTER)
-	sz_val = SZ_FNAME
-	call salloc (sympset, sz_val, TY_CHAR)
+	call salloc (syms, nsyms, TY_POINTER)
+	call salloc (sympset, SZ_FNAME, TY_CHAR)
 
 	# Get a reversed list of symbol pointers.
 	op = syms + nsyms - 1

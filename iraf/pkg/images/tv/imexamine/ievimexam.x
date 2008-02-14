@@ -28,7 +28,6 @@ pointer	ie		# IMEXAM pointer
 real	x, y		# Starting or center coordinate
 int	key		# 'u' centered vector, 'v' two endpoint vector
 
-size_t	sz_val
 int	btype, nxvals, nyvals, nzvals, width
 pointer	sp, title, boundary, im, x_vec, y_vec, pp
 real	x1, y1, x2, y2, zmin, zmax, bconstant
@@ -47,10 +46,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = IE_SZTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_BTYPE
-	call salloc (boundary, sz_val, TY_CHAR)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (boundary, SZ_BTYPE, TY_CHAR)
 
 	# Get boundary extension parameters.
 	if (IE_PP(ie) != NULL)
@@ -140,7 +137,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, dpx, dpy, ratio, xoff, yoff, noff, xv, yv
 int	i, j, k, nedge, col1, col2, line1, line2
 int	colb, colc, line, linea, lineb, linec
@@ -151,12 +147,11 @@ errchk	msiinit
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oxs, sz_val, TY_REAL)
-	call salloc (oys, sz_val, TY_REAL)
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oxs, width, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Determine sampling perpendicular to vector.
 	dx = (x2 - x1) / (nvals - 1)
@@ -278,7 +273,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 real	sum
 int	line, linea, lineb, linec
 pointer sp, xs, ys, msi, yvals, buf
@@ -289,10 +283,9 @@ errchk	msiinit
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]
@@ -389,7 +382,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, yoff, noff, xv, yv
 int	i, j, nedge, col1, col2, line1, line2
 int	line, linea, lineb, linec
@@ -399,12 +391,10 @@ pointer	imgs2r()
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oys, sz_val, TY_REAL)
-	sz_val = nvals
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, nvals, TY_REAL)
+	call salloc (ys, nvals, TY_REAL)
+	call salloc (yvals, nvals, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]

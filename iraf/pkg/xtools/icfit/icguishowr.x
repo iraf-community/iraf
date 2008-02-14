@@ -26,7 +26,6 @@ pointer cv                              #I CURFIT pointer for error listing
 real   x[npts], y[npts], wts[npts]     #I Data arrays
 int     npts                            #I Number of data points
 
-size_t	sz_val
 int	ncmd, deact, fd
 pointer	sp, str, msg
 int	strdic(), nscan(), stropen(), open()
@@ -34,8 +33,7 @@ errchk	stropen, open, ic_fshow, ic_fvshowr, ic_fxyshowr, ic_ferrorsr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Scan the command.
 	call sscan (cmd)

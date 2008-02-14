@@ -12,15 +12,13 @@ int	mode			# Image mode
 pointer	refim			# Reference image
 pointer	pm			# IMIO pointer (returned)
 
-size_t	sz_val
 int	i, fnextn()
 pointer	sp, extn, immap()
 bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
 
 	i = fnextn (fname, Memc[extn], SZ_FNAME)
 	if (streq (Memc[extn], "pl"))

@@ -15,7 +15,6 @@ pointer	hb		# encode help block header
 char	modname[ARB]	# module name
 pointer	ctrl		# help control block
 
-size_t	sz_val
 char	blank
 int	n, center, offset, lmargin, rmargin
 pointer	sp, lbuf, edge, op, hbuf
@@ -23,10 +22,9 @@ int	strlen(), gstrcpy()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	call salloc (edge, sz_val, TY_CHAR)
-	call salloc (hbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (edge, SZ_LINE, TY_CHAR)
+	call salloc (hbuf, SZ_LINE, TY_CHAR)
 
 	# Clear screen.
 	if (H_FORMAT(ctrl) == HF_TEXT) {

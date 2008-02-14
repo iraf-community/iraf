@@ -62,7 +62,6 @@ char	expr[ARB]		# expression to be evaluated
 pointer	getop_epa		# user supplied get operand procedure
 pointer	ufcn_epa		# user supplied function call procedure
 
-size_t	sz_val
 int	junk
 bool	debug
 pointer	sp, ip
@@ -84,8 +83,7 @@ begin
 	call calloc (ev_oval, LEN_OPERAND, TY_STRUCT)
 
 	# Make a local copy of the input string.
-	sz_val = strlen(expr)
-	call salloc (ip, sz_val, TY_CHAR)
+	call salloc (ip, strlen(expr), TY_CHAR)
 	call strcpy (expr, Memc[ip], ARB)
 
 	# Evaluate the expression.  The expression value is copied into the
@@ -391,17 +389,14 @@ int procedure xev_patmatch (str, pat)
 char	str[ARB]		# operand string
 char	pat[ARB]		# pattern
 
-size_t	sz_val
 int	junk, ip, index
 pointer	sp, patstr, patbuf, op
 int	patmake(), patmatch()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (patstr, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val,  TY_CHAR)
+	call salloc (patstr, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE,  TY_CHAR)
 	call aclrc (Memc[patstr], SZ_FNAME)
 	call aclrc (Memc[patbuf], SZ_LINE)
 
@@ -493,7 +488,6 @@ pointer	args[ARB]		# pointer to arglist descriptor
 int	nargs			# number of arguments
 pointer	out			# output operand (function value)
 
-size_t	sz_val
 real	rresult, rval[2], rtemp
 int	iresult, ival[2], type[2], optype, oplen, itemp
 int	opcode, v_nargs, i
@@ -509,8 +503,7 @@ define	free_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
 	oplen = 0
 
@@ -819,13 +812,11 @@ procedure xev_error1 (fmt, arg)
 
 char	fmt[ARB]		# printf format string
 char	arg[ARB]		# string argument
-size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg)
@@ -843,13 +834,11 @@ procedure xev_error2 (fmt, arg1, arg2)
 char	fmt[ARB]		# printf format string
 char	arg1[ARB]		# string argument
 int	arg2			# integer argument
-size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg1)
@@ -1148,7 +1137,6 @@ int procedure yyparse (fd, yydebug, yylex)
 
 int	fd			# stream to be parsed
 bool	yydebug			# print debugging information?
-size_t	sz_val
 int	yylex()			# user-supplied lexical input function
 extern	yylex()
 
@@ -1284,8 +1272,7 @@ data	(yydef(i),i= 73, 75)	/  30,   0,  23/
 
 begin
 	call smark (yysp)
-	sz_val = (YYMAXDEPTH+2) * YYOPLEN
-	call salloc (yyv, sz_val, TY_STRUCT)
+	call salloc (yyv, (YYMAXDEPTH+2) * YYOPLEN, TY_STRUCT)
 
 	# Initialization.  The first element of the dynamically allocated
 	# token value stack (yyv) is used for yyval, the second for yylval,

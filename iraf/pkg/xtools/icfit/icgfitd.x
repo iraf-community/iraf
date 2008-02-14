@@ -20,7 +20,6 @@ double	y[npts]			# Abscissas
 double	wts[npts]		# Weights
 int	npts			# Number of points
 
-size_t	sz_val
 real	wx, wy
 int	wcs, key
 
@@ -36,8 +35,7 @@ errchk	ic_fitd()
 
 begin
 	call smark (sp)
-	sz_val = IC_SZSAMPLE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
 
 	# Allocate memory for the fit and a copy of the weights.
 	# The weights are copied because they are changed when points are

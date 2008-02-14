@@ -86,16 +86,14 @@ char	xerrmsg[ARB]	#O the x fit error message
 char	yerrmsg[ARB]	#O the y fit error message
 int	maxch		#I maximum size of the error message
 
-size_t	sz_val
 pointer	sp, xresidual, yresidual
 errchk	geo_fxyr(), geo_mrejectr(), geo_fthetar(), geo_fmagnifyr()
 errchk	geo_flinearr()
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xresidual, sz_val, TY_REAL)
-	call salloc (yresidual, sz_val, TY_REAL)
+	call salloc (xresidual, npts, TY_REAL)
+	call salloc (yresidual, npts, TY_REAL)
 
 	switch (GM_FIT(fit)) {
 	case GM_ROTATE:
@@ -155,7 +153,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, num, denom, theta, det 
@@ -167,8 +164,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_REAL)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -380,7 +376,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, det, theta
@@ -392,8 +387,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_REAL)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -630,7 +624,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, theta
@@ -642,8 +635,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_REAL)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -882,7 +874,6 @@ int	xfit		#I X fit ?
 char	errmsg[ARB]	#O returned error message
 int	maxch		#I maximum number of characters in error message
 
-size_t	sz_val
 int	i, ier, ncoeff
 pointer	sp, zfit, savefit, coeff
 real	xmin, xmax, ymin, ymax
@@ -891,12 +882,9 @@ bool	fp_equald()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (zfit, sz_val, TY_REAL)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_REAL)
-	sz_val = 3
-	call salloc (coeff, sz_val, TY_REAL)
+	call salloc (zfit, npts, TY_REAL)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
+	call salloc (coeff, 3, TY_REAL)
 
 	# Determine the minimum and maximum values
 	if (fp_equald (GM_XMIN(fit), GM_XMAX(fit))) {
@@ -1171,7 +1159,6 @@ int	xmaxch		#I maximum number of characters in the x error message
 char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
-size_t	sz_val
 int	i
 int	nreject, niter
 pointer	sp, twts
@@ -1181,8 +1168,7 @@ errchk	geo_fxyr(), geo_fthetar(), geo_fmagnifyr(), geo_flinearr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (twts, sz_val, TY_REAL)
+	call salloc (twts, npts, TY_REAL)
 
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)
@@ -1314,16 +1300,14 @@ char	xerrmsg[ARB]	#O the x fit error message
 char	yerrmsg[ARB]	#O the y fit error message
 int	maxch		#I maximum size of the error message
 
-size_t	sz_val
 pointer	sp, xresidual, yresidual
 errchk	geo_fxyd(), geo_mrejectd(), geo_fthetad(), geo_fmagnifyd()
 errchk	geo_flineard()
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xresidual, sz_val, TY_DOUBLE)
-	call salloc (yresidual, sz_val, TY_DOUBLE)
+	call salloc (xresidual, npts, TY_DOUBLE)
+	call salloc (yresidual, npts, TY_DOUBLE)
 
 	switch (GM_FIT(fit)) {
 	case GM_ROTATE:
@@ -1383,7 +1367,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, num, denom, theta, det 
@@ -1395,8 +1378,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_DOUBLE)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -1608,7 +1590,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, det, theta
@@ -1620,8 +1601,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_DOUBLE)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -1858,7 +1838,6 @@ int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-size_t	sz_val
 int	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, theta
@@ -1870,8 +1849,7 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_DOUBLE)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -2110,7 +2088,6 @@ int	xfit		#I X fit ?
 char	errmsg[ARB]	#O returned error message
 int	maxch		#I maximum number of characters in error message
 
-size_t	sz_val
 int	i, ier, ncoeff
 pointer	sp, zfit, savefit, coeff
 double	xmin, xmax, ymin, ymax
@@ -2119,12 +2096,9 @@ bool	fp_equald()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (zfit, sz_val, TY_DOUBLE)
-	sz_val = GS_SAVECOEFF + 3
-	call salloc (savefit, sz_val, TY_DOUBLE)
-	sz_val = 3
-	call salloc (coeff, sz_val, TY_DOUBLE)
+	call salloc (zfit, npts, TY_DOUBLE)
+	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
+	call salloc (coeff, 3, TY_DOUBLE)
 
 	# Determine the minimum and maximum values
 	if (fp_equald (GM_XMIN(fit), GM_XMAX(fit))) {
@@ -2397,7 +2371,6 @@ int	xmaxch		#I maximum number of characters in the x error message
 char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
-size_t	sz_val
 int	i
 int	nreject, niter
 pointer	sp, twts
@@ -2407,8 +2380,7 @@ errchk	geo_fxyd(), geo_fthetad(), geo_fmagnifyd(), geo_flineard()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (twts, sz_val, TY_DOUBLE)
+	call salloc (twts, npts, TY_DOUBLE)
 
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)

@@ -525,7 +525,6 @@ procedure sys_scanarglist (cmdin, i_args)
 int	cmdin			# command input stream
 char	i_args[ARB]		# (first part of) argument list
 
-size_t	sz_val
 int	fd
 char	ch
 bool	skip
@@ -534,10 +533,8 @@ int	getlline()
 
 begin
 	call smark (sp)
-	sz_val = SZ_CMDBUF
-	call salloc (args, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (args, SZ_CMDBUF, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	call strcpy (i_args, Memc[args], SZ_CMDBUF)
 
@@ -607,7 +604,6 @@ procedure sys_getpars (fname)
 
 char	fname			# pset file
 
-size_t	sz_val
 bool	skip
 int	lineno, fd
 pointer	sp, lbuf, ip
@@ -616,8 +612,7 @@ errchk	open, getlline
 
 begin
 	call smark (sp)
-	sz_val = SZ_CMDBUF
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_CMDBUF, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
@@ -656,16 +651,13 @@ char	args[ARB]		# argument list
 int	ip			# pointer to first char of argument
 bool	skip			# skip whitespace within "param=value" args
 
-size_t	sz_val
 pointer	sp, param, value, op
 int	stridx()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (param, sz_val, TY_CHAR)
-	sz_val = SZ_VALSTR
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_VALSTR, TY_CHAR)
 
 	# Extract the param field.
 	op = param
@@ -733,7 +725,6 @@ procedure sys_redirect (args, ip)
 char	args[ARB]		# argument list
 int	ip			# pointer to first char of redir arg
 
-size_t	sz_val
 pointer	sp, fname
 int	fd, mode, type
 int	ctoi()
@@ -742,8 +733,7 @@ errchk	fredir, fseti
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	# Get number of stream (0 if not given).
 	if (ctoi (args, ip, fd) <= 0)

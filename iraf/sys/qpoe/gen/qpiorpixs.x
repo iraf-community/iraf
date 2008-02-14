@@ -20,7 +20,6 @@ int	vs[ndim], ve[ndim]	#I vectors defining region to be extracted
 int	ndim			#I should be 2 for QPOE
 real	xblock, yblock		#I blocking factors
 
-size_t	sz_val
 double	x, y
 pointer	sp, evl, ev_p
 int	evtype, maxpix, maskval, xoff, yoff, xw, yw, nev, totev, pix, i, j
@@ -43,8 +42,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = SZ_EVLIST
-	call salloc (evl, sz_val, TY_POINTER)
+	call salloc (evl, SZ_EVLIST, TY_POINTER)
 
 	xoff = IO_EVXOFF(io)
 	yoff = IO_EVYOFF(io)

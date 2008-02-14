@@ -15,7 +15,6 @@ char	prefix[ARB]		#I String to preceed sysid info
 pointer	logfd			#O Pointer to array of open file descriptors
 int	stdflag			#O Flag that STDOUT or ERR is in the list
 
-size_t	sz_val
 int	nlogfd, fd, i
 pointer	loglist, linebuf, fname, sp
 
@@ -32,10 +31,8 @@ begin
 
 	if (nlogfd > 0) {
 	    call smark (sp)
-	    sz_val = SZ_LINE
-	    call salloc (linebuf, sz_val, TY_CHAR)
-	    sz_val = SZ_FNAME
-	    call salloc (fname, sz_val, TY_CHAR)
+	    call salloc (linebuf, SZ_LINE, TY_CHAR)
+	    call salloc (fname, SZ_FNAME, TY_CHAR)
 	    call malloc (logfd, nlogfd, TY_INT)
 
 	    call sysid (Memc[linebuf], SZ_LINE)
@@ -68,7 +65,6 @@ pointer	logfd			#I Pointer to array of open file descriptors
 int	nlogfd			#I Number of open files
 char	prefix[ARB]		#I String to preceed sysid info
 
-size_t	sz_val
 int	fd, i
 pointer	linebuf, sp
 
@@ -79,8 +75,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (linebuf, sz_val, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
 
 	call sysid (Memc[linebuf], SZ_LINE)
 

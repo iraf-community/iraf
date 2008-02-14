@@ -424,7 +424,6 @@ int	npix					#i number of pixels to read
 int	line					#i image line number
 int	band					#i image band number
 
-size_t	sz_val
 int	i, lnum, type
 int	nldone, blnum
 pointer	sp, dptr, data, optr
@@ -466,8 +465,7 @@ begin
 
 	# See if we're flipping image in x, and reverse the pixels.
 	if (and(IP_FLIP(ip),FLIP_X) == FLIP_X) {
-	    sz_val = npix
-	    call salloc (dptr, sz_val, type)    
+	    call salloc (dptr, npix, type)    
 	    do i = 1, npix {
         	switch (type) {
         	case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -728,7 +726,6 @@ procedure ip_fix_outbands (ip)
 
 pointer ip                                      #i task struct pointer
 
-size_t	sz_val
 pointer	sp, buf
 pointer	im
 int	i, nbands
@@ -737,8 +734,7 @@ define	SZ_OBSTR	2500
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
 	if (DEBUG) {
 	    call eprintf ("fix_outbands: npixt=%d ndim=%d inter=%d\n")

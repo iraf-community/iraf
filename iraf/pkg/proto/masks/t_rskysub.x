@@ -10,7 +10,6 @@ pointer	sp, imasks, str
 pointer	rs, inlist, imsklist, omsklist, tmplist, outlist, hmsklist, sclist
 bool	msk_invert, useimasks, cache, verbose
 
-size_t	sz_val
 real	clgetr()
 pointer	imtopenp(), imtopen(), rs_imlist(), rs_olist(), rs_omlist(), fntopnb()
 int	imtlen(), fntlenb()
@@ -20,9 +19,8 @@ bool	clgetb(), strne()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imasks, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imasks, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Open the input image list. Make this a test versus nmin ?
 	inlist = imtopenp ("input")

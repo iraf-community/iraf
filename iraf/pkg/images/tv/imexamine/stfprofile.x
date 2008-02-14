@@ -164,7 +164,6 @@ procedure stf_bkgd (sf, sfd)
 pointer	sf			#I Parameter structure
 pointer	sfd			#I Star structure
 
-size_t	sz_val
 int	i, j, x1, x2, y1, y2, xc, yc, nx, ny, npts, ns, nsat
 real	sat, bkgd, miso
 real	r, r1, r2, r3, dx, dy, dz
@@ -193,8 +192,7 @@ begin
 	    sat = MAX_REAL
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (bdata, sz_val, TY_REAL)
+	call salloc (bdata, npts, TY_REAL)
 
 	ptr = data
 	do j = y1, y2 {
@@ -253,7 +251,6 @@ procedure stf_profile (sf, sfd)
 pointer	sf			#I Parameter structure
 pointer	sfd			#I Star structure
 
-size_t	sz_val
 int	np
 real	radius, xc, yc
 
@@ -301,8 +298,7 @@ begin
 
 	# Compute the enclosed flux profile, its derivative, and moments.
 	call smark (sp)
-	sz_val = np
-	call salloc (profile, sz_val, TY_REAL)
+	call salloc (profile, np, TY_REAL)
 	call aclrr (Memr[profile], np)
 
 	xx = 0.
@@ -653,7 +649,6 @@ pointer	sfd			#I Star structure
 real	x			#I Radius
 real	y			#I Flux
 
-size_t	sz_val
 int	npmax, np
 pointer	asi
 
@@ -669,8 +664,7 @@ begin
 	asi = SFD_ASI1(sfd)
 
 	call smark (sp)
-	sz_val = npmax
-	call salloc (profile, sz_val, TY_REAL)
+	call salloc (profile, npmax, TY_REAL)
 
 	# Renormalize the enclosed flux profile.
 	if (IS_INDEF(x) || x <= 0.) {
@@ -1002,7 +996,6 @@ procedure stf_fit (sf, sfd)
 pointer	sf			#I Main data structure
 pointer	sfd			#I Star data structure
 
-size_t	sz_val
 int	i, j, n, np, pfit[2]
 real	beta, z, params[3]
 pointer	asi, nl
@@ -1020,10 +1013,9 @@ begin
 	asi = SFD_ASI1(sfd)
 
 	call smark (sp)
-	sz_val = np
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (w, sz_val, TY_REAL)
+	call salloc (x, np, TY_REAL)
+	call salloc (y, np, TY_REAL)
+	call salloc (w, np, TY_REAL)
 
 	n = 0
 	j = 0

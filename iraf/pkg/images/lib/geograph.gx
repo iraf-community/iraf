@@ -22,7 +22,6 @@ int	plot_type	#I type of plot
 pointer	gt		#I gtools descriptor
 pointer	fit		#I geomap fit parameters
 
-size_t	sz_val
 int	npts
 pointer	sp, params, xtermlab, ytermlab
 real	xrms, yrms, rej
@@ -30,11 +29,9 @@ int	strlen(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = MAX_PARAMS
-	call salloc (params, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (xtermlab, sz_val, TY_CHAR)
-	call salloc (ytermlab, sz_val, TY_CHAR)
+	call salloc (params, MAX_PARAMS, TY_CHAR)
+	call salloc (xtermlab, SZ_FNAME, TY_CHAR)
+	call salloc (ytermlab, SZ_FNAME, TY_CHAR)
 
 	npts = max (0, GM_NPTS(fit) - GM_NWTS0(fit))
 	xrms = max (0.0d0, GM_XRMS(fit))
@@ -258,7 +255,6 @@ pointer	gfit		#I pointer to the gfit structure
 char	cmdstr[ARB]	#I command string
 int	newgraph	#I plot new graph
 
-size_t	sz_val
 int	ncmd, ival
 pointer	sp, str, cmd
 real	rval
@@ -266,10 +262,8 @@ int	nscan(), strdic(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -719,7 +713,6 @@ PIXEL	yin[ARB]	#I y values
 PIXEL	wts[ARB]	#I array of weights
 int	npts		#I number of points
 
-size_t	sz_val
 int	i, j
 $if (datatype == d)
 pointer	sp, rxin, ryin
@@ -740,9 +733,8 @@ $if (datatype == r)
 	    call gascale (gd, yin, npts, 2)
 $else
 	    call smark (sp)
-	    sz_val = npts
-	    call salloc (rxin, sz_val, TY_REAL)
-	    call salloc (ryin, sz_val, TY_REAL)
+	    call salloc (rxin, npts, TY_REAL)
+	    call salloc (ryin, npts, TY_REAL)
 	    call achtdr (xin, Memr[rxin], npts)
 	    call achtdr (yin, Memr[ryin], npts)
 	    call gascale (gd, Memr[rxin], npts, 1)
@@ -802,7 +794,6 @@ PIXEL	resid[ARB]	#I residual
 PIXEL	wts[ARB]	#I array of weights
 int	npts		#I number of points
 
-size_t	sz_val
 int	i, j
 pointer	sp, zero
 $if (datatype == d)
@@ -812,8 +803,7 @@ $endif
 begin
 	# Allocate space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (zero, sz_val, TY_REAL)
+	call salloc (zero, npts, TY_REAL)
 	call amovkr (0.0, Memr[zero], npts)
 
 	# Calculate the residuals.
@@ -829,9 +819,8 @@ $if (datatype == r)
 	    call gascale (gd, x, npts, 1)
 	    call gascale (gd, resid, npts, 2)
 $else
-	    sz_val = npts
-	    call salloc (rxin, sz_val, TY_REAL)
-	    call salloc (ryin, sz_val, TY_REAL)
+	    call salloc (rxin, npts, TY_REAL)
+	    call salloc (ryin, npts, TY_REAL)
 	    call achtdr (x, Memr[rxin], npts)
 	    call achtdr (resid, Memr[ryin], npts)
 	    call gascale (gd, Memr[rxin], npts, 1)
@@ -896,7 +885,6 @@ pointer	fit		#I fit descriptor
 pointer	sx1, sy1	#I pointer to the linear x and y surface fits
 pointer sx2, sy2	#I pointer to the linear x and y surface fits
 
-size_t	sz_val
 int	i
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 $if (datatype == d)
@@ -907,17 +895,15 @@ PIXEL	xint, yint, dx, dy
 begin
 	# allocate temporary space
 	call smark (sp)
-	sz_val = NGRAPH
-	call salloc (xtemp, sz_val, TY_PIXEL)
-	call salloc (ytemp, sz_val, TY_PIXEL)
-	call salloc (xfit1, sz_val, TY_PIXEL)
-	call salloc (yfit1, sz_val, TY_PIXEL)
-	call salloc (xfit2, sz_val, TY_PIXEL)
-	call salloc (yfit2, sz_val, TY_PIXEL)
+	call salloc (xtemp, NGRAPH, TY_PIXEL)
+	call salloc (ytemp, NGRAPH, TY_PIXEL)
+	call salloc (xfit1, NGRAPH, TY_PIXEL)
+	call salloc (yfit1, NGRAPH, TY_PIXEL)
+	call salloc (xfit2, NGRAPH, TY_PIXEL)
+	call salloc (yfit2, NGRAPH, TY_PIXEL)
 $if (datatype == d)
-	sz_val = NGRAPH
-	call salloc (xbuf, sz_val, TY_REAL)
-	call salloc (ybuf, sz_val, TY_REAL)
+	call salloc (xbuf, NGRAPH, TY_REAL)
+	call salloc (ybuf, NGRAPH, TY_REAL)
 $endif
 
 	# Calculate intervals in x and y.
@@ -1081,7 +1067,6 @@ PIXEL	yin[ARB]	#I y input values
 int	npts		#I number of data points
 real	wx, wy		#I x and y world coordinates
 
-size_t	sz_val
 int	i, j
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 $if (datatype == d)
@@ -1120,17 +1105,15 @@ $endif
 
 	    # Allocate temporary space.
 	    call smark (sp)
-	    sz_val = NGRAPH
-	    call salloc (xtemp, sz_val, TY_PIXEL)
-	    call salloc (ytemp, sz_val, TY_PIXEL)
-	    call salloc (xfit1, sz_val, TY_PIXEL)
-	    call salloc (yfit1, sz_val, TY_PIXEL)
-	    call salloc (xfit2, sz_val, TY_PIXEL)
-	    call salloc (yfit2, sz_val, TY_PIXEL)
+	    call salloc (xtemp, NGRAPH, TY_PIXEL)
+	    call salloc (ytemp, NGRAPH, TY_PIXEL)
+	    call salloc (xfit1, NGRAPH, TY_PIXEL)
+	    call salloc (yfit1, NGRAPH, TY_PIXEL)
+	    call salloc (xfit2, NGRAPH, TY_PIXEL)
+	    call salloc (yfit2, NGRAPH, TY_PIXEL)
 $if (datatype == d)
-	    sz_val = NGRAPH
-	    call salloc (xbuf, sz_val, TY_REAL)
-	    call salloc (ybuf, sz_val, TY_REAL)
+	    call salloc (xbuf, NGRAPH, TY_REAL)
+	    call salloc (ybuf, NGRAPH, TY_REAL)
 $endif
 
 	    # Compute the deltas.
@@ -1284,7 +1267,6 @@ PIXEL	b		#O output y coefficient of x fit
 PIXEL	c		#O output x coefficient of y fit
 PIXEL	d		#O output y coefficient of y fit
 
-size_t	sz_val
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
 PIXEL	xxrange, xyrange, xxmaxmin, xymaxmin
@@ -1302,15 +1284,11 @@ begin
 	# Allocate working space.
 	call smark (sp)
 $if (datatype == r)
-	sz_val = gsgeti (sx, GSNCOEFF)
-	call salloc (xcoeff, sz_val, TY_PIXEL)
-	sz_val = gsgeti (sy, GSNCOEFF)
-	call salloc (ycoeff, sz_val, TY_PIXEL)
+	call salloc (xcoeff, gsgeti (sx, GSNCOEFF), TY_PIXEL)
+	call salloc (ycoeff, gsgeti (sy, GSNCOEFF), TY_PIXEL)
 $else
-	sz_val = dgsgeti (sx, GSNCOEFF)
-	call salloc (xcoeff, sz_val, TY_PIXEL)
-	sz_val = dgsgeti (sy, GSNCOEFF)
-	call salloc (ycoeff, sz_val, TY_PIXEL)
+	call salloc (xcoeff, dgsgeti (sx, GSNCOEFF), TY_PIXEL)
+	call salloc (ycoeff, dgsgeti (sy, GSNCOEFF), TY_PIXEL)
 $endif
 
 	# Get coefficients and numbers of coefficients.

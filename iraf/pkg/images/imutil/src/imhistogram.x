@@ -27,7 +27,6 @@ real	z1, z2, dz, z1temp, z2temp, zstart
 int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch, histtype
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 
-size_t	sz_val
 real	clgetr()
 pointer	immap(), gopen()
 int	clgeti(), clgwrd()
@@ -36,10 +35,8 @@ bool	clgetb(), fp_equalr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_CHOICE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_CHOICE, TY_CHAR)
 
 	# Get the image name.
 	call clgstr ("image", Memc[image], SZ_LINE)
@@ -109,8 +106,7 @@ begin
 	nbins1 = nbins + 1
 
 	# Initialize the histogram buffer and image line vector.
-	sz_val = nbins1
-	call salloc (hgm, sz_val, TY_INT)
+	call salloc (hgm,  nbins1, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
 	call amovkl (long(1), v, IM_MAXDIM)
 
@@ -186,12 +182,9 @@ begin
 		zstart = zstart + dz
 	    }
 	} else {
-	    sz_val = SZ_FNAME
-	    call salloc (device, sz_val, TY_CHAR)
-	    sz_val = SZ_TITLE
-	    call salloc (title, sz_val, TY_CHAR)
-	    sz_val = nbins
-	    call salloc (hgmr, sz_val, TY_REAL)
+	    call salloc (device, SZ_FNAME, TY_CHAR)
+	    call salloc (title, SZ_TITLE, TY_CHAR)
+	    call salloc (hgmr, nbins, TY_REAL)
 	    call achtir (Memi[hgm], Memr[hgmr], nbins)
 
 	    call clgstr ("device", Memc[device], SZ_FNAME)

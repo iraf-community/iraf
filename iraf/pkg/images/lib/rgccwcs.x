@@ -144,7 +144,6 @@ double  reflat                  #I the dec / latitude reference point
 int     lngunits                #I the ra / longitude units
 int     latunits                #I the dec / latitude units
 
-size_t	sz_val
 int     ndim
 pointer sp, projstr, projpars, wpars, ltm, ltv, cd, r, w, mw, axes
 pointer mw_open()
@@ -154,22 +153,15 @@ begin
 
         # Allocate working space.
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (projstr, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (projpars, sz_val, TY_CHAR)
-        call salloc (wpars, sz_val, TY_CHAR)
-        sz_val = ndim * ndim
-        call salloc (ltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (ltv, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (cd, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (r, sz_val, TY_DOUBLE)
-        call salloc (w, sz_val, TY_DOUBLE)
-        sz_val = IM_MAXDIM
-        call salloc (axes, sz_val, TY_INT)
+        call salloc (projstr, SZ_FNAME, TY_CHAR)
+        call salloc (projpars, SZ_LINE, TY_CHAR)
+        call salloc (wpars, SZ_LINE, TY_CHAR)
+        call salloc (ltm, ndim * ndim, TY_DOUBLE)
+        call salloc (ltv, ndim, TY_DOUBLE)
+        call salloc (cd, ndim * ndim, TY_DOUBLE)
+        call salloc (r, ndim, TY_DOUBLE)
+        call salloc (w, ndim, TY_DOUBLE)
+        call salloc (axes, IM_MAXDIM, TY_INT)
 
         # Open the wcs.
         mw = mw_open (NULL, ndim)

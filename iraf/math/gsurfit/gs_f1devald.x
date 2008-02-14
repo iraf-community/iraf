@@ -11,7 +11,6 @@ int	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sp, temp
 
@@ -27,8 +26,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (temp, sz_val, TY_DOUBLE)
+	call salloc (temp, npts, TY_DOUBLE)
 
 	# accumulate the output vector
 	call amovd (x, Memd[temp], npts)
@@ -53,7 +51,6 @@ int	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer sp
@@ -74,11 +71,10 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_DOUBLE)
-	call salloc (pn, sz_val, TY_DOUBLE)
-	call salloc (pnm1, sz_val, TY_DOUBLE)
-	call salloc (pnm2, sz_val, TY_DOUBLE)
+	call salloc (sx, npts, TY_DOUBLE)
+	call salloc (pn, npts, TY_DOUBLE)
+	call salloc (pnm1, npts, TY_DOUBLE)
+	call salloc (pnm2, npts, TY_DOUBLE)
 
 	# a higher order polynomial
 	call amovkd (1.0d0, Memd[pnm2], npts)
@@ -114,7 +110,6 @@ int	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer	sp
@@ -135,11 +130,10 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_DOUBLE)
-	call salloc (pn, sz_val, TY_DOUBLE)
-	call salloc (pnm1, sz_val, TY_DOUBLE)
-	call salloc (pnm2, sz_val, TY_DOUBLE)
+	call salloc (sx, npts, TY_DOUBLE)
+	call salloc (pn, npts, TY_DOUBLE)
+	call salloc (pnm1, npts, TY_DOUBLE)
+	call salloc (pnm2, npts, TY_DOUBLE)
 
 	# a higher order polynomial
 	call amovkd (1.0d0, Memd[pnm2], npts)

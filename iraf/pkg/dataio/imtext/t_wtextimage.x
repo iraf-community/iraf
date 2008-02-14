@@ -107,7 +107,6 @@ bool	pixels			# convert pixels (y/n)?
 int	maxll			# maximum line length of text file
 char	user_format[ARB] 	# output format for single pixel entered by user
 
-size_t	sz_val
 int	width, decpl, fmtchar
 pointer	sp, out_format, ftn_format, spp_format, ep
 errchk	wti_determine_fmt, wti_write_header
@@ -115,12 +114,10 @@ errchk	wti_putint, wti_putreal, wti_putcomplex
 
 begin
 	call smark (sp)
-	sz_val = SZ_FORMAT
-	call salloc (out_format, sz_val, TY_CHAR)
-	call salloc (spp_format, sz_val, TY_CHAR)
-	call salloc (ftn_format, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (ep, sz_val, TY_CHAR)
+	call salloc (out_format, SZ_FORMAT, TY_CHAR)
+	call salloc (spp_format, SZ_FORMAT, TY_CHAR)
+	call salloc (ftn_format, SZ_FORMAT, TY_CHAR)
+	call salloc (ep, SZ_LINE, TY_CHAR)
 
 	# Clear the format variables.
 	call aclrc (Memc[out_format], SZ_FORMAT)

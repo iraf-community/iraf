@@ -106,7 +106,6 @@ int	dx, dy					#o destination raster
 int	dnx, dny
 char	objref[SZ_FNAME]			#o object reference
 
-size_t	sz_val
 pointer	sp, wcstext, ip, ds
 int	fd, frame, chan, status, wcs_status, nl
 
@@ -118,8 +117,7 @@ define	done_	91
 
 begin
 	call smark (sp)
-	sz_val = SZ_WCSTEXT
-	call salloc (wcstext, sz_val, TY_CHAR)
+	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
 	call aclrc (Memc[wcstext], SZ_WCSTEXT)
 
 	wcs_status = ERR

@@ -75,18 +75,15 @@ double	y[npts]				# Abscissas
 double	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (xr1, sz_val, TY_REAL)
-	call salloc (yr1, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (xr1, 2, TY_REAL)
+	call salloc (yr1, 2, TY_REAL)
 	call achtdr (x, Memr[xr], npts)
 	call achtdr (y, Memr[yr], npts)
 
@@ -140,15 +137,13 @@ double	x[npts], y[npts]	# Data points
 int	npts			# Number of data points
 real	size			# Symbol size
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
 	call achtdr (x, Memr[xr], npts)
 	call achtdr (y, Memr[yr], npts)
 
@@ -188,7 +183,6 @@ pointer	gt			# GTOOL pointer
 pointer	cv			# CURFIT pointer
 int	npts			# Number of points to plot
 
-size_t	sz_val
 pointer	sp, xr, yr, x, y, xo, yo, gt1
 int	i
 double	dx
@@ -199,13 +193,12 @@ begin
 
 	call smark (sp)
 
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	call salloc (x, sz_val, TY_DOUBLE)
-	call salloc (y, sz_val, TY_DOUBLE)
-	call salloc (xo, sz_val, TY_DOUBLE)
-	call salloc (yo, sz_val, TY_DOUBLE)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (x,  npts, TY_DOUBLE)
+	call salloc (y,  npts, TY_DOUBLE)
+	call salloc (xo, npts, TY_DOUBLE)
+	call salloc (yo, npts, TY_DOUBLE)
 
 	# Generate vector of independent variable values
 	dx = (IC_XMAX(ic) - IC_XMIN(ic)) / (npts - 1)

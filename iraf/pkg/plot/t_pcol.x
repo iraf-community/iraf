@@ -13,17 +13,14 @@ pointer	image, wcslab, fmt
 pointer	im, mw, ct, sp, x_vec, y_vec
 int	col, ncols, nlines
 real	zmin, zmax
-size_t	sz_val
 int	clgeti()
 pointer	immap(), mw_openim(), mw_sctran()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (wcslab, sz_val, TY_CHAR)
-	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (wcslab, SZ_LINE, TY_CHAR)
+	call salloc (fmt, SZ_LINE, TY_CHAR)
 
 	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)

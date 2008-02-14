@@ -13,7 +13,6 @@ int procedure fsfopen (fname, mode)
 char	fname[ARB]		# name of logical file
 int	mode			# access mode for subfile list
 
-size_t	sz_val
 int	fd
 pointer	sp, listfile
 int	open()
@@ -21,8 +20,7 @@ errchk	open, fsf_getfname
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (listfile, sz_val, TY_CHAR)
+	call salloc (listfile, SZ_FNAME, TY_CHAR)
 
 	call fsf_getfname (fname, Memc[listfile], SZ_FNAME)
 	fd = open (Memc[listfile], mode, TEXT_FILE)
@@ -40,14 +38,12 @@ procedure fsfdelete (fname)
 char	fname[ARB]		# file whose subfiles are to be deleted
 int	fd
 pointer	sp, subfile
-size_t	sz_val
 int	fsfopen(), getline()
 errchk	getline, delete, fsf_getfname
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (subfile, sz_val, TY_CHAR)
+	call salloc (subfile, SZ_FNAME, TY_CHAR)
 
 	# Open the list and delete each subfile.  To avoid recursion this must
 	# be done by calling delete, hence subfiles may not have subfiles.

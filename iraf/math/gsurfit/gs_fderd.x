@@ -18,19 +18,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_DOUBLE)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_DOUBLE)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_DOUBLE)
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_dpol (x, npts, xorder, nxder, k1x, k2x, Memd[xb])
@@ -98,19 +94,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_DOUBLE)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_DOUBLE)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_DOUBLE)
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_dcheb (x, npts, xorder, nxder, k1x, k2x, Memd[xb])
@@ -179,19 +171,15 @@ int	nxder,nyder		# order of the derivatives in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, accum, xbptr, ybptr
 
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	sz_val = xorder * npts
-	call salloc (xb, sz_val, TY_DOUBLE)
-	sz_val = yorder * npts
-	call salloc (yb, sz_val, TY_DOUBLE)
-	sz_val = npts
-	call salloc (accum, sz_val, TY_DOUBLE)
+	call salloc (xb, xorder * npts, TY_DOUBLE)
+	call salloc (yb, yorder * npts, TY_DOUBLE)
+	call salloc (accum, npts, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_dleg (x, npts, xorder, nxder, k1x, k2x, Memd[xb])

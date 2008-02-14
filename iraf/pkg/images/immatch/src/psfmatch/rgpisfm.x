@@ -31,7 +31,6 @@ pointer	im2		#I/O pointer to the output image
 pointer	gd		#I graphics stream pointer
 pointer	id		#I display stream pointer
 
-size_t	sz_val
 int	newref, newimage, newfourier, newfilter, plotfunc, plottype, wcs, key
 int	newplot, ncolr, nliner, ip
 pointer	sp, cmd
@@ -42,8 +41,7 @@ pointer	rg_pstatp()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	newref = YES
 	newimage = YES
@@ -294,7 +292,6 @@ pointer	pm		# pointer to psfmatch structure
 pointer	imk		# pointer to kernel image
 int	ch		# character keystroke command
 
-size_t	sz_val
 int	wcs, stat 
 pointer	sp, cmd
 real	wx, wy
@@ -303,8 +300,7 @@ int	clgcur(), rg_pstati()
 
 begin
  	call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (cmd, sz_val, TY_CHAR)
+        call salloc (cmd, SZ_LINE, TY_CHAR)
 
         # Print the status line query in reverse video and get the keystroke.
         call printf (QUERY)
@@ -368,7 +364,6 @@ int     line            #I line of cross-correlation function to plot
 int	plotfunc	#I the default plot function type
 int     plottype        #I the default plot type
 
-size_t	sz_val
 int	nx, ny
 pointer	sp, title, str, data
 int	rg_pstati(), strlen()
@@ -380,9 +375,8 @@ begin
 
         # Allocate working space.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (title, sz_val, TY_CHAR)
-        call salloc (str, sz_val, TY_CHAR)
+        call salloc (title, SZ_LINE, TY_CHAR)
+        call salloc (str, SZ_LINE, TY_CHAR)
 
         # Initialize the plot title and data.
 	switch (plotfunc) {
@@ -477,7 +471,6 @@ real    data[nx,ARB]    #I the input data array
 int     nx, ny          #I dimensions of the input data array
 int     nline           #I the line number
 
-size_t	sz_val
 int     i
 pointer sp, str, x
 real    ymin, ymax
@@ -493,10 +486,8 @@ begin
 
         # Allocate some working space.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (str, sz_val, TY_CHAR)
-        sz_val = nx
-        call salloc (x, sz_val, TY_REAL)
+        call salloc (str, SZ_LINE, TY_CHAR)
+        call salloc (x, nx, TY_REAL)
 
         # Initialize the data.
         do i = 1, nx
@@ -527,7 +518,6 @@ real    data[nx,ARB]    #I the input data array
 int     nx, ny          #I the dimensions of the input data array
 int     ncol            #I line number
 
-size_t	sz_val
 int     i
 pointer sp, x, y
 real    ymin, ymax
@@ -543,9 +533,8 @@ begin
 
         # Initialize.
         call smark (sp)
-        sz_val = ny
-        call salloc (x, sz_val, TY_REAL)
-        call salloc (y, sz_val, TY_REAL)
+        call salloc (x, ny, TY_REAL)
+        call salloc (y, ny, TY_REAL)
 
         # Get the data to be plotted.
         do i = 1, ny {

@@ -15,7 +15,6 @@ int	mode				#I Mode
 char	mname[maxchar]			#O Output mask name
 int	maxchar				#I Maximum characters in mask name
 
-size_t	sz_val
 int	i, fits
 pointer	sp, extnm, temp
 
@@ -25,10 +24,8 @@ int	envfind(), access(), imaccess()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (extnm, sz_val, TY_CHAR)
-	sz_val = maxchar
-	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (extnm, SZ_FNAME, TY_CHAR)
+	call salloc (temp, maxchar, TY_CHAR)
 
 	# Set extension name.
 	if (extname[1] == EOS)

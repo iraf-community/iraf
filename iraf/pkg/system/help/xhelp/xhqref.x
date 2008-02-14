@@ -171,7 +171,6 @@ procedure xh_make_pkglist (list)
 
 char	list[ARB]				#i package list
 
-size_t	sz_val
 pointer	sp, err, pkg
 pointer	stp, sym
 int	i, ip, fd
@@ -182,10 +181,8 @@ errchk	open
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (err, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pkg, sz_val, TY_CHAR)
+	call salloc (err, SZ_LINE, TY_CHAR)
+	call salloc (pkg, SZ_FNAME, TY_CHAR)
 
 	# Delete existing files.
 	if (access(PKGFILE,0,0) == YES)	

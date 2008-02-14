@@ -15,7 +15,6 @@ double	zfit[npts]	# fitted values
 int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
-size_t	sz_val
 double	norm
 int	ncoeff, nxder, nyder, i, j
 int	order, maxorder1, maxorder2, nmove1, nmove2
@@ -143,8 +142,7 @@ begin
 
 	# get coefficients
 	call smark (sp)
-	sz_val = GS_NCOEFF(sf1)
-	call salloc (coeff, sz_val, TY_DOUBLE)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_DOUBLE)
 	call dgscoeff (sf1, Memd[coeff], ncoeff)
 
 	# compute the new coefficients

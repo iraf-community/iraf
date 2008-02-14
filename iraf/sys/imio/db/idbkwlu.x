@@ -11,15 +11,13 @@ int procedure idb_kwlookup (key)
 char	key[ARB]		# keyword to be looked up
 int	index, ip, ch
 pointer	sp, kwname
-size_t	sz_val
 int	strdic(), strncmp(), strlen()
 string	keywords "|ctime|history|limtime|maxpixval|minpixval|mtime|naxis\
 |pixfile|pixtype|title|"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (kwname, sz_val, TY_CHAR)
+	call salloc (kwname, SZ_FNAME, TY_CHAR)
 
 	# Look the string up in the dictionary of standard keywords.  Note that
 	# the "i_" prefix is omitted in the dictionary.  The order of the

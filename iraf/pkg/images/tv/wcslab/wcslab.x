@@ -192,7 +192,6 @@ pointer mw              # O: The MWCS descriptor.
 real    log_x1, log_x2, # O: The extent of the logical space to graph.
 real	log_y1, log_y2
 
-size_t	sz_val
 real    cd[2,2], r[2], w[2]
 pointer sp, input, pp
 pointer clopset(), mw_open()
@@ -200,8 +199,7 @@ real    clgpsetr()
 
 begin
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (input, sz_val, TY_CHAR)
+        call salloc (input, SZ_LINE, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wcspars")
@@ -332,7 +330,6 @@ int	system_type           # O: the transformation type:
 			      #                  declination
                               #    LINEAR     -> any regular linear system
                               #    INDEFI     -> could not be determined
-size_t	sz_val
 double  logical_center[N_DIM] # O: the center point in the logical system.
 double  world_center[N_DIM]   # O: the center point in the world system.
 int	flip                  # O: true if the order of the axes have been
@@ -348,11 +345,9 @@ errchk	mw_gwattrs
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (axtype, sz_val, TY_CHAR)
-	call salloc (cur_type, sz_val, TY_CHAR)
-	sz_val = MAX_DIM
-	call salloc (cd, sz_val, TY_DOUBLE)
+	call salloc (axtype, SZ_LINE, TY_CHAR)
+	call salloc (cur_type, SZ_LINE, TY_CHAR)
+	call salloc (cd, MAX_DIM, TY_DOUBLE)
 
 	# Get the dimensionality of the WCS.
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -489,7 +484,6 @@ procedure wl_gr_inparams (wd)
 
 pointer wd                       # I: the WCSLAB descriptor
 
-size_t	sz_val
 pointer sp, aline, pp
 bool	clgpsetb(), streq()
 double	wl_string_to_internal()
@@ -500,8 +494,7 @@ real	clgpsetr()
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (aline, sz_val, TY_CHAR)
+	call salloc (aline, SZ_LINE, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wlpars")
@@ -624,15 +617,13 @@ procedure wl_gr_remparams (wd)
 
 pointer wd  		# I: the WCSLAB descriptor.
 
-size_t	sz_val
 pointer sp, output, pp
 pointer	clopset()
 
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (output, sz_val, TY_CHAR)
+	call salloc (output, SZ_LINE, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wlpars")
@@ -922,7 +913,6 @@ bool	side_flags[N_SIDES]  # I: the boolean array of sides
 char	output[ARB]          # O: the output comma separated list of sides
 int	max_len              # I: maximum length of the output string
 
-size_t	sz_val
 int	i
 pointer sp, side
 int	strlen()
@@ -930,8 +920,7 @@ int	strlen()
 begin
 	# Get memory.
 	call smark (sp)
-	sz_val = max_len
-	call salloc (side, sz_val, TY_CHAR)
+	call salloc (side, max_len, TY_CHAR)
 
 	# Build the list.
 	output[1] = EOS

@@ -38,7 +38,6 @@ procedure wf_smp_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I type of transformation
 
-size_t	sz_val
 int	axis, npts
 pointer	wp, mw, sp, emsg, pv, wv
 
@@ -64,8 +63,7 @@ begin
 	# Verify that we have a sampled WCS for this axis.
 	if (npts <= 0 || pv == NULL || wv == NULL) {
 	    call smark (sp)
-	    sz_val = SZ_LINE
-	    call salloc (emsg, sz_val, TY_CHAR)
+	    call salloc (emsg, SZ_LINE, TY_CHAR)
 	    call sprintf (Memc[emsg], SZ_LINE,
 		"No sampled wcs entered for axis %d")
 		call pargi (axis)

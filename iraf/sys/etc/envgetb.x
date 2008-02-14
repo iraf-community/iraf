@@ -10,13 +10,11 @@ bool procedure envgetb (varname)
 char	varname[ARB]
 bool	answer
 pointer	sp, def
-size_t	sz_val
 int	envfind()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (def, sz_val, TY_CHAR)
+	call salloc (def, SZ_LINE, TY_CHAR)
 
 	if (envfind (varname, Memc[def], SZ_LINE) < 0)
 	    answer = false

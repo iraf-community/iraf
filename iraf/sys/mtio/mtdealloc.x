@@ -13,14 +13,12 @@ procedure mtdeallocate (mtname, rewind_tape)
 char	mtname[ARB]		#I magtape specification
 int	rewind_tape		#I rewind before deallocating drive
 
-size_t	sz_val
 pointer	sp, lockfile
 errchk	mt_glock, syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (lockfile, SZ_FNAME, TY_CHAR)
 
 	if (rewind_tape == YES)
 	    iferr (call mtrewind (mtname, NO))

@@ -102,7 +102,6 @@ pointer procedure fntopnb (template, sort)
 char	template[ARB]		# filename template
 int	sort			# sort expanded patterns
 
-size_t	sz_val
 int	nedit[MAX_PATTERNS], junk, nchars
 bool	is_template[MAX_PATTERNS], is_edit[MAX_PATTERNS], sortlist
 pointer	sp, pbuf, fname, rname, extn, ebuf, sbuf, list, ip, op, ep, pp
@@ -115,13 +114,11 @@ errchk	fntopn, fntgfn, syserr, malloc, realloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (rname, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (pbuf, sz_val, TY_CHAR)
-	call salloc (ebuf, sz_val, TY_CHAR)
+	call salloc (rname, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (extn,  SZ_FNAME, TY_CHAR)
+	call salloc (pbuf,  SZ_LINE, TY_CHAR)
+	call salloc (ebuf,  SZ_LINE, TY_CHAR)
 
 	# Allocate list descriptor.
 	call malloc (list, LEN_FNTBHDR + LEN_INDEXVECTOR, TY_STRUCT)
@@ -648,7 +645,6 @@ pointer	pp			# pattern pointer
 char	outstr[ARB]		# output filename
 int	maxch
 
-size_t	sz_val
 bool	match
 pointer	ip, sp, linebuf, fname, patstr
 int	nchars, token, first_ch, last_ch, status
@@ -663,12 +659,9 @@ begin
 	    call syserr (SYS_FNTMAGIC)
 
 	call smark (sp)					# get buffers
-	sz_val = SZ_LINE
-	call salloc (linebuf, sz_val, TY_CHAR)
-	sz_val = SZ_PATSTR
-	call salloc (patstr, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
+	call salloc (patstr, SZ_PATSTR, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	repeat {
 	    # Read file names from either list file or directory file, until

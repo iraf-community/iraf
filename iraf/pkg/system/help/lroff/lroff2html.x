@@ -34,7 +34,6 @@ char	center[ARB]				#I .help optional keyword 3
 char	ls_block[ARB]				#I .ls block to search for
 char	section[ARB]				#I section to print
 
-size_t	sz_val
 pointer sp, ip, sptr
 pointer ibuf, unesc, name, level
 int	lastline, font, indented, ls_level
@@ -51,15 +50,11 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (ibuf, sz_val, TY_CHAR)
-	call salloc (unesc, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (name, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (level, sz_val, TY_CHAR)
-	sz_val = MAX_SECTIONS
-	call salloc (sptr, sz_val, TY_POINTER)
+	call salloc (ibuf, SZ_IBUF, TY_CHAR)
+	call salloc (unesc, SZ_IBUF, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
+	call salloc (level, SZ_FNAME, TY_CHAR)
+	call salloc (sptr, MAX_SECTIONS, TY_POINTER)
 
 	call aclrc (Memc[ibuf], SZ_IBUF)
 	call aclrc (Memc[name], SZ_LINE)
@@ -302,8 +297,7 @@ begin
 		    # everything else gets written normally.
 
 		    # Save the section name.
-		    sz_val = SZ_LINE
-		    call salloc (SPTR(sptr,nsec), sz_val, TY_CHAR)
+		    call salloc (SPTR(sptr,nsec), SZ_LINE, TY_CHAR)
 	    	    call aclrc (SECTION(sptr,nsec), SZ_LINE)
 	    	    Memc[ibuf+strlen(Memc[ibuf])-1] = EOS
 		    call sprintf (SECTION(sptr,nsec), SZ_LINE, "\'%s\'")
@@ -441,7 +435,6 @@ bool	format					#I formatting flag
 int	special_only				#I escape only special chars?
 int	maxch					#I max length of string
 
-size_t	sz_val
 pointer	sp, ip, buf, keyword
 int	i, gstrcpy(), stridx()
 
@@ -449,9 +442,8 @@ define	copy_	90
 
 begin
 	call smark (sp)
-	sz_val = maxch
-	call salloc (buf, sz_val, TY_CHAR)
-	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (buf, maxch, TY_CHAR)
+	call salloc (keyword, maxch, TY_CHAR)
 	call aclrc (Memc[buf], maxch)
 	call aclrc (Memc[keyword], maxch)
 
@@ -602,7 +594,6 @@ int	fd
 bool	formatted
 char	param[ARB]
 
-size_t	sz_val
 bool	match_found
 pointer	sp, lbuf, pattern
 int	len
@@ -613,10 +604,8 @@ define	err_	90
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pattern, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_FNAME, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	match_found = false
 
@@ -668,7 +657,6 @@ int	fd			# input file
 bool	formatted		# is help block formatted
 char	sections[ARB]		# list of sections "a|b|c"
 
-size_t	sz_val
 bool	match_found
 int	npat, ip
 pointer	sp, patbuf, patoff[MAXPAT], op
@@ -682,8 +670,7 @@ define	err_	91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Process the list of sections into patbuf and patoff, i.e., into a
 	# list of EOS delimited strings in the string buffer patbuf.  Each
@@ -750,15 +737,13 @@ char    lbuf[ARB]               # line of text
 pointer patoff[npat]            # pointers to pattern strings
 int     npat                    # number of patterns
 
-size_t	sz_val
 int     pat
 pointer sp, pattern
 int     strmatch()
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (pattern, sz_val, TY_CHAR)
+        call salloc (pattern, SZ_FNAME, TY_CHAR)
 
         for (pat=1;  pat <= npat;  pat=pat+1) {
             call sprintf (Memc[pattern], SZ_FNAME, "^{%s}")

@@ -25,7 +25,6 @@ double	w[npts]		# array of weights
 int	npts		# number of data points
 int	wtflag		# type of weighting
 
-size_t	sz_val
 int	i, ii, j, k
 pointer	sp
 pointer	vzptr, vindex, mzptr, mindex, bptr, bbptr
@@ -85,8 +84,7 @@ begin
 
 	# allocate space for the basis functions
 	call smark (sp)
-	sz_val = npts * CV_ORDER(cv)
-	call salloc (CV_BASIS(cv), sz_val, TY_DOUBLE)
+	call salloc (CV_BASIS(cv), npts * CV_ORDER(cv), TY_DOUBLE)
 
 	# calculate the non-zero basis functions
 	switch (CV_TYPE(cv)) {
@@ -97,14 +95,12 @@ begin
 	    call dcv_bcheb (x, npts, CV_ORDER(cv), CV_MAXMIN(cv),
 	    		  CV_RANGE(cv), BASIS(CV_BASIS(cv)))
 	case SPLINE3:
-	    sz_val = npts
-	    call salloc (CV_LEFT(cv), sz_val, TY_INT)
+	    call salloc (CV_LEFT(cv), npts, TY_INT)
 	    call dcv_bspline3 (x, npts, CV_NPIECES(cv), -CV_XMIN(cv),
 			      CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 			      LEFT(CV_LEFT(cv)))
 	case SPLINE1:
-	    sz_val = npts
-	    call salloc (CV_LEFT(cv), sz_val, TY_INT)
+	    call salloc (CV_LEFT(cv), npts, TY_INT)
 	    call dcv_bspline1 (x, npts, CV_NPIECES(cv), -CV_XMIN(cv),
 			      CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 			      LEFT(CV_LEFT(cv)))
@@ -114,9 +110,8 @@ begin
 
 
 	# allocate temporary storage space for matrix accumulation
-	sz_val = npts
-	call salloc (bw, sz_val, TY_DOUBLE)
-	call salloc (rows, sz_val, TY_INT)
+	call salloc (bw, npts, TY_DOUBLE)
+	call salloc (rows, npts, TY_INT)
 
 	# one index the pointers
 	vzptr = CV_VECTOR(cv) - 1

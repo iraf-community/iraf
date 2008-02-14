@@ -15,7 +15,6 @@ procedure mw_load (mw, bp)
 pointer	mw			#I pointer to MWCS descriptor
 pointer	bp			#I pointer to save buffer, type char
 
-size_t	sz_val
 pointer	sp, sv, ct, ip, cw, ms, wp
 int	nelem, cwlen, mslen, nwcs, lenwcs, n, i
 errchk	syserrs, malloc
@@ -24,8 +23,7 @@ int	pl_l2pi()
 
 begin
 	call smark (sp)
-	sz_val = LEN_SVHDR
-	call salloc (sv, sz_val, TY_STRUCT)
+	call salloc (sv, LEN_SVHDR, TY_STRUCT)
 
 	# Get the save header.
 	ip = coerce (bp, TY_CHAR, TY_STRUCT)
@@ -45,10 +43,8 @@ begin
 	    nwcs = SV_NWCS(sv)
 	}
 
-	sz_val = cwlen
-	call salloc (cw, sz_val, TY_INT)
-	sz_val = mslen
-	call salloc (ms, sz_val, TY_INT)
+	call salloc (cw, cwlen, TY_INT)
+	call salloc (ms, mslen, TY_INT)
 
 	# Unpack the saved MWSV descriptor.  Due to a bug in MWCS prior to
 	# V2.10.4 IRAF the packed descriptor was erroneously encoded using

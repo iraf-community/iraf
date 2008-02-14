@@ -18,7 +18,6 @@ int	fnt		# font file descriptor
 int	autolog		# automatic logging enabled
 int	interactive	# interactive mode
 
-size_t	sz_val
 int	ncmd, ncols, nlines, nc, nr
 int	wcs, bkey, skey, vkey, ekey, fkey, okey, key
 int	id, ltid, ndelete, req_num, lreq_num, prev_num, newlist
@@ -33,13 +32,11 @@ real	mk_statr()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (scratchim, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	call salloc (keepcmd, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
-	call salloc (label, sz_val, TY_CHAR)
+	call salloc (scratchim, SZ_FNAME, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (keepcmd, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (label, SZ_LINE, TY_CHAR)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)

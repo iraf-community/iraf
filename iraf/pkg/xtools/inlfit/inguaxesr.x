@@ -15,7 +15,6 @@ real	z[npts]				# Output values
 int	npts				# Number of points
 int	nvars				# Number of variables
 
-size_t	sz_val
 int	npars				# number of parameters
 int	uaxes				# user defined procedure
 pointer	params				# parameter values
@@ -33,8 +32,7 @@ begin
 	    # for parameter values, and get parameter values
 	    npars = nlstati (nl, NLNPARAMS)
 	    call smark (sp)
-	    sz_val = npars
-	    call salloc (params, sz_val, TY_REAL)
+	    call salloc (params, npars, TY_REAL)
 	    call nlpgetr (nl, Memr[params], npars)
 
 	    # Call user plot functions

@@ -12,7 +12,6 @@ pointer	sf		# pointer to surface descriptor structure
 real	x		# x value
 real	y		# y value
 
-size_t	sz_val
 real	sum, accum
 int	i, ii, k, maxorder, xorder
 pointer	sp, xb, xzb, yb, yzb, czptr
@@ -24,10 +23,8 @@ begin
 	# allocate space for the basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
-	    sz_val = GS_NXCOEFF(sf)
-	    call salloc (xb, sz_val, TY_REAL)
-	    sz_val = GS_NYCOEFF(sf)
-	    call salloc (yb, sz_val, TY_REAL)
+	    call salloc (xb, GS_NXCOEFF(sf), TY_REAL)
+	    call salloc (yb, GS_NYCOEFF(sf), TY_REAL)
 	    xzb = xb - 1
 	    yzb = yb - 1
 	    czptr = GS_COEFF(sf) - 1

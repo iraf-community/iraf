@@ -27,7 +27,6 @@ int	type				# Feature type
 real	radius				# Centering radius
 real	threshold			# Minimum range in feature
 
-size_t	sz_val
 real	xc				# Center
 
 int	x1, x2, nx
@@ -69,8 +68,7 @@ begin
 	nx = x2 - x1 + 1
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (data1, sz_val, TY_REAL)
+	call salloc (data1, nx, TY_REAL)
 	call amovr (data[x1], Memr[data1], nx)
 
 	# Make the centering data positive, subtract the continuum, and
@@ -144,7 +142,6 @@ int	npts				# Number of points in data vector
 real	data[npts]			# Data vector
 real	width				# Centering width
 
-size_t	sz_val
 int	i, j, iteration, dxcheck
 real	xc, wid, hwidth, dx, dxabs, dxlast
 real	a, b, sum1, sum2, intgrl1, intgrl2
@@ -195,8 +192,7 @@ begin
 
 	# Allocate, compute, and interpolate the x*y values.
 	call smark (sp)
-	sz_val = npts
-	call salloc (data1, sz_val, TY_REAL)
+	call salloc (data1, npts, TY_REAL)
 	do i = 1, npts
 	    Memr[data1+i-1] = data[i] * i
 	call asifit (asi2, Memr[data1], npts)

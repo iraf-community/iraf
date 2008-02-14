@@ -178,7 +178,6 @@ int	infil[ARB]		# input file numbers
 int	outfil			# output file number
 int	nfiles			# number of files to be merged
 
-size_t	sz_val
 pointer	sp, linbuf
 int	linptr[MERGEORDER]
 int	i, inf, lbp, lp1, nf
@@ -188,8 +187,7 @@ include	"sort.com"
 
 begin
 	call smark (sp)
-	sz_val = MERGEORDER * SZ_LINE
-	call salloc (linbuf, sz_val, TY_CHAR)
+	call salloc (linbuf, MERGEORDER * SZ_LINE, TY_CHAR)
 
 	lbp = 1
 	nf = 0

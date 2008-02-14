@@ -75,7 +75,6 @@ pointer	sx1, sy1		#I/O pointers to the linear x and y surfaces
 real	xscale, yscale		#I the x and y scales
 real	xrotation,yrotation	#I the x and y axis  rotation angles in radians
 
-size_t	sz_val
 real	cosx, sinx, cosy, siny, xrange, yrange
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -86,9 +85,8 @@ begin
 	# Get the current solution.
 	call smark (sp)
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_REAL)
-	call salloc (ycoeff, sz_val, TY_REAL)
+	call salloc (xcoeff, ncoeff, TY_REAL)
+	call salloc (ycoeff, ncoeff, TY_REAL)
 	call gssave (sx1, Memr[xcoeff])
 	call gssave (sy1, Memr[ycoeff])
 
@@ -139,7 +137,6 @@ procedure geo_xyshiftr (sx1, sy1, xshift, yshift)
 pointer	sx1, sy1		#I pointers to linear x and y surfaces
 real	xshift, yshift		#I the input x and y shifts
 
-size_t	sz_val
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
 int	gsgeti()
@@ -149,9 +146,8 @@ begin
 
 	# Allocate working space.
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_REAL)
-	call salloc (ycoeff, sz_val, TY_REAL)
+	call salloc (xcoeff, ncoeff, TY_REAL)
+	call salloc (ycoeff, ncoeff, TY_REAL)
 
 	# Get coefficients.
 	call gssave (sx1, Memr[xcoeff])
@@ -247,7 +243,6 @@ pointer	sx1, sy1		#I/O pointers to the linear x and y surfaces
 double	xscale, yscale		#I the x and y scales
 double	xrotation,yrotation	#I the x and y axis  rotation angles in radians
 
-size_t	sz_val
 double	cosx, sinx, cosy, siny, xrange, yrange
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -258,9 +253,8 @@ begin
 	# Get the current solution.
 	call smark (sp)
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_DOUBLE)
-	call salloc (ycoeff, sz_val, TY_DOUBLE)
+	call salloc (xcoeff, ncoeff, TY_DOUBLE)
+	call salloc (ycoeff, ncoeff, TY_DOUBLE)
 	call dgssave (sx1, Memd[xcoeff])
 	call dgssave (sy1, Memd[ycoeff])
 
@@ -311,7 +305,6 @@ procedure geo_xyshiftd (sx1, sy1, xshift, yshift)
 pointer	sx1, sy1		#I pointers to linear x and y surfaces
 double	xshift, yshift		#I the input x and y shifts
 
-size_t	sz_val
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
 int	dgsgeti()
@@ -321,9 +314,8 @@ begin
 
 	# Allocate working space.
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_DOUBLE)
-	call salloc (ycoeff, sz_val, TY_DOUBLE)
+	call salloc (xcoeff, ncoeff, TY_DOUBLE)
+	call salloc (ycoeff, ncoeff, TY_DOUBLE)
 
 	# Get coefficients.
 	call dgssave (sx1, Memd[xcoeff])

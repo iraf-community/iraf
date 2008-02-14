@@ -46,7 +46,6 @@ pointer	sp, files, fname, dirname, patp, fp, ip, op, ep, list
 int	ncols, maxch, dirmode, fd, n, i, patlen, len_dir
 bool	long_format, is_template, is_pattern, is_dir, sort_list, match_extension
 
-size_t	sz_val
 bool	clgetb(), strne()
 int	clgeti(), fntgfnb()
 int	diropen(), getline(), stridx(), strlen(), strncmp(), stridxs()
@@ -58,11 +57,9 @@ define	done_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (files, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (dirname, sz_val, TY_CHAR)
+	call salloc (files, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (dirname, SZ_PATHNAME, TY_CHAR)
 
 	# If directory is called without any arguments, list the contents
 	# of the current directory.  Otherwise read in the file template.
@@ -302,7 +299,6 @@ char	pat[ARB]		# selection pattern, if any
 bool	have_pattern		# do we have a pattern?
 int	a_ncols			# number of columns out
 
-size_t	sz_val
 bool	flushlines, match_extension
 pointer	sp, fname, obuf, patbuf, op, ep
 int	colwidth, patlen, ip, col, maxch, junk, lastch
@@ -313,12 +309,9 @@ errchk	getline, ungetline, putline
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (obuf, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (obuf, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Initialization.
 	flushlines = (out == STDOUT && fstati (out, F_REDIR) == NO)
@@ -504,7 +497,6 @@ procedure dir_pfiledata (fname, out)
 char	fname[ARB]			# file name
 int	out				# output file
 
-size_t	sz_val
 pointer	sp, date
 long	fi[LEN_FINFO]
 int	protected, ftypes[4], i
@@ -513,8 +505,7 @@ data	ftypes /'-', 'd', 'x', 's'/
 
 begin
 	call smark (sp)
-	sz_val = SZ_DATE
-	call salloc (date, sz_val, TY_CHAR)
+	call salloc (date, SZ_DATE, TY_CHAR)
 
 	# Get file directory information.
 	if (finfo (fname, fi) != OK) {
