@@ -10,11 +10,13 @@ int	errcode
 char	upkmsg[ARB]		# unpacked string
 int	msglen			# number of chars in string
 
+size_t	sz_val
 pointer	sp, sppmsg
 
 begin
 	call smark (sp)
-	call salloc (sppmsg,  SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sppmsg, sz_val, TY_CHAR)
 
 	# Construct error message string
 	call sprintf (Memc[sppmsg], SZ_LINE, "ERROR %d IN %s\n")

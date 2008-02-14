@@ -8,6 +8,7 @@ procedure mtstatus (out, mtname)
 int	out			#I output file
 char	mtname[ARB]		#I magtape specification
 
+size_t	sz_val
 int	in
 pointer	sp, lockfile
 errchk	open, fcopyo
@@ -15,7 +16,8 @@ int	open(), access()
 
 begin
 	call smark (sp)
-	call salloc (lockfile, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
 
 	call mt_sync (OK)
 

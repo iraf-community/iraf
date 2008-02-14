@@ -19,6 +19,7 @@ int	mode			# Mode
 pointer	ie			# IMEXAM pointer
 real	x, y			# Center
 
+size_t	sz_val
 real	angh, angv		# Orientation of surface (degrees)
 real	floor, ceiling		# Range limits
  
@@ -79,7 +80,8 @@ begin
 	if (IS_INDEF (floor) && IS_INDEF (ceiling))
 	    sdata = data
 	else {
-	    call salloc (sdata, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (sdata, sz_val, TY_REAL)
 	    call amovr (Memr[data], Memr[sdata], npts)
 	    if (!IS_INDEF (floor) && !IS_INDEF (ceiling)) {
 		floor = min (floor, ceiling)
@@ -98,8 +100,10 @@ begin
 	    # Set the viewport.
 	    call gsview (gp, 0.1, 0.9, 0.1, 0.9)
 
-	    call salloc (title, IE_SZTITLE, TY_CHAR)
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	    sz_val = IE_SZTITLE
+	    call salloc (title, sz_val, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (str, sz_val, TY_CHAR)
 
 	    if (clgpsetb (pp, "banner")) {
 		call sysid (Memc[str], SZ_LINE)
@@ -135,7 +139,8 @@ begin
 	call srfabd()
 	call ggview (gp, vpx1, vpx2, vpy1, vpy2)
 	call set (vpx1, vpx2, vpy1, vpy2, 1.0, 1024., 1.0, 1024., 1)
-	call salloc (work, 2*nx*ny+nx+ny, TY_REAL)
+	sz_val = 2*nx*ny+nx+ny
+	call salloc (work, sz_val, TY_REAL)
 	call ezsrfc (Memr[sdata], nx, ny, angh, angv, Memr[work])
 
 	if (mode != APPEND) {
@@ -163,6 +168,7 @@ real	z[ncols, nlines]	# Array of intensity values
 real	angh			# Angle of horizontal inclination
 real	angv			# Angle of vertical inclination
 
+size_t	sz_val
 pointer	sp, x_val, y_val, kvec
 char	tlabel[10]
 real	xmin, ymin, delta, fact1, flo, hi, xcen, ycen
@@ -176,9 +182,12 @@ common	/noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
 	call smark (sp)
-	call salloc (x_val,   ncols + 2,  TY_REAL)
-	call salloc (y_val,  nlines + 2, TY_REAL)
-	call salloc (kvec, max (ncols, nlines) + 2, TY_REAL)
+	sz_val = ncols + 2
+	call salloc (x_val, sz_val,  TY_REAL)
+	sz_val = nlines + 2
+	call salloc (y_val, sz_val, TY_REAL)
+	sz_val = max (ncols, nlines) + 2
+	call salloc (kvec, sz_val, TY_REAL)
 
 	# Get window coordinates set up in calling procedure.
 	call ggwind (gp, wc1, wc2, wl1, wl2)
@@ -360,12 +369,14 @@ real	yvals[nvals]
 real	zval
 pointer	sp, xt, yt
 int	i
+size_t	sz_val
 real	dum
 
 begin
 	call smark (sp)
-	call salloc (xt, nvals, TY_REAL)
-	call salloc (yt, nvals, TY_REAL)
+	sz_val = nvals
+	call salloc (xt, sz_val, TY_REAL)
+	call salloc (yt, sz_val, TY_REAL)
 
 	do i = 1, nvals 
 	    call trn32s (xvals[i], yvals[i], zval, Memr[xt+i-1], Memr[yt+i-1], 

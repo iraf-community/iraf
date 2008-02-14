@@ -19,11 +19,13 @@ pointer	sf		# surface descriptor
 real	fit[ARB]	# array containing the surface parameters and
 			# coefficients
 
+size_t	sz_val
 int	surface_type, xorder, yorder, ncols, nlines
 
 begin
 	# allocate space for the surface descriptor
-	call calloc (sf, LEN_SFSTRUCT, TY_STRUCT)
+	sz_val = LEN_SFSTRUCT
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	xorder = nint (SF_SAVEXORDER(fit))
 	if (xorder < 1)
@@ -106,7 +108,8 @@ begin
 	SF_WZ(sf) = NULL
 	SF_TLEFT(sf) = NULL
 
-	call calloc (SF_COEFF(sf), SF_NXCOEFF(sf) * SF_NYCOEFF(sf), MEM_TYPE)
+	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
+	call calloc (SF_COEFF(sf), sz_val, MEM_TYPE)
 
 	# restore coefficient array
 	call amovr (fit[SF_SAVECOEFF+1], COEFF(SF_COEFF(sf)), SF_NYCOEFF(sf) *

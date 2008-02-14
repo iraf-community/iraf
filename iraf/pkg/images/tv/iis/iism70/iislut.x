@@ -20,6 +20,7 @@ short	offset			# offset into lut
 short	n			# number of data values
 short	data[ARB]		# the data
 
+size_t	sz_val
 int	command,len,x,y,z,t
 short	iispack()
 int	mapcolor()
@@ -42,7 +43,8 @@ begin
 	    # data space for manipulating lut information
 
 	    call smark (sp)
-	    call salloc (ldata, LEN_LUT, TY_SHORT)
+	    sz_val = LEN_LUT
+	    call salloc (ldata, sz_val, TY_SHORT)
 	    call aclrs (Mems[ldata], LEN_LUT)
 
 	    # We could have negative lut values, but don't bother for now

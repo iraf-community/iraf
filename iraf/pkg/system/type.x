@@ -42,6 +42,7 @@ char	fname[ARB]
 bool	print_file_name
 int	map_cc
 
+size_t	sz_val
 int	in
 pointer	sp, buf
 int	open(), getline()
@@ -49,7 +50,8 @@ errchk	salloc, open, getline, ttyputline
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	in = open (fname, READ_ONLY, TEXT_FILE)
 

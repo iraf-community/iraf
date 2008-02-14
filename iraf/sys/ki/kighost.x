@@ -13,14 +13,17 @@ int procedure ki_gethosts()
 pointer	sp, lbuf, osfn, ip
 int	chan, node, ch, op, junk, n, status, i, delim
 
+size_t	sz_val
 bool	streq()
 int	ctowrd(), envfind(), ki_gnode()
 include	"kinode.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE,  TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val,  TY_CHAR)
 
 	# Null selected node descriptor fields.
 	call aclri (n_kschan, MAX_NODES)

@@ -9,6 +9,7 @@ pointer	ip					#i task struct pointer
 char	fname[ARB]				#i binary file name
 int	verbose					#i verbose output?
 
+size_t	sz_val
 pointer	sp, buf
 pointer	fmt
 int	fdb
@@ -27,7 +28,8 @@ begin
 
 	} else {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    if (IP_FSYM(ip) == NULL) {
                 fdb = fdb_opendb ()
@@ -199,6 +201,7 @@ procedure ip_list_formats (fd)
 
 int	fd					#i input binary file descriptor
 
+size_t	sz_val
 pointer	sp, format, idstr, alias
 pointer	fmt, ap[5]
 int	i, nsym
@@ -213,9 +216,11 @@ begin
 	cur_offset = note (fd)
 
 	call smark (sp)
-	call salloc (format, SZ_EXPR, TY_CHAR)
-	call salloc (idstr, SZ_EXPR, TY_CHAR)
-	call salloc (alias, SZ_LINE, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (format, sz_val, TY_CHAR)
+	call salloc (idstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (alias, sz_val, TY_CHAR)
 
         # Loop through the database records.
 	call seek (fd, BOF)

@@ -20,6 +20,7 @@ real	y[ARB]		# y array
 real	w[ARB]		# weight array
 int	ier		# error code
 
+size_t	sz_val
 int	i, k
 pointer	bzptr
 pointer	vzptr, vindex
@@ -36,8 +37,10 @@ begin
 
 	    # allocate space for the basis functions and array containing
 	    # the index of the first non-zero basis function
-	    call malloc (CV_BASIS(cv), CV_NPTS(cv)*CV_ORDER(cv), TY_REAL)
-	    call malloc (CV_WY(cv), CV_NPTS(cv), TY_REAL)
+	    sz_val = CV_NPTS(cv)*CV_ORDER(cv)
+	    call malloc (CV_BASIS(cv), sz_val, TY_REAL)
+	    sz_val = CV_NPTS(cv)
+	    call malloc (CV_WY(cv), sz_val, TY_REAL)
 
 	    # calculate the non-zero basis functions
 	    switch (CV_TYPE(cv)) {
@@ -48,14 +51,16 @@ begin
 		call rcv_bcheb (x, CV_NPTS(cv), CV_ORDER(cv), CV_MAXMIN(cv),
 			    CV_RANGE(cv), BASIS(CV_BASIS(cv)))
 	    case SPLINE3:
-	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_INT)
+	        sz_val = CV_NPTS(cv)
+	        call malloc (CV_LEFT(cv), sz_val, TY_INT)
 		call rcv_bspline3 (x, CV_NPTS(cv), CV_NPIECES(cv),
 		    -CV_XMIN(cv), CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 		    LEFT(CV_LEFT(cv)))
 		call aaddki (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)),
 		    CV_NPTS(cv))
 	    case SPLINE1:
-	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_INT)
+	        sz_val = CV_NPTS(cv)
+	        call malloc (CV_LEFT(cv), sz_val, TY_INT)
 		call rcv_bspline1 (x, CV_NPTS(cv), CV_NPIECES(cv),
 		    -CV_XMIN(cv), CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 		    LEFT(CV_LEFT(cv)))

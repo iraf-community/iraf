@@ -33,6 +33,7 @@ int	interactive		# Fit curve interactively?
 int	ofmt			# Type of output listing
 bool	power			# Convert coeff to power series?
 
+size_t	sz_val
 int	ncoeff, i
 real	xmin, xmax
 pointer	sp, gp, cv, coeff, tty
@@ -77,7 +78,8 @@ begin
  	    # Calculate and print coefficients
 	    ncoeff = rcvstati (cv, CVNCOEFF)
 	    call smark (sp)
-	    call salloc (coeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_REAL)
 	    call rcvpower (cv, Memr[coeff], ncoeff)
 	    call printf ("# Power series coefficients would be:\n")
 	    call printf ("# \t\tcoefficient\n")
@@ -225,6 +227,7 @@ int	interactive		# Fit curve interactively?
 int	ofmt			# Type of output listing
 bool	power			# Convert coeff to power series?
 
+size_t	sz_val
 int	ncoeff, i
 double	xmin, xmax
 pointer	sp, gp, cv, coeff, tty
@@ -269,7 +272,8 @@ begin
  	    # Calculate and print coefficients
 	    ncoeff = dcvstati (cv, CVNCOEFF)
 	    call smark (sp)
-	    call salloc (coeff, ncoeff, TY_DOUBLE)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_DOUBLE)
 	    call dcvpower (cv, Memd[coeff], ncoeff)
 	    call printf ("# Power series coefficients would be:\n")
 	    call printf ("# \t\tcoefficient\n")

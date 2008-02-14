@@ -29,6 +29,7 @@ PIXEL	z		# z value
 PIXEL	w		# weight
 int	wtflag		# type of weighting
 
+size_t	sz_val
 int	ii, j, k, l
 int	maxorder, xorder, xxorder, xindex, yindex, ntimes
 pointer	sp, vzptr, mzptr, xbptr, ybptr
@@ -81,11 +82,15 @@ begin
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
 	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    $else
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
 	    $endif
 	    call $tgs_b1leg (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
@@ -93,11 +98,15 @@ begin
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_CHEBYSHEV:
 	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    $else
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
 	    $endif
 	    call $tgs_b1cheb (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
@@ -105,11 +114,15 @@ begin
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_POLYNOMIAL:
 	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    $else
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
 	    $endif
 	    call $tgs_b1pol (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))

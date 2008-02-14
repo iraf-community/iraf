@@ -18,6 +18,7 @@ int	mode		# Mode
 pointer	ie		# Structure pointer
 real	x, y		# Center coordinate
 
+size_t	sz_val
 real	z1, z2, dz, zmin, zmax
 int	i, j, x1, x2, y1, y2, nx, ny, npts, nbins, nbins1, nlevels, nwide
 pointer	pp, sp, hgm, title, im, data, xp, yp
@@ -119,7 +120,8 @@ begin
 
 	# Initialize the histogram buffer and image line vector.
 	call smark (sp)
-	call salloc (hgm,  nbins1, TY_INT)
+	sz_val = nbins1
+	call salloc (hgm, sz_val, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
 
 	call ahgmr (Memr[data], npts, Memi[hgm], nbins1, z1, z2)
@@ -139,16 +141,18 @@ begin
 	    # Draw the plot.
 	    if (clgpsetb (pp, "pointmode")) {
 		nbins1 = nbins
-		call salloc (xp, nbins1, TY_REAL)
-	        call salloc (yp, nbins1, TY_REAL)
+		sz_val = nbins1
+		call salloc (xp, sz_val, TY_REAL)
+	        call salloc (yp, sz_val, TY_REAL)
 	        call achtir (Memi[hgm], Memr[yp], nbins1)
 		Memr[xp] = z1 + dz / 2.
 		do i = 1, nbins1 - 1
 		    Memr[xp+i] = Memr[xp+i-1] + dz
 	    } else {
 		nbins1 = 2 * nbins
-		call salloc (xp, nbins1, TY_REAL)
-	        call salloc (yp, nbins1, TY_REAL)
+		sz_val = nbins1
+		call salloc (xp, sz_val, TY_REAL)
+	        call salloc (yp, sz_val, TY_REAL)
 		Memr[xp] = z1
 		Memr[yp] = Memi[hgm]
 		j = 0
@@ -164,7 +168,8 @@ begin
 		Memr[yp+j+1] = Memr[yp+j]
 	    }
 
-	    call salloc (title, IE_SZTITLE, TY_CHAR)
+	    sz_val = IE_SZTITLE
+	    call salloc (title, sz_val, TY_CHAR)
 	    call sprintf (Memc[title], IE_SZTITLE,
 		"%s[%d:%d,%d:%d]: Histogram from z1=%g to z2=%g, nbins=%d\n%s")
 	        call pargstr (IE_IMNAME(ie))

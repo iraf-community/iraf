@@ -17,6 +17,7 @@ char	new_root[ARB]		# new image root name
 char	new_extn[ARB]		# old image extn
 int	status
 
+size_t	sz_val
 pointer	sp, im
 bool	heq, peq
 pointer	old_hfn, new_hfn
@@ -30,10 +31,11 @@ errchk	immapz, rename
 
 begin
 	call smark (sp)
-	call salloc (old_hfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (old_hfn, sz_val, TY_CHAR)
+	call salloc (new_hfn, sz_val, TY_CHAR)
+	call salloc (old_pfn, sz_val, TY_CHAR)
+	call salloc (new_pfn, sz_val, TY_CHAR)
 
 	# Get filenames of old and new images.
 	call iki_mkfname (old_root, old_extn, Memc[old_hfn], SZ_PATHNAME)

@@ -21,6 +21,7 @@ real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 int	npts		# number of points which describe the boundary
 
+size_t	sz_val
 int	i, interp_type, nylmin, nylmax, offset
 pointer	x1lim, x2lim, xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
@@ -48,9 +49,10 @@ begin
 	}
 
 	# set up temporary storage for x limits and the x integrals
-	call calloc (x1lim, MSI_NYCOEFF(msi), TY_REAL)
-	call calloc (x2lim, MSI_NYCOEFF(msi), TY_REAL)
-	call calloc (xintegrl, MSI_NYCOEFF(msi), TY_REAL)
+	sz_val = MSI_NYCOEFF(msi)
+	call calloc (x1lim, sz_val, TY_REAL)
+	call calloc (x2lim, sz_val, TY_REAL)
+	call calloc (xintegrl, sz_val, TY_REAL)
 
 	# offset of first data point from edge of coefficient array
 	offset = mod (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
@@ -109,6 +111,7 @@ real	ymax		# maximum y value for integration
 int	nylmin		# minimum line number for x integration
 int	nylmax		# maximum line number for x integration
 
+size_t	sz_val
 int	i, ninter
 pointer	sp, xintr, yintr
 real	xmin, xmax, lx, ld
@@ -116,8 +119,9 @@ int	ii_pyclip()
 
 begin
 	call smark (sp)
-	call salloc (xintr, npts, TY_REAL)
-	call salloc (yintr, npts, TY_REAL)
+	sz_val = npts
+	call salloc (xintr, sz_val, TY_REAL)
+	call salloc (yintr, sz_val, TY_REAL)
 
 	# find x and y limits and their indicess
 	call alimr (x, npts, xmin, xmax)

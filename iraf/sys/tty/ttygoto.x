@@ -15,6 +15,7 @@ pointer	tty			# termcap descriptor
 int	col			# destination column
 int	line			# destination line
 
+size_t	sz_val
 pointer	sp, cm_in, cm_out
 int	coords[2], nchars, i
 int	ttygets(), ttysubi()
@@ -22,8 +23,10 @@ errchk	salloc, ttygets, ttyputs, ttywrite
 
 begin
 	call smark (sp)
-	call salloc (cm_in, SZ_CTRLSTR, TY_CHAR)
-	call salloc (cm_out, SZ_LINE, TY_CHAR)
+	sz_val = SZ_CTRLSTR
+	call salloc (cm_in, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cm_out, sz_val, TY_CHAR)
 
 	# Use the cursor motion control string to position cursor, if the
 	# terminal has such a capability.  Otherwise try to use primitive

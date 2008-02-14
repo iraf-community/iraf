@@ -23,13 +23,15 @@ int	nsdig[ARB]		#I array of numbers of significant digits
 int	ncout			#I the number of coordinates	
 int	min_sigdigits		#I the minimum number of signficant digits
 
+size_t	sz_val
 int	op, num_field, width, cf, cfptr
 pointer	sp, field
 int	gstrcpy()
 
 begin
 	call smark (sp)
-	call salloc (field, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Initialize output pointer.
 	op = 1

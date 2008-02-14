@@ -20,6 +20,7 @@ int	nvectors		# number of univariate splines to calculate
 int	len_data		# row dimension of data
 int	len_coeff		# row dimension of coeff
 
+size_t	sz_val
 int	i, j
 pointer	diag
 
@@ -27,7 +28,8 @@ errchk	malloc, mfree
 
 begin
 	# allocate space for off-diagonal elements
-	call malloc (diag, nxpix+1, TY_REAL)
+	sz_val = nxpix+1
+	call malloc (diag, sz_val, TY_REAL)
 
 	# calculate off-diagonal elements by Gaussian elimination
 	Memr[diag] = -2.

@@ -18,6 +18,7 @@ int	verbose			# verbose mode ?
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
+size_t	sz_val
 int	nregions, newref, stat
 pointer	list1, listr, psflist, listk, list2
 pointer	sp, imtemp, str, pm, gd, id, imr, im1, impsf, imk, im2
@@ -33,14 +34,18 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (fpsflist, SZ_LINE, TY_CHAR)
-	call salloc (kernel, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (pspectra, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (imager, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fpsflist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kernel, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (pspectra, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[str], SZ_LINE)
@@ -348,13 +353,15 @@ char    image[ARB]              #I image specification
 char    root[ARB]               #O rootname
 int     maxch                   #I maximum number of characters
 
+size_t	sz_val
 int     nchars
 pointer sp, str
 int     fnldir(), strlen()
 
 begin
         call smark (sp)
-        call salloc (str, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (str, sz_val, TY_CHAR)
 
         call imgimage (image, root, maxch)
         nchars = fnldir (root, Memc[str], maxch)

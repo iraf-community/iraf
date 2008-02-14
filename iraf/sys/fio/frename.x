@@ -19,6 +19,7 @@ procedure frename (oldfname, newfname)
 char	oldfname[ARB]		# old filename
 char	newfname[ARB]		# new filename
 
+size_t	sz_val
 int	file_exists
 int	status, junk
 pointer	sp, vp, oldosfn, newosfn, errmsg
@@ -43,9 +44,11 @@ begin
 	    call syserrs (SYS_FRENAME, newfname)
 
 	call smark (sp)
-	call salloc (oldosfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (newosfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (oldosfn, sz_val, TY_CHAR)
+	call salloc (newosfn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Format the string "oldfname -> newfname" for error messages.
 	call strcpy (oldfname, Memc[errmsg], SZ_LINE)

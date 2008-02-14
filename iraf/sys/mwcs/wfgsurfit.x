@@ -70,6 +70,7 @@ pointer procedure wf_gsopen (atstr)
 
 char    atstr[ARB]              #I the input mwcs attribute string
 
+size_t	sz_val
 double  dval
 int     ip, npar, szcoeff
 pointer gs, sp, par, coeff
@@ -81,7 +82,8 @@ begin
             return (NULL)
 
         call smark (sp)
-        call salloc (par, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (par, sz_val, TY_CHAR)
 
         gs = NULL
         npar = 0
@@ -245,6 +247,7 @@ double	x		#I x values
 double	y		#I y values
 int	nxd, nyd	#I order of the derivatives in x and y
 
+size_t	sz_val
 int	ncoeff, nxder, nyder, i, j, k
 int	order, maxorder1, maxorder2, nmove1, nmove2
 pointer	sf2, sp, coeff, ptr1, ptr2
@@ -331,7 +334,8 @@ begin
 
 	# Get coefficients.
 	call smark (sp)
-	call salloc (coeff, WF_NCOEFF(sf1), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf1)
+	call salloc (coeff, sz_val, TY_DOUBLE)
 	call wf_gscoeff (sf1, Memd[coeff], ncoeff)
 
 	# Compute the new coefficients.

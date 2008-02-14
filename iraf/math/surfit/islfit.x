@@ -26,6 +26,7 @@ int	ncols		# the number of columns
 int	wtflag		# type of weighting
 int	ier		# error codes
 
+size_t	sz_val
 int	i, ii, j, k
 pointer	xbzptr, xbptr
 pointer	xmzptr, xmindex
@@ -66,7 +67,8 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	call salloc (bw, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (bw, sz_val, TY_REAL)
 
 	switch (SF_TYPE(sf)) {
 	case SF_LEGENDRE, SF_CHEBYSHEV:
@@ -96,8 +98,9 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 	    xlzptr = SF_XLEFT(sf) - 1
 
-	    call salloc (left, ncols, TY_INT)
-	    call salloc (rows, ncols, TY_INT)
+	    sz_val = ncols
+	    call salloc (left, sz_val, TY_INT)
+	    call salloc (rows, sz_val, TY_INT)
 
 	    do j = 1, ncols
 		Memi[left+j-1] = XLEFT(xlzptr+cols[j])

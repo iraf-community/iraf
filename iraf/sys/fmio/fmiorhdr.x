@@ -12,6 +12,7 @@ procedure fmio_readheader (fm)
 
 pointer	fm			#I FMIO descriptor
 
+size_t	sz_val
 pointer	sp, buf, dh, pti, pt, ft, ip, op
 int	offset, buflen, npti, p1, p2, d1, d2, b_off1, b_off2, i
 int	status, chan, nbytes, nwords, maxpages, szbpage
@@ -20,7 +21,8 @@ long	clktime()
 
 begin
 	call smark (sp)
-	call salloc (dh, LEN_DHSTRUCT, TY_STRUCT)
+	sz_val = LEN_DHSTRUCT
+	call salloc (dh, sz_val, TY_STRUCT)
 
 	chan = FM_CHAN(fm)
 

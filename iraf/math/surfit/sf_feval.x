@@ -16,6 +16,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, k, j
 int	ytorder, cptr
 pointer	sp
@@ -31,9 +32,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_REAL)
-	call salloc (yb, yorder * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_REAL)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
 
 	# calculate basis functions
 	call sf_bcheb (x, npts, xorder, k1x, k2x, Memr[xb])
@@ -88,6 +92,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, k, j
 int	ytorder, cptr
 pointer	sp
@@ -103,9 +108,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_REAL)
-	call salloc (yb, yorder * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_REAL)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
 
 	# calculate basis functions
 	call sf_bleg (x, npts, xorder, k1x, k2x, Memr[xb])
@@ -159,6 +167,7 @@ int	nxpieces, nypieces	# number of fitted points minus 1
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, j, k, cindex
 pointer	xb, xbzptr, yb, ybzptr, ybptr
 pointer	accum, leftx, lefty
@@ -167,11 +176,13 @@ pointer	sp
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, 4 * npts, TY_REAL)
-	call salloc (yb, 4 * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
-	call salloc (leftx, npts, TY_INT)
-	call salloc (lefty, npts, TY_INT)
+	sz_val = 4 * npts
+	call salloc (xb, sz_val, TY_REAL)
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
+	call salloc (leftx, sz_val, TY_INT)
+	call salloc (lefty, sz_val, TY_INT)
 
 	# calculate basis functions
 	call sf_bspline3 (x, npts, nxpieces, k1x, k2x, Memr[xb], Memi[leftx])
@@ -227,6 +238,7 @@ int	nxpieces, nypieces	# number of fitted points minus 1
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, j, k, cindex
 pointer	xb, xbzptr, yb, ybzptr, ybptr
 pointer	accum, leftx, lefty
@@ -235,11 +247,13 @@ pointer	sp
 begin
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, 2 * npts, TY_REAL)
-	call salloc (yb, 2 * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
-	call salloc (leftx, npts, TY_INT)
-	call salloc (lefty, npts, TY_INT)
+	sz_val = 2 * npts
+	call salloc (xb, sz_val, TY_REAL)
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
+	call salloc (leftx, sz_val, TY_INT)
+	call salloc (lefty, sz_val, TY_INT)
 
 	# calculate basis functions
 	call sf_bspline1 (x, npts, nxpieces, k1x, k2x, Memr[xb], Memi[leftx])

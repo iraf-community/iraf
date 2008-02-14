@@ -12,6 +12,7 @@ char	old_osfn[ARB]		#I packed old os filename
 char	new_osfn[ARB]		#I packed new os filename
 int	status			#O answer; ok or err
 
+size_t	sz_val
 pointer	sp, fname
 int	server1, server2, old, new
 int	ki_connect(), ki_sendrcv(), strlen()
@@ -19,7 +20,8 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	server2 = ki_connect (new_osfn)
 	call strcpy (p_sbuf[p_arg[1]], Memc[fname], SZ_FNAME)

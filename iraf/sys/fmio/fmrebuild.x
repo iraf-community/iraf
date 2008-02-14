@@ -9,12 +9,14 @@ procedure fm_rebuild (dfname)
 
 char	dfname[ARB]		#I datafile name
 
+size_t	sz_val
 pointer	sp, tfname
 errchk	fm_copy, fm_delete, fm_rename
 
 begin
 	call smark (sp)
-	call salloc (tfname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (tfname, sz_val, TY_CHAR)
 
 	# The copy operation rebuilds a datafile.
 	call mktemp (dfname, Memc[tfname], SZ_PATHNAME)

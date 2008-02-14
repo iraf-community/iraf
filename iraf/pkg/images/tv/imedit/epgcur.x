@@ -16,6 +16,7 @@ int	key			# Keystroke value of cursor event
 char	strval[ARB]		# String value, if any
 int	maxch
 
+size_t	sz_val
 real	a, b, c, d, e
 pointer	sp, buf, ip
 int	nitems, wcs
@@ -28,7 +29,8 @@ begin
 
 	if (EP_FIXPIX(ep) == YES) {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    # Read the list structured string.
 	    if (clglstr ("cursor", Memc[buf], SZ_LINE) == EOF) {

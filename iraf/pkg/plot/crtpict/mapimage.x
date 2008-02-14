@@ -25,6 +25,7 @@ real	px1,px2,py1,py2			# input section
 real	ndc_xs,ndc_xe,ndc_ys,ndc_ye	# NDC of output section
 int	nx_output, ny_output		# Number of output pixels.  Image pixels
 					# are scaled to these dimensions.
+size_t	sz_val
 real	z1,z2				# range of intensities to be mapped.
 int	zt				# specified greyscale transform type
 pointer	cl				# Pointer to crtpict structure
@@ -44,9 +45,11 @@ errchk	ggetb, ggetr, gpcell, crt_ulut
 
 begin
 	call smark (sp)
-	call salloc (sline, nx_output, TY_SHORT)
+	sz_val = nx_output
+	call salloc (sline, sz_val, TY_SHORT)
 	if (IM_PIXTYPE(im) != TY_SHORT)
-	    call salloc (rline, nx_output, TY_REAL)
+	    sz_val = nx_output
+	    call salloc (rline, sz_val, TY_REAL)
 
 	# Calculate and allocate heap space needed for an image row.
 	ndev_cols = ggeti (gp, "xr")

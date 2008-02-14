@@ -12,13 +12,15 @@ bool	verify
 int	nchars
 pointer	list, sp, tty, imname, im
 
+size_t	sz_val
 pointer	ttyodes(), immap(), imtopenp()
 int	imtgetim(), imaccess(), strlen()
 bool	clgetb()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	list = imtopenp ("images")
 	verify = clgetb ("verify")

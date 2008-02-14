@@ -17,6 +17,7 @@ char	infile[ARB]		# name of host command input file
 char	outfile[ARB]		# name of file to receive output
 char	errfile[ARB]		# name of file to receive error output
 
+size_t	sz_val
 int	status, ip, ch
 pointer	sp, cmdbuf, osin, osout, oserr, ostmp, op
 errchk	fmapfn, mktemp, fclobber, flush, putline
@@ -25,11 +26,13 @@ bool	fnullfile()
 
 begin
 	call smark (sp)
-	call salloc (cmdbuf, SZ_COMMAND, TY_CHAR)
-	call salloc (osin, SZ_PATHNAME, TY_CHAR)
-	call salloc (osout, SZ_PATHNAME, TY_CHAR)
-	call salloc (oserr, SZ_PATHNAME, TY_CHAR)
-	call salloc (ostmp, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (cmdbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osin, sz_val, TY_CHAR)
+	call salloc (osout, sz_val, TY_CHAR)
+	call salloc (oserr, sz_val, TY_CHAR)
+	call salloc (ostmp, sz_val, TY_CHAR)
 
 	# If we are called from the root process, e.g., the CL, the ZOSCMD
 	# primitive is called directly to transmit the host command, otherwise

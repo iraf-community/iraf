@@ -15,6 +15,7 @@ int	calctype		# Internal calculation type
 real	low_reject		# Number or frac of low pix to reject
 real	high_reject		# Number or frac of high pix to reject
 
+size_t	sz_val
 int	i, nimages, nlow, nhigh
 pointer	sp, str, im_in, im_out
 
@@ -36,9 +37,11 @@ begin
 
 	# Allocate strings and get the parameters.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (hparams, SZ_LINE, TY_CHAR)
-	call salloc (option, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (hparams, sz_val, TY_CHAR)
+	call salloc (option, sz_val, TY_CHAR)
 
 	i = clgwrd ("option", Memc[option], SZ_LINE, "|sum|average|median|")
 	if (streq (Memc[option], "median")) {
@@ -84,7 +87,8 @@ begin
 
 	# Print verbose info.
 	if (clgetb ("verbose")) {
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (str, sz_val, TY_CHAR)
 	    call printf ("IMSUM:\n")
 	    call printf ("  Input images:\n")
 	    while (imtgetim (list, Memc[str], SZ_LINE) != EOF) {
@@ -148,6 +152,7 @@ int	list				# List of input images
 int	pixtype				# Pixel datatype of output image
 int	calctype			# Pixel datatype for calculations
 
+size_t	sz_val
 int	i, j, nimages, max_type
 pointer	sp, str, im1, im2
 
@@ -158,7 +163,8 @@ errchk	immap, imunmap
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Determine maximum precedence datatype.
 	# Also check that the images are the same dimension and size.
@@ -263,6 +269,7 @@ char	output[ARB]		# Output image
 char	hparams[ARB]		# List of header parameters
 char	option[ARB]		# Sum option
 
+size_t	sz_val
 int	i, nfields
 pointer	flist, sp, field, dvals, image, in, out
 
@@ -281,9 +288,12 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (field, NFIELDS*SZ_FNAME, TY_CHAR)
-	call salloc (dvals, NFIELDS, TY_DOUBLE)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = NFIELDS*SZ_FNAME
+	call salloc (field, sz_val, TY_CHAR)
+	sz_val = NFIELDS
+	call salloc (dvals, sz_val, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	# Map the fields.
 	out = immap (output, READ_WRITE, 0)

@@ -103,6 +103,7 @@ procedure snap (gp, ps, pe)
 pointer	gp
 int	ps, pe
 
+size_t	sz_val
 real	y
 short	data[7]
 pointer	sp
@@ -125,7 +126,8 @@ begin
 	    return
 	}
 
-	call salloc ( sndata, DIM, TY_SHORT)
+	sz_val = DIM
+	call salloc ( sndata, sz_val, TY_SHORT)
 	call eprintf ("snapping from %d through %d\n")
 	    call pargi (ps)
 	    call pargi (pe)

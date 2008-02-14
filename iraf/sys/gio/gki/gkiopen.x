@@ -18,6 +18,7 @@ int	fd			# output file
 char	device[ARB]		# device name
 int	mode			# access mode
 
+size_t	sz_val
 int	ip, n, nchars
 pointer	epa
 pointer	sp, gki, op
@@ -28,7 +29,8 @@ begin
 	call smark (sp)
 
 	n = strlen (device)
-	call salloc (gki, GKI_OPENWS_LEN + n, TY_SHORT)
+	sz_val = GKI_OPENWS_LEN + n
+	call salloc (gki, sz_val, TY_SHORT)
 
 	# Pack the device name as a SHORT integer array.
 	op = gki + GKI_OPENWS_D - 1

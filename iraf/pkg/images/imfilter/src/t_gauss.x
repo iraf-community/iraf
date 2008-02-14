@@ -13,6 +13,7 @@ procedure t_gauss()
 char	imtlist1[SZ_LINE]			# Input image list
 char	imtlist2[SZ_LINE]			# Output image list
 
+size_t	sz_val
 char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
@@ -158,11 +159,13 @@ begin
 
 		# Compute the kernel.
 		call smark (sp)
-		call salloc (kernel1, nxk1 * nyk1, TY_REAL)
+		sz_val = nxk1 * nyk1
+		call salloc (kernel1, sz_val, TY_REAL)
 		call cnv_gauss_kernel (Memr[kernel1], nxk1, nyk1, a1, b1,
 		    c1, f1)
 		if (kbilinear == YES) {
-		    call salloc (kernel2, nxk2 * nyk2, TY_REAL)
+		    sz_val = nxk2 * nyk2
+		    call salloc (kernel2, sz_val, TY_REAL)
 		    call cnv_gauss_kernel (Memr[kernel2], nxk2, nyk2, a2, b2,
 		        c2, f2)
 		}

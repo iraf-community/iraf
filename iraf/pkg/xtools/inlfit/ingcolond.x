@@ -43,6 +43,7 @@ int	nvars				# Number of variables
 int	len_name			# Length of object name
 int	newgraph			# New graph ?
 
+size_t	sz_val
 int	ncmd, ival
 double	fval
 pointer	sp, cmd
@@ -54,7 +55,8 @@ double	in_getd()
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Use formated scan to parse the command string.
 	# The first word is the command and it may be minimum match
@@ -241,6 +243,7 @@ procedure ing_changed (in, type)
 pointer	in			# INLFIT descriptor
 int	type			# parameter type (fit, constant)
 
+size_t	sz_val
 bool	isfit
 int	ip, pos, number, npars
 double	dval
@@ -257,10 +260,11 @@ pointer	in_getp()
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (param,   SZ_LINE, TY_CHAR)
-	call salloc (value,   SZ_LINE, TY_CHAR)
-	call salloc (pname,   SZ_LINE, TY_CHAR)
-	call salloc (plabels, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (param, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (pname, sz_val, TY_CHAR)
+	call salloc (plabels, sz_val, TY_CHAR)
 
 	# Get parameter name.
 	Memc[param] = EOS

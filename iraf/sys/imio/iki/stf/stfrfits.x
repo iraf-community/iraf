@@ -41,6 +41,7 @@ pointer	im				#I image descriptor
 pointer	fits				#O pointer to saved FITS cards
 int	fitslen				#O length of FITS save area
 
+size_t	sz_val
 long	fi[LEN_FINFO]
 pointer	sp, pp, stf, o_stf, lbuf, op, hdrfile
 int	in, index, nchars, spool, slot, user, i
@@ -66,8 +67,10 @@ data	initialized /false/
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	# Initialize the header file cache on the first call.
 	if (!initialized) {

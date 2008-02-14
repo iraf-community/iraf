@@ -11,6 +11,7 @@ int procedure fxf_ctype (card, kwindex)
 char	card[ARB]			#I FITS card (or keyword)
 int	kwindex				#O index number, if any
 
+size_t	sz_val
 pointer sp, kwname
 char	kw[SZ_KEYWORD]
 int	index, ch, i, ip
@@ -19,7 +20,8 @@ string  keywords FK_KEYWORDS
 
 begin
 	call smark (sp)
-	call salloc (kwname, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (kwname, sz_val, TY_CHAR)
 
 	# Check for a reference to one of the NAXIS keywords.
 	kwindex= 0

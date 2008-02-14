@@ -12,6 +12,7 @@ char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
+size_t	sz_val
 pointer	sp, fname, image, dirname, otemplate, outlist
 int	i, len_dir, len_otemplate, strfd
 int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
@@ -35,9 +36,10 @@ begin
 
 	# Get working space.
         call smark (sp)
-        call salloc (fname, SZ_FNAME, TY_CHAR)
-        call salloc (image, SZ_FNAME, TY_CHAR)
-        call salloc (dirname, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (image, sz_val, TY_CHAR)
+        call salloc (dirname, sz_val, TY_CHAR)
 
         # Get the directory name.
         if (imtrgetim (outlist, 1, Memc[fname], SZ_FNAME) == EOF)
@@ -52,7 +54,8 @@ begin
 	    # Create a temporary list string.
             call imtclose (outlist)
             len_otemplate = imtlen (inlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
 	    # Loop over the input image list.
@@ -86,7 +89,8 @@ begin
 
 	    # Create a temporary list string.
             len_otemplate = imtlen (outlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
             strfd = stropen (Memc[otemplate], len_otemplate, NEW_FILE)
@@ -126,6 +130,7 @@ char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
+size_t	sz_val
 pointer	sp, fname, image, dirname, otemplate, outlist
 int	i, len_dir, len_otemplate, strfd
 int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
@@ -149,9 +154,10 @@ begin
 
 	# Get working space.
         call smark (sp)
-        call salloc (fname, SZ_FNAME, TY_CHAR)
-        call salloc (image, SZ_FNAME, TY_CHAR)
-        call salloc (dirname, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (image, sz_val, TY_CHAR)
+        call salloc (dirname, sz_val, TY_CHAR)
 
         # Get the directory name.
         if (imtrgetim (outlist, 1, Memc[fname], SZ_FNAME) == EOF)
@@ -166,7 +172,8 @@ begin
 	    # Create a temporary list string.
             call imtclose (outlist)
             len_otemplate = imtlen (inlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
 	    # Loop over the input image list.
@@ -197,7 +204,8 @@ begin
 
 	    # Create a temporary list string.
             len_otemplate = imtlen (outlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
             strfd = stropen (Memc[otemplate], len_otemplate, NEW_FILE)
@@ -236,6 +244,7 @@ char    output[ARB] 	        #I the input output file list
 char    defaultstr[ARB]         #I the defaults id string
 char    extstr[ARB]             #I the extension string
 
+size_t	sz_val
 pointer	sp, fname, image, dirname, otemplate, outlist
 int	i, len_dir, len_otemplate, strfd
 int	imtlen(), imtrgetim(), fnldir(), strncmp(), strlen()
@@ -259,9 +268,10 @@ begin
 
 	# Get working space.
         call smark (sp)
-        call salloc (fname, SZ_FNAME, TY_CHAR)
-        call salloc (image, SZ_FNAME, TY_CHAR)
-        call salloc (dirname, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (image, sz_val, TY_CHAR)
+        call salloc (dirname, sz_val, TY_CHAR)
 
         # Get the directory name.
         if (imtrgetim (outlist, 1, Memc[fname], SZ_FNAME) == EOF)
@@ -276,7 +286,8 @@ begin
 	    # Create a temporary list string.
             call imtclose (outlist)
             len_otemplate = imtlen (inlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
 	    # Loop over the input image list.
@@ -310,7 +321,8 @@ begin
 
 	    # Create a temporary list string.
             len_otemplate = imtlen (outlist) * SZ_FNAME + 1
-            call salloc (otemplate, len_otemplate, TY_CHAR)
+            sz_val = len_otemplate
+            call salloc (otemplate, sz_val, TY_CHAR)
             Memc[otemplate] = EOS
 
             strfd = stropen (Memc[otemplate], len_otemplate, NEW_FILE)
@@ -353,6 +365,7 @@ char    ext[ARB]                #I input extension
 char    name[ARB]               #O output file name
 int     maxch                   #I maximum size of name
 
+size_t	sz_val
 pointer sp, root, str
 int     ndir, nimdir, clindex, clsize, nextn
 int     fnldir(), strlen(), strldx(), strdic()
@@ -360,8 +373,9 @@ char	period
 
 begin
         call smark (sp)
-        call salloc (root, SZ_FNAME, TY_CHAR)
-        call salloc (str, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (root, sz_val, TY_CHAR)
+        call salloc (str, sz_val, TY_CHAR)
 
         ndir = fnldir (output, name, maxch)
         if (strlen (output) == ndir) {
@@ -413,6 +427,7 @@ char    template[ARB]                   #I the input name template
 char    filename[ARB]                   #O the output name
 int     maxch                           #I the  maximum number of characters
 
+size_t	sz_val
 char    period
 int     newversion, version, len
 pointer sp, list, name
@@ -423,7 +438,8 @@ errchk  fntopnb()
 begin
         # Allocate temporary space
         call smark (sp)
-        call salloc (name, maxch, TY_CHAR)
+        sz_val = maxch
+        call salloc (name, sz_val, TY_CHAR)
         period = '.'
         iferr (list = fntopnb (template, NO))
             list = fntopnb ("", NO)
@@ -461,6 +477,7 @@ char    ext[ARB]                #I the output image extension
 char    name[ARB]               #O the final output image name
 int     maxch                   #I maximum size of name
 
+size_t	sz_val
 int     ndir, nimdir, clindex, clsize
 pointer sp, root, str
 int     fnldir(), strlen()
@@ -468,8 +485,9 @@ int     fnldir(), strlen()
 begin
 	# Allocate some temporary space.
         call smark (sp)
-        call salloc (root, SZ_FNAME, TY_CHAR)
-        call salloc (str, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (root, sz_val, TY_CHAR)
+        call salloc (str, sz_val, TY_CHAR)
 
 	# Determine the length of the directory spec.
         ndir = fnldir (output, name, maxch)
@@ -518,6 +536,7 @@ char    template[ARB]                   #I the image name template
 char    filename[ARB]                   #O the output image name
 int     maxch                           #I the maximum number of characters
 
+size_t	sz_val
 char    period
 int     newversion, version, len
 pointer sp, list, name
@@ -527,7 +546,8 @@ pointer	imtopen()
 begin
         # Allocate temporary space
         call smark (sp)
-        call salloc (name, maxch, TY_CHAR)
+        sz_val = maxch
+        call salloc (name, sz_val, TY_CHAR)
         period = '.'
         list = imtopen (template)
 

@@ -16,6 +16,7 @@ pointer	ls			#I pointer to the linscale structure
 int	rp			#I region pointer
 int	reread			#I reread the current file
 
+size_t	sz_val
 char	fname[SZ_FNAME]
 int	max_nregions, nregions, fd
 pointer	sp, regions
@@ -26,7 +27,8 @@ errchk	fntgfnb(), seek(),  open(), close()
 
 begin
 	call smark (sp)
-	call salloc (regions, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (regions, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, REGIONS, Memc[regions], SZ_LINE)
 	max_nregions = rg_lstati (ls, MAXNREGIONS)
@@ -84,6 +86,7 @@ pointer ls                      #I pointer to the linscale structure
 int     rp                      #I index of the current region
 int     max_nregions            #I the maximum number of regions
 
+size_t	sz_val
 int     i, istart, iend, j, jstart, jend, ncols, nlines, nxsample, nysample
 int     nxcols, nylines, nregions
 pointer sp, region, section
@@ -93,8 +96,9 @@ pointer rg_lstatp()
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_LINE, TY_CHAR)
-        call salloc (section, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (region, sz_val, TY_CHAR)
+        call salloc (section, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information,
         call rg_lrealloc (ls, max_nregions)
@@ -184,6 +188,7 @@ pointer ls                      #I pointer to the linscale structure
 int     rp                      #I pointer to the current region
 int     max_nregions            #I maximum number of regions
 
+size_t	sz_val
 char	comma
 int     ncols, nlines, nregions, onscan()
 int     x1, x2, y1, y2
@@ -195,7 +200,8 @@ pointer rg_lstatp()
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (region, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information.
         call rg_lrealloc (ls, max_nregions)
@@ -308,6 +314,7 @@ int	max_nregions		#I maximum number of regions
 char	regions[ARB]		#O the output regions string
 int	maxch			#I the maximum size of the output string
 
+size_t	sz_val
 int	nregions, op, wcs, key
 pointer	sp, cmd
 real	xll, yll, xur, yur
@@ -317,7 +324,8 @@ pointer	rg_lstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
@@ -430,6 +438,7 @@ pointer	ls                      #I pointer to the psf matching structure
 int     rp                      #I pointer to current region
 int     max_nregions            #I maximum number of regions
 
+size_t	sz_val
 int     nregions, wcs, key, x1, x2, y1, y2
 pointer sp, region, cmd
 real    xc, yc
@@ -439,8 +448,10 @@ pointer rg_lstatp()
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_FNAME, TY_CHAR)
-        call salloc (cmd, SZ_LINE, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (region, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (cmd, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information,
         call rg_lrealloc (ls, max_nregions)
@@ -541,6 +552,7 @@ pointer	ls			#I pointer to the linscale structure
 int	rp			#I pointer to current region
 int	max_nregions		#I the  maximum number of regions
 
+size_t	sz_val
 int	stat, nregions, ncols, nlines, x1, y1, x2, y2, xstep, ystep
 pointer	sp, section, line
 int	rg_lstati(), getline(), rg_lgsections()
@@ -549,8 +561,9 @@ pointer	rg_lstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
@@ -649,6 +662,7 @@ pointer	ls			#I pointer to the linscale structure
 int	rp			#I pointer to current region
 int	max_nregions		#I the  maximum number of regions
 
+size_t	sz_val
 int	ncols, nlines, nregions, x1, x2, y1, y2
 pointer	sp, line
 real	x, y, xc, yc
@@ -658,7 +672,8 @@ pointer	rg_lstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
@@ -754,6 +769,7 @@ int	rp			#I pointer to current region
 int	max_nregions		#I the  maximum number of regions
 int	refimage		#I is the photometry for the reference image
 
+size_t	sz_val
 int	nregions, maxnr
 pointer	sp, line
 real	sky, skyerr, mag, magerr
@@ -763,7 +779,8 @@ pointer	rg_lstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Allocate the space to hold the arrays.
 	if (refimage == YES) {
@@ -855,6 +872,7 @@ pointer	ls			#I pointer to the linscale structure
 int	rp			#I pointer to the current region
 int	max_nregions		#I maximum number of regions
 
+size_t	sz_val
 int	ncols, nlines, nregions
 int	x1, x2, y1, y2, xstep, ystep
 pointer	sp, section, region
@@ -864,8 +882,9 @@ pointer	rg_lstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 	call rg_lstats (ls, REGIONS, Memc[region], SZ_LINE)
 
 	# Allocate the arrays to hold the regions information.

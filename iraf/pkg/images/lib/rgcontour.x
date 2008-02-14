@@ -25,6 +25,7 @@ char	btitle[ARB]		#I the plot trailer title
 real	data[ncols,ARB]		#I input data
 int	ncols, nlines		#I dimensions of data
 
+size_t	sz_val
 bool	perimeter
 pointer	tcojmp[LEN_JUMPBUF]
 int	status, wkid
@@ -54,8 +55,10 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (label, SZ_LINE, TY_CHAR)
-	call salloc (temp, ncols * nlines, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (label, sz_val, TY_CHAR)
+	sz_val = ncols * nlines
+	call salloc (temp, sz_val, TY_REAL)
 
 	# First of all, intialize conrec's block data before altering any
 	# parameters in common.
@@ -220,6 +223,7 @@ procedure rg_perimeter (gp)
 
 pointer	gp			#I graphics descriptor
 
+size_t	sz_val
 real	xs, xe, ys, ye
 int	i, first_col, last_col, first_tick, last_tick, bias
 int	nchar, dummy, first_row, last_row, cnt_step, cnt_label
@@ -235,11 +239,13 @@ errchk	ggwind, gseti, gctran, gline, gtext, itoc
 
 begin
 	call smark (sp)
-	call salloc (label, SZ_LABEL, TY_CHAR)
-	call salloc (fmt1, SZ_FMT, TY_CHAR)
-	call salloc (fmt2, SZ_FMT, TY_CHAR)
-	call salloc (fmt3, SZ_FMT, TY_CHAR)
-	call salloc (fmt4, SZ_FMT, TY_CHAR)
+	sz_val = SZ_LABEL
+	call salloc (label, sz_val, TY_CHAR)
+	sz_val = SZ_FMT
+	call salloc (fmt1, sz_val, TY_CHAR)
+	call salloc (fmt2, sz_val, TY_CHAR)
+	call salloc (fmt3, sz_val, TY_CHAR)
+	call salloc (fmt4, sz_val, TY_CHAR)
 
 	# First, get window coordinates and turn off clipping
 	call ggwind (gp, xs, xe, ys, ye)

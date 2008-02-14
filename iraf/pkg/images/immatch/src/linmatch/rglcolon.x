@@ -24,6 +24,7 @@ int	newimage		#I/O new input image
 int	newfit			#I/O new fit
 int	newavg			#I/O new averages
 
+size_t	sz_val
 int	ncmd, nref, nim, ival, fd
 pointer	sp, cmd, str
 real	rval
@@ -36,8 +37,9 @@ errchk	immap(), open(), fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)

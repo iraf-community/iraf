@@ -7,13 +7,15 @@ procedure clputd (param, dval)
 char	param[ARB]
 double	dval
 
+size_t	sz_val
 pointer	sp, value, pname
 pointer	clc_find()
 
 begin
 	call smark (sp)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (pname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (pname, sz_val, TY_CHAR)
 
 	# Update the parameter in the CL.
 	call sprintf (Memc[value], SZ_FNAME, "%g")

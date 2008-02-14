@@ -13,6 +13,7 @@ int	key			# keystroke value of cursor event
 char	strval[ARB]		# string value, if any
 int	maxch
 
+size_t	sz_val
 char	ch
 int	nitems, op
 pointer	sp, buf, ip
@@ -22,7 +23,8 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Flush any buffered text output.
 	call flush (STDERR)

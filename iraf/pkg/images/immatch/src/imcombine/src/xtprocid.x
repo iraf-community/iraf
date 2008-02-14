@@ -4,13 +4,16 @@ procedure xt_procid (im)
 
 pointer	im			#I Image header
 
+size_t	sz_val
 int	i, j, ver, patmake(), gpatmatch(), strlen(), ctoi()
 pointer	sp, pat, str
 
 begin
 	call smark (sp)
-	call salloc (pat, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (pat, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get current ID.
 	iferr (call imgstr (im, "PROCID", Memc[str], SZ_LINE)) {

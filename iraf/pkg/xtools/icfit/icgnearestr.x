@@ -18,6 +18,7 @@ real	x[npts], y[npts]			# Data points
 int	npts					# Number of points
 real	wx, wy					# Cursor position
 
+size_t	sz_val
 int	pt
 pointer	sp, xout, yout
 
@@ -25,8 +26,9 @@ int	icg_nr(), gt_geti()
 
 begin
 	call smark (sp)
-	call salloc (xout, npts, TY_REAL)
-	call salloc (yout, npts, TY_REAL)
+	sz_val = npts
+	call salloc (xout, sz_val, TY_REAL)
+	call salloc (yout, sz_val, TY_REAL)
 	call icg_axesr (ic, gt, cv, 1, x, y, Memr[xout], npts)
 	call icg_axesr (ic, gt, cv, 2, x, y, Memr[yout], npts)
 	if (gt_geti (gt, GTTRANSPOSE) == NO)

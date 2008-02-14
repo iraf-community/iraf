@@ -15,6 +15,7 @@ bool	center			# center the object before computing profile
 int	cboxsize		# the centering box width
 bool	list			# list output instead of plot output
 
+size_t	sz_val
 int	rboxsize, npts
 pointer	sp, imname, im, radius, azimuth, intensity
 real	xcntr, ycntr
@@ -27,7 +28,8 @@ real	clgetr()
 begin
 	# Allocate stack space.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	# Get the radial profiling parameters. The width of the extraction
 	# box mut be odd.
@@ -105,6 +107,7 @@ real	xstart, ystart		# starting coordinates
 int	boxsize			# width of the centering box
 real	xcntr, ycntr		# centered coordinates
 
+size_t	sz_val
 int	half_box, x1, x2, y1, y2
 int	ncols, nrows, nx, ny, try
 pointer	bufptr, sp, x_vect, y_vect
@@ -134,8 +137,10 @@ begin
 	    bufptr = imgs2r (im, x1, x2, y1, y2)
 
 	    call smark (sp)
-	    call salloc (x_vect, nx, TY_REAL)
-	    call salloc (y_vect, ny, TY_REAL)
+	    sz_val = nx
+	    call salloc (x_vect, sz_val, TY_REAL)
+	    sz_val = ny
+	    call salloc (y_vect, sz_val, TY_REAL)
 
 	    # Compute the marginals.
 	    call aclrr (Memr[x_vect], nx)
@@ -411,6 +416,7 @@ real	x[npts]		# X data
 real	y[npts]		# Y data
 int	npts		# Number of points
 
+size_t	sz_val
 int	i, marks[10], linepattern, patterns[4], clgeti(), btoi(), strdic()
 pointer	sp, marker, title, xlabel, ylabel
 real	x1, x2, y1, y2, wx1, wx2, wy1, wy2, vx1, vx2, vy1,vy2, temp, 
@@ -423,7 +429,8 @@ data	marks/GM_POINT, GM_BOX, GM_PLUS, GM_CROSS, GM_CIRCLE, GM_HEBAR,
 
 begin
 	call smark (sp)
-	call salloc (marker, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (marker, sz_val, TY_CHAR)
 
 	# If a new graph setup all the axes and labeling options and then
 	# make the graph.
@@ -497,9 +504,11 @@ begin
 		    btoi (clgetb ("ticklabels")))
 
 	        # Fetch labels and plot title string. 
-		call salloc (title, RP_SZTITLE, TY_CHAR)
-		call salloc (xlabel, SZ_LINE, TY_CHAR)
-		call salloc (ylabel, SZ_LINE, TY_CHAR)
+		sz_val = RP_SZTITLE
+		call salloc (title, sz_val, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (xlabel, sz_val, TY_CHAR)
+		call salloc (ylabel, sz_val, TY_CHAR)
 
 		# Build system info string
 		call sysid (Memc[title], SZ_LINE)

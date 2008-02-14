@@ -18,6 +18,7 @@ procedure t_imshift()
 pointer	imtlist1		# Input image list
 pointer	imtlist2		# Output image list
 
+size_t	sz_val
 pointer	image1			# Input image
 pointer	image2			# Output image
 pointer imtemp			# Temporary file
@@ -38,14 +39,17 @@ errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
 
 begin
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_LINE, TY_CHAR)
-	call salloc (image2, SZ_LINE, TY_CHAR)
-	call salloc (imtemp, SZ_LINE, TY_CHAR)
-	call salloc (sfile, SZ_FNAME, TY_CHAR)
-	call salloc (interpstr, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sfile, sz_val, TY_CHAR)
+	call salloc (interpstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -73,8 +77,9 @@ begin
 	# Determine the source of the shifts.
 	if (Memc[sfile] != EOS) {
 	    sf = open (Memc[sfile], READ_ONLY, TEXT_FILE)
-	    call salloc (xs, imtlen (list1), TY_DOUBLE)
-	    call salloc (ys, imtlen (list1), TY_DOUBLE)
+	    sz_val = imtlen (list1)
+	    call salloc (xs, sz_val, TY_DOUBLE)
+	    call salloc (ys, sz_val, TY_DOUBLE)
 	    nshifts = ish_rshifts (sf, Memd[xs], Memd[ys], imtlen (list1))
 	    if (nshifts != imtlen (list1))
 		call error (2,
@@ -298,6 +303,7 @@ char	interpstr[ARB]	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
 
+size_t	sz_val
 int	lout1, lout2, nyout, nxymargin, interp_type, nsinc, nincr
 int	cin1, cin2, nxin, lin1, lin2, nyin, i
 int	ncols, nlines, nbpix, fstline, lstline
@@ -331,8 +337,10 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (x, 2 * ncols, TY_REAL)
-	call salloc (y, 2 * nlines, TY_REAL)
+	sz_val = 2 * ncols
+	call salloc (x, sz_val, TY_REAL)
+	sz_val = 2 * nlines
+	call salloc (y, sz_val, TY_REAL)
 	sinbuf = NULL
 
 	# Define the x and y shifts for the interpolation.

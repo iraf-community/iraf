@@ -15,6 +15,7 @@ int procedure imaccess (image, acmode)
 char	image[ARB]		# image name
 int	acmode			# access mode
 
+size_t	sz_val
 int	exists, cl_index, cl_size, mode, status
 pointer	sp, cluster, ksection, section, root, extn, im
 int	iki_access()
@@ -23,11 +24,15 @@ pointer	immap()
 
 begin
 	call smark (sp)
-	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
-	call salloc (ksection, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (root, SZ_PATHNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (cluster, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ksection, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (extn, sz_val, TY_CHAR)
 
 	call iki_init()
 

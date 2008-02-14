@@ -16,6 +16,7 @@ int	stream			# graphics stream
 real	v[ARB]			# polyline, NDC units
 int	npts			# number of points (coord pairs) in polyline
 
+size_t	sz_val
 pointer	tr, sp, p, pl, op, last_op
 int	nwords, fd, save1, save2, i
 int	stropen()
@@ -24,7 +25,8 @@ errchk	gtr_init, gtr_writep, gki_redir
 
 begin
 	call smark (sp)
-	call salloc (p, npts * 2, TY_SHORT)
+	sz_val = npts * 2
+	call salloc (p, sz_val, TY_SHORT)
 
 	tr = gtr_init (stream)
 

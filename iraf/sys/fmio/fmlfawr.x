@@ -14,6 +14,7 @@ char	buf[ARB]		#O input data buffer
 int	nbytes			#I nbytes to write
 long	offset			#I lfile offset
 
+size_t	sz_val
 int	status, nb
 pointer	sp, pk_buf
 
@@ -22,7 +23,8 @@ begin
 	    call fm_lfbinwrite (lf, buf, nbytes, offset)
 	else {
 	    call smark (sp)
-	    call salloc (pk_buf, nbytes / SZB_CHAR, TY_CHAR)
+	    sz_val = nbytes / SZB_CHAR
+	    call salloc (pk_buf, sz_val, TY_CHAR)
 
 	    # Wait for i/o to complete before freeing buffer!
 	    nb = (nbytes + SZB_CHAR-1) / SZB_CHAR

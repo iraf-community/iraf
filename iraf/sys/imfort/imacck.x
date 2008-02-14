@@ -7,6 +7,7 @@ include	"imfort.h"
 
 procedure imacck (im, key, ier)
 
+size_t	sz_val
 pointer	im			# image descriptor
 %	character*(*) key
 int	ier
@@ -16,7 +17,8 @@ int	imaccf()
 
 begin
 	call smark (sp)
-	call salloc (kp, SZ_KEYWORD, TY_CHAR)
+	sz_val = SZ_KEYWORD
+	call salloc (kp, sz_val, TY_CHAR)
 
 	call f77upk (key, Memc[kp], SZ_KEYWORD)
 	if (imaccf (im, Memc[kp]) == YES)

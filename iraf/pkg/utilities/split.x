@@ -15,14 +15,16 @@ pointer	sp, input, output, fname, buf
 int	maxfiles, nchars, nlines, nbytes
 int	file_type, nrecords, fileno, in, out, n
 
+size_t	sz_val
 bool	clgetb()
 int	open(), read(), getline(), access(), clgeti()
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Get the input file name and the root name for the output files.
 	call clgstr ("input", Memc[input], SZ_FNAME)
@@ -37,11 +39,13 @@ begin
 	# Determine the segment size and allocate the data buffer.
 	if (file_type == TEXT_FILE) {
 	    nlines = clgeti ("nlines")
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	} else {
 	    nbytes = clgeti ("nbytes")
 	    nchars = (nbytes + SZB_CHAR-1) / SZB_CHAR
-	    call salloc (buf, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call salloc (buf, sz_val, TY_CHAR)
 	}
 
 	maxfiles = clgeti ("maxfiles")

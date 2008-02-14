@@ -12,6 +12,7 @@ char	hdrfile[ARB]		# header file name (gives hdr directory)
 char	path[maxch]		# receives pathname
 int	maxch
 
+size_t	sz_val
 int	ip, nchars
 pointer	sp, fname, op
 int	strncmp(), fnldir()
@@ -24,7 +25,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Get host pathname of pixel file directory.
 	nchars = fnldir (hdrfile, Memc[fname], SZ_PATHNAME)

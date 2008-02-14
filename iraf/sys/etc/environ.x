@@ -243,6 +243,7 @@ int procedure envfree (old_top, userfcn)
 int	old_top			# top of envbuf stack
 pointer	userfcn			# epa of function called for uncovered redefs
 
+size_t	sz_val
 int	nredefs, head, i, j, t
 pointer	sp, start, namep, el1, el2, ep1, ep2
 include	"environ.com"
@@ -252,7 +253,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	call salloc (namep, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (namep, sz_val, TY_CHAR)
 
 	nredefs = 0
 

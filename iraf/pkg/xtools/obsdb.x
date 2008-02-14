@@ -103,6 +103,7 @@ char	observatory[ARB]		# Observatory name
 int	verbose				# Verbose?
 pointer	obs				# Observatory symbol table pointer
 
+size_t	sz_val
 int	fd, envfind(), envgets(), open(), fscan(), nscan(), nowhite()
 pointer	sp, fname, obsname, key, str, temp, sym
 pointer	stopen(), stenter()
@@ -114,11 +115,13 @@ define	getobs_	99
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (obsname, SZ_FNAME, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (obsname, sz_val, TY_CHAR)
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Open observatory database.
 	if (envfind ("obsdb", Memc[fname], SZ_FNAME) <= 0) {
@@ -276,6 +279,7 @@ pointer	obs		# Observatory pointer
 char	param[ARB]	# Parameter
 pointer	sym		# Symbol table pointer
 
+size_t	sz_val
 bool	streq()
 pointer	sp, str, stfind(), stenter()
 double	clgetd()
@@ -291,7 +295,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call sprintf (Memc[str], SZ_LINE, "observatory.%s")
 	    call pargstr (param)
 
@@ -331,13 +336,15 @@ char	task[ARB]		# Task name, image name, or other string
 char	params[ARB]		# Parameters to log
 int	fd			# File descriptor
 
+size_t	sz_val
 int	ip, ctowrd()
 pointer	sym, obspars()
 pointer	sp, param
 
 begin
 	call smark (sp)
-	call salloc (param, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
 
 	# Log task string and observatory name
 	sym = obspars (obs, "name")
@@ -469,13 +476,15 @@ int	verbose			#I Verbose?
 bool	newobs			#O New observatory?
 bool	obshead			#O Observatory found in header?	
 
+size_t	sz_val
 bool	strne()
 pointer	sp, observat, sym, obsvopen(), obspars()
 errchk	obsvopen
 
 begin
 	call smark (sp)
-	call salloc (observat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (observat, sz_val, TY_CHAR)
 
 	if (verbose == YES) {
 	    call imstats (im, IM_IMAGENAME, Memc[observat], SZ_FNAME)

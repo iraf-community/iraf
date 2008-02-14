@@ -23,6 +23,7 @@ int	newdata			#I/O new input data
 int	newcross		#I/O new cross-correlation function flag
 int	newcenter		#I/O new cross-correlation peak flag
 
+size_t	sz_val
 bool	streq()
 int	ncmd, creg, nreg, ival, stat
 pointer	sp, cmd, str
@@ -35,8 +36,9 @@ errchk	immap(), dtmap(), open(), fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)

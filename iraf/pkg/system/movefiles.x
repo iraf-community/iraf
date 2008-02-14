@@ -11,17 +11,21 @@ procedure t_movefiles()
 bool	verbose
 int	root_len
 pointer	sp, fname, newdir, pathname, newname, junkstr, list
+size_t	sz_val
 bool	clgetb()
 int	clgfil(), fnldir(), isdirectory()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (newdir, SZ_FNAME, TY_CHAR)
-	call salloc (pathname, SZ_PATHNAME, TY_CHAR)
-	call salloc (newname, SZ_PATHNAME, TY_CHAR)
-	call salloc (junkstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (newdir, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (pathname, sz_val, TY_CHAR)
+	call salloc (newname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (junkstr, sz_val, TY_CHAR)
 
 	list = clpopni ("files")
 	call clgstr ("newdir", Memc[newdir], SZ_FNAME)

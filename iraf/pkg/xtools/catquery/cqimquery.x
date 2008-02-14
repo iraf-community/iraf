@@ -191,6 +191,7 @@ pointer procedure cq_firinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
+size_t	sz_val
 pointer	cc, res
 pointer	sp, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -212,12 +213,16 @@ begin
 
 	# Format the query.
 	call smark (sp)
-	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
-	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
-	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
-	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
-	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
-	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
+	sz_val = CQ_SZ_QPVALUE
+	call salloc (value, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPNAME
+	call salloc (wpname, sz_val, TY_CHAR)
+	call salloc (wkname, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPVALUE
+	call salloc (wkdvalue, sz_val, TY_CHAR)
+	call salloc (wkvalue, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPUNITS
+	call salloc (wkunits, sz_val, TY_CHAR)
 
 	# Save the survey informaton and query in the results structure.
 	call strcpy (CQ_CATDB(cq), CQ_IMCATDB(res), SZ_FNAME)
@@ -511,6 +516,7 @@ pointer procedure cq_irinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
+size_t	sz_val
 pointer	cc, res
 pointer	sp, query, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, fsize, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -532,8 +538,10 @@ begin
 
 	# Format the query.
 	call smark (sp)
-	call salloc (query, SZ_LINE, TY_CHAR)
-	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (query, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPVALUE
+	call salloc (value, sz_val, TY_CHAR)
 	call sprintf (Memc[query], SZ_LINE, CQ_QUERY(cc))
 	do i = 1, CQ_NQPARS(cc) {
 	    if (cq_wrdstr (i, Memc[value], CQ_SZ_QPVALUE,
@@ -572,11 +580,14 @@ begin
 	        CQ_ITYPESTR)
 	}
 
-	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
-	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
-	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
-	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
-	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
+	sz_val = CQ_SZ_QPNAME
+	call salloc (wpname, sz_val, TY_CHAR)
+	call salloc (wkname, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPVALUE
+	call salloc (wkdvalue, sz_val, TY_CHAR)
+	call salloc (wkvalue, sz_val, TY_CHAR)
+	sz_val = CQ_SZ_QPUNITS
+	call salloc (wkunits, sz_val, TY_CHAR)
 
 	# Get the input image data type.
 	iferr {

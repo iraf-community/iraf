@@ -15,6 +15,7 @@ int	ctype			#I card type
 char	fmt1[ARB], fmt2[ARB]	#I keyword name formats
 int	max_index		#I use fmt2 if index > max_index
 
+size_t	sz_val
 bool	update
 int	index, nchars
 pointer	sp, bigstr, im, cp
@@ -26,7 +27,8 @@ errchk	read, imaddf, impstr
 
 begin
 	call smark (sp)
-	call salloc (bigstr, SZ_BIGSTR, TY_CHAR)
+	sz_val = SZ_BIGSTR
+	call salloc (bigstr, sz_val, TY_CHAR)
 
 	index = 0
 	im = IW_IM(iw)

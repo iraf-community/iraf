@@ -26,6 +26,7 @@ procedure oif_opix (im, status)
 pointer	im				# image descriptor
 int	status				# return status
 
+size_t	sz_val
 long	pixoff
 pointer	sp, pixhdr, pixfile
 int	pfd, blklen
@@ -41,8 +42,10 @@ begin
 
 
 	call smark (sp)
-	call salloc (pixhdr, LEN_IMDES + LEN_PIXHDR, TY_STRUCT)
-	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_IMDES + LEN_PIXHDR
+	call salloc (pixhdr, sz_val, TY_STRUCT)
+	sz_val = SZ_PATHNAME
+	call salloc (pixfile, sz_val, TY_CHAR)
 
 	switch (IM_ACMODE(im)) {
 	case READ_ONLY, READ_WRITE, WRITE_ONLY, APPEND:

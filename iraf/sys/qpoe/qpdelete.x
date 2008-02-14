@@ -7,11 +7,13 @@ include	"qpoe.h"
 procedure qp_delete (poefile)
 
 char	poefile[ARB]		#I poefile name
+size_t	sz_val
 pointer	sp, fname
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call qp_mkfname (poefile, QPOE_EXTN, Memc[fname], SZ_PATHNAME)
 	call delete (Memc[fname])

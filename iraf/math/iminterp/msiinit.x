@@ -13,6 +13,7 @@ procedure msiinit (msi, interp_type)
 pointer	msi		# pointer to the interpolant descriptor structure
 int	interp_type	# interpolant type
 
+size_t	sz_val
 int	nconv
 errchk	malloc
 
@@ -20,7 +21,8 @@ begin
 	if (interp_type < 1 || interp_type > II_NTYPES2D) {
 	    call error (0, "MSIINIT: Illegal interpolant.")
 	} else {
-	    call calloc (msi, LEN_MSISTRUCT, TY_STRUCT)
+	    sz_val = LEN_MSISTRUCT
+	    call calloc (msi, sz_val, TY_STRUCT)
 	    MSI_TYPE(msi) = interp_type
 	    switch (interp_type) {
 	    case II_BILSINC:
@@ -34,8 +36,8 @@ begin
 		MSI_XSHIFT(msi) = INDEFR
 		MSI_YSHIFT(msi) = INDEFR
 		nconv = 2 * MSI_NSINC(msi) + 1
-		call calloc (MSI_LTABLE(msi), nconv * MSI_NXINCR(msi) * nconv *
-		    MSI_NYINCR(msi), TY_REAL)
+		sz_val = nconv * MSI_NXINCR(msi) * nconv * MSI_NYINCR(msi)
+		call calloc (MSI_LTABLE(msi), sz_val, TY_REAL)
 		call ii_bisinctable (LTABLE(MSI_LTABLE(msi)), nconv,
 		    MSI_NXINCR(msi), MSI_NYINCR(msi), MSI_XSHIFT(msi),
 		    MSI_YSHIFT(msi))

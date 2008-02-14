@@ -15,6 +15,7 @@ procedure ip_mkheader (im, fname)
 pointer	im			# IMIO pointer
 char	fname[ARB]		# Image or data file name
 
+size_t	sz_val
 int	i, j
 pointer	ua, fd
 pointer	sp, str
@@ -35,7 +36,8 @@ begin
 	    fd = open (fname, READ_ONLY, TEXT_FILE)
 
 	    call smark (sp)
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (str, sz_val, TY_CHAR)
 
 	    Memc[ua] = EOS
 	    while (getline (fd, Memc[str]) != EOF) {

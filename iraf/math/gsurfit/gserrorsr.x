@@ -21,6 +21,7 @@ real	zfit[ARB]	# fitted data points
 real	chisqr		# reduced chi-squared of fit
 real	errors[ARB]	# errors in coefficients
 
+size_t	sz_val
 int	i, nfree
 real	variance, chisq, hold
 pointer	sp, covptr
@@ -28,7 +29,8 @@ pointer	sp, covptr
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, GS_NCOEFF(sf), TY_REAL)
+	sz_val = GS_NCOEFF(sf)
+	call salloc (covptr, sz_val, TY_REAL)
 
 	# estimate the variance and chi-squared of the fit
 	variance = 0.

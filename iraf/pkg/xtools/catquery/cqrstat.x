@@ -110,6 +110,7 @@ int     param                   #I the list parameter to be retrieved
 char    str[ARB]                #O the output string parameter
 int     maxch                   #I the maximum size of the string parameter
 
+size_t	sz_val
 pointer	sp, tstr
 int     i, fd
 int     stropen(), cq_wrdstr()
@@ -119,7 +120,8 @@ begin
 
         case CQRQPNAMES:
 	    call smark (sp)
-	    call salloc (tstr, CQ_SZ_QPNAME, TY_CHAR)
+	    sz_val = CQ_SZ_QPNAME
+	    call salloc (tstr, sz_val, TY_CHAR)
             fd = stropen (str, maxch, NEW_FILE)
 	    str[1] = EOS
             do i = 1, CQ_RNQPARS(res) {
@@ -135,7 +137,8 @@ begin
 
         case CQRQPVALUES:
 	    call smark (sp)
-	    call salloc (tstr, CQ_SZ_QPVALUE, TY_CHAR)
+	    sz_val = CQ_SZ_QPVALUE
+	    call salloc (tstr, sz_val, TY_CHAR)
             fd = stropen (str, maxch, NEW_FILE)
 	    str[1] = EOS
             do i = 1, CQ_RNQPARS(res) {
@@ -151,7 +154,8 @@ begin
 
         case CQRQPUNITS:
 	    call smark (sp)
-	    call salloc (tstr, CQ_SZ_QPUNITS, TY_CHAR)
+	    sz_val = CQ_SZ_QPUNITS
+	    call salloc (tstr, sz_val, TY_CHAR)
             fd = stropen (str, maxch, NEW_FILE)
 	    str[1] = EOS
             do i = 1, CQ_RNQPARS(res) {

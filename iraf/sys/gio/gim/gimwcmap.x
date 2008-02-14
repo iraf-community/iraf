@@ -13,6 +13,7 @@ int	first			#I first colormap entry to be written
 int	nelem			#I number of elements to write
 int	r[ARB],g[ARB],b[ARB]	#I RGB color values (0-255)
 
+size_t	sz_val
 int	i
 pointer	sp, cm, op
 short	gim[GIM_WRITECMAP_LEN]
@@ -22,7 +23,8 @@ begin
 	call gpl_flush()
 
 	call smark (sp)
-	call salloc (cm, nelem * 3, TY_SHORT)
+	sz_val = nelem * 3
+	call salloc (cm, sz_val, TY_SHORT)
 
 	gim[GIM_WRITECMAP_MP] = colormap
 	gim[GIM_WRITECMAP_FC] = first

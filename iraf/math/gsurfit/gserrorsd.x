@@ -21,6 +21,7 @@ double	zfit[ARB]	# fitted data points
 double	chisqr		# reduced chi-squared of fit
 double	errors[ARB]	# errors in coefficients
 
+size_t	sz_val
 int	i, nfree
 double	variance, chisq, hold
 pointer	sp, covptr
@@ -28,7 +29,8 @@ pointer	sp, covptr
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, GS_NCOEFF(sf), TY_DOUBLE)
+	sz_val = GS_NCOEFF(sf)
+	call salloc (covptr, sz_val, TY_DOUBLE)
 
 	# estimate the variance and chi-squared of the fit
 	variance = 0.

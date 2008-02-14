@@ -12,6 +12,7 @@ short	pv[ARB]			#U polygon to be clipped
 int	npts			#U number of points in polygon
 int	x1,x2,y1,y2		#I clipping box
 
+size_t	sz_val
 pointer	sp, p1, p2, pt
 int	x1out, x2out, y1out, y2out, i
 int	gtr_cliptoplane()
@@ -47,7 +48,8 @@ begin
 	# is crossed.
 
 	call smark (sp)
-	call salloc (p1, npts * 4, TY_REAL)
+	sz_val = npts * 4
+	call salloc (p1, sz_val, TY_REAL)
 	p2 = p1 + npts * 2
 
 	call achtsr (pv, Memr[p1], npts * 2)

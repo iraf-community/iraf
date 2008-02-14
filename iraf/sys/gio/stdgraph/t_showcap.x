@@ -18,6 +18,7 @@ char	g_mem[SZ_MEMORY]
 char	argstr[MAXARGSTR]
 int	arg1, arg2, arg3, op, len_prog, status, nchars
 pointer	tty, sp, prog, ip, cmd
+size_t	sz_val
 pointer	ttygdes(), ttycaps()
 int	stg_encode(), ctoi(), getline(), strncmp()
 int	ttygets(), ctowrd(), strlen()
@@ -26,8 +27,10 @@ define	getargs_ 91
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (prog, SZ_PROGRAM, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_PROGRAM
+	call salloc (prog, sz_val, TY_CHAR)
 
 	# Print instructions.
 	call printf ("cmd :  `set' device\n")

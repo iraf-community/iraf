@@ -12,6 +12,7 @@ int	list		#I list of reference points files
 pointer	xc		#I pointer to the cross-correlation structure
 char	reffile[ARB]	#O the output reference points file name
 
+size_t	sz_val
 int	tdf
 pointer	sp, line, pxref, pyref
 real	x1, y1, x2, y2, x3, y3
@@ -21,7 +22,8 @@ pointer	rg_xstatp()
 begin
 	# Get some working memory.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Get the points to the reference point lists.
 	pxref = rg_xstatp (xc, XREF)
@@ -95,6 +97,7 @@ pointer	imr		#I pointer to the reference image
 pointer	im		#I pointer to the input image
 pointer	id		#I pointer to the display device
 
+size_t	sz_val
 int	nref, nstar, wcs, key
 pointer	sp, cmd, x, y, pxref, pyref, ptrans
 real	wx, wy
@@ -104,9 +107,11 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (x, MAX_NREF, TY_REAL)
-	call salloc (y, MAX_NREF, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = MAX_NREF
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
 	call aclrr (Memr[x], MAX_NREF)
 	call aclrr (Memr[y], MAX_NREF)
 
@@ -215,6 +220,7 @@ procedure rg_xtransform (tfd, xc)
 int	tfd		#I the reference points file descriptor
 pointer	xc		#I the cross-correlation file descriptor
 
+size_t	sz_val
 int	nref
 pointer	sp, line, x, y, pxref, pyref, ptrans
 int	getline(), rg_xstati(), nscan()
@@ -223,9 +229,11 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (x, MAX_NREF, TY_REAL)
-	call salloc (y, MAX_NREF, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	sz_val = MAX_NREF
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
 	call aclrr (Memr[x], MAX_NREF)
 	call aclrr (Memr[y], MAX_NREF)
 

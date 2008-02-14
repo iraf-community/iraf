@@ -17,13 +17,15 @@ int	first_col, last_col	# where to place table on a line
 int	maxch			# maximum chars to print from a string
 int	ncol			# desired number of columns (0 to autoscale)
 
+size_t	sz_val
 pointer	sp, obuf, op
 int	row, i, j, p, nspaces, maxlen, colwidth, numcol, numrow, str
 int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (obuf, last_col + 1, TY_CHAR)
+	sz_val = last_col + 1
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	maxlen = 0
 	do i = 1, nstr

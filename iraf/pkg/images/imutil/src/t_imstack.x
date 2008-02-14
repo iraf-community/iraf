@@ -15,6 +15,7 @@ int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
 
+size_t	sz_val
 bool	envgetb()
 int	imtgetim(), imtlen()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
@@ -24,8 +25,9 @@ pointer	imtopenp(), immap(), mw_open(), mw_openim()
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
 
 	# Get the input images and the output image.
 	list = imtopenp ("images")
@@ -159,6 +161,7 @@ procedure isk_new_image (im)
 
 pointer	im				# image descriptor
 
+size_t	sz_val
 pointer	sp, lbuf
 int	i, type_codes[NTYPES]
 bool	strne()
@@ -170,7 +173,8 @@ data	type_codes /TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	call clgstr ("title", Memc[lbuf], SZ_LINE)
 	if (strne (Memc[lbuf], "default") && strne (Memc[lbuf], "*"))
@@ -195,6 +199,7 @@ pointer	mwin			# input wcs descriptor
 pointer	mwout			# output wcs descriptor
 int	ndim			# the dimension of the output image
 
+size_t	sz_val
 int	i, j, nin, nout, szatstr, axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, wcs, attribute, matin, matout, rin, rout, win, wout, atstr
 int	mw_stati(), itoc(), strlen()
@@ -208,14 +213,22 @@ begin
 
 	# Allocate space for the matrices and vectors.
 	call smark (sp)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
-	call salloc (matin, nin * nin, TY_DOUBLE)
-	call salloc (matout, nout * nout, TY_DOUBLE)
-	call salloc (rin, nin, TY_DOUBLE)
-	call salloc (rout, nout, TY_DOUBLE)
-	call salloc (win, nin, TY_DOUBLE)
-	call salloc (wout, nout, TY_DOUBLE)
-	call salloc (attribute, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (wcs, sz_val, TY_CHAR)
+	sz_val = nin * nin
+	call salloc (matin, sz_val, TY_DOUBLE)
+	sz_val = nout * nout
+	call salloc (matout, sz_val, TY_DOUBLE)
+	sz_val = nin
+	call salloc (rin, sz_val, TY_DOUBLE)
+	sz_val = nout
+	call salloc (rout, sz_val, TY_DOUBLE)
+	sz_val = nin
+	call salloc (win, sz_val, TY_DOUBLE)
+	sz_val = nout
+	call salloc (wout, sz_val, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (attribute, sz_val, TY_CHAR)
 	call malloc (atstr, szatstr, TY_CHAR)
 
 	# Set the system name.

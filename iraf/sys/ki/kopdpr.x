@@ -12,6 +12,7 @@ char	bkgfile[ARB]		# packed osfn of bkg file
 char	bkgmsg[ARB]		# control string for kernel
 int	jobcode			# receives job code of process
 
+size_t	sz_val
 pointer	sp, osfn, alias
 int	server, off, delim
 int	ki_connect(), ki_sendrcv(), ki_getchan(), strlen(), ki_gnode()
@@ -19,8 +20,10 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn,  SZ_PATHNAME, TY_CHAR)
-	call salloc (alias, SZ_ALIAS,    TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
+	sz_val = SZ_ALIAS
+	call salloc (alias, sz_val,    TY_CHAR)
 
 	server = ki_connect (process)
 

@@ -35,6 +35,7 @@ real	ptolerance		#I the input triangles matching tolerance
 real	ratio			#I the maximum ratio of triangle sides
 int	nreject			#I maximum number of rejection iterations
 
+size_t	sz_val
 int	i, nmerge, nkeep, nmatch, ncheck
 pointer	sp, rindex, lindex
 int	rg_tmerge(), rg_treject(), rg_tvote(), rg_triangle
@@ -72,8 +73,9 @@ begin
 
 	    # Find the indices of the matched points.
 	    call smark (sp)
-	    call salloc (rindex, nmatch, TY_INT)
-	    call salloc (lindex, nmatch, TY_INT)
+	    sz_val = nmatch
+	    call salloc (rindex, sz_val, TY_INT)
+	    call salloc (lindex, sz_val, TY_INT)
 	    do i = 1, nmatch {
 		Memi[rindex+i-1] = reftri[i,RG_MATCH]
 		Memi[lindex+i-1] = intri[i,RG_MATCH]
@@ -383,6 +385,7 @@ int	nmltri			#I maximum number of reference triangles
 int	nmatch			#I initial number of matches
 int	maxiter			#I maximum number of rejection iterations
 
+size_t	sz_val
 double	dif, mode, sum, sumsq
 int	i, nrej, nplus, nminus, ntrue, nfalse, npts, ncount, niter, rindex
 int	lindex
@@ -392,7 +395,8 @@ double	rg_moded()
 
 begin
 	call smark (sp)
-	call salloc (adif, nmatch, TY_DOUBLE)
+	sz_val = nmatch
+	call salloc (adif, sz_val, TY_DOUBLE)
 
 	# Accumulate the number of same sense and number of opposite sense
 	# matches as well as the log perimeter statistics.
@@ -564,6 +568,7 @@ int	nmltri				#I maximum number of list triangles
 int	nliststars			#I number of list stars
 int	nmatch				#I number of match triangles
 
+size_t	sz_val
 int	i, j, rp, lp, vp, pixval, tminvote, tmaxvote, minvote, maxvote, hmaxvote
 int	ninter, axes[2], laxes[2], pvp
 pointer	sp, vote, vindex, pl, lmatch, rmatch
@@ -614,10 +619,12 @@ begin
 
 	# Allocate temporary working space.
 	call smark (sp)
-	call salloc (vote, axes[1], TY_INT)
-	call salloc (vindex, axes[1], TY_INT)
-	call salloc (lmatch, axes[1], TY_INT)
-	call salloc (rmatch, axes[2], TY_INT)
+	sz_val = axes[1]
+	call salloc (vote, sz_val, TY_INT)
+	call salloc (vindex, sz_val, TY_INT)
+	call salloc (lmatch, sz_val, TY_INT)
+	sz_val = axes[2]
+	call salloc (rmatch, sz_val, TY_INT)
 	call amovki (NO, Memi[lmatch], axes[1])
 	call amovki (NO, Memi[rmatch], axes[2])
 
@@ -707,6 +714,7 @@ int	nmatch			#I number of matches
 real	coeff[ARB]		#O the new computed coefficients
 int	ncoeff			#I the number of coefficients
 
+size_t	sz_val
 int	i, rindex, lindex, stat
 pointer	sp, xr, yr, xin, yin
 int	rg_lincoeff()
@@ -716,10 +724,11 @@ begin
 	    return (ERR)
 
 	call smark (sp)
-	call salloc (xr, nmatch, TY_REAL)
-	call salloc (yr, nmatch, TY_REAL)
-	call salloc (xin, nmatch, TY_REAL)
-	call salloc (yin, nmatch, TY_REAL)
+	sz_val = nmatch
+	call salloc (xr, sz_val, TY_REAL)
+	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (yin, sz_val, TY_REAL)
 
 	# Load the points to be fit.
 	do i = 1, nmatch {
@@ -762,12 +771,14 @@ int	nmatch			#I number of matches
 char	xformat[ARB]		#I the output x column format
 char	yformat[ARB]		#I the output y column format
 
+size_t	sz_val
 int	i, lindex, rindex
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the format string.
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")
@@ -828,12 +839,14 @@ char	latformat[ARB]		#I the output latitude column format
 char	xformat[ARB]		#I the output x column format
 char	yformat[ARB]		#I the output y column format
 
+size_t	sz_val
 int	i, lindex, rindex
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the format string.
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")

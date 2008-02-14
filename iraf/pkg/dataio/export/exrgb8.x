@@ -52,6 +52,7 @@ procedure ex_mkcmap (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	oim				# Output image
 real	z1[3], dz[3]			# Display ranges
 
@@ -94,10 +95,12 @@ begin
 	# Allocate color map.
 	ncolors = NCOLORS
 	call smark (sp)
-	call salloc (cmap, 3 * ncolors, TY_SHORT)
+	sz_val = 3 * ncolors
+	call salloc (cmap, sz_val, TY_SHORT)
 
 	# Allocate and initialize color boxes.
-	call salloc (box_list, ncolors * CBOX_LEN, TY_STRUCT) 
+	sz_val = ncolors * CBOX_LEN
+	call salloc (box_list, sz_val, TY_STRUCT) 
 
 	freeboxes = box_list
 	usedboxes = NULL
@@ -128,7 +131,8 @@ begin
 	    call printf ("Computing colormap....\n")
 	    call flush (STDOUT)
 	}
-	call salloc (histogram, B_LEN*B_LEN*B_LEN, TY_INT)
+	sz_val = B_LEN*B_LEN*B_LEN
+	call salloc (histogram, sz_val, TY_INT)
 	call aclri (Memi[histogram], B_LEN*B_LEN*B_LEN)
 	call cm_get_histogram(ex, z1, dz, ptr, Memi[histogram])
 	EX_OUTFLAGS(ex) = or (EX_OUTFLAGS(ex), OF_CMAP)
@@ -157,7 +161,8 @@ begin
 	# First create cell list as described in Heckbert[2] and then
 	# create mapping from truncated pixel space to color table entries
 
-	call salloc (ColorCells, C_LEN*C_LEN*C_LEN, TY_POINTER)
+	sz_val = C_LEN*C_LEN*C_LEN
+	call salloc (ColorCells, sz_val, TY_POINTER)
 	call aclri (Memi[ColorCells], C_LEN*C_LEN*C_LEN)
 	call cm_map_colortable (Memi[histogram], Mems[cmap], ncolors,
 	    Memi[ColorCells])
@@ -291,6 +296,7 @@ real	dz[3]				#I Intensity mapping ranges
 pointer	box				#O Initial box
 int	histogram[B_LEN,B_LEN,B_LEN]	#O Histogram
 
+size_t	sz_val
 int	i, j, nc, nl, r, g, b, rmin, gmin, bmin, rmax, gmax, bmax
 pointer	sp, data, ptr
 
@@ -299,7 +305,8 @@ begin
 	nl = EX_OROWS(ex)
 
 	call smark (sp)
-	call salloc (data, 3 * nc, TY_INT)
+	sz_val = 3 * nc
+	call salloc (data, sz_val, TY_INT)
 
 	rmin = A_LEN; rmax = -1 
 	gmin = A_LEN; gmax = -1 
@@ -374,6 +381,7 @@ pointer	usedboxes				#U Used boxes
 pointer	freeboxes				#U Free boxes
 int	histogram[B_LEN, B_LEN, B_LEN]		#I Histogram
 
+size_t	sz_val
 int	first, last, i, j, rdel, gdel, bdel, sum1, sum2
 pointer	sp, hist, new
 int	ir, ig, ib
@@ -382,7 +390,8 @@ int	which
 
 begin
 	call smark (sp)
-	call salloc (hist, B_LEN, TY_INT)
+	sz_val = B_LEN
+	call salloc (hist, sz_val, TY_INT)
 
 	# see which axis is the largest, do a histogram along that
 	# axis.  Split at median point.  Contract both new boxes to
@@ -823,6 +832,7 @@ short	cmap[3,ncolor]			#I Color map
 int	ncolor				#I Number of colors
 pointer	oim				#O Output IMIO pointer
 
+size_t	sz_val
 pointer	thisptr, nextptr, optr, impl2s()
 pointer	sp, thisline, nextline, tmpptr
 int     ir, ig, ib, r1, g1, b1, rcell, bcell, gcell
@@ -839,8 +849,9 @@ begin
 	nl = EX_OROWS(ex)
 
 	call smark (sp)
-	call salloc (thisline, nc * 3, TY_INT)
-	call salloc (nextline, nc * 3, TY_INT)
+	sz_val = nc * 3
+	call salloc (thisline, sz_val, TY_INT)
+	call salloc (nextline, sz_val, TY_INT)
 
 	# get first line of picture
 	call cm_getline (ex, z1, dz, 1, nextline)

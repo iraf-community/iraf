@@ -21,6 +21,7 @@ int	nimages			# Number of input images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
 real	sigma, r, s, t
@@ -41,7 +42,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
@@ -239,6 +241,7 @@ int	nimages			# Number of input images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
 real	sigma, r, s, t
@@ -259,7 +262,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
@@ -457,6 +461,7 @@ int	nimages			# Number of input images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
 real	sigma, r, s, t
@@ -477,7 +482,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
@@ -675,6 +681,7 @@ int	nimages			# Number of input images
 int	npts			# Number of output points per line
 double	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
 real	sigma, r, s, t
@@ -695,7 +702,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)

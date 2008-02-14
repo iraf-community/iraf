@@ -201,6 +201,7 @@ real	krej			# k-sigma pixel rejection factor
 int	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
+size_t	sz_val
 int	i, ngoodpix, last_ngoodpix, minpix, niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
@@ -222,9 +223,10 @@ begin
 	# Allocate a buffer for data minus fitted curve, another for the
 	# normalized X values, and another to flag rejected pixels.
 
-	call salloc (flat, npix, TY_REAL)
-	call salloc (normx, npix, TY_REAL)
-	call salloc (badpix, npix, TY_SHORT)
+	sz_val = npix
+	call salloc (flat, sz_val, TY_REAL)
+	call salloc (normx, sz_val, TY_REAL)
+	call salloc (badpix, sz_val, TY_SHORT)
 	call aclrs (Mems[badpix], npix)
 
 	# Compute normalized X vector.  The data X values [1:npix] are

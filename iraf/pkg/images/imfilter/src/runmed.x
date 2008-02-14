@@ -37,6 +37,7 @@ real	blank			#I Blank values
 char	storetype[ARB]		#I Storage type
 bool	verbose			#I Verbose?
 
+size_t	sz_val
 int	i, j, nims, nc, nl, iindex, oindex, eindex, stat, halfwin, ot, stype
 int	fd, len[IM_MAXDIM]
 short	nused
@@ -54,7 +55,8 @@ pointer	immap(), rm_open()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Check input data for errors.
 	nims = imtlen (input)
@@ -105,19 +107,23 @@ begin
 	    fd = NULL
 
 	# Allocate memory.
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (omname, SZ_FNAME, TY_CHAR)
-	call salloc (iline, IM_MAXDIM, TY_LONG)
-	call salloc (imline, IM_MAXDIM, TY_LONG)
-	call salloc (oline, IM_MAXDIM, TY_LONG)
-	call salloc (omline, IM_MAXDIM, TY_LONG)
-	call salloc (hdrs, window, TY_POINTER)
-	call salloc (scales, window, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (omname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (iline, sz_val, TY_LONG)
+	call salloc (imline, sz_val, TY_LONG)
+	call salloc (oline, sz_val, TY_LONG)
+	call salloc (omline, sz_val, TY_LONG)
+	sz_val = window
+	call salloc (hdrs, sz_val, TY_POINTER)
+	call salloc (scales, sz_val, TY_REAL)
 	if (streq (scale, "mode"))
-	    call salloc (sample, NSAMPLE, TY_STRUCT)
+	    sz_val = NSAMPLE
+	    call salloc (sample, sz_val, TY_STRUCT)
 
 	# Initialize
 	halfwin = window / 2
@@ -166,7 +172,8 @@ begin
 	        if (!aveqi (IM_LEN(im,1), len, IM_MAXDIM))
 		    call error (21, "Mask size not the same")
 	    } else if (imdata1 == NULL) {
-	        call salloc (imdata1, IM_LEN(in,1), TY_SHORT)
+	        sz_val = IM_LEN(in,1)
+	        call salloc (imdata1, sz_val, TY_SHORT)
 		call aclrs (Mems[imdata1], IM_LEN(in,1))
 	    }
 
@@ -178,7 +185,8 @@ begin
 		    nl = nl * len[i]
 
 		# Memory is allocated in blocks of number of columns.
-		call salloc (rms, nl, TY_POINTER)
+		sz_val = nl
+		call salloc (rms, sz_val, TY_POINTER)
 		do j = 1, nl {
 		    rm = rm_open (window, nc, stype)
 		    Memi[rms+j-1] = rm
@@ -297,7 +305,8 @@ begin
 	    } else
 	        om = NULL
 	    if (omdata1 == NULL)
-	        call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
+	        sz_val = IM_LEN(in,1)
+	        call salloc (omdata1, sz_val, TY_SHORT)
 
 	    if (outscale)
 	        oscl = 1
@@ -432,7 +441,8 @@ begin
 		} else
 		    om = NULL
 		if (omdata1 == NULL)
-		    call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
+		    sz_val = IM_LEN(in,1)
+		    call salloc (omdata1, sz_val, TY_SHORT)
 
 		if (outscale)
 		    oscl = 1

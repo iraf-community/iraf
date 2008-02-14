@@ -14,6 +14,7 @@ pointer procedure ttyopen (termcap_file, device, ttyload)
 
 char	termcap_file[ARB]	# termcap file to be scanned
 char	device[ARB]		# name of device to be scanned for
+size_t	sz_val
 extern	ttyload()		# fetches pre-compiled entries from a cache
 int	ttyload()
 
@@ -23,7 +24,8 @@ errchk	ttyload, calloc, realloc
 
 begin
 	call smark (sp)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	# Truncate the device name if device fields are appended.
 	call strcpy (device, Memc[devname], SZ_FNAME)
@@ -74,6 +76,7 @@ pointer	tty			# tty descriptor structure
 char	termcap_file[ARB]	# termcap format file to be scanned
 char	devname[ARB]		# termcap entry to be scanned for
 
+size_t	sz_val
 int	fd, ntc
 pointer	sp, device, ip, op, caplist
 int	open(), strlen(), strncmp()
@@ -82,7 +85,8 @@ errchk	open, syserrs
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
 
 	fd = open (termcap_file, READ_ONLY, TEXT_FILE)
 	call strcpy (devname, Memc[device], SZ_FNAME)
@@ -142,6 +146,7 @@ int	fd
 char	device[ARB]
 pointer	tty
 
+size_t	sz_val
 char	ch, lastch
 pointer	sp, ip, op, otop, lbuf, alias, caplist
 bool	device_found, streq()
@@ -153,8 +158,10 @@ define	errtn_ 91
 
 begin
 	call smark (sp)
-	call salloc (lbuf,  SZ_LINE,  TY_CHAR)
-	call salloc (alias, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (alias, sz_val, TY_CHAR)
 
 	# Locate entry.  First line of each termcap entry contains a list
 	# of aliases for the device.  Only first lines and comment lines

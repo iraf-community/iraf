@@ -31,6 +31,7 @@ pointer	x, y, w, gt, fcn, fname, flist, dev, str, sp, ic, fd
 bool	listdata, verbose, power, redir
 int	ofmt, interactive, datatype
 int	axis, nvalues, nmax, weighting
+size_t	sz_val
 pointer	gt_init(), imtopen()
 bool	clgetb()
 int	clgeti(), cf_operand(), cf_rimage(), cf_rlist()
@@ -40,11 +41,14 @@ int	fstati()
 begin
 	# Allocate space for string buffers
 	call smark (sp)
-	call salloc (fcn,   SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (flist, SZ_LINE,  TY_CHAR)
-	call salloc (dev,   SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fcn, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (flist, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (dev, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# First get cl parameters.  Check to see if input has been redirected.
 	redir = false
@@ -212,6 +216,7 @@ pointer	w			# Pointer to weight values (returned)
 int	weighting		# Type of weighting
 int	datatype		# Datatype of x and Y values
 
+size_t	sz_val
 int	buflen, n, fd, ncols, lineno
 pointer	sp, lbuf, ip
 
@@ -223,7 +228,8 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 

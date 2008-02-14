@@ -21,6 +21,7 @@ int procedure rdukey (keystr, maxch)
 char	keystr[ARB]	 	# receives keystroke command string
 int	maxch			# max chars out
 
+size_t	sz_val
 int	junk, ch
 int	delay, key
 pointer	sp, buf, ip, op, tty
@@ -35,7 +36,8 @@ errchk	ttyodes, syserrs
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call flush (STDERR)
 	call flush (STDOUT)

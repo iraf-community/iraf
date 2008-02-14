@@ -45,6 +45,7 @@ char	fname[ARB]
 int	out, nlines
 bool	print_file_name
 
+size_t	sz_val
 pointer	sp, offsets, line
 int	in, linenum, index, noffsets, nlines_in_file
 int	open(), getline()
@@ -58,8 +59,10 @@ begin
 	    noffsets = abs (nlines) + 1
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (offsets, noffsets, TY_LONG)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	sz_val = noffsets
+	call salloc (offsets, sz_val, TY_LONG)
 
 	# Open the file.
 	in = open (fname, READ_ONLY, TEXT_FILE)

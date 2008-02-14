@@ -21,6 +21,7 @@ pointer	sf		# pointer to the surface descriptor structure
 int	lines[ARB]	# line numbers included in the fit
 int	ier		# error code
 
+size_t	sz_val
 int	i, j, k, nxcoeff
 pointer	ybzptr
 pointer	ylzptr
@@ -65,8 +66,9 @@ begin
 
 	case SF_SPLINE3, SF_SPLINE1:
 	    call smark (sp)
-	    call salloc (left, SF_NYPTS(sf), TY_INT)
-	    call salloc (tleft, SF_NYPTS(sf), TY_INT)
+	    sz_val = SF_NYPTS(sf)
+	    call salloc (left, sz_val, TY_INT)
+	    call salloc (tleft, sz_val, TY_INT)
 
 	    ylzptr = SF_YLEFT(sf) - 1
 	    do j = 1, SF_NYPTS(sf)

@@ -22,6 +22,7 @@ int	bilinear				# Bilinear kernel
 int	radsym					# Radially symmetric kernel?
 int	delim					# record delimiter for files
 
+size_t	sz_val
 char	str[SZ_LINE], imtemp[SZ_FNAME]
 int	kxdim, kydim, dummy
 pointer	list1, list2
@@ -37,9 +38,10 @@ errchk	cnv_convolve
 begin
 	# Allocate temporary working space.
 	call smark (sp)
-	call salloc (kername, SZ_LINE, TY_CHAR)
-	call salloc (xkername, SZ_LINE, TY_CHAR)
-	call salloc (ykername, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (kername, sz_val, TY_CHAR)
+	call salloc (xkername, sz_val, TY_CHAR)
+	call salloc (ykername, sz_val, TY_CHAR)
 
 	# Get the input and output image parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
@@ -218,6 +220,7 @@ pointer	kernel		# pointer to kernel
 int	nx, ny		# kernel dimensions
 int	delim		# kernel row delimiter
 
+size_t	sz_val
 pointer	sp, line
 int	sz_kernel, kp, lp, minnx, maxnx, nchars
 int	getline(), ctor()
@@ -225,7 +228,8 @@ int	getline(), ctor()
 begin
 	# Allocate space for the line buffer.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Initialize row and column counters and the kernel element counter.
 	kp = 0

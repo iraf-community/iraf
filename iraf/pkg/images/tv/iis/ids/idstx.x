@@ -23,6 +23,7 @@ int	xc, yc			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 real	x, y, dx, dy, tsz
 int	x1, x2, y1, y2, orien
 int	x0, y0, ids_dx, ids_dy, ch, cw
@@ -41,7 +42,8 @@ data	i_x1 /0/, i_y1 /0/, i_x2 /GKI_MAXNDC/, i_y2 / GKI_MAXNDC/
 
 begin
 	call smark (sp)
-	call salloc (seg, n + 2, TY_CHAR)
+	sz_val = n + 2
+	call salloc (seg, sz_val, TY_CHAR)
 
 	# Set pointer to the text attribute structure.
 	tx = IDS_TXAP(i_kt)
