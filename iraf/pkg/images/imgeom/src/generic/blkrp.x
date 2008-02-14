@@ -12,7 +12,6 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
-size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1d(), impl1d()
@@ -48,12 +47,10 @@ begin
 	        IM_LEN(out,i) = IM_LEN(in,i) * blkfac[i]
 
 	    # Allocate memory.
-	    sz_val = nout
-	    call salloc (buf, sz_val, TY_DOUBLE)
-	    sz_val = IM_MAXDIM
-	    call salloc (v1, sz_val, TY_LONG)
-	    call salloc (v2, sz_val, TY_LONG)
-	    call salloc (v3, sz_val, TY_LONG)
+	    call salloc (buf, nout, TY_DOUBLE)
+	    call salloc (v1, IM_MAXDIM, TY_LONG)
+	    call salloc (v2, IM_MAXDIM, TY_LONG)
+	    call salloc (v3, IM_MAXDIM, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
 	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
@@ -114,7 +111,6 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
-size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1l(), impl1l()
@@ -150,12 +146,10 @@ begin
 	        IM_LEN(out,i) = IM_LEN(in,i) * blkfac[i]
 
 	    # Allocate memory.
-	    sz_val = nout
-	    call salloc (buf, sz_val, TY_LONG)
-	    sz_val = IM_MAXDIM
-	    call salloc (v1, sz_val, TY_LONG)
-	    call salloc (v2, sz_val, TY_LONG)
-	    call salloc (v3, sz_val, TY_LONG)
+	    call salloc (buf, nout, TY_LONG)
+	    call salloc (v1, IM_MAXDIM, TY_LONG)
+	    call salloc (v2, IM_MAXDIM, TY_LONG)
+	    call salloc (v3, IM_MAXDIM, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
 	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
@@ -216,7 +210,6 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
-size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1r(), impl1r()
@@ -252,12 +245,10 @@ begin
 	        IM_LEN(out,i) = IM_LEN(in,i) * blkfac[i]
 
 	    # Allocate memory.
-	    sz_val = nout
-	    call salloc (buf, sz_val, TY_REAL)
-	    sz_val = IM_MAXDIM
-	    call salloc (v1, sz_val, TY_LONG)
-	    call salloc (v2, sz_val, TY_LONG)
-	    call salloc (v3, sz_val, TY_LONG)
+	    call salloc (buf, nout, TY_REAL)
+	    call salloc (v1, IM_MAXDIM, TY_LONG)
+	    call salloc (v2, IM_MAXDIM, TY_LONG)
+	    call salloc (v3, IM_MAXDIM, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
 	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
@@ -318,7 +309,6 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
-size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1s(), impl1s()
@@ -354,12 +344,10 @@ begin
 	        IM_LEN(out,i) = IM_LEN(in,i) * blkfac[i]
 
 	    # Allocate memory.
-	    sz_val = nout
-	    call salloc (buf, sz_val, TY_SHORT)
-	    sz_val = IM_MAXDIM
-	    call salloc (v1, sz_val, TY_LONG)
-	    call salloc (v2, sz_val, TY_LONG)
-	    call salloc (v3, sz_val, TY_LONG)
+	    call salloc (buf, nout, TY_SHORT)
+	    call salloc (v1, IM_MAXDIM, TY_LONG)
+	    call salloc (v2, IM_MAXDIM, TY_LONG)
+	    call salloc (v3, IM_MAXDIM, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
 	    call amovkl (long(1), Meml[v1], IM_MAXDIM)

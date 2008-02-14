@@ -20,7 +20,6 @@ int	xres			# number of resolved pixels in X
 int	yres			# number of resolved pixels in Y
 int	hardchar		# use hardware character generator
 
-size_t	sz_val
 bool	first_time
 pointer	sp, devns
 int	len_devname
@@ -38,8 +37,7 @@ data	first_time /true/
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (devns, sz_val, TY_SHORT)
+	call salloc (devns, SZ_FNAME, TY_SHORT)
 
 	if (first_time) {
 	    g_nopen = 0

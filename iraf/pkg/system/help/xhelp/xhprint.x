@@ -48,7 +48,6 @@ procedure xh_lprint (fname, device)
 char	fname[ARB]
 char	device[ARB]
 
-size_t	sz_val
 int	out
 pointer	sp, lp, ddstr
 
@@ -60,8 +59,7 @@ errchk	clgfil, xh_print_file
 
 begin
 	call smark (sp)
-	sz_val = SZ_DDSTR
-	call salloc (ddstr, sz_val, TY_CHAR)
+	call salloc (ddstr,  SZ_DDSTR, TY_CHAR)
 
 	# Get device name.  Default is "printer", which means that the actual
 	# device name is given by the environment variable "printer".
@@ -104,7 +102,6 @@ int	out
 pointer	lp
 char	fname[ARB]
 
-size_t	sz_val
 bool	one_tab_in
 int	lineno, maxlines, status, in
 pointer	sp, ip, lbuf
@@ -113,8 +110,7 @@ errchk	salloc, open, ttystati, getline, ttyputline
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE+1
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE+1, TY_CHAR)
 
 	in = open (fname, READ_ONLY, TEXT_FILE)
 	maxlines = ttystati (lp, TTY_NLINES)

@@ -14,15 +14,13 @@ real	w[nx,ny]		# Weights
 int	nx, ny			# Subraster size
 pointer	gs			# Surface pointer (returned)
  
-size_t	sz_val
 int	i, j, n, npts, xo, yo
 pointer	sp, work
 real	amedr()
  
 begin
 	call smark (sp)
-	sz_val = nx * ny
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (work, nx * ny, TY_REAL)
 
 	gs = NULL
 	npts = nx * ny

@@ -274,7 +274,6 @@ int procedure cl_psio_request (cmd, arg1, arg2)
 char	cmd[ARB]		# e.g. "xmit" or "xfer"
 int	arg1, arg2		# integer arguments
 
-size_t	sz_val
 int	ip, status, clout_chan
 pointer	obuf, sp, op
 long	offset
@@ -283,8 +282,7 @@ define	output {Memc[op]=$1;op=op+1}
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (obuf, sz_val, TY_CHAR)
+	call salloc (obuf, SZ_PATHNAME, TY_CHAR)
 
 	clout_chan = fstati (CLOUT, F_CHANNEL)
 

@@ -14,7 +14,6 @@ int	prev_num	# previous number
 int	req_num		# requested number
 int	num		# list number
 
-size_t	sz_val
 int	stdin, nskip, ncount
 pointer	sp, fname
 int	fscan(), nscan(), strncmp()
@@ -25,8 +24,7 @@ begin
 	    return (EOF)
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	# Find the number of objects to be skipped.
 	call fstats (sl, F_FILENAME, Memc[fname], SZ_FNAME)

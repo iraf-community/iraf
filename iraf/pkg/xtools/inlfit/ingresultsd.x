@@ -15,7 +15,6 @@ int	npts		        # Number of data points
 int	nvars		        # Number of variables
 int	len_name		# Length of a name
 
-size_t	sz_val
 int	i, fd, rejected
 pointer	sp, fit, wts1, rejpts
 int	open(), in_geti()
@@ -36,9 +35,8 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (fit, sz_val, TY_DOUBLE)
-	call salloc (wts1, sz_val, TY_DOUBLE)
+	call salloc (fit, npts, TY_DOUBLE)
+	call salloc (wts1, npts, TY_DOUBLE)
 
 	# Evaluate the fit.
 	call nlvectord (nl, x, Memd[fit], npts, nvars)

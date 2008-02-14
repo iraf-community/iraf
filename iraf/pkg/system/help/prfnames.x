@@ -14,7 +14,6 @@ char	module[ARB]
 int	modnum
 pointer	ctrl
 
-size_t	sz_val
 int	i, nfiles, ftype[NFILES]
 pointer	sp, lbuf, pakname, modname, fname[NFILES]
 int	hd_getname()
@@ -25,15 +24,12 @@ string	fcode "hlpsyssrcpkgmen"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pakname, sz_val, TY_CHAR)
-	call salloc (modname, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (pakname, SZ_FNAME, TY_CHAR)
+	call salloc (modname, SZ_FNAME, TY_CHAR)
 
 	do i = 1, NFILES
-	    sz_val = SZ_PATHNAME
-	    call salloc (fname[i], sz_val, TY_CHAR)
+	    call salloc (fname[i], SZ_PATHNAME, TY_CHAR)
 
 	nfiles = 0
 	do i = 1, NFILES

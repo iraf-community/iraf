@@ -15,7 +15,6 @@ char	vfn[ARB]		# name to be tested
 char	pathname[ARB]		# receives path of directory
 int	maxch			# max chars out
 
-size_t	sz_val
 bool	isdir
 pointer	sp, fname, op
 int	ip, fd, nchars, ch
@@ -24,8 +23,7 @@ int	finfo(), diropen(), gstrcpy(), strlen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# Copy the VFN string, minus any whitespace on either end.
 	op = fname

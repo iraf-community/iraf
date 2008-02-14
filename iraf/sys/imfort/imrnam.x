@@ -9,7 +9,6 @@ include	"oif.h"
 # an image to a different directory.
 
 procedure imrnam (oimage, nimage, ier)
-size_t	sz_val
 
 %	character*(*) oimage
 %	character*(*) nimage
@@ -28,17 +27,15 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (old_hfn, sz_val, TY_CHAR)
-	call salloc (new_hfn, sz_val, TY_CHAR)
-	call salloc (old_pfn, sz_val, TY_CHAR)
-	call salloc (new_pfn, sz_val, TY_CHAR)
-	call salloc (n_osfn, sz_val, TY_CHAR)
-	call salloc (o_osfn, sz_val, TY_CHAR)
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+	call salloc (old_hfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (n_osfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (o_osfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	ier = OK
 

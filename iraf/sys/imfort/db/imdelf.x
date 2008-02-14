@@ -12,7 +12,6 @@ procedure imdelf (im, key)
 pointer	im			# image descriptor
 char	key[ARB]		# name of the new parameter
 
-size_t	sz_val
 int	off
 pointer	rp, sp, keyname
 int	idb_kwlookup(), idb_findrecord(), stridxs()
@@ -20,8 +19,7 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyname, sz_val, TY_CHAR)
+	call salloc (keyname, SZ_FNAME, TY_CHAR)
 
 	# FITS format requires that the keyword name be upper case.
 	call strcpy (key, Memc[keyname], SZ_FNAME)

@@ -17,7 +17,6 @@ int	cl		# coords file descriptor
 int	ltid		# coords file sequence number
 int	dl		# deletions file descriptor
 
-size_t	sz_val
 bool	bval
 real	rval
 pointer	sp, cmd, str, outim, deletions, ext
@@ -32,12 +31,10 @@ errchk	imd_mapframe(), iw_open(), immap(), imunmap(), open()
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (deletions, sz_val, TY_CHAR)
-	call salloc (ext, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (deletions, SZ_FNAME, TY_CHAR)
+	call salloc (ext, SZ_FNAME, TY_CHAR)
 
 	# Get the command.
 	ip = 1

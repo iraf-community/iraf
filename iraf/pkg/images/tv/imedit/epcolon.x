@@ -38,7 +38,6 @@ pointer	ep			# EPIX structure
 char	cmdstr[ARB]		# Colon command
 int	newimage		# New image?
  
-size_t	sz_val
 int	ival, ncmd
 real	rval
 bool	bval
@@ -50,8 +49,7 @@ pointer	immap()
  
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
  
 	# Scan the command string and get the first word.
 	call sscan (cmdstr)

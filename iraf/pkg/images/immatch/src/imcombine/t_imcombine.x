@@ -17,7 +17,6 @@ pointer	scales, zeros, wts, im
 int	n
 pointer	input, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
 
-size_t	sz_val
 bool	clgetb()
 real	clgetr()
 int	clgwrd(), clgeti(), imtgetim(), imtlen()
@@ -28,21 +27,20 @@ include	"src/icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (headers, sz_val, TY_CHAR)
-	call salloc (bmask, sz_val, TY_CHAR)
-	call salloc (rmask, sz_val, TY_CHAR)
-	call salloc (nrmask, sz_val, TY_CHAR)
-	call salloc (emask, sz_val, TY_CHAR)
-	call salloc (sigma, sz_val, TY_CHAR)
-	call salloc (expkeyword, sz_val, TY_CHAR)
-	call salloc (statsec, sz_val, TY_CHAR)
-	call salloc (gain, sz_val, TY_CHAR)
-	call salloc (rdnoise, sz_val, TY_CHAR)
-	call salloc (snoise, sz_val, TY_CHAR)
-	call salloc (logfile, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (headers, SZ_FNAME, TY_CHAR)
+	call salloc (bmask, SZ_FNAME, TY_CHAR)
+	call salloc (rmask, SZ_FNAME, TY_CHAR)
+	call salloc (nrmask, SZ_FNAME, TY_CHAR)
+	call salloc (emask, SZ_FNAME, TY_CHAR)
+	call salloc (sigma, SZ_FNAME, TY_CHAR)
+	call salloc (expkeyword, SZ_FNAME, TY_CHAR)
+	call salloc (statsec, SZ_FNAME, TY_CHAR)
+	call salloc (gain, SZ_FNAME, TY_CHAR)
+	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
+	call salloc (snoise, SZ_FNAME, TY_CHAR)
+	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.  Some additional parameters are obtained later.
 	ilist = imtopenp ("input")

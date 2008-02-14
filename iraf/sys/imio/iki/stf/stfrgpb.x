@@ -21,7 +21,6 @@ int	group			# group to be accessed
 int	acmode			# image access mode
 real	datamin, datamax	# min,max pixel values from GPB
 
-size_t	sz_val
 real	rval
 double	dval
 short	sval
@@ -41,8 +40,7 @@ define	minmax_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -72,8 +70,7 @@ begin
 
 	# Allocate a buffer for the GPB.
 	sz_gpb = STF_PSIZE(stf) / NBITS_BYTE / SZB_CHAR
-	sz_val = sz_gpb
-	call salloc (gpb, sz_val, TY_CHAR)
+	call salloc (gpb, sz_gpb, TY_CHAR)
 
 	# Read the GPB into a buffer.  The GPB is located at the very end of
 	# the data storage area for the group.  If we are opening a new,

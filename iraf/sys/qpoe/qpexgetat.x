@@ -20,7 +20,6 @@ char	attribute[ARB]		#I attribute name
 char	outstr[maxch]		#O receives the filter string
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, atname, et
 int	nchars, op, otop
 int	gstrcpy(), qp_expandtext()
@@ -28,8 +27,7 @@ bool	strne()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (atname, sz_val, TY_CHAR)
+	call salloc (atname, SZ_FNAME, TY_CHAR)
 
 	# Translate attribute name, in case it is aliased.
 	nchars = qp_expandtext (EX_QP(ex), attribute, Memc[atname], SZ_FNAME)

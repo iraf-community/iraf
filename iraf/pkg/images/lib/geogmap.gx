@@ -32,7 +32,6 @@ char	xerrmsg[ARB]	#O the output x fit error message
 char	yerrmsg[ARB]	#O the output x fit error message 
 int	maxch		#I the size of the error messages
 
-size_t	sz_val
 char	errstr[SZ_LINE]
 int	newgraph, delete, wcs, key, errcode
 pointer	sp, w, gfit, xresid, yresid, cmd
@@ -49,14 +48,11 @@ errchk	geo_fmagnify$t(), geo_flinear$t()
 begin
 	# Initialize gfit structure and working space.
 	call smark (sp)
-	sz_val = LEN_GEOGRAPH
-	call salloc (gfit, sz_val, TY_STRUCT)
-	sz_val = npts
-	call salloc (xresid, sz_val, TY_PIXEL)
-	call salloc (yresid, sz_val, TY_PIXEL)
-	call salloc (w, sz_val, TY_PIXEL)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (gfit, LEN_GEOGRAPH, TY_STRUCT)
+	call salloc (xresid, npts, TY_PIXEL)
+	call salloc (yresid, npts, TY_PIXEL)
+	call salloc (w, npts, TY_PIXEL)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Do initial fit.
 	iferr {
@@ -364,7 +360,6 @@ PIXEL   yscale          #O output y scale
 PIXEL   xrot            #O rotation of point on x axis
 PIXEL   yrot            #O rotation of point on y axis
 
-size_t	sz_val
 int     nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer sp, xcoeff, ycoeff
 PIXEL   xxrange, xyrange, xxmaxmin, xymaxmin
@@ -384,15 +379,11 @@ begin
         # Allocate working space.
         call smark (sp)
 $if (datatype == r)
-        sz_val = gsgeti (sx, GSNCOEFF)
-        call salloc (xcoeff, sz_val, TY_PIXEL)
-        sz_val = gsgeti (sy, GSNCOEFF)
-        call salloc (ycoeff, sz_val, TY_PIXEL)
+        call salloc (xcoeff, gsgeti (sx, GSNCOEFF), TY_PIXEL)
+        call salloc (ycoeff, gsgeti (sy, GSNCOEFF), TY_PIXEL)
 $else
-        sz_val = dgsgeti (sx, GSNCOEFF)
-        call salloc (xcoeff, sz_val, TY_PIXEL)
-        sz_val = dgsgeti (sy, GSNCOEFF)
-        call salloc (ycoeff, sz_val, TY_PIXEL)
+        call salloc (xcoeff, dgsgeti (sx, GSNCOEFF), TY_PIXEL)
+        call salloc (ycoeff, dgsgeti (sy, GSNCOEFF), TY_PIXEL)
 $endif
 
         # Get coefficients and numbers of coefficients.

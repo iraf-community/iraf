@@ -18,7 +18,6 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 int	mode			# access mode
 
-size_t	sz_val
 long	filesize
 bool	need_open, same_dev
 pointer	sp, buf, devinfo
@@ -36,10 +35,8 @@ include	"../lib/ids.com"
 
 begin
 	call smark (sp)
-	sz_val = max (SZ_FNAME, n)
-	call salloc (buf, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (devinfo, sz_val, TY_CHAR)
+	call salloc (buf, max (SZ_FNAME, n), TY_CHAR)
+	call salloc (devinfo, SZ_LINE, TY_CHAR)
 
 	# If a device was named when the kernel was opened then output will
 	# always be to that device (i_device) regardless of the device named

@@ -15,7 +15,6 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I name of the new parameter
 char	datatype[ARB]		#I string permits generalization to domains
 
-size_t	sz_val
 pointer	rp, sp, keyname, ua, ip
 int	fd, max_lenuserarea, curlen, buflen, nchars
 int	idb_kwlookup(), idb_findrecord()
@@ -24,8 +23,7 @@ errchk	syserrs, stropen, fprintf, pargstr, pargi
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyname, sz_val, TY_CHAR)
+	call salloc (keyname, SZ_FNAME, TY_CHAR)
 
 	# FITS format requires that the keyword name be upper case, not to
 	# exceed 8 characters in length.  [Nov97 - This is not entirely 

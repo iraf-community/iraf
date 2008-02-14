@@ -13,17 +13,14 @@ procedure t_imgets()
 
 pointer	sp, im
 pointer	image, param, value
-size_t	sz_val
 pointer	immap()
 int	ip, op, stridxs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (param, sz_val, TY_CHAR)
-	call salloc (value, sz_val,  TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (param, SZ_LINE, TY_CHAR)
+	call salloc (value, SZ_LINE,  TY_CHAR)
 
 	call clgstr ("image", Memc[image], SZ_FNAME)
 	call clgstr ("param", Memc[param], SZ_LINE)

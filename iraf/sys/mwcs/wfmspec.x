@@ -97,7 +97,6 @@ procedure wf_msp_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I type of transformation
 
-size_t	sz_val
 pointer	ct, mw
 int	sz_atval, naps, ip, i
 pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff
@@ -118,8 +117,7 @@ begin
 	call smark (sp)
 	sz_atval = DEF_SZATVAL
 	call malloc (atval, sz_atval, TY_CHAR)
-	sz_val = SZ_ATNAME
-	call salloc (atkey, sz_val, TY_CHAR)
+	call salloc (atkey, SZ_ATNAME, TY_CHAR)
 
 	for (naps=0;  ;  naps=naps+1) {
 	    call sprintf (Memc[atkey], SZ_ATNAME, "spec%d")

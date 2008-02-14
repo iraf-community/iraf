@@ -14,19 +14,16 @@ pointer	im			# image descriptor
 char	key[ARB]		# record key
 pointer	rp			# char record pointer (output)
 
-size_t	sz_val
 pointer	sp, pat, patbuf, ukey, lkey, ip, ua
 int	recno, nchars, lch, uch, ch, junk, i
 int	patmake(), patmatch(), gstrcpy()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pat, sz_val, TY_CHAR)
-	call salloc (ukey, sz_val, TY_CHAR)
-	call salloc (lkey, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (pat, SZ_FNAME, TY_CHAR)
+	call salloc (ukey, SZ_FNAME, TY_CHAR)
+	call salloc (lkey, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Search for the FIRST occurrence of a record with the given key.
 	# If the key is abbreviated and multiple keys are matched, the first

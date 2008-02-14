@@ -13,15 +13,13 @@ char	label[ARB]		#I line label
 int	firstcol		#I first column for output
 int	maxcol			#I width of formatted output
 
-size_t	sz_val
 pointer	sp, buf
 int	col, rn, r_len, x, n, pv
 int	strlen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	# Output the line label and advance to the first column.  If the label
 	# extends beyond the first column, start a new line.

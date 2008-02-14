@@ -19,7 +19,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, imptrs, mskptrs, str
 pointer	hmask, imids, tmpim, tmpmsk, im, pmim, outim, hmim
@@ -31,19 +30,16 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	sz_val = RS_NCOMBINE(rs) + 1
-	call salloc (imptrs, sz_val, TY_POINTER)
-	call salloc (mskptrs, sz_val, TY_POINTER)
-	call salloc (imids, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (imptrs, RS_NCOMBINE(rs) + 1, TY_POINTER)
+	call salloc (mskptrs, RS_NCOMBINE(rs) + 1, TY_POINTER)
+	call salloc (imids, RS_NCOMBINE(rs) + 1, TY_INT)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -323,7 +319,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, hmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
@@ -335,14 +330,13 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -606,7 +600,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	fscale
 pointer	sp, image,  imask, outimage, hmask, tmpimage, tmpmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
@@ -618,14 +611,13 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), imstati(), rs_pmout()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -875,7 +867,6 @@ pointer	tmpmsk			#I the output mask counts image
 int	start			#I the starting image in the list
 int	finish			#I the ending image in the list
 #real	normsum			#U the normalization accumulator 
-size_t	sz_val
 char	skyscale[ARB]		#I the scaling factor keyword 
 
 pointer	sp, image, imask, imptrs, mkptrs, mpptrs, imnorm
@@ -890,22 +881,18 @@ errchk	imgetr()
 begin
 	nin = finish - start + 1
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR) 
-	call salloc (imask, sz_val, TY_CHAR) 
-	sz_val = nin
-	call salloc (imptrs, sz_val, TY_POINTER) 
-	call salloc (imnorm, sz_val, TY_REAL) 
-	call salloc (mkptrs, sz_val, TY_POINTER) 
-	call salloc (mpptrs, sz_val, TY_POINTER) 
-	sz_val = IM_MAXDIM
-	call salloc (vout, sz_val, TY_LONG) 
-	call salloc (mvout, sz_val, TY_LONG) 
-	call salloc (vs, sz_val, TY_LONG) 
-	call salloc (ve, sz_val, TY_LONG) 
-	call salloc (vin, sz_val, TY_LONG) 
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR) 
+	call salloc (image, SZ_FNAME, TY_CHAR) 
+	call salloc (imask, SZ_FNAME, TY_CHAR) 
+	call salloc (imptrs, nin, TY_POINTER) 
+	call salloc (imnorm, nin, TY_REAL) 
+	call salloc (mkptrs, nin, TY_POINTER) 
+	call salloc (mpptrs, nin, TY_POINTER) 
+	call salloc (vout, IM_MAXDIM, TY_LONG) 
+	call salloc (mvout, IM_MAXDIM, TY_LONG) 
+	call salloc (vs, IM_MAXDIM, TY_LONG) 
+	call salloc (ve, IM_MAXDIM, TY_LONG) 
+	call salloc (vin, IM_MAXDIM, TY_LONG) 
+	call salloc (str, SZ_FNAME, TY_CHAR) 
 
 	# Open the initial input images and masks.
 	j = 1
@@ -996,7 +983,6 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new normalization factor
 
-size_t	sz_val
 real	norm1, pout, rmin, rmax
 pointer	sp, vin, vmin, vout, vtmp, vmtmp
 pointer	obuf, ibuf, imbuf, tbuf, tmbuf
@@ -1007,12 +993,11 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vmin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vmin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
 
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	call amovkl (long(1), Meml[vin], IM_MAXDIM)
@@ -1077,7 +1062,6 @@ real	fscale			#I the new normalization factor
 char	skyscale[ARB]		#I the sky scaling keyword
 char	skysub[ARB]		#I the sky subtraction keyword
 
-size_t	sz_val
 real	norm1, pout
 pointer	sp, vin, vmin, vout, vtmp, vmtmp, vs, str
 pointer	obuf, ibuf, imbuf, tbuf, tmbuf, hbuf
@@ -1088,14 +1072,12 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vmin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vmin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	call amovkl (long(1), Meml[vin], IM_MAXDIM)
@@ -1137,11 +1119,9 @@ begin
 	        call asubr (Memr[ibuf], Memr[obuf], Memr[obuf], npix)
 	    }
 	} else {
-	    sz_val = IM_MAXDIM
-	    call salloc (vs, sz_val, TY_LONG)
+	    call salloc (vs, IM_MAXDIM, TY_LONG)
 	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	    sz_val = npix
-	    call salloc (hbuf, sz_val, TY_SHORT)
+	    call salloc (hbuf, npix, TY_SHORT)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
 	       imgnlr (im, ibuf, Meml[vin]) != EOF &&
 	       imgnli (pmim, imbuf, Meml[vmin]) != EOF &&
@@ -1195,7 +1175,6 @@ int	finish			#I the current ending image
 int	ostart			#I the previous starting image
 int	ofinish			#I the previous ending image
 #real	normsum			#I the norm factor accumulator
-size_t	sz_val
 char	skyscale[ARB]		#I the sky scaling keyword
 
 pointer	sp, image, vin, vout, v, imsub, imadd, norma, norms
@@ -1215,30 +1194,26 @@ begin
 	nadd = finish - ofinish
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (mvin, sz_val, TY_LONG)
-	call salloc (mvout, sz_val, TY_LONG)
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
-	call salloc (v, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (mvin, IM_MAXDIM, TY_LONG)
+	call salloc (mvout, IM_MAXDIM, TY_LONG)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
-	sz_val = nsub
-	call salloc (imsub, sz_val, TY_POINTER)
-	call salloc (mksub, sz_val, TY_POINTER)
-	call salloc (mpsub, sz_val, TY_POINTER)
-	call salloc (norms, sz_val, TY_REAL)
-	sz_val = nadd
-	call salloc (imadd, sz_val, TY_POINTER)
-	call salloc (mkadd, sz_val, TY_POINTER)
-	call salloc (mpadd, sz_val, TY_POINTER)
-	call salloc (norma, sz_val, TY_REAL)
+	call salloc (imsub, nsub, TY_POINTER)
+	call salloc (mksub, nsub, TY_POINTER)
+	call salloc (mpsub, nsub, TY_POINTER)
+	call salloc (norms, nsub, TY_REAL)
+	call salloc (imadd, nadd, TY_POINTER)
+	call salloc (mkadd, nadd, TY_POINTER)
+	call salloc (mpadd, nadd, TY_POINTER)
+	call salloc (norma, nadd, TY_REAL)
 
 	# Open the images to be subtracted. In most cases there will be
 	# one such image.
@@ -1420,7 +1395,6 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new scale factor
 
-size_t	sz_val
 real	rmin, rmax
 pointer	sp, vin, vout, vtmp, vmtmp
 pointer	obuf, ibuf, tbuf, tmbuf
@@ -1429,11 +1403,10 @@ int	impnlr(), imgnlr(), imgnli()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
 
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	call amovkl (long(1), Meml[vin], IM_MAXDIM)
@@ -1486,20 +1459,17 @@ real	blank			#I the undefined pixel value
 real	fscale			#I the normalization factor
 char	skysub[ARB]		#I the sky subtraction keyword
 
-size_t	sz_val
 pointer	sp, vin, vout, vtmp, vmtmp, vs, str, obuf, ibuf, tbuf, tmbuf, hbuf
 int	i, npix, stat
 int	impnlr(), imgnlr(), imgnli(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 	call amovkl (long(1), Meml[vin], IM_MAXDIM)
@@ -1514,10 +1484,8 @@ begin
 	stat = NO
 	npix = IM_LEN(im,1)
 	if (hmim != NULL) {
-	    sz_val = npix
-	    call salloc (hbuf, sz_val, TY_SHORT)
-	    sz_val = IM_MAXDIM
-	    call salloc (vs, sz_val, TY_LONG)
+	    call salloc (hbuf, npix, TY_SHORT)
+	    call salloc (vs, IM_MAXDIM, TY_LONG)
 	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
 	        imgnlr (im, ibuf, Meml[vin]) != EOF &&
@@ -1580,7 +1548,6 @@ bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache the image in memory ?
 size_t	old_size                        #O the original working set size
 
-size_t	sz_val
 pointer sp, image, str
 int     n, i
 size_t	bufsize
@@ -1589,9 +1556,8 @@ int     imtrgetim(), btoi()
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (image, sz_val, TY_CHAR)
-        call salloc (str, sz_val, TY_CHAR)
+        call salloc (image, SZ_FNAME, TY_CHAR)
+        call salloc (str, SZ_FNAME, TY_CHAR)
 
         n = 1
         do i = start, finish {
@@ -1641,7 +1607,6 @@ int     ofinish                         #I the old ending image in the serious
 bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache image buffers ?
 
-size_t	sz_val
 pointer sp, image, str
 int     i, n, nold, nsub, nadd
 size_t	bufsize
@@ -1654,9 +1619,8 @@ begin
             return
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (image, sz_val, TY_CHAR)
-        call salloc (str, sz_val, TY_CHAR)
+        call salloc (image, SZ_FNAME, TY_CHAR)
+        call salloc (str, SZ_FNAME, TY_CHAR)
 
         nold = ofinish - start + 1
 

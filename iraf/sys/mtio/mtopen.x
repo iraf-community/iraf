@@ -50,7 +50,6 @@ char	mtname[ARB]		#I device to be opened
 int	acmode			#I access mode
 int	bufsize			#I fio buffer size (record size) or 0
 
-size_t	sz_val
 bool	first_time
 pointer	sp, devcap, fname, gty
 int	mt, fd, nskip, new_file, new_record
@@ -68,10 +67,8 @@ include	"mtio.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_DEVCAP
-	call salloc (devcap, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
 	# Runtime initialization of the mtio file descriptor common.
 	# Make each file descriptor available for use.

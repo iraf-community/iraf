@@ -25,7 +25,6 @@ int	lname			# List extension name?
 int	lver			# List extension version?
 pointer	ikparams		# Image kernel parameters
 
-size_t	sz_val
 pointer	sp, image, listout, list
 int	nimages, fd
 int	clgwrd(), btoi(), imtgetim(), imtlen(), stropen()
@@ -35,14 +34,12 @@ errchk	stropen, fprintf, strclose
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (index, sz_val, TY_CHAR)
-	call salloc (extname, sz_val, TY_CHAR)
-	call salloc (extver, sz_val, TY_CHAR)
-	call salloc (ikparams, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
+	call salloc (input, SZ_LINE, TY_CHAR)
+	call salloc (index, SZ_LINE, TY_CHAR)
+	call salloc (extname, SZ_LINE, TY_CHAR)
+	call salloc (extver, SZ_LINE, TY_CHAR)
+	call salloc (ikparams, SZ_LINE, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	# Task parameters
 	call clgstr ("input", Memc[input], SZ_LINE)
@@ -62,8 +59,7 @@ begin
 	# Format the output and set the number of images.
 	switch (output) {
 	case LIST:
-	    sz_val = SZ_LISTOUT
-	    call salloc (listout, sz_val, TY_CHAR)
+	    call salloc (listout, SZ_LISTOUT, TY_CHAR)
 	    iferr {
 		fd = stropen (Memc[listout], SZ_LISTOUT, WRITE_ONLY)
 		nimages = 0

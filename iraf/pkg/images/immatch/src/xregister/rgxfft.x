@@ -8,13 +8,11 @@ procedure rg_fftcor (fft, nxfft nyfft)
 real	fft[ARB]	#I/O array to be  fft'd
 int	nxfft, nyfft	#I dimensions of the fft
 
-size_t	sz_val
 pointer	sp, dim
 
 begin
 	call smark (sp)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (dim, 2, TY_INT)
 
 	# Fourier transform the two arrays.
 	Memi[dim] = nxfft

@@ -16,7 +16,6 @@ char	pixfile[maxch]		#O receives pathname to pixfile
 int	maxch			#I max chars out
 int	ier			#O exit status code
 
-size_t	sz_val
 int	status, n
 char	suffix[2], hdr[STRLEN_HDR]
 pointer	sp, imdir, osdir, root, extn, subdir, fname, ip, op
@@ -26,14 +25,12 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (imdir, sz_val, TY_CHAR)
-	call salloc (osdir, sz_val, TY_CHAR)
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (subdir, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (imdir,  SZ_PATHNAME, TY_CHAR)
+	call salloc (osdir,  SZ_PATHNAME, TY_CHAR)
+	call salloc (root,   SZ_PATHNAME, TY_CHAR)
+	call salloc (subdir, SZ_PATHNAME, TY_CHAR)
+	call salloc (fname,  SZ_PATHNAME, TY_CHAR)
+	call salloc (extn,   SZ_FNAME, TY_CHAR)
 
 	ier = OK
 

@@ -14,7 +14,6 @@ procedure fm_sync (fm)
 
 pointer	fm			#I FMIO descriptor
 
-size_t	sz_val
 pointer	sp, ip, op, dhbuf, pgbuf, pti, dh, ft, pt
 int	maxpages, nbytes, npti, p1, p2, d1, d2, dp, i
 int	szbpage, chan, buflen, status, npte_perpage
@@ -67,12 +66,10 @@ begin
 	if (FM_DHMODIFIED(fm) != NO) {
 	    # Allocate a buffer to hold the encoded datafile header area.
 	    buflen = (FM_DATASTART(fm) - 1) / (SZ_STRUCT * SZB_CHAR)
-	    sz_val = buflen
-	    call salloc (dhbuf, sz_val, TY_STRUCT)
+	    call salloc (dhbuf, buflen, TY_STRUCT)
 
 	    # Encode and output the datafile header.
-	    sz_val = LEN_DHSTRUCT
-	    call salloc (dh, sz_val, TY_STRUCT)
+	    call salloc (dh, LEN_DHSTRUCT, TY_STRUCT)
 
 	    DH_MAGIC(dh)	 = FMIO_MAGIC
 	    DH_DFVERSION(dh)	 = FM_DFVERSION(fm)
@@ -130,8 +127,7 @@ begin
 	    
 	    # Get an output temporary buffer if we have to swap on output.
 	    if (BYTE_SWAP2 == YES)
-		sz_val = maxpages * szbpage / SZB_SHORT
-		call salloc (pgbuf, sz_val, TY_SHORT)
+		call salloc (pgbuf, maxpages * szbpage / SZB_SHORT, TY_SHORT)
 
 	    # Determine the PT page containing the LUPTE+1.
 	    p1 = FM_PTLUPTE(fm) / npte_perpage + 1

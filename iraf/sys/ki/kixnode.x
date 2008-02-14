@@ -13,7 +13,6 @@ char	r1[ARB]			#I input resource with optional node prefix
 char	r2[ARB]			#U output resource to append node! to
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, rt
 int	ip, nchars, buflen
 int	ki_extnode(), strlen()
@@ -21,8 +20,7 @@ int	ki_extnode(), strlen()
 begin
 	call smark (sp)
 	buflen = strlen(r2) + SZ_FNAME
-	sz_val = buflen
-	call salloc (rt, sz_val, TY_CHAR)
+	call salloc (rt, buflen, TY_CHAR)
 
 	ip = ki_extnode (r2, Memc[rt], buflen, nchars) + 1
 	call strcpy (r2[ip], Memc[rt], buflen)

@@ -22,7 +22,6 @@ pointer	bp			#U buffer pointer (to short), or NULL
 int	buflen			#U buffer length, shorts
 int	flags			#I not used at present
 
-size_t	sz_val
 pointer	sp, index, ex, op
 int	sz_index, n_buflen
 int	pl_p2li()
@@ -31,10 +30,8 @@ errchk	malloc, realloc, pl_compress
 
 begin
 	call smark (sp)
-	sz_val = LEN_PLEXTERN
-	call salloc (ex, sz_val, TY_STRUCT)
-	sz_val = PL_NLP(pl) * 3 + LL_CURHDRLEN
-	call salloc (index, sz_val, TY_SHORT)
+	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
+	call salloc (index, PL_NLP(pl) * 3 + LL_CURHDRLEN, TY_SHORT)
 
 	# Eliminate any wasted space in the mask, and compute the amount
 	# of space needed to store the compressed mask.  Compress the index

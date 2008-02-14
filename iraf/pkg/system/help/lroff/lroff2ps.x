@@ -26,7 +26,6 @@ pointer	psptr					#i PSIO pointer
 char	ls_block[ARB]				#i .ls block to search for
 char	section[ARB]				#i section to print
 
-size_t	sz_val
 pointer sp, ip, ps
 pointer ibuf, line, level
 int	lastline, font, indent, ls_level
@@ -44,12 +43,9 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (ibuf, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (level, sz_val, TY_CHAR)
+	call salloc (ibuf, SZ_IBUF, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (level, SZ_FNAME, TY_CHAR)
 
 	call aclrc (Memc[ibuf], SZ_LINE)
 	call aclrc (Memc[line], SZ_LINE)
@@ -347,7 +343,6 @@ int	font					#u current font
 bool	format					#i formatting flag
 int	maxch					#i max length of string
 
-size_t	sz_val
 pointer	sp, ip, buf, keyword
 int	i, strmatch(), gstrcpy()
 bool	is_ls
@@ -356,9 +351,8 @@ define	copy_	90
 
 begin
 	call smark (sp)
-	sz_val = maxch
-	call salloc (buf, sz_val, TY_CHAR)
-	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (buf, maxch, TY_CHAR)
+	call salloc (keyword, maxch, TY_CHAR)
 	call aclrc (Memc[buf], maxch)
 	call aclrc (Memc[keyword], maxch)
 

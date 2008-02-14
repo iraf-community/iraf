@@ -13,7 +13,6 @@ procedure xh_sort_list (list)
 
 char	list[ARB]					#u list to be sorted
 
-size_t	sz_val
 pointer	sp, index, buf, ip
 int	i, j, count, len
 
@@ -23,10 +22,8 @@ begin
 	len = strlen (list)
 
 	call smark (sp)
-	sz_val = SZ_HELPLIST
-	call salloc (index, sz_val, TY_INT)
-	sz_val = len+2
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (index, SZ_HELPLIST, TY_INT)
+	call salloc (buf, len+2, TY_CHAR)
 
 	# Build up the index array.
 	count = 1

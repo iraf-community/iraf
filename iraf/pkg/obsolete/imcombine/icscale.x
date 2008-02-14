@@ -19,7 +19,6 @@ real	zeros[nimages]		# Zero or sky levels
 real	wts[nimages]		# Weights
 int	nimages			# Number of images
 
-size_t	sz_val
 int	stype, ztype, wtype
 int	i, j, k, l, nout
 real	mode, median, mean, exposure, zmean
@@ -35,21 +34,17 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = nimages
-	call salloc (ncombine, sz_val, TY_INT)
-	call salloc (exptime, sz_val, TY_REAL)
-	call salloc (modes, sz_val, TY_REAL)
-	call salloc (medians, sz_val, TY_REAL)
-	call salloc (means, sz_val, TY_REAL)
-	sz_val = SZ_FNAME
-	call salloc (expname, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (sname, sz_val, TY_CHAR)
-	call salloc (zname, sz_val, TY_CHAR)
-	call salloc (wname, sz_val, TY_CHAR)
+	call salloc (ncombine, nimages, TY_INT)
+	call salloc (exptime, nimages, TY_REAL)
+	call salloc (modes, nimages, TY_REAL)
+	call salloc (medians, nimages, TY_REAL)
+	call salloc (means, nimages, TY_REAL)
+	call salloc (expname, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (sname, SZ_FNAME, TY_CHAR)
+	call salloc (zname, SZ_FNAME, TY_CHAR)
+	call salloc (wname, SZ_FNAME, TY_CHAR)
 
 	# Set the defaults.
 	call amovki (1, Memi[ncombine], nimages)
@@ -302,7 +297,6 @@ real	exptime[nimages]	#I Exposure times
 real	values[nimages]		#O Values
 int	nimages			#I Number of images
 
-size_t	sz_val
 int	type			#O Type of value
 
 int	fd, i, nowhite(), open(), fscan(), nscan(), strdic()
@@ -336,8 +330,7 @@ begin
 	    }
 	    call close (fd)
 	    if (i < nimages) {
-		sz_val = SZ_LINE
-		call salloc (errstr, sz_val, TY_CHAR)
+		call salloc (errstr, SZ_LINE, TY_CHAR)
 		call sprintf (errstr, SZ_FNAME, "Insufficient %s values in %s")
 		    call pargstr (param)
 		    call pargstr (name[2])

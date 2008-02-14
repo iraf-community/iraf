@@ -22,7 +22,6 @@ int	cl_size			#I NOT USED
 int	acmode			#I access mode
 int	status			#O return value
 
-size_t	sz_val
 pointer	sp, fname, pixfile
 int	hfd, nchars, mode, junk
 int	open(), oif_rdhdr(), access(), protect(), envgeti()
@@ -32,9 +31,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (pixfile, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
 
 	status = OK
 

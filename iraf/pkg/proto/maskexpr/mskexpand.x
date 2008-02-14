@@ -31,7 +31,6 @@ pointer procedure me_getexprdb (fname)
 
 char	fname[ARB]		#I file to be read
 
-size_t	sz_val
 pointer	sym, sp, lbuf, st, a_st, ip, symname, tokbuf, text
 int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n
 pointer	stopen(), stenter()
@@ -42,12 +41,10 @@ define	skip_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (lbuf, sz_val, TY_CHAR)
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (tokbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (symname, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (text, SZ_COMMAND, TY_CHAR)
+	call salloc (tokbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (symname, SZ_FNAME, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 	st = stopen ("imexpr", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)

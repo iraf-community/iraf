@@ -121,7 +121,6 @@ int	first_page		# first page to be displayed
 int	clear_screen		# clear screen between pages
 int	map_cc			# map control chars on output
 
-size_t	sz_val
 bool	redirin, useroot
 pointer	sp, fname, newfname, tty, lbuf
 int	spoolfd, list, nfiles, cmd, i, j, n, o
@@ -136,11 +135,9 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (newfname, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (newfname, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	list = fntopnb (files, YES)
 	nfiles = fntlenb (list)
@@ -252,7 +249,6 @@ int	nfiles			# number of files to be paged
 bool	redirin			# reading from the standard input
 int	spoolfd			# fd if spooling output in a file
 
-size_t	sz_val
 char	patbuf[SZ_LINE]
 int	nlines, ncols, maxlines, maxcols
 long	fi[LEN_FINFO], nchars, totchars, loffset
@@ -277,13 +273,10 @@ define	destline_ 94
 
 begin
 	call smark (sp)
-	sz_val = SZ_LONGLINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (cmdbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (prompt, sz_val, TY_CHAR)
-	call salloc (token, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LONGLINE, TY_CHAR)
+	call salloc (cmdbuf, SZ_LINE, TY_CHAR)
+	call salloc (prompt, SZ_FNAME, TY_CHAR)
+	call salloc (token, SZ_FNAME, TY_CHAR)
 
 	if (first_call) {
 	    # The pattern buffer is retained indefinitely.

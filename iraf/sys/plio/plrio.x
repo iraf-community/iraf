@@ -72,7 +72,6 @@ pointer	pl			#I PLIO descriptor
 int	plane[ARB]		#I 2-dim plane to be accessed
 int	buflimit		#I approximate table size, or 0 if don't care
 
-size_t	sz_val
 int	v1[PL_MAXDIM], v2[PL_MAXDIM]
 int	maxpix, ndim, npix, mval, i, j
 int	msize[2], tsize[2], block[2], vm[2]
@@ -83,8 +82,7 @@ bool	pl_sectnotconst()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	sz_val = LEN_STACK * LEN_REGDES
-	call salloc (stack, sz_val, TY_STRUCT)
+	call salloc (stack, LEN_STACK * LEN_REGDES, TY_STRUCT)
 
 	# Allocate the PLRIO descriptor.
 	call calloc (plr, LEN_PLRDES, TY_STRUCT)

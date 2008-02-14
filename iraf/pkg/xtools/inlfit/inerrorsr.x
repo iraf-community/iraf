@@ -22,7 +22,6 @@ real	scatter			# additional scatter in equation
 real	rms			# RMS of the fit (output)
 real	errors[ARB]		# errors in coefficients (output)
 
-size_t	sz_val
 int	i
 real	in_rmsr(), nlstatr
 pointer	sp, fit, wts1, rejpts
@@ -40,9 +39,8 @@ begin
 
 	# Allocate memory for fit and weights.
 	call smark (sp)
-	sz_val = npts
-	call salloc (fit, sz_val, TY_REAL)
-	call salloc (wts1, sz_val, TY_REAL)
+	call salloc (fit, npts, TY_REAL)
+	call salloc (wts1, npts, TY_REAL)
 
 	# Set zero weight for rejeceted points.
 	call amovr (wts, Memr[wts1], npts)

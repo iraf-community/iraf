@@ -12,7 +12,6 @@ char	image1[ARB]			# Input image
 char	image2[ARB]			# Output image
 bool	verbose				# Print the operation
 
-size_t	sz_val
 int	npix, junk
 pointer	buf1, buf2, im1, im2
 pointer	sp, root1, root2, imtemp, section
@@ -25,12 +24,10 @@ pointer	immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (root1, sz_val, TY_CHAR)
-	call salloc (root2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (root1, SZ_PATHNAME, TY_CHAR)
+	call salloc (root2, SZ_PATHNAME, TY_CHAR)
+	call salloc (imtemp, SZ_PATHNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	# If verbose print the operation.
 	if (verbose) {

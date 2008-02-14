@@ -22,7 +22,6 @@ int	x1,y1			#I lower left corner of box
 int	x2,y2			#I upper right corner of box
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, ufd
 bool	pl_ubox()
 extern	pl_ubox()
@@ -30,8 +29,7 @@ extern	pl_ubox()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	sz_val = LEN_BOXDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_BOXDES, TY_STRUCT)
 
 	B_PL(ufd) = pl
 	B_X1(ufd) = max(1, min(PL_AXLEN(pl,1), x1))

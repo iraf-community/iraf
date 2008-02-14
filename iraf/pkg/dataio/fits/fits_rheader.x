@@ -236,7 +236,6 @@ int	fd_usr		# file descriptor of user area
 char	card[ARB]	# FITS card
 int	ndiscard	# Number of cards for which no space available
 
-size_t	sz_val
 char	cval
 double	dval
 int	nchar, i, j, k, len
@@ -250,10 +249,8 @@ include	"rfits.com"
 
 begin
 	call smark (sp)
-	sz_val = LEN_CARD
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (comment, sz_val, TY_CHAR)
+	call salloc (str, LEN_CARD, TY_CHAR)
+	call salloc (comment, SZ_LINE, TY_CHAR)
 
 	i = COL_VALUE
 	if (strmatch (card, "^END     ") != 0) {
@@ -792,7 +789,6 @@ int	len_card	# length of FITS card
 int	ndiscard	# number of cards discarded
 int	long_header	# print the long header
 
-size_t	sz_val
 int	ngcards, gim_lenuser, ninherit, count
 pointer	sp, indices, idb_gim, grp, irp
 bool	streq()
@@ -804,8 +800,7 @@ begin
 	# Initialize.
 	call smark (sp)
 	ngcards = strlen (UNKNOWN(gim)) / (len_card + 1)
-	sz_val = ngcards
-	call salloc (indices, sz_val, TY_INT)
+	call salloc (indices, ngcards, TY_INT)
 
 	# Mark the global header cards which are to be inherited. These
 	# include all COMMENT, HISTORY, and BLANK cards, plus all those

@@ -518,7 +518,6 @@ pointer	gp				# GIO pointer
 pointer	gt				# GTOOLS pointer
 int	newgraph			# Update graph?
 
-size_t	sz_val
 bool	bval
 real	rval[12]
 pointer	sp, cmd
@@ -531,8 +530,7 @@ begin
 
 	# Parse the command string matched against a dictionary.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	call sscan (cmdstr[2])
 	call gargwrd (Memc[cmd], SZ_LINE)

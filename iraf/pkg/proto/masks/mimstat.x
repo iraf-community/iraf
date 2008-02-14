@@ -35,7 +35,6 @@ char    fieldstr[ARB]           #I string containing the list of fields
 int     fields[ARB]             #O fields array
 int     max_nfields             #I maximum number of fields
 
-size_t	sz_val
 int     nfields, flist, field
 pointer sp, fname
 int     fntopenb(), fntgfnb(), strdic()
@@ -44,8 +43,7 @@ begin
         nfields = 0
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (fname, SZ_FNAME, TY_CHAR)
 
         flist = fntopenb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
@@ -708,7 +706,6 @@ real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
-size_t	sz_val
 real    h1, hdiff, hnorm
 pointer sp, ihgm
 int     i, lo, hi
@@ -717,8 +714,7 @@ bool    fp_equalr()
 
 begin
         call smark (sp)
-        sz_val = nbins
-        call salloc (ihgm, sz_val, TY_REAL)
+        call salloc (ihgm, nbins, TY_REAL)
 
         # Integrate the histogram and normalize.
         Memr[ihgm] = hgm[1]

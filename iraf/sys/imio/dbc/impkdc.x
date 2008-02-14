@@ -11,14 +11,12 @@ char	key[ARB]		# parameter to be set
 double	dval			# double precision value
 char	comment[ARB]		# 
 
-size_t	sz_val
 pointer	sp, sval
 int	i, strlen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (sval, SZ_FNAME, TY_CHAR)
 
 	# Reduce the precision of the encoded value if necessary to fit in
 	# the FITS value field.  Start with NDIGITS_DP-1 as the precision

@@ -20,7 +20,6 @@ int	geometry, min_sigdigits
 pointer	inlist, outlist
 pointer	sp, infile, outfile, record, str, dt, sx1, sy1, sx2, sy2, coo, mw
 pointer	reclist, xformat, yformat, lngformat, latformat
-size_t	sz_val
 bool	clgetb(), streq()
 int	fntlenb(), imtlen(), fntgfnb(), imtgetim()
 int	open(), clgwrd(), clgeti()
@@ -29,16 +28,14 @@ pointer	fntopnb(), dtmap(), imtopenp()
 begin
 	# Allocate memory for transformation parameters structure
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (infile, sz_val, TY_CHAR)
-	call salloc (outfile, sz_val, TY_CHAR)
-	call salloc (record, sz_val, TY_CHAR)
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	call salloc (lngformat, sz_val, TY_CHAR)
-	call salloc (latformat, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (outfile, SZ_FNAME, TY_CHAR)
+	call salloc (record, SZ_FNAME, TY_CHAR)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (lngformat, SZ_FNAME, TY_CHAR)
+	call salloc (latformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Open the input and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -194,7 +191,6 @@ pointer	coo			#I pointer to the celestial coordinate structure
 bool	forward			#I Is the transform in the forward direction ?
 bool	polar			#I Polar standard coordinates ?
 
-size_t	sz_val
 double	xd, yd, lngd, latd, txd, tyd, tlngd, tlatd
 int	max_fields, nline, nfields, nchars
 int	offset, tlngunits, tlatunits
@@ -206,19 +202,14 @@ pointer	mw_sctran()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inbuf, sz_val, TY_CHAR)
-	call salloc (linebuf, sz_val, TY_CHAR)
-	sz_val = MAX_FIELDS
-	call salloc (field_pos, sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call salloc (outbuf, sz_val, TY_CHAR)
-	sz_val = 4
-	call salloc (vfields, sz_val, TY_INT)
-	call salloc (values, sz_val, TY_DOUBLE)
-	call salloc (nsdigits, sz_val, TY_INT)
-	sz_val = (SZ_FNAME + 1) * 4
-	call salloc (vformats, sz_val, TY_CHAR)
+	call salloc (inbuf, SZ_LINE, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
+	call salloc (field_pos, MAX_FIELDS, TY_INT)
+	call salloc (outbuf, SZ_LINE, TY_CHAR)
+	call salloc (vfields, 4, TY_INT)
+	call salloc (values, 4, TY_DOUBLE)
+	call salloc (nsdigits, 4, TY_INT)
+	call salloc (vformats, (SZ_FNAME + 1) * 4, TY_CHAR)
 
 	# Determine the longitude and latitude units.
 	if (lngunits <= 0) {

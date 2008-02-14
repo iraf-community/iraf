@@ -628,15 +628,13 @@ pointer	xc		#I pointer to the cross-correlation structure
 int	param		#I parameter to be set
 char	str[ARB]	#O value of string parameter
 
-size_t	sz_val
 int	index
 pointer	sp, temp
 int	strdic(), fnldir()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
 
 	switch (param) {
 	case BSTRING:

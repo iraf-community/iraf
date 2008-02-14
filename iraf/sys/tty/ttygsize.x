@@ -20,7 +20,6 @@ pointer	tty			# terminal descriptor
 int	width			# ncols on screen (out)
 int	height			# nlines on screen (out)
 
-size_t	sz_val
 pointer	sp, patbuf, buf, qs, wh, ip, op
 int	index, len_qs, len_wh, w_index, h_index, sv_iomode, nchars, junk
 
@@ -31,12 +30,10 @@ errchk	ttyread
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
-	call salloc (buf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (qs, sz_val, TY_CHAR)
-	call salloc (wh, sz_val, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
+	call salloc (qs, SZ_FNAME, TY_CHAR)
+	call salloc (wh, SZ_FNAME, TY_CHAR)
 
 	width = 0
 	height = 0

@@ -14,7 +14,6 @@ pointer	xh					#i task struct pointer
 int	exact_match				#i require an exact match?
 char	pattern[ARB]				#i search pattern
 
-size_t	sz_val
 pointer	sp, lfile, line, helpstr, item
 pointer	tp, lp, pat
 char	task[SZ_FNAME], pkg[SZ_FNAME], desc[SZ_FNAME]
@@ -27,13 +26,10 @@ errchk	open, xh_updt_quickref
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (lfile, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	call salloc (item, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pat, sz_val, TY_CHAR)
+	call salloc (lfile, SZ_FNAME, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (item, SZ_LINE, TY_CHAR)
+	call salloc (pat, SZ_FNAME, TY_CHAR)
 
 	# Open the quick reference file.
 	iferr (fd = open (QUICKREF(xh), READ_ONLY, TEXT_FILE))

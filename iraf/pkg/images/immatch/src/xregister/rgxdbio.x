@@ -8,7 +8,6 @@ pointer	db		#I pointer to the database file
 int	dformat		#I is the shifts file in database format
 pointer	xc		#I pointer to the cross correlation structure
 
-size_t	sz_val
 int	i, nregions, ngood, c1, c2, l1, l2, xlag, ylag
 pointer	sp, image, prc1, prc2, prl1, prl2, pxshift, pyshift
 real	xin, yin, xout, yout, xavshift, yavshift
@@ -18,8 +17,7 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	# Write the header record.
 	if (dformat == YES)
@@ -102,15 +100,13 @@ procedure rg_xdbparams (db, xc)
 pointer	db		#I pointer to the database file
 pointer	xc		#I pointer to the cross-correlation structure
 
-size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
 #real	rg_xstatr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Write out the time record was written.
 	call dtput (db, "\n")

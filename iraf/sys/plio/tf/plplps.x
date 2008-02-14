@@ -14,7 +14,6 @@ int	px_depth		#I pixel depth, bits
 int	npix			#I number of pixels to be set
 int	rop			#I rasterop
 
-size_t	sz_val
 int	ll_len
 pointer	sp, ll_src, ll_out, ll_dst
 pointer	pl_access()
@@ -23,8 +22,7 @@ errchk	pl_access
 
 begin
 	call smark (sp)
-	sz_val = LL_MAXLEN(pl)
-	call salloc (ll_src, sz_val, TY_SHORT)
+	call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
 	# Convert the pixel array to a line list.
 	ll_len = pl_p2ls (px_src, 1, Mems[ll_src], npix)
@@ -32,8 +30,7 @@ begin
 	if (!R_NEED_DST(rop) && v[1] == 1 && npix == PL_AXLEN(pl,1))
 	    call pl_update (pl, v, Mems[ll_src])
 	else {
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_out, sz_val, TY_SHORT)
+	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	    ll_dst = pl_access (pl,v)
 	    call pl_linerop (Mems[ll_src], 1, PL_MAXVAL(pl), Mems[ll_dst], v[1],
 		MV(px_depth), Mems[ll_out], npix, rop)

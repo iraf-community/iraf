@@ -9,7 +9,6 @@ int	cl		# coordinate file descriptor
 int	dl		# deletions file descriptor
 int	ndelete		# number of deletions
 
-size_t	sz_val
 int	i, ndel, nobj, obj, tcl, tdl, stat
 pointer	sp, id, tclname, tdlname, line
 real	xval, yval
@@ -17,13 +16,10 @@ int	fscan(), nscan(), open(), getline()
 
 begin
 	call smark (sp)
-	sz_val = ndelete
-	call salloc (id, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (tclname, sz_val, TY_CHAR)
-	call salloc (tdlname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (id, ndelete, TY_INT)
+	call salloc (tclname, SZ_FNAME, TY_CHAR)
+	call salloc (tdlname, SZ_FNAME, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Rewind both files to the beginning.
 	call seek (cl, BOF)

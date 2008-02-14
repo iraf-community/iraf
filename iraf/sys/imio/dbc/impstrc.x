@@ -19,7 +19,6 @@ char	key[ARB]		#I parameter to be set
 char	value[ARB]		#I new parameter value
 char	comment[ARB]		#I comment string
 
-size_t	sz_val
 bool	string_valued
 int	nchars, ch, i
 pointer	rp, ip, op, sp, val, start, text, cmmt, slen
@@ -28,10 +27,9 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (val, sz_val, TY_CHAR)
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (cmmt, sz_val, TY_CHAR)
+	call salloc (val, SZ_LINE, TY_CHAR)
+	call salloc (text, SZ_LINE, TY_CHAR)
+	call salloc (cmmt, SZ_LINE, TY_CHAR)
 
 	# Filter the value string to remove any undesirable characters.
 	nchars = idb_filstr (value, Memc[text], SZ_LINE)

@@ -23,7 +23,6 @@ pointer	qp			#I QPOE descriptor
 char	fieldlist[ARB]		#I field list defining new datatype (domain)
 pointer	dd			#U pointer to domain descriptor
 
-size_t	sz_val
 pointer	sp, tokbuf, dsym, in
 int	nfields, offset, maxsize, xfield, yfield, token, dtype, fsize
 
@@ -35,8 +34,7 @@ define	nextfield_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_TOKBUF
-	call salloc (tokbuf, sz_val, TY_CHAR)
+	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
 
 	# Open declarations string for non macro expanded token input.
 	in = qp_opentext (NULL, fieldlist)

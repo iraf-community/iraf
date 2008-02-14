@@ -15,7 +15,6 @@ int	ndim
 pointer	sp, imnamelist, image, wcs, system
 pointer	r, w, cd, ncd, nr, ltv, iltm, ltm
 pointer	imlist, im, mwim, mw
-size_t	sz_val
 bool    clgetb(), streq()
 int	imtgetim(), mw_stati()
 pointer	imtopen(), immap(), mw_openim(), mw_open()
@@ -24,11 +23,10 @@ errchk	mw_openim()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imnamelist, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (wcs, sz_val, TY_CHAR)
-	call salloc (system, sz_val, TY_CHAR)
+	call salloc (imnamelist, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (wcs, SZ_FNAME, TY_CHAR)
+	call salloc (system, SZ_FNAME, TY_CHAR)
 
 	# Get the parameters.
 	call clgstr ("image", Memc[imnamelist], SZ_FNAME)

@@ -12,7 +12,6 @@ procedure greset (gp, flags)
 pointer gp			#I graphics descriptor
 int	flags			#I flags indicating what to reset
 
-size_t	sz_val
 int	color, ch, i
 real	char_height, aspect
 bool	reset_wcs, reset_gio, reset_glabax
@@ -26,10 +25,8 @@ errchk	ggetr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (glbcolor, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (param, sz_val, TY_CHAR)
+	call salloc (glbcolor, SZ_LINE, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
 
 	# Initialize for a new frame; this is always done.
 	call gfrinit (gp)

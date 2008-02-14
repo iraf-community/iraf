@@ -116,7 +116,6 @@ short	lut[ARB]		# Look up table previously calculated
 int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
-size_t	sz_val
 pointer buf, ibuf, sp, rlut
 short	min_val, max_val, short_min, short_max, dz1, dz2
 int	npix
@@ -173,10 +172,8 @@ begin
 	    }
 
 	    call smark (sp)
-	    sz_val = npix
-	    call salloc (ibuf, sz_val, TY_INT)
-	    sz_val = SZ_BUF
-	    call salloc (rlut, sz_val, TY_REAL)
+	    call salloc (ibuf, npix, TY_INT)
+	    call salloc (rlut, SZ_BUF, TY_REAL)
 	    call achtsr (lut, Memr[rlut], SZ_BUF)
 
 	    while (imgnlr (im, buf, v) != EOF) {

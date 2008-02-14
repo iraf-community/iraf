@@ -18,7 +18,6 @@ procedure wl_label (wd)
 
 pointer wd                  # I: the WCSLAB descriptor
 
-size_t	sz_val
 bool	no_side_axis1, no_side_axis2
 int	i, axis1_side, axis2_side
 pointer	sp, offset_ptr
@@ -27,8 +26,7 @@ real	offset
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = N_SIDES
-	call salloc (offset_ptr, sz_val, TY_REAL)
+	call salloc (offset_ptr, N_SIDES, TY_REAL)
 	do i = 1, N_SIDES
 	    OFFSET(offset_ptr,i) = 0.
 
@@ -162,7 +160,6 @@ procedure wl_polar_label (wd)
 
 pointer wd            # I: the WCSLAB descriptor
 
-size_t	sz_val
 int	i, prec
 pointer sp, label, units, label_format, units_format
 real	char_height, char_width, ndc_textx, ndc_texty, old_text_size
@@ -173,11 +170,10 @@ real	gstatr(), ggetr()
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (label, sz_val, TY_CHAR)
-	call salloc (units, sz_val, TY_CHAR)
-	call salloc (label_format, sz_val, TY_CHAR)
-	call salloc (units_format, sz_val, TY_CHAR)
+	call salloc (label, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
+	call salloc (label_format, SZ_LINE, TY_CHAR)
+	call salloc (units_format, SZ_LINE, TY_CHAR)
 
 	# Get the character height and width.  This is used to ensure that we
 	# have moved the label strings off the border.
@@ -268,7 +264,6 @@ int     axis    	# I: the type of axis being labeled
 int     side    	# I: the side to place the labels
 real    offset  	# O: offset in NDC units for titles
 
-size_t	sz_val
 bool	do_full
 double	angle, tangle
 int	i, full_label, nlabels, old_wcs, prec
@@ -301,8 +296,7 @@ begin
 	# that the label should be for the current axis and that it lies on
 	# the current side.
 
-	sz_val = WL_N_LABELS(wd)
-	call salloc (labels, sz_val, TY_INT)
+	call salloc (labels, WL_N_LABELS(wd), TY_INT)
 	nlabels = 0
 	for (i = 1; i <= WL_N_LABELS(wd); i = i + 1)
 	    if  (WL_LABEL_AXIS(wd,i) == axis && 
@@ -498,7 +492,6 @@ int     maxch            # I: the maximum number of characters allowed
 int     precision        # I: how precise the output should be
 bool    all              # I: true if all relevent fields should be formatted
 
-size_t	sz_val
 double  accuracy, fraction
 int	sec, h, m, s
 pointer sp, temp_hms, temp_units 
@@ -506,9 +499,8 @@ pointer sp, temp_hms, temp_units
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = maxch
-	call salloc (temp_hms, sz_val, TY_CHAR)
-	call salloc (temp_units, sz_val, TY_CHAR)
+	call salloc (temp_hms, maxch, TY_CHAR)
+	call salloc (temp_units, maxch, TY_CHAR)
 
 	units[1] = EOS
 	hms[1]   = EOS
@@ -618,7 +610,6 @@ int     maxch            # I: the maximum number of characters allowed
 int     precision        # I: how precise the output should be ?
 bool    all              # I: true if all relavent fields should be formatted
 
-size_t	sz_val
 double  accuracy, fraction 
 int	sec, h, m, s
 pointer sp, temp_dms, temp_units
@@ -627,9 +618,8 @@ int	strlen()
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = maxch
-	call salloc (temp_dms, sz_val, TY_CHAR)
-	call salloc (temp_units, sz_val, TY_CHAR)
+	call salloc (temp_dms, maxch, TY_CHAR)
+	call salloc (temp_units, maxch, TY_CHAR)
 
 	units[1] = EOS
 	dms[1]   = EOS
@@ -756,7 +746,6 @@ int     axis                 # I: the axis being dealt with
 int     side                 # I: the side being dealt with
 int	precision	     # I: precision of the label
 
-size_t	sz_val
 bool	all
 double	cur_dist, dist
 int	i, cur_label, xside, yside
@@ -766,8 +755,7 @@ double	wl_distanced()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (temp1, sz_val, TY_CHAR)
+	call salloc (temp1, SZ_LINE, TY_CHAR)
 
 	# Initialize.
 	xside = INDEFI
@@ -867,7 +855,6 @@ int     precision            # I:   level of precision for labels
 bool    do_full              # I:   true if the full label should be printed
 real    offset               # I/O: offset for titles in NDC units
 
-size_t	sz_val
 int	tside
 pointer	sp, label, label_format, units, units_format
 real	char_height, char_width, in_off_x, in_off_y, length
@@ -882,11 +869,10 @@ real	ggetr(), gstatr()
 begin
 	# Get some memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (label, sz_val, TY_CHAR)
-	call salloc (units, sz_val, TY_CHAR)
-	call salloc (label_format, sz_val, TY_CHAR)
-	call salloc (units_format, sz_val, TY_CHAR)
+	call salloc (label, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
+	call salloc (label_format, SZ_LINE, TY_CHAR)
+	call salloc (units_format, SZ_LINE, TY_CHAR)
 
 	# Get character size.  This info is used to move the character string
 	# by the appropriate amounts.

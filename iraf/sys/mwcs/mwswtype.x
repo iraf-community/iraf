@@ -32,7 +32,6 @@ int	naxes			#I number of axes in function group
 char	wtype[ARB]		#I axis coordinate type
 char	wattr[ARB]		#I axis attributes, "attr=value, ..."
 
-size_t	sz_val
 pointer	sp, atname, valstr, wp, op, wf
 int	ip, ch, fn, wfno, ax, sz_valstr, i
 int	ctowrd(), mw_flookup(), ctoi(), strlen()
@@ -42,10 +41,8 @@ bool	streq()
 begin
 	call smark (sp)
 	sz_valstr = strlen (wattr)
-	sz_val = sz_valstr
-	call salloc (valstr, sz_val, TY_CHAR)
-	sz_val = SZ_ATNAME
-	call salloc (atname, sz_val, TY_CHAR)
+	call salloc (valstr, sz_valstr, TY_CHAR)
+	call salloc (atname, SZ_ATNAME, TY_CHAR)
 
 	# Get the current WCS.
 	wp = MI_WCS(mw)

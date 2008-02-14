@@ -16,7 +16,6 @@ short	color[ARB]		# reference color
 short	n			# count of data items
 short	data[ARB]		# frame/color to be changed.
 
-size_t	sz_val
 pointer	sp, ldata
 int	len, x,y,z,t
 int	unit, i
@@ -50,8 +49,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = len
-	call salloc (ldata, sz_val, TY_SHORT)
+	call salloc (ldata, len, TY_SHORT)
 
 	call iishdr (IREAD+VRETRACE, len, unit, x, y, z, t)
 	call iisio (Mems[ldata], len * SZB_CHAR)

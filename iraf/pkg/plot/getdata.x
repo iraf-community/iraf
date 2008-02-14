@@ -56,7 +56,6 @@ int	xres, yres		# desired output resolution
 bool	pre			# preserve aspect ratio?
 int	nxout, nyout		# dimensions of output array (returned)
 
-size_t	sz_val
 pointer	sp, xvec, data
 int	x_factor, y_factor, xrf, yrf
 int	nxin, nyin, yin, ii, jj, index, nop
@@ -92,8 +91,7 @@ begin
 	    call pargi (xrf)
 	    call pargi (yrf)
 
-	sz_val = nxin
-	call salloc (xvec, sz_val, TY_REAL)
+	call salloc (xvec, nxin, TY_REAL)
 	call calloc (data, nxout * nyout, TY_REAL)
 
 	yin = 1
@@ -125,7 +123,6 @@ int	xres, yres		# blocking factors
 bool	pre			# preserve aspect ratio?
 int	nx, ny			# dimensions of output array (returned)
 
-size_t	sz_val
 real	sum
 pointer	sp, xvec, data
 int	nxin, nyin, nxout, nyout, nxout_full, nyout_full
@@ -166,8 +163,7 @@ begin
 	nxcols = nxin - (nxout_full * x_factor)
 	nxrows = nyin - (nyout_full * y_factor)
 
-	sz_val = nxin
-	call salloc (xvec, sz_val, TY_REAL)
+	call salloc (xvec, nxin, TY_REAL)
 	call calloc (data, nxout * nyout, TY_REAL)
 
 	yin = 1

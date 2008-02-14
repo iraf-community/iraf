@@ -11,7 +11,6 @@ procedure ie_statistics (ie, x, y)
 pointer	ie			# IMEXAM structure
 real	x, y			# Aperture coordinates
  
-size_t	sz_val
 double	mean, median, std
 int	ncstat, nlstat, x1, x2,y1, y2, npts, clgeti()
 pointer	sp, imname, im, data, sortdata, ie_gimage(), ie_gdata()
@@ -37,10 +36,8 @@ begin
 	npts = (x2-x1+1) * (y2-y1+1)
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	sz_val = npts
-	call salloc (sortdata, sz_val, TY_DOUBLE)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (sortdata, npts, TY_DOUBLE)
 
 	call achtrd (Memr[data], Memd[sortdata], npts)
 	call asrtd (Memd[sortdata], Memd[sortdata], npts)

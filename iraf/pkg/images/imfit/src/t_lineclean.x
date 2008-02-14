@@ -105,7 +105,6 @@ pointer	gt				# GTIO pointer
 char	title[ARB]			# Title
 bool	interactive			# Interactive?
 
-size_t	sz_val
 char	graphics[SZ_FNAME]
 int	i, nx, new
 long	inline[IM_MAXDIM], outline[IM_MAXDIM]
@@ -120,9 +119,8 @@ begin
 	nx = IM_LEN(in, 1)
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (wts, sz_val, TY_REAL)
+	call salloc (x, nx, TY_REAL)
+	call salloc (wts, nx, TY_REAL)
 
 	do i = 1, nx
 	    Memr[x+i-1] = i
@@ -183,7 +181,6 @@ char	output[ARB]		# Output image
 pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 
-size_t	sz_val
 pointer	sp, root, sect
 int	imaccess()
 pointer	immap()
@@ -192,9 +189,8 @@ begin
 	# Get the root name and section of the input image.
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (sect, sz_val, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (sect, SZ_FNAME, TY_CHAR)
 
 	call get_root (input, Memc[root], SZ_FNAME)
 	call get_section (input, Memc[sect], SZ_FNAME)

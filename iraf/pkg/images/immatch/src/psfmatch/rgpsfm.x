@@ -115,7 +115,6 @@ pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to input image
 int	newref		#I new reference image ?
 
-size_t	sz_val
 int	i, nregions, nrimcols, nrimlines, nrcols, nrlines, nrpcols, nrplines
 int	nborder, stat, rc1, rc2, rl1, rl2, nxfft, nyfft
 pointer	sp, str, coeff, dim, rbuf, ibuf, rsum, isum, border
@@ -136,12 +135,9 @@ begin
 	    return (ERR)
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = max (GS_SAVECOEFF+6, 9)
-	call salloc (coeff, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (coeff, max (GS_SAVECOEFF+6, 9), TY_REAL)
+	call salloc (dim, 2, TY_INT)
 
 	# Get the reference region pointers.
 	prc1 = rg_pstatp (pm, RC1)
@@ -447,7 +443,6 @@ pointer	imr		#I pointer to the reference psf
 pointer	impsf		#I pointer to the input image psf
 int	newref		#I new reference image
 
-size_t	sz_val
 int	nrcols, nrlines, nxfft, nyfft
 pointer	sp, dim, rbuf, ibuf, imfft, fft, reffft
 int	rg_szfft()
@@ -456,8 +451,7 @@ real	rg_pstatr(), rg_pg2norm(), rg_pg1norm()
 
 begin
 	call smark (sp)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (dim, 2, TY_INT)
 
 	nrcols = IM_LEN(imr,1)
 	if (IM_NDIM(imr) == 1)
@@ -616,7 +610,6 @@ procedure rg_pfilter (pm)
 
 pointer	pm		#I pointer to the psf matching structure
 
-size_t	sz_val
 pointer	sp, dim, psfft, conv
 real	nfactor
 int	rg_pstati()
@@ -625,8 +618,7 @@ real	rg_pstatr(), asumr()
 
 begin
 	call smark (sp)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (dim, 2, TY_INT)
 
 	# Allocate space for the fourier spectrum.
 	if (rg_pstatp (pm, ASFFT) != NULL)

@@ -217,7 +217,6 @@ int	npts		#I the number of data points
 real	median		#O the median of the data
 real	lcut, hcut	#I the good data limits
 
-size_t	sz_val
 int	i, ngpts, lindex, hindex
 pointer	sp, sdata
 real	mean, sigma, dif, lo, hi
@@ -231,8 +230,7 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (sdata, sz_val, TY_REAL)
+	call salloc (sdata, npts, TY_REAL)
 	call asrtr (data, Memr[sdata], npts)
 	if (mod (npts, 2) == 0)
 	    median = (Memr[sdata+(1+npts)/2-1] + Memr[sdata+(1+npts)/2]) / 2.0
@@ -297,7 +295,6 @@ int	nx, ny			#I dimensions of the original data
 int	wxborder, wyborder	#I the x and y width of the border
 real	loreject, hireject	#I the rejection criteria
 
-size_t	sz_val
 int	i, stat, ier
 pointer	sp, x, y, w, zfit
 real	lcut, hcut, sigma
@@ -307,11 +304,10 @@ real	rg_sigma(), rg_bsigma()
 begin
 	# Initialize.
 	call smark (sp)
-	sz_val = nx
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (w, sz_val, TY_REAL)
-	call salloc (zfit, sz_val, TY_REAL)
+	call salloc (x, nx, TY_REAL)
+	call salloc (y, nx, TY_REAL)
+	call salloc (w, nx, TY_REAL)
+	call salloc (zfit, nx, TY_REAL)
 	do i = 1, nx
 	    Memr[x+i-1] = i
 	call amovkr (1.0, Memr[w], nx)

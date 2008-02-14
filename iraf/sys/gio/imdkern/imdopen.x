@@ -16,7 +16,6 @@ int	frame			# display frame buffer number
 int	color			# graphics overlay color index
 pointer	dd[ARB]			# device table to be initialized
 
-size_t	sz_val
 pointer	sp, devns
 int	len_devname
 pointer	locpr()
@@ -30,8 +29,7 @@ include	"imd.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (devns, sz_val, TY_SHORT)
+	call salloc (devns, SZ_FNAME, TY_SHORT)
 
 	# Flag first pass.  Save forced device name in common for OPENWS.
 	# Zero the frame and instruction counters.

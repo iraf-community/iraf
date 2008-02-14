@@ -9,17 +9,14 @@ char	imspec[ARB]		# full image specification
 char	image[ARB]		# receives image name
 int	maxch
 
-size_t	sz_val
 int	cl_index, cl_size
 pointer	sp, cluster, ksection, section
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (cluster, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (ksection, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
+	call salloc (ksection, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	call imparse (imspec,
 	    Memc[cluster], SZ_PATHNAME,

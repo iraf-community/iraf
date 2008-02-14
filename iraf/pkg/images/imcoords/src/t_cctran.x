@@ -19,7 +19,6 @@ int	infd, outfd, lngunits, latunits
 pointer	inlist, outlist
 pointer	sp, infile, outfile, record, xformat, yformat, str, dt
 pointer	reclist, sx1, sy1, sx2, sy2, coo, mw
-size_t	sz_val
 bool	clgetb(), streq()
 int	fntlenb(), fntgfnb(), clgwrd(), clgeti()
 int	open(), imtgetim (), imtlen()
@@ -28,14 +27,12 @@ pointer	fntopnb(), imtopenp(), dtmap()
 begin
 	# Allocate memory for transformation parameters structure
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (infile, sz_val, TY_CHAR)
-	call salloc (outfile, sz_val, TY_CHAR)
-	call salloc (record, sz_val, TY_CHAR)
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (outfile, SZ_FNAME, TY_CHAR)
+	call salloc (record, SZ_FNAME, TY_CHAR)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Open the input and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -180,7 +177,6 @@ pointer	mw			#I pointer to the mwcs structure
 pointer	coo			#I pointer to the celestial coordinate structure
 bool	forward			#I forwards transform ?
 
-size_t	sz_val
 double	xd, yd, xtd, ytd
 int	max_fields, nline, nfields, nchars, nsdig_x, nsdig_y, offset
 int	tlngunits, tlatunits
@@ -191,15 +187,12 @@ pointer	mw_sctran()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inbuf, sz_val, TY_CHAR)
-	call salloc (linebuf, sz_val, TY_CHAR)
-	sz_val = MAX_FIELDS
-	call salloc (field_pos, sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call salloc (outbuf, sz_val, TY_CHAR)
-	call salloc (txformat, sz_val, TY_CHAR)
-	call salloc (tyformat, sz_val, TY_CHAR)
+	call salloc (inbuf, SZ_LINE, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
+	call salloc (field_pos, MAX_FIELDS, TY_INT)
+	call salloc (outbuf, SZ_LINE, TY_CHAR)
+	call salloc (txformat, SZ_LINE, TY_CHAR)
+	call salloc (tyformat, SZ_LINE, TY_CHAR)
 
         # Determine the units.
         if (lngunits <= 0) {

@@ -26,7 +26,6 @@ int	imdim				# dimensionality of images
 int	imtype				# datatype of images
 int	i
 
-size_t	sz_val
 pointer	ex_init(), immap(), imtopenp(), fntopnb()
 int	ex_getpars()
 int	clgfil(), access()
@@ -40,14 +39,12 @@ define	quit_	99
 begin
 	# Allocate local stack storage.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (bfname, sz_val, TY_CHAR)
-	call salloc (blist, sz_val, TY_CHAR)
+	call salloc (bfname, SZ_FNAME, TY_CHAR)
+	call salloc (blist, SZ_FNAME, TY_CHAR)
 	call aclrc (Memc[blist], SZ_FNAME)
 	call aclrc (Memc[bfname], SZ_FNAME)
 	do i = 1, MAX_OPERANDS {
-	    sz_val = SZ_FNAME
-	    call salloc (imname[i], sz_val, TY_CHAR)
+	    call salloc (imname[i], SZ_FNAME, TY_CHAR)
 	    call aclrc (Memc[imname[i]], SZ_FNAME)
 	}
 
@@ -306,7 +303,6 @@ int procedure ex_getpars (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, format, header, bswap
 pointer	outtype, outbands
 
@@ -318,14 +314,11 @@ errchk	ex_do_outtype, ex_do_outbands
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (format, sz_val, TY_CHAR)
-	call salloc (header, sz_val, TY_CHAR)
-	call salloc (bswap, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (outtype, sz_val, TY_CHAR)
-	sz_val = SZ_EXPSTR
-	call salloc (outbands, sz_val, TY_CHAR)
+	call salloc (format, SZ_FNAME, TY_CHAR)
+	call salloc (header, SZ_FNAME, TY_CHAR)
+	call salloc (bswap, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_LINE, TY_CHAR)
+	call salloc (outbands, SZ_EXPSTR, TY_CHAR)
 
 	call aclrc (Memc[format], SZ_FNAME)
 	call aclrc (Memc[header], SZ_FNAME)
@@ -404,7 +397,6 @@ int	files				#i binary files list pointer
 int	ndim				#o dimensionality of images
 int	type				#o datatype of images
 
-size_t	sz_val
 pointer	im, sp, imname
 int	dim
 
@@ -415,8 +407,7 @@ errchk	immap
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call aclrc (Memc[imname], SZ_FNAME)
 
 	# Get dimension of first image.
@@ -454,7 +445,6 @@ procedure ex_outsize (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, expr
 int	i, ip, imnum, plev
 int	height, maxlen, maxhgt
@@ -465,8 +455,7 @@ int	ctoi(), strncmp()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (expr, sz_val, TY_CHAR)
+	call salloc (expr, SZ_EXPSTR, TY_CHAR)
 	call aclrc (Memc[expr], SZ_EXPSTR)
 
         call ex_getpix (ex, 1)
@@ -723,7 +712,6 @@ procedure ex_do_outbands (ex, outbands)
 pointer	ex				#i task struct pointer
 char	outbands[ARB]			#i outbands expression string
 
-size_t	sz_val
 pointer	sp, exp, expr
 int	fd, nchars, nexpr
 int	j, ip, plevel
@@ -744,8 +732,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (exp, sz_val, TY_CHAR)
+	call salloc (exp, SZ_EXPSTR, TY_CHAR)
 	call aclrc (Memc[exp], SZ_EXPSTR)
 
 	# If the outbands parameter is an @-file read in the expression from
@@ -835,7 +822,6 @@ procedure ex_parse_operands (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, expr
 int	i, ip, opnum
 char	ch, tag[SZ_TAG]
@@ -844,8 +830,7 @@ int	ctoi()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (expr, sz_val, TY_CHAR)
+	call salloc (expr, SZ_EXPSTR, TY_CHAR)
 
 	EX_NIMOPS(ex) = 0
 	EX_NIMAGES(ex) = 0
@@ -1093,7 +1078,6 @@ procedure ex_mkfname (ex, fname)
 pointer ex                              #i task struct pointer
 char	fname[ARB]			# generate the output filename
 
-size_t	sz_val
 pointer	sp, suffix, test
 int	fnextn()
 bool 	streq()
@@ -1101,8 +1085,7 @@ pointer	exb_fmt_ext()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (test, sz_val, TY_CHAR)
+	call salloc (test, SZ_FNAME, TY_CHAR)
 
 	if (EX_FORMAT(ex) == FMT_BUILTIN)
 	     suffix =  exb_fmt_ext (ex)

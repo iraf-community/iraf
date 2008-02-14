@@ -28,7 +28,6 @@ char	label[ARB]		# input system label, output coordinate label
 char	format[ARB]		# output coordinate format
 int	maxchar			# maximum characters in label and format
 
-size_t	sz_val
 int	i, j, wcsdim, paxis, mw_stati()
 real	dx
 pointer	sp, axno, axval, xin, xout, str1, str2
@@ -37,14 +36,12 @@ errchk	mw_gwattrs
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (axno, sz_val, TY_INT)
-	call salloc (axval, sz_val, TY_INT)
-	call salloc (xin, sz_val, TY_REAL)
-	call salloc (xout, sz_val, TY_REAL)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (axno, IM_MAXDIM, TY_INT)
+	call salloc (axval, IM_MAXDIM, TY_INT)
+	call salloc (xin, IM_MAXDIM, TY_REAL)
+	call salloc (xout, IM_MAXDIM, TY_REAL)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	call mw_seti (mw, MW_USEAXMAP, NO)
 	wcsdim = mw_stati (mw, MW_NDIM)
@@ -135,7 +132,6 @@ real	value			# pixel value
 char	str[maxchar]		# coordinate string
 int	maxchar			# maximum length of coordinate string
 
-size_t	sz_val
 int	i, j, k, wcsdim, mw_stati()
 pointer	sp, axno, axval, axis, xin, xout, fmt, temp
 bool	streq()
@@ -151,15 +147,13 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (axno, sz_val, TY_INT)
-	call salloc (axval, sz_val, TY_INT)
-	call salloc (axis, sz_val, TY_INT)
-	call salloc (xin, sz_val, TY_REAL)
-	call salloc (xout, sz_val, TY_REAL)
-	sz_val = SZ_FNAME
-	call salloc (fmt, sz_val, TY_CHAR)
-	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (axno, IM_MAXDIM, TY_INT)
+	call salloc (axval, IM_MAXDIM, TY_INT)
+	call salloc (axis, IM_MAXDIM, TY_INT)
+	call salloc (xin, IM_MAXDIM, TY_REAL)
+	call salloc (xout, IM_MAXDIM, TY_REAL)
+	call salloc (fmt, SZ_FNAME, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
 	call aclri (Memi[axis], IM_MAXDIM)
 
 	# Map the logical to physical coordinates

@@ -16,7 +16,6 @@ pointer	im			#I pointer to the reference image
 pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 
-size_t	sz_val
 int	fd, nregions
 pointer	sp, fname, regions
 int	rg_xgrid(), rg_xgregions(), rg_xrregions(), rg_xstati(), fntgfnb()
@@ -25,10 +24,8 @@ errchk	fntgfnb(), open(), close()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (regions, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (regions, SZ_LINE, TY_CHAR)
 
 	call rg_xstats (xc, REGIONS, Memc[regions], SZ_LINE)
 	if (rp < 1 || rp > MAX_NREGIONS || Memc[regions] == EOS) {
@@ -67,7 +64,6 @@ int	max_nregions		#I the maximum number of regions
 char	regions[ARB]		#O the output regions string
 int	maxch			#I maximum size of the output regions string
 
-size_t	sz_val
 int	op, nregions, wcs, key
 pointer	sp, region, section, cmd
 real	xll, yll, xur, yur
@@ -77,10 +73,9 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (region, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (region, SZ_LINE, TY_CHAR)
+	call salloc (section, SZ_LINE, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -155,7 +150,6 @@ pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 int	max_nregions		#I the maximum number of regions
 
-size_t	sz_val
 int	i, istart, iend, j, jstart, jend, ncols, nlines, nxsample, nysample
 int	nxcols, nylines, nregions
 pointer	sp, region, section
@@ -165,9 +159,8 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (region, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (region, SZ_LINE, TY_CHAR)
+	call salloc (section, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -236,7 +229,6 @@ pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 int	max_nregions		#I the maximum number of regions
 
-size_t	sz_val
 int	ncols, nlines, nregions, x1, y1, x2, y2, step
 pointer	sp, line, section
 int	rg_xstati(), getline(), rg_xgsections()
@@ -245,9 +237,8 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (section, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -302,7 +293,6 @@ pointer	xc			#I pointer to cross-correlation structure
 int	rp			#I the index of the current region
 int	max_nregions		#I the maximum number of regions
 
-size_t	sz_val
 int	ncols, nlines, nregions, x1, x2, y1, y2, step
 pointer	sp, section, region
 int	rg_xstati(), rg_xgsections()
@@ -311,9 +301,8 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (region, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (region, SZ_LINE, TY_CHAR)
+	call salloc (section, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information.
 	call rg_xrealloc (xc, max_nregions)

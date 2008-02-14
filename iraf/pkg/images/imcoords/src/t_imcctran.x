@@ -16,7 +16,6 @@ pointer	ix, iy, ox, oy, ilng, ilat, olng, olat, imlist
 int	nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
 bool	uselp, verbose, update, usecd
 
-size_t	sz_val
 double	rg_rmsdiff()
 pointer	immap(), rg_xytoxy(), mw_newcopy(), imtopen()
 int	fstati(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
@@ -29,13 +28,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imtemplate, sz_val, TY_CHAR)
-	call salloc (insystem, sz_val, TY_CHAR)
-	call salloc (outsystem, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtemplate, SZ_FNAME, TY_CHAR)
+	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (outsystem, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the list of images and output coordinate system.
 	call clgstr ("image", Memc[imtemplate], SZ_FNAME)
@@ -358,7 +355,6 @@ int	ndim			#I the dimension of the wcs
 double	longpole		#I the longpole value assumed
 double	latpole			#I the latpole value assumed
 
-size_t	sz_val
 int	i,j
 pointer	sp, str
 errchk	mw_gwattrs()
@@ -366,8 +362,7 @@ errchk	mw_gwattrs()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("%s wcs\n")
@@ -438,7 +433,6 @@ double	ilatpole	#O the input system latpole value (deg)
 double	olngpole	#O the output system longpole value (deg)
 double	olatpole	#O the output system latpole value (deg)
 
-size_t	sz_val
 double	tilngpole, tilatpole, thetaa, theta0, tilng, tilat, tilngp, tilatp
 double	ntilng, ntilat
 pointer	sp, str
@@ -449,8 +443,7 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the projection type
 	projection = sk_stati (incoo, S_WTYPE)
@@ -769,7 +762,6 @@ double	xscale, yscale			#O the x and y scale factors
 double	xrot				#O the rotation angle in degrees
 double	yrot				#O the rotation angle in degrees
 
-size_t	sz_val
 int	fitstat
 double	xshift, yshift
 pointer	sp, wts
@@ -777,8 +769,7 @@ int	rg_ffit()
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (wts, sz_val, TY_DOUBLE)
+	call salloc (wts, npts, TY_DOUBLE)
 	call amovkd (1.0d0, Memd[wts], npts)
 
 	fitstat = rg_ffit (xref, yref, xin, yin, Memd[wts], npts,

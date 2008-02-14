@@ -13,7 +13,6 @@ procedure gtr_backup (stream)
 
 int	stream				# graphics stream
 
-size_t	sz_val
 int	opcode
 pointer	tr, op, bp, sp, ap
 pointer	gtr_init()
@@ -22,8 +21,7 @@ include	"gtr.com"
 
 begin
 	call smark (sp)
-	sz_val = LEN_PL
-	call salloc (ap, sz_val, TY_STRUCT)
+	call salloc (ap, LEN_PL, TY_STRUCT)
 
 	tr = gtr_init (stream)
 

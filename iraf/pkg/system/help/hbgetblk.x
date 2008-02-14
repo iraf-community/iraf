@@ -32,7 +32,6 @@ int procedure hb_getnextblk (hb, ctrl)
 pointer	hb
 pointer	ctrl
 
-size_t	sz_val
 bool	at_eof
 char	key[SZ_KEY]
 int	fd, n, ip, op, junk
@@ -41,10 +40,8 @@ int	hb_getstr(), strmatch(), getline(), strlen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_SBUF
-	call salloc (sbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (sbuf, SZ_SBUF, TY_CHAR)
 
 	# Search forward for the next help block.
 	fd = H_IN(ctrl)

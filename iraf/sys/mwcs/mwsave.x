@@ -15,7 +15,6 @@ pointer	o_mw			#I pointer to MWCS descriptor
 pointer	bp			#U pointer to save buffer of type char
 int	buflen			#U allocated length of save buffer
 
-size_t	sz_val
 int	nchars, olen
 pointer	mw, sp, sv, op, oo
 errchk	coerce, realloc, mw_newcopy
@@ -24,8 +23,7 @@ int	pl_p2li()
 
 begin
 	call smark (sp)
-	sz_val = LEN_SVHDR
-	call salloc (sv, sz_val, TY_STRUCT)
+	call salloc (sv, LEN_SVHDR, TY_STRUCT)
 
 	# We save a new copy of the MWCS, rather than the MWCS itself,
 	# to discard any dead storage and to cause the runtime descriptor
@@ -41,8 +39,7 @@ begin
 	call aclri (MI_PHYSAX(mw,1), MAX_DIM)
 
 	# Compress the main header to save space.
-	sz_val = MI_LEN(mw) * 3 + 32
-	call salloc (oo, sz_val, TY_SHORT)
+	call salloc (oo, MI_LEN(mw) * 3 + 32, TY_SHORT)
 	olen = pl_p2li (Memi[mw], 1, Mems[oo], MI_LEN(mw))
 
 	# Determine how much space will be needed.

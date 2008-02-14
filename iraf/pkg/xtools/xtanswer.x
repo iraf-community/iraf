@@ -52,15 +52,13 @@ procedure xt_clanswer (parameter, answer)
 char	parameter[ARB]		# CL parameter
 int	answer			# Answer
 
-size_t	sz_val
 pointer	sp, str
 
 int	clgwrd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	switch (clgwrd (parameter, Memc[str], SZ_LINE, "|no|yes|NO|YES|")) {
 	case 1:

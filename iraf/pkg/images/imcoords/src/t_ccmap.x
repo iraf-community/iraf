@@ -42,7 +42,6 @@ int	geometry, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int	nrecords, pixsys, maxiter
 bool	verbose, update, interactive
 
-size_t	sz_val
 double	clgetd()
 pointer	dtmap(), immap(), gopen(), cc_utan(), cc_imtan(), imtopenp(), imtopen()
 pointer	clpopnu()
@@ -55,19 +54,16 @@ errchk	open(), cc_map()
 begin
 	# Get some working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (infile, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (database, sz_val, TY_CHAR)
-	call salloc (insystem, sz_val, TY_CHAR)
-	call salloc (lngref, sz_val, TY_CHAR)
-	call salloc (latref, sz_val, TY_CHAR)
-	call salloc (refsystem, sz_val, TY_CHAR)
-	call salloc (graphics, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (projstr, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (database, SZ_FNAME, TY_CHAR)
+	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (lngref, SZ_FNAME, TY_CHAR)
+	call salloc (latref, SZ_FNAME, TY_CHAR)
+	call salloc (refsystem, SZ_FNAME, TY_CHAR)
+	call salloc (graphics, SZ_FNAME, TY_CHAR)
+	call salloc (projstr, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the input data file list.
 	inlist = clpopnu ("input")
@@ -510,7 +506,6 @@ double	odlatref		#O the output reference point dec / latitude
 int	lngrefunits		#I the input reference ra / longitude units
 int	latrefunits		#I the input reference dec / latitude units
 
-size_t	sz_val
 double	idlngref, idlatref, idepoch
 pointer	sp, str, tcoo, mw
 double	imgetd()
@@ -519,8 +514,7 @@ int	sk_decwcs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	iferr (idlngref = imgetd (im, lngref))
 	    idlngref = INDEFD
@@ -585,7 +579,6 @@ double	ymin, ymax		#I max and min yref values
 bool	update			#I update the image wcs
 bool	verbose			#I verbose mode
 
-size_t	sz_val
 double	mintemp, maxtemp, lngrms, latrms, lngmean, latmean
 pointer	sp, str, projstr
 pointer	xref, yref, lngref, latref, xi, eta, xifit, etafit, lngfit, latfit, wts
@@ -600,12 +593,10 @@ errchk	geo_fitd, geo_mgfitd()
 begin
 	# Get working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (projstr, sz_val, TY_CHAR)
-	call salloc (xerrmsg, sz_val, TY_CHAR)
-	call salloc (yerrmsg, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (projstr, SZ_LINE, TY_CHAR)
+	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
+	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	# Initialize the pointers.
 	xref = NULL
@@ -898,18 +889,15 @@ pointer	lngref, latref		#I pointers to the lng / lat value arrays
 double	xmin, xmax		#I the min and max x values
 double	ymin, ymax		#I the min and max y values
 
-size_t	sz_val
 int	nline, ip, npts, bufsize, nfields, max_fields, nsig, offset
 pointer	sp, inbuf, linebuf, field_pos
 int	getline(), li_get_numd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inbuf, sz_val, TY_CHAR)
-	call salloc (linebuf, sz_val, TY_CHAR)
-	sz_val = MAX_FIELDS
-	call salloc (field_pos, sz_val, TY_INT)
+	call salloc (inbuf, SZ_LINE, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
+	call salloc (field_pos, MAX_FIELDS, TY_INT)
 
 	bufsize = CC_DEFBUFSIZE
 	call malloc (xref, bufsize, TY_DOUBLE)
@@ -1116,13 +1104,11 @@ double	xi[ARB]			#O the fitted xi coordinates
 double	eta[ARB]		#O the fitted eta coordinates
 int	npts			#I the number of points
 
-size_t	sz_val
 pointer	sp, temp
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (temp, sz_val, TY_DOUBLE)
+	call salloc (temp, npts, TY_DOUBLE)
 
 	call dgsvector (sx1, xref, yref, xi, npts)
 	if (sx2 != NULL) {
@@ -1153,15 +1139,13 @@ int	npts			#I the number of points
 double	xirms			#O the output xi rms
 double	etarms			#O the output eta rms
 
-size_t	sz_val
 int	i, index, ngood
 pointer	sp, twts
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (twts, sz_val, TY_DOUBLE)
+	call salloc (twts, npts, TY_DOUBLE)
 
 	# Compute the weights.
 	call amovd (wts, Memd[twts], npts)
@@ -1207,7 +1191,6 @@ double	lngref, latref		#I the coordinates of the reference point
 pointer	sx1, sy1		#I pointer to linear surfaces
 int	comment			#I comment the output ?
 
-size_t	sz_val
 double	xshift, yshift, a, b, c, d, denom
 double	xpix, ypix, xscale, yscale, xrot, yrot
 pointer sp, str, keyword, value
@@ -1217,11 +1200,9 @@ int	sk_stati()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (keyword, sz_val, TY_CHAR)
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
 
 	# Compute the geometric parameters.
 	call geo_gcoeffd (sx1, sy1, xshift, yshift, a, b, c, d)
@@ -1389,7 +1370,6 @@ pointer	sx1, sy1	#I pointer to linear surfaces
 pointer	sx2, sy2	#I pointer to distortion surfaces
 double	lxrms, lyrms	#I the input wcs x and y rms
 
-size_t	sz_val
 double	xshift, yshift, a, b, c, d, denom, xrms, yrms
 double	xpixref, ypixref, xscale, yscale, xrot, yrot
 int	i, npts, ncoeff
@@ -1400,10 +1380,9 @@ int	dgsgeti(), rg_wrdstr(), sk_stati()
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
-	call salloc (keyword, sz_val, TY_CHAR)
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
 
 	# Compute the rms.
 	#npts = max (0, GM_NPTS(fit) - GM_NREJECT(fit) - GM_NWTS0(fit))
@@ -1613,7 +1592,6 @@ double  latfit[ARB]             #I the fitted dec / latitude coordinates
 double  wts[ARB]                #I the weights array
 int     npts                    #I the number of data points
 
-size_t	sz_val
 double  diflng, diflat
 int     i, index
 pointer sp, fmtstr, lngunits, latunits, twts
@@ -1622,13 +1600,10 @@ int     sk_stati()
 begin
         # Allocate working space.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (fmtstr, sz_val, TY_CHAR)
-        sz_val = SZ_FNAME
-        call salloc (lngunits, sz_val, TY_CHAR)
-        call salloc (latunits, sz_val, TY_CHAR)
-        sz_val = npts
-        call salloc (twts, sz_val, TY_DOUBLE)
+        call salloc (fmtstr, SZ_LINE, TY_CHAR)
+        call salloc (lngunits, SZ_FNAME, TY_CHAR)
+        call salloc (latunits, SZ_FNAME, TY_CHAR)
+        call salloc (twts, npts, TY_DOUBLE)
 
         # Get the unit strings.
         switch (sk_stati (coo, S_NLNGUNITS)) {

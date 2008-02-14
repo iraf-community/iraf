@@ -9,7 +9,6 @@ procedure qp_dsym (qp, out)
 pointer	qp			#I QPOE descriptor
 int	out			#I output file
 
-size_t	sz_val
 int	nsyms, i
 pointer	sp, st, sym, op, pname, syms
 pointer	sthead(), stnext(), stname()
@@ -24,8 +23,7 @@ begin
 	    nsyms = nsyms + 1
 
 	# Construct a reversed array of symbol pointers.
-	sz_val = nsyms
-	call salloc (syms, sz_val, TY_POINTER) 
+	call salloc (syms, nsyms, TY_POINTER) 
 	op = syms + nsyms - 1
 	for (sym=sthead(st);  sym != NULL;  sym=stnext(st,sym)) {
 	    Memi[op] = sym

@@ -43,7 +43,6 @@ char	module[ARB]		# name of module for which help is desired
 int	modnum			# module number within package directory
 pointer	ctrl			# help control parameters
 
-size_t	sz_val
 bool	not_found
 int	option
 pointer	sp, fname, pakname, modname
@@ -51,11 +50,9 @@ int	hd_getname()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pakname, sz_val, TY_CHAR)
-	call salloc (modname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (pakname, SZ_FNAME, TY_CHAR)
+	call salloc (modname, SZ_FNAME, TY_CHAR)
 
 	# Handle options which do not access a help file.
 	option = H_OPTION(ctrl)

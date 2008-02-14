@@ -12,7 +12,6 @@ procedure blink()
 char	token[SZ_LINE]
 int	tok, count, rate
 int	sets, button, i
-size_t	sz_val
 int	ctoi(), ip
 pointer	sp, setp, ptr
 int	cv_rdbut()
@@ -42,8 +41,7 @@ begin
 	# The "3" is to hold frame/color/quad for one frame;
 	# the "2" is to allow duplication of each frame so that
 	# some frames can stay "on" longer.  The extra "1" is for graphics.
-	sz_val = 2 * 3 * (cv_maxframes+1)
-	call salloc (setp, sz_val, TY_POINTER)
+	call salloc (setp, 2 * 3 * (cv_maxframes+1), TY_POINTER)
 	sets = 0
 
 	# which frames to blink
@@ -53,8 +51,7 @@ begin
 	while ( (sets <= cv_maxframes+1) && (tok != TOK_NEWLINE) ) {
 	    sets = sets + 1
 	    ptr = setp + (3 * (sets-1))
-	    sz_val = IDS_MAXIMPL+1
-	    call salloc (Memi[ptr], sz_val, TY_SHORT)
+	    call salloc (Memi[ptr], IDS_MAXIMPL+1, TY_SHORT)
 	    if (tok == TOK_IDENTIFIER) {
 	        if (token[1] == 'f') {
 	            call cv_frame (token[2], Mems[Memi[ptr]])
@@ -82,10 +79,8 @@ errmsg
 		return
 	    }
 	    ptr = ptr + 1
-	    sz_val = IDS_MAXGCOLOR+1
-	    call salloc (Memi[ptr], sz_val, TY_SHORT)
-	    sz_val = 5
-	    call salloc (Memi[ptr+1], sz_val, TY_SHORT)
+	    call salloc (Memi[ptr], IDS_MAXGCOLOR+1, TY_SHORT)
+	    call salloc (Memi[ptr+1], 5, TY_SHORT)
 	    Mems[Memi[ptr]] = IDS_EOD		# default all colors
 	    Mems[Memi[ptr+1]] = IDS_EOD		# default all quads
 	    call gargtok (tok, token, SZ_LINE)

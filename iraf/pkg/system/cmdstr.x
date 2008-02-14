@@ -11,19 +11,15 @@ procedure t_cmdstr()
 
 bool	hidden, hparam
 pointer	sp, ltask, pname, ibuf, obuf, ip, op, pp, nl, last
-size_t	sz_val
 int	getline(), gstrcpy(), strncmp()
 bool	clgetb()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (ltask, sz_val, TY_CHAR)
-	call salloc (pname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (ibuf, sz_val, TY_CHAR)
-	sz_val = SZ_CMDSTR
-	call salloc (obuf, sz_val, TY_CHAR)
+	call salloc (ltask, SZ_FNAME, TY_CHAR)
+	call salloc (pname, SZ_FNAME, TY_CHAR)
+	call salloc (ibuf, SZ_LINE, TY_CHAR)
+	call salloc (obuf, SZ_CMDSTR, TY_CHAR)
 
 	# Get the task name and whether to print hidden parameters.
 	call clgstr ("task", Memc[ltask], SZ_FNAME)

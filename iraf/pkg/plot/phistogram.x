@@ -33,7 +33,6 @@ int	isimage, npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, hist_type
 pointer im, tx, sp, hgm, hgmr, buf, input, str, v
 real	z1, z2, dz, z1temp, z2temp, zstart
 
-size_t	sz_val
 bool	streq(), clgetb(), fp_equalr()
 int	clgeti(), clgwrd(), open(), ph_gdata(), imgnlr(), imgnli()
 pointer	immap()
@@ -42,12 +41,9 @@ errchk	immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = SZ_CHOICE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v, sz_val, TY_LONG)
+	call salloc (input, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_CHOICE, TY_CHAR)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
 	# Get the image name.
 	call clgstr ("input", Memc[input], SZ_LINE)
@@ -137,8 +133,7 @@ begin
 	nbins1 = nbins + 1
 
 	# Initialize the histogram buffer and image line vector.
-	sz_val = nbins1
-	call salloc (hgm, sz_val, TY_INT)
+	call salloc (hgm,  nbins1, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
 
 	# Read successive lines of the image and accumulate the histogram.
@@ -235,8 +230,7 @@ begin
 	    # Convert the histogram to the correct data type for plotting
 	    # and do the plot.
 
-	    sz_val = nbins
-	    call salloc (hgmr, sz_val, TY_REAL)
+	    call salloc (hgmr, nbins, TY_REAL)
 	    call achtir (Memi[hgm], Memr[hgmr], nbins)
 	    if (isimage == YES)
 	        call ph_plot (Memr[hgmr], nbins, z1, z2, dz, hist_type,
@@ -306,7 +300,6 @@ int	hist_type		# the histogram type
 char	hsource[ARB]		# source of the histogram data
 char	hid[ARB]		# the id of the histogram
 
-size_t	sz_val
 pointer	sp, title, xlabel, ylabel, device, str, gp
 real	hmin, hmax, wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2
 bool	clgetb(), streq()
@@ -317,10 +310,8 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	sz_val = max (SZ_CHOICE, SZ_TITLE)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (str, max (SZ_CHOICE, SZ_TITLE), TY_CHAR)
 
 	call clgstr ("device", Memc[device], SZ_FNAME)
 	if (! clgetb ("append")) {
@@ -380,11 +371,9 @@ begin
 		call gseti (gp, G_YNMINOR, clgeti ("minry"))
 
 	        # Allocate space for the labels and title.
-	        sz_val = SZ_TITLE
-	        call salloc (title, sz_val, TY_CHAR)
-	        sz_val = SZ_FNAME
-	        call salloc (xlabel, sz_val, TY_CHAR)
-	        call salloc (ylabel, sz_val, TY_CHAR)
+	        call salloc (title, SZ_TITLE, TY_CHAR)
+	        call salloc (xlabel, SZ_FNAME, TY_CHAR)
+	        call salloc (ylabel, SZ_FNAME, TY_CHAR)
 
 	        # Format the x and y axis labels.
 	        call clgstr ("xlabel", Memc[xlabel], SZ_FNAME)

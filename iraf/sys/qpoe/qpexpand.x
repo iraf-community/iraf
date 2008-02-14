@@ -15,7 +15,6 @@ char	s1[ARB]			#I input string containing macros
 char	s2[maxch]		#O output string buffer
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, tokbuf, in
 int	token, op, otop
 int	gstrcpy(), qp_gettok()
@@ -23,8 +22,7 @@ pointer	qp_opentext()
 
 begin
 	call smark (sp)
-	sz_val = SZ_TOKBUF
-	call salloc (tokbuf, sz_val, TY_CHAR)
+	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
 
 	# Open input text for macro expanded token input.
 	in = qp_opentext (qp, s1)

@@ -124,7 +124,6 @@ procedure xh_ghelpdb (xh)
 
 pointer	xh					# task descriptor
 
-size_t	sz_val
 pointer	sp, hdb, hdbstr, name, list
 int	fntgfnb()
 int	access(), envgets()
@@ -133,11 +132,9 @@ pointer	fntopnb()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (name, sz_val, TY_CHAR)
-	sz_val = SZ_HELPDB
-	call salloc (hdb, sz_val, TY_CHAR)
-	call salloc (hdbstr, sz_val, TY_CHAR)
+	call salloc (name, SZ_FNAME, TY_CHAR)
+	call salloc (hdb, SZ_HELPDB, TY_CHAR)
+	call salloc (hdbstr, SZ_HELPDB, TY_CHAR)
 
 	# Clear the working memory.
 	call aclrc (Memc[name], SZ_FNAME)

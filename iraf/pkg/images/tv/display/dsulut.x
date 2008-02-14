@@ -17,7 +17,6 @@ char	fname[SZ_FNAME]		# Name of file with intensity, greyscale values
 real	z1			# Intensity mapped to minimum gs value
 real	z2			# Intensity mapped to maximum gs value
 
-size_t	sz_val
 pointer	lut, sp, x, y
 int	nvalues, i, j, x1, x2, y1
 real	delta_gs, delta_xv, slope
@@ -25,9 +24,8 @@ errchk	ds_ulutread, ds_ulutsort, malloc
 
 begin
 	call smark (sp)
-	sz_val = U_MAXPTS
-	call salloc (x, sz_val, TY_REAL)	
-	call salloc (y, sz_val, TY_REAL)
+	call salloc (x, U_MAXPTS, TY_REAL)	
+	call salloc (y, U_MAXPTS, TY_REAL)
 
 	# Read intensities and greyscales from the user's input file.  The
 	# intensity range is then mapped into a standard range and the 
@@ -77,7 +75,6 @@ real	x[U_MAXPTS]		# Array of x values, filled on return
 real	y[U_MAXPTS]		# Array of y values, filled on return
 int	nvalues			# Number of values in x, y vectors - returned
 
-size_t	sz_val
 int	n, fd
 pointer	sp, lbuf, ip
 real	xval, yval
@@ -86,8 +83,7 @@ errchk	open, sscan, getline, salloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	iferr (fd = open (utab, READ_ONLY, TEXT_FILE))
 	    call error (1, "Error opening user lookup table")

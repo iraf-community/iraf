@@ -11,7 +11,6 @@ a nofill block are FI (resume filling) and RJ (right justify).
 
 int procedure nofill (in, out, linebuf)
 
-size_t	sz_val
 extern	in(), out()
 char	linebuf[ARB]
 int	ip, command
@@ -22,8 +21,7 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (rjbuf, sz_val, TY_CHAR)
+	call salloc (rjbuf, SZ_IBUF, TY_CHAR)
 
 	call breakline (out, NJ)
 

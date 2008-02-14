@@ -18,7 +18,6 @@ char	title[ARB]		# plot title (may be more than one line)
 char	xlabel[ARB]		# X axis label
 char	ylabel[ARB]		# Y axis label
 
-size_t	sz_val
 char	label[SZ_LABEL]
 int	axis, wcs, ntitlelines, ip, major_tick
 int	save_plcolor, save_txcolor, save_facolor
@@ -36,11 +35,10 @@ errchk	glb_label_axis, glb_plot_title, glb_gettick
 
 begin
 	call smark (sp)
-	sz_val = LEN_AX
-	call salloc (axes[1], sz_val, TY_STRUCT)
-	call salloc (axes[2], sz_val, TY_STRUCT)
-	call salloc (axes[3], sz_val, TY_STRUCT)
-	call salloc (axes[4], sz_val, TY_STRUCT)
+	call salloc (axes[1], LEN_AX, TY_STRUCT)
+	call salloc (axes[2], LEN_AX, TY_STRUCT)
+	call salloc (axes[3], LEN_AX, TY_STRUCT)
+	call salloc (axes[4], LEN_AX, TY_STRUCT)
 
 	wcs = GP_WCS(gp)
 	w   = GP_WCSPTR(gp,wcs)

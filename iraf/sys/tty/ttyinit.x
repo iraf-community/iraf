@@ -18,7 +18,6 @@ procedure ttyinit (fd, tty)
 int	fd			# file descriptor of terminal
 pointer	tty			# tty descriptor
 
-size_t	sz_val
 pointer	sp, fname
 int	in, junk, rawmode
 int	ttyctrl(), ttygets(), open(), fstati()
@@ -26,8 +25,7 @@ errchk	ttygets, fcopyo
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# Output contents of initialization file, if any.
 	if (ttygets (tty, "if", Memc[fname], SZ_PATHNAME) > 0)

@@ -14,7 +14,6 @@ int	px_depth		#I pixel depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-size_t	sz_val
 int	np
 pointer	sp, px_out, ll_src
 pointer	pl_access()
@@ -29,8 +28,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = npix
-	call salloc (px_out, sz_val, TY_SHORT)
+	call salloc (px_out, npix, TY_SHORT)
 
 	np = pl_l2ps (Mems[ll_src], v[1], Mems[px_out], npix)
 	call pl_pixrops (Mems[px_out], 1, PL_MAXVAL(pl),

@@ -28,7 +28,6 @@ int	i, ip, op, len_exprbuf, fd, nchars, ch
 int	undim, npix, depth
 bool	verbose
 
-size_t	sz_val
 pointer	me_getexprdb(), me_expandtext(), immap(), me_mkmask(), imtopenp()
 long	fstatl()
 int	imtlen(), open(), getci(), imtgetim(), ctoi()
@@ -75,15 +74,12 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (exprdb, sz_val, TY_CHAR)
-	call salloc (dims, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (uaxlen, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (mskname, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (refname, sz_val, TY_CHAR)
+	call salloc (exprdb, SZ_FNAME, TY_CHAR)
+	call salloc (dims, SZ_FNAME, TY_CHAR)
+	call salloc (uaxlen, IM_MAXDIM, TY_LONG)
+	call salloc (mskname, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (refname, SZ_FNAME, TY_CHAR)
 
 	# Get remaining parameters,
 	call clgstr ("exprdb", Memc[exprdb], SZ_PATHNAME)

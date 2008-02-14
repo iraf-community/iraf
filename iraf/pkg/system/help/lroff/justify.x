@@ -8,7 +8,6 @@ include	"lroff.h"
 
 procedure right_justify (in, out, linebuf, ip)
 
-size_t	sz_val
 extern	in(), out()
 char	linebuf[ARB]
 int	ip
@@ -19,8 +18,7 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (rjbuf, sz_val, TY_CHAR)
+	call salloc (rjbuf, SZ_IBUF, TY_CHAR)
 
 	call breakline (out, NJ)
 	if (input (in, Memc[rjbuf]) != EOF)

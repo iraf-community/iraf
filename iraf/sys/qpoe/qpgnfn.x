@@ -70,7 +70,6 @@ pointer	qp			#I QPOE descriptor
 char	template[ARB]		#I field name template
 bool	sort			#I sort list of matched names?
 
-size_t	sz_val
 pointer	sp, patbuf, pattern, sym, fl, st, offv, sbuf, ip, op
 int	len_offv, sz_sbuf, nsyms, nc, junk, nchars, i, nmatch
 
@@ -81,9 +80,8 @@ errchk	calloc, malloc, realloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (pattern, sz_val, TY_CHAR)
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_LINE, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Allocate the list descriptor.
 	call calloc (fl, LEN_FL, TY_STRUCT)

@@ -16,7 +16,6 @@ procedure gki_closews (fd, device)
 int	fd			# output file
 char	device[ARB]		# device name
 
-size_t	sz_val
 pointer	epa
 int	ip, nchars, n
 pointer	sp, gki, op
@@ -27,8 +26,7 @@ begin
 	call smark (sp)
 
 	n = strlen (device)
-	sz_val = GKI_CLOSEWS_LEN + n
-	call salloc (gki, sz_val, TY_SHORT)
+	call salloc (gki, GKI_CLOSEWS_LEN + n, TY_SHORT)
 
 	# Pack the device name as a SHORT integer array.
 	op = gki + GKI_CLOSEWS_D - 1

@@ -18,7 +18,6 @@ real	x, y
 pointer	sp, cmd, imname, imlist, gp, ie, im
 int	curtype, key, redraw, mode, nframes, nargs
  
-size_t	sz_val
 bool	clgetb()
 pointer	gopen(), ie_gimage()
 pointer	imtopen()
@@ -27,14 +26,10 @@ int	btoi(), clgeti(), imtlen()
 
 begin
 	call smark (sp)
-	sz_val = IE_LEN
-	call salloc (ie, sz_val, TY_STRUCT)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	sz_val = SZ_IMLIST
-	call salloc (imlist, sz_val, TY_CHAR)
+	call salloc (ie, IE_LEN, TY_STRUCT)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (imlist, SZ_IMLIST, TY_CHAR)
 
 	# Initialize the imexamine descriptor.
 	call aclri (Memi[ie], IE_LEN)
@@ -327,7 +322,6 @@ pointer	ie			#I imexamine descriptor
 char	image[ARB]		#I image name
 pointer	imlist			#I image list
 
-size_t	sz_val
 int	i
 bool	inlist
 pointer	im, sp, lname
@@ -337,8 +331,7 @@ bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (lname, sz_val, TY_CHAR)
+	call salloc (lname, SZ_FNAME, TY_CHAR)
 
 	# Is image already in list?
 	inlist = false

@@ -63,7 +63,6 @@ pointer	pm			#I pointer to the psf matching structure
 int	rp			#I pointer to current region
 int	max_nregions		#I maximum number of regions
 
-size_t	sz_val
 int	nregions, wcs, key, x1, x2, y1, y2
 pointer	sp, region, cmd
 real	x, y, xc, yc
@@ -73,10 +72,8 @@ pointer	rg_pstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (region, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (region, SZ_FNAME, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_prealloc (pm, max_nregions)
@@ -158,7 +155,6 @@ pointer	pm			#I pointer to psf matching structure
 int	rp			#I pointer to current region
 int	max_nregions		#I maximum number of regions
 
-size_t	sz_val
 int	nregions, x1, y1, x2, y2
 pointer	sp, line
 real	x, y, xc, yc
@@ -168,8 +164,7 @@ pointer	rg_pstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_prealloc (pm, max_nregions)
@@ -240,7 +235,6 @@ pointer	pm			#I pointer to psf matching structure
 int	rp			#I pointer to the current region
 int	max_nregions		#I maximum number of regions
 
-size_t	sz_val
 int	ncols, nlines, nregions
 int	x1, x2, y1, y2
 pointer	sp, region
@@ -251,8 +245,7 @@ pointer	rg_pstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (region, sz_val, TY_CHAR)
+	call salloc (region, SZ_LINE, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information.
 	call rg_prealloc (pm, max_nregions)
@@ -328,7 +321,6 @@ real    xstart, ystart			#I initial position
 int     boxsize				#I width of the centering box
 real    xcntr, ycntr			#O computed center
 
-size_t	sz_val
 int     x1, x2, y1, y2, half_box
 int     ncols, nrows, nx, ny, try
 real    xinit, yinit
@@ -366,17 +358,14 @@ begin
             # Compute the new center.
             call smark (sp)
 	    if (IM_NDIM(im) == 1) {
-                sz_val = nx
-                call salloc (x_vect, sz_val, TY_REAL)
+                call salloc (x_vect, nx, TY_REAL)
  	        call aclrr (Memr[x_vect], nx)
                 call rg_prowsum (Memr[bufptr], Memr[x_vect], nx, ny)
                 call rg_pcenter (Memr[x_vect], nx, xcntr)
 		ycntr = 1
 	    } else {
-                sz_val = nx
-                call salloc (x_vect, sz_val, TY_REAL)
-                sz_val = ny
-                call salloc (y_vect, sz_val, TY_REAL)
+                call salloc (x_vect, nx, TY_REAL)
+                call salloc (y_vect, ny, TY_REAL)
  	        call aclrr (Memr[x_vect], nx)
                 call aclrr (Memr[y_vect], ny)
                 call rg_prowsum (Memr[bufptr], Memr[x_vect], nx, ny)

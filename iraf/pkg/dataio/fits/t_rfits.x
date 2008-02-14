@@ -16,7 +16,6 @@ pointer	inlist, outlist
 pointer	sp, infile, file_list, outfile, ext_list, in_fname, out_fname
 pointer	pl, axes
 
-size_t	sz_val
 bool	clgetb(), pl_linenotempty()
 #char	clgetc()
 int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi(), fntlenb()
@@ -33,19 +32,13 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (infile, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (file_list, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (outfile, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (ext_list, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (in_fname, sz_val, TY_CHAR)
-	call salloc (out_fname, sz_val, TY_CHAR)
-	sz_val = 2
-	call salloc (axes, sz_val, TY_INT)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (file_list, SZ_LINE, TY_CHAR)
+	call salloc (outfile, SZ_FNAME, TY_CHAR)
+	call salloc (ext_list, SZ_LINE, TY_CHAR)
+	call salloc (in_fname, SZ_FNAME, TY_CHAR)
+	call salloc (out_fname, SZ_FNAME, TY_CHAR)
+	call salloc (axes, 2, TY_INT)
 
 	# Get RFITS parameters.
 	call clgstr ("fits_file", Memc[infile], SZ_FNAME)
