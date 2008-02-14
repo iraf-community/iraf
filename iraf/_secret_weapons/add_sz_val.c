@@ -222,16 +222,36 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	int  prev_line_idx = -1;
 	int j;
 	bool target_found = false;
+	bool prev_if_or_else = false;
 	for ( j=proc_begin[i]+1 ; j < proc_end[i] ; j++ ) {
 	    const char *ip;
 	    const char *ptr_call_begin;
 	    const char *ptr_proc_begin;
 	    int arg_cnt = 0;
+	    bool flg_prev_if;
 	    if ( DEBUG ) {
 		fprintf(stderr,"debug: j = %d\n",j);
 	    }
 	    ip = lines[j];
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
+	    if ( *ip == '#' || *ip == '\n' ) continue;
+	    /* */
+	    flg_prev_if = prev_if_or_else;
+	    /* */
+	    prev_if_or_else = false;
+	    if ( (strncmp(ip,"if",2)==0 && is_valchar(ip[2])==0) ||
+		 (strncmp(ip,"else",4)==0 && is_valchar(ip[4])==0) ||
+		 (strncmp(ip,"while",5)==0 && is_valchar(ip[5])==0) ||
+		 (strncmp(ip,"do",2)==0 && is_valchar(ip[2])==0) ||
+		 (strncmp(ip,"for",3)==0 && is_valchar(ip[3])==0) ||
+		 (strncmp(ip,"repeat",6)==0 && is_valchar(ip[6])==0) ||
+		 (strncmp(ip,"iferr",5)==0 && is_valchar(ip[5])==0) ||
+		 (strncmp(ip,"ifnoerr",7)==0 && is_valchar(ip[7])==0) ) {
+		if ( strrchr(ip,'{') == NULL ) {
+		    prev_if_or_else = true;
+		}
+	    }
+	    /* */
 	    if ( strncmp(ip,"call ",5) != 0 && strncmp(ip,"call\t",5) != 0 ) {
 		continue;
 	    }
@@ -244,6 +264,13 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    if ( *ip != ' ' && *ip != '\t' && *ip != '(' ) continue;
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
 	    if ( *ip != '(' ) continue;
+	    /* */
+	    if ( flg_prev_if == true ) {
+		fprintf(stderr,
+			"[ERROR] line: %d: previous line contains `if' or `else' without a brace\n",
+			j+1);
+		goto quit;
+	    }
 	    /* 1st arg begins... */
 	    if ( DEBUG ) {
 		fprintf(stderr,"debug: 1st arg begins...\n");
