@@ -24,7 +24,7 @@ real	aplow[2], aphigh[2]		# Aperture limits
 char	coeff[ARB]			# Nonlinear coeff string
 
 bool	fp_equald()
-int	i, j, sz_val, strlen()
+int	i, j, sz_len, strlen()
 double	a, b
 pointer	sp, str, val, mw
 errchk	smw_mw
@@ -128,11 +128,11 @@ start_
 	    # Use STRCAT instead.
 
 	    call smw_mw (smw, index1, index2, mw, i, j)
-	    sz_val = strlen (coeff) + SZ_LINE
-	    call salloc (val, sz_val, TY_CHAR)
+	    sz_len = strlen (coeff) + SZ_LINE
+	    call salloc (val, sz_len, TY_CHAR)
 	    call sprintf (Memc[str], SZ_LINE, "spec%d")
 		call pargi (i)
-	    call sprintf (Memc[val], sz_val,
+	    call sprintf (Memc[val], sz_len,
 		"%d %d %d %.14g %.14g %d %.14g %.2f %.2f")
 		call pargi (ap)
 		call pargi (beam)
@@ -149,8 +149,8 @@ start_
 		call pargr (aplow[1])
 		call pargr (aphigh[1])
 	    if (coeff[1] != EOS) {
-		call strcat (" ", Memc[val], sz_val)
-		call strcat (coeff, Memc[val], sz_val)
+		call strcat (" ", Memc[val], sz_len)
+		call strcat (coeff, Memc[val], sz_len)
 	    }
 	    call mw_swattrs (mw, 2, Memc[str], Memc[val])
 
