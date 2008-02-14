@@ -16,6 +16,7 @@ pointer	gp			# graphics descriptor
 char	title[ARB]		# title block
 int	ntitlelines		# number of lines in title block
 
+size_t	sz_val
 int	lineno, ip, wcs
 real	char_height, x, y, dy
 pointer sp, op, lbuf, format, w
@@ -26,8 +27,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (format, SZ_FORMAT, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FORMAT
+	call salloc (format, sz_val, TY_CHAR)
 
 	char_height = ggetr (gp, "ch")
 	if (char_height < EPSILON)

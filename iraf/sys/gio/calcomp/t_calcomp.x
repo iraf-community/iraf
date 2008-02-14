@@ -18,6 +18,7 @@ pointer	list, gki, sp, fname, devname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 char	txquality[SZ_TXQUALITY]
+size_t	sz_val
 bool	clgetb()
 char	clgetc()
 real	clgetr()
@@ -29,8 +30,9 @@ include "ccp.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (devname, sz_val, TY_CHAR)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")

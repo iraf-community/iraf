@@ -139,6 +139,7 @@ pointer	file[QM_MAXFILES]
 long	fi[LEN_FINFO], date[QM_MAXFILES], stdate
 pointer sp, qmfiles, qmsave, cbuf, qm, st, st_start, start, sym, ps, ip, op
 
+size_t	sz_val
 long	clktime()
 int	envfind(), finfo(), open()
 pointer stopen(), stenter(), stfind(), strestore()
@@ -149,9 +150,12 @@ data	qm /NULL/
 
 begin
 	call smark (sp)
-	call salloc (qmfiles, SZ_LINE, TY_CHAR)
-	call salloc (qmsave, SZ_PATHNAME, TY_CHAR)
-	call salloc (cbuf, QM_SZCBUF, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (qmfiles, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (qmsave, sz_val, TY_CHAR)
+	sz_val = QM_SZCBUF
+	call salloc (cbuf, sz_val, TY_CHAR)
 
 	# Open the QM descriptor only once (per process).
 	if (qm == NULL) {
@@ -360,6 +364,7 @@ pointer qm			#I QM descriptor
 int	fd			#I input stream
 int	flags			#I scan flags
 
+size_t	sz_val
 int	ch
 bool	is_define, is_set
 int	symarg, junk, buflen, i
@@ -373,7 +378,8 @@ define	next_ 91
 
 begin
 	call smark (sp)
-	call salloc (mname, SZ_MNAME, TY_CHAR)
+	sz_val = SZ_MNAME
+	call salloc (mname, sz_val, TY_CHAR)
 	call malloc (mvbuf, SZ_MVBUF, TY_CHAR)
 
 	st = QM_ST(qm)

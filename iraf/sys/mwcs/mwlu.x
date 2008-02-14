@@ -21,13 +21,15 @@ double	a[ndim,ndim]		#U matrix to be inverted; inverted matrix
 int	ix[ndim]		#O vector describing row permutation
 int	ndim			#I dimension of square matrix
 
+size_t	sz_val
 pointer	sp, vv
 int	d, i, j, k, imax
 double	aamax, sum, dum
 
 begin
 	call smark (sp)
-	call salloc (vv, ndim, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (vv, sz_val, TY_DOUBLE)
 
 	# Keep track of the number of row interchanges, odd or even (not used).
 	d = 1

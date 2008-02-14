@@ -572,6 +572,7 @@ pointer	pm		# pointer to psfmatch structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
+size_t	sz_val
 int	index, ip
 pointer	sp, temp
 real	rval
@@ -579,7 +580,8 @@ int	strdic(), fnldir(), ctor()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 
 	switch (param) {
 	case BSTRING:

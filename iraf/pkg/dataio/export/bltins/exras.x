@@ -40,6 +40,7 @@ procedure ex_ras (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, cmap
 long	header[SZ_RASHDR]
 int	i, flags
@@ -101,7 +102,8 @@ begin
 	# If we have a colormap write that out now.
 	if (bitset(flags, OF_CMAP)) {
 	    call smark (sp)
-	    call salloc (cmap, 3*CMAP_SIZE, TY_CHAR)
+	    sz_val = 3*CMAP_SIZE
+	    call salloc (cmap, sz_val, TY_CHAR)
 
 	    call achtcb (Memc[EX_CMAP(ex)], Memc[cmap], (3 * CMAP_SIZE))
 	    call write (EX_FD(ex), Memc[cmap], ((3 * CMAP_SIZE) / SZB_CHAR))

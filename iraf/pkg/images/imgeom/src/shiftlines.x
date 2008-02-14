@@ -21,6 +21,7 @@ int	boundary			# Boundary extension type
 real	constant			# Constant boundary extension
 char	interpstr[ARB]			# Interpolation type
 
+size_t	sz_val
 int	i, nsinc, nincr, ncols, nimcols, nlines, nbpix, nmargin, interpolation
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 real	dx, deltax, cx
@@ -65,7 +66,8 @@ begin
 
 	# Allocate space for and set up the interpolation coordinates.
 	call smark (sp)
-	call salloc (x, 2 * ncols, TY_REAL)
+	sz_val = 2 * ncols
+	call salloc (x, sz_val, TY_REAL)
 	deltax = deltax + nmargin
 	if (interpolation == II_DRIZZLE) {
 	    do i = 1, ncols {

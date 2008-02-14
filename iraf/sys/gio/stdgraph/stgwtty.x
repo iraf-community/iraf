@@ -34,6 +34,7 @@ int	fd			#I output stream
 char	text[ARB]		#I text to be output
 int	nchars			#I nchars to be written
 
+size_t	sz_val
 int	ip, delim
 pointer	sp, lbuf, op
 include	"stdgraph.com"
@@ -71,7 +72,8 @@ begin
 	    # graphics mode, regardless of the state of g_enable when issued.
 
 	    call smark (sp)
-	    call salloc (lbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (lbuf, sz_val, TY_CHAR)
 
 	    if (g_enable == YES)
 		call stg_gdisab()

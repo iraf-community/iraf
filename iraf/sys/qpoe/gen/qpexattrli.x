@@ -29,6 +29,7 @@ pointer	xs			#U pointer to array of start values
 pointer	xe			#U pointer to array of end values
 int	xlen			#U length of xs/xe arrays
 
+size_t	sz_val
 pointer	ps, pe, qs, qe
 pointer	sp, expr, ip, ep
 int	plen, qlen, np, nq, nx
@@ -47,7 +48,8 @@ begin
 
 	repeat {
 	    maxch = maxch * 2
-	    call salloc (expr, maxch, TY_CHAR)
+	    sz_val = maxch
+	    call salloc (expr, sz_val, TY_CHAR)
 	    nchars = qpex_getattribute (ex, attribute, Memc[expr], maxch)
 	    if (nchars <= 0)
 		break

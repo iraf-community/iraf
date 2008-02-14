@@ -19,6 +19,7 @@ long	vs_stn[PL_MAXDIM]	#I start vector in stencil mask
 long	vn[PL_MAXDIM]		#I vector giving subregion size
 long	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src
 pointer	sp, ll_out, ll_src, ll_dst, ll_stn, ol_src, ol_dst, ol_stn
 long	v_src[PL_MAXDIM], v_dst[PL_MAXDIM], v_stn[PL_MAXDIM]
@@ -36,7 +37,8 @@ begin
 	    call syserr (SYS_PLNULLSRC)
 
 	call smark (sp)
-	call salloc (ll_out, LL_MAXLEN(pl_dst), TY_SHORT)
+	sz_val = LL_MAXLEN(pl_dst)
+	call salloc (ll_out, sz_val, TY_SHORT)
 
 	# Initialize the N-dimensional loop counters.
 	call plsslv (pl_dst, vs_dst, vn, v_dst, ve_dst)

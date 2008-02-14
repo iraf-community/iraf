@@ -14,6 +14,7 @@ pointer	list1, list2, sp, imtlist1, imtlist2, image1, image2, imtemp, str
 pointer	fmd, im1, im2, kernel
 real	rinner, router, ratio, theta, constant, a1, b1, c1, f1, a2, b2, c2, f2
 
+size_t	sz_val
 bool	clgetb(), fp_equalr()
 int	clgeti(), imtgetim(), imtlen(), clgwrd(), btoi()
 int	med_mkring()
@@ -24,12 +25,15 @@ errchk	med_ell_gauss, med_mkring, fmd_maxmin, fmd_modring
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Allcoate space for the fmode structure.
 	call calloc (fmd, LEN_FRMODE_STRUCT, TY_STRUCT)

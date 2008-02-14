@@ -16,6 +16,7 @@ real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	nm[3,nimages]		# Noise model parameters
 int	nimages			# Number of images
+size_t	sz_val
 int	npts			# Number of output points per line
 $if (datatype == sil)
 real	average[npts]		# Average
@@ -53,7 +54,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -275,6 +277,7 @@ real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
+size_t	sz_val
 int	npts			# Number of output points per line
 $if (datatype == sil)
 real	median[npts]		# Median
@@ -307,7 +310,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]

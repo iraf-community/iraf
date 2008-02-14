@@ -23,6 +23,7 @@ pointer	refim			#I Reference image pointer
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
+size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -30,7 +31,8 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -82,6 +84,7 @@ int	match			#I Match by physical coordinates?
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
+size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -89,7 +92,8 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -212,6 +216,7 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
+size_t	sz_val
 int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
@@ -221,8 +226,9 @@ errchk	immap, mw_openim, im_pmmapo
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
@@ -476,6 +482,7 @@ procedure xt_pminvert (pm)
 
 pointer	pm		#I Pixel mask to be inverted
 
+size_t	sz_val
 int	i, naxes, axlen[IM_MAXDIM], depth, npix, val
 pointer	sp, v, buf, one
 bool	pm_linenotempty()
@@ -484,9 +491,12 @@ begin
 	call pm_gsize (pm, naxes, axlen, depth)
 
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call salloc (buf, axlen[1], TY_INT)
-	call salloc (one, 6, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = axlen[1]
+	call salloc (buf, sz_val, TY_INT)
+	sz_val = 6
+	call salloc (one, sz_val, TY_INT)
 
 	npix = axlen[1]
 	RLI_LEN(one) = 2

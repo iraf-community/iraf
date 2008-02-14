@@ -11,6 +11,7 @@ pointer	sf		# pointer to surface descriptor structure
 int	surf_type	# type of surface to be fitted
 int	xorder		# x order of surface to be fit, or in the case of the
 			# spline the number of polynomial pieces in x to be fit
+size_t	sz_val
 int	yorder		# y order of surface to be fit, or in the case of the
 			# spline the number of polynomial pieces in y to be fit
 int	xterms		# cross terms for polynomials?
@@ -101,8 +102,10 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	call salloc (x, SF_NCOLS(sf), MEM_TYPE)
-	call salloc (y, SF_NLINES(sf), MEM_TYPE)
+	sz_val = SF_NCOLS(sf)
+	call salloc (x, sz_val, MEM_TYPE)
+	sz_val = SF_NLINES(sf)
+	call salloc (y, sz_val, MEM_TYPE)
 
 	# calculate all possible x basis functions and store
 	do i = 1, SF_NCOLS(sf)

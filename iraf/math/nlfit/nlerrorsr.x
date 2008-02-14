@@ -23,6 +23,7 @@ real	variance	# variance of the fit
 real	chisqr		# reduced chi-squared of fit (output)
 real	errors[ARB]	# errors in coefficients (output)
 
+size_t	sz_val
 int	i, n, nfree
 pointer	sp, covptr
 real   factor
@@ -30,7 +31,8 @@ real   factor
 begin
 	# Allocate space for covariance vector.
 	call smark (sp)
-	call salloc (covptr, NL_NPARAMS(nl), TY_REAL)
+	sz_val = NL_NPARAMS(nl)
+	call salloc (covptr, sz_val, TY_REAL)
 
 	# Estimate the variance and reduce chi-squared of the fit.
 	n = 0

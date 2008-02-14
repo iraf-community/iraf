@@ -19,6 +19,7 @@ real    tx, ty                  #I x, y offsets.
 real	z1, z2			#I min and maximum grey scale values.
 int	ztr			#I greyscale transformation code.
 
+size_t	sz_val
 pointer	sp, old_wcs, mapping, wcstext, dir, fname, ftemp, device
 int	wcsfile, server, chan[MAXCHAN]
 int	fstati(), imstati(), envfind(), open(), strncmp()
@@ -27,9 +28,10 @@ include "iis.com"
 
 begin
 	call smark (sp)
-	call salloc (old_wcs, SZ_WCSTEXT, TY_CHAR)
-	call salloc (mapping, SZ_WCSTEXT, TY_CHAR)
-	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
+	sz_val = SZ_WCSTEXT
+	call salloc (old_wcs, sz_val, TY_CHAR)
+	call salloc (mapping, sz_val, TY_CHAR)
+	call salloc (wcstext, sz_val, TY_CHAR)
 
         # Format the WCS text.
         call sprintf (Memc[old_wcs], SZ_WCSTEXT,
@@ -86,10 +88,12 @@ begin
 
         } else {
 	    # Construct the WCS filename, "dir$device_frame.wcs".
-	    call salloc (dir,    SZ_PATHNAME, TY_CHAR)
-	    call salloc (fname,  SZ_PATHNAME, TY_CHAR)
-	    call salloc (ftemp,  SZ_PATHNAME, TY_CHAR)
-	    call salloc (device, SZ_FNAME,    TY_CHAR)
+	    sz_val = SZ_PATHNAME
+	    call salloc (dir, sz_val, TY_CHAR)
+	    call salloc (fname, sz_val, TY_CHAR)
+	    call salloc (ftemp, sz_val, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (device, sz_val,    TY_CHAR)
 
 	    if (envfind ("wcsdir", Memc[dir], SZ_PATHNAME) <= 0)
 		if (envfind ("WCSDIR", Memc[dir], SZ_PATHNAME) <= 0)

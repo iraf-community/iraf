@@ -15,6 +15,7 @@ real	zfit[npts]	# fitted values
 int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
+size_t	sz_val
 real	norm
 int	ncoeff, nxder, nyder, i, j
 int	order, maxorder1, maxorder2, nmove1, nmove2
@@ -142,7 +143,8 @@ begin
 
 	# get coefficients
 	call smark (sp)
-	call salloc (coeff, GS_NCOEFF(sf1), TY_REAL)
+	sz_val = GS_NCOEFF(sf1)
+	call salloc (coeff, sz_val, TY_REAL)
 	call gscoeff (sf1, Memr[coeff], ncoeff)
 
 	# compute the new coefficients

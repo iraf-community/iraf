@@ -18,6 +18,7 @@ real	curvature[npts]		# 2nd deriv. of cubic spline at extrema
 int	npts			# Number of input data points
 real	dx			# Precision of extrema positions
 
+size_t	sz_val
 int	i, ier, nextrema
 real	xeval, left_deriv, right_deriv
 pointer	sp, bspln, q
@@ -27,8 +28,10 @@ errchk	salloc, seval
 begin
 	# Allocate working arrays for spline routines
 	call smark (sp)
-	call salloc (bspln, 2 * npts + 30, TY_REAL)
-	call salloc (q, (2 * ORDER - 1) * npts, TY_REAL)
+	sz_val = 2 * npts + 30
+	call salloc (bspln, sz_val, TY_REAL)
+	sz_val = (2 * ORDER - 1) * npts
+	call salloc (q, sz_val, TY_REAL)
 
 	# Calculate the spline coefficients
 	call spline (x, y, npts, Memr[bspln], Memr[q], ORDER, ier)

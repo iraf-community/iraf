@@ -19,6 +19,7 @@ procedure fmkcopy (oldfile, newfile)
 char	oldfile[ARB]		# file to be copied
 char	newfile[ARB]		# newfile
 
+size_t	sz_val
 int	status, file_exists, junk
 pointer	vp, sp, oldosfn, newosfn
 int	vfnadd()
@@ -30,8 +31,9 @@ define	abort_ 92
 
 begin
 	call smark (sp)
-	call salloc (oldosfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (newosfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (oldosfn, sz_val, TY_CHAR)
+	call salloc (newosfn, sz_val, TY_CHAR)
 
 	# Get OSFN of old file and verify that the file exists.
 

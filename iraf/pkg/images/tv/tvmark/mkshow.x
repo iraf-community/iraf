@@ -6,6 +6,7 @@ procedure mk_show (mk)
 
 pointer	mk		# pointer to the immark structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	mk_stati()
@@ -13,7 +14,8 @@ real	mk_statr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print a blank line.
 	call printf ("\n")

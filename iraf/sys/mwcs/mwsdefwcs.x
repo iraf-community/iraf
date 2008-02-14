@@ -11,12 +11,14 @@ procedure mw_sdefwcs (mw)
 
 pointer	mw			#I pointer to MWCS descriptor
 
+size_t	sz_val
 pointer	sp, defwcs
 int	envfind()
 
 begin
 	call smark (sp)
-	call salloc (defwcs, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (defwcs, sz_val, TY_CHAR)
 
 	MI_WCS(mw) = NULL
 

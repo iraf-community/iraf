@@ -12,6 +12,7 @@ pointer	mask			# Mask pointer
 int	ap			# Aperture type
 int	xa, ya, xb, yb		# Aperture
  
+size_t	sz_val
 int	xc, yc, i, j
 real	rad, r, a, b, c, d, minv, maxv
 int	x1a, x1b, x1c, x2a, x2b, x2c, y1a, y1b, y1c, y2a, y2b, y2c
@@ -93,7 +94,8 @@ begin
 	    }
 	default:
 	    call smark (sp)
-	    call salloc (line, EP_NX(ep), TY_INT)
+	    sz_val = EP_NX(ep)
+	    call salloc (line, sz_val, TY_INT)
  
 	    x1a = max (EP_X1(ep), min (xa, xb))
 	    x1b = max (EP_X1(ep), int (x1a - EP_BUFFER(ep)))

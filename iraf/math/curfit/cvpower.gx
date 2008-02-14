@@ -21,6 +21,7 @@ pointer	cv				# Pointer to curfit structure
 PIXEL	ps_coeff[ncoeff]		# Power series coefficients (output)
 int	ncoeff				# Number of coefficients in fit
 
+size_t	sz_val
 pointer	sp, cf_coeff, elm
 int	function
 $if (datatype == r)
@@ -45,8 +46,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
-	call salloc (cf_coeff, ncoeff, TY_PIXEL)
+	sz_val = ncoeff ** 2
+	call salloc (elm, sz_val, TY_DOUBLE)
+	sz_val = ncoeff
+	call salloc (cf_coeff, sz_val, TY_PIXEL)
 
 	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
@@ -94,6 +97,7 @@ int	npts		# number of points
 PIXEL	chisqr		# reduced chi-squared of fit
 PIXEL	perrors[ARB]	# errors in coefficients
 
+size_t	sz_val
 int	i, j, n, nfree, function, ncoeff
 PIXEL	variance, chisq, hold
 pointer	sp, covar, elm
@@ -154,8 +158,9 @@ begin
 
 	# Allocate space for the covariance and conversion matrices.
 	call smark (sp)
-	call salloc (covar, ncoeff * ncoeff, TY_DOUBLE)
-	call salloc (elm, ncoeff * ncoeff, TY_DOUBLE)
+	sz_val = ncoeff * ncoeff
+	call salloc (covar, sz_val, TY_DOUBLE)
+	call salloc (elm, sz_val, TY_DOUBLE)
 
 	# Compute the covariance matrix.
 	do j = 1, ncoeff {

@@ -28,6 +28,7 @@ pointer procedure mt_gtyopen (device, ufields)
 char	device[ARB]			#I local device name (incl node)
 char	ufields[ARB]			#I optional user tapecap fields
 
+size_t	sz_val
 int	len_ufields, junk
 char	c_device[SZ_DEVICE]
 char	c_ufields[SZ_DEVCAP]
@@ -57,12 +58,15 @@ begin
 	    call gtyclose (c_gty)
 
 	call smark (sp)
-	call salloc (tapecap, SZ_DEVCAP, TY_CHAR)
-	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (tname, SZ_PATHNAME, TY_CHAR)
-	call salloc (dname, SZ_FNAME, TY_CHAR)
-	call salloc (nname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_DEVCAP
+	call salloc (tapecap, sz_val, TY_CHAR)
+	call salloc (devcap, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (tname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (dname, sz_val, TY_CHAR)
+	call salloc (nname, sz_val, TY_CHAR)
 
 	# Get tapecap definition.
 	if (envfind ("tapecap", Memc[tapecap], SZ_DEVCAP) <= 0)

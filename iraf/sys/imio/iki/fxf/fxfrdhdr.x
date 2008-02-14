@@ -16,6 +16,7 @@ pointer	im			#I image descriptor
 int	group			#I group number to read
 int	acmode			#I access mode
 
+size_t	sz_val
 long	pixoff,	mtime
 pointer	sp, fit, lbuf, poff
 int	compress, devblksz, i, impixtype
@@ -27,7 +28,8 @@ errchk	fxf_rfitshdr, realloc, syserr, syserrs
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 

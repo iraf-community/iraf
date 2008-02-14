@@ -17,6 +17,7 @@ short	offset			# offset into lut
 short	n			# number of data values
 short	data[ARB]		# the data
 
+size_t	sz_val
 int	command,len,x,y
 pointer	sp, idata
 
@@ -28,7 +29,8 @@ begin
 	        return
 
 	    call smark (sp)
-	    call salloc (idata, LEN_IFM, TY_SHORT)
+	    sz_val = LEN_IFM
+	    call salloc (idata, sz_val, TY_SHORT)
 	    call aclrs (Mems[idata], LEN_IFM)
 
 	    command = IWRITE+VRETRACE

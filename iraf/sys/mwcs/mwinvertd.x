@@ -9,6 +9,7 @@ double	o_ltm[ndim,ndim]	#I input matrix
 double	n_ltm[ndim,ndim]	#O output (inverted) matrix
 int	ndim			#I dimensionality of system
 
+size_t	sz_val
 pointer	sp, ix, ltm
 int	nelem, i, j
 
@@ -16,8 +17,10 @@ begin
 	call smark (sp)
 
 	nelem = ndim * ndim
-	call salloc (ix, ndim, TY_INT)
-	call salloc (ltm, nelem, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (ix, sz_val, TY_INT)
+	sz_val = nelem
+	call salloc (ltm, sz_val, TY_DOUBLE)
 
 	# Make scratch copy (to be modified) of input matrix.
 	call amovd (o_ltm, Memd[ltm], nelem)

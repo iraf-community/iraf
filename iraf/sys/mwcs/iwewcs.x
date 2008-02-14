@@ -20,6 +20,7 @@ pointer	mw			#I pointer to MWCS descriptor
 pointer	iw			#I pointer to IMWCS descriptor
 int	ndim			#I system dimension
 
+size_t	sz_val
 double	theta
 char	ctype[8]
 bool	have_ltm, have_ltv, have_wattr
@@ -35,13 +36,16 @@ define	samperr_ 91
 
 begin
 	call smark (sp)
-	call salloc (r, ndim, TY_DOUBLE)
-	call salloc (o_r, ndim, TY_DOUBLE)
-	call salloc (cd, ndim*ndim, TY_DOUBLE)
-	call salloc (ltm, ndim*ndim, TY_DOUBLE)
-	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (o_ltm, ndim*ndim, TY_DOUBLE)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = ndim
+	call salloc (r, sz_val, TY_DOUBLE)
+	call salloc (o_r, sz_val, TY_DOUBLE)
+	sz_val = ndim*ndim
+	call salloc (cd, sz_val, TY_DOUBLE)
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	call salloc (o_cd, sz_val, TY_DOUBLE)
+	call salloc (o_ltm, sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	raax = 1
 	decax = 2

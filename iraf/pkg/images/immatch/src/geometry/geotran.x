@@ -22,6 +22,7 @@ pointer	sx1, sy1		#I pointers to linear surfaces
 pointer	sx2, sy2		#I pointers to higher order surfaces
 int	nxblock, nyblock	#I working block size
 
+size_t	sz_val
 int	l1, l2, c1, c2, nincr
 pointer	sp, xref, yref, msi
 real	shift
@@ -46,8 +47,10 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (xref, GT_NCOLS(geo), TY_REAL)
-	call salloc (yref, GT_NLINES(geo), TY_REAL)
+	sz_val = GT_NCOLS(geo)
+	call salloc (xref, sz_val, TY_REAL)
+	sz_val = GT_NLINES(geo)
+	call salloc (yref, sz_val, TY_REAL)
 
 	# Compute the reference coordinates corresponding to the center of
 	# the output image pixels.
@@ -99,6 +102,7 @@ pointer	sx1, sy1		#I pointers to linear surfaces
 pointer	sx2, sy2		#I pointers to higher order surfaces
 int	nxblock, nyblock	#I working block size
 
+size_t	sz_val
 int	nxsample, nysample, ncols, nlines, l1, l2, c1, c2
 int	line1, line2, llast1, llast2, nincr
 pointer	sp, xsample, ysample, xinterp, yinterp
@@ -109,10 +113,14 @@ real	gsgetr()
 begin
 	# Allocate working space and intialize the interpolant.
 	call smark (sp)
-	call salloc (xsample, GT_NCOLS(geo), TY_REAL)
-	call salloc (ysample, GT_NLINES(geo), TY_REAL)
-	call salloc (xinterp, GT_NCOLS(geo), TY_REAL)
-	call salloc (yinterp, GT_NLINES(geo), TY_REAL)
+	sz_val = GT_NCOLS(geo)
+	call salloc (xsample, sz_val, TY_REAL)
+	sz_val = GT_NLINES(geo)
+	call salloc (ysample, sz_val, TY_REAL)
+	sz_val = GT_NCOLS(geo)
+	call salloc (xinterp, sz_val, TY_REAL)
+	sz_val = GT_NLINES(geo)
+	call salloc (yinterp, sz_val, TY_REAL)
 
 	# Compute the sample size.
 	if (GT_NCOLS(geo) == 1)
@@ -584,6 +592,7 @@ int	c1, c2		#I columns of interest in sampled image
 int	l1, l2		#I lines of interest in the sampled image
 pointer	buf		#I pointer to output buffer
 
+size_t	sz_val
 int	i, ncols, nlines, llast1, llast2, nclast, nllast
 pointer	sp, sf, y, z, buf1, buf2
 
@@ -599,8 +608,9 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (z, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (z, sz_val, TY_REAL)
 
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
@@ -669,6 +679,7 @@ int	c1, c2		#I columns of interest in sampled image
 int	l1, l2		#I lines of interest in the sampled image
 pointer	buf		#I pointer to output buffer
 
+size_t	sz_val
 int	i, ncols, nlines, llast1, llast2, nclast, nllast
 pointer	sp, sf, y, z, buf1, buf2
 
@@ -684,8 +695,9 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (z, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (z, sz_val, TY_REAL)
 
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
@@ -756,6 +768,7 @@ int	c1, c2		#I columns of interest in sampled image
 int	l1, l2		#I lines of interest in the sampled image
 pointer	jbuf		#I pointer to output buffer
 
+size_t	sz_val
 int	i, ncols, nlines, llast1, llast2, nclast, nllast
 pointer	sp, sx, sy, y, z, buf1, buf2
 
@@ -776,8 +789,9 @@ begin
 	    call gsadd (sy1, sy2, sy)
 
 	call smark (sp)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (z, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (z, sz_val, TY_REAL)
 
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
@@ -848,6 +862,7 @@ real	y[ARB]			#I y values
 real	out[ARB]		#O output values
 int	ncols			#I number of points
 
+size_t	sz_val
 pointer	sp, der1, der2
 
 begin
@@ -856,8 +871,9 @@ begin
 	if (sy == NULL) {
 	    call gsder (sx, x, y, out, ncols, 1, 0)
 	} else {
-	    call salloc (der1, ncols, TY_REAL)
-	    call salloc (der2, ncols, TY_REAL)
+	    sz_val = ncols
+	    call salloc (der1, sz_val, TY_REAL)
+	    call salloc (der2, sz_val, TY_REAL)
 	    call gsder (sx, x, y, Memr[der1], ncols, 1, 0)
 	    call gsder (sy, x, y, Memr[der2], ncols, 0, 1)
 	    call amulr (Memr[der1], Memr[der2], out, ncols)
@@ -892,6 +908,7 @@ int	l1, l2		#I line limits in output image
 int	nysample	#I the y sample size
 int	x0, y0		#I zero points of interpolation coordinates
 
+size_t	sz_val
 int	j, ncols, nlines, ncols4, nlines4
 int	imc1, imc2, iml1, iml2, nicols, nilines
 pointer	sp, txref, tyref, x, y, xin, yin, inbuf, outbuf 
@@ -945,12 +962,15 @@ begin
 	call smark (sp)
 	if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
 	    II_BIDRIZZLE) {
-	    call salloc (txref, ncols4, TY_REAL)
-	    call salloc (tyref, nlines4, TY_REAL)
-	    call salloc (x, ncols4, TY_REAL)
-	    call salloc (y, ncols4, TY_REAL)
-	    call salloc (xin, ncols4, TY_REAL)
-	    call salloc (yin, ncols4, TY_REAL)
+	    sz_val = ncols4
+	    call salloc (txref, sz_val, TY_REAL)
+	    sz_val = nlines4
+	    call salloc (tyref, sz_val, TY_REAL)
+	    sz_val = ncols4
+	    call salloc (x, sz_val, TY_REAL)
+	    call salloc (y, sz_val, TY_REAL)
+	    call salloc (xin, sz_val, TY_REAL)
+	    call salloc (yin, sz_val, TY_REAL)
 	    if (IM_NDIM(in) == 1)
 	        call geo_sample (geo, Memr[txref], c1, c2, nxsample,
 		    Memr[tyref], l1, l2, nysample, GT_TWO)
@@ -959,10 +979,11 @@ begin
 		    Memr[tyref], l1, l2, nysample, GT_FOUR)
 	    call aaddkr (Memr[txref], real (-x0 + 1), Memr[x], ncols4)
 	} else {
-	    call salloc (x, ncols, TY_REAL)
-	    call salloc (y, ncols, TY_REAL)
-	    call salloc (xin, ncols, TY_REAL)
-	    call salloc (yin, ncols, TY_REAL)
+	    sz_val = ncols
+	    call salloc (x, sz_val, TY_REAL)
+	    call salloc (y, sz_val, TY_REAL)
+	    call salloc (xin, sz_val, TY_REAL)
+	    call salloc (yin, sz_val, TY_REAL)
 	    call aaddkr (xref[c1], real (-x0 + 1), Memr[x], ncols)
 	}
 
@@ -1059,6 +1080,7 @@ int	l1, l2			#I lines of interest in the output image
 pointer	sx1, sy1		#I linear surface descriptors
 pointer	sx2, sy2		#I distortion surface descriptors
 
+size_t	sz_val
 int	j, ncols, nlines, ncols4, nlines4, nicols, nilines
 int	imc1, imc2, iml1, iml2
 pointer	sp, txref, tyref, y, xin, yin, temp, inbuf, outbuf
@@ -1109,12 +1131,15 @@ begin
 	call smark (sp)
 	if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
 		II_BIDRIZZLE) {
-	    call salloc (txref, ncols4, TY_REAL)
-	    call salloc (tyref, nlines4, TY_REAL)
-	    call salloc (y, ncols4, TY_REAL)
-	    call salloc (xin, ncols4, TY_REAL)
-	    call salloc (yin, ncols4, TY_REAL)
-	    call salloc (temp, ncols4, TY_REAL)
+	    sz_val = ncols4
+	    call salloc (txref, sz_val, TY_REAL)
+	    sz_val = nlines4
+	    call salloc (tyref, sz_val, TY_REAL)
+	    sz_val = ncols4
+	    call salloc (y, sz_val, TY_REAL)
+	    call salloc (xin, sz_val, TY_REAL)
+	    call salloc (yin, sz_val, TY_REAL)
+	    call salloc (temp, sz_val, TY_REAL)
 	    if (IM_NDIM(input) == 1)
 	        call geo_ref (geo, Memr[txref], c1, c2, GT_NCOLS(geo),
 	            Memr[tyref], l1, l2, GT_NLINES(geo), gsgetr (sx1, GSXMIN),
@@ -1126,10 +1151,11 @@ begin
 	            gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
 	            GSYMAX), GT_FOUR)
 	} else {
-	    call salloc (y, ncols, TY_REAL)
-	    call salloc (xin, ncols, TY_REAL)
-	    call salloc (yin, ncols, TY_REAL)
-	    call salloc (temp, ncols, TY_REAL)
+	    sz_val = ncols
+	    call salloc (y, sz_val, TY_REAL)
+	    call salloc (xin, sz_val, TY_REAL)
+	    call salloc (yin, sz_val, TY_REAL)
+	    call salloc (temp, sz_val, TY_REAL)
 	}
 
 	# Compute the pixels.
@@ -1244,6 +1270,7 @@ pointer	xmsi, ymsi		#I coord surfaces
 real	xmin, xmax		#O output xmin and xmax
 real	ymin, ymax		#O output ymin and ymax
 
+size_t	sz_val
 int	j, ncols
 pointer	sp, x, y, xin, yin
 real	mintemp, maxtemp, x1, x2, y1, y2
@@ -1252,10 +1279,11 @@ real	asieval(), msieval()
 begin
 	call smark (sp)
 	ncols = c2 - c1 + 1
-	call salloc (x, ncols, TY_REAL)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (xin, ncols, TY_REAL)
-	call salloc (yin, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (yin, sz_val, TY_REAL)
 
 	xmin = MAX_REAL
 	xmax = -MAX_REAL
@@ -1326,6 +1354,7 @@ pointer	sx2, sy2		#I distortion surface descriptors
 real	xmin, xmax		#O output xmin and xmax
 real	ymin, ymax		#O output ymin and ymax
 
+size_t	sz_val
 int	j, ncols
 pointer	sp, y, xin, yin, temp
 real	x1, x2, y1, y2, mintemp, maxtemp
@@ -1334,10 +1363,11 @@ real	gseval()
 begin
 	call smark (sp)
 	ncols = c2 - c1 + 1
-	call salloc (y, ncols, TY_REAL)
-	call salloc (xin, ncols, TY_REAL)
-	call salloc (yin, ncols, TY_REAL)
-	call salloc (temp, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (yin, sz_val, TY_REAL)
+	call salloc (temp, sz_val, TY_REAL)
 
 	xmin = MAX_REAL
 	xmax = -MAX_REAL
@@ -1478,6 +1508,7 @@ int	nx			#I number of x reference coordinates
 real	yref[ARB]		#I y reference coordinates
 int	ny			#I number of y reference coordinates
 
+size_t	sz_val
 int	bndry, npts
 pointer	sp, x1, x2, y1, y2, xtemp, ytemp
 real	xn1, xn2, xn3, xn4, yn1, yn2, yn3, yn4, xmin, xmax, ymin, ymax
@@ -1503,10 +1534,11 @@ begin
 
 	if (sx2 != NULL) {
 	    call smark (sp)
-	    call salloc (x1, npts, TY_REAL)
-	    call salloc (x2, npts, TY_REAL)
-	    call salloc (xtemp, npts, TY_REAL)
-	    call salloc (ytemp, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (x1, sz_val, TY_REAL)
+	    call salloc (x2, sz_val, TY_REAL)
+	    call salloc (xtemp, sz_val, TY_REAL)
+	    call salloc (ytemp, sz_val, TY_REAL)
 
 	    call amovkr (GT_YMIN(geo), Memr[ytemp], nx) 
 	    call gsvector (sx1, xref, Memr[ytemp], Memr[x1], nx)
@@ -1540,10 +1572,11 @@ begin
 
 	if (sy2 != NULL) {
 	    call smark (sp)
-	    call salloc (y1, npts, TY_REAL)
-	    call salloc (y2, npts, TY_REAL)
-	    call salloc (xtemp, npts, TY_REAL)
-	    call salloc (ytemp, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (y1, sz_val, TY_REAL)
+	    call salloc (y2, sz_val, TY_REAL)
+	    call salloc (xtemp, sz_val, TY_REAL)
+	    call salloc (ytemp, sz_val, TY_REAL)
 
 	    call amovkr (GT_YMIN(geo), Memr[ytemp], nx) 
 	    call gsvector (sy1, xref, Memr[ytemp], Memr[y1], nx)
@@ -1608,6 +1641,7 @@ int	line			#I line in the output image
 pointer	sx1, sy1		#I linear surface descriptors
 pointer	sx2, sy2		#I distortion surface descriptors
 
+size_t	sz_val
 int	ncols
 pointer	sp, y, der1, der2, jacob, sx, sy
 
@@ -1616,8 +1650,9 @@ begin
 
 	# Get the reference coordinates.
 	call smark (sp)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (jacob, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (jacob, sz_val, TY_REAL)
 
 	# Add the two surfaces together for efficiency.
 	if (sx2 != NULL)
@@ -1636,8 +1671,9 @@ begin
 	if (sy == NULL)
 	    call gsder (sx, xref[c1], Memr[y], Memr[jacob], ncols, 1, 0)
 	else {
-	    call salloc (der1, ncols, TY_REAL)
-	    call salloc (der2, ncols, TY_REAL)
+	    sz_val = ncols
+	    call salloc (der1, sz_val, TY_REAL)
+	    call salloc (der2, sz_val, TY_REAL)
 	    call gsder (sx, xref[c1], Memr[y], Memr[der1], ncols, 1, 0)
 	    call gsder (sy, xref[c1], Memr[y], Memr[der2], ncols, 0, 1)
 	    call amulr (Memr[der1], Memr[der2], Memr[jacob], ncols)
@@ -1669,6 +1705,7 @@ int	c1, c2			#I column limits in output image
 int	line			#I line to be flux corrected
 int	x0, y0			#I zero points of interpolation coordinates
 
+size_t	sz_val
 int	ncols
 pointer	sp, x, y, jacob
 
@@ -1676,8 +1713,9 @@ begin
 	# Allocate tempoaray space.
 	call smark (sp)
 	ncols = c2 - c1 + 1
-	call salloc (x, ncols, TY_REAL)
-	call salloc (jacob, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (jacob, sz_val, TY_REAL)
 
 	# Calculate the x points.
 	if (x0 == 1)
@@ -1689,7 +1727,8 @@ begin
 	if (line == 0) {
 	    call asivector (jmsi, Memr[x], Memr[jacob], ncols)
 	} else {
-	    call salloc (y, ncols, TY_REAL)
+	    sz_val = ncols
+	    call salloc (y, sz_val, TY_REAL)
 	    call amovkr ((yinterp[line] + real (-y0 + 1)), Memr[y], ncols)
 	    call msivector (jmsi, Memr[x], Memr[y], Memr[jacob], ncols)
 	}

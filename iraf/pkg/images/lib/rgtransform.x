@@ -14,6 +14,7 @@ int	ntie			#I the number of tie points
 int	file_type		#I the input file type
 bool	interactive		#I the 
 
+size_t	sz_val
 int	nref, wcs, key
 pointer	sp, str
 int	clgcur(), fscan(), nscan()
@@ -21,7 +22,8 @@ int	clgcur(), fscan(), nscan()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the prompt string.
 	if (interactive) {
@@ -119,6 +121,7 @@ int	lngunits		#I the ra / longitude units
 int	latunits		#I the dec / latitude units
 int	file_type		#I the input file type
 
+size_t	sz_val
 int	nref
 pointer	sp, dxref, dyref, str
 int	fscan(), nscan()
@@ -126,9 +129,11 @@ int	fscan(), nscan()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (dxref, ntie, TY_DOUBLE)
-	call salloc (dyref, ntie, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = ntie
+	call salloc (dxref, sz_val, TY_DOUBLE)
+	call salloc (dyref, sz_val, TY_DOUBLE)
 
 	# Issue prompt.
 	if (fd == STDIN) {
@@ -396,6 +401,7 @@ int	ntie			#I number of tie points
 real	coeff[ARB]		#O the output coefficient array
 int	ncoeff			#I the number of coefficients
 
+size_t	sz_val
 int	ier, xier, yier, nfcoeff
 pointer	sp, wts, fcoeff, sx, sy
 real	xmin, xmax, ymin, ymax
@@ -414,8 +420,10 @@ begin
 	        coeff, ncoeff)
 	default:
 	    call smark (sp)
-	    call salloc (fcoeff, 3, TY_REAL)
-	    call salloc (wts, ntie, TY_REAL)
+	    sz_val = 3
+	    call salloc (fcoeff, sz_val, TY_REAL)
+	    sz_val = ntie
+	    call salloc (wts, sz_val, TY_REAL)
 	    call alimr (xlist, ntie, xmin, xmax)
 	    call alimr (ylist, ntie, ymin, ymax)
 	    call gsinit (sx, GS_POLYNOMIAL, 2, 2, GS_XNONE, xmin, xmax,
@@ -498,13 +506,15 @@ real	tolerance		#I the matching tolerance
 char	xformat[ARB]		#I the output x coordinate format
 char	yformat[ARB]		#I the output y coordinate format
 
+size_t	sz_val
 int	blp, rp, rindex, lp, lindex, rmatch, lmatch, ninter
 pointer	sp, fmtstr
 real	dx, dy, tol2, rmax2, r2
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the fromat string
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")
@@ -622,13 +632,15 @@ char	latformat[ARB]		#I the output dec / latitude coordinate format
 char	xformat[ARB]		#I the output x coordinate format
 char	yformat[ARB]		#I the output y coordinate format
 
+size_t	sz_val
 int	blp, rp, rindex, lp, lindex, rmatch, lmatch, ninter
 pointer	sp, fmtstr
 real	dx, dy, tol2, rmax2, r2
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the fromat string
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")

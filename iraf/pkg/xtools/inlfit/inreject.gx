@@ -18,6 +18,7 @@ int	npts				# Number of input points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 
+size_t	sz_val
 int	i, nreject, newreject, niter
 PIXEL	low, high, grow
 pointer	sp, wts1, rejpts
@@ -41,7 +42,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (wts1, npts, TY_PIXEL)
+	sz_val = npts
+	call salloc (wts1, sz_val, TY_PIXEL)
 	call amov$t (w, Mem$t[wts1], npts)
 
 	# Get rejection parameters, and rejected point list.

@@ -11,6 +11,7 @@ int	fd			#I input file
 real	spp[ARB]		#O receives data
 int	maxelem			# max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
 int	pksize, nchars, nelem
 int	miipksize(), miinelem(), read()
@@ -24,7 +25,8 @@ begin
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
-	    call salloc (bp, pksize, TY_CHAR)
+	    sz_val = pksize
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    nchars = read (fd, Memc[bp], pksize)
 	    if (nchars != EOF) {

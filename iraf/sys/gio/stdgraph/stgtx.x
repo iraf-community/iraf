@@ -22,6 +22,7 @@ int	xc, yc			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 bool	hard
 real	x, y
 int	x1, x2, y1, y2, mx, my
@@ -34,7 +35,8 @@ include	"stdgraph.com"
 
 begin
 	call smark (sp)
-	call salloc (seg, n + 2, TY_CHAR)
+	sz_val = n + 2
+	call salloc (seg, sz_val, TY_CHAR)
 
 	if (g_enable == NO)
 	    call stg_genab()

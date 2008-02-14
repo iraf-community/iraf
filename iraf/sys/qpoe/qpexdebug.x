@@ -18,6 +18,7 @@ pointer	ex			#I QPEX descriptor
 int	out			#I output stream
 int	what			#I bitflags defining what to print
 
+size_t	sz_val
 char	binval[SZ_TEXT]
 pointer	sp, text, label, lutp, et, lt, pb, ip
 int	neterms, lutno, proglen, dest, nout, ch, i
@@ -69,7 +70,8 @@ begin
 
 	# Regenerate and print the compiled expression.
 	if (and (what, QPEXD_SHOWEXPR) != 0) {
-	    call salloc (text, SZ_FILTERBUF, TY_CHAR)
+	    sz_val = SZ_FILTERBUF
+	    call salloc (text, sz_val, TY_CHAR)
 	    call fprintf (out,
 		"==================== expr ========================\n")
 	    if (qpex_getfilter (ex, Memc[text], SZ_FILTERBUF) > 0) {
@@ -82,7 +84,8 @@ begin
 	if (and (what, QPEXD_PROGRAM) != 0) {
 	    pb = EX_PB(ex)
 
-	    call salloc (label, proglen+1, TY_INT)
+	    sz_val = proglen+1
+	    call salloc (label, sz_val, TY_INT)
 	    call aclri (Memi[label], proglen+1)
 
 	    # Flag those instructions which are the destinations of branches.

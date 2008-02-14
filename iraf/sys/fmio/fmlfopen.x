@@ -12,6 +12,7 @@ char	pk_lfname[ARB]		#I encoded lfile specification (packed char)
 int	mode			#I file access mode
 int	chan			#O i/o channel assigned (descriptor)
 
+size_t	sz_val
 int	flags, lfile, type, np, i
 pointer	sp, lfname, fm, lf, pt, pm
 int	kmalloc(), krealloc(), fm_lfparse()
@@ -19,7 +20,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (lfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lfname, sz_val, TY_CHAR)
 
 	flags = 0
 

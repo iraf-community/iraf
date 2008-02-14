@@ -17,6 +17,7 @@ char	fname[ARB]		# file name
 bool	clobber			# clobber existing file
 bool	fullframe		# write full frame (no workstation transform)
 
+size_t	sz_val
 pointer	sp, lbuf
 long	size1, size2
 int	save1, save2, fd, nchars
@@ -26,7 +27,8 @@ errchk	write, gtr_redraw
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Delete existing file if clobber requested.
 	if (clobber)

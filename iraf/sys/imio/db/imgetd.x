@@ -12,6 +12,7 @@ double procedure imgetd (im, key)
 pointer	im			# image descriptor
 char	key[ARB]		# parameter to be returned
 
+size_t	sz_val
 int	ip
 double	dval
 pointer	sp, sval
@@ -20,7 +21,8 @@ errchk	syserrs, imgstr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
 
 	ip = 1
 	call imgstr (im, key, Memc[sval], SZ_LINE)

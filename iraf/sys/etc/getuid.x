@@ -9,11 +9,13 @@ procedure getuid (user_name, maxch)
 char	user_name[ARB]
 int	maxch
 pointer	sp, tempfile
+size_t	sz_val
 int	open()
 
 begin
 	call smark (sp)
-	call salloc (tempfile, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tempfile, sz_val, TY_CHAR)
 
 	call mktemp ("tmp$uid", Memc[tempfile], SZ_FNAME)
 	call close (open (Memc[tempfile], NEW_FILE, BINARY_FILE))

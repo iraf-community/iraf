@@ -34,6 +34,7 @@ char	helpdb[SZ_HELPDB], device[SZ_FNAME]
 bool	output_is_not_redirected, file_template
 pointer	list, sp, ctrl, option, tempbuf, db, tty, fname, tempdev
 
+size_t	sz_val
 long	clktime()
 pointer	ttyodes(), hdb_open(), fntopnb()
 bool	strne(), streq(), clgetb()
@@ -46,11 +47,16 @@ define	forms_ 91
 
 begin
 	call smark (sp)
-	call salloc (ctrl, LEN_CTRLSTRUCT, TY_STRUCT)
-	call salloc (option, SZ_FNAME, TY_CHAR)
-	call salloc (tempbuf, SZ_TEMPBUF, TY_CHAR)
-	call salloc (tempdev, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_CTRLSTRUCT
+	call salloc (ctrl, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (option, sz_val, TY_CHAR)
+	sz_val = SZ_TEMPBUF
+	call salloc (tempbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tempdev, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# If we were called without any arguments, do not query for the
 	# template, just set it to null and help will be given for the

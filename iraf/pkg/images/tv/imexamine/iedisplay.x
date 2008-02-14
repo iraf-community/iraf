@@ -14,6 +14,7 @@ pointer	ie			#I imexamine descriptor
 char	image[ARB]		#I image to be displayed
 int	frame			#I frame in which to display image
 
+size_t	sz_val
 int	nchars
 pointer	sp, d_cmd, d_args, d_template, im
 int	gstrcpy(), strmac(), ie_getnframes()
@@ -21,9 +22,10 @@ pointer	immap()
 
 begin
 	call smark (sp)
-	call salloc (d_cmd, SZ_LINE, TY_CHAR)
-	call salloc (d_args, SZ_LINE, TY_CHAR)
-	call salloc (d_template, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (d_cmd, sz_val, TY_CHAR)
+	call salloc (d_args, sz_val, TY_CHAR)
+	call salloc (d_template, sz_val, TY_CHAR)
 
 	# Verify that the named image or image section exists.
 	iferr (im = immap (image, READ_ONLY, 0)) {

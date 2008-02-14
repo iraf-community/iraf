@@ -18,6 +18,7 @@ int procedure gkt_mfopen (tty, mode)
 pointer	tty			# pointer to graphcap entry for device
 int	mode			# access mode
 
+size_t	sz_val
 int	fd
 pointer	sp, ddstr
 int	fopnbf(), ttygets()
@@ -26,7 +27,8 @@ errchk	fopnbf
 
 begin
 	call smark (sp)
-	call salloc (ddstr, SZ_DDSTR, TY_CHAR)
+	sz_val = SZ_DDSTR
+	call salloc (ddstr, sz_val, TY_CHAR)
 
 	# The DD string is used to pass device dependent information to the
 	# NSPP graphics device driver.

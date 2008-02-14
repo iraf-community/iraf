@@ -14,13 +14,15 @@ int	stream				# graphics stream
 int	opcode
 pointer	tr, op, new_op, old_op, sp, ap
 
+size_t	sz_val
 pointer	gtr_init()
 errchk	gtr_init
 include	"gtr.com"
 
 begin
 	call smark (sp)
-	call salloc (ap, LEN_PL, TY_STRUCT)
+	sz_val = LEN_PL
+	call salloc (ap, sz_val, TY_STRUCT)
 
 	tr = gtr_init (stream)
 

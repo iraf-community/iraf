@@ -15,6 +15,7 @@ procedure stf_wfitshdr (im)
 
 pointer	im			# image descriptor
 
+size_t	sz_val
 pointer	sp, fname, lbuf, stf, pp
 int	in, out, pn, junk, i, width
 
@@ -27,8 +28,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 

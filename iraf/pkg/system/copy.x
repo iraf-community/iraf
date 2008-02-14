@@ -13,17 +13,21 @@ procedure t_copy()
 int	root_len
 bool	verbose
 pointer	sp, infile, destination, outfile, junkstr, dirname, list
+size_t	sz_val
 bool	clgetb()
 int	clgfil(), clplen(), fnldir(), isdirectory()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (destination, SZ_FNAME, TY_CHAR)
-	call salloc (dirname, SZ_PATHNAME, TY_CHAR)
-	call salloc (junkstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (outfile, sz_val, TY_CHAR)
+	call salloc (destination, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dirname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (junkstr, sz_val, TY_CHAR)
 
 	list = clpopni ("input")
 	call clgstr ("output", Memc[destination], SZ_FNAME)

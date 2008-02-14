@@ -14,6 +14,7 @@ char	iodev[ARB]		#I PACKED i/o device name string
 int	acmode			#I file access mode
 int	mtchan			#O return value (mt descriptor index)
 
+size_t	sz_val
 int	mt
 pointer	sp, pk_devcap
 include	"mtio.com"
@@ -21,7 +22,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (pk_devcap, SZ_DEVCAP, TY_CHAR)
+	sz_val = SZ_DEVCAP
+	call salloc (pk_devcap, sz_val, TY_CHAR)
 
 	# Pick up index of mt descriptor slot set up by MTOPEN.  Make sure
 	# that we were called by MTOPEN and not somebody else.

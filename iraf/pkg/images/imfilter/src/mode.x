@@ -100,6 +100,7 @@ int	left[ARB]		#U array of back pointers
 int	right[ARB]		#U array of forward pointers
 int	line			#I line number
 
+size_t	sz_val
 int	i, j, k, l, xbox, ybox, nlo, nhi, npts, nptsp1, start, finish, mp
 pointer	sp, insert, index
 real	sum, zlo, zhi
@@ -146,7 +147,8 @@ begin
 	    nptsp1 = npts + 1
 	    mp = 1
 
-	    call salloc (index, npts, TY_INT)
+	    sz_val = npts
+	    call salloc (index, sz_val, TY_INT)
 
 	    # Load the filter kernel.
 	    nlo = 0
@@ -191,8 +193,9 @@ begin
 	    nhi = MOD_NHIGH(mde)
 	    sum = MOD_SUM(mde)
 
-	    call salloc (index, xbox, TY_INT)
-	    call salloc (insert, xbox, TY_REAL)
+	    sz_val = xbox
+	    call salloc (index, sz_val, TY_INT)
+	    call salloc (insert, sz_val, TY_REAL)
 
 	    # Xbox elements are deleted when lines are changed.
 	    # These elements are always located in the first
@@ -278,8 +281,9 @@ begin
 	    nhi = MOD_NHIGH(mde)
 	    sum = MOD_SUM(mde)
 
-	    call salloc (index, xbox, TY_INT)
-	    call salloc (insert, xbox, TY_REAL)
+	    sz_val = xbox
+	    call salloc (index, sz_val, TY_INT)
+	    call salloc (insert, sz_val, TY_REAL)
 
 	    # Xbox elements are deleted when lines are changed.
 	    # These elements are always located in the first
@@ -410,6 +414,7 @@ real	filter[ARB]	#U the array of points to be filtered
 int	left[ARB]	#U the array of back pointers
 int	right[ARB]	#U the array of forward pointers
 
+size_t	sz_val
 int	i, j, k, l, col, nzero, nhalf, xbox, ybox, npts, nptsp1
 int	nlo, nhi, start, finish, mp
 real	sum, zlo, zhi
@@ -431,7 +436,8 @@ begin
 	sum = MOD_SUM(mde)
 
 	call smark (sp)
-	call salloc (index, ybox, TY_INT)
+	sz_val = ybox
+	call salloc (index, sz_val, TY_INT)
 
 	col = 1 + xbox
 	do i = 1, ncols - 1 {
@@ -564,6 +570,7 @@ real	filter[ARB]	#U the array of data to be filtered
 int	left[ARB]	#U the array of back pointers
 int	right[ARB]	#U the array of forward pointers
 
+size_t	sz_val
 int	i, j, k, l, col, nhalf, xbox, ybox, npts, start, finish, nlo, nhi, mp
 int	nptsp1, nzero
 pointer	sp, index
@@ -585,7 +592,8 @@ begin
 	sum = MOD_SUM(mde)
 
 	call smark (sp)
-	call salloc (index, ybox, TY_INT)
+	sz_val = ybox
+	call salloc (index, sz_val, TY_INT)
 
 	col = nx - xbox
 	do i = ncols, 2, - 1 {

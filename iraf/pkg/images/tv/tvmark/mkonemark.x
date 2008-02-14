@@ -14,6 +14,7 @@ real	owx, owy	# coordinates of previous list member
 char	label[ARB]	# current label
 int	ltid		# list sequence number
 
+size_t	sz_val
 int	ncols, nlines, nr, nc, x1, x2, y1, y2
 pointer	sp, str, lengths, radii
 real	fx, fy, ofx, ofy, xmag, ymag, lmax, lratio, rmax, ratio
@@ -24,9 +25,11 @@ real	mk_statr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (lengths, MAX_NMARKS, TY_REAL)
-	    call salloc (radii, MAX_NMARKS, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = MAX_NMARKS
+	call salloc (lengths, sz_val, TY_REAL)
+	    call salloc (radii, sz_val, TY_REAL)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
@@ -173,6 +176,7 @@ pointer	im		# pointer to the frame buffer image
 pointer	iw		# pointer to the wcs structure
 real	fx, fy		# center of circle
 
+size_t	sz_val
 int	nc, ncols, nlines, x1, x2, y1, y2
 pointer	sp, radii
 real	xmag, ymag, rmax, ratio
@@ -189,7 +193,8 @@ begin
 	call mk_mag (im, iw, xmag, ymag)
 
 	call smark (sp)
-	call salloc (radii, nc, TY_REAL)
+	sz_val = nc
+	call salloc (radii, sz_val, TY_REAL)
 
 	if (xmag <= 0.0) {
 	    rmax = 0.0
@@ -318,6 +323,7 @@ pointer	im		# pointer to the frame buffer
 pointer	iw		# pointer to the wcs structure
 real	fx, fy		# x and y center coordinates
 
+size_t	sz_val
 int	nr, ncols, nlines, x1, y1, x2, y2
 pointer	sp, lengths
 real	xmag, ymag, lmax, lratio
@@ -335,7 +341,8 @@ begin
 	call mk_mag (im, iw, xmag, ymag)
 
 	call smark (sp)
-	call salloc (lengths, nr, TY_REAL)
+	sz_val = nr
+	call salloc (lengths, sz_val, TY_REAL)
 
 	if (xmag <= 0.0) {
 	    lmax = 0.0

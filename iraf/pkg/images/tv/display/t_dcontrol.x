@@ -22,6 +22,7 @@ int	red_chan[2], green_chan[2], blue_chan[2], prim_chan[2], alt_chan[2]
 char	type_string[SZ_FNAME], map_string[SZ_FNAME]
 int	chan[2], alt1[2], alt2[2] alt3[2] alt4[2]
 
+size_t	sz_val
 real	clgetr()
 pointer	ttygdes()
 bool	clgetb(), streq(), ttygetb()
@@ -32,8 +33,10 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (devinfo, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (devinfo, sz_val, TY_CHAR)
 
 	# Get display parameters.
 

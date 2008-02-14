@@ -14,6 +14,7 @@ pointer procedure fm_open (fname, mode)
 char	fname[ARB]		#I datafile filename
 int	mode			#I file access mode
 
+size_t	sz_val
 int	chan, n
 pointer	sp, osfn, fn, fm
 errchk	syserrs, calloc, fclobber
@@ -21,8 +22,9 @@ int	nowhite()
 
 begin
 	call smark (sp)
-	call salloc (fn, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fn, sz_val, TY_CHAR)
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	n = nowhite (fname, Memc[fn], SZ_PATHNAME)
 

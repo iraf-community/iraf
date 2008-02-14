@@ -50,6 +50,7 @@ int	stream			# graphics stream
 char	outstr[ARB]		# encoded cursor value (output)
 int	maxch
 
+size_t	sz_val
 bool	cminit
 int	xroam[9], yroam[9]
 pointer	rc, tr, sp, lbuf, ip
@@ -77,7 +78,8 @@ define	coloncmd_ 92
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Allocate and initialize the RCURSOR descriptor.
 	if (rc == NULL) {
@@ -671,13 +673,15 @@ real	sx, sy			#I screen coords of cursor
 int	raster			#I raster number
 real	rx, ry			#I raster coords of cursor
 
+size_t	sz_val
 int	wcs
 real	xc, yc
 pointer	sp, lbuf
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	call grc_scrtowcs (stream, sx, sy, raster, rx, ry, xc, yc, wcs)
 	if (abs(xc) > 1 && abs(xc) < 10000 && abs(yc) > 1 && abs(yc) < 10000)

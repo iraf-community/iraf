@@ -12,6 +12,7 @@ pointer	n_qp			#I QPOE descriptor of new datafile
 pointer	o_qp			#I QPOE descriptor of old datafile
 int	out			#I output stream for verbose messages, or NULL
 
+size_t	sz_val
 int	nsyms, i
 pointer	sp, n_st, o_st, sym, op, pname, syms
 pointer	sthead(), stnext(), stname()
@@ -31,7 +32,8 @@ begin
 		    nsyms = nsyms + 1
 
 	# Construct a reversed array of symbol pointers.
-	call salloc (syms, nsyms, TY_POINTER) 
+	sz_val = nsyms
+	call salloc (syms, sz_val, TY_POINTER) 
 	op = syms + nsyms - 1
 	for (sym=sthead(o_st);  sym != NULL;  sym=stnext(o_st,sym))
 	    if (and (S_FLAGS(sym), SF_DELETED) == 0)

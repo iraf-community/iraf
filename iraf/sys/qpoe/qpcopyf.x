@@ -15,6 +15,7 @@ char	o_param[ARB]		#I input parameter name
 pointer	n_qp			#I QPOE descriptor of new (output) datafile
 char	n_param[ARB]		#I output parameter name
 
+size_t	sz_val
 pointer	sp, dp, cp, buf
 int	nelem, elsize, chunk, nleft, first, maxelem, flags
 int	qp_queryf(), qp_accessf(), qp_elementsize(), qp_read()
@@ -22,8 +23,10 @@ errchk	qp_queryf, qp_addf, qp_read, qp_write
 
 begin
 	call smark (sp)
-	call salloc (dp, SZ_DATATYPE, TY_CHAR)
-	call salloc (cp, SZ_COMMENT, TY_CHAR)
+	sz_val = SZ_DATATYPE
+	call salloc (dp, sz_val, TY_CHAR)
+	sz_val = SZ_COMMENT
+	call salloc (cp, sz_val, TY_CHAR)
 
 	# Get parameter attributes and create new parameter if necessary.
 	nelem = qp_queryf (o_qp, o_param, Memc[dp], maxelem, Memc[cp], flags)
@@ -34,7 +37,8 @@ begin
 	if (nelem > 0) {
 	    elsize = qp_elementsize (o_qp, Memc[dp], INSTANCEOF)
 	    chunk = min (MAX_NELEM, nelem)
-	    call salloc (buf, chunk * elsize, TY_CHAR)
+	    sz_val = chunk * elsize
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    first = 1
 	    for (nleft=nelem;  nleft > 0;  nleft=nleft-nelem) {

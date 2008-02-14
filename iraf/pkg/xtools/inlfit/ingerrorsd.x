@@ -16,6 +16,7 @@ double	wts[ARB]	# Weights
 int	npts		# Number of data points
 int	nvars		# Number of variables
 
+size_t	sz_val
 bool	isfit
 int	i, j, deleted, rejected, nparams, fd
 double	chisqr, variance, rms
@@ -38,15 +39,19 @@ begin
 
 	# Allocate memory for parameters, errors, and parameter list.
 	call smark (sp)
-	call salloc (params, nparams, TY_DOUBLE)
-	call salloc (errors, nparams, TY_DOUBLE)
-	call salloc (labels, SZ_LINE + 1, TY_CHAR)
+	sz_val = nparams
+	call salloc (params, sz_val, TY_DOUBLE)
+	call salloc (errors, sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE + 1
+	call salloc (labels, sz_val, TY_CHAR)
 
 	# Allocate memory for the fit and strings.
-	call salloc (fit, npts, TY_DOUBLE)
-	call salloc (wts1, npts, TY_DOUBLE)
-	call salloc (name, SZ_LINE + 1, TY_CHAR)
-	call salloc (pvnames, SZ_LINE + 1, TY_CHAR)
+	sz_val = npts
+	call salloc (fit, sz_val, TY_DOUBLE)
+	call salloc (wts1, sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE + 1
+	call salloc (name, sz_val, TY_CHAR)
+	call salloc (pvnames, sz_val, TY_CHAR)
 
 	# Get number of rejected points and rejected point list.
 	rejected = in_geti (in, INLNREJPTS)

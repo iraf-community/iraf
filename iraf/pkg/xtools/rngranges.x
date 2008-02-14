@@ -41,6 +41,7 @@ char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 pointer	rg			# Range pointer
 
+size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 real	a, b, c
 pointer	sp, str, ptr
@@ -48,7 +49,8 @@ errchk	open, rng_add
 
 begin
 	call smark (sp)
-	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
+	sz_val = max (strlen (rstr), SZ_LINE)
+	call salloc (str, sz_val, TY_CHAR)
 	call calloc (rg, LEN_RNG, TY_STRUCT)
 
 	a = r1
@@ -241,6 +243,7 @@ pointer	rg			# Range descriptor
 char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 
+size_t	sz_val
 int	i, j, nrgs, strlen(), ctor()
 real	x1, x2, dx, nx
 pointer	sp, str, ptr
@@ -248,7 +251,8 @@ errchk	rng_error
 
 begin
 	call smark (sp)
-	call salloc (str, strlen (rstr), TY_CHAR)
+	sz_val = strlen (rstr)
+	call salloc (str, sz_val, TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -349,10 +353,12 @@ char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 pointer	rg			# Range pointer to be freed.
 
+size_t	sz_val
 pointer	errstr
 
 begin
-	call salloc (errstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errstr, sz_val, TY_CHAR)
 
 	switch (errnum) {
 	case 1:

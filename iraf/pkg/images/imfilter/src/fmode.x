@@ -118,6 +118,7 @@ int	hist[nbins]		#U histogram
 int	nbins			#I number of histogram bins
 int	line			#I line number
 
+size_t	sz_val
 int	i, j, xbox, ybox, hmin, hmax, hlo, hhi, nhlo, nhhi, index
 int	median, nmedian, nltmedian, nzero
 pointer	sp, filter
@@ -136,7 +137,8 @@ begin
 	if (line == 1)  {
 
 	    call smark (sp)
-	    call salloc (filter, xbox * ybox, TY_INT)
+	    sz_val = xbox * ybox
+	    call salloc (filter, sz_val, TY_INT)
 
 	    # Load filter.
 	    index = 0

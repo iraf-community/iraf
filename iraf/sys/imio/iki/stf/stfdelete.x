@@ -14,14 +14,16 @@ char	root[ARB]		#I root filename
 char	extn[ARB]		#U header file extension
 int	status			#O return value
 
+size_t	sz_val
 pointer	sp
 pointer	hdr_fname, pix_fname
 int	access()
 
 begin
 	call smark (sp)
-	call salloc (hdr_fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (pix_fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdr_fname, sz_val, TY_CHAR)
+	call salloc (pix_fname, sz_val, TY_CHAR)
 
 	# Generate filename.
 	call iki_mkfname (root, extn, Memc[hdr_fname], SZ_PATHNAME)

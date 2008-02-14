@@ -21,6 +21,7 @@ pointer	qp			#I QPOE descriptor
 char	paramex[ARB]		#I event-list parameter plus expression list
 int	mode			#I access mode
 
+size_t	sz_val
 bool	newlist
 pointer	sp, io, dd, eh, op, oo, flist, deffilt, defmask, maskname
 pointer	param, expr, filter, filter_text, mask, umask, psym, dsym, name
@@ -39,10 +40,11 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	call salloc (deffilt, SZ_FNAME, TY_CHAR)
-	call salloc (defmask, SZ_FNAME, TY_CHAR)
-	call salloc (maskname, SZ_FNAME, TY_CHAR)
-	call salloc (umask, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (deffilt, sz_val, TY_CHAR)
+	call salloc (defmask, sz_val, TY_CHAR)
+	call salloc (maskname, sz_val, TY_CHAR)
+	call salloc (umask, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -141,7 +143,8 @@ iferr {
 	nchars = S_NELEM(dsym)
 	name = stname (QP_ST(qp), dsym)
 
-	call salloc (flist, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (flist, sz_val, TY_CHAR)
 	if (qp_gstr (qp, Memc[name], Memc[flist], nchars) < nchars)
 	    call syserrs (SYS_QPBADVAL, Memc[name])
 
@@ -188,7 +191,8 @@ iferr {
 	fd = IO_FD(io)
 	szb_page = QP_FMPAGESIZE(qp)
 	nchars = szb_page / SZB_CHAR
-	call salloc (eh, szb_page / (SZ_STRUCT*SZB_CHAR), TY_STRUCT)
+	sz_val = szb_page / (SZ_STRUCT*SZB_CHAR)
+	call salloc (eh, sz_val, TY_STRUCT)
 	call aclri (Memi[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
 
 	# Read event list header.
@@ -234,7 +238,8 @@ iferr {
 
 	# Get compressed event list index, if any.
 	if (IO_INDEXLEN(io) > 0) {
-	    call salloc (oo, IO_INDEXLEN(io) * 2, TY_SHORT)
+	    sz_val = IO_INDEXLEN(io) * 2
+	    call salloc (oo, sz_val, TY_SHORT)
 	    call malloc (IO_YOFFVP(io), IO_INDEXLEN(io), TY_INT)
 	    call malloc (IO_YLENVP(io), IO_INDEXLEN(io), TY_INT)
 
@@ -271,7 +276,8 @@ iferr {
 
 	    # Open the default filter if one was found.
 	    if (nchars > 0) {
-		call salloc (filter_text, nchars, TY_CHAR)
+		sz_val = nchars
+		call salloc (filter_text, sz_val, TY_CHAR)
 		if (qp_gstr(qp,Memc[deffilt],Memc[filter_text],nchars) < nchars)
 		    call syserrs (SYS_QPBADVAL, Memc[deffilt])
 		IO_EX(io) = qpex_open (qp, Memc[filter_text])

@@ -10,6 +10,7 @@ procedure ex_iraf (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, imname
 pointer	im, op, out
 int	i, j, flags
@@ -33,7 +34,8 @@ begin
 	    call ex_do_outtype (ex, "u2")
 
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	call aclrc (Memc[imname], SZ_FNAME)
 
 	# Since we're writing an image, close the output file descriptor

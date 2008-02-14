@@ -157,6 +157,7 @@ procedure cl_initargs (ier)
 
 int	ier
 
+size_t	sz_val
 int	status, op
 bool	first_time
 pointer	sp, cmd, token, ip
@@ -175,8 +176,9 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (cmd, SZ_CMDLINE, TY_CHAR)
-	call salloc (token, SZ_CMDLINE, TY_CHAR)
+	sz_val = SZ_CMDLINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (token, sz_val, TY_CHAR)
 
 	call zgcmdl (Memc[cmd], SZ_CMDLINE, status)
 	if (status <= 0) {
@@ -208,6 +210,7 @@ end
 # in the CL.
 
 procedure clrawc (outstr, ier)
+size_t	sz_val
 
 %	character*(*) outstr
 int	ier
@@ -217,7 +220,8 @@ pointer	sp, cmd
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_CMDLINE, TY_CHAR)
+	sz_val = SZ_CMDLINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call zgcmdl (Memc[cmd], SZ_CMDLINE, status)
 	if (status <= 0)

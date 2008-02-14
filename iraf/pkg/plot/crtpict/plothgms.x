@@ -17,6 +17,7 @@ pointer im
 pointer	wdes
 real	xs, xe, ys, ye, z1, z2
 
+size_t	sz_val
 pointer	w1, inten_hgram, greys_hgram, sp, text, syv, greys, hgram
 pointer real_greys, xval, yval
 int	nsig_bits, i, zrange, mask
@@ -34,15 +35,18 @@ errchk	gsetr, gseti, glabax, amapr, gpline, gvline, achtir, gtext
 
 begin
 	call smark (sp)
-	call salloc (inten_hgram, NBINS, TY_INT)
-	call salloc (greys_hgram, NBINS, TY_INT)
-	call salloc (text, SZ_LINE, TY_CHAR)
-	call salloc (syv, NBINS, TY_SHORT)
-	call salloc (greys, NBINS, TY_INT)
-	call salloc (hgram, NBINS, TY_REAL)
-	call salloc (real_greys, NBINS, TY_REAL)
-	call salloc (xval, NBINS, TY_REAL)
-	call salloc (yval, NBINS, TY_REAL)
+	sz_val = NBINS
+	call salloc (inten_hgram, sz_val, TY_INT)
+	call salloc (greys_hgram, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (text, sz_val, TY_CHAR)
+	sz_val = NBINS
+	call salloc (syv, sz_val, TY_SHORT)
+	call salloc (greys, sz_val, TY_INT)
+	call salloc (hgram, sz_val, TY_REAL)
+	call salloc (real_greys, sz_val, TY_REAL)
+	call salloc (xval, sz_val, TY_REAL)
+	call salloc (yval, sz_val, TY_REAL)
 
 	# First, get pointer to WCS 1 and some device parameters.
 	w1 = W_WC(wdes, 1)

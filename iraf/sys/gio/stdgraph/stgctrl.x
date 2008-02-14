@@ -12,12 +12,14 @@ procedure stg_ctrl (cap)
 
 char	cap[ARB]		# name of device capability to be encoded
 pointer	sp, prog
+size_t	sz_val
 int	stg_encode(), ttygets()
 include	"stdgraph.com"
 
 begin
 	call smark (sp)
-	call salloc (prog, SZ_PROGRAM, TY_CHAR)
+	sz_val = SZ_PROGRAM
+	call salloc (prog, sz_val, TY_CHAR)
 
 	# Fetch the program from the graphcap file.  Zero is returned if the
 	# device does not have the named capability, in which case the function

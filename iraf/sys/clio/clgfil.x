@@ -28,12 +28,14 @@ pointer procedure clpopni (param)
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
+size_t	sz_val
 pointer	fntopnb()
 int	fstati()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = YES
 
@@ -57,11 +59,13 @@ pointer procedure clpopns (param)
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
+size_t	sz_val
 pointer	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = YES
 
@@ -81,11 +85,13 @@ pointer procedure clpopnu (param)
 char	param[ARB]			# CL filename template parameter
 int	sort
 pointer	sp, template, list
+size_t	sz_val
 pointer	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = NO
 

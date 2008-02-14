@@ -17,6 +17,7 @@ pointer	ip					#i task struct pointer
 char	opname[ARB]				#i operand name to retrieve
 pointer	o					#o output operand pointer
 
+size_t	sz_val
 int	i, nops, found, optype
 pointer	sp, buf
 pointer	op
@@ -33,7 +34,8 @@ begin
 		O_VALI(o) = fstati (IP_FD(ip), F_FILESIZE) * SZB_CHAR
 	    } else if (strncmp(opname, "$FNAME", 3) == 0) {
 	        call smark (sp)
-	        call salloc (buf, SZ_FNAME, TY_CHAR)
+	        sz_val = SZ_FNAME
+	        call salloc (buf, sz_val, TY_CHAR)
 
 		call fstats (IP_FD(ip), F_FILENAME, Memc[buf], SZ_FNAME)
 
@@ -103,7 +105,8 @@ begin
 	    
 	} else {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	    call sprintf (Memc[buf], SZ_LINE, "Unknown outbands operand `%s'\n")
 	    	call pargstr(opname) 
 	    call sfree (sp)
@@ -149,6 +152,7 @@ pointer args[ARB]                               #i argument list
 int     nargs                                   #i number of arguments
 pointer o                                       #o operand pointer
 
+size_t	sz_val
 pointer	sp, buf
 pointer	r, g, b, gray, color, cmap
 int	i, len, v_nargs, func
@@ -160,7 +164,8 @@ define	setop_		99
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
         # Lookup function in dictionary.
         func = strdic (fcn, Memc[buf], SZ_LINE, OB_FUNCTIONS)

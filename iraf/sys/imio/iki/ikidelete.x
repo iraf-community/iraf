@@ -9,6 +9,7 @@ procedure iki_delete (image)
 
 char	image[ARB]		#I name of image
 
+size_t	sz_val
 int	k, status
 pointer	sp, root, extn
 int	iki_access()
@@ -22,8 +23,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (root, SZ_PATHNAME, TY_CHAR)
-	call salloc (extn, MAX_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (extn, sz_val, TY_CHAR)
 
 	# Verify that the image exists and determine its type.
 	k = iki_access (image, Memc[root], Memc[extn], 0)

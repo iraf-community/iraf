@@ -25,6 +25,7 @@ int	boundary	#I type of boundary extension
 real	constant	#I constant for constant boundary extension
 int	verbose		#I verbose switch
 
+size_t	sz_val
 int	i, j, fwidth, swidth, norm
 int	l1, l2, c1, c2, ncols, nlines, nxb, nyb, nstars, stid
 pointer	sp, gker2d, ngker2d, skip, fmtstr, twxformat, twyformat
@@ -41,10 +42,12 @@ errchk	mw_openim(), mw_sctran(), mw_gattrs()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (twxformat, SZ_FNAME, TY_CHAR)
-	call salloc (twyformat, SZ_FNAME, TY_CHAR)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (twxformat, sz_val, TY_CHAR)
+	call salloc (twyformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Compute the parameters of the Gaussian kernel.
 	sigma = HWHM_TO_SIGMA * SF_HWHMPSF(sf)
@@ -338,6 +341,7 @@ char	fmtstr[ARB]		#I the format string
 int	stid			#U the object sequence number
 int	verbose			#I verbose mode
 
+size_t	sz_val
 int	line1, line2, inline, xmiddle, ymiddle, ntotal, nobjs, nstars
 pointer	sp, cols, sharp, x, y, ellip, theta, npix, mag, size
 int	sf_detect(), sf_test()
@@ -352,15 +356,16 @@ begin
 	# Set up a cylindrical buffers and some working space for
 	# the detected images.
 	call smark (sp)
-	call salloc (cols, ncols, TY_INT)
-	call salloc (x, ncols, TY_REAL)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (mag, ncols, TY_REAL)
-	call salloc (npix, ncols, TY_INT)
-	call salloc (size, ncols, TY_REAL)
-	call salloc (ellip, ncols, TY_REAL)
-	call salloc (theta, ncols, TY_REAL)
-	call salloc (sharp, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (cols, sz_val, TY_INT)
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (mag, sz_val, TY_REAL)
+	call salloc (npix, sz_val, TY_INT)
+	call salloc (size, sz_val, TY_REAL)
+	call salloc (ellip, sz_val, TY_REAL)
+	call salloc (theta, sz_val, TY_REAL)
+	call salloc (sharp, sz_val, TY_REAL)
 
 	# Generate the starlist line by line.
 	ntotal = 0

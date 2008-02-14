@@ -58,13 +58,15 @@ pointer	ep			# EPIX structure
 char	image[ARB]		# Image name
 bool	erase			# Erase?
  
+size_t	sz_val
 int	i, j, k, nscan(), strdic(), stridxs()
 pointer	sp, cmd, word
  
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (word, sz_val, TY_CHAR)
  
 	call sscan (EP_COMMAND(ep))
  

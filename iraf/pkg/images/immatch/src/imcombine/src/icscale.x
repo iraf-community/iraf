@@ -23,6 +23,7 @@ real	zeros[nimages]		# Zero or sky levels
 real	wts[nimages]		# Weights
 int	nimages			# Number of images
 
+size_t	sz_val
 int	stype, ztype, wtype
 int	i, j, k, l, nout
 real	mode, median, mean, sumwts
@@ -39,16 +40,19 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (ncombine, nimages, TY_INT)
-	call salloc (exptime, nimages, TY_REAL)
-	call salloc (modes, nimages, TY_REAL)
-	call salloc (medians, nimages, TY_REAL)
-	call salloc (means, nimages, TY_REAL)
-	call salloc (section, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (sname, SZ_FNAME, TY_CHAR)
-	call salloc (zname, SZ_FNAME, TY_CHAR)
-	call salloc (wname, SZ_FNAME, TY_CHAR)
+	sz_val = nimages
+	call salloc (ncombine, sz_val, TY_INT)
+	call salloc (exptime, sz_val, TY_REAL)
+	call salloc (modes, sz_val, TY_REAL)
+	call salloc (medians, sz_val, TY_REAL)
+	call salloc (means, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (section, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sname, sz_val, TY_CHAR)
+	call salloc (zname, sz_val, TY_CHAR)
+	call salloc (wname, sz_val, TY_CHAR)
 
 	# Get the number of images previously combined and the exposure times.
 	# The default combine number is 1 and the default exposure is 0.

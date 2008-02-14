@@ -168,6 +168,7 @@ procedure ex_pp_setcmap (ex, expstr)
 pointer	ex				#i task struct pointer
 char	expstr[ARB]			#i expression string
 
+size_t	sz_val
 pointer	sp, cm, cmap
 int	ip, lp				# string pointers
 int	tp, i				# where to trim the string
@@ -178,7 +179,8 @@ include "cmaps.inc"
 
 begin
 	call smark (sp)
-	call salloc (cm, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (cm, sz_val, TY_CHAR)
 	call aclrc (Memc[cm], SZ_FNAME)
 
 	if (DEBUG) { call eprintf("\t\texp=`%s'\n");call pargstr(expstr)}

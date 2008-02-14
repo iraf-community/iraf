@@ -24,6 +24,7 @@ int	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
+size_t	sz_val
 real	rval
 pointer	qp, sp, keyword, vp, in
 int	assignop, byte_offset, sz_field
@@ -40,7 +41,8 @@ define	badkey_ 93
 
 begin
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
 
 	qp = IO_QP(io)
 

@@ -19,6 +19,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
@@ -44,7 +45,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -269,6 +271,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, mp1, mp2
@@ -289,7 +292,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -465,6 +469,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
@@ -490,7 +495,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -715,6 +721,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, mp1, mp2
@@ -735,7 +742,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -911,6 +919,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
@@ -936,7 +945,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -1161,6 +1171,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, mp1, mp2
@@ -1181,7 +1192,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -1357,6 +1369,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 double	d1, low, high, sum, a, s, r, zero
 data	zero /0.0D0/
@@ -1382,7 +1395,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -1607,6 +1621,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, mp1, mp2
@@ -1627,7 +1642,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]

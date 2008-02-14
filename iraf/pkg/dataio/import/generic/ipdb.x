@@ -15,6 +15,7 @@ procedure ip_eval_dbrec (ip)
 
 pointer	ip					#i task struct pointer
 
+size_t	sz_val
 int	ival
 pointer	sp, dims, pixtype, err
 pointer	np, stp, sym
@@ -27,9 +28,10 @@ errchk	ip_dbgeti()
 
 begin
 	call smark (sp)
-	call salloc (dims, SZ_EXPR, TY_CHAR)
-	call salloc (pixtype, SZ_EXPR, TY_CHAR)
-	call salloc (err, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (dims, sz_val, TY_CHAR)
+	call salloc (pixtype, sz_val, TY_CHAR)
+	call salloc (err, sz_val, TY_CHAR)
 	call aclrc (Memc[dims], SZ_EXPR)
 	call aclrc (Memc[pixtype], SZ_EXPR)
 	call aclrc (Memc[err], SZ_EXPR)
@@ -132,6 +134,7 @@ pointer	args[ARB]				#i argument list
 int	nargs					#i number of arguments
 pointer	o					#o operand pointer
 
+size_t	sz_val
 pointer	sp, buf, outstr
 int	fd, func, v_nargs
 int	i, len, nchar, ival, cur_offset, swap
@@ -151,8 +154,9 @@ bool	strne(), streq()
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (outstr, sz_val, TY_CHAR)
 	call aclrc (Memc[buf], SZ_LINE)
 	call aclrc (Memc[outstr], SZ_LINE)
 
@@ -570,6 +574,7 @@ char	param[ARB]				#i parameter to evaluate
 char	outstr[ARB]				#o result string
 int	maxch					#i max length of string
 
+size_t	sz_val
 pointer sp, expr, o
 
 int     strlen()
@@ -579,7 +584,8 @@ errchk  evvexpr
 
 begin
         call smark (sp)
-        call salloc (expr, SZ_EXPR, TY_CHAR)
+        sz_val = SZ_EXPR
+        call salloc (expr, sz_val, TY_CHAR)
         call aclrc (Memc[expr], SZ_EXPR)
 
         # Get the requested parameter.
@@ -619,6 +625,7 @@ int procedure ip_dbgeti (ip, param)
 pointer	ip					#i task struct pointer
 char	param[ARB]				#i requested parameter
 
+size_t	sz_val
 int	val
 pointer	sp, expr, o
 
@@ -628,7 +635,8 @@ errchk	evvexpr
 
 begin
 	call smark (sp)
-	call salloc (expr, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
 
 	# Get the requested parameter.
         call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
@@ -674,6 +682,7 @@ real procedure ip_dbgetr (ip, param)
 pointer	ip					#i task struct pointer
 char	param[ARB]				#i requested parameter
 
+size_t	sz_val
 real	val
 pointer	sp, expr, o
 
@@ -683,7 +692,8 @@ errchk	evvexpr
 
 begin
 	call smark (sp)
-	call salloc (expr, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
 
 	# Get the requested parameter.
         call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
@@ -767,6 +777,7 @@ procedure ip_do_comment (ip, comstr)
 pointer	ip					#i task struct pointer
 char	comstr[ARB]				#i comment to add
 
+size_t	sz_val
 pointer	sp, buf
 
 begin
@@ -779,7 +790,8 @@ begin
 	    call strcat (comstr, COMMENT(ip), SZ_LINE)
 	} else { 
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    Memc[buf] = '\0'
 	    call strcpy ("\t", Memc[buf], SZ_LINE)

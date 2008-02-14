@@ -8,6 +8,7 @@ procedure ex_pgm (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, hdr
 int	len, flags
 
@@ -24,7 +25,8 @@ begin
 
 	# Write the header to the file.
 	call smark (sp)
-	call salloc (hdr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (hdr, sz_val, TY_CHAR)
 	call aclrc (Memc[hdr], SZ_LINE)
 
 	call sprintf (Memc[hdr], SZ_LINE, "P5\n%-6d  %-6d\n255\n")

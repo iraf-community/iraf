@@ -88,14 +88,17 @@ int	nconv				 #I the sinc truncation length
 int	nxincr, nyincr			 #I the number of look-up tables
 real	xshift, yshift			 #I the shift of the look up table
 
+size_t	sz_val
 int	j, ii, jj
 pointer	sp, fx, fy
 
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (fx, nconv * nxincr, TY_REAL)
-	call salloc (fy, nconv * nyincr, TY_REAL)
+	sz_val = nconv * nxincr
+	call salloc (fx, sz_val, TY_REAL)
+	sz_val = nconv * nyincr
+	call salloc (fy, sz_val, TY_REAL)
 
 	# Create a one entry look-up table.
 	if (! IS_INDEFR(xshift) && ! IS_INDEFR(yshift)) {
