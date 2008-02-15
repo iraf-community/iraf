@@ -26,7 +26,8 @@ int	strlen()
 
 begin
 	# Allocate and initialize the tty descriptor structure.
-	call calloc (tty, LEN_DEFTTY, TY_STRUCT)
+	sz_val = LEN_DEFTTY
+	call calloc (tty, sz_val, TY_STRUCT)
 
 	T_LEN(tty) = LEN_DEFTTY
 	T_OP(tty) = 1

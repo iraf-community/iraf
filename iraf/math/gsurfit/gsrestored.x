@@ -23,7 +23,8 @@ double	xmin, xmax, ymin, ymax
 
 begin
 	# allocate space for the surface descriptor
-	call calloc (sf, LEN_GSSTRUCT, TY_STRUCT)
+	sz_val = LEN_GSSTRUCT
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	xorder = nint (GS_SAVEXORDER(fit))
 	if (xorder < 1)

@@ -292,6 +292,7 @@ int	fd					#i file descriptor
 pointer	ras					#i RAS struct pointer
 pointer	cmap					#i colormap array ptr
 
+size_t	sz_val
 int	ncolors
 
 long    filepos
@@ -301,8 +302,10 @@ begin
 	# Now read the colormap, allocate the pointer if we need to.
 	ncolors = RAS_MAPLENGTH(ras)
 	if (RAS_MAPTYPE(ras) == RMT_EQUAL_RGB && ncolors > 0) {
-	    if (cmap == NULL)
-	        call calloc (cmap, ncolors*3, TY_CHAR)
+	    if (cmap == NULL) {
+	        sz_val = ncolors*3
+	        call calloc (cmap, sz_val, TY_CHAR)
+	    }
 	    call ip_agetb (fd, cmap, ncolors)
 
 	} else if (RAS_MAPTYPE(ras) == RMT_RAW) {
@@ -410,7 +413,8 @@ begin
         do i = 1, IP_NPIXT(ip) {
             op = PTYPE(ip,i)
             IO_NPIX(op) = npix
-            call calloc (IO_DATA(op), npix, TY_SHORT)
+            sz_val = npix
+            call calloc (IO_DATA(op), sz_val, TY_SHORT)
         }
 
         percent = 0

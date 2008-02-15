@@ -64,13 +64,16 @@ procedure xh_file_sort (fname)
 
 char	fname[SZ_FNAME]				#i file to be sorted
 
+size_t	sz_val
 pointer	linbuf, linptr
 int	nlines, fd
 int	open()
 
 begin
-        call calloc (linptr, MAXPTR, TY_INT)
-        call calloc (linbuf, SZ_LINBUF, TY_CHAR)
+        sz_val = MAXPTR
+        call calloc (linptr, sz_val, TY_INT)
+        sz_val = SZ_LINBUF
+        call calloc (linbuf, sz_val, TY_CHAR)
 
 	# Sort the file then write it back out.
 	fd = open (fname, READ_ONLY, TEXT_FILE)

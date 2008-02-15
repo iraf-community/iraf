@@ -81,7 +81,8 @@ begin
 	matlen = naxes * naxes
 	ndata = matlen + naxes
 	ctlen = LEN_CTBASE + ndata * SZ_DOUBLE / SZ_STRUCT
-	call calloc (ct, ctlen*2, TY_STRUCT)
+	sz_val = ctlen*2
+	call calloc (ct, sz_val, TY_STRUCT)
 
 	# Save a pointer to the CTRAN descriptor in the main MWCS descriptor,
 	# to permit automatic deallocation at close time.

@@ -211,7 +211,8 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	call calloc (res, CQ_LEN_IM, TY_STRUCT)
+	sz_val = CQ_LEN_IM
+	call calloc (res, sz_val, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
@@ -266,12 +267,15 @@ begin
 	    CQ_NWCS(res) = 0
 
 	# Allocate space for the wcs parameters.
-	call calloc (CQ_WPNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKDVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKTYPES(res), CQ_NWCS(res), TY_INT)
-	call calloc (CQ_WKUNITS(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+	sz_val = CQ_NWCS(res)
+	call calloc (CQ_WKTYPES(res), sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call calloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
 
 	# Get the wcs parameters.
 	ncount = 0
@@ -400,12 +404,15 @@ begin
 	    CQ_NIMPARS(res) = 0
 
 	# Allocate space for the keyword parameters.
-	call calloc (CQ_IPNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKDVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKTYPES(res), CQ_NIMPARS(res), TY_INT)
-	call calloc (CQ_IKUNITS(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+	sz_val = CQ_NIMPARS(res)
+	call calloc (CQ_IKTYPES(res), sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call calloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
 
 	# Get the keyword parameters.
 	ncount = 0
@@ -560,7 +567,8 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	call calloc (res, CQ_LEN_IM, TY_STRUCT)
+	sz_val = CQ_LEN_IM
+	call calloc (res, sz_val, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
@@ -634,12 +642,15 @@ begin
 	    CQ_NWCS(res) = 0
 
 	# Allocate space for the wcs parameters.
-	call calloc (CQ_WPNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKDVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_WKTYPES(res), CQ_NWCS(res), TY_INT)
-	call calloc (CQ_WKUNITS(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
+	call calloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+	sz_val = CQ_NWCS(res)
+	call calloc (CQ_WKTYPES(res), sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call calloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
 
 	# Get the wcs parameters.
 	ncount = 0
@@ -769,12 +780,15 @@ begin
 	    CQ_NIMPARS(res) = 0
 
 	# Allocate space for the keyword parameters.
-	call calloc (CQ_IPNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKDVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKVALUES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_IKTYPES(res), CQ_NIMPARS(res), TY_INT)
-	call calloc (CQ_IKUNITS(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
+	call calloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+	sz_val = CQ_NIMPARS(res)
+	call calloc (CQ_IKTYPES(res), sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call calloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
 
 	# Get the keyword parameters.
 	ncount = 0

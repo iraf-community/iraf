@@ -213,11 +213,15 @@ begin
 	    spool = open ("spool", NEW_FILE, SPOOL_FILE)
 
 	    # Allocate cache version of FITS descriptor.
-	    call calloc (fit, LEN_FITBASE, TY_STRUCT)
-	    call calloc (hoff, MAX_OFFSETS, TY_INT) 
-	    call calloc (poff, MAX_OFFSETS, TY_INT) 
-	    call calloc (extn, MAX_OFFSETS*LEN_CARD, TY_CHAR) 
-	    call calloc (extv, MAX_OFFSETS, TY_INT) 
+	    sz_val = LEN_FITBASE
+	    call calloc (fit, sz_val, TY_STRUCT)
+	    sz_val = MAX_OFFSETS
+	    call calloc (hoff, sz_val, TY_INT) 
+	    call calloc (poff, sz_val, TY_INT) 
+	    sz_val = MAX_OFFSETS*LEN_CARD
+	    call calloc (extn, sz_val, TY_CHAR) 
+	    sz_val = MAX_OFFSETS
+	    call calloc (extv, sz_val, TY_INT) 
 
 	    # Initialize the entries.
 	    call amovki (INDEFL, Memi[extv], MAX_OFFSETS)

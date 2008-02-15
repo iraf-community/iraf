@@ -92,13 +92,15 @@ pointer procedure qp_opentext (qp, text)
 pointer	qp			#I QPOE descriptor
 char	text[ARB]		#I input text to be scanned
 
+size_t	sz_val
 pointer	gt
 int	sz_pbbuf
 int	stropen(), strlen()
 errchk	stropen, calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_QP(gt) = qp
 	GT_FD(gt) = stropen (text, strlen(text), READ_ONLY)

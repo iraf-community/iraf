@@ -173,6 +173,7 @@ char	mtname[SZ_FNAME]
 int	nrecords
 int	min_recsize, max_recsize
 
+size_t	sz_val
 pointer	buf
 long	seed
 int	fd, i, recsize, oschan, status
@@ -190,7 +191,8 @@ begin
 	min_recsize = max (1, clgeti ("min_recsize"))
 	max_recsize = max (min_recsize, clgeti ("max_recsize"))
 
-	call calloc (buf, max_recsize, TY_CHAR)
+	sz_val = max_recsize
+	call calloc (buf, sz_val, TY_CHAR)
 
 	# Records are written by directly calling ZAWRMT, so that we can
 	# write odd size records.

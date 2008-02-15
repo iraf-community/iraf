@@ -207,6 +207,7 @@ int	ndatasets		#I Number of datasets
 int	pixtype			#I Internal storage type
 pointer	rm			#O RM pointer
 
+size_t	sz_val
 int	i
 short	s, nots(), shifts()
 pointer	rms, rms_open()
@@ -221,11 +222,16 @@ begin
 	else
 	    i = TY_REAL
 
-	call calloc (rm, RM_LEN, TY_STRUCT)
-	call calloc (RM_GOOD(rm), box, TY_REAL)
-	call calloc (RM_PWIN(rm), box*ndatasets, i)
-	call calloc (RM_POUT(rm), ndatasets*(box+1)/2, TY_SHORT)
-	call calloc (RM_PMASK(rm), ndatasets*(box+15)/16, TY_SHORT)
+	sz_val = RM_LEN
+	call calloc (rm, sz_val, TY_STRUCT)
+	sz_val = box
+	call calloc (RM_GOOD(rm), sz_val, TY_REAL)
+	sz_val = box*ndatasets
+	call calloc (RM_PWIN(rm), sz_val, i)
+	sz_val = ndatasets*(box+1)/2
+	call calloc (RM_POUT(rm), sz_val, TY_SHORT)
+	sz_val = ndatasets*(box+15)/16
+	call calloc (RM_PMASK(rm), sz_val, TY_SHORT)
 	
 	RM_RMS(rm) = rms
 	RM_BOX(rm) = box

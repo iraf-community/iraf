@@ -45,7 +45,8 @@ begin
 	    nlines = 1
 	else
 	    nlines = IM_LEN(im2,2)
-	call calloc (inbuf, ncols * nyk , TY_REAL)
+	sz_val = ncols * nyk
+	call calloc (inbuf, sz_val, TY_REAL)
 	sz_val = ncols
 	call salloc (linebuf, sz_val, TY_REAL)
 

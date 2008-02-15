@@ -42,7 +42,8 @@ begin
 	ua = IM_USERAREA(im)
 
 	# Allocate internal STF image descriptor.
-	call calloc (stf, LEN_STFDES, TY_STRUCT)
+	sz_val = LEN_STFDES
+	call calloc (stf, sz_val, TY_STRUCT)
 	IM_KDES(im) = stf
 
 	group  = max (1, gr_arg)

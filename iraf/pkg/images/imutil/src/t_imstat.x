@@ -191,7 +191,8 @@ size_t	sz_val
 pointer	ist		#O the statistics descriptor
 
 begin
-    	call calloc (ist, LEN_IMSTAT, TY_STRUCT)
+    	sz_val = LEN_IMSTAT
+    	call calloc (ist, sz_val, TY_STRUCT)
 	sz_val = LEN_NSWITCHES
 	call malloc (IST_SW(ist), sz_val, TY_INT)
 end

@@ -297,7 +297,8 @@ null_		call eprintf ("%s: null range list\n")
 
 		# Allocate and initialize the lookup table descriptor.
 		lt = qpex_dballoc (ex, LEN_LTDES, TY_STRUCT)
-		call calloc (lut, nbins, TY_SHORT)
+		sz_val = nbins
+		call calloc (lut, sz_val, TY_SHORT)
 
 		LT_NEXT(lt)	= EX_LTHEAD(ex)
 		EX_LTHEAD(ex)	= lt

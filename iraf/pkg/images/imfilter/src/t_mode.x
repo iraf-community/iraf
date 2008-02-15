@@ -34,7 +34,8 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	# Allocate the mode fitting structure
-	call calloc (mde, LEN_MODE_STRUCT, TY_STRUCT)
+	sz_val = LEN_MODE_STRUCT
+	call calloc (mde, sz_val, TY_STRUCT)
 
 	# Get task parameters
 	call clgstr ("input", Memc[imtlist1], SZ_LINE)

@@ -28,7 +28,8 @@ include	"ccp.com"
 begin
 	# Allocate the CCP descriptor, string buffer, and x,y segment buffers.
 	if (g_cc == NULL) {
-	    call calloc (g_cc, LEN_CCP, TY_STRUCT)
+	    sz_val = LEN_CCP
+	    call calloc (g_cc, sz_val, TY_STRUCT)
 	    sz_val = SZ_SBUF
 	    call malloc (CCP_SBUF(g_cc), sz_val, TY_CHAR)
 	}

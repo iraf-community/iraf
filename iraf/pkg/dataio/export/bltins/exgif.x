@@ -62,6 +62,7 @@ procedure ex_gif (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	gif
 int	nbytes, flags
 
@@ -83,12 +84,17 @@ begin
 
 	# Allocate the gif structure.
 	iferr {
-	    call calloc (gif, SZ_GIFSTRUCT, TY_STRUCT)
-	    call calloc (GIF_APTR(gif), 257, TY_SHORT)
-	    call calloc (GIF_HPTR(gif), HSIZE, TY_INT)
-	    call calloc (GIF_CPTR(gif), HSIZE, TY_INT)
-	    call calloc (GIF_DPTR(gif), max(256,EX_OCOLS(ex)), TY_SHORT)
-	    call calloc (GIF_CDPTR(gif), (2*EX_OROWS(ex)*EX_OCOLS(ex)),TY_SHORT)
+	    sz_val = SZ_GIFSTRUCT
+	    call calloc (gif, sz_val, TY_STRUCT)
+	    sz_val = 257
+	    call calloc (GIF_APTR(gif), sz_val, TY_SHORT)
+	    sz_val = HSIZE
+	    call calloc (GIF_HPTR(gif), sz_val, TY_INT)
+	    call calloc (GIF_CPTR(gif), sz_val, TY_INT)
+	    sz_val = max(256,EX_OCOLS(ex))
+	    call calloc (GIF_DPTR(gif), sz_val, TY_SHORT)
+	    sz_val = (2*EX_OROWS(ex)*EX_OCOLS(ex))
+	    call calloc (GIF_CDPTR(gif), sz_val,TY_SHORT)
 	} then
 	    call error (0, "Error allocating gif structure.")
 

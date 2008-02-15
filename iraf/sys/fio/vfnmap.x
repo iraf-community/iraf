@@ -162,7 +162,8 @@ begin
 	    vfd = def_vfd
 	    call aclri (Memi[vfd], LEN_VFD)
 	} else
-	    call calloc (vfd, LEN_VFD, TY_STRUCT)
+	    sz_val = LEN_VFD
+	    call calloc (vfd, sz_val, TY_STRUCT)
 	n_open_vfns = n_open_vfns + 1
 
 	# Break the VFN into its component parts.  Map using escape sequence
@@ -631,7 +632,8 @@ begin
 	call salloc (fname, sz_val, TY_CHAR)
 	call salloc (pkosfn, sz_val, TY_CHAR)
 
-	call calloc (mfd, LEN_MFD, TY_STRUCT)
+	sz_val = LEN_MFD
+	call calloc (mfd, sz_val, TY_STRUCT)
 	V_MFD(vfd)	= mfd
 
 	# Make OSFN of mapping file.  If the mode is VFN_UNMAP then the root

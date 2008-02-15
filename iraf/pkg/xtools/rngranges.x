@@ -51,7 +51,8 @@ begin
 	call smark (sp)
 	sz_val = max (strlen (rstr), SZ_LINE)
 	call salloc (str, sz_val, TY_CHAR)
-	call calloc (rg, LEN_RNG, TY_STRUCT)
+	sz_val = LEN_RNG
+	call calloc (rg, sz_val, TY_STRUCT)
 
 	a = r1
 	b = r2

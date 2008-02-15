@@ -89,10 +89,12 @@ begin
 	# allocate space for the matrix and vectors
 	switch (surface_type ) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
-	    call calloc (GS_MATRIX(sf), GS_NCOEFF(sf) ** 2, TY_DOUBLE)
-	    call calloc (GS_CHOFAC(sf), GS_NCOEFF(sf) ** 2, TY_DOUBLE)
-	    call calloc (GS_VECTOR(sf), GS_NCOEFF(sf), TY_DOUBLE)
-	    call calloc (GS_COEFF(sf), GS_NCOEFF(sf), TY_DOUBLE)
+	    sz_val = GS_NCOEFF(sf) ** 2
+	    call calloc (GS_MATRIX(sf), sz_val, TY_DOUBLE)
+	    call calloc (GS_CHOFAC(sf), sz_val, TY_DOUBLE)
+	    sz_val = GS_NCOEFF(sf)
+	    call calloc (GS_VECTOR(sf), sz_val, TY_DOUBLE)
+	    call calloc (GS_COEFF(sf), sz_val, TY_DOUBLE)
 	default:
 	    call error (0, "GSINIT: Unknown surface type.")
 	}

@@ -70,8 +70,10 @@ begin
 	# allocate space for xbasis and coefficient arrays, set remaining
 	# pointers to NULL
 
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_REAL)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
+	sz_val = CV_ORDER(cv)
+	call calloc (CV_XBASIS(cv), sz_val, TY_REAL)
+	sz_val = CV_NCOEFF(cv)
+	call calloc (CV_COEFF(cv), sz_val, TY_REAL)
 
 	CV_MATRIX(cv) = NULL
 	CV_CHOFAC(cv) = NULL

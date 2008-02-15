@@ -87,7 +87,8 @@ begin
 	call salloc (stack, sz_val, TY_STRUCT)
 
 	# Allocate the PLRIO descriptor.
-	call calloc (plr, LEN_PLRDES, TY_STRUCT)
+	sz_val = LEN_PLRDES
+	call calloc (plr, sz_val, TY_STRUCT)
 
 	# Set the plane to be accessed.
 	ndim = PL_NAXES(pl)

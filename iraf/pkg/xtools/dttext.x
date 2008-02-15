@@ -205,7 +205,8 @@ begin
 
 	i = open (database, mode, TEXT_FILE)
 
-	call calloc (dt, DT_LEN, TY_STRUCT)
+	sz_val = DT_LEN
+	call calloc (dt, sz_val, TY_STRUCT)
 	DT(dt) = i
 
 	if (mode != READ_ONLY)

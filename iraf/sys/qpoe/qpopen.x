@@ -48,7 +48,8 @@ begin
 	fm = fm_open (Memc[fname], fmmode)
 
 	# Allocate the QPOE descriptor.
-	call calloc (qp, LEN_QPDES, TY_STRUCT)
+	sz_val = LEN_QPDES
+	call calloc (qp, sz_val, TY_STRUCT)
 	call strcpy (Memc[fname], QP_DFNAME(qp), SZ_QPDFNAME)
 
 	# Access the global macro database, and set the default values of

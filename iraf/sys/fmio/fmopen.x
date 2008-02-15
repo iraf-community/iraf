@@ -39,7 +39,8 @@ begin
 	    call syserrs (SYS_FMOPEN, Memc[fn])
 
 	# Allocate the FMIO descriptor.
-	call calloc (fm, LEN_FMDES, TY_STRUCT)
+	sz_val = LEN_FMDES
+	call calloc (fm, sz_val, TY_STRUCT)
 
 	FM_MODE(fm) = mode
 	FM_CHAN(fm) = chan

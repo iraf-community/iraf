@@ -34,7 +34,8 @@ begin
 	    npts = ncols
 	    sz_val = ncols
 	    call malloc (x, sz_val, TY_REAL)
-	    call calloc (y, ncols, TY_REAL)
+	    sz_val = ncols
+	    call calloc (y, sz_val, TY_REAL)
 
 	    do i = 1, ncols
 	        Memr[x+i-1] = col1 + i - 1
@@ -94,7 +95,8 @@ begin
 	    npts = ncols
 	    sz_val = ncols
 	    call malloc (x, sz_val, TY_REAL)
-	    call calloc (y, ncols, TY_REAL)
+	    sz_val = ncols
+	    call calloc (y, sz_val, TY_REAL)
 	    sz_val = nlines
 	    call malloc (buf1, sz_val, TY_REAL)
 

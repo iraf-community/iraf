@@ -110,7 +110,8 @@ begin
 
 	# Initialize the new dictionary.
 	sz1 = strlen (Memc[CQ_PQPVALUES(cc)]) + CQ_SZ_QPVALUE
-	call calloc (tmpdic, sz1, TY_CHAR)
+	sz_val = sz1
+	call calloc (tmpdic, sz_val, TY_CHAR)
 	call strcpy ("|", Memc[tmpdic], sz1)
 	op1 = 2
 

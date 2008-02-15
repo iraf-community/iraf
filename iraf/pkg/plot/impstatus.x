@@ -13,9 +13,10 @@ int	i
 
 begin
 	i = nlines * (SZ_LINE + 1)
-	if (sl == NULL)
-	    call calloc (sl, i, TY_CHAR)
-	else {
+	if (sl == NULL) {
+	    sz_val = i
+	    call calloc (sl, sz_val, TY_CHAR)
+	} else {
 	    sz_val = i
 	    call realloc (sl, sz_val, TY_CHAR)
 	    call aclrc (Memc[sl], i)

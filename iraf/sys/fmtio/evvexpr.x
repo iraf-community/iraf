@@ -195,7 +195,8 @@ begin
 	ev_flags = flags
 
 	# Allocate an operand struct for the expression value.
-	call calloc (ev_oval, LEN_OPERAND, TY_STRUCT)
+	sz_val = LEN_OPERAND
+	call calloc (ev_oval, sz_val, TY_STRUCT)
 
 	# Make a local copy of the input string.
 	sz_val = strlen(expr)

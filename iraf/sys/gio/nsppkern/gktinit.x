@@ -30,7 +30,8 @@ int	pow2()
 begin
 	# Allocate the gkt descriptor and the string buffer.
 	if (g_kt == NULL) {
-	    call calloc (g_kt, LEN_GKT, TY_STRUCT)
+	    sz_val = LEN_GKT
+	    call calloc (g_kt, sz_val, TY_STRUCT)
 	    sz_val = SZ_SBUF
 	    call malloc (GKT_SBUF(g_kt), sz_val, TY_CHAR)
 	}

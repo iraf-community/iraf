@@ -83,8 +83,9 @@ begin
 	}
 
 	# Allocate working space for the basis functions and derivatives.
-	call calloc (fn, npts * (order + nder), TY_DOUBLE)
-	call calloc (dfn, npts * (order + nder), TY_DOUBLE)
+	sz_val = npts * (order + nder)
+	call calloc (fn, sz_val, TY_DOUBLE)
+	call calloc (dfn, sz_val, TY_DOUBLE)
 
 	# Compute the normalized x values.
 	sz_val = npts
@@ -174,8 +175,9 @@ begin
 	}
 
 	# Allocate working space for the basis functions and derivatives.
-	call calloc (fn, npts * (order + nder), TY_DOUBLE)
-	call calloc (dfn, npts * (order + nder), TY_DOUBLE)
+	sz_val = npts * (order + nder)
+	call calloc (fn, sz_val, TY_DOUBLE)
+	call calloc (dfn, sz_val, TY_DOUBLE)
 
 	# Compute the normalized x values.
 	sz_val = npts

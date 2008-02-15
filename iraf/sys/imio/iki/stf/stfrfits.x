@@ -175,7 +175,8 @@ begin
 	    call fseti (spool, F_BUFSIZE, FI_SIZE(fi))
 
 	    # Allocate cache version of STF descriptor.
-	    call calloc (stf, LEN_STFDES, TY_STRUCT)
+	    sz_val = LEN_STFDES
+	    call calloc (stf, sz_val, TY_STRUCT)
 
 	    # Initialize the cache entry.
 	    call strcpy (Memc[hdrfile], rf_fname[1,slot], SZ_PATHNAME)

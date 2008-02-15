@@ -75,7 +75,8 @@ begin
 	    call syserrs (SYS_FMBLKCHSZ, FM_DFNAME(fm))
 
 	# Initialize the file table.
-	call calloc (ft, (FM_NLFILES(fm) + 1) * LEN_FTE, TY_STRUCT)
+	sz_val = (FM_NLFILES(fm) + 1) * LEN_FTE
+	call calloc (ft, sz_val, TY_STRUCT)
 	FM_FTOFF(fm)		= DH_FTOFF(dh)
 	FM_FTLASTNF(fm)		= DH_FTLASTNF(dh)
 	FM_FTABLE(fm)		= ft

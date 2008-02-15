@@ -67,7 +67,8 @@ begin
 	    nopen = 0
 	    nopenpix = 0
 	    nalloc = MAX_OPENIM
-	    call calloc (ims, nalloc, TY_POINTER)
+	    sz_val = nalloc
+	    call calloc (ims, sz_val, TY_POINTER)
 	    first_time = NO
 	}
 
@@ -82,7 +83,8 @@ begin
 	    call realloc (ims, sz_val, TY_STRUCT)
 	    call amovki (NULL, Memi[ims+i], nalloc-i)
 	}
-	call calloc (xt, XT_LEN, TY_STRUCT)
+	sz_val = XT_LEN
+	call calloc (xt, sz_val, TY_STRUCT)
 	Memi[ims+index-1] = xt
 
 	# Initialize.

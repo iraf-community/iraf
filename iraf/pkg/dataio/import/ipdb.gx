@@ -734,8 +734,10 @@ pointer	sp, buf
 
 begin
 	# Copy the comment line to the comment block.
-	if (IP_COMPTR(ip) == NULL)
-	    call calloc (IP_COMPTR(ip), SZ_COMMENT, TY_CHAR)
+	if (IP_COMPTR(ip) == NULL) {
+	    sz_val = SZ_COMMENT
+	    call calloc (IP_COMPTR(ip), sz_val, TY_CHAR)
+	}
 
 	if (COMMENT(ip) == '\0') {
 	    call strcpy ("\t", COMMENT(ip), SZ_LINE)
@@ -764,11 +766,14 @@ procedure ip_initop (o, len, type)
 
 pointer	o				#u operand pointer
 int	len				#i length of array
+size_t	sz_val
 int	type				#i data type of operand
 
 begin
 	O_LEN(o) = len
 	O_TYPE(o) = type
-	if (len > 1)
-	    call calloc (O_VALP(o), len, type)
+	if (len > 1) {
+	    sz_val = len
+	    call calloc (O_VALP(o), sz_val, type)
+	}
 end

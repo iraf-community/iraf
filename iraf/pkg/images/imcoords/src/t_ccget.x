@@ -820,16 +820,19 @@ char	cnames[ARB]		#I optional list of columm names
 char	lngname[ARB]		#I the ra / longitude column name or number
 char	latname[ARB]		#I the dec / latitude column name or number
 
+size_t	sz_val
 int	i, ip, op
 pointer	dc, cptr
 int	cc_cnames(), ctotok(), ctoi()
 bool	streq()
 
 begin
-	call calloc (dc, DC_DLENGTH, TY_STRUCT)
+	sz_val = DC_DLENGTH
+	call calloc (dc, sz_val, TY_STRUCT)
 
 	# Define the column names.
-	call calloc (DC_COLNAMES(dc), MAX_NCOLUMNS * (SZ_COLNAME + 1), TY_CHAR)
+	sz_val = MAX_NCOLUMNS * (SZ_COLNAME + 1)
+	call calloc (DC_COLNAMES(dc), sz_val, TY_CHAR)
 	Memc[DC_COLNAMES(dc)] = EOS
 
 	ip = 1
@@ -879,10 +882,12 @@ begin
 	if (DC_LATCOLUMN(dc) <= 0)
 	    DC_LATCOLUMN(dc) = DC_LNGCOLUMN(dc) + 1
 
-	call calloc (DC_RECORD(dc), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (DC_RECORD(dc), sz_val, TY_CHAR)
 	Memc[DC_RECORD(dc)) = EOS 
 
-	call calloc (DC_COFFSETS(dc), MAX_NCOLUMNS + 1, TY_INT)
+	sz_val = MAX_NCOLUMNS + 1
+	call calloc (DC_COFFSETS(dc), sz_val, TY_INT)
 
 	return (dc)
 end
@@ -970,7 +975,8 @@ pointer	ec, cptr, fptr
 int	cc_enames()
 
 begin
-	call calloc (ec, EC_ELENGTH, TY_STRUCT)
+	sz_val = EC_ELENGTH
+	call calloc (ec, sz_val, TY_STRUCT)
 
 	# Define the column names.
 	sz_val = MAX_NEXPR * (SZ_EXPR + 1)
@@ -993,9 +999,11 @@ begin
 
 	# Decode the list of expressions into column names, column ranges,
 	# and column expressions.
-	call calloc (EC_ERANGES(ec), 3 * MAX_NERANGES + 1, TY_INT)
+	sz_val = 3 * MAX_NERANGES + 1
+	call calloc (EC_ERANGES(ec), sz_val, TY_INT)
 
-	call calloc (EC_EFORMATS(ec), MAX_NEXPR * (SZ_EFORMATS + 1), TY_CHAR)
+	sz_val = MAX_NEXPR * (SZ_EFORMATS + 1)
+	call calloc (EC_EFORMATS(ec), sz_val, TY_CHAR)
 	Memc[EC_EFORMATS(ec)] = EOS
 	ip  = 1
 	fptr = EC_EFORMATS(ec)
@@ -1007,9 +1015,11 @@ begin
 	    cptr = cptr + SZ_EXPR + 1
 	}
 
-	call calloc (EC_ELNGFORMAT(ec), SZ_EFORMATS, TY_CHAR)
+	sz_val = SZ_EFORMATS
+	call calloc (EC_ELNGFORMAT(ec), sz_val, TY_CHAR)
 	call strcpy (lngformat, Memc[EC_ELNGFORMAT(ec)], SZ_EFORMATS)
-	call calloc (EC_ELATFORMAT(ec), SZ_EFORMATS, TY_CHAR)
+	sz_val = SZ_EFORMATS
+	call calloc (EC_ELATFORMAT(ec), sz_val, TY_CHAR)
 	call strcpy (latformat, Memc[EC_ELATFORMAT(ec)], SZ_EFORMATS)
 
 	return (ec)

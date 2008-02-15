@@ -34,7 +34,8 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	# Allcoate space for the fmedian structure.
-	call calloc (fmd, LEN_FMEDIAN_STRUCT, TY_STRUCT)
+	sz_val = LEN_FMEDIAN_STRUCT
+	call calloc (fmd, sz_val, TY_STRUCT)
 
 	# Get the task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)

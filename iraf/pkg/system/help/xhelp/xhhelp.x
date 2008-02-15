@@ -16,6 +16,7 @@ char    topic[ARB]                           	#i help topic
 char    curpack[ARB]                           	#i current package
 char    opt[ARB]                           	#i help option
 
+size_t	sz_val
 pointer helpstr
 int	ip, fdi
 long	fsize
@@ -75,7 +76,8 @@ begin
 
 	# Now filter the file to escape the curly braces so they pass thru
 	# to the Tcl cleanly.  Put the result in the string sent to the GUI.
-	call calloc (helpstr, fsize + SZ_LINE, TY_CHAR)
+	sz_val = fsize + SZ_LINE
+	call calloc (helpstr, sz_val, TY_CHAR)
 	ip = helpstr
 	repeat {
 	    ch = getc (fdi, ch)

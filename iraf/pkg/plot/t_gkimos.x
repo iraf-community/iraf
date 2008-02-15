@@ -114,7 +114,8 @@ begin
 
 	    # Initialize memory and plot counters for maintaining index
 	    buflen = MAX_FRAMES
-	    call calloc (ip, buflen, TY_LONG)
+	    sz_val = buflen
+	    call calloc (ip, sz_val, TY_LONG)
 	    Meml[ip] = long (fpos)
 	    lastp = 0
 

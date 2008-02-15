@@ -50,8 +50,9 @@ begin
 	npts = 0
 
 	# Allocate the initial arrays.
-	call calloc (xtab, SZ_TABLE, TY_DOUBLE)
-	call calloc (ytab, SZ_TABLE, TY_DOUBLE)
+	sz_val = SZ_TABLE
+	call calloc (xtab, sz_val, TY_DOUBLE)
+	call calloc (ytab, sz_val, TY_DOUBLE)
 	tbsize = SZ_TABLE
 
 	while (fscan(tbl) != EOF) {

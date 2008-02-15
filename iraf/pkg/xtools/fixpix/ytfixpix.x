@@ -53,7 +53,8 @@ begin
 	call salloc (buf, sz_val, TY_SHORT) 
 	sz_val = nc
 	call salloc (cols, sz_val, TY_SHORT)
-	call calloc (fp, FP_LEN, TY_STRUCT)
+	sz_val = FP_LEN
+	call calloc (fp, sz_val, TY_STRUCT)
 
 	# Set the mask codes.  Go through the mask and change any mask codes
 	# that match the input mask code to the output mask code (if they are

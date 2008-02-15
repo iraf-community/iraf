@@ -24,7 +24,8 @@ begin
 	call smark (sp)
 	sz_val = max (strlen (rstr), SZ_LINE)
 	call salloc (str, sz_val, TY_CHAR)
-	call calloc (rg, LEN_RG, TY_STRUCT)
+	sz_val = LEN_RG
+	call calloc (rg, sz_val, TY_STRUCT)
 
 	i = 1
 	while (rstr[i] != EOS) {

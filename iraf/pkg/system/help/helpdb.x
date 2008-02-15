@@ -96,6 +96,7 @@ char	root_helpdir_file[ARB]	# name of root help directory file
 char	helpdb_file[ARB]	# name of new database file
 bool	verbose			# print informative messages
 
+size_t	sz_val
 pointer	db, index, p1, p2, ix
 bool	no_entries_interchanged
 int	fd, temp[LEN_HDBINDEX], i
@@ -114,8 +115,10 @@ begin
 	# as we go.  The index and db header are written out after all
 	# help directories have been processed.
 
-	call calloc (db, LEN_HDBHEADER, TY_STRUCT)
-	call calloc (index, MAX_ENTRIES * LEN_HDBINDEX, TY_STRUCT)
+	sz_val = LEN_HDBHEADER
+	call calloc (db, sz_val, TY_STRUCT)
+	sz_val = MAX_ENTRIES * LEN_HDBINDEX
+	call calloc (index, sz_val, TY_STRUCT)
 
 	HDB_MAGIC(db)      = HDB_MAGICVAL
 	HDB_MAXENTRIES(db) = MAX_ENTRIES
@@ -443,7 +446,8 @@ begin
 	# Allocate and initialize descriptor and string buffer.  Must init
 	# nextch to 1 because 0 is the null index.
 
-	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
+	sz_val = LEN_HDSTRUCT
+	call calloc (hp, sz_val, TY_STRUCT)
 	sz_val = SZ_SBUF
 	call malloc (sbuf, sz_val, TY_CHAR)
 
@@ -577,7 +581,8 @@ begin
 	call salloc (db_save, sz_val, TY_STRUCT)
 
 	# Allocate database descriptor.
-	call calloc (db, LEN_HDBHEADER, TY_STRUCT)
+	sz_val = LEN_HDBHEADER
+	call calloc (db, sz_val, TY_STRUCT)
 
 	# If the database name is "helpdir", raw access is desired and the
 	# name of the root help directory file is given by the environment

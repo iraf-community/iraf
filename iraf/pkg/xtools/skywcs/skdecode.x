@@ -26,7 +26,8 @@ pointer	immap()
 errchk	immap()
 
 begin
-	call calloc (coo, LEN_SKYCOOSTRUCT, TY_STRUCT)
+	sz_val = LEN_SKYCOOSTRUCT
+	call calloc (coo, sz_val, TY_STRUCT)
 	call strcpy (instr, SKY_COOSYSTEM(coo), SZ_FNAME)
 
 	# Allocate some working space.
@@ -114,11 +115,13 @@ char	instr[ARB]		#I the input wcs string
 pointer	coo			#O the pointer to the coordinate structure
 pointer	imcoo			#I pointer to an existing coordinate structure 
 
+size_t	sz_val
 int	stat
 int	sk_strwcs()
 
 begin
-	call calloc (coo, LEN_SKYCOOSTRUCT, TY_STRUCT)
+	sz_val = LEN_SKYCOOSTRUCT
+	call calloc (coo, sz_val, TY_STRUCT)
 	call strcpy (instr, SKY_COOSYSTEM(coo), SZ_FNAME)
 
 	# Initialize.
@@ -965,13 +968,15 @@ pointer procedure sk_copy (cooin)
 
 pointer	cooin			#I the pointer to the input structure
 
+size_t	sz_val
 pointer	cooout
 
 begin
 	if (cooin == NULL)
 	    cooout = NULL
 	else {
-	    call calloc (cooout, LEN_SKYCOOSTRUCT, TY_STRUCT)
+	    sz_val = LEN_SKYCOOSTRUCT
+	    call calloc (cooout, sz_val, TY_STRUCT)
             SKY_VXOFF(cooout) = SKY_VXOFF(cooin)
             SKY_VYOFF(cooout) = SKY_VYOFF(cooin)
             SKY_VXSTEP(cooout) = SKY_VXSTEP(cooin)

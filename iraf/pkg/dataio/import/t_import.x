@@ -239,6 +239,7 @@ end
 
 pointer procedure ip_init ()
 
+size_t	sz_val
 pointer	ptr
 
 begin
@@ -247,9 +248,10 @@ begin
 	    call error (0, "Error allocating IMPORT task structure.")
 
 	# Allocate the pixtype, outbands, and buffer struct pointers.
-	call calloc (IP_PIXTYPE(ptr), MAX_OPERANDS, TY_POINTER)
-	call calloc (IP_OUTBANDS(ptr), MAX_OPERANDS, TY_POINTER)
-	call calloc (IP_BUFPTR(ptr), MAX_OPERANDS, TY_POINTER)
+	sz_val = MAX_OPERANDS
+	call calloc (IP_PIXTYPE(ptr), sz_val, TY_POINTER)
+	call calloc (IP_OUTBANDS(ptr), sz_val, TY_POINTER)
+	call calloc (IP_BUFPTR(ptr), sz_val, TY_POINTER)
 
 	# Initialize some parameters
 	IP_IM(ptr) = NULL
@@ -414,7 +416,8 @@ begin
 	if (streq (Memc[imhead],"")) {
 	    IP_IMHEADER(ip) = NULL
 	} else {
-	    call calloc (IP_IMHEADER(ip), SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call calloc (IP_IMHEADER(ip), sz_val, TY_CHAR)
 	    call strcpy (Memc[imhead], Memc[IP_IMHEADER(ip)], SZ_FNAME)
 	}
         IP_VERBOSE(ip) = btoi (clgetb("verbose"))
@@ -732,11 +735,14 @@ end
 
 procedure ip_alloc_outbands (op)
 
+size_t	sz_val
 pointer	op					#i outbands struct pointer
 
 begin
-	call calloc (op, LEN_OUTBANDS, TY_STRUCT)
-	call calloc (OB_EXPR(op), SZ_EXPR, TY_CHAR)
+	sz_val = LEN_OUTBANDS
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_EXPR
+	call calloc (OB_EXPR(op), sz_val, TY_CHAR)
 	call ip_alloc_operand (OB_OP(op))
 end
 
@@ -758,11 +764,14 @@ end
 
 procedure ip_alloc_operand (op)
 
+size_t	sz_val
 pointer	op					#i operand struct pointer
 
 begin
-	call calloc (op, LEN_OPERAND, TY_STRUCT)
-	call calloc (IO_TAG(op), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_OPERAND
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call calloc (IO_TAG(op), sz_val, TY_CHAR)
 end
 
 

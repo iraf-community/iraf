@@ -86,7 +86,8 @@ begin
 	call salloc (patbuf, sz_val, TY_CHAR)
 
 	# Allocate the list descriptor.
-	call calloc (fl, LEN_FL, TY_STRUCT)
+	sz_val = LEN_FL
+	call calloc (fl, sz_val, TY_STRUCT)
 	sz_val = DEF_LENOFFV
 	call malloc (offv, sz_val, TY_INT)
 	sz_val = DEF_SZSBUF

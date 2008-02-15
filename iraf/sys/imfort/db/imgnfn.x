@@ -117,7 +117,8 @@ begin
 	call salloc (patcode, sz_val,  TY_CHAR)
 
 	# Allocate field list descriptor.
-	call calloc (fn, LEN_FNSTRUCT, TY_STRUCT)
+	sz_val = LEN_FNSTRUCT
+	call calloc (fn, sz_val, TY_STRUCT)
 	sz_val = SZ_SBUF
 	call malloc (sbuf, sz_val, TY_CHAR)
 

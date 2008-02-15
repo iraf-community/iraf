@@ -59,11 +59,14 @@ begin
 	}
 
 	# Allocate and initialize the QPIO descriptor.
-	call calloc (io, LEN_IODES, TY_STRUCT)
+	sz_val = LEN_IODES
+	call calloc (io, sz_val, TY_STRUCT)
 
-	call calloc (IO_DD(io), LEN_DDDES, TY_STRUCT)
-	call calloc (IO_PARAM(io), SZ_FNAME, TY_CHAR)
-	call calloc (IO_MASK(io), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_DDDES
+	call calloc (IO_DD(io), sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call calloc (IO_PARAM(io), sz_val, TY_CHAR)
+	call calloc (IO_MASK(io), sz_val, TY_CHAR)
 
 	IO_QP(io) = qp
 	IO_MODE(io) = mode

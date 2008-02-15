@@ -131,8 +131,9 @@ begin
 	# Allocate the offset and length vectors (comprising the index).
 	# These are deallocated at qpio_close time.
 
-	call calloc (ov, len_index, TY_INT)
-	call calloc (lv, len_index, TY_INT)
+	sz_val = len_index
+	call calloc (ov, sz_val, TY_INT)
+	call calloc (lv, sz_val, TY_INT)
 
 	ox = -1
 	line = 1

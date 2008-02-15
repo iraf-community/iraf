@@ -72,8 +72,9 @@ begin
 	    # event list.
 
 	    nwords = IO_EVENTLEN(io)
-	    call calloc (IO_MINEVL(io), nwords, TY_SHORT)
-	    call calloc (IO_MAXEVL(io), nwords, TY_SHORT)
+	    sz_val = nwords
+	    call calloc (IO_MINEVL(io), sz_val, TY_SHORT)
+	    call calloc (IO_MAXEVL(io), sz_val, TY_SHORT)
 
 	    # Write the event list header.
 	    call qpio_sync (io)

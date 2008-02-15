@@ -211,12 +211,14 @@ int	gsym_data		#I client data for above
 int	pbblen			#I pushback buffer length
 int	flags			#I option flags
 
+size_t	sz_val
 pointer	gt
 int	sz_pbbuf
 errchk	calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_GSYM(gt) = gsym
 	GT_GSYMDATA(gt) = gsym_data
@@ -250,13 +252,15 @@ int	gsym_data		#I client data for above
 int	pbblen			#I pushback buffer length
 int	flags			#I option flags
 
+size_t	sz_val
 pointer	gt
 int	sz_pbbuf
 int	stropen(), strlen()
 errchk	stropen, calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_GSYM(gt) = gsym
 	GT_GSYMDATA(gt) = gsym_data

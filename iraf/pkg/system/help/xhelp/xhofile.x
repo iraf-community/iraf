@@ -171,13 +171,15 @@ procedure xh_text_msg (gp, param, msg)
 pointer gp
 char	param[ARB], msg[ARB]
 
+size_t	sz_val
 pointer	buf, ip
 int	i, nchars
 int	strlen()
 
 begin
 	nchars = strlen (msg)
-	call calloc (buf, nchars + SZ_LINE, TY_CHAR)
+	sz_val = nchars + SZ_LINE
+	call calloc (buf, sz_val, TY_CHAR)
 
 	ip = buf
 	for (i=1; i < nchars; i=i+1) {

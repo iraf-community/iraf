@@ -28,7 +28,8 @@ include	"imd.com"
 begin
 	# Allocate the gkt descriptor and the string buffer.
 	if (g_kt == NULL) {
-	    call calloc (g_kt, LEN_IMD, TY_STRUCT)
+	    sz_val = LEN_IMD
+	    call calloc (g_kt, sz_val, TY_STRUCT)
 	    sz_val = SZ_SBUF
 	    call malloc (IMD_SBUF(g_kt), sz_val, TY_CHAR)
 	}

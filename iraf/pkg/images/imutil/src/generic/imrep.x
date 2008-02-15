@@ -85,6 +85,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 real	ilower
@@ -140,7 +141,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_SHORT)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_SHORT)
 
 	while (imgnls (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
@@ -329,6 +331,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 real	ilower
@@ -384,7 +387,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_INT)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_INT)
 
 	while (imgnli (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
@@ -573,6 +577,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 real	ilower
@@ -628,7 +633,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_LONG)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_LONG)
 
 	while (imgnll (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
@@ -807,6 +813,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 real	floor, ceil, newval, val1, val2
@@ -852,7 +859,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_REAL)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_REAL)
 
 	while (imgnlr (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
@@ -1031,6 +1039,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 double	floor, ceil, newval, val1, val2
@@ -1076,7 +1085,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_DOUBLE)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_DOUBLE)
 
 	while (imgnld (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
@@ -1255,6 +1265,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 complex	floor, ceil, newval, val1, val2
@@ -1307,7 +1318,8 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_COMPLEX)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_COMPLEX)
 
 	while (imgnlx (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1

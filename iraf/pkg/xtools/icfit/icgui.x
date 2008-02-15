@@ -119,7 +119,8 @@ errchk	open()
 
 begin
 	len_str = 10 * SZ_LINE
-	call calloc (help, len_str, TY_CHAR)
+	sz_val = len_str
+	call calloc (help, sz_val, TY_CHAR)
 	line = help
 
 	fd = open (Memc[IC_HELP(ic)], READ_ONLY, TEXT_FILE)

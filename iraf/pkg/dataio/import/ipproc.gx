@@ -467,8 +467,10 @@ begin
 	    IM_PIXTYPE(im) = type
 
 	# Allocate the buffer pointer if needed.
-	if (BUFFER(ip,band) == NULL)
-	    call calloc (BUFFER(ip,band), npix*IP_SZBUF(ip), IP_OUTTYPE(ip))
+	if (BUFFER(ip,band) == NULL) {
+	    sz_val = npix*IP_SZBUF(ip)
+	    call calloc (BUFFER(ip,band), sz_val, IP_OUTTYPE(ip))
+	}
 
 	if (nldone < IP_SZBUF(ip) && !lastline) {
 	    # Copy the image line to the buffer
@@ -691,14 +693,17 @@ pointer procedure ip_chtype (op, type)
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
+size_t	sz_val
 pointer	out, coerce()
 
 begin
 	# Allocate the pointer and coerce it so the routine works.
-	if (type == TY_UBYTE || type == TY_CHAR)
-            call calloc (out, O_LEN(op), TY_CHAR)
-	else {
-            call calloc (out, O_LEN(op), type)
+	if (type == TY_UBYTE || type == TY_CHAR) {
+            sz_val = O_LEN(op)
+            call calloc (out, sz_val, TY_CHAR)
+	} else {
+            sz_val = O_LEN(op)
+            call calloc (out, sz_val, type)
             out = coerce (out, type, TY_CHAR)
 	}
 

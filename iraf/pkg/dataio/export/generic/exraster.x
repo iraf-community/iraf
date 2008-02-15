@@ -282,7 +282,8 @@ begin
 	    band = max (1, IO_BAND(op))
 
 	    if (line > IM_LEN(im,2)) {
-	        call calloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
+	        sz_val = IM_LEN(im,1)
+	        call calloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
 	        IO_ISIM(op) = NO
 	        IO_NPIX(op) = IM_LEN(im,1)
 		next
@@ -552,15 +553,18 @@ pointer	ex				#i task struct pointer
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
+size_t	sz_val
 pointer	out, coerce()
 int	swap, flags
 
 begin
 	# Allocate the pointer and coerce it so the routine works.
-	if (type == TY_UBYTE || type == TY_CHAR)
-            call calloc (out, O_LEN(op), TY_CHAR)
-	else {
-            call calloc (out, O_LEN(op), type)
+	if (type == TY_UBYTE || type == TY_CHAR) {
+            sz_val = O_LEN(op)
+            call calloc (out, sz_val, TY_CHAR)
+	} else {
+            sz_val = O_LEN(op)
+            call calloc (out, sz_val, type)
             out = coerce (out, type, TY_CHAR)
 	}
 

@@ -36,7 +36,8 @@ begin
 	    # This is the first time the stream has been accessed.
 
 	    # Allocate descriptor.
-	    call calloc (tr, LEN_TRSTRUCT, TY_STRUCT)
+	    sz_val = LEN_TRSTRUCT
+	    call calloc (tr, sz_val, TY_STRUCT)
 
 	    # Don't need a frame buffer for STDPLOT, but make a dummy one
 	    # anyhow so that the stream looks like the interactive ones.

@@ -67,6 +67,7 @@ end
 pointer procedure xh_open ()
 
 pointer	xh					# task descriptor
+size_t	sz_val
 errchk	calloc
 
 begin
@@ -74,17 +75,22 @@ begin
             call error (0, "Error opening task structure.")
 
 	iferr {
-            call calloc (XH_LPTR(xh), SZ_HELPLIST, TY_CHAR)
-            call calloc (XH_TEMPLATE(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_OPTION(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_PRINTER(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURTASK(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURPACK(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_QUICKREF(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_HOMEPAGE(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURDIR(xh), SZ_PATHNAME, TY_CHAR)
-            call calloc (XH_PATTERN(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_HELPDB(xh), SZ_HELPDB, TY_CHAR)
+            sz_val = SZ_HELPLIST
+            call calloc (XH_LPTR(xh), sz_val, TY_CHAR)
+            sz_val = SZ_FNAME
+            call calloc (XH_TEMPLATE(xh), sz_val, TY_CHAR)
+            call calloc (XH_OPTION(xh), sz_val, TY_CHAR)
+            call calloc (XH_PRINTER(xh), sz_val, TY_CHAR)
+            call calloc (XH_CURTASK(xh), sz_val, TY_CHAR)
+            call calloc (XH_CURPACK(xh), sz_val, TY_CHAR)
+            call calloc (XH_QUICKREF(xh), sz_val, TY_CHAR)
+            call calloc (XH_HOMEPAGE(xh), sz_val, TY_CHAR)
+            sz_val = SZ_PATHNAME
+            call calloc (XH_CURDIR(xh), sz_val, TY_CHAR)
+            sz_val = SZ_FNAME
+            call calloc (XH_PATTERN(xh), sz_val, TY_CHAR)
+            sz_val = SZ_HELPDB
+            call calloc (XH_HELPDB(xh), sz_val, TY_CHAR)
 	} then
 	    call error (0, "Error allocating structure pointers.")
 

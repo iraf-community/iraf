@@ -13,6 +13,7 @@ pointer procedure mw_open (bufptr, ndim)
 pointer	bufptr		#I pointer to encoded MWCS, or NULL
 int	ndim		#I dimension of system to be created
 
+size_t	sz_val
 int	i
 pointer	mw, wp
 int	mw_allocd()
@@ -24,7 +25,8 @@ begin
 	call wf_init()
 
 	# Allocate the base descriptor.
-	call calloc (mw, LEN_MWCS, TY_STRUCT)
+	sz_val = LEN_MWCS
+	call calloc (mw, sz_val, TY_STRUCT)
 
 	# Load saved MWCS, if one was given.
 	if (bufptr != NULL) {

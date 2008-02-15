@@ -93,7 +93,8 @@ begin
 	# Allocate and initialize descriptor and string buffer.  Must init
 	# nextch to 1 because 0 is the null index.
 
-	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
+	sz_val = LEN_HDSTRUCT
+	call calloc (hp, sz_val, TY_STRUCT)
 	sz_val = SZ_SBUF
 	call malloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_DEFDIR(hp) = NULL

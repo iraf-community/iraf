@@ -11,12 +11,14 @@ pointer procedure pl_open (smp)
 
 pointer	smp			#I stored mask pointer or NULL
 
+size_t	sz_val
 pointer	pl
 errchk	calloc, pl_load
 
 begin
 	# Allocate and initialize an inactive descriptor.
-	call calloc (pl, LEN_PLDES, TY_STRUCT)
+	sz_val = LEN_PLDES
+	call calloc (pl, sz_val, TY_STRUCT)
 
 	call amovki (1, PL_PLANE(pl,1), PL_MAXDIM)
 	PL_MAGIC(pl) = PL_MAGICVAL

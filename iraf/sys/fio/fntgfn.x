@@ -954,7 +954,8 @@ errchk	calloc, malloc
 begin
 	nchars = strlen (template)
 
-	call calloc (pp, LEN_FNTUHDR, TY_STRUCT)
+	sz_val = LEN_FNTUHDR
+	call calloc (pp, sz_val, TY_STRUCT)
 	sz_val = nchars
 	call malloc (U_TEMPLATE(pp), sz_val, TY_CHAR)
 

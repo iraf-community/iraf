@@ -96,7 +96,8 @@ begin
 	# Allocate and initialize storage for the file list descriptor and
 	# assocated array storage.
 	
-	call calloc (fp, LEN_FLDES, TY_STRUCT)
+	sz_val = LEN_FLDES
+	call calloc (fp, sz_val, TY_STRUCT)
 	sz_val = DEF_MAXFILES
 	call malloc (FL_OFFBP(fp), sz_val, TY_INT)
 	sz_val = DEF_SZSBUF

@@ -28,7 +28,8 @@ include	"../lib/ids.com"
 begin
 	# Allocate the ids descriptor and the string buffer.
 	if ( i_kt == NULL) {
-	    call calloc (i_kt, LEN_IDS, TY_STRUCT)
+	    sz_val = LEN_IDS
+	    call calloc (i_kt, sz_val, TY_STRUCT)
 	    sz_val = SZ_SBUF
 	    call malloc (IDS_SBUF(i_kt), sz_val, TY_CHAR)
 	    sz_val = IDS_MAXBITPL+1

@@ -116,7 +116,8 @@ begin
 	    szindex = DEF_SZ_INDEX
 	    sz_val = SZ_LINE
 	    call malloc (line, sz_val, TY_CHAR)
-	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
+	    sz_val = szindex
+	    call calloc (CQ_RINDEX(res), sz_val, TY_LONG)
 
 	    # Create the index array.
 	    call seek (CQ_RFD(res), BOF)
@@ -275,7 +276,8 @@ begin
 	    szindex = DEF_SZ_INDEX
 	    sz_val = SZ_LINE
 	    call malloc (line, sz_val, TY_CHAR)
-	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
+	    sz_val = szindex
+	    call calloc (CQ_RINDEX(res), sz_val, TY_LONG)
 
 	    # Create the index array.
 	    call seek (CQ_RFD(res), BOF)
@@ -369,7 +371,8 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	call calloc (res, CQ_LEN_RES, TY_STRUCT)
+	sz_val = CQ_LEN_RES
+	call calloc (res, sz_val, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
@@ -436,8 +439,9 @@ begin
 	    CQ_NHEADER(res) = 0
 
 	# Get the header parameters.
-	call calloc (CQ_HKNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_HKVALUES(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+	call calloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
 	ncount = 0
 	if (CQ_NHEADER(res) > 0) {
 
@@ -506,12 +510,15 @@ begin
 	    CQ_NFIELDS(res) = 0
 
 	# Allocate the field description arrays.
-	call calloc (CQ_FNAMES(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_FOFFSETS(res), CQ_NFIELDS(res), TY_INT)
-	call calloc (CQ_FSIZES(res), CQ_NFIELDS(res), TY_INT)
-	call calloc (CQ_FTYPES(res), CQ_NFIELDS(res), TY_INT)
-	call calloc (CQ_FUNITS(res), SZ_LINE, TY_CHAR)
-	call calloc (CQ_FFMTS(res), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+	sz_val = CQ_NFIELDS(res)
+	call calloc (CQ_FOFFSETS(res), sz_val, TY_INT)
+	call calloc (CQ_FSIZES(res), sz_val, TY_INT)
+	call calloc (CQ_FTYPES(res), sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call calloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+	call calloc (CQ_FFMTS(res), sz_val, TY_CHAR)
 
 	# Get the field decoding parameters.
 	ncount = 0
@@ -616,7 +623,8 @@ begin
 	}
 
 	# Allocate space for the simple text field indices array.
-	call calloc (CQ_FINDICES(res), CQ_MAX_NFIELDS + 1, TY_INT)
+	sz_val = CQ_MAX_NFIELDS + 1
+	call calloc (CQ_FINDICES(res), sz_val, TY_INT)
 
 	# Initilize the records descriptor.
 	CQ_RFD(res) = NULL
@@ -662,7 +670,8 @@ begin
             return (NULL)
 
 	# Allocate the structure.
-	call calloc (res, CQ_LEN_RES, TY_STRUCT)
+	sz_val = CQ_LEN_RES
+	call calloc (res, sz_val, TY_STRUCT)
 
 	# Format the catalog information, the address, query, and query
 	# parameters.
@@ -749,8 +758,9 @@ begin
 		if (nscan() < 2)
 		    CQ_NHEADER(res) = 0
 
-                call calloc (CQ_HKNAMES(res), SZ_LINE, TY_CHAR)
-                call calloc (CQ_HKVALUES(res), SZ_LINE, TY_CHAR)
+                sz_val = SZ_LINE
+                call calloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+                call calloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
 
 		ncount = 0
 		if (CQ_NHEADER(res) > 0) {
@@ -820,12 +830,15 @@ begin
 		    CQ_NFIELDS(res) = 0
 
 		# Allocate space for the field descriptors.
-		call calloc (CQ_FNAMES(res), SZ_LINE, TY_CHAR)
-	    	call calloc (CQ_FOFFSETS(res), CQ_NFIELDS(res), TY_INT)
-	    	call calloc (CQ_FSIZES(res), CQ_NFIELDS(res), TY_INT)
-	    	call calloc (CQ_FTYPES(res), CQ_NFIELDS(res), TY_INT)
-		call calloc (CQ_FUNITS(res), SZ_LINE, TY_CHAR)
-		call calloc (CQ_FFMTS(res), SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call calloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+	    	sz_val = CQ_NFIELDS(res)
+	    	call calloc (CQ_FOFFSETS(res), sz_val, TY_INT)
+	    	call calloc (CQ_FSIZES(res), sz_val, TY_INT)
+	    	call calloc (CQ_FTYPES(res), sz_val, TY_INT)
+		sz_val = SZ_LINE
+		call calloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+		call calloc (CQ_FFMTS(res), sz_val, TY_CHAR)
 
 		ncount = 0
 		if (CQ_NFIELDS(res) > 0) {
@@ -927,7 +940,8 @@ begin
 	call sfree (sp)
 
 	# Allocate space for the field indices array.
-	call calloc (CQ_FINDICES(res), CQ_MAX_NFIELDS + 1, TY_INT)
+	sz_val = CQ_MAX_NFIELDS + 1
+	call calloc (CQ_FINDICES(res), sz_val, TY_INT)
 
 	# Initilize the records descriptor.
 	CQ_RFD(res) = NULL

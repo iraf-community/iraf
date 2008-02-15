@@ -344,7 +344,8 @@ bool	clgetb()
 errchk	ia_get2r
 
 begin
-	call calloc (cp, LEN_CP, TY_STRUCT)
+	sz_val = LEN_CP
+	call calloc (cp, sz_val, TY_STRUCT)
 
 	boxsize = clgeti ("boxsize")
 	if (mod (boxsize, 2) == 0) {
@@ -406,7 +407,8 @@ begin
 	call malloc (YCENTER_PT(cp), sz_val, TY_REAL)
 	call malloc (XSIGMA_PT(cp), sz_val, TY_REAL)
 	call malloc (YSIGMA_PT(cp), sz_val, TY_REAL)
-	call calloc (REJECTED_PT(cp), (nshifts+1)*ncoords, TY_INT)
+	sz_val = (nshifts+1)*ncoords
+	call calloc (REJECTED_PT(cp), sz_val, TY_INT)
 
 	for (i=1; ia_get2r (coordlist, x, y) != EOF; i=i+1) {
 	    if (i > ncoords)

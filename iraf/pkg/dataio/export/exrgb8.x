@@ -73,10 +73,12 @@ begin
 	# we'll path up the operand and expressions structs to it copies 
 	# this out to the requested format.
 
-	if (EX_TIMPTR(ex) == NULL)
-	    call calloc (EX_TIMPTR(ex), SZ_FNAME, TY_CHAR)
-	else
+	if (EX_TIMPTR(ex) == NULL) {
+	    sz_val = SZ_FNAME
+	    call calloc (EX_TIMPTR(ex), sz_val, TY_CHAR)
+	} else {
 	    call aclrc (TIMNAME(ex), SZ_FNAME)
+	}
 	call mktemp ("tmp$ex", TIMNAME(ex), SZ_FNAME)
 	oim = immap (TIMNAME(ex), NEW_IMAGE, 0)
 	IM_PIXTYPE(oim) = TY_SHORT

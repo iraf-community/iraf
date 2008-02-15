@@ -24,7 +24,8 @@ begin
 	iferr (i = open (database, mode, TEXT_FILE))
 	    return (NULL)
 
-	call calloc (cq, CQ_LEN, TY_STRUCT)
+	sz_val = CQ_LEN
+	call calloc (cq, sz_val, TY_STRUCT)
 	call strcpy (database, CQ_CATDB(cq), SZ_FNAME)
 	CQ_FD(cq) = i
 

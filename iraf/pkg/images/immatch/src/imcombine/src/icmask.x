@@ -72,9 +72,10 @@ begin
 	    }
 	}
 	npix = IM_LEN(out[1],1)
-	call calloc (pms, nimages, TY_POINTER)
-	call calloc (bufs, nimages, TY_POINTER)
-	call calloc (names, nimages, TY_POINTER)
+	sz_val = nimages
+	call calloc (pms, sz_val, TY_POINTER)
+	call calloc (bufs, sz_val, TY_POINTER)
+	call calloc (names, sz_val, TY_POINTER)
 	do i = 1, nimages {
 	    sz_val = npix
 	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
@@ -164,7 +165,8 @@ begin
 	}
 
 	# Set up mask structure.
-	call calloc (icm, ICM_LEN, TY_STRUCT)
+	sz_val = ICM_LEN
+	call calloc (icm, sz_val, TY_STRUCT)
 	ICM_TYPE(icm) = mtype
 	ICM_VALUE(icm) = mvalue
 	ICM_BUFS(icm) = bufs

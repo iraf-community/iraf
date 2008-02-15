@@ -1550,8 +1550,9 @@ begin
 
 	# Allocate memory for linear coefficients.
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Encode the linear coefficients.
 	call dgssave (sx1, Memd[xcoeff])
@@ -1579,8 +1580,9 @@ begin
 	    ncoeff = max (0, ncoeff)
 	else
 	    ncoeff = max (dgsgeti (sy2, GSNSAVE), ncoeff)
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Encode the coefficients.
 	call dgssave (sx2, Memd[xcoeff])

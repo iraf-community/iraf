@@ -100,7 +100,8 @@ operr_	    call sfree (sp)
 	}
 
 	# Allocate and initialize the image header.
-	call calloc (im, LEN_IMDES + LEN_IMHDR, TY_STRUCT)
+	sz_val = LEN_IMDES + LEN_IMHDR
+	call calloc (im, sz_val, TY_STRUCT)
 	call zgtime (clktime, cputime)
 
 	call strcpy ("imhdr", IM_MAGIC(im), SZ_IMMAGIC)

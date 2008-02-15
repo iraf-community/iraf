@@ -28,7 +28,8 @@ include	"sgi.com"
 begin
 	# Allocate the gkt descriptor and the string buffer.
 	if (g_kt == NULL) {
-	    call calloc (g_kt, LEN_SGI, TY_STRUCT)
+	    sz_val = LEN_SGI
+	    call calloc (g_kt, sz_val, TY_STRUCT)
 	    sz_val = SZ_SBUF
 	    call malloc (SGI_SBUF(g_kt), sz_val, TY_CHAR)
 	}

@@ -29,7 +29,8 @@ begin
 	call salloc (ksec, sz_val, TY_CHAR)
 	call salloc (section, sz_val, TY_CHAR)
 
-	call calloc (mef, LEN_MEF, TY_STRUCT)
+	sz_val = LEN_MEF
+	call calloc (mef, sz_val, TY_STRUCT)
 
 	MEF_ACMODE(mef) = acmode
 

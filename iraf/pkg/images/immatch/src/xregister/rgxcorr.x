@@ -692,7 +692,8 @@ begin
 	    nyfft = 1
 	else
 	    nyfft = rg_szfft (nrlines, ywindow)
-	call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
+	sz_val = 2 * nxfft * nyfft
+	call calloc (fft, sz_val, TY_REAL)
 
 	# Get the input reference and input image data.
 	rbuf = NULL

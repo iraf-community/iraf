@@ -325,14 +325,17 @@ procedure fm_fcinit (fm, cachesize)
 pointer	fm		#I FMIO descriptor
 int	cachesize	#I size of cache, file slots
 
+size_t	sz_val
 pointer	fc
 
 begin
 	if (FM_FCACHE(fm) != NULL)
 	    call fm_fcfree (fm)
 
-	call calloc (fc, LEN_FCACHE(cachesize), TY_STRUCT)
-	call calloc (FC_LFSTAT(fc), FM_NLFILES(fm)+1, TY_SHORT)
+	sz_val = LEN_FCACHE(cachesize)
+	call calloc (fc, sz_val, TY_STRUCT)
+	sz_val = FM_NLFILES(fm)+1
+	call calloc (FC_LFSTAT(fc), sz_val, TY_SHORT)
 	FC_NFILES(fc) = cachesize
 	FC_REFCNT(fc) = 1
 

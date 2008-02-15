@@ -37,7 +37,8 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	# Allcoate space for the rmode structure.
-	call calloc (med, LEN_RMODE_STRUCT, TY_STRUCT)
+	sz_val = LEN_RMODE_STRUCT
+	call calloc (med, sz_val, TY_STRUCT)
 
 	# Get the task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -133,7 +134,8 @@ begin
 		    "T_RMODE: Cannot modal filter a greater than 2D image.")
 		}
 
-		call calloc (kernel, nxk * nyk, TY_SHORT)
+		sz_val = nxk * nyk
+		call calloc (kernel, sz_val, TY_SHORT)
 		RMOD_NRING(med) = med_mkring (Mems[kernel], nxk, nyk,
 		    a1, b1, c1, f1, a2, b2, c2, f2)
 

@@ -72,7 +72,8 @@ begin
 
 	# Allocate image descriptor.
 	len_hdrmem = LEN_IMHDR + (len_ua / SZ_STRUCT)
-	call calloc (im, LEN_IMDES + len_hdrmem, TY_STRUCT)
+	sz_val = LEN_IMDES + len_hdrmem
+	call calloc (im, sz_val, TY_STRUCT)
 
 	IM_ACMODE(im) = acmode
 

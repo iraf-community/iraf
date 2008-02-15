@@ -14,6 +14,7 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 
+size_t	sz_val
 int	col1, col2, ncols, line, line1, line2
 pointer	filter, left, right, inbuf, outbuf
 pointer	impl2r()
@@ -26,9 +27,11 @@ begin
 	    MOD_YBOX(mde) = 1
 
 	# Set the mode filtering buffers.
-	call calloc (filter, MOD_XBOX(mde) * MOD_YBOX(mde) + 1, TY_REAL)
-	call calloc (left, MOD_XBOX(mde) * MOD_YBOX(mde), TY_INT)
-	call calloc (right, MOD_XBOX(mde) * MOD_YBOX(mde), TY_INT)
+	sz_val = MOD_XBOX(mde) * MOD_YBOX(mde) + 1
+	call calloc (filter, sz_val, TY_REAL)
+	sz_val = MOD_XBOX(mde) * MOD_YBOX(mde)
+	call calloc (left, sz_val, TY_INT)
+	call calloc (right, sz_val, TY_INT)
 
 	# Set the input image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)

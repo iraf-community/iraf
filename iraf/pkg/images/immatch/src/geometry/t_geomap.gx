@@ -675,8 +675,9 @@ $if (datatype == r)
 $else
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
 $endif
-	call calloc (xcoeff, ncoeff, TY_PIXEL)
-	call calloc (ycoeff, ncoeff, TY_PIXEL)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_PIXEL)
+	call calloc (ycoeff, sz_val, TY_PIXEL)
 
 	# Output the linear coefficients.
 $if (datatype == r)
@@ -714,8 +715,9 @@ $if (datatype == r)
 $else
 	    ncoeff = max (dgsgeti (sy2, GSNSAVE), ncoeff)
 $endif
-	call calloc (xcoeff, ncoeff, TY_PIXEL)
-	call calloc (ycoeff, ncoeff, TY_PIXEL)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_PIXEL)
+	call calloc (ycoeff, sz_val, TY_PIXEL)
 
 	# Save the coefficients.
 $if (datatype == r)

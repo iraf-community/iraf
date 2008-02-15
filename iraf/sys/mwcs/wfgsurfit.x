@@ -269,7 +269,8 @@ begin
 	}
 
 	# Allocate space for new surface.
-	call calloc (sf2, LEN_WFGSSTRUCT, TY_STRUCT)
+	sz_val = LEN_WFGSSTRUCT
+	call calloc (sf2, sz_val, TY_STRUCT)
 
 	# check the order of the derivatives
 	nxder = min (nxd, WF_XORDER(sf1) - 1)
@@ -330,9 +331,12 @@ begin
 	}
 
 	# Allocate space for coefficients and basis functions.
-	call calloc (WF_COEFF(sf2), WF_NCOEFF(sf2), TY_DOUBLE)
-	call calloc (WF_XBASIS(sf2), WF_XORDER(sf2), TY_DOUBLE)
-	call calloc (WF_YBASIS(sf2), WF_YORDER(sf2), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf2)
+	call calloc (WF_COEFF(sf2), sz_val, TY_DOUBLE)
+	sz_val = WF_XORDER(sf2)
+	call calloc (WF_XBASIS(sf2), sz_val, TY_DOUBLE)
+	sz_val = WF_YORDER(sf2)
+	call calloc (WF_YBASIS(sf2), sz_val, TY_DOUBLE)
 
 	# Get coefficients.
 	call smark (sp)
@@ -441,7 +445,8 @@ double	xmin, xmax, ymin, ymax
 
 begin
 	# Allocate space for the surface descriptor.
-	call calloc (sf, LEN_WFGSSTRUCT, TY_STRUCT)
+	sz_val = LEN_WFGSSTRUCT
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	xorder = nint (WF_SAVEXORDER(fit))
 	if (xorder < 1)

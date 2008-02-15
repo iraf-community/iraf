@@ -171,10 +171,12 @@ begin
 	rbuf = NULL
 	ibuf = NULL
 	stat = OK
-	if (newref == YES)
-	    call calloc  (rsum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
-	        TY_REAL)
-	call calloc  (isum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
+	if (newref == YES) {
+	    sz_val = rg_pstati (pm, DNX) * rg_pstati (pm, DNY)
+	    call calloc  (rsum, sz_val, TY_REAL)
+	}
+	sz_val = rg_pstati (pm, DNX) * rg_pstati (pm, DNY)
+	call calloc  (isum, sz_val,
 	    TY_REAL)
 
 	do i = 1, nregions {
@@ -322,14 +324,16 @@ begin
 	imfft = rg_pstatp (pm, IMFFT)
 	if (imfft != NULL)
 	    call mfree (imfft, TY_REAL)
-	call calloc (imfft, 2 * nxfft * nyfft, TY_REAL)
+	sz_val = 2 * nxfft * nyfft
+	call calloc (imfft, sz_val, TY_REAL)
 	call rg_psetp (pm, IMFFT, imfft)
 
 	# Allocate space for the fft.
 	fft = rg_pstatp (pm, FFT)
 	if (fft != NULL)
 	    call mfree (fft, TY_REAL)
-	call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
+	sz_val = 2 * nxfft * nyfft
+	call calloc (fft, sz_val, TY_REAL)
 	call rg_psetp (pm, FFT, fft)
 
 	# Allocate space for the reference and input image ffts
@@ -338,7 +342,8 @@ begin
 	    reffft = rg_pstatp (pm, REFFFT)
 	    if (reffft != NULL)
 	        call mfree (reffft, TY_REAL)
-	    call calloc (reffft, 2 * nxfft * nyfft, TY_REAL)
+	    sz_val = 2 * nxfft * nyfft
+	    call calloc (reffft, sz_val, TY_REAL)
 	    call rg_psetp (pm, REFFFT, reffft)
 
 	    # Load the reference image FFT.
@@ -469,10 +474,12 @@ begin
 	rbuf = NULL
 	ibuf = NULL
 	if (newref == YES) {
-	    call calloc (rbuf, nrcols * nrlines, TY_REAL)
+	    sz_val = nrcols * nrlines
+	    call calloc (rbuf, sz_val, TY_REAL)
 	    rbuf = rg_pgdata (imr, 1, nrcols, 1, nrlines)
 	}
-	call calloc (ibuf, nrcols * nrlines, TY_REAL)
+	sz_val = nrcols * nrlines
+	call calloc (ibuf, sz_val, TY_REAL)
 	ibuf = rg_pgdata (impsf, 1, nrcols, 1, nrlines)
 
 	# Compute the size for the FFT buffers.
@@ -487,14 +494,16 @@ begin
 	imfft = rg_pstatp (pm, IMFFT)
         if (imfft != NULL)
             call mfree (imfft, TY_REAL)
-        call calloc (imfft, 2 * nxfft * nyfft, TY_REAL)
+        sz_val = 2 * nxfft * nyfft
+        call calloc (imfft, sz_val, TY_REAL)
         call rg_psetp (pm, IMFFT, imfft)
 
         # Allocate space for the fft.
         fft = rg_pstatp (pm, FFT)
         if (fft != NULL)
             call mfree (fft, TY_REAL)
-        call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
+        sz_val = 2 * nxfft * nyfft
+        call calloc (fft, sz_val, TY_REAL)
         call rg_psetp (pm, FFT, fft)
 
 	if (newref == YES) {
@@ -502,7 +511,8 @@ begin
  	    reffft = rg_pstatp (pm, REFFFT)
             if (reffft != NULL)
                 call mfree (reffft, TY_REAL)
-            call calloc (reffft, 2 * nxfft * nyfft, TY_REAL)
+            sz_val = 2 * nxfft * nyfft
+            call calloc (reffft, sz_val, TY_REAL)
             call rg_psetp (pm, REFFFT, reffft)
 
             # Load the reference image FFT.
@@ -631,8 +641,8 @@ begin
 	# Allocate space for the fourier spectrum.
 	if (rg_pstatp (pm, ASFFT) != NULL)
 	    call mfree (rg_pstatp (pm, ASFFT), TY_REAL)
-	call calloc (psfft, rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
-	    TY_REAL)
+	sz_val = rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
+	call calloc (psfft, sz_val, TY_REAL)
 	call rg_psetp (pm, ASFFT, psfft)
 
 	# Allocate space for the convolution kernel.

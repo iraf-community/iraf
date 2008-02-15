@@ -42,7 +42,8 @@ begin
 	call salloc (expr, sz_val, TY_CHAR)
 
 	# Allocate space for the mask expression structure.
-	call calloc (rg, LEN_RGEXPR, TY_STRUCT)
+	sz_val = LEN_RGEXPR
+	call calloc (rg, sz_val, TY_STRUCT)
 	RG_PMIM(rg) = pmim
 
 	# Initalize the i/o pointers.

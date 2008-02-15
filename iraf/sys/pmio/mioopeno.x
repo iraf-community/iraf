@@ -15,7 +15,8 @@ size_t	sz_val
 pointer	mp
 
 begin
-	call calloc (mp, LEN_MIODES, TY_STRUCT)
+	sz_val = LEN_MIODES
+	call calloc (mp, sz_val, TY_STRUCT)
 	sz_val = RL_MAXLEN(pm)
 	call malloc (M_RLP(mp), sz_val, TY_INT)
 	RLI_LEN(M_RLP(mp)) = 0

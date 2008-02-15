@@ -57,7 +57,8 @@ begin
 	PL_NLP(pl) = 1
 	do i = 2, naxes
 	    PL_NLP(pl) = PL_NLP(pl) * axlen[i]
-	call calloc (PL_LPP(pl), PL_NLP(pl), TY_INT)
+	sz_val = PL_NLP(pl)
+	call calloc (PL_LPP(pl), sz_val, TY_INT)
 
 	# Set up the LL header for the empty line.
 	LP_NREFS(lp) = PL_NLP(pl)

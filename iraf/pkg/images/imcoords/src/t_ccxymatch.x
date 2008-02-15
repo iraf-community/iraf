@@ -234,8 +234,10 @@ begin
 		    nreftri = nrefstars
 		} else if (nrefstars > 2) {
 	    	    nrmaxtri = rg_factorial (min (nrefstars, maxntriangles), 3)
-	    	    call calloc (reftri, SZ_TRIINDEX * nrmaxtri, TY_INT)
-	    	    call calloc (reftrirat, SZ_TRIPAR * nrmaxtri, TY_REAL)
+	    	    sz_val = SZ_TRIINDEX * nrmaxtri
+	    	    call calloc (reftri, sz_val, TY_INT)
+	    	    sz_val = SZ_TRIPAR * nrmaxtri
+	    	    call calloc (reftrirat, sz_val, TY_REAL)
 	    	    nreftri = rg_triangle (Memr[xref], Memr[yref],
 		        Memi[rsindex], nrefstars, Memi[reftri],
 			Memr[reftrirat], nrmaxtri, maxntriangles,
@@ -342,8 +344,10 @@ begin
 	        } else if (nliststars > 2) {
 	    	    ninmaxtri = rg_factorial (min (max(nliststars,nrefstars),
 		        maxntriangles), 3)
-	    	    call calloc (intri, SZ_TRIINDEX * ninmaxtri, TY_INT)
-	    	    call calloc (intrirat, SZ_TRIPAR * ninmaxtri, TY_REAL)
+	    	    sz_val = SZ_TRIINDEX * ninmaxtri
+	    	    call calloc (intri, sz_val, TY_INT)
+	    	    sz_val = SZ_TRIPAR * ninmaxtri
+	    	    call calloc (intrirat, sz_val, TY_REAL)
 	    	    nintri = rg_triangle (Memr[xtrans], Memr[ytrans],
 		        Memi[listindex], nliststars, Memi[intri],
 			Memr[intrirat], ninmaxtri, maxntriangles,

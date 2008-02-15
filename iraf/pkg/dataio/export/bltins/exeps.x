@@ -29,6 +29,7 @@ procedure ex_eps (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	eps
 pointer	bptr
 int	fd, len, flags
@@ -50,8 +51,10 @@ begin
 	# Allocate the EPS structure.
 	iferr (call calloc (eps, SZ_EPSSTRUCT, TY_STRUCT))
 	    call error (0, "Error allocating eps structure.")
-	call calloc (EPS_HPTR(eps), 17, TY_CHAR)
-	call calloc (EPS_BPTR(eps), SZ_EPSBUF+SZ_TRAILER, TY_CHAR)
+	sz_val = 17
+	call calloc (EPS_HPTR(eps), sz_val, TY_CHAR)
+	sz_val = SZ_EPSBUF+SZ_TRAILER
+	call calloc (EPS_BPTR(eps), sz_val, TY_CHAR)
 	call strcpy (HEXITS, Memc[EPS_HPTR(eps)], 17)
 	EPS_BCNT(eps) = 1
 
@@ -78,7 +81,8 @@ begin
 	}
 
 	# Flush the remaining pixels in the buffer.
-	call calloc (bptr, SZ_EPSBUF, TY_CHAR)
+	sz_val = SZ_EPSBUF
+	call calloc (bptr, sz_val, TY_CHAR)
 
 	if (mod (EPS_BCNT(eps),2) == 0) {
 	    call amovc ("\ngrestore showpage\n%%Trailer\n\0", 

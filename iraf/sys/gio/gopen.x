@@ -136,7 +136,8 @@ begin
 	# GKI (the graphics kernel interface) on the stream, if the stream
 	# has not already been directed to a kernel.
 
-	call calloc (gp, LEN_GDES, TY_STRUCT)
+	sz_val = LEN_GDES
+	call calloc (gp, sz_val, TY_STRUCT)
 
 	GP_FD(gp) = outfd
 	GP_TTY(gp) = tty

@@ -234,6 +234,7 @@ end
 
 pointer procedure ex_init ()
 
+size_t	sz_val
 pointer	ex
 
 begin
@@ -242,14 +243,19 @@ begin
 	    call error (0, "Error allocating EXPORT task structure.")
 
 	# Allocate internal pointers.
-	call calloc (EX_HDRPTR(ex), SZ_FNAME, TY_CHAR)
-	call calloc (EX_CMPTR(ex), SZ_FNAME, TY_CHAR)
-	call calloc (EX_LUTPTR(ex), SZ_FNAME, TY_CHAR)
-	call calloc (EX_BFNPTR(ex), SZ_FNAME, TY_CHAR)
-	call calloc (EX_OBANDS(ex), MAX_OBEXPR, TY_STRUCT)
-	call calloc (EX_IMOPS(ex), MAX_OPERANDS, TY_STRUCT)
-	call calloc (EX_OTPTR(ex), SZ_LINE, TY_CHAR)
-	call calloc (EX_OBPTR(ex), SZ_EXPSTR, TY_CHAR)
+	sz_val = SZ_FNAME
+	call calloc (EX_HDRPTR(ex), sz_val, TY_CHAR)
+	call calloc (EX_CMPTR(ex), sz_val, TY_CHAR)
+	call calloc (EX_LUTPTR(ex), sz_val, TY_CHAR)
+	call calloc (EX_BFNPTR(ex), sz_val, TY_CHAR)
+	sz_val = MAX_OBEXPR
+	call calloc (EX_OBANDS(ex), sz_val, TY_STRUCT)
+	sz_val = MAX_OPERANDS
+	call calloc (EX_IMOPS(ex), sz_val, TY_STRUCT)
+	sz_val = SZ_LINE
+	call calloc (EX_OTPTR(ex), sz_val, TY_CHAR)
+	sz_val = SZ_EXPSTR
+	call calloc (EX_OBPTR(ex), sz_val, TY_CHAR)
 
 	# Initialize some parameters.
 	EX_OUTFLAGS(ex)   = NULL
@@ -753,7 +759,8 @@ begin
         if (outbands[1] == '@') {
             fd = open (outbands[2], READ_ONLY, TEXT_FILE)
             nchars = fstatl (fd, F_FILESIZE) + 1
-            call calloc (expr, max(SZ_EXPSTR,nchars), TY_CHAR)
+            sz_val = max(SZ_EXPSTR,nchars)
+            call calloc (expr, sz_val, TY_CHAR)
 	    ip = 0
 	    for (j=0; j<nchars && ip != EOF; j=j+1)
 	        ip = getc (fd, Memc[expr+j])
@@ -761,7 +768,8 @@ begin
             call close (fd)
         } else {
             nchars = strlen (outbands) + 1
-            call calloc (expr, max(SZ_EXPSTR,nchars), TY_CHAR)
+            sz_val = max(SZ_EXPSTR,nchars)
+            call calloc (expr, sz_val, TY_CHAR)
 	    call strcpy (outbands, Memc[expr], nchars)
 	}
 
@@ -1134,11 +1142,14 @@ end
 
 procedure ex_alloc_outbands (op)
 
+size_t	sz_val
 pointer	op				#i outbands struct pointer
 
 begin
-	call calloc (op, LEN_OUTBANDS, TY_STRUCT)
-	call calloc (OB_EXPSTR(op), SZ_EXPSTR, TY_CHAR)
+	sz_val = LEN_OUTBANDS
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_EXPSTR
+	call calloc (OB_EXPSTR(op), sz_val, TY_CHAR)
 end
 
 
@@ -1158,11 +1169,14 @@ end
 
 procedure ex_alloc_operand (op)
 
+size_t	sz_val
 pointer	op				#i operand struct pointer
 
 begin
-	call calloc (op, LEN_OPERAND, TY_STRUCT)
-	call calloc (IO_TAG(op), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_OPERAND
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call calloc (IO_TAG(op), sz_val, TY_CHAR)
 end
 
 

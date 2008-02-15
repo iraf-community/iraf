@@ -395,10 +395,12 @@ end
 
 procedure fxf_alloc (fit)
 
+size_t	sz_val
 pointer fit	 		#I input fits descriptor
 
 begin
-	call calloc (fit, LEN_FITDES, TY_STRUCT)
+	sz_val = LEN_FITDES
+	call calloc (fit, sz_val, TY_STRUCT)
 
 	FIT_GROUP(fit) = -1
 	FIT_PIXTYPE(fit) = NULL
@@ -459,7 +461,8 @@ begin
 
 	# We will use a local temporary imio and fit structures.
 #	call calloc (lim, LEN_IMDES+LEN_IMHDR+MIN_LENUSERAREA, TY_STRUCT)
-	call calloc (lim, LEN_IMDES+IM_LENHDRMEM(im), TY_STRUCT)
+	sz_val = LEN_IMDES+IM_LENHDRMEM(im)
+	call calloc (lim, sz_val, TY_STRUCT)
 
 	call fxf_alloc (lfit)
 

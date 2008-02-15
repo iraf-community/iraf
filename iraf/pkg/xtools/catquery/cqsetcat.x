@@ -74,6 +74,7 @@ procedure cq_ccinit (cq, catno)
 pointer	cq			#I the catalog database descriptor
 int	catno			#I the current catalog number
 
+size_t	sz_val
 pointer	cc
 
 begin
@@ -82,17 +83,19 @@ begin
 	CQ_CATNO(cq) = catno
 	call strcpy (CQ_NAME(cq, catno), CQ_CATNAME(cq), SZ_FNAME)
 
-	call calloc (CQ_CAT(cq), CQ_LEN_CC, TY_STRUCT)
+	sz_val = CQ_LEN_CC
+	call calloc (CQ_CAT(cq), sz_val, TY_STRUCT)
 	cc = CQ_CAT(cq)
 
 	CQ_NQPARS(cc) = 0
 	CQ_HFMT(cc) = CQ_HNONE
 
-	call calloc (CQ_PQPNAMES(cc), SZ_LINE, TY_CHAR)
-	call calloc (CQ_PQPDVALUES(cc), SZ_LINE, TY_CHAR)
-	call calloc (CQ_PQPVALUES(cc), SZ_LINE, TY_CHAR)
-	call calloc (CQ_PQPUNITS(cc), SZ_LINE, TY_CHAR)
-	call calloc (CQ_PQPFMTS(cc), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (CQ_PQPNAMES(cc), sz_val, TY_CHAR)
+	call calloc (CQ_PQPDVALUES(cc), sz_val, TY_CHAR)
+	call calloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
+	call calloc (CQ_PQPUNITS(cc), sz_val, TY_CHAR)
+	call calloc (CQ_PQPFMTS(cc), sz_val, TY_CHAR)
 
 	Memc[CQ_PQPNAMES(cc)] = EOS
 	Memc[CQ_PQPDVALUES(cc)] = EOS

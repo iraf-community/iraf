@@ -30,12 +30,14 @@ end
 
 pointer procedure gt_init ()
 
+size_t	sz_val
 pointer	gt
 
 begin
 	# Initialize the graphics.
 
-	call calloc (gt, LEN_GT, TY_STRUCT)
+	sz_val = LEN_GT
+	call calloc (gt, sz_val, TY_STRUCT)
 	GT_VXMIN(gt) = INDEFR
 	GT_VXMAX(gt) = INDEFR
 	GT_VYMIN(gt) = INDEFR

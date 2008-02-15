@@ -22,7 +22,8 @@ begin
 
 	if (IM_OBDES(im) == NULL) {
 	    call imopsf (im)
-	    call calloc (IM_OBDES(im), LEN_BDES, TY_STRUCT)
+	    sz_val = LEN_BDES
+	    call calloc (IM_OBDES(im), sz_val, TY_STRUCT)
 	    IM_MTIME(im) = clktime (long(0))
 	    IM_SVMTIME(im) = IM_MTIME(im)
 	}

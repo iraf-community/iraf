@@ -88,7 +88,8 @@ begin
 	}
 
 	# Allocate space for the mask expression structure.
-	call calloc (me, LEN_MSKEXPR, TY_STRUCT)
+	sz_val = LEN_MSKEXPR
+	call calloc (me, sz_val, TY_STRUCT)
 	ME_PMIM(me) = pmim
 	ME_REFIM(me) = refim
 	ME_REFMSK(me) = refmsk

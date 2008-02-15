@@ -34,9 +34,11 @@ errchk	calloc, malloc
 begin
 	nlines = max (MIN_NLINES, maxlines)
 
-	call calloc (lp, LEN_LNODES, TY_STRUCT)
+	sz_val = LEN_LNODES
+	call calloc (lp, sz_val, TY_STRUCT)
 	LNO_MAXLINES(lp) = nlines
-	call calloc (LNO_LINENUMP(lp), nlines, TY_LONG)
+	sz_val = nlines
+	call calloc (LNO_LINENUMP(lp), sz_val, TY_LONG)
 	sz_val = nlines
 	call malloc (LNO_LINEOFFP(lp), sz_val, TY_LONG)
 	call malloc (LNO_LINETAGP(lp), sz_val, TY_LONG)

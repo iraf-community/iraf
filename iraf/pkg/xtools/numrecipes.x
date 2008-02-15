@@ -676,7 +676,8 @@ pointer	y, indx
 
 begin
 	# Allocate working memory.
-	call calloc (y, n*n, TY_REAL)
+	sz_val = n*n
+	call calloc (y, sz_val, TY_REAL)
 	sz_val = n
 	call malloc (indx, sz_val, TY_INT)
 

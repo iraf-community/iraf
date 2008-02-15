@@ -19,6 +19,7 @@ int	nypix				# number of y data points
 int	len_datain			# row length of datain
 int	interp_type			# interpolant type
 
+size_t	sz_val
 int	nx, ny, nterms, row_length
 int	xindex, yindex, first_row, last_row
 int	kx, ky
@@ -241,7 +242,8 @@ begin
 	    ny = y[1]
 
 	    # allocate space for temporary array and 0 file
-	    call calloc (tmp, row_length * row_length, TY_REAL)
+	    sz_val = row_length * row_length
+	    call calloc (tmp, sz_val, TY_REAL)
 
 	    ky = 0
 	    # maximum number of points used in each direction is SPLPTS

@@ -24,11 +24,13 @@ int	stpstr()
 
 begin
 	# Allocate symtab descriptor.
-	call calloc (stp, LEN_SYMTAB, TY_STRUCT)
+	sz_val = LEN_SYMTAB
+	call calloc (stp, sz_val, TY_STRUCT)
 	ST_MAGIC(stp) = MAGIC
 
 	# Allocate index.
-	call calloc (ST_INDEX(stp), len_index, TY_INT)
+	sz_val = len_index
+	call calloc (ST_INDEX(stp), sz_val, TY_INT)
 	ST_INDEXLEN(stp) = len_index
 
 	# Allocate string buffer.  The first char of storage, at offset 0,

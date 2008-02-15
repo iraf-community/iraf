@@ -21,7 +21,8 @@ begin
 
 	if (IM_IBDES(im) == NULL) {
 	    call imopsf (im)
-	    call calloc (IM_IBDES(im), LEN_BDES * IM_VNBUFS(im), TY_STRUCT)
+	    sz_val = LEN_BDES * IM_VNBUFS(im)
+	    call calloc (IM_IBDES(im), sz_val, TY_STRUCT)
 	}
 
 	# Compute pointer to the next input buffer descriptor.

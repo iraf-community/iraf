@@ -40,12 +40,15 @@ begin
 	copy = (mode == RF_COPY)
 
 	# Allocate and initialize the FITS-WCS descriptor.
-	call calloc (iw, LEN_IMWCS, TY_STRUCT)
-	call calloc (IW_CBUF(iw), LEN_CDES * DEF_MAXCARDS, TY_STRUCT)
+	sz_val = LEN_IMWCS
+	call calloc (iw, sz_val, TY_STRUCT)
+	sz_val = LEN_CDES * DEF_MAXCARDS
+	call calloc (IW_CBUF(iw), sz_val, TY_STRUCT)
 
 	# Allocate string buffer if we must keep a local copy of the data.
 	if (copy) {
-	    call calloc (IW_SBUF(iw), SZ_SBUF, TY_CHAR)
+	    sz_val = SZ_SBUF
+	    call calloc (IW_SBUF(iw), sz_val, TY_CHAR)
 	    IW_SBUFLEN(iw) = SZ_SBUF
 	    IW_SBUFOP(iw) = 0
 	}

@@ -84,7 +84,8 @@ begin
 	    call sfree (sp)
 	    return
 	}
-	call calloc (helpstr, 5*fsize, TY_CHAR)
+	sz_val = 5*fsize
+	call calloc (helpstr, sz_val, TY_CHAR)
 
 	# Read back the sorted list, separate the task name, package, and
 	# descriptions and format it for the GUI.

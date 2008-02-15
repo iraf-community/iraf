@@ -44,7 +44,8 @@ begin
 	}
 
 	# Allocate the stdgraph descriptor and the string buffer.
-	call calloc (g_sg, LEN_SG, TY_STRUCT)
+	sz_val = LEN_SG
+	call calloc (g_sg, sz_val, TY_STRUCT)
 	sz_val = SZ_SBUF
 	call malloc (SG_SBUF(g_sg), sz_val, TY_CHAR)
 
