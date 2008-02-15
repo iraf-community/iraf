@@ -430,28 +430,32 @@ pointer	out			#I output operand
 
 
 short	v_s
+short	zero_s
 short	xvv_nulls()
 extern	xvv_nulls()
 
 int	v_i
+int	zero_i
 int	xvv_nulli()
 extern	xvv_nulli()
 
 long	v_l
+long	zero_l
 long	xvv_nulll()
 extern	xvv_nulll()
 
 real	v_r
+real	zero_r
 real	xvv_nullr()
 extern	xvv_nullr()
 
 double	v_d
+double	zero_d
 double	xvv_nulld()
 extern	xvv_nulld()
 
 pointer	sp, otemp, p1, p2, po
 int	dtype, nelem, len1, len2
-short	zero
 include	"evvexpr.com"
 
 int	xvv_newtype(), strlen()
@@ -461,7 +465,17 @@ string	s_boolop "binop: bitwise boolean operands must be an integer type"
 define	done_ 91
 
 begin
-	zero = 0
+
+	zero_s = 0
+
+	zero_i = 0
+
+	zero_l = 0
+
+	zero_r = 0.0
+
+	zero_d = 0.0D0
+
 
 	# Set the datatype of the output operand, taking an error action if
 	# the operands have incompatible datatypes.
@@ -730,12 +744,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALS(in2) == 0)
-			    O_VALS(out) = xvv_nulls(zero)
+			    O_VALS(out) = xvv_nulls(zero_s)
 			else
 			    O_VALS(out) = O_VALS(in1) / O_VALS(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALS(in2) == 0)
-			    call amovks (xvv_nulls(zero), Mems[po], nelem)
+			    call amovks (xvv_nulls(zero_s), Mems[po], nelem)
 			else {
 			    call adivks (Mems[p1], O_VALS(in2), Mems[po],
 				nelem)
@@ -812,12 +826,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALI(in2) == 0)
-			    O_VALI(out) = xvv_nulli(0)
+			    O_VALI(out) = xvv_nulli(zero_i)
 			else
 			    O_VALI(out) = O_VALI(in1) / O_VALI(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALI(in2) == 0)
-			    call amovki (xvv_nulli(0), Memi[po], nelem)
+			    call amovki (xvv_nulli(zero_i), Memi[po], nelem)
 			else {
 			    call adivki (Memi[p1], O_VALI(in2), Memi[po],
 				nelem)
@@ -894,12 +908,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALL(in2) == 0)
-			    O_VALL(out) = xvv_nulll(0)
+			    O_VALL(out) = xvv_nulll(zero_l)
 			else
 			    O_VALL(out) = O_VALL(in1) / O_VALL(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALL(in2) == 0)
-			    call amovkl (xvv_nulll(0), Meml[po], nelem)
+			    call amovkl (xvv_nulll(zero_l), Meml[po], nelem)
 			else {
 			    call adivkl (Meml[p1], O_VALL(in2), Meml[po],
 				nelem)
@@ -976,12 +990,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALR(in2) == 0.0)
-			    O_VALR(out) = xvv_nullr(0.0)
+			    O_VALR(out) = xvv_nullr(zero_r)
 			else
 			    O_VALR(out) = O_VALR(in1) / O_VALR(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALR(in2) == 0.0)
-			    call amovkr (xvv_nullr(0.0), Memr[po], nelem)
+			    call amovkr (xvv_nullr(zero_r), Memr[po], nelem)
 			else {
 			    call adivkr (Memr[p1], O_VALR(in2), Memr[po],
 				nelem)
@@ -1058,12 +1072,12 @@ begin
 		    # Check for divide by zero.
 		    if (len1 <= 0) {
 			if (O_VALD(in2) == 0.0D0)
-			    O_VALD(out) = xvv_nulld(0.0D0)
+			    O_VALD(out) = xvv_nulld(zero_d)
 			else
 			    O_VALD(out) = O_VALD(in1) / O_VALD(in2)
 		    } else if (len2 <= 0) {
 			if (O_VALD(in2) == 0.0D0)
-			    call amovkd (xvv_nulld(0.0D0), Memd[po], nelem)
+			    call amovkd (xvv_nulld(zero_d), Memd[po], nelem)
 			else {
 			    call adivkd (Memd[p1], O_VALD(in2), Memd[po],
 				nelem)
