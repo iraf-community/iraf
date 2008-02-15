@@ -15,7 +15,6 @@ pointer	list1, list2, sp, imtlist1, imtlist2, image1, image2, imtemp, str
 pointer	med, im1, im2, kernel
 real	rinner, router, ratio, theta, constant, a1, b1, c1, f1, a2, b2, c2, f2
 
-size_t	sz_val
 bool	fp_equalr(), clgetb()
 int	imtgetim(), imtlen(), clgwrd()
 int	med_mkring()
@@ -26,19 +25,15 @@ errchk	med_ell_gauss, med_mkring, med_modring
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (imtlist1, sz_val, TY_CHAR)
-	call salloc (imtlist2, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtlist1, SZ_LINE, TY_CHAR)
+	call salloc (imtlist2, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Allcoate space for the rmode structure.
-	sz_val = LEN_RMODE_STRUCT
-	call calloc (med, sz_val, TY_STRUCT)
+	call calloc (med, LEN_RMODE_STRUCT, TY_STRUCT)
 
 	# Get the task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -134,8 +129,7 @@ begin
 		    "T_RMODE: Cannot modal filter a greater than 2D image.")
 		}
 
-		sz_val = nxk * nyk
-		call calloc (kernel, sz_val, TY_SHORT)
+		call calloc (kernel, nxk * nyk, TY_SHORT)
 		RMOD_NRING(med) = med_mkring (Mems[kernel], nxk, nyk,
 		    a1, b1, c1, f1, a2, b2, c2, f2)
 

@@ -16,7 +16,6 @@ int	n[npts]			#I Number of good pixels
 real	wts[npts]		#I Weights
 int	npts			#I Number of output pixels per line
 
-size_t	sz_val
 int	i, j, k, impnli()
 real	exp
 pointer	buf
@@ -38,8 +37,7 @@ begin
 	    einit = YES
 	}
 
-	sz_val = IM_MAXDIM
-	call amovl (v, Meml[ev], sz_val)
+	call amovl (v, Meml[ev], IM_MAXDIM)
 	i = impnli (pm, buf, Meml[ev])
 	call aclri (Memi[buf], npts)
 	do i = 1, npts {
@@ -65,7 +63,6 @@ char	key[ARB]		#I Exposure time keyword
 real	default			#I Default exposure time
 int	maxval			#I Maximum mask value
 
-size_t	sz_val
 int	i
 real	exp, emin, emax, efrac, imgetr()
 
@@ -77,10 +74,8 @@ int	einit			# Initialization flag
 common	/emask/ exps, ev, ezero, escale, einit
 
 begin
-	sz_val = IM_MAXDIM
-	call malloc (ev, sz_val, TY_LONG)
-	sz_val = nimages
-	call malloc (exps, sz_val, TY_REAL)
+	call malloc (ev, IM_MAXDIM, TY_LONG)
+	call malloc (exps, nimages, TY_REAL)
 
 	emax = 0.
 	emin = MAX_REAL

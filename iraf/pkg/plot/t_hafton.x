@@ -244,8 +244,6 @@ pointer	im				# image descriptor
 real	min_value			# minimum pixel value in image (out)
 real	max_value			# maximum pixel value in image (out)
 
-size_t	sz_val
-long	lg_val
 pointer	buf
 bool	first_line
 long	v[IM_MAXDIM]
@@ -256,9 +254,7 @@ int	imgnls(), imgnll(), imgnlr()
 errchk	amovkl, imgnls, imgnll, imgnlr, alims, aliml, alimr
 
 begin
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)		# start vector
+	call amovkl (long(1), v, IM_MAXDIM)		# start vector
 	first_line = true
 	min_value = INDEF
 	max_value = INDEF

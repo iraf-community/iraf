@@ -18,7 +18,6 @@ int	npts				# Number of input points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 
-size_t	sz_val
 int	i, nreject, newreject, niter
 real	low, high, grow
 pointer	sp, wts1, rejpts
@@ -42,10 +41,8 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (wts1, sz_val, TY_REAL)
-	sz_val = npts
-	call amovr (w, Memr[wts1], sz_val)
+	call salloc (wts1, npts, TY_REAL)
+	call amovr (w, Memr[wts1], npts)
 
 	# Get rejection parameters, and rejected point list.
 	low    = in_getr (in, INLLOW)
@@ -62,8 +59,7 @@ begin
 
 	    # Refit if there are new rejected points.
 	    if (newreject != 0) {
-	        sz_val = npts
-	        call amovr (Memr[wts1], w, sz_val)
+	        call amovr (Memr[wts1], w, npts)
 		call in_refitr (in, nl, x, y, w, npts, nvars, wtflag)
 	    } else
 		break

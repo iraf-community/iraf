@@ -455,14 +455,12 @@ procedure t_load()
 pointer	mw, bp
 int	fd, nchars
 char	fname[SZ_FNAME]
-size_t	sz_val
 int	open(), read()
 pointer	mw_open()
 
 begin
 	call clgstr ("savefile", fname, SZ_FNAME)
-	sz_val = SAVELEN
-	call malloc (bp, sz_val, TY_CHAR)
+	call malloc (bp, SAVELEN, TY_CHAR)
 
 	# Open and read save file.
 	fd = open (fname, READ_ONLY, BINARY_FILE)

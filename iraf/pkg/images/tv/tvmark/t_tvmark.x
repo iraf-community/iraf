@@ -20,7 +20,6 @@ pointer	font			# pointer to the font
 int	autolog			# automatically log commands
 int	interactive		# interactive mode
 
-size_t	sz_val
 pointer	sp, mk, im, iw, outim, cfilename, tmpname
 int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete, bufsize
 
@@ -35,15 +34,14 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (coords, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (deletions, sz_val, TY_CHAR)
-	call salloc (logfile, sz_val, TY_CHAR)
-	call salloc (font, sz_val, TY_CHAR)
-	call salloc  (cfilename, sz_val, TY_CHAR)
-	call salloc (tmpname, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (coords, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (deletions, SZ_FNAME, TY_CHAR)
+	call salloc (logfile, SZ_FNAME, TY_CHAR)
+	call salloc (font, SZ_FNAME, TY_CHAR)
+	call salloc  (cfilename, SZ_FNAME, TY_CHAR)
+	call salloc (tmpname, SZ_FNAME, TY_CHAR)
 
         # Query server to get the WCS version, this also tells us whether
         # we can use the all 16 supported frames.
@@ -193,8 +191,6 @@ procedure mk_imcopy (in, out)
 pointer	in		# pointer to the input image
 pointer	out		# pointe to the output image
 
-long	lg_val
-size_t	sz_val
 int	i, ncols, nlines
 pointer	sp, vin, vout, inbuf, outbuf
 int	imgnls(), impnls()
@@ -202,16 +198,13 @@ errchk	imgnls(), impnls()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
 
 	ncols = IM_LEN(in, 1)
 	nlines = IM_LEN(in, 2)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
 
 	do i = 1, nlines {
 	    if (impnls (out, outbuf, Meml[vout]) == EOF)

@@ -20,7 +20,6 @@ int	mode			# Mode
 pointer	ie			# IE pointer
 real	x, y			# Center
 
-size_t	sz_val
 bool	banner
 int	nset, ncontours, dashpat, nhi
 int	x1, x2, y1, y2, nx, ny, npts, wkid
@@ -103,13 +102,11 @@ begin
 		    btoi (clgpsetb (pp, "ticklabels")))
 
 		# Labels
-		sz_val = IE_SZTITLE
-		call salloc (title, sz_val, TY_CHAR)
-		sz_val = SZ_LINE
-		call salloc (hostid, sz_val, TY_CHAR)
-		call salloc (user, sz_val, TY_CHAR)
-		call salloc (xlabel, sz_val, TY_CHAR)
-		call salloc (ylabel, sz_val, TY_CHAR)
+		call salloc (title, IE_SZTITLE, TY_CHAR)
+		call salloc (hostid, SZ_LINE, TY_CHAR)
+		call salloc (user, SZ_LINE, TY_CHAR)
+		call salloc (xlabel, SZ_LINE, TY_CHAR)
+		call salloc (ylabel, SZ_LINE, TY_CHAR)
 
 		banner = clgpsetb (pp, "banner")
 		if (banner) {
@@ -156,8 +153,7 @@ begin
 
 	# Apply the zero point shift.
 	if (abs (zero) > EPSILON) {
-	    sz_val = npts
-	    call salloc (data1, sz_val, TY_REAL)
+	    call salloc (data1, npts, TY_REAL)
 	    call asubkr (Memr[data], zero, Memr[data1], npts)
 	    floor = floor - zero
 	    ceiling = ceiling - zero

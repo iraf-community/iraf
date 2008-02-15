@@ -22,8 +22,6 @@ char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 pointer	ref_im			#I reference image
 
-long	lg_val
-size_t	sz_val
 pointer	sp, fname, pl, b_pl
 long	axlen[PL_MAXDIM], v[PL_MAXDIM]
 int	acmode, flags, naxes, depth
@@ -39,8 +37,7 @@ include <nullptr.com>
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)
@@ -78,18 +75,14 @@ begin
 	    # Modify the mask according to the given flags, if any.
 	    if (flags != 0) {
 		call pl_gsize (pl, naxes, axlen, depth)
-		lg_val = 1
-		sz_val = PL_MAXDIM
-		call amovkl (lg_val, v, sz_val)
+		call amovkl (1, v, PL_MAXDIM)
 
 		if (and (flags, BOOLEAN_MASK) != 0 && depth > 1) {
 		    b_pl = pl_create (naxes, axlen, 1)
 
 		    if (and (flags, INVERT_MASK) != 0) {
 		        call pl_rop (pl, v, b_pl, v, axlen, PIX_SRC)
-			lg_val = 1
-			sz_val = PL_MAXDIM
-			call amovkl (lg_val, v, sz_val)
+			call amovkl (1, v, PL_MAXDIM)
 		        call pl_rop (b_pl, v, b_pl, v, axlen, PIX_NOT(PIX_SRC))
 		    } else {
 		        call pl_rop (pl, v, b_pl, v, axlen, PIX_SRC)

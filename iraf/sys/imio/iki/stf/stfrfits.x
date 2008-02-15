@@ -41,7 +41,6 @@ pointer	im				#I image descriptor
 pointer	fits				#O pointer to saved FITS cards
 int	fitslen				#O length of FITS save area
 
-size_t	sz_val
 long	fi[LEN_FINFO]
 pointer	sp, pp, stf, o_stf, lbuf, op, hdrfile
 int	in, index, nchars, spool, slot, user, i
@@ -67,10 +66,8 @@ data	initialized /false/
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	# Initialize the header file cache on the first call.
 	if (!initialized) {
@@ -175,8 +172,7 @@ begin
 	    call fseti (spool, F_BUFSIZE, FI_SIZE(fi))
 
 	    # Allocate cache version of STF descriptor.
-	    sz_val = LEN_STFDES
-	    call calloc (stf, sz_val, TY_STRUCT)
+	    call calloc (stf, LEN_STFDES, TY_STRUCT)
 
 	    # Initialize the cache entry.
 	    call strcpy (Memc[hdrfile], rf_fname[1,slot], SZ_PATHNAME)
@@ -248,8 +244,8 @@ begin
 
 	    # Free any unneeded space in the STF descriptor.
 	    if (STF_PCOUNT(stf) > 0) {
-		sz_val = LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES
-		call realloc (stf, sz_val, TY_STRUCT)
+		call realloc (stf,
+		    LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
 		rf_stf[slot] = stf
 	    }
 
@@ -258,8 +254,7 @@ begin
 
 	    call seek (spool, BOFL)
 	    nchars = fstatl (spool, F_FILESIZE)
-	    sz_val = nchars
-	    call malloc (fits, sz_val, TY_CHAR)
+	    call malloc (fits, nchars, TY_CHAR)
 	    user = stropen (Memc[fits], nchars, NEW_FILE)
 	    call stf_copyfits (stf, spool, NULL, user)
 

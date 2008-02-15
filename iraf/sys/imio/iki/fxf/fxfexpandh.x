@@ -26,7 +26,6 @@ int	nbks		#I numbers of blocks to expand group 'group'
 int	hdroff		#O new offset for beginning of 'group' 
 int	pixoff		#0 new offset for beginning of data
 
-size_t	sz_val
 pointer hd, ip, op, buf
 char	line[80], endl[80]
 int	gn, newc, k, nchars, nbk, hsize
@@ -52,8 +51,7 @@ begin
 	call fseti (out_fd, F_ADVICE, SEQUENTIAL)
 
 	bufsize = max (MIN_BUFSIZE, fstati (in_fd, F_BUFSIZE))
-	sz_val = bufsize
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, bufsize, TY_CHAR)
 
 	gn = 0
 	hd = buf
@@ -158,7 +156,6 @@ int	hoffset		#O Header offset for next group
 int	poffset		#O Data offset for current group
 int	hsize		#O Number of cards read in header
 
-size_t	sz_val
 pointer	sp, hb
 int	nblks, totpix, i, j, ip, nchars
 int	strncmp(), read()
@@ -170,8 +167,7 @@ errchk  syserr, read, write
 
 begin
 	call smark (sp)
-	sz_val = 1440
-	call salloc (hb, sz_val, TY_CHAR)
+	call salloc (hb, 1440, TY_CHAR)
 
 	hoffset = note (in)
 

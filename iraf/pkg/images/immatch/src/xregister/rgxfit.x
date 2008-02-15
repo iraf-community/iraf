@@ -110,16 +110,13 @@ int	xwindow, ywindow	#I dimensions of the cross-correlation function
 int	xcbox, ycbox		#I dimensions of the centering box
 real	xshift, yshift		#O x and y shift of cross-correlation function
 
-size_t	sz_val
 int	xindex, yindex, xlo, xhi, ylo, yhi, nx, ny
 pointer	sp, xmarg, ymarg
 
 begin
 	call smark (sp)
-	sz_val = xcbox
-	call salloc (xmarg, sz_val, TY_REAL)
-	sz_val = ycbox
-	call salloc (ymarg, sz_val, TY_REAL)
+	call salloc (xmarg, xcbox, TY_REAL)
+	call salloc (ymarg, ycbox, TY_REAL)
 
 	# Locate the maximum point and normalize.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -156,19 +153,17 @@ int	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
 int	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shift of the peak
 
-size_t	sz_val
 int	i, j, xindex, yindex, xlo, xhi, nx, ylo, yhi, ny
 pointer	sp, x, y, c, xfit, yfit
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = 3
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (c, sz_val, TY_REAL)
-	call salloc (xfit, sz_val, TY_REAL)
-	call salloc (yfit, sz_val, TY_REAL)
+	call salloc (x, 3, TY_REAL)
+	call salloc (y, 3, TY_REAL)
+	call salloc (c, 3, TY_REAL)
+	call salloc (xfit, 3, TY_REAL)
+	call salloc (yfit, 3, TY_REAL)
 
 	# Locate the maximum point.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -234,7 +229,6 @@ int	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
 int	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shift of the peak
 
-size_t	sz_val
 extern	rg_polyfit, rg_dpolyfit
 int	i,  xindex, yindex, xlo, xhi, ylo, yhi, nx, ny, npar, ier
 pointer	sp, x, w, xmarg, ymarg, params, eparams, list, nl
@@ -242,15 +236,13 @@ pointer	locpr()
 
 begin
 	call smark (sp)
-	sz_val = max (xwindow, ywindow)
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (w, sz_val, TY_REAL)
-	call salloc (xmarg, sz_val, TY_REAL)
-	call salloc (ymarg, sz_val, TY_REAL)
-	sz_val = NPARS_PARABOLA
-	call salloc (params, sz_val, TY_REAL)
-	call salloc (eparams, sz_val, TY_REAL)
-	call salloc (list, sz_val, TY_INT)
+	call salloc (x, max (xwindow, ywindow), TY_REAL)
+	call salloc (w, max (xwindow, ywindow), TY_REAL)
+	call salloc (xmarg, max (xwindow, ywindow), TY_REAL)
+	call salloc (ymarg, max (xwindow, ywindow), TY_REAL)
+	call salloc (params, NPARS_PARABOLA, TY_REAL)
+	call salloc (eparams, NPARS_PARABOLA, TY_REAL)
+	call salloc (list, NPARS_PARABOLA, TY_INT)
 
 	# Locate the maximum point.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -361,18 +353,16 @@ int	xwindow, ywindow	#I the dimensions of the cross-correlation
 int	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shifts
 
-size_t	sz_val
 int	i, j, xindex, yindex, xlo, xhi, ylo, yhi, nx, ny
 pointer	sp, data, xfit, yfit, yclean
 real	ic
 
 begin
 	call smark (sp)
-	sz_val = max (xwindow, ywindow)
-	call salloc (data, sz_val, TY_REAL)
-	call salloc (xfit, sz_val, TY_REAL)
-	call salloc (yfit, sz_val, TY_REAL)
-	call salloc (yclean, sz_val, TY_REAL)
+	call salloc (data, max (xwindow, ywindow), TY_REAL)
+	call salloc (xfit, max (xwindow, ywindow), TY_REAL)
+	call salloc (yfit, max (xwindow, ywindow), TY_REAL)
+	call salloc (yclean, max (xwindow, ywindow), TY_REAL)
 
 	# Locate the maximum point and normalize.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -557,7 +547,6 @@ int	type				#I feature type
 real	radius				#I centering radius
 real	threshold			#I minimum range in feature
 
-size_t	sz_val
 int	x1, x2, nx
 real	a, b, rad, wid
 pointer	sp, data1
@@ -599,10 +588,8 @@ begin
 	nx = x2 - x1 + 1
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (data1, sz_val, TY_REAL)
-	sz_val = nx
-	call amovr (data[x1], Memr[data1], sz_val)
+	call salloc (data1, nx, TY_REAL)
+	call amovr (data[x1], Memr[data1], nx)
 
 	# Make the centering data positive, subtract the continuum, and
 	# apply a threshold to eliminate noise spikes.
@@ -648,7 +635,6 @@ real	xc				#O computed xc
 real	ic				#O computed intensity at xc
 real	width				#I centering width
 
-size_t	sz_val
 int	i, j, iteration, dxcheck
 real	hwidth, dx, dxabs, dxlast
 real	a, b, sum1, sum2, intgrl1, intgrl2
@@ -690,8 +676,7 @@ begin
 
 	# Allocate, compute, and interpolate the x*y values.
 	call smark (sp)
-	sz_val = npts
-	call salloc (data1, sz_val, TY_REAL)
+	call salloc (data1, npts, TY_REAL)
 	do i = 1, npts
 	    Memr[data1+i-1] = data[i] * i
 	call asifit (asi2, Memr[data1], npts)

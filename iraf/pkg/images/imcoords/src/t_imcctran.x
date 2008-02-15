@@ -16,7 +16,6 @@ pointer	ix, iy, ox, oy, ilng, ilat, olng, olat, imlist
 int	nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
 bool	uselp, verbose, update, usecd
 
-size_t	sz_val
 double	rg_rmsdiff()
 pointer	immap(), rg_xytoxy(), mw_newcopy(), imtopen()
 int	fstati(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
@@ -29,13 +28,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imtemplate, sz_val, TY_CHAR)
-	call salloc (insystem, sz_val, TY_CHAR)
-	call salloc (outsystem, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtemplate, SZ_FNAME, TY_CHAR)
+	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (outsystem, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the list of images and output coordinate system.
 	call clgstr ("image", Memc[imtemplate], SZ_FNAME)
@@ -105,32 +102,25 @@ begin
 	    ndim = mw_stati (mwin, MW_NPHYSDIM)
 
 	    # Allocate working memory for the vectors and matrices.
-	    sz_val = ndim
-	    call malloc (r, sz_val, TY_DOUBLE)
-	    call malloc (w, sz_val, TY_DOUBLE)
-	    sz_val = ndim * ndim
-	    call malloc (cd, sz_val, TY_DOUBLE)
-	    call malloc (ltm, sz_val, TY_DOUBLE)
-	    sz_val = ndim
-	    call malloc (ltv, sz_val, TY_DOUBLE)
-	    sz_val = ndim * ndim
-	    call malloc (iltm, sz_val, TY_DOUBLE)
-	    sz_val = ndim
-	    call malloc (nr, sz_val, TY_DOUBLE)
-	    call malloc (jr, sz_val, TY_DOUBLE)
-	    sz_val = ndim * ndim
-	    call malloc (ncd, sz_val, TY_DOUBLE)
+	    call malloc (r, ndim, TY_DOUBLE)
+	    call malloc (w, ndim, TY_DOUBLE)
+	    call malloc (cd, ndim * ndim, TY_DOUBLE)
+	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
+	    call malloc (ltv, ndim, TY_DOUBLE)
+	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
+	    call malloc (nr, ndim, TY_DOUBLE)
+	    call malloc (jr, ndim, TY_DOUBLE)
+	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
 
 	    # Allocate working memory for the grid points.
-	    sz_val = npts
-	    call malloc (ix, sz_val, TY_DOUBLE)
-	    call malloc (iy, sz_val, TY_DOUBLE)
-	    call malloc (ilng, sz_val, TY_DOUBLE)
-	    call malloc (ilat, sz_val, TY_DOUBLE)
-	    call malloc (ox, sz_val, TY_DOUBLE)
-	    call malloc (oy, sz_val, TY_DOUBLE)
-	    call malloc (olng, sz_val, TY_DOUBLE)
-	    call malloc (olat, sz_val, TY_DOUBLE)
+	    call malloc (ix, npts, TY_DOUBLE)
+	    call malloc (iy, npts, TY_DOUBLE)
+	    call malloc (ilng, npts, TY_DOUBLE)
+	    call malloc (ilat, npts, TY_DOUBLE)
+	    call malloc (ox, npts, TY_DOUBLE)
+	    call malloc (oy, npts, TY_DOUBLE)
+	    call malloc (olng, npts, TY_DOUBLE)
+	    call malloc (olat, npts, TY_DOUBLE)
 
 	    # Compute the original logical to world transformation.
             call mw_gltermd (mwin, Memd[ltm], Memd[ltv], ndim)
@@ -365,7 +355,6 @@ int	ndim			#I the dimension of the wcs
 double	longpole		#I the longpole value assumed
 double	latpole			#I the latpole value assumed
 
-size_t	sz_val
 int	i,j
 pointer	sp, str
 errchk	mw_gwattrs()
@@ -373,8 +362,7 @@ errchk	mw_gwattrs()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("%s wcs\n")
@@ -445,7 +433,6 @@ double	ilatpole	#O the input system latpole value (deg)
 double	olngpole	#O the output system longpole value (deg)
 double	olatpole	#O the output system latpole value (deg)
 
-size_t	sz_val
 double	tilngpole, tilatpole, thetaa, theta0, tilng, tilat, tilngp, tilatp
 double	ntilng, ntilat
 pointer	sp, str
@@ -456,8 +443,7 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the projection type
 	projection = sk_stati (incoo, S_WTYPE)
@@ -776,7 +762,6 @@ double	xscale, yscale			#O the x and y scale factors
 double	xrot				#O the rotation angle in degrees
 double	yrot				#O the rotation angle in degrees
 
-size_t	sz_val
 int	fitstat
 double	xshift, yshift
 pointer	sp, wts
@@ -784,8 +769,7 @@ int	rg_ffit()
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (wts, sz_val, TY_DOUBLE)
+	call salloc (wts, npts, TY_DOUBLE)
 	call amovkd (1.0d0, Memd[wts], npts)
 
 	fitstat = rg_ffit (xref, yref, xin, yin, Memd[wts], npts,

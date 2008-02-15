@@ -27,7 +27,6 @@ procedure t_hedit()
 pointer	fields			# template listing fields to be processed
 pointer	valexpr			# the value expression (if op=edit|add)
 
-size_t	sz_val
 bool	noupdate, quit
 int	nfields, up, min_lenuserarea
 pointer	imlist
@@ -42,15 +41,12 @@ int	envfind(), ctoi()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (field, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (s_fields, sz_val,  TY_CHAR)
-	call salloc (s_valexpr, sz_val,  TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (sections, sz_val, TY_CHAR)
+	call salloc (buf,       SZ_FNAME, TY_CHAR)
+	call salloc (image,     SZ_FNAME, TY_CHAR)
+	call salloc (field,     SZ_FNAME, TY_CHAR)
+	call salloc (s_fields,  SZ_LINE,  TY_CHAR)
+	call salloc (s_valexpr, SZ_LINE,  TY_CHAR)
+	call salloc (sections, SZ_FNAME, TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
@@ -230,7 +226,6 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
-size_t	sz_val
 int	goahead, nl
 pointer	sp, ip, oldval, newval, defval, o
 
@@ -242,10 +237,9 @@ errchk	evexpr, getline, imaccf, he_gval
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (oldval, sz_val, TY_CHAR)
-	call salloc (newval, sz_val, TY_CHAR)
-	call salloc (defval, sz_val, TY_CHAR)
+	call salloc (oldval, SZ_LINE, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
+	call salloc (defval, SZ_LINE, TY_CHAR)
 
 	# Verify that the named field exists before going any further.
 	if (field[1] != '$')
@@ -351,7 +345,6 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
-size_t	sz_val
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
@@ -362,8 +355,7 @@ errchk	imaccf, evexpr, imaddb, imastr, imaddi, imaddr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (newval, sz_val, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
 
 	# If the named field already exists, this is really an edit operation
 	# rather than an add.  Call editfield so that the usual verification
@@ -389,8 +381,7 @@ begin
 	if (numeric || valexpr[1] == '(')
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
-	    sz_val = LEN_OPERAND
-	    call malloc (o, sz_val, TY_STRUCT)
+	    call malloc (o, LEN_OPERAND, TY_STRUCT)
 	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
@@ -440,7 +431,6 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
-size_t	sz_val
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
@@ -451,8 +441,7 @@ errchk	imaccf, evexpr, imaddb, imastr, imaddi, imaddr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (newval, sz_val, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
 
 	# If the named field already exists, this is really an edit operation
 	# rather than an add.  Call editfield so that the usual verification
@@ -476,8 +465,7 @@ begin
 	if (numeric || valexpr[1] == '(')
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
-	    sz_val = LEN_OPERAND
-	    call malloc (o, sz_val, TY_STRUCT)
+	    call malloc (o, LEN_OPERAND, TY_STRUCT)
 	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
@@ -526,14 +514,12 @@ int	verify			# verify deletion interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
-size_t	sz_val
 pointer	sp, ip, newval
 int	getline(), imaccf()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (newval, sz_val, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
 
 	if (imaccf (im, field) == NO) {
 	    call eprintf ("nonexistent field %s,%s\n")
@@ -776,13 +762,11 @@ procedure he_pargstr (str)
 char	str[ARB]		# string to be printed
 int	ip
 bool	quoteit
-size_t	sz_val
 pointer	sp, op, buf
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	op = buf
 	Memc[op] = '"'

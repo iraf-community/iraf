@@ -9,7 +9,6 @@ procedure in_copyr (insrc, indst)
 pointer	insrc			# source INLFIT pointer
 pointer	indst			# destination INLFIT pointer
 
-size_t	sz_val
 int	in_geti()
 real	in_getr()
 pointer	in_getp()
@@ -25,42 +24,34 @@ begin
 	if (indst == NULL) {
 
 	    # Allocate structure memory.
-	    sz_val = LEN_INLSTRUCT
-	    call malloc (indst, sz_val, TY_STRUCT)
+	    call malloc (indst, LEN_INLSTRUCT, TY_STRUCT)
 
 	    # Allocate memory for parameter values, changes, and list.
-	    sz_val = in_geti (insrc, INLNPARAMS)
-	    call malloc (IN_PARAM  (indst), sz_val,
+	    call malloc (IN_PARAM  (indst), in_geti (insrc, INLNPARAMS),
 			 TY_REAL)
-	    sz_val = in_geti (insrc, INLNPARAMS)
-	    call malloc (IN_DPARAM (indst), sz_val,
+	    call malloc (IN_DPARAM (indst), in_geti (insrc, INLNPARAMS),
 			 TY_REAL)
-	    sz_val = in_geti (insrc, INLNPARAMS)
-	    call malloc (IN_PLIST  (indst), sz_val,
+	    call malloc (IN_PLIST  (indst), in_geti (insrc, INLNPARAMS),
 			 TY_INT)
 
 	    # Allocate space for strings. All strings are limited
 	    # to SZ_LINE or SZ_FNAME.
-	    sz_val = SZ_LINE
-	    call malloc (IN_LABELS     (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_UNITS      (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_FLABELS    (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_FUNITS     (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_PLABELS    (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_PUNITS     (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_VLABELS    (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_VUNITS     (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_USERLABELS (indst), sz_val,  TY_CHAR)
-	    call malloc (IN_USERUNITS  (indst), sz_val,  TY_CHAR)
-	    sz_val = SZ_FNAME
-	    call malloc (IN_HELP       (indst), sz_val, TY_CHAR)
-	    call malloc (IN_PROMPT     (indst), sz_val, TY_CHAR)
+	    call malloc (IN_LABELS     (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_UNITS      (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_FLABELS    (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_FUNITS     (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_PLABELS    (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_PUNITS     (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_VLABELS    (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_VUNITS     (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_USERLABELS (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_USERUNITS  (indst), SZ_LINE,  TY_CHAR)
+	    call malloc (IN_HELP       (indst), SZ_FNAME, TY_CHAR)
+	    call malloc (IN_PROMPT     (indst), SZ_FNAME, TY_CHAR)
 
 	    # Allocate space for floating point and graph substructures.
-	    sz_val = LEN_INLFLOAT
-	    call malloc (IN_SFLOAT (indst), sz_val, TY_REAL)
-	    sz_val = INLNGKEYS * LEN_INLGRAPH
-	    call malloc (IN_SGAXES (indst), sz_val, TY_INT)
+	    call malloc (IN_SFLOAT (indst), LEN_INLFLOAT, TY_REAL)
+	    call malloc (IN_SGAXES (indst), INLNGKEYS * LEN_INLGRAPH, TY_INT)
 	}
 
 	# Copy integer parameters.
@@ -70,10 +61,15 @@ begin
 	call in_puti (indst, INLNFPARAMS,   in_geti (insrc, INLNFPARAMS))
 
 	# Copy parameter values, changes, and list.
-	sz_val = in_geti (insrc, INLNPARAMS)
-	call amovr  (Memr[in_getp (insrc, INLPARAM)], Memr[in_getp (indst, INLPARAM)], sz_val)
-	call amovr  (Memr[in_getp (insrc, INLDPARAM)], Memr[in_getp (indst, INLDPARAM)], sz_val)
-	call amovi   (Memi[in_getp (insrc, INLPLIST)], Memi[in_getp (indst, INLPLIST)], in_geti (insrc, INLNPARAMS))
+	call amovr  (Memr[in_getp (insrc, INLPARAM)],
+		      Memr[in_getp (indst, INLPARAM)],
+		      in_geti (insrc, INLNPARAMS))
+	call amovr  (Memr[in_getp (insrc, INLDPARAM)],
+		      Memr[in_getp (indst, INLDPARAM)],
+		      in_geti (insrc, INLNPARAMS))
+	call amovi   (Memi[in_getp (insrc, INLPLIST)],
+		      Memi[in_getp (indst, INLPLIST)],
+		      in_geti (insrc, INLNPARAMS))
 
 	# Copy defaults.
 	call in_putr (indst, INLTOLERANCE, in_getr (insrc, INLTOLERANCE))
@@ -123,7 +119,8 @@ begin
 	# Copy rejected point list and limit values.
 	call amovi  (Memp[in_getp (insrc, INLREJPTS)],
 	    Memp[in_getp (indst, INLREJPTS)], in_geti (indst, INLNPTS))
-	sz_val = in_geti (indst, INLNVARS)
-	call amovr (Memr[in_getp (insrc, INLXMIN)], Memr[in_getp (indst, INLXMIN)], sz_val)
-	call amovr (Memr[in_getp (insrc, INLXMAX)], Memr[in_getp (indst, INLXMAX)], sz_val)
+	call amovr (Memr[in_getp (insrc, INLXMIN)],
+	    Memr[in_getp (indst, INLXMIN)], in_geti (indst, INLNVARS))
+	call amovr (Memr[in_getp (insrc, INLXMAX)],
+	    Memr[in_getp (indst, INLXMAX)], in_geti (indst, INLNVARS))
 end

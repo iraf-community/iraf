@@ -31,7 +31,6 @@ int	tbl, in, imode
 char	fname[SZ_FNAME], tbl_file[SZ_FNAME], mode[SZ_FNAME]
 bool	gen
 
-size_t	sz_val
 int	clgfil(), open(), fscan(), strncmp(), nscan()
 real	clgetr()
 bool	clgetb()
@@ -50,17 +49,15 @@ begin
 	npts = 0
 
 	# Allocate the initial arrays.
-	sz_val = SZ_TABLE
-	call calloc (xtab, sz_val, TY_DOUBLE)
-	call calloc (ytab, sz_val, TY_DOUBLE)
+	call calloc (xtab, SZ_TABLE, TY_DOUBLE)
+	call calloc (ytab, SZ_TABLE, TY_DOUBLE)
 	tbsize = SZ_TABLE
 
 	while (fscan(tbl) != EOF) {
 	    npts = npts + 1
 	    if (npts > tbsize) {
-		sz_val = (tbsize+SZ_TABLE)
-		call realloc (xtab, sz_val, TY_DOUBLE)
-		call realloc (ytab, sz_val, TY_DOUBLE)
+		call realloc (xtab, (tbsize+SZ_TABLE), TY_DOUBLE)
+		call realloc (ytab, (tbsize+SZ_TABLE), TY_DOUBLE)
 		tbsize = tbsize + SZ_TABLE
 	    }
 	    call gargd (Memd[xtab+npts-1])

@@ -24,7 +24,6 @@ int	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
-size_t	sz_val
 real	rval
 pointer	qp, sp, keyword, vp, in
 int	assignop, byte_offset, sz_field
@@ -41,8 +40,7 @@ define	badkey_ 93
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (keyword, SZ_FNAME, TY_CHAR)
 
 	qp = IO_QP(io)
 
@@ -87,8 +85,7 @@ begin
 		op = op + strlen (F(op))
 		if (op + SZ_TOKBUF > sz_filter) {
 		    sz_filter = sz_filter + INC_SZEXPRBUF
-		    sz_val = sz_filter
-		    call realloc (filter, sz_val, TY_CHAR)
+		    call realloc (filter, sz_filter, TY_CHAR)
 		}
 		call strcpy (F(start), Memc[keyword], SZ_FNAME)
 		call strlwr (Memc[keyword])
@@ -144,8 +141,7 @@ begin
 		    op = op + strlen (F(op))
 		    if (op + SZ_TOKBUF + 1 > sz_filter) {
 			sz_filter = sz_filter + INC_SZEXPRBUF
-			sz_val = sz_filter
-			call realloc (filter, sz_val, TY_CHAR)
+			call realloc (filter, sz_filter, TY_CHAR)
 		    }
 
 		    F(op) = ' ';  op = op + 1
@@ -369,8 +365,7 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 
 	F(op) = EOS
 	sz_filter = op
-	sz_val = sz_filter
-	call realloc (filter, sz_val, TY_CHAR)
+	call realloc (filter, sz_filter, TY_CHAR)
 
 	call qp_closetext (in)
 	call sfree (sp)

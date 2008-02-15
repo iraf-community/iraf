@@ -16,7 +16,6 @@ pointer procedure strestore (fd)
 
 int	fd			# file from which symbol table is to be read
 
-size_t	sz_val
 int	nelem
 pointer	stp, stab, sbuf, index
 int	miireadc(), miireadi()
@@ -29,8 +28,7 @@ begin
 	sbuf  = NULL
 
 	# Read symbol table descriptor.
-	sz_val = LEN_SYMTAB
-	call malloc (stp, sz_val, TY_STRUCT)
+	call malloc (stp, LEN_SYMTAB, TY_STRUCT)
 	if (miireadi (fd, Memi[stp], LEN_SYMTAB) < LEN_SYMTAB)
 	    goto readerr_
 
@@ -39,22 +37,19 @@ begin
 
 	# Read the hash table index.
 	nelem = ST_INDEXLEN(stp)
-	sz_val = nelem
-	call malloc (index, sz_val, TY_INT)
+	call malloc (index, nelem, TY_INT)
 	if (miireadi (fd, Memi[index], nelem) < nelem)
 	    goto readerr_
 
 	# Read the symbol table data.
 	nelem = ST_STABLEN(stp)
-	sz_val = nelem
-	call malloc (stab, sz_val, TY_STRUCT)
+	call malloc (stab, nelem, TY_STRUCT)
 	if (miireadi (fd, Memi[stab], nelem) < nelem)
 	    goto readerr_
 
 	# Read the string buffer.
 	nelem = ST_SBUFLEN(stp)
-	sz_val = nelem
-	call malloc (sbuf, sz_val, TY_CHAR)
+	call malloc (sbuf, nelem, TY_CHAR)
 	if (miireadc (fd, Memc[sbuf], nelem) < nelem)
 	    goto readerr_
 

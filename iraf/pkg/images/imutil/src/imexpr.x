@@ -82,8 +82,6 @@ pointer	oplist, opnam, opval, param, io, ip, op, o, im, ia, emsg
 int	len_exprbuf, fd, nchars, noperands, dtype, status, i, j
 int	ndim, npix, ch, percent, nlines, totlines, flags, mapflag
 
-long	lg_val
-size_t	sz_val
 real	clgetr()
 double	imgetd()
 int	imgftype(), clgwrd(), ctod()
@@ -107,21 +105,17 @@ begin
 	# call memlog ("--------- START IMEXPR -----------")
 
 	call smark (sp)
-	sz_val = LEN_IMEXPR
-	call salloc (ie, sz_val, TY_STRUCT)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
-	call salloc (intype, sz_val, TY_CHAR)
-	call salloc (outtype, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (oplist, sz_val, TY_CHAR)
-	call salloc (opval, sz_val, TY_CHAR)
-	call salloc (dims, sz_val, TY_CHAR)
-	call salloc (emsg, sz_val, TY_CHAR)
+	call salloc (ie, LEN_IMEXPR, TY_STRUCT)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (output, SZ_PATHNAME, TY_CHAR)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (intype, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_FNAME, TY_CHAR)
+	call salloc (oplist, SZ_LINE, TY_CHAR)
+	call salloc (opval, SZ_LINE, TY_CHAR)
+	call salloc (dims, SZ_LINE, TY_CHAR)
+	call salloc (emsg, SZ_LINE, TY_CHAR)
 
 	# Initialize the main imexpr descriptor.
 	call aclri (Memi[ie], LEN_IMEXPR)
@@ -140,8 +134,7 @@ begin
 	# or macro references.
 
 	len_exprbuf = SZ_COMMAND
-	sz_val = len_exprbuf
-	call malloc (expr, sz_val, TY_CHAR)
+	call malloc (expr, len_exprbuf, TY_CHAR)
 	call clgstr ("expr", Memc[expr], len_exprbuf)
 
 	if (Memc[expr] == '@') {
@@ -149,8 +142,7 @@ begin
 	    nchars = fstatl (fd, F_FILESIZE)
 	    if (nchars > len_exprbuf) {
 		len_exprbuf = nchars
-		sz_val = len_exprbuf
-		call realloc (expr, sz_val, TY_CHAR)
+		call realloc (expr, len_exprbuf, TY_CHAR)
 	    }
 	    for (op=expr;  getci(fd,ch) != EOF;  op = op + 1) {
 		if (ch == '\n')
@@ -236,8 +228,7 @@ begin
 
 		IO_TYPE(io) = PARAMETER
 		IO_DATA(io) = ip
-		sz_val = SZ_LINE
-		call salloc (IO_DATA(io), sz_val, TY_CHAR)
+		call salloc (IO_DATA(io), SZ_LINE, TY_CHAR)
 		call strcpy (Memc[ip], Memc[IO_DATA(io)], SZ_LINE)
 
 	    } else if (ctod (Memc, ip, dval) > 0) {
@@ -282,9 +273,7 @@ image_
 		}
 
 		IO_TYPE(io) = IMAGE
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, IO_V(io,1), sz_val)
+		call amovkl (1, IO_V(io,1), IM_MAXDIM)
 		IO_IM(io) = im
 
 		switch (IM_PIXTYPE(im)) {
@@ -398,8 +387,7 @@ image_
 	    case TY_CHAR:
 		O_TYPE(o) = TY_CHAR
 		O_LEN(o)  = SZ_LINE
-		sz_val = SZ_LINE
-		call malloc (O_VALP(o), sz_val, TY_CHAR)
+		call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
 		call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
 
 	    case TY_INT:
@@ -470,8 +458,7 @@ image_
 	call clgstr ("dims", Memc[dims], SZ_LINE)
 	if (streq (Memc[dims], "auto")) {
 	    # Determine the output image dimensions from the input images.
-	    sz_val = IM_MAXDIM-1
-	    call amovki (1, IE_AXLEN(ie,2), sz_val)
+	    call amovki (1, IE_AXLEN(ie,2), IM_MAXDIM-1)
 	    IE_AXLEN(ie,1) = 0
 	    ndim = 1
 
@@ -548,16 +535,13 @@ image_
 	    else
 		outim = immap (Memc[output], NEW_IMAGE, 0)
 	    IM_LEN(outim,1) = 0
-	    sz_val = IM_MAXDIM-1
-	    call amovl (IE_AXLEN(ie,2), IM_LEN(outim,2), sz_val)
+	    call amovl (IE_AXLEN(ie,2), IM_LEN(outim,2), IM_MAXDIM-1)
 	    IM_NDIM(outim) = IE_NDIM(ie)
 	    IM_PIXTYPE(outim) = 0
 	}
 
 	# Initialize output image line pointer.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, IE_V(ie,1), sz_val)
+	call amovkl (1, IE_V(ie,1), IM_MAXDIM)
 
 	percent = 0
 	nlines = 0
@@ -618,12 +602,10 @@ image_
 			call amovi (Memi[ip], Memi[op], npix)
 
 		    case TY_LONG:
-			sz_val = npix
-			call amovl (Meml[ip], Meml[op], sz_val)
+			call amovl (Meml[ip], Meml[op], npix)
 
 		    case TY_REAL:
-			sz_val = npix
-			call amovr (Memr[ip], Memr[op], sz_val)
+			call amovr (Memr[ip], Memr[op], npix)
 
 		    case TY_DOUBLE:
 			call amovd (Memd[ip], Memd[op], npix)
@@ -656,45 +638,35 @@ image_
 
 		case TY_SHORT:
 		    if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			lg_val = 1
-			sz_val = IM_MAXDIM
-			call amovkl (lg_val, IO_V(io,1), sz_val)
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
 			if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_INT:
 		    if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			lg_val = 1
-			sz_val = IM_MAXDIM
-			call amovkl (lg_val, IO_V(io,1), sz_val)
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
 			if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_LONG:
 		    if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			lg_val = 1
-			sz_val = IM_MAXDIM
-			call amovkl (lg_val, IO_V(io,1), sz_val)
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
 			if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_REAL:
 		    if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			lg_val = 1
-			sz_val = IM_MAXDIM
-			call amovkl (lg_val, IO_V(io,1), sz_val)
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
 			if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_DOUBLE:
 		    if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			lg_val = 1
-			sz_val = IM_MAXDIM
-			call amovkl (lg_val, IO_V(io,1), sz_val)
+			call amovkl (1, IO_V(io,1), IM_MAXDIM)
 			if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
@@ -818,7 +790,6 @@ pointer	ie			#I imexpr descriptor
 char	opname[ARB]		#I operand name
 pointer	o			#I output operand to be filled in
 
-size_t	sz_val
 int	axis, i
 pointer	param, data
 pointer	sp, im, io, v
@@ -860,8 +831,7 @@ begin
 
 	} else if (IS_LOWER(opname[1]) && opname[2] == '.') {
 	    # Image parameter reference, e.g., "a.foo".
-	    sz_val = SZ_FNAME
-	    call salloc (param, sz_val, TY_CHAR)
+	    call salloc (param, SZ_FNAME, TY_CHAR)
 
 	    # Locate referenced symbolic image operand (e.g. "a").
 	    io = NULL
@@ -890,8 +860,7 @@ begin
 		O_LEN(o) = SZ_LINE
 		O_FLAGS(o) = O_FREEVAL
 		iferr {
-		    sz_val = SZ_LINE
-		    call malloc (O_VALP(o), sz_val, TY_CHAR)
+		    call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
 		    call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
 		} then
 		    goto err_
@@ -927,8 +896,7 @@ begin
 		    # Line length not known yet.
 		    O_LEN(o) = DEF_LINELEN
 		}
-		sz_val = O_LEN(o)
-		call malloc (data, sz_val, TY_INT)
+		call malloc (data, O_LEN(o), TY_INT)
 		do i = 1, O_LEN(o)
 		    Memi[data+i-1] = i
 		O_VALP(o) = data
@@ -946,15 +914,11 @@ begin
 		else 
 		    # Line length not known yet.
 		    O_LEN(o) = DEF_LINELEN
-		sz_val = O_LEN(o)
-		call malloc (data, sz_val, TY_INT)
-		if (axis < 1 || axis > IM_MAXDIM) {
-		    sz_val = O_LEN(o)
-		    call amovki (1, Memi[data], sz_val)
-		} else {
-		    sz_val = O_LEN(o)
-		    call amovki (IE_V(ie,axis), Memi[data], sz_val)
-		}
+		call malloc (data, O_LEN(o), TY_INT)
+		if (axis < 1 || axis > IM_MAXDIM)
+		    call amovki (1, Memi[data], O_LEN(o))
+		else
+		    call amovki (IE_V(ie,axis), Memi[data], O_LEN(o))
 		O_VALP(o) = data
 		O_FLAGS(o) = O_FREEVAL
 	    }
@@ -997,7 +961,6 @@ pointer procedure ie_getexprdb (fname)
 
 char	fname[ARB]		#I file to be read
 
-size_t	sz_val
 pointer	sym, sp, lbuf, st, a_st, ip, symname, tokbuf, text
 int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n
 errchk	open, getlline, stopen, stenter, ie_puttok
@@ -1007,12 +970,10 @@ define	skip_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (lbuf, sz_val, TY_CHAR)
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (tokbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (symname, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (text, SZ_COMMAND, TY_CHAR)
+	call salloc (tokbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (symname, SZ_FNAME, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 	st = stopen ("imexpr", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)
@@ -1138,7 +1099,6 @@ int	op			#U output pointer
 int	buflen			#U buffer length, chars
 char	token[ARB]		#I token string
 
-size_t	sz_val
 pointer	sym
 int	ip, ch1, ch2
 pointer	stfind()
@@ -1159,8 +1119,7 @@ begin
 	for (ip=1;  token[ip] != EOS;  ip=ip+1) {
 	    if (op + 1 > buflen) {
 		buflen = buflen + SZ_COMMAND
-		sz_val = buflen
-		call realloc (text, sz_val, TY_CHAR)
+		call realloc (text, buflen, TY_CHAR)
 	    }
 
 	    # The following is necessary because ctotok parses tokens such as
@@ -1213,7 +1172,6 @@ pointer procedure ie_expandtext (st, expr)
 pointer	st			#I symbol table (macros)
 char	expr[ARB]		#I input expression
 
-size_t	sz_val
 pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
@@ -1223,8 +1181,7 @@ extern	ie_gsym()
 
 begin
 	buflen = SZ_COMMAND
-	sz_val = buflen
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, buflen, TY_CHAR)
 
 	gt = gt_opentext (expr, locpr(ie_gsym), st, 0, GT_NOFILE)
 	nchars = gt_expand (gt, buf, buflen)
@@ -1244,7 +1201,6 @@ char	expr[ARB]		#I input expression
 char	oplist[ARB]		#O operand list
 int	maxch			#I max chars out
 
-size_t	sz_val
 int	noperands, ch, i
 int	ops[MAX_OPERANDS]
 pointer	gt, sp, tokbuf, op
@@ -1257,8 +1213,7 @@ errchk	gt_opentext, gt_rawtok
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (tokbuf, sz_val, TY_CHAR)
+	call salloc (tokbuf, SZ_LINE, TY_CHAR)
 
 	call aclri (ops, MAX_OPERANDS)
 	gt = gt_opentext (expr, locpr(ie_gsym), st, 0, GT_NOFILE+GT_NOCOMMAND)

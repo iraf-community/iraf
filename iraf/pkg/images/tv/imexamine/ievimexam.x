@@ -28,7 +28,6 @@ pointer	ie		# IMEXAM pointer
 real	x, y		# Starting or center coordinate
 int	key		# 'u' centered vector, 'v' two endpoint vector
 
-size_t	sz_val
 int	btype, nxvals, nyvals, nzvals, width
 pointer	sp, title, boundary, im, x_vec, y_vec, pp
 real	x1, y1, x2, y2, zmin, zmax, bconstant
@@ -47,10 +46,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = IE_SZTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_BTYPE
-	call salloc (boundary, sz_val, TY_CHAR)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (boundary, SZ_BTYPE, TY_CHAR)
 
 	# Get boundary extension parameters.
 	if (IE_PP(ie) != NULL)
@@ -82,9 +79,8 @@ begin
 	nzvals = int (sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))) + 1
 
 	# Check for cases which should be handled by pcols or prows.
-	sz_val = nzvals
-	call malloc (x_vec, sz_val, TY_REAL)
-	call malloc (y_vec, sz_val, TY_REAL)
+	call malloc (x_vec, nzvals, TY_REAL)
+	call malloc (y_vec, nzvals, TY_REAL)
 	if (fp_equalr (x1, x2))
 	    call ie_get_col (im, x1, y1, x2, y2, nzvals, width, btype,
 	        bconstant, Memr[x_vec], Memr[y_vec], zmin, zmax)
@@ -141,7 +137,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, dpx, dpy, ratio, xoff, yoff, noff, xv, yv
 int	i, j, k, nedge, col1, col2, line1, line2
 int	colb, colc, line, linea, lineb, linec
@@ -152,12 +147,11 @@ errchk	msiinit
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oxs, sz_val, TY_REAL)
-	call salloc (oys, sz_val, TY_REAL)
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oxs, width, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Determine sampling perpendicular to vector.
 	dx = (x2 - x1) / (nvals - 1)
@@ -279,7 +273,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 real	sum
 int	line, linea, lineb, linec
 pointer sp, xs, ys, msi, yvals, buf
@@ -290,10 +283,9 @@ errchk	msiinit
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (xs, width, TY_REAL)
+	call salloc (ys, width, TY_REAL)
+	call salloc (yvals, width, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]
@@ -390,7 +382,6 @@ real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
-size_t	sz_val
 double	dx, dy, yoff, noff, xv, yv
 int	i, j, nedge, col1, col2, line1, line2
 int	line, linea, lineb, linec
@@ -400,12 +391,10 @@ pointer	imgs2r()
 
 begin
 	call smark (sp)
-	sz_val = width
-	call salloc (oys, sz_val, TY_REAL)
-	sz_val = nvals
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	call salloc (yvals, sz_val, TY_REAL)
+	call salloc (oys, width, TY_REAL)
+	call salloc (xs, nvals, TY_REAL)
+	call salloc (ys, nvals, TY_REAL)
+	call salloc (yvals, nvals, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
 	call msiinit (msi, II_BILINEAR]
@@ -473,12 +462,10 @@ begin
 	    call amovkr (real (Memr[oys+i-1] - lineb + 1), Memr[ys], nvals)
 	    call msivector (msi, Memr[xs], Memr[ys], Memr[yvals], nvals)
 
-	    if (width == 1) {
-		sz_val = nvals
-		call amovr (Memr[yvals], y_vector, sz_val)
-	    } else {
+	    if (width == 1)
+		call amovr (Memr[yvals], y_vector, nvals)
+	    else 
 		call aaddr (Memr[yvals], y_vector, y_vector, nvals)
-	    }
 
 	    yv = yv + dy
 	}	
@@ -539,7 +526,6 @@ int	line1		# First image line of buffer
 int	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
-size_t	sz_val
 pointer	buf1, buf2
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 errchk	malloc, realloc, imgs2r
@@ -555,13 +541,11 @@ begin
 	# a full buffer image read.
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    sz_val = ncols * nlines
-	    call realloc (buf, sz_val, TY_REAL)
+	    call realloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	}
@@ -576,8 +560,7 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	} else if (line2 > llast2) {
 	    do i = line1, line2 {
@@ -587,8 +570,7 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	}
 

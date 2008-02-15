@@ -104,7 +104,6 @@ int	geometry		#I the type of geometry to be computed
 pointer	sx1, sy1		#O pointers to the linear x and y surfaces
 pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 
-size_t	sz_val
 int	i, rec, ncoeff, junk
 real	xmag, ymag, xrot, yrot, xref, yref, xout, yout, xshift, yshift
 pointer	newsx1, newsy1, xcoeff, ycoeff
@@ -118,9 +117,8 @@ begin
 
 	# Get linear part of fit.
 	ncoeff = dtgeti (dt, rec, "surface1")
-	sz_val = ncoeff
-	call malloc (xcoeff, sz_val, TY_REAL)
-	call malloc (ycoeff, sz_val, TY_REAL)
+	call malloc (xcoeff, ncoeff, TY_REAL)
+	call malloc (ycoeff, ncoeff, TY_REAL)
 	do i = 1, ncoeff {
 	    junk = dtscan (dt)
 	    call gargr (Memr[xcoeff+i-1])
@@ -164,9 +162,8 @@ begin
 	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
 	    geometry == GEO_DISTORTION)) {
 
-	    sz_val = ncoeff
-	    call realloc (xcoeff, sz_val, TY_REAL)
-	    call realloc (ycoeff, sz_val, TY_REAL)
+	    call realloc (xcoeff, ncoeff, TY_REAL)
+	    call realloc (ycoeff, ncoeff, TY_REAL)
 	    do i = 1, ncoeff {
 		junk = dtscan (dt)
 		call gargr (Memr[xcoeff+i-1])
@@ -325,7 +322,6 @@ int	geometry		#I the type of geometry to be computed
 pointer	sx1, sy1		#O pointers to the linear x and y surfaces
 pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 
-size_t	sz_val
 int	i, rec, ncoeff, junk
 double	xmag, ymag, xrot, yrot, xref, yref, xout, yout, xshift, yshift
 pointer	newsx1, newsy1, xcoeff, ycoeff
@@ -339,9 +335,8 @@ begin
 
 	# Get linear part of fit.
 	ncoeff = dtgeti (dt, rec, "surface1")
-	sz_val = ncoeff
-	call malloc (xcoeff, sz_val, TY_DOUBLE)
-	call malloc (ycoeff, sz_val, TY_DOUBLE)
+	call malloc (xcoeff, ncoeff, TY_DOUBLE)
+	call malloc (ycoeff, ncoeff, TY_DOUBLE)
 	do i = 1, ncoeff {
 	    junk = dtscan (dt)
 	    call gargd (Memd[xcoeff+i-1])
@@ -385,9 +380,8 @@ begin
 	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
 	    geometry == GEO_DISTORTION)) {
 
-	    sz_val = ncoeff
-	    call realloc (xcoeff, sz_val, TY_DOUBLE)
-	    call realloc (ycoeff, sz_val, TY_DOUBLE)
+	    call realloc (xcoeff, ncoeff, TY_DOUBLE)
+	    call realloc (ycoeff, ncoeff, TY_DOUBLE)
 	    do i = 1, ncoeff {
 		junk = dtscan (dt)
 		call gargd (Memd[xcoeff+i-1])

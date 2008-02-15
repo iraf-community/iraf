@@ -31,7 +31,6 @@ pointer procedure me_getexprdb (fname)
 
 char	fname[ARB]		#I file to be read
 
-size_t	sz_val
 pointer	sym, sp, lbuf, st, a_st, ip, symname, tokbuf, text
 int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n
 pointer	stopen(), stenter()
@@ -42,12 +41,10 @@ define	skip_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (lbuf, sz_val, TY_CHAR)
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (tokbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (symname, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (text, SZ_COMMAND, TY_CHAR)
+	call salloc (tokbuf, SZ_COMMAND, TY_CHAR)
+	call salloc (symname, SZ_FNAME, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 	st = stopen ("imexpr", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)
@@ -173,7 +170,6 @@ int	op			#U output pointer
 int	buflen			#U buffer length, chars
 char	token[ARB]		#I token string
 
-size_t	sz_val
 pointer	sym
 int	ip, ch1, ch2
 pointer	stfind()
@@ -194,8 +190,7 @@ begin
 	for (ip=1;  token[ip] != EOS;  ip=ip+1) {
 	    if (op + 1 > buflen) {
 		buflen = buflen + SZ_COMMAND
-		sz_val = buflen
-		call realloc (text, sz_val, TY_CHAR)
+		call realloc (text, buflen, TY_CHAR)
 	    }
 
 	    # The following is necessary because ctotok parses tokens such as
@@ -248,7 +243,6 @@ pointer procedure me_expandtext (st, expr)
 pointer	st			#I symbol table (macros)
 char	expr[ARB]		#I input expression
 
-size_t	sz_val
 pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
@@ -258,8 +252,7 @@ extern	me_gsym()
 
 begin
 	buflen = SZ_COMMAND
-	sz_val = buflen
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, buflen, TY_CHAR)
 
 	gt = gt_opentext (expr, locpr(me_gsym), st, 0, GT_NOFILE)
 	nchars = gt_expand (gt, buf, buflen)

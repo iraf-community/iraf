@@ -44,8 +44,6 @@ procedure imisec (imdes, section)
 pointer	imdes
 char	section[ARB]
 int	ip, i, dim, nsubscripts, nphysdim, nlogdim
-long	lg_val
-size_t	sz_val
 long	x1[IM_MAXDIM], x2[IM_MAXDIM], step[IM_MAXDIM], clktime()
 
 begin
@@ -55,9 +53,7 @@ begin
 	nphysdim = IM_NDIM(imdes)
 
 	call aclrl (IM_VOFF(imdes,1), nphysdim)
-	lg_val = 1
-	sz_val = nphysdim
-	call amovkl (lg_val, IM_VSTEP(imdes,1), sz_val)
+	call amovkl (long(1), IM_VSTEP(imdes,1), nphysdim)
 
 	do dim = 1, nphysdim
 	    IM_VMAP(imdes,dim) = dim

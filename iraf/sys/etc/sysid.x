@@ -17,7 +17,6 @@ procedure sysid (outstr, maxch)
 char	outstr[maxch]			# receives id string
 int	maxch
 
-size_t	sz_val
 pointer	sp, buf
 int	op, nchars
 int	envfind(), gstrcpy()
@@ -25,8 +24,7 @@ long	clktime()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	nchars = envfind ("version", outstr, maxch)
 	if (nchars <= 0)

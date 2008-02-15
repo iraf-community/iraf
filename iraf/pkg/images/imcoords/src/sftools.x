@@ -36,12 +36,10 @@ end
 
 procedure sf_init (sf)
 
-size_t	sz_val
 pointer	sf			#U pointer to the star finding structure
 
 begin
-	sz_val = LEN_STARFIND
-	call calloc (sf, sz_val, TY_STRUCT)
+	call calloc (sf, LEN_STARFIND, TY_STRUCT)
 
 	SF_HWHMPSF(sf) = DEF_HWHMPSF
 	SF_FRADIUS(sf) = DEF_FRADIUS

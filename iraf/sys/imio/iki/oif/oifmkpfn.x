@@ -16,7 +16,6 @@ pointer	im			# image descriptor
 char	pixfile[maxch]		# receives pathname to pixfile
 int	maxch
 
-size_t	sz_val
 char	suffix[2]
 int	len_osdir, len_root, len_extn, n
 pointer	sp, imdir, osdir, root, extn, subdir, fname, ip, op
@@ -38,14 +37,12 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (imdir, sz_val, TY_CHAR)
-	call salloc (osdir, sz_val, TY_CHAR)
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (subdir, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (imdir,  SZ_PATHNAME, TY_CHAR)
+	call salloc (osdir,  SZ_PATHNAME, TY_CHAR)
+	call salloc (root,   SZ_PATHNAME, TY_CHAR)
+	call salloc (subdir, SZ_PATHNAME, TY_CHAR)
+	call salloc (fname,  SZ_PATHNAME, TY_CHAR)
+	call salloc (extn,   SZ_FNAME, TY_CHAR)
 
 	if (envgets ("imdir", Memc[imdir], SZ_PATHNAME) <= 0)
 	    call strcpy (HDR, Memc[imdir], SZ_PATHNAME)

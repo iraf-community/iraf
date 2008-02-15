@@ -16,7 +16,6 @@ int	nchars			#I nchars of data to be written
 int	offset			#I file offset in pixel file
 int	inplace			#I nonzero if ok to modify input data buffer
 
-size_t	sz_val
 pointer	sp, bp
 int	nbytes, status
 int	bfwrit()
@@ -34,8 +33,7 @@ begin
 
 	# We need to swap into a private buffer.
 	call smark (sp)
-	sz_val = nchars
-	call salloc (bp, sz_val, TY_CHAR)
+	call salloc (bp, nchars, TY_CHAR)
 
 	# Swap into the output buffer.
 	nbytes = nchars * SZB_CHAR

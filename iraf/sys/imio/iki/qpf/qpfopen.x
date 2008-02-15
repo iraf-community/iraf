@@ -25,7 +25,6 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
-size_t	sz_val
 int	n
 real	xblock, yblock, tol
 pointer	sp, qp, io, v, fname, qpf
@@ -37,10 +36,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (v, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (v, SZ_FNAME, TY_CHAR)
 
 	io = NULL
 	qp = NULL
@@ -51,8 +48,7 @@ begin
 	if (!(cl_index < 0 || cl_index == 1))
 	    goto err_
 
-	sz_val = LEN_QPFDES
-	call malloc (qpf, sz_val, TY_STRUCT)
+	call malloc (qpf, LEN_QPFDES, TY_STRUCT)
 
 	# Open the QPOE file.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)

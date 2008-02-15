@@ -11,7 +11,6 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I parameter to be set
 char	comment[ARB]		#I comment string
 
-size_t	sz_val
 bool	string_valued
 int	ch, i, ti, j
 pointer	rp, ip, op, sp, val, start, text, cmmt
@@ -20,10 +19,9 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (val, sz_val, TY_CHAR)
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (cmmt, sz_val, TY_CHAR)
+	call salloc (val, SZ_LINE, TY_CHAR)
+	call salloc (text, SZ_LINE, TY_CHAR)
+	call salloc (cmmt, SZ_LINE, TY_CHAR)
 
 	# Find the record.
 	if (idb_findrecord (im, key, rp) == 0)

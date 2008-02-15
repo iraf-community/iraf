@@ -19,7 +19,6 @@ int	mode
 real	x, y
 int	axis
 
-size_t	sz_val
 int	navg, order, clgpseti()
 bool	center, background, clgpsetb()
 real	sigma, width, rplot, clgpsetr()
@@ -91,21 +90,17 @@ begin
 	yc = (y1 + y2) / 2.
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (xs, sz_val, TY_REAL)
-	call salloc (ys, sz_val, TY_REAL)
-	sz_val = IE_SZTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (avstr, sz_val, TY_CHAR)
+	call salloc (xs, nx, TY_REAL)
+	call salloc (ys, nx, TY_REAL)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (avstr, SZ_LINE, TY_CHAR)
 
 	ptr = data
 	if (axis == 1) {
 	    call sprintf (Memc[avstr], SZ_LINE, "Lines %d-%d")
 		call pargi (y1)
 		call pargi (y2)
-	    sz_val = nx
-	    call amovr (Memr[ptr], Memr[ys], sz_val) 
+	    call amovr (Memr[ptr], Memr[ys], nx) 
 	    ptr = ptr + nx
 	    do i = 2, ny {
 		call aaddr (Memr[ptr], Memr[ys], Memr[ys], nx)
@@ -339,7 +334,6 @@ int	nfit			# Number of parameters to fit
 real	mr			# MR parameter
 real	chisq			# Chi square of fit
 
-size_t	sz_val
 int	i
 real	chisq1
 pointer	new, a1, a2, delta1, delta2
@@ -355,27 +349,21 @@ begin
 	    call mfree (delta1, TY_REAL)
 	    call mfree (delta2, TY_REAL)
 
-	    sz_val = np
-	    call malloc (new, sz_val, TY_REAL)
-	    sz_val = nfit*nfit
-	    call malloc (a1, sz_val, TY_REAL)
-	    call malloc (a2, sz_val, TY_REAL)
-	    sz_val = nfit
-	    call malloc (delta1, sz_val, TY_REAL)
-	    call malloc (delta2, sz_val, TY_REAL)
+	    call malloc (new, np, TY_REAL)
+	    call malloc (a1, nfit*nfit, TY_REAL)
+	    call malloc (a2, nfit*nfit, TY_REAL)
+	    call malloc (delta1, nfit, TY_REAL)
+	    call malloc (delta2, nfit, TY_REAL)
 
-	    sz_val = np
-	    call amovr (params, Memr[new], sz_val)
+	    call amovr (params, Memr[new], np)
 	    call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a2],
 	        Memr[delta2], nfit, chisq)
 	    mr = 0.001
 	}
 
 	# Restore last good fit and apply the Marquardt parameter.
-	sz_val = nfit * nfit
-	call amovr (Memr[a2], Memr[a1], sz_val)
-	sz_val = nfit
-	call amovr (Memr[delta2], Memr[delta1], sz_val)
+	call amovr (Memr[a2], Memr[a1], nfit * nfit)
+	call amovr (Memr[delta2], Memr[delta1], nfit)
 	do i = 1, nfit
 	    Memr[a1+(i-1)*(nfit+1)] = Memr[a2+(i-1)*(nfit+1)] * (1. + mr)
 
@@ -392,12 +380,9 @@ begin
 	if (chisq1 < chisq) {
 	    mr = max (EPSILONR, 0.1 * mr)
 	    chisq = chisq1
-	    sz_val = nfit * nfit
-	    call amovr (Memr[a1], Memr[a2], sz_val)
-	    sz_val = nfit
-	    call amovr (Memr[delta1], Memr[delta2], sz_val)
-	    sz_val = np
-	    call amovr (Memr[new], params, sz_val)
+	    call amovr (Memr[a1], Memr[a2], nfit * nfit)
+	    call amovr (Memr[delta1], Memr[delta2], nfit)
+	    call amovr (Memr[new], params, np)
 	} else
 	    mr = 10. * mr
 
@@ -426,15 +411,13 @@ real	delta[nfit]		# Delta array
 int	nfit			# Number of parameters to fit
 real	chisq			# Chi square of fit
 
-size_t	sz_val
 int	i, j, k
 real	ymod, dy, dydpj, dydpk
 pointer	sp, dydp
 
 begin
 	call smark (sp)
-	sz_val = np
-	call salloc (dydp, sz_val, TY_REAL)
+	call salloc (dydp, np, TY_REAL)
 
 	do j = 1, nfit {
 	   do k = 1, j
@@ -473,17 +456,15 @@ real	a[n,n]		# Input matrix and returned inverse
 real	b[n]		# Input RHS vector and returned solution
 int	n		# Dimension of input matrices
 
-size_t	sz_val
 int	krank
 real	rnorm
 pointer	sp, h, g, ip
 
 begin
 	call smark (sp)
-	sz_val = n
-	call salloc (h, sz_val, TY_REAL)
-	call salloc (g, sz_val, TY_REAL)
-	call salloc (ip, sz_val, TY_INT)
+	call salloc (h, n, TY_REAL)
+	call salloc (g, n, TY_REAL)
+	call salloc (ip, n, TY_INT)
 
 	call hfti (a, n, n, n, b, n, 1, 1E-10, krank, rnorm,
 	    Memr[h], Memr[g], Memi[ip])

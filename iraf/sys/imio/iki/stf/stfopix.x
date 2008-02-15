@@ -27,7 +27,6 @@ procedure stf_opix (im, status)
 pointer	im				# image descriptor
 int	status				# return status
 
-size_t	sz_val
 int	compress, blklen
 bool	copy_of_stf_image
 int	pfd, sz_gpb, group, i
@@ -147,8 +146,7 @@ begin
 		# as that of the group parameter block
 
 		sz_gpb = STF_PSIZE(stf) / NBITS_BYTE / SZB_CHAR
-		sz_val = sz_gpb
-		call calloc (gpb, sz_val, TY_CHAR)
+		call calloc (gpb, sz_gpb, TY_CHAR)
 	
 		# Zero out every group except the current one.
 		do group = 1, STF_GCOUNT(stf) {

@@ -16,7 +16,6 @@ int	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 int	i
 pointer	sp, xp, yp
 errchk	pl_getplane
@@ -25,9 +24,8 @@ include	"pmio.com"
 begin
 	if (PM_MAPXY(pl) == YES) {
 	    call smark (sp)
-	    sz_val = npts
-	    call salloc (xp, sz_val, TY_INT)
-	    call salloc (yp, sz_val, TY_INT)
+	    call salloc (xp, npts, TY_INT)
+	    call salloc (yp, npts, TY_INT)
 
 	    call pl_getplane (pl, v1)
 	    do i = 1, npts {

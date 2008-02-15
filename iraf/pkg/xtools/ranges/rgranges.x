@@ -15,17 +15,14 @@ int	rmin			# Minimum value
 int	rmax			# Maximum value
 pointer	rg			# Range pointer
 
-size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 pointer	sp, str, ptr
 errchk	open, rg_add
 
 begin
 	call smark (sp)
-	sz_val = max (strlen (rstr), SZ_LINE)
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = LEN_RG
-	call calloc (rg, sz_val, TY_STRUCT)
+	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
+	call calloc (rg, LEN_RG, TY_STRUCT)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -74,15 +71,13 @@ char	rstr[ARB]		# Range string
 int	rmin			# Minimum value
 int	rmax			# Maximum value
 
-size_t	sz_val
 int	i, j, nrgs, strlen(), ctoi()
 int	rval1, rval2
 pointer	sp, str, ptr
 
 begin
 	call smark (sp)
-	sz_val = strlen (rstr)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, strlen (rstr), TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -126,10 +121,8 @@ begin
 	    rval2 = max (j, rval2)
 	    if (rval2 >= rmin && rval1 <= rmax) {
 		nrgs = RG_NRGS(rg)
-		if (mod (nrgs, NRGS) == 0) {
-		    sz_val = LEN_RG+2*(nrgs+NRGS)
-		    call realloc (rg, sz_val, TY_STRUCT)
-		}
+		if (mod (nrgs, NRGS) == 0)
+		    call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
 		nrgs = nrgs + 1
 		RG_NRGS(rg) = nrgs
 		RG_X1(rg, nrgs) = max (rmin, rval1)

@@ -49,7 +49,6 @@ int procedure qpex_modfilter (ex, exprlist)
 pointer ex                      #I qpex descriptor
 char    exprlist[ARB]           #I list of attribute=expr expressions
 
-size_t	sz_val
 bool	replace
 int	boffset, offset, max_offset, dtype
 int	status, sz_expr, token, parenlevel, nchars, buflen
@@ -66,10 +65,9 @@ define	badatt_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_TOKBUF
-	call salloc (atname, sz_val, TY_CHAR)
-	call salloc (assignop, sz_val, TY_CHAR)
-	call salloc (tokbuf, sz_val, TY_CHAR)
+	call salloc (atname, SZ_TOKBUF, TY_CHAR)
+	call salloc (assignop, SZ_TOKBUF, TY_CHAR)
+	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
 
 	status = OK
 	sz_expr = DEF_SZEXPRBUF
@@ -77,8 +75,7 @@ begin
 	qp = EX_QP(ex)
 
 	# Allocate a variable size expression buffer.
-	sz_val = sz_expr
-	call malloc (expr, sz_val, TY_CHAR)
+	call malloc (expr, sz_expr, TY_CHAR)
 
 	# Open the expression list for token input with macro expansion.
 	in = qp_opentext (qp, exprlist)
@@ -157,8 +154,7 @@ eatup_
 		buflen = op - expr
 		if (buflen + nchars > sz_expr) {
 		    sz_expr = sz_expr + INC_SZEXPRBUF
-		    sz_val = sz_expr
-		    call realloc (expr, sz_val, TY_CHAR)
+		    call realloc (expr, sz_expr, TY_CHAR)
 		    op = expr + buflen
 		}
 

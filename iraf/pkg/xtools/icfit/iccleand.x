@@ -15,7 +15,6 @@ double	y[npts]				# Abscissas
 double	w[npts]				# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i, nclean, newreject
 pointer	sp, xclean, yclean, wclean
 
@@ -54,8 +53,7 @@ begin
 	# Do the cleaning using ic_deviant to find the points to reject.
 
 	} else if (RG_NPTS(IC_RG(ic)) == npts) {
-	    sz_val = npts
-	    call amovki (NO, Memi[IC_REJPTS(ic)], sz_val)
+	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
 	    call ic_deviantd (cv, x, y, w, Memi[IC_REJPTS(ic)], npts,
 		IC_LOW(ic), IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic),
 		newreject)
@@ -72,15 +70,13 @@ begin
 	} else {
 	    call smark (sp)
 	    nclean = RG_NPTS(IC_RG(ic))
-	    sz_val = nclean
-	    call salloc (xclean, sz_val, TY_DOUBLE)
-	    call salloc (yclean, sz_val, TY_DOUBLE)
-	    call salloc (wclean, sz_val, TY_DOUBLE)
+	    call salloc (xclean, nclean, TY_DOUBLE)
+	    call salloc (yclean, nclean, TY_DOUBLE)
+	    call salloc (wclean, nclean, TY_DOUBLE)
 	    call rg_packd (IC_RG(ic), x, Memd[xclean])
 	    call rg_packd (IC_RG(ic), y, Memd[yclean])
 	    call rg_packd (IC_RG(ic), w, Memd[wclean])
-	    sz_val = npts
-	    call amovki (NO, Memi[IC_REJPTS(ic)], sz_val)
+	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
 	    call ic_deviantd (cv, Memd[xclean], Memd[yclean],
 		Memd[wclean], Memi[IC_REJPTS(ic)], nclean, IC_LOW(ic),
 		IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic), newreject)

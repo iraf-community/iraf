@@ -18,8 +18,6 @@ int	ztrans			# Type of transfer function - linear or unitary
 int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
-size_t	sz_val
-long	lg_val
 pointer buf
 int	npix, nsig_bits, zrange, mask, min_val, max_val
 long	v[IM_MAXDIM]
@@ -52,9 +50,7 @@ begin
 
 	call aclri (inten_hgram, NBINS)
 	call aclri (greys_hgram, NBINS)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 
 	# Read lines into buffer and accumulate histograms.
 	npix = IM_LEN(im,1)
@@ -120,8 +116,6 @@ short	lut[ARB]		# Look up table previously calculated
 int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
-long	lg_val
-size_t	sz_val
 pointer buf, ibuf, sp, rlut
 short	min_val, max_val, short_min, short_max, dz1, dz2
 int	npix
@@ -137,9 +131,7 @@ begin
 
 	call aclri (inten_hgram, NBINS)
 	call aclri (greys_hgram, NBINS)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 
 	# Read lines into buffer and accumulate histograms.
 	npix = IM_LEN(im,1)
@@ -180,10 +172,8 @@ begin
 	    }
 
 	    call smark (sp)
-	    sz_val = npix
-	    call salloc (ibuf, sz_val, TY_INT)
-	    sz_val = SZ_BUF
-	    call salloc (rlut, sz_val, TY_REAL)
+	    call salloc (ibuf, npix, TY_INT)
+	    call salloc (rlut, SZ_BUF, TY_REAL)
 	    call achtsr (lut, Memr[rlut], SZ_BUF)
 
 	    while (imgnlr (im, buf, v) != EOF) {

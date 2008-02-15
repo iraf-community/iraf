@@ -39,7 +39,6 @@ int procedure xallocate (device)
 
 char	device[ARB]		#I device to be allocated
 
-size_t	sz_val
 pointer	sp, devlist
 int	status, onedev
 int	xgdevlist(), mtfile()
@@ -48,8 +47,7 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_DEVLIST
-	call salloc (devlist, sz_val, TY_CHAR)
+	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
 
 	# Fetch the device list for the named device.
 	onedev = NO
@@ -79,7 +77,6 @@ int procedure xdeallocate (device, rewind)
 char	device[ARB]		#I device to be deallocated
 int	rewind			#I rewind if magtape?
 
-size_t	sz_val
 int	status, onedev
 pointer	sp, devlist, osdev, owner
 int	xgdevlist(), mtfile()
@@ -88,11 +85,9 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_DEVLIST
-	call salloc (devlist, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (osdev, sz_val, TY_CHAR)
-	call salloc (owner, sz_val, TY_CHAR)
+	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
+	call salloc (osdev, SZ_FNAME, TY_CHAR)
+	call salloc (owner, SZ_FNAME, TY_CHAR)
 
 	# Get the i/o device name.
 	onedev = YES
@@ -176,7 +171,6 @@ char	device[ARB]		#I device to be deallocated
 char	owner[maxch]		#O receives owner name
 int	maxch			#I max chars out
 
-size_t	sz_val
 pointer	sp, devlist
 int	status, onedev
 int	xgdevlist()
@@ -185,8 +179,7 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_DEVLIST
-	call salloc (devlist, sz_val, TY_CHAR)
+	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
 
 	# Fetch the device list for the named device.
 	onedev = YES

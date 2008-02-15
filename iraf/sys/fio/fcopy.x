@@ -59,7 +59,6 @@ procedure fcopyo (in, out)
 int	in			# input file descriptor
 int	out			# output file descriptor
 
-size_t	sz_val
 pointer	sp, buf
 int	buf_size
 int	fstati(), read()
@@ -75,8 +74,7 @@ begin
 	call fseti (in, F_ADVICE, SEQUENTIAL)
 	call fseti (out, F_ADVICE, SEQUENTIAL)
 	buf_size = max (MIN_BUFSIZE, fstati (in, F_BUFSIZE))
-	sz_val = buf_size
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, buf_size, TY_CHAR)
 
 	while (read (in, Memc[buf], buf_size) != EOF)
 	    call write (out, Memc[buf], fstati (in, F_NCHARS))

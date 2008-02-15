@@ -17,8 +17,6 @@ char	imname[ARB]		#I image name or section
 char	title[ARB]		#I mask "title" string
 int	flags			#I bitflags
 
-size_t	sz_val
-long	lg_val
 bool	sampling
 pointer	im, px, im_pl, bp
 int	npix, naxes, depth, maxdim, mode, i, locstr, locmem
@@ -60,8 +58,7 @@ begin
 	    IM_PIXTYPE(im) = TY_SHORT
 	    if (PL_MAXVAL(pl) > MAX_SHORT)
 		IM_PIXTYPE(im) = TY_INT
-	    sz_val = maxdim
-	    call amovl (vn, IM_LEN(im,1), sz_val)
+	    call amovl (vn, IM_LEN(im,1), maxdim)
 	} else {
 	    if (naxes != IM_NDIM(im)) {
 		call imunmap (im)
@@ -82,11 +79,8 @@ begin
 	sampling = false
 
 	if (im_pl != NULL) {
-	    lg_val = 1
-	    sz_val = maxdim
-	    call amovkl (lg_val, vs_l, sz_val)
-	    sz_val = maxdim
-	    call amovl (IM_LEN(im,1), ve_l, sz_val)
+	    call amovkl (long(1), vs_l, maxdim)
+	    call amovl (IM_LEN(im,1), ve_l, maxdim)
 	    call imaplv (im, vs_l, vs_p, maxdim)
 	    call imaplv (im, ve_l, ve_p, maxdim)
 
@@ -110,16 +104,13 @@ begin
 
 	} else {
 	    # Copy image pixels.  Initialize the vector loop indices.
-	    lg_val = 1
-	    sz_val = maxdim
-	    call amovkl (lg_val, v_in, sz_val)
-	    call amovkl (lg_val, v_out, sz_val)
+	    call amovkl (long(1), v_in, maxdim)
+	    call amovkl (long(1), v_out, maxdim)
 
 	    # Copy the image.
 	    while (impnli (im, px, v_out) != EOF) {
 		call pl_glpi (pl, v_in, Memi[px], 0, npix, PIX_SRC)
-		sz_val = maxdim
-		call amovl (v_out, v_in, sz_val)
+		call amovl (v_out, v_in, maxdim)
 	    }
 	}
 

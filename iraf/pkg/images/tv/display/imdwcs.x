@@ -48,7 +48,6 @@ char	imname[ARB]	#O receives name of image loaded into frame (if any)
 int	sz_imname	#I max chars out to imname[].
 int	wcs_status	#O ERR if WCS cannot be accessed, OK otherwise
 
-size_t	sz_val
 pointer	iw
 int	server
 char	junk[1]
@@ -56,8 +55,7 @@ int	imd_getwcs()
 errchk	calloc
 
 begin
-	sz_val = LEN_IWDES
-	call calloc (iw, sz_val, TY_STRUCT)
+	call calloc (iw, LEN_IWDES, TY_STRUCT)
 
 	# Get the WCS.
 	server = IM_LEN(ds,4)

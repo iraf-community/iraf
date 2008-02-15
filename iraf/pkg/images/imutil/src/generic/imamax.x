@@ -10,8 +10,6 @@ procedure ima_maxs (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 short	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -22,9 +20,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do the vector/scalar
 	# maximum to imagec.
@@ -55,8 +51,6 @@ procedure ima_maxi (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 int	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -67,9 +61,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do the vector/scalar
 	# maximum to imagec.
@@ -100,8 +92,6 @@ procedure ima_maxl (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 long	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -112,9 +102,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do the vector/scalar
 	# maximum to imagec.
@@ -145,8 +133,6 @@ procedure ima_maxr (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 real	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -157,9 +143,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do the vector/scalar
 	# maximum to imagec.
@@ -190,8 +174,6 @@ procedure ima_maxd (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 double	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -202,9 +184,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do the vector/scalar
 	# maximum to imagec.

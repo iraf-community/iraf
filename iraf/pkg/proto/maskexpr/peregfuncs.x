@@ -41,7 +41,6 @@ real	x,y			#I center coords of circle
 real	radius			#I radius of circle
 int	rop			#I rasterop
 
-size_t	sz_val
 real	y1r, y2r, x1r, x2r
 int	y1, y2
 pointer	sp, ufd
@@ -63,8 +62,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_CIRCLEDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_CIRCLEDES, TY_STRUCT)
 
 	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
 	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
@@ -162,7 +160,6 @@ real	ratio			#I the ratio semi-minor / semi-major axes
 real	theta			#I position angle in degrees
 int	rop			#I rasterop
 
-size_t	sz_val
 real	aa, bb, cc, ff, dx, dy
 real	y1r, y2r, x1r, x2r, r2
 int	y1, y2
@@ -199,8 +196,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_ELLDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_ELLDES, TY_STRUCT)
 	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
 	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
 
@@ -301,7 +297,6 @@ real	x1, y1			#I lower left corner of box
 real	x2, y2			#I upper right corner of box
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, ufd
 bool	pe_ubox()
 extern	pe_ubox()
@@ -317,8 +312,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_BOXDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_BOXDES, TY_STRUCT)
 
 	B_PL(ufd) = pl
 	B_X1(ufd) = max (1, min (PL_AXLEN(pl,1), nint(x1)))
@@ -482,7 +476,6 @@ real	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, xp, yp, oo
 int	line_1, line_2, i
@@ -497,13 +490,10 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_PGONDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = RL_FIRST + (npts+1)*3
-	call salloc (oo, sz_val, TY_INT)
-	sz_val = npts + 1
-	call salloc (xp, sz_val, TY_REAL)
-	call salloc (yp, sz_val, TY_REAL)
+	call salloc (ufd, LEN_PGONDES, TY_STRUCT)
+	call salloc (oo, RL_FIRST + (npts+1)*3, TY_INT)
+	call salloc (xp, npts + 1, TY_REAL)
+	call salloc (yp, npts + 1, TY_REAL)
 
 	# Initialize the region descriptor.
 	P_PL(ufd) = pl
@@ -787,7 +777,6 @@ real	radius1			#I inner radius of circular annulus
 real	radius2			#I outer radius of circular annulus
 int	rop			#I rasterop
 
-size_t	sz_val
 real	y1r, y2r, x1r, x2r
 int	y1, y2
 pointer	sp, ufd
@@ -813,8 +802,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_CANNDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_CANNDES, TY_STRUCT)
 
 	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
 	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
@@ -942,7 +930,6 @@ real	ratio			#I the semi-minor / semi-major axis ratio
 real	theta			#I the position angle in degrees
 int	rop			#I rasterop
 
-size_t	sz_val
 real	aa, bb, cc, ff, r2, dx, dy
 real	y1r, y2r, x1r, x2r
 int	y1, y2
@@ -983,8 +970,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = LEN_EANNDES
-	call salloc (ufd, sz_val, TY_STRUCT)
+	call salloc (ufd, LEN_EANNDES, TY_STRUCT)
 
 	EA_PL(ufd) = pl
 	EA_XCEN(ufd) = x
@@ -1132,7 +1118,6 @@ real	ratio			#I ratio of the semi-minor / semi-major axes
 real	theta			#I position angle
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, ixp, iyp, oxp, oyp
 int	line_1, line_2, i
@@ -1146,13 +1131,11 @@ begin
 
 	# Initialize the
 	call smark (sp)
-	sz_val = LEN_RANNDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = 5
-	call salloc (ixp, sz_val, TY_REAL)
-	call salloc (iyp, sz_val, TY_REAL)
-	call salloc (oxp, sz_val, TY_REAL)
-	call salloc (oyp, sz_val, TY_REAL)
+	call salloc (ufd, LEN_RANNDES, TY_STRUCT)
+	call salloc (ixp, 5, TY_REAL)
+	call salloc (iyp, 5, TY_REAL)
+	call salloc (oxp, 5, TY_REAL)
+	call salloc (oyp, 5, TY_REAL)
 
 	# Copy and close the inner polygon.
 	call me_rectgeom (radius1, ratio, theta, Memr[ixp], Memr[iyp])
@@ -1218,7 +1201,6 @@ int	rl_reg[3,ARB]		#O the output regions list
 int	xs			#O the starting x value
 int	npix			#O the number of pixels affected
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, work1, work2, oxintr, ixintr, pl
 int	j, jj, rn, onintr, inintr, ix1, ix2, ox1, ox2, ibegin, iend, jx1, jx2
@@ -1227,11 +1209,10 @@ int	me_pyclip()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = RA_NVER(ufd) + 1
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (oxintr, sz_val, TY_REAL)
-	call salloc (ixintr, sz_val, TY_REAL)
+	call salloc (work1, RA_NVER(ufd) + 1, TY_REAL)
+	call salloc (work2, RA_NVER(ufd) + 1, TY_REAL)
+	call salloc (oxintr, RA_NVER(ufd) + 1, TY_REAL)
+	call salloc (ixintr, RA_NVER(ufd) + 1, TY_REAL)
 
 	# Initialize.
 	pl = RA_PL(ufd)
@@ -1346,7 +1327,6 @@ real	y[npts]			#I outer polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, ixp, iyp, oxp, oyp
 int	line_1, line_2, i
@@ -1362,13 +1342,11 @@ begin
 
 	# Initialize the
 	call smark (sp)
-	sz_val = LEN_PAGONDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = npts + 1
-	call salloc (ixp, sz_val, TY_REAL)
-	call salloc (iyp, sz_val, TY_REAL)
-	call salloc (oxp, sz_val, TY_REAL)
-	call salloc (oyp, sz_val, TY_REAL)
+	call salloc (ufd, LEN_PAGONDES, TY_STRUCT)
+	call salloc (ixp, npts + 1, TY_REAL)
+	call salloc (iyp, npts + 1, TY_REAL)
+	call salloc (oxp, npts + 1, TY_REAL)
+	call salloc (oyp, npts + 1, TY_REAL)
 
 	# Copy and close the inner polygon.
 	do i = 1, npts {
@@ -1430,7 +1408,6 @@ int	rl_reg[3,ARB]		#O the output regions list
 int	xs			#O the starting x value
 int	npix			#O the number of pixels affected
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, work1, work2, oxintr, ixintr, pl
 int	j, jj, rn, onintr, inintr, ix1, ix2, ox1, ox2, ibegin, iend, jx1, jx2
@@ -1439,11 +1416,10 @@ int	me_pyclip()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = PA_NVER(ufd) + 1
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (oxintr, sz_val, TY_REAL)
-	call salloc (ixintr, sz_val, TY_REAL)
+	call salloc (work1, PA_NVER(ufd) + 1, TY_REAL)
+	call salloc (work2, PA_NVER(ufd) + 1, TY_REAL)
+	call salloc (oxintr, PA_NVER(ufd) + 1, TY_REAL)
+	call salloc (ixintr, PA_NVER(ufd) + 1, TY_REAL)
 
 	# Initialize.
 	pl = PA_PL(ufd)
@@ -1560,7 +1536,6 @@ pointer	pl			#I mask descriptor
 char	rangestr[ARB]		#I the input ranges string
 int	rop			#I rasterop
 
-size_t	sz_val
 int	npts, nvalues, colno, x1, x2, nregions
 pointer	sp, ufd, rgptr, lineptr
 int	me_decode_ranges(), me_next_number(), me_previous_number(), pl_p2ri()
@@ -1573,12 +1548,9 @@ begin
 	npts = PL_AXLEN(pl,1)
 
 	call smark (sp)
-	sz_val = LEN_COLSDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (rgptr, sz_val, TY_INT)
-	sz_val = npts
-	call salloc (lineptr, sz_val, TY_INT)
+	call salloc (ufd, LEN_COLSDES, TY_STRUCT)
+	call salloc (rgptr, 3 * MAX_NRANGES + 1, TY_INT)
+	call salloc (lineptr, npts, TY_INT)
 
 	# Decode the ranges string
 	if (me_decode_ranges (rangestr, Memi[rgptr], MAX_NRANGES,
@@ -1671,7 +1643,6 @@ pointer	pl			#I mask descriptor
 char	rangestr[ARB]		#I the input ranges string
 int	rop			#I rasterop
 
-size_t	sz_val
 int	i, y1, y2, nvalues
 pointer	sp, rgptr, ufd
 int	me_decode_ranges()
@@ -1684,10 +1655,8 @@ begin
 	#call plvalid (pl)
 
 	call smark (sp)
-	sz_val = LEN_LINESDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (rgptr, sz_val, TY_INT)
+	call salloc (ufd, LEN_LINESDES, TY_STRUCT)
+	call salloc (rgptr, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string
 	if (me_decode_ranges (rangestr, Memi[rgptr], MAX_NRANGES,

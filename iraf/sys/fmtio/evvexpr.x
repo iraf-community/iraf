@@ -165,7 +165,6 @@ int	ufcn			#I user supplied function call procedure
 int	ufcn_data		#I client data for above function
 int	flags			#I flag bits
 
-size_t	sz_val
 int	junk
 pointer	sp, ip
 bool	debug, first_time
@@ -195,12 +194,10 @@ begin
 	ev_flags = flags
 
 	# Allocate an operand struct for the expression value.
-	sz_val = LEN_OPERAND
-	call calloc (ev_oval, sz_val, TY_STRUCT)
+	call calloc (ev_oval, LEN_OPERAND, TY_STRUCT)
 
 	# Make a local copy of the input string.
-	sz_val = strlen(expr)
-	call salloc (ip, sz_val, TY_CHAR)
+	call salloc (ip, strlen(expr), TY_CHAR)
 	call strcpy (expr, Memc[ip], ARB)
 
 	# Evaluate the expression.  The expression value is copied into the
@@ -432,7 +429,6 @@ pointer	in1, in2		#I input operands
 pointer	out			#I output operand
 
 
-size_t	sz_val
 short	v_s
 short	xvv_nulls()
 extern	xvv_nulls()
@@ -512,8 +508,7 @@ begin
 	    case PLUS:
 		# Swap operands.
 		call smark (sp)
-		sz_val = LEN_OPERAND
-		call salloc (otemp, sz_val, TY_STRUCT)
+		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -1127,7 +1122,6 @@ pointer	in1, in2		#I input operands
 pointer	out			#I output operand
 
 
-size_t	sz_val
 short	v_s
 
 int	v_i
@@ -1191,8 +1185,7 @@ begin
 	    switch (opcode) {
 	    case EQ, NE:
 		call smark (sp)
-		sz_val = LEN_OPERAND
-		call salloc (otemp, sz_val, TY_STRUCT)
+		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -1634,17 +1627,14 @@ int procedure xvv_patmatch (str, pat)
 char	str[ARB]		#I operand string
 char	pat[ARB]		#I pattern
 
-size_t	sz_val
 int	junk, ip, index
 pointer	sp, patstr, patbuf, op
 int	patmake(), patmatch()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (patstr, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val,  TY_CHAR)
+	call salloc (patstr, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE,  TY_CHAR)
 	call aclrc (Memc[patstr], SZ_FNAME)
 	call aclrc (Memc[patbuf], SZ_LINE)
 
@@ -1716,7 +1706,6 @@ pointer	cond			#I pointer to condition operand
 pointer	in1, in2		#I pointer to true,false operands
 pointer	out			#I pointer to output operand
 
-size_t	sz_val
 int	dtype, nelem, i
 pointer	sp, otemp, ip1, ip2, op, sel
 errchk	xvv_error, xvv_newtype, xvv_initop, xvv_chtype
@@ -1780,8 +1769,7 @@ begin
 
 	    if (O_LEN(in1) == 0 && O_LEN(in2) > 0) {
 		call smark (sp)
-		sz_val = LEN_OPERAND
-		call salloc (otemp, sz_val, TY_STRUCT)
+		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -2022,7 +2010,6 @@ int	nargs			#I number of arguments
 pointer	out			#I output operand (function value)
 
 
-size_t	sz_val
 short	v_s
 short	ahivs(), alovs()
 short	ameds()
@@ -2070,8 +2057,7 @@ define	free_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
 	# Lookup the function name in the symbol table.
 	sym = stfind (ev_st, fcn)
@@ -3996,13 +3982,11 @@ procedure xvv_error1 (fmt, arg)
 char	fmt[ARB]		#I printf format string
 char	arg[ARB]		#I string argument
 
-size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg)
@@ -4021,13 +4005,11 @@ char	fmt[ARB]		#I printf format string
 char	arg1[ARB]		#I string argument
 int	arg2			#I integer argument
 
-size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg1)
@@ -4527,7 +4509,6 @@ pointer	o		#I pointer to operand structure
 int	o_len		#I length of operand (zero if scalar)
 int	o_type		#I datatype of operand
 
-size_t	sz_val
 errchk	malloc
 
 begin
@@ -4546,13 +4527,10 @@ begin
 
 	# Allocate array storage if nonscalar operand.
 	if (o_len > 0) {
-	    if (o_type == TY_BOOL) {
-		sz_val = o_len
-		call malloc (O_VALP(o), sz_val, TY_INT)
-	    } else {
-		sz_val = o_len
-		call malloc (O_VALP(o), sz_val, o_type)
-	    }
+	    if (o_type == TY_BOOL)
+		call malloc (O_VALP(o), o_len, TY_INT)
+	    else
+		call malloc (O_VALP(o), o_len, o_type)
 	    O_LEN(o) = o_len
 	}
 
@@ -4598,15 +4576,13 @@ pointer procedure xvv_loadsymbols (s)
 
 char	s[ARB]			#I symbol list "|sym1|sym2|...|"
 
-size_t	sz_val
 int	delim, symnum, ip
 pointer	sp, symname, st, sym, op
 pointer	stopen(), stenter()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (symname, sz_val, TY_CHAR)
+	call salloc (symname, SZ_FNAME, TY_CHAR)
 
 	st = stopen ("evvexpr", LEN_INDEX, LEN_STAB, LEN_SBUF)
 	delim = s[1]
@@ -4710,7 +4686,6 @@ int procedure yyparse (fd, yydebug, yylex)
 
 int	fd			# stream to be parsed
 bool	yydebug			# print debugging information?
-size_t	sz_val
 int	yylex()			# user-supplied lexical input function
 extern	yylex()
 
@@ -4852,8 +4827,7 @@ data	(yydef(i),i= 89, 91)	/   0,  36,  29/
 
 begin
 	call smark (yysp)
-	sz_val = (YYMAXDEPTH+2) * YYOPLEN
-	call salloc (yyv, sz_val, TY_STRUCT)
+	call salloc (yyv, (YYMAXDEPTH+2) * YYOPLEN, TY_STRUCT)
 
 	# Initialization.  The first element of the dynamically allocated
 	# token value stack (yyv) is used for yyval, the second for yylval,

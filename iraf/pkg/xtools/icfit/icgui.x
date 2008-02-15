@@ -24,7 +24,6 @@ procedure ic_gui (ic, cmd)
 pointer	ic		#I ICFIT pointer
 char	cmd[ARB]	#I Command
 
-size_t	sz_val
 int	ncmd, strdic()
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 pointer	sp, str, msg
@@ -36,8 +35,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Scan the command and switch on the first word.
 	call sscan (cmd)
@@ -45,8 +43,7 @@ begin
 	ncmd = strdic (Memc[str], Memc[str], SZ_LINE, CMDS)
 	switch (ncmd) {
 	case OPEN, CLOSE, PARAMS:
-	    sz_val = SZ_LINE+IC_SZSAMPLE
-	    call salloc (msg, sz_val, TY_CHAR)
+	    call salloc (msg, SZ_LINE+IC_SZSAMPLE, TY_CHAR)
 	    call ic_gstr (ic, "function", Memc[str], SZ_LINE)
 	    call sprintf (Memc[msg], SZ_LINE+IC_SZSAMPLE,
 		"%s %s %d \"%s\" %d %d %g %g %g %b")
@@ -112,15 +109,13 @@ procedure ic_help (ic)
 
 pointer	ic		#I ICFIT pointer
 
-size_t	sz_val
 int	i, fd, len_str, open(), getline()
 pointer	line, help
 errchk	open()
 
 begin
 	len_str = 10 * SZ_LINE
-	sz_val = len_str
-	call calloc (help, sz_val, TY_CHAR)
+	call calloc (help, len_str, TY_CHAR)
 	line = help
 
 	fd = open (Memc[IC_HELP(ic)], READ_ONLY, TEXT_FILE)
@@ -130,8 +125,7 @@ begin
 	    i = line - help
 	    if (i + SZ_LINE > len_str) {
 		len_str = len_str + 10 * SZ_LINE
-		sz_val = len_str
-		call realloc (help, sz_val, TY_CHAR)
+		call realloc (help, len_str, TY_CHAR)
 		line = help + i
 	    }
 	}

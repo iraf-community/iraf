@@ -13,7 +13,6 @@ procedure xh_sort_list (list)
 
 char	list[ARB]					#u list to be sorted
 
-size_t	sz_val
 pointer	sp, index, buf, ip
 int	i, j, count, len
 
@@ -23,10 +22,8 @@ begin
 	len = strlen (list)
 
 	call smark (sp)
-	sz_val = SZ_HELPLIST
-	call salloc (index, sz_val, TY_INT)
-	sz_val = len+2
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (index, SZ_HELPLIST, TY_INT)
+	call salloc (buf, len+2, TY_CHAR)
 
 	# Build up the index array.
 	count = 1
@@ -64,16 +61,13 @@ procedure xh_file_sort (fname)
 
 char	fname[SZ_FNAME]				#i file to be sorted
 
-size_t	sz_val
 pointer	linbuf, linptr
 int	nlines, fd
 int	open()
 
 begin
-        sz_val = MAXPTR
-        call calloc (linptr, sz_val, TY_INT)
-        sz_val = SZ_LINBUF
-        call calloc (linbuf, sz_val, TY_CHAR)
+        call calloc (linptr, MAXPTR, TY_INT)
+        call calloc (linbuf, SZ_LINBUF, TY_CHAR)
 
 	# Sort the file then write it back out.
 	fd = open (fname, READ_ONLY, TEXT_FILE)

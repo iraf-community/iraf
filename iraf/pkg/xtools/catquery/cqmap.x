@@ -8,7 +8,6 @@ pointer procedure cq_map (database, mode)
 char	database[ARB]			#I The database file
 int	mode				#I The database file access mode
 
-size_t	sz_val
 int	i, nrec, cq_alloc1, cq_alloc2
 pointer	cq, str
 
@@ -24,8 +23,7 @@ begin
 	iferr (i = open (database, mode, TEXT_FILE))
 	    return (NULL)
 
-	sz_val = CQ_LEN
-	call calloc (cq, sz_val, TY_STRUCT)
+	call calloc (cq, CQ_LEN, TY_STRUCT)
 	call strcpy (database, CQ_CATDB(cq), SZ_FNAME)
 	CQ_FD(cq) = i
 
@@ -34,13 +32,10 @@ begin
 
 	cq_alloc1 = CQ_ALLOC
 	cq_alloc2 = CQ_ALLOC * SZ_LINE
-	sz_val = cq_alloc1
-	call malloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
-	call malloc (CQ_NAMES(cq), sz_val, TY_INT)
-	sz_val = cq_alloc2
-	call malloc (CQ_MAP(cq), sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call malloc (str, sz_val, TY_CHAR)
+	call malloc (CQ_OFFSETS(cq), cq_alloc1, TY_LONG)
+	call malloc (CQ_NAMES(cq), cq_alloc1, TY_INT)
+	call malloc (CQ_MAP(cq), cq_alloc2, TY_CHAR)
+	call malloc (str, SZ_LINE, TY_CHAR)
 
 	nrec = 1
 	CQ_NRECS(cq) = 0
@@ -71,23 +66,19 @@ begin
 
 		if (nrec == cq_alloc1) {
 		    cq_alloc1 = cq_alloc1 + CQ_ALLOC
-		    sz_val = cq_alloc1
-		    call realloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
-		    call realloc (CQ_NAMES(cq), sz_val, TY_INT)
+		    call realloc (CQ_OFFSETS(cq), cq_alloc1, TY_LONG)
+		    call realloc (CQ_NAMES(cq), cq_alloc1, TY_INT)
 		}
 		if (CQ_NAMEI(cq, nrec) + SZ_LINE >= cq_alloc2) {
 		    cq_alloc2 = cq_alloc2 + CQ_ALLOC * SZ_LINE
-		    sz_val = cq_alloc2
-		    call realloc (CQ_MAP(cq), sz_val, TY_CHAR)
+		    call realloc (CQ_MAP(cq), cq_alloc2, TY_CHAR)
 		}
 	    }
 	}
 
-	sz_val = CQ_NAMEI(cq, nrec)
-	call realloc (CQ_MAP(cq), sz_val, TY_CHAR)
-	sz_val = CQ_NRECS(cq)
-	call realloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
-	call realloc (CQ_NAMES(cq), sz_val, TY_INT)
+	call realloc (CQ_MAP(cq), CQ_NAMEI(cq, nrec), TY_CHAR)
+	call realloc (CQ_OFFSETS(cq), CQ_NRECS(cq), TY_LONG)
+	call realloc (CQ_NAMES(cq), CQ_NRECS(cq), TY_INT)
 	call mfree (str, TY_CHAR)
 
 	return (cq)

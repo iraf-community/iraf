@@ -19,7 +19,6 @@ pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 pointer	mw			#O pointer to the mwcs structure
 pointer	coo			#O pointer to the coordinate structure
 
-size_t	sz_val
 double	lngref, latref
 int	recstat, proj
 pointer	sp, projstr, projpars
@@ -28,10 +27,8 @@ pointer	cc_celwcs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (projstr, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (projpars, sz_val, TY_CHAR)
+	call salloc (projstr, SZ_FNAME, TY_CHAR)
+	call salloc (projpars, SZ_LINE, TY_CHAR)
 
 	if (dt == NULL) {
 
@@ -101,7 +98,6 @@ pointer	sy1		#O pointer to the linear y coordinate surface
 pointer	mw		#O pointer to the mwcs structure
 pointer	coo		#O pointer to the celestial coordinate structure
 
-size_t	sz_val
 double	xref, yref, xscale, yscale, xrot, yrot, lngref, latref
 int	coostat, proj, tlngunits, tlatunits, pfd
 pointer	sp, projstr
@@ -114,8 +110,7 @@ errchk	open()
 begin
 	# Allocate some workin space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (projstr, sz_val, TY_CHAR)
+	call salloc (projstr, SZ_LINE, TY_CHAR)
 
 	# Get the reference point pixel coordinates.
 	xref = clgetd ("xref")

@@ -5,12 +5,10 @@ include "xregister.h"
 procedure rg_xinit (xc, cfunc)
 
 pointer	xc		#O pointer to the cross-correlation structure
-size_t	sz_val
 int	cfunc		#I the input cross-correlation function
 
 begin
-	sz_val = LEN_XCSTRUCT
-	call malloc (xc, sz_val, TY_STRUCT)
+	call malloc (xc, LEN_XCSTRUCT, TY_STRUCT)
 
 	# Initialize the regions pointers.
 	XC_RC1(xc) = NULL
@@ -29,11 +27,9 @@ begin
 
 	# Set up transformation parameters.
 	XC_NREFPTS(xc) = 0
-	sz_val = MAX_NREF
-	call malloc (XC_XREF(xc), sz_val, TY_REAL)
-	call malloc (XC_YREF(xc), sz_val, TY_REAL)
-	sz_val = MAX_NTRANSFORM
-	call malloc (XC_TRANSFORM(xc), sz_val, TY_REAL)
+	call malloc (XC_XREF(xc), MAX_NREF, TY_REAL)
+	call malloc (XC_YREF(xc), MAX_NREF, TY_REAL)
+	call malloc (XC_TRANSFORM(xc), MAX_NTRANSFORM, TY_REAL)
 
 	# Initialize the region offsets
 	XC_IXLAG(xc) = DEF_IXLAG
@@ -100,7 +96,6 @@ end
 
 procedure rg_xrinit (xc)
 
-size_t	sz_val
 pointer	xc		#I pointer to crosscor structure
 
 begin
@@ -109,22 +104,20 @@ begin
 	XC_NREGIONS(xc) = 0
 	XC_CREGION(xc) = 1
 
-	sz_val = MAX_NREGIONS
-	call malloc (XC_RC1(xc), sz_val, TY_INT)
-	call malloc (XC_RC2(xc), sz_val, TY_INT)
-	call malloc (XC_RL1(xc), sz_val, TY_INT)
-	call malloc (XC_RL2(xc), sz_val, TY_INT)
-	call malloc (XC_RZERO(xc), sz_val, TY_REAL)
-	call malloc (XC_RXSLOPE(xc), sz_val, TY_REAL)
-	call malloc (XC_RYSLOPE(xc), sz_val, TY_REAL)
-	call malloc (XC_XSHIFTS(xc), sz_val, TY_REAL)
-	call malloc (XC_YSHIFTS(xc), sz_val, TY_REAL)
+	call malloc (XC_RC1(xc), MAX_NREGIONS, TY_INT)
+	call malloc (XC_RC2(xc), MAX_NREGIONS, TY_INT)
+	call malloc (XC_RL1(xc), MAX_NREGIONS, TY_INT)
+	call malloc (XC_RL2(xc), MAX_NREGIONS, TY_INT)
+	call malloc (XC_RZERO(xc), MAX_NREGIONS, TY_REAL)
+	call malloc (XC_RXSLOPE(xc), MAX_NREGIONS, TY_REAL)
+	call malloc (XC_RYSLOPE(xc), MAX_NREGIONS, TY_REAL)
+	call malloc (XC_XSHIFTS(xc), MAX_NREGIONS, TY_REAL)
+	call malloc (XC_YSHIFTS(xc), MAX_NREGIONS, TY_REAL)
 
-	sz_val = MAX_NREGIONS
-	call amovki (INDEFI, Memi[XC_RC1(xc)], sz_val)
-	call amovki (INDEFI, Memi[XC_RC2(xc)], sz_val)
-	call amovki (INDEFI, Memi[XC_RL1(xc)], sz_val)
-	call amovki (INDEFI, Memi[XC_RL2(xc)], sz_val)
+	call amovki (INDEFI, Memi[XC_RC1(xc)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[XC_RC2(xc)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[XC_RL1(xc)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[XC_RL2(xc)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[XC_RZERO(xc)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[XC_RXSLOPE(xc)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[XC_RYSLOPE(xc)], MAX_NREGIONS)
@@ -200,29 +193,26 @@ procedure rg_xrealloc (xc, nregions)
 pointer	xc		#I pointer to crosscor structure
 int	nregions	#I number of regions
 
-size_t	sz_val
 int	nr
 int	rg_xstati()
 
 begin
 	nr = rg_xstati (xc, NREGIONS)
 
-	sz_val = nregions
-	call realloc (XC_RC1(xc), sz_val, TY_INT)
-	call realloc (XC_RC2(xc), sz_val, TY_INT)
-	call realloc (XC_RL1(xc), sz_val, TY_INT)
-	call realloc (XC_RL2(xc), sz_val, TY_INT)
-	call realloc (XC_RZERO(xc), sz_val, TY_REAL)
-	call realloc (XC_RXSLOPE(xc), sz_val, TY_REAL)
-	call realloc (XC_RYSLOPE(xc), sz_val, TY_REAL)
-	call realloc (XC_XSHIFTS(xc), sz_val, TY_REAL)
-	call realloc (XC_YSHIFTS(xc), sz_val, TY_REAL)
+	call realloc (XC_RC1(xc), nregions, TY_INT)
+	call realloc (XC_RC2(xc), nregions, TY_INT)
+	call realloc (XC_RL1(xc), nregions, TY_INT)
+	call realloc (XC_RL2(xc), nregions, TY_INT)
+	call realloc (XC_RZERO(xc), nregions, TY_REAL)
+	call realloc (XC_RXSLOPE(xc), nregions, TY_REAL)
+	call realloc (XC_RYSLOPE(xc), nregions, TY_REAL)
+	call realloc (XC_XSHIFTS(xc), nregions, TY_REAL)
+	call realloc (XC_YSHIFTS(xc), nregions, TY_REAL)
 
-	sz_val = nregions - nr
-	call amovki (INDEFI, Memi[XC_RC1(xc)+nr], sz_val)
-	call amovki (INDEFI, Memi[XC_RC2(xc)+nr], sz_val)
-	call amovki (INDEFI, Memi[XC_RL1(xc)+nr], sz_val)
-	call amovki (INDEFI, Memi[XC_RL2(xc)+nr], sz_val)
+	call amovki (INDEFI, Memi[XC_RC1(xc)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[XC_RC2(xc)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[XC_RL1(xc)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[XC_RL2(xc)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[XC_RZERO(xc)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[XC_RXSLOPE(xc)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[XC_RYSLOPE(xc)+nr], nregions - nr)
@@ -638,15 +628,13 @@ pointer	xc		#I pointer to the cross-correlation structure
 int	param		#I parameter to be set
 char	str[ARB]	#O value of string parameter
 
-size_t	sz_val
 int	index
 pointer	sp, temp
 int	strdic(), fnldir()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
 
 	switch (param) {
 	case BSTRING:

@@ -115,7 +115,6 @@ pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to input image
 int	newref		#I new reference image ?
 
-size_t	sz_val
 int	i, nregions, nrimcols, nrimlines, nrcols, nrlines, nrpcols, nrplines
 int	nborder, stat, rc1, rc2, rl1, rl2, nxfft, nyfft
 pointer	sp, str, coeff, dim, rbuf, ibuf, rsum, isum, border
@@ -136,12 +135,9 @@ begin
 	    return (ERR)
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = max (GS_SAVECOEFF+6, 9)
-	call salloc (coeff, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (coeff, max (GS_SAVECOEFF+6, 9), TY_REAL)
+	call salloc (dim, 2, TY_INT)
 
 	# Get the reference region pointers.
 	prc1 = rg_pstatp (pm, RC1)
@@ -171,12 +167,10 @@ begin
 	rbuf = NULL
 	ibuf = NULL
 	stat = OK
-	if (newref == YES) {
-	    sz_val = rg_pstati (pm, DNX) * rg_pstati (pm, DNY)
-	    call calloc  (rsum, sz_val, TY_REAL)
-	}
-	sz_val = rg_pstati (pm, DNX) * rg_pstati (pm, DNY)
-	call calloc  (isum, sz_val,
+	if (newref == YES)
+	    call calloc  (rsum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
+	        TY_REAL)
+	call calloc  (isum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
 	    TY_REAL)
 
 	do i = 1, nregions {
@@ -324,16 +318,14 @@ begin
 	imfft = rg_pstatp (pm, IMFFT)
 	if (imfft != NULL)
 	    call mfree (imfft, TY_REAL)
-	sz_val = 2 * nxfft * nyfft
-	call calloc (imfft, sz_val, TY_REAL)
+	call calloc (imfft, 2 * nxfft * nyfft, TY_REAL)
 	call rg_psetp (pm, IMFFT, imfft)
 
 	# Allocate space for the fft.
 	fft = rg_pstatp (pm, FFT)
 	if (fft != NULL)
 	    call mfree (fft, TY_REAL)
-	sz_val = 2 * nxfft * nyfft
-	call calloc (fft, sz_val, TY_REAL)
+	call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
 	call rg_psetp (pm, FFT, fft)
 
 	# Allocate space for the reference and input image ffts
@@ -342,8 +334,7 @@ begin
 	    reffft = rg_pstatp (pm, REFFFT)
 	    if (reffft != NULL)
 	        call mfree (reffft, TY_REAL)
-	    sz_val = 2 * nxfft * nyfft
-	    call calloc (reffft, sz_val, TY_REAL)
+	    call calloc (reffft, 2 * nxfft * nyfft, TY_REAL)
 	    call rg_psetp (pm, REFFFT, reffft)
 
 	    # Load the reference image FFT.
@@ -452,7 +443,6 @@ pointer	imr		#I pointer to the reference psf
 pointer	impsf		#I pointer to the input image psf
 int	newref		#I new reference image
 
-size_t	sz_val
 int	nrcols, nrlines, nxfft, nyfft
 pointer	sp, dim, rbuf, ibuf, imfft, fft, reffft
 int	rg_szfft()
@@ -461,8 +451,7 @@ real	rg_pstatr(), rg_pg2norm(), rg_pg1norm()
 
 begin
 	call smark (sp)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (dim, 2, TY_INT)
 
 	nrcols = IM_LEN(imr,1)
 	if (IM_NDIM(imr) == 1)
@@ -474,12 +463,10 @@ begin
 	rbuf = NULL
 	ibuf = NULL
 	if (newref == YES) {
-	    sz_val = nrcols * nrlines
-	    call calloc (rbuf, sz_val, TY_REAL)
+	    call calloc (rbuf, nrcols * nrlines, TY_REAL)
 	    rbuf = rg_pgdata (imr, 1, nrcols, 1, nrlines)
 	}
-	sz_val = nrcols * nrlines
-	call calloc (ibuf, sz_val, TY_REAL)
+	call calloc (ibuf, nrcols * nrlines, TY_REAL)
 	ibuf = rg_pgdata (impsf, 1, nrcols, 1, nrlines)
 
 	# Compute the size for the FFT buffers.
@@ -494,16 +481,14 @@ begin
 	imfft = rg_pstatp (pm, IMFFT)
         if (imfft != NULL)
             call mfree (imfft, TY_REAL)
-        sz_val = 2 * nxfft * nyfft
-        call calloc (imfft, sz_val, TY_REAL)
+        call calloc (imfft, 2 * nxfft * nyfft, TY_REAL)
         call rg_psetp (pm, IMFFT, imfft)
 
         # Allocate space for the fft.
         fft = rg_pstatp (pm, FFT)
         if (fft != NULL)
             call mfree (fft, TY_REAL)
-        sz_val = 2 * nxfft * nyfft
-        call calloc (fft, sz_val, TY_REAL)
+        call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
         call rg_psetp (pm, FFT, fft)
 
 	if (newref == YES) {
@@ -511,8 +496,7 @@ begin
  	    reffft = rg_pstatp (pm, REFFFT)
             if (reffft != NULL)
                 call mfree (reffft, TY_REAL)
-            sz_val = 2 * nxfft * nyfft
-            call calloc (reffft, sz_val, TY_REAL)
+            call calloc (reffft, 2 * nxfft * nyfft, TY_REAL)
             call rg_psetp (pm, REFFFT, reffft)
 
             # Load the reference image FFT.
@@ -626,7 +610,6 @@ procedure rg_pfilter (pm)
 
 pointer	pm		#I pointer to the psf matching structure
 
-size_t	sz_val
 pointer	sp, dim, psfft, conv
 real	nfactor
 int	rg_pstati()
@@ -635,25 +618,23 @@ real	rg_pstatr(), asumr()
 
 begin
 	call smark (sp)
-	sz_val = 2
-	call salloc (dim, sz_val, TY_INT)
+	call salloc (dim, 2, TY_INT)
 
 	# Allocate space for the fourier spectrum.
 	if (rg_pstatp (pm, ASFFT) != NULL)
 	    call mfree (rg_pstatp (pm, ASFFT), TY_REAL)
-	sz_val = rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
-	call calloc (psfft, sz_val, TY_REAL)
+	call calloc (psfft, rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
+	    TY_REAL)
 	call rg_psetp (pm, ASFFT, psfft)
 
 	# Allocate space for the convolution kernel.
 	if (rg_pstatp (pm, CONV) != NULL)
 	    call mfree (rg_pstatp (pm, CONV), TY_REAL)
-	sz_val = 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
-	call malloc (conv, sz_val,
+	call malloc (conv, 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
 	    TY_REAL)
 	call rg_psetp (pm, CONV, conv)
-	sz_val = 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
-	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)], sz_val)
+	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)],
+	    2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT))
 
 #	# Compute the zextend parameter.
 #	call rg_psetr (pm, THRESHOLD, rg_pstatr (pm, PRATIO) *
@@ -732,7 +713,6 @@ pointer im              #I pointer to the iraf image
 int     c1, c2          #I column limits in the input image
 int     l1, l2          #I line limits in the input image
 
-size_t	sz_val
 int     i, ncols, nlines, npts
 pointer ptr, index, buf
 pointer imgs1r(), imgs2r()
@@ -741,8 +721,7 @@ begin
         ncols = c2 - c1 + 1
         nlines = l2 - l1 + 1
         npts = ncols * nlines
-        sz_val = npts
-        call malloc (ptr, sz_val, TY_REAL)
+        call malloc (ptr, npts, TY_REAL)
 
         index = ptr
         do i = l1, l2 {
@@ -750,8 +729,7 @@ begin
                 buf = imgs1r (im, c1, c2)
             else
                 buf = imgs2r (im, c1, c2, i, i)
-            sz_val = ncols
-            call amovr (Memr[buf], Memr[index], sz_val)
+            call amovr (Memr[buf], Memr[index], ncols)
             index = index + ncols
         }
 
@@ -798,7 +776,6 @@ pointer	pm			#I pointer to psf matching structure
 pointer	imk			#I pointer to kernel image
 pointer imf			#I pointer to fourier spectrum image
 
-size_t	sz_val
 int	nx, ny
 pointer	buf
 int	rg_pstati()
@@ -814,12 +791,10 @@ begin
 	    IM_LEN(imk,2) = ny
 	    IM_PIXTYPE(imk) = TY_REAL
 	    buf = imps2r (imk, 1, nx, 1, ny)
-	    if (rg_pstatp (pm, CONV) != NULL) {
-	        sz_val = nx * ny
-	        call amovr (Memr[rg_pstatp(pm,CONV)], Memr[buf], sz_val)
-	    } else {
+	    if (rg_pstatp (pm, CONV) != NULL)
+	        call amovr (Memr[rg_pstatp(pm,CONV)], Memr[buf], nx * ny)
+	    else
 	        call amovkr (0.0, Memr[buf], nx * ny)
-	    }
 	}
 
 	# Write out the fourier spectrum.
@@ -831,12 +806,10 @@ begin
 	    IM_LEN(imf,2) = ny
 	    IM_PIXTYPE(imf) = TY_REAL
 	    buf = imps2r (imf, 1, nx, 1, ny)
-	    if (rg_pstatp (pm, CONV) != NULL) {
-	        sz_val = nx * ny
-	        call amovr (Memr[rg_pstatp(pm,ASFFT)], Memr[buf], sz_val)
-	    } else {
+	    if (rg_pstatp (pm, CONV) != NULL)
+	        call amovr (Memr[rg_pstatp(pm,ASFFT)], Memr[buf], nx * ny)
+	    else
 	        call amovkr (0.0, Memr[buf], nx * ny)
-	    }
 	}
 end
 

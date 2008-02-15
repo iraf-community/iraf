@@ -17,7 +17,6 @@ pointer	im			#I image descriptor
 int	param			#I parameter to be set
 int	value			#I integer value of parameter
 
-size_t	sz_val
 int	i
 pointer	ibdes
 errchk	calloc
@@ -71,8 +70,7 @@ begin
 
 	    if (ibdes != NULL) {
 		call mfree (IM_IBDES(im), TY_STRUCT)
-		sz_val = LEN_BDES * IM_VNBUFS(im)
-		call calloc (IM_IBDES(im), sz_val, TY_STRUCT)
+		call calloc (IM_IBDES(im), LEN_BDES * IM_VNBUFS(im), TY_STRUCT)
 		IM_NGET(im) = 0
 	    }
 

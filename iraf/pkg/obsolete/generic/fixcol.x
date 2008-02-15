@@ -51,7 +51,6 @@ procedure fixcoli (image, x1, x2, y1, y2)
 pointer	image				# Image pointer
 int	x1, x2, y1, y2			# Region to be fixed
 
-size_t	sz_val
 int	i, j, nx, ny
 real	f1, f2, scale
 pointer	a, b, c
@@ -64,16 +63,12 @@ begin
 	ny = y2 - y1 + 1
 	if (x1 == 1) {
 	    a = imgs2i (image, x2 + 1, x2 + 1, y1, y2)
-	    do i = 1, ny {
-		sz_val = nx
-		call amovki (Memi[a + i - 1], Memi[c + (i - 1) * nx], sz_val)
-	    }
+	    do i = 1, ny
+		call amovki (Memi[a + i - 1], Memi[c + (i - 1) * nx], nx)
 	} else if (x2 == IM_LEN (image, 1)) {
 	    a = imgs2i (image, x1 - 1, x1 - 1,  y1, y2)
-	    do i = 1, ny {
-		sz_val = nx
-		call amovki (Memi[a + i - 1], Memi[c + (i - 1) * nx], sz_val)
-	    }
+	    do i = 1, ny
+		call amovki (Memi[a + i - 1], Memi[c + (i - 1) * nx], nx)
 	} else {
 	    call imseti (image, IM_NBUFS, 2)
 	    a = imgs2i (image, x1 - 1, x1 - 1, y1, y2)
@@ -97,7 +92,6 @@ procedure fixcoll (image, x1, x2, y1, y2)
 pointer	image				# Image pointer
 int	x1, x2, y1, y2			# Region to be fixed
 
-size_t	sz_val
 int	i, j, nx, ny
 real	f1, f2, scale
 pointer	a, b, c
@@ -110,16 +104,12 @@ begin
 	ny = y2 - y1 + 1
 	if (x1 == 1) {
 	    a = imgs2l (image, x2 + 1, x2 + 1, y1, y2)
-	    do i = 1, ny {
-		sz_val = nx
-		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], sz_val)
-	    }
+	    do i = 1, ny
+		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], nx)
 	} else if (x2 == IM_LEN (image, 1)) {
 	    a = imgs2l (image, x1 - 1, x1 - 1,  y1, y2)
-	    do i = 1, ny {
-		sz_val = nx
-		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], sz_val)
-	    }
+	    do i = 1, ny
+		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], nx)
 	} else {
 	    call imseti (image, IM_NBUFS, 2)
 	    a = imgs2l (image, x1 - 1, x1 - 1, y1, y2)

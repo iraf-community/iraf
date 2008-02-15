@@ -13,7 +13,6 @@ int	xwindow, ywindow, boundary
 pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str, im1, im2, mde
 real	constant
-size_t	sz_val
 bool	clgetb()
 int	clgeti(), imtgetim(), imtlen(), clgwrd()
 pointer	imtopen(), immap()
@@ -23,19 +22,15 @@ errchk	mde_medbox
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (imtlist1, sz_val, TY_CHAR)
-	call salloc (imtlist2, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtlist1, SZ_LINE, TY_CHAR)
+	call salloc (imtlist2, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Allocate the median fitting structure
-	sz_val = LEN_MEDIAN_STRUCT
-	call calloc (mde, sz_val, TY_STRUCT)
+	call calloc (mde, LEN_MEDIAN_STRUCT, TY_STRUCT)
 
 	# Get task parameters
 	call clgstr ("input", Memc[imtlist1], SZ_LINE)

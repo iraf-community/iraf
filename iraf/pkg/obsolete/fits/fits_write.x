@@ -16,7 +16,6 @@ procedure wft_write_fitz (iraf_file, fits_file)
 char	iraf_file[ARB]		# IRAF file name
 char	fits_file[ARB]		# FITS file name
 
-size_t	sz_val
 int	fits_fd, chars_rec, nchars, ip, min_lenuserarea
 pointer	im, sp, fits, envstr
 
@@ -30,10 +29,8 @@ include "wfits.com"
 begin
 	# Allocate memory for program data structure.
 	call smark (sp)
-	sz_val = LEN_FITS
-	call salloc (fits, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call salloc (envstr, sz_val, TY_CHAR)
+	call salloc (fits, LEN_FITS, TY_STRUCT)
+	call salloc (envstr, SZ_FNAME, TY_CHAR)
 
 	# Construct the old iraf name by removing the directory
 	# specification.
@@ -126,8 +123,6 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
-size_t	sz_val
-long	lg_val
 int	npix
 long	v[IM_MAXDIM]
 pointer	buf
@@ -145,9 +140,7 @@ begin
 	    irafmin = MAX_REAL
 	    npix = NAXISN(im,1)
 
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, v, sz_val)
+	    call amovkl (long(1), v, IM_MAXDIM)
 	    while (imgnlr (im, buf, v) != EOF) {
 	        call alimr (Memr[buf], npix, minval, maxval)
 	        irafmin = min (irafmin, minval)

@@ -137,7 +137,6 @@ double	w[ARB]		# weights (npts)
 int	npts		# number of points
 int	nvars		# number of independent variables
 
-size_t	sz_val
 pointer	sp, zfit, errors
 double	scatter, variance, chisqr
 int	nlstati()
@@ -145,10 +144,8 @@ int	nlstati()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (zfit, sz_val, TY_DOUBLE)
-	sz_val = nlstati (nl, NLNPARAMS)
-	call salloc (errors, sz_val, TY_DOUBLE)
+	call salloc (zfit, npts, TY_DOUBLE)
+	call salloc (errors, nlstati (nl, NLNPARAMS), TY_DOUBLE)
 
 	# Initialize
 	scatter = double (0.0)

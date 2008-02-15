@@ -16,7 +16,6 @@ int	dformat			#I write the output file in database format
 int	interactive		#I interactive mode ?
 int	verbose			#I verbose mode
 
-size_t	sz_val
 int	stat, nregions
 int	rpfd, ipfd, sfd
 pointer	reglist, reclist, shiftslist, list1, listr, list2
@@ -36,20 +35,16 @@ begin
 	# Allocate temporary space.
 	call smark (sp)
 
-	sz_val = SZ_FNAME
-	call salloc (reference, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (freglist, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (imager, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	call salloc (database, sz_val, TY_CHAR)
-	call salloc (shifts, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (reference, SZ_FNAME, TY_CHAR)
+	call salloc (freglist, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (imager, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (database, SZ_FNAME, TY_CHAR)
+	call salloc (shifts, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
 
 	# Open the input and output image lists.
 	call clgstr ("input", Memc[str], SZ_LINE)
@@ -419,7 +414,6 @@ procedure rg_lgain (im, ls)
 pointer	im		#I pointer to the input image
 pointer	ls		#I pointer to the intensity matching structure
 
-size_t	sz_val
 int	ip
 pointer	sp, key
 real	epadu
@@ -429,8 +423,7 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (key, sz_val, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	call rg_lstats (ls, CCDGAIN, Memc[key], SZ_FNAME)
 	ip = 1
@@ -461,7 +454,6 @@ procedure rg_lrdnoise (im, ls)
 pointer	im		#I pointer to the input image
 pointer	ls		#I pointer to the intensity matching structure
 
-size_t	sz_val
 int	ip
 pointer	sp, key
 real	rdnoise
@@ -471,8 +463,7 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (key, sz_val, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	call rg_lstats (ls, CCDREAD, Memc[key], SZ_FNAME)
 	ip = 1
@@ -533,23 +524,18 @@ pointer	im2		#I pointer to the output image
 real	bscale		#I the bscale value
 real	bzero		#I the bzero value
 
-long	lg_val
-size_t	sz_val
 int	ncols
 pointer	sp, v1, v2, buf1, buf2
 int	imgnlr(), impnlr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
 
 	ncols = IM_LEN(im1,1)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 	while (imgnlr (im1, buf1, Meml[v1]) != EOF) {
 	    if (impnlr (im2, buf2, Meml[v2]) != EOF)
 		call altmr (Memr[buf1], Memr[buf2], ncols, bscale, bzero)

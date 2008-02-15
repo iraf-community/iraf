@@ -62,7 +62,6 @@ procedure ex_gif (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	gif
 int	nbytes, flags
 
@@ -84,17 +83,12 @@ begin
 
 	# Allocate the gif structure.
 	iferr {
-	    sz_val = SZ_GIFSTRUCT
-	    call calloc (gif, sz_val, TY_STRUCT)
-	    sz_val = 257
-	    call calloc (GIF_APTR(gif), sz_val, TY_SHORT)
-	    sz_val = HSIZE
-	    call calloc (GIF_HPTR(gif), sz_val, TY_INT)
-	    call calloc (GIF_CPTR(gif), sz_val, TY_INT)
-	    sz_val = max(256,EX_OCOLS(ex))
-	    call calloc (GIF_DPTR(gif), sz_val, TY_SHORT)
-	    sz_val = (2*EX_OROWS(ex)*EX_OCOLS(ex))
-	    call calloc (GIF_CDPTR(gif), sz_val,TY_SHORT)
+	    call calloc (gif, SZ_GIFSTRUCT, TY_STRUCT)
+	    call calloc (GIF_APTR(gif), 257, TY_SHORT)
+	    call calloc (GIF_HPTR(gif), HSIZE, TY_INT)
+	    call calloc (GIF_CPTR(gif), HSIZE, TY_INT)
+	    call calloc (GIF_DPTR(gif), max(256,EX_OCOLS(ex)), TY_SHORT)
+	    call calloc (GIF_CDPTR(gif), (2*EX_OROWS(ex)*EX_OCOLS(ex)),TY_SHORT)
 	} then
 	    call error (0, "Error allocating gif structure.")
 
@@ -234,7 +228,6 @@ pointer	ex				#i tast struct pointer
 pointer	gif				#i gif struct pointer
 int	fd				#i output file descriptor
 
-size_t	sz_val
 long	fcode
 int	i, c, ent, disp
 int	hsize_reg, hshift
@@ -264,8 +257,7 @@ begin
 	hshift = 8-hshift		# set hash code range bound
 
 	hsize_reg = HSIZE		# clear the hash table
-	sz_val = HSIZE
-	call amovki (-1, HTAB(gif,0), sz_val)
+	call amovki (-1, HTAB(gif,0), HSIZE)
 
 	call gif_output (fd, gif, GIF_CLEAR_CODE(gif))
 
@@ -307,8 +299,7 @@ nomatch_    call gif_output (fd, gif, ent)
 		HTAB(gif,i) = fcode
 	    } else {
 		# Clear out the hash table.
-		sz_val = HSIZE
-		call amovki (-1, HTAB(gif,0), sz_val)
+		call amovki (-1, HTAB(gif,0), HSIZE)
 		GIF_FREE_ENT(gif) = GIF_CLEAR_CODE(gif) + 2
 		GIF_CLEAR_FLAG(gif) = YES
 		call gif_output (fd, gif, GIF_CLEAR_CODE(gif))

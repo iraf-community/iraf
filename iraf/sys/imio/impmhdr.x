@@ -48,7 +48,6 @@ pointer	im				#I image descriptor
 pointer	bp				#U buffer containing encoded header
 int	sz_buf				#U allocated size of buffer, chars
 
-size_t	sz_val
 int	nchars, ualen, ch, i
 pointer	sp, tbuf, ip, op, idb, rp
 errchk	malloc, realloc, idb_open
@@ -57,14 +56,12 @@ pointer	idb_open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_IMTITLE
-	call salloc (tbuf, sz_val, TY_CHAR)
+	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
 
 	# Allocate text buffer if the user hasn't already done so.
 	if (bp == NULL || sz_buf <= 0) {
 	    sz_buf = DEF_SZBUF
-	    sz_val = sz_buf
-	    call malloc (bp, sz_val, TY_CHAR)
+	    call malloc (bp, sz_buf, TY_CHAR)
 	}
 
 	# Store title string in buffer.
@@ -123,8 +120,7 @@ begin
 	    nchars = op - bp
 	    if (sz_buf - nchars < IDB_RECLEN) {
 		sz_buf = sz_buf + INC_SZBUF
-		sz_val = sz_buf
-		call realloc (bp, sz_val, TY_CHAR)
+		call realloc (bp, sz_buf, TY_CHAR)
 		op = bp + nchars
 	    }
 
@@ -144,8 +140,7 @@ begin
 	# All done, terminate the string and return any extra space.
 	Memc[op] = EOS;  op = op + 1
 	nchars = op - bp
-	sz_val = nchars
-	call realloc (bp, sz_val, TY_CHAR)
+	call realloc (bp, nchars, TY_CHAR)
 
 	# Clean up.
 	call idb_close (idb)
@@ -164,7 +159,6 @@ procedure im_pmldhdr (im, bp)
 pointer	im			#I image descriptor
 pointer	bp			#I pointer to text buffer (header save buf)
 
-size_t	sz_val
 int	hdrlen, sz_ua, nchars, ch, i
 pointer	sp, tbuf, ip, op, rp, ua
 int	strncmp(), ctol(), ctor()
@@ -172,8 +166,7 @@ errchk	realloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_IMTITLE
-	call salloc (tbuf, sz_val, TY_CHAR)
+	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
 
 	# Get the image title string.
 	for (ip = bp;  Memc[ip] != EOS;) {
@@ -304,8 +297,7 @@ begin
 	    if (nchars + IDB_RECLEN + 2 > sz_ua) {
 		hdrlen = hdrlen + INC_HDRMEM
 		IM_LENHDRMEM(im) = IM_LENHDRMEM(im) + INC_HDRMEM
-		sz_val = hdrlen
-		call realloc (im, sz_val, TY_STRUCT)
+		call realloc (im, hdrlen, TY_STRUCT)
 		sz_ua = (hdrlen - IMU) * SZ_STRUCT - 1
 		ua = IM_USERAREA(im)
 		op = ua + nchars

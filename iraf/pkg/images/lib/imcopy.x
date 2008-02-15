@@ -12,8 +12,6 @@ char	image1[ARB]			# Input image
 char	image2[ARB]			# Output image
 bool	verbose				# Print the operation
 
-long	lg_val
-size_t	sz_val
 int	npix, junk
 pointer	buf1, buf2, im1, im2
 pointer	sp, root1, root2, imtemp, section
@@ -26,12 +24,10 @@ pointer	immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (root1, sz_val, TY_CHAR)
-	call salloc (root2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (root1, SZ_PATHNAME, TY_CHAR)
+	call salloc (root2, SZ_PATHNAME, TY_CHAR)
+	call salloc (imtemp, SZ_PATHNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	# If verbose print the operation.
 	if (verbose) {
@@ -65,10 +61,8 @@ begin
 
 	# Setup start vector for sequential reads and writes.
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v1, sz_val)
-	call amovkl (lg_val, v2, sz_val)
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
 
 	# Copy the image.
 
@@ -82,14 +76,12 @@ begin
 	case TY_USHORT, TY_INT, TY_LONG:
 	    while (imgnll (im1, buf1, v1) != EOF) {
 		junk = impnll (im2, buf2, v2)
-		sz_val = npix
-		call amovl (Meml[buf1], Meml[buf2], sz_val)
+		call amovl (Meml[buf1], Meml[buf2], npix)
 	    }
 	case TY_REAL:
 	    while (imgnlr (im1, buf1, v1) != EOF) {
 		junk = impnlr (im2, buf2, v2)
-		sz_val = npix
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], npix)
 	    }
 	case TY_DOUBLE:
 	    while (imgnld (im1, buf1, v1) != EOF) {

@@ -20,7 +20,6 @@ int	ndim			# dimensionality of section
 int	dtype			# datatype of pixels desired
 long	totpix			# total pixels in section (output)
 
-size_t	sz_val
 bool	rlio
 pointer	sp, px, bp, line, rl_high
 long	v[IM_MAXDIM], vinc[IM_MAXDIM]
@@ -53,8 +52,7 @@ begin
 	# A temporary pixel buffer is required for RLIO conversions.
 	if (rlio) {
 	    call smark (sp)
-	    sz_val = npix
-	    call salloc (px, sz_val, TY_INT)
+	    call salloc (px, npix, TY_INT)
 	}
 
 	line = bp

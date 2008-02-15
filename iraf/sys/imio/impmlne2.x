@@ -10,15 +10,11 @@ bool procedure im_pmlne2 (im, lineno)
 pointer	im			#I image descriptor
 int	lineno			#I line number
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM]
 bool	pm_linenotempty()
 
 begin
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (1, v, IM_MAXDIM)
 	v[2] = lineno
 
 	return (pm_linenotempty (IM_PL(im), v))

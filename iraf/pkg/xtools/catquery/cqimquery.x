@@ -49,7 +49,6 @@ pointer	procedure cq_imquery (cq, imname)
 pointer	cq			#I the catalog database descriptor
 char	imname[ARB]		#I the image name
 
-size_t	sz_val
 pointer	res, inbuf
 int	cc, fd, outfd, nchars
 bool	done
@@ -116,8 +115,7 @@ begin
 	iferr {
 
 	    # Allocate the maximum buffer size.
-	    sz_val = DEF_SZ_INBUF
-	    call malloc (inbuf, sz_val, TY_CHAR)
+	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 
 	    # Skip a fixed number of bytes. Dangerous unless the header
 	    # is always the same size.
@@ -193,7 +191,6 @@ pointer procedure cq_firinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
-size_t	sz_val
 pointer	cc, res
 pointer	sp, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -211,21 +208,16 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	sz_val = CQ_LEN_IM
-	call calloc (res, sz_val, TY_STRUCT)
+	call calloc (res, CQ_LEN_IM, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (value, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPNAME
-	call salloc (wpname, sz_val, TY_CHAR)
-	call salloc (wkname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (wkdvalue, sz_val, TY_CHAR)
-	call salloc (wkvalue, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPUNITS
-	call salloc (wkunits, sz_val, TY_CHAR)
+	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
 
 	# Save the survey informaton and query in the results structure.
 	call strcpy (CQ_CATDB(cq), CQ_IMCATDB(res), SZ_FNAME)
@@ -267,15 +259,12 @@ begin
 	    CQ_NWCS(res) = 0
 
 	# Allocate space for the wcs parameters.
-	sz_val = SZ_LINE
-	call calloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
-	sz_val = CQ_NWCS(res)
-	call calloc (CQ_WKTYPES(res), sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call calloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	call calloc (CQ_WPNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKDVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKTYPES(res), CQ_NWCS(res), TY_INT)
+	call calloc (CQ_WKUNITS(res), SZ_LINE, TY_CHAR)
 
 	# Get the wcs parameters.
 	ncount = 0
@@ -310,8 +299,7 @@ begin
 		# Add the parameter name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    sz_val = sz1
-		    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WPNAMES(res), sz1, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[wpname], Memc[CQ_WPNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -321,8 +309,7 @@ begin
 		# Add the keyword name to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    sz_val = sz2
-		    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKNAMES(res), sz2, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[wkname], Memc[CQ_WKNAMES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -332,8 +319,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz3 - op3 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz3 = sz3 + SZ_LINE
-		    sz_val = sz3
-		    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKDVALUES(res), sz3, TY_CHAR)
 		}
 		op3 = op3 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_WKDVALUES(res)+op3-1], sz3 - op3 + 1)
@@ -343,8 +329,7 @@ begin
 		# Add the keyword value to the list.
 		if ((sz4 - op4 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz4 = sz4 + SZ_LINE
-		    sz_val = sz4
-		    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKVALUES(res), sz4, TY_CHAR)
 		}
 		op4 = op4 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_WKVALUES(res)+op4-1], sz4 - op4 + 1)
@@ -357,8 +342,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz5 - op5 + 1) < (CQ_SZ_QPUNITS + 1)) {
 		    sz5 = sz5 + SZ_LINE
-		    sz_val = sz5
-		    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKUNITS(res), sz5, TY_CHAR)
 		}
 		op5 = op5 + gstrcpy (Memc[wkunits],
 		    Memc[CQ_WKUNITS(res)+op5-1], sz5 - op5 + 1)
@@ -372,26 +356,19 @@ begin
 	# Resize the wcs parameter arrays.
 	if (ncount != CQ_NWCS(res)) {
 	    CQ_NWCS(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WPNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKDVALUES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKVALUES(res), 1, TY_CHAR)
 	    call mfree (CQ_WKTYPES(res), TY_INT)
 	    CQ_WKTYPES(res) = NULL
-	    sz_val = 1
-	    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WKUNITS(res), 1, TY_CHAR)
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op4
-	    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op5
-	    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WPNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_WKNAMES(res), op2, TY_CHAR)
+	    call realloc (CQ_WKDVALUES(res), op3, TY_CHAR)
+	    call realloc (CQ_WKVALUES(res), op4, TY_CHAR)
+	    call realloc (CQ_WKUNITS(res), op5, TY_CHAR)
 	    Memc[CQ_WPNAMES(res)+op1] = EOS
 	    Memc[CQ_WKNAMES(res)+op2] = EOS
 	    Memc[CQ_WKDVALUES(res)+op3] = EOS
@@ -404,15 +381,12 @@ begin
 	    CQ_NIMPARS(res) = 0
 
 	# Allocate space for the keyword parameters.
-	sz_val = SZ_LINE
-	call calloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
-	sz_val = CQ_NIMPARS(res)
-	call calloc (CQ_IKTYPES(res), sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call calloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	call calloc (CQ_IPNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKDVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKTYPES(res), CQ_NIMPARS(res), TY_INT)
+	call calloc (CQ_IKUNITS(res), SZ_LINE, TY_CHAR)
 
 	# Get the keyword parameters.
 	ncount = 0
@@ -447,8 +421,7 @@ begin
 		# Add the parameter name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    sz_val = sz1
-		    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IPNAMES(res), sz1, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[wpname], Memc[CQ_IPNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -458,8 +431,7 @@ begin
 		# Add the keyword name to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    sz_val = sz2
-		    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKNAMES(res), sz2, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[wkname], Memc[CQ_IKNAMES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -469,8 +441,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz3 - op3 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz3 = sz3 + SZ_LINE
-		    sz_val = sz3
-		    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKDVALUES(res), sz3, TY_CHAR)
 		}
 		op3 = op3 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_IKDVALUES(res)+op3-1], sz3 - op3 + 1)
@@ -480,8 +451,7 @@ begin
 		# Add the keyword value to the list.
 		if ((sz4 - op4 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz4 = sz4 + SZ_LINE
-		    sz_val = sz4
-		    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKVALUES(res), sz4, TY_CHAR)
 		}
 		op4 = op4 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_IKVALUES(res)+op4-1], sz4 - op4 + 1)
@@ -494,8 +464,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz5 - op5 + 1) < (CQ_SZ_QPUNITS + 1)) {
 		    sz5 = sz5 + SZ_LINE
-		    sz_val = sz5
-		    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKUNITS(res), sz5, TY_CHAR)
 		}
 		op5 = op5 + gstrcpy (Memc[wkunits],
 		    Memc[CQ_IKUNITS(res)+op5-1], sz5 - op5 + 1)
@@ -510,26 +479,19 @@ begin
 	# Resize the wcs parameter arrays.
 	if (ncount != CQ_NIMPARS(res)) {
 	    CQ_NIMPARS(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IPNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKDVALUES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKVALUES(res), 1, TY_CHAR)
 	    call mfree (CQ_IKTYPES(res), TY_INT)
 	    CQ_IKTYPES(res) = NULL
-	    sz_val = 1
-	    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IKUNITS(res), 1, TY_CHAR)
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op4
-	    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op5
-	    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IPNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_IKNAMES(res), op2, TY_CHAR)
+	    call realloc (CQ_IKDVALUES(res), op3, TY_CHAR)
+	    call realloc (CQ_IKVALUES(res), op4, TY_CHAR)
+	    call realloc (CQ_IKUNITS(res), op5, TY_CHAR)
 	    Memc[CQ_IPNAMES(res)+op1] = EOS
 	    Memc[CQ_IKNAMES(res)+op2] = EOS
 	    Memc[CQ_IKDVALUES(res)+op3] = EOS
@@ -549,7 +511,6 @@ pointer procedure cq_irinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
-size_t	sz_val
 pointer	cc, res
 pointer	sp, query, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, fsize, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -567,15 +528,12 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	sz_val = CQ_LEN_IM
-	call calloc (res, sz_val, TY_STRUCT)
+	call calloc (res, CQ_LEN_IM, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (query, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (query, SZ_LINE, TY_CHAR)
+	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
 	call sprintf (Memc[query], SZ_LINE, CQ_QUERY(cc))
 	do i = 1, CQ_NQPARS(cc) {
 	    if (cq_wrdstr (i, Memc[value], CQ_SZ_QPVALUE,
@@ -593,16 +551,13 @@ begin
 	# Copy the query parameters to the results descriptor.
 	CQ_INQPARS(res) = CQ_NQPARS(cc)
 	fsize = strlen (Memc[CQ_PQPNAMES(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPNAMES(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPNAMES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPNAMES(cc)], Memc[CQ_IQPNAMES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPVALUES(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPVALUES(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPVALUES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPVALUES(cc)], Memc[CQ_IQPVALUES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPUNITS(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPUNITS(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPUNITS(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPUNITS(cc)], Memc[CQ_IQPUNITS(res)], fsize)
 
 	# Get the input image data type.
@@ -617,14 +572,11 @@ begin
 	        CQ_ITYPESTR)
 	}
 
-	sz_val = CQ_SZ_QPNAME
-	call salloc (wpname, sz_val, TY_CHAR)
-	call salloc (wkname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (wkdvalue, sz_val, TY_CHAR)
-	call salloc (wkvalue, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPUNITS
-	call salloc (wkunits, sz_val, TY_CHAR)
+	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
 
 	# Get the input image data type.
 	iferr {
@@ -642,15 +594,12 @@ begin
 	    CQ_NWCS(res) = 0
 
 	# Allocate space for the wcs parameters.
-	sz_val = SZ_LINE
-	call calloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	call calloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
-	sz_val = CQ_NWCS(res)
-	call calloc (CQ_WKTYPES(res), sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call calloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	call calloc (CQ_WPNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKDVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_WKTYPES(res), CQ_NWCS(res), TY_INT)
+	call calloc (CQ_WKUNITS(res), SZ_LINE, TY_CHAR)
 
 	# Get the wcs parameters.
 	ncount = 0
@@ -686,8 +635,7 @@ begin
 		# Add the parameter name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    sz_val = sz1
-		    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WPNAMES(res), sz1, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[wpname], Memc[CQ_WPNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -697,8 +645,7 @@ begin
 		# Add the keyword name to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    sz_val = sz2
-		    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKNAMES(res), sz2, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[wkname], Memc[CQ_WKNAMES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -708,8 +655,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz3 - op3 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz3 = sz3 + SZ_LINE
-		    sz_val = sz3
-		    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKDVALUES(res), sz3, TY_CHAR)
 		}
 		op3 = op3 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_WKDVALUES(res)+op3-1], sz3 - op3 + 1)
@@ -719,8 +665,7 @@ begin
 		# Add the keyword value to the list.
 		if ((sz4 - op4 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz4 = sz4 + SZ_LINE
-		    sz_val = sz4
-		    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKVALUES(res), sz4, TY_CHAR)
 		}
 		op4 = op4 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_WKVALUES(res)+op4-1], sz4 - op4 + 1)
@@ -733,8 +678,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz5 - op5 + 1) < (CQ_SZ_QPUNITS + 1)) {
 		    sz5 = sz5 + SZ_LINE
-		    sz_val = sz5
-		    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+		    call realloc (CQ_WKUNITS(res), sz5, TY_CHAR)
 		}
 		op5 = op5 + gstrcpy (Memc[wkunits],
 		    Memc[CQ_WKUNITS(res)+op5-1], sz5 - op5 + 1)
@@ -748,26 +692,19 @@ begin
 	# Resize the wcs parameter arrays.
 	if (ncount != CQ_NWCS(res)) {
 	    CQ_NWCS(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WPNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKDVALUES(res), 1, TY_CHAR)
+	    call realloc (CQ_WKVALUES(res), 1, TY_CHAR)
 	    call mfree (CQ_WKTYPES(res), TY_INT)
 	    CQ_WKTYPES(res) = NULL
-	    sz_val = 1
-	    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WKUNITS(res), 1, TY_CHAR)
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_WPNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_WKNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_WKDVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op4
-	    call realloc (CQ_WKVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op5
-	    call realloc (CQ_WKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_WPNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_WKNAMES(res), op2, TY_CHAR)
+	    call realloc (CQ_WKDVALUES(res), op3, TY_CHAR)
+	    call realloc (CQ_WKVALUES(res), op4, TY_CHAR)
+	    call realloc (CQ_WKUNITS(res), op5, TY_CHAR)
 	    Memc[CQ_WPNAMES(res)+op1] = EOS
 	    Memc[CQ_WKNAMES(res)+op2] = EOS
 	    Memc[CQ_WKDVALUES(res)+op3] = EOS
@@ -780,15 +717,12 @@ begin
 	    CQ_NIMPARS(res) = 0
 
 	# Allocate space for the keyword parameters.
-	sz_val = SZ_LINE
-	call calloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	call calloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
-	sz_val = CQ_NIMPARS(res)
-	call calloc (CQ_IKTYPES(res), sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call calloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	call calloc (CQ_IPNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKDVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKVALUES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_IKTYPES(res), CQ_NIMPARS(res), TY_INT)
+	call calloc (CQ_IKUNITS(res), SZ_LINE, TY_CHAR)
 
 	# Get the keyword parameters.
 	ncount = 0
@@ -823,8 +757,7 @@ begin
 		# Add the parameter name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    sz_val = sz1
-		    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IPNAMES(res), sz1, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[wpname], Memc[CQ_IPNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -834,8 +767,7 @@ begin
 		# Add the keyword name to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    sz_val = sz2
-		    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKNAMES(res), sz2, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[wkname], Memc[CQ_IKNAMES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -845,8 +777,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz3 - op3 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz3 = sz3 + SZ_LINE
-		    sz_val = sz3
-		    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKDVALUES(res), sz3, TY_CHAR)
 		}
 		op3 = op3 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_IKDVALUES(res)+op3-1], sz3 - op3 + 1)
@@ -856,8 +787,7 @@ begin
 		# Add the keyword value to the list.
 		if ((sz4 - op4 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz4 = sz4 + SZ_LINE
-		    sz_val = sz4
-		    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKVALUES(res), sz4, TY_CHAR)
 		}
 		op4 = op4 + gstrcpy (Memc[wkdvalue],
 		    Memc[CQ_IKVALUES(res)+op4-1], sz4 - op4 + 1)
@@ -870,8 +800,7 @@ begin
 		# Add the default keyword value to the list.
 		if ((sz5 - op5 + 1) < (CQ_SZ_QPUNITS + 1)) {
 		    sz5 = sz5 + SZ_LINE
-		    sz_val = sz5
-		    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+		    call realloc (CQ_IKUNITS(res), sz5, TY_CHAR)
 		}
 		op5 = op5 + gstrcpy (Memc[wkunits],
 		    Memc[CQ_IKUNITS(res)+op5-1], sz5 - op5 + 1)
@@ -886,26 +815,19 @@ begin
 	# Resize the wcs parameter arrays.
 	if (ncount != CQ_NIMPARS(res)) {
 	    CQ_NIMPARS(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IPNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKDVALUES(res), 1, TY_CHAR)
+	    call realloc (CQ_IKVALUES(res), 1, TY_CHAR)
 	    call mfree (CQ_IKTYPES(res), TY_INT)
 	    CQ_IKTYPES(res) = NULL
-	    sz_val = 1
-	    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IKUNITS(res), 1, TY_CHAR)
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_IPNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_IKNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_IKDVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op4
-	    call realloc (CQ_IKVALUES(res), sz_val, TY_CHAR)
-	    sz_val = op5
-	    call realloc (CQ_IKUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_IPNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_IKNAMES(res), op2, TY_CHAR)
+	    call realloc (CQ_IKDVALUES(res), op3, TY_CHAR)
+	    call realloc (CQ_IKVALUES(res), op4, TY_CHAR)
+	    call realloc (CQ_IKUNITS(res), op5, TY_CHAR)
 	    Memc[CQ_IPNAMES(res)+op1] = EOS
 	    Memc[CQ_IKNAMES(res)+op2] = EOS
 	    Memc[CQ_IKDVALUES(res)+op3] = EOS

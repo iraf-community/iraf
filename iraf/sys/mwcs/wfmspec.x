@@ -97,7 +97,6 @@ procedure wf_msp_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I type of transformation
 
-size_t	sz_val
 pointer	ct, mw
 int	sz_atval, naps, ip, i
 pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff
@@ -117,10 +116,8 @@ begin
 	# Get spectrum information.
 	call smark (sp)
 	sz_atval = DEF_SZATVAL
-	sz_val = sz_atval
-	call malloc (atval, sz_val, TY_CHAR)
-	sz_val = SZ_ATNAME
-	call salloc (atkey, sz_val, TY_CHAR)
+	call malloc (atval, sz_atval, TY_CHAR)
+	call salloc (atkey, SZ_ATNAME, TY_CHAR)
 
 	for (naps=0;  ;  naps=naps+1) {
 	    call sprintf (Memc[atkey], SZ_ATNAME, "spec%d")
@@ -130,29 +127,26 @@ begin
 
 	    while (strlen (Memc[atval]) == sz_atval) {
 		sz_atval = 2 * sz_atval
-		sz_val = sz_atval
-		call realloc (atval, sz_val, TY_CHAR)
+		call realloc (atval, sz_atval, TY_CHAR)
 		call mw_gwattrs (mw, 2, Memc[atkey], Memc[atval], sz_atval)
 	    }
 
 	    if (naps == 0) {
-		sz_val = NALLOC
-		call malloc (aps, sz_val, TY_INT) 
-		call malloc (dtype, sz_val, TY_INT) 
-		call malloc (crval, sz_val, TY_DOUBLE) 
-		call malloc (cdelt, sz_val, TY_DOUBLE) 
-		call malloc (npts, sz_val, TY_INT) 
-		call malloc (z, sz_val, TY_DOUBLE) 
-		call malloc (coeff, sz_val, TY_POINTER)
+		call malloc (aps, NALLOC, TY_INT) 
+		call malloc (dtype, NALLOC, TY_INT) 
+		call malloc (crval, NALLOC, TY_DOUBLE) 
+		call malloc (cdelt, NALLOC, TY_DOUBLE) 
+		call malloc (npts, NALLOC, TY_INT) 
+		call malloc (z, NALLOC, TY_DOUBLE) 
+		call malloc (coeff, NALLOC, TY_POINTER)
 	    } else if (mod (naps, NALLOC) == 0) {
-		sz_val = naps+NALLOC
-		call realloc (aps, sz_val, TY_INT) 
-		call realloc (dtype, sz_val, TY_INT) 
-		call realloc (crval, sz_val, TY_DOUBLE)
-		call realloc (cdelt, sz_val, TY_DOUBLE) 
-		call realloc (npts, sz_val, TY_INT) 
-		call realloc (z, sz_val, TY_DOUBLE) 
-		call realloc (coeff, sz_val, TY_POINTER) 
+		call realloc (aps, naps+NALLOC, TY_INT) 
+		call realloc (dtype, naps+NALLOC, TY_INT) 
+		call realloc (crval, naps+NALLOC, TY_DOUBLE)
+		call realloc (cdelt, naps+NALLOC, TY_DOUBLE) 
+		call realloc (npts, naps+NALLOC, TY_INT) 
+		call realloc (z, naps+NALLOC, TY_DOUBLE) 
+		call realloc (coeff, naps+NALLOC, TY_POINTER) 
 	    }
 
 	    # Linear dispersion function.
@@ -186,14 +180,13 @@ begin
 	if (naps <= 0)
 	    call error (2, "WFMSPEC: No aperture information")
 
-	sz_val = naps
-	call realloc (aps, sz_val, TY_INT) 
-	call realloc (dtype, sz_val, TY_INT) 
-	call realloc (crval, sz_val, TY_DOUBLE) 
-	call realloc (cdelt, sz_val, TY_DOUBLE) 
-	call realloc (npts, sz_val, TY_INT) 
-	call realloc (z, sz_val, TY_DOUBLE) 
-	call realloc (coeff, sz_val, TY_POINTER) 
+	call realloc (aps, naps, TY_INT) 
+	call realloc (dtype, naps, TY_INT) 
+	call realloc (crval, naps, TY_DOUBLE) 
+	call realloc (cdelt, naps, TY_DOUBLE) 
+	call realloc (npts, naps, TY_INT) 
+	call realloc (z, naps, TY_DOUBLE) 
+	call realloc (coeff, naps, TY_POINTER) 
 
 	FC_NAPS(fc) = naps
 	FC_APS(fc) = aps
@@ -210,9 +203,8 @@ begin
 	# when the inverse transformation is evaluated sequentially.
 
 	if (dir == INVERSE) {
-	   sz_val = naps
-	   call malloc (crval, sz_val, TY_DOUBLE)
-	   call malloc (cdelt, sz_val, TY_DOUBLE)
+	   call malloc (crval, naps, TY_DOUBLE)
+	   call malloc (cdelt, naps, TY_DOUBLE)
 	   do i = 0, naps-1 {
 		if (Memi[FC_NPTS(fc)+i] == 0)
 		    next
@@ -347,7 +339,6 @@ char	atval[ARB]		#I attribute string
 pointer	coeff			#O coefficient array
 double	xmin, xmax		#I x limits
 
-size_t	sz_val
 double	dval, temp
 int	ncoeff, type, order, ip, i
 errchk	malloc, realloc
@@ -360,13 +351,10 @@ begin
 
 	ip = 1
 	while (ctod (atval, ip, dval) > 0) {
-	    if (coeff == NULL) {
-		sz_val = NALLOC
-		call malloc (coeff, sz_val, TY_DOUBLE)
-	    } else if (mod (ncoeff, NALLOC) == 0) {
-		sz_val = ncoeff+NALLOC
-		call realloc (coeff, sz_val, TY_DOUBLE)
-	    }
+	    if (coeff == NULL)
+		call malloc (coeff, NALLOC, TY_DOUBLE)
+	    else if (mod (ncoeff, NALLOC) == 0)
+		call realloc (coeff, ncoeff+NALLOC, TY_DOUBLE)
 	    Memd[coeff+ncoeff] = dval
 	    ncoeff = ncoeff + 1
 	}
@@ -374,8 +362,7 @@ begin
 	    return
 
 	# Convert range elements to a more efficient form.
-	sz_val = ncoeff
-	call realloc (coeff, sz_val, TY_DOUBLE)
+	call realloc (coeff, ncoeff, TY_DOUBLE)
 	Memd[coeff] = ncoeff
 	i = 6
 	while (i < ncoeff) {

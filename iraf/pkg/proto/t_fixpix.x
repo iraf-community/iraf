@@ -15,8 +15,6 @@ int	cinterp			# Mask code for column interpolation
 bool	verbose			# Verbose output?
 int	fd			# List pixels?
 
-long	lg_val
-size_t	sz_val
 int	i, nc, nl
 long	v[IM_MAXDIM]
 pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
@@ -31,12 +29,10 @@ errchk	immap, xt_pmmap, xt_fpinit
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (pmname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (pmname, SZ_FNAME, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	# Get task parameters
 	ilist = imtopenp ("images")
@@ -93,9 +89,7 @@ begin
 		    call flush (STDOUT)
 		}
 
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, v, sz_val)
+		call amovkl (long(1), v, IM_MAXDIM)
 		if (fp != NULL) {
 		    do i = 1, nl {
 			v[2] = i
@@ -113,13 +107,11 @@ begin
 			case TY_USHORT, TY_LONG:
 			    tmp = xt_fpl (fp, im, i, fd)
 			    buf = impl2l (im, i)
-			    sz_val = nc
-			    call amovl (Meml[tmp], Meml[buf], sz_val)
+			    call amovl (Meml[tmp], Meml[buf], nc)
 			case TY_REAL, TY_COMPLEX:
 			    tmp = xt_fpr (fp, im, i, fd)
 			    buf = impl2r (im, i)
-			    sz_val = nc
-			    call amovr (Memr[tmp], Memr[buf], sz_val)
+			    call amovr (Memr[tmp], Memr[buf], nc)
 			case TY_DOUBLE:
 			    tmp = xt_fpd (fp, im, i, fd)
 			    buf = impl2d (im, i)

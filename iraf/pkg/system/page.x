@@ -13,17 +13,14 @@ bool	redirin
 pointer	sp, device, prompt, files
 int	map_cc, clear_screen, first_page
 
-size_t	sz_val
 bool	clgetb()
 int	fstati(), clgeti(), btoi()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (prompt, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (files, sz_val, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (prompt, SZ_FNAME, TY_CHAR)
+	call salloc (files, SZ_LINE, TY_CHAR)
 
 	redirin = (fstati (STDIN, F_REDIR) == YES)
 	if (redirin)

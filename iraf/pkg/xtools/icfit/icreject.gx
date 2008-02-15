@@ -24,15 +24,13 @@ int	niterate			# Number of rejection iterations
 real	grow				# Rejection radius
 int	nreject				# Number of points rejected
 
-size_t	sz_val
 int	i, ierr, nit, newreject
 errchk	ic_deviant$t
 
 begin
 	# Initialize rejection.
 	nreject = 0
-	sz_val = npts
-	call amovki (NO, rejpts, sz_val)
+	call amovki (NO, rejpts, npts)
 
 	if (niterate <= 0)
 	    return
@@ -51,8 +49,7 @@ begin
 	} then {
 	    call $tcvfit (cv, x, y, w, npts, WTS_USER, ierr)
 	    nreject = 0
-	    sz_val = npts
-	    call amovki (NO, rejpts, sz_val)
+	    call amovki (NO, rejpts, npts)
 	    do i = 1, nit
 		call ic_deviant$t (cv, x, y, w, rejpts, npts, low_reject,
 		    high_reject, grow, YES, nreject, newreject)

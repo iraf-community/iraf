@@ -31,7 +31,6 @@ int	pregno			#I the current region number
 int	pregval			#I the current region value
 bool	verbose			#I print status messages ?
 
-size_t	sz_val
 real	xc, yc, a, b, ratio, theta
 real	x1, y1, x2, y2, width
 pointer	sp, function, ufunction, pl, xver, yver, rangestr
@@ -41,14 +40,11 @@ int	strdic(), imstati(), nscan()
 begin
 	# Allocate working space. 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (function, sz_val, TY_CHAR)
-	call salloc (ufunction, sz_val, TY_CHAR)
-	sz_val = MAX_NVERTICES
-	call salloc (xver, sz_val, TY_REAL)
-	call salloc (yver, sz_val, TY_REAL)
-	sz_val = SZ_FNAME
-	call salloc (rangestr, sz_val, TY_CHAR)
+	call salloc (function, SZ_FNAME, TY_CHAR)
+	call salloc (ufunction, SZ_FNAME, TY_CHAR)
+	call salloc (xver, MAX_NVERTICES, TY_REAL)
+	call salloc (yver, MAX_NVERTICES, TY_REAL)
+	call salloc (rangestr, SZ_FNAME, TY_CHAR)
 
 	# Determine the type of region.
 	call sscan (region)

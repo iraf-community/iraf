@@ -9,7 +9,6 @@ procedure ep_gdata (ep, x1, x2, y1, y2)
 pointer	ep			# EPIX pointer
 int	x1, x2, y1, y2		# Subraster limits
  
-size_t	sz_val
 int	nc, nl
 pointer	im, imgs2r(), imps2r()
  
@@ -34,8 +33,7 @@ begin
 	EP_NPTS(ep) = EP_NX(ep) * EP_NY(ep)
 	EP_OUTDATA(ep) = imps2r (im, EP_X1(ep), EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
 	EP_INDATA(ep) = imgs2r (im, EP_X1(ep), EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
-	sz_val = EP_NPTS(ep)
-	call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)], sz_val)
+	call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)], EP_NPTS(ep))
 end
  
  

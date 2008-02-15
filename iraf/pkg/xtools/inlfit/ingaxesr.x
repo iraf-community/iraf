@@ -16,7 +16,6 @@ real	z[npts]				# Output values
 int	npts				# Number of points
 int	nvars				# Number of variables
 
-size_t	sz_val
 int	i, j
 int	axistype, axisnum
 int	gtlabel[2], gtunits[2]
@@ -37,9 +36,8 @@ pointer	in_getp()
 begin
 	# Allocate string space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (label, sz_val, TY_CHAR)
-	call salloc (units, sz_val, TY_CHAR)
+	call salloc (label, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
 
 	# Get the appropiate axis type and variable number.
 	call in_gkey (in, in_geti (in, INLGKEY), axis, axistype, axisnum)
@@ -56,8 +54,7 @@ begin
 	    do i = 1, npts
 		z[i] = x[(i-1)*nvars+axisnum]
 	case KEY_FUNCTION:	# Function variable
-	    sz_val = npts
-	    call amovr (y, z, sz_val)
+	    call amovr (y, z, npts)
 	case KEY_FIT:		# Fitted values
 	    call nlvectorr (nl, x, z, npts, nvars)
 	case KEY_RESIDUALS:	# Residuals
@@ -86,8 +83,7 @@ begin
 	        do i = 1, npts
 		    z[i] = x[(i-1)*nvars+axisnum]
 	    } else
-	        sz_val = npts
-	        call amovr (y, z, sz_val)
+	        call amovr (y, z, npts)
 	    call ing_uaxesr (axisnum, in, nl, x, y, z, npts, nvars)
 	default:
 	    call error (0, "ing_axes: Unknown axis type")

@@ -7,14 +7,12 @@ procedure clpstr (param, value)
 char	param[ARB]		# param name
 char	value[ARB]		# new value
 
-size_t	sz_val
 pointer	sp, pname
 pointer	clc_find()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pname, sz_val, TY_CHAR)
+	call salloc (pname, SZ_FNAME, TY_CHAR)
 
 	call fprintf (CLOUT, "%s=\"%s\"\n")
 	    call pargstr (param)

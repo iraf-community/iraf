@@ -20,7 +20,6 @@ char	mask[ARB]		#I mask file name or "BPM"
 int	mode			#I mode and flag bits
 pointer	ref_im			#I reference image
 
-size_t	sz_val
 pointer	sp, cluster, section, pl, im, hp
 int	acmode, flags, sz_svhdr, ip
 pointer	im_pmmapo(), im_pmopen()
@@ -29,10 +28,8 @@ errchk	im_pmopen, im_pmopen
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (cluster, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)
@@ -47,8 +44,7 @@ begin
 		    sz_svhdr = MIN_LENUSERAREA
 	    } else
 		sz_svhdr = MIN_LENUSERAREA
-	    sz_val = sz_svhdr
-	    call salloc (hp, sz_val, TY_CHAR)
+	    call salloc (hp, sz_svhdr, TY_CHAR)
 	}
 
 	# Parse the full image specification into a root name and an image
@@ -84,9 +80,8 @@ begin
 	IM_UPDATE(im) = btoi (acmode != READ_ONLY)
 
 	IM_NPHYSDIM(im) = IM_NDIM(im)
-	sz_val = IM_MAXDIM
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   IM_MAXDIM)
 
 	# Set up section transformation.
 	if (ref_im == NULL && Memc[section] != EOS)

@@ -24,7 +24,6 @@ include <plio.h>
 procedure pl_regionrop (pl, ufcn, ufd, y1, y2, rop)
 
 pointer	pl			#I mask descriptor
-size_t	sz_val
 extern	ufcn()			#I user supplied region tracing procedure
 pointer	ufd			#I user region descriptor
 int	y1			#I first mask line to be modified
@@ -44,14 +43,11 @@ begin
 	call plvalid (pl)
 
 	call smark (sp)
-	sz_val = LL_MAXLEN(pl)
-	call salloc (ll_out, sz_val, TY_SHORT)
-	call salloc (ll_reg, sz_val, TY_SHORT)
-	sz_val = RL_MAXLEN(pl)
-	call salloc (rl_out, sz_val, TY_INT)
+	call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
+	call salloc (ll_reg, LL_MAXLEN(pl), TY_SHORT)
+	call salloc (rl_out, RL_MAXLEN(pl), TY_INT)
 
-	sz_val = PL_MAXDIM
-	call amovl (PL_PLANE(pl,1), v, sz_val)
+	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
 	ol_dst = 1
 
 	for (v[2]=y1;  v[2] <= y2;  v[2]=v[2]+1) {

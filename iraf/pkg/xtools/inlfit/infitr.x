@@ -17,7 +17,6 @@ int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 int	stat				# Error code (output)
 
-size_t	sz_val
 int	i, ndeleted
 pointer	sp, wts1, str
 int	in_geti()
@@ -37,12 +36,9 @@ begin
 	# calling NLFIT.
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = npts
-	call salloc (wts1, sz_val, TY_REAL)
-	sz_val = npts
-	call amovr (wts, Memr[wts1], sz_val)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (wts1, npts, TY_REAL)
+	call amovr (wts, Memr[wts1], npts)
 
 	# Initialize rejected point list, and the buffer containing
 	# the minimum and maximum variable values.

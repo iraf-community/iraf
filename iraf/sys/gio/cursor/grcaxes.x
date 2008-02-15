@@ -24,7 +24,6 @@ real	sx, sy			#I screen coords of cursor
 int	raster			#I raster number
 real	rx, ry			#I raster coords of cursor
 
-size_t	sz_val
 char	tickformat[SZ_TICKFORMAT], ticklabel[SZ_TICKLABEL]
 pointer tr, w, ap, save_op
 int	xt, yt, nwords, nticks, wcs, lt_save
@@ -165,8 +164,7 @@ begin
 
 	nwords = TR_OP(tr) - save_op
 	if (nwords > TR_LENSCRATCHBUF(tr)) {
-	    sz_val = nwords
-	    call realloc (TR_SCRATCHBUF(tr), sz_val, TY_SHORT)
+	    call realloc (TR_SCRATCHBUF(tr), nwords, TY_SHORT)
 	    TR_LENSCRATCHBUF(tr) = nwords
 	}
 
@@ -344,13 +342,11 @@ procedure gax_start (wx, wy)
 real	wx, wy			# world or log-world coords to draw to
 pointer	polyline, op
 
-size_t	sz_val
 errchk	malloc
 common	/gaxdcm/ polyline, op
 
 begin
-	sz_val = LEN_POLYLINE
-	call malloc (polyline, sz_val, TY_REAL)
+	call malloc (polyline, LEN_POLYLINE, TY_REAL)
 	op = polyline
 	call gax_draw (wx, wy)
 end

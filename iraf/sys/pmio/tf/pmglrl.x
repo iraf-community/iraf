@@ -19,7 +19,6 @@ int	rl_depth		#I line list depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-size_t	sz_val
 int	rl_len, temp, step, xstep, np
 pointer	sp, px_src, rl_src, rl_out, im
 include	"../pmio.com"
@@ -33,12 +32,10 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = RL_MAXLEN(pl)
-	call salloc (rl_src, sz_val, TY_LONG)
+	call salloc (rl_src, RL_MAXLEN(pl), TY_LONG)
 
 	# Determine physical coords of line segment.
-	sz_val = PM_MAXDIM
-	call amovl (v, v3, sz_val)
+	call amovl (v, v3, PM_MAXDIM)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -56,8 +53,7 @@ begin
 
 	# Extract the pixels.
 	np = (npix - 1) * step + 1
-	sz_val = np
-	call salloc (px_src, sz_val, TY_LONG)
+	call salloc (px_src, np, TY_LONG)
 	call pl_glpl (pl, v1, Meml[px_src], 0, np, PIX_SRC)
 
 	# Subsample and flip if necessary.
@@ -72,16 +68,13 @@ begin
 	# Copy to or combine with destination.
 	if (!R_NEED_DST(rop)) {
 	    rl_len = RLI_LEN(rl_src) * RL_LENELEM
-	    sz_val = rl_len
-	    call amovl (Meml[rl_src], rl_dst, sz_val)
+	    call amovl (Meml[rl_src], rl_dst, rl_len)
 	} else {
-	    sz_val = RL_MAXLEN(pl)
-	    call salloc (rl_out, sz_val, TY_SHORT)
+	    call salloc (rl_out, RL_MAXLEN(pl), TY_SHORT)
 	    call pl_rangeropl (Meml[rl_src], 1, PL_MAXVAL(pl), rl_dst, 1,
 		MV(rl_depth), Meml[rl_out], npix, rop)
 		rl_len = RLI_LEN(rl_out) * RL_LENELEM
-	    sz_val = rl_len
-	    call amovl (Meml[rl_out], rl_dst, sz_val)
+	    call amovl (Meml[rl_out], rl_dst, rl_len)
 	}
 
 	call sfree (sp)

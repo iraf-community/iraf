@@ -15,7 +15,6 @@ char	vfn[ARB]		# virtual filename of file to be mapped.
 char	osfn[maxch]		# packed OS filename (output)
 int	maxch
 
-size_t	sz_val
 int	status, ip, delim
 pointer	vfd, sp, nodename
 pointer	vfnopen()
@@ -24,8 +23,7 @@ errchk	vfnopen, vfnmapu, syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (nodename, sz_val, TY_CHAR)
+	call salloc (nodename, SZ_FNAME, TY_CHAR)
 
 	# Map VFN to OSFN.
 

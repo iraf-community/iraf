@@ -13,7 +13,6 @@ int	xa1, ya1, xb1, yb1	# Aperture coordinates
 int	xa2, ya2, xb2, yb2	# Aperture coordinates
 int	key			# Key
 
-size_t	sz_val
 int	i, x1, x2, y1, y2
 pointer	bufdata, mask, x, y, w
 
@@ -25,15 +24,13 @@ begin
 	y2 = max (ya1, yb1) + i
 	call ep_gindata (ep, x1, x2, y1, y2)
 	if (EP_INDATA(ep) != NULL) {
-	    sz_val = EP_NPTS(ep)
-	    call malloc (bufdata, sz_val, TY_REAL)
-	    call malloc (mask, sz_val, TY_INT)
-	    call malloc (x, sz_val, TY_REAL)
-	    call malloc (y, sz_val, TY_REAL)
-	    call malloc (w, sz_val, TY_REAL)
+	    call malloc (bufdata, EP_NPTS(ep), TY_REAL)
+	    call malloc (mask, EP_NPTS(ep), TY_INT)
+	    call malloc (x, EP_NPTS(ep), TY_REAL)
+	    call malloc (y, EP_NPTS(ep), TY_REAL)
+	    call malloc (w, EP_NPTS(ep), TY_REAL)
 
-	    sz_val = EP_NPTS(ep)
-	    call amovr (Memr[EP_INDATA(ep)], Memr[bufdata], sz_val)
+	    call amovr (Memr[EP_INDATA(ep)], Memr[bufdata], EP_NPTS(ep))
 	    call ep_mask (ep, mask, ap, xa1, ya1, xb1, yb1)
 	    i = EP_BUFFER(ep) + EP_WIDTH(ep) + 1
 	    x1 = min (xa2, xb2) - i

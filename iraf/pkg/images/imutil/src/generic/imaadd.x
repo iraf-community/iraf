@@ -10,8 +10,6 @@ procedure ima_adds (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 short	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -22,9 +20,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector/scalar
 	# addition to imagec.
@@ -64,8 +60,6 @@ procedure ima_addi (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 int	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -76,9 +70,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector/scalar
 	# addition to imagec.
@@ -118,8 +110,6 @@ procedure ima_addl (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 long	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -130,21 +120,17 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector/scalar
 	# addition to imagec.
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (a == 0) {
-		    sz_val = len
-		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
-		} else {
+		if (a == 0)
+		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
+		else
 		    call aaddkl (Meml[buf[2]], a, Meml[buf[1]], len)
-		}
 	    }
 
 	# If imageb is constant then read imagea and do a vector/scalar
@@ -152,12 +138,10 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (b == 0) {
-		    sz_val = len
-		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
-		} else {
+		if (b == 0)
+		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
+		else
 		    call aaddkl (Meml[buf[2]], b, Meml[buf[1]], len)
-		}
 	    }
 
 	# Read imagea and imageb and do a vector addition into imagec.
@@ -176,8 +160,6 @@ procedure ima_addr (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 real	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -188,21 +170,17 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector/scalar
 	# addition to imagec.
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
-		if (a == 0.0) {
-		    sz_val = len
-		    call amovr (Memr[buf[2]], Memr[buf[1]], sz_val)
-		} else {
+		if (a == 0.0)
+		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
+		else
 		    call aaddkr (Memr[buf[2]], a, Memr[buf[1]], len)
-		}
 	    }
 
 	# If imageb is constant then read imagea and do a vector/scalar
@@ -210,12 +188,10 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
-		if (b == 0.0) {
-		    sz_val = len
-		    call amovr (Memr[buf[2]], Memr[buf[1]], sz_val)
-		} else {
+		if (b == 0.0)
+		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
+		else
 		    call aaddkr (Memr[buf[2]], b, Memr[buf[1]], len)
-		}
 	    }
 
 	# Read imagea and imageb and do a vector addition into imagec.
@@ -234,8 +210,6 @@ procedure ima_addd (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 double	a, b
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -246,9 +220,7 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector/scalar
 	# addition to imagec.

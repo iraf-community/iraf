@@ -22,7 +22,6 @@ char	file[ARB]		#I the text file to be inserted and appended
 char    pkey[ARB]               #I Pivot keyword to insert 'key'
 int     baf                     #I Insert BEFORE or AFTER
 
-size_t	sz_val
 pointer	ua, rp, piv, ip, op
 int	max_lenuserarea, curlen, buflen, jump, nlines
 int	old_curlen, k, nshift
@@ -48,8 +47,7 @@ begin
             IM_HDRLEN(im)  = LEN_IMHDR  +
                     (curlen + 10*36*CLEN + SZ_STRUCT-1) / SZ_STRUCT
             IM_LENHDRMEM(im) = IM_HDRLEN(im)  + (SZ_UAPAD / SZ_STRUCT)
-            sz_val = IM_LENHDRMEM(im) + LEN_IMDES
-            call realloc (im, sz_val, TY_STRUCT)
+            call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
             buflen = LEN_IMDES + IM_LENHDRMEM(im)
             max_lenuserarea = (buflen - IMU) * SZ_STRUCT - 1
 	    ua = IM_USERAREA(im)
@@ -95,7 +93,6 @@ char	fname[ARB]
 int	nlines
 int	insert
 
-size_t	sz_val
 char	line[IDB_RECLEN+1], blk, lf
 pointer	sp, ln, buf, urp
 int 	ip, op, fd, in_last_blank, out_last_blank, blen, len, w, k
@@ -104,9 +101,8 @@ int	open(), getline(), strlen()
 
 begin
 	call smark(sp)
-	sz_val = SZ_LINE
-	call salloc (ln, sz_val, TY_CHAR)
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (ln, SZ_LINE, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	fd = open(fname, READ_ONLY, TEXT_FILE)
         nlines= 0

@@ -14,15 +14,13 @@ char	new_root[ARB]		#I new image root name
 char	new_extn[ARB]		#I old image extn
 int	status			#O output status
 
-size_t	sz_val
 pointer	sp, oldname, newname
 errchk	qp_rename
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (oldname, sz_val, TY_CHAR)
-	call salloc (newname, sz_val, TY_CHAR)
+	call salloc (oldname, SZ_PATHNAME, TY_CHAR)
+	call salloc (newname, SZ_PATHNAME, TY_CHAR)
 
 	# Get filenames of old and new datafiles.
 	call iki_mkfname (old_root, old_extn, Memc[oldname], SZ_PATHNAME)

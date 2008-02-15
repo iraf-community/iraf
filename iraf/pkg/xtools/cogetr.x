@@ -32,7 +32,6 @@ int	col		# Column
 int	line1		# First image line of column vector
 int	line2		# Last image line of column vector
 
-size_t	sz_val
 int	ncols, nlines, lastc1, lastl1, lastl2
 int	i, imlen1, imlen2, col1, nc
 pointer	im, coldata, buffer, buf, data
@@ -67,10 +66,8 @@ begin
 
 	    call mfree (coldata, TY_REAL)
 	    call mfree (buffer, TY_REAL)
-	    sz_val = line2 - line1 + 1
-	    call malloc (coldata, sz_val, TY_REAL)
-	    sz_val = ncols * nlines
-	    call malloc (buffer, sz_val, TY_REAL)
+	    call malloc (coldata, line2 - line1 + 1, TY_REAL)
+	    call malloc (buffer, ncols * nlines, TY_REAL)
 
 	    CO_DATA(co) = coldata
 	    CO_BUF(co) = buffer
@@ -93,8 +90,7 @@ begin
 	    lastl2 = min (imlen2, line2 + EXTRA)
 	    do i = lastl1, lastl2 {
 	        buf = buffer + mod (i, nlines) * ncols
-		sz_val = nc
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    CO_COL1(co) = lastc1
 	    CO_LINE1(co) = lastl1
@@ -103,8 +99,7 @@ begin
 	} else if (line1 < lastl1) {
 	    do i = max (1, line1 - EXTRA), min (imlen2, lastl1 - 1) {
 	        buf = buffer + mod (i, nlines) * ncols
-		sz_val = nc
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
 	    lastl2 = min (imlen2, line2 + EXTRA)
@@ -114,8 +109,7 @@ begin
 	} else if (line2 > lastl2) {
 	    do i = max (1, lastl2 + 1), min (imlen2, line2 + EXTRA) {
 	        buf = buffer + mod (i, nlines) * ncols
-		sz_val = nc
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
 	    lastl2 = min (imlen2, line2 + EXTRA)
@@ -142,12 +136,10 @@ pointer procedure comap (im, maxbuf)
 
 pointer	im		# IMIO pointer
 int	maxbuf		# Maximum buffer size
-size_t	sz_val
 pointer	co		# Returned pointer
 
 begin
-	sz_val = LEN_CO
-	call malloc (co, sz_val, TY_LONG)
+	call malloc (co, LEN_CO, TY_LONG)
 	CO_IM(co) = im
 	CO_MAXBUF(co) = maxbuf
 	CO_DATA(co) = NULL

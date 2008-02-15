@@ -39,7 +39,6 @@ end
 
 procedure new_numbered_section (in, out, linebuf, ip)
 
-size_t	sz_val
 extern	in(), out()
 char	linebuf[ARB]
 int	ip
@@ -62,8 +61,7 @@ begin
 	# section counters.
 
 	nh_level[n] = nh_level[n] + 1
-	sz_val = MAX_NHLEVEL - n
-	call amovki (0, nh_level[n+1], sz_val)
+	call amovki (0, nh_level[n+1], MAX_NHLEVEL - n)
 
 	# Output the section number followed by a blank and then the section
 	# label.
@@ -94,12 +92,10 @@ end
 
 procedure init_nh()
 
-size_t	sz_val
 include	"lroff.com"
 
 begin
-	sz_val = MAX_NHLEVEL
-	call amovki (0, nh_level, sz_val)
+	call amovki (0, nh_level, MAX_NHLEVEL)
 end
 
 
@@ -146,7 +142,6 @@ end
 
 int procedure inbold (in, user_linebuf)
 
-size_t	sz_val
 extern	in()
 int	in()
 char	user_linebuf[ARB]
@@ -160,8 +155,7 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE + 3 + 3
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE + 3 + 3, TY_CHAR)
 
 	# Deposit escape sequence to turn bold on.
 	call strcpy ("\\fB", Memc[lbuf], ARB)

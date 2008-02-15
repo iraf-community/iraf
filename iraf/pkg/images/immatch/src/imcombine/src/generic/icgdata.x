@@ -28,7 +28,6 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnls()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -68,8 +67,7 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		sz_val = IM_MAXDIM
-		call amovl (v1, v2, sz_val)
+		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnls (in[i], i, d[i], v2, v1[2])
@@ -228,14 +226,10 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    sz_val = npts
-	    call amovki (nused, n, sz_val)
-	    if (keepids) {
-		do i = 1, nimages {
-		    sz_val = npts
-		    call amovki (i, Memi[id[i]], sz_val)
-		}
-	    }
+	    call amovki (nused, n, npts)
+	    if (keepids)
+		do i = 1, nimages
+		    call amovki (i, Memi[id[i]], npts)
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -300,11 +294,9 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    sz_val = nimages
-	    call malloc (dp, sz_val, TY_SHORT)
+	    call malloc (dp, nimages, TY_SHORT)
 	    if (keepids) {
-		sz_val = nimages
-		call malloc (ip, sz_val, TY_INT)
+		call malloc (ip, nimages, TY_INT)
 		call ic_2sorts (d, Mems[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -336,7 +328,6 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnli()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -376,8 +367,7 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		sz_val = IM_MAXDIM
-		call amovl (v1, v2, sz_val)
+		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnli (in[i], i, d[i], v2, v1[2])
@@ -536,14 +526,10 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    sz_val = npts
-	    call amovki (nused, n, sz_val)
-	    if (keepids) {
-		do i = 1, nimages {
-		    sz_val = npts
-		    call amovki (i, Memi[id[i]], sz_val)
-		}
-	    }
+	    call amovki (nused, n, npts)
+	    if (keepids)
+		do i = 1, nimages
+		    call amovki (i, Memi[id[i]], npts)
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -608,11 +594,9 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    sz_val = nimages
-	    call malloc (dp, sz_val, TY_INT)
+	    call malloc (dp, nimages, TY_INT)
 	    if (keepids) {
-		sz_val = nimages
-		call malloc (ip, sz_val, TY_INT)
+		call malloc (ip, nimages, TY_INT)
 		call ic_2sorti (d, Memi[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -644,7 +628,6 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnlr()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -684,8 +667,7 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		sz_val = IM_MAXDIM
-		call amovl (v1, v2, sz_val)
+		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnlr (in[i], i, d[i], v2, v1[2])
@@ -712,8 +694,7 @@ begin
 		if (project)
 		    v2[ndim+1] = i
 		l = xt_imgnlr (in[i], i, buf, v2, v1[2])
-		sz_val = npix
-		call amovr (Memr[buf+k-1], Memr[dbuf[i]+j], sz_val)
+		call amovr (Memr[buf+k-1], Memr[dbuf[i]+j], npix)
 		d[i] = dbuf[i]
 	    }
 	}
@@ -845,14 +826,10 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    sz_val = npts
-	    call amovki (nused, n, sz_val)
-	    if (keepids) {
-		do i = 1, nimages {
-		    sz_val = npts
-		    call amovki (i, Memi[id[i]], sz_val)
-		}
-	    }
+	    call amovki (nused, n, npts)
+	    if (keepids)
+		do i = 1, nimages
+		    call amovki (i, Memi[id[i]], npts)
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -917,11 +894,9 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    sz_val = nimages
-	    call malloc (dp, sz_val, TY_REAL)
+	    call malloc (dp, nimages, TY_REAL)
 	    if (keepids) {
-		sz_val = nimages
-		call malloc (ip, sz_val, TY_INT)
+		call malloc (ip, nimages, TY_INT)
 		call ic_2sortr (d, Memr[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -953,7 +928,6 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnld()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -993,8 +967,7 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		sz_val = IM_MAXDIM
-		call amovl (v1, v2, sz_val)
+		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnld (in[i], i, d[i], v2, v1[2])
@@ -1153,14 +1126,10 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    sz_val = npts
-	    call amovki (nused, n, sz_val)
-	    if (keepids) {
-		do i = 1, nimages {
-		    sz_val = npts
-		    call amovki (i, Memi[id[i]], sz_val)
-		}
-	    }
+	    call amovki (nused, n, npts)
+	    if (keepids)
+		do i = 1, nimages
+		    call amovki (i, Memi[id[i]], npts)
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -1225,11 +1194,9 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    sz_val = nimages
-	    call malloc (dp, sz_val, TY_DOUBLE)
+	    call malloc (dp, nimages, TY_DOUBLE)
 	    if (keepids) {
-		sz_val = nimages
-		call malloc (ip, sz_val, TY_INT)
+		call malloc (ip, nimages, TY_INT)
 		call ic_2sortd (d, Memd[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else

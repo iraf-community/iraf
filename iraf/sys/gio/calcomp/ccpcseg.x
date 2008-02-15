@@ -191,7 +191,6 @@ procedure ccx_addsegpt (x,y, xseg,yseg, cursegpt,segsize)
 real	x,y			# point to be added to output segment
 pointer	xseg,yseg		# NDC-coord contiguous line segment, output
 int	cursegpt		# index of current drawable point in segment
-size_t	sz_val
 int	segsize			# current segment size
 
 begin
@@ -199,9 +198,8 @@ begin
 
 	if (cursegpt > segsize) {
 	    segsize = segsize + SEGSIZE
-	    sz_val = segsize
-	    call realloc (xseg, sz_val, TY_REAL)
-	    call realloc (yseg, sz_val, TY_REAL)
+	    call realloc (xseg, segsize, TY_REAL)
+	    call realloc (yseg, segsize, TY_REAL)
 	}
 
 	XSEG(cursegpt) = x

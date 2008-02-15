@@ -13,7 +13,6 @@ include	"gsurfitdef.h"
 procedure gssave (sf, fit)
 
 pointer	sf		# pointer to the surface descriptor
-size_t	sz_val
 real	fit[ARB]	# array for storing fit
 
 begin
@@ -39,6 +38,5 @@ begin
 	GS_SAVEXTERMS(fit) = GS_XTERMS(sf)
 
 	# save the coefficients
-	sz_val = GS_NCOEFF(sf)
-	call amovr (COEFF(GS_COEFF(sf)), fit[GS_SAVECOEFF+1], sz_val)
+	call amovr (COEFF(GS_COEFF(sf)), fit[GS_SAVECOEFF+1], GS_NCOEFF(sf))
 end

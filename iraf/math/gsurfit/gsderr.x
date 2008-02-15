@@ -15,7 +15,6 @@ real	zfit[npts]	# fitted values
 int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
-size_t	sz_val
 real	norm
 int	ncoeff, nxder, nyder, i, j
 int	order, maxorder1, maxorder2, nmove1, nmove2
@@ -34,8 +33,7 @@ begin
 	}
 
 	# allocate space for new surface
-	sz_val = LEN_GSSTRUCT
-	call calloc (sf2, sz_val, TY_STRUCT)
+	call calloc (sf2, LEN_GSSTRUCT, TY_STRUCT)
 
 	# check the order of the derivatives and return 0 if the order is
 	# high
@@ -140,13 +138,11 @@ begin
 	GS_WZ(sf2) = NULL
 
 	# allocate space for coefficients
-	sz_val = GS_NCOEFF(sf2)
-	call calloc (GS_COEFF(sf2), sz_val, TY_REAL)
+	call calloc (GS_COEFF(sf2), GS_NCOEFF(sf2), TY_REAL)
 
 	# get coefficients
 	call smark (sp)
-	sz_val = GS_NCOEFF(sf1)
-	call salloc (coeff, sz_val, TY_REAL)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_REAL)
 	call gscoeff (sf1, Memr[coeff], ncoeff)
 
 	# compute the new coefficients
@@ -158,8 +154,8 @@ begin
 	        ptr2 = GS_COEFF(sf2) + (GS_NYCOEFF(sf2) - 1) * GS_NXCOEFF(sf2)
 	        ptr1 = coeff + (GS_NYCOEFF(sf1) - 1) * GS_NXCOEFF(sf1)
 	        do i = GS_NYCOEFF(sf1), nyder + 1, -1 {
-		    sz_val = GS_NXCOEFF(sf2)
-		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), sz_val)
+		    call amovr (Memr[ptr1+nxder], COEFF(ptr2),
+		        GS_NXCOEFF(sf2))
 	            ptr2 = ptr2 - GS_NXCOEFF(sf2)
 	            ptr1 = ptr1 - GS_NXCOEFF(sf1)
 	        }
@@ -180,8 +176,7 @@ begin
 		        GS_NXCOEFF(sf2)))
 		    ptr1 = ptr1 - nmove1
 		    ptr2 = ptr2 - nmove2
-		    sz_val = nmove2
-		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), sz_val)
+		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), nmove2)
 	        }
 	    }
 
@@ -207,8 +202,7 @@ begin
 		    ptr2 = GS_COEFF(sf2)
 		    do i = GS_NYCOEFF(sf1), nyder + 1, -1
 		        ptr1 = ptr1 - 1
-		    sz_val = GS_NCOEFF(sf2)
-		    call amovr (Memr[ptr1+1], COEFF(ptr2), sz_val)
+		    call amovr (Memr[ptr1+1], COEFF(ptr2), GS_NCOEFF(sf2))
 		}
 	    }
 	}

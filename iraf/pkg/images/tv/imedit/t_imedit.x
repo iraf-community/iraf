@@ -22,7 +22,6 @@ procedure t_imedit ()
 pointer	inlist		# List of input images
 pointer	outlist		# List of output images
  
-size_t	sz_val
 int	i, key, ap, xa, ya, xb, yb, x1, x2, y1, y2
 int	change, changes, newdisplay, newimage
 bool	erase
@@ -38,12 +37,10 @@ define	newim_	99
  
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Allocate and initialize imedit descriptor.
-	sz_val = EP_LEN
-	call salloc (ep, sz_val, TY_STRUCT)
+	call salloc (ep, EP_LEN, TY_STRUCT)
 	call aclri (Memi[ep], EP_LEN)
  
 	# Check the input and output image lists have proper format.
@@ -196,12 +193,13 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		    case 'q':	# Quit and save
 		    case 'u':	# Undo
 			if (EP_OUTDATA(ep) != NULL && EP_INDATA(ep) != NULL) {
-			    sz_val = EP_NPTS(ep)
-			    call malloc (temp, sz_val, TY_REAL)
-			    sz_val = EP_NPTS(ep)
-			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp], sz_val)
-			    call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)], sz_val)
-			    call amovr (Memr[temp], Memr[EP_INDATA(ep)], sz_val)
+			    call malloc (temp, EP_NPTS(ep), TY_REAL)
+			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
+				EP_NPTS(ep))
+			    call amovr (Memr[EP_INDATA(ep)],
+				Memr[EP_OUTDATA(ep)], EP_NPTS(ep))
+			    call amovr (Memr[temp], Memr[EP_INDATA(ep)],
+				EP_NPTS(ep))
 			    call mfree (temp, TY_REAL)
 			    change = YES
 			} else
@@ -276,10 +274,9 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		if (streq (EP_INPUT(ep), EP_OUTPUT(ep))) {
 		    EP_IM(ep) = immap (EP_OUTPUT(ep), READ_WRITE, 0)
 		    im = immap (EP_WORK(ep), READ_ONLY, 0)
-		    do i = 1, IM_LEN(EP_IM(ep),2) {
-		        sz_val = IM_LEN(im,1)
-		        call amovr (Memr[imgl2r(im,i)], Memr[impl2r(EP_IM(ep),i)], sz_val)
-		    }
+		    do i = 1, IM_LEN(EP_IM(ep),2)
+		        call amovr (Memr[imgl2r(im,i)],
+			    Memr[impl2r(EP_IM(ep),i)], IM_LEN(im,1))
 		    call imunmap (im)
 		    call imunmap (EP_IM(ep))
 		    call imdelete (EP_WORK(ep))

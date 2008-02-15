@@ -12,7 +12,6 @@ char	label[ARB]		#I line label
 int	firstcol		#I first column for output
 int	maxcols			#I width of formatted output
 
-size_t	sz_val
 pointer	sp, buf
 bool	skipword
 int	opcode, data
@@ -21,8 +20,7 @@ int	strlen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
 	# Support old format line lists.
 	if (LL_OLDFORMAT(ll)) {

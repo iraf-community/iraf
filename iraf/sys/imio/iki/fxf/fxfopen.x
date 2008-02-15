@@ -27,7 +27,6 @@ int	gc_arg			#I [NOT USED]
 int	acmode			#I access mode
 int	status			#O status flag to calling routine
 
-size_t	sz_val
 long	fi[LEN_FINFO]
 int	newimage, i, gn, ksinh, type, fmode
 pointer	sp, path, fit_extn, ua, o_fit, fit
@@ -45,10 +44,8 @@ define	err_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (path, sz_val, TY_CHAR)
-	sz_val = FITS_LENEXTN
-	call salloc (fit_extn, sz_val, TY_CHAR)
+	call salloc (path, SZ_PATHNAME, TY_CHAR)
+	call salloc (fit_extn, FITS_LENEXTN, TY_CHAR)
 	call fxf_init()
 	ua = IM_USERAREA(im)
 
@@ -60,8 +57,7 @@ begin
 	IM_KDES(im) = fit
 	IM_HFD(im) = NULL
 	FIT_IM(fit) = im
-	sz_val = IM_MAXDIM
-	call amovki (1, FIT_LENAXIS(fit,1), sz_val)
+	call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {
@@ -396,12 +392,10 @@ end
 
 procedure fxf_alloc (fit)
 
-size_t	sz_val
 pointer fit	 		#I input fits descriptor
 
 begin
-	sz_val = LEN_FITDES
-	call calloc (fit, sz_val, TY_STRUCT)
+	call calloc (fit, LEN_FITDES, TY_STRUCT)
 
 	FIT_GROUP(fit) = -1
 	FIT_PIXTYPE(fit) = NULL
@@ -449,7 +443,6 @@ procedure fxf_prhdr (im, group)
 pointer	im  	 		#I image descriptor
 int	group			#I maximum group number to read
 
-size_t	sz_val
 int	poff, extv
 pointer	fit, lim, lfit, sp, path
 errchk	fpathname, open, syserr, fxf_alloc, calloc
@@ -457,13 +450,11 @@ int	open(), imgeti()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (path, sz_val, TY_CHAR)
+	call salloc (path, SZ_PATHNAME, TY_CHAR)
 
 	# We will use a local temporary imio and fit structures.
 #	call calloc (lim, LEN_IMDES+LEN_IMHDR+MIN_LENUSERAREA, TY_STRUCT)
-	sz_val = LEN_IMDES+IM_LENHDRMEM(im)
-	call calloc (lim, sz_val, TY_STRUCT)
+	call calloc (lim, LEN_IMDES+IM_LENHDRMEM(im), TY_STRUCT)
 
 	call fxf_alloc (lfit)
 
@@ -541,7 +532,6 @@ procedure fxf_dummy_header (im, status)
 pointer im 			#I image descriptor
 int	status			#O status flag
 
-size_t	sz_val
 char    blank[1]	
 pointer sp, path, spp, mii, pn, n
 int	iso_cutover, fd, nblanks, size_rec
@@ -551,12 +541,9 @@ long	clktime()
 
 begin
 	call smark (sp)
-	sz_val = FITS_BLOCK_BYTES
-	call salloc (spp, sz_val, TY_CHAR)
-	sz_val = FITS_BLOCK_CHARS
-	call salloc (mii, sz_val, TY_INT)
-	sz_val = SZ_PATHNAME
-	call salloc (path, sz_val, TY_CHAR)
+	call salloc (spp, FITS_BLOCK_BYTES, TY_CHAR)
+	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	call salloc (path, SZ_PATHNAME, TY_CHAR)
 
 	status = OK
 
@@ -615,7 +602,6 @@ int procedure fxf_check_dup_extnv (im, group)
 pointer im			#I image descriptor
 int	group			#O extension number where there is a duplicate
 
-size_t	sz_val
 int	cindx
 pointer extn, extv, sp, hdrfile, fit, poff
 int	fxf_extnv_error()
@@ -625,8 +611,7 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 	fit = IM_KDES(im)
@@ -670,7 +655,6 @@ procedure fxf_check_old_name (im)
 
 pointer im				#I image descriptor
 
-size_t	sz_val
 int	cindx
 pointer sp, hdrfile, fit
 bool    streq()
@@ -679,8 +663,7 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 
@@ -715,7 +698,6 @@ procedure fxf_reblock (im)
 
 pointer	im				#I image descriptor
 
-size_t	sz_val
 pointer	sp, lbuf, op, ua
 int	fd, spool, nlines, nchars, sz_userarea, len_hdrmem
 errchk	stropen, open, getline, putline, realloc, seek, fcopyo
@@ -723,8 +705,7 @@ int	open(), stropen(), getline()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	ua = IM_USERAREA(im)
 	fd = stropen (Memc[ua], ARB, READ_ONLY)
@@ -755,8 +736,7 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
-	    call realloc (im, sz_val, TY_STRUCT)
+	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 	}
 
 	# Move spooled data back to user area.
@@ -885,7 +865,6 @@ int	acmode			#I fits unit extension mode
 int	group			#U extension number in the image section
 int	ksinh			#O INHERIT value from the filename ksection
 
-size_t	sz_val
 pointer sp, ks, fit
 bool    fks_extn_or_ver, inherit_override	
 int	igroup, kgroup, fgroup, tgroup, sv_inherit, newimage, append
@@ -896,8 +875,7 @@ errchk  syserrs, fxf_ks_error
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (ks, sz_val, TY_CHAR)
+	call salloc (ks, SZ_LINE, TY_CHAR)
 
 	fit = IM_KDES(im)
 	newimage = FIT_NEWIMAGE(fit)

@@ -15,7 +15,6 @@ int	nin					# Number of input points
 real	b[ARB]					# Output array
 int	nout					# Number of output points
 
-size_t	sz_val
 int	i, j, k, n, ntemp
 
 begin
@@ -25,8 +24,7 @@ begin
 	    call error (0, "Range descriptor undefined")
 
 	if (RG_NRGS(rg) == 0) {
-	    sz_val = nin
-	    call amovr (a[1], b[1], sz_val)
+	    call amovr (a[1], b[1], nin)
 	    nout = nin
 	} else {
 	    ntemp = 0
@@ -35,16 +33,14 @@ begin
 	    j = 1
 	    k = min (nin, min (RG_X1(rg, i), RG_X2(rg, i)) - 1)
 	    n = max (0, k - j + 1)
-	    sz_val = n
-	    call amovr (a[j], b[ntemp+1], sz_val)
+	    call amovr (a[j], b[ntemp+1], n)
 	    ntemp = ntemp + n
 
 	    do i = 2, RG_NRGS(rg) {
 	        j = max (1, max (RG_X1(rg, i-1), RG_X2(rg, i-1)) + 1)
 	        k = min (nin, min (RG_X1(rg, i), RG_X2(rg, i)) - 1)
 	        n = max (0, k - j + 1)
-	        sz_val = n
-	        call amovr (a[j], b[ntemp+1], sz_val)
+	        call amovr (a[j], b[ntemp+1], n)
 	        ntemp = ntemp + n
 	    }
 
@@ -52,8 +48,7 @@ begin
 	    j = max (1, max (RG_X1(rg, i), RG_X2(rg, i)) + 1)
 	    k = nin
 	    n = max (0, k - j + 1)
-	    sz_val = n
-	    call amovr (a[j], b[ntemp+1], sz_val)
+	    call amovr (a[j], b[ntemp+1], n)
 	    ntemp = ntemp + n
 	}
 

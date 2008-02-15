@@ -20,7 +20,6 @@ procedure fxf_plread (im)
 
 pointer	im			#I image descriptor
 
-size_t	sz_val
 char	kwname[SZ_KEYWORD]
 pointer sp, fk, pl, lp, ip, ix
 long	data_offset, data_len, heap_offset, llen, loff
@@ -47,12 +46,10 @@ begin
 	    maxlen = DEF_PLMAXLEN
 
 	# Scratch buffer for encoded line lists.
-	sz_val = maxlen
-	call salloc (lp, sz_val, TY_SHORT)
+	call salloc (lp, maxlen, TY_SHORT)
 
 	# Get the dimensionality and size of the stored mask.
-	sz_val = IM_MAXDIM
-	call amovki (1, axlen, sz_val)
+	call amovki (1, axlen, IM_MAXDIM)
 	naxes = imgeti (im, "ZNAXIS")
 	call fxf_filter_keyw (im, "ZNAXIS")
 	do i = 1, naxes {
@@ -84,8 +81,7 @@ begin
 
 	# Create a buffer for the line list index (maxdim 3 assumed).
 	nlines = axlen[3] * axlen[2]
-	sz_val = nlines * 2
-	call salloc (ix, sz_val, TY_INT)
+	call salloc (ix, nlines * 2, TY_INT)
 
 	# Compute the file offsets of the table data and heap areas.  The
 	# file position is assumed to be already positioned at the start
@@ -155,9 +151,8 @@ begin
 	}
 
 	# Set up IMIO descriptor.
-	sz_val = IM_MAXDIM
-	call amovl (axlen, IM_LEN(im,1), sz_val)
-	call amovl (axlen, IM_PHYSLEN(im,1), sz_val)
+	call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
+	call amovl (axlen, IM_PHYSLEN(im,1), IM_MAXDIM)
         IM_NDIM(im) = naxes
 	IM_PIXTYPE(im) = TY_INT
 	IM_PL(im) = pl

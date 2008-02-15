@@ -77,12 +77,10 @@ int	box			#I Running median box
 real	data			#I Initial data value
 pointer	rm			#R Method pointer
 
-size_t	sz_val
 int	i
 
 begin
-	sz_val = RMS_LEN(box)
-	call malloc (rm, sz_val, TY_STRUCT)
+	call malloc (rm, RMS_LEN(box), TY_STRUCT)
 	RMS_BOX(rm) = box
 	RMS_DATA(rm) = rm + RMS_OFFSET
 	RMS_IN(rm) = P2S(RMS_DATA(rm) + box)

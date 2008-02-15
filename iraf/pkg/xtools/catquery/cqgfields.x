@@ -110,7 +110,6 @@ int	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 double	dval			#O the output double value
 
-size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
 int	cq_fnumber(), ctod(), cq_setrecord()
@@ -134,8 +133,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -181,7 +179,6 @@ int	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 real	rval			#O the output real value
 
-size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
 int	cq_fnumber(), ctor(), cq_setrecord()
@@ -205,8 +202,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -252,7 +248,6 @@ int	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 long	lval			#I the output long value
 
-size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
 int	cq_fnumber(), ctol(), cq_setrecord()
@@ -276,8 +271,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -323,7 +317,6 @@ int	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 int	ival			#I the output int value
 
-size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
 int	cq_fnumber(), ctoi(), cq_setrecord()
@@ -347,8 +340,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -393,7 +385,6 @@ int	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 short	sval			#O the output short value
 
-size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars, ival
 int	cq_fnumber(), ctoi(), cq_setrecord()
@@ -417,8 +408,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data

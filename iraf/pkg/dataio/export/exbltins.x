@@ -220,12 +220,10 @@ pointer procedure exb_fmt_ext (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	suf
 
 begin
-	sz_val = SZ_FNAME
-	call malloc (suf, sz_val, TY_CHAR)
+	call malloc (suf, SZ_FNAME, TY_CHAR)
 
         switch (EX_BLTIN(ex)) {
         case EPS:    call strcpy (".eps",  Memc[suf], SZ_FNAME)

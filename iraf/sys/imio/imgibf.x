@@ -10,7 +10,6 @@ pointer procedure imgibf (im, vs, ve, ndim, dtype)
 pointer	im
 long	vs[ndim], ve[ndim]
 int	dtype, ndim, i
-size_t	sz_val
 long	nget, nchars, totpix, imcssz()
 pointer	bdes
 errchk	imopsf, calloc, realloc, mfree, malloc
@@ -21,8 +20,7 @@ begin
 
 	if (IM_IBDES(im) == NULL) {
 	    call imopsf (im)
-	    sz_val = LEN_BDES * IM_VNBUFS(im)
-	    call calloc (IM_IBDES(im), sz_val, TY_STRUCT)
+	    call calloc (IM_IBDES(im), LEN_BDES * IM_VNBUFS(im), TY_STRUCT)
 	}
 
 	# Compute pointer to the next input buffer descriptor.
@@ -38,13 +36,11 @@ begin
 
 	nchars = imcssz (im, vs, ve, ndim, dtype, totpix, IM_READ)
 
-	if (nchars < BD_BUFSIZE(bdes)) {
-	    sz_val = nchars
-	    call realloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)
-	} else if (nchars > BD_BUFSIZE(bdes)) {
+	if (nchars < BD_BUFSIZE(bdes))
+	    call realloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
+	else if (nchars > BD_BUFSIZE(bdes)) {
 	    call mfree (BD_BUFPTR(bdes), TY_CHAR)
-	    sz_val = nchars
-	    call malloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)
+	    call malloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
 	}
 
 	# Save section coordinates, datatype in buffer descriptor, and

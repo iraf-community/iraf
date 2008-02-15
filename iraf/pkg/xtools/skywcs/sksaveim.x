@@ -87,19 +87,15 @@ procedure sk_ctypeim (coo, im)
 pointer	coo			#I pointer to the coordinate structure
 pointer	im			#I image descriptor
 
-size_t	sz_val
 pointer	sp, wtype, key1, key2, attr
 int	sk_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = 8
-	call salloc (key1, sz_val, TY_CHAR)
-	call salloc (key2, sz_val, TY_CHAR)
-	sz_val = 3
-	call salloc (wtype, sz_val, TY_CHAR)
-	sz_val = 8
-	call salloc (attr, sz_val, TY_CHAR)
+	call salloc (key1, 8, TY_CHAR)
+	call salloc (key2, 8, TY_CHAR)
+	call salloc (wtype, 3, TY_CHAR)
+	call salloc (attr, 8, TY_CHAR)
 
 	call sprintf (Memc[key1], 8, "CTYPE%d")
 	    call pargi (SKY_PLNGAX(coo))

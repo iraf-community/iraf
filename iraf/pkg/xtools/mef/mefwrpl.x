@@ -14,7 +14,6 @@ pointer	mef		#I input mef descriptor
 short   plbuf		#I Pixel list buffer
 int	naxis, axlen[ARB]
 
-size_t	sz_val
 pointer sp, ln, mii, hb
 char    blank[1]
 int	output_lines, npad, i 
@@ -24,8 +23,7 @@ errchk  open, fcopyo
 
 begin
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	# Output file descriptor
 	fd  = MEF_FD(mef)
@@ -100,16 +98,14 @@ begin
 	output_lines = output_lines + nlines + 1 + naxis
 	call mef_wrblank (fd, output_lines)
 
-	sz_val = 1400
-	call salloc (mii, sz_val, TY_INT)
+	call salloc (mii, 1400, TY_INT)
 
 	# Now write 2 integers as table data (nelem,offset)
 	Memi[mii] = MEF_PLSIZE(mef)	 # Number of words in pl buff (2bytes)
 	Memi[mii+1] = 0			 # Offset from start of heap
 
 	npad = 1438
-	sz_val = npad
-	call amovki (0, Memi[mii+2], sz_val)
+	call amovki (0, Memi[mii+2], npad)
 	call write (fd, Memi[mii], 1440)
 
 	# Write mask in heap area
@@ -120,8 +116,7 @@ begin
 
 	npad = 1440 - mod (MEF_PLSIZE(mef), 1440)
 
-	sz_val = npad
-	call amovki (0, Memi[mii], sz_val)
+	call amovki (0, Memi[mii], npad)
 	call write (fd, Memi[mii], npad)
 							 
 
@@ -135,14 +130,12 @@ int	kvalue	        #I Keyword value
 char 	kcomm[ARB]	#I Card comment
 int	fd	        #I file descriptor
 
-size_t	sz_val
 pointer sp, ln
 
 begin
 
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	call mef_encodei (kname, kvalue, Memc[ln], kcomm)
 	call mef_pakwr (fd, Memc[ln])
@@ -159,15 +152,13 @@ char	kvalue[ARB]	#I Keyword value
 char 	kcomm[ARB]	#I Card comment
 int	fd   	        #I file descriptor
 
-size_t	sz_val
 pointer sp, ln
 int     slen, strlen()
 
 begin
 
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	slen = strlen(kvalue)
 	call mef_encodec (kname, kvalue, slen, Memc[ln], kcomm)
@@ -185,14 +176,12 @@ int	kvalue	        #I Keyword value
 char 	kcomm[ARB]	#I Card comment
 int	fd	        #I file descriptor
 
-size_t	sz_val
 pointer sp, ln
 
 begin
 
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	call mef_encodeb (kname, kvalue, Memc[ln], kcomm)
 	call mef_pakwr (fd, Memc[ln])
@@ -208,14 +197,12 @@ real	kvalue		#I Keyword value
 char 	kcomm[ARB]	#I Card comment
 int	fd	        #I file descriptor
 
-size_t	sz_val
 pointer sp, ln
 
 begin
 
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	call mef_encoder (kname, kvalue, Memc[ln], kcomm, 6)
 	call mef_pakwr (fd, Memc[ln])

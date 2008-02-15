@@ -19,7 +19,6 @@ pointer	in[nimages]		#I Input images
 pointer	out[3]			#I Output images
 int	nimages			#I Number of images
 
-size_t	sz_val
 int	i, npix, npms, clgwrd()
 real	clgetr()
 pointer	sp, fname, title, pm, pm_open()
@@ -31,9 +30,8 @@ include "icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (title, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (title, SZ_FNAME, TY_CHAR)
 
 	# Determine the mask parameters and allocate memory.
 	# The mask buffers are initialize to all excluded so that
@@ -43,14 +41,11 @@ begin
 	mtype = clgwrd ("masktype", Memc[title], SZ_FNAME, MASKTYPES)
 	mvalue = clgetr ("maskvalue")
 	npix = IM_LEN(out[1],1)
-	sz_val = nimages
-	call calloc (pms, sz_val, TY_POINTER)
-	call calloc (bufs, sz_val, TY_POINTER)
+	call calloc (pms, nimages, TY_POINTER)
+	call calloc (bufs, nimages, TY_POINTER)
 	do i = 1, nimages {
-	    sz_val = npix
-	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
-	    sz_val = npix
-	    call amovki (1, Memi[Memi[bufs+i-1]], sz_val)
+	    call malloc (Memi[bufs+i-1], npix, TY_INT)
+	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
 	}
 
 	# Check for special cases.  The BOOLEAN type is used when only
@@ -87,8 +82,7 @@ begin
 		    else {
 			if (project) {
 			    npms = nimages
-			    sz_val = nimages
-			    call amovki (pm, Memi[pms], sz_val)
+			    call amovki (pm, Memi[pms], nimages)
 			} else {
 			    npms = npms + 1
 			    Memi[pms+i-1] = pm
@@ -151,7 +145,6 @@ pointer	m[nimages]		# Pointer to mask pointers
 int	lflag[nimages]		# Line flags
 int	nimages			# Number of images
 
-size_t	sz_val
 int	i, j, ndim, nout, npix
 pointer	buf, pm
 bool	pm_linenotempty()
@@ -235,8 +228,7 @@ begin
 		    (mtype == M_GOODVAL && mvalue == 0)) {
 		    call aclri (Memi[buf], npix)
 		} else {
-		    sz_val = npix
-		    call amovki (1, Memi[buf], sz_val)
+		    call amovki (1, Memi[buf], npix)
 		    lflag[i] = D_NONE
 		}
 	    }

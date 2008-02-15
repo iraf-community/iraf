@@ -17,8 +17,6 @@ double	imin_value		# minimum pixel value in image (imag, out)
 double	imax_value		# maximum pixel value in image (imag, out)
 long	vmin[ARB], vmax[ARB]	# v vectors
 
-size_t	sz_val
-long	lg_val
 bool	first_line
 int	colmin, colmax
 complex	xmin_value, xmax_value, minval_x, maxval_x
@@ -31,13 +29,11 @@ double	minval_d, maxval_d
 int	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
 
 begin
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)		# start vector
-	call amovkl (lg_val, ovmin, sz_val)
-	call amovkl (lg_val, ovmax, sz_val)
-	call amovkl (lg_val, vmin, sz_val)
-	call amovkl (lg_val, vmax, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)		# start vector
+	call amovkl (long(1), ovmin, IM_MAXDIM)
+	call amovkl (long(1), ovmax, IM_MAXDIM)
+	call amovkl (long(1), vmin, IM_MAXDIM)
+	call amovkl (long(1), vmax, IM_MAXDIM)
 
 	first_line = true
 	min_value = INDEFD
@@ -60,19 +56,16 @@ begin
 		    if (minval_s < min_value) {
 			min_value = minval_s
 			vmin[1] = colmin
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmin[2], vmin[2], sz_val)
+			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
 		    }
 		    if (maxval_s > max_value) {
 			max_value = maxval_s
 			vmax[1] = colmax
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmax[2], vmax[2], sz_val)
+			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
 		    }
 		}
-		sz_val = IM_NDIM(im) - 1
-		call amovl (v[2], ovmin[2], sz_val)
-		call amovl (v[2], ovmax[2], sz_val)
+		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
+		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
 	    }
 
 	case TY_USHORT, TY_INT, TY_LONG:
@@ -89,19 +82,16 @@ begin
 		    if (minval_l < min_value) {
 			min_value = minval_l
 			vmin[1] = colmin
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmin[2], vmin[2], sz_val)
+			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
 		    }
 		    if (maxval_l > max_value) {
 			max_value = maxval_l
 			vmax[1] = colmax
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmax[2], vmax[2], sz_val)
+			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
 		    }
 		}
-		sz_val = IM_NDIM(im) - 1
-		call amovl (v[2], ovmin[2], sz_val)
-		call amovl (v[2], ovmax[2], sz_val)
+		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
+		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
 	    }
 
 	case TY_REAL:
@@ -118,19 +108,16 @@ begin
 		    if (minval_r < min_value) {
 			min_value = minval_r
 			vmin[1] = colmin
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmin[2], vmin[2], sz_val)
+			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
 		    }
 		    if (maxval_r > max_value) {
 			max_value = maxval_r
 			vmax[1] = colmax
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmax[2], vmax[2], sz_val)
+			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
 		    }
 		}
-		sz_val = IM_NDIM(im) - 1
-		call amovl (v[2], ovmin[2], sz_val)
-		call amovl (v[2], ovmax[2], sz_val)
+		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
+		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
 	    }
 
 	case TY_DOUBLE:
@@ -147,19 +134,16 @@ begin
 		    if (minval_d < min_value) {
 			min_value = minval_d
 			vmin[1] = colmin
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmin[2], vmin[2], sz_val)
+			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
 		    }
 		    if (maxval_d > max_value) {
 			max_value = maxval_d
 			vmax[1] = colmax
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmax[2], vmax[2], sz_val)
+			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
 		    }
 		}
-		sz_val = IM_NDIM(im) - 1
-		call amovl (v[2], ovmin[2], sz_val)
-		call amovl (v[2], ovmax[2], sz_val)
+		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
+		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
 	    }
 
 	case TY_COMPLEX:
@@ -176,19 +160,16 @@ begin
 		    if (abs (minval_x) < abs (xmin_value)) {
 			xmin_value = minval_x
 			vmin[1] = colmin
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmin[2], vmin[2], sz_val)
+			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
 		    }
 		    if (abs (maxval_x) > abs (xmax_value)) {
 			xmax_value = maxval_x
 			vmax[1] = colmax
-			sz_val = IM_NDIM(im) - 1
-			call amovl (ovmax[2], vmax[2], sz_val)
+			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
 		    }
 		}
-		sz_val = IM_NDIM(im) - 1
-		call amovl (v[2], ovmin[2], sz_val)
-		call amovl (v[2], ovmax[2], sz_val)
+		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
+		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
 	    }
 
 	    min_value = real (xmin_value)

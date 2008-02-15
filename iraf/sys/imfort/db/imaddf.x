@@ -15,7 +15,6 @@ char	key[ARB]		# name of the new parameter
 int	datatype		# datatype of parameter
 char	comment[ARB]		# comment describing new parameter
 
-size_t	sz_val
 int	max_lenuserarea
 pointer	sp, keyname, rp, ua, op
 int	idb_kwlookup(), idb_findrecord(), strlen()
@@ -23,8 +22,7 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyname, sz_val, TY_CHAR)
+	call salloc (keyname, SZ_FNAME, TY_CHAR)
 
 	# FITS format requires that the keyword name be upper case.
 	call strcpy (key, Memc[keyname], SZ_FNAME)

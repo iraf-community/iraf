@@ -23,7 +23,6 @@ pointer	db			# help database to be used
 char	tlist[ARB]		# template list ("a.*,b.*,...")
 pointer	ctrl			# Help control structure
 
-size_t	sz_val
 int	m, pk
 bool	no_matches, matchall
 pointer	sp, fname, template, module, pakname, modtemp, curmod
@@ -38,15 +37,12 @@ errchk	tl_open, ml_open, print_help
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (template, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (module, sz_val, TY_CHAR)
-	call salloc (pakname, sz_val, TY_CHAR)
-	call salloc (modtemp, sz_val, TY_CHAR)
-	call salloc (curmod, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (module, SZ_FNAME, TY_CHAR)
+	call salloc (pakname, SZ_FNAME, TY_CHAR)
+	call salloc (modtemp, SZ_FNAME, TY_CHAR)
+	call salloc (curmod, SZ_FNAME, TY_CHAR)
 
 	# The help database contains the package names and references to
 	# all help modules in the package.  Load the help database index

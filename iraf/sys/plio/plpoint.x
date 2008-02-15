@@ -15,7 +15,6 @@ int	x			#I pixel to be modified
 int	y			#I line to be modified
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 long	v[PL_MAXDIM]
 int	npix, ll_len
 pointer	sp, ll_out, ll_reg, rl_out, ll_dst, op
@@ -25,17 +24,13 @@ int	pl_r2li()
 
 begin
 	call plvalid (pl)
-	sz_val = PL_MAXDIM
-	call amovl (PL_PLANE(pl,1), v, sz_val)
+	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
 	v[2] = y
 
 	call smark (sp)
-	sz_val = LL_MAXLEN(pl)
-	call salloc (ll_out, sz_val, TY_SHORT)
-	sz_val = LL_CURHDRLEN + 6
-	call salloc (ll_reg, sz_val, TY_SHORT)
-	sz_val = RL_FIRST * 3
-	call salloc (rl_out, sz_val, TY_INT)
+	call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
+	call salloc (ll_reg, LL_CURHDRLEN + 6, TY_SHORT)
+	call salloc (rl_out, RL_FIRST * 3, TY_INT)
 
 	# Access the destination line in the mask.
 	ll_dst = pl_access (pl, v)

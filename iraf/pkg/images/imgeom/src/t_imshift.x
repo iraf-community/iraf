@@ -18,7 +18,6 @@ procedure t_imshift()
 pointer	imtlist1		# Input image list
 pointer	imtlist2		# Output image list
 
-size_t	sz_val
 pointer	image1			# Input image
 pointer	image2			# Output image
 pointer imtemp			# Temporary file
@@ -39,17 +38,14 @@ errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (imtlist1, sz_val, TY_CHAR)
-	call salloc (imtlist2, sz_val, TY_CHAR)
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (sfile, sz_val, TY_CHAR)
-	call salloc (interpstr, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtlist1, SZ_LINE, TY_CHAR)
+	call salloc (imtlist2, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_LINE, TY_CHAR)
+	call salloc (image2, SZ_LINE, TY_CHAR)
+	call salloc (imtemp, SZ_LINE, TY_CHAR)
+	call salloc (sfile, SZ_FNAME, TY_CHAR)
+	call salloc (interpstr, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -77,9 +73,8 @@ begin
 	# Determine the source of the shifts.
 	if (Memc[sfile] != EOS) {
 	    sf = open (Memc[sfile], READ_ONLY, TEXT_FILE)
-	    sz_val = imtlen (list1)
-	    call salloc (xs, sz_val, TY_DOUBLE)
-	    call salloc (ys, sz_val, TY_DOUBLE)
+	    call salloc (xs, imtlen (list1), TY_DOUBLE)
+	    call salloc (ys, imtlen (list1), TY_DOUBLE)
 	    nshifts = ish_rshifts (sf, Memd[xs], Memd[ys], imtlen (list1))
 	    if (nshifts != imtlen (list1))
 		call error (2,
@@ -175,8 +170,6 @@ int	iyshift		#I
 int	boundary_type	#I type of boundary extension
 real	constant	#I constant for boundary extension
 
-size_t	sz_val
-long	lg_val
 pointer	buf1, buf2
 long	v[IM_MAXDIM]
 int	ncols, nlines, nbpix
@@ -219,9 +212,7 @@ begin
 	x1col = max (-ncols + 1, - ixshift + 1) 
 	x2col = min (2 * ncols,  ncols - ixshift)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long (1), v, IM_MAXDIM)
 
 	# Shift the image using the appropriate data type operators.
 	switch (IM_PIXTYPE(im1)) {
@@ -253,8 +244,7 @@ begin
 		buf1 = imgs2l (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
 		    call error (5, wrerr)
-		sz_val = ncols
-		call amovl (Meml[buf1], Meml[buf2], sz_val)
+		call amovl (Meml[buf1], Meml[buf2], ncols)
 	    }
 	case TY_REAL:
 	    do i = 1, nlines {
@@ -264,8 +254,7 @@ begin
 		buf1 = imgs2r (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
 		    call error (5, wrerr)
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	case TY_DOUBLE:
 	    do i = 1, nlines {
@@ -309,7 +298,6 @@ char	interpstr[ARB]	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
 
-size_t	sz_val
 int	lout1, lout2, nyout, nxymargin, interp_type, nsinc, nincr
 int	cin1, cin2, nxin, lin1, lin2, nyin, i
 int	ncols, nlines, nbpix, fstline, lstline
@@ -343,10 +331,8 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = 2 * ncols
-	call salloc (x, sz_val, TY_REAL)
-	sz_val = 2 * nlines
-	call salloc (y, sz_val, TY_REAL)
+	call salloc (x, 2 * ncols, TY_REAL)
+	call salloc (y, 2 * nlines, TY_REAL)
 	sinbuf = NULL
 
 	# Define the x and y shifts for the interpolation.
@@ -470,7 +456,6 @@ int	col1, col2	#I column range of input buffer
 int	line1, line2	#I line range of input buffer
 pointer	buf		#U buffer
 
-size_t	sz_val
 pointer	buf1, buf2
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 errchk	malloc, realloc
@@ -482,13 +467,11 @@ begin
 
 	# Make sure the buffer is large enough.
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    sz_val = ncols * nlines
-	    call realloc (buf, sz_val, TY_REAL)
+	    call realloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	}
@@ -501,8 +484,7 @@ begin
 		else
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	} else if (line2 > llast2) {
 	    do i = line1, line2 {
@@ -511,8 +493,7 @@ begin
 		else
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	}
 

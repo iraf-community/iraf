@@ -20,7 +20,6 @@ char	expr[ARB]		#I expression to be compiled
 int	offset			#I typed offset of referenced attribute
 int	dtype			#I datatype of referenced attribute
 
-size_t	sz_val
 int	nbins, bin, xp
 pointer	lt, lut, lutx, pb
 real	x1, x2, xmin, xmax
@@ -100,9 +99,8 @@ begin
 	# ranges.
 
 	xlen = DEF_XLEN
-	sz_val = xlen
-	call malloc (xs_buf, sz_val, TY_REAL)
-	call malloc (xe_buf, sz_val, TY_REAL)
+	call malloc (xs_buf, xlen, TY_REAL)
+	call malloc (xe_buf, xlen, TY_REAL)
 
 	# Convert expr to a binary range list and set up the initial context.
 	# Ensure that the range list buffers are large enough to hold any
@@ -111,9 +109,8 @@ begin
 	nranges = qpex_parser (expr, xs_buf, xe_buf, xlen)
 	if (xlen < nranges * 2) {
 	    xlen = nranges * 2
-	    sz_val = xlen
-	    call realloc (xs_buf, sz_val, TY_REAL)
-	    call realloc (xe_buf, sz_val, TY_REAL)
+	    call realloc (xs_buf, xlen, TY_REAL)
+	    call realloc (xe_buf, xlen, TY_REAL)
 	}
 
 	xs = xs_buf
@@ -242,8 +239,7 @@ null_		call eprintf ("%s: null range list\n")
 
 		# Allocate and initialize the lookup table descriptor.
 		lt = qpex_dballoc (ex, LEN_LTDES, TY_STRUCT)
-		sz_val = nbins
-		call calloc (lut, sz_val, TY_SHORT)
+		call calloc (lut, nbins, TY_SHORT)
 
 		LT_NEXT(lt)	= EX_LTHEAD(ex)
 		EX_LTHEAD(ex)	= lt

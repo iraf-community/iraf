@@ -29,7 +29,6 @@ pointer	xs			#U pointer to array of start values
 pointer	xe			#U pointer to array of end values
 int	xlen			#U length of xs/xe arrays
 
-size_t	sz_val
 pointer	ps, pe, qs, qe
 pointer	sp, expr, ip, ep
 int	plen, qlen, np, nq, nx
@@ -48,8 +47,7 @@ begin
 
 	repeat {
 	    maxch = maxch * 2
-	    sz_val = maxch
-	    call salloc (expr, sz_val, TY_CHAR)
+	    call salloc (expr, maxch, TY_CHAR)
 	    nchars = qpex_getattribute (ex, attribute, Memc[expr], maxch)
 	    if (nchars <= 0)
 		break
@@ -65,13 +63,11 @@ begin
 	if (nchars > 0) {
 	    # Get range list storage.
 	    plen = DEF_XLEN
-	    sz_val = plen
-	    call malloc (ps, sz_val, TY_REAL)
-	    call malloc (pe, sz_val, TY_REAL)
+	    call malloc (ps, plen, TY_REAL)
+	    call malloc (pe, plen, TY_REAL)
 	    qlen = DEF_XLEN
-	    sz_val = qlen
-	    call malloc (qs, sz_val, TY_REAL)
-	    call malloc (qe, sz_val, TY_REAL)
+	    call malloc (qs, qlen, TY_REAL)
+	    call malloc (qe, qlen, TY_REAL)
 
 	    # Parse each subexpression and merge into output range list.
 	    for (ip=expr;  Memc[ip] != EOS;  ) {
@@ -90,18 +86,16 @@ begin
 		# Copy output range list to X list temporary.
 		if (max(nx,1) > plen) {
 		    plen = max(xlen,1)
-		    sz_val = plen
-		    call realloc (ps, sz_val, TY_REAL)
-		    call realloc (pe, sz_val, TY_REAL)
+		    call realloc (ps, plen, TY_REAL)
+		    call realloc (pe, plen, TY_REAL)
 		}
 		if (neterms <= 0) {
 		    Memr[ps] = LEFTR
 		    Memr[pe] = RIGHTR
 		    np = 1
 		} else {
-		    sz_val = nx
-		    call amovr (Memr[xs], Memr[ps], sz_val)
-		    call amovr (Memr[xe], Memr[pe], sz_val)
+		    call amovr (Memr[xs], Memr[ps], nx)
+		    call amovr (Memr[xe], Memr[pe], nx)
 		    np = nx
 		}
 

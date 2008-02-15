@@ -13,7 +13,6 @@ include "curfitdef.h"
 procedure cvsave (cv, fit)
 
 pointer	cv		# curve descriptor
-size_t	sz_val
 real	fit[ARB]	# PIXEL array containing curve parameters
 
 begin
@@ -36,12 +35,10 @@ begin
 
 
 	# set coefficients
-	if (CV_TYPE(cv) == USERFNC) {
-	    sz_val = CV_NCOEFF(cv)
-	    call amovr (COEFF(CV_COEFF(cv)), fit[CV_SAVECOEFF+1], sz_val) 
-	} else {
-	    sz_val = CV_NCOEFF(cv)
-	    call amovr (COEFF(CV_COEFF(cv)), fit[CV_SAVECOEFF], sz_val) 
-	}
-
+	if (CV_TYPE(cv) == USERFNC)
+	    call amovr (COEFF(CV_COEFF(cv)), fit[CV_SAVECOEFF+1],
+	        CV_NCOEFF(cv)) 
+	else
+	    call amovr (COEFF(CV_COEFF(cv)), fit[CV_SAVECOEFF],
+	        CV_NCOEFF(cv)) 
 end

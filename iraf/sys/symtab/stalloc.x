@@ -9,7 +9,6 @@ int procedure stalloc (stp, blklen)
 
 pointer	stp			# symtab descriptor
 int	blklen			# number of integer units of storage
-size_t	sz_val
 int	offset, buflen
 
 begin
@@ -26,8 +25,7 @@ begin
 	    ST_STABLEN(stp) = buflen
 	    ST_STABNGROW(stp) = ST_STABNGROW(stp) + 1
 
-	    sz_val = buflen
-	    call realloc (ST_STABP(stp), sz_val, TY_STRUCT)
+	    call realloc (ST_STABP(stp), buflen, TY_STRUCT)
 	}
 
 	ST_STABOP(stp) = offset + ((blklen + 1) / 2 * 2)

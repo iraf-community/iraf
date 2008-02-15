@@ -141,7 +141,6 @@ pointer	ep			#I EPIX pointer
 int	x, y			#I Reference pixel
 int	key			#I Key
 
-size_t	sz_val
 int	i, j, nc, nl, x1, x2, y1, y2
 real	minv, maxv
 real	val, ival, oval
@@ -233,8 +232,7 @@ begin
 	    EP_Y2(ep))
 
 	buf = EP_OUTDATA(ep)
-	sz_val = EP_NPTS(ep)
-	call amovr (Memr[EP_INDATA(ep)], Memr[buf], sz_val)
+	call amovr (Memr[EP_INDATA(ep)], Memr[buf], EP_NPTS(ep))
 	switch (key) {
 	case '=':
 	    do i = 1, EP_NPTS(ep) {

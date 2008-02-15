@@ -14,7 +14,6 @@ char	fname[ARB]
 pointer	ctrl
 char	pakname[ARB]
 
-size_t	sz_val
 int	center_col, ip
 long	fi[LEN_FINFO]
 pointer	sp, lbuf, time
@@ -23,10 +22,8 @@ errchk	houtput, open, hinput
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_TIME
-	call salloc (time, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (time, SZ_TIME, TY_CHAR)
 
 	H_EOF(ctrl) = NO
 	H_RAWIN(ctrl) = YES

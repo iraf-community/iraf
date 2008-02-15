@@ -74,14 +74,12 @@ int	box			#I Running median box
 real	data			#I Initial data value
 pointer	rm			#R Method pointer
 
-size_t	sz_val
 short	i, halfbox
 #short	i, j, k, halfbox, one
 #data	one/1/
 
 begin
-	sz_val = RMT_LEN(box)
-	call malloc (rm, sz_val, TY_STRUCT)
+	call malloc (rm, RMT_LEN(box), TY_STRUCT)
 
 	RMT_BOX(rm) = box
 	RMT_DATA(rm) = rm + RMT_OFFSET

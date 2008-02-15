@@ -6,14 +6,11 @@ include "mimstat.h"
 
 procedure mst_allocate (mst)
 
-size_t	sz_val
 pointer	mst		#O the statistics descriptor
 
 begin
-    	sz_val = LEN_MIMSTAT
-    	call calloc (mst, sz_val, TY_STRUCT)
-	sz_val = LEN_NSWITCHES
-	call malloc (MIS_SW(mst), sz_val, TY_INT)
+    	call calloc (mst, LEN_MIMSTAT, TY_STRUCT)
+	call malloc (MIS_SW(mst), LEN_NSWITCHES, TY_INT)
 end
 
 
@@ -38,7 +35,6 @@ char    fieldstr[ARB]           #I string containing the list of fields
 int     fields[ARB]             #O fields array
 int     max_nfields             #I maximum number of fields
 
-size_t	sz_val
 int     nfields, flist, field
 pointer sp, fname
 int     fntopenb(), fntgfnb(), strdic()
@@ -47,8 +43,7 @@ begin
         nfields = 0
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (fname, SZ_FNAME, TY_CHAR)
 
         flist = fntopenb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
@@ -76,15 +71,13 @@ int     fields[ARB]             #I fields array
 int     nfields                 #I maximum number of fields
 int	nclip			#I the number of clipping iterations
 
-size_t	sz_val
 pointer	sw
 int	mst_isfield()
 
 begin
 	# Initialize.
 	sw = MIS_SW(mst)
-	sz_val = LEN_NSWITCHES
-	call amovki (NO, Memi[sw], sz_val)
+	call amovki (NO, Memi[sw], LEN_NSWITCHES)
 
         # Set the computation switches.
         MIS_SNPIX(sw) = mst_isfield (MIS_FNPIX, fields, nfields)
@@ -678,7 +671,6 @@ pointer hgm             #O pointer to the histogram
 int     nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
-size_t	sz_val
 real    hmax            #O maximum histogram value
 
 begin
@@ -697,8 +689,7 @@ begin
         hmin = MIS_MIN(mst)
         hmax = MIS_MAX(mst)
 
-        sz_val = nbins
-        call malloc (hgm, sz_val, TY_INT)
+        call malloc (hgm, nbins, TY_INT)
 
         return (YES)
 end
@@ -715,7 +706,6 @@ real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
-size_t	sz_val
 real    h1, hdiff, hnorm
 pointer sp, ihgm
 int     i, lo, hi
@@ -724,8 +714,7 @@ bool    fp_equalr()
 
 begin
         call smark (sp)
-        sz_val = nbins
-        call salloc (ihgm, sz_val, TY_REAL)
+        call salloc (ihgm, nbins, TY_REAL)
 
         # Integrate the histogram and normalize.
         Memr[ihgm] = hgm[1]

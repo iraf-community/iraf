@@ -106,7 +106,6 @@ real	k1, k2		# normalizing constants
 real	basis[ARB]	# array of basis functions
 int	left[ARB]	# array of indices for first non-zero spline
 
-size_t	sz_val
 int	i
 pointer	sp, sx, tx
 real	dsx, dtx
@@ -114,9 +113,8 @@ real	dsx, dtx
 begin
 	# allocate space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (tx, npts, TY_REAL)
 
 	# calculate the index of the first non-zero coeff
 	call altar (x, Memr[sx], npts, k1, k2)

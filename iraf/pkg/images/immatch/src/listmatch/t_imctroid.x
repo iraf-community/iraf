@@ -77,7 +77,6 @@ int	nimages, ncoords, nshifts, ncentered, i, j
 real	x, y, junk
 bool	error_seen, firsttime
 
-size_t	sz_val
 pointer	imtopenp(), immap(), ia_openp2r(), ia_init()
 int	imtlen(), imtgetim(), ia_len(), ia_center(), strmatch()
 
@@ -86,9 +85,8 @@ errchk	ia_init, ia_openp2r, ia_len, ia_close, ia_center
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (img, sz_val, TY_CHAR)
-	call salloc (refer, sz_val, TY_CHAR)
+	call salloc (img, SZ_FNAME, TY_CHAR)
+	call salloc (refer, SZ_FNAME, TY_CHAR)
 
 	error_seen = false
 	imlist = NULL
@@ -332,7 +330,6 @@ int	nshifts			#I number of shifts in list (or # images)
 pointer	coordlist		#I coordinate "template" pointer
 int	ncoords			#I number of coordinates in list
 
-size_t	sz_val
 pointer	cp
 int	boxsize, i
 real	x, y
@@ -344,8 +341,7 @@ bool	clgetb()
 errchk	ia_get2r
 
 begin
-	sz_val = LEN_CP
-	call calloc (cp, sz_val, TY_STRUCT)
+	call calloc (cp, LEN_CP, TY_STRUCT)
 
 	boxsize = clgeti ("boxsize")
 	if (mod (boxsize, 2) == 0) {
@@ -393,22 +389,17 @@ begin
 	NIMAGES(cp)	= nshifts
 	NCOORDS(cp)	= ncoords
 
-	sz_val = ncoords
-	call malloc (XINIT_PT(cp), sz_val, TY_REAL)
-	call malloc (YINIT_PT(cp), sz_val, TY_REAL)
-	sz_val = nshifts
-	call malloc (XSHIFT_PT(cp), sz_val, TY_REAL)
-	call malloc (YSHIFT_PT(cp), sz_val, TY_REAL)
-	sz_val = nshifts+1
-	call malloc (XSIZE_PT(cp), sz_val, TY_REAL)
-	call malloc (YSIZE_PT(cp), sz_val, TY_REAL)
-	sz_val = (nshifts+1)*ncoords
-	call malloc (XCENTER_PT(cp), sz_val, TY_REAL)
-	call malloc (YCENTER_PT(cp), sz_val, TY_REAL)
-	call malloc (XSIGMA_PT(cp), sz_val, TY_REAL)
-	call malloc (YSIGMA_PT(cp), sz_val, TY_REAL)
-	sz_val = (nshifts+1)*ncoords
-	call calloc (REJECTED_PT(cp), sz_val, TY_INT)
+	call malloc (XINIT_PT(cp), ncoords, TY_REAL)
+	call malloc (YINIT_PT(cp), ncoords, TY_REAL)
+	call malloc (XSHIFT_PT(cp), nshifts, TY_REAL)
+	call malloc (YSHIFT_PT(cp), nshifts, TY_REAL)
+	call malloc (XSIZE_PT(cp), nshifts+1, TY_REAL)
+	call malloc (YSIZE_PT(cp), nshifts+1, TY_REAL)
+	call malloc (XCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
+	call malloc (YCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
+	call malloc (XSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
+	call malloc (YSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
+	call calloc (REJECTED_PT(cp), (nshifts+1)*ncoords, TY_INT)
 
 	for (i=1; ia_get2r (coordlist, x, y) != EOF; i=i+1) {
 	    if (i > ncoords)
@@ -475,7 +466,6 @@ real	xinit, yinit		#I initial x and y coordinates
 real	xcenter, ycenter	#O centered x and y coordinates
 real	xsigma, ysigma		#O centering errors
 
-size_t	sz_val
 int	x1, x2, y1, y2, nx, ny, try
 pointer	im, buf, xbuf, ybuf, sp
 real	xold, yold, xnew, ynew
@@ -503,10 +493,8 @@ begin
 
 	    # inside the loop in case we're near an edge
 	    call smark (sp)
-	    sz_val = nx
-	    call salloc (xbuf, sz_val, TY_REAL)
-	    sz_val = ny
-	    call salloc (ybuf, sz_val, TY_REAL)
+	    call salloc (xbuf, nx, TY_REAL)
+	    call salloc (ybuf, ny, TY_REAL)
 
 	    iferr {
 		buf = imgs2r (im, x1, x2, y1, y2)
@@ -715,7 +703,6 @@ pointer procedure ia_openp2r (param)
 
 char	param[ARB]	#I parameter name
 
-size_t	sz_val
 int	fd, length
 pointer	lp, fname, sp
 real	x1, x2
@@ -726,8 +713,7 @@ errchk	open
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	call clgstr (param, Memc[fname], SZ_FNAME)
 
@@ -761,8 +747,7 @@ begin
 
 	call sfree (sp)
 
-	sz_val = LEN_LP
-	call malloc (lp, sz_val, TY_STRUCT)
+	call malloc (lp, LEN_LP, TY_STRUCT)
 	LP_FD(lp) = fd
 	LP_LEN(lp) = length
 
@@ -847,7 +832,6 @@ procedure ia_stats (cp, imlist)
 pointer	cp			#I center structure pointer
 pointer	imlist			#I image template (for labeling)
 
-size_t	sz_val
 real	xshift, yshift, xsum, ysum
 real	xsum2, ysum2, xsig2, ysig2
 real	xvar, yvar, xerr, yerr, xprop, yprop
@@ -859,8 +843,7 @@ int	imtgetim()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (img, sz_val, TY_CHAR)
+	call salloc (img, SZ_FNAME, TY_CHAR)
 
 	nim = NIMAGES(cp)
 	ncoo = NCOORDS(cp)

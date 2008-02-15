@@ -11,7 +11,6 @@ char	hkname[ARB]		#I the header keyword name
 char	hkvalue[ARB]		#O the header keyword value
 int	sz_hkvalue		#I the maximum size of the keyword value
 
-size_t	sz_val
 pointer	sp, kname
 int	kwno
 int	strdic(), cq_wrdstr()
@@ -22,8 +21,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (kname, sz_val, TY_CHAR)
+	call salloc (kname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	kwno = strdic (hkname, Memc[kname], CQ_SZ_FNAME, Memc[CQ_HKNAMES(res)])
@@ -91,7 +89,6 @@ int	sz_units		#I the maximum size of the units string
 char	fmts[ARB]		#O the outpit field formats string
 int	sz_fmts			#I the maximum size of the formats string
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic(), cq_wrdstr()
@@ -102,8 +99,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -136,7 +132,6 @@ int procedure cq_fnumber (res, field)
 pointer	res			#I the results descriptor
 char	field[ARB]		#I the field name
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic()
@@ -147,8 +142,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -165,7 +159,6 @@ int procedure cq_foffset (res, field)
 pointer	res			#I the results descriptor
 char	field[ARB]		#I the field name
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic()
@@ -176,8 +169,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -198,7 +190,6 @@ int procedure cq_fsize (res, field)
 pointer	res			#I the results descriptor
 char	field[ARB]		#I the field name
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic()
@@ -209,8 +200,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -231,7 +221,6 @@ int procedure cq_ftype (res, field)
 pointer	res			#I the results descriptor
 char	field[ARB]		#I the field name
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic()
@@ -242,8 +231,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -266,7 +254,6 @@ char	field[ARB]		#I the field name
 char	units[ARB]		#O the output units string
 int	sz_units		#I the maximum size of the units string
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic(), cq_wrdstr()
@@ -279,8 +266,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])
@@ -305,7 +291,6 @@ char	field[ARB]		#I the field name
 char	format[ARB]		#O the output format string
 int	sz_format		#I the maximum size of the format string
 
-size_t	sz_val
 pointer	sp, fname
 int	fieldno
 int	strdic(), cq_wrdstr()
@@ -318,8 +303,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
 
 	# Find the requested field.
 	fieldno = strdic (field, Memc[fname], CQ_SZ_FNAME, Memc[CQ_FNAMES(res)])

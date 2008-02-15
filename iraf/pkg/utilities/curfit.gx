@@ -33,7 +33,6 @@ int	interactive		# Fit curve interactively?
 int	ofmt			# Type of output listing
 bool	power			# Convert coeff to power series?
 
-size_t	sz_val
 int	ncoeff, i
 PIXEL	xmin, xmax
 pointer	sp, gp, cv, coeff, tty
@@ -78,8 +77,7 @@ begin
  	    # Calculate and print coefficients
 	    ncoeff = $tcvstati (cv, CVNCOEFF)
 	    call smark (sp)
-	    sz_val = ncoeff
-	    call salloc (coeff, sz_val, TY_PIXEL)
+	    call salloc (coeff, ncoeff, TY_PIXEL)
 	    call $tcvpower (cv, Mem$t[coeff], ncoeff)
 	    call printf ("# Power series coefficients would be:\n")
 	    call printf ("# \t\tcoefficient\n")
@@ -137,8 +135,6 @@ int	weighting		# Weighting of the individual points
 int	npix			# Length of projection vector
 int	axis			# The axis to be projected to (x=1)
 
-size_t	sz_val
-long	lg_val
 int	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
@@ -155,9 +151,7 @@ begin
 
 	# Set the y projection vector
 	call aclr$t (y, npix)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 
 	switch (axis) {
 	case 1:

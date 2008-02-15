@@ -44,8 +44,6 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-long	lg_val
-size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
@@ -68,17 +66,14 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
 	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_SHORT
-	    sz_val = ncols
-	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFS
 	    call amovks (indef, Mems[FP_V1(fp,1)], ncols)
 	    call amovks (indef, Mems[FP_V2(fp,1)], ncols)
@@ -97,8 +92,7 @@ begin
 	}
 
 	# Get the pixel mask.
-	sz_val = nc
-	call malloc (bp, sz_val, TY_SHORT)
+	call malloc (bp, nc, TY_SHORT)
 	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
 	bp = bp - 1
 
@@ -127,8 +121,7 @@ begin
 	# Fix pixels by column or line interpolation.
 	if (FP_DATA(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_SHORT
-	    sz_val = nc
-	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
 	call amovs (Mems[xt_fpvals(fp,im,line)], Mems[data], nc)
@@ -304,8 +297,6 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-long	lg_val
-size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
@@ -328,21 +319,17 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
 	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_INT
-	    sz_val = ncols
-	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFI
-	    sz_val = ncols
-	    call amovki (indef, Memi[FP_V1(fp,1)], sz_val)
-	    call amovki (indef, Memi[FP_V2(fp,1)], sz_val)
+	    call amovki (indef, Memi[FP_V1(fp,1)], ncols)
+	    call amovki (indef, Memi[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -358,8 +345,7 @@ begin
 	}
 
 	# Get the pixel mask.
-	sz_val = nc
-	call malloc (bp, sz_val, TY_SHORT)
+	call malloc (bp, nc, TY_SHORT)
 	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
 	bp = bp - 1
 
@@ -388,8 +374,7 @@ begin
 	# Fix pixels by column or line interpolation.
 	if (FP_DATA(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_INT
-	    sz_val = nc
-	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
 	call amovi (Memi[xt_fpvali(fp,im,line)], Memi[data], nc)
@@ -565,8 +550,6 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-long	lg_val
-size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
@@ -589,21 +572,17 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
 	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_LONG
-	    sz_val = ncols
-	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFL
-	    sz_val = ncols
-	    call amovkl (indef, Meml[FP_V1(fp,1)], sz_val)
-	    call amovkl (indef, Meml[FP_V2(fp,1)], sz_val)
+	    call amovkl (indef, Meml[FP_V1(fp,1)], ncols)
+	    call amovkl (indef, Meml[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -619,8 +598,7 @@ begin
 	}
 
 	# Get the pixel mask.
-	sz_val = nc
-	call malloc (bp, sz_val, TY_SHORT)
+	call malloc (bp, nc, TY_SHORT)
 	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
 	bp = bp - 1
 
@@ -649,12 +627,10 @@ begin
 	# Fix pixels by column or line interpolation.
 	if (FP_DATA(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_LONG
-	    sz_val = nc
-	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
-	sz_val = nc
-	call amovl (Meml[xt_fpvall(fp,im,line)], Meml[data], sz_val)
+	call amovl (Meml[xt_fpvall(fp,im,line)], Meml[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -827,8 +803,6 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-long	lg_val
-size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
@@ -851,17 +825,14 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
 	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_REAL
-	    sz_val = ncols
-	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFR
 	    call amovkr (indef, Memr[FP_V1(fp,1)], ncols)
 	    call amovkr (indef, Memr[FP_V2(fp,1)], ncols)
@@ -880,8 +851,7 @@ begin
 	}
 
 	# Get the pixel mask.
-	sz_val = nc
-	call malloc (bp, sz_val, TY_SHORT)
+	call malloc (bp, nc, TY_SHORT)
 	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
 	bp = bp - 1
 
@@ -910,12 +880,10 @@ begin
 	# Fix pixels by column or line interpolation.
 	if (FP_DATA(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_REAL
-	    sz_val = nc
-	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
-	sz_val = nc
-	call amovr (Memr[xt_fpvalr(fp,im,line)], Memr[data], sz_val)
+	call amovr (Memr[xt_fpvalr(fp,im,line)], Memr[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -1088,8 +1056,6 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-long	lg_val
-size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
@@ -1112,17 +1078,14 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
 	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_DOUBLE
-	    sz_val = ncols
-	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFD
 	    call amovkd (indef, Memd[FP_V1(fp,1)], ncols)
 	    call amovkd (indef, Memd[FP_V2(fp,1)], ncols)
@@ -1141,8 +1104,7 @@ begin
 	}
 
 	# Get the pixel mask.
-	sz_val = nc
-	call malloc (bp, sz_val, TY_SHORT)
+	call malloc (bp, nc, TY_SHORT)
 	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
 	bp = bp - 1
 
@@ -1171,8 +1133,7 @@ begin
 	# Fix pixels by column or line interpolation.
 	if (FP_DATA(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_DOUBLE
-	    sz_val = nc
-	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
 	call amovd (Memd[xt_fpvald(fp,im,line)], Memd[data], nc)

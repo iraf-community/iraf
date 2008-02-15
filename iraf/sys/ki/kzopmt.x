@@ -16,7 +16,6 @@ long	devpos[ARB]		#I tape position information
 int	newfile			#U receives new file number
 int	chan			#O channel assigned for reading filenames
 
-size_t	sz_val
 pointer	sp, bp, bd
 int	server, dv_len, dc_len, dc_off
 int	ki_connect(), ki_send(), ki_receive(), ki_getchan()
@@ -38,8 +37,7 @@ begin
 
 	} else {
 	    call smark (sp)
-	    sz_val = SZ_COMMAND
-	    call salloc (bp, sz_val, TY_CHAR)
+	    call salloc (bp, SZ_COMMAND, TY_CHAR)
 
 	    # Determine whether devcap string will fit in sbuf.
 	    call strupk (devcap, Memc[bp], SZ_COMMAND)
@@ -58,8 +56,7 @@ begin
 	    p_arg[3] = dc_off
 	    p_arg[4] = dc_len
 	    p_arg[5] = newfile
-	    sz_val = LEN_MTDEVPOS
-	    call amovl (devpos, p_arg[6], sz_val)
+	    call amovl (devpos, p_arg[6], LEN_MTDEVPOS)
 
 	    if (ki_send (server, KI_ZFIOMT, MT_OP) == ERR)
 		k_oschan[chan] = ERR

@@ -18,7 +18,6 @@ char	fits_file[ARB]		# FITS file name
 int	image_number		# the current image number
 int	nimages			# the number of images
 
-size_t	sz_val
 int	fits_fd, chars_rec, nchars, ip, min_lenuserarea
 pointer	im, sp, fits, envstr
 
@@ -47,10 +46,8 @@ begin
 
 	# Allocate memory for program data structure.
 	call smark (sp)
-	sz_val = LEN_FITS
-	call salloc (fits, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call salloc (envstr, sz_val, TY_CHAR)
+	call salloc (fits, LEN_FITS, TY_STRUCT)
+	call salloc (envstr, SZ_FNAME, TY_CHAR)
 
 	# Set up the minimum length of the user area.
 	if (envfind ("min_lenuserarea", Memc[envstr], SZ_FNAME) > 0) {
@@ -216,8 +213,6 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
-size_t	sz_val
-long	lg_val
 int	npix
 long	v[IM_MAXDIM]
 pointer	buf
@@ -235,9 +230,7 @@ begin
 	    irafmin = MAX_REAL
 	    npix = NAXISN(im,1)
 
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, v, sz_val)
+	    call amovkl (long(1), v, IM_MAXDIM)
 	    while (imgnlr (im, buf, v) != EOF) {
 	        call alimr (Memr[buf], npix, minval, maxval)
 	        irafmin = min (irafmin, minval)

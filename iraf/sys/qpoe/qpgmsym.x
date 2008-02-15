@@ -17,7 +17,6 @@ pointer	qp			#I QPOE descriptor
 char	macro[ARB]		#I macro name
 pointer	textp			#O char pointer to macro text
 
-size_t	sz_val
 int	sz_textbuf, nchars, fd
 pointer	st, sm, sym, textbuf
 data	textbuf /NULL/, sz_textbuf /NULL/
@@ -43,8 +42,7 @@ begin
 			# Make sure the text buffer is large enough.
 			if (sz_textbuf < S_NELEM(sym)) {
 			    sz_textbuf = S_NELEM(sym)
-			    sz_val = sz_textbuf
-			    call realloc (textbuf, sz_val, TY_CHAR)
+			    call realloc (textbuf, sz_textbuf, TY_CHAR)
 			}
 
 			# Read the data.

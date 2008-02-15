@@ -16,7 +16,6 @@ procedure stf_newimage (im)
 
 pointer	im			# image descriptor
 
-size_t	sz_val
 pointer	stf
 pointer	o_im
 long	totpix
@@ -97,8 +96,8 @@ begin
 
 	    # Free any unneeded space in the STF descriptor.
 	    if (STF_PCOUNT(stf) > 0) {
-		sz_val = LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES
-		call realloc (stf, sz_val, TY_STRUCT)
+		call realloc (stf,
+		    LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
 		IM_KDES(im) = stf
 	    }
 

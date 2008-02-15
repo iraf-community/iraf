@@ -8,7 +8,6 @@ procedure rg_merge (rg)
 
 pointer	rg				# Ranges
 
-size_t	sz_val
 int	new, old
 
 begin
@@ -30,8 +29,7 @@ begin
 	    } else
 		RG_X2(rg, new) = max (RG_X2(rg, old), RG_X2(rg, new))
 
-	sz_val = LEN_RG + 2 * new
-	call realloc (rg, sz_val, TY_STRUCT)
+	call realloc (rg, LEN_RG + 2 * new, TY_STRUCT)
 
 	RG_NPTS(rg) = 0
 	RG_NRGS(rg) = new

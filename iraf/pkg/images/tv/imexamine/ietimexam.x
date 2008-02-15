@@ -13,7 +13,6 @@ procedure ie_timexam (ie, x, y)
 pointer	ie			# IE pointer
 real	x, y			# Center
 
-size_t	sz_val
 int	i, x1, x2, y1, y2, nx, ny
 pointer	sp, root, extn, output
 pointer	im, out, data, outbuf, mw
@@ -29,10 +28,9 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
 
 	# Get parameters.
 	call clgstr ("output", Memc[root], SZ_FNAME)
@@ -89,8 +87,7 @@ begin
 	    do i = y1, y2 {
 	        data = ie_gdata (im, x1, x2, i, i)
 		outbuf = impl2r (out, i-y1+1)
-		sz_val = nx
-		call amovr (Memr[data], Memr[outbuf], sz_val)
+		call amovr (Memr[data], Memr[outbuf], nx)
 	    }
 	    mw = mw_open (NULL, 2)
 	    call mw_saveim (mw, out)

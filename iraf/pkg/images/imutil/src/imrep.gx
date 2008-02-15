@@ -12,8 +12,6 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
-size_t	sz_val
-long	lg_val
 pointer	buf1, buf2
 int	npix, junk
 $if (datatype == sil)
@@ -29,10 +27,8 @@ $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v1, sz_val)
-	call amovkl (lg_val, v2, sz_val)
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
 
 	npix = IM_LEN(im, 1)
 	$if (datatype == x)
@@ -110,8 +106,6 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
-long	lg_val
-size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 $if (datatype == sil)
@@ -130,10 +124,8 @@ $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v1, sz_val)
-	call amovkl (lg_val, v2, sz_val)
+	call amovkl (long(1), v1, IM_MAXDIM)
+	call amovkl (long(1), v2, IM_MAXDIM)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -210,8 +202,7 @@ begin
 	radius2 = radius * radius
 	nradius = int (radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	sz_val = nc*nbufs
-	call calloc (buf, sz_val, TY_PIXEL)
+	call calloc (buf, nc*nbufs, TY_PIXEL)
 
 	while (imgnl$t (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1

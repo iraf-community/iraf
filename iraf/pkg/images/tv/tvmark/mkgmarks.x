@@ -37,15 +37,13 @@ int	fd		# aperture list file descriptor
 real	marks[ARB]	# list of marks
 int	max_nmarks	# maximum number of apertures
 
-size_t	sz_val
 int	nmarks
 pointer	sp, line
 int	getline(), mk_decmarks()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
 
 	nmarks = 0
 	while (getline (fd, Memc[line]) != EOF && nmarks < max_nmarks) {

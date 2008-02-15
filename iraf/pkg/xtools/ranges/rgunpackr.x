@@ -14,7 +14,6 @@ pointer	rg					# Ranges
 real	packed[ARB]				# Packed array
 real	unpacked[ARB]				# Unpacked array
 
-size_t	sz_val
 int	i, j, x1, x2, nx
 
 begin
@@ -32,8 +31,7 @@ begin
 	    }
 
 	    nx = x2 - x1 + 1
-	    sz_val = nx
-	    call amovr (packed[j], unpacked[x1], sz_val)
+	    call amovr (packed[j], unpacked[x1], nx)
 	    j = j + nx
 	}
 end

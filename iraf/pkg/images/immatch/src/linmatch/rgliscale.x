@@ -24,7 +24,6 @@ pointer	ls		#I pointer to the linmatch structure
 pointer	gd		#I the graphics stream pointer
 pointer	id		#I display stream pointer
 
-size_t	sz_val
 int	i, newref, newimage, newfit, newavg, newplot, plottype, wcs, key, reg
 int	hplot, lplot, lplot_type
 pointer	sp, cmd, udelete, stat
@@ -38,10 +37,8 @@ begin
 	call gdeactivate (gd, 0)
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	sz_val = rg_lstati(ls, MAXNREGIONS)
-	call salloc (udelete, sz_val, TY_INT)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (udelete, rg_lstati(ls, MAXNREGIONS), TY_INT)
 
 	# Initialize the fitting.
 	newref = YES
@@ -89,11 +86,10 @@ begin
 	    bserr = INDEFR; bzerr = INDEFR
 	    call printf ("The regions/photometry list is empty\n")
 	} else {
-	    sz_val = rg_lstati(ls, NREGIONS)
-	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], sz_val)
+	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], rg_lstati(ls,
+	        NREGIONS))
 	    call rg_scale (imr, im1, ls, bscale, bzero, bserr, bzerr, YES)
-	    sz_val = rg_lstati(ls,NREGIONS)
-	    call amovki (NO, Memi[udelete], sz_val)
+	    call amovki (NO, Memi[udelete], rg_lstati(ls,NREGIONS))
 	    if (rg_lplot (gd, imr, im1, ls, Memi[udelete], 1, bscale, bzero,
 	    	plottype) == OK) {
 	        newref = NO
@@ -142,10 +138,10 @@ begin
 				call rg_lindefr (ls)
 			    }
 			}
-			if (newfit == YES) {
-	    		    sz_val = rg_lstati(ls,NREGIONS)
-	    		    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], sz_val)
-			} else if (newavg == YES) {
+			if (newfit == YES)
+	    		    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)],
+			        rg_lstati(ls,NREGIONS))
+			else if (newavg == YES) {
 			    do i = 1, rg_lstati(ls,NREGIONS) {
 				if (Memi[rg_lstatp(ls,RDELETE)+i-1] ==
 				    LS_DELETED || Memi[rg_lstatp(ls,
@@ -540,7 +536,6 @@ int     dformat         #I is the shifts file in database format
 pointer rg              #I pointer to the task structure
 int     ch              #I the input keystroke command
 
-size_t	sz_val
 int     wcs, stat
 pointer sp, cmd
 real    wx, wy
@@ -549,8 +544,7 @@ int     clgcur()
 
 begin
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (cmd, sz_val, TY_CHAR)
+        call salloc (cmd, SZ_LINE, TY_CHAR)
 
         # Print the status line query in reverse video and get the keystroke.
         call printf (QUERY)

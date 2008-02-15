@@ -37,7 +37,6 @@ double	divzero				# Zero divide replacement
 int	pixtype				# Output pixel datatype
 int	calctype			# Datatype for calculations
 
-size_t	sz_val
 int	i, j, pixtype1, pixtype2
 short	sc1, sc2, sdz
 pointer	hlist
@@ -58,18 +57,15 @@ errchk	immap, imgetd, imputd
 begin
 	# Allocate memory for strings.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (operand1, sz_val, TY_CHAR)
-	call salloc (operand2, sz_val, TY_CHAR)
-	call salloc (result, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	call salloc (opstr, sz_val, TY_CHAR)
-	call salloc (dtstr, sz_val, TY_CHAR)
-	call salloc (field, sz_val, TY_CHAR)
-	sz_val = SZ_IMTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (hparams, sz_val, TY_CHAR)
+	call salloc (operand1, SZ_FNAME, TY_CHAR)
+	call salloc (operand2, SZ_FNAME, TY_CHAR)
+	call salloc (result, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (opstr, SZ_FNAME, TY_CHAR)
+	call salloc (dtstr, SZ_FNAME, TY_CHAR)
+	call salloc (field, SZ_FNAME, TY_CHAR)
+	call salloc (title, SZ_IMTITLE, TY_CHAR)
+	call salloc (hparams, SZ_LINE, TY_CHAR)
 
 	# Get the operands and the operator.
 	list1 = imtopenp ("operand1")

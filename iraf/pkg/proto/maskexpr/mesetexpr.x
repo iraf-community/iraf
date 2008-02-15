@@ -8,15 +8,13 @@ int	pregno			#I the current region number
 int	pregval			#I the current region value
 bool	verbose			#I print status messages ?
 
-size_t	sz_val
 pointer	sp, chregval
 int	nchars, stat
 int	itoc(), me_rgmask()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (chregval, sz_val, TY_CHAR)
+	call salloc (chregval, SZ_FNAME, TY_CHAR)
 	nchars = itoc (pregval, Memc[chregval], SZ_FNAME)
 	if (nchars <= 0) {
 	    if (verbose) {

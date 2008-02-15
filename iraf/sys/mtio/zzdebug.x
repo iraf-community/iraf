@@ -173,7 +173,6 @@ char	mtname[SZ_FNAME]
 int	nrecords
 int	min_recsize, max_recsize
 
-size_t	sz_val
 pointer	buf
 long	seed
 int	fd, i, recsize, oschan, status
@@ -191,8 +190,7 @@ begin
 	min_recsize = max (1, clgeti ("min_recsize"))
 	max_recsize = max (min_recsize, clgeti ("max_recsize"))
 
-	sz_val = max_recsize
-	call calloc (buf, sz_val, TY_CHAR)
+	call calloc (buf, max_recsize, TY_CHAR)
 
 	# Records are written by directly calling ZAWRMT, so that we can
 	# write odd size records.
@@ -250,7 +248,6 @@ int procedure mt_examine (out, mtfile)
 int	out				# output stream
 char	mtfile[ARB]			# magtape file to be examined
 
-size_t	sz_val
 pointer	buf
 int	in, nrecords, totrecords, totbytes, bufsize, recsize, last_recsize
 errchk	mtopen, read, fstati, printf, pargi
@@ -259,8 +256,7 @@ int	mtopen(), read(), fstati()
 begin
 	in = mtopen (mtfile, READ_ONLY, 0)
 	bufsize = fstati (in, F_BUFSIZE)
-	sz_val = bufsize
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, bufsize, TY_CHAR)
 
 	call fprintf (out, "    File %s:\n")
 	    call pargstr (mtfile)
@@ -319,7 +315,6 @@ procedure t_mtcopy()
 pointer	buf
 int	in, out, bufsize, acmode
 char	infile[SZ_FNAME], outfile[SZ_FNAME]
-size_t	sz_val
 int	mtopen(), fstati(), read(),  mtfile()
 
 begin
@@ -337,8 +332,7 @@ begin
 	out = mtopen (outfile, acmode, 0)
 
 	bufsize = fstati (in, F_BUFSIZE)
-	sz_val = bufsize
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, bufsize, TY_CHAR)
 
 	while (read (in, Memc[buf], bufsize) != EOF)
 	    call write (out, Memc[buf], fstati (in, F_NCHARS))

@@ -21,14 +21,12 @@ PIXEL	y[npts]				# Dependent variable
 PIXEL	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 pointer	xout, yout
 real	size
 
 begin
-	sz_val = npts
-	call malloc (xout, sz_val, TY_PIXEL)
-	call malloc (yout, sz_val, TY_PIXEL)
+	call malloc (xout, npts, TY_PIXEL)
+	call malloc (yout, npts, TY_PIXEL)
 	call icg_axes$t (ic, gt, cv, 1, x, y, Mem$t[xout], npts)
 	call icg_axes$t (ic, gt, cv, 2, x, y, Mem$t[yout], npts)
 	call icg_params$t (ic, cv, x, y, wts, npts, gt)
@@ -41,9 +39,8 @@ begin
  
 	if (npts != IC_NFIT(ic)) {
 	    if ((abs (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
-	        sz_val = IC_NFIT(ic)
-	        call realloc (xout, sz_val, TY_PIXEL)
-		call realloc (yout, sz_val, TY_PIXEL)
+	        call realloc (xout, IC_NFIT(ic), TY_PIXEL)
+		call realloc (yout, IC_NFIT(ic), TY_PIXEL)
 		call icg_axes$t (ic, gt, cv, 1, Mem$t[IC_XFIT(ic)],
 		    Mem$t[IC_YFIT(ic)], Mem$t[xout], IC_NFIT(ic))
 		call icg_axes$t (ic, gt, cv, 2, Mem$t[IC_XFIT(ic)],
@@ -78,18 +75,15 @@ PIXEL	y[npts]				# Abscissas
 PIXEL	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (xr1, sz_val, TY_REAL)
-	call salloc (yr1, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (xr1, 2, TY_REAL)
+	call salloc (yr1, 2, TY_REAL)
 	call acht$tr (x, Memr[xr], npts)
 	call acht$tr (y, Memr[yr], npts)
 
@@ -143,15 +137,13 @@ PIXEL	x[npts], y[npts]	# Data points
 int	npts			# Number of data points
 real	size			# Symbol size
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
 	call acht$tr (x, Memr[xr], npts)
 	call acht$tr (y, Memr[yr], npts)
 
@@ -191,7 +183,6 @@ pointer	gt			# GTOOL pointer
 pointer	cv			# CURFIT pointer
 int	npts			# Number of points to plot
 
-size_t	sz_val
 pointer	sp, xr, yr, x, y, xo, yo, gt1
 int	i
 PIXEL	dx
@@ -202,13 +193,12 @@ begin
 
 	call smark (sp)
 
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	call salloc (x, sz_val, TY_PIXEL)
-	call salloc (y, sz_val, TY_PIXEL)
-	call salloc (xo, sz_val, TY_PIXEL)
-	call salloc (yo, sz_val, TY_PIXEL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (x,  npts, TY_PIXEL)
+	call salloc (y,  npts, TY_PIXEL)
+	call salloc (xo, npts, TY_PIXEL)
+	call salloc (yo, npts, TY_PIXEL)
 
 	# Generate vector of independent variable values
 	dx = (IC_XMAX(ic) - IC_XMIN(ic)) / (npts - 1)

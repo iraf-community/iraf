@@ -11,7 +11,6 @@ int	nder		# order of derivative, order = 0, no derivative
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
 
-size_t	sz_val
 int	bptr, k, kk
 real	fac
 
@@ -32,14 +31,12 @@ begin
 	# Compute the polynomials.
 	bptr = 1
 	do k = 1, order {
-	    if (k == 1) {
+	    if (k == 1)
 		call amovkr (real(1.0), basis, npts)
-	    } else if (k == 2) {
-		sz_val = npts
-		call amovr (x, basis[bptr], sz_val)
-	    } else {
+	    else if (k == 2)
+		call amovr (x, basis[bptr], npts)
+	    else 
 		call amulr (basis[bptr-npts], x, basis[bptr], npts)
-	    }
 	    bptr = bptr + npts
 	}
 
@@ -73,7 +70,6 @@ int	nder		# order of derivative, order = 0, no derivative
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
 
-size_t	sz_val
 int	i, k
 pointer	fn, dfn, xnorm, bptr, fptr
 real	fac
@@ -86,24 +82,21 @@ begin
 	}
 
 	# Allocate working space for the basis functions and derivatives.
-	sz_val = npts * (order + nder)
-	call calloc (fn, sz_val, TY_REAL)
-	call calloc (dfn, sz_val, TY_REAL)
+	call calloc (fn, npts * (order + nder), TY_REAL)
+	call calloc (dfn, npts * (order + nder), TY_REAL)
 
 	# Compute the normalized x values.
-	sz_val = npts
-	call malloc (xnorm, sz_val, TY_REAL)
+	call malloc (xnorm, npts, TY_REAL)
         call altar (x, Memr[xnorm], npts, k1, k2)
 
 	# Compute the current solution.
         bptr = fn
         do k = 1, order + nder {
-	    if (k == 1) {
+	    if (k == 1)
 	        call amovkr (real(1.0), Memr[bptr], npts)
-	    } else if (k == 2) {
-	        sz_val = npts
-	        call amovr (Memr[xnorm], Memr[bptr], sz_val)
-	    } else {
+	    else if (k == 2)
+	        call amovr (Memr[xnorm], Memr[bptr], npts)
+	    else {
 	        call amulr (Memr[xnorm], Memr[bptr-npts], Memr[bptr], npts)
 	        call amulkr (Memr[bptr], real(2.0), Memr[bptr], npts)
 		call asubr (Memr[bptr], Memr[bptr-2*npts], Memr[bptr], npts)
@@ -141,15 +134,12 @@ begin
 	    }
 
 	    # Make the derivatives the old solution
-	    if (i < nder) {
-		sz_val = npts * (order + nder)
-		call amovr (Memr[dfn], Memr[fn], sz_val)
-	    }
+	    if (i < nder)
+		call amovr (Memr[dfn], Memr[fn], npts * (order + nder))
 	}
 
 	# Copy the solution into the basis functions.
-	sz_val = order * npts
-	call amovr (Memr[dfn+nder*npts], basis[1], sz_val)
+	call amovr (Memr[dfn+nder*npts], basis[1], order * npts)
 
 	call mfree (xnorm, TY_REAL)
 	call mfree (fn, TY_REAL)
@@ -169,7 +159,6 @@ int	nder		# order of derivate, 0 is no derivative
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# array of basis functions
 
-size_t	sz_val
 int	i, k
 pointer	fn, dfn, xnorm, bptr, fptr
 real	ri, ri1, ri2, fac
@@ -182,24 +171,21 @@ begin
 	}
 
 	# Allocate working space for the basis functions and derivatives.
-	sz_val = npts * (order + nder)
-	call calloc (fn, sz_val, TY_REAL)
-	call calloc (dfn, sz_val, TY_REAL)
+	call calloc (fn, npts * (order + nder), TY_REAL)
+	call calloc (dfn, npts * (order + nder), TY_REAL)
 
 	# Compute the normalized x values.
-	sz_val = npts
-	call malloc (xnorm, sz_val, TY_REAL)
+	call malloc (xnorm, npts, TY_REAL)
         call altar (x, Memr[xnorm], npts, k1, k2)
 
 	# Compute the basis functions.
 	bptr = fn
 	do k = 1, order + nder {
-	    if (k == 1) {
+	    if (k == 1)
 		call amovkr (real(1.0), Memr[bptr], npts)
-	    } else if (k == 2) {
-		sz_val = npts
-		call amovr (Memr[xnorm], Memr[bptr], sz_val)
-	    } else {
+	    else if (k == 2)
+		call amovr (Memr[xnorm], Memr[bptr], npts)
+	    else {
 		ri = k
 		ri1 = (real(2.0) * ri - real(3.0)) / (ri - real(1.0))
 		ri2 = - (ri - real(2.0)) / (ri - real(1.0))
@@ -242,15 +228,12 @@ begin
 	    }
 
 	    # Make the derivatives the old solution
-	    if (i < nder) {
-		sz_val = npts * (order + nder)
-		call amovr (Memr[dfn], Memr[fn], sz_val)
-	    }
+	    if (i < nder)
+		call amovr (Memr[dfn], Memr[fn], npts * (order + nder))
 	}
 
 	# Copy the solution into the basis functions.
-	sz_val = order * npts
-	call amovr (Memr[dfn+nder*npts], basis[1], sz_val)
+	call amovr (Memr[dfn+nder*npts], basis[1], order * npts)
 
 	call mfree (xnorm, TY_REAL)
 	call mfree (fn, TY_REAL)

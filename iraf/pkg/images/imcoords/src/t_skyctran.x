@@ -9,7 +9,6 @@ int	ilngunits, ilatunits, olngunits, olatunits, min_sigdigits, optype
 int	instat, outstat, nilng, nilat, plngcolumn, platcolumn, pxcolumn
 int	rvcolumn
 double	ilngmin, ilngmax, ilatmin, ilatmax
-size_t	sz_val
 int	fstati()
 pointer	sp, inname, outname, insystem, outsystem, olngformat, olatformat
 pointer	inlist, outlist
@@ -24,16 +23,15 @@ errchk	clgwrd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (inname, sz_val, TY_CHAR)
-	call salloc (outname, sz_val, TY_CHAR)
-	call salloc (insystem, sz_val, TY_CHAR)
-	call salloc (outsystem, sz_val, TY_CHAR)
-	call salloc (ilngformat, sz_val, TY_CHAR)
-	call salloc (ilatformat, sz_val, TY_CHAR)
-	call salloc (olngformat, sz_val, TY_CHAR)
-	call salloc (olatformat, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (inname, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (outsystem, SZ_FNAME, TY_CHAR)
+	call salloc (ilngformat, SZ_FNAME, TY_CHAR)
+	call salloc (ilatformat, SZ_FNAME, TY_CHAR)
+	call salloc (olngformat, SZ_FNAME, TY_CHAR)
+	call salloc (olatformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Open the input and output file lists.
 	inlist = clpopnu ("input")

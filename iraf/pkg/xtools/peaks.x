@@ -17,7 +17,6 @@ real	background[npts]	# Background estimate
 int	npts			# Number of input data points
 real	dx			# Precision of peak positions
 
-size_t	sz_val
 int	i, j, k, npeaks, nextrema
 pointer	sp, a, b, c
 
@@ -32,10 +31,9 @@ begin
 
 	# Allocate working storage
 	call smark (sp)
-	sz_val = nextrema
-	call salloc (a, sz_val, TY_REAL)
-	call salloc (b, sz_val, TY_REAL)
-	call salloc (c, sz_val, TY_REAL)
+	call salloc (a, nextrema, TY_REAL)
+	call salloc (b, nextrema, TY_REAL)
+	call salloc (c, nextrema, TY_REAL)
 
 	npeaks = 0
 	do i = 1, nextrema {
@@ -63,10 +61,9 @@ begin
 	    }
 	}
 
-	sz_val = npeaks
-	call amovr (Memr[a], x, sz_val)
-	call amovr (Memr[b], y, sz_val)
-	call amovr (Memr[c], background, sz_val)
+	call amovr (Memr[a], x, npeaks)
+	call amovr (Memr[b], y, npeaks)
+	call amovr (Memr[c], background, npeaks)
 
 	call sfree (sp)
 	return (npeaks)

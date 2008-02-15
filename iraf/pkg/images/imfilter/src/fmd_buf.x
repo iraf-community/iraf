@@ -17,7 +17,6 @@ real	a1, a2		#I limits of input image line
 real	b1, b2		#I limits of output image line
 
 
-size_t	sz_val
 int	i
 int	ncols, nlines, llast1, llast2, nllast, nclast
 pointer	bufr, bufi, buf1, buf2
@@ -35,13 +34,11 @@ begin
 	# buffer image read.
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_INT)
+	    call malloc (buf, ncols * nlines, TY_INT)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    sz_val = ncols * nlines
-	    call realloc (buf, sz_val, TY_INT)
+	    call realloc (buf, ncols * nlines, TY_INT)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	}

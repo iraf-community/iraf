@@ -14,7 +14,6 @@ long	vs[ARB]			#I ll vector (only first two elements used)
 long	ve[ARB]			#I ur vector (only first two elements used)
 int	outfd			#I output file
 
-size_t	sz_val
 pointer	sp, pv, cv
 int	npix, ch, i
 long	v[PL_MAXDIM]
@@ -25,13 +24,11 @@ begin
 	npix = ve[1] - vs[1] + 1
 
 	call smark (sp)
-	sz_val = npix
-	call salloc (pv, sz_val, TY_INT)
-	call salloc (cv, sz_val, TY_CHAR)
+	call salloc (pv, npix, TY_INT)
+	call salloc (cv, npix, TY_CHAR)
 
 	# Output mask.
-	sz_val = PL_MAXDIM
-	call amovl (vs, v, sz_val)
+	call amovl (vs, v, PL_MAXDIM)
 	v[2] = ve[2]
 
 	while (v[2] >= vs[2]) {

@@ -189,7 +189,6 @@ int	nxpix, nypix		# size of the coefficient array
 int	nsinc			# the sinc truncation length
 real	mindx, mindy		# the precision of the sinc interpolant
 
-size_t	sz_val
 double	sumx, normx[3], normy[3], norm[3,3], sum[3,3]
 int	i, j, k, jj, kk, xc, yc, nconv, index
 int	minj, maxj, offj, mink, maxk, offk, last_point
@@ -230,9 +229,8 @@ begin
 	# Allocate some working space.
 	nconv = 2 * nsinc + 1
 	call smark (sp)
-	sz_val = 3 * nconv
-	call salloc (ac, sz_val, TY_REAL)
-	call salloc (ar, sz_val, TY_REAL)
+	call salloc (ac, 3 * nconv, TY_REAL)
+	call salloc (ar, 3 * nconv, TY_REAL)
 	call aclrr (Memr[ac], 3 * nconv)
 	call aclrr (Memr[ar], 3 * nconv)
 

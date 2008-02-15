@@ -18,7 +18,6 @@ pointer	geo			#I pointer to geotran structure
 pointer	sx1, sy1		#I pointers to linear surface descriptors
 pointer	sx2, sy2		#I pointer to higher order surface descriptors
 
-size_t	sz_val
 int	nincr
 pointer	sp, xref, yref, msi
 real	shift
@@ -44,10 +43,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = GT_NCOLS(geo)
-	call salloc (xref, sz_val, TY_REAL)
-	sz_val = GT_NLINES(geo)
-	call salloc (yref, sz_val, TY_REAL)
+	call salloc (xref, GT_NCOLS(geo), TY_REAL)
+	call salloc (yref, GT_NLINES(geo), TY_REAL)
 
 	# Calculate the reference coordinates of the input image pixels.
 	call geo_ref (geo, Memr[xref], 1, GT_NCOLS(geo), GT_NCOLS(geo),
@@ -84,7 +81,6 @@ pointer	geo			#I pointer to geotran structure
 pointer	sx1, sy1		#I pointer to linear surface descriptors
 pointer	sx2, sy2		#I pointer to higher order surface descriptors
 
-size_t	sz_val
 int	nxsample, nysample, nincr
 pointer	sp, xsample, ysample, xinterp, yinterp
 pointer	xmsi, ymsi, jmsi, msi, xbuf, ybuf, jbuf
@@ -94,14 +90,10 @@ real	gsgetr()
 begin
 	# Allocate working space and intialize the interpolant.
 	call smark (sp)
-	sz_val = GT_NCOLS(geo)
-	call salloc (xsample, sz_val, TY_REAL)
-	sz_val = GT_NLINES(geo)
-	call salloc (ysample, sz_val, TY_REAL)
-	sz_val = GT_NCOLS(geo)
-	call salloc (xinterp, sz_val, TY_REAL)
-	sz_val = GT_NLINES(geo)
-	call salloc (yinterp, sz_val, TY_REAL)
+	call salloc (xsample, GT_NCOLS(geo), TY_REAL)
+	call salloc (ysample, GT_NLINES(geo), TY_REAL)
+	call salloc (xinterp, GT_NCOLS(geo), TY_REAL)
+	call salloc (yinterp, GT_NLINES(geo), TY_REAL)
 
 	# Set up sampling size.
 	if (GT_NCOLS(geo) == 1)

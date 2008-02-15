@@ -18,27 +18,23 @@ int	len_index		# number of hash threads in index
 int	len_stab		# initial length of STAB
 int	sz_sbuf			# initial size of string buffer
 
-size_t	sz_val
 pointer	stp
 int	stpstr()
 
 begin
 	# Allocate symtab descriptor.
-	sz_val = LEN_SYMTAB
-	call calloc (stp, sz_val, TY_STRUCT)
+	call calloc (stp, LEN_SYMTAB, TY_STRUCT)
 	ST_MAGIC(stp) = MAGIC
 
 	# Allocate index.
-	sz_val = len_index
-	call calloc (ST_INDEX(stp), sz_val, TY_INT)
+	call calloc (ST_INDEX(stp), len_index, TY_INT)
 	ST_INDEXLEN(stp) = len_index
 
 	# Allocate string buffer.  The first char of storage, at offset 0,
 	# is set to EOS so that offset 0 may be used to reference the null
 	# string.
 
-	sz_val = sz_sbuf
-	call malloc (ST_SBUFP(stp), sz_val, TY_CHAR)
+	call malloc (ST_SBUFP(stp), sz_sbuf, TY_CHAR)
 	ST_SBUFINC(stp) = max (1, nint (sz_sbuf * INC_START))
 	ST_SBUFLEN(stp) = sz_sbuf
 	ST_SBUFOP(stp)  = 1
@@ -49,8 +45,7 @@ begin
 	# to 1 rather than 0 since 0 as an STAB offset is used to mark the end
 	# of a list.
 
-	sz_val = len_stab
-	call malloc (ST_STABP(stp), sz_val, TY_STRUCT)
+	call malloc (ST_STABP(stp), len_stab, TY_STRUCT)
 	ST_STABINC(stp) = max (1, nint (len_stab * INC_START))
 	ST_STABLEN(stp) = len_stab
 	ST_STABOP(stp)  = 1

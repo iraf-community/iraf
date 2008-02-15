@@ -28,7 +28,6 @@ int	len_name		# length of an object name
 int	wtflag			# type of weighting
 int	stat			# Error code (output)
 
-size_t	sz_val
 int	i, wcs, key, gkey, newgraph
 int	xtype, xvar, ytype, yvar, xt, xv, yt, yv
 PIXEL	fit
@@ -41,22 +40,19 @@ PIXEL	nleval$t()
 begin
 	# Allocate string space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Allocate and initialize a copy of the weights. A new copy
 	# of the weights is used because it is necessary to have the
 	# original values to restore them back when the user deletes
 	# and undeletes points.
 
-	sz_val = npts
-	call salloc (oldwts, sz_val, TY_PIXEL)
+	call salloc (oldwts, npts, TY_PIXEL)
 	call amov$t (wts, Mem$t[oldwts], npts)
 
 	# Allocate space for help page and prompt, and get them.
-	sz_val = SZ_LINE
-	call salloc (help, sz_val, TY_CHAR)
-	call salloc (prompt, sz_val, TY_CHAR)
+	call salloc (help, SZ_LINE, TY_CHAR)
+	call salloc (prompt, SZ_LINE, TY_CHAR)
 	call in_gstr (in, INLHELP, Memc[help], SZ_LINE)
 	call in_gstr (in, INLPROMPT, Memc[prompt], SZ_LINE)
 

@@ -13,8 +13,6 @@ pointer	im			# IRAF image descriptor
 pointer	fits			# FITS data structure
 int	fits_fd			# FITS file descriptor
 
-long	lg_val
-size_t	sz_val
 int	npix, nlines, npix_record, i, stat, nrecords
 long	v[IM_MAXDIM]
 pointer	tempbuf, buf
@@ -41,15 +39,12 @@ begin
 	    nlines = nlines * NAXISN(im, i)
 	npix_record = len_record * FITS_BYTE / abs (FITS_BITPIX(fits))
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	switch (FITS_BITPIX(fits)) {
 	case FITS_REAL:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_REAL)
+	    call malloc (tempbuf, npix, TY_REAL)
 
 	    # Initialize the pixel write.
 	    call wft_init_write_pixels (npix_record, TY_REAL,
@@ -84,8 +79,7 @@ begin
 	case FITS_DOUBLE:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_DOUBLE)
+	    call malloc (tempbuf, npix, TY_DOUBLE)
 
 	    # Initialize the pixel write.
 	    call wft_init_write_pixels (npix_record, TY_DOUBLE,
@@ -121,8 +115,7 @@ begin
 	default:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_LONG)
+	    call malloc (tempbuf, npix, TY_LONG)
 
 	    # Scale the line, deal with the blanks, and write the output
 	    # record. At the moement blanks are not dealt with.
@@ -201,7 +194,6 @@ int	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
-size_t	sz_val
 errchk	achtlr, altadr, amovr, achtdr, acthxr
 
 begin
@@ -210,8 +202,7 @@ begin
 	    call achtlr (Meml[buf], outbuffer, npix)
 	    call altadr (outbuffer, outbuffer, npix, bzero, bscale)
 	case TY_REAL:
-	    sz_val = npix
-	    call amovr (Memr[buf], outbuffer, sz_val)
+	    call amovr (Memr[buf], outbuffer, npix)
 	    call altadr (outbuffer, outbuffer, npix, bzero, bscale)
 	case TY_DOUBLE:
 	    call achtdr (Memd[buf], outbuffer, npix)
@@ -297,7 +288,6 @@ real	outbuffer[ARB]		# buffer of FITS integers
 int	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
-size_t	sz_val
 errchk	achtlr, achtdr, amovr, achtxr
 
 begin
@@ -305,8 +295,7 @@ begin
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
 	    call achtlr (Meml[buf], outbuffer, npix)
 	case TY_REAL:
-	    sz_val = npix
-	    call amovr (Memr[buf], outbuffer, sz_val)
+	    call amovr (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:
 	    call achtdr (Memd[buf], outbuffer, npix)
 	case TY_COMPLEX:
@@ -355,14 +344,12 @@ long	outbuffer[ARB]		# buffer of FITS integers
 int	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
-size_t	sz_val
 errchk	amovl, achtrl, achtdl, achtxl
 
 begin
 	switch (datatype) {
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
-	    sz_val = npix
-	    call amovl (Meml[buf], outbuffer, sz_val)
+	    call amovl (Meml[buf], outbuffer, npix)
 	case TY_REAL:
 	    call achtrl (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:

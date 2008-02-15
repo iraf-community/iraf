@@ -11,15 +11,11 @@ pointer	im			#I image descriptor
 int	lineno			#I line number
 int	bandno			#I band number
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM]
 bool	pm_linenotempty()
 
 begin
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (1, v, IM_MAXDIM)
 	v[2] = lineno
 	v[3] = bandno
 

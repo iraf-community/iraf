@@ -12,7 +12,6 @@ int	nx, ny		#I the dimensions of the input subraster
 int	pnx, pny	#I the size of the data region
 pointer	ptr		#I the pointer to the output buffer
 	
-size_t	sz_val
 int	j, nborder, wxborder, wyborder, index
 
 begin
@@ -22,35 +21,28 @@ begin
 	    ptr = NULL
 	    return (0)
 	} else if (nborder >= nx * ny) {
-	    sz_val = nx * ny
-	    call malloc (ptr, sz_val, TY_REAL)
-	    sz_val = nx * ny
-	    call amovr (buf, Memr[ptr], sz_val)
+	    call malloc (ptr, nx * ny, TY_REAL)
+	    call amovr (buf, Memr[ptr], nx * ny)
 	    return (nx * ny)
 	} else
-	    sz_val = nborder
-	    call malloc (ptr, sz_val, TY_REAL)
+	    call malloc (ptr, nborder, TY_REAL)
 
 	# Fill the array.
 	wxborder = (nx - pnx) / 2
 	wyborder = (ny - pny) / 2
 	index = ptr
 	do j = 1, wyborder {
-	    sz_val = nx
-	    call amovr (buf[1,j], Memr[index], sz_val)
+	    call amovr (buf[1,j], Memr[index], nx)
 	    index = index + nx
 	}
 	do j = wyborder + 1, ny - wyborder {
-	    sz_val = wxborder
-	    call amovr (buf[1,j], Memr[index], sz_val) 
+	    call amovr (buf[1,j], Memr[index], wxborder) 
 	    index = index + wxborder
-	    sz_val = wxborder
-	    call amovr (buf[nx-wxborder+1,j], Memr[index], sz_val)
+	    call amovr (buf[nx-wxborder+1,j], Memr[index], wxborder)
 	    index = index + wxborder
 	}
 	do j = ny - wyborder + 1, ny {
-	    sz_val = nx
-	    call amovr (buf[1,j], Memr[index], sz_val)
+	    call amovr (buf[1,j], Memr[index], nx)
 	    index = index + nx
 	}
 
@@ -225,7 +217,6 @@ int	npts		#I the number of data points
 real	median		#O the median of the data
 real	lcut, hcut	#I the good data limits
 
-size_t	sz_val
 int	i, ngpts, lindex, hindex
 pointer	sp, sdata
 real	mean, sigma, dif, lo, hi
@@ -239,8 +230,7 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = npts
-	call salloc (sdata, sz_val, TY_REAL)
+	call salloc (sdata, npts, TY_REAL)
 	call asrtr (data, Memr[sdata], npts)
 	if (mod (npts, 2) == 0)
 	    median = (Memr[sdata+(1+npts)/2-1] + Memr[sdata+(1+npts)/2]) / 2.0
@@ -305,7 +295,6 @@ int	nx, ny			#I dimensions of the original data
 int	wxborder, wyborder	#I the x and y width of the border
 real	loreject, hireject	#I the rejection criteria
 
-size_t	sz_val
 int	i, stat, ier
 pointer	sp, x, y, w, zfit
 real	lcut, hcut, sigma
@@ -315,11 +304,10 @@ real	rg_sigma(), rg_bsigma()
 begin
 	# Initialize.
 	call smark (sp)
-	sz_val = nx
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (w, sz_val, TY_REAL)
-	call salloc (zfit, sz_val, TY_REAL)
+	call salloc (x, nx, TY_REAL)
+	call salloc (y, nx, TY_REAL)
+	call salloc (w, nx, TY_REAL)
+	call salloc (zfit, nx, TY_REAL)
 	do i = 1, nx
 	    Memr[x+i-1] = i
 	call amovkr (1.0, Memr[w], nx)

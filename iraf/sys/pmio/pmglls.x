@@ -16,7 +16,6 @@ int	ll_depth		#I line list depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-size_t	sz_val
 int	ll_len, temp, np, step, xstep
 pointer	sp, px_src, ll_src, ll_out, im
 int	pl_p2li()
@@ -30,12 +29,10 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = LL_MAXLEN(pl)
-	call salloc (ll_src, sz_val, TY_SHORT)
+	call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
 	# Determine physical coords of line segment.
-	sz_val = PM_MAXDIM
-	call amovl (v, v3, sz_val)
+	call amovl (v, v3, PM_MAXDIM)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -53,8 +50,7 @@ begin
 
 	# Extract the pixels.
 	np = (npix - 1) * step + 1
-	sz_val = np
-	call salloc (px_src, sz_val, TY_INT)
+	call salloc (px_src, np, TY_INT)
 	call pl_glpi (pl, v1, Memi[px_src], 0, np, PIX_SRC)
 
 	# Subsample and flip if necessary.
@@ -71,8 +67,7 @@ begin
 	    ll_len = LP_LEN(ll_src)
 	    call amovs (Mems[ll_src], ll_dst, ll_len)
 	} else {
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_out, sz_val, TY_SHORT)
+	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	    call pl_linerop (Mems[ll_src], 1, PL_MAXVAL(pl), ll_dst, 1,
 		MV(ll_depth), Mems[ll_out], npix, rop)
 	    ll_len = LP_LEN(ll_out)

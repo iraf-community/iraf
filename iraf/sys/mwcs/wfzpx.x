@@ -64,7 +64,6 @@ procedure wf_zpx_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
-size_t	sz_val
 int	i, j, np, szatstr
 double	dec, zd1, d1, zd2, d2, zd, d, r, tol
 pointer	sp, atname, atvalue, ct, mw, wp, wv
@@ -76,10 +75,8 @@ errchk	wf_decaxis(), mw_gwattrs()
 begin
 	# Allocate space for the attribute string.
 	call smark (sp)
-	sz_val = SZ_ATNAME
-	call salloc (atname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (atvalue, sz_val, TY_CHAR)
+	call salloc (atname, SZ_ATNAME, TY_CHAR)
+	call salloc (atvalue, SZ_LINE, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)
@@ -174,8 +171,7 @@ begin
                 if (strlen (Memc[atvalue]) < szatstr)
                     break
                 szatstr = szatstr + SZ_LINE
-                sz_val = szatstr
-                call realloc (atvalue, sz_val, TY_CHAR)
+                call realloc (atvalue, szatstr, TY_CHAR)
 
             }
         } then {
@@ -195,8 +191,7 @@ begin
                 if (strlen (Memc[atvalue]) < szatstr)
                     break
                 szatstr = szatstr + SZ_LINE
-                sz_val = szatstr
-                call realloc (atvalue, sz_val, TY_CHAR)
+                call realloc (atvalue, szatstr, TY_CHAR)
             }
         } then {
             FC_LATCOR(fc) = NULL

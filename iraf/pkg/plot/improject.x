@@ -13,8 +13,6 @@ real	pv[npix]		# receives the projection vector
 int	npix			# length of projection vector
 int	axis			# the axis to be projected to (x=1)
 
-size_t	sz_val
-long	lg_val
 int	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
@@ -29,9 +27,7 @@ begin
 	    call error (2, "Attempt to take projection over nonexistent axis")
 
 	call aclrr (pv, npix)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 
 	switch (axis) {
 	case 1:

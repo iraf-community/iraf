@@ -13,7 +13,6 @@ procedure mtallocate (mtname)
 
 char	mtname[ARB]			#I device name
 
-size_t	sz_val
 int	fd, junk
 pointer	sp, lockfile, mtowner, userid, timestr, device
 errchk	open, mtparse
@@ -22,13 +21,11 @@ int	open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (lockfile, sz_val, TY_CHAR)
-	call salloc (mtowner, sz_val, TY_CHAR)
-	call salloc (userid, sz_val, TY_CHAR)
-	sz_val = SZ_TIME
-	call salloc (timestr, sz_val, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (lockfile, SZ_FNAME, TY_CHAR)
+	call salloc (mtowner, SZ_FNAME, TY_CHAR)
+	call salloc (userid, SZ_FNAME, TY_CHAR)
+	call salloc (timestr, SZ_TIME, TY_CHAR)
 
 	# Get name of lockfile used by the given device.
 	call mtparse (mtname, Memc[device], SZ_FNAME, junk, junk, junk, 0)

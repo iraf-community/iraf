@@ -14,7 +14,6 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 
-size_t	sz_val
 int	col1, col2, ncols, line, line1, line2, nlines
 pointer	inbuf, outbuf, hst
 real	rval
@@ -30,8 +29,7 @@ begin
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the histogram and zero.
-	sz_val = FMOD_HMAX(fmd) - FMOD_HMIN(fmd) + 1
-	call calloc (hst, sz_val, TY_INT)
+	call calloc (hst, FMOD_HMAX(fmd) - FMOD_HMIN(fmd) + 1, TY_INT)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -120,7 +118,6 @@ int	hist[nbins]		#U histogram
 int	nbins			#I number of histogram bins
 int	line			#I line number
 
-size_t	sz_val
 int	i, j, xbox, ybox, hmin, hmax, hlo, hhi, nhlo, nhhi, index
 int	median, nmedian, nltmedian, nzero
 pointer	sp, filter
@@ -139,8 +136,7 @@ begin
 	if (line == 1)  {
 
 	    call smark (sp)
-	    sz_val = xbox * ybox
-	    call salloc (filter, sz_val, TY_INT)
+	    call salloc (filter, xbox * ybox, TY_INT)
 
 	    # Load filter.
 	    index = 0

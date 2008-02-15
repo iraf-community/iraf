@@ -12,7 +12,6 @@ procedure fmio_readheader (fm)
 
 pointer	fm			#I FMIO descriptor
 
-size_t	sz_val
 pointer	sp, buf, dh, pti, pt, ft, ip, op
 int	offset, buflen, npti, p1, p2, d1, d2, b_off1, b_off2, i
 int	status, chan, nbytes, nwords, maxpages, szbpage
@@ -21,15 +20,13 @@ long	clktime()
 
 begin
 	call smark (sp)
-	sz_val = LEN_DHSTRUCT
-	call salloc (dh, sz_val, TY_STRUCT)
+	call salloc (dh, LEN_DHSTRUCT, TY_STRUCT)
 
 	chan = FM_CHAN(fm)
 
 	# Make a guess at the size of buffer needed to hold the header.
 	buflen = DEF_DFHDRLEN
-	sz_val = buflen
-	call malloc (buf, sz_val, TY_STRUCT)
+	call malloc (buf, buflen, TY_STRUCT)
 
 	# Read the full datafile header area into BUF.
 	repeat {
@@ -48,8 +45,7 @@ begin
 	    # Repeat if the full header was not read.
 	    if (DH_DATASTART(dh)-1 > nbytes) {
 		buflen = DH_DATASTART(dh)-1 / (SZ_STRUCT * SZB_CHAR)
-		sz_val = buflen
-		call realloc (buf, sz_val, TY_STRUCT)
+		call realloc (buf, buflen, TY_STRUCT)
 	    } else if (status < DH_DATASTART(dh)-1) {
 		call syserrs (SYS_FMTRUNC, FM_DFNAME(fm))
 	    } else
@@ -75,8 +71,7 @@ begin
 	    call syserrs (SYS_FMBLKCHSZ, FM_DFNAME(fm))
 
 	# Initialize the file table.
-	sz_val = (FM_NLFILES(fm) + 1) * LEN_FTE
-	call calloc (ft, sz_val, TY_STRUCT)
+	call calloc (ft, (FM_NLFILES(fm) + 1) * LEN_FTE, TY_STRUCT)
 	FM_FTOFF(fm)		= DH_FTOFF(dh)
 	FM_FTLASTNF(fm)		= DH_FTLASTNF(dh)
 	FM_FTABLE(fm)		= ft
@@ -98,8 +93,7 @@ begin
 	FM_PTINPTI(fm)		= DH_PTINPTI(dh)
 
 	ip = buf + FM_PTIOFF(fm) - 1
-	sz_val = FM_PTILEN(fm)
-	call malloc (pti, sz_val, TY_INT)
+	call malloc (pti, FM_PTILEN(fm), TY_INT)
 	call miiupk32 (Memi[ip], Memi[pti], FM_PTILEN(fm), TY_INT)
 	FM_PTINDEX(fm)		= pti
 
@@ -108,8 +102,7 @@ begin
 	FM_PTNPTE(fm)		= DH_PTNPTE(dh)
 	FM_PTLUPTE(fm)		= DH_PTNPTE(dh)
 
-	sz_val = FM_PTLEN(fm)
-	call malloc (pt, sz_val, TY_SHORT)
+	call malloc (pt, FM_PTLEN(fm), TY_SHORT)
 	FM_PTABLE(fm)		= pt
 
 	maxpages = FM_MAXBUFSIZE(fm) / FM_SZBPAGE(fm)

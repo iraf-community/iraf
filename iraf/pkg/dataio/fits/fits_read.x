@@ -18,7 +18,6 @@ char	iraffile[ARB]		# root IRAF file name
 pointer	pl			# pointer to the file/extensions list
 int	file_number		# the current file number
 
-size_t	sz_val
 bool	strne()
 int	fits_fd, stat, min_lenuserarea, ip, len_elist, oshort_header
 int	olong_header, ext_count, ext_number, max_extensions, naxes
@@ -40,14 +39,12 @@ begin
 	# Allocate memory for the FITS data structure and initialize the file
 	# dependent  components of that structure.
 	call smark (sp)
-	sz_val = LEN_FITS
-	call salloc (fits, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (himname, sz_val, TY_CHAR)
-	call salloc (gimname, sz_val, TY_CHAR)
-	call salloc (gfname, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (fits, LEN_FITS, TY_STRUCT)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (himname, SZ_FNAME, TY_CHAR)
+	call salloc (gimname, SZ_FNAME, TY_CHAR)
+	call salloc (gfname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Initialize.
 	SIMPLE(fits) = NO
@@ -72,12 +69,10 @@ begin
 
 	# Get the extensions list for a given line and count the number of
 	# extensions files.
-	sz_val = 2
-	call salloc (axes, sz_val, TY_INT)
+	call salloc (axes, 2, TY_INT)
 	call pl_gsize (pl, naxes, Memi[axes], stat)
 	max_extensions = Memi[axes+1]
-	sz_val = max_extensions
-	call salloc (extensions, sz_val, TY_INT)
+	call salloc (extensions, max_extensions, TY_INT)
 	Memi[axes] = 1
 	Memi[axes+1] = file_number
 	call pl_glpi (pl, Memi[axes], Memi[extensions], 1, max_extensions,
@@ -376,7 +371,6 @@ procedure rft_find_eof (fd)
 
 int	fd			# the FITS file descriptor
 
-size_t	sz_val
 int	szbuf
 pointer	sp, buf
 int	fstati(), read()
@@ -386,8 +380,7 @@ begin
 	# Scan through the file.
 	szbuf = fstati (fd, F_BUFSIZE)
 	call smark (sp)
-	sz_val = szbuf
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, szbuf, TY_CHAR)
 	while (read (fd, Memc[buf], szbuf) != EOF)
 	    ;
 	call sfree (sp)
@@ -442,7 +435,6 @@ int	fits_fd			# fits file descriptor
 pointer	fits			# pointer to the fits structure
 pointer	im			# pointer to the output image
 
-size_t	sz_val
 int	i, nbits, nblocks, sz_rec, blksize, stat
 pointer	buf
 int	fstati(), rft_getbuf()
@@ -457,8 +449,7 @@ begin
 	nblocks = int ((nbits + 23039) / 23040)
 
 	sz_rec = FITS_RECORD / SZB_CHAR
-	sz_val = sz_rec
-	call malloc (buf, sz_val, TY_CHAR)
+	call malloc (buf, sz_rec, TY_CHAR)
 	blksize = fstati (fits_fd, F_SZBBLK)
         if (mod (blksize, FITS_RECORD) == 0)
             blksize = blksize / FITS_RECORD

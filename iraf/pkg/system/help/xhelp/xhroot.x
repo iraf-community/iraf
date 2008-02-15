@@ -12,7 +12,6 @@ procedure xh_root_pkg (xh)
 
 pointer	xh				#i struct pointer.
 
-size_t	sz_val
 pointer sp, fname, buf, ip, op, lp, list
 
 int     xh_pkglist()
@@ -22,9 +21,8 @@ bool    strne()
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (fname, sz_val, TY_CHAR)
-        call salloc (buf, sz_val, TY_CHAR)
+        call salloc (fname, SZ_FNAME, TY_CHAR)
+        call salloc (buf, SZ_FNAME, TY_CHAR)
 
         # Set initial packages and help databases.  This consists of the
         # system documentation (in sys$sys.hd), the contents of the

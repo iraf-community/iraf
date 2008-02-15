@@ -24,7 +24,6 @@ double	ltm[ndim,ndim]		#I linear transformation matrix
 double	ltv_2[ndim]		#I output translation vector
 int	ndim			#I dimensionality of transform
 
-size_t	sz_val
 double	v
 pointer	sp, o_ltm, o_ltv, n_ltm, n_ltv, ltv
 int	pdim, nelem, axis[MAX_DIM], i, j
@@ -36,16 +35,11 @@ begin
 	nelem = pdim * pdim
 
 	call smark (sp)
-	sz_val = ndim
-	call salloc (ltv, sz_val, TY_DOUBLE)
-	sz_val = nelem
-	call salloc (o_ltm, sz_val, TY_DOUBLE)
-	sz_val = pdim
-	call salloc (o_ltv, sz_val, TY_DOUBLE)
-	sz_val = nelem
-	call salloc (n_ltm, sz_val, TY_DOUBLE)
-	sz_val = pdim
-	call salloc (n_ltv, sz_val, TY_DOUBLE)
+	call salloc (ltv, ndim, TY_DOUBLE)
+	call salloc (o_ltm, nelem, TY_DOUBLE)
+	call salloc (o_ltv, pdim, TY_DOUBLE)
+	call salloc (n_ltm, nelem, TY_DOUBLE)
+	call salloc (n_ltv, pdim, TY_DOUBLE)
 
 	# Combine the input and output translation vectors.
 	do j = 1, ndim {

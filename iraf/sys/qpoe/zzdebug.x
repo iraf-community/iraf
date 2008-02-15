@@ -270,16 +270,13 @@ end
 procedure t_expand()
 
 pointer	qp, sp, ip, text, obuf
-size_t	sz_val
 int	getline(), qp_expandtext(), strncmp(), clgeti()
 pointer	qp_open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (text, sz_val, TY_CHAR)
-	sz_val = SZ_OBUF
-	call salloc (obuf, sz_val, TY_CHAR)
+	call salloc (text, SZ_LINE, TY_CHAR)
+	call salloc (obuf, SZ_OBUF, TY_CHAR)
 
 	call clgstr ("poefile", Memc[text], SZ_LINE)
 	qp = qp_open (Memc[text], READ_ONLY, 0)
@@ -314,16 +311,13 @@ procedure t_recio()
 
 int	i, n, nrec
 pointer	sp, qp, rp, poefile, data
-size_t	sz_val
 int	qp_read(), qp_accessf(), clgeti()
 pointer	qp_open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (poefile, sz_val, TY_CHAR)
-	sz_val = 4096 * 3
-	call salloc (data, sz_val, TY_STRUCT)
+	call salloc (poefile, SZ_FNAME, TY_CHAR)
+	call salloc (data, 4096 * 3, TY_STRUCT)
 
 	call clgstr ("poefile", Memc[poefile], SZ_FNAME)
 	qp = qp_open (Memc[poefile], READ_WRITE, 0)
@@ -767,7 +761,6 @@ procedure t_mkpoe()
 char	infile[SZ_FNAME]		# input CFA-format poefile
 char	outfile[SZ_FNAME]		# output QPOE-format poefile
 
-size_t	sz_val
 char	key[SZ_KEY]
 pointer	sp, hdr, obuf, optr, ph, ev, qp, io
 int	datastart, dataend, mission, instrument, now
@@ -781,14 +774,10 @@ long	clktime()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FILEHEADER
-	call salloc (hdr, sz_val, TY_CHAR)
-	sz_val = LEN_EVBUF * SZ_OEVENT / SZ_SHORT
-	call salloc (obuf, sz_val, TY_SHORT)
-	sz_val = LEN_EVBUF
-	call salloc (optr, sz_val, TY_POINTER)
-	sz_val = SZ_IEVENT
-	call salloc (ph, sz_val, TY_CHAR)
+	call salloc (hdr, SZ_FILEHEADER, TY_CHAR)
+	call salloc (obuf, LEN_EVBUF * SZ_OEVENT / SZ_SHORT, TY_SHORT)
+	call salloc (optr, LEN_EVBUF, TY_POINTER)
+	call salloc (ph, SZ_IEVENT, TY_CHAR)
 
 	call clgstr ("infile", infile, SZ_FNAME)
 	call clgstr ("outfile", outfile, SZ_FNAME)
@@ -1008,7 +997,6 @@ procedure t_testpoe()
 
 char	outfile[SZ_FNAME]		# output QPOE-format poefile
 
-size_t	sz_val
 pointer	sp, ev, qp, io, evl[1]
 int	nevents, naxes, axlen[2], i, datatype
 pointer	qp_open(), qpio_open()
@@ -1037,20 +1025,16 @@ begin
 	call smark (sp)
 	switch (datatype) {
 	case 's':
-	    sz_val = S_SZ_EVENT / SZ_SHORT
-	    call salloc (ev, sz_val, TY_SHORT)
+	    call salloc (ev, S_SZ_EVENT / SZ_SHORT, TY_SHORT)
 	    call qp_addf (qp, EVTYPE, S_FIELDLIST, 1, "event record type", 0)
 	case 'i':
-	    sz_val = I_SZ_EVENT / SZ_SHORT
-	    call salloc (ev, sz_val, TY_SHORT)
+	    call salloc (ev, I_SZ_EVENT / SZ_SHORT, TY_SHORT)
 	    call qp_addf (qp, EVTYPE, I_FIELDLIST, 1, "event record type", 0)
 	case 'r':
-	    sz_val = R_SZ_EVENT / SZ_SHORT
-	    call salloc (ev, sz_val, TY_SHORT)
+	    call salloc (ev, R_SZ_EVENT / SZ_SHORT, TY_SHORT)
 	    call qp_addf (qp, EVTYPE, R_FIELDLIST, 1, "event record type", 0)
 	case 'd':
-	    sz_val = D_SZ_EVENT / SZ_SHORT
-	    call salloc (ev, sz_val, TY_SHORT)
+	    call salloc (ev, D_SZ_EVENT / SZ_SHORT, TY_SHORT)
 	    call qp_addf (qp, EVTYPE, D_FIELDLIST, 1, "event record type", 0)
 	}
 
@@ -1148,21 +1132,16 @@ bool	list_events
 int	debug, nev, mval, m, i
 pointer	sp, qp, poefile, evlist, evl, cv, ev, io
 
-size_t	sz_val
 bool	clgetb()
 pointer	qp_open(), qpio_open()
 int	qpio_getevents(), clgeti()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (poefile, sz_val, TY_CHAR)
-	sz_val = SZ_EXPR
-	call salloc (evlist, sz_val, TY_CHAR)
-	sz_val = LEN_EVBUF
-	call salloc (evl, sz_val, TY_POINTER)
-	sz_val = LEN_CVBUF
-	call salloc (cv, sz_val, TY_INT)
+	call salloc (poefile, SZ_FNAME, TY_CHAR)
+	call salloc (evlist, SZ_EXPR, TY_CHAR)
+	call salloc (evl, LEN_EVBUF, TY_POINTER)
+	call salloc (cv,  LEN_CVBUF, TY_INT)
 
 	call clgstr ("poefile", Memc[poefile], SZ_FNAME)
 	qp = qp_open (Memc[poefile], READ_ONLY, NULL)
@@ -1239,7 +1218,6 @@ pointer	sp, poefile, filter, output, fname, evl, x1, y1, t1, x2, y2, t2
 pointer	qp, io, ex, ev, xs, xe
 double	t
 
-size_t	sz_val
 bool	clgetb()
 int	qpio_getevents(), qpex_attrld(), open()
 pointer	qp_open(), qpio_open(), qpex_open()
@@ -1248,22 +1226,18 @@ include <nullptr.com>
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (poefile, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_EXPR
-	call salloc (filter, sz_val, TY_CHAR)
-	sz_val = LEN_EVBUF
-	call salloc (evl, sz_val, TY_POINTER)
+	call salloc (poefile, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (filter, SZ_EXPR, TY_CHAR)
+	call salloc (evl, LEN_EVBUF, TY_POINTER)
 
-	sz_val = MAX_EVENTS
-	call salloc (x1, sz_val, TY_SHORT)
-	call salloc (y1, sz_val, TY_SHORT)
-	call salloc (t1, sz_val, TY_DOUBLE)
-	call salloc (x2, sz_val, TY_SHORT)
-	call salloc (y2, sz_val, TY_SHORT)
-	call salloc (t2, sz_val, TY_DOUBLE)
+	call salloc (x1, MAX_EVENTS, TY_SHORT)
+	call salloc (y1, MAX_EVENTS, TY_SHORT)
+	call salloc (t1, MAX_EVENTS, TY_DOUBLE)
+	call salloc (x2, MAX_EVENTS, TY_SHORT)
+	call salloc (y2, MAX_EVENTS, TY_SHORT)
+	call salloc (t2, MAX_EVENTS, TY_DOUBLE)
 
 	nev1 = 0
 	nev2 = 0
@@ -1301,9 +1275,8 @@ begin
 	call printf ("%d events\n")
 	    call pargi (nev1)
 	xlen = 128
-	sz_val = TY_DOUBLE
-	call malloc (xs, sz_val, xlen)
-	call malloc (xe, sz_val, xlen)
+	call malloc (xs, TY_DOUBLE, xlen)
+	call malloc (xe, TY_DOUBLE, xlen)
 
 	# Get the time filter as a list of ranges.
 	xs = NULL;  xe = NULL;  xlen = 0
@@ -1439,20 +1412,16 @@ procedure t_plotpoe()
 
 int	ncols, nlines, xblock, yblock, mval, nev, i
 pointer	sp, poefile, evlist, evl, xv, yv, qp, io, ev, gp
-size_t	sz_val
 pointer	qp_open(), gopen(), qpio_open
 int	clgeti(), qp_stati(), qp_geti(), qpio_getevents()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (poefile, sz_val, TY_CHAR)
-	sz_val = SZ_EXPR
-	call salloc (evlist, sz_val, TY_CHAR)
-	sz_val = LEN_EVBUF
-	call salloc (evl, sz_val, TY_POINTER)
-	call salloc (xv, sz_val, TY_REAL)
-	call salloc (yv, sz_val, TY_REAL)
+	call salloc (poefile, SZ_FNAME, TY_CHAR)
+	call salloc (evlist, SZ_EXPR, TY_CHAR)
+	call salloc (evl, LEN_EVBUF, TY_POINTER)
+	call salloc (xv, LEN_EVBUF, TY_REAL)
+	call salloc (yv, LEN_EVBUF, TY_REAL)
 
 	call clgstr ("poefile", Memc[poefile], SZ_FNAME)
 	qp = qp_open (Memc[poefile], READ_ONLY, NULL)
@@ -1601,14 +1570,12 @@ int	p1, p2
 char	list1[SZ_LINE], list2[SZ_LINE]
 pointer	sp, rl1, rl2, op, xs, xe, ys, ye, os, oe
 int	fd, ch, xlen, ylen, olen, nx, ny, nout, i
-size_t	sz_val
 int	open(), getci(), qpex_parsei(), qp_rlmergei()
 
 begin
 	call smark (sp)
-	sz_val = SZ_RLBUF
-	call salloc (rl1, sz_val, TY_CHAR)
-	call salloc (rl2, sz_val, TY_CHAR)
+	call salloc (rl1, SZ_RLBUF, TY_CHAR)
+	call salloc (rl2, SZ_RLBUF, TY_CHAR)
 
 	# Get the first range list.
 	call clgstr ("list1", list1, SZ_LINE)
@@ -1642,22 +1609,19 @@ begin
 
 	# Parse the lists.
 	xlen = 100
-	sz_val = xlen
-	call malloc (xs, sz_val, TY_INT)
-	call malloc (xe, sz_val, TY_INT)
+	call malloc (xs, xlen, TY_INT)
+	call malloc (xe, xlen, TY_INT)
 	nx = qpex_parsei (Memc[rl1], xs, xe, xlen)
 
 	ylen = 100
-	sz_val = ylen
-	call malloc (ys, sz_val, TY_INT)
-	call malloc (ye, sz_val, TY_INT)
+	call malloc (ys, ylen, TY_INT)
+	call malloc (ye, ylen, TY_INT)
 	ny = qpex_parsei (Memc[rl2], ys, ye, ylen)
 
 	# Merge the lists.
 	olen = 100
-	sz_val = olen
-	call malloc (os, sz_val, TY_INT)
-	call malloc (oe, sz_val, TY_INT)
+	call malloc (os, olen, TY_INT)
+	call malloc (oe, olen, TY_INT)
 	nout = qp_rlmergei (os,oe,olen,
 	    Memi[xs],Memi[xe],nx, Memi[ys],Memi[ye],ny)
 

@@ -15,7 +15,6 @@ procedure mt_update_lockfile (mt)
 
 int	mt			#I device slot
 
-size_t	sz_val
 extern	mt_sync()
 pointer	sp, lockfile, tempfile, lbuf, ip, op, extn
 int	old_lockfile, new_lockfile, junk, status, nlines
@@ -26,11 +25,9 @@ define	err_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (lockfile, sz_val, TY_CHAR)
-	call salloc (tempfile, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lockfile, SZ_PATHNAME, TY_CHAR)
+	call salloc (tempfile, SZ_PATHNAME, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	# Catch any errors in the following section and convert them
 	# into fatal errors.

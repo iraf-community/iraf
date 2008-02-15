@@ -15,7 +15,6 @@ char	osfn[maxch]		# receives packed OS filename
 int	maxch			# maxchars out
 int	status			# answer; ok or err
 
-size_t	sz_val
 pointer	dp, bp, ip, op
 pointer	sp, vfn, root, extn
 int	server, nchars, len_root, len_extn
@@ -32,11 +31,9 @@ begin
 
 	} else {
 	    call smark (sp)
-	    sz_val = SZ_PATHNAME
-	    call salloc (vfn, sz_val, TY_CHAR)
-	    sz_val = SZ_FNAME
-	    call salloc (root, sz_val, TY_CHAR)
-	    call salloc (extn, sz_val, TY_CHAR)
+	    call salloc (vfn, SZ_PATHNAME, TY_CHAR)
+	    call salloc (root, SZ_FNAME, TY_CHAR)
+	    call salloc (extn, SZ_FNAME, TY_CHAR)
 
 	    dp = k_bufp[chan]
 	    bp = D_DATA(dp)

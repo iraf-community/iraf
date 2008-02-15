@@ -12,7 +12,6 @@ char	mtname[ARB]		#I device to be positioned
 int	file			#I desired file number
 int	record			#I desired record number
 
-size_t	sz_val
 int	junk
 pointer	sp, mtspec, device, devcap
 errchk	mtparse, mtopen
@@ -20,11 +19,9 @@ int	mtopen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (mtspec, sz_val, TY_CHAR)
-	sz_val = SZ_DEVCAP
-	call salloc (devcap, sz_val, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (mtspec, SZ_FNAME, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
 	# Get device name (including node! prefix) from mtname.
 	call mtparse (mtname,

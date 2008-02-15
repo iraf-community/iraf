@@ -62,8 +62,6 @@ pointer	im	# pointer to the input image
 pointer	imfit	# pointer to the imsurfit structure
 pointer	sf	# pointer to the surface descriptor
 
-long	lg_val
-size_t	sz_val
 int	i, lp, ncols, nlines, ier
 long	v[IM_MAXDIM]
 pointer	sp, cols, lines, wgt, lbuf
@@ -81,12 +79,9 @@ begin
 
 	# Allocate working space for fitting.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (cols, sz_val, TY_INT)
-	sz_val = nlines
-	call salloc (lines, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (wgt, sz_val, TY_REAL)
+	call salloc (cols, ncols, TY_INT)
+	call salloc (lines, nlines, TY_INT)
+	call salloc (wgt, ncols, TY_REAL)
 
 	# Initialize the x and weight buffers.
 	do i = 1, ncols
@@ -95,9 +90,7 @@ begin
 
 	# Loop over image lines.
 	lp = 0
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long (1), v, IM_MAXDIM)
 	do i = 1, nlines {
 
 	    # Read in the image line.
@@ -156,7 +149,6 @@ pointer	imfit	# pointer to imsurfit header structure
 pointer	gl	# pointer to good region list
 pointer	sf	# pointer to the surface descriptor
 
-size_t	sz_val
 int	lp, lineno, prevlineno, ncols, nlines, npts, nranges, ier, ijunk
 int	max_nranges
 pointer	sp, colsfit, lines, buf, fbuf, wgt, ranges
@@ -180,15 +172,11 @@ begin
 
 	# Allocate temporary space for fitting.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (colsfit, sz_val, TY_INT)
-	sz_val = nlines
-	call salloc (lines, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (fbuf, sz_val, TY_REAL)
-	call salloc (wgt, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (colsfit, ncols, TY_INT)
+	call salloc (lines, nlines, TY_INT)
+	call salloc (fbuf, ncols, TY_REAL)
+	call salloc (wgt, ncols, TY_REAL)
+	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
 	call amovkr (1., Memr[wgt], ncols)
 
 	# Intialize counters and pointers.
@@ -394,7 +382,6 @@ pointer	imfit	# pointer to surface descriptor structure
 pointer	gl	# pointer to good regions list
 pointer	sf	# pointer the surface descriptor
 
-size_t	sz_val
 int	i, cp, lp, x1, x2, y1, y2, ier, ntemp
 int	nimcols, nimlines, ncols, nlines, nranges, nbox, nxpts
 int	lineno, current_line, lines_per_box, max_nranges
@@ -430,21 +417,14 @@ begin
 
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = nimcols
-	call salloc (colsfit, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (cols, sz_val, TY_INT)
-	call salloc (npts, sz_val, TY_INT)
-	sz_val = nlines
-	call salloc (lines, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (wgt, sz_val, TY_REAL)
-	sz_val = nbox * ncols
-	call salloc (med, sz_val, TY_REAL)
-	sz_val = ncols
-	call salloc (z, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (colsfit, nimcols, TY_INT)
+	call salloc (cols, ncols, TY_INT)
+	call salloc (npts, ncols, TY_INT)
+	call salloc (lines, nlines, TY_INT)
+	call salloc (wgt, ncols, TY_REAL)
+	call salloc (med, nbox * ncols, TY_REAL)
+	call salloc (z, ncols, TY_REAL)
+	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
 	call amovkr (1., Memr[wgt], ncols)
 
 	# Loop over median boxes in y.
@@ -551,8 +531,6 @@ pointer	imfit	# pointer to the imsurfut header structure
 pointer	sf	# pointer to the surface descriptor
 pointer	rl	# pointer to the rejected pixel list regions list
 
-long	lg_val
-size_t	sz_val
 int	i, k, ncols, nlines, max_nranges
 long	u[IM_MAXDIM], v[IM_MAXDIM]
 real	b1x, b2x, b1y, b2y
@@ -580,11 +558,9 @@ begin
 	# Allocate space for x coordinates, initialize to image coordinates
 	# and transform to median coordinates.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (x, ncols, TY_REAL)
+	call salloc (y, ncols, TY_REAL)
+	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
 
 	# Intialize the x array.
 	do i = 1, ncols
@@ -593,10 +569,8 @@ begin
 	    call amapr (Memr[x], Memr[x], ncols, 1., real (ncols), b1x, b2x)
 
 	# loop over the images lines
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
-	call amovkl (lg_val, u, sz_val)
+	call amovkl (long (1), v, IM_MAXDIM)
+	call amovkl (long (1), u, IM_MAXDIM)
 	do i = 1, nlines {
 
 	    # Get input and output image buffers.
@@ -624,8 +598,7 @@ begin
 	    case CLEAN:
 		call clean_line (Memr[x], Memr[y], Memr[inbuf], ncols, nlines,
 		   rl, sf, i, NGROW(imfit)) 
-		sz_val = ncols
-		call amovr (Memr[inbuf], Memr[outbuf], sz_val)
+		call amovr (Memr[inbuf], Memr[outbuf], ncols)
 	    case RESID:
 	        call isvector (sf, Memr[x], Memr[y], Memr[outbuf], ncols)
 		call asubr (Memr[inbuf], Memr[outbuf], Memr[outbuf], ncols)
@@ -669,7 +642,6 @@ pointer	sf		# surface fitting
 int	line		# line number
 int	ngrow		# radius for region growing
 
-size_t	sz_val
 int	cp, j, k, nranges, dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
 real	r2
@@ -678,8 +650,7 @@ real	iseval()
 
 begin
 	call smark (sp)
-	sz_val = 3 * ncols + 1
-	call salloc (branges, sz_val, TY_INT)
+	call salloc (branges, 3 * ncols + 1, TY_INT)
 
 	r2 = ngrow ** 2
 	yreg_min = max (1, line - ngrow)
@@ -755,7 +726,6 @@ pointer		gl	# pointer to good regions list
 pointer		sf	# pointer to surface descriptor
 pointer		rl	# pointer to rejected pixels list
 
-size_t	sz_val
 int	i, ijunk, lp, ier, max_nranges
 int	ncols, nlines, npts, nfree, nrejects, nranges, ncoeff
 pointer	sp, cols, colsfit, lines, buf, fbuf, wgt, granges
@@ -775,16 +745,12 @@ begin
 
 	# Allocate up temporary storage.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (cols, sz_val, TY_INT)
-	call salloc (colsfit, sz_val, TY_INT)
-	sz_val = nlines
-	call salloc (lines, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (fbuf, sz_val, TY_INT)
-	call salloc (wgt, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (granges, sz_val, TY_INT)
+	call salloc (cols, ncols, TY_INT)
+	call salloc (colsfit, ncols, TY_INT)
+	call salloc (lines, nlines, TY_INT)
+	call salloc (fbuf, ncols, TY_INT)
+	call salloc (wgt, ncols, TY_REAL)
+	call salloc (granges, 3 * max_nranges + 1, TY_INT)
 
 	# Initialize columns.
 	do i = 1, ncols
@@ -903,7 +869,6 @@ pointer	rl		# pointer to reject pixel list
 int	line		# line number
 int	ngrow		# radius for region growing
 
-size_t	sz_val
 int	cp, j, k, nrejects, nranges, max_nranges
 int	dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
@@ -916,8 +881,7 @@ begin
 	max_nranges = ncols
 
 	call smark (sp)
-	sz_val = 3 * max_nranges + 1
-	call salloc (branges, sz_val, TY_INT)
+	call salloc (branges, 3 * max_nranges + 1, TY_INT)
 
 	r2 = ngrow ** 2
 	nrejects = 0
@@ -957,7 +921,6 @@ pointer		gl	# pointer to good pixel list
 pointer		sf	# pointer to surface deascriptor
 pointer		rl	# pointer to rejected pixel list
 
-size_t	sz_val
 int	i, ijunk, cp, nranges, npts, ntpts, ncols, nlines, max_nranges
 pointer	sp, colsfit, x, xfit, y, zfit, buf, fbuf, wgt, granges, branges
 real	sum, sigma
@@ -974,23 +937,20 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (colsfit, sz_val, TY_REAL)
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (xfit, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (fbuf, sz_val, TY_REAL)
-	call salloc (zfit, sz_val, TY_REAL)
-	call salloc (wgt, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (granges, sz_val, TY_INT)
-	call salloc (branges, sz_val, TY_INT)
+	call salloc (colsfit, ncols, TY_REAL)
+	call salloc (x, ncols, TY_REAL)
+	call salloc (xfit, ncols, TY_REAL)
+	call salloc (y, ncols, TY_REAL)
+	call salloc (fbuf, ncols, TY_REAL)
+	call salloc (zfit, ncols, TY_REAL)
+	call salloc (wgt, ncols, TY_REAL)
+	call salloc (granges, 3 * max_nranges + 1, TY_INT)
+	call salloc (branges, 3 * max_nranges + 1, TY_INT)
 
 	# Intialize the x array.
 	do i = 1, ncols
 	    Memr[x+i-1] = i
-	sz_val = ncols
-	call amovr (Memr[x], Memr[xfit], sz_val)
+	call amovr (Memr[x], Memr[xfit], ncols)
 
 	sum = 0.
 	sigma = 0.
@@ -1061,7 +1021,6 @@ pointer		sf	# pointer to surface descriptor
 pointer		rl	# pointer to rejected pixel list
 real		sigma	# standard deviation of fit
 
-size_t	sz_val
 int	i, j, ijunk, cp, ncols, nlines, npts, nranges, nlrejects, ntrejects
 int	norejects, max_nranges
 pointer	sp, granges, branges, x, xfit, cols, colsfit, y, zfit, buf, fbuf
@@ -1079,28 +1038,24 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = ncols
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (xfit, sz_val, TY_REAL)
-	call salloc (cols, sz_val, TY_INT)
-	call salloc (colsfit, sz_val, TY_INT)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (fbuf, sz_val, TY_REAL)
-	call salloc (zfit, sz_val, TY_REAL)
-	call salloc (wgt, sz_val, TY_REAL)
-	sz_val = 3 * max_nranges + 1
-	call salloc (granges, sz_val, TY_INT)
-	call salloc (branges, sz_val, TY_INT)
-	sz_val = ncols
-	call salloc (list, sz_val, TY_INT)
+	call salloc (x, ncols, TY_REAL)
+	call salloc (xfit, ncols, TY_REAL)
+	call salloc (cols, ncols, TY_INT)
+	call salloc (colsfit, ncols, TY_INT)
+	call salloc (y, ncols, TY_REAL)
+	call salloc (fbuf, ncols, TY_REAL)
+	call salloc (zfit, ncols, TY_REAL)
+	call salloc (wgt, ncols, TY_REAL)
+	call salloc (granges, 3 * max_nranges + 1, TY_INT)
+	call salloc (branges, 3 * max_nranges + 1, TY_INT)
+	call salloc (list, ncols, TY_INT)
 
 	# Intialize x and column values.
 	do i = 1, ncols {
 	    Memi[cols+i-1] = i
 	    Memr[x+i-1] = i
 	}
-	sz_val = ncols
-	call amovr (Memr[x], Memr[xfit], sz_val)
+	call amovr (Memr[x], Memr[xfit], ncols)
 	call amovi (Memi[cols], Memi[colsfit], ncols)
 
 	ntrejects = 0

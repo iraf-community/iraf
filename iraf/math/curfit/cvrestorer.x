@@ -14,15 +14,13 @@ procedure cvrestore (cv, fit)
 pointer	cv		# curve descriptor
 real	fit[ARB]	# array containing fit parameters
 
-size_t	sz_val
 int	curve_type, order
 
 errchk malloc
 
 begin
 	# allocate space for curve descriptor
-	sz_val = LEN_CVSTRUCT
-	call malloc (cv, sz_val, TY_STRUCT)
+	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
 
 	order = nint (CV_SAVEORDER(fit))
 	if (order < 1)
@@ -70,10 +68,8 @@ begin
 	# allocate space for xbasis and coefficient arrays, set remaining
 	# pointers to NULL
 
-	sz_val = CV_ORDER(cv)
-	call calloc (CV_XBASIS(cv), sz_val, TY_REAL)
-	sz_val = CV_NCOEFF(cv)
-	call calloc (CV_COEFF(cv), sz_val, TY_REAL)
+	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_REAL)
+	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
 
 	CV_MATRIX(cv) = NULL
 	CV_CHOFAC(cv) = NULL
@@ -83,12 +79,10 @@ begin
 	CV_WY(cv) = NULL
 
 	# restore coefficients
-	if (CV_TYPE(cv) == USERFNC) {
-	    sz_val = CV_NCOEFF(cv)
-	    call amovr (fit[CV_SAVECOEFF+1], COEFF(CV_COEFF(cv)), sz_val)
-	} else {
-	    sz_val = CV_NCOEFF(cv)
-	    call amovr (fit[CV_SAVECOEFF], COEFF(CV_COEFF(cv)), sz_val)
-	}
-
+	if (CV_TYPE(cv) == USERFNC)
+	    call amovr (fit[CV_SAVECOEFF+1], COEFF(CV_COEFF(cv)),
+	        CV_NCOEFF(cv))
+	else
+	    call amovr (fit[CV_SAVECOEFF], COEFF(CV_COEFF(cv)),
+	        CV_NCOEFF(cv))
 end

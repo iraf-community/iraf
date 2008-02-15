@@ -18,8 +18,6 @@ int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, imlist, mw, ct, fmtptrs[IM_MAXDIM]
 
-long	lg_val
-size_t	sz_val
 bool	clgetb()
 int	imgnlr(), imgnld(), imgnlx(), imtgetim(), mw_stati(), clscan(), nscan()
 pointer	imtopenp(), immap(), mw_openim(), mw_sctran()
@@ -73,10 +71,8 @@ begin
 	    }
 
 	    # Initialize the v vectors.
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, v, sz_val)
-	    call amovkl (lg_val, vcoords, sz_val)
+	    call amovkl (long (1), v, IM_MAXDIM)
+	    call amovkl (long (1), vcoords, IM_MAXDIM)
 
 	    # Initialize the coordinates.
 	    laxis1 = 0
@@ -112,8 +108,7 @@ begin
 	    # Set the format strings for the logical axes.
 	    fmtstat = clscan ("formats")
 	    do i = 1, ndim {
-		sz_val = SZ_FNAME
-		call malloc (fmtptrs[i], sz_val, TY_CHAR)
+		call malloc (fmtptrs[i], SZ_FNAME, TY_CHAR)
 		if (fmtstat != EOF)
 		    call gargwrd (Memc[fmtptrs[i]], SZ_FNAME)
 		else
@@ -151,8 +146,7 @@ begin
 			call printf (" %z\n")		    # pixel value
 			    call pargx (Memx[line+i-1])
 		    }
-		    sz_val = IM_MAXDIM
-		    call amovl (v, vcoords, sz_val)
+		    call amovl (v, vcoords, IM_MAXDIM)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next
@@ -177,8 +171,7 @@ begin
 			call printf (" %g\n")		    # pixel value
 			    call pargd (Memd[line+i-1])
 		    }
-		    sz_val = IM_MAXDIM
-		    call amovl (v, vcoords, sz_val)
+		    call amovl (v, vcoords, IM_MAXDIM)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next
@@ -203,8 +196,7 @@ begin
 			call printf (" %g\n")		    # pixel value
 			    call pargr (Memr[line+i-1])
 		    }
-		    sz_val = IM_MAXDIM
-		    call amovl (v, vcoords, sz_val)
+		    call amovl (v, vcoords, IM_MAXDIM)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next

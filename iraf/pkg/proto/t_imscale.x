@@ -15,8 +15,6 @@ real	lower					# Lower limit for mean
 real	upper					# Upper limit for mean
 bool	verbose					# Verbose output?
 
-size_t	sz_val
-long	lg_val
 int	i
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 real	mean_in, scale
@@ -50,10 +48,8 @@ begin
 	scale = mean / mean_in
 
 	# Create the output image.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, line_in, sz_val)
-	call amovkl (lg_val, line_out, sz_val)
+	call amovkl (long(1), line_in, IM_MAXDIM)
+	call amovkl (long(1), line_out, IM_MAXDIM)
 
 	# Loop through the image lines and rescale.
 	while (impnlr (out, data_out, line_out) != EOF) {
@@ -94,8 +90,6 @@ pointer	im				# IMIO descriptor
 real	lower				# Low cutoff
 real	upper				# High cutoff
 
-size_t	sz_val
-long	lg_val
 int	i, npix
 long	line[IM_MAXDIM]
 real	sum
@@ -106,9 +100,7 @@ int	imgnls(), imgnli(), imgnll(), imgnlr()
 begin
 	sum = 0.
 	npix = 0
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, line, sz_val)
+	call amovkl (long(1), line, IM_MAXDIM)
 
 	# Loop through the image lines to compute the mean.
 	# Optimize IMIO for the image datatype.

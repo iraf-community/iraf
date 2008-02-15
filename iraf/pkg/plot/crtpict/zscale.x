@@ -109,7 +109,6 @@ pointer	sample			# output vector containing the sample
 int	optimal_sample_size	# desired number of pixels in sample
 int	len_stdline		# optimal number of pixels per line
 
-size_t	sz_val
 int	ncols, nlines, col_step, line_step, maxpix, line
 int	opt_npix_per_line, npix_per_line
 int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
@@ -146,8 +145,7 @@ begin
 	# caller.
 
 	maxpix = npix_per_line * max_nlines_in_sample
-	sz_val = maxpix
-	call malloc (sample, sz_val, TY_REAL)
+	call malloc (sample, maxpix, TY_REAL)
 
 	# Extract the vector.
 	op = sample
@@ -171,14 +169,12 @@ procedure zsc_subsample (a, b, npix, step)
 real	a[ARB]
 real	b[npix]
 int	npix, step
-size_t	sz_val
 int	ip, i
 
 begin
-	if (step <= 1) {
-	    sz_val = npix
-	    call amovr (a, b, sz_val)
-	} else {
+	if (step <= 1)
+	    call amovr (a, b, npix)
+	else {
 	    ip = 1
 	    do i = 1, npix {
 		b[i] = a[ip]
@@ -205,7 +201,6 @@ real	krej			# k-sigma pixel rejection factor
 int	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
-size_t	sz_val
 int	i, ngoodpix, last_ngoodpix, minpix, niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
@@ -227,10 +222,9 @@ begin
 	# Allocate a buffer for data minus fitted curve, another for the
 	# normalized X values, and another to flag rejected pixels.
 
-	sz_val = npix
-	call salloc (flat, sz_val, TY_REAL)
-	call salloc (normx, sz_val, TY_REAL)
-	call salloc (badpix, sz_val, TY_SHORT)
+	call salloc (flat, npix, TY_REAL)
+	call salloc (normx, npix, TY_REAL)
+	call salloc (badpix, npix, TY_SHORT)
 	call aclrs (Mems[badpix], npix)
 
 	# Compute normalized X vector.  The data X values [1:npix] are

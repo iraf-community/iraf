@@ -18,7 +18,6 @@ pointer	im			#I image descriptor
 int	uchars			#I maxchars of user area data to read
 int	htype			#I TY_IMHDR or TY_PIXHDR
 
-size_t	sz_val
 pointer	sp, v1
 char	immagic[SZ_IMMAGIC]
 int	sulen_userarea, hdrlen, nchars, status
@@ -44,8 +43,7 @@ begin
 	    # Old V1 image header.
 
 	    call smark (sp)
-	    sz_val = LEN_V1IMHDR
-	    call salloc (v1, sz_val, TY_STRUCT)
+	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
 
 	    call seek (fd, BOFL)
 	    nchars = LEN_V1IMHDR * SZ_STRUCT
@@ -67,9 +65,8 @@ begin
 	    IM_PIXTYPE(im) = IM_V1PIXTYPE(v1)
 
 	    IM_NDIM(im) = IM_V1NDIM(v1)
-	    sz_val = IM_MAXDIM
-	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), sz_val)
-	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), sz_val)
+	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), IM_MAXDIM)
+	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), IM_MAXDIM)
 
 	    IM_SSMTYPE(im) = IM_V1SSMTYPE(v1)
 	    IM_LUTOFF(im) = IM_V1LUTOFF(v1)

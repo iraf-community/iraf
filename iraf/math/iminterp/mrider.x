@@ -24,7 +24,6 @@ int	nyder				# number of derivatives in y
 int	len_der				# row length of der, len_der >= nxder
 int	interp_type			# interpolant type
 
-size_t	sz_val
 int	nx, ny, nxterms, nyterms, row_length
 int	index, xindex, yindex, first_row, last_row
 int	i, j, ii, jj, kx, ky
@@ -326,8 +325,7 @@ begin
 	    sy = y[1] - ny
 
 	    # allocate space for temporary array and 0 file
-	    sz_val = row_length * row_length
-	    call calloc (tmp, sz_val, TY_REAL)
+	    call calloc (tmp, row_length * row_length, TY_REAL)
 
 	    ky = 0
 	    # maximum number of points used in each direction is SPLPTS

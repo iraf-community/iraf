@@ -105,8 +105,6 @@ pointer	gt				# GTIO pointer
 char	title[ARB]			# Title
 bool	interactive			# Interactive?
 
-long	lg_val
-size_t	sz_val
 char	graphics[SZ_FNAME]
 int	i, nx, new
 long	inline[IM_MAXDIM], outline[IM_MAXDIM]
@@ -121,9 +119,8 @@ begin
 	nx = IM_LEN(in, 1)
 
 	call smark (sp)
-	sz_val = nx
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (wts, sz_val, TY_REAL)
+	call salloc (x, nx, TY_REAL)
+	call salloc (wts, nx, TY_REAL)
 
 	do i = 1, nx
 	    Memr[x+i-1] = i
@@ -154,10 +151,8 @@ begin
 	# Loop through each input image line and create an output image line.
 
 	new = YES
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, inline, sz_val)
-	call amovkl (lg_val, outline, sz_val)
+	call amovkl (long(1), inline, IM_MAXDIM)
+	call amovkl (long(1), outline, IM_MAXDIM)
 
 	while (imgnlr (in, indata, inline) != EOF) {
 	    if (impnlr (out, outdata, outline) == EOF)
@@ -169,8 +164,7 @@ begin
 
 	    call ic_clean (ic, cv, Memr[x], Memr[indata], Memr[wts], nx)
 
-	    sz_val = nx
-	    call amovr (Memr[indata], Memr[outdata], sz_val)
+	    call amovr (Memr[indata], Memr[outdata], nx)
 	}
 
 	call cvfree (cv)
@@ -187,7 +181,6 @@ char	output[ARB]		# Output image
 pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 
-size_t	sz_val
 pointer	sp, root, sect
 int	imaccess()
 pointer	immap()
@@ -196,9 +189,8 @@ begin
 	# Get the root name and section of the input image.
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (sect, sz_val, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (sect, SZ_FNAME, TY_CHAR)
 
 	call get_root (input, Memc[root], SZ_FNAME)
 	call get_section (input, Memc[sect], SZ_FNAME)
@@ -235,8 +227,6 @@ pointer	data			# Image data
 long	v[ARB]			# Image line vector
 char	title[ARB]		# Title
 
-size_t	sz_val
-long	lg_val
 int	i
 char	line[SZ_LINE]
 int	getline(), nscan(), imgnlr()
@@ -253,9 +243,7 @@ begin
 	    return (EOF)
 	call sscan (line)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long (1), v, IM_MAXDIM)
 	do i = 2, max (2, IM_NDIM(im)) {
 	    call gargl (v[i])
 	    if (nscan() == 0)

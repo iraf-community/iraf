@@ -26,8 +26,6 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -55,9 +53,7 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -87,8 +83,7 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        sz_val = IM_MAXDIM
-	        call amovl (v, vbuf, sz_val)
+	        call amovl (v, vbuf, IM_MAXDIM)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnls (im, buf, v) == EOF)
@@ -116,8 +111,6 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -146,9 +139,7 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -178,8 +169,7 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        sz_val = IM_MAXDIM
-	        call amovl (v, vbuf, sz_val)
+	        call amovl (v, vbuf, IM_MAXDIM)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnli (im, buf, v) == EOF)
@@ -207,8 +197,6 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -237,9 +225,7 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -269,8 +255,7 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        sz_val = IM_MAXDIM
-	        call amovl (v, vbuf, sz_val)
+	        call amovl (v, vbuf, IM_MAXDIM)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnlr (im, buf, v) == EOF)
@@ -298,8 +283,6 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
-size_t	sz_val
-long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -328,9 +311,7 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -360,8 +341,7 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        sz_val = IM_MAXDIM
-	        call amovl (v, vbuf, sz_val)
+	        call amovl (v, vbuf, IM_MAXDIM)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnld (im, buf, v) == EOF)

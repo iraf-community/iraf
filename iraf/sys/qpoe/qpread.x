@@ -17,7 +17,6 @@ int	maxelem			#I max number of data elements to read
 int	first			#I first data element to read
 char	datatype[ARB]		#I datatype to be returned
 
-size_t	sz_val
 pointer	sp, fm, sym, tbuf, isym, osym
 int	fd, sz_itype, sz_otype, nelem, itype, otype
 
@@ -68,8 +67,7 @@ begin
 	    } else {
 		# Read the data into a temporary buffer.
 		call smark (sp)
-		sz_val = nelem * sz_itype
-		call salloc (tbuf, sz_val, TY_CHAR)
+		call salloc (tbuf, nelem * sz_itype, TY_CHAR)
 		nelem = read (fd, Memc[tbuf], nelem * sz_itype) / sz_itype
 		if (nelem > 0)
 		    call acht (Memc[tbuf], buf, nelem, itype, otype)

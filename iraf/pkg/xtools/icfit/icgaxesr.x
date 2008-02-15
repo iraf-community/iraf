@@ -18,7 +18,6 @@ real	y[npts]				# Dependent variable
 real	z[npts]				# Output values
 int	npts				# Number of points
 
-size_t	sz_val
 int	i, axistype, gtlabel[2], gtunits[2]
 real 	a, b, xmin, xmax
 pointer	label, units
@@ -36,13 +35,11 @@ begin
 	case 'x':	# Independent variable
 	    call gt_sets (gt, gtlabel[axis], Memc[IC_LABELS(ic,1)])
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,1)])
-	    sz_val = npts
-	    call amovr (x, z, sz_val)
+	    call amovr (x, z, npts)
 	case 'y':	# Dependent variable
 	    call gt_sets (gt, gtlabel[axis], Memc[IC_LABELS(ic,2)])
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,2)])
-	    sz_val = npts
-	    call amovr (y, z, sz_val)
+	    call amovr (y, z, npts)
 	case 'f':	# Fitted values
 	    call gt_sets (gt, gtlabel[axis], "fit")
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,2)])
@@ -74,19 +71,16 @@ begin
 	    do i = 1, npts
 	        z[i] = (z[i] - y[i]) / y[i] * 300000.
 	default:	# User axes types.
-	    sz_val = SZ_LINE
-	    call malloc (label, sz_val, TY_CHAR)
-	    call malloc (units, sz_val, TY_CHAR)
+	    call malloc (label, SZ_LINE, TY_CHAR)
+	    call malloc (units, SZ_LINE, TY_CHAR)
 	    if (axis == 1) {
 		call strcpy (Memc[IC_LABELS(ic,1)], Memc[label], SZ_LINE)
 		call strcpy (Memc[IC_UNITS(ic,1)], Memc[units], SZ_LINE)
-	        sz_val = npts
-	        call amovr (x, z, sz_val)
+	        call amovr (x, z, npts)
 	    } else {
 		call strcpy (Memc[IC_LABELS(ic,2)], Memc[label], SZ_LINE)
 		call strcpy (Memc[IC_UNITS(ic,2)], Memc[units], SZ_LINE)
-	        sz_val = npts
-	        call amovr (y, z, sz_val)
+	        call amovr (y, z, npts)
 	    }
 	    call icg_uaxesr (axistype, cv, x, y, z, npts, Memc[label],
 		Memc[units], SZ_LINE)

@@ -23,7 +23,6 @@ pointer procedure gtr_writep (fd, nchars)
 int	fd			# graphics stream
 int	nchars			# nchars to reserve at end of buffer
 
-size_t	sz_val
 pointer	tr, bufp, top, segp
 int	blen, nwords, ip_offset, op_offset
 errchk	syserr, realloc
@@ -54,8 +53,7 @@ begin
 	    op_offset = segp - bufp
 	    blen = blen + max (INC_LENFRAMEBUF, nwords)
 
-	    sz_val = blen
-	    call realloc (bufp, sz_val, TY_SHORT)
+	    call realloc (bufp, blen, TY_SHORT)
 
 	    TR_FRAMEBUF(tr) = bufp
 	    TR_LENFRAMEBUF(tr) = blen

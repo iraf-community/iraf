@@ -18,7 +18,6 @@ char	stdout_file[ARB]	# packed filename of stdout file
 char	stderr_file[ARB]	# packed filename of stderr file
 int	status
 
-size_t	sz_val
 pointer	sp, remfn, locfn, lbuf, op
 int	server, oscmd_status, inchan, outchan, nchars
 int	ki_connect(), ki_sendrcv(), gstrcpy()
@@ -40,11 +39,9 @@ begin
 
 	    else {
 		call smark (sp)
-		sz_val = SZ_PATHNAME
-		call salloc (remfn, sz_val, TY_CHAR)
-		call salloc (locfn, sz_val, TY_CHAR)
-		sz_val = SZ_LINE
-		call salloc (lbuf, sz_val, TY_CHAR)
+		call salloc (remfn, SZ_PATHNAME, TY_CHAR)
+		call salloc (locfn, SZ_PATHNAME, TY_CHAR)
+		call salloc (lbuf,  SZ_LINE, TY_CHAR)
 
 		oscmd_status = p_arg[1]
 

@@ -292,7 +292,6 @@ int	fd					#i file descriptor
 pointer	ras					#i RAS struct pointer
 pointer	cmap					#i colormap array ptr
 
-size_t	sz_val
 int	ncolors
 
 long    filepos
@@ -302,10 +301,8 @@ begin
 	# Now read the colormap, allocate the pointer if we need to.
 	ncolors = RAS_MAPLENGTH(ras)
 	if (RAS_MAPTYPE(ras) == RMT_EQUAL_RGB && ncolors > 0) {
-	    if (cmap == NULL) {
-	        sz_val = ncolors*3
-	        call calloc (cmap, sz_val, TY_CHAR)
-	    }
+	    if (cmap == NULL)
+	        call calloc (cmap, ncolors*3, TY_CHAR)
 	    call ip_agetb (fd, cmap, ncolors)
 
 	} else if (RAS_MAPTYPE(ras) == RMT_RAW) {
@@ -333,7 +330,6 @@ pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
 int	nchars					#i line size
 
-size_t	sz_val
 pointer	im, data, op
 int	i, percent
 
@@ -343,8 +339,7 @@ common  /rascom/ filepos
 begin
         im = IP_IM(ip)
         op = PTYPE(ip,1)
-        sz_val = nchars
-        call malloc (data, sz_val, TY_CHAR)
+        call malloc (data, nchars, TY_CHAR)
         IO_DATA(op) = data
         IO_NPIX(op) = RAS_WIDTH(ras)
 
@@ -389,7 +384,6 @@ pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
 int	nchars					#i line size
 
-size_t	sz_val
 pointer	im, data, op
 int	i, percent, npix
 
@@ -399,8 +393,7 @@ common  /rascom/ filepos
 begin
         im = IP_IM(ip)
         op = PTYPE(ip,1)
-        sz_val = nchars
-        call malloc (data, sz_val, TY_SHORT)
+        call malloc (data, nchars, TY_SHORT)
         IO_DATA(op) = data
         IO_NPIX(op) = RAS_WIDTH(ras)
 
@@ -413,8 +406,7 @@ begin
         do i = 1, IP_NPIXT(ip) {
             op = PTYPE(ip,i)
             IO_NPIX(op) = npix
-            sz_val = npix
-            call calloc (IO_DATA(op), sz_val, TY_SHORT)
+            call calloc (IO_DATA(op), npix, TY_SHORT)
         }
 
         percent = 0

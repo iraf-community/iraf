@@ -12,7 +12,6 @@ bool	pre			# Preserve aspect ratio (yes/no)?
 int	xres, yres		# desired resolution
 int	nx, ny			# dimensions of output array
 
-size_t	sz_val
 int	nxin, nyin
 pointer subras, data
 pointer plt_blkaverage(), plt_subsample(), imgs2r()
@@ -39,11 +38,9 @@ begin
 	    # Return entire image as data matrix.
 	    nx = nxin
 	    ny = nyin
-	    sz_val = nx * ny
-	    call calloc (data, sz_val, TY_REAL)
+	    call calloc (data, nx * ny, TY_REAL)
 	    subras = imgs2r (im, 1, nxin, 1, nyin)
-	    sz_val = nx * ny
-	    call amovr (Memr[subras], Memr[data], sz_val)
+	    call amovr (Memr[subras], Memr[data], nx * ny)
 	    return (data)
 	}
 end
@@ -59,7 +56,6 @@ int	xres, yres		# desired output resolution
 bool	pre			# preserve aspect ratio?
 int	nxout, nyout		# dimensions of output array (returned)
 
-size_t	sz_val
 pointer	sp, xvec, data
 int	x_factor, y_factor, xrf, yrf
 int	nxin, nyin, yin, ii, jj, index, nop
@@ -95,15 +91,12 @@ begin
 	    call pargi (xrf)
 	    call pargi (yrf)
 
-	sz_val = nxin
-	call salloc (xvec, sz_val, TY_REAL)
-	sz_val = nxout * nyout
-	call calloc (data, sz_val, TY_REAL)
+	call salloc (xvec, nxin, TY_REAL)
+	call calloc (data, nxout * nyout, TY_REAL)
 
 	yin = 1
 	do jj = 1, nyout {
-	    sz_val = nxin
-	    call amovr (Memr[imgl2r (im, yin)], Memr[xvec], sz_val)
+	    call amovr (Memr[imgl2r (im, yin)], Memr[xvec],  nxin)
 	    nop = 1
 	    do ii = 1, nxin {
 		index = data + ((jj-1) * nxout) + nop - 1
@@ -130,7 +123,6 @@ int	xres, yres		# blocking factors
 bool	pre			# preserve aspect ratio?
 int	nx, ny			# dimensions of output array (returned)
 
-size_t	sz_val
 real	sum
 pointer	sp, xvec, data
 int	nxin, nyin, nxout, nyout, nxout_full, nyout_full
@@ -171,10 +163,8 @@ begin
 	nxcols = nxin - (nxout_full * x_factor)
 	nxrows = nyin - (nyout_full * y_factor)
 
-	sz_val = nxin
-	call salloc (xvec, sz_val, TY_REAL)
-	sz_val = nxout * nyout
-	call calloc (data, sz_val, TY_REAL)
+	call salloc (xvec, nxin, TY_REAL)
+	call calloc (data, nxout * nyout, TY_REAL)
 
 	yin = 1
 	do jj = 1, nyout_full {

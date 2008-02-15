@@ -19,7 +19,6 @@ include	"imfort.h"
 procedure impixf (im, pixfp, pixfil, pixoff, szline, ier)
 
 pointer	im			# image descriptor
-size_t	sz_val
 pointer	pixfp			# receives file pointer of pixel file
 %	character*(*) pixfil
 int	pixoff			# one-indexed char offset to the pixels
@@ -32,8 +31,7 @@ bool	strne()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	if (strne (IM_MAGIC(im), "imhdr"))
 	    ier = IE_MAGIC

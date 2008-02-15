@@ -8,15 +8,13 @@ procedure nlsolver (nl, ier)
 pointer	nl	# pointer to the nlfit structure
 int	ier	# error code
 
-size_t	sz_val
 int	nfree
 
 begin
 	# Make temporary arrays.
-	sz_val = NL_NFPARAMS(nl) ** 2
-	call amovr (ALPHA(NL_ALPHA(nl)), COVAR(NL_COVAR(nl)), sz_val)
-	sz_val = NL_NFPARAMS(nl)
-	call amovr (BETA(NL_BETA(nl)), DPARAM(NL_DPARAM(nl)), sz_val)
+	call amovr (ALPHA(NL_ALPHA(nl)), COVAR(NL_COVAR(nl)),
+	    NL_NFPARAMS(nl) ** 2)
+	call amovr (BETA(NL_BETA(nl)), DPARAM(NL_DPARAM(nl)), NL_NFPARAMS(nl))
 
 	# Add the lambda damping factor.
 	call nl_dampr (COVAR(NL_COVAR(nl)), COVAR(NL_COVAR(nl)),

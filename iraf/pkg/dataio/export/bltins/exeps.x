@@ -29,7 +29,6 @@ procedure ex_eps (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	eps
 pointer	bptr
 int	fd, len, flags
@@ -51,10 +50,8 @@ begin
 	# Allocate the EPS structure.
 	iferr (call calloc (eps, SZ_EPSSTRUCT, TY_STRUCT))
 	    call error (0, "Error allocating eps structure.")
-	sz_val = 17
-	call calloc (EPS_HPTR(eps), sz_val, TY_CHAR)
-	sz_val = SZ_EPSBUF+SZ_TRAILER
-	call calloc (EPS_BPTR(eps), sz_val, TY_CHAR)
+	call calloc (EPS_HPTR(eps), 17, TY_CHAR)
+	call calloc (EPS_BPTR(eps), SZ_EPSBUF+SZ_TRAILER, TY_CHAR)
 	call strcpy (HEXITS, Memc[EPS_HPTR(eps)], 17)
 	EPS_BCNT(eps) = 1
 
@@ -81,8 +78,7 @@ begin
 	}
 
 	# Flush the remaining pixels in the buffer.
-	sz_val = SZ_EPSBUF
-	call calloc (bptr, sz_val, TY_CHAR)
+	call calloc (bptr, SZ_EPSBUF, TY_CHAR)
 
 	if (mod (EPS_BCNT(eps),2) == 0) {
 	    call amovc ("\ngrestore showpage\n%%Trailer\n\0", 
@@ -114,7 +110,6 @@ int	fd				#i output file descriptor
 bool	use_cmap			#i write a false color image?
 bool	is_gray				#i is this a grayscale cmap?
 
-size_t	sz_val
 pointer	op, bop, out, cm
 int	i, j, k, line, percent
 int	len, orow, type
@@ -127,8 +122,7 @@ begin
         percent = 0
         orow = 0
 	cm = EX_CMAP(ex)
-	sz_val = EX_OCOLS(ex)+2
-	call malloc (out, sz_val, TY_SHORT)
+	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
         do i = 1, EX_NEXPR(ex) {
 
             # Process each line in the image.
@@ -193,7 +187,6 @@ pointer	ex				#i task struct pointer
 pointer	eps				#i postscript struct pointer
 int	fd				#i output file descriptor
 
-size_t	sz_val
 pointer	op, bop, out
 int	i, j, k, line, percent, orow, type
 
@@ -204,8 +197,7 @@ begin
         type = EX_OUTTYPE(ex)
         percent = 0
         orow = 0
-	sz_val = EX_OCOLS(ex)+2
-	call malloc (out, sz_val, TY_SHORT)
+	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
         do j = 1, EX_NLINES(ex) {
 
             # See if we're flipping the image.

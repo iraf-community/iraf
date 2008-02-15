@@ -12,7 +12,6 @@ pointer	procedure cq_query (cq)
 
 pointer	cq			#I the catalog database descriptor
 
-size_t	sz_val
 pointer	cc, res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
@@ -54,15 +53,13 @@ begin
 	    call flush (fd)
 
 	    # Open the output spool file.
-	    sz_val = SZ_FNAME
-	    call salloc (spfname, sz_val, TY_CHAR)
+	    call salloc (spfname, SZ_FNAME, TY_CHAR)
 	    call mktemp ("query", Memc[spfname], SZ_FNAME)
 	    CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
 	    call sfree (sp)
 
 	    # Get the data.
-	    sz_val = DEF_SZ_INBUF
-	    call malloc (inbuf, sz_val, TY_CHAR)
+	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 	    call fseti (fd, F_CANCEL, OK)
 
 	    switch (CQ_HFMT(cc)) {
@@ -114,10 +111,8 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    sz_val = SZ_LINE
-	    call malloc (line, sz_val, TY_CHAR)
-	    sz_val = szindex
-	    call calloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    call malloc (line, SZ_LINE, TY_CHAR)
+	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
 	    call seek (CQ_RFD(res), BOF)
@@ -144,8 +139,7 @@ begin
 		nrecs = nrecs + 1
 		if (nrecs >= szindex) {
 		    szindex = szindex + DEF_SZ_INDEX
-	    	    sz_val = szindex
-	    	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    	    call realloc (CQ_RINDEX(res), szindex, TY_LONG)
 		    call aclrl (Meml[CQ_RINDEX(res)+szindex-DEF_SZ_INDEX],
 		        DEF_SZ_INDEX)
 		}
@@ -164,8 +158,7 @@ begin
 	    CQ_RNRECS(res) = nrecs
 
 	    # Resize the index array.
-	    sz_val = max (1, CQ_RNRECS(res) + 1)
-	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    call realloc (CQ_RINDEX(res), max (1, CQ_RNRECS(res) + 1), TY_LONG)
 
 	default:
 	    ;
@@ -186,7 +179,6 @@ pointer	cq			#I the catalog database descriptor
 char	catfile[ARB]		#I the input catalog file
 char	catfmt[ARB]		#I the input catalog description
 
-size_t	sz_val
 pointer	res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
@@ -230,16 +222,14 @@ begin
 
 	    # Open the output spool file.
 	    call smark (sp)
-	    sz_val = SZ_FNAME
-	    call salloc (spfname, sz_val, TY_CHAR)
+	    call salloc (spfname, SZ_FNAME, TY_CHAR)
 	    call mktemp ("query", Memc[spfname], SZ_FNAME)
 	    #CQ_RFD(res) = open ("dev$null", READ_WRITE, SPOOL_FILE)
 	    CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
 	    call sfree (sp)
 
 	    # Get the data.
-	    sz_val = DEF_SZ_INBUF
-	    call malloc (inbuf, sz_val, TY_CHAR)
+	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 	    repeat {
 	        nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
 	        if (nchars > 0) {
@@ -274,10 +264,8 @@ begin
 
 	    # Iniitialize the index array.
 	    szindex = DEF_SZ_INDEX
-	    sz_val = SZ_LINE
-	    call malloc (line, sz_val, TY_CHAR)
-	    sz_val = szindex
-	    call calloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    call malloc (line, SZ_LINE, TY_CHAR)
+	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
 	    call seek (CQ_RFD(res), BOF)
@@ -306,8 +294,7 @@ begin
 		nrecs = nrecs + 1
 		if (nrecs >= szindex) {
 		    szindex = szindex + DEF_SZ_INDEX
-	    	    sz_val = szindex
-	    	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    	    call realloc (CQ_RINDEX(res), szindex, TY_LONG)
 		    call aclrl (Meml[CQ_RINDEX(res)+szindex-DEF_SZ_INDEX],
 		        DEF_SZ_INDEX)
 		}
@@ -326,8 +313,7 @@ begin
 	    CQ_RNRECS(res) = nrecs
 
 	    # Trim the trailing records.
-	    sz_val = max (1, CQ_RNRECS(res) + 1)
-	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
+	    call realloc (CQ_RINDEX(res), max (1, CQ_RNRECS(res) + 1), TY_LONG)
 
 	default:
 	    ;
@@ -354,7 +340,6 @@ pointer procedure cq_rinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
-size_t	sz_val
 pointer	cc, res, sp, query, value, kname, fname, funits, ffmt
 int	i, ncount, sz1, sz2, sz3, op1, op2, op3, foffset, fsize
 char	ftype
@@ -371,15 +356,12 @@ begin
 	cc = CQ_CAT(cq)
 
 	# Allocate the results structure.
-	sz_val = CQ_LEN_RES
-	call calloc (res, sz_val, TY_STRUCT)
+	call calloc (res, CQ_LEN_RES, TY_STRUCT)
 
 	# Format the query.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (query, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (query, SZ_LINE, TY_CHAR)
+	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
 	call sprintf (Memc[query], SZ_LINE, CQ_QUERY(cc))
 	do i = 1, CQ_NQPARS(cc) {
 	    if (cq_wrdstr (i, Memc[value], CQ_SZ_QPVALUE,
@@ -397,16 +379,13 @@ begin
 	# Copy the query parameters to the results descriptor.
 	CQ_RNQPARS(res) = CQ_NQPARS(cc)
 	fsize = strlen (Memc[CQ_PQPNAMES(cc)])
-	sz_val = fsize
-	call malloc (CQ_RQPNAMES(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPNAMES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPNAMES(cc)], Memc[CQ_RQPNAMES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPVALUES(cc)])
-	sz_val = fsize
-	call malloc (CQ_RQPVALUES(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPVALUES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPVALUES(cc)], Memc[CQ_RQPVALUES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPUNITS(cc)])
-	sz_val = fsize
-	call malloc (CQ_RQPUNITS(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPUNITS(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPUNITS(cc)], Memc[CQ_RQPUNITS(res)], fsize)
 
 	# Get the input data type.
@@ -439,9 +418,8 @@ begin
 	    CQ_NHEADER(res) = 0
 
 	# Get the header parameters.
-	sz_val = SZ_LINE
-	call calloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-	call calloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+	call calloc (CQ_HKNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_HKVALUES(res), SZ_LINE, TY_CHAR)
 	ncount = 0
 	if (CQ_NHEADER(res) > 0) {
 
@@ -451,8 +429,7 @@ begin
 	    call strcpy ("|", Memc[CQ_HKNAMES(res)], sz1)
 	    call strcpy ("|", Memc[CQ_HKVALUES(res)], sz2)
 
-	    sz_val = CQ_SZ_FNAME
-	    call salloc (kname, sz_val, TY_CHAR)
+	    call salloc (kname, CQ_SZ_FNAME, TY_CHAR)
 	    do i = 1, CQ_NHEADER(res) {
 
 		# Get the keyword and value.
@@ -466,8 +443,7 @@ begin
 		# Add the keyword name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    sz_val = sz1
-		    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_HKNAMES(res), sz1, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[kname], Memc[CQ_HKNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -477,8 +453,7 @@ begin
 		# Add the keyword value to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    sz_val = sz2
-		    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+		    call realloc (CQ_HKVALUES(res), sz2, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[query], Memc[CQ_HKVALUES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -492,16 +467,13 @@ begin
 	# Resize the header keyword  and value arrays.
 	if (ncount != CQ_NHEADER(res)) {
 	    CQ_NHEADER(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_HKNAMES(res), 1, TY_CHAR)
+	    call realloc (CQ_HKVALUES(res), 1, TY_CHAR)
 	    Memc[CQ_HKNAMES(res)] = EOS
 	    Memc[CQ_HKVALUES(res)] = EOS
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_HKNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_HKVALUES(res), op2, TY_CHAR)
 	    Memc[CQ_HKNAMES(res)+op1] = EOS
 	    Memc[CQ_HKVALUES(res)+op2] = EOS
 	}
@@ -510,26 +482,20 @@ begin
 	    CQ_NFIELDS(res) = 0
 
 	# Allocate the field description arrays.
-	sz_val = SZ_LINE
-	call calloc (CQ_FNAMES(res), sz_val, TY_CHAR)
-	sz_val = CQ_NFIELDS(res)
-	call calloc (CQ_FOFFSETS(res), sz_val, TY_INT)
-	call calloc (CQ_FSIZES(res), sz_val, TY_INT)
-	call calloc (CQ_FTYPES(res), sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call calloc (CQ_FUNITS(res), sz_val, TY_CHAR)
-	call calloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+	call calloc (CQ_FNAMES(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_FOFFSETS(res), CQ_NFIELDS(res), TY_INT)
+	call calloc (CQ_FSIZES(res), CQ_NFIELDS(res), TY_INT)
+	call calloc (CQ_FTYPES(res), CQ_NFIELDS(res), TY_INT)
+	call calloc (CQ_FUNITS(res), SZ_LINE, TY_CHAR)
+	call calloc (CQ_FFMTS(res), SZ_LINE, TY_CHAR)
 
 	# Get the field decoding parameters.
 	ncount = 0
 	if (CQ_NFIELDS(res) > 0) {
 
-	    sz_val = CQ_SZ_FNAME
-	    call salloc (fname, sz_val, TY_CHAR)
-	    sz_val = CQ_SZ_FUNITS
-	    call salloc (funits, sz_val, TY_CHAR)
-	    sz_val = CQ_SZ_FFMTS
-	    call salloc (ffmt, sz_val, TY_CHAR)
+	    call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
+	    call salloc (funits, CQ_SZ_FUNITS, TY_CHAR)
+	    call salloc (ffmt, CQ_SZ_FFMTS, TY_CHAR)
 
 	    # Initialize the name, units, and format string dictionaries.
 	    sz1 = SZ_LINE; op1 = 2
@@ -556,8 +522,7 @@ begin
 		# Add the field name to the field name dictionary.
                 if ((sz1 - op1 + 1) < (CQ_SZ_FNAME + 1)) {
                     sz1 = sz1 + SZ_LINE
-                    sz_val = sz1
-                    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+                    call realloc (CQ_FNAMES(res), sz1, TY_CHAR)
                 }
                 op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_FNAMES(res)+op1-1],
                     sz1 - op1 + 1)
@@ -572,8 +537,7 @@ begin
 		# Add the field units to the field units dictionary.
                 if ((sz2 - op2 + 1) < (CQ_SZ_FUNITS + 1)) {
                     sz2 = sz2 + SZ_LINE
-                    sz_val = sz2
-                    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+                    call realloc (CQ_FUNITS(res), sz2, TY_CHAR)
                 }
                 op2 = op2 + gstrcpy (Memc[funits], Memc[CQ_FUNITS(res)+op2-1],
                     sz2 - op2 + 1)
@@ -583,8 +547,7 @@ begin
 		# Add the field format to the field format dictionary.
                 if ((sz3 - op3 + 1) < (CQ_SZ_FFMTS + 1)) {
                     sz3 = sz3 + SZ_LINE
-                    sz_val = sz3
-                    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+                    call realloc (CQ_FFMTS(res), sz3, TY_CHAR)
                 }
                 op3 = op3 + gstrcpy (Memc[ffmt], Memc[CQ_FFMTS(res)+op3-1],
                     sz3 - op3 + 1)
@@ -598,33 +561,26 @@ begin
 	# Adjust the field description size.
 	if (ncount != CQ_NFIELDS(res)) {
 	    CQ_NFIELDS(res) = 0
-	    sz_val = 1
-	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_FNAMES(res), 1, TY_CHAR)
 	    Memc[CQ_FNAMES(res)] = EOS
 	    call mfree (CQ_FOFFSETS(res), TY_INT); CQ_FOFFSETS(res) = NULL
 	    call mfree (CQ_FSIZES(res), TY_INT); CQ_FSIZES(res) = NULL
 	    call mfree (CQ_FTYPES(res), TY_INT); CQ_FTYPES(res) = NULL
-	    sz_val = 1
-	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_FUNITS(res), 1, TY_CHAR)
 	    Memc[CQ_FUNITS(res)] = EOS
-	    sz_val = 1
-	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_FFMTS(res), 1, TY_CHAR)
 	    Memc[CQ_FFMTS(res)] = EOS
 	} else {
-	    sz_val = op1
-	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+	    call realloc (CQ_FNAMES(res), op1, TY_CHAR)
+	    call realloc (CQ_FUNITS(res), op2, TY_CHAR)
+	    call realloc (CQ_FFMTS(res), op3, TY_CHAR)
 	    Memc[CQ_FNAMES(res)+op1] = EOS
 	    Memc[CQ_FUNITS(res)+op2] = EOS
 	    Memc[CQ_FFMTS(res)+op3] = EOS
 	}
 
 	# Allocate space for the simple text field indices array.
-	sz_val = CQ_MAX_NFIELDS + 1
-	call calloc (CQ_FINDICES(res), sz_val, TY_INT)
+	call calloc (CQ_FINDICES(res), CQ_MAX_NFIELDS + 1, TY_INT)
 
 	# Initilize the records descriptor.
 	CQ_RFD(res) = NULL
@@ -655,7 +611,6 @@ pointer procedure cq_frinit (cq, catfmt)
 pointer	cq			#I Initialize the results structure.
 char	catfmt[ARB]		#I the catalog format desciption
 
-size_t	sz_val
 pointer	res, sp, fname, funits, ffmt, fvalue
 int	i, ncount, sz1, sz2, sz3, op1, op2, op3, fd, foffset, fsize
 int	fscan(), nscan(), strdic(), strlen(), cq_dtype(), gstrcpy()
@@ -670,8 +625,7 @@ begin
             return (NULL)
 
 	# Allocate the structure.
-	sz_val = CQ_LEN_RES
-	call calloc (res, sz_val, TY_STRUCT)
+	call calloc (res, CQ_LEN_RES, TY_STRUCT)
 
 	# Format the catalog information, the address, query, and query
 	# parameters.
@@ -680,10 +634,9 @@ begin
 	call strcpy ("", CQ_RADDRESS(res), SZ_LINE)
 	call strcpy ("", CQ_RQUERY(res), SZ_LINE)
 	CQ_RNQPARS(res) = 0
-	sz_val = 1
-	call malloc (CQ_RQPNAMES(res), sz_val, TY_CHAR)
-	call malloc (CQ_RQPVALUES(res), sz_val, TY_CHAR)
-	call malloc (CQ_RQPUNITS(res), sz_val, TY_CHAR)
+	call malloc (CQ_RQPNAMES(res), 1, TY_CHAR)
+	call malloc (CQ_RQPVALUES(res), 1, TY_CHAR)
+	call malloc (CQ_RQPUNITS(res), 1, TY_CHAR)
 	Memc[CQ_RQPNAMES(res)] = EOS
 	Memc[CQ_RQPVALUES(res)] = EOS
 	Memc[CQ_RQPUNITS(res)] = EOS
@@ -698,14 +651,10 @@ begin
 	CQ_NFIELDS(res) = 0
 
 	call smark(sp)
-	sz_val = CQ_SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_FUNITS
-	call salloc (funits, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_FFMTS
-	call salloc (ffmt, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (fvalue, sz_val, TY_CHAR)
+	call salloc (fname, CQ_SZ_FNAME, TY_CHAR)
+	call salloc (funits, CQ_SZ_FUNITS, TY_CHAR)
+	call salloc (ffmt, CQ_SZ_FFMTS, TY_CHAR)
+	call salloc (fvalue, SZ_LINE, TY_CHAR)
 
 	# Read in the defined file formats.
 	fd = stropen (catfmt, strlen (catfmt), READ_ONLY)
@@ -758,9 +707,8 @@ begin
 		if (nscan() < 2)
 		    CQ_NHEADER(res) = 0
 
-                sz_val = SZ_LINE
-                call calloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-                call calloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+                call calloc (CQ_HKNAMES(res), SZ_LINE, TY_CHAR)
+                call calloc (CQ_HKVALUES(res), SZ_LINE, TY_CHAR)
 
 		ncount = 0
 		if (CQ_NHEADER(res) > 0) {
@@ -784,8 +732,7 @@ begin
 			# Add the keyword name to the keyword dictionary.
                 	if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
                     	    sz1 = sz1 + SZ_LINE
-                    	    sz_val = sz1
-                    	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+                    	    call realloc (CQ_HKNAMES(res), sz1, TY_CHAR)
                         }
                 	op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_HKNAMES(res)+
 			    op1-1], sz1 - op1 + 1)
@@ -795,8 +742,7 @@ begin
 			# Add the keyword value to the keyword value dictionary.
                 	if ((sz2 - op2 + 1) < (CQ_SZ_QPVALUE + 1)) {
                     	    sz2 = sz2 + SZ_LINE
-                    	    sz_val = sz2
-                    	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+                    	    call realloc (CQ_HKVALUES(res), sz2, TY_CHAR)
                 	}
                 	op2 = op2 + gstrcpy (Memc[fvalue],
 			    Memc[CQ_HKVALUES(res)+ op2-1], sz2 - op2 + 1)
@@ -810,16 +756,13 @@ begin
 		# Addjust the keyword dictionary sizes.
 	    	if (ncount != CQ_NHEADER(res)) {
                     CQ_NHEADER(res) = 0
-                    sz_val = 1
-                    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-                    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+                    call realloc (CQ_HKNAMES(res), 1, TY_CHAR)
+                    call realloc (CQ_HKVALUES(res), 1, TY_CHAR)
                     Memc[CQ_HKNAMES(res)] = EOS
                     Memc[CQ_HKVALUES(res)] = EOS
 		} else {
-                    sz_val = op1
-                    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
-                    sz_val = op2
-                    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
+                    call realloc (CQ_HKNAMES(res), op1, TY_CHAR)
+                    call realloc (CQ_HKVALUES(res), op2, TY_CHAR)
                     Memc[CQ_HKNAMES(res)+op1] = EOS
                     Memc[CQ_HKVALUES(res)+op2] = EOS
 		}
@@ -830,15 +773,12 @@ begin
 		    CQ_NFIELDS(res) = 0
 
 		# Allocate space for the field descriptors.
-		sz_val = SZ_LINE
-		call calloc (CQ_FNAMES(res), sz_val, TY_CHAR)
-	    	sz_val = CQ_NFIELDS(res)
-	    	call calloc (CQ_FOFFSETS(res), sz_val, TY_INT)
-	    	call calloc (CQ_FSIZES(res), sz_val, TY_INT)
-	    	call calloc (CQ_FTYPES(res), sz_val, TY_INT)
-		sz_val = SZ_LINE
-		call calloc (CQ_FUNITS(res), sz_val, TY_CHAR)
-		call calloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+		call calloc (CQ_FNAMES(res), SZ_LINE, TY_CHAR)
+	    	call calloc (CQ_FOFFSETS(res), CQ_NFIELDS(res), TY_INT)
+	    	call calloc (CQ_FSIZES(res), CQ_NFIELDS(res), TY_INT)
+	    	call calloc (CQ_FTYPES(res), CQ_NFIELDS(res), TY_INT)
+		call calloc (CQ_FUNITS(res), SZ_LINE, TY_CHAR)
+		call calloc (CQ_FFMTS(res), SZ_LINE, TY_CHAR)
 
 		ncount = 0
 		if (CQ_NFIELDS(res) > 0) {
@@ -867,8 +807,7 @@ begin
 			# Add the field name to the field name dictionary.
                 	if ((sz1 - op1 + 1) < (CQ_SZ_FNAME + 1)) {
                     	    sz1 = sz1 + SZ_LINE
-                    	    sz_val = sz1
-                    	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+                    	    call realloc (CQ_FNAMES(res), sz1, TY_CHAR)
                         }
                 	op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_FNAMES(res)+
 			    op1-1], sz1 - op1 + 1)
@@ -882,8 +821,7 @@ begin
 			# Add the field units to the field units dictionary.
                 	if ((sz2 - op2 + 1) < (CQ_SZ_FUNITS + 1)) {
                     	    sz2 = sz2 + SZ_LINE
-                    	    sz_val = sz2
-                    	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+                    	    call realloc (CQ_FUNITS(res), sz2, TY_CHAR)
                 	}
                 	op2 = op2 + gstrcpy (Memc[funits],
 			    Memc[CQ_FUNITS(res)+ op2-1], sz2 - op2 + 1)
@@ -893,8 +831,7 @@ begin
 			# Add the field format to the field formats dictionary.
                 	if ((sz3 - op3 + 1) < (CQ_SZ_FFMTS + 1)) {
                     	    sz3 = sz3 + SZ_LINE
-                    	    sz_val = sz3
-                    	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
+                    	    call realloc (CQ_FFMTS(res), sz3, TY_CHAR)
                 	}
                 	op3 = op3 + gstrcpy (Memc[ffmt],
 			    Memc[CQ_FFMTS(res)+ op3 -1], sz3 - op3 + 1)
@@ -906,8 +843,7 @@ begin
 		}
 	    	if (ncount != CQ_NFIELDS(res)) {
 		    CQ_NFIELDS(res) = 0
-		    sz_val = 1
-		    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR) 
+		    call realloc (CQ_FNAMES(res), 1, TY_CHAR) 
 		    Memc[CQ_FNAMES(res]) = EOS
 		    call mfree (CQ_FOFFSETS(res), TY_INT)
 		    CQ_FOFFSETS(res) = NULL
@@ -915,19 +851,14 @@ begin
 		    CQ_FSIZES(res) = NULL
 		    call mfree (CQ_FTYPES(res), TY_INT)
 		    CQ_FTYPES(res) = NULL
-		    sz_val = 1
-		    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR) 
+		    call realloc (CQ_FUNITS(res), 1, TY_CHAR) 
 		    Memc[CQ_FUNITS(res)] = EOS
-		    sz_val = 1
-		    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR) 
+		    call realloc (CQ_FFMTS(res), 1, TY_CHAR) 
 		    Memc[CQ_FFMTS(res)] = EOS
 	    	} else {
-		    sz_val = op1
-		    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR) 
-		    sz_val = op2
-		    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR) 
-		    sz_val = op3
-		    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR) 
+		    call realloc (CQ_FNAMES(res), op1, TY_CHAR) 
+		    call realloc (CQ_FUNITS(res), op2, TY_CHAR) 
+		    call realloc (CQ_FFMTS(res), op3, TY_CHAR) 
 		    Memc[CQ_FNAMES(res]+op1) = EOS
 		    Memc[CQ_FUNITS(res)+op2] = EOS
 		    Memc[CQ_FFMTS(res)+op3] = EOS
@@ -940,8 +871,7 @@ begin
 	call sfree (sp)
 
 	# Allocate space for the field indices array.
-	sz_val = CQ_MAX_NFIELDS + 1
-	call calloc (CQ_FINDICES(res), sz_val, TY_INT)
+	call calloc (CQ_FINDICES(res), CQ_MAX_NFIELDS + 1, TY_INT)
 
 	# Initilize the records descriptor.
 	CQ_RFD(res) = NULL

@@ -17,7 +17,6 @@ char	poefile[ARB]		#I QPOE file to be opened
 int	mode			#I file access mode
 pointer o_qp			#I reference file, if NEW_COPY
 
-size_t	sz_val
 int	fmmode, fd, n
 pointer sp, qph, qp, fname, fm
 
@@ -33,10 +32,8 @@ string	s_defyblock DEF_YBLOCK
 
 begin
 	call smark (sp)
-	sz_val = LEN_QPH
-	call salloc (qph, sz_val, TY_STRUCT)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (qph, LEN_QPH, TY_STRUCT)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# Construct the filename (with extension .qp) of the poefile.
 	call qp_mkfname (poefile, QPOE_EXTN, Memc[fname], SZ_PATHNAME)
@@ -48,8 +45,7 @@ begin
 	fm = fm_open (Memc[fname], fmmode)
 
 	# Allocate the QPOE descriptor.
-	sz_val = LEN_QPDES
-	call calloc (qp, sz_val, TY_STRUCT)
+	call calloc (qp, LEN_QPDES, TY_STRUCT)
 	call strcpy (Memc[fname], QP_DFNAME(qp), SZ_QPDFNAME)
 
 	# Access the global macro database, and set the default values of

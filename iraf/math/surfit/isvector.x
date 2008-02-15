@@ -17,7 +17,6 @@ real	y[ARB]		# y value
 real	zfit[ARB]	# fits surface values
 int	npts		# number of data points
 
-size_t	sz_val
 int	i
 pointer	xcoeff, cptr, sp
 
@@ -30,8 +29,7 @@ begin
 		    SF_YORDER(sf), SF_YMAXMIN(sf), SF_YRANGE(sf))
 	    } else if (SF_YORDER(sf) == 1) {
 		call smark (sp)
-		sz_val = SF_NXCOEFF(sf)
-		call salloc (xcoeff, sz_val, MEM_TYPE)
+		call salloc (xcoeff, SF_NXCOEFF(sf), MEM_TYPE)
 		cptr = SF_COEFF(sf)
 		do i = 1, SF_NXCOEFF(sf) {
 		    Memr[xcoeff+i-1] = COEFF(cptr)
@@ -51,8 +49,7 @@ begin
 		    SF_YORDER(sf), SF_YMAXMIN(sf), SF_YRANGE(sf))
 	    } else if (SF_YORDER(sf) == 1) {
 		call smark (sp)
-		sz_val = SF_NXCOEFF(sf)
-		call salloc (xcoeff, sz_val, MEM_TYPE)
+		call salloc (xcoeff, SF_NXCOEFF(sf), MEM_TYPE)
 		cptr = SF_COEFF(sf)
 		do i = 1, SF_NXCOEFF(sf) {
 		    Memr[xcoeff+i-1] = COEFF(cptr)

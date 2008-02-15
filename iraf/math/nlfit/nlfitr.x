@@ -137,7 +137,6 @@ real	w[ARB]		# weights (npts)
 int	npts		# number of points
 int	nvars		# number of independent variables
 
-size_t	sz_val
 pointer	sp, zfit, errors
 real	scatter, variance, chisqr
 int	nlstati()
@@ -145,10 +144,8 @@ int	nlstati()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (zfit, sz_val, TY_REAL)
-	sz_val = nlstati (nl, NLNPARAMS)
-	call salloc (errors, sz_val, TY_REAL)
+	call salloc (zfit, npts, TY_REAL)
+	call salloc (errors, nlstati (nl, NLNPARAMS), TY_REAL)
 
 	# Initialize
 	scatter = real (0.0)

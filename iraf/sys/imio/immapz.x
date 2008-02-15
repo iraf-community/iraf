@@ -15,8 +15,6 @@ char	imspec[ARB]		# image specification
 int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
-long	lg_val
-size_t	sz_val
 pointer	sp, imname, root, cluster, ksection, section, im
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
 int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti()
@@ -24,13 +22,11 @@ errchk	im_make_newcopy, im_init_newimage, malloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (cluster, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (ksection, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
-	call salloc (root, sz_val, TY_CHAR)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
+	call salloc (ksection, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
 
 	# The user or system manager can specify the minimum user area size
 	# as an environment variable, if the IRAF default is too small.
@@ -60,8 +56,7 @@ begin
 		max (min_lenuserarea, int(hdr_arg)) / SZ_STRUCT
 	}
 
-	sz_val = LEN_IMDES + len_imhdr
-	call malloc (im, sz_val, TY_STRUCT)
+	call malloc (im, LEN_IMDES + len_imhdr, TY_STRUCT)
 	call aclri (Memi[im], LEN_IMDES + min (len_imhdr, LEN_IMHDR + 1))
 	IM_LENHDRMEM(im) = len_imhdr
 
@@ -152,8 +147,7 @@ begin
 
 	IM_NPHYSDIM(im) = IM_NDIM(im)
 	IM_SVMTIME(im)  = IM_MTIME(im)
-	sz_val = IM_MAXDIM
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
 
 	# Process the image section if one was given, i.e., parse the section
 	# string and set up a transformation to be applied to logical input
@@ -169,9 +163,7 @@ begin
 	    IM_SECTUSED(im) = YES
 	} else {
 	    # IM_VOFF is already zero, because of the CALLOC.
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, IM_VSTEP(im,1), sz_val)
+	    call amovkl (long(1), IM_VSTEP(im,1), IM_MAXDIM)
 	    do i = 1, IM_MAXDIM
 		IM_VMAP(im,i) = i
 	}

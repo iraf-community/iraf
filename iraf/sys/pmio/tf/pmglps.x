@@ -15,7 +15,6 @@ int	px_depth		#I pixel depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-size_t	sz_val
 int	temp, np, step, xstep
 pointer	sp, px_src, px_out, im
 include	"../pmio.com"
@@ -30,8 +29,7 @@ begin
 	call smark (sp)
 
 	# Determine physical coords of line segment.
-	sz_val = PM_MAXDIM
-	call amovl (v, v3, sz_val)
+	call amovl (v, v3, PM_MAXDIM)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -49,8 +47,7 @@ begin
 
 	# Extract the pixels.
 	np = (npix - 1) * step + 1
-	sz_val = np
-	call salloc (px_src, sz_val, TY_SHORT)
+	call salloc (px_src, np, TY_SHORT)
 	call pl_glps (pl, v1, Mems[px_src], 0, np, PIX_SRC)
 
 	# Subsample and flip if necessary.
@@ -62,8 +59,7 @@ begin
 	if (!R_NEED_DST(rop))
 	    call amovs (Mems[px_src], px_dst, npix)
 	else {
-	    sz_val = npix
-	    call salloc (px_out, sz_val, TY_SHORT)
+	    call salloc (px_out, npix, TY_SHORT)
 	    call pl_pixrops (Mems[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
 		MV(px_depth), npix, rop)
 	    call amovs (Mems[px_out], px_dst, npix)

@@ -14,7 +14,6 @@ char	fname[ARB]		#I file name
 char	title[ARB]		#I mask title
 int	flags			#I save flags
 
-size_t	sz_val
 int	fd, masklen, buflen, junk
 pointer	sp, fullname, extn, bp, sv
 errchk	open, pl_save, write, mfree
@@ -23,12 +22,9 @@ bool	strne()
 
 begin
 	call smark (sp)
-	sz_val = LEN_SVDES
-	call salloc (sv, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call salloc (extn, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fullname, sz_val, TY_CHAR)
+	call salloc (sv, LEN_SVDES, TY_STRUCT)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+	call salloc (fullname, SZ_PATHNAME, TY_CHAR)
 
 	# Add the ".pl" filename extension if not already present.
 	call strcpy (fname, Memc[fullname], SZ_PATHNAME)

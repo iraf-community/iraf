@@ -14,7 +14,6 @@ procedure qpf_copyparams (im, qp)
 pointer	im			#I image descriptor
 pointer	qp			#I QPOE descriptor
 
-size_t	sz_val
 int	nelem, dtype, maxelem, flags
 pointer	sp, param, text, comment, datatype, fl, qpf, mw, io
 
@@ -30,14 +29,10 @@ double	qp_getd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (text, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (param, sz_val, TY_CHAR)
-	sz_val = SZ_COMMENT
-	call salloc (comment, sz_val, TY_CHAR)
-	sz_val = SZ_DATATYPE
-	call salloc (datatype, sz_val, TY_CHAR)
+	call salloc (text, SZ_LINE, TY_CHAR)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+	call salloc (comment, SZ_COMMENT, TY_CHAR)
+	call salloc (datatype, SZ_DATATYPE, TY_CHAR)
 
 	qpf = IM_KDES(im)
 

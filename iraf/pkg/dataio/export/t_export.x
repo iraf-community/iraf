@@ -26,7 +26,6 @@ int	imdim				# dimensionality of images
 int	imtype				# datatype of images
 int	i
 
-size_t	sz_val
 pointer	ex_init(), immap(), imtopenp(), fntopnb()
 int	ex_getpars()
 int	clgfil(), access()
@@ -40,14 +39,12 @@ define	quit_	99
 begin
 	# Allocate local stack storage.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (bfname, sz_val, TY_CHAR)
-	call salloc (blist, sz_val, TY_CHAR)
+	call salloc (bfname, SZ_FNAME, TY_CHAR)
+	call salloc (blist, SZ_FNAME, TY_CHAR)
 	call aclrc (Memc[blist], SZ_FNAME)
 	call aclrc (Memc[bfname], SZ_FNAME)
 	do i = 1, MAX_OPERANDS {
-	    sz_val = SZ_FNAME
-	    call salloc (imname[i], sz_val, TY_CHAR)
+	    call salloc (imname[i], SZ_FNAME, TY_CHAR)
 	    call aclrc (Memc[imname[i]], SZ_FNAME)
 	}
 
@@ -234,7 +231,6 @@ end
 
 pointer procedure ex_init ()
 
-size_t	sz_val
 pointer	ex
 
 begin
@@ -243,19 +239,14 @@ begin
 	    call error (0, "Error allocating EXPORT task structure.")
 
 	# Allocate internal pointers.
-	sz_val = SZ_FNAME
-	call calloc (EX_HDRPTR(ex), sz_val, TY_CHAR)
-	call calloc (EX_CMPTR(ex), sz_val, TY_CHAR)
-	call calloc (EX_LUTPTR(ex), sz_val, TY_CHAR)
-	call calloc (EX_BFNPTR(ex), sz_val, TY_CHAR)
-	sz_val = MAX_OBEXPR
-	call calloc (EX_OBANDS(ex), sz_val, TY_STRUCT)
-	sz_val = MAX_OPERANDS
-	call calloc (EX_IMOPS(ex), sz_val, TY_STRUCT)
-	sz_val = SZ_LINE
-	call calloc (EX_OTPTR(ex), sz_val, TY_CHAR)
-	sz_val = SZ_EXPSTR
-	call calloc (EX_OBPTR(ex), sz_val, TY_CHAR)
+	call calloc (EX_HDRPTR(ex), SZ_FNAME, TY_CHAR)
+	call calloc (EX_CMPTR(ex), SZ_FNAME, TY_CHAR)
+	call calloc (EX_LUTPTR(ex), SZ_FNAME, TY_CHAR)
+	call calloc (EX_BFNPTR(ex), SZ_FNAME, TY_CHAR)
+	call calloc (EX_OBANDS(ex), MAX_OBEXPR, TY_STRUCT)
+	call calloc (EX_IMOPS(ex), MAX_OPERANDS, TY_STRUCT)
+	call calloc (EX_OTPTR(ex), SZ_LINE, TY_CHAR)
+	call calloc (EX_OBPTR(ex), SZ_EXPSTR, TY_CHAR)
 
 	# Initialize some parameters.
 	EX_OUTFLAGS(ex)   = NULL
@@ -312,7 +303,6 @@ int procedure ex_getpars (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, format, header, bswap
 pointer	outtype, outbands
 
@@ -324,14 +314,11 @@ errchk	ex_do_outtype, ex_do_outbands
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (format, sz_val, TY_CHAR)
-	call salloc (header, sz_val, TY_CHAR)
-	call salloc (bswap, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (outtype, sz_val, TY_CHAR)
-	sz_val = SZ_EXPSTR
-	call salloc (outbands, sz_val, TY_CHAR)
+	call salloc (format, SZ_FNAME, TY_CHAR)
+	call salloc (header, SZ_FNAME, TY_CHAR)
+	call salloc (bswap, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_LINE, TY_CHAR)
+	call salloc (outbands, SZ_EXPSTR, TY_CHAR)
 
 	call aclrc (Memc[format], SZ_FNAME)
 	call aclrc (Memc[header], SZ_FNAME)
@@ -410,7 +397,6 @@ int	files				#i binary files list pointer
 int	ndim				#o dimensionality of images
 int	type				#o datatype of images
 
-size_t	sz_val
 pointer	im, sp, imname
 int	dim
 
@@ -421,8 +407,7 @@ errchk	immap
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call aclrc (Memc[imname], SZ_FNAME)
 
 	# Get dimension of first image.
@@ -460,7 +445,6 @@ procedure ex_outsize (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, expr
 int	i, ip, imnum, plev
 int	height, maxlen, maxhgt
@@ -471,8 +455,7 @@ int	ctoi(), strncmp()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (expr, sz_val, TY_CHAR)
+	call salloc (expr, SZ_EXPSTR, TY_CHAR)
 	call aclrc (Memc[expr], SZ_EXPSTR)
 
         call ex_getpix (ex, 1)
@@ -729,7 +712,6 @@ procedure ex_do_outbands (ex, outbands)
 pointer	ex				#i task struct pointer
 char	outbands[ARB]			#i outbands expression string
 
-size_t	sz_val
 pointer	sp, exp, expr
 int	fd, nchars, nexpr
 int	j, ip, plevel
@@ -750,8 +732,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (exp, sz_val, TY_CHAR)
+	call salloc (exp, SZ_EXPSTR, TY_CHAR)
 	call aclrc (Memc[exp], SZ_EXPSTR)
 
 	# If the outbands parameter is an @-file read in the expression from
@@ -759,8 +740,7 @@ begin
         if (outbands[1] == '@') {
             fd = open (outbands[2], READ_ONLY, TEXT_FILE)
             nchars = fstatl (fd, F_FILESIZE) + 1
-            sz_val = max(SZ_EXPSTR,nchars)
-            call calloc (expr, sz_val, TY_CHAR)
+            call calloc (expr, max(SZ_EXPSTR,nchars), TY_CHAR)
 	    ip = 0
 	    for (j=0; j<nchars && ip != EOF; j=j+1)
 	        ip = getc (fd, Memc[expr+j])
@@ -768,8 +748,7 @@ begin
             call close (fd)
         } else {
             nchars = strlen (outbands) + 1
-            sz_val = max(SZ_EXPSTR,nchars)
-            call calloc (expr, sz_val, TY_CHAR)
+            call calloc (expr, max(SZ_EXPSTR,nchars), TY_CHAR)
 	    call strcpy (outbands, Memc[expr], nchars)
 	}
 
@@ -843,7 +822,6 @@ procedure ex_parse_operands (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, expr
 int	i, ip, opnum
 char	ch, tag[SZ_TAG]
@@ -852,8 +830,7 @@ int	ctoi()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (expr, sz_val, TY_CHAR)
+	call salloc (expr, SZ_EXPSTR, TY_CHAR)
 
 	EX_NIMOPS(ex) = 0
 	EX_NIMAGES(ex) = 0
@@ -1101,7 +1078,6 @@ procedure ex_mkfname (ex, fname)
 pointer ex                              #i task struct pointer
 char	fname[ARB]			# generate the output filename
 
-size_t	sz_val
 pointer	sp, suffix, test
 int	fnextn()
 bool 	streq()
@@ -1109,8 +1085,7 @@ pointer	exb_fmt_ext()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (test, sz_val, TY_CHAR)
+	call salloc (test, SZ_FNAME, TY_CHAR)
 
 	if (EX_FORMAT(ex) == FMT_BUILTIN)
 	     suffix =  exb_fmt_ext (ex)
@@ -1142,14 +1117,11 @@ end
 
 procedure ex_alloc_outbands (op)
 
-size_t	sz_val
 pointer	op				#i outbands struct pointer
 
 begin
-	sz_val = LEN_OUTBANDS
-	call calloc (op, sz_val, TY_STRUCT)
-	sz_val = SZ_EXPSTR
-	call calloc (OB_EXPSTR(op), sz_val, TY_CHAR)
+	call calloc (op, LEN_OUTBANDS, TY_STRUCT)
+	call calloc (OB_EXPSTR(op), SZ_EXPSTR, TY_CHAR)
 end
 
 
@@ -1169,14 +1141,11 @@ end
 
 procedure ex_alloc_operand (op)
 
-size_t	sz_val
 pointer	op				#i operand struct pointer
 
 begin
-	sz_val = LEN_OPERAND
-	call calloc (op, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call calloc (IO_TAG(op), sz_val, TY_CHAR)
+	call calloc (op, LEN_OPERAND, TY_STRUCT)
+	call calloc (IO_TAG(op), SZ_FNAME, TY_CHAR)
 end
 
 

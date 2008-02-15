@@ -86,7 +86,6 @@ int	linemin		# minimum line number
 int	linemax		# maximum line number
 int	ranges[ARB]	# ranges
 
-size_t	sz_val
 int	i, j, lc
 int	olp, lp, lnull, lold
 int	nr, nnewr, noldr
@@ -121,8 +120,7 @@ begin
 		    # check the size of the list
 		    if (PRL_SZLIST(pl) < (nr + PRL_LP(pl))) {
 	    		PRL_SZLIST(pl) = PRL_SZLIST(pl) + nr + 1 
-	    		sz_val = PRL_SZLIST(pl)
-	    		call realloc (PRL_LIST(pl), sz_val, TY_INT)
+	    		call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
 		    }
 
 		    # move ranges and reset pointers
@@ -154,8 +152,7 @@ begin
 		    # check size of list
 	            if (PRL_SZLIST(pl) < (nnewr + PRL_LP(pl))) {
 		        PRL_SZLIST(pl) = PRL_SZLIST(pl) + nnewr + 1
-	                sz_val = PRL_SZLIST(pl)
-	                call realloc (PRL_LIST(pl), sz_val, TY_INT)
+	                call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
 		    }
 
 		    # add ranges to list and update pointers
@@ -293,7 +290,6 @@ int	linemin		# minimum line
 int	linemax		# maximum line
 int	ranges[ARB]	# list of ranges
 
-size_t	sz_val
 int	i
 int	len_range
 
@@ -310,8 +306,7 @@ begin
 	# check space allocation
 	if (PRL_SZLIST(pl) < (len_range + PRL_LP(pl))) {
 	    PRL_SZLIST(pl) = PRL_SZLIST(pl) + len_range + 1
-	    sz_val = PRL_SZLIST(pl)
-	    call realloc (PRL_LIST(pl), sz_val, TY_INT)
+	    call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
 	}
 
 	# set the line pointers
@@ -351,29 +346,24 @@ procedure prl_init (pl, ncols, nlines)
 
 pointer	pl		# pixel list descriptor
 int	ncols		# number of image columns 
-size_t	sz_val
 int	nlines		# number of image lines
 
 begin
 	# allocate space for a pixel list descriptor
-	sz_val = LEN_PLSTRUCT
-	call malloc (pl, sz_val, TY_STRUCT)
+	call malloc (pl, LEN_PLSTRUCT, TY_STRUCT)
 
 	# initialize
 	PRL_NCOLS(pl) = ncols
 	PRL_NLINES(pl) = nlines
 
 	# allocate space for the line pointers
-	sz_val = PRL_NLINES(pl)
-	call malloc (PRL_LINES(pl), sz_val, TY_INT) 
-	sz_val = PRL_NLINES(pl)
-	call amovki (NULL, Memi[PRL_LINES(pl)], sz_val)
+	call malloc (PRL_LINES(pl), PRL_NLINES(pl), TY_INT) 
+	call amovki (NULL, Memi[PRL_LINES(pl)], PRL_NLINES(pl))
 
 	# set pointer to next free element
 	PRL_LP(pl) = 1
 
 	# allocate space for the actual list
-	sz_val = PRL_NLINES(pl)
-	call malloc (PRL_LIST(pl), sz_val, TY_INT)
+	call malloc (PRL_LIST(pl), PRL_NLINES(pl), TY_INT)
 	PRL_SZLIST(pl) = PRL_NLINES(pl)
 end

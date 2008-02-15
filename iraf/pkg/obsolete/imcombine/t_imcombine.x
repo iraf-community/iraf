@@ -18,7 +18,6 @@ pointer	sp, input, output, rmask, sigma, plfile, logfile
 pointer	ilist, olist, rlist, slist, plist
 int	n
 
-size_t	sz_val
 bool	clgetb()
 real	clgetr()
 int	clgwrd(), clgeti(), imtgetim(), imtlen()
@@ -28,16 +27,15 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (rmask, sz_val, TY_CHAR)
-	call salloc (plfile, sz_val, TY_CHAR)
-	call salloc (sigma, sz_val, TY_CHAR)
-	call salloc (gain, sz_val, TY_CHAR)
-	call salloc (rdnoise, sz_val, TY_CHAR)
-	call salloc (snoise, sz_val, TY_CHAR)
-	call salloc (logfile, sz_val, TY_CHAR)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (rmask, SZ_FNAME, TY_CHAR)
+	call salloc (plfile, SZ_FNAME, TY_CHAR)
+	call salloc (sigma, SZ_FNAME, TY_CHAR)
+	call salloc (gain, SZ_FNAME, TY_CHAR)
+	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
+	call salloc (snoise, SZ_FNAME, TY_CHAR)
+	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.  Some additional parameters are obtained later.
 	ilist = imtopenp ("input")
@@ -173,7 +171,6 @@ char	sigma[ARB]		# Sigma image (optional)
 char	logfile[ARB]		# Logfile (optional)
 int	stack			# Stack input images?
 
-size_t	sz_val
 char	errstr[SZ_LINE]
 int	i, j, nimages, intype, stack1, err, bufsize_i
 pointer	sp, in, out[4], icm, offsets, key, tmp
@@ -222,15 +219,11 @@ retry_
 		if (IM_NDIM(out[1]) == 1)
 		    call error (1, "Can't project one dimensional images")
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
-		sz_val = nimages
-		call salloc (in, sz_val, TY_POINTER)
-		sz_val = nimages
-		call amovki (out[1], Memi[in], sz_val)
+		call salloc (in, nimages, TY_POINTER)
+		call amovki (out[1], Memi[in], nimages)
 	    } else {
-		sz_val = imtlen(list)
-		call salloc (in, sz_val, TY_POINTER)
-		sz_val = imtlen(list)
-		call amovki (NULL, Memi[in], sz_val)
+		call salloc (in, imtlen(list), TY_POINTER)
+		call amovki (NULL, Memi[in], imtlen(list))
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
 		    tmp = immap (input, READ_ONLY, 0)
@@ -274,16 +267,14 @@ retry_
 	    # Map the output image and set dimensions and offsets.
 	    tmp = immap (output, NEW_COPY, Memi[in]); out[1] = tmp
 	    if (stack1 == YES) {
-		sz_val = SZ_FNAME
-		call salloc (key, sz_val, TY_CHAR)
+		call salloc (key, SZ_FNAME, TY_CHAR)
 		do i = 1, nimages {
 		    call sprintf (Memc[key], SZ_FNAME, "stck%04d")
 			call pargi (i)
 		    call imdelf (out[1], Memc[key])
 		}
 	    }
-	    sz_val = nimages*IM_NDIM(out[1])
-	    call salloc (offsets, sz_val, TY_INT)
+	    call salloc (offsets, nimages*IM_NDIM(out[1]), TY_INT)
 	    call ic_setout (Memi[in], out, Memi[offsets], nimages)
 
 	    # Determine the highest precedence datatype and set output datatype.
@@ -300,10 +291,8 @@ retry_
 		IM_NDIM(out[4]) = IM_NDIM(out[4]) + 1
 		IM_LEN(out[4],IM_NDIM(out[4])) = nimages
 		if (!project) {
-		    if (key == NULL) {
-			sz_val = SZ_FNAME
-			call salloc (key, sz_val, TY_CHAR)
-		    }
+		    if (key == NULL)
+			call salloc (key, SZ_FNAME, TY_CHAR)
 		    do i = 1, nimages {
 			j = imtrgetim (list, i, input, SZ_FNAME)
 			call sprintf (Memc[key], SZ_FNAME, "mask%04d")
@@ -496,15 +485,13 @@ int	mode			# Image mode
 pointer	refim			# Reference image
 pointer	pm			# IMIO pointer (returned)
 
-size_t	sz_val
 int	i, fnextn()
 pointer	sp, extn, immap()
 bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
 
 	i = fnextn (fname, Memc[extn], SZ_FNAME)
 	if (streq (Memc[extn], "pl"))

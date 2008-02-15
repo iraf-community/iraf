@@ -37,8 +37,6 @@ real	blank			#I Blank values
 char	storetype[ARB]		#I Storage type
 bool	verbose			#I Verbose?
 
-long	lg_val
-size_t	sz_val
 int	i, j, nims, nc, nl, iindex, oindex, eindex, stat, halfwin, ot, stype
 int	fd, len[IM_MAXDIM]
 short	nused
@@ -56,8 +54,7 @@ pointer	immap(), rm_open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Check input data for errors.
 	nims = imtlen (input)
@@ -108,24 +105,19 @@ begin
 	    fd = NULL
 
 	# Allocate memory.
-	sz_val = SZ_FNAME
-	call salloc (inname, sz_val, TY_CHAR)
-	call salloc (outname, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (omname, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (iline, sz_val, TY_LONG)
-	call salloc (imline, sz_val, TY_LONG)
-	call salloc (oline, sz_val, TY_LONG)
-	call salloc (omline, sz_val, TY_LONG)
-	sz_val = window
-	call salloc (hdrs, sz_val, TY_POINTER)
-	call salloc (scales, sz_val, TY_REAL)
-	if (streq (scale, "mode")) {
-	    sz_val = NSAMPLE
-	    call salloc (sample, sz_val, TY_STRUCT)
-	}
+	call salloc (inname, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (omname, SZ_FNAME, TY_CHAR)
+	call salloc (iline, IM_MAXDIM, TY_LONG)
+	call salloc (imline, IM_MAXDIM, TY_LONG)
+	call salloc (oline, IM_MAXDIM, TY_LONG)
+	call salloc (omline, IM_MAXDIM, TY_LONG)
+	call salloc (hdrs, window, TY_POINTER)
+	call salloc (scales, window, TY_REAL)
+	if (streq (scale, "mode"))
+	    call salloc (sample, NSAMPLE, TY_STRUCT)
 
 	# Initialize
 	halfwin = window / 2
@@ -159,8 +151,7 @@ begin
 	    j = mod (iindex, window)
 	    hdr = Memi[hdrs+j]
 	    call mfree (hdr, TY_STRUCT)
-	    sz_val = LEN_IMDES+IM_HDRLEN(in)+1
-	    call malloc (hdr, sz_val, TY_STRUCT)
+	    call malloc (hdr, LEN_IMDES+IM_HDRLEN(in)+1, TY_STRUCT)
 	    call amovi (Memi[in], Memi[hdr], LEN_IMDES)
 	    call amovi (IM_MAGIC(in), IM_MAGIC(hdr), IM_HDRLEN(in)+1)
 	    call strcpy (Memc[inname], IM_NAME(hdr), SZ_IMNAME)
@@ -175,8 +166,7 @@ begin
 	        if (!aveqi (IM_LEN(im,1), len, IM_MAXDIM))
 		    call error (21, "Mask size not the same")
 	    } else if (imdata1 == NULL) {
-	        sz_val = IM_LEN(in,1)
-	        call salloc (imdata1, sz_val, TY_SHORT)
+	        call salloc (imdata1, IM_LEN(in,1), TY_SHORT)
 		call aclrs (Mems[imdata1], IM_LEN(in,1))
 	    }
 
@@ -188,8 +178,7 @@ begin
 		    nl = nl * len[i]
 
 		# Memory is allocated in blocks of number of columns.
-		sz_val = nl
-		call salloc (rms, sz_val, TY_POINTER)
+		call salloc (rms, nl, TY_POINTER)
 		do j = 1, nl {
 		    rm = rm_open (window, nc, stype)
 		    Memi[rms+j-1] = rm
@@ -244,10 +233,8 @@ begin
 
 	    # Do initial accumulation.
 	    if (iindex < window) {
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, Meml[iline], sz_val)
-		call amovkl (lg_val, Meml[imline], sz_val)
+		call amovkl (long(1), Meml[iline], IM_MAXDIM)
+		call amovkl (long(1), Meml[imline], IM_MAXDIM)
 		do j = 1, nl {
 		    rm = Memi[rms+j-1]
 		    if (im != NULL)
@@ -309,10 +296,8 @@ begin
 		    call imastr (out, Memc[str], Memc[omname])
 	    } else
 	        om = NULL
-	    if (omdata1 == NULL) {
-	        sz_val = IM_LEN(in,1)
-	        call salloc (omdata1, sz_val, TY_SHORT)
-	    }
+	    if (omdata1 == NULL)
+	        call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
 
 	    if (outscale)
 	        oscl = 1
@@ -320,12 +305,10 @@ begin
 		oscl = 1 / Memr[scales+mod(oindex,window)]
 
 	    # Add input data and create output data.
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, Meml[iline], sz_val)
-	    call amovkl (lg_val, Meml[imline], sz_val)
-	    call amovkl (lg_val, Meml[oline], sz_val)
-	    call amovkl (lg_val, Meml[omline], sz_val)
+	    call amovkl (long(1), Meml[iline], IM_MAXDIM)
+	    call amovkl (long(1), Meml[imline], IM_MAXDIM)
+	    call amovkl (long(1), Meml[oline], IM_MAXDIM)
+	    call amovkl (long(1), Meml[omline], IM_MAXDIM)
 	    do j = 1, nl {
 		stat = impnlr (out, odata, Meml[oline])
 		if (im != NULL)
@@ -448,20 +431,16 @@ begin
 			call imastr (out, Memc[str], Memc[omname])
 		} else
 		    om = NULL
-		if (omdata1 == NULL) {
-		    sz_val = IM_LEN(in,1)
-		    call salloc (omdata1, sz_val, TY_SHORT)
-		}
+		if (omdata1 == NULL)
+		    call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
 
 		if (outscale)
 		    oscl = 1
 		else
 		    oscl = 1 / Memr[scales+mod(oindex,window)]
 
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, Meml[oline], sz_val)
-		call amovkl (lg_val, Meml[omline], sz_val)
+		call amovkl (long(1), Meml[oline], IM_MAXDIM)
+		call amovkl (long(1), Meml[omline], IM_MAXDIM)
 		do j = 1, nl {
 		    stat = impnlr (out, odata, Meml[oline])
 		    if (om != NULL)

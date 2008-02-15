@@ -17,8 +17,6 @@ pointer	io			#I QPIO descriptor
 char	mask[ARB]		#I mask to be loaded
 int	merge			#I merge with old mask?
 
-long	lg_val
-size_t	sz_val
 int	niter
 int	naxes, axlen[PL_MAXDIM], v[PL_MAXDIM]
 pointer	sp, title, mp, sym, plbuf, qp, o_pl, n_pl, b_pl
@@ -30,9 +28,8 @@ define	tryfile_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (title, sz_val, TY_CHAR)
-	call salloc (mp, sz_val, TY_CHAR)
+	call salloc (title, SZ_FNAME, TY_CHAR)
+	call salloc (mp, SZ_FNAME, TY_CHAR)
 
 	if (IO_DEBUG(io) > 0) {
 	    call eprintf ("load mask `%s'\n")
@@ -57,8 +54,7 @@ tryfile_
 		sym = qp_gpsym (qp, Memc[mp])
 		if (S_DTYPE(sym) == TY_OPAQUE) {
 		    # Parameter value is stored mask.
-		    sz_val = S_NELEM(sym) / SZ_SHORT
-		    call salloc (plbuf, sz_val, TY_SHORT)
+		    call salloc (plbuf, S_NELEM(sym) / SZ_SHORT, TY_SHORT)
 		    if (qp_read (qp, Memc[mp], Mems[plbuf], S_NELEM(sym), 1,
 			"opaque") < S_NELEM(sym)) {
 			call syserrs (SYS_QPBADVAL, Memc[mp])
@@ -93,9 +89,7 @@ tryfile_
 
 	if (merge == YES && o_pl != NULL) {
 	    b_pl = pl_open (NULL)
-	    lg_val = 1
-	    sz_val = PL_MAXDIM
-	    call amovkl (lg_val, v, sz_val)
+	    call amovkl (1, v, PL_MAXDIM)
 	    call pl_ssize (b_pl, naxes, axlen, 1)
 	    call pl_rop (o_pl, v, b_pl, v, axlen, PIX_SRC)
 	    call pl_rop (b_pl, v, n_pl, v, axlen, and(PIX_SRC,PIX_DST))
@@ -115,13 +109,10 @@ tryfile_
 	if (IO_INDEXLEN(io) > 0) {
 	    if (IO_RL(io) != NULL)
 		call mfree (IO_RL(io), TY_INT)
-	    if (IO_PL(io) != NULL) {
-		sz_val = RL_MAXLEN(IO_PL(io))
-		call malloc (IO_RL(io), sz_val, TY_INT)
-	    } else {
-		sz_val = RL_LENELEM*2
-		call malloc (IO_RL(io), sz_val, TY_INT)
-	    }
+	    if (IO_PL(io) != NULL)
+		call malloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+	    else
+		call malloc (IO_RL(io), RL_LENELEM*2, TY_INT)
 	}
 
 	call sfree (sp)

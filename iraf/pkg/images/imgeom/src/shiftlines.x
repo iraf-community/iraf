@@ -21,8 +21,6 @@ int	boundary			# Boundary extension type
 real	constant			# Constant boundary extension
 char	interpstr[ARB]			# Interpolation type
 
-long	lg_val
-size_t	sz_val
 int	i, nsinc, nincr, ncols, nimcols, nlines, nbpix, nmargin, interpolation
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 real	dx, deltax, cx
@@ -67,8 +65,7 @@ begin
 
 	# Allocate space for and set up the interpolation coordinates.
 	call smark (sp)
-	sz_val = 2 * ncols
-	call salloc (x, sz_val, TY_REAL)
+	call salloc (x, 2 * ncols, TY_REAL)
 	deltax = deltax + nmargin
 	if (interpolation == II_DRIZZLE) {
 	    do i = 1, ncols {
@@ -99,9 +96,7 @@ begin
 	    nlines = nlines * IM_LEN(im1, i)
 
 	# Initialize the output v vector.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, vout, sz_val)
+	call amovkl (long(1), vout, IM_MAXDIM)
 
 	# Shift the images.
 	do i = 1, nlines {
@@ -142,8 +137,6 @@ int	shift				# Integer shift
 int	boundary			# Boundary extension type
 real	constant			# Constant for boundary extension
 
-size_t	sz_val
-long	lg_val
 int	i, ncols, nlines, junk
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 pointer	buf1, buf2
@@ -169,9 +162,7 @@ begin
 	    v1[i] = long (1)
 	    v2[i] = long (1)
 	}
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, vout, sz_val)
+	call amovkl (long(1), vout, IM_MAXDIM)
 
 	# Setup line counter.
 	nlines = 1
@@ -214,8 +205,7 @@ begin
 		junk = impnll (im2, buf2, vout)
 		if (junk == EOF)
 		    call error (0, "Shiftlinesi: error writing out image")
-		sz_val = ncols
-		call amovl (Meml[buf1], Meml[buf2], sz_val)
+		call amovl (Meml[buf1], Meml[buf2], ncols)
 		call sh_loop (v1, v2, IM_LEN(im1,1), IM_NDIM(im1))
 	    }
 
@@ -227,8 +217,7 @@ begin
 		junk = impnlr (im2, buf2, vout)
 		if (junk == EOF)
 		    call error (0, "Shiftlinesi: error writing out image")
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 		call sh_loop (v1, v2, IM_LEN(im1,1), IM_NDIM(im1))
 	    }
 

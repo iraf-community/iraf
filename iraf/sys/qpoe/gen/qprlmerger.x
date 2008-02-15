@@ -12,7 +12,6 @@ int procedure qp_rlmerger (os,oe,olen, xs,xe,nx, ys,ye,ny)
 pointer	os, oe			#U output range list
 int	olen			#U allocated length of OS, OE arrays
 
-size_t	sz_val
 real	xs[ARB], xe[ARB]	#I range list to be merged with
 int	nx			#I number of ranges in X list
 real	ys[ARB], ye[ARB]	#I range list to be merged with X
@@ -56,9 +55,8 @@ begin
 	    # Output the range.
 	    if (nx_out + 1 > olen) {
 		olen = max (DEF_XLEN, olen * 2)
-		sz_val = olen
-		call realloc (os, sz_val, TY_REAL)
-		call realloc (oe, sz_val, TY_REAL)
+		call realloc (os, olen, TY_REAL)
+		call realloc (oe, olen, TY_REAL)
 	    }
 
 	    Memr[os+nx_out] = o1

@@ -17,7 +17,6 @@ pointer	sf		# pointer to the surface fitting descriptor
 real	coeff[ARB]	# the coefficients of the fit
 int	ncoeff		# the number of coefficients
 
-size_t	sz_val
 int	i
 pointer	cptr
 
@@ -25,8 +24,7 @@ begin
 	# calculate the number of coefficients
 	if (SF_XTERMS(sf) == NO) {
 	    ncoeff = SF_NXCOEFF(sf) + SF_NYCOEFF(sf) - 1
-	    sz_val = SF_NYCOEFF(sf)
-	    call amovr (COEFF(SF_COEFF(sf)), coeff, sz_val)
+	    call amovr (COEFF(SF_COEFF(sf)), coeff, SF_NYCOEFF(sf))
 	    cptr = SF_COEFF(sf) + SF_NYCOEFF(sf)
 	    do i = SF_NYCOEFF(sf) + 1, ncoeff {
 		coeff[i] = COEFF(cptr)
@@ -34,7 +32,6 @@ begin
 	    }
 	} else {
 	    ncoeff = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
-	    sz_val = ncoeff
-	    call amovr (COEFF(SF_COEFF(sf)), coeff, sz_val)
+	    call amovr (COEFF(SF_COEFF(sf)), coeff, ncoeff)
 	}
 end

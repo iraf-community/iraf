@@ -67,7 +67,6 @@ bool	verbose
 int	fd, ndev, buflen
 pointer	devlist
 pointer	sp, termcap_file, output_file, devname, tc, tty
-size_t	sz_val
 bool	clgetb()
 int	clgfil(), tc_putstr(), open(), tc_dummy_ttyload()
 pointer	clpopnu(), ttyopen()
@@ -76,12 +75,10 @@ errchk	open, tc_write_data_declarations, clgfil, tc_putstr, malloc, realloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (termcap_file, sz_val, TY_CHAR)
-	call salloc (output_file, sz_val, TY_CHAR)
-	call salloc (devname, sz_val, TY_CHAR)
-	sz_val = LEN_TCSTRUCT
-	call salloc (tc, sz_val, TY_STRUCT)
+	call salloc (termcap_file, SZ_FNAME, TY_CHAR)
+	call salloc (output_file, SZ_FNAME, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (tc, LEN_TCSTRUCT, TY_STRUCT)
 
 	# Open the list of devices to be compiled into the cache.  CLGFIL is
 	# useful for reading the list even though the list elements are not
@@ -108,11 +105,9 @@ begin
 	TC_NEXTCH(tc)     = 0
 
 	iferr {
-	    sz_val = buflen
-	    call malloc (TC_DEVNAME_P(tc), sz_val, TY_INT)
-	    call malloc (TC_CAPLIST_P(tc), sz_val, TY_INT)
-	    sz_val = SZ_SBUF
-	    call malloc (TC_SBUF(tc), sz_val, TY_CHAR)
+	    call malloc (TC_DEVNAME_P(tc), buflen, TY_INT)
+	    call malloc (TC_CAPLIST_P(tc), buflen, TY_INT)
+	    call malloc (TC_SBUF(tc), SZ_SBUF, TY_CHAR)
 	} then
 	    call erract (EA_FATAL)
 
@@ -149,9 +144,8 @@ begin
 		TC_MAXDEVICES(tc) = TC_MAXDEVICES(tc) + INC_DEVICES
 		buflen = TC_MAXDEVICES(tc)
 		iferr {
-		    sz_val = buflen
-		    call realloc (TC_DEVNAME_P(tc), sz_val, TY_INT)
-		    call realloc (TC_CAPLIST_P(tc), sz_val, TY_INT)
+		    call realloc (TC_DEVNAME_P(tc), buflen, TY_INT)
+		    call realloc (TC_CAPLIST_P(tc), buflen, TY_INT)
 		} then
 		    call erract (EA_FATAL)
 	    }
@@ -189,7 +183,6 @@ int procedure tc_putstr (tc, str)
 
 pointer	tc
 char	str[ARB]
-size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -202,8 +195,7 @@ begin
 	nextch = TC_NEXTCH(tc)
 	if (nextch + nchars + 1 > TC_SZSBUF(tc)) {
 	    TC_SZSBUF(tc) = TC_SZSBUF(tc) + INC_SZSBUF
-	    sz_val = TC_SZSBUF(tc)
-	    call realloc (TC_SBUF(tc), sz_val, TY_CHAR)
+	    call realloc (TC_SBUF(tc), TC_SZSBUF(tc), TY_CHAR)
 	}
 
 	call strcpy (str, Memc[TC_SBUF(tc) + nextch], ARB)

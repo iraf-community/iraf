@@ -23,7 +23,6 @@ real	zeros[nimages]		# Zero or sky levels
 real	wts[nimages]		# Weights
 int	nimages			# Number of images
 
-size_t	sz_val
 int	stype, ztype, wtype
 int	i, j, k, l, nout
 real	mode, median, mean, sumwts
@@ -40,19 +39,16 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	sz_val = nimages
-	call salloc (ncombine, sz_val, TY_INT)
-	call salloc (exptime, sz_val, TY_REAL)
-	call salloc (modes, sz_val, TY_REAL)
-	call salloc (medians, sz_val, TY_REAL)
-	call salloc (means, sz_val, TY_REAL)
-	sz_val = SZ_LINE
-	call salloc (section, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (sname, sz_val, TY_CHAR)
-	call salloc (zname, sz_val, TY_CHAR)
-	call salloc (wname, sz_val, TY_CHAR)
+	call salloc (ncombine, nimages, TY_INT)
+	call salloc (exptime, nimages, TY_REAL)
+	call salloc (modes, nimages, TY_REAL)
+	call salloc (medians, nimages, TY_REAL)
+	call salloc (means, nimages, TY_REAL)
+	call salloc (section, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (sname, SZ_FNAME, TY_CHAR)
+	call salloc (zname, SZ_FNAME, TY_CHAR)
+	call salloc (wname, SZ_FNAME, TY_CHAR)
 
 	# Get the number of images previously combined and the exposure times.
 	# The default combine number is 1 and the default exposure is 0.
@@ -66,8 +62,7 @@ begin
 	    } else
 		Memr[exptime+i-1] = 0.
 	    if (project) {
-		sz_val = nimages
-		call amovki (Memi[ncombine], Memi[ncombine], sz_val)
+		call amovki (Memi[ncombine], Memi[ncombine], nimages)
 		call amovkr (Memr[exptime], Memr[exptime], nimages)
 		break
 	    }
@@ -192,42 +187,24 @@ begin
 	call amovkr (INDEFR, Memr[modes], nimages)
 	call amovkr (INDEFR, Memr[medians], nimages)
 	call amovkr (INDEFR, Memr[means], nimages)
-	if (stype == S_MODE) {
-	    sz_val = nimages
-	    call amovr (scales, Memr[modes], sz_val)
-	}
-	if (stype == S_MEDIAN) {
-	    sz_val = nimages
-	    call amovr (scales, Memr[medians], sz_val)
-	}
-	if (stype == S_MEAN) {
-	    sz_val = nimages
-	    call amovr (scales, Memr[means], sz_val)
-	}
-	if (ztype == S_MODE) {
-	    sz_val = nimages
-	    call amovr (zeros, Memr[modes], sz_val)
-	}
-	if (ztype == S_MEDIAN) {
-	    sz_val = nimages
-	    call amovr (zeros, Memr[medians], sz_val)
-	}
-	if (ztype == S_MEAN) {
-	    sz_val = nimages
-	    call amovr (zeros, Memr[means], sz_val)
-	}
-	if (wtype == S_MODE) {
-	    sz_val = nimages
-	    call amovr (wts, Memr[modes], sz_val)
-	}
-	if (wtype == S_MEDIAN) {
-	    sz_val = nimages
-	    call amovr (wts, Memr[medians], sz_val)
-	}
-	if (wtype == S_MEAN) {
-	    sz_val = nimages
-	    call amovr (wts, Memr[means], sz_val)
-	}
+	if (stype == S_MODE)
+	    call amovr (scales, Memr[modes], nimages)
+	if (stype == S_MEDIAN)
+	    call amovr (scales, Memr[medians], nimages)
+	if (stype == S_MEAN)
+	    call amovr (scales, Memr[means], nimages)
+	if (ztype == S_MODE)
+	    call amovr (zeros, Memr[modes], nimages)
+	if (ztype == S_MEDIAN)
+	    call amovr (zeros, Memr[medians], nimages)
+	if (ztype == S_MEAN)
+	    call amovr (zeros, Memr[means], nimages)
+	if (wtype == S_MODE)
+	    call amovr (wts, Memr[modes], nimages)
+	if (wtype == S_MEDIAN)
+	    call amovr (wts, Memr[medians], nimages)
+	if (wtype == S_MEAN)
+	    call amovr (wts, Memr[means], nimages)
 
 	# If nothing else has set the scaling factors set them to defaults.
 	do i = 1, nimages {

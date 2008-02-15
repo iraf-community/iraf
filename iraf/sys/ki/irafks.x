@@ -152,7 +152,6 @@ int	in		# input channel, a binary stream
 int	out		# output channel, a binary stream
 int	buflen		# iobuf size or 0
 
-size_t	sz_val
 pointer	iobuf, op, top
 long	fi[LEN_FINFO]
 char	curdir[SZ_PATHNAME]
@@ -186,8 +185,7 @@ begin
 	    len_iobuf = buflen / SZB_CHAR
 	else
 	    len_iobuf = DEF_LENIOBUF / SZB_CHAR
-	sz_val = len_iobuf
-	call malloc (iobuf, sz_val, TY_CHAR)
+	call malloc (iobuf, len_iobuf, TY_CHAR)
 
 	if (debug == YES) {
 	    call fprintf (spy, "kernel server, len_iobuf=%d\n")
@@ -254,8 +252,7 @@ begin
 		    status = envscan (p_sbuf)
 		else {
 		    if (len_iobuf < nchars) {
-			sz_val = nchars
-			call realloc (iobuf, sz_val, TY_CHAR)
+			call realloc (iobuf, nchars, TY_CHAR)
 			len_iobuf = nchars
 		    }
 
@@ -676,7 +673,6 @@ pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 pointer	bfdd[ARB]		# loaded device drivers
 
-size_t	sz_val
 long	lval, ks_maxbufsize
 int	dd, status, nchars, arg1, arg2, arg3
 char	osfn[SZ_PATHNAME], temp[SZ_PATHNAME]
@@ -702,8 +698,7 @@ begin
 	if (p_subcode == BF_ARD || p_subcode == BF_AWR) {
 	    nchars = (p_arg[2] + SZB_CHAR-1) / SZB_CHAR
 	    if (len_iobuf < nchars) {
-		sz_val = nchars
-		call realloc (iobuf, sz_val, TY_CHAR)
+		call realloc (iobuf, nchars, TY_CHAR)
 		len_iobuf = nchars
 	    }
 	}
@@ -1081,7 +1076,6 @@ int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 
-size_t	sz_val
 long	lval
 int	status, nchars, mode, dc_off, dc_len
 int	newfile, arg[MAX_ARGS]
@@ -1104,8 +1098,7 @@ begin
 	if (p_subcode == MT_RD || p_subcode == MT_WR) {
 	    nchars = (arg[2] + SZB_CHAR-1) / SZB_CHAR
 	    if (len_iobuf < nchars) {
-		sz_val = nchars
-		call realloc (iobuf, sz_val, TY_CHAR)
+		call realloc (iobuf, nchars, TY_CHAR)
 		len_iobuf = nchars
 	    }
 	}

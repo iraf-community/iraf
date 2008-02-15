@@ -14,7 +14,6 @@ procedure ex_wheader (ex, outfile)
 pointer	ex				#i task struct pointer
 char	outfile[ARB]			#i output file name
 
-size_t	sz_val
 pointer	sp, tfile, buf, cbuf
 int	file_type, nchars
 
@@ -27,11 +26,9 @@ begin
 	if (EX_HEADER(ex) == HDR_SHORT || EX_HEADER(ex) == HDR_LONG) {
 
 	    call smark (sp)
-	    sz_val = SZ_PATHNAME
-	    call salloc (tfile, sz_val, TY_CHAR)
-	    sz_val = SZ_LINE
-	    call salloc (buf, sz_val, TY_CHAR)
-	    call salloc (cbuf, sz_val, TY_CHAR)
+	    call salloc (tfile, SZ_PATHNAME, TY_CHAR)
+	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    call salloc (cbuf, SZ_LINE, TY_CHAR)
 	    call aclrc (Memc[buf], SZ_LINE)
 	    call aclrc (Memc[cbuf], SZ_LINE)
 
@@ -160,7 +157,6 @@ procedure ex_wimhdr (ex, fd)
 pointer	ex					#i task struct pointer
 int	fd					#i temp file descriptor
 
-size_t	sz_val
 pointer sp, lbuf, ip, im
 int     i, in, ncols, min_lenuserarea 
 int     stropen(), getline(), envgeti()
@@ -170,8 +166,7 @@ define  LMARGIN         4
 
 begin
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (lbuf, sz_val, TY_CHAR)
+        call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	do i = 1, EX_NIMAGES(ex) {
 

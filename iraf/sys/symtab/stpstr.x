@@ -16,7 +16,6 @@ pointer	stp			# symtab descriptor
 char	str[ARB]		# string to be moved into storage
 int	minchars		# minimum number of chars to reserve
 
-size_t	sz_val
 int	offset, buflen, blklen
 int	strlen()
 errchk	realloc
@@ -36,8 +35,7 @@ begin
 	    ST_SBUFLEN(stp) = buflen
 	    ST_SBUFNGROW(stp) = ST_SBUFNGROW(stp) + 1
 
-	    sz_val = buflen
-	    call realloc (ST_SBUFP(stp), sz_val, TY_CHAR)
+	    call realloc (ST_SBUFP(stp), buflen, TY_CHAR)
 	}
 
 	ST_SBUFOP(stp) = ST_SBUFOP(stp) + blklen

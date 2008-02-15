@@ -124,15 +124,13 @@ int	nyfft			#I y dimension of the fft
 real	pthreshold		#I the minimum percent amplitude in the divisor
 real	norm			#I the normalization  value
 
-size_t	sz_val
 pointer	sp, params
 int	xcen, ycen, i, j, ri, rj, index
 real	divpeak, a1, a2, a3, u, v, divisor, absv, phi
 
 begin
 	call smark (sp)
-	sz_val = 5
-	call salloc (params, sz_val, TY_REAL)
+	call salloc (params, 5, TY_REAL)
 
 	# Compute the central amplitude peak.
 	xcen = nxfft / 2 + 1
@@ -198,15 +196,13 @@ int	nyfft			#I the y dimension of the fft
 real	pthreshold		#I the minimum percent amplitude in the divisor
 real	norm			#I the normalization factor
 
-size_t	sz_val
 pointer	sp, params
 int	xcen, ycen, i, j, index
 real	divpeak, a1, a2, a3, u, v, absv, phi, ri, rj
 
 begin
 	call smark (sp)
-	sz_val = 5
-	call salloc (params, sz_val, TY_REAL)
+	call salloc (params, 5, TY_REAL)
 
 	# Compute the central amplitude peak.
 	xcen = nxfft / 2 + 1
@@ -268,7 +264,6 @@ real	divpeak			#I the minimum value in the divisor
 real	norm			#I the normalization value norm value
 real	param[ARB]		#O the output fitted parameters
 
-size_t	sz_val
 int	i, j, yj, xcen, ycen
 double	x, y, x2, xy, y2, z, wt, x2w, y2w, xyw, zw, xzw, yzw
 double	sxxxx, sxxxy, sxxyy, sxyyy, syyyy, sxxz, sxyz, syyz, sxx, sxy
@@ -279,8 +274,7 @@ real	divisor
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = 12
-	call salloc (mat, sz_val, TY_DOUBLE)
+	call salloc (mat, 12, TY_DOUBLE)
 
 	# Define the center of the fft.
 	xcen = nxfft / 2 + 1

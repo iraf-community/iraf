@@ -10,7 +10,6 @@ procedure stg_outstr (cap, strval)
 char	cap[ARB]			#I graphcap capability name
 char	strval[ARB]			#I string data
 
-size_t	sz_val
 pointer	sp, fmt, ctrl
 include	"stdgraph.com"
 int	ttygets()
@@ -18,9 +17,8 @@ errchk	ttygets
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fmt, sz_val, TY_CHAR)
-	call salloc (ctrl, sz_val, TY_CHAR)
+	call salloc (fmt, SZ_LINE, TY_CHAR)
+	call salloc (ctrl, SZ_LINE, TY_CHAR)
 
 	if (ttygets (g_tty, cap, Memc[fmt], SZ_LINE) > 0) {
 	    call sprintf (Memc[ctrl], SZ_LINE, Memc[fmt])

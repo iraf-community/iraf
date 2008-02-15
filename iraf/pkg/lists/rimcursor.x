@@ -13,7 +13,6 @@ procedure t_rimcursor()
 double	px, py, wx, wy
 pointer gp, ct, mw, sp, wcs, rest, format[2], fmt[2]
 int	axis, frame, newframe, ntokens, wcscode
-size_t	sz_val
 pointer	gopen(), rim_getctran()
 int	clscan(), nscan()
 errchk	gopen, rim_getctran
@@ -21,14 +20,11 @@ errchk	gopen, rim_getctran
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (wcs, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (rest, sz_val, TY_CHAR)
+	call salloc (wcs, SZ_FNAME, TY_CHAR)
+	call salloc (rest, SZ_LINE, TY_CHAR)
 	do axis = 1, 2 {
-	    sz_val = SZ_FNAME
-	    call salloc (format[axis], sz_val, TY_CHAR)
-	    call salloc (fmt[axis], sz_val, TY_CHAR)
+	    call salloc (format[axis], SZ_FNAME, TY_CHAR)
+	    call salloc (fmt[axis], SZ_FNAME, TY_CHAR)
 	}
 
 	# Open graphics context (doesn't work currently for stdimage).
@@ -133,7 +129,6 @@ int	frame			#I image frame, if display is used
 char	wcs[ARB]		#O name of requested wcs
 pointer	mw			#O MWCS descriptor
 
-size_t	sz_val
 int	status
 bool	use_display
 pointer	sp, imname, ds, iw, im, ct
@@ -144,8 +139,7 @@ bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_LINE, TY_CHAR)
 
 	# Access image display to get name of reference image?
 	if (clgeti ("$nargs") > 0)

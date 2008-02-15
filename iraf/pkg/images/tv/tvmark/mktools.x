@@ -5,12 +5,10 @@ include "tvmark.h"
 
 procedure mk_init (mk)
 
-size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
-	sz_val = LEN_MARKSTRUCT
-	call malloc (mk, sz_val, TY_STRUCT)
+	call malloc (mk, LEN_MARKSTRUCT, TY_STRUCT)
 
 	# Initialize the mark type parameters.
 	MK_MARK(mk) = EOS
@@ -70,16 +68,14 @@ end
 
 procedure mk_rinit (mk)
 
-size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
 	call mk_rfree (mk)
-	sz_val = MAX_NMARKS
-	call malloc (MK_RADII(mk), sz_val, TY_REAL)
-	call malloc (MK_AXES(mk), sz_val, TY_REAL)
-	call malloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
-	call malloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
+	call malloc (MK_RADII(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_AXES(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_SLENGTHS(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_RLENGTHS(mk), MAX_NMARKS, TY_REAL)
 end
 
 
@@ -120,39 +116,34 @@ int	nellipses 	# number of ellipses
 int	nsquares	# number of squares
 int	nrectangles	# number of rectangles
 
-size_t	sz_val
 int	nc, ne, ns, nr
 int	mk_stati()
 
 begin
-	if (ncircles > 0) {
-	    sz_val = ncircles
-	    call realloc (MK_RADII(mk), sz_val, TY_REAL)
-	} else {
+	if (ncircles > 0)
+	    call realloc (MK_RADII(mk), ncircles, TY_REAL)
+	else {
 	    call mfree (MK_RADII(mk), TY_REAL)
 	    MK_RADII(mk) = NULL
 	}
 
-	if (nellipses > 0) {
-	    sz_val = nellipses
-	    call realloc (MK_AXES(mk), sz_val, TY_REAL)
-	} else {
+	if (nellipses > 0) 
+	    call realloc (MK_AXES(mk), nellipses, TY_REAL)
+	else {
 	    call mfree (MK_AXES(mk), TY_REAL)
 	    MK_AXES(mk) = NULL
 	}
 
-	if (nsquares > 0) {
-	    sz_val = nsquares
-	    call realloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
-	} else {
+	if (nsquares > 0)
+	    call realloc (MK_SLENGTHS(mk), nsquares, TY_REAL)
+	else {
 	    call mfree (MK_SLENGTHS(mk), TY_REAL)
 	    MK_SLENGTHS(mk) = NULL
 	}
 
-	if (nrectangles > 0) {
-	    sz_val = nrectangles
-	    call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
-	} else {
+	if (nrectangles > 0)
+	    call realloc (MK_RLENGTHS(mk), nrectangles, TY_REAL)
+	else {
 	    call mfree (MK_RLENGTHS(mk), TY_REAL)
 	    MK_RLENGTHS(mk) = NULL
 	}
@@ -451,7 +442,6 @@ pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
-size_t	sz_val
 int	rp, ntemp
 pointer	sp, rtemp
 int	fnldir(), mk_gmarks()
@@ -485,32 +475,26 @@ begin
 
 	case CSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_CSTRING(mk), SZ_FNAME)
 		MK_NCIRCLES(mk) = ntemp
-		sz_val = ntemp
-		call realloc (MK_RADII(mk), sz_val, TY_REAL)
-		sz_val = ntemp
-		call amovr (Memr[rtemp], Memr[MK_RADII(mk)], sz_val)
+		call realloc (MK_RADII(mk), ntemp, TY_REAL)
+		call amovr (Memr[rtemp], Memr[MK_RADII(mk)], ntemp)
 		call asrtr (Memr[MK_RADII(mk)], Memr[MK_RADII(mk)], ntemp)
 	    }
 	    call sfree (sp)
 
 	case RSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_RSTRING(mk), SZ_FNAME)
 		MK_NRECTANGLES(mk) = ntemp
-		sz_val = ntemp
-		call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
-		sz_val = ntemp
-		call amovr (Memr[rtemp], Memr[MK_RLENGTHS(mk)], sz_val)
+		call realloc (MK_RLENGTHS(mk), ntemp, TY_REAL)
+		call amovr (Memr[rtemp], Memr[MK_RLENGTHS(mk)], ntemp)
 		call asrtr (Memr[MK_RLENGTHS(mk)], Memr[MK_RLENGTHS(mk)], ntemp)
 	    }
 	    call sfree (sp)

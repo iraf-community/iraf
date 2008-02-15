@@ -24,8 +24,6 @@ pointer	data[nimages]		# Returned data pointers
 long	v[IM_MAXDIM, nimages]	# Line vectors
 int	nimages			# Number of images
 
-size_t	sz_val
-long	lg_val
 int	i
 
 int	impnls(), imgnls()
@@ -37,9 +35,7 @@ begin
 	for (i=2; i <= nimages; i=i+1) {
 	    if (imgnls (im[i], data[i], v[1,i]) == EOF) {
 	        if (IM_NDIM(im[i]) > 1) {
-	            lg_val = 1
-	            sz_val = IM_MAXDIM
-	            call amovkl (lg_val, v[1,i], sz_val)
+	            call amovkl (long(1), v[1,i], IM_MAXDIM)
                     if (imgnls (im[i], data[i], v[1,i]) == EOF)
 			call error (0, "Error reading image line")
 	        }
@@ -56,8 +52,6 @@ pointer	data[nimages]		# Returned data pointers
 long	v[IM_MAXDIM, nimages]	# Line vectors
 int	nimages			# Number of images
 
-size_t	sz_val
-long	lg_val
 int	i
 
 int	impnli(), imgnli()
@@ -69,9 +63,7 @@ begin
 	for (i=2; i <= nimages; i=i+1) {
 	    if (imgnli (im[i], data[i], v[1,i]) == EOF) {
 	        if (IM_NDIM(im[i]) > 1) {
-	            lg_val = 1
-	            sz_val = IM_MAXDIM
-	            call amovkl (lg_val, v[1,i], sz_val)
+	            call amovkl (long(1), v[1,i], IM_MAXDIM)
                     if (imgnli (im[i], data[i], v[1,i]) == EOF)
 			call error (0, "Error reading image line")
 	        }
@@ -88,8 +80,6 @@ pointer	data[nimages]		# Returned data pointers
 long	v[IM_MAXDIM, nimages]	# Line vectors
 int	nimages			# Number of images
 
-size_t	sz_val
-long	lg_val
 int	i
 
 int	impnll(), imgnll()
@@ -101,9 +91,7 @@ begin
 	for (i=2; i <= nimages; i=i+1) {
 	    if (imgnll (im[i], data[i], v[1,i]) == EOF) {
 	        if (IM_NDIM(im[i]) > 1) {
-	            lg_val = 1
-	            sz_val = IM_MAXDIM
-	            call amovkl (lg_val, v[1,i], sz_val)
+	            call amovkl (long(1), v[1,i], IM_MAXDIM)
                     if (imgnll (im[i], data[i], v[1,i]) == EOF)
 			call error (0, "Error reading image line")
 	        }
@@ -120,8 +108,6 @@ pointer	data[nimages]		# Returned data pointers
 long	v[IM_MAXDIM, nimages]	# Line vectors
 int	nimages			# Number of images
 
-size_t	sz_val
-long	lg_val
 int	i
 
 int	impnlr(), imgnlr()
@@ -133,9 +119,7 @@ begin
 	for (i=2; i <= nimages; i=i+1) {
 	    if (imgnlr (im[i], data[i], v[1,i]) == EOF) {
 	        if (IM_NDIM(im[i]) > 1) {
-	            lg_val = 1
-	            sz_val = IM_MAXDIM
-	            call amovkl (lg_val, v[1,i], sz_val)
+	            call amovkl (long(1), v[1,i], IM_MAXDIM)
                     if (imgnlr (im[i], data[i], v[1,i]) == EOF)
 			call error (0, "Error reading image line")
 	        }
@@ -152,8 +136,6 @@ pointer	data[nimages]		# Returned data pointers
 long	v[IM_MAXDIM, nimages]	# Line vectors
 int	nimages			# Number of images
 
-size_t	sz_val
-long	lg_val
 int	i
 
 int	impnld(), imgnld()
@@ -165,9 +147,7 @@ begin
 	for (i=2; i <= nimages; i=i+1) {
 	    if (imgnld (im[i], data[i], v[1,i]) == EOF) {
 	        if (IM_NDIM(im[i]) > 1) {
-	            lg_val = 1
-	            sz_val = IM_MAXDIM
-	            call amovkl (lg_val, v[1,i], sz_val)
+	            call amovkl (long(1), v[1,i], IM_MAXDIM)
                     if (imgnld (im[i], data[i], v[1,i]) == EOF)
 			call error (0, "Error reading image line")
 	        }

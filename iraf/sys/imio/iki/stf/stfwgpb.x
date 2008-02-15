@@ -19,7 +19,6 @@ pointer	im			# IMIO image descriptor
 int	group			# group to be accessed
 real	datamin, datamax	# new min, max pixel values
 
-size_t	sz_val
 long	offset
 pointer	sp, stf, gpb, lbuf, pp, op
 int	pfd, pn, sz_param, sz_gpb, i
@@ -40,8 +39,7 @@ string	badtype "illegal group data parameter datatype"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -71,8 +69,7 @@ begin
 
 	# Allocate a buffer for the GPB.
 	sz_gpb = STF_PSIZE(stf) / NBITS_BYTE / SZB_CHAR
-	sz_val = sz_gpb
-	call salloc (gpb, sz_val, TY_CHAR)
+	call salloc (gpb, sz_gpb, TY_CHAR)
 
 	# Extract the binary value of each parameter in the GPB and encode it
 	# in FITS format in the IMIO user area.

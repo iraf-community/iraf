@@ -72,7 +72,6 @@ pointer	pl			#I PLIO descriptor
 int	plane[ARB]		#I 2-dim plane to be accessed
 int	buflimit		#I approximate table size, or 0 if don't care
 
-size_t	sz_val
 int	v1[PL_MAXDIM], v2[PL_MAXDIM]
 int	maxpix, ndim, npix, mval, i, j
 int	msize[2], tsize[2], block[2], vm[2]
@@ -83,12 +82,10 @@ bool	pl_sectnotconst()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	sz_val = LEN_STACK * LEN_REGDES
-	call salloc (stack, sz_val, TY_STRUCT)
+	call salloc (stack, LEN_STACK * LEN_REGDES, TY_STRUCT)
 
 	# Allocate the PLRIO descriptor.
-	sz_val = LEN_PLRDES
-	call calloc (plr, sz_val, TY_STRUCT)
+	call calloc (plr, LEN_PLRDES, TY_STRUCT)
 
 	# Set the plane to be accessed.
 	ndim = PL_NAXES(pl)
@@ -125,8 +122,7 @@ begin
 	    tsize[i]  = (msize[i] + block[i]-1) / block[i]
 
 	# Allocate the table space.
-	sz_val = tsize[1] * tsize[2]
-	call malloc (bufp, sz_val, TY_INT)
+	call malloc (bufp, tsize[1] * tsize[2], TY_INT)
 
 	# Compute the lookup table.  Since the lookup table can be large,
 	# e.g., a quarter million elements for a 512sq table, we don't want
@@ -216,12 +212,10 @@ begin
 			do i = 1, npix
 			    Memi[rp+i-1] = mval
 		    } else {
-			if (mval == 0) {
+			if (mval == 0)
 			    call aclri (Memi[rp], npix)
-			} else {
-			    sz_val = npix
-			    call amovki (mval, Memi[rp], sz_val)
-			}
+			else
+			    call amovki (mval, Memi[rp], npix)
 		    }
 		}
 	    }

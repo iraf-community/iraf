@@ -9,7 +9,6 @@ procedure rg_glpars (ls)
 
 pointer ls              #I pointer to iscale structure
 
-size_t	sz_val
 int	ip, nchars
 pointer sp, str1, str2
 int     clgeti(), nscan(), lexnum()
@@ -18,9 +17,8 @@ real    clgetr()
 begin
         # Allocate working space.
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (str1, sz_val, TY_CHAR)
-        call salloc (str2, sz_val, TY_CHAR)
+        call salloc (str1, SZ_LINE, TY_CHAR)
+        call salloc (str2, SZ_LINE, TY_CHAR)
 
         # Initialize the linscale structure.
         call rg_linit (ls, clgeti ("maxnregions"))
@@ -67,7 +65,6 @@ procedure rg_plpars (ls)
 
 pointer	ls		# pointer to the linscale structure
 
-size_t	sz_val
 pointer	sp, str1, str2, str
 int	rg_lstati()
 real	rg_lstatr()
@@ -75,10 +72,9 @@ real	rg_lstatr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Set the x and y shifts parameters.
 	call clputr ("xshift", rg_lstatr (ls, XSHIFT))

@@ -17,7 +17,6 @@ procedure delete (fname)
 
 char	fname[ARB]		# file to be deleted
 
-size_t	sz_val
 int	status
 bool	nosuchfile
 pointer	vp, sp, osfn
@@ -36,8 +35,7 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	call intr_disable()
 	iferr (vp = vfnopen (fname, VFN_WRITE))

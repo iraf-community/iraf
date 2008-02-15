@@ -21,16 +21,14 @@ int	npts				# Number of points
 int	nvars				# Number of variables
 real	wx, wy				# Position to be nearest
 
-size_t	sz_val
 int	gt_geti()
 pointer	sp, xout, yout
 
 begin
 	# Allocate memory for axes data
 	call smark (sp)
-	sz_val = npts
-	call salloc (xout, sz_val, TY_REAL)
-	call salloc (yout, sz_val, TY_REAL)
+	call salloc (xout, npts, TY_REAL)
+	call salloc (yout, npts, TY_REAL)
 
 	# Get axes data
 	call ing_axesr (in, gt, nl, 1, x, y, Memr[xout], npts, nvars)

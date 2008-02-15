@@ -19,7 +19,6 @@ pointer image2                  # Output image
 int	sdim			# Dimension to be sliced
 int	verbose			# Verbose mode
 
-size_t	sz_val
 pointer sp
 pointer	list1, list2
 
@@ -30,11 +29,10 @@ errchk	sl_slice
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (imtlist1, sz_val, TY_CHAR)
-        call salloc (imtlist2, sz_val, TY_CHAR)
-        call salloc (image1, sz_val, TY_CHAR)
-        call salloc (image2, sz_val, TY_CHAR)
+        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
+        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
+        call salloc (image1, SZ_FNAME, TY_CHAR)
+        call salloc (image2, SZ_FNAME, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -74,8 +72,6 @@ char	image2[ARB]		# output image
 int	sdim			# slice dimension
 int	verbose			# verbose mode
 
-long	lg_val
-size_t	sz_val
 int	i, j, ndim, fdim, ncols, nlout, nimout, pdim
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, inname, outname, outsect, im1, im2, buf1, buf2, vim1, vim2
@@ -128,18 +124,14 @@ begin
 	#}
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inname, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (outname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (outsect, sz_val, TY_CHAR)
+	call salloc (inname, SZ_LINE, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (outsect, SZ_LINE, TY_CHAR)
 
-	sz_val = IM_MAXDIM
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
-	call salloc (vim1, sz_val, TY_LONG)
-	call salloc (vim2, sz_val, TY_LONG)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
+	call salloc (vim1, IM_MAXDIM, TY_LONG)
+	call salloc (vim2, IM_MAXDIM, TY_LONG)
 
 	# Compute the number of output images. and the number of columns
 	nimout = IM_LEN(im1, sdim)
@@ -159,9 +151,7 @@ begin
 	    nlout = nlout * IM_LEN(im1,i)
 	nlout = nlout / ncols 
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vim1], sz_val)
+	call amovkl (long(1), Meml[vim1], IM_MAXDIM)
 	do i = 1, nimout {
 
 	    # Construct the output image name.
@@ -212,9 +202,7 @@ begin
 	    }
 
 	    # Loop over the appropriate range of lines.
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, Meml[vim2], sz_val)
+	    call amovkl (long(1), Meml[vim2], IM_MAXDIM)
 	    switch (IM_PIXTYPE(im1)) {
 	    case TY_SHORT:
 		if (sdim == ndim) {
@@ -265,8 +253,7 @@ begin
 			    call error (0, "Error writing output image.")
 		        if (imgnll (im1, buf1, Meml[vim1]) == EOF)
 			    call error (0, "Error reading input image.")
-		       sz_val = ncols
-		       call amovl (Meml[buf1], Meml[buf2], sz_val) 
+		       call amovl (Meml[buf1], Meml[buf2], ncols) 
 		    }
 		} else {
 		    do j = 1, nlout {
@@ -275,8 +262,7 @@ begin
 			buf1 = imggsl (im1, Meml[vs], Meml[ve], IM_NDIM(im1))
 		        if (buf1 == EOF)
 			    call error (0, "Error reading input image.")
-		       sz_val = ncols
-		       call amovl (Meml[buf1], Meml[buf2], sz_val) 
+		       call amovl (Meml[buf1], Meml[buf2], ncols) 
 		       call sl_loop (Meml[vs], Meml[ve], IM_LEN(im1,1), fdim,
 		           sdim, ndim)
 		    }
@@ -288,8 +274,7 @@ begin
 			    call error (0, "Error writing output image.")
 		        if (imgnlr (im1, buf1, Meml[vim1]) == EOF)
 			    call error (0, "Error reading input image.")
-		       sz_val = ncols
-		       call amovr (Memr[buf1], Memr[buf2], sz_val) 
+		       call amovr (Memr[buf1], Memr[buf2], ncols) 
 		    }
 		} else {
 		    do j = 1, nlout {
@@ -298,8 +283,7 @@ begin
 			buf1 = imggsr (im1, Meml[vs], Meml[ve], IM_NDIM(im1))
 		        if (buf1 == EOF)
 			    call error (0, "Error reading input image.")
-		       sz_val = ncols
-		       call amovr (Memr[buf1], Memr[buf2], sz_val) 
+		       call amovr (Memr[buf1], Memr[buf2], ncols) 
 		       call sl_loop (Meml[vs], Meml[ve], IM_LEN(im1,1),
 		           fdim, sdim, ndim)
 		    }

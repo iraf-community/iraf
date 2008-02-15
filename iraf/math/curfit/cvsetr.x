@@ -22,13 +22,11 @@ real	xmax		# the maximum x value
 real	coeff[ncoeff]	# the coefficient array
 int	ncoeff		# the number of coefficients
 
-size_t	sz_val
 errchk	malloc
 
 begin
 	# allocate space for curve descriptor
-	sz_val = LEN_CVSTRUCT
-	call malloc (cv, sz_val, TY_STRUCT)
+	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
 
 	if (ncoeff < 1)
 	    call error (0, "CVSET: Illegal number of coefficients.")
@@ -70,10 +68,8 @@ begin
 	# allocate space for xbasis and coefficient arrays, set remaining
 	# pointers to NULL
 
-	sz_val = CV_ORDER(cv)
-	call malloc (CV_XBASIS(cv), sz_val, TY_REAL)
-	sz_val = CV_NCOEFF(cv)
-	call malloc (CV_COEFF(cv), sz_val, TY_REAL)
+	call malloc (CV_XBASIS(cv), CV_ORDER(cv), TY_REAL)
+	call malloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
 
 	CV_MATRIX(cv) = NULL
 	CV_CHOFAC(cv) = NULL
@@ -85,6 +81,5 @@ begin
 	CV_USERFNC(cv) = NULL
 
 	# restore coefficients
-	sz_val = CV_NCOEFF(cv)
-	call amovr (coeff, COEFF(CV_COEFF(cv)), sz_val)
+	call amovr (coeff, COEFF(CV_COEFF(cv)), CV_NCOEFF(cv))
 end

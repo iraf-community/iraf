@@ -17,7 +17,6 @@ pointer procedure ie_gimage (ie, select)
 pointer	ie			#I IMEXAM pointer
 int	select			#I select frame?
 
-size_t	sz_val
 char	errstr[SZ_FNAME]
 int	frame, i, j, k
 pointer	sp, image, dimage, imname, im
@@ -30,10 +29,9 @@ errchk	imd_mapframe, immap, ie_display, ie_mwinit
  
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (dimage, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (dimage, SZ_FNAME, TY_CHAR)
 
 	# Get image name, and display image if using display.  If we are
 	# examining a list of images, the list and the current index into
@@ -209,8 +207,6 @@ char	input[ARB]		#I Input image name
 char	output[maxchar]		#O Output image name
 int	maxchar			#I Maximum characters in output name.
 
-long	lg_val
-size_t	sz_val
 int	i, fd
 pointer	sp, section, lv, pv1, pv2
 
@@ -219,21 +215,16 @@ bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (lv, sz_val, TY_LONG)
-	call salloc (pv1, sz_val, TY_LONG)
-	call salloc (pv2, sz_val, TY_LONG)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (lv, IM_MAXDIM, TY_LONG)
+	call salloc (pv1, IM_MAXDIM, TY_LONG)
+	call salloc (pv2, IM_MAXDIM, TY_LONG)
 
 	# Get endpoint coordinates in original image.
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[lv], sz_val)
+	call amovkl (long(1), Meml[lv], IM_MAXDIM)
 	call aclrl (Meml[pv1], IM_MAXDIM)
 	call imaplv (im, Meml[lv], Meml[pv1], 2)
-	sz_val = IM_NDIM(im)
-	call amovl (IM_LEN(im,1), Meml[lv], sz_val)
+	call amovl (IM_LEN(im,1), Meml[lv], IM_NDIM(im))
 	call aclrl (Meml[pv2], IM_MAXDIM)
 	call imaplv (im, Meml[lv], Meml[pv2], 2)
 

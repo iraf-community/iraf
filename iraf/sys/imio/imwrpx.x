@@ -17,7 +17,6 @@ int	npix			# number of pixels to be written
 long	v[ARB]			# physical coords of first pixel to be written
 int	xstep			# step size between output pixels
 
-size_t	sz_val
 bool	rlio
 long	offset
 pointer	pl, sp, ibuf
@@ -55,8 +54,7 @@ begin
 	    # Write to a pixel list.
 
 	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
-	    sz_val = IM_MAXDIM
-	    call amovl (v, o_v, sz_val)
+	    call amovl (v, o_v, IM_MAXDIM)
 	    nchars = npix * sz_pixel
 
 	    switch (IM_PIXTYPE(im)) {
@@ -84,8 +82,7 @@ begin
 		}
 	    default:
 		call smark (sp)
-		sz_val = npix
-		call salloc (ibuf, sz_val, TY_INT)
+		call salloc (ibuf, npix, TY_INT)
 
 		call acht (buf, Memi[ibuf], npix, IM_PIXTYPE(im), TY_INT)
 		if (rlio)

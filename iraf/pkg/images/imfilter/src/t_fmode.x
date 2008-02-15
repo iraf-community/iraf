@@ -13,7 +13,6 @@ pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str, fmd, im1, im2
 real	constant
 
-size_t	sz_val
 bool	clgetb(), fp_equalr()
 int	clgeti(), imtgetim(), imtlen(), clgwrd(), btoi()
 pointer	imtopen(), immap()
@@ -23,19 +22,15 @@ errchk	fmd_modbox
 begin
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (imtlist1, sz_val, TY_CHAR)
-	call salloc (imtlist2, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imtlist1, SZ_LINE, TY_CHAR)
+	call salloc (imtlist2, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Allocate space for the fmode structure.
-	sz_val = LEN_FMODE_STRUCT
-	call calloc (fmd, sz_val, TY_STRUCT)
+	call calloc (fmd, LEN_FMODE_STRUCT, TY_STRUCT)
 
 	# Get the task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)

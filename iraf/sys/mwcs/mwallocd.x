@@ -12,7 +12,6 @@ int procedure mw_allocd (mw, nelem)
 pointer	mw		#I pointer to MWCS descriptor
 int	nelem		#I number of elements to alloc space for
 
-size_t	sz_val
 int	dbufused, dbuflen, offset
 errchk	realloc
 
@@ -27,8 +26,7 @@ begin
 	    while (dbufused + nelem > dbuflen)
 		dbuflen = dbuflen + INC_SZDBUF
 
-	    sz_val = dbuflen
-	    call realloc (MI_DBUF(mw), sz_val, TY_DOUBLE)
+	    call realloc (MI_DBUF(mw), dbuflen, TY_DOUBLE)
 	    call aclrd (D(mw,offset), dbuflen - offset + 1)
 	    MI_DBUFLEN(mw) = dbuflen
 	}

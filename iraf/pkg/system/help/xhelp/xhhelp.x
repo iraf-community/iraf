@@ -16,7 +16,6 @@ char    topic[ARB]                           	#i help topic
 char    curpack[ARB]                           	#i current package
 char    opt[ARB]                           	#i help option
 
-size_t	sz_val
 pointer helpstr
 int	ip, fdi
 long	fsize
@@ -76,8 +75,7 @@ begin
 
 	# Now filter the file to escape the curly braces so they pass thru
 	# to the Tcl cleanly.  Put the result in the string sent to the GUI.
-	sz_val = fsize + SZ_LINE
-	call calloc (helpstr, sz_val, TY_CHAR)
+	call calloc (helpstr, fsize + SZ_LINE, TY_CHAR)
 	ip = helpstr
 	repeat {
 	    ch = getc (fdi, ch)
@@ -118,7 +116,6 @@ char	helpdb[ARB]				#i help database
 char	section[ARB]				#i section on which to get help
 char	opt[ARB]				#i type of help
 
-size_t	sz_val
 long	fi[LEN_FINFO], db_ctime
 pointer	list, sp, ctrl, optn, db, fname
 
@@ -134,12 +131,9 @@ define	forms_ 91
 
 begin
 	call smark (sp)
-	sz_val = LEN_CTRLSTRUCT
-	call salloc (ctrl, sz_val, TY_STRUCT)
-	sz_val = SZ_FNAME
-	call salloc (optn, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (ctrl, LEN_CTRLSTRUCT, TY_STRUCT)
+	call salloc (optn, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# If we were called without any arguments, do not query for the
 	# template, just set it to null and help will be given for the

@@ -397,7 +397,6 @@ real	a[ARB]				# Input array
 real	b[ARB]				# Output array
 int	ranges[3, ARB]			# Ranges
 
-size_t	sz_val
 int	i, j, npts, nmove
 
 begin
@@ -405,8 +404,7 @@ begin
 	for (i = 1; ranges[1, i] != NULL; i = i + 1) {
 	    if (ranges[3, i] == 1) {
 	        nmove = ranges[2, i] - ranges[1, i] + 1
-	        sz_val = nmove
-	        call amovr (a[ranges[1, i]], b[npts + 1], sz_val)
+	        call amovr (a[ranges[1, i]], b[npts + 1], nmove)
 		npts = npts + nmove
 	    } else {
 		do j = ranges[1, i], ranges[2, i], ranges[3, i] {

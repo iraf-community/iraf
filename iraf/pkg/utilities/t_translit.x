@@ -16,7 +16,6 @@ procedure t_translit()
 
 char	from_string[NCHARS], to_string[NCHARS]
 
-size_t	sz_val
 char	to[NCHARS], from[NCHARS], lut[NCHARS], infile[SZ_FNAME], endto
 char	line[SZ_LINE], lastchar
 int	del[NCHARS], collap[NCHARS]
@@ -82,9 +81,8 @@ begin
 
 	# Initialize lookup table, delete and collapse vectors
 	call makelut (lut, NCHARS)
-	sz_val = NCHARS
-	call amovki (OFF, del, sz_val)
-	call amovki (OFF, collap, sz_val)
+	call amovki (OFF, del, NCHARS)
+	call amovki (OFF, collap, NCHARS)
 	
 	# Delete array
 	if (delete == YES) {

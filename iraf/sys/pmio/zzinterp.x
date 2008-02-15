@@ -124,7 +124,6 @@ pointer	pm, pm_1, pm_2, def_pm, pm_src, pm_dst, pm_stn, tty
 char	cmd[SZ_LINE], kwname[SZ_FNAME], fname[SZ_FNAME], title[SZ_LINE]
 int	opcode, save_fd[MAXINCL], in, fd, o_fd, maskno, depth, naxes, npts
 int	v1[PL_MAXDIM], v2[PL_MAXDIM], v3[PL_MAXDIM], v4[PL_MAXDIM], v[PL_MAXDIM]
-size_t	sz_val
 int	fstati(), strdic(), open(), getline(), strncmp()
 pointer	pm_create(), ttyodes()
 
@@ -154,10 +153,8 @@ begin
 	def_pm = v_mask[1]
 
 	# Initialize the vector registers.
-	do i = 1, MAXVREG {
-	    sz_val = PL_MAXDIM
-	    call amovki (1, v_reg[1,i], sz_val)
-	}
+	do i = 1, MAXVREG
+	    call amovki (1, v_reg[1,i], PL_MAXDIM)
 
 	# Main interpreter loop.
 	# ---------------------------
@@ -552,10 +549,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v1, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v1, sz_val)
-		}
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
 
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v2, PL_MAXDIM)
@@ -580,10 +575,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v1, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v1, sz_val)
-		}
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
 
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v2, PL_MAXDIM)
@@ -849,10 +842,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v1, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v1, sz_val)
-		}
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
 
 		# Get destination mask.
 		pm_dst = def_pm
@@ -865,10 +856,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v2, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v2, sz_val)
-		}
+		} else
+		    call amovki (1, v2, PL_MAXDIM)
 
 		# Get vector defining size of region to be modified.
 		if (argtype[argno] == VECTOR_ARG) {
@@ -906,10 +895,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v1, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v1, sz_val)
-		}
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
 
 		# Get destination mask.
 		pm_dst = def_pm
@@ -922,10 +909,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v2, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v2, sz_val)
-		}
+		} else
+		    call amovki (1, v2, PL_MAXDIM)
 
 		# Get stencil mask.
 		pm_stn = def_pm
@@ -938,10 +923,8 @@ eof_		    if (in > 0) {
 		if (argtype[argno] == VECTOR_ARG) {
 		    call amovi (v_v(argno), v3, PL_MAXDIM)
 		    argno = argno + 1
-		} else {
-		    sz_val = PL_MAXDIM
-		    call amovki (1, v3, sz_val)
-		}
+		} else
+		    call amovki (1, v3, PL_MAXDIM)
 
 		# Get vector defining size of region to be modified.
 		if (argtype[argno] == VECTOR_ARG) {

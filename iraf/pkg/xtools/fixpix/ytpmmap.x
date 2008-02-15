@@ -45,7 +45,6 @@ int	match			#I Match by physical coordinates?
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, extname, im, ref, yt_pmmap1()
 bool	streq()
@@ -53,9 +52,8 @@ errchk	yt_pmmap1
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (extname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (extname, SZ_FNAME, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -187,8 +185,6 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-long	lg_val
-size_t	sz_val
 int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
@@ -198,14 +194,11 @@ errchk	immap, mw_openim, im_pmmapo
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 
 	im_in = immap (pmname, READ_ONLY, 0)
 	pm = imstati (im_in, IM_PMDES)
@@ -238,8 +231,7 @@ begin
 		}
 	    }
 	    call pmplpi (pm, Meml[v2], Memi[data], 0, npix, rop)
-	    sz_val = ndim
-	    call amovl (Meml[v1], Meml[v2], sz_val)
+	    call amovl (Meml[v1], Meml[v2], ndim)
 	}
 
 	im_out = im_pmmapo (pm, im_in)
@@ -337,7 +329,6 @@ char	section[ARB]		#I Image section
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-size_t	sz_val
 int	i, j, ip, temp, a[2], b[2], c[2], rop, ctoi()
 pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	im_pmmapo
@@ -349,10 +340,9 @@ begin
 	    call error (1, "Image sections only allowed for 1D and 2D images")
 
         # Decode the section string.
-	sz_val = 2
-	call amovki (1, a, sz_val)
-	call amovki (1, b, sz_val)
-	call amovki (1, c, sz_val)
+	call amovki (1, a, 2)
+	call amovki (1, b, 2)
+	call amovki (1, c, 2)
 	do i = 1, IM_NDIM(refim)
 	    b[i] = IM_LEN(refim,i)
 
@@ -459,8 +449,6 @@ procedure yt_pminvert (pm)
 
 pointer	pm		#I Pixel mask to be inverted
 
-long	lg_val
-size_t	sz_val
 int	i, naxes, axlen[IM_MAXDIM], depth, npix, val
 pointer	sp, v, buf, one
 bool	pm_linenotempty()
@@ -469,12 +457,9 @@ begin
 	call pm_gsize (pm, naxes, axlen, depth)
 
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v, sz_val, TY_LONG)
-	sz_val = axlen[1]
-	call salloc (buf, sz_val, TY_INT)
-	sz_val = 6
-	call salloc (one, sz_val, TY_INT)
+	call salloc (v, IM_MAXDIM, TY_LONG)
+	call salloc (buf, axlen[1], TY_INT)
+	call salloc (one, 6, TY_INT)
 
 	npix = axlen[1]
 	RLI_LEN(one) = 2
@@ -483,9 +468,7 @@ begin
 	Memi[one+4] = npix
 	Memi[one+5] = 1
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v], sz_val)
+	call amovkl (long(1), Meml[v], IM_MAXDIM)
 	repeat {
 	    if (pm_linenotempty (pm, Meml[v])) {
 		call pmglpi (pm, Meml[v], Memi[buf], 0, npix, 0)
@@ -527,7 +510,6 @@ pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 int	match			#I Match by physical coordinates?
 
-size_t	sz_val
 int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
@@ -635,8 +617,7 @@ begin
 	    # If the scales are the same then it is just a problem of
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
-		sz_val = 3+3*nc
-		call malloc (bufpm, sz_val, TY_INT)
+		call malloc (bufpm, 3+3*nc, TY_INT)
 		k = nint (lt[5])
 		l = nint (lt[6])
 		do j = max(1-l,j1), min(nl-l,j2) {
@@ -657,10 +638,8 @@ begin
 	    # Do all the geometry and pixel size matching.  This can
 	    # be slow.
 	    } else {
-		sz_val = nx
-		call malloc (bufpm, sz_val, TY_INT)
-		sz_val = nc
-		call malloc (bufref, sz_val, TY_INT)
+		call malloc (bufpm, nx, TY_INT)
+		call malloc (bufref, nc, TY_INT)
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)

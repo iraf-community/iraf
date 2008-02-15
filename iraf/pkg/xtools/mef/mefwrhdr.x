@@ -9,7 +9,6 @@ pointer	mefi		#I input mef descriptor
 pointer	mefo		#I output mef descriptor
 bool	in_phdu		#I true if input header is Primary Header Unit.
 
-size_t	sz_val
 pointer	hb, sp, ln
 int	output_lines, out
 int	i, index, naxis
@@ -23,8 +22,7 @@ define	nextb_ 99
 
 begin
 	call smark (sp)
-	sz_val = LEN_CARDNL
-	call salloc (ln, sz_val, TY_CHAR)
+	call salloc (ln, LEN_CARDNL, TY_CHAR)
 
 	# At this point the input first header has been read
 

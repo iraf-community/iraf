@@ -11,8 +11,6 @@ procedure ic_imstack (list, output)
 int	list		#I List of images
 char	output		#I Name of output image
 
-long	lg_val
-size_t	sz_val
 int	i, j, npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	sp, input, key, in, out, buf_in, buf_out, ptr
@@ -25,9 +23,8 @@ errchk	immap
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (key, sz_val, TY_CHAR)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	iferr {
 	    # Add each input image to the output image.
@@ -49,9 +46,7 @@ begin
 		    IM_NDIM(out) = IM_NDIM(out) + 1
 		    IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		    npix = IM_LEN(out, 1)
-		    lg_val = 1
-		    sz_val = IM_MAXDIM
-		    call amovkl (lg_val, line_out, sz_val)
+		    call amovkl (long(1), line_out, IM_MAXDIM)
 		}
 
 		# Check next input image for consistency with the output image.
@@ -70,9 +65,7 @@ begin
 		# the output image.  Switch on the output data type to optimize
 		# IMIO.
 
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, line_in, sz_val)
+		call amovkl (long(1), line_in, IM_MAXDIM)
 		switch (IM_PIXTYPE (out)) {
 		case TY_SHORT:
 		    while (imgnls (in, buf_in, line_in) != EOF) {
@@ -90,15 +83,13 @@ begin
 		    while (imgnll (in, buf_in, line_in) != EOF) {
 			if (impnll (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
-			sz_val = npix
-			call amovl (Meml[buf_in], Meml[buf_out], sz_val)
+			call amovl (Meml[buf_in], Meml[buf_out], npix)
 		    }
 		case TY_REAL:
 		    while (imgnlr (in, buf_in, line_in) != EOF) {
 			if (impnlr (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
-			sz_val = npix
-			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
+			call amovr (Memr[buf_in], Memr[buf_out], npix)
 		    }
 		case TY_DOUBLE:
 		    while (imgnld (in, buf_in, line_in) != EOF) {
@@ -116,8 +107,7 @@ begin
 		    while (imgnlr (in, buf_in, line_in) != EOF) {
 			if (impnlr (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
-			sz_val = npix
-			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
+			call amovr (Memr[buf_in], Memr[buf_out], npix)
 		    }
 		}
 		call imunmap (in)

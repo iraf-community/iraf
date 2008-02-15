@@ -10,7 +10,6 @@ procedure ex_iraf (ex)
 
 pointer	ex					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, imname
 pointer	im, op, out
 int	i, j, flags
@@ -34,8 +33,7 @@ begin
 	    call ex_do_outtype (ex, "u2")
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call aclrc (Memc[imname], SZ_FNAME)
 
 	# Since we're writing an image, close the output file descriptor
@@ -87,11 +85,9 @@ begin
 		case TY_INT:
 		    call amovi (Memi[out], Memi[impl2i(im,orow)], O_LEN(op))
 		case TY_LONG:
-		    sz_val = O_LEN(op)
-		    call amovl (Meml[out], Meml[impl2l(im,orow)], sz_val)
+		    call amovl (Meml[out], Meml[impl2l(im,orow)], O_LEN(op))
 		case TY_REAL:
-		    sz_val = O_LEN(op)
-		    call amovr (Memr[out], Memr[impl2r(im,orow)], sz_val)
+		    call amovr (Memr[out], Memr[impl2r(im,orow)], O_LEN(op))
 		case TY_DOUBLE:
 		    call amovd (Memd[out], Memd[impl2d(im,orow)], O_LEN(op))
 		default:

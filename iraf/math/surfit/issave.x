@@ -15,7 +15,6 @@ include	"surfitdef.h"
 procedure issave (sf, fit)
 
 pointer	sf		# pointer to the surface descriptor
-size_t	sz_val
 real	fit[ARB]	# array for storing fit
 
 begin
@@ -40,6 +39,6 @@ begin
 	SF_SAVEXTERMS(fit) = SF_XTERMS(sf)
 
 	# save the coefficients
-	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
-	call amovr (COEFF(SF_COEFF(sf)), fit[SF_SAVECOEFF+1], sz_val)
+	call amovr (COEFF(SF_COEFF(sf)), fit[SF_SAVECOEFF+1], SF_NXCOEFF(sf) *
+	    SF_NYCOEFF(sf))
 end

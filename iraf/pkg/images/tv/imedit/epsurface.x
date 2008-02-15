@@ -10,7 +10,6 @@ real	data[ncols,nlines]	# Surface data to be plotted
 int	ncols, nlines		# Dimensions of surface
 real	angh, angv		# Orientation of surface (degrees)
  
-size_t	sz_val
 int	wkid
 pointer	sp, work
  
@@ -21,8 +20,7 @@ common  /noaovp/ vpx1, vpx2, vpy1, vpy2
  
 begin
 	call smark (sp)
-	sz_val = 2 * ncols * nlines + ncols + nlines
-	call salloc (work, sz_val, TY_REAL)
+	call salloc (work, 2 * ncols * nlines + ncols + nlines, TY_REAL)
  
 	# Initialize surface common blocks
 	first = 1

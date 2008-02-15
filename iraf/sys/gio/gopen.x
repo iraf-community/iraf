@@ -23,7 +23,6 @@ int	mode			#I access mode: NEW_FILE or APPEND
 char	uifname[ARB]		#I user interface specification file
 int	fd			#I metacode output file
 
-size_t	sz_val
 pointer	gp, tty
 int	outfd, stream_type, junk
 bool	close_at_end, kf_ok, vdm_device, std_stream
@@ -45,10 +44,9 @@ string	stdvdm 	 "stdvdm"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (devname, sz_val, TY_CHAR)
-	call salloc (envname, sz_val, TY_CHAR)
-	call salloc (kfname, sz_val, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (envname, SZ_FNAME, TY_CHAR)
+	call salloc (kfname,  SZ_FNAME, TY_CHAR)
 
 	call flush (STDOUT)
 
@@ -136,8 +134,7 @@ begin
 	# GKI (the graphics kernel interface) on the stream, if the stream
 	# has not already been directed to a kernel.
 
-	sz_val = LEN_GDES
-	call calloc (gp, sz_val, TY_STRUCT)
+	call calloc (gp, LEN_GDES, TY_STRUCT)
 
 	GP_FD(gp) = outfd
 	GP_TTY(gp) = tty

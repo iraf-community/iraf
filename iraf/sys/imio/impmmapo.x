@@ -16,7 +16,6 @@ pointer procedure im_pmmapo (pl, ref_im)
 pointer	pl			#I mask descriptor
 pointer	ref_im			#I reference image or NULL
 
-size_t	sz_val
 pointer	im
 long	axlen[IM_MAXDIM]
 int	naxes, depth, i
@@ -40,8 +39,7 @@ begin
 	# Set up the image descriptor.
 	IM_NDIM(im) = naxes
 	IM_PIXTYPE(im) = TY_INT
-	sz_val = IM_MAXDIM
-	call amovl (axlen, IM_LEN(im,1), sz_val)
+	call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
 
 	IM_PL(im)	= pl
 	IM_PLREFIM(im)	= ref_im

@@ -19,7 +19,6 @@ bool	redir
 pointer	sp, cl, gp, im, command, image, word, title, output, ofile, dev, list
 int	cmd, stat, fd
 
-size_t	sz_val
 pointer	immap(), gopen(), imtopenp()
 bool	clgetb(), streq()
 int	strncmp(), clgeti(), btoi(), fstati(), open(), getline()
@@ -28,19 +27,14 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	sz_val = LEN_CLPAR
-	call salloc (cl, sz_val, TY_STRUCT)
-	sz_val = SZ_LINE
-	call salloc (command, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (word, sz_val, TY_CHAR)
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (ofile, sz_val, TY_CHAR)
-	call salloc (dev, sz_val, TY_CHAR)
+	call salloc (cl, LEN_CLPAR, TY_STRUCT)
+	call salloc (command, SZ_LINE, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (word, SZ_LINE, TY_CHAR)
+	call salloc (title, SZ_LINE, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (ofile, SZ_FNAME, TY_CHAR)
+	call salloc (dev, SZ_FNAME, TY_CHAR)
 
 	# If the input has been redirected, input is read from the named
 	# command file.  If not, each image name in the input template is

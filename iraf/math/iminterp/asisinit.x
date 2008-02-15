@@ -15,15 +15,13 @@ int	nincr			# number of sinc look-up table elements
 real	shift			# sinc interpolant shift
 real	badval			# drizzle bad pixel value
 
-size_t	sz_val
 int	nconv
 
 begin
 	if (interp_type < 1 || interp_type > II_NTYPES)
 	    call error (0, "ASISINIT: Illegal interpolant type")
 	else {
-	    sz_val = LEN_ASISTRUCT
-	    call calloc (asi, sz_val, TY_STRUCT)
+	    call calloc (asi, LEN_ASISTRUCT, TY_STRUCT)
 	    ASI_TYPE(asi) = interp_type
 	    switch (interp_type) {
 	    case II_LSINC:
@@ -37,8 +35,7 @@ begin
 		    ASI_SHIFT(asi) = shift
 		ASI_PIXFRAC(asi) = PIXFRAC
 		nconv = 2 * ASI_NSINC(asi) + 1
-		sz_val = nconv * ASI_NINCR(asi)
-		call calloc (ASI_LTABLE(asi), sz_val,
+		call calloc (ASI_LTABLE(asi), nconv * ASI_NINCR(asi),
 		    TY_REAL)
 		call ii_sinctable (Memr[ASI_LTABLE(asi)], nconv, ASI_NINCR(asi),
 		    ASI_SHIFT(asi))

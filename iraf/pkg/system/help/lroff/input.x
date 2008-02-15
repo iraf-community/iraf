@@ -21,7 +21,6 @@ the end of a line.
 
 int procedure input (in, userbuf)
 
-size_t	sz_val
 extern	in()
 char	userbuf[ARB]
 
@@ -35,8 +34,7 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_IBUF, TY_CHAR)
 
 	# Get input line and deal with any tab characters therein.
 	if (in (in_magic_arg, Memc[lbuf]) == EOF) {

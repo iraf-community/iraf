@@ -16,7 +16,6 @@ real	wts[ARB]	# Weights
 int	npts		# Number of data points
 pointer	gt		# GTOOLS pointer
 
-size_t	sz_val
 int	i, n, deleted
 real	rms
 pointer	sp, fit, wts1, str, params
@@ -33,14 +32,12 @@ begin
 	if (n == npts) {
 	    # Allocate memory for the fit.
 
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_REAL)
-	    call salloc (wts1, sz_val, TY_REAL)
+	    call salloc (fit, n, TY_REAL)
+	    call salloc (wts1, n, TY_REAL)
 
 	    # Eliminate rejected points and count deleted points.
 
-	    sz_val = n
-	    call amovr (wts, Memr[wts1], sz_val)
+	    call amovr (wts, Memr[wts1], n)
 	    if (IC_NREJECT(ic) > 0) {
 		do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
@@ -63,14 +60,12 @@ begin
 	} else if (n > 0) {
 	    # Allocate memory for the fit.
 
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_REAL)
-	    call salloc (wts1, sz_val, TY_REAL)
+	    call salloc (fit, n, TY_REAL)
+	    call salloc (wts1, n, TY_REAL)
 
 	    # Eliminate rejected points and count deleted points.
 
-	    sz_val = n
-	    call amovr (Memr[IC_WTSFIT(ic)], Memr[wts1], sz_val)
+	    call amovr (Memr[IC_WTSFIT(ic)], Memr[wts1], n)
 	    if (IC_NREJECT(ic) > 0) {
 	        do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
@@ -95,10 +90,8 @@ begin
 
 	# Print the parameters and errors.
 
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = 2*SZ_LINE
-	call salloc (params, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (params, 2*SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[str], SZ_LINE,
 	    "func=%s, order=%d, low_rej=%r, high_rej=%r, niterate=%d, grow=%r")

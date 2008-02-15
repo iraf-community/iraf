@@ -10,7 +10,6 @@ procedure fmio_bind (fm)
 
 pointer	fm			#I FMIO descriptor
 
-size_t	sz_val
 pointer	ft, pti, pt
 int	chan, szbpage, ftoff, ftlen, ptioff, ptilen, ptlen
 
@@ -35,15 +34,13 @@ begin
 	    szbpage) * szbpage + 1
 
 	# Initialize the file table.
-	sz_val = ftlen
-	call calloc (ft, sz_val, TY_STRUCT)
+	call calloc (ft, ftlen, TY_STRUCT)
 	FM_FTOFF(fm)		= ftoff
 	FM_FTLASTNF(fm)		= 0
 	FM_FTABLE(fm)		= ft
 
 	# Initialize the page table index.
-	sz_val = ptilen
-	call calloc (pti, sz_val, TY_INT)
+	call calloc (pti, ptilen, TY_INT)
 	FM_PTIOFF(fm)		= ptioff
 	FM_PTINPTI(fm)		= 0
 	FM_PTINDEX(fm)		= pti
@@ -51,8 +48,7 @@ begin
 	# Initialize the page table, stored in the data pages.  Note that the
 	# page table length must be an integral multiple of the page size.
 
-	sz_val = ptlen
-	call calloc (pt, sz_val, TY_SHORT)
+	call calloc (pt, ptlen, TY_SHORT)
 	FM_PTLEN(fm)		= ptlen
 	FM_PTNPTE(fm)		= 0
 	FM_PTLUPTE(fm)		= 0

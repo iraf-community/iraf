@@ -15,7 +15,6 @@ double	zfit[npts]	# fitted values
 int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
-size_t	sz_val
 double	norm
 int	ncoeff, nxder, nyder, i, j
 int	order, maxorder1, maxorder2, nmove1, nmove2
@@ -34,8 +33,7 @@ begin
 	}
 
 	# allocate space for new surface
-	sz_val = LEN_GSSTRUCT
-	call calloc (sf2, sz_val, TY_STRUCT)
+	call calloc (sf2, LEN_GSSTRUCT, TY_STRUCT)
 
 	# check the order of the derivatives and return 0 if the order is
 	# high
@@ -140,13 +138,11 @@ begin
 	GS_WZ(sf2) = NULL
 
 	# allocate space for coefficients
-	sz_val = GS_NCOEFF(sf2)
-	call calloc (GS_COEFF(sf2), sz_val, TY_DOUBLE)
+	call calloc (GS_COEFF(sf2), GS_NCOEFF(sf2), TY_DOUBLE)
 
 	# get coefficients
 	call smark (sp)
-	sz_val = GS_NCOEFF(sf1)
-	call salloc (coeff, sz_val, TY_DOUBLE)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_DOUBLE)
 	call dgscoeff (sf1, Memd[coeff], ncoeff)
 
 	# compute the new coefficients

@@ -8,7 +8,6 @@ pointer	in		# pointer to the inlfit structure (not used yet)
 char	file[ARB]	# arbitrary file name
 pointer	gt		# pointer to the gtools structure
 
-size_t	sz_val
 int	fd, sfd
 pointer	sp, str
 int	open(), stropen(), fscan()
@@ -20,8 +19,7 @@ begin
 	fd = open (file, APPEND, TEXT_FILE)
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Put time stamp in.
 	call cnvtime (clktime(0), Memc[str], SZ_LINE)

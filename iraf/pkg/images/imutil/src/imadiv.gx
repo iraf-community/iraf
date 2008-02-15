@@ -10,8 +10,6 @@ procedure ima_div$t (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 PIXEL	a, b, c
 
-size_t	sz_val
-long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -28,9 +26,7 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	lg_val = 1
-	sz_val = 3 * IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, 3 * IM_MAXDIM)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.

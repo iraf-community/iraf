@@ -96,7 +96,6 @@ pointer	sx1, sy1		#I/O pointers to the linear x and y surfaces
 PIXEL	xscale, yscale		#I the x and y scales
 PIXEL	xrotation,yrotation	#I the x and y axis  rotation angles in radians
 
-size_t	sz_val
 PIXEL	cosx, sinx, cosy, siny, xrange, yrange
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -116,9 +115,8 @@ $if (datatype == r)
 $else
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
 $endif
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_PIXEL)
-	call salloc (ycoeff, sz_val, TY_PIXEL)
+	call salloc (xcoeff, ncoeff, TY_PIXEL)
+	call salloc (ycoeff, ncoeff, TY_PIXEL)
 $if (datatype == r)
 	call gssave (sx1, Mem$t[xcoeff])
 	call gssave (sy1, Mem$t[ycoeff])
@@ -194,7 +192,6 @@ procedure geo_xyshift$t (sx1, sy1, xshift, yshift)
 pointer	sx1, sy1		#I pointers to linear x and y surfaces
 PIXEL	xshift, yshift		#I the input x and y shifts
 
-size_t	sz_val
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
 $if (datatype == r)
@@ -212,9 +209,8 @@ $if (datatype == r)
 $else
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
 $endif
-	sz_val = ncoeff
-	call salloc (xcoeff, sz_val, TY_PIXEL)
-	call salloc (ycoeff, sz_val, TY_PIXEL)
+	call salloc (xcoeff, ncoeff, TY_PIXEL)
+	call salloc (ycoeff, ncoeff, TY_PIXEL)
 
 	# Get coefficients.
 $if (datatype == r)

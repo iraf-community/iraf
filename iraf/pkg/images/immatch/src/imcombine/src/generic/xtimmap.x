@@ -45,7 +45,6 @@ int	hdr_arg			#I Header argument
 int	index			#I Save index
 pointer	im			#O Image pointer (returned)
 
-size_t	sz_val
 int	i, envgeti()
 pointer	xt, xt_opix()
 errchk	xt_opix
@@ -67,8 +66,7 @@ begin
 	    nopen = 0
 	    nopenpix = 0
 	    nalloc = MAX_OPENIM
-	    sz_val = nalloc
-	    call calloc (ims, sz_val, TY_POINTER)
+	    call calloc (ims, nalloc, TY_POINTER)
 	    first_time = NO
 	}
 
@@ -79,13 +77,10 @@ begin
 	if (index > nalloc) {
 	    i = nalloc
 	    nalloc = index + MAX_OPENIM
-	    sz_val = nalloc
-	    call realloc (ims, sz_val, TY_STRUCT)
-	    sz_val = nalloc-i
-	    call amovki (NULL, Memi[ims+i], sz_val)
+	    call realloc (ims, nalloc, TY_STRUCT)
+	    call amovki (NULL, Memi[ims+i], nalloc-i)
 	}
-	sz_val = XT_LEN
-	call calloc (xt, sz_val, TY_STRUCT)
+	call calloc (xt, XT_LEN, TY_STRUCT)
 	Memi[ims+index-1] = xt
 
 	# Initialize.
@@ -99,8 +94,7 @@ begin
 	im = xt_opix (NULL, index, 0)
 
 	# Make copy of IMIO pointer for header keyword access.
-	sz_val = LEN_IMDES+IM_HDRLEN(im)+1
-	call malloc (XT_HDR(xt), sz_val, TY_STRUCT)
+	call malloc (XT_HDR(xt), LEN_IMDES+IM_HDRLEN(im)+1, TY_STRUCT)
 	call amovi (Memi[im], Memi[XT_HDR(xt)], LEN_IMDES)
 	call amovi (IM_MAGIC(im), IM_MAGIC(XT_HDR(xt)), IM_HDRLEN(im)+1)
 
@@ -392,7 +386,6 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-size_t	sz_val
 int	i, j, nc, nl, open(), imgnls(), sizeof(), imloop()
 pointer	im, xt, xt1, ptr, immap(), imggss()
 errchk	open, immap, imgnls, imggss, imunmap
@@ -496,16 +489,14 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_SHORT) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			sz_val = IM_MAXDIM
-			call amovl (v, XT_VS(xt1,1), sz_val)
-			call amovl (v, XT_VE(xt1,1), sz_val)
+			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
+			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
 			nl = XT_VE(xt1,2) - XT_VS(xt1,2) + 1
 			XT_BTYPE(xt1) = TY_SHORT
-			sz_val = nl*nc
-			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
+			call malloc (XT_BUF(xt1), nl*nc, XT_BTYPE(xt1))
 			ptr = imggss (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
 			call amovs (Mems[ptr], Mems[XT_BUF(xt1)], nl*nc)
@@ -571,7 +562,6 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-size_t	sz_val
 int	i, j, nc, nl, open(), imgnli(), sizeof(), imloop()
 pointer	im, xt, xt1, ptr, immap(), imggsi()
 errchk	open, immap, imgnli, imggsi, imunmap
@@ -675,16 +665,14 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_INT) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			sz_val = IM_MAXDIM
-			call amovl (v, XT_VS(xt1,1), sz_val)
-			call amovl (v, XT_VE(xt1,1), sz_val)
+			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
+			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
 			nl = XT_VE(xt1,2) - XT_VS(xt1,2) + 1
 			XT_BTYPE(xt1) = TY_INT
-			sz_val = nl*nc
-			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
+			call malloc (XT_BUF(xt1), nl*nc, XT_BTYPE(xt1))
 			ptr = imggsi (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
 			call amovi (Memi[ptr], Memi[XT_BUF(xt1)], nl*nc)
@@ -750,7 +738,6 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-size_t	sz_val
 int	i, j, nc, nl, open(), imgnlr(), sizeof(), imloop()
 pointer	im, xt, xt1, ptr, immap(), imggsr()
 errchk	open, immap, imgnlr, imggsr, imunmap
@@ -854,20 +841,17 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_REAL) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			sz_val = IM_MAXDIM
-			call amovl (v, XT_VS(xt1,1), sz_val)
-			call amovl (v, XT_VE(xt1,1), sz_val)
+			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
+			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
 			nl = XT_VE(xt1,2) - XT_VS(xt1,2) + 1
 			XT_BTYPE(xt1) = TY_REAL
-			sz_val = nl*nc
-			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
+			call malloc (XT_BUF(xt1), nl*nc, XT_BTYPE(xt1))
 			ptr = imggsr (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
-			sz_val = nl*nc
-			call amovr (Memr[ptr], Memr[XT_BUF(xt1)], sz_val)
+			call amovr (Memr[ptr], Memr[XT_BUF(xt1)], nl*nc)
 		    }
 
 		    call imunmap (XT_IM(xt1))
@@ -930,7 +914,6 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-size_t	sz_val
 int	i, j, nc, nl, open(), imgnld(), sizeof(), imloop()
 pointer	im, xt, xt1, ptr, immap(), imggsd()
 errchk	open, immap, imgnld, imggsd, imunmap
@@ -1034,16 +1017,14 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_DOUBLE) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			sz_val = IM_MAXDIM
-			call amovl (v, XT_VS(xt1,1), sz_val)
-			call amovl (v, XT_VE(xt1,1), sz_val)
+			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
+			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
 			nl = XT_VE(xt1,2) - XT_VS(xt1,2) + 1
 			XT_BTYPE(xt1) = TY_DOUBLE
-			sz_val = nl*nc
-			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
+			call malloc (XT_BUF(xt1), nl*nc, XT_BTYPE(xt1))
 			ptr = imggsd (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
 			call amovd (Memd[ptr], Memd[XT_BUF(xt1)], nl*nc)

@@ -17,7 +17,6 @@ int	pid			#I process to be updated, or 0 for all procs
 char	message[ARB]		#I message to be broadcast to each child
 int	flushout		#I flush output
 
-size_t	sz_val
 int	pr, status
 pointer	sp, cmd, op
 int	gstrcpy(), prstati()
@@ -25,8 +24,7 @@ include	"prc.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_COMMAND, TY_CHAR)
 
 	# Make sure that the message string is non-null and is newline
 	# delimited.

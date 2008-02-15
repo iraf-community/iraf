@@ -11,7 +11,6 @@ procedure map(command)
 
 char	command[ARB]
 
-size_t	sz_val
 char	token[SZ_LINE]
 int	tok
 short	frames[IDS_MAXIMPL+2]			# frames, graphics, EOD
@@ -126,10 +125,9 @@ begin
 	# First, set up arrays
 
 	call smark (sp)
-	sz_val = level*4
-	call salloc (rdata, sz_val, TY_SHORT)
-	call salloc (gdata, sz_val, TY_SHORT)
-	call salloc (bdata, sz_val, TY_SHORT)
+	call salloc (rdata, level*4, TY_SHORT)
+	call salloc (gdata, level*4, TY_SHORT)
+	call salloc (bdata, level*4, TY_SHORT)
 
 	if (seed == -1)
 	    seed = level

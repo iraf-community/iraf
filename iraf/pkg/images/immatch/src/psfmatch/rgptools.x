@@ -5,12 +5,10 @@ include "psfmatch.h"
 procedure rg_pinit (pm, cfunc)
 
 pointer	pm		#O pointer to psfmatch structure
-size_t	sz_val
 int	cfunc		#I mode of computing the convolution function
 
 begin
-	sz_val = LEN_PSFSTRUCT
-	call malloc (pm, sz_val, TY_STRUCT)
+	call malloc (pm, LEN_PSFSTRUCT, TY_STRUCT)
 
 	# Initialize the pointers.
 	PM_RC1(pm) = NULL
@@ -95,7 +93,6 @@ end
 
 procedure rg_prinit (pm)
 
-size_t	sz_val
 pointer	pm		#I pointer to psfmatch structure
 
 begin
@@ -104,20 +101,18 @@ begin
 	PM_NREGIONS(pm) = 0
 	PM_CNREGION(pm) = 1
 
-	sz_val = MAX_NREGIONS
-	call malloc (PM_RC1(pm), sz_val, TY_INT)
-	call malloc (PM_RC2(pm), sz_val, TY_INT)
-	call malloc (PM_RL1(pm), sz_val, TY_INT)
-	call malloc (PM_RL2(pm), sz_val, TY_INT)
-	call malloc (PM_RZERO(pm), sz_val, TY_REAL)
-	call malloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
-	call malloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
+	call malloc (PM_RC1(pm), MAX_NREGIONS, TY_INT)
+	call malloc (PM_RC2(pm), MAX_NREGIONS, TY_INT)
+	call malloc (PM_RL1(pm), MAX_NREGIONS, TY_INT)
+	call malloc (PM_RL2(pm), MAX_NREGIONS, TY_INT)
+	call malloc (PM_RZERO(pm), MAX_NREGIONS, TY_REAL)
+	call malloc (PM_RXSLOPE(pm), MAX_NREGIONS, TY_REAL)
+	call malloc (PM_RYSLOPE(pm), MAX_NREGIONS, TY_REAL)
 
-	sz_val = MAX_NREGIONS
-	call amovki (INDEFI, Memi[PM_RC1(pm)], sz_val)
-	call amovki (INDEFI, Memi[PM_RC2(pm)], sz_val)
-	call amovki (INDEFI, Memi[PM_RL1(pm)], sz_val)
-	call amovki (INDEFI, Memi[PM_RL2(pm)], sz_val)
+	call amovki (INDEFI, Memi[PM_RC1(pm)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[PM_RC2(pm)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[PM_RL1(pm)], MAX_NREGIONS)
+	call amovki (INDEFI, Memi[PM_RL2(pm)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[PM_RZERO(pm)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[PM_RXSLOPE(pm)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[PM_RYSLOPE(pm)], MAX_NREGIONS)
@@ -152,27 +147,24 @@ procedure rg_prealloc (pm, nregions)
 pointer	pm		#I pointer to psfmatch structure
 int	nregions	#I number of regions
 
-size_t	sz_val
 int	nr
 int	rg_pstati()
 
 begin
 	nr = rg_pstati (pm, NREGIONS)
 
-	sz_val = nregions
-	call realloc (PM_RC1(pm), sz_val, TY_INT)
-	call realloc (PM_RC2(pm), sz_val, TY_INT)
-	call realloc (PM_RL1(pm), sz_val, TY_INT)
-	call realloc (PM_RL2(pm), sz_val, TY_INT)
-	call realloc (PM_RZERO(pm), sz_val, TY_REAL)
-	call realloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
-	call realloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
+	call realloc (PM_RC1(pm), nregions, TY_INT)
+	call realloc (PM_RC2(pm), nregions, TY_INT)
+	call realloc (PM_RL1(pm), nregions, TY_INT)
+	call realloc (PM_RL2(pm), nregions, TY_INT)
+	call realloc (PM_RZERO(pm), nregions, TY_REAL)
+	call realloc (PM_RXSLOPE(pm), nregions, TY_REAL)
+	call realloc (PM_RYSLOPE(pm), nregions, TY_REAL)
 
-	sz_val = nregions - nr
-	call amovki (INDEFI, Memi[PM_RC1(pm)+nr], sz_val)
-	call amovki (INDEFI, Memi[PM_RC2(pm)+nr], sz_val)
-	call amovki (INDEFI, Memi[PM_RL1(pm)+nr], sz_val)
-	call amovki (INDEFI, Memi[PM_RL2(pm)+nr], sz_val)
+	call amovki (INDEFI, Memi[PM_RC1(pm)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[PM_RC2(pm)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[PM_RL1(pm)+nr], nregions - nr)
+	call amovki (INDEFI, Memi[PM_RL2(pm)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[PM_RZERO(pm)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[PM_RXSLOPE(pm)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[PM_RYSLOPE(pm)+nr], nregions - nr)
@@ -580,7 +572,6 @@ pointer	pm		# pointer to psfmatch structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
-size_t	sz_val
 int	index, ip
 pointer	sp, temp
 real	rval
@@ -588,8 +579,7 @@ int	strdic(), fnldir(), ctor()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (temp, SZ_LINE, TY_CHAR)
 
 	switch (param) {
 	case BSTRING:

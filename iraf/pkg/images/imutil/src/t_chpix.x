@@ -27,7 +27,6 @@ procedure t_chpixtype()
 pointer imtlist1                # Input image list
 pointer imtlist2                # Output image list
 
-size_t	sz_val
 pointer image1                  # Input image
 pointer image2                  # Output image
 pointer imtemp                  # Temporary file
@@ -45,16 +44,14 @@ begin
 
         # Allocate temporary space.
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (imtlist1, sz_val, TY_CHAR)
-        call salloc (imtlist2, sz_val, TY_CHAR)
-        call salloc (image1, sz_val, TY_CHAR)
-        call salloc (image2, sz_val, TY_CHAR)
-        call salloc (imtemp, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (instr, sz_val, TY_CHAR)
-        call salloc (outstr, sz_val, TY_CHAR)
-        call salloc (imstr, sz_val, TY_CHAR)
+        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
+        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
+        call salloc (image1, SZ_FNAME, TY_CHAR)
+        call salloc (image2, SZ_FNAME, TY_CHAR)
+        call salloc (imtemp, SZ_FNAME, TY_CHAR)
+        call salloc (instr, SZ_LINE, TY_CHAR)
+        call salloc (outstr, SZ_LINE, TY_CHAR)
+        call salloc (imstr, SZ_LINE, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -141,8 +138,6 @@ pointer im1             # pointer to the input image
 pointer im2             # pointer to the output image
 int     outtype         # output pixel type
 
-size_t	sz_val
-long	lg_val
 int     ncols
 long    v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer buf1, buf2
@@ -155,43 +150,31 @@ errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 begin
         ncols = IM_LEN(im1, 1)
         IM_PIXTYPE(im2) = outtype
-        lg_val = 1
-        sz_val = IM_MAXDIM
-        call amovkl (lg_val, v1, sz_val)
-        call amovkl (lg_val, v2, sz_val)
+        call amovkl (long(1), v1, IM_MAXDIM)
+        call amovkl (long(1), v2, IM_MAXDIM)
 
         switch (outtype) {
         case TY_USHORT:
-            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF) {
-                sz_val = ncols
-                call amovl (Meml[buf1], Meml[buf2], sz_val)
-	    }
+            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF)
+                call amovl (Meml[buf1], Meml[buf2], ncols)
         case TY_SHORT:
-            while (impnls(im2,buf2,v2) != EOF && imgnls(im1,buf1,v1) != EOF) {
+            while (impnls(im2,buf2,v2) != EOF && imgnls(im1,buf1,v1) != EOF)
                 call amovs (Mems[buf1], Mems[buf2], ncols)
-	    }
         case TY_INT:
-            while (impnli(im2,buf2,v2) != EOF && imgnli(im1,buf1,v1) != EOF) {
+            while (impnli(im2,buf2,v2) != EOF && imgnli(im1,buf1,v1) != EOF)
                 call amovi (Memi[buf1], Memi[buf2], ncols)
-	    }
         case TY_LONG:
-            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF) {
-                sz_val = ncols
-                call amovl (Meml[buf1], Meml[buf2], sz_val)
-	    }
+            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF)
+                call amovl (Meml[buf1], Meml[buf2], ncols)
         case TY_REAL:
-            while (impnlr(im2,buf2,v2) != EOF && imgnlr(im1,buf1,v1) != EOF) {
-                sz_val = ncols
-                call amovr (Memr[buf1], Memr[buf2], sz_val)
-	    }
+            while (impnlr(im2,buf2,v2) != EOF && imgnlr(im1,buf1,v1) != EOF)
+                call amovr (Memr[buf1], Memr[buf2], ncols)
         case TY_DOUBLE:
-            while (impnld(im2,buf2,v2) != EOF && imgnld(im1,buf1,v1) != EOF) {
+            while (impnld(im2,buf2,v2) != EOF && imgnld(im1,buf1,v1) != EOF)
                 call amovd (Memd[buf1], Memd[buf2], ncols)
-	    }
         case TY_COMPLEX:
-            while (impnlx(im2,buf2,v2) != EOF && imgnlx(im1,buf1,v1) != EOF) {
+            while (impnlx(im2,buf2,v2) != EOF && imgnlx(im1,buf1,v1) != EOF)
                 call amovx (Memx[buf1], Memx[buf2], ncols)
-	    }
         }
 end
 

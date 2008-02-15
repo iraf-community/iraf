@@ -20,7 +20,6 @@ keywords, including the standard fields ("i_" prefix).
 
 procedure imokwl (im, patstr, sortit, kwl, ier)
 
-size_t	sz_val
 pointer	im				# imfort image descriptor
 %	character*(*) patstr
 bool	sortit				# sort the list?
@@ -33,8 +32,7 @@ pointer	imofnls(), imofnlu()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (pp, sz_val, TY_CHAR)
+	call salloc (pp, SZ_LINE, TY_CHAR)
 
 	call f77upk (patstr, Memc[pp], SZ_LINE)
 	iferr {
@@ -55,7 +53,6 @@ end
 
 procedure imgnkw (kwl, outstr, ier)
 
-size_t	sz_val
 pointer	kwl				# image descriptor
 %	character*(*) outstr
 int	ier
@@ -67,8 +64,7 @@ int	errcode(), strncmp()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (kp, sz_val, TY_CHAR)
+	call salloc (kp, SZ_FNAME, TY_CHAR)
 
 	iferr (nchars = imgnfn (kwl, Memc[kp], SZ_FNAME)) {
 	    ier = errcode()

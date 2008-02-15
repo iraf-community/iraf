@@ -70,7 +70,6 @@ pointer	qp			#I QPOE descriptor
 char	template[ARB]		#I field name template
 bool	sort			#I sort list of matched names?
 
-size_t	sz_val
 pointer	sp, patbuf, pattern, sym, fl, st, offv, sbuf, ip, op
 int	len_offv, sz_sbuf, nsyms, nc, junk, nchars, i, nmatch
 
@@ -81,17 +80,13 @@ errchk	calloc, malloc, realloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (pattern, sz_val, TY_CHAR)
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_LINE, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Allocate the list descriptor.
-	sz_val = LEN_FL
-	call calloc (fl, sz_val, TY_STRUCT)
-	sz_val = DEF_LENOFFV
-	call malloc (offv, sz_val, TY_INT)
-	sz_val = DEF_SZSBUF
-	call malloc (sbuf, sz_val, TY_CHAR)
+	call calloc (fl, LEN_FL, TY_STRUCT)
+	call malloc (offv, DEF_LENOFFV, TY_INT)
+	call malloc (sbuf, DEF_SZSBUF, TY_CHAR)
 
 	len_offv = DEF_LENOFFV
 	sz_sbuf = DEF_SZSBUF
@@ -141,15 +136,13 @@ begin
 		# Make room in offset vector?
 		if (nsyms > len_offv) {
 		    len_offv = len_offv + INC_LENOFFV
-		    sz_val = len_offv
-		    call realloc (offv, sz_val, TY_INT)
+		    call realloc (offv, len_offv, TY_INT)
 		}
 
 		# Make room in string buffer?
 		if (nc + nchars + 1 > sz_sbuf) {
 		    sz_sbuf = sz_sbuf + INC_SZSBUF
-		    sz_val = sz_sbuf
-		    call realloc (sbuf, sz_val, TY_CHAR)
+		    call realloc (sbuf, sz_sbuf, TY_CHAR)
 		}
 
 		# Add the symbol.

@@ -47,14 +47,12 @@ pointer	procedure imtopenp (param)
 
 char	param[ARB]		# CL parameter with string value template
 pointer	sp, template, imt
-size_t	sz_val
 pointer	imtopen()
 errchk	clgstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNT
-	call salloc (template, sz_val, TY_CHAR)
+	call salloc (template, SZ_FNT, TY_CHAR)
 
 	call clgstr (param, Memc[template], SZ_FNT)
 	imt = imtopen (Memc[template])
@@ -76,7 +74,6 @@ pointer	procedure imtopen (template)
 
 char	template[ARB]		# image template
 
-size_t	sz_val
 int	sort, level, ip, ch
 pointer	sp, listp, fnt, op
 define	output {Memc[op]=$1;op=op+1}
@@ -85,8 +82,7 @@ int	strlen()
 
 begin
 	call smark (sp)
-	sz_val = max(strlen(template)*2, SZ_FNT)
-	call salloc (fnt, sz_val, TY_CHAR)
+	call salloc (fnt, max(strlen(template)*2, SZ_FNT), TY_CHAR)
 
 	# Sorting is disabled as input and output templates, derived from the
 	# same database but with string editing used to modify the output list,
@@ -183,7 +179,6 @@ pointer	imt			# image template descriptor
 char	outstr[ARB]		# output string
 int	maxch			# max chars out
 
-size_t	sz_val
 int	nchars
 pointer	sp, buf
 int	fntgfnb(), imt_mapname()
@@ -191,8 +186,7 @@ errchk	fntgfnb
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_PATHNAME, TY_CHAR)
 
 	if (fntgfnb (imt, Memc[buf], SZ_PATHNAME) == EOF) {
 	    outstr[1] = EOS
@@ -216,7 +210,6 @@ int	index			# list element to be returned
 char	outstr[ARB]		# output string
 int	maxch			# max chars out
 
-size_t	sz_val
 int	nchars
 pointer	sp, buf
 int	fntrfnb(), imt_mapname()
@@ -224,8 +217,7 @@ errchk	fntrfnb
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_PATHNAME, TY_CHAR)
 
 	if (fntrfnb (imt, index, Memc[buf], SZ_PATHNAME) == EOF) {
 	    outstr[1] = EOS

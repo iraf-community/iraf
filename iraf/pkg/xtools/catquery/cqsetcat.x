@@ -74,7 +74,6 @@ procedure cq_ccinit (cq, catno)
 pointer	cq			#I the catalog database descriptor
 int	catno			#I the current catalog number
 
-size_t	sz_val
 pointer	cc
 
 begin
@@ -83,19 +82,17 @@ begin
 	CQ_CATNO(cq) = catno
 	call strcpy (CQ_NAME(cq, catno), CQ_CATNAME(cq), SZ_FNAME)
 
-	sz_val = CQ_LEN_CC
-	call calloc (CQ_CAT(cq), sz_val, TY_STRUCT)
+	call calloc (CQ_CAT(cq), CQ_LEN_CC, TY_STRUCT)
 	cc = CQ_CAT(cq)
 
 	CQ_NQPARS(cc) = 0
 	CQ_HFMT(cc) = CQ_HNONE
 
-	sz_val = SZ_LINE
-	call calloc (CQ_PQPNAMES(cc), sz_val, TY_CHAR)
-	call calloc (CQ_PQPDVALUES(cc), sz_val, TY_CHAR)
-	call calloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
-	call calloc (CQ_PQPUNITS(cc), sz_val, TY_CHAR)
-	call calloc (CQ_PQPFMTS(cc), sz_val, TY_CHAR)
+	call calloc (CQ_PQPNAMES(cc), SZ_LINE, TY_CHAR)
+	call calloc (CQ_PQPDVALUES(cc), SZ_LINE, TY_CHAR)
+	call calloc (CQ_PQPVALUES(cc), SZ_LINE, TY_CHAR)
+	call calloc (CQ_PQPUNITS(cc), SZ_LINE, TY_CHAR)
+	call calloc (CQ_PQPFMTS(cc), SZ_LINE, TY_CHAR)
 
 	Memc[CQ_PQPNAMES(cc)] = EOS
 	Memc[CQ_PQPDVALUES(cc)] = EOS
@@ -116,7 +113,6 @@ int procedure cq_ccrquery (cq)
 
 pointer	cq			#I the catalog database descriptor
 
-size_t	sz_val
 pointer	cc, sp, str
 int	i, catno, nqpars, npars, sz1, sz2, sz3, sz4, sz5
 int	op1, op2, op3, op4, op5
@@ -133,8 +129,7 @@ begin
 	catno = CQ_CATNO(cq)
 
 	call smark (sp)
-	sz_val = 4 * (SZ_LINE + 1)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, 4 * (SZ_LINE + 1), TY_CHAR)
 
 	iferr {
 
@@ -192,8 +187,7 @@ begin
 	    # Get the query parameter name.
 	    if ((sz1 - op1 + 1)  <  (CQ_SZ_QPNAME + 1)) {
 		sz1 = sz1 + SZ_LINE
-		sz_val = sz1
-		call realloc (CQ_PQPNAMES(cc), sz_val, TY_CHAR)
+		call realloc (CQ_PQPNAMES(cc), sz1, TY_CHAR)
 	    }
 	    op1 = op1 + gstrcpy (Memc[str], Memc[CQ_PQPNAMES(cc)+op1-1],
 	        sz1 - op1 + 1)
@@ -205,10 +199,8 @@ begin
 	    if ((sz2 - op2 + 1)  <  (CQ_SZ_QPVALUE + 1)) {
 		sz2 = sz2 + SZ_LINE
 		sz3 = sz3 + SZ_LINE
-		sz_val = sz2
-		call realloc (CQ_PQPDVALUES(cc), sz_val, TY_CHAR)
-		sz_val = sz3
-		call realloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
+		call realloc (CQ_PQPDVALUES(cc), sz2, TY_CHAR)
+		call realloc (CQ_PQPVALUES(cc), sz3, TY_CHAR)
 	    }
 	    op2 = op2 + gstrcpy (Memc[str+SZ_LINE+1],
 	        Memc[CQ_PQPDVALUES(cc)+op2-1], sz2 - op2 + 1)
@@ -222,8 +214,7 @@ begin
 	    # Get the query parameter units.
 	    if ((sz4 - op4 + 1)  <  (CQ_SZ_QPUNITS + 1)) {
 		sz4 = sz4 + SZ_LINE
-		sz_val = sz4
-		call realloc (CQ_PQPUNITS(cc), sz_val, TY_CHAR)
+		call realloc (CQ_PQPUNITS(cc), sz4, TY_CHAR)
 	    }
 	    op4 = op4 + gstrcpy (Memc[str+2*(SZ_LINE+1)],
 	        Memc[CQ_PQPUNITS(cc)+op4-1], sz4 - op4 + 1)
@@ -233,8 +224,7 @@ begin
 	    # Get the query parameter formats.
 	    if ((sz5 - op5 + 1)  <  (CQ_SZ_QPFMTS + 1)) {
 		sz5 = sz5 + SZ_LINE
-		sz_val = sz5
-		call realloc (CQ_PQPFMTS(cc), sz_val, TY_CHAR)
+		call realloc (CQ_PQPFMTS(cc), sz5, TY_CHAR)
 	    }
 	    op5 = op5 + gstrcpy (Memc[str+3*(SZ_LINE+1)],
 	        Memc[CQ_PQPFMTS(cc)+op5-1], sz5 - op5 + 1)
@@ -248,12 +238,11 @@ begin
 	call sfree (sp)
 	if (npars != nqpars) {
 	    CQ_NQPARS(cc) = 0
-	    sz_val = SZ_LINE
-	    call realloc (CQ_PQPNAMES(cc), sz_val, TY_CHAR)
-	    call realloc (CQ_PQPDVALUES(cc), sz_val, TY_CHAR)
-	    call realloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
-	    call realloc (CQ_PQPUNITS(cc), sz_val, TY_CHAR)
-	    call realloc (CQ_PQPFMTS(cc), sz_val, TY_CHAR)
+	    call realloc (CQ_PQPNAMES(cc), SZ_LINE, TY_CHAR)
+	    call realloc (CQ_PQPDVALUES(cc), SZ_LINE, TY_CHAR)
+	    call realloc (CQ_PQPVALUES(cc), SZ_LINE, TY_CHAR)
+	    call realloc (CQ_PQPUNITS(cc), SZ_LINE, TY_CHAR)
+	    call realloc (CQ_PQPFMTS(cc), SZ_LINE, TY_CHAR)
 	    Memc[CQ_PQPNAMES(cc)] = EOS
 	    Memc[CQ_PQPDVALUES(cc)] = EOS
 	    Memc[CQ_PQPVALUES(cc)] = EOS
@@ -264,16 +253,11 @@ begin
 	    return (ERR)
 	} else {
 	    CQ_NQPARS(cc) = npars
-	    sz_val = op1
-	    call realloc (CQ_PQPNAMES(cc), sz_val, TY_CHAR)
-	    sz_val = op2
-	    call realloc (CQ_PQPDVALUES(cc), sz_val, TY_CHAR)
-	    sz_val = op3
-	    call realloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
-	    sz_val = op4
-	    call realloc (CQ_PQPUNITS(cc), sz_val, TY_CHAR)
-	    sz_val = op5
-	    call realloc (CQ_PQPFMTS(cc), sz_val, TY_CHAR)
+	    call realloc (CQ_PQPNAMES(cc), op1, TY_CHAR)
+	    call realloc (CQ_PQPDVALUES(cc), op2, TY_CHAR)
+	    call realloc (CQ_PQPVALUES(cc), op3, TY_CHAR)
+	    call realloc (CQ_PQPUNITS(cc), op4, TY_CHAR)
+	    call realloc (CQ_PQPFMTS(cc), op5, TY_CHAR)
 	    Memc[CQ_PQPNAMES(cc)+op1] = EOS
 	    Memc[CQ_PQPDVALUES(cc)+op2] = EOS
 	    Memc[CQ_PQPVALUES(cc)+op3] = EOS

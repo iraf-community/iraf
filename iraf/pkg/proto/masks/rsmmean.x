@@ -19,7 +19,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, imptrs, mskptrs, str
 pointer	hmask, imids, tmpim, tmpmsk, im, pmim, outim, hmim
@@ -31,19 +30,16 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	sz_val = RS_NCOMBINE(rs) + 1
-	call salloc (imptrs, sz_val, TY_POINTER)
-	call salloc (mskptrs, sz_val, TY_POINTER)
-	call salloc (imids, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (imptrs, RS_NCOMBINE(rs) + 1, TY_POINTER)
+	call salloc (mskptrs, RS_NCOMBINE(rs) + 1, TY_POINTER)
+	call salloc (imids, RS_NCOMBINE(rs) + 1, TY_INT)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -198,14 +194,12 @@ begin
 		call rs_piptrs (inlist, msklist, Memp[imptrs], Memp[mskptrs],
 		    Memi[imids], start, finish, msk_invert, cache, old_size)
 		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), sz_val)
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), (finish - start + 2), tmpim,
 		    new_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(Memp[imptrs])
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpmsk,1), sz_val)
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpmsk,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), (finish - start + 3), tmpmsk,
 		    new_size)
@@ -325,7 +319,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	flow, fhigh, fscale
 pointer	sp, image, imask, outimage, tmpimage, tmpmask, hmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
@@ -337,14 +330,13 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -529,13 +521,11 @@ begin
 	    # since it is already in memory ...
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 2, tmpim, new_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(im)
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), sz_val)
+		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), 3, tmpmsk, new_size)
 	    }
@@ -610,7 +600,6 @@ bool	msk_invert		#I invert the input masks ?
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
-size_t	sz_val
 real	fscale
 pointer	sp, image,  imask, outimage, hmask, tmpimage, tmpmask, str
 pointer	tmpim, tmpmsk, im, pmim, outim, hmim
@@ -622,14 +611,13 @@ int	imtlen(), imtrgetim(), btoi(), imaccess(), imstati(), rs_pmout()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (outimage, sz_val, TY_CHAR)
-	call salloc (hmask, sz_val, TY_CHAR)
-	call salloc (tmpimage, sz_val, TY_CHAR)
-	call salloc (tmpmask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (outimage, SZ_FNAME, TY_CHAR)
+	call salloc (hmask, SZ_FNAME, TY_CHAR)
+	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
+	call salloc (tmpmask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         # Check image status. If resubtract is yes then delete the output
         # images if they already exist. Otherwise determine whether the
@@ -812,13 +800,11 @@ begin
 	    # since it is already in memory ...
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cache1 (btoi(cache), tmpim, old_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(im)
-		sz_val = IM_MAXDIM
-		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), sz_val)
+		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), IM_MAXDIM)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), 2, tmpmsk, new_size)
 		call rs_pminit (inlist, msklist, msk_invert, tmpim, tmpmsk,
@@ -881,8 +867,6 @@ pointer	tmpmsk			#I the output mask counts image
 int	start			#I the starting image in the list
 int	finish			#I the ending image in the list
 #real	normsum			#U the normalization accumulator 
-long	lg_val
-size_t	sz_val
 char	skyscale[ARB]		#I the scaling factor keyword 
 
 pointer	sp, image, imask, imptrs, mkptrs, mpptrs, imnorm
@@ -897,22 +881,18 @@ errchk	imgetr()
 begin
 	nin = finish - start + 1
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR) 
-	call salloc (imask, sz_val, TY_CHAR) 
-	sz_val = nin
-	call salloc (imptrs, sz_val, TY_POINTER) 
-	call salloc (imnorm, sz_val, TY_REAL) 
-	call salloc (mkptrs, sz_val, TY_POINTER) 
-	call salloc (mpptrs, sz_val, TY_POINTER) 
-	sz_val = IM_MAXDIM
-	call salloc (vout, sz_val, TY_LONG) 
-	call salloc (mvout, sz_val, TY_LONG) 
-	call salloc (vs, sz_val, TY_LONG) 
-	call salloc (ve, sz_val, TY_LONG) 
-	call salloc (vin, sz_val, TY_LONG) 
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR) 
+	call salloc (image, SZ_FNAME, TY_CHAR) 
+	call salloc (imask, SZ_FNAME, TY_CHAR) 
+	call salloc (imptrs, nin, TY_POINTER) 
+	call salloc (imnorm, nin, TY_REAL) 
+	call salloc (mkptrs, nin, TY_POINTER) 
+	call salloc (mpptrs, nin, TY_POINTER) 
+	call salloc (vout, IM_MAXDIM, TY_LONG) 
+	call salloc (mvout, IM_MAXDIM, TY_LONG) 
+	call salloc (vs, IM_MAXDIM, TY_LONG) 
+	call salloc (ve, IM_MAXDIM, TY_LONG) 
+	call salloc (vin, IM_MAXDIM, TY_LONG) 
+	call salloc (str, SZ_FNAME, TY_CHAR) 
 
 	# Open the initial input images and masks.
 	j = 1
@@ -949,25 +929,21 @@ begin
 
 	# Initialize image and mask i/o.
 	npix = IM_LEN(tmpim,1)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[mvout], sz_val)
-	call amovkl (lg_val, Meml[vs], sz_val)
-	call amovkl (lg_val, Meml[ve], sz_val)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vs], IM_MAXDIM)
+	call amovkl (long(1), Meml[ve], IM_MAXDIM)
 	Meml[ve] = npix
 
 	# Do the initial accumulation of counts and numbers of pixels.
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF &&
 	    impnli (tmpmsk, ombuf, Meml[mvout]) != EOF) {
 	    call amovkr (0.0, Memr[obuf], npix)
-	    sz_val = npix
-	    call amovki (0, Memi[ombuf], sz_val)
+	    call amovki (0, Memi[ombuf], npix)
 	    do j = 1, nin {
 	        call mio_setrange (Memp[mpptrs+j-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[imptrs+j-1])) 
-		sz_val = IM_MAXDIM
-		call amovl (Meml[vs], Meml[vin], sz_val)
+		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
 		while (mio_glsegr (Memp[mpptrs+j-1], ibuf, mval,
 		    Meml[vin], npts) != EOF) {
 		    call amulkr (Memr[ibuf], Memr[imnorm+j-1], Memr[ibuf],
@@ -978,9 +954,8 @@ begin
 		        Memi[ombuf+Meml[vin]-1], npts)
 		}
 	    }
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[vout], Meml[vs], sz_val)
-	    call amovl (Meml[vout], Meml[ve], sz_val)
+	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
+	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -1008,8 +983,6 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new normalization factor
 
-long	lg_val
-size_t	sz_val
 real	norm1, pout, rmin, rmax
 pointer	sp, vin, vmin, vout, vtmp, vmtmp
 pointer	obuf, ibuf, imbuf, tbuf, tmbuf
@@ -1020,20 +993,17 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vmin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vmin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vmin], sz_val)
-	call amovkl (lg_val, Meml[vtmp], sz_val)
-	call amovkl (lg_val, Meml[vmtmp], sz_val)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
 
 	# Accumulate the normalized input image.
 	iferr (norm1 = imgetr (im, RS_KYFSCALE(rs)))
@@ -1092,8 +1062,6 @@ real	fscale			#I the new normalization factor
 char	skyscale[ARB]		#I the sky scaling keyword
 char	skysub[ARB]		#I the sky subtraction keyword
 
-long	lg_val
-size_t	sz_val
 real	norm1, pout
 pointer	sp, vin, vmin, vout, vtmp, vmtmp, vs, str
 pointer	obuf, ibuf, imbuf, tbuf, tmbuf, hbuf
@@ -1104,22 +1072,18 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vmin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vmin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vmin], sz_val)
-	call amovkl (lg_val, Meml[vtmp], sz_val)
-	call amovkl (lg_val, Meml[vmtmp], sz_val)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
 
 	call sprintf (Memc[str], SZ_FNAME,
 	    "Sky subtracted with scale factor = %g")
@@ -1155,13 +1119,9 @@ begin
 	        call asubr (Memr[ibuf], Memr[obuf], Memr[obuf], npix)
 	    }
 	} else {
-	    sz_val = IM_MAXDIM
-	    call salloc (vs, sz_val, TY_LONG)
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, Meml[vs], sz_val)
-	    sz_val = npix
-	    call salloc (hbuf, sz_val, TY_SHORT)
+	    call salloc (vs, IM_MAXDIM, TY_LONG)
+	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
+	    call salloc (hbuf, npix, TY_SHORT)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
 	       imgnlr (im, ibuf, Meml[vin]) != EOF &&
 	       imgnli (pmim, imbuf, Meml[vmin]) != EOF &&
@@ -1189,8 +1149,7 @@ begin
 
 	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
-	        sz_val = IM_MAXDIM
-	        call amovl (Meml[vin], Meml[vs], sz_val)
+	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
 	    }
 	}
 
@@ -1216,8 +1175,6 @@ int	finish			#I the current ending image
 int	ostart			#I the previous starting image
 int	ofinish			#I the previous ending image
 #real	normsum			#I the norm factor accumulator
-long	lg_val
-size_t	sz_val
 char	skyscale[ARB]		#I the sky scaling keyword
 
 pointer	sp, image, vin, vout, v, imsub, imadd, norma, norms
@@ -1237,30 +1194,26 @@ begin
 	nadd = finish - ofinish
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imask, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imask, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (mvin, sz_val, TY_LONG)
-	call salloc (mvout, sz_val, TY_LONG)
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
-	call salloc (v, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (mvin, IM_MAXDIM, TY_LONG)
+	call salloc (mvout, IM_MAXDIM, TY_LONG)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
-	sz_val = nsub
-	call salloc (imsub, sz_val, TY_POINTER)
-	call salloc (mksub, sz_val, TY_POINTER)
-	call salloc (mpsub, sz_val, TY_POINTER)
-	call salloc (norms, sz_val, TY_REAL)
-	sz_val = nadd
-	call salloc (imadd, sz_val, TY_POINTER)
-	call salloc (mkadd, sz_val, TY_POINTER)
-	call salloc (mpadd, sz_val, TY_POINTER)
-	call salloc (norma, sz_val, TY_REAL)
+	call salloc (imsub, nsub, TY_POINTER)
+	call salloc (mksub, nsub, TY_POINTER)
+	call salloc (mpsub, nsub, TY_POINTER)
+	call salloc (norms, nsub, TY_REAL)
+	call salloc (imadd, nadd, TY_POINTER)
+	call salloc (mkadd, nadd, TY_POINTER)
+	call salloc (mpadd, nadd, TY_POINTER)
+	call salloc (norma, nadd, TY_REAL)
 
 	# Open the images to be subtracted. In most cases there will be
 	# one such image.
@@ -1334,29 +1287,25 @@ begin
 
 	# Make the vector operators in-line code later if necessary.
 	npix = IM_LEN(tmpim,1)
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[mvin], sz_val)
-	call amovkl (lg_val, Meml[mvout], sz_val)
-	call amovkl (lg_val, Meml[vs], sz_val)
-	call amovkl (lg_val, Meml[ve], sz_val)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[mvin], IM_MAXDIM)
+	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vs], IM_MAXDIM)
+	call amovkl (long(1), Meml[ve], IM_MAXDIM)
 	Meml[ve] = npix
 
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF &&
 	    impnli (tmpmsk, mobuf, Meml[mvout]) != EOF &&
 	    imgnlr (tmpim, ibuf, Meml[vin]) != EOF &&
 	    imgnli (tmpmsk, mibuf, Meml[mvin]) != EOF) {
-	    sz_val = npix
-	    call amovr (Memr[ibuf], Memr[obuf], sz_val)
+	    call amovr (Memr[ibuf], Memr[obuf], npix)
 	    call amovi (Memi[mibuf], Memi[mobuf], npix)
 	    if (dosub == YES && doadd == YES) {
 		do i = 1, nsub {
 		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imsub+i-1]))
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[vs], Meml[v], sz_val)
+		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
 		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
@@ -1370,8 +1319,7 @@ begin
 		do i = 1, nadd {
 		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imadd+i-1]))
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[vs], Meml[v], sz_val)
+		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
 		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
@@ -1386,8 +1334,7 @@ begin
 		do i = 1, nsub {
 		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imsub+i-1]))
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[vs], Meml[v], sz_val)
+		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
 		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
@@ -1402,8 +1349,7 @@ begin
 		do i = 1, nadd {
 		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imadd+i-1]))
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[vs], Meml[v], sz_val)
+		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
 		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
@@ -1415,9 +1361,8 @@ begin
 		    }
 		}
 	    }
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[vout], Meml[vs], sz_val)
-	    call amovl (Meml[vout], Meml[ve], sz_val)
+	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
+	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -1450,8 +1395,6 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new scale factor
 
-long	lg_val
-size_t	sz_val
 real	rmin, rmax
 pointer	sp, vin, vout, vtmp, vmtmp
 pointer	obuf, ibuf, tbuf, tmbuf
@@ -1460,18 +1403,15 @@ int	impnlr(), imgnlr(), imgnli()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vtmp], sz_val)
-	call amovkl (lg_val, Meml[vmtmp], sz_val)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
 
 	# Accumulate the normalized image.
 	npix = IM_LEN(im,1)
@@ -1519,28 +1459,22 @@ real	blank			#I the undefined pixel value
 real	fscale			#I the normalization factor
 char	skysub[ARB]		#I the sky subtraction keyword
 
-long	lg_val
-size_t	sz_val
 pointer	sp, vin, vout, vtmp, vmtmp, vs, str, obuf, ibuf, tbuf, tmbuf, hbuf
 int	i, npix, stat
 int	impnlr(), imgnlr(), imgnli(), imstati()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vin, sz_val, TY_LONG)
-	call salloc (vout, sz_val, TY_LONG)
-	call salloc (vtmp, sz_val, TY_LONG)
-	call salloc (vmtmp, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (vin, IM_MAXDIM, TY_LONG)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	call salloc (vmtmp, IM_MAXDIM, TY_LONG)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[vout], sz_val)
-	call amovkl (lg_val, Meml[vin], sz_val)
-	call amovkl (lg_val, Meml[vtmp], sz_val)
-	call amovkl (lg_val, Meml[vmtmp], sz_val)
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
 
 	call sprintf (Memc[str], SZ_FNAME,
 	    "Sky subtracted with scale factor = %g")
@@ -1550,13 +1484,9 @@ begin
 	stat = NO
 	npix = IM_LEN(im,1)
 	if (hmim != NULL) {
-	    sz_val = npix
-	    call salloc (hbuf, sz_val, TY_SHORT)
-	    sz_val = IM_MAXDIM
-	    call salloc (vs, sz_val, TY_LONG)
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, Meml[vs], sz_val)
+	    call salloc (hbuf, npix, TY_SHORT)
+	    call salloc (vs, IM_MAXDIM, TY_LONG)
+	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
 	        imgnlr (im, ibuf, Meml[vin]) != EOF &&
 	        imgnlr (tmpim, tbuf, Meml[vtmp]) != EOF &&
@@ -1576,8 +1506,7 @@ begin
 
 	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
-	        sz_val = IM_MAXDIM
-	        call amovl (Meml[vin], Meml[vs], sz_val)
+	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
 	    }
 	} else {
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
@@ -1619,7 +1548,6 @@ bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache the image in memory ?
 size_t	old_size                        #O the original working set size
 
-size_t	sz_val
 pointer sp, image, str
 int     n, i
 size_t	bufsize
@@ -1628,9 +1556,8 @@ int     imtrgetim(), btoi()
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (image, sz_val, TY_CHAR)
-        call salloc (str, sz_val, TY_CHAR)
+        call salloc (image, SZ_FNAME, TY_CHAR)
+        call salloc (str, SZ_FNAME, TY_CHAR)
 
         n = 1
         do i = start, finish {
@@ -1680,7 +1607,6 @@ int     ofinish                         #I the old ending image in the serious
 bool	msk_invert			#I invert the input masks
 bool    cache                           #I cache image buffers ?
 
-size_t	sz_val
 pointer sp, image, str
 int     i, n, nold, nsub, nadd
 size_t	bufsize
@@ -1693,9 +1619,8 @@ begin
             return
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (image, sz_val, TY_CHAR)
-        call salloc (str, sz_val, TY_CHAR)
+        call salloc (image, SZ_FNAME, TY_CHAR)
+        call salloc (str, SZ_FNAME, TY_CHAR)
 
         nold = ofinish - start + 1
 

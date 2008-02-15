@@ -14,7 +14,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -27,8 +26,7 @@ begin
 
 	if ((data == NULL) || (ncols != nc)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = ncols
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, ncols, TY_REAL)
 	    nc = ncols
 	    l1 = 0
 	    l2 = 0
@@ -49,8 +47,7 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = imgs2r (im, c1, c2, l1, l2)
-	        sz_val = nc
-	        call amovr (Memr[j], Memr[data], sz_val)
+	        call amovr (Memr[j], Memr[data], nc)
 	    }
 	    return
 	}
@@ -114,7 +111,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -127,8 +123,7 @@ begin
 
 	if ((data == NULL) || (nlines != nl)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = nlines
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, nlines, TY_REAL)
 	    nl = nlines
 	    c1 = 0
 	    c2 = 0
@@ -149,8 +144,7 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = cogetr (co, c1, l1, l2)
-	        sz_val = nl
-	        call amovr (Memr[j], Memr[data], sz_val)
+	        call amovr (Memr[j], Memr[data], nl)
 	    }
 	    return
 	}
@@ -214,7 +208,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -227,8 +220,7 @@ begin
 
 	if ((data == NULL) || (ncols != nc)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = (nlines + 1) * ncols
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, (nlines + 1) * ncols, TY_REAL)
 	    nc = ncols
 	    l1 = 0
 	    l2 = 0
@@ -249,8 +241,7 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = imgs2r (im, c1, c2, l1, l2)
-	        sz_val = nc
-	        call amovr (Memr[j], Memr[data], sz_val)
+	        call amovr (Memr[j], Memr[data], nc)
 	    }
 	    return
 	}
@@ -266,8 +257,7 @@ begin
 	    call aclrr (Memr[data], nc)
 	    do i = l1, l2 {
 		j = data + (mod (i, nl) + 1) * nc
-		sz_val = nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 
@@ -282,8 +272,7 @@ begin
 	    }
 	    do i = l2 + 1, line2 {
 		j = data + (mod (i, nl) + 1) * nc
-		sz_val = nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    l1 = line1
@@ -296,8 +285,7 @@ begin
 	    }
 	    do i = line1, l1 - 1 {
 		j = data + (mod (i, nl) + 1) * nc
-		sz_val = nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    l1 = line1
@@ -320,7 +308,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -333,8 +320,7 @@ begin
 
 	if ((data == NULL) || (nlines != nl)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = (ncols + 1) * nlines
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, (ncols + 1) * nlines, TY_REAL)
 	    nl = nlines
 	    c1 = 0
 	    c2 = 0
@@ -355,8 +341,7 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = cogetr (co, c1, l1, l2)
-	        sz_val = nl
-	        call amovr (Memr[j], Memr[data], sz_val)
+	        call amovr (Memr[j], Memr[data], nl)
 	    }
 	    return
 	}
@@ -372,8 +357,7 @@ begin
 	    call aclrr (Memr[data], nlines)
 	    do i = c1, c2 {
 		j = data + (mod (i, nc) + 1) * nl
-		sz_val = nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 
@@ -388,8 +372,7 @@ begin
 	    }
 	    do i = c2 + 1, col2 {
 		j = data + (mod (i, nc) + 1) * nl
-		sz_val = nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    c1 = col1
@@ -402,8 +385,7 @@ begin
 	    }
 	    do i = col1, c1 - 1 {
 		j = data + (mod (i, nc) + 1) * nl
-		sz_val = nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    c1 = col1

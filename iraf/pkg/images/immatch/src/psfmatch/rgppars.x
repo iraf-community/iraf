@@ -6,7 +6,6 @@ procedure rg_pgpars (pm)
 
 pointer	pm		#I pointer to psfmatch structure
 
-size_t	sz_val
 int	ival
 pointer	sp, str
 bool	clgetb()
@@ -16,8 +15,7 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Initialize the psf matching structure.
 	call rg_pinit (pm, clgwrd ("convolution", Memc[str], SZ_LINE,
@@ -78,7 +76,6 @@ procedure rg_pppars (pm)
 
 pointer	pm		#I pointer to the psf matching structure
 
-size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	rg_pstati()
@@ -87,8 +84,7 @@ real	rg_pstatr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Store the psf data string.
 	call rg_pstats (pm, PSFDATA, Memc[str], SZ_LINE)

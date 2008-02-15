@@ -148,7 +148,6 @@ int	hdr_size				#i header size
 int	ncolors					#i number of colormap entries
 pointer	cmap					#i colormap pointer
 
-size_t	sz_val
 int	i
 long	filepos, pixel
 int	r, g, b
@@ -165,10 +164,8 @@ begin
 	cmap = NULL
         if (ncolors == 0)
 	    return
-	else {
-            sz_val = CMAP_SIZE*3
-            call calloc (cmap, sz_val, TY_CHAR)
-	}
+	else
+            call calloc (cmap, CMAP_SIZE*3, TY_CHAR)
 
 	filepos = hdr_size + 3
 	call ip_lseek (fd, filepos)

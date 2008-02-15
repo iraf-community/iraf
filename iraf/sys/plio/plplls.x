@@ -14,7 +14,6 @@ int	ll_depth		#I line list depth, bits
 int	npix			#I number of pixels to be set
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, ll_out, ll_dst
 pointer	pl_access()
 errchk	pl_access
@@ -24,8 +23,7 @@ begin
 	    call pl_update (pl, v, ll_src)
 	else {
 	    call smark (sp)
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_out, sz_val, TY_SHORT)
+	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 
 	    ll_dst = pl_access (pl,v)
 	    call pl_linerop (ll_src, 1, PL_MAXVAL(pl), Mems[ll_dst], v[1],

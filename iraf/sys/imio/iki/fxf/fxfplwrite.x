@@ -43,8 +43,6 @@ procedure fxf_plwrite (im, fd)
 pointer	im			#I image descriptor
 int	fd			#I output file descriptor
 
-size_t	sz_val
-long	lg_val
 int	i, j, v_in[PL_MAXDIM], lp_len
 int	naxes, axlen[PL_MAXDIM], depth
 int	heap_offset, ep_off, lp_off, vararray[2]
@@ -71,9 +69,7 @@ begin
 	ep_off = -1
 	lastline = NULL
 	lp_off = -1
-	lg_val = 1
-	sz_val = PL_MAXDIM
-	call amovkl(lg_val, v_in, sz_val)
+	call amovkl(long(1), v_in, PL_MAXDIM)
 
 	do j = 1, axlen[3] {
 	    v_in[3] = j
@@ -147,8 +143,6 @@ int	maxlen			#O maximum line list length
 int	pcount			#O storage required to store mask (bytes)
 int	depth			#O mask depth
 
-size_t	sz_val
-long	lg_val
 int	naxes, axlen[PL_MAXDIM]
 int	i, j, v_in[PL_MAXDIM], lp_len
 int	heap_offset, ep_off, lp_off
@@ -169,9 +163,7 @@ begin
 	ep_off = -1
 	lastline = NULL
 	lp_off = -1
-	lg_val = 1
-	sz_val = PL_MAXDIM
-	call amovkl(lg_val, v_in, sz_val)
+	call amovkl(long(1), v_in, PL_MAXDIM)
 
 	# The following must duplicate the logic above for determining what
 	# gets written to the heap area.  All we are doing here is computing
@@ -276,7 +268,6 @@ int	hdroff		#I Header offset
 int 	poff		#I Pixel offset
 int	datasize	#I New FITS unit size
 
-size_t	sz_val
 pointer sp, tempfile, outname
 int	nchars, junk, inoff, out_fd, size
 int	fnldir(), fnroot(), open()
@@ -286,9 +277,8 @@ errchk	fxf_make_adj_copy, fxf_write_blanks
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (tempfile, sz_val, TY_CHAR)
-	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (tempfile, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
 
 	nchars = fnldir (IM_HDRFILE(im), Memc[tempfile], SZ_FNAME)
 	junk = fnroot (IM_HDRFILE(im), Memc[tempfile+nchars], SZ_FNAME)
@@ -326,8 +316,6 @@ procedure fxf_plpf (im)
 
 pointer im				#I IMIO descriptor
 
-long	lg_val
-size_t	sz_val
 int	pfd
 pointer	sp, imname, ref_im
 int	sv_acmode, sv_update, ndim, i, depth
@@ -336,8 +324,7 @@ int	open()
 
 begin
 	call smark (sp)
-	sz_val = SZ_IMNAME
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_IMNAME, TY_CHAR)
 
 	# Complete the initialization of a mask image.
 	ref_im = IM_PLREFIM(im)
@@ -354,13 +341,12 @@ begin
 	    IM_NDIM(im) = IM_NDIM(ref_im)
 	    IM_NPHYSDIM(im) = IM_NPHYSDIM(ref_im)
 	    IM_SECTUSED(im) = IM_SECTUSED(ref_im)
-	    sz_val = IM_MAXDIM
-	    call amovl (IM_LEN(ref_im,1), IM_LEN(im,1), sz_val)
-	    call amovl (IM_PHYSLEN(ref_im,1),IM_PHYSLEN(im,1), sz_val)
-	    call amovl (IM_SVLEN(ref_im,1), IM_SVLEN(im,1), sz_val)
-	    call amovl (IM_VMAP(ref_im,1), IM_VMAP(im,1), sz_val)
-	    call amovl (IM_VOFF(ref_im,1), IM_VOFF(im,1), sz_val)
-	    call amovl (IM_VSTEP(ref_im,1), IM_VSTEP(im,1), sz_val)
+	    call amovl (IM_LEN(ref_im,1), IM_LEN(im,1), IM_MAXDIM)
+	    call amovl (IM_PHYSLEN(ref_im,1),IM_PHYSLEN(im,1),IM_MAXDIM)
+	    call amovl (IM_SVLEN(ref_im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	    call amovl (IM_VMAP(ref_im,1), IM_VMAP(im,1), IM_MAXDIM)
+	    call amovl (IM_VOFF(ref_im,1), IM_VOFF(im,1), IM_MAXDIM)
+	    call amovl (IM_VSTEP(ref_im,1), IM_VSTEP(im,1), IM_MAXDIM)
 
 	    # Tell PMIO to use this image as the reference image.
 	    call pm_seti (IM_PL(im), P_REFIM, im)
@@ -394,14 +380,10 @@ begin
 		IM_LEN(im,i) = 1
 
 	    IM_NPHYSDIM(im) = ndim
-	    sz_val = IM_MAXDIM
-	    call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
-	    call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
-	    if (sv_acmode == NEW_IMAGE) {
-		lg_val = 1
-		sz_val = IM_MAXDIM
-		call amovkl (lg_val, IM_VSTEP(im,1), sz_val)	
-	    }
+	    call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	    call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	    if (sv_acmode == NEW_IMAGE)
+		call amovkl (long(1), IM_VSTEP(im,1), IM_MAXDIM)	
 
 	    depth = PL_MAXDEPTH
 	    if (and (IM_PLFLAGS(im), PL_BOOL) != 0)

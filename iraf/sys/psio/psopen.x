@@ -14,7 +14,6 @@ pointer procedure ps_open (fd, default_footer)
 int	fd					#I output file descriptor
 int	default_footer				#I option flags
 
-size_t	sz_val
 pointer	ps
 int	scale
 char	page[SZ_FNAME], version[SZ_FNAME]
@@ -25,19 +24,16 @@ errchk	calloc, syserr
 begin
 	# Allocate the structure.
 	iferr {
-	    sz_val = LEN_PSSTRUCT
-	    call calloc (ps, sz_val, TY_STRUCT)
+	    call calloc (ps, LEN_PSSTRUCT, TY_STRUCT)
 
-	    sz_val = SZ_WORD
-	    call calloc (PS_HLE(ps), sz_val, TY_CHAR)
-	    call calloc (PS_HCE(ps), sz_val, TY_CHAR)
-	    call calloc (PS_HRE(ps), sz_val, TY_CHAR)
-	    call calloc (PS_FLE(ps), sz_val, TY_CHAR)
-	    call calloc (PS_FCE(ps), sz_val, TY_CHAR)
-	    call calloc (PS_FRE(ps), sz_val, TY_CHAR)
+	    call calloc (PS_HLE(ps), SZ_WORD, TY_CHAR)
+	    call calloc (PS_HCE(ps), SZ_WORD, TY_CHAR)
+	    call calloc (PS_HRE(ps), SZ_WORD, TY_CHAR)
+	    call calloc (PS_FLE(ps), SZ_WORD, TY_CHAR)
+	    call calloc (PS_FCE(ps), SZ_WORD, TY_CHAR)
+	    call calloc (PS_FRE(ps), SZ_WORD, TY_CHAR)
 	
-	    sz_val = SZ_LINE
-	    call calloc (PS_WBPTR(ps), sz_val, TY_CHAR)
+	    call calloc (PS_WBPTR(ps), SZ_LINE, TY_CHAR)
 	} then
 	    call syserr (SYS_PSOPEN)
 

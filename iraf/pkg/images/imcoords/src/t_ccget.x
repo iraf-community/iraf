@@ -54,7 +54,6 @@ pointer	olatformat, lngcolumn, latcolumn, colnames, exprs, formats
 pointer	infile, outfile, str
 pointer	fldcoo, catcoo, outcoo, mw, dc, ec
 bool	verbose
-size_t	sz_val
 double	clgetd()
 pointer	cc_dinit(), cc_einit(), clpopnu()
 int	clplen(), ctod(), strncmp(), clgwrd(), sk_decwcs()
@@ -92,26 +91,21 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (infile, sz_val, TY_CHAR)
-	call salloc (outfile, sz_val, TY_CHAR)
-	call salloc (lngcenter, sz_val, TY_CHAR)
-	call salloc (latcenter, sz_val, TY_CHAR)
-	call salloc (fcsystem, sz_val, TY_CHAR)
-	call salloc (catsystem, sz_val, TY_CHAR)
-	call salloc (lngcolumn, sz_val, TY_CHAR)
-	call salloc (latcolumn, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (colnames, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (outsystem, sz_val, TY_CHAR)
-	call salloc (olngformat, sz_val, TY_CHAR)
-	call salloc (olatformat, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (exprs, sz_val, TY_CHAR)
-	call salloc (formats, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (outfile, SZ_FNAME, TY_CHAR)
+	call salloc (lngcenter, SZ_FNAME, TY_CHAR)
+	call salloc (latcenter, SZ_FNAME, TY_CHAR)
+	call salloc (fcsystem, SZ_FNAME, TY_CHAR)
+	call salloc (catsystem, SZ_FNAME, TY_CHAR)
+	call salloc (lngcolumn, SZ_FNAME, TY_CHAR)
+	call salloc (latcolumn, SZ_FNAME, TY_CHAR)
+	call salloc (colnames, SZ_LINE, TY_CHAR)
+	call salloc (outsystem, SZ_FNAME, TY_CHAR)
+	call salloc (olngformat, SZ_FNAME, TY_CHAR)
+	call salloc (olatformat, SZ_FNAME, TY_CHAR)
+	call salloc (exprs, SZ_LINE, TY_CHAR)
+	call salloc (formats, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the field center coordinates and make some preliminary checks.
 	call clgstr ("lngcenter", Memc[lngcenter], SZ_FNAME)
@@ -568,7 +562,6 @@ double	dlng1, dlng2		#I the ra / longitude limits in degrees
 double	dlat1, dlat2		#I the dec / latitude limits in degrees
 bool	verbose			#I verbose mode
 
-size_t	sz_val
 double	dlngcenter, dlatcenter, tlng, tlat, dlng, dlat, dist
 double  tmplng, tlngcenter
 int	ip, op, i, j, nline, lngoffset, latoffset, offset1, offset2, nsig
@@ -580,10 +573,9 @@ extern	cc_getop()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inbuf, sz_val, TY_CHAR)
-	call salloc (outbuf, sz_val, TY_CHAR)
-	call salloc (newval, sz_val, TY_CHAR)
+	call salloc (inbuf, SZ_LINE, TY_CHAR)
+	call salloc (outbuf, SZ_LINE, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
 
 	# Convert the field center coordinates to degrees.
         switch (sk_stati(catcoo, S_NLNGUNITS)) {
@@ -820,19 +812,16 @@ char	cnames[ARB]		#I optional list of columm names
 char	lngname[ARB]		#I the ra / longitude column name or number
 char	latname[ARB]		#I the dec / latitude column name or number
 
-size_t	sz_val
 int	i, ip, op
 pointer	dc, cptr
 int	cc_cnames(), ctotok(), ctoi()
 bool	streq()
 
 begin
-	sz_val = DC_DLENGTH
-	call calloc (dc, sz_val, TY_STRUCT)
+	call calloc (dc, DC_DLENGTH, TY_STRUCT)
 
 	# Define the column names.
-	sz_val = MAX_NCOLUMNS * (SZ_COLNAME + 1)
-	call calloc (DC_COLNAMES(dc), sz_val, TY_CHAR)
+	call calloc (DC_COLNAMES(dc), MAX_NCOLUMNS * (SZ_COLNAME + 1), TY_CHAR)
 	Memc[DC_COLNAMES(dc)] = EOS
 
 	ip = 1
@@ -882,12 +871,10 @@ begin
 	if (DC_LATCOLUMN(dc) <= 0)
 	    DC_LATCOLUMN(dc) = DC_LNGCOLUMN(dc) + 1
 
-	sz_val = SZ_LINE
-	call calloc (DC_RECORD(dc), sz_val, TY_CHAR)
+	call calloc (DC_RECORD(dc), SZ_LINE, TY_CHAR)
 	Memc[DC_RECORD(dc)) = EOS 
 
-	sz_val = MAX_NCOLUMNS + 1
-	call calloc (DC_COFFSETS(dc), sz_val, TY_INT)
+	call calloc (DC_COFFSETS(dc), MAX_NCOLUMNS + 1, TY_INT)
 
 	return (dc)
 end
@@ -969,18 +956,15 @@ char	formats[ARB]		#I the input formats list
 char	lngformat[ARB]		#I the input output ra / longitude format
 char	latformat[ARB]		#I the input output dec / latitude format
 
-size_t	sz_val
 int	i, ip, nexpr
 pointer	ec, cptr, fptr
 int	cc_enames()
 
 begin
-	sz_val = EC_ELENGTH
-	call calloc (ec, sz_val, TY_STRUCT)
+	call calloc (ec, EC_ELENGTH, TY_STRUCT)
 
 	# Define the column names.
-	sz_val = MAX_NEXPR * (SZ_EXPR + 1)
-	call malloc (EC_ELIST(ec), sz_val, TY_CHAR)
+	call malloc (EC_ELIST(ec), MAX_NEXPR * (SZ_EXPR + 1), TY_CHAR)
 	Memc[EC_ELIST(ec)] = EOS
 
 	# Create list of expressions.
@@ -999,11 +983,9 @@ begin
 
 	# Decode the list of expressions into column names, column ranges,
 	# and column expressions.
-	sz_val = 3 * MAX_NERANGES + 1
-	call calloc (EC_ERANGES(ec), sz_val, TY_INT)
+	call calloc (EC_ERANGES(ec), 3 * MAX_NERANGES + 1, TY_INT)
 
-	sz_val = MAX_NEXPR * (SZ_EFORMATS + 1)
-	call calloc (EC_EFORMATS(ec), sz_val, TY_CHAR)
+	call calloc (EC_EFORMATS(ec), MAX_NEXPR * (SZ_EFORMATS + 1), TY_CHAR)
 	Memc[EC_EFORMATS(ec)] = EOS
 	ip  = 1
 	fptr = EC_EFORMATS(ec)
@@ -1015,11 +997,9 @@ begin
 	    cptr = cptr + SZ_EXPR + 1
 	}
 
-	sz_val = SZ_EFORMATS
-	call calloc (EC_ELNGFORMAT(ec), sz_val, TY_CHAR)
+	call calloc (EC_ELNGFORMAT(ec), SZ_EFORMATS, TY_CHAR)
 	call strcpy (lngformat, Memc[EC_ELNGFORMAT(ec)], SZ_EFORMATS)
-	sz_val = SZ_EFORMATS
-	call calloc (EC_ELATFORMAT(ec), sz_val, TY_CHAR)
+	call calloc (EC_ELATFORMAT(ec), SZ_EFORMATS, TY_CHAR)
 	call strcpy (latformat, Memc[EC_ELATFORMAT(ec)], SZ_EFORMATS)
 
 	return (ec)
@@ -1089,7 +1069,6 @@ procedure cc_edecode (dc, ec)
 pointer	dc			#I the pointer to the data structure
 pointer	ec			#I the pointer to the expression structure
 
-size_t	sz_val
 int	i, j, ip1, ip2, c1, c2, lindex, rindex, column
 pointer	sp, ename, eptr, cptr, rptr
 char	lbracket, rbracket
@@ -1098,8 +1077,7 @@ bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPR
-	call salloc (ename, sz_val, TY_CHAR)
+	call salloc (ename, SZ_EXPR, TY_CHAR)
 
 	# Initialize.
 	lbracket = '['

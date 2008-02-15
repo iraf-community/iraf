@@ -6,7 +6,6 @@ include	"imfort.h"
 
 procedure imdelk (im, keyw, ier)
 
-size_t	sz_val
 pointer	im			# imfort image descriptor
 %       character*(*) keyw
 int	ier
@@ -16,8 +15,7 @@ int	errcode()
 
 begin
 	call smark (sp)
-	sz_val = SZ_KEYWORD
-	call salloc (kp, sz_val, TY_CHAR)
+	call salloc (kp, SZ_KEYWORD, TY_CHAR)
 
 	call f77upk (keyw, Memc[kp], SZ_KEYWORD)
 	iferr (call imdelf (im, Memc[kp])) {

@@ -146,7 +146,6 @@ int procedure sgk_open (device, tty)
 char	device[ARB]		# device name [NOT USED]
 pointer	tty			# pointer to graphcap descriptor
 
-size_t	sz_val
 char	cap[2]
 int	len_nodeprefix, byte, off, op, i, j
 pointer	sp, raw_ddstr, ddstr, devname, spool, fname, tempfn, val, ip
@@ -159,17 +158,13 @@ include	"sgk.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_DDSTR
-	call salloc (raw_ddstr, sz_val, TY_CHAR)
-	call salloc (ddstr, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (devname, sz_val, TY_CHAR)
-	call salloc (spool, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (tempfn, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (val, sz_val, TY_CHAR)
+	call salloc (raw_ddstr, SZ_DDSTR, TY_CHAR)
+	call salloc (ddstr, SZ_DDSTR, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (spool, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (tempfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (val, SZ_FNAME, TY_CHAR)
 
 	# The DB flag may be set in the graphcap entry for an SGI device to
 	# print debug messages during execution.
@@ -416,7 +411,6 @@ procedure sgk_close (fd)
 
 int	fd			# output stream [NOT USED]
 
-size_t	sz_val
 int	i
 pointer	sp, fname
 int	oscmd()
@@ -425,8 +419,7 @@ include	"sgk.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	if (mf_debug)
 	    call eprintf ("close device\n")

@@ -19,8 +19,6 @@ int	decpl		# number of decimal places of precision
 int	fmtchar		# type of encoding (efg)
 int	width		# field width of each number (0=free format)
 
-long	lg_val
-size_t	sz_val
 char	numbuf[MAX_DIGITS]
 int	npix, ip, j, ndigits, nspaces, maxch
 pointer	sp, obuf, op, pix, cp
@@ -30,12 +28,9 @@ errchk	imgnld, putline
 
 begin
 	call smark (sp)
-	sz_val = maxll+1
-	call salloc (obuf, sz_val, TY_CHAR)
+	call salloc (obuf, maxll+1, TY_CHAR)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	npix = IM_LEN(im,1)
 	op = obuf
 

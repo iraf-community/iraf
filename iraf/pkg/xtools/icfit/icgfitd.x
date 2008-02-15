@@ -20,7 +20,6 @@ double	y[npts]			# Abscissas
 double	wts[npts]		# Weights
 int	npts			# Number of points
 
-size_t	sz_val
 real	wx, wy
 int	wcs, key
 
@@ -36,8 +35,7 @@ errchk	ic_fitd()
 
 begin
 	call smark (sp)
-	sz_val = IC_SZSAMPLE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
 
 	# Allocate memory for the fit and a copy of the weights.
 	# The weights are copied because they are changed when points are
@@ -47,8 +45,7 @@ begin
 	x1 = NULL
 	y1 = NULL
 	w1 = NULL
-	sz_val = n
-	call malloc (userwts, sz_val, TY_DOUBLE)
+	call malloc (userwts, n, TY_DOUBLE)
 	call amovd (wts, Memd[userwts], n)
 
 	# Initialize
@@ -110,21 +107,18 @@ begin
 		}
 
 		if (x1 == NULL) {
-		    sz_val = n+1
-		    call malloc (x1, sz_val, TY_DOUBLE)
-		    call malloc (y1, sz_val, TY_DOUBLE)
-		    call malloc (w1, sz_val, TY_DOUBLE)
+		    call malloc (x1, n+1, TY_DOUBLE)
+		    call malloc (y1, n+1, TY_DOUBLE)
+		    call malloc (w1, n+1, TY_DOUBLE)
 		    call amovd (x, Memd[x1], n)
 		    call amovd (y, Memd[y1], n)
 		    call amovd (wts, Memd[w1], n)
 		} else {
-		    sz_val = n+1
-		    call realloc (x1, sz_val, TY_DOUBLE)
-		    call realloc (y1, sz_val, TY_DOUBLE)
-		    call realloc (w1, sz_val, TY_DOUBLE)
+		    call realloc (x1, n+1, TY_DOUBLE)
+		    call realloc (y1, n+1, TY_DOUBLE)
+		    call realloc (w1, n+1, TY_DOUBLE)
 		}
-		sz_val = n+1
-		call realloc (userwts, sz_val, TY_DOUBLE)
+		call realloc (userwts, n+1, TY_DOUBLE)
 
 		call icg_addd (gp, wx, wy, rx1, Memd[x1], Memd[y1],
 		    Memd[w1], Memd[userwts], n)

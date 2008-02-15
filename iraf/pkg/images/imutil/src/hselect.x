@@ -18,20 +18,16 @@ procedure t_hselect()
 
 pointer	sp, im, image, fields, expr, missing, section, imlist
 int	ip, min_lenuserarea
-size_t	sz_val
 int	imtgetim(), envfind(), ctoi()
 pointer	imtopenp(), immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (fields, sz_val,  TY_CHAR)
-	call salloc (expr, sz_val,  TY_CHAR)
-	call salloc (missing, sz_val,  TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (image,   SZ_FNAME, TY_CHAR)
+	call salloc (fields,  SZ_LINE,  TY_CHAR)
+	call salloc (expr,    SZ_LINE,  TY_CHAR)
+	call salloc (missing, SZ_LINE,  TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
@@ -85,7 +81,6 @@ char	fields[ARB]		# fields to be passed if record is selected
 char	expr[ARB]		# exression to be evaluated
 char	missing[ARB]		# missing output value
 
-size_t	sz_val
 int	fieldno
 pointer	o, sp, field, value, flist
 pointer	evexpr(), imofnlu(), locpr()
@@ -95,10 +90,8 @@ errchk	evexpr, imofnlu, imgnfn
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (field, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (value, sz_val,  TY_CHAR)
+	call salloc (field, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_LINE,  TY_CHAR)
 
 	# Evaluate selection criteria.
 	o = evexpr (expr, locpr(he_getop), 0)

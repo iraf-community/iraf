@@ -13,7 +13,6 @@ pointer	in			# INLFIT descriptor
 int	nvars			# number of variables
 int	newgraph		# update graph ?
 
-size_t	sz_val
 char	ch
 int	key			# graph key
 int	axis			# axis number
@@ -30,11 +29,10 @@ int	in_geti()
 begin
 	# Allocate string space.
 	call smark  (sp)
-	sz_val = SZ_LINE + 1
-	call salloc (line, sz_val, TY_CHAR)
-	call salloc (word, sz_val, TY_CHAR)
-	call salloc (vlabels, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (line,    SZ_LINE + 1, TY_CHAR)
+	call salloc (word,    SZ_LINE + 1, TY_CHAR)
+	call salloc (vlabels, SZ_LINE + 1, TY_CHAR)
+	call salloc (str,     SZ_LINE + 1, TY_CHAR)
 
 	# Get graph key to define.
 	call printf ("Graph key to be defined: ")

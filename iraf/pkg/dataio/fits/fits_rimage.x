@@ -13,8 +13,6 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
-long	lg_val
-size_t	sz_val
 int	i, npix, npix_record, blksize, ndummy
 long	v[IM_MAXDIM], nlines, il
 pointer	tempbuf, buf
@@ -62,15 +60,12 @@ begin
 	# FITS data is converted to type  LONG, REAL or DOUBLE. If BITPIX is
 	# not one of the MII types then rft_read_pixels returns an ERROR.
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, v, sz_val)
+	call amovkl (long(1), v, IM_MAXDIM)
 	switch (BITPIX(fits)) {
 	case FITS_REAL:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_REAL)
+	    call malloc (tempbuf, npix, TY_REAL)
 
 	    # Initialize the read.
 	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
@@ -109,8 +104,7 @@ begin
 	case FITS_DOUBLE:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_DOUBLE)
+	    call malloc (tempbuf, npix, TY_DOUBLE)
 
 	    # Initialize the read.
 	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF,
@@ -157,8 +151,7 @@ begin
 	default:
 
 	    # Allocate the required space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_LONG)
+	    call malloc (tempbuf, npix, TY_LONG)
 
 	    # Allocate the space for the output line, read in the image
 	    # line, convert from the ieee to native format, and compute the
@@ -258,7 +251,6 @@ int	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero
 int	data_type		# IRAF image pixel type
 
-size_t	sz_val
 errchk	altmdr, achtrl, amovr, achtrd, achtrx
 
 begin
@@ -268,8 +260,7 @@ begin
 	    call achtrl (inbuf, Meml[outbuf], npix)
 	case TY_REAL:
 	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
-	    sz_val = npix
-	    call amovr (inbuf, Memr[outbuf], sz_val)
+	    call amovr (inbuf, Memr[outbuf], npix)
 	case TY_DOUBLE:
 	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
 	    call achtrd (inbuf, Memd[outbuf], npix)
@@ -362,7 +353,6 @@ pointer	outbuf			# pointer to IRAF image line
 int	npix			# number of pixels
 int	data_type		# IRAF pixel type
 
-size_t	sz_val
 errchk	achtrl, amovr, achtrd, achtrx
 
 begin
@@ -370,8 +360,7 @@ begin
 	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
 	    call achtrl (inbuf, Meml[outbuf], npix)
 	case TY_REAL:
-	    sz_val = npix
-	    call amovr (inbuf, Memr[outbuf], sz_val)
+	    call amovr (inbuf, Memr[outbuf], npix)
 	case TY_DOUBLE:
 	    call achtrd (inbuf, Memd[outbuf], npix)
 	case TY_COMPLEX:

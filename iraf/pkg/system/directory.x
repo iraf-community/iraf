@@ -46,7 +46,6 @@ pointer	sp, files, fname, dirname, patp, fp, ip, op, ep, list
 int	ncols, maxch, dirmode, fd, n, i, patlen, len_dir
 bool	long_format, is_template, is_pattern, is_dir, sort_list, match_extension
 
-size_t	sz_val
 bool	clgetb(), strne()
 int	clgeti(), fntgfnb()
 int	diropen(), getline(), stridx(), strlen(), strncmp(), stridxs()
@@ -58,11 +57,9 @@ define	done_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (files, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (dirname, sz_val, TY_CHAR)
+	call salloc (files, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (dirname, SZ_PATHNAME, TY_CHAR)
 
 	# If directory is called without any arguments, list the contents
 	# of the current directory.  Otherwise read in the file template.
@@ -96,12 +93,9 @@ begin
 	# Allocate and initialize storage for the file list descriptor and
 	# assocated array storage.
 	
-	sz_val = LEN_FLDES
-	call calloc (fp, sz_val, TY_STRUCT)
-	sz_val = DEF_MAXFILES
-	call malloc (FL_OFFBP(fp), sz_val, TY_INT)
-	sz_val = DEF_SZSBUF
-	call malloc (FL_SBUFP(fp), sz_val, TY_CHAR)
+	call calloc (fp, LEN_FLDES, TY_STRUCT)
+	call malloc (FL_OFFBP(fp), DEF_MAXFILES, TY_INT)
+	call malloc (FL_SBUFP(fp), DEF_SZSBUF, TY_CHAR)
 
 	FL_MAXFILES(fp) = DEF_MAXFILES
 	FL_SZSBUF(fp)   = DEF_SZSBUF
@@ -305,7 +299,6 @@ char	pat[ARB]		# selection pattern, if any
 bool	have_pattern		# do we have a pattern?
 int	a_ncols			# number of columns out
 
-size_t	sz_val
 bool	flushlines, match_extension
 pointer	sp, fname, obuf, patbuf, op, ep
 int	colwidth, patlen, ip, col, maxch, junk, lastch
@@ -316,12 +309,9 @@ errchk	getline, ungetline, putline
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (obuf, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (obuf, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Initialization.
 	flushlines = (out == STDOUT && fstati (out, F_REDIR) == NO)
@@ -471,7 +461,6 @@ pointer	fp			# file list pointer
 char	fname[ARB]		# file name to be put in list
 int	nchars			# nchars in file name
 
-size_t	sz_val
 int	op
 int	fileno
 
@@ -483,8 +472,7 @@ begin
 	# Increase size of file list if it overflows.
 	if (fileno >= FL_MAXFILES(fp)) {
 	    FL_MAXFILES(fp) = FL_MAXFILES(fp) * 2
-	    sz_val = FL_MAXFILES(fp)
-	    call realloc (FL_OFFBP(fp), sz_val, TY_INT)
+	    call realloc (FL_OFFBP(fp), FL_MAXFILES(fp), TY_INT)
 	}
 
 	op = FL_NEXTOFF(fp)
@@ -493,8 +481,7 @@ begin
 	# Increase size of string buffer if it overflows.
 	if (op + nchars + 1 >= FL_SZSBUF(fp)) {
 	    FL_SZSBUF(fp) = FL_SZSBUF(fp) * 2
-	    sz_val = FL_SZSBUF(fp)
-	    call realloc (FL_SBUFP(fp), sz_val, TY_CHAR)
+	    call realloc (FL_SBUFP(fp), FL_SZSBUF(fp), TY_CHAR)
 	}
 
 	call strcpy (fname, FL_FNAME(fp,fileno), nchars)
@@ -510,7 +497,6 @@ procedure dir_pfiledata (fname, out)
 char	fname[ARB]			# file name
 int	out				# output file
 
-size_t	sz_val
 pointer	sp, date
 long	fi[LEN_FINFO]
 int	protected, ftypes[4], i
@@ -519,8 +505,7 @@ data	ftypes /'-', 'd', 'x', 's'/
 
 begin
 	call smark (sp)
-	sz_val = SZ_DATE
-	call salloc (date, sz_val, TY_CHAR)
+	call salloc (date, SZ_DATE, TY_CHAR)
 
 	# Get file directory information.
 	if (finfo (fname, fi) != OK) {

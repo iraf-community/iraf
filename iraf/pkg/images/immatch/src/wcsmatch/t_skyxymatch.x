@@ -22,7 +22,6 @@ pointer	rwxformat, rwyformat, txformat, tyformat, twxformat, twyformat, str
 pointer	imr, im, mwr, mw, coor, coo, ctr, ct
 pointer	rxl, ryl, rxw, ryw, trxw, tryw, ixl, iyl
 
-size_t	sz_val
 bool	clgetb(), streq()
 double	clgetd()
 int	clgeti(), clgwrd(), strdic(), imtlen()
@@ -34,21 +33,19 @@ errchk	mw_gwattrs()
 begin
 	# Get some temporary working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (refimage, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	call salloc (rwxformat, sz_val, TY_CHAR)
-	call salloc (rwyformat, sz_val, TY_CHAR)
-	call salloc (rxformat, sz_val, TY_CHAR)
-	call salloc (ryformat, sz_val, TY_CHAR)
-	call salloc (twxformat, sz_val, TY_CHAR)
-	call salloc (twyformat, sz_val, TY_CHAR)
-	call salloc (txformat, sz_val, TY_CHAR)
-	call salloc (tyformat, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (refimage, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (rwxformat, SZ_FNAME, TY_CHAR)
+	call salloc (rwyformat, SZ_FNAME, TY_CHAR)
+	call salloc (rxformat, SZ_FNAME, TY_CHAR)
+	call salloc (ryformat, SZ_FNAME, TY_CHAR)
+	call salloc (twxformat, SZ_FNAME, TY_CHAR)
+	call salloc (twyformat, SZ_FNAME, TY_CHAR)
+	call salloc (txformat, SZ_FNAME, TY_CHAR)
+	call salloc (tyformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the input image and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -213,13 +210,12 @@ begin
 			cfd = open (Memc[str], READ_ONLY, TEXT_FILE)
 			npts = rg_rdxy (cfd, rxw, ryw, wcs, xcolumn, ycolumn,
 			    xunits, yunits)
-		        sz_val = npts
-		        call malloc (trxw, sz_val, TY_DOUBLE)
-		        call malloc (tryw, sz_val, TY_DOUBLE)
-		        call malloc (rxl, sz_val, TY_DOUBLE)
-		        call malloc (ryl, sz_val, TY_DOUBLE)
-		        call malloc (ixl, sz_val, TY_DOUBLE)
-		        call malloc (iyl, sz_val, TY_DOUBLE)
+		        call malloc (trxw, npts, TY_DOUBLE)
+		        call malloc (tryw, npts, TY_DOUBLE)
+		        call malloc (rxl, npts, TY_DOUBLE)
+		        call malloc (ryl, npts, TY_DOUBLE)
+		        call malloc (ixl, npts, TY_DOUBLE)
+		        call malloc (iyl, npts, TY_DOUBLE)
 			if (wcs == RG_WORLD)
 		    	    ctr = rg_xytoxy (mwr, Memd[rxw], Memd[ryw],
 			        Memd[rxl], Memd[ryl], npts, "world", "logical",
@@ -236,15 +232,14 @@ begin
 			npts = nx
 		    else
 		        npts = nx * ny
-		    sz_val = npts
-		    call malloc (rxl, sz_val, TY_DOUBLE)
-		    call malloc (ryl, sz_val, TY_DOUBLE)
-		    call malloc (rxw, sz_val, TY_DOUBLE)
-		    call malloc (ryw, sz_val, TY_DOUBLE)
-		    call malloc (trxw, sz_val, TY_DOUBLE)
-		    call malloc (tryw, sz_val, TY_DOUBLE)
-		    call malloc (ixl, sz_val, TY_DOUBLE)
-		    call malloc (iyl, sz_val, TY_DOUBLE)
+		    call malloc (rxl, npts, TY_DOUBLE)
+		    call malloc (ryl, npts, TY_DOUBLE)
+		    call malloc (rxw, npts, TY_DOUBLE)
+		    call malloc (ryw, npts, TY_DOUBLE)
+		    call malloc (trxw, npts, TY_DOUBLE)
+		    call malloc (tryw, npts, TY_DOUBLE)
+		    call malloc (ixl, npts, TY_DOUBLE)
+		    call malloc (iyl, npts, TY_DOUBLE)
 		    if (IM_NDIM(imr) == 1)
 		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, x1, x2,
 			    y1, y2)
@@ -574,14 +569,12 @@ int	min_sigdigits		#I the minmum number of significant digits
 char	wformat[ARB]		#O the output format string
 int	maxch			#I the maximum size of the output format string
 
-size_t	sz_val
 pointer	sp, str
 bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	if (mw == NULL) {
 	    call sprintf (wformat, maxch, "%%%d.%dg")
@@ -644,14 +637,12 @@ char	wyformat[ARB]		#I the reference world y coordinates format
 char	twxformat[ARB]		#I the input world x coordinates format
 char	twyformat[ARB]		#I the input world y coordinates format
 
-size_t	sz_val
 int	i
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fmtstr, sz_val, TY_CHAR)
+	call salloc (fmtstr, SZ_LINE, TY_CHAR)
 
 	# Write the column descriptions.
 	call fprintf (ofd,

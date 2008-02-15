@@ -12,7 +12,6 @@ int	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer sp
@@ -34,25 +33,22 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (pn, sz_val, TY_REAL)
-	call salloc (pnm1, sz_val, TY_REAL)
-	call salloc (pnm2, sz_val, TY_REAL)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
 	call amovkr (real(1.0), Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	sz_val = npts
-	call amovr (Memr[sx], Memr[pnm1], sz_val)
+	call amovr (Memr[sx], Memr[pnm1], npts)
 	call amulkr (Memr[sx], real(2.0), Memr[sx], npts)
 	do i = 3, order {
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call asubr (Memr[pn], Memr[pnm2], Memr[pn], npts)
 	    if (i < order) {
-	        sz_val = npts
-	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
-	        call amovr (Memr[pn], Memr[pnm1], sz_val)
+	        call amovr (Memr[pnm1], Memr[pnm2], npts)
+	        call amovr (Memr[pn], Memr[pnm1], npts)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)
@@ -75,7 +71,6 @@ int	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer	sp
@@ -98,17 +93,15 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (pn, sz_val, TY_REAL)
-	call salloc (pnm1, sz_val, TY_REAL)
-	call salloc (pnm2, sz_val, TY_REAL)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
 	call amovkr (real(1.0), Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	sz_val = npts
-	call amovr (Memr[sx], Memr[pnm1], sz_val)
+	call amovr (Memr[sx], Memr[pnm1], npts)
 	do i = 3, order {
 	    ri = i
 	    ri1 = (real(2.0) * ri - real(3.0)) / (ri - real(1.0))
@@ -116,9 +109,8 @@ begin
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call awsur (Memr[pn], Memr[pnm2], Memr[pn], npts, ri1, ri2)
 	    if (i < order) {
-	        sz_val = npts
-	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
-	        call amovr (Memr[pn], Memr[pnm1], sz_val)
+	        call amovr (Memr[pnm1], Memr[pnm2], npts)
+	        call amovr (Memr[pn], Memr[pnm1], npts)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)
@@ -141,7 +133,6 @@ int	npts			# number of data points
 int	npieces			# number of fitted points minus 1
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	j
 pointer sx, tx, azindex, aindex, index
 pointer	sp
@@ -150,10 +141,9 @@ begin
 
 	# allocate the required space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	call salloc (index, sz_val, TY_INT)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (tx, npts, TY_REAL)
+	call salloc (index, npts, TY_INT)
 
 	# calculate the index of the first non-zero coefficient
 	# for each point
@@ -193,7 +183,6 @@ int	npts		# number of data points
 int	npieces		# number of polynomial pieces
 real	k1, k2		# normalizing constants
 
-size_t	sz_val
 int	i, j
 pointer	sx, tx, temp, index, sp
 
@@ -201,11 +190,10 @@ begin
 
 	# allocate the required space
 	call smark (sp)
-        sz_val = npts
-        call salloc (sx, sz_val, TY_REAL)
-	call salloc (tx, sz_val, TY_REAL)
-	call salloc (temp, sz_val, TY_REAL)
-	call salloc (index, sz_val, TY_INT)
+        call salloc (sx, npts, TY_REAL)
+	call salloc (tx, npts, TY_REAL)
+	call salloc (temp, npts, TY_REAL)
+	call salloc (index, npts, TY_INT)
 
 	# calculate to which coefficients the x values contribute to
         call altar (x, Memr[sx], npts, k1, k2)

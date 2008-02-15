@@ -74,7 +74,6 @@ int	npts				#I the number of points
 int	niter				#I the number of iterations
 real	answers[ARB]			#I/O the answers array
 
-size_t	sz_val
 int	i, j
 pointer	bufr, bufx, bufw
 real	slope, yintrcpt, me1, msq, wt, dm, db
@@ -86,10 +85,9 @@ begin
 	    return
 
 	# Allocate working space.
-	sz_val = npts
-	call malloc (bufr, sz_val, TY_REAL)
-	call malloc (bufx, sz_val, TY_REAL)
-	call malloc (bufw, sz_val, TY_REAL)
+	call malloc (bufr, npts, TY_REAL)
+	call malloc (bufx, npts, TY_REAL)
+	call malloc (bufw, npts, TY_REAL)
 
 	# Initialize the iterations.
 	slope = SLOPE[answers]

@@ -11,7 +11,6 @@ int	col1, col2	#I column limits in the image
 int	line1, line2	#I line limits in the image
 pointer	buf		#U buffer pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, llast1, llast2, nllast, nclast
 pointer	buf1, buf2
@@ -28,13 +27,11 @@ begin
 	# buffer image read.
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    sz_val = ncols * nlines
-	    call realloc (buf, sz_val, TY_REAL)
+	    call realloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	}
@@ -47,8 +44,7 @@ begin
 		else
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	} else if (line2 > llast2) {
 	    do i = line1, line2 {
@@ -57,8 +53,7 @@ begin
 		else
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		buf2 = buf + (i - line1) * ncols
-		sz_val = ncols
-		call amovr (Memr[buf1], Memr[buf2], sz_val)
+		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	}
 

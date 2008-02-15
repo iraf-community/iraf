@@ -18,7 +18,6 @@ int	fd			# output file
 int	x, y			# position at which text is to be drawn
 char	text[ARB]		# text string to be drawn
 
-size_t	sz_val
 pointer	epa
 int	ip, n
 pointer	sp, gki, op
@@ -29,8 +28,7 @@ begin
 	call smark (sp)
 
 	n = strlen (text)
-	sz_val = GKI_TEXT_LEN + n
-	call salloc (gki, sz_val, TY_SHORT)
+	call salloc (gki, GKI_TEXT_LEN + n, TY_SHORT)
 
 	# Pack the text string as a SHORT integer array.
 	op = gki + GKI_TEXT_T - 1

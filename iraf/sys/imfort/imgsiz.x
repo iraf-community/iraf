@@ -13,15 +13,13 @@ int	naxis			# receives number of axes
 int	pixtype			# receives pixel type
 int	ier			# receives error status
 
-size_t	sz_val
 bool	strne()
 
 begin
 	if (strne (IM_MAGIC(im), "imhdr"))
 	    ier = IE_MAGIC
 	else {
-	    sz_val = IM_MAXDIM
-	    call amovl (IM_LEN(im,1), axlen, sz_val)
+	    call amovl (IM_LEN(im,1), axlen, IM_MAXDIM)
 	    naxis = IM_NDIM(im)
 	    pixtype = IM_PIXTYPE(im)
 	    ier = OK

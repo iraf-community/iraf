@@ -164,7 +164,6 @@ procedure ex_px_interleave (ex)
 
 pointer	ex				#i task struct pointer
 
-size_t	sz_val
 pointer	sp, pp, op
 pointer	o, outptr
 int	i, j, line, npix, outtype
@@ -181,8 +180,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = EX_NEXPR(ex)
-	call salloc (pp, sz_val, TY_POINTER)
+	call salloc (pp, EX_NEXPR(ex), TY_POINTER)
 
 	# Process each line in the image.
 	fd = EX_FD(ex)
@@ -266,7 +264,6 @@ procedure ex_getpix (ex, line)
 pointer	ex				#i task struct pointer
 int	line				#i current line number
 
-size_t	sz_val
 pointer	im, op, data
 int	nptrs, i, band
 
@@ -282,14 +279,12 @@ begin
 	    band = max (1, IO_BAND(op))
 
 	    if (line > IM_LEN(im,2)) {
-	        sz_val = IM_LEN(im,1)
-	        call calloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
+	        call calloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
 	        IO_ISIM(op) = NO
 	        IO_NPIX(op) = IM_LEN(im,1)
 		next
 	    } else if (IO_DATA(op) == NULL)
-	        sz_val = IM_LEN(im,1)
-	        call malloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
+	        call malloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
 
 	    switch (IM_PIXTYPE(im)) {
             case TY_USHORT:
@@ -452,18 +447,15 @@ int     dtype                           #i type of pointer to alloc
 pointer pix                             #o output pixel array ptr
 int     totpix                          #o total no. of output pixels
 
-size_t	sz_val
 int     i, j, ip
 
 begin
         # Calculate the number of output pixels and allocate the pointer.
         totpix = nptrs * npix
-	if (dtype != TY_CHAR && dtype != TY_UBYTE) {
-            sz_val = totpix
-            call realloc (pix, sz_val, dtype)
-	} else {
-            sz_val = totpix
-            call realloc (pix, sz_val, TY_CHAR)
+	if (dtype != TY_CHAR && dtype != TY_UBYTE)
+            call realloc (pix, totpix, dtype)
+	else {
+            call realloc (pix, totpix, TY_CHAR)
 	    do i = 1, nptrs
 		call achtbs (Mems[ptrs[i]], Mems[ptrs[i]], npix)
 	}
@@ -500,18 +492,15 @@ pointer	ex				#i task struct pointer
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
-size_t	sz_val
 pointer	out, coerce()
 int	swap, flags
 
 begin
 	# Allocate the pointer and coerce it so the routine works.
-	if (type == TY_UBYTE || type == TY_CHAR) {
-            sz_val = O_LEN(op)
-            call calloc (out, sz_val, TY_CHAR)
-	} else {
-            sz_val = O_LEN(op)
-            call calloc (out, sz_val, type)
+	if (type == TY_UBYTE || type == TY_CHAR)
+            call calloc (out, O_LEN(op), TY_CHAR)
+	else {
+            call calloc (out, O_LEN(op), type)
             out = coerce (out, type, TY_CHAR)
 	}
 

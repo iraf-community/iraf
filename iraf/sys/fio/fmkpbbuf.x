@@ -12,7 +12,6 @@ int	fd
 int	buflen
 pointer	bp
 errchk	malloc
-size_t	sz_val
 include	<fio.com>
 
 begin
@@ -26,8 +25,7 @@ begin
 	    FPBBUFSIZE(fp) = buflen
 	}
 
-	sz_val = buflen
-	call malloc (bp, sz_val, TY_CHAR)
+	call malloc (bp, buflen, TY_CHAR)
 
 	FPBBUF(fp) = bp
 	FPBTOP(fp) = bp + buflen

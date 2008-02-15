@@ -321,7 +321,6 @@ real	xver[ARB]		#I the x polygon vertices coordinates
 real	yver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, txver, tyver, work1, work2, xintr
 int	i, j, ixmin, ixmax, nintr
@@ -329,17 +328,15 @@ int	me_pyclip()
 
 begin
 	call smark (sp)
-	sz_val = nver + 1
-	call salloc (txver, sz_val, TY_REAL)
-	call salloc (tyver, sz_val, TY_REAL)
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (xintr, sz_val, TY_REAL)
+	call salloc (txver, nver + 1, TY_REAL)
+	call salloc (tyver, nver + 1, TY_REAL)
+	call salloc (work1, nver + 1, TY_REAL)
+	call salloc (work2, nver + 1, TY_REAL)
+	call salloc (xintr, nver + 1, TY_REAL)
 
 	# Close the polygon.
-	sz_val = nver
-	call amovr (xver, Memr[txver], sz_val)
-	call amovr (yver, Memr[tyver], sz_val)
+	call amovr (xver, Memr[txver], nver)
+	call amovr (yver, Memr[tyver], nver)
 	Memr[txver+nver] = xver[1] 
 	Memr[tyver+nver] = yver[1] 
 
@@ -393,7 +390,6 @@ real	oxver[ARB]		#I the x polygon vertices coordinates
 real	oyver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, tixver, tiyver, toxver, toyver, work1, work2, ixintr, oxintr
 int	i, j, jj, ixmin, ixmax, inintr, onintr, ibegin, iend
@@ -401,25 +397,22 @@ int	me_pyclip()
 
 begin
 	call smark (sp)
-	sz_val = nver + 1
-	call salloc (tixver, sz_val, TY_REAL)
-	call salloc (tiyver, sz_val, TY_REAL)
-	call salloc (toxver, sz_val, TY_REAL)
-	call salloc (toyver, sz_val, TY_REAL)
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (ixintr, sz_val, TY_REAL)
-	call salloc (oxintr, sz_val, TY_REAL)
+	call salloc (tixver, nver + 1, TY_REAL)
+	call salloc (tiyver, nver + 1, TY_REAL)
+	call salloc (toxver, nver + 1, TY_REAL)
+	call salloc (toyver, nver + 1, TY_REAL)
+	call salloc (work1, nver + 1, TY_REAL)
+	call salloc (work2, nver + 1, TY_REAL)
+	call salloc (ixintr, nver + 1, TY_REAL)
+	call salloc (oxintr, nver + 1, TY_REAL)
 
 	# Close the polygons.
-	sz_val = nver
-	call amovr (ixver, Memr[tixver], sz_val)
-	call amovr (iyver, Memr[tiyver], sz_val)
+	call amovr (ixver, Memr[tixver], nver)
+	call amovr (iyver, Memr[tiyver], nver)
 	Memr[tixver+nver] = ixver[1] 
 	Memr[tiyver+nver] = iyver[1] 
-	sz_val = nver
-	call amovr (oxver, Memr[toxver], sz_val)
-	call amovr (oyver, Memr[toyver], sz_val)
+	call amovr (oxver, Memr[toxver], nver)
+	call amovr (oyver, Memr[toyver], nver)
 	Memr[toxver+nver] = oxver[1] 
 	Memr[toyver+nver] = oyver[1] 
 
@@ -517,7 +510,6 @@ int	stat[ARB]		#O the output status array
 int	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
-size_t	sz_val
 pointer	sp, ranges
 int	index, nvals
 int	me_decode_ranges(), me_next_number()
@@ -525,8 +517,7 @@ int	me_decode_ranges(), me_next_number()
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.
@@ -537,8 +528,7 @@ begin
 	}
 
 	# Set the status array.
-	sz_val = npts
-	call amovki (NO, stat, sz_val)
+	call amovki (NO, stat, npts)
 	index = 0
 	while (me_next_number (Memi[ranges], index) != EOF)
 	    stat[index] = YES
@@ -556,7 +546,6 @@ int	stat[ARB]		#O the output status array
 int	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
-size_t	sz_val
 pointer	sp, ranges
 int	i, lastix, nvals
 int	me_decode_ranges()
@@ -565,8 +554,7 @@ bool	me_is_in_range()
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.
@@ -577,8 +565,7 @@ begin
 	}
 
 	# Set the line numbers.
-	sz_val = npts
-	call amovki (NO, stat, sz_val)
+	call amovki (NO, stat, npts)
 	lastix = 0
 	do i = 1, npts {
 	    if (ix[i] == lastix) {
@@ -652,7 +639,6 @@ real	xc, yc			#I the center of the wedge
 real	angle1, angle2		#I the wedge angles
 int	width, height		#I the image mask width and height
 
-size_t	sz_val
 real	sweep, x2, y2, vx[7], vy[7]
 int	count, intrcpt1, intrcpt2
 int	me_pie_intercept(), me_corner_vertex()
@@ -665,8 +651,7 @@ begin
 
 	# If the sweep is too small to be noticed don't bother.
 	if (abs (sweep) < SMALL_NUMBER) {
-	    sz_val = npts
-	    call amovki (NO, stat, sz_val) 
+	    call amovki (NO, stat, npts) 
 	    return
 	}
 	if (sweep < 0.0)
@@ -959,7 +944,6 @@ real    xranges[ARB]            #O the x line segments
 int     nver                    #I the number of vertices
 real    lx, ld                  #I the equation of the image line
 
-size_t	sz_val
 real    u1, u2, u1u2, dx, dy, dd, xa, wa
 int     i, j, nintr, nplus, nzero, nneg, imin, imax, nadd
 bool    collinear
@@ -1143,27 +1127,23 @@ begin
 
         # Reorder the x ranges and slopes if necessary.
         if ((imax < imin) && ! (imin == nintr && imax == 1)) {
-            sz_val = nintr
-            call amovr (xranges, xintr, sz_val)
+            call amovr (xranges, xintr, nintr)
             do i = 1, imax
                 xranges[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 xranges[i-imax] = xintr[i]
-            sz_val = nintr
-            call amovr (slope, xintr, sz_val)
+            call amovr (slope, xintr, nintr)
             do i = 1, imax
                 slope[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 slope[i-imax] = xintr[i]
         } else if ((imin < imax) && ! (imin == 1 && imax == nintr)) {
-            sz_val = nintr
-            call amovr (xranges, xintr, sz_val)
+            call amovr (xranges, xintr, nintr)
             do i = 1, imin
                 xranges[nintr-imin+i] = xintr[i]
             do i = imax, nintr
                 xranges[i-imin] = xintr[i]
-            sz_val = nintr
-            call amovr (slope, xintr, sz_val)
+            call amovr (slope, xintr, nintr)
             do i = 1, imin
                 slope[nintr-imin+i] = xintr[i]
             do i = imax, nintr

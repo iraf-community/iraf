@@ -15,7 +15,6 @@ int     fd              #I the input file containing the projection parameters
 char    projstr[ARB]    #O the output projection parameters string
 int     maxch           #I the maximum size of the output projection string
 
-size_t	sz_val
 int     projection, op
 pointer sp, keyword, value, param
 int     fscan(), nscan(), strdic(), gstrcpy()
@@ -26,10 +25,9 @@ begin
             return (0)
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (keyword, sz_val, TY_CHAR)
-        call salloc (value, sz_val, TY_CHAR)
-        call salloc (param, sz_val, TY_CHAR)
+        call salloc (keyword, SZ_FNAME, TY_CHAR)
+        call salloc (value, SZ_FNAME, TY_CHAR)
+        call salloc (param, SZ_FNAME, TY_CHAR)
 
         call gargwrd (Memc[keyword], SZ_FNAME)
         projection = strdic (Memc[keyword], Memc[keyword], SZ_FNAME,
@@ -74,7 +72,6 @@ double	lngref, latref		#I the position of the reference point.
 pointer	sx1, sy1		#I pointer to linear surfaces
 bool	transpose		#I transpose the wcs
 
-size_t	sz_val
 int	ndim, naxes, ax1, ax2, axmap, wtype
 double	xshift, yshift, a, b, c, d, denom, xpix, ypix, tlngref, tlatref
 pointer	mw, sp, str, r, w, cd, ltm, ltv, iltm, nr, ncd, axes, axno, axval
@@ -87,26 +84,18 @@ begin
 
 	# Allocate working memory for the vectors and matrices.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (axno, sz_val, TY_INT)
-	call salloc (axval, sz_val, TY_INT)
-	call salloc (axes, sz_val, TY_INT)
-        sz_val = ndim
-        call salloc (r, sz_val, TY_DOUBLE)
-        call salloc (w, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (cd, sz_val, TY_DOUBLE)
-        call salloc (ltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (ltv, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (iltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (nr, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (ncd, sz_val, TY_DOUBLE)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (axno, IM_MAXDIM, TY_INT)
+	call salloc (axval, IM_MAXDIM, TY_INT)
+	call salloc (axes, IM_MAXDIM, TY_INT)
+        call salloc (r, ndim, TY_DOUBLE)
+        call salloc (w, ndim, TY_DOUBLE)
+        call salloc (cd, ndim * ndim, TY_DOUBLE)
+        call salloc (ltm, ndim * ndim, TY_DOUBLE)
+        call salloc (ltv, ndim, TY_DOUBLE)
+        call salloc (iltm, ndim * ndim, TY_DOUBLE)
+        call salloc (nr, ndim, TY_DOUBLE)
+        call salloc (ncd, ndim * ndim, TY_DOUBLE)
 
         # Compute the original logical to world transformation.
 	call mw_gaxmap (mw, Memi[axno], Memi[axval], ndim)
@@ -247,7 +236,6 @@ pointer sx1, sy1                #I pointer to linear surfaces
 pointer sx2, sy2                #I pointer to distortion surfaces
 bool    transpose               #I transpose the wcs
 
-size_t	sz_val
 int     l, i, ndim, naxes, ax1, ax2, axmap, wtype, szatstr
 double  xshift, yshift, a, b, c, d, denom, xpix, ypix, tlngref, tlatref
 pointer mw, sp, r, w, cd, ltm, ltv, iltm, nr, ncd, axes, axno, axval
@@ -265,29 +253,20 @@ begin
         # Allocate working memory for the wcs attributes, vectors, and
         # matrices.
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (projstr, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (projpars, sz_val, TY_CHAR)
-        call salloc (wpars, sz_val, TY_CHAR)
-        sz_val = IM_MAXDIM
-        call salloc (axno, sz_val, TY_INT)
-        call salloc (axval, sz_val, TY_INT)
-        call salloc (axes, sz_val, TY_INT)
-        sz_val = ndim
-        call salloc (r, sz_val, TY_DOUBLE)
-        call salloc (w, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (cd, sz_val, TY_DOUBLE)
-        call salloc (ltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (ltv, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (iltm, sz_val, TY_DOUBLE)
-        sz_val = ndim
-        call salloc (nr, sz_val, TY_DOUBLE)
-        sz_val = ndim * ndim
-        call salloc (ncd, sz_val, TY_DOUBLE)
+        call salloc (projstr, SZ_FNAME, TY_CHAR)
+        call salloc (projpars, SZ_LINE, TY_CHAR)
+        call salloc (wpars, SZ_LINE, TY_CHAR)
+        call salloc (axno, IM_MAXDIM, TY_INT)
+        call salloc (axval, IM_MAXDIM, TY_INT)
+        call salloc (axes, IM_MAXDIM, TY_INT)
+        call salloc (r, ndim, TY_DOUBLE)
+        call salloc (w, ndim, TY_DOUBLE)
+        call salloc (cd, ndim * ndim, TY_DOUBLE)
+        call salloc (ltm, ndim * ndim, TY_DOUBLE)
+        call salloc (ltv, ndim, TY_DOUBLE)
+        call salloc (iltm, ndim * ndim, TY_DOUBLE)
+        call salloc (nr, ndim, TY_DOUBLE)
+        call salloc (ncd, ndim * ndim, TY_DOUBLE)
 
         # Open the new wcs and set the system type.
         mwnew = mw_open (NULL, ndim)
@@ -334,8 +313,7 @@ begin
 
         # Copy the attributes of the remaining axes to the new wcs.
         szatstr = SZ_LINE
-        sz_val = szatstr
-        call malloc (atstr, sz_val, TY_CHAR)
+        call malloc (atstr, szatstr, TY_CHAR)
         do l = 1, ndim {
             if (l == ax1 || l == ax2)
                 next
@@ -356,8 +334,7 @@ begin
                     if (strlen(Memc[atstr]) < szatstr)
                         break
                     szatstr = szatstr + SZ_LINE
-                    sz_val = szatstr
-                    call realloc (atstr, sz_val, TY_CHAR)
+                    call realloc (atstr, szatstr, TY_CHAR)
                 }
                 if (Memc[atstr] == EOS)
                     break
@@ -494,7 +471,6 @@ char    etaname[ARB]    #I the wcs eta correction attribute name
 int     xiaxis          #I the xi axis number
 int     etaaxis         #I the eta axis number
 
-size_t	sz_val
 int     i, j, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int     nx, ny, npix, ier
 double  sxmin, sxmax, symin, symax, ratio, x, y, xstep, ystep, ximin, ximax
@@ -546,14 +522,13 @@ begin
 
         # Allocate some working space.
         call smark (sp)
-        sz_val = npix
-        call salloc (xpix, sz_val, TY_DOUBLE)
-        call salloc (ypix, sz_val, TY_DOUBLE)
-        call salloc (xilin, sz_val, TY_DOUBLE)
-        call salloc (etalin, sz_val, TY_DOUBLE)
-        call salloc (dxi, sz_val, TY_DOUBLE)
-        call salloc (deta, sz_val, TY_DOUBLE)
-        call salloc (wgt, sz_val, TY_DOUBLE)
+        call salloc (xpix, npix, TY_DOUBLE)
+        call salloc (ypix, npix, TY_DOUBLE)
+        call salloc (xilin, npix, TY_DOUBLE)
+        call salloc (etalin, npix, TY_DOUBLE)
+        call salloc (dxi, npix, TY_DOUBLE)
+        call salloc (deta, npix, TY_DOUBLE)
+        call salloc (wgt, npix, TY_DOUBLE)
 
         # Compute the grid of x and y points.
         xstep = (sxmax - sxmin) / (nx - 1)
@@ -629,7 +604,6 @@ pointer gs              #I pointer to the surface to be encoded
 char    atname[ARB]     #I attribute name for the encoded surface
 int     axis            #I axis for which the encode surface is encoded
 
-size_t	sz_val
 int     i, op, nsave, szatstr, szpar
 pointer sp, coeff, par, atstr
 int     dgsgeti(), strlen(), gstrcpy()
@@ -637,15 +611,12 @@ int     dgsgeti(), strlen(), gstrcpy()
 begin
         nsave = dgsgeti (gs, GSNSAVE)
         call smark (sp)
-        sz_val = nsave
-        call salloc (coeff, sz_val, TY_DOUBLE)
-        sz_val = SZ_LINE
-        call salloc (par, sz_val, TY_CHAR)
+        call salloc (coeff, nsave, TY_DOUBLE)
+        call salloc (par, SZ_LINE, TY_CHAR)
         call dgssave (gs, Memd[coeff])
 
         szatstr = SZ_LINE
-        sz_val = szatstr
-        call malloc (atstr, sz_val, TY_CHAR)
+        call malloc (atstr, szatstr, TY_CHAR)
         op = 0
         do i = 1, nsave {
             call sprintf (Memc[par], SZ_LINE, "%g ")
@@ -653,8 +624,7 @@ begin
             szpar = strlen (Memc[par])
             if (szpar > (szatstr - op)) {
                 szatstr = szatstr + SZ_LINE
-                sz_val = szatstr
-                call realloc (atstr, sz_val, TY_CHAR)
+                call realloc (atstr, szatstr, TY_CHAR)
             }
             op = op + gstrcpy (Memc[par], Memc[atstr+op], SZ_LINE)
 

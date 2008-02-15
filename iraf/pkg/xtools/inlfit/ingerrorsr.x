@@ -16,7 +16,6 @@ real	wts[ARB]	# Weights
 int	npts		# Number of data points
 int	nvars		# Number of variables
 
-size_t	sz_val
 bool	isfit
 int	i, j, deleted, rejected, nparams, fd
 real	chisqr, variance, rms
@@ -39,19 +38,15 @@ begin
 
 	# Allocate memory for parameters, errors, and parameter list.
 	call smark (sp)
-	sz_val = nparams
-	call salloc (params, sz_val, TY_REAL)
-	call salloc (errors, sz_val, TY_REAL)
-	sz_val = SZ_LINE + 1
-	call salloc (labels, sz_val, TY_CHAR)
+	call salloc (params, nparams, TY_REAL)
+	call salloc (errors, nparams, TY_REAL)
+	call salloc (labels, SZ_LINE + 1, TY_CHAR)
 
 	# Allocate memory for the fit and strings.
-	sz_val = npts
-	call salloc (fit, sz_val, TY_REAL)
-	call salloc (wts1, sz_val, TY_REAL)
-	sz_val = SZ_LINE + 1
-	call salloc (name, sz_val, TY_CHAR)
-	call salloc (pvnames, sz_val, TY_CHAR)
+	call salloc (fit, npts, TY_REAL)
+	call salloc (wts1, npts, TY_REAL)
+	call salloc (name, SZ_LINE + 1, TY_CHAR)
+	call salloc (pvnames, SZ_LINE + 1, TY_CHAR)
 
 	# Get number of rejected points and rejected point list.
 	rejected = in_geti (in, INLNREJPTS)
@@ -65,8 +60,7 @@ begin
 	}
 
 	# Assign a zero weight to rejected points.
-	sz_val = npts
-	call amovr (wts, Memr[wts1], sz_val)
+	call amovr (wts, Memr[wts1], npts)
 	if (rejected > 0) {
 	    do i = 1, npts {
 		if (Memi[rejpts+i-1] == YES)

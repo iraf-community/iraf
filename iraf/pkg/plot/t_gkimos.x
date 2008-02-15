@@ -42,7 +42,6 @@ bool	fill, rotate, clear_screen
 int	in, nx, ny, out, interactive, nwcs, buflen
 int	nplots_page, index, lastp, nplot, nfiles, nf, pcounter
 long	fpos, length_mc
-size_t	sz_val
 bool	clgetb(), streq()
 int	open(), clgeti(), clgfil(), btoi(), fstati(), gm_interact()
 int	clplen()
@@ -52,12 +51,10 @@ pointer	clpopni()
 
 begin
 	call smark  (sp)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	sz_val = LEN_WCSARRAY
-	call salloc (wcs, sz_val, TY_STRUCT)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (input,  SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (wcs, LEN_WCSARRAY, TY_STRUCT)
 
 	call gm_initwcs (wcs)
 
@@ -89,8 +86,7 @@ begin
 	rotate = clgetb ("rotate")
 
 	# Calculate initial viewport corner points and store in array vp.
-	sz_val = nplots_page * 4
-	call malloc (vp, sz_val, TY_REAL)
+	call malloc (vp, nplots_page * 4, TY_REAL)
 	call gm_getvp (vp, nx, ny, fill)
 
 	# Initialize flag for clearing screen and plot and file counters.
@@ -114,8 +110,7 @@ begin
 
 	    # Initialize memory and plot counters for maintaining index
 	    buflen = MAX_FRAMES
-	    sz_val = buflen
-	    call calloc (ip, sz_val, TY_LONG)
+	    call calloc (ip, buflen, TY_LONG)
 	    Meml[ip] = long (fpos)
 	    lastp = 0
 
@@ -180,8 +175,7 @@ cursor_loop_	    call gki_setwcs (out, Memi[wcs], LEN_WCSARRAY)
 
 	            if (lastp > buflen) {
 		        buflen = buflen + MAX_FRAMES
-		        sz_val = buflen
-		        call realloc (ip, sz_val, TY_LONG)
+		        call realloc (ip, buflen, TY_LONG)
 	            }
 
 		    fpos = fpos + length_mc
@@ -220,7 +214,6 @@ int	lastp
 int	nx, ny		# The number of plots in x and y
 bool	rotate		# Rotate plots (y/n)?
 
-size_t	sz_val
 pointer	sp, bp
 bool	fill
 int	nskip, new_vport, junk, key, cval, nxold, nyold
@@ -229,8 +222,7 @@ int	clgcur()
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (bp, sz_val, TY_CHAR)
+	call salloc (bp, SZ_COMMAND, TY_CHAR)
 	nskip = 0
 	new_vport = NO
 
@@ -264,8 +256,7 @@ begin
 
 	# Reset viewport if necessary
         if (new_vport == YES) {
-	    sz_val = nx * ny * 4
-	    call realloc (vp, sz_val, TY_LONG)
+	    call realloc (vp, nx * ny * 4, TY_LONG)
 	    call gm_getvp (vp, nx, ny, fill)
         }
 
@@ -334,7 +325,6 @@ int	new_vport
 bool	rotate
 int	nskip
 
-size_t	sz_val
 pointer	sp, bp, mp
 bool	tempb, plus_sign
 int	ncmd, tempi
@@ -345,10 +335,8 @@ string	cmds "|nx|ny|fill|rotate|skip|"
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (bp, sz_val, TY_CHAR)
-	sz_val = SZ_MATCH
-	call salloc (mp, sz_val, TY_CHAR)
+	call salloc (bp, SZ_COMMAND, TY_CHAR)
+	call salloc (mp, SZ_MATCH, TY_CHAR)
 
 	# Parse the command string with fmtio.  First look for a minus sign,
 	# then find the string in the string index, matching only the
@@ -537,7 +525,6 @@ int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
 int	nchars_total		# number of chars read from input stream
 
-size_t	sz_val
 int	len_ibuf, nchars, nchars_read
 pointer	ibuf
 int	read()
@@ -549,8 +536,7 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    sz_val = LEN_DEFIBUF
-	    call malloc (ibuf, sz_val, TY_SHORT)
+	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 
@@ -583,8 +569,7 @@ begin
 
 	    if (I_LENGTH(ibuf) > len_ibuf) {
 		len_ibuf = I_LENGTH(ibuf)
-		sz_val = len_ibuf
-		call realloc (ibuf, sz_val, TY_SHORT)
+		call realloc (ibuf, len_ibuf, TY_SHORT)
 	    }
 
 	    nchars = (I_LENGTH(ibuf) - LEN_GKIHDR) * SZ_SHORT
@@ -625,7 +610,6 @@ short	gki[ARB]	# GKI_SETWCS instruction
 pointer	frame_wcs	# Pointer to accumulating SETWCS instruction
 int	nwcs_cnt	# Number of SETWCS instructions encountered
 
-size_t	sz_val
 int	nwords,	i, nwcs, temp, nwcs_in
 real	xy_pairs[NPAIRS * 2]
 pointer	sp, wcs_temp, w, ow
@@ -639,8 +623,7 @@ errchk	amovi, gm_vtransr
 
 begin
 	call smark (sp)
-	sz_val = LEN_WCSARRAY
-	call salloc (wcs_temp, sz_val, TY_STRUCT)
+	call salloc (wcs_temp, LEN_WCSARRAY, TY_STRUCT)
 
 	nwcs_in = nwcs_cnt
 	nwords = gki[GKI_SETWCS_N]

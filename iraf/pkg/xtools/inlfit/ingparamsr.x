@@ -16,7 +16,6 @@ int	npts		# Number of data points
 int	nvars		# Number of variables
 pointer	gt		# GTOOLS pointer
 
-size_t	sz_val
 int	i, rejected, deleted, length
 int	len3, len4
 real	rms
@@ -35,19 +34,16 @@ pointer	in_getp()
 begin
 	# Allocate memory
 	call smark (sp)
-	sz_val = npts
-	call salloc (fit, sz_val, TY_REAL)
-	call salloc (wts1, sz_val, TY_REAL)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
-	call salloc (str3, sz_val, TY_CHAR)
-	call salloc (str4, sz_val, TY_CHAR)
+	call salloc (fit, npts, TY_REAL)
+	call salloc (wts1, npts, TY_REAL)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
+	call salloc (str3, SZ_LINE, TY_CHAR)
+	call salloc (str4, SZ_LINE, TY_CHAR)
 
 	# Mark rejected points as deleted for rms comnputation,
 	# and count number of deleted points.
-	sz_val = npts
-	call amovr (wts, Memr[wts1], sz_val)
+	call amovr (wts, Memr[wts1], npts)
 	rejected = in_geti (in, INLNREJPTS)
 	rejpts   = in_getp (in, INLREJPTS)
 	if (rejected > 0) {
@@ -94,8 +90,7 @@ begin
 	# Set the output parameter line.
 	length = strlen (Memc[str1]) + strlen (Memc[str2]) +
 	    strlen (Memc[str3]) + 3
-	sz_val = length + 1
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (line, length + 1, TY_CHAR)
 	call sprintf (Memc[line], length, "%s\n%s\n%s")
 	    call pargstr (Memc[str1])
 	    call pargstr (Memc[str2])

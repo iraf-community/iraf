@@ -15,8 +15,6 @@ int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
 
-long	lg_val
-size_t	sz_val
 bool	envgetb()
 int	imtgetim(), imtlen()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
@@ -26,9 +24,8 @@ pointer	imtopenp(), immap(), mw_open(), mw_openim()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
 
 	# Get the input images and the output image.
 	list = imtopenp ("images")
@@ -51,9 +48,7 @@ begin
 		IM_NDIM(out) = IM_NDIM(out) + 1
 		IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		npix = IM_LEN(out, 1)
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, line_out, sz_val)
+	        call amovkl (long(1), line_out, IM_MAXDIM)
 	    }
 
 	    # Check next input image for consistency with the output image.
@@ -68,9 +63,7 @@ begin
 	    # the output image.  Switch on the output data type to optimize
 	    # IMIO.
 
-	    lg_val = 1
-	    sz_val = IM_MAXDIM
-	    call amovkl (lg_val, line_in, sz_val)
+	    call amovkl (long(1), line_in, IM_MAXDIM)
 	    switch (IM_PIXTYPE (out)) {
 	    case TY_SHORT:
 	        while (imgnls (in, buf_in, line_in) != EOF) {
@@ -88,15 +81,13 @@ begin
 	        while (imgnll (in, buf_in, line_in) != EOF) {
 		    if (impnll (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
-		    sz_val = npix
-		    call amovl (Meml[buf_in], Meml[buf_out], sz_val)
+		    call amovl (Meml[buf_in], Meml[buf_out], npix)
 		}
 	    case TY_REAL:
 	        while (imgnlr (in, buf_in, line_in) != EOF) {
 		    if (impnlr (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
-		    sz_val = npix
-		    call amovr (Memr[buf_in], Memr[buf_out], sz_val)
+		    call amovr (Memr[buf_in], Memr[buf_out], npix)
 		}
 	    case TY_DOUBLE:
 	        while (imgnld (in, buf_in, line_in) != EOF) {
@@ -114,8 +105,7 @@ begin
 	        while (imgnlr (in, buf_in, line_in) != EOF) {
 		    if (impnlr (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
-		    sz_val = npix
-		    call amovr (Memr[buf_in], Memr[buf_out], sz_val)
+		    call amovr (Memr[buf_in], Memr[buf_out], npix)
 		}
 	    }
 
@@ -169,7 +159,6 @@ procedure isk_new_image (im)
 
 pointer	im				# image descriptor
 
-size_t	sz_val
 pointer	sp, lbuf
 int	i, type_codes[NTYPES]
 bool	strne()
@@ -181,8 +170,7 @@ data	type_codes /TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	call clgstr ("title", Memc[lbuf], SZ_LINE)
 	if (strne (Memc[lbuf], "default") && strne (Memc[lbuf], "*"))
@@ -207,7 +195,6 @@ pointer	mwin			# input wcs descriptor
 pointer	mwout			# output wcs descriptor
 int	ndim			# the dimension of the output image
 
-size_t	sz_val
 int	i, j, nin, nout, szatstr, axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, wcs, attribute, matin, matout, rin, rout, win, wout, atstr
 int	mw_stati(), itoc(), strlen()
@@ -221,24 +208,15 @@ begin
 
 	# Allocate space for the matrices and vectors.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (wcs, sz_val, TY_CHAR)
-	sz_val = nin * nin
-	call salloc (matin, sz_val, TY_DOUBLE)
-	sz_val = nout * nout
-	call salloc (matout, sz_val, TY_DOUBLE)
-	sz_val = nin
-	call salloc (rin, sz_val, TY_DOUBLE)
-	sz_val = nout
-	call salloc (rout, sz_val, TY_DOUBLE)
-	sz_val = nin
-	call salloc (win, sz_val, TY_DOUBLE)
-	sz_val = nout
-	call salloc (wout, sz_val, TY_DOUBLE)
-	sz_val = SZ_FNAME
-	call salloc (attribute, sz_val, TY_CHAR)
-	sz_val = szatstr
-	call malloc (atstr, sz_val, TY_CHAR)
+	call salloc (wcs, SZ_FNAME, TY_CHAR)
+	call salloc (matin, nin * nin, TY_DOUBLE)
+	call salloc (matout, nout * nout, TY_DOUBLE)
+	call salloc (rin, nin, TY_DOUBLE)
+	call salloc (rout, nout, TY_DOUBLE)
+	call salloc (win, nin, TY_DOUBLE)
+	call salloc (wout, nout, TY_DOUBLE)
+	call salloc (attribute, SZ_FNAME, TY_CHAR)
+	call malloc (atstr, szatstr, TY_CHAR)
 
 	# Set the system name.
 	call mw_gsystem (mwin, Memc[wcs], SZ_FNAME)
@@ -286,8 +264,7 @@ begin
 		    if (strlen (Memc[atstr]) < szatstr)
 			break
 		    szatstr = szatstr + SZ_LINE
-		    sz_val = szatstr
-		    call realloc (atstr, sz_val, TY_CHAR)
+		    call realloc (atstr, szatstr, TY_CHAR)
 		}
 		if (Memc[atstr] == EOS)
 		    break

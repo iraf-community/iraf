@@ -167,7 +167,6 @@ int	fd					#i inpout file descriptor
 pointer	im					#i output image pointer
 pointer	cmap					#i colormap pointer
 
-size_t	sz_val
 pointer	op, data
 int	i, swap, optype, nlines
 int	percent, npix, totpix
@@ -193,13 +192,10 @@ begin
 	    optype = ip_ptype (IO_TYPE(op),IO_NBYTES(op))
 	    IO_NPIX(op) = npix
 	    if (IO_DATA(op) == NULL)
-	        if (optype == TY_UBYTE) {
-		    sz_val = npix
-		    call malloc (IO_DATA(op), sz_val, TY_SHORT)
-		} else {
-		    sz_val = npix
-		    call malloc (IO_DATA(op), sz_val, optype)
-		}
+	        if (optype == TY_UBYTE)
+		    call malloc (IO_DATA(op), npix, TY_SHORT)
+		else
+		    call malloc (IO_DATA(op), npix, optype)
 	}
 
         # Loop over the image lines.
@@ -428,7 +424,6 @@ int	npix					#i number of pixels to read
 int	line					#i image line number
 int	band					#i image band number
 
-size_t	sz_val
 int	i, lnum, type
 int	nldone, blnum
 pointer	sp, dptr, data, optr
@@ -470,8 +465,7 @@ begin
 
 	# See if we're flipping image in x, and reverse the pixels.
 	if (and(IP_FLIP(ip),FLIP_X) == FLIP_X) {
-	    sz_val = npix
-	    call salloc (dptr, sz_val, type)    
+	    call salloc (dptr, npix, type)    
 	    do i = 1, npix {
         	switch (type) {
         	case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -499,10 +493,8 @@ begin
 	    IM_PIXTYPE(im) = type
 
 	# Allocate the buffer pointer if needed.
-	if (BUFFER(ip,band) == NULL) {
-	    sz_val = npix*IP_SZBUF(ip)
-	    call calloc (BUFFER(ip,band), sz_val, IP_OUTTYPE(ip))
-	}
+	if (BUFFER(ip,band) == NULL)
+	    call calloc (BUFFER(ip,band), npix*IP_SZBUF(ip), IP_OUTTYPE(ip))
 
 	if (nldone < IP_SZBUF(ip) && !lastline) {
 	    # Copy the image line to the buffer
@@ -515,12 +507,10 @@ begin
                 call amovi (Memi[dptr], Memi[data+((blnum-1)*npix)], npix)
 
             case TY_LONG:
-                sz_val = npix
-                call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], sz_val)
+                call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], npix)
 
             case TY_REAL:
-                sz_val = npix
-                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], sz_val)
+                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], npix)
 
             case TY_DOUBLE:
                 call amovd (Memd[dptr], Memd[data+((blnum-1)*npix)], npix)
@@ -569,41 +559,39 @@ begin
 		}
 
             case TY_LONG:
-                sz_val = npix
-                call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], sz_val)
+                call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
                     data = imps3l (im, 1, npix, 
 		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
 		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
 		       band, band)
-                    sz_val = npix*(IP_SZBUF(ip)-blnum+1)
-                    call amovl (Meml[BUFFER(ip,band)+(blnum-1)*npix], Meml[data], sz_val)
+                    call amovl (Meml[BUFFER(ip,band)+(blnum-1)*npix], 
+		        Meml[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
                     data = imps3l (im, 1, npix, 
 		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
 		       min(IP_AXLEN(ip,2),lnum),
 		       band, band)
-                    sz_val = npix*blnum
-                    call amovl (Meml[BUFFER(ip,band)], Meml[data], sz_val)
+                    call amovl (Meml[BUFFER(ip,band)], Meml[data], 
+			npix*blnum)
 		}
 
             case TY_REAL:
-                sz_val = npix
-                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], sz_val)
+                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
                     data = imps3r (im, 1, npix, 
 		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
 		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
 		       band, band)
-                    sz_val = npix*(IP_SZBUF(ip)-blnum+1)
-                    call amovr (Memr[BUFFER(ip,band)+(blnum-1)*npix], Memr[data], sz_val)
+                    call amovr (Memr[BUFFER(ip,band)+(blnum-1)*npix], 
+		        Memr[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
                     data = imps3r (im, 1, npix, 
 		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
 		       min(IP_AXLEN(ip,2),lnum),
 		       band, band)
-                    sz_val = npix*blnum
-                    call amovr (Memr[BUFFER(ip,band)], Memr[data], sz_val)
+                    call amovr (Memr[BUFFER(ip,band)], Memr[data], 
+			npix*blnum)
 		}
 
             case TY_DOUBLE:
@@ -738,7 +726,6 @@ procedure ip_fix_outbands (ip)
 
 pointer ip                                      #i task struct pointer
 
-size_t	sz_val
 pointer	sp, buf
 pointer	im
 int	i, nbands
@@ -747,8 +734,7 @@ define	SZ_OBSTR	2500
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
 
 	if (DEBUG) {
 	    call eprintf ("fix_outbands: npixt=%d ndim=%d inter=%d\n")
@@ -801,17 +787,14 @@ pointer procedure ip_chtype (op, type)
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
-size_t	sz_val
 pointer	out, coerce()
 
 begin
 	# Allocate the pointer and coerce it so the routine works.
-	if (type == TY_UBYTE || type == TY_CHAR) {
-            sz_val = O_LEN(op)
-            call calloc (out, sz_val, TY_CHAR)
-	} else {
-            sz_val = O_LEN(op)
-            call calloc (out, sz_val, type)
+	if (type == TY_UBYTE || type == TY_CHAR)
+            call calloc (out, O_LEN(op), TY_CHAR)
+	else {
+            call calloc (out, O_LEN(op), type)
             out = coerce (out, type, TY_CHAR)
 	}
 

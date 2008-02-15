@@ -28,7 +28,6 @@ procedure fxf_updhdr (im, status)
 pointer	im			#I image descriptor
 int	status			#O return status
 
-size_t	sz_val
 pointer	sp, fit, mii, poff
 pointer	outname, fits_file, tempfile
 bool    adjust_header, overwrite, append
@@ -45,14 +44,10 @@ errchk  set_cache_time, syserr, syserrs, imerr
 long	clktime()
 begin
 	call smark (sp)
-	sz_val = FITS_BLOCK_CHARS
-	call salloc (mii, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (fits_file, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (outname, sz_val, TY_CHAR)
-	sz_val = max(SZ_PATHNAME,SZ_FNAME*2)
-	call salloc (tempfile, sz_val, TY_CHAR)
+	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	call salloc (fits_file, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_PATHNAME, TY_CHAR)
+	call salloc (tempfile, max(SZ_PATHNAME,SZ_FNAME*2), TY_CHAR)
 
 	acmode = IM_ACMODE(im)
 	fit = IM_KDES(im)
@@ -235,8 +230,7 @@ begin
 	if (mod(npad,FITS_BLOCK_CHARS) > 0 &&
 		(FIT_NEWIMAGE(fit) == YES || append)) {
 
-	    sz_val = npad
-	    call amovki (0, Memi[mii], sz_val)
+	    call amovki (0, Memi[mii], npad)
 	    call flush (hdr_fd)
 	    call seek (hdr_fd, EOF)
 	    call write (hdr_fd, Memi[mii], npad)
@@ -364,7 +358,6 @@ int	hdr_off			#I header offset for group
 int	diff			#O difference
 int	ualen			#O new header length
 
-size_t	sz_val
 char	temp[LEN_CARD]
 pointer	hoff, poff, sp, pb, tb
 int	ua, fit, orig_hdr_size, pixoff, clines, ulines, len
@@ -427,8 +420,7 @@ begin
 	    clines = FIT_CACHEHLEN(fit) / LEN_UACARD
 
 	    call smark (sp)
-	    sz_val = len+1
-	    call salloc (tb, sz_val, TY_CHAR)
+	    call salloc (tb, len+1, TY_CHAR)
 
 	    # Now select those lines in UA that are not in fit_cache and
 	    # put them in 'pb'.
@@ -603,7 +595,6 @@ pointer	 fit     		#I fits structure
 int	 hdr_fd  		#I FITS header file descriptor
 int	 diff			#I header size difference opix -> wrhdr time
 
-size_t	sz_val
 char	temp[SZ_FNAME] 
 bool	xtension, ext_append
 pointer	sp, spp, mii, rp, uap
@@ -620,10 +611,8 @@ errchk  write
 
 begin
 	call smark (sp)
-	sz_val = FITS_BLOCK_CHARS*5
-	call salloc (spp, sz_val, TY_CHAR)
-	sz_val = FITS_BLOCK_CHARS
-	call salloc (mii, sz_val, TY_INT)
+	call salloc (spp, FITS_BLOCK_CHARS*5, TY_CHAR)
+	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
 
 	# Write out the standard, reserved header parameters.
 	n = spp
@@ -1071,7 +1060,6 @@ int	hdr_off		#I offset to be beginning of the ua to be resized
 int	pixoff		#I offset to be pixel area following hdroff
 int	chars_ua	#I size of the new UA (user area) in units of chars
 
-size_t	sz_val
 pointer	mii, sp
 int	nk, nblocks, junk, size_ua
 errchk  read, write
@@ -1079,8 +1067,7 @@ int	read()
 
 begin
 	call smark (sp)
-	sz_val = FITS_BLOCK_CHARS
-	call salloc (mii, sz_val, TY_INT)
+	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
 
 	# Number of 1440 chars block up to the beginning of the UA to change.
 	nblocks = hdr_off / FITS_BLOCK_CHARS
@@ -1097,8 +1084,7 @@ begin
 	nblocks = size_ua / FITS_BLOCK_CHARS
 	
 	# Put a blank new header in the meantime.
-	sz_val = FITS_BLOCK_CHARS
-	call amovki( 0, Memi[mii], sz_val)
+	call amovki( 0, Memi[mii], FITS_BLOCK_CHARS)
 	do nk = 1, nblocks
 	    call write (out_fd, Memi[mii], FITS_BLOCK_CHARS)
 
@@ -1121,7 +1107,6 @@ procedure fxf_set_cache_time (im, overwrite)
 pointer im			#I image descriptor
 bool    overwrite		#I invalidate entry if true
 
-size_t	sz_val
 pointer sp, hdrfile, fit
 long    fi[LEN_FINFO]
 int	finfo(), cindx
@@ -1132,8 +1117,7 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	fit = IM_KDES(im)
 
@@ -1180,7 +1164,6 @@ procedure fxf_set_extnv (im)
 
 pointer im			#I image descriptor
 
-size_t	sz_val
 pointer fit, sp, hdrfile
 int	cindx, ig, extn, extv
 errchk	syserr, syserrs
@@ -1194,8 +1177,7 @@ begin
 	ig = FIT_GROUP(fit)
 
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	# Search the header file cache for the named image.
 	do cindx = 1, rf_cachesize {
@@ -1257,7 +1239,6 @@ procedure fxf_over_delete (im)
 
 pointer im			#I image descriptor
 
-size_t	sz_val
 pointer fname, sp
 bool	streq()
 int	cindx
@@ -1265,8 +1246,7 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[fname], SZ_PATHNAME)
 
@@ -1298,7 +1278,6 @@ procedure fxf_update_extend (im)
 
 pointer	im			#I image descriptor	
 
-size_t	sz_val
 pointer sp, hdrfile
 int	fd, fdout, i, nch, nc, cfit
 char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
@@ -1382,8 +1361,7 @@ begin
 cfit_
 	# Now reset the value in the cache
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 

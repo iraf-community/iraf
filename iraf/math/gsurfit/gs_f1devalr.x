@@ -11,7 +11,6 @@ int	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sp, temp
 
@@ -27,12 +26,10 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = npts
-	call salloc (temp, sz_val, TY_REAL)
+	call salloc (temp, npts, TY_REAL)
 
 	# accumulate the output vector
-	sz_val = npts
-	call amovr (x, Memr[temp], sz_val)
+	call amovr (x, Memr[temp], npts)
 	do i = 3, order {
 	    call amulr (Memr[temp], x, Memr[temp], npts)
 	    call awsur (yfit, Memr[temp], yfit, npts, 1.0, coeff[i])
@@ -54,7 +51,6 @@ int	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer sp
@@ -75,25 +71,22 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (pn, sz_val, TY_REAL)
-	call salloc (pnm1, sz_val, TY_REAL)
-	call salloc (pnm2, sz_val, TY_REAL)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
 	call amovkr (1., Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	sz_val = npts
-	call amovr (Memr[sx], Memr[pnm1], sz_val)
+	call amovr (Memr[sx], Memr[pnm1], npts)
 	call amulkr (Memr[sx], 2.0, Memr[sx], npts)
 	do i = 3, order {
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call asubr (Memr[pn], Memr[pnm2], Memr[pn], npts)
 	    if (i < order) {
-	        sz_val = npts
-	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
-	        call amovr (Memr[pn], Memr[pnm1], sz_val)
+	        call amovr (Memr[pnm1], Memr[pnm2], npts)
+	        call amovr (Memr[pn], Memr[pnm1], npts)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)
@@ -117,7 +110,6 @@ int	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
-size_t	sz_val
 int	i
 pointer	sx, pn, pnm1, pnm2
 pointer	sp
@@ -138,17 +130,15 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_REAL)
-	call salloc (pn, sz_val, TY_REAL)
-	call salloc (pnm1, sz_val, TY_REAL)
-	call salloc (pnm2, sz_val, TY_REAL)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
 	call amovkr (1., Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	sz_val = npts
-	call amovr (Memr[sx], Memr[pnm1], sz_val)
+	call amovr (Memr[sx], Memr[pnm1], npts)
 	do i = 3, order {
 	    ri = i
 	    ri1 = (2. * ri - 3.) / (ri - 1.)
@@ -156,9 +146,8 @@ begin
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call awsur (Memr[pn], Memr[pnm2], Memr[pn], npts, ri1, ri2)
 	    if (i < order) {
-	        sz_val = npts
-	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
-	        call amovr (Memr[pn], Memr[pnm1], sz_val)
+	        call amovr (Memr[pnm1], Memr[pnm2], npts)
+	        call amovr (Memr[pn], Memr[pnm1], npts)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)

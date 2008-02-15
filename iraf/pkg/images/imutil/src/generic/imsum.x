@@ -29,8 +29,6 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
-long	lg_val
-size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 short	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -52,13 +50,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -84,11 +79,8 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, Meml[v1], sz_val)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
 		while (impnls (im_out, buf_out, Meml[v2]) != EOF) {
@@ -100,8 +92,7 @@ begin
 		    if (pass == 1)
 			call aclrs (Mems[buf_out], npix)
 		    else {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnls (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call amovs (Mems[buf_in], Mems[buf_out], npix)
@@ -109,8 +100,7 @@ begin
 
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnls (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aadds (Mems[buf_in], Mems[buf_out],
@@ -123,8 +113,7 @@ begin
 			call adivks (Mems[buf_out], const, Mems[buf_out],
 			    npix)
 
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		}
 
 		do i = 1, n
@@ -148,26 +137,19 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
-	if (nimages - n > 0) {
-	    sz_val = (nimages-n)*npix
-	    call salloc (buf1, sz_val, TY_SHORT)
-	}
+	call salloc (buf, nimages, TY_POINTER)
+	if (nimages - n > 0)
+	    call salloc (buf1, (nimages-n)*npix, TY_SHORT)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	sz_val = IM_MAXDIM
-	call amovl (Meml[v1], Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
 	while (impnls (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnls (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
@@ -179,8 +161,7 @@ begin
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
 		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnls (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
@@ -197,8 +178,7 @@ begin
 		call adivks (Mems[buf_out], const, Mems[buf_out], npix)
 	    }
 
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[v2], Meml[v1], sz_val)
+	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 	}
 
 	# Finish up.
@@ -426,8 +406,6 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
-long	lg_val
-size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 int	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -449,13 +427,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -481,11 +456,8 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, Meml[v1], sz_val)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
 		while (impnli (im_out, buf_out, Meml[v2]) != EOF) {
@@ -497,8 +469,7 @@ begin
 		    if (pass == 1)
 			call aclri (Memi[buf_out], npix)
 		    else {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnli (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call amovi (Memi[buf_in], Memi[buf_out], npix)
@@ -506,8 +477,7 @@ begin
 
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnli (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddi (Memi[buf_in], Memi[buf_out],
@@ -520,8 +490,7 @@ begin
 			call adivki (Memi[buf_out], const, Memi[buf_out],
 			    npix)
 
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		}
 
 		do i = 1, n
@@ -545,26 +514,19 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
-	if (nimages - n > 0) {
-	    sz_val = (nimages-n)*npix
-	    call salloc (buf1, sz_val, TY_INT)
-	}
+	call salloc (buf, nimages, TY_POINTER)
+	if (nimages - n > 0)
+	    call salloc (buf1, (nimages-n)*npix, TY_INT)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	sz_val = IM_MAXDIM
-	call amovl (Meml[v1], Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
 	while (impnli (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnli (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
@@ -576,8 +538,7 @@ begin
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
 		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnli (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
@@ -594,8 +555,7 @@ begin
 		call adivki (Memi[buf_out], const, Memi[buf_out], npix)
 	    }
 
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[v2], Meml[v1], sz_val)
+	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 	}
 
 	# Finish up.
@@ -823,8 +783,6 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
-long	lg_val
-size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 long	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -846,13 +804,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -878,11 +833,8 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, Meml[v1], sz_val)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
 		while (impnll (im_out, buf_out, Meml[v2]) != EOF) {
@@ -894,18 +846,15 @@ begin
 		    if (pass == 1)
 			call aclrl (Meml[buf_out], npix)
 		    else {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnll (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
-			sz_val = npix
-			call amovl (Meml[buf_in], Meml[buf_out], sz_val)
+			call amovl (Meml[buf_in], Meml[buf_out], npix)
 		    }
 
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnll (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddl (Meml[buf_in], Meml[buf_out],
@@ -918,8 +867,7 @@ begin
 			call adivkl (Meml[buf_out], const, Meml[buf_out],
 			    npix)
 
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		}
 
 		do i = 1, n
@@ -943,26 +891,19 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
-	if (nimages - n > 0) {
-	    sz_val = (nimages-n)*npix
-	    call salloc (buf1, sz_val, TY_LONG)
-	}
+	call salloc (buf, nimages, TY_POINTER)
+	if (nimages - n > 0)
+	    call salloc (buf1, (nimages-n)*npix, TY_LONG)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	sz_val = IM_MAXDIM
-	call amovl (Meml[v1], Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
 	while (impnll (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnll (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
@@ -974,13 +915,11 @@ begin
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
 		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnll (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
-		sz_val = npix
-		call amovl (Meml[buf_in], Meml[Memp[buf+i-1]], sz_val)
+		call amovl (Meml[buf_in], Meml[Memp[buf+i-1]], npix)
 		call imunmap (Memp[im+i-1])
 	    }
 		
@@ -993,8 +932,7 @@ begin
 		call adivkl (Meml[buf_out], const, Meml[buf_out], npix)
 	    }
 
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[v2], Meml[v1], sz_val)
+	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 	}
 
 	# Finish up.
@@ -1015,7 +953,6 @@ int	npts			# Number of points in the vectors
 int	nlow			# Number of low points to be rejected
 int	nhigh			# Number of high points to be rejected
 
-size_t	sz_val
 int	i, j
 int	naccept, minrej, npairs, nlow1, nhigh1
 real	tmedian, time1, time2
@@ -1026,8 +963,7 @@ begin
 	# If no points are rejected return the sum.
 
 	if (naccept == nvecs) {
-	    sz_val = npts
-	    call amovl (Meml[a[1]], b, sz_val)
+	    call amovl (Meml[a[1]], b, npts)
 	    for (j = 2; j <= naccept; j = j + 1)
 		call aaddl (Meml[a[j]], b, b, npts)
 	    return
@@ -1067,8 +1003,7 @@ begin
 	            call minswl (a, i, npts)
 		    i = i - 1
 	        }
-	    	sz_val = npts
-	    	call amovl (Meml[a[nhigh+1]], b, sz_val)
+	    	call amovl (Meml[a[nhigh+1]], b, npts)
 		for (j = nhigh+2; j <= nhigh+naccept; j = j + 1)
 		    call aaddl (Meml[a[j]], b, b, npts)
 
@@ -1078,8 +1013,7 @@ begin
 	            call maxswl (a, i, npts)
 		    i = i - 1
 	        }
-	    	sz_val = npts
-	    	call amovl (Meml[a[nlow+1]], b, sz_val)
+	    	call amovl (Meml[a[nlow+1]], b, npts)
 		for (j = nlow+2; j <= nlow+naccept; j = j + 1)
 		    call aaddl (Meml[a[j]], b, b, npts)
 	    }
@@ -1104,8 +1038,7 @@ begin
 	    # Check if the remaining points constitute a 3 or 5 point median
 	    # or the set of desired points.
 	    if (tmedian == 0.) {
-	        sz_val = npts
-	        call amovl (Meml[a[1]], b, sz_val)
+	        call amovl (Meml[a[1]], b, npts)
 	        for (j = 2; j <= naccept; j = j + 1)
 		    call aaddl (Meml[a[j]], b, b, npts)
 	    } else if (tmedian == TMED3) {
@@ -1227,8 +1160,6 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
-long	lg_val
-size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 real	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -1250,13 +1181,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1282,11 +1210,8 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, Meml[v1], sz_val)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
 		while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -1298,18 +1223,15 @@ begin
 		    if (pass == 1)
 			call aclrr (Memr[buf_out], npix)
 		    else {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnlr (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
-			sz_val = npix
-			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
+			call amovr (Memr[buf_in], Memr[buf_out], npix)
 		    }
 
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddr (Memr[buf_in], Memr[buf_out],
@@ -1322,8 +1244,7 @@ begin
 			call adivkr (Memr[buf_out], const, Memr[buf_out],
 			    npix)
 
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		}
 
 		do i = 1, n
@@ -1347,26 +1268,19 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
-	if (nimages - n > 0) {
-	    sz_val = (nimages-n)*npix
-	    call salloc (buf1, sz_val, TY_REAL)
-	}
+	call salloc (buf, nimages, TY_POINTER)
+	if (nimages - n > 0)
+	    call salloc (buf1, (nimages-n)*npix, TY_REAL)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	sz_val = IM_MAXDIM
-	call amovl (Meml[v1], Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
 	while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnlr (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
@@ -1378,13 +1292,11 @@ begin
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
 		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
-		sz_val = npix
-		call amovr (Memr[buf_in], Memr[Memp[buf+i-1]], sz_val)
+		call amovr (Memr[buf_in], Memr[Memp[buf+i-1]], npix)
 		call imunmap (Memp[im+i-1])
 	    }
 		
@@ -1397,8 +1309,7 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 	    }
 
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[v2], Meml[v1], sz_val)
+	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 	}
 
 	# Finish up.
@@ -1419,7 +1330,6 @@ int	npts			# Number of points in the vectors
 int	nlow			# Number of low points to be rejected
 int	nhigh			# Number of high points to be rejected
 
-size_t	sz_val
 int	i, j
 int	naccept, minrej, npairs, nlow1, nhigh1
 real	tmedian, time1, time2
@@ -1430,8 +1340,7 @@ begin
 	# If no points are rejected return the sum.
 
 	if (naccept == nvecs) {
-	    sz_val = npts
-	    call amovr (Memr[a[1]], b, sz_val)
+	    call amovr (Memr[a[1]], b, npts)
 	    for (j = 2; j <= naccept; j = j + 1)
 		call aaddr (Memr[a[j]], b, b, npts)
 	    return
@@ -1471,8 +1380,7 @@ begin
 	            call minswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	sz_val = npts
-	    	call amovr (Memr[a[nhigh+1]], b, sz_val)
+	    	call amovr (Memr[a[nhigh+1]], b, npts)
 		for (j = nhigh+2; j <= nhigh+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 
@@ -1482,8 +1390,7 @@ begin
 	            call maxswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	sz_val = npts
-	    	call amovr (Memr[a[nlow+1]], b, sz_val)
+	    	call amovr (Memr[a[nlow+1]], b, npts)
 		for (j = nlow+2; j <= nlow+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    }
@@ -1508,8 +1415,7 @@ begin
 	    # Check if the remaining points constitute a 3 or 5 point median
 	    # or the set of desired points.
 	    if (tmedian == 0.) {
-	        sz_val = npts
-	        call amovr (Memr[a[1]], b, sz_val)
+	        call amovr (Memr[a[1]], b, npts)
 	        for (j = 2; j <= naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    } else if (tmedian == TMED3) {
@@ -1631,8 +1537,6 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
-long	lg_val
-size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 double	const
 pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
@@ -1654,13 +1558,10 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
-	sz_val = nimages
-	call salloc (im, sz_val, TY_POINTER)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
+	call salloc (im, nimages, TY_POINTER)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels
 	# and do the operation in blocks so that the number of images mapped
@@ -1686,11 +1587,8 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        lg_val = 1
-	        sz_val = IM_MAXDIM
-	        call amovkl (lg_val, Meml[v1], sz_val)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
 		while (impnld (im_out, buf_out, Meml[v2]) != EOF) {
@@ -1702,8 +1600,7 @@ begin
 		    if (pass == 1)
 			call aclrd (Memd[buf_out], npix)
 		    else {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnld (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call amovd (Memd[buf_in], Memd[buf_out], npix)
@@ -1711,8 +1608,7 @@ begin
 
 		    # Accumulate lines from each input image.
 	    	    do i = 1, n {
-			sz_val = IM_MAXDIM
-			call amovl (Meml[v1], Meml[v2], sz_val)
+			call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 			if (imgnld (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
 			call aaddd (Memd[buf_in], Memd[buf_out],
@@ -1725,8 +1621,7 @@ begin
 			call adivkd (Memd[buf_out], const, Memd[buf_out],
 			    npix)
 
-		    sz_val = IM_MAXDIM
-		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		}
 
 		do i = 1, n
@@ -1750,26 +1645,19 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	sz_val = nimages
-	call salloc (buf, sz_val, TY_POINTER)
-	if (nimages - n > 0) {
-	    sz_val = (nimages-n)*npix
-	    call salloc (buf1, sz_val, TY_DOUBLE)
-	}
+	call salloc (buf, nimages, TY_POINTER)
+	if (nimages - n > 0)
+	    call salloc (buf1, (nimages-n)*npix, TY_DOUBLE)
 
-	lg_val = 1
-	sz_val = IM_MAXDIM
-	call amovkl (lg_val, Meml[v1], sz_val)
-	sz_val = IM_MAXDIM
-	call amovl (Meml[v1], Meml[v2], sz_val)
+	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
 	while (impnld (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the images which remain open.
 	    for (i = 1; i <= n; i = i + 1) {
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnld (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 	    }
@@ -1781,8 +1669,7 @@ begin
 		if (imtrgetim (list, i, Memc[input], SZ_FNAME) == EOF)
 		    break
 		Memp[im+i-1] = immap (Memc[input], READ_ONLY, 0)
-		sz_val = IM_MAXDIM
-		call amovl (Meml[v1], Meml[v2], sz_val)
+		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 		if (imgnld (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
@@ -1799,8 +1686,7 @@ begin
 		call adivkd (Memd[buf_out], const, Memd[buf_out], npix)
 	    }
 
-	    sz_val = IM_MAXDIM
-	    call amovl (Meml[v2], Meml[v1], sz_val)
+	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 	}
 
 	# Finish up.
