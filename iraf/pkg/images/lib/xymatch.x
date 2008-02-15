@@ -59,9 +59,10 @@ begin
 	    npts = npts + 1
 	    if (npts >= bufsize) {
 		bufsize = bufsize + DEF_BUFSIZE
-		call realloc (x, bufsize, TY_REAL)
-		call realloc (y, bufsize, TY_REAL)
-		call realloc (lineno, bufsize, TY_INT)
+		sz_val = bufsize
+		call realloc (x, sz_val, TY_REAL)
+		call realloc (y, sz_val, TY_REAL)
+		call realloc (lineno, sz_val, TY_INT)
 	    }
 	}
 

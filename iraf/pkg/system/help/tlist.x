@@ -117,7 +117,8 @@ paknotfound_
 	# Return unused space in string buffer.  Copy length of list to
 	# the main help structure.
 
-	call realloc (TL_SBUF(tl), TL_NEXTCH(tl), TY_CHAR)
+	sz_val = TL_NEXTCH(tl)
+	call realloc (TL_SBUF(tl), sz_val, TY_CHAR)
 	TL_SZSBUF(tl) = TL_NEXTCH(tl)
 	H_LENTL(ctrl) = TL_LISTLEN(tl)
 
@@ -392,6 +393,7 @@ int procedure tl_putstr (tl, str)
 
 pointer	tl
 char	str[ARB]
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -404,7 +406,8 @@ begin
 	nextch = TL_NEXTCH(tl)
 	if (nextch + nchars + 1 > TL_SZSBUF(tl)) {
 	    TL_SZSBUF(tl) = TL_SZSBUF(tl) + INC_SZTLSBUF
-	    call realloc (TL_SBUF(tl), TL_SZSBUF(tl), TY_CHAR)
+	    sz_val = TL_SZSBUF(tl)
+	    call realloc (TL_SBUF(tl), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[TL_SBUF(tl) + nextch], ARB)

@@ -50,7 +50,8 @@ begin
 	do i = 1, CQ_NQPARS(cc) {
 	    if ((sz1 - op1 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		sz1 = sz1 + SZ_LINE
-		call realloc (tmpdic, sz1, TY_CHAR)
+		sz_val = sz1
+		call realloc (tmpdic, sz_val, TY_CHAR)
 	    }
 	    if (i == parno) {
 		op1 = op1 + gstrcpy (valuestr, Memc[tmpdic+op1-1],
@@ -65,7 +66,8 @@ begin
 	}
 
 	# Update the values string. Leave as temp length for now.
-	call realloc (CQ_PQPVALUES(cc), op1 - 1, TY_CHAR)
+	sz_val = op1 - 1
+	call realloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
 	call strcpy (Memc[tmpdic], Memc[CQ_PQPVALUES(cc)], op1 - 1)
 
 	call mfree (tmpdic, TY_CHAR)
@@ -116,7 +118,8 @@ begin
 	do i = 1, CQ_NQPARS(cc) {
 	    if ((sz1 - op1 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		sz1 = sz1 + SZ_LINE
-		call realloc (tmpdic, sz1, TY_CHAR)
+		sz_val = sz1
+		call realloc (tmpdic, sz_val, TY_CHAR)
 	    }
 	    if (i == parno) {
 		op1 = op1 + gstrcpy (valuestr, Memc[tmpdic+op1-1],
@@ -131,7 +134,8 @@ begin
 	}
 
 	# Update the values string.
-	call realloc (CQ_PQPVALUES(cc), op1, TY_CHAR)
+	sz_val = op1
+	call realloc (CQ_PQPVALUES(cc), sz_val, TY_CHAR)
 	call strcpy (Memc[tmpdic], Memc[CQ_PQPVALUES(cc)], op1 - 1)
 
 	# Free memory.

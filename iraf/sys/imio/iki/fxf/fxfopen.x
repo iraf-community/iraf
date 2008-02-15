@@ -751,7 +751,8 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 	# Move spooled data back to user area.

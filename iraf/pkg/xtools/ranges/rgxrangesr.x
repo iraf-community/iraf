@@ -150,8 +150,10 @@ begin
 		# Add range
 		if (k <= j) {
 		    nrgs = RG_NRGS(rg)
-		    if (mod (nrgs, NRGS) == 0)
-			call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
+		    if (mod (nrgs, NRGS) == 0) {
+			sz_val = LEN_RG+2*(nrgs+NRGS)
+			call realloc (rg, sz_val, TY_STRUCT)
+		    }
 		    nrgs = nrgs + 1
 		    RG_NRGS(rg) = nrgs
 		    RG_X1(rg, nrgs) = k

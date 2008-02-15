@@ -52,7 +52,8 @@ begin
 
 	# Get the space.
 	if (nchars > buflen) {
-	    call realloc (bp, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call realloc (bp, sz_val, TY_CHAR)
 	    buflen = nchars
 	}
 

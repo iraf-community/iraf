@@ -82,10 +82,11 @@ begin
 		    call malloc (z, sz_val, TY_DOUBLE)
 		    call malloc (w, sz_val, TY_DOUBLE)
 		} else if (mod (n, 100) == 0) {
-		    call realloc (x, n+100, TY_DOUBLE)
-		    call realloc (y, n+100, TY_DOUBLE)
-		    call realloc (z, n+100, TY_DOUBLE)
-		    call realloc (w, n+100, TY_DOUBLE)
+		    sz_val = n+100
+		    call realloc (x, sz_val, TY_DOUBLE)
+		    call realloc (y, sz_val, TY_DOUBLE)
+		    call realloc (z, sz_val, TY_DOUBLE)
+		    call realloc (w, sz_val, TY_DOUBLE)
 		}
 		Memd[x+n] = r[1]
 		Memd[y+n] = r[2]

@@ -270,8 +270,9 @@ begin
 	    n = n + 1
 	    if (n > buflen) {
 		buflen = buflen + SZ_BUF
-		call realloc (x, buflen, TY_REAL)
-		call realloc (y, buflen, TY_REAL)
+		sz_val = buflen
+		call realloc (x, sz_val, TY_REAL)
+		call realloc (y, sz_val, TY_REAL)
 	    }
 
 	    Memr[x+n-1] = xval
@@ -286,8 +287,9 @@ begin
 	    do i = 1, n
 		Memr[x+i-1] = maxy * real(i) / real(n)
 	}
-	call realloc (x, n, TY_REAL)
-	call realloc (y, n, TY_REAL)
+	sz_val = n
+	call realloc (x, sz_val, TY_REAL)
+	call realloc (y, sz_val, TY_REAL)
 
 	call close (fd)
 	call sfree (sp)

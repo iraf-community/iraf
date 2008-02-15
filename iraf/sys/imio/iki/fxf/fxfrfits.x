@@ -501,7 +501,8 @@ rxtn_
 
 	if (FIT_TFIELDS(lfit) > 0) {
 	    fitslen = fitslen + FIT_TFIELDS(lfit)*LEN_UACARD
-	    call realloc (po, fitslen, TY_CHAR)
+	    sz_val = fitslen
+	    call realloc (po, sz_val, TY_CHAR)
         }
 
 	call fxf_merge_w_ua (im, po, fitslen)
@@ -600,10 +601,13 @@ begin
 	# Allocate more memory for offsets in case we are pass MAX_OFFSETS.
 	if (group >= FIT_NUMOFFS(cfit)) {
 	    FIT_NUMOFFS(cfit) = FIT_NUMOFFS(cfit) + MAX_OFFSETS 
-	    call realloc (hoff, FIT_NUMOFFS(cfit), TY_INT)
-	    call realloc (poff, FIT_NUMOFFS(cfit), TY_INT)
-	    call realloc (extn, FIT_NUMOFFS(cfit)*LEN_CARD, TY_CHAR)
-	    call realloc (extv, FIT_NUMOFFS(cfit), TY_INT)
+	    sz_val = FIT_NUMOFFS(cfit)
+	    call realloc (hoff, sz_val, TY_INT)
+	    call realloc (poff, sz_val, TY_INT)
+	    sz_val = FIT_NUMOFFS(cfit)*LEN_CARD
+	    call realloc (extn, sz_val, TY_CHAR)
+	    sz_val = FIT_NUMOFFS(cfit)
+	    call realloc (extv, sz_val, TY_INT)
 
 	    offset = FIT_NUMOFFS(cfit) - MAX_OFFSETS
 	    call amovki (INDEFL, Memi[extv+offset], MAX_OFFSETS)
@@ -896,7 +900,8 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 

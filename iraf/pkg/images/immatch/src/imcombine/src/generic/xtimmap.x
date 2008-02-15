@@ -78,7 +78,8 @@ begin
 	if (index > nalloc) {
 	    i = nalloc
 	    nalloc = index + MAX_OPENIM
-	    call realloc (ims, nalloc, TY_STRUCT)
+	    sz_val = nalloc
+	    call realloc (ims, sz_val, TY_STRUCT)
 	    call amovki (NULL, Memi[ims+i], nalloc-i)
 	}
 	call calloc (xt, XT_LEN, TY_STRUCT)

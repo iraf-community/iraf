@@ -157,7 +157,8 @@ eatup_
 		buflen = op - expr
 		if (buflen + nchars > sz_expr) {
 		    sz_expr = sz_expr + INC_SZEXPRBUF
-		    call realloc (expr, sz_expr, TY_CHAR)
+		    sz_val = sz_expr
+		    call realloc (expr, sz_val, TY_CHAR)
 		    op = expr + buflen
 		}
 

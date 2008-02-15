@@ -284,12 +284,15 @@ begin
 	    if (ndata < szbuf)
 		next
 	    szbuf = szbuf + sz_bufincr
-	    call realloc (data, szbuf, TY_REAL)
+	    sz_val = szbuf
+	    call realloc (data, sz_val, TY_REAL)
 	}
 
 	# Fit the buffer size to the data.
-	if (ndata > 0)
-	    call realloc (data, ndata, TY_REAL)
+	if (ndata > 0) {
+	    sz_val = ndata
+	    call realloc (data, sz_val, TY_REAL)
+	}
 
 	return (ndata)
 end

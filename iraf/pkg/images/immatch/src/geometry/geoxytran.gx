@@ -226,8 +226,9 @@ $endif
 	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
 	    geometry == GEO_DISTORTION)) {
 
-	    call realloc (xcoeff, ncoeff, TY_PIXEL)
-	    call realloc (ycoeff, ncoeff, TY_PIXEL)
+	    sz_val = ncoeff
+	    call realloc (xcoeff, sz_val, TY_PIXEL)
+	    call realloc (ycoeff, sz_val, TY_PIXEL)
 	    do i = 1, ncoeff {
 		junk = dtscan (dt)
 		call garg$t (Mem$t[xcoeff+i-1])

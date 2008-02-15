@@ -11,6 +11,7 @@ int procedure pl_alloc (pl, nwords)
 pointer	pl			#I mask descriptor
 int	nwords			#I number of words of storage to allocate
 
+size_t	sz_val
 int	newbuf
 int	len, o_len, inc, op
 errchk	realloc
@@ -28,8 +29,10 @@ begin
 	    len = len + inc
 	}
 
-	if (len != o_len)
-	    call realloc (PL_LLBP(pl), len, TY_SHORT)
+	if (len != o_len) {
+	    sz_val = len
+	    call realloc (PL_LLBP(pl), sz_val, TY_SHORT)
+	}
 
 	PL_LLLEN(pl) = len
 	PL_LLINC(pl) = inc

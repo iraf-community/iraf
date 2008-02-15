@@ -250,19 +250,23 @@ begin
 
 		if (nrec == dt_alloc1) {
 		    dt_alloc1 = dt_alloc1 + DT_ALLOC
-		    call realloc (DT_OFFSETS(dt), dt_alloc1, TY_LONG)
-		    call realloc (DT_NAMES(dt), dt_alloc1, TY_INT)
+		    sz_val = dt_alloc1
+		    call realloc (DT_OFFSETS(dt), sz_val, TY_LONG)
+		    call realloc (DT_NAMES(dt), sz_val, TY_INT)
 		}
 		if (DT_NAMEI(dt, nrec) + SZ_LINE >= dt_alloc2) {
 		    dt_alloc2 = dt_alloc2 + DT_ALLOC * SZ_LINE
-		    call realloc (DT_MAP(dt), dt_alloc2, TY_CHAR)
+		    sz_val = dt_alloc2
+		    call realloc (DT_MAP(dt), sz_val, TY_CHAR)
 		}
 	    }
 	}
 
-	call realloc (DT_MAP(dt), DT_NAMEI(dt, nrec), TY_CHAR)
-	call realloc (DT_OFFSETS(dt), DT_NRECS(dt), TY_LONG)
-	call realloc (DT_NAMES(dt), DT_NRECS(dt), TY_INT)
+	sz_val = DT_NAMEI(dt, nrec)
+	call realloc (DT_MAP(dt), sz_val, TY_CHAR)
+	sz_val = DT_NRECS(dt)
+	call realloc (DT_OFFSETS(dt), sz_val, TY_LONG)
+	call realloc (DT_NAMES(dt), sz_val, TY_INT)
 	call mfree (str, TY_CHAR)
 
 	return (dt)

@@ -58,7 +58,8 @@ begin
 	    sz_val = nlp
 	    call malloc (PL_LPP(pl), sz_val, TY_INT)
 	} else if (nlp != o_nlp) {
-	    call realloc (PL_LPP(pl), nlp, TY_INT)
+	    sz_val = nlp
+	    call realloc (PL_LPP(pl), sz_val, TY_INT)
 	}
 
 	sz_val = sz_index
@@ -72,7 +73,8 @@ begin
 	    sz_val = PL_LLLEN(pl)
 	    call malloc (PL_LLBP(pl), sz_val, TY_SHORT)
 	} else if (PL_LLLEN(pl) != o_lllen) {
-	    call realloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
+	    sz_val = PL_LLLEN(pl)
+	    call realloc (PL_LLBP(pl), sz_val, TY_SHORT)
 	}
 
 	# Read the stored line list.

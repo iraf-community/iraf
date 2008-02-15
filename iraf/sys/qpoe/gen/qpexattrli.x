@@ -90,8 +90,9 @@ begin
 		# Copy output range list to X list temporary.
 		if (max(nx,1) > plen) {
 		    plen = max(xlen,1)
-		    call realloc (ps, plen, TY_INT)
-		    call realloc (pe, plen, TY_INT)
+		    sz_val = plen
+		    call realloc (ps, sz_val, TY_INT)
+		    call realloc (pe, sz_val, TY_INT)
 		}
 		if (neterms <= 0) {
 		    Memi[ps] = LEFTI

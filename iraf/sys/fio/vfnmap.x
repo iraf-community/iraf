@@ -752,7 +752,8 @@ reallynew_
 	    }
 	    new_struct_size = LEN_MFD -
 		(MAX_LONGFNAMES - M_NFILES(mfd)) * (SZ_FNPAIR/SZ_STRUCT)
-	    call realloc (mfd, new_struct_size, TY_STRUCT)
+	    sz_val = new_struct_size
+	    call realloc (mfd, sz_val, TY_STRUCT)
 	    V_MFD(vfd) = mfd
 	} else {
 	    M_CHAN(mfd) = chan

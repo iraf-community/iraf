@@ -523,13 +523,15 @@ begin
 	HD_NMODULES(hp) = pos
 
 	# Return any unused space in string buffer.
-	call realloc (HD_SBUF(hp), HD_NEXTCH(hp), TY_CHAR)
+	sz_val = HD_NEXTCH(hp)
+	call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_SZSBUF(hp) = HD_NEXTCH(hp)
 
 	# Return any unused module descriptors.
         HD_LENHD(hp) = HD_LENHD(hp) -
 	    LEN_MODSTRUCT * (HD_MAXMODULES(hp) - HD_NMODULES(hp))
-	call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+	sz_val = HD_LENHD(hp)
+	call realloc (hp, sz_val, TY_STRUCT)
 	HD_MAXMODULES(hp) = HD_NMODULES(hp)
 
 	return (hp)
@@ -665,9 +667,11 @@ begin
 	    # Make room for the new data and index entries.
 	    iferr {
 		HDB_DATALEN(db) = HDB_DATALEN(db) + HDB_DATALEN(hp)
-		call realloc (HDB_DATAPTR(db), HDB_DATALEN(db), TY_STRUCT)
+		sz_val = HDB_DATALEN(db)
+		call realloc (HDB_DATAPTR(db), sz_val, TY_STRUCT)
 		HDB_INDEXLEN(db) = HDB_INDEXLEN(db) + HDB_INDEXLEN(hp)
-		call realloc (HDB_INDEXPTR(db), HDB_INDEXLEN(db), TY_STRUCT)
+		sz_val = HDB_INDEXLEN(db)
+		call realloc (HDB_INDEXPTR(db), sz_val, TY_STRUCT)
 	    } then
 		call erract (EA_WARN)
 
@@ -741,7 +745,8 @@ rejectfile_
 	d_len = HDB_DATALEN(db)
 	nints = HD_LENHD(hp) + (HD_SZSBUF(hp) + SZ_STRUCT-1) / SZ_STRUCT
 	HDB_DATALEN(db) = HDB_DATALEN(db) + nints
-	call realloc (HDB_DATAPTR(db), HDB_DATALEN(db), TY_STRUCT)
+	sz_val = HDB_DATALEN(db)
+	call realloc (HDB_DATAPTR(db), sz_val, TY_STRUCT)
 	d_op = HDB_DATAPTR(db) + d_len
 
 	HD_NEXTCH(hp) = HD_LENHD(hp)
@@ -1130,7 +1135,8 @@ begin
 	if (m > HD_NMODULES(hp)) {
 	    if (m > HD_MAXMODULES(hp)) {
 		HD_LENHD(hp) = HD_LENHD(hp) + (INC_MODULES * LEN_MODSTRUCT)
-		call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+		sz_val = HD_LENHD(hp)
+		call realloc (hp, sz_val, TY_STRUCT)
 		HD_MAXMODULES(hp) = HD_MAXMODULES(hp) + INC_MODULES
 	    }
 	    HD_NMODULES(hp) = m

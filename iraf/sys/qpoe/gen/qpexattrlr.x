@@ -90,8 +90,9 @@ begin
 		# Copy output range list to X list temporary.
 		if (max(nx,1) > plen) {
 		    plen = max(xlen,1)
-		    call realloc (ps, plen, TY_REAL)
-		    call realloc (pe, plen, TY_REAL)
+		    sz_val = plen
+		    call realloc (ps, sz_val, TY_REAL)
+		    call realloc (pe, sz_val, TY_REAL)
 		}
 		if (neterms <= 0) {
 		    Memr[ps] = LEFTR

@@ -25,6 +25,7 @@ pointer	mw			#I pointer to MWCS descriptor
 pointer	im			#I pointer to image header
 int	mode			#I RF_REFERENCE or RF_COPY
 
+size_t	sz_val
 double	dval
 bool	omit, copy
 pointer	iw, idb, rp, cp, fp
@@ -91,8 +92,8 @@ begin
 	    IW_NCARDS(iw) = IW_NCARDS(iw) + 1
 	    if (IW_NCARDS(iw) > IW_MAXCARDS(iw)) {
 		IW_MAXCARDS(iw) = IW_MAXCARDS(iw) + INC_MAXCARDS
-		call realloc (IW_CBUF(iw),
-		    IW_MAXCARDS(iw) * LEN_CDES, TY_STRUCT)
+		sz_val = IW_MAXCARDS(iw) * LEN_CDES
+		call realloc (IW_CBUF(iw), sz_val, TY_STRUCT)
 		cp = IW_CARD(iw,IW_NCARDS(iw))
 		call aclri (Memi[cp],
 		    (IW_MAXCARDS(iw) - IW_NCARDS(iw) + 1) * LEN_CDES)

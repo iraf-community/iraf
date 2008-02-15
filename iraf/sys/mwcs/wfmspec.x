@@ -130,7 +130,8 @@ begin
 
 	    while (strlen (Memc[atval]) == sz_atval) {
 		sz_atval = 2 * sz_atval
-		call realloc (atval, sz_atval, TY_CHAR)
+		sz_val = sz_atval
+		call realloc (atval, sz_val, TY_CHAR)
 		call mw_gwattrs (mw, 2, Memc[atkey], Memc[atval], sz_atval)
 	    }
 
@@ -144,13 +145,14 @@ begin
 		call malloc (z, sz_val, TY_DOUBLE) 
 		call malloc (coeff, sz_val, TY_POINTER)
 	    } else if (mod (naps, NALLOC) == 0) {
-		call realloc (aps, naps+NALLOC, TY_INT) 
-		call realloc (dtype, naps+NALLOC, TY_INT) 
-		call realloc (crval, naps+NALLOC, TY_DOUBLE)
-		call realloc (cdelt, naps+NALLOC, TY_DOUBLE) 
-		call realloc (npts, naps+NALLOC, TY_INT) 
-		call realloc (z, naps+NALLOC, TY_DOUBLE) 
-		call realloc (coeff, naps+NALLOC, TY_POINTER) 
+		sz_val = naps+NALLOC
+		call realloc (aps, sz_val, TY_INT) 
+		call realloc (dtype, sz_val, TY_INT) 
+		call realloc (crval, sz_val, TY_DOUBLE)
+		call realloc (cdelt, sz_val, TY_DOUBLE) 
+		call realloc (npts, sz_val, TY_INT) 
+		call realloc (z, sz_val, TY_DOUBLE) 
+		call realloc (coeff, sz_val, TY_POINTER) 
 	    }
 
 	    # Linear dispersion function.
@@ -184,13 +186,14 @@ begin
 	if (naps <= 0)
 	    call error (2, "WFMSPEC: No aperture information")
 
-	call realloc (aps, naps, TY_INT) 
-	call realloc (dtype, naps, TY_INT) 
-	call realloc (crval, naps, TY_DOUBLE) 
-	call realloc (cdelt, naps, TY_DOUBLE) 
-	call realloc (npts, naps, TY_INT) 
-	call realloc (z, naps, TY_DOUBLE) 
-	call realloc (coeff, naps, TY_POINTER) 
+	sz_val = naps
+	call realloc (aps, sz_val, TY_INT) 
+	call realloc (dtype, sz_val, TY_INT) 
+	call realloc (crval, sz_val, TY_DOUBLE) 
+	call realloc (cdelt, sz_val, TY_DOUBLE) 
+	call realloc (npts, sz_val, TY_INT) 
+	call realloc (z, sz_val, TY_DOUBLE) 
+	call realloc (coeff, sz_val, TY_POINTER) 
 
 	FC_NAPS(fc) = naps
 	FC_APS(fc) = aps
@@ -361,7 +364,8 @@ begin
 		sz_val = NALLOC
 		call malloc (coeff, sz_val, TY_DOUBLE)
 	    } else if (mod (ncoeff, NALLOC) == 0) {
-		call realloc (coeff, ncoeff+NALLOC, TY_DOUBLE)
+		sz_val = ncoeff+NALLOC
+		call realloc (coeff, sz_val, TY_DOUBLE)
 	    }
 	    Memd[coeff+ncoeff] = dval
 	    ncoeff = ncoeff + 1
@@ -370,7 +374,8 @@ begin
 	    return
 
 	# Convert range elements to a more efficient form.
-	call realloc (coeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call realloc (coeff, sz_val, TY_DOUBLE)
 	Memd[coeff] = ncoeff
 	i = 6
 	while (i < ncoeff) {

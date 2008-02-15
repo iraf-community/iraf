@@ -17,6 +17,7 @@ char	termcap_file[ARB]	#I termcap file to be scanned
 char	device[ARB]		#I name of device to be extracted
 char	ufields[ARB]		#I user specified capabilities
 
+size_t	sz_val
 int	nchars, ip
 pointer	caplist, tty, op
 errchk	calloc, realloc, gty_index_caps
@@ -56,7 +57,8 @@ begin
 
 	# Call realloc to return any unused space in the descriptor.
 	T_LEN(tty) = T_OFFCAP + (T_OP(tty) + SZ_STRUCT-1) / SZ_STRUCT
-	call realloc (tty, T_LEN(tty), TY_STRUCT)
+	sz_val = T_LEN(tty)
+	call realloc (tty, sz_val, TY_STRUCT)
 
 	# Prepare index of fields in the descriptor, so that we can more
 	# efficiently search for fields later.
@@ -268,7 +270,8 @@ begin
 	    if (op >= otop) {
 		T_OP(tty) = op - caplist + 1
 		T_LEN(tty) = T_LEN(tty) + T_MEMINCR
-		call realloc (tty, T_LEN(tty), TY_STRUCT)
+		sz_val = T_LEN(tty)
+		call realloc (tty, sz_val, TY_STRUCT)
 		op = caplist + T_OP(tty) - 1
 		otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR)
 	    }

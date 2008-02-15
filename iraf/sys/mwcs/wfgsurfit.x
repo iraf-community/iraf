@@ -103,7 +103,8 @@ begin
                 break
             if (npar >= szcoeff) {
                 szcoeff =szcoeff + SZ_GSCOEFFBUF
-                call realloc (coeff, szcoeff, TY_DOUBLE)
+                sz_val = szcoeff
+                call realloc (coeff, sz_val, TY_DOUBLE)
             }
             Memd[coeff+npar] = dval
             npar = npar + 1

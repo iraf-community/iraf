@@ -254,7 +254,8 @@ begin
 		    status = envscan (p_sbuf)
 		else {
 		    if (len_iobuf < nchars) {
-			call realloc (iobuf, nchars, TY_CHAR)
+			sz_val = nchars
+			call realloc (iobuf, sz_val, TY_CHAR)
 			len_iobuf = nchars
 		    }
 
@@ -675,6 +676,7 @@ pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 pointer	bfdd[ARB]		# loaded device drivers
 
+size_t	sz_val
 long	lval, ks_maxbufsize
 int	dd, status, nchars, arg1, arg2, arg3
 char	osfn[SZ_PATHNAME], temp[SZ_PATHNAME]
@@ -700,7 +702,8 @@ begin
 	if (p_subcode == BF_ARD || p_subcode == BF_AWR) {
 	    nchars = (p_arg[2] + SZB_CHAR-1) / SZB_CHAR
 	    if (len_iobuf < nchars) {
-		call realloc (iobuf, nchars, TY_CHAR)
+		sz_val = nchars
+		call realloc (iobuf, sz_val, TY_CHAR)
 		len_iobuf = nchars
 	    }
 	}
@@ -1078,6 +1081,7 @@ int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 
+size_t	sz_val
 long	lval
 int	status, nchars, mode, dc_off, dc_len
 int	newfile, arg[MAX_ARGS]
@@ -1100,7 +1104,8 @@ begin
 	if (p_subcode == MT_RD || p_subcode == MT_WR) {
 	    nchars = (arg[2] + SZB_CHAR-1) / SZB_CHAR
 	    if (len_iobuf < nchars) {
-		call realloc (iobuf, nchars, TY_CHAR)
+		sz_val = nchars
+		call realloc (iobuf, sz_val, TY_CHAR)
 		len_iobuf = nchars
 	    }
 	}

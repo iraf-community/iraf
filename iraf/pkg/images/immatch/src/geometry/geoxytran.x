@@ -164,8 +164,9 @@ begin
 	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
 	    geometry == GEO_DISTORTION)) {
 
-	    call realloc (xcoeff, ncoeff, TY_REAL)
-	    call realloc (ycoeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call realloc (xcoeff, sz_val, TY_REAL)
+	    call realloc (ycoeff, sz_val, TY_REAL)
 	    do i = 1, ncoeff {
 		junk = dtscan (dt)
 		call gargr (Memr[xcoeff+i-1])
@@ -384,8 +385,9 @@ begin
 	if (ncoeff > 0 && (geometry == GEO_GEOMETRIC ||
 	    geometry == GEO_DISTORTION)) {
 
-	    call realloc (xcoeff, ncoeff, TY_DOUBLE)
-	    call realloc (ycoeff, ncoeff, TY_DOUBLE)
+	    sz_val = ncoeff
+	    call realloc (xcoeff, sz_val, TY_DOUBLE)
+	    call realloc (ycoeff, sz_val, TY_DOUBLE)
 	    do i = 1, ncoeff {
 		junk = dtscan (dt)
 		call gargd (Memd[xcoeff+i-1])

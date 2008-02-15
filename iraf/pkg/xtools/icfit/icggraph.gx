@@ -41,8 +41,9 @@ begin
  
 	if (npts != IC_NFIT(ic)) {
 	    if ((abs (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
-	        call realloc (xout, IC_NFIT(ic), TY_PIXEL)
-		call realloc (yout, IC_NFIT(ic), TY_PIXEL)
+	        sz_val = IC_NFIT(ic)
+	        call realloc (xout, sz_val, TY_PIXEL)
+		call realloc (yout, sz_val, TY_PIXEL)
 		call icg_axes$t (ic, gt, cv, 1, Mem$t[IC_XFIT(ic)],
 		    Mem$t[IC_YFIT(ic)], Mem$t[xout], IC_NFIT(ic))
 		call icg_axes$t (ic, gt, cv, 2, Mem$t[IC_XFIT(ic)],

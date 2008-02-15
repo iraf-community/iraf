@@ -48,7 +48,8 @@ begin
 	else {
 	    while (nextch + nchars + 1 >= sz_tmpbuf) {
 		sz_tmpbuf = sz_tmpbuf + SZ_INCREMENT
-		call realloc (tmpbuf, sz_tmpbuf, TY_CHAR)
+		sz_val = sz_tmpbuf
+		call realloc (tmpbuf, sz_val, TY_CHAR)
 	    }
 	}
 

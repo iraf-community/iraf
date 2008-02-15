@@ -620,7 +620,8 @@ begin
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    call realloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call realloc (buf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	}
@@ -708,7 +709,8 @@ begin
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    call realloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call realloc (buf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	}
@@ -803,7 +805,8 @@ begin
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    call realloc (jbuf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call realloc (jbuf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	}

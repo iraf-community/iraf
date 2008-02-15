@@ -127,9 +127,10 @@ begin
 
 	    # Allow for adding points.
 	    nmax = nvalues + NADD
-	    call realloc (x, nmax, datatype)
-	    call realloc (y, nmax, datatype)
-	    call realloc (w, nmax, datatype)
+	    sz_val = nmax
+	    call realloc (x, sz_val, datatype)
+	    call realloc (y, sz_val, datatype)
+	    call realloc (w, sz_val, datatype)
 
 	    call gt_sets (gt, GTTITLE, Memc[fname])
 
@@ -258,9 +259,10 @@ begin
 		    call erract (EA_FATAL)
 	    } else if (n + 1 > buflen) {
 		buflen = buflen + SZ_BUF
-		call realloc (x, buflen, datatype)
-		call realloc (y, buflen, datatype)
-		call realloc (w, buflen, datatype)
+		sz_val = buflen
+		call realloc (x, sz_val, datatype)
+		call realloc (y, sz_val, datatype)
+		call realloc (w, sz_val, datatype)
 	    }
 
 	    # Decode the points to be plotted.
@@ -329,9 +331,10 @@ begin
 	    n = n + 1
 	}
 
-	call realloc (x, n, datatype)
-	call realloc (y, n, datatype)
-	call realloc (w, n, datatype)
+	sz_val = n
+	call realloc (x, sz_val, datatype)
+	call realloc (y, sz_val, datatype)
+	call realloc (w, sz_val, datatype)
 
 	switch (weighting) {
 	case CF_UNIFORM:

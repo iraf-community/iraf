@@ -63,7 +63,8 @@ begin
 	    IM_HDRLEN(im)  = LEN_IMHDR  + 
 	            (curlen + 10*36*81 + SZ_STRUCT-1) / SZ_STRUCT
 	    IM_LENHDRMEM(im) = IM_HDRLEN(im)  + (SZ_UAPAD / SZ_STRUCT)
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	    buflen = LEN_IMDES + IM_LENHDRMEM(im)
 	    max_lenuserarea = (buflen - IMU) * SZ_STRUCT - 1
 call eprintf("REALLOC MORE SPACE in UA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")

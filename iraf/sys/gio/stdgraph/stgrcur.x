@@ -392,7 +392,8 @@ begin
 	if (nchars > 0) {
 	    if (nchars > g_msgbuflen) {
 		g_msgbuflen = (nchars + SZ_MSGBUF - 1) / SZ_MSGBUF * SZ_MSGBUF
-		call realloc (g_msgbuf, g_msgbuflen, TY_CHAR)
+		sz_val = g_msgbuflen
+		call realloc (g_msgbuf, sz_val, TY_CHAR)
 	    }
 
 	    # We should encode this data transfer in a way that permits

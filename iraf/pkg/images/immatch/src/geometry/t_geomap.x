@@ -504,10 +504,11 @@ begin
 	    npts = npts + 1
 	    if (npts >= bufsize) {
 		bufsize = bufsize + GEO_DEFBUFSIZE
-		call realloc (xref, bufsize, TY_REAL)
-		call realloc (yref, bufsize, TY_REAL)
-		call realloc (xin, bufsize, TY_REAL)
-		call realloc (yin, bufsize, TY_REAL)
+		sz_val = bufsize
+		call realloc (xref, sz_val, TY_REAL)
+		call realloc (yref, sz_val, TY_REAL)
+		call realloc (xin, sz_val, TY_REAL)
+		call realloc (yin, sz_val, TY_REAL)
 	    }
 	}
 
@@ -521,10 +522,11 @@ begin
 	    xin = NULL
 	    yin = NULL
 	} else if (npts < bufsize) {
-	    call realloc (xref, npts, TY_REAL)
-	    call realloc (yref, npts, TY_REAL)
-	    call realloc (xin, npts, TY_REAL)
-	    call realloc (yin, npts, TY_REAL)
+	    sz_val = npts
+	    call realloc (xref, sz_val, TY_REAL)
+	    call realloc (yref, sz_val, TY_REAL)
+	    call realloc (xin, sz_val, TY_REAL)
+	    call realloc (yin, sz_val, TY_REAL)
 	}
 
 	return (npts)
@@ -1160,10 +1162,11 @@ begin
 	    npts = npts + 1
 	    if (npts >= bufsize) {
 		bufsize = bufsize + GEO_DEFBUFSIZE
-		call realloc (xref, bufsize, TY_DOUBLE)
-		call realloc (yref, bufsize, TY_DOUBLE)
-		call realloc (xin, bufsize, TY_DOUBLE)
-		call realloc (yin, bufsize, TY_DOUBLE)
+		sz_val = bufsize
+		call realloc (xref, sz_val, TY_DOUBLE)
+		call realloc (yref, sz_val, TY_DOUBLE)
+		call realloc (xin, sz_val, TY_DOUBLE)
+		call realloc (yin, sz_val, TY_DOUBLE)
 	    }
 	}
 
@@ -1177,10 +1180,11 @@ begin
 	    xin = NULL
 	    yin = NULL
 	} else if (npts < bufsize) {
-	    call realloc (xref, npts, TY_DOUBLE)
-	    call realloc (yref, npts, TY_DOUBLE)
-	    call realloc (xin, npts, TY_DOUBLE)
-	    call realloc (yin, npts, TY_DOUBLE)
+	    sz_val = npts
+	    call realloc (xref, sz_val, TY_DOUBLE)
+	    call realloc (yref, sz_val, TY_DOUBLE)
+	    call realloc (xin, sz_val, TY_DOUBLE)
+	    call realloc (yin, sz_val, TY_DOUBLE)
 	}
 
 	return (npts)

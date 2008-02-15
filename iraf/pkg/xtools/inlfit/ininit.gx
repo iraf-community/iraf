@@ -150,6 +150,7 @@ pointer	in			# INLFIT descriptor
 int	npts			# number of points
 int	nvars			# number of variables
 
+size_t	sz_val
 int	in_geti()
 
 begin
@@ -165,7 +166,8 @@ begin
 	# Reallocate space for rejected point list and initialize it.
 	if (in_geti (in, INLNPTS) != npts) {
 	    call in_puti (in, INLNPTS, npts)
-	    call realloc (IN_REJPTS (in), npts, TY_INT)
+	    sz_val = npts
+	    call realloc (IN_REJPTS (in), sz_val, TY_INT)
 	}
 	call amovki  (NO, Memi[IN_REJPTS(in)], npts)
 
@@ -173,7 +175,8 @@ begin
 	# Initialization is made afterwards.
 	if (in_geti (in, INLNVARS) != nvars) {
 	    call in_puti (in, INLNVARS, nvars)
-	    call realloc (IN_XMIN (in), nvars, TY_PIXEL)
-	    call realloc (IN_XMAX (in), nvars, TY_PIXEL)
+	    sz_val = nvars
+	    call realloc (IN_XMIN (in), sz_val, TY_PIXEL)
+	    call realloc (IN_XMAX (in), sz_val, TY_PIXEL)
 	}
 end

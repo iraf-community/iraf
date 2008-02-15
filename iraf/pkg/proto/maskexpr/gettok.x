@@ -171,7 +171,8 @@ begin
 		if (op + strlen(Memc[tokbuf]) + 3 > otop) {
 		    nchars = op - obuf
 		    len_obuf = len_obuf + INC_TOKBUF
-		    call realloc (obuf, len_obuf, TY_CHAR)
+		    sz_val = len_obuf
+		    call realloc (obuf, sz_val, TY_CHAR)
 		    otop = obuf + len_obuf
 		    op = obuf + nchars
 		}

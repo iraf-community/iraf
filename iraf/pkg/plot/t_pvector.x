@@ -966,7 +966,8 @@ begin
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
-	    call realloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call realloc (buf, sz_val, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	}

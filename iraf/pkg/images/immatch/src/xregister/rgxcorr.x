@@ -497,7 +497,8 @@ begin
 	    call rg_xsetp (xc, XCOR, xcor)
 	} else {
 	    xcor = rg_xstatp (xc, XCOR)
-	    call realloc (xcor, xwindow * ywindow, TY_REAL)
+	    sz_val = xwindow * ywindow
+	    call realloc (xcor, sz_val, TY_REAL)
 	    call rg_xsetp (xc, XCOR, xcor)
 	}
 
@@ -804,7 +805,8 @@ begin
 	    call rg_xsetp (xc, XCOR, xcor)
 	} else {
 	    xcor = rg_xstatp (xc, XCOR)
-	    call realloc (xcor, xwindow * ywindow, TY_REAL)
+	    sz_val = xwindow * ywindow
+	    call realloc (xcor, sz_val, TY_REAL)
 	    call rg_xsetp (xc, XCOR, xcor)
 	}
 

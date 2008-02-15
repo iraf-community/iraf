@@ -226,9 +226,10 @@ begin
 		# Make more space if vectors fill up.
 		if (nrg+4 > vlen) {
 		    vlen = vlen + INC_VLEN
-		    call realloc (xv, vlen, TY_REAL)
-		    call realloc (uv, vlen, TY_INT)
-		    call realloc (sv, vlen, TY_INT)
+		    sz_val = vlen
+		    call realloc (xv, sz_val, TY_REAL)
+		    call realloc (uv, sz_val, TY_INT)
+		    call realloc (sv, sz_val, TY_INT)
 		}
 
 		# Save range on intermediate breakpoint list.
@@ -354,8 +355,9 @@ pop_
 	    if (ov == 2) {
 		if (op > xlen) {
 		    xlen = xlen + INC_XLEN
-		    call realloc (xs, xlen, TY_REAL)
-		    call realloc (xe, xlen, TY_REAL)
+		    sz_val = xlen
+		    call realloc (xs, sz_val, TY_REAL)
+		    call realloc (xe, sz_val, TY_REAL)
 		}
 
 		Memr[xs+op-1] = n_xs

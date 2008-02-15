@@ -35,9 +35,10 @@ begin
 
 	nchars = imcssz (im, vs, ve, ndim, dtype, totpix, IM_WRITE)
 
-	if (nchars < BD_BUFSIZE(bdes))
-	    call realloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
-	else if (nchars > BD_BUFSIZE(bdes)) {
+	if (nchars < BD_BUFSIZE(bdes)) {
+	    sz_val = nchars
+	    call realloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)
+	} else if (nchars > BD_BUFSIZE(bdes)) {
 	    call mfree (BD_BUFPTR(bdes), TY_CHAR)
 	    sz_val = nchars
 	    call malloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)

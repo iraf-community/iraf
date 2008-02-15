@@ -173,7 +173,8 @@ begin
 	    nchars = rp - hd
 	    if (nchars + IDB_RECLEN + 2 > hdrlen) {
 		hdrlen = hdrlen + INC_HDRMEM
-		call realloc (hd, hdrlen, TY_CHAR)
+		sz_val = hdrlen
+		call realloc (hd, sz_val, TY_CHAR)
 		op = hd + nchars
 	    }
 	    # Copy the saved card, leave IP positioned to past newline.

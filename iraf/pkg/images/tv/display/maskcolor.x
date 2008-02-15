@@ -125,8 +125,10 @@ begin
 			    break
 		    }
 		    if (i > ncolors) {
-			if (mod (ncolors, 10) == 0)
-			    call realloc (colors, 4*(ncolors+10), TY_INT)
+			if (mod (ncolors, 10) == 0) {
+			    sz_val = 4*(ncolors+10)
+			    call realloc (colors, sz_val, TY_INT)
+			}
 			ncolors = ncolors + 1
 		    }
 		    j = 4 * i - 4

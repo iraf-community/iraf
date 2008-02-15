@@ -76,7 +76,8 @@ begin
 			    sz_val = nalloc
 			    call malloc (regions, sz_val, TY_STRUCT)
 			} else {
-			    call realloc (regions, nalloc, TY_STRUCT)
+			    sz_val = nalloc
+			    call realloc (regions, sz_val, TY_STRUCT)
 			}
 			sz_val = SZ_REGION
 			call salloc (Memi[regions+nregions], sz_val,

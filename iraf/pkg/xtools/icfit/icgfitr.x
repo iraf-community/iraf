@@ -118,11 +118,13 @@ begin
 		    call amovr (y, Memr[y1], n)
 		    call amovr (wts, Memr[w1], n)
 		} else {
-		    call realloc (x1, n+1, TY_REAL)
-		    call realloc (y1, n+1, TY_REAL)
-		    call realloc (w1, n+1, TY_REAL)
+		    sz_val = n+1
+		    call realloc (x1, sz_val, TY_REAL)
+		    call realloc (y1, sz_val, TY_REAL)
+		    call realloc (w1, sz_val, TY_REAL)
 		}
-		call realloc (userwts, n+1, TY_REAL)
+		sz_val = n+1
+		call realloc (userwts, sz_val, TY_REAL)
 
 		call icg_addr (gp, wx, wy, rx1, Memr[x1], Memr[y1],
 		    Memr[w1], Memr[userwts], n)

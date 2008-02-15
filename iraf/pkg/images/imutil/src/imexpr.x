@@ -148,7 +148,8 @@ begin
 	    nchars = fstatl (fd, F_FILESIZE)
 	    if (nchars > len_exprbuf) {
 		len_exprbuf = nchars
-		call realloc (expr, len_exprbuf, TY_CHAR)
+		sz_val = len_exprbuf
+		call realloc (expr, sz_val, TY_CHAR)
 	    }
 	    for (op=expr;  getci(fd,ch) != EOF;  op = op + 1) {
 		if (ch == '\n')
@@ -1115,6 +1116,7 @@ int	op			#U output pointer
 int	buflen			#U buffer length, chars
 char	token[ARB]		#I token string
 
+size_t	sz_val
 pointer	sym
 int	ip, ch1, ch2
 pointer	stfind()
@@ -1135,7 +1137,8 @@ begin
 	for (ip=1;  token[ip] != EOS;  ip=ip+1) {
 	    if (op + 1 > buflen) {
 		buflen = buflen + SZ_COMMAND
-		call realloc (text, buflen, TY_CHAR)
+		sz_val = buflen
+		call realloc (text, sz_val, TY_CHAR)
 	    }
 
 	    # The following is necessary because ctotok parses tokens such as

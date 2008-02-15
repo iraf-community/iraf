@@ -149,8 +149,9 @@ begin
 		TC_MAXDEVICES(tc) = TC_MAXDEVICES(tc) + INC_DEVICES
 		buflen = TC_MAXDEVICES(tc)
 		iferr {
-		    call realloc (TC_DEVNAME_P(tc), buflen, TY_INT)
-		    call realloc (TC_CAPLIST_P(tc), buflen, TY_INT)
+		    sz_val = buflen
+		    call realloc (TC_DEVNAME_P(tc), sz_val, TY_INT)
+		    call realloc (TC_CAPLIST_P(tc), sz_val, TY_INT)
 		} then
 		    call erract (EA_FATAL)
 	    }
@@ -188,6 +189,7 @@ int procedure tc_putstr (tc, str)
 
 pointer	tc
 char	str[ARB]
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -200,7 +202,8 @@ begin
 	nextch = TC_NEXTCH(tc)
 	if (nextch + nchars + 1 > TC_SZSBUF(tc)) {
 	    TC_SZSBUF(tc) = TC_SZSBUF(tc) + INC_SZSBUF
-	    call realloc (TC_SBUF(tc), TC_SZSBUF(tc), TY_CHAR)
+	    sz_val = TC_SZSBUF(tc)
+	    call realloc (TC_SBUF(tc), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[TC_SBUF(tc) + nextch], ARB)

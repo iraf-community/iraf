@@ -298,13 +298,15 @@ begin
 		nstr = nstr + 1
 		if (nstr > maxstr) {
 		    maxstr = maxstr + LEN_INDEXVECTOR
-		    call realloc (list, LEN_FNTBHDR + maxstr, TY_STRUCT)
+		    sz_val = LEN_FNTBHDR + maxstr
+		    call realloc (list, sz_val, TY_STRUCT)
 		}
 
 		# Out of space in string buffer?
 		if (nextch + (op - fname) >= sz_sbuf) {
 		    sz_sbuf = sz_sbuf + SZ_DEFSTRBUF
-		    call realloc (sbuf, sz_sbuf, TY_CHAR)
+		    sz_val = sz_sbuf
+		    call realloc (sbuf, sz_val, TY_CHAR)
 		}
 
 		# Save index of list element, move chars to string buffer.
@@ -331,8 +333,10 @@ begin
 	# Update the string buffer descriptor, return unused buffer space.
 	# Rewind the list in preparation for reading (set strnum=1).
 
-	call realloc (sbuf, nextch, TY_CHAR)
-	call realloc (list, LEN_FNTBHDR + nstr, TY_STRUCT)
+	sz_val = nextch
+	call realloc (sbuf, sz_val, TY_CHAR)
+	sz_val = LEN_FNTBHDR + nstr
+	call realloc (list, sz_val, TY_STRUCT)
 
 	B_NSTR(list)	= nstr
 	B_STRNUM(list)	= 1

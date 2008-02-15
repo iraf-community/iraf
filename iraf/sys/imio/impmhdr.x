@@ -123,7 +123,8 @@ begin
 	    nchars = op - bp
 	    if (sz_buf - nchars < IDB_RECLEN) {
 		sz_buf = sz_buf + INC_SZBUF
-		call realloc (bp, sz_buf, TY_CHAR)
+		sz_val = sz_buf
+		call realloc (bp, sz_val, TY_CHAR)
 		op = bp + nchars
 	    }
 
@@ -143,7 +144,8 @@ begin
 	# All done, terminate the string and return any extra space.
 	Memc[op] = EOS;  op = op + 1
 	nchars = op - bp
-	call realloc (bp, nchars, TY_CHAR)
+	sz_val = nchars
+	call realloc (bp, sz_val, TY_CHAR)
 
 	# Clean up.
 	call idb_close (idb)
@@ -302,7 +304,8 @@ begin
 	    if (nchars + IDB_RECLEN + 2 > sz_ua) {
 		hdrlen = hdrlen + INC_HDRMEM
 		IM_LENHDRMEM(im) = IM_LENHDRMEM(im) + INC_HDRMEM
-		call realloc (im, hdrlen, TY_STRUCT)
+		sz_val = hdrlen
+		call realloc (im, sz_val, TY_STRUCT)
 		sz_ua = (hdrlen - IMU) * SZ_STRUCT - 1
 		ua = IM_USERAREA(im)
 		op = ua + nchars

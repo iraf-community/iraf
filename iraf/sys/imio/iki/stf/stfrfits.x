@@ -247,8 +247,8 @@ begin
 
 	    # Free any unneeded space in the STF descriptor.
 	    if (STF_PCOUNT(stf) > 0) {
-		call realloc (stf,
-		    LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
+		sz_val = LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES
+		call realloc (stf, sz_val, TY_STRUCT)
 		rf_stf[slot] = stf
 	    }
 

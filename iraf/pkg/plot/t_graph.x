@@ -689,9 +689,10 @@ begin
 	    n = n + 1
 	    if (n > buflen) {
 		buflen = buflen + SZ_BUF
-		call realloc (x, buflen, TY_REAL)
-		call realloc (y, buflen, TY_REAL)
-		call realloc (size, buflen, TY_REAL)
+		sz_val = buflen
+		call realloc (x, sz_val, TY_REAL)
+		call realloc (y, sz_val, TY_REAL)
+		call realloc (size, sz_val, TY_REAL)
 	    }
 
 	    Memr[x+n-1] = xval
@@ -700,9 +701,10 @@ begin
 		Memr[size+n-1] = szmark
 	}
 
-	call realloc (x, n, TY_REAL)
-	call realloc (y, n, TY_REAL)
-	call realloc (size, n, TY_REAL)
+	sz_val = n
+	call realloc (x, sz_val, TY_REAL)
+	call realloc (y, sz_val, TY_REAL)
+	call realloc (size, sz_val, TY_REAL)
 
 	call close (fd)
 	call sfree (sp)

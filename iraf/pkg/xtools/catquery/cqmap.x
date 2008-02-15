@@ -70,19 +70,23 @@ begin
 
 		if (nrec == cq_alloc1) {
 		    cq_alloc1 = cq_alloc1 + CQ_ALLOC
-		    call realloc (CQ_OFFSETS(cq), cq_alloc1, TY_LONG)
-		    call realloc (CQ_NAMES(cq), cq_alloc1, TY_INT)
+		    sz_val = cq_alloc1
+		    call realloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
+		    call realloc (CQ_NAMES(cq), sz_val, TY_INT)
 		}
 		if (CQ_NAMEI(cq, nrec) + SZ_LINE >= cq_alloc2) {
 		    cq_alloc2 = cq_alloc2 + CQ_ALLOC * SZ_LINE
-		    call realloc (CQ_MAP(cq), cq_alloc2, TY_CHAR)
+		    sz_val = cq_alloc2
+		    call realloc (CQ_MAP(cq), sz_val, TY_CHAR)
 		}
 	    }
 	}
 
-	call realloc (CQ_MAP(cq), CQ_NAMEI(cq, nrec), TY_CHAR)
-	call realloc (CQ_OFFSETS(cq), CQ_NRECS(cq), TY_LONG)
-	call realloc (CQ_NAMES(cq), CQ_NRECS(cq), TY_INT)
+	sz_val = CQ_NAMEI(cq, nrec)
+	call realloc (CQ_MAP(cq), sz_val, TY_CHAR)
+	sz_val = CQ_NRECS(cq)
+	call realloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
+	call realloc (CQ_NAMES(cq), sz_val, TY_INT)
 	call mfree (str, TY_CHAR)
 
 	return (cq)

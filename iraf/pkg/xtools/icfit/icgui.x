@@ -112,6 +112,7 @@ procedure ic_help (ic)
 
 pointer	ic		#I ICFIT pointer
 
+size_t	sz_val
 int	i, fd, len_str, open(), getline()
 pointer	line, help
 errchk	open()
@@ -128,7 +129,8 @@ begin
 	    i = line - help
 	    if (i + SZ_LINE > len_str) {
 		len_str = len_str + 10 * SZ_LINE
-		call realloc (help, len_str, TY_CHAR)
+		sz_val = len_str
+		call realloc (help, sz_val, TY_CHAR)
 		line = help + i
 	    }
 	}

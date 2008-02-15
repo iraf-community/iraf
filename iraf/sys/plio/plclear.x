@@ -10,6 +10,7 @@ procedure pl_clear (pl)
 
 pointer	pl			#I mask descriptor
 
+size_t	sz_val
 pointer	lp
 int	n_len, i
 errchk	realloc
@@ -24,7 +25,8 @@ begin
 	    PL_LP(pl,i) = PL_EMPTYLINE
 	    
 	n_len = PL_LLBUFLEN
-	call realloc (PL_LLBP(pl), n_len, TY_SHORT)
+	sz_val = n_len
+	call realloc (PL_LLBP(pl), sz_val, TY_SHORT)
 
 	PL_LLLEN(pl) = n_len
 	PL_LLFREE(pl) = 0

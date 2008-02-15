@@ -167,9 +167,10 @@ begin
 		    if (j > 0) {
 			if (ncols == n) {
 			    n = n + 10
-			    call realloc (col, n, TY_INT)
-			    call realloc (pl1, n, TY_INT)
-			    call realloc (pl2, n, TY_INT)
+			    sz_val = n
+			    call realloc (col, sz_val, TY_INT)
+			    call realloc (pl1, sz_val, TY_INT)
+			    call realloc (pl2, sz_val, TY_INT)
 			}
 			j = 1 + l1 - 1
 			k = 1 + l2 - 1

@@ -151,19 +151,21 @@ procedure rg_prealloc (pm, nregions)
 pointer	pm		#I pointer to psfmatch structure
 int	nregions	#I number of regions
 
+size_t	sz_val
 int	nr
 int	rg_pstati()
 
 begin
 	nr = rg_pstati (pm, NREGIONS)
 
-	call realloc (PM_RC1(pm), nregions, TY_INT)
-	call realloc (PM_RC2(pm), nregions, TY_INT)
-	call realloc (PM_RL1(pm), nregions, TY_INT)
-	call realloc (PM_RL2(pm), nregions, TY_INT)
-	call realloc (PM_RZERO(pm), nregions, TY_REAL)
-	call realloc (PM_RXSLOPE(pm), nregions, TY_REAL)
-	call realloc (PM_RYSLOPE(pm), nregions, TY_REAL)
+	sz_val = nregions
+	call realloc (PM_RC1(pm), sz_val, TY_INT)
+	call realloc (PM_RC2(pm), sz_val, TY_INT)
+	call realloc (PM_RL1(pm), sz_val, TY_INT)
+	call realloc (PM_RL2(pm), sz_val, TY_INT)
+	call realloc (PM_RZERO(pm), sz_val, TY_REAL)
+	call realloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
+	call realloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
 
 	call amovki (INDEFI, Memi[PM_RC1(pm)+nr], nregions - nr)
 	call amovki (INDEFI, Memi[PM_RC2(pm)+nr], nregions - nr)

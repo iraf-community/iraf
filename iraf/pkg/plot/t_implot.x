@@ -385,10 +385,11 @@ nextim_		    	if (index < nim)
 
 			    npix   = max (ncols, nlines)
 			    call strcpy (command, image, SZ_FNAME)
-			    call realloc (xold, npix, TY_REAL)
-			    call realloc (yold, npix, TY_REAL)
-			    call realloc (xnew, npix, TY_REAL)
-			    call realloc (ynew, npix, TY_REAL)
+			    sz_val = npix
+			    call realloc (xold, sz_val, TY_REAL)
+			    call realloc (yold, sz_val, TY_REAL)
+			    call realloc (xnew, sz_val, TY_REAL)
+			    call realloc (ynew, sz_val, TY_REAL)
 
 			    if (lineplot)
 				goto line_
@@ -633,10 +634,11 @@ replotcol_
 
 				npix   = max (ncols, nlines)
 				call strcpy (command[ip], image, SZ_FNAME)
-				call realloc (xold, npix, TY_REAL)
-				call realloc (yold, npix, TY_REAL)
-				call realloc (xnew, npix, TY_REAL)
-				call realloc (ynew, npix, TY_REAL)
+				sz_val = npix
+				call realloc (xold, sz_val, TY_REAL)
+				call realloc (yold, sz_val, TY_REAL)
+				call realloc (xnew, sz_val, TY_REAL)
+				call realloc (ynew, sz_val, TY_REAL)
 			    }
 
 			case 'w':

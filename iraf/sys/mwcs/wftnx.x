@@ -160,7 +160,8 @@ begin
 		if (strlen (Memc[atvalue]) < szatstr)
 		    break
 		szatstr = szatstr + SZ_LINE 
-		call realloc (atvalue, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atvalue, sz_val, TY_CHAR)
 
 	    }
 	} then {
@@ -180,7 +181,8 @@ begin
 		if (strlen (Memc[atvalue]) < szatstr)
 		    break
 		szatstr = szatstr + SZ_LINE 
-		call realloc (atvalue, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atvalue, sz_val, TY_CHAR)
 	    }
 	} then {
 	    FC_LATCOR(fc) = NULL

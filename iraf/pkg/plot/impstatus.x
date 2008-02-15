@@ -8,6 +8,7 @@ procedure sl_init (sl, nlines)
 pointer	sl			# Pointer to status lines
 int	nlines			# Number of lines
 
+size_t	sz_val
 int	i
 
 begin
@@ -15,7 +16,8 @@ begin
 	if (sl == NULL)
 	    call calloc (sl, i, TY_CHAR)
 	else {
-	    call realloc (sl, i, TY_CHAR)
+	    sz_val = i
+	    call realloc (sl, sz_val, TY_CHAR)
 	    call aclrc (Memc[sl], i)
 	}
 	Memc[sl] = nlines

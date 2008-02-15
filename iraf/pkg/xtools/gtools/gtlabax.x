@@ -43,12 +43,14 @@ begin
 		if (GT_SYSID(gt) == YES) {
 		    call sysid (Memc[title], len)
 		    len = len + strlen (Memc[title]) + 1
-		    call realloc (title, len, TY_CHAR)
+		    sz_val = len
+		    call realloc (title, sz_val, TY_CHAR)
 		    nl = YES 
 		}
 		if (GT_PARAMS(gt) != NULL) {
 		    len = len + strlen (Memc[GT_PARAMS(gt)]) + 1
-		    call realloc (title, len, TY_CHAR)
+		    sz_val = len
+		    call realloc (title, sz_val, TY_CHAR)
 		    if (nl == YES)
 			call strcat ("\n", Memc[title], len)
 		    call strcat (Memc[GT_PARAMS(gt)], Memc[title], len)
@@ -56,7 +58,8 @@ begin
 		}
 		if (GT_TITLE(gt) != NULL) {
 		    len = len + strlen (Memc[GT_TITLE(gt)]) + 1
-		    call realloc (title, len, TY_CHAR)
+		    sz_val = len
+		    call realloc (title, sz_val, TY_CHAR)
 		    if (nl == YES)
 			call strcat ("\n", Memc[title], len)
 		    call strcat (Memc[GT_TITLE(gt)], Memc[title], len)
@@ -64,7 +67,8 @@ begin
 		}
 		if (GT_SUBTITLE(gt) != NULL) {
 		    len = len + strlen (Memc[GT_SUBTITLE(gt)]) + 1
-		    call realloc (title, len, TY_CHAR)
+		    sz_val = len
+		    call realloc (title, sz_val, TY_CHAR)
 		    if (nl == YES)
 			call strcat ("\n", Memc[title], len)
 		    call strcat (Memc[GT_SUBTITLE(gt)], Memc[title], len)
@@ -72,7 +76,8 @@ begin
 		}
 		if (GT_COMMENTS(gt) != NULL) {
 		    len = len + strlen (Memc[GT_COMMENTS(gt)]) + 1
-		    call realloc (title, len, TY_CHAR)
+		    sz_val = len
+		    call realloc (title, sz_val, TY_CHAR)
 		    if (nl == YES)
 			call strcat ("\n", Memc[title], len)
 		    call strcat (Memc[GT_COMMENTS(gt)], Memc[title], len)

@@ -254,6 +254,7 @@ procedure rg_lrealloc (ls, nregions)
 pointer	ls		#I pointer to the intensity scaling structure
 int	nregions	#I the number of regions
 
+size_t	sz_val
 int	nr
 int	rg_lstati()
 
@@ -261,41 +262,45 @@ begin
 	nr = rg_lstati (ls, NREGIONS)
 
 	# Resize the region definition buffers.
-	call realloc (LS_RC1(ls), nregions, TY_INT)
-	call realloc (LS_RC2(ls), nregions, TY_INT)
-	call realloc (LS_RL1(ls), nregions, TY_INT)
-	call realloc (LS_RL2(ls), nregions, TY_INT)
-	call realloc (LS_RXSTEP(ls), nregions, TY_INT)
-	call realloc (LS_RYSTEP(ls), nregions, TY_INT)
+	sz_val = nregions
+	call realloc (LS_RC1(ls), sz_val, TY_INT)
+	call realloc (LS_RC2(ls), sz_val, TY_INT)
+	call realloc (LS_RL1(ls), sz_val, TY_INT)
+	call realloc (LS_RL2(ls), sz_val, TY_INT)
+	call realloc (LS_RXSTEP(ls), sz_val, TY_INT)
+	call realloc (LS_RYSTEP(ls), sz_val, TY_INT)
 
 	# Resize the statistics buffers.
-	call realloc (LS_RMEAN(ls), nregions, TY_REAL)
-	call realloc (LS_RMEDIAN(ls), nregions, TY_REAL)
-	call realloc (LS_RMODE(ls), nregions, TY_REAL)
-	call realloc (LS_RSIGMA(ls), nregions, TY_REAL)
-	call realloc (LS_RSKY(ls), nregions, TY_REAL)
-	call realloc (LS_RSKYERR(ls), nregions, TY_REAL)
-	call realloc (LS_RMAG(ls), nregions, TY_REAL)
-	call realloc (LS_RMAGERR(ls), nregions, TY_REAL)
-	call realloc (LS_RNPTS(ls), nregions, TY_INT)
+	sz_val = nregions
+	call realloc (LS_RMEAN(ls), sz_val, TY_REAL)
+	call realloc (LS_RMEDIAN(ls), sz_val, TY_REAL)
+	call realloc (LS_RMODE(ls), sz_val, TY_REAL)
+	call realloc (LS_RSIGMA(ls), sz_val, TY_REAL)
+	call realloc (LS_RSKY(ls), sz_val, TY_REAL)
+	call realloc (LS_RSKYERR(ls), sz_val, TY_REAL)
+	call realloc (LS_RMAG(ls), sz_val, TY_REAL)
+	call realloc (LS_RMAGERR(ls), sz_val, TY_REAL)
+	call realloc (LS_RNPTS(ls), sz_val, TY_INT)
 
-	call realloc (LS_IMEAN(ls), nregions, TY_REAL)
-	call realloc (LS_IMEDIAN(ls), nregions, TY_REAL)
-	call realloc (LS_IMODE(ls), nregions, TY_REAL)
-	call realloc (LS_ISIGMA(ls), nregions, TY_REAL)
-	call realloc (LS_ISKY(ls), nregions, TY_REAL)
-	call realloc (LS_ISKYERR(ls), nregions, TY_REAL)
-	call realloc (LS_IMAG(ls), nregions, TY_REAL)
-	call realloc (LS_IMAGERR(ls), nregions, TY_REAL)
-	call realloc (LS_INPTS(ls), nregions, TY_INT)
+	sz_val = nregions
+	call realloc (LS_IMEAN(ls), sz_val, TY_REAL)
+	call realloc (LS_IMEDIAN(ls), sz_val, TY_REAL)
+	call realloc (LS_IMODE(ls), sz_val, TY_REAL)
+	call realloc (LS_ISIGMA(ls), sz_val, TY_REAL)
+	call realloc (LS_ISKY(ls), sz_val, TY_REAL)
+	call realloc (LS_ISKYERR(ls), sz_val, TY_REAL)
+	call realloc (LS_IMAG(ls), sz_val, TY_REAL)
+	call realloc (LS_IMAGERR(ls), sz_val, TY_REAL)
+	call realloc (LS_INPTS(ls), sz_val, TY_INT)
 
 	# Resize the answers buffers.
-	call realloc (LS_RBSCALE(ls), nregions, TY_REAL)
-	call realloc (LS_RBSCALEERR(ls), nregions, TY_REAL)
-	call realloc (LS_RBZERO(ls), nregions, TY_REAL)
-	call realloc (LS_RBZEROERR(ls), nregions, TY_REAL)
-	call realloc (LS_RDELETE(ls), nregions, TY_INT)
-	call realloc (LS_RCHI(ls), nregions, TY_REAL)
+	sz_val = nregions
+	call realloc (LS_RBSCALE(ls), sz_val, TY_REAL)
+	call realloc (LS_RBSCALEERR(ls), sz_val, TY_REAL)
+	call realloc (LS_RBZERO(ls), sz_val, TY_REAL)
+	call realloc (LS_RBZEROERR(ls), sz_val, TY_REAL)
+	call realloc (LS_RDELETE(ls), sz_val, TY_INT)
+	call realloc (LS_RCHI(ls), sz_val, TY_REAL)
 
 	# Reinitialize the region defintions.
 	call amovi (INDEFI, Memi[LS_RC1(ls)+nr], nregions - nr)

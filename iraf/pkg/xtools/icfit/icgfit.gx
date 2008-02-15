@@ -118,11 +118,13 @@ begin
 		    call amov$t (y, Mem$t[y1], n)
 		    call amov$t (wts, Mem$t[w1], n)
 		} else {
-		    call realloc (x1, n+1, TY_PIXEL)
-		    call realloc (y1, n+1, TY_PIXEL)
-		    call realloc (w1, n+1, TY_PIXEL)
+		    sz_val = n+1
+		    call realloc (x1, sz_val, TY_PIXEL)
+		    call realloc (y1, sz_val, TY_PIXEL)
+		    call realloc (w1, sz_val, TY_PIXEL)
 		}
-		call realloc (userwts, n+1, TY_PIXEL)
+		sz_val = n+1
+		call realloc (userwts, sz_val, TY_PIXEL)
 
 		call icg_add$t (gp, wx, wy, rx1, Mem$t[x1], Mem$t[y1],
 		    Mem$t[w1], Mem$t[userwts], n)

@@ -143,7 +143,8 @@ begin
 		nrecs = nrecs + 1
 		if (nrecs >= szindex) {
 		    szindex = szindex + DEF_SZ_INDEX
-	    	    call realloc (CQ_RINDEX(res), szindex, TY_LONG)
+	    	    sz_val = szindex
+	    	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
 		    call aclrl (Meml[CQ_RINDEX(res)+szindex-DEF_SZ_INDEX],
 		        DEF_SZ_INDEX)
 		}
@@ -162,7 +163,8 @@ begin
 	    CQ_RNRECS(res) = nrecs
 
 	    # Resize the index array.
-	    call realloc (CQ_RINDEX(res), max (1, CQ_RNRECS(res) + 1), TY_LONG)
+	    sz_val = max (1, CQ_RNRECS(res) + 1)
+	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
 
 	default:
 	    ;
@@ -302,7 +304,8 @@ begin
 		nrecs = nrecs + 1
 		if (nrecs >= szindex) {
 		    szindex = szindex + DEF_SZ_INDEX
-	    	    call realloc (CQ_RINDEX(res), szindex, TY_LONG)
+	    	    sz_val = szindex
+	    	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
 		    call aclrl (Meml[CQ_RINDEX(res)+szindex-DEF_SZ_INDEX],
 		        DEF_SZ_INDEX)
 		}
@@ -321,7 +324,8 @@ begin
 	    CQ_RNRECS(res) = nrecs
 
 	    # Trim the trailing records.
-	    call realloc (CQ_RINDEX(res), max (1, CQ_RNRECS(res) + 1), TY_LONG)
+	    sz_val = max (1, CQ_RNRECS(res) + 1)
+	    call realloc (CQ_RINDEX(res), sz_val, TY_LONG)
 
 	default:
 	    ;
@@ -458,7 +462,8 @@ begin
 		# Add the keyword name to the list.
 		if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
 		    sz1 = sz1 + SZ_LINE
-		    call realloc (CQ_HKNAMES(res), sz1, TY_CHAR)
+		    sz_val = sz1
+		    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
 		}
 		op1 = op1 + gstrcpy (Memc[kname], Memc[CQ_HKNAMES(res)+op1-1],
 		    sz1 - op1 + 1)
@@ -468,7 +473,8 @@ begin
 		# Add the keyword value to the list.
 		if ((sz2 - op2 + 1) < (CQ_SZ_QPVALUE + 1)) {
 		    sz2 = sz2 + SZ_LINE
-		    call realloc (CQ_HKVALUES(res), sz2, TY_CHAR)
+		    sz_val = sz2
+		    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
 		}
 		op2 = op2 + gstrcpy (Memc[query], Memc[CQ_HKVALUES(res)+op2-1],
 		    sz2 - op2 + 1)
@@ -482,13 +488,16 @@ begin
 	# Resize the header keyword  and value arrays.
 	if (ncount != CQ_NHEADER(res)) {
 	    CQ_NHEADER(res) = 0
-	    call realloc (CQ_HKNAMES(res), 1, TY_CHAR)
-	    call realloc (CQ_HKVALUES(res), 1, TY_CHAR)
+	    sz_val = 1
+	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
 	    Memc[CQ_HKNAMES(res)] = EOS
 	    Memc[CQ_HKVALUES(res)] = EOS
 	} else {
-	    call realloc (CQ_HKNAMES(res), op1, TY_CHAR)
-	    call realloc (CQ_HKVALUES(res), op2, TY_CHAR)
+	    sz_val = op1
+	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+	    sz_val = op2
+	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
 	    Memc[CQ_HKNAMES(res)+op1] = EOS
 	    Memc[CQ_HKVALUES(res)+op2] = EOS
 	}
@@ -540,7 +549,8 @@ begin
 		# Add the field name to the field name dictionary.
                 if ((sz1 - op1 + 1) < (CQ_SZ_FNAME + 1)) {
                     sz1 = sz1 + SZ_LINE
-                    call realloc (CQ_FNAMES(res), sz1, TY_CHAR)
+                    sz_val = sz1
+                    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
                 }
                 op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_FNAMES(res)+op1-1],
                     sz1 - op1 + 1)
@@ -555,7 +565,8 @@ begin
 		# Add the field units to the field units dictionary.
                 if ((sz2 - op2 + 1) < (CQ_SZ_FUNITS + 1)) {
                     sz2 = sz2 + SZ_LINE
-                    call realloc (CQ_FUNITS(res), sz2, TY_CHAR)
+                    sz_val = sz2
+                    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
                 }
                 op2 = op2 + gstrcpy (Memc[funits], Memc[CQ_FUNITS(res)+op2-1],
                     sz2 - op2 + 1)
@@ -565,7 +576,8 @@ begin
 		# Add the field format to the field format dictionary.
                 if ((sz3 - op3 + 1) < (CQ_SZ_FFMTS + 1)) {
                     sz3 = sz3 + SZ_LINE
-                    call realloc (CQ_FFMTS(res), sz3, TY_CHAR)
+                    sz_val = sz3
+                    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
                 }
                 op3 = op3 + gstrcpy (Memc[ffmt], Memc[CQ_FFMTS(res)+op3-1],
                     sz3 - op3 + 1)
@@ -579,19 +591,25 @@ begin
 	# Adjust the field description size.
 	if (ncount != CQ_NFIELDS(res)) {
 	    CQ_NFIELDS(res) = 0
-	    call realloc (CQ_FNAMES(res), 1, TY_CHAR)
+	    sz_val = 1
+	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
 	    Memc[CQ_FNAMES(res)] = EOS
 	    call mfree (CQ_FOFFSETS(res), TY_INT); CQ_FOFFSETS(res) = NULL
 	    call mfree (CQ_FSIZES(res), TY_INT); CQ_FSIZES(res) = NULL
 	    call mfree (CQ_FTYPES(res), TY_INT); CQ_FTYPES(res) = NULL
-	    call realloc (CQ_FUNITS(res), 1, TY_CHAR)
+	    sz_val = 1
+	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
 	    Memc[CQ_FUNITS(res)] = EOS
-	    call realloc (CQ_FFMTS(res), 1, TY_CHAR)
+	    sz_val = 1
+	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
 	    Memc[CQ_FFMTS(res)] = EOS
 	} else {
-	    call realloc (CQ_FNAMES(res), op1, TY_CHAR)
-	    call realloc (CQ_FUNITS(res), op2, TY_CHAR)
-	    call realloc (CQ_FFMTS(res), op3, TY_CHAR)
+	    sz_val = op1
+	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
+	    sz_val = op2
+	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
+	    sz_val = op3
+	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
 	    Memc[CQ_FNAMES(res)+op1] = EOS
 	    Memc[CQ_FUNITS(res)+op2] = EOS
 	    Memc[CQ_FFMTS(res)+op3] = EOS
@@ -756,7 +774,8 @@ begin
 			# Add the keyword name to the keyword dictionary.
                 	if ((sz1 - op1 + 1) < (CQ_SZ_QPNAME + 1)) {
                     	    sz1 = sz1 + SZ_LINE
-                    	    call realloc (CQ_HKNAMES(res), sz1, TY_CHAR)
+                    	    sz_val = sz1
+                    	    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
                         }
                 	op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_HKNAMES(res)+
 			    op1-1], sz1 - op1 + 1)
@@ -766,7 +785,8 @@ begin
 			# Add the keyword value to the keyword value dictionary.
                 	if ((sz2 - op2 + 1) < (CQ_SZ_QPVALUE + 1)) {
                     	    sz2 = sz2 + SZ_LINE
-                    	    call realloc (CQ_HKVALUES(res), sz2, TY_CHAR)
+                    	    sz_val = sz2
+                    	    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
                 	}
                 	op2 = op2 + gstrcpy (Memc[fvalue],
 			    Memc[CQ_HKVALUES(res)+ op2-1], sz2 - op2 + 1)
@@ -780,13 +800,16 @@ begin
 		# Addjust the keyword dictionary sizes.
 	    	if (ncount != CQ_NHEADER(res)) {
                     CQ_NHEADER(res) = 0
-                    call realloc (CQ_HKNAMES(res), 1, TY_CHAR)
-                    call realloc (CQ_HKVALUES(res), 1, TY_CHAR)
+                    sz_val = 1
+                    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+                    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
                     Memc[CQ_HKNAMES(res)] = EOS
                     Memc[CQ_HKVALUES(res)] = EOS
 		} else {
-                    call realloc (CQ_HKNAMES(res), op1, TY_CHAR)
-                    call realloc (CQ_HKVALUES(res), op2, TY_CHAR)
+                    sz_val = op1
+                    call realloc (CQ_HKNAMES(res), sz_val, TY_CHAR)
+                    sz_val = op2
+                    call realloc (CQ_HKVALUES(res), sz_val, TY_CHAR)
                     Memc[CQ_HKNAMES(res)+op1] = EOS
                     Memc[CQ_HKVALUES(res)+op2] = EOS
 		}
@@ -831,7 +854,8 @@ begin
 			# Add the field name to the field name dictionary.
                 	if ((sz1 - op1 + 1) < (CQ_SZ_FNAME + 1)) {
                     	    sz1 = sz1 + SZ_LINE
-                    	    call realloc (CQ_FNAMES(res), sz1, TY_CHAR)
+                    	    sz_val = sz1
+                    	    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR)
                         }
                 	op1 = op1 + gstrcpy (Memc[fname], Memc[CQ_FNAMES(res)+
 			    op1-1], sz1 - op1 + 1)
@@ -845,7 +869,8 @@ begin
 			# Add the field units to the field units dictionary.
                 	if ((sz2 - op2 + 1) < (CQ_SZ_FUNITS + 1)) {
                     	    sz2 = sz2 + SZ_LINE
-                    	    call realloc (CQ_FUNITS(res), sz2, TY_CHAR)
+                    	    sz_val = sz2
+                    	    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR)
                 	}
                 	op2 = op2 + gstrcpy (Memc[funits],
 			    Memc[CQ_FUNITS(res)+ op2-1], sz2 - op2 + 1)
@@ -855,7 +880,8 @@ begin
 			# Add the field format to the field formats dictionary.
                 	if ((sz3 - op3 + 1) < (CQ_SZ_FFMTS + 1)) {
                     	    sz3 = sz3 + SZ_LINE
-                    	    call realloc (CQ_FFMTS(res), sz3, TY_CHAR)
+                    	    sz_val = sz3
+                    	    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR)
                 	}
                 	op3 = op3 + gstrcpy (Memc[ffmt],
 			    Memc[CQ_FFMTS(res)+ op3 -1], sz3 - op3 + 1)
@@ -867,7 +893,8 @@ begin
 		}
 	    	if (ncount != CQ_NFIELDS(res)) {
 		    CQ_NFIELDS(res) = 0
-		    call realloc (CQ_FNAMES(res), 1, TY_CHAR) 
+		    sz_val = 1
+		    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR) 
 		    Memc[CQ_FNAMES(res]) = EOS
 		    call mfree (CQ_FOFFSETS(res), TY_INT)
 		    CQ_FOFFSETS(res) = NULL
@@ -875,14 +902,19 @@ begin
 		    CQ_FSIZES(res) = NULL
 		    call mfree (CQ_FTYPES(res), TY_INT)
 		    CQ_FTYPES(res) = NULL
-		    call realloc (CQ_FUNITS(res), 1, TY_CHAR) 
+		    sz_val = 1
+		    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR) 
 		    Memc[CQ_FUNITS(res)] = EOS
-		    call realloc (CQ_FFMTS(res), 1, TY_CHAR) 
+		    sz_val = 1
+		    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR) 
 		    Memc[CQ_FFMTS(res)] = EOS
 	    	} else {
-		    call realloc (CQ_FNAMES(res), op1, TY_CHAR) 
-		    call realloc (CQ_FUNITS(res), op2, TY_CHAR) 
-		    call realloc (CQ_FFMTS(res), op3, TY_CHAR) 
+		    sz_val = op1
+		    call realloc (CQ_FNAMES(res), sz_val, TY_CHAR) 
+		    sz_val = op2
+		    call realloc (CQ_FUNITS(res), sz_val, TY_CHAR) 
+		    sz_val = op3
+		    call realloc (CQ_FFMTS(res), sz_val, TY_CHAR) 
 		    Memc[CQ_FNAMES(res]+op1) = EOS
 		    Memc[CQ_FUNITS(res)+op2] = EOS
 		    Memc[CQ_FFMTS(res)+op3] = EOS

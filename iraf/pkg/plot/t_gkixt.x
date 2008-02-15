@@ -311,7 +311,8 @@ begin
 
 	    if (I_LENGTH(ibuf) > len_ibuf) {
 		len_ibuf = I_LENGTH(ibuf)
-		call realloc (ibuf, len_ibuf, TY_SHORT)
+		sz_val = len_ibuf
+		call realloc (ibuf, sz_val, TY_SHORT)
 	    }
 
 	    nchars = (I_LENGTH(ibuf) - LEN_GKIHDR) * SZ_SHORT

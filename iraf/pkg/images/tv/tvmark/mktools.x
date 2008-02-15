@@ -120,34 +120,39 @@ int	nellipses 	# number of ellipses
 int	nsquares	# number of squares
 int	nrectangles	# number of rectangles
 
+size_t	sz_val
 int	nc, ne, ns, nr
 int	mk_stati()
 
 begin
-	if (ncircles > 0)
-	    call realloc (MK_RADII(mk), ncircles, TY_REAL)
-	else {
+	if (ncircles > 0) {
+	    sz_val = ncircles
+	    call realloc (MK_RADII(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_RADII(mk), TY_REAL)
 	    MK_RADII(mk) = NULL
 	}
 
-	if (nellipses > 0) 
-	    call realloc (MK_AXES(mk), nellipses, TY_REAL)
-	else {
+	if (nellipses > 0) {
+	    sz_val = nellipses
+	    call realloc (MK_AXES(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_AXES(mk), TY_REAL)
 	    MK_AXES(mk) = NULL
 	}
 
-	if (nsquares > 0)
-	    call realloc (MK_SLENGTHS(mk), nsquares, TY_REAL)
-	else {
+	if (nsquares > 0) {
+	    sz_val = nsquares
+	    call realloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_SLENGTHS(mk), TY_REAL)
 	    MK_SLENGTHS(mk) = NULL
 	}
 
-	if (nrectangles > 0)
-	    call realloc (MK_RLENGTHS(mk), nrectangles, TY_REAL)
-	else {
+	if (nrectangles > 0) {
+	    sz_val = nrectangles
+	    call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_RLENGTHS(mk), TY_REAL)
 	    MK_RLENGTHS(mk) = NULL
 	}
@@ -486,7 +491,8 @@ begin
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_CSTRING(mk), SZ_FNAME)
 		MK_NCIRCLES(mk) = ntemp
-		call realloc (MK_RADII(mk), ntemp, TY_REAL)
+		sz_val = ntemp
+		call realloc (MK_RADII(mk), sz_val, TY_REAL)
 		call amovr (Memr[rtemp], Memr[MK_RADII(mk)], ntemp)
 		call asrtr (Memr[MK_RADII(mk)], Memr[MK_RADII(mk)], ntemp)
 	    }
@@ -500,7 +506,8 @@ begin
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_RSTRING(mk), SZ_FNAME)
 		MK_NRECTANGLES(mk) = ntemp
-		call realloc (MK_RLENGTHS(mk), ntemp, TY_REAL)
+		sz_val = ntemp
+		call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
 		call amovr (Memr[rtemp], Memr[MK_RLENGTHS(mk)], ntemp)
 		call asrtr (Memr[MK_RLENGTHS(mk)], Memr[MK_RLENGTHS(mk)], ntemp)
 	    }

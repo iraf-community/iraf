@@ -86,6 +86,7 @@ int	linemin		# minimum line number
 int	linemax		# maximum line number
 int	ranges[ARB]	# ranges
 
+size_t	sz_val
 int	i, j, lc
 int	olp, lp, lnull, lold
 int	nr, nnewr, noldr
@@ -120,7 +121,8 @@ begin
 		    # check the size of the list
 		    if (PRL_SZLIST(pl) < (nr + PRL_LP(pl))) {
 	    		PRL_SZLIST(pl) = PRL_SZLIST(pl) + nr + 1 
-	    		call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	    		sz_val = PRL_SZLIST(pl)
+	    		call realloc (PRL_LIST(pl), sz_val, TY_INT)
 		    }
 
 		    # move ranges and reset pointers
@@ -152,7 +154,8 @@ begin
 		    # check size of list
 	            if (PRL_SZLIST(pl) < (nnewr + PRL_LP(pl))) {
 		        PRL_SZLIST(pl) = PRL_SZLIST(pl) + nnewr + 1
-	                call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	                sz_val = PRL_SZLIST(pl)
+	                call realloc (PRL_LIST(pl), sz_val, TY_INT)
 		    }
 
 		    # add ranges to list and update pointers
@@ -290,6 +293,7 @@ int	linemin		# minimum line
 int	linemax		# maximum line
 int	ranges[ARB]	# list of ranges
 
+size_t	sz_val
 int	i
 int	len_range
 
@@ -306,7 +310,8 @@ begin
 	# check space allocation
 	if (PRL_SZLIST(pl) < (len_range + PRL_LP(pl))) {
 	    PRL_SZLIST(pl) = PRL_SZLIST(pl) + len_range + 1
-	    call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	    sz_val = PRL_SZLIST(pl)
+	    call realloc (PRL_LIST(pl), sz_val, TY_INT)
 	}
 
 	# set the line pointers

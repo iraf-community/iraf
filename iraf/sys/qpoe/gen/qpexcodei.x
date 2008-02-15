@@ -156,8 +156,9 @@ bbmask_		    call eprintf ("%s: bad bitmask expression `%s'\n")
 	nranges = qpex_parsei (expr, xs_buf, xe_buf, xlen)
 	if (xlen < nranges * 2) {
 	    xlen = nranges * 2
-	    call realloc (xs_buf, xlen, TY_INT)
-	    call realloc (xe_buf, xlen, TY_INT)
+	    sz_val = xlen
+	    call realloc (xs_buf, sz_val, TY_INT)
+	    call realloc (xe_buf, sz_val, TY_INT)
 	}
 
 	xs = xs_buf

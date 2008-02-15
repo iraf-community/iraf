@@ -327,8 +327,10 @@ begin
 		call rng_error (4, rstr, r1, r2, dr, rg)
 
 	    nrgs = RNG_NRNGS(rg)
-	    if (mod (nrgs, RNG_ALLOC) == 0)
-		call realloc (rg, LEN_RNG+4*(nrgs+RNG_ALLOC), TY_STRUCT)
+	    if (mod (nrgs, RNG_ALLOC) == 0) {
+		sz_val = LEN_RNG+4*(nrgs+RNG_ALLOC)
+		call realloc (rg, sz_val, TY_STRUCT)
+	    }
 	    nrgs = nrgs + 1
 	    RNG_NRNGS(rg) = nrgs
 	    RNG_X1(rg, nrgs) = x1

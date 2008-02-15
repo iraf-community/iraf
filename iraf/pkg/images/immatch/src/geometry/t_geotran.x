@@ -542,8 +542,9 @@ begin
 	    GT_DISTORT)) {
 
 	    # Get the distortion coefficients.
-	    call realloc (xcoeff, ncoeff, TY_REAL)
-	    call realloc (ycoeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call realloc (xcoeff, sz_val, TY_REAL)
+	    call realloc (ycoeff, sz_val, TY_REAL)
 	    do i = 1, ncoeff {
 	        junk = dtscan(dt)
 	        call gargr (Memr[xcoeff+i-1])

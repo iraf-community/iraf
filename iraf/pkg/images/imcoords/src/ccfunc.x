@@ -356,7 +356,8 @@ begin
                     if (strlen(Memc[atstr]) < szatstr)
                         break
                     szatstr = szatstr + SZ_LINE
-                    call realloc (atstr, szatstr, TY_CHAR)
+                    sz_val = szatstr
+                    call realloc (atstr, sz_val, TY_CHAR)
                 }
                 if (Memc[atstr] == EOS)
                     break
@@ -652,7 +653,8 @@ begin
             szpar = strlen (Memc[par])
             if (szpar > (szatstr - op)) {
                 szatstr = szatstr + SZ_LINE
-                call realloc (atstr, szatstr, TY_CHAR)
+                sz_val = szatstr
+                call realloc (atstr, sz_val, TY_CHAR)
             }
             op = op + gstrcpy (Memc[par], Memc[atstr+op], SZ_LINE)
 

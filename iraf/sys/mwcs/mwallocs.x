@@ -14,6 +14,7 @@ int procedure mw_allocs (mw, nchars)
 pointer	mw		#I pointer to MWCS descriptor
 int	nchars		#I number of chars to allocate space for
 
+size_t	sz_val
 int	sbufused, sbuflen, offset, nelem
 errchk	realloc
 
@@ -29,7 +30,8 @@ begin
 	    while (sbufused + nelem > sbuflen)
 		sbuflen = sbuflen + INC_SZSBUF
 
-	    call realloc (MI_SBUF(mw), sbuflen, TY_CHAR)
+	    sz_val = sbuflen
+	    call realloc (MI_SBUF(mw), sz_val, TY_CHAR)
 	    call aclrc (S(mw,offset), sbuflen - offset + 1)
 	    MI_SBUFLEN(mw) = sbuflen
 	}

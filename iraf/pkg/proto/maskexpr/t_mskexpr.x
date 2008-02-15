@@ -106,7 +106,8 @@ begin
 	    nchars = fstatl (fd, F_FILESIZE)
 	    if (nchars > len_exprbuf) {
 		len_exprbuf = nchars
-		call realloc (expr, len_exprbuf, TY_CHAR)
+		sz_val = len_exprbuf
+		call realloc (expr, sz_val, TY_CHAR)
 	    }
 	    for (op = expr;  getci(fd, ch) != EOF;  op = op + 1) {
 		if (ch == '\n')

@@ -491,17 +491,21 @@ int     dtype                           #i type of pointer to alloc
 pointer pix                             #o output pixel array ptr
 int     totpix                          #o total no. of output pixels
 
+size_t	sz_val
 int     i, j, ip
 
 begin
         # Calculate the number of output pixels and allocate the pointer.
         totpix = nptrs * npix
-	if (dtype != TY_CHAR && dtype != TY_UBYTE)
-            call realloc (pix, totpix, dtype)
-	else {
-            call realloc (pix, totpix, TY_CHAR)
-	    do i = 1, nptrs
+	if (dtype != TY_CHAR && dtype != TY_UBYTE) {
+            sz_val = totpix
+            call realloc (pix, sz_val, dtype)
+	} else {
+            sz_val = totpix
+            call realloc (pix, sz_val, TY_CHAR)
+	    do i = 1, nptrs {
 		call achtbs (Mems[ptrs[i]], Mems[ptrs[i]], npix)
+	    }
 	}
 
         # Fill the output array

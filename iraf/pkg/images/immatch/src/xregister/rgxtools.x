@@ -199,21 +199,23 @@ procedure rg_xrealloc (xc, nregions)
 pointer	xc		#I pointer to crosscor structure
 int	nregions	#I number of regions
 
+size_t	sz_val
 int	nr
 int	rg_xstati()
 
 begin
 	nr = rg_xstati (xc, NREGIONS)
 
-	call realloc (XC_RC1(xc), nregions, TY_INT)
-	call realloc (XC_RC2(xc), nregions, TY_INT)
-	call realloc (XC_RL1(xc), nregions, TY_INT)
-	call realloc (XC_RL2(xc), nregions, TY_INT)
-	call realloc (XC_RZERO(xc), nregions, TY_REAL)
-	call realloc (XC_RXSLOPE(xc), nregions, TY_REAL)
-	call realloc (XC_RYSLOPE(xc), nregions, TY_REAL)
-	call realloc (XC_XSHIFTS(xc), nregions, TY_REAL)
-	call realloc (XC_YSHIFTS(xc), nregions, TY_REAL)
+	sz_val = nregions
+	call realloc (XC_RC1(xc), sz_val, TY_INT)
+	call realloc (XC_RC2(xc), sz_val, TY_INT)
+	call realloc (XC_RL1(xc), sz_val, TY_INT)
+	call realloc (XC_RL2(xc), sz_val, TY_INT)
+	call realloc (XC_RZERO(xc), sz_val, TY_REAL)
+	call realloc (XC_RXSLOPE(xc), sz_val, TY_REAL)
+	call realloc (XC_RYSLOPE(xc), sz_val, TY_REAL)
+	call realloc (XC_XSHIFTS(xc), sz_val, TY_REAL)
+	call realloc (XC_YSHIFTS(xc), sz_val, TY_REAL)
 
 	call amovki (INDEFI, Memi[XC_RC1(xc)+nr], nregions - nr)
 	call amovki (INDEFI, Memi[XC_RC2(xc)+nr], nregions - nr)

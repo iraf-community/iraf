@@ -666,9 +666,10 @@ begin
 		    (strlen (Memc[atstr3]) < szatstr))
 		    break
 		szatstr = szatstr + SZ_LINE
-		call realloc (atstr1, szatstr, TY_CHAR)
-		call realloc (atstr2, szatstr, TY_CHAR)
-		call realloc (atstr3, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atstr1, sz_val, TY_CHAR)
+		call realloc (atstr2, sz_val, TY_CHAR)
+		call realloc (atstr3, sz_val, TY_CHAR)
 	    }
 	    if ((Memc[atstr1] == EOS) && (Memc[atstr2] == EOS) &&
 		(Memc[atstr3] == EOS))

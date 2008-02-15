@@ -111,8 +111,9 @@ begin
 	nranges = qpex_parser (expr, xs_buf, xe_buf, xlen)
 	if (xlen < nranges * 2) {
 	    xlen = nranges * 2
-	    call realloc (xs_buf, xlen, TY_REAL)
-	    call realloc (xe_buf, xlen, TY_REAL)
+	    sz_val = xlen
+	    call realloc (xs_buf, sz_val, TY_REAL)
+	    call realloc (xe_buf, sz_val, TY_REAL)
 	}
 
 	xs = xs_buf

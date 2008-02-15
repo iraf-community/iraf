@@ -15,6 +15,7 @@ pointer	io			#I QPIO descriptor
 int	param			#I parameter code
 long	lvalue			#I new parameter value
 
+size_t	sz_val
 int	naxes, axlen[PL_MAXDIM], sv_active, value
 errchk	pl_close, syserr, realloc
 
@@ -80,8 +81,10 @@ begin
 		call syserr (SYS_QPPLSIZE)
 
 	    # Allocate a range list buffer if i/o is indexed.
-	    if (IO_INDEXLEN(io) > 0)
-		call realloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+	    if (IO_INDEXLEN(io) > 0) {
+		sz_val = RL_MAXLEN(IO_PL(io))
+		call realloc (IO_RL(io), sz_val, TY_INT)
+	    }
 
 	    # Update the mask name, such as it is...
 	    if (IO_MASK(io) != NULL) {
@@ -112,6 +115,7 @@ pointer	io			#I QPIO descriptor
 int	param			#I parameter code
 pointer	pvalue			#I new parameter value
 
+size_t	sz_val
 int	naxes, axlen[PL_MAXDIM], sv_active
 long	lvalue
 errchk	pl_close, syserr, realloc
@@ -144,8 +148,10 @@ begin
 		call syserr (SYS_QPPLSIZE)
 
 	    # Allocate a range list buffer if i/o is indexed.
-	    if (IO_INDEXLEN(io) > 0)
-		call realloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+	    if (IO_INDEXLEN(io) > 0) {
+		sz_val = RL_MAXLEN(IO_PL(io))
+		call realloc (IO_RL(io), sz_val, TY_INT)
+	    }
 
 	    # Update the mask name, such as it is...
 	    if (IO_MASK(io) != NULL) {

@@ -35,7 +35,8 @@ begin
 	    call malloc (bp, sz_val, TY_CHAR)
 	} else {
 	    FBUFSIZE(fp) = FBUFSIZE(fp) + INC_BUFSIZE
-	    call realloc (bp, FBUFSIZE(fp), TY_CHAR)
+	    sz_val = FBUFSIZE(fp)
+	    call realloc (bp, sz_val, TY_CHAR)
 	}
 
 	boffset[fd] = 1

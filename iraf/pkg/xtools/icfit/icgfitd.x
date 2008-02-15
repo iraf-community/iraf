@@ -118,11 +118,13 @@ begin
 		    call amovd (y, Memd[y1], n)
 		    call amovd (wts, Memd[w1], n)
 		} else {
-		    call realloc (x1, n+1, TY_DOUBLE)
-		    call realloc (y1, n+1, TY_DOUBLE)
-		    call realloc (w1, n+1, TY_DOUBLE)
+		    sz_val = n+1
+		    call realloc (x1, sz_val, TY_DOUBLE)
+		    call realloc (y1, sz_val, TY_DOUBLE)
+		    call realloc (w1, sz_val, TY_DOUBLE)
 		}
-		call realloc (userwts, n+1, TY_DOUBLE)
+		sz_val = n+1
+		call realloc (userwts, sz_val, TY_DOUBLE)
 
 		call icg_addd (gp, wx, wy, rx1, Memd[x1], Memd[y1],
 		    Memd[w1], Memd[userwts], n)

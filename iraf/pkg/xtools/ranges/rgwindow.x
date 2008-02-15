@@ -34,7 +34,8 @@ begin
 	    }
 	}
 
-	call realloc (rgout, LEN_RG + 2 * max (1, j), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, j)
+	call realloc (rgout, sz_val, TY_STRUCT)
 	RG_NRGS(rgout) = j
 	RG_NPTS(rgout) = 0
 	do i = 1, RG_NRGS(rgout)

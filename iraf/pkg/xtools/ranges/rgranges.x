@@ -125,8 +125,10 @@ begin
 	    rval2 = max (j, rval2)
 	    if (rval2 >= rmin && rval1 <= rmax) {
 		nrgs = RG_NRGS(rg)
-		if (mod (nrgs, NRGS) == 0)
-		    call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
+		if (mod (nrgs, NRGS) == 0) {
+		    sz_val = LEN_RG+2*(nrgs+NRGS)
+		    call realloc (rg, sz_val, TY_STRUCT)
+		}
 		nrgs = nrgs + 1
 		RG_NRGS(rg) = nrgs
 		RG_X1(rg, nrgs) = max (rmin, rval1)

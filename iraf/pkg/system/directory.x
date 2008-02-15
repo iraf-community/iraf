@@ -470,6 +470,7 @@ pointer	fp			# file list pointer
 char	fname[ARB]		# file name to be put in list
 int	nchars			# nchars in file name
 
+size_t	sz_val
 int	op
 int	fileno
 
@@ -481,7 +482,8 @@ begin
 	# Increase size of file list if it overflows.
 	if (fileno >= FL_MAXFILES(fp)) {
 	    FL_MAXFILES(fp) = FL_MAXFILES(fp) * 2
-	    call realloc (FL_OFFBP(fp), FL_MAXFILES(fp), TY_INT)
+	    sz_val = FL_MAXFILES(fp)
+	    call realloc (FL_OFFBP(fp), sz_val, TY_INT)
 	}
 
 	op = FL_NEXTOFF(fp)
@@ -490,7 +492,8 @@ begin
 	# Increase size of string buffer if it overflows.
 	if (op + nchars + 1 >= FL_SZSBUF(fp)) {
 	    FL_SZSBUF(fp) = FL_SZSBUF(fp) * 2
-	    call realloc (FL_SBUFP(fp), FL_SZSBUF(fp), TY_CHAR)
+	    sz_val = FL_SZSBUF(fp)
+	    call realloc (FL_SBUFP(fp), sz_val, TY_CHAR)
 	}
 
 	call strcpy (fname, FL_FNAME(fp,fileno), nchars)

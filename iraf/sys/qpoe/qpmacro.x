@@ -483,7 +483,8 @@ next_
 				symarg = max (symarg, TO_INTEG(ch))
 		    op = op + 1
 		    if (op - mvbuf == buflen) {
-			call realloc (mvbuf, buflen + SZ_MVBUF, TY_CHAR)
+			sz_val = buflen + SZ_MVBUF
+			call realloc (mvbuf, sz_val, TY_CHAR)
 			op = mvbuf + buflen
 			buflen = buflen + SZ_MVBUF
 		    }

@@ -253,7 +253,8 @@ begin
 		    call malloc (kernel, sz_val, TY_REAL)
 	        } else if (kp > sz_kernel) {
 		    sz_kernel = sz_kernel + SZ_KERNEL
-		    call realloc (kernel, sz_kernel, TY_REAL)
+		    sz_val = sz_kernel
+		    call realloc (kernel, sz_val, TY_REAL)
 	        }
 
 		# Decode the kernel elements one by one.
@@ -302,7 +303,8 @@ begin
 	} else if ((kp != minnx * ny) || (kp != maxnx * ny)) {
 	    call error (0, "CNV_KERNEL: Incorrect number of kernel rows.")
 	} else {
-	    call realloc (kernel, kp, TY_REAL)
+	    sz_val = kp
+	    call realloc (kernel, sz_val, TY_REAL)
 	    nx = minnx
 	}
 end

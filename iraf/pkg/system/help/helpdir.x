@@ -162,14 +162,16 @@ begin
 	    call hd_sort_modules (hp)
 
 	# Return any unused space in string buffer.
-	call realloc (HD_SBUF(hp), HD_NEXTCH(hp), TY_CHAR)
+	sz_val = HD_NEXTCH(hp)
+	call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_SZSBUF(hp) = HD_NEXTCH(hp)
 
 	# Return any unused module descriptors.
 	HD_LENHD(hp) = HD_LENHD(hp) -
 	    LEN_MODSTRUCT * (HD_MAXMODULES(hp) - HD_NMODULES(hp))
 	HD_MAXMODULES(hp) = HD_NMODULES(hp)
-	call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+	sz_val = HD_LENHD(hp)
+	call realloc (hp, sz_val, TY_STRUCT)
 
 	call sfree (sp)
 	return (hp)
@@ -294,7 +296,8 @@ begin
 	    # structure size to allow more module descriptors.
 	    if (m > HD_MAXMODULES(hp)) {
 		HD_LENHD(hp) = HD_LENHD(hp) + (INC_MODULES * LEN_MODSTRUCT)
-		call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+		sz_val = HD_LENHD(hp)
+		call realloc (hp, sz_val, TY_STRUCT)
 		HD_MAXMODULES(hp) = HD_MAXMODULES(hp) + INC_MODULES
 	    }
 	    HD_NMODULES(hp) = m
@@ -450,6 +453,7 @@ int procedure hd_putstr (hp, str)
 
 pointer	hp
 char	str[ARB]
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -462,7 +466,8 @@ begin
 	nextch = HD_NEXTCH(hp)
 	if (nextch + nchars + 1 > HD_SZSBUF(hp)) {
 	    HD_SZSBUF(hp) = HD_SZSBUF(hp) + INC_SZSBUF
-	    call realloc (HD_SBUF(hp), HD_SZSBUF(hp), TY_CHAR)
+	    sz_val = HD_SZSBUF(hp)
+	    call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[HD_SBUF(hp) + nextch], ARB)

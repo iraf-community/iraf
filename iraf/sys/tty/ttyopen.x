@@ -59,7 +59,8 @@ begin
 
 	# Call realloc to return any unused space in the descriptor.
 	T_LEN(tty) = T_OFFCAP + (T_OP(tty) + SZ_STRUCT-1) / SZ_STRUCT
-	call realloc (tty, T_LEN(tty), TY_STRUCT)
+	sz_val = T_LEN(tty)
+	call realloc (tty, sz_val, TY_STRUCT)
 
 	call sfree (sp)
 	return (tty)
@@ -264,7 +265,8 @@ begin
 	    if (op >= otop) {
 		T_OP(tty) = op - caplist + 1
 		T_LEN(tty) = T_LEN(tty) + T_MEMINCR
-		call realloc (tty, T_LEN(tty), TY_STRUCT)
+		sz_val = T_LEN(tty)
+		call realloc (tty, sz_val, TY_STRUCT)
 		op = caplist + T_OP(tty) - 1
 		otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR) - 1
 	    }

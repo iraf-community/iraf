@@ -179,7 +179,8 @@ cursor_loop_	    call gki_setwcs (out, Memi[wcs], LEN_WCSARRAY)
 
 	            if (lastp > buflen) {
 		        buflen = buflen + MAX_FRAMES
-		        call realloc (ip, buflen, TY_LONG)
+		        sz_val = buflen
+		        call realloc (ip, sz_val, TY_LONG)
 	            }
 
 		    fpos = fpos + length_mc
@@ -262,7 +263,8 @@ begin
 
 	# Reset viewport if necessary
         if (new_vport == YES) {
-	    call realloc (vp, nx * ny * 4, TY_LONG)
+	    sz_val = nx * ny * 4
+	    call realloc (vp, sz_val, TY_LONG)
 	    call gm_getvp (vp, nx, ny, fill)
         }
 
@@ -580,7 +582,8 @@ begin
 
 	    if (I_LENGTH(ibuf) > len_ibuf) {
 		len_ibuf = I_LENGTH(ibuf)
-		call realloc (ibuf, len_ibuf, TY_SHORT)
+		sz_val = len_ibuf
+		call realloc (ibuf, sz_val, TY_SHORT)
 	    }
 
 	    nchars = (I_LENGTH(ibuf) - LEN_GKIHDR) * SZ_SHORT

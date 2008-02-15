@@ -31,6 +31,7 @@ int	tbl, in, imode
 char	fname[SZ_FNAME], tbl_file[SZ_FNAME], mode[SZ_FNAME]
 bool	gen
 
+size_t	sz_val
 int	clgfil(), open(), fscan(), strncmp(), nscan()
 real	clgetr()
 bool	clgetb()
@@ -56,8 +57,9 @@ begin
 	while (fscan(tbl) != EOF) {
 	    npts = npts + 1
 	    if (npts > tbsize) {
-		call realloc (xtab, (tbsize+SZ_TABLE), TY_DOUBLE)
-		call realloc (ytab, (tbsize+SZ_TABLE), TY_DOUBLE)
+		sz_val = (tbsize+SZ_TABLE)
+		call realloc (xtab, sz_val, TY_DOUBLE)
+		call realloc (ytab, sz_val, TY_DOUBLE)
 		tbsize = tbsize + SZ_TABLE
 	    }
 	    call gargd (Memd[xtab+npts-1])

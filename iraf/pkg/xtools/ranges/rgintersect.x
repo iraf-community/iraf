@@ -49,7 +49,8 @@ begin
 	    }
 	}
 
-	call realloc (rg3, LEN_RG + 2 * max (1, k), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, k)
+	call realloc (rg3, sz_val, TY_STRUCT)
 
 	RG_NRGS(rg3) = k
 	RG_NPTS(rg3) = 0

@@ -24,6 +24,7 @@ real	sx, sy			#I screen coords of cursor
 int	raster			#I raster number
 real	rx, ry			#I raster coords of cursor
 
+size_t	sz_val
 char	tickformat[SZ_TICKFORMAT], ticklabel[SZ_TICKLABEL]
 pointer tr, w, ap, save_op
 int	xt, yt, nwords, nticks, wcs, lt_save
@@ -164,7 +165,8 @@ begin
 
 	nwords = TR_OP(tr) - save_op
 	if (nwords > TR_LENSCRATCHBUF(tr)) {
-	    call realloc (TR_SCRATCHBUF(tr), nwords, TY_SHORT)
+	    sz_val = nwords
+	    call realloc (TR_SCRATCHBUF(tr), sz_val, TY_SHORT)
 	    TR_LENSCRATCHBUF(tr) = nwords
 	}
 

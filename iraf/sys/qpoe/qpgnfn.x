@@ -140,13 +140,15 @@ begin
 		# Make room in offset vector?
 		if (nsyms > len_offv) {
 		    len_offv = len_offv + INC_LENOFFV
-		    call realloc (offv, len_offv, TY_INT)
+		    sz_val = len_offv
+		    call realloc (offv, sz_val, TY_INT)
 		}
 
 		# Make room in string buffer?
 		if (nc + nchars + 1 > sz_sbuf) {
 		    sz_sbuf = sz_sbuf + INC_SZSBUF
-		    call realloc (sbuf, sz_sbuf, TY_CHAR)
+		    sz_val = sz_sbuf
+		    call realloc (sbuf, sz_val, TY_CHAR)
 		}
 
 		# Add the symbol.

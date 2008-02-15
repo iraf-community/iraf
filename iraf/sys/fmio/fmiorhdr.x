@@ -48,7 +48,8 @@ begin
 	    # Repeat if the full header was not read.
 	    if (DH_DATASTART(dh)-1 > nbytes) {
 		buflen = DH_DATASTART(dh)-1 / (SZ_STRUCT * SZB_CHAR)
-		call realloc (buf, buflen, TY_STRUCT)
+		sz_val = buflen
+		call realloc (buf, sz_val, TY_STRUCT)
 	    } else if (status < DH_DATASTART(dh)-1) {
 		call syserrs (SYS_FMTRUNC, FM_DFNAME(fm))
 	    } else

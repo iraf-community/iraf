@@ -41,8 +41,9 @@ begin
  
 	if (npts != IC_NFIT(ic)) {
 	    if ((abs (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
-	        call realloc (xout, IC_NFIT(ic), TY_REAL)
-		call realloc (yout, IC_NFIT(ic), TY_REAL)
+	        sz_val = IC_NFIT(ic)
+	        call realloc (xout, sz_val, TY_REAL)
+		call realloc (yout, sz_val, TY_REAL)
 		call icg_axesr (ic, gt, cv, 1, Memr[IC_XFIT(ic)],
 		    Memr[IC_YFIT(ic)], Memr[xout], IC_NFIT(ic))
 		call icg_axesr (ic, gt, cv, 2, Memr[IC_XFIT(ic)],

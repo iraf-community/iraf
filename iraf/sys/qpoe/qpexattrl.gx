@@ -90,8 +90,9 @@ begin
 		# Copy output range list to X list temporary.
 		if (max(nx,1) > plen) {
 		    plen = max(xlen,1)
-		    call realloc (ps, plen, TY_PIXEL)
-		    call realloc (pe, plen, TY_PIXEL)
+		    sz_val = plen
+		    call realloc (ps, sz_val, TY_PIXEL)
+		    call realloc (pe, sz_val, TY_PIXEL)
 		}
 		if (neterms <= 0) {
 		    Mem$t[ps] = LEFT$T

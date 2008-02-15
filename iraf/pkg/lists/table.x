@@ -94,13 +94,15 @@ begin
 		# Check buffers, make bigger if necessary.
 		if (nextch + maxch >= sz_strbuf) {
 		    sz_strbuf = sz_strbuf + STRBUF_INCREMENT
-		    call realloc (strbuf, sz_strbuf, TY_CHAR)
+		    sz_val = sz_strbuf
+		    call realloc (strbuf, sz_val, TY_CHAR)
 		}
 		# Add space for more string offsets if too many strings.
 		nstrings = nstrings + 1
 		if (nstrings > max_strings) {
 		    max_strings = max_strings + MAXSTR_INCREMENT
-		    call realloc (stroff, max_strings, TY_INT)
+		    sz_val = max_strings
+		    call realloc (stroff, sz_val, TY_INT)
 		}
 	    }
 

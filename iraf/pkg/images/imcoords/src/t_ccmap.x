@@ -976,10 +976,11 @@ begin
 
 	    if (npts >= bufsize) {
 		bufsize = bufsize + CC_DEFBUFSIZE
-	        call realloc (xref, bufsize, TY_DOUBLE)
-	        call realloc (yref, bufsize, TY_DOUBLE)
-	        call realloc (lngref, bufsize, TY_DOUBLE)
-	        call realloc (latref, bufsize, TY_DOUBLE)
+	        sz_val = bufsize
+	        call realloc (xref, sz_val, TY_DOUBLE)
+	        call realloc (yref, sz_val, TY_DOUBLE)
+	        call realloc (lngref, sz_val, TY_DOUBLE)
+	        call realloc (latref, sz_val, TY_DOUBLE)
 	    }
 	}
 
@@ -989,10 +990,11 @@ begin
 	    call mfree (lngref, TY_DOUBLE)
 	    call mfree (latref, TY_DOUBLE)
 	} else if (npts < bufsize) {
-	    call realloc (xref, npts, TY_DOUBLE)
-	    call realloc (yref, npts, TY_DOUBLE)
-	    call realloc (lngref, npts, TY_DOUBLE)
-	    call realloc (latref, npts, TY_DOUBLE)
+	    sz_val = npts
+	    call realloc (xref, sz_val, TY_DOUBLE)
+	    call realloc (yref, sz_val, TY_DOUBLE)
+	    call realloc (lngref, sz_val, TY_DOUBLE)
+	    call realloc (latref, sz_val, TY_DOUBLE)
 	}
 
 	call sfree (sp)
