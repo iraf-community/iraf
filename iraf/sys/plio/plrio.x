@@ -216,10 +216,12 @@ begin
 			do i = 1, npix
 			    Memi[rp+i-1] = mval
 		    } else {
-			if (mval == 0)
+			if (mval == 0) {
 			    call aclri (Memi[rp], npix)
-			else
-			    call amovki (mval, Memi[rp], npix)
+			} else {
+			    sz_val = npix
+			    call amovki (mval, Memi[rp], sz_val)
+			}
 		    }
 		}
 	    }

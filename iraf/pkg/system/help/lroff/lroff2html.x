@@ -78,7 +78,8 @@ begin
         formatted  = false
 
 	# Initialize the section numbering.
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 
         # Determine whether or not the text is formatted.
         repeat {
@@ -569,6 +570,7 @@ procedure lh_set_level (n, level)
 int	n					#I level number
 char	level[ARB]				#U level string
 
+size_t	sz_val
 int	i, strlen()
 include	"lroff.com"
 
@@ -576,7 +578,8 @@ begin
         # Increment the desired section number; zero all higher
 	# numbered section counters.
         nh_level[n] = nh_level[n] + 1
-        call amovki (0, nh_level[n+1], MAX_NHLEVEL - n)
+        sz_val = MAX_NHLEVEL - n
+        call amovki (0, nh_level[n+1], sz_val)
 
         # Output the section number followed by a blank and then
 	# the section label.

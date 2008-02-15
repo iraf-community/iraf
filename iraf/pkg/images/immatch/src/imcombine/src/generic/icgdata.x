@@ -228,10 +228,14 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    call amovki (nused, n, npts)
-	    if (keepids)
-		do i = 1, nimages
-		    call amovki (i, Memi[id[i]], npts)
+	    sz_val = npts
+	    call amovki (nused, n, sz_val)
+	    if (keepids) {
+		do i = 1, nimages {
+		    sz_val = npts
+		    call amovki (i, Memi[id[i]], sz_val)
+		}
+	    }
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -532,10 +536,14 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    call amovki (nused, n, npts)
-	    if (keepids)
-		do i = 1, nimages
-		    call amovki (i, Memi[id[i]], npts)
+	    sz_val = npts
+	    call amovki (nused, n, sz_val)
+	    if (keepids) {
+		do i = 1, nimages {
+		    sz_val = npts
+		    call amovki (i, Memi[id[i]], sz_val)
+		}
+	    }
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -837,10 +845,14 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    call amovki (nused, n, npts)
-	    if (keepids)
-		do i = 1, nimages
-		    call amovki (i, Memi[id[i]], npts)
+	    sz_val = npts
+	    call amovki (nused, n, sz_val)
+	    if (keepids) {
+		do i = 1, nimages {
+		    sz_val = npts
+		    call amovki (i, Memi[id[i]], sz_val)
+		}
+	    }
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {
@@ -1141,10 +1153,14 @@ begin
 	# If growing mark the end of the included image indices with zero
 
 	if (dflag == D_ALL) {
-	    call amovki (nused, n, npts)
-	    if (keepids)
-		do i = 1, nimages
-		    call amovki (i, Memi[id[i]], npts)
+	    sz_val = npts
+	    call amovki (nused, n, sz_val)
+	    if (keepids) {
+		do i = 1, nimages {
+		    sz_val = npts
+		    call amovki (i, Memi[id[i]], sz_val)
+		}
+	    }
 	} else if (dflag == D_NONE)
 	    call aclri (n, npts)
 	else {

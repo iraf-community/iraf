@@ -39,6 +39,7 @@ end
 
 procedure new_numbered_section (in, out, linebuf, ip)
 
+size_t	sz_val
 extern	in(), out()
 char	linebuf[ARB]
 int	ip
@@ -61,7 +62,8 @@ begin
 	# section counters.
 
 	nh_level[n] = nh_level[n] + 1
-	call amovki (0, nh_level[n+1], MAX_NHLEVEL - n)
+	sz_val = MAX_NHLEVEL - n
+	call amovki (0, nh_level[n+1], sz_val)
 
 	# Output the section number followed by a blank and then the section
 	# label.
@@ -92,10 +94,12 @@ end
 
 procedure init_nh()
 
+size_t	sz_val
 include	"lroff.com"
 
 begin
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 end
 
 

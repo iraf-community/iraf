@@ -76,13 +76,15 @@ int     fields[ARB]             #I fields array
 int     nfields                 #I maximum number of fields
 int	nclip			#I the number of clipping iterations
 
+size_t	sz_val
 pointer	sw
 int	mst_isfield()
 
 begin
 	# Initialize.
 	sw = MIS_SW(mst)
-	call amovki (NO, Memi[sw], LEN_NSWITCHES)
+	sz_val = LEN_NSWITCHES
+	call amovki (NO, Memi[sw], sz_val)
 
         # Set the computation switches.
         MIS_SNPIX(sw) = mst_isfield (MIS_FNPIX, fields, nfields)

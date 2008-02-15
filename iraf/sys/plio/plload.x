@@ -85,7 +85,8 @@ begin
 	PL_LLFREE(pl) = 0
 	PL_LLNUPDATES(pl) = 0
 	PL_LLINC(pl) = PL_STARTINC
-	call amovki (1, PL_PLANE(pl,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovki (1, PL_PLANE(pl,1), sz_val)
 
 	call sfree (sp)
 end

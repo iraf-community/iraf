@@ -51,9 +51,10 @@ begin
 	ndim = IM_NDIM(im)
 	if (project)
 	    ndim = ndim - 1
-	call amovki (1, Memi[v1], IM_MAXDIM)
-	call amovki (1, Memi[va], IM_MAXDIM)
-	call amovki (1, Memi[dv], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (1, Memi[v1], sz_val)
+	call amovki (1, Memi[va], sz_val)
+	call amovki (1, Memi[dv], sz_val)
 	call amovi (IM_LEN(imref,1), Memi[vb], ndim)
 	call ic_section (section, Memi[va], Memi[vb], Memi[dv], ndim)
 	if (im != imref)

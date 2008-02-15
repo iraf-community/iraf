@@ -625,8 +625,10 @@ begin
 	call salloc (lmatch, sz_val, TY_INT)
 	sz_val = axes[2]
 	call salloc (rmatch, sz_val, TY_INT)
-	call amovki (NO, Memi[lmatch], axes[1])
-	call amovki (NO, Memi[rmatch], axes[2])
+	sz_val = axes[1]
+	call amovki (NO, Memi[lmatch], sz_val)
+	sz_val = axes[2]
+	call amovki (NO, Memi[rmatch], sz_val)
 
 	# Find the maximum value in the mask.
 	minvote = MAX_INT

@@ -25,7 +25,8 @@ include	"gtr.com"
 
 begin
 	if (first_time) {
-	    call amovki (NULL, trdes, MAX_PSEUDOFILES)
+	    sz_val = MAX_PSEUDOFILES
+	    call amovki (NULL, trdes, sz_val)
 	    tr_stream = NULL
 	    first_time = false
 	}

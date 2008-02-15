@@ -234,6 +234,7 @@ pointer	ex				#i tast struct pointer
 pointer	gif				#i gif struct pointer
 int	fd				#i output file descriptor
 
+size_t	sz_val
 long	fcode
 int	i, c, ent, disp
 int	hsize_reg, hshift
@@ -263,7 +264,8 @@ begin
 	hshift = 8-hshift		# set hash code range bound
 
 	hsize_reg = HSIZE		# clear the hash table
-	call amovki (-1, HTAB(gif,0), HSIZE)
+	sz_val = HSIZE
+	call amovki (-1, HTAB(gif,0), sz_val)
 
 	call gif_output (fd, gif, GIF_CLEAR_CODE(gif))
 
@@ -305,7 +307,8 @@ nomatch_    call gif_output (fd, gif, ent)
 		HTAB(gif,i) = fcode
 	    } else {
 		# Clear out the hash table.
-		call amovki (-1, HTAB(gif,0), HSIZE)
+		sz_val = HSIZE
+		call amovki (-1, HTAB(gif,0), sz_val)
 		GIF_FREE_ENT(gif) = GIF_CLEAR_CODE(gif) + 2
 		GIF_CLEAR_FLAG(gif) = YES
 		call gif_output (fd, gif, GIF_CLEAR_CODE(gif))

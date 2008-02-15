@@ -20,7 +20,8 @@ begin
 	sz_val = LEN_PLDES
 	call calloc (pl, sz_val, TY_STRUCT)
 
-	call amovki (1, PL_PLANE(pl,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovki (1, PL_PLANE(pl,1), sz_val)
 	PL_MAGIC(pl) = PL_MAGICVAL
 	PL_LLINC(pl) = PL_STARTINC
 

@@ -30,7 +30,8 @@ begin
 	    call mfree (PL_LPP(pl), TY_INT)
 	if (PL_LLBP(pl) != NULL)
 	    call mfree (PL_LLBP(pl), TY_SHORT)
-	call amovki (1, PL_PLANE(pl,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovki (1, PL_PLANE(pl,1), sz_val)
 
 	# Set up the empty descriptor.
 	PL_NAXES(pl) = naxes

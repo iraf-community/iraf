@@ -186,15 +186,17 @@ pointer procedure zsc_pmsection (section, refim)
 char	section[ARB]		#I Image section
 pointer	refim			#I Reference image pointer
 
+size_t	sz_val
 int	i, j, ip, ndim, temp, a[2], b[2], c[2], rop, ctoi()
 pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 define  error_  99
 
 begin
         # Decode the section string.
-	call amovki (1, a, 2)
-	call amovki (1, b, 2)
-	call amovki (1, c, 2)
+	sz_val = 2
+	call amovki (1, a, sz_val)
+	call amovki (1, b, sz_val)
+	call amovki (1, c, sz_val)
 	ndim = min (2, IM_NDIM(refim))
 	do i = 1, ndim
 	    b[i] = IM_LEN(refim,i)

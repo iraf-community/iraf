@@ -113,10 +113,11 @@ begin
 	call malloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
 	call malloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
 
-	call amovki (INDEFI, Memi[PM_RC1(pm)], MAX_NREGIONS)
-	call amovki (INDEFI, Memi[PM_RC2(pm)], MAX_NREGIONS)
-	call amovki (INDEFI, Memi[PM_RL1(pm)], MAX_NREGIONS)
-	call amovki (INDEFI, Memi[PM_RL2(pm)], MAX_NREGIONS)
+	sz_val = MAX_NREGIONS
+	call amovki (INDEFI, Memi[PM_RC1(pm)], sz_val)
+	call amovki (INDEFI, Memi[PM_RC2(pm)], sz_val)
+	call amovki (INDEFI, Memi[PM_RL1(pm)], sz_val)
+	call amovki (INDEFI, Memi[PM_RL2(pm)], sz_val)
 	call amovkr (INDEFR, Memr[PM_RZERO(pm)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[PM_RXSLOPE(pm)], MAX_NREGIONS)
 	call amovkr (INDEFR, Memr[PM_RYSLOPE(pm)], MAX_NREGIONS)
@@ -167,10 +168,11 @@ begin
 	call realloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
 	call realloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
 
-	call amovki (INDEFI, Memi[PM_RC1(pm)+nr], nregions - nr)
-	call amovki (INDEFI, Memi[PM_RC2(pm)+nr], nregions - nr)
-	call amovki (INDEFI, Memi[PM_RL1(pm)+nr], nregions - nr)
-	call amovki (INDEFI, Memi[PM_RL2(pm)+nr], nregions - nr)
+	sz_val = nregions - nr
+	call amovki (INDEFI, Memi[PM_RC1(pm)+nr], sz_val)
+	call amovki (INDEFI, Memi[PM_RC2(pm)+nr], sz_val)
+	call amovki (INDEFI, Memi[PM_RL1(pm)+nr], sz_val)
+	call amovki (INDEFI, Memi[PM_RL2(pm)+nr], sz_val)
 	call amovkr (INDEFR, Memr[PM_RZERO(pm)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[PM_RXSLOPE(pm)+nr], nregions - nr)
 	call amovkr (INDEFR, Memr[PM_RYSLOPE(pm)+nr], nregions - nr)

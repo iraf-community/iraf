@@ -20,6 +20,7 @@ int	errchan			#RW process error output channel
 pointer	device			#RW device driver epa
 int	devtype			#R  device type (not modified)
 
+size_t	sz_val
 pointer	locpr()
 extern	zgettx(), zgetty(), zardbf(), zardpr()
 extern	kgettx(), kgetty(), kardbf(), kardpr()
@@ -28,8 +29,9 @@ include	"kinode.com"
 
 begin
 	# Initialize the ki channel descriptors.
-	call amovki (NULL, k_oschan, MAX_CHANNELS)
-	call amovki (ERR,  k_status, MAX_CHANNELS)
+	sz_val = MAX_CHANNELS
+	call amovki (NULL, k_oschan, sz_val)
+	call amovki (ERR,  k_status, sz_val)
 
 	# Assign KI channels for the 3 OS channels.
 

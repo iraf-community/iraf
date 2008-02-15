@@ -169,7 +169,8 @@ begin
 	    sz_val = npts
 	    call realloc (IN_REJPTS (in), sz_val, TY_INT)
 	}
-	call amovki  (NO, Memi[IN_REJPTS(in)], npts)
+	sz_val = npts
+	call amovki  (NO, Memi[IN_REJPTS(in)], sz_val)
 
 	# Reallocate space for minimum and maximum variable values.
 	# Initialization is made afterwards.

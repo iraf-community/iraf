@@ -51,7 +51,8 @@ begin
 	call salloc (lp, sz_val, TY_SHORT)
 
 	# Get the dimensionality and size of the stored mask.
-	call amovki (1, axlen, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (1, axlen, sz_val)
 	naxes = imgeti (im, "ZNAXIS")
 	call fxf_filter_keyw (im, "ZNAXIS")
 	do i = 1, naxes {

@@ -314,7 +314,8 @@ begin
 	fits_lenc = FITS_BLOCK_BYTES/SZB_CHAR
 	sz_val = fits_lenc
 	call salloc (bf, sz_val, TY_INT)
-	call amovki (0, Memi[bf], fits_lenc)
+	sz_val = fits_lenc
+	call amovki (0, Memi[bf], sz_val)
 
 	size = FITS_LEN_CHAR(size)
 	nblocks = size / fits_lenc
@@ -546,7 +547,8 @@ begin
 	FIT_EOFSIZE(fit) = filesize + 1
 	# Now write a blank header.
 	if (group != 0) {
-	    call amovki (0, Memi[mii], FITS_BLOCK_CHARS)
+	    sz_val = FITS_BLOCK_CHARS
+	    call amovki (0, Memi[mii], sz_val)
 	    nblocks = hdr_size/FITS_BLOCK_CHARS
 	    FIT_HFD(fit) = -1
 

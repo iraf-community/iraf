@@ -65,7 +65,8 @@ begin
 	call salloc (lflag, sz_val, TY_INT)
 	sz_val = IM_MAXDIM
 	call salloc (v, sz_val, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v], sz_val)
@@ -86,7 +87,8 @@ begin
 		    call salloc (Memi[dbuf+i-1], sz_val, TY_SHORT)
 		}
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 	}
 
 	if (project) {
@@ -405,7 +407,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -514,7 +517,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -572,7 +576,8 @@ begin
 	call salloc (lflag, sz_val, TY_INT)
 	sz_val = IM_MAXDIM
 	call salloc (v, sz_val, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v], sz_val)
@@ -593,7 +598,8 @@ begin
 		    call salloc (Memi[dbuf+i-1], sz_val, TY_INT)
 		}
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 	}
 
 	if (project) {
@@ -912,7 +918,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -1021,7 +1028,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -1079,7 +1087,8 @@ begin
 	call salloc (lflag, sz_val, TY_INT)
 	sz_val = IM_MAXDIM
 	call salloc (v, sz_val, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v], sz_val)
@@ -1100,7 +1109,8 @@ begin
 		    call salloc (Memi[dbuf+i-1], sz_val, TY_REAL)
 		}
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 	}
 
 	if (project) {
@@ -1420,7 +1430,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -1529,7 +1540,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -1587,7 +1599,8 @@ begin
 	call salloc (lflag, sz_val, TY_INT)
 	sz_val = IM_MAXDIM
 	call salloc (v, sz_val, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v], sz_val)
@@ -1608,7 +1621,8 @@ begin
 		    call salloc (Memi[dbuf+i-1], sz_val, TY_DOUBLE)
 		}
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 	}
 
 	if (project) {
@@ -1928,7 +1942,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 
@@ -2036,7 +2051,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 

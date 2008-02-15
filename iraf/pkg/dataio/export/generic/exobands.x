@@ -361,7 +361,8 @@ begin
 		    call amapi (Memi[data], Memi[scaled], len, int (z1), 
 		        int(z2), int (0), int (nbins-1))
 		} else {
-		    call amovki (int (0), Memi[scaled], len)
+		    sz_val = len
+		    call amovki (int (0), Memi[scaled], sz_val)
 		}
 
             case TY_LONG:
@@ -416,7 +417,8 @@ begin
                     do i = 0, len
                         Memr[scaled+i] = (Memi[data+i] - bzero) / bscale
 		} else {
-		    call amovki (int(0), Memi[scaled], len)
+		    sz_val = len
+		    call amovki (int(0), Memi[scaled], sz_val)
 		}
 
             case TY_LONG:
@@ -504,7 +506,8 @@ begin
             case TY_UBYTE, TY_USHORT, TY_SHORT:
 		call amovks (O_VALS(args[1]), Mems[scaled], len)
             case TY_INT:
-		call amovki (O_VALI(args[1]), Memi[scaled], len)
+		sz_val = len
+		call amovki (O_VALI(args[1]), Memi[scaled], sz_val)
             case TY_LONG:
 		lg_val = O_VALL(args[1])
 		sz_val = len

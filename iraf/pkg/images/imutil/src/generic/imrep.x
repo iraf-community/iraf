@@ -288,8 +288,10 @@ begin
 
 	# If both lower and upper are INDEF then replace all pixels by value.
 	if (IS_INDEFR (lower) && IS_INDEFR (upper)) {
-	    while (impnli (im, buf2, v2) != EOF)
-	        call amovki (newval, Memi[buf2], npix)
+	    while (impnli (im, buf2, v2) != EOF) {
+	        sz_val = npix
+	        call amovki (newval, Memi[buf2], sz_val)
+	    }
 
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
@@ -369,8 +371,10 @@ begin
 
 	# If both lower and upper are INDEF then replace all pixels by value.
 	if (IS_INDEFR (lower) && IS_INDEFR (upper)) {
-	    while (impnli (im, buf2, v2) != EOF)
-	        call amovki (newval, Memi[buf2], nc)
+	    while (impnli (im, buf2, v2) != EOF) {
+	        sz_val = nc
+	        call amovki (newval, Memi[buf2], sz_val)
+	    }
 	    return
 	
 	# If lower is INDEF then all pixels below upper are replaced by value.

@@ -453,7 +453,8 @@ image_
 	call clgstr ("dims", Memc[dims], SZ_LINE)
 	if (streq (Memc[dims], "auto")) {
 	    # Determine the output image dimensions from the input images.
-	    call amovki (1, IE_AXLEN(ie,2), IM_MAXDIM-1)
+	    sz_val = IM_MAXDIM-1
+	    call amovki (1, IE_AXLEN(ie,2), sz_val)
 	    IE_AXLEN(ie,1) = 0
 	    ndim = 1
 
@@ -856,10 +857,13 @@ begin
 		    O_LEN(o) = DEF_LINELEN
 		sz_val = O_LEN(o)
 		call malloc (data, sz_val, TY_INT)
-		if (axis < 1 || axis > IM_MAXDIM)
-		    call amovki (1, Memi[data], O_LEN(o))
-		else
-		    call amovki (IE_V(ie,axis), Memi[data], O_LEN(o))
+		if (axis < 1 || axis > IM_MAXDIM) {
+		    sz_val = O_LEN(o)
+		    call amovki (1, Memi[data], sz_val)
+		} else {
+		    sz_val = O_LEN(o)
+		    call amovki (IE_V(ie,axis), Memi[data], sz_val)
+		}
 		O_VALP(o) = data
 		O_FLAGS(o) = O_FREEVAL
 	    }

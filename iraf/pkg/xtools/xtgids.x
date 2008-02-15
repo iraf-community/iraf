@@ -16,13 +16,15 @@ char	dicstr[ARB]		# Dictionary string
 int	ids[maxids]		# Identifier indices in dictionary
 int	maxids			# Maximum number of identifiers
 
+size_t	sz_val
 int	i, ip, token
 char	tokstr[SZ_LINE]
 
 int	ctotok(), strdic()
 
 begin
-	call amovki (NO, ids, maxids)
+	sz_val = maxids
+	call amovki (NO, ids, sz_val)
 
 	ip = 1
 	repeat {

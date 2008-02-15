@@ -54,7 +54,8 @@ begin
 	# Do the cleaning using ic_deviant to find the points to reject.
 
 	} else if (RG_NPTS(IC_RG(ic)) == npts) {
-	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
+	    sz_val = npts
+	    call amovki (NO, Memi[IC_REJPTS(ic)], sz_val)
 	    call ic_deviantd (cv, x, y, w, Memi[IC_REJPTS(ic)], npts,
 		IC_LOW(ic), IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic),
 		newreject)
@@ -78,7 +79,8 @@ begin
 	    call rg_packd (IC_RG(ic), x, Memd[xclean])
 	    call rg_packd (IC_RG(ic), y, Memd[yclean])
 	    call rg_packd (IC_RG(ic), w, Memd[wclean])
-	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
+	    sz_val = npts
+	    call amovki (NO, Memi[IC_REJPTS(ic)], sz_val)
 	    call ic_deviantd (cv, Memd[xclean], Memd[yclean],
 		Memd[wclean], Memi[IC_REJPTS(ic)], nclean, IC_LOW(ic),
 		IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic), newreject)

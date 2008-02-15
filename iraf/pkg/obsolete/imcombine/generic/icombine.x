@@ -58,7 +58,8 @@ begin
 	call salloc (scales, sz_val, TY_REAL)
 	call salloc (zeros, sz_val, TY_REAL)
 	call salloc (wts, sz_val, TY_REAL)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
@@ -69,7 +70,8 @@ begin
 		call salloc (Memi[dbuf+i-1], sz_val, TY_SHORT)
 	    }
 	} else
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
@@ -333,7 +335,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -423,7 +426,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -486,7 +490,8 @@ begin
 	call salloc (scales, sz_val, TY_REAL)
 	call salloc (zeros, sz_val, TY_REAL)
 	call salloc (wts, sz_val, TY_REAL)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
@@ -497,7 +502,8 @@ begin
 		call salloc (Memi[dbuf+i-1], sz_val, TY_INT)
 	    }
 	} else
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
@@ -761,7 +767,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -851,7 +858,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -914,7 +922,8 @@ begin
 	call salloc (scales, sz_val, TY_REAL)
 	call salloc (zeros, sz_val, TY_REAL)
 	call salloc (wts, sz_val, TY_REAL)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
@@ -925,7 +934,8 @@ begin
 		call salloc (Memi[dbuf+i-1], sz_val, TY_REAL)
 	    }
 	} else
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
@@ -1189,7 +1199,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -1278,7 +1289,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -1341,7 +1353,8 @@ begin
 	call salloc (scales, sz_val, TY_REAL)
 	call salloc (zeros, sz_val, TY_REAL)
 	call salloc (wts, sz_val, TY_REAL)
-	call amovki (D_ALL, Memi[lflag], nimages)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
@@ -1352,7 +1365,8 @@ begin
 		call salloc (Memi[dbuf+i-1], sz_val, TY_DOUBLE)
 	    }
 	} else
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovki (NULL, Memi[dbuf], sz_val)
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
@@ -1616,7 +1630,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
@@ -1705,7 +1720,8 @@ begin
 		    sz_val = IM_MAXDIM
 		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    call amovki (nimages, Memi[buf], npts)
+		    sz_val = npts
+		    call amovki (nimages, Memi[buf], sz_val)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			

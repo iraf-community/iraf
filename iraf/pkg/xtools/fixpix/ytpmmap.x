@@ -337,6 +337,7 @@ char	section[ARB]		#I Image section
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
+size_t	sz_val
 int	i, j, ip, temp, a[2], b[2], c[2], rop, ctoi()
 pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	im_pmmapo
@@ -348,9 +349,10 @@ begin
 	    call error (1, "Image sections only allowed for 1D and 2D images")
 
         # Decode the section string.
-	call amovki (1, a, 2)
-	call amovki (1, b, 2)
-	call amovki (1, c, 2)
+	sz_val = 2
+	call amovki (1, a, sz_val)
+	call amovki (1, b, sz_val)
+	call amovki (1, c, sz_val)
 	do i = 1, IM_NDIM(refim)
 	    b[i] = IM_LEN(refim,i)
 

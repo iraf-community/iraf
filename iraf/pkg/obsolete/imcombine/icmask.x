@@ -49,7 +49,8 @@ begin
 	do i = 1, nimages {
 	    sz_val = npix
 	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
-	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
+	    sz_val = npix
+	    call amovki (1, Memi[Memi[bufs+i-1]], sz_val)
 	}
 
 	# Check for special cases.  The BOOLEAN type is used when only
@@ -86,7 +87,8 @@ begin
 		    else {
 			if (project) {
 			    npms = nimages
-			    call amovki (pm, Memi[pms], nimages)
+			    sz_val = nimages
+			    call amovki (pm, Memi[pms], sz_val)
 			} else {
 			    npms = npms + 1
 			    Memi[pms+i-1] = pm
@@ -149,6 +151,7 @@ pointer	m[nimages]		# Pointer to mask pointers
 int	lflag[nimages]		# Line flags
 int	nimages			# Number of images
 
+size_t	sz_val
 int	i, j, ndim, nout, npix
 pointer	buf, pm
 bool	pm_linenotempty()
@@ -232,7 +235,8 @@ begin
 		    (mtype == M_GOODVAL && mvalue == 0)) {
 		    call aclri (Memi[buf], npix)
 		} else {
-		    call amovki (1, Memi[buf], npix)
+		    sz_val = npix
+		    call amovki (1, Memi[buf], sz_val)
 		    lflag[i] = D_NONE
 		}
 	    }

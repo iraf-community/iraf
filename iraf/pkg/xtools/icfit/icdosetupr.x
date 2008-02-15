@@ -45,7 +45,8 @@ begin
 	    call mfree (IC_REJPTS(ic), TY_INT)
 	    sz_val = npts
 	    call malloc (IC_REJPTS(ic), sz_val, TY_INT)
-	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
+	    sz_val = npts
+	    call amovki (NO, Memi[IC_REJPTS(ic)], sz_val)
 	    IC_NREJECT(ic) = 0
 
 	    # Set sample points.

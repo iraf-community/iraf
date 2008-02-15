@@ -108,7 +108,8 @@ begin
 	Memi[mii+1] = 0			 # Offset from start of heap
 
 	npad = 1438
-	call amovki (0, Memi[mii+2], npad)
+	sz_val = npad
+	call amovki (0, Memi[mii+2], sz_val)
 	call write (fd, Memi[mii], 1440)
 
 	# Write mask in heap area
@@ -119,7 +120,8 @@ begin
 
 	npad = 1440 - mod (MEF_PLSIZE(mef), 1440)
 
-	call amovki (0, Memi[mii], npad)
+	sz_val = npad
+	call amovki (0, Memi[mii], sz_val)
 	call write (fd, Memi[mii], npad)
 							 
 

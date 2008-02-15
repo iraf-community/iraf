@@ -46,7 +46,8 @@ begin
 
 	# Do each set of input/output images.
 
-	call amovki (INDEFI, Memi[blkfac], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (INDEFI, Memi[blkfac], sz_val)
 	while ((imtgetim (list1, Memc[image1], SZ_LINE) != EOF) &&
 	    (imtgetim (list2, Memc[image2], SZ_LINE) != EOF)) {
 

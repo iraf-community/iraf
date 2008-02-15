@@ -224,9 +224,11 @@ begin
 	    call calloc (extv, sz_val, TY_INT) 
 
 	    # Initialize the entries.
-	    call amovki (INDEFL, Memi[extv], MAX_OFFSETS)
+	    sz_val = MAX_OFFSETS
+	    call amovki (INDEFL, Memi[extv], sz_val)
 	    call aclrc (Memc[extn], MAX_OFFSETS)
-	    call amovki (-1, Memi[poff], MAX_OFFSETS)
+	    sz_val = MAX_OFFSETS
+	    call amovki (-1, Memi[poff], sz_val)
 
 	    FIT_GROUP(fit) = -1
 	    FIT_HDRPTR(fit) = hoff
@@ -260,7 +262,8 @@ begin
 	    
 	    # Read main FITS header and copy to spool fd.
 	    FIT_IM(fit) = im
-	    call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovki (1, FIT_LENAXIS(fit,1), sz_val)
 
 	    call fxf_load_header (in, fit, spool, nrec1440, totpix)
 
@@ -614,8 +617,9 @@ begin
 	    call realloc (extv, sz_val, TY_INT)
 
 	    offset = FIT_NUMOFFS(cfit) - MAX_OFFSETS
-	    call amovki (INDEFL, Memi[extv+offset], MAX_OFFSETS)
-	    call amovki (-1, Memi[poff+offset], MAX_OFFSETS)
+	    sz_val = MAX_OFFSETS
+	    call amovki (INDEFL, Memi[extv+offset], sz_val)
+	    call amovki (-1, Memi[poff+offset], sz_val)
 
 	    do i = 0,  MAX_OFFSETS-1  {
 		k = (offset+i)*LEN_CARD

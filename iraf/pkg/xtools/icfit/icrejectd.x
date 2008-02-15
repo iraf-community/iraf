@@ -24,13 +24,15 @@ int	niterate			# Number of rejection iterations
 real	grow				# Rejection radius
 int	nreject				# Number of points rejected
 
+size_t	sz_val
 int	i, ierr, nit, newreject
 errchk	ic_deviantd
 
 begin
 	# Initialize rejection.
 	nreject = 0
-	call amovki (NO, rejpts, npts)
+	sz_val = npts
+	call amovki (NO, rejpts, sz_val)
 
 	if (niterate <= 0)
 	    return
@@ -49,7 +51,8 @@ begin
 	} then {
 	    call dcvfit (cv, x, y, w, npts, WTS_USER, ierr)
 	    nreject = 0
-	    call amovki (NO, rejpts, npts)
+	    sz_val = npts
+	    call amovki (NO, rejpts, sz_val)
 	    do i = 1, nit
 		call ic_deviantd (cv, x, y, w, rejpts, npts, low_reject,
 		    high_reject, grow, YES, nreject, newreject)

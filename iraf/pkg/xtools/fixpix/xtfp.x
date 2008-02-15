@@ -340,8 +340,9 @@ begin
 	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
 	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
 	    indef = INDEFI
-	    call amovki (indef, Memi[FP_V1(fp,1)], ncols)
-	    call amovki (indef, Memi[FP_V2(fp,1)], ncols)
+	    sz_val = ncols
+	    call amovki (indef, Memi[FP_V1(fp,1)], sz_val)
+	    call amovki (indef, Memi[FP_V2(fp,1)], sz_val)
 	}
 
 	# If there are no bad pixels in the line and the line contains

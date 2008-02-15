@@ -366,7 +366,8 @@ begin
 	# allocate space for the line pointers
 	sz_val = PRL_NLINES(pl)
 	call malloc (PRL_LINES(pl), sz_val, TY_INT) 
-	call amovki (NULL, Memi[PRL_LINES(pl)], PRL_NLINES(pl))
+	sz_val = PRL_NLINES(pl)
+	call amovki (NULL, Memi[PRL_LINES(pl)], sz_val)
 
 	# set pointer to next free element
 	PRL_LP(pl) = 1

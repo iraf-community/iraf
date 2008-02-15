@@ -537,7 +537,8 @@ begin
 	}
 
 	# Set the status array.
-	call amovki (NO, stat, npts)
+	sz_val = npts
+	call amovki (NO, stat, sz_val)
 	index = 0
 	while (me_next_number (Memi[ranges], index) != EOF)
 	    stat[index] = YES
@@ -576,7 +577,8 @@ begin
 	}
 
 	# Set the line numbers.
-	call amovki (NO, stat, npts)
+	sz_val = npts
+	call amovki (NO, stat, sz_val)
 	lastix = 0
 	do i = 1, npts {
 	    if (ix[i] == lastix) {
@@ -650,6 +652,7 @@ real	xc, yc			#I the center of the wedge
 real	angle1, angle2		#I the wedge angles
 int	width, height		#I the image mask width and height
 
+size_t	sz_val
 real	sweep, x2, y2, vx[7], vy[7]
 int	count, intrcpt1, intrcpt2
 int	me_pie_intercept(), me_corner_vertex()
@@ -662,7 +665,8 @@ begin
 
 	# If the sweep is too small to be noticed don't bother.
 	if (abs (sweep) < SMALL_NUMBER) {
-	    call amovki (NO, stat, npts) 
+	    sz_val = npts
+	    call amovki (NO, stat, sz_val) 
 	    return
 	}
 	if (sweep < 0.0)

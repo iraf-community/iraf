@@ -118,21 +118,24 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nli (im, buf, v, 2) != EOF) {
-		if (b == 0)
-		    call amovki (divzero, Memi[buf[1]], len)
-		else if (b == 1)
+		if (b == 0) {
+		    sz_val = len
+		    call amovki (divzero, Memi[buf[1]], sz_val)
+		} else if (b == 1) {
 		    call amovi (Memi[buf[2]], Memi[buf[1]], len)
-		else
+		} else {
 		    call adivki (Memi[buf[2]], b, Memi[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do the vector divide to imagec.
 	} else {
 	    im[2] = im_a
 	    im[3] = im_b
-	    while (ima_nli (im, buf, v, 3) != EOF)
+	    while (ima_nli (im, buf, v, 3) != EOF) {
 		call advzi (Memi[buf[2]], Memi[buf[3]], Memi[buf[1]],
 		    len, ima_efnci)
+	    }
 	}
 end
 

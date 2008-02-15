@@ -67,7 +67,8 @@ begin
         formatted  = false
 
 	# Initialize the section numbering.
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 
         # Determine whether or not the text is formatted.
         repeat {

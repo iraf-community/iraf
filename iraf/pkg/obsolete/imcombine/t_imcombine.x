@@ -224,11 +224,13 @@ retry_
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
 		sz_val = nimages
 		call salloc (in, sz_val, TY_POINTER)
-		call amovki (out[1], Memi[in], nimages)
+		sz_val = nimages
+		call amovki (out[1], Memi[in], sz_val)
 	    } else {
 		sz_val = imtlen(list)
 		call salloc (in, sz_val, TY_POINTER)
-		call amovki (NULL, Memi[in], imtlen(list))
+		sz_val = imtlen(list)
+		call amovki (NULL, Memi[in], sz_val)
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
 		    tmp = immap (input, READ_ONLY, 0)

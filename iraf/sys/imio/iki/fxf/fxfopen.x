@@ -60,7 +60,8 @@ begin
 	IM_KDES(im) = fit
 	IM_HFD(im) = NULL
 	FIT_IM(fit) = im
-	call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (1, FIT_LENAXIS(fit,1), sz_val)
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {

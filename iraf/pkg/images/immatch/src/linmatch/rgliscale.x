@@ -89,10 +89,11 @@ begin
 	    bserr = INDEFR; bzerr = INDEFR
 	    call printf ("The regions/photometry list is empty\n")
 	} else {
-	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], rg_lstati(ls,
-	        NREGIONS))
+	    sz_val = rg_lstati(ls, NREGIONS)
+	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], sz_val)
 	    call rg_scale (imr, im1, ls, bscale, bzero, bserr, bzerr, YES)
-	    call amovki (NO, Memi[udelete], rg_lstati(ls,NREGIONS))
+	    sz_val = rg_lstati(ls,NREGIONS)
+	    call amovki (NO, Memi[udelete], sz_val)
 	    if (rg_lplot (gd, imr, im1, ls, Memi[udelete], 1, bscale, bzero,
 	    	plottype) == OK) {
 	        newref = NO
@@ -141,10 +142,10 @@ begin
 				call rg_lindefr (ls)
 			    }
 			}
-			if (newfit == YES)
-	    		    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)],
-			        rg_lstati(ls,NREGIONS))
-			else if (newavg == YES) {
+			if (newfit == YES) {
+	    		    sz_val = rg_lstati(ls,NREGIONS)
+	    		    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], sz_val)
+			} else if (newavg == YES) {
 			    do i = 1, rg_lstati(ls,NREGIONS) {
 				if (Memi[rg_lstatp(ls,RDELETE)+i-1] ==
 				    LS_DELETED || Memi[rg_lstatp(ls,

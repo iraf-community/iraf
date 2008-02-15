@@ -385,7 +385,8 @@ begin
             case TY_UBYTE, TY_USHORT, TY_SHORT:
 		call amovks (O_VALS(args[1]), Mems[scaled], len)
             case TY_INT:
-		call amovki (O_VALI(args[1]), Memi[scaled], len)
+		sz_val = len
+		call amovki (O_VALI(args[1]), Memi[scaled], sz_val)
             case TY_LONG:
 		sz_val = len
 		call amovkl (O_VALL(args[1]), Meml[scaled], sz_val)

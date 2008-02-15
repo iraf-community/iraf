@@ -79,7 +79,8 @@ begin
 	do i = 1, nimages {
 	    sz_val = npix
 	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
-	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
+	    sz_val = npix
+	    call amovki (1, Memi[Memi[bufs+i-1]], sz_val)
 	}
 
 	# Check for special cases.  The BOOLEAN type is used when only
@@ -297,6 +298,7 @@ pointer	m[nimages]		# Pointer to mask pointers
 int	lflag[nimages]		# Line flags
 int	nimages			# Number of images
 
+size_t	sz_val
 int	mtype			# Mask type
 int	mvalue			# Mask value
 pointer	bufs			# Pointer to data line buffers
@@ -431,7 +433,8 @@ begin
 		} else if (mtype == M_LTVAL && mvalue > 0) {
 		    call aclri (Memi[buf], npix)
 		} else {
-		    call amovki (1, Memi[buf], npix)
+		    sz_val = npix
+		    call amovki (1, Memi[buf], sz_val)
 		    lflag[i] = D_NONE
 		}
 	    }

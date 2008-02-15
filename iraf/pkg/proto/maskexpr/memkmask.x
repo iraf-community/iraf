@@ -363,10 +363,13 @@ begin
 		    O_LEN(o) = DEF_LINELEN
 		sz_val = O_LEN(o)
 		call malloc (data, sz_val, TY_INT)
-		if (axis < 1 || axis > IM_MAXDIM)
-		    call amovki (1, Memi[data], O_LEN(o))
-		else
-		    call amovki (ME_PMV(me,axis), Memi[data], O_LEN(o))
+		if (axis < 1 || axis > IM_MAXDIM) {
+		    sz_val = O_LEN(o)
+		    call amovki (1, Memi[data], sz_val)
+		} else {
+		    sz_val = O_LEN(o)
+		    call amovki (ME_PMV(me,axis), Memi[data], sz_val)
+		}
 		O_VALP(o) = data
 		O_FLAGS(o) = O_FREEVAL
 	    }
@@ -509,7 +512,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_circle (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -535,7 +539,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_ellipse (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -562,7 +567,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_box (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -588,7 +594,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_rectangle (Memi[ix], Memi[iy], Memi[O_VALP(o)],
@@ -623,7 +630,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        nver = nargs / 2
 	        do i = 1, nver
 		    Memr[rval2+i-1] = Memr[rval1+2*i-1]
@@ -670,7 +678,8 @@ begin
 	    } else if (nargs == 1) {
 	        sz_val = O_LEN(o)
 	        call malloc (ix, sz_val, TY_INT)
-	        call amovki (ME_PMV(me,2), Memi[ix], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[ix], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_lines (Memi[ix], Memi[O_VALP(o)], O_LEN(o),
@@ -695,7 +704,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_vector (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -723,7 +733,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_pie (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -750,7 +761,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_cannulus (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -776,7 +788,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_eannulus (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -803,7 +816,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	            sz_val = O_LEN(o)
 	            call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_rannulus (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),
@@ -845,7 +859,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        width = Memr[rval1]
@@ -879,7 +894,8 @@ begin
 	        call malloc (iy, sz_val, TY_INT)
 	        do i = 1, O_LEN(o)
 		    Memi[ix+i-1] = i
-	        call amovki (ME_PMV(me,2), Memi[iy], O_LEN(o))
+	        sz_val = O_LEN(o)
+	        call amovki (ME_PMV(me,2), Memi[iy], sz_val)
 	        sz_val = O_LEN(o)
 	        call malloc (O_VALP(o), sz_val, TY_INT)
 	        call me_point (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),

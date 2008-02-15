@@ -961,7 +961,8 @@ begin
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF &&
 	    impnli (tmpmsk, ombuf, Meml[mvout]) != EOF) {
 	    call amovkr (0.0, Memr[obuf], npix)
-	    call amovki (0, Memi[ombuf], npix)
+	    sz_val = npix
+	    call amovki (0, Memi[ombuf], sz_val)
 	    do j = 1, nin {
 	        call mio_setrange (Memp[mpptrs+j-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[imptrs+j-1])) 

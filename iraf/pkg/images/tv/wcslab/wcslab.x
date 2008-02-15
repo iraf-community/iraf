@@ -465,8 +465,9 @@ begin
 	# "first" position in that axis direction.  This will more than likely
 	# be a problem, but no general solution comes to mind this second.
 
-	call amovki (0, axno, wcs_dim)
-	call amovki (0, axval, wcs_dim)
+	sz_val = wcs_dim
+	call amovki (0, axno, sz_val)
+	call amovki (0, axval, sz_val)
 
 	# Setup so that the desired axes are set as the X and Y axis.
 	axno[index_sys1] = X_DIM

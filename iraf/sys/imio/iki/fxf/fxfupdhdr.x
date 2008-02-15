@@ -235,7 +235,8 @@ begin
 	if (mod(npad,FITS_BLOCK_CHARS) > 0 &&
 		(FIT_NEWIMAGE(fit) == YES || append)) {
 
-	    call amovki (0, Memi[mii], npad)
+	    sz_val = npad
+	    call amovki (0, Memi[mii], sz_val)
 	    call flush (hdr_fd)
 	    call seek (hdr_fd, EOF)
 	    call write (hdr_fd, Memi[mii], npad)
@@ -1096,7 +1097,8 @@ begin
 	nblocks = size_ua / FITS_BLOCK_CHARS
 	
 	# Put a blank new header in the meantime.
-	call amovki( 0, Memi[mii], FITS_BLOCK_CHARS)
+	sz_val = FITS_BLOCK_CHARS
+	call amovki( 0, Memi[mii], sz_val)
 	do nk = 1, nblocks
 	    call write (out_fd, Memi[mii], FITS_BLOCK_CHARS)
 

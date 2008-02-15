@@ -93,6 +93,7 @@ char	imname[SZ_FNAME]
 int	ndim, dim[IM_MAXDIM]
 int	i, j, k, scalar
 long	offset
+size_t	sz_val
 int	clgeti(), nscan(), clscan(), stridx()
 pointer	buf, im, immap(), impl3l()
 
@@ -107,7 +108,8 @@ begin
 	dtype = ty_code[stridx (clgetc ("datatype"), types)]
 	ndim = clgeti ("ndim")
 
-	call amovki (1, dim, 3)
+	sz_val = 3
+	call amovki (1, dim, sz_val)
 	if (clscan ("axis_lengths") != EOF) {
 	    do i = 1, ndim
 		call gargi (dim[i])

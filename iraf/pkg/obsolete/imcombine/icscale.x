@@ -52,7 +52,8 @@ begin
 	call salloc (wname, sz_val, TY_CHAR)
 
 	# Set the defaults.
-	call amovki (1, Memi[ncombine], nimages)
+	sz_val = nimages
+	call amovki (1, Memi[ncombine], sz_val)
 	call amovkr (0., Memr[exptime], nimages)
 	call amovkr (INDEF, Memr[modes], nimages)
 	call amovkr (INDEF, Memr[medians], nimages)
@@ -73,7 +74,8 @@ begin
 		    Memr[exptime+i-1] = 0.
 	    }
 	    if (project) {
-		call amovki (Memi[ncombine], Memi[ncombine], nimages)
+		sz_val = nimages
+		call amovki (Memi[ncombine], Memi[ncombine], sz_val)
 		call amovkr (Memr[exptime], Memr[exptime], nimages)
 		break
 	    }

@@ -23,6 +23,7 @@ char	imtlist2[SZ_LINE]			# Output image list
 int	option					# Type of operation
 int	blkfac[IM_MAXDIM]			# Block sizes
 
+size_t	sz_val
 char	image1[SZ_FNAME]			# Input image name
 char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
@@ -43,7 +44,8 @@ begin
 	call clgstr ("input", imtlist1, SZ_LINE)
 	call clgstr ("output", imtlist2, SZ_LINE)
 	option = clgwrd ("option", image1, SZ_FNAME, OPTIONS)
-	call amovki (INDEFI, blkfac, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (INDEFI, blkfac, sz_val)
 
 	# Expand the input and output image lists.
 

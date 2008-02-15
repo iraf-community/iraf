@@ -81,7 +81,8 @@ begin
 	    nalloc = index + MAX_OPENIM
 	    sz_val = nalloc
 	    call realloc (ims, sz_val, TY_STRUCT)
-	    call amovki (NULL, Memi[ims+i], nalloc-i)
+	    sz_val = nalloc-i
+	    call amovki (NULL, Memi[ims+i], sz_val)
 	}
 	sz_val = XT_LEN
 	call calloc (xt, sz_val, TY_STRUCT)
