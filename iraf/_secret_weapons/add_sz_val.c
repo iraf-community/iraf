@@ -255,21 +255,25 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    }
 	    ip = lines[j];
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
-	    if ( *ip == '#' || *ip == '\n' ) continue;
+	    if ( *ip == '#' || *ip == '\n' || *ip == '\0' ) continue;
 	    /* */
 	    flg_prev_if = prev_if_or_else;
 	    /* */
 	    prev_if_or_else = false;
-	    if ( (strncmp(ip,"if",2)==0 && is_valchar(ip[2])==0) ||
-		 (strncmp(ip,"else",4)==0 && is_valchar(ip[4])==0) ||
-		 (strncmp(ip,"while",5)==0 && is_valchar(ip[5])==0) ||
-		 (strncmp(ip,"do",2)==0 && is_valchar(ip[2])==0) ||
-		 (strncmp(ip,"for",3)==0 && is_valchar(ip[3])==0) ||
-		 (strncmp(ip,"repeat",6)==0 && is_valchar(ip[6])==0) ||
-		 (strncmp(ip,"iferr",5)==0 && is_valchar(ip[5])==0) ||
-		 (strncmp(ip,"ifnoerr",7)==0 && is_valchar(ip[7])==0) ) {
-		if ( strrchr(ip,'{') == NULL ) {
-		    prev_if_or_else = true;
+	    {
+		const char *ip1 = ip;
+		while ( isalpha(*ip1)==0 && *ip1!='\0' ) ip1++;
+		if ( (strncmp(ip1,"if",2)==0 && is_valchar(ip1[2])==0) ||
+		     (strncmp(ip1,"else",4)==0 && is_valchar(ip1[4])==0) ||
+		     (strncmp(ip1,"while",5)==0 && is_valchar(ip1[5])==0) ||
+		     (strncmp(ip1,"do",2)==0 && is_valchar(ip1[2])==0) ||
+		     (strncmp(ip1,"for",3)==0 && is_valchar(ip1[3])==0) ||
+		     (strncmp(ip1,"repeat",6)==0 && is_valchar(ip1[6])==0) ||
+		     (strncmp(ip1,"iferr",5)==0 && is_valchar(ip1[5])==0) ||
+		     (strncmp(ip1,"ifnoerr",7)==0 && is_valchar(ip1[7])==0) ) {
+		    if ( strrchr(ip1,'{') == NULL ) {
+			prev_if_or_else = true;
+		    }
 		}
 	    }
 	    /* */
@@ -287,10 +291,94 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    if ( *ip != '(' ) continue;
 	    /* */
 	    if ( flg_prev_if == true ) {
+		//fprintf(stderr,
+		//	"[ERROR] line: %d: previous line contains `if' or `else' without a brace\n",
+		//	j+1);
+		//goto quit;
+		char tmp_buf[SZ_LINE_BUF];
+		const char *ip1;
+		char *op1;
+		char *maxop1;
 		fprintf(stderr,
-			"[ERROR] line: %d: previous line contains `if' or `else' without a brace\n",
-			j+1);
-		goto quit;
+			"[INFO] file: %s  line = %d: appended braces\n",
+			file_name,j+1);
+		op1 = strchr(lines[j-1],'\n');
+		if ( op1 != NULL ) *op1 = ' ';
+		snprintf(tmp_buf,SZ_LINE_BUF,"%s{\n",lines[j-1]);
+		free(lines[j-1]);
+		lines[j-1] = strdup(tmp_buf);
+		if ( lines[j-1] == NULL ) {
+		    fprintf(stderr,"[ERROR] strdup() failed\n");
+		    goto quit;
+		}
+		/* */
+		op1 = tmp_buf;
+		maxop1 = tmp_buf + SZ_LINE_BUF -1;
+		ip1 = lines[j+1];
+		while ( *ip1 == ' ' || *ip1 == '\t' ) {
+		    if ( op1 < maxop1 ) {
+			*op1 = *ip1;
+			op1++;
+		    }
+		    ip1++;
+		}
+		if ( strncmp("else ",ip1,5)==0 || strncmp("else\t",ip1,5)==0 ) {
+		    const char *ip2 = "} ";
+		    while ( *ip2 != '\0' ) {
+			if ( op1 < maxop1 ) {
+			    *op1 = *ip2;
+			    op1++;
+			}
+			ip2++;
+		    }
+		    ip2 = ip1;
+		    while ( *ip2 != '\0' ) {
+			if ( op1 < maxop1 ) {
+			    *op1 = *ip2;
+			    op1++;
+			}
+			ip2++;
+		    }
+		    *op1 = '\0';
+		    free(lines[j+1]);
+		    lines[j+1] = strdup(tmp_buf);
+		    if ( lines[j+1] == NULL ) {
+			fprintf(stderr,"[ERROR] strdup() failed\n");
+			goto quit;
+		    }
+		}
+		else {
+		    char tmp_buf1[SZ_LINE_BUF];
+		    const char *ip2;
+		    op1 = tmp_buf;
+		    ip2 = lines[j-1];
+		    while ( *ip2 == ' ' || *ip2 == '\t' ) {
+			if ( op1 < maxop1 ) {
+			    *op1 = *ip2;
+			    op1++;
+			}
+			ip2++;
+		    }
+		    ip2 = "}\n";
+		    while ( *ip2 != '\0' ) {
+			if ( op1 < maxop1 ) {
+			    *op1 = *ip2;
+			    op1++;
+			}
+			ip2++;
+		    }
+		    *op1 = '\0';
+		    snprintf(tmp_buf1,SZ_LINE_BUF,"%s%s",
+			     lines[j],tmp_buf);
+		    free(lines[j]);
+		    lines[j] = strdup(tmp_buf1);
+		    if ( lines[j] == NULL ) {
+			fprintf(stderr,"[ERROR] strdup() failed\n");
+			goto quit;
+		    }
+		    j--;	/* try again */
+		    continue;
+		}
 	    }
 	    /* 1st arg begins... */
 	    if ( DEBUG ) {
@@ -325,8 +413,27 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    ip1 ++;
 		}
 		if ( next_arg == NULL ) {
-		    fprintf(stderr,"[ERROR] Invalid line: '%s'\n",lines[j]);
-		    goto quit;
+		    char tmp_buf[SZ_LINE_BUF];
+		    const char *ip1;
+		    char *op1;
+		    int next_j;
+		    op1 = strchr(lines[j],'\n');
+		    if ( op1 != NULL ) *op1 = ' ';
+		    for ( next_j=j+1 ; lines[next_j][0] == '\0' ; next_j++ );
+		    ip1 = lines[next_j];	/* next line */
+		    while ( *ip1 == ' ' || *ip1 == '\t' ) ip1++;
+		    snprintf(tmp_buf,SZ_LINE_BUF,"%s%s",lines[j],ip1);
+		    free(lines[j]);
+		    lines[j] = strdup(tmp_buf);
+		    if ( lines[j] == NULL ) {
+			fprintf(stderr,"[ERROR] strdup() failed\n");
+			goto quit;
+		    }
+		    lines[next_j][0] = '\0';
+		    j--;	/* try again */
+		    fprintf(stderr,"[INFO] file: %s  concatenated line: %d and %d\n",
+			    file_name,j+1,next_j+1);
+		    break;
 		}
 		if ( arg_cnt == target_arg ) {
 		    char tmp_buf[SZ_LINE_BUF];
@@ -381,6 +488,10 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			/* */
 			ip2 = current_arg_str;
 			/* check `long( ... )' */
+			if ( strcmp(ap_type,"long")==0 &&
+			     strncmp("Meml[",ip,5)==0 ) {
+			    break;
+			}
 			if ( strncmp("long",ip,4)==0 ) {
 			    const char *ip3;
 			    ip3 = ip2 + 4;
@@ -412,9 +523,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    for ( ; ip2 < current_arg ; op++, ip2++ ) {
 			if ( op < maxop ) *op = *ip2;
 		    }
-		    ip2 = " ";
-		    for ( ; *ip2 != '\0' ; op++, ip2++ ) {
-			if ( op < maxop ) *op = *ip2;
+		    if ( arg_cnt != 0 ) {
+			ip2 = " ";
+			for ( ; *ip2 != '\0' ; op++, ip2++ ) {
+			    if ( op < maxop ) *op = *ip2;
+			}
 		    }
 		    ip2 = ap_val;
 		    for ( ; *ip2 != '\0' ; op++, ip2++ ) {
