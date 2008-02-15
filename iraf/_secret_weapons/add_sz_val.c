@@ -291,16 +291,12 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    if ( *ip != '(' ) continue;
 	    /* */
 	    if ( flg_prev_if == true ) {
-		//fprintf(stderr,
-		//	"[ERROR] line: %d: previous line contains `if' or `else' without a brace\n",
-		//	j+1);
-		//goto quit;
 		char tmp_buf[SZ_LINE_BUF];
 		const char *ip1;
 		char *op1;
 		char *maxop1;
 		fprintf(stderr,
-			"[INFO] file: %s  line = %d: appended braces\n",
+			"[INFO] file = %s  line = %d: appended braces\n",
 			file_name,j+1);
 		op1 = strchr(lines[j-1],'\n');
 		if ( op1 != NULL ) *op1 = ' ';
@@ -322,7 +318,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    }
 		    ip1++;
 		}
-		if ( strncmp("else ",ip1,5)==0 || strncmp("else\t",ip1,5)==0 ) {
+		if ( strncmp("else",ip1,4)==0 && is_valchar(ip1[4])==0 ) {
 		    const char *ip2 = "} ";
 		    while ( *ip2 != '\0' ) {
 			if ( op1 < maxop1 ) {
@@ -431,7 +427,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    }
 		    lines[next_j][0] = '\0';
 		    j--;	/* try again */
-		    fprintf(stderr,"[INFO] file: %s  concatenated line: %d and %d\n",
+		    fprintf(stderr,"[INFO] file = %s  concatenated line: %d and %d\n",
 			    file_name,j+1,next_j+1);
 		    break;
 		}
@@ -560,7 +556,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
     if ( needs_update == true ) {
 	fp = fopen(file_name,"w");
 	if ( fp == NULL ) {
-	    fprintf(stderr,"[ERROR] file not found: %s\n",file_name);
+	    fprintf(stderr,"[ERROR] cannot open: %s\n",file_name);
 	    goto quit;
 	}
 	printf("updating: %s\n",file_name);
