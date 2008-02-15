@@ -10,30 +10,47 @@
 #define SZ_LINE_BUF 65536
 #define SZ_NUM_PROC 1024
 
-static int add_sz_val( const char *, int, const char * );
+static int add_sz_val( const char *, int, const char *, const char *,
+		       const char * );
 
 int main( int argc, char *argv[] )
 {
     int return_status = -1;
     const char *proc_name;
+    const char *arg_type;
+    const char *arg_val = NULL;
     int target_arg;
     int i;
 
     if ( argc < 4 ) {
 	fprintf(stderr,"[USAGE]\n");
-	fprintf(stderr,"%s proc_name arg_index foo.x foo1.x ...\n",argv[0]);
+	fprintf(stderr,"%s proc_name arg_index arg_type foo.x foo1.x ...\n",argv[0]);
 	fprintf(stderr,"(example)\n");
-	fprintf(stderr,"%s salloc 1 foo.x foo1.x ...\n",argv[0]);
+	fprintf(stderr,"%s salloc 1 size_t foo.x foo1.x ...\n",argv[0]);
 	goto quit;
     }
 
-    proc_name = argv[1];
-    target_arg = atoi(argv[2]);
+    i=1;
+    proc_name = argv[i++];
+    target_arg = atoi(argv[i++]);
+    arg_type = argv[i++];
 
-    for ( i=3 ; i < argc ; i++ ) {
+    if ( strcmp(arg_type,"size_t") == 0 ) {
+	arg_val = "sz_val";
+    }
+    else if ( strcmp(arg_type,"long") == 0 ) {
+	arg_val = "lg_val";
+    }
+    else {
+	fprintf(stderr,"[ERROR] invalid arg_type: %s\n",arg_type);
+	goto quit;
+    }
+
+    for ( ; i < argc ; i++ ) {
 	int status;
 	//printf("[INFO] target = %s\n",argv[i]);
-	status = add_sz_val(proc_name,target_arg,argv[i]);
+	status = add_sz_val(proc_name,target_arg,arg_type,arg_val,
+			    argv[i]);
 	if ( status != 0 ) {
 	    fprintf(stderr,"[ERROR] add_sz_val() failed: file = %s\n",argv[i]);
 	    goto quit;
@@ -51,6 +68,7 @@ static int is_valchar( int ch )
 }
 
 static int add_sz_val( const char *proc_name, int target_arg, 
+		       const char *ap_type, const char *ap_val,
 		       const char *file_name )
 {
     int return_status = -1;
@@ -204,10 +222,13 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	/* check sz_val decl. */
 	for ( j=j0 ; j < proc_begin[i] ; j++ ) {
 	    const char *ip;
-	    ip = strstr(lines[j],"\tsz_val");
-	    if ( ip != NULL && is_valchar(ip[7]) == 0 ) {
-		/* already exists */
-		insert_idx[i] = -1;
+	    ip = strchr(lines[j],'\t');
+	    if ( ip != NULL && strncmp(ip+1,ap_val,strlen(ap_val))==0 ) {
+		ip++;
+		if ( is_valchar(ip[strlen(ap_val)]) == 0 ) {
+		    /* already exists */
+		    insert_idx[i] = -1;
+		}
 	    }
 	}
     }
@@ -315,7 +336,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    size_t len_target;
 		    bool skip_ok;
 		    /* */
-		    if ( strncmp(current_arg_str,"sz_val",6) == 0 && 
+		    if ( strncmp(current_arg_str,ap_val,strlen(ap_val)) == 0 && 
 			 is_valchar(current_arg_str[6]) == 0 ) {
 			break;
 		    }
@@ -349,12 +370,28 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			for ( ; ip2 < ptr_call_begin ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
-			ip2 = "sz_val = ";
+			ip2 = ap_val;
 			for ( ; *ip2 != '\0' ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
+			ip2 = " = ";
+			for ( ; *ip2 != '\0' ; op++, ip2++ ) {
+			    if ( op < maxop ) *op = *ip2;
+			}
+			/* */
 			ip2 = current_arg_str;
-			for ( ; ip2 < next_arg ; op++, ip2++ ) {
+			/* check `long( ... )' */
+			if ( strncmp("long",ip,4)==0 ) {
+			    const char *ip3;
+			    ip3 = ip2 + 4;
+			    while ( *ip3==' ' || *ip3=='\t' ) ip3++;
+			    if ( *ip3 == '(' && ip2[len_target-1] == ')' ) {
+				ip3++;
+				len_target --;
+				ip2 = ip3;
+			    }
+			}
+			for ( ; ip2 < current_arg_str + len_target ; op++, ip2++ ) {
 			    if ( op < maxop ) *op = *ip2;
 			}
 			ip2 = "\n";
@@ -375,7 +412,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    for ( ; ip2 < current_arg ; op++, ip2++ ) {
 			if ( op < maxop ) *op = *ip2;
 		    }
-		    ip2 = " sz_val";
+		    ip2 = " ";
+		    for ( ; *ip2 != '\0' ; op++, ip2++ ) {
+			if ( op < maxop ) *op = *ip2;
+		    }
+		    ip2 = ap_val;
 		    for ( ; *ip2 != '\0' ; op++, ip2++ ) {
 			if ( op < maxop ) *op = *ip2;
 		    }
@@ -414,7 +455,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    int j;
 	    for ( j=0 ; j < num_proc ; j++ ) {
 		if ( i == insert_idx[j] ) {
-		    fprintf(fp,"size_t\tsz_val\n");
+		    fprintf(fp,"%s\t%s\n",ap_type,ap_val);
 		}
 	    }
 	    fprintf(fp,"%s",lines[i]);
