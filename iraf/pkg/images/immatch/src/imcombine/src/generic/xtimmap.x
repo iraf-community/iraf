@@ -495,8 +495,9 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_SHORT) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
-			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
+			sz_val = IM_MAXDIM
+			call amovl (v, XT_VS(xt1,1), sz_val)
+			call amovl (v, XT_VE(xt1,1), sz_val)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
@@ -673,8 +674,9 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_INT) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
-			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
+			sz_val = IM_MAXDIM
+			call amovl (v, XT_VS(xt1,1), sz_val)
+			call amovl (v, XT_VE(xt1,1), sz_val)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
@@ -851,8 +853,9 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_REAL) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
-			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
+			sz_val = IM_MAXDIM
+			call amovl (v, XT_VS(xt1,1), sz_val)
+			call amovl (v, XT_VE(xt1,1), sz_val)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
@@ -1029,8 +1032,9 @@ begin
 		    nl = XT_BUFSIZE(xt1) / sizeof (TY_DOUBLE) / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
-			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
-			call amovl (v, XT_VE(xt1,1), IM_MAXDIM)
+			sz_val = IM_MAXDIM
+			call amovl (v, XT_VS(xt1,1), sz_val)
+			call amovl (v, XT_VE(xt1,1), sz_val)
 			XT_VS(xt1,1) = 1
 			XT_VE(xt1,1) = nc
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))

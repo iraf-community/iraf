@@ -253,7 +253,8 @@ begin
 		buf1 = imgs2l (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
 		    call error (5, wrerr)
-		call amovl (Meml[buf1], Meml[buf2], ncols)
+		sz_val = ncols
+		call amovl (Meml[buf1], Meml[buf2], sz_val)
 	    }
 	case TY_REAL:
 	    do i = 1, nlines {

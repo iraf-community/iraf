@@ -87,7 +87,8 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnls (im, buf, v) == EOF)
@@ -177,7 +178,8 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnli (im, buf, v) == EOF)
@@ -267,7 +269,8 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnlr (im, buf, v) == EOF)
@@ -357,7 +360,8 @@ begin
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnld (im, buf, v) == EOF)

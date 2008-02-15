@@ -87,7 +87,8 @@ begin
 		case TY_INT:
 		    call amovi (Memi[out], Memi[impl2i(im,orow)], O_LEN(op))
 		case TY_LONG:
-		    call amovl (Meml[out], Meml[impl2l(im,orow)], O_LEN(op))
+		    sz_val = O_LEN(op)
+		    call amovl (Meml[out], Meml[impl2l(im,orow)], sz_val)
 		case TY_REAL:
 		    call amovr (Memr[out], Memr[impl2r(im,orow)], O_LEN(op))
 		case TY_DOUBLE:

@@ -91,7 +91,8 @@ begin
                 O_TYPE(o) = TY_LONG
                 sz_val = IO_NPIX(op)
                 call malloc (O_VALP(o), sz_val, TY_LONG)
-		call amovl (Meml[IO_DATA(op)], Meml[O_VALP(o)], IO_NPIX(op))
+		sz_val = IO_NPIX(op)
+		call amovl (Meml[IO_DATA(op)], Meml[O_VALP(o)], sz_val)
 
 	    case TY_REAL:
                 O_LEN(o) = IO_NPIX(op)
@@ -368,7 +369,8 @@ setop_      switch (O_TYPE(args[1])) {
                 O_TYPE(o) = TY_LONG
                 sz_val = O_LEN(args[1])
                 call malloc (O_VALP(o), sz_val, TY_LONG)
-                call amovl (Meml[O_VALP(args[1])], Meml[O_VALP(o)], O_LEN(o))
+                sz_val = O_LEN(o)
+                call amovl (Meml[O_VALP(args[1])], Meml[O_VALP(o)], sz_val)
 
             case TY_REAL:
                 O_LEN(o) = O_LEN(args[1])

@@ -55,7 +55,8 @@ begin
 	    # Write to a pixel list.
 
 	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
-	    call amovl (v, o_v, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (v, o_v, sz_val)
 	    nchars = npix * sz_pixel
 
 	    switch (IM_PIXTYPE(im)) {

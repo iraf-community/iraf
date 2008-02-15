@@ -330,14 +330,16 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmas (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -347,7 +349,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
@@ -416,14 +419,16 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmas (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -432,7 +437,8 @@ begin
 		if (out[4] != NULL)
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
@@ -751,14 +757,16 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmai (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -768,7 +776,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
@@ -837,14 +846,16 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmai (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -853,7 +864,8 @@ begin
 		if (out[4] != NULL)
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
@@ -1172,14 +1184,16 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmar (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -1189,7 +1203,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
@@ -1258,14 +1273,16 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmar (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -1274,7 +1291,8 @@ begin
 		if (out[4] != NULL)
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
@@ -1593,14 +1611,16 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnld (out[3], buf, Meml[v1])
 		    call ic_sigmad (d, id, n, wts, npts, Memd[outdata],
 			Memd[buf])
@@ -1610,7 +1630,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
@@ -1679,14 +1700,16 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnld (out[3], buf, Meml[v1])
 		    call ic_sigmad (d, id, n, wts, npts, Memd[outdata],
 			Memd[buf])
@@ -1695,7 +1718,8 @@ begin
 		if (out[4] != NULL)
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages

@@ -265,7 +265,8 @@ begin
 			    call error (0, "Error writing output image.")
 		        if (imgnll (im1, buf1, Meml[vim1]) == EOF)
 			    call error (0, "Error reading input image.")
-		       call amovl (Meml[buf1], Meml[buf2], ncols) 
+		       sz_val = ncols
+		       call amovl (Meml[buf1], Meml[buf2], sz_val) 
 		    }
 		} else {
 		    do j = 1, nlout {
@@ -274,7 +275,8 @@ begin
 			buf1 = imggsl (im1, Meml[vs], Meml[ve], IM_NDIM(im1))
 		        if (buf1 == EOF)
 			    call error (0, "Error reading input image.")
-		       call amovl (Meml[buf1], Meml[buf2], ncols) 
+		       sz_val = ncols
+		       call amovl (Meml[buf1], Meml[buf2], sz_val) 
 		       call sl_loop (Meml[vs], Meml[ve], IM_LEN(im1,1), fdim,
 		           sdim, ndim)
 		    }

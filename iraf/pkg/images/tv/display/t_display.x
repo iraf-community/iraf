@@ -539,7 +539,8 @@ begin
 	call amovkl (lg_val, Meml[lv], sz_val)
 	call aclrl (Meml[pv1], IM_MAXDIM)
 	call imaplv (im, Meml[lv], Meml[pv1], 2)
-	call amovl (IM_LEN(im,1), Meml[lv], IM_NDIM(im))
+	sz_val = IM_NDIM(im)
+	call amovl (IM_LEN(im,1), Meml[lv], sz_val)
 	call aclrl (Meml[pv2], IM_MAXDIM)
 	call imaplv (im, Meml[lv], Meml[pv2], 2)
 

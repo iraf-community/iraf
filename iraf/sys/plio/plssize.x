@@ -38,7 +38,8 @@ begin
 	    PL_MAXVAL(pl) = MV(depth)
 	else
 	    PL_MAXVAL(pl) = MV(PL_MAXDEPTH)
-	call amovl (axlen, PL_AXLEN(pl,1), naxes)
+	sz_val = naxes
+	call amovl (axlen, PL_AXLEN(pl,1), sz_val)
 	do i = naxes + 1, PL_MAXDIM
 	    PL_AXLEN(pl,i) = 1
 

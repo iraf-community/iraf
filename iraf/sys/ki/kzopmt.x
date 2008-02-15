@@ -58,7 +58,8 @@ begin
 	    p_arg[3] = dc_off
 	    p_arg[4] = dc_len
 	    p_arg[5] = newfile
-	    call amovl (devpos, p_arg[6], LEN_MTDEVPOS)
+	    sz_val = LEN_MTDEVPOS
+	    call amovl (devpos, p_arg[6], sz_val)
 
 	    if (ki_send (server, KI_ZFIOMT, MT_OP) == ERR)
 		k_oschan[chan] = ERR

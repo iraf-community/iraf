@@ -49,7 +49,8 @@ begin
 	case TY_LONG:
 	    while (imgnll (im1, buf1, v1) != EOF) {
 		junk = impnll (im2, buf2, v2)
-		call amovl (Meml[buf1], Meml[buf2], npix)
+		sz_val = npix
+		call amovl (Meml[buf1], Meml[buf2], sz_val)
 	    }
 	case TY_REAL:
 	    while (imgnlr (im1, buf1, v1) != EOF) {

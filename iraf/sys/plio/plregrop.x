@@ -50,7 +50,8 @@ begin
 	sz_val = RL_MAXLEN(pl)
 	call salloc (rl_out, sz_val, TY_INT)
 
-	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_PLANE(pl,1), v, sz_val)
 	ol_dst = 1
 
 	for (v[2]=y1;  v[2] <= y2;  v[2]=v[2]+1) {

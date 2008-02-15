@@ -14,6 +14,7 @@ procedure imf_initoffsets (im, dev_block_size)
 pointer	im
 int	dev_block_size
 long	offset, temp1, temp2
+size_t	sz_val
 int	ndim, dim, sz_pixel, lblksize, pblksize, sizeof()
 
 begin
@@ -34,7 +35,8 @@ begin
 	# image will be increased to fill an integral number of device blocks.
 
 	IM_PIXOFF(im) = offset
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
 	ndim = IM_NDIM(im)
 
 	# If ndim was not explicitly set, compute it by counting the number

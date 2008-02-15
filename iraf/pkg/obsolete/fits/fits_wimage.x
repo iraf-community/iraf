@@ -263,13 +263,15 @@ int	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
+size_t	sz_val
 errchk  altal, amovl, altadr, achtrl, altad, achtdl, altax, achtxl
 
 begin
 	switch (datatype) {
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
 	    call altal (Meml[buf], Meml[buf], npix, bzero, bscale)
-	    call amovl (Meml[buf], outbuffer, npix)
+	    sz_val = npix
+	    call amovl (Meml[buf], outbuffer, sz_val)
 	case TY_REAL:
 	    call altarl (Memr[buf], outbuffer, npix, bzero, bscale)
 	    #call altadr (Memr[buf], Memr[buf], npix, bzero, bscale)
@@ -352,12 +354,14 @@ long	outbuffer[ARB]		# buffer of FITS integers
 int	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
+size_t	sz_val
 errchk	amovl, achtrl, achtdl, achtxl
 
 begin
 	switch (datatype) {
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
-	    call amovl (Meml[buf], outbuffer, npix)
+	    sz_val = npix
+	    call amovl (Meml[buf], outbuffer, sz_val)
 	case TY_REAL:
 	    call achtrl (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:

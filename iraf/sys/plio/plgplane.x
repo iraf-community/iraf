@@ -8,8 +8,10 @@ include	<plio.h>
 procedure pl_getplane (pl, v)
 
 pointer	pl			#I mask descriptor
+size_t	sz_val
 long	v[ARB]			#O vector defining plane
 
 begin
-	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_PLANE(pl,1), v, sz_val)
 end

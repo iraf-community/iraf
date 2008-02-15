@@ -39,7 +39,8 @@ begin
 				      Meml[rl_out], npix, rop)
 
 	     # Copy out the edited range list.
-	     call amovl (Meml[rl_out], rl_dst, RLL_LEN(rl_out))
+	     sz_val = RLL_LEN(rl_out)
+	     call amovl (Meml[rl_out], rl_dst, sz_val)
 
 	    call sfree (sp)
 	}

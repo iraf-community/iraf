@@ -113,7 +113,8 @@ begin
 			case TY_USHORT, TY_LONG:
 			    tmp = xt_fpl (fp, im, i, fd)
 			    buf = impl2l (im, i)
-			    call amovl (Meml[tmp], Meml[buf], nc)
+			    sz_val = nc
+			    call amovl (Meml[tmp], Meml[buf], sz_val)
 			case TY_REAL, TY_COMPLEX:
 			    tmp = xt_fpr (fp, im, i, fd)
 			    buf = impl2r (im, i)

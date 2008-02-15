@@ -21,7 +21,8 @@ begin
 	    sz_val = PM_MAXDIM
 	    call amovkl (lg_val, v1, sz_val)
 	    call imaplv (PM_REFIM(pl), v1, v2, PM_MAXDIM)
-	    call amovl (IM_LEN(PM_REFIM(pl),1), v3, PM_MAXDIM)
+	    sz_val = PM_MAXDIM
+	    call amovl (IM_LEN(PM_REFIM(pl),1), v3, sz_val)
 	    call imaplv (PM_REFIM(pl), v3, v4, PM_MAXDIM)
 
 	    return (!pl_sectnotempty (pl, v2, v4, PM_MAXDIM))

@@ -25,7 +25,8 @@ int	pl_r2li()
 
 begin
 	call plvalid (pl)
-	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_PLANE(pl,1), v, sz_val)
 	v[2] = y
 
 	call smark (sp)

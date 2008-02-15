@@ -139,10 +139,12 @@ begin
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (a == 0)
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		if (a == 0) {
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
+		} else {
 		    call aaddkl (Meml[buf[2]], a, Meml[buf[1]], len)
+		}
 	    }
 
 	# If imageb is constant then read imagea and do a vector/scalar
@@ -150,10 +152,12 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (b == 0)
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		if (b == 0) {
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
+		} else {
 		    call aaddkl (Meml[buf[2]], b, Meml[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do a vector addition into imagec.

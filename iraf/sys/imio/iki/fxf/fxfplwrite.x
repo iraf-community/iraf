@@ -354,12 +354,13 @@ begin
 	    IM_NDIM(im) = IM_NDIM(ref_im)
 	    IM_NPHYSDIM(im) = IM_NPHYSDIM(ref_im)
 	    IM_SECTUSED(im) = IM_SECTUSED(ref_im)
-	    call amovl (IM_LEN(ref_im,1), IM_LEN(im,1), IM_MAXDIM)
-	    call amovl (IM_PHYSLEN(ref_im,1),IM_PHYSLEN(im,1),IM_MAXDIM)
-	    call amovl (IM_SVLEN(ref_im,1), IM_SVLEN(im,1), IM_MAXDIM)
-	    call amovl (IM_VMAP(ref_im,1), IM_VMAP(im,1), IM_MAXDIM)
-	    call amovl (IM_VOFF(ref_im,1), IM_VOFF(im,1), IM_MAXDIM)
-	    call amovl (IM_VSTEP(ref_im,1), IM_VSTEP(im,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (IM_LEN(ref_im,1), IM_LEN(im,1), sz_val)
+	    call amovl (IM_PHYSLEN(ref_im,1),IM_PHYSLEN(im,1), sz_val)
+	    call amovl (IM_SVLEN(ref_im,1), IM_SVLEN(im,1), sz_val)
+	    call amovl (IM_VMAP(ref_im,1), IM_VMAP(im,1), sz_val)
+	    call amovl (IM_VOFF(ref_im,1), IM_VOFF(im,1), sz_val)
+	    call amovl (IM_VSTEP(ref_im,1), IM_VSTEP(im,1), sz_val)
 
 	    # Tell PMIO to use this image as the reference image.
 	    call pm_seti (IM_PL(im), P_REFIM, im)
@@ -393,8 +394,9 @@ begin
 		IM_LEN(im,i) = 1
 
 	    IM_NPHYSDIM(im) = ndim
-	    call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	    call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	    call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 	    if (sv_acmode == NEW_IMAGE) {
 		lg_val = 1
 		sz_val = IM_MAXDIM

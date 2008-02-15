@@ -92,8 +92,9 @@ begin
 	IM_BLIST(im)    = NULL
 	IM_NPHYSDIM(im) = 2
 
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	# Open the display device.
 	pfd = imdopen (Memc[devinfo], pixel_mode)

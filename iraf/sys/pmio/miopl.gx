@@ -26,6 +26,7 @@ int	mval			#O mask value for the output line segment
 long	v[IM_MAXDIM]		#U vector coordinates of first pixel
 int	npix			#O number of pixels in output line segment
 
+size_t	sz_val
 int	x1, i
 long	ve[IM_MAXDIM]
 pointer	pm, im, rl, rp, bp
@@ -53,7 +54,8 @@ begin
 		M_NDIM(mp)) == LOOP_DONE) {
 		return (EOF)
 	    } else {
-		call amovl (M_V(mp,1), ve, M_NDIM(mp))
+		sz_val = M_NDIM(mp)
+		call amovl (M_V(mp,1), ve, sz_val)
 		ve[1] = M_VE(mp,1)
 		if (pm_sectnotempty (pm, M_V(mp,1), ve, M_NDIM(mp))) {
 		    call pm_glri (pm,
@@ -65,7 +67,8 @@ begin
 
 	# Get a new image line?
 	if (M_RLI(mp) == RL_FIRST) {
-	    call amovl (M_V(mp,1), v, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (M_V(mp,1), v, sz_val)
 	    im = M_IM(mp)
 	
 	    if (M_LINEIO(mp) == YES && M_NDIM(mp) == 2)

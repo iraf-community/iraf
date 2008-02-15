@@ -84,8 +84,9 @@ begin
 	IM_UPDATE(im) = btoi (acmode != READ_ONLY)
 
 	IM_NPHYSDIM(im) = IM_NDIM(im)
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	# Set up section transformation.
 	if (ref_im == NULL && Memc[section] != EOS)

@@ -98,7 +98,8 @@ begin
 	    	do i = 1, n {
 		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 			IM_NDIM(Memp[im+i-1]))
-		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[vin], sz_val)
 		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
@@ -117,8 +118,9 @@ begin
 		}
 
 		# Set the i/o parameters.
-		call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-		call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vout], Meml[vs], sz_val)
+		call amovl (Meml[vout], Meml[ve], sz_val)
 		Meml[vs] = 1
 		Meml[ve] = npix
 	    }
@@ -170,7 +172,8 @@ begin
 	    for (i = 1; i <= n; i = i + 1) {
 		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[im+i-1]))
-		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vs], Meml[vin], sz_val)
 		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
@@ -189,8 +192,9 @@ begin
 	    }
 
 	    # Set the i/o parameters.
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -317,7 +321,8 @@ begin
 	    	do i = 1, n {
 		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 			IM_NDIM(Memp[im+i-1]))
-		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[vin], sz_val)
 		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
@@ -336,8 +341,9 @@ begin
 		}
 
 		# Set the i/o parameters.
-		call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-		call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vout], Meml[vs], sz_val)
+		call amovl (Meml[vout], Meml[ve], sz_val)
 		Meml[vs] = 1
 		Meml[ve] = npix
 	    }
@@ -410,7 +416,8 @@ begin
 	    for (i = 1; i <= n; i = i + 1) {
 		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[im+i-1]))
-		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vs], Meml[vin], sz_val)
 		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
@@ -429,8 +436,9 @@ begin
 	    }
 
 	    # Set the i/o parameters.
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -525,7 +533,8 @@ begin
 	    lg_val = 1
 	    sz_val = IM_MAXDIM
 	    call amovkl (lg_val, Meml[v1], sz_val)
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 
 	    # For each input line compute an output line.
 	    while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -535,7 +544,8 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v1], Meml[v2], sz_val)
 		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call awsur (Memr[buf_in], Memr[buf_out], Memr[buf_out],
@@ -550,7 +560,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 
 		# Set the i/o parameters.
-		call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v1], sz_val)
 	    }
 
 	    # Finish up.
@@ -580,7 +591,8 @@ begin
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v1], sz_val)
-	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v1], Meml[v2], sz_val)
 
 	# Compute output lines for each input line.
 	while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -588,7 +600,8 @@ begin
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
 		Memp[pbuf+i-1] = rbuf + (i - 1) * npix
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[Memp[pbuf+i-1]],
@@ -604,7 +617,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 	    }
 
-	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v2], Meml[v1], sz_val)
 	}
 
 	# Finish up.
@@ -695,7 +709,8 @@ begin
 	    lg_val = 1
 	    sz_val = IM_MAXDIM
 	    call amovkl (lg_val, Meml[v1], sz_val)
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 
 	    # For each input line compute an output line.
 	    while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -705,7 +720,8 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v1], Meml[v2], sz_val)
 		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[buf_in],
@@ -718,7 +734,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 
 		# Set the i/o parameters.
-		call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v1], sz_val)
 	    }
 
 	    # Unmap the images.
@@ -752,14 +769,16 @@ begin
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, Meml[v1], sz_val)
-	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v1], Meml[v2], sz_val)
 
 	# Compute output lines for each input line.
 	while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 		if (imgnlr (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		call amulkr (Memr[Memp[buf+i-1]], Memr[norm+i-1],
@@ -775,7 +794,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 	    }
 
-	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v2], Meml[v1], sz_val)
 	}
 
 	# Finish up.

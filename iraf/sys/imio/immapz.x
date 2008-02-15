@@ -152,7 +152,8 @@ begin
 
 	IM_NPHYSDIM(im) = IM_NDIM(im)
 	IM_SVMTIME(im)  = IM_MTIME(im)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	# Process the image section if one was given, i.e., parse the section
 	# string and set up a transformation to be applied to logical input

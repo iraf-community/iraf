@@ -30,7 +30,8 @@ begin
 	call smark (sp)
 
 	# Determine physical coords of line segment.
-	call amovl (v, v3, PM_MAXDIM)
+	sz_val = PM_MAXDIM
+	call amovl (v, v3, sz_val)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -58,14 +59,16 @@ begin
 	if (xstep < 0)
 	    call imaflp (Meml[px_src], npix, SZ_LONG)
 
-	if (!R_NEED_DST(rop))
-	    call amovl (Meml[px_src], px_dst, npix)
-	else {
+	if (!R_NEED_DST(rop)) {
+	    sz_val = npix
+	    call amovl (Meml[px_src], px_dst, sz_val)
+	} else {
 	    sz_val = npix
 	    call salloc (px_out, sz_val, TY_LONG)
 	    call pl_pixropl (Meml[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
 		MV(px_depth), npix, rop)
-	    call amovl (Meml[px_out], px_dst, npix)
+	    sz_val = npix
+	    call amovl (Meml[px_out], px_dst, sz_val)
 	}
 
 	call sfree (sp)

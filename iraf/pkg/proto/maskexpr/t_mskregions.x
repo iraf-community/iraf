@@ -177,7 +177,8 @@ begin
 	        } else {
 		    pmim = immap (Memc[mskname], NEW_IMAGE, 0) 
 		    IM_NDIM(pmim) = undim
-		    call amovl (Meml[uaxlen], IM_LEN(pmim,1), undim)
+		    sz_val = undim
+		    call amovl (Meml[uaxlen], IM_LEN(pmim,1), sz_val)
 	        }
 		IM_PIXTYPE(pmim) = TY_INT
 		pl = imstati (pmim, IM_PLDES)

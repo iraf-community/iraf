@@ -12,6 +12,7 @@ int	chan			#I active magtape channel
 long	devpos[ARB]		#O device position structure
 long	status			#O receives nbytes transferred or ERR
 
+size_t	sz_val
 pointer	bd
 include	"kichan.com"
 
@@ -21,6 +22,7 @@ begin
 	else {
 	    bd = k_bufp[chan]
 	    status = k_status[chan]
-	    call amovl (Memi[bd], devpos, LEN_MTDEVPOS)
+	    sz_val = LEN_MTDEVPOS
+	    call amovl (Memi[bd], devpos, sz_val)
 	}
 end

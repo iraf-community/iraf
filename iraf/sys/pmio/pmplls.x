@@ -34,7 +34,8 @@ begin
 	call salloc (ll_src, sz_val, TY_SHORT)
 
 	# Determine physical coords of line segment.
-	call amovl (v, v3, PM_MAXDIM)
+	sz_val = PM_MAXDIM
+	call amovl (v, v3, sz_val)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)

@@ -351,12 +351,14 @@ long	outbuffer[ARB]		# buffer of FITS integers
 int	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
+size_t	sz_val
 errchk	amovl, achtrl, achtdl, achtxl
 
 begin
 	switch (datatype) {
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
-	    call amovl (Meml[buf], outbuffer, npix)
+	    sz_val = npix
+	    call amovl (Meml[buf], outbuffer, sz_val)
 	case TY_REAL:
 	    call achtrl (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:

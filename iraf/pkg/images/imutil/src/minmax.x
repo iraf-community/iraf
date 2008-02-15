@@ -60,16 +60,19 @@ begin
 		    if (minval_s < min_value) {
 			min_value = minval_s
 			vmin[1] = colmin
-			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
 		    }
 		    if (maxval_s > max_value) {
 			max_value = maxval_s
 			vmax[1] = colmax
-			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
 		    }
 		}
-		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
-		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
 	case TY_USHORT, TY_INT, TY_LONG:
@@ -86,16 +89,19 @@ begin
 		    if (minval_l < min_value) {
 			min_value = minval_l
 			vmin[1] = colmin
-			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
 		    }
 		    if (maxval_l > max_value) {
 			max_value = maxval_l
 			vmax[1] = colmax
-			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
 		    }
 		}
-		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
-		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
 	case TY_REAL:
@@ -112,16 +118,19 @@ begin
 		    if (minval_r < min_value) {
 			min_value = minval_r
 			vmin[1] = colmin
-			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
 		    }
 		    if (maxval_r > max_value) {
 			max_value = maxval_r
 			vmax[1] = colmax
-			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
 		    }
 		}
-		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
-		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
 	case TY_DOUBLE:
@@ -138,16 +147,19 @@ begin
 		    if (minval_d < min_value) {
 			min_value = minval_d
 			vmin[1] = colmin
-			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
 		    }
 		    if (maxval_d > max_value) {
 			max_value = maxval_d
 			vmax[1] = colmax
-			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
 		    }
 		}
-		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
-		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
 	case TY_COMPLEX:
@@ -164,16 +176,19 @@ begin
 		    if (abs (minval_x) < abs (xmin_value)) {
 			xmin_value = minval_x
 			vmin[1] = colmin
-			call amovl (ovmin[2], vmin[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
 		    }
 		    if (abs (maxval_x) > abs (xmax_value)) {
 			xmax_value = maxval_x
 			vmax[1] = colmax
-			call amovl (ovmax[2], vmax[2], IM_NDIM(im) - 1)
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
 		    }
 		}
-		call amovl (v[2], ovmin[2], IM_NDIM(im) - 1)
-		call amovl (v[2], ovmax[2], IM_NDIM(im) - 1)
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
 	    min_value = real (xmin_value)

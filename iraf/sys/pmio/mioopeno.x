@@ -25,7 +25,8 @@ begin
 	lg_val = 1
 	sz_val = IM_MAXDIM
 	call amovkl (lg_val, M_VS(mp,1), sz_val)
-	call amovl (IM_LEN(im,1), M_VN(mp,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), M_VN(mp,1), sz_val)
 
 	M_IM(mp) = im
 	M_PM(mp) = pm

@@ -252,8 +252,8 @@ begin
 		do image = 1, nimages {
 		    in = inptr[image]
 		    stat = imgnll (in, inbuf, Meml[VPTR(vin,image)])
-		    call amovl (Meml[inbuf], Meml[outbuf+cum_len],
-			    IM_LEN(in,1))
+		    sz_val = IM_LEN(in,1)
+		    call amovl (Meml[inbuf], Meml[outbuf+cum_len], sz_val)
 		    cum_len = cum_len + IM_LEN(in,1)
 		}
 	    }
@@ -268,7 +268,8 @@ begin
 		    do line = 1, IM_LEN(in,2) {
 			stat = impnll (out, outbuf, Meml[vout])
 			stat = imgnll (in, inbuf, Meml[VPTR(vin,image)])
-			call amovl (Meml[inbuf], Meml[outbuf], IM_LEN(in,1))
+			sz_val = IM_LEN(in,1)
+			call amovl (Meml[inbuf], Meml[outbuf], sz_val)
 		    }
 		}
 	    }
@@ -282,7 +283,8 @@ begin
 		do i = 1, nlines {
 		    stat = impnll (out, outbuf, Meml[vout])
 		    stat = imgnll (in, inbuf, Meml[VPTR(vin,image)])
-		    call amovl (Meml[inbuf], Meml[outbuf], IM_LEN(in,1))
+		    sz_val = IM_LEN(in,1)
+		    call amovl (Meml[inbuf], Meml[outbuf], sz_val)
 		}
 	    }
 	}

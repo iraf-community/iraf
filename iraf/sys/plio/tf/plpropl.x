@@ -45,9 +45,10 @@ begin
 	    call amovkl (data, px_dst[ds], sz_val)
 	    goto out_
 	case PIX_SRC:
-	    if (src_maxval != 1)
-		call amovl (px_src[xs], px_dst[ds], npix)
-	    else {
+	    if (src_maxval != 1) {
+		sz_val = npix
+		call amovl (px_src[xs], px_dst[ds], sz_val)
+	    } else {
 		do i = 1, npix
 		    if (px_src[xs+i-1] > 0)
 			px_dst[ds+i-1] = src_value

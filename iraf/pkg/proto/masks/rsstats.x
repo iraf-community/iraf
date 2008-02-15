@@ -292,7 +292,8 @@ begin
             lg_val = 1
             sz_val = IM_NDIM(ims)
             call amovkl (lg_val, Meml[vs], sz_val)
-            call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
+            sz_val = IM_NDIM(ims)
+            call amovl (IM_LEN(ims,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
 
 	    # Initialize the statistics computation.
@@ -338,7 +339,8 @@ begin
             lg_val = 1
             sz_val = IM_NDIM(ims)
             call amovkl (lg_val, Meml[vs], sz_val)
-            call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
+            sz_val = IM_NDIM(ims)
+            call amovl (IM_LEN(ims,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF)
                 call ahgmr (Memr[buf], npts, Memi[hgm], nbins, hmin, hmax)
@@ -356,7 +358,8 @@ begin
             lg_val = 1
             sz_val = IM_NDIM(im)
             call amovkl (lg_val, Meml[vs], sz_val)
-            call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
+            sz_val = IM_NDIM(im)
+            call amovl (IM_LEN(im,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
             pm = imstati (pmout, IM_PMDES)
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) {

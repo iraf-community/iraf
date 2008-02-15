@@ -267,7 +267,8 @@ begin
 		}
 	    }
 	    call pmplpi (pm, Meml[v2], Memi[data], 0, npix, rop)
-	    call amovl (Meml[v1], Meml[v2], ndim)
+	    sz_val = ndim
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	im_out = im_pmmapo (pm, im_in)

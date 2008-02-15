@@ -154,8 +154,9 @@ begin
 	}
 
 	# Set up IMIO descriptor.
-	call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
-	call amovl (axlen, IM_PHYSLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (axlen, IM_LEN(im,1), sz_val)
+	call amovl (axlen, IM_PHYSLEN(im,1), sz_val)
         IM_NDIM(im) = naxes
 	IM_PIXTYPE(im) = TY_INT
 	IM_PL(im) = pl

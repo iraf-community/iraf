@@ -101,7 +101,8 @@ begin
 		    call amovd (Memd[buf3], Memd[buf2], nout)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 
@@ -198,15 +199,18 @@ begin
 		}
 
 		# Copy the input line to the output line.
-		call amovl (Meml[buf3], Meml[buf2], nout)
+		sz_val = nout
+		call amovl (Meml[buf3], Meml[buf2], sz_val)
 
 		# Repeat for each repetition of the input line.
 		for (i=2;  i <= blkfac[2];  i=i+1) {
 	            j = impnll (out, buf2, Meml[v2])
-		    call amovl (Meml[buf3], Meml[buf2], nout)
+		    sz_val = nout
+		    call amovl (Meml[buf3], Meml[buf2], sz_val)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 
@@ -311,7 +315,8 @@ begin
 		    call amovr (Memr[buf3], Memr[buf2], nout)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 
@@ -416,7 +421,8 @@ begin
 		    call amovs (Mems[buf3], Mems[buf2], nout)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 

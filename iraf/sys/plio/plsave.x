@@ -71,7 +71,8 @@ begin
 	PLE_EXLEN(ex)	= n_buflen
 
 	op = bp
-	call amovl (PL_AXLEN(pl,1), PLE_AXLEN(ex,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_AXLEN(pl,1), PLE_AXLEN(ex,1), sz_val)
 	call miipak32 (Memi[ex], Memi[coerce(op,TY_SHORT,TY_INT)],
 	    LEN_PLEXTERN, TY_STRUCT)
 	op = op + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT

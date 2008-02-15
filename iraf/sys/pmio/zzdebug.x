@@ -190,7 +190,8 @@ begin
 	    lg_val = 1
 	    sz_val = 2
 	    call amovkl (lg_val, vs, sz_val)
-	    call amovl (IM_LEN(im,1), ve, 2)
+	    sz_val = 2
+	    call amovl (IM_LEN(im,1), ve, sz_val)
 	}
 	call mio_setrange (mp, vs, ve, 2)
 

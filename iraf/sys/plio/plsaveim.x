@@ -60,7 +60,8 @@ begin
 	    IM_PIXTYPE(im) = TY_SHORT
 	    if (PL_MAXVAL(pl) > MAX_SHORT)
 		IM_PIXTYPE(im) = TY_INT
-	    call amovl (vn, IM_LEN(im,1), maxdim)
+	    sz_val = maxdim
+	    call amovl (vn, IM_LEN(im,1), sz_val)
 	} else {
 	    if (naxes != IM_NDIM(im)) {
 		call imunmap (im)
@@ -84,7 +85,8 @@ begin
 	    lg_val = 1
 	    sz_val = maxdim
 	    call amovkl (lg_val, vs_l, sz_val)
-	    call amovl (IM_LEN(im,1), ve_l, maxdim)
+	    sz_val = maxdim
+	    call amovl (IM_LEN(im,1), ve_l, sz_val)
 	    call imaplv (im, vs_l, vs_p, maxdim)
 	    call imaplv (im, ve_l, ve_p, maxdim)
 
@@ -116,7 +118,8 @@ begin
 	    # Copy the image.
 	    while (impnli (im, px, v_out) != EOF) {
 		call pl_glpi (pl, v_in, Memi[px], 0, npix, PIX_SRC)
-		call amovl (v_out, v_in, maxdim)
+		sz_val = maxdim
+		call amovl (v_out, v_in, sz_val)
 	    }
 	}
 

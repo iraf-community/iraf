@@ -58,7 +58,8 @@ begin
 	    } else {
 	        pmim = im_pmmap (Memc[tmpname], NEW_IMAGE,  NULL)
 	        IM_NDIM(pmim) = ndim
-	        call amovl (axlen, IM_LEN(pmim,1), ndim)
+	        sz_val = ndim
+	        call amovl (axlen, IM_LEN(pmim,1), sz_val)
 	    }
 	    call sfree (sp)
 	} else {
@@ -69,7 +70,8 @@ begin
 	    } else {
 		pmim = immap (mskname, NEW_IMAGE, 0)
 	        IM_NDIM(pmim) = ndim
-	        call amovl (axlen, IM_LEN(pmim,1), ndim)
+	        sz_val = ndim
+	        call amovl (axlen, IM_LEN(pmim,1), sz_val)
 	    }
 	}
 	IM_PIXTYPE(pmim) = TY_INT

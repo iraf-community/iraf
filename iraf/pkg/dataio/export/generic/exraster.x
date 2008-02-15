@@ -315,7 +315,8 @@ begin
 
             case TY_LONG:
 		data = imgl3l (im, line, band)
-		call amovl (Meml[data], Meml[IO_DATA(op)], IM_LEN(im,1))
+		sz_val = IM_LEN(im,1)
+		call amovl (Meml[data], Meml[IO_DATA(op)], sz_val)
 	        IO_TYPE(op) = TY_LONG
 		IO_NBYTES(op) = SZ_LONG * SZB_CHAR
 	        IO_ISIM(op) = YES

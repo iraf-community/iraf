@@ -25,13 +25,15 @@ begin
 	    lg_val = 1
 	    sz_val = PM_MAXDIM
 	    call amovkl (lg_val, v1, sz_val)
-	    call amovl (vs, v1, ndim)
+	    sz_val = ndim
+	    call amovl (vs, v1, sz_val)
 	    call imaplv (PM_REFIM(pl), v1, v2, PM_MAXDIM)
 
 	    lg_val = 1
 	    sz_val = PM_MAXDIM
 	    call amovkl (lg_val, v3, sz_val)
-	    call amovl (ve, v3, ndim)
+	    sz_val = ndim
+	    call amovl (ve, v3, sz_val)
 	    call imaplv (PM_REFIM(pl), v3, v4, PM_MAXDIM)
 
 	    return (pl_sectnotconst (pl, v2, v4, PM_MAXDIM, mval))

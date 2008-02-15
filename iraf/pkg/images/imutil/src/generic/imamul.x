@@ -140,10 +140,12 @@ begin
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (a == 1)
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		if (a == 1) {
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
+		} else {
 		    call amulkl (Meml[buf[2]], a, Meml[buf[1]], len)
+		}
 	    }
 
 	# If imageb is constant then read imagea.  If the constant
@@ -152,10 +154,12 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (b == 1)
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		if (b == 1) {
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
+		} else {
 		    call amulkl (Meml[buf[2]], b, Meml[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do the vector multiply to imagec.

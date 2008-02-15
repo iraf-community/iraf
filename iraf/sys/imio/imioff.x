@@ -16,6 +16,7 @@ long	pixoff			# file offset of first pixel
 int	compress		# if set, do not align image lines
 int	devblksz		# FIO device block size
 
+size_t	sz_val
 real	impkden, envgetr()
 long	offset, temp1, temp2, imnote()
 int	ndim, dim, sz_pixel, lblksize, pblksize, sizeof()
@@ -37,8 +38,9 @@ begin
 	# image will be increased to fill an integral number of device blocks.
 
 	IM_PIXOFF(im) = pixoff
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	ndim = IM_NDIM(im)
 

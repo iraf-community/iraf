@@ -170,7 +170,8 @@ begin
 
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 1, tmpim, oldsize)
 		call rs_minit (inlist, tmpim, start, finish, RS_KYFSCALE(rs))
@@ -373,7 +374,8 @@ begin
 		call rs_iptrs (inlist, Memp[imptrs], Memi[imids], start,
 		    finish, cache, oldsize)
 		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), finish - start + 2, tmpim,
 		    bufsize)
@@ -607,7 +609,8 @@ begin
 	    # Set the size of the temporary image. 
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 1, tmpim, oldsize)
 	    }

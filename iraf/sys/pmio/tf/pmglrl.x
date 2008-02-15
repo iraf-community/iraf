@@ -37,7 +37,8 @@ begin
 	call salloc (rl_src, sz_val, TY_LONG)
 
 	# Determine physical coords of line segment.
-	call amovl (v, v3, PM_MAXDIM)
+	sz_val = PM_MAXDIM
+	call amovl (v, v3, sz_val)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -71,14 +72,16 @@ begin
 	# Copy to or combine with destination.
 	if (!R_NEED_DST(rop)) {
 	    rl_len = RLI_LEN(rl_src) * RL_LENELEM
-	    call amovl (Meml[rl_src], rl_dst, rl_len)
+	    sz_val = rl_len
+	    call amovl (Meml[rl_src], rl_dst, sz_val)
 	} else {
 	    sz_val = RL_MAXLEN(pl)
 	    call salloc (rl_out, sz_val, TY_SHORT)
 	    call pl_rangeropl (Meml[rl_src], 1, PL_MAXVAL(pl), rl_dst, 1,
 		MV(rl_depth), Meml[rl_out], npix, rop)
 		rl_len = RLI_LEN(rl_out) * RL_LENELEM
-	    call amovl (Meml[rl_out], rl_dst, rl_len)
+	    sz_val = rl_len
+	    call amovl (Meml[rl_out], rl_dst, sz_val)
 	}
 
 	call sfree (sp)

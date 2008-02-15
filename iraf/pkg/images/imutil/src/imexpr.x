@@ -547,7 +547,8 @@ image_
 	    else
 		outim = immap (Memc[output], NEW_IMAGE, 0)
 	    IM_LEN(outim,1) = 0
-	    call amovl (IE_AXLEN(ie,2), IM_LEN(outim,2), IM_MAXDIM-1)
+	    sz_val = IM_MAXDIM-1
+	    call amovl (IE_AXLEN(ie,2), IM_LEN(outim,2), sz_val)
 	    IM_NDIM(outim) = IE_NDIM(ie)
 	    IM_PIXTYPE(outim) = 0
 	}
@@ -616,7 +617,8 @@ image_
 			call amovi (Memi[ip], Memi[op], npix)
 
 		    case TY_LONG:
-			call amovl (Meml[ip], Meml[op], npix)
+			sz_val = npix
+			call amovl (Meml[ip], Meml[op], sz_val)
 
 		    case TY_REAL:
 			call amovr (Memr[ip], Memr[op], npix)

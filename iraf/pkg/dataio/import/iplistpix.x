@@ -127,7 +127,8 @@ begin
 	    	call printf (" %g\n")	        # pixel value
 	    	    call pargr (Memr[line+i-1])
 	    }
-	    call amovl (v, vcoords, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (v, vcoords, sz_val)
 	    do i = 1, wcsndim {
 	    	if (paxno[i] == 0)
 	    	    next

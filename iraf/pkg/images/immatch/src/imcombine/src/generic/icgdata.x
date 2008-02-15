@@ -68,7 +68,8 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		call amovl (v1, v2, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (v1, v2, sz_val)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnls (in[i], i, d[i], v2, v1[2])
@@ -371,7 +372,8 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		call amovl (v1, v2, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (v1, v2, sz_val)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnli (in[i], i, d[i], v2, v1[2])
@@ -674,7 +676,8 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		call amovl (v1, v2, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (v1, v2, sz_val)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnlr (in[i], i, d[i], v2, v1[2])
@@ -977,7 +980,8 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		call amovl (v1, v2, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (v1, v2, sz_val)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnld (in[i], i, d[i], v2, v1[2])

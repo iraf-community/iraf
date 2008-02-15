@@ -30,7 +30,8 @@ begin
 	call salloc (cv, sz_val, TY_CHAR)
 
 	# Output mask.
-	call amovl (vs, v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (vs, v, sz_val)
 	v[2] = ve[2]
 
 	while (v[2] >= vs[2]) {

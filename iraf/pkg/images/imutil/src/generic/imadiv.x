@@ -194,7 +194,8 @@ begin
 		    sz_val = len
 		    call amovkl (divzero, Meml[buf[1]], sz_val)
 		} else if (b == 1) {
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
 		} else {
 		    call adivkl (Meml[buf[2]], b, Meml[buf[1]], len)
 		}

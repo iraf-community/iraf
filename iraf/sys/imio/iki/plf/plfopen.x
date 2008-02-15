@@ -76,7 +76,8 @@ begin
 	    call pl_gsize (pl, naxes, axlen, depth)
 
 	    IM_NDIM(im) = naxes
-	    call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (axlen, IM_LEN(im,1), sz_val)
 	    call imioff (im, 1, YES, 1)
 
 	    # Restore the header cards.

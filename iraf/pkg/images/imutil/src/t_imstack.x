@@ -88,7 +88,8 @@ begin
 	        while (imgnll (in, buf_in, line_in) != EOF) {
 		    if (impnll (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
-		    call amovl (Meml[buf_in], Meml[buf_out], npix)
+		    sz_val = npix
+		    call amovl (Meml[buf_in], Meml[buf_out], sz_val)
 		}
 	    case TY_REAL:
 	        while (imgnlr (in, buf_in, line_in) != EOF) {

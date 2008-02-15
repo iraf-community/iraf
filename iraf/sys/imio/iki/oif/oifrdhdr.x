@@ -67,8 +67,9 @@ begin
 	    IM_PIXTYPE(im) = IM_V1PIXTYPE(v1)
 
 	    IM_NDIM(im) = IM_V1NDIM(v1)
-	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), IM_MAXDIM)
-	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), sz_val)
+	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), sz_val)
 
 	    IM_SSMTYPE(im) = IM_V1SSMTYPE(v1)
 	    IM_LUTOFF(im) = IM_V1LUTOFF(v1)

@@ -312,7 +312,8 @@ begin
 	call salloc (data, sz_val, TY_REAL)
 	Meml[v] = 1
 	ptr1 = data
-	call amovl (Meml[v], Meml[v1], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v], Meml[v1], sz_val)
 	while (imgnlr (im, ptr2, Meml[v1]) != EOF) {
 
 	    ptr2 = ptr2 + Memi[x1] - 1
@@ -332,7 +333,8 @@ begin
 	    if (i > ndim)
 		break
 
-	    call amovl (Meml[v], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v], Meml[v1], sz_val)
 	}
 
 	# Compute the statistics.

@@ -162,26 +162,35 @@ begin
 
         switch (outtype) {
         case TY_USHORT:
-            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF)
-                call amovl (Meml[buf1], Meml[buf2], ncols)
+            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF) {
+                sz_val = ncols
+                call amovl (Meml[buf1], Meml[buf2], sz_val)
+	    }
         case TY_SHORT:
-            while (impnls(im2,buf2,v2) != EOF && imgnls(im1,buf1,v1) != EOF)
+            while (impnls(im2,buf2,v2) != EOF && imgnls(im1,buf1,v1) != EOF) {
                 call amovs (Mems[buf1], Mems[buf2], ncols)
+	    }
         case TY_INT:
-            while (impnli(im2,buf2,v2) != EOF && imgnli(im1,buf1,v1) != EOF)
+            while (impnli(im2,buf2,v2) != EOF && imgnli(im1,buf1,v1) != EOF) {
                 call amovi (Memi[buf1], Memi[buf2], ncols)
+	    }
         case TY_LONG:
-            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF)
-                call amovl (Meml[buf1], Meml[buf2], ncols)
+            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF) {
+                sz_val = ncols
+                call amovl (Meml[buf1], Meml[buf2], sz_val)
+	    }
         case TY_REAL:
-            while (impnlr(im2,buf2,v2) != EOF && imgnlr(im1,buf1,v1) != EOF)
+            while (impnlr(im2,buf2,v2) != EOF && imgnlr(im1,buf1,v1) != EOF) {
                 call amovr (Memr[buf1], Memr[buf2], ncols)
+	    }
         case TY_DOUBLE:
-            while (impnld(im2,buf2,v2) != EOF && imgnld(im1,buf1,v1) != EOF)
+            while (impnld(im2,buf2,v2) != EOF && imgnld(im1,buf1,v1) != EOF) {
                 call amovd (Memd[buf1], Memd[buf2], ncols)
+	    }
         case TY_COMPLEX:
-            while (impnlx(im2,buf2,v2) != EOF && imgnlx(im1,buf1,v1) != EOF)
+            while (impnlx(im2,buf2,v2) != EOF && imgnlx(im1,buf1,v1) != EOF) {
                 call amovx (Memx[buf1], Memx[buf2], ncols)
+	    }
         }
 end
 

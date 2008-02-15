@@ -149,10 +149,12 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (b == 0)
-		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		if (b == 0) {
+		    sz_val = len
+		    call amovl (Meml[buf[2]], Meml[buf[1]], sz_val)
+		} else {
 		    call asubkl (Meml[buf[2]], b, Meml[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do a vector subtraction into imagec.

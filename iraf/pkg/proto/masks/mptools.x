@@ -243,7 +243,8 @@ begin
 	while (imgnli (im, data, Meml[v1]) != EOF) {
 	    # may need to convert negative values here ...
 	    call pm_plpi (pm, Meml[v2], Memi[data], 0, npix, PIX_SRC)
-	    call amovl (Meml[v1], Meml[v2], ndim)
+	    sz_val = ndim
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 	call imunmap (im)
 
@@ -285,7 +286,8 @@ begin
 	newpm = pl_create (ndim, IM_LEN(pmim,1), depth)
 	while (imgnls (pmim, ibuf, Meml[v1]) != EOF) {
 	    call pm_plps (newpm, Meml[v2], Mems[ibuf], 1, npix, PIX_SRC)
-	    call amovl (Meml[v1], Meml[v2], ndim)
+	    sz_val = ndim
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	call imunmap (pmim)

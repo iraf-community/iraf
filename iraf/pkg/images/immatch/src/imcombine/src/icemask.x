@@ -16,6 +16,7 @@ int	n[npts]			#I Number of good pixels
 real	wts[npts]		#I Weights
 int	npts			#I Number of output pixels per line
 
+size_t	sz_val
 int	i, j, k, impnli()
 real	exp
 pointer	buf
@@ -37,7 +38,8 @@ begin
 	    einit = YES
 	}
 
-	call amovl (v, Meml[ev], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (v, Meml[ev], sz_val)
 	i = impnli (pm, buf, Meml[ev])
 	call aclri (Memi[buf], npts)
 	do i = 1, npts {

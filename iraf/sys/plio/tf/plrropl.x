@@ -23,6 +23,7 @@ long	rl_out[3,ARB]		#O output list (edited version of rl_dst)
 int	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src, need_dst, rop_enable
 long	data, src_value, v_src, v_dst, pv
 int	segsize, opcode, x, i, np, rn_o, p
@@ -190,6 +191,7 @@ begin
 	}
 
 	# Update the range list header.
-	call amovl (rl_dst, rl_out, (RL_FIRST - 1) * 3)
+	sz_val = (RL_FIRST - 1) * 3
+	call amovl (rl_dst, rl_out, sz_val)
 	RL_LEN(rl_out) = rn_o - 1
 end

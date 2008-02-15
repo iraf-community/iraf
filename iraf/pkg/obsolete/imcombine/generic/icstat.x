@@ -78,11 +78,13 @@ begin
 		break
 	}
 
-	call amovl (Memi[v1], Memi[va], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[v1], Memi[va], sz_val)
 	Memi[va] = 1
 	if (project)
 	   Memi[va+ndim] = image
-	call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[va], Memi[vb], sz_val)
 
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
@@ -143,7 +145,8 @@ begin
 	    }
 	    if (i > ndim)
 		break
-	    call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Memi[va], Memi[vb], sz_val)
 	}
 
 	n = dp - data
@@ -300,11 +303,13 @@ begin
 		break
 	}
 
-	call amovl (Memi[v1], Memi[va], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[v1], Memi[va], sz_val)
 	Memi[va] = 1
 	if (project)
 	   Memi[va+ndim] = image
-	call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[va], Memi[vb], sz_val)
 
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
@@ -365,7 +370,8 @@ begin
 	    }
 	    if (i > ndim)
 		break
-	    call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Memi[va], Memi[vb], sz_val)
 	}
 
 	n = dp - data
@@ -521,11 +527,13 @@ begin
 		break
 	}
 
-	call amovl (Memi[v1], Memi[va], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[v1], Memi[va], sz_val)
 	Memi[va] = 1
 	if (project)
 	   Memi[va+ndim] = image
-	call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[va], Memi[vb], sz_val)
 
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
@@ -586,7 +594,8 @@ begin
 	    }
 	    if (i > ndim)
 		break
-	    call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Memi[va], Memi[vb], sz_val)
 	}
 
 	n = dp - data
@@ -740,11 +749,13 @@ begin
 		break
 	}
 
-	call amovl (Memi[v1], Memi[va], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[v1], Memi[va], sz_val)
 	Memi[va] = 1
 	if (project)
 	   Memi[va+ndim] = image
-	call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Memi[va], Memi[vb], sz_val)
 
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
@@ -805,7 +816,8 @@ begin
 	    }
 	    if (i > ndim)
 		break
-	    call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Memi[va], Memi[vb], sz_val)
 	}
 
 	n = dp - data

@@ -100,7 +100,8 @@ begin
 		    call amov$t (Mem$t[buf3], Mem$t[buf2], nout)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 

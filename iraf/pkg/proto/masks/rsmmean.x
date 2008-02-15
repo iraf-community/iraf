@@ -198,12 +198,14 @@ begin
 		call rs_piptrs (inlist, msklist, Memp[imptrs], Memp[mskptrs],
 		    Memi[imids], start, finish, msk_invert, cache, old_size)
 		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), (finish - start + 2), tmpim,
 		    new_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(Memp[imptrs])
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpmsk,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpmsk,1), sz_val)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), (finish - start + 3), tmpmsk,
 		    new_size)
@@ -527,11 +529,13 @@ begin
 	    # since it is already in memory ...
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 2, tmpim, new_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), sz_val)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), 3, tmpmsk, new_size)
 	    }
@@ -808,11 +812,13 @@ begin
 	    # since it is already in memory ...
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cache1 (btoi(cache), tmpim, old_size)
 		IM_NDIM(tmpmsk) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpmsk,1), sz_val)
 		IM_PIXTYPE(tmpmsk) = TY_INT
 		call rs_cachen (btoi(cache), 2, tmpmsk, new_size)
 		call rs_pminit (inlist, msklist, msk_invert, tmpim, tmpmsk,
@@ -959,7 +965,8 @@ begin
 	    do j = 1, nin {
 	        call mio_setrange (Memp[mpptrs+j-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[imptrs+j-1])) 
-		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vs], Meml[vin], sz_val)
 		while (mio_glsegr (Memp[mpptrs+j-1], ibuf, mval,
 		    Meml[vin], npts) != EOF) {
 		    call amulkr (Memr[ibuf], Memr[imnorm+j-1], Memr[ibuf],
@@ -970,8 +977,9 @@ begin
 		        Memi[ombuf+Meml[vin]-1], npts)
 		}
 	    }
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -1180,7 +1188,8 @@ begin
 
 	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
-	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (Meml[vin], Meml[vs], sz_val)
 	    }
 	}
 
@@ -1344,7 +1353,8 @@ begin
 		do i = 1, nsub {
 		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imsub+i-1]))
-		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[v], sz_val)
 		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
@@ -1358,7 +1368,8 @@ begin
 		do i = 1, nadd {
 		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imadd+i-1]))
-		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[v], sz_val)
 		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
@@ -1373,7 +1384,8 @@ begin
 		do i = 1, nsub {
 		    call mio_setrange (Memp[mpsub+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imsub+i-1]))
-		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[v], sz_val)
 		    while (mio_glsegr (Memp[mpsub+i-1], sbuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[sbuf], Memr[norms+i-1], Memr[sbuf],
@@ -1388,7 +1400,8 @@ begin
 		do i = 1, nadd {
 		    call mio_setrange (Memp[mpadd+i-1], Meml[vs], Meml[ve],
 		        IM_NDIM(Memp[imadd+i-1]))
-		    call amovl (Meml[vs], Meml[v], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[v], sz_val)
 		    while (mio_glsegr (Memp[mpadd+i-1], abuf, mval, Meml[v],
 		        npts) != EOF) {
 		        call amulkr (Memr[abuf], Memr[norma+i-1], Memr[abuf],
@@ -1400,8 +1413,9 @@ begin
 		    }
 		}
 	    }
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -1560,7 +1574,8 @@ begin
 
 	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
-	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
+	        sz_val = IM_MAXDIM
+	        call amovl (Meml[vin], Meml[vs], sz_val)
 	    }
 	} else {
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&

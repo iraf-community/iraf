@@ -551,7 +551,8 @@ begin
 	    ceil = int (upper)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
-		call amovl (Meml[buf1], Meml[buf2], npix)
+		sz_val = npix
+		call amovl (Meml[buf1], Meml[buf2], sz_val)
 		call arlel (Meml[buf2], npix, ceil, newval)
 	    }
 
@@ -564,7 +565,8 @@ begin
 	        floor = int (lower+1.0)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
-		call amovl (Meml[buf1], Meml[buf2], npix)
+		sz_val = npix
+		call amovl (Meml[buf1], Meml[buf2], sz_val)
 		call argel (Meml[buf2], npix, floor, newval)
 	    }
 
@@ -578,7 +580,8 @@ begin
 	    ceil = int (upper)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
-		call amovl (Meml[buf1], Meml[buf2], npix)
+		sz_val = npix
+		call amovl (Meml[buf1], Meml[buf2], sz_val)
 		call arepl (Meml[buf2], npix, floor, ceil, newval)
 	    }
 	}
