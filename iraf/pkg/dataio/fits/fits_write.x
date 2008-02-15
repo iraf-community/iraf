@@ -216,6 +216,8 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
+size_t	sz_val
+long	lg_val
 int	npix
 long	v[IM_MAXDIM]
 pointer	buf
@@ -233,7 +235,9 @@ begin
 	    irafmin = MAX_REAL
 	    npix = NAXISN(im,1)
 
-	    call amovkl (long(1), v, IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, v, sz_val)
 	    while (imgnlr (im, buf, v) != EOF) {
 	        call alimr (Memr[buf], npix, minval, maxval)
 	        irafmin = min (irafmin, minval)

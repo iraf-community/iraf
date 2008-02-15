@@ -216,6 +216,7 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
+long	lg_val
 size_t	sz_val
 int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
@@ -230,8 +231,10 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
 
 	im_in = immap (pmname, READ_ONLY, 0)
 	pm = imstati (im_in, IM_PMDES)
@@ -482,6 +485,7 @@ procedure xt_pminvert (pm)
 
 pointer	pm		#I Pixel mask to be inverted
 
+long	lg_val
 size_t	sz_val
 int	i, naxes, axlen[IM_MAXDIM], depth, npix, val
 pointer	sp, v, buf, one
@@ -505,7 +509,9 @@ begin
 	Memi[one+4] = npix
 	Memi[one+5] = 1
 
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v], sz_val)
 	repeat {
 	    if (pm_linenotempty (pm, Meml[v])) {
 		call pmglpi (pm, Meml[v], Memi[buf], 0, npix, 0)

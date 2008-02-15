@@ -11,6 +11,7 @@ pointer procedure mio_openo (pm, im)
 pointer	pm			#I mask descriptor
 pointer	im			#I image descriptor
 
+long	lg_val
 size_t	sz_val
 pointer	mp
 
@@ -21,7 +22,9 @@ begin
 	call malloc (M_RLP(mp), sz_val, TY_INT)
 	RLI_LEN(M_RLP(mp)) = 0
 
-	call amovkl (1, M_VS(mp,1), IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, M_VS(mp,1), sz_val)
 	call amovl (IM_LEN(im,1), M_VN(mp,1), IM_MAXDIM)
 
 	M_IM(mp) = im

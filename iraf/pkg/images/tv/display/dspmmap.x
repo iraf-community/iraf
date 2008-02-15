@@ -62,6 +62,7 @@ pointer procedure ds_pmimmap (pmname, refim)
 char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 
+long	lg_val
 size_t	sz_val
 int	i, ndim, npix, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
@@ -76,8 +77,10 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
 
 	im_in = immap (pmname, READ_ONLY, 0)
 	pm = imstati (im_in, IM_PMDES)

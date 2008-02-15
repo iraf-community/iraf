@@ -26,6 +26,8 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
+size_t	sz_val
+long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -53,7 +55,9 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -111,6 +115,8 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
+size_t	sz_val
+long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -139,7 +145,9 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -197,6 +205,8 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
+size_t	sz_val
+long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -225,7 +235,9 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
@@ -283,6 +295,8 @@ int	nsample			#I Maximum number of sample pixels
 int	nlines			#I Minimum number of lines to sample
 int	nreturn			#I Number of pixels returned
 
+size_t	sz_val
+long	lg_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
 int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
@@ -311,7 +325,9 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 

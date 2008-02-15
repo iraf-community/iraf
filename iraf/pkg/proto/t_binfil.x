@@ -29,6 +29,7 @@ real	scale_fact, temp
 bool	add_header
 pointer	infile, im, pix, sp, inpix
 
+long	lg_val
 size_t	sz_val
 int	clplen(), clgfil(), open(), imgnlr(), strlen()
 real	clgetr()
@@ -96,7 +97,9 @@ begin
 	    call salloc (pix, sz_val, TY_SHORT)
 
 	    # Access pixels and write them out for each row
-	    call amovkl (long(1), v1, IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, v1, sz_val)
 	    while (imgnlr (im, inpix, v1) != EOF) {
 		do i = 1, ncols {
 		    temp = Memr[inpix+i-1] * scale_fact

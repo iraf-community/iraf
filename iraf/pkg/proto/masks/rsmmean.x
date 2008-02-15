@@ -875,6 +875,7 @@ pointer	tmpmsk			#I the output mask counts image
 int	start			#I the starting image in the list
 int	finish			#I the ending image in the list
 #real	normsum			#U the normalization accumulator 
+long	lg_val
 size_t	sz_val
 char	skyscale[ARB]		#I the scaling factor keyword 
 
@@ -942,10 +943,12 @@ begin
 
 	# Initialize image and mask i/o.
 	npix = IM_LEN(tmpim,1)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[mvout], sz_val)
+	call amovkl (lg_val, Meml[vs], sz_val)
+	call amovkl (lg_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	# Do the initial accumulation of counts and numbers of pixels.
@@ -996,6 +999,7 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new normalization factor
 
+long	lg_val
 size_t	sz_val
 real	norm1, pout, rmin, rmax
 pointer	sp, vin, vmin, vout, vtmp, vmtmp
@@ -1014,11 +1018,13 @@ begin
 	call salloc (vtmp, sz_val, TY_LONG)
 	call salloc (vmtmp, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vmin], sz_val)
+	call amovkl (lg_val, Meml[vtmp], sz_val)
+	call amovkl (lg_val, Meml[vmtmp], sz_val)
 
 	# Accumulate the normalized input image.
 	iferr (norm1 = imgetr (im, RS_KYFSCALE(rs)))
@@ -1077,6 +1083,7 @@ real	fscale			#I the new normalization factor
 char	skyscale[ARB]		#I the sky scaling keyword
 char	skysub[ARB]		#I the sky subtraction keyword
 
+long	lg_val
 size_t	sz_val
 real	norm1, pout
 pointer	sp, vin, vmin, vout, vtmp, vmtmp, vs, str
@@ -1097,11 +1104,13 @@ begin
 	sz_val = SZ_FNAME
 	call salloc (str, sz_val, TY_CHAR)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vmin], sz_val)
+	call amovkl (lg_val, Meml[vtmp], sz_val)
+	call amovkl (lg_val, Meml[vmtmp], sz_val)
 
 	call sprintf (Memc[str], SZ_FNAME,
 	    "Sky subtracted with scale factor = %g")
@@ -1139,7 +1148,9 @@ begin
 	} else {
 	    sz_val = IM_MAXDIM
 	    call salloc (vs, sz_val, TY_LONG)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[vs], sz_val)
 	    sz_val = npix
 	    call salloc (hbuf, sz_val, TY_SHORT)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
@@ -1195,6 +1206,7 @@ int	finish			#I the current ending image
 int	ostart			#I the previous starting image
 int	ofinish			#I the previous ending image
 #real	normsum			#I the norm factor accumulator
+long	lg_val
 size_t	sz_val
 char	skyscale[ARB]		#I the sky scaling keyword
 
@@ -1312,12 +1324,14 @@ begin
 
 	# Make the vector operators in-line code later if necessary.
 	npix = IM_LEN(tmpim,1)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvin], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[mvin], sz_val)
+	call amovkl (lg_val, Meml[mvout], sz_val)
+	call amovkl (lg_val, Meml[vs], sz_val)
+	call amovkl (lg_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF &&
@@ -1420,6 +1434,7 @@ pointer	tmpmsk			#I the counter image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the new scale factor
 
+long	lg_val
 size_t	sz_val
 real	rmin, rmax
 pointer	sp, vin, vout, vtmp, vmtmp
@@ -1435,10 +1450,12 @@ begin
 	call salloc (vtmp, sz_val, TY_LONG)
 	call salloc (vmtmp, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vtmp], sz_val)
+	call amovkl (lg_val, Meml[vmtmp], sz_val)
 
 	# Accumulate the normalized image.
 	npix = IM_LEN(im,1)
@@ -1486,6 +1503,7 @@ real	blank			#I the undefined pixel value
 real	fscale			#I the normalization factor
 char	skysub[ARB]		#I the sky subtraction keyword
 
+long	lg_val
 size_t	sz_val
 pointer	sp, vin, vout, vtmp, vmtmp, vs, str, obuf, ibuf, tbuf, tmbuf, hbuf
 int	i, npix, stat
@@ -1501,10 +1519,12 @@ begin
 	sz_val = SZ_FNAME
 	call salloc (str, sz_val, TY_CHAR)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vmtmp], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vtmp], sz_val)
+	call amovkl (lg_val, Meml[vmtmp], sz_val)
 
 	call sprintf (Memc[str], SZ_FNAME,
 	    "Sky subtracted with scale factor = %g")
@@ -1518,7 +1538,9 @@ begin
 	    call salloc (hbuf, sz_val, TY_SHORT)
 	    sz_val = IM_MAXDIM
 	    call salloc (vs, sz_val, TY_LONG)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[vs], sz_val)
 	    while (impnlr (outim, obuf, Meml[vout]) != EOF &&
 	        imgnlr (im, ibuf, Meml[vin]) != EOF &&
 	        imgnlr (tmpim, tbuf, Meml[vtmp]) != EOF &&

@@ -256,6 +256,7 @@ pointer	pmout			#I the output mask image descriptor
 pointer	rs			#I the sky subtraction pointer
 real	fscale			#O the scaling factor
 
+long	lg_val
 size_t	sz_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, vs, ve, mst, pm, mp, buf, hgm, smsk
@@ -288,7 +289,9 @@ begin
 	do i = 0 , RS_MAXITER(rs) {
 
 	    # Set up the mask i/o boundaries.
-            call amovkl (long(1), Meml[vs], IM_NDIM(ims))
+            lg_val = 1
+            sz_val = IM_NDIM(ims)
+            call amovkl (lg_val, Meml[vs], sz_val)
             call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
 
@@ -332,7 +335,9 @@ begin
         if (mst_ihist (mst, RS_BINWIDTH(rs), hgm, nbins, hwidth, hmin,
 	    hmax) == YES) {
             call aclri (Memi[hgm], nbins)
-            call amovkl (long(1), Meml[vs], IM_NDIM(ims))
+            lg_val = 1
+            sz_val = IM_NDIM(ims)
+            call amovkl (lg_val, Meml[vs], sz_val)
             call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF)
@@ -348,7 +353,9 @@ begin
 	if (pmout != NULL) {
             sz_val = IM_LEN(im,1)
             call malloc (smsk, sz_val, TY_SHORT)
-            call amovkl (long(1), Meml[vs], IM_NDIM(im))
+            lg_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (lg_val, Meml[vs], sz_val)
             call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
             pm = imstati (pmout, IM_PMDES)
@@ -380,6 +387,7 @@ pointer rs			#I the sky subtraction descriptor
 real	fscale			#I the computed scaling factor
 
 
+long	lg_val
 size_t	sz_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, v, mst, buf, hgm
@@ -410,7 +418,9 @@ begin
 
 	    # Accumulate the statistics.
 	    npts = IM_LEN(im,1)
-            call amovkl (long(1), Meml[v], IM_NDIM(im))
+            lg_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (lg_val, Meml[v], sz_val)
             while (imgnlr (im, buf, Meml[v]) != EOF)
                 call mst_accumulate2 (mst, Memr[buf], npts, low, up, YES)
 
@@ -445,7 +455,9 @@ begin
         if (mst_ihist (mst, RS_BINWIDTH(rs), hgm, nbins, hwidth, hmin,
 	    hmax) == YES) {
             call aclri (Memi[hgm], nbins)
-            call amovkl (long(1), Meml[v], IM_NDIM(im))
+            lg_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (lg_val, Meml[v], sz_val)
             while (imgnlr (im, buf, Meml[v]) != EOF)
                 call ahgmr (Memr[buf], npts, Memi[hgm], nbins, hmin, hmax)
             call mst_hmedian (mst, Memi[hgm], nbins, hwidth, hmin, hmax)

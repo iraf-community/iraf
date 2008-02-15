@@ -29,6 +29,7 @@ int	nlow				# Number of low pixels to reject
 int	nhigh				# Number of high pixels to reject
 char	option[ARB]			# Output option
 
+long	lg_val
 size_t	sz_val
 int	i, n, nimages, naccept, npix, ndone, pass
 PIXEL	const
@@ -82,7 +83,9 @@ begin
 		    im_out = immap (output, READ_WRITE, 0)
 		}
 
-	        call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	        lg_val = 1
+	        sz_val = IM_MAXDIM
+	        call amovkl (lg_val, Meml[v1], sz_val)
 		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 		# For each input line compute an output line.
@@ -147,7 +150,9 @@ begin
 	    call salloc (buf1, sz_val, TY_PIXEL)
 	}
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.

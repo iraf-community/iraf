@@ -44,6 +44,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -71,7 +72,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.

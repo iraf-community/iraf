@@ -33,6 +33,7 @@ int	isimage, npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, hist_type
 pointer im, tx, sp, hgm, hgmr, buf, input, str, v
 real	z1, z2, dz, z1temp, z2temp, zstart
 
+long	lg_val
 size_t	sz_val
 bool	streq(), clgetb(), fp_equalr()
 int	clgeti(), clgwrd(), open(), ph_gdata(), imgnlr(), imgnli()
@@ -65,7 +66,9 @@ begin
 	    } else {
 	        isimage = YES
 	        npix = IM_LEN(im,1)
-	        call amovkl (long(1), Meml[v], IM_MAXDIM)
+	        lg_val = 1
+	        sz_val = IM_MAXDIM
+	        call amovkl (lg_val, Meml[v], sz_val)
 	    }
 	}
 

@@ -222,6 +222,7 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 bool	same			# Same image?
 
+long	lg_val
 size_t	sz_val
 int	i
 pointer	sp, iroot, isect, oroot, osect, line, data
@@ -257,7 +258,9 @@ begin
 
 	    sz_val = IM_MAXDIM
 	    call salloc (line, sz_val, TY_LONG)
-	    call amovkl (long (1), Meml[line], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[line], sz_val)
 
 	    switch (ntype) {
 	    case 1, 2:

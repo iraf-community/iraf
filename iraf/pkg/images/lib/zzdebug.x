@@ -271,13 +271,17 @@ procedure t_maxmin()
 
 char	imname[SZ_FNAME]
 real	minval, maxval
+long	lg_val
+size_t	sz_val
 long	v[IM_MAXDIM], clktime()
 pointer	im, buf, immap()
 int	imgnlr()
 
 begin
 	call clgstr ("imname", imname, SZ_FNAME)
-	call amovkl (long(1), v, IM_MAXDIM)		# start vector
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)		# start vector
 
 	im = immap (imname, READ_WRITE, 0)
 

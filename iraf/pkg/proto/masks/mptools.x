@@ -213,6 +213,7 @@ pointer procedure mp_immap (pmname)
 
 char	pmname[ARB]		#I the pixel list or image name
 
+long	lg_val
 size_t	sz_val
 pointer	sp, v1, v2, im, pm, data, pmim
 int	ndim, npix
@@ -225,8 +226,10 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
 
 	# Open the input image.
 	im = immap (pmname, READ_ONLY, 0)
@@ -258,6 +261,7 @@ procedure mp_section (pmim)
 
 pointer	pmim			#U mask image descriptor
 
+long	lg_val
 size_t	sz_val
 pointer	newpm, newpmim, sp, v1, v2, ibuf
 pointer	pl_create(), im_pmmapo()
@@ -269,8 +273,10 @@ begin
 	sz_val = IM_MAXDIM
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
 
 	ndim = IM_NDIM(pmim)
 	depth = 1
@@ -299,6 +305,7 @@ pointer	im			#I the input image descriptor
 pointer	pmim			#I the input mask descriptor
 pointer	pmout			#I the output mask descriptor
 
+long	lg_val
 size_t	sz_val
 pointer	sp, axlen, v, oldpm, newpm
 int	naxes, depth
@@ -346,7 +353,9 @@ begin
 
 	# Copy the input to the output mask using the mapping parameters
 	# as appropriate
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v], sz_val)
 	call pm_rop (oldpm, Meml[v], newpm, Meml[v], Meml[axlen], PIX_SRC)
 
 	call imseti (pmout, IM_PLDES, newpm)
@@ -422,6 +431,7 @@ procedure mp_invert (pm)
 
 pointer	pm			#U plio descriptor
 
+long	lg_val
 size_t	sz_val
 pointer	sp, axlen, v, newpm
 int	naxes, depth
@@ -439,7 +449,9 @@ begin
 
 	# Create the new inverted mask.
 	newpm = pl_create (naxes, Meml[axlen], depth)
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v], sz_val)
 	call pl_rop (pm, Meml[v], newpm, Meml[v], Meml[axlen],
 	    PIX_NOT(PIX_SRC))
 
@@ -457,6 +469,7 @@ pointer procedure mp_copy (oldpm)
 
 pointer	oldpm			#I old pixel mask pointer
 
+long	lg_val
 size_t	sz_val
 pointer	sp, axlen, v, newpm
 int	naxes, depth
@@ -471,7 +484,9 @@ begin
 	call pl_gsize (oldpm, naxes, Meml[axlen], depth)
 	newpm = pl_create (naxes, Meml[axlen], depth)
 
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v], sz_val)
 	call pl_rop (oldpm, Meml[v], newpm, Meml[v], Meml[axlen],
 	    PIX_SRC)
 

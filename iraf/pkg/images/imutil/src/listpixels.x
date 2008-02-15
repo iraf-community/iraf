@@ -18,6 +18,7 @@ int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, imlist, mw, ct, fmtptrs[IM_MAXDIM]
 
+long	lg_val
 size_t	sz_val
 bool	clgetb()
 int	imgnlr(), imgnld(), imgnlx(), imtgetim(), mw_stati(), clscan(), nscan()
@@ -72,8 +73,10 @@ begin
 	    }
 
 	    # Initialize the v vectors.
-	    call amovkl (long (1), v, IM_MAXDIM)
-	    call amovkl (long (1), vcoords, IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, v, sz_val)
+	    call amovkl (lg_val, vcoords, sz_val)
 
 	    # Initialize the coordinates.
 	    laxis1 = 0

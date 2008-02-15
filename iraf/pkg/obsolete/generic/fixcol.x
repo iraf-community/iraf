@@ -92,6 +92,7 @@ procedure fixcoll (image, x1, x2, y1, y2)
 pointer	image				# Image pointer
 int	x1, x2, y1, y2			# Region to be fixed
 
+size_t	sz_val
 int	i, j, nx, ny
 real	f1, f2, scale
 pointer	a, b, c
@@ -104,12 +105,16 @@ begin
 	ny = y2 - y1 + 1
 	if (x1 == 1) {
 	    a = imgs2l (image, x2 + 1, x2 + 1, y1, y2)
-	    do i = 1, ny
-		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], nx)
+	    do i = 1, ny {
+		sz_val = nx
+		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], sz_val)
+	    }
 	} else if (x2 == IM_LEN (image, 1)) {
 	    a = imgs2l (image, x1 - 1, x1 - 1,  y1, y2)
-	    do i = 1, ny
-		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], nx)
+	    do i = 1, ny {
+		sz_val = nx
+		call amovkl (Meml[a + i - 1], Meml[c + (i - 1) * nx], sz_val)
+	    }
 	} else {
 	    call imseti (image, IM_NBUFS, 2)
 	    a = imgs2l (image, x1 - 1, x1 - 1, y1, y2)

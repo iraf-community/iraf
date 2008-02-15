@@ -206,6 +206,7 @@ pointer args[ARB]                       #i argument list
 int     nargs                           #i number of arguments
 pointer o                               #o operand pointer
 
+long	lg_val
 size_t	sz_val
 pointer	sp, buf
 pointer	r, g, b, gray
@@ -346,39 +347,46 @@ begin
 		sz2 = z2
 		sb1 = 0
 		sb2 = nbins - 1
-		if (abs(sz2-sz1) > 1.0e-5)
+		if (abs(sz2-sz1) > 1.0e-5) {
 		    call amaps (Mems[data], Mems[scaled], len, sz1, sz2, 
 			sb1, sb2)
-		else
+		} else {
 		    call amovks (0, Mems[scaled], len)
+		}
 
             case TY_INT:
-		if (abs(z2-z1) > 1.0e-5)
+		if (abs(z2-z1) > 1.0e-5) {
 		    call amapi (Memi[data], Memi[scaled], len, int (z1), 
 		        int(z2), int (0), int (nbins-1))
-		else
+		} else {
 		    call amovki (int (0), Memi[scaled], len)
+		}
 
             case TY_LONG:
-		if (abs(z2-z1) > 1.0e-5)
+		if (abs(z2-z1) > 1.0e-5) {
 		    call amapl (Meml[data], Meml[scaled], len, long (z1), 
 		        long(z2), long (0), long (nbins-1))
-		else
-		    call amovkl (long (0), Meml[scaled], len)
+		} else {
+		    lg_val = 0
+		    sz_val = len
+		    call amovkl (lg_val, Meml[scaled], sz_val)
+		}
 
             case TY_REAL:
-		if (abs(z2-z1) > 1.0e-5)
+		if (abs(z2-z1) > 1.0e-5) {
 		    call amapr (Memr[data], Memr[scaled], len, real (z1), 
 		        real(z2), real (0), real (nbins-1))
-		else
+		} else {
 		    call amovkr (real (0), Memr[scaled], len)
+		}
 
             case TY_DOUBLE:
-		if (abs(z2-z1) > 1.0e-5)
+		if (abs(z2-z1) > 1.0e-5) {
 		    call amapd (Memd[data], Memd[scaled], len, double (z1), 
 		        double(z2), double (0), double (nbins-1))
-		else
+		} else {
 		    call amovkd (double (0), Memd[scaled], len)
+		}
 
             }
 
@@ -397,36 +405,43 @@ begin
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Mems[data+i] - bzero) / bscale
-		} else
+		} else {
 		    call amovks (zero, Mems[scaled], len)
+		}
 
             case TY_INT:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memi[data+i] - bzero) / bscale
-		} else
+		} else {
 		    call amovki (int(0), Memi[scaled], len)
+		}
 
             case TY_LONG:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Meml[data+i] - bzero) / bscale
-		} else
-		    call amovkl (long(0), Meml[scaled], len)
+		} else {
+		    lg_val = 0
+		    sz_val = len
+		    call amovkl (lg_val, Meml[scaled], sz_val)
+		}
 
             case TY_REAL:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memr[data+i] - bzero) / bscale
-		} else
+		} else {
 		    call amovkr (real(0), Memr[scaled], len)
+		}
 
             case TY_DOUBLE:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memd[data+i] - bzero) / bscale
-		} else
+		} else {
 		    call amovkd (double(0), Memd[scaled], len)
+		}
 
             }
 
@@ -489,7 +504,9 @@ begin
             case TY_INT:
 		call amovki (O_VALI(args[1]), Memi[scaled], len)
             case TY_LONG:
-		call amovkl (O_VALL(args[1]), Meml[scaled], len)
+		lg_val = O_VALL(args[1])
+		sz_val = len
+		call amovkl (lg_val, Meml[scaled], sz_val)
             case TY_REAL:
 		call amovkr (O_VALR(args[1]), Memr[scaled], len)
             case TY_DOUBLE:

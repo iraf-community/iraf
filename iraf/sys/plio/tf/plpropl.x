@@ -41,7 +41,8 @@ begin
 	    call aclrl (px_dst[ds], npix)
 	    return
 	case PIX_SET:
-	    call amovkl (data, px_dst[ds], npix)
+	    sz_val = npix
+	    call amovkl (data, px_dst[ds], sz_val)
 	    goto out_
 	case PIX_SRC:
 	    if (src_maxval != 1)

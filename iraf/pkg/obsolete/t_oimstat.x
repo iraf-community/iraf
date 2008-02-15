@@ -15,6 +15,7 @@ real	upper				# Upper limit of data value window
 real	binwidth			# Width of histogram bin in sigma
 int	format				# Format the output
 
+long	lg_val
 size_t	sz_val
 int	nfields, nbins
 int	minmax, npix, mean, median, mode, stddev, skew, kurtosis
@@ -84,7 +85,9 @@ begin
 	    call ist_initialize (ist, lower, upper)
 
 	    # Accumulate the central moment statistics.
-	    call amovkl (long(1), Meml[v], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v], sz_val)
 	    if (kurtosis == YES) {
 	    	while (imgnlr (im, buf, Meml[v]) != EOF)
 		    call ist_accumulate4 (ist, Memr[buf], int (IM_LEN(im, 1)),
@@ -119,7 +122,9 @@ begin
 	    if ((median == YES || mode == YES) && ist_ihist (ist, binwidth,
 	        hgm, nbins, hwidth, hmin, hmax) == YES) {
 		call aclri (Memi[hgm], nbins)
-		call amovkl (long(1), Meml[v], IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, Meml[v], sz_val)
 		while (imgnlr (im, buf, Meml[v]) != EOF)
 		    call ahgmr (Memr[buf], int(IM_LEN(im,1)), Memi[hgm], nbins,
 		        hmin, hmax)

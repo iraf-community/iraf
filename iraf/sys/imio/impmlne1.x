@@ -10,9 +10,13 @@ bool procedure im_pmlne1 (im)
 pointer	im			#I image descriptor
 long	v[IM_MAXDIM]
 
+size_t	sz_val
+long	lg_val
 bool	pm_linenotempty()
 
 begin
-	call amovkl (1, v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	return (pm_linenotempty (IM_PL(im), v))
 end

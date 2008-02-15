@@ -105,6 +105,7 @@ pointer	gt				# GTIO pointer
 char	title[ARB]			# Title
 bool	interactive			# Interactive?
 
+long	lg_val
 size_t	sz_val
 char	graphics[SZ_FNAME]
 int	i, nx, new
@@ -153,8 +154,10 @@ begin
 	# Loop through each input image line and create an output image line.
 
 	new = YES
-	call amovkl (long(1), inline, IM_MAXDIM)
-	call amovkl (long(1), outline, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, inline, sz_val)
+	call amovkl (lg_val, outline, sz_val)
 
 	while (imgnlr (in, indata, inline) != EOF) {
 	    if (impnlr (out, outdata, outline) == EOF)
@@ -231,6 +234,8 @@ pointer	data			# Image data
 long	v[ARB]			# Image line vector
 char	title[ARB]		# Title
 
+size_t	sz_val
+long	lg_val
 int	i
 char	line[SZ_LINE]
 int	getline(), nscan(), imgnlr()
@@ -247,7 +252,9 @@ begin
 	    return (EOF)
 	call sscan (line)
 
-	call amovkl (long (1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	do i = 2, max (2, IM_NDIM(im)) {
 	    call gargl (v[i])
 	    if (nscan() == 0)

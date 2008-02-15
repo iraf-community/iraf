@@ -13,6 +13,7 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
+long	lg_val
 size_t	sz_val
 int	i, npix, npix_record, blksize, ndummy
 long	v[IM_MAXDIM], nlines, il
@@ -60,7 +61,9 @@ begin
 	# FITS data is converted to type  LONG, REAL or DOUBLE. If BITPIX is
 	# not one of the MII types then rft_read_pixels returns an ERROR.
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	switch (BITPIX(fits)) {
 	case FITS_REAL:
 

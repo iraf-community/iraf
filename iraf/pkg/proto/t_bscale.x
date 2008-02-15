@@ -173,6 +173,8 @@ pointer	outim		# pointer to the output image
 real	bzero		# zero point
 real	bscale		# scale
 
+size_t	sz_val
+long	lg_val
 int	nc
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 real	bz, bs
@@ -181,8 +183,10 @@ pointer	in, out
 int	imgnlr(), impnlr(), imgnlx(), impnlx(), imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v1, sz_val)
+	call amovkl (lg_val, v2, sz_val)
 
 	bz = -bzero
 	bs = 1. / bscale

@@ -9,6 +9,8 @@ procedure ep_imcopy (image1, image2)
 char	image1[ARB]			# Input image
 char	image2[ARB]			# Output image
  
+size_t	sz_val
+long	lg_val
 int	npix, junk
 pointer	buf1, buf2, im1, im2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
@@ -26,8 +28,10 @@ begin
 	im2 = immap (image2, NEW_COPY, im1)
  
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v1, sz_val)
+	call amovkl (lg_val, v2, sz_val)
  
 	# Copy the image.
 	npix = IM_LEN(im1, 1)

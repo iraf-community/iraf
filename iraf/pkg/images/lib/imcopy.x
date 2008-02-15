@@ -12,6 +12,7 @@ char	image1[ARB]			# Input image
 char	image2[ARB]			# Output image
 bool	verbose				# Print the operation
 
+long	lg_val
 size_t	sz_val
 int	npix, junk
 pointer	buf1, buf2, im1, im2
@@ -64,8 +65,10 @@ begin
 
 	# Setup start vector for sequential reads and writes.
 
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v1, sz_val)
+	call amovkl (lg_val, v2, sz_val)
 
 	# Copy the image.
 

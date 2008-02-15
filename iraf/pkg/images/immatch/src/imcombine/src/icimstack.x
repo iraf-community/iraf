@@ -12,6 +12,7 @@ int	list		#I List of images
 char	output[ARB]	#I Name of output image
 char	mask[ARB]	#I Name of output mask
 
+long	lg_val
 size_t	sz_val
 int	i, j, npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM], line_outbpm[IM_MAXDIM]
@@ -52,14 +53,18 @@ begin
 		    IM_NDIM(out) = IM_NDIM(out) + 1
 		    IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		    npix = IM_LEN(out, 1)
-		    call amovkl (long(1), line_out, IM_MAXDIM)
+		    lg_val = 1
+		    sz_val = IM_MAXDIM
+		    call amovkl (lg_val, line_out, sz_val)
 
 		    if (mask[1] != EOS) {
 			ptr = immap (mask, NEW_COPY, in)
 			outbpm = ptr
 			IM_NDIM(outbpm) = IM_NDIM(outbpm) + 1
 			IM_LEN(outbpm, IM_NDIM(outbpm)) = imtlen (list)
-			call amovkl (long(1), line_outbpm, IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, line_outbpm, sz_val)
 		    }
 		}
 
@@ -79,7 +84,9 @@ begin
 		# the output image.  Switch on the output data type to optimize
 		# IMIO.
 
-		call amovkl (long(1), line_in, IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, line_in, sz_val)
 		switch (IM_PIXTYPE (out)) {
 		case TY_SHORT:
 		    while (imgnls (in, buf_in, line_in) != EOF) {
@@ -141,7 +148,9 @@ begin
 			    call error (0, "Masks not consistent")
 		    }
 
-		    call amovkl (long(1), line_in, IM_MAXDIM)
+		    lg_val = 1
+		    sz_val = IM_MAXDIM
+		    call amovkl (lg_val, line_in, sz_val)
 		    while (imgnli (inbpm, buf_in, line_in) != EOF) {
 			if (impnli (outbpm, buf_out, line_outbpm) == EOF)
 			    call error (0, "Error writing output mask")

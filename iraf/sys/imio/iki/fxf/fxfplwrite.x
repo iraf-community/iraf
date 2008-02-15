@@ -43,6 +43,8 @@ procedure fxf_plwrite (im, fd)
 pointer	im			#I image descriptor
 int	fd			#I output file descriptor
 
+size_t	sz_val
+long	lg_val
 int	i, j, v_in[PL_MAXDIM], lp_len
 int	naxes, axlen[PL_MAXDIM], depth
 int	heap_offset, ep_off, lp_off, vararray[2]
@@ -69,7 +71,9 @@ begin
 	ep_off = -1
 	lastline = NULL
 	lp_off = -1
-	call amovkl(long(1), v_in, PL_MAXDIM)
+	lg_val = 1
+	sz_val = PL_MAXDIM
+	call amovkl(lg_val, v_in, sz_val)
 
 	do j = 1, axlen[3] {
 	    v_in[3] = j
@@ -143,6 +147,8 @@ int	maxlen			#O maximum line list length
 int	pcount			#O storage required to store mask (bytes)
 int	depth			#O mask depth
 
+size_t	sz_val
+long	lg_val
 int	naxes, axlen[PL_MAXDIM]
 int	i, j, v_in[PL_MAXDIM], lp_len
 int	heap_offset, ep_off, lp_off
@@ -163,7 +169,9 @@ begin
 	ep_off = -1
 	lastline = NULL
 	lp_off = -1
-	call amovkl(long(1), v_in, PL_MAXDIM)
+	lg_val = 1
+	sz_val = PL_MAXDIM
+	call amovkl(lg_val, v_in, sz_val)
 
 	# The following must duplicate the logic above for determining what
 	# gets written to the heap area.  All we are doing here is computing
@@ -318,6 +326,7 @@ procedure fxf_plpf (im)
 
 pointer im				#I IMIO descriptor
 
+long	lg_val
 size_t	sz_val
 int	pfd
 pointer	sp, imname, ref_im
@@ -386,8 +395,11 @@ begin
 	    IM_NPHYSDIM(im) = ndim
 	    call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
 	    call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
-	    if (sv_acmode == NEW_IMAGE)
-		call amovkl (long(1), IM_VSTEP(im,1), IM_MAXDIM)	
+	    if (sv_acmode == NEW_IMAGE) {
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, IM_VSTEP(im,1), sz_val)	
+	    }
 
 	    depth = PL_MAXDEPTH
 	    if (and (IM_PLFLAGS(im), PL_BOOL) != 0)

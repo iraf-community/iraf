@@ -291,6 +291,7 @@ procedure geo_imzero (im, constant)
 pointer	im			#I pointer to the input image
 real	constant		#I the constant value to insert in the imagw
 
+long	lg_val
 size_t	sz_val
 int	npix
 pointer	sp, v, buf
@@ -301,26 +302,35 @@ begin
 	call smark (sp)
 	sz_val = IM_MAXDIM
 	call salloc (v, sz_val, TY_LONG)
-        call amovkl (long(1), Meml[v], IM_MAXDIM)
+        lg_val = 1
+        sz_val = IM_MAXDIM
+        call amovkl (lg_val, Meml[v], sz_val)
 
         # Initialize the image.
         npix = IM_LEN(im, 1)
         switch (IM_PIXTYPE(im)) {
         case TY_SHORT:
-            while (impnls (im, buf, Meml[v]) != EOF)
+            while (impnls (im, buf, Meml[v]) != EOF) {
                 call amovks (short (constant), Mems[buf], npix)
+	    }
         case TY_USHORT, TY_INT, TY_LONG:
-            while (impnll (im, buf, Meml[v]) != EOF)
-                call amovkl (long (constant), Meml[buf], npix)
+            while (impnll (im, buf, Meml[v]) != EOF) {
+                lg_val = constant
+                sz_val = npix
+                call amovkl (lg_val, Meml[buf], sz_val)
+	    }
         case TY_REAL:
-            while (impnlr (im, buf, Meml[v]) != EOF)
+            while (impnlr (im, buf, Meml[v]) != EOF) {
                 call amovkr (constant, Memr[buf], npix)
+	    }
         case TY_DOUBLE:
-            while (impnld (im, buf, Meml[v]) != EOF)
+            while (impnld (im, buf, Meml[v]) != EOF) {
                 call amovkd (double (constant), Memd[buf], npix)
+	    }
         case TY_COMPLEX:
-            while (impnlx (im, buf, Meml[v]) != EOF)
+            while (impnlx (im, buf, Meml[v]) != EOF) {
                 call amovkx (complex (constant, 0.0), Memx[buf], npix)
+	    }
         default:
             call error (1, "Unknown pixel datatype")
         }

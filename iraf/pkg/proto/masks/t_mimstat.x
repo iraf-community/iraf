@@ -16,6 +16,7 @@ int	i, nclip, nfields, format, mval, npts, npix
 int	nbins, in_invert, nbad, cache
 size_t	old_size
 
+long	lg_val
 size_t	sz_val
 real	clgetr()
 pointer	mp_open(), mp_miopen()
@@ -186,7 +187,9 @@ begin
 	    do i = 0 , nclip {
 
 		# Set up the mask i/o boundaries.
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
+                lg_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (lg_val, Meml[vs], sz_val)
                 call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
 
@@ -256,7 +259,9 @@ begin
 	        MIS_SMODE(MIS_SW(mst)) == YES) && mst_ihist (mst, binwidth,
 		hgm, nbins, hwidth, hmin, hmax) == YES) {
                 call aclri (Memi[hgm], nbins)
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
+                lg_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (lg_val, Meml[vs], sz_val)
                 call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF)
@@ -282,10 +287,14 @@ begin
 	    if (pmout != NULL) {
 	        sz_val = IM_LEN(im,1)
 	        call malloc (smsk, sz_val, TY_SHORT)
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
+                lg_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (lg_val, Meml[vs], sz_val)
                 call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
+                lg_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (lg_val, Meml[vs], sz_val)
 		opm = imstati (pmout, IM_PMDES)
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) { 
 		    nbad = mst_umask (Memr[buf], Mems[smsk], npts, low, up)

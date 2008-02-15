@@ -12,6 +12,7 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
+long	lg_val
 size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
@@ -56,9 +57,11 @@ begin
 	    call salloc (v3, sz_val, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 
 	    # For each output line compute a block replicated line from the
 	    # input image.  If the line replication factor is greater than
@@ -114,6 +117,7 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
+long	lg_val
 size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
@@ -158,9 +162,11 @@ begin
 	    call salloc (v3, sz_val, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 
 	    # For each output line compute a block replicated line from the
 	    # input image.  If the line replication factor is greater than
@@ -216,6 +222,7 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
+long	lg_val
 size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
@@ -260,9 +267,11 @@ begin
 	    call salloc (v3, sz_val, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 
 	    # For each output line compute a block replicated line from the
 	    # input image.  If the line replication factor is greater than
@@ -318,6 +327,7 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
+long	lg_val
 size_t	sz_val
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
@@ -362,9 +372,11 @@ begin
 	    call salloc (v3, sz_val, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 
 	    # For each output line compute a block replicated line from the
 	    # input image.  If the line replication factor is greater than

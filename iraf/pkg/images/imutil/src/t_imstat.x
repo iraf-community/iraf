@@ -16,6 +16,7 @@ pointer	im, buf, hgm, list
 int	i, nclip, format, nfields, nbins, npix, cache
 size_t	old_size
 
+long	lg_val
 size_t	sz_val
 real	clgetr()
 pointer	immap(), imtopenp()
@@ -84,7 +85,9 @@ begin
 	    do i = 0, nclip {
 
 	        call ist_initialize (ist, low, up)
-	        call amovkl (long(1), Meml[v], IM_MAXDIM)
+	        lg_val = 1
+	        sz_val = IM_MAXDIM
+	        call amovkl (lg_val, Meml[v], sz_val)
 
 	        if (IST_SKURTOSIS(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
@@ -153,7 +156,9 @@ begin
 	        YES) && ist_ihist (ist, binwidth, hgm, nbins, hwidth, hmin,
 		hmax) == YES) {
 		call aclri (Memi[hgm], nbins)
-		call amovkl (long(1), Meml[v], IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, Meml[v], sz_val)
 		while (imgnlr (im, buf, Meml[v]) != EOF)
 		    call ahgmr (Memr[buf], int(IM_LEN(im,1)), Memi[hgm], nbins,
 		        hmin, hmax)

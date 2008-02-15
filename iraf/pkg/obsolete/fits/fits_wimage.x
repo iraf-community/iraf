@@ -13,6 +13,7 @@ pointer	im			# IRAF image descriptor
 pointer	fits			# FITS data structure
 int	fits_fd			# FITS file descriptor
 
+long	lg_val
 size_t	sz_val
 int	npix, nlines, npix_record, i, stat, nrecords
 long	v[IM_MAXDIM]
@@ -36,7 +37,9 @@ begin
 	    nlines = nlines * NAXISN(im, i)
 	npix_record = len_record * FITS_BYTE / abs (FITS_BITPIX(fits))
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	switch (FITS_BITPIX(fits)) {
 	case FITS_REAL:
 

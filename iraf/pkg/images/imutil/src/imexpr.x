@@ -82,6 +82,7 @@ pointer	oplist, opnam, opval, param, io, ip, op, o, im, ia, emsg
 int	len_exprbuf, fd, nchars, noperands, dtype, status, i, j
 int	ndim, npix, ch, percent, nlines, totlines, flags, mapflag
 
+long	lg_val
 size_t	sz_val
 real	clgetr()
 double	imgetd()
@@ -281,7 +282,9 @@ image_
 		}
 
 		IO_TYPE(io) = IMAGE
-		call amovkl (1, IO_V(io,1), IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, IO_V(io,1), sz_val)
 		IO_IM(io) = im
 
 		switch (IM_PIXTYPE(im)) {
@@ -550,7 +553,9 @@ image_
 	}
 
 	# Initialize output image line pointer.
-	call amovkl (1, IE_V(ie,1), IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, IE_V(ie,1), sz_val)
 
 	percent = 0
 	nlines = 0
@@ -647,35 +652,45 @@ image_
 
 		case TY_SHORT:
 		    if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, IO_V(io,1), sz_val)
 			if (imgnls (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_INT:
 		    if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, IO_V(io,1), sz_val)
 			if (imgnli (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_LONG:
 		    if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, IO_V(io,1), sz_val)
 			if (imgnll (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_REAL:
 		    if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, IO_V(io,1), sz_val)
 			if (imgnlr (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }
 
 		case TY_DOUBLE:
 		    if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF) {
-			call amovkl (1, IO_V(io,1), IM_MAXDIM)
+			lg_val = 1
+			sz_val = IM_MAXDIM
+			call amovkl (lg_val, IO_V(io,1), sz_val)
 			if (imgnld (im, IO_DATA(io), IO_V(io,1)) == EOF)
 			    call error (9, s_nodata)
 		    }

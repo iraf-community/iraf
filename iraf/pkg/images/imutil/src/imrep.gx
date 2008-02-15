@@ -12,6 +12,8 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	lg_val
 pointer	buf1, buf2
 int	npix, junk
 $if (datatype == sil)
@@ -27,8 +29,10 @@ $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v1, sz_val)
+	call amovkl (lg_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	$if (datatype == x)
@@ -106,6 +110,7 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+long	lg_val
 size_t	sz_val
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
@@ -125,8 +130,10 @@ $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v1, sz_val)
+	call amovkl (lg_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)

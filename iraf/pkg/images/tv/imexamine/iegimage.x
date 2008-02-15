@@ -209,6 +209,7 @@ char	input[ARB]		#I Input image name
 char	output[maxchar]		#O Output image name
 int	maxchar			#I Maximum characters in output name.
 
+long	lg_val
 size_t	sz_val
 int	i, fd
 pointer	sp, section, lv, pv1, pv2
@@ -226,7 +227,9 @@ begin
 	call salloc (pv2, sz_val, TY_LONG)
 
 	# Get endpoint coordinates in original image.
-	call amovkl (long(1), Meml[lv], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[lv], sz_val)
 	call aclrl (Meml[pv1], IM_MAXDIM)
 	call imaplv (im, Meml[lv], Meml[pv1], 2)
 	call amovl (IM_LEN(im,1), Meml[lv], IM_NDIM(im))

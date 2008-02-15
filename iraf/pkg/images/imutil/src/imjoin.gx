@@ -15,6 +15,7 @@ pointer	out			#I Output IMIO pointer
 int	joindim			#I Dimension along which to join images
 int	outtype			#I Output datatype
 
+long	lg_val
 size_t	sz_val
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
@@ -31,11 +32,15 @@ begin
 	call salloc (vout, sz_val, TY_LONG)
 
 	# Initialize the v vectors.
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
 	do image = 1, nimages {
 	    sz_val = IM_MAXDIM
 	    call salloc (VPTR(vin,image), sz_val, TY_LONG)
-	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[VPTR(vin,image)], sz_val)
 	}
 
 	# Join input images along the specified dimension. Joins along

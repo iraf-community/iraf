@@ -37,6 +37,7 @@ real	blank			#I Blank values
 char	storetype[ARB]		#I Storage type
 bool	verbose			#I Verbose?
 
+long	lg_val
 size_t	sz_val
 int	i, j, nims, nc, nl, iindex, oindex, eindex, stat, halfwin, ot, stype
 int	fd, len[IM_MAXDIM]
@@ -243,8 +244,10 @@ begin
 
 	    # Do initial accumulation.
 	    if (iindex < window) {
-		call amovkl (long(1), Meml[iline], IM_MAXDIM)
-		call amovkl (long(1), Meml[imline], IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, Meml[iline], sz_val)
+		call amovkl (lg_val, Meml[imline], sz_val)
 		do j = 1, nl {
 		    rm = Memi[rms+j-1]
 		    if (im != NULL)
@@ -317,10 +320,12 @@ begin
 		oscl = 1 / Memr[scales+mod(oindex,window)]
 
 	    # Add input data and create output data.
-	    call amovkl (long(1), Meml[iline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[imline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[oline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[omline], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[iline], sz_val)
+	    call amovkl (lg_val, Meml[imline], sz_val)
+	    call amovkl (lg_val, Meml[oline], sz_val)
+	    call amovkl (lg_val, Meml[omline], sz_val)
 	    do j = 1, nl {
 		stat = impnlr (out, odata, Meml[oline])
 		if (im != NULL)
@@ -453,8 +458,10 @@ begin
 		else
 		    oscl = 1 / Memr[scales+mod(oindex,window)]
 
-		call amovkl (long(1), Meml[oline], IM_MAXDIM)
-		call amovkl (long(1), Meml[omline], IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, Meml[oline], sz_val)
+		call amovkl (lg_val, Meml[omline], sz_val)
 		do j = 1, nl {
 		    stat = impnlr (out, odata, Meml[oline])
 		    if (om != NULL)

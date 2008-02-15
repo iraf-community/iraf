@@ -26,6 +26,7 @@ char	texpr[ARB]		#I the condition equals true expression
 char	fexpr[ARB]		#I the condition equals true expression
 pointer	pmim			#I the pixel mask imio descriptor
 
+long	lg_val
 size_t	sz_val
 pointer	sp, rg, oexpr, expr, obuf
 int	i, npix, nlines, depth, pmaxval, stat
@@ -47,8 +48,10 @@ begin
 	RG_PMIM(rg) = pmim
 
 	# Initalize the i/o pointers.
-	call amovkl (long(1), RG_OPMV(rg,1), IM_MAXDIM)
-	call amovkl (long(1), RG_IPMV(rg,1), IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, RG_OPMV(rg,1), sz_val)
+	call amovkl (lg_val, RG_IPMV(rg,1), sz_val)
 
 	# Create the conditional expression to be evaluated.
 	call sprintf (Memc[expr], 3 * SZ_LINE, "(%s) ? %s : %s")

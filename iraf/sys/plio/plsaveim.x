@@ -17,6 +17,8 @@ char	imname[ARB]		#I image name or section
 char	title[ARB]		#I mask "title" string
 int	flags			#I bitflags
 
+size_t	sz_val
+long	lg_val
 bool	sampling
 pointer	im, px, im_pl, bp
 int	npix, naxes, depth, maxdim, mode, i, locstr, locmem
@@ -79,7 +81,9 @@ begin
 	sampling = false
 
 	if (im_pl != NULL) {
-	    call amovkl (long(1), vs_l, maxdim)
+	    lg_val = 1
+	    sz_val = maxdim
+	    call amovkl (lg_val, vs_l, sz_val)
 	    call amovl (IM_LEN(im,1), ve_l, maxdim)
 	    call imaplv (im, vs_l, vs_p, maxdim)
 	    call imaplv (im, ve_l, ve_p, maxdim)
@@ -104,8 +108,10 @@ begin
 
 	} else {
 	    # Copy image pixels.  Initialize the vector loop indices.
-	    call amovkl (long(1), v_in, maxdim)
-	    call amovkl (long(1), v_out, maxdim)
+	    lg_val = 1
+	    sz_val = maxdim
+	    call amovkl (lg_val, v_in, sz_val)
+	    call amovkl (lg_val, v_out, sz_val)
 
 	    # Copy the image.
 	    while (impnli (im, px, v_out) != EOF) {

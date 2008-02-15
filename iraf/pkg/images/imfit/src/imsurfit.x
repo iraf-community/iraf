@@ -62,6 +62,7 @@ pointer	im	# pointer to the input image
 pointer	imfit	# pointer to the imsurfit structure
 pointer	sf	# pointer to the surface descriptor
 
+long	lg_val
 size_t	sz_val
 int	i, lp, ncols, nlines, ier
 long	v[IM_MAXDIM]
@@ -94,7 +95,9 @@ begin
 
 	# Loop over image lines.
 	lp = 0
-	call amovkl (long (1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	do i = 1, nlines {
 
 	    # Read in the image line.
@@ -548,6 +551,7 @@ pointer	imfit	# pointer to the imsurfut header structure
 pointer	sf	# pointer to the surface descriptor
 pointer	rl	# pointer to the rejected pixel list regions list
 
+long	lg_val
 size_t	sz_val
 int	i, k, ncols, nlines, max_nranges
 long	u[IM_MAXDIM], v[IM_MAXDIM]
@@ -589,8 +593,10 @@ begin
 	    call amapr (Memr[x], Memr[x], ncols, 1., real (ncols), b1x, b2x)
 
 	# loop over the images lines
-	call amovkl (long (1), v, IM_MAXDIM)
-	call amovkl (long (1), u, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
+	call amovkl (lg_val, u, sz_val)
 	do i = 1, nlines {
 
 	    # Get input and output image buffers.

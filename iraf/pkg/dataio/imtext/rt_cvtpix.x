@@ -13,6 +13,7 @@ pointer	im		# Pointer to image header
 int	format		# Format of text pixels (integer/floating point)
 int	pixels		# Get pixels from input text file?
 
+long	lg_val
 size_t	sz_val
 pointer	bufptr, sp, word1, pattern
 int	stat, nlines, npix, i
@@ -80,7 +81,9 @@ begin
 	nlines = 1
 	do i = 2, IM_NDIM(im)
 	    nlines = nlines * IM_LEN (im, i)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	npix = IM_LEN (im, 1)
 
 	# Initialize text buffer

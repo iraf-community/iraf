@@ -152,6 +152,7 @@ real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
 int	npts			# Number of points per output line
 
+long	lg_val
 size_t	sz_val
 int	i, ext, ctor(), ic_qsort(), errcode()
 real	r, imgetr()
@@ -176,9 +177,11 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 	call salloc (v3, sz_val, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (lg_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -381,9 +384,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -568,6 +573,7 @@ real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
 int	npts			# Number of points per output line
 
+long	lg_val
 size_t	sz_val
 int	i, ext, ctor(), ic_qsort(), errcode()
 real	r, imgetr()
@@ -592,9 +598,11 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 	call salloc (v3, sz_val, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (lg_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -797,9 +805,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatai (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -984,6 +994,7 @@ real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
 int	npts			# Number of points per output line
 
+long	lg_val
 size_t	sz_val
 int	i, ext, ctor(), ic_qsort(), errcode()
 real	r, imgetr()
@@ -1008,9 +1019,11 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 	call salloc (v3, sz_val, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (lg_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -1213,9 +1226,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -1400,6 +1415,7 @@ real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
 int	npts			# Number of points per output line
 
+long	lg_val
 size_t	sz_val
 int	i, ext, ctor(), ic_qsort(), errcode()
 real	r, imgetr()
@@ -1424,9 +1440,11 @@ begin
 	call salloc (v1, sz_val, TY_LONG)
 	call salloc (v2, sz_val, TY_LONG)
 	call salloc (v3, sz_val, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
+	call amovkl (lg_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -1629,9 +1647,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
+	    call amovkl (lg_val, Meml[v2], sz_val)
+	    call amovkl (lg_val, Meml[v3], sz_val)
 	    while (impnld (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatad (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])

@@ -21,6 +21,7 @@ pointer	pmin			#I Pixel mask
 int	lvalin			#I Input line interpolation code
 int	cvalin			#I Input column interpolation code
 
+long	lg_val
 size_t	sz_val
 int	i, j, k, l, n, nc, nl, l1, l2, lmin, lmax, ncols, lval, cval, ncompress
 short	val
@@ -92,7 +93,9 @@ begin
 	# i.e. are there any mask values different from the line interpolation.
 
 	call aclrs (Mems[cols], nc)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	do l = 1, nl {
 	    v[2] = l
 	    call pmglrs (pm, v, Mems[buf], 0, nc, 0)
@@ -225,11 +228,15 @@ int	cvalin		#I Input column interpolation code
 int	lvalout		#I Output line interpolation code
 int	cvalout		#I Output column interpolation code
 
+size_t	sz_val
+long	lg_val
 int	c, l, c1, c2, val
 bool	pm_linenotempty()
 
 begin
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	do l = 1, nl {
 	    v[2] = l
 	    if (!pm_linenotempty (pmin, v))

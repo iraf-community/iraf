@@ -533,6 +533,7 @@ pointer	im2		#I pointer to the output image
 real	bscale		#I the bscale value
 real	bzero		#I the bzero value
 
+long	lg_val
 size_t	sz_val
 int	ncols
 pointer	sp, v1, v2, buf1, buf2
@@ -545,8 +546,10 @@ begin
 	call salloc (v2, sz_val, TY_LONG)
 
 	ncols = IM_LEN(im1,1)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
+	call amovkl (lg_val, Meml[v2], sz_val)
 	while (imgnlr (im1, buf1, Meml[v1]) != EOF) {
 	    if (impnlr (im2, buf2, Meml[v2]) != EOF)
 		call altmr (Memr[buf1], Memr[buf2], ncols, bscale, bzero)

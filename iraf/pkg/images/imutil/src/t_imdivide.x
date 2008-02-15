@@ -19,6 +19,8 @@ int	rescale					# Option for rescaling
 real	constant				# Replacement for zero divide
 bool	verbose					# Verbose output?
 
+size_t	sz_val
+long	lg_val
 char	str[SZ_LINE]
 int	i, npix, ntotal
 real	sum1, sum2, sum3, scale
@@ -62,9 +64,11 @@ begin
 	sum1 = 0.
 	sum2 = 0.
 	sum3 = 0.
-	call amovkl (long(1), line1, IM_MAXDIM)
-	call amovkl (long(1), line2, IM_MAXDIM)
-	call amovkl (long(1), line3, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, line1, sz_val)
+	call amovkl (lg_val, line2, sz_val)
+	call amovkl (lg_val, line3, sz_val)
 
 	# Loop through the images doing the division.
 	# Accumulate the sums for mean values.
@@ -119,8 +123,10 @@ begin
 
 	# Open image read_write and initialize line counters.
 	im1 = immap (image3, READ_WRITE, 0)
-	call amovkl (long(1), line1, IM_MAXDIM)
-	call amovkl (long(1), line2, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, line1, sz_val)
+	call amovkl (lg_val, line2, sz_val)
 
 	# Loop through the image rescaling the image lines.
 	while (imgnlr (im1, data1, line1) != EOF) {

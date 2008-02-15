@@ -175,6 +175,8 @@ int	iyshift		#I
 int	boundary_type	#I type of boundary extension
 real	constant	#I constant for boundary extension
 
+size_t	sz_val
+long	lg_val
 pointer	buf1, buf2
 long	v[IM_MAXDIM]
 int	ncols, nlines, nbpix
@@ -217,7 +219,9 @@ begin
 	x1col = max (-ncols + 1, - ixshift + 1) 
 	x2col = min (2 * ncols,  ncols - ixshift)
 
-	call amovkl (long (1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# Shift the image using the appropriate data type operators.
 	switch (IM_PIXTYPE(im1)) {

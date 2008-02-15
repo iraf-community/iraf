@@ -15,16 +15,22 @@ long	ve[PM_MAXDIM]		#I ending coordinates of section
 int	ndim			#I dimension of section
 int	mval			#O mask value
 
+size_t	sz_val
+long	lg_val
 bool	pl_sectnotconst()
 include	"pmio.com"
 
 begin
 	if (PM_MAPXY(pl) == YES) {
-	    call amovkl ( 1, v1, PM_MAXDIM)
+	    lg_val = 1
+	    sz_val = PM_MAXDIM
+	    call amovkl (lg_val, v1, sz_val)
 	    call amovl (vs, v1, ndim)
 	    call imaplv (PM_REFIM(pl), v1, v2, PM_MAXDIM)
 
-	    call amovkl ( 1, v3, PM_MAXDIM)
+	    lg_val = 1
+	    sz_val = PM_MAXDIM
+	    call amovkl (lg_val, v3, sz_val)
 	    call amovl (ve, v3, ndim)
 	    call imaplv (PM_REFIM(pl), v3, v4, PM_MAXDIM)
 

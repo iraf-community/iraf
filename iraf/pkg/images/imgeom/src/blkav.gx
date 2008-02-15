@@ -22,6 +22,7 @@ pointer im2			# output image
 int	blkfac[IM_MAXDIM]	# blocking factors
 int	option			# block operation (average, sum, ...)
 
+long	lg_val
 size_t	sz_val
 int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
@@ -57,7 +58,9 @@ begin
 	num_olines = 1
 	do i = 2, ndim
 	    num_olines = num_olines * num_oblks[i]
-	call amovkl (long(1), vout, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, vout, sz_val)
 
 	# For each sequential output-image line, ...
 	do oline = 1, num_olines {

@@ -10,6 +10,8 @@ procedure ima_muls (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 short	a, b
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -20,7 +22,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  If the constant
 	# is 1 do a vector move to imagec otherwise do a vector
@@ -60,6 +64,8 @@ procedure ima_muli (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 int	a, b
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -70,7 +76,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  If the constant
 	# is 1 do a vector move to imagec otherwise do a vector
@@ -110,6 +118,8 @@ procedure ima_mull (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 long	a, b
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -120,7 +130,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  If the constant
 	# is 1 do a vector move to imagec otherwise do a vector
@@ -160,6 +172,8 @@ procedure ima_mulr (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 real	a, b
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -170,7 +184,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  If the constant
 	# is 1 do a vector move to imagec otherwise do a vector
@@ -210,6 +226,8 @@ procedure ima_muld (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 double	a, b
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -220,7 +238,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  If the constant
 	# is 1 do a vector move to imagec otherwise do a vector

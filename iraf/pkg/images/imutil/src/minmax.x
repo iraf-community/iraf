@@ -17,6 +17,8 @@ double	imin_value		# minimum pixel value in image (imag, out)
 double	imax_value		# maximum pixel value in image (imag, out)
 long	vmin[ARB], vmax[ARB]	# v vectors
 
+size_t	sz_val
+long	lg_val
 bool	first_line
 int	colmin, colmax
 complex	xmin_value, xmax_value, minval_x, maxval_x
@@ -29,11 +31,13 @@ double	minval_d, maxval_d
 int	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
 
 begin
-	call amovkl (long(1), v, IM_MAXDIM)		# start vector
-	call amovkl (long(1), ovmin, IM_MAXDIM)
-	call amovkl (long(1), ovmax, IM_MAXDIM)
-	call amovkl (long(1), vmin, IM_MAXDIM)
-	call amovkl (long(1), vmax, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)		# start vector
+	call amovkl (lg_val, ovmin, sz_val)
+	call amovkl (lg_val, ovmax, sz_val)
+	call amovkl (lg_val, vmin, sz_val)
+	call amovkl (lg_val, vmax, sz_val)
 
 	first_line = true
 	min_value = INDEFD

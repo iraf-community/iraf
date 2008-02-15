@@ -27,6 +27,7 @@ real	z1, z2, dz, z1temp, z2temp, zstart
 int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch, histtype
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 
+long	lg_val
 size_t	sz_val
 real	clgetr()
 pointer	immap(), gopen()
@@ -112,7 +113,9 @@ begin
 	sz_val = nbins1
 	call salloc (hgm, sz_val, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# Read successive lines of the image and accumulate the histogram.
 

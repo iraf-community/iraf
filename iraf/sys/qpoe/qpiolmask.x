@@ -17,6 +17,7 @@ pointer	io			#I QPIO descriptor
 char	mask[ARB]		#I mask to be loaded
 int	merge			#I merge with old mask?
 
+long	lg_val
 size_t	sz_val
 int	niter
 int	naxes, axlen[PL_MAXDIM], v[PL_MAXDIM]
@@ -92,7 +93,9 @@ tryfile_
 
 	if (merge == YES && o_pl != NULL) {
 	    b_pl = pl_open (NULL)
-	    call amovkl (1, v, PL_MAXDIM)
+	    lg_val = 1
+	    sz_val = PL_MAXDIM
+	    call amovkl (lg_val, v, sz_val)
 	    call pl_ssize (b_pl, naxes, axlen, 1)
 	    call pl_rop (o_pl, v, b_pl, v, axlen, PIX_SRC)
 	    call pl_rop (b_pl, v, n_pl, v, axlen, and(PIX_SRC,PIX_DST))

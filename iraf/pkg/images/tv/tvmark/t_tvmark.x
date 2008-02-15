@@ -193,6 +193,7 @@ procedure mk_imcopy (in, out)
 pointer	in		# pointer to the input image
 pointer	out		# pointe to the output image
 
+long	lg_val
 size_t	sz_val
 int	i, ncols, nlines
 pointer	sp, vin, vout, inbuf, outbuf
@@ -207,8 +208,10 @@ begin
 
 	ncols = IM_LEN(in, 1)
 	nlines = IM_LEN(in, 2)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vin], sz_val)
+	call amovkl (lg_val, Meml[vout], sz_val)
 
 	do i = 1, nlines {
 	    if (impnls (out, outbuf, Meml[vout]) == EOF)

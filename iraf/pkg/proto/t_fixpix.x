@@ -15,6 +15,7 @@ int	cinterp			# Mask code for column interpolation
 bool	verbose			# Verbose output?
 int	fd			# List pixels?
 
+long	lg_val
 size_t	sz_val
 int	i, nc, nl
 long	v[IM_MAXDIM]
@@ -92,7 +93,9 @@ begin
 		    call flush (STDOUT)
 		}
 
-		call amovkl (long(1), v, IM_MAXDIM)
+		lg_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (lg_val, v, sz_val)
 		if (fp != NULL) {
 		    do i = 1, nl {
 			v[2] = i

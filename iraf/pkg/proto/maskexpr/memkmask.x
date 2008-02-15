@@ -33,6 +33,7 @@ int	ndim			#I the number of output mask dimensions
 long	axlen[ARB]		#I the size of the output mask
 int	depth			#I the pixel depth of the output mask
 
+long	lg_val
 size_t	sz_val
 pointer	sp, tmpname, pm, pmim, me, obuf, oexpr
 int	i, npix, nlines, pmaxval
@@ -111,9 +112,11 @@ begin
 	 }
 
 	# Initalize the i/o pointers.
-	call amovkl (long(1), ME_PMV(me,1), IM_MAXDIM)
-	call amovkl (long(1), ME_REFV(me,1), IM_MAXDIM)
-	call amovkl (long(1), ME_REFPMV(me,1), IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, ME_PMV(me,1), sz_val)
+	call amovkl (lg_val, ME_REFV(me,1), sz_val)
+	call amovkl (lg_val, ME_REFPMV(me,1), sz_val)
 
 	# Compute the total number of output image lines.
 	npix = IM_LEN(pmim,1)

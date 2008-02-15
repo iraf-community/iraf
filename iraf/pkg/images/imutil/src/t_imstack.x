@@ -15,6 +15,7 @@ int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
 
+long	lg_val
 size_t	sz_val
 bool	envgetb()
 int	imtgetim(), imtlen()
@@ -50,7 +51,9 @@ begin
 		IM_NDIM(out) = IM_NDIM(out) + 1
 		IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		npix = IM_LEN(out, 1)
-	        call amovkl (long(1), line_out, IM_MAXDIM)
+	        lg_val = 1
+	        sz_val = IM_MAXDIM
+	        call amovkl (lg_val, line_out, sz_val)
 	    }
 
 	    # Check next input image for consistency with the output image.
@@ -65,7 +68,9 @@ begin
 	    # the output image.  Switch on the output data type to optimize
 	    # IMIO.
 
-	    call amovkl (long(1), line_in, IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, line_in, sz_val)
 	    switch (IM_PIXTYPE (out)) {
 	    case TY_SHORT:
 	        while (imgnls (in, buf_in, line_in) != EOF) {

@@ -74,6 +74,7 @@ char	image2[ARB]		# output image
 int	sdim			# slice dimension
 int	verbose			# verbose mode
 
+long	lg_val
 size_t	sz_val
 int	i, j, ndim, fdim, ncols, nlout, nimout, pdim
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
@@ -158,7 +159,9 @@ begin
 	    nlout = nlout * IM_LEN(im1,i)
 	nlout = nlout / ncols 
 
-	call amovkl (long(1), Meml[vim1], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vim1], sz_val)
 	do i = 1, nimout {
 
 	    # Construct the output image name.
@@ -209,7 +212,9 @@ begin
 	    }
 
 	    # Loop over the appropriate range of lines.
-	    call amovkl (long(1), Meml[vim2], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[vim2], sz_val)
 	    switch (IM_PIXTYPE(im1)) {
 	    case TY_SHORT:
 		if (sdim == ndim) {

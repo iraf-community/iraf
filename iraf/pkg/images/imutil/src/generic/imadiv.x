@@ -10,6 +10,8 @@ procedure ima_divs (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 short	a, b, c
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -26,7 +28,9 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.
@@ -78,6 +82,8 @@ procedure ima_divi (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 int	a, b, c
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -94,7 +100,9 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.
@@ -146,6 +154,8 @@ procedure ima_divl (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 long	a, b, c
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -162,7 +172,9 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.
@@ -178,12 +190,14 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
-		if (b == 0)
-		    call amovkl (divzero, Meml[buf[1]], len)
-		else if (b == 1)
+		if (b == 0) {
+		    sz_val = len
+		    call amovkl (divzero, Meml[buf[1]], sz_val)
+		} else if (b == 1) {
 		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
-		else
+		} else {
 		    call adivkl (Meml[buf[2]], b, Meml[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do the vector divide to imagec.
@@ -214,6 +228,8 @@ procedure ima_divr (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 real	a, b, c
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -230,7 +246,9 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.
@@ -282,6 +300,8 @@ procedure ima_divd (im_a, im_b, im_c, a, b, c)
 pointer	im_a, im_b, im_c
 double	a, b, c
 
+size_t	sz_val
+long	lg_val
 int	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
@@ -298,7 +318,9 @@ begin
 	divzero = c
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	lg_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 
 	# If imagea is constant then read imageb and do a vector
 	# reciprical to imagec.

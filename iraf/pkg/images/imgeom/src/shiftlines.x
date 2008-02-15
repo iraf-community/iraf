@@ -21,6 +21,7 @@ int	boundary			# Boundary extension type
 real	constant			# Constant boundary extension
 char	interpstr[ARB]			# Interpolation type
 
+long	lg_val
 size_t	sz_val
 int	i, nsinc, nincr, ncols, nimcols, nlines, nbpix, nmargin, interpolation
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
@@ -98,7 +99,9 @@ begin
 	    nlines = nlines * IM_LEN(im1, i)
 
 	# Initialize the output v vector.
-	call amovkl (long(1), vout, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, vout, sz_val)
 
 	# Shift the images.
 	do i = 1, nlines {
@@ -139,6 +142,8 @@ int	shift				# Integer shift
 int	boundary			# Boundary extension type
 real	constant			# Constant for boundary extension
 
+size_t	sz_val
+long	lg_val
 int	i, ncols, nlines, junk
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 pointer	buf1, buf2
@@ -164,7 +169,9 @@ begin
 	    v1[i] = long (1)
 	    v2[i] = long (1)
 	}
-	call amovkl (long(1), vout, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, vout, sz_val)
 
 	# Setup line counter.
 	nlines = 1

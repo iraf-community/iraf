@@ -110,6 +110,8 @@ procedure t_pmcopy
 char	refim[SZ_FNAME]
 char	mask[SZ_FNAME], newmask[SZ_FNAME], title[SZ_LINE]
 
+size_t	sz_val
+long	lg_val
 pointer	im, old_pm, new_pm
 long	vs[PM_MAXDIM], vn[PM_MAXDIM]
 pointer	immap(), pm_open(), pm_newmask()
@@ -132,8 +134,12 @@ begin
 	new_pm = pm_newmask (im, pm_stati(old_pm,P_DEPTH))
 
 	# Copy the mask.
-	call amovkl (1, vs, PM_MAXDIM)
-	call amovkl (IM_LEN(im,1), vn, PM_MAXDIM)
+	lg_val = 1
+	sz_val = PM_MAXDIM
+	call amovkl (lg_val, vs, sz_val)
+	lg_val = IM_LEN(im,1)
+	sz_val = PM_MAXDIM
+	call amovkl (lg_val, vn, sz_val)
 	call pm_rop (old_pm, vs, new_pm, vs, vn, PIX_SRC)
 
 	# Save in a file.
@@ -152,6 +158,8 @@ procedure t_mio()
 char	image[SZ_FNAME]
 char	mask[SZ_FNAME]
 
+size_t	sz_val
+long	lg_val
 real	rsum
 pointer	im, mp, pm, bp
 bool	debug, usefullimage
@@ -179,7 +187,9 @@ begin
 	    usefullimage = (nscan() != 4)
 	}
 	if (usefullimage) {
-	    call amovkl (1, vs, 2)
+	    lg_val = 1
+	    sz_val = 2
+	    call amovkl (lg_val, vs, sz_val)
 	    call amovl (IM_LEN(im,1), ve, 2)
 	}
 	call mio_setrange (mp, vs, ve, 2)

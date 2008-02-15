@@ -44,6 +44,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -67,7 +68,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -301,6 +304,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -324,7 +328,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -558,6 +564,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -581,7 +588,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -591,8 +600,9 @@ begin
 	    call malloc (FP_PV1(fp), sz_val, FP_PIXTYPE(fp))
 	    call malloc (FP_PV2(fp), sz_val, FP_PIXTYPE(fp))
 	    indef = INDEFL
-	    call amovkl (indef, Meml[FP_V1(fp,1)], ncols)
-	    call amovkl (indef, Meml[FP_V2(fp,1)], ncols)
+	    sz_val = ncols
+	    call amovkl (indef, Meml[FP_V1(fp,1)], sz_val)
+	    call amovkl (indef, Meml[FP_V2(fp,1)], sz_val)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -815,6 +825,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -838,7 +849,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -1072,6 +1085,7 @@ pointer	im			#I Image pointer
 int	line			#I Line
 int	fd			#I File descriptor for pixel list
 
+long	lg_val
 size_t	sz_val
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
@@ -1095,7 +1109,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.

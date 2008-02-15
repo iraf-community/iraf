@@ -15,6 +15,7 @@ char	imspec[ARB]		# image specification
 int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
+long	lg_val
 size_t	sz_val
 pointer	sp, imname, root, cluster, ksection, section, im
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
@@ -167,7 +168,9 @@ begin
 	    IM_SECTUSED(im) = YES
 	} else {
 	    # IM_VOFF is already zero, because of the CALLOC.
-	    call amovkl (long(1), IM_VSTEP(im,1), IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, IM_VSTEP(im,1), sz_val)
 	    do i = 1, IM_MAXDIM
 		IM_VMAP(im,i) = i
 	}

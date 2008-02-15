@@ -141,6 +141,8 @@ pointer im1             # pointer to the input image
 pointer im2             # pointer to the output image
 int     outtype         # output pixel type
 
+size_t	sz_val
+long	lg_val
 int     ncols
 long    v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer buf1, buf2
@@ -153,8 +155,10 @@ errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 begin
         ncols = IM_LEN(im1, 1)
         IM_PIXTYPE(im2) = outtype
-        call amovkl (long(1), v1, IM_MAXDIM)
-        call amovkl (long(1), v2, IM_MAXDIM)
+        lg_val = 1
+        sz_val = IM_MAXDIM
+        call amovkl (lg_val, v1, sz_val)
+        call amovkl (lg_val, v2, sz_val)
 
         switch (outtype) {
         case TY_USHORT:

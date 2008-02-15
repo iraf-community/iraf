@@ -28,6 +28,7 @@ real	flow				#I Number of low pixels to reject
 real	fhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	lg_val
 size_t	sz_val
 pointer	sp, im, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
@@ -77,10 +78,12 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	    call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[vout], sz_val)
+	    call amovkl (lg_val, Meml[mvout], sz_val)
+	    call amovkl (lg_val, Meml[vs], sz_val)
+	    call amovkl (lg_val, Meml[ve], sz_val)
 	    Meml[ve] = npix
 
 	    # For each input line compute an output line.
@@ -148,10 +151,12 @@ begin
 	call salloc (pbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[mvout], sz_val)
+	call amovkl (lg_val, Meml[vs], sz_val)
+	call amovkl (lg_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	# Compute output lines for each input line.
@@ -220,6 +225,7 @@ real	fhigh				#I Number of high pixels to reject
 bool	msk_invert			#I inver the input mask ?
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	lg_val
 size_t	sz_val
 pointer	sp, input, str, im, mkim, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
@@ -291,10 +297,12 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	    call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[vout], sz_val)
+	    call amovkl (lg_val, Meml[mvout], sz_val)
+	    call amovkl (lg_val, Meml[vs], sz_val)
+	    call amovkl (lg_val, Meml[ve], sz_val)
 	    Meml[ve] = npix
 
 	    # For each input line compute an output line.
@@ -383,10 +391,12 @@ begin
 	call salloc (pbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[vout], sz_val)
+	call amovkl (lg_val, Meml[mvout], sz_val)
+	call amovkl (lg_val, Meml[vs], sz_val)
+	call amovkl (lg_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	# Compute output lines for each input line.
@@ -456,6 +466,7 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	lg_val
 size_t	sz_val
 real	const
 pointer	sp, v1, v2, im, norm, buf_out, buf_in, pbuf, rbuf
@@ -511,7 +522,9 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
 	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	    # For each input line compute an output line.
@@ -564,7 +577,9 @@ begin
 	call salloc (rbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
@@ -616,6 +631,7 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	lg_val
 size_t	sz_val
 real	const
 pointer	sp, input, v1, v2, im, norm, buf_out, buf_in, buf
@@ -676,7 +692,9 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	    lg_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lg_val, Meml[v1], sz_val)
 	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	    # For each input line compute an output line.
@@ -731,7 +749,9 @@ begin
 	call salloc (buf, sz_val, TY_POINTER)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
+	lg_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lg_val, Meml[v1], sz_val)
 	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
 
 	# Compute output lines for each input line.
