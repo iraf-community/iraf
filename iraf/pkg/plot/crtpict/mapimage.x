@@ -148,7 +148,8 @@ begin
 	    for (nline=1;  nline <= ny_output;  nline=nline+1) {
 		in  = sigl2r (si, nline)
 		if (unitary_greyscale_transformation) {
-		    call amovr (Memr[in], Memr[rline], nx_output)
+		    sz_val = nx_output
+		    call amovr (Memr[in], Memr[rline], sz_val)
 		    call achtrs (Memr[rline], Mems[sline], nx_output)
 		} else if (zt == W_LINEAR) {
 		    call amapr (Memr[in], Memr[rline], nx_output, z1, z2, dz1, 

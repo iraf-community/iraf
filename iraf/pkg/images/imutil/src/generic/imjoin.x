@@ -350,8 +350,8 @@ begin
 		do image = 1, nimages {
 		    in = inptr[image]
 		    stat = imgnlr (in, inbuf, Meml[VPTR(vin,image)])
-		    call amovr (Memr[inbuf], Memr[outbuf+cum_len],
-			    IM_LEN(in,1))
+		    sz_val = IM_LEN(in,1)
+		    call amovr (Memr[inbuf], Memr[outbuf+cum_len], sz_val)
 		    cum_len = cum_len + IM_LEN(in,1)
 		}
 	    }
@@ -366,7 +366,8 @@ begin
 		    do line = 1, IM_LEN(in,2) {
 			stat = impnlr (out, outbuf, Meml[vout])
 			stat = imgnlr (in, inbuf, Meml[VPTR(vin,image)])
-			call amovr (Memr[inbuf], Memr[outbuf], IM_LEN(in,1))
+			sz_val = IM_LEN(in,1)
+			call amovr (Memr[inbuf], Memr[outbuf], sz_val)
 		    }
 		}
 	    }
@@ -380,7 +381,8 @@ begin
 		do i = 1, nlines {
 		    stat = impnlr (out, outbuf, Meml[vout])
 		    stat = imgnlr (in, inbuf, Meml[VPTR(vin,image)])
-		    call amovr (Memr[inbuf], Memr[outbuf], IM_LEN(in,1))
+		    sz_val = IM_LEN(in,1)
+		    call amovr (Memr[inbuf], Memr[outbuf], sz_val)
 		}
 	    }
 	}

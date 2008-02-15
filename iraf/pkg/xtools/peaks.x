@@ -63,9 +63,10 @@ begin
 	    }
 	}
 
-	call amovr (Memr[a], x, npeaks)
-	call amovr (Memr[b], y, npeaks)
-	call amovr (Memr[c], background, npeaks)
+	sz_val = npeaks
+	call amovr (Memr[a], x, sz_val)
+	call amovr (Memr[b], y, sz_val)
+	call amovr (Memr[c], background, sz_val)
 
 	call sfree (sp)
 	return (npeaks)

@@ -63,7 +63,8 @@ begin
 	    ptr = data
 	    sz_val = nx
 	    call salloc (yp, sz_val, TY_REAL)
-	    call amovr (Memr[ptr], Memr[yp], nx)
+	    sz_val = nx
+	    call amovr (Memr[ptr], Memr[yp], sz_val)
 	    do i = 2, ny {
 	        ptr = ptr + nx
 	        call aaddr (Memr[ptr], Memr[yp], Memr[yp], nx)

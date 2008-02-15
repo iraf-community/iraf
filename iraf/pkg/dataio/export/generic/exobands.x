@@ -176,7 +176,8 @@ getpar_          O_LEN(o) = 0
 		O_TYPE(o) = TY_REAL
 		sz_val = IO_NPIX(op)
 		call malloc (O_VALP(o), sz_val, TY_REAL)
-		call amovr (Memr[IO_DATA(op)], Memr[O_VALP(o)], IO_NPIX(op))
+		sz_val = IO_NPIX(op)
+		call amovr (Memr[IO_DATA(op)], Memr[O_VALP(o)], sz_val)
 
 	    case TY_DOUBLE:
 		O_LEN(o) = IO_NPIX(op)

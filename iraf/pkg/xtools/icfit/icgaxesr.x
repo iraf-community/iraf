@@ -36,11 +36,13 @@ begin
 	case 'x':	# Independent variable
 	    call gt_sets (gt, gtlabel[axis], Memc[IC_LABELS(ic,1)])
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,1)])
-	    call amovr (x, z, npts)
+	    sz_val = npts
+	    call amovr (x, z, sz_val)
 	case 'y':	# Dependent variable
 	    call gt_sets (gt, gtlabel[axis], Memc[IC_LABELS(ic,2)])
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,2)])
-	    call amovr (y, z, npts)
+	    sz_val = npts
+	    call amovr (y, z, sz_val)
 	case 'f':	# Fitted values
 	    call gt_sets (gt, gtlabel[axis], "fit")
 	    call gt_sets (gt, gtunits[axis], Memc[IC_UNITS(ic,2)])
@@ -78,11 +80,13 @@ begin
 	    if (axis == 1) {
 		call strcpy (Memc[IC_LABELS(ic,1)], Memc[label], SZ_LINE)
 		call strcpy (Memc[IC_UNITS(ic,1)], Memc[units], SZ_LINE)
-	        call amovr (x, z, npts)
+	        sz_val = npts
+	        call amovr (x, z, sz_val)
 	    } else {
 		call strcpy (Memc[IC_LABELS(ic,2)], Memc[label], SZ_LINE)
 		call strcpy (Memc[IC_UNITS(ic,2)], Memc[units], SZ_LINE)
-	        call amovr (y, z, npts)
+	        sz_val = npts
+	        call amovr (y, z, sz_val)
 	    }
 	    call icg_uaxesr (axistype, cv, x, y, z, npts, Memc[label],
 		Memc[units], SZ_LINE)

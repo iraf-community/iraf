@@ -704,7 +704,8 @@ begin
 		if (project)
 		    v2[ndim+1] = i
 		l = xt_imgnlr (in[i], i, buf, v2, v1[2])
-		call amovr (Memr[buf+k-1], Memr[dbuf[i]+j], npix)
+		sz_val = npix
+		call amovr (Memr[buf+k-1], Memr[dbuf[i]+j], sz_val)
 		d[i] = dbuf[i]
 	    }
 	}

@@ -32,7 +32,8 @@ begin
 	    call malloc (y, sz_val, TY_REAL)
 	    call malloc (w, sz_val, TY_REAL)
 
-	    call amovr (Memr[EP_INDATA(ep)], Memr[bufdata], EP_NPTS(ep))
+	    sz_val = EP_NPTS(ep)
+	    call amovr (Memr[EP_INDATA(ep)], Memr[bufdata], sz_val)
 	    call ep_mask (ep, mask, ap, xa1, ya1, xb1, yb1)
 	    i = EP_BUFFER(ep) + EP_WIDTH(ep) + 1
 	    x1 = min (xa2, xb2) - i

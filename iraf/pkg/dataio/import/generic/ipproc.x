@@ -519,7 +519,8 @@ begin
                 call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], sz_val)
 
             case TY_REAL:
-                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], npix)
+                sz_val = npix
+                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], sz_val)
 
             case TY_DOUBLE:
                 call amovd (Memd[dptr], Memd[data+((blnum-1)*npix)], npix)
@@ -587,21 +588,22 @@ begin
 		}
 
             case TY_REAL:
-                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], npix)
+                sz_val = npix
+                call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], sz_val)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
                     data = imps3r (im, 1, npix, 
 		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
 		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
 		       band, band)
-                    call amovr (Memr[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Memr[data], npix*(IP_SZBUF(ip)-blnum+1))
+                    sz_val = npix*(IP_SZBUF(ip)-blnum+1)
+                    call amovr (Memr[BUFFER(ip,band)+(blnum-1)*npix], Memr[data], sz_val)
 		} else {
                     data = imps3r (im, 1, npix, 
 		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
 		       min(IP_AXLEN(ip,2),lnum),
 		       band, band)
-                    call amovr (Memr[BUFFER(ip,band)], Memr[data], 
-			npix*blnum)
+                    sz_val = npix*blnum
+                    call amovr (Memr[BUFFER(ip,band)], Memr[data], sz_val)
 		}
 
             case TY_DOUBLE:

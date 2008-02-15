@@ -8,11 +8,13 @@ procedure cvcoeff (cv, coeff, ncoeff)
 
 pointer	cv		# curve descriptor
 real	coeff[ARB]	# the coefficients of the fit
+size_t	sz_val
 int	ncoeff		# the number of coefficients
 
 begin
 	ncoeff = CV_NCOEFF(cv)
 
 	# fetch coefficients
-	call amovr (COEFF(CV_COEFF(cv)), coeff, ncoeff)
+	sz_val = ncoeff
+	call amovr (COEFF(CV_COEFF(cv)), coeff, sz_val)
 end

@@ -139,7 +139,8 @@ begin
 	# load data into coefficient array
 	rptr = fptr
 	do j = 1, nypix {
-	    call amovr (datain[1,j], COEFF(rptr+1), nxpix)
+	    sz_val = nxpix
+	    call amovr (datain[1,j], COEFF(rptr+1), sz_val)
 	    rptr = rptr + MSI_NXCOEFF(msi)
 	}
 

@@ -25,7 +25,8 @@ begin
 	if (EP_OUTDATA(ep) != NULL) {
 	    sz_val = EP_NPTS(ep)
 	    call malloc (temp, sz_val, TY_REAL)
-	    call amovr (Memr[EP_INDATA(ep)], Memr[temp], EP_NPTS(ep))
+	    sz_val = EP_NPTS(ep)
+	    call amovr (Memr[EP_INDATA(ep)], Memr[temp], sz_val)
 	    call imunmap (EP_IM(ep))
 	    call ep_command (ep, image, erase)
 	    erase = false
@@ -34,9 +35,9 @@ begin
 		EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
 	    EP_INDATA(ep) = imgs2r (EP_IM(ep), EP_X1(ep),
 		EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
-	    call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)],
-		EP_NPTS(ep))
-	    call amovr (Memr[temp], Memr[EP_INDATA(ep)], EP_NPTS(ep))
+	    sz_val = EP_NPTS(ep)
+	    call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)], sz_val)
+	    call amovr (Memr[temp], Memr[EP_INDATA(ep)], sz_val)
 	    call mfree (temp, TY_REAL)
 	} else {
 	    call imunmap (EP_IM(ep))

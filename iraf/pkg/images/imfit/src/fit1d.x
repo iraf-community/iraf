@@ -444,7 +444,8 @@ begin
 		call mfree (data, TY_REAL)
 		sz_val = IM_LEN(im, 1)
 		call malloc (data, sz_val, TY_REAL)
-		call amovr (Memr[imgl1r(im)], Memr[data], IM_LEN(im, 1))
+		sz_val = IM_LEN(im, 1)
+		call amovr (Memr[imgl1r(im)], Memr[data], sz_val)
 		stat = OK
 	    } else
 		stat = EOF

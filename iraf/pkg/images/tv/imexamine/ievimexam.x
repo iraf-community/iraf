@@ -473,10 +473,12 @@ begin
 	    call amovkr (real (Memr[oys+i-1] - lineb + 1), Memr[ys], nvals)
 	    call msivector (msi, Memr[xs], Memr[ys], Memr[yvals], nvals)
 
-	    if (width == 1)
-		call amovr (Memr[yvals], y_vector, nvals)
-	    else 
+	    if (width == 1) {
+		sz_val = nvals
+		call amovr (Memr[yvals], y_vector, sz_val)
+	    } else {
 		call aaddr (Memr[yvals], y_vector, y_vector, nvals)
+	    }
 
 	    yv = yv + dy
 	}	
@@ -574,7 +576,8 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	} else if (line2 > llast2) {
 	    do i = line1, line2 {
@@ -584,7 +587,8 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	}
 

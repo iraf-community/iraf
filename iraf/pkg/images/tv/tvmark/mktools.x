@@ -493,7 +493,8 @@ begin
 		MK_NCIRCLES(mk) = ntemp
 		sz_val = ntemp
 		call realloc (MK_RADII(mk), sz_val, TY_REAL)
-		call amovr (Memr[rtemp], Memr[MK_RADII(mk)], ntemp)
+		sz_val = ntemp
+		call amovr (Memr[rtemp], Memr[MK_RADII(mk)], sz_val)
 		call asrtr (Memr[MK_RADII(mk)], Memr[MK_RADII(mk)], ntemp)
 	    }
 	    call sfree (sp)
@@ -508,7 +509,8 @@ begin
 		MK_NRECTANGLES(mk) = ntemp
 		sz_val = ntemp
 		call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
-		call amovr (Memr[rtemp], Memr[MK_RLENGTHS(mk)], ntemp)
+		sz_val = ntemp
+		call amovr (Memr[rtemp], Memr[MK_RLENGTHS(mk)], sz_val)
 		call asrtr (Memr[MK_RLENGTHS(mk)], Memr[MK_RLENGTHS(mk)], ntemp)
 	    }
 	    call sfree (sp)

@@ -1347,7 +1347,8 @@ begin
 	    impnli (tmpmsk, mobuf, Meml[mvout]) != EOF &&
 	    imgnlr (tmpim, ibuf, Meml[vin]) != EOF &&
 	    imgnli (tmpmsk, mibuf, Meml[mvin]) != EOF) {
-	    call amovr (Memr[ibuf], Memr[obuf], npix)
+	    sz_val = npix
+	    call amovr (Memr[ibuf], Memr[obuf], sz_val)
 	    call amovi (Memi[mibuf], Memi[mobuf], npix)
 	    if (dosub == YES && doadd == YES) {
 		do i = 1, nsub {

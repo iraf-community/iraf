@@ -406,7 +406,8 @@ begin
 	    case TY_LONG:
 	        call achtlr (Meml[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_REAL:
-	        call amovr (Memr[O_VALP(ep)], Memr[out], O_LEN(ep))
+	        sz_val = O_LEN(ep)
+	        call amovr (Memr[O_VALP(ep)], Memr[out], sz_val)
 	    case TY_DOUBLE:
 	        call achtdr (Memd[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    default:
@@ -448,13 +449,15 @@ real	a[n]
 real	b[npix]
 int	n
 int	npix, step, nsubsample
+size_t	sz_val
 int	ip, i
 
 begin
 	nsubsample = npix
-	if (step <= 1)
-	    call amovr (a, b, npix)
-	else {
+	if (step <= 1) {
+	    sz_val = npix
+	    call amovr (a, b, sz_val)
+	} else {
 	    ip = 1
 	    do i = 1, npix {
 		b[i] = a[ip]

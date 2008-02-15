@@ -11,19 +11,22 @@ int	order		# order of polynomial, order = 1, constant
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
 
+size_t	sz_val
 int	bptr, k
 
 begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 	        call amovkr (1.0, basis, npts)
-	    else if (k == 2)
-		call amovr (x, basis[bptr], npts)
-	    else 
+	    } else if (k == 2) {
+		sz_val = npts
+		call amovr (x, basis[bptr], sz_val)
+	    } else {
 		call amulr (basis[bptr-npts], x, basis[bptr], npts)
-		
+	    }
+
 	    bptr = bptr + npts
 	}
 end

@@ -99,8 +99,9 @@ begin
 		    Memr[pe] = RIGHTR
 		    np = 1
 		} else {
-		    call amovr (Memr[xs], Memr[ps], nx)
-		    call amovr (Memr[xe], Memr[pe], nx)
+		    sz_val = nx
+		    call amovr (Memr[xs], Memr[ps], sz_val)
+		    call amovr (Memr[xe], Memr[pe], sz_val)
 		    np = nx
 		}
 

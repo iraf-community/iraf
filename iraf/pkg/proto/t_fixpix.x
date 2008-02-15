@@ -118,7 +118,8 @@ begin
 			case TY_REAL, TY_COMPLEX:
 			    tmp = xt_fpr (fp, im, i, fd)
 			    buf = impl2r (im, i)
-			    call amovr (Memr[tmp], Memr[buf], nc)
+			    sz_val = nc
+			    call amovr (Memr[tmp], Memr[buf], sz_val)
 			case TY_DOUBLE:
 			    tmp = xt_fpd (fp, im, i, fd)
 			    buf = impl2d (im, i)

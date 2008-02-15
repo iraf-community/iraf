@@ -170,12 +170,14 @@ procedure zsc_subsample (a, b, npix, step)
 real	a[ARB]
 real	b[npix]
 int	npix, step
+size_t	sz_val
 int	ip, i
 
 begin
-	if (step <= 1)
-	    call amovr (a, b, npix)
-	else {
+	if (step <= 1) {
+	    sz_val = npix
+	    call amovr (a, b, sz_val)
+	} else {
 	    ip = 1
 	    do i = 1, npix {
 		b[i] = a[ip]

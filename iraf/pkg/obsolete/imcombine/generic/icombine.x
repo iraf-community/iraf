@@ -405,7 +405,8 @@ begin
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
 				;
-			    call amovr (Memr[buf], Memr[outdata], npts)
+			    sz_val = npts
+			    call amovr (Memr[buf], Memr[outdata], sz_val)
 			    break
 			}
 		    }
@@ -832,7 +833,8 @@ begin
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
 				;
-			    call amovr (Memr[buf], Memr[outdata], npts)
+			    sz_val = npts
+			    call amovr (Memr[buf], Memr[outdata], sz_val)
 			    break
 			}
 		    }

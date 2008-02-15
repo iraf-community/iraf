@@ -169,7 +169,8 @@ begin
 
 	    call ic_clean (ic, cv, Memr[x], Memr[indata], Memr[wts], nx)
 
-	    call amovr (Memr[indata], Memr[outdata], nx)
+	    sz_val = nx
+	    call amovr (Memr[indata], Memr[outdata], sz_val)
 	}
 
 	call cvfree (cv)

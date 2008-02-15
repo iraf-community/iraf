@@ -803,8 +803,9 @@ begin
 		in  = sigm2r (si, wy - wy1 + 1)
 		out = imps2r (ds, wx1, wx2, wy, wy)
 
-		if (unitary_greyscale_transformation)  {
-		    call amovr (Memr[in], Memr[out], nx)
+		if (unitary_greyscale_transformation) {
+		    sz_val = nx
+		    call amovr (Memr[in], Memr[out], sz_val)
 		} else if (zt == W_LOG) {
 		    call amapr (Memr[in], Memr[out], nx,
 			z1, z2, 1.0, 10.0 ** MAXLOG)

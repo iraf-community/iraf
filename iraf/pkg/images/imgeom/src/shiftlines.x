@@ -227,7 +227,8 @@ begin
 		junk = impnlr (im2, buf2, vout)
 		if (junk == EOF)
 		    call error (0, "Shiftlinesi: error writing out image")
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 		call sh_loop (v1, v2, IM_LEN(im1,1), IM_NDIM(im1))
 	    }
 

@@ -191,24 +191,42 @@ begin
 	call amovkr (INDEFR, Memr[modes], nimages)
 	call amovkr (INDEFR, Memr[medians], nimages)
 	call amovkr (INDEFR, Memr[means], nimages)
-	if (stype == S_MODE)
-	    call amovr (scales, Memr[modes], nimages)
-	if (stype == S_MEDIAN)
-	    call amovr (scales, Memr[medians], nimages)
-	if (stype == S_MEAN)
-	    call amovr (scales, Memr[means], nimages)
-	if (ztype == S_MODE)
-	    call amovr (zeros, Memr[modes], nimages)
-	if (ztype == S_MEDIAN)
-	    call amovr (zeros, Memr[medians], nimages)
-	if (ztype == S_MEAN)
-	    call amovr (zeros, Memr[means], nimages)
-	if (wtype == S_MODE)
-	    call amovr (wts, Memr[modes], nimages)
-	if (wtype == S_MEDIAN)
-	    call amovr (wts, Memr[medians], nimages)
-	if (wtype == S_MEAN)
-	    call amovr (wts, Memr[means], nimages)
+	if (stype == S_MODE) {
+	    sz_val = nimages
+	    call amovr (scales, Memr[modes], sz_val)
+	}
+	if (stype == S_MEDIAN) {
+	    sz_val = nimages
+	    call amovr (scales, Memr[medians], sz_val)
+	}
+	if (stype == S_MEAN) {
+	    sz_val = nimages
+	    call amovr (scales, Memr[means], sz_val)
+	}
+	if (ztype == S_MODE) {
+	    sz_val = nimages
+	    call amovr (zeros, Memr[modes], sz_val)
+	}
+	if (ztype == S_MEDIAN) {
+	    sz_val = nimages
+	    call amovr (zeros, Memr[medians], sz_val)
+	}
+	if (ztype == S_MEAN) {
+	    sz_val = nimages
+	    call amovr (zeros, Memr[means], sz_val)
+	}
+	if (wtype == S_MODE) {
+	    sz_val = nimages
+	    call amovr (wts, Memr[modes], sz_val)
+	}
+	if (wtype == S_MEDIAN) {
+	    sz_val = nimages
+	    call amovr (wts, Memr[medians], sz_val)
+	}
+	if (wtype == S_MEAN) {
+	    sz_val = nimages
+	    call amovr (wts, Memr[means], sz_val)
+	}
 
 	# If nothing else has set the scaling factors set them to defaults.
 	do i = 1, nimages {

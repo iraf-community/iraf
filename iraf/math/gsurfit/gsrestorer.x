@@ -89,5 +89,6 @@ begin
 	call malloc (GS_COEFF(sf), sz_val, TY_REAL)
 
 	# restore coefficient array
-	call amovr (fit[GS_SAVECOEFF+1], COEFF(GS_COEFF(sf)), GS_NCOEFF(sf))
+	sz_val = GS_NCOEFF(sf)
+	call amovr (fit[GS_SAVECOEFF+1], COEFF(GS_COEFF(sf)), sz_val)
 end

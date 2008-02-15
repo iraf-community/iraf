@@ -24,7 +24,8 @@ begin
 	} else if (nborder >= nx * ny) {
 	    sz_val = nx * ny
 	    call malloc (ptr, sz_val, TY_REAL)
-	    call amovr (buf, Memr[ptr], nx * ny)
+	    sz_val = nx * ny
+	    call amovr (buf, Memr[ptr], sz_val)
 	    return (nx * ny)
 	} else
 	    sz_val = nborder
@@ -35,17 +36,21 @@ begin
 	wyborder = (ny - pny) / 2
 	index = ptr
 	do j = 1, wyborder {
-	    call amovr (buf[1,j], Memr[index], nx)
+	    sz_val = nx
+	    call amovr (buf[1,j], Memr[index], sz_val)
 	    index = index + nx
 	}
 	do j = wyborder + 1, ny - wyborder {
-	    call amovr (buf[1,j], Memr[index], wxborder) 
+	    sz_val = wxborder
+	    call amovr (buf[1,j], Memr[index], sz_val) 
 	    index = index + wxborder
-	    call amovr (buf[nx-wxborder+1,j], Memr[index], wxborder)
+	    sz_val = wxborder
+	    call amovr (buf[nx-wxborder+1,j], Memr[index], sz_val)
 	    index = index + wxborder
 	}
 	do j = ny - wyborder + 1, ny {
-	    call amovr (buf[1,j], Memr[index], nx)
+	    sz_val = nx
+	    call amovr (buf[1,j], Memr[index], sz_val)
 	    index = index + nx
 	}
 

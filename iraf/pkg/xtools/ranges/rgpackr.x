@@ -13,6 +13,7 @@ pointer	rg					# Ranges
 real	a[ARB]					# Input array
 real	b[ARB]					# Output array
 
+size_t	sz_val
 int	i, j, k, n
 
 begin
@@ -30,7 +31,8 @@ begin
 		}
 	    } else {
 		n = RG_X2(rg, i) - RG_X1(rg, i) + 1
-	        call amovr (a[RG_X1(rg, i)], b[j + 1], n)
+	        sz_val = n
+	        call amovr (a[RG_X1(rg, i)], b[j + 1], sz_val)
 	        j = j + n
 	    }
 	}

@@ -807,7 +807,8 @@ begin
 	    ceil = double (upper)
 	    while (imgnlr (im, buf1, v1) != EOF) {
 		junk = impnlr (im, buf2, v2)
-		call amovr (Memr[buf1], Memr[buf2], npix)
+		sz_val = npix
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 		call arler (Memr[buf2], npix, ceil, newval)
 	    }
 
@@ -816,7 +817,8 @@ begin
 	    floor = double (lower)
 	    while (imgnlr (im, buf1, v1) != EOF) {
 		junk = impnlr (im, buf2, v2)
-		call amovr (Memr[buf1], Memr[buf2], npix)
+		sz_val = npix
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 		call arger (Memr[buf2], npix, floor, newval)
 	    }
 
@@ -826,7 +828,8 @@ begin
 	    ceil = double (upper)
 	    while (imgnlr (im, buf1, v1) != EOF) {
 		junk = impnlr (im, buf2, v2)
-		call amovr (Memr[buf1], Memr[buf2], npix)
+		sz_val = npix
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 		call arepr (Memr[buf2], npix, floor, ceil, newval)
 	    }
 	}

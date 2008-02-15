@@ -933,7 +933,8 @@ begin
 			new_y[i], SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si))
 
 		if (SI_INTERP(si,1) == NO) {
-		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], npix)
+		    sz_val = npix
+		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], sz_val)
 		} else if (SI_ORDER(si) == 0) {
 		    call si_sampler (Memr[rawline], Memr[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
@@ -1096,10 +1097,12 @@ begin
 	# than an input line.
 
 	if (ybavg > 1) {
-	    if (order == -1)
-		call amovr (Memr[b], Memr[a], nblks_x)
-	    else
+	    if (order == -1) {
+		sz_val = nblks_x
+		call amovr (Memr[b], Memr[a], sz_val)
+	    } else {
 		call adivkr (Memr[b], real(nlines_in_sum), Memr[a], nblks_x)
+	    }
 	}
 
 	call sfree (sp)

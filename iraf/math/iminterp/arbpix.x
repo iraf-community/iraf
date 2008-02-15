@@ -18,6 +18,7 @@ int	npts			# number of data points
 int	interp_type		# interpolator type
 int	boundary_type		# boundary type, at present must be BOUNDARY_EXT
 
+size_t	sz_val
 int	i, badnc, k, ka, kb
 real	ii_badpix()
 
@@ -42,7 +43,8 @@ begin
 
 	# Copy input array to output array if all points good.
 	if (badnc == 0) {
-	    call amovr (datain, dataout, npts)
+	    sz_val = npts
+	    call amovr (datain, dataout, sz_val)
 	    return
 	}
 

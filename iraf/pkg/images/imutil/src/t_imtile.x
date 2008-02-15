@@ -411,6 +411,7 @@ int	nsub			# number of subrasters
 real	oval			# output value
 int	subtract		# subtract the median value
 
+size_t	sz_val
 int	i, j, jj, noutcols
 pointer	obuf, ibuf
 pointer	impl2r(), imgl2r()
@@ -424,12 +425,13 @@ begin
 		jj = index[j+init-1]
 		if (imptrs[j] != NULL) {
 		    ibuf = imgl2r (imptrs[j], i - l1 + 1)
-		    if (subtract == YES)
+		    if (subtract == YES) {
 		        call asubkr (Memr[ibuf], meds[jj], Memr[obuf+c1[jj]-1],
 			    c2[jj] - c1[jj] + 1)
-		    else
-		        call amovr (Memr[ibuf], Memr[obuf+c1[jj]-1], c2[jj] -
-			    c1[jj] + 1)
+		    } else {
+		        sz_val = c2[jj] - c1[jj] + 1
+		        call amovr (Memr[ibuf], Memr[obuf+c1[jj]-1], sz_val)
+		    }
 		}
 	    }
 	}

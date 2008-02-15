@@ -135,13 +135,15 @@ begin
 	    call pargstr (yerrmsg)
 
 	# Read the cursor commands.
-	call amovr (wts, Memr[w], npts)
+	sz_val = npts
+	call amovr (wts, Memr[w], sz_val)
 	while (clgcur ("cursor", wx, wy, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
 
 	    switch (key) {
 
 	    case 'q':
-		call amovr (Memr[w], wts, npts)
+		sz_val = npts
+		call amovr (Memr[w], wts, sz_val)
 		break
 
 	    case '?':

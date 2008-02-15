@@ -6,9 +6,11 @@ procedure nlpgetr (nl, params, nparams)
 
 pointer	nl			# pointer to the nlfit structure
 real	params[ARB]		# parameter array
+size_t	sz_val
 int	nparams			# the number of the parameters
 
 begin
 	nparams = NL_NPARAMS(nl)
-	call amovr (PARAM(NL_PARAM(nl)), params, nparams)
+	sz_val = nparams
+	call amovr (PARAM(NL_PARAM(nl)), params, sz_val)
 end

@@ -71,7 +71,8 @@ begin
 	call smark (sp)
 	sz_val = nx
 	call salloc (data1, sz_val, TY_REAL)
-	call amovr (data[x1], Memr[data1], nx)
+	sz_val = nx
+	call amovr (data[x1], Memr[data1], sz_val)
 
 	# Make the centering data positive, subtract the continuum, and
 	# apply a threshold to eliminate noise spikes.

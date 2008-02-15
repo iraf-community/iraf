@@ -51,7 +51,8 @@ begin
 
 	sz_val = npts
 	call salloc (oldwts, sz_val, TY_REAL)
-	call amovr (wts, Memr[oldwts], npts)
+	sz_val = npts
+	call amovr (wts, Memr[oldwts], sz_val)
 
 	# Allocate space for help page and prompt, and get them.
 	sz_val = SZ_LINE

@@ -160,7 +160,8 @@ begin
 	inline = l1 - bwidth - nyk / 2
 	do index = 1 , nyk - 1 {
 	    Memp[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
-	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], ncols)
+	    sz_val = ncols
+	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], sz_val)
 	    inline = inline + 1
 	}
 
@@ -180,7 +181,8 @@ begin
 	        inline)
 
 	    # Compute the input image line into the data buffer.
-	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], ncols)
+	    sz_val = ncols
+	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], sz_val)
 
 	    # Generate first output image line.
 	    call aclrr (denbuf[1,outline+nyk/2], ncols)
@@ -252,7 +254,8 @@ begin
 	inline = l1 - bwidth - nyk / 2
 	do index = 1 , nyk - 1 {
 	    Memp[lineptrs+index] = imgs2r (im, col1, col2, inline, inline)
-	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], ncols)
+	    sz_val = ncols
+	    call amovr (Memr[Memp[lineptrs+index]], imbuf[1,index], sz_val)
 	    inline = inline + 1
 	}
 
@@ -272,7 +275,8 @@ begin
 	        inline)
 
 	    # Compute the input image line into the data buffer.
-	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], ncols)
+	    sz_val = ncols
+	    call amovr (Memr[Memp[lineptrs+nyk-1]], imbuf[1,index], sz_val)
 
 	    # Generate first output image line.
 	    call aclrr (denbuf[1,outline+nyk/2], ncols)

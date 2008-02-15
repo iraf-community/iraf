@@ -185,14 +185,17 @@ begin
 	# Get the data.
 	switch (mtype) {
 	case LS_MEAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], sz_val)
 	case LS_MEDIAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], sz_val)
 	case LS_MODE:
-	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], sz_val)
 	}
 
 	# Delete or undelete the point.
@@ -265,19 +268,22 @@ begin
 
 	switch (mtype) {
 	case LS_MEAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMEAN)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], Memr[ydata],
 	        nregions)
 	case LS_MEDIAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], Memr[ydata],
 	        nregions)
 	case LS_MODE:
-	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMODE)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], Memr[ydata],
@@ -607,14 +613,17 @@ begin
 	# Get the data.
 	switch (mtype) {
 	case LS_MEAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], sz_val)
 	case LS_MEDIAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], sz_val)
 	case LS_MODE:
-	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], nregions)
-	    call amovr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], sz_val)
+	    call amovr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], sz_val)
 	}
 
 	region = rg_lpfind (gd, 1, wx, wy, Memr[xdata], Memr[ydata], nregions)
@@ -678,19 +687,22 @@ begin
 
 	switch (mtype) {
 	case LS_MEAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEAN)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMEAN)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMEAN)], Memr[ydata], Memr[ydata],
 	        nregions)
 	case LS_MEDIAN:
-	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMEDIAN)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMEDIAN)], Memr[ydata], Memr[ydata],
 	        nregions)
 	case LS_MODE:
-	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], nregions)
+	    sz_val = nregions
+	    call amovr (Memr[rg_lstatp(ls,IMODE)], Memr[xdata], sz_val)
 	    call altmr (Memr[rg_lstatp(ls,IMODE)], Memr[ydata], nregions,
 	        bscale, bzero)
 	    call asubr (Memr[rg_lstatp(ls,RMODE)], Memr[ydata], Memr[ydata],

@@ -837,7 +837,8 @@ begin
 			SI_BAVG(si,1), SI_BAVG(si,2))
 
 		if (SI_INTERP(si,1) == NO) {
-		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], npix)
+		    sz_val = npix
+		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], sz_val)
 		} else if (SI_ORDER(si) <= 0) {
 		    call si_sampler (Memr[rawline], Memr[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)

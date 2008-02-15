@@ -556,7 +556,8 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	} else if (line2 > llast2) {
 	    do i = line1, line2 {
@@ -566,7 +567,8 @@ begin
 		    buf1 = imgs2r (im, col1, col2, i, i)
 		    
 		buf2 = buf + (i - line1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	}
 

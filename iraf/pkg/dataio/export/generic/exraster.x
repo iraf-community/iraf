@@ -323,7 +323,8 @@ begin
 
             case TY_REAL:
 		data = imgl3r (im, line, band)
-		call amovr (Memr[data], Memr[IO_DATA(op)], IM_LEN(im,1))
+		sz_val = IM_LEN(im,1)
+		call amovr (Memr[data], Memr[IO_DATA(op)], sz_val)
 	        IO_TYPE(op) = TY_REAL
 		IO_NBYTES(op) = SZ_REAL * SZB_CHAR
 	        IO_ISIM(op) = YES

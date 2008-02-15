@@ -158,8 +158,8 @@ begin
 	        ptr2 = GS_COEFF(sf2) + (GS_NYCOEFF(sf2) - 1) * GS_NXCOEFF(sf2)
 	        ptr1 = coeff + (GS_NYCOEFF(sf1) - 1) * GS_NXCOEFF(sf1)
 	        do i = GS_NYCOEFF(sf1), nyder + 1, -1 {
-		    call amovr (Memr[ptr1+nxder], COEFF(ptr2),
-		        GS_NXCOEFF(sf2))
+		    sz_val = GS_NXCOEFF(sf2)
+		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), sz_val)
 	            ptr2 = ptr2 - GS_NXCOEFF(sf2)
 	            ptr1 = ptr1 - GS_NXCOEFF(sf1)
 	        }
@@ -180,7 +180,8 @@ begin
 		        GS_NXCOEFF(sf2)))
 		    ptr1 = ptr1 - nmove1
 		    ptr2 = ptr2 - nmove2
-		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), nmove2)
+		    sz_val = nmove2
+		    call amovr (Memr[ptr1+nxder], COEFF(ptr2), sz_val)
 	        }
 	    }
 
@@ -206,7 +207,8 @@ begin
 		    ptr2 = GS_COEFF(sf2)
 		    do i = GS_NYCOEFF(sf1), nyder + 1, -1
 		        ptr1 = ptr1 - 1
-		    call amovr (Memr[ptr1+1], COEFF(ptr2), GS_NCOEFF(sf2))
+		    sz_val = GS_NCOEFF(sf2)
+		    call amovr (Memr[ptr1+1], COEFF(ptr2), sz_val)
 		}
 	    }
 	}

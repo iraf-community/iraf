@@ -56,7 +56,8 @@ begin
 	    do i = 1, npts
 		z[i] = x[(i-1)*nvars+axisnum]
 	case KEY_FUNCTION:	# Function variable
-	    call amovr (y, z, npts)
+	    sz_val = npts
+	    call amovr (y, z, sz_val)
 	case KEY_FIT:		# Fitted values
 	    call nlvectorr (nl, x, z, npts, nvars)
 	case KEY_RESIDUALS:	# Residuals
@@ -85,7 +86,8 @@ begin
 	        do i = 1, npts
 		    z[i] = x[(i-1)*nvars+axisnum]
 	    } else
-	        call amovr (y, z, npts)
+	        sz_val = npts
+	        call amovr (y, z, sz_val)
 	    call ing_uaxesr (axisnum, in, nl, x, y, z, npts, nvars)
 	default:
 	    call error (0, "ing_axes: Unknown axis type")

@@ -550,9 +550,10 @@ begin
 		    rawline = si_blkavgr (SI_IM(si), x1, x2, new_y[i],
 			SI_BAVG(si,1), SI_BAVG(si,2))
 
-		if (SI_INTERP(si,1) == NO)
-		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], npix)
-		else {
+		if (SI_INTERP(si,1) == NO) {
+		    sz_val = npix
+		    call amovr (Memr[rawline], Memr[SI_BUF(si,i)], sz_val)
+		} else {
 		    call aluir (Memr[rawline], Memr[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
 		}

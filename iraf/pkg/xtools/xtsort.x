@@ -23,7 +23,8 @@ begin
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
 
-	call amovr (a1, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a1, Memr[ptr], sz_val)
 
 	call qsort (Memi[index], npts, xts_compare)
 
@@ -32,7 +33,8 @@ begin
 	    a1[i] = Memr[j]
 	}
 
-	call amovr (a2, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a2, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a2[i] = Memr[j]
@@ -65,7 +67,8 @@ begin
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
 
-	call amovr (a1, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a1, Memr[ptr], sz_val)
 
 	call qsort (Memi[index], npts, xts_compare)
 
@@ -74,13 +77,15 @@ begin
 	    a1[i] = Memr[j]
 	}
 
-	call amovr (a2, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a2, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a2[i] = Memr[j]
 	}
 
-	call amovr (a3, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a3, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a3[i] = Memr[j]
@@ -113,7 +118,8 @@ begin
 	do i = 1, npts
 	    Memi[index+i-1] = ptr + i - 1
 
-	call amovr (a1, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a1, Memr[ptr], sz_val)
 
 	call qsort (Memi[index], npts, xts_compare)
 
@@ -122,19 +128,22 @@ begin
 	    a1[i] = Memr[j]
 	}
 
-	call amovr (a2, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a2, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a2[i] = Memr[j]
 	}
 
-	call amovr (a3, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a3, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a3[i] = Memr[j]
 	}
 
-	call amovr (a4, Memr[ptr], npts)
+	sz_val = npts
+	call amovr (a4, Memr[ptr], sz_val)
 	do i = 1, npts {
 	    j = Memi[index+i-1]
 	    a4[i] = Memr[j]

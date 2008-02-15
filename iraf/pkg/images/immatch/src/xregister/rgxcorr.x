@@ -855,7 +855,8 @@ begin
 	        buf = imgs1r (im, c1, c2)
 	    else
 	        buf = imgs2r (im, c1, c2, i, i)
-	    call amovr (Memr[buf], Memr[index], ncols)
+	    sz_val = ncols
+	    call amovr (Memr[buf], Memr[index], sz_val)
 	    index = index + ncols
 	}
 
@@ -905,11 +906,13 @@ begin
 	inline = 1 - nyk / 2
 	do i = 1, nyk - 1 {
 	    if (inline < 1) {
-	        call amovr (data[1,1], Memr[Memi[lineptrs+i]+nxk/2], nx)
+	        sz_val = nx
+	        call amovr (data[1,1], Memr[Memi[lineptrs+i]+nxk/2], sz_val)
 	        Memr[Memi[lineptrs+i]] = data[1,1]
 	        Memr[Memi[lineptrs+i]+nxc-1] = data[nx,1]
 	    } else {
-	        call amovr (data[1,i-1], Memr[Memi[lineptrs+i]+nxk/2], nx)
+	        sz_val = nx
+	        call amovr (data[1,i-1], Memr[Memi[lineptrs+i]+nxk/2], sz_val)
 	        Memr[Memi[lineptrs+i]] = data[1,i-1]
 	        Memr[Memi[lineptrs+i]+nxc-1] = data[nx,i-1]
 	    }
@@ -927,13 +930,13 @@ begin
 
 	    # Read in new image line
 	    if (inline > ny) {
-		call amovr (data[1,ny], Memr[Memi[lineptrs+nyk-1]+nxk/2],
-		    nx)
+		sz_val = nx
+		call amovr (data[1,ny], Memr[Memi[lineptrs+nyk-1]+nxk/2], sz_val)
 	        Memr[Memi[lineptrs+nyk-1]] = data[1,ny]
 	        Memr[Memi[lineptrs+nyk-1]+nxc-1] = data[nx,ny]
 	    } else {
-		call amovr (data[1,inline], Memr[Memi[lineptrs+nyk-1]+nxk/2],
-		    nx)
+		sz_val = nx
+		call amovr (data[1,inline], Memr[Memi[lineptrs+nyk-1]+nxk/2], sz_val)
 	        Memr[Memi[lineptrs+nyk-1]] = data[1,inline]
 	        Memr[Memi[lineptrs+nyk-1]+nxc-1] = data[nx,inline]
 	    }

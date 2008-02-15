@@ -42,14 +42,16 @@ begin
 	# a higher order polynomial
 	call amovkr (1., Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	call amovr (Memr[sx], Memr[pnm1], npts)
+	sz_val = npts
+	call amovr (Memr[sx], Memr[pnm1], sz_val)
 	call amulkr (Memr[sx], 2., Memr[sx], npts)
 	do i = 3, order {
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call asubr (Memr[pn], Memr[pnm2], Memr[pn], npts)
 	    if (i < order) {
-	        call amovr (Memr[pnm1], Memr[pnm2], npts)
-	        call amovr (Memr[pn], Memr[pnm1], npts)
+	        sz_val = npts
+	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
+	        call amovr (Memr[pn], Memr[pnm1], sz_val)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)
@@ -103,7 +105,8 @@ begin
 	# a higher order polynomial
 	call amovkr (1., Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
-	call amovr (Memr[sx], Memr[pnm1], npts)
+	sz_val = npts
+	call amovr (Memr[sx], Memr[pnm1], sz_val)
 	do i = 3, order {
 	    ri = i
 	    ri1 = (2. * ri - 3.) / (ri - 1.)
@@ -111,8 +114,9 @@ begin
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call awsur (Memr[pn], Memr[pnm2], Memr[pn], npts, ri1, ri2)
 	    if (i < order) {
-	        call amovr (Memr[pnm1], Memr[pnm2], npts)
-	        call amovr (Memr[pn], Memr[pnm1], npts)
+	        sz_val = npts
+	        call amovr (Memr[pnm1], Memr[pnm2], sz_val)
+	        call amovr (Memr[pn], Memr[pnm1], sz_val)
 	    }
 	    call amulkr (Memr[pn], coeff[i], Memr[pn], npts)
 	    call aaddr (yfit, Memr[pn], yfit, npts)

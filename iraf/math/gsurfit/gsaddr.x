@@ -110,7 +110,8 @@ begin
 	nmove1 = GS_NXCOEFF(sf1)
 	nmove3 = GS_NXCOEFF(sf3)
 	do i = 1, GS_NYCOEFF(sf1) {
-	    call amovr (COEFF(ptr1), COEFF(ptr3), nmove1)
+	    sz_val = nmove1
+	    call amovr (COEFF(ptr1), COEFF(ptr3), sz_val)
 	    ptr1 = ptr1 + nmove1
 	    ptr3 = ptr3 + nmove3
 	    switch (GS_XTERMS(sf1)) {

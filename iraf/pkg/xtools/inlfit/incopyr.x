@@ -70,15 +70,10 @@ begin
 	call in_puti (indst, INLNFPARAMS,   in_geti (insrc, INLNFPARAMS))
 
 	# Copy parameter values, changes, and list.
-	call amovr  (Memr[in_getp (insrc, INLPARAM)],
-		      Memr[in_getp (indst, INLPARAM)],
-		      in_geti (insrc, INLNPARAMS))
-	call amovr  (Memr[in_getp (insrc, INLDPARAM)],
-		      Memr[in_getp (indst, INLDPARAM)],
-		      in_geti (insrc, INLNPARAMS))
-	call amovi   (Memi[in_getp (insrc, INLPLIST)],
-		      Memi[in_getp (indst, INLPLIST)],
-		      in_geti (insrc, INLNPARAMS))
+	sz_val = in_geti (insrc, INLNPARAMS)
+	call amovr  (Memr[in_getp (insrc, INLPARAM)], Memr[in_getp (indst, INLPARAM)], sz_val)
+	call amovr  (Memr[in_getp (insrc, INLDPARAM)], Memr[in_getp (indst, INLDPARAM)], sz_val)
+	call amovi   (Memi[in_getp (insrc, INLPLIST)], Memi[in_getp (indst, INLPLIST)], in_geti (insrc, INLNPARAMS))
 
 	# Copy defaults.
 	call in_putr (indst, INLTOLERANCE, in_getr (insrc, INLTOLERANCE))
@@ -128,8 +123,7 @@ begin
 	# Copy rejected point list and limit values.
 	call amovi  (Memp[in_getp (insrc, INLREJPTS)],
 	    Memp[in_getp (indst, INLREJPTS)], in_geti (indst, INLNPTS))
-	call amovr (Memr[in_getp (insrc, INLXMIN)],
-	    Memr[in_getp (indst, INLXMIN)], in_geti (indst, INLNVARS))
-	call amovr (Memr[in_getp (insrc, INLXMAX)],
-	    Memr[in_getp (indst, INLXMAX)], in_geti (indst, INLNVARS))
+	sz_val = in_geti (indst, INLNVARS)
+	call amovr (Memr[in_getp (insrc, INLXMIN)], Memr[in_getp (indst, INLXMIN)], sz_val)
+	call amovr (Memr[in_getp (insrc, INLXMAX)], Memr[in_getp (indst, INLXMAX)], sz_val)
 end

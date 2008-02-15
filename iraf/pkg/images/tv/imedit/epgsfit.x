@@ -41,7 +41,8 @@ begin
 	    xo = 1
 	    yo = 1
 	} else {
-	    call amovr (data, Memr[work], npts)
+	    sz_val = npts
+	    call amovr (data, Memr[work], sz_val)
 	    xo = EP_XORDER(ep)
 	    yo = EP_YORDER(ep)
 	}

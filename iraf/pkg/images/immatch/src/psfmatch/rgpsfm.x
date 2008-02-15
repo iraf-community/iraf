@@ -652,8 +652,8 @@ begin
 	call malloc (conv, sz_val,
 	    TY_REAL)
 	call rg_psetp (pm, CONV, conv)
-	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)],
-	    2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT))
+	sz_val = 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
+	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)], sz_val)
 
 #	# Compute the zextend parameter.
 #	call rg_psetr (pm, THRESHOLD, rg_pstatr (pm, PRATIO) *
@@ -750,7 +750,8 @@ begin
                 buf = imgs1r (im, c1, c2)
             else
                 buf = imgs2r (im, c1, c2, i, i)
-            call amovr (Memr[buf], Memr[index], ncols)
+            sz_val = ncols
+            call amovr (Memr[buf], Memr[index], sz_val)
             index = index + ncols
         }
 
@@ -797,6 +798,7 @@ pointer	pm			#I pointer to psf matching structure
 pointer	imk			#I pointer to kernel image
 pointer imf			#I pointer to fourier spectrum image
 
+size_t	sz_val
 int	nx, ny
 pointer	buf
 int	rg_pstati()
@@ -812,10 +814,12 @@ begin
 	    IM_LEN(imk,2) = ny
 	    IM_PIXTYPE(imk) = TY_REAL
 	    buf = imps2r (imk, 1, nx, 1, ny)
-	    if (rg_pstatp (pm, CONV) != NULL)
-	        call amovr (Memr[rg_pstatp(pm,CONV)], Memr[buf], nx * ny)
-	    else
+	    if (rg_pstatp (pm, CONV) != NULL) {
+	        sz_val = nx * ny
+	        call amovr (Memr[rg_pstatp(pm,CONV)], Memr[buf], sz_val)
+	    } else {
 	        call amovkr (0.0, Memr[buf], nx * ny)
+	    }
 	}
 
 	# Write out the fourier spectrum.
@@ -827,10 +831,12 @@ begin
 	    IM_LEN(imf,2) = ny
 	    IM_PIXTYPE(imf) = TY_REAL
 	    buf = imps2r (imf, 1, nx, 1, ny)
-	    if (rg_pstatp (pm, CONV) != NULL)
-	        call amovr (Memr[rg_pstatp(pm,ASFFT)], Memr[buf], nx * ny)
-	    else
+	    if (rg_pstatp (pm, CONV) != NULL) {
+	        sz_val = nx * ny
+	        call amovr (Memr[rg_pstatp(pm,ASFFT)], Memr[buf], sz_val)
+	    } else {
 	        call amovkr (0.0, Memr[buf], nx * ny)
+	    }
 	}
 end
 

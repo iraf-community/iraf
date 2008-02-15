@@ -730,7 +730,8 @@ begin
         call salloc (twts, sz_val, TY_REAL)
 
         # Compute the weights.
-        call amovr (wts, Memr[twts], npts)
+        sz_val = npts
+        call amovr (wts, Memr[twts], sz_val)
         do i = 1, GM_NREJECT(fit) {
             index = Memi[GM_REJ(fit)+i-1]
             if (wts[index] > real(0.0))

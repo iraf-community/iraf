@@ -913,7 +913,8 @@ begin
 	    call malloc (FP_DATA(fp), sz_val, FP_PIXTYPE(fp))
 	}
 	data = FP_DATA(fp)
-	call amovr (Memr[xt_fpvalr(fp,im,line)], Memr[data], nc)
+	sz_val = nc
+	call amovr (Memr[xt_fpvalr(fp,im,line)], Memr[data], sz_val)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;

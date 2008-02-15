@@ -197,10 +197,12 @@ begin
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
-		if (a == 0.0)
-		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
-		else
+		if (a == 0.0) {
+		    sz_val = len
+		    call amovr (Memr[buf[2]], Memr[buf[1]], sz_val)
+		} else {
 		    call aaddkr (Memr[buf[2]], a, Memr[buf[1]], len)
+		}
 	    }
 
 	# If imageb is constant then read imagea and do a vector/scalar
@@ -208,10 +210,12 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
-		if (b == 0.0)
-		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
-		else
+		if (b == 0.0) {
+		    sz_val = len
+		    call amovr (Memr[buf[2]], Memr[buf[1]], sz_val)
+		} else {
 		    call aaddkr (Memr[buf[2]], b, Memr[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do a vector addition into imagec.

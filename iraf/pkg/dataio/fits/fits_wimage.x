@@ -201,6 +201,7 @@ int	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
+size_t	sz_val
 errchk	achtlr, altadr, amovr, achtdr, acthxr
 
 begin
@@ -209,7 +210,8 @@ begin
 	    call achtlr (Meml[buf], outbuffer, npix)
 	    call altadr (outbuffer, outbuffer, npix, bzero, bscale)
 	case TY_REAL:
-	    call amovr (Memr[buf], outbuffer, npix)
+	    sz_val = npix
+	    call amovr (Memr[buf], outbuffer, sz_val)
 	    call altadr (outbuffer, outbuffer, npix, bzero, bscale)
 	case TY_DOUBLE:
 	    call achtdr (Memd[buf], outbuffer, npix)
@@ -295,6 +297,7 @@ real	outbuffer[ARB]		# buffer of FITS integers
 int	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
+size_t	sz_val
 errchk	achtlr, achtdr, amovr, achtxr
 
 begin
@@ -302,7 +305,8 @@ begin
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
 	    call achtlr (Meml[buf], outbuffer, npix)
 	case TY_REAL:
-	    call amovr (Memr[buf], outbuffer, npix)
+	    sz_val = npix
+	    call amovr (Memr[buf], outbuffer, sz_val)
 	case TY_DOUBLE:
 	    call achtdr (Memd[buf], outbuffer, npix)
 	case TY_COMPLEX:

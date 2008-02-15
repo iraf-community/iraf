@@ -198,12 +198,10 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 			if (EP_OUTDATA(ep) != NULL && EP_INDATA(ep) != NULL) {
 			    sz_val = EP_NPTS(ep)
 			    call malloc (temp, sz_val, TY_REAL)
-			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
-				EP_NPTS(ep))
-			    call amovr (Memr[EP_INDATA(ep)],
-				Memr[EP_OUTDATA(ep)], EP_NPTS(ep))
-			    call amovr (Memr[temp], Memr[EP_INDATA(ep)],
-				EP_NPTS(ep))
+			    sz_val = EP_NPTS(ep)
+			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp], sz_val)
+			    call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)], sz_val)
+			    call amovr (Memr[temp], Memr[EP_INDATA(ep)], sz_val)
 			    call mfree (temp, TY_REAL)
 			    change = YES
 			} else
@@ -278,9 +276,10 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		if (streq (EP_INPUT(ep), EP_OUTPUT(ep))) {
 		    EP_IM(ep) = immap (EP_OUTPUT(ep), READ_WRITE, 0)
 		    im = immap (EP_WORK(ep), READ_ONLY, 0)
-		    do i = 1, IM_LEN(EP_IM(ep),2)
-		        call amovr (Memr[imgl2r(im,i)],
-			    Memr[impl2r(EP_IM(ep),i)], IM_LEN(im,1))
+		    do i = 1, IM_LEN(EP_IM(ep),2) {
+		        sz_val = IM_LEN(im,1)
+		        call amovr (Memr[imgl2r(im,i)], Memr[impl2r(EP_IM(ep),i)], sz_val)
+		    }
 		    call imunmap (im)
 		    call imunmap (EP_IM(ep))
 		    call imdelete (EP_WORK(ep))

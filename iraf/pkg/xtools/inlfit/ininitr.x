@@ -81,8 +81,9 @@ begin
 	call in_puti (in, INLDERIVATIVE, dfunc)
 	call in_puti (in, INLNPARAMS, nparams)
 	call in_puti (in, INLNFPARAMS, nfparams)
-	call amovr  (param, Memr[IN_PARAM(in)], nparams)
-	call amovr  (dparam, Memr[IN_DPARAM(in)], nparams)
+	sz_val = nparams
+	call amovr  (param, Memr[IN_PARAM(in)], sz_val)
+	call amovr  (dparam, Memr[IN_DPARAM(in)], sz_val)
 	call amovi   (plist, Memi[IN_PLIST(in)], nparams)
 
 	# Set defaults, just in case.

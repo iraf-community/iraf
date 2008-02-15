@@ -8,6 +8,7 @@ procedure nlzeror (nl)
 
 pointer	nl		# pointer to nl fitting structure
 
+size_t	sz_val
 int	nparams		# number of parameters
 int	nfparams	# number of fitted parameters
 
@@ -27,7 +28,8 @@ begin
 	call aclrr (TRY(NL_TRY(nl)), nparams)
 
 	# Reset parameters.
-	call amovr (OPARAM(NL_OPARAM(nl)), PARAM(NL_PARAM(nl)), nparams)
+	sz_val = nparams
+	call amovr (OPARAM(NL_OPARAM(nl)), PARAM(NL_PARAM(nl)), sz_val)
 	call aclrr (DPARAM(NL_DPARAM(nl)), nparams)
 
 	NL_SCATTER(nl) = real(0.0)

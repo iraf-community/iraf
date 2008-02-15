@@ -44,7 +44,8 @@ begin
 	call smark (sp)
 	sz_val = npts
 	call salloc (wts1, sz_val, TY_REAL)
-	call amovr (w, Memr[wts1], npts)
+	sz_val = npts
+	call amovr (w, Memr[wts1], sz_val)
 
 	# Get rejection parameters, and rejected point list.
 	low    = in_getr (in, INLLOW)
@@ -61,7 +62,8 @@ begin
 
 	    # Refit if there are new rejected points.
 	    if (newreject != 0) {
-	        call amovr (Memr[wts1], w, npts)
+	        sz_val = npts
+	        call amovr (Memr[wts1], w, sz_val)
 		call in_refitr (in, nl, x, y, w, npts, nvars, wtflag)
 	    } else
 		break

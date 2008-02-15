@@ -90,7 +90,8 @@ begin
 		    sz_val = O_LEN(op)
 		    call amovl (Meml[out], Meml[impl2l(im,orow)], sz_val)
 		case TY_REAL:
-		    call amovr (Memr[out], Memr[impl2r(im,orow)], O_LEN(op))
+		    sz_val = O_LEN(op)
+		    call amovr (Memr[out], Memr[impl2r(im,orow)], sz_val)
 		case TY_DOUBLE:
 		    call amovd (Memd[out], Memd[impl2d(im,orow)], O_LEN(op))
 		default:

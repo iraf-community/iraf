@@ -528,8 +528,8 @@ begin
 		if (project)
 		    v2[ndim+1] = i
 		j = imgnlr (in[i], buf, v2)
-		call amovr (Memr[buf], Memr[dbuf[i]+offsets[i,1]],
-		    IM_LEN(in[i],1))
+		sz_val = IM_LEN(in[i],1)
+		call amovr (Memr[buf], Memr[dbuf[i]+offsets[i,1]], sz_val)
 		d[i] = dbuf[i]
 	    }
 	}

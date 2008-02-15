@@ -1195,7 +1195,8 @@ begin
 
 	# Initialize the temporary weights array and the number of rejected
 	# points.
-	call amovr (wts, Memr[twts], npts)
+	sz_val = npts
+	call amovr (wts, Memr[twts], sz_val)
 	nreject = 0
 
 	niter = 0

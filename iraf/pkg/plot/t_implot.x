@@ -249,8 +249,9 @@ quit_			break
 			erase = true
 			navg = p_navg
 			overplot = true
-			call amovr (Memr[xnew], Memr[xold], npix)
-			call amovr (Memr[ynew], Memr[yold], npix)
+			sz_val = npix
+			call amovr (Memr[xnew], Memr[xold], sz_val)
+			call amovr (Memr[ynew], Memr[yold], sz_val)
 
 			shift = step
 			if (key == 'j')
@@ -896,19 +897,20 @@ begin
 	    call plt_wcs (im, mw, ct, 1, Memr[axvals], real(x1), real(x2),
 		Memr[x], nx, xlabel, format, SZ_FNAME)
 
-	    if (ndim == 1)
-		call amovr (Memr[imgl1r(im)], Memr[y], nx)
-
-	    else {
+	    if (ndim == 1) {
+		sz_val = nx
+		call amovr (Memr[imgl1r(im)], Memr[y], sz_val)
+	    } else {
 		# Compute sum.
 		call aclrr (Memr[y], nx)
-		do i = y1, y2
+		do i = y1, y2 {
 		    call aaddr (Memr[imgl2r(im,i)], Memr[y], Memr[y], nx)
-
+		}
 		# Normalize.
 		width = y2 - y1 + 1
-		if (width > 1)
+		if (width > 1) {
 		    call amulkr (Memr[y], 1. / width, Memr[y], nx)
+		}
 	    }
 
 	} else {
@@ -943,7 +945,8 @@ begin
 		}
 	    } else {
 		buf = imgs2r (im, x1, x2, y1, y2)
-		call amovr (Memr[buf], Memr[y], ny)
+		sz_val = ny
+		call amovr (Memr[buf], Memr[y], sz_val)
 	    }
 	}
 

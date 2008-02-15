@@ -56,5 +56,6 @@ begin
 	# restore coefficient array
 	sz_val = GS_NCOEFF(sf2)
 	call calloc (GS_COEFF(sf2), sz_val, TY_REAL)
-	call amovr (COEFF(GS_COEFF(sf1)), COEFF(GS_COEFF(sf2)), GS_NCOEFF(sf2))
+	sz_val = GS_NCOEFF(sf2)
+	call amovr (COEFF(GS_COEFF(sf1)), COEFF(GS_COEFF(sf2)), sz_val)
 end

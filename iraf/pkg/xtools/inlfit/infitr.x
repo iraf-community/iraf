@@ -41,7 +41,8 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 	sz_val = npts
 	call salloc (wts1, sz_val, TY_REAL)
-	call amovr (wts, Memr[wts1], npts)
+	sz_val = npts
+	call amovr (wts, Memr[wts1], sz_val)
 
 	# Initialize rejected point list, and the buffer containing
 	# the minimum and maximum variable values.

@@ -46,7 +46,8 @@ begin
 
 	# Mark rejected points as deleted for rms comnputation,
 	# and count number of deleted points.
-	call amovr (wts, Memr[wts1], npts)
+	sz_val = npts
+	call amovr (wts, Memr[wts1], sz_val)
 	rejected = in_geti (in, INLNREJPTS)
 	rejpts   = in_getp (in, INLREJPTS)
 	if (rejected > 0) {

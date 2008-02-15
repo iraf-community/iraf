@@ -43,7 +43,8 @@ begin
 
 	    # Eliminate rejected points and count deleted points.
 
-	    call amovr (wts, Memr[wts1], n)
+	    sz_val = n
+	    call amovr (wts, Memr[wts1], sz_val)
 	    if (IC_NREJECT(ic) > 0) {
 		do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
@@ -73,7 +74,8 @@ begin
 
 	    # Eliminate rejected points and count deleted points.
 
-	    call amovr (Memr[IC_WTSFIT(ic)], Memr[wts1], n)
+	    sz_val = n
+	    call amovr (Memr[IC_WTSFIT(ic)], Memr[wts1], sz_val)
 	    if (IC_NREJECT(ic) > 0) {
 	        do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)

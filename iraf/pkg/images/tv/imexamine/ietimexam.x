@@ -89,7 +89,8 @@ begin
 	    do i = y1, y2 {
 	        data = ie_gdata (im, x1, x2, i, i)
 		outbuf = impl2r (out, i-y1+1)
-		call amovr (Memr[data], Memr[outbuf], nx)
+		sz_val = nx
+		call amovr (Memr[data], Memr[outbuf], sz_val)
 	    }
 	    mw = mw_open (NULL, 2)
 	    call mw_saveim (mw, out)

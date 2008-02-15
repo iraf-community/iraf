@@ -85,5 +85,6 @@ begin
 	CV_USERFNC(cv) = NULL
 
 	# restore coefficients
-	call amovr (coeff, COEFF(CV_COEFF(cv)), CV_NCOEFF(cv))
+	sz_val = CV_NCOEFF(cv)
+	call amovr (coeff, COEFF(CV_COEFF(cv)), sz_val)
 end

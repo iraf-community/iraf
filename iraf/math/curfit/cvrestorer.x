@@ -83,10 +83,12 @@ begin
 	CV_WY(cv) = NULL
 
 	# restore coefficients
-	if (CV_TYPE(cv) == USERFNC)
-	    call amovr (fit[CV_SAVECOEFF+1], COEFF(CV_COEFF(cv)),
-	        CV_NCOEFF(cv))
-	else
-	    call amovr (fit[CV_SAVECOEFF], COEFF(CV_COEFF(cv)),
-	        CV_NCOEFF(cv))
+	if (CV_TYPE(cv) == USERFNC) {
+	    sz_val = CV_NCOEFF(cv)
+	    call amovr (fit[CV_SAVECOEFF+1], COEFF(CV_COEFF(cv)), sz_val)
+	} else {
+	    sz_val = CV_NCOEFF(cv)
+	    call amovr (fit[CV_SAVECOEFF], COEFF(CV_COEFF(cv)), sz_val)
+	}
+
 end

@@ -14,10 +14,12 @@ procedure gscoeff (sf, coeff, ncoeff)
 
 pointer	sf		# pointer to the surface fitting descriptor
 real	coeff[ARB]	# the coefficients of the fit
+size_t	sz_val
 int	ncoeff		# the number of coefficients
 
 begin
 	# calculate the number of coefficients
 	ncoeff = GS_NCOEFF(sf)
-	call amovr (COEFF(GS_COEFF(sf)), coeff, ncoeff)
+	sz_val = ncoeff
+	call amovr (COEFF(GS_COEFF(sf)), coeff, sz_val)
 end

@@ -865,7 +865,8 @@ begin
 			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
 			ptr = imggsr (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
-			call amovr (Memr[ptr], Memr[XT_BUF(xt1)], nl*nc)
+			sz_val = nl*nc
+			call amovr (Memr[ptr], Memr[XT_BUF(xt1)], sz_val)
 		    }
 
 		    call imunmap (XT_IM(xt1))

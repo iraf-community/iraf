@@ -45,7 +45,8 @@ begin
 	call salloc (wts1, sz_val, TY_REAL)
 
 	# Set zero weight for rejeceted points.
-	call amovr (wts, Memr[wts1], npts)
+	sz_val = npts
+	call amovr (wts, Memr[wts1], sz_val)
 	if (in_geti (in, INLNREJPTS) > 0) {
 	    rejpts = in_getp (in, INLREJPTS)
 	    do i = 1, npts {

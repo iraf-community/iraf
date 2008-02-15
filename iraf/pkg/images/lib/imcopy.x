@@ -88,7 +88,8 @@ begin
 	case TY_REAL:
 	    while (imgnlr (im1, buf1, v1) != EOF) {
 		junk = impnlr (im2, buf2, v2)
-		call amovr (Memr[buf1], Memr[buf2], npix)
+		sz_val = npix
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	case TY_DOUBLE:
 	    while (imgnld (im1, buf1, v1) != EOF) {

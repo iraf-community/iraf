@@ -49,7 +49,8 @@ begin
 	w1 = NULL
 	sz_val = n
 	call malloc (userwts, sz_val, TY_REAL)
-	call amovr (wts, Memr[userwts], n)
+	sz_val = n
+	call amovr (wts, Memr[userwts], sz_val)
 
 	# Initialize
 	IC_GP(ic) = gp
@@ -114,9 +115,10 @@ begin
 		    call malloc (x1, sz_val, TY_REAL)
 		    call malloc (y1, sz_val, TY_REAL)
 		    call malloc (w1, sz_val, TY_REAL)
-		    call amovr (x, Memr[x1], n)
-		    call amovr (y, Memr[y1], n)
-		    call amovr (wts, Memr[w1], n)
+		    sz_val = n
+		    call amovr (x, Memr[x1], sz_val)
+		    call amovr (y, Memr[y1], sz_val)
+		    call amovr (wts, Memr[w1], sz_val)
 		} else {
 		    sz_val = n+1
 		    call realloc (x1, sz_val, TY_REAL)

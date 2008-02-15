@@ -82,7 +82,8 @@ begin
 	else {
 	    sz_val = npts
 	    call salloc (sdata, sz_val, TY_REAL)
-	    call amovr (Memr[data], Memr[sdata], npts)
+	    sz_val = npts
+	    call amovr (Memr[data], Memr[sdata], sz_val)
 	    if (!IS_INDEF (floor) && !IS_INDEF (ceiling)) {
 		floor = min (floor, ceiling)
 		ceiling = max (floor, ceiling)

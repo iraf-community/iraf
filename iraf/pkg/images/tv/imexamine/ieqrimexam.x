@@ -281,9 +281,10 @@ begin
 	    }
 	}
 	if (np > 0) {
-	    call amovr (Memr[xs+npts-np], Memr[xs+no], np)
-	    call amovr (Memr[ys+npts-np], Memr[ys+no], np)
-	    call amovr (Memr[ws+npts-np], Memr[ws+no], np)
+	    sz_val = np
+	    call amovr (Memr[xs+npts-np], Memr[xs+no], sz_val)
+	    call amovr (Memr[ys+npts-np], Memr[ys+no], sz_val)
+	    call amovr (Memr[ws+npts-np], Memr[ws+no], sz_val)
 	}
 	if (rplot <= radius) {
 	    no = no + np

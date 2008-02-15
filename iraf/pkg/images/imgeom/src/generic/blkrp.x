@@ -307,12 +307,14 @@ begin
 		}
 
 		# Copy the input line to the output line.
-		call amovr (Memr[buf3], Memr[buf2], nout)
+		sz_val = nout
+		call amovr (Memr[buf3], Memr[buf2], sz_val)
 
 		# Repeat for each repetition of the input line.
 		for (i=2;  i <= blkfac[2];  i=i+1) {
 	            j = impnlr (out, buf2, Meml[v2])
-		    call amovr (Memr[buf3], Memr[buf2], nout)
+		    sz_val = nout
+		    call amovr (Memr[buf3], Memr[buf2], sz_val)
 		}
 
 		sz_val = IM_MAXDIM

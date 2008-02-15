@@ -49,9 +49,10 @@ begin
 	# Initialize the parameters.
 	NL_NPARAMS(nl) = nparams
 	NL_NFPARAMS(nl) = nfparams
-	call amovr (params, PARAM(NL_PARAM(nl)), nparams)
-	call amovr (params, PARAM(NL_OPARAM(nl)), nparams)
-	call amovr (dparams, DPARAM(NL_DELPARAM(nl)), nparams)
+	sz_val = nparams
+	call amovr (params, PARAM(NL_PARAM(nl)), sz_val)
+	call amovr (params, PARAM(NL_OPARAM(nl)), sz_val)
+	call amovr (dparams, DPARAM(NL_DELPARAM(nl)), sz_val)
 	call amovi (plist, PLIST(NL_PLIST(nl)), nfparams)
 	NL_TOL(nl) = tol
 	NL_ITMAX(nl) = itmax

@@ -218,7 +218,8 @@ begin
 	call salloc (yo, sz_val, TY_REAL)
 
 	# Move input data into vector.
-	call amovr (xin, Memr[x], npts * nvars)
+	sz_val = npts * nvars
+	call amovr (xin, Memr[x], sz_val)
 
 	# Calculate vector of fit values.
 	call nlvectorr (nl, Memr[x], Memr[y], npts, nvars)

@@ -265,12 +265,14 @@ begin
 	} else if (im_b == NULL) {
 	    im[2] = im_a
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
-		if (b == 0.0)
+		if (b == 0.0) {
 		    call amovkr (divzero, Memr[buf[1]], len)
-		else if (b == 1.0)
-		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
-		else
+		} else if (b == 1.0) {
+		    sz_val = len
+		    call amovr (Memr[buf[2]], Memr[buf[1]], sz_val)
+		} else {
 		    call adivkr (Memr[buf[2]], b, Memr[buf[1]], len)
+		}
 	    }
 
 	# Read imagea and imageb and do the vector divide to imagec.

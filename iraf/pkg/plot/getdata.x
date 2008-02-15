@@ -42,7 +42,8 @@ begin
 	    sz_val = nx * ny
 	    call calloc (data, sz_val, TY_REAL)
 	    subras = imgs2r (im, 1, nxin, 1, nyin)
-	    call amovr (Memr[subras], Memr[data], nx * ny)
+	    sz_val = nx * ny
+	    call amovr (Memr[subras], Memr[data], sz_val)
 	    return (data)
 	}
 end
@@ -101,7 +102,8 @@ begin
 
 	yin = 1
 	do jj = 1, nyout {
-	    call amovr (Memr[imgl2r (im, yin)], Memr[xvec],  nxin)
+	    sz_val = nxin
+	    call amovr (Memr[imgl2r (im, yin)], Memr[xvec], sz_val)
 	    nop = 1
 	    do ii = 1, nxin {
 		index = data + ((jj-1) * nxout) + nop - 1

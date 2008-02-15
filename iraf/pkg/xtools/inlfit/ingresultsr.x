@@ -46,7 +46,8 @@ begin
 	# Assign a zero weight to the rejected points.
 	rejected = in_geti (in, INLNREJPTS)
 	rejpts = in_getp (in, INLREJPTS)
-	call amovr (wts, Memr[wts1], npts)
+	sz_val = npts
+	call amovr (wts, Memr[wts1], sz_val)
 	if (rejected > 0) {
 	    do i = 1, npts {
 		if (Memi[rejpts+i-1] == YES)

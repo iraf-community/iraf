@@ -181,7 +181,8 @@ begin
 	    }
         case TY_REAL:
             while (impnlr(im2,buf2,v2) != EOF && imgnlr(im1,buf1,v1) != EOF) {
-                call amovr (Memr[buf1], Memr[buf2], ncols)
+                sz_val = ncols
+                call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
         case TY_DOUBLE:
             while (impnld(im2,buf2,v2) != EOF && imgnld(im1,buf1,v1) != EOF) {

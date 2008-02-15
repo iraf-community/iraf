@@ -1079,6 +1079,7 @@ int	npts			# Number of points in the vectors
 int	nlow			# Number of low points to be rejected
 int	nhigh			# Number of high points to be rejected
 
+size_t	sz_val
 int	i, j
 int	naccept, minrej, npairs, nlow1, nhigh1
 real	tmedian, time1, time2
@@ -1089,7 +1090,8 @@ begin
 	# If no points are rejected return the sum.
 
 	if (naccept == nvecs) {
-	    call amovr (Memr[a[1]], b, npts)
+	    sz_val = npts
+	    call amovr (Memr[a[1]], b, sz_val)
 	    for (j = 2; j <= naccept; j = j + 1)
 		call aaddr (Memr[a[j]], b, b, npts)
 	    return
@@ -1129,7 +1131,8 @@ begin
 	            call rs_minswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	call amovr (Memr[a[nhigh+1]], b, npts)
+	    	sz_val = npts
+	    	call amovr (Memr[a[nhigh+1]], b, sz_val)
 		for (j = nhigh+2; j <= nhigh+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 
@@ -1139,7 +1142,8 @@ begin
 	            call rs_maxswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	call amovr (Memr[a[nlow+1]], b, npts)
+	    	sz_val = npts
+	    	call amovr (Memr[a[nlow+1]], b, sz_val)
 		for (j = nlow+2; j <= nlow+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    }
@@ -1164,7 +1168,8 @@ begin
 	    # Check if the remaining points constitute a 3 or 5 point median
 	    # or the set of desired points.
 	    if (tmedian == 0.) {
-	        call amovr (Memr[a[1]], b, npts)
+	        sz_val = npts
+	        call amovr (Memr[a[1]], b, sz_val)
 	        for (j = 2; j <= naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    } else if (tmedian == TMED3) {

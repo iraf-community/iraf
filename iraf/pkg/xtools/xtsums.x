@@ -49,7 +49,8 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = imgs2r (im, c1, c2, l1, l2)
-	        call amovr (Memr[j], Memr[data], nc)
+	        sz_val = nc
+	        call amovr (Memr[j], Memr[data], sz_val)
 	    }
 	    return
 	}
@@ -148,7 +149,8 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = cogetr (co, c1, l1, l2)
-	        call amovr (Memr[j], Memr[data], nl)
+	        sz_val = nl
+	        call amovr (Memr[j], Memr[data], sz_val)
 	    }
 	    return
 	}
@@ -247,7 +249,8 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = imgs2r (im, c1, c2, l1, l2)
-	        call amovr (Memr[j], Memr[data], nc)
+	        sz_val = nc
+	        call amovr (Memr[j], Memr[data], sz_val)
 	    }
 	    return
 	}
@@ -263,7 +266,8 @@ begin
 	    call aclrr (Memr[data], nc)
 	    do i = l1, l2 {
 		j = data + (mod (i, nl) + 1) * nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
+		sz_val = nc
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 
@@ -278,7 +282,8 @@ begin
 	    }
 	    do i = l2 + 1, line2 {
 		j = data + (mod (i, nl) + 1) * nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
+		sz_val = nc
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    l1 = line1
@@ -291,7 +296,8 @@ begin
 	    }
 	    do i = line1, l1 - 1 {
 		j = data + (mod (i, nl) + 1) * nc
-		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
+		sz_val = nc
+		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    l1 = line1
@@ -349,7 +355,8 @@ begin
 	        l1 = line1
 	        l2 = line2
 		j = cogetr (co, c1, l1, l2)
-	        call amovr (Memr[j], Memr[data], nl)
+	        sz_val = nl
+	        call amovr (Memr[j], Memr[data], sz_val)
 	    }
 	    return
 	}
@@ -365,7 +372,8 @@ begin
 	    call aclrr (Memr[data], nlines)
 	    do i = c1, c2 {
 		j = data + (mod (i, nc) + 1) * nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
+		sz_val = nl
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 
@@ -380,7 +388,8 @@ begin
 	    }
 	    do i = c2 + 1, col2 {
 		j = data + (mod (i, nc) + 1) * nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
+		sz_val = nl
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    c1 = col1
@@ -393,7 +402,8 @@ begin
 	    }
 	    do i = col1, c1 - 1 {
 		j = data + (mod (i, nc) + 1) * nl
-		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
+		sz_val = nl
+		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], sz_val)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    c1 = col1

@@ -637,7 +637,8 @@ begin
 		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
 		}
 		buf2 = buf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	} else if (l2 > llast2) {
 	    do i = l1, l2 {
@@ -649,7 +650,8 @@ begin
 		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
 		}
 		buf2 = buf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	}
 
@@ -726,7 +728,8 @@ begin
 		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
 		}
 		buf2 = buf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	} else if (l2 > llast2) {
 	    do i = l1, l2 {
@@ -738,7 +741,8 @@ begin
 		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
 		}
 		buf2 = buf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	}
 
@@ -823,7 +827,8 @@ begin
 		        Memr[buf1], ncols)
 		}
 		buf2 = jbuf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	} else if (l2 > llast2) {
 	    do i = l1, l2 {
@@ -836,7 +841,8 @@ begin
 		        Memr[buf1], ncols)
 		}
 		buf2 = jbuf + (i - l1) * ncols
-		call amovr (Memr[buf1], Memr[buf2], ncols)
+		sz_val = ncols
+		call amovr (Memr[buf1], Memr[buf2], sz_val)
 	    }
 	}
 
@@ -1724,10 +1730,12 @@ begin
 	call salloc (jacob, sz_val, TY_REAL)
 
 	# Calculate the x points.
-	if (x0 == 1)
-	    call amovr (xinterp[c1], Memr[x], ncols)
-	else
+	if (x0 == 1) {
+	    sz_val = ncols
+	    call amovr (xinterp[c1], Memr[x], sz_val)
+	} else {
 	    call aaddkr (xinterp[c1], real (-x0 + 1), Memr[x], ncols)
+	}
 
 	# Multiply the data by the Jacobian.
 	if (line == 0) {

@@ -288,7 +288,8 @@ begin
 			    call error (0, "Error writing output image.")
 		        if (imgnlr (im1, buf1, Meml[vim1]) == EOF)
 			    call error (0, "Error reading input image.")
-		       call amovr (Memr[buf1], Memr[buf2], ncols) 
+		       sz_val = ncols
+		       call amovr (Memr[buf1], Memr[buf2], sz_val) 
 		    }
 		} else {
 		    do j = 1, nlout {
@@ -297,7 +298,8 @@ begin
 			buf1 = imggsr (im1, Meml[vs], Meml[ve], IM_NDIM(im1))
 		        if (buf1 == EOF)
 			    call error (0, "Error reading input image.")
-		       call amovr (Memr[buf1], Memr[buf2], ncols) 
+		       sz_val = ncols
+		       call amovr (Memr[buf1], Memr[buf2], sz_val) 
 		       call sl_loop (Meml[vs], Meml[ve], IM_LEN(im1,1),
 		           fdim, sdim, ndim)
 		    }

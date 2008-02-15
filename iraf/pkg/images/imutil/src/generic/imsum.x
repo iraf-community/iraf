@@ -1302,7 +1302,8 @@ begin
 			call amovl (Meml[v1], Meml[v2], sz_val)
 			if (imgnlr (im_out, buf_in, Meml[v2]) == EOF)
 		    	    call error (0, "Error reading input image")
-			call amovr (Memr[buf_in], Memr[buf_out], npix)
+			sz_val = npix
+			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
 		    }
 
 		    # Accumulate lines from each input image.
@@ -1382,7 +1383,8 @@ begin
 		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		Memp[buf+i-1] = buf1 + (i - n - 1) * npix
-		call amovr (Memr[buf_in], Memr[Memp[buf+i-1]], npix)
+		sz_val = npix
+		call amovr (Memr[buf_in], Memr[Memp[buf+i-1]], sz_val)
 		call imunmap (Memp[im+i-1])
 	    }
 		
@@ -1417,6 +1419,7 @@ int	npts			# Number of points in the vectors
 int	nlow			# Number of low points to be rejected
 int	nhigh			# Number of high points to be rejected
 
+size_t	sz_val
 int	i, j
 int	naccept, minrej, npairs, nlow1, nhigh1
 real	tmedian, time1, time2
@@ -1427,7 +1430,8 @@ begin
 	# If no points are rejected return the sum.
 
 	if (naccept == nvecs) {
-	    call amovr (Memr[a[1]], b, npts)
+	    sz_val = npts
+	    call amovr (Memr[a[1]], b, sz_val)
 	    for (j = 2; j <= naccept; j = j + 1)
 		call aaddr (Memr[a[j]], b, b, npts)
 	    return
@@ -1467,7 +1471,8 @@ begin
 	            call minswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	call amovr (Memr[a[nhigh+1]], b, npts)
+	    	sz_val = npts
+	    	call amovr (Memr[a[nhigh+1]], b, sz_val)
 		for (j = nhigh+2; j <= nhigh+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 
@@ -1477,7 +1482,8 @@ begin
 	            call maxswr (a, i, npts)
 		    i = i - 1
 	        }
-	    	call amovr (Memr[a[nlow+1]], b, npts)
+	    	sz_val = npts
+	    	call amovr (Memr[a[nlow+1]], b, sz_val)
 		for (j = nlow+2; j <= nlow+naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    }
@@ -1502,7 +1508,8 @@ begin
 	    # Check if the remaining points constitute a 3 or 5 point median
 	    # or the set of desired points.
 	    if (tmedian == 0.) {
-	        call amovr (Memr[a[1]], b, npts)
+	        sz_val = npts
+	        call amovr (Memr[a[1]], b, sz_val)
 	        for (j = 2; j <= naccept; j = j + 1)
 		    call aaddr (Memr[a[j]], b, b, npts)
 	    } else if (tmedian == TMED3) {

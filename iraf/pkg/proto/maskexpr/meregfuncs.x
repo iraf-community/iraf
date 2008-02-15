@@ -337,8 +337,9 @@ begin
 	call salloc (xintr, sz_val, TY_REAL)
 
 	# Close the polygon.
-	call amovr (xver, Memr[txver], nver)
-	call amovr (yver, Memr[tyver], nver)
+	sz_val = nver
+	call amovr (xver, Memr[txver], sz_val)
+	call amovr (yver, Memr[tyver], sz_val)
 	Memr[txver+nver] = xver[1] 
 	Memr[tyver+nver] = yver[1] 
 
@@ -411,12 +412,14 @@ begin
 	call salloc (oxintr, sz_val, TY_REAL)
 
 	# Close the polygons.
-	call amovr (ixver, Memr[tixver], nver)
-	call amovr (iyver, Memr[tiyver], nver)
+	sz_val = nver
+	call amovr (ixver, Memr[tixver], sz_val)
+	call amovr (iyver, Memr[tiyver], sz_val)
 	Memr[tixver+nver] = ixver[1] 
 	Memr[tiyver+nver] = iyver[1] 
-	call amovr (oxver, Memr[toxver], nver)
-	call amovr (oyver, Memr[toyver], nver)
+	sz_val = nver
+	call amovr (oxver, Memr[toxver], sz_val)
+	call amovr (oyver, Memr[toyver], sz_val)
 	Memr[toxver+nver] = oxver[1] 
 	Memr[toyver+nver] = oyver[1] 
 
@@ -952,6 +955,7 @@ real    xranges[ARB]            #O the x line segments
 int     nver                    #I the number of vertices
 real    lx, ld                  #I the equation of the image line
 
+size_t	sz_val
 real    u1, u2, u1u2, dx, dy, dd, xa, wa
 int     i, j, nintr, nplus, nzero, nneg, imin, imax, nadd
 bool    collinear
@@ -1135,23 +1139,27 @@ begin
 
         # Reorder the x ranges and slopes if necessary.
         if ((imax < imin) && ! (imin == nintr && imax == 1)) {
-            call amovr (xranges, xintr, nintr)
+            sz_val = nintr
+            call amovr (xranges, xintr, sz_val)
             do i = 1, imax
                 xranges[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 xranges[i-imax] = xintr[i]
-            call amovr (slope, xintr, nintr)
+            sz_val = nintr
+            call amovr (slope, xintr, sz_val)
             do i = 1, imax
                 slope[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 slope[i-imax] = xintr[i]
         } else if ((imin < imax) && ! (imin == 1 && imax == nintr)) {
-            call amovr (xranges, xintr, nintr)
+            sz_val = nintr
+            call amovr (xranges, xintr, sz_val)
             do i = 1, imin
                 xranges[nintr-imin+i] = xintr[i]
             do i = imax, nintr
                 xranges[i-imin] = xintr[i]
-            call amovr (slope, xintr, nintr)
+            sz_val = nintr
+            call amovr (slope, xintr, sz_val)
             do i = 1, imin
                 slope[nintr-imin+i] = xintr[i]
             do i = imax, nintr

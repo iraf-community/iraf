@@ -40,14 +40,14 @@ begin
 	sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
 	call malloc (MSI_COEFF(msi), sz_val,
 	    TY_REAL)
-	call amovr (interpolant[1+MSI_SAVECOEFF], COEFF(MSI_COEFF(msi)),
-	    MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi))
+	sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+	call amovr (interpolant[1+MSI_SAVECOEFF], COEFF(MSI_COEFF(msi)), sz_val)
 
 	# allocate space for and restore the look-up table
 	if (MSI_NXINCR(msi) > 0 && MSI_NYINCR(msi) > 0) {
 	    npix = (2.0 * MSI_NSINC(msi) + 1) ** 2 * MSI_NXINCR(msi) *
 		MSI_NYINCR(msi)
-	    call amovr (interpolant[1+MSI_SAVECOEFF+MSI_NXCOEFF(msi) *
-	        MSI_NYCOEFF(msi)], LTABLE(MSI_LTABLE(msi)), npix)
+	    sz_val = npix
+	    call amovr (interpolant[1+MSI_SAVECOEFF+MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)], LTABLE(MSI_LTABLE(msi)), sz_val)
 	}
 end

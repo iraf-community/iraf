@@ -135,6 +135,7 @@ procedure fixliner (image, x1, x2, y1, y2)
 pointer	image				# Image pointer
 int	x1, x2, y1, y2			# Region to be fixed
 
+size_t	sz_val
 int	i, nx, ny
 real	f1, f2
 pointer	a, b, c
@@ -148,12 +149,16 @@ begin
 	ny = y2 - y1 + 1
 	if (y1 == 1) {
 	    a = imgs2r (image, x1, x2, y2 + 1, y2 + 1)
-	    do i = 1, ny
-		call amovr (Memr[a], Memr[c + (i - 1) * nx], nx)
+	    do i = 1, ny {
+		sz_val = nx
+		call amovr (Memr[a], Memr[c + (i - 1) * nx], sz_val)
+	    }
 	} else if (y2 == IM_LEN (image, 2)) {
 	    a = imgs2r (image, x1, x2,  y1 - 1, y1 - 1)
-	    do i = 1, ny
-		call amovr (Memr[a], Memr[c + (i - 1) * nx], nx)
+	    do i = 1, ny {
+		sz_val = nx
+		call amovr (Memr[a], Memr[c + (i - 1) * nx], sz_val)
+	    }
 	} else {
 	    call imseti (image, IM_NBUFS, 2)
 	    a = imgs2r (image, x1, x2, y1 - 1, y1 - 1)

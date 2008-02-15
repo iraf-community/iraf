@@ -621,7 +621,8 @@ image_
 			call amovl (Meml[ip], Meml[op], sz_val)
 
 		    case TY_REAL:
-			call amovr (Memr[ip], Memr[op], npix)
+			sz_val = npix
+			call amovr (Memr[ip], Memr[op], sz_val)
 
 		    case TY_DOUBLE:
 			call amovd (Memd[ip], Memd[op], npix)

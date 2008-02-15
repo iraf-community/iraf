@@ -97,7 +97,8 @@ begin
 		    while (imgnlr (in, buf_in, line_in) != EOF) {
 			if (impnlr (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
-			call amovr (Memr[buf_in], Memr[buf_out], npix)
+			sz_val = npix
+			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
 		    }
 		case TY_DOUBLE:
 		    while (imgnld (in, buf_in, line_in) != EOF) {
@@ -115,7 +116,8 @@ begin
 		    while (imgnlr (in, buf_in, line_in) != EOF) {
 			if (impnlr (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
-			call amovr (Memr[buf_in], Memr[buf_out], npix)
+			sz_val = npix
+			call amovr (Memr[buf_in], Memr[buf_out], sz_val)
 		    }
 		}
 		call imunmap (in)

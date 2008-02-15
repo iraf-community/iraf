@@ -111,7 +111,8 @@ begin
 	ceiling = ceiling - zero
 
 	# Make a copy of the image and contour this.
-	call amovr (data,  Memr[temp], nlines * ncols)
+	sz_val = nlines * ncols
+	call amovr (data,  Memr[temp], sz_val)
 
 	# Apply the zero point shift.
 	if (abs (zero) > EPSILON)

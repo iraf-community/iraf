@@ -112,6 +112,6 @@ begin
 	call calloc (SF_COEFF(sf), sz_val, MEM_TYPE)
 
 	# restore coefficient array
-	call amovr (fit[SF_SAVECOEFF+1], COEFF(SF_COEFF(sf)), SF_NYCOEFF(sf) *
-	    SF_NXCOEFF(sf))
+	sz_val = SF_NYCOEFF(sf) * SF_NXCOEFF(sf)
+	call amovr (fit[SF_SAVECOEFF+1], COEFF(SF_COEFF(sf)), sz_val)
 end

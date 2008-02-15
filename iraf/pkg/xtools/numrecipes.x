@@ -179,15 +179,18 @@ begin
 	    call malloc (delta1, sz_val, TY_REAL)
 	    call malloc (delta2, sz_val, TY_REAL)
 
-	    call amovr (params, Memr[new], np)
+	    sz_val = np
+	    call amovr (params, Memr[new], sz_val)
 	    call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a2],
 	        Memr[delta2], nfit, chisq)
 	    mr = 0.001
 	}
 
 	# Restore last good fit and apply the Marquardt parameter.
-	call amovr (Memr[a2], Memr[a1], nfit * nfit)
-	call amovr (Memr[delta2], Memr[delta1], nfit)
+	sz_val = nfit * nfit
+	call amovr (Memr[a2], Memr[a1], sz_val)
+	sz_val = nfit
+	call amovr (Memr[delta2], Memr[delta1], sz_val)
 	do i = 1, nfit
 	    Memr[a1+(i-1)*(nfit+1)] = Memr[a2+(i-1)*(nfit+1)] * (1. + mr)
 
@@ -204,9 +207,12 @@ begin
 	if (chisq1 < chisq) {
 	    mr = 0.1 * mr
 	    chisq = chisq1
-	    call amovr (Memr[a1], Memr[a2], nfit * nfit)
-	    call amovr (Memr[delta1], Memr[delta2], nfit)
-	    call amovr (Memr[new], params, np)
+	    sz_val = nfit * nfit
+	    call amovr (Memr[a1], Memr[a2], sz_val)
+	    sz_val = nfit
+	    call amovr (Memr[delta1], Memr[delta2], sz_val)
+	    sz_val = np
+	    call amovr (Memr[new], params, sz_val)
 	} else
 	    mr = 10. * mr
 

@@ -93,7 +93,8 @@ begin
 	    lastl2 = min (imlen2, line2 + EXTRA)
 	    do i = lastl1, lastl2 {
 	        buf = buffer + mod (i, nlines) * ncols
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
+		sz_val = nc
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
 	    }
 	    CO_COL1(co) = lastc1
 	    CO_LINE1(co) = lastl1
@@ -102,7 +103,8 @@ begin
 	} else if (line1 < lastl1) {
 	    do i = max (1, line1 - EXTRA), min (imlen2, lastl1 - 1) {
 	        buf = buffer + mod (i, nlines) * ncols
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
+		sz_val = nc
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
 	    lastl2 = min (imlen2, line2 + EXTRA)
@@ -112,7 +114,8 @@ begin
 	} else if (line2 > lastl2) {
 	    do i = max (1, lastl2 + 1), min (imlen2, line2 + EXTRA) {
 	        buf = buffer + mod (i, nlines) * ncols
-		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
+		sz_val = nc
+		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], sz_val)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
 	    lastl2 = min (imlen2, line2 + EXTRA)

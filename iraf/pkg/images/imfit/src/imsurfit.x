@@ -624,7 +624,8 @@ begin
 	    case CLEAN:
 		call clean_line (Memr[x], Memr[y], Memr[inbuf], ncols, nlines,
 		   rl, sf, i, NGROW(imfit)) 
-		call amovr (Memr[inbuf], Memr[outbuf], ncols)
+		sz_val = ncols
+		call amovr (Memr[inbuf], Memr[outbuf], sz_val)
 	    case RESID:
 	        call isvector (sf, Memr[x], Memr[y], Memr[outbuf], ncols)
 		call asubr (Memr[inbuf], Memr[outbuf], Memr[outbuf], ncols)
@@ -988,7 +989,8 @@ begin
 	# Intialize the x array.
 	do i = 1, ncols
 	    Memr[x+i-1] = i
-	call amovr (Memr[x], Memr[xfit], ncols)
+	sz_val = ncols
+	call amovr (Memr[x], Memr[xfit], sz_val)
 
 	sum = 0.
 	sigma = 0.
@@ -1097,7 +1099,8 @@ begin
 	    Memi[cols+i-1] = i
 	    Memr[x+i-1] = i
 	}
-	call amovr (Memr[x], Memr[xfit], ncols)
+	sz_val = ncols
+	call amovr (Memr[x], Memr[xfit], sz_val)
 	call amovi (Memi[cols], Memi[colsfit], ncols)
 
 	ntrejects = 0
