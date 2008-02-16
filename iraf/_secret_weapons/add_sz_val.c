@@ -63,7 +63,7 @@ int main( int argc, char *argv[] )
 
 static int is_valchar( int ch )
 {
-    return ( isalpha(ch) || isdigit(ch) || ch=='_' );
+    return ( isalpha(ch) || isdigit(ch) || ch=='_' || ch=='$' );
 }
 
 static int parse_in_braces ( const char *char_ptr_in_brace, char *lines[], 
@@ -235,7 +235,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		comm_ptr++;
 		while ( *comm_ptr==' ' || *comm_ptr=='\t' )
 		    comm_ptr++;
-		if ( is_valchar(*comm_ptr) || *comm_ptr == '$' ) break;
+		if ( is_valchar(*comm_ptr) ) break;
 		else if ( *comm_ptr!='#' && *comm_ptr!='\n' && *comm_ptr!='\0' ) {
 		    fprintf(stderr,"[ERROR] file = %s  line = %d: Unexpected syntax\n",
 			    file_name,j0+1);
