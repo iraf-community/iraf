@@ -241,15 +241,17 @@ static int add_sz_val( const char *proc_name, int target_arg,
     for ( i=0 ; i < num_proc ; i++ ) {
 	char prev_arg_str[SZ_LINE_BUF] = {'\0'};
 	int  prev_line_idx = -1;
-	int j;
+	int j, j_not_gc;
 	bool target_found = false;
-	bool prev_if_or_else = false;
+	bool flg_if_or_else = false;
+	j_not_gc = -1;
 	for ( j=proc_begin[i]+1 ; j < proc_end[i] ; j++ ) {
 	    const char *ip;
 	    const char *ptr_call_begin;
 	    const char *ptr_proc_begin;
 	    int arg_cnt = 0;
 	    bool flg_prev_if;
+	    int prev_j;
 	    if ( DEBUG ) {
 		fprintf(stderr,"debug: j = %d\n",j);
 	    }
@@ -257,12 +259,17 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
 	    if ( *ip == '#' || *ip == '\n' || *ip == '\0' ) continue;
 	    /* */
-	    flg_prev_if = prev_if_or_else;
+	    flg_prev_if = flg_if_or_else;
+	    prev_j = j_not_gc;
 	    /* */
-	    prev_if_or_else = false;
+	    flg_if_or_else = false;
 	    /* skip $if, $else, etc. in foo.gx */
-	    if ( *ip != '$' ) {
+	    if ( *ip == '$' ) {
+		continue;
+	    }
+	    else {
 		const char *ip1 = ip;
+		j_not_gc = j;
 		while ( isalpha(*ip1)==0 && *ip1!='\0' ) ip1++;
 		if ( (strncmp(ip1,"if",2)==0 && is_valchar(ip1[2])==0) ||
 		     (strncmp(ip1,"else",4)==0 && is_valchar(ip1[4])==0) ||
@@ -273,7 +280,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		     (strncmp(ip1,"iferr",5)==0 && is_valchar(ip1[5])==0) ||
 		     (strncmp(ip1,"ifnoerr",7)==0 && is_valchar(ip1[7])==0) ) {
 		    if ( strrchr(ip1,'{') == NULL ) {
-			prev_if_or_else = true;
+			flg_if_or_else = true;
 		    }
 		}
 	    }
@@ -299,12 +306,16 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		fprintf(stderr,
 			"[INFO] file = %s  line = %d: appended braces\n",
 			file_name,j+1);
-		op1 = strchr(lines[j-1],'\n');
+		if ( prev_j < 0 ) {
+		    fprintf(stderr,"[ERROR] Invalid prev_j\n");
+		    goto quit;
+		}
+		op1 = strchr(lines[prev_j],'\n');
 		if ( op1 != NULL ) *op1 = ' ';
-		snprintf(tmp_buf,SZ_LINE_BUF,"%s{\n",lines[j-1]);
-		free(lines[j-1]);
-		lines[j-1] = strdup(tmp_buf);
-		if ( lines[j-1] == NULL ) {
+		snprintf(tmp_buf,SZ_LINE_BUF,"%s{\n",lines[prev_j]);
+		free(lines[prev_j]);
+		lines[prev_j] = strdup(tmp_buf);
+		if ( lines[prev_j] == NULL ) {
 		    fprintf(stderr,"[ERROR] strdup() failed\n");
 		    goto quit;
 		}
@@ -318,6 +329,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			op1++;
 		    }
 		    ip1++;
+		}
+		if ( *ip1 == '$' ) {
+		    fprintf(stderr,"[ERROR] Cannot handle: file = %s  line = %d\n",
+			    file_name,j+1);
+		    goto quit;
 		}
 		if ( strncmp("else",ip1,4)==0 && is_valchar(ip1[4])==0 ) {
 		    const char *ip2 = "} ";
@@ -348,7 +364,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    char tmp_buf1[SZ_LINE_BUF];
 		    const char *ip2;
 		    op1 = tmp_buf;
-		    ip2 = lines[j-1];
+		    ip2 = lines[prev_j];
 		    while ( *ip2 == ' ' || *ip2 == '\t' ) {
 			if ( op1 < maxop1 ) {
 			    *op1 = *ip2;
