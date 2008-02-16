@@ -13,13 +13,15 @@ char	extn[ARB]		#U extension (SET on output if none specified)
 int	acmode			#I access mode (0 to test only existence)
 int	status			#O ok or err
 
+size_t	sz_val
 pointer	sp, fname
 int	btoi(), access(), iki_validextn()
 string	plf_extn PLF_EXTN
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# If new image, test only the legality of the given extension.
 	# This is used to select a kernel given the imagefile extension.

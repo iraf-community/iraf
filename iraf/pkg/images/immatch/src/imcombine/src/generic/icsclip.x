@@ -20,6 +20,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, one
 data	one /1.0/
@@ -46,9 +47,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -298,6 +302,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, w, mp1, mp2
@@ -319,9 +324,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -499,6 +507,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, one
 data	one /1.0/
@@ -525,9 +534,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -777,6 +789,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, w, mp1, mp2
@@ -798,9 +811,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -978,6 +994,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 real	d1, low, high, sum, a, s, r, one
 data	one /1.0/
@@ -1004,9 +1021,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -1256,6 +1276,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 real	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, w, mp1, mp2
@@ -1277,9 +1298,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -1457,6 +1481,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	average[npts]		# Average
 
+size_t	sz_val
 int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
 double	d1, low, high, sum, a, s, r, one
 data	one /1.0D0/
@@ -1483,9 +1508,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -1735,6 +1763,7 @@ int	nimages			# Number of images
 int	npts			# Number of output points per line
 double	median[npts]		# Median
 
+size_t	sz_val
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, w, mp1, mp2
@@ -1756,9 +1785,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]

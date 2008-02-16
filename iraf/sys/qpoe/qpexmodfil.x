@@ -49,6 +49,7 @@ int procedure qpex_modfilter (ex, exprlist)
 pointer ex                      #I qpex descriptor
 char    exprlist[ARB]           #I list of attribute=expr expressions
 
+size_t	sz_val
 bool	replace
 int	boffset, offset, max_offset, dtype
 int	status, sz_expr, token, parenlevel, nchars, buflen
@@ -65,9 +66,10 @@ define	badatt_ 92
 
 begin
 	call smark (sp)
-	call salloc (atname, SZ_TOKBUF, TY_CHAR)
-	call salloc (assignop, SZ_TOKBUF, TY_CHAR)
-	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
+	sz_val = SZ_TOKBUF
+	call salloc (atname, sz_val, TY_CHAR)
+	call salloc (assignop, sz_val, TY_CHAR)
+	call salloc (tokbuf, sz_val, TY_CHAR)
 
 	status = OK
 	sz_expr = DEF_SZEXPRBUF

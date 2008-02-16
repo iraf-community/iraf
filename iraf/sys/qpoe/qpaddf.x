@@ -19,6 +19,7 @@ int	maxelem			#I allocated length of parameter
 char	comment[ARB]		#I comment describing parameter
 int	flags			#I parameter flags
 
+size_t	sz_val
 bool	newtype
 pointer	sp, text, st, fm, sym, pval, dsym, dd
 int	fd, sz_elem, type, nchars, dtype, nfields, i
@@ -33,7 +34,8 @@ define	fixed_ 91
 
 begin
 	call smark (sp)
-	call salloc (text, SZ_TEXTBUF, TY_CHAR)
+	sz_val = SZ_TEXTBUF
+	call salloc (text, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -83,7 +85,8 @@ begin
 
 	if (newtype) {
 	    S_MAXELEM(sym) = nchars
-	    call salloc (dd, LEN_DDDES, TY_STRUCT)
+	    sz_val = LEN_DDDES
+	    call salloc (dd, sz_val, TY_STRUCT)
 	    iferr (nfields = qp_parsefl (qp, Memc[text], dd))
 		call erract (EA_WARN)
 	    else
@@ -149,7 +152,8 @@ fixed_
 		call write (fd, Memc[text], nchars)
 		S_NELEM(sym) = S_MAXELEM(sym)
 	    } else {
-		call salloc (pval, nchars, TY_CHAR)
+		sz_val = nchars
+		call salloc (pval, sz_val, TY_CHAR)
 		call aclrc (Memc[pval], nchars)
 		call write (fd, Memc[pval], nchars)
 	    }

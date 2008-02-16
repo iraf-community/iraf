@@ -16,6 +16,7 @@ pointer	im
 real	z1, z2, zfrac
 int	maxcols, nsample_lines
 
+size_t	sz_val
 real	rmin, rmax
 real	frac
 int	imin, imax, ncols, nlines
@@ -27,7 +28,8 @@ include	"iis.com"
 
 begin
 	call smark (sp)
-	call salloc (buf, ncols, TY_REAL)
+	sz_val = ncols
+	call salloc (buf, sz_val, TY_REAL)
 
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)

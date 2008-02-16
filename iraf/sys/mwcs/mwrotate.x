@@ -20,6 +20,7 @@ real	theta			#I rotation angle, degrees
 real	center[ARB]		#I center of rotation
 int	axbits			#I bitflags defining axes to be rotated
 
+size_t	sz_val
 double	d_theta
 pointer	sp, ltm, ltv_1, ltv_2
 int	axis[MAX_DIM], naxes, ax1, ax2, axmap, pdim, nelem
@@ -40,9 +41,11 @@ begin
 	ax2 = axis[2]
 
 	call smark (sp)
-	call salloc (ltm, nelem, TY_DOUBLE)
-	call salloc (ltv_1, pdim, TY_DOUBLE)
-	call salloc (ltv_2, pdim, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (ltv_1, sz_val, TY_DOUBLE)
+	call salloc (ltv_2, sz_val, TY_DOUBLE)
 
 	# Initialize the translation matrix and vectors.
 	call mw_mkidmd (Memd[ltm], pdim)

@@ -54,6 +54,7 @@ pointer	olatformat, lngcolumn, latcolumn, colnames, exprs, formats
 pointer	infile, outfile, str
 pointer	fldcoo, catcoo, outcoo, mw, dc, ec
 bool	verbose
+size_t	sz_val
 double	clgetd()
 pointer	cc_dinit(), cc_einit(), clpopnu()
 int	clplen(), ctod(), strncmp(), clgwrd(), sk_decwcs()
@@ -91,21 +92,26 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (lngcenter, SZ_FNAME, TY_CHAR)
-	call salloc (latcenter, SZ_FNAME, TY_CHAR)
-	call salloc (fcsystem, SZ_FNAME, TY_CHAR)
-	call salloc (catsystem, SZ_FNAME, TY_CHAR)
-	call salloc (lngcolumn, SZ_FNAME, TY_CHAR)
-	call salloc (latcolumn, SZ_FNAME, TY_CHAR)
-	call salloc (colnames, SZ_LINE, TY_CHAR)
-	call salloc (outsystem, SZ_FNAME, TY_CHAR)
-	call salloc (olngformat, SZ_FNAME, TY_CHAR)
-	call salloc (olatformat, SZ_FNAME, TY_CHAR)
-	call salloc (exprs, SZ_LINE, TY_CHAR)
-	call salloc (formats, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (outfile, sz_val, TY_CHAR)
+	call salloc (lngcenter, sz_val, TY_CHAR)
+	call salloc (latcenter, sz_val, TY_CHAR)
+	call salloc (fcsystem, sz_val, TY_CHAR)
+	call salloc (catsystem, sz_val, TY_CHAR)
+	call salloc (lngcolumn, sz_val, TY_CHAR)
+	call salloc (latcolumn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outsystem, sz_val, TY_CHAR)
+	call salloc (olngformat, sz_val, TY_CHAR)
+	call salloc (olatformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (exprs, sz_val, TY_CHAR)
+	call salloc (formats, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the field center coordinates and make some preliminary checks.
 	call clgstr ("lngcenter", Memc[lngcenter], SZ_FNAME)
@@ -562,6 +568,7 @@ double	dlng1, dlng2		#I the ra / longitude limits in degrees
 double	dlat1, dlat2		#I the dec / latitude limits in degrees
 bool	verbose			#I verbose mode
 
+size_t	sz_val
 double	dlngcenter, dlatcenter, tlng, tlat, dlng, dlat, dist
 double  tmplng, tlngcenter
 int	ip, op, i, j, nline, lngoffset, latoffset, offset1, offset2, nsig
@@ -573,9 +580,10 @@ extern	cc_getop()
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (outbuf, SZ_LINE, TY_CHAR)
-	call salloc (newval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (outbuf, sz_val, TY_CHAR)
+	call salloc (newval, sz_val, TY_CHAR)
 
 	# Convert the field center coordinates to degrees.
         switch (sk_stati(catcoo, S_NLNGUNITS)) {
@@ -1069,6 +1077,7 @@ procedure cc_edecode (dc, ec)
 pointer	dc			#I the pointer to the data structure
 pointer	ec			#I the pointer to the expression structure
 
+size_t	sz_val
 int	i, j, ip1, ip2, c1, c2, lindex, rindex, column
 pointer	sp, ename, eptr, cptr, rptr
 char	lbracket, rbracket
@@ -1077,7 +1086,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (ename, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (ename, sz_val, TY_CHAR)
 
 	# Initialize.
 	lbracket = '['

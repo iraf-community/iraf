@@ -23,6 +23,7 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
+size_t	sz_val
 pointer	sp, fname, hp, pl
 int	naxes, axlen[IM_MAXDIM], depth
 bool	envgetb(), fnullfile()
@@ -32,8 +33,10 @@ errchk	imerr
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (hp, IM_LENHDRMEM(im), TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = IM_LENHDRMEM(im)
+	call salloc (hp, sz_val, TY_CHAR)
 
 	# The only valid cl_index for a PL image is -1 (none specified) or 1.
 	if (!(cl_index < 0 || cl_index == 1)) {

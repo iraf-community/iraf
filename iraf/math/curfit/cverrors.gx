@@ -31,6 +31,7 @@ int	npts		# number of points
 PIXEL	chisqr		# reduced chi-squared of fit
 PIXEL	errors[ARB]	# errors in coefficients
 
+size_t	sz_val
 int	i, n, nfree
 PIXEL   variance, chisq, hold
 pointer	sp, covptr
@@ -38,7 +39,8 @@ pointer	sp, covptr
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, CV_NCOEFF(cv), TY_PIXEL)
+	sz_val = CV_NCOEFF(cv)
+	call salloc (covptr, sz_val, TY_PIXEL)
 
 	# estimate the variance and chi-squared of the fit
 	n = 0

@@ -17,6 +17,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
@@ -44,9 +45,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_REAL)
-	call salloc (yb, yorder * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_REAL)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
 
 	# calculate basis functions
 	call rgs_bpol (x, npts, xorder, k1x, k2x, Memr[xb])
@@ -111,6 +115,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
@@ -123,9 +128,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_REAL)
-	call salloc (yb, yorder * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_REAL)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
 
 	# calculate basis functions
 	call rgs_bcheb (x, npts, xorder, k1x, k2x, Memr[xb])
@@ -191,6 +199,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, accum, xbptr, ybptr
 
@@ -203,9 +212,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_REAL)
-	call salloc (yb, yorder * npts, TY_REAL)
-	call salloc (accum, npts, TY_REAL)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_REAL)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_REAL)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_REAL)
 
 	# calculate basis functions
 	call rgs_bleg (x, npts, xorder, k1x, k2x, Memr[xb])

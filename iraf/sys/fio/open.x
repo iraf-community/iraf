@@ -14,6 +14,7 @@ char	fname[ARB]			# virtual file name
 int	mode				# access mode (ro,rw,apnd,newf,temp)
 int	type				# text or binary file
 
+size_t	sz_val
 int	fd
 pointer	sp, vfn
 bool	nullfile, fnullfile()
@@ -24,7 +25,8 @@ errchk	syserr, fgetfd, filopn, seek
 
 begin
 	call smark (sp)
-	call salloc (vfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (vfn, sz_val, TY_CHAR)
 
 	# Strip any whitespace at either end of the filename.
 	if (nowhite (fname, Memc[vfn], SZ_PATHNAME) == 0)

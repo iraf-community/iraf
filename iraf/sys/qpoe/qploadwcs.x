@@ -13,6 +13,7 @@ pointer procedure qp_loadwcs (qp)
 
 pointer	qp				#I QPOE descriptor
 
+size_t	sz_val
 int	wcslen
 pointer	sp, svwcs, mw
 errchk	qp_lenf, syserrs, qp_read, mw_open
@@ -27,7 +28,8 @@ begin
 	    call syserrs (SYS_QPNOWCS, QP_DFNAME(qp))
 
 	call smark (sp)
-	call salloc (svwcs, wcslen, TY_CHAR)
+	sz_val = wcslen
+	call salloc (svwcs, sz_val, TY_CHAR)
 
 	# Retrieved the saved wcs, and load it into an MWCS descriptor.
 	wcslen = qp_read (qp, s_qpwcs, Memc[svwcs], wcslen, 1, "opaque")

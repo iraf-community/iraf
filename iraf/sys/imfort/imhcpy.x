@@ -12,6 +12,7 @@ pointer	o_im		# old image
 pointer	n_im		# new image
 int	ier
 
+size_t	sz_val
 int	junk
 pointer	sp, root, o_ua, n_ua
 string	imhdr "imhdr"
@@ -20,7 +21,8 @@ bool	strne()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
 
 	if (strne (IM_MAGIC(o_im), imhdr) || strne (IM_MAGIC(n_im), imhdr)) {
 	    ier = IE_MAGIC

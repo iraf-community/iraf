@@ -33,6 +33,7 @@ int	ndim			#I the number of output mask dimensions
 long	axlen[ARB]		#I the size of the output mask
 int	depth			#I the pixel depth of the output mask
 
+size_t	sz_val
 pointer	sp, tmpname, pm, pmim, me, obuf, oexpr
 int	i, npix, nlines, pmaxval
 pointer pm_create(), im_pmmap(), evvexpr(), immap(), locpr()
@@ -46,7 +47,8 @@ begin
 	# image depending on whether or not you wish to save the mask.
 	if (mskname[1] == EOS) {
 	    call smark (sp)
-	    call salloc (tmpname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (tmpname, sz_val, TY_CHAR)
 	    call mktemp ("tmpmsk", Memc[tmpname], SZ_FNAME)
 	    if (refim != NULL) {
 	        pmim = im_pmmap (Memc[tmpname], NEW_COPY, refim)
@@ -236,6 +238,7 @@ pointer	me			#I mskexpr descriptor
 char	opname[ARB]		#I operand name
 pointer	o			#I output operand to be filled in
 
+size_t	sz_val
 pointer	sp, param, data, im
 int	i, axis
 int	imgftype(), btoi()
@@ -288,7 +291,8 @@ begin
 		goto err_
 
 	    # Get the parameter value and set up operand struct.
-	    call salloc (param, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (param, sz_val, TY_CHAR)
 	    call strcpy (opname[3], Memc[param], SZ_FNAME)
 	    iferr (O_TYPE(o) = imgftype (im, Memc[param]))
 		goto err_
@@ -399,6 +403,7 @@ pointer	args[ARB]		#I input arguments
 int	nargs			#I number of input arguments
 pointer	o			#I output operand to be filled in
 
+size_t	sz_val
 real	width
 pointer	sp, ufunc, rval1, rval2, orval1, orval2, ix, iy
 int	i, ip, func, v_nargs, nver
@@ -408,7 +413,8 @@ bool	strne()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ufunc, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ufunc, sz_val, TY_CHAR)
 
 	# Get the function.
 	func = strdic (fcn, Memc[ufunc], SZ_LINE, ME_FUNCS)
@@ -458,8 +464,9 @@ begin
 
 	# Type convert the arguments appropriately. At the moment this is
 	# simple if we assume that all the required arguments are real.
-	call salloc (rval1, nargs, TY_REAL)
-	call salloc (rval2, nargs, TY_REAL)
+	sz_val = nargs
+	call salloc (rval1, sz_val, TY_REAL)
+	call salloc (rval2, sz_val, TY_REAL)
 	do i = 1, nargs {
 	    switch (O_TYPE(args[i])) {
 	    case TY_CHAR:
@@ -778,8 +785,9 @@ begin
 	        do i = 1, nver
 		    #Memr[rval1+i-1] = Memr[rval1+2*i+2]
 		    Memr[rval1+i-1] = Memr[rval1+2*i+1]
-	        call salloc (orval1, nver, TY_REAL)
-	        call salloc (orval2, nver, TY_REAL)
+	        sz_val = nver
+	        call salloc (orval1, sz_val, TY_REAL)
+	        call salloc (orval2, sz_val, TY_REAL)
 	        call me_pyexpand (Memr[rval1], Memr[rval2], Memr[orval1],
 		    Memr[orval2], nver, width)
 	        call me_apolygon (Memi[O_VALP(args[1])], Memi[O_VALP(args[2])],
@@ -798,8 +806,9 @@ begin
 		    Memr[rval2+i-1] = Memr[rval1+2*i]
 	        do i = 1, nver
 		    Memr[rval1+i-1] = Memr[rval1+2*i-1]
-	        call salloc (orval1, nver, TY_REAL)
-	        call salloc (orval2, nver, TY_REAL)
+	        sz_val = nver
+	        call salloc (orval1, sz_val, TY_REAL)
+	        call salloc (orval2, sz_val, TY_REAL)
 	        call me_pyexpand (Memr[rval1], Memr[rval2], Memr[orval1],
 		    Memr[orval2], nver, width)
 	        call me_apolygon (Memi[ix], Memi[iy], Memi[O_VALP(o)], O_LEN(o),

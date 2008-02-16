@@ -24,6 +24,7 @@ int procedure ki_connect (rname)
 
 char	rname[ARB]		# packed resource name, e.g., a filename
 
+size_t	sz_val
 pointer	sp, sbuf, op
 char	alias[SZ_ALIAS]
 int	node, delim, junk, nlookup
@@ -79,7 +80,8 @@ again_
 	    # the local network.
 
 	    call smark (sp)
-	    call salloc (sbuf, SZ_SBUF, TY_CHAR)
+	    sz_val = SZ_SBUF
+	    call salloc (sbuf, sz_val, TY_CHAR)
 
 	    op = sbuf + gstrcpy (n_server[2,node], Memc[sbuf], SZ_SBUF)
 	    Memc[op] = '!';  op = op + 1

@@ -22,6 +22,7 @@ pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 pointer	mw			#O pointer to the mwcs structure
 pointer	coo			#O pointer to the coordinate structure
 
+size_t	sz_val
 double	lngref, latref
 int	recstat, proj
 pointer	sp, projstr, projpars
@@ -30,8 +31,10 @@ pointer	cc_geowcs(), cc_celwcs()
 
 begin
 	call smark (sp)
-	call salloc (projstr, SZ_FNAME, TY_CHAR)
-	call salloc (projpars, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (projstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projpars, sz_val, TY_CHAR)
 
 	if (dt == NULL) {
 
@@ -105,6 +108,7 @@ int     latunits                #I the input dec / latitude units
 pointer	mw			#O pointer to the mwcs structure
 pointer	coo			#O pointer to the celestial coordinate structure
 
+size_t	sz_val
 double	xref, yref, xscale, yscale, xrot, yrot, lngref, latref
 int	coostat, proj, tlngunits, tlatunits, pfd
 pointer	sp, projstr
@@ -116,7 +120,8 @@ errchk	open()
 begin
 	# Allocate some workin space.
 	call smark (sp)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
 
 	# Get the reference point pixel coordinates.
 	xref = clgetd ("xref")
@@ -198,6 +203,7 @@ double  lngref, latref          #O the reference point world coordinates
 pointer sx1, sy1                #O pointer to the linear x and y fits
 pointer sx2, sy2                #O pointer to the distortion x and y fits
 
+size_t	sz_val
 int     i, op, ncoeff, junk, rec, coostat, lngunits, latunits
 pointer mw, xcoeff, ycoeff, sp, projpar, projvalue
 double  dtgetd()
@@ -289,8 +295,9 @@ begin
 
         # Get the projection parameters if any.
         call smark (sp)
-        call salloc (projpar, SZ_FNAME, TY_CHAR)
-        call salloc (projvalue, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (projpar, sz_val, TY_CHAR)
+        call salloc (projvalue, sz_val, TY_CHAR)
         op = strlen (projection) + 1
         do i = 0, 9 {
             call sprintf (Memc[projpar], SZ_FNAME, "projp%d")
@@ -414,6 +421,7 @@ double  xscale, yscale          #I the x and y scale in arcsec / pixel
 double  xrot, yrot              #I the x and y axis rotation angles in degrees
 bool    transpose               #I transpose the wcs
 
+size_t	sz_val
 int     ndim
 double  tlngref, tlatref
 pointer sp, axes, ltm, ltv, r, w, cd, mw, projstr, projpars, wpars
@@ -427,15 +435,21 @@ begin
 
         # Allocate working space.
         call smark (sp)
-        call salloc (projstr, SZ_FNAME, TY_CHAR)
-        call salloc (projpars, SZ_LINE, TY_CHAR)
-        call salloc (wpars, SZ_LINE, TY_CHAR)
-        call salloc (axes, ndim, TY_INT)
-        call salloc (ltm, ndim * ndim, TY_DOUBLE)
-        call salloc (ltv, ndim, TY_DOUBLE)
-        call salloc (r, ndim, TY_DOUBLE)
-        call salloc (w, ndim, TY_DOUBLE)
-        call salloc (cd, ndim * ndim, TY_DOUBLE)
+        sz_val = SZ_FNAME
+        call salloc (projstr, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (projpars, sz_val, TY_CHAR)
+        call salloc (wpars, sz_val, TY_CHAR)
+        sz_val = ndim
+        call salloc (axes, sz_val, TY_INT)
+        sz_val = ndim * ndim
+        call salloc (ltm, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (ltv, sz_val, TY_DOUBLE)
+        call salloc (r, sz_val, TY_DOUBLE)
+        call salloc (w, sz_val, TY_DOUBLE)
+        sz_val = ndim * ndim
+        call salloc (cd, sz_val, TY_DOUBLE)
 
         # Set the wcs.
         iferr (call mw_newsystem (mw, "image", ndim))
@@ -531,6 +545,7 @@ double  lngref, latref          #I the coordinates of the reference point
 pointer sx1, sy1                #I pointer to linear surfaces
 bool    transpose               #I transpose the wcs
 
+size_t	sz_val
 int     ndim
 double  xshift, yshift, a, b, c, d, denom, xpix, ypix, tlngref, tlatref
 pointer mw, sp, projstr, projpars, wpars, r, w, cd, ltm, ltv, axes
@@ -543,15 +558,21 @@ begin
 
         # Allocate working memory for the vectors and matrices.
         call smark (sp)
-        call salloc (projstr, SZ_FNAME, TY_CHAR)
-        call salloc (projpars, SZ_LINE, TY_CHAR)
-        call salloc (wpars, SZ_LINE, TY_CHAR)
-        call salloc (axes, 2, TY_INT)
-        call salloc (r, ndim, TY_DOUBLE)
-        call salloc (w, ndim, TY_DOUBLE)
-        call salloc (cd, ndim * ndim, TY_DOUBLE)
-        call salloc (ltm, ndim * ndim, TY_DOUBLE)
-        call salloc (ltv, ndim, TY_DOUBLE)
+        sz_val = SZ_FNAME
+        call salloc (projstr, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (projpars, sz_val, TY_CHAR)
+        call salloc (wpars, sz_val, TY_CHAR)
+        sz_val = 2
+        call salloc (axes, sz_val, TY_INT)
+        sz_val = ndim
+        call salloc (r, sz_val, TY_DOUBLE)
+        call salloc (w, sz_val, TY_DOUBLE)
+        sz_val = ndim * ndim
+        call salloc (cd, sz_val, TY_DOUBLE)
+        call salloc (ltm, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (ltv, sz_val, TY_DOUBLE)
 
         # Set the wcs.
         iferr (call mw_newsystem (mw, "image", ndim))
@@ -659,6 +680,7 @@ pointer coo                     #I the pointer to the coordinate structure
 char    projection[ARB]         #I the sky projection geometry
 double  lngref, latref          #I the position of the reference point.
 
+size_t	sz_val
 int     ndim
 pointer sp, projstr, projpars, wpars, ltm, ltv, cd, r, w, axes, mw
 int     sk_stati()
@@ -671,15 +693,22 @@ begin
 
         # Allocate working space.
         call smark (sp)
-        call salloc (projstr, SZ_FNAME, TY_CHAR)
-        call salloc (projpars, SZ_LINE, TY_CHAR)
-        call salloc (wpars, SZ_LINE, TY_CHAR)
-        call salloc (ltm, ndim * ndim, TY_DOUBLE)
-        call salloc (ltv, ndim, TY_DOUBLE)
-        call salloc (cd, ndim * ndim, TY_DOUBLE)
-        call salloc (r, ndim, TY_DOUBLE)
-        call salloc (w, ndim, TY_DOUBLE)
-        call salloc (axes, 2, TY_INT)
+        sz_val = SZ_FNAME
+        call salloc (projstr, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (projpars, sz_val, TY_CHAR)
+        call salloc (wpars, sz_val, TY_CHAR)
+        sz_val = ndim * ndim
+        call salloc (ltm, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (ltv, sz_val, TY_DOUBLE)
+        sz_val = ndim * ndim
+        call salloc (cd, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (r, sz_val, TY_DOUBLE)
+        call salloc (w, sz_val, TY_DOUBLE)
+        sz_val = 2
+        call salloc (axes, sz_val, TY_INT)
 
 
         # Set the wcs.

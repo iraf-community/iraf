@@ -46,6 +46,7 @@ pointer	refim				#I the reference image pointer
 char	pmname[ARB]			#O the pixel mask name
 int	sz_pmname			#I the maximum  pixel name length
 
+size_t	sz_val
 pointer	sp, fname, kfname
 pointer	pmim, pm
 int	ip, flags, invflag
@@ -56,8 +57,9 @@ errchk	im_pmmap(), mp_pmmap(), imgstr()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (kfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (kfname, sz_val, TY_CHAR)
 
 	# Remove leading whitespace from the pixel source specification.
 	ip = 1
@@ -154,6 +156,7 @@ pointer	refim			#I the reference image descriptor
 int	flags			#I the pixel list or image flags
 int	invflag			#I invert mask flag, remove when pmio fixed
 
+size_t	sz_val
 pointer	sp, section, pmim, pm, tmp_refim
 int	use_section
 pointer	im_pmmap(), mp_immap()
@@ -163,7 +166,8 @@ errchk	im_pmmap(), mp_immap()
 begin
 	# Does the pmname include an image section.
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
 	call imgsection (pmname, Memc[section], SZ_FNAME)
 	if (Memc[section] == EOS) {
 	    use_section = NO
@@ -209,6 +213,7 @@ pointer procedure mp_immap (pmname)
 
 char	pmname[ARB]		#I the pixel list or image name
 
+size_t	sz_val
 pointer	sp, v1, v2, im, pm, data, pmim
 int	ndim, npix
 pointer	immap(), pm_newmask(), im_pmmapo()
@@ -216,8 +221,9 @@ int	imgnli()
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
@@ -252,6 +258,7 @@ procedure mp_section (pmim)
 
 pointer	pmim			#U mask image descriptor
 
+size_t	sz_val
 pointer	newpm, newpmim, sp, v1, v2, ibuf
 pointer	pl_create(), im_pmmapo()
 int	ndim, depth, npix
@@ -259,8 +266,9 @@ int	imgnls()
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 
@@ -291,6 +299,7 @@ pointer	im			#I the input image descriptor
 pointer	pmim			#I the input mask descriptor
 pointer	pmout			#I the output mask descriptor
 
+size_t	sz_val
 pointer	sp, axlen, v, oldpm, newpm
 int	naxes, depth
 pointer	pl_create()
@@ -301,8 +310,9 @@ int	refim, mapstat
 
 begin
 	call smark (sp)
-	call salloc (axlen, IM_MAXDIM, TY_LONG)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (axlen, sz_val, TY_LONG)
+	call salloc (v, sz_val, TY_LONG)
 
 	# Create new mask.
 	oldpm = imstati (pmim, IM_PLDES)
@@ -412,6 +422,7 @@ procedure mp_invert (pm)
 
 pointer	pm			#U plio descriptor
 
+size_t	sz_val
 pointer	sp, axlen, v, newpm
 int	naxes, depth
 pointer	pl_create()
@@ -419,8 +430,9 @@ pointer	pl_create()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (axlen, IM_MAXDIM, TY_LONG)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (axlen, sz_val, TY_LONG)
+	call salloc (v, sz_val, TY_LONG)
 
 	# Get pixel mask characteristics.
 	call pl_gsize (pm, naxes, Meml[axlen], depth)
@@ -445,14 +457,16 @@ pointer procedure mp_copy (oldpm)
 
 pointer	oldpm			#I old pixel mask pointer
 
+size_t	sz_val
 pointer	sp, axlen, v, newpm
 int	naxes, depth
 pointer	pl_create()
 
 begin
 	call smark (sp)
-	call salloc (axlen, IM_MAXDIM, TY_LONG)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (axlen, sz_val, TY_LONG)
+	call salloc (v, sz_val, TY_LONG)
 
 	call pl_gsize (oldpm, naxes, Meml[axlen], depth)
 	newpm = pl_create (naxes, Meml[axlen], depth)

@@ -6,6 +6,7 @@ procedure rg_pshow (pm)
 
 pointer	pm		#I pointer to psfmatch structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	rg_pstati()
@@ -13,7 +14,8 @@ real	rg_pstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call rg_pstats (pm, CSTRING, Memc[str], SZ_FNAME)
 	call printf ("\nConvolution: %s\n")

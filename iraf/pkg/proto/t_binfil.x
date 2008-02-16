@@ -29,6 +29,7 @@ real	scale_fact, temp
 bool	add_header
 pointer	infile, im, pix, sp, inpix
 
+size_t	sz_val
 int	clplen(), clgfil(), open(), imgnlr(), strlen()
 real	clgetr()
 bool	clgetb()
@@ -91,7 +92,8 @@ begin
 	    }
 
 	    call smark (sp)
-	    call salloc (pix, ncols, TY_SHORT)
+	    sz_val = ncols
+	    call salloc (pix, sz_val, TY_SHORT)
 
 	    # Access pixels and write them out for each row
 	    call amovkl (long(1), v1, IM_MAXDIM)
@@ -129,6 +131,7 @@ long	offset
 bool	flip, sign16
 pointer	infile, im, pix, sp, temp, opix, sp1, hdr, src
 
+size_t	sz_val
 int	clplen(), clgfil(), clgeti()
 int	open(), read()
 bool	clgetb()
@@ -194,14 +197,16 @@ begin
 	    IM_PIXTYPE (im) = ptype
 
 	    call smark (sp)
-	    call salloc (pix, ncols, TY_SHORT)
-	    call salloc (temp, ncols, TY_SHORT)
+	    sz_val = ncols
+	    call salloc (pix, sz_val, TY_SHORT)
+	    call salloc (temp, sz_val, TY_SHORT)
 
 	    # Skip over header pixels if any
 	    nc_skip = nr_skip / 2
 	    if (nr_skip > 0) {
 		call smark (sp1)
-		call salloc (hdr, nc_skip, TY_SHORT)
+		sz_val = nc_skip
+		call salloc (hdr, sz_val, TY_SHORT)
 		if (read (fd, Mems[hdr], nc_skip) != EOF)
 		    ;
 		call sfree (sp1)

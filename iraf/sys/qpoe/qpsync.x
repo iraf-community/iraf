@@ -8,6 +8,7 @@ procedure qp_sync (qp)
 
 pointer	qp			#I QPOE descriptor
 
+size_t	sz_val
 int	n, fd
 pointer	sp, qph
 int	fm_fopen()
@@ -20,7 +21,8 @@ begin
 	# Update the QPOE descriptor and symbol table in the datafile.
 	if (QP_MODIFIED(qp) != NO) {
 	    call smark (sp)
-	    call salloc (qph, LEN_QPH, TY_STRUCT)
+	    sz_val = LEN_QPH
+	    call salloc (qph, sz_val, TY_STRUCT)
 	    call aclri (Memi[qph], LEN_QPH)
 
 	    QPH_MAGIC(qph)	= QP_MAGIC(qp)

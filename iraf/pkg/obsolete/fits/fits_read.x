@@ -12,6 +12,7 @@ int procedure rft_read_fitz (fitsfile, iraffile)
 char	fitsfile[ARB]		# FITS file name
 char	iraffile[ARB]		# IRAF file name
 
+size_t	sz_val
 int	fits_fd, stat, min_lenuserarea, ip
 pointer	im, sp, fits, envstr
 int	rft_read_header(), mtopen(), strlen(), envfind(), ctoi()
@@ -27,8 +28,10 @@ begin
 
 	# Allocate memory for program data structure.
 	call smark (sp)
-	call salloc (fits, LEN_FITS, TY_STRUCT)
-	call salloc (envstr, SZ_FNAME, TY_CHAR)
+	sz_val = LEN_FITS
+	call salloc (fits, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (envstr, sz_val, TY_CHAR)
 
 	# Set up for printing a long or a short header.
 	if (long_header == YES || short_header == YES) {
@@ -119,6 +122,7 @@ procedure rft_find_eof (fd)
 
 int	fd			# the FITS file descriptor
 
+size_t	sz_val
 int	szbuf
 pointer	sp, buf
 int	fstati(), read()
@@ -128,7 +132,8 @@ begin
 	# Scan through the file.
 	szbuf = fstati (fd, F_BUFSIZE)
 	call smark (sp)
-	call salloc (buf, szbuf, TY_CHAR)
+	sz_val = szbuf
+	call salloc (buf, sz_val, TY_CHAR)
 	while (read (fd, Memc[buf], szbuf) != EOF)
 	    ;
 	call sfree (sp)

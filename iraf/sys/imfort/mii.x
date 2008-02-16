@@ -27,6 +27,7 @@ pointer	fp			#I input file
 int	spp[ARB]		#O receives data
 int	maxelem			#I max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
 int	pksize, nchars, nelem
 int	miipksize(), miinelem(), bfrseq()
@@ -39,7 +40,8 @@ begin
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
-	    call salloc (bp, pksize, TY_CHAR)
+	    sz_val = pksize
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    nchars = bfrseq (fp, Memc[bp], pksize)
 	    if (nchars != EOF) {
@@ -72,6 +74,7 @@ pointer	fp			#I input file
 long	spp[ARB]		#O receives data
 int	maxelem			#I max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
 int	pksize, nchars, nelem
 int	miipksize(), miinelem(), bfrseq()
@@ -84,7 +87,8 @@ begin
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
-	    call salloc (bp, pksize, TY_CHAR)
+	    sz_val = pksize
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    nchars = bfrseq (fp, Memc[bp], pksize)
 	    if (nchars != EOF) {
@@ -117,6 +121,7 @@ pointer	fp			#I input file
 real	spp[ARB]		#O receives data
 int	maxelem			# max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
 int	pksize, nchars, nelem
 int	miipksize(), miinelem(), bfrseq()
@@ -129,7 +134,8 @@ begin
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
-	    call salloc (bp, pksize, TY_CHAR)
+	    sz_val = pksize
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    nchars = bfrseq (fp, Memc[bp], pksize)
 	    if (nchars != EOF) {
@@ -162,6 +168,7 @@ pointer	fp			#I output file
 int	spp[ARB]		#I native format data to be written
 int	nelem			#I number of data elements to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize(), bfwseq()
@@ -171,7 +178,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nelem, MII_INT)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipaki (spp, Memc[bp], nelem, TY_INT)
 	if (bfwseq (fp, Memc[bp], bufsize) == ERR)
@@ -191,6 +199,7 @@ pointer	fp			#I output file
 long	spp[ARB]		#I native format data to be written
 int	nelem			#I number of data elements to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize(), bfwseq()
@@ -200,7 +209,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nelem, MII_LONG)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipakl (spp, Memc[bp], nelem, TY_LONG)
 	if (bfwseq (fp, Memc[bp], bufsize) == ERR)
@@ -220,6 +230,7 @@ pointer	fp			#I output file
 real	spp[ARB]		#I native format data to be written
 int	nelem			#I number of data elements to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize(), bfwseq()
@@ -229,7 +240,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nelem, MII_REAL)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipakr (spp, Memc[bp], nelem, TY_REAL)
 	if (bfwseq (fp, Memc[bp], bufsize) == ERR)
@@ -249,6 +261,7 @@ pointer	fp			#I input file
 char	spp[ARB]		#O receives data
 int	maxchars		#I max number of chars to be read
 
+size_t	sz_val
 pointer	sp, bp
 int	pksize, nchars
 int	miipksize(), miinelem(), bfrseq()
@@ -261,7 +274,8 @@ begin
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
-	    call salloc (bp, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    nchars = bfrseq (fp, Memc[bp], pksize)
 	    if (nchars != EOF) {
@@ -294,6 +308,7 @@ pointer	fp			#I output file
 char	spp[ARB]		#I data to be written
 int	nchars			#I number of chars units to be written
 
+size_t	sz_val
 pointer	sp, bp
 int	bufsize, status
 int	miipksize(), bfwseq()
@@ -303,7 +318,8 @@ begin
 	call smark (sp)
 
 	bufsize = miipksize (nchars, MII_BYTE)
-	call salloc (bp, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call miipak8 (spp, Memc[bp], nchars, TY_CHAR)
 	if (bfwseq (fp, Memc[bp], bufsize) == ERR)

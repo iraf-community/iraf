@@ -18,6 +18,7 @@ procedure fxf_opix (im, status)
 pointer	im			#I image descriptor
 int	status 			#O return status
 
+size_t	sz_val
 pointer sp, fn, fit
 char    pathname[SZ_PATHNAME]
 int	compress, blklen, pixoff, filesize
@@ -32,7 +33,8 @@ define  endowr_ 92
 
 begin
 	call smark (sp)
-	call salloc (fn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fn, sz_val, TY_CHAR)
 
 	status = OK
 	fit = IM_KDES(im)
@@ -200,6 +202,7 @@ int procedure fxf_header_size (im)
 
 pointer im 				#I Image descriptor
 
+size_t	sz_val
 bool	inherit
 int	merge, hdr_size
 pointer op, fit, sp, tb, pb
@@ -232,7 +235,8 @@ begin
 	    clines = FIT_CACHEHLEN(fit) / LEN_UACARD
 
 	    call smark (sp)
-	    call salloc (tb, ualen+1, TY_CHAR)
+	    sz_val = ualen+1
+	    call salloc (tb, sz_val, TY_CHAR)
 
 	    merge = NO
 	    pb = tb
@@ -299,6 +303,7 @@ procedure fxf_write_blanks (fd, size)
 int	fd			#I File descriptor
 int	size			#I New size (chars) to allocate.
 
+size_t	sz_val
 pointer sp, bf
 int	nblocks,i, fits_lenc
 
@@ -307,7 +312,8 @@ begin
 
 	# Length of a FITS block (2880) in chars.
 	fits_lenc = FITS_BLOCK_BYTES/SZB_CHAR
-	call salloc (bf, fits_lenc, TY_INT)
+	sz_val = fits_lenc
+	call salloc (bf, sz_val, TY_INT)
 	call amovki (0, Memi[bf], fits_lenc)
 
 	size = FITS_LEN_CHAR(size)
@@ -438,6 +444,7 @@ procedure fxf_overwrite_unit (fit, im)
 pointer	fit			#I Fits descriptor
 pointer	im			#I Image descriptor
 
+size_t	sz_val
 pointer sp, file, mii
 int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
 int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
@@ -461,8 +468,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (file, SZ_FNAME, TY_CHAR)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (file, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_INT)
 	
 	junk = fnroot (IM_HDRFILE(im), Memc[file], SZ_FNAME)
 
@@ -653,6 +662,7 @@ procedure fxf_falloc (fname, size)
 char	fname[ARB]	#I filename
 int	size      	#I size to preallocate in chars
 
+size_t	sz_val
 pointer sp, cp
 int	nb,i, fd
 errchk  open, write
@@ -660,7 +670,8 @@ int	open()
 
 begin
 	call smark (sp)
-	call salloc (cp, FITS_BLOCK_CHARS, TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (cp, sz_val, TY_CHAR)
 	
         call amovkc (' ', Memc[cp], FITS_BLOCK_CHARS)
 	nb = size / FITS_BLOCK_CHARS
@@ -707,6 +718,7 @@ procedure fxf_not_incache (im)
 
 pointer im                      #I image descriptor
 
+size_t	sz_val
 int     cindx, group, sfit[4]
 pointer sp, hdrfile, fit
 bool    streq()
@@ -715,7 +727,8 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-        call salloc (hdrfile, SZ_PATHNAME, TY_CHAR) 
+        sz_val = SZ_PATHNAME
+        call salloc (hdrfile, sz_val, TY_CHAR) 
 
         call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
         fit = IM_KDES(im)

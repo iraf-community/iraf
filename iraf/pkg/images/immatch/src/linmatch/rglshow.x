@@ -6,14 +6,16 @@ procedure rg_lshow (ls)
 
 pointer	ls		#I pointer to linmatch structure
 
+size_t	sz_val
 pointer	sp, str1, str2
 int	rg_lstati()
 real	rg_lstatr()
 
 begin
 	call smark (sp)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	call printf ("\nIntensity Matching Parameters\n")
 	if (rg_lstati (ls, BSALGORITHM) != LS_PHOTOMETRY &&  rg_lstati(ls,

@@ -22,6 +22,7 @@ double	scatter			# additional scatter in equation
 double	rms			# RMS of the fit (output)
 double	errors[ARB]		# errors in coefficients (output)
 
+size_t	sz_val
 int	i
 double	in_rmsd(), nlstatd
 pointer	sp, fit, wts1, rejpts
@@ -39,8 +40,9 @@ begin
 
 	# Allocate memory for fit and weights.
 	call smark (sp)
-	call salloc (fit, npts, TY_DOUBLE)
-	call salloc (wts1, npts, TY_DOUBLE)
+	sz_val = npts
+	call salloc (fit, sz_val, TY_DOUBLE)
+	call salloc (wts1, sz_val, TY_DOUBLE)
 
 	# Set zero weight for rejeceted points.
 	call amovd (wts, Memd[wts1], npts)

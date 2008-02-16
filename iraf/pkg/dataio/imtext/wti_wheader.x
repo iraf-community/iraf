@@ -20,6 +20,7 @@ char	image[ARB]		# Image filename
 int	tx			# File descriptor of text file
 char	out_format[ARB] 	# Output format for pixel conversion
 
+size_t	sz_val
 int	i, nlines, user, op, max_lenuser
 pointer	sp, root, line, comment
 bool	streq()
@@ -30,9 +31,11 @@ errchk	wti_iraf_type, streq, strupr, stropen, strclose, getline
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE,  TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val,  TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	call addcard_i (tx, "BITPIX", NBITS_ASCII, "8-bit ASCII characters")
 	call addcard_i (tx, "NAXIS", IM_NDIM(im), "Number of Image Dimensions")

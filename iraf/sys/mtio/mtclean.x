@@ -23,6 +23,7 @@ int	level			#I 0 for default; 1 to delete all .lok files
 int	stale			#I delete lok file if older than stale seconds
 int	out			#I if nonzero, print messages to this file
 
+size_t	sz_val
 int	fd, status
 pointer	list, ip, cp, device
 pointer	sp, fname, owner, template, lbuf
@@ -36,10 +37,12 @@ define	del_ 91
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (owner, SZ_FNAME, TY_CHAR)
-	call salloc (template, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (owner, sz_val, TY_CHAR)
+	call salloc (template, sz_val, TY_CHAR)
 
 	# Get file name template matching all lock files.
 	call sprintf (Memc[template], SZ_FNAME, "%s%s*%s")

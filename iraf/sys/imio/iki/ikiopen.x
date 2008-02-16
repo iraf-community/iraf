@@ -22,6 +22,7 @@ int	cl_size			#I number of images in cl_index
 int	acmode			#I access mode
 pointer	o_im			#I existing image descriptor, if new_copy
 
+size_t	sz_val
 bool	inherit
 pointer	sp, root, extn, textn, fextn
 int	status, clmode, i, k
@@ -30,10 +31,12 @@ include	"iki.com"
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_PATHNAME, TY_CHAR)
-	call salloc (extn, MAX_LENEXTN, TY_CHAR)
-	call salloc (textn, MAX_LENEXTN, TY_CHAR)
-	call salloc (fextn, MAX_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (textn, sz_val, TY_CHAR)
+	call salloc (fextn, sz_val, TY_CHAR)
 
 	# Compute the access mode for the ACCESS test, below.  If opening an
 	# existing image, all we want to do here is test for the existence of

@@ -510,13 +510,15 @@ pointer	gif					#i Gif struct pointer
 char	label					#i GIF extension label
 int	verbose					#i print verbose info?
 
+size_t	sz_val
 pointer	sp, buf
 int	val
 int	and(), gif_get_data_block()
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_GIFCODE, TY_CHAR)
+	sz_val = SZ_GIFCODE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	switch (label) {
 	case GE_PLAINTEXT:			# Plain Text Extension
@@ -612,6 +614,7 @@ int procedure gif_lzw_rdbyte (gif)
 
 pointer	gif					#i GIF struct pointer
 
+size_t	sz_val
 pointer	sp, buf
 int     i, count
 int	code, incode
@@ -661,7 +664,8 @@ begin
                     return (ERR)
 
 		call smark (sp)
-		call salloc (buf, 260, TY_CHAR)
+		sz_val = 260
+		call salloc (buf, sz_val, TY_CHAR)
 
 		repeat {
                     count = gif_get_data_block (gif, Memc[buf])
@@ -863,6 +867,7 @@ int	fd					#i file descriptor
 char	buffer[ARB]				#o output buffer
 int	len					#i no. of bytes to read
 
+size_t	sz_val
 pointer	sp, bp
 
 long    filepos
@@ -870,7 +875,8 @@ common  /gifcom/ filepos
 
 begin
 	call smark (sp)
-	call salloc (bp, len+1, TY_CHAR)
+	sz_val = len+1
+	call salloc (bp, sz_val, TY_CHAR)
 	call aclrc (Memc[bp], len+1)
 
 	call ip_agetb (fd, bp, len)		# read the bytes

@@ -24,6 +24,7 @@ int	maxch			# max chars out
 char	patbuf[ARB]		# encoded pattern
 int	timeout			# timeout interval, msec (0 for no timeout)
 
+size_t	sz_val
 bool	match
 pointer	sp, ip, op, buf
 int	sv_iomode, iomode, delay, first, last, nchars, ch
@@ -33,7 +34,8 @@ define	abort_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Save raw mode state and set up for nonblocking raw mode reads
 	# if a timeout interval was specified.

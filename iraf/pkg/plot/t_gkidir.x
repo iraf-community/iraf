@@ -12,12 +12,14 @@ procedure t_gkidir ()
 
 pointer	sp, mc_fname, list
 int	mfd
+size_t	sz_val
 int	open(), clgfil()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (mc_fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (mc_fname, sz_val, TY_CHAR)
 
 	list = clpopni ("input")
 	while (clgfil (list, Memc[mc_fname], SZ_FNAME) != EOF) {

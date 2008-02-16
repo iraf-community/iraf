@@ -67,13 +67,15 @@ bool	os_has_file_locking
 int	nsec, delay, status
 long	fi[LEN_FINFO]
 pointer	sp, lockfile, timelock1, timelock2, fname
+size_t	sz_val
 long	clktime()
 data	os_has_file_locking /OS_FILELOCKING/
 errchk	syserrs
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Even if file locking is provided by the OS we must determine if the
 	# file does not exist or is write protected.  If the file is not write
@@ -89,9 +91,10 @@ begin
 	    return (clktime (long(0)))
 	}
 
-	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (timelock1, sz_val, TY_CHAR)
+	call salloc (timelock2, sz_val, TY_CHAR)
 
 	# Host system does not provide file locking; we must do it ourselves
 	# using null files as semaphores.  The lock files need not exist
@@ -159,6 +162,7 @@ int procedure osfn_timeleft (osfn, time)
 char	osfn[ARB]		# OS pathname of file to be locked
 long	time			# time when lock set
 
+size_t	sz_val
 bool	os_has_file_locking
 int	time_left, status, file_exists
 long	fi[LEN_FINFO]
@@ -171,9 +175,10 @@ begin
 	    return (FILELOCK_PERIOD)
 
 	call smark (sp)
-	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (timelock1, sz_val, TY_CHAR)
+	call salloc (timelock2, sz_val, TY_CHAR)
 
 	call osfn_mkfnames (osfn, Memc[lockfile], Memc[timelock1],
 	    Memc[timelock2], SZ_PATHNAME)
@@ -208,6 +213,7 @@ int procedure osfn_unlock (osfn, time)
 char	osfn[ARB]		# OS pathname of file to be locked
 long	time			# time when lock set
 
+size_t	sz_val
 bool	os_has_file_locking
 int	time_left, status
 pointer	sp, lockfile, timelock1, timelock2
@@ -219,9 +225,10 @@ begin
 	    return (FILELOCK_PERIOD)
 
 	call smark (sp)
-	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (timelock1, sz_val, TY_CHAR)
+	call salloc (timelock2, sz_val, TY_CHAR)
 
 	call osfn_mkfnames (osfn, Memc[lockfile], Memc[timelock1],
 	    Memc[timelock2], SZ_PATHNAME)
@@ -245,6 +252,7 @@ char	osfn[ARB]		# OS pathname of main file
 bool	os_has_file_locking
 int	junk
 pointer	sp, lockfile, timelock1, timelock2
+size_t	sz_val
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
@@ -252,9 +260,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (timelock1, sz_val, TY_CHAR)
+	call salloc (timelock2, sz_val, TY_CHAR)
 
 	call osfn_mkfnames (osfn, Memc[lockfile], Memc[timelock1],
 	    Memc[timelock2], SZ_PATHNAME)
@@ -278,6 +287,7 @@ char	osfn[ARB]		# OS pathname of file to be locked
 bool	os_has_file_locking
 int	status
 pointer	sp, lockfile, timelock1, timelock2
+size_t	sz_val
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
@@ -285,9 +295,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
-	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (timelock1, sz_val, TY_CHAR)
+	call salloc (timelock2, sz_val, TY_CHAR)
 
 	call osfn_mkfnames (osfn, Memc[lockfile], Memc[timelock1],
 	    Memc[timelock2], SZ_PATHNAME)
@@ -314,13 +325,15 @@ char	timelock1[maxch]	# OSFN of the first timelock file
 char	timelock2[maxch]	# OSFN of the second timelock file
 int	maxch
 
+size_t	sz_val
 char	ch
 int	op, last_dot, max_chars
 pointer	sp, ip, fname
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call strupk (osfn, Memc[fname], SZ_PATHNAME)
 	ip = fname

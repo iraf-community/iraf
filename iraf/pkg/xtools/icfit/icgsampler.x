@@ -97,6 +97,7 @@ pointer	gt				# GTOOLS pointer
 real	x[npts]				# Ordinates of graph
 int	npts				# Number of data points
 
+size_t	sz_val
 pointer	sp, str, rg
 int	i,  j, axis, pltype1
 real	w, diff
@@ -127,7 +128,8 @@ begin
 	rg = rg_xrangesr (Memc[IC_SAMPLE(ic)], x, npts)
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	Memc[IC_SAMPLE(ic)] = EOS
 
 	# Find nearest sample region

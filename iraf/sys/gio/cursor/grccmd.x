@@ -51,6 +51,7 @@ int	raster			#I raster number
 real	rx, ry			#I raster coords of cursor
 char	opstr[ARB]		#I options string excluding the leading ":.".
 
+size_t	sz_val
 pointer	tr, p_tr, sp, fname, lbuf, tty
 bool	clobber, fullframe, auto_gflush
 int	ip, op, ch, opcode, cursor
@@ -67,8 +68,10 @@ define	exit_ 91
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# The terminal is left in graphics mode when the user types return to
 	# enter the command.  Echo the user command to the terminal without

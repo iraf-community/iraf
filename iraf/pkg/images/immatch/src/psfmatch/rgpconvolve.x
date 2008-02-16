@@ -14,6 +14,7 @@ int	nxk, nyk	# dimensions of the kernel
 int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 
+size_t	sz_val
 int	i, ncols, nlines, col1, col2, nincols, inline, outline
 pointer	sp, lineptrs, linebuf, outbuf, nkern
 pointer	imgs2r(), impl2r()
@@ -22,8 +23,10 @@ errchk	imgs2r, impl2r
 begin
 	# Set up an array of line pointers.
 	call smark (sp)
-	call salloc (lineptrs, nyk, TY_POINTER)
-	call salloc (nkern, nxk * nyk, TY_REAL)
+	sz_val = nyk
+	call salloc (lineptrs, sz_val, TY_POINTER)
+	sz_val = nxk * nyk
+	call salloc (nkern, sz_val, TY_REAL)
 
 	# Set the number of image buffers.
 	call imseti (im1, IM_NBUFS, nyk)
@@ -57,7 +60,8 @@ begin
 	}
 
 	# Generate the output image line by line
-	call salloc (linebuf, nincols, TY_REAL)
+	sz_val = nincols
+	call salloc (linebuf, sz_val, TY_REAL)
 	do outline = 1, nlines {
 
 	    # Scroll the input buffers

@@ -268,6 +268,7 @@ int	hdroff		#I Header offset
 int 	poff		#I Pixel offset
 int	datasize	#I New FITS unit size
 
+size_t	sz_val
 pointer sp, tempfile, outname
 int	nchars, junk, inoff, out_fd, size
 int	fnldir(), fnroot(), open()
@@ -277,8 +278,9 @@ errchk	fxf_make_adj_copy, fxf_write_blanks
 
 begin
 	call smark (sp)
-	call salloc (tempfile, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tempfile, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
 
 	nchars = fnldir (IM_HDRFILE(im), Memc[tempfile], SZ_FNAME)
 	junk = fnroot (IM_HDRFILE(im), Memc[tempfile+nchars], SZ_FNAME)
@@ -316,6 +318,7 @@ procedure fxf_plpf (im)
 
 pointer im				#I IMIO descriptor
 
+size_t	sz_val
 int	pfd
 pointer	sp, imname, ref_im
 int	sv_acmode, sv_update, ndim, i, depth
@@ -324,7 +327,8 @@ int	open()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_IMNAME, TY_CHAR)
+	sz_val = SZ_IMNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	# Complete the initialization of a mask image.
 	ref_im = IM_PLREFIM(im)

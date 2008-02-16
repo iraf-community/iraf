@@ -43,6 +43,7 @@ pointer	cv				# CURFIT pointer for error listing
 real	x[npts], y[npts], wts[npts]	# Data arrays for error listing
 int	npts				# Number of data points
 
+size_t	sz_val
 real	val, rcveval()
 char	key, xtype, ytype
 bool	bval
@@ -66,7 +67,8 @@ begin
 	# abbreviated with the list of commands.
 
 	call smark (sp)
-	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
+	sz_val = IC_SZSAMPLE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], IC_SZSAMPLE)

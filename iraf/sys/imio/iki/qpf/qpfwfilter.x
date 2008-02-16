@@ -9,6 +9,7 @@ procedure qpf_wfilter (qpf, im)
 pointer	qpf				#I QPF descriptor
 pointer	im				#I image descriptor
 
+size_t	sz_val
 int	nchars, nleft, index
 pointer	io, sp, bp, ip, kw, strval
 errchk	qpio_getfilter, impstr
@@ -20,9 +21,12 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (kw, SZ_KWNAME, TY_CHAR)
-	call salloc (bp, SZ_MAXFILTER, TY_CHAR)
-	call salloc (strval, SZ_BIGSTR, TY_CHAR)
+	sz_val = SZ_KWNAME
+	call salloc (kw, sz_val, TY_CHAR)
+	sz_val = SZ_MAXFILTER
+	call salloc (bp, sz_val, TY_CHAR)
+	sz_val = SZ_BIGSTR
+	call salloc (strval, sz_val, TY_CHAR)
 
 	# Get the filter as as string from QPIO.
 	nchars = qpio_getfilter (io, Memc[bp], SZ_MAXFILTER)

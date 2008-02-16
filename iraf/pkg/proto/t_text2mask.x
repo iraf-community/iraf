@@ -17,6 +17,7 @@ short	cinterp			# Mask value for narrow column rectangles
 short	square			# Mask value for squares
 short	pixel			# Mask value for single pixel
 
+size_t	sz_val
 short	val
 int	i, fd, nc1, nl1, c1, c2, l1, l2
 pointer	sp, pm
@@ -27,8 +28,9 @@ errchk	open, immap
 
 begin
 	call smark (sp)
-	call salloc (text, SZ_FNAME, TY_CHAR)
-	call salloc (mask, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (text, sz_val, TY_CHAR)
+	call salloc (mask, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("mask", Memc[mask], SZ_FNAME)

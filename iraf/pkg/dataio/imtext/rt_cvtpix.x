@@ -13,6 +13,7 @@ pointer	im		# Pointer to image header
 int	format		# Format of text pixels (integer/floating point)
 int	pixels		# Get pixels from input text file?
 
+size_t	sz_val
 pointer	bufptr, sp, word1, pattern
 int	stat, nlines, npix, i
 long	v[IM_MAXDIM], start
@@ -33,8 +34,9 @@ begin
 
 	if (pixels == YES && format == UNSET) {
 	    call smark (sp)
-	    call salloc (word1,   SZ_LINE, TY_CHAR)
-	    call salloc (pattern, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (word1, sz_val, TY_CHAR)
+	    call salloc (pattern, sz_val, TY_CHAR)
 
 	    # Note position so we can return to it
 	    start = note (tf)

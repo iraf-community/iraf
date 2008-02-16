@@ -13,6 +13,7 @@ char	drive[ARB]		#I packed name of drive to be rewound
 char	devcap[ARB]		#I packed tapecap entry for device
 int	status			#O receives status, ok|err
 
+size_t	sz_val
 pointer	sp, bp
 int	server, dv_len, dc_len, dc_off, nbytes
 int	ki_connect(), ki_send(), ki_receive(), strlen()
@@ -27,7 +28,8 @@ begin
 
 	} else {
 	    call smark (sp)
-	    call salloc (bp, SZ_COMMAND, TY_CHAR)
+	    sz_val = SZ_COMMAND
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    # Determine whether devcap string will fit in sbuf.
 	    call strupk (devcap, Memc[bp], SZ_COMMAND)

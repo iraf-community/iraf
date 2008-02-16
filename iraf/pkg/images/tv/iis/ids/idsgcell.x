@@ -14,6 +14,7 @@ int	nc, nr			# number of pixels in X and Y
 int	ax1, ay1		# lower left corner of input window
 int	ax2, ay2		# upper right corner of input window
 
+size_t	sz_val
 int	x1, y1, x2, y2
 int	nx,ny			# number of device pixels in x and y
 real	px1, px2, py1, py2
@@ -88,7 +89,8 @@ begin
 
 	# allocate storage for output
 
-	call salloc (mp, nc*nr, TY_SHORT)
+	sz_val = nc*nr
+	call salloc (mp, sz_val, TY_SHORT)
 	sy = 0
 	bcy = blocky
 	startrow = 1
@@ -103,7 +105,8 @@ begin
 	} else {
 	    use_orig = false
 	    # allocate storage for a row of pixels.
-	    call salloc ( cell, nx, TY_SHORT)
+	    sz_val = nx
+	    call salloc ( cell, sz_val, TY_SHORT)
 	}
 	new_row = true
 

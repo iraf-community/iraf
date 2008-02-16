@@ -23,6 +23,7 @@ int	mode			#I access mode: NEW_FILE or APPEND
 char	uifname[ARB]		#I user interface specification file
 int	fd			#I metacode output file
 
+size_t	sz_val
 pointer	gp, tty
 int	outfd, stream_type, junk
 bool	close_at_end, kf_ok, vdm_device, std_stream
@@ -44,9 +45,10 @@ string	stdvdm 	 "stdvdm"
 
 begin
 	call smark (sp)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
-	call salloc (envname, SZ_FNAME, TY_CHAR)
-	call salloc (kfname,  SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
+	call salloc (envname, sz_val, TY_CHAR)
+	call salloc (kfname, sz_val, TY_CHAR)
 
 	call flush (STDOUT)
 

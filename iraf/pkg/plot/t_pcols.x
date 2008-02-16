@@ -13,14 +13,17 @@ pointer	image, wcslab, fmt
 pointer	im, mw, ct, sp, x_vec, y_vec
 int	col1, col2, ncols, nlines
 real	zmin, zmax
+size_t	sz_val
 int	clgeti()
 pointer	immap(), mw_openim(), mw_sctran()
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (wcslab, SZ_LINE, TY_CHAR)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (wcslab, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
 
 	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -78,13 +81,15 @@ char	wcslab[sz_wcslab]	# WCS label if present
 char	format[sz_wcslab]	# WCS format if present
 int	sz_wcslab	# String length
  
+size_t	sz_val
 int     i, nrows, ncols
 pointer	sp, axvals, off, imgl2r()
 real    asumr()
  
 begin
 	call smark (sp)
-	call salloc (axvals, IM_MAXDIM, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (axvals, sz_val, TY_REAL)
 
         # Fill x and y arrays.
         nrows = IM_LEN(im,2)
@@ -120,6 +125,7 @@ char	wcslab[ARB]				#I WCS label
 char	format[ARB]				#I WCS format
 bool	pcols					#I Is task PCOLS? (y/n)
 
+size_t	sz_val
 pointer	sp, gp
 pointer	device, marker, xlabel, ylabel, title, suffix
 real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, szm, tol
@@ -133,12 +139,15 @@ int	btoi(), clgeti()
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (marker, SZ_FNAME, TY_CHAR)
-	call salloc (xlabel, SZ_LINE,  TY_CHAR)
-	call salloc (ylabel, SZ_LINE,  TY_CHAR)
-	call salloc (title,  SZ_LINE,  TY_CHAR)
-	call salloc (suffix, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	call salloc (marker, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xlabel, sz_val,  TY_CHAR)
+	call salloc (ylabel, sz_val,  TY_CHAR)
+	call salloc (title, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (suffix, sz_val, TY_CHAR)
 
 	call clgstr ("device", Memc[device], SZ_FNAME)
 	mode = NEW_FILE

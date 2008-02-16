@@ -11,6 +11,7 @@ int procedure fdevblk (path)
 
 char	path[ARB]			# pathname of directory or file
 
+size_t	sz_val
 pointer	sp, fname, ldir, tempfn
 int	fd, junk, block_size
 int	fstati(), open(), fnldir()
@@ -18,9 +19,10 @@ errchk	mktemp, open, close
 
 begin
 	call smark (sp)
-	call salloc (ldir,   SZ_PATHNAME, TY_CHAR)
-	call salloc (fname,  SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (ldir, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (tempfn, sz_val, TY_CHAR)
 
 	# Generate the name of a temporary file in named directory.
 	junk = fnldir (path, Memc[ldir], SZ_PATHNAME)

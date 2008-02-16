@@ -12,6 +12,7 @@ char	image[ARB]		# input image name
 char	root[SZ_PATHNAME]	# output root pathname
 char	extn[MAX_LENEXTN]	# output extension
 
+size_t	sz_val
 int	delim, ip, op
 pointer	sp, pattern, osfn
 int	strmatch(), strlen()
@@ -19,8 +20,10 @@ string	ex HDR_EXTENSIONS
 
 begin
 	call smark (sp)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pattern, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	# Parse the image name into the root and extn fields.  The portion
 	# of the filename excluding any directory specification is also

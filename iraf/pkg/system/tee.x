@@ -11,6 +11,7 @@ define	SZ_OTSTR	10
 procedure t_tee()
 
 char	tee_file[SZ_FNAME], out_type_string[SZ_OTSTR]
+size_t	sz_val
 bool	clgetb()
 pointer	sp, buf
 int	out, sz_buf, out_type, nchars
@@ -36,7 +37,8 @@ begin
 	call smark (sp)
 
 	if (out_type == TEXT_FILE) {
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	    while (getline (STDIN, Memc[buf]) != EOF) {
 		call putline (STDOUT, Memc[buf])
 		call putline (out, Memc[buf])
@@ -44,7 +46,8 @@ begin
 
 	} else {
 	    sz_buf = fstati (STDIN, F_BUFSIZE)
-	    call salloc (buf, sz_buf, TY_CHAR)
+	    sz_val = sz_buf
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    while (read (STDIN, Memc[buf], sz_buf) != EOF) {
 		nchars = fstati (STDIN, F_NCHARS)

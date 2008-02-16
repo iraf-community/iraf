@@ -23,6 +23,7 @@ int	xc, yc			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 real	x, y, dx, dy, tsz
 int	x1, x2, y1, y2, orien
 int	x0, y0, gki_dx, gki_dy, ch, cw
@@ -40,7 +41,8 @@ data	g_x1 /0/, g_y1 /0/, g_x2 /GKI_MAXNDC/, g_y2 / GKI_MAXNDC/
 
 begin
 	call smark (sp)
-	call salloc (seg, n + 2, TY_CHAR)
+	sz_val = n + 2
+	call salloc (seg, sz_val, TY_CHAR)
 
 	# Keep track of the number of drawing instructions since the last frame
 	# clear.

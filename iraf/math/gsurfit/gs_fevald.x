@@ -17,6 +17,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
@@ -44,9 +45,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_DOUBLE)
-	call salloc (yb, yorder * npts, TY_DOUBLE)
-	call salloc (accum, npts, TY_DOUBLE)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_DOUBLE)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_DOUBLE)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_bpol (x, npts, xorder, k1x, k2x, Memd[xb])
@@ -112,6 +116,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
@@ -124,9 +129,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_DOUBLE)
-	call salloc (yb, yorder * npts, TY_DOUBLE)
-	call salloc (accum, npts, TY_DOUBLE)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_DOUBLE)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_DOUBLE)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_bcheb (x, npts, xorder, k1x, k2x, Memd[xb])
@@ -193,6 +201,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
+size_t	sz_val
 int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, accum, xbptr, ybptr
 
@@ -205,9 +214,12 @@ begin
 
 	# allocate temporary space for the basis functions
 	call smark (sp)
-	call salloc (xb, xorder * npts, TY_DOUBLE)
-	call salloc (yb, yorder * npts, TY_DOUBLE)
-	call salloc (accum, npts, TY_DOUBLE)
+	sz_val = xorder * npts
+	call salloc (xb, sz_val, TY_DOUBLE)
+	sz_val = yorder * npts
+	call salloc (yb, sz_val, TY_DOUBLE)
+	sz_val = npts
+	call salloc (accum, sz_val, TY_DOUBLE)
 
 	# calculate basis functions
 	call dgs_bleg (x, npts, xorder, k1x, k2x, Memd[xb])

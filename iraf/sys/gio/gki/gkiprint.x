@@ -158,6 +158,7 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 int	mode			# access mode
 
+size_t	sz_val
 int	junk
 pointer	sp, buf
 int	itoc()
@@ -166,7 +167,8 @@ common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, max (SZ_FNAME, n), TY_CHAR)
+	sz_val = max (SZ_FNAME, n)
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call achtsc (devname, Memc[buf], n)
 	Memc[buf+n] = EOS
@@ -194,11 +196,13 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
+size_t	sz_val
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call achtsc (devname, Memc[buf], n)
 	Memc[buf+n] = EOS
@@ -249,11 +253,13 @@ short	title[ARB]		# title string
 int	n			# length of title string
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
+size_t	sz_val
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call achtsc (title, Memc[buf], n)
 	Memc[buf+n] = EOS
@@ -359,13 +365,15 @@ int	x, y			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call achtsc (text, Memc[buf], n)
 	Memc[buf+n] = EOS
@@ -432,6 +440,7 @@ int	nx, ny			# number of pixels in X and Y
 int	x1, y1			# lower left corner of input window
 int	x2, y2			# lower left corner of input window
 
+size_t	sz_val
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
@@ -459,7 +468,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (buf, nx * ny, TY_SHORT)
+	sz_val = nx * ny
+	call salloc (buf, sz_val, TY_SHORT)
 	call amovks (short(-1), Mems[buf], nx * ny)
 
 	call flush (fd)
@@ -620,6 +630,7 @@ procedure gkp_setwcs (wcs, nwords)
 short	wcs[ARB]		# WCS data
 int	nwords			# number of words of data
 
+size_t	sz_val
 int	i, nwcs
 pointer	sp, wcs_temp, w
 int	fd, stream, verbose, gkiunits
@@ -627,7 +638,8 @@ common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (wcs_temp, LEN_WCSARRAY, TY_STRUCT)
+	sz_val = LEN_WCSARRAY
+	call salloc (wcs_temp, sz_val, TY_STRUCT)
 
 	call fprintf (fd, "set_wcs nwords=%d\n")
 	    call pargi (nwords)

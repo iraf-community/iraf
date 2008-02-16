@@ -159,6 +159,7 @@ int	npix		# number of data pixels
 int	nsinc		# sinc truncation length
 real	mindx		# interpolation minimum
 
+size_t	sz_val
 int	i, j, xc, minj, maxj, offj
 pointer	sp, taper
 real	dx, dxn, dx2, w1, sconst, a2, a4, sum, sumw
@@ -172,7 +173,8 @@ begin
 	# Pre-compute the taper array. Incorporate the sign change portion
 	# of the sinc interpolator into the taper array.
 	call smark (sp)
-	call salloc (taper, 2 * nsinc + 1, TY_REAL)
+	sz_val = 2 * nsinc + 1
+	call salloc (taper, sz_val, TY_REAL)
 	if (mod (nsinc, 2) == 0)
 	    w1 = 1.0
 	else

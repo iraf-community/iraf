@@ -17,6 +17,7 @@ int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 int	nimages			# Number of images
+size_t	sz_val
 int	npts			# Number of output points per line
 $if (datatype == sil)
 real	average[npts]		# Average
@@ -55,9 +56,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -304,6 +308,7 @@ int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 int	nimages			# Number of images
+size_t	sz_val
 int	npts			# Number of output points per line
 $if (datatype == sil)
 real	median[npts]		# Median
@@ -337,9 +342,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]

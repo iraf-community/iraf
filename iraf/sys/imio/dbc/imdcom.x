@@ -10,6 +10,7 @@ procedure imdcom (im, key)
 pointer	im			#I image descriptor
 char	key[ARB]		#I parameter to be set
 
+size_t	sz_val
 bool	string_valued
 int	ch, i, ti, j, n
 pointer	rp, ip, op, sp, val, start, text, cmmt
@@ -18,9 +19,10 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	call salloc (val, SZ_LINE, TY_CHAR)
-	call salloc (text, SZ_LINE, TY_CHAR)
-	call salloc (cmmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (val, sz_val, TY_CHAR)
+	call salloc (text, sz_val, TY_CHAR)
+	call salloc (cmmt, sz_val, TY_CHAR)
 
 	# Find the record.
 	if (idb_findrecord (im, key, rp) == 0)

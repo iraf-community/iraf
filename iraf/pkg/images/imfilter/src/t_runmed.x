@@ -18,6 +18,7 @@ real	blank			# Blank values
 pointer	storetype		# Storage type
 bool	verbose			# Verbose?
 
+size_t	sz_val
 pointer	sp
 
 int	clgeti()
@@ -27,11 +28,12 @@ pointer	imtopenp()
 
 begin
 	call smark (sp)
-	call salloc (inmaskkey, SZ_FNAME, TY_CHAR)
-	call salloc (outmaskkey, SZ_FNAME, TY_CHAR)
-	call salloc (outtype, SZ_FNAME, TY_CHAR)
-	call salloc (scale, SZ_FNAME, TY_CHAR)
-	call salloc (storetype, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inmaskkey, sz_val, TY_CHAR)
+	call salloc (outmaskkey, sz_val, TY_CHAR)
+	call salloc (outtype, sz_val, TY_CHAR)
+	call salloc (scale, sz_val, TY_CHAR)
+	call salloc (storetype, sz_val, TY_CHAR)
 
 	input = imtopenp ("input")
 	output = imtopenp ("output")

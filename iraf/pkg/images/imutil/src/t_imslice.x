@@ -19,6 +19,7 @@ pointer image2                  # Output image
 int	sdim			# Dimension to be sliced
 int	verbose			# Verbose mode
 
+size_t	sz_val
 pointer sp
 pointer	list1, list2
 
@@ -29,10 +30,11 @@ errchk	sl_slice
 
 begin
         call smark (sp)
-        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
-        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
-        call salloc (image1, SZ_FNAME, TY_CHAR)
-        call salloc (image2, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (imtlist1, sz_val, TY_CHAR)
+        call salloc (imtlist2, sz_val, TY_CHAR)
+        call salloc (image1, sz_val, TY_CHAR)
+        call salloc (image2, sz_val, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -72,6 +74,7 @@ char	image2[ARB]		# output image
 int	sdim			# slice dimension
 int	verbose			# verbose mode
 
+size_t	sz_val
 int	i, j, ndim, fdim, ncols, nlout, nimout, pdim
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, inname, outname, outsect, im1, im2, buf1, buf2, vim1, vim2
@@ -124,14 +127,18 @@ begin
 	#}
 
 	call smark (sp)
-	call salloc (inname, SZ_LINE, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (outsect, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outsect, sz_val, TY_CHAR)
 
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
-	call salloc (vim1, IM_MAXDIM, TY_LONG)
-	call salloc (vim2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vim1, sz_val, TY_LONG)
+	call salloc (vim2, sz_val, TY_LONG)
 
 	# Compute the number of output images. and the number of columns
 	nimout = IM_LEN(im1, sdim)

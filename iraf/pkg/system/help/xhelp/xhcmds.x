@@ -24,6 +24,7 @@ procedure xh_command_loop (xh)
 
 pointer	xh					#I task descriptor
 
+size_t	sz_val
 pointer	sp, cmd, name, pkg, pat, opt, dev
 real    x, y
 int     wcs, key, exact_match
@@ -35,12 +36,13 @@ int     xh_pkglist()
 
 begin
 	call smark (sp)
-	call salloc (name, SZ_FNAME, TY_CHAR)
-	call salloc (pkg, SZ_FNAME, TY_CHAR)
-	call salloc (opt, SZ_FNAME, TY_CHAR)
-	call salloc (dev, SZ_FNAME, TY_CHAR)
-	call salloc (cmd, SZ_FNAME, TY_CHAR)
-	call salloc (pat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (name, sz_val, TY_CHAR)
+	call salloc (pkg, sz_val, TY_CHAR)
+	call salloc (opt, sz_val, TY_CHAR)
+	call salloc (dev, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (pat, sz_val, TY_CHAR)
 
 
 	# Enter the command loop.

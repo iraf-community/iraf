@@ -11,11 +11,13 @@ pointer	gp			#I graphics descriptor
 char	object[ARB]		#I object name
 char	format[ARB]		#I print format
 
+size_t	sz_val
 pointer	sp, fmt
 
 begin
 	call smark (sp)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmt, sz_val, TY_CHAR)
 
 	call sprintf (Memc[fmt], SZ_LINE, "\031%s %s\035\037")
 	    call pargstr (object)

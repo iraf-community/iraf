@@ -16,6 +16,7 @@ real	rvals[npts]		# Range values (sorted)
 int	npts			# Number of range values
 pointer	rg			# Range pointer
 
+size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 pointer	sp, str, ptr
 errchk	open, rg_xaddr
@@ -26,7 +27,8 @@ begin
 	    call error (0, "No data points for range determination")
 
 	call smark (sp)
-	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
+	sz_val = max (strlen (rstr), SZ_LINE)
+	call salloc (str, sz_val, TY_CHAR)
 	call calloc (rg, LEN_RG, TY_STRUCT)
 
 	i = 1
@@ -76,13 +78,15 @@ char	rstr[ARB]		# Range string
 real	rvals[npts]		# Range values (sorted)
 int	npts			# Number of range values
 
+size_t	sz_val
 int	i, j, k, nrgs, strlen(), ctor()
 real	rval1, rval2, a1, b1, a2, b2
 pointer	sp, str, ptr
 
 begin
 	call smark (sp)
-	call salloc (str, strlen (rstr), TY_CHAR)
+	sz_val = strlen (rstr)
+	call salloc (str, sz_val, TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {

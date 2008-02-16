@@ -17,6 +17,7 @@ real	x, y			# position at which text is to be drawn
 char	text[ARB]		# text to be drawn
 char	format[ARB]		# text drawing parameters
 
+size_t	sz_val
 int	ip, i
 real	mx, my
 pointer	sp, ap, tx
@@ -24,7 +25,8 @@ bool	text_attributes_modified
 
 begin
 	call smark (sp)
-	call salloc (ap, LEN_TX, TY_STRUCT)
+	sz_val = LEN_TX
+	call salloc (ap, sz_val, TY_STRUCT)
 
 	# Set up pointers to text attribute packets and initialize the
 	# new packet to the default values.  Two text attribute packets

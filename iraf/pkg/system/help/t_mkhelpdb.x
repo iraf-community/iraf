@@ -14,6 +14,7 @@ procedure t_mkhelpdb()
 
 bool	verbose
 pointer	sp, helpdir, helpdb, tempname
+size_t	sz_val
 int	envgets(), access()
 bool	streq(), clgetb()
 string	s_helpdir "helpdir"
@@ -21,9 +22,10 @@ string	s_helpdb "helpdb"
 
 begin
 	call smark (sp)
-	call salloc (helpdir,  SZ_FNAME, TY_CHAR)
-	call salloc (helpdb,   SZ_FNAME, TY_CHAR)
-	call salloc (tempname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (helpdir, sz_val, TY_CHAR)
+	call salloc (helpdb, sz_val, TY_CHAR)
+	call salloc (tempname, sz_val, TY_CHAR)
 
 	# Fetch the names of the root help directory file and the new database
 	# file.  If the names are "helpdir" or "helpdb", the filenames are

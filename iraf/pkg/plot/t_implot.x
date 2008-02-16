@@ -856,6 +856,7 @@ int	linecol			# line or column number
 int	navg			# number of lines or columns to be averaged
 bool	lineplot		# true if line is to be extracted
 
+size_t	sz_val
 real	norm
 pointer	sp, axvals, buf, off
 int	x1, x2, y1, y2
@@ -866,7 +867,8 @@ errchk	imgl2r, imgs2r, imgl1r, imgs1r, plt_wcs
 
 begin
 	call smark (sp)
-	call salloc (axvals, IM_NDIM(im), TY_REAL)
+	sz_val = IM_NDIM(im)
+	call salloc (axvals, sz_val, TY_REAL)
 
 	call strcpy (wcstype, xlabel, SZ_FNAME)
 
@@ -963,6 +965,7 @@ bool	rescale[2]		# rescale plot
 char	image[ARB]		# image name
 char	xlabel[ARB]		# X label
 
+size_t	sz_val
 real	junkr
 int	i, i1, i2, npix, maxch
 pointer	sp, ip, plot_title, op
@@ -973,7 +976,8 @@ common	/comimp/ x1, x2, y1, y2
 
 begin
 	call smark (sp)
-	call salloc (plot_title, SZ_PLOTTITLE, TY_CHAR)
+	sz_val = SZ_PLOTTITLE
+	call salloc (plot_title, sz_val, TY_CHAR)
 
 	# Format the plot title, starting with the system banner.
 	call sysid (Memc[plot_title], SZ_PLOTTITLE)

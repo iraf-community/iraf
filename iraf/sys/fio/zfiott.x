@@ -51,6 +51,7 @@ char	buf[ARB]		# output buffer
 int	maxch			# max chars out
 int	status			# actual chars out
 
+size_t	sz_val
 pointer	sp, logbuf
 int	nchars, ch, i
 int	ztt_lowercase(), ztt_query(), gstrcpy(), and()
@@ -68,7 +69,8 @@ begin
 
 	    if (tty_inbuf[tty_ip] == EOS) {
 		call smark (sp)
-		call salloc (logbuf, SZ_LOGLINE, TY_CHAR)
+		sz_val = SZ_LOGLINE
+		call salloc (logbuf, sz_val, TY_CHAR)
 nextline_
 		call ztt_getlog (tty_pbinchan, Memc[logbuf], SZ_LOGLINE, nchars)
 
@@ -180,6 +182,7 @@ char	buf[ARB]		# data to be output
 int	nchars			# nchars to write to file
 int	status			# return status
 
+size_t	sz_val
 int	ch
 pointer	sp, obuf
 bool	ctrlstr
@@ -212,7 +215,8 @@ begin
 			goto noucase_
 
 		call smark (sp)
-		call salloc (obuf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (obuf, sz_val, TY_CHAR)
 
 		call ztt_uppercase (buf, Memc[obuf], nchars)
 		call zputty (fd, Memc[obuf], nchars, status)
@@ -240,6 +244,7 @@ procedure ztt_logio (inflag, outflag)
 int	inflag			# log input stream (YES|NO|DONTCARE)
 int	outflag			# log output stream (YES|NO|DONTCARE)
 
+size_t	sz_val
 int	status
 pointer	sp, osfn, fname
 string	openerr "cannot open file "
@@ -247,8 +252,9 @@ include	"zfiott.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	# Enable/disable logging of the input stream.
 	if (inflag == YES) {
@@ -336,6 +342,7 @@ procedure ztt_playback (flag)
 
 int	flag			# YES to enable playback, NO to disable
 
+size_t	sz_val
 int	status
 pointer	sp, osfn
 extern	ztt_pboff()
@@ -344,7 +351,8 @@ include	"zfiott.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	if (flag == YES) {
 	    # If we try to turn on playback mode while in login mode, log
@@ -423,14 +431,17 @@ procedure ztt_logdev (chan)
 
 int	chan			# output file
 
+size_t	sz_val
 int	status
 pointer	sp, obuf, devname
 int	envfind(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (obuf, SZ_LINE, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (obuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	# Timestamp the new entry in the logfile.
 	call strcpy ("\O=", Memc[obuf], SZ_LINE)
@@ -465,6 +476,7 @@ int	chan			# kernel i/o channel
 char	dstr[ARB]		# data string
 int	nchars			# length of data string (0 if EOS delimited)
 
+size_t	sz_val
 char	cch
 pointer	sp, obuf, op
 int	status, ip, ch, n
@@ -478,7 +490,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (obuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	n = nchars
 	if (n <= 0)
@@ -672,6 +685,7 @@ char	dtext[maxch]		# line of text to be returned from zgettt
 int	maxch			# max chars returned
 int	sz_dtext		# actual chars returned
 
+size_t	sz_val
 char	text[1]
 pointer	sp, etext, ep
 bool	learn, incom, verify, format_control
@@ -684,7 +698,8 @@ define	deposit_ 92
 
 begin
 	call smark (sp)
-	call salloc (etext, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (etext, sz_val, TY_CHAR)
 
 	# The logfile line may contain embedded sequences of text which are
 	# to be echoed to the terminal, but which are not to be returned as

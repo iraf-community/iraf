@@ -8,13 +8,15 @@ pointer	db			#I pointer to the database file
 int	dformat			#I is the scaling file in database format
 pointer	ls			#I pointer to the linmatch structure
 
+size_t	sz_val
 pointer	sp, image
 real	rg_lstatr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	if (dformat == YES) {
 	    call rg_ldbparams (db, ls)
@@ -94,12 +96,14 @@ procedure rg_ldbparams (db, ls)
 pointer	db		#I pointer to the database file
 pointer	ls		#I pointer to the intensity matching structure
 
+size_t	sz_val
 pointer	sp, str
 int	rg_lstati()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the time record was written.
 	call dtput (db, "\n")

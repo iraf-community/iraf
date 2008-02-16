@@ -18,6 +18,7 @@ short	offset			# offset into lut
 short	n			# number of data values
 short	data[ARB]		# the data
 
+size_t	sz_val
 int	command,len,x,y,z
 int	mapcolor()
 pointer	sp, odata
@@ -31,7 +32,8 @@ begin
 	        return
 	
 	    call smark (sp)
-	    call salloc (odata, LEN_OFM, TY_SHORT)
+	    sz_val = LEN_OFM
+	    call salloc (odata, sz_val, TY_SHORT)
 	    call aclrs (Mems[odata], LEN_OFM)
 
 	    command = IWRITE+VRETRACE

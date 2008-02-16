@@ -21,13 +21,15 @@ real	wts[npts], userwts[npts]		# Weight arrays
 int	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
+size_t	sz_val
 int	gt_geti()
 pointer	sp, xout, yout
 
 begin
 	call smark (sp)
-	call salloc (xout, npts, TY_REAL)
-	call salloc (yout, npts, TY_REAL)
+	sz_val = npts
+	call salloc (xout, sz_val, TY_REAL)
+	call salloc (yout, sz_val, TY_REAL)
 
 	call icg_axesr (ic, gt, cv, 1, x, y, Memr[xout], npts)
 	call icg_axesr (ic, gt, cv, 2, x, y, Memr[yout], npts)

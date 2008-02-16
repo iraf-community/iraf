@@ -24,6 +24,7 @@ char	devname[ARB]			# device name
 int	wcs[ARB]			# array to be saved
 int	len_wcs
 
+size_t	sz_val
 pointer	sp, fname
 int	fd
 int	open()
@@ -31,7 +32,8 @@ errchk	open, write
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call gwcs_mkfilename (devname, Memc[fname], SZ_FNAME)
 	iferr (call delete (Memc[fname]))
@@ -54,6 +56,7 @@ char	devname[ARB]			# device name
 int	wcs[ARB]			# array to be returned
 int	len_wcs				# max ints to read
 
+size_t	sz_val
 pointer	sp, fname
 int	fd, nchars
 int	open(), read()
@@ -61,7 +64,8 @@ errchk	read
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call gwcs_mkfilename (devname, Memc[fname], SZ_FNAME)
 	iferr (fd = open (Memc[fname], READ_ONLY, BINARY_FILE))

@@ -16,6 +16,7 @@ procedure gkt_putcellarray (m, nc, nr, ax1,ay1, ax2,ay2)
 short	m[ARB]			# cell array
 int	nc, nr			# number of pixels in X and Y
 				# (number of columns[x], rows[y]
+size_t	sz_val
 int	ax1, ay1		# lower left corner of output window
 int	ax2, ay2		# upper right corner of output window
 
@@ -66,7 +67,8 @@ begin
 	    yres = real(GKI_MAXNDC)/ charheight
 	    z_scale = 1.0 / sqrt ( real(max(NSYMBOL, GKT_ZRES(g_kt))) )
 	    tx = GKT_TXAP(g_kt)
-	    call salloc(txsave, LEN_TX, TY_INT)
+	    sz_val = LEN_TX
+	    call salloc(txsave, sz_val, TY_INT)
 	    call savetx(txsave,tx)
 	}
 
@@ -120,7 +122,8 @@ begin
 	# won't be too much bigger (?).
 	# need nx+1 in case nx odd ... pixels() wants to pad output.
 
-	call salloc ( cell, nx+1, TY_SHORT)
+	sz_val = nx+1
+	call salloc ( cell, sz_val, TY_SHORT)
 	Mems[cell + nx] = 0
 
 	# Initialize counters

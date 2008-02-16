@@ -25,6 +25,7 @@ char	devname[ARB]		# device name or null string
 int	stream			# graphics stream to connect process to
 int	in, out			# input and output streams to process
 
+size_t	sz_val
 pointer	sp, lbuf
 int	pid
 bool	streq()
@@ -33,7 +34,8 @@ errchk	propen, flush, getline, syserr
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	pid = propen (kernfname, in, out)
 	call fprintf (out, "%s\n")

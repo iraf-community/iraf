@@ -30,6 +30,7 @@ pointer im		#I image descriptor
 int	group		#I Group number to read
 int	poff		#O char offset the the pixel area in the FITS image
 
+size_t	sz_val
 long	fi[LEN_FINFO]
 pointer hoff,totpix, extn, extv
 pointer sp, fit, o_fit, lbuf, hdrfile, hdr
@@ -52,8 +53,10 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	# Initialize the header file cache on the first call.  The kernel
 	# doesn't appear to work with the cache completely deactivated, so
@@ -306,6 +309,7 @@ pointer poff			#I Pointer to pixel offsets array
 pointer extn			#I Pointer to extname's array
 pointer extv			#I Pointer to extver's array
 
+size_t	sz_val
 char	messg[SZ_LINE]
 pointer lfit, sp, po, ln
 int	spool, ig, acmode, i
@@ -460,7 +464,8 @@ rxtn_
 	# Copy the spool array into a static array. We cannot reliable
 	# get the pointer from the spool file.
 	call smark (sp)
-	call salloc (ln, LEN_UACARD, TY_CHAR)
+	sz_val = LEN_UACARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	if (po != NULL)
 	    call mfree(po, TY_CHAR)
@@ -571,6 +576,7 @@ pointer poff			#I extension data offset
 pointer extn			#I points to the array of extname
 pointer extv			#I points to the arrays of extver
 
+size_t	sz_val
 pointer sp, lfit, fit, hdrfile
 bool    streq()
 int	spool, in, nrec1440, totpix, offset, i, k, cindx
@@ -581,8 +587,10 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (lfit, LEN_FITBASE, TY_STRUCT)
-        call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_FITBASE
+	call salloc (lfit, sz_val, TY_STRUCT)
+        sz_val = SZ_PATHNAME
+        call salloc (hdrfile, sz_val, TY_CHAR)
 
 	call seek (spool, BOFL)
 	fit = IM_KDES(im)
@@ -660,6 +668,7 @@ int	spool			#I spool output file descriptor
 int	nrec1440		#O number of 1440 char records output
 int	datalen			#O length of data area in chars
 
+size_t	sz_val
 int	ncols
 pointer lbuf, sp, im, stime, fb, ttp
 int	totpix, nchars, nbytes, index, ncards, simple, i, pcount, junk
@@ -669,9 +678,12 @@ errchk	syserr, syserrs
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (stime, LEN_CARD, TY_CHAR)
-	call salloc (fb, FITS_BLOCK_BYTES, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (stime, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call salloc (fb, sz_val, TY_CHAR)
 
 	FIT_BSCALE(fit) = 1.0d0
 	FIT_BZERO(fit) = 0.0d0
@@ -841,6 +853,7 @@ pointer im		#I image descriptor
 int	userh		#I pointer to user area spool
 int	fitslen		#I length in chars of the user area
 
+size_t	sz_val
 bool	inherit
 pointer sp, lbuf, ua, ln
 int	elen, elines, nbl, i, k
@@ -850,8 +863,10 @@ int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (ln, LEN_UACARD, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = LEN_UACARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 
@@ -933,14 +948,16 @@ int procedure fxf_strcmp_lwr (s1, s2)
 
 char s1[ARB], s2[ARB]		#I strings to be compare for equality
 
+size_t	sz_val
 int	istat
 pointer sp, l1, l2
 int	strcmp()
 
 begin
 	call smark (sp)
-	call salloc (l1, LEN_CARD, TY_CHAR)
-	call salloc (l2, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (l1, sz_val, TY_CHAR)
+	call salloc (l2, sz_val, TY_CHAR)
 
 	call strcpy (s1, Memc[l1], LEN_CARD)
 	call strcpy (s2, Memc[l2], LEN_CARD)
@@ -1052,6 +1069,7 @@ int	slines		#I number of lines in str
 int	merge		#I flag to indicate merging or unmerge
 pointer po		#I matching pattern accumulation pointer
 
+size_t	sz_val
 char	line[LEN_UACARD]
 pointer sp, pt, tpt, tst, ps, pkp
 int	nbl, l, k, j, i, strncmp(), nbkw, nsb, cmplen
@@ -1059,8 +1077,10 @@ int	stridxs()
 
 begin
 	call smark (sp)
-	call salloc (tpt, LEN_UACARD_100+1, TY_CHAR)
-	call salloc (tst, LEN_UACARD_5+1, TY_CHAR)
+	sz_val = LEN_UACARD_100+1
+	call salloc (tpt, sz_val, TY_CHAR)
+	sz_val = LEN_UACARD_5+1
+	call salloc (tst, sz_val, TY_CHAR)
 
 	Memc[tpt] = EOS
 	Memc[tst] = EOS

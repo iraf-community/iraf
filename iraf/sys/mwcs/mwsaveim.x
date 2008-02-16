@@ -25,6 +25,7 @@ procedure mw_saveim (mw, im)
 pointer	mw				#I pointer to MWCS descriptor
 pointer	im				#I pointer to image descriptor
 
+size_t	sz_val
 double	cdelt
 char	label[SZ_VALSTR]
 bool	update, output_cdelt
@@ -57,11 +58,13 @@ begin
 	    C_UPDATED(cp) = YES
 
 	call smark (sp)
-	call salloc (o_r, ndim, TY_DOUBLE)
-	call salloc (n_r, ndim, TY_DOUBLE)
-	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (n_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (ltm, ndim*ndim, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (o_r, sz_val, TY_DOUBLE)
+	call salloc (n_r, sz_val, TY_DOUBLE)
+	sz_val = ndim*ndim
+	call salloc (o_cd, sz_val, TY_DOUBLE)
+	call salloc (n_cd, sz_val, TY_DOUBLE)
+	call salloc (ltm, sz_val, TY_DOUBLE)
 
 	# Get pointer to the world system to be saved.  Currently only one
 	# such system can be saved since the image header is FITS based and

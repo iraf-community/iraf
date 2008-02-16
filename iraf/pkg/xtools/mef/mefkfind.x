@@ -10,6 +10,7 @@ pointer	hdrp			#I pointer to header buffer
 char	key[ARB]		#I Keyword name
 char	keywval[ARB]		#O string value
 
+size_t	sz_val
 pointer	sp, ukey, lkey, ip
 int	nchars, lch, uch, ch, i
 int	gstrcpy()
@@ -18,8 +19,9 @@ errchk  syserrs
 
 begin
 	call smark (sp)
-	call salloc (ukey, SZ_KEYWORD, TY_CHAR)
-	call salloc (lkey, SZ_KEYWORD, TY_CHAR)
+	sz_val = SZ_KEYWORD
+	call salloc (ukey, sz_val, TY_CHAR)
+	call salloc (lkey, sz_val, TY_CHAR)
 
 	# Prepare U/L FITS keywords, truncated to 8 chars.
 	nchars = gstrcpy (key, Memc[lkey], SZ_KEYWORD)

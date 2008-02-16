@@ -17,6 +17,7 @@ procedure mw_loadim (mw, im)
 pointer	mw			#U pointer to MWCS descriptor
 pointer	im			#I pointer to image header
 
+size_t	sz_val
 bool	have_wcs
 int	ndim, i, j, ea_type
 int	axno[MAX_DIM], axval[MAX_DIM]
@@ -33,7 +34,8 @@ define	axinit_ 92
 
 begin
 	call smark (sp)
-	call salloc (sysname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sysname, sz_val, TY_CHAR)
 
 	# Read the FITS image header into an IMWCS descriptor.
 	iw = iw_rfits (mw, im, RF_REFERENCE)

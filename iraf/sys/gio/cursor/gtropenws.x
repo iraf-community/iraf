@@ -25,6 +25,7 @@ int	mode			#I access mode
 int	stream			#I graphics stream
 int	source_pid		#I process which issued the openws directive
 
+size_t	sz_val
 int	redir_code, dd[LEN_GKIDD], ip
 pointer	sp, op, tr, tty, kernfname, taskname, device
 
@@ -40,9 +41,10 @@ include	"gtr.com"
 
 begin
 	call smark (sp)
-	call salloc (kernfname, SZ_FNAME, TY_CHAR)
-	call salloc (taskname, SZ_FNAME, TY_CHAR)
-	call salloc (device, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kernfname, sz_val, TY_CHAR)
+	call salloc (taskname, sz_val, TY_CHAR)
+	call salloc (device, sz_val, TY_CHAR)
 
 	tr = trdes[stream]
 

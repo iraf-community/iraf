@@ -385,6 +385,7 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
+size_t	sz_val
 real	sum
 short	blkmax
 pointer	sp, a, b
@@ -415,7 +416,8 @@ begin
 	    call error (2, "si_blmavg: block number out of range")
 
 	if (ybavg > 1) {
-	    call salloc (b, nblks_x, TY_LONG)
+	    sz_val = nblks_x
+	    call salloc (b, sz_val, TY_LONG)
 	    call aclrl (Meml[b], nblks_x)
 	    nlines_in_sum = 0
 	}
@@ -685,6 +687,7 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
+size_t	sz_val
 real	sum
 int	blkmax
 pointer	sp, a, b
@@ -715,7 +718,8 @@ begin
 	    call error (2, "si_blmavg: block number out of range")
 
 	if (ybavg > 1) {
-	    call salloc (b, nblks_x, TY_LONG)
+	    sz_val = nblks_x
+	    call salloc (b, sz_val, TY_LONG)
 	    call aclrl (Meml[b], nblks_x)
 	    nlines_in_sum = 0
 	}
@@ -985,6 +989,7 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
+size_t	sz_val
 int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
 int	first_line, nlines_in_sum, npix, nfull_blks, count
 real	sum, blkmax
@@ -1013,7 +1018,8 @@ begin
 	if (y < 1 || y > nblks_y)
 	    call error (2, "si_blmavg: block number out of range")
 
-	call salloc (b, nblks_x, TY_REAL)
+	sz_val = nblks_x
+	call salloc (b, sz_val, TY_REAL)
 
 	if (ybavg > 1) {
 	    call aclrr (Memr[b], nblks_x)

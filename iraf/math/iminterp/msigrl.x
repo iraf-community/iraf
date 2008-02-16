@@ -109,6 +109,7 @@ real	ymax		# maximum y value for integration
 int	nylmin		# minimum line number for x integration
 int	nylmax		# maximum line number for x integration
 
+size_t	sz_val
 int	i, ninter
 pointer	sp, xintr, yintr
 real	xmin, xmax, lx, ld
@@ -116,8 +117,9 @@ int	ii_pyclip()
 
 begin
 	call smark (sp)
-	call salloc (xintr, npts, TY_REAL)
-	call salloc (yintr, npts, TY_REAL)
+	sz_val = npts
+	call salloc (xintr, sz_val, TY_REAL)
+	call salloc (yintr, sz_val, TY_REAL)
 
 	# find x and y limits and their indicess
 	call alimr (x, npts, xmin, xmax)

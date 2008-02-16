@@ -12,12 +12,14 @@ procedure ttyclearln (fd, tty)
 int	fd
 pointer	tty
 pointer	sp, buf
+size_t	sz_val
 int	nchars, ttygets()
 errchk	salloc, ttygets, putc, ttywrite, fprintf, pargi
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_CTRLSTR, TY_CHAR)
+	sz_val = SZ_CTRLSTR
+	call salloc (buf, sz_val, TY_CHAR)
 
 	nchars = ttygets (tty, "ce", Memc[buf], SZ_CTRLSTR)
 	if (nchars > 0) {

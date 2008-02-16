@@ -22,6 +22,7 @@ int	plot_type	#I type of plot
 pointer	gt		#I gtools descriptor
 pointer	fit		#I geomap fit parameters
 
+size_t	sz_val
 int	npts
 pointer	sp, params, xtermlab, ytermlab
 real	xrms, yrms, rej
@@ -29,9 +30,11 @@ int	strlen(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (params, MAX_PARAMS, TY_CHAR)
-	call salloc (xtermlab, SZ_FNAME, TY_CHAR)
-	call salloc (ytermlab, SZ_FNAME, TY_CHAR)
+	sz_val = MAX_PARAMS
+	call salloc (params, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xtermlab, sz_val, TY_CHAR)
+	call salloc (ytermlab, sz_val, TY_CHAR)
 
 	npts = max (0, GM_NPTS(fit) - GM_NWTS0(fit))
 	xrms = max (0.0d0, GM_XRMS(fit))
@@ -255,6 +258,7 @@ pointer	gfit		#I pointer to the gfit structure
 char	cmdstr[ARB]	#I command string
 int	newgraph	#I plot new graph
 
+size_t	sz_val
 int	ncmd, ival
 pointer	sp, str, cmd
 real	rval
@@ -262,8 +266,10 @@ int	nscan(), strdic(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -723,13 +729,15 @@ real	resid[ARB]	#I residual
 real	wts[ARB]	#I array of weights
 int	npts		#I number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, zero
 
 begin
 	# Allocate space.
 	call smark (sp)
-	call salloc (zero, npts, TY_REAL)
+	sz_val = npts
+	call salloc (zero, sz_val, TY_REAL)
 	call amovkr (0.0, Memr[zero], npts)
 
 	# Calculate the residuals.
@@ -784,6 +792,7 @@ pointer	fit		#I fit descriptor
 pointer	sx1, sy1	#I pointer to the linear x and y surface fits
 pointer sx2, sy2	#I pointer to the linear x and y surface fits
 
+size_t	sz_val
 int	i
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 real	xint, yint, dx, dy
@@ -791,12 +800,13 @@ real	xint, yint, dx, dy
 begin
 	# allocate temporary space
 	call smark (sp)
-	call salloc (xtemp, NGRAPH, TY_REAL)
-	call salloc (ytemp, NGRAPH, TY_REAL)
-	call salloc (xfit1, NGRAPH, TY_REAL)
-	call salloc (yfit1, NGRAPH, TY_REAL)
-	call salloc (xfit2, NGRAPH, TY_REAL)
-	call salloc (yfit2, NGRAPH, TY_REAL)
+	sz_val = NGRAPH
+	call salloc (xtemp, sz_val, TY_REAL)
+	call salloc (ytemp, sz_val, TY_REAL)
+	call salloc (xfit1, sz_val, TY_REAL)
+	call salloc (yfit1, sz_val, TY_REAL)
+	call salloc (xfit2, sz_val, TY_REAL)
+	call salloc (yfit2, sz_val, TY_REAL)
 
 	# Calculate intervals in x and y.
 	dx = (GM_XMAX(fit) - GM_XMIN(fit)) / NINTERVALS
@@ -907,6 +917,7 @@ real	yin[ARB]	#I y input values
 int	npts		#I number of data points
 real	wx, wy		#I x and y world coordinates
 
+size_t	sz_val
 int	i, j
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 real	x0, y0, r2, r2min
@@ -934,12 +945,13 @@ begin
 
 	    # Allocate temporary space.
 	    call smark (sp)
-	    call salloc (xtemp, NGRAPH, TY_REAL)
-	    call salloc (ytemp, NGRAPH, TY_REAL)
-	    call salloc (xfit1, NGRAPH, TY_REAL)
-	    call salloc (yfit1, NGRAPH, TY_REAL)
-	    call salloc (xfit2, NGRAPH, TY_REAL)
-	    call salloc (yfit2, NGRAPH, TY_REAL)
+	    sz_val = NGRAPH
+	    call salloc (xtemp, sz_val, TY_REAL)
+	    call salloc (ytemp, sz_val, TY_REAL)
+	    call salloc (xfit1, sz_val, TY_REAL)
+	    call salloc (yfit1, sz_val, TY_REAL)
+	    call salloc (xfit2, sz_val, TY_REAL)
+	    call salloc (yfit2, sz_val, TY_REAL)
 
 	    # Compute the deltas.
 	    deltax = xin[j] - gseval (sx1, xref[j], yref[j])
@@ -1031,6 +1043,7 @@ real	b		#O output y coefficient of x fit
 real	c		#O output x coefficient of y fit
 real	d		#O output y coefficient of y fit
 
+size_t	sz_val
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
 real	xxrange, xyrange, xxmaxmin, xymaxmin
@@ -1042,8 +1055,10 @@ real	gsgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (xcoeff, gsgeti (sx, GSNCOEFF), TY_REAL)
-	call salloc (ycoeff, gsgeti (sy, GSNCOEFF), TY_REAL)
+	sz_val = gsgeti (sx, GSNCOEFF)
+	call salloc (xcoeff, sz_val, TY_REAL)
+	sz_val = gsgeti (sy, GSNCOEFF)
+	call salloc (ycoeff, sz_val, TY_REAL)
 
 	# Get coefficients and numbers of coefficients.
 	call gscoeff (sx, Memr[xcoeff], nxxcoeff)
@@ -1270,6 +1285,7 @@ double	yin[ARB]	#I y values
 double	wts[ARB]	#I array of weights
 int	npts		#I number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, rxin, ryin
 
@@ -1284,8 +1300,9 @@ begin
 	    # Set scale and axes.
 	    call gclear (gd)
 	    call smark (sp)
-	    call salloc (rxin, npts, TY_REAL)
-	    call salloc (ryin, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (rxin, sz_val, TY_REAL)
+	    call salloc (ryin, sz_val, TY_REAL)
 	    call achtdr (xin, Memr[rxin], npts)
 	    call achtdr (yin, Memr[ryin], npts)
 	    call gascale (gd, Memr[rxin], npts, 1)
@@ -1333,6 +1350,7 @@ double	resid[ARB]	#I residual
 double	wts[ARB]	#I array of weights
 int	npts		#I number of points
 
+size_t	sz_val
 int	i, j
 pointer	sp, zero
 pointer	rxin, ryin
@@ -1340,7 +1358,8 @@ pointer	rxin, ryin
 begin
 	# Allocate space.
 	call smark (sp)
-	call salloc (zero, npts, TY_REAL)
+	sz_val = npts
+	call salloc (zero, sz_val, TY_REAL)
 	call amovkr (0.0, Memr[zero], npts)
 
 	# Calculate the residuals.
@@ -1352,8 +1371,9 @@ begin
 	    call gclear (gd)
 
 	    # Set scale and axes.
-	    call salloc (rxin, npts, TY_REAL)
-	    call salloc (ryin, npts, TY_REAL)
+	    sz_val = npts
+	    call salloc (rxin, sz_val, TY_REAL)
+	    call salloc (ryin, sz_val, TY_REAL)
 	    call achtdr (x, Memr[rxin], npts)
 	    call achtdr (resid, Memr[ryin], npts)
 	    call gascale (gd, Memr[rxin], npts, 1)
@@ -1402,6 +1422,7 @@ pointer	fit		#I fit descriptor
 pointer	sx1, sy1	#I pointer to the linear x and y surface fits
 pointer sx2, sy2	#I pointer to the linear x and y surface fits
 
+size_t	sz_val
 int	i
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 pointer	xbuf, ybuf
@@ -1410,14 +1431,15 @@ double	xint, yint, dx, dy
 begin
 	# allocate temporary space
 	call smark (sp)
-	call salloc (xtemp, NGRAPH, TY_DOUBLE)
-	call salloc (ytemp, NGRAPH, TY_DOUBLE)
-	call salloc (xfit1, NGRAPH, TY_DOUBLE)
-	call salloc (yfit1, NGRAPH, TY_DOUBLE)
-	call salloc (xfit2, NGRAPH, TY_DOUBLE)
-	call salloc (yfit2, NGRAPH, TY_DOUBLE)
-	call salloc (xbuf, NGRAPH, TY_REAL)
-	call salloc (ybuf, NGRAPH, TY_REAL)
+	sz_val = NGRAPH
+	call salloc (xtemp, sz_val, TY_DOUBLE)
+	call salloc (ytemp, sz_val, TY_DOUBLE)
+	call salloc (xfit1, sz_val, TY_DOUBLE)
+	call salloc (yfit1, sz_val, TY_DOUBLE)
+	call salloc (xfit2, sz_val, TY_DOUBLE)
+	call salloc (yfit2, sz_val, TY_DOUBLE)
+	call salloc (xbuf, sz_val, TY_REAL)
+	call salloc (ybuf, sz_val, TY_REAL)
 
 	# Calculate intervals in x and y.
 	dx = (GM_XMAX(fit) - GM_XMIN(fit)) / NINTERVALS
@@ -1532,6 +1554,7 @@ double	yin[ARB]	#I y input values
 int	npts		#I number of data points
 real	wx, wy		#I x and y world coordinates
 
+size_t	sz_val
 int	i, j
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 pointer	xbuf, ybuf
@@ -1560,14 +1583,15 @@ begin
 
 	    # Allocate temporary space.
 	    call smark (sp)
-	    call salloc (xtemp, NGRAPH, TY_DOUBLE)
-	    call salloc (ytemp, NGRAPH, TY_DOUBLE)
-	    call salloc (xfit1, NGRAPH, TY_DOUBLE)
-	    call salloc (yfit1, NGRAPH, TY_DOUBLE)
-	    call salloc (xfit2, NGRAPH, TY_DOUBLE)
-	    call salloc (yfit2, NGRAPH, TY_DOUBLE)
-	    call salloc (xbuf, NGRAPH, TY_REAL)
-	    call salloc (ybuf, NGRAPH, TY_REAL)
+	    sz_val = NGRAPH
+	    call salloc (xtemp, sz_val, TY_DOUBLE)
+	    call salloc (ytemp, sz_val, TY_DOUBLE)
+	    call salloc (xfit1, sz_val, TY_DOUBLE)
+	    call salloc (yfit1, sz_val, TY_DOUBLE)
+	    call salloc (xfit2, sz_val, TY_DOUBLE)
+	    call salloc (yfit2, sz_val, TY_DOUBLE)
+	    call salloc (xbuf, sz_val, TY_REAL)
+	    call salloc (ybuf, sz_val, TY_REAL)
 
 	    # Compute the deltas.
 	    deltax = xin[j] - dgseval (sx1, xref[j], yref[j])
@@ -1663,6 +1687,7 @@ double	b		#O output y coefficient of x fit
 double	c		#O output x coefficient of y fit
 double	d		#O output y coefficient of y fit
 
+size_t	sz_val
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
 double	xxrange, xyrange, xxmaxmin, xymaxmin
@@ -1674,8 +1699,10 @@ double	dgsgetd()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (xcoeff, dgsgeti (sx, GSNCOEFF), TY_DOUBLE)
-	call salloc (ycoeff, dgsgeti (sy, GSNCOEFF), TY_DOUBLE)
+	sz_val = dgsgeti (sx, GSNCOEFF)
+	call salloc (xcoeff, sz_val, TY_DOUBLE)
+	sz_val = dgsgeti (sy, GSNCOEFF)
+	call salloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Get coefficients and numbers of coefficients.
 	call dgscoeff (sx, Memd[xcoeff], nxxcoeff)

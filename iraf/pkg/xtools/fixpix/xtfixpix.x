@@ -18,6 +18,7 @@ pointer	pm			#I Pixel mask
 int	lvalin			#I Input line interpolation code
 int	cvalin			#I Input column interpolation code
 
+size_t	sz_val
 int	i, j, k, l, n, nc, nl, l1, l2, lmin, lmax, ncols, lval, cval, ncompress
 short	val
 long	v[IM_MAXDIM]
@@ -41,8 +42,10 @@ begin
 
 	# Allocate memory and data structure.
 	call smark (sp)
-	call salloc (buf, 3*max(nc, nl), TY_SHORT) 
-	call salloc (cols, nc, TY_SHORT)
+	sz_val = 3*max(nc, nl)
+	call salloc (buf, sz_val, TY_SHORT) 
+	sz_val = nc
+	call salloc (cols, sz_val, TY_SHORT)
 	call calloc (fp, FP_LEN, TY_STRUCT)
 
 	# Set the mask codes.  Go through the mask and change any mask codes

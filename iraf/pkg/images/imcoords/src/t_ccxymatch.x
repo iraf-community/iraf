@@ -29,6 +29,7 @@ pointer	xtrans, ytrans, listindex, xlist, ylist, ilineno, intri, intrirat
 real	tolerance, ptolerance, xin, yin, xmag, ymag, xrot, yrot
 real	pseparation, separation, ratio
 
+size_t	sz_val
 bool	clgetb()
 double	clgetd()
 int	fstati(), clplen(), clgeti(), clgwrd(), open(), clgfil()
@@ -45,21 +46,26 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (refname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (refpoints, SZ_FNAME, TY_CHAR)
-	call salloc (xreftie, MAX_NTIE, TY_REAL)
-	call salloc (yreftie, MAX_NTIE, TY_REAL)
-	call salloc (xintie, MAX_NTIE, TY_REAL)
-	call salloc (yintie, MAX_NTIE, TY_REAL)
-	call salloc (coeff, MAX_NCOEFF, TY_REAL)
-	call salloc (projection, SZ_LINE, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (lngformat, SZ_FNAME, TY_CHAR)
-	call salloc (latformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (refname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (refpoints, sz_val, TY_CHAR)
+	sz_val = MAX_NTIE
+	call salloc (xreftie, sz_val, TY_REAL)
+	call salloc (yreftie, sz_val, TY_REAL)
+	call salloc (xintie, sz_val, TY_REAL)
+	call salloc (yintie, sz_val, TY_REAL)
+	sz_val = MAX_NCOEFF
+	call salloc (coeff, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (projection, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	call salloc (lngformat, sz_val, TY_CHAR)
+	call salloc (latformat, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input, output, and reference lists.
 	ilist = clpopnu ("input")
@@ -474,6 +480,7 @@ double	latref			#I the input reference dec / latitude
 int	lngunits		#I the ra / longitude units
 int	latunits		#I the dec / latitude units
 
+size_t	sz_val
 int	i, ip, bufsize, npts, lnpts, maxcols
 double	xval, yval
 pointer	sp, str, tx, ty
@@ -482,7 +489,8 @@ double	asumd()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
 	call malloc (lng, bufsize, TY_DOUBLE)
@@ -539,8 +547,9 @@ begin
 		tlatref = asumd (Memd[lat], npts) / npts
 	    else
 		tlatref = latref
-	    call salloc (tx, npts, TY_DOUBLE)
-	    call salloc (ty, npts, TY_DOUBLE)
+	    sz_val = npts
+	    call salloc (tx, sz_val, TY_DOUBLE)
+	    call salloc (ty, sz_val, TY_DOUBLE)
 	    call rg_celtostd (projection, Memd[lng], Memd[lat], Memd[tx],
 		Memd[ty], npts, tlngref, tlatref, lngunits, latunits)
 	    call amulkd (Memd[tx], 3600.0d0, Memd[tx], npts)

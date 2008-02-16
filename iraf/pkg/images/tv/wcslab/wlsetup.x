@@ -748,6 +748,7 @@ double	min		# I/O: the minimum RA
 double	max		# I/O: the maximum RA
 double	diff		# I/O: the difference between minimum and maximum
 
+size_t	sz_val
 bool	wrap
 int	i, j, n_diffs
 pointer	sp, max_array, min_array, ran_array
@@ -755,9 +756,10 @@ int	wl_max_element_array()
 
 begin
 	call smark (sp)
-	call salloc (max_array, n_values * n_values, TY_DOUBLE)
-	call salloc (min_array, n_values * n_values, TY_DOUBLE)
-	call salloc (ran_array, n_values * n_values, TY_DOUBLE)
+	sz_val = n_values * n_values
+	call salloc (max_array, sz_val, TY_DOUBLE)
+	call salloc (min_array, sz_val, TY_DOUBLE)
+	call salloc (ran_array, sz_val, TY_DOUBLE)
 
 	# Check whether the RA is wrapped or not.
 	n_diffs = 0

@@ -13,6 +13,7 @@ procedure iki_copy (old, new)
 char	old[ARB]		#I name of old image
 char	new[ARB]		#I name of new image
 
+size_t	sz_val
 int	k, n, status
 pointer	sp, old_root, old_extn, new_root, new_extn
 int	iki_access()
@@ -23,10 +24,14 @@ include	"iki.com"
 
 begin
 	call smark (sp)
-	call salloc (old_root, SZ_PATHNAME, TY_CHAR)
-	call salloc (old_extn, MAX_LENEXTN, TY_CHAR)
-	call salloc (new_root, SZ_PATHNAME, TY_CHAR)
-	call salloc (new_extn, MAX_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (old_root, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (old_extn, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (new_root, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (new_extn, sz_val, TY_CHAR)
 
 	# Verify that the old image exists and determine its type.
 	k = iki_access (old, Memc[old_root], Memc[old_extn], READ_ONLY)

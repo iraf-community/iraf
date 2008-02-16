@@ -17,6 +17,7 @@ pointer	io			#I QPIO descriptor
 char	mask[ARB]		#I mask to be loaded
 int	merge			#I merge with old mask?
 
+size_t	sz_val
 int	niter
 int	naxes, axlen[PL_MAXDIM], v[PL_MAXDIM]
 pointer	sp, title, mp, sym, plbuf, qp, o_pl, n_pl, b_pl
@@ -28,8 +29,9 @@ define	tryfile_ 91
 
 begin
 	call smark (sp)
-	call salloc (title, SZ_FNAME, TY_CHAR)
-	call salloc (mp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (mp, sz_val, TY_CHAR)
 
 	if (IO_DEBUG(io) > 0) {
 	    call eprintf ("load mask `%s'\n")
@@ -54,7 +56,8 @@ tryfile_
 		sym = qp_gpsym (qp, Memc[mp])
 		if (S_DTYPE(sym) == TY_OPAQUE) {
 		    # Parameter value is stored mask.
-		    call salloc (plbuf, S_NELEM(sym) / SZ_SHORT, TY_SHORT)
+		    sz_val = S_NELEM(sym) / SZ_SHORT
+		    call salloc (plbuf, sz_val, TY_SHORT)
 		    if (qp_read (qp, Memc[mp], Mems[plbuf], S_NELEM(sym), 1,
 			"opaque") < S_NELEM(sym)) {
 			call syserrs (SYS_QPBADVAL, Memc[mp])

@@ -16,6 +16,7 @@ procedure imopsf (im)
 
 pointer	im
 
+size_t	sz_val
 pointer	sp, imname, ref_im, pfd
 int	sv_acmode, sv_update, ndim, depth, i
 errchk	iki_opix, open
@@ -23,7 +24,8 @@ int	open()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_IMNAME, TY_CHAR)
+	sz_val = SZ_IMNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	if (IM_PL(im) != NULL) {
 	    if (IM_PFD(im) == NULL) {

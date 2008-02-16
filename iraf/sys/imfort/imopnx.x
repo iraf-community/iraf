@@ -17,6 +17,7 @@ int	acmode		#I image access mode (RO, WO)
 pointer	im		#O receives image descriptor pointer
 int	ier		#O receives error status
 
+size_t	sz_val
 pointer	sp, pix_fp, hdr_fp
 pointer	pixfile, hdrfile, root, extn, envvar, valstr
 int	len_hdrmem, len_ua, status, ip
@@ -28,12 +29,15 @@ errchk	calloc
 
 begin
 	call smark (sp)
-	call salloc (hdrfile, SZ_FNAME, TY_CHAR)
-	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
-	call salloc (envvar, SZ_FNAME, TY_CHAR)
-	call salloc (valstr, SZ_FNAME, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (pixfile, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (envvar, sz_val, TY_CHAR)
+	call salloc (valstr, sz_val, TY_CHAR)
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
 
 	# Construct name of image header file.
 	call imf_parse (image, Memc[root], Memc[extn])

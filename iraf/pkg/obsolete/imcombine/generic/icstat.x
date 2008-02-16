@@ -25,6 +25,7 @@ int	nimages			 # Number of images in  offsets.
 bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
+size_t	sz_val
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
@@ -37,11 +38,12 @@ include	"../icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
-	call salloc (va, IM_MAXDIM, TY_LONG)
-	call salloc (vb, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
+	call salloc (va, sz_val, TY_LONG)
+	call salloc (vb, sz_val, TY_LONG)
 
 	# Determine the image section parameters.  This must be in terms of
 	# the data image pixel coordinates though the section may be specified
@@ -85,7 +87,8 @@ begin
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
 
-	call salloc (data, n, TY_SHORT)
+	sz_val = n
+	call salloc (data, sz_val, TY_SHORT)
 	dp = data
 	while (imgnls (im, lp, Memi[vb]) != EOF) {
 	    call ic_mget1 (im, image, offsets[image,1], Memi[va], mask)
@@ -244,6 +247,7 @@ int	nimages			 # Number of images in  offsets.
 bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
+size_t	sz_val
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
@@ -256,11 +260,12 @@ include	"../icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
-	call salloc (va, IM_MAXDIM, TY_LONG)
-	call salloc (vb, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
+	call salloc (va, sz_val, TY_LONG)
+	call salloc (vb, sz_val, TY_LONG)
 
 	# Determine the image section parameters.  This must be in terms of
 	# the data image pixel coordinates though the section may be specified
@@ -304,7 +309,8 @@ begin
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
 
-	call salloc (data, n, TY_INT)
+	sz_val = n
+	call salloc (data, sz_val, TY_INT)
 	dp = data
 	while (imgnli (im, lp, Memi[vb]) != EOF) {
 	    call ic_mget1 (im, image, offsets[image,1], Memi[va], mask)
@@ -463,6 +469,7 @@ int	nimages			 # Number of images in  offsets.
 bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
+size_t	sz_val
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
@@ -474,11 +481,12 @@ include	"../icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
-	call salloc (va, IM_MAXDIM, TY_LONG)
-	call salloc (vb, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
+	call salloc (va, sz_val, TY_LONG)
+	call salloc (vb, sz_val, TY_LONG)
 
 	# Determine the image section parameters.  This must be in terms of
 	# the data image pixel coordinates though the section may be specified
@@ -522,7 +530,8 @@ begin
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
 
-	call salloc (data, n, TY_REAL)
+	sz_val = n
+	call salloc (data, sz_val, TY_REAL)
 	dp = data
 	while (imgnlr (im, lp, Memi[vb]) != EOF) {
 	    call ic_mget1 (im, image, offsets[image,1], Memi[va], mask)
@@ -679,6 +688,7 @@ int	nimages			 # Number of images in  offsets.
 bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
+size_t	sz_val
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
@@ -690,11 +700,12 @@ include	"../icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
-	call salloc (va, IM_MAXDIM, TY_LONG)
-	call salloc (vb, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
+	call salloc (va, sz_val, TY_LONG)
+	call salloc (vb, sz_val, TY_LONG)
 
 	# Determine the image section parameters.  This must be in terms of
 	# the data image pixel coordinates though the section may be specified
@@ -738,7 +749,8 @@ begin
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
 
-	call salloc (data, n, TY_DOUBLE)
+	sz_val = n
+	call salloc (data, sz_val, TY_DOUBLE)
 	dp = data
 	while (imgnld (im, lp, Memi[vb]) != EOF) {
 	    call ic_mget1 (im, image, offsets[image,1], Memi[va], mask)

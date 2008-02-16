@@ -6,15 +6,18 @@ procedure t_lcase()
 
 pointer sp, line, in_file, out_file, list
 int	in, out
+size_t	sz_val
 bool	strne()
 int	open(), clgfil(), getline(), clplen()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (in_file, SZ_FNAME, TY_CHAR)
-	call salloc (out_file, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (in_file, sz_val, TY_CHAR)
+	call salloc (out_file, sz_val, TY_CHAR)
 
 	list = clpopni ("files")
 

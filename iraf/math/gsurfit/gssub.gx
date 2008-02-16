@@ -21,6 +21,7 @@ pointer	sf1		# pointer to the first surface
 pointer	sf2		# pointer to the second surface
 pointer	sf3		# pointer to the output surface
 
+size_t	sz_val
 int	i, ncoeff, order, maxorder1, maxorder2, maxorder3
 int	nmove1, nmove2, nmove3
 pointer	sp, coeff, ptr1, ptr2, ptr3
@@ -45,9 +46,11 @@ $else
 $endif
 	    call smark (sp)
 	    $if (datatype == r)
-	    call salloc (coeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_REAL)
 	    $else
-	    call salloc (coeff, ncoeff, TY_DOUBLE)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_DOUBLE)
 	    $endif
 	    call gssave (sf2, Mem$t[coeff])
 	    $if (datatype == r)

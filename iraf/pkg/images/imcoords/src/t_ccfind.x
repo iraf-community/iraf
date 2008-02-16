@@ -23,6 +23,7 @@ pointer	slngref, slatref, xformat, yformat, coo, refcoo, im, mw, imlist
 pointer	inlist, outlist
 real	datamin, datamax, back
 
+size_t	sz_val
 bool	clgetb()
 double	clgetd(), imgetd()
 int	clplen(), imtlen(), clgeti(), clgwrd(), strlen()
@@ -35,17 +36,20 @@ errchk	imgstr(), imgetd(), open()
 begin
 	# Get some working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (insystem, SZ_FNAME, TY_CHAR)
-	call salloc (refsystem, SZ_FNAME, TY_CHAR)
-	call salloc (slngref, SZ_FNAME, TY_CHAR)
-	call salloc (slatref, SZ_FNAME, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (outfile, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (insystem, sz_val, TY_CHAR)
+	call salloc (refsystem, sz_val, TY_CHAR)
+	call salloc (slngref, sz_val, TY_CHAR)
+	call salloc (slatref, sz_val, TY_CHAR)
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input data file list.
 	inlist = clpopnu ("input")
@@ -397,6 +401,7 @@ char	oxformat[ARB]		#I the output x format
 char	oyformat[ARB]		#I the output y format
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 double	ilng, ilat, tlng, tlat, olng, olat
 int	nline, ip, max_fields, nfields, offset, nchars, nsdig_lng, nsdig_lat
 int	tilngunits, tilatunits, tolngunits, tolatunits, cier, ncenter
@@ -416,12 +421,16 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-        call salloc (inbuf, SZ_LINE, TY_CHAR)
-        call salloc (linebuf, SZ_LINE, TY_CHAR)
-        call salloc (field_pos, MAX_FIELDS, TY_INT)
-        call salloc (outbuf, SZ_LINE, TY_CHAR)
-	call salloc (toxformat, SZ_FNAME, TY_CHAR)
-	call salloc (toyformat, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (inbuf, sz_val, TY_CHAR)
+        call salloc (linebuf, sz_val, TY_CHAR)
+        sz_val = MAX_FIELDS
+        call salloc (field_pos, sz_val, TY_INT)
+        sz_val = SZ_LINE
+        call salloc (outbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (toxformat, sz_val, TY_CHAR)
+	call salloc (toyformat, sz_val, TY_CHAR)
 
 	# Set the default input and output units.
 	if (ilngunits <= 0)
@@ -578,6 +587,7 @@ int	tolerance		#I the tolerance for convergence in pixels
 double	xinit, yinit		#I the initial x and y positions
 double	xcenter, ycenter	#I the final x and y positions
 
+size_t	sz_val
 bool	converged
 double	xold, yold, xnew, ynew
 int	i, fbox, x1, x2, y1, y2, nx, ny
@@ -607,8 +617,10 @@ begin
 	    ny = y2 - y1 + 1
 
 	    call smark (sp)
-	    call salloc (xbuf, nx, TY_REAL)
-	    call salloc (ybuf, ny, TY_REAL)
+	    sz_val = nx
+	    call salloc (xbuf, sz_val, TY_REAL)
+	    sz_val = ny
+	    call salloc (ybuf, sz_val, TY_REAL)
 
 	    iferr {
 		buf = imgs2r (im, x1, x2, y1, y2)

@@ -17,6 +17,7 @@ char	mtname[ARB]			#I full magtape device spec
 char	lockfile[ARB]			#O receives lockfile name
 int	maxch				#I max chars out
 
+size_t	sz_val
 int	filno, recno
 pointer	sp, lkname, device, devcap, gty
 errchk	mt_gtyopen, syserrs
@@ -25,9 +26,11 @@ pointer	mt_gtyopen()
 
 begin
 	call smark (sp)
-	call salloc (lkname, SZ_FNAME, TY_CHAR)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lkname, sz_val, TY_CHAR)
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = SZ_DEVCAP
+	call salloc (devcap, sz_val, TY_CHAR)
 
 	call mtparse (mtname,
 	    Memc[device], SZ_FNAME, filno, recno, Memc[devcap], SZ_DEVCAP)

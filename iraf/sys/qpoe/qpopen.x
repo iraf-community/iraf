@@ -17,6 +17,7 @@ char	poefile[ARB]		#I QPOE file to be opened
 int	mode			#I file access mode
 pointer o_qp			#I reference file, if NEW_COPY
 
+size_t	sz_val
 int	fmmode, fd, n
 pointer sp, qph, qp, fname, fm
 
@@ -32,8 +33,10 @@ string	s_defyblock DEF_YBLOCK
 
 begin
 	call smark (sp)
-	call salloc (qph, LEN_QPH, TY_STRUCT)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_QPH
+	call salloc (qph, sz_val, TY_STRUCT)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Construct the filename (with extension .qp) of the poefile.
 	call qp_mkfname (poefile, QPOE_EXTN, Memc[fname], SZ_PATHNAME)

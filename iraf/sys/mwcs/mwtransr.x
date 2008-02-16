@@ -11,15 +11,18 @@ real	ltm[ndim,ndim]		#I linear transformation matrix
 real	ltv_2[ndim]		#I output translation vector
 int	ndim			#I dimensionality of transform
 
+size_t	sz_val
 int	nelem
 pointer	sp, d_ltm, d_ltv1, d_ltv2
 
 begin
 	call smark (sp)
 	nelem = ndim * ndim
-	call salloc (d_ltm, nelem, TY_DOUBLE)
-	call salloc (d_ltv1, ndim, TY_DOUBLE)
-	call salloc (d_ltv2, ndim, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (d_ltm, sz_val, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (d_ltv1, sz_val, TY_DOUBLE)
+	call salloc (d_ltv2, sz_val, TY_DOUBLE)
 
 	call achtrd (ltm, Memd[d_ltm], nelem)
 	call achtrd (ltv_1, Memd[d_ltv1], ndim)

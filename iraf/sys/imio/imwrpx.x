@@ -17,6 +17,7 @@ int	npix			# number of pixels to be written
 long	v[ARB]			# physical coords of first pixel to be written
 int	xstep			# step size between output pixels
 
+size_t	sz_val
 bool	rlio
 long	offset
 pointer	pl, sp, ibuf
@@ -82,7 +83,8 @@ begin
 		}
 	    default:
 		call smark (sp)
-		call salloc (ibuf, npix, TY_INT)
+		sz_val = npix
+		call salloc (ibuf, sz_val, TY_INT)
 
 		call acht (buf, Memi[ibuf], npix, IM_PIXTYPE(im), TY_INT)
 		if (rlio)
