@@ -328,6 +328,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    }
 		}
 		if ( next_j == proc_end[i] ) next_j = j+1;
+		if ( next_j != j+1 ) {
+		    fprintf(stderr,
+			    "[INFO] file = %s  line = %d: found blank line\n",
+			    file_name,j+1);
+		}
 		op1 = tmp_buf;
 		maxop1 = tmp_buf + SZ_LINE_BUF -1;
 		ip1 = lines[next_j];
