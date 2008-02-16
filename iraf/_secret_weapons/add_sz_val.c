@@ -257,17 +257,15 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    }
 	    ip = lines[j];
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
-	    if ( *ip == '#' || *ip == '\n' || *ip == '\0' ) continue;
+	    if ( *ip == '#' || *ip == '\n' || *ip == '$' ) continue;
+	    if ( *ip == '\0' ) continue;
 	    /* */
 	    flg_prev_if = flg_if_or_else;
 	    prev_j = j_not_gc;
 	    /* */
+	    /* detect if,else,etc. */
 	    flg_if_or_else = false;
-	    /* skip $if, $else, etc. in foo.gx */
-	    if ( *ip == '$' ) {
-		continue;
-	    }
-	    else {
+	    {
 		const char *ip1 = ip;
 		j_not_gc = j;
 		while ( isalpha(*ip1)==0 && *ip1!='\0' ) ip1++;
@@ -330,7 +328,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    }
 		    ip1++;
 		}
-		if ( *ip1 == '$' ) {
+		if ( *ip1 == '#' || *ip1 == '\n' || *ip1 == '$' ) {
 		    fprintf(stderr,"[ERROR] Cannot handle: file = %s  line = %d\n",
 			    file_name,j+1);
 		    goto quit;
