@@ -15,6 +15,7 @@ procedure ccp_init (tty, devname)
 pointer	tty			# graphcap descriptor
 char	devname[ARB]		# device name
 
+size_t	sz_val
 pointer	nextch
 int	maxch, i
 real	char_height, char_width, char_size, xres, yres, xwidth, yheight
@@ -28,7 +29,8 @@ begin
 	# Allocate the CCP descriptor, string buffer, and x,y segment buffers.
 	if (g_cc == NULL) {
 	    call calloc (g_cc, LEN_CCP, TY_STRUCT)
-	    call malloc (CCP_SBUF(g_cc), SZ_SBUF, TY_CHAR)
+	    sz_val = SZ_SBUF
+	    call malloc (CCP_SBUF(g_cc), sz_val, TY_CHAR)
 	}
 
 	# Init string buffer parameters.  The first char of the string buffer

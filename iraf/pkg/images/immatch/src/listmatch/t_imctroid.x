@@ -332,6 +332,7 @@ int	nshifts			#I number of shifts in list (or # images)
 pointer	coordlist		#I coordinate "template" pointer
 int	ncoords			#I number of coordinates in list
 
+size_t	sz_val
 pointer	cp
 int	boxsize, i
 real	x, y
@@ -391,16 +392,20 @@ begin
 	NIMAGES(cp)	= nshifts
 	NCOORDS(cp)	= ncoords
 
-	call malloc (XINIT_PT(cp), ncoords, TY_REAL)
-	call malloc (YINIT_PT(cp), ncoords, TY_REAL)
-	call malloc (XSHIFT_PT(cp), nshifts, TY_REAL)
-	call malloc (YSHIFT_PT(cp), nshifts, TY_REAL)
-	call malloc (XSIZE_PT(cp), nshifts+1, TY_REAL)
-	call malloc (YSIZE_PT(cp), nshifts+1, TY_REAL)
-	call malloc (XCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (YCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (XSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (YSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
+	sz_val = ncoords
+	call malloc (XINIT_PT(cp), sz_val, TY_REAL)
+	call malloc (YINIT_PT(cp), sz_val, TY_REAL)
+	sz_val = nshifts
+	call malloc (XSHIFT_PT(cp), sz_val, TY_REAL)
+	call malloc (YSHIFT_PT(cp), sz_val, TY_REAL)
+	sz_val = nshifts+1
+	call malloc (XSIZE_PT(cp), sz_val, TY_REAL)
+	call malloc (YSIZE_PT(cp), sz_val, TY_REAL)
+	sz_val = (nshifts+1)*ncoords
+	call malloc (XCENTER_PT(cp), sz_val, TY_REAL)
+	call malloc (YCENTER_PT(cp), sz_val, TY_REAL)
+	call malloc (XSIGMA_PT(cp), sz_val, TY_REAL)
+	call malloc (YSIGMA_PT(cp), sz_val, TY_REAL)
 	call calloc (REJECTED_PT(cp), (nshifts+1)*ncoords, TY_INT)
 
 	for (i=1; ia_get2r (coordlist, x, y) != EOF; i=i+1) {
@@ -754,7 +759,8 @@ begin
 
 	call sfree (sp)
 
-	call malloc (lp, LEN_LP, TY_STRUCT)
+	sz_val = LEN_LP
+	call malloc (lp, sz_val, TY_STRUCT)
 	LP_FD(lp) = fd
 	LP_LEN(lp) = length
 

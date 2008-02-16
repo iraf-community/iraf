@@ -23,11 +23,13 @@ int	yxorder		#I order of y fit in x
 int	yyorder		#I order of y fit in y
 int	yxterms		#I include cross-terms in y fit
 int	maxiter		#I the maximum number of rejection interations
+size_t	sz_val
 double	reject		#I rejection threshold in sigma
 
 begin
 	# Allocate the space.
-	call malloc (fit, LEN_GEOMAP, TY_STRUCT)
+	sz_val = LEN_GEOMAP
+	call malloc (fit, sz_val, TY_STRUCT)
 
 	# Set function and order.
 	GM_PROJECTION(fit) = projection
@@ -1187,7 +1189,8 @@ begin
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)
 	    call mfree (GM_REJ(fit), TY_INT)
-	call malloc (GM_REJ(fit), npts, TY_INT)
+	sz_val = npts
+	call malloc (GM_REJ(fit), sz_val, TY_INT)
 	GM_NREJECT(fit) = 0
 
 	# Initialize the temporary weights array and the number of rejected
@@ -2413,7 +2416,8 @@ begin
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)
 	    call mfree (GM_REJ(fit), TY_INT)
-	call malloc (GM_REJ(fit), npts, TY_INT)
+	sz_val = npts
+	call malloc (GM_REJ(fit), sz_val, TY_INT)
 	GM_NREJECT(fit) = 0
 
 	# Initialize the temporary weights array and the number of rejected

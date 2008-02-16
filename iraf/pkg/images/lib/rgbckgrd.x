@@ -12,6 +12,7 @@ int	nx, ny		#I the dimensions of the input subraster
 int	pnx, pny	#I the size of the data region
 pointer	ptr		#I the pointer to the output buffer
 	
+size_t	sz_val
 int	j, nborder, wxborder, wyborder, index
 
 begin
@@ -21,11 +22,14 @@ begin
 	    ptr = NULL
 	    return (0)
 	} else if (nborder >= nx * ny) {
-	    call malloc (ptr, nx * ny, TY_REAL)
+	    sz_val = nx * ny
+	    call malloc (ptr, sz_val, TY_REAL)
 	    call amovr (buf, Memr[ptr], nx * ny)
 	    return (nx * ny)
-	} else
-	    call malloc (ptr, nborder, TY_REAL)
+	} else {
+	    sz_val = nborder
+	    call malloc (ptr, sz_val, TY_REAL)
+	}
 
 	# Fill the array.
 	wxborder = (nx - pnx) / 2

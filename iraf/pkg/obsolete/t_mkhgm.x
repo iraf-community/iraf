@@ -47,7 +47,8 @@ begin
 	call salloc (hgmr, sz_val, TY_REAL)
 
 	# Fetch the data.
-	call malloc (data, SZ_HISTBUF, TY_REAL)
+	sz_val = SZ_HISTBUF
+	call malloc (data, sz_val, TY_REAL)
 	ndata = get_histdata (fd, data, SZ_HISTBUF)
 	if (ndata <= 0) {
 	    call eprintf ("Warning: No input data for histogram.\n")

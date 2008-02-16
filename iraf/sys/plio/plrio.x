@@ -124,7 +124,8 @@ begin
 	    tsize[i]  = (msize[i] + block[i]-1) / block[i]
 
 	# Allocate the table space.
-	call malloc (bufp, tsize[1] * tsize[2], TY_INT)
+	sz_val = tsize[1] * tsize[2]
+	call malloc (bufp, sz_val, TY_INT)
 
 	# Compute the lookup table.  Since the lookup table can be large,
 	# e.g., a quarter million elements for a 512sq table, we don't want

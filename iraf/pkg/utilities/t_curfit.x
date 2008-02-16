@@ -250,9 +250,10 @@ begin
 	    if (n == 0) {
 		buflen = SZ_BUF
 		iferr {
-		    call malloc (x, buflen, datatype)
-		    call malloc (y, buflen, datatype)
-		    call malloc (w, buflen, datatype)
+		    sz_val = buflen
+		    call malloc (x, sz_val, datatype)
+		    call malloc (y, sz_val, datatype)
+		    call malloc (w, sz_val, datatype)
 		} then
 		    call erract (EA_FATAL)
 	    } else if (n + 1 > buflen) {
@@ -376,6 +377,7 @@ int	weighting		# Type of weighting
 int	axis			# Axis about which projection is taken
 int	datatype		# Datatype of data values
 
+size_t	sz_val
 int	npix
 pointer	im
 pointer	immap()
@@ -388,9 +390,10 @@ begin
 	    call error (2, "Attempt to take projection over nonexistent axis")
 	npix = IM_LEN(im,axis)
 
-	call malloc (x, npix, datatype)
-	call malloc (y, npix, datatype)
-	call malloc (w, npix, datatype)
+	sz_val = npix
+	call malloc (x, sz_val, datatype)
+	call malloc (y, sz_val, datatype)
+	call malloc (w, sz_val, datatype)
 
 	switch (datatype) {
 	case TY_REAL:

@@ -163,7 +163,8 @@ begin
 	}
 	
 	hdrlen = tlen*2
-	call malloc (hd, hdrlen, TY_CHAR)
+	sz_val = hdrlen
+	call malloc (hd, sz_val, TY_CHAR)
 	op = hd
 
 	while (Memc[ip] != EOS) {

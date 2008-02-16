@@ -72,9 +72,10 @@ begin
 		if (pmatch == NULL) {
 		    if (nregions == nalloc) {
 			nalloc = nregions + 1
-			if (nalloc == 1)
-			    call malloc (regions, nalloc, TY_STRUCT)
-			else
+			if (nalloc == 1) {
+			    sz_val = nalloc
+			    call malloc (regions, sz_val, TY_STRUCT)
+			} else
 			    call realloc (regions, nalloc, TY_STRUCT)
 			sz_val = SZ_REGION
 			call salloc (Memi[regions+nregions], sz_val,

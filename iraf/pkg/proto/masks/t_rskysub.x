@@ -95,7 +95,8 @@ begin
         }
 
 	# Allocate the sky subtraction structure
-	call malloc (rs, LEN_RSKYSUB, TY_STRUCT)
+	sz_val = LEN_RSKYSUB
+	call malloc (rs, sz_val, TY_STRUCT)
 
 	# Get the scaling factor computation method.
 	RS_RESCALE(rs) = btoi(clgetb ("rescale"))

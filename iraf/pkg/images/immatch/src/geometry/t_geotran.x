@@ -498,6 +498,7 @@ char	transform[ARB]		#I name of transform
 pointer	sx1, sy1		#O pointer to linear part of surface fit
 pointer	sx2, sy2		#O pointer to higher order surface
 
+size_t	sz_val
 int	i, rec, ncoeff, junk
 pointer	dt, xcoeff, ycoeff, newsx1, newsy1
 int	dtlocate(), dtgeti(), dtscan()
@@ -511,8 +512,9 @@ begin
 
 	# Get the linear part of the fit.
 	ncoeff = dtgeti (dt, rec, "surface1")
-	call malloc (xcoeff, ncoeff, TY_REAL)
-	call malloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call malloc (xcoeff, sz_val, TY_REAL)
+	call malloc (ycoeff, sz_val, TY_REAL)
 	do i = 1, ncoeff {
 	    junk = dtscan (dt)
 	    call gargr (Memr[xcoeff+i-1])

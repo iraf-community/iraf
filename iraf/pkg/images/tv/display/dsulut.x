@@ -39,7 +39,8 @@ begin
 	call ds_ulutsort (Memr[x], Memr[y], nvalues)
 
 	# Fill lut in straight line segments - piecewise linear
-	call malloc (lut, U_MAXPTS, TY_SHORT)	
+	sz_val = U_MAXPTS
+	call malloc (lut, sz_val, TY_SHORT)	
 	do i = 1, nvalues-1 {
 	    delta_gs = Memr[y+i] - Memr[y+i-1]
 	    delta_xv = Memr[x+i] - Memr[x+i-1]

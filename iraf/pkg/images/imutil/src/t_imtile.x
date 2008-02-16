@@ -21,7 +21,8 @@ real	clgetr()
 
 begin
 	call fseti (STDOUT, F_FLUSHNL, YES)
-	call malloc (it, LEN_IRSTRUCT, TY_STRUCT)
+	sz_val = LEN_IRSTRUCT
+	call malloc (it, sz_val, TY_STRUCT)
 
 	# Allocate temporary working space.
 	call smark (sp)

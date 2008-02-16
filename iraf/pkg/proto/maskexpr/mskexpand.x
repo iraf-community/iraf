@@ -246,6 +246,7 @@ pointer procedure me_expandtext (st, expr)
 pointer	st			#I symbol table (macros)
 char	expr[ARB]		#I input expression
 
+size_t	sz_val
 pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
@@ -255,7 +256,8 @@ extern	me_gsym()
 
 begin
 	buflen = SZ_COMMAND
-	call malloc (buf, buflen, TY_CHAR)
+	sz_val = buflen
+	call malloc (buf, sz_val, TY_CHAR)
 
 	gt = gt_opentext (expr, locpr(me_gsym), st, 0, GT_NOFILE)
 	nchars = gt_expand (gt, buf, buflen)

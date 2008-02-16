@@ -694,6 +694,7 @@ pointer	hgm		# pointer to the histogram
 int	nbins		# number of bins
 real	hwidth		# histogram resolution
 real	hmin		# minimum histogram value
+size_t	sz_val
 real	hmax		# maximum histogram value
 
 begin
@@ -709,7 +710,8 @@ begin
 
 	hmin = IS_MIN(ist)
 	hmax = IS_MAX(ist)
-	call malloc (hgm, nbins, TY_INT)
+	sz_val = nbins
+	call malloc (hgm, sz_val, TY_INT)
 	return (YES)
 end
 

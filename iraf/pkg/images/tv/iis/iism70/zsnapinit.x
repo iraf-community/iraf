@@ -14,6 +14,7 @@ procedure zsnap_init(kind)
 
 short	kind
 
+size_t	sz_val
 pointer	ptr
 short	gram[LEN_GRAM]
 short	select[LEN_SELECT+2]			# include split points
@@ -158,20 +159,27 @@ begin
 
 	# now allocate memory for all the various tables
 
-	call malloc (input,  IIS_XDIM, TY_SHORT)
-	call malloc (answer, IIS_XDIM, TY_SHORT)
-	call malloc (zs,     IIS_XDIM, TY_SHORT)
+	sz_val = IIS_XDIM
+	call malloc (input, sz_val, TY_SHORT)
+	call malloc (answer, sz_val, TY_SHORT)
+	call malloc (zs, sz_val, TY_SHORT)
 	# for each color:
 	do j = sn_start, sn_end {
-	    call malloc (result[j], IIS_XDIM,   TY_SHORT)
-	    call malloc (ofmp[j],   LEN_OFM,    TY_SHORT)
-	    call malloc (grp[j],    LEN_GRAM/2, TY_SHORT)
+	    sz_val = IIS_XDIM
+	    call malloc (result[j], sz_val,   TY_SHORT)
+	    sz_val = LEN_OFM
+	    call malloc (ofmp[j], sz_val,    TY_SHORT)
+	    sz_val = LEN_GRAM/2
+	    call malloc (grp[j], sz_val, TY_SHORT)
 	    do i = 1, i_maxframes {
-		if ( on[i] )
-		    call malloc (lutp[j,i], LEN_LUT, TY_SHORT)
+		if ( on[i] ) {
+		    sz_val = LEN_LUT
+		    call malloc (lutp[j,i], sz_val, TY_SHORT)
+		}
 	    }
 	}
-	call malloc (grbit_on, IIS_XDIM, TY_INT)
+	sz_val = IIS_XDIM
+	call malloc (grbit_on, sz_val, TY_INT)
 
 	# fill these up
 

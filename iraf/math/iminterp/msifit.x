@@ -19,6 +19,7 @@ int	nxpix			# number of points in the x dimension
 int	nypix			# number of points in the y dimension
 int	len_datain			# row length of datain
 
+size_t	sz_val
 int	i, j
 pointer	fptr, nptr, rptr
 pointer	tmp
@@ -50,7 +51,8 @@ begin
 		MSI_FSTPNT(msi) = 0
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi), nxpix * nypix, TY_REAL)
+		sz_val = nxpix * nypix
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BILINEAR, II_BIDRIZZLE:
@@ -64,8 +66,8 @@ begin
 		MSI_FSTPNT(msi) = 0
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BIPOLY3:
@@ -79,8 +81,8 @@ begin
 		MSI_FSTPNT(msi) = MSI_NXCOEFF(msi) + 1
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BIPOLY5:
@@ -94,8 +96,8 @@ begin
 		MSI_FSTPNT(msi) = 2 * MSI_NXCOEFF(msi) + 2
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BISPLINE3:

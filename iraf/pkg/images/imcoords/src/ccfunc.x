@@ -334,7 +334,8 @@ begin
 
         # Copy the attributes of the remaining axes to the new wcs.
         szatstr = SZ_LINE
-        call malloc (atstr, szatstr, TY_CHAR)
+        sz_val = szatstr
+        call malloc (atstr, sz_val, TY_CHAR)
         do l = 1, ndim {
             if (l == ax1 || l == ax2)
                 next
@@ -642,7 +643,8 @@ begin
         call dgssave (gs, Memd[coeff])
 
         szatstr = SZ_LINE
-        call malloc (atstr, szatstr, TY_CHAR)
+        sz_val = szatstr
+        call malloc (atstr, sz_val, TY_CHAR)
         op = 0
         do i = 1, nsave {
             call sprintf (Memc[par], SZ_LINE, "%g ")

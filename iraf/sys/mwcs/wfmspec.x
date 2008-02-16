@@ -117,7 +117,8 @@ begin
 	# Get spectrum information.
 	call smark (sp)
 	sz_atval = DEF_SZATVAL
-	call malloc (atval, sz_atval, TY_CHAR)
+	sz_val = sz_atval
+	call malloc (atval, sz_val, TY_CHAR)
 	sz_val = SZ_ATNAME
 	call salloc (atkey, sz_val, TY_CHAR)
 
@@ -134,13 +135,14 @@ begin
 	    }
 
 	    if (naps == 0) {
-		call malloc (aps, NALLOC, TY_INT) 
-		call malloc (dtype, NALLOC, TY_INT) 
-		call malloc (crval, NALLOC, TY_DOUBLE) 
-		call malloc (cdelt, NALLOC, TY_DOUBLE) 
-		call malloc (npts, NALLOC, TY_INT) 
-		call malloc (z, NALLOC, TY_DOUBLE) 
-		call malloc (coeff, NALLOC, TY_POINTER)
+		sz_val = NALLOC
+		call malloc (aps, sz_val, TY_INT) 
+		call malloc (dtype, sz_val, TY_INT) 
+		call malloc (crval, sz_val, TY_DOUBLE) 
+		call malloc (cdelt, sz_val, TY_DOUBLE) 
+		call malloc (npts, sz_val, TY_INT) 
+		call malloc (z, sz_val, TY_DOUBLE) 
+		call malloc (coeff, sz_val, TY_POINTER)
 	    } else if (mod (naps, NALLOC) == 0) {
 		call realloc (aps, naps+NALLOC, TY_INT) 
 		call realloc (dtype, naps+NALLOC, TY_INT) 
@@ -205,8 +207,9 @@ begin
 	# when the inverse transformation is evaluated sequentially.
 
 	if (dir == INVERSE) {
-	   call malloc (crval, naps, TY_DOUBLE)
-	   call malloc (cdelt, naps, TY_DOUBLE)
+	   sz_val = naps
+	   call malloc (crval, sz_val, TY_DOUBLE)
+	   call malloc (cdelt, sz_val, TY_DOUBLE)
 	   do i = 0, naps-1 {
 		if (Memi[FC_NPTS(fc)+i] == 0)
 		    next
@@ -341,6 +344,7 @@ char	atval[ARB]		#I attribute string
 pointer	coeff			#O coefficient array
 double	xmin, xmax		#I x limits
 
+size_t	sz_val
 double	dval, temp
 int	ncoeff, type, order, ip, i
 errchk	malloc, realloc
@@ -353,9 +357,10 @@ begin
 
 	ip = 1
 	while (ctod (atval, ip, dval) > 0) {
-	    if (coeff == NULL)
-		call malloc (coeff, NALLOC, TY_DOUBLE)
-	    else if (mod (ncoeff, NALLOC) == 0)
+	    if (coeff == NULL) {
+		sz_val = NALLOC
+		call malloc (coeff, sz_val, TY_DOUBLE)
+	    } else if (mod (ncoeff, NALLOC) == 0)
 		call realloc (coeff, ncoeff+NALLOC, TY_DOUBLE)
 	    Memd[coeff+ncoeff] = dval
 	    ncoeff = ncoeff + 1

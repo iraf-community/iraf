@@ -109,7 +109,8 @@ iferr {
 	# that it may be reallocated if more space is needed.
 
 	sz_filter = DEF_SZEXPRBUF
-	call malloc (filter, sz_filter, TY_CHAR)
+	sz_val = sz_filter
+	call malloc (filter, sz_val, TY_CHAR)
 	if (qpio_parse (io, paramex[expr],
 	    filter, sz_filter, Memc[mask], SZ_FNAME) == ERR)
 	    call eprintf ("QPIO warning: error parsing options expression\n")
@@ -218,12 +219,14 @@ iferr {
 
 	# Copy the MINEVL event struct into the QPIO descriptor.
 	nwords = IO_EVENTLEN(io)
-	call malloc (IO_MINEVL(io), nwords, TY_SHORT)
+	sz_val = nwords
+	call malloc (IO_MINEVL(io), sz_val, TY_SHORT)
 	call amovs (Memi[eh+EH_MINEVLOFF(eh)], Mems[IO_MINEVL(io)],
 	    IO_EVENTLEN(io))
 
 	# Copy the MAXEVL event struct into the QPIO descriptor.
-	call malloc (IO_MAXEVL(io), nwords, TY_SHORT)
+	sz_val = nwords
+	call malloc (IO_MAXEVL(io), sz_val, TY_SHORT)
 	call amovs (Memi[eh+EH_MAXEVLOFF(eh)], Mems[IO_MAXEVL(io)],
 	    IO_EVENTLEN(io))
 
@@ -240,8 +243,9 @@ iferr {
 	if (IO_INDEXLEN(io) > 0) {
 	    sz_val = IO_INDEXLEN(io) * 2
 	    call salloc (oo, sz_val, TY_SHORT)
-	    call malloc (IO_YOFFVP(io), IO_INDEXLEN(io), TY_INT)
-	    call malloc (IO_YLENVP(io), IO_INDEXLEN(io), TY_INT)
+	    sz_val = IO_INDEXLEN(io)
+	    call malloc (IO_YOFFVP(io), sz_val, TY_INT)
+	    call malloc (IO_YLENVP(io), sz_val, TY_INT)
 
 	    nchars = IO_YOFFVLEN(io) * SZ_SHORT
 	    call seek (fd, IO_YOFFVOFF(io))
@@ -331,11 +335,14 @@ iferr {
 	# Load user specified mask.
 	if (Memc[umask] != EOS)
 	    call qpio_loadmask (io, Memc[umask], YES)
-	else if (IO_INDEXLEN(io) > 0)
-	    call malloc (IO_RL(io), RL_LENELEM*2, TY_INT)
+	else if (IO_INDEXLEN(io) > 0) {
+	    sz_val = RL_LENELEM*2
+	    call malloc (IO_RL(io), sz_val, TY_INT)
+	}
 
 	# Allocate the bucket buffer.
-	call malloc (IO_BP(io), IO_SZBBUCKET(io)/SZB_CHAR/SZ_SHORT, TY_SHORT)
+	sz_val = IO_SZBBUCKET(io)/SZB_CHAR/SZ_SHORT
+	call malloc (IO_BP(io), sz_val, TY_SHORT)
 done_
 	# If no default rect was specified, set default bounding box for
 	# reading to be the entire image.

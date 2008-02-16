@@ -16,6 +16,7 @@ int procedure reopen (fd, mode)
 
 int	fd, mode
 pointer	newfp, ffp
+size_t	sz_val
 int	newfd, fgetfd()
 errchk	syserr, malloc, seek
 include	<fio.com>
@@ -41,7 +42,8 @@ begin
 	# descriptor and copy the channel descriptor from the original file.
 
 	if (FCD(ffp) == FLCD(ffp)) {
-	    call malloc (FCD(ffp), LEN_CHANDES, TY_STRUCT)
+	    sz_val = LEN_CHANDES
+	    call malloc (FCD(ffp), sz_val, TY_STRUCT)
 	    call amovi (Memi[FLCD(ffp)], Memi[FCD(ffp)], LEN_CHANDES)
 	}
 

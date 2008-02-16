@@ -118,7 +118,8 @@ begin
 
 	# Allocate field list descriptor.
 	call calloc (fn, LEN_FNSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_SBUF, TY_CHAR)
+	sz_val = SZ_SBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	FN_SBUF(fn) = sbuf
 	nextch = sbuf

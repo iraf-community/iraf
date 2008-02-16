@@ -77,7 +77,8 @@ begin
 	qp = EX_QP(ex)
 
 	# Allocate a variable size expression buffer.
-	call malloc (expr, sz_expr, TY_CHAR)
+	sz_val = sz_expr
+	call malloc (expr, sz_val, TY_CHAR)
 
 	# Open the expression list for token input with macro expansion.
 	in = qp_opentext (qp, exprlist)

@@ -12,6 +12,7 @@ pointer ep			# EPIX structure
 int	ap			# Aperture type
 int	xa, ya, xb, yb		# Aperture coordinates
 
+size_t	sz_val
 int	i, x1, x2, y1, y2
 pointer	mask, x, y, w, gs
 
@@ -24,10 +25,11 @@ begin
 	y2 = max (ya, yb) + i
 	call ep_gdata (ep, x1, x2, y1, y2)
 	if (EP_OUTDATA(ep) != NULL) {
-	    call malloc (mask, EP_NPTS(ep), TY_INT)
-	    call malloc (x, EP_NPTS(ep), TY_REAL)
-	    call malloc (y, EP_NPTS(ep), TY_REAL)
-	    call malloc (w, EP_NPTS(ep), TY_REAL)
+	    sz_val = EP_NPTS(ep)
+	    call malloc (mask, sz_val, TY_INT)
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (y, sz_val, TY_REAL)
+	    call malloc (w, sz_val, TY_REAL)
 
 	    call ep_search (ep, Memr[EP_OUTDATA(ep)], EP_NX(ep), EP_NY(ep),
 		ap, xa, ya, xb, yb)

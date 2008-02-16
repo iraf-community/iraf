@@ -104,6 +104,7 @@ pointer	sample			# output vector containing the sample
 int	optimal_sample_size	# desired number of pixels in sample
 int	len_stdline		# optimal number of pixels per line
 
+size_t	sz_val
 int	ncols, nlines, col_step, line_step, maxpix, line
 int	opt_npix_per_line, npix_per_line
 int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
@@ -140,7 +141,8 @@ begin
 	# caller.
 
 	maxpix = npix_per_line * max_nlines_in_sample
-	call malloc (sample, maxpix, TY_REAL)
+	sz_val = maxpix
+	call malloc (sample, sz_val, TY_REAL)
 
 # call eprintf ("sample: x[%d:%d:%d] y[%d:%d:%d]\n")
 # call pargi(1);call pargi(ncols); call pargi(col_step)

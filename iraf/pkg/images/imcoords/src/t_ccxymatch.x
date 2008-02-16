@@ -224,7 +224,8 @@ begin
 		# triangles used for matching and sort them in order of
 		# increasing ratio.
 
-		call malloc (rsindex, ntrefstars, TY_INT)
+		sz_val = ntrefstars
+		call malloc (rsindex, sz_val, TY_INT)
 	    	nrefstars = rg_sort (Memr[xref], Memr[yref], Memi[rsindex],
 	            ntrefstars, separation, YES, YES)
 		if (match != RG_TRIANGLES) {
@@ -319,9 +320,10 @@ begin
 		    call printf (
 		        "    No valid reference triangles can be defined\n")
 	    } else {
-	        call malloc (xtrans, ntliststars, TY_REAL)
-	        call malloc (ytrans, ntliststars, TY_REAL)
-	        call malloc (listindex, ntliststars, TY_INT)
+	        sz_val = ntliststars
+	        call malloc (xtrans, sz_val, TY_REAL)
+	        call malloc (ytrans, sz_val, TY_REAL)
+	        call malloc (listindex, sz_val, TY_INT)
 	        call rg_compute (Memr[xlist], Memr[ylist], Memr[xtrans],
 	            Memr[ytrans], ntliststars, Memr[coeff], MAX_NCOEFF)
 	        nliststars = rg_sort (Memr[xtrans], Memr[ytrans],
@@ -493,11 +495,12 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	call malloc (lng, bufsize, TY_DOUBLE)
-	call malloc (lat, bufsize, TY_DOUBLE)
-	call malloc (x, bufsize, TY_REAL)
-	call malloc (y, bufsize, TY_REAL)
-	call malloc (lineno, bufsize, TY_INT)
+	sz_val = bufsize
+	call malloc (lng, sz_val, TY_DOUBLE)
+	call malloc (lat, sz_val, TY_DOUBLE)
+	call malloc (x, sz_val, TY_REAL)
+	call malloc (y, sz_val, TY_REAL)
+	call malloc (lineno, sz_val, TY_INT)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0

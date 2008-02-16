@@ -45,7 +45,8 @@ begin
 	# Allocate the line list buffer.
 	PL_MAXLINE(pl) = (axlen[1] * 3) + LL_CURHDRLEN
 	PL_LLLEN(pl) = PL_LLBUFLEN
-	call malloc (PL_LLBP(pl), PL_LLBUFLEN, TY_SHORT)
+	sz_val = PL_LLBUFLEN
+	call malloc (PL_LLBP(pl), sz_val, TY_SHORT)
 	lp = PL_LLBP(pl)
 
 	# Encode the empty line line-list.

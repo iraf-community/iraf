@@ -46,7 +46,8 @@ begin
 	call calloc (pms, nimages, TY_POINTER)
 	call calloc (bufs, nimages, TY_POINTER)
 	do i = 1, nimages {
-	    call malloc (Memi[bufs+i-1], npix, TY_INT)
+	    sz_val = npix
+	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
 	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
 	}
 

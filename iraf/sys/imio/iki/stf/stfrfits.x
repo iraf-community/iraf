@@ -257,7 +257,8 @@ begin
 
 	    call seek (spool, BOFL)
 	    nchars = fstatl (spool, F_FILESIZE)
-	    call malloc (fits, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call malloc (fits, sz_val, TY_CHAR)
 	    user = stropen (Memc[fits], nchars, NEW_FILE)
 	    call stf_copyfits (stf, spool, NULL, user)
 

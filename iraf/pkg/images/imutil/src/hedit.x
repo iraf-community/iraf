@@ -389,7 +389,8 @@ begin
 	if (numeric || valexpr[1] == '(')
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
-	    call malloc (o, LEN_OPERAND, TY_STRUCT)
+	    sz_val = LEN_OPERAND
+	    call malloc (o, sz_val, TY_STRUCT)
 	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
@@ -475,7 +476,8 @@ begin
 	if (numeric || valexpr[1] == '(')
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
-	    call malloc (o, LEN_OPERAND, TY_STRUCT)
+	    sz_val = LEN_OPERAND
+	    call malloc (o, sz_val, TY_STRUCT)
 	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}

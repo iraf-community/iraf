@@ -172,8 +172,10 @@ begin
         sz_val = nval
         call salloc (buf, sz_val, TY_CHAR)
 
-        if (ptr == NULL)
-            call malloc (ptr, nval * SZB_CHAR, TY_CHAR)
+        if (ptr == NULL) {
+            sz_val = nval * SZB_CHAR
+            call malloc (ptr, sz_val, TY_CHAR)
+        }
         nstat = read (fd, Memc[buf], nval / SZB_CHAR + 1)
 
         fp = ip_lnote(fd)
@@ -210,12 +212,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_PIXEL)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_PIXEL)
+        }
         nstat = read (fd, Mem$t[ptr], len * SZ_PIXEL)
 	$if (datatype == rd)
 	call ieevupk$t (Mem$t[ptr], Mem$t[ptr], len)
@@ -233,12 +238,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_REAL)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_REAL)
+        }
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 end
 
@@ -252,12 +260,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_DOUBLE)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_DOUBLE)
+        }
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 end
 

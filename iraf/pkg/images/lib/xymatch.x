@@ -24,9 +24,10 @@ begin
 	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	call malloc (x, bufsize, TY_REAL)
-	call malloc (y, bufsize, TY_REAL)
-	call malloc (lineno, bufsize, TY_INT)
+	sz_val = bufsize
+	call malloc (x, sz_val, TY_REAL)
+	call malloc (y, sz_val, TY_REAL)
+	call malloc (lineno, sz_val, TY_INT)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0

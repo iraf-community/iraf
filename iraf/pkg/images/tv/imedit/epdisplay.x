@@ -15,6 +15,7 @@ pointer	ep		# EPIX structure
 char	image[ARB]	# Image
 bool	erase		# Erase
  
+size_t	sz_val
 pointer	temp, immap(), imgs2r(), imps2r()
  
 begin
@@ -22,7 +23,8 @@ begin
 	# input subraster for later undoing.
  
 	if (EP_OUTDATA(ep) != NULL) {
-	    call malloc (temp, EP_NPTS(ep), TY_REAL)
+	    sz_val = EP_NPTS(ep)
+	    call malloc (temp, sz_val, TY_REAL)
 	    call amovr (Memr[EP_INDATA(ep)], Memr[temp], EP_NPTS(ep))
 	    call imunmap (EP_IM(ep))
 	    call ep_command (ep, image, erase)

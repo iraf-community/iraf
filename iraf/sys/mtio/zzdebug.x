@@ -248,6 +248,7 @@ int procedure mt_examine (out, mtfile)
 int	out				# output stream
 char	mtfile[ARB]			# magtape file to be examined
 
+size_t	sz_val
 pointer	buf
 int	in, nrecords, totrecords, totbytes, bufsize, recsize, last_recsize
 errchk	mtopen, read, fstati, printf, pargi
@@ -256,7 +257,8 @@ int	mtopen(), read(), fstati()
 begin
 	in = mtopen (mtfile, READ_ONLY, 0)
 	bufsize = fstati (in, F_BUFSIZE)
-	call malloc (buf, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call malloc (buf, sz_val, TY_CHAR)
 
 	call fprintf (out, "    File %s:\n")
 	    call pargstr (mtfile)
@@ -315,6 +317,7 @@ procedure t_mtcopy()
 pointer	buf
 int	in, out, bufsize, acmode
 char	infile[SZ_FNAME], outfile[SZ_FNAME]
+size_t	sz_val
 int	mtopen(), fstati(), read(),  mtfile()
 
 begin
@@ -332,7 +335,8 @@ begin
 	out = mtopen (outfile, acmode, 0)
 
 	bufsize = fstati (in, F_BUFSIZE)
-	call malloc (buf, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call malloc (buf, sz_val, TY_CHAR)
 
 	while (read (in, Memc[buf], bufsize) != EOF)
 	    call write (out, Memc[buf], fstati (in, F_NCHARS))

@@ -44,8 +44,9 @@ begin
 	}
 
 	# Get the requested columns from the image.
-	call malloc (x_vec, nlines, TY_REAL)
-	call malloc (y_vec, nlines, TY_REAL)
+	sz_val = nlines
+	call malloc (x_vec, sz_val, TY_REAL)
+	call malloc (y_vec, sz_val, TY_REAL)
 	call plt_gcols (im, mw, ct, min(col1,col2), max(col1,col2),
 	    Memr[x_vec], Memr[y_vec], zmin, zmax, Memc[wcslab], Memc[fmt],
 	    SZ_LINE)

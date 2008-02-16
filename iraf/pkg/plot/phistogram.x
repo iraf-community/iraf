@@ -264,12 +264,14 @@ int	fd		# input text file descriptor
 pointer	data		# pointer to the ouput data array
 int	sz_bufincr	# increment for data buffer size
 
+size_t	sz_val
 int	szbuf, ndata
 int	fscan(), nscan()
 
 begin
 	# Get some buffer space.
-	call malloc (data, sz_bufincr, TY_REAL)
+	sz_val = sz_bufincr
+	call malloc (data, sz_val, TY_REAL)
 	szbuf = sz_bufincr
 
 	# Read the data.

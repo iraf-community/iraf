@@ -217,7 +217,8 @@ begin
 	    while (fscan (regfd) != EOF) {
 
 		# Get the expression.
-	        call malloc (expr, SZ_LINE, TY_CHAR)
+	        sz_val = SZ_LINE
+	        call malloc (expr, sz_val, TY_CHAR)
 		call gargstr (Memc[expr], SZ_LINE)
 
 		# Determine whether or not the region specificationis an

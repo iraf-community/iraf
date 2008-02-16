@@ -188,7 +188,8 @@ pointer	mw_openim()
 errchk	mw_openim()
 
 begin
-	call malloc (coo, LEN_SKYCOOSTRUCT, TY_STRUCT)
+	sz_val = LEN_SKYCOOSTRUCT
+	call malloc (coo, sz_val, TY_STRUCT)
 	call sprintf (SKY_COOSYSTEM(coo), SZ_FNAME, "%s %s")
 	    call pargstr (IM_HDRFILE(im))
 	    call pargstr (wcs)

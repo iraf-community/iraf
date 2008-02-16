@@ -31,8 +31,10 @@ begin
 	sz_val = SZ_FNAME
 	call salloc (fname, sz_val, TY_CHAR)
 
-	call malloc (strbuf, INIT_STRBUF, TY_CHAR)
-	call malloc (stroff, INIT_MAXSTR, TY_INT)
+	sz_val = INIT_STRBUF
+	call malloc (strbuf, sz_val, TY_CHAR)
+	sz_val = INIT_MAXSTR
+	call malloc (stroff, sz_val, TY_INT)
 
 
 	# Get various table formatting parameters from CL.

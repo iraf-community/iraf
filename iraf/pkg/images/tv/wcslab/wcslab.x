@@ -111,30 +111,43 @@ end
 pointer procedure wl_create()
 
 int	i,j
+size_t	sz_val
 pointer	wd
 
 begin
 	# Allocate the descriptor memory.
-	call malloc (wd, WL_LEN, TY_STRUCT)
+	sz_val = WL_LEN
+	call malloc (wd, sz_val, TY_STRUCT)
 
 	# Allocate the subarrays.
-	call malloc (WL_AXIS_TITLE_PTR(wd), SZ_LINE * N_DIM, TY_CHAR)
-	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), N_SIDES * N_DIM, TY_INT)
-	call malloc (WL_BEGIN_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_END_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_LABEL_ANGLE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
-	call malloc (WL_LABEL_AXIS_PTR(wd), MAX_LABEL_POINTS, TY_INT)
-	call malloc (WL_LABEL_POSITION_PTR(wd), N_DIM * MAX_LABEL_POINTS,
+	sz_val = SZ_LINE * N_DIM
+	call malloc (WL_AXIS_TITLE_PTR(wd), sz_val, TY_CHAR)
+	sz_val = N_SIDES * N_DIM
+	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), sz_val, TY_INT)
+	sz_val = N_DIM
+	call malloc (WL_BEGIN_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_END_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = MAX_LABEL_POINTS
+	call malloc (WL_LABEL_ANGLE_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_LABEL_AXIS_PTR(wd), sz_val, TY_INT)
+	sz_val = N_DIM * MAX_LABEL_POINTS
+	call malloc (WL_LABEL_POSITION_PTR(wd), sz_val,
 	    TY_DOUBLE)
-	call malloc (WL_LABEL_SIDE_PTR(wd), N_DIM * N_SIDES, TY_BOOL)
-	call malloc (WL_LABEL_VALUE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
-	call malloc (WL_LOGICAL_CENTER_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_MAJ_I_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_MIN_I_PTR(wd), N_DIM, TY_INT)
-	call malloc (WL_NV_PTR(wd), N_SIDES, TY_REAL)
-	call malloc (WL_SCREEN_BOUNDARY_PTR(wd), N_SIDES, TY_DOUBLE)
-	call malloc (WL_TITLE_PTR(wd), SZ_LINE, TY_CHAR)
-	call malloc (WL_WORLD_CENTER_PTR(wd), N_DIM, TY_DOUBLE)
+	sz_val = N_DIM * N_SIDES
+	call malloc (WL_LABEL_SIDE_PTR(wd), sz_val, TY_BOOL)
+	sz_val = MAX_LABEL_POINTS
+	call malloc (WL_LABEL_VALUE_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = N_DIM
+	call malloc (WL_LOGICAL_CENTER_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_MAJ_I_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_MIN_I_PTR(wd), sz_val, TY_INT)
+	sz_val = N_SIDES
+	call malloc (WL_NV_PTR(wd), sz_val, TY_REAL)
+	call malloc (WL_SCREEN_BOUNDARY_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call malloc (WL_TITLE_PTR(wd), sz_val, TY_CHAR)
+	sz_val = N_DIM
+	call malloc (WL_WORLD_CENTER_PTR(wd), sz_val, TY_DOUBLE)
 
 	# Initialize the simple values (should be the same as the parameter
 	# file).

@@ -108,9 +108,11 @@ begin
 	TC_NEXTCH(tc)     = 0
 
 	iferr {
-	    call malloc (TC_DEVNAME_P(tc), buflen, TY_INT)
-	    call malloc (TC_CAPLIST_P(tc), buflen, TY_INT)
-	    call malloc (TC_SBUF(tc), SZ_SBUF, TY_CHAR)
+	    sz_val = buflen
+	    call malloc (TC_DEVNAME_P(tc), sz_val, TY_INT)
+	    call malloc (TC_CAPLIST_P(tc), sz_val, TY_INT)
+	    sz_val = SZ_SBUF
+	    call malloc (TC_SBUF(tc), sz_val, TY_CHAR)
 	} then
 	    call erract (EA_FATAL)
 

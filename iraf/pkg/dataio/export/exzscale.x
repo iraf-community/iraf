@@ -342,6 +342,7 @@ pointer	sample				# output vector containing the sample
 int	optimal_sample_size		# desired number of pixels in sample
 int	len_stdline			# optimal number of pixels per line
 
+size_t	sz_val
 pointer	op, ep, out, bpm
 int	ncols, nlines, col_step, line_step, maxpix, line
 int	opt_npix_per_line, npix_per_line, nsubsample
@@ -379,13 +380,17 @@ begin
 	# caller.
 
 	maxpix = npix_per_line * max_nlines_in_sample
-	call malloc (sample, maxpix, TY_REAL)
+	sz_val = maxpix
+	call malloc (sample, sz_val, TY_REAL)
 
 	# Extract the vector.
 	op = sample
-	call malloc (out, ncols, TY_REAL)
-	if (exptr2 != NULL)
-	    call malloc (bpm, ncols, TY_INT)
+	sz_val = ncols
+	call malloc (out, sz_val, TY_REAL)
+	if (exptr2 != NULL) {
+	    sz_val = ncols
+	    call malloc (bpm, sz_val, TY_INT)
+	}
 	do line = (line_step + 1) / 2, nlines, line_step {
 
 	    # Evaluate the expression at the current line.

@@ -40,7 +40,8 @@ begin
 
 	# Initalize the temporary string.
 	sz1 = strlen (Memc[CQ_PQPVALUES(cc)]) + CQ_SZ_QPVALUE
-	call malloc (tmpdic, sz1, TY_CHAR)
+	sz_val = sz1
+	call malloc (tmpdic, sz_val, TY_CHAR)
 	call strcpy ("|", Memc[tmpdic], sz1)
 	op1 = 2
 

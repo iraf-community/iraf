@@ -5,10 +5,12 @@ include "psfmatch.h"
 procedure rg_pinit (pm, cfunc)
 
 pointer	pm		#O pointer to psfmatch structure
+size_t	sz_val
 int	cfunc		#I mode of computing the convolution function
 
 begin
-	call malloc (pm, LEN_PSFSTRUCT, TY_STRUCT)
+	sz_val = LEN_PSFSTRUCT
+	call malloc (pm, sz_val, TY_STRUCT)
 
 	# Initialize the pointers.
 	PM_RC1(pm) = NULL
@@ -93,6 +95,7 @@ end
 
 procedure rg_prinit (pm)
 
+size_t	sz_val
 pointer	pm		#I pointer to psfmatch structure
 
 begin
@@ -101,13 +104,14 @@ begin
 	PM_NREGIONS(pm) = 0
 	PM_CNREGION(pm) = 1
 
-	call malloc (PM_RC1(pm), MAX_NREGIONS, TY_INT)
-	call malloc (PM_RC2(pm), MAX_NREGIONS, TY_INT)
-	call malloc (PM_RL1(pm), MAX_NREGIONS, TY_INT)
-	call malloc (PM_RL2(pm), MAX_NREGIONS, TY_INT)
-	call malloc (PM_RZERO(pm), MAX_NREGIONS, TY_REAL)
-	call malloc (PM_RXSLOPE(pm), MAX_NREGIONS, TY_REAL)
-	call malloc (PM_RYSLOPE(pm), MAX_NREGIONS, TY_REAL)
+	sz_val = MAX_NREGIONS
+	call malloc (PM_RC1(pm), sz_val, TY_INT)
+	call malloc (PM_RC2(pm), sz_val, TY_INT)
+	call malloc (PM_RL1(pm), sz_val, TY_INT)
+	call malloc (PM_RL2(pm), sz_val, TY_INT)
+	call malloc (PM_RZERO(pm), sz_val, TY_REAL)
+	call malloc (PM_RXSLOPE(pm), sz_val, TY_REAL)
+	call malloc (PM_RYSLOPE(pm), sz_val, TY_REAL)
 
 	call amovki (INDEFI, Memi[PM_RC1(pm)], MAX_NREGIONS)
 	call amovki (INDEFI, Memi[PM_RC2(pm)], MAX_NREGIONS)

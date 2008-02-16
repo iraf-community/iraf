@@ -50,7 +50,8 @@ begin
 
 	    if (nscan() == 1) {
 		if (GP_UIFNAME(IC_GP(ic)) != EOS) {
-		    call malloc (msg, 100000, TY_CHAR)
+		    sz_val = 100000
+		    call malloc (msg, sz_val, TY_CHAR)
 		    fd = stropen (Memc[msg], 100000, WRITE_ONLY)
 		} else {
 		    fd = open ("STDOUT", APPEND, TEXT_FILE)

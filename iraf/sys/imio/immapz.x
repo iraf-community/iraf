@@ -59,7 +59,8 @@ begin
 		max (min_lenuserarea, int(hdr_arg)) / SZ_STRUCT
 	}
 
-	call malloc (im, LEN_IMDES + len_imhdr, TY_STRUCT)
+	sz_val = LEN_IMDES + len_imhdr
+	call malloc (im, sz_val, TY_STRUCT)
 	call aclri (Memi[im], LEN_IMDES + min (len_imhdr, LEN_IMHDR + 1))
 	IM_LENHDRMEM(im) = len_imhdr
 

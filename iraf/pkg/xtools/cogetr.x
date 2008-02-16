@@ -32,6 +32,7 @@ int	col		# Column
 int	line1		# First image line of column vector
 int	line2		# Last image line of column vector
 
+size_t	sz_val
 int	ncols, nlines, lastc1, lastl1, lastl2
 int	i, imlen1, imlen2, col1, nc
 pointer	im, coldata, buffer, buf, data
@@ -66,8 +67,10 @@ begin
 
 	    call mfree (coldata, TY_REAL)
 	    call mfree (buffer, TY_REAL)
-	    call malloc (coldata, line2 - line1 + 1, TY_REAL)
-	    call malloc (buffer, ncols * nlines, TY_REAL)
+	    sz_val = line2 - line1 + 1
+	    call malloc (coldata, sz_val, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buffer, sz_val, TY_REAL)
 
 	    CO_DATA(co) = coldata
 	    CO_BUF(co) = buffer
@@ -136,10 +139,12 @@ pointer procedure comap (im, maxbuf)
 
 pointer	im		# IMIO pointer
 int	maxbuf		# Maximum buffer size
+size_t	sz_val
 pointer	co		# Returned pointer
 
 begin
-	call malloc (co, LEN_CO, TY_LONG)
+	sz_val = LEN_CO
+	call malloc (co, sz_val, TY_LONG)
 	CO_IM(co) = im
 	CO_MAXBUF(co) = maxbuf
 	CO_DATA(co) = NULL

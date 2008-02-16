@@ -14,6 +14,7 @@ real	x[npts], y[npts]	# Coordinates
 int	npts			# Number of pixels in subraster
 pointer	gs			# Background surface
 
+size_t	sz_val
 int	i, j, nbg
 real	a, b, urand(), gseval(), ep_gauss()
 pointer	bg
@@ -38,7 +39,8 @@ begin
 	if (gs == NULL)
 	    return
 
-	call malloc (bg, npts, TY_REAL)
+	sz_val = npts
+	call malloc (bg, sz_val, TY_REAL)
 
 	nbg = 0
 	do i = 1, npts {

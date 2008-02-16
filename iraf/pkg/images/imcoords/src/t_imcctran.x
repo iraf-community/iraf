@@ -105,25 +105,32 @@ begin
 	    ndim = mw_stati (mwin, MW_NPHYSDIM)
 
 	    # Allocate working memory for the vectors and matrices.
-	    call malloc (r, ndim, TY_DOUBLE)
-	    call malloc (w, ndim, TY_DOUBLE)
-	    call malloc (cd, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltv, ndim, TY_DOUBLE)
-	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (nr, ndim, TY_DOUBLE)
-	    call malloc (jr, ndim, TY_DOUBLE)
-	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (r, sz_val, TY_DOUBLE)
+	    call malloc (w, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (cd, sz_val, TY_DOUBLE)
+	    call malloc (ltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (ltv, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (iltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (nr, sz_val, TY_DOUBLE)
+	    call malloc (jr, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (ncd, sz_val, TY_DOUBLE)
 
 	    # Allocate working memory for the grid points.
-	    call malloc (ix, npts, TY_DOUBLE)
-	    call malloc (iy, npts, TY_DOUBLE)
-	    call malloc (ilng, npts, TY_DOUBLE)
-	    call malloc (ilat, npts, TY_DOUBLE)
-	    call malloc (ox, npts, TY_DOUBLE)
-	    call malloc (oy, npts, TY_DOUBLE)
-	    call malloc (olng, npts, TY_DOUBLE)
-	    call malloc (olat, npts, TY_DOUBLE)
+	    sz_val = npts
+	    call malloc (ix, sz_val, TY_DOUBLE)
+	    call malloc (iy, sz_val, TY_DOUBLE)
+	    call malloc (ilng, sz_val, TY_DOUBLE)
+	    call malloc (ilat, sz_val, TY_DOUBLE)
+	    call malloc (ox, sz_val, TY_DOUBLE)
+	    call malloc (oy, sz_val, TY_DOUBLE)
+	    call malloc (olng, sz_val, TY_DOUBLE)
+	    call malloc (olat, sz_val, TY_DOUBLE)
 
 	    # Compute the original logical to world transformation.
             call mw_gltermd (mwin, Memd[ltm], Memd[ltv], ndim)

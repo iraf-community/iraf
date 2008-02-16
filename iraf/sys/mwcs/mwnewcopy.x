@@ -10,6 +10,7 @@ pointer procedure mw_newcopy (o_mw)
 
 pointer	o_mw			#I pointer to old MWCS descriptor
 
+size_t	sz_val
 int	ndim, nelem, i, j
 pointer	mw, wp, o_wp, at, o_at
 
@@ -19,7 +20,8 @@ errchk	calloc, mw_copys, mw_copyd
 
 begin
 	# Make a copy of the main descriptor.
-	call malloc (mw, LEN_MWCS, TY_STRUCT)
+	sz_val = LEN_MWCS
+	call malloc (mw, sz_val, TY_STRUCT)
 	call amovi (Memi[o_mw], Memi[mw], LEN_MWCS)
 
 	# We have to allocate our own string and data buffers.

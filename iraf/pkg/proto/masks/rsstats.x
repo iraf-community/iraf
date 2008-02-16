@@ -346,7 +346,8 @@ begin
 	fscale = MIS_MEDIAN(mst)
 
 	if (pmout != NULL) {
-            call malloc (smsk, IM_LEN(im,1), TY_SHORT)
+            sz_val = IM_LEN(im,1)
+            call malloc (smsk, sz_val, TY_SHORT)
             call amovkl (long(1), Meml[vs], IM_NDIM(im))
             call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))

@@ -251,6 +251,7 @@ real	dz[3]				#I Intensity mapping ranges
 int	line				#I Line to be obtained
 pointer	data				#O Intensity mapped data
 
+size_t	sz_val
 int	i, j, nc, lnum
 pointer	iptr, optr, bptr, op
 
@@ -267,7 +268,8 @@ begin
 	call ex_getpix (ex, lnum)
 
 	nc = EX_OCOLS(ex)
-	call malloc (iptr, nc, TY_SHORT)
+	sz_val = nc
+	call malloc (iptr, sz_val, TY_SHORT)
 	do i = 1, 3 {
 	    op = ex_evaluate (ex, O_EXPR(ex,i))
 	    bptr = ex_chtype (ex, op, EX_OUTTYPE(ex))
@@ -702,6 +704,7 @@ int	ra, ga, ba				#I Color to create cell for
 short	cmap[3,ncolor]				#I Color map
 int	ncolor					#I Number of colors
 
+size_t	sz_val
 int	i, n, next_n, ir,ig,ib, r1,g1,b1
 long	dist, mindist, tmp
 pointer	ptr
@@ -715,7 +718,8 @@ begin
 	g1 = ig * AC_SHIFT
 	b1 = ib * AC_SHIFT
 
-	call malloc (ptr, CCELL_LEN, TY_STRUCT)
+	sz_val = CCELL_LEN
+	call malloc (ptr, sz_val, TY_STRUCT)
 	ColorCells[1+ir,1+ig,1+ib] = ptr
 	CCELL_NUM_ENTS(ptr) = 0
 

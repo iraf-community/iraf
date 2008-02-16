@@ -663,8 +663,9 @@ begin
 
 	# Convert the ra / longitude and dec / latitude values to standard
 	# coordinates in arc seconds before fitting.
-	call malloc (xi, npts, TY_DOUBLE)
-	call malloc (eta, npts, TY_DOUBLE)
+	sz_val = npts
+	call malloc (xi, sz_val, TY_DOUBLE)
+	call malloc (eta, sz_val, TY_DOUBLE)
 	call rg_celtostd (Memc[projstr], Memd[lngref], Memd[latref], Memd[xi],
 	    Memd[eta], npts, GM_XREFPT(fit), GM_YREFPT(fit), sk_stati(coo,
 	    S_NLNGUNITS), sk_stati(coo, S_NLATUNITS))
@@ -672,7 +673,8 @@ begin
 	call amulkd (Memd[eta], 3600.0d0, Memd[eta], npts)
 
 	# Allocate space for and compute the weights.
-	call malloc (wts, npts, TY_DOUBLE)
+	sz_val = npts
+	call malloc (wts, sz_val, TY_DOUBLE)
 	call amovkd (double(1.), Memd[wts], npts)
 
 	# Determine the x max and min.
@@ -773,10 +775,11 @@ begin
 	}
 
 	# Allocate fitting arrays.
-	call malloc (xifit, npts, TY_DOUBLE)
-	call malloc (etafit, npts, TY_DOUBLE)
-	call malloc (lngfit, npts, TY_DOUBLE)
-	call malloc (latfit, npts, TY_DOUBLE)
+	sz_val = npts
+	call malloc (xifit, sz_val, TY_DOUBLE)
+	call malloc (etafit, sz_val, TY_DOUBLE)
+	call malloc (lngfit, sz_val, TY_DOUBLE)
+	call malloc (latfit, sz_val, TY_DOUBLE)
 
 	# Compute the fitted ra / dec or longitude latitude,
 	if (res != NULL || verbose) {
@@ -912,10 +915,11 @@ begin
 	call salloc (field_pos, sz_val, TY_INT)
 
 	bufsize = CC_DEFBUFSIZE
-	call malloc (xref, bufsize, TY_DOUBLE)
-	call malloc (yref, bufsize, TY_DOUBLE)
-	call malloc (lngref, bufsize, TY_DOUBLE)
-	call malloc (latref, bufsize, TY_DOUBLE)
+	sz_val = bufsize
+	call malloc (xref, sz_val, TY_DOUBLE)
+	call malloc (yref, sz_val, TY_DOUBLE)
+	call malloc (lngref, sz_val, TY_DOUBLE)
+	call malloc (latref, sz_val, TY_DOUBLE)
 
 	npts = 0
 	max_fields = MAX_FIELDS

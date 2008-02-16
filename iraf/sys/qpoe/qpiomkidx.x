@@ -39,7 +39,8 @@ begin
 	call smark (sp)
 	sz_val = SZ_TOKBUF
 	call salloc (tokbuf, sz_val, TY_CHAR)
-	call malloc (oo, IO_NLINES(io) * 3 + 32, TY_SHORT)
+	sz_val = IO_NLINES(io) * 3 + 32
+	call malloc (oo, sz_val, TY_SHORT)
 
 	ncols  = IO_NCOLS(io)
 	nlines = IO_NLINES(io)

@@ -638,7 +638,8 @@ begin
 	# Allocate space for the convolution kernel.
 	if (rg_pstatp (pm, CONV) != NULL)
 	    call mfree (rg_pstatp (pm, CONV), TY_REAL)
-	call malloc (conv, 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
+	sz_val = 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT)
+	call malloc (conv, sz_val,
 	    TY_REAL)
 	call rg_psetp (pm, CONV, conv)
 	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)],
@@ -721,6 +722,7 @@ pointer im              #I pointer to the iraf image
 int     c1, c2          #I column limits in the input image
 int     l1, l2          #I line limits in the input image
 
+size_t	sz_val
 int     i, ncols, nlines, npts
 pointer ptr, index, buf
 pointer imgs1r(), imgs2r()
@@ -729,7 +731,8 @@ begin
         ncols = c2 - c1 + 1
         nlines = l2 - l1 + 1
         npts = ncols * nlines
-        call malloc (ptr, npts, TY_REAL)
+        sz_val = npts
+        call malloc (ptr, sz_val, TY_REAL)
 
         index = ptr
         do i = l1, l2 {

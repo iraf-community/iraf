@@ -31,6 +31,7 @@ procedure set_outbuf (outbuf_size)
 
 int	outbuf_size		# new buffer size in chars
 
+size_t	sz_val
 include	"lroff.com"
 errchk	malloc, out
 bool	first_time
@@ -50,7 +51,8 @@ begin
 	if (outbuf_size <= 0 && obuf != NULL)
 	    call mfree (obuf, TY_CHAR)
 	else {
-	    call malloc (obuf, outbuf_size, TY_CHAR)
+	    sz_val = outbuf_size
+	    call malloc (obuf, sz_val, TY_CHAR)
 	    otop = obuf + outbuf_size - 1
 	    op = obuf
 	    buffer_empty = YES

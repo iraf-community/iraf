@@ -187,7 +187,8 @@ begin
 
 		call sscan (Memc[fmtstr])
 		do i = 1, IM_MAXDIM {
-	    	    call malloc (Memi[fmtptrs+i-1], SZ_FNAME, TY_CHAR)
+	    	    sz_val = SZ_FNAME
+	    	    call malloc (Memi[fmtptrs+i-1], sz_val, TY_CHAR)
 		    call gargwrd (Memc[Memi[fmtptrs+i-1]], SZ_FNAME)
 		    if (nscan() != i || Memc[Memi[fmtptrs+i-1]] == EOS) {
 			if (outwcs == WT_WORLD) {

@@ -131,6 +131,7 @@ char	infile[SZ_FNAME]
 char	outfile[SZ_FNAME]
 bool	errignore
 
+size_t	sz_val
 bool	inblock
 int	blksize, mxbufszo, numblks, cutoff, obufsize, temp, numrecords
 int	inblksize, innumblks, toread, mxbufszi
@@ -172,8 +173,9 @@ begin
 	cutoff = numblks * blksize
 	obufsize = cutoff + OBUF_PAD
 
-	call malloc (bufa, obufsize, TY_CHAR) 	# Allocate output buffer.
-	call malloc (bufb, obufsize, TY_CHAR)	# Other output buffer
+	sz_val = obufsize
+	call malloc (bufa, sz_val, TY_CHAR) 	# Allocate output buffer.
+	call malloc (bufb, sz_val, TY_CHAR)	# Other output buffer
 	op = bufa				# Movable pointer inside buffer
 	otop = bufa + cutoff			# Point to full position (top)
 

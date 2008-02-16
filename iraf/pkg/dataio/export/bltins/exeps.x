@@ -110,6 +110,7 @@ int	fd				#i output file descriptor
 bool	use_cmap			#i write a false color image?
 bool	is_gray				#i is this a grayscale cmap?
 
+size_t	sz_val
 pointer	op, bop, out, cm
 int	i, j, k, line, percent
 int	len, orow, type
@@ -122,7 +123,8 @@ begin
         percent = 0
         orow = 0
 	cm = EX_CMAP(ex)
-	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
+	sz_val = EX_OCOLS(ex)+2
+	call malloc (out, sz_val, TY_SHORT)
         do i = 1, EX_NEXPR(ex) {
 
             # Process each line in the image.
@@ -187,6 +189,7 @@ pointer	ex				#i task struct pointer
 pointer	eps				#i postscript struct pointer
 int	fd				#i output file descriptor
 
+size_t	sz_val
 pointer	op, bop, out
 int	i, j, k, line, percent, orow, type
 
@@ -197,7 +200,8 @@ begin
         type = EX_OUTTYPE(ex)
         percent = 0
         orow = 0
-	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
+	sz_val = EX_OCOLS(ex)+2
+	call malloc (out, sz_val, TY_SHORT)
         do j = 1, EX_NLINES(ex) {
 
             # See if we're flipping the image.

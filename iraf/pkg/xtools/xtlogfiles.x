@@ -36,7 +36,8 @@ begin
 	    call salloc (linebuf, sz_val, TY_CHAR)
 	    sz_val = SZ_FNAME
 	    call salloc (fname, sz_val, TY_CHAR)
-	    call malloc (logfd, nlogfd, TY_INT)
+	    sz_val = nlogfd
+	    call malloc (logfd, sz_val, TY_INT)
 
 	    call sysid (Memc[linebuf], SZ_LINE)
 

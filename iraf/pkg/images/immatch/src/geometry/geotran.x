@@ -615,7 +615,8 @@ begin
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
 	if (buf ==  NULL) {
-	    call malloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
@@ -702,7 +703,8 @@ begin
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
 	if (buf ==  NULL) {
-	    call malloc (buf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (buf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {
@@ -796,7 +798,8 @@ begin
 	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
 	if (jbuf ==  NULL) {
-	    call malloc (jbuf, ncols * nlines, TY_REAL)
+	    sz_val = ncols * nlines
+	    call malloc (jbuf, sz_val, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

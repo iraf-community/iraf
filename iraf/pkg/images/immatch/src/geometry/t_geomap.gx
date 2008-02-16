@@ -289,9 +289,10 @@ begin
 	GM_YREFPT(fit) = INDEFD
 
 	# Compute the weights.
-	call malloc (xfit, npts, TY_PIXEL)
-	call malloc (yfit, npts, TY_PIXEL)
-	call malloc (wts, npts, TY_PIXEL)
+	sz_val = npts
+	call malloc (xfit, sz_val, TY_PIXEL)
+	call malloc (yfit, sz_val, TY_PIXEL)
+	call malloc (wts, sz_val, TY_PIXEL)
 	call amovk$t (PIXEL(1.), Mem$t[wts], npts)
 
 	# Determine the x max and min.
@@ -459,15 +460,17 @@ pointer	yin			# the y coordinates
 PIXEL	xmin, xmax		# the range of the x coordinates
 PIXEL	ymin, ymax		# the range of the y coordinates
 
+size_t	sz_val
 int	npts, bufsize
 int	fscan(), nscan()
 
 begin
 	bufsize = GEO_DEFBUFSIZE
-	call malloc (xref, bufsize, TY_PIXEL)
-	call malloc (yref, bufsize, TY_PIXEL)
-	call malloc (xin, bufsize, TY_PIXEL)
-	call malloc (yin, bufsize, TY_PIXEL)
+	sz_val = bufsize
+	call malloc (xref, sz_val, TY_PIXEL)
+	call malloc (yref, sz_val, TY_PIXEL)
+	call malloc (xin, sz_val, TY_PIXEL)
+	call malloc (yin, sz_val, TY_PIXEL)
 
 	npts = 0
 	while (fscan (fd) != EOF) {

@@ -14,6 +14,7 @@ procedure fsvtfn (fname)
 char	fname[ARB]
 bool	first_time
 int	sz_tmpbuf, nchars
+size_t	sz_val
 int	strlen()
 errchk	malloc, realloc
 
@@ -35,7 +36,8 @@ begin
 	# Initial allocation of buffer.
 	if (tmpbuf == NULL) {
 	    sz_tmpbuf = SZ_TMPFILBUF
-	    call malloc (tmpbuf, sz_tmpbuf, TY_CHAR)
+	    sz_val = sz_tmpbuf
+	    call malloc (tmpbuf, sz_val, TY_CHAR)
 	    nextch = 0
 	}
 

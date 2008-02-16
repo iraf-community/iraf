@@ -26,6 +26,7 @@ int	nbks		#I numbers of blocks to expand group 'group'
 int	hdroff		#O new offset for beginning of 'group' 
 int	pixoff		#0 new offset for beginning of data
 
+size_t	sz_val
 pointer hd, ip, op, buf
 char	line[80], endl[80]
 int	gn, newc, k, nchars, nbk, hsize
@@ -51,7 +52,8 @@ begin
 	call fseti (out_fd, F_ADVICE, SEQUENTIAL)
 
 	bufsize = max (MIN_BUFSIZE, fstati (in_fd, F_BUFSIZE))
-	call malloc (buf, bufsize, TY_CHAR)
+	sz_val = bufsize
+	call malloc (buf, sz_val, TY_CHAR)
 
 	gn = 0
 	hd = buf

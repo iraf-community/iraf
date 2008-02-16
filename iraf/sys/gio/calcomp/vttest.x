@@ -208,8 +208,9 @@ begin
 
 	buflen = SZ_BUF
 	iferr {
-	    call malloc (x, buflen, TY_REAL)
-	    call malloc (y, buflen, TY_REAL)
+	    sz_val = buflen
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (y, sz_val, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 

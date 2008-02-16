@@ -53,6 +53,7 @@ procedure xh_make_quickref (xh, quickref)
 pointer	xh					#i task struct pointer
 char	quickref[ARB]				#i quickref filename
 
+size_t	sz_val
 pointer	pkglist, pp
 int	fdi, fdo, fd_err
 int	sz_pbuf, npkgs
@@ -105,7 +106,8 @@ begin
 	lastpkg[1] = EOS
 	npkgs = 0
 	sz_pbuf = MAX_PKGS * SZ_PKG
-	call malloc (pkglist, sz_pbuf, TY_CHAR)
+	sz_val = sz_pbuf
+	call malloc (pkglist, sz_val, TY_CHAR)
 	pp = pkglist
 
 	# Loop over the lines in the file, save the ones that are the

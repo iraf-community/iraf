@@ -80,8 +80,9 @@ begin
 
 		bufp = iw_gbigfits (iw, TY_WSVDATA, axis)
 		npts = IW_WSVLEN(iw,axis)
-		call malloc (pv, npts, TY_DOUBLE)
-		call malloc (wv, npts, TY_DOUBLE)
+		sz_val = npts
+		call malloc (pv, sz_val, TY_DOUBLE)
+		call malloc (wv, sz_val, TY_DOUBLE)
 
 		ip = 1
 		do i = 1, npts {

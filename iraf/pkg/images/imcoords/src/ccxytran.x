@@ -250,8 +250,9 @@ begin
         # Read in the coefficients.
         iferr (ncoeff = dtgeti (dt, rec, "surface1"))
             return (ERR)
-        call malloc (xcoeff, ncoeff, TY_DOUBLE)
-        call malloc (ycoeff, ncoeff, TY_DOUBLE)
+        sz_val = ncoeff
+        call malloc (xcoeff, sz_val, TY_DOUBLE)
+        call malloc (ycoeff, sz_val, TY_DOUBLE)
         do i = 1, ncoeff {
             junk = dtscan(dt)
             call gargd (Memd[xcoeff+i-1])

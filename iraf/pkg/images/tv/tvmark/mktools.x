@@ -5,10 +5,12 @@ include "tvmark.h"
 
 procedure mk_init (mk)
 
+size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
-	call malloc (mk, LEN_MARKSTRUCT, TY_STRUCT)
+	sz_val = LEN_MARKSTRUCT
+	call malloc (mk, sz_val, TY_STRUCT)
 
 	# Initialize the mark type parameters.
 	MK_MARK(mk) = EOS
@@ -68,14 +70,16 @@ end
 
 procedure mk_rinit (mk)
 
+size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
 	call mk_rfree (mk)
-	call malloc (MK_RADII(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_AXES(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_SLENGTHS(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_RLENGTHS(mk), MAX_NMARKS, TY_REAL)
+	sz_val = MAX_NMARKS
+	call malloc (MK_RADII(mk), sz_val, TY_REAL)
+	call malloc (MK_AXES(mk), sz_val, TY_REAL)
+	call malloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
+	call malloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
 end
 
 

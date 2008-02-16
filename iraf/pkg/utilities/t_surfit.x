@@ -76,10 +76,11 @@ begin
 		if (nscan() < 4)
 		    r[4] = 1.
 		if (n == 0) {
-		    call malloc (x, 100, TY_DOUBLE)
-		    call malloc (y, 100, TY_DOUBLE)
-		    call malloc (z, 100, TY_DOUBLE)
-		    call malloc (w, 100, TY_DOUBLE)
+		    sz_val = 100
+		    call malloc (x, sz_val, TY_DOUBLE)
+		    call malloc (y, sz_val, TY_DOUBLE)
+		    call malloc (z, sz_val, TY_DOUBLE)
+		    call malloc (w, sz_val, TY_DOUBLE)
 		} else if (mod (n, 100) == 0) {
 		    call realloc (x, n+100, TY_DOUBLE)
 		    call realloc (y, n+100, TY_DOUBLE)

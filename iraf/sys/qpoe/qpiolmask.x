@@ -112,10 +112,13 @@ tryfile_
 	if (IO_INDEXLEN(io) > 0) {
 	    if (IO_RL(io) != NULL)
 		call mfree (IO_RL(io), TY_INT)
-	    if (IO_PL(io) != NULL)
-		call malloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
-	    else
-		call malloc (IO_RL(io), RL_LENELEM*2, TY_INT)
+	    if (IO_PL(io) != NULL) {
+		sz_val = RL_MAXLEN(IO_PL(io))
+		call malloc (IO_RL(io), sz_val, TY_INT)
+	    } else {
+		sz_val = RL_LENELEM*2
+		call malloc (IO_RL(io), sz_val, TY_INT)
+	    }
 	}
 
 	call sfree (sp)

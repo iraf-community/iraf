@@ -5,10 +5,12 @@ include "xregister.h"
 procedure rg_xinit (xc, cfunc)
 
 pointer	xc		#O pointer to the cross-correlation structure
+size_t	sz_val
 int	cfunc		#I the input cross-correlation function
 
 begin
-	call malloc (xc, LEN_XCSTRUCT, TY_STRUCT)
+	sz_val = LEN_XCSTRUCT
+	call malloc (xc, sz_val, TY_STRUCT)
 
 	# Initialize the regions pointers.
 	XC_RC1(xc) = NULL
@@ -27,9 +29,11 @@ begin
 
 	# Set up transformation parameters.
 	XC_NREFPTS(xc) = 0
-	call malloc (XC_XREF(xc), MAX_NREF, TY_REAL)
-	call malloc (XC_YREF(xc), MAX_NREF, TY_REAL)
-	call malloc (XC_TRANSFORM(xc), MAX_NTRANSFORM, TY_REAL)
+	sz_val = MAX_NREF
+	call malloc (XC_XREF(xc), sz_val, TY_REAL)
+	call malloc (XC_YREF(xc), sz_val, TY_REAL)
+	sz_val = MAX_NTRANSFORM
+	call malloc (XC_TRANSFORM(xc), sz_val, TY_REAL)
 
 	# Initialize the region offsets
 	XC_IXLAG(xc) = DEF_IXLAG
@@ -96,6 +100,7 @@ end
 
 procedure rg_xrinit (xc)
 
+size_t	sz_val
 pointer	xc		#I pointer to crosscor structure
 
 begin
@@ -104,15 +109,16 @@ begin
 	XC_NREGIONS(xc) = 0
 	XC_CREGION(xc) = 1
 
-	call malloc (XC_RC1(xc), MAX_NREGIONS, TY_INT)
-	call malloc (XC_RC2(xc), MAX_NREGIONS, TY_INT)
-	call malloc (XC_RL1(xc), MAX_NREGIONS, TY_INT)
-	call malloc (XC_RL2(xc), MAX_NREGIONS, TY_INT)
-	call malloc (XC_RZERO(xc), MAX_NREGIONS, TY_REAL)
-	call malloc (XC_RXSLOPE(xc), MAX_NREGIONS, TY_REAL)
-	call malloc (XC_RYSLOPE(xc), MAX_NREGIONS, TY_REAL)
-	call malloc (XC_XSHIFTS(xc), MAX_NREGIONS, TY_REAL)
-	call malloc (XC_YSHIFTS(xc), MAX_NREGIONS, TY_REAL)
+	sz_val = MAX_NREGIONS
+	call malloc (XC_RC1(xc), sz_val, TY_INT)
+	call malloc (XC_RC2(xc), sz_val, TY_INT)
+	call malloc (XC_RL1(xc), sz_val, TY_INT)
+	call malloc (XC_RL2(xc), sz_val, TY_INT)
+	call malloc (XC_RZERO(xc), sz_val, TY_REAL)
+	call malloc (XC_RXSLOPE(xc), sz_val, TY_REAL)
+	call malloc (XC_RYSLOPE(xc), sz_val, TY_REAL)
+	call malloc (XC_XSHIFTS(xc), sz_val, TY_REAL)
+	call malloc (XC_YSHIFTS(xc), sz_val, TY_REAL)
 
 	call amovki (INDEFI, Memi[XC_RC1(xc)], MAX_NREGIONS)
 	call amovki (INDEFI, Memi[XC_RC2(xc)], MAX_NREGIONS)

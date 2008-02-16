@@ -63,7 +63,8 @@ begin
 	# Set up bkg job descriptor.
 	pr_jobcode[pr] = jobcode
 	pr_active[pr] = YES
-	call malloc (pr_bkgfile[pr], SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call malloc (pr_bkgfile[pr], sz_val, TY_CHAR)
 	call strcpy (bkgfile, Memc[pr_bkgfile[pr]], SZ_FNAME)
 
 	call sfree (sp)

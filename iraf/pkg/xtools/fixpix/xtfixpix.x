@@ -113,9 +113,10 @@ begin
 
 	if (n > 0) {
 	    n = n + 10
-	    call malloc (col, n, TY_INT)
-	    call malloc (pl1, n, TY_INT)
-	    call malloc (pl2, n, TY_INT)
+	    sz_val = n
+	    call malloc (col, sz_val, TY_INT)
+	    call malloc (pl1, sz_val, TY_INT)
+	    call malloc (pl2, sz_val, TY_INT)
 	    ncols = 0
 	    lmin = nl
 	    lmax = 0

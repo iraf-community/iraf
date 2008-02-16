@@ -193,7 +193,8 @@ begin
 		}
 
 		# Allocate and initialize scaling factors.
-		call malloc (scales, 3*n, TY_REAL)
+		sz_val = 3*n
+		call malloc (scales, sz_val, TY_REAL)
 		zeros = scales + n
 		wts = scales + 2 * n
 		call amovkr (INDEFR, Memr[scales], 3*n]

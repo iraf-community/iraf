@@ -94,7 +94,8 @@ begin
 	# nextch to 1 because 0 is the null index.
 
 	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (HD_SBUF(hp), SZ_SBUF, TY_CHAR)
+	sz_val = SZ_SBUF
+	call malloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_DEFDIR(hp) = NULL
 	HD_NEXTCH(hp) = 1
 	HD_SZSBUF(hp) = SZ_SBUF

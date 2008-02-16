@@ -27,6 +27,7 @@ int	xres, yres, first, status
 real	angh, angv, imcols, imlines
 real	floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
+size_t	sz_val
 pointer gp, gopen()
 bool	clgetb(), streq()
 int	clgeti(), surf_limits()
@@ -98,7 +99,8 @@ begin
 	call imunmap (im)
 
 	# Allocate the working storage needed by EZSRFC.
-	call malloc (work, (2 * nx * ny) + nx + ny, TY_REAL)
+	sz_val = (2 * nx * ny) + nx + ny
+	call malloc (work, sz_val, TY_REAL)
 
 	# Take floor and ceiling if enabled (nonzero).
 	npix = nx * ny

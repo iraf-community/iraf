@@ -249,7 +249,8 @@ begin
 	        # Check to see that kernel is big enough.
 	        if (kernel == NULL) {
 		    sz_kernel = SZ_KERNEL
-		    call malloc (kernel, sz_kernel, TY_REAL)
+		    sz_val = sz_kernel
+		    call malloc (kernel, sz_val, TY_REAL)
 	        } else if (kp > sz_kernel) {
 		    sz_kernel = sz_kernel + SZ_KERNEL
 		    call realloc (kernel, sz_kernel, TY_REAL)

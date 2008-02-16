@@ -28,6 +28,7 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
+size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnls()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -294,9 +295,11 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_SHORT)
+	    sz_val = nimages
+	    call malloc (dp, sz_val, TY_SHORT)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		sz_val = nimages
+		call malloc (ip, sz_val, TY_INT)
 		call ic_2sorts (d, Mems[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -328,6 +331,7 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
+size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnli()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -594,9 +598,11 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_INT)
+	    sz_val = nimages
+	    call malloc (dp, sz_val, TY_INT)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		sz_val = nimages
+		call malloc (ip, sz_val, TY_INT)
 		call ic_2sorti (d, Memi[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -628,6 +634,7 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
+size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnlr()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -894,9 +901,11 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_REAL)
+	    sz_val = nimages
+	    call malloc (dp, sz_val, TY_REAL)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		sz_val = nimages
+		call malloc (ip, sz_val, TY_INT)
 		call ic_2sortr (d, Memr[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
@@ -928,6 +937,7 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
+size_t	sz_val
 int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnld()
 real	a, b
 pointer	buf, dp, ip, mp
@@ -1194,9 +1204,11 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_DOUBLE)
+	    sz_val = nimages
+	    call malloc (dp, sz_val, TY_DOUBLE)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		sz_val = nimages
+		call malloc (ip, sz_val, TY_INT)
 		call ic_2sortd (d, Memd[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else

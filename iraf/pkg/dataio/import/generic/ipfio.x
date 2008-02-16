@@ -239,8 +239,10 @@ begin
         sz_val = nval
         call salloc (buf, sz_val, TY_CHAR)
 
-        if (ptr == NULL)
-            call malloc (ptr, nval * SZB_CHAR, TY_CHAR)
+        if (ptr == NULL) {
+            sz_val = nval * SZB_CHAR
+            call malloc (ptr, sz_val, TY_CHAR)
+        }
         nstat = read (fd, Memc[buf], nval / SZB_CHAR + 1)
 
         fp = ip_lnote(fd)
@@ -277,12 +279,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_SHORT)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_SHORT)
+        }
         nstat = read (fd, Mems[ptr], len * SZ_SHORT)
 end
 
@@ -293,12 +298,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_INT)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_INT)
+        }
         nstat = read (fd, Memi[ptr], len * SZ_INT)
 end
 
@@ -309,12 +317,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_LONG)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_LONG)
+        }
         nstat = read (fd, Meml[ptr], len * SZ_LONG)
 end
 
@@ -325,12 +336,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_REAL)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_REAL)
+        }
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 	call ieevupkr (Memr[ptr], Memr[ptr], len)
 end
@@ -342,12 +356,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_DOUBLE)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_DOUBLE)
+        }
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 	call ieevupkd (Memd[ptr], Memd[ptr], len)
 end
@@ -363,12 +380,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_REAL)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_REAL)
+        }
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 end
 
@@ -382,12 +402,15 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
+size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL)
-            call malloc (ptr, len, TY_DOUBLE)
+        if (ptr == NULL) {
+            sz_val = len
+            call malloc (ptr, sz_val, TY_DOUBLE)
+        }
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 end
 

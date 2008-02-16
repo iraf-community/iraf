@@ -97,8 +97,10 @@ begin
 	# assocated array storage.
 	
 	call calloc (fp, LEN_FLDES, TY_STRUCT)
-	call malloc (FL_OFFBP(fp), DEF_MAXFILES, TY_INT)
-	call malloc (FL_SBUFP(fp), DEF_SZSBUF, TY_CHAR)
+	sz_val = DEF_MAXFILES
+	call malloc (FL_OFFBP(fp), sz_val, TY_INT)
+	sz_val = DEF_SZSBUF
+	call malloc (FL_SBUFP(fp), sz_val, TY_CHAR)
 
 	FL_MAXFILES(fp) = DEF_MAXFILES
 	FL_SZSBUF(fp)   = DEF_SZSBUF

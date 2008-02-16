@@ -167,7 +167,8 @@ begin
 		    call mfree (rsindex, TY_INT)
 		ntrefstars = rg_rdxyi (rfd, xref, yref, rlineno, xrefcol,
 		    yrefcol)
-		call malloc (rsindex, ntrefstars, TY_INT)
+		sz_val = ntrefstars
+		call malloc (rsindex, sz_val, TY_INT)
 
 		# Prepare the reference list for the merge algorithm. If a tie
 		# point matching algorithm is selected, sort the list in the
@@ -261,9 +262,10 @@ begin
 		    call printf (
 		        "    No valid reference triangles can be defined\n")
 	    } else {
-	        call malloc (xtrans, ntliststars, TY_REAL)
-	        call malloc (ytrans, ntliststars, TY_REAL)
-	        call malloc (listindex, ntliststars, TY_INT)
+	        sz_val = ntliststars
+	        call malloc (xtrans, sz_val, TY_REAL)
+	        call malloc (ytrans, sz_val, TY_REAL)
+	        call malloc (listindex, sz_val, TY_INT)
 	        call rg_compute (Memr[xlist], Memr[ylist], Memr[xtrans],
 	            Memr[ytrans], ntliststars, Memr[coeff], MAX_NCOEFF)
 	        nliststars = rg_sort (Memr[xtrans], Memr[ytrans],

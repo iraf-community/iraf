@@ -1301,8 +1301,9 @@ begin
 	call printf ("%d events\n")
 	    call pargi (nev1)
 	xlen = 128
-	call malloc (xs, TY_DOUBLE, xlen)
-	call malloc (xe, TY_DOUBLE, xlen)
+	sz_val = TY_DOUBLE
+	call malloc (xs, sz_val, xlen)
+	call malloc (xe, sz_val, xlen)
 
 	# Get the time filter as a list of ranges.
 	xs = NULL;  xe = NULL;  xlen = 0
@@ -1641,19 +1642,22 @@ begin
 
 	# Parse the lists.
 	xlen = 100
-	call malloc (xs, xlen, TY_INT)
-	call malloc (xe, xlen, TY_INT)
+	sz_val = xlen
+	call malloc (xs, sz_val, TY_INT)
+	call malloc (xe, sz_val, TY_INT)
 	nx = qpex_parsei (Memc[rl1], xs, xe, xlen)
 
 	ylen = 100
-	call malloc (ys, ylen, TY_INT)
-	call malloc (ye, ylen, TY_INT)
+	sz_val = ylen
+	call malloc (ys, sz_val, TY_INT)
+	call malloc (ye, sz_val, TY_INT)
 	ny = qpex_parsei (Memc[rl2], ys, ye, ylen)
 
 	# Merge the lists.
 	olen = 100
-	call malloc (os, olen, TY_INT)
-	call malloc (oe, olen, TY_INT)
+	sz_val = olen
+	call malloc (os, sz_val, TY_INT)
+	call malloc (oe, sz_val, TY_INT)
 	nout = qp_rlmergei (os,oe,olen,
 	    Memi[xs],Memi[xe],nx, Memi[ys],Memi[ye],ny)
 

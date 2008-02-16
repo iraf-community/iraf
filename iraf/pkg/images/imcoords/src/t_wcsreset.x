@@ -62,14 +62,17 @@ begin
 
 	        # Allocate space for the transforms.
 	        ndim = mw_stati (mwim, MW_NPHYSDIM)
-	        call malloc (r, ndim * ndim, TY_DOUBLE)
-	        call malloc (w, ndim * ndim, TY_DOUBLE)
-	        call malloc (cd, ndim * ndim, TY_DOUBLE)
-	        call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	        call malloc (ltv, ndim, TY_DOUBLE)
-	        call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	        call malloc (nr, ndim * ndim, TY_DOUBLE)
-	        call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	        sz_val = ndim * ndim
+	        call malloc (r, sz_val, TY_DOUBLE)
+	        call malloc (w, sz_val, TY_DOUBLE)
+	        call malloc (cd, sz_val, TY_DOUBLE)
+	        call malloc (ltm, sz_val, TY_DOUBLE)
+	        sz_val = ndim
+	        call malloc (ltv, sz_val, TY_DOUBLE)
+	        sz_val = ndim * ndim
+	        call malloc (iltm, sz_val, TY_DOUBLE)
+	        call malloc (nr, sz_val, TY_DOUBLE)
+	        call malloc (ncd, sz_val, TY_DOUBLE)
 
 		call mw_gwtermd (mwim, Memd[r], Memd[w], Memd[cd], ndim)
 		call mw_gltermd (mwim, Memd[ltm], Memd[ltv], ndim)

@@ -54,9 +54,10 @@ begin
 	nlp = 1
 	do i = 2, PL_NAXES(pl)
 	    nlp = nlp * PL_AXLEN(pl,i)
-	if (PL_LPP(pl) == NULL)
-	    call malloc (PL_LPP(pl), nlp, TY_INT)
-	else if (nlp != o_nlp)
+	if (PL_LPP(pl) == NULL) {
+	    sz_val = nlp
+	    call malloc (PL_LPP(pl), sz_val, TY_INT)
+	} else if (nlp != o_nlp)
 	    call realloc (PL_LPP(pl), nlp, TY_INT)
 
 	sz_val = sz_index
@@ -66,9 +67,10 @@ begin
 	PL_NLP(pl) = pl_l2pi (Mems[index], 1, PL_LP(pl,1), nlp)
 
 	# Allocate or resize the line list buffer.
-	if (PL_LLBP(pl) == NULL)
-	    call malloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
-	else if (PL_LLLEN(pl) != o_lllen)
+	if (PL_LLBP(pl) == NULL) {
+	    sz_val = PL_LLLEN(pl)
+	    call malloc (PL_LLBP(pl), sz_val, TY_SHORT)
+	} else if (PL_LLLEN(pl) != o_lllen)
 	    call realloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
 
 	# Read the stored line list.

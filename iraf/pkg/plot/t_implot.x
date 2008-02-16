@@ -65,6 +65,7 @@ char	fmt[SZ_FNAME]
 char	command[SZ_FNAME]
 char	device[SZ_FNAME]
 
+size_t	sz_val
 int	xnticks, ynticks
 bool	overplot, lineplot, logscale, erase, rescale[2], p_rescale[2]
 int	key, wcs, ip, i1, i2, n, linetype, color, nltypes, linestep, navg
@@ -162,10 +163,11 @@ begin
 		    step = max (1, nlines / 10)
 
 		npix = max (ncols, nlines)
-		call malloc (xold, npix, TY_REAL)
-		call malloc (yold, npix, TY_REAL)
-		call malloc (xnew, npix, TY_REAL)
-		call malloc (ynew, npix, TY_REAL)
+		sz_val = npix
+		call malloc (xold, sz_val, TY_REAL)
+		call malloc (yold, sz_val, TY_REAL)
+		call malloc (xnew, sz_val, TY_REAL)
+		call malloc (ynew, sz_val, TY_REAL)
 
 		if (!overplot)
 		    call gclear (gp)

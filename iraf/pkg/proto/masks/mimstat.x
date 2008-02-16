@@ -6,11 +6,13 @@ include "mimstat.h"
 
 procedure mst_allocate (mst)
 
+size_t	sz_val
 pointer	mst		#O the statistics descriptor
 
 begin
     	call calloc (mst, LEN_MIMSTAT, TY_STRUCT)
-	call malloc (MIS_SW(mst), LEN_NSWITCHES, TY_INT)
+	sz_val = LEN_NSWITCHES
+	call malloc (MIS_SW(mst), sz_val, TY_INT)
 end
 
 
@@ -673,6 +675,7 @@ pointer hgm             #O pointer to the histogram
 int     nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
+size_t	sz_val
 real    hmax            #O maximum histogram value
 
 begin
@@ -691,7 +694,8 @@ begin
         hmin = MIS_MIN(mst)
         hmax = MIS_MAX(mst)
 
-        call malloc (hgm, nbins, TY_INT)
+        sz_val = nbins
+        call malloc (hgm, sz_val, TY_INT)
 
         return (YES)
 end

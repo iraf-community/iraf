@@ -245,16 +245,18 @@ begin
 	    do i = 1, IM_LEN(im,1), nxb {
 
 		# Allocate space for the convolution kernel.
-		call malloc (gker2d, fwidth * fwidth, TY_REAL)
-		call malloc (ngker2d, fwidth * fwidth, TY_REAL)
-		call malloc (skip, fwidth * fwidth, TY_INT)
+		sz_val = fwidth * fwidth
+		call malloc (gker2d, sz_val, TY_REAL)
+		call malloc (ngker2d, sz_val, TY_REAL)
+		call malloc (skip, sz_val, TY_INT)
 
 		# Allocate space for the data and the convolution.
 	        c1 = i
 	        c2 = min (IM_LEN(im,1), i + nxb - 1)
 		ncols = c2 - c1 + 1 + 2 * (fwidth / 2 + swidth)
-		call malloc (imbuf, ncols * nlines, TY_REAL)
-		call malloc (denbuf, ncols * nlines, TY_REAL)
+		sz_val = ncols * nlines
+		call malloc (imbuf, sz_val, TY_REAL)
+		call malloc (denbuf, sz_val, TY_REAL)
 
 		# Compute the convolution kernels.
 		relerr = sf_egkernel (Memr[gker2d], Memr[ngker2d], Memi[skip],

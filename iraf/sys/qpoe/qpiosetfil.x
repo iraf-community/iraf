@@ -36,7 +36,8 @@ begin
 
 	# Parse full QPIO oriented filter expression.
 	sz_filter = DEF_SZEXPRBUF
-	call malloc (filter, sz_filter, TY_CHAR)
+	sz_val = sz_filter
+	call malloc (filter, sz_val, TY_CHAR)
 	if (qpio_parse (io,expr,filter,sz_filter,Memc[mask],SZ_FNAME) == ERR) {
 	    call eprintf ("QPIO warning: error parsing `%s'\n")
 		call pargstr (expr)

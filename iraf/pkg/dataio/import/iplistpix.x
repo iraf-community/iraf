@@ -14,6 +14,7 @@ int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, mw, ct, fmtptrs[IM_MAXDIM]
 
+size_t	sz_val
 int	imgnlr(), mw_stati()
 pointer	mw_openim(), mw_sctran()
 
@@ -88,7 +89,8 @@ begin
 	# Set the format strings for the logical axes.
 	fmtstat = EOS
 	do i = 1, ndim {
-	    call malloc (fmtptrs[i], SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call malloc (fmtptrs[i], sz_val, TY_CHAR)
 	    if (fmtstat != EOF)
 	        call gargwrd (Memc[fmtptrs[i]], SZ_FNAME)
 	    else

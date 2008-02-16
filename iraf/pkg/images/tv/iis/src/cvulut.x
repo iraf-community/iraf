@@ -40,7 +40,8 @@ begin
 	call cv_sort (Memr[x], Memr[y], nvalues)
 
 	# Fill lut in straight line segments - piecewise linear
-	call malloc (lut, SZ_BUF, TY_SHORT)
+	sz_val = SZ_BUF
+	call malloc (lut, sz_val, TY_SHORT)
 	do i = 1, nvalues-1 {
 	    delta_gs = Memr[y+i] - Memr[y+i-1]
 	    delta_xv = Memr[x+i] - Memr[x+i-1]

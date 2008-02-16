@@ -553,12 +553,14 @@ begin
 	    call error (2, "Attempt to take projection over nonexistent axis")
 	npix = IM_LEN(im,axis)
 
-	call malloc (y, npix, TY_REAL)
+	sz_val = npix
+	call malloc (y, sz_val, TY_REAL)
 	call im_projection (im, Memr[y], npix, axis)
 
 	iferr {
-	    call malloc (x, npix, TY_REAL)
-	    call malloc (size, npix, TY_REAL)
+	    sz_val = npix
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (size, sz_val, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 
@@ -620,9 +622,10 @@ begin
 
 	buflen = SZ_BUF
 	iferr {
-	    call malloc (x, buflen, TY_REAL)
-	    call malloc (y, buflen, TY_REAL)
-	    call malloc (size, buflen, TY_REAL)
+	    sz_val = buflen
+	    call malloc (x, sz_val, TY_REAL)
+	    call malloc (y, sz_val, TY_REAL)
+	    call malloc (size, sz_val, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 

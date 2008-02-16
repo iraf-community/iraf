@@ -76,7 +76,8 @@ begin
 	call calloc (bufs, nimages, TY_POINTER)
 	call calloc (names, nimages, TY_POINTER)
 	do i = 1, nimages {
-	    call malloc (Memi[bufs+i-1], npix, TY_INT)
+	    sz_val = npix
+	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
 	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
 	}
 
@@ -123,7 +124,8 @@ begin
 	npms = 0
 	do i = 1, nimages {
 	    if (mtype != M_NONE) {
-		call malloc (Memi[names+i-1], SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call malloc (Memi[names+i-1], sz_val, TY_CHAR)
 		fname = Memi[names+i-1]
 		ifnoerr (call imgstr (in[i],Memc[key],Memc[fname],SZ_FNAME)) {
 		    nin = IM_LEN(in[i],1)
