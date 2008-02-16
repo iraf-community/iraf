@@ -301,6 +301,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		const char *ip1;
 		char *op1;
 		char *maxop1;
+		int next_j;
 		fprintf(stderr,
 			"[INFO] file = %s  line = %d: appended braces\n",
 			file_name,j+1);
@@ -318,9 +319,18 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    goto quit;
 		}
 		/* */
+		for ( next_j = j+1 ; next_j < proc_end[i] ; next_j++ ) {
+		    ip1 = lines[next_j];
+		    while ( *ip1 == ' ' || *ip1 == '\t' ) ip1++;
+		    if ( *ip1 != '#' && *ip1 != '\n' && 
+			 *ip1 != '$' && *ip1 != '\0' ) {
+			break;
+		    }
+		}
+		if ( next_j == proc_end[i] ) next_j = j+1;
 		op1 = tmp_buf;
 		maxop1 = tmp_buf + SZ_LINE_BUF -1;
-		ip1 = lines[j+1];
+		ip1 = lines[next_j];
 		while ( *ip1 == ' ' || *ip1 == '\t' ) {
 		    if ( op1 < maxop1 ) {
 			*op1 = *ip1;
@@ -328,11 +338,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    }
 		    ip1++;
 		}
-		if ( *ip1 == '#' || *ip1 == '\n' || *ip1 == '$' ) {
-		    fprintf(stderr,"[ERROR] Cannot handle: file = %s  line = %d\n",
-			    file_name,j+1);
-		    goto quit;
-		}
+		/* */
 		if ( strncmp("else",ip1,4)==0 && is_valchar(ip1[4])==0 ) {
 		    const char *ip2 = "} ";
 		    while ( *ip2 != '\0' ) {
@@ -351,9 +357,9 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			ip2++;
 		    }
 		    *op1 = '\0';
-		    free(lines[j+1]);
-		    lines[j+1] = strdup(tmp_buf);
-		    if ( lines[j+1] == NULL ) {
+		    free(lines[next_j]);
+		    lines[next_j] = strdup(tmp_buf);
+		    if ( lines[next_j] == NULL ) {
 			fprintf(stderr,"[ERROR] strdup() failed\n");
 			goto quit;
 		    }
@@ -430,7 +436,12 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    int next_j;
 		    op1 = strchr(lines[j],'\n');
 		    if ( op1 != NULL ) *op1 = ' ';
-		    for ( next_j=j+1 ; lines[next_j][0] == '\0' ; next_j++ );
+		    for ( next_j=j+1 ; next_j < proc_end[i] ; next_j++ ) {
+			if ( lines[next_j][0] != '\0' ) break;
+		    }
+		    if ( next_j == proc_end[i] ) {
+			fprintf(stderr,"[ERROR] Invalid line: %d\n",j+1);
+		    }
 		    ip1 = lines[next_j];	/* next line */
 		    while ( *ip1 == ' ' || *ip1 == '\t' ) ip1++;
 		    snprintf(tmp_buf,SZ_LINE_BUF,"%s%s",lines[j],ip1);
