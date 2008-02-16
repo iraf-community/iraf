@@ -48,7 +48,6 @@ int main( int argc, char *argv[] )
 
     for ( ; i < argc ; i++ ) {
 	int status;
-	//printf("[INFO] target = %s\n",argv[i]);
 	status = add_sz_val(proc_name,target_arg,arg_type,arg_val,
 			    argv[i]);
 	if ( status != 0 ) {
@@ -363,7 +362,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    const char *ptr_proc_begin;
 	    int arg_cnt = 0;
 	    bool flg_prev_if_without_brace;
-	    int prev_j;
+	    int prev_j, end_j;
 	    if ( DEBUG ) {
 		fprintf(stderr,"debug: j = %d\n",j);
 	    }
@@ -393,11 +392,43 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
 	    if ( *ip != '(' ) continue;
 	    /* */
-	    if ( flg_prev_if_without_brace == true && 
-		 parse_in_braces (ip+1, lines, j, proc_end[i]-1, ")", NULL) != j ) {
+	    end_j = parse_in_braces (ip+1, lines, j, proc_end[i]-1, ")", NULL);
+	    if ( end_j < 0 ) {
 		fprintf(stderr,"[ERROR] file = %s  line = %d: Cannot handle\n",
 			file_name,j+1);
 		goto quit;
+	    }
+	    if ( j < end_j ) {
+		char tmp_buf[SZ_LINE_BUF];
+		const char *ip1;
+		int k;
+		char *old_ptr = lines[j];
+		snprintf(tmp_buf,SZ_LINE_BUF,"%s",lines[j]);
+		for ( k=j+1 ; k <= end_j ; k++ ) {
+		    char tmp_buf1[SZ_LINE_BUF];
+		    char *op;
+		    op = strrchr(tmp_buf,'\n');
+		    if ( op != NULL ) *op = ' ';
+		    ip1 = lines[k];
+		    while ( *ip1 == ' ' || *ip1 == '\t' ) ip1++;
+		    strcpy(tmp_buf1,tmp_buf);
+		    snprintf(tmp_buf,SZ_LINE_BUF,"%s%s",
+			     tmp_buf1,ip1);
+		    lines[k][0] = '\0';
+		}
+		free(lines[j]);
+		lines[j] = strdup(tmp_buf);
+		if ( lines[j] == NULL ) {
+		    fprintf(stderr,"[ERROR] strdup() failed\n");
+		    goto quit;
+		}
+		ip += lines[j] - old_ptr;
+		ptr_call_begin += lines[j] - old_ptr;
+		ptr_proc_begin += lines[j] - old_ptr;
+		/* */
+		printf("[INFO] file = %s  concatenated lines: %d - %d\n",
+		       file_name,j+1,end_j+1);
+		fflush(stdout);
 	    }
 	    /* */
 	    if ( flg_prev_if_without_brace == true ) {
@@ -526,33 +557,9 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    next_arg = NULL;
 		}
 		if ( next_arg == NULL ) {
-		    char tmp_buf[SZ_LINE_BUF];
-		    const char *ip1;
-		    char *op1;
-		    int next_j;
-		    op1 = strchr(lines[j],'\n');
-		    if ( op1 != NULL ) *op1 = ' ';
-		    for ( next_j=j+1 ; next_j < proc_end[i] ; next_j++ ) {
-			if ( lines[next_j][0] != '\0' ) break;
-		    }
-		    if ( next_j == proc_end[i] ) {
-			fprintf(stderr,"[ERROR] Invalid line: %d\n",j+1);
-		    }
-		    ip1 = lines[next_j];	/* next line */
-		    while ( *ip1 == ' ' || *ip1 == '\t' ) ip1++;
-		    snprintf(tmp_buf,SZ_LINE_BUF,"%s%s",lines[j],ip1);
-		    free(lines[j]);
-		    lines[j] = strdup(tmp_buf);
-		    if ( lines[j] == NULL ) {
-			fprintf(stderr,"[ERROR] strdup() failed\n");
-			goto quit;
-		    }
-		    lines[next_j][0] = '\0';
-		    printf("[INFO] file = %s  concatenated line: %d and %d\n",
-			   file_name,j+1,next_j+1);
-		    fflush(stdout);
-		    j--;	/* try again */
-		    break;
+		    fprintf(stderr,"[ERROR] file = %s  Cannot handle: %d\n",
+			    file_name,j+1);
+		    goto quit;
 		}
 		if ( arg_cnt == target_arg ) {
 		    char tmp_buf[SZ_LINE_BUF];
