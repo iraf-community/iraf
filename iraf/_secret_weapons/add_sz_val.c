@@ -186,11 +186,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    proc_decl[num_proc] = i;
 	}
 	else if ( strncmp(ip,"begin",5) == 0 &&
-	     (ip[5] == ' ' || ip[5] == '\t' || ip[5] == '\n') ) {
+	     (ip[5] == ' ' || ip[5] == '\t' || ip[5] == '#' || ip[5] == '\n') ) {
 	    proc_begin[num_proc] = i;
 	}
 	else if ( strncmp(ip,"end",3) == 0 &&
-	     (ip[3] == ' ' || ip[3] == '\t' || ip[3] == '\n') ) {
+	     (ip[3] == ' ' || ip[3] == '\t' || ip[3] == '#' || ip[3] == '\n') ) {
 	    proc_end[num_proc] = i;
 	    if ( DEBUG ) {
 		fprintf(stderr,"debug: decl=%d  begin=%d  end=%d\n",
@@ -233,9 +233,14 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    comm_ptr = strrchr(lines[j0],',');
 	    if ( comm_ptr != NULL ) {
 		comm_ptr++;
-		while ( *comm_ptr==' ' || *comm_ptr=='\t' || *comm_ptr=='\n' )
+		while ( *comm_ptr==' ' || *comm_ptr=='\t' )
 		    comm_ptr++;
-		if ( *comm_ptr != '\0' ) break;
+		if ( is_valchar(*comm_ptr) || *comm_ptr == '$' ) break;
+		else if ( *comm_ptr!='#' && *comm_ptr!='\n' && *comm_ptr!='\0' ) {
+		    fprintf(stderr,"[ERROR] file = %s  line = %d: Unexpected syntax\n",
+			    file_name,j0+1);
+		    goto quit;
+		}
 	    }
 	    else break;
 	    j0++;
@@ -246,8 +251,9 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	while ( j0 < proc_begin[i] ) {
 	    const char *ip;
 	    ip = lines[j0];
-	    while ( *ip==' ' || *ip=='\t' || *ip=='\n' ) ip++;
-	    if ( *ip != '$' && *ip != '\0' ) break;
+	    while ( *ip==' ' || *ip=='\t' ) ip++;
+	    if ( *ip != '$' && *ip != '#' && 
+		 *ip != '\n' && *ip != '\0' ) break;
 	    j0++;
 	}
 
@@ -327,7 +333,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		}
 		else {
 		    while ( *ip2 == ' ' || *ip2 == '\t' ) ip2++;
-		    if ( *ip2 == '\n' || *ip2 == '#'|| *ip2 == '\0' ) {
+		    if ( *ip2 == '#' || *ip2 == '\n'|| *ip2 == '\0' ) {
 			flags[j] |= FLG_IF_WITHOUT_BRACE;
 			break;
 		    }
@@ -346,7 +352,13 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			ip3++;
 			while ( *ip3 == ' ' || *ip3 == '\t' ) ip3++;
 			if ( *ip3 != '{' ) {
-			    flags[j] |= FLG_IF_WITHOUT_BRACE;
+			    if ( *ip3 == '#' || *ip3 == '\n' || *ip3 == '\0' ) {
+				flags[j] |= FLG_IF_WITHOUT_BRACE;
+			    }
+			    //else {
+			    //	printf("[INFO] file = %s  line = %d: Unexpected syntax\n",
+			    //	       file_name,o_j+1);
+			    //}
 			}
 			break;
 		    }
@@ -360,6 +372,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    const char *ip;
 	    const char *ptr_call_begin;
 	    const char *ptr_proc_begin;
+	    const char *end_ptr;
 	    int arg_cnt = 0;
 	    bool flg_prev_if_without_brace;
 	    int prev_j, end_j;
@@ -391,13 +404,22 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    if ( *ip != ' ' && *ip != '\t' && *ip != '(' ) continue;
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
 	    if ( *ip != '(' ) continue;
-	    /* */
-	    end_j = parse_in_braces (ip+1, lines, j, proc_end[i]-1, ")", NULL);
+	    /* parse (....) */
+	    end_j = parse_in_braces (ip+1, lines, j, proc_end[i]-1, ")", &end_ptr);
 	    if ( end_j < 0 ) {
-		fprintf(stderr,"[ERROR] file = %s  line = %d: Cannot handle\n",
+		fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax Error??\n",
 			file_name,j+1);
 		goto quit;
 	    }
+	    end_ptr++;
+	    while ( *end_ptr == ' ' || *end_ptr == '\t' ) end_ptr++;
+	    if ( *end_ptr != '#' && *end_ptr != '\n' && *end_ptr != '\0' &&
+		 *end_ptr != ';' ) {
+		fprintf(stderr,"[ERROR] file = %s  line = %d: Unexpected syntax\n",
+			file_name,j+1);
+		goto quit;
+	    }
+	    /* merge lines */
 	    if ( j < end_j ) {
 		char tmp_buf[SZ_LINE_BUF];
 		const char *ip1;
