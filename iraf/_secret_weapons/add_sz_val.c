@@ -261,10 +261,13 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    const char *ip;
 	    bool contain_alpha = false;
 	    ip = lines[j];
-	    while ( is_valchar(*ip) || *ip==' ' || *ip=='\t'||
-		    *ip==',' || *ip=='[' || *ip==']' ) {
-		if ( is_valchar(*ip) ) contain_alpha = true;
-		ip++;
+	    while ( *ip==' ' || *ip=='\t' ) ip++;
+	    if ( *ip != '$' ) {
+		while ( is_valchar(*ip) || *ip==' ' || *ip=='\t'||
+			*ip==',' || *ip=='[' || *ip==']' ) {
+		    if ( is_valchar(*ip) ) contain_alpha = true;
+		    ip++;
+		}
 	    }
 	    if ( contain_alpha == true ) {
 		if ( fix_last_decl < 2 ) {
