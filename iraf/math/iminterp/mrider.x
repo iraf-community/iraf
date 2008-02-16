@@ -359,8 +359,8 @@ begin
 
 	    # zero out 1st and last 2 rows
 	    call amovkr (0., coeff[1,1], kx+3)
-	    call amovkr (0., coeff[1,ky+2], kx+3]
-	    call amovkr (0., coeff[1,ky+3],kx+3]
+	    call amovkr (0., coeff[1,ky+2], kx+3)
+	    call amovkr (0., coeff[1,ky+3],kx+3)
 
 	    # calculate the spline coefficients
 	    call ii_spline2d (coeff, Memr[tmp], kx, ky+2, row_length,
