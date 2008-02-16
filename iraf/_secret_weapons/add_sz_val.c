@@ -260,7 +260,8 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    flg_prev_if = prev_if_or_else;
 	    /* */
 	    prev_if_or_else = false;
-	    {
+	    /* skip $if, $else, etc. in foo.gx */
+	    if ( *ip != '$' ) {
 		const char *ip1 = ip;
 		while ( isalpha(*ip1)==0 && *ip1!='\0' ) ip1++;
 		if ( (strncmp(ip1,"if",2)==0 && is_valchar(ip1[2])==0) ||
