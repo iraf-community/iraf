@@ -305,6 +305,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		fprintf(stderr,
 			"[INFO] file = %s  line = %d: appended braces\n",
 			file_name,j+1);
+		fflush(stderr);
 		if ( prev_j < 0 ) {
 		    fprintf(stderr,"[ERROR] Invalid prev_j\n");
 		    goto quit;
@@ -332,6 +333,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    fprintf(stderr,
 			    "[INFO] file = %s  line = %d: found blank line\n",
 			    file_name,j+1);
+		    fflush(stderr);
 		}
 		op1 = tmp_buf;
 		maxop1 = tmp_buf + SZ_LINE_BUF -1;
@@ -460,6 +462,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    j--;	/* try again */
 		    fprintf(stderr,"[INFO] file = %s  concatenated line: %d and %d\n",
 			    file_name,j+1,next_j+1);
+		    fflush(stderr);
 		    break;
 		}
 		if ( arg_cnt == target_arg ) {
@@ -591,6 +594,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    goto quit;
 	}
 	printf("updating: %s\n",file_name);
+	fflush(stdout);
 	for ( i=0 ; i < num_lines ; i++ ) {
 	    int j;
 	    for ( j=0 ; j < num_proc ; j++ ) {
