@@ -15,7 +15,6 @@ char	root[ARB]		#I root filename
 char	extn[ARB]		#I header file extension
 int	status			#O status value
 
-size_t	sz_val
 int	cindx
 pointer	sp, fname, im, tmp
 pointer	immapz()
@@ -26,9 +25,8 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-        call salloc (tmp, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+        call salloc (tmp, SZ_PATHNAME, TY_CHAR)
 
 	call fxf_init()
 	status = OK

@@ -28,7 +28,6 @@ pointer procedure lno_open (maxlines)
 int	maxlines	# max lines to store offsets for
 int	nlines
 pointer	lp
-size_t	sz_val
 errchk	calloc, malloc
 
 begin
@@ -37,9 +36,8 @@ begin
 	call calloc (lp, LEN_LNODES, TY_STRUCT)
 	LNO_MAXLINES(lp) = nlines
 	call calloc (LNO_LINENUMP(lp), nlines, TY_LONG)
-	sz_val = nlines
-	call malloc (LNO_LINEOFFP(lp), sz_val, TY_LONG)
-	call malloc (LNO_LINETAGP(lp), sz_val, TY_LONG)
+	call malloc (LNO_LINEOFFP(lp), nlines, TY_LONG)
+	call malloc (LNO_LINETAGP(lp), nlines, TY_LONG)
 
 	return (lp)
 end

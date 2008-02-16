@@ -23,7 +23,6 @@ procedure qpio_mkindex (io, key)
 pointer	io			#I QPIO descriptor
 char	key[ARB]		#I list of key fields
 
-size_t	sz_val
 pointer	sp, tokbuf, ip, in, ev, ev_p, ov, lv, oo, bp
 int	ox, line, nevents, szs_event, ncols, nlines, nout, x, y, i, ch
 int	token, offset, xoff, yoff, len_index, nev, fd, sv_evi, firstev
@@ -37,10 +36,8 @@ define	nosort_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_TOKBUF
-	call salloc (tokbuf, sz_val, TY_CHAR)
-	sz_val = IO_NLINES(io) * 3 + 32
-	call malloc (oo, sz_val, TY_SHORT)
+	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
+	call malloc (oo, IO_NLINES(io) * 3 + 32, TY_SHORT)
 
 	ncols  = IO_NCOLS(io)
 	nlines = IO_NLINES(io)

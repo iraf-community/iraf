@@ -13,17 +13,14 @@ procedure pr_summary (fname, ctrl)
 char	fname[ARB]
 pointer	ctrl
 
-size_t	sz_val
 int	fd, i, n, nlines
 pointer	sp, hb, lbuf
 int	open(), gstrcat(), hb_getnextblk(), strlen(), getline(), strmatch()
 
 begin
 	call smark (sp)
-	sz_val = LEN_HBSTRUCT
-	call salloc (hb, sz_val, TY_STRUCT)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (hb, LEN_HBSTRUCT, TY_STRUCT)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
 	    call eprintf ("Cannot open helpfile `%s'\n")

@@ -136,7 +136,6 @@ pointer procedure vfnopen (vfn, mode)
 char	vfn[ARB]		# virtual filename
 int	mode			# access mode for VFN database
 
-size_t	sz_val
 bool	first_time
 int	n_open_vfns, root_offset, extn_offset
 pointer	def_vfd, vfd
@@ -150,8 +149,7 @@ begin
 	# call.
 
 	if (first_time) {
-	    sz_val = LEN_VFD
-	    call malloc (def_vfd, sz_val, TY_STRUCT)
+	    call malloc (def_vfd, LEN_VFD, TY_STRUCT)
 	    n_open_vfns = 0
 	    first_time = false
 	}
@@ -337,7 +335,6 @@ pointer	vfd			# pointer to VFN descriptor
 char	osfn[maxch]		# buffer to receive packed OSFN
 int	maxch
 
-size_t	sz_val
 char	first_char
 int	fn, fn_index, ip, junk
 pointer	sp, root, extn, mfd, vfnp
@@ -347,9 +344,8 @@ errchk	vfnmap
 
 begin
 	call smark (sp)
-	sz_val = SZ_VFNFN
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (root, SZ_VFNFN, TY_CHAR)
+	call salloc (extn, SZ_VFNFN, TY_CHAR)
 
 	# Call VFNMAP to perform the mapping and possibly open the database.
 	# If VFNMAP returns ERR then the filename was degenerate but was not
@@ -425,7 +421,6 @@ char	osfn[maxch]		# OS filename to be searched for (packed)
 char	vfn[ARB]		# receives unpacked VFN
 int	maxch
 
-size_t	sz_val
 char	first_char
 int	fn, op, extn_offset
 pointer	mfd, osfnp, sp, osfname, ip
@@ -434,8 +429,7 @@ int	gstrcpy(), vfn_decode()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfname, sz_val, TY_CHAR)
+	call salloc (osfname, SZ_PATHNAME, TY_CHAR)
 
 	call strupk (osfn, Memc[osfname], SZ_PATHNAME)
 	if (CASE_INSENSITIVE && HOST_CASE != 'L')
@@ -510,7 +504,6 @@ procedure vfnclose (vfd, update_enable)
 pointer	vfd			# VFN descriptor
 int	update_enable		# update the database?
 
-size_t	sz_val
 int	n_open_vfns, lastop, junk, len_struct
 int	status
 pointer	sp, fname, osfn, mfd
@@ -525,9 +518,8 @@ define	unlock_ 93
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (osfn,  SZ_PATHNAME, TY_CHAR)
 
 	# If the mapping file was never referenced or the database was not
 	# modified in the MFD, just return buffers and quit.
@@ -613,7 +605,6 @@ procedure vvfn_readmapfile (vfd)
 
 pointer	vfd			# pointer to VFD descriptor
 
-size_t	sz_val
 int	new_struct_size, checksum, file_exists, maxbytes, new_mapping_file
 int	nbytes, len_file, junk, chan, ntrys, errnum, status
 long	locktime
@@ -627,9 +618,8 @@ define	reallynew_ 92
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (pkosfn, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (pkosfn, SZ_PATHNAME, TY_CHAR)
 
 	call calloc (mfd, LEN_MFD, TY_STRUCT)
 	V_MFD(vfd)	= mfd
@@ -783,7 +773,6 @@ pointer	vfd			# pointer to VFN descriptor
 char	osfn[maxch]		# packaged OS filename (in/out)
 int	maxch
 
-size_t	sz_val
 int	file_exists, op, ndigits, m, n, num, offset, fn
 pointer	sp, fname, numbuf, mfd
 int	gstrcpy(), itoc()
@@ -791,10 +780,8 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = MAX_DIGITS
-	call salloc (numbuf, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (numbuf, MAX_DIGITS, TY_CHAR)
 
 	# Generate the first attempt at the OSFN of the new file.
 

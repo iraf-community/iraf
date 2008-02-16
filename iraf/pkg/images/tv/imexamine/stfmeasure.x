@@ -31,7 +31,6 @@ real	dfwhm		#O Direct FWHM
 real	gfwhm		#O Gaussian FWHM
 real	mfwhm		#O Moffat FWHM
 
-size_t	sz_val
 int	i
 bool	ignore_sat
 pointer	sp, str, sf, sfd, sfds
@@ -42,14 +41,10 @@ errchk	stf_find, stf_bkgd, stf_profile, stf_widths, stf_fwhms, stf_organize
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SF
-	call salloc (sf, sz_val, TY_STRUCT)
-	sz_val = SFD
-	call salloc (sfd, sz_val, TY_STRUCT)
-	sz_val = 1
-	call salloc (sfds, sz_val, TY_POINTER)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (sf, SF, TY_STRUCT)
+	call salloc (sfd, SFD, TY_STRUCT)
+	call salloc (sfds, 1, TY_POINTER)
 	call aclri (Memi[sf], SF)
 	call aclri (Memi[sfd], SFD)
 	Memi[sfds] = sfd

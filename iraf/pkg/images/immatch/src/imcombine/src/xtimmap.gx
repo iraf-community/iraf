@@ -45,7 +45,6 @@ int	hdr_arg			#I Header argument
 int	index			#I Save index
 pointer	im			#O Image pointer (returned)
 
-size_t	sz_val
 int	i, envgeti()
 pointer	xt, xt_opix()
 errchk	xt_opix
@@ -95,8 +94,7 @@ begin
 	im = xt_opix (NULL, index, 0)
 
 	# Make copy of IMIO pointer for header keyword access.
-	sz_val = LEN_IMDES+IM_HDRLEN(im)+1
-	call malloc (XT_HDR(xt), sz_val, TY_STRUCT)
+	call malloc (XT_HDR(xt), LEN_IMDES+IM_HDRLEN(im)+1, TY_STRUCT)
 	call amovi (Memi[im], Memi[XT_HDR(xt)], LEN_IMDES)
 	call amovi (IM_MAGIC(im), IM_MAGIC(XT_HDR(xt)), IM_HDRLEN(im)+1)
 
@@ -388,7 +386,6 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-size_t	sz_val
 int	i, j, nc, nl, open(), imgnl$t(), sizeof(), imloop()
 pointer	im, xt, xt1, ptr, immap(), imggs$t()
 errchk	open, immap, imgnl$t, imggs$t, imunmap
@@ -499,8 +496,7 @@ begin
 			XT_VE(xt1,2) = min (XT_VS(xt1,2)+(nl-1), IM_LEN(im,2))
 			nl = XT_VE(xt1,2) - XT_VS(xt1,2) + 1
 			XT_BTYPE(xt1) = TY_PIXEL
-			sz_val = nl*nc
-			call malloc (XT_BUF(xt1), sz_val, XT_BTYPE(xt1))
+			call malloc (XT_BUF(xt1), nl*nc, XT_BTYPE(xt1))
 			ptr = imggs$t (im, XT_VS(xt1,1), XT_VE(xt1,1),
 			   IM_NDIM(im))
 			call amov$t (Mem$t[ptr], Mem$t[XT_BUF(xt1)], nl*nc)

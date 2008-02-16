@@ -22,7 +22,6 @@ char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 pointer	ref_im			#I reference image
 
-size_t	sz_val
 pointer	sp, fname, pl, b_pl
 long	axlen[PL_MAXDIM], v[PL_MAXDIM]
 int	acmode, flags, naxes, depth
@@ -38,8 +37,7 @@ include <nullptr.com>
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)

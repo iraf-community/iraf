@@ -16,22 +16,17 @@ procedure t_columns()
 
 int	numcols, infd, nchar, nfile, ip
 pointer	sp, fname, ofile, oroot, line, word, fnum, ofd
-size_t	sz_val
 int	clgeti(), open(), getline(), itoc(), ctowrd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (ofile, sz_val, TY_CHAR)
-	call salloc (oroot, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	call salloc (word, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (fnum, sz_val, TY_CHAR)
-	sz_val = MAX_FILES
-	call salloc (ofd, sz_val, TY_INT)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (ofile, SZ_FNAME, TY_CHAR)
+	call salloc (oroot, SZ_FNAME, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (word, SZ_LINE, TY_CHAR)
+	call salloc (fnum, SZ_FNAME, TY_CHAR)
+	call salloc (ofd, MAX_FILES, TY_INT)
 
 	# Get the number of columns and the input file name
 	call clgstr ("filename", Memc[fname], SZ_FNAME)

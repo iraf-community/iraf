@@ -27,7 +27,6 @@ double	zmin, zmax		# Data limits
 int	ncols			# Number of image columns
 int	nlines			# Number of image lines
 
-size_t	sz_val
 int	i, j, k, fd, n, ncoeff, maxorder, xincr
 double	r[8], dx, dy, chisqr
 pointer	sf, im, mw
@@ -42,14 +41,13 @@ errchk	dgsinit, dgsfit, dgscoeff, dgserrors
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (func, sz_val, TY_CHAR)
-	call salloc (wttype, sz_val, TY_CHAR)
-	call salloc (coords, sz_val, TY_CHAR)
-	call salloc (fit, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (xtype, sz_val, TY_CHAR)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (func, SZ_FNAME, TY_CHAR)
+	call salloc (wttype, SZ_FNAME, TY_CHAR)
+	call salloc (coords, SZ_FNAME, TY_CHAR)
+	call salloc (fit, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (xtype, SZ_FNAME, TY_CHAR)
 
 	x = NULL
 	y = NULL
@@ -76,11 +74,10 @@ begin
 		if (nscan() < 4)
 		    r[4] = 1.
 		if (n == 0) {
-		    sz_val = 100
-		    call malloc (x, sz_val, TY_DOUBLE)
-		    call malloc (y, sz_val, TY_DOUBLE)
-		    call malloc (z, sz_val, TY_DOUBLE)
-		    call malloc (w, sz_val, TY_DOUBLE)
+		    call malloc (x, 100, TY_DOUBLE)
+		    call malloc (y, 100, TY_DOUBLE)
+		    call malloc (z, 100, TY_DOUBLE)
+		    call malloc (w, 100, TY_DOUBLE)
 		} else if (mod (n, 100) == 0) {
 		    call realloc (x, n+100, TY_DOUBLE)
 		    call realloc (y, n+100, TY_DOUBLE)
@@ -167,11 +164,9 @@ begin
 
 	    # Output parameters, coefficients, errors, and fit results.
 	    ncoeff = dgsgeti (sf, GSNCOEFF)
-	    sz_val = ncoeff
-	    call salloc (c, sz_val, TY_DOUBLE)
-	    call salloc (e, sz_val, TY_DOUBLE)
-	    sz_val = n
-	    call salloc (f, sz_val, TY_DOUBLE)
+	    call salloc (c, ncoeff, TY_DOUBLE)
+	    call salloc (e, ncoeff, TY_DOUBLE)
+	    call salloc (f, n, TY_DOUBLE)
 	    call dgscoeff (sf, Memd[c], ncoeff)
 	    call dgsvector (sf, Memd[x], Memd[y], Memd[f], n)
 	    call dgserrors (sf, Memd[z], Memd[w], Memd[f], chisqr, Memd[e])
@@ -300,9 +295,8 @@ begin
 		IM_LEN(im,1) = ncols
 		IM_LEN(im,2) = nlines
 
-		sz_val = ncols
-		call salloc (xvec, sz_val, TY_DOUBLE)
-		call salloc (yvec, sz_val, TY_DOUBLE)
+		call salloc (xvec, ncols, TY_DOUBLE)
+		call salloc (yvec, ncols, TY_DOUBLE)
 		dx = (xmax - xmin) / (ncols - 1)
 		dy = (ymax - ymin) / (nlines - 1)
 		do i = 1, ncols

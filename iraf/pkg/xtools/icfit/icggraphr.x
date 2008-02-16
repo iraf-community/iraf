@@ -21,14 +21,12 @@ real	y[npts]				# Dependent variable
 real	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 pointer	xout, yout
 real	size
 
 begin
-	sz_val = npts
-	call malloc (xout, sz_val, TY_REAL)
-	call malloc (yout, sz_val, TY_REAL)
+	call malloc (xout, npts, TY_REAL)
+	call malloc (yout, npts, TY_REAL)
 	call icg_axesr (ic, gt, cv, 1, x, y, Memr[xout], npts)
 	call icg_axesr (ic, gt, cv, 2, x, y, Memr[yout], npts)
 	call icg_paramsr (ic, cv, x, y, wts, npts, gt)
@@ -77,18 +75,15 @@ real	y[npts]				# Abscissas
 real	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (xr1, sz_val, TY_REAL)
-	call salloc (yr1, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (xr1, 2, TY_REAL)
+	call salloc (yr1, 2, TY_REAL)
 	call achtrr (x, Memr[xr], npts)
 	call achtrr (y, Memr[yr], npts)
 
@@ -142,15 +137,13 @@ real	x[npts], y[npts]	# Data points
 int	npts			# Number of data points
 real	size			# Symbol size
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, gt1
 
 begin
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
 	call achtrr (x, Memr[xr], npts)
 	call achtrr (y, Memr[yr], npts)
 
@@ -190,7 +183,6 @@ pointer	gt			# GTOOL pointer
 pointer	cv			# CURFIT pointer
 int	npts			# Number of points to plot
 
-size_t	sz_val
 pointer	sp, xr, yr, x, y, xo, yo, gt1
 int	i
 real	dx
@@ -201,13 +193,12 @@ begin
 
 	call smark (sp)
 
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (xo, sz_val, TY_REAL)
-	call salloc (yo, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (x,  npts, TY_REAL)
+	call salloc (y,  npts, TY_REAL)
+	call salloc (xo, npts, TY_REAL)
+	call salloc (yo, npts, TY_REAL)
 
 	# Generate vector of independent variable values
 	dx = (IC_XMAX(ic) - IC_XMIN(ic)) / (npts - 1)

@@ -19,15 +19,13 @@ char	fitsfile[ARB]	#I Input FITS filename
 int	acmode		#I access mode
 pointer	oldp		#I Old Fits pointer or header size
 
-size_t	sz_val
 pointer	sp, ksec, section, mef
 int	group, clsize, open()
 
 begin
         call smark (sp)
-	sz_val = LEN_CARD
-	call salloc (ksec, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (ksec, LEN_CARD, TY_CHAR)
+	call salloc (section, LEN_CARD, TY_CHAR)
 
 	call calloc (mef, LEN_MEF, TY_STRUCT)
 
@@ -62,7 +60,6 @@ procedure mef_file_access (fname, acmode)
 char	fname[ARB]
 int	acmode
 
-size_t	sz_val
 pointer sp, fext, fn
 int	len, fnextn(), access(), strncmp()
 begin
@@ -70,9 +67,8 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fext, sz_val, TY_CHAR)
-	call salloc (fn, sz_val, TY_CHAR)
+	call salloc (fext, SZ_FNAME, TY_CHAR)
+	call salloc (fn, SZ_FNAME, TY_CHAR)
 
 	call strcpy (fname, Memc[fn], SZ_FNAME)
 

@@ -38,7 +38,6 @@ program that reads lroff output.
 
 procedure lroff (in, in_arg, out, out_arg, plm, prm, soflag_val, foflag_val)
 
-size_t	sz_val
 extern	in()			# called to get lines of input text
 int	in_arg			# magic argument for in()
 extern	out()			# called to output formatted lines of text
@@ -61,8 +60,7 @@ define	text_	98
 
 begin
 	call smark (sp)
-	sz_val = SZ_IBUF
-	call salloc (ibuf, sz_val, TY_CHAR)
+	call salloc (ibuf, SZ_IBUF, TY_CHAR)
 
 	if (plm > prm || plm < 1)
 	    call error (1, "Lroff called with invalid margins")

@@ -6,7 +6,6 @@ bool procedure fnullfile (fname)
 
 char	fname[ARB]		# null file candidate
 
-size_t	sz_val
 pointer	sp, osfn
 bool	first_time, bval
 char	nullpath[SZ_FNAME]
@@ -24,8 +23,7 @@ begin
 	    return (false)
 
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	if (first_time) {
 	    call fpathname (nullfile, nullpath, SZ_FNAME)

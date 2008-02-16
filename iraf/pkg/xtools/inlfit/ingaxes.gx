@@ -16,7 +16,6 @@ PIXEL	z[npts]				# Output values
 int	npts				# Number of points
 int	nvars				# Number of variables
 
-size_t	sz_val
 int	i, j
 int	axistype, axisnum
 int	gtlabel[2], gtunits[2]
@@ -37,9 +36,8 @@ pointer	in_getp()
 begin
 	# Allocate string space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (label, sz_val, TY_CHAR)
-	call salloc (units, sz_val, TY_CHAR)
+	call salloc (label, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
 
 	# Get the appropiate axis type and variable number.
 	call in_gkey (in, in_geti (in, INLGKEY), axis, axistype, axisnum)

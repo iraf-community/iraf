@@ -20,7 +20,6 @@ char	process[ARB]		# filename of executable process file
 int	in			# fd of IPC input from child (output)
 int	out			# fd of IPC output to child (output)
 
-size_t	sz_val
 bool	first_time
 int	pr
 pointer	loc_onipc
@@ -38,8 +37,7 @@ data	first_time /true/
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# Initialize the process table.  Post exception handler to recover
 	# from write to IPC with no reader.

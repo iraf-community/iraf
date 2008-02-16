@@ -18,7 +18,6 @@ double	xmax		# maximum value of x
 double	ymin		# minimum value of y
 double	ymax		# maximum value of y
 
-size_t	sz_val
 int	order
 errchk	malloc, calloc
 
@@ -32,8 +31,7 @@ begin
 	    call error (0, "GSINIT: ymax <= ymin.")
 
 	# allocate space for the gsurve descriptor
-	sz_val = LEN_GSSTRUCT
-	call malloc (sf, sz_val, TY_STRUCT)
+	call malloc (sf, LEN_GSSTRUCT, TY_STRUCT)
 
 	# specify the surface-type dependent parameters
 	switch (surface_type) {

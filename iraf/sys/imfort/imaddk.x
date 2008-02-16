@@ -6,7 +6,6 @@ include	"imfort.h"
 
 procedure imaddk (im, keyw, dtype, comm, ier)
 
-size_t	sz_val
 pointer	im			# imfort image descriptor
 %       character*(*) keyw
 int	dtype
@@ -18,10 +17,8 @@ int	errcode()
 
 begin
 	call smark (sp)
-	sz_val = SZ_KEYWORD
-	call salloc (kp, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (cp, sz_val, TY_CHAR)
+	call salloc (kp, SZ_KEYWORD, TY_CHAR)
+	call salloc (cp, SZ_LINE, TY_CHAR)
 
 	call f77upk (keyw, Memc[kp], SZ_KEYWORD)
 	call f77upk (comm, Memc[cp], SZ_LINE)

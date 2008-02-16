@@ -11,15 +11,13 @@ char	envvar[ARB]		# possibly indirect env. variable name
 char	outstr[ARB]		# receives value of variable
 int	maxch
 
-size_t	sz_val
 pointer	sp, envname
 int	envfind()
 errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (envname, sz_val, TY_CHAR)
+	call salloc (envname, SZ_FNAME, TY_CHAR)
 
 	call strcpy (envvar, outstr, maxch)
 

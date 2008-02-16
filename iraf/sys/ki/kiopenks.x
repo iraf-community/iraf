@@ -14,7 +14,6 @@ int procedure ki_openks (node)
 
 int	node			# node descriptor to open kernel on
 
-size_t	sz_val
 bool	hostdep
 pointer	sp, ksname, env, el, valp, ip, op, sv
 int	show, kschan, nchars, status, junk
@@ -30,10 +29,8 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (ksname, sz_val, TY_CHAR)
-	sz_val = SZB_PACKET / SZB_CHAR
-	call salloc (sv, sz_val, TY_CHAR)
+	call salloc (ksname, SZ_FNAME, TY_CHAR)
+	call salloc (sv, SZB_PACKET / SZB_CHAR, TY_CHAR)
 
 	status = ERR
 
@@ -61,8 +58,7 @@ begin
 	for (el=env_first(valp);  el != NULL;  el=env_next(el,valp,show))
 	    nchars = nchars + strlen (Memc[valp]) + 4 + 2 + 1
 
-	sz_val = nchars
-	call salloc (env, sz_val, TY_CHAR)
+	call salloc (env, nchars, TY_CHAR)
 
 	op = env
 	for (el=env_first(valp);  el != NULL;  el=env_next(el,valp,show)) {

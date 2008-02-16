@@ -188,7 +188,6 @@ pointer procedure dtmap (database, mode)
 char	database[ARB]			# Database file
 int	mode				# FIO mode
 
-size_t	sz_val
 int	i, nrec
 int	dt_alloc1, dt_alloc2
 pointer	dt, str
@@ -213,13 +212,10 @@ begin
 
 	dt_alloc1 = DT_ALLOC
 	dt_alloc2 = DT_ALLOC * SZ_LINE
-	sz_val = dt_alloc1
-	call malloc (DT_OFFSETS(dt), sz_val, TY_LONG)
-	call malloc (DT_NAMES(dt), sz_val, TY_INT)
-	sz_val = dt_alloc2
-	call malloc (DT_MAP(dt), sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call malloc (str, sz_val, TY_CHAR)
+	call malloc (DT_OFFSETS(dt), dt_alloc1, TY_LONG)
+	call malloc (DT_NAMES(dt), dt_alloc1, TY_INT)
+	call malloc (DT_MAP(dt), dt_alloc2, TY_CHAR)
+	call malloc (str, SZ_LINE, TY_CHAR)
 
 	nrec = 1
 	DT_NRECS(dt) = 0
@@ -617,7 +613,6 @@ char	database[ARB]		# Database
 char	key[ARB]		# Key
 int	mode			# Mode
 
-size_t	sz_val
 pointer	sp, dbfile, dt
 
 int	isdirectory(), access(), stridxs()
@@ -627,8 +622,7 @@ errchk	dtmap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME + SZ_FNAME
-	call salloc (dbfile, sz_val, TY_CHAR)
+	call salloc (dbfile, SZ_PATHNAME + SZ_FNAME, TY_CHAR)
 
 	# Check if the database does not exist create it as a directory.
 
@@ -671,7 +665,6 @@ char	dname[ARB]		# Directory name
 char	fname[ARB]		# File name
 int	mode			# Mode
 
-size_t	sz_val
 int	i, open()
 bool	strne()
 pointer	dbfile, dtmap1()
@@ -683,8 +676,7 @@ begin
 		call dtunmap (dt)
 	    } else if (mode != DT_MODE(dt)) {
 		i = SZ_PATHNAME + SZ_FNAME
-		sz_val = i
-		call malloc (dbfile, sz_val, TY_CHAR)
+		call malloc (dbfile, i, TY_CHAR)
 		call fstats (DT(dt), F_FILENAME, Memc[dbfile], i)
 		call close (DT(dt))
 		iferr (i = open (Memc[dbfile], mode, TEXT_FILE)) {

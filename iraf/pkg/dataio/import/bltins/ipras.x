@@ -330,7 +330,6 @@ pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
 int	nchars					#i line size
 
-size_t	sz_val
 pointer	im, data, op
 int	i, percent
 
@@ -340,8 +339,7 @@ common  /rascom/ filepos
 begin
         im = IP_IM(ip)
         op = PTYPE(ip,1)
-        sz_val = nchars
-        call malloc (data, sz_val, TY_CHAR)
+        call malloc (data, nchars, TY_CHAR)
         IO_DATA(op) = data
         IO_NPIX(op) = RAS_WIDTH(ras)
 
@@ -386,7 +384,6 @@ pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
 int	nchars					#i line size
 
-size_t	sz_val
 pointer	im, data, op
 int	i, percent, npix
 
@@ -396,8 +393,7 @@ common  /rascom/ filepos
 begin
         im = IP_IM(ip)
         op = PTYPE(ip,1)
-        sz_val = nchars
-        call malloc (data, sz_val, TY_SHORT)
+        call malloc (data, nchars, TY_SHORT)
         IO_DATA(op) = data
         IO_NPIX(op) = RAS_WIDTH(ras)
 

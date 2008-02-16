@@ -11,7 +11,6 @@ int	col1, col2	#I column limits in the image
 int	line1, line2	#I line limits in the image
 pointer	buf		#U buffer pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, llast1, llast2, nllast, nclast
 pointer	buf1, buf2
@@ -28,8 +27,7 @@ begin
 	# buffer image read.
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

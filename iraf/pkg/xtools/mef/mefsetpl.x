@@ -37,7 +37,6 @@ real	minval
 real	maxval
 pointer mef		#I Mef descriptor
 
-size_t	sz_val
 int	tlen, i, ch, hdrlen, nchars
 pointer	sp, tbuf, ip, op, rp, bp, hd
 int	strncmp(), ctol(), ctor(), strlen()
@@ -49,10 +48,8 @@ begin
 	tlen= strlen(imhdr)
 
 	call smark (sp)
-	sz_val = SZ_IMTITLE
-	call salloc (tbuf, sz_val, TY_CHAR)
-	sz_val = tlen
-	call salloc (bp, sz_val, TY_CHAR)
+	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
+	call salloc (bp, tlen, TY_CHAR)
 
 	call strcpy (imhdr, Memc[bp], tlen)
 
@@ -163,8 +160,7 @@ begin
 	}
 	
 	hdrlen = tlen*2
-	sz_val = hdrlen
-	call malloc (hd, sz_val, TY_CHAR)
+	call malloc (hd, hdrlen, TY_CHAR)
 	op = hd
 
 	while (Memc[ip] != EOS) {

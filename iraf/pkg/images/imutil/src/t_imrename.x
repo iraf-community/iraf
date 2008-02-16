@@ -13,7 +13,6 @@ pointer	sp, old_list, new_list
 pointer	old_name, new_name, old_dir, new_dir
 bool	verbose
 
-size_t	sz_val
 pointer	list1, list2
 int	root_len
 int	imtgetim(), imtlen()
@@ -23,14 +22,12 @@ bool	clgetb()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (old_list, sz_val, TY_CHAR)
-	call salloc (new_list, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (old_name, sz_val, TY_CHAR)
-	call salloc (new_name, sz_val, TY_CHAR)
-	call salloc (new_dir, sz_val, TY_CHAR)
-	call salloc (old_dir, sz_val, TY_CHAR)
+	call salloc (old_list, SZ_LINE, TY_CHAR)
+	call salloc (new_list, SZ_LINE, TY_CHAR)
+	call salloc (old_name, SZ_PATHNAME, TY_CHAR)
+	call salloc (new_name, SZ_PATHNAME, TY_CHAR)
+	call salloc (new_dir,  SZ_PATHNAME, TY_CHAR)
+	call salloc (old_dir,  SZ_PATHNAME, TY_CHAR)
 
 	# Get input and output image template lists.
 	call clgstr ("oldnames", Memc[old_list], SZ_LINE)

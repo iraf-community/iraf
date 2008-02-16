@@ -29,7 +29,6 @@ PIXEL	zfit[ARB]	# fitted data points
 PIXEL	chisqr		# reduced chi-squared of fit
 PIXEL	errors[ARB]	# errors in coefficients
 
-size_t	sz_val
 int	i, nfree
 PIXEL	variance, chisq, hold
 pointer	sp, covptr
@@ -38,11 +37,9 @@ begin
 	# allocate space for covariance vector
 	call smark (sp)
 	$if (datatype == r)
-	sz_val = GS_NCOEFF(sf)
-	call salloc (covptr, sz_val, TY_REAL)
+	call salloc (covptr, GS_NCOEFF(sf), TY_REAL)
 	$else
-	sz_val = GS_NCOEFF(sf)
-	call salloc (covptr, sz_val, TY_DOUBLE)
+	call salloc (covptr, GS_NCOEFF(sf), TY_DOUBLE)
 	$endif
 
 	# estimate the variance and chi-squared of the fit

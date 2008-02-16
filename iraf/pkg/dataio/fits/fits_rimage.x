@@ -13,7 +13,6 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
-size_t	sz_val
 int	i, npix, npix_record, blksize, ndummy
 long	v[IM_MAXDIM], nlines, il
 pointer	tempbuf, buf
@@ -66,8 +65,7 @@ begin
 	case FITS_REAL:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_REAL)
+	    call malloc (tempbuf, npix, TY_REAL)
 
 	    # Initialize the read.
 	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
@@ -106,8 +104,7 @@ begin
 	case FITS_DOUBLE:
 
 	    # Allocate temporary space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_DOUBLE)
+	    call malloc (tempbuf, npix, TY_DOUBLE)
 
 	    # Initialize the read.
 	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF,
@@ -154,8 +151,7 @@ begin
 	default:
 
 	    # Allocate the required space.
-	    sz_val = npix
-	    call malloc (tempbuf, sz_val, TY_LONG)
+	    call malloc (tempbuf, npix, TY_LONG)
 
 	    # Allocate the space for the output line, read in the image
 	    # line, convert from the ieee to native format, and compute the

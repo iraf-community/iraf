@@ -22,7 +22,6 @@ pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 int	offsets[nimages,ARB]	#I Offsets to  output image
 
-size_t	sz_val
 int	mtype			# Mask type
 int	mvalue			# Mask value
 pointer	bufs			# Pointer to data line buffers
@@ -43,11 +42,10 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (key, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (title, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (title, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	# Determine the mask parameters and allocate memory.
 	# The mask buffers are initialize to all excluded so that
@@ -76,8 +74,7 @@ begin
 	call calloc (bufs, nimages, TY_POINTER)
 	call calloc (names, nimages, TY_POINTER)
 	do i = 1, nimages {
-	    sz_val = npix
-	    call malloc (Memi[bufs+i-1], sz_val, TY_INT)
+	    call malloc (Memi[bufs+i-1], npix, TY_INT)
 	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
 	}
 
@@ -124,8 +121,7 @@ begin
 	npms = 0
 	do i = 1, nimages {
 	    if (mtype != M_NONE) {
-		sz_val = SZ_FNAME
-		call malloc (Memi[names+i-1], sz_val, TY_CHAR)
+		call malloc (Memi[names+i-1], SZ_FNAME, TY_CHAR)
 		fname = Memi[names+i-1]
 		ifnoerr (call imgstr (in[i],Memc[key],Memc[fname],SZ_FNAME)) {
 		    nin = IM_LEN(in[i],1)
@@ -187,14 +183,12 @@ pointer	pm			#O Mask pointer to be returned
 char	fname[ARB]		#U Mask name
 int	maxchar			#I Max size of mask name
 
-size_t	sz_val
 pointer	sp, str, imname
 int	i, fnldir(), stridxs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_PATHNAME, TY_CHAR)
 
 	# First check if the specified file can be loaded.
 	ifnoerr (call pm_loadf (pm, fname, Memc[str], SZ_PATHNAME))
@@ -216,8 +210,7 @@ begin
 	}
 
 	# Check if the image has a path.  If not return an error.
-	sz_val = SZ_PATHNAME
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
 	call imstats (im, IM_IMAGENAME, Memc[imname], SZ_PATHNAME)
 	if (fnldir (Memc[imname], Memc[str], SZ_PATHNAME) == 0) {
 	    call sprintf (Memc[str], SZ_PATHNAME,

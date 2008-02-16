@@ -59,15 +59,13 @@ int	radecsys		#I the input equatorial reference system
 double	equinox			#I the input equinox
 double	epoch			#I the input epoch of the observation
 
-size_t	sz_val
 pointer	sp, radecstr
 double	sl_epj(), sl_epb()
 int	sk_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (radecstr, sz_val, TY_CHAR)
+	call salloc (radecstr, SZ_FNAME, TY_CHAR)
 
 	switch (ctype) {
 
@@ -153,15 +151,13 @@ int	radecsys		#I the input equatorial reference system
 double	equinox			#I the input equinox
 double	epoch			#I the input epoch of the observation
 
-size_t	sz_val
 pointer	sp, radecstr
 double	sl_epj(), sl_epb()
 int	sk_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (radecstr, sz_val, TY_CHAR)
+	call salloc (radecstr, SZ_FNAME, TY_CHAR)
 
 	switch (ctype) {
 
@@ -256,18 +252,16 @@ int	radecsys		#I the image equatorial reference system
 double	equinox			#I the image equinox
 double	epoch			#I the image epoch of the observation
 
-size_t	sz_val
 pointer	sp, imname, projstr, wcsstr, radecstr
 double	sl_epj(), sl_epb()
 int	sk_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (projstr, sz_val, TY_CHAR)
-	call salloc (wcsstr, sz_val, TY_CHAR)
-	call salloc (radecstr, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (projstr, SZ_FNAME, TY_CHAR)
+	call salloc (wcsstr, SZ_FNAME, TY_CHAR)
+	call salloc (radecstr, SZ_FNAME, TY_CHAR)
 
 	call sscan (imagesys)
 	    call gargwrd (Memc[imname], SZ_FNAME)
@@ -395,18 +389,16 @@ int	radecsys		#I the image equatorial reference system
 double	equinox			#I the image equinox
 double	epoch			#I the image epoch of the observation
 
-size_t	sz_val
 pointer	sp, imname, projstr, wcsstr, radecstr
 double	sl_epj(), sl_epb()
 int	sk_wrdstr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (projstr, sz_val, TY_CHAR)
-	call salloc (wcsstr, sz_val, TY_CHAR)
-	call salloc (radecstr, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (projstr, SZ_FNAME, TY_CHAR)
+	call salloc (wcsstr, SZ_FNAME, TY_CHAR)
+	call salloc (radecstr, SZ_FNAME, TY_CHAR)
 
 	call sscan (imagesys)
 	    call gargwrd (Memc[imname], SZ_FNAME)

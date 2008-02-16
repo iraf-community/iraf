@@ -18,7 +18,6 @@ real	z1			# Intensity mapped to minimum gs value
 real	z2			# Intensity mapped to maximum gs value
 pointer	lut			# Look up table - pointer is returned
 
-size_t	sz_val
 pointer	sp, x, y
 int	nvalues, i, j, x1, x2, y1
 real	delta_gs, delta_xv, slope
@@ -26,9 +25,8 @@ errchk	cv_rlut, cv_sort, malloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_BUF
-	call salloc (x, sz_val, TY_REAL)
-	call salloc (y, sz_val, TY_REAL)
+	call salloc (x, SZ_BUF, TY_REAL)
+	call salloc (y, SZ_BUF, TY_REAL)
 
 	# Read intensities and greyscales from the user's input file.  The
 	# intensity range is then mapped into a standard range and the 
@@ -40,8 +38,7 @@ begin
 	call cv_sort (Memr[x], Memr[y], nvalues)
 
 	# Fill lut in straight line segments - piecewise linear
-	sz_val = SZ_BUF
-	call malloc (lut, sz_val, TY_SHORT)
+	call malloc (lut, SZ_BUF, TY_SHORT)
 	do i = 1, nvalues-1 {
 	    delta_gs = Memr[y+i] - Memr[y+i-1]
 	    delta_xv = Memr[x+i] - Memr[x+i-1]
@@ -66,7 +63,6 @@ real	x[SZ_BUF]		# Array of x values, filled on return
 real	y[SZ_BUF]		# Array of y values, filled on return
 int	nvalues			# Number of values in x, y vectors - returned
 
-size_t	sz_val
 int	n, fd
 pointer	sp, lbuf, ip
 real	xval, yval
@@ -75,8 +71,7 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	iferr (fd = open (utab, READ_ONLY, TEXT_FILE))
 	    call error (0, "Error opening user table")

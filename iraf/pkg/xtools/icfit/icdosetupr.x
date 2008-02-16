@@ -19,7 +19,6 @@ int	newwts				# New weights?
 int	newfunction			# New function?
 int	refit				# Use cvrefit?
 
-size_t	sz_val
 int	ord
 real	xmin, xmax
 
@@ -35,16 +34,13 @@ begin
 
 	    call mfree (IC_XFIT(ic), TY_REAL)
 	    call mfree (IC_YFIT(ic), TY_REAL)
-	    sz_val = npts
-	    call malloc (IC_XFIT(ic), sz_val, TY_REAL)
+	    call malloc (IC_XFIT(ic), npts, TY_REAL)
 
 	    call mfree (IC_WTSFIT(ic), TY_REAL)
-	    sz_val = npts
-	    call malloc (IC_WTSFIT(ic), sz_val, TY_REAL)
+	    call malloc (IC_WTSFIT(ic), npts, TY_REAL)
 
 	    call mfree (IC_REJPTS(ic), TY_INT)
-	    sz_val = npts
-	    call malloc (IC_REJPTS(ic), sz_val, TY_INT)
+	    call malloc (IC_REJPTS(ic), npts, TY_INT)
 	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
 	    IC_NREJECT(ic) = 0
 
@@ -68,8 +64,7 @@ begin
 		IC_WTSFIT(ic) = NULL
 		call alimr (x, npts, xmin, xmax)
 	    } else {
-	        sz_val = IC_NFIT(ic)
-	        call malloc (IC_YFIT(ic), sz_val, TY_REAL)
+	        call malloc (IC_YFIT(ic), IC_NFIT(ic), TY_REAL)
 		if (IC_NFIT(ic) == 1)
 		    call alimr (x, npts, xmin, xmax)
 		else

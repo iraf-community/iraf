@@ -14,7 +14,6 @@ pointer	db		#I pointer to the database file
 int	dformat		#I write the output file in database format
 pointer	ls		#I pointer to the linscale structure
 
-size_t	sz_val
 pointer	sp, image, imname
 real	bscale, bzero, bserr, bzerr
 bool	streq()
@@ -27,9 +26,8 @@ int	rg_lstati(), fscan(), nscan()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call rg_lstats (ls, IMAGE, Memc[image], SZ_FNAME)
 
 	# Initialize.
@@ -238,7 +236,6 @@ pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to image
 int	i		#I the region id
 
-size_t	sz_val
 int	stat, nrimcols, nrimlines, nimcols, nimlines, nrcols, nrlines, ncols 
 int	nlines, rc1, rc2, rl1, rl2, c1, c2, l1, l2, xstep, ystep, npts
 pointer	sp, str, ibuf, rbuf, prc1, prc2, prxstep, prl1, prl2, prystep
@@ -256,8 +253,7 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Delete the data of the previous region if any.
 	rbuf = rg_lstatp (ls, RBUF)
@@ -433,7 +429,6 @@ procedure rg_lgmmm (ls, i)
 pointer	ls		#I pointer to the intensity scaling structure
 int	i		#I the current region
 
-size_t	sz_val
 int	npts
 pointer	rbuf, ibuf, buf
 real	sigma, dmin, dmax
@@ -458,8 +453,7 @@ begin
 	    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 	    return
 	}
-	sz_val = npts
-	call malloc (buf, sz_val, TY_REAL)
+	call malloc (buf, npts, TY_REAL)
 
 	# Compute the mean, median, and mode of the reference region but
 	# don't recompute the reference region statistics needlessly.
@@ -743,7 +737,6 @@ real	tbzero		#O the computed bzero factor
 real	tbserr		#O the computed error in bscale
 real	tbzerr		#O the computed error in bzero
 
-size_t	sz_val
 int	i, bsalg, bzalg, nregions
 pointer	sp, weight
 real	answers[MAX_NFITPARS]
@@ -757,8 +750,7 @@ begin
 	nregions = rg_lstati (ls, NREGIONS)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (weight, sz_val, TY_REAL)
+	call salloc (weight, nregions, TY_REAL)
 
 	if (bsalg == LS_MEAN || bzalg == LS_MEAN) {
 	    do i = 1, nregions {
@@ -928,7 +920,6 @@ real	bzero		#O the average offset parameter
 real	bserr		#O the error in bscale
 real	bzerr		#O the error in bzero
 
-size_t	sz_val
 int	rec
 pointer	sp, record
 int	dtlocate()
@@ -936,8 +927,7 @@ real	dtgetr()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (record, sz_val, TY_CHAR)
+	call salloc (record, SZ_FNAME, TY_CHAR)
 
 	call rg_lstats (ls, RECORD, Memc[record], SZ_FNAME)
 	iferr {
@@ -969,7 +959,6 @@ int     l1, l2          #I the line limits
 int     lstep           #I the line step size
 pointer ptr             #I the pointer to the output buffer
 
-size_t	sz_val
 int	i, j, ncols, nlines, npts
 pointer	iptr, buf
 pointer imgs2r()
@@ -978,8 +967,7 @@ begin
 	ncols = (c2 - c1) / cstep + 1
 	nlines = (l2 - l1) / lstep + 1
 	npts = ncols * nlines
-        sz_val = npts
-        call malloc (ptr, sz_val, TY_REAL)
+        call malloc (ptr, npts, TY_REAL)
 
         iptr = ptr
         do j = l1, l2, lstep {
@@ -1072,7 +1060,6 @@ real	bserr			#O the estimated error in bscale
 real	bzerr			#O the estimated error in bzero
 real	chi			#O the output chi at unit weight
 
-size_t	sz_val
 int	j, npts
 pointer	rbuf, ibuf, rerr, ierr, weight
 real	rgain, igain, rrnoise, irnoise, answers[MAX_NFITPARS]
@@ -1088,10 +1075,9 @@ begin
 
 	# Allocate space for the error and weight arrays.
 	npts = Memi[rg_lstatp(ls,RNPTS)+i-1]
-	sz_val = npts
-	call malloc (rerr, sz_val, TY_REAL)
-	call malloc (ierr, sz_val, TY_REAL)
-	call malloc (weight, sz_val, TY_REAL)
+	call malloc (rerr, npts, TY_REAL)
+	call malloc (ierr, npts, TY_REAL)
+	call malloc (weight, npts, TY_REAL)
 
 	# Compute the errors. 
 	rgain = rg_lstatr (ls, RGAIN)

@@ -25,7 +25,6 @@ pointer	im					# image pointer
 pointer	sp, bfname, imname			# local storage
 pointer	format, output, fmt, idstr
 
-size_t	sz_val
 int	clplen(), imtlen()		# function definitions
 int	clgfil(), open()
 int	imtgetim(), fdb_opendb()
@@ -39,13 +38,12 @@ define	done_		99
 
 begin
 	call smark (sp)				# local storage
-	sz_val = SZ_FNAME
-	call salloc (bfname, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (format, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	call salloc (fmt, sz_val, TY_CHAR)
-	call salloc (idstr, sz_val, TY_CHAR)
+	call salloc (bfname, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (format, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (fmt, SZ_FNAME, TY_CHAR)
+	call salloc (idstr, SZ_FNAME, TY_CHAR)
 
 	ip = ip_init () 			# allocate task struct pointer
 
@@ -295,17 +293,15 @@ procedure ip_gin_pars (ip)
 
 pointer	ip					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, dims, bswap, pixtype
 
 int	clgeti()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (dims, sz_val, TY_CHAR)
-	call salloc (bswap, sz_val, TY_CHAR)
-	call salloc (pixtype, sz_val, TY_CHAR)
+	call salloc (dims, SZ_FNAME, TY_CHAR)
+	call salloc (bswap, SZ_FNAME, TY_CHAR)
+	call salloc (pixtype, SZ_FNAME, TY_CHAR)
 
 	# Get the storage parameters.
         IP_HSKIP(ip) = clgeti ("hskip")
@@ -354,18 +350,16 @@ procedure ip_gout_pars (ip)
 
 pointer	ip					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, out, otype, obands, imhead
 int	btoi(), clgeti()
 bool	clgetb(), streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (out, sz_val, TY_CHAR)
-	call salloc (otype, sz_val, TY_CHAR)
-	call salloc (obands, sz_val, TY_CHAR)
-	call salloc (imhead, sz_val, TY_CHAR)
+	call salloc (out, SZ_FNAME, TY_CHAR)
+	call salloc (otype, SZ_FNAME, TY_CHAR)
+	call salloc (obands, SZ_FNAME, TY_CHAR)
+	call salloc (imhead, SZ_FNAME, TY_CHAR)
 
 	# Get the type of output to do.
 	call aclrc (Memc[out], SZ_FNAME)
@@ -432,7 +426,6 @@ procedure ip_reset_outbands (ip)
 
 pointer	ip					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, obands
 int	i
 
@@ -441,8 +434,7 @@ begin
 	    return 
 
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (obands, sz_val, TY_CHAR)
+	call salloc (obands, SZ_FNAME, TY_CHAR)
 
 	do i = 1, IP_NBANDS(ip)
 	    call ip_free_outbands (OBANDS(ip,i))
@@ -657,7 +649,6 @@ procedure ip_do_outbands (ip, outbands)
 pointer	ip					#i task struct pointer
 char	outbands[ARB]				#i outbands string
 
-size_t	sz_val
 pointer	sp, buf
 int	i, op, nbands, level
 
@@ -675,8 +666,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_EXPR
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_EXPR, TY_CHAR)
 	call aclrc (Memc[buf], SZ_EXPR)
 
 	if (DEBUG) { call eprintf("outbands='%s'\n");call pargstr(outbands) }

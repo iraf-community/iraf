@@ -321,7 +321,6 @@ real	xver[ARB]		#I the x polygon vertices coordinates
 real	yver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, txver, tyver, work1, work2, xintr
 int	i, j, ixmin, ixmax, nintr
@@ -329,12 +328,11 @@ int	me_pyclip()
 
 begin
 	call smark (sp)
-	sz_val = nver + 1
-	call salloc (txver, sz_val, TY_REAL)
-	call salloc (tyver, sz_val, TY_REAL)
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (xintr, sz_val, TY_REAL)
+	call salloc (txver, nver + 1, TY_REAL)
+	call salloc (tyver, nver + 1, TY_REAL)
+	call salloc (work1, nver + 1, TY_REAL)
+	call salloc (work2, nver + 1, TY_REAL)
+	call salloc (xintr, nver + 1, TY_REAL)
 
 	# Close the polygon.
 	call amovr (xver, Memr[txver], nver)
@@ -392,7 +390,6 @@ real	oxver[ARB]		#I the x polygon vertices coordinates
 real	oyver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
-size_t	sz_val
 real	lx, ld
 pointer	sp, tixver, tiyver, toxver, toyver, work1, work2, ixintr, oxintr
 int	i, j, jj, ixmin, ixmax, inintr, onintr, ibegin, iend
@@ -400,15 +397,14 @@ int	me_pyclip()
 
 begin
 	call smark (sp)
-	sz_val = nver + 1
-	call salloc (tixver, sz_val, TY_REAL)
-	call salloc (tiyver, sz_val, TY_REAL)
-	call salloc (toxver, sz_val, TY_REAL)
-	call salloc (toyver, sz_val, TY_REAL)
-	call salloc (work1, sz_val, TY_REAL)
-	call salloc (work2, sz_val, TY_REAL)
-	call salloc (ixintr, sz_val, TY_REAL)
-	call salloc (oxintr, sz_val, TY_REAL)
+	call salloc (tixver, nver + 1, TY_REAL)
+	call salloc (tiyver, nver + 1, TY_REAL)
+	call salloc (toxver, nver + 1, TY_REAL)
+	call salloc (toyver, nver + 1, TY_REAL)
+	call salloc (work1, nver + 1, TY_REAL)
+	call salloc (work2, nver + 1, TY_REAL)
+	call salloc (ixintr, nver + 1, TY_REAL)
+	call salloc (oxintr, nver + 1, TY_REAL)
 
 	# Close the polygons.
 	call amovr (ixver, Memr[tixver], nver)
@@ -514,7 +510,6 @@ int	stat[ARB]		#O the output status array
 int	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
-size_t	sz_val
 pointer	sp, ranges
 int	index, nvals
 int	me_decode_ranges(), me_next_number()
@@ -522,8 +517,7 @@ int	me_decode_ranges(), me_next_number()
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.
@@ -552,7 +546,6 @@ int	stat[ARB]		#O the output status array
 int	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
-size_t	sz_val
 pointer	sp, ranges
 int	i, lastix, nvals
 int	me_decode_ranges()
@@ -561,8 +554,7 @@ bool	me_is_in_range()
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	sz_val = 3 * MAX_NRANGES + 1
-	call salloc (ranges, sz_val, TY_INT)
+	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.

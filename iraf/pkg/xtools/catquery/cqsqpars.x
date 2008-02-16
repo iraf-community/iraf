@@ -10,7 +10,6 @@ pointer	cq				#I the catalog descriptor
 char	name[ARB]			#I the input query parameter name
 char	valuestr[ARB]			#I the parameter value string
 
-size_t	sz_val
 pointer	cc, sp, pname, tmpdic, pvalue
 int	i, parno, sz1, op1
 int	strdic(), strlen(), cq_wrdstr(), gstrcpy()
@@ -26,10 +25,8 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = CQ_SZ_QPNAME
-	call salloc (pname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (pvalue, sz_val, TY_CHAR)
+	call salloc (pname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (pvalue, CQ_SZ_QPVALUE, TY_CHAR)
 
 	# Locate the parameter.
 	parno = strdic (name, Memc[pname], CQ_SZ_QPNAME, Memc[CQ_PQPNAMES(cc)])
@@ -40,8 +37,7 @@ begin
 
 	# Initalize the temporary string.
 	sz1 = strlen (Memc[CQ_PQPVALUES(cc)]) + CQ_SZ_QPVALUE
-	sz_val = sz1
-	call malloc (tmpdic, sz_val, TY_CHAR)
+	call malloc (tmpdic, sz1, TY_CHAR)
 	call strcpy ("|", Memc[tmpdic], sz1)
 	op1 = 2
 
@@ -83,7 +79,6 @@ pointer	cq				#I the catalog descriptor
 int	parno				#I the query parameter number
 char	valuestr[ARB]			#I the parameter value string
 
-size_t	sz_val
 pointer	cc, sp, pname, tmpdic, pvalue
 int	i, sz1, op1
 int	strlen(), cq_wrdstr(), gstrcpy()
@@ -101,10 +96,8 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	sz_val = CQ_SZ_QPNAME
-	call salloc (pname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (pvalue, sz_val, TY_CHAR)
+	call salloc (pname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (pvalue, CQ_SZ_QPVALUE, TY_CHAR)
 
 	# Initialize the new dictionary.
 	sz1 = strlen (Memc[CQ_PQPVALUES(cc)]) + CQ_SZ_QPVALUE

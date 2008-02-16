@@ -15,15 +15,13 @@ int	rmin			# Minimum value
 int	rmax			# Maximum value
 pointer	rg			# Range pointer
 
-size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 pointer	sp, str, ptr
 errchk	open, rg_add
 
 begin
 	call smark (sp)
-	sz_val = max (strlen (rstr), SZ_LINE)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
 	call calloc (rg, LEN_RG, TY_STRUCT)
 
 	i = 1
@@ -73,15 +71,13 @@ char	rstr[ARB]		# Range string
 int	rmin			# Minimum value
 int	rmax			# Maximum value
 
-size_t	sz_val
 int	i, j, nrgs, strlen(), ctoi()
 int	rval1, rval2
 pointer	sp, str, ptr
 
 begin
 	call smark (sp)
-	sz_val = strlen (rstr)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, strlen (rstr), TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {

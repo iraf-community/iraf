@@ -33,7 +33,6 @@ int     maxch                   #I max chars out
 int     wcs                     #I desired wcs: 0=framecoords, 1=imagecoords
 int     pause                   #I blocking cursor read? (YES|NO)
 
-size_t	sz_val
 short	cursor[3]
 char	key, str[1]
 short	split[LEN_SPLIT]
@@ -51,10 +50,8 @@ include "iis.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (strval, sz_val, TY_CHAR)
-	sz_val = SZB_IMCURVAL
-	call salloc (imcurval, sz_val, TY_CHAR)
+	call salloc (strval, SZ_LINE, TY_CHAR)
+	call salloc (imcurval, SZB_IMCURVAL, TY_CHAR)
 
 	if (ttygetb (tty, "LC")) {
 	    # Logical image cursor read; the display server supports the

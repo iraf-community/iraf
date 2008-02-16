@@ -12,7 +12,6 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I parameter to be set
 char	comment[ARB]		#O comment string
 
-size_t	sz_val
 bool	string_valued
 int	ch, i, n, j, ic, op
 pointer	rp, ip, sp, buf
@@ -22,8 +21,7 @@ errchk	syserrs
 define  end_ 91
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
         # Special fields do not have comment.
         if (key[1] == 'i' && key[2] == '_') {  

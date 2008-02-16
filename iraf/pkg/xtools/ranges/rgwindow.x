@@ -9,7 +9,6 @@ pointer procedure rg_window (rg, rmin, rmax)
 pointer	rg				# Ranges
 int	rmin, rmax			# Window
 
-size_t	sz_val
 pointer	rgout				# Pointer to windowed ranges
 
 int	i, j
@@ -20,8 +19,7 @@ begin
 
 	# Allocate the range points array.
 
-	sz_val = LEN_RG + 2 * max (1, RG_NRGS(rg))
-	call malloc (rgout, sz_val, TY_STRUCT)
+	call malloc (rgout, LEN_RG + 2 * max (1, RG_NRGS(rg)), TY_STRUCT)
 
 	# Set the windowed ranges.
 

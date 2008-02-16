@@ -11,7 +11,6 @@ pointer	sf		# pointer to surface descriptor structure
 int	surf_type	# type of surface to be fitted
 int	xorder		# x order of surface to be fit, or in the case of the
 			# spline the number of polynomial pieces in x to be fit
-size_t	sz_val
 int	yorder		# y order of surface to be fit, or in the case of the
 			# spline the number of polynomial pieces in y to be fit
 int	xterms		# cross terms for polynomials?
@@ -25,8 +24,7 @@ errchk	malloc, calloc
 
 begin
 	# allocate space for the surface descriptor
-	sz_val = LEN_SFSTRUCT
-	call malloc (sf, sz_val, TY_STRUCT)
+	call malloc (sf, LEN_SFSTRUCT, TY_STRUCT)
 
 	if (xorder < 1 || yorder < 1)
 	    call error (0, "SFLINIT: Illegal order.")
@@ -103,10 +101,8 @@ begin
 
 	# allocate temporary space
 	call smark (sp)
-	sz_val = SF_NCOLS(sf)
-	call salloc (x, sz_val, MEM_TYPE)
-	sz_val = SF_NLINES(sf)
-	call salloc (y, sz_val, MEM_TYPE)
+	call salloc (x, SF_NCOLS(sf), MEM_TYPE)
+	call salloc (y, SF_NLINES(sf), MEM_TYPE)
 
 	# calculate all possible x basis functions and store
 	do i = 1, SF_NCOLS(sf)

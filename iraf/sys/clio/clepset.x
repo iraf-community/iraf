@@ -11,7 +11,6 @@ procedure clepset (pp)
 
 pointer	pp			#I pset descriptor
 
-size_t	sz_val
 pointer	sp, lbuf
 bool	streq()
 int	getlline()
@@ -19,8 +18,7 @@ errchk	flush, getlline, clc_scan
 
 begin
 	call smark (sp)
-	sz_val = SZ_COMMAND
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
 
 	# Edit pset and dump edited version back to CLIN.  It is not
 	# necessary to write the pset to the CL before editing as the

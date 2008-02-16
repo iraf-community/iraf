@@ -20,7 +20,6 @@ procedure fxf_plread (im)
 
 pointer	im			#I image descriptor
 
-size_t	sz_val
 char	kwname[SZ_KEYWORD]
 pointer sp, fk, pl, lp, ip, ix
 long	data_offset, data_len, heap_offset, llen, loff
@@ -47,8 +46,7 @@ begin
 	    maxlen = DEF_PLMAXLEN
 
 	# Scratch buffer for encoded line lists.
-	sz_val = maxlen
-	call salloc (lp, sz_val, TY_SHORT)
+	call salloc (lp, maxlen, TY_SHORT)
 
 	# Get the dimensionality and size of the stored mask.
 	call amovki (1, axlen, IM_MAXDIM)
@@ -83,8 +81,7 @@ begin
 
 	# Create a buffer for the line list index (maxdim 3 assumed).
 	nlines = axlen[3] * axlen[2]
-	sz_val = nlines * 2
-	call salloc (ix, sz_val, TY_INT)
+	call salloc (ix, nlines * 2, TY_INT)
 
 	# Compute the file offsets of the table data and heap areas.  The
 	# file position is assumed to be already positioned at the start

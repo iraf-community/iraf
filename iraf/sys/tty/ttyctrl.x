@@ -11,15 +11,13 @@ int	fd, afflncnt
 char	cap[ARB]
 pointer	tty
 
-size_t	sz_val
 pointer	sp, buf
 int	status, nchars, ttygets()
 errchk	ttygets, ttywrite
 
 begin
 	call smark (sp)
-	sz_val = SZ_CTRLSTR
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_CTRLSTR, TY_CHAR)
 
 	nchars = ttygets (tty, cap, Memc[buf], SZ_CTRLSTR)
 	if (nchars > 0) {

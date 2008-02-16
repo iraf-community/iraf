@@ -11,7 +11,6 @@ pointer	mw			#I pointer to MWCS descriptor
 real	scale[ARB]		#I scale factor for each axis in axbits
 int	axbits			#I bitflags defining axes
 
-size_t	sz_val
 pointer	sp, ltm, ltv_1, ltv_2
 int	axis[MAX_DIM], naxes, pdim, nelem, axmap, i, j
 
@@ -27,11 +26,9 @@ begin
 	MI_USEAXMAP(mw) = NO
 
 	call smark (sp)
-	sz_val = nelem
-	call salloc (ltm, sz_val, TY_DOUBLE)
-	sz_val = pdim
-	call salloc (ltv_1, sz_val, TY_DOUBLE)
-	call salloc (ltv_2, sz_val, TY_DOUBLE)
+	call salloc (ltm, nelem, TY_DOUBLE)
+	call salloc (ltv_1, pdim, TY_DOUBLE)
+	call salloc (ltv_2, pdim, TY_DOUBLE)
 
 	# Initialize the translation matrix and vectors.
 	call mw_mkidmd (Memd[ltm], pdim)

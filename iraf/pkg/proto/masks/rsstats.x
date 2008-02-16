@@ -20,7 +20,6 @@ bool	msk_invert		#I invert the pixel masks ?
 bool	cache			#I cache the image i/o buffers ?
 bool	verbose			#I print image statistics ?
 
-size_t	sz_val
 real	fscale
 pointer	sp, image, imaskname, omaskname, masktemp, str
 pointer	im, ims, pmim, pmout
@@ -35,12 +34,11 @@ errchk	immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (imaskname, sz_val, TY_CHAR)
-	call salloc (omaskname, sz_val, TY_CHAR)
-	call salloc (masktemp, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imaskname, SZ_FNAME, TY_CHAR)
+	call salloc (omaskname, SZ_FNAME, TY_CHAR)
+	call salloc (masktemp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Loop over the input images and compute the scale factors.
 	# At some point we might combine this with the later running
@@ -256,7 +254,6 @@ pointer	pmout			#I the output mask image descriptor
 pointer	rs			#I the sky subtraction pointer
 real	fscale			#O the scaling factor
 
-size_t	sz_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, vs, ve, mst, pm, mp, buf, hgm, smsk
 int	i, mval, npts, npix, nbins, nbad
@@ -266,9 +263,8 @@ int	imstati(), mio_glsegr(), mst_ihist(), rs_umask()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (vs, sz_val, TY_LONG)
-	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vs, IM_MAXDIM, TY_LONG)
+	call salloc (ve, IM_MAXDIM, TY_LONG)
 
 	# Allocate space for statistics structure.
 	call mst_allocate (mst)
@@ -346,8 +342,7 @@ begin
 	fscale = MIS_MEDIAN(mst)
 
 	if (pmout != NULL) {
-            sz_val = IM_LEN(im,1)
-            call malloc (smsk, sz_val, TY_SHORT)
+            call malloc (smsk, IM_LEN(im,1), TY_SHORT)
             call amovkl (long(1), Meml[vs], IM_NDIM(im))
             call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
@@ -380,7 +375,6 @@ pointer rs			#I the sky subtraction descriptor
 real	fscale			#I the computed scaling factor
 
 
-size_t	sz_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, v, mst, buf, hgm
 int	i, npts, npix, nbins
@@ -388,8 +382,7 @@ int	imgnlr(), mst_ihist()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v, sz_val, TY_LONG)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
 	# Allocate space for statistics structure.
 	call mst_allocate (mst)

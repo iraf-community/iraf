@@ -346,28 +346,24 @@ procedure prl_init (pl, ncols, nlines)
 
 pointer	pl		# pixel list descriptor
 int	ncols		# number of image columns 
-size_t	sz_val
 int	nlines		# number of image lines
 
 begin
 	# allocate space for a pixel list descriptor
-	sz_val = LEN_PLSTRUCT
-	call malloc (pl, sz_val, TY_STRUCT)
+	call malloc (pl, LEN_PLSTRUCT, TY_STRUCT)
 
 	# initialize
 	PRL_NCOLS(pl) = ncols
 	PRL_NLINES(pl) = nlines
 
 	# allocate space for the line pointers
-	sz_val = PRL_NLINES(pl)
-	call malloc (PRL_LINES(pl), sz_val, TY_INT) 
+	call malloc (PRL_LINES(pl), PRL_NLINES(pl), TY_INT) 
 	call amovki (NULL, Memi[PRL_LINES(pl)], PRL_NLINES(pl))
 
 	# set pointer to next free element
 	PRL_LP(pl) = 1
 
 	# allocate space for the actual list
-	sz_val = PRL_NLINES(pl)
-	call malloc (PRL_LIST(pl), sz_val, TY_INT)
+	call malloc (PRL_LIST(pl), PRL_NLINES(pl), TY_INT)
 	PRL_SZLIST(pl) = PRL_NLINES(pl)
 end

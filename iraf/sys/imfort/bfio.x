@@ -108,7 +108,6 @@ char	fname[ARB]		# HOST filename
 int	acmode			# SPP access mode, as in FIO
 int	advice			# seq. or random, or bufsize in chars
 
-size_t	sz_val
 pointer	bp, fp
 long	blksize
 char	osfn[SZ_PATHNAME]
@@ -124,8 +123,7 @@ begin
 	    return (ERR)
 
 	# Allocate and initialize file descriptor and i/o buffer.
-	sz_val = LEN_BFIO
-	call malloc (fp, sz_val, TY_STRUCT)
+	call malloc (fp, LEN_BFIO, TY_STRUCT)
 
 	# Pick a buffer size.
 	if (advice == RANDOM)
@@ -138,8 +136,7 @@ begin
 	call zsttbf (chan, FSTT_BLKSIZE, blksize)
 	blksize = blksize / SZB_CHAR
 	bufsize = (bufsize + blksize - 1) / blksize * blksize
-	sz_val = bufsize
-	call malloc (bp, sz_val, TY_CHAR)
+	call malloc (bp, bufsize, TY_CHAR)
 
 	BF_CHAN(fp)       = chan
 	BF_ACMODE(fp)     = acmode

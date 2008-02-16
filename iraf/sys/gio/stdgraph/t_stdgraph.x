@@ -16,7 +16,6 @@ char	txquality[SZ_TXQUALITY]
 pointer	list, gki, sp, fname, devname
 int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits, xres, yres, quality
-size_t	sz_val
 bool	clgetb()
 int	clgfil(), open(), btoi(), clgeti()
 int	gki_fetch_next_instruction()
@@ -24,9 +23,8 @@ pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (devname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")

@@ -37,7 +37,6 @@ int	ip, npix, ch, regno, pregno
 char	lbrackett
 bool	verbose, append
 
-size_t	sz_val
 pointer	pl
 
 pointer	me_getexprdb(), immap(), me_expandtext(), pl_create(), imtopenp()
@@ -86,16 +85,13 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (exprdb, sz_val, TY_CHAR)
-	call salloc (dims, sz_val, TY_CHAR)
-	call salloc (regnumber, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (uaxlen, sz_val, TY_LONG)
-	sz_val = SZ_FNAME
-	call salloc (mskname, sz_val, TY_CHAR)
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (regfname, sz_val, TY_CHAR)
+	call salloc (exprdb, SZ_FNAME, TY_CHAR)
+	call salloc (dims, SZ_FNAME, TY_CHAR)
+	call salloc (regnumber, SZ_FNAME, TY_CHAR)
+	call salloc (uaxlen, IM_MAXDIM, TY_LONG)
+	call salloc (mskname, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (regfname, SZ_FNAME, TY_CHAR)
 
 	# Get remaining parameters,
 	call clgstr ("dims", Memc[dims], SZ_FNAME)
@@ -217,8 +213,7 @@ begin
 	    while (fscan (regfd) != EOF) {
 
 		# Get the expression.
-	        sz_val = SZ_LINE
-	        call malloc (expr, sz_val, TY_CHAR)
+	        call malloc (expr, SZ_LINE, TY_CHAR)
 		call gargstr (Memc[expr], SZ_LINE)
 
 		# Determine whether or not the region specificationis an

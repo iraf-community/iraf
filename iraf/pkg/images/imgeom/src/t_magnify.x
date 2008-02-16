@@ -32,7 +32,6 @@ real	x1, y1				# Starting coordinates
 real	x2, y2				# Ending coordinates
 int	flux				# Flux conserve
 
-size_t	sz_val
 int	btype, logfd
 pointer	list1, list2, sp, in, out, image1, image2, image3, mw, errmsg
 real	a, b, c, d, shifts[2], scale[2]
@@ -45,18 +44,14 @@ errchk	open(), mg_magnify1(), mg_magnify2()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (output, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (interp, sz_val, TY_CHAR)
-	sz_val = SZ_BTYPE
-	call salloc (boundary, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (image3, sz_val, TY_CHAR)
-	call salloc (errmsg, sz_val, TY_CHAR)
+	call salloc (input, SZ_LINE, TY_CHAR)
+	call salloc (output, SZ_LINE, TY_CHAR)
+	call salloc (interp, SZ_FNAME, TY_CHAR)
+	call salloc (boundary, SZ_BTYPE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (image3, SZ_FNAME, TY_CHAR)
+	call salloc (errmsg, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[input], SZ_LINE)
@@ -263,7 +258,6 @@ real	x1, x2			# Starting and ending points of output image
 real	dx			# Pixel interval
 int	flux			# Conserve flux?
 
-size_t	sz_val
 int	i, nxin, nxout, nxymargin, itype, nsinc, nincr, col1, col2
 pointer	sp, x, z, buf, asi
 real	xshift
@@ -314,8 +308,7 @@ begin
 	# Also initialize the image data buffer.
 
 	call smark (sp)
-	sz_val = 2 * nxout
-	call salloc (x, sz_val, TY_REAL)
+	call salloc (x, 2 * nxout, TY_REAL)
 
 	# Set the x interpolation coordinates.  The coordinates are relative
 	# to the boundary extended input image.
@@ -363,7 +356,6 @@ real	x2, y2			# Ending point of output image
 real	dx, dy			# Pixel interval
 int	flux			# Conserve flux?
 
-size_t	sz_val
 int	i, nxin, nxout, nyout, nxymargin, itype, nsinc, nincr
 int	l1out, l2out, nlout, l1in, l2in, nlin, fstline, lstline
 int	col1, col2, line1, line2
@@ -435,10 +427,8 @@ begin
 	# Also initialize the image data buffer.
 
 	call smark (sp)
-	sz_val = 2 * nxout
-	call salloc (x, sz_val, TY_REAL)
-	sz_val = 2 * NYOUT2
-	call salloc (y, sz_val, TY_REAL)
+	call salloc (x, 2 * nxout, TY_REAL)
+	call salloc (y, 2 * NYOUT2, TY_REAL)
 	buf = NULL
 	fstline = 0
 	lstline = 0
@@ -519,7 +509,6 @@ int	line1		# First image line of buffer
 int	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
-size_t	sz_val
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 pointer	buf1, buf2
 
@@ -535,8 +524,7 @@ begin
 	# a full buffer image read.
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

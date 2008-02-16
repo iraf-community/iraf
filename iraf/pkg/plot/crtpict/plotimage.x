@@ -14,15 +14,13 @@ pointer	im			# Pointer to image
 char	image[SZ_FNAME]		# Image filename
 pointer	cl			# Pointer to structure of cl parameters
 
-size_t	sz_val
 pointer	sp, wdes
 errchk	crt_establish_transform, crt_transform_image
 errchk  crt_draw_graphics, crt_draw_greyscale
 
 begin
 	call smark (sp)
-	sz_val = LEN_WDES
-	call salloc (wdes, sz_val, TY_STRUCT)
+	call salloc (wdes, LEN_WDES, TY_STRUCT)
 	call strcpy (image, W_IMSECT(wdes), W_SZIMSECT)
 
 	if (IMAGE_FRACTION(cl) > EPSILON) {

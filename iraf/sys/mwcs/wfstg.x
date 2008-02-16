@@ -52,7 +52,6 @@ procedure wf_stg_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
-size_t	sz_val
 int	i
 double	dec
 pointer	sp, atvalue, ct, mw, wp, wv
@@ -62,8 +61,7 @@ errchk	wf_decaxis(), mw_gwattrs()
 begin
 	# Allocate space for the attribute string.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (atvalue, sz_val, TY_CHAR)
+	call salloc (atvalue, SZ_LINE, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)

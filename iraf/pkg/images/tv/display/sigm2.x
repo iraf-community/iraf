@@ -226,7 +226,6 @@ pointer procedure sigm2s (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
-size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, new_y[2], tempi, curbuf, altbuf
 int	nraw, npix, nblks_y, ybavg, x1, x2
@@ -270,15 +269,13 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		sz_val = npix
-		call malloc (SI_BUF(si,i), sz_val, TY_SHORT)
+		call malloc (SI_BUF(si,i), npix, TY_SHORT)
 		SI_TYBUF(si) = TY_SHORT
 		SI_BUFY(si,i) = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    sz_val = npix
-	    call malloc (OUTBUF(si), sz_val, TY_SHORT)
+	    call malloc (OUTBUF(si), npix, TY_SHORT)
 	    SI_INIT(si) = NO
 	}
 
@@ -388,7 +385,6 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-size_t	sz_val
 real	sum
 short	blkmax
 pointer	sp, a, b
@@ -419,8 +415,7 @@ begin
 	    call error (2, "si_blmavg: block number out of range")
 
 	if (ybavg > 1) {
-	    sz_val = nblks_x
-	    call salloc (b, sz_val, TY_LONG)
+	    call salloc (b, nblks_x, TY_LONG)
 	    call aclrl (Meml[b], nblks_x)
 	    nlines_in_sum = 0
 	}
@@ -531,7 +526,6 @@ pointer procedure sigm2i (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
-size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, new_y[2], tempi, curbuf, altbuf
 int	nraw, npix, nblks_y, ybavg, x1, x2
@@ -575,15 +569,13 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		sz_val = npix
-		call malloc (SI_BUF(si,i), sz_val, TY_INT)
+		call malloc (SI_BUF(si,i), npix, TY_INT)
 		SI_TYBUF(si) = TY_INT
 		SI_BUFY(si,i) = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    sz_val = npix
-	    call malloc (OUTBUF(si), sz_val, TY_INT)
+	    call malloc (OUTBUF(si), npix, TY_INT)
 	    SI_INIT(si) = NO
 	}
 
@@ -693,7 +685,6 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-size_t	sz_val
 real	sum
 int	blkmax
 pointer	sp, a, b
@@ -724,8 +715,7 @@ begin
 	    call error (2, "si_blmavg: block number out of range")
 
 	if (ybavg > 1) {
-	    sz_val = nblks_x
-	    call salloc (b, sz_val, TY_LONG)
+	    call salloc (b, nblks_x, TY_LONG)
 	    call aclrl (Meml[b], nblks_x)
 	    nlines_in_sum = 0
 	}
@@ -836,7 +826,6 @@ pointer procedure sigm2r (si, lineno)
 pointer	si		# pointer to SI descriptor
 int	lineno
 
-size_t	sz_val
 pointer	rawline, tempp, gp
 int	i, new_y[2], tempi, curbuf, altbuf
 int	nraw, npix, nblks_y, ybavg, x1, x2
@@ -880,15 +869,13 @@ begin
 	    do i = 1, 2 {
 		if (SI_BUF(si,i) != NULL)
 		    call mfree (SI_BUF(si,i), SI_TYBUF(si))
-		sz_val = npix
-		call malloc (SI_BUF(si,i), sz_val, TY_REAL)
+		call malloc (SI_BUF(si,i), npix, TY_REAL)
 		SI_TYBUF(si) = TY_REAL
 		SI_BUFY(si,i) = NOTSET
 	    }
 	    if (OUTBUF(si) != NULL)
 		call mfree (OUTBUF(si), SI_TYBUF(si))
-	    sz_val = npix
-	    call malloc (OUTBUF(si), sz_val, TY_REAL)
+	    call malloc (OUTBUF(si), npix, TY_REAL)
 	    SI_INIT(si) = NO
 	}
 
@@ -998,7 +985,6 @@ int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-size_t	sz_val
 int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
 int	first_line, nlines_in_sum, npix, nfull_blks, count
 real	sum, blkmax
@@ -1027,8 +1013,7 @@ begin
 	if (y < 1 || y > nblks_y)
 	    call error (2, "si_blmavg: block number out of range")
 
-	sz_val = nblks_x
-	call salloc (b, sz_val, TY_REAL)
+	call salloc (b, nblks_x, TY_REAL)
 
 	if (ybavg > 1) {
 	    call aclrr (Memr[b], nblks_x)

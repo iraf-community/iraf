@@ -14,7 +14,6 @@ int	mode		# Mode
 pointer	ie		# Structure pointer
 real	x		# Column
 
-size_t	sz_val
 real	xavg, junk
 int	i, x1, x2, y1, y2, nx, ny, npts
 pointer	sp, title, im, data, ptr, xp, yp
@@ -52,18 +51,15 @@ begin
 	npts = nx * ny
 
 	call smark (sp)
-	sz_val = IE_SZTITLE
-	call salloc (title, sz_val, TY_CHAR)
-	sz_val = ny
-	call salloc (xp, sz_val, TY_REAL)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (xp, ny, TY_REAL)
 
 	do i = 1, ny
 	    call ie_mwctran (ie, xavg,  real(i), junk, Memr[xp+i-1])
 
 	if (nx > 1) {
 	    ptr = data
-	    sz_val = ny
-	    call salloc (yp, sz_val, TY_REAL)
+	    call salloc (yp, ny, TY_REAL)
 	    do i = 1, ny {
 		Memr[yp+i-1] = asumr (Memr[ptr], nx)
 	        ptr = ptr + nx

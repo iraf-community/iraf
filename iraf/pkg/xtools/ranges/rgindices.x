@@ -11,7 +11,6 @@ pointer	indices				# Indices
 int	npts				# Number of indices
 int	type				# Data type of points
 
-size_t	sz_val
 int	i, j, k, step
 
 begin
@@ -36,8 +35,7 @@ begin
 
 	# Allocate the range points array.
 
-	sz_val = npts
-	call malloc (indices, sz_val, type)
+	call malloc (indices, npts, type)
 
 	# Set the range points.
 

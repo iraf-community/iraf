@@ -14,14 +14,12 @@ int	offset
 int	len
 char    outstr[ARB]
 
-size_t	sz_val
 int     nstat, read()
 pointer sp, buf
 
 begin
         call smark (sp)
-        sz_val = len+2
-        call salloc (buf, sz_val, TY_CHAR)
+        call salloc (buf, len+2, TY_CHAR)
 	call aclrc (Memc[buf], len+2)
 	call aclrc (outstr, len+2)
 
@@ -222,7 +220,6 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 pointer sp, buf
 int     fp, nval, nstat
 int	read()
@@ -236,13 +233,10 @@ begin
 	    nval = len + 1
 
         call smark (sp)
-        sz_val = nval
-        call salloc (buf, sz_val, TY_CHAR)
+        call salloc (buf, nval, TY_CHAR)
 
-        if (ptr == NULL) {
-            sz_val = nval * SZB_CHAR
-            call malloc (ptr, sz_val, TY_CHAR)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, nval * SZB_CHAR, TY_CHAR)
         nstat = read (fd, Memc[buf], nval / SZB_CHAR + 1)
 
         fp = ip_lnote(fd)
@@ -279,15 +273,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_SHORT)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_SHORT)
         nstat = read (fd, Mems[ptr], len * SZ_SHORT)
 end
 
@@ -298,15 +289,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_INT)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_INT)
         nstat = read (fd, Memi[ptr], len * SZ_INT)
 end
 
@@ -317,15 +305,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_LONG)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_LONG)
         nstat = read (fd, Meml[ptr], len * SZ_LONG)
 end
 
@@ -336,15 +321,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_REAL)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_REAL)
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 	call ieevupkr (Memr[ptr], Memr[ptr], len)
 end
@@ -356,15 +338,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_DOUBLE)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_DOUBLE)
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 	call ieevupkd (Memd[ptr], Memd[ptr], len)
 end
@@ -380,15 +359,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_REAL)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_REAL)
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 end
 
@@ -402,15 +378,12 @@ int     fd					#i file descriptor
 pointer ptr					#i data pointer
 int     len					#i length of array
 
-size_t	sz_val
 int     nstat
 int     read()
 
 begin
-        if (ptr == NULL) {
-            sz_val = len
-            call malloc (ptr, sz_val, TY_DOUBLE)
-        }
+        if (ptr == NULL)
+            call malloc (ptr, len, TY_DOUBLE)
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 end
 
@@ -429,7 +402,6 @@ int procedure ip_line (fd, line)
 int	fd					#i input file descriptor
 int	line					#i line number to search
 
-size_t	sz_val
 pointer	sp, cbuf, buf
 int	nl, offset, i, nread, fsize
 
@@ -443,9 +415,8 @@ begin
 	    return (1)
 	} else {
 	    call smark (sp)
-	    sz_val = BLKSIZE
-	    call salloc (buf, sz_val, TY_CHAR)
-	    call salloc (cbuf, sz_val, TY_CHAR)
+	    call salloc (buf, BLKSIZE, TY_CHAR)
+	    call salloc (cbuf, BLKSIZE, TY_CHAR)
 
 	    # Rewind file descriptor
 	    call ip_lseek (fd, BOF)
@@ -490,7 +461,6 @@ int     fd                                      #i input file descriptor
 int	offset					#i offset to begin search
 char	pattern[ARB]                            #i pattern to locate
 
-size_t	sz_val
 pointer	sp, cbuf, buf
 int     fsize, nread, patlen, cur_offset, loc
 
@@ -504,9 +474,8 @@ begin
 	cur_offset = offset
 
 	call smark (sp)
-	sz_val = BLKSIZE
-	call salloc (buf, sz_val, TY_CHAR)
-	call salloc (cbuf, sz_val, TY_CHAR)
+	call salloc (buf, BLKSIZE, TY_CHAR)
+	call salloc (cbuf, BLKSIZE, TY_CHAR)
 
 	if (DEBUG) { call eprintf("ip_loc: offset %d\n"); call pargi(offset)}
 

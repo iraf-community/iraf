@@ -28,7 +28,6 @@ procedure set_wordbuf (max_words)
 
 int	max_words		#I output word buffer size
 
-size_t	sz_val
 int	word_buffer_size
 errchk	malloc
 
@@ -41,10 +40,8 @@ begin
 	    call mfree (wbuf, TY_CHAR)
 	    call mfree (words, TY_POINTER)
 	} else {
-	    sz_val = word_buffer_size
-	    call malloc (wbuf, sz_val, TY_CHAR)
-	    sz_val = max_words
-	    call malloc (words, sz_val, TY_POINTER)
+	    call malloc (wbuf, word_buffer_size, TY_CHAR)
+	    call malloc (words, max_words, TY_POINTER)
 	    wp = wbuf
 	    nwords = 0
 	    wcols = 0

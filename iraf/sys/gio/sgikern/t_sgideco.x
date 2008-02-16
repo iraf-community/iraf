@@ -15,17 +15,14 @@ procedure t_sgidecode()
 pointer	sp, fname, mcbuf, ip, itop, list
 int	fd, verbose, gkiunits, nwords
 
-size_t	sz_val
 bool	clgetb()
 int	clgfil(), clplen(), open(), btoi(), miireads()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = LEN_MCBUF
-	call salloc (mcbuf, sz_val, TY_SHORT)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (mcbuf, LEN_MCBUF, TY_SHORT)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")

@@ -21,7 +21,6 @@ int     maxch                   #I max chars out
 int     in_wcs                  #I desired wcs: 0=frame, 1=image
 int     pause                   #I blocking cursor read? (YES|NO)
 
-size_t	sz_val
 char    ch
 int     fd, op
 pointer sp, curval, devname, tty, dd, ip
@@ -36,11 +35,9 @@ errchk  ttygdes, imdopen, imdrcuro
 
 begin
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (devname, sz_val, TY_CHAR)
-        sz_val = SZ_LINE
-        call salloc (curval, sz_val, TY_CHAR)
-        call salloc (dd, sz_val, TY_CHAR)
+        call salloc (devname, SZ_FNAME, TY_CHAR)
+        call salloc (curval, SZ_LINE, TY_CHAR)
+        call salloc (dd, SZ_LINE, TY_CHAR)
 
         # Get the logical device name.
         if (streq (device, stdimage)) {

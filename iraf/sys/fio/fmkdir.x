@@ -11,7 +11,6 @@ procedure fmkdir (newdir)
 
 char	newdir[ARB]		# virtual or OS-dependent directory spec
 
-size_t	sz_val
 int	status
 pointer	sp, osfn, dirname
 int	access()
@@ -19,9 +18,8 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
-	call salloc (dirname, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (dirname, SZ_PATHNAME, TY_CHAR)
 
 	# It is an error if the named file already exists, be it a directory
 	# or not.  If the file does not exist but the filename cannot be

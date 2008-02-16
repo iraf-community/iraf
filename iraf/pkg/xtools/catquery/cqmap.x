@@ -8,7 +8,6 @@ pointer procedure cq_map (database, mode)
 char	database[ARB]			#I The database file
 int	mode				#I The database file access mode
 
-size_t	sz_val
 int	i, nrec, cq_alloc1, cq_alloc2
 pointer	cq, str
 
@@ -33,13 +32,10 @@ begin
 
 	cq_alloc1 = CQ_ALLOC
 	cq_alloc2 = CQ_ALLOC * SZ_LINE
-	sz_val = cq_alloc1
-	call malloc (CQ_OFFSETS(cq), sz_val, TY_LONG)
-	call malloc (CQ_NAMES(cq), sz_val, TY_INT)
-	sz_val = cq_alloc2
-	call malloc (CQ_MAP(cq), sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call malloc (str, sz_val, TY_CHAR)
+	call malloc (CQ_OFFSETS(cq), cq_alloc1, TY_LONG)
+	call malloc (CQ_NAMES(cq), cq_alloc1, TY_INT)
+	call malloc (CQ_MAP(cq), cq_alloc2, TY_CHAR)
+	call malloc (str, SZ_LINE, TY_CHAR)
 
 	nrec = 1
 	CQ_NRECS(cq) = 0

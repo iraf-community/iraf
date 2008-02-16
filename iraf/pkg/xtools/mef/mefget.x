@@ -12,7 +12,6 @@ bool procedure mefgetb (mef, key)
 pointer	mef			# image descriptor
 char	key[ARB]		# parameter to be returned
 
-size_t	sz_val
 pointer	sp, kv, line
 int	strlen()
 bool    bval
@@ -21,9 +20,8 @@ errchk mef_findkw
 
 begin
 	call smark (sp)
-	sz_val = LEN_CARD
-	call salloc (kv, sz_val, TY_CHAR)
-	call salloc (line, sz_val, TY_CHAR)
+	call salloc (kv, LEN_CARD, TY_CHAR)
+	call salloc (line, LEN_CARD, TY_CHAR)
 	
 	call mef_findkw (MEF_HDRP(mef), key, Memc[kv])
 	if (strlen(Memc[kv]) != 1) {
@@ -60,7 +58,6 @@ double procedure mefgetd (mef, key)
 pointer	mef			# image descriptor
 char	key[ARB]		# parameter to be returned
 
-size_t	sz_val
 int	ip
 double	dval
 pointer	sp, sval
@@ -69,8 +66,7 @@ errchk	syserrs, mefgstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (sval, SZ_LINE, TY_CHAR)
 
 	ip = 1
 	call mefgstr (mef, key, Memc[sval], SZ_LINE)
@@ -171,13 +167,11 @@ char	key[ARB]		# parameter to be returned
 char	outstr[ARB]		# output string to receive parameter value
 int	maxch
 
-size_t	sz_val
 pointer	sp, kv
 
 begin
 	call smark (sp)
-	sz_val = LEN_CARD
-	call salloc (kv, sz_val, TY_CHAR)
+	call salloc (kv, LEN_CARD, TY_CHAR)
 
 	# Find the record.
 	iferr (call mef_findkw (MEF_HDRP(mef), key, Memc[kv]))

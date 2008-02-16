@@ -20,7 +20,6 @@ pointer	sf		# pointer to surface descriptor structure
 PIXEL	x		# x value
 PIXEL	y		# y value
 
-size_t	sz_val
 PIXEL	sum, accum
 int	i, ii, k, maxorder, xorder
 pointer	sp, xb, xzb, yb, yzb, czptr
@@ -33,15 +32,11 @@ begin
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 	    $if (datatype == r)
-	    sz_val = GS_NXCOEFF(sf)
-	    call salloc (xb, sz_val, TY_REAL)
-	    sz_val = GS_NYCOEFF(sf)
-	    call salloc (yb, sz_val, TY_REAL)
+	    call salloc (xb, GS_NXCOEFF(sf), TY_REAL)
+	    call salloc (yb, GS_NYCOEFF(sf), TY_REAL)
 	    $else
-	    sz_val = GS_NXCOEFF(sf)
-	    call salloc (xb, sz_val, TY_DOUBLE)
-	    sz_val = GS_NYCOEFF(sf)
-	    call salloc (yb, sz_val, TY_DOUBLE)
+	    call salloc (xb, GS_NXCOEFF(sf), TY_DOUBLE)
+	    call salloc (yb, GS_NYCOEFF(sf), TY_DOUBLE)
 	    $endif
 	    xzb = xb - 1
 	    yzb = yb - 1

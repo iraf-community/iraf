@@ -29,7 +29,6 @@ int	wcsdim, parno, naxes1, naxes2, ndim
 pointer	sp, imtemplate, image, parameter, ax1list, ax2list, axes1, axes2
 pointer	value, wcs, system
 pointer	imlist, im, mwim, r, w, cd, ltm, ltv, iltm, nr, ncd
-size_t	sz_val
 bool	clgetb(), streq(), wcs_iedit()
 int	clgeti(), fstati(), wcs_decode_parno(), wcs_decode_axlist(), imtgetim()
 int	mw_stati()
@@ -42,19 +41,16 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imtemplate, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (parameter, sz_val, TY_CHAR)
-	call salloc (value, sz_val, TY_CHAR)
-	call salloc (ax1list, sz_val, TY_CHAR)
-	call salloc (ax2list, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (axes1, sz_val, TY_INT)
-	call salloc (axes2, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (wcs, sz_val, TY_CHAR)
-	call salloc (system, sz_val, TY_CHAR)
+	call salloc (imtemplate, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (parameter, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
+	call salloc (ax1list, SZ_FNAME, TY_CHAR)
+	call salloc (ax2list, SZ_FNAME, TY_CHAR)
+	call salloc (axes1, IM_MAXDIM, TY_INT)
+	call salloc (axes2, IM_MAXDIM, TY_INT)
+	call salloc (wcs, SZ_FNAME, TY_CHAR)
+	call salloc (system, SZ_FNAME, TY_CHAR)
 
 	# Get the list of images, parameter to be edited, axes lists,
 	# and new parameter value.
@@ -137,17 +133,14 @@ begin
 	    call mw_gsystem (mwim, Memc[system], SZ_FNAME)
 
 	    # Allocate working memory.
-	    sz_val = ndim * ndim
-	    call malloc (r, sz_val, TY_DOUBLE)
-	    call malloc (w, sz_val, TY_DOUBLE)
-	    call malloc (cd, sz_val, TY_DOUBLE)
-	    call malloc (ltm, sz_val, TY_DOUBLE)
-	    sz_val = ndim
-	    call malloc (ltv, sz_val, TY_DOUBLE)
-	    sz_val = ndim * ndim
-	    call malloc (iltm, sz_val, TY_DOUBLE)
-	    call malloc (nr, sz_val, TY_DOUBLE)
-	    call malloc (ncd, sz_val, TY_DOUBLE)
+	    call malloc (r, ndim * ndim, TY_DOUBLE)
+	    call malloc (w, ndim * ndim, TY_DOUBLE)
+	    call malloc (cd, ndim * ndim, TY_DOUBLE)
+	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
+	    call malloc (ltv, ndim, TY_DOUBLE)
+	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
+	    call malloc (nr, ndim * ndim, TY_DOUBLE)
+	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
 
 	    # Compute the original world to logical transformation.
 	    call mw_gwtermd (mwim, Memd[r], Memd[w], Memd[cd], ndim)
@@ -245,7 +238,6 @@ double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 bool	verbose			# verbose mode
 
-size_t	sz_val
 bool	update
 int	cmd, parno, naxes1, naxes2
 pointer	sp, parameter, value, ax1list, ax2list, axes1, axes2
@@ -254,14 +246,12 @@ int	clscan(), strdic(), nscan(), wcs_decode_parno(), wcs_decode_axlist()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (parameter, sz_val, TY_CHAR)
-	call salloc (value, sz_val, TY_CHAR)
-	call salloc (ax1list, sz_val, TY_CHAR)
-	call salloc (ax2list, sz_val, TY_CHAR)
-	sz_val = ndim
-	call salloc (axes1, sz_val, TY_INT)
-	call salloc (axes2, sz_val, TY_INT)
+	call salloc (parameter, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
+	call salloc (ax1list, SZ_FNAME, TY_CHAR)
+	call salloc (ax2list, SZ_FNAME, TY_CHAR)
+	call salloc (axes1, ndim, TY_INT)
+	call salloc (axes2, ndim, TY_INT)
 
 	# Print the starting wcs.
 	if (verbose)
@@ -428,7 +418,6 @@ double	r[ARB]			# the fits crpix parameters
 double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 
-size_t	sz_val
 int	i,j
 pointer	sp, str
 errchk	mw_gwattrs()
@@ -436,8 +425,7 @@ errchk	mw_gwattrs()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("\nIMAGE: %s  CURRENT WCS: %s\n")
@@ -569,7 +557,6 @@ double	r[ARB]			# the fits crpix parameters
 double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 
-size_t	sz_val
 int	i,j
 pointer	sp, str
 errchk	mw_gwattrs()
@@ -577,8 +564,7 @@ errchk	mw_gwattrs()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("\nIMAGE: %s  CURRENT WCS: %s\n")

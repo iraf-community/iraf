@@ -8,17 +8,14 @@ procedure t_files()
 pointer	list
 pointer	sp, template, fname
 
-size_t	sz_val
 bool	clgetb()
 int	fntgfnb(), clgeti(), btoi()
 pointer	fntopnb()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (template, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (template, SZ_LINE, TY_CHAR)
 
 	if (clgeti ("$nargs") > 0)
 	    call clgstr ("template", Memc[template], SZ_LINE)

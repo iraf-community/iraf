@@ -31,7 +31,6 @@ int	err			#I Print errors?
 int	imext			#O Image extensions?
 pointer	list			#O Image list
 
-size_t	sz_val
 int	i, j, nphu, nextns, fd
 pointer	sp, temp, patbuf, fname, image, im
 pointer	immap(), imtopen(), xt_extns1()
@@ -40,11 +39,10 @@ errchk	xt_extns1, open, immap, delete
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (temp, sz_val, TY_CHAR)
-	call salloc (patbuf, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	# Get the list.
 	list = xt_extns1 (files, exttype, index, extname, extver, lindex,
@@ -138,7 +136,6 @@ char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 pointer	list			#O Image list
 
-size_t	sz_val
 int	i, fd
 pointer	sp, temp, fname, rindex, rextver, ikp, str
 pointer	imtopen()
@@ -148,24 +145,20 @@ errchk	open, xt_extn, delete
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (temp, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (ikp, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (ikp, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Expand parameters.
 	list = imtopen (files)
-	sz_val = 3*SZ_RANGE
-	call salloc (rindex, sz_val, TY_INT)
+	call salloc (rindex, 3*SZ_RANGE, TY_INT)
 	if (ix_decode_ranges (index, Memi[rindex], SZ_RANGE, i) == ERR)
 	    call error (1, "Bad index range list")
 
 	rextver = NULL
 	if (nowhite (extver, Memc[str], SZ_LINE) > 0) {
-	    sz_val = 3*SZ_RANGE
-	    call salloc (rextver, sz_val, TY_INT)
+	    call salloc (rextver, 3*SZ_RANGE, TY_INT)
 	    if (ix_decode_ranges (Memc[str], Memi[rextver], SZ_RANGE, i)==ERR)
 		call error (1, "Bad extension version range list")
 	}
@@ -207,7 +200,6 @@ int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 
-size_t	sz_val
 int	i, j, n, index, ver, stat
 pointer	sp, clust, ksec, imsec, name, str
 pointer	mef, im
@@ -219,13 +211,11 @@ errchk	mefopen, mef_rdhdr_exnv, mef_rdhdr_gn, immap
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (clust, sz_val, TY_CHAR)
-	call salloc (ksec, sz_val, TY_CHAR)
-	call salloc (imsec, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (name, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (clust, SZ_FNAME, TY_CHAR)
+	call salloc (ksec, SZ_FNAME, TY_CHAR)
+	call salloc (imsec, SZ_FNAME, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Parse the file name syntax.
 	call imparse (fname, Memc[clust], SZ_FNAME, Memc[ksec],
@@ -529,7 +519,6 @@ char	extname[ARB]		#I Extension name to match
 char	patterns[ARB]		#I Comma-delimited list of patterns
 bool	stat			#O Match?
 
-size_t	sz_val
 int	i, j, k, sz_pat, strlen(), patmake(), patmatch(), nowhite()
 pointer	sp, patstr, patbuf
 
@@ -545,9 +534,8 @@ begin
 	sz_pat = sz_pat + SZ_LINE
 
 	call smark (sp)
-	sz_val = sz_pat
-	call salloc (patstr, sz_val, TY_CHAR)
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (patstr, sz_pat, TY_CHAR)
+	call salloc (patbuf, sz_pat, TY_CHAR)
 
 	i = nowhite (patterns, Memc[patstr], sz_pat)
 	if (i == 0)

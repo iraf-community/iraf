@@ -16,7 +16,6 @@ pointer	im, buf, hgm, list
 int	i, nclip, format, nfields, nbins, npix, cache
 size_t	old_size
 
-size_t	sz_val
 real	clgetr()
 pointer	immap(), imtopenp()
 int	btoi(), ist_fields(), imtgetim(), imgnlr(), ist_ihist()
@@ -26,14 +25,10 @@ errchk	immap()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fieldstr, sz_val, TY_CHAR)
-	sz_val = IST_NFIELDS
-	call salloc (fields, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (v, sz_val, TY_LONG)
+	call salloc (fieldstr, SZ_LINE, TY_CHAR)
+	call salloc (fields, IST_NFIELDS, TY_INT)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (v, IM_MAXDIM, TY_LONG)
 
 	# Open the list of input images, the fields and the data value limits.
 	list = imtopenp ("images")
@@ -187,13 +182,11 @@ end
 
 procedure ist_allocate (ist)
 
-size_t	sz_val
 pointer	ist		#O the statistics descriptor
 
 begin
     	call calloc (ist, LEN_IMSTAT, TY_STRUCT)
-	sz_val = LEN_NSWITCHES
-	call malloc (IST_SW(ist), sz_val, TY_INT)
+	call malloc (IST_SW(ist), LEN_NSWITCHES, TY_INT)
 end
 
 
@@ -218,7 +211,6 @@ char    fieldstr[ARB]           #I string containing the list of fields
 int     fields[ARB]             #O fields array
 int     max_nfields             #I maximum number of fields
 
-size_t	sz_val
 int     nfields, flist, field
 pointer sp, fname
 int     fntopenb(), fntgfnb(), strdic()
@@ -227,8 +219,7 @@ begin
         nfields = 0
 
         call smark (sp)
-        sz_val = SZ_FNAME
-        call salloc (fname, sz_val, TY_CHAR)
+        call salloc (fname, SZ_FNAME, TY_CHAR)
 
         flist = fntopenb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
@@ -853,7 +844,6 @@ pointer hgm             #O pointer to the histogram
 int     nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
-size_t	sz_val
 real    hmax            #O maximum histogram value
 
 begin
@@ -872,8 +862,7 @@ begin
         hmin = IST_MIN(ist)
         hmax = IST_MAX(ist)
 
-        sz_val = nbins
-        call malloc (hgm, sz_val, TY_INT)
+        call malloc (hgm, nbins, TY_INT)
 
         return (YES)
 end
@@ -890,7 +879,6 @@ real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
-size_t	sz_val
 real    h1, hdiff, hnorm
 pointer sp, ihgm
 int     i, lo, hi
@@ -899,8 +887,7 @@ bool    fp_equalr()
 
 begin
         call smark (sp)
-        sz_val = nbins
-        call salloc (ihgm, sz_val, TY_REAL)
+        call salloc (ihgm, nbins, TY_REAL)
 
         # Integrate the histogram and normalize.
         Memr[ihgm] = hgm[1]

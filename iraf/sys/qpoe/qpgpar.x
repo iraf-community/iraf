@@ -17,7 +17,6 @@ pointer qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 pointer o_pp			#O pointer to parameter value
 
-size_t	sz_val
 int	loc_pval, loc_Mem, ip, ch, elem, sz_elem, fd
 pointer sp, key, fm, pp, op, sym
 double	pval[LEN_PVAL+1]
@@ -29,8 +28,7 @@ errchk	qp_bind, qp_gpsym, syserrs, fm_getfd, seek, read
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (key, sz_val, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)

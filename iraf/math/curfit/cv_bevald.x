@@ -106,7 +106,6 @@ double	k1, k2		# normalizing constants
 double	basis[ARB]	# array of basis functions
 int	left[ARB]	# array of indices for first non-zero spline
 
-size_t	sz_val
 int	i
 pointer	sp, sx, tx
 double	dsx, dtx
@@ -114,9 +113,8 @@ double	dsx, dtx
 begin
 	# allocate space
 	call smark (sp)
-	sz_val = npts
-	call salloc (sx, sz_val, TY_DOUBLE)
-	call salloc (tx, sz_val, TY_DOUBLE)
+	call salloc (sx, npts, TY_DOUBLE)
+	call salloc (tx, npts, TY_DOUBLE)
 
 	# calculate the index of the first non-zero coeff
 	call altad (x, Memd[sx], npts, k1, k2)

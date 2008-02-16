@@ -119,7 +119,6 @@ pointer size[MAX_CURVES]	# Size of markers to plot
 int	npix[MAX_CURVES]	# Number of points per curve
 int	ncurves			# Number of curves to overplot
 
-size_t	sz_val
 pointer	gd
 char	xlabel[SZ_LINE], ylabel[SZ_LINE], title[SZ_LINE]
 char	marker[SZ_FNAME], wcs[SZ_FNAME], xformat[SZ_FNAME], yformat[SZ_FNAME]
@@ -140,9 +139,8 @@ errchk	gswind, gseti, gg_rdcurves, gascale, grscale
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (ltypes, sz_val, TY_CHAR)
-	call salloc (colors, sz_val, TY_CHAR)
+	call salloc (ltypes, SZ_LINE, TY_CHAR)
+	call salloc (colors, SZ_LINE, TY_CHAR)
 
 	# If computing projection along an axis (collapsing a multidimensional
 	# section to a vector), fetch axis number.  Get wcs string.
@@ -534,7 +532,6 @@ pointer	x, y, size		# Pointer to x, y and size vector
 int	axis			# Axis about which the projection is to be taken
 char	wcs[ARB]		# WCS type
 
-size_t	sz_val
 int	npix, i, stridxs()
 pointer	sp, im, mw, ct, axvals, str
 pointer	immap(), mw_openim(), mw_sctran()
@@ -542,10 +539,8 @@ errchk	immap, im_projection, malloc, mw_openim, mw_sctran, plt_wcs
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (axvals, sz_val, TY_REAL)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (axvals, IM_MAXDIM, TY_REAL)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	im = immap (imsect, READ_ONLY, 0)
 
@@ -553,14 +548,12 @@ begin
 	    call error (2, "Attempt to take projection over nonexistent axis")
 	npix = IM_LEN(im,axis)
 
-	sz_val = npix
-	call malloc (y, sz_val, TY_REAL)
+	call malloc (y, npix, TY_REAL)
 	call im_projection (im, Memr[y], npix, axis)
 
 	iferr {
-	    sz_val = npix
-	    call malloc (x, sz_val, TY_REAL)
-	    call malloc (size, sz_val, TY_REAL)
+	    call malloc (x, npix, TY_REAL)
+	    call malloc (size, npix, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 
@@ -606,7 +599,6 @@ char	fname[ARB]		# Name of list file
 pointer	x, y, size		# Pointers to x, y and size vectors
 bool	rdmarks			# Read markers from file?
 
-size_t	sz_val
 int	buflen, n, fd, ncols, lineno
 pointer	sp, lbuf, ip
 real	xval, yval, szmark
@@ -615,17 +607,15 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
 	buflen = SZ_BUF
 	iferr {
-	    sz_val = buflen
-	    call malloc (x, sz_val, TY_REAL)
-	    call malloc (y, sz_val, TY_REAL)
-	    call malloc (size, sz_val, TY_REAL)
+	    call malloc (x, buflen, TY_REAL)
+	    call malloc (y, buflen, TY_REAL)
+	    call malloc (size, buflen, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 

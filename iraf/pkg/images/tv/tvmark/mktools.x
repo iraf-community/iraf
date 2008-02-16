@@ -5,12 +5,10 @@ include "tvmark.h"
 
 procedure mk_init (mk)
 
-size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
-	sz_val = LEN_MARKSTRUCT
-	call malloc (mk, sz_val, TY_STRUCT)
+	call malloc (mk, LEN_MARKSTRUCT, TY_STRUCT)
 
 	# Initialize the mark type parameters.
 	MK_MARK(mk) = EOS
@@ -70,16 +68,14 @@ end
 
 procedure mk_rinit (mk)
 
-size_t	sz_val
 pointer	mk		# pointer to immark structure
 
 begin
 	call mk_rfree (mk)
-	sz_val = MAX_NMARKS
-	call malloc (MK_RADII(mk), sz_val, TY_REAL)
-	call malloc (MK_AXES(mk), sz_val, TY_REAL)
-	call malloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
-	call malloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
+	call malloc (MK_RADII(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_AXES(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_SLENGTHS(mk), MAX_NMARKS, TY_REAL)
+	call malloc (MK_RLENGTHS(mk), MAX_NMARKS, TY_REAL)
 end
 
 
@@ -446,7 +442,6 @@ pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
-size_t	sz_val
 int	rp, ntemp
 pointer	sp, rtemp
 int	fnldir(), mk_gmarks()
@@ -480,8 +475,7 @@ begin
 
 	case CSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_CSTRING(mk), SZ_FNAME)
@@ -494,8 +488,7 @@ begin
 
 	case RSTRING:
 	    call smark (sp)
-	    sz_val = MAX_NMARKS
-	    call salloc (rtemp, sz_val, TY_REAL)
+	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
 	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
 	    if (ntemp > 0) {
 	        call strcpy (str, MK_RSTRING(mk), SZ_FNAME)

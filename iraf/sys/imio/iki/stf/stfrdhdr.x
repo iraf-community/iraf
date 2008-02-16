@@ -19,7 +19,6 @@ pointer	im		# image descriptor
 int	group		# group to be accessed
 int	acmode		# access mode
 
-size_t	sz_val
 long	pixoff
 long	fi[LEN_FINFO]
 real	datamin, datamax
@@ -34,11 +33,9 @@ errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi, imgetr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
 
 	stf = IM_KDES(im)
 

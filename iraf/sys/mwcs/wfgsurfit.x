@@ -70,7 +70,6 @@ pointer procedure wf_gsopen (atstr)
 
 char    atstr[ARB]              #I the input mwcs attribute string
 
-size_t	sz_val
 double  dval
 int     ip, npar, szcoeff
 pointer gs, sp, par, coeff
@@ -82,14 +81,12 @@ begin
             return (NULL)
 
         call smark (sp)
-        sz_val = SZ_LINE
-        call salloc (par, sz_val, TY_CHAR)
+        call salloc (par, SZ_LINE, TY_CHAR)
 
         gs = NULL
         npar = 0
         szcoeff = SZ_GSCOEFFBUF
-        sz_val = szcoeff
-        call malloc (coeff, sz_val, TY_DOUBLE)
+        call malloc (coeff, szcoeff, TY_DOUBLE)
 
         call sscan (atstr)
         repeat {
@@ -248,7 +245,6 @@ double	x		#I x values
 double	y		#I y values
 int	nxd, nyd	#I order of the derivatives in x and y
 
-size_t	sz_val
 int	ncoeff, nxder, nyder, i, j, k
 int	order, maxorder1, maxorder2, nmove1, nmove2
 pointer	sf2, sp, coeff, ptr1, ptr2
@@ -335,8 +331,7 @@ begin
 
 	# Get coefficients.
 	call smark (sp)
-	sz_val = WF_NCOEFF(sf1)
-	call salloc (coeff, sz_val, TY_DOUBLE)
+	call salloc (coeff, WF_NCOEFF(sf1), TY_DOUBLE)
 	call wf_gscoeff (sf1, Memd[coeff], ncoeff)
 
 	# Compute the new coefficients.
@@ -434,7 +429,6 @@ pointer	sf		#O surface descriptor
 double	fit[ARB]	#I array containing the surface parameters and
 			#I coefficients
 
-size_t	sz_val
 int	surface_type, xorder, yorder, order
 double	xmin, xmax, ymin, ymax	
 
@@ -487,12 +481,9 @@ begin
 	# Set remaining curve parameters.
 	WF_TYPE(sf) = surface_type
 
-	sz_val = WF_NCOEFF(sf)
-	call malloc (WF_COEFF(sf), sz_val, TY_DOUBLE)
-	sz_val = WF_XORDER(sf)
-	call malloc (WF_XBASIS(sf), sz_val, TY_DOUBLE)
-	sz_val = WF_YORDER(sf)
-	call malloc (WF_YBASIS(sf), sz_val, TY_DOUBLE)
+	call malloc (WF_COEFF(sf), WF_NCOEFF(sf), TY_DOUBLE)
+	call malloc (WF_XBASIS(sf), WF_XORDER(sf), TY_DOUBLE)
+	call malloc (WF_YBASIS(sf), WF_YORDER(sf), TY_DOUBLE)
 
 	# restore coefficient array
 	call amovd (fit[WF_SAVECOEFF+1], Memd[WF_COEFF(sf)], WF_NCOEFF(sf))

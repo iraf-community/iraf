@@ -9,16 +9,13 @@ procedure t_words()
 
 int	fd, last_nscan
 pointer	sp, fname, word, list
-size_t	sz_val
 int	clgfil(), fscan(), nscan(), open()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (word, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (word, SZ_LINE, TY_CHAR)
 
 	list = clpopni ("files")
 

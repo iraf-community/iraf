@@ -319,13 +319,11 @@ pointer procedure man_putstr (str)
 char	str[ARB]
 int	nchars
 pointer	bp
-size_t	sz_val
 int	strlen()
 
 begin
 	nchars = strlen (str)
-	sz_val = nchars
-	call malloc (bp, sz_val, TY_CHAR)
+	call malloc (bp, nchars, TY_CHAR)
 	call strcpy (str, Memc[bp], nchars)
 
 	return (bp)

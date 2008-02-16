@@ -10,15 +10,13 @@ include	"help.h"
 procedure t_hdbexamine()
 
 pointer	sp, helpdb
-size_t	sz_val
 bool	streq(), clgetb()
 int	envgets()
 string	s_helpdb "helpdb"
 
 begin
 	call smark (sp)
-	sz_val = SZ_HELPDB
-	call salloc (helpdb, sz_val, TY_CHAR)
+	call salloc (helpdb, SZ_HELPDB, TY_CHAR)
 
 	# Fetch the name of the help database file to be examined.  If the
 	# name is "helpdb", the filename is taken from the environment.

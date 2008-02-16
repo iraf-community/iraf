@@ -14,7 +14,6 @@ real	buf[ARB]		# user data buffer
 int	i1, i2			# first, last column
 int	ier
 
-size_t	sz_val
 pointer	bp
 long	offset
 int	nchars, npix
@@ -37,8 +36,7 @@ begin
 	if (IM_PIXTYPE(im) == TY_SHORT) {
 	    bp = IM_LINEBUFP(im)
 	    if (bp == NULL) {
-		sz_val = IM_LEN(im,1)
-		call malloc (bp, sz_val, TY_SHORT)
+		call malloc (bp, IM_LEN(im,1), TY_SHORT)
 		IM_LINEBUFP(im) = bp
 	    }
 	}

@@ -31,7 +31,6 @@ int	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
-size_t	sz_val
 int	line_1, line_2, i
 pointer	sp, ufd, xp, yp, oo
 bool	pl_upolygon()
@@ -48,13 +47,10 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = LEN_PGONDES
-	call salloc (ufd, sz_val, TY_STRUCT)
-	sz_val = RL_FIRST + (npts+1)*3
-	call salloc (oo, sz_val, TY_INT)
-	sz_val = npts + 1
-	call salloc (xp, sz_val, TY_REAL)
-	call salloc (yp, sz_val, TY_REAL)
+	call salloc (ufd, LEN_PGONDES, TY_STRUCT)
+	call salloc (oo, RL_FIRST + (npts+1)*3, TY_INT)
+	call salloc (xp, npts + 1, TY_REAL)
+	call salloc (yp, npts + 1, TY_REAL)
 
 	# Initialize the region descriptor.
 	P_PL(ufd) = pl

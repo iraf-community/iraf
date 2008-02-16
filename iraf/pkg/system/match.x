@@ -13,7 +13,6 @@ char	chset[2]
 int	fd
 pointer	sp, ip, line, fname, patbuf, pattern, list
 bool	line_matches, encode_pattern, print_file_names, match_pattern
-size_t	sz_val
 bool	clgetb()
 int	strmatch(), strsearch(), patmatch(), patmake(), stridxs()
 int	open(), getline(), clplen(), clgfil()
@@ -21,14 +20,10 @@ pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (line, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (line, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	call salloc (pattern, SZ_FNAME, TY_CHAR)
 
 	# Get pattern.  If it contains either * or [, general pattern
 	# matching with an encoded pattern must be used.  If no metacharacters

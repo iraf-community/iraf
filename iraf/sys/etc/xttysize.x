@@ -16,7 +16,6 @@ procedure xttysize (width, height)
 int	width			# width of screen (out)
 int	height			# height of screen (out)
 
-size_t	sz_val
 int	junk, i
 pointer	sp, buf, tty
 pointer	ttyodes()
@@ -25,8 +24,7 @@ errchk	clcmd, getline, envgeti, ttyodes
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	# If we are a connected subprocess it is difficult to write directly
 	# to the terminal, since the terminal is opened by the CL.  Hence we

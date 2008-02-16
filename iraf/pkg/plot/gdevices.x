@@ -15,7 +15,6 @@ pointer	fnt, ip, op, gty
 int	fd, junk, nalias, lnum, xr, yr
 pointer	sp, devices, fname, patstr, patbuf, lbuf, device, devdes
 
-size_t	sz_val
 bool	streq()
 pointer	fntopn(), gtyopen()
 int	patmake(), patmatch(), gtygeti()
@@ -24,18 +23,12 @@ string	s_graphcap "graphcap"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (devices, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = SZ_PATSTR
-	call salloc (patstr, sz_val, TY_CHAR)
-	sz_val = SZ_PATBUF
-	call salloc (patbuf, sz_val, TY_CHAR)
-	sz_val = SZ_LBUF
-	call salloc (lbuf, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
+	call salloc (devices, SZ_LINE, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (patstr, SZ_PATSTR, TY_CHAR)
+	call salloc (patbuf, SZ_PATBUF, TY_CHAR)
+	call salloc (lbuf, SZ_LBUF, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
 
 	# Get list of device patterns to be matched against graphcap.
 	call clgstr ("devices", Memc[devices], SZ_LINE)

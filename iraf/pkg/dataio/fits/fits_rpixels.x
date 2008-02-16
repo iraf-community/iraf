@@ -33,7 +33,6 @@ int	spp_type	# SPP data type to be returned
 
 # entry rft_read_pixels (fd, buffer, npix)
 
-size_t	sz_val
 int	rft_read_pixels
 int	fd		# input file descriptor
 char	buffer[1]	# output buffer
@@ -60,13 +59,11 @@ begin
 
 	if (mii != NULL)
 	    call mfree (mii, TY_INT)
-	sz_val = len_mii
-	call malloc (mii, sz_val, TY_INT)
+	call malloc (mii, len_mii, TY_INT)
 
 	if (spp != NULL)
 	    call mfree (spp, TY_CHAR)
-	sz_val = nch_rec
-	call malloc (spp, sz_val, TY_CHAR)
+	call malloc (spp, nch_rec, TY_CHAR)
 
 	ip = nch_rec
 	return (OK)

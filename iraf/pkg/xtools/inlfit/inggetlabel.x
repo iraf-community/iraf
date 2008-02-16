@@ -12,7 +12,6 @@ char	label[ARB]		# label
 char	units[ARB]		# units
 int	maxch			# max chars. in label and units
 
-size_t	sz_val
 int	dummy
 pointer	sp, str
 pointer	labels, lunits, vlabels, vunits
@@ -23,16 +22,14 @@ int	inlstrwrd()
 begin
 	# Begin allocation of string space.
 	call smark (sp)
-	sz_val = SZ_LINE + 1
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE + 1, TY_CHAR)
 
 	# Branch on axis type.
 	switch (xtype) {
 	case KEY_VARIABLE:
-	    sz_val = SZ_LINE
-	    call salloc (labels, sz_val, TY_CHAR)
-	    call salloc (vlabels, sz_val, TY_CHAR)
-	    call salloc (vunits, sz_val, TY_CHAR)
+	    call salloc (labels,  SZ_LINE, TY_CHAR)
+	    call salloc (vlabels, SZ_LINE, TY_CHAR)
+	    call salloc (vunits,  SZ_LINE, TY_CHAR)
 	    call in_gstr (in, INLLABELS,  Memc[labels],  SZ_LINE)
 	    call in_gstr (in, INLVLABELS, Memc[vlabels], SZ_LINE)
 	    call in_gstr (in, INLVUNITS,  Memc[vunits],  SZ_LINE)
@@ -47,9 +44,8 @@ begin
 	    dummy = inlstrwrd (xnum, units, maxch, Memc[vunits])
 
 	case KEY_FUNCTION, KEY_FIT, KEY_RESIDUALS, KEY_RATIO, KEY_NONLINEAR:
-	    sz_val = SZ_LINE
-	    call salloc (labels, sz_val, TY_CHAR)
-	    call salloc (lunits, sz_val, TY_CHAR)
+	    call salloc (labels, SZ_LINE, TY_CHAR)
+	    call salloc (lunits, SZ_LINE, TY_CHAR)
 	    call in_gstr (in, INLLABELS, Memc[labels], SZ_LINE)
 	    call in_gstr (in, INLUNITS,  Memc[lunits], SZ_LINE)
 
@@ -57,10 +53,9 @@ begin
 	    dummy = inlstrwrd (xtype, units, maxch, Memc[lunits])
 
 	case KEY_UAXIS:
-	    sz_val = SZ_LINE
-	    call salloc (labels, sz_val, TY_CHAR)
-	    call salloc (userlabels, sz_val, TY_CHAR)
-	    call salloc (userunits, sz_val, TY_CHAR)
+	    call salloc (labels,     SZ_LINE, TY_CHAR)
+	    call salloc (userlabels, SZ_LINE, TY_CHAR)
+	    call salloc (userunits,  SZ_LINE, TY_CHAR)
 	    call in_gstr (in, INLLABELS, Memc[labels], SZ_LINE)
 	    call in_gstr (in, INLUSERLABELS, Memc[userlabels], SZ_LINE)
 	    call in_gstr (in, INLUSERUNITS,  Memc[userunits],  SZ_LINE)

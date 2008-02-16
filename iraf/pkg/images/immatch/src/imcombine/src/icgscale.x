@@ -18,7 +18,6 @@ real	exptime[nimages]	#I Exposure times
 real	values[nimages]		#O Values
 int	nimages			#I Number of images
 
-size_t	sz_val
 int	type			#O Type of value
 
 int	fd, i, nowhite(), open(), fscan(), nscan(), strdic()
@@ -57,8 +56,7 @@ begin
 		}
 		call close (fd)
 		if (i < nimages) {
-		    sz_val = SZ_LINE
-		    call salloc (errstr, sz_val, TY_CHAR)
+		    call salloc (errstr, SZ_LINE, TY_CHAR)
 		    call sprintf (errstr, SZ_FNAME,
 			"Insufficient %s values in %s")
 			call pargstr (param)

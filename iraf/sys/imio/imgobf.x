@@ -10,7 +10,6 @@ pointer procedure imgobf (im, vs, ve, ndim, dtype)
 pointer	im, bdes
 int	ndim, dtype, i
 long	vs[ndim], ve[ndim]
-size_t	sz_val
 long	nchars, totpix, imcssz(), clktime()
 errchk	imopsf, malloc, realloc, calloc
 include	<szdtype.inc>
@@ -39,8 +38,7 @@ begin
 	    call realloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
 	else if (nchars > BD_BUFSIZE(bdes)) {
 	    call mfree (BD_BUFPTR(bdes), TY_CHAR)
-	    sz_val = nchars
-	    call malloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)
+	    call malloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
 	}
 
 	# Save section coordinates, datatype of pixels in buffer

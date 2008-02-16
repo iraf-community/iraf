@@ -47,7 +47,6 @@ procedure ex_patch_zscale (ex, expnum)
 pointer	ex				#i task struct pointer
 int	expnum				#i expression number to fix
 
-size_t	sz_val
 pointer	sp, exp, func
 int	ip, pp
 
@@ -55,10 +54,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_EXPSTR
-	call salloc (exp, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (func, sz_val, TY_CHAR)
+	call salloc (exp, SZ_EXPSTR, TY_CHAR)
+	call salloc (func, SZ_FNAME, TY_CHAR)
 	call aclrc(Memc[exp], SZ_EXPSTR)
 	call aclrc(Memc[func], SZ_FNAME)
 
@@ -116,7 +113,6 @@ pointer ex                              #i task struct pointer
 char    expstr[ARB]                     #i expression string
 int     pp                              #i position pointer
 
-size_t	sz_val
 pointer sp, arg, arg2, exp, buf
 pointer exptr, exptr2, ep
 char    ch
@@ -127,11 +123,10 @@ pointer	ex_evaluate()
 
 begin
         call smark (sp)
-        sz_val = SZ_EXPSTR
-        call salloc (arg, sz_val, TY_CHAR); call aclrc (Memc[arg], SZ_EXPSTR)
-        call salloc (arg2, sz_val,TY_CHAR); call aclrc (Memc[arg2],SZ_EXPSTR)
-        call salloc (exp, sz_val, TY_CHAR); call aclrc (Memc[exp], SZ_EXPSTR)
-        call salloc (buf, sz_val, TY_CHAR); call aclrc (Memc[buf], SZ_EXPSTR)
+        call salloc (arg, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[arg], SZ_EXPSTR)
+        call salloc (arg2, SZ_EXPSTR,TY_CHAR); call aclrc (Memc[arg2],SZ_EXPSTR)
+        call salloc (exp, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[exp], SZ_EXPSTR)
+        call salloc (buf, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[buf], SZ_EXPSTR)
 
         if (DEBUG) { call eprintf("\t\texp=`%s'\n");call pargstr(expstr)}
 
@@ -342,7 +337,6 @@ pointer	sample				# output vector containing the sample
 int	optimal_sample_size		# desired number of pixels in sample
 int	len_stdline			# optimal number of pixels per line
 
-size_t	sz_val
 pointer	op, ep, out, bpm
 int	ncols, nlines, col_step, line_step, maxpix, line
 int	opt_npix_per_line, npix_per_line, nsubsample
@@ -380,17 +374,13 @@ begin
 	# caller.
 
 	maxpix = npix_per_line * max_nlines_in_sample
-	sz_val = maxpix
-	call malloc (sample, sz_val, TY_REAL)
+	call malloc (sample, maxpix, TY_REAL)
 
 	# Extract the vector.
 	op = sample
-	sz_val = ncols
-	call malloc (out, sz_val, TY_REAL)
-	if (exptr2 != NULL) {
-	    sz_val = ncols
-	    call malloc (bpm, sz_val, TY_INT)
-	}
+	call malloc (out, ncols, TY_REAL)
+	if (exptr2 != NULL)
+	    call malloc (bpm, ncols, TY_INT)
 	do line = (line_step + 1) / 2, nlines, line_step {
 
 	    # Evaluate the expression at the current line.
@@ -525,7 +515,6 @@ real	krej				#i k-sigma pixel rejection factor
 int	ngrow				#i number of pixels of growing
 int	maxiter				#i max iterations
 
-size_t	sz_val
 int	i, ngoodpix, last_ngoodpix, minpix, niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
@@ -546,10 +535,9 @@ begin
 	# normalized X values, and another to flag rejected pixels.
 
 	call smark (sp)
-	sz_val = npix
-	call salloc (flat, sz_val, TY_REAL)
-	call salloc (normx, sz_val, TY_REAL)
-	call salloc (badpix, sz_val, TY_SHORT)
+	call salloc (flat, npix, TY_REAL)
+	call salloc (normx, npix, TY_REAL)
+	call salloc (badpix, npix, TY_SHORT)
 	call aclrs (Mems[badpix], npix)
 
 	# Compute normalized X vector.  The data X values [1:npix] are

@@ -104,7 +104,6 @@ pointer	gt			# GTOOLS pointer
 int	param			# Parameter to set
 char	str[ARB]		# String
 
-size_t	sz_val
 char	dummy[10]
 int	len
 
@@ -125,71 +124,61 @@ begin
 	case GTPARAMS:
 	    call mfree (GT_PARAMS(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_PARAMS(gt), sz_val, TY_CHAR)
+	        call malloc (GT_PARAMS(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_PARAMS(gt)], len)
 	    }
 	case GTTITLE:
 	    call mfree (GT_TITLE(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_TITLE(gt), sz_val, TY_CHAR)
+	        call malloc (GT_TITLE(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_TITLE(gt)], len)
 	    }
 	case GTSUBTITLE:
 	    call mfree (GT_SUBTITLE(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_SUBTITLE(gt), sz_val, TY_CHAR)
+	        call malloc (GT_SUBTITLE(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_SUBTITLE(gt)], len)
 	    }
 	case GTCOMMENTS:
 	    call mfree (GT_COMMENTS(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_COMMENTS(gt), sz_val, TY_CHAR)
+	        call malloc (GT_COMMENTS(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_COMMENTS(gt)], len)
 	    }
 	case GTXLABEL:
 	    call mfree (GT_XLABEL(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_XLABEL(gt), sz_val, TY_CHAR)
+	        call malloc (GT_XLABEL(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_XLABEL(gt)], len)
 	    }
 	case GTYLABEL:
 	    call mfree (GT_YLABEL(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_YLABEL(gt), sz_val, TY_CHAR)
+	        call malloc (GT_YLABEL(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_YLABEL(gt)], len)
 	    }
 	case GTXUNITS:
 	    call mfree (GT_XUNITS(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_XUNITS(gt), sz_val, TY_CHAR)
+	        call malloc (GT_XUNITS(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_XUNITS(gt)], len)
 	    }
 	case GTYUNITS:
 	    call mfree (GT_YUNITS(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_YUNITS(gt), sz_val, TY_CHAR)
+	        call malloc (GT_YUNITS(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_YUNITS(gt)], len)
 	    }
 	case GTXFORMAT:
 	    call mfree (GT_XFORMAT(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_XFORMAT(gt), sz_val, TY_CHAR)
+	        call malloc (GT_XFORMAT(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_XFORMAT(gt)], len)
 	    }
 	case GTYFORMAT:
 	    call mfree (GT_YFORMAT(gt), TY_CHAR)
 	    if (len > 0) {
-	        sz_val = len
-	        call malloc (GT_YFORMAT(gt), sz_val, TY_CHAR)
+	        call malloc (GT_YFORMAT(gt), len, TY_CHAR)
 	        call strcpy (str, Memc[GT_YFORMAT(gt)], len)
 	    }
 	case GTXTRAN:

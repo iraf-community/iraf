@@ -14,7 +14,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -27,8 +26,7 @@ begin
 
 	if ((data == NULL) || (ncols != nc)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = ncols
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, ncols, TY_REAL)
 	    nc = ncols
 	    l1 = 0
 	    l2 = 0
@@ -113,7 +111,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -126,8 +123,7 @@ begin
 
 	if ((data == NULL) || (nlines != nl)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = nlines
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, nlines, TY_REAL)
 	    nl = nlines
 	    c1 = 0
 	    c2 = 0
@@ -212,7 +208,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -225,8 +220,7 @@ begin
 
 	if ((data == NULL) || (ncols != nc)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = (nlines + 1) * ncols
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, (nlines + 1) * ncols, TY_REAL)
 	    nc = ncols
 	    l1 = 0
 	    l2 = 0
@@ -314,7 +308,6 @@ int	col1, col2	# Column limits of the sum
 int	line1, line2	# Line limits
 pointer	data		# Data pointer
 
-size_t	sz_val
 int	i
 int	ncols, nlines, nc, nl, c1, c2, l1, l2
 pointer	j
@@ -327,8 +320,7 @@ begin
 
 	if ((data == NULL) || (nlines != nl)) {
 	    call mfree (data, TY_REAL)
-	    sz_val = (ncols + 1) * nlines
-	    call malloc (data, sz_val, TY_REAL)
+	    call malloc (data, (ncols + 1) * nlines, TY_REAL)
 	    nl = nlines
 	    c1 = 0
 	    c2 = 0

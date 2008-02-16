@@ -13,7 +13,6 @@ pointer	cv				# Pointer to curfit structure
 double	ps_coeff[ncoeff]		# Power series coefficients (output)
 int	ncoeff				# Number of coefficients in fit
 
-size_t	sz_val
 pointer	sp, cf_coeff, elm
 int	function
 int	dcvstati()
@@ -29,10 +28,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = ncoeff ** 2
-	call salloc (elm, sz_val, TY_DOUBLE)
-	sz_val = ncoeff
-	call salloc (cf_coeff, sz_val, TY_DOUBLE)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+	call salloc (cf_coeff, ncoeff, TY_DOUBLE)
 
 	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
@@ -72,7 +69,6 @@ int	npts		# number of points
 double	chisqr		# reduced chi-squared of fit
 double	perrors[ARB]	# errors in coefficients
 
-size_t	sz_val
 int	i, j, n, nfree, function, ncoeff
 double	variance, chisq, hold
 pointer	sp, covar, elm
@@ -124,9 +120,8 @@ begin
 
 	# Allocate space for the covariance and conversion matrices.
 	call smark (sp)
-	sz_val = ncoeff * ncoeff
-	call salloc (covar, sz_val, TY_DOUBLE)
-	call salloc (elm, sz_val, TY_DOUBLE)
+	call salloc (covar, ncoeff * ncoeff, TY_DOUBLE)
+	call salloc (elm, ncoeff * ncoeff, TY_DOUBLE)
 
 	# Compute the covariance matrix.
 	do j = 1, ncoeff {
@@ -348,7 +343,6 @@ pointer	cv			# Pointer to curfit structure
 int	ncoeff			# Number of coefficients in fit
 double	ps_coeff[ncoeff]	# Power series coefficients
 
-size_t	sz_val
 pointer	sp, elm, index
 int	n, i, k
 double	k1, k2, bc, sum
@@ -358,8 +352,7 @@ double	dcv_bcoeff()
 begin
 	# Need space for ncoeff**2 matrix elements
 	call smark (sp)
-	sz_val = ncoeff ** 2
-	call salloc (elm, sz_val, TY_DOUBLE)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
 
 	k1 = CV_RANGE(cv)
 	k2 = k1 * CV_MAXMIN(cv)
@@ -398,7 +391,6 @@ pointer	cv			# Pointer to curfit structure
 double	elm[ncoeff,ncoeff]	# Input transformed matrix
 int	ncoeff			# Number of coefficients in fit
 
-size_t	sz_val
 pointer	sp, norm, onorm, index
 int	n, i, k
 double	k1, k2, bc
@@ -408,9 +400,8 @@ double	dcv_bcoeff()
 begin
 	# Need space for ncoeff**2 matrix elements
 	call smark (sp)
-	sz_val = ncoeff ** 2
-	call salloc (norm, sz_val, TY_DOUBLE)
-	call salloc (onorm, sz_val, TY_DOUBLE)
+	call salloc (norm, ncoeff ** 2, TY_DOUBLE)
+	call salloc (onorm, ncoeff ** 2, TY_DOUBLE)
 
 	k1 = CV_RANGE(cv)
 	k2 = k1 * CV_MAXMIN(cv)

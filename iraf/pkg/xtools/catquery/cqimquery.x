@@ -49,7 +49,6 @@ pointer	procedure cq_imquery (cq, imname)
 pointer	cq			#I the catalog database descriptor
 char	imname[ARB]		#I the image name
 
-size_t	sz_val
 pointer	res, inbuf
 int	cc, fd, outfd, nchars
 bool	done
@@ -116,8 +115,7 @@ begin
 	iferr {
 
 	    # Allocate the maximum buffer size.
-	    sz_val = DEF_SZ_INBUF
-	    call malloc (inbuf, sz_val, TY_CHAR)
+	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 
 	    # Skip a fixed number of bytes. Dangerous unless the header
 	    # is always the same size.
@@ -193,7 +191,6 @@ pointer procedure cq_firinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
-size_t	sz_val
 pointer	cc, res
 pointer	sp, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -215,16 +212,12 @@ begin
 
 	# Format the query.
 	call smark (sp)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (value, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPNAME
-	call salloc (wpname, sz_val, TY_CHAR)
-	call salloc (wkname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (wkdvalue, sz_val, TY_CHAR)
-	call salloc (wkvalue, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPUNITS
-	call salloc (wkunits, sz_val, TY_CHAR)
+	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
 
 	# Save the survey informaton and query in the results structure.
 	call strcpy (CQ_CATDB(cq), CQ_IMCATDB(res), SZ_FNAME)
@@ -518,7 +511,6 @@ pointer procedure cq_irinit (cq)
 
 pointer	cq			#I the catalog descriptor
 
-size_t	sz_val
 pointer	cc, res
 pointer	sp, query, value, wpname, wkname, wkdvalue, wkvalue, wkunits
 int	i, fsize, ncount, sz1, sz2, sz3, sz4, sz5, op1, op2, op3, op4, op5
@@ -540,10 +532,8 @@ begin
 
 	# Format the query.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (query, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (query, SZ_LINE, TY_CHAR)
+	call salloc (value, CQ_SZ_QPVALUE, TY_CHAR)
 	call sprintf (Memc[query], SZ_LINE, CQ_QUERY(cc))
 	do i = 1, CQ_NQPARS(cc) {
 	    if (cq_wrdstr (i, Memc[value], CQ_SZ_QPVALUE,
@@ -561,16 +551,13 @@ begin
 	# Copy the query parameters to the results descriptor.
 	CQ_INQPARS(res) = CQ_NQPARS(cc)
 	fsize = strlen (Memc[CQ_PQPNAMES(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPNAMES(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPNAMES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPNAMES(cc)], Memc[CQ_IQPNAMES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPVALUES(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPVALUES(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPVALUES(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPVALUES(cc)], Memc[CQ_IQPVALUES(res)], fsize)
 	fsize = strlen (Memc[CQ_PQPUNITS(cc)])
-	sz_val = fsize
-	call malloc (CQ_IQPUNITS(res), sz_val, TY_CHAR)
+	call malloc (CQ_IQPUNITS(res), fsize, TY_CHAR)
 	call strcpy (Memc[CQ_PQPUNITS(cc)], Memc[CQ_IQPUNITS(res)], fsize)
 
 	# Get the input image data type.
@@ -585,14 +572,11 @@ begin
 	        CQ_ITYPESTR)
 	}
 
-	sz_val = CQ_SZ_QPNAME
-	call salloc (wpname, sz_val, TY_CHAR)
-	call salloc (wkname, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPVALUE
-	call salloc (wkdvalue, sz_val, TY_CHAR)
-	call salloc (wkvalue, sz_val, TY_CHAR)
-	sz_val = CQ_SZ_QPUNITS
-	call salloc (wkunits, sz_val, TY_CHAR)
+	call salloc (wpname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkname, CQ_SZ_QPNAME, TY_CHAR)
+	call salloc (wkdvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkvalue, CQ_SZ_QPVALUE, TY_CHAR)
+	call salloc (wkunits, CQ_SZ_QPUNITS, TY_CHAR)
 
 	# Get the input image data type.
 	iferr {

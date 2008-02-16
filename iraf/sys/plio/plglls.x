@@ -14,7 +14,6 @@ int	ll_depth		#I line list depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-size_t	sz_val
 int	ll_len
 pointer	sp, ll_out, ll_src
 pointer	pl_access()
@@ -28,8 +27,7 @@ begin
 
 	} else {
 	    call smark (sp)
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_out, sz_val, TY_SHORT)
+	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 
 	    call pl_linerop (Mems[ll_src], v[1], PL_MAXVAL(pl), ll_dst, 1,
 		MV(ll_depth), Mems[ll_out], npix, rop)

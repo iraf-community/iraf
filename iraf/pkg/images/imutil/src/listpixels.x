@@ -18,7 +18,6 @@ int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, imlist, mw, ct, fmtptrs[IM_MAXDIM]
 
-size_t	sz_val
 bool	clgetb()
 int	imgnlr(), imgnld(), imgnlx(), imtgetim(), mw_stati(), clscan(), nscan()
 pointer	imtopenp(), immap(), mw_openim(), mw_sctran()
@@ -109,8 +108,7 @@ begin
 	    # Set the format strings for the logical axes.
 	    fmtstat = clscan ("formats")
 	    do i = 1, ndim {
-		sz_val = SZ_FNAME
-		call malloc (fmtptrs[i], sz_val, TY_CHAR)
+		call malloc (fmtptrs[i], SZ_FNAME, TY_CHAR)
 		if (fmtstat != EOF)
 		    call gargwrd (Memc[fmtptrs[i]], SZ_FNAME)
 		else

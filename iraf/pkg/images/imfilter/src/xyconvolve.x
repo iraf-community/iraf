@@ -20,7 +20,6 @@ int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	radsym		# does the kernel have radial symmetry
 
-size_t	sz_val
 int	i, ncols, nlines, col1, col2, nincols, inline, outline, tempi
 pointer	sp, lineptrs, imbuf, inbuf, linebuf, outbuf, bufptr, bufptr1, bufptr2
 pointer	imgs2r(), impl2r()
@@ -29,8 +28,7 @@ errchk	imgs2r, impl2r
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nyk
-	call salloc (lineptrs, sz_val, TY_INT)
+	call salloc (lineptrs, nyk, TY_INT)
 
 	# Set the input image boundary conditions.
 	call imseti (im1, IM_TYBNDRY, boundary)
@@ -46,8 +44,7 @@ begin
 	else
 	    nlines = IM_LEN(im2,2)
 	call calloc (inbuf, ncols * nyk , TY_REAL)
-	sz_val = ncols
-	call salloc (linebuf, sz_val, TY_REAL)
+	call salloc (linebuf, ncols, TY_REAL)
 
 	# Set the input image column limits and allocate the data buffer.
 	col1 = 1 - nxk / 2

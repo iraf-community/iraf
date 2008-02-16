@@ -12,7 +12,6 @@ procedure pl_compress (pl)
 
 pointer	pl			#I mask descriptor
 
-size_t	sz_val
 pointer	n_bp, o_lp, n_lp, op
 int	nwords, r_len, b_len, i
 errchk	malloc, mfree, syserr
@@ -38,8 +37,7 @@ begin
 	    call eprintf ("Warning: PL_LLFREE inconsistent (recoverable)\n")
 
 	# Allocate a new buffer large enough to hold the compressed line list.
-	sz_val = nwords
-	call malloc (n_bp, sz_val, TY_SHORT)
+	call malloc (n_bp, nwords, TY_SHORT)
 
 	# Copy the active line lists to the new buffer; as each line is
 	# copied, overwrite a couple words of the old line list with the

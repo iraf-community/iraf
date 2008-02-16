@@ -17,7 +17,6 @@ pointer	sf		# surface descriptor
 real	fit[ARB]	# array containing the surface parameters and
 			# coefficients
 
-size_t	sz_val
 int	surface_type, xorder, yorder, order
 real	xmin, xmax, ymin, ymax	
 
@@ -84,8 +83,7 @@ begin
 	GS_COEFF(sf) = NULL
 	GS_WZ(sf) = NULL
 
-	sz_val = GS_NCOEFF(sf)
-	call malloc (GS_COEFF(sf), sz_val, TY_REAL)
+	call malloc (GS_COEFF(sf), GS_NCOEFF(sf), TY_REAL)
 
 	# restore coefficient array
 	call amovr (fit[GS_SAVECOEFF+1], COEFF(GS_COEFF(sf)), GS_NCOEFF(sf))

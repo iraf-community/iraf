@@ -15,7 +15,6 @@ procedure qpio_sync (io)
 
 pointer	io			#I QPIO descriptor
 
-size_t	sz_val
 pointer	sp, eh
 int	szb_page, off, flen
 int	fstati()
@@ -33,8 +32,7 @@ begin
 	szb_page = QP_FMPAGESIZE(IO_QP(io))
 
 	# Update the event list header (stored in a full datafile page).
-	sz_val = szb_page / (SZ_STRUCT*SZB_CHAR)
-	call salloc (eh, sz_val, TY_STRUCT)
+	call salloc (eh, szb_page / (SZ_STRUCT*SZB_CHAR), TY_STRUCT)
 	call aclri (Memi[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
 
 	EH_FBOFF(eh)		= szb_page + 1

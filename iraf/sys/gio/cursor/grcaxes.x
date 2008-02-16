@@ -342,13 +342,11 @@ procedure gax_start (wx, wy)
 real	wx, wy			# world or log-world coords to draw to
 pointer	polyline, op
 
-size_t	sz_val
 errchk	malloc
 common	/gaxdcm/ polyline, op
 
 begin
-	sz_val = LEN_POLYLINE
-	call malloc (polyline, sz_val, TY_REAL)
+	call malloc (polyline, LEN_POLYLINE, TY_REAL)
 	op = polyline
 	call gax_draw (wx, wy)
 end

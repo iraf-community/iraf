@@ -15,7 +15,6 @@ procedure gkt_init (tty, devname)
 pointer	tty			# graphcap descriptor
 char	devname[ARB]		# device name
 
-size_t	sz_val
 pointer	nextch
 int	maxch, i
 real	char_height, char_width, char_size
@@ -31,8 +30,7 @@ begin
 	# Allocate the gkt descriptor and the string buffer.
 	if (g_kt == NULL) {
 	    call calloc (g_kt, LEN_GKT, TY_STRUCT)
-	    sz_val = SZ_SBUF
-	    call malloc (GKT_SBUF(g_kt), sz_val, TY_CHAR)
+	    call malloc (GKT_SBUF(g_kt), SZ_SBUF, TY_CHAR)
 	}
 
 	# Get the maximum frame count and the flags controlling frame advance

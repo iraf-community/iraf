@@ -25,7 +25,6 @@ int	hdrlen		#I header length, shorts
 short	data[ARB]	#I escape instruction data
 int	datalen		#I data length, shorts
 
-size_t	sz_val
 pointer	sp, buf
 pointer	epa
 int	nwords
@@ -38,8 +37,7 @@ begin
 
 	if (IS_INLINE(fd)) {
 	    call smark (sp)
-	    sz_val = nwords
-	    call salloc (buf, sz_val, TY_SHORT)
+	    call salloc (buf, nwords, TY_SHORT)
 
 	    call amovs (hdr, Mems[buf], ARB)
 	    call amovs (data, Mems[buf+hdrlen], ARB)

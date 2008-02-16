@@ -21,7 +21,6 @@ char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
-size_t	sz_val
 int	interp_type
 pointer	sp, str
 bool	fp_equalr()
@@ -29,8 +28,7 @@ int	strdic()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 	interp_type = strdic (interpstr, Memc[str], SZ_FNAME, II_BFUNCTIONS)
 
 	if (interp_type == II_NEAREST)
@@ -190,7 +188,6 @@ char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
-size_t	sz_val
 int	i, interp_type, nsinc, nincr
 int	ncols, nlines, nbpix, fstline, lstline, nxymargin
 int	cin1, cin2, nxin, lin1, lin2, nyin
@@ -226,10 +223,8 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	sz_val = 2 * ncols
-	call salloc (x, sz_val, TY_REAL)
-	sz_val = 2 * nlines
-	call salloc (y, sz_val, TY_REAL)
+	call salloc (x, 2 * ncols, TY_REAL)
+	call salloc (y, 2 * nlines, TY_REAL)
 	sinbuf = NULL
 
 	# Define the x and y interpolation coordinates.
@@ -350,7 +345,6 @@ int	col1, col2	#I column range of input buffer
 int	line1, line2	#I line range of input buffer
 pointer	buf		#I buffer
 
-size_t	sz_val
 int	i, ncols, nlines, nclast, llast1, llast2, nllast
 pointer	buf1, buf2
 
@@ -361,8 +355,7 @@ begin
 	nlines = line2 - line1 + 1
 
 	if (buf == NULL) {
-	    sz_val = ncols * nlines
-	    call malloc (buf, sz_val, TY_REAL)
+	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
 	    llast2 = line2 - nlines
 	} else if ((nlines != nllast) || (ncols != nclast)) {

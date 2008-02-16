@@ -20,7 +20,6 @@ char	expr[ARB]		#I expression to be compiled
 int	offset			#I typed offset of referenced attribute
 int	dtype			#I datatype of referenced attribute
 
-size_t	sz_val
 int	nbins, bin, xp
 pointer	lt, lut, lutx, pb
 int	x1, x2, xmin, xmax
@@ -145,9 +144,8 @@ bbmask_		    call eprintf ("%s: bad bitmask expression `%s'\n")
 	# ranges.
 
 	xlen = DEF_XLEN
-	sz_val = xlen
-	call malloc (xs_buf, sz_val, TY_INT)
-	call malloc (xe_buf, sz_val, TY_INT)
+	call malloc (xs_buf, xlen, TY_INT)
+	call malloc (xe_buf, xlen, TY_INT)
 
 	# Convert expr to a binary range list and set up the initial context.
 	# Ensure that the range list buffers are large enough to hold any

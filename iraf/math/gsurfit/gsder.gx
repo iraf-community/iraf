@@ -23,7 +23,6 @@ PIXEL	zfit[npts]	# fitted values
 int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
-size_t	sz_val
 PIXEL	norm
 int	ncoeff, nxder, nyder, i, j
 int	order, maxorder1, maxorder2, nmove1, nmove2
@@ -155,8 +154,7 @@ begin
 
 	# get coefficients
 	call smark (sp)
-	sz_val = GS_NCOEFF(sf1)
-	call salloc (coeff, sz_val, TY_PIXEL)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_PIXEL)
 	$if (datatype == r)
 	call gscoeff (sf1, Mem$t[coeff], ncoeff)
 	$else

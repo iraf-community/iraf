@@ -30,7 +30,6 @@ real	wts[ARB]			#I Weights
 int	stack				#I Stack input images?
 int	delete				#I Delete input images?
 
-size_t	sz_val
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
 int	i, j, nimages, intype, stack1, err, bufsize_i
@@ -69,8 +68,7 @@ begin
 retry_
 	iferr {
 	    call smark (sp)
-	    sz_val = 1
-	    call salloc (in, sz_val, TY_POINTER)
+	    call salloc (in, 1, TY_POINTER)
 
 	    nimages = 0
 	    in1 = NULL; Memi[in] = NULL; logfd = NULL
@@ -81,8 +79,7 @@ retry_
 	    if (stack1 == YES) {
 		proj = project
 		project = true
-		sz_val = SZ_FNAME
-		call salloc (bpmstack, sz_val, TY_CHAR)
+		call salloc (bpmstack, SZ_FNAME, TY_CHAR)
 		i = clgwrd ("masktype", Memc[bpmstack], SZ_FNAME, MASKTYPES)
 		if (i == M_NONE)
 		    Memc[bpmstack] = EOS
@@ -101,12 +98,10 @@ retry_
 		if (IM_NDIM(out[1]) == 1)
 		    call error (1, "Can't project one dimensional images")
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
-		sz_val = nimages
-		call salloc (in, sz_val, TY_POINTER)
+		call salloc (in, nimages, TY_POINTER)
 		call amovki (out[1], Memi[in], nimages)
 	    } else {
-		sz_val = imtlen(list)
-		call salloc (in, sz_val, TY_POINTER)
+		call salloc (in, imtlen(list), TY_POINTER)
 		call amovki (NULL, Memi[in], imtlen(list))
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
@@ -168,8 +163,7 @@ retry_
 		i = imtgetim (list, errstr, SZ_LINE)
 		in1 = immap (errstr, READ_ONLY, 0)
 		tmp = immap (output, NEW_COPY, in1); out[1] = tmp
-		sz_val = SZ_FNAME
-		call salloc (key, sz_val, TY_CHAR)
+		call salloc (key, SZ_FNAME, TY_CHAR)
 		do i = 1, nimages {
 		    call sprintf (Memc[key], SZ_FNAME, "stck%04d")
 			call pargi (i)
@@ -189,8 +183,7 @@ retry_
 		    IM_NDIM(out[1]) = IM_NDIM(out[1]) - 1
 		}
 	    }
-	    sz_val = nimages*IM_NDIM(out[1])
-	    call salloc (offsets, sz_val, TY_INT)
+	    call salloc (offsets, nimages*IM_NDIM(out[1]), TY_INT)
 	    iferr (call ic_setout (Memi[in], out, Memi[offsets], nimages)) {
 		call erract (EA_WARN)
 		call error (1, "Can't set output geometry")
@@ -213,10 +206,8 @@ retry_
 		IM_NDIM(out[4]) = IM_NDIM(out[4]) + 1
 		IM_LEN(out[4],IM_NDIM(out[4])) = nimages
 		if (!project) {
-		    if (key == NULL) {
-			sz_val = SZ_FNAME
-			call salloc (key, sz_val, TY_CHAR)
-		    }
+		    if (key == NULL)
+			call salloc (key, SZ_FNAME, TY_CHAR)
 		    do i = 100, nimages {
 			j = imtrgetim (list, i, input, SZ_FNAME)
 			if (i < 999)

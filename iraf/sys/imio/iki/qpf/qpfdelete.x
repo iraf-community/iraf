@@ -11,14 +11,12 @@ char	root[ARB]		#I root filename
 char	extn[ARB]		#I extension
 int	status			#O output status
 
-size_t	sz_val
 pointer	sp, fname
 errchk	qp_delete
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
 	iferr (call qp_delete (Memc[fname])) {

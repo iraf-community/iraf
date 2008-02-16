@@ -30,7 +30,6 @@ real	param[nparams]		# parameter values
 real	dparam[nparams]		# initial guess at uncertenties in parameters
 int	nparams			# number of parameters
 int	plist[nparams]		# list of active parameters
-size_t	sz_val
 int	nfparams		# number of fitting paramters
 
 begin
@@ -44,37 +43,31 @@ begin
 #	    call pargi (nfparams)
 
 	# Allocate the structure memory.
-	sz_val = LEN_INLSTRUCT
-	call malloc (in, sz_val, TY_STRUCT)
+	call malloc (in, LEN_INLSTRUCT, TY_STRUCT)
 
 	# Allocate memory for parameter values, changes, and list.
-	sz_val = nparams
-	call malloc (IN_PARAM  (in), sz_val, TY_REAL)
-	call malloc (IN_DPARAM (in), sz_val, TY_REAL)
-	call malloc (IN_PLIST  (in), sz_val, TY_INT)
+	call malloc (IN_PARAM  (in), nparams, TY_REAL)
+	call malloc (IN_DPARAM (in), nparams, TY_REAL)
+	call malloc (IN_PLIST  (in), nparams, TY_INT)
 
 	# Allocate space for strings. All strings are limited
 	# to SZ_LINE or SZ_FNAME.
-	sz_val = SZ_LINE
-	call malloc (IN_LABELS(in), sz_val, TY_CHAR)
-	call malloc (IN_UNITS(in), sz_val, TY_CHAR)
-	call malloc (IN_FLABELS(in), sz_val, TY_CHAR)
-	call malloc (IN_FUNITS(in), sz_val, TY_CHAR)
-	call malloc (IN_PLABELS(in), sz_val, TY_CHAR)
-	call malloc (IN_PUNITS(in), sz_val, TY_CHAR)
-	call malloc (IN_VLABELS(in), sz_val, TY_CHAR)
-	call malloc (IN_VUNITS(in), sz_val, TY_CHAR)
-	call malloc (IN_USERLABELS(in), sz_val, TY_CHAR)
-	call malloc (IN_USERUNITS(in), sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call malloc (IN_HELP(in), sz_val, TY_CHAR)
-	call malloc (IN_PROMPT(in), sz_val, TY_CHAR)
+	call malloc (IN_LABELS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_UNITS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_FLABELS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_FUNITS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_PLABELS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_PUNITS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_VLABELS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_VUNITS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_USERLABELS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_USERUNITS(in), SZ_LINE, TY_CHAR)
+	call malloc (IN_HELP(in), SZ_FNAME, TY_CHAR)
+	call malloc (IN_PROMPT(in), SZ_FNAME, TY_CHAR)
 
 	# Allocate space for floating point and graph substructures.
-	sz_val = LEN_INLFLOAT
-	call malloc (IN_SFLOAT (in), sz_val, TY_REAL)
-	sz_val = INLNGKEYS * LEN_INLGRAPH
-	call malloc (IN_SGAXES (in), sz_val, TY_INT)
+	call malloc (IN_SFLOAT (in), LEN_INLFLOAT, TY_REAL)
+	call malloc (IN_SGAXES (in), INLNGKEYS * LEN_INLGRAPH, TY_INT)
 
 	# Enter procedure parameters into the structure.
 	call in_puti (in, INLFUNCTION, func)

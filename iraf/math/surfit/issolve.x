@@ -26,7 +26,6 @@ int	lines[ARB]	# line numbers included in the fit
 int	nlines		# number of lines fit
 int	ier		# error code
 
-size_t	sz_val
 int	i, ii, j, k, nxcoeff
 pointer	ybzptr, ybptr
 pointer	ylzptr
@@ -88,10 +87,9 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 
 	    call smark (sp)
-	    sz_val = nlines
-	    call salloc (left, sz_val, TY_INT)
-	    call salloc (tleft, sz_val, TY_INT)
-	    call salloc (rows, sz_val, TY_INT)
+	    call salloc (left, nlines, TY_INT)
+	    call salloc (tleft, nlines, TY_INT)
+	    call salloc (rows, nlines, TY_INT)
 
 	    ylzptr = SF_YLEFT(sf) - 1
 	    do j = 1, nlines

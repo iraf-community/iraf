@@ -10,13 +10,11 @@ procedure ic_fshow (ic, fd)
 pointer	ic			# ICFIT pointer
 int	fd			# Output file
 
-size_t	sz_val
 pointer	str, ptr
 long	clktime()
 
 begin
-	sz_val = SZ_LINE
-	call malloc (str, sz_val, TY_CHAR)
+	call malloc (str, SZ_LINE, TY_CHAR)
 
 	call cnvtime (clktime(0), Memc[str], SZ_LINE)
 	call fprintf (fd, "\n# %s\n")

@@ -46,7 +46,6 @@ pointer	hp			# system package directory
 char	tlist[ARB]		# template list string
 pointer	ctrl
 
-size_t	sz_val
 int	ip, junk
 pointer	sp, op, tl, sbuf, template, pakstr, modstr
 int	tl_fetchelem(), tl_matchpak(), tl_putstr(), tl_getcurpack()
@@ -55,15 +54,12 @@ define	paknotfound_	91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (template, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pakstr, sz_val, TY_CHAR)
-	call salloc (modstr, sz_val, TY_CHAR)
+	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (pakstr, SZ_FNAME, TY_CHAR)
+	call salloc (modstr, SZ_FNAME, TY_CHAR)
 
 	call calloc (tl, LEN_TLSTRUCT, TY_STRUCT)
-	sz_val = SZ_TLSBUF
-	call malloc (sbuf, sz_val, TY_CHAR)
+	call malloc (sbuf, SZ_TLSBUF, TY_CHAR)
 
 	TL_CTRL(tl)    = ctrl
 	TL_SBUF(tl)    = sbuf
@@ -171,7 +167,6 @@ pointer	hp
 char	package[ARB]
 char	module[ARB]
 
-size_t	sz_val
 int	paklen, junk, ngen, modnum
 pointer	sp, template, op, ml
 int	tl_putstr(), ml_read()
@@ -180,8 +175,7 @@ errchk	ml_open, ml_read, tl_putstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (template, sz_val, TY_CHAR)
+	call salloc (template, SZ_LINE, TY_CHAR)
 
 	ngen = 0
 	ml = ml_open (hp, package)
@@ -230,7 +224,6 @@ pointer	db			# database descriptor
 pointer	hp			# package directory
 char	module[ARB]		# module template
 
-size_t	sz_val
 int	paklen, junk, ip, pk
 pointer	sp, curpack, template, op
 bool	streq()
@@ -239,10 +232,8 @@ errchk	tl_putstr, tl_getcurpack, hd_getname
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (template, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (curpack, sz_val, TY_CHAR)
+	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (curpack, SZ_FNAME, TY_CHAR)
 
 	# Output the template for the current package.  Save the name of
 	# the current package for later use.

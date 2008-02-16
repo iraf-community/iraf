@@ -28,7 +28,6 @@ pointer	section		# image section for statistics
 int	step		# default sample step
 int	verbose		# verbose mode
 
-size_t	sz_val
 double	temp
 int	i, bz, bs 
 real	mean, median, mode, sigma, tlower, tupper 
@@ -42,13 +41,11 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (imtemp, sz_val, TY_CHAR)
-	call salloc (section, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (image1, SZ_FNAME, TY_CHAR)
+	call salloc (image2, SZ_FNAME, TY_CHAR)
+	call salloc (imtemp, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
 	# Open the input and output image lists.
 	inlist = imtopenp ("input")
@@ -259,20 +256,18 @@ real	sigma			# sigma
 real    upper			# upper limit for statistics 
 real	lower			# lower limit for statistics 
 
-size_t	sz_val
 int	i, n, nx, ndim
 pointer	sp, x1, x2, xs, v, v1, dv, data, ptr1, ptr2
 int	imgnlr()
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (x1, sz_val, TY_INT)
-	call salloc (x2, sz_val, TY_INT)
-	call salloc (xs, sz_val, TY_INT)
-	call salloc (v, sz_val, TY_LONG)
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (dv, sz_val, TY_LONG)
+	call salloc (x1, IM_MAXDIM, TY_INT)
+	call salloc (x2, IM_MAXDIM, TY_INT)
+	call salloc (xs, IM_MAXDIM, TY_INT)
+	call salloc (v, IM_MAXDIM, TY_LONG)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (dv, IM_MAXDIM, TY_LONG)
 
 	# Initialize the section.
 	ndim = IM_NDIM(im)
@@ -304,8 +299,7 @@ begin
 	}
 
 	# Accumulate the pixel values within the section.
-	sz_val = n
-	call salloc (data, sz_val, TY_REAL)
+	call salloc (data, n, TY_REAL)
 	Meml[v] = 1
 	ptr1 = data
 	call amovl (Meml[v], Meml[v1], IM_MAXDIM)

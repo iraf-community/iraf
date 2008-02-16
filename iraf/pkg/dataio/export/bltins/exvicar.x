@@ -11,7 +11,6 @@ procedure ex_vicar (ex)
 
 pointer	ex					#i task struct pointer
 
-size_t	sz_val
 pointer	sp, hdr, user, date, arch
 int	i, flags
 char	space
@@ -30,12 +29,10 @@ begin
 
 	# Write the header to the file.
 	call smark (sp)
-	sz_val = SZ_VICHDR
-	call salloc (hdr, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (user, sz_val, TY_CHAR)
-	call salloc (date, sz_val, TY_CHAR)
-	call salloc (arch, sz_val, TY_CHAR)
+	call salloc (hdr, SZ_VICHDR, TY_CHAR)
+	call salloc (user, SZ_FNAME, TY_CHAR)
+	call salloc (date, SZ_FNAME, TY_CHAR)
+	call salloc (arch, SZ_FNAME, TY_CHAR)
 
 	space = ' '
 	call amovkc (space, Memc[hdr], SZ_VICHDR)

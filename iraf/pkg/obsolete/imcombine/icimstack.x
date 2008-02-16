@@ -11,7 +11,6 @@ procedure ic_imstack (list, output)
 int	list		#I List of images
 char	output		#I Name of output image
 
-size_t	sz_val
 int	i, j, npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	sp, input, key, in, out, buf_in, buf_out, ptr
@@ -24,9 +23,8 @@ errchk	immap
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (input, sz_val, TY_CHAR)
-	call salloc (key, sz_val, TY_CHAR)
+	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	iferr {
 	    # Add each input image to the output image.

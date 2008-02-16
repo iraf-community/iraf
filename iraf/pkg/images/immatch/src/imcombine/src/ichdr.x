@@ -9,16 +9,13 @@ pointer	in[nimages]		#I Input images
 pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 
-size_t	sz_val
 int	i, imgnfn()
 pointer	sp, key, str, list, imofnlu()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (key, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (key, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Set new PROCID.
 	call xt_procid (out)

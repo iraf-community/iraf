@@ -14,7 +14,6 @@ procedure ccp_polyline (p, npts)
 short	p[ARB]			# points defining line
 int	npts			# number of points, i.e., (x,y) pairs
 
-size_t	sz_val
 pointer	pl, xseg,yseg
 int	i, curpl_pt, nsegpts
 int	len_p, segsize, lsize
@@ -79,9 +78,8 @@ begin
 	} else {		# vector polyline; simulate linetype, linewidth
 
 	    segsize = SEGSIZE
-	    sz_val = segsize
-	    call malloc (xseg, sz_val, TY_REAL)
-	    call malloc (yseg, sz_val, TY_REAL)
+	    call malloc (xseg, segsize, TY_REAL)
+	    call malloc (yseg, segsize, TY_REAL)
 
 	    curpl_pt = 1
 	    lsize    = nint(GKI_UNPACKREAL(CCP_WIDTH(g_cc)))

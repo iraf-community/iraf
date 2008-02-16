@@ -10,7 +10,6 @@ pointer procedure imgibf (im, vs, ve, ndim, dtype)
 pointer	im
 long	vs[ndim], ve[ndim]
 int	dtype, ndim, i
-size_t	sz_val
 long	nget, nchars, totpix, imcssz()
 pointer	bdes
 errchk	imopsf, calloc, realloc, mfree, malloc
@@ -41,8 +40,7 @@ begin
 	    call realloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
 	else if (nchars > BD_BUFSIZE(bdes)) {
 	    call mfree (BD_BUFPTR(bdes), TY_CHAR)
-	    sz_val = nchars
-	    call malloc (BD_BUFPTR(bdes), sz_val, TY_CHAR)
+	    call malloc (BD_BUFPTR(bdes), nchars, TY_CHAR)
 	}
 
 	# Save section coordinates, datatype in buffer descriptor, and

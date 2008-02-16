@@ -340,7 +340,6 @@ int	nsinc		# sinc truncation length
 real	mindx		# interpolation mininmum in x
 real	mindy		# interpolation mininmum in y
 
-size_t	sz_val
 int	i, j, k, nconv, nx, ny, index, mink, maxk, offk, minj, maxj, offj
 int	last_point
 pointer	sp, taper, ac, ar
@@ -353,10 +352,9 @@ begin
 
 	# Allocate working array space.
 	call smark (sp)
-	sz_val = nconv
-	call salloc (taper, sz_val, TY_REAL)
-	call salloc (ac, sz_val, TY_REAL)
-	call salloc (ar, sz_val, TY_REAL)
+	call salloc (taper, nconv, TY_REAL)
+	call salloc (ac, nconv, TY_REAL)
+	call salloc (ar, nconv, TY_REAL)
 
 	# Compute the constants for the cosine bell taper.
         sconst = (HALFPI / nsinc) ** 2

@@ -57,18 +57,15 @@ int	lenroot			# length of the root string	(output)
 char	extn[SZ_VFNFN]		# OS filename extension		(output)
 int	lenextn			# length of the extn string	(output)
 
-size_t	sz_val
 pointer	sp, ip, vfn, fname, sqroot
 int	gstrcpy(), nowhite()
 errchk	syserr
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (vfn, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
-	sz_val = MAX_ROOTLEN
-	call salloc (sqroot, sz_val, TY_CHAR)
+	call salloc (vfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (sqroot, MAX_ROOTLEN, TY_CHAR)
 
 	# Strip any whitespace at either end of the filename.
 	if (nowhite (rawvfn, Memc[vfn], SZ_PATHNAME) == 0)
@@ -147,7 +144,6 @@ char	vfn[ARB]	# VFN possibly containing an ldir prefix
 char	outstr[maxch]	# output string
 int	maxch
 
-size_t	sz_val
 char	ch
 pointer	pbbuf					# pushback buffer
 pointer	pb_stack[MAX_PUSHBACK]			# pushback stack
@@ -161,8 +157,7 @@ errchk	syserrs, envfind
 
 begin
 	call smark (sp)
-	sz_val = SZ_PBBUF
-	call salloc (pbbuf, sz_val, TY_CHAR)
+	call salloc (pbbuf, SZ_PBBUF, TY_CHAR)
 
 	# Discard leading whitespace and copy the VFN into the input buffer.
 	for (in=1;  IS_WHITE (vfn[in]);  in=in+1)
@@ -335,7 +330,6 @@ int	lenroot			# nchars in root
 char	extn[SZ_VFNFN]		# receives the encoded filename extn
 int	lenextn			# nchars in extn
 
-size_t	sz_val
 int	out, i
 char	ch, nextch
 bool	uc_mode, processing_extension, escape_extension, subdir
@@ -347,8 +341,7 @@ define	notextn_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (field, sz_val, TY_CHAR)
+	call salloc (field, SZ_FNAME, TY_CHAR)
 
 	# Skip leading whitespace and control chars.
 	while (vfn[ip] > 0 && vfn[ip] <= BLANK)

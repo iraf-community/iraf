@@ -14,7 +14,6 @@ pointer procedure gtr_init (stream)
 
 int	stream			# graphics stream
 
-size_t	sz_val
 int	i, len_fb, len_sb
 pointer	tr, tx, ap, w
 bool	first_time
@@ -49,10 +48,8 @@ begin
 		len_sb = DEF_LENSCRATCHBUF
 	    }
 
-	    sz_val = len_fb
-	    call malloc (TR_FRAMEBUF(tr), sz_val, TY_SHORT)
-	    sz_val = len_sb
-	    call malloc (TR_SCRATCHBUF(tr), sz_val, TY_SHORT)
+	    call malloc (TR_FRAMEBUF(tr),   len_fb, TY_SHORT)
+	    call malloc (TR_SCRATCHBUF(tr), len_sb, TY_SHORT)
 
 	    trdes[stream] = tr
 	    TR_IP(tr) = TR_FRAMEBUF(tr)

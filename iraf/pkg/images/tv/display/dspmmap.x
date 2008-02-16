@@ -62,7 +62,6 @@ pointer procedure ds_pmimmap (pmname, refim)
 char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 
-size_t	sz_val
 int	i, ndim, npix, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
@@ -72,9 +71,8 @@ errchk	immap, mw_openim, im_pmmapo
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
@@ -123,7 +121,6 @@ procedure ds_match (im, refim)
 pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 
-size_t	sz_val
 int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
@@ -212,8 +209,7 @@ begin
 	    # If the scales are the same then it is just a problem of
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
-		sz_val = 3+3*nc
-		call malloc (bufpm, sz_val, TY_INT)
+		call malloc (bufpm, 3+3*nc, TY_INT)
 		k = nint (lt[5])
 		l = nint (lt[6])
 		do j = j1, j2 {
@@ -234,10 +230,8 @@ begin
 	    # Do all the geometry and pixel size matching.  This can
 	    # be slow.
 	    } else {
-		sz_val = nx
-		call malloc (bufpm, sz_val, TY_INT)
-		sz_val = nc
-		call malloc (bufref, sz_val, TY_INT)
+		call malloc (bufpm, nx, TY_INT)
+		call malloc (bufref, nc, TY_INT)
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)

@@ -29,7 +29,6 @@ pointer	xtrans, ytrans, listindex, xlist, ylist, ilineno, intri, intrirat
 real	tolerance, ptolerance, xin, yin, xmag, ymag, xrot, yrot
 real	pseparation, separation, ratio
 
-size_t	sz_val
 bool	clgetb()
 double	clgetd()
 int	fstati(), clplen(), clgeti(), clgwrd(), open(), clgfil()
@@ -46,26 +45,21 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (inname, sz_val, TY_CHAR)
-	call salloc (refname, sz_val, TY_CHAR)
-	call salloc (outname, sz_val, TY_CHAR)
-	call salloc (refpoints, sz_val, TY_CHAR)
-	sz_val = MAX_NTIE
-	call salloc (xreftie, sz_val, TY_REAL)
-	call salloc (yreftie, sz_val, TY_REAL)
-	call salloc (xintie, sz_val, TY_REAL)
-	call salloc (yintie, sz_val, TY_REAL)
-	sz_val = MAX_NCOEFF
-	call salloc (coeff, sz_val, TY_REAL)
-	sz_val = SZ_LINE
-	call salloc (projection, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	call salloc (lngformat, sz_val, TY_CHAR)
-	call salloc (latformat, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (inname, SZ_FNAME, TY_CHAR)
+	call salloc (refname, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (refpoints, SZ_FNAME, TY_CHAR)
+	call salloc (xreftie, MAX_NTIE, TY_REAL)
+	call salloc (yreftie, MAX_NTIE, TY_REAL)
+	call salloc (xintie, MAX_NTIE, TY_REAL)
+	call salloc (yintie, MAX_NTIE, TY_REAL)
+	call salloc (coeff, MAX_NCOEFF, TY_REAL)
+	call salloc (projection, SZ_LINE, TY_CHAR)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (lngformat, SZ_FNAME, TY_CHAR)
+	call salloc (latformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the input, output, and reference lists.
 	ilist = clpopnu ("input")
@@ -224,8 +218,7 @@ begin
 		# triangles used for matching and sort them in order of
 		# increasing ratio.
 
-		sz_val = ntrefstars
-		call malloc (rsindex, sz_val, TY_INT)
+		call malloc (rsindex, ntrefstars, TY_INT)
 	    	nrefstars = rg_sort (Memr[xref], Memr[yref], Memi[rsindex],
 	            ntrefstars, separation, YES, YES)
 		if (match != RG_TRIANGLES) {
@@ -320,10 +313,9 @@ begin
 		    call printf (
 		        "    No valid reference triangles can be defined\n")
 	    } else {
-	        sz_val = ntliststars
-	        call malloc (xtrans, sz_val, TY_REAL)
-	        call malloc (ytrans, sz_val, TY_REAL)
-	        call malloc (listindex, sz_val, TY_INT)
+	        call malloc (xtrans, ntliststars, TY_REAL)
+	        call malloc (ytrans, ntliststars, TY_REAL)
+	        call malloc (listindex, ntliststars, TY_INT)
 	        call rg_compute (Memr[xlist], Memr[ylist], Memr[xtrans],
 	            Memr[ytrans], ntliststars, Memr[coeff], MAX_NCOEFF)
 	        nliststars = rg_sort (Memr[xtrans], Memr[ytrans],
@@ -482,7 +474,6 @@ double	latref			#I the input reference dec / latitude
 int	lngunits		#I the ra / longitude units
 int	latunits		#I the dec / latitude units
 
-size_t	sz_val
 int	i, ip, bufsize, npts, lnpts, maxcols
 double	xval, yval
 pointer	sp, str, tx, ty
@@ -491,16 +482,14 @@ double	asumd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	sz_val = bufsize
-	call malloc (lng, sz_val, TY_DOUBLE)
-	call malloc (lat, sz_val, TY_DOUBLE)
-	call malloc (x, sz_val, TY_REAL)
-	call malloc (y, sz_val, TY_REAL)
-	call malloc (lineno, sz_val, TY_INT)
+	call malloc (lng, bufsize, TY_DOUBLE)
+	call malloc (lat, bufsize, TY_DOUBLE)
+	call malloc (x, bufsize, TY_REAL)
+	call malloc (y, bufsize, TY_REAL)
+	call malloc (lineno, bufsize, TY_INT)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0
@@ -550,9 +539,8 @@ begin
 		tlatref = asumd (Memd[lat], npts) / npts
 	    else
 		tlatref = latref
-	    sz_val = npts
-	    call salloc (tx, sz_val, TY_DOUBLE)
-	    call salloc (ty, sz_val, TY_DOUBLE)
+	    call salloc (tx, npts, TY_DOUBLE)
+	    call salloc (ty, npts, TY_DOUBLE)
 	    call rg_celtostd (projection, Memd[lng], Memd[lat], Memd[tx],
 		Memd[ty], npts, tlngref, tlatref, lngunits, latunits)
 	    call amulkd (Memd[tx], 3600.0d0, Memd[tx], npts)

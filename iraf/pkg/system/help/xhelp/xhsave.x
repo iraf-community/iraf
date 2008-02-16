@@ -18,7 +18,6 @@ char	oname[ARB]				#i output filename
 char	format[ARB]				#i format
 int	overwrite				#i overwrite flag
 
-size_t	sz_val
 pointer	sp, buf
 char	extn[SZ_EXTN]
 
@@ -27,8 +26,7 @@ int	access(), fnextn(), strlen(), strcmp()
 begin
 	if (access (oname, 0, 0) == YES && overwrite == NO) {
 	    call smark (sp)
-	    sz_val = SZ_LINE
-	    call salloc (buf, sz_val, TY_CHAR)
+	    call salloc (buf, SZ_LINE, TY_CHAR)
 	    call sprintf (Memc[buf], SZ_LINE,
 		"Operation would overwrite\nexisting file '%s'")
 		    call pargstr (oname)

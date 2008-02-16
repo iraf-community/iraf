@@ -16,13 +16,11 @@ int	nfparams	# number of fitted parameters
 real	tol		# fitting tolerance
 int	itmax		# maximum number of iterations
 
-size_t	sz_val
 errchk	malloc, calloc, nl_list
 
 begin
 	# Allocate space for the non-linear package structure.
-	sz_val = LEN_NLSTRUCT
-	call malloc (nl, sz_val, TY_STRUCT)
+	call malloc (nl, LEN_NLSTRUCT, TY_STRUCT)
 
 	# Store the addresses of the non-linear functions.
 	NL_FUNC(nl) = fnc

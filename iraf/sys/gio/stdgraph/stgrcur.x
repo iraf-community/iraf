@@ -62,7 +62,6 @@ int	sx, sy		#O screen coordinates of cursor in GKI units
 int	raster		#O raster number
 int	rx, ry		#O raster coordinates of cursor in GKI units
 
-size_t	sz_val
 short	texts[4]
 char	textc[4], ch
 pointer	sp, pbdevice, tx, o_tx
@@ -86,10 +85,8 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = SZ_GDEVICE
-	call salloc (pbdevice, sz_val, TY_CHAR)
-	sz_val = LEN_TX
-	call salloc (o_tx, sz_val, TY_STRUCT)
+	call salloc (pbdevice, SZ_GDEVICE, TY_CHAR)
+	call salloc (o_tx, LEN_TX, TY_STRUCT)
 
 	# The playback script may have been generated on a different graphics
 	# terminal than the one we are playing it back on.  Open the graphcap
@@ -227,7 +224,6 @@ int	sx, sy		#O cursor screen position in GKI coords
 int	raster		#O raster number
 int	rx, ry		#O cursor raster position in GKI coords
 
-size_t	sz_val
 pointer	decodecur, delimcur, pattern, patbuf, sp, otop
 int	len_pattern, len_curval, sv_iomode, nchars, ip, op, i1, i2, ch
 
@@ -239,12 +235,10 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (pattern, sz_val, TY_CHAR)
-	call salloc (patbuf, sz_val, TY_CHAR)
-	call salloc (decodecur, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (delimcur, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_LINE, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	call salloc (decodecur, SZ_LINE, TY_CHAR)
+	call salloc (delimcur, SZ_FNAME, TY_CHAR)
 
 	key = EOF
 

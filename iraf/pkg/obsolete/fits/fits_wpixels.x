@@ -17,7 +17,6 @@ int	blkfac			# fits blocking factor (0 for disk)
 
 # entry wft_write_pixels, wft_write_last_record
 
-size_t	sz_val
 int	fd			# output file descriptor
 char	buffer[1]		# input buffer
 int	npix			# number of pixels in the input buffer
@@ -50,12 +49,10 @@ begin
 	# Allocate space for the buffers.
 	if (spp != NULL)
 	    call mfree (spp, TY_CHAR)
-	sz_val = nch_rec
-	call malloc (spp, sz_val, TY_CHAR)
+	call malloc (spp, nch_rec, TY_CHAR)
 	if (mii != NULL)
 	    call mfree (mii, TY_INT)
-	sz_val = len_mii
-	call malloc (mii, sz_val, TY_INT)
+	call malloc (mii, len_mii, TY_INT)
 
 	op = 0
 	nrec = 0

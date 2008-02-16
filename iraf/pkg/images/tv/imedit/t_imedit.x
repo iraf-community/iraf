@@ -22,7 +22,6 @@ procedure t_imedit ()
 pointer	inlist		# List of input images
 pointer	outlist		# List of output images
  
-size_t	sz_val
 int	i, key, ap, xa, ya, xb, yb, x1, x2, y1, y2
 int	change, changes, newdisplay, newimage
 bool	erase
@@ -38,12 +37,10 @@ define	newim_	99
  
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	# Allocate and initialize imedit descriptor.
-	sz_val = EP_LEN
-	call salloc (ep, sz_val, TY_STRUCT)
+	call salloc (ep, EP_LEN, TY_STRUCT)
 	call aclri (Memi[ep], EP_LEN)
  
 	# Check the input and output image lists have proper format.
@@ -196,8 +193,7 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		    case 'q':	# Quit and save
 		    case 'u':	# Undo
 			if (EP_OUTDATA(ep) != NULL && EP_INDATA(ep) != NULL) {
-			    sz_val = EP_NPTS(ep)
-			    call malloc (temp, sz_val, TY_REAL)
+			    call malloc (temp, EP_NPTS(ep), TY_REAL)
 			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
 				EP_NPTS(ep))
 			    call amovr (Memr[EP_INDATA(ep)],

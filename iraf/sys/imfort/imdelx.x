@@ -12,7 +12,6 @@ procedure imdelx (image, ier)
 char	image[ARB]		#I image to be deleted
 int	ier			#O receives error status
 
-size_t	sz_val
 int	status
 pointer	im, sp, hdrfile, pixfile, ip
 int	stridxs()
@@ -20,9 +19,8 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
-	call salloc (pixfile, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
 
 	# Get the OS pathnames of the header and pixel files.
 

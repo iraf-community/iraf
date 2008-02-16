@@ -31,7 +31,6 @@ int	nout			# Number of images combined in output
 char	expname[ARB]		# Exposure name
 real	exposure		# Output exposure
 
-size_t	sz_val
 int	i, j, stack, ctor()
 real	rval, imgetr()
 long	clktime()
@@ -48,18 +47,15 @@ begin
 	    return
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_LINE, TY_CHAR)
 
 	stack = NO
 	if (project) {
 	    ifnoerr (call imgstr (in[1], "stck0001", Memc[fname], SZ_LINE))
 	        stack = YES
 	}
-	if (stack == YES) {
-	    sz_val = SZ_FNAME
-	    call salloc (key, sz_val, TY_CHAR)
-	}
+	if (stack == YES)
+	    call salloc (key, SZ_FNAME, TY_CHAR)
 
 	# Time stamp the log and print parameter information.
 

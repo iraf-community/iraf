@@ -12,7 +12,6 @@ int	fd, ndata, nbins
 pointer sp, file, device, data, hgm, hgmr, gp
 real	z1, z2, zmin, zmax, dz, zval
 
-size_t	sz_val
 bool	clgetb(), fp_equalr()
 int	i, clgeti(), open(), get_histdata()
 real	clgetr()
@@ -20,10 +19,8 @@ pointer	gopen()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (file, sz_val,  TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (device, sz_val, TY_CHAR)
+	call salloc (file,   SZ_LINE,  TY_CHAR)
+	call salloc (device,  SZ_FNAME, TY_CHAR)
 
 	# Get the file name.
 	call clgstr ("file", Memc[file], SZ_LINE)
@@ -42,13 +39,11 @@ begin
 	    call sfree (sp)
 	    return
 	}
-	sz_val = nbins
-	call salloc (hgm, sz_val, TY_INT)
-	call salloc (hgmr, sz_val, TY_REAL)
+	call salloc (hgm,  nbins, TY_INT)
+	call salloc (hgmr, nbins, TY_REAL)
 
 	# Fetch the data.
-	sz_val = SZ_HISTBUF
-	call malloc (data, sz_val, TY_REAL)
+	call malloc (data, SZ_HISTBUF, TY_REAL)
 	ndata = get_histdata (fd, data, SZ_HISTBUF)
 	if (ndata <= 0) {
 	    call eprintf ("Warning: No input data for histogram.\n")

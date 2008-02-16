@@ -12,7 +12,6 @@ procedure iispio (buf, nx, ny)
 short	buf[nx,ny]		# Cell array
 int	nx, ny			# length, number of image lines
 
-size_t	sz_val
 pointer	iobuf
 bool	first_time
 int	xferid, status, nbytes, szline, i
@@ -26,8 +25,7 @@ begin
 		i = IIS_MAXBUFSIZE
 	    else
 		i = IIS_MAXBUFSIZE * (SZ_SHORT * SZB_CHAR)
-	    sz_val = i
-	    call malloc (iobuf, sz_val, TY_SHORT)
+	    call malloc (iobuf, i, TY_SHORT)
 	    first_time = false
 	}
 

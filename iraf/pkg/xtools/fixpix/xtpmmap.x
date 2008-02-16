@@ -23,7 +23,6 @@ pointer	refim			#I Reference image pointer
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -31,8 +30,7 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -84,7 +82,6 @@ int	match			#I Match by physical coordinates?
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -92,8 +89,7 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -216,7 +212,6 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-size_t	sz_val
 int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
@@ -226,9 +221,8 @@ errchk	immap, mw_openim, im_pmmapo
 
 begin
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v1, sz_val, TY_LONG)
-	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v1, IM_MAXDIM, TY_LONG)
+	call salloc (v2, IM_MAXDIM, TY_LONG)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
@@ -482,7 +476,6 @@ procedure xt_pminvert (pm)
 
 pointer	pm		#I Pixel mask to be inverted
 
-size_t	sz_val
 int	i, naxes, axlen[IM_MAXDIM], depth, npix, val
 pointer	sp, v, buf, one
 bool	pm_linenotempty()
@@ -491,12 +484,9 @@ begin
 	call pm_gsize (pm, naxes, axlen, depth)
 
 	call smark (sp)
-	sz_val = IM_MAXDIM
-	call salloc (v, sz_val, TY_LONG)
-	sz_val = axlen[1]
-	call salloc (buf, sz_val, TY_INT)
-	sz_val = 6
-	call salloc (one, sz_val, TY_INT)
+	call salloc (v, IM_MAXDIM, TY_LONG)
+	call salloc (buf, axlen[1], TY_INT)
+	call salloc (one, 6, TY_INT)
 
 	npix = axlen[1]
 	RLI_LEN(one) = 2
@@ -547,7 +537,6 @@ pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 int	match			#I Match by physical coordinates?
 
-size_t	sz_val
 int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
@@ -639,8 +628,7 @@ begin
 	    # If the scales are the same then it is just a problem of
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
-		sz_val = 3+3*nc
-		call malloc (bufpm, sz_val, TY_INT)
+		call malloc (bufpm, 3+3*nc, TY_INT)
 		k = nint (lt[5])
 		l = nint (lt[6])
 		do j = max(1-l,j1), min(nl-l,j2) {
@@ -661,10 +649,8 @@ begin
 	    # Do all the geometry and pixel size matching.  This can
 	    # be slow.
 	    } else {
-		sz_val = nx
-		call malloc (bufpm, sz_val, TY_INT)
-		sz_val = nc
-		call malloc (bufref, sz_val, TY_INT)
+		call malloc (bufpm, nx, TY_INT)
+		call malloc (bufref, nc, TY_INT)
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)

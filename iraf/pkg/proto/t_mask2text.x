@@ -14,7 +14,6 @@ procedure t_mask2text ()
 pointer	mask			# Pixel mask
 pointer	text			# Text file
 
-size_t	sz_val
 int	i, fd, nc, nl, c1, c2, l, nalloc, nregions
 pointer	sp, regions, p, pmatch, im, bp
 
@@ -24,9 +23,8 @@ errchk	immap, open
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (text, sz_val, TY_CHAR)
-	call salloc (mask, sz_val, TY_CHAR)
+	call salloc (text, SZ_FNAME, TY_CHAR)
+	call salloc (mask, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("mask", Memc[mask], SZ_FNAME)
@@ -72,13 +70,11 @@ begin
 		if (pmatch == NULL) {
 		    if (nregions == nalloc) {
 			nalloc = nregions + 1
-			if (nalloc == 1) {
-			    sz_val = nalloc
-			    call malloc (regions, sz_val, TY_STRUCT)
-			} else
+			if (nalloc == 1)
+			    call malloc (regions, nalloc, TY_STRUCT)
+			else
 			    call realloc (regions, nalloc, TY_STRUCT)
-			sz_val = SZ_REGION
-			call salloc (Memi[regions+nregions], sz_val,
+			call salloc (Memi[regions+nregions], SZ_REGION,
 			    TY_STRUCT)
 		    }
 		    p = Memi[regions+nregions]

@@ -22,7 +22,6 @@ pointer im2			# output image
 int	blkfac[IM_MAXDIM]	# blocking factors
 int	option			# block operation (average, sum, ...)
 
-size_t	sz_val
 int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
 long	blkin_s[IM_MAXDIM], blkin_e[IM_MAXDIM]
@@ -36,8 +35,7 @@ errchk	imggsl(), impnll()
 
 begin
 	call smark (sp)
-	sz_val = IM_LEN(im1, 1)
-	call salloc (accum_ptr, sz_val, TY_LONG)
+	call salloc (accum_ptr, IM_LEN(im1, 1), TY_LONG)
 
 	# Initialize; input and output vectors, block counters.
 	ndim = IM_NDIM(im1)
@@ -142,7 +140,6 @@ pointer im2			# output image
 int	blkfac[IM_MAXDIM]	# blocking factors
 int	option			# block operation (average, sum, ...)
 
-size_t	sz_val
 int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
 long	blkin_s[IM_MAXDIM], blkin_e[IM_MAXDIM]
@@ -156,8 +153,7 @@ errchk	imggsr(), impnlr()
 
 begin
 	call smark (sp)
-	sz_val = IM_LEN(im1, 1)
-	call salloc (accum_ptr, sz_val, TY_REAL)
+	call salloc (accum_ptr, IM_LEN(im1, 1), TY_REAL)
 
 	# Initialize; input and output vectors, block counters.
 	ndim = IM_NDIM(im1)
@@ -262,7 +258,6 @@ pointer im2			# output image
 int	blkfac[IM_MAXDIM]	# blocking factors
 int	option			# block operation (average, sum, ...)
 
-size_t	sz_val
 int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
 long	blkin_s[IM_MAXDIM], blkin_e[IM_MAXDIM]
@@ -276,8 +271,7 @@ errchk	imggsd(), impnld()
 
 begin
 	call smark (sp)
-	sz_val = IM_LEN(im1, 1)
-	call salloc (accum_ptr, sz_val, TY_DOUBLE)
+	call salloc (accum_ptr, IM_LEN(im1, 1), TY_DOUBLE)
 
 	# Initialize; input and output vectors, block counters.
 	ndim = IM_NDIM(im1)

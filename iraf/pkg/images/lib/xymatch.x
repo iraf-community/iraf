@@ -12,7 +12,6 @@ pointer	lineno			#U pointer to the line numbers
 int	xcolumn			#I column containing the x coordinate
 int	ycolumn			#I column containing the y coordinate
 
-size_t	sz_val
 int	i, ip, bufsize, npts, lnpts, maxcols
 pointer	sp, str
 real	xval, yval
@@ -20,14 +19,12 @@ int	fscan(), nscan(), ctor()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	sz_val = bufsize
-	call malloc (x, sz_val, TY_REAL)
-	call malloc (y, sz_val, TY_REAL)
-	call malloc (lineno, sz_val, TY_INT)
+	call malloc (x, bufsize, TY_REAL)
+	call malloc (y, bufsize, TY_REAL)
+	call malloc (lineno, bufsize, TY_INT)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0

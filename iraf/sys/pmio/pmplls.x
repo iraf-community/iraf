@@ -15,7 +15,6 @@ int	ll_depth		#I line list depth, bits
 int	npix			#I number of pixels affected
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, ll_src, ll_dst, ll_stn, ll_out, px_src, im
 int	ll_len, step, xstep, temp, np, ip, i
 int	pl_l2pi(), pl_p2li()
@@ -30,8 +29,7 @@ begin
 	}
 
 	call smark (sp)
-	sz_val = LL_MAXLEN(pl)
-	call salloc (ll_src, sz_val, TY_SHORT)
+	call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
 	# Determine physical coords of line segment.
 	call amovl (v, v3, PM_MAXDIM)
@@ -57,8 +55,7 @@ begin
 	# list if the step size is greater than 1.
 
 	if (xstep < 0 || step > 1) {
-	    sz_val = np
-	    call salloc (px_src, sz_val, TY_INT)
+	    call salloc (px_src, np, TY_INT)
 	    i = pl_l2pi (ll_raw, 1, Memi[px_src], npix)
 	    call aclri (Memi[px_src+i], np - i)
 
@@ -75,8 +72,7 @@ begin
 		}
 
 		# Construct stencil.
-		sz_val = LL_MAXLEN(pl)
-		call salloc (ll_stn, sz_val, TY_SHORT)
+		call salloc (ll_stn, LL_MAXLEN(pl), TY_SHORT)
 		call aclri (Memi[px_src], np)
 		do i = 1, np, step
 		    Memi[px_src+i-1] = 1
@@ -95,8 +91,7 @@ begin
 	if (ll_stn == NULL)
 	    call pl_plls (pl, v1, Mems[ll_src], ll_depth, np, rop)
 	else {
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_out, sz_val, TY_SHORT)
+	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	    ll_dst = pl_access (pl, v1)
 	    call pl_linestencil (Mems[ll_src],  1, MV(ll_depth),
 		Mems[ll_dst], v1, PL_MAXVAL(pl), Mems[ll_stn], 1,

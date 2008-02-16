@@ -11,7 +11,6 @@ procedure msirestore (msi, interpolant)
 pointer	msi			# interpolant descriptor
 real	interpolant[ARB]	# array containing the interpolant
 
-size_t	sz_val
 int	interp_type, npix
 
 begin
@@ -21,8 +20,7 @@ begin
 
 	# allocate the interpolant descriptor structure and restore
 	# interpolant parameters
-	sz_val = LEN_MSISTRUCT
-	call malloc (msi, sz_val, TY_STRUCT)
+	call malloc (msi, LEN_MSISTRUCT, TY_STRUCT)
 	MSI_TYPE(msi) = interp_type
 	MSI_NSINC(msi) = nint (MSI_SAVENSINC(interpolant))
 	MSI_NXINCR(msi) = nint (MSI_SAVENXINCR(interpolant))
@@ -37,8 +35,7 @@ begin
 	MSI_BADVAL(msi) = MSI_SAVEBADVAL(interpolant)
 
 	# allocate space for and restore coefficients
-	sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
-	call malloc (MSI_COEFF(msi), sz_val,
+	call malloc (MSI_COEFF(msi), MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi),
 	    TY_REAL)
 	call amovr (interpolant[1+MSI_SAVECOEFF], COEFF(MSI_COEFF(msi)),
 	    MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi))

@@ -82,14 +82,12 @@ short	 a[ARB]			 #I input array
 char	 b[ARB]			 #O output array
 int	 npix			 #I number of pixels
 
-size_t	sz_val
 int	i
 pointer sp, ip
 
 begin
 	call smark (sp)
-	sz_val = npix+1
-	call salloc (ip, sz_val, TY_INT)
+	call salloc (ip, npix+1, TY_INT)
 		 
 	do i = 1, npix
 	    Memi[ip+i] = a[i] + 32768

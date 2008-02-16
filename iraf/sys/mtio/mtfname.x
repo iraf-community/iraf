@@ -12,16 +12,13 @@ int	fileno				#I desired file number
 char	outstr[ARB]			#O output mtname string
 int	maxch				#I maxch chars out
 
-size_t	sz_val
 int	ofileno, orecno
 pointer	sp, device, devcap
 
 begin
 	call smark (sp)
-	sz_val = SZ_DEVICE
-	call salloc (device, sz_val, TY_CHAR)
-	sz_val = SZ_DEVCAP
-	call salloc (devcap, sz_val, TY_CHAR)
+	call salloc (device, SZ_DEVICE, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
 	call mtparse (mtname, Memc[device], SZ_DEVICE, ofileno, orecno,
 	    Memc[devcap], SZ_DEVCAP)

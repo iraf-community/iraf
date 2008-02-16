@@ -13,7 +13,6 @@ procedure mt_read_lockfile (mtname, mt)
 char	mtname[ARB]		#I device name
 int	mt			#I MTIO descriptor
 
-size_t	sz_val
 int	fd, ip
 pointer	sp, lockfile, lbuf
 int	strmatch(), stridxs(), ctoi(), open(), getline()
@@ -23,10 +22,8 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (lockfile, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lockfile, SZ_FNAME, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	# If the lock file cannot be accessed, return an undefined tape
 	# position but do not abort.

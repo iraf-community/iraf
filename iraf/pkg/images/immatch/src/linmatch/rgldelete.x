@@ -142,7 +142,6 @@ real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 int	delete			#I delete the input object
 
-size_t	sz_val
 int	nregions, region, mtype
 pointer	sp, xdata, ydata
 int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
@@ -178,9 +177,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xdata, sz_val, TY_REAL)
-	call salloc (ydata, sz_val, TY_REAL)
+	call salloc (xdata, nregions, TY_REAL)
+	call salloc (ydata, nregions, TY_REAL)
 
 	# Get the data.
 	switch (mtype) {
@@ -223,7 +221,6 @@ real	bscale			#I the computed bscale factor
 real	bzero			#I the computed bzero factor
 int	delete			#I delete the input object
 
-size_t	sz_val
 int	nregions, region, mtype
 pointer	sp, xdata, ydata
 int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
@@ -259,9 +256,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xdata, sz_val, TY_REAL)
-	call salloc (ydata, sz_val, TY_REAL)
+	call salloc (xdata, nregions, TY_REAL)
+	call salloc (ydata, nregions, TY_REAL)
 
 	switch (mtype) {
 	case LS_MEAN:
@@ -311,7 +307,6 @@ real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 int	delete			#I delete the input object
 
-size_t	sz_val
 int	i, nregions, region
 pointer	sp, xreg
 int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
@@ -323,8 +318,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xreg, sz_val, TY_REAL)
+	call salloc (xreg, nregions, TY_REAL)
 	do i = 1, nregions
 	    Memr[xreg+i-1] = i
 
@@ -375,7 +369,6 @@ real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 int	delete			#I delete the input object
 
-size_t	sz_val
 int	i, nregions, region
 pointer	sp, xreg, yreg
 int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
@@ -387,9 +380,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xreg, sz_val, TY_REAL)
-	call salloc (yreg, sz_val, TY_REAL)
+	call salloc (xreg, nregions, TY_REAL)
+	call salloc (yreg, nregions, TY_REAL)
 	do i = 1, nregions
 	    Memr[xreg+i-1] = i
 
@@ -494,7 +486,6 @@ real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 int	delete			#I delete the input object
 
-size_t	sz_val
 int	nregions, region
 pointer	sp, resid
 int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
@@ -506,8 +497,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nregions, TY_REAL)
 
 	if (wcs == 1) {
 	    if (bscale > 0.0) {
@@ -564,7 +554,6 @@ pointer	ls			#I pointer to the linmatch structure
 real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 
-size_t	sz_val
 int	nregions, mtype, region
 pointer	sp, xdata, ydata
 int	rg_lstati(), rg_lpfind()
@@ -600,9 +589,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xdata, sz_val, TY_REAL)
-	call salloc (ydata, sz_val, TY_REAL)
+	call salloc (xdata, nregions, TY_REAL)
+	call salloc (ydata, nregions, TY_REAL)
 
 	# Get the data.
 	switch (mtype) {
@@ -636,7 +624,6 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale factor
 real	bzero			#I the input bzero factor
 
-size_t	sz_val
 int	nregions, mtype, region
 pointer	sp, xdata, ydata
 int	rg_lstati(), rg_lpfind()
@@ -672,9 +659,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xdata, sz_val, TY_REAL)
-	call salloc (ydata, sz_val, TY_REAL)
+	call salloc (xdata, nregions, TY_REAL)
+	call salloc (ydata, nregions, TY_REAL)
 
 	switch (mtype) {
 	case LS_MEAN:
@@ -716,7 +702,6 @@ int	wcs			#I the input wcs
 real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 
-size_t	sz_val
 int	i, nregions, region
 pointer	sp, xreg
 int	rg_lstati(), rg_lpfind()
@@ -728,8 +713,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xreg, sz_val, TY_REAL)
+	call salloc (xreg, nregions, TY_REAL)
 	do i = 1, nregions
 	    Memr[xreg+i-1] = i
 
@@ -761,7 +745,6 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale value
 real	bzero			#I the input bscale value
 
-size_t	sz_val
 int	i, nregions, region
 pointer	sp, xreg, yreg
 int	rg_lstati(), rg_lpfind()
@@ -773,9 +756,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (xreg, sz_val, TY_REAL)
-	call salloc (yreg, sz_val, TY_REAL)
+	call salloc (xreg, nregions, TY_REAL)
+	call salloc (yreg, nregions, TY_REAL)
 
 	do i = 1, nregions
 	    Memr[xreg+i-1] = i
@@ -845,7 +827,6 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 
-size_t	sz_val
 int	nregions, region
 pointer	sp, resid
 int	rg_lstati(), rg_lpfind()
@@ -857,8 +838,7 @@ begin
 	    return (0)
 
 	call smark (sp)
-	sz_val = nregions
-	call salloc (resid, sz_val, TY_REAL)
+	call salloc (resid, nregions, TY_REAL)
 
 	if (wcs == 1) {
 	    if (bscale > 0.0) {

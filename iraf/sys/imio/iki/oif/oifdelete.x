@@ -14,7 +14,6 @@ char	root[ARB]		#I root filename
 char	extn[ARB]		#U extension
 int	status
 
-size_t	sz_val
 int	junk
 pointer	sp, fname, pixfile
 int	access(), protect()
@@ -22,9 +21,8 @@ pointer	im, immapz()
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (pixfile, sz_val, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
 
 	# Generate filename.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)

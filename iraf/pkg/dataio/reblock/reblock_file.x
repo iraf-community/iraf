@@ -13,7 +13,6 @@ char	in_fname[ARB]		# input file name
 char	out_fname[ARB]		# output file name
 int	outparam[ARB]		# output parameters
 
-size_t	sz_val
 char	padchar
 int	in, out, sz_charsin, sz_charsout, mov_nbytes, rem_in, rem_out
 int	bytes_read, ip, op, i, first_byte, nchars, rec_count, ntrim
@@ -32,8 +31,7 @@ begin
 
 	# Allocate space for input buffer.
 	sz_charsin = fstati (in, F_BUFSIZE)
-	sz_val = sz_charsin
-	call malloc (inbuf, sz_val, TY_CHAR)
+	call malloc (inbuf, sz_charsin, TY_CHAR)
 	outbuf = NULL
 
 	# Skip over n input blocks (tape) or records (disk).
@@ -122,8 +120,7 @@ begin
 	            # Allocate space for the output buffer.
 	            sz_charsout = reb_roundup (szb_outblock, SZB_CHAR) /
 		        SZB_CHAR
-	            sz_val = sz_charsout
-	            call malloc (outbuf, sz_val, TY_CHAR)
+	            call malloc (outbuf, sz_charsout, TY_CHAR)
 
 	            # Intialize the record remainder counters
 	            rem_in = szb_inrecord

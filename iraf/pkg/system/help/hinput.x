@@ -121,7 +121,6 @@ char	lbuf
 bool	formatted
 char	param[ARB]
 
-size_t	sz_val
 bool	match_found
 pointer	sp, pattern
 int	getline(), strmatch(), strlen()
@@ -129,8 +128,7 @@ errchk	getline
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_FNAME, TY_CHAR)
 
 	match_found = false
 
@@ -176,7 +174,6 @@ char	lbuf			# line buffer
 bool	formatted		# is help block formatted
 char	sections[ARB]		# list of sections "a|b|c"
 
-size_t	sz_val
 bool	match_found
 int	npat, ip
 pointer	sp, patbuf, patoff[MAXPAT], op
@@ -186,8 +183,7 @@ errchk	getline
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (patbuf, SZ_LINE, TY_CHAR)
 
 	# Process the list of sections into patbuf and patoff, i.e., into a
 	# list of EOS delimited strings in the string buffer patbuf.  Each
@@ -256,15 +252,13 @@ char	lbuf[ARB]		# line of text
 pointer	patoff[npat]		# pointers to pattern strings
 int	npat			# number of patterns
 
-size_t	sz_val
 int	pat
 pointer	sp, pattern
 int	strmatch()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (pattern, SZ_FNAME, TY_CHAR)
 
 	for (pat=1;  pat <= npat;  pat=pat+1) {
 	    call sprintf (Memc[pattern], SZ_FNAME, "^{%s}")

@@ -70,7 +70,6 @@ int	nder		# order of derivative, order = 0, no derivative
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# basis functions
 
-size_t	sz_val
 int	i, k
 pointer	fn, dfn, xnorm, bptr, fptr
 double	fac
@@ -87,8 +86,7 @@ begin
 	call calloc (dfn, npts * (order + nder), TY_DOUBLE)
 
 	# Compute the normalized x values.
-	sz_val = npts
-	call malloc (xnorm, sz_val, TY_DOUBLE)
+	call malloc (xnorm, npts, TY_DOUBLE)
         call altad (x, Memd[xnorm], npts, k1, k2)
 
 	# Compute the current solution.
@@ -161,7 +159,6 @@ int	nder		# order of derivate, 0 is no derivative
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# array of basis functions
 
-size_t	sz_val
 int	i, k
 pointer	fn, dfn, xnorm, bptr, fptr
 double	ri, ri1, ri2, fac
@@ -178,8 +175,7 @@ begin
 	call calloc (dfn, npts * (order + nder), TY_DOUBLE)
 
 	# Compute the normalized x values.
-	sz_val = npts
-	call malloc (xnorm, sz_val, TY_DOUBLE)
+	call malloc (xnorm, npts, TY_DOUBLE)
         call altad (x, Memd[xnorm], npts, k1, k2)
 
 	# Compute the basis functions.

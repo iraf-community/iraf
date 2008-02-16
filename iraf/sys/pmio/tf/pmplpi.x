@@ -15,7 +15,6 @@ int	px_depth		#I pixel depth, bits
 int	npix			#I number of pixels affected
 int	rop			#I rasterop
 
-size_t	sz_val
 pointer	sp, ll_src
 int	ll_len, pl_p2li()
 include	"../pmio.com"
@@ -25,8 +24,7 @@ begin
 	    call pl_plpi (pl, v, px_src, px_depth, npix, rop)
 	else {
 	    call smark (sp)
-	    sz_val = LL_MAXLEN(pl)
-	    call salloc (ll_src, sz_val, TY_SHORT)
+	    call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
 	    ll_len = pl_p2li (px_src, 1, Mems[ll_src], npix)
 	    call pm_plls (pl, v, Mems[ll_src], px_depth, npix, rop)

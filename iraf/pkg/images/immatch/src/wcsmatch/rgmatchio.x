@@ -15,7 +15,6 @@ int	ycolumn			#I column containing the y coordinate
 int	xunits			#I the x coordinate units
 int	yunits			#I the y coordinate units
 
-size_t	sz_val
 double	xval, yval
 int	i, ip, bufsize, maxcols, npts
 pointer	sp, str
@@ -23,13 +22,11 @@ int	fscan(), nscan(), ctod()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
-	sz_val = bufsize
-	call malloc (x, sz_val, TY_DOUBLE)
-	call malloc (y, sz_val, TY_DOUBLE)
+	call malloc (x, bufsize, TY_DOUBLE)
+	call malloc (y, bufsize, TY_DOUBLE)
 	maxcols = max (xcolumn, ycolumn)
 
 	npts = 0

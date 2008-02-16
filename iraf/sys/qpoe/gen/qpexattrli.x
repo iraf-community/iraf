@@ -29,7 +29,6 @@ pointer	xs			#U pointer to array of start values
 pointer	xe			#U pointer to array of end values
 int	xlen			#U length of xs/xe arrays
 
-size_t	sz_val
 pointer	ps, pe, qs, qe
 pointer	sp, expr, ip, ep
 int	plen, qlen, np, nq, nx
@@ -48,8 +47,7 @@ begin
 
 	repeat {
 	    maxch = maxch * 2
-	    sz_val = maxch
-	    call salloc (expr, sz_val, TY_CHAR)
+	    call salloc (expr, maxch, TY_CHAR)
 	    nchars = qpex_getattribute (ex, attribute, Memc[expr], maxch)
 	    if (nchars <= 0)
 		break
@@ -65,13 +63,11 @@ begin
 	if (nchars > 0) {
 	    # Get range list storage.
 	    plen = DEF_XLEN
-	    sz_val = plen
-	    call malloc (ps, sz_val, TY_INT)
-	    call malloc (pe, sz_val, TY_INT)
+	    call malloc (ps, plen, TY_INT)
+	    call malloc (pe, plen, TY_INT)
 	    qlen = DEF_XLEN
-	    sz_val = qlen
-	    call malloc (qs, sz_val, TY_INT)
-	    call malloc (qe, sz_val, TY_INT)
+	    call malloc (qs, qlen, TY_INT)
+	    call malloc (qe, qlen, TY_INT)
 
 	    # Parse each subexpression and merge into output range list.
 	    for (ip=expr;  Memc[ip] != EOS;  ) {

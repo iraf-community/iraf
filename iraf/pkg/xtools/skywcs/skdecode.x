@@ -18,7 +18,6 @@ pointer	mw			#O the pointer to the image wcs structure
 pointer	coo			#O the pointer to the coordinate structure
 pointer	imcoo			#I pointer to an existing coordinate structure 
 
-size_t	sz_val
 int	stat
 pointer	sp, str1, str2, laxno, paxval, im
 int	sk_strwcs(), sk_decim()
@@ -31,12 +30,10 @@ begin
 
 	# Allocate some working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (laxno, sz_val, TY_INT)
-	call salloc (paxval, sz_val, TY_INT)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
+	call salloc (laxno, IM_MAXDIM, TY_INT)
+	call salloc (paxval, IM_MAXDIM, TY_INT)
 
 	# Decode the wcs.
 	call sscan (instr)
@@ -180,7 +177,6 @@ char	wcs[ARB]		#I the wcs string [logical|tv|physical|world]
 pointer	mw			#O the pointer to the image wcs structure
 pointer	coo			#O the pointer to the coordinate structure
 
-size_t	sz_val
 int	stat
 pointer	sp, str1, laxno, paxval
 int	sk_imwcs(), strdic(), mw_stati()
@@ -188,18 +184,15 @@ pointer	mw_openim()
 errchk	mw_openim()
 
 begin
-	sz_val = LEN_SKYCOOSTRUCT
-	call malloc (coo, sz_val, TY_STRUCT)
+	call malloc (coo, LEN_SKYCOOSTRUCT, TY_STRUCT)
 	call sprintf (SKY_COOSYSTEM(coo), SZ_FNAME, "%s %s")
 	    call pargstr (IM_HDRFILE(im))
 	    call pargstr (wcs)
 
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (laxno, sz_val, TY_INT)
-	call salloc (paxval, sz_val, TY_INT)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (laxno, IM_MAXDIM, TY_INT)
+	call salloc (paxval, IM_MAXDIM, TY_INT)
 
 	# Try to open the image wcs.
 	iferr {
@@ -312,7 +305,6 @@ int	radecsys		#O the output equatorial reference system
 double	equinox			#O the output equinox
 double	epoch			#O the output epoch of the observation
 
-size_t	sz_val
 int	ip, nitems, sctype, sradecsys, stat
 pointer	sp, str1, str2
 int	strdic(), nscan(), ctod()
@@ -327,9 +319,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	# Determine the coordinate string.
 	call sscan (instr)
@@ -655,7 +646,6 @@ int	radecsys		#O the output equatorial reference system
 double	equinox			#O the output equinox
 double	epoch			#O the output epoch of the observation
 
-size_t	sz_val
 int	i, ndim, axtype, day, month, year, ier, oldfits
 pointer	sp, atval
 double	hours
@@ -665,8 +655,7 @@ errchk	mw_gwattrs(), imgstr(), imgetd()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (atval, sz_val, TY_CHAR)
+	call salloc (atval, SZ_LINE, TY_CHAR)
 
 	# Initialize
 	ctype = 0

@@ -36,7 +36,6 @@ pointer	inlist, outlist
 pointer	imlist, sp, image, columns, units, iwcs, owcs, fmtstr, fmtptrs
 pointer	str, name, im, mw, ct, tmp
 
-size_t	sz_val
 bool	clgetb()
 pointer	imtopenp()
 int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
@@ -47,20 +46,15 @@ errchk	mw_openim(), mw_gwattrs(), mw_sctran()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (image, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (columns, sz_val, TY_INT)
-	call salloc (units, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (iwcs, sz_val, TY_CHAR)
-	call salloc (owcs, sz_val, TY_CHAR)
-	call salloc (fmtstr, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (fmtptrs, sz_val, TY_POINTER)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
-	call salloc (name, sz_val, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (columns, IM_MAXDIM, TY_INT)
+	call salloc (units, IM_MAXDIM, TY_INT)
+	call salloc (iwcs, SZ_FNAME, TY_CHAR)
+	call salloc (owcs, SZ_FNAME, TY_CHAR)
+	call salloc (fmtstr, SZ_FNAME, TY_CHAR)
+	call salloc (fmtptrs, IM_MAXDIM, TY_POINTER)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (name, SZ_FNAME, TY_CHAR)
 
 	# Get the input and output image and file lists.
 	imlist = imtopenp ("image")
@@ -187,8 +181,7 @@ begin
 
 		call sscan (Memc[fmtstr])
 		do i = 1, IM_MAXDIM {
-	    	    sz_val = SZ_FNAME
-	    	    call malloc (Memi[fmtptrs+i-1], sz_val, TY_CHAR)
+	    	    call malloc (Memi[fmtptrs+i-1], SZ_FNAME, TY_CHAR)
 		    call gargwrd (Memc[Memi[fmtptrs+i-1]], SZ_FNAME)
 		    if (nscan() != i || Memc[Memi[fmtptrs+i-1]] == EOS) {
 			if (outwcs == WT_WORLD) {
@@ -314,7 +307,6 @@ pointer	fmtptrs[ARB]		#I the array of format pointers
 int	wcsndim			#I the dimensions of the wcs
 int	min_sigdigits		#I the minimum number of significant digits
 
-size_t	sz_val
 int	nline, ip, nread, nwrite, max_fields, nfields, offset
 pointer	sp, inbuf, linebuf, field_pos, outbuf, voff, vstep, paxno, laxno, incoo
 pointer	lincoo, outcoo, nsig
@@ -323,23 +315,19 @@ int	getline(), li_get_numd()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (inbuf, sz_val, TY_CHAR)
-	call salloc (linebuf, sz_val, TY_CHAR)
-	sz_val = MAX_FIELDS
-	call salloc (field_pos, sz_val, TY_INT)
-	sz_val = SZ_LINE
-	call salloc (outbuf, sz_val, TY_CHAR)
+	call salloc (inbuf, SZ_LINE, TY_CHAR)
+	call salloc (linebuf, SZ_LINE, TY_CHAR)
+	call salloc (field_pos, MAX_FIELDS, TY_INT)
+	call salloc (outbuf, SZ_LINE, TY_CHAR)
 
-	sz_val = wcsndim
-	call salloc (voff, sz_val, TY_DOUBLE)
-	call salloc (vstep, sz_val, TY_DOUBLE)
-	call salloc (paxno, sz_val, TY_INT)
-	call salloc (laxno, sz_val, TY_INT)
-	call salloc (incoo, sz_val, TY_DOUBLE)
-	call salloc (lincoo, sz_val, TY_DOUBLE)
-	call salloc (outcoo, sz_val, TY_DOUBLE)
-	call salloc (nsig, sz_val, TY_INT)
+	call salloc (voff, wcsndim, TY_DOUBLE)
+	call salloc (vstep, wcsndim, TY_DOUBLE)
+	call salloc (paxno, wcsndim, TY_INT)
+	call salloc (laxno, wcsndim, TY_INT)
+	call salloc (incoo, wcsndim, TY_DOUBLE)
+	call salloc (lincoo, wcsndim, TY_DOUBLE)
+	call salloc (outcoo, wcsndim, TY_DOUBLE)
+	call salloc (nsig, wcsndim, TY_INT)
 
 	call mw_gaxmap (mw, Memi[paxno], Memi[laxno], wcsndim)
 	call wt_laxmap (outwcs, Memi[paxno], wcsndim, Memi[laxno], ndim)

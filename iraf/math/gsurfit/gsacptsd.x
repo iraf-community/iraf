@@ -22,7 +22,6 @@ double	w[npts]		# array of weights
 int	npts		# number of data points
 int	wtflag		# type of weighting
 
-size_t	sz_val
 int	i, ii, j, jj, k, l, ll
 int	maxorder, xorder, xxorder, ntimes
 pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
@@ -76,28 +75,22 @@ begin
 	# calculate the non-zero basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
-	    sz_val = npts * GS_XORDER(sf)
-	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
-	    sz_val = npts * GS_YORDER(sf)
-	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
+	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
+	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
 	    call dgs_bleg (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call dgs_bleg (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_CHEBYSHEV:
-	    sz_val = npts * GS_XORDER(sf)
-	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
-	    sz_val = npts * GS_YORDER(sf)
-	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
+	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
+	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
 	    call dgs_bcheb (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call dgs_bcheb (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_POLYNOMIAL:
-	    sz_val = npts * GS_XORDER(sf)
-	    call salloc (GS_XBASIS(sf), sz_val, TY_DOUBLE)
-	    sz_val = npts * GS_YORDER(sf)
-	    call salloc (GS_YBASIS(sf), sz_val, TY_DOUBLE)
+	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
+	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
 	    call dgs_bpol (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call dgs_bpol (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
@@ -108,9 +101,8 @@ begin
 
 
 	# allocate temporary storage space for matrix accumulation
-	sz_val = npts
-	call salloc (byw, sz_val, TY_DOUBLE)
-	call salloc (bw, sz_val, TY_DOUBLE)
+	call salloc (byw, npts, TY_DOUBLE)
+	call salloc (bw, npts, TY_DOUBLE)
 
 	# one index the pointers
 	vzptr = GS_VECTOR(sf) - 1

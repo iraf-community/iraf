@@ -54,7 +54,6 @@ procedure wf_tnx_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
-size_t	sz_val
 int	i, szatstr
 double	dec
 pointer	atvalue, ct, mw, wp, wv
@@ -64,8 +63,7 @@ errchk	wf_decaxis(), mw_gwattrs()
 
 begin
 	# Allocate space for the attribute string.
-	sz_val = SZ_LINE
-	call malloc (atvalue, sz_val, TY_CHAR)
+	call malloc (atvalue, SZ_LINE, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)

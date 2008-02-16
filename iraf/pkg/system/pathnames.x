@@ -9,16 +9,14 @@
 procedure t_pathnames()
 
 pointer	sp, fname, osfname, list
-size_t	sz_val
 bool	streq(), clgetb()
 int	clgeti(), clgfil(), fscan()
 pointer	clpopni(), clpopnu()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (osfname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_LINE, TY_CHAR)
+	call salloc (osfname, SZ_LINE, TY_CHAR)
 
 	# If no arguments, return the pathame of the current
 	# directory: do not prompt for the template.

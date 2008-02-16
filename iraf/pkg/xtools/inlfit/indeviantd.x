@@ -21,7 +21,6 @@ double	grow				# Rejection radius
 int	nreject				# Number of points rejected (output)
 int	newreject			# Number of new points rej. (output)
 
-size_t	sz_val
 int	i, j, i_min, i_max, ilast
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
@@ -47,8 +46,7 @@ begin
 
 	# Allocate memory for the residuals.
 	call smark (sp)
-	sz_val = npts
-	call salloc (residuals, sz_val, TY_DOUBLE)
+	call salloc (residuals, npts, TY_DOUBLE)
 
 	# Compute the residuals.
 	call nlvectord (nl, x, Memd[residuals], npts, nvars)

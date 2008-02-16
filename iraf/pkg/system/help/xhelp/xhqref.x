@@ -53,7 +53,6 @@ procedure xh_make_quickref (xh, quickref)
 pointer	xh					#i task struct pointer
 char	quickref[ARB]				#i quickref filename
 
-size_t	sz_val
 pointer	pkglist, pp
 int	fdi, fdo, fd_err
 int	sz_pbuf, npkgs
@@ -106,8 +105,7 @@ begin
 	lastpkg[1] = EOS
 	npkgs = 0
 	sz_pbuf = MAX_PKGS * SZ_PKG
-	sz_val = sz_pbuf
-	call malloc (pkglist, sz_val, TY_CHAR)
+	call malloc (pkglist, sz_pbuf, TY_CHAR)
 	pp = pkglist
 
 	# Loop over the lines in the file, save the ones that are the
@@ -173,7 +171,6 @@ procedure xh_make_pkglist (list)
 
 char	list[ARB]				#i package list
 
-size_t	sz_val
 pointer	sp, err, pkg
 pointer	stp, sym
 int	i, ip, fd
@@ -184,10 +181,8 @@ errchk	open
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (err, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (pkg, sz_val, TY_CHAR)
+	call salloc (err, SZ_LINE, TY_CHAR)
+	call salloc (pkg, SZ_FNAME, TY_CHAR)
 
 	# Delete existing files.
 	if (access(PKGFILE,0,0) == YES)	

@@ -22,16 +22,14 @@ real	wts[npts]			# Weights
 int	npts				# Number of points
 int	nvars				# Number of variables
 
-size_t	sz_val
 pointer	xout, yout
 pointer	sp
 
 begin
 	# Alloacate axes data memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (xout, sz_val, TY_REAL)
-	call salloc (yout, sz_val, TY_REAL)
+	call salloc (xout, npts, TY_REAL)
+	call salloc (yout, npts, TY_REAL)
 
 	# Set axes data.
 	call ing_axesr (in, gt, nl, 1, x, y, Memr[xout], npts, nvars)
@@ -66,7 +64,6 @@ real	y[npts]				# Abscissas
 real	wts[npts]			# Weights
 int	npts				# Number of points
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
@@ -75,12 +72,10 @@ int	in_geti()
 begin
 	# Allocate memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	sz_val = 2
-	call salloc (xr1, sz_val, TY_REAL)
-	call salloc (yr1, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (xr1, 2, TY_REAL)
+	call salloc (yr1, 2, TY_REAL)
 
 	# Change type to real for plotting.
 	call achtrr (x, Memr[xr], npts)
@@ -136,7 +131,6 @@ pointer	gt			# GTOOLS pointer
 real	x[npts], y[npts]	# Data points
 int	npts			# Number of data points
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, gt1
 pointer	rejpts
@@ -151,9 +145,8 @@ begin
 
 	# Allocate axes memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
 
 	# Change type to real for plotting.
 	call achtrr (x, Memr[xr], npts)
@@ -193,7 +186,6 @@ real	wts[npts]		# weights
 int	npts			# Number of points to plot
 int	nvars			# Number of variables
 
-size_t	sz_val
 int	i
 pointer	sp, xr, yr, x, y, xo, yo, gt1
 
@@ -207,15 +199,12 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = npts
-	call salloc (xr, sz_val, TY_REAL)
-	call salloc (yr, sz_val, TY_REAL)
-	sz_val = npts * nvars
-	call salloc (x, sz_val, TY_REAL)
-	sz_val = npts
-	call salloc (y, sz_val, TY_REAL)
-	call salloc (xo, sz_val, TY_REAL)
-	call salloc (yo, sz_val, TY_REAL)
+	call salloc (xr, npts, TY_REAL)
+	call salloc (yr, npts, TY_REAL)
+	call salloc (x,  npts * nvars, TY_REAL)
+	call salloc (y,  npts, TY_REAL)
+	call salloc (xo, npts, TY_REAL)
+	call salloc (yo, npts, TY_REAL)
 
 	# Move input data into vector.
 	call amovr (xin, Memr[x], npts * nvars)

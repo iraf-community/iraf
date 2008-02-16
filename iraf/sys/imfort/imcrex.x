@@ -20,7 +20,6 @@ int	naxis			#I number of axes
 int	pixtype			#I pixel type
 int	ier			#O receives error status
 
-size_t	sz_val
 pointer	fp
 int	status, ip, i
 long	pfsize, clktime, cputime
@@ -34,15 +33,12 @@ errchk	calloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (hdrfile, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (pixfile, sz_val, TY_CHAR)
-	call salloc (osfn, sz_val, TY_CHAR)
-	sz_val = SZ_FNAME
-	call salloc (root, sz_val, TY_CHAR)
-	call salloc (extn, sz_val, TY_CHAR)
-	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (hdrfile, SZ_FNAME, TY_CHAR)
+	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+	call salloc (sval, SZ_FNAME, TY_CHAR)
 
 	# Verify image size and datatype operands.
 	ier = OK

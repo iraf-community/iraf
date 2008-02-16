@@ -16,7 +16,6 @@ double	wts[ARB]	# Weights
 int	npts		# Number of data points
 pointer	gt		# GTOOLS pointer
 
-size_t	sz_val
 int	i, n, deleted
 double	rms
 pointer	sp, fit, wts1, str, params
@@ -33,9 +32,8 @@ begin
 	if (n == npts) {
 	    # Allocate memory for the fit.
 
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_DOUBLE)
-	    call salloc (wts1, sz_val, TY_DOUBLE)
+	    call salloc (fit, n, TY_DOUBLE)
+	    call salloc (wts1, n, TY_DOUBLE)
 
 	    # Eliminate rejected points and count deleted points.
 
@@ -62,9 +60,8 @@ begin
 	} else if (n > 0) {
 	    # Allocate memory for the fit.
 
-	    sz_val = n
-	    call salloc (fit, sz_val, TY_DOUBLE)
-	    call salloc (wts1, sz_val, TY_DOUBLE)
+	    call salloc (fit, n, TY_DOUBLE)
+	    call salloc (wts1, n, TY_DOUBLE)
 
 	    # Eliminate rejected points and count deleted points.
 
@@ -93,10 +90,8 @@ begin
 
 	# Print the parameters and errors.
 
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
-	sz_val = 2*SZ_LINE
-	call salloc (params, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (params, 2*SZ_LINE, TY_CHAR)
 
 	call sprintf (Memc[str], SZ_LINE,
 	    "func=%s, order=%d, low_rej=%r, high_rej=%r, niterate=%d, grow=%r")

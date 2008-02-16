@@ -18,7 +18,6 @@ char	pkey[ARB]		#I 'key' will be inserted bef/after pkey
 char	datatype[ARB]		#I string permits generalization to domains
 int     baf			# I Insert BEFORE or AFTER
 
-size_t	sz_val
 pointer	rp, sp, keyname, ua, ip
 int	fd, max_lenuserarea, curlen, buflen, nchars, piv
 int	idb_kwlookup(), idb_findrecord()
@@ -28,8 +27,7 @@ errchk	syserrs, sprintf, pargstr, pargi
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyname, sz_val, TY_CHAR)
+	call salloc (keyname, SZ_FNAME, TY_CHAR)
 
 	nchars = idb_filstr (key, Memc[keyname], IDB_SZFITSKEY)
 	nchars = nowhite (Memc[keyname], Memc[keyname], IDB_SZFITSKEY)

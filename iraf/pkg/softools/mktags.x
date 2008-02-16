@@ -31,7 +31,6 @@ bool	listing, mktags
 int	fd, ip, ip1, ip2, op, linenum, i, j, out
 pointer	list
 
-size_t	sz_val
 bool	clgetb()
 int	tg_compare()
 extern	tg_compare()
@@ -52,8 +51,7 @@ common	/tagcom/ ntags, tg_op, tg_sbuf, tg_tag, tg_file, tg_lnum, tg_lbuf,
 	tg_sort
 
 begin
-	sz_val = SZ_SBUF
-	call malloc (tg_sbuf, sz_val, TY_CHAR)
+	call malloc (tg_sbuf, SZ_SBUF, TY_CHAR)
 	list  = clpopni ("files")
 	tg_op = tg_sbuf
 	ntags = 0

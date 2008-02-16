@@ -14,7 +14,6 @@ int	npts			# Number of data points
 int	nvars			# Number of variables
 int	len_name		# Length of the name
 
-size_t	sz_val
 int	i, j, fd
 pointer	sp, vnames, name
 int	open()
@@ -35,9 +34,8 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (vnames, sz_val, TY_CHAR)
-	call salloc (name, sz_val, TY_CHAR)
+	call salloc (vnames, SZ_LINE, TY_CHAR)
+	call salloc (name, SZ_LINE, TY_CHAR)
 
 	# Get the variable names.
 	call in_gstr (in, INLVLABELS, Memc[vnames], SZ_LINE)

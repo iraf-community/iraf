@@ -27,7 +27,6 @@ char	testoption
 pointer	x, y, gp, sim_gp
 short	p[ARB]
 
-size_t	sz_val
 pointer	sp, nambuf, pl, pm
 int	clgeti (), strlen ()
 real	clgetr ()
@@ -41,8 +40,7 @@ string	fdevice	"vt640"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (nambuf, sz_val, TY_CHAR)
+	call salloc (nambuf, SZ_FNAME, TY_CHAR)
 
 	testoption= clgetc ("option")
 	if (testoption == 'l') {
@@ -192,7 +190,6 @@ char	fname[ARB]
 pointer	x, y
 int	npts
 
-size_t	sz_val
 int	buflen, n, fd, ncols, lineno, i, status, testint
 pointer	sp, lbuf, ip
 real	xval, yval, maxy
@@ -201,16 +198,14 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
 	buflen = SZ_BUF
 	iferr {
-	    sz_val = buflen
-	    call malloc (x, sz_val, TY_REAL)
-	    call malloc (y, sz_val, TY_REAL)
+	    call malloc (x, buflen, TY_REAL)
+	    call malloc (y, buflen, TY_REAL)
 	} then
 	    call erract (EA_FATAL)
 

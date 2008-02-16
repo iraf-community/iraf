@@ -24,7 +24,6 @@ procedure gtr_wstran (gki)
 
 short	gki[ARB]		#I metacode instruction to be spooled
 
-size_t	sz_val
 long	x, y
 pointer	sp, buf
 int	length, npts, data
@@ -68,8 +67,7 @@ begin
 	case GKI_SETCURSOR:
 	    length = gki[GKI_HDR_LENGTH]
 	    call smark (sp)
-	    sz_val = length
-	    call salloc (buf, sz_val, TY_SHORT)
+	    call salloc (buf, length, TY_SHORT)
 
 	    # Move cursor to edge of screen if point referenced is out of
 	    # bounds.
@@ -87,8 +85,7 @@ begin
 	case GKI_TEXT:
 	    length = gki[GKI_HDR_LENGTH]
 	    call smark (sp)
-	    sz_val = length
-	    call salloc (buf, sz_val, TY_SHORT)
+	    call salloc (buf, length, TY_SHORT)
 
 	    # Discard text drawing instruction if the point referenced is
 	    # out of bounds.  If in bounds, transform coordinates and draw

@@ -17,7 +17,6 @@ int	i
 pointer	list1, list2, sp, image1, image2, image3, blkfac, im1, im2, mw
 real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 
-size_t	sz_val
 bool	envgetb()
 int	imtgetim(), imtlen(), clgeti()
 pointer	imtopenp(), immap(), mw_openim()
@@ -26,12 +25,10 @@ string	blk_param	"bX"
 begin
 	# Allocate memory.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (image1, sz_val, TY_CHAR)
-	call salloc (image2, sz_val, TY_CHAR)
-	call salloc (image3, sz_val, TY_CHAR)
-	sz_val = IM_MAXDIM
-	call salloc (blkfac, sz_val, TY_INT)
+	call salloc (image1, SZ_LINE, TY_CHAR)
+	call salloc (image2, SZ_LINE, TY_CHAR)
+	call salloc (image3, SZ_LINE, TY_CHAR)
+	call salloc (blkfac, IM_MAXDIM, TY_INT)
 
 	# Expand the input and output image lists.
 

@@ -10,15 +10,13 @@ pointer	rg			# RANGES pointer
 int	rmin			# Minimum value of window
 int	rmax			# Maximum value of window
 
-size_t	sz_val
 int	i
 pointer rgtmp
 
 pointer	rg_window()
 
 begin
-	sz_val = LEN_RG + 2 * (RG_NRGS(rg) + 1)
-	call malloc (rgtmp, sz_val, TY_STRUCT)
+	call malloc (rgtmp, LEN_RG + 2 * (RG_NRGS(rg) + 1), TY_STRUCT)
 	RG_NRGS(rgtmp) = RG_NRGS(rg) + 1
 
 	RG_X1(rgtmp, 1) = rmin

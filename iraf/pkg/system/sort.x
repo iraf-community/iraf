@@ -22,7 +22,6 @@ int	infil[MERGEORDER], nlines
 char	name[SZ_FNAME], source_file[SZ_FNAME]
 int	high, lim, low, fd, outfil, t, junk
 
-size_t	sz_val
 bool	clgetb()
 int	ss_gtext(), ss_mkfile()
 int	open(), clplen(), clgfil(), clgeti(), btoi()
@@ -53,10 +52,8 @@ begin
 	    use_strsrt = YES
 
 	# Allocate buffer space.
-	sz_val = SZ_LINBUF
-	call malloc (linbuf, sz_val, TY_CHAR)
-	sz_val = MAXPTR
-	call malloc (linptr, sz_val, TY_INT)
+	call malloc (linbuf, SZ_LINBUF, TY_CHAR)
+	call malloc (linptr, MAXPTR, TY_INT)
 
 	# Perform the sort. 
 	junk = clgfil (list, source_file, SZ_FNAME)
@@ -181,7 +178,6 @@ int	infil[ARB]		# input file numbers
 int	outfil			# output file number
 int	nfiles			# number of files to be merged
 
-size_t	sz_val
 pointer	sp, linbuf
 int	linptr[MERGEORDER]
 int	i, inf, lbp, lp1, nf
@@ -191,8 +187,7 @@ include	"sort.com"
 
 begin
 	call smark (sp)
-	sz_val = MERGEORDER * SZ_LINE
-	call salloc (linbuf, sz_val, TY_CHAR)
+	call salloc (linbuf, MERGEORDER * SZ_LINE, TY_CHAR)
 
 	lbp = 1
 	nf = 0

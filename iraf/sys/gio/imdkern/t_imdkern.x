@@ -14,7 +14,6 @@ int	dev[LEN_GKIDD], deb[LEN_GKIDD]
 int	debug, verbose, gkiunits
 int	color, frame
 
-size_t	sz_val
 bool	clgetb()
 int	clgeti(), envfind()
 int	clgfil(), open(), btoi()
@@ -23,11 +22,9 @@ pointer	clpopni()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (devname, sz_val, TY_CHAR)
-	sz_val = SZ_PATHNAME
-	call salloc (dbfname, sz_val, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (dbfname, SZ_PATHNAME, TY_CHAR)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")

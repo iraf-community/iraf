@@ -92,7 +92,6 @@ char	args[ARB]		# argument list
 int	ttin, ttout		# tty file descriptors
 int	outfd			# write task output here
 
-size_t	sz_val
 pointer	sp, keyw, value, tty
 int	startcol, ival, nargs, yesno, defact, show, all, ip
 int	stty_getarg(), strdic(), ctoi()
@@ -104,9 +103,8 @@ define	argerr_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (keyw, sz_val, TY_CHAR)
-	call salloc (value, sz_val, TY_CHAR)
+	call salloc (keyw, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
 
 	defact = YES
 	show = NO
@@ -213,7 +211,6 @@ procedure stty_newterm (ttin, ttout, terminal)
 int	ttin, ttout			# tty file descriptors
 char	terminal[ARB]			# termcap name of new terminal
 
-size_t	sz_val
 pointer	sp, vp, tty
 pointer	ttyodes()
 
@@ -223,8 +220,7 @@ errchk	ttyodes, stty_envreset, ttygsize
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (vp, sz_val, TY_CHAR)
+	call salloc (vp, SZ_FNAME, TY_CHAR)
 
 	tty = ttyodes (terminal)
 
@@ -314,7 +310,6 @@ int	ttin, ttout		# tty file descriptors
 int	fd			# where the output goes
 int	all			# show all params, even if not in use
 
-size_t	sz_val
 int	junk
 pointer	sp, val
 bool	ucasein, ucaseout, shift, logio, login, logout, playback, showall
@@ -326,8 +321,7 @@ string	off "off"
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (val, sz_val, TY_CHAR)
+	call salloc (val, SZ_FNAME, TY_CHAR)
 
 	ucasein  = (ttstati (ttin, TT_UCASEIN) == YES)
 	ucaseout = (ttstati (ttin, TT_UCASEOUT) == YES)

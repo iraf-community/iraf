@@ -23,7 +23,6 @@ int	mfd, verify, nframes, junk
 int	this_frame, frames[3,MAX_RANGES]
 pointer	list, index, sp
 
-size_t	sz_val
 bool	clgetb()
 int	clgfil(), open(), get_next_number()
 int	decode_ranges(), btoi(), gke_user_go_ahead()
@@ -32,8 +31,7 @@ pointer	clpopni()
 begin
 	# Allocate space for the index array.
 	call smark (sp)
-	sz_val = 4 * MAX_FRAMES
-	call salloc (index, sz_val, TY_INT)
+	call salloc (index, 4 * MAX_FRAMES, TY_INT)
 
 	list = clpopni ("input")
 	call clgstr ("frames", frames_list, SZ_LINE)
@@ -114,7 +112,6 @@ int	mf			# Metacode file descriptor
 int	index[4,ARB]		# Index of metacode frames
 int	this_frame		# Current frame number
 
-size_t	sz_val
 int	mc_begin, nchars
 pointer	metacode, sp
 int	read()
@@ -124,8 +121,7 @@ begin
 	# Allocate space for the metacode instructions
 	call smark (sp)
 	nchars = index[3,this_frame] * SZ_SHORT
-	sz_val = nchars
-	call salloc (metacode, sz_val, TY_CHAR)
+	call salloc (metacode, nchars, TY_CHAR)
 
 	# Position to proper place in metacode file
 	mc_begin = index[2,this_frame]
@@ -155,7 +151,6 @@ int	mf			# Metacode file descriptor
 int	index[4,ARB]		# Index of metacode frames
 int	nframes			# Number of frames in index (output)
 
-size_t	sz_val
 bool	new_frame
 char	tx_string[SZ_TEXT+1]
 pointer	gki, ptr
@@ -194,8 +189,7 @@ begin
 		    index[1,nframe] = nframe
 		    index[2,nframe + 1] = file_pos - length
 		    index[3,nframe] = mc_length
-		    sz_val = nchars_max + 1
-		    call malloc (ptr, sz_val, TY_CHAR)
+		    call malloc (ptr, nchars_max + 1, TY_CHAR)
 		    call strcpy (tx_string, Memc[ptr], nchars_max)
 		    index[4,nframe] = ptr
 		} else 
@@ -242,8 +236,7 @@ begin
 	if (mc_length > GKI_CLEAR_LEN) {
             index[1,nframe] = nframe
             index[3,nframe] = mc_length
-            sz_val = nchars_max + 1
-            call malloc (ptr, sz_val, TY_CHAR)
+            call malloc (ptr, nchars_max + 1, TY_CHAR)
             call strcpy (tx_string, Memc[ptr], nchars_max)
             index[4,nframe] = ptr
 	    nframes = nframe
@@ -265,7 +258,6 @@ int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
 int	nchars_total		# number of chars read from input stream
 
-size_t	sz_val
 int	len_ibuf, nchars, nchars_read
 pointer	ibuf
 int	read()
@@ -277,8 +269,7 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    sz_val = LEN_DEFIBUF
-	    call malloc (ibuf, sz_val, TY_SHORT)
+	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 

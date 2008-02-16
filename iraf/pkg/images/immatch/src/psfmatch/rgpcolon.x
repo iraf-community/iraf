@@ -23,7 +23,6 @@ int	newdata			#I/O new input image
 int	newfourier		#I/O new FFT
 int	newfilter		#I/O new filter
 
-size_t	sz_val
 bool	bval
 int	ncmd, ival, stat, fd, ip
 pointer	sp, cmd, str
@@ -38,9 +37,8 @@ errchk	immap(), fntopnb()
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (cmd, sz_val, TY_CHAR)
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)

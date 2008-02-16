@@ -13,7 +13,6 @@ pointer procedure maskcolor_map (colorstring)
 char	colorstring		#I Color specification string
 pointer	colors			#O Mask colormap object
 
-size_t	sz_val
 int	i, j, ip, ncolors, token, lasttoken, maskval1, maskval2, color, offset
 int	strdic(), ctoi(), nowhite()
 pointer	sp, str, op
@@ -25,17 +24,14 @@ define	err_	10
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# If the colorstring is an expression just save the string
 	# and set the number of colors to 0.
 	i = nowhite (colorstring, Memc[str], SZ_LINE)
 	if (Memc[str] == '(') {
-	    sz_val = SZ_LINE
-	    call malloc (colors, sz_val, TY_INT)
-	    sz_val = LEN_OPERAND
-	    call malloc (op, sz_val, TY_STRUCT)
+	    call malloc (colors, SZ_LINE, TY_INT)
+	    call malloc (op, LEN_OPERAND, TY_STRUCT)
 	    Memi[colors] = 0
 	    Memi[colors+1] = op
 	    call strcpy (colorstring, Memc[P2C(colors+2)], SZ_LINE)
@@ -47,8 +43,7 @@ begin
 	}
 
 	# Allocate memory for the colormap object.
-	sz_val = 4*10
-	call malloc (colors, sz_val, TY_INT)
+	call malloc (colors, 4*10, TY_INT)
 
 	# Initialize
 	ncolors = 1
@@ -303,7 +298,6 @@ pointer	args[ARB]		#I pointer to arglist descriptor
 int	nargs			#I number of arguments
 pointer	val			#O output operand (function value)
 
-size_t	sz_val
 char	str[12]
 int	i, j, c1, c2, c3
 int	iresult, optype, oplen, opcode, v_nargs
@@ -351,10 +345,8 @@ begin
 	    }
 	    optype = TY_INT
 	    oplen = O_LEN(args[1])
-	    if (oplen > 0) {
-		sz_val = oplen
-		call malloc (iresult, sz_val, TY_INT)
-	    }
+	    if (oplen > 0)
+		call malloc (iresult, oplen, TY_INT)
 	case F_COLORS:
 	    # Check types of arguments.
 	    do i = 1, nargs {
@@ -364,10 +356,8 @@ begin
 	    }
 	    optype = TY_INT
 	    oplen = O_LEN(args[1])
-	    if (oplen > 0) {
-		sz_val = oplen
-		call malloc (iresult, sz_val, TY_INT)
-	    }
+	    if (oplen > 0)
+		call malloc (iresult, oplen, TY_INT)
 	}
 
 	# Evaluate the function.

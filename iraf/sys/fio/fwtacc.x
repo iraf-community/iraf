@@ -21,7 +21,6 @@ procedure fwtacc (fd, fname)
 int	fd				#I file we are trying to open
 char	fname[ARB]			#I name of file
 
-size_t	sz_val
 bool	locked
 pointer	sp, osfn
 int	perm, delay, chan, status, ofd
@@ -35,8 +34,7 @@ define	noacc_ 91
 
 begin
 	call smark (sp)
-	sz_val = SZ_PATHNAME
-	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	fp = fiodes[fd]
 	if (FMODE(fp) == NEW_FILE)

@@ -7,7 +7,6 @@ procedure mk_gpars (mk)
 
 pointer	mk		# pointer to the immark structure
 
-size_t	sz_val
 int	mark, dotsize, ip
 pointer	sp, str
 real	ratio
@@ -18,8 +17,7 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Initialize the immark structure.
 	call mk_init (mk)

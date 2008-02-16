@@ -17,7 +17,6 @@ procedure fexbuf (fd)
 
 int	fd			# file which needs a larger buffer
 
-size_t	sz_val
 pointer	bp
 int	offset
 errchk	malloc, realloc
@@ -31,8 +30,7 @@ begin
 	if (bufptr[fd] == NULL) {
 	    if (FBUFSIZE(fp) == 0)
 		FBUFSIZE(fp) = SZ_SPOOLBUF
-	    sz_val = FBUFSIZE(fp)
-	    call malloc (bp, sz_val, TY_CHAR)
+	    call malloc (bp, FBUFSIZE(fp), TY_CHAR)
 	} else {
 	    FBUFSIZE(fp) = FBUFSIZE(fp) + INC_BUFSIZE
 	    call realloc (bp, FBUFSIZE(fp), TY_CHAR)

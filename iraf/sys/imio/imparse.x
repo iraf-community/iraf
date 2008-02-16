@@ -30,7 +30,6 @@ int	sz_section		# max chars in image section name
 int	cl_index		# receives cluster index (default -1)
 int	cl_size			# receives cluster size (default -1)
 
-size_t	sz_val
 pointer	sp, cp, secbuf
 int	ip, op, lbrack, level, ch, n
 bool	is_ksection, sect_out, ksect_out
@@ -39,8 +38,7 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (secbuf, sz_val, TY_CHAR)
+	call salloc (secbuf, SZ_LINE, TY_CHAR)
 
 	ip = 1
 	op = 1

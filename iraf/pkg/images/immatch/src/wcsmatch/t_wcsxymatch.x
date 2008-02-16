@@ -18,7 +18,6 @@ pointer	sp, refimage, image, xformat, yformat, rxformat, ryformat
 pointer	wxformat, wyformat, str, paxno, rlaxno, laxno
 pointer	im, imr, mw, mwr, rxl, ryl, rxw, ryw, ixl, iyl, ctr, ct
 
-size_t	sz_val
 bool	clgetb(), streq()
 double	clgetd()
 int	imtlen(), fntlenb(), imtgetim(), open(), clgeti()
@@ -30,22 +29,19 @@ errchk	mw_openim(), mw_gwattrs()
 begin
 	# Get some temporary working space.
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (refimage, sz_val, TY_CHAR)
-	call salloc (image, sz_val, TY_CHAR)
-	call salloc (xformat, sz_val, TY_CHAR)
-	call salloc (yformat, sz_val, TY_CHAR)
-	call salloc (wxformat, sz_val, TY_CHAR)
-	call salloc (wyformat, sz_val, TY_CHAR)
-	call salloc (rxformat, sz_val, TY_CHAR)
-	call salloc (ryformat, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (refimage, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (xformat, SZ_FNAME, TY_CHAR)
+	call salloc (yformat, SZ_FNAME, TY_CHAR)
+	call salloc (wxformat, SZ_FNAME, TY_CHAR)
+	call salloc (wyformat, SZ_FNAME, TY_CHAR)
+	call salloc (rxformat, SZ_FNAME, TY_CHAR)
+	call salloc (ryformat, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
-	sz_val = IM_MAXDIM
-	call salloc (paxno, sz_val, TY_INT)
-	call salloc (rlaxno, sz_val, TY_INT)
-	call salloc (laxno, sz_val, TY_INT)
+	call salloc (paxno, IM_MAXDIM, TY_INT)
+	call salloc (rlaxno, IM_MAXDIM, TY_INT)
+	call salloc (laxno, IM_MAXDIM, TY_INT)
 
 	# Get the input image and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -226,11 +222,10 @@ begin
 			cfd = open (Memc[str], READ_ONLY, TEXT_FILE)
 			npts = rg_rdxy (cfd, rxw, ryw, wcs, xcolumn, ycolumn,
 			    xunits, yunits)
-		        sz_val = npts
-		        call malloc (rxl, sz_val, TY_DOUBLE)
-		        call malloc (ryl, sz_val, TY_DOUBLE)
-		        call malloc (ixl, sz_val, TY_DOUBLE)
-		        call malloc (iyl, sz_val, TY_DOUBLE)
+		        call malloc (rxl, npts, TY_DOUBLE)
+		        call malloc (ryl, npts, TY_DOUBLE)
+		        call malloc (ixl, npts, TY_DOUBLE)
+		        call malloc (iyl, npts, TY_DOUBLE)
 			if (wcs == RG_WORLD)
 		    	    ctr = rg_xytoxy (mwr, Memd[rxw], Memd[ryw],
 			        Memd[rxl], Memd[ryl], npts, "world",
@@ -247,13 +242,12 @@ begin
 			npts = nx
 		    else
 		        npts = nx * ny
-		    sz_val = npts
-		    call malloc (rxl, sz_val, TY_DOUBLE)
-		    call malloc (ryl, sz_val, TY_DOUBLE)
-		    call malloc (rxw, sz_val, TY_DOUBLE)
-		    call malloc (ryw, sz_val, TY_DOUBLE)
-		    call malloc (ixl, sz_val, TY_DOUBLE)
-		    call malloc (iyl, sz_val, TY_DOUBLE)
+		    call malloc (rxl, npts, TY_DOUBLE)
+		    call malloc (ryl, npts, TY_DOUBLE)
+		    call malloc (rxw, npts, TY_DOUBLE)
+		    call malloc (ryw, npts, TY_DOUBLE)
+		    call malloc (ixl, npts, TY_DOUBLE)
+		    call malloc (iyl, npts, TY_DOUBLE)
 		    if (IM_NDIM(imr) == 1)
 		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, x1, x2,
 			    y1, y2)
@@ -554,14 +548,12 @@ int	min_sigdigits		#I the minimum number of significant digits
 char	wformat[ARB]		#O the output world coordinate format
 int	maxch			#I the maximum size of the format string
 
-size_t	sz_val
 pointer	sp, str
 bool	streq()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	if (mwr == NULL || mw == NULL) {
 	    call sprintf (wformat, maxch, "%%%d.%dg")
@@ -618,7 +610,6 @@ pointer	mw2			#I pointer to the second wcs
 int	ax21, ax22		#I the logical input axes
 bool	transpose		#I transpose the world coordinates
 
-size_t	sz_val
 int	stat
 pointer	sp, xax1, yax1, xax2, yax2
 bool	streq()
@@ -626,11 +617,10 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (xax1, sz_val, TY_CHAR)
-	call salloc (yax1, sz_val, TY_CHAR)
-	call salloc (xax2, sz_val, TY_CHAR)
-	call salloc (yax2, sz_val, TY_CHAR)
+	call salloc (xax1, SZ_FNAME, TY_CHAR)
+	call salloc (yax1, SZ_FNAME, TY_CHAR)
+	call salloc (xax2, SZ_FNAME, TY_CHAR)
+	call salloc (yax2, SZ_FNAME, TY_CHAR)
 
 	iferr (call mw_gwattrs (mw1, ax11, "axtype", Memc[xax1], SZ_FNAME))
 	    Memc[xax1] = EOS
@@ -667,7 +657,6 @@ int	ax11, ax12		#I the logical reference axes
 pointer	mw2			#I pointer to the second wcs
 int	ax21, ax22		#I the logical reference axes
 
-size_t	sz_val
 int	stat
 pointer	sp, xproj1, yproj1, xproj2, yproj2
 bool	streq()
@@ -675,11 +664,10 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (xproj1, sz_val, TY_CHAR)
-	call salloc (yproj1, sz_val, TY_CHAR)
-	call salloc (xproj2, sz_val, TY_CHAR)
-	call salloc (yproj2, sz_val, TY_CHAR)
+	call salloc (xproj1, SZ_FNAME, TY_CHAR)
+	call salloc (yproj1, SZ_FNAME, TY_CHAR)
+	call salloc (xproj2, SZ_FNAME, TY_CHAR)
+	call salloc (yproj2, SZ_FNAME, TY_CHAR)
 
 	iferr (call mw_gwattrs (mw1, ax11, "wtype", Memc[xproj1], SZ_FNAME))
 	    Memc[xproj1] = EOS
@@ -724,14 +712,12 @@ char	yformat[ARB]		#I the logical y coordinates format
 char	wxformat[ARB]		#I the world x coordinates format
 char	wyformat[ARB]		#I the world y coordinates format
 
-size_t	sz_val
 int	i
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE
-	call salloc (fmtstr, sz_val, TY_CHAR)
+	call salloc (fmtstr, SZ_LINE, TY_CHAR)
 
 	# Write the column descriptions.
 	call fprintf (ofd,

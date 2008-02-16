@@ -34,7 +34,6 @@ pointer procedure ttyodes (ttyname)
 
 char	ttyname[ARB]
 
-size_t	sz_val
 bool	istty
 int	nchars
 pointer	sp, ttysource, device, devname, fname, tty
@@ -53,11 +52,10 @@ string	termcap  "termcap"	# name of termcap file stored in env. too
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (ttysource, sz_val, TY_CHAR)
-	call salloc (devname, sz_val, TY_CHAR)
-	call salloc (device, sz_val, TY_CHAR)
-	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (ttysource, SZ_FNAME, TY_CHAR)
+	call salloc (devname, SZ_FNAME, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	# Resolve any indirection in the device name.
 	call envindir (ttyname, Memc[devname], SZ_FNAME)

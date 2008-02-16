@@ -14,7 +14,6 @@ procedure pl_load (pl, bp)
 pointer	pl			#I mask descriptor
 pointer	bp			#I buffer pointer (to short)
 
-size_t	sz_val
 pointer	sp, index, ex, ip
 int	o_lllen, o_nlp, sz_index, flags, nlp, i
 errchk	malloc, realloc, syserr
@@ -23,8 +22,7 @@ pointer	coerce()
 
 begin
 	call smark (sp)
-	sz_val = LEN_PLEXTERN
-	call salloc (ex, sz_val, TY_STRUCT)
+	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
 
 	o_lllen = PL_LLLEN(pl)
 	o_nlp = PL_NLP(pl)
@@ -54,23 +52,20 @@ begin
 	nlp = 1
 	do i = 2, PL_NAXES(pl)
 	    nlp = nlp * PL_AXLEN(pl,i)
-	if (PL_LPP(pl) == NULL) {
-	    sz_val = nlp
-	    call malloc (PL_LPP(pl), sz_val, TY_INT)
-	} else if (nlp != o_nlp)
+	if (PL_LPP(pl) == NULL)
+	    call malloc (PL_LPP(pl), nlp, TY_INT)
+	else if (nlp != o_nlp)
 	    call realloc (PL_LPP(pl), nlp, TY_INT)
 
-	sz_val = sz_index
-	call salloc (index, sz_val, TY_SHORT)
+	call salloc (index, sz_index, TY_SHORT)
 	ip = bp + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
 	call miiupk16 (Mems[ip], Mems[index], sz_index, TY_SHORT)
 	PL_NLP(pl) = pl_l2pi (Mems[index], 1, PL_LP(pl,1), nlp)
 
 	# Allocate or resize the line list buffer.
-	if (PL_LLBP(pl) == NULL) {
-	    sz_val = PL_LLLEN(pl)
-	    call malloc (PL_LLBP(pl), sz_val, TY_SHORT)
-	} else if (PL_LLLEN(pl) != o_lllen)
+	if (PL_LLBP(pl) == NULL)
+	    call malloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
+	else if (PL_LLLEN(pl) != o_lllen)
 	    call realloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
 
 	# Read the stored line list.

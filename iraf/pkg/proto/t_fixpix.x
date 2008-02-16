@@ -15,7 +15,6 @@ int	cinterp			# Mask code for column interpolation
 bool	verbose			# Verbose output?
 int	fd			# List pixels?
 
-size_t	sz_val
 int	i, nc, nl
 long	v[IM_MAXDIM]
 pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
@@ -30,12 +29,10 @@ errchk	immap, xt_pmmap, xt_fpinit
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (imname, sz_val, TY_CHAR)
-	call salloc (pmname, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (str1, sz_val, TY_CHAR)
-	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (pmname, SZ_FNAME, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	# Get task parameters
 	ilist = imtopenp ("images")

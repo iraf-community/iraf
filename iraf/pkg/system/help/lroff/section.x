@@ -142,7 +142,6 @@ end
 
 int procedure inbold (in, user_linebuf)
 
-size_t	sz_val
 extern	in()
 int	in()
 char	user_linebuf[ARB]
@@ -156,8 +155,7 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	sz_val = SZ_LINE + 3 + 3
-	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (lbuf, SZ_LINE + 3 + 3, TY_CHAR)
 
 	# Deposit escape sequence to turn bold on.
 	call strcpy ("\\fB", Memc[lbuf], ARB)

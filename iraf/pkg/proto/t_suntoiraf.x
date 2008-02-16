@@ -59,7 +59,6 @@ int	fd, fdtmp, i, krow, nlut, nchars, junk, nread
 pointer	infile, fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
 bool	apply_lut, delete_file, verbose, listonly, yflip
 
-size_t	sz_val
 int	clgfil(), open(), strcmp(), fnroot(), fnextn(), read()
 pointer	clpopni(), immap(), impl2s()
 bool	clgetb()
@@ -68,13 +67,10 @@ errchk	open, read, immap
 
 begin
 	call smark (sp)
-	sz_val = RAS_HEADER_LEN
-	call salloc (hdr, sz_val, TY_INT)
-	sz_val = SZ_FNAME
-	call salloc (fname, sz_val, TY_CHAR)
-	call salloc (buf, sz_val, TY_CHAR)
-	sz_val = SZ_LINE
-	call salloc (image, sz_val, TY_CHAR)
+	call salloc (hdr, RAS_HEADER_LEN, TY_INT)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (buf, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_LINE, TY_CHAR)
 
 	infile = clpopni ("names")	# Get the raster/image names.
 	apply_lut = clgetb ("apply_lut")# Apply the raster lut?
@@ -200,13 +196,11 @@ begin
 	    }
 
 	    call smark (sp1)
-	    sz_val = RAS_WIDTH(hdr)
-	    call salloc (pix, sz_val, TY_SHORT)
+	    call salloc (pix, RAS_WIDTH(hdr), TY_SHORT)
 
 	    # Extract the Sun raster LUT
 	    if (RAS_MAPLENGTH(hdr) > 0) {
-		sz_val = RAS_MAPLENGTH(hdr)
-		call salloc (lut, sz_val, TY_SHORT)
+		call salloc (lut, RAS_MAPLENGTH(hdr), TY_SHORT)
 
 		# assumes that MAPLENGTH is even (for SZB_CHAR=2)
 		nread = read (fd, Mems[lut], RAS_MAPLENGTH(hdr) / SZB_CHAR)

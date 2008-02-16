@@ -17,7 +17,6 @@ pointer	io			#I QPIO descriptor
 pointer	i_ev[ARB]		#I array of event pointers
 int	nevents			#I number of events
 
-size_t	sz_val
 pointer	qp, bp, ev
 int	szs_event, szb_page, nwords, bklen, bksiz, nev, i, j
 errchk	qpio_wbucket, qpio_sync, malloc, calloc
@@ -63,8 +62,7 @@ begin
 	    }
 
 	    # Allocate the bucket buffer.
-	    sz_val = bksiz / SZB_CHAR / SZ_SHORT
-	    call malloc (IO_BP(io), sz_val, TY_SHORT)
+	    call malloc (IO_BP(io), bksiz / SZB_CHAR / SZ_SHORT, TY_SHORT)
 	    bp = IO_BP(io)
 
 	    # Allocate the MINEVL and MAXEVL event structs, used to keep

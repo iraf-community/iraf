@@ -15,14 +15,12 @@ char	keyword[ARB]		# String matched in dictionary
 int	maxchar			# Maximum size of str
 char	dictionary[ARB]		# Dictionary string
 
-size_t	sz_val
 pointer	sp, abbrev
 int	kwindex, strdic()
 
 begin
 	call smark (sp)
-	sz_val = SZ_FNAME
-	call salloc (abbrev, sz_val, TY_CHAR)
+	call salloc (abbrev, SZ_FNAME, TY_CHAR)
 
 	call clgstr (param, Memc[abbrev], maxchar)
 	kwindex = strdic (Memc[abbrev], keyword, maxchar, dictionary)
