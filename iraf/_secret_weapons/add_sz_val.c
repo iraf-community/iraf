@@ -365,6 +365,13 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			}
 			break;
 		    }
+		    else {
+			if ( isalpha(*ip2) == 0 ) {
+			    fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax error [1]\n",
+				    file_name,j+1);
+			    goto quit;
+			}
+		    }
 		}
 		ip1 = ip2;
 	    }
@@ -404,13 +411,17 @@ static int add_sz_val( const char *proc_name, int target_arg,
 	    if ( strncmp(ip,proc_name,strlen(proc_name)) != 0 ) continue;
 	    ptr_proc_begin = ip;
 	    ip += strlen(proc_name);
-	    if ( *ip != ' ' && *ip != '\t' && *ip != '(' ) continue;
 	    while ( *ip == ' ' || *ip == '\t' ) ip++;
-	    if ( *ip != '(' ) continue;
+	    if ( is_valchar(*ip) ) continue;
+	    if ( *ip != '(' ) {
+		fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax error [2]\n",
+			file_name,j+1);
+		goto quit;
+	    }
 	    /* parse (....) */
 	    end_j = parse_in_braces (ip+1, lines, j, proc_end[i]-1, ")", &end_ptr);
 	    if ( end_j < 0 ) {
-		fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax Error??\n",
+		fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax error [3]\n",
 			file_name,j+1);
 		goto quit;
 	    }
@@ -467,6 +478,18 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		fflush(stdout);
 		if ( prev_j < 0 ) {
 		    fprintf(stderr,"[ERROR] Invalid prev_j\n");
+		    goto quit;
+		}
+		/*
+		  if ( )
+		  $if ...
+		      call hoge ()
+		  $else
+		      call hoge ()
+		*/
+		if ( prev_j != j-1 ) {
+		    fprintf(stderr,"[ERROR] file = %s  line = %d  Cannot handle this case\n",
+			    file_name,j+1);
 		    goto quit;
 		}
 		op1 = strchr(lines[prev_j],'\n');
