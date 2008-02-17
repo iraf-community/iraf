@@ -257,9 +257,10 @@ begin
 
 	    npix = mf_pxsize * (y2 - y1 + 1)
 
-	    if (ob != ib)
+	    if (ob != ib) {
 		# Copy the input buffer to the output buffer
 		call amovs (Mems[ib], Mems[ob], npix)
+	    }
 
 	    do line = y1, y2 {
 		# Each line in the local frame buffer section

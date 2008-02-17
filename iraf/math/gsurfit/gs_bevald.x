@@ -17,12 +17,13 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 	        call amovkd (1.0d0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call amovd (x, basis[bptr], npts)
-	    else 
+	    } else {
 		call amuld (basis[bptr-npts], x, basis[bptr], npts)
+	    }
 		
 	    bptr = bptr + npts
 	}
@@ -45,11 +46,11 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		call amovkd (1.0d0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call altad (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		call amuld (basis[1+npts], basis[bptr-npts], basis[bptr],
 		    npts)
 		call amulkd (basis[bptr], 2.0d0, basis[bptr], npts)
@@ -79,11 +80,11 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		call amovkd (1.0d0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call altad (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		ri = k
 		ri1 = (2.0d0 * ri - 3.0d0) / (ri - 1.0d0)
 		ri2 = - (ri - 2.0d0) / (ri - 1.0d0)

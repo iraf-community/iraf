@@ -17,16 +17,17 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		$if (datatype == r)
 	        call amovkr (1.0, basis, npts)
 		$else
 	        call amovkd (1.0d0, basis, npts)
 		$endif
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call amov$t (x, basis[bptr], npts)
-	    else 
+	    } else {
 		call amul$t (basis[bptr-npts], x, basis[bptr], npts)
+	    }
 		
 	    bptr = bptr + npts
 	}
@@ -49,15 +50,15 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		$if (datatype == r)
 	        call amovkr (1.0, basis, npts)
 		$else
 		call amovkd (1.0d0, basis, npts)
 		$endif
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call alta$t (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		call amul$t (basis[1+npts], basis[bptr-npts], basis[bptr],
 		    npts)
 		$if (datatype == r)
@@ -91,15 +92,15 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		$if (datatype == r)
 		call amovkr (1.0, basis, npts)
 		$else
 		call amovkd (1.0d0, basis, npts)
 		$endif
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call alta$t (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		$if (datatype == r)
 		ri = k
 		ri1 = (2. * ri - 3.) / (ri - 1.)

@@ -199,10 +199,10 @@ include	"zsnap.com"
 
 begin
 	if ( (xscr != IIS_XCEN) || (zm != 1)) {
-	    if (xscr == IIS_XCEN)
+	    if (xscr == IIS_XCEN) {
 		# Scrolling not needed
 		call amovs (Mems[input], Mems[zs], IIS_XDIM)
-	    else {
+	    } else {
 		# Scroll the data
 		lb = xscr - IIS_XCEN
 		if ( lb < 0 )

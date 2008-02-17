@@ -17,12 +17,13 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 	        call amovkr (1.0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call amovr (x, basis[bptr], npts)
-	    else 
+	    } else {
 		call amulr (basis[bptr-npts], x, basis[bptr], npts)
+	    }
 		
 	    bptr = bptr + npts
 	}
@@ -45,11 +46,11 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 	        call amovkr (1.0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call altar (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		call amulr (basis[1+npts], basis[bptr-npts], basis[bptr],
 		    npts)
 		call amulkr (basis[bptr], 2.0, basis[bptr], npts)
@@ -79,11 +80,11 @@ begin
 	bptr = 1
 	do k = 1, order {
 
-	    if (k == 1)
+	    if (k == 1) {
 		call amovkr (1.0, basis, npts)
-	    else if (k == 2)
+	    } else if (k == 2) {
 		call altar (x, basis[bptr], npts, k1, k2)
-	    else {
+	    } else {
 		ri = k
 		ri1 = (2. * ri - 3.) / (ri - 1.)
 		ri2 = - (ri - 2.) / (ri - 1.)
