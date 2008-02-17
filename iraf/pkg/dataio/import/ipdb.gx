@@ -374,8 +374,9 @@ begin
 		rval = ip_getr (fd, O_VALI(args[1]))
 	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_REAL)
 	    }
-	    if (and(swap, S_ALL) == S_ALL)	# handle byte-swapping
+	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
 		call bswap4 (rval, 1, rval, 1, (SZ_REAL*SZB_CHAR))
+	    }
 	    O_TYPE(o) = TY_REAL
 
         case GETR8:
@@ -386,8 +387,9 @@ begin
 		dval = ip_getd (fd, O_VALI(args[1]))
 	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_DOUBLE)
 	    }
-	    if (and(swap, S_ALL) == S_ALL)	# handle byte-swapping
+	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
 		call bswap8 (dval, 1, dval, 1, (SZ_DOUBLE*SZB_CHAR))
+	    }
 	    O_TYPE(o) = TY_DOUBLE
 
         case GETN, GETN4:
@@ -398,8 +400,9 @@ begin
 		rval = ip_getn (fd, O_VALI(args[1]))
 	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_REAL)
 	    }
-	    if (and(swap, S_ALL) == S_ALL)	# handle byte-swapping
+	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
 		call bswap4 (rval, 1, rval, 1, (SZ_REAL*SZB_CHAR))
+	    }
 	    O_TYPE(o) = TY_REAL
 
         case GETN8:
@@ -410,8 +413,9 @@ begin
 		dval = ip_getn8 (fd, O_VALI(args[1]))
 	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_DOUBLE)
 	    }
-	    if (and(swap, S_ALL) == S_ALL)	# handle byte-swapping
+	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
 		call bswap8 (dval, 1, dval, 1, (SZ_DOUBLE*SZB_CHAR))
+	    }
 	    O_TYPE(o) = TY_DOUBLE
 
         case LOCATE: 			# locate the pattern in the file
