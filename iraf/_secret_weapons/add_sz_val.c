@@ -619,7 +619,7 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		    bool skip_ok;
 		    /* */
 		    if ( strncmp(current_arg_str,ap_val,strlen(ap_val)) == 0 && 
-			 is_valchar(current_arg_str[6]) == 0 ) {
+			 is_valchar(current_arg_str[strlen(ap_val)]) == 0 ) {
 			break;
 		    }
 		    /* */
