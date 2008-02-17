@@ -18,15 +18,15 @@ int main( int argc, char *argv[] )
     int return_status = -1;
     const char *proc_name;
     const char *arg_type;
-    const char *arg_val = NULL;
+    const char *arg_val;
     int target_arg;
     int i;
 
     if ( argc < 4 ) {
 	fprintf(stderr,"[USAGE]\n");
-	fprintf(stderr,"%s proc_name arg_index arg_type foo.x foo1.x ...\n",argv[0]);
+	fprintf(stderr,"%s proc_name arg_index arg_type val_name foo.x foo1.x ...\n",argv[0]);
 	fprintf(stderr,"(example)\n");
-	fprintf(stderr,"%s salloc 1 size_t foo.x foo1.x ...\n",argv[0]);
+	fprintf(stderr,"%s salloc 1 size_t sz_val foo.x foo1.x ...\n",argv[0]);
 	goto quit;
     }
 
@@ -34,14 +34,10 @@ int main( int argc, char *argv[] )
     proc_name = argv[i++];
     target_arg = atoi(argv[i++]);
     arg_type = argv[i++];
+    arg_val = argv[i++];
 
-    if ( strcmp(arg_type,"size_t") == 0 ) {
-	arg_val = "sz_val";
-    }
-    else if ( strcmp(arg_type,"long") == 0 ) {
-	arg_val = "lg_val";
-    }
-    else {
+    if ( strcmp(arg_type,"size_t") != 0 && 
+	 strcmp(arg_type,"long") != 0 ) {
 	fprintf(stderr,"[ERROR] invalid arg_type: %s\n",arg_type);
 	goto quit;
     }
@@ -489,6 +485,11 @@ static int add_sz_val( const char *proc_name, int target_arg,
 		*/
 		if ( prev_j != j-1 ) {
 		    fprintf(stderr,"[ERROR] file = %s  line = %d  Cannot handle this case\n",
+			    file_name,j+1);
+		    goto quit;
+		}
+		if ( strrchr(lines[prev_j],'#') != NULL ) {
+		    fprintf(stderr,"[ERROR] file = %s  line = %d  Cannot handle this case '#'\n",
 			    file_name,j+1);
 		    goto quit;
 		}
