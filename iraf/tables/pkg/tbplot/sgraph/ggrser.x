@@ -75,7 +75,7 @@ begin
 	    call malloc (herr, numrows, TY_REAL)
 	    call tbcgtr (tdp, lecp, Memr[lerr], Memb[null], 1, numrows)
 	    call tbcgtr (tdp, hecp, Memr[herr], Memb[null], 1, numrows)
-	    call aaddr  (Memr[lerr], Memr[herr], size, numrows]
+	    call aaddr  (Memr[lerr], Memr[herr], size, numrows)
 
 	    # Position of centered marker
 	    call malloc (offs, numrows, TY_REAL)

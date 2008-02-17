@@ -44,10 +44,10 @@ begin
             }
         }
 
-	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot)]
-	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot)]
-	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot)]
-	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot)]
+	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot))
+	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot))
+	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
+	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
 
 	# Make sure the center is defined.
 	if (IS_INDEFR(wx) || IS_INDEFR(wy))

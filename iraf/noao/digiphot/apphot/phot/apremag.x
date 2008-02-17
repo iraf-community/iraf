@@ -25,8 +25,8 @@ begin
 	# Initalize.
 	phot = AP_PPHOT(ap)
 	nse = AP_NOISE(ap)
-	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot)]
-	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot)]
+	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
+	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
         if (IS_INDEFR(AP_PXCUR(phot)) || IS_INDEFR(AP_PYCUR(phot))) {
             AP_OPXCUR(phot) = AP_PXCUR(phot)
             AP_OPYCUR(phot) = AP_PYCUR(phot)

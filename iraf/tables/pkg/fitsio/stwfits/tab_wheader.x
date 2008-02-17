@@ -266,7 +266,7 @@ include "wfits.com"
 begin
 	
 	call tbhgnp (tp, ncount, keyword, dtype, str)
-	call get_string(str,str,SZ_PARREC]
+	call get_string(str,str,SZ_PARREC)
 	call tbhgcm (tp, keyword, comment, SZ_PARREC)
 
 	if (strncmp("/ ", comment, 2) == 0) {

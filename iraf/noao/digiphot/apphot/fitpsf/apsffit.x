@@ -38,8 +38,8 @@ begin
                 AP_OPFYCUR(psf) = wy
             }
 	}
-	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf)]
-	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf)]
+	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf))
+	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf))
 
 	# Fetch the buffer of pixels.
 	ier = apfbuf (ap, im, wx, wy)

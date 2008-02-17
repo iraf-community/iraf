@@ -37,14 +37,14 @@ begin
 	} else if (token == IDENTIFIER || token == STRING) {
 	    # First (horizontal) justification argument
 	    call lcmdcat (igs, NO)
-	    call strcpy (LOP_VALC(tokvals), Memc[cjust], SZ_LINE]
+	    call strcpy (LOP_VALC(tokvals), Memc[cjust], SZ_LINE)
 
 	    token = gettok (igs)
 	    if (token == IDENTIFIER || token == STRING) {
 		# Second (vertical) justification argument
 		call lcmdcat (igs, NO)
-		call strcat (" ", Memc[cjust], SZ_LINE]
-		call strcat (LOP_VALC(tokvals), Memc[cjust], SZ_LINE]
+		call strcat (" ", Memc[cjust], SZ_LINE)
+		call strcat (LOP_VALC(tokvals), Memc[cjust], SZ_LINE)
 	    } else {
 		call eprintf ("Invalid justification argument ")
 		call sfree (sp)
