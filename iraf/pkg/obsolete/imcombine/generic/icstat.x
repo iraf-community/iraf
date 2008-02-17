@@ -468,7 +468,8 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 int	imgnlr()
-real	ic_moder(), asumr()
+real	ic_moder()
+real	asumr()
 
 include	"../icombine.com"
 
@@ -684,7 +685,8 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 int	imgnld()
-double	ic_moded(), asumd()
+double	ic_moded()
+double	asumd()
 
 include	"../icombine.com"
 
@@ -875,3 +877,4 @@ begin
 
 	return (mode)
 end
+

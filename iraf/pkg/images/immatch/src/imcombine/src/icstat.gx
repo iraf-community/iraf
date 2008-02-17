@@ -28,8 +28,9 @@ real	mode, median, mean	 # Statistics
 int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
-pointer	data, mask, dp, lp, mp, imgnl$t()
+pointer	data, mask, dp, lp, mp
 
+int	imgnl$t()
 $if (datatype == csir)
 real	asum$t()
 $else $if (datatype == ld)

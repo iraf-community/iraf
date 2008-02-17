@@ -20,11 +20,11 @@ define	DEF_LINELEN	8192
 
 # Input image operands.
 define	LEN_IMOPERAND	18
-define	IO_OPNAME	Memi[$1]		# symbolic operand name
-define	IO_TYPE		Memi[$1+1]		# operand type
-define	IO_IM		Memi[$1+2]		# image pointer if image
-define	IO_V		Memi[$1+3+($2)-1]	# image i/o pointer
-define	IO_DATA		Memi[$1+10]		# current image line
+define	IO_OPNAME	Memi[P2I($1)]		# symbolic operand name
+define	IO_TYPE		Memi[P2I($1+1)]		# operand type
+define	IO_IM		Memi[P2I($1+2)]		# image pointer if image
+define	IO_V		Memi[P2I($1+3)+($2)-1]	# image i/o pointer
+define	IO_DATA		Memi[P2I($1+10)]	# current image line
 			# align
 define	IO_OP		($1+12)			# pointer to evvexpr operand
 
@@ -35,28 +35,28 @@ define	PARAMETER	3			# image parameter reference
 
 # Main imexpr descriptor.
 define	LEN_IMEXPR	(24+LEN_IMOPERAND*MAX_OPERANDS)
-define	IE_ST		Memi[$1]		# symbol table
-define	IE_IM		Memi[$1+1]		# output image
-define	IE_NDIM		Memi[$1+2]		# dimension of output image
-define	IE_AXLEN	Memi[$1+3+($2)-1]	# dimensions of output image
-define	IE_INTYPE	Memi[$1+10]		# minimum input operand type
-define	IE_OUTTYPE	Memi[$1+11]		# datatype of output image
-define	IE_BWIDTH	Memi[$1+12]		# npixels boundary extension
-define	IE_BTYPE	Memi[$1+13]		# type of boundary extension
-define	IE_BPIXVAL	Memr[$1+14]		# boundary pixel value
-define	IE_V		Memi[$1+15+($2)-1]	# position in output image
-define	IE_NOPERANDS	Memi[$1+22]		# number of input operands
+define	IE_ST		Memi[P2I($1)]		# symbol table
+define	IE_IM		Memi[P2I($1+1)]		# output image
+define	IE_NDIM		Memi[P2I($1+2)]		# dimension of output image
+define	IE_AXLEN	Memi[P2I($1+3)+($2)-1]	# dimensions of output image
+define	IE_INTYPE	Memi[P2I($1+10)]	# minimum input operand type
+define	IE_OUTTYPE	Memi[P2I($1+11)]	# datatype of output image
+define	IE_BWIDTH	Memi[P2I($1+12)]	# npixels boundary extension
+define	IE_BTYPE	Memi[P2I($1+13)]	# type of boundary extension
+define	IE_BPIXVAL	Memr[P2R($1+14)]	# boundary pixel value
+define	IE_V		Memi[P2I($1+15)+($2)-1]	# position in output image
+define	IE_NOPERANDS	Memi[P2I($1+22)]	# number of input operands
 			# align
 define	IE_IMOP		($1+24+(($2)-1)*LEN_IMOPERAND)	# image operand array
 
 # Expression database symbol.
 define	LEN_SYM		2
-define	SYM_TEXT	Memi[$1]
-define	SYM_NARGS	Memi[$1+1]
+define	SYM_TEXT	Memi[P2I($1)]
+define	SYM_NARGS	Memi[P2I($1+1)]
 
 # Argument list symbol
 define	LEN_ARGSYM	1
-define	ARGNO		Memi[$1]
+define	ARGNO		Memi[P2I($1)]
 
 
 # IMEXPR -- Task procedure for the image expression evaluator.  This task
@@ -1095,6 +1095,7 @@ pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
 pointer	locpr(), gt_opentext()
+pointer	ie_gsym()
 extern	ie_gsym()
 
 begin
@@ -1123,6 +1124,7 @@ int	noperands, ch, i
 int	ops[MAX_OPERANDS]
 pointer	gt, sp, tokbuf, op
 
+pointer	ie_gsym()
 extern	ie_gsym()
 pointer	gt_opentext(), locpr()
 int	gt_rawtok(), gt_nexttok()

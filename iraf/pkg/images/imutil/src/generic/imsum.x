@@ -1167,7 +1167,7 @@ pointer	sp, input, v1, v2, im, buf, buf1, buf_in, buf_out
 bool	streq()
 int	imtlen(), imtgetim(), imtrgetim()
 pointer	immap()
-int	impnlr(), imgnlr()
+int	imgnlr(), impnlr()
 errchk	immap, imunmap, imgnlr, impnlr
 
 begin

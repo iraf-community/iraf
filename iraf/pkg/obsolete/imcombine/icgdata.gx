@@ -30,7 +30,8 @@ long	v1[ARB], v2[ARB]	# Line vectors
 
 int	i, j, k, l, ndim, nused
 real	a, b
-pointer	buf, dp, ip, mp, imgnl$t()
+pointer	buf, dp, ip, mp
+int	imgnl$t()
 
 include	"../icombine.com"
 

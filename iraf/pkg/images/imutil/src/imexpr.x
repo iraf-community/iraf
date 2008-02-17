@@ -91,7 +91,6 @@ int	impnls(), impnli(), impnll(), impnlr(), impnld()
 int	open(), getci(), ie_getops(), lexnum(), stridxs()
 int	imgeti(), ctoi(), btoi(), clgeti(), strncmp()
 pointer	locpr(), ie_getexprdb(), ie_expandtext(), immap()
-pointer	ie_getop(), ie_fcn()
 extern	ie_getop(), ie_fcn()
 pointer	evvexpr()
 long	fstatl()
@@ -784,7 +783,7 @@ end
 
 # IE_GETOP -- Called by evvexpr to fetch an input image operand.
 
-pointer procedure ie_getop (ie, opname, o)
+procedure ie_getop (ie, opname, o)
 
 pointer	ie			#I imexpr descriptor
 char	opname[ARB]		#I operand name
@@ -935,7 +934,7 @@ end
 
 # IE_FCN -- Called by evvexpr to execute an imexpr special function.
 
-pointer procedure ie_fcn (ie, fcn, args, nargs, o)
+procedure ie_fcn (ie, fcn, args, nargs, o)
 
 pointer	ie			#I imexpr descriptor
 char	fcn[ARB]		#I function name

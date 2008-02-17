@@ -139,7 +139,7 @@ int	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
 PIXEL	asum$t()
-pointer	imgnl$t()
+int	imgnl$t()
 errchk	imgnl$t
 
 begin

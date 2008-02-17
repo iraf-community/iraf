@@ -213,7 +213,7 @@ int	blkfac[ARB]		# Block replication factors
 int	i, j, ndim, nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1r(), impl1r()
-int	impnlr(), imgnlr()
+int	imgnlr(), impnlr()
 
 begin
 	call smark (sp)
