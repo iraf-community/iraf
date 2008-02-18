@@ -106,6 +106,7 @@
 #define	MII_BYTE	8
 #define	MII_SHORT	16
 #define	MII_LONG	32
+#define	MII_LONGLONG	64
 #define	MII_REAL	-32
 #define	MII_DOUBLE	-64
 #define	MII_INT		MII_LONG

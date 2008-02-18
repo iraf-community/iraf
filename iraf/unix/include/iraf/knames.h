@@ -689,11 +689,13 @@ extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 #define	MIIPAK8		miipa8_
 #define	MIIPAK16	miipa6_
 #define	MIIPAK32	miipa2_
+#define	MIIPAK64	miipa4_
 #define	MIIPAKR		miipar_
 #define	MIIPAKD		miipad_
 #define	MIIUPK8		miiup8_
 #define	MIIUPK16	miiup6_
 #define	MIIUPK32	miiup2_
+#define	MIIUPK64	miiup4_
 #define	MIIUPKR		miiupr_
 #define	MIIUPKD		miiupd_
 #define	NOTI		noti_
@@ -994,11 +996,13 @@ extern int MIIUPK ( void *, void *, XSIZE_T *, XINT *, XINT * );
 extern int MIIPAK8 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIPAK16 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIPAK32 ( void *, void *, XSIZE_T *, XINT * );
+extern int MIIPAK64 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIPAKR ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIPAKD ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPK8 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPK16 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPK32 ( void *, void *, XSIZE_T *, XINT * );
+extern int MIIUPK64 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPKR ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPKD ( void *, void *, XSIZE_T *, XINT * );
 

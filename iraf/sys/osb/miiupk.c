@@ -28,6 +28,9 @@ int MIIUPK ( void *mii, void *spp, XSIZE_T *nelems, XINT *mii_datatype, XINT *sp
 	case MII_LONG:
 	    MIIUPK32 (mii, spp, nelems, spp_datatype);
 	    break;
+	case MII_LONGLONG:
+	    MIIUPK64 (mii, spp, nelems, spp_datatype);
+	    break;
 	case MII_REAL:
 	    MIIUPKR (mii, spp, nelems, spp_datatype);
 	    break;

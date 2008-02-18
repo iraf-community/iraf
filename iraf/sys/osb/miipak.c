@@ -56,6 +56,9 @@ int MIIPAK ( void *spp, void *mii, XSIZE_T *nelems, XINT *spp_datatype, XINT *mi
 	case MII_LONG:
 	    MIIPAK32 (spp, mii, nelems, spp_datatype);
 	    break;
+	case MII_LONGLONG:
+	    MIIPAK64 (spp, mii, nelems, spp_datatype);
+	    break;
 	case MII_REAL:
 	    MIIPAKR (spp, mii, nelems, spp_datatype);
 	    break;

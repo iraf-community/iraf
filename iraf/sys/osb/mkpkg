@@ -126,6 +126,7 @@ libvops.a:
 	miipak.c	
 	miipak16.c	
 	miipak32.c	
+	miipak64.c	
 	miipak8.c	
 	miipakd.c	
 	miipakr.c	
@@ -133,6 +134,7 @@ libvops.a:
 	miiupk.c	
 	miiupk16.c	
 	miiupk32.c	
+	miiupk64.c	
 	miiupk8.c	
 	miiupkd.c	
 	miiupkr.c	
