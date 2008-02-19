@@ -48,12 +48,15 @@ procedure zgettt (fd, buf, maxch, status)
 
 int	fd			# input file
 char	buf[ARB]		# output buffer
-int	maxch			# max chars out
-int	status			# actual chars out
+size_t	maxch			# max chars out
+long	status			# actual chars out
 
+size_t	sz_val
 pointer	sp, logbuf
-int	nchars, ch, i
-int	ztt_lowercase(), ztt_query(), gstrcpy(), and()
+size_t	nchars, i
+int	ch, i_len
+size_t	ztt_lowercase()
+int	ztt_query(), gstrcpy(), and()
 include	"zfiott.com"
 define	nextline_ 91
 define	again_ 92
@@ -68,9 +71,11 @@ begin
 
 	    if (tty_inbuf[tty_ip] == EOS) {
 		call smark (sp)
-		call salloc (logbuf, SZ_LOGLINE, TY_CHAR)
+		sz_val = SZ_LOGLINE
+		call salloc (logbuf, sz_val, TY_CHAR)
 nextline_
-		call ztt_getlog (tty_pbinchan, Memc[logbuf], SZ_LOGLINE, nchars)
+		sz_val = SZ_LOGLINE
+		call ztt_getlog (tty_pbinchan, Memc[logbuf], sz_val, nchars)
 
 		if (nchars == 1 && Memc[logbuf] == EOFCHAR) {
 		    call ztt_ttyput ("[EOF]\n")
@@ -80,8 +85,9 @@ nextline_
 		    # Process any \{ ... \} sequences in the line from the
 		    # logfile, leave 'status' chars of data text in tty_inbuf.
 
+		    sz_val = SZ_LINE
 		    if (ztt_query (Memc[logbuf], nchars,
-			tty_inbuf, SZ_LINE, status) == QUIT) {
+			tty_inbuf, sz_val, status) == QUIT) {
 
 			# User commands us to quit.
 			tty_inbuf[1] = EOS
@@ -91,7 +97,8 @@ nextline_
 		    } else {
 			# Copy data text to tty_inbuf.
 			tty_inbuf[status+1] = EOS
-			status = gstrcpy (tty_inbuf, buf, maxch)
+			i_len = maxch
+			status = gstrcpy (tty_inbuf, buf, i_len)
 			tty_ip = status + 1
 
 			# If there was no data on the line but we get here,
@@ -107,7 +114,8 @@ nextline_
 		call sfree (sp)
 
 	    } else {
-		status = gstrcpy (tty_inbuf[tty_ip], buf, maxch)
+		i_len = maxch
+		status = gstrcpy (tty_inbuf[tty_ip], buf, i_len)
 		tty_ip = tty_ip + status
 		if (!tty_verify || tty_rawmode)
 		    call zwmsec (tty_delay)
@@ -145,6 +153,7 @@ again_	    call zgetty (fd, buf, maxch, status)
 
 		if (tty_filter != 0)
 		    if (buf[1] == tty_filter_key) {
+			# args: int, char, size_t, long
 			call zcall4 (tty_filter, fd, buf, maxch, status)
 			if (status == 0)
 			    goto again_
@@ -154,18 +163,24 @@ again_	    call zgetty (fd, buf, maxch, status)
 
 	# Log the input string if input logging is in effect.
 	if (tty_login && !tty_passthru) {
-	    if (status <= 0)
-		call ztt_putlog (tty_inlogchan, "\032", 1)
-	    else
-		call ztt_putlog (tty_inlogchan, buf, status)
+	    if (status <= 0) {
+		sz_val = 1
+		call ztt_putlog (tty_inlogchan, "\032", sz_val)
+	    } else {
+		sz_val = status
+		call ztt_putlog (tty_inlogchan, buf, sz_val)
+	    }
 	}
 
 	# If UCASE mode in set and not in raw mode, map the input string to
 	# lower case.
 
-	if ((tty_ucasein || tty_ucaseout) && status > 0)
-	    if (!tty_rawmode && tty_ucasein)
-		status = ztt_lowercase (buf, buf, status)
+	if ((tty_ucasein || tty_ucaseout) && status > 0) {
+	    if (!tty_rawmode && tty_ucasein) {
+		sz_val = status
+		status = ztt_lowercase (buf, buf, sz_val)
+	    }
+	}
 end
 
 
@@ -177,9 +192,10 @@ procedure zputtt (fd, buf, nchars, status)
 
 int	fd			# file to be written to
 char	buf[ARB]		# data to be output
-int	nchars			# nchars to write to file
-int	status			# return status
+size_t	nchars			# nchars to write to file
+long	status			# return status
 
+size_t	sz_val
 int	ch
 pointer	sp, obuf
 bool	ctrlstr
@@ -212,7 +228,8 @@ begin
 			goto noucase_
 
 		call smark (sp)
-		call salloc (obuf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (obuf, sz_val, TY_CHAR)
 
 		call ztt_uppercase (buf, Memc[obuf], nchars)
 		call zputty (fd, Memc[obuf], nchars, status)
@@ -240,6 +257,7 @@ procedure ztt_logio (inflag, outflag)
 int	inflag			# log input stream (YES|NO|DONTCARE)
 int	outflag			# log output stream (YES|NO|DONTCARE)
 
+size_t	sz_val
 int	status
 pointer	sp, osfn, fname
 string	openerr "cannot open file "
@@ -247,8 +265,9 @@ include	"zfiott.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	# Enable/disable logging of the input stream.
 	if (inflag == YES) {
@@ -336,6 +355,7 @@ procedure ztt_playback (flag)
 
 int	flag			# YES to enable playback, NO to disable
 
+size_t	sz_val
 int	status
 pointer	sp, osfn
 extern	ztt_pboff()
@@ -344,7 +364,8 @@ include	"zfiott.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	if (flag == YES) {
 	    # If we try to turn on playback mode while in login mode, log
@@ -423,32 +444,38 @@ procedure ztt_logdev (chan)
 
 int	chan			# output file
 
-int	status
+size_t	sz_val
+long	status
 pointer	sp, obuf, devname
 int	envfind(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (obuf, SZ_LINE, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (obuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	# Timestamp the new entry in the logfile.
 	call strcpy ("\O=", Memc[obuf], SZ_LINE)
 	call sysid (Memc[obuf+3], SZ_LINE-3)
 	call strcat ("\n", Memc[obuf], SZ_LINE)
-	call zputtx (chan, Memc[obuf], strlen(Memc[obuf]), status)
+	sz_val = strlen(Memc[obuf])
+	call zputtx (chan, Memc[obuf], sz_val, status)
 
 	if (envfind ("terminal", Memc[devname], SZ_FNAME) > 0) {
 	    call strcpy ("\T=", Memc[obuf], SZ_LINE)
 	    call strcat (Memc[devname], Memc[obuf], SZ_LINE)
 	    call strcat ("\n", Memc[obuf], SZ_LINE)
-	    call zputtx (chan, Memc[obuf], strlen(Memc[obuf]), status)
+	    sz_val = strlen(Memc[obuf])
+	    call zputtx (chan, Memc[obuf], sz_val, status)
 	}
 	if (envfind ("stdgraph", Memc[devname], SZ_FNAME) > 0) {
 	    call strcpy ("\G=", Memc[obuf], SZ_LINE)
 	    call strcat (Memc[devname], Memc[obuf], SZ_LINE)
 	    call strcat ("\n", Memc[obuf], SZ_LINE)
-	    call zputtx (chan, Memc[obuf], strlen(Memc[obuf]), status)
+	    sz_val = strlen(Memc[obuf])
+	    call zputtx (chan, Memc[obuf], sz_val, status)
 	}
 
 	call sfree (sp)
@@ -463,11 +490,14 @@ procedure ztt_putlog (chan, dstr, nchars)
 
 int	chan			# kernel i/o channel
 char	dstr[ARB]		# data string
-int	nchars			# length of data string (0 if EOS delimited)
+size_t	nchars			# length of data string (0 if EOS delimited)
 
+size_t	sz_val
 char	cch
 pointer	sp, obuf, op
-int	status, ip, ch, n
+long	status
+size_t	ip, n
+int	ch
 int	strlen(), ctocc()
 define	output {Memc[op]=($1);op=op+1}
 include	"zfiott.com"
@@ -478,7 +508,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (obuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	n = nchars
 	if (n <= 0)
@@ -538,11 +569,12 @@ procedure ztt_getlog (chan, obuf, maxch, nchars)
 
 int	chan			# kernel input channel (text file)
 char	obuf[maxch]		# output buffer
-int	maxch			# max chars to return
-int	nchars			# nchars returned or EOF
+size_t	maxch			# max chars to return
+size_t	nchars			# nchars returned or EOF
 
 bool	incom
-int	lastch, ch, op, o
+int	lastch, ch, o
+size_t	op
 char	cch, cc[4], devname[SZ_DEVNAME]
 int	ztt_getchar(), cctoc()
 include	"zfiott.com"
@@ -667,15 +699,18 @@ end
 int procedure ztt_query (logtext, nchars, dtext, maxch, sz_dtext)
 
 char	logtext[ARB]		# line of text from logfile
-int	nchars			# nchars in logfile text
+size_t	nchars			# nchars in logfile text
 char	dtext[maxch]		# line of text to be returned from zgettt
-int	maxch			# max chars returned
-int	sz_dtext		# actual chars returned
+size_t	maxch			# max chars returned
+long	sz_dtext		# actual chars returned
 
+size_t	sz_val
 char	text[1]
 pointer	sp, etext, ep
 bool	learn, incom, verify, format_control
-int	status, delay, ip_save, ip, op, ch, n
+int	delay, ch, i_off
+size_t	ip_save, ip, op, n
+long	status
 
 int	ctoi()
 include	"zfiott.com"
@@ -684,7 +719,8 @@ define	deposit_ 92
 
 begin
 	call smark (sp)
-	call salloc (etext, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (etext, sz_val, TY_CHAR)
 
 	# The logfile line may contain embedded sequences of text which are
 	# to be echoed to the terminal, but which are not to be returned as
@@ -738,11 +774,16 @@ begin
 			    } else
 				ip = ip_save
 			} else if (IS_DIGIT (logtext[ip])) {
-			    if (ctoi (logtext, ip, delay) <= 0) {
+			    i_off = 1
+			    if (ctoi (logtext[ip], i_off, delay) <= 0) {
 				delay = tty_delay
 				ip = ip_save
-			    } else if (learn)
-				tty_delay = delay
+			    } else {
+				ip = ip + i_off - 1
+				if (learn) {
+				    tty_delay = delay
+				}
+			    }
 			}
 
 			if (ip > ip_save)
@@ -767,7 +808,7 @@ deposit_	# Do not include the trailing data-newline in the echo text.
 		if (logtext[ip] == '\n' && ip < nchars) {
 		    if (ep > etext) {
 			n = ep - etext
-			call zputty (tty_koutchan, Memc[etext], ep-etext, n)
+			call zputty (tty_koutchan, Memc[etext], n, status)
 			call zflsty (tty_koutchan, status)
 		    }
 		    ep = etext
@@ -809,7 +850,8 @@ deposit_	# Do not include the trailing data-newline in the echo text.
 	# char read leaves the terminal in raw mode.
 
 	repeat {
-	    call zgetty (tty_kinchan, text, 1, status)
+	    sz_val = 1
+	    call zgetty (tty_kinchan, text, sz_val, status)
 	    if (status > 0)
 		ch = text[1]
 	    else 
@@ -852,11 +894,13 @@ int procedure ztt_getchar (chan, ch)
 int	chan			# input channel
 int	ch			# receives character
 
+size_t	c_1
 char	text[1]
-int	status
+long	status
 
 begin
-	call zgettx (chan, text, 1, status)
+	c_1 = 1
+	call zgettx (chan, text, c_1, status)
 	if (status <= 0) {
 	    ch = EOF
 	    return (EOF)
@@ -879,14 +923,14 @@ end
 # The case shift control sequences are shown above.  These are not recognized
 # when the terminal is in raw mode.
 
-int procedure ztt_lowercase (in, out, nchars)
+size_t procedure ztt_lowercase (in, out, nchars)
 
 char	in[ARB]			# input string
 char	out[ARB]		# output string
-int	nchars			# input string length
+size_t	nchars			# input string length
 
 int	ch
-int	ip, op
+size_t	ip, op
 include	"zfiott.com"
 
 begin
@@ -935,9 +979,10 @@ procedure ztt_uppercase (in, out, nchars)
 
 char	in[ARB]			# input string
 char	out[ARB]		# output string
-int	nchars			# string length
+size_t	nchars			# string length
 
-int	ch, i
+int	ch
+size_t	i
 
 begin
 	do i = 1, nchars {
@@ -955,12 +1000,14 @@ procedure ztt_ttyput (message)
 
 char	message[ARB]		# message string
 
-int	status
+size_t	sz_val
+long	status
 int	stridxs(), strlen()
 include	"zfiott.com"
 
 begin
-	call zputty (tty_koutchan, message, strlen(message), status)
+	sz_val = strlen(message)
+	call zputty (tty_koutchan, message, sz_val, status)
 	if (stridxs ("\n", message) > 0)
 	    call zflsty (tty_koutchan, status)
 end
@@ -1267,7 +1314,7 @@ end
 procedure zflstt (fd, status)
 
 int	fd			# channel
-int	status			# return status
+long	status			# return status
 
 begin
 	call zflsty (fd, status)

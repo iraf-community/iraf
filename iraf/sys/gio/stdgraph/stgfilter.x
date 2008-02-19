@@ -38,8 +38,8 @@ procedure sgf_ttyfilter (fd, buf, maxch, status)
 
 int	fd			#I input file
 char	buf[ARB]		#U input buffer
-int	maxch			#I max chars in buffer
-int	status			#U number of chars in buffer
+size_t	maxch			#I max chars in buffer
+long	status			#U number of chars in buffer
 
 char	escape[MAXCH]
 char	svbuf[MAXCH+4]
