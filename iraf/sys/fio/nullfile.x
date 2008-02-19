@@ -32,7 +32,7 @@ int	chan			# assigned channel (output)
 bool	first_time
 int	nu
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 data	first_time /true/
 
@@ -75,7 +75,7 @@ int	chan
 int	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -98,7 +98,7 @@ long	lvalue
 int	and()
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -120,12 +120,13 @@ end
 
 procedure zardnu (chan, buf, maxbytes, loffset)
 
-int	chan, maxbytes
+int	chan
 char	buf[ARB]
+size_t	maxbytes
 long	loffset
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -135,12 +136,13 @@ end
 
 procedure zawrnu (chan, buf, nbytes, loffset)
 
-int	chan, nbytes
+int	chan
 char	buf[ARB]
+size_t	nbytes
 long	loffset
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -150,10 +152,11 @@ end
 
 procedure zawtnu (chan, status)
 
-int	chan, status
+int	chan
+long	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -168,11 +171,13 @@ end
 
 procedure zgetnu (chan, buf, maxch, status)
 
-int	chan, maxch, status
+int	chan
 char	buf[ARB]
+size_t	maxch
+long	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -185,11 +190,13 @@ end
 
 procedure zputnu (chan, buf, nchars, status)
 
-int	chan, nchars, status
+int	chan
 char	buf[ARB]
+size_t	nchars
+long	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -203,10 +210,10 @@ end
 procedure zflsnu (chan, status)
 
 int	chan
-int	status
+long	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -219,11 +226,12 @@ end
 
 procedure zseknu (chan, loffset, status)
 
-int	chan, status
+int	chan
 long	loffset
+int	status
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
@@ -240,7 +248,7 @@ int	chan
 long	loffset
 
 int	flags[MAX_NULLFILES]
-int	count[MAX_NULLFILES]
+size_t	count[MAX_NULLFILES]
 common	/znucom/ flags, count
 
 begin
