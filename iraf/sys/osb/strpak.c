@@ -16,7 +16,7 @@
  * and the operation is being performed in place, then this procedure should
  * do nothing.
  */
-int STRPAK ( XCHAR *instr, PKCHAR *outstr, XINT *maxch )
+int STRPAK ( XCHAR *instr, PKCHAR *outstr, XSIZE_T *maxch )
 {
 	XCHAR *ip = instr;
 	char *op = (char *)outstr;

@@ -10,7 +10,7 @@
  * Note that while XCHAR is signed, the signedness of the C char is unspecified,
  * hence we pack the chars into unsigned bytes and restore the sign explicitly.
  */
-int CHRUPK ( XCHAR *a, XINT *a_off, XCHAR *b, XINT *b_off, XINT *nchars )
+int CHRUPK ( XCHAR *a, XSIZE_T *a_off, XCHAR *b, XSIZE_T *b_off, XSIZE_T *nchars )
 {
 	unsigned char *ip;
 	XCHAR *op, *minop;

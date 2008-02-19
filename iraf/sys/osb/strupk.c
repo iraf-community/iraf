@@ -16,11 +16,11 @@
  * and the operation is being performed in place, then this procedure should
  * do nothing.
  */
-int STRUPK ( PKCHAR *instr, XCHAR *outstr, XINT *maxch )
+int STRUPK ( PKCHAR *instr, XCHAR *outstr, XSIZE_T *maxch )
 {
 	char *ip = (char *)instr;
 	XCHAR *op = outstr;
-	long n;
+	XSIZE_T n;
 
 	if ( *maxch < 0 ) goto quit;
 

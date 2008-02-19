@@ -1006,10 +1006,10 @@ extern int MIIUPK64 ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPKR ( void *, void *, XSIZE_T *, XINT * );
 extern int MIIUPKD ( void *, void *, XSIZE_T *, XINT * );
 
-extern int CHRPAK ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int CHRUPK ( XCHAR *, XINT *, XCHAR *, XINT *, XINT * );
-extern int STRPAK ( XCHAR *, PKCHAR *, XINT * );
-extern int STRUPK ( PKCHAR *, XCHAR *, XINT * );
+extern int CHRPAK ( XCHAR *, XSIZE_T *, XCHAR *, XSIZE_T *, XSIZE_T * );
+extern int CHRUPK ( XCHAR *, XSIZE_T *, XCHAR *, XSIZE_T *, XSIZE_T * );
+extern int STRPAK ( XCHAR *, PKCHAR *, XSIZE_T * );
+extern int STRUPK ( PKCHAR *, XCHAR *, XSIZE_T * );
 
 extern XINT ANDI ( XINT *, XINT * );
 extern XSHORT ANDS ( XSHORT *, XSHORT * );

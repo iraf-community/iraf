@@ -11,7 +11,7 @@
  * hence we pack the chars in unsigned bytes, dealing explicitly with any
  * negative values.
  */
-int CHRPAK ( XCHAR *a, XINT *a_off, XCHAR *b, XINT *b_off, XINT *nchars )
+int CHRPAK ( XCHAR *a, XSIZE_T *a_off, XCHAR *b, XSIZE_T *b_off, XSIZE_T *nchars )
 {
 	XCHAR *ip;
 	unsigned char *op, *maxop;
