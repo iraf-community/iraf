@@ -9,7 +9,7 @@ procedure zzwrii (fcb, buf, nbytes, offset)
 
 pointer	fcb			# pointer to channel descriptor
 char	buf[ARB]		# input buffer
-int	nbytes			# number of  bytes to write
+size_t	nbytes			# number of  bytes to write
 long	offset			# not used for this device
 
 begin

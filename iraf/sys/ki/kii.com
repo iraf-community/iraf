@@ -4,12 +4,14 @@
 # size of the packed packet in host ints will only damage the area used by
 # the unpacked packet, causing no harm.
 
-int	p_packet[SZB_PACKET/SZB_CHAR/SZ_INT]	# packed packet
-
-int	p_opcode		# instruction opcode
-int	p_subcode		# subcode, if device driver
+# Unpacked
+long	p_opcode		# instruction opcode
+long	p_subcode		# subcode, if device driver
 long	p_arg[MAX_ARGS]		# procedure arguments
-int	p_sbuflen		# nchars in use in string buffer
+long	p_sbuflen		# nchars in use in string buffer
 char	p_sbuf[SZ_SBUF]		# string buffer
 
-common	/kiicom/ p_packet, p_opcode, p_subcode, p_arg, p_sbuflen, p_sbuf
+# SZB_PACKET: 384 bytes (mii64-packed)
+char	p_packet[SZB_PACKET/SZB_CHAR]	# packed packet
+
+common	/kiicom/ p_opcode, p_subcode, p_arg, p_sbuflen, p_sbuf, p_packet

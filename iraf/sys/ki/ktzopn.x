@@ -14,8 +14,9 @@ char	osfn[ARB]		# packed os filename
 int	mode			# access mode
 int	chan			# receives assigned channel
 
+size_t	sz_txbdes
 pointer	bd, bp
-int	server
+int	server, oschan
 int	ki_connect(), ki_sendrcv(), ki_getchan(), kmalloc()
 include	"kichan.com"
 include	"kii.com"
@@ -24,14 +25,16 @@ begin
 	server = ki_connect (osfn)
 	p_arg[2] = mode
 
+	sz_txbdes = LEN_TXBDES
 	if (ki_sendrcv (server, device, TX_OPN) == ERR)
 	    chan = ERR
 	else if (p_arg[1] == ERR)
 	    chan = ERR
-	else if (kmalloc (bd, LEN_TXBDES, TY_STRUCT) == ERR)
+	else if (kmalloc (bd, sz_txbdes, TY_STRUCT) == ERR)
 	    chan = ERR
 	else {
-	    chan = ki_getchan (server, p_arg[1])
+	    oschan = p_arg[1]
+	    chan = ki_getchan (server, oschan)
 	    k_bufp[chan] = NULL
 
 	    # Init the text buffer and buffer descriptor.  Text i/o over the

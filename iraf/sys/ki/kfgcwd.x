@@ -13,6 +13,7 @@ char	outstr[maxch]		# receives pathname of directory
 int	maxch			# max chars out
 int	nchars			# length of returned string
 
+size_t	sz_val
 int	server, op
 int	gstrcpy(), ki_sendrcv()
 include	"kinode.com"
@@ -26,7 +27,8 @@ begin
 
 	if (n_default == NULL || n_default == n_local) {
 err_	    call zfgcwd (p_sbuf, SZ_SBUF, nchars)
-	    call strupk (p_sbuf, p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strupk (p_sbuf, p_sbuf, sz_val)
 	    p_arg[2] = 1
 
 	} else {
@@ -50,5 +52,6 @@ err_	    call zfgcwd (p_sbuf, SZ_SBUF, nchars)
 	}
 
 	nchars = op + gstrcpy (p_sbuf[p_arg[2]], outstr[op], maxch-op+1)
-	call strpak (outstr, outstr, maxch)
+	sz_val = maxch
+	call strpak (outstr, outstr, sz_val)
 end

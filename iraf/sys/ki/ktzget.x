@@ -12,11 +12,12 @@ procedure kt_zget (device, chan, obuf, maxch, status)
 int	device			# device driver code
 int	chan			# channel assigned device
 char	obuf[maxch]		# receives text
-int	maxch			# max chars to read
-int	status			# receives nchars read or ERR
+size_t	maxch			# max chars to read
+long	status			# receives nchars read or ERR
 
 pointer	bd, bp, ip, rp
-int	server, nchars, nleft, reclen
+size_t	nchars, nleft, c_1
+int	server, reclen
 int	ki_sendrcv()
 long	ki_decode()
 include	"kichan.com"
@@ -54,9 +55,9 @@ begin
 		# else it is returned as a second record.  Each line is
 		# contained entirely in a single buffer.
 
-		if (nchars <= SZ_SBUF)
+		if (nchars <= SZ_SBUF) {
 		    call amovc (p_sbuf, Memc[bp], nchars)
-		else {
+		} else {
 		    call ks_aread (server, Memc[bp], nchars)
 		    call ks_await (server, status)
 
@@ -68,7 +69,8 @@ begin
 			return
 		    }
 
-		    call chrupk (Memc[bp], 1, Memc[bp], 1, nchars)
+		    c_1 = 1
+		    call chrupk (Memc[bp], c_1, Memc[bp], c_1, nchars)
 		}
 
 		B_RP(bd)   = bp

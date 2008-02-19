@@ -11,6 +11,7 @@ char	osfn[ARB]		# packed os filename
 int	protflag		# set/query flag
 int	status			# answer; yes or no
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_sendrcv()
 include	"kii.com"
@@ -19,7 +20,8 @@ begin
 	server = ki_connect (osfn)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zfprot (p_sbuf, protflag, status)
 
 	} else {

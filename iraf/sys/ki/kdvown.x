@@ -13,6 +13,7 @@ char	owner[ARB]		# receives owner name string
 int	maxch			# max chars out
 int	status			# allocation status (<xalloc.h>)
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_sendrcv()
 include	"kii.com"
@@ -21,7 +22,8 @@ begin
 	server = ki_connect (device)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zdvown (p_sbuf, owner, maxch, status)
 
 	} else {
@@ -31,7 +33,8 @@ begin
 		status = ERR
 	    } else {
 		status = p_arg[1]
-		call strpak (p_sbuf, owner, maxch)
+		sz_val = maxch
+		call strpak (p_sbuf, owner, sz_val)
 	    }
 	}
 end

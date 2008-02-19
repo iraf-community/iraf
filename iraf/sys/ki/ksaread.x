@@ -10,12 +10,14 @@ procedure ks_aread (server, buf, maxbytes)
 
 int	server			# node descriptor index of server
 char	buf[ARB]		# i/o buffer
-int	maxbytes		# maxbytes to read
+size_t	maxbytes		# maxbytes to read
 
+long	c_0
 int	and()
 include	"kinode.com"
 
 begin
+	c_0 = 0
 	if (and (n_status[server], F_IOERR) == 0)
-	    call zardks (n_kschan[server], buf, maxbytes, long(0))
+	    call zardks (n_kschan[server], buf, maxbytes, c_0)
 end

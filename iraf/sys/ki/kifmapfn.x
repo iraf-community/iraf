@@ -18,21 +18,25 @@ char	vfn[ARB]		# network filename
 char	pkosfn[maxch]		# receives packed, fully resolved OS filename
 int	maxch
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_sendrcv()
 include	"kii.com"
 
 begin
-	call strpak (vfn, pkosfn, maxch)
+	sz_val = maxch
+	call strpak (vfn, pkosfn, sz_val)
 	server = ki_connect (pkosfn)
 
 	if (server == NULL)
 	    call fmapfn (vfn, pkosfn, maxch)
 	else {
 	    p_arg[2] = maxch
-	    if (ki_sendrcv (server, KI_FMAPFN, 0) == ERR)
+	    if (ki_sendrcv (server, KI_FMAPFN, 0) == ERR) {
 		call syserrs (SYS_FNOSUCHFILE, vfn)
-	    else
-		call strpak (p_sbuf, pkosfn, maxch)
+	    } else {
+		sz_val = maxch
+		call strpak (p_sbuf, pkosfn, sz_val)
+	    }
 	}
 end

@@ -11,9 +11,10 @@ int	nchars			# number of chars to be encoded
 
 int	i
 long	v, nv
+long	absl()
 
 begin
-	v = abs (data)
+	v = absl (data)
 
 	do i = 1, nchars {
 	    nv = v / 128

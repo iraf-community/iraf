@@ -12,7 +12,7 @@ procedure kb_zawr (device, chan, ibuf, nbytes, loffset)
 int	device			# device driver code
 int	chan			# channel assigned device
 char	ibuf[nbytes]		# receives data
-int	nbytes			# number of bytes to write
+size_t	nbytes			# number of bytes to write
 long	loffset			# file offset
 
 int	server

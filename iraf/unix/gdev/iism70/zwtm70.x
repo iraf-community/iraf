@@ -6,7 +6,7 @@
 procedure zwtm70 (chan, status)
 
 int	chan			# FCB pointer for device
-int	status			# nbytes transferred or ERR
+long	status			# nbytes transferred or ERR
 
 begin
 	call zawtbf (chan, status)

@@ -12,6 +12,7 @@ char	osfn[ARB]		# packed os filename
 long	fi[ARB]			# receives finfo structure
 int	status			# answer; ok or err
 
+size_t	sz_val
 int	server, i
 int	ki_connect(), ki_sendrcv()
 include	"kii.com"
@@ -20,7 +21,8 @@ begin
 	server = ki_connect (osfn)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zfinfo (p_sbuf, fi, status)
 
 	} else {
@@ -36,7 +38,9 @@ begin
 
 		do i = 1, FI_NINTFIELDS
 		    fi[i] = p_arg[i+1]
-		call strpak (p_sbuf, FI_OWNER(fi), FI_SZOWNER)
+		sz_val = FI_SZOWNER
+		# arg 2: incompatible pointer...
+		call strpak (p_sbuf, FI_OWNER(fi), sz_val)
 	    }
 	}
 end

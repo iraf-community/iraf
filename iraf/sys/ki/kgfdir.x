@@ -15,9 +15,11 @@ char	osfn[maxch]		# receives packed OS filename
 int	maxch			# maxchars out
 int	status			# answer; ok or err
 
+size_t	sz_val, c_1
+long	lstatus
 pointer	dp, bp, ip, op
 pointer	sp, vfn, root, extn
-int	server, nchars, len_root, len_extn
+int	server, nchars, len_root, len_extn, i_off
 int	ki_sendrcv(), gstrcpy()
 include	"kichan.com"
 include	"kii.com"
@@ -31,9 +33,11 @@ begin
 
 	} else {
 	    call smark (sp)
-	    call salloc (vfn, SZ_PATHNAME, TY_CHAR)
-	    call salloc (root, SZ_FNAME, TY_CHAR)
-	    call salloc (extn, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_PATHNAME
+	    call salloc (vfn, sz_val, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (root, sz_val, TY_CHAR)
+	    call salloc (extn, sz_val, TY_CHAR)
 
 	    dp = k_bufp[chan]
 	    bp = D_DATA(dp)
@@ -66,17 +70,22 @@ begin
 
 		nchars = p_arg[1]
 		if (nchars <= SZ_SBUF) {
-		    call amovc (p_sbuf, Memc[bp], nchars)
+		    sz_val = nchars
+		    call amovc (p_sbuf, Memc[bp], sz_val)
 		    p_sbuflen = nchars
 		} else {
-		    call ks_aread (server, Memc[bp], nchars)
-		    call ks_await (server, status)
+		    sz_val = nchars
+		    call ks_aread (server, Memc[bp], sz_val)
+		    call ks_await (server, lstatus)
 
-		    if (status != nchars) {
+		    if (lstatus != nchars) {
 			status = ERR
 			goto quit_
-		    } else
-			call chrupk (Memc[bp], 1, Memc[bp], 1, nchars)
+		    } else {
+			c_1 = 1
+			sz_val = nchars
+			call chrupk (Memc[bp], c_1, Memc[bp], c_1, sz_val)
+		    }
 		}
 
 		D_IP(dp)      = bp
@@ -96,8 +105,11 @@ begin
 		# are.  We must map these into local host filenames since that
 		# is what the kernel interface is supposed to return.
 
-		call vfn_encode (Memc, D_IP(dp),
+		i_off = 1
+		call vfn_encode (Memc[D_IP(dp)], i_off,
 		    Memc[root], len_root, Memc[extn], len_extn)
+		D_IP(dp) = D_IP(dp) + i_off - 1
+
 		if (len_extn > 0)
 		    call vfn_map_extension (Memc[extn], Memc[extn], SZ_FNAME)
 
@@ -109,7 +121,8 @@ begin
 		}
 
 		# Return a packed (local) host filename.
-		call strpak (Memc[vfn], osfn, maxch)
+		sz_val = maxch
+		call strpak (Memc[vfn], osfn, sz_val)
 	    } else
 		op = vfn
 

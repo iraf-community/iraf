@@ -11,7 +11,7 @@ include	<chars.h>
 int procedure ctowrd (str, ip, outstr, maxch)
 
 char	str[ARB]			# input string
-int	ip				# pointer into input string
+int	ip				# offset into input string
 char	outstr[ARB]			# receives extracted word
 int	maxch
 

@@ -13,15 +13,18 @@ procedure m75put (fcb, buf, nbytes_buf, offset)
 
 pointer	fcb			# pointer to channel descriptor
 short	buf[ARB]		# data array
-int	nbytes_buf		# nbytes of data in buffer
+size_t	nbytes_buf		# nbytes of data in buffer
 long	offset			# not used
 
+size_t	sz_val
 int	ifcb
 bool	use_altbuf
 short	altbuf[128]
 short	m70[LEN_IISHDR]
 short	m75[LEN_IISHDR]
-int	nbytes, status, sum, i
+size_t	nbytes, i
+int	sum
+long	status
 int	xferid, subunit, xreg, yreg
 int	and(), or(), not()
 
@@ -30,7 +33,8 @@ begin
 	use_altbuf = false
 
 	# Retrieve the M70 header from the channel descriptor.
-	call amovs (FCB_IISHDR(fcb), m70, LEN_IISHDR)
+	sz_val = LEN_IISHDR
+	call amovs (FCB_IISHDR(fcb), m70, sz_val)
 	
 	xferid  = XFERID(m70)
 	subunit = SUBUNIT(m70)
@@ -46,7 +50,8 @@ begin
 	# in the transfer id which the M70 knows nothing about and hence could
 	# not have set.
 
-	call amovs (m70, m75, LEN_IISHDR)
+	sz_val = LEN_IISHDR
+	call amovs (m70, m75, sz_val)
 	XFERID(m75) = and (xferid,
 	    not (BYTEORDER+PMA+ACCELERATE+REPEAT+PAGEMODE))
 
@@ -143,7 +148,8 @@ begin
 
 	# Output the header.
 
-	call zzwrii (fcb, m75, SZB_IISHDR, offset)
+	sz_val = SZB_IISHDR
+	call zzwrii (fcb, m75, sz_val, offset)
 	call zwtm75 (ifcb, status)
 	if (status == ERR) {
 	    FCB_STATUS(fcb) = ERR

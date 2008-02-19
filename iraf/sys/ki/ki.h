@@ -26,11 +26,12 @@ define	SZ_TXBUF	16386		# size of text file buffer (should be
 					# at least (2*LEN_SEQBUF*SZ_LINE))
 define	LEN_TXBDES	(5+SZ_TXBUF/SZ_STRUCT)
 
-define	B_CI		Memi[P2I($1)]	# character index into current record
-define	B_RP		Memi[P2I($1+1)]	# pointer to current record
-define	B_ITOP		Memi[P2I($1+2)]	# end of input buffer
-define	B_OTOP		Memi[P2I($1+3)]	# end of output buffer
-define	B_BUFTOP	Memi[P2I($1+4)]	# end of buffer
+# Note: Use Meml only.
+define	B_CI		Meml[P2L($1)]	# character index into current record
+define	B_RP		Meml[P2L($1+1)]	# pointer to current record
+define	B_ITOP		Meml[P2L($1+2)]	# end of input buffer
+define	B_OTOP		Meml[P2L($1+3)]	# end of output buffer
+define	B_BUFTOP	Meml[P2L($1+4)]	# end of buffer
 define	B_BUFPTR	P2C(($1)+5)	# first char of buffer
 
 # ZGFDIR buffer descriptor.
@@ -38,8 +39,8 @@ define	B_BUFPTR	P2C(($1)+5)	# first char of buffer
 define	SZ_DIRDATA	2048		# amount of directory data to read
 define	LEN_DIRBDES	(5+SZ_DIRDATA/SZ_STRUCT)
 
-define	D_IP		Memi[P2I($1)]	# input pointer into dirbuf
-define	D_ITOP		Memi[P2I($1+1)]	# top of dirbuf
+define	D_IP		Memp[$1]	# input pointer into dirbuf
+define	D_ITOP		Memp[$1+1]	# top of dirbuf
 define	D_EOFSEEN	Memi[P2I($1+2)]	# dirbuf contains last of data
 define	D_DATA		P2C(($1)+5)	# pointer to data area
 
@@ -57,11 +58,13 @@ define	R_GETRECLEN	(($1)+7)	# nchars to reclen
 
 # KII instruction format.
 
-define	LEN_INTFIELDS	16		# number of integer fields
-define	FIRSTINTFIELD	p_opcode	# first integer field in common
+define	LEN_LONGFIELDS	16		# number of long integer fields
+define	FIRSTLONGFIELD	p_opcode	# first long integer field in common
 define	MAX_ARGS	13		# max procedure arguments
 define	SZ_SBUF		255		# size of string buffer
-define	SZB_PACKET	320		# packet size, bytes
+# packet size, bytes; see kii.com
+define	SZB_PACKET	(8*LEN_LONGFIELDS+1*(SZ_SBUF+1))
+define	SZB_UNPACKED	((SZ_LONG*LEN_LONGFIELDS+SZ_CHAR*(SZ_SBUF+1))*SZB_CHAR)
 
 # KII opcodes.
 

@@ -13,6 +13,7 @@ procedure kfchdr (dirname, status)
 char	dirname[ARB]		# directory name
 int	status
 
+size_t	sz_val
 pointer	sp, fname, defnode
 int	server, junk
 int	ki_gnode(), ki_connect(), ki_findnode()
@@ -22,15 +23,17 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (defnode, SZ_ALIAS, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_ALIAS
+	call salloc (defnode, sz_val, TY_CHAR)
 
 	server = ki_connect (dirname)
 
 	if (server == NULL) {
 	    # Directory is on the local node.
-
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zfchdr (p_sbuf, status)
 
 	} else {
@@ -51,7 +54,8 @@ begin
 	# is successful.
 
 	if (status != ERR) {
-	    call strupk (dirname, Memc[fname], SZ_PATHNAME)
+	    sz_val = SZ_PATHNAME
+	    call strupk (dirname, Memc[fname], sz_val)
 	    junk = ki_gnode (Memc[fname], Memc[defnode], junk)
 	    call strcpy (Memc[defnode], n_defaultnode, SZ_ALIAS)
 	    n_default = ki_findnode (n_defaultnode)

@@ -16,7 +16,9 @@ int	node			# node descriptor to open kernel on
 
 bool	hostdep
 pointer	sp, ksname, env, el, valp, ip, op, sv
-int	show, kschan, nchars, status, junk
+int	show, kschan, nchars, junk
+long	status, c_0
+size_t	sz_val
 
 pointer	env_first(), env_next()
 int	strlen(), stridx(), strncmp()
@@ -29,19 +31,24 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (ksname, SZ_FNAME, TY_CHAR)
-	call salloc (sv, SZB_PACKET / SZB_CHAR, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ksname, sz_val, TY_CHAR)
+	sz_val = SZB_UNPACKED / SZB_CHAR
+	call salloc (sv, sz_val, TY_CHAR)
 
 	status = ERR
 
 	# Our caller may have already prepped a packet in the kii common, which
 	# we are going to clobber below.  Save packet and restore when done.
 
-	call amovc (FIRSTINTFIELD, Memc[sv], SZB_PACKET / SZB_CHAR)
+	sz_val = SZB_UNPACKED / SZB_CHAR
+	# arg 1: incompatible pointer
+	call amovc (FIRSTLONGFIELD, Memc[sv], sz_val)
 
 	# Spawn the kernel server process.
 
-	call strpak (n_server[1,node], Memc[ksname], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call strpak (n_server[1,node], Memc[ksname], sz_val)
 	call zopnks (Memc[ksname], READ_WRITE, kschan)
 	if (kschan == ERR) {
 	    call sfree (sp)
@@ -58,7 +65,8 @@ begin
 	for (el=env_first(valp);  el != NULL;  el=env_next(el,valp,show))
 	    nchars = nchars + strlen (Memc[valp]) + 4 + 2 + 1
 
-	call salloc (env, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (env, sz_val, TY_CHAR)
 
 	op = env
 	for (el=env_first(valp);  el != NULL;  el=env_next(el,valp,show)) {
@@ -103,8 +111,11 @@ begin
 
 	if (nchars > SZ_SBUF) {
 	    # Transmit the data record.
-	    call strpak (Memc[env], Memc[env], nchars)
-	    call zawrks (kschan, Memc[env], nchars, long(0)) 
+	    sz_val = nchars
+	    call strpak (Memc[env], Memc[env], sz_val)
+	    c_0 = 0
+	    sz_val = nchars
+	    call zawrks (kschan, Memc[env], sz_val, c_0) 
 	    call zawtks (kschan, status)
 	    if (status != nchars) {
 		status = ERR
@@ -126,7 +137,9 @@ quit_
 	}
 
 	# Restore the caller's kii packet.
-	call amovc (Memc[sv], FIRSTINTFIELD, SZB_PACKET / SZB_CHAR)
+	sz_val = SZB_UNPACKED / SZB_CHAR
+	# arg 2: incompatible pointer
+	call amovc (Memc[sv], FIRSTLONGFIELD, sz_val)
 
 	call sfree (sp)
 	return (status)

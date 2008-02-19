@@ -16,14 +16,17 @@ int	status			# receives nchars written or ERR
 
 pointer	bd
 int	server
+long	lstatus
 int	ki_sendrcv()
 include	"kichan.com"
 include	"kii.com"
 
 begin
-	call ki_flushtx (device, chan, status)
-	if (status == ERR)
+	call ki_flushtx (device, chan, lstatus)
+	if (lstatus == ERR) {
+	    status = ERR
 	    return
+	}
 
 	# Discard any cached input text to force a buffer refill at the new
 	# offset.

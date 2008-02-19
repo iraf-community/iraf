@@ -14,7 +14,8 @@ int	chan			# channel assigned device
 long	loffset			# receives the file offset
 
 pointer	bd, rp
-int	server, status
+int	server
+long	status
 int	ki_sendrcv()
 long	ki_decode()
 include	"kichan.com"

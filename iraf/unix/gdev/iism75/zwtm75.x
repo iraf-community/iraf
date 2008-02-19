@@ -9,7 +9,7 @@ include	"m75.h"
 procedure zwtm75 (ifcb, status)
 
 int	ifcb			# pointer to channel descriptor passed as int
-int	status			# nbytes transferred or ERR
+long	status			# nbytes transferred or ERR
 
 pointer	fcb
 

@@ -13,6 +13,7 @@ char	osfn[ARB]		# packed os filename
 int	mode			# access mode
 int	chan			# receives assigned channel
 
+int	oschan
 int	server
 int	ki_connect(), ki_sendrcv(), ki_getchan()
 include	"kii.com"
@@ -25,6 +26,8 @@ begin
 	    chan = ERR
 	else if (p_arg[1] == ERR)
 	    chan = ERR
-	else
-	    chan = ki_getchan (server, p_arg[1])
+	else {
+	    oschan = p_arg[1]
+	    chan = ki_getchan (server, oschan)
+	}
 end

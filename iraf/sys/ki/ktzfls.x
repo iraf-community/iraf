@@ -11,7 +11,7 @@ procedure kt_zfls (device, chan, status)
 
 int	device			# device driver code
 int	chan			# channel assigned device
-int	status			# receives nchars written or ERR
+long	status			# receives nchars written or ERR
 
 int	server
 int	ki_sendrcv()

@@ -12,6 +12,7 @@ procedure kopdir (osfn, chan)
 char	osfn[ARB]		# packed os filename or directory name
 int	chan			# channel assigned for reading filenames
 
+size_t	sz_val
 int	server
 pointer	dp
 int	ki_connect(), ki_sendrcv(), ki_getchan(), kmalloc()
@@ -22,7 +23,8 @@ begin
 	server = ki_connect (osfn)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zopdir (p_sbuf, chan)
 
 	} else {
@@ -32,9 +34,10 @@ begin
 		chan = ERR
 	    else {
 		chan = p_arg[1]
-		if (kmalloc (dp, LEN_DIRBDES, TY_STRUCT) == ERR)
+		sz_val = LEN_DIRBDES
+		if (kmalloc (dp, sz_val, TY_STRUCT) == ERR) {
 		    chan = ERR
-		else {
+		} else {
 		    D_IP(dp)      = D_DATA(dp)
 		    D_ITOP(dp)    = D_DATA(dp)
 		    D_EOFSEEN(dp) = NO

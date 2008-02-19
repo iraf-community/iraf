@@ -12,8 +12,9 @@ procedure ki_envreset (name, value)
 char	name[ARB]		#I name of environment variable
 char	value[ARB]		#I value of environment variable
 
+size_t	sz_val
 pointer	sp, buf, op
-int	node, junk, ch
+int	node, junk, ch, i_len
 int	gstrcpy(), ki_send()
 bool	streq()
 
@@ -31,14 +32,16 @@ begin
 		return
 
 	call smark (sp)
-	call salloc (buf, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Format the SET statement to be sent to each node.
 	op = buf + gstrcpy ("set ", Memc[buf], SZ_COMMAND)
 	op = op + gstrcpy (name, Memc[op], SZ_COMMAND - 4)
 	Memc[op] = '=';  op = op + 1
 	Memc[op] = '"';  op = op + 1
-	op = op + gstrcpy (value, Memc[op], SZ_COMMAND - (op - buf))
+	i_len = SZ_COMMAND - (op - buf)
+	op = op + gstrcpy (value, Memc[op], i_len)
 	Memc[op] = '"';  op = op + 1
 	Memc[op] = '\n';  op = op + 1
 	Memc[op] = EOS

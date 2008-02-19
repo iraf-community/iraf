@@ -17,6 +17,7 @@ int	maxch			#RO max chars out in osdir string
 char	subdir[ARB]		#RO receives pathname
 int	nchars			#WO receives length of osfn string
 
+size_t	sz_val
 int	delim, op
 char	alias[SZ_ALIAS]
 int	ki_gnode(), gstrcat()
@@ -29,7 +30,8 @@ begin
 		call zfgcwd (osdir[delim+1], maxch - delim, nchars)
 		if (nchars == ERR)
 		    return
-		call strupk (osdir[delim+1], osdir[delim+1], maxch-delim)
+		sz_val = maxch-delim
+		call strupk (osdir[delim+1], osdir[delim+1], sz_val)
 	    }
 	    call zfsubd (osdir[delim+1], maxch - delim, subdir, nchars)
 	    if (nchars != ERR)

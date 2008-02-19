@@ -13,6 +13,7 @@ char	osfn[maxch]		# receives pathname
 int	maxch			# max chars out
 int	nchars			# receives length of osfn string
 
+size_t	sz_val
 int	delim, op, nodeflag, junk
 int	ki_gnode(), gstrcpy(), ki_gethosts()
 include	"kinode.com"
@@ -25,7 +26,8 @@ begin
 	# If no VFN is given return the current working directory.
 	if (vfn[1] == EOS) {
 	    call kfgcwd (osfn, maxch, nchars)
-	    call strupk (osfn, osfn, maxch)
+	    sz_val = maxch
+	    call strupk (osfn, osfn, sz_val)
 	    return
 	}
 

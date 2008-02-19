@@ -15,7 +15,8 @@ int	chan			# channel assigned device
 int	what			# file parameter to be returned
 long	lvalue			# receives the parameter value
 
-int	server, ks_maxbufsize
+int	server
+long	ks_maxbufsize
 int	ki_sendrcv()
 include	"kichan.com"
 include	"kinode.com"

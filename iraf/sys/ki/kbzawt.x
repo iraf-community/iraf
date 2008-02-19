@@ -34,7 +34,7 @@ procedure kb_zawt (device, chan, status)
 
 int	device			# device driver code
 int	chan			# channel assigned device
-int	status			# receives nbytes transferred or ERR
+long	status			# receives nbytes transferred or ERR
 
 include	"kichan.com"
 

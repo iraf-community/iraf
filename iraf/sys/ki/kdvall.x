@@ -11,6 +11,7 @@ char	device[ARB]		# device name or alias list
 int	allflag			# flag: allocate=1, deallocate=0
 int	status			# return status
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_sendrcv()
 include	"kii.com"
@@ -19,7 +20,8 @@ begin
 	server = ki_connect (device)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zdvall (p_sbuf, allflag, status)
 
 	} else {

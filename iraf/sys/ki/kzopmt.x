@@ -16,7 +16,9 @@ long	devpos[ARB]		#I tape position information
 int	newfile			#U receives new file number
 int	chan			#O channel assigned for reading filenames
 
+size_t	sz_val
 pointer	sp, bp, bd
+long	lstatus
 int	server, dv_len, dc_len, dc_off
 int	ki_connect(), ki_send(), ki_receive(), ki_getchan()
 int	kmalloc(), strlen()
@@ -32,15 +34,18 @@ begin
 	chan = ki_getchan (server, chan)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zzopmt (p_sbuf, mode, devcap, devpos, newfile, k_oschan[chan])
 
 	} else {
 	    call smark (sp)
-	    call salloc (bp, SZ_COMMAND, TY_CHAR)
+	    sz_val = SZ_COMMAND
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    # Determine whether devcap string will fit in sbuf.
-	    call strupk (devcap, Memc[bp], SZ_COMMAND)
+	    sz_val = SZ_COMMAND
+	    call strupk (devcap, Memc[bp], sz_val)
 	    dv_len = strlen (p_sbuf[p_arg[1]])
 	    dc_len = strlen (Memc[bp])
 	    if (p_arg[1] + dv_len+1 + dc_len > SZ_SBUF)
@@ -56,13 +61,16 @@ begin
 	    p_arg[3] = dc_off
 	    p_arg[4] = dc_len
 	    p_arg[5] = newfile
-	    call amovl (devpos, p_arg[6], LEN_MTDEVPOS)
+	    sz_val = LEN_MTDEVPOS
+	    call amovl (devpos, p_arg[6], sz_val)
 
 	    if (ki_send (server, KI_ZFIOMT, MT_OP) == ERR)
 		k_oschan[chan] = ERR
 	    else if (dc_len > 0 && dc_off == 0) {
-		call ks_awrite (server, devcap, dc_len+1)
-		call ks_await (server, k_oschan[chan])
+		sz_val = dc_len+1
+		call ks_awrite (server, devcap, sz_val)
+		call ks_await (server, lstatus)
+		k_oschan[chan] = lstatus
 	    }
 
 	    if (ki_receive (server, KI_ZFIOMT, MT_OP) == ERR)
@@ -80,7 +88,8 @@ begin
 	    chan = ERR
 	} else {
 	    if (server != NULL) {
-		if (kmalloc (bd, LEN_MTDEVPOS, TY_INT) == ERR) {
+		sz_val = LEN_MTDEVPOS
+		if (kmalloc (bd, sz_val, TY_STRUCT) == ERR) {
 		    call ki_freechan (chan)
 		    chan = ERR
 		} else

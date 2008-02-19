@@ -9,7 +9,7 @@ include	"ki.h"
 procedure ks_await (server, status)
 
 int	server			# node descriptor index of server
-int	status			# receives i/o status
+long	status			# receives i/o status
 
 int	and()
 include	"kinode.com"

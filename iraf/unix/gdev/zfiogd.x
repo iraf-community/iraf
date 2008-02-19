@@ -39,26 +39,30 @@ char	devinfo[ARB]		#I PACKED device info string
 int	mode			#I access mode
 int	chan			#O receives assigned channel
 
+size_t	sz_val
 bool	first_time
 pointer	devname, envname
 pointer	sp, info, imtdev, osdev, pkfname, ip, op
-int	nchars, dev, oschan, arg1, arg2, i
+int	nchars, dev, oschan, arg1, arg2, i, i_off
 int	strdic(), ctoi()
 data	first_time /true/
 define	err_ 91
 
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin
 	call smark (sp)
-	call salloc (info, SZ_OSDEV, TY_CHAR)
-	call salloc (osdev, SZ_OSDEV, TY_CHAR)
-	call salloc (imtdev, SZ_OSDEV, TY_CHAR)
-	call salloc (pkfname, SZ_OSDEV, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
-	call salloc (envname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_OSDEV
+	call salloc (info, sz_val, TY_CHAR)
+	call salloc (osdev, sz_val, TY_CHAR)
+	call salloc (imtdev, sz_val, TY_CHAR)
+	call salloc (pkfname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
+	call salloc (envname, sz_val, TY_CHAR)
 
 	if (first_time) {
 	    do i = 1, MAXDEV
@@ -68,7 +72,8 @@ begin
 
 	# Parse device specification.
 	# -----------------------------
-	call strupk (devinfo, Memc[info], SZ_OSDEV)
+	sz_val = SZ_OSDEV
+	call strupk (devinfo, Memc[info], sz_val)
 
 	# Extract generic device name.
 	op = devname
@@ -98,12 +103,19 @@ begin
 	    ip = ip + 1
 
 	# Get any optional integer arguments.
-	if (ctoi (Memc, ip, arg1) <= 0)
+	i_off = 1
+	if (ctoi (Memc[ip], i_off, arg1) <= 0) {
 	    arg1 = 0
-	if (Memc[ip] == DELIMCH)
+	}
+	ip = ip + i_off - 1
+	if (Memc[ip] == DELIMCH) {
 	    ip = ip + 1
-	if (ctoi (Memc, ip, arg2) <= 0)
+	}
+	i_off = 1
+	if (ctoi (Memc[ip], i_off, arg2) <= 0) {
 	    arg2 = 0
+	}
+	ip = ip + i_off - 1
 
 	# Edit device specification as necessary.
 	# ------------------------------------------
@@ -115,12 +127,14 @@ begin
 	# passed in the argument list.
 
 	if (dev == IMTOOL) {
-	    call strpak (IMTDEV, Memc[envname], SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call strpak (IMTDEV, Memc[envname], sz_val)
 	    call zgtenv (Memc[envname], Memc[imtdev], SZ_OSDEV, nchars)
 
 	    if (nchars > 0) {
 		# Environment override.
-		call strupk (Memc[imtdev], Memc[osdev], SZ_OSDEV)
+		sz_val = SZ_OSDEV
+		call strupk (Memc[imtdev], Memc[osdev], sz_val)
 
 	    } else if (Memc[osdev] == '/') {
 		# Old style device name.  Convert to the form "fifo:in:out".
@@ -145,23 +159,28 @@ begin
 	# Try to physically open the device.  [ADD NEW DEVICES HERE].
 	switch (dev) {
 	case IISM70:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
+	    sz_val = SZ_OSDEV
+	    call strpak (Memc[osdev], Memc[pkfname], sz_val)
 	    call zopm70 (Memc[pkfname], mode, oschan)
 	case IISM75:
-	    call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
+	    sz_val = SZ_OSDEV
+	    call strpak (Memc[osdev], Memc[pkfname], sz_val)
 	    call zopm75 (Memc[pkfname], mode, oschan)
 
 	case IMTOOL:
 	    if (Memc[osdev] == EOS) {
 		# Supply default value.
-		call strpak (DEF_OSDEV_1, Memc[pkfname], SZ_OSDEV)
+		sz_val = SZ_OSDEV
+		call strpak (DEF_OSDEV_1, Memc[pkfname], sz_val)
 		call zopnnd (Memc[pkfname], mode, oschan)
 		if (oschan == ERR) {
-		    call strpak (DEF_OSDEV_2, Memc[pkfname], SZ_OSDEV)
+		    sz_val = SZ_OSDEV
+		    call strpak (DEF_OSDEV_2, Memc[pkfname], sz_val)
 		    call zopnnd (Memc[pkfname], mode, oschan)
 		}
 	    } else {
-		call strpak (Memc[osdev], Memc[pkfname], SZ_OSDEV)
+		sz_val = SZ_OSDEV
+		call strpak (Memc[osdev], Memc[pkfname], sz_val)
 		call zopnnd (Memc[pkfname], mode, oschan)
 	    }
 
@@ -194,7 +213,8 @@ int	chan			#I channel assigned device
 int	status			#O receives status of close
 
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin
@@ -226,12 +246,15 @@ procedure zardgd (chan, buf, maxbytes, offset)
 
 int	chan			# channel assigned device
 char	buf[ARB]		# buffer to be filled
-int	maxbytes		# max bytes to read
+size_t	maxbytes		# max bytes to read
 long	offset			# file offset (function code else zero)
 
-int	nread, nleft, ntries, n, op
+size_t	nread, nleft, op, rnbytes
+long	n
+int	ntries
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin
@@ -260,7 +283,8 @@ begin
 
 	    for (nleft=maxbytes;  nleft > 0;  ) {
 		n = min (nleft, MAXBYTES)
-		call zardnd (gd_oschan[chan], buf[op], n, offset)
+		rnbytes = n
+		call zardnd (gd_oschan[chan], buf[op], rnbytes, offset)
 		call zawtnd (gd_oschan[chan], n)
 		if (n < 0) {
 		    nread = ERR
@@ -294,12 +318,15 @@ procedure zawrgd (chan, buf, nbytes, offset)
 
 int	chan			# channel assigned device
 char	buf[ARB]		# buffer containing the data
-int	nbytes			# nbytes to be written
+size_t	nbytes			# nbytes to be written
 long	offset			# file offset (function code else zero)
 
-int	nwrote, nleft, ntries, n, ip
+size_t	nwrote, nleft, ip, wnbytes
+long	n
+int	ntries
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin
@@ -320,7 +347,8 @@ begin
 
 	    for (nleft=nbytes;  nleft > 0;  ) {
 		n = min (nleft, MAXBYTES)
-		call zawrnd (gd_oschan[chan], buf[ip], n, offset)
+		wnbytes = n
+		call zawrnd (gd_oschan[chan], buf[ip], wnbytes, offset)
 		call zawtnd (gd_oschan[chan], n)
 		if (n < 0) {
 		    nwrote = ERR
@@ -353,10 +381,11 @@ end
 procedure zawtgd (chan, status)
 
 int	chan			# channel assigned device
-int	status			# receives nbytes transferred or ERR
+long	status			# receives nbytes transferred or ERR
 
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin
@@ -389,7 +418,8 @@ int	what			# status parameter being queried
 long	lvalue			# receives value of parameter
 
 int	gd_dev[MAXDEV], gd_oschan[MAXDEV]
-int	gd_status[MAXDEV], gd_arg1[MAXDEV], gd_arg2[MAXDEV]
+long	gd_status[MAXDEV]
+int	gd_arg1[MAXDEV], gd_arg2[MAXDEV]
 common	/zgdcom/ gd_dev, gd_oschan, gd_status, gd_arg1, gd_arg2
 
 begin

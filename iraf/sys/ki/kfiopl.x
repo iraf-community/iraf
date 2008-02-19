@@ -11,6 +11,7 @@ procedure kopnpl (osfn, mode, chan)
 char	osfn[ARB]
 int	mode, chan
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_getchan()
 include	"kii.com"
@@ -19,7 +20,8 @@ begin
 	server = ki_connect (osfn)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zopnpl (p_sbuf, mode, chan)
 	    if (chan != ERR)
 		chan = ki_getchan (server, chan)

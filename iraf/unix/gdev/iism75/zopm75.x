@@ -11,11 +11,13 @@ char	device[ARB]		# packed UNIX device name
 int	mode			# access mode
 int	ifcb			# pointer to channel descriptor passed as int
 
+size_t	sz_val
 pointer	fcb
 int	chan
 
 begin
-	call calloc (fcb, LEN_FCB, TY_STRUCT)
+	sz_val = LEN_FCB
+	call calloc (fcb, sz_val, TY_STRUCT)
 	ifcb = fcb
 
 	FCB_STATUS(fcb)   = IIS_INACTIVE

@@ -16,6 +16,7 @@ char	old_osfn[ARB]		# packed os filename of existing file
 char	new_osfn[ARB]		# packed os filename of new file
 int	status			# answer; ok or err
 
+size_t	sz_val
 pointer	sp, fname
 int	server1, server2, chan, junk, old, new
 int	ki_connect(), ki_sendrcv(), strlen()
@@ -23,7 +24,8 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	server2 = ki_connect (new_osfn)
 	call strcpy (p_sbuf[p_arg[1]], Memc[fname], SZ_FNAME)
@@ -33,8 +35,10 @@ begin
 	if (server1 == NULL && server2 == NULL) {
 	    # Both files reside on the local node.
 
-	    call strpak (p_sbuf[old], p_sbuf[old], SZ_SBUF)
-            call strpak (Memc[fname], Memc[fname], SZ_FNAME)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[old], p_sbuf[old], sz_val)
+	    sz_val = SZ_FNAME
+            call strpak (Memc[fname], Memc[fname], sz_val)
 	    call zfmkcp (p_sbuf[old], Memc[fname], status)
 
 	} else if (server1 == server2) {
@@ -62,7 +66,8 @@ begin
 	    # and create a null length text or binary file.
 
 	    call kfacss (old_osfn, 0, TEXT_FILE, status)
-            call strpak (Memc[fname], Memc[fname], SZ_FNAME)
+	    sz_val = SZ_FNAME
+            call strpak (Memc[fname], Memc[fname], sz_val)
 
 	    if (status == YES) {
 		# Create a text file.
@@ -85,7 +90,8 @@ begin
 	} else {
 	    # The new file is remote.
 
-	    call strpak (p_sbuf[old], p_sbuf[old], SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[old], p_sbuf[old], sz_val)
 	    call zfacss (p_sbuf[old], 0, TEXT_FILE, status)
 
 	    if (status == YES) {

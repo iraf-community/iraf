@@ -13,7 +13,9 @@ char	drive[ARB]		#I packed name of drive to be rewound
 char	devcap[ARB]		#I packed tapecap entry for device
 int	status			#O receives status, ok|err
 
+size_t	sz_val
 pointer	sp, bp
+long	lstatus
 int	server, dv_len, dc_len, dc_off, nbytes
 int	ki_connect(), ki_send(), ki_receive(), strlen()
 include	"kii.com"
@@ -22,15 +24,18 @@ begin
 	server = ki_connect (drive)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zzrwmt (p_sbuf, devcap, status)
 
 	} else {
 	    call smark (sp)
-	    call salloc (bp, SZ_COMMAND, TY_CHAR)
+	    sz_val = SZ_COMMAND
+	    call salloc (bp, sz_val, TY_CHAR)
 
 	    # Determine whether devcap string will fit in sbuf.
-	    call strupk (devcap, Memc[bp], SZ_COMMAND)
+	    sz_val = SZ_COMMAND
+	    call strupk (devcap, Memc[bp], sz_val)
 	    dv_len = strlen (p_sbuf[p_arg[1]])
 	    dc_len = strlen (Memc[bp])
 	    if (dv_len+1 + dc_len > SZ_SBUF) {
@@ -49,8 +54,9 @@ begin
 	    if (ki_send (server, KI_ZFIOMT, MT_RW) == ERR)
 		status = ERR
 	    else if (dc_len > 0 && dc_off == 0) {
-		call ks_awrite (server, devcap, nbytes)
-		call ks_await (server, status)
+		sz_val = nbytes
+		call ks_awrite (server, devcap, sz_val)
+		call ks_await (server, lstatus)
 	    }
 
 	    if (ki_receive (server, KI_ZFIOMT, MT_RW) == ERR)

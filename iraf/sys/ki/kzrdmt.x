@@ -14,8 +14,11 @@ char	obuf[ARB]		#O buffer to receive data
 size_t	max_bytes		#I max bytes to read
 long	offset			#I file offset
 
+int	i
 pointer	bd
-int	server, status
+int	server
+size_t	nbytes
+long	status
 int	ki_send(), ki_receive()
 include	"kichan.com"
 include	"kii.com"
@@ -49,12 +52,15 @@ begin
 		status = ERR
 	    else {
 		status = p_arg[1]
-		call amovi (p_arg[2], Memi[bd], LEN_MTDEVPOS)
+		do i = 0, LEN_MTDEVPOS-1 {
+		    Meml[P2L(bd+i)] = p_arg[2+i]
+		}
 	    }
 
 	    # Read the data block (if any) directly into caller's buffer.
 	    if (status > 0) {
-		call ks_aread (server, obuf, status)
+		nbytes = status
+		call ks_aread (server, obuf, nbytes)
 		call ks_await (server, status)
 	    }
 	}

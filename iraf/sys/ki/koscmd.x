@@ -18,8 +18,10 @@ char	stdout_file[ARB]	# packed filename of stdout file
 char	stderr_file[ARB]	# packed filename of stderr file
 int	status
 
+size_t	sz_val
 pointer	sp, remfn, locfn, lbuf, op
-int	server, oscmd_status, inchan, outchan, nchars
+int	server, oscmd_status, inchan, outchan
+long	nchars, lstatus
 int	ki_connect(), ki_sendrcv(), gstrcpy()
 include	"kinode.com"
 include	"kii.com"
@@ -28,7 +30,8 @@ begin
 	server = ki_connect (oscmd)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zoscmd (p_sbuf, stdin_file, stdout_file, stderr_file, status)
 
 	} else {
@@ -39,9 +42,11 @@ begin
 
 	    else {
 		call smark (sp)
-		call salloc (remfn, SZ_PATHNAME, TY_CHAR)
-		call salloc (locfn, SZ_PATHNAME, TY_CHAR)
-		call salloc (lbuf,  SZ_LINE, TY_CHAR)
+		sz_val = SZ_PATHNAME
+		call salloc (remfn, sz_val, TY_CHAR)
+		call salloc (locfn, sz_val, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (lbuf,  sz_val, TY_CHAR)
 
 		oscmd_status = p_arg[1]
 
@@ -49,7 +54,8 @@ begin
 		op = remfn + gstrcpy (n_alias[1,1,server], Memc[remfn], ARB)
 		Memc[op] = FNNODE_CHAR;  op = op + 1
 		call strcpy (p_sbuf, Memc[op], ARB)
-		call strpak (Memc[remfn], Memc[remfn], SZ_PATHNAME)
+		sz_val = SZ_PATHNAME
+		call strpak (Memc[remfn], Memc[remfn], sz_val)
 
 		# Open the spooled output file on the remote node.
 		call kopntx (Memc[remfn], READ_ONLY, inchan)
@@ -64,7 +70,8 @@ begin
 		# redirection files are ignored if specified.  If no stdout
 		# file is specified, write directly to the user terminal.
 
-		call strupk (stdout_file, Memc[locfn], SZ_PATHNAME)
+		sz_val = SZ_PATHNAME
+		call strupk (stdout_file, Memc[locfn], sz_val)
 		if (Memc[locfn] != EOS) {
 		    # Copy to a textfile on the local node.
 
@@ -77,9 +84,12 @@ begin
 		    }
 
 		    repeat {
-			call kgettx (inchan, Memc[lbuf], SZ_LINE, nchars)
-			if (nchars > 0)
-			    call zputtx (outchan, Memc[lbuf], nchars, status)
+			sz_val = SZ_LINE
+			call kgettx (inchan, Memc[lbuf], sz_val, nchars)
+			if (nchars > 0) {
+			    sz_val = nchars
+			    call zputtx (outchan, Memc[lbuf], sz_val, lstatus)
+			}
 		    } until (nchars <= 0)
 
 		    call zclstx (outchan, status)
@@ -89,7 +99,8 @@ begin
 		    # standard error output of the calling process.
 
 		    repeat {
-			call kgettx (inchan, Memc[lbuf], SZ_LINE, nchars)
+			sz_val = SZ_LINE
+			call kgettx (inchan, Memc[lbuf], sz_val, nchars)
 			if (nchars > 0) {
 			    Memc[lbuf+nchars] = EOS
 			    call xer_putline (STDERR, Memc[lbuf])

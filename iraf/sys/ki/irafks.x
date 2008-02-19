@@ -64,6 +64,7 @@ int	prtype			#I process type flag (not used)
 char	bkgfile[ARB]		#I bkgfilename if detached process (not used)
 char	cmd[ARB]		#I optional command (used to flag irafks type) 
 
+size_t	sz_val
 bool	error_restart
 int	debuginit, chan, junk
 char	osfn[SZ_PATHNAME], debugfile[SZ_PATHNAME]
@@ -100,7 +101,8 @@ begin
 	    error_restart = true
 
 	# Open the network connection to the host process.
-	call strpak (cmd, osfn, SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strpak (cmd, osfn, sz_val)
 	call zopnks (osfn, READ_WRITE, chan)
 
 	# Open the debug file if so indicated.  The value of the debug flag
@@ -126,8 +128,10 @@ begin
 	call fredir (STDERR, "dev$null", WRITE_ONLY, TEXT_FILE)
 
 	# Serve up the kernel until EOF is seen on the input stream.
-	if (chan != ERR)
-	    call kserver (chan, chan, DEF_LENIOBUF)
+	if (chan != ERR) {
+	    sz_val = DEF_LENIOBUF
+	    call kserver (chan, chan, sz_val)
+	}
 
 	# Exit w/o running interpreter.
 	call zclsks (chan, junk)
@@ -150,12 +154,17 @@ procedure kserver (in, out, buflen)
 
 int	in		# input channel, a binary stream
 int	out		# output channel, a binary stream
-int	buflen		# iobuf size or 0
+size_t	buflen		# iobuf size or 0
 
+size_t	sz_val
+size_t	len_iobuf, i, nchars, c_1
+long	c_0, status
+long	arg1, arg2, arg3
+int	i_arg1, i_arg2, i_arg3
+int	i_status, i_len, opcode, subcode
 pointer	iobuf, op, top
 long	fi[LEN_FINFO]
 char	curdir[SZ_PATHNAME]
-int	len_iobuf, status, i, nchars, opcode, subcode, arg1, arg2, arg3
 pointer	bfdd[LEN_BFDD], txdd[LEN_TXDD]
 
 char	txbuf[SZ_TXBUF], queue[SZ_FNAME]
@@ -189,7 +198,7 @@ begin
 
 	if (debug == YES) {
 	    call fprintf (spy, "kernel server, len_iobuf=%d\n")
-		call pargi (len_iobuf)
+		call pargl (len_iobuf)
 	}
 
 	# Load the device drivers.
@@ -212,6 +221,9 @@ begin
 	    arg1    = p_arg[1]
 	    arg2    = p_arg[2]
 	    arg3    = p_arg[3]
+	    i_arg1    = p_arg[1]
+	    i_arg2    = p_arg[2]
+	    i_arg3    = p_arg[3]
 
 	    p_sbuflen = 0
 
@@ -227,7 +239,7 @@ begin
 		}
 		do i = 1, 10 {
 		    call fprintf (spy, " %d")
-		    call pargi (p_arg[i])
+		    call pargl (p_arg[i])
 		}
 		call fprintf (spy, "\n")
 	    }
@@ -248,15 +260,16 @@ begin
 		# follows in a separate record.
 
 		nchars = arg1
-		if (nchars <= SZ_SBUF)
+		if (nchars <= SZ_SBUF) {
 		    status = envscan (p_sbuf)
-		else {
+		} else {
 		    if (len_iobuf < nchars) {
 			call realloc (iobuf, nchars, TY_CHAR)
 			len_iobuf = nchars
 		    }
 
-		    call zardks (in, Memc[iobuf], nchars, long(0))
+		    c_0 = 0
+		    call zardks (in, Memc[iobuf], nchars, c_0)
 		    call zawtks (in, status)
 		    if (status != nchars)
 			break
@@ -268,7 +281,7 @@ begin
 
 		if (debug == YES) {
 		    call fprintf (spy, "%d environment entries scanned\n")
-			call pargi (status)
+			call pargl (status)
 		}
 
 		# Do not send a status packet back for single variable updates.
@@ -302,8 +315,10 @@ begin
 		# it in for a while nonetheless, just in case it is called.
 
 		call strcpy (p_sbuf[arg1], osfn1, SZ_PATHNAME)
-		call zfxdir (osfn1, osfn2, SZ_PATHNAME, nchars)
-		call zfsubd (osfn2, SZ_PATHNAME, "..", nchars)
+		call zfxdir (osfn1, osfn2, SZ_PATHNAME, i_len)
+		nchars = i_len
+		call zfsubd (osfn2, SZ_PATHNAME, "..", i_len)
+		nchars = i_len
 		call strcpy ("set iraf=", osfn1, SZ_PATHNAME)
 		call strcat (osfn2, osfn1, SZ_PATHNAME)
 
@@ -323,7 +338,8 @@ begin
 		iferr (call ks_fmapfn (osfn1, temp, SZ_PATHNAME))
 		    status = ERR
 		else {
-		    call strupk (temp, p_sbuf, SZ_SBUF)
+		    sz_val = SZ_SBUF
+		    call strupk (temp, p_sbuf, sz_val)
 		    p_sbuflen = strlen (p_sbuf)
 		    status = p_sbuflen
 		}
@@ -333,16 +349,20 @@ begin
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfacss (osfn1, arg2, arg3, status)
+		else {
+		    call zfacss (osfn1, i_arg2, i_arg3, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFALOC:
 		# Preallocate space for a file.
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfaloc (osfn1, arg2, status)
+		else {
+		    call zfaloc (osfn1, arg2, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFCHDR:
 		# Change the default directory.
@@ -355,8 +375,10 @@ begin
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfchdr (osfn1, status)
+		else {
+		    call zfchdr (osfn1, i_status)
+		    status = i_status
+		}
 
 		# Save the logical name of the new default directory, but only
 		# if the zfchdr request is successful.
@@ -369,8 +391,10 @@ begin
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfdele (osfn1, status)
+		else {
+		    call zfdele (osfn1, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFGCWD:
 		# Get the name of the current default directory.  Return the
@@ -379,8 +403,10 @@ begin
 		# remote node.
 
 		if (curdir[1] == EOS) {
-		    call zfgcwd (osfn1, SZ_PATHNAME, status)
-		    call strupk (osfn1, p_sbuf, SZ_SBUF)
+		    call zfgcwd (osfn1, SZ_PATHNAME, i_status)
+		    status = i_status
+		    sz_val = SZ_SBUF
+		    call strupk (osfn1, p_sbuf, sz_val)
 		} else
 		    status = gstrcpy (curdir, p_sbuf, SZ_SBUF)
 
@@ -392,8 +418,10 @@ begin
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfinfo (osfn1, fi, status)
+		else {
+		    call zfinfo (osfn1, fi, i_status)
+		    status = i_status
+		}
 
 		if (status != ERR) {
 		    # Return the integer part of the FI structure in args 2+.
@@ -401,7 +429,9 @@ begin
 			p_arg[i+1] = fi[i]
 
 		    # Return the owner string in the string buffer.
-		    call strupk (FI_OWNER(fi), p_sbuf, SZ_SBUF)
+		    # arg 1: incompatible pointer
+		    sz_val = SZ_SBUF
+		    call strupk (FI_OWNER(fi), p_sbuf, sz_val)
 		    p_sbuflen = strlen (p_sbuf)
 		}
 
@@ -414,8 +444,10 @@ begin
 		    call ks_fmapfn (temp, osfn2, SZ_PATHNAME)
 		} then {
 		    status = ERR
-		} else
-		    call zfmkcp (osfn1, osfn2, status)
+		} else {
+		    call zfmkcp (osfn1, osfn2, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFMKDR:
 		# Make a new directory.
@@ -424,16 +456,20 @@ begin
 		    call ks_fmapfn (temp, osfn1, SZ_PATHNAME)
 		} then {
 		    status = ERR
-		} else
-		    call zfmkdr (osfn1, status)
+		} else {
+		    call zfmkdr (osfn1, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFPROT:
 		# Set or query file protection.
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
-		else
-		    call zfprot (osfn1, arg2, status)
+		else {
+		    call zfprot (osfn1, i_arg2, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZFRNAM:
 		# Rename a file.
@@ -444,24 +480,31 @@ begin
 		    call ks_fmapfn (temp, osfn2, SZ_PATHNAME)
 		} then {
 		    status = ERR
-		} else
-		    call zfrnam (osfn1, osfn2, status)
+		} else {
+		    call zfrnam (osfn1, osfn2, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZDVALL:
 		# Allocate or deallocate a device.
 		if (debug == YES) {
 		    call fprintf (spy, "allocate `%s' flag=%d\n")
 			call pargstr (p_sbuf[arg1])
-			call pargi (arg2)
+			call pargl (arg2)
 		}
-		call strpak (p_sbuf[arg1], temp, SZ_PATHNAME)
-		call zdvall (temp, arg2, status)
+		sz_val = SZ_PATHNAME
+		call strpak (p_sbuf[arg1], temp, sz_val)
+		call zdvall (temp, i_arg2, i_status)
+		status = i_status
 
 	    case KI_ZDVOWN:
 		# Query device allocation.
-		call strpak (p_sbuf[arg1], osfn1, SZ_PATHNAME)
-		call zdvown (osfn1, temp, SZ_PATHNAME, status)
-		call strupk (temp, p_sbuf, SZ_SBUF)
+		sz_val = SZ_PATHNAME
+		call strpak (p_sbuf[arg1], osfn1, sz_val)
+		call zdvown (osfn1, temp, SZ_PATHNAME, i_status)
+		status = i_status
+		sz_val = SZ_SBUF
+		call strupk (temp, p_sbuf, sz_val)
 		p_sbuflen = strlen (p_sbuf)
 
             case KI_ZFUTIM:
@@ -470,13 +513,15 @@ begin
                 if (debug == YES) {
                     call fprintf (spy, "utime `%s' atime=%d mtime=%d\n")
                         call pargstr (temp)
-                        call pargi (arg2)
-                        call pargi (arg3)
+                        call pargl (arg2)
+                        call pargl (arg3)
                 }
                 iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
                     status = ERR
-                else
-                    call zfutim (osfn1, arg2, arg3, status)
+                else {
+                    call zfutim (osfn1, arg2, arg3, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZOPDIR:
 		# Open a directory for reading.  Since we must perform the
@@ -486,22 +531,22 @@ begin
 		if (debug == YES) {
 		    call fprintf (spy, "open directory `%s', mode %d\n")
 			call pargstr (p_sbuf[arg1])
-			call pargi (arg2)
+			call pargi (i_arg2)
 		}
 
 		call strcpy (p_sbuf[arg1], osfn1, SZ_PATHNAME)
-		iferr (status = diropen (osfn1, arg2))
+		iferr (status = diropen (osfn1, i_arg2))
 		    status = ERR
 
 		if (debug == YES) {
 		    call fprintf (spy, "diropen returns %d\n")
-			call pargi (status)
+			call pargl (status)
 		}
 
 	    case KI_ZCLDIR:
 		# Close a directory file.
 
-		iferr (call close (arg1))
+		iferr (call close (i_arg1))
 		    status = ERR
 		else
 		    status = OK
@@ -520,7 +565,7 @@ begin
 
 		arg2 = 1
 		iferr {
-		    while (getline (arg1, Memc[op]) != EOF) {
+		    while (getline (i_arg1, Memc[op]) != EOF) {
 			op = op + strlen (Memc[op])
 			if (op + SZ_FNAME >= top) {
 			    arg2 = 0
@@ -548,8 +593,10 @@ begin
 		    if (ks_send (out, opcode, subcode) == ERR)
 			return
 
-		    call chrpak (Memc[iobuf], 1, Memc[iobuf], 1, nchars)
-		    call zawrks (out, Memc[iobuf], nchars, long(0))
+		    c_1 = 1
+		    call chrpak (Memc[iobuf], c_1, Memc[iobuf], c_1, nchars)
+		    c_0 = 0
+		    call zawrks (out, Memc[iobuf], nchars, c_0)
 		    call zawtks (out, status)
 		    if (status <= 0)
 			return
@@ -563,14 +610,18 @@ begin
 		# file to the client so that it can recover the output via
 		# the text file i/o interface.
 
-		call strpak (p_sbuf[arg1], txbuf, SZ_TXBUF)
-		call strpak ("", osfn1, SZ_PATHNAME)
+		sz_val = SZ_TXBUF
+		call strpak (p_sbuf[arg1], txbuf, sz_val)
+		sz_val = SZ_PATHNAME
+		call strpak ("", osfn1, sz_val)
 		call mktemp ("tmp$zos", temp, SZ_PATHNAME)
 		call ks_fmapfn (temp, osfn2, SZ_PATHNAME)
 
-		call zoscmd (txbuf, osfn1, osfn2, osfn2, status)
+		call zoscmd (txbuf, osfn1, osfn2, osfn2, i_status)
+		status = i_status
 
-		call strupk (osfn2, p_sbuf, SZ_SBUF)
+		sz_val = SZ_SBUF
+		call strupk (osfn2, p_sbuf, sz_val)
 		p_sbuflen = strlen (p_sbuf)
 
 	    case KI_ZOPDPR:
@@ -583,12 +634,15 @@ begin
 		    call strcpy (p_sbuf[arg3], queue, SZ_FNAME)
 		} then {
 		    status = ERR
-		} else
-		    call zopdpr (osfn1, osfn2, queue, status)
+		} else {
+		    call zopdpr (osfn1, osfn2, queue, i_status)
+		    status = i_status
+		}
 
 	    case KI_ZCLDPR:
 		# Close a detached process.
-		call zcldpr (arg1, arg2, status)
+		call zcldpr (i_arg1, i_arg2, i_status)
+		status = i_status
 
 	    case KI_ZOPCPR:
 		# Open a connected subprocess.
@@ -596,18 +650,21 @@ begin
 		iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
 		    status = ERR
 		else {
-		    call zopcpr (osfn1, arg2, arg3, status)
-		    p_arg[2] = arg2
-		    p_arg[3] = arg3
+		    call zopcpr (osfn1, i_arg2, i_arg3, i_status)
+		    status = i_status
+		    p_arg[2] = i_arg2
+		    p_arg[3] = i_arg3
 		}
 
 	    case KI_ZCLCPR:
 		# Close a connected subprocess.
-		call zclcpr (arg1, status)
+		call zclcpr (i_arg1, i_status)
+		status = i_status
 
 	    case KI_ZINTPR:
 		# Interrupt a connected subprocess.
-		call zintpr (arg1, arg2, status)
+		call zintpr (i_arg1, i_arg2, i_status)
+		status = i_status
 
 	    case KI_ZFIOBF,KI_ZFIOLP,KI_ZFIOPL,KI_ZFIOPR,KI_ZFIOSF,KI_ZFIOGD:
 		# Binary file drivers.
@@ -645,7 +702,7 @@ begin
 reply_
 	    if (debug == YES) {
 		call fprintf (spy, "status = %d\n")
-		    call pargi (status)
+		    call pargl (status)
 		call flush (spy)
 	    }
 
@@ -670,11 +727,15 @@ procedure ks_zfiobf (in, out, iobuf, len_iobuf, bfdd)
 
 int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
-int	len_iobuf		# current length of buffer
+size_t	len_iobuf		# current length of buffer
 pointer	bfdd[ARB]		# loaded device drivers
 
-long	lval, ks_maxbufsize
-int	dd, status, nchars, arg1, arg2, arg3
+size_t	sz_val
+size_t	nchars
+long	lval, ks_maxbufsize, c_0
+int	dd, i_status, opcode, subcode
+int	i_arg1, i_arg2, i_arg3
+long	arg1, arg2, arg3, status
 char	osfn[SZ_PATHNAME], temp[SZ_PATHNAME]
 errchk	realloc
 int	ks_send()
@@ -706,6 +767,9 @@ begin
 	arg1 = p_arg[1]
 	arg2 = p_arg[2]
 	arg3 = p_arg[3]
+	i_arg1 = p_arg[1]
+	i_arg2 = p_arg[2]
+	i_arg3 = p_arg[3]
 
 	switch (p_subcode) {
 	case BF_OPN:
@@ -714,7 +778,7 @@ begin
 	    if (debug == YES) {
 		call fprintf (spy, "open binary file `%s', mode %d\n")
 		    call pargstr (p_sbuf[arg1])
-		    call pargi (arg2)
+		    call pargl (arg2)
 	    }
 
 	    # Do not map the filename strings of special devices, since the
@@ -726,21 +790,26 @@ begin
 		call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		iferr (call ks_fmapfn (temp, osfn, SZ_PATHNAME))
 		    status = ERR
-	    } else
-		call strpak (p_sbuf[arg1], osfn, SZ_PATHNAME)
+	    } else {
+		sz_val = SZ_PATHNAME
+		call strpak (p_sbuf[arg1], osfn, sz_val)
+	    }
 
-	    if (status != ERR)
-		call zcall3 (ZOPNBF(dd), osfn, arg2, status)
+	    if (status != ERR) {
+		call zcall3 (ZOPNBF(dd), osfn, i_arg2, i_status)
+		status = i_status
+	    }
 
 	case BF_CLS:
 	    # Close a binary file.
 
 	    if (debug == YES) {
 		call fprintf (spy, "close %d\n")
-		    call pargi (arg1)
+		    call pargl (arg1)
 	    }
 
-	    call zcall2 (ZCLSBF(dd), arg1, status)
+	    call zcall2 (ZCLSBF(dd), i_arg1, i_status)
+	    status = i_status
 
 	case BF_ARD:
 	    # Read from a binary file.  The read must be performed in one
@@ -751,14 +820,15 @@ begin
 
 	    if (debug == YES) {
 		call fprintf (spy, "aread (%d, %d, %d)\n")
-		    call pargi (arg1)
-		    call pargi (arg2)
-		    call pargi (arg3)
+		    call pargl (arg1)
+		    call pargl (arg2)
+		    call pargl (arg3)
 	    }
 
 	    # Read the data.
-	    call zcall4 (ZARDBF(dd), arg1, Memc[iobuf], arg2, arg3)
-	    call zcall2 (ZAWTBF(dd), arg1, status)
+	    sz_val = arg2
+	    call zcall4 (ZARDBF(dd), i_arg1, Memc[iobuf], sz_val, arg3)
+	    call zcall2 (ZAWTBF(dd), i_arg1, status)
 
 	    # Send the ZAWT packet to the host followed by the data block.
 	    # The next operation performed by the host on the channel MUST
@@ -766,10 +836,13 @@ begin
 	    # do other things before completing the transfer.
 
 	    p_arg[1] = status
-	    if (ks_send (out, p_opcode, BF_AWT) == ERR)
+	    opcode = p_opcode
+	    if (ks_send (out, opcode, BF_AWT) == ERR)
 		goto fatal_
 	    if (status > 0) {
-		call zawrks (out, Memc[iobuf], status, 0)
+		c_0 = 0
+		sz_val = status
+		call zawrks (out, Memc[iobuf], sz_val, c_0)
 		call zawtks (out, status)
 		if (status <= 0)
 		    goto fatal_
@@ -777,7 +850,7 @@ begin
 
 	    if (debug == YES) {
 		call fprintf (spy, "status %d\n")
-		    call pargi (status)
+		    call pargl (status)
 	    }
 
 	    return
@@ -794,17 +867,19 @@ begin
 
 	    if (debug == YES) {
 		call fprintf (spy, "awrite (%d, %d, %d)\n")
-		    call pargi (arg1)
-		    call pargi (arg2)
-		    call pargi (arg3)
+		    call pargl (arg1)
+		    call pargl (arg2)
+		    call pargl (arg3)
 	    }
 
 	    # Read the data from the host.
-	    call zardks (in, Memc[iobuf], arg2, 0)
+	    c_0 = 0
+	    sz_val = arg2
+	    call zardks (in, Memc[iobuf], sz_val, c_0)
 	    call zawtks (in, status)
 	    if (debug == YES) {
 		call fprintf (spy, "read net status %d\n")
-		    call pargi (status)
+		    call pargl (status)
 	    }
 	    if (status != arg2)
 		goto fatal_
@@ -812,11 +887,12 @@ begin
 	    # Write the data to the output device.
 	    # TODO - delay the call to zawtbf to overlap i/o even further.
 
-	    call zcall4 (ZAWRBF(dd), arg1, Memc[iobuf], arg2, arg3)
-	    call zcall2 (ZAWTBF(dd), arg1, status)
+	    sz_val = arg2
+	    call zcall4 (ZAWRBF(dd), i_arg1, Memc[iobuf], sz_val, arg3)
+	    call zcall2 (ZAWTBF(dd), i_arg1, status)
 	    if (debug == YES) {
 		call fprintf (spy, "write device status %d\n")
-		    call pargi (status)
+		    call pargl (status)
 	    }
 	    if (status != arg2)
 		goto fatal_
@@ -831,7 +907,7 @@ begin
 
 	case BF_STT:
 	    # Get channel status.
-	    call zcall3 (ZSTTBF(dd), arg1, arg2, lval)
+	    call zcall3 (ZSTTBF(dd), i_arg1, i_arg2, lval)
 
 	    # The max transfer size for a binary device is limited by the
 	    # network interface as well as the device.
@@ -854,11 +930,13 @@ begin
 
 	if (debug == YES) {
 	    call fprintf (spy, "status %d\n")
-		call pargi (status)
+		call pargl (status)
 	}
 
 	p_arg[1] = status
-	if (ks_send (out, p_opcode, p_subcode) != ERR)
+	opcode = p_opcode
+	subcode = p_subcode
+	if (ks_send (out, opcode, subcode) != ERR)
 	    return
 
 fatal_
@@ -875,14 +953,17 @@ procedure ks_zfiotx (in, out, iobuf, len_iobuf, txdd)
 
 int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer (not used)
-int	len_iobuf		# current length of buffer (not used)
+size_t	len_iobuf		# current length of buffer (not used)
 pointer	txdd[ARB]		# loaded device drivers
 
-long	lval, reclen
+long	lval, reclen, status, c_0
 bool	buffer_full
 pointer	rp, nextrec
+size_t	maxch, nchars, c_1
+int	dd, i_status
+int	arg1, arg2, arg3
+int	opcode, subcode
 char	osfn[SZ_PATHNAME], temp[SZ_PATHNAME]
-int	dd, status, maxch, nchars, arg1, arg2, arg3
 
 int	ks_send()
 long	ki_decode()
@@ -916,8 +997,10 @@ begin
 	    call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 	    iferr (call ks_fmapfn (temp, osfn, SZ_PATHNAME))
 		status = ERR
-	    else
-		call zcall3 (ZOPNTX(dd), osfn, arg2, status)
+	    else {
+		call zcall3 (ZOPNTX(dd), osfn, arg2, i_status)
+		status = i_status
+	    }
 
 	case TX_CLS:
 	    # Close a binary file.
@@ -927,7 +1010,8 @@ begin
 		    call pargi (arg1)
 	    }
 
-	    call zcall2 (ZCLSTX(dd), arg1, status)
+	    call zcall2 (ZCLSTX(dd), arg1, i_status)
+	    status = i_status
 
 	case TX_GET:
 	    # Read from a text file.  If the device is an ordinary text file
@@ -980,12 +1064,16 @@ begin
 	    }
 
 	    p_arg[1] = nchars
-	    if (ks_send (out, p_opcode, p_subcode) == ERR)
+	    opcode = p_opcode
+	    subcode = p_subcode
+	    if (ks_send (out, opcode, subcode) == ERR)
 		goto fatal_
 
 	    if (nchars > SZ_SBUF) {
-		call chrpak (Memc[iobuf], 1, Memc[iobuf], 1, nchars)
-		call zawrks (out, Memc[iobuf], nchars, long(0))
+		c_1 = 1
+		call chrpak (Memc[iobuf], c_1, Memc[iobuf], c_1, nchars)
+		c_0 = 0
+		call zawrks (out, Memc[iobuf], nchars, c_0)
 		call zawtks (out, status)
 		if (status != nchars)
 		    goto fatal_
@@ -1002,12 +1090,14 @@ begin
 	    if (nchars <= SZ_SBUF)
 		call zcall4 (ZPUTTX(dd), arg1, p_sbuf, nchars, status)
 	    else {
-		call zardks (in, Memc[iobuf], nchars, long(0))
+		c_0 = 0
+		call zardks (in, Memc[iobuf], nchars, c_0)
 		call zawtks (in, status)
 		if (status != nchars)
 		    goto fatal_
 
-		call chrupk (Memc[iobuf], 1, Memc[iobuf], 1, nchars)
+		c_1 = 1
+		call chrupk (Memc[iobuf], c_1, Memc[iobuf], c_1, nchars)
 		call zcall4 (ZPUTTX(dd), arg1, Memc[iobuf], nchars, status)
 	    }
 
@@ -1026,7 +1116,8 @@ begin
 	case TX_SEK:
 	    # Seek on a text file.
 	    lval = ki_decode (p_sbuf, NCHARS_LONG)
-	    call zcall3 (ZSEKTX(dd), arg1, lval, status)
+	    call zcall3 (ZSEKTX(dd), arg1, lval, i_status)
+	    status = i_status
 
 	case TX_NOT:
 	    # Note the file position of a text file.  The seek offset is
@@ -1055,11 +1146,13 @@ begin
 
 	if (debug == YES) {
 	    call fprintf (spy, "status %d\n")
-	    call pargi (status)
+	    call pargl (status)
 	}
 
 	p_arg[1] = status
-	if (ks_send (out, p_opcode, p_subcode) != ERR)
+	opcode = p_opcode
+	subcode = p_subcode
+	if (ks_send (out, opcode, subcode) != ERR)
 	    return
 
 fatal_
@@ -1074,11 +1167,14 @@ procedure ks_zfiomt (in, out, iobuf, len_iobuf)
 
 int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
-int	len_iobuf		# current length of buffer
+size_t	len_iobuf		# current length of buffer
 
-long	lval
-int	status, nchars, mode, dc_off, dc_len
-int	newfile, arg[MAX_ARGS]
+size_t	sz_val
+size_t	nchars
+long	lval, c_0, status, dc_off, dc_len
+int	i_status, mode
+int	newfile, opcode, subcode, param, chan
+long	arg[MAX_ARGS]
 char	drive[SZ_FNAME]
 errchk	realloc
 include	"kii.com"
@@ -1089,7 +1185,8 @@ int	debug, spy
 common	/dbgcom/ debug, spy
 
 begin
-	call amovi (p_arg, arg, MAX_ARGS)
+	sz_val = MAX_ARGS
+	call amovl (p_arg, arg, sz_val)
 
 	# Make sure the iobuffer is large enough.  If a large enough buffer
 	# cannot be allocated something is very wrong and the server shuts
@@ -1113,16 +1210,20 @@ begin
 	    newfile = arg[5]
 
 	    # Get the device name string.
-	    call strpak (p_sbuf[arg[1]], drive, SZ_PATHNAME)
+	    sz_val = SZ_PATHNAME
+	    call strpak (p_sbuf[arg[1]], drive, sz_val)
 
 	    # Get the devcap string.
 	    if (dc_len > 0 && dc_off == 0) {
-		call zardks (in, Memc[iobuf], dc_len+1, 0)
+		c_0 = 0
+		sz_val = dc_len+1
+		call zardks (in, Memc[iobuf], sz_val, c_0)
 		call zawtks (in, status)
 		if (status != dc_len + 1)
 		    goto fatal_
-	    } else
+	    } else {
 		call strpak (p_sbuf[dc_off], Memc[iobuf], len_iobuf)
+	    }
 
 	    if (debug == YES) {
 		call fprintf (spy,
@@ -1136,12 +1237,15 @@ begin
 		    call strpak (Memc[iobuf], Memc[iobuf], len_iobuf)
 	    }
 
-	    call zzopmt (drive, mode, Memc[iobuf], arg[6], newfile, status)
+	    call zzopmt (drive, mode, Memc[iobuf], arg[6], newfile, i_status)
+	    status = i_status
 	    p_arg[2] = newfile
 
 	case MT_CL:
 	    # Close a binary file.
-	    call zzclmt (arg[1], p_arg[2], status)
+	    chan = arg[1]
+	    call zzclmt (chan, p_arg[2], i_status)
+	    status = i_status
 
 	case MT_RD:
 	    # Read from a magtape file.  The read must be performed in one
@@ -1151,8 +1255,10 @@ begin
 	    # complete each request before processing the next one.
 
 	    # Read the data.
-	    call zzrdmt (arg[1], Memc[iobuf], arg[2], arg[3])
-	    call zzwtmt (arg[1], p_arg[2], status)
+	    chan = arg[1]
+	    sz_val = arg[2]
+	    call zzrdmt (chan, Memc[iobuf], sz_val, arg[3])
+	    call zzwtmt (chan, p_arg[2], status)
 
 	    # Send the ZAWT packet to the host followed by the data block.
 	    # The next operation performed by the host on the channel MUST
@@ -1160,10 +1266,13 @@ begin
 	    # do other things before completing the transfer.
 
 	    p_arg[1] = status
-	    if (ks_send (out, p_opcode, MT_WT) == ERR)
+	    opcode = p_opcode
+	    if (ks_send (out, opcode, MT_WT) == ERR)
 		goto fatal_
 	    if (status > 0) {
-		call zawrks (out, Memc[iobuf], status, 0)
+		c_0 = 0
+		sz_val = status
+		call zawrks (out, Memc[iobuf], sz_val, c_0)
 		call zawtks (out, status)
 		if (status <= 0)
 		    goto fatal_
@@ -1182,7 +1291,9 @@ begin
 	    # other channels as well, but the performance gain is worth it.
 
 	    # Read the data from the host.
-	    call zardks (in, Memc[iobuf], arg[2], 0)
+	    c_0 = 0
+	    sz_val = arg[2]
+	    call zardks (in, Memc[iobuf], sz_val, c_0)
 	    call zawtks (in, status)
 	    if (status != arg[2])
 		goto fatal_
@@ -1190,8 +1301,10 @@ begin
 	    # Write the data to the output device.
 	    # TODO - delay the call to zawtbf to overlap i/o even further.
 
-	    call zzwrmt (arg[1], Memc[iobuf], arg[2], arg[3])
-	    call zzwtmt (arg[1], p_arg[2], status)
+	    chan = arg[1]
+	    sz_val = arg[2]
+	    call zzwrmt (chan, Memc[iobuf], sz_val, arg[3])
+	    call zzwtmt (chan, p_arg[2], status)
 	    if (status != arg[2])
 		goto fatal_
 
@@ -1207,7 +1320,9 @@ begin
 
 	case MT_ST:
 	    # Get device status.
-	    call zzstmt (arg[1], arg[2], lval)
+	    chan = arg[1]
+	    param = arg[2]
+	    call zzstmt (chan, param, lval)
 	    status = lval
 
 	case MT_RW:
@@ -1216,18 +1331,23 @@ begin
 	    dc_len = p_arg[3]
 
 	    # Get the device name string.
-	    call strpak (p_sbuf[arg[1]], drive, SZ_PATHNAME)
+	    sz_val = SZ_PATHNAME
+	    call strpak (p_sbuf[arg[1]], drive, sz_val)
 
 	    # Get the devcap string.
 	    if (dc_len > 0 && dc_off == 0) {
-		call zardks (in, Memc[iobuf], dc_len+1, 0)
+		c_0 = 0
+		sz_val = dc_len+1
+		call zardks (in, Memc[iobuf], sz_val, c_0)
 		call zawtks (in, status)
 		if (status != dc_len + 1)
 		    goto fatal_
-	    } else
+	    } else {
 		call strpak (p_sbuf[dc_off], Memc[iobuf], len_iobuf)
+	    }
 
-	    call zzrwmt (drive, Memc[iobuf], status)
+	    call zzrwmt (drive, Memc[iobuf], i_status)
+	    status = i_status
 
 	default:
 	    status = ERR
@@ -1238,11 +1358,13 @@ begin
 
 	if (debug == YES) {
 	    call fprintf (spy, "status %d\n")
-	    call pargi (status)
+	    call pargl (status)
 	}
 
 	p_arg[1] = status
-	if (ks_send (out, p_opcode, p_subcode) != ERR)
+	opcode = p_opcode
+	subcode = p_subcode
+	if (ks_send (out, opcode, subcode) != ERR)
 	    return
 
 fatal_
@@ -1383,6 +1505,10 @@ int	server			# channel to host
 int	opcode			# function opcode
 int	subcode			# function subcode (for drivers)
 
+size_t	sz_val
+size_t	sz_val1
+size_t	sz_val2
+long	c_0, lstatus
 int	status
 include	"kii.com"
 
@@ -1393,19 +1519,25 @@ begin
 	p_opcode  = opcode
 	p_subcode = subcode
 
-	# Encode the packet in machine independent form, i.e., LEN_INTFIELDS
-	# 32 bit MII integers followed by p_sbuflen chars, one char per byte.
+	# Encode the packet in machine independent form, i.e., LEN_LONGFIELDS
+	# 64 bit MII integers followed by p_sbuflen chars, one char per byte.
 
-	call miipak32 (FIRSTINTFIELD, p_packet, LEN_INTFIELDS, TY_INT)
-	call chrpak (p_sbuf, 1, p_packet, LEN_INTFIELDS * 4 + 1,
-	    min (SZ_SBUF, p_sbuflen + 1))
+	sz_val = LEN_LONGFIELDS
+	call miipak64 (FIRSTLONGFIELD, p_packet, sz_val, TY_LONG)
+	sz_val = min (SZ_SBUF, p_sbuflen + 1)
+	sz_val1 = 1
+	sz_val2 = LEN_LONGFIELDS * 8 + 1
+	call chrpak (p_sbuf, sz_val1, p_packet, sz_val2, sz_val)
 
 	# Transmit the packet.
-	call zawrks (server, p_packet, SZB_PACKET, long(0))
-	call zawtks (server, status)
+	c_0 = 0
+	sz_val = SZB_PACKET
+	call zawrks (server, p_packet, sz_val, c_0)
+	call zawtks (server, lstatus)
+	status = lstatus
 
 	if (debug == YES) {
-	    call fprintf (spy, "ks_send: status=%d\n");call pargi (status)
+	    call fprintf (spy, "ks_send: status=%d\n"); call pargi (status)
 	}
 
 	return (status)
@@ -1423,6 +1555,10 @@ int	server			# os channel to server process
 int	status
 include	"kii.com"
 
+size_t	sz_val
+size_t	sz_val1
+size_t	sz_val2
+long	lstatus, c_0
 int	debug, spy
 common	/dbgcom/ debug, spy
 
@@ -1430,8 +1566,11 @@ begin
 	# Read the packet.
 	# [DEBUG]: call zzrdks (server, p_packet, SZB_PACKET, long(0))
 
-	call zardks (server, p_packet, SZB_PACKET, long(0))
-	call zawtks (server, status)
+	c_0 = 0
+	sz_val = SZB_PACKET
+	call zardks (server, p_packet, sz_val, c_0)
+	call zawtks (server, lstatus)
+	status = lstatus
 
 	if (debug == YES && status <= 0) {
 	    call fprintf (spy, "ERROR: ks_receive: status=%d\n")
@@ -1441,12 +1580,15 @@ begin
 	if (status <= 0)
 	    return (status)
 
-	# The encoded packet consists of LEN_INTFIELDS 32 bit MII integers
+	# The encoded packet consists of LEN_LONGFIELDS 64 bit MII integers
 	# followed by p_sbuflen chars, one char per byte.
 
-	call miiupk32 (p_packet, FIRSTINTFIELD, LEN_INTFIELDS, TY_INT)
-	call chrupk (p_packet, LEN_INTFIELDS * 4 + 1, p_sbuf, 1,
-	    min (SZ_SBUF, p_sbuflen + 1))
+	sz_val = LEN_LONGFIELDS
+	call miiupk64 (p_packet, FIRSTLONGFIELD, sz_val, TY_LONG)
+	sz_val = min (SZ_SBUF, p_sbuflen + 1)
+	sz_val1 = LEN_LONGFIELDS * 8 + 1
+	sz_val2 = 1
+	call chrupk (p_packet, sz_val1, p_sbuf, sz_val2, sz_val)
 
 	if (debug == YES) {
 	    call fprintf (spy, "ks_receive: status=%d\n") ; call pargi (status)
@@ -1464,6 +1606,7 @@ char	vfn[ARB]		# filename to be mapped
 char	osfn[maxch]		# packed output OS filename
 int	maxch			# max chars out
 
+size_t	sz_val
 char	upk_osfn[SZ_FNAME]
 errchk	fmapfn
 int	debug, spy
@@ -1473,7 +1616,8 @@ begin
 	call fmapfn (vfn, osfn, maxch)
 
 	if (debug == YES) {
-	    call strupk (osfn, upk_osfn, SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call strupk (osfn, upk_osfn, sz_val)
 
 	    call fprintf (spy, "`%s' -> `%s'\n")
 		call pargstr (vfn)
@@ -1488,6 +1632,8 @@ int	opcode			#i opcode
 int	subcode			#i opcode
 char	o_str[ARB]		#o string containing opcode instruction
 char	s_str[ARB]		#o string containing subcode instruction
+
+size_t	sz_val
 
 begin
 	switch (opcode) {
@@ -1540,7 +1686,8 @@ begin
 
 
 	# Now convert the subcode if needed.
-	call aclrc (s_str, SZ_LINE)
+	sz_val = SZ_LINE
+	call aclrc (s_str, sz_val)
 	if (opcode >= KI_ZFIOBF && opcode <= KI_ZFIOGD) {
 	    switch (subcode) {
 	    case BF_OPN:  call strcpy ("BF_OPN", s_str, SZ_LINE) 

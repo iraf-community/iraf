@@ -11,7 +11,9 @@ include	"ki.h"
 int procedure ki_gethosts()
 
 pointer	sp, lbuf, osfn, ip
-int	chan, node, ch, op, junk, n, status, i, delim
+int	chan, node, ch, op, junk, n, status, i, delim, i_off
+size_t	sz_val
+long	lstatus
 
 bool	streq()
 int	ctowrd(), envfind(), ki_gnode()
@@ -19,13 +21,16 @@ include	"kinode.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE,  TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Null selected node descriptor fields.
-	call aclri (n_kschan, MAX_NODES)
-	call aclri (n_nrefs,  MAX_NODES)
-	call aclri (n_status, MAX_NODES)
+	sz_val = MAX_NODES
+	call aclri (n_kschan, sz_val)
+	call aclri (n_nrefs,  sz_val)
+	call aclri (n_status, sz_val)
 
 	# Process the host name table, ignoring blank lines and comment lines,
 	# until EOF is reached or the maximum number of nodes is exceeded.
@@ -55,7 +60,8 @@ begin
 	}
 
 	# Open the table file, a text file.
-	call strpak (Memc[osfn], Memc[osfn], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strpak (Memc[osfn], Memc[osfn], sz_val)
 	call zopntx (Memc[osfn], READ_ONLY, chan)
 	if (chan == ERR) {
 	    call sfree (sp)
@@ -63,9 +69,10 @@ begin
 	}
 
 	for (node=0;  node < MAX_NODES;  ) {
-	    call zgettx (chan, Memc[lbuf], SZ_LINE, status)
-	    if (status > 0)
-		Memc[lbuf+status] = EOS
+	    sz_val = SZ_LINE
+	    call zgettx (chan, Memc[lbuf], sz_val, lstatus)
+	    if (lstatus > 0)
+		Memc[lbuf+lstatus] = EOS
 	    else
 		break
 
@@ -84,7 +91,9 @@ begin
 	    n_nalias[node] = 0
 	    n = 1
 
-	    while (ctowrd (Memc, ip, n_alias[1,n,node], SZ_ALIAS) > 0) {
+	    i_off = 1
+	    while (ctowrd (Memc[ip], i_off, n_alias[1,n,node], SZ_ALIAS) > 0) {
+		ip = ip + i_off - 1
 		while (IS_WHITE (Memc[ip]))
 		    ip = ip + 1
 
@@ -95,6 +104,7 @@ begin
 		} else
 		    n = min (MAX_ALIAS, n + 1)
 	    }
+	    ip = ip + i_off - 1
 
 	    while (IS_WHITE (Memc[ip]))
 		ip = ip + 1

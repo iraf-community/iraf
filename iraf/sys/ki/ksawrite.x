@@ -10,12 +10,14 @@ procedure ks_awrite (server, buf, nbytes)
 
 int	server			# node descriptor index of server
 char	buf[ARB]		# i/o buffer
-int	nbytes			# nbytes to write
+size_t	nbytes			# nbytes to write
 
+long	c_0
 int	and()
 include	"kinode.com"
 
 begin
+	c_0 = 0
 	if (and (n_status[server], F_IOERR) == 0)
-	    call zawrks (n_kschan[server], buf, nbytes, long(0))
+	    call zawrks (n_kschan[server], buf, nbytes, c_0)
 end

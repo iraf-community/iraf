@@ -19,9 +19,10 @@ procedure zwrm75 (ifcb, buf, nbytes, offset)
 
 int	ifcb			# pointer to channel descriptor passed as int
 char	buf[ARB]		# input buffer
-int	nbytes			# number of  bytes to write
+size_t	nbytes			# number of  bytes to write
 long	offset			# not used for this device
 
+size_t	sz_val
 pointer	fcb
 int	xferid, and()
 
@@ -37,7 +38,8 @@ begin
 	    }
 
 	    # Save the M70 header in the descriptor.
-	    call amovs (buf, FCB_IISHDR(fcb), LEN_IISHDR)
+	    sz_val = LEN_IISHDR
+	    call amovs (buf, FCB_IISHDR(fcb), sz_val)
 	    xferid = XFERID(buf)
 
 	    # Determine the state for the new instruction.

@@ -12,6 +12,7 @@ char	bkgfile[ARB]		# packed osfn of bkg file
 char	bkgmsg[ARB]		# control string for kernel
 int	jobcode			# receives job code of process
 
+size_t	sz_val
 pointer	sp, osfn, alias
 int	server, off, delim
 int	ki_connect(), ki_sendrcv(), ki_getchan(), strlen(), ki_gnode()
@@ -19,20 +20,25 @@ include	"kii.com"
 
 begin
 	call smark (sp)
-	call salloc (osfn,  SZ_PATHNAME, TY_CHAR)
-	call salloc (alias, SZ_ALIAS,    TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn,  sz_val, TY_CHAR)
+	sz_val = SZ_ALIAS
+	call salloc (alias, sz_val, TY_CHAR)
 
 	server = ki_connect (process)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
-	    call strupk (bkgfile, Memc[osfn], SZ_PATHNAME)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
+	    sz_val = SZ_PATHNAME
+	    call strupk (bkgfile, Memc[osfn], sz_val)
 
 	    # The bkg file must be on the same node as the process file.
 	    if (ki_gnode (Memc[osfn], Memc[alias], delim) == REMOTE)
 		jobcode = ERR
 	    else {
-		call strpak (Memc[osfn+(delim+1)-1], Memc[osfn], SZ_PATHNAME)
+		sz_val = SZ_PATHNAME
+		call strpak (Memc[osfn+(delim+1)-1], Memc[osfn], sz_val)
 		call zopdpr (p_sbuf, Memc[osfn], bkgmsg, jobcode)
 	    }
 
@@ -43,7 +49,8 @@ begin
 
 	    off = p_sbuflen + 2
 	    p_arg[2] = off
-	    call strupk (bkgfile, p_sbuf[off], ARB)
+	    sz_val = ARB
+	    call strupk (bkgfile, p_sbuf[off], sz_val)
 	    p_sbuflen = off + strlen(p_sbuf[off])
 
 	    if (ki_sendrcv (server, KI_ZOPDPR, 0) == ERR)

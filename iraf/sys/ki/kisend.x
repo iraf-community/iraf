@@ -12,21 +12,29 @@ int	server			# node index of server process
 int	opcode			# function opcode
 int	subcode			# function subcode (for drivers)
 
-int	status
+size_t	sz_val
+size_t	sz_val1
+size_t	sz_val2
+long	status
 include	"kii.com"
 
 begin
 	p_opcode  = opcode
 	p_subcode = subcode
 
-	# Encode the packet in machine independent form, i.e., LEN_INTFIELDS
-	# 32 bit MII integers followed by p_sbuflen chars, one char per byte.
+	# Encode the packet in machine independent form, i.e., LEN_LONGFIELDS
+	# 64 bit MII integers followed by p_sbuflen chars, one char per byte.
 
-	call miipak32 (FIRSTINTFIELD, p_packet, LEN_INTFIELDS, TY_INT)
-	call chrpak (p_sbuf, 1, p_packet, LEN_INTFIELDS * 4 + 1, p_sbuflen + 1)
+	sz_val = LEN_LONGFIELDS
+	call miipak64 (FIRSTLONGFIELD, p_packet, sz_val, TY_LONG)
+	sz_val = p_sbuflen + 1
+	sz_val1 = 1
+	sz_val2 = LEN_LONGFIELDS * 8 + 1
+	call chrpak (p_sbuf, sz_val1, p_packet, sz_val2, sz_val)
 
 	# Transmit the packet.
-	call ks_awrite (server, p_packet, SZB_PACKET)
+	sz_val = SZB_PACKET
+	call ks_awrite (server, p_packet, sz_val)
 	call ks_await  (server, status)
 
 	return (status)

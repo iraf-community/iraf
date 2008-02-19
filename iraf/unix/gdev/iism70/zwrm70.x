@@ -6,7 +6,7 @@ procedure zwrm70 (chan, buf, nbytes, offset)
 
 int	chan			# FCB pointer for device
 char	buf[ARB]		# input buffer
-int	nbytes			# number of  bytes to write
+size_t	nbytes			# number of  bytes to write
 long	offset			# not used for this device
 
 begin

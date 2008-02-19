@@ -18,10 +18,12 @@ procedure kb_zard (device, chan, obuf, max_bytes, loffset)
 int	device			# device driver code
 int	chan			# channel assigned device
 char	obuf[max_bytes]		# receives data
-int	max_bytes		# max bytes to read
+size_t	max_bytes		# max bytes to read
 long	loffset			# file offset
 
-int	server, status
+int	server
+size_t	nbytes
+long	status
 int	ki_send(), ki_receive()
 include	"kichan.com"
 include	"kii.com"
@@ -51,7 +53,8 @@ begin
 
 	    # Read the data block (if any) directly into caller's buffer.
 	    if (status > 0) {
-		call ks_aread (server, obuf, status)
+		nbytes = status
+		call ks_aread (server, obuf, nbytes)
 		call ks_await (server, status)
 	    }
 	}

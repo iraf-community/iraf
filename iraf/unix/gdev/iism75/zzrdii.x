@@ -9,7 +9,7 @@ procedure zzrdii (fcb, buf, nbytes, offset)
 
 pointer	fcb			# pointer to channel descriptor
 char	buf[ARB]		# output buffer
-int	nbytes			# number of  bytes to read
+size_t	nbytes			# number of  bytes to read
 long	offset			# not used for this device
 
 begin

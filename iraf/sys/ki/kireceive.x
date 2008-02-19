@@ -16,26 +16,34 @@ int	server			# node index of server process
 int	opcode			# function opcode
 int	subcode			# function subcode (for drivers)
 
-int	stat, ip, op, ch
+size_t	sz_val
+size_t	sz_val1
+size_t	sz_val2
+long	stat
+int	ip, op, ch
 int	gstrcpy()
 include	"kii.com"
 include	"kinode.com"
 
 begin
 	# Read the packet.
-	call ks_aread (server, p_packet, SZB_PACKET)
+	sz_val = SZB_PACKET
+	call ks_aread (server, p_packet, sz_val)
 	call ks_await (server, stat)
 
 	# Hard error on the channel to the kernel server.
 	if (stat == ERR)
 	    return (ERR)
 
-	# The encoded packet consists of LEN_INTFIELDS 32 bit MII integers
+	# The encoded packet consists of LEN_LONGFIELDS 64 bit MII integers
 	# followed by p_sbuflen chars, one char per byte.
 
-	call miiupk32 (p_packet, FIRSTINTFIELD, LEN_INTFIELDS, TY_INT)
-	call chrupk (p_packet, LEN_INTFIELDS * 4 + 1, p_sbuf, 1,
-	    max(0, min(SZ_SBUF, p_sbuflen)) + 1)
+	sz_val = LEN_LONGFIELDS
+	call miiupk64 (p_packet, FIRSTLONGFIELD, sz_val, TY_LONG)
+	sz_val = max(0, min(SZ_SBUF, p_sbuflen)) + 1
+	sz_val1 = LEN_LONGFIELDS * 8 + 1
+	sz_val2 = 1
+	call chrupk (p_packet, sz_val1, p_sbuf, sz_val2, sz_val)
 
 	# Check for out of band data, i.e., the data read was not a packet
 	# but some unsolicited message, e.g., error message, from the
@@ -52,7 +60,10 @@ begin
 	    op = op + 1
 	    p_sbuf[op] = ' '
 	    op = op + 1
-	    call chrupk (p_packet, 1, p_sbuf, op, SZ_LINE)
+	    sz_val = SZ_LINE
+	    sz_val1 = 1
+	    sz_val2 = op
+	    call chrupk (p_packet, sz_val1, p_sbuf, sz_val2, sz_val)
 
 	    do ip = op, SZ_LINE {
 		ch = p_sbuf[ip]

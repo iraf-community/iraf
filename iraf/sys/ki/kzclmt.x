@@ -13,6 +13,7 @@ int	chan			#I channel to be closed
 long	devpos[ARB]		#O receives position information
 int	status			#O close status
 
+size_t	sz_val
 int	server
 int	ki_sendrcv()
 include	"kichan.com"
@@ -35,10 +36,11 @@ begin
 		status = ERR
 	    else {
 		status = p_arg[1]
-		call amovi (p_arg[2], devpos, LEN_MTDEVPOS)
+		sz_val = LEN_MTDEVPOS
+		call amovl (p_arg[2], devpos, sz_val)
 	    }
 
-	    call mfree (k_bufp[chan], TY_INT)
+	    call mfree (k_bufp[chan], TY_STRUCT)
 	}
 
 	call ki_freechan (chan)

@@ -12,6 +12,7 @@ char	process[ARB]		# packed osfn of process executable
 int	inchan, outchan		# receives process input output channels
 int	pid			# receives process id
 
+size_t	sz_val
 int	server
 int	ki_connect(), ki_sendrcv(), ki_getchan()
 include	"kichan.com"
@@ -21,7 +22,8 @@ begin
 	server = ki_connect (process)
 
 	if (server == NULL) {
-	    call strpak (p_sbuf[p_arg[1]], p_sbuf, SZ_SBUF)
+	    sz_val = SZ_SBUF
+	    call strpak (p_sbuf[p_arg[1]], p_sbuf, sz_val)
 	    call zopcpr (p_sbuf, inchan, outchan, pid)
 	} else {
 	    if (ki_sendrcv (server, KI_ZOPCPR, 0) == ERR)

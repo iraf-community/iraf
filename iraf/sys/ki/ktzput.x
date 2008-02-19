@@ -13,8 +13,8 @@ procedure kt_zput (device, chan, ibuf, nchars, status)
 int	device			# device driver code
 int	chan			# channel assigned device
 char	ibuf[nchars]		# receives text
-int	nchars			# nchars to write
-int	status			# receives nchars written or ERR
+size_t	nchars			# nchars to write
+long	status			# receives nchars written or ERR
 
 pointer	bd, ep
 include	"kichan.com"
@@ -67,10 +67,12 @@ procedure ki_flushtx (device, chan, status)
 
 int	device			# text file device code
 int	chan			# channel assigned device
-int	status			# receives nchars written or ERR
+long	status			# receives nchars written or ERR
 
+size_t	c_1
 pointer	bd, bp
-int	server, nchars
+int	server
+size_t	nchars
 int	ki_send()
 include	"kichan.com"
 include	"kii.com"
@@ -109,12 +111,14 @@ begin
 	else if (nchars > SZ_SBUF) {
 	    # Send data record.
 
-	    call chrpak (Memc[bp], 1, Memc[bp], 1, nchars)
+	    c_1 = 1
+	    call chrpak (Memc[bp], c_1, Memc[bp], c_1, nchars)
 	    call ks_awrite (server, Memc[bp], nchars)
 	    call ks_await  (server, status)
 
-	    if (status != nchars)
+	    if (status != nchars) {
 		status = ERR
+	    }
 	}
 
 	# Mark the buffer empty.
