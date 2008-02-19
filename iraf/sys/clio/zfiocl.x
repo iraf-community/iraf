@@ -125,12 +125,16 @@ procedure zardps (ps, buf, maxbytes, offset)
 
 int	ps				# pseudofile
 char	buf[ARB]			# buffer to receive data
-int	maxbytes, maxchars		# capacity of buffer
+size_t	maxbytes			# capacity of buffer
 long	offset				# ignored at present
 
+size_t	sz_val
+size_t	maxchars, ndigits
+long	nbytes
+int	nchars, ip, clin_chan, raw_mode
 char	numstr[SZ_NUMSTR]
-int	nbytes, nchars, ndigits, ip, clin_chan, raw_mode
-int	ctoi(), cl_psio_request(), fstati()
+int	ctoi(), fstati()
+long	cl_psio_request()
 include	"clio.com"
 define	ioerr_ 91
 
@@ -152,7 +156,8 @@ begin
 	    goto ioerr_
 
 	# Get the number of chars to be read.
-	call zardpr (clin_chan, numstr, SZ_NUMSTR * SZB_CHAR, offset)
+	sz_val = SZ_NUMSTR * SZB_CHAR
+	call zardpr (clin_chan, numstr, sz_val, offset)
 	call zawtpr (clin_chan, nbytes)
 
 	if (nbytes < 0)
@@ -180,7 +185,8 @@ begin
 	if (nchars == 0)
 	    ps_status[ps] = 0				# EOF
 	else {
-	    call zardpr (clin_chan, buf, nbytes, offset)
+	    sz_val = nbytes
+	    call zardpr (clin_chan, buf, sz_val, offset)
 	    call zawtpr (clin_chan, ps_status[ps])
 	}
 	return
@@ -203,11 +209,13 @@ procedure zawrps (ps, buf, nbytes, offset)
 
 int	ps				# pseudofile
 char	buf[ARB]			# buffer to receive data
-int	nbytes				# capacity of buffer
+size_t	nbytes				# capacity of buffer
 long	offset				# ignored at present
 
-int	nchars, clout_chan
-int	cl_psio_request(), fstati()
+size_t	nchars
+int	clout_chan
+long	cl_psio_request()
+int	fstati()
 include	"clio.com"
 define	ioerr_ 91
 
@@ -237,7 +245,7 @@ end
 procedure zawtps (ps, status)
 
 int	ps			# pseudofile code
-int	status			# nbytes transferred in last packed (output)
+long	status			# nbytes transferred in last packed (output)
 include	"clio.com"
 
 begin
@@ -269,20 +277,23 @@ end
 # and CL_ZAWRPS to send the XMIT and XFER commands to the CL, when writing to
 # or reading from a pseudofile.
 
-int procedure cl_psio_request (cmd, arg1, arg2)
+long procedure cl_psio_request (cmd, arg1, arg2)
 
 char	cmd[ARB]		# e.g. "xmit" or "xfer"
-int	arg1, arg2		# integer arguments
+int	arg1			# integer arguments
+size_t	arg2
 
-int	ip, status, clout_chan
+size_t	ip, sz_val
+int	clout_chan, i_arg2, i_len
 pointer	obuf, sp, op
-long	offset
-int	itoc(), fstati()
+long	offset, status, l_arg2
+int	itoc(), ltoc(), fstati()
 define	output {Memc[op]=$1;op=op+1}
 
 begin
 	call smark (sp)
-	call salloc (obuf, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	clout_chan = fstati (CLOUT, F_CHANNEL)
 
@@ -294,17 +305,23 @@ begin
 	# nonnegative.  Optimized for simple single digit numbers.
 
 	output ('(')
-	if (arg1 < 10)
+	if (arg1 < 10) {
 	    output (TO_DIGIT (arg1))
-	else
-	    op = op + itoc (arg1, Memc[op], SZ_PATHNAME-(op-obuf))
+	} else {
+	    i_len = SZ_PATHNAME-(op-obuf)
+	    op = op + itoc (arg1, Memc[op], i_len)
+	}
 
 	output (',')
 
-	if (arg2 < 10)
-	    output (TO_DIGIT (arg2))
-	else
-	    op = op + itoc (arg2, Memc[op], SZ_PATHNAME-(op-obuf))
+	if (arg2 < 10) {
+	    i_arg2 = arg2
+	    output (TO_DIGIT (i_arg2))
+	} else {
+	    l_arg2 = arg2
+	    i_len = SZ_PATHNAME-(op-obuf)
+	    op = op + ltoc (l_arg2, Memc[op], i_len)
+	}
 
 	output (')')
 	output ('\n')

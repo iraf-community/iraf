@@ -6,7 +6,7 @@ int	cl_stmark			# stmark value for initial table
 int	cl_nposargs			# number of $1, $2 type task parameters
 int	cl_nextarg			# index into posarg list
 pointer	cl_posarg[MAX_POSARGS]		# symtab offsets of positional args
-int	ps_status[MAX_PSEUDOFILES]	# for pseudofile drivers
+long	ps_status[MAX_PSEUDOFILES]	# for pseudofile drivers
 int	cl_npsets			# number of psets for task (>= 1)
 int	cl_psetop			# next char in pset name buffer
 int	cl_psetindex[MAX_PSETS]		# index of pset names (1 = taskname)
