@@ -12,9 +12,10 @@ int os_fcopy ( const char *oldfile, const char *newfile )
 {
 	XCHAR	buf[SZ_FBUF+1];
 	XINT	mode = 0;
-	XINT	status, junk, x_maxch = SZ_FBUF;
+	XINT	status, junk;
+	XSIZE_T	x_maxch = SZ_FBUF;
 	XINT	in, out;
-	XINT	n;
+	XLONG	n, lstatus;
 
 	if (os_access (oldfile,0,0) == NO)
 	    return (ERR);
@@ -37,9 +38,11 @@ int os_fcopy ( const char *oldfile, const char *newfile )
 	    }
 
 	    while (ZGETTX (&in, buf, &x_maxch, &n), n != XEOF) {
-		if (n != XERR)
-		    ZPUTTX (&out, buf, &n, &status);
-		if (n == XERR || status == XERR) {
+		if (n != XERR) {
+		    XSIZE_T sz_n = n;
+		    ZPUTTX (&out, buf, &sz_n, &lstatus);
+		}
+		if (n == XERR || lstatus == XERR) {
 		    ZCLSTX (&in, &junk);
 		    ZCLSTX (&out, &junk);
 		    return (ERR);

@@ -49,7 +49,7 @@ int ZCLSTY ( XINT *fd, XINT *status )
 
 /* ZFLSTY -- Flush any buffered textual output.
  */
-int ZFLSTY ( XINT *fd, XINT *status )
+int ZFLSTY ( XINT *fd, XLONG *status )
 {
 	return ZFLSTX (fd, status);
 }
@@ -61,7 +61,7 @@ int ZFLSTY ( XINT *fd, XINT *status )
  * current line will NOT be newline terminated.  If maxchar==1 assert
  * character mode, otherwise assert line mode.
  */
-int ZGETTY ( XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status )
+int ZGETTY ( XINT *fd, XCHAR *buf, XSIZE_T *maxchars, XLONG *status )
 {
 	return ZGETTX (fd, buf, maxchars, status);
 }
@@ -88,7 +88,7 @@ int ZNOTTY ( XINT *fd, XLONG *offset )
 /* buf    : data to be output		*/
 /* nchars : nchars to write to file	*/
 /* status : return status		*/
-int ZPUTTY ( XINT *fd, XCHAR *buf, XINT *nchars, XINT *status )
+int ZPUTTY ( XINT *fd, XCHAR *buf, XSIZE_T *nchars, XLONG *status )
 {
 	return ZPUTTX (fd, buf, nchars, status);
 }

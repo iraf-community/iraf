@@ -17,7 +17,9 @@ ssize_t os_write ( int fd, const char *buf, size_t nbytes )
 	XCHAR *op, *otop;
 	int ch;
 	size_t n;
-	XINT nchars, status, x_fd;
+	XSIZE_T nchars;
+	XLONG status;
+	XINT x_fd;
 
 	if (osfiletype == BINARY_FILE)
 	    return (write (fd, buf, nbytes));

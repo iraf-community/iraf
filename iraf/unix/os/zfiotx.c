@@ -106,7 +106,7 @@ static	signal_handler_t sigtstp, sigcont;
 
 static	void tty_rawon ( struct ttyport *, int );
 static	void tty_reset ( struct	ttyport * );
-static	void uio_bwrite ( FILE *, XCHAR *, int );
+static	void uio_bwrite ( FILE *, XCHAR *, XSIZE_T );
 
 #ifdef OLD_MACOSX
 static void tty_onsig ( int , int, struct sigcontext * );
@@ -312,7 +312,7 @@ int ZCLSTX ( XINT *fd, XINT *status )
 
 /* ZFLSTX -- Flush any buffered textual output.
  */
-int ZFLSTX ( XINT *fd, XINT *status )
+int ZFLSTX ( XINT *fd, XLONG *status )
 {
 	*status = (fflush (zfd[*fd].fp) == EOF) ? XERR : XOK;
 
@@ -326,14 +326,15 @@ int ZFLSTX ( XINT *fd, XINT *status )
  * current line will NOT be newline terminated.  If maxchar==1 assert
  * character mode, otherwise assert line mode.
  */
-int ZGETTX ( XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status )
+int ZGETTX ( XINT *fd, XCHAR *buf, XSIZE_T *maxchars, XLONG *status )
 {
 	FILE *fp;
 	XCHAR *op, *maxop;
 	int ch;
 	struct fiodes *kfp;
 	struct ttyport *port;
-	int nbytes, ntrys;
+	XSIZE_T nbytes;
+	int ntrys;
 	size_t bufsize = *maxchars + 1;
 
 	if (*maxchars <= 0) {
@@ -546,14 +547,15 @@ int ZNOTTX ( XINT *fd, XLONG *offset )
 /* buf    : data to be output		*/
 /* nchars : nchars to write to file	*/
 /* status : return status		*/
-int ZPUTTX ( XINT *fd, XCHAR *buf, XINT *nchars, XINT *status )
+int ZPUTTX ( XINT *fd, XCHAR *buf, XSIZE_T *nchars, XLONG *status )
 {
 	FILE *fp;
 	struct fiodes *kfp = &zfd[*fd];
 	struct ttyport *port;
 	const XCHAR *ip, *maxip;
 	const char *cp;
-	int count, ch;
+	XSIZE_T count;
+	int ch;
 
 	count = *nchars;
 	port = (struct ttyport *) kfp->port;
@@ -989,12 +991,12 @@ static void tty_continue ( int sig )
 /* fp : output file		*/
 /* buf : data buffer		*/
 /* nbytes : data size		*/
-static void uio_bwrite ( FILE *fp, XCHAR *buf, int nbytes )
+static void uio_bwrite ( FILE *fp, XCHAR *buf, XSIZE_T nbytes )
 {
 	const XCHAR *ip = buf;
 	char *op, *maxop;
 	char obuf[1024];
-	int chunk;
+	XSIZE_T chunk;
 
 	while (nbytes > 0) {
 	    chunk = (nbytes <= 1024) ? nbytes : 1024;

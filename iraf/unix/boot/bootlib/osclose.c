@@ -9,9 +9,9 @@
  */
 int os_close ( int fd )
 {
-	XINT	junk;
-	XINT	nchars;
-	XINT	x_fd;
+	XLONG	ljunk;
+	XSIZE_T	nchars;
+	XINT	x_fd, junk;
 
 	x_fd = fd;
 	if (osfiletype == BINARY_FILE)
@@ -19,7 +19,7 @@ int os_close ( int fd )
 	else {
 	    if (txop > text) {
 		nchars = txop - text;
-		ZPUTTX (&x_fd, text, &nchars, &junk);
+		ZPUTTX (&x_fd, text, &nchars, &ljunk);
 	    }
 	    ZCLSTX (&x_fd, &junk);
 	}
