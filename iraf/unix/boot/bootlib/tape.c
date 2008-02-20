@@ -92,7 +92,7 @@ int tape_open ( const char *fname, int mode )
 	    XINT *op;
 	    struct mtpos devpos;
 	    int nwords = sizeof(devpos) / sizeof(XINT);
-	    XINT newfile = 0;
+	    XLONG newfile = 0;
 	    const char *tapecap = ":np";
 
 	    for ( op = (XINT *)&devpos ; nwords > 0 ; nwords-- )

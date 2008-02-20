@@ -13,7 +13,7 @@ char	device[ARB]		#I logical device name
 int	mode			#I access mode
 char	devcap[ARB]		#I tapecap entry for device
 long	devpos[ARB]		#I tape position information
-int	newfile			#U receives new file number
+long	newfile			#U receives new file number
 int	chan			#O channel assigned for reading filenames
 
 size_t	sz_val

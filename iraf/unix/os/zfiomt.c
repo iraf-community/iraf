@@ -372,7 +372,7 @@ static	void zmtdbgn ( struct mtdesc *, const char *, ... );
 /* newfile : file to be opened or EOT				*/
 /* chan    : OS channel of opened file				*/
 int ZZOPMT ( PKCHAR *device, XINT *acmode, PKCHAR *devcap, XLONG *devpos, 
-	     XINT *newfile, XINT *chan )
+	     XLONG *newfile, XINT *chan )
 {
 	struct mtdesc *mp;
 	struct _mtpos *pp;

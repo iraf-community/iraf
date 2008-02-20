@@ -15,7 +15,7 @@ int	acmode			#I file access mode
 int	mtchan			#O return value (mt descriptor index)
 
 size_t	sz_val
-int	mt, n_acmode, n_newfile, n_chan
+int	mt, n_acmode, n_chan
 pointer	sp, pk_devcap
 include	"mtio.com"
 define	err_ 91
@@ -36,10 +36,8 @@ begin
 	sz_val = SZ_DEVCAP
 	call strpak (Memc[MT_DEVCAP(mt)], Memc[pk_devcap], sz_val)
 	n_acmode = MT_ACMODE(mt)
-	n_newfile = MT_FILE(mt)
 	call zzopmt (iodev, n_acmode, Memc[pk_devcap], MT_DEVPOS(mt),
-	    n_newfile, n_chan)
-	MT_FILE(mt) = n_newfile
+	    MT_FILE(mt), n_chan)
 	MT_OSCHAN(mt) = n_chan
 	if (MT_OSCHAN(mt) == ERR)
 	    goto err_

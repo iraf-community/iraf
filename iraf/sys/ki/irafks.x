@@ -1171,9 +1171,9 @@ size_t	len_iobuf		# current length of buffer
 
 size_t	sz_val
 size_t	nchars
-long	lval, c_0, status, dc_off, dc_len
+long	newfile, lval, c_0, status, dc_off, dc_len
 int	i_status, mode
-int	newfile, opcode, subcode, param, chan
+int	opcode, subcode, param, chan
 long	arg[MAX_ARGS]
 char	drive[SZ_FNAME]
 errchk	realloc
@@ -1230,7 +1230,7 @@ begin
 		    "open magtape device `%s', mode=%d, file=%d, devcap=`%s'\n")
 		    call pargstr (p_sbuf[arg[1]])
 		    call pargi (mode)
-		    call pargi (newfile)
+		    call pargl (newfile)
 
 		    call strupk (Memc[iobuf], Memc[iobuf], len_iobuf)
 		    call pargstr (Memc[iobuf])
