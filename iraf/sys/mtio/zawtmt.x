@@ -10,8 +10,9 @@ include	"mtio.h"
 procedure zawtmt (mtchan, status)
 
 int	mtchan			#I i/o channel
-int	status			#O status (nbytes transferred or ERR)
+long	status			#O status (nbytes transferred or ERR)
 
+int	chan
 include	"mtio.com"
 
 begin
@@ -23,7 +24,8 @@ begin
 	if (MT_ATEOF(mtchan) == YES)
 	    status = 0
 	else {
-	    call zzwtmt (MT_OSCHAN(mtchan), MT_DEVPOS(mtchan), status)
+	    chan = MT_OSCHAN(mtchan)
+	    call zzwtmt (chan, MT_DEVPOS(mtchan), status)
 	    if (status == 0)
 		MT_ATEOF(mtchan) = YES
 	}

@@ -9,12 +9,13 @@ procedure mtencode (outstr, maxch, device, fileno, recno, attrl)
 char	outstr[ARB]			#O magtape device specification
 int	maxch				#I max chars out
 char	device[ARB]			#I device name (incl node)
-int	fileno, recno			#I file and record numbers, or ERR
+long	fileno				#I file and record numbers, or ERR
+long	recno
 char	attrl[ARB]			#I tapecap attributes
 
 int	op
 int	gstrcpy()
-int	itoc()
+int	ltoc()
 
 begin
 	if (fileno != ERR || recno != ERR || attrl[1] != EOS) {
@@ -24,11 +25,11 @@ begin
 		if (fileno == EOT)
 		    op = op + gstrcpy ("EOT", outstr[op], maxch-op+1)
 		else
-		    op = op + itoc (fileno, outstr[op], maxch-op+1)
+		    op = op + ltoc (fileno, outstr[op], maxch-op+1)
 	    }
 	    if (recno != ERR) {
 		outstr[op] = '.';  op = op + 1
-		op = op + itoc (recno, outstr[op], maxch-op+1)
+		op = op + ltoc (recno, outstr[op], maxch-op+1)
 	    }
 	    if (attrl[1] != EOS) {
 		if (attrl[1] != ':') {

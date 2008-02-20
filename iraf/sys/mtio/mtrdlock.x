@@ -13,17 +13,20 @@ procedure mt_read_lockfile (mtname, mt)
 char	mtname[ARB]		#I device name
 int	mt			#I MTIO descriptor
 
+size_t	sz_val
 int	fd, ip
 pointer	sp, lockfile, lbuf
-int	strmatch(), stridxs(), ctoi(), open(), getline()
+int	strmatch(), stridxs(), ctol(), open(), getline()
 errchk	open, getline
 include	"mtio.com"
 define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (lockfile, SZ_FNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# If the lock file cannot be accessed, return an undefined tape
 	# position but do not abort.
@@ -41,35 +44,35 @@ begin
 		goto err_
 	} until (strmatch (Memc[lbuf], "^file") > 0)
 	ip = stridxs ("=", Memc[lbuf]) + 1
-	if (ctoi (Memc[lbuf], ip, MT_FILNO(mt)) == 0)
+	if (ctol (Memc[lbuf], ip, MT_FILNO(mt)) == 0)
 	    goto err_
 
 	# Get record number.
 	if (getline (fd, Memc[lbuf]) == EOF)
 	    goto err_
 	ip = stridxs ("=", Memc[lbuf]) + 1
-	if (ctoi (Memc[lbuf], ip, MT_RECNO(mt)) == 0)
+	if (ctol (Memc[lbuf], ip, MT_RECNO(mt)) == 0)
 	    goto err_
 
 	# Get total files on tape.
 	if (getline (fd, Memc[lbuf]) == EOF)
 	    goto err_
 	ip = stridxs ("=", Memc[lbuf]) + 1
-	if (ctoi (Memc[lbuf], ip, MT_NFILES(mt)) == 0)
+	if (ctol (Memc[lbuf], ip, MT_NFILES(mt)) == 0)
 	    goto err_
 
 	# Get amount of tape used.
 	if (getline (fd, Memc[lbuf]) == EOF)
 	    goto err_
 	ip = stridxs ("=", Memc[lbuf]) + 1
-	if (ctoi (Memc[lbuf], ip, MT_TAPEUSED(mt)) == 0)
+	if (ctol (Memc[lbuf], ip, MT_TAPEUSED(mt)) == 0)
 	    goto err_
 
 	# Get pflags.
 	if (getline (fd, Memc[lbuf]) == EOF)
 	    goto err_
 	ip = stridxs ("=", Memc[lbuf]) + 1
-	if (ctoi (Memc[lbuf], ip, MT_PFLAGS(mt)) == 0)
+	if (ctol (Memc[lbuf], ip, MT_PFLAGS(mt)) == 0)
 	    goto err_
 
 	call close (fd)

@@ -9,14 +9,17 @@ int procedure mtneedfileno (mtname)
 
 char	mtname[ARB]			#I magtape device specification
 
-int	fileno, recno
+size_t	sz_val
+long	fileno, recno
 pointer	sp, device, devcap
 int	btoi()
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_DEVICE, TY_CHAR)
-	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
+	sz_val = SZ_DEVICE
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = SZ_DEVCAP
+	call salloc (devcap, sz_val, TY_CHAR)
 
 	call mtparse (mtname, Memc[device], SZ_DEVICE, fileno, recno,
 	    Memc[devcap], SZ_DEVCAP)

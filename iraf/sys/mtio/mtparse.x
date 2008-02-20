@@ -37,14 +37,15 @@ procedure mtparse (mtname, device, sz_device, file, record, attrl, sz_attrl)
 char	mtname[ARB]		#I device specification
 char	device[ARB]		#O device name as in tapecap
 int	sz_device		#I max chars in device name
-int	file			#O file number or -1
-int	record			#O record number or -1
+long	file			#O file number or -1
+long	record			#O record number or -1
 char	attrl[ARB]		#O attribute list
 int	sz_attrl		#I max char in attribute list
 
 char	eotstr[3]
-int	ip, op, nchars, ival
-int	ctoi(), strncmp(), ki_extnode()
+int	ip, op, nchars
+long	lval
+int	ctol(), strncmp(), ki_extnode()
 bool	streq()
 define	bad_ 91
 
@@ -74,8 +75,8 @@ begin
 	    ip = ip + 1
 
 	    # Get the file number.
-	    if (ctoi (mtname, ip, ival) > 0) {
-		file = ival
+	    if (ctol (mtname, ip, lval) > 0) {
+		file = lval
 		if (file < 0)
 		    goto bad_
 	    } else if (IS_ALPHA(mtname[ip])) {
@@ -93,8 +94,8 @@ begin
 		ip = ip + 1
 		if (mtname[ip] == ']')
 		    record = ERR
-		else if (ctoi (mtname, ip, ival) > 0) {
-		    record = ival
+		else if (ctol (mtname, ip, lval) > 0) {
+		    record = lval
 		    if (record < 0)
 			goto bad_
 		}

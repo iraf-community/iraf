@@ -14,8 +14,10 @@ int	mtchan			#I mtio descriptor
 int	what			#I status parameter to be returned
 long	lvalue			#O returned status value
 
+int	chan
 include	"mtio.com"
 
 begin
-	call zzstmt (MT_OSCHAN(mtchan), what, lvalue)
+	chan = MT_OSCHAN(mtchan)
+	call zzstmt (chan, what, lvalue)
 end

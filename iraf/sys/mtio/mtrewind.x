@@ -15,13 +15,16 @@ procedure mtrewind (mtname, initcache)
 char	mtname[ARB]		#I device to be rewound
 int	initcache		#I discard positional information?
 
+size_t	sz_val
+long	c_1
 pointer	sp, fname
 int	fd, mtopen()
 errchk	mtfname
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Init position cache.
 	if (initcache == YES) {
@@ -31,8 +34,10 @@ begin
 	}
 
 	# Rewind device.
-	call mtfname (mtname, 1, Memc[fname], SZ_FNAME)
-	iferr (fd = mtopen (Memc[fname], READ_ONLY, 0))
+	c_1 = 1
+	call mtfname (mtname, c_1, Memc[fname], SZ_FNAME)
+	sz_val = 0
+	iferr (fd = mtopen (Memc[fname], READ_ONLY, sz_val))
 	    call erract (EA_WARN)
 	else
 	    call close (fd)

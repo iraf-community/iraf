@@ -48,16 +48,20 @@ int procedure mtopen (mtname, acmode, bufsize)
 
 char	mtname[ARB]		#I device to be opened
 int	acmode			#I access mode
-int	bufsize			#I fio buffer size (record size) or 0
+size_t	bufsize			#I fio buffer size (record size) or 0
 
+size_t	sz_val
+long	lval
 bool	first_time
 pointer	sp, devcap, fname, gty
-int	mt, fd, nskip, new_file, new_record
+int	mt, fd
+long	new_file, new_record, nskip
 
 bool	streq()
 pointer	mt_gtyopen(), gtycaps()
 int	open(), fopnbf(), gtygets(), access()
-int	mt_skip_record(), mtfile(), mt_devallocated()
+long	mt_skip_record()
+int	mtfile(), mt_devallocated()
 extern	zopnmt(), zardmt(), zawrmt(), zawtmt(), zsttmt(), zclsmt()
 
 errchk	open, fopnbf, fseti, syserrs, mtparse
@@ -67,8 +71,10 @@ include	"mtio.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_DEVCAP
+	call salloc (devcap, sz_val, TY_CHAR)
 
 	# Runtime initialization of the mtio file descriptor common.
 	# Make each file descriptor available for use.
@@ -166,8 +172,10 @@ begin
 	    zopnmt, zardmt, zawrmt, zawtmt, zsttmt, zclsmt)
 
 	# Set the file buffer size (record size for variable block devices).
-	if (bufsize > 0)
-	    call fseti (fd, F_BUFSIZE, bufsize)
+	if (bufsize > 0) {
+	    lval = bufsize
+	    call fsetl (fd, F_BUFSIZE, lval)
+	}
 	
 	# If the user specified a record offset, skip records up to there.
 	# Zero means leave positioned to old record.

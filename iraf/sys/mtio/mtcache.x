@@ -50,6 +50,7 @@ procedure mt_getpos (mtname, mt)
 char	mtname[ARB]		#I device name
 int	mt			#I MTIO descriptor
 
+size_t	sz_val
 int	slot
 bool	streq()
 include	"mtcache.com"
@@ -59,7 +60,8 @@ begin
 	# First look in the cache.
 	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1)
 	    if (streq (MT_LKNAME(mt), c_lkname[1,slot])) {
-		call amovi (c_mtdes[1,slot], MT_DEVPOS(mt), LEN_DEVPOS)
+		sz_val = LEN_DEVPOS
+		call amovl (c_mtdes[1,slot], MT_DEVPOS(mt), sz_val)
 		call strcpy (c_device[1,slot], MT_DEVICE(mt), SZ_DEVICE)
 		call strcpy (c_lkname[1,slot], MT_LKNAME(mt), SZ_LKNAME)
 		call strcpy (c_iodev[1,slot], MT_IODEV(mt), SZ_IODEV)
@@ -79,6 +81,7 @@ procedure mt_savepos (mt)
 
 int	mt			#I MTIO descriptor
 
+size_t	sz_val
 int	prev, slot
 bool	streq(), strne()
 extern	mt_sync()
@@ -110,7 +113,8 @@ begin
 	prev = slot
 
 	if (c_modified[slot] == YES && strne(MT_LKNAME(mt),c_lkname[1,slot])) {
-	    call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+	    sz_val = LEN_DEVPOS
+	    call amovl (c_mtdes[1,slot], MT_DEVPOS(0), sz_val)
 	    call strcpy (c_device[1,slot], MT_DEVICE(0), SZ_DEVICE)
 	    call strcpy (c_lkname[1,slot], MT_LKNAME(0), SZ_LKNAME)
 	    call strcpy (c_iodev[1,slot], MT_IODEV(0), SZ_IODEV)
@@ -118,7 +122,8 @@ begin
 	}
 
 cache_
-	call amovi (MT_DEVPOS(mt), c_mtdes[1,slot], LEN_DEVPOS)
+	sz_val = LEN_DEVPOS
+	call amovl (MT_DEVPOS(mt), c_mtdes[1,slot], sz_val)
 	call strcpy (MT_DEVICE(mt), c_device[1,slot], SZ_DEVICE)
 	call strcpy (MT_LKNAME(mt), c_lkname[1,slot], SZ_LKNAME)
 	call strcpy (MT_IODEV(mt), c_iodev[1,slot], SZ_IODEV)
@@ -134,6 +139,7 @@ procedure mt_sync (status)
 
 int	status			#I task termination status
 
+size_t	sz_val
 int	slot
 include	"mtcache.com"
 include	"mtio.com"
@@ -144,14 +150,17 @@ begin
 	    if (c_modified[slot] == YES) {
 		# If called during error recovery mark the file position undef.
 		if (status != OK) {
-		    call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+		    sz_val = LEN_DEVPOS
+		    call amovl (c_mtdes[1,slot], MT_DEVPOS(0), sz_val)
 		    MT_FILNO(0) = -1
 		    MT_RECNO(0) = -1
-		    call amovi (MT_DEVPOS(0), c_mtdes[1,slot], LEN_DEVPOS)
+		    sz_val = LEN_DEVPOS
+		    call amovl (MT_DEVPOS(0), c_mtdes[1,slot], sz_val)
 		}
 
 		# Update the lockfile.
-		call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+		sz_val = LEN_DEVPOS
+		call amovl (c_mtdes[1,slot], MT_DEVPOS(0), sz_val)
 		call strcpy (c_device[1,slot], MT_DEVICE(0), SZ_DEVICE)
 		call strcpy (c_lkname[1,slot], MT_LKNAME(0), SZ_LKNAME)
 		call strcpy (c_iodev[1,slot], MT_IODEV(0), SZ_IODEV)
@@ -185,6 +194,7 @@ end
 
 procedure mt_clrcache()
 
+size_t	sz_val
 int	slot
 include	"mtcache.com"
 
@@ -194,6 +204,7 @@ begin
 	    c_device[1,slot] = EOS
 	    c_lkname[1,slot] = EOS
 	    c_iodev[1,slot] = EOS
-	    call aclri (c_mtdes[1,slot], LEN_DEVPOS)
+	    sz_val = LEN_DEVPOS
+	    call aclrl (c_mtdes[1,slot], sz_val)
 	}
 end

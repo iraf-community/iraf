@@ -19,7 +19,7 @@ procedure zclsmt (mtchan, status)
 int	mtchan				#I i/o channel
 int	status				#O close status
 
-int	mt
+int	mt, chan
 bool	error_recovery
 include	"mtio.com"
 
@@ -27,8 +27,10 @@ begin
 	# Called by error recovery while positioning tape? (during open)
 	if (new_mtchan != NULL) {
 	    mt = new_mtchan
-	    if (MT_OSCHAN(mt) != NULL)
-		call zzclmt (MT_OSCHAN(mt), MT_DEVPOS(mt), status)
+	    if (MT_OSCHAN(mt) != NULL) {
+		chan = MT_OSCHAN(mt)
+		call zzclmt (chan, MT_DEVPOS(mt), status)
+	    }
 
 	    call mt_savepos (mt)
 	    call mt_sync (ERR)
@@ -44,7 +46,8 @@ begin
 	    error_recovery = (MT_FILNO(mt) == -1)
 
 	    # Close device.  This clobbers MT_FILNO (see above).
-	    call zzclmt (MT_OSCHAN(mt), MT_DEVPOS(mt), status)
+	    chan = MT_OSCHAN(mt)
+	    call zzclmt (chan, MT_DEVPOS(mt), status)
 
 	    # Update the tape position if not recovering from an abort.
 	    if (!error_recovery)

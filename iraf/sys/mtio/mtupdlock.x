@@ -15,9 +15,11 @@ procedure mt_update_lockfile (mt)
 
 int	mt			#I device slot
 
+size_t	sz_val
 extern	mt_sync()
 pointer	sp, lockfile, tempfile, lbuf, ip, op, extn
-int	old_lockfile, new_lockfile, junk, status, nlines
+int	old_lockfile, new_lockfile, junk, nlines, i_status
+long	status
 errchk	fmapfn
 include	"mtio.com"
 define	oline_ 91
@@ -25,9 +27,11 @@ define	err_ 92
 
 begin
 	call smark (sp)
-	call salloc (lockfile, SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfile, SZ_PATHNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (lockfile, sz_val, TY_CHAR)
+	call salloc (tempfile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Catch any errors in the following section and convert them
 	# into fatal errors.
@@ -79,10 +83,12 @@ oline_	    call strcpy ("# Magtape unit ", Memc[lbuf], SZ_LINE)
 	} else {
 	    nlines = 0
 	    repeat {
-		call zgettx (old_lockfile, Memc[lbuf], SZ_LINE, status)
+		sz_val = SZ_LINE
+		call zgettx (old_lockfile, Memc[lbuf], sz_val, status)
 		if (status <= 0) {
 		    if (nlines == 0) {
-			call zclstx (old_lockfile, status)
+			call zclstx (old_lockfile, i_status)
+			status = i_status
 			goto oline_
 		    } else
 			break
@@ -92,7 +98,7 @@ oline_	    call strcpy ("# Magtape unit ", Memc[lbuf], SZ_LINE)
 		if (Memc[lbuf] == '#')
 		    call mt_putline (new_lockfile, Memc[lbuf])
 	    } until (Memc[lbuf] != '#')
-	    call zclstx (old_lockfile, status)
+	    call zclstx (old_lockfile, i_status)
 	}
 
 	# Everything else we write from here on is new stuff.  Discard rest
@@ -118,13 +124,13 @@ oline_	    call strcpy ("# Magtape unit ", Memc[lbuf], SZ_LINE)
 	call zflstx (new_lockfile, status)
 	if (status == ERR)
 	    goto err_
-	call zclstx (new_lockfile, status)
-	if (status == ERR)
+	call zclstx (new_lockfile, i_status)
+	if (i_status == ERR)
 	    goto err_
 
-	call zfdele (Memc[lockfile], status)
-	call zfrnam (Memc[tempfile], Memc[lockfile], status)
-	if (status == ERR)
+	call zfdele (Memc[lockfile], i_status)
+	call zfrnam (Memc[tempfile], Memc[lockfile], i_status)
+	if (i_status == ERR)
 	    goto err_
 
 	call sfree (sp)
@@ -133,8 +139,8 @@ oline_	    call strcpy ("# Magtape unit ", Memc[lbuf], SZ_LINE)
 err_
 	# If an error of any sort occurs, it is fatal.
 	call onerror_remove (mt_sync)
-	call zfdele (Memc[tempfile], status)
-	call zfdele (Memc[lockfile], status)
+	call zfdele (Memc[tempfile], i_status)
+	call zfdele (Memc[lockfile], i_status)
 	call fatal (0, "Fatal error writing magtape device lockfile")
 end
 
@@ -145,12 +151,14 @@ procedure mt_savekeyword (fd, keyword, value)
 
 int	fd			# output file
 char	keyword[ARB]		# name of keyword
-int	value			# value of keyword
+long	value			# value of keyword
+
 char	numbuf[MAX_DIGITS]
-int	junk, itoc()
+int	junk
+int	ltoc()
 
 begin
-	junk = itoc (value, numbuf, MAX_DIGITS)
+	junk = ltoc (value, numbuf, MAX_DIGITS)
 
 	call mt_putline (fd, keyword)
 	call mt_putline (fd, " = ")
@@ -166,9 +174,11 @@ procedure mt_putline (fd, text)
 int	fd
 char	text[ARB]
 
+size_t	sz_val
 extern	mt_sync()
 char	lbuf[SZ_LINE]
-int	ip, op, status
+long	status
+int	ip, op
 data	op /1/
 
 begin
@@ -176,7 +186,8 @@ begin
 	    lbuf[op] = text[ip]
 	    op = min (SZ_LINE, op) + 1
 	    if (text[ip] == '\n') {
-		call zputtx (fd, lbuf, op-1, status)
+		sz_val = op-1
+		call zputtx (fd, lbuf, sz_val, status)
 		if (status == ERR) {
 		    call onerror_remove (mt_sync)
 		    call fatal (0,

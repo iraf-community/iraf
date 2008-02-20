@@ -11,11 +11,13 @@ procedure zawrmt (mtchan, buf, nbytes, offset)
 
 int	mtchan			#I i/o channel
 char	buf[ARB]		#I data to be written
-int	nbytes			#I number of bytes of data
+size_t	nbytes			#I number of bytes of data
 long	offset			#I file offset
 
+int	chan
 include	"mtio.com"
 
 begin
-	call zzwrmt (MT_OSCHAN(mtchan), buf, nbytes, offset)
+	chan = MT_OSCHAN(mtchan)
+	call zzwrmt (chan, buf, nbytes, offset)
 end

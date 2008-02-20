@@ -11,12 +11,15 @@ procedure zardmt (mtchan, buf, maxbytes, offset)
 
 int	mtchan			#I i/o channel
 char	buf[ARB]		#O output data buffer
-int	maxbytes		#I max bytes to read
+size_t	maxbytes		#I max bytes to read
 long	offset			#I file offset
 
+int	chan
 include	"mtio.com"
 
 begin
-	if (MT_ATEOF(mtchan) == NO)
-	    call zzrdmt (MT_OSCHAN(mtchan), buf, maxbytes, offset)
+	if (MT_ATEOF(mtchan) == NO) {
+	    chan = MT_OSCHAN(mtchan)
+	    call zzrdmt (chan, buf, maxbytes, offset)
+	}
 end
