@@ -88,6 +88,34 @@ begin
 end
 
 
+# PARGZ -- Pass a size_t.
+
+procedure pargz (zval)
+
+size_t	zval
+double	dval
+
+begin
+	dval = zval
+
+	call pargg (dval, TY_POINTER)
+end
+
+
+# PARGP -- Pass a pointer.
+
+procedure pargp (pval)
+
+pointer	pval
+double	dval
+
+begin
+	dval = pval
+
+	call pargg (dval, TY_POINTER)
+end
+
+
 # PARGR -- Pass a real.
 
 procedure pargr (rval)

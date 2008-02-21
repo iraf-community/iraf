@@ -198,7 +198,7 @@ begin
 
 	if (debug == YES) {
 	    call fprintf (spy, "kernel server, len_iobuf=%d\n")
-		call pargl (len_iobuf)
+		call pargz (len_iobuf)
 	}
 
 	# Load the device drivers.
