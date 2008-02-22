@@ -10,8 +10,9 @@ include	<fio.h>
 procedure fmkbfs (fd)
 
 int	fd
+
 pointer	bp
-int	dev_blksz
+long	dev_blksz
 long	offset
 errchk	malloc
 include	<fio.com>
@@ -43,9 +44,9 @@ begin
 	# restore seek offset (which depends on buffer pointer, buf offset).
 
 	offset = LNOTE(fd)
-	if (FTYPE(fp) == TEXT_FILE)
+	if (FTYPE(fp) == TEXT_FILE) {
 	    call malloc (bp, FBUFSIZE(fp), TY_CHAR)
-	else
+	} else
 	    call FBUF_ALLOC (bp, FBUFSIZE(fp), TY_CHAR)
 
 	boffset[fd] = NULL

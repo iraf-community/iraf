@@ -20,8 +20,10 @@ char	linebuf[ARB]			# output line buffer (>= SZ_LINE)
 bool	pushback
 char	ch
 pointer	ip, ip_top, op
-int	maxch, status
-int	filbuf(), and()
+size_t	maxch
+long	status
+long	filbuf()
+int	and()
 errchk	filbuf, filerr
 include	<fio.com>
 

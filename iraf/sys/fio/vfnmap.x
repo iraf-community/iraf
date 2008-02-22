@@ -87,7 +87,7 @@ define	V_UNMAP		4
 
 define	LEN_VFD		778
 
-define	V_MFD		Memi[P2I($1)]		# ptr to mapping file descriptor
+define	V_MFD		Memp[$1]		# ptr to mapping file descriptor
 define	V_ACMODE	Memi[P2I($1+1)]		# access mode
 define	V_LENOSDIR	Memi[P2I($1+2)]		# length of OSDIR string
 define	V_LENROOT	Memi[P2I($1+3)]		# length of ROOT string
@@ -136,6 +136,7 @@ pointer procedure vfnopen (vfn, mode)
 char	vfn[ARB]		# virtual filename
 int	mode			# access mode for VFN database
 
+size_t	sz_val
 bool	first_time
 int	n_open_vfns, root_offset, extn_offset
 pointer	def_vfd, vfd
@@ -149,7 +150,8 @@ begin
 	# call.
 
 	if (first_time) {
-	    call malloc (def_vfd, LEN_VFD, TY_STRUCT)
+	    sz_val = LEN_VFD
+	    call malloc (def_vfd, sz_val, TY_STRUCT)
 	    n_open_vfns = 0
 	    first_time = false
 	}
@@ -158,9 +160,12 @@ begin
 
 	if (n_open_vfns <= 0) {
 	    vfd = def_vfd
-	    call aclri (Memi[vfd], LEN_VFD)
-	} else
-	    call calloc (vfd, LEN_VFD, TY_STRUCT)
+	    sz_val = LEN_VFD
+	    call aclrp (Memp[vfd], sz_val)
+	} else {
+	    sz_val = LEN_VFD
+	    call calloc (vfd, sz_val, TY_STRUCT)
+	}
 	n_open_vfns = n_open_vfns + 1
 
 	# Break the VFN into its component parts.  Map using escape sequence
@@ -335,6 +340,7 @@ pointer	vfd			# pointer to VFN descriptor
 char	osfn[maxch]		# buffer to receive packed OSFN
 int	maxch
 
+size_t	sz_val
 char	first_char
 int	fn, fn_index, ip, junk
 pointer	sp, root, extn, mfd, vfnp
@@ -344,8 +350,9 @@ errchk	vfnmap
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_VFNFN, TY_CHAR)
-	call salloc (extn, SZ_VFNFN, TY_CHAR)
+	sz_val = SZ_VFNFN
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
 
 	# Call VFNMAP to perform the mapping and possibly open the database.
 	# If VFNMAP returns ERR then the filename was degenerate but was not
@@ -394,8 +401,9 @@ begin
 	# We are more concerned here about saving space in the mapping file
 	# and in the MFD, than in making set deletion efficient.
 
+	sz_val = SZ_FNPAIR
 	for (fn = fn_index + 1;  fn <= M_NFILES(mfd);  fn=fn+1)
-	    call amovc (FN_VFN(mfd,fn), FN_VFN(mfd,fn-1), SZ_FNPAIR)
+	    call amovc (FN_VFN(mfd,fn), FN_VFN(mfd,fn-1), sz_val)
 	M_NFILES(mfd) = M_NFILES(mfd) - 1
 
 	M_LASTOP(mfd) = V_DEL
@@ -421,17 +429,20 @@ char	osfn[maxch]		# OS filename to be searched for (packed)
 char	vfn[ARB]		# receives unpacked VFN
 int	maxch
 
+size_t	sz_val
 char	first_char
-int	fn, op, extn_offset
+int	fn, op, extn_offset, i_off
 pointer	mfd, osfnp, sp, osfname, ip
 bool	streq()
 int	gstrcpy(), vfn_decode()
 
 begin
 	call smark (sp)
-	call salloc (osfname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfname, sz_val, TY_CHAR)
 
-	call strupk (osfn, Memc[osfname], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (osfn, Memc[osfname], sz_val)
 	if (CASE_INSENSITIVE && HOST_CASE != 'L')
 	    call strlwr (Memc[osfname])
 
@@ -462,7 +473,9 @@ begin
 	op = 1
 
 	while (Memc[ip] != EOS) {
-	    op = op + vfn_decode (Memc, ip, vfn[op], maxch-op+1)
+	    i_off = 1
+	    op = op + vfn_decode (Memc[ip], i_off, vfn[op], maxch-op+1)
+	    ip = ip + i_off - 1
 	    if (Memc[ip] == EXTN_DELIMITER) {
 		ip = ip + 1
 		vfn[op] = '.'
@@ -504,11 +517,14 @@ procedure vfnclose (vfd, update_enable)
 pointer	vfd			# VFN descriptor
 int	update_enable		# update the database?
 
-int	n_open_vfns, lastop, junk, len_struct
-int	status
+size_t	sz_val
+size_t	len_struct
+int	n_open_vfns, lastop, junk
+int	i_status
 pointer	sp, fname, osfn, mfd
+long	lval, status
 
-int	osfn_unlock(), osfn_timeleft()
+long	osfn_unlock(), osfn_timeleft()
 int	vfnadd(), vfndel(), vvfn_checksum()
 common	/vfncom/ n_open_vfns
 errchk	osfn_unlock, osfn_timeleft, vfnadd, vfndel, syserrs
@@ -518,8 +534,9 @@ define	unlock_ 93
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn,  SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	# If the mapping file was never referenced or the database was not
 	# modified in the MFD, just return buffers and quit.
@@ -565,16 +582,17 @@ begin
 
 	len_struct = LEN_MFD - (MAX_LONGFNAMES - M_NFILES(mfd)) *
 	    (SZ_FNPAIR / SZ_STRUCT)
-	M_CHECKSUM(mfd) = vvfn_checksum (Memi[mfd+1], (len_struct - 1) * SZ_INT)
+	M_CHECKSUM(mfd) = vvfn_checksum (Memc[P2C(mfd+1)], (len_struct - 1) * SZ_STRUCT)
 
-	call zawrbf (M_CHAN(mfd), Memi[mfd], len_struct * SZ_STRUCT * SZB_CHAR,
-	    long(1))
+	lval = 1
+	sz_val = len_struct * SZ_STRUCT * SZB_CHAR
+	call zawrbf (M_CHAN(mfd), Memc[P2C(mfd)], sz_val, lval)
 	call zawtbf (M_CHAN(mfd), status)
 	if (status == ERR)
 	    call syserrs (SYS_FWRITE, M_MAPFNAME(mfd))
 unlock_
-	call zclsbf (M_CHAN(mfd), status)
-	if (status == ERR)
+	call zclsbf (M_CHAN(mfd), i_status)
+	if (i_status == ERR)
 	    call syserrs (SYS_FCLOSE, M_MAPFNAME(mfd))
 
 	# All done!  Unlock the directory.  If there are no files left in
@@ -605,9 +623,11 @@ procedure vvfn_readmapfile (vfd)
 
 pointer	vfd			# pointer to VFD descriptor
 
-int	new_struct_size, checksum, file_exists, maxbytes, new_mapping_file
-int	nbytes, len_file, junk, chan, ntrys, errnum, status
-long	locktime
+size_t	sz_val
+size_t	maxbytes, len_file, new_struct_size
+int	checksum, file_exists, new_mapping_file
+int	junk, chan, ntrys, errnum, status
+long	locktime, lval, nbytes
 pointer	sp, mfd, fname, pkosfn
 
 int	vvfn_checksum()
@@ -618,10 +638,12 @@ define	reallynew_ 92
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (pkosfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (pkosfn, sz_val, TY_CHAR)
 
-	call calloc (mfd, LEN_MFD, TY_STRUCT)
+	sz_val = LEN_MFD
+	call calloc (mfd, sz_val, TY_STRUCT)
 	V_MFD(vfd)	= mfd
 
 	# Make OSFN of mapping file.  If the mode is VFN_UNMAP then the root
@@ -694,7 +716,8 @@ begin
 	    repeat {
 		# Read the file into the MFD.
 		maxbytes = LEN_MFD * SZ_STRUCT * SZB_CHAR
-		call zardbf (chan, Memi[mfd], maxbytes, long(1))
+		lval = 1
+		call zardbf (chan, Memc[P2C(mfd)], maxbytes, lval)
 		call zawtbf (chan, nbytes)
 
 		# The mapping file can be zero length if it was opened for
@@ -718,7 +741,7 @@ begin
 
 		len_file = LEN_MFD - (MAX_LONGFNAMES - M_NFILES(mfd)) *
 		    (SZ_FNPAIR / SZ_STRUCT)
-		checksum = vvfn_checksum (Memi[mfd+1], (len_file-1) * SZ_INT)
+		checksum = vvfn_checksum (Memc[P2C(mfd+1)], (len_file-1) * SZ_STRUCT)
 
 		ntrys = ntrys + 1
 	    } until (checksum == M_CHECKSUM(mfd) || ntrys > MAX_READS)
@@ -773,15 +796,19 @@ pointer	vfd			# pointer to VFN descriptor
 char	osfn[maxch]		# packaged OS filename (in/out)
 int	maxch
 
-int	file_exists, op, ndigits, m, n, num, offset, fn
+size_t	sz_val
+size_t	ndigits
+int	file_exists, op, m, n, num, offset, fn
 pointer	sp, fname, numbuf, mfd
 int	gstrcpy(), itoc()
 errchk	syserrs
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (numbuf, MAX_DIGITS, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = MAX_DIGITS
+	call salloc (numbuf, sz_val, TY_CHAR)
 
 	# Generate the first attempt at the OSFN of the new file.
 

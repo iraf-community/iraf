@@ -68,8 +68,8 @@ define	LEN_FNTUHDR		(10+1024+256)
 define	FNTU_MAGIC		5664
 define	U_MAGIC			Memi[P2I($1)]
 define	U_FILDES		Memi[P2I($1+1)]
-define	U_TEMPLATE		Memi[P2I($1+2)]	# pointer
-define	U_TEMPLATE_INDEX	Memi[P2I($1+3)]
+define	U_TEMPLATE		Memp[$1+2]	# pointer
+define	U_TEMPLATE_INDEX	Memp[$1+3]
 define	U_PATTERN		(P2C($1+10))
 define	U_LDIR			(P2C($1+1034))
 
@@ -102,6 +102,7 @@ pointer procedure fntopnb (template, sort)
 char	template[ARB]		# filename template
 int	sort			# sort expanded patterns
 
+size_t	sz_val
 int	nedit[MAX_PATTERNS], junk, nchars
 bool	is_template[MAX_PATTERNS], is_edit[MAX_PATTERNS], sortlist
 pointer	sp, pbuf, fname, rname, extn, ebuf, sbuf, list, ip, op, ep, pp
@@ -114,15 +115,19 @@ errchk	fntopn, fntgfn, syserr, malloc, realloc
 
 begin
 	call smark (sp)
-	call salloc (rname, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (extn,  SZ_FNAME, TY_CHAR)
-	call salloc (pbuf,  SZ_LINE, TY_CHAR)
-	call salloc (ebuf,  SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (rname, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (pbuf, sz_val, TY_CHAR)
+	call salloc (ebuf, sz_val, TY_CHAR)
 
 	# Allocate list descriptor.
-	call malloc (list, LEN_FNTBHDR + LEN_INDEXVECTOR, TY_STRUCT)
-	call malloc (sbuf, SZ_DEFSTRBUF, TY_CHAR)
+	sz_val = LEN_FNTBHDR + LEN_INDEXVECTOR
+	call malloc (list, sz_val, TY_STRUCT)
+	sz_val = SZ_DEFSTRBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	B_MAGIC(list) = FNTB_MAGIC
 	maxstr = LEN_INDEXVECTOR
@@ -293,13 +298,15 @@ begin
 		nstr = nstr + 1
 		if (nstr > maxstr) {
 		    maxstr = maxstr + LEN_INDEXVECTOR
-		    call realloc (list, LEN_FNTBHDR + maxstr, TY_STRUCT)
+		    sz_val = LEN_FNTBHDR + maxstr
+		    call realloc (list, sz_val, TY_STRUCT)
 		}
 
 		# Out of space in string buffer?
 		if (nextch + (op - fname) >= sz_sbuf) {
 		    sz_sbuf = sz_sbuf + SZ_DEFSTRBUF
-		    call realloc (sbuf, sz_sbuf, TY_CHAR)
+		    sz_val = sz_sbuf
+		    call realloc (sbuf, sz_val, TY_CHAR)
 		}
 
 		# Save index of list element, move chars to string buffer.
@@ -326,8 +333,10 @@ begin
 	# Update the string buffer descriptor, return unused buffer space.
 	# Rewind the list in preparation for reading (set strnum=1).
 
-	call realloc (sbuf, nextch, TY_CHAR)
-	call realloc (list, LEN_FNTBHDR + nstr, TY_STRUCT)
+	sz_val = nextch
+	call realloc (sbuf, sz_val, TY_CHAR)
+	sz_val = LEN_FNTBHDR + nstr
+	call realloc (list, sz_val, TY_STRUCT)
 
 	B_NSTR(list)	= nstr
 	B_STRNUM(list)	= 1
@@ -645,6 +654,7 @@ pointer	pp			# pattern pointer
 char	outstr[ARB]		# output filename
 int	maxch
 
+size_t	sz_val
 bool	match
 pointer	ip, sp, linebuf, fname, patstr
 int	nchars, token, first_ch, last_ch, status
@@ -659,9 +669,12 @@ begin
 	    call syserr (SYS_FNTMAGIC)
 
 	call smark (sp)					# get buffers
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (patstr, SZ_PATSTR, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (linebuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATSTR
+	call salloc (patstr, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	repeat {
 	    # Read file names from either list file or directory file, until
@@ -851,9 +864,13 @@ end
 
 int procedure fnt_open_list (str, patstr, maxch, fname, ldir, ftype)
 
-int	maxch, ftype
+char	str[ARB]
+char	patstr[maxch]
+int	maxch
+char	fname[SZ_FNAME]
 char	ldir[SZ_LDIR]
-char	str[ARB], patstr[maxch], fname[SZ_FNAME]
+int	ftype
+
 int	fd, ip, op, fnt_delim, pat_start, dirmode
 int	open(), diropen()
 errchk	open, diropen, fpathname
@@ -932,6 +949,7 @@ pointer procedure fntopn (template)
 
 char	template[ARB]
 
+size_t	sz_val
 pointer	pp
 int	nchars
 int	strlen()
@@ -940,8 +958,10 @@ errchk	calloc, malloc
 begin
 	nchars = strlen (template)
 
-	call calloc (pp, LEN_FNTUHDR, TY_STRUCT)
-	call malloc (U_TEMPLATE(pp), nchars, TY_CHAR)
+	sz_val = LEN_FNTUHDR
+	call calloc (pp, sz_val, TY_STRUCT)
+	sz_val = nchars
+	call malloc (U_TEMPLATE(pp), sz_val, TY_CHAR)
 
 	call strcpy (template, Memc[U_TEMPLATE(pp)], nchars)
 	U_TEMPLATE_INDEX(pp) = U_TEMPLATE(pp)

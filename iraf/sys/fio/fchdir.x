@@ -9,6 +9,7 @@ procedure fchdir (newdir)
 
 char	newdir[ARB]
 
+size_t	sz_val
 int	ip, status
 pointer	sp, vfn, osfn1, osfn2
 int	ki_extnode(), envfind()
@@ -16,9 +17,11 @@ errchk	fmapfn, ki_extnode
 
 begin
 	call smark (sp)
-	call salloc (vfn,   SZ_FNAME,    TY_CHAR)
-	call salloc (osfn1, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn2, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (vfn, sz_val,    TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn1, sz_val, TY_CHAR)
+	call salloc (osfn2, sz_val, TY_CHAR)
 
 	call strcpy (newdir, Memc[vfn], SZ_FNAME)
 
@@ -32,12 +35,14 @@ begin
 
 	# Try the name as is.
 	call fmapfn (Memc[vfn], Memc[osfn1], SZ_PATHNAME)
-	call strupk (Memc[osfn1], Memc[osfn1], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (Memc[osfn1], Memc[osfn1], sz_val)
 
 	call zfpath (Memc[osfn1], Memc[osfn2], SZ_PATHNAME, status)
 	call zfsubd (Memc[osfn2], SZ_PATHNAME, "", status)
 
-	call strpak (Memc[osfn2], Memc[osfn2], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strpak (Memc[osfn2], Memc[osfn2], sz_val)
 	call zfchdr (Memc[osfn2], status)
 
 	# Try chdir ldir$.

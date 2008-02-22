@@ -9,8 +9,11 @@ include	<fio.h>
 
 procedure fstats (fd, what, outstr, maxch)
 
-int	fd, what, maxch
+int	fd
+int	what
 char	outstr[ARB]
+int	maxch
+
 pointer	ffp
 errchk	syserr
 include	<fio.com>

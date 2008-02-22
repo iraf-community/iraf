@@ -12,12 +12,14 @@ include	<fio.h>
 procedure awriteb (fd, buffer, nbytes, byte_offset)
 
 int	fd			# FIO file descriptor
-int	nbytes			# number of machine bytes to be written
 char	buffer[ARB]		# buffer containing the data
+size_t	nbytes			# number of machine bytes to be written
 long	byte_offset		# one-indexed byte offset in file
 
 long	file_offset, szb_file
-int	junk, awaitb()
+int	junk
+long	awaitb()
+long	modl()
 errchk	filerr, syserr
 include	<fio.com>
 
@@ -47,7 +49,7 @@ begin
 
 	file_offset = byte_offset
 	if (FBLKSIZE(fp) > 0) {
-	    if (mod (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
+	    if (modl (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
 		call filerr (FNAME(fp), SYS_FAWRALIGN)
 	} else
 	    file_offset = 0

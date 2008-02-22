@@ -11,6 +11,7 @@ include	<fio.h>
 long procedure ffilsz (fd)
 
 int	fd
+
 long	file_size
 include	<fio.com>
 

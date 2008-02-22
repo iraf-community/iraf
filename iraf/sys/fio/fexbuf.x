@@ -18,7 +18,7 @@ procedure fexbuf (fd)
 int	fd			# file which needs a larger buffer
 
 pointer	bp
-int	offset
+long	offset
 errchk	malloc, realloc
 include	<fio.com>
 

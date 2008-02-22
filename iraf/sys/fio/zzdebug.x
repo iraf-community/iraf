@@ -432,6 +432,7 @@ procedure t_daytime()
 int	fd, nchars, ip
 char	hostname[SZ_FNAME]
 char	line[SZ_LINE], netpath[SZ_LINE]
+size_t	sz_val
 int	ndopen(), read(), strlen()
 
 begin
@@ -455,7 +456,8 @@ begin
 	call fseti (fd, F_CANCEL, OK)
 	nchars = read (fd, line, SZ_LINE)
 	if (nchars > 0) {
-	    call strupk (line, line, SZ_LINE)
+	    sz_val = SZ_LINE
+	    call strupk (line, line, sz_val)
 	    for (ip=1;  line[ip] != EOS;  ip=ip+1)
 		if (line[ip] == '\n') {
 		    line[ip] = EOS

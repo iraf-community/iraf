@@ -11,15 +11,16 @@ include	<fio.h>
 # cannot be filled (as occurs at the EOF of a binary file, or when reading
 # from a terminal or pipe).
 
-int procedure read (fd, buffer, maxchars)
+long procedure read (fd, buffer, maxchars)
 
 int	fd
 char	buffer[ARB]
-int	maxchars
+size_t	maxchars
 
-int	maxch
+size_t	maxch
 bool	stream
-int	nchars, chunk_size, nchars_read, filbuf()
+size_t	nchars, chunk_size, nchars_read
+long	filbuf()
 errchk	filbuf, filerr
 include	<fio.com>
 

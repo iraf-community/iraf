@@ -9,7 +9,8 @@ int procedure getci (fd, ch)
 
 int	fd			# input file
 int	ch			# character (output)
-int	filbuf()
+
+long	filbuf()
 errchk	filbuf
 include	<fio.com>
 

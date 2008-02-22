@@ -18,8 +18,8 @@ int	fd			# file
 long	offset			# offset == BOF,EOF, or char offset
 
 pointer	bp
-long	file_offset
-int	status
+long	file_offset, status
+long	i_status
 long	ffilsz()
 errchk	filerr, syserr, ffilsz
 include	<fio.com>
@@ -51,8 +51,8 @@ begin
 	    itop[fd] = bp
 	    otop[fd] = bp
 
-	    call zcall3 (ZSEKTX(fp), FCHAN(fp), offset, status)
-	    if (status == ERR)
+	    call zcall3 (ZSEKTX(fp), FCHAN(fp), offset, i_status)
+	    if (i_status == ERR)
 		call filerr (FNAME(fp), SYS_FSEEK)
 
 	} else {				# logical seek (binary files)

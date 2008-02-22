@@ -11,6 +11,7 @@ procedure fmkdir (newdir)
 
 char	newdir[ARB]		# virtual or OS-dependent directory spec
 
+size_t	sz_val
 int	status
 pointer	sp, osfn, dirname
 int	access()
@@ -18,8 +19,9 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (dirname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
+	call salloc (dirname, sz_val, TY_CHAR)
 
 	# It is an error if the named file already exists, be it a directory
 	# or not.  If the file does not exist but the filename cannot be
@@ -40,7 +42,8 @@ begin
 	# absolute or cwd relative filename), in case the kernel procedure
 	# is not smart enough to handle all these possibilities.
 
-	call strupk (Memc[osfn], Memc[osfn], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (Memc[osfn], Memc[osfn], sz_val)
 	call zfpath (Memc[osfn], Memc[dirname], SZ_PATHNAME, status)
 	if (status != ERR)
 	    call zfsubd (Memc[dirname], SZ_PATHNAME, "", status)
@@ -50,7 +53,8 @@ begin
 	# loop with the user.
 
 	if (status != ERR) {
-	    call strpak (Memc[dirname], Memc[osfn], SZ_PATHNAME)
+	    sz_val = SZ_PATHNAME
+	    call strpak (Memc[dirname], Memc[osfn], sz_val)
 	    call zfmkdr (Memc[osfn], status)
 	}
 	if (status == ERR)

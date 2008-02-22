@@ -12,7 +12,7 @@ procedure fcanpb (fd)
 
 int	fd		# file descriptor
 
-int	pb_sp
+pointer	pb_sp
 int	and()
 include	<fio.com>
 
@@ -22,10 +22,10 @@ begin
 	while (and (fflags[fd], FF_PUSHBACK) != 0) {
 	    pb_sp = FPBSP(fp)
 
-	    iop[fd]	= Memi[pb_sp];	pb_sp = pb_sp + 1
-	    itop[fd]	= Memi[pb_sp];	pb_sp = pb_sp + 1
-	    bufptr[fd]	= Memi[pb_sp];	pb_sp = pb_sp + 1
-	    FPBIOP(fp)	= Memi[pb_sp];	pb_sp = pb_sp + 1
+	    iop[fd]	= Memp[pb_sp];	pb_sp = pb_sp + 1
+	    itop[fd]	= Memp[pb_sp];	pb_sp = pb_sp + 1
+	    bufptr[fd]	= Memp[pb_sp];	pb_sp = pb_sp + 1
+	    FPBIOP(fp)	= Memp[pb_sp];	pb_sp = pb_sp + 1
 
 	    FPBSP(fp) = pb_sp
 
@@ -33,7 +33,7 @@ begin
 	    # all pushed back data has been read.  Note that the stack pointer
 	    # is a pointer to int while FPBTOP is a pointer to char.
 
-	    if (pb_sp >= (FPBTOP(fp) - 1) / SZ_INT + 1)
+	    if (pb_sp >= (FPBTOP(fp) - 1) / SZ_POINTER + 1)
 		fflags[fd] = fflags[fd] - FF_PUSHBACK
 	}
 end

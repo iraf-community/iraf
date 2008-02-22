@@ -16,6 +16,7 @@ char	vfn[ARB]			# VFN of file
 char	output_pathname[maxchars]	# pathname of file
 int	maxchars
 
+size_t	sz_val
 int	status
 include	<fio.com>
 errchk	filerr
@@ -23,13 +24,15 @@ errchk	filerr
 begin
 	status = OK
 	
-	if (vfn[1] == EOS)
-	    call strpak (vfn, pathname, SZ_PATHNAME)
-	else iferr (call fmapfn (vfn, pathname, SZ_PATHNAME))
+	if (vfn[1] == EOS) {
+	    sz_val = SZ_PATHNAME
+	    call strpak (vfn, pathname, sz_val)
+	} else iferr (call fmapfn (vfn, pathname, SZ_PATHNAME))
 	    status = ERR
 
 	if (status != ERR) {
-	    call strupk (pathname, pathname, SZ_PATHNAME)
+	    sz_val = SZ_PATHNAME
+	    call strupk (pathname, pathname, sz_val)
 	    call zfpath (pathname, output_pathname, maxchars, status)
 	}
 

@@ -13,12 +13,16 @@ include	<fio.h>
 procedure xerputc (ch)
 
 char	ch
-int	op, junk, nchars
+
+int	op
+long	junk, c_0
+size_t	nchars
 char	msg[SZ_LINE+1]
 include	<fio.com>
 data	op /1/
 
 begin
+	c_0 = 0
 	msg[op] = ch
 
 	if (ch == '\n' || op > SZ_PATHNAME) {
@@ -29,7 +33,7 @@ begin
 	    if (FTYPE(fp) == TEXT_FILE)
 		call fputtx (CLOUT, msg, nchars, junk)
 	    else {
-		call zcall4 (ZAWRBF(fp), FCHAN(fp), msg, nchars * SZB_CHAR, 0)
+		call zcall4 (ZAWRBF(fp), FCHAN(fp), msg, nchars * SZB_CHAR, c_0)
 	    }
 	}
 

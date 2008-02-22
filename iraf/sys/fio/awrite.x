@@ -9,11 +9,11 @@ include	<mach.h>
 procedure awrite (fd, buffer, nchars, char_offset)
 
 int	fd
-int	nchars
 char	buffer[ARB]
+size_t	nchars
 long	char_offset
 
-int	nbytes
+size_t	nbytes
 long	byte_offset
 
 begin

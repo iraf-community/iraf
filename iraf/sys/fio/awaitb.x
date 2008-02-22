@@ -8,10 +8,12 @@ include	<fio.h>
 # Must be called after an AREADB or AWRITEB (to check for an i/o error
 # and for synchronization) or an abort will result.
 
-int procedure awaitb (fd)
+long procedure awaitb (fd)
 
 int	fd
-int	nbytes, nchars
+
+long	nbytes
+size_t	nchars
 include	<fio.com>
 
 begin

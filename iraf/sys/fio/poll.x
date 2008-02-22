@@ -50,10 +50,12 @@ which can be serviced without blocking.
 
 pointer procedure poll_open ()
 
+size_t	sz_val
 pointer	fds
 
 begin
-	iferr (call calloc (fds, LEN_FPOLL, TY_STRUCT))
+	sz_val = LEN_FPOLL
+	iferr (call calloc (fds, sz_val, TY_INT))
 	    call syserr (SYS_MFULL)
 
 	return (fds)
@@ -105,7 +107,7 @@ procedure poll_close (fds)
 pointer	fds					#i descriptor set pointer
 
 begin
-	call mfree (fds, TY_STRUCT)
+	call mfree (fds, TY_INT)
 end
 
 
@@ -114,9 +116,11 @@ end
 procedure poll_zero (fds)
 
 pointer	fds					#i descriptor set pointer
+size_t	sz_val
 
 begin
-	call aclri (Memi[fds], LEN_FPOLL)
+	sz_val = LEN_FPOLL
+	call aclri (Memi[fds], sz_val)
 end
 
 

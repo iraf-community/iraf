@@ -19,7 +19,9 @@ Remote files are handled via the KI interface automatically.
 int procedure futime (fname, atime, mtime)
 
 char	fname[ARB]
-long	atime, mtime
+long	atime
+long	mtime
+
 int	status
 include	<fio.com>
 

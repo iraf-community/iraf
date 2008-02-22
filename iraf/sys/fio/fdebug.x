@@ -9,6 +9,7 @@ include	<fio.h>
 procedure fdebug (out, fd1_arg, fd2_arg)
 
 int	out, fd1_arg, fd2_arg
+
 int	fd, fd1, fd2, n
 int	and()
 long	note()
@@ -70,14 +71,14 @@ begin
 		    default:
 			call pargstr ("ILLEGAL_FTYPE")
 		    }
-		    call pargi (ffp)
+		    call pargp (ffp)
 
 		call fprintf (out, "    ")
 		call fprintf (out,
 		"chan=%d, device=%d, epa=0%xX, filesize(chars)=%d, posn=%s,\n")
 		    call pargi (FCHAN(ffp))
 		    call pargi ((FDEV(ffp)-1) / LEN_DTE + 1)
-		    call pargi (zdev[FDEV(ffp)])
+		    call pargp (zdev[FDEV(ffp)])
 		    call pargl (FILSIZE(ffp))
 
 		    if (FILSIZE(ffp) < 0)
@@ -107,7 +108,7 @@ begin
 		    case OK:
 			call pargstr ("OK")
 		    default:
-			call pargi (FILSTAT(ffp))
+			call pargl (FILSTAT(ffp))
 		    }
 
 		    call pargi (FREFCNT(ffp))
@@ -117,28 +118,28 @@ begin
 		call fprintf (out,
 		"nbufs=%d, bufsize=%d, optbufsize=%d, blksize=%d,\n")
 		    call pargi (FNBUFS(ffp))
-		    call pargi (FBUFSIZE(ffp))
-		    call pargi (FOPTBUFSIZE(ffp))
-		    call pargi (FBLKSIZE(ffp))
+		    call pargz (FBUFSIZE(ffp))
+		    call pargz (FOPTBUFSIZE(ffp))
+		    call pargl (FBLKSIZE(ffp))
 
 		call fprintf (out, "    ")
 		call fprintf (out,
 		"pbbufsize=%d, pbbuf=%d, pbtop=%d, pbiop=%d, pbsp=%d,\n")
-		    call pargi (FPBBUFSIZE(ffp))
-		    call pargi (FPBBUF(ffp))
-		    call pargi (FPBTOP(ffp))
-		    call pargi (FPBIOP(ffp))
-		    call pargi (FPBSP(ffp))
+		    call pargz (FPBBUFSIZE(ffp))
+		    call pargp (FPBBUF(ffp))
+		    call pargp (FPBTOP(ffp))
+		    call pargp (FPBIOP(ffp))
+		    call pargp (FPBSP(ffp))
 
 		call fprintf (out, "    ")
 		call fprintf (out,
 		"iop=%d, itop=%d, otop=%d, bp=%d, top=%d, offset=%d,\n")
-		    call pargi (iop[fd])
-		    call pargi (itop[fd])
-		    call pargi (otop[fd])
-		    call pargi (bufptr[fd])
-		    call pargi (buftop[fd])
-		    call pargi (boffset[fd])
+		    call pargp (iop[fd])
+		    call pargp (itop[fd])
+		    call pargp (otop[fd])
+		    call pargp (bufptr[fd])
+		    call pargp (buftop[fd])
+		    call pargl (boffset[fd])
 
 		call fprintf (out, "    Flags =")
 		if (and (FF_FLUSH, fflags[fd]) != 0)

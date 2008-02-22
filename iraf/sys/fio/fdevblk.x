@@ -7,20 +7,24 @@ include	<fset.h>
 # directory resides.  The named logical directory must have write permission.
 # A file pathname may be used to pass the logical directory name.
 
-int procedure fdevblk (path)
+long procedure fdevblk (path)
 
 char	path[ARB]			# pathname of directory or file
 
+size_t	sz_val
 pointer	sp, fname, ldir, tempfn
-int	fd, junk, block_size
-int	fstati(), open(), fnldir()
+int	fd, junk
+long	block_size
+long	fstatl()
+int	open(), fnldir()
 errchk	mktemp, open, close
 
 begin
 	call smark (sp)
-	call salloc (ldir,   SZ_PATHNAME, TY_CHAR)
-	call salloc (fname,  SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (ldir, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (tempfn, sz_val, TY_CHAR)
 
 	# Generate the name of a temporary file in named directory.
 	junk = fnldir (path, Memc[ldir], SZ_PATHNAME)
@@ -31,7 +35,7 @@ begin
 	# Open the file and get the device block size.
 	iferr {
 	    fd = open (Memc[tempfn], NEW_FILE, BINARY_FILE)
-	    block_size = fstati (fd, F_BLKSIZE)
+	    block_size = fstatl (fd, F_BLKSIZE)
 	    call close (fd)
 	    call delete (Memc[tempfn])
 	} then

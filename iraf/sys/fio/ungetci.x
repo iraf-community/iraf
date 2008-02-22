@@ -21,6 +21,7 @@ procedure ungetci (fd, ch)
 
 int	fd			# file
 int	ch			# char to be pushed back
+
 pointer	pb_sp, pb_iop
 int	or()
 include	<fio.com>
@@ -40,13 +41,13 @@ begin
 	pb_iop = FPBIOP(fp)
 	pb_sp  = FPBSP(fp) - 1
 
-	Memi[pb_sp] = pb_iop
+	Memp[pb_sp] = pb_iop
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = bufptr[fd]
+	Memp[pb_sp] = bufptr[fd]
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = itop[fd]
+	Memp[pb_sp] = itop[fd]
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = iop[fd]
+	Memp[pb_sp] = iop[fd]
 
 	# Deposit the char in the pbbuf and set up i/o pointers.  When iop
 	# reaches itop filbuf will pop the old input pointers off the pbstack.
@@ -60,7 +61,7 @@ begin
 	itop[fd] = pb_iop
 
 	# Check for overflow.
-	if (pb_iop >= (pb_sp - 1) * SZ_INT + 1)
+	if (pb_iop >= (pb_sp - 1) * SZ_POINTER + 1)
 	    call syserrs (SYS_FPBOVFL, FNAME(fp))
 	
 	FPBSP(fp) = pb_sp

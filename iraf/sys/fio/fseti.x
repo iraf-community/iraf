@@ -23,6 +23,7 @@ int	fd			# file in question
 int	param			# parameter to be set
 long	lvalue			# value of parameter
 
+size_t	sz_val
 pointer	bp, ffp
 long	file_offset
 int	i, junk, outfd, flags, value
@@ -30,7 +31,8 @@ bool	blocked_file, setraw, ndelay
 char	set_redraw[LEN_SETREDRAW]
 char	rawcmd[LEN_RAWCMD+1]
 
-int	await(), xisatty()
+long	await()
+int	xisatty()
 include	<fio.com>
 
 begin
@@ -347,7 +349,8 @@ begin
 		call strcpy (SETREDRAW, set_redraw, LEN_SETREDRAW)
 		set_redraw[LEN_SETREDRAW] = value
 		call flush (outfd)
-		call write (outfd, set_redraw, LEN_SETREDRAW)
+		sz_val = LEN_SETREDRAW
+		call write (outfd, set_redraw, sz_val)
 		call flush (outfd)
 	    }
 
@@ -406,11 +409,10 @@ int	fd			# file in question
 int	param			# parameter to be set
 pointer	pvalue			# value of parameter
 
-pointer	bp, ffp
+pointer	ffp
 long	file_offset
 int	i
 
-int	await(), xisatty()
 include	<fio.com>
 
 begin

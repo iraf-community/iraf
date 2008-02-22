@@ -16,6 +16,7 @@ procedure putline (fd, linebuf)
 int	fd				# output file
 char	linebuf[ARB]			# line to be output
 
+size_t	c_0
 int	ch, ip, ip_top, i
 pointer	op, op_top
 int	and()
@@ -24,6 +25,7 @@ include	<fio.com>
 define	done_ 91
 
 begin
+	c_0 = 0
 	if (fd <= 0 || fiodes[fd] == NULL)
 	    call syserr (SYS_FILENOTOPEN)
 
@@ -33,7 +35,7 @@ begin
 
 	# Check for a file fault.
 	if (op < bufptr[fd] || op > op_top) {
-	    call flsbuf (fd, 0)
+	    call flsbuf (fd, c_0)
 	    op = iop[fd]
 	    op_top = otop[fd]
 	}
@@ -63,7 +65,7 @@ begin
 		# flushed.
 
 		iop[fd] = op
-		call flsbuf (fd, 0)
+		call flsbuf (fd, c_0)
 		op = iop[fd]
 		op_top = otop[fd]
 	    }
@@ -90,7 +92,7 @@ begin
 		# buffer is full.  In either case the buffer must be flushed.
 
 		iop[fd] = op
-		call flsbuf (fd, 0)
+		call flsbuf (fd, c_0)
 		op = iop[fd]
 		op_top = otop[fd]
 	    }

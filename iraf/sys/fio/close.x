@@ -9,7 +9,9 @@ include	<fio.h>
 
 procedure close (fd_arg)
 
-int	fd_arg, fd
+int	fd_arg
+
+int	fd
 int	status
 errchk	flush, mfree, frtnfd
 include	<fio.com>

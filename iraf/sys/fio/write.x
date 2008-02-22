@@ -12,8 +12,9 @@ procedure write (fd, buffer, maxchars)
 
 int	fd
 char	buffer[ARB]
-int	maxchars
-int	nchars, chunk_size
+size_t	maxchars
+
+size_t	nchars, chunk_size
 errchk	flsbuf
 include	<fio.com>
 

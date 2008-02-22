@@ -8,8 +8,11 @@ include	<fio.h>
 
 procedure fputtx (fd, buf, nchars, status)
 
-int	fd, nchars, status
+int	fd
 char	buf[ARB]
+size_t	nchars
+long	status
+
 int	and()
 include	<fio.com>
 

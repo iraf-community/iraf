@@ -37,6 +37,7 @@ char    filename[ARB]           # name of file to be assigned to FD
 int     mode                    # access mode
 int     type                    # file type
 
+size_t	sz_val
 int	or()
 errchk  calloc, filerr, syserr
 include <fio.com>
@@ -44,7 +45,8 @@ include "mmap.inc"
 
 begin
         # Allocate descriptor.
-        call calloc (fp, LEN_FIODES, TY_STRUCT)
+	sz_val = LEN_FIODES
+        call calloc (fp, sz_val, TY_STRUCT)
 
         iop[fd]      = NULL
         itop[fd]     = NULL

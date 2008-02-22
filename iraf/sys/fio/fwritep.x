@@ -24,11 +24,11 @@ pointer procedure fwritep (fd, offset, nchars)
 
 int	fd		# file to be accessed
 long	offset		# file offset in chars
-int	nchars		# nchars to "write"
+size_t	nchars		# nchars to "write"
 
 int	junk
 pointer	fiop, bp
-int	ffault()
+long	ffault()
 errchk	filerr, ffault, fmkbfs
 include	<fio.com>
 

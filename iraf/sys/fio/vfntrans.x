@@ -57,15 +57,19 @@ int	lenroot			# length of the root string	(output)
 char	extn[SZ_VFNFN]		# OS filename extension		(output)
 int	lenextn			# length of the extn string	(output)
 
+size_t	sz_val
 pointer	sp, ip, vfn, fname, sqroot
+int	i_off
 int	gstrcpy(), nowhite()
 errchk	syserr
 
 begin
 	call smark (sp)
-	call salloc (vfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (sqroot, MAX_ROOTLEN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (vfn, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = MAX_ROOTLEN
+	call salloc (sqroot, sz_val, TY_CHAR)
 
 	# Strip any whitespace at either end of the filename.
 	if (nowhite (rawvfn, Memc[vfn], SZ_PATHNAME) == 0)
@@ -107,7 +111,9 @@ begin
 	# long directory names must be unique within a directory.
 
 	repeat {
-	    call vfn_encode (Memc, ip, root, lenroot, extn, lenextn)
+	    i_off = 1
+	    call vfn_encode (Memc[ip], i_off, root, lenroot, extn, lenextn)
+	    ip = ip + i_off - 1
 	    if (Memc[ip] == '/' ||
 		(root[1] == '.' && lenroot == 1) ||
 		(root[1] == '.' && root[2] == '.' && lenroot == 2)) {
@@ -144,10 +150,11 @@ char	vfn[ARB]	# VFN possibly containing an ldir prefix
 char	outstr[maxch]	# output string
 int	maxch
 
+size_t	sz_val
 char	ch
 pointer	pbbuf					# pushback buffer
 pointer	pb_stack[MAX_PUSHBACK]			# pushback stack
-int	n, op, op_node, op_env, pbsp, in
+int	n, op, op_node, op_env, pbsp, in, i_len
 pointer	nextch, ip, sp
 
 int	envfind(), gstrcpy(), ki_localnode()
@@ -157,7 +164,8 @@ errchk	syserrs, envfind
 
 begin
 	call smark (sp)
-	call salloc (pbbuf, SZ_PBBUF, TY_CHAR)
+	sz_val = SZ_PBBUF
+	call salloc (pbbuf, sz_val, TY_CHAR)
 
 	# Discard leading whitespace and copy the VFN into the input buffer.
 	for (in=1;  IS_WHITE (vfn[in]);  in=in+1)
@@ -223,8 +231,8 @@ begin
 		# are passed on correctly.
 
 		output (EOS)
-		n = envfind (outstr[op_node], Memc[nextch],
-		    pbbuf + SZ_PBBUF - nextch)
+		i_len = pbbuf + SZ_PBBUF - nextch
+		n = envfind (outstr[op_node], Memc[nextch], i_len)
 
 		if (n >= 0) {				# push back defn
 		    pb_stack[pbsp] = ip			# save ip on stk
@@ -249,8 +257,8 @@ begin
 		# Complete an environment substitution.
 
 		outstr[op_env] = EOS
-		n = gstrcpy (outstr[op_node], Memc[nextch],
-		    pbbuf + SZ_PBBUF - nextch)
+		i_len = pbbuf + SZ_PBBUF - nextch
+		n = gstrcpy (outstr[op_node], Memc[nextch], i_len)
 
 		pb_stack[pbsp] = ip			# save ip on stk
 		pbsp = pbsp + 1
@@ -263,8 +271,8 @@ begin
 
 		# Get the envvar value string; use null string if not defined.
 		output (EOS)
-		n = envfind (outstr[op_env+1], Memc[nextch],
-		    pbbuf + SZ_PBBUF - nextch)
+		i_len = pbbuf + SZ_PBBUF - nextch
+		n = envfind (outstr[op_env+1], Memc[nextch], i_len)
 		if (n <= 0) {
 		    Memc[nextch] = EOS
 		    n = 0
@@ -330,6 +338,7 @@ int	lenroot			# nchars in root
 char	extn[SZ_VFNFN]		# receives the encoded filename extn
 int	lenextn			# nchars in extn
 
+size_t	sz_val
 int	out, i
 char	ch, nextch
 bool	uc_mode, processing_extension, escape_extension, subdir
@@ -341,7 +350,8 @@ define	notextn_ 91
 
 begin
 	call smark (sp)
-	call salloc (field, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Skip leading whitespace and control chars.
 	while (vfn[ip] > 0 && vfn[ip] <= BLANK)

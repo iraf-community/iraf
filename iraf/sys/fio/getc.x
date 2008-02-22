@@ -9,7 +9,7 @@ char procedure getc (fd, ch)
 
 int	fd			# input file
 char	ch			# character (output)
-int	filbuf()
+long	filbuf()
 errchk	filbuf
 include	<fio.com>
 

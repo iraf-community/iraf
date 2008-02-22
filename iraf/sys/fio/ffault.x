@@ -11,16 +11,17 @@ include	<fio.h>
 # a variable number of either global or local buffers will be supported, as
 # well as read ahead and write behind (see Fio.doc).
 
-int procedure ffault (fd, file_offset, nreserve, rwflag)
+long procedure ffault (fd, file_offset, nreserve, rwflag)
 
 int	fd
 long	file_offset		# char offset to be faulted in
-int	nreserve		# size of transfer pending
+size_t	nreserve		# size of transfer pending
 int	rwflag			# next access is a read or a write
 
 pointer	bp
 long	buffer_offset, fboff
-int	bufsize, nchars_read
+size_t	bufsize
+long	nchars_read
 bool	block_write, stream, at_eof
 
 int	and()

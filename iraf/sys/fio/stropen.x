@@ -26,7 +26,8 @@ int	maxch				#I capacity of buffer
 int	mode				#I FIO access mode
 
 pointer	bp
-int	fd, ip, loc_str, loc_Mem
+int	fd, ip
+pointer	loc_str, loc_Mem
 errchk	syserr
 include	<fio.com>
 

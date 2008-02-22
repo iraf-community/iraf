@@ -9,8 +9,10 @@ include	<fio.h>
 procedure flush (fd)
 
 int	fd
+
 pointer	bp
-int	status, and()
+long	status
+int	and()
 errchk	filerr, fflsbf, fwatio
 include	<fio.com>
 

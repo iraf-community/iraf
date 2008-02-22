@@ -44,13 +44,13 @@ begin
 	pb_sp  = FPBSP(fp) - 1
 	pb_iop = FPBIOP(fp)
 
-	Memi[pb_sp] = pb_iop
+	Memp[pb_sp] = pb_iop
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = bufptr[fd]
+	Memp[pb_sp] = bufptr[fd]
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = itop[fd]
+	Memp[pb_sp] = itop[fd]
 	pb_sp = pb_sp - 1
-	Memi[pb_sp] = iop[fd]
+	Memp[pb_sp] = iop[fd]
 
 	# Copy the string into the buffer; abort if the buffer overflows.
 	# Set iop to point to first char of string.  Note: pushed back chars
@@ -58,7 +58,7 @@ begin
 
 	bufptr[fd] = pb_iop
 	iop[fd] = pb_iop
-	iop_limit = (pb_sp - 1) * SZ_INT + 1
+	iop_limit = (pb_sp - 1) * SZ_POINTER + 1
 
 	for (ip=1;  str[ip] != EOS;  ip=ip+1) {
 	    if (pb_iop >= iop_limit)

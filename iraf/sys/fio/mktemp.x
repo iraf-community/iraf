@@ -16,9 +16,13 @@ define	MAX_TRIP	5000
 
 procedure mktemp (seed, temp_file, maxchars)
 
-char	seed[ARB], temp_file[ARB], suffix[SZ_SUFFIX]
-int	maxchars, counter, i, n, op, pid
-int	access(), itoc()
+char	seed[ARB]
+char	temp_file[ARB]
+int	maxchars
+
+char	suffix[SZ_SUFFIX]
+int	counter, i, n, op, pid
+int	access(), itoc(), modi()
 data	counter/0/
 
 begin
@@ -26,13 +30,13 @@ begin
 
 	do i = 1, MAX_TRIP {
 	    call strcpy (seed, temp_file, maxchars)
-	    op = itoc (mod(pid,10000), suffix, SZ_SUFFIX)
+	    op = itoc (modi(pid,10000), suffix, SZ_SUFFIX)
 	    call strcat (suffix, temp_file, maxchars)
 
 	    counter = counter + 1
 	    op = 1
 	    for (n=counter;  n > 0;  n = (n-1) / RADIX) {
-		suffix[op] = mod (n-1, RADIX) + 'a'
+		suffix[op] = modi (n-1, RADIX) + 'a'
 		op = op + 1
 	    }
 	    suffix[op] = EOS
@@ -40,8 +44,8 @@ begin
 
 	    if (access (temp_file,0,0) == NO)		# does file exist?
 		return
-	    else if (mod(i,NTRIES) == 0)
-		pid = pid + mod(counter,10)		# not likely to get here
+	    else if (modi(i,NTRIES) == 0)
+		pid = pid + modi(counter,10)		# not likely to get here
 	}
 
 	call filerr (seed, SYS_FMKTEMP)

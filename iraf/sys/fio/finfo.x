@@ -29,7 +29,9 @@ int procedure finfo (fname, ostruct)
 
 char	fname[ARB]
 long	ostruct[LEN_FINFO]
+
 int	status
+size_t	sz_val
 include	<fio.com>
 
 begin
@@ -39,8 +41,11 @@ begin
 	call zfinfo (pathname, ostruct, status)
 
 	# ZFINFO returns the file owner string as a packed string.
-	if (status != ERR)
-	    call strupk (FI_OWNER(ostruct), FI_OWNER(ostruct), FI_SZOWNER)
+	if (status != ERR) {
+	    sz_val = FI_SZOWNER
+	    # arg 1,2: incompatible pointer
+	    call strupk (FI_OWNER(ostruct), FI_OWNER(ostruct), sz_val)
+	}
 
 	return (status)
 end

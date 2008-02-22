@@ -9,11 +9,11 @@ include	<mach.h>
 procedure aread (fd, buffer, maxchars, char_offset)
 
 int	fd			# FIO file descriptor
-int	maxchars		# maximum number of chars to be read
 char	buffer[ARB]		# buffer into which data is to be read
+size_t	maxchars		# maximum number of chars to be read
 long	char_offset		# one-indexed char offset in file
 
-int	maxbytes
+size_t	maxbytes
 long	byte_offset
 
 begin

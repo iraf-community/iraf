@@ -26,21 +26,21 @@ define	FCHAN		Memi[P2I($1)]		# os channnel
 define	FMODE		Memi[P2I($1+1)]		# mode of access
 define	FTYPE		Memi[P2I($1+2)]		# binary or text
 define	FDEV		Memi[P2I($1+3)]		# device index
-define	FBUFSIZE	Memi[P2I($1+4)]		# buffer size
-define	FIRSTBUFOFF	Memi[P2I($1+5)]		# offset of first file buffer
+define	FBUFSIZE	Memz[P2Z($1+4)]		# buffer size
+define	FIRSTBUFOFF	Meml[P2L($1+5)]		# offset of first file buffer
 define	FNBUFS		Memi[P2I($1+6)]		# number of buffers
-define	FLOCBUF		Memi[P2I($1+7)]		# zlocva of aread buffer
-define	FPBBUFSIZE	Memi[P2I($1+8)]		# size pushback buffer
-define	FPBBUF		Memi[P2I($1+9)]		# ptr to pushback buffer
-define	FPBTOP		Memi[P2I($1+10)]		# ptr to top of pbbuf
-define	FPBIOP		Memi[P2I($1+11)]		# iop into pbbuf
-define	FPBSP		Memi[P2I($1+12)]		# pbbuf stack pointer 
-define	FILSTAT		Memi[P2I($1+13)]		# channel status
-define	FNCHARS		Memi[P2I($1+14)]		# nchars last i/o
-define	FNBYTES		Memi[P2I($1+15)]		# nbytes last rec read
-define	FBUFMODE	Memi[P2I($1+16)]		# i/o mode for buffer
-define	FFIOMODE	Memi[P2I($1+17)]		# i/o mode for file
-define	FCD		Memi[P2I($1+18)]		# ptr to chan descr.
+define	FLOCBUF		Memp[$1+7]		# zlocva of aread buffer
+define	FPBBUFSIZE	Memz[P2Z($1+8)]		# size pushback buffer
+define	FPBBUF		Memp[$1+9]		# ptr to pushback buffer
+define	FPBTOP		Memp[$1+10]		# ptr to top of pbbuf
+define	FPBIOP		Memp[$1+11]		# iop into pbbuf
+define	FPBSP		Memp[$1+12]		# pbbuf stack pointer 
+define	FILSTAT		Meml[P2L($1+13)]	# channel status
+define	FNCHARS		Memz[P2Z($1+14)]	# nchars last i/o
+define	FNBYTES		Memz[P2Z($1+15)]	# nbytes last rec read
+define	FBUFMODE	Memi[P2I($1+16)]	# i/o mode for buffer
+define	FFIOMODE	Memi[P2I($1+17)]	# i/o mode for file
+define	FCD		Memp[$1+18]		# ptr to chan descr.
 			# (open)
 define	FLCD		($1+20)				# local storage for cd
 define	FNAME		Memc[P2C($1+20+LEN_CHANDES)]	# filename
@@ -54,9 +54,9 @@ define	FREFCNT		Memi[P2I(FCD($1))]		# chan reference count
 define	FCIOMODE	Memi[P2I(FCD($1)+1)]		# chan i/o mode
 define	FCLOSEFD	Memi[P2I(FCD($1)+2)]		# close chan when inactive
 define	FAFD		Memi[P2I(FCD($1)+3)]		# active fd
-define	FBLKSIZE	Memi[P2I(FCD($1)+4)]		# device block size
-define	FOPTBUFSIZE	Memi[P2I(FCD($1)+5)]		# "optimum" buffer size
-define	FMAXBUFSIZE	Memi[P2I(FCD($1)+6)]		# maximum buffer size
+define	FBLKSIZE	Meml[P2L(FCD($1)+4)]		# device block size
+define	FOPTBUFSIZE	Memz[P2Z(FCD($1)+5)]		# "optimum" buffer size
+define	FMAXBUFSIZE	Memz[P2Z(FCD($1)+6)]		# maximum buffer size
 define	FDEVOPEN	Memp[FCD($1)+7]			# device zopen proc
 define	FILSZ_PTR	FCD($1)+8
 define	FILSIZE		Meml[P2L(FILSZ_PTR($1))]	# file size, chars

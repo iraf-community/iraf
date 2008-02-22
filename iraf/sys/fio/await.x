@@ -9,12 +9,16 @@ include	<fio.h>
 # Must be called after an AREAD or AWRITE (to check for an i/o error
 # and for synchronization) or an abort will result.
 
-int procedure await (fd)
+long procedure await (fd)
 
 int	fd
-pointer	bufp
-int	nbytes, nchars, nfill, loc_Mem, zero, mode
-int	awaitb()
+
+size_t	sz_val
+size_t	nbytes, nchars, c_1
+long	lval, nfill
+pointer	bufp, loc_Mem
+int	zero, mode
+long	awaitb()
 include	<fio.com>
 
 data	loc_Mem /0/, zero /0/
@@ -29,9 +33,10 @@ begin
 	mode = FFIOMODE(fp)
 
 	# Wait for i/o.
-	nbytes = awaitb (fd)
-	if (nbytes <= 0)
-	    return (nbytes)
+	lval = awaitb (fd)
+	if (lval <= 0)
+	    return (lval)
+	nbytes = lval
 
 	# Zero fill the last char of the output buffer if the last transfer was
 	# a read and the number of bytes read was not commensurate with the
@@ -45,7 +50,9 @@ begin
 		if (loc_Mem == 0)
 		    call zlocva (Memc, loc_Mem)
 		bufp = FLOCBUF(fp) - loc_Mem + 1
-		call bytmov (zero, 1, Memc[bufp], nbytes + 1, nfill)
+		c_1 = 1
+		sz_val = nfill
+		call bytmov (zero, c_1, Memc[bufp], nbytes + 1, sz_val)
 	    }
 	}
 

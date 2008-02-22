@@ -25,9 +25,11 @@ int	mode				# access mode (ro,rw,apnd,newf,temp)
 int	type				# text or binary file
 extern	zopen_proc(), device()
 
+size_t	sz_val
 pointer	vp
 bool	standard_device
 int	ip, fd, junk, status, vfnmode
+long	lval
 pointer	dev_epa
 
 pointer	vfnopen()
@@ -103,8 +105,10 @@ begin
 		goto abort_
 	    call intr_enable()
 
-	} else
-	    call strpak (fname[ip], FPKOSFN(fp), SZ_FFNAME)
+	} else {
+	    sz_val = SZ_FFNAME
+	    call strpak (fname[ip], FPKOSFN(fp), sz_val)
+	}
 
 	# Open file.  If file exists on a standard device but cannot be
 	# accessed and "filewait" is enabled, wait for file to become
@@ -134,10 +138,13 @@ begin
 	    goto cleanup_
 
 	iferr {
-	    if (mode == APPEND)
-		call seek (fd, EOFL)
-	    else
-		call seek (fd, BOFL)
+	    if (mode == APPEND) {
+		lval = EOFL
+		call seek (fd, lval)
+	    } else {
+		lval = BOFL
+		call seek (fd, lval)
+	    }
 
 	    # Save name of temporary file for automatic deletion at program
 	    # termination.

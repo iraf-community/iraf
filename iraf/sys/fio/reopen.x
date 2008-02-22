@@ -15,8 +15,12 @@ include	<fio.h>
 int procedure reopen (fd, mode)
 
 int	fd, mode
+
 pointer	newfp, ffp
-int	newfd, fgetfd()
+size_t	sz_val
+long	lval
+int	newfd
+int	fgetfd()
 errchk	syserr, malloc, seek
 include	<fio.com>
 
@@ -41,15 +45,18 @@ begin
 	# descriptor and copy the channel descriptor from the original file.
 
 	if (FCD(ffp) == FLCD(ffp)) {
-	    call malloc (FCD(ffp), LEN_CHANDES, TY_STRUCT)
-	    call amovi (Memi[FLCD(ffp)], Memi[FCD(ffp)], LEN_CHANDES)
+	    sz_val = LEN_CHANDES
+	    call malloc (FCD(ffp), sz_val, TY_STRUCT)
+	    call amovp (Memp[FLCD(ffp)], Memp[FCD(ffp)], sz_val)
 	}
 
 	FREFCNT(ffp) = FREFCNT(ffp) + 1			# bump ref count
 	FCD(newfp) = FCD(ffp)
 
-	if (mode == APPEND)
-	    call seek (newfd, EOFL)
+	if (mode == APPEND) {
+	    lval = EOFL
+	    call seek (newfd, lval)
+	}
 
 	return (newfd)
 end

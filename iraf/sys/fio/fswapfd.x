@@ -20,6 +20,7 @@ define	SWAPP		{tempp=$1;$1=$2;$2=tempp}
 procedure fswapfd (fd1, fd2)
 
 int	fd1, fd2		# file descriptors to be swapped.
+
 int	tempi
 long	templ
 pointer	tempp

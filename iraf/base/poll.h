@@ -9,10 +9,10 @@ define	INFTIM		-1		# poll will block until event
 
 # Structure of file descriptor/event pairs supplied in the poll arrays. The
 # array elements are zero-indexed.
-define	POLL_NFD	Memi[P2I($1)]	       # no. of file descriptors to poll
-define	POLL_FD		Memi[P2I($1+1+(0*MPFD)+$2)] # file descriptor array
-define	POLL_EVENTS	Memi[P2I($1+1+(1*MPFD)+$2)] # events of interest on fd
-define	POLL_REVENTS	Memi[P2I($1+1+(2*MPFD)+$2)] # (return) events on fd
+define	POLL_NFD	Memi[$1]	       # no. of file descriptors to poll
+define	POLL_FD		Memi[$1+1+(0*MPFD)+$2] # file descriptor array
+define	POLL_EVENTS	Memi[$1+1+(1*MPFD)+$2] # events of interest on fd
+define	POLL_REVENTS	Memi[$1+1+(2*MPFD)+$2] # (return) events on fd
 
 # Testable select events.
 define 	POLLIN		001B		# fd is readable

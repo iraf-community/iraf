@@ -16,10 +16,14 @@ include	<fio.h>
 
 procedure flsbuf (fd, nreserve)
 
-int	fd, nreserve
+int	fd
+size_t	nreserve
+
 pointer	bp
 bool	iop_in_range
-int	nchars_written, ffault(), and()
+long	nchars_written
+int	and()
+long	ffault()
 errchk	fmkbfs, syserr, filerr, ffault
 include	<fio.com>
 

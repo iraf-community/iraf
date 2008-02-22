@@ -9,14 +9,15 @@ include	<fio.h>
 # (1) there is no file buffer yet, (2) all the data in the buffer has been
 # read, or (3) a SEEK has occurred.
 
-int procedure filbuf (fd)
+long procedure filbuf (fd)
 
 int	fd			#I input file
 
 pointer	bp, pb_sp
-int	maxch, nchars_read
+size_t	maxch, c_0
+long	nchars_read
 
-int	ffault()
+long	ffault()
 errchk	fmkbfs, ffault, filerr, syserr
 include	<fio.com>
 define	again_ 91
@@ -41,10 +42,10 @@ again_
 	    repeat {
 		pb_sp = FPBSP(fp)
 
-		iop[fd]    = Memi[pb_sp];	pb_sp = pb_sp + 1
-		itop[fd]   = Memi[pb_sp];	pb_sp = pb_sp + 1
-		bufptr[fd] = Memi[pb_sp];	pb_sp = pb_sp + 1
-		FPBIOP(fp) = Memi[pb_sp];	pb_sp = pb_sp + 1
+		iop[fd]    = Memp[pb_sp];	pb_sp = pb_sp + 1
+		itop[fd]   = Memp[pb_sp];	pb_sp = pb_sp + 1
+		bufptr[fd] = Memp[pb_sp];	pb_sp = pb_sp + 1
+		FPBIOP(fp) = Memp[pb_sp];	pb_sp = pb_sp + 1
 
 		FPBSP(fp) = pb_sp
 
@@ -53,7 +54,7 @@ again_
 		# stack pointer is a pointer to int while FPBTOP is a pointer
 		# to char.
 
-		if (pb_sp >= (FPBTOP(fp) - 1) / SZ_INT + 1)
+		if (pb_sp >= (FPBTOP(fp) - 1) / SZ_POINTER + 1)
 		    fflags[fd] = fflags[fd] - FF_PUSHBACK
 
 		# If there was no data left when pushback occurred, then we
@@ -99,7 +100,8 @@ again_
 
 	} else {
 	    # Fill buffer from binary file.
-	    nchars_read = ffault (fd, LNOTE(fd), 0, FF_READ)
+	    c_0 = 0
+	    nchars_read = ffault (fd, LNOTE(fd), c_0, FF_READ)
 	}
 
 	switch (nchars_read) {

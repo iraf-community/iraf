@@ -68,7 +68,7 @@ pointer	ffp
 int	what
 
 long	nbytes
-int	status_epa
+pointer	status_epa
 include	<fio.com>
 
 begin

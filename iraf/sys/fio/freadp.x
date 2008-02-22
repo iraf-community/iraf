@@ -17,10 +17,10 @@ pointer procedure freadp (fd, offset, nchars)
 
 int	fd		# file to be accessed
 long	offset		# file offset in chars
-int	nchars		# nchars to "read"
+size_t	nchars		# nchars to "read"
 
 pointer	bp, fiop
-int	ffault()
+long	ffault()
 errchk	filerr, ffault, fmkbfs
 include	<fio.com>
 

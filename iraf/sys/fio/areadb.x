@@ -12,12 +12,14 @@ include	<fio.h>
 procedure areadb (fd, buffer, maxbytes, byte_offset)
 
 int	fd			# FIO file descriptor
-int	maxbytes		# maximum number of machine bytes to read
 char	buffer[ARB]		# buffer into to which data is to be read
+size_t	maxbytes		# maximum number of machine bytes to read
 long	byte_offset		# one-indexed byte offset in file
 
 long	file_offset
-int	junk, awaitb()
+int	junk
+long	awaitb()
+long	modl()
 errchk	filerr, syserr
 include	<fio.com>
 
@@ -48,7 +50,7 @@ begin
 
 	file_offset = byte_offset
 	if (FBLKSIZE(fp) > 0) {
-	    if (mod (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
+	    if (modl (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
 		call filerr (FNAME(fp), SYS_FARDALIGN)
 	} else
 	    file_offset = 0

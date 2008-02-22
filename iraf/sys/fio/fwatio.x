@@ -10,8 +10,10 @@ include	<fio.h>
 procedure fwatio (fd)
 
 int	fd
-int	nchars, bufmode
-int	await()
+
+long	nchars
+int	bufmode
+long	await()
 errchk	filerr
 include	<fio.com>
 

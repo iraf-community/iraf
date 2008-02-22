@@ -7,8 +7,10 @@
 
 int procedure fnextn (vfn, outstr, maxch)
 
-char	vfn[ARB], outstr[maxch]
+char	vfn[ARB]
+char	outstr[maxch]
 int	maxch
+
 int	root_offset, extn_offset
 int	gstrcpy()
 

@@ -5,8 +5,10 @@
 int procedure vvfn_checksum (a, nchars)
 
 char	a[nchars]		# array to be summed
-int	nchars			# length of array
-int	i, sum
+size_t	nchars			# length of array
+
+size_t	i
+int	sum
 
 begin
 	sum = 0

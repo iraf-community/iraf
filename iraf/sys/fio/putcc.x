@@ -11,6 +11,7 @@ procedure putcc (fd, ch)
 
 int	fd
 char	ch
+
 char	ccstr[SZ_CCSTR]
 int	ip, n, ctocc()
 

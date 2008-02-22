@@ -7,10 +7,12 @@ include	<fio.h>
 
 procedure ffilbf (fd, bp, bufsize, buffer_offset)
 
-int	fd, bufsize
+int	fd
 pointer	bp
-bool	at_eof, stream_dev
+size_t	bufsize
 long	buffer_offset
+
+bool	at_eof, stream_dev
 errchk	fwatio
 include	<fio.com>
 

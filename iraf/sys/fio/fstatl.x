@@ -17,7 +17,8 @@ int	fd				#I file descriptor
 int	what				#I parameter to be returned
 
 pointer	ffp, pb, pbtop
-int	flag, ffd, nchars, seglen, iomode
+int	flag, ffd, iomode
+long	seglen, nchars
 int	and(), btoi()
 bool	envgetb()
 long	ffilsz()
@@ -131,9 +132,9 @@ begin
 	    else
 		nchars = itop[fd] - iop[fd]
 	    if (and (FF_PUSHBACK, fflags[fd]) != 0) {
-		pbtop = (FPBTOP(ffp) - 1) / SZ_INT + 1
+		pbtop = (FPBTOP(ffp) - 1) / SZ_POINTER + 1
 		for (pb=FPBSP(ffp);  pb < pbtop;  pb=pb+4) {
-		    seglen = Memi[pb+1] - Memi[pb]
+		    seglen = Memp[pb+1] - Memp[pb]
 		    if (seglen > 0)
 			nchars = nchars + seglen
 		}

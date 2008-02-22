@@ -8,8 +8,10 @@
 
 int procedure fnroot (vfn, outstr, maxch)
 
-char	vfn[ARB], outstr[maxch]
+char	vfn[ARB]
+char	outstr[maxch]
 int	maxch
+
 int	root_offset, extn_offset, nchars_root
 int	gstrcpy()
 

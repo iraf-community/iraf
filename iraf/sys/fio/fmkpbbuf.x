@@ -9,7 +9,8 @@ include	<fio.h>
 procedure fmkpbbuf (fd)
 
 int	fd
-int	buflen
+
+size_t	buflen
 pointer	bp
 errchk	malloc
 include	<fio.com>
@@ -30,5 +31,5 @@ begin
 	FPBBUF(fp) = bp
 	FPBTOP(fp) = bp + buflen
 	FPBIOP(fp) = bp
-	FPBSP(fp) = (FPBTOP(fp) - 1) / SZ_INT + 1
+	FPBSP(fp) = (FPBTOP(fp) - 1) / SZ_POINTER + 1
 end

@@ -12,6 +12,7 @@ include	<fio.h>
 procedure fclobber (fname)
 
 char	fname[ARB]
+
 int	fd
 int	access()
 bool	streq(), envgetb()

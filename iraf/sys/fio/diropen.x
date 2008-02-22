@@ -21,6 +21,7 @@ int procedure diropen (fname, mode)
 char	fname[ARB]		# directory file to be opened
 int	mode			# pass or skip hidden filenames
 
+size_t	sz_val
 int	fd, dirf
 bool	first_time
 int	dirmode[MAX_OPENDIR]
@@ -37,7 +38,8 @@ data	first_time /true/
 
 begin
 	call smark (sp)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	# Free up all descriptor slots.
 	if (first_time) {
@@ -50,7 +52,8 @@ begin
 	# filenames opened on special devices (when FOPNTX is called).
 
 	call fmapfn (fname, Memc[osfn], SZ_PATHNAME)
-	call strupk (Memc[osfn], Memc[osfn], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (Memc[osfn], Memc[osfn], sz_val)
 
 	# Open the VFN database, used to unmap filenames.
 	vp = vfnopen (Memc[osfn], VFN_UNMAP)
@@ -93,7 +96,7 @@ int	channel			# we return index into oschan
 int	dirf
 int	dirmode[MAX_OPENDIR]
 int	oschan[MAX_OPENDIR]
-int	vfnptr[MAX_OPENDIR]
+pointer	vfnptr[MAX_OPENDIR]
 common	/dircom/ dirmode, oschan, vfnptr
 
 begin
@@ -128,7 +131,7 @@ int	status
 
 int	dirmode[MAX_OPENDIR]
 int	oschan[MAX_OPENDIR]
-int	vfnptr[MAX_OPENDIR]
+pointer	vfnptr[MAX_OPENDIR]
 common	/dircom/ dirmode, oschan, vfnptr
 
 begin
@@ -153,15 +156,16 @@ end
 procedure fgtdir (chan, outline, maxch, status)
 
 int	chan			# oschan index
-char	outline[maxch]		# buffer which receives the VFN
-int	maxch			# maxchars to return
-int	status
+char	outline[a_maxch]	# buffer which receives the VFN
+size_t	a_maxch			# maxchars to return
+long	status
 
-int	nchars
+size_t	sz_val
+int	nchars, maxch
 pointer	vp, sp, osfn
 int	dirmode[MAX_OPENDIR]
 int	oschan[MAX_OPENDIR]
-int	vfnptr[MAX_OPENDIR]
+pointer	vfnptr[MAX_OPENDIR]
 
 int	vfnunmap(), vfn_is_hidden_file()
 errchk	vfnunmap, vfn_is_hidden_file
@@ -169,8 +173,10 @@ common	/dircom/ dirmode, oschan, vfnptr
 define	done_ 91
 
 begin
+	maxch = a_maxch
 	call smark (sp)
-	call salloc (osfn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	status = ERR
 	if (chan < 1 || chan > MAX_OPENDIR)
@@ -212,8 +218,10 @@ end
 
 procedure fptdir (chan, line, nchars, status)
 
-int	chan, nchars, status
+int	chan
 char	line[ARB]
+size_t	nchars
+long	status
 
 begin
 	status = ERR
@@ -225,7 +233,8 @@ end
 
 procedure ffldir (chan, status)
 
-int	chan, status
+int	chan
+long	status
 
 begin
 	status = ERR
