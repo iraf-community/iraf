@@ -83,7 +83,8 @@ procedure t_rbin()
 long	totchars
 char	fname[SZ_FNAME]
 char	bbuf[SZ_BBUF]
-int	fd, open(), read()
+int	fd, open()
+long	read()
 
 begin
 	call clgstr ("fname", fname, SZ_FNAME)

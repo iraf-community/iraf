@@ -96,7 +96,7 @@ char    obuf[ARB]		#O Output buffer
 int	ncards			#I ncards read so far
 
 int	ip, nchars_read
-int	read()
+long	read()
 errchk	read
 
 begin

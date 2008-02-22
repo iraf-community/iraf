@@ -527,7 +527,7 @@ int	nchars_total		# number of chars read from input stream
 
 int	len_ibuf, nchars, nchars_read
 pointer	ibuf
-int	read()
+long	read()
 errchk	read
 data	ibuf/NULL/
 

@@ -14,8 +14,9 @@ int	offset
 int	len
 char    outstr[ARB]
 
-int     nstat, read()
+int     nstat
 pointer sp, buf
+long	read()
 
 begin
         call smark (sp)
@@ -43,9 +44,10 @@ short procedure ip_getb (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 short	val
 char    buf[2]
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -90,8 +92,9 @@ short procedure ip_gets (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 short   val
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -107,8 +110,9 @@ int procedure ip_geti (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 int   val
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -124,8 +128,9 @@ long procedure ip_getl (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 long   val
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -141,8 +146,9 @@ real procedure ip_getr (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 real   val
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -159,8 +165,9 @@ double procedure ip_getd (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 double   val
+long	read()
 
 begin
         call ip_lseek (fd, offset)
@@ -179,8 +186,9 @@ real procedure ip_getn (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 real	rval
+long	read()
 
 begin
 	call ip_lseek (fd, offset)
@@ -199,8 +207,9 @@ double procedure ip_getn8 (fd, offset)
 int     fd
 int	offset
 
-int     nstat, read()
+int     nstat
 double	dval
+long	read()
 
 begin
 	call ip_lseek (fd, offset)
@@ -222,7 +231,7 @@ int     len					#i length of array
 
 pointer sp, buf
 int     fp, nval, nstat
-int	read()
+long	read()
 long	ip_lnote()
 
 begin
@@ -274,7 +283,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -290,7 +299,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -306,7 +315,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -322,7 +331,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -339,7 +348,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -360,7 +369,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -379,7 +388,7 @@ pointer ptr					#i data pointer
 int     len					#i length of array
 
 int     nstat
-int     read()
+long	read()
 
 begin
         if (ptr == NULL)
@@ -405,7 +414,8 @@ int	line					#i line number to search
 pointer	sp, cbuf, buf
 int	nl, offset, i, nread, fsize
 
-int	read(), fstati()
+long	read()
+int	fstati()
 
 define	done_ 	99
 define	err_ 	98
@@ -464,7 +474,8 @@ char	pattern[ARB]                            #i pattern to locate
 pointer	sp, cbuf, buf
 int     fsize, nread, patlen, cur_offset, loc
 
-int     fstati(), read(), strsearch(), strlen()
+int     fstati(), strsearch(), strlen()
+long	read()
 
 define	done_	99
 

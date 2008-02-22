@@ -11,7 +11,8 @@ int	gn      #I input group number
 
 char    ibuf[FITS_BLKSZ_CHAR]
 int	ndim, totpix, i, k, in, out, status
-int	read(), mef_rdhdr_gn(), mef_totpix()
+int	mef_rdhdr_gn(), mef_totpix()
+long	read()
 bool    iphdu
 
 errchk  mef_rdhdr_gn

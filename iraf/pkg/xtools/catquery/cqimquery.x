@@ -53,7 +53,8 @@ pointer	res, inbuf
 int	cc, fd, outfd, nchars
 bool	done
 pointer	cq_irinit()
-int	ndopen(), strlen(), open(), read(), getline()
+int	ndopen(), strlen(), open(), getline()
+long	read()
 errchk	ndopen(), awriteb(), open(), read(), getline()
 
 begin

@@ -16,7 +16,8 @@ int	bufsize		# buffer size in records
 int	recptr		# last successful FITS record read
 
 int	i, nchars
-int	read(), fstati()
+int	fstati()
+long	read()
 errchk	read
 
 begin

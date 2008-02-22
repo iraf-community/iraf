@@ -249,7 +249,7 @@ int	fd				# input file descriptor
 char	card[ARB]			# the packed/unpacked cardimage image
 
 int	npacked_chars, nchars
-int	read()
+long	read()
 errchk	read, ebcdic_to_ascii, ibm_to_ascii 
 include "rcardimage.com"
 

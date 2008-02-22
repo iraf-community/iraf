@@ -59,7 +59,8 @@ int	fd, fdtmp, i, krow, nlut, nchars, junk, nread
 pointer	infile, fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
 bool	apply_lut, delete_file, verbose, listonly, yflip
 
-int	clgfil(), open(), strcmp(), fnroot(), fnextn(), read()
+int	clgfil(), open(), strcmp(), fnroot(), fnextn()
+long	read()
 pointer	clpopni(), immap(), impl2s()
 bool	clgetb()
 

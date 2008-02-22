@@ -16,7 +16,8 @@ int	maxfiles, nchars, nlines, nbytes
 int	file_type, nrecords, fileno, in, out, n
 
 bool	clgetb()
-int	open(), read(), getline(), access(), clgeti()
+int	open(), getline(), access(), clgeti()
+long	read()
 
 begin
 	call smark (sp)

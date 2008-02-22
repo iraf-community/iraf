@@ -138,7 +138,8 @@ long	ooffset
 int	nchars, stat, in, out, lastnchars
 pointer	op, otop, bufa, bufb
 
-int	fstati(), mtopen(), open(), await()
+int	fstati(), mtopen(), open()
+long	await()
 
 begin
 	# Open the input and output files.

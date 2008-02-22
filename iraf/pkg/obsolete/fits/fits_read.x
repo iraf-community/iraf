@@ -121,7 +121,8 @@ int	fd			# the FITS file descriptor
 
 int	szbuf
 pointer	sp, buf
-int	fstati(), read()
+int	fstati()
+long	read()
 errchk	read
 
 begin
@@ -149,7 +150,8 @@ real	fe			# maximum file size in Kb for scan mode
 int	i, szbuf
 pointer	sp, buf
 real	file_size
-int	fstati(), read()
+int	fstati()
+long	read()
 errchk	read
 
 begin

@@ -19,7 +19,8 @@ int	bytes_read, ip, op, i, first_byte, nchars, rec_count, ntrim
 long	offset
 pointer	inbuf, outbuf
 
-int	mtopen(), reb_roundup(), read(), reb_skipover(), fstati(), open()
+int	mtopen(), reb_roundup(), reb_skipover(), fstati(), open()
+long	read()
 errchk	open, mtopen, read, awriteb, awaitb, close, mfree, malloc, flush
 errchk	reb_write_block, reb_pad_block, reb_pad_record, reb_skipover
 include "reblock.com"
@@ -339,7 +340,7 @@ int	byteswap	# swap every other byte before output
 int	wordswap	# swap every other word before output
 
 int	nbread
-int	awaitb()
+long	awaitb()
 errchk	awriteb, awaitb
 
 begin

@@ -130,7 +130,8 @@ bool	flip, sign16
 pointer	infile, im, pix, sp, temp, opix, sp1, hdr, src
 
 int	clplen(), clgfil(), clgeti()
-int	open(), read()
+int	open()
+long	read()
 bool	clgetb()
 pointer	clpopni(), immap(), impl2s(), impl2l()
 

@@ -14,7 +14,8 @@ char	tee_file[SZ_FNAME], out_type_string[SZ_OTSTR]
 bool	clgetb()
 pointer	sp, buf
 int	out, sz_buf, out_type, nchars
-int	open(), read(), strmatch(), getline(), fstati()
+int	open(), strmatch(), getline(), fstati()
+long	read()
 
 begin
 	# Get params and open the output file.

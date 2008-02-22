@@ -114,7 +114,7 @@ int	this_frame		# Current frame number
 
 int	mc_begin, nchars
 pointer	metacode, sp
-int	read()
+long	read()
 errchk	seek, salloc, read, write, mfree
 
 begin
@@ -260,7 +260,7 @@ int	nchars_total		# number of chars read from input stream
 
 int	len_ibuf, nchars, nchars_read
 pointer	ibuf
-int	read()
+long	read()
 errchk	read
 data	ibuf/NULL/
 

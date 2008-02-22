@@ -15,9 +15,9 @@ pointer	cq			#I the catalog database descriptor
 pointer	cc, res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
-long	note()
+long	read(), note()
 pointer	cq_rinit()
-int	ndopen(), strlen(), read(), open(), getline()
+int	ndopen(), strlen(), open(), getline()
 pointer	 fstatp()
 errchk	ndopen(), fprintf(), areadb(), awriteb(), open(), read()
 
@@ -183,8 +183,8 @@ pointer	res, inbuf, line, sp, spfname
 int	j, fd, nchars, nlines, nrecs, szindex
 bool	done
 pointer	cq_frinit()
-long	note()
-int	access(), open(), read(), getline()
+long	read(), note()
+int	access(), open(), getline()
 pointer	fstatp()
 errchk	open(), read()
 

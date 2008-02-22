@@ -112,7 +112,8 @@ int	in, bufsize, totrecords, nrecords, totbytes, last_recsize, nbadrec
 int	stat, rec_number, next_dump, recsize, nelems, vals_per_line, field_len
 long	maxval, max_plusint, twice_max_plusint
 
-int	mtopen(), fstati(), get_next_number(), read(), gltoc()
+int	mtopen(), fstati(), get_next_number(), gltoc()
+long	read()
 errchk	mtopen, malloc, read, mfree, close
 include "mtexamine.com"
 
