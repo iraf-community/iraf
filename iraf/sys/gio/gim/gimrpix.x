@@ -22,7 +22,7 @@ short	gim[GIM_READPIXELS_LEN]
 short	retval[GIM_RET_RPIX_LEN]
 errchk	gpl_flush, gflush, read, syserrs
 string	s_readpixels "gim_readpixels"
-int	read()
+long	read()
 
 begin
 	call gpl_flush()

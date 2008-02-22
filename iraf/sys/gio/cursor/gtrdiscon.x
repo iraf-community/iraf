@@ -20,7 +20,8 @@ int	stream			# graphics stream used by kernel
 pointer	sp, sp2, lbuf, buf
 int	pseudofile, nchars, junk
 bool	streq()
-int	getline(), read(), strncmp(), psio_isxmit(), prclose(), pr_findproc()
+int	getline(), strncmp(), psio_isxmit(), prclose(), pr_findproc()
+long	read()
 errchk	getline, prclose, read, write
 
 begin

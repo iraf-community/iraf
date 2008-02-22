@@ -29,11 +29,11 @@ int	pixoff		#0 new offset for beginning of data
 pointer hd, ip, op, buf
 char	line[80], endl[80]
 int	gn, newc, k, nchars, nbk, hsize
-int	fxf_xaddl(), read()
-
 int	bufsize, psize, rem, hoffset, poffset
+
+int	fxf_xaddl()
 int	fstati()
-long	note()
+long	read(), note()
 errchk	malloc, read, write
 
 begin
@@ -158,8 +158,8 @@ int	hsize		#O Number of cards read in header
 
 pointer	sp, hb
 int	nblks, totpix, i, j, ip, nchars
-int	strncmp(), read()
-long	note()
+int	strncmp()
+long	read(), note()
 bool	end_card, fxf_xn_decode_blk1()
 
 include "fxfcache.com"

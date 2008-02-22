@@ -22,7 +22,8 @@ pointer sp, qph, qp, fname, fm
 
 real	qp_getr()
 pointer fm_open(), strestore(), qm_access()
-int	fm_fopen(), read(), fm_stati(), qp_accessf()
+int	fm_fopen(), fm_stati(), qp_accessf()
+long	read()
 errchk	fm_open, strestore, fm_fopen, seek, read
 errchk	calloc, syserrs, qm_access
 

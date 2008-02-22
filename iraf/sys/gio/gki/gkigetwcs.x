@@ -18,7 +18,8 @@ int	fd			# input/output file
 int	wcs[ARB]		# array of WCS structures (output)
 int	len_wcs			# number of ints (struct units) in array
 
-int	nchars, nwords, read()
+int	nchars, nwords
+long	read()
 short	gki[GKI_GETWCS_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_GETWCS/, gki[3] /GKI_GETWCS_LEN/
 errchk	syserr, read, write, flush

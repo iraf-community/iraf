@@ -26,7 +26,7 @@ pointer	instruction		# pointer to instruction (output)
 
 int	len_ibuf, nchars
 pointer	ibuf
-int	read()
+long	read()
 errchk	read, malloc, realloc
 data	ibuf /NULL/
 

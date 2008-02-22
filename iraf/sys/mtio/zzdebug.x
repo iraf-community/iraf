@@ -251,7 +251,8 @@ char	mtfile[ARB]			# magtape file to be examined
 pointer	buf
 int	in, nrecords, totrecords, totbytes, bufsize, recsize, last_recsize
 errchk	mtopen, read, fstati, printf, pargi
-int	mtopen(), read(), fstati()
+int	mtopen(), fstati()
+long	read()
 
 begin
 	in = mtopen (mtfile, READ_ONLY, 0)
@@ -315,7 +316,8 @@ procedure t_mtcopy()
 pointer	buf
 int	in, out, bufsize, acmode
 char	infile[SZ_FNAME], outfile[SZ_FNAME]
-int	mtopen(), fstati(), read(),  mtfile()
+int	mtopen(), fstati(), mtfile()
+long	read()
 
 begin
 	call clgstr ("infile", infile, SZ_FNAME)

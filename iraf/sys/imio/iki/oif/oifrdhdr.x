@@ -24,7 +24,8 @@ int	sulen_userarea, hdrlen, nchars, status
 
 bool	streq()
 int	miireadc(), miireadi(), miireadl(), miireadr()
-int	btoi(), read()
+int	btoi()
+long	read()
 
 errchk	read, miireadc, miireadi, miireadl, miireadr
 define	readerr_ 91

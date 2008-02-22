@@ -72,7 +72,8 @@ char	fname[SZ_FNAME]
 char	dbuf[SZ_BUF]
 int	fd
 long	nchars, totchars
-int	open(), read()
+int	open()
+long	read()
 
 begin
 	call clgstr ("file", fname, SZ_FNAME)

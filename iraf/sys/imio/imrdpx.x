@@ -24,8 +24,7 @@ pointer	pl
 long	offset
 int	sz_pixel, nbytes, fd, op, step, nchars, n
 
-int	read()
-long	imnote()
+long	read(), imnote()
 errchk	imerr, seek, read, pl_glpi, pl_glri
 include	<szdtype.inc>
 

@@ -27,7 +27,8 @@ int	bufsize, outfd, destfd, pr, pseudofile, line_type, offset
 pointer	sp, buf, ip
 
 char	getc()
-int	getline(), read(), fstati(), ctoi(), itoc()
+int	getline(), fstati(), ctoi(), itoc()
+long	read()
 errchk	syserr, getline, fstati, read, write, pr_decodeargs, putc, getc
 include	"prc.com"
 

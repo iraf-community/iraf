@@ -769,8 +769,8 @@ int	debug, nphotons, naxes, axlen[2], dmin[8], dmax[8], in, op, i
 bool	clgetb()
 double	mp_getd()
 pointer	qp_open(), qpio_open()
-int	open(), read(), mp_geti(), clgeti()
-long	clktime()
+int	open(), mp_geti(), clgeti()
+long	read(), clktime()
 
 begin
 	call smark (sp)

@@ -13,7 +13,8 @@ int	maxchars		# max number of chars to be read
 
 pointer	sp, bp
 int	pksize, nchars
-int	miipksize(), miinelem(), read()
+int	miipksize(), miinelem()
+long	read()
 errchk	read()
 
 begin

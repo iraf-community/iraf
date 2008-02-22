@@ -27,7 +27,8 @@ pointer	param, expr, filter, filter_text, mask, umask, psym, dsym, name
 int	sz_filter, szb_page, nwords, nchars, junk, fd, ip, i, j
 
 pointer	qp_gpsym(), qpex_open(), stname(), strefstab()
-int	qp_popen(), qp_lenf(), read(), pl_l2pi(), fstati()
+int	qp_popen(), qp_lenf(), pl_l2pi(), fstati()
+long	read()
 int	qp_geti(), qp_gstr(), qp_parsefl(), qpio_parse(), qpex_modfilter()
 
 errchk	qp_bind, qp_geti, qpio_parse, qp_gpsym, qp_addf, qp_gstr

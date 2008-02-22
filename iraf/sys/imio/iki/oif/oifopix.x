@@ -30,7 +30,8 @@ long	pixoff
 pointer	sp, pixhdr, pixfile
 int	pfd, blklen
 
-int	open(), fdevblk(), oif_rdhdr()
+int	open(), oif_rdhdr()
+long	fdevblk()
 errchk	open, falloc, fdevblk, imerr, oif_rdhdr, oif_updhdr
 errchk	imioff, oif_wrhdr, oif_mkpixfname, oif_gpixfname, flush
 

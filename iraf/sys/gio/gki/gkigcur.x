@@ -50,7 +50,8 @@ int	raster			#O raster number
 int	rx, ry			#O raster coordinates of cursor
 
 pointer	epa
-int	nchars, read()
+int	nchars
+long	read()
 short	gki[GKI_GETCURSOR_LEN]
 short	cur[GKI_CURSORVALUE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_GETCURSOR/, gki[3] /GKI_GETCURSOR_LEN/

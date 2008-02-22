@@ -13,7 +13,8 @@ int procedure prfilbuf (fd)
 int	fd			# parent's input IPC from child process
 
 int	pr
-int	filbuf(), prpsio()
+long	filbuf()
+int	prpsio()
 include	"prc.com"
 
 begin

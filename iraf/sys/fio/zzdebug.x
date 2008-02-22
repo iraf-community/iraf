@@ -176,7 +176,8 @@ end
 procedure t_spool()
 
 int	fd, i, j, n
-int	open(), read()
+int	open()
+long	read()
 
 begin
 	fd = open ("spool", READ_WRITE, SPOOL_FILE)
@@ -240,7 +241,8 @@ procedure t_server()
 
 char	buf[SZ_BUF]
 int	fdi, fdo, nb, i
-int	ndopen(), read(), reopen()
+int	ndopen(), reopen()
+long	read()
 
 begin
 	do i = 1, 5 {
@@ -283,7 +285,8 @@ char	buf[SZ_BUF]
 int	fdi, fdo, n, i, msglen
 int	msgsize[8]
 
-int	ndopen(), read(), reopen()
+int	ndopen(), reopen()
+long	read()
 data	msgsize /64, 128, 256, 134, 781, 3, 19, 1544/
 
 begin
@@ -344,7 +347,8 @@ procedure t_old_server()
 char	port[SZ_LINE]
 char	buf[SZ_BUF]
 int	fd, sum, n, maxconn, i
-int	ndopen(), read(), checksum(), clgeti()
+int	ndopen(), checksum(), clgeti()
+long	read()
 
 begin
 	call clgstr ("port", port, SZ_LINE)
@@ -388,7 +392,8 @@ char	port[SZ_LINE]
 int	fd, nmsg, n, i, msglen
 int	msgsize[8]
 
-int	ndopen(), read(), clgeti(), checksum()
+int	ndopen(), clgeti(), checksum()
+long	read()
 data	msgsize /64, 128, 256, 134, 781, 3, 19, 1544/
 
 begin
@@ -433,7 +438,8 @@ int	fd, nchars, ip
 char	hostname[SZ_FNAME]
 char	line[SZ_LINE], netpath[SZ_LINE]
 size_t	sz_val
-int	ndopen(), read(), strlen()
+int	ndopen(), strlen()
+long	read()
 
 begin
 	# Open the daytime service on the named host or the local host.
@@ -480,7 +486,8 @@ bool	done
 int	fd, nchars, lastch
 char	hostname[SZ_FNAME], buf[SZ_BUF]
 char	netpath[SZ_LINE], path[SZ_LINE]
-int	ndopen(), read()
+int	ndopen()
+long	read()
 
 begin
 	# Connect to HTTP server (default port 80) on the given host.

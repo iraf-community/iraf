@@ -21,7 +21,8 @@ int	sz_textbuf, nchars, fd
 pointer	st, sm, sym, textbuf
 data	textbuf /NULL/, sz_textbuf /NULL/
 
-int	fm_getfd(), read()
+int	fm_getfd()
+long	read()
 pointer	qm_symtab(), strefsbuf(), stfind()
 errchk	realloc, fm_getfd, seek, read
 

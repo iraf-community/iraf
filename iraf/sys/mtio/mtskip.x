@@ -13,8 +13,9 @@ long	nrecords			#I number of records to skip
 pointer	sp, buf
 long	n, c_0
 size_t	bufsize
+long	await()
+int	fstati()
 errchk	aread, await
-int	await(), fstati()
 
 begin
 	call smark (sp)

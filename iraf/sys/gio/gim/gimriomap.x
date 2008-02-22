@@ -18,7 +18,7 @@ int	nchars
 pointer	sp, data
 short	gim[GIM_READIOMAP_LEN]
 short	retval[GIM_RET_RIOMAP_LEN]
-int	read()
+long	read()
 
 string	s_readiomap "gim_iomapread"
 errchk	flush, read, syserrs

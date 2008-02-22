@@ -21,7 +21,8 @@ pointer	sp, fm, sym, tbuf, isym, osym
 int	fd, sz_itype, sz_otype, nelem, itype, otype
 
 pointer	qp_gpsym()
-int	fm_getfd(), qp_sizeof(), read(), qp_dtype()
+int	fm_getfd(), qp_sizeof(), qp_dtype()
+long	read()
 errchk	qp_bind, qp_gpsym, fm_getfd, seek, read, syserrs
 
 begin

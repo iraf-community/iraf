@@ -56,7 +56,8 @@ int	len_wcs				# max ints to read
 
 pointer	sp, fname
 int	fd, nchars
-int	open(), read()
+int	open()
+long	read()
 errchk	read
 
 begin

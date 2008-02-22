@@ -28,7 +28,7 @@ pointer	epa
 int	nchars, npts
 short	ca[GKI_CELLARRAY_LEN]
 short	gki[GKI_GETCELLARRAY_LEN]
-int	read()
+long	read()
 data	gki[1] /BOI/, gki[2] /GKI_GETCELLARRAY/, gki[3] /GKI_GETCELLARRAY_LEN/
 errchk	write, seek, flush, read
 include	"gki.com"

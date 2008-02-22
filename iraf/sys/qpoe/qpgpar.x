@@ -23,7 +23,8 @@ double	pval[LEN_PVAL+1]
 data	pp /NULL/
 
 pointer qp_gpsym()
-int	qp_sizeof(), fm_getfd(), qp_ctoi(), read()
+int	qp_sizeof(), fm_getfd(), qp_ctoi()
+long	read()
 errchk	qp_bind, qp_gpsym, syserrs, fm_getfd, seek, read
 
 begin

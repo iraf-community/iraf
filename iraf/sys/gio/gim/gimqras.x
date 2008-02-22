@@ -21,8 +21,8 @@ int	depth			#O raster depth, bits per pixel
 int	nchars, nread
 short	gim[GIM_QUERYRASTER_LEN]
 short	retval[GIM_RET_QRAS_LEN]
+long	read()
 errchk	gescape, flush, read, syserrs
-int	read()
 
 begin
 	call gpl_flush()

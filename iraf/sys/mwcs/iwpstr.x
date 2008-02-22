@@ -21,7 +21,8 @@ pointer	sp, bigstr, im, cp
 char	kwname[SZ_KWNAME]
 
 pointer	iw_findcard()
-int	read(), strncmp()
+long	read()
+int	strncmp()
 errchk	read, imaddf, impstr
 
 begin

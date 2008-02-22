@@ -28,7 +28,8 @@ int	nchars, nread
 short	gim[GIM_GETMAPPING_LEN]
 short	retval[GIM_RET_GMAP_LEN]
 errchk	gescape, flush, read, syserrs
-int	read(), btoi()
+long	read()
+int	btoi()
 
 begin
 	call gpl_flush()

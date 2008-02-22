@@ -21,7 +21,8 @@ char	obuf[ARB]		#O output buffer
 int	maxch			#I max chars to read
 
 int	nchars, op, ch
-int	read(), getci(), fstati()
+long	read()
+int	getci(), fstati()
 include	"stdgraph.com"
 errchk	read, getci, ttyctrl
 string	delstr "\010 \010"

@@ -455,7 +455,8 @@ procedure t_load()
 pointer	mw, bp
 int	fd, nchars
 char	fname[SZ_FNAME]
-int	open(), read()
+int	open()
+long	read()
 pointer	mw_open()
 
 begin

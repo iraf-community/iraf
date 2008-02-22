@@ -13,7 +13,8 @@ int	maxelem			# max number of data elements to be read
 
 pointer	sp, bp
 int	pksize, nchars, nelem
-int	miipksize(), miinelem(), read()
+int	miipksize(), miinelem()
+long	read()
 errchk	read()
 
 begin

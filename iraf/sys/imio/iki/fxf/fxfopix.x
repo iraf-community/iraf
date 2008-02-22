@@ -442,9 +442,9 @@ pointer sp, file, mii
 int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
 int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
-int	fnroot(), open(), read(), fxf_totpix(), strncmp(), itoc()
+int	fnroot(), open(), fxf_totpix(), strncmp(), itoc()
 int	strlen(), fopnbf(), sizeof(), fxf_header_size()
-long	fstatl()
+long	read(), fstatl()
 
 errchk	syserr, syserrs
 define  err_ 91

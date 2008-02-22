@@ -34,9 +34,9 @@ bool    adjust_header, overwrite, append
 int	nchars_ua, hdr_fd, group, hdr_off, size
 int	npad, nlines, pixoff, grp_pix_off, nbks
 int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
-int	read(), fxf_hdr_offset(), access(), strncmp()
+int	fxf_hdr_offset(), access(), strncmp()
 int	open(), fnroot(), fnldir()
-long	fstatl()
+long	read(), fstatl()
 bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
@@ -1062,8 +1062,8 @@ int	chars_ua	#I size of the new UA (user area) in units of chars
 
 pointer	mii, sp
 int	nk, nblocks, junk, size_ua
+long	read()
 errchk  read, write
-int	read()
 
 begin
 	call smark (sp)
@@ -1282,8 +1282,8 @@ pointer sp, hdrfile
 int	fd, fdout, i, nch, nc, cfit
 char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
 bool	streq()
-int	open(), naxis, read(), strncmp(), fnroot()
-long	note()
+int	open(), naxis, strncmp(), fnroot()
+long	read(), note()
 
 include "fxfcache.com"
 define	cfit_ 91

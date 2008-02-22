@@ -21,7 +21,7 @@ pointer	sp, cm, ip
 int	ncells, nret, nchars, i
 short	gim[GIM_READCMAP_LEN]
 short	retval[GIM_RET_RCMAP_LEN]
-int	read()
+long	read()
 
 string	s_readcmap "gim_readcolormap"
 errchk	flush, read, syserrs

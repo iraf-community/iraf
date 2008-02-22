@@ -15,7 +15,8 @@ int	maxch			#I max chars out
 pointer	sym, fm
 int	nchars, fd
 pointer	qp_gpsym()
-int	fm_getfd(), read()
+int	fm_getfd()
+long	read()
 errchk	qp_bind, qp_gpsym, syserrs, fm_getfd, seek
 
 begin

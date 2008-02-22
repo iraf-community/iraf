@@ -30,7 +30,8 @@ pointer	sp, stf, gpb, lbuf, pp
 int	pfd, pn, sz_param, sz_gpb
 errchk	imaddb, imadds, imaddl, imaddr, imaddd, imastr
 errchk	imputd, impstr, open, read
-int	open(), read(), imaccf()
+int	open(), imaccf()
+long	read()
 real	imgetr()
 
 string	readerr "cannot read group data block - no such group?"

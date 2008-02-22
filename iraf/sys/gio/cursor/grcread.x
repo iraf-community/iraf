@@ -17,7 +17,8 @@ pointer	sp, lbuf, op
 int 	fd, nchars, filelen
 long	fstatl()
 pointer	gtr_writep()
-int	open(), read()
+int	open()
+long	read()
 errchk	read
 define	err_ 91
 
