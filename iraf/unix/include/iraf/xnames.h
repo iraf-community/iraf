@@ -314,11 +314,11 @@ extern XINT PRENVFREE ( XINT *, XINT * );
 /* ../../../sys/etc/prfilbuf.x */
 extern XINT PRFILBUF ( XINT * );
 /* ../../../sys/fio/filbuf.x */
-extern XINT FILBUF ( XINT * );
+extern XLONG FILBUF ( XINT * );
 /* ../../../sys/fio/finfo.x */
 extern XINT FINFO ( XCHAR *, XLONG * );
 /* ../../../sys/fio/flsbuf.x */
-extern int FLSBUF ( XINT *, XINT * );
+extern int FLSBUF ( XINT *, XLONG * );
 /* ../../../sys/fio/fmapfn.x */
 extern int FMAPFN ( XCHAR *, XCHAR *, XINT * );
 /* ../../../sys/fio/fmkdir.x */
@@ -412,7 +412,7 @@ extern XINT RCURSOR ( XINT *, XCHAR *, XINT * );
 /* ../../../sys/clio/rdukey.x */
 extern XINT RDUKEY ( XCHAR *, XINT * );
 /* ../../../sys/fio/read.x */
-extern XINT READ ( XINT *, XCHAR *, XINT * );
+extern XLONG READ ( XINT *, XCHAR *, XSIZE_T * );
 /* ../../../sys/fio/rename.x */
 extern int RENAME ( XCHAR *, XCHAR * );
 /* ../../../sys/fio/reopen.x */
@@ -474,7 +474,7 @@ extern int UNGETC ( XINT *, XCHAR * );
 /* ../../../sys/fio/ungetline.x */
 extern int UNGETLINE ( XINT *, XCHAR * );
 /* ../../../sys/fio/write.x */
-extern int WRITE ( XINT *, XCHAR *, XINT * );
+extern int WRITE ( XINT *, XCHAR *, XSIZE_T * );
 /* ../../../sys/etc/onerror.x */
 extern int XONERR ( XINT * );
 /* ../../../sys/etc/xttysize.x */
