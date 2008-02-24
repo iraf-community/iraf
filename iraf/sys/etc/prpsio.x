@@ -59,7 +59,8 @@ int	pseudofile, destfd, destpr, destination, ps, flags
 bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
 long	filbuf(), read()
-int	strncmp(), fstatl()
+int	strncmp()
+long	fstatl()
 int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
