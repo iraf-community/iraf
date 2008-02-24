@@ -8,10 +8,13 @@ procedure sys_panic (errcode, errmsg)
 int	errcode			# error code
 char	errmsg[ARB]		# error message
 
+size_t	sz_val
+
 begin
 	# Since process termination is imminent we may as well overwrite the
 	# error message string by packing it in place.
 
-	call strpak (errmsg, errmsg, ARB)
+	sz_val = ARB
+	call strpak (errmsg, errmsg, sz_val)
 	call zpanic (errcode, errmsg)
 end

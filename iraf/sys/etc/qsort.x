@@ -20,10 +20,12 @@ define	LOGPTR 	32			# log2(maxpts)  (4e9)
 procedure qsort (x, nelem, compare)
 
 int	x[ARB]			# array to be sorted
-int	nelem			# number of elements in array
+size_t	nelem			# number of elements in array
 extern	compare()		# function to be called to compare elements
 
-int	i, j, k, lv[LOGPTR], p, pivot, uv[LOGPTR], temp
+int	p, pivot, temp
+long	i, j, k
+long	lv[LOGPTR], uv[LOGPTR]
 define	swap {temp=$1;$1=$2;$2=temp}
 int	compare()
 

@@ -59,7 +59,7 @@ begin
 
 	    # Release image descriptor for old image
 
-	    call gf_gfind_close ()
+	    call gf_gfind_close (0)
 
 	    # Read primary header for new image
 
@@ -93,8 +93,9 @@ end
 
 # GF_GFIND_CLOSE -- Close any header that might still be open
 
-procedure gf_gfind_close ()
+procedure gf_gfind_close (dummy)
 
+int dummy
 #--
 include	"gf_gfind.com"
 

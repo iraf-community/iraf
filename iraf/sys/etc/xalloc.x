@@ -39,6 +39,7 @@ int procedure xallocate (device)
 
 char	device[ARB]		#I device to be allocated
 
+size_t	sz_val
 pointer	sp, devlist
 int	status, onedev
 int	xgdevlist(), mtfile()
@@ -47,7 +48,8 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
+	sz_val = SZ_DEVLIST
+	call salloc (devlist, sz_val, TY_CHAR)
 
 	# Fetch the device list for the named device.
 	onedev = NO
@@ -56,7 +58,8 @@ begin
 	    goto done_
 
 	# Attempt to allocate the device at the host system level.
-	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
+	sz_val = SZ_DEVLIST
+	call strpak (Memc[devlist], Memc[devlist], sz_val)
 	call zdvall (Memc[devlist], ALLOCATE, status)
 
 	# If that worked and the device is a magtape, call MTIO to complete
@@ -77,6 +80,7 @@ int procedure xdeallocate (device, rewind)
 char	device[ARB]		#I device to be deallocated
 int	rewind			#I rewind if magtape?
 
+size_t	sz_val
 int	status, onedev
 pointer	sp, devlist, osdev, owner
 int	xgdevlist(), mtfile()
@@ -85,9 +89,11 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
-	call salloc (osdev, SZ_FNAME, TY_CHAR)
-	call salloc (owner, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_DEVLIST
+	call salloc (devlist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (osdev, sz_val, TY_CHAR)
+	call salloc (owner, sz_val, TY_CHAR)
 
 	# Get the i/o device name.
 	onedev = YES
@@ -99,7 +105,8 @@ begin
 	# magtape, call MTIO to conditionally rewind the drive and deallocate
 	# the drive in MTIO.
 
-	call strpak (Memc[osdev], Memc[osdev], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call strpak (Memc[osdev], Memc[osdev], sz_val)
 	call zdvown (Memc[osdev], Memc[owner], SZ_FNAME, status)
 	if (status != DV_DEVALLOC)
 	    call syserrs (SYS_MTNOTALLOC, device)
@@ -113,7 +120,8 @@ begin
 	    goto done_
 
 	# Physically deallocate the device.
-	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
+	sz_val = SZ_DEVLIST
+	call strpak (Memc[devlist], Memc[devlist], sz_val)
 	call zdvall (Memc[devlist], DEALLOCATE, status)
 done_
 	call sfree (sp)
@@ -171,6 +179,7 @@ char	device[ARB]		#I device to be deallocated
 char	owner[maxch]		#O receives owner name
 int	maxch			#I max chars out
 
+size_t	sz_val
 pointer	sp, devlist
 int	status, onedev
 int	xgdevlist()
@@ -179,7 +188,8 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	call salloc (devlist, SZ_DEVLIST, TY_CHAR)
+	sz_val = SZ_DEVLIST
+	call salloc (devlist, sz_val, TY_CHAR)
 
 	# Fetch the device list for the named device.
 	onedev = YES
@@ -188,9 +198,11 @@ begin
 	    goto done_
 
 	# Query device allocation.
-	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
+	sz_val = SZ_DEVLIST
+	call strpak (Memc[devlist], Memc[devlist], sz_val)
 	call zdvown (Memc[devlist], owner, maxch, status)
-	call strupk (owner, owner, maxch)
+	sz_val = maxch
+	call strupk (owner, owner, sz_val)
 done_
 	call sfree (sp)
 	return (status)

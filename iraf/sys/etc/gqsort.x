@@ -22,11 +22,13 @@ define	LOGPTR 	32			# log2(maxpts)  (4e9)
 procedure gqsort (x, nelem, compare, arg)
 
 int	x[ARB]			#U array to be sorted
-int	nelem			#I number of elements in array
+size_t	nelem			#I number of elements in array
 extern	compare()		#I function to be called to compare elements
 int	arg			#I private data to be passed to compare func
 
-int	i, j, k, lv[LOGPTR], p, pivot, uv[LOGPTR], temp
+int	p, pivot, temp
+long	i, j, k
+long	lv[LOGPTR], uv[LOGPTR]
 define	swap {temp=$1;$1=$2;$2=temp}
 int	compare()
 

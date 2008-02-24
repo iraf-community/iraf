@@ -11,7 +11,8 @@ int	pr		# subprocess process slot number
 char	cmd[ARB]	# host command to be executed
 
 char	statbuf[5]
-int	fd, status, op
+int	fd, status
+size_t	op
 int	itoc(), oscmd()
 include	"prc.com"
 

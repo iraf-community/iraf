@@ -48,14 +48,18 @@ int	pid			# process id number
 int	fd			# file for which request is desired
 int	rwflag			# type of transfer to wait for
 
+size_t	sz_val
+long	lval
 pointer	ip, op
-int	stack[LEN_STACK], stkp, nchars, nleft
+int	stack[LEN_STACK], stkp
+long	nleft
+size_t	nchars
 int	stream, pr, in, record_type, rq, iotype
 int	pseudofile, destfd, destpr, destination, ps, flags
 bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
 long	filbuf(), read()
-int	strncmp(), fstati()
+int	strncmp(), fstatl()
 int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
@@ -216,7 +220,8 @@ begin
 
 			call fseti (destfd, F_CANCEL, OK)
 			call zcall1 (epa_giotr, destfd)
-			call seek (destfd, BOFL)
+			lval = BOFL
+			call seek (destfd, lval)
 
 		    } else {
 			# Binary transfer.
@@ -266,8 +271,10 @@ begin
 		    # the process in a subsequent XFER call on the stream.
 
 		    if (destpr != 0) {
-			if (graphics_stream)
-			    call seek (destfd, BOFL)
+			if (graphics_stream) {
+			    lval = BOFL
+			    call seek (destfd, lval)
+			}
 
 			push (pr)
 			push (in)
@@ -296,7 +303,8 @@ begin
 			    pop (in)
 			    pop (pr)
 
-			    call seek (stream, BOFL)
+			    lval = BOFL
+			    call seek (stream, lval)
 			    nchars = itop[stream] - iop[stream]
 			    if (nchars <= 0)
 				nchars = 0
@@ -413,7 +421,9 @@ begin
 
 		    # Read pseudofile number.
 		    iotype = 0
-		    if (read (in, ps, SZ_INT) < SZ_INT)
+		    sz_val = SZ_INT
+		    # arg 2: incompatible pointer
+		    if (read (in, ps, sz_val) < SZ_INT)
 			call syserr (SYS_PRIPCSYNTAX)
 
 		    # Read data block.
@@ -432,7 +442,7 @@ begin
 		    # cause the subkernel process to be polled to see if it
 		    # wants the spooled data.
 
-		    nchars = fstati (ps, F_FILESIZE)
+		    nchars = fstatl (ps, F_FILESIZE)
 		    if (nchars > 0) {
 			destination = abs(pr_pstofd[pr,ps])
 			if (destination > KSHIFT) {
@@ -444,7 +454,8 @@ begin
 			}
 
 			if (destpr != 0) {
-			    call seek (destfd, BOFL)
+			    lval = BOFL
+			    call seek (destfd, lval)
 
 			    push (pr)
 			    push (in)

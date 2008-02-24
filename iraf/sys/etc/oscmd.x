@@ -17,6 +17,7 @@ char	infile[ARB]		# name of host command input file
 char	outfile[ARB]		# name of file to receive output
 char	errfile[ARB]		# name of file to receive error output
 
+size_t	sz_val
 int	status, ip, ch
 pointer	sp, cmdbuf, osin, osout, oserr, ostmp, op
 errchk	fmapfn, mktemp, fclobber, flush, putline
@@ -25,11 +26,13 @@ bool	fnullfile()
 
 begin
 	call smark (sp)
-	call salloc (cmdbuf, SZ_COMMAND, TY_CHAR)
-	call salloc (osin, SZ_PATHNAME, TY_CHAR)
-	call salloc (osout, SZ_PATHNAME, TY_CHAR)
-	call salloc (oserr, SZ_PATHNAME, TY_CHAR)
-	call salloc (ostmp, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (cmdbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (osin, sz_val, TY_CHAR)
+	call salloc (osout, sz_val, TY_CHAR)
+	call salloc (oserr, sz_val, TY_CHAR)
+	call salloc (ostmp, sz_val, TY_CHAR)
 
 	# If we are called from the root process, e.g., the CL, the ZOSCMD
 	# primitive is called directly to transmit the host command, otherwise
@@ -43,10 +46,12 @@ begin
 	    # interpreter.
 		
 	    # Pack command string and get OS versions of the filenames.
-	    call strpak (cmd, Memc[cmdbuf], SZ_COMMAND)
-	    if (infile[1] == EOS)
-		call strpak ("", Memc[osin], SZ_PATHNAME)
-	    else
+	    sz_val = SZ_COMMAND
+	    call strpak (cmd, Memc[cmdbuf], sz_val)
+	    if (infile[1] == EOS) {
+		sz_val = SZ_PATHNAME
+		call strpak ("", Memc[osin], sz_val)
+	    } else
 		call fmapfn (infile, Memc[osin], SZ_PATHNAME)
 
 	    # If output is directed to dev$null, save in temp file and delete.
@@ -55,18 +60,20 @@ begin
 	    else
 		Memc[ostmp] = EOS
 
-	    if (outfile[1] == EOS)
-		call strpak ("", Memc[osout], SZ_PATHNAME)
-	    else if (fnullfile (outfile))
+	    if (outfile[1] == EOS) {
+		sz_val = SZ_PATHNAME
+		call strpak ("", Memc[osout], sz_val)
+	    } else if (fnullfile (outfile))
 		call fmapfn (Memc[ostmp], Memc[osout], SZ_PATHNAME)
 	    else {
 		call fclobber (outfile)
 		call fmapfn (outfile, Memc[osout], SZ_PATHNAME)
 	    }
 
-	    if (errfile[1] == EOS)
-		call strpak ("", Memc[oserr], SZ_PATHNAME)
-	    else if (fnullfile (errfile))
+	    if (errfile[1] == EOS) {
+		sz_val = SZ_PATHNAME
+		call strpak ("", Memc[oserr], sz_val)
+	    } else if (fnullfile (errfile))
 		call fmapfn (Memc[ostmp], Memc[oserr], SZ_PATHNAME)
 	    else {
 		call fclobber (errfile)

@@ -20,9 +20,11 @@ int procedure psio_isxmit (lbuf, pseudofile, nchars)
 
 char	lbuf[ARB]		# text
 int	pseudofile		# pseudofile code (output)
-int	nchars			# block size (output)
+size_t	nchars			# block size (output)
+
+long	lval
 int	line_type, ip
-int	ctoi()
+int	ctoi(), ctol()
 errchk	syserr
 
 begin
@@ -51,8 +53,9 @@ begin
 	    ip = ip + 1
 
 	# Get char size of data block.
-	if (ctoi (lbuf, ip, nchars) <= 0)
+	if (ctol (lbuf, ip, lval) <= 0)
 	    call syserr (SYS_PRIPCSYNTAX)
+	nchars = lval
 
 	return (line_type)
 end

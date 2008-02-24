@@ -15,25 +15,27 @@
 
 define	MIN_NLINES	64
 define	LEN_LNODES	5
-define	LNO_MAXLINES	Memi[P2I($1)]	# number of lines stored
-define	LNO_SLOT	Memi[P2I($1+1)]	# cycles around available slots
-define	LNO_LINENUMP	Memi[P2I($1+2)]	# pointer to array of line numbers
-define	LNO_LINEOFFP	Memi[P2I($1+3)]	# pointer to array of line offsets
-define	LNO_LINETAGP	Memi[P2I($1+4)]	# pointer to array of line tags
+define	LNO_MAXLINES	Meml[P2L($1)]	# number of lines stored
+define	LNO_SLOT	Meml[P2L($1+1)]	# cycles around available slots
+define	LNO_LINENUMP	Memp[$1+2]	# pointer to array of line numbers
+define	LNO_LINEOFFP	Memp[$1+3]	# pointer to array of line offsets
+define	LNO_LINETAGP	Memp[$1+4]	# pointer to array of line tags
 
 # LNO_OPEN -- Open the line offset descriptor.
 
 pointer procedure lno_open (maxlines)
 
-int	maxlines	# max lines to store offsets for
-int	nlines
+long	maxlines	# max lines to store offsets for
+
+size_t	nlines, sz_val
 pointer	lp
 errchk	calloc, malloc
 
 begin
 	nlines = max (MIN_NLINES, maxlines)
 
-	call calloc (lp, LEN_LNODES, TY_STRUCT)
+	sz_val = LEN_LNODES
+	call calloc (lp, sz_val, TY_STRUCT)
 	LNO_MAXLINES(lp) = nlines
 	call calloc (LNO_LINENUMP(lp), nlines, TY_LONG)
 	call malloc (LNO_LINEOFFP(lp), nlines, TY_LONG)
@@ -62,10 +64,11 @@ end
 procedure lno_save (lp, line, loffset, ltag)
 
 pointer	lp		# line offset descriptor
-int	line		# line number
+long	line		# line number
 long	loffset		# line offset from NOTE
 long	ltag		# tag value assoc. with line
-int	slot
+
+long	slot
 
 begin
 	slot = LNO_SLOT(lp) + 1
@@ -73,7 +76,7 @@ begin
 	    slot = 1
 	LNO_SLOT(lp) = slot
 
-	Memi[LNO_LINENUMP(lp)+slot-1] = line
+	Meml[LNO_LINENUMP(lp)+slot-1] = line
 	Meml[LNO_LINEOFFP(lp)+slot-1] = loffset
 	Meml[LNO_LINETAGP(lp)+slot-1] = ltag
 end
@@ -89,11 +92,11 @@ end
 int procedure lno_fetch (lp, line, loffset, ltag)
 
 pointer	lp		# line offset descriptor
-int	line		# line number to search for
+long	line		# line number to search for
 long	loffset		# receives line offset if entry for line is found
 long	ltag		# receives tag value assoc. with line
 
-int	maxl, i
+long	maxl, i
 pointer	nump, offp, tagp
 
 begin
@@ -103,7 +106,7 @@ begin
 	tagp = LNO_LINETAGP(lp)
 	
 	do i = 0, maxl
-	    if (Memi[nump+i] == line) {
+	    if (Meml[nump+i] == line) {
 		loffset = Meml[offp+i]
 		ltag = Meml[tagp+i]
 		return (OK)

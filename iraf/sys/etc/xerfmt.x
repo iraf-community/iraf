@@ -14,8 +14,10 @@ char	errmsg[ARB]			# encoded error message.
 char	outstr[maxch]			# output string
 int	maxch
 
+size_t	sz_val
 char	buf[SZ_LINE], user_string[SZ_FNAME]
 int	codelen, nchars, chan, ip, op, junk
+long	lnchars
 int	strncmp(), envfind(), gstrcpy()
 define	nofile_ 91
 
@@ -47,7 +49,8 @@ begin
 	if (envfind ("iraf", buf, SZ_LINE) > 0) {
 	    call zfsubd (buf, SZ_LINE, "base", nchars)
 	    call strcat ("syserrmsg", buf, SZ_LINE)
-	    call strpak (buf, buf, SZ_LINE)
+	    sz_val = SZ_LINE
+	    call strpak (buf, buf, sz_val)
 	} else
 	    goto nofile_
 
@@ -57,8 +60,9 @@ begin
 	    goto nofile_
 
 	repeat {
-	    call zgettx (chan, buf, SZ_LINE, nchars)
-	    if (nchars == 0 || nchars == ERR) {
+	    sz_val = SZ_LINE
+	    call zgettx (chan, buf, sz_val, lnchars)
+	    if (lnchars == 0 || lnchars == ERR) {
 		call zclstx (chan, junk)
 		goto nofile_
 	    } else if (strncmp (buf, errmsg, codelen) == 0) {

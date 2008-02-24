@@ -2,10 +2,10 @@
 
 # LOCVA -- Return the address (in CHAR units) of a variable.
 
-int procedure locva (variable)
+pointer procedure locva (variable)
 
 int	variable		# data object to be addressed
-int	address
+pointer	address
 
 begin
 	call zlocva (variable, address)

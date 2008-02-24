@@ -480,7 +480,7 @@ extern int XONERR ( XINT * );
 /* ../../../sys/etc/xttysize.x */
 extern int XTTYSIZE ( XINT *, XINT * );
 /* ../../../sys/etc/xwhen.x */
-extern int XWHEN ( XINT *, XINT *, XINT * );
+extern int XWHEN ( XINT *, XPOINTER *, XPOINTER * );
 /* ../../../sys/etc/onentry.x */
 extern XINT ONENTRY ( XINT *, XCHAR *, XCHAR * );
 /* ../../../base/sysruk.x */

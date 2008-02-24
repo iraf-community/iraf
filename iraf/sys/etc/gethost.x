@@ -7,7 +7,10 @@ procedure gethost (outstr, maxch)
 char	outstr[maxch]		# receives host name string
 int	maxch
 
+size_t	sz_val
+
 begin
 	call zghost (outstr, maxch)
-	call strupk (outstr, outstr, maxch)
+	sz_val = maxch
+	call strupk (outstr, outstr, sz_val)
 end

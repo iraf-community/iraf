@@ -14,8 +14,8 @@ procedure xer_putline (fd, text)
 int	fd
 char	text[ARB]
 
-long	offset
-int	nchars, junk
+size_t	nchars
+long	offset, junk
 int	strlen()
 include	<fio.com>
 

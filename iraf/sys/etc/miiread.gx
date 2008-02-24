@@ -5,15 +5,17 @@ include <mii.h>
 # MIIREAD -- Read a block of data stored externally in MII format.
 # Data is returned in the format of the local host machine.
 
-int procedure miiread$t (fd, spp, maxelem)
+long procedure miiread$t (fd, spp, maxelem)
 
 int	fd			#I input file
 PIXEL	spp[ARB]		#O receives data
-int	maxelem			# max number of data elements to be read
+size_t	maxelem			# max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
-int	pksize, nchars, nelem
-int	miipksize(), miinelem()
+size_t	pksize
+long	nchars, nelem
+size_t	miipksize(), miinelem()
 long	read()
 errchk	read()
 
@@ -29,8 +31,10 @@ begin
 
 	    nchars = read (fd, Memc[bp], pksize)
 	    if (nchars != EOF) {
-		nelem = min (maxelem, miinelem (nchars, MII_PIXEL))
-		call miiupk$t (Memc[bp], spp, nelem, TY_PIXEL)
+		sz_val = nchars
+		nelem = min (maxelem, miinelem (sz_val, MII_PIXEL))
+		sz_val = nelem
+		call miiupk$t (Memc[bp], spp, sz_val, TY_PIXEL)
 	    }
 
 	    call sfree (sp)
@@ -40,8 +44,10 @@ begin
 
 	    nchars = read (fd, spp, pksize)
 	    if (nchars != EOF) {
-		nelem = min (maxelem, miinelem (nchars, MII_PIXEL))
-		call miiupk$t (spp, spp, nelem, TY_PIXEL)
+		sz_val = nchars
+		nelem = min (maxelem, miinelem (sz_val, MII_PIXEL))
+		sz_val = nelem
+		call miiupk$t (spp, spp, sz_val, TY_PIXEL)
 	    }
 	}
 

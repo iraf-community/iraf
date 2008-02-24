@@ -36,13 +36,15 @@ procedure xstdexh (exception, next_handler)
 int	exception			# code for exception
 pointer	next_handler			# EPA of next handler to be called
 
+size_t	sz_val
 char	os_errmsg[SZ_ERRMSG]
 int	os_errcode
 
 begin
 	# Get OS description of the exception.
 	call zxgmes (os_errcode, os_errmsg, SZ_ERRMSG)
-	call strupk (os_errmsg, os_errmsg, SZ_ERRMSG)
+	sz_val = SZ_ERRMSG
+	call strupk (os_errmsg, os_errmsg, sz_val)
 
 	# Cancel any output and resync awaits.
 	call fseti (STDOUT, F_CANCEL, OK)

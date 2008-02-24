@@ -19,10 +19,12 @@ define	(LPCOM,	common /lprcom/ lp_type, lp_nbytes)
 int procedure lpopen (device, mode, type)
 
 char	device[ARB]
-int	mode, type
+int	mode
+int	type
 
 int	fd
-int	lp_type, lp_nbytes
+int	lp_type
+long	lp_nbytes
 bool	streq()
 int	fopnbf()
 extern	zopnlp(), lp_zaread(), lp_zawrite(), lp_zawait(), zsttlp(), zclslp()
@@ -54,11 +56,13 @@ procedure lp_zaread (chan, buf, maxbytes, offset)
 
 int	chan
 char	buf[ARB]
-int	maxbytes
+size_t	maxbytes
 long	offset			# ignore, since lp is streaming device
 
-int	nbytes
-int	lp_type, lp_nbytes
+size_t	sz_val
+size_t	nbytes, c_1
+int	lp_type
+long	lp_nbytes
 LPCOM
 
 begin
@@ -69,8 +73,11 @@ begin
 	call zardlp (chan, buf, nbytes, offset)
 	call zawtlp (chan, lp_nbytes)
 
-	if (lp_nbytes > 0 && lp_type == TEXT_FILE)
-	    call chrupk (buf, 1, buf, 1, lp_nbytes)
+	if (lp_nbytes > 0 && lp_type == TEXT_FILE) {
+	    c_1 = 1
+	    sz_val = lp_nbytes
+	    call chrupk (buf, c_1, buf, c_1, sz_val)
+	}
 end
 
 
@@ -84,18 +91,20 @@ procedure lp_zawrite (chan, buf, nbytes, offset)
 
 int	chan
 char	buf[ARB]
-int	nbytes
+size_t	nbytes
 long	offset			# ignore, since lp is streaming device
 
-int	nbytes_to_write
-int	lp_type, lp_nbytes
+size_t	nbytes_to_write, c_1
+int	lp_type
+long	lp_nbytes
 LPCOM
 
 begin
 	nbytes_to_write = nbytes
 	if (lp_type == TEXT_FILE) {
 	    nbytes_to_write = nbytes_to_write / SZB_CHAR
-	    call chrpak (buf, 1, buf, 1, nbytes_to_write)
+	    c_1 = 1
+	    call chrpak (buf, c_1, buf, c_1, nbytes_to_write)
 	}
 
 	call zawrlp (chan, buf, nbytes_to_write, offset)
@@ -109,8 +118,10 @@ end
 procedure lp_zawait (chan, nbytes)
 
 int	chan
-int	nbytes
-int	lp_type, lp_nbytes
+long	nbytes
+
+int	lp_type
+long	lp_nbytes
 LPCOM
 
 begin

@@ -18,10 +18,11 @@ procedure envreset (key, value)
 char	key[ARB]		# environment variable name
 char	value[ARB]		# new string value
 
-long	sum
+long	sum, lval
 pointer	el, ep
 int	head, ip, junk, maxch
 int	envputs(), strlen()
+long	modl()
 include	"environ.com"
 
 begin
@@ -35,7 +36,8 @@ begin
 		    break
 		sum = sum + (sum + key[ip])
 	    }
-	    head = threads[mod(sum,NTHREADS)+1]
+	    lval = NTHREADS
+	    head = threads[modl(sum,lval)+1]
 	}
 
 	# If thread is not empty search down it for the named key; if the key

@@ -72,10 +72,12 @@ char	key[ARB]		# environment variable name
 char	value[maxch]		# string value (output)
 int	maxch
 
-long	sum
+size_t	sz_val
+long	sum, lval
 pointer	el, ep
 int	head, ip, nchars
 int	envputs(), gstrcpy()
+long	modl()
 include	"environ.com"
 
 begin
@@ -89,7 +91,8 @@ begin
 		    break
 		sum = sum + (sum + key[ip])
 	    }
-	    head = threads[mod(sum,NTHREADS)+1]
+	    lval = NTHREADS
+	    head = threads[modl(sum,lval)+1]
 	}
 
 	# If thread is not empty search down it for the named key and return
@@ -109,11 +112,13 @@ begin
 	# Key not found.  Ask the host system for the value of the environment
 	# variable.
 
-	call strpak (key, value, maxch)
+	sz_val = maxch
+	call strpak (key, value, sz_val)
 	call zgtenv (value, value, maxch, nchars)
 
 	if (nchars >= 0)  {
-	    call strupk (value, value, maxch)
+	    sz_val = maxch
+	    call strupk (value, value, sz_val)
 	    ip = envputs (key, value)
 	    return (nchars)
 	} else {
@@ -134,13 +139,14 @@ int procedure envputs (key, value)
 char	key[ARB]		# environment variable name
 char	value[ARB]		# string value
 
-long	sum
+long	sum, lval
 int	head, thread_index, redef, ip
 pointer	el, op, ep
 
 bool	streq()
 pointer	coerce()
 int	gstrcpy(), krealloc()
+long	modl()
 include	"environ.com"
 
 begin
@@ -155,7 +161,8 @@ begin
 	    sum = sum + (sum + key[ip])
 	}
 
-	thread_index = mod (sum, NTHREADS) + 1
+	lval = NTHREADS
+	thread_index = modl (sum, lval) + 1
 	head = threads[thread_index]
 
 	# If thread is not empty search down it for the named key to see if we
@@ -243,7 +250,8 @@ int procedure envfree (old_top, userfcn)
 int	old_top			# top of envbuf stack
 pointer	userfcn			# epa of function called for uncovered redefs
 
-int	nredefs, head, i, j, t
+size_t	sz_val
+int	nredefs, head, i, j, t, i_len
 pointer	sp, start, namep, el1, el2, ep1, ep2
 include	"environ.com"
 
@@ -252,7 +260,8 @@ begin
 	    return (0)
 
 	call smark (sp)
-	call salloc (namep, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (namep, sz_val, TY_CHAR)
 
 	nredefs = 0
 
@@ -286,8 +295,8 @@ begin
 				E_REDEF(el2) = NO
 				nredefs = nredefs + 1
 				if (userfcn != NULL) {
-				    call strcpy (Memc[start], Memc[namep],
-					ep2 - start)
+				    i_len = ep2 - start
+				    call strcpy (Memc[start], Memc[namep], i_len )
 				    call zcall2 (userfcn,
 					Memc[namep], Memc[ep2+1])
 				}

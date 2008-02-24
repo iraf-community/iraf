@@ -14,6 +14,7 @@ procedure cnvtime (ltime, outstr, maxch)
 long	ltime			# seconds since 00:00:00 01-Jan-1980
 char	outstr[ARB]
 int	maxch
+
 int	tm[LEN_TMSTRUCT]	# broken down time structure
 string	weekday "SunMonTueWedThuFriSat"
 string	month   "JanFebMarAprMayJunJulAugSepOctNovDec"

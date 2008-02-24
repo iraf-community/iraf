@@ -10,8 +10,9 @@ define	LEN_SAVE	10
 
 procedure intr_disable()
 
+pointer	pval
 int	sp
-int	save[LEN_SAVE]
+pointer	save[LEN_SAVE]
 common	/zintde/ sp, save
 
 begin
@@ -19,7 +20,8 @@ begin
 	if (sp > LEN_SAVE)
 	    call sys_panic (1, "interrupt save stack overflow")
 
-	call zxwhen (X_INT, X_IGNORE, save[sp])
+	pval = X_IGNORE
+	call zxwhen (X_INT, pval, save[sp])
 end
 
 
@@ -27,9 +29,9 @@ end
 
 procedure intr_enable()
 
-int	junk
+pointer	junk
 int	sp
-int	save[LEN_SAVE]
+pointer	save[LEN_SAVE]
 common	/zintde/ sp, save
 
 begin
@@ -46,7 +48,7 @@ end
 procedure intr_reset()
 
 int	sp
-int	save[LEN_SAVE]
+pointer	save[LEN_SAVE]
 common	/zintde/ sp, save
 
 begin

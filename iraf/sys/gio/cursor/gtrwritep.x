@@ -21,7 +21,7 @@ include "gtr.h"
 pointer procedure gtr_writep (fd, nchars)
 
 int	fd			# graphics stream
-int	nchars			# nchars to reserve at end of buffer
+size_t	nchars			# nchars to reserve at end of buffer
 
 pointer	tr, bufp, top, segp
 int	blen, nwords, ip_offset, op_offset

@@ -16,7 +16,7 @@ long	ltime			# seconds since 00:00:00 01-Jan-1980
 char	outstr[ARB]
 int	maxch
 
-long	one_year_ago
+long	one_year_ago, c_0
 int	fd, tm[LEN_TMSTRUCT]
 
 long	clktime()
@@ -26,8 +26,9 @@ data	one_year_ago /0/
 errchk	stropen
 
 begin
+	c_0 = 0
 	if (one_year_ago == 0)
-	    one_year_ago = clktime (0) - 3600 * 24 * (365 - 31)
+	    one_year_ago = clktime (c_0) - 3600 * 24 * (365 - 31)
 
 	call brktime (ltime, tm)
 	fd = stropen (outstr, maxch, NEW_FILE)

@@ -12,15 +12,17 @@ procedure psio_xfer (fd, buf, nchars)
 
 int	fd			# output file
 char	buf[ARB]		# buffer containing record to be written
-int	nchars			# length of record
+size_t	nchars			# length of record
 
-int	ndigits
+long	lval
+size_t	ndigits
 char	numbuf[SZ_NUMBUF]
-int	itoc()
+int	ltoc()
 
 begin
 	if (nchars >= 0) {
-	    ndigits = itoc (nchars, numbuf, SZ_NUMBUF)
+	    lval = nchars
+	    ndigits = ltoc (lval, numbuf, SZ_NUMBUF)
 	    numbuf[ndigits+1] = '\n'
 	    call write (fd, numbuf, ndigits + 1)
 	    call flush (fd)

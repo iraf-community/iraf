@@ -176,7 +176,8 @@ procedure t_spawn()
 char	process[SZ_FNAME]
 char	lbuf[SZ_LINE]
 int	in, out, pid
-int	prgetline(), propen(), prclose(), strmatch()
+long	prgetline()
+int	propen(), prclose(), strmatch()
 define	done_ 91
 
 begin

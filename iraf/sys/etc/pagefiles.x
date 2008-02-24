@@ -121,9 +121,11 @@ int	first_page		# first page to be displayed
 int	clear_screen		# clear screen between pages
 int	map_cc			# map control chars on output
 
+size_t	sz_val
+long	c_0
 bool	redirin, useroot
-pointer	sp, fname, newfname, tty, lbuf
-int	spoolfd, list, nfiles, cmd, i, j, n, o
+pointer	sp, fname, newfname, tty, lbuf, list
+int	spoolfd, nfiles, cmd, i, j, n, o
 
 pointer	ttyodes(), fntopnb()
 bool	ttygetb()
@@ -134,10 +136,13 @@ errchk	fntopnb, ttyodes, ttygetb, fntrfnb, pg_pagefile, pg_getcmd
 define	err_ 91
 
 begin
+	c_0 = 0
 	call smark (sp)
-	call salloc (newfname, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (newfname, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	list = fntopnb (files, YES)
 	nfiles = fntlenb (list)
@@ -167,12 +172,12 @@ begin
 		switch (cmd) {
 		case NEXT_FILE, BLANK, NEXT_LINE, CR, LF:
 		    if (i >= nfiles)
-			cmd = pg_getcmd (tty, "no more files", 0,0,0,i,nfiles)
+			cmd = pg_getcmd (tty, "no more files", c_0,c_0,c_0,i,nfiles)
 		    else
 			break
 		case PREV_FILE:
 		    if (i <= 1)
-			cmd = pg_getcmd (tty, "at first file", 0,0,0,i,nfiles)
+			cmd = pg_getcmd (tty, "at first file", c_0,c_0,c_0,i,nfiles)
 		    else {
 			i = i - 2
 			break
@@ -210,7 +215,7 @@ begin
 		    cmd = TO_FILE
 
 		case HELP:
-		    cmd = pg_getcmd (tty, HELPTXT, 0,0,0,0,0)
+		    cmd = pg_getcmd (tty, HELPTXT, c_0,c_0,c_0,0,0)
 
 		default:
 err_		    if (!redirin) {
@@ -249,14 +254,18 @@ int	nfiles			# number of files to be paged
 bool	redirin			# reading from the standard input
 int	spoolfd			# fd if spooling output in a file
 
+size_t	sz_val
 char	patbuf[SZ_LINE]
-int	nlines, ncols, maxlines, maxcols
-long	fi[LEN_FINFO], nchars, totchars, loffset
+int	ncols, maxcols, nlines, maxlines
+long	nchars, totchars, loffset, lval, c_0
+long	fi[LEN_FINFO]
 pointer	sp, lbuf, prompt, token, cmdbuf, ip, op, lp
 long	pgoff[MAX_PAGE], pgnch[MAX_PAGE], pglno[MAX_PAGE]
-int	fd, lineno, linelen, nleft, destline, toklen, lnout, i
+int	fd, toklen, i, i_off, lnout
+long	lineno, linelen, destline, nleft
 bool	ateof, first_call, redirout, pushback, upline, upline_ok
-int	o_loffset, o_nchars, o_lineno, o_pageno, junk, pageno, cmd, ch, n
+int	o_pageno, junk, pageno, cmd, ch, n
+long	o_nchars, o_loffset, o_lineno
 
 long	note()
 pointer	lno_open()
@@ -272,11 +281,15 @@ define	search_ 93
 define	destline_ 94
 
 begin
+	c_0 = 0
 	call smark (sp)
-	call salloc (lbuf, SZ_LONGLINE, TY_CHAR)
-	call salloc (cmdbuf, SZ_LINE, TY_CHAR)
-	call salloc (prompt, SZ_FNAME, TY_CHAR)
-	call salloc (token, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LONGLINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmdbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (prompt, sz_val, TY_CHAR)
+	call salloc (token, sz_val, TY_CHAR)
 
 	if (first_call) {
 	    # The pattern buffer is retained indefinitely.
@@ -303,7 +316,7 @@ begin
 	} else if (finfo (fname, fi) == ERR) {
 	    call sprintf (Memc[lbuf], SZ_LINE, "Cannot access file `%s'")
 		call pargstr (fname)
-	    cmd = pg_getcmd (tty, Memc[lbuf], 0, 0, 0, fileno, nfiles)
+	    cmd = pg_getcmd (tty, Memc[lbuf], c_0, c_0, c_0, fileno, nfiles)
 	    call sfree (sp)
 	    return (cmd)
 	} else
@@ -313,7 +326,7 @@ begin
 	if (totchars == 0) {
 	    call sprintf (Memc[lbuf], SZ_LINE, "Null length file `%s'")
 		call pargstr (fname)
-	    cmd = pg_getcmd (tty, Memc[lbuf], 0, 0, 0, fileno, nfiles)
+	    cmd = pg_getcmd (tty, Memc[lbuf], c_0, c_0, c_0, fileno, nfiles)
 	    call sfree (sp)
 	    return (cmd)
 	}
@@ -322,13 +335,14 @@ begin
 	iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
 	    call sprintf (Memc[lbuf], SZ_LINE, "Cannot open file `%s'")
 		call pargstr (fname)
-	    cmd = pg_getcmd (tty, Memc[lbuf], 0, 0, 0, fileno, nfiles)
+	    cmd = pg_getcmd (tty, Memc[lbuf], c_0, c_0, c_0, fileno, nfiles)
 	    call sfree (sp)
 	    return (cmd)
 	}
 
 	# Open the line offset save/fetch database.
-	lp = lno_open (LNO_MAXLINES)
+	lval = LNO_MAXLINES
+	lp = lno_open (lval)
 
 	# Advance to the first page of the file to be displayed.  Pages are
 	# marked by FF chararacters in the text.  If the first page is number
@@ -593,7 +607,8 @@ quit_			call close (fd)
 			    goto err_
 
 			call pg_setprompt (Memc[prompt], u_prompt, fname)
-			call seek (fd, BOFL)
+			lval = BOFL
+			call seek (fd, lval)
 			pushback = false
 			Memc[lbuf] = EOS
 			ateof  = false
@@ -658,7 +673,7 @@ quit_			call close (fd)
 			goto search_
 
 		    case HELP:
-			cmd = pg_getcmd (tty, HELPTXT, 0, 0, 0, 0, 0)
+			cmd = pg_getcmd (tty, HELPTXT, c_0, c_0, c_0, 0, 0)
 			# get another command
 
 		    case EDIT:
@@ -682,8 +697,10 @@ quit_			call close (fd)
 			iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
 			    call sfree (sp)
 			    return (NEXT_FILE)
-			} else
-			    lp = lno_open (LNO_MAXLINES)
+			} else {
+			    lval = LNO_MAXLINES
+			    lp = lno_open (lval)
+			}
 
 			# Redisplay the file at the BOF.
 			if (!redirout) {
@@ -721,7 +738,7 @@ quit_			call close (fd)
 search_
 			    if (patbuf[1] == EOS) {
 				cmd = pg_getcmd (tty, "No current pattern",
-				    0, 0, 0, fileno, nfiles)
+				    c_0, c_0, c_0, fileno, nfiles)
 				Memc[lbuf] = EOS
 				next
 			    }
@@ -803,16 +820,18 @@ search_
 			    # for a relative move.
 
 			    destline = lineno
+			    i_off = 1
 			    if (Memc[ip] == '+') {
 				ip = ip + 1
-				if (ctoi (Memc, ip, n) > 0)
+				if (ctoi (Memc[ip], i_off, n) > 0)
 				    destline = lineno + n
 			    } else if (Memc[ip] == '-') {
 				ip = ip + 1
-				if (ctoi (Memc, ip, n) > 0)
+				if (ctoi (Memc[ip], i_off, n) > 0)
 				    destline = lineno - n
-			    } else if (ctoi (Memc, ip, n) > 0)
+			    } else if (ctoi (Memc[ip], i_off, n) > 0)
 				destline = n
+			    ip = ip + i_off - 1
 destline_
 			    # Upscroll one line?
 			    if (upline_ok && destline == lineno-2)
@@ -838,7 +857,8 @@ destline_
 
 			    if (lno_fetch(lp,destline,loffset,nchars)==ERR) {
 				if (!redirin && destline < lineno) {
-				    call seek (fd, BOFL)
+				    lval = BOFL
+				    call seek (fd, lval)
 				    pushback = false
 				    lineno = 1
 				    pageno = 1
@@ -940,7 +960,7 @@ destline_
 			} else {
 			    cmd = pg_getcmd (tty,
 			    "colon cmds: :!cmd :/pat :line L :file F :spool F",
-				0, 0, 0, 0, 0)
+				c_0, c_0, c_0, 0, 0)
 			}
 
 		    default:
@@ -1012,7 +1032,7 @@ pointer	tty			# tty descriptor
 char	fname[ARB]		# prefix string
 long	nchars			# position in file
 long	totchars		# size of file
-int	lineno			# current line number
+long	lineno			# current line number
 int	fileno			# current file number
 int	nfiles			# nfiles being paged through
 
@@ -1049,12 +1069,12 @@ begin
 		call eprintf ("-(EOF)")
 	    else {
 		call eprintf ("-(%02d%%)")
-		    call pargi (max(0, min(99, nchars * 100 / totchars)))
+		    call pargl (max(0, min(99, nchars * 100 / totchars)))
 	    }
 	}
 	if (lineno > 0) {
 	    call eprintf ("-line %d")
-		call pargi (lineno - 1)
+		call pargl (lineno - 1)
 	}
 	if (fileno > 0 && nfiles > 0) {
 	    call eprintf ("-file %d of %d")

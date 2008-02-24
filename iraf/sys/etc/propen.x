@@ -20,6 +20,7 @@ int procedure propen (process, in, out)
 char	process[ARB]		# filename of executable file
 int	in, out			# input, output file descriptors to child
 
+size_t	sz_val
 int	pid, print_redefined_variables, status
 pointer	sp, cwd
 int	propcpr()
@@ -28,7 +29,8 @@ errchk	propcpr, envlist, putline, putci
 
 begin
 	call smark (sp)
-	call salloc (cwd, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (cwd, sz_val, TY_CHAR)
 
 	# Connect the subprocess with read and write IPC channels.
 
@@ -46,7 +48,8 @@ begin
 	# cwd name, an expensive operation on some systems.
 
 	call zfgcwd (Memc[cwd], SZ_PATHNAME, status)
-	call strupk (Memc[cwd], Memc[cwd], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (Memc[cwd], Memc[cwd], sz_val)
 	call putline (out, "chdir ")
 	call putline (out, Memc[cwd])
 	call putci (out, '\n')

@@ -36,6 +36,7 @@ trying to send error messages to the CL.
 procedure erract (severity)
 
 int	severity
+
 int	op
 pointer	jumpbuf[LEN_JUMPBUF]
 char	wmsg[SZ_LINE]

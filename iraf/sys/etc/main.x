@@ -138,8 +138,10 @@ int	jobcode			# jobcode if detached process
 extern	sys_runtask()		# client task execution procedure
 extern	onentry()		# client onentry procedure
 
+size_t	sz_val
 bool	networking
-int	inchan, outchan, errchan, driver, devtype
+int	inchan, outchan, errchan, devtype
+pointer	driver
 char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
 pointer	jumpbuf[LEN_JUMPBUF]
@@ -202,11 +204,12 @@ begin
 	call erract (OK)				# init error handling
 	call onerror (DUMMY)				# init onerror
 	call onexit  (DUMMY)				# init onexit 
-	call finit()					# initialize FIO
+	call finit(0)					# initialize FIO
 	call clopen (inchan, outchan, errchan, driver, devtype)
 	call clseti (CL_PRTYPE, prtype)
 	call clc_init()					# init param cache
-	call strupk (bkgfile, bkgfname, SZ_FNAME)
+	sz_val = SZ_FNAME
+	call strupk (bkgfile, bkgfname, sz_val)
 
 	# If we are running as a host process (no IRAF parent process) look
 	# for the file "zzsetenv.def" in the current directory and then in
@@ -525,7 +528,8 @@ procedure sys_scanarglist (cmdin, i_args)
 int	cmdin			# command input stream
 char	i_args[ARB]		# (first part of) argument list
 
-int	fd
+size_t	sz_val
+int	fd, i_off
 char	ch
 bool	skip
 pointer	sp, fname, args, ip, op
@@ -533,8 +537,10 @@ int	getlline()
 
 begin
 	call smark (sp)
-	call salloc (args, SZ_CMDBUF, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_CMDBUF
+	call salloc (args, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call strcpy (i_args, Memc[args], SZ_CMDBUF)
 
@@ -588,9 +594,14 @@ begin
 		call sys_getpars (Memc[fname])
 
 	    } else if (IS_ALPHA(ch) || ch == '_' || ch == '$') {
-		call sys_paramset (Memc, ip, skip)
-	    } else
-		call sys_redirect (Memc, ip)
+		i_off = 1
+		call sys_paramset (Memc[ip], i_off, skip)
+		ip = ip + i_off - 1
+	    } else {
+		i_off = 1
+		call sys_redirect (Memc[ip], i_off)
+		ip = ip + i_off - 1
+	    }
 	}
 
 	call sfree (sp)
@@ -604,15 +615,17 @@ procedure sys_getpars (fname)
 
 char	fname			# pset file
 
+size_t	sz_val
 bool	skip
-int	lineno, fd
+int	lineno, fd, i_off
 pointer	sp, lbuf, ip
 int	open(), getlline()
 errchk	open, getlline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_CMDBUF, TY_CHAR)
+	sz_val = SZ_CMDBUF
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
@@ -626,7 +639,9 @@ begin
 		;
 	    if (Memc[ip] == '#' || Memc[ip] == '\n')
 		next
-	    iferr (call sys_paramset (Memc, ip, skip)) {
+	    i_off = 1
+	    iferr (call sys_paramset (Memc[ip], i_off, skip)) {
+		ip = ip + i_off - 1
 		for (;  Memc[ip] != EOS && Memc[ip] != '\n';  ip=ip+1)
 		    ;
 		Memc[ip] = EOS
@@ -651,13 +666,16 @@ char	args[ARB]		# argument list
 int	ip			# pointer to first char of argument
 bool	skip			# skip whitespace within "param=value" args
 
+size_t	sz_val
 pointer	sp, param, value, op
 int	stridx()
 
 begin
 	call smark (sp)
-	call salloc (param, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_VALSTR, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
+	sz_val = SZ_VALSTR
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Extract the param field.
 	op = param
@@ -725,6 +743,7 @@ procedure sys_redirect (args, ip)
 char	args[ARB]		# argument list
 int	ip			# pointer to first char of redir arg
 
+size_t	sz_val
 pointer	sp, fname
 int	fd, mode, type
 int	ctoi()
@@ -733,7 +752,8 @@ errchk	fredir, fseti
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Get number of stream (0 if not given).
 	if (ctoi (args, ip, fd) <= 0)

@@ -32,6 +32,7 @@ int	prtype			#I process type (connected, detached, host)
 char	bkgfile[ARB]		#I osfn of bkg file, if detached process
 char	cmd[ARB]		#I command argument string, if any
 
+size_t	sz_val
 char	osfn[SZ_FNAME]
 int	chan, i, fd[NFD]
 pointer	loc_zgettx
@@ -46,7 +47,8 @@ begin
 	    # that we do not wish to use FREDIR as that would preclude
 	    # redirection on the command line.
 
-	    call strpak (bkgfile, osfn, SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call strpak (bkgfile, osfn, sz_val)
 	    call zopntx (osfn, READ_ONLY, chan)
 	    if (chan == ERR)
 		call sys_panic (EA_FATAL, "Cannot open bkgfile")

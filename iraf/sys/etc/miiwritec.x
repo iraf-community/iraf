@@ -9,10 +9,11 @@ int procedure miiwritec (fd, spp, nchars)
 
 int	fd			# output file
 char	spp[ARB]		# data to be written
-int	nchars			# number of chars units to be written
+size_t	nchars			# number of chars units to be written
 
 pointer	sp, bp
-int	bufsize, status
+size_t	bufsize
+int	status
 int	miipksize()
 
 begin

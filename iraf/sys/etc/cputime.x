@@ -5,7 +5,9 @@
 
 long procedure cputime (old_cputime)
 
-long	old_cputime, new_cputime
+long	old_cputime
+
+long	new_cputime
 long	clk_time
 
 begin

@@ -5,15 +5,17 @@ include <mii.h>
 # MIIREAD -- Read a block of data stored externally in MII format.
 # Data is returned in the format of the local host machine.
 
-int procedure miireadi (fd, spp, maxelem)
+long procedure miireadi (fd, spp, maxelem)
 
 int	fd			#I input file
 int	spp[ARB]		#O receives data
-int	maxelem			# max number of data elements to be read
+size_t	maxelem			# max number of data elements to be read
 
+size_t	sz_val
 pointer	sp, bp
-int	pksize, nchars, nelem
-int	miipksize(), miinelem()
+size_t	pksize
+long	nchars, nelem
+size_t	miipksize(), miinelem()
 long	read()
 errchk	read()
 
@@ -29,8 +31,10 @@ begin
 
 	    nchars = read (fd, Memc[bp], pksize)
 	    if (nchars != EOF) {
-		nelem = min (maxelem, miinelem (nchars, MII_INT))
-		call miiupki (Memc[bp], spp, nelem, TY_INT)
+		sz_val = nchars
+		nelem = min (maxelem, miinelem (sz_val, MII_INT))
+		sz_val = nelem
+		call miiupki (Memc[bp], spp, sz_val, TY_INT)
 	    }
 
 	    call sfree (sp)
@@ -40,8 +44,10 @@ begin
 
 	    nchars = read (fd, spp, pksize)
 	    if (nchars != EOF) {
-		nelem = min (maxelem, miinelem (nchars, MII_INT))
-		call miiupki (spp, spp, nelem, TY_INT)
+		sz_val = nchars
+		nelem = min (maxelem, miinelem (sz_val, MII_INT))
+		sz_val = nelem
+		call miiupki (spp, spp, sz_val, TY_INT)
 	    }
 	}
 

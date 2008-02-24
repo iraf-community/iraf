@@ -16,8 +16,10 @@ char	key[ARB]		# environment variable name
 char	value[maxch]		# string value (output)
 int	maxch
 
+size_t	sz_val
 char	buf[SZ_FNAME]
-int	nchars, junk, in, out, ip
+long	nchars, ip, junk
+int	in, out
 pointer	ttydriver
 int	gstrcpy(), envfind(), fstati(), strlen(), envputs()
 pointer	fstatp()
@@ -42,14 +44,18 @@ begin
 
 	if (fstatp (CLIN, F_DEVICE) == ttydriver) {
 	    # Issue prompt, format "env.key: "
-	    call zputty (out, "env.", 4, junk)
-	    call zputty (out, key, strlen(key), junk)
-	    call zputty (out, ": ", 2, junk)
+	    sz_val = 4
+	    call zputty (out, "env.", sz_val, junk)
+	    sz_val = strlen(key)
+	    call zputty (out, key, sz_val, junk)
+	    sz_val = 2
+	    call zputty (out, ": ", sz_val, junk)
 	    call zflsty (out, junk)
 
 	    # Get value and enter in envlist, excluding the trailing newline.
 
-	    call zgetty (in, buf, SZ_FNAME, nchars)
+	    sz_val = SZ_FNAME
+	    call zgetty (in, buf, sz_val, nchars)
 	    if (nchars <= 0)
 		return (0)
 	    for (ip=1;  buf[ip] != '\n' && ip <= nchars;  ip=ip+1)

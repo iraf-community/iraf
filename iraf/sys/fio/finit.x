@@ -11,7 +11,9 @@ include	<fio.h>
 # Mark all file descriptors empty and install drivers for the standard file 
 # defices, i.e., text file, binary file, terminal, and IPC.
 
-procedure finit()
+procedure finit(dummy)
+
+int	dummy
 
 int	fd, first_time
 long	lval

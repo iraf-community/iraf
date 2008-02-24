@@ -9,11 +9,12 @@ int procedure miiwritei (fd, spp, nelem)
 
 int	fd			#I output file
 int	spp[ARB]		#I native format data to be written
-int	nelem			#I number of data elements to be written
+size_t	nelem			#I number of data elements to be written
 
 pointer	sp, bp
-int	bufsize, status
-int	miipksize()
+size_t	bufsize
+int	status
+size_t	miipksize()
 
 begin
 	status = OK

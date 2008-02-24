@@ -16,20 +16,22 @@ define	XFER		1
 # on any file; pseudofile directives are recognized and process only if the
 # FD is associated with a connected subprocess.
 
-int procedure prgetline (fd, lbuf)
+long procedure prgetline (fd, lbuf)
 
 int	fd			# parent's input IPC from child process
 char	lbuf[SZ_LINE]		# output line buffer
 
 char	ch
-int	nchars, maxchars, nchars_read, raw_mode_set, ndigits
-int	bufsize, outfd, destfd, pr, pseudofile, line_type, offset
+int	raw_mode_set
+long	lnchars
+size_t	maxchars, nchars, bufsize, ndigits
+int	outfd, destfd, pr, pseudofile, line_type, offset
 pointer	sp, buf, ip
 
 char	getc()
-int	getline(), fstati(), ctoi(), itoc()
-long	read()
-errchk	syserr, getline, fstati, read, write, pr_decodeargs, putc, getc
+int	getline(), fstati(), ctol(), ltoc()
+long	read(), fstatl()
+errchk	syserr, getline, fstati, fstatl, read, write, pr_decodeargs, putc, getc
 include	"prc.com"
 
 begin
@@ -40,7 +42,7 @@ begin
 	raw_mode_set = 0
 
 	repeat {
-	    nchars = getline (fd, lbuf)
+	    lnchars = getline (fd, lbuf)
 
 	    # Return immediately if not XMIT or XFER directive.  This code is
 	    # exercised heavily when performing raw mode i/o, hence some
@@ -53,7 +55,7 @@ begin
 	    # the data block in chars.  In the following code all explicit
 	    # integer constants refer to the character offsets shown above.
 
-	    if (lbuf[1] != 'x' || nchars == EOF) {
+	    if (lbuf[1] != 'x' || lnchars == EOF) {
 		break
 	    } else if (lbuf[2] == 'm') {
 		if (lbuf[3] == 'i' && lbuf[4] == 't' && lbuf[5] == '(') {
@@ -141,20 +143,21 @@ begin
 	    # stream and transmit it to the other stream.
 
 	    if (buf == NULL) {
-		bufsize = fstati (fd, F_BUFSIZE)
+		bufsize = fstatl (fd, F_BUFSIZE)
 		call salloc (buf, bufsize, TY_CHAR)
 	    }
 	    
 	    offset = 8
-	    if (ctoi (lbuf, offset, nchars) <= 0)
+	    if (ctol (lbuf, offset, lnchars) <= 0)
 		call syserr (SYS_PRIPCSYNTAX)
 
 	    if (line_type == XMIT) {
 		# XMIT -- Copy the block of data from the IPC channel to the
 		# destination file.
 
-		nchars_read = read (fd, Memc[buf], nchars)
-		if (nchars_read != nchars)
+		nchars = lnchars
+		lnchars = read (fd, Memc[buf], nchars)
+		if (lnchars != nchars)
 		    call syserr (SYS_PRIPCSYNTAX)
 		else {
 		    # Clear RAW input mode if set and newline is encountered
@@ -179,16 +182,17 @@ begin
 		# XFER -- Read up to maxchars chars from the input file and
 		# pass them on to the output IPC channel.
 
-		maxchars = min (nchars, bufsize)
-		nchars = read (destfd, Memc[buf], maxchars)
-		if (nchars == EOF)
-		    nchars = 0
+		maxchars = min (lnchars, bufsize)
+		lnchars = read (destfd, Memc[buf], maxchars)
+		if (lnchars == EOF)
+		    lnchars = 0
+		nchars = lnchars
 
 		# Write the byte count record followed by the data record.
 		# These must be written as two separate records or deadlock
 		# will occur (with the reader waiting for the second record).
 
-		ndigits = itoc (nchars, lbuf, SZ_LINE)
+		ndigits = ltoc (lnchars, lbuf, SZ_LINE)
 		lbuf[ndigits+1] = '\n'
 		call write (outfd, lbuf, ndigits + 1)
 		call flush (outfd)
@@ -201,5 +205,5 @@ begin
 	}
 
 	call sfree (sp)
-	return (nchars)
+	return (lnchars)
 end
