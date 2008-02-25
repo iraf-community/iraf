@@ -59,9 +59,9 @@ int	pseudofile, destfd, destpr, destination, ps, flags
 bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
 long	filbuf(), read()
-int	strncmp()
+int	strncmp(), absi()
 long	fstatl()
-int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3()
+int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3(), modi()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
 include	<fio.com>
@@ -145,7 +145,7 @@ begin
 			filter_gki = false
 		    
 		    if (destination > KSHIFT) {
-			destfd = mod (destination, KSHIFT)
+			destfd = modi (destination, KSHIFT)
 			destpr = destination / KSHIFT
 		    } else {
 			destfd = destination
@@ -445,9 +445,9 @@ begin
 
 		    nchars = fstatl (ps, F_FILESIZE)
 		    if (nchars > 0) {
-			destination = abs(pr_pstofd[pr,ps])
+			destination = absi(pr_pstofd[pr,ps])
 			if (destination > KSHIFT) {
-			    destfd = mod (destination, KSHIFT)
+			    destfd = modi (destination, KSHIFT)
 			    destpr = destination / KSHIFT
 			} else {
 			    destfd = destination

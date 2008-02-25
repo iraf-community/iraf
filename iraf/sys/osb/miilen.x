@@ -12,7 +12,9 @@ size_t procedure miilen (nelems, mii_datatype)
 size_t	nelems			#I number of MII data elements
 int	mii_datatype		#I datatype of MII data
 
+int	absi()
+
 begin
-	return (((nelems * abs(mii_datatype) / NBITS_BYTE + SZB_CHAR - 1) /
+	return (((nelems * absi(mii_datatype) / NBITS_BYTE + SZB_CHAR - 1) /
 	    SZB_CHAR + SZ_INT - 1) / SZ_INT)
 end

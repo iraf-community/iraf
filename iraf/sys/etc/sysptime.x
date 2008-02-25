@@ -32,7 +32,7 @@ int	op, junk
 char	obuf[SZ_OBUF]
 long	new_clk, new_cpu
 int	d_clk, d_cpu, msec, sec, percent
-int	itoc()
+int	itoc(), modi()
 
 begin
 	call zgtime (new_clk, new_cpu)
@@ -49,7 +49,7 @@ begin
 	# Output the cpu time in seconds.
 	op = itoc (d_cpu / 1000, obuf, SZ_OBUF) + 1
 	obuf[op] = '.'; op = op + 1
-	msec = mod (d_cpu, 1000)
+	msec = modi (d_cpu, 1000)
 	if (msec < 100) {
 	    obuf[op] = '0'; op = op + 1
 	}
@@ -64,9 +64,9 @@ begin
 	call putci (fd, ' ')
 	op = itoc (d_clk / 60, obuf, SZ_OBUF) + 1
 	obuf[op] = ':'; op = op + 1
-	sec = mod (d_clk, 60)
+	sec = modi (d_clk, 60)
 	obuf[op] = TO_DIGIT(sec/10); op = op + 1
-	obuf[op] = TO_DIGIT(mod(sec,10)); op = op + 1
+	obuf[op] = TO_DIGIT(modi(sec,10)); op = op + 1
 	obuf[op] = EOS
 	call putline (fd, obuf)
 
