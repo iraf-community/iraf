@@ -23,7 +23,7 @@ char	immagic[SZ_IMMAGIC]
 int	sulen_userarea, hdrlen, nchars, status
 
 bool	streq()
-int	miireadc(), miireadi(), miireadl(), miireadr()
+long	miireadc(), miireadi(), miireadl(), miireadr()
 int	btoi()
 long	read()
 

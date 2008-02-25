@@ -18,7 +18,7 @@ int	fd			# file from which symbol table is to be read
 
 int	nelem
 pointer	stp, stab, sbuf, index
-int	miireadc(), miireadi()
+long	miireadc(), miireadi()
 errchk	miireadc, miireadi
 define	readerr_ 91
 

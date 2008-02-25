@@ -17,8 +17,8 @@ int	maxch			#I max chars out
 
 int	fd, nchars
 pointer	sp, bp, sv, text, fname, extn
-int	open(), miireadc(), miireadi(), fnextn()
-long	read()
+int	open(), fnextn()
+long	read(), miireadc(), miireadi()
 errchk	open, read, syserrs
 define	err_ 91
 

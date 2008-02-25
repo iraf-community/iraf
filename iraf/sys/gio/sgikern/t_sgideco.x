@@ -16,7 +16,8 @@ pointer	sp, fname, mcbuf, ip, itop, list
 int	fd, verbose, gkiunits, nwords
 
 bool	clgetb()
-int	clgfil(), clplen(), open(), btoi(), miireads()
+int	clgfil(), clplen(), open(), btoi()
+long	miireads()
 pointer	clpopni()
 
 begin
