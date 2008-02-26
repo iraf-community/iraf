@@ -44,7 +44,7 @@ $special "sys$vops/lz/":	amovc.x		host$sys/amovc.c
 				amovd.x		host$sys/amovd.c
 				;
 
-$set	XBIG	= '& "$xc -c -w -/Nx512 -/Ns3072 &"'
+$set	XBIG	= '& "$xc -c -/ARw8 -/Nx512 -/Ns3072 &"'
 $special "sys$fmtio/":		evvexpr.x	$(XBIG)	;
 
 $set    XNL     = '& "$xc -c -/NL400 &"'
