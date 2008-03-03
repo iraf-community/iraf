@@ -8,11 +8,11 @@ DIR_TARGETS="sys"
 #DIR_TARGETS="tables"
 
 FILE_LIST=`find $DIR_FUNCS | grep -v '\.svn' | grep '\.x$'`
-#echo $FILE_LIST
+#echo flielist = $FILE_LIST
 
-FUNC_LIST=`grep '^[	]*[a-z][a-z]*[ 	]procedure' $FILE_LIST | tr '\t' ' ' | sed -e 's/^.*://' -e 's/ procedure /%/g' -e 's/(.*//'`
+FUNC_LIST=`grep '^[	]*[a-z][a-z_]*[ 	]procedure' $FILE_LIST | tr '\t' ' ' | sed -e 's/^.*://' -e 's/ procedure /%/g' -e 's/(.*//'`
 
-#echo $FUNC_LIST
+#echo funclist = $FUNC_LIST
 
 for i in $DIR_TARGETS; do
   FILE_LIST=`find $i | grep -v '\.svn' | grep '\.[g]*x$'`
