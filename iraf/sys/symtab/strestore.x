@@ -16,10 +16,11 @@ pointer procedure strestore (fd)
 
 int	fd			# file from which symbol table is to be read
 
-int	nelem
+size_t	sz_val
+size_t	nelem
 pointer	stp, stab, sbuf, index
-long	miireadc(), miireadi()
-errchk	miireadc, miireadi
+long	miireadc(), miireadi(), miireadp()
+errchk	miireadc, miireadi, miireadp
 define	readerr_ 91
 
 begin
@@ -28,8 +29,9 @@ begin
 	sbuf  = NULL
 
 	# Read symbol table descriptor.
-	call malloc (stp, LEN_SYMTAB, TY_STRUCT)
-	if (miireadi (fd, Memi[stp], LEN_SYMTAB) < LEN_SYMTAB)
+	sz_val = LEN_SYMTAB
+	call malloc (stp, sz_val, TY_STRUCT)
+	if (miireadp (fd, Memp[stp], sz_val) < LEN_SYMTAB)
 	    goto readerr_
 
 	if (ST_MAGIC(stp) != MAGIC)
@@ -44,7 +46,7 @@ begin
 	# Read the symbol table data.
 	nelem = ST_STABLEN(stp)
 	call malloc (stab, nelem, TY_STRUCT)
-	if (miireadi (fd, Memi[stab], nelem) < nelem)
+	if (miireadp (fd, Memp[stab], nelem) < nelem)
 	    goto readerr_
 
 	# Read the string buffer.

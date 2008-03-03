@@ -14,10 +14,11 @@ char	key[ARB]		# symbol name
 pointer	symbols[max_symbols]	# pointers to the symstructs
 int	max_symbols
 
-long	sum
+long	sum, lval
 char	first_char
 int	head, ip, nsym, thread
 pointer	el, cp, stab, sbuf
+long	modl()
 
 begin
 	# When a symbol is entered in the table a flag is set in the ST_ASCII
@@ -41,7 +42,8 @@ begin
 	    sum = sum + (sum + key[ip])
 	}
 
-	thread = mod (sum, ST_INDEXLEN(stp))
+	lval = ST_INDEXLEN(stp)
+	thread = modl (sum, lval)
 	head = Memi[ST_INDEX(stp)+thread]
 
 	# If thread is not empty search down it for the named key and return

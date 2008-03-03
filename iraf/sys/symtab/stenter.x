@@ -13,10 +13,11 @@ pointer	stp			# symbol table descriptor
 char	key[ARB]		# symbol name
 int	u_symlen		# length of user part of symstruct (su)
 
-long	sum
+long	sum, lval
 pointer	el, tp
 int	symlen, new_symbol, thread, ip
 int	stpstr(), stalloc()
+long	modl()
 errchk	stalloc, stpstr
 
 begin
@@ -31,7 +32,8 @@ begin
 	    sum = sum + (sum + key[ip])
 	}
 
-	thread = mod (sum, ST_INDEXLEN(stp))
+	lval = ST_INDEXLEN(stp)
+	thread = modl (sum, lval)
 	tp = ST_INDEX(stp) + thread
 
 	# Allocate space in STAB.

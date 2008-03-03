@@ -33,12 +33,12 @@ begin
 	# Print information on memory usage.
 	call fprintf (fd,
 	    "index=(%x,%d), stab=(%x,%d,%d%%), sbuf=(%x,%d,%d%%)\n")
-	    call pargi (index)
+	    call pargp (index)
 	    call pargi (ST_INDEXLEN(stp))
-	    call pargi (stab)
+	    call pargp (stab)
 	    call pargi (ST_STABLEN(stp))
 	    call pargr (ST_STABOP(stp) * 100.0 / ST_STABLEN(stp))
-	    call pargi (sbuf)
+	    call pargp (sbuf)
 	    call pargi (ST_SBUFLEN(stp))
 	    call pargr (ST_SBUFOP(stp) * 100.0 / ST_SBUFLEN(stp))
 

@@ -10,12 +10,16 @@ int procedure stsize (stp)
 
 pointer	stp			# symbol table descriptor
 
+size_t	sz1, sz2, sz3
 int	size
-int	miipksize()
+size_t	miipksize()
 
 begin
-	size = miipksize (LEN_SYMTAB + ST_INDEXLEN(stp) + ST_STABLEN(stp),
-	    MII_LONG) + miipksize (ST_SBUFLEN(stp), MII_BYTE)
+	sz1 = LEN_SYMTAB + ST_STABLEN(stp)
+	sz2 = ST_INDEXLEN(stp)
+	sz3 = ST_SBUFLEN(stp)
+	size = miipksize (sz1, MII_LONGLONG) + 
+		miipksize (sz2, MII_INT) + miipksize (sz3, MII_BYTE)
 
 	return (size)
 end

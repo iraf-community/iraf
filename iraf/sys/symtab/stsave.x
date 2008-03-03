@@ -14,13 +14,16 @@ procedure stsave (stp, fd)
 pointer	stp			# symtab descriptor
 int	fd			# output file
 
-int	nelem
-int	ip, itop
-errchk	miiwritei, miiwritec
+size_t	sz_val
+size_t	nelem
+pointer	ip, itop
+errchk	miiwritei, miiwritec, miiwritep
 
 begin
-	call miiwritei (fd, Memi[stp], LEN_SYMTAB)
-	call miiwritei (fd, Memi[ST_INDEX(stp)], ST_INDEXLEN(stp))
+	sz_val = LEN_SYMTAB
+	call miiwritep (fd, Memp[stp], sz_val)
+	sz_val = ST_INDEXLEN(stp)
+	call miiwritei (fd, Memi[ST_INDEX(stp)], sz_val)
 
 	# Since the symbol table can be very large, write it out in chunks
 	# of a reasonable size to avoid allocating large buffers.
@@ -28,7 +31,7 @@ begin
 	itop = ST_STABP(stp) + ST_STABLEN(stp)
 	for (ip=ST_STABP(stp);  ip < itop;  ip=ip+nelem) {
 	    nelem = min (SZ_BLOCK, itop - ip)
-	    call miiwritei (fd, Memi[ip], nelem)
+	    call miiwritep (fd, Memp[ip], nelem)
 	}
 
 	# Ditto for the string buffer.

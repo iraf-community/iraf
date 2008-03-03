@@ -17,16 +17,16 @@ define	ST_NAME		Memi[P2I($1+1)]	# optional name for symbol table
 define	ST_LASTSYMBOL	Memi[P2I($1+2)]	# last element entered
 define	ST_NSYMBOLS	Memi[P2I($1+3)]	# number of symbols in table
 			# (extra space)
-define	ST_INDEX	Memi[P2I($1+5)]	# pointer to buffer of thread indices
+define	ST_INDEX	Memp[$1+5]	# pointer to buffer of thread indices
 define	ST_INDEXLEN	Memi[P2I($1+6)]	# length of index
 			# (extra space)
-define	ST_SBUFP	Memi[P2I($1+10)]	# string buffer
+define	ST_SBUFP	Memp[$1+10]	# string buffer
 define	ST_SBUFLEN	Memi[P2I($1+11)]	# current size of string buffer
 define	ST_SBUFOP	Memi[P2I($1+12)]	# next location in string buffer
 define	ST_SBUFINC	Memi[P2I($1+13)]	# increment if overflow occurs
 define	ST_SBUFNGROW	Memi[P2I($1+14)]	# number of reallocs of sbuf
 			# (extra space)
-define	ST_STABP	Memi[P2I($1+20)]	# symbol table
+define	ST_STABP	Memp[$1+20]	# symbol table
 define	ST_STABLEN	Memi[P2I($1+21)]	# symbol table length
 define	ST_STABOP	Memi[P2I($1+22)]	# next location in symbol table
 define	ST_STABINC	Memi[P2I($1+23)]	# increment if overflow occurs
