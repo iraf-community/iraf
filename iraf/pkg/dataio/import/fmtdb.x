@@ -292,10 +292,10 @@ pointer procedure fdb_scan_records (fd, keyword, getop, opdata, fcn, fcndata)
 
 int	fd					#i input binary file descriptor
 char	keyword[ARB]				#i keyword to be evaluated
-int	getop					#i func to get an operand
-int	opdata					#i data pointer for getop
-int	fcn					#i user functions in evvexpr
-int	fcndata					#i data pointer for fcn
+pointer	getop					#i func to get an operand
+pointer	opdata					#i data pointer for getop
+pointer	fcn					#i user functions in evvexpr
+pointer	fcndata					#i data pointer for fcn
 
 pointer	sp, expr, fm
 pointer	fmt, o

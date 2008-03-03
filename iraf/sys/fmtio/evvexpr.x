@@ -28,7 +28,7 @@ Operand struct (base$evvexpr.h):
 
 	struct operand {
 		int	O_TYPE			# operand type (bcsilrd)
-		int	O_LEN			# operand length (0=scalar)
+		size_t	O_LEN			# operand length (0=scalar)
 		int	O_FLAGS			# O_FREEVAL, O_FREEOP
 		union {
 			char*	O_VALC		# string
@@ -159,15 +159,16 @@ define	T_D		TY_DOUBLE
 pointer procedure evvexpr (expr, getop, getop_data, ufcn, ufcn_data, flags)
 
 char	expr[ARB]		#I expression to be evaluated
-int	getop			#I user supplied get operand procedure
-int	getop_data		#I client data for above function
-int	ufcn			#I user supplied function call procedure
-int	ufcn_data		#I client data for above function
+pointer	getop			#I user supplied get operand procedure
+pointer	getop_data		#I client data for above function
+pointer	ufcn			#I user supplied function call procedure
+pointer	ufcn_data		#I client data for above function
 int	flags			#I flag bits
 
 int	junk
 pointer	sp, ip
 bool	debug, first_time
+size_t	sz_val
 int	strlen(), xvv_parse(), xvv_gettok()
 pointer	xvv_loadsymbols()
 extern	xvv_gettok()
@@ -194,10 +195,12 @@ begin
 	ev_flags = flags
 
 	# Allocate an operand struct for the expression value.
-	call calloc (ev_oval, LEN_OPERAND, TY_STRUCT)
+	sz_val = LEN_OPERAND
+	call calloc (ev_oval, sz_val, TY_STRUCT)
 
 	# Make a local copy of the input string.
-	call salloc (ip, strlen(expr), TY_CHAR)
+	sz_val = strlen(expr)
+	call salloc (ip, sz_val, TY_CHAR)
 	call strcpy (expr, Memc[ip], ARB)
 
 	# Evaluate the expression.  The expression value is copied into the
@@ -253,10 +256,10 @@ define	GE		283
 define	UMINUS		284
 define	yyclearin	yychar = -1
 define	yyerrok		yyerrflag = 0
-define	YYMOVE		call amovp (Memp[$1], Memp[$2], YYOPLEN)
+define	YYMOVE		call yy_move (Memp[$1], Memp[$2], YYOPLEN)
 define	YYERRCODE	256
 
-# line 454 "evvexpr.y"
+# line 459 "evvexpr.y"
 
 
 # End generic preprocessor escape.
@@ -274,7 +277,8 @@ pointer	out			#I output operand
 
 short	val_s
 long	val_l
-int	val_i, nelem
+int	val_i
+size_t	nelem
 errchk	xvv_error, xvv_initop
 string	s_badswitch "unop: bad switch"
 
@@ -455,7 +459,9 @@ double	xvv_nulld()
 extern	xvv_nulld()
 
 pointer	sp, otemp, p1, p2, po
-int	dtype, nelem, len1, len2
+int	dtype
+size_t	len1, len2, nelem
+size_t	sz_val
 include	"evvexpr.com"
 
 int	xvv_newtype(), strlen()
@@ -522,7 +528,8 @@ begin
 	    case PLUS:
 		# Swap operands.
 		call smark (sp)
-		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
+		sz_val = LEN_OPERAND
+		call salloc (otemp, sz_val, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -1147,7 +1154,9 @@ real	v_r
 double	v_d
 
 pointer	sp, otemp, p1, p2, po
-int	dtype, nelem, len1, len2
+int	dtype
+size_t	len1, len2, nelem
+size_t	sz_val
 int	xvv_newtype(), xvv_patmatch(), strncmp(), btoi()
 errchk	xvv_newtype, xvv_initop, xvv_chtype, xvv_error
 string	s_badop "boolop: illegal operation"
@@ -1199,7 +1208,8 @@ begin
 	    switch (opcode) {
 	    case EQ, NE:
 		call smark (sp)
-		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
+		sz_val = LEN_OPERAND
+		call salloc (otemp, sz_val, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -1643,14 +1653,19 @@ char	pat[ARB]		#I pattern
 
 int	junk, ip, index
 pointer	sp, patstr, patbuf, op
+size_t	sz_val
 int	patmake(), patmatch()
 
 begin
 	call smark (sp)
-	call salloc (patstr, SZ_FNAME, TY_CHAR)
-	call salloc (patbuf, SZ_LINE,  TY_CHAR)
-	call aclrc (Memc[patstr], SZ_FNAME)
-	call aclrc (Memc[patbuf], SZ_LINE)
+	sz_val = SZ_FNAME
+	call salloc (patstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patbuf, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[patstr], sz_val)
+	sz_val = SZ_LINE
+	call aclrc (Memc[patbuf], sz_val)
 
 	# Map pattern, changing '*' into '?*'.
 	op = patstr
@@ -1720,7 +1735,10 @@ pointer	cond			#I pointer to condition operand
 pointer	in1, in2		#I pointer to true,false operands
 pointer	out			#I pointer to output operand
 
-int	dtype, nelem, i
+int	dtype
+long	i
+size_t	nelem
+size_t	sz_val
 pointer	sp, otemp, ip1, ip2, op, sel
 errchk	xvv_error, xvv_newtype, xvv_initop, xvv_chtype
 int	xvv_newtype(), btoi()
@@ -1783,7 +1801,8 @@ begin
 
 	    if (O_LEN(in1) == 0 && O_LEN(in2) > 0) {
 		call smark (sp)
-		call salloc (otemp, LEN_OPERAND, TY_STRUCT)
+		sz_val = LEN_OPERAND
+		call salloc (otemp, sz_val, TY_STRUCT)
 		YYMOVE (in1, otemp)
 		YYMOVE (in2, in1)
 		YYMOVE (otemp, in2)
@@ -2057,12 +2076,17 @@ double	asuml(), asumd()
 
 bool	rangecheck
 int	optype, opcode
-int	chunk, repl, nelem, v_nargs, ch, shift, i, j
+int	v_nargs, ch, i_val, i_off
+long	i, j, shift
+size_t	chunk, repl, nelem
+size_t	sz_val
 pointer	sp, sym, buf, ap, ip, op, in1, in2
 include	"evvexpr.com"
 
 pointer	stfind()
-int	xvv_newtype(), strlen(), gctod(), btoi()
+short	mods()
+int	xvv_newtype(), strlen(), gctod(), btoi(), absi(), modi()
+long	absl(), modl()
 errchk	xvv_chtype, xvv_initop, xvv_newtype, xvv_error1, xvv_error2
 errchk	zcall5, malloc
 
@@ -2071,7 +2095,8 @@ define	free_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Lookup the function name in the symbol table.
 	sym = stfind (ev_st, fcn)
@@ -2108,9 +2133,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xvv_error2 ("function `%s' requires %d arguments",
 		fcn, v_nargs)
-	else if (v_nargs < 0 && nargs < abs(v_nargs))
+	else if (v_nargs < 0 && nargs < absi(v_nargs))
 	    call xvv_error2 ("function `%s' requires at least %d arguments",
-		fcn, abs(v_nargs))
+		fcn, absi(v_nargs))
 
 	# Some functions require that the input operand be a certain type,
 	# e.g. floating.  Handle the simple cases, converting input operands
@@ -2139,7 +2164,8 @@ begin
 	    optype = O_TYPE(args[1])
 	    nelem = O_LEN(args[1])
 	    do i = 2, nargs {
-		optype = xvv_newtype (optype, args[i])
+		i_val = args[i]
+		optype = xvv_newtype (optype, i_val)
 		if (O_LEN(args[i]) > 0)
 		    if (nelem > 0)
 			nelem = min (nelem, O_LEN(args[i]))
@@ -2960,7 +2986,7 @@ begin
 		call xvv_chtype (args[2], args[2], TY_INT)
 	    shift = O_VALI(args[2])
 
-	    if (abs(shift) > nelem) {
+	    if (absl(shift) > nelem) {
 		if (shift > 0)
 		    shift = nelem
 		else
@@ -3125,7 +3151,7 @@ begin
 
 	    case TY_SHORT:
 		if (O_LEN(in1) <= 0) {
-		    O_VALS(out) = mod (O_VALS(in1), O_VALS(in2))
+		    O_VALS(out) = mods (O_VALS(in1), O_VALS(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodks (Mems[O_VALP(in1)], O_VALS(in2),
 			Mems[O_VALP(out)], nelem)
@@ -3136,7 +3162,7 @@ begin
 
 	    case TY_INT:
 		if (O_LEN(in1) <= 0) {
-		    O_VALI(out) = mod (O_VALI(in1), O_VALI(in2))
+		    O_VALI(out) = modi (O_VALI(in1), O_VALI(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodki (Memi[O_VALP(in1)], O_VALI(in2),
 			Memi[O_VALP(out)], nelem)
@@ -3147,7 +3173,7 @@ begin
 
 	    case TY_LONG:
 		if (O_LEN(in1) <= 0) {
-		    O_VALL(out) = mod (O_VALL(in1), O_VALL(in2))
+		    O_VALL(out) = modl (O_VALL(in1), O_VALL(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodkl (Meml[O_VALP(in1)], O_VALL(in2),
 			Meml[O_VALP(out)], nelem)
@@ -3549,41 +3575,43 @@ begin
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALS(out) = 0
 		else
 		    O_VALS(out) = v_d
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
 		if (O_LEN(ap) <= 0)
 		    O_VALS(out) = O_VALS(ap)
 		else
-		    call achtss (Mems[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtss (Mems[O_VALP(ap)], Mems[O_VALP(out)], nelem)
 
 	    case TY_INT:
 		if (O_LEN(ap) <= 0)
 		    O_VALS(out) = O_VALI(ap)
 		else
-		    call achtis (Memi[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtis (Memi[O_VALP(ap)], Mems[O_VALP(out)], nelem)
 
 	    case TY_LONG:
 		if (O_LEN(ap) <= 0)
 		    O_VALS(out) = O_VALL(ap)
 		else
-		    call achtls (Meml[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtls (Meml[O_VALP(ap)], Mems[O_VALP(out)], nelem)
 
 	    case TY_REAL:
 		if (O_LEN(ap) <= 0)
 		    O_VALS(out) = O_VALR(ap)
 		else
-		    call achtrs (Memr[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtrs (Memr[O_VALP(ap)], Mems[O_VALP(out)], nelem)
 
 	    case TY_DOUBLE:
 		if (O_LEN(ap) <= 0)
 		    O_VALS(out) = O_VALD(ap)
 		else
-		    call achtds (Memd[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtds (Memd[O_VALP(ap)], Mems[O_VALP(out)], nelem)
 
 
 	    default:
@@ -3605,10 +3633,12 @@ begin
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALI(out) = 0
 		else
 		    O_VALI(out) = v_d
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
@@ -3657,45 +3687,47 @@ begin
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALI(ap)
 		else
-		    call amovi (Memi[O_VALP(ap)], Meml[O_VALP(out)], nelem)
+		    call achtil (Memi[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALL(out) = 0
 		else
 		    O_VALL(out) = v_d
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALS(ap)
 		else
-		    call achtsl (Mems[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtsl (Mems[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 	    case TY_INT:
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALI(ap)
 		else
-		    call achtil (Memi[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtil (Memi[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 	    case TY_LONG:
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALL(ap)
 		else
-		    call achtll (Meml[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtll (Meml[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 	    case TY_REAL:
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALR(ap)
 		else
-		    call achtrl (Memr[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtrl (Memr[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 	    case TY_DOUBLE:
 		if (O_LEN(ap) <= 0)
 		    O_VALL(out) = O_VALD(ap)
 		else
-		    call achtdl (Memd[O_VALP(ap)], Memi[O_VALP(out)], nelem)
+		    call achtdl (Memd[O_VALP(ap)], Meml[O_VALP(out)], nelem)
 
 
 	    default:
@@ -3717,10 +3749,12 @@ begin
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALI(out) = 0
 		else
 		    O_VALI(out) = nint (v_d)
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
@@ -3779,10 +3813,12 @@ begin
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALR(out) = 0
 		else
 		    O_VALR(out) = v_d
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
@@ -3835,10 +3871,12 @@ begin
 
 	    case TY_CHAR:
 		ip = O_VALP(ap)
-		if (gctod (Memc, ip, v_d) <= 0)
+		i_off = 1
+		if (gctod (Memc[ip], i_off, v_d) <= 0)
 		    O_VALD(out) = 0
 		else
 		    O_VALD(out) = v_d
+		ip = ip + i_off - 1
 
 
 	    case TY_SHORT:
@@ -3886,31 +3924,38 @@ begin
 
 	    switch (O_TYPE(ap)) {
 	    case TY_BOOL:
-		call sprintf (O_VALC(out), nelem, "%b")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%b")
 		    call pargi (O_VALI(ap))
 	    case TY_CHAR:
-		call sprintf (O_VALC(out), nelem, "%s")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%s")
 		    call pargstr (O_VALC(ap))
 
 	    case TY_SHORT:
-		call sprintf (O_VALC(out), nelem, "%d")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%d")
 		    call pargs (O_VALS(ap))
 
 	    case TY_INT:
-		call sprintf (O_VALC(out), nelem, "%d")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%d")
 		    call pargi (O_VALI(ap))
 
 	    case TY_LONG:
-		call sprintf (O_VALC(out), nelem, "%d")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%d")
 		    call pargl (O_VALL(ap))
 
 
 	    case TY_REAL:
-		call sprintf (O_VALC(out), nelem, "%g")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%g")
 		    call pargr (O_VALR(ap))
 
 	    case TY_DOUBLE:
-		call sprintf (O_VALC(out), nelem, "%g")
+		i_val = nelem
+		call sprintf (O_VALC(out), i_val, "%g")
 		    call pargd (O_VALD(ap))
 
 	    default:
@@ -3944,11 +3989,13 @@ procedure xvv_startarglist (arg, out)
 pointer	arg			#I pointer to first argument, or NULL
 pointer	out			#I output operand pointing to arg descriptor
 
+size_t	sz_val
 pointer	ap
 errchk	xvv_initop
 
 begin
-	call xvv_initop (out, LEN_ARGSTRUCT, TY_STRUCT)
+	sz_val = LEN_ARGSTRUCT
+	call xvv_initop (out, sz_val, TY_STRUCT)
 	ap = O_VALP(out)
 
 	if (arg == NULL)
@@ -3997,10 +4044,12 @@ char	fmt[ARB]		#I printf format string
 char	arg[ARB]		#I string argument
 
 pointer	sp, buf
+size_t	sz_val
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg)
@@ -4020,10 +4069,12 @@ char	arg1[ARB]		#I string argument
 int	arg2			#I integer argument
 
 pointer	sp, buf
+size_t	sz_val
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg1)
@@ -4060,11 +4111,13 @@ long	lval
 double	dval
 pointer	ip_start
 char	numbuf[MAX_DIGITS]
-int	nchars, token, junk, dtype
+size_t	nchars, c_0
+int	token, junk, dtype, i_len, i_off
 int	stridx(), stridxs(), lexnum(), gctod(), gctol()
 define	ident_ 91
 
 begin
+	c_0 = 0
 	while (IS_WHITE(Memc[ip]))
 	    ip = ip + 1
 
@@ -4085,7 +4138,8 @@ ident_
 
 	    nchars = ip - ip_start
 	    call xvv_initop (out, nchars, TY_CHAR)
-	    call strcpy (Memc[ip_start], O_VALC(out), nchars)
+	    i_len = nchars
+	    call strcpy (Memc[ip_start], O_VALC(out), i_len)
 
 	    return (IDENTIFIER)
 
@@ -4093,31 +4147,44 @@ ident_
 	    # Return a numeric constant.  The character I vectors here so
 	    # that we can check for INDEF, a legal number.
 
-	    token = lexnum (Memc, ip, nchars)
+	    i_off = 1
+	    token = lexnum (Memc[ip], i_off, i_len)
+	    ip = ip + i_off - 1
+	    nchars = i_len
+
 	    switch (token) {
 	    case LEX_OCTAL:
-		junk = gctol (Memc, ip, lval, 8)
-		call xvv_initop (out, 0, TY_INT)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 8)
+		ip = ip + i_off - 1
+		call xvv_initop (out, c_0, TY_INT)
 		O_VALI(out) = lval
 	    case LEX_DECIMAL:
-		junk = gctol (Memc, ip, lval, 10)
-		call xvv_initop (out, 0, TY_INT)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 10)
+		ip = ip + i_off - 1
+		call xvv_initop (out, c_0, TY_INT)
 		O_VALI(out) = lval
 	    case LEX_HEX:
-		junk = gctol (Memc, ip, lval, 16)
-		call xvv_initop (out, 0, TY_INT)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 16)
+		ip = ip + i_off - 1
+		call xvv_initop (out, c_0, TY_INT)
 		O_VALI(out) = lval
 
 	    case LEX_REAL:
 		ip_start = ip
-		nchars = gctod (Memc, ip, dval)
-		call strcpy (Memc[ip], numbuf, min(nchars,MAX_DIGITS))
+		i_off = 1
+		nchars = gctod (Memc[ip], i_off, dval)
+		ip = ip + i_off - 1
+		i_len = min(nchars,MAX_DIGITS)
+		call strcpy (Memc[ip], numbuf, i_len)
 
 		dtype = TY_REAL
 		if (stridxs ("dD", numbuf) > 0 || nchars > NDIGITS_RP+3)
 		    dtype = TY_DOUBLE
 
-		call xvv_initop (out, 0, dtype)
+		call xvv_initop (out, c_0, dtype)
 		if (dtype == TY_REAL) {
 		    if (IS_INDEFD (dval))
 			O_VALR(out) = INDEFR
@@ -4149,7 +4216,8 @@ ident_
 		ip = ip + 1
 
 	    call xvv_initop (out, nchars, TY_CHAR)
-	    call strcpy (Memc[ip_start], O_VALC(out), nchars)
+	    i_len = nchars
+	    call strcpy (Memc[ip_start], O_VALC(out), i_len)
 
 	    return (CONSTANT)
 
@@ -4260,7 +4328,9 @@ real	v_r
 double	v_d
 pointer	vp, ip, op
 bool	float, freeval
-int	old_type, nelem, ch
+int	old_type, ch, i_off
+size_t	nelem
+size_t	sz_val
 
 pointer	coerce()
 int	sizeof(), btoi(), gctod()
@@ -4327,7 +4397,8 @@ begin
 		else
 		    O_VALI(o2) = btoi (v_l != 0)
 	    case TY_CHAR:
-		call xvv_initop (o2, MAX_DIGITS, TY_CHAR)
+		sz_val = MAX_DIGITS
+		call xvv_initop (o2, sz_val, TY_CHAR)
 		if (float) {
 		    call sprintf (O_VALC(o2), MAX_DIGITS, "%g")
 			call pargd (v_d)
@@ -4444,8 +4515,10 @@ begin
 		    call achti (Memi[vp], Memc[op], nelem, dtype)
 		case TY_CHAR:
 		    ip = vp
-		    if (gctod (Memc, ip, v_d) <= 0)
+		    i_off = 1
+		    if (gctod (Memc[ip], i_off, v_d) <= 0)
 			v_d = 0
+		    ip = ip + i_off - 1
 		    switch (dtype) {
 
 		    case TY_SHORT:
@@ -4505,7 +4578,7 @@ end
 procedure xvv_initop (o, o_len, o_type)
 
 pointer	o		#I pointer to operand structure
-int	o_len		#I length of operand (zero if scalar)
+size_t	o_len		#I length of operand (zero if scalar)
 int	o_type		#I datatype of operand
 
 begin
@@ -4520,7 +4593,7 @@ end
 procedure xvv_makeop (o, o_len, o_type)
 
 pointer	o		#I pointer to operand structure
-int	o_len		#I length of operand (zero if scalar)
+size_t	o_len		#I length of operand (zero if scalar)
 int	o_type		#I datatype of operand
 
 errchk	malloc
@@ -4592,11 +4665,13 @@ char	s[ARB]			#I symbol list "|sym1|sym2|...|"
 
 int	delim, symnum, ip
 pointer	sp, symname, st, sym, op
+size_t	sz_val
 pointer	stopen(), stenter()
 
 begin
 	call smark (sp)
-	call salloc (symname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (symname, sz_val, TY_CHAR)
 
 	st = stopen ("evvexpr", LEN_INDEX, LEN_STAB, LEN_SBUF)
 	delim = s[1]
@@ -4698,7 +4773,7 @@ define	YYABORT		return (ERR)
 
 int procedure yyparse (fd, yydebug, yylex)
 
-int	fd			# stream to be parsed
+pointer	fd			# stream to be parsed
 bool	yydebug			# print debugging information?
 int	yylex()			# user-supplied lexical input function
 extern	yylex()
@@ -4717,6 +4792,7 @@ short	yyj, yym		# internal variables
 pointer	yysp, yypvt
 short	yystate, yyn
 int	yyxi, i
+size_t	sz_val
 errchk	salloc, yylex
 
 
@@ -4727,7 +4803,7 @@ errchk	salloc, yylex
 # is to reduce an expression to a single value of type bool, string, int,
 # or real.
 
-pointer	ap
+pointer	ap, p_val
 bool	streq()
 errchk	zcall3, xvv_error1, xvv_unop, xvv_binop, xvv_boolop
 errchk	xvv_quest, xvv_callfcn, xvv_addarg
@@ -4841,7 +4917,8 @@ data	(yydef(i),i= 89, 91)	/   0,  36,  29/
 
 begin
 	call smark (yysp)
-	call salloc (yyv, (YYMAXDEPTH+2) * YYOPLEN, TY_STRUCT)
+	sz_val = (YYMAXDEPTH+2) * YYOPLEN
+	call salloc (yyv, sz_val, TY_STRUCT)
 
 	# Initialization.  The first element of the dynamically allocated
 	# token value stack (yyv) is used for yyval, the second for yylval,
@@ -5017,7 +5094,7 @@ yyabort_
 	switch (yym) {
 	    
 case 1:
-# line 266 "evvexpr.y"
+# line 269 "evvexpr.y"
 {
 			# Normal exit.  Move the final expression value operand
 			# into the operand structure pointed to by the global
@@ -5028,34 +5105,35 @@ case 1:
 			return (OK)
 		}
 case 2:
-# line 275 "evvexpr.y"
+# line 278 "evvexpr.y"
 {
 			call error (1, "syntax error")
 		}
 case 3:
-# line 280 "evvexpr.y"
+# line 283 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		}
 case 4:
-# line 283 "evvexpr.y"
+# line 286 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 			call xvv_freeop (yypvt-3*YYOPLEN)
 		}
 case 5:
-# line 289 "evvexpr.y"
+# line 292 "evvexpr.y"
 {
 			# Numeric constant.
 			YYMOVE (yypvt, yyval)
 		    }
 case 6:
-# line 293 "evvexpr.y"
+# line 296 "evvexpr.y"
 {
 			# The boolean constants "yes" and "no" are implemented
 			# as reserved operands.
 
-			call xvv_initop (yyval, 0, TY_BOOL)
+			sz_val = 0
+			call xvv_initop (yyval, sz_val, TY_BOOL)
 			if (streq (O_VALC(yypvt), "yes")) {
 			    O_VALI(yyval) = YES
 			} else if (streq (O_VALC(yypvt), "no")) {
@@ -5070,7 +5148,7 @@ case 6:
 			call xvv_freeop (yypvt)
 		    }
 case 7:
-# line 311 "evvexpr.y"
+# line 315 "evvexpr.y"
 {
 			# e.g., @"param"
 			if (ev_getop != NULL) {
@@ -5083,139 +5161,139 @@ case 7:
 			call xvv_freeop (yypvt)
 		    }
 case 8:
-# line 322 "evvexpr.y"
+# line 326 "evvexpr.y"
 {
 			# Unary arithmetic minus.
 			call xvv_unop (MINUS, yypvt, yyval)
 		    }
 case 9:
-# line 326 "evvexpr.y"
+# line 330 "evvexpr.y"
 {
 			# Logical not.
 			call xvv_unop (LNOT, yypvt, yyval)
 		    }
 case 10:
-# line 330 "evvexpr.y"
+# line 334 "evvexpr.y"
 {
 			# Boolean not.
 			call xvv_unop (BNOT, yypvt, yyval)
 		    }
 case 11:
-# line 334 "evvexpr.y"
+# line 338 "evvexpr.y"
 {
 			# Addition.
 			call xvv_binop (PLUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 12:
-# line 338 "evvexpr.y"
+# line 342 "evvexpr.y"
 {
 			# Subtraction.
 			call xvv_binop (MINUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 13:
-# line 342 "evvexpr.y"
+# line 346 "evvexpr.y"
 {
 			# Multiplication.
 			call xvv_binop (STAR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 14:
-# line 346 "evvexpr.y"
+# line 350 "evvexpr.y"
 {
 			# Division.
 			call xvv_binop (SLASH, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 15:
-# line 350 "evvexpr.y"
+# line 354 "evvexpr.y"
 {
 			# Exponentiation.
 			call xvv_binop (EXPON, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 16:
-# line 354 "evvexpr.y"
+# line 358 "evvexpr.y"
 {
 			# Concatenate two operands.
 			call xvv_binop (CONCAT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 17:
-# line 358 "evvexpr.y"
+# line 362 "evvexpr.y"
 {
 			# Logical and.
 			call xvv_boolop (LAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 18:
-# line 362 "evvexpr.y"
+# line 366 "evvexpr.y"
 {
 			# Logical or.
 			call xvv_boolop (LOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 19:
-# line 366 "evvexpr.y"
+# line 370 "evvexpr.y"
 {
 			# Boolean and.
 			call xvv_binop (BAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 20:
-# line 370 "evvexpr.y"
+# line 374 "evvexpr.y"
 {
 			# Boolean or.
 			call xvv_binop (BOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 21:
-# line 374 "evvexpr.y"
+# line 378 "evvexpr.y"
 {
 			# Boolean xor.
 			call xvv_binop (BXOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 22:
-# line 378 "evvexpr.y"
+# line 382 "evvexpr.y"
 {
 			# Boolean less than.
 			call xvv_boolop (LT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 23:
-# line 382 "evvexpr.y"
+# line 386 "evvexpr.y"
 {
 			# Boolean greater than.
 			call xvv_boolop (GT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 24:
-# line 386 "evvexpr.y"
+# line 390 "evvexpr.y"
 {
 			# Boolean less than or equal.
 			call xvv_boolop (LE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 25:
-# line 390 "evvexpr.y"
+# line 394 "evvexpr.y"
 {
 			# Boolean greater than or equal.
 			call xvv_boolop (GE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 26:
-# line 394 "evvexpr.y"
+# line 398 "evvexpr.y"
 {
 			# Boolean equal.
 			call xvv_boolop (EQ, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 27:
-# line 398 "evvexpr.y"
+# line 402 "evvexpr.y"
 {
 			# String pattern-equal.
 			call xvv_boolop (SE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 28:
-# line 402 "evvexpr.y"
+# line 406 "evvexpr.y"
 {
 			# Boolean not equal.
 			call xvv_boolop (NE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 29:
-# line 406 "evvexpr.y"
+# line 410 "evvexpr.y"
 {
 			# Conditional expression.
 			call xvv_quest (yypvt-6*YYOPLEN, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 30:
-# line 410 "evvexpr.y"
+# line 414 "evvexpr.y"
 {
 			# Call an intrinsic or external function.
 			ap = O_VALP(yypvt-YYOPLEN)
@@ -5225,36 +5303,37 @@ case 30:
 			call xvv_freeop (yypvt-YYOPLEN)
 		    }
 case 31:
-# line 418 "evvexpr.y"
+# line 422 "evvexpr.y"
 {
 			YYMOVE (yypvt-YYOPLEN, yyval)
 		    }
 case 32:
-# line 424 "evvexpr.y"
+# line 428 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		    }
 case 33:
-# line 427 "evvexpr.y"
+# line 431 "evvexpr.y"
 {
 			if (O_TYPE(yypvt) != TY_CHAR)
 			    call error (1, "illegal function name")
 			YYMOVE (yypvt, yyval)
 		    }
 case 34:
-# line 435 "evvexpr.y"
+# line 439 "evvexpr.y"
 {
 			# Empty.
-			call xvv_startarglist (NULL, yyval)
+			p_val = NULL
+			call xvv_startarglist (p_val, yyval)
 		    }
 case 35:
-# line 439 "evvexpr.y"
+# line 444 "evvexpr.y"
 {
 			# First arg; start a nonnull list.
 			call xvv_startarglist (yypvt, yyval)
 		    }
 case 36:
-# line 443 "evvexpr.y"
+# line 448 "evvexpr.y"
 {
 			# Add an argument to an existing list.
 			call xvv_addarg (yypvt, yypvt-3*YYOPLEN, yyval)

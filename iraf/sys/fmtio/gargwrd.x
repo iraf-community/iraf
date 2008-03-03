@@ -6,7 +6,8 @@
 procedure gargwrd (outstr, maxch)
 
 char	outstr[ARB]
-int	maxch, ctowrd()
+int	maxch
+int	ctowrd()
 include	"scan.com"
 
 begin

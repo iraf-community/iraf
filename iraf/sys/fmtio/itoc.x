@@ -8,8 +8,9 @@ include	<ctype.h>
 
 int procedure itoc (ival, str, maxch)
 
-int	ival, maxch
+int	ival
 char	str[ARB]
+int	maxch
 
 char	buf[MAX_DIGITS]
 int	b_op, s_op, num, temp

@@ -6,7 +6,8 @@
 procedure gargrad (lval, radix)
 
 long	lval
-int	radix, gctol()
+int	radix
+int	gctol()
 include	"scan.com"
 
 begin

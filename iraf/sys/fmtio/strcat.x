@@ -4,8 +4,12 @@
 
 procedure strcat (str, outstr, maxch)
 
-char	str[ARB], outstr[ARB]
-int	maxch, junk, gstrcat()
+char	str[ARB]
+char	outstr[ARB]
+int	maxch
+
+int	junk
+int	gstrcat()
 
 begin
 	junk = gstrcat (str, outstr, maxch)

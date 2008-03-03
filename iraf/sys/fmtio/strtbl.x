@@ -11,19 +11,22 @@ procedure strtbl (fd, buf, strp, nstr, first_col, last_col, maxch, ncol)
 
 int	fd			# output file
 char	buf[ARB]		# buffer containing the strings
-int	strp[ARB]		# array of string pointers
-int	nstr			# number of strings
+pointer	strp[ARB]		# array of string pointers
+size_t	nstr			# number of strings
 int	first_col, last_col	# where to place table on a line
 int	maxch			# maximum chars to print from a string
 int	ncol			# desired number of columns (0 to autoscale)
 
+size_t	sz_val
 pointer	sp, obuf, op
-int	row, i, j, p, nspaces, maxlen, colwidth, numcol, numrow, str
+long	row, i, j, p, nspaces, maxlen, numrow, str
+int	colwidth, numcol
 int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (obuf, last_col + 1, TY_CHAR)
+	sz_val = last_col + 1
+	call salloc (obuf, sz_val, TY_CHAR)
 
 	maxlen = 0
 	do i = 1, nstr

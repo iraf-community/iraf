@@ -7,6 +7,7 @@
 procedure sscan (str)
 
 char	str[ARB]
+
 int	ip, op
 include	"scan.com"
 

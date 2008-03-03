@@ -97,6 +97,7 @@ int	maxch			# max chars in output buffer
 int	currclass
 char	class[TABLESIZE]
 int	op, ch, i, junk, nchars
+char	cjunk
 int	ctowrd(), lexnum(), cctoc()
 include	"tokdata.inc"
 
@@ -133,7 +134,7 @@ begin
 	    return (TOK_STRING)
 
 	} else if (ch == SQUOTE || ch == ESCAPE) {
-	    nchars = cctoc (str, ip, junk)
+	    nchars = cctoc (str, ip, cjunk)
 	    call strcpy (str[ip-nchars], outstr, nchars)
 	    return (TOK_CHARCON)
 

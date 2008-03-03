@@ -18,8 +18,9 @@ int	width			# field width
 
 bool	neg
 double	val
-int	op, round, h, m, s, f, v, i
-int	dtoc3(), ltoc()
+int	op, round, h, m, s, f, i, i_len
+long	v
+int	dtoc3(), ltoc(), absi(), modi()
 
 define	output {outstr[op]=$1;op=op+1;if(op>maxch)goto retry_}
 define	retry_ 91
@@ -94,19 +95,20 @@ retry_
 	    v = h
 	else
 	    v = h * 60 + m
-	op = op + ltoc (v, outstr[op], maxch-op+1)
+	i_len = maxch-op+1
+	op = op + ltoc (v, outstr[op], i_len)
 	output (':')
 
 	# Output the minutes field in HMS format.
 	if (fmt == FMT_HMS) {
 	    output (TO_DIGIT (m / 10))
-	    output (TO_DIGIT (mod (m, 10)))
+	    output (TO_DIGIT (modi (m, 10)))
 	    output (':')
 	}
 
 	# Output the seconds field.
 	output (TO_DIGIT (s / 10))
-	output (TO_DIGIT (mod (s, 10)))
+	output (TO_DIGIT (modi (s, 10)))
 
 	# Output the fraction, if any.
 	if (decpl > 0) {
@@ -114,12 +116,12 @@ retry_
 	    do i = 1, decpl {
 		round = round / 10
 		output (TO_DIGIT (f / round))
-		f = mod (f, round)
+		f = modi (f, round)
 	    }
 	}
 
 	# If the HMS format does not fit, go try a more compact format.
-	if (op-1 > abs(width) || op > maxch) {
+	if (op-1 > absi(width) || op > maxch) {
 	    fmt = FMT_GENERAL
 	    goto retry_
 	}

@@ -7,9 +7,9 @@ int procedure xtoc (xval, outstr, maxch, decpl, fmt, width)
 
 complex	xval			# value to be formatted
 char	outstr[ARB]		# output string
-int	fmt			# format encoding (f,e,etc.)
 int	maxch			# max chars out
 int	decpl			# precision
+int	fmt			# format encoding (f,e,etc.)
 int	width			# field width
 
 int	op, dtoc()

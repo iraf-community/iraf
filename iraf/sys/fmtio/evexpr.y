@@ -63,6 +63,7 @@ char	expr[ARB]		# expression to be evaluated
 pointer	getop_epa		# user supplied get operand procedure
 pointer	ufcn_epa		# user supplied function call procedure
 
+size_t	sz_val
 int	junk
 bool	debug
 pointer	sp, ip
@@ -81,10 +82,12 @@ begin
 	ev_ufcn  = ufcn_epa
 
 	# Allocate an operand struct for the expression value.
-	call calloc (ev_oval, LEN_OPERAND, TY_STRUCT)
+	sz_val = LEN_OPERAND
+	call calloc (ev_oval, sz_val, TY_STRUCT)
 
 	# Make a local copy of the input string.
-	call salloc (ip, strlen(expr), TY_CHAR)
+	sz_val = strlen(expr)
+	call salloc (ip, sz_val, TY_CHAR)
 	call strcpy (expr, Memc[ip], ARB)
 
 	# Evaluate the expression.  The expression value is copied into the
@@ -106,7 +109,7 @@ end
 # is to reduce an expression to a single value of type bool, string, int,
 # or real.
 
-pointer	ap
+pointer	ap, p_val
 bool	streq()
 errchk	zcall2, xev_error1, xev_unop, xev_binop, xev_boolop
 errchk	xev_quest, xev_callfcn, xev_addarg
@@ -272,7 +275,8 @@ funct	:	IDENTIFIER {
 
 arglist	:	{
 			# Empty.
-			call xev_startarglist (NULL, $$)
+			p_val = NULL
+			call xev_startarglist (p_val, $$)
 		    }
 	|	expr {
 			# First arg; start a nonnull list.
@@ -551,16 +555,21 @@ int procedure xev_patmatch (str, pat)
 char	str[ARB]		# operand string
 char	pat[ARB]		# pattern
 
+size_t	sz_val
 int	junk, ip, index
 pointer	sp, patstr, patbuf, op
 int	patmake(), patmatch()
 
 begin
 	call smark (sp)
-	call salloc (patstr, SZ_FNAME, TY_CHAR)
-	call salloc (patbuf, SZ_LINE,  TY_CHAR)
-	call aclrc (Memc[patstr], SZ_FNAME)
-	call aclrc (Memc[patbuf], SZ_LINE)
+	sz_val = SZ_FNAME
+	call salloc (patstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patbuf, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[patstr], sz_val)
+	sz_val = SZ_LINE
+	call aclrc (Memc[patbuf], sz_val)
 
 	# Map pattern, changing '*' into '?*'.
 	op = patstr
@@ -650,14 +659,16 @@ pointer	args[ARB]		# pointer to arglist descriptor
 int	nargs			# number of arguments
 pointer	out			# output operand (function value)
 
+size_t	sz_val
 real	rresult, rval[2], rtemp
 int	iresult, ival[2], type[2], optype, oplen, itemp
+pointer	presult
 int	opcode, v_nargs, i
 pointer	sp, buf, ap
 include	"evexpr.com"
 
 bool	strne()
-int	strdic(), strlen()
+int	strdic(), strlen(), absi(), modi()
 errchk	zcall4, xev_error1, xev_error2, malloc
 string	keywords KEYWORDS
 define	badtype_ 91
@@ -665,7 +676,8 @@ define	free_ 92
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	oplen = 0
 
@@ -700,9 +712,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xev_error2 ("function `%s' requires %d arguments",
 		fcn, v_nargs)
-	else if (v_nargs < 0 && nargs < abs(v_nargs))
+	else if (v_nargs < 0 && nargs < absi(v_nargs))
 	    call xev_error2 ("function `%s' requires at least %d arguments",
-		fcn, abs(v_nargs))
+		fcn, absi(v_nargs))
 
 	# Verify datatypes.
 	if (opcode != F_STR && opcode != F_BOOL) {
@@ -730,7 +742,7 @@ begin
 	switch (opcode) {
 	case F_ABS:
 	    if (type[1] == TY_INT) {
-		iresult = abs (ival[1])
+		iresult = absi (ival[1])
 		optype = TY_INT
 	    } else
 		rresult = abs (rval[1])
@@ -764,7 +776,7 @@ begin
 	    if (type[1] == TY_REAL || type[2] == TY_REAL)
 		rresult = mod (rval[1], rval[2])
 	    else {
-		iresult = mod (ival[1], ival[2])
+		iresult = modi (ival[1], ival[2])
 		optype = TY_INT
 	    }
 		
@@ -847,25 +859,29 @@ begin
 	    optype = TY_CHAR
 	    switch (O_TYPE(ap)) {
 	    case TY_BOOL:
-		call malloc (iresult, 3, TY_CHAR)
+		sz_val = 3
+		call malloc (presult, sz_val, TY_CHAR)
 		oplen = 3
 		if (O_VALB(ap))
-		    call strcpy ("yes", Memc[iresult], 3)
+		    call strcpy ("yes", Memc[presult], 3)
 		else
-		    call strcpy ("no",  Memc[iresult], 3)
+		    call strcpy ("no",  Memc[presult], 3)
 	    case TY_CHAR:
 		oplen = strlen (O_VALC(ap))
-		call malloc (iresult, oplen, TY_CHAR)
-		call strcpy (O_VALC(ap), Memc[iresult], ARB)
+		sz_val = oplen
+		call malloc (presult, sz_val, TY_CHAR)
+		call strcpy (O_VALC(ap), Memc[presult], ARB)
 	    case TY_INT:
 		oplen = MAX_DIGITS
-		call malloc (iresult, oplen, TY_CHAR)
-		call sprintf (Memc[iresult], SZ_FNAME, "%d")
+		sz_val = oplen
+		call malloc (presult, sz_val, TY_CHAR)
+		call sprintf (Memc[presult], SZ_FNAME, "%d")
 		    call pargi (O_VALI(ap))
 	    case TY_REAL:
 		oplen = MAX_DIGITS
-		call malloc (iresult, oplen, TY_CHAR)
-		call sprintf (Memc[iresult], SZ_FNAME, "%g")
+		sz_val = oplen
+		call malloc (presult, sz_val, TY_CHAR)
+		call sprintf (Memc[presult], SZ_FNAME, "%g")
 		    call pargr (O_VALR(ap))
 	    default:
 		goto badtype_
@@ -886,7 +902,7 @@ begin
 	case TY_BOOL:
 	    O_VALB(out) = (iresult != 0)
 	case TY_CHAR:
-	    O_VALP(out) = iresult
+	    O_VALP(out) = presult
 	case TY_INT:
 	    O_VALI(out) = iresult
 	case TY_REAL:
@@ -921,13 +937,16 @@ procedure xev_startarglist (arg, out)
 
 pointer	arg			# pointer to first argument, or NULL
 pointer	out			# output operand pointing to arg descriptor
+
+size_t	sz_val
 pointer	ap
 
 errchk	malloc
 
 begin
 	call xev_initop (out, 0, TY_POINTER)
-	call malloc (ap, LEN_ARGSTRUCT, TY_STRUCT)
+	sz_val = LEN_ARGSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 	O_VALP(out) = ap
 
 	if (arg == NULL)
@@ -974,11 +993,14 @@ procedure xev_error1 (fmt, arg)
 
 char	fmt[ARB]		# printf format string
 char	arg[ARB]		# string argument
+
+size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg)
@@ -996,11 +1018,14 @@ procedure xev_error2 (fmt, arg1, arg2)
 char	fmt[ARB]		# printf format string
 char	arg1[ARB]		# string argument
 int	arg2			# integer argument
+
+size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_LINE, fmt)
 	    call pargstr (arg1)
@@ -1036,7 +1061,7 @@ char	ch
 long	lval
 double	dval
 pointer	ip_start
-int	nchars, token, junk
+int	nchars, token, junk, i_off
 int	stridx(), lexnum(), gctod(), gctol()
 define	ident_ 91
 
@@ -1069,22 +1094,32 @@ ident_
 	    # Return a numeric constant.  The character I vectors here so
 	    # that we can check for INDEF, a legal number.
 
-	    token = lexnum (Memc, ip, nchars)
+	    i_off = 1
+	    token = lexnum (Memc[ip], i_off, nchars)
+	    ip = ip + i_off - 1
 	    switch (token) {
 	    case LEX_OCTAL:
-		junk = gctol (Memc, ip, lval, 8)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 8)
+		ip = ip + i_off - 1
 		call xev_initop (out, 0, TY_INT)
 		O_VALI(out) = lval
 	    case LEX_DECIMAL:
-		junk = gctol (Memc, ip, lval, 10)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 10)
+		ip = ip + i_off - 1
 		call xev_initop (out, 0, TY_INT)
 		O_VALI(out) = lval
 	    case LEX_HEX:
-		junk = gctol (Memc, ip, lval, 16)
+		i_off = 1
+		junk = gctol (Memc[ip], i_off, lval, 16)
+		ip = ip + i_off - 1
 		call xev_initop (out, 0, TY_INT)
 		O_VALI(out) = lval
 	    case LEX_REAL:
-		junk = gctod (Memc, ip, dval)
+		i_off = 1
+		junk = gctod (Memc[ip], i_off, dval)
+		ip = ip + i_off - 1
 		call xev_initop (out, 0, TY_REAL)
 		if (IS_INDEFD (dval))
 		    O_VALR(out) = INDEFR
@@ -1223,6 +1258,7 @@ pointer	o		# pointer to operand structure
 int	o_len		# length of operand (zero if scalar)
 int	o_type		# datatype of operand
 
+size_t	sz_val
 errchk	malloc
 
 begin
@@ -1237,7 +1273,8 @@ begin
 
 	# Allocate array storage if nonscalar operand.
 	if (o_len > 0) {
-	    call malloc (O_VALP(o), o_len, o_type)
+	    sz_val = o_len
+	    call malloc (O_VALP(o), sz_val, o_type)
 	    O_LEN(o) = o_len
 	}
 end

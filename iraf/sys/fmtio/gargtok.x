@@ -6,7 +6,8 @@ procedure gargtok (token, outstr, maxch)
 
 int	token
 char	outstr[ARB]
-int	maxch, ctotok()
+int	maxch
+int	ctotok()
 include	"scan.com"
 
 begin

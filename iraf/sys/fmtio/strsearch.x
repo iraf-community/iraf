@@ -43,6 +43,7 @@ bool procedure strse1 (str, patstr, patlen)
 char	str[ARB]
 char	patstr[ARB]
 int	patlen
+
 int	ip
 
 begin

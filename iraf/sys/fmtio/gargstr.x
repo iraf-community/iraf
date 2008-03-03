@@ -5,7 +5,8 @@
 procedure gargstr (outstr, maxch)
 
 char	outstr[ARB]
-int	maxch, op
+int	maxch
+int	op
 include	"scan.com"
 
 begin

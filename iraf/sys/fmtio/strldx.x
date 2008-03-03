@@ -5,7 +5,9 @@
 
 int procedure strldx (ch, str)
 
-char	ch, str[ARB]
+char	ch
+char	str[ARB]
+
 int	ip, offset
 
 begin

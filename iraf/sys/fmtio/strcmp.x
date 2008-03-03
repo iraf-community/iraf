@@ -5,7 +5,9 @@
 
 int procedure strcmp (s1, s2)
 
-char	s1[ARB], s2[ARB]		# strings to be compared
+char	s1[ARB]				# strings to be compared
+char	s2[ARB]				# strings to be compared
+
 int	i
 
 begin

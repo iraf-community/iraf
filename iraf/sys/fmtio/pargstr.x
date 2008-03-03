@@ -8,6 +8,7 @@ procedure pargstr (str)
 
 char	str[ARB]
 int	maxch
+int	absi()
 include "fmt.com"
 
 begin
@@ -16,7 +17,7 @@ begin
 	if (decpl == USE_DEFAULT)
 	    maxch = SZ_OBUF
 	else
-	    maxch = abs (decpl)
+	    maxch = absi (decpl)
 
 	if (width == USE_DEFAULT)
 	    width = 0

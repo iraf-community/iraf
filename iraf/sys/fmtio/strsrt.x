@@ -8,12 +8,14 @@ define	LOGPTR	20		# log2(maxpts)  (1e6)
 
 procedure strsrt (x, sb, nstr)
 
-int	x[ARB]			# array of string pointers or indices
+pointer	x[ARB]			# array of string pointers
 char	sb[ARB]			# string buffer
-int	nstr			# number of strings
+size_t	nstr			# number of strings
 
-int	i, j, k, p, temp
-int	lv[LOGPTR], uv[LOGPTR], pivot
+int	p
+long	i, j, k
+pointer	temp, pivot
+long	lv[LOGPTR], uv[LOGPTR]
 define	swap {temp=$1;$1=$2;$2=temp}
 int	strcmp()
 

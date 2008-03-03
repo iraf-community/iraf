@@ -4,7 +4,9 @@
 
 bool procedure strle (s1, s2)
 
-char	s1[ARB], s2[ARB]
+char	s1[ARB]
+char	s2[ARB]
+
 int	ip
 
 begin

@@ -11,38 +11,44 @@ define	MAX_RADIX	'Z' - 'A' + 11
 # GLTOC -- Convert long integer to any radix string.  Returns the
 # number of characters generated.
 
-int procedure gltoc (lval, outstr, maxch, base)
+int procedure gltoc (a_lval, outstr, maxch, base)
 
-long	lval			# long integer to be encoded
+long	a_lval			# long integer to be encoded
 char	outstr[maxch]		# output buffer
 int	maxch, base		# numeric base (2..16)
 
-int	carry, d, op, radix, n, size, nchars, gstrcpy()
-long	andl(), orl()
+long	lval, carry, d, n, radix
+int	op, size, nchars
+int	gstrcpy(), absi()
+long	andl(), orl(), absl(), modl()
 bool	unsigned
 
 begin
-	if (IS_INDEFL(lval) && base > 0)
+	if (IS_INDEFL(a_lval) && base > 0)
 	    return (gstrcpy ("INDEF", outstr, maxch))
 	size = maxch
 
 	# Digit string is generated backwards, then reversed.  Unsigned
 	# conversion used if radix negative.
 
-	radix = max(2, min(MAX_RADIX, abs(base)))
+	radix = max(2, min(MAX_RADIX, absi(base)))
 
 	unsigned = (base < 0)			# get raw number
 	if (unsigned) {
-	    n = andl (lval, MAX_LONG) / 2
-	    if (lval < 0)
-		n = orl (n, (MAX_LONG / 2 + 1))
-	    carry = andl (lval, 1)		# get initial carry
+	    lval = MAX_LONG
+	    n = andl (a_lval, lval) / 2
+	    if (a_lval < 0) {
+		lval = (MAX_LONG / 2 + 1)
+		n = orl (n, lval)
+	    }
+	    lval = 1
+	    carry = andl (a_lval, lval)		# get initial carry
 	} else
-	    n = lval
+	    n = a_lval
 
 	op = 0
 	repeat {
-	    d = abs (mod (n, radix))		# generate next digit
+	    d = absl (modl (n, radix))		# generate next digit
 	    if (unsigned) {
 		d = 2 * d + carry		# get actual digit value
 		if (d >= radix) {		# check for generated carry
@@ -64,7 +70,7 @@ begin
 		op = op + 1
 		outstr[op] = '1'
 	    }
-	} else if (lval < 0 && op < size) {	# add sign if needed
+	} else if (a_lval < 0 && op < size) {	# add sign if needed
 	    op = op + 1
 	    outstr[op] = '-'
 	}

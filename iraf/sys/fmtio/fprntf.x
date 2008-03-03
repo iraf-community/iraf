@@ -8,8 +8,9 @@ include	<printf.h>
 
 procedure fprntf (new_fd, format_string, file_type)
 
-int	new_fd, file_type
+int	new_fd
 char	format_string[ARB]
+int	file_type
 include "fmt.com"
 
 begin

@@ -31,7 +31,7 @@ define	YYABORT		return (ERR)
 
 int procedure yyparse (fd, yydebug, yylex)
 
-int	fd			# stream to be parsed
+pointer	fd			# stream to be parsed
 bool	yydebug			# print debugging information?
 int	yylex()			# user-supplied lexical input function
 extern	yylex()
@@ -50,6 +50,7 @@ short	yyj, yym		# internal variables
 pointer	yysp, yypvt
 short	yystate, yyn
 int	yyxi, i
+size_t	sz_val
 errchk	salloc, yylex
 
 $A	# User declarations go here.
@@ -57,7 +58,8 @@ $B	# YACC parser tables defining the finite automaton go here.
 
 begin
 	call smark (yysp)
-	call salloc (yyv, (YYMAXDEPTH+2) * YYOPLEN, TY_STRUCT)
+	sz_val = (YYMAXDEPTH+2) * YYOPLEN
+	call salloc (yyv, sz_val, TY_STRUCT)
 
 	# Initialization.  The first element of the dynamically allocated
 	# token value stack (yyv) is used for yyval, the second for yylval,

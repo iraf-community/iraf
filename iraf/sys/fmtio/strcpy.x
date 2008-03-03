@@ -4,8 +4,11 @@
 
 procedure strcpy (s1, s2, maxch)
 
-char	s1[ARB], s2[ARB]
-int	maxch, i
+char	s1[ARB]
+char	s2[ARB]
+int	maxch
+
+int	i
 
 begin
 	do i = 1, maxch {

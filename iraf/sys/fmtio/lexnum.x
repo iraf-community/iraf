@@ -188,3 +188,17 @@ begin
 
 	return (toktype)
 end
+
+
+procedure yy_move (src, dest, size)
+
+pointer	src
+pointer	dest
+int	size
+
+size_t	sz_val
+
+begin
+	sz_val = size
+	call amovp (src, dest, sz_val)
+end

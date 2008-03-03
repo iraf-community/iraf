@@ -4,7 +4,8 @@
 
 int procedure gstrcat (str, outstr, maxch)
 
-char	str[ARB], outstr[ARB]
+char	str[ARB]
+char	outstr[ARB]
 int	maxch
 
 int	ip, op, n

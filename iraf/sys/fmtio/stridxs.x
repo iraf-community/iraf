@@ -11,6 +11,7 @@ int procedure stridxs (set, str)
 char	set[ARB]		# set of characters to be searched for
 char	str[ARB]		# string to be searched
 
+size_t	sz_val
 int	setlen, ip, i
 char	ch, lut[SZ_ASCII]
 int	strlen()
@@ -20,7 +21,8 @@ begin
 
 	if (setlen > BIGSET) {
 	    # Encode the set in a lookup table.
-	    call aclrc (lut, SZ_ASCII)
+	    sz_val = SZ_ASCII
+	    call aclrc (lut, sz_val)
 	    do i = 1, setlen
 		lut[set[i]] = 1
 

@@ -25,7 +25,9 @@ can be escaped.
 
 int procedure strmatch (str, pat)
 
-char	pat[ARB], str[ARB]
+char	str[ARB]
+char	pat[ARB]
+
 int	first_char, last_char
 int	gstrmatch()
 
@@ -39,8 +41,11 @@ end
 
 int procedure gstrmatch (str, pat, first_char, last_char)
 
-char	pat[ARB], str[ARB]
-int	first_char, last_char
+char	str[ARB]
+char	pat[ARB]
+int	first_char
+int	last_char
+
 bool	ignore_case, bolflag
 char	ch, pch
 int	i, ip, initial_pp, pp

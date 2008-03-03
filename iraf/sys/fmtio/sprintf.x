@@ -10,7 +10,9 @@ procedure sprintf (outstr, maxch, format_string)
 char	outstr[maxch]
 int	maxch
 char	format_string[ARB]
-int	mem_fd, stropen()
+
+int	mem_fd
+int	stropen()
 errchk	stropen, fprntf
 
 begin

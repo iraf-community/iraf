@@ -5,8 +5,10 @@
 
 int procedure strncmp (s1, s2, n)
 
-char	s1[ARB], s2[ARB]		# strings to be compared
+char	s1[ARB]				# strings to be compared
+char	s2[ARB]
 int	n				# number of chars to compare
+
 int	i
 
 begin
