@@ -20,7 +20,11 @@ begin
 	status = OK
 	call smark (sp)
 
+	$if (datatype == l)
+	bufsize = miipksize (nelem, MII_LONGLONG)
+	$else
 	bufsize = miipksize (nelem, MII_PIXEL)
+	$endif
 	call salloc (bp, bufsize, TY_CHAR)
 
 	call miipak$t (spp, Memc[bp], nelem, TY_PIXEL)

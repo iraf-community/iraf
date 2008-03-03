@@ -5,10 +5,10 @@ include <mii.h>
 # MIIREAD -- Read a block of data stored externally in MII format.
 # Data is returned in the format of the local host machine.
 
-long procedure miireadl (fd, spp, maxelem)
+long procedure miireadp (fd, spp, maxelem)
 
 int	fd			#I input file
-long	spp[ARB]		#O receives data
+pointer	spp[ARB]		#O receives data
 size_t	maxelem			# max number of data elements to be read
 
 size_t	sz_val
@@ -23,7 +23,7 @@ begin
 	pksize = miipksize (maxelem, MII_LONGLONG)
 	nelem  = EOF
 
-	if (pksize > maxelem * SZ_LONG) {
+	if (pksize > maxelem * SZ_POINTER) {
 	    # Read data into local buffer and unpack into user buffer.
 
 	    call smark (sp)
@@ -34,7 +34,7 @@ begin
 		sz_val = nchars
 		nelem = min (maxelem, miinelem (sz_val, MII_LONGLONG))
 		sz_val = nelem
-		call miiupkl (Memc[bp], spp, sz_val, TY_LONG)
+		call miiupkl (Memc[bp], spp, sz_val, TY_POINTER)
 	    }
 
 	    call sfree (sp)
@@ -47,7 +47,7 @@ begin
 		sz_val = nchars
 		nelem = min (maxelem, miinelem (sz_val, MII_LONGLONG))
 		sz_val = nelem
-		call miiupkl (spp, spp, sz_val, TY_LONG)
+		call miiupkl (spp, spp, sz_val, TY_POINTER)
 	    }
 	}
 

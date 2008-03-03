@@ -14,7 +14,7 @@ size_t	maxchars		# max number of chars to be read
 pointer	sp, bp
 size_t	pksize, nchars
 long	lnchars
-int	miipksize(), miinelem()
+size_t	miipksize(), miinelem()
 long	read()
 errchk	read()
 

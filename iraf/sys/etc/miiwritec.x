@@ -14,7 +14,7 @@ size_t	nchars			# number of chars units to be written
 pointer	sp, bp
 size_t	bufsize
 int	status
-int	miipksize()
+size_t	miipksize()
 
 begin
 	status = OK

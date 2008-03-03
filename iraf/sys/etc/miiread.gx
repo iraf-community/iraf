@@ -20,7 +20,11 @@ long	read()
 errchk	read()
 
 begin
+	$if (datatype == l)
+	pksize = miipksize (maxelem, MII_LONGLONG)
+	$else
 	pksize = miipksize (maxelem, MII_PIXEL)
+	$endif
 	nelem  = EOF
 
 	if (pksize > maxelem * SZ_PIXEL) {
@@ -32,7 +36,11 @@ begin
 	    nchars = read (fd, Memc[bp], pksize)
 	    if (nchars != EOF) {
 		sz_val = nchars
+		$if (datatype == l)
+		nelem = min (maxelem, miinelem (sz_val, MII_LONGLONG))
+		$else
 		nelem = min (maxelem, miinelem (sz_val, MII_PIXEL))
+		$endif
 		sz_val = nelem
 		call miiupk$t (Memc[bp], spp, sz_val, TY_PIXEL)
 	    }
@@ -45,7 +53,11 @@ begin
 	    nchars = read (fd, spp, pksize)
 	    if (nchars != EOF) {
 		sz_val = nchars
+		$if (datatype == l)
+		nelem = min (maxelem, miinelem (sz_val, MII_LONGLONG))
+		$else
 		nelem = min (maxelem, miinelem (sz_val, MII_PIXEL))
+		$endif
 		sz_val = nelem
 		call miiupk$t (spp, spp, sz_val, TY_PIXEL)
 	    }

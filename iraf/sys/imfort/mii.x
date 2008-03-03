@@ -29,7 +29,8 @@ int	maxelem			#I max number of data elements to be read
 
 pointer	sp, bp
 int	pksize, nchars, nelem
-int	miipksize(), miinelem(), bfrseq()
+size_t	miipksize(), miinelem()
+int	bfrseq()
 
 begin
 	pksize = miipksize (maxelem, MII_INT)
@@ -74,7 +75,8 @@ int	maxelem			#I max number of data elements to be read
 
 pointer	sp, bp
 int	pksize, nchars, nelem
-int	miipksize(), miinelem(), bfrseq()
+size_t	miipksize(), miinelem()
+int	bfrseq()
 
 begin
 	pksize = miipksize (maxelem, MII_LONG)
@@ -119,7 +121,8 @@ int	maxelem			# max number of data elements to be read
 
 pointer	sp, bp
 int	pksize, nchars, nelem
-int	miipksize(), miinelem(), bfrseq()
+size_t	miipksize(), miinelem()
+int	bfrseq()
 
 begin
 	pksize = miipksize (maxelem, MII_REAL)
@@ -164,7 +167,8 @@ int	nelem			#I number of data elements to be written
 
 pointer	sp, bp
 int	bufsize, status
-int	miipksize(), bfwseq()
+size_t	miipksize()
+int	bfwseq()
 
 begin
 	status = OK
@@ -193,7 +197,8 @@ int	nelem			#I number of data elements to be written
 
 pointer	sp, bp
 int	bufsize, status
-int	miipksize(), bfwseq()
+size_t	miipksize()
+int	bfwseq()
 
 begin
 	status = OK
@@ -222,7 +227,8 @@ int	nelem			#I number of data elements to be written
 
 pointer	sp, bp
 int	bufsize, status
-int	miipksize(), bfwseq()
+size_t	miipksize()
+int	bfwseq()
 
 begin
 	status = OK
@@ -251,7 +257,8 @@ int	maxchars		#I max number of chars to be read
 
 pointer	sp, bp
 int	pksize, nchars
-int	miipksize(), miinelem(), bfrseq()
+size_t	miipksize(), miinelem()
+int	bfrseq()
 
 begin
 	pksize = miipksize (maxchars, MII_BYTE)
@@ -296,7 +303,8 @@ int	nchars			#I number of chars units to be written
 
 pointer	sp, bp
 int	bufsize, status
-int	miipksize(), bfwseq()
+size_t	miipksize()
+int	bfwseq()
 
 begin
 	status = OK

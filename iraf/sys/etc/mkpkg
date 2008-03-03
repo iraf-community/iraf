@@ -56,7 +56,9 @@ libsys.a:
 	main.x		<clset.h> <config.h> <ctype.h> <error.h> <fset.h>\
 			<knet.h> <printf.h> <xwhen.h>
 	miireadc.x	<mii.h>
+	miireadp.x	<mii.h>
 	miiwritec.x	<mii.h>
+	miiwritep.x	<mii.h>
 	onentry.x	<clset.h> <error.h> <fset.h> <knet.h>
 	onerror.x	<config.h> <error.h>
 	onexit.x	<config.h> <error.h>
