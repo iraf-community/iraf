@@ -52,3 +52,25 @@
   
   
   
+*** src_org/formatdata.c	Fri Mar  2 06:16:12 2001
+--- src/formatdata.c	Tue Mar  4 22:16:54 2008
+***************
+*** 1232,1238 ****
+  				break;
+  #ifndef NO_LONG_LONG
+  			case TYQUAD:
+! 				nice_printf(outfile, "%s", Const.cds[0]);
+  				break;
+  #endif
+  			case TYREAL:
+--- 1232,1241 ----
+  				break;
+  #ifndef NO_LONG_LONG
+  			case TYQUAD:
+! 				if ( Const.cds[0] )
+! 				    nice_printf(outfile, "%s", Const.cds[0]);
+! 				else
+! 				    nice_printf(outfile, "%s", "0");
+  				break;
+  #endif
+  			case TYREAL:

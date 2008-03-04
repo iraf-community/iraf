@@ -1232,7 +1232,10 @@ wr_equiv_init(FILE *outfile, int memno, chainp *Values, int iscomm)
 				break;
 #ifndef NO_LONG_LONG
 			case TYQUAD:
-				nice_printf(outfile, "%s", Const.cds[0]);
+				if ( Const.cds[0] )
+				    nice_printf(outfile, "%s", Const.cds[0]);
+				else
+				    nice_printf(outfile, "%s", "0");
 				break;
 #endif
 			case TYREAL:
