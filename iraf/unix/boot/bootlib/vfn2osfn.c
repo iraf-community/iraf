@@ -81,7 +81,8 @@ const char *vfn2osfn ( const char *vfn, int new )
 {
 	const char *ip;
 	XCHAR *op, *maxop;
-	XINT vp, mode, x_maxch = SZ_PATHNAME;
+	XPOINTER vp;
+	XINT mode, x_maxch = SZ_PATHNAME;
 	PKCHAR upkvfn[SZ_PATHNAME+1];
 	int err;
 
