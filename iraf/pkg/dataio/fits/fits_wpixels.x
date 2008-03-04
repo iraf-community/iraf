@@ -27,7 +27,8 @@ int	ty_mii, ty_spp, npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
 int	bf, szblk
 pointer	spp, mii, ip, op
 
-int	sizeof(), miilen(), fstati()
+int	sizeof(), fstati()
+size_t	miilen()
 long	note()
 errchk	malloc, mfree, write, miipak, amovc
 data	mii /NULL/, spp/NULL/

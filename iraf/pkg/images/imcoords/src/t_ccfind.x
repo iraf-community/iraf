@@ -665,7 +665,7 @@ real	ldatamax		#I local maximum good data value
 real	lback			#I local background value
 
 real	junk
-int     awvgr()
+size_t	awvgr()
 errchk  alimr, awvgr
 
 begin

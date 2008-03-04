@@ -548,7 +548,7 @@ int	npix			#I size of the (apparently) 1-D subraster
 
 real	lo, hi, junk
 
-int	awvgr()
+size_t	awvgr()
 
 errchk	alimr, awvgr
 

@@ -43,7 +43,8 @@ int	ty_mii, ty_spp, npix_rec, nch_rec, sz_rec, nchars, len_mii, recptr
 int	bufsize, i, n, ip, op
 pointer	mii, spp
 
-int	rft_getbuf(), sizeof(), miilen()
+int	rft_getbuf(), sizeof()
+size_t	miilen()
 errchk	miilen, mfree, malloc, rft_getbuf, miiupk
 data	mii/NULL/, spp/NULL/
 
