@@ -29,7 +29,7 @@ define	YYABORT		return (ERR)
 # structures, with the length and makeup of the operand structure being
 # application dependent.
 
-int procedure yyparse (fd, yydebug, yylex)
+long procedure yyparse (fd, yydebug, yylex)
 
 pointer	fd			# stream to be parsed
 bool	yydebug			# print debugging information?

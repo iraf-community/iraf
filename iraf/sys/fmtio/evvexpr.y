@@ -170,7 +170,8 @@ int	junk
 pointer	sp, ip
 bool	debug, first_time
 size_t	sz_val
-int	strlen(), xvv_parse(), xvv_gettok()
+int	strlen(), xvv_gettok()
+long	xvv_parse()
 pointer	xvv_loadsymbols()
 extern	xvv_gettok()
 

@@ -67,7 +67,8 @@ size_t	sz_val
 int	junk
 bool	debug
 pointer	sp, ip
-int	xev_gettok(), strlen(), xev_parse()
+int	xev_gettok(), strlen()
+long	xev_parse()
 extern	xev_gettok()
 
 errchk	xev_parse, calloc
