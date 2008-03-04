@@ -61,7 +61,7 @@ define	B_MAGIC			Memi[P2I($1)]
 define	B_SBUFPTR		Memp[$1+1]	# string buffer pointer
 define	B_NSTR			Memi[P2I($1+2)]	# number of strings
 define	B_STRNUM		Memi[P2I($1+3)]	# used to read list
-define	B_STRINDX		Memi[P2I($1+$2-1+4)]	# index of string
+define	B_STRINDX		Memp[$1+$2-1+4]	# index of string
 
 # FNTU descriptor structure.
 define	LEN_FNTUHDR		(10+1024+256)
@@ -325,9 +325,10 @@ begin
 	    # If sorting is desired and the pattern did not specify an explicit
 	    # list (e.g., "@listfile"), sort the last batch of filenames.
 
-	    if (sortlist && nstr > first_string)
-		call strsrt (B_STRINDX(list,first_string), Memc[sbuf],
-		    nstr - first_string + 1)
+	    if (sortlist && nstr > first_string) {
+		sz_val = nstr - first_string + 1
+		call strsrt (B_STRINDX(list,first_string), Memc[sbuf], sz_val)
+	    }
 	}
 
 	# Update the string buffer descriptor, return unused buffer space.
