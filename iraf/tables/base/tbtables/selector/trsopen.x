@@ -26,7 +26,7 @@ define	YSEMI		269
 define	YSTR		270
 define	yyclearin	yychar = -1
 define	yyerrok		yyerrflag = 0
-define	YYMOVE		call amovi (Memi[P2I($1)], Memi[P2I($2)], YYOPLEN)
+define	YYMOVE		call yy_move (Memp[$1], Memp[$2], YYOPLEN)
 define	YYERRCODE	256
 
 # line 131 "trsopen.y"
@@ -54,7 +54,8 @@ errchk	stropen, trsparse, trserr
 
 int	trslex()
 extern	trslex
-pointer	trsinit(), trsparse()
+pointer	trsinit()
+long	trsparse()
 int	stropen(), strlen()
 
 begin
@@ -534,9 +535,9 @@ define	YYABORT		return (ERR)
 # structures, with the length and makeup of the operand structure being
 # application dependent.
 
-int procedure yyparse (fd, yydebug, yylex)
+long procedure yyparse (fd, yydebug, yylex)
 
-int	fd			# stream to be parsed
+pointer	fd			# stream to be parsed
 bool	yydebug			# print debugging information?
 int	yylex()			# user-supplied lexical input function
 extern	yylex()
@@ -555,17 +556,16 @@ short	yyj, yym		# internal variables
 pointer	yysp, yypvt
 short	yystate, yyn
 int	yyxi, i
+size_t	sz_val
 errchk	salloc, yylex
 
 
 include "trsopen.com"
 
 int	cptr
-
-errchk	trslex, trsaddnode
 bool	trscname(), trscnum()
-pointer	trsaddnode
-
+pointer	trsaddnode()
+errchk	trslex, trsaddnode
 string	badcol  "column not found"
 
 short	yyexca[6]
@@ -610,7 +610,8 @@ data	(yydef(i),i= 33, 38)	/  16,  21,  11,  10,  17,  18/
 
 begin
 	call smark (yysp)
-	call salloc (yyv, (YYMAXDEPTH+2) * YYOPLEN, TY_STRUCT)
+	sz_val = (YYMAXDEPTH+2) * YYOPLEN
+	call salloc (yyv, sz_val, TY_STRUCT)
 
 	# Initialization.  The first element of the dynamically allocated
 	# token value stack (yyv) is used for yyval, the second for yylval,

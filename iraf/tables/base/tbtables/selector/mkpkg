@@ -19,6 +19,15 @@ generic:
         $ifolder (generic/tcsrdaryi.x, tcsrdary.gx)
         $generic -k -p generic/ -t bcsird tcsrdary.gx
         $endif
+
+	$ifnewer (trsopen.y, trsopen.x)
+	    $ifeq (HOSTID, unix)
+		$echo "selector/trsopen.x is out of date; rebuilding with XYACC:"
+		!(xyacc trsopen.y; mv -f ytab.x trsopen.x)
+	    $else
+		$echo "selector/trsopen.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
         ;
 
 libtbtables.a:

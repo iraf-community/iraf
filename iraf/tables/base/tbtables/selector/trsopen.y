@@ -4,6 +4,8 @@ include "trs.h"
 #* HISTORY *
 #* B.Simon	04-Nov-94	original
 #* B.Simon	23-Dec-97	row optimization added
+#  Phil Hodge	12-Jul-2005	In trsopen, declare 'debug' to be bool rather
+#				than int, and add 'int trslex()'
 
 define	YYMAXDEPTH	64
 define	YYOPLEN		1
@@ -13,11 +15,9 @@ define	yyparse		trsparse
 include "trsopen.com"
 
 int	cptr
-
-errchk	trslex, trsaddnode
 bool	trscname(), trscnum()
-pointer	trsaddnode
-
+pointer	trsaddnode()
+errchk	trslex, trsaddnode
 string	badcol  "column not found"
 
 %}
@@ -148,11 +148,12 @@ data	nil     / EOS /
 data	debug	/ false /
 string	syntax  "syntax error"
 
-errchk	stropen, trsparse, trserr, trsgencode
+errchk	stropen, trsparse, trserr
 
 int	trslex()
 extern	trslex
-pointer	trsinit(), trsparse()
+pointer	trsinit()
+long	trsparse()
 int	stropen(), strlen()
 
 begin
@@ -288,7 +289,7 @@ include "trsopen.com"
 int	nc
 pointer	sp, token, errmsg
 
-string	errfmt  "Error in table row selector, %s. Last read: %s\n"
+string	errfmt  "Error in table row selector, %s. Last read: %s"
 
 begin
 	# Allocate memory to hold token
@@ -430,7 +431,7 @@ char	ch		# o: character read from input
 #--
 include	"trsopen.com"
 
-int	getc()
+char	getc()
 
 begin
 	Memc[tokbuf+itok] = getc (fd, ch)
