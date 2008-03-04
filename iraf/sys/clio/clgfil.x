@@ -26,6 +26,8 @@ The CLPOPNI procedure creates a dummy list containing the single filename
 pointer procedure clpopni (param)
 
 char	param[ARB]			# CL filename template parameter
+
+size_t	sz_val
 int	sort
 pointer	sp, template, list
 pointer	fntopnb()
@@ -33,7 +35,8 @@ int	fstati()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = YES
 
@@ -55,13 +58,16 @@ end
 pointer procedure clpopns (param)
 
 char	param[ARB]			# CL filename template parameter
+
+size_t	sz_val
 int	sort
 pointer	sp, template, list
 pointer	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = YES
 
@@ -79,13 +85,16 @@ end
 pointer procedure clpopnu (param)
 
 char	param[ARB]			# CL filename template parameter
+
+size_t	sz_val
 int	sort
 pointer	sp, template, list
 pointer	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (template, sz_val, TY_CHAR)
 
 	sort = NO
 
@@ -113,7 +122,7 @@ end
 
 int procedure clgfil (list, fname, maxch)
 
-int	list			# list descriptor
+pointer	list			# list descriptor
 char	fname[ARB]		# output string
 int	maxch
 int	fntgfnb()
@@ -127,7 +136,7 @@ end
 
 procedure clpcls (list)
 
-int	list			# list descriptor
+pointer	list			# list descriptor
 
 begin
 	call fntclsb (list)
@@ -138,7 +147,7 @@ end
 
 procedure clprew (list)
 
-int	list			# list descriptor
+pointer	list			# list descriptor
 
 begin
 	call fntrewb (list)

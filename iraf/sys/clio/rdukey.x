@@ -21,6 +21,7 @@ int procedure rdukey (keystr, maxch)
 char	keystr[ARB]	 	# receives keystroke command string
 int	maxch			# max chars out
 
+size_t	sz_val
 int	junk, ch
 int	delay, key
 pointer	sp, buf, ip, op, tty
@@ -28,14 +29,15 @@ bool	rawmode_set, ucasein_set
 bool	playback_set, pbverify_set
 
 pointer	ttyodes()
-int	fstati(), ttstati(), envgets(), getci()
+int	fstati(), ttstati(), envgets(), getci(), modi()
 define	again_ 91
 define	done_  92
 errchk	ttyodes, syserrs
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call flush (STDERR)
 	call flush (STDOUT)
@@ -188,7 +190,7 @@ done_
 		keystr[op] = '\\';  op=op+1
 		keystr[op] = '0';  op=op+1
 		keystr[op] = key / 8 + '0';  op=op+1
-		keystr[op] = mod(key,8) + '0';  op=op+1
+		keystr[op] = modi(key,8) + '0';  op=op+1
 	    }
 
 	    if (Memc[buf] != EOS && maxch > 1) {

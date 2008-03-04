@@ -72,6 +72,7 @@ define	SYM_VALUE	Memi[P2I($1)]	# sbuf offset of value string
 procedure clc_init()
 
 pointer	stopen()
+size_t	sz_val
 bool	first_time
 data	first_time /true/
 include	"clio.com"
@@ -85,7 +86,8 @@ begin
 	    call stfree (cl_stp, cl_stmark)
 
 	call stmark (cl_stp, cl_stmark)
-	call aclri (cl_posarg, MAX_POSARGS)
+	sz_val = MAX_POSARGS
+	call aclrp (cl_posarg, sz_val)
 	cl_nposargs = 0
 	cl_nextarg  = 1
 end
@@ -113,7 +115,7 @@ end
 
 procedure clc_mark (marker)
 
-pointer	marker			# receives marked position
+int	marker			# receives marked position
 include	"clio.com"
 
 begin
@@ -126,14 +128,17 @@ end
 
 procedure clc_free (marker)
 
-pointer	marker			# marked position
+int	marker			# marked position
+
+size_t	sz_val
 include	"clio.com"
 
 begin
 	call stfree (cl_stp, marker)
 	cl_nposargs = 0
 	cl_nextarg  = 1
-	call aclri (cl_posarg, MAX_POSARGS)
+	sz_val = MAX_POSARGS
+	call aclrp (cl_posarg, sz_val)
 end
 
 
@@ -334,14 +339,17 @@ procedure clc_scan (cmd)
 
 char	cmd[ARB]		#I command to be scanned
 
+size_t	sz_val
 int	ip
 pointer	sp, param, value, op, nchars
 int	stridx(), ctowrd()
 
 begin
 	call smark (sp)
-	call salloc (param, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Skip any leading whitespace.
 	for (ip=1;  IS_WHITE(cmd[ip]);  ip=ip+1)
@@ -386,6 +394,7 @@ int	fd			#I output file
 char	pset[ARB]		#I pset to be listed, or EOS for full cache
 char	format[ARB]		#I output format - one %s each for param,value
 
+size_t	sz_val
 int	nsyms, i
 pointer	sp, syms, sympset, ip, op, sym, np
 
@@ -400,19 +409,21 @@ begin
 	    nsyms = nsyms + 1
 
 	call smark (sp)
-	call salloc (syms, nsyms, TY_POINTER)
-	call salloc (sympset, SZ_FNAME, TY_CHAR)
+	sz_val = nsyms
+	call salloc (syms, sz_val, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (sympset, sz_val, TY_CHAR)
 
 	# Get a reversed list of symbol pointers.
 	op = syms + nsyms - 1
 	for (sym=sthead(cl_stp);  sym != NULL;  sym=stnext(cl_stp,sym)) {
-	    Memi[op] = sym
+	    Memp[op] = sym
 	    op = op - 1
 	}
 
 	# Output the list.
 	do i = 1, nsyms {
-	    sym = Memi[syms+i-1]
+	    sym = Memp[syms+i-1]
 	    np = stname (cl_stp, sym)
 
 	    # Check the pset name if the user named a specific pset.

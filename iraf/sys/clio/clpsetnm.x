@@ -11,6 +11,7 @@ pointer	pp			# pset descriptor
 char	parname[ARB]		# name of parameter in pset
 
 pointer	op
+int	i_len
 int	gstrcpy()
 
 begin
@@ -19,7 +20,8 @@ begin
 	    op = op + gstrcpy (PS_PSETNAME(pp), Memc[op], SZ_PSPARNAME)
 	    Memc[op] = '.';  op = op + 1
 	}
-	call strcpy (parname, Memc[op], SZ_PSPARNAME-(op-PS_PARNAMEP(pp)))
+	i_len = SZ_PSPARNAME-(op-PS_PARNAMEP(pp))
+	call strcpy (parname, Memc[op], i_len)
 
 	return (PS_PARNAMEP(pp))
 end

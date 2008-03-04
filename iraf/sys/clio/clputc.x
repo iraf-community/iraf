@@ -9,13 +9,15 @@ procedure clputc (param, cval)
 char	param[ARB]
 char	cval
 
+size_t	sz_val
 pointer	sp, value, pname
 pointer	clc_find()
 
 begin
 	call smark (sp)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (pname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (pname, sz_val, TY_CHAR)
 
 	# Character constants are stored as strings in the CL.  Add single
 	# quotes about the character value to deimit the string.  The

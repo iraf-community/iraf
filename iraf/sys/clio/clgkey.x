@@ -13,8 +13,9 @@ int	key			# keystroke value of cursor event
 char	strval[ARB]		# string value, if any
 int	maxch
 
+size_t	sz_val
 char	ch
-int	nitems, op
+int	nitems, op, i_off
 pointer	sp, buf, ip
 int	cctoc(), clglstr()
 int	clstati(), rdukey()
@@ -22,7 +23,8 @@ define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Flush any buffered text output.
 	call flush (STDERR)
@@ -43,8 +45,10 @@ begin
 
 	ip = buf
 	nitems = 0
-	if (cctoc (Memc, ip, ch) == 0)
+	i_off = 1
+	if (cctoc (Memc[ip], i_off, ch) == 0)
 	    goto quit_
+	ip = ip + i_off - 1
 	key = ch
 	nitems = nitems + 1
 

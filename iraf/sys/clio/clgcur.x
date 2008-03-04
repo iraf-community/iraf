@@ -28,15 +28,17 @@ int	key			# keystroke value of cursor event
 char	strval[ARB]		# string value, if any
 int	maxch
 
+size_t	sz_val
 char	ch
 pointer	sp, buf, ip
-int	nitems, op, delim
+int	nitems, op, delim, i_off
 int	ctor(), ctoi(), cctoc(), clglstr(), stridx()
 define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE + maxch, TY_CHAR)
+	sz_val = SZ_LINE + maxch
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Flush any buffered text or graphics output.
 	call flush (STDERR)
@@ -63,20 +65,24 @@ begin
 
 	} else {
 	    # Decode the X-Y-WCS fields.
-	    if (ctor (Memc, ip, wx) == 0)
+	    i_off = 1
+	    if (ctor (Memc[ip], i_off, wx) == 0)
 		goto quit_
 	    nitems = nitems + 1
-	    if (ctor (Memc, ip, wy) == 0)
+	    if (ctor (Memc[ip], i_off, wy) == 0)
 		goto quit_
 	    nitems = nitems + 1
-	    if (ctoi (Memc, ip, wcs) == 0)
+	    if (ctoi (Memc[ip], i_off, wcs) == 0)
 		goto quit_
 	    nitems = nitems + 1
+	    ip = ip + i_off - 1
 	}
 
 	# Get the KEY field.
-	if (cctoc (Memc, ip, ch) == 0)
+	i_off = 1
+	if (cctoc (Memc[ip], i_off, ch) == 0)
 	    goto quit_
+	ip = ip + i_off - 1
 	key = ch
 	nitems = nitems + 1
 

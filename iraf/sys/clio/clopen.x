@@ -22,7 +22,7 @@ int	devtype			# device type (text or binary)
 
 long	lvalue
 int	fd, psmode, chan
-pointer	 devepa
+pointer	devepa
 int	fsetfd()
 pointer	locpr()
 extern	zardps(), zardnu(), zgetty(), zgettt()
@@ -120,10 +120,14 @@ begin
 	# Seek is needed to set the proper logical offset for each file,
 	# as well as to seek to the end of a text file if no CL.
 
-	call seek (CLIN,  BOFL)
-	call seek (CLOUT, EOFL)
-	call seek (STDIN, BOFL)
+	lvalue = BOFL
+	call seek (CLIN,  lvalue)
+	lvalue = EOFL
+	call seek (CLOUT, lvalue)
+	lvalue = BOFL
+	call seek (STDIN, lvalue)
 
+	lvalue = EOFL
 	do fd = STDOUT, PSIOCTRL
-	    call seek (fd, EOFL)
+	    call seek (fd, lvalue)
 end
