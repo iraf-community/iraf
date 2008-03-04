@@ -39,7 +39,8 @@ int	clgwrd(), clgcur()
 int	open(), imtgetim(), getline(), scan(), nscan()
 int	stridxs(), nowhite(), btoi(), gt_geti()
 real	clgetr()
-pointer	sp_nearest(), imtopenp(), gopen(), gt_init()
+int	sp_nearest()
+pointer	imtopenp(), gopen(), gt_init()
 errchk	sp_gdata, un_changer
 
 define	nospec_	99

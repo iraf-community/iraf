@@ -85,7 +85,8 @@ procedure cmd_dbg_file (rv)
 
 pointer	rv						#I RV struct pointer
 
-pointer	sp, buf, open()
+pointer	sp, buf
+int	open()
 errchk 	open
 
 begin
@@ -243,9 +244,9 @@ procedure op_debug (rv)
 pointer	rv					#I RV struct pointer
 
 pointer	db, sp, bp, ks
-pointer	clopset(), open()
+pointer	clopset()
 bool	clgpsetb(), streq()
-int	clgpseti(), btoi()
+int	open(), clgpseti(), btoi()
 errchk  clopset, open
 
 begin

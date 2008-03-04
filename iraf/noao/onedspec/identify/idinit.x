@@ -142,7 +142,8 @@ pointer procedure id_getid (id, key)
 pointer	id		#I IDENTIFY structure
 char	key[ARB]	#I Key to use in saving information
 
-int	sid, stfind()
+int	sid
+pointer	stfind()
 
 begin
 	sid = stfind (ID_STP(id), key)
@@ -174,7 +175,8 @@ pointer procedure id_getap (id)
 
 pointer	id		# IDENTIFY structure
 
-int	sid, stfind()
+int	sid
+pointer	stfind()
 
 begin
 	call sprintf (ID_SAVEID(id), ID_LENSTRING, "aperture %d %d")

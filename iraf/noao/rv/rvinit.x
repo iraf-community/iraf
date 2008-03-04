@@ -248,7 +248,7 @@ bool	interactive				#I Interactive flag
 pointer	sp, log, meta, verb, pverb
 bool	streq()
 int	verbose, cod_verbose()
-pointer	open()
+int	open()
 errchk	open
 
 begin

@@ -485,7 +485,7 @@ int	element		# element of int array
 int	index
 pointer	sp, temp, ptr
 int	strmatch()
-pointer	strdic()
+int	strdic()
 
 begin
 	call smark (sp)
@@ -519,7 +519,7 @@ int	element		# element of int array
 int	index, ip, ival
 pointer	sp, temp, ptr
 int	ctoi()
-pointer	strdic()
+int	strdic()
 
 begin
 	call smark (sp)
@@ -555,7 +555,7 @@ int	index, ip
 pointer	sp, temp, ptr
 real	rval
 int	ctor()
-pointer	strdic()
+int	strdic()
 
 begin
 	call smark (sp)
@@ -591,7 +591,7 @@ int	maxch		# maximum number of character
 
 int	index, nk
 pointer	sp, temp, ptr
-pointer	strdic()
+int	strdic()
 
 begin
 	call smark (sp)
