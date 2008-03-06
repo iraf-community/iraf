@@ -16,7 +16,8 @@ char	cmd[ARB]		#I command line
 int	ruk_argoff		#I offset of argument list in CMD
 int	ruk_interact		#I we were called interactively
 
-int	i, ntasks
+long	i
+size_t	ntasks
 int	lmarg, rmarg, maxch, ncol, ruk_eawarn
 int	envgeti(), envscan()
 bool	streq()

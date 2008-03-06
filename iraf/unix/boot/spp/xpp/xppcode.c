@@ -1119,7 +1119,7 @@ void put_dictionary( void )
 	 * descriptor for string 0 (dict) was prepared when the TASK statement
 	 * was processed.
 	 */
-	snprintf (buf, SZ_LINE, "%s\tdp(%d)\n", type_decl[XTY_INT], ntasks + 1);
+	snprintf (buf, SZ_LINE, "%s\tdp(%d)\n", type_decl[XTY_POINTER], ntasks + 1);
 	outstr (buf);
 	snprintf (buf, SZ_LINE, "%s\tdict(%d)\n", type_decl[XTY_CHAR],
 	    string_list[0].str_length);
