@@ -116,6 +116,7 @@ int	curpos					#I X position of text
 char	str[ARB]				#I string to write
 
 char	word[SZ_WORD], line[SZ_LINE]
+size_t	sz_val
 int	i, fd, ip, pos, st, en, gstrmatch()
 int	ps_textwidth(), ps_getfont()
 errchk	ps_setfont, ps_textwidth
@@ -123,8 +124,10 @@ errchk	ps_setfont, ps_textwidth
 begin
 	fd = PS_FD(ps)
 
-	call aclrc (word, SZ_WORD)
-	call aclrc (line, SZ_LINE)
+	sz_val = SZ_WORD
+	call aclrc (word, sz_val)
+	sz_val = SZ_LINE
+	call aclrc (line, sz_val)
 
 	if (gstrmatch (str, "\\\\f?", st, en) == 0) {
 	    # No font changes so just output the word.

@@ -16,7 +16,7 @@ int     fd, ip, op
 char    fname[SZ_FNAME], date[SZ_TIME], line[SZ_LINE], outline[SZ_LINE]
 
 pointer ps_open()
-int     open(), getline()
+int     open(), getline(), modi()
 long    clktime()
 errchk	open, close, getline, ps_setfont, ps_open
 
@@ -55,7 +55,7 @@ begin
                         repeat {
                             outline[op] = ' '
                             op = op + 1
-                        } until (mod(op,8) == 1)
+                        } until (modi(op,8) == 1)
                         ip = ip + 1
                     } else {
                         outline[op] = line [ip]

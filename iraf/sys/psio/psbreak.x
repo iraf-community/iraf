@@ -13,6 +13,8 @@ procedure ps_linebreak (ps, fill_flag)
 pointer	ps					#I PSIO descriptor
 int	fill_flag				#I fill line flag
 
+size_t	sz_val
+
 begin
 	iferr (call ps_output (ps, Memc[PS_WBPTR(ps)], fill_flag))
 	    return
@@ -37,7 +39,8 @@ begin
         PS_XPOS(ps) = PS_CLMARGIN(ps)
 
 	# Clear the word buffer.
-	call aclrc (Memc[PS_WBPTR(ps)], SZ_LINE)
+	sz_val = SZ_LINE
+	call aclrc (Memc[PS_WBPTR(ps)], sz_val)
 end
 
 

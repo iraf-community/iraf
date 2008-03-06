@@ -13,13 +13,15 @@ pointer	ps					#I PSIO descriptor
 
 int	fd, sz_font
 char	buf[SZ_LINE]
+long	lval
 
 int	itoc(), ps_centerPos(), ps_rjPos()
 long	clktime()
 
 begin
 	fd = PS_FD(ps)
-	call cnvtime (clktime(long(0)), buf, SZ_LINE)
+	lval = 0
+	call cnvtime (clktime(lval), buf, SZ_LINE)
 
 	# Write the header stuff.
 	call fprintf (fd, "%%!PS-Adobe-1.0\n")

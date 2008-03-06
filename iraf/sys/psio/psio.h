@@ -60,14 +60,14 @@ define	PS_RMARGIN	Memr[P2R($1+21)]	# right margin	    (inches)
 define	PS_TMARGIN	Memr[P2R($1+22)]	# top margin	    (inches)
 define	PS_BMARGIN	Memr[P2R($1+23)]	# bottom margin	    (inches)
 
-define	PS_HLE		Memi[P2I($1+25)]	# header left edge tag str
-define	PS_HCE		Memi[P2I($1+26)]	# header center tag str
-define	PS_HRE		Memi[P2I($1+27)]	# header right edge tag str
-define	PS_FLE		Memi[P2I($1+28)]	# footer left edge tag str
-define	PS_FCE		Memi[P2I($1+29)]	# footer center tag str
-define	PS_FRE		Memi[P2I($1+30)]	# footer right edge tag str
+define	PS_HLE		Memp[$1+25]	# header left edge tag str
+define	PS_HCE		Memp[$1+26]	# header center tag str
+define	PS_HRE		Memp[$1+27]	# header right edge tag str
+define	PS_FLE		Memp[$1+28]	# footer left edge tag str
+define	PS_FCE		Memp[$1+29]	# footer center tag str
+define	PS_FRE		Memp[$1+30]	# footer right edge tag str
 
-define	PS_WBPTR	Memi[P2I($1+31)]	# word buffer ptr
+define	PS_WBPTR	Memp[$1+31]	# word buffer ptr
 
 # Runtime descriptor.
 define  PS_XPOS         Memi[P2I($1+35)]     # current page X position

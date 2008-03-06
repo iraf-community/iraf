@@ -16,6 +16,7 @@ pointer	ps					#I PSIO descriptor
 char	line[ARB]				#I text line
 
 char	word[SZ_FNAME]
+size_t	sz_val
 pointer	wbuf, wp
 int	i, ip, start_ip
 int	len, width, curpos, rmargin
@@ -64,7 +65,8 @@ begin
 		Memc[wbuf+len-1] = EOS
 		call ps_linebreak (ps, PS_JUSTIFY(ps))
 
-		call aclrc (Memc[wbuf], SZ_FNAME)
+		sz_val = SZ_FNAME
+		call aclrc (Memc[wbuf], sz_val)
 		call strcpy (line[start_ip], Memc[wbuf], SZ_LINE)
 		call strcat (" ", Memc[wbuf], SZ_LINE)
 		return
