@@ -10,20 +10,22 @@ int	lfile			#I lfile to be opened
 int	mode			#I file access mode
 int	type			#I logical file type
 
+size_t	sz_val
 int	fd
 pointer	sp, lfname
 extern	fm_lfopen(), fm_lfclose()
-extern	fm_lfaread(), fm_lfawrite(), fm_lfawait(), fm_lfstati()
+extern	fm_lfaread(), fm_lfawrite(), fm_lfawait(), fm_lfstatl()
 int	fopnbf()
 errchk	fopnbf
 
 begin
 	call smark (sp)
-	call salloc (lfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lfname, sz_val, TY_CHAR)
 
 	call fm_lfname (fm, lfile, type, Memc[lfname], SZ_FNAME)
 	fd = fopnbf (Memc[lfname], mode, fm_lfopen, fm_lfaread, fm_lfawrite,
-	    fm_lfawait, fm_lfstati, fm_lfclose)
+	    fm_lfawait, fm_lfstatl, fm_lfclose)
 
 	call sfree (sp)
 	return (fd)

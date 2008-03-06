@@ -12,12 +12,17 @@ procedure fm_lfcopy (old, o_lfile, new, n_lfile)
 pointer	old, new		#I FMIO descriptors of source and destination
 int	o_lfile, n_lfile	#I lfile numbers of source and dest. lfiles
 
-long	offset
-int	n_szbpage
+size_t	sz_val
+long	offset, n_szbpage
 pointer	sp, o_ft, n_ft, o_lf, n_lf, o_lfname, n_lfname, buf
-int	maxpages, maxbytes, nbytes, type, nleft, status
+int	type, i_status, o_lf_chan, n_lf_chan
+long	maxpages, nleft, status
+size_t	maxbytes, nbytes
 
 errchk	fmio_errchk, fmio_bind, syserrs
+
+include "fmio.com"
+
 define	olderr_ 91
 define	newerr_ 92
 
@@ -53,23 +58,28 @@ begin
 
 	# Allocate buffers.
 	call smark (sp)
-	call salloc (o_lfname, SZ_FNAME, TY_CHAR)
-	call salloc (n_lfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (o_lfname, sz_val, TY_CHAR)
+	call salloc (n_lfname, sz_val, TY_CHAR)
 	call salloc (buf, maxbytes / SZB_CHAR, TY_CHAR)
 
 	# Open old lfile.
 	call fm_lfname (old, o_lfile, type, Memc[o_lfname], SZ_FNAME)
-	call strpak (Memc[o_lfname], Memc[o_lfname], SZ_FNAME)
-	call fm_lfopen (Memc[o_lfname], READ_ONLY, o_lf)
-	if (o_lf == ERR)
+	sz_val = SZ_FNAME
+	call strpak (Memc[o_lfname], Memc[o_lfname], sz_val)
+	call fm_lfopen (Memc[o_lfname], READ_ONLY, o_lf_chan)
+	if (o_lf_chan == ERR)
 	    goto olderr_
+	o_lf = Memp[lf_ptrs+o_lf_chan]
 
 	# Open new lfile.
 	call fm_lfname (new, n_lfile, type, Memc[n_lfname], SZ_FNAME)
-	call strpak (Memc[n_lfname], Memc[n_lfname], SZ_FNAME)
-	call fm_lfopen (Memc[n_lfname], NEW_FILE, n_lf)
-	if (n_lf == ERR)
+	sz_val = SZ_FNAME
+	call strpak (Memc[n_lfname], Memc[n_lfname], sz_val)
+	call fm_lfopen (Memc[n_lfname], NEW_FILE, n_lf_chan)
+	if (n_lf_chan == ERR)
 	    goto newerr_
+	n_lf = Memp[lf_ptrs+n_lf_chan]
 
 	# Copy the lfile data (as a binary file to avoid needless
 	# character unpack/pack).
@@ -77,32 +87,32 @@ begin
 	nleft = LF_FSIZE(o_lf)
 	for (offset=1;  nleft > 0;  offset=offset+nbytes) {
 	    # Read a block of data.
-	    call fm_lfbinread (o_lf, Memc[buf], maxbytes, offset)
-	    call fm_lfbinwait (o_lf, nbytes)
+	    call fm_lfbinread (o_lf_chan, Memc[buf], maxbytes, offset)
+	    call fm_lfbinwait (o_lf_chan, nbytes)
 	    if (nbytes == ERR)
 		goto olderr_
 	    else if (nbytes == 0)
 		break
 
 	    # Write to the new datafile.
-	    call fm_lfbinwait (n_lf, status)
+	    call fm_lfbinwait (n_lf_chan, status)
 	    if (status == ERR)
 		goto newerr_
-	    call fm_lfbinwrite (n_lf, Memc[buf], nbytes, offset)
+	    call fm_lfbinwrite (n_lf_chan, Memc[buf], nbytes, offset)
 	    nleft = nleft - nbytes
 	}
 
 	# Wait for the last write to terminate.
-	call fm_lfbinwait (n_lf, status)
+	call fm_lfbinwait (n_lf_chan, status)
 	if (status == ERR)
 	    goto newerr_
 
 	# Close the lfiles.
-	call fm_lfclose (o_lf, status)
-	if (status == ERR)
+	call fm_lfclose (o_lf_chan, i_status)
+	if (i_status == ERR)
 	    goto olderr_
-	call fm_lfclose (n_lf, status)
-	if (status == ERR)
+	call fm_lfclose (n_lf_chan, i_status)
+	if (i_status == ERR)
 	    goto newerr_
 
 	call fmio_errchk (old)

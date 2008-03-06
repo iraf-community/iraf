@@ -10,15 +10,15 @@ include "fmio.h"
 # fm_sync is called.  The page number of the first page allocated is returned
 # as the function value (a contiguous sequence of pages will be allocated).
 
-int procedure fmio_extend (fm, lfile, npages)
+long procedure fmio_extend (fm, lfile, npages)
 
 pointer fm                      #I FMIO descriptor
 int     lfile                   #I lfile getting the new pages
-int     npages                  #I number of pages to add
+long    npages                  #I number of pages to add
 
 pointer pt, pm, lf
-int	npte_perpage, npti
-int     inc, np, p1, p2, l1, l2, i
+long	npte_perpage, npti
+long	inc, np, p1, p2, l1, l2, i
 int	krealloc()
 
 begin
@@ -62,7 +62,7 @@ begin
             # Increase the size of the lfile pagemap if necessary.
             if (l2 > LF_PMLEN(lf)) {
                 LF_PMLEN(lf) = (l2 + INC_PMLEN-1) / INC_PMLEN * INC_PMLEN
-                if (krealloc (LF_PAGEMAP(lf), LF_PMLEN(lf), TY_INT) == ERR)
+                if (krealloc (LF_PAGEMAP(lf), LF_PMLEN(lf), TY_LONG) == ERR)
 		    return (ERR)
                 pm = LF_PAGEMAP(lf)
             }
@@ -70,7 +70,7 @@ begin
             # Add the pages to the lfile page table.
             LF_NPAGES(lf) = l2
             do i = l1, l2
-                Memi[pm+i-1] = p1 + i - l1
+                Meml[pm+i-1] = p1 + i - l1
         }
 
 	# Update the FTE for lfile zero (the page table file).

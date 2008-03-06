@@ -36,7 +36,7 @@ the cache; FM_UNLOCK releases the lock.
 define	LEN_FCACHE	(3+($1)*LEN_FSLOT)	# len = LEN_FCACHE(cachesize)
 define	FC_NFILES	Memi[P2I($1)]		# number of files in cache
 define	FC_REFCNT	Memi[P2I($1+1)]		# cache reference count
-define	FC_LFSTAT	Memi[P2I($1+2)]		# lfile statistics array
+define	FC_LFSTAT	Memp[$1+2]		# lfile statistics array
 define	FC_FS		((($2)-1)*LEN_FSLOT+($1)+3)	# get slot pointer
 
 define	LEN_FSLOT	4
@@ -59,6 +59,7 @@ int	type		# file type
 
 int	acmode, lru, i
 pointer	oldest, fc, fs, st
+long	lval
 
 bool	fm_locked()
 pointer	fm_findlf()
@@ -108,8 +109,10 @@ ref_
 	    FC_REFCNT(fc) = FC_REFCNT(fc) + 1
 	    FC_LRU(fs)    = FC_REFCNT(fc)
 	    FC_NREF(fs)   = FC_NREF(fs) + 1
-	    if (mode == APPEND)
-		call seek (FC_FD(fs), EOFL)
+	    if (mode == APPEND) {
+		lval = EOFL
+		call seek (FC_FD(fs), lval)
+	    }
 
 	    return (FC_FD(fs))
 
@@ -325,14 +328,17 @@ procedure fm_fcinit (fm, cachesize)
 pointer	fm		#I FMIO descriptor
 int	cachesize	#I size of cache, file slots
 
+size_t	sz_val
 pointer	fc
 
 begin
 	if (FM_FCACHE(fm) != NULL)
 	    call fm_fcfree (fm)
 
-	call calloc (fc, LEN_FCACHE(cachesize), TY_STRUCT)
-	call calloc (FC_LFSTAT(fc), FM_NLFILES(fm)+1, TY_SHORT)
+	sz_val = LEN_FCACHE(cachesize)
+	call calloc (fc, sz_val, TY_STRUCT)
+	sz_val = FM_NLFILES(fm)+1
+	call calloc (FC_LFSTAT(fc), sz_val, TY_SHORT)
 	FC_NFILES(fc) = cachesize
 	FC_REFCNT(fc) = 1
 

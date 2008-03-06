@@ -5,15 +5,18 @@ include	"fmio.h"
 
 # FM_LFBINWAIT -- Wait for i/o on a binary lfile.
 
-procedure fm_lfbinwait (lf, status)
+procedure fm_lfbinwait (lf_chan, status)
 
-pointer	lf			#I lfile descriptor
-int	status			#O i/o status (nbytes transferred or ERR)
+int	lf_chan			#I lfile descriptor
+long	status			#O i/o status (nbytes transferred or ERR)
 
-pointer	fm
+pointer	lf, fm
 int	chan
 
+include "fmio.com"
+
 begin
+	lf = Memp[lf_ptrs+lf_chan]
 	fm = LF_FM(lf)
 	chan = FM_CHAN(fm)
 

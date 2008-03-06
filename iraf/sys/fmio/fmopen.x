@@ -14,15 +14,29 @@ pointer procedure fm_open (fname, mode)
 char	fname[ARB]		#I datafile filename
 int	mode			#I file access mode
 
+size_t	sz_val
 int	chan, n
 pointer	sp, osfn, fn, fm
+int	initialized
 errchk	syserrs, calloc, fclobber
 int	nowhite()
 
+include "fmio.com"
+
+data initialized /0/
+
 begin
+	# Setup lf address table
+	if ( initialized == 0 ) {
+	    initialized = 1
+	    lf_ptrs = NULL
+	    num_lf = 0
+	}
+
 	call smark (sp)
-	call salloc (fn, SZ_PATHNAME, TY_CHAR)
-	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fn, sz_val, TY_CHAR)
+	call salloc (osfn, sz_val, TY_CHAR)
 
 	n = nowhite (fname, Memc[fn], SZ_PATHNAME)
 
@@ -37,7 +51,8 @@ begin
 	    call syserrs (SYS_FMOPEN, Memc[fn])
 
 	# Allocate the FMIO descriptor.
-	call calloc (fm, LEN_FMDES, TY_STRUCT)
+	sz_val = LEN_FMDES
+	call calloc (fm, sz_val, TY_STRUCT)
 
 	FM_MODE(fm) = mode
 	FM_CHAN(fm) = chan

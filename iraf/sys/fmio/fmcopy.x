@@ -14,6 +14,7 @@ char	newname[ARB]		#I new datafile name
 pointer	o_fm, n_fm
 pointer	fm_open()
 int	fm_stati()
+long	fm_statl()
 errchk	fm_open, fm_copyo
 
 begin
@@ -22,7 +23,7 @@ begin
 	n_fm = fm_open (newname, NEW_FILE)
 
 	# The child inherits the attributes of the parent.
-	call fm_seti (n_fm, FM_PAGESIZE,   fm_stati(o_fm,FM_PAGESIZE))
+	call fm_setl (n_fm, FM_PAGESIZE,   fm_statl(o_fm,FM_PAGESIZE))
 	call fm_seti (n_fm, FM_MAXLFILES,  fm_stati(o_fm,FM_MAXLFILES))
 
 	# Copy the datafile and clean up.

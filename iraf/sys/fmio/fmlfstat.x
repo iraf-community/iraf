@@ -9,7 +9,7 @@ int procedure fm_lfstat (fm, lfile, statbuf)
 
 pointer	fm			#I FMIO descriptor
 int	lfile			#I lfile number
-int	statbuf[ARB]		#O receives status
+long	statbuf[ARB]		#O receives status
 
 pointer	lf
 errchk	fmio_bind, fmio_errchk

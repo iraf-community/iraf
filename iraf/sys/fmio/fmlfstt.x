@@ -5,18 +5,21 @@ include	<mach.h>
 include	<fio.h>
 include	"fmio.h"
 
-# FM_LFSTATI -- Stat an lfile.
+# FM_LFSTAT[IL] -- Stat an lfile.
 
-procedure fm_lfstati (lf, param, lvalue)
+procedure fm_lfstatl (lf_chan, param, lvalue)
 
-pointer	lf			#I lfile descriptor
+int	lf_chan			#I lfile descriptor
 int	param			#I parameter code
 long	lvalue			#O parameter value
 
-pointer	fm
+pointer	lf, fm
 int	chan
 
+include "fmio.com"
+
 begin
+	lf = Memp[lf_ptrs+lf_chan]
 	fm = LF_FM(lf)
 	chan = FM_CHAN(fm)
 
@@ -35,4 +38,18 @@ begin
 	# For text lfiles, things appear to be SZB_CHAR larger.
 	if (and (LF_FLAGS(lf), LFF_TEXTFILE) != 0)
 	    lvalue = lvalue * SZB_CHAR
+end
+
+
+procedure fm_lfstati (lf_chan, param, value)
+
+int	lf_chan			#I lfile descriptor
+int	param			#I parameter code
+int	value			#O parameter value
+
+long	lvalue
+
+begin
+	call fm_lfstatl (lf_chan,param,lvalue)
+	value = lvalue
 end

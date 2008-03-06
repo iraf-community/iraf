@@ -6,11 +6,14 @@ long procedure clgetl (param)
 
 char	param[ARB]
 double	dval, clgetd()
+long	lval
 
 begin
 	dval = clgetd (param)
 	if (IS_INDEFD (dval))
 	    return (INDEFL)
-	else
-	    return (long(dval))
+	else {
+	    lval = dval
+	    return (lval)
+	}
 end

@@ -12,19 +12,25 @@ include	"fmio.h"
 # the requested amount of data has been transferred.  When writing at or
 # beyond EOF, new pages are automatically allocated upon demand.
 
-procedure fm_lfbinwrite (lf, buf, nbytes, offset)
+procedure fm_lfbinwrite (lf_chan, buf, nbytes, offset)
 
-pointer	lf			#I lfile descriptor
+int	lf_chan			#I lfile descriptor
 char	buf[ARB]		#I input data buffer
-int	nbytes			#I nbytes to write
+size_t	nbytes			#I nbytes to write
 long	offset			#I lfile offset
 
-pointer	fm, pm
-int	status, chan, nleft, szbpage
-int	lfile, l1,l2, p1,p2, d1,d2, ip, nb, nt
-int	fmio_extend()
+pointer	lf, fm, pm
+int	chan, lfile
+long	status, nleft, szbpage, c_1
+long	l1,l2, p1,p2, d1,d2, ip, nb
+size_t	nt
+long	fmio_extend()
+
+include "fmio.com"
 
 begin
+	c_1 = 1
+	lf = Memp[lf_ptrs+lf_chan]
 	fm = LF_FM(lf)
 	pm = LF_PAGEMAP(lf)
 
@@ -42,7 +48,7 @@ begin
 
 	# Extend the pagemap?
 	while (offset + nbytes > LF_NPAGES(lf)*szbpage + 1)
-	    if (fmio_extend (fm, lfile, 1) == ERR) {
+	    if (fmio_extend (fm, lfile, c_1) == ERR) {
 		LF_STATUS(lf) = ERR
 		return
 	    } else
@@ -61,9 +67,9 @@ begin
 	ip = 1
 	for (p1=l1;  nleft > 0 && p1 <= l2;  p1=p2) {
 	    # Get a contiguous range of datafile pages.
-	    d1 = Memi[pm+p1-1]
+	    d1 = Meml[pm+p1-1]
 	    for (p2=p1+1;  p2 <= l2;  p2=p2+1) {
-		d2 = Memi[pm+p2-1]
+		d2 = Meml[pm+p2-1]
 		if (d2 - d1 != p2 - p1)
 		    break
 	    }

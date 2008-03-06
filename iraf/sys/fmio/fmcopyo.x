@@ -14,9 +14,10 @@ procedure fm_copyo (old, new)
 pointer	old, new		#I FMIO descriptors of source and destination
 
 pointer	o_ft, o_lf
-int	n_szbpage, nlfiles, dpages, npte_perpage, npti, p1, dp, i
+int	nlfiles, i
+long	n_szbpage, dpages, npte_perpage, npti, p1, dp, lval
 errchk	fmio_bind, syserrs, fm_lfcopy
-int	fmio_extend()
+long	fmio_extend()
 
 begin
 	call fmio_bind (old)
@@ -47,10 +48,11 @@ begin
 	    call syserrs (SYS_FMPTIOVFL, FM_DFNAME(new))
 
 	for (p1=FM_PTINPTI(new)+1;  p1 <= npti;  p1=p1+1) {
-	    dp = fmio_extend (new, PT_LFILE, 1)
+	    lval = 1
+	    dp = fmio_extend (new, PT_LFILE, lval)
 	    if (dp == ERR)
 		call syserrs (SYS_FMCOPYO, FM_DFNAME(new))
-	    Memi[FM_PTINDEX(new)+p1-1] = dp
+	    Meml[FM_PTINDEX(new)+p1-1] = dp
 	    FM_PTINPTI(new) = p1
 	    FM_DHMODIFIED(new) = YES
 	}

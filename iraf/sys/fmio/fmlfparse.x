@@ -16,8 +16,9 @@ pointer	fm			#O FMIO descriptor
 int	lfile			#O lfile number
 int	type			#O lfile file type (text or binary)
 
+long	lval
 int	ip
-int	ctoi()
+int	ctoi(), ctol()
 
 begin
 	# Determine file type.
@@ -28,8 +29,9 @@ begin
 
 	# Get FMIO descriptor.
 	ip = 2
-	if (ctoi (lfname, ip, fm) <= 0)
+	if (ctol (lfname, ip, lval) <= 0)
 	    return (ERR)
+	fm = lval
 	
 	# Skip . delimiter.
 	if (lfname[ip] == '.')

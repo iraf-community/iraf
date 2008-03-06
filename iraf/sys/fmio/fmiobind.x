@@ -11,7 +11,9 @@ procedure fmio_bind (fm)
 pointer	fm			#I FMIO descriptor
 
 pointer	ft, pti, pt
-int	chan, szbpage, ftoff, ftlen, ptioff, ptilen, ptlen
+int	chan
+long	szbpage, ftoff, ptioff
+size_t	ftlen, ptilen, ptlen
 
 begin
 	if (FM_ACTIVE(fm) != NO)
@@ -30,7 +32,7 @@ begin
 
 	# Determine the byte offset of the first data page.
 	FM_DATASTART(fm) = max (1,
-	    (((ptioff+ptilen-1) * SZ_INT*SZB_CHAR) + szbpage-1) /
+	    (((ptioff+ptilen-1) * SZ_LONG*SZB_CHAR) + szbpage-1) /
 	    szbpage) * szbpage + 1
 
 	# Initialize the file table.
@@ -40,7 +42,7 @@ begin
 	FM_FTABLE(fm)		= ft
 
 	# Initialize the page table index.
-	call calloc (pti, ptilen, TY_INT)
+	call calloc (pti, ptilen, TY_LONG)
 	FM_PTIOFF(fm)		= ptioff
 	FM_PTINPTI(fm)		= 0
 	FM_PTINDEX(fm)		= pti

@@ -20,9 +20,11 @@ int	what			#I what to print
 
 pointer	ft, lf
 bool	deleted
-int	nlfiles, nlfdeleted, nlfinuse, i
-int	szbpage, spaceinuse, filesize, freespace
-long	clktime()
+int	nlfiles, nlfdeleted, nlfinuse
+long	szbpage, filesize, freespace, i, c_15
+int	spaceinuse
+int	modi()
+long	clktime(), modl()
 errchk	fmio_bind
 
 define	end_header_	91
@@ -31,6 +33,8 @@ define	end_ptindex_	93
 define	end_ptable_	94
 
 begin
+	c_15 = 15
+
 	call fmio_bind (fm)
 
 	ft = FM_FTABLE(fm)
@@ -65,9 +69,9 @@ begin
 	call fprintf (out,
 	"FMIO V%d.%d: datafile=%s, pagesize=%d, nlfiles=%d\n")
 	    call pargi (FM_DFVERSION(fm) / 100)
-	    call pargi (mod(FM_DFVERSION(fm),100))
+	    call pargi (modi(FM_DFVERSION(fm),100))
 	    call pargstr (FM_DFNAME(fm))
-	    call pargi (szbpage)
+	    call pargl (szbpage)
 	    call pargi (nlfiles)
 
 	call fprintf (out,
@@ -75,41 +79,41 @@ begin
 	    call pargi (nlfinuse)
 	    call pargi (nlfdeleted)
 	    call pargi (nlfiles - nlfinuse)
-	    call pargi (FM_FTOFF(fm))
+	    call pargl (FM_FTOFF(fm))
 	    call pargi (FM_FTLASTNF(fm))
 
 	call fprintf (out,
 	    "headersize=%d, filesize=%d, freespace=%d bytes (%d%%)\n")
-	    call pargi (FM_DATASTART(fm) - 1)
-	    call pargi (filesize)
-	    call pargi (freespace)
+	    call pargl (FM_DATASTART(fm) - 1)
+	    call pargl (filesize)
+	    call pargl (freespace)
 	    if (freespace <= 0)
 		call pargi (0)
 	    else
-		call pargi (freespace * 100 / filesize)
+		call pargl (freespace * 100 / filesize)
 
 	call fprintf (out,
 	    "fm=%xX, chan=%d, mode=%d, time since last sync=%d seconds\n")
-	    call pargi (fm)
+	    call pargp (fm)
 	    call pargi (FM_CHAN(fm))
 	    call pargi (FM_MODE(fm))
-	    call pargi (clktime (FM_LSYNCTIME(fm)))
+	    call pargl (clktime (FM_LSYNCTIME(fm)))
 
 	call fprintf (out,
 	    "datastart=%d, devblksize=%d, optbufsize=%d, maxbufsize=%d\n")
-	    call pargi (FM_DATASTART(fm))
-	    call pargi (FM_DEVBLKSIZE(fm))
-	    call pargi (FM_OPTBUFSIZE(fm))
-	    call pargi (FM_MAXBUFSIZE(fm))
+	    call pargl (FM_DATASTART(fm))
+	    call pargl (FM_DEVBLKSIZE(fm))
+	    call pargz (FM_OPTBUFSIZE(fm))
+	    call pargz (FM_MAXBUFSIZE(fm))
 
 	call fprintf (out, "ptioff=%d, ptilen=%d, npti=%d, ")
-	    call pargi (FM_PTIOFF(fm))
-	    call pargi (FM_PTILEN(fm))
-	    call pargi (FM_PTINPTI(fm))
+	    call pargl (FM_PTIOFF(fm))
+	    call pargl (FM_PTILEN(fm))
+	    call pargl (FM_PTINPTI(fm))
 	call fprintf (out, "ptlen=%d, npte=%d, lupte=%d\n")
-	    call pargi (FM_PTLEN(fm))
-	    call pargi (FM_PTNPTE(fm))
-	    call pargi (FM_PTLUPTE(fm))
+	    call pargz (FM_PTLEN(fm))
+	    call pargl (FM_PTNPTE(fm))
+	    call pargl (FM_PTLUPTE(fm))
 
 end_header_
 
@@ -124,14 +128,14 @@ end_header_
 	    if (LF_FSIZE(lf) == 0)
 		next
 	    call fprintf (out, " %4d size=%d")
-		call pargi (i)
-		call pargi (LF_FSIZE(lf))
+		call pargl (i)
+		call pargl (LF_FSIZE(lf))
 	    if (i == 0)
 		call fprintf (out, " [page table]")
 	    if (LF_PAGEMAP(lf) != NULL) {
 		call fprintf (out, " npages=%d pmlen=%d")
-		    call pargi (LF_NPAGES(lf))
-		    call pargi (LF_PMLEN(lf))
+		    call pargl (LF_NPAGES(lf))
+		    call pargz (LF_PMLEN(lf))
 	    }
 	    if (and (LF_FLAGS(lf), LFF_ALLOCATED) != 0)
 		call fprintf (out, " allocated")
@@ -152,11 +156,11 @@ end_ftable_
 	    "=================== page table index ====================\n")
 	do i = 0, FM_PTINPTI(fm) - 1 {
 	    call fprintf (out, " %4d")
-		call pargi (Memi[FM_PTINDEX(fm)+i])
-	    if (mod (i+1, 15) == 0)
+		call pargl (Meml[FM_PTINDEX(fm)+i])
+	    if (modl (i+1, c_15) == 0)
 		call fprintf (out, "\n")
 	}
-	if (mod (FM_PTINPTI(fm), 15) != 0)
+	if (modl (FM_PTINPTI(fm), c_15) != 0)
 	    call fprintf (out, "\n")
 
 end_ptindex_
@@ -170,10 +174,10 @@ end_ptindex_
 	do i = 0, FM_PTNPTE(fm) - 1 {
 	    call fprintf (out, " %4d")
 		call pargs (Mems[FM_PTABLE(fm)+i])
-	    if (mod (i+1, 15) == 0)
+	    if (modl (i+1, c_15) == 0)
 		call fprintf (out, "\n")
 	}
-	if (mod (FM_PTINPTI(fm), 15) != 0)
+	if (modl (FM_PTINPTI(fm), c_15) != 0)
 	    call fprintf (out, "\n")
 
 end_ptable_

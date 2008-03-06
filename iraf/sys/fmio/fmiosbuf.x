@@ -13,8 +13,8 @@ procedure fmio_setbuf (fm)
 
 pointer	fm			#I FMIO descriptor
 
-int	devblksize, devmaxsize
-int	optbufsize, maxbufsize, szbpage
+long	devblksize, devmaxsize
+long	optbufsize, maxbufsize, szbpage
 
 begin
 	# Get the device parameters for the device on which datafile resides.

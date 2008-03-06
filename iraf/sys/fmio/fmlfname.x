@@ -20,8 +20,9 @@ int	type			#I file type, text or binary
 char	lfname[maxch]		#O encoded lfile filename
 int	maxch			#I max chars out
 
+long	lval
 int	op
-int	itoc()
+int	itoc(), ltoc()
 errchk	fmio_bind, fmio_errchk
 
 begin
@@ -37,7 +38,8 @@ begin
 	    lfname[op] = 'B'
 	op = min (maxch, op + 1)
 
-	op = min (maxch, op + itoc (fm, lfname[op], maxch-op+1))
+	lval = fm
+	op = min (maxch, op + ltoc (lval, lfname[op], maxch-op+1))
 	lfname[op] = '.'
 	op = min (maxch, op + 1)
 	op = min (maxch, op + itoc (lfile, lfname[op], maxch-op+1))

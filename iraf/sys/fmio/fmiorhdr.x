@@ -12,15 +12,21 @@ procedure fmio_readheader (fm)
 
 pointer	fm			#I FMIO descriptor
 
+size_t	sz_val
 pointer	sp, buf, dh, pti, pt, ft, ip, op
-int	offset, buflen, npti, p1, p2, d1, d2, b_off1, b_off2, i
-int	status, chan, nbytes, nwords, maxpages, szbpage
-errchk	syserrs, calloc, malloc, realloc
+size_t	buflen, nbytes, nwords, c_1
+long	offset, npti, p1, p2, d1, d2, b_off1, b_off2, status
+int	i, chan
+long	maxpages, szbpage, lval
 long	clktime()
+int	sizeof()
+errchk	syserrs, calloc, malloc, realloc
 
 begin
+	c_1 = 1
 	call smark (sp)
-	call salloc (dh, LEN_DHSTRUCT, TY_STRUCT)
+	sz_val = LEN_DHSTRUCT
+	call salloc (dh, sz_val, TY_STRUCT)
 
 	chan = FM_CHAN(fm)
 
@@ -32,13 +38,20 @@ begin
 	repeat {
 	    # Get the raw data.
 	    nbytes = buflen * (SZ_STRUCT * SZB_CHAR)
-	    call zardbf (chan, Memi[buf], nbytes, 1)
+	    lval = 1
+	    # arg2: incompatible pointer
+	    call zardbf (chan, Memp[buf], nbytes, lval)
 	    call zawtbf (chan, status)
 	    if (status == ERR)
 		call syserrs (SYS_FMRERR, FM_DFNAME(fm))
 
 	    # Extract the datafile header struct.
-	    call miiupk32 (Memi[buf], Memi[dh], LEN_DHSTRUCT, TY_STRUCT)
+	    sz_val = LEN_DHSTRUCT
+	    if ( sizeof(TY_POINTER) == 2 ) {
+		call miiupk32 (Memp[buf], Memp[dh], sz_val, TY_POINTER)
+	    } else {
+		call miiupk64 (Memp[buf], Memp[dh], sz_val, TY_POINTER)
+	    }
 	    if (DH_MAGIC(dh) != FMIO_MAGIC)
 		call syserrs (SYS_FMBADMAGIC, FM_DFNAME(fm))
 
@@ -61,7 +74,8 @@ begin
 	FM_SZBPAGE(fm)		= DH_SZBPAGE(dh)
 	FM_NLFILES(fm)		= DH_NLFILES(dh)
 	FM_DATASTART(fm)	= DH_DATASTART(dh)
-	FM_LSYNCTIME(fm)	= clktime(0)
+	lval = 0
+	FM_LSYNCTIME(fm)	= clktime(lval)
 	FM_DHMODIFIED(fm)	= NO
 
 	# Initialize buffer sizes.
@@ -71,14 +85,19 @@ begin
 	    call syserrs (SYS_FMBLKCHSZ, FM_DFNAME(fm))
 
 	# Initialize the file table.
-	call calloc (ft, (FM_NLFILES(fm) + 1) * LEN_FTE, TY_STRUCT)
+	sz_val = (FM_NLFILES(fm) + 1) * LEN_FTE
+	call calloc (ft, sz_val, TY_STRUCT)
 	FM_FTOFF(fm)		= DH_FTOFF(dh)
 	FM_FTLASTNF(fm)		= DH_FTLASTNF(dh)
 	FM_FTABLE(fm)		= ft
 
 	ip = buf + FM_FTOFF(fm) - 1
-	call miiupk32 (Memi[ip], Memi[ip],
-	    (FM_NLFILES(fm) + 1) * LEN_FTEX, TY_INT)
+	sz_val = (FM_NLFILES(fm) + 1) * LEN_FTEX
+	if ( sizeof(TY_POINTER) == 2 ) {
+	    call miiupk32 (Memp[ip], Memp[ip], sz_val, TY_POINTER)
+	} else {
+	    call miiupk64 (Memp[ip], Memp[ip], sz_val, TY_POINTER)
+	}
 
 	do i = 0, FM_NLFILES(fm) {
 	    op = ft + i * LEN_FTE
@@ -93,8 +112,12 @@ begin
 	FM_PTINPTI(fm)		= DH_PTINPTI(dh)
 
 	ip = buf + FM_PTIOFF(fm) - 1
-	call malloc (pti, FM_PTILEN(fm), TY_INT)
-	call miiupk32 (Memi[ip], Memi[pti], FM_PTILEN(fm), TY_INT)
+	call malloc (pti, FM_PTILEN(fm), TY_LONG)
+	if ( sizeof(TY_LONG) == 2 ) {
+	    call miiupk32 (Memp[ip], Meml[pti], FM_PTILEN(fm), TY_LONG)
+	} else {
+	    call miiupk64 (Memp[ip], Meml[pti], FM_PTILEN(fm), TY_LONG)
+	}
 	FM_PTINDEX(fm)		= pti
 
 	# Now read the page table itself, stored in the data pages.
@@ -113,9 +136,9 @@ begin
 	npti = FM_PTINPTI(fm)
 	for (p1=1;  p1 <= npti;  p1=p2) {
 	    # Get a contiguous range of page table pages.
-	    d1 = Memi[pti+p1-1]
+	    d1 = Meml[pti+p1-1]
 	    for (p2=p1+1;  p2 <= npti;  p2=p2+1) {
-		d2 = Memi[pti+p2-1]
+		d2 = Meml[pti+p2-1]
 		if (d2-d1 != p2-p1 || p2-p1 >= maxpages)
 		    break
 	    }
@@ -126,9 +149,10 @@ begin
 	    offset = (d1-1) * FM_SZBPAGE(fm) + FM_DATASTART(fm)
 
 	    # Check to see if data is in BUF before reading datafile.
-	    if (offset >= b_off1 && (offset+nbytes) <= b_off2)
-		call bytmov (Memi[buf], offset, Mems[op], 1, nbytes)
-	    else {
+	    if (offset >= b_off1 && (offset+nbytes) <= b_off2) {
+		sz_val = offset
+		call bytmov (Memp[buf], sz_val, Mems[op], c_1, nbytes)
+	    } else {
 		call zardbf (chan, Mems[op], nbytes, offset)
 		call zawtbf (chan, status)
 		if (status < nbytes)
@@ -139,8 +163,10 @@ begin
 	}
 
 	# Swap the data.
-	if (BYTE_SWAP2 == YES)
-	    call bswap2 (Mems[pt], 1, Mems[pt], 1, npti * FM_SZBPAGE(fm))
+	if (BYTE_SWAP2 == YES) {
+	    sz_val = npti * FM_SZBPAGE(fm)
+	    call bswap2 (Mems[pt], c_1, Mems[pt], c_1, sz_val)
+	}
 
 	call mfree (buf, TY_STRUCT)
 	call sfree (sp)

@@ -14,6 +14,6 @@ begin
 	if (IS_INDEFD (dval))
 	    lval = INDEFL
 	else
-	    lval = long (dval)
+	    lval = dval
 	return (stat)
 end

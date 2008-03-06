@@ -25,24 +25,26 @@ procedure t_create()
 
 pointer	fm
 char	datafile[SZ_FNAME]
-int	pagesize, nlfiles, maxptpages
+int	nlfiles
+long	pagesize, maxptpages
 
 int	clgeti()
+long	clgetl()
 pointer	fm_open()
 
 begin
 	call clgstr ("datafile", datafile, SZ_FNAME)
-	pagesize   = clgeti ("pagesize")
+	pagesize   = clgetl ("pagesize")
 	nlfiles    = clgeti ("nlfiles")
-	maxptpages = clgeti ("maxptpages")
+	maxptpages = clgetl ("maxptpages")
 
 	fm = fm_open (datafile, NEW_FILE)
 	if (pagesize > 0)
-	    call fm_seti (fm, FM_PAGESIZE, pagesize)
+	    call fm_setl (fm, FM_PAGESIZE, pagesize)
 	if (nlfiles > 0)
 	    call fm_seti (fm, FM_MAXLFILES, nlfiles)
 	if (maxptpages > 0)
-	    call fm_seti (fm, FM_MAXPTPAGES, maxptpages)
+	    call fm_setl (fm, FM_MAXPTPAGES, maxptpages)
 	call fm_close (fm)
 end
 

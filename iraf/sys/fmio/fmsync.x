@@ -14,11 +14,14 @@ procedure fm_sync (fm)
 
 pointer	fm			#I FMIO descriptor
 
+size_t	sz_val
 pointer	sp, ip, op, dhbuf, pgbuf, pti, dh, ft, pt
-int	maxpages, nbytes, npti, p1, p2, d1, d2, dp, i
-int	szbpage, chan, buflen, status, npte_perpage
-int	fmio_extend()
+long	npti, p1, p2, d1, d2, dp, status, npte_perpage, lval
+int	chan, i
+size_t	nbytes, maxpages, szbpage, buflen
+long	fmio_extend()
 long	clktime()
+int	sizeof()
 
 begin
 	if (FM_MODE(fm) == READ_ONLY)
@@ -53,9 +56,10 @@ begin
 
 	# Allocate the page table pages.
 	for (p1=FM_PTINPTI(fm)+1;  p1 <= npti;  p1=p1+1) {
-	    dp = fmio_extend (fm, PT_LFILE, 1)
+	    lval = 1
+	    dp = fmio_extend (fm, PT_LFILE, lval)
 	    if (dp != ERR) {
-		Memi[FM_PTINDEX(fm)+p1-1] = dp
+		Meml[FM_PTINDEX(fm)+p1-1] = dp
 		FM_PTINPTI(fm) = p1
 		FM_DHMODIFIED(fm) = YES
 	    } else
@@ -69,7 +73,8 @@ begin
 	    call salloc (dhbuf, buflen, TY_STRUCT)
 
 	    # Encode and output the datafile header.
-	    call salloc (dh, LEN_DHSTRUCT, TY_STRUCT)
+	    sz_val = LEN_DHSTRUCT
+	    call salloc (dh, sz_val, TY_STRUCT)
 
 	    DH_MAGIC(dh)	 = FMIO_MAGIC
 	    DH_DFVERSION(dh)	 = FM_DFVERSION(fm)
@@ -84,7 +89,12 @@ begin
 	    DH_PTNPTE(dh)	 = FM_PTNPTE(fm)
 	    DH_DATASTART(dh)	 = FM_DATASTART(fm)
 
-	    call miipak32 (Memi[dh], Memi[dhbuf], LEN_DHSTRUCT, TY_STRUCT)
+	    sz_val = LEN_DHSTRUCT
+	    if ( sizeof(TY_POINTER) == 2 ) {
+		call miipak32 (Memp[dh], Memp[dhbuf], sz_val, TY_POINTER)
+	    } else {
+		call miipak64 (Memp[dh], Memp[dhbuf], sz_val, TY_POINTER)
+	    }
 
 	    # Output the file table.
 	    ft = FM_FTABLE(fm)
@@ -97,15 +107,28 @@ begin
 	    }
 
 	    op = dhbuf + FM_FTOFF(fm) - 1
-	    call miipak32 (Memi[op], Memi[op],
-		(FM_NLFILES(fm) + 1) * LEN_FTEX, TY_INT)
+	    sz_val = (FM_NLFILES(fm) + 1) * LEN_FTEX
+	    if ( sizeof(TY_POINTER) == 2 ) {
+	        call miipak32 (Memp[op], Memp[op], sz_val, TY_POINTER)
+	    } else {
+	        call miipak64 (Memp[op], Memp[op], sz_val, TY_POINTER)
+	    }
 
 	    # Output the page table index.
-	    call miipak32 (Memi[FM_PTINDEX(fm)], Memi[dhbuf+FM_PTIOFF(fm)-1],
-		FM_PTILEN(fm), TY_INT)
+	    sz_val = FM_PTILEN(fm)
+	    if ( sizeof(TY_POINTER) == 2 ) {
+	        call miipak32 (Meml[FM_PTINDEX(fm)], Memp[dhbuf+FM_PTIOFF(fm)-1],
+			       sz_val , TY_LONG)
+	    } else {
+	        call miipak64 (Meml[FM_PTINDEX(fm)], Memp[dhbuf+FM_PTIOFF(fm)-1],
+			       sz_val , TY_LONG)
+	    }
 
 	    # Update the whole thing on disk.
-	    call zawrbf (chan, Memi[dhbuf], FM_DATASTART(fm)-1, 1)
+	    sz_val = FM_DATASTART(fm)-1
+	    lval = 1
+	    # arg2: incompatible pointer
+	    call zawrbf (chan, Memp[dhbuf], sz_val, lval)
 	    call zawtbf (chan, status)
 	    if (status == ERR)
 		call fmio_posterr (fm, SYS_FMWRERR, FM_DFNAME(fm))
@@ -136,9 +159,9 @@ begin
 	    npti = FM_PTINPTI(fm)
 	    for (;  p1 <= npti;  p1=p2) {
 		# Get a contiguous range of page table pages.
-		d1 = Memi[pti+p1-1]
+		d1 = Meml[pti+p1-1]
 		for (p2=p1+1;  p2 <= npti;  p2=p2+1) {
-		    d2 = Memi[pti+p2-1]
+		    d2 = Meml[pti+p2-1]
 		    if (d2-d1 != p2-p1 || p2-p1 >= maxpages)
 			break
 		}
@@ -147,7 +170,8 @@ begin
 		ip = pt + (p1 - 1) * npte_perpage
 		nbytes = (min(npti+1,p2) - p1) * szbpage
 		if (BYTE_SWAP2 == YES) {
-		    call bswap2 (Mems[ip], 1, Mems[pgbuf], 1, nbytes)
+		    sz_val = 1
+		    call bswap2 (Mems[ip], sz_val, Mems[pgbuf], sz_val, nbytes)
 		    ip = pgbuf
 		}
 
@@ -162,7 +186,8 @@ begin
 	    FM_PTLUPTE(fm) = FM_PTNPTE(fm)
 	}
 
-	FM_LSYNCTIME(fm) = clktime(0)
+	lval = 0
+	FM_LSYNCTIME(fm) = clktime(lval)
 	call intr_enable()
 
 	call sfree (sp)

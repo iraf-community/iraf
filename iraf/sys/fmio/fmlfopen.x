@@ -6,25 +6,32 @@ include "fmio.h"
 # pseudo-filename identifying the FMIO datafile, lfile therein, and file type.
 # This is necessary to conform to the binary file driver interface standard.
 
-procedure fm_lfopen (pk_lfname, mode, chan)
+procedure fm_lfopen (pk_lfname, mode, lf_chan)
 
 char	pk_lfname[ARB]		#I encoded lfile specification (packed char)
 int	mode			#I file access mode
-int	chan			#O i/o channel assigned (descriptor)
+int	lf_chan			#O i/o channel assigned (descriptor)
 
-int	flags, lfile, type, np, i
+size_t	sz_val
+int	flags, lfile, type
+long	np, i
 pointer	sp, lfname, fm, lf, pt, pm
 int	kmalloc(), krealloc(), fm_lfparse()
+
+include "fmio.com"
+
 define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (lfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lfname, sz_val, TY_CHAR)
 
 	flags = 0
 
 	# Parse the file spec.
-	call strupk (pk_lfname, Memc[lfname], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call strupk (pk_lfname, Memc[lfname], sz_val)
 	if (fm_lfparse (Memc[lfname], fm, lfile, type) == ERR)
 	    goto err_
 	else if (type == TEXT_FILE)
@@ -40,10 +47,24 @@ begin
 
 	lf = FM_FTABLE(fm) + lfile * LEN_FTE
 
+	# Setup lf address table
+	do i = 0, num_lf {
+	    if ( i == num_lf ) break
+	    if ( Memp[lf_ptrs+i] == NULL ) break
+	}
+	if ( i == num_lf ) {
+	    sz_val = num_lf + 1
+	    call realloc (lf_ptrs, sz_val, TY_POINTER)
+	    num_lf = sz_val
+	}
+	Memp[lf_ptrs+i] = lf
+	lf_chan = i
+	#
+
 	# Activate the descriptor?
 	if (LF_PAGEMAP(lf) == NULL) {
 	    LF_PMLEN(lf) = DEF_PMLEN
-	    if (kmalloc (LF_PAGEMAP(lf), DEF_PMLEN, TY_INT) == ERR)
+	    if (kmalloc (LF_PAGEMAP(lf), LF_PMLEN(lf), TY_LONG) == ERR)
 		goto err_
 
 	    pm = LF_PAGEMAP(lf)
@@ -56,11 +77,11 @@ begin
 		    np = np + 1
 		    if (np > LF_PMLEN(lf)) {
 			LF_PMLEN(lf) = (np+INC_PMLEN-1) / INC_PMLEN * INC_PMLEN
-			if (krealloc (pm, LF_PMLEN(lf), TY_INT) == ERR)
+			if (krealloc (pm, LF_PMLEN(lf), TY_LONG) == ERR)
 			    goto err_
 			LF_PAGEMAP(lf) = pm
 		    }
-		    Memi[pm+np-1] = i
+		    Meml[pm+np-1] = i
 		}
 
 	    LF_NPAGES(lf) = np
@@ -79,11 +100,10 @@ begin
 
 	FM_DHMODIFIED(fm) = YES
 
-	chan = lf
 	call fmio_tick (fm)
 	call sfree (sp)
 	return
 err_
-	chan = ERR
+	lf_chan = ERR
 	call sfree (sp)
 end

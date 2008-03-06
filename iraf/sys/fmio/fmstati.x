@@ -3,9 +3,9 @@
 include	"fmset.h"
 include	"fmio.h"
 
-# FM_STATI -- Query an FMIO integer parameter.
+# FM_STAT[IL] -- Query an FMIO integer parameter.
 
-int procedure fm_stati (fm, param)
+long procedure fm_statl (fm, param)
 
 pointer	fm		#I FMIO descriptor
 int	param		#I parameter code from <fmset.h>
@@ -33,4 +33,16 @@ begin
 	default:
 	    return (ERR)
 	}
+end
+
+
+int procedure fm_stati (fm, param)
+
+pointer	fm		#I FMIO descriptor
+int	param		#I parameter code from <fmset.h>
+
+long	fm_statl()
+
+begin
+	return ( fm_statl(fm,param) )
 end

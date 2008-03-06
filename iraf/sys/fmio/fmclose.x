@@ -11,9 +11,12 @@ procedure fm_close (fm)
 
 pointer	fm			#I FMIO descriptor
 
+size_t	sz_val
 pointer	lf
-int	status, i
+int	status, i, j, i_max
 errchk	fmio_bind, fm_fcfree, fmio_errchk
+
+include "fmio.com"
 
 begin
 	# An open-new-file followed by a close should create an empty datafile.
@@ -39,13 +42,32 @@ begin
 	lf = FM_FTABLE(fm)
 	do i = 0, FM_NLFILES(fm) {
 	    if (LF_PAGEMAP(lf) != NULL)
-		call mfree (LF_PAGEMAP(lf), TY_INT)
+		call mfree (LF_PAGEMAP(lf), TY_LONG)
+	    #
+	    do j = 0, num_lf-1 {
+		if ( Memp[lf_ptrs+j] == lf ) Memp[lf_ptrs+j] = NULL
+	    }
+	    #
 	    lf = lf + LEN_FTE
 	}
+	# Setup lf address table
+	i_max = -1
+	do i = 0, num_lf-1 {
+	    if ( Memp[lf_ptrs+i] != NULL ) i_max = i
+	}
+	sz_val = i_max + 1
+	if ( sz_val == 0 ) {
+	    call mfree (lf_ptrs, TY_POINTER)
+	    lf_ptrs = NULL
+	} else {
+	    call realloc (lf_ptrs, sz_val, TY_POINTER)
+	}
+	num_lf = sz_val
+	#
 
 	# Free the main descriptor.
 	call mfree (FM_PTABLE(fm), TY_SHORT)
-	call mfree (FM_PTINDEX(fm), TY_INT)
-	call mfree (FM_FTABLE(fm), TY_INT)
+	call mfree (FM_PTINDEX(fm), TY_LONG)
+	call mfree (FM_FTABLE(fm), TY_LONG)
 	call mfree (fm, TY_STRUCT)
 end

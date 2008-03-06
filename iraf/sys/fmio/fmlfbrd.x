@@ -11,18 +11,23 @@ include	"fmio.h"
 # physical datafile pages.  I/O is done in chunks of contiguous pages until
 # the requested amount of data has been transferred.
 
-procedure fm_lfbinread (lf, buf, maxbytes, offset)
+procedure fm_lfbinread (lf_chan, buf, maxbytes, offset)
 
-pointer	lf			#I lfile descriptor
+int	lf_chan			#I lfile descriptor
 char	buf[ARB]		#O output data buffer
-int	maxbytes		#I max bytes to read
+size_t	maxbytes		#I max bytes to read
 long	offset			#I lfile offset
 
-pointer	fm, pm
-int	status, chan, nleft, szbpage
-int	l1,l2, p1,p2, d1,d2, op, nb, np
+pointer	lf, fm, pm
+int	chan
+long	status, nleft, szbpage
+long	l1,l2, p1,p2, d1,d2, op, np
+size_t	nb
+
+include "fmio.com"
 
 begin
+	lf = Memp[lf_ptrs+lf_chan]
 	fm = LF_FM(lf)
 	pm = LF_PAGEMAP(lf)
 
@@ -56,9 +61,9 @@ begin
 	op = 1
 	for (p1=l1;  nleft > 0 && p1 <= l2;  p1=p2) {
 	    # Get a contiguous range of datafile pages.
-	    d1 = Memi[pm+p1-1]
+	    d1 = Meml[pm+p1-1]
 	    for (p2=p1+1;  p2 <= l2;  p2=p2+1) {
-		d2 = Memi[pm+p2-1]
+		d2 = Meml[pm+p2-1]
 		if (d2 - d1 != p2 - p1)
 		    break
 	    }
