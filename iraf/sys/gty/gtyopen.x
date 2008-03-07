@@ -17,6 +17,7 @@ char	termcap_file[ARB]	#I termcap file to be scanned
 char	device[ARB]		#I name of device to be extracted
 char	ufields[ARB]		#I user specified capabilities
 
+size_t	sz_val
 int	nchars, ip
 pointer	caplist, tty, op
 errchk	calloc, realloc, gty_index_caps
@@ -25,7 +26,8 @@ int	strlen()
 
 begin
 	# Allocate and initialize the tty descriptor structure.
-	call calloc (tty, LEN_DEFTTY, TY_STRUCT)
+	sz_val = LEN_DEFTTY
+	call calloc (tty, sz_val, TY_STRUCT)
 
 	T_LEN(tty) = LEN_DEFTTY
 	T_OP(tty) = 1
@@ -56,7 +58,8 @@ begin
 
 	# Call realloc to return any unused space in the descriptor.
 	T_LEN(tty) = T_OFFCAP + (T_OP(tty) + SZ_STRUCT-1) / SZ_STRUCT
-	call realloc (tty, T_LEN(tty), TY_STRUCT)
+	sz_val = T_LEN(tty)
+	call realloc (tty, sz_val, TY_STRUCT)
 
 	# Prepare index of fields in the descriptor, so that we can more
 	# efficiently search for fields later.
@@ -78,6 +81,8 @@ pointer	tty			# tty descriptor structure
 char	termcap_file[ARB]	# termcap format file to be scanned
 char	devname[ARB]		# termcap entry to be scanned for
 
+size_t	sz_val
+long	lval
 int	fd, ntc
 pointer	sp, device, ip, op, caplist
 int	open(), strlen(), strncmp()
@@ -86,7 +91,8 @@ errchk	open, syserrs
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
 
 	fd = open (termcap_file, READ_ONLY, TEXT_FILE)
 	call strcpy (devname, Memc[device], SZ_FNAME)
@@ -126,7 +132,8 @@ begin
 		    op = op + 1
 		}
 		Memc[op] = EOS
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 	    } else
 		break
 	}
@@ -146,6 +153,7 @@ int	fd
 char	device[ARB]
 pointer	tty
 
+size_t	sz_val
 char	ch, lastch
 bool	device_found
 pointer	sp, ip, op, otop, lbuf, alias, caplist
@@ -159,8 +167,10 @@ define	errtn_ 91
 
 begin
 	call smark (sp)
-	call salloc (lbuf,  SZ_LINE,  TY_CHAR)
-	call salloc (alias, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (alias, sz_val, TY_CHAR)
 
 	# Locate entry.  First line of each termcap entry contains a list
 	# of aliases for the device.  Only first lines and comment lines
@@ -263,7 +273,8 @@ begin
 	    if (op >= otop) {
 		T_OP(tty) = op - caplist + 1
 		T_LEN(tty) = T_LEN(tty) + T_MEMINCR
-		call realloc (tty, T_LEN(tty), TY_STRUCT)
+		sz_val = T_LEN(tty)
+		call realloc (tty, sz_val, TY_STRUCT)
 		op = caplist + T_OP(tty) - 1
 		otop = coerce (tty + T_LEN(tty), TY_STRUCT, TY_CHAR)
 	    }
@@ -282,7 +293,7 @@ end
 int procedure gty_extract_alias (str, ip, outstr, maxch)
 
 char	str[ARB]		# first line of termcap entry
-int	ip			# on input, first char of alias
+pointer	ip			# on input, first char of alias
 char	outstr[ARB]
 int	maxch
 

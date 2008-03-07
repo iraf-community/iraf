@@ -8,7 +8,7 @@ int procedure gtygeti (tty, cap)
 
 pointer	tty			# tty descriptor
 char	cap[ARB]		# two character capability name
-int	ival
+int	ival, i_off
 pointer	ip
 int	gty_find_capability(), ctoi()
 
@@ -19,7 +19,8 @@ begin
 	    return (0)
 	else {
 	    ip = ip + 1				# skip the '#'
-	    if (ctoi (Memc, ip, ival) == 0)
+	    i_off = 1
+	    if (ctoi (Memc[ip], i_off, ival) == 0)
 		return (0)
 	    else
 		return (ival)
