@@ -66,7 +66,7 @@ int	nargs			# number of args (min(MAX_COORDS,ncoords))
 char	driver_chars[NDCHARS]
 char	ch, format_char
 int	i, ip, op, field_width, left, right, temp
-int	stridx(), strlen(), xor()
+int	stridx(), strlen(), xor(), modi()
 data	driver_chars /DRIVER_CHARS/
 errchk	sprintf, pargi
 
@@ -171,10 +171,10 @@ begin
 		    args[i] = xor (args[i], 140B)
 	    case 'B':					# BCD encode next arg
 		temp = args[argnum]
-		args[argnum] = 16 * (temp / 10) + mod (temp, 10)
+		args[argnum] = 16 * (temp / 10) + modi (temp, 10)
 	    case 'D':					# Reverse code next arg
 		temp = args[argnum]
-		args[argnum] = temp - 2 * mod (temp, 16)
+		args[argnum] = temp - 2 * modi (temp, 16)
 	    }
 	}
 

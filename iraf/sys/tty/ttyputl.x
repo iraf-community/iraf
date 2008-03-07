@@ -40,6 +40,7 @@ pointer	tty			# TTY descriptor
 char	text[ARB]		# line of text to be output
 int	map_cc			# enable mapping of SO, SE control chars
 
+size_t	sz_val
 char	obuf[SZ_LINE]
 int	ip, op, pos, col, maxcols, tabstop, tabchar, ch
 errchk	write
@@ -112,8 +113,10 @@ begin
 		    goto hardcase_
 	    }
 
-	    if (op > 1)
-		call write (fd, obuf, op - 1)
+	    if (op > 1) {
+		sz_val = op - 1
+		call write (fd, obuf, sz_val)
+	    }
 
 	    op  = 1
 	    col = 1
@@ -138,15 +141,17 @@ pointer	tty			# TTY descriptor
 char	text[ARB]		# line of text to be output
 int	map_cc			# enable mapping of SO, SE control chars
 
+size_t	sz_val
 pointer	sp, ostrike, op
 bool	so_seen, so_mode_in_effect
 int	ip, so_type, ocol, junk, ch, tabchar
-int	ttyctrl()
+int	ttyctrl(), modi()
 errchk	tty_break_line, putci, ttyctrl, ttyso
 
 begin
 	call smark (sp)
-	call salloc (ostrike, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ostrike, sz_val, TY_CHAR)
 
 	so_mode_in_effect = false
 	so_type = T_SOTYPE(tty)
@@ -239,7 +244,7 @@ begin
 			}
 		    }
 		    ocol = ocol + 1
-		} until (mod (ocol+TABSIZE-1, TABSIZE) == 0)
+		} until (modi (ocol+TABSIZE-1, TABSIZE) == 0)
 
 	    } else if (ch == FF) {
 		# Formfeed breaks the output line if not at beginning of a

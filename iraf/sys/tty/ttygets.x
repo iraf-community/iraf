@@ -29,7 +29,7 @@ int	maxch			# size of outstr
 
 char	ch
 pointer	ip
-int	op, junk, temp
+int	op, junk, temp, i_off
 int	tty_find_capability(), cctoc()
 
 begin
@@ -55,7 +55,9 @@ begin
 			ip = ip + 1
 			ch = Memc[ip]
 		    default:
-			junk = cctoc (Memc, ip, ch)
+			i_off = 1
+			junk = cctoc (Memc[ip], i_off, ch)
+			ip = ip + i_off - 1
 			ip = ip - 1
 		    }
 		}

@@ -43,9 +43,9 @@ define	LEN_TCSTRUCT	8
 
 define	TC_NDEVICES	Memi[P2I($1)]	# number of termcap entries
 define	TC_MAXDEVICES	Memi[P2I($1+1)]	# initial max termcap entries
-define	TC_DEVNAME_P	Memi[P2I($1+2)]	# pointer to devname index array
-define	TC_CAPLIST_P	Memi[P2I($1+3)]	# pointer to caplist index array
-define	TC_SBUF		Memi[P2I($1+4)]	# pointer to string buffer
+define	TC_DEVNAME_P	Memp[$1+2]	# pointer to devname index array
+define	TC_CAPLIST_P	Memp[$1+3]	# pointer to caplist index array
+define	TC_SBUF		Memp[$1+4]	# pointer to string buffer
 define	TC_SZSBUF	Memi[P2I($1+5)]	# current size of string buffer
 define	TC_NEXTCH	Memi[P2I($1+6)]	# offset of next avail char in sbuf
 define	TC_TCFNAME	Memi[P2I($1+7)]	# name of termcap file
@@ -64,9 +64,11 @@ define	TC_CAPLIST	Memi[TC_CAPLIST_P($1)+$2-1]
 procedure t_mkttydata()
 
 bool	verbose
-int	fd, ndev, buflen
+int	fd, ndev
+size_t	buflen
 pointer	devlist
 pointer	sp, termcap_file, output_file, devname, tc, tty
+size_t	sz_val
 bool	clgetb()
 int	clgfil(), tc_putstr(), open(), tc_dummy_ttyload()
 pointer	clpopnu(), ttyopen()
@@ -75,10 +77,12 @@ errchk	open, tc_write_data_declarations, clgfil, tc_putstr, malloc, realloc
 
 begin
 	call smark (sp)
-	call salloc (termcap_file, SZ_FNAME, TY_CHAR)
-	call salloc (output_file, SZ_FNAME, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
-	call salloc (tc, LEN_TCSTRUCT, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (termcap_file, sz_val, TY_CHAR)
+	call salloc (output_file, sz_val, TY_CHAR)
+	call salloc (devname, sz_val, TY_CHAR)
+	sz_val = LEN_TCSTRUCT
+	call salloc (tc, sz_val, TY_STRUCT)
 
 	# Open the list of devices to be compiled into the cache.  CLGFIL is
 	# useful for reading the list even though the list elements are not
@@ -107,7 +111,8 @@ begin
 	iferr {
 	    call malloc (TC_DEVNAME_P(tc), buflen, TY_INT)
 	    call malloc (TC_CAPLIST_P(tc), buflen, TY_INT)
-	    call malloc (TC_SBUF(tc), SZ_SBUF, TY_CHAR)
+	    sz_val = SZ_SBUF
+	    call malloc (TC_SBUF(tc), sz_val, TY_CHAR)
 	} then
 	    call erract (EA_FATAL)
 
@@ -183,6 +188,8 @@ int procedure tc_putstr (tc, str)
 
 pointer	tc
 char	str[ARB]
+
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -195,7 +202,8 @@ begin
 	nextch = TC_NEXTCH(tc)
 	if (nextch + nchars + 1 > TC_SZSBUF(tc)) {
 	    TC_SZSBUF(tc) = TC_SZSBUF(tc) + INC_SZSBUF
-	    call realloc (TC_SBUF(tc), TC_SZSBUF(tc), TY_CHAR)
+	    sz_val = TC_SZSBUF(tc)
+	    call realloc (TC_SBUF(tc), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[TC_SBUF(tc) + nextch], ARB)
