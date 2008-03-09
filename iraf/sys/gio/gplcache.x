@@ -31,7 +31,7 @@ begin
 	if (GP_WCSSTATE(gp) != FIXED) {
 	    call gactivate (gp, 0)
 	    call gpl_flush()
-	    call gki_setwcs (GP_FD(gp), Memi[GP_WCSPTR(gp,1)],
+	    call gki_setwcs (GP_FD(gp), Memp[GP_WCSPTR(gp,1)],
 		LEN_WCS * MAX_WCS)
 	    GP_WCSSTATE(gp) = FIXED
 	    wcsord = wcsord + 1

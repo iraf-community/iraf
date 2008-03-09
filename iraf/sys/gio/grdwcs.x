@@ -21,9 +21,10 @@ saving the WCSSTATE and the index of the current WCS.
 procedure gwrwcs (devname, wcs, len_wcs)
 
 char	devname[ARB]			# device name
-int	wcs[ARB]			# array to be saved
+pointer	wcs[ARB]			# array to be saved
 int	len_wcs
 
+size_t	sz_val
 pointer	sp, fname
 int	fd
 int	open()
@@ -31,13 +32,16 @@ errchk	open, write
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call gwcs_mkfilename (devname, Memc[fname], SZ_FNAME)
 	iferr (call delete (Memc[fname]))
 	    ;
 	fd = open (Memc[fname], NEW_FILE, BINARY_FILE)
-	call write (fd, wcs, len_wcs * SZ_INT)
+	sz_val = len_wcs * SZ_POINTER
+	# arg2: incompatible pointer
+	call write (fd, wcs, sz_val)
 	call close (fd)
 
 	call sfree (sp)
@@ -51,9 +55,10 @@ end
 int procedure grdwcs (devname, wcs, len_wcs)
 
 char	devname[ARB]			# device name
-int	wcs[ARB]			# array to be returned
+pointer	wcs[ARB]			# array to be returned
 int	len_wcs				# max ints to read
 
+size_t	sz_val
 pointer	sp, fname
 int	fd, nchars
 int	open()
@@ -62,18 +67,21 @@ errchk	read
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call gwcs_mkfilename (devname, Memc[fname], SZ_FNAME)
 	iferr (fd = open (Memc[fname], READ_ONLY, BINARY_FILE))
 	    nchars = 0
 	else {
-	    nchars = read (fd, wcs, len_wcs * SZ_INT)
+	    sz_val = len_wcs * SZ_POINTER
+	    # arg2: incompatible pointer
+	    nchars = read (fd, wcs, sz_val)
 	    call close (fd)
 	}
 
 	call sfree (sp)
-	return (nchars / SZ_INT)
+	return (nchars / SZ_POINTER)
 end
 
 

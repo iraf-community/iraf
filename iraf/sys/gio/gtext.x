@@ -17,6 +17,7 @@ real	x, y			# position at which text is to be drawn
 char	text[ARB]		# text to be drawn
 char	format[ARB]		# text drawing parameters
 
+size_t	sz_val
 int	ip, i
 real	mx, my
 pointer	sp, ap, tx
@@ -24,7 +25,8 @@ bool	text_attributes_modified
 
 begin
 	call smark (sp)
-	call salloc (ap, LEN_TX, TY_STRUCT)
+	sz_val = LEN_TX
+	call salloc (ap, sz_val, TY_STRUCT)
 
 	# Set up pointers to text attribute packets and initialize the
 	# new packet to the default values.  Two text attribute packets
@@ -34,7 +36,8 @@ begin
 	# We start by initializing the new packet at AP to the default
 	# text drawing parameters.
 
-	call amovi (Memi[GP_TXAP(gp)], Memi[ap], LEN_TX)
+	sz_val = LEN_TX
+	call amovp (Memp[GP_TXAP(gp)], Memp[ap], sz_val)
 	tx = GP_TXAPCUR(gp)
 
 	# Parse the format string and set the text attributes.  The code is
@@ -52,7 +55,7 @@ begin
 
 	text_attributes_modified = false
 	for (i=2;  i <= LEN_TX;  i=i+1)
-	    if (Memi[ap+i-1] != Memi[tx+i-1]) {
+	    if (Memp[ap+i-1] != Memp[tx+i-1]) {
 		text_attributes_modified = true
 		break
 	    }
@@ -65,7 +68,8 @@ begin
 
 	# Update text attributes if necessary.
 	if (text_attributes_modified || TX_STATE(tx) != FIXED) {
-	    call amovi (Memi[ap], Memi[tx], LEN_TX)
+	    sz_val = LEN_TX
+	    call amovp (Memp[ap], Memp[tx], sz_val)
 	    call gki_txset (GP_FD(gp), tx)
 	    TX_STATE(tx) = FIXED
 	}

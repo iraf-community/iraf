@@ -5,6 +5,7 @@ include	<gset.h>
 include	<gio.h>
 
 # GSTATS -- Get the value of a string valued GIO parameter.
+# ??? unused ???
 
 int procedure gstats (gp, param, outstr, maxch)
 
@@ -12,10 +13,11 @@ pointer	gp			# graphics descriptor
 int	param			# parmeter to be set
 char	outstr[ARB]		# output string
 int	maxch
-int	gstrcpy()
 
-int	i, value
+int	i
+char	value[SZ_TICKFORMAT]
 pointer	p[2]
+int	gstrcpy()
 
 begin
 	p[1] = GP_XAP(gp)

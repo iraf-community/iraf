@@ -23,6 +23,7 @@ int	mode			#I access mode: NEW_FILE or APPEND
 char	uifname[ARB]		#I user interface specification file
 int	fd			#I metacode output file
 
+size_t	sz_val
 pointer	gp, tty
 int	outfd, stream_type, junk
 bool	close_at_end, kf_ok, vdm_device, std_stream
@@ -31,7 +32,7 @@ pointer	sp, devname, envname, kfname
 bool	streq()
 extern	gflush()
 pointer	ttygdes()
-int	envgets(), envfind(), open(), access(), ttygets()
+int	envgets(), envfind(), open(), access(), ttygets(), modi()
 pointer	locpr()
 errchk	syserr, syserrs, ttygdes
 errchk	greset, gki_openws, calloc
@@ -44,9 +45,10 @@ string	stdvdm 	 "stdvdm"
 
 begin
 	call smark (sp)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
-	call salloc (envname, SZ_FNAME, TY_CHAR)
-	call salloc (kfname,  SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
+	call salloc (envname, sz_val, TY_CHAR)
+	call salloc (kfname, sz_val, TY_CHAR)
 
 	call flush (STDOUT)
 
@@ -134,7 +136,8 @@ begin
 	# GKI (the graphics kernel interface) on the stream, if the stream
 	# has not already been directed to a kernel.
 
-	call calloc (gp, LEN_GDES, TY_STRUCT)
+	sz_val = LEN_GDES
+	call calloc (gp, sz_val, TY_STRUCT)
 
 	GP_FD(gp) = outfd
 	GP_TTY(gp) = tty
@@ -142,7 +145,7 @@ begin
 	    GP_GFLAGS(gp) = GF_CLOSEFD
 
 	# Set the access mode; default to NEW_FILE if not specified.
-	GP_ACMODE(gp) = mod (mode, AW_DEFER)
+	GP_ACMODE(gp) = modi (mode, AW_DEFER)
 	if (GP_ACMODE(gp) == 0)
 	    GP_ACMODE(gp) = NEW_FILE
 

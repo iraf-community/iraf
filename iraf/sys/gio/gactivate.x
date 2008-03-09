@@ -14,6 +14,7 @@ procedure gactivate (gp, flags)
 pointer	gp			# graphics descriptor
 int	flags			# AW_ bit flags; zero if no flags
 
+size_t	sz_val
 int	junk, fd
 pointer	w, sp, devname
 
@@ -34,7 +35,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (devname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	fd = GP_FD(gp)
 
@@ -64,8 +66,8 @@ begin
 	if (GP_ACMODE(gp) == APPEND) {
 	    w = GP_WCSPTR(gp,1)
 	    if (fstatp (fd, F_DEVICE) != locpr (zardbf))
-		call gki_getwcs (fd, Memi[w], LEN_WCSARRAY)
-	    else iferr (junk = grdwcs(GP_DEVNAME(gp), Memi[w], LEN_WCSARRAY))
+		call gki_getwcs (fd, Memp[w], LEN_WCSARRAY)
+	    else iferr (junk = grdwcs(GP_DEVNAME(gp), Memp[w], LEN_WCSARRAY))
 		;
 	}
 

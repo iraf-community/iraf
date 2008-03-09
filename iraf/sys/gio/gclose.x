@@ -27,7 +27,7 @@ begin
 
 	    if (fd > STDPLOT)
 		call gwrwcs (GP_DEVNAME(gp),
-		    Memi[GP_WCSPTR(gp,1)], LEN_WCSARRAY)
+		    Memp[GP_WCSPTR(gp,1)], LEN_WCSARRAY)
 
 	    # If the output file was opened by GOPEN (as indicated by the
 	    # CLOSEFD flag), close the file.

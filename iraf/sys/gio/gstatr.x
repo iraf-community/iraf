@@ -16,6 +16,7 @@ int	param			# parameter to be set
 real	char_height
 int	wcs, axes, field, ax[2], i
 pointer	w, p, pl, pm, tx, fa
+int	modi()
 real	ggetr()
 
 begin
@@ -141,7 +142,7 @@ begin
 		call syserr (SYS_GSTAT)
 
 	    axes = param / 100
-	    field = mod (param, 100) + 300
+	    field = modi (param, 100) + 300
 
 	    ax[1] = 0
 	    ax[2] = 0

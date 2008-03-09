@@ -246,7 +246,7 @@ int	i, j, m, npts, nsteps
 long	seed
 real	p[MAXPTS,2], d[MAXPTS,2]
 real	urand()
-int	fd, open(), clgeti()
+int	fd, open(), clgeti(), modi()
 pointer	gp, gopen()
 
 begin
@@ -266,7 +266,7 @@ begin
 	    do j = 1, 2 {
 		p[i,j] = urand (seed)
 		d[i,j] = max (0.01, urand (seed) * .1)
-		if (mod (i, 2) == 0)
+		if (modi (i, 2) == 0)
 		    d[i,j] = -d[i,j]
 	    }
 

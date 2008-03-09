@@ -12,7 +12,8 @@ procedure greset (gp, flags)
 pointer gp			#I graphics descriptor
 int	flags			#I flags indicating what to reset
 
-int	color, ch, i
+size_t	sz_val
+int	color, ch, i, i_off
 real	char_height, aspect
 bool	reset_wcs, reset_gio, reset_glabax
 pointer	sp, glbcolor, param, w, ap, ax, ax1, ax2, ip, op
@@ -25,8 +26,10 @@ errchk	ggetr
 
 begin
 	call smark (sp)
-	call salloc (glbcolor, SZ_LINE, TY_CHAR)
-	call salloc (param, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (glbcolor, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
 
 	# Initialize for a new frame; this is always done.
 	call gfrinit (gp)
@@ -155,8 +158,13 @@ begin
 		    # Get color index.
 		    if (Memc[ip] == '=' || Memc[ip] == ':')
 			ip = ip + 1
-		    if (ctoi (Memc, ip, color) <= 0)
+		    i_off = 1
+		    if (ctoi (Memc[ip], i_off, color) <= 0) {
+			ip = ip + i_off - 1
 			goto next_
+		    } else {
+			ip = ip + i_off - 1
+		    }
 
 		    # Set parameter.  The two character parameter name may
 		    # have an "x" or "y" appended to set only one axis.  For
