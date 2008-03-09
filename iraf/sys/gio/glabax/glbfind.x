@@ -23,13 +23,14 @@ pointer	ap			# axis parameters (from graphics descriptor)
 pointer	ax1, ax2		# axis descriptors (output)
 int	angle			# axis orientation, 0 or 90 degrees
 
+size_t	sz_val
 pointer	w
-int	logflag, nminor, scaling, t1, t2
+int	logflag, nminor, scaling, t1, t2, ival
 real	char_height, char_width, wctick, tval
 real	p1, p2, tp1, tp2, wcp1, tick1, step, minor_step, length
 
 bool	fp_equalr()
-int	gt_ndigits()
+int	gt_ndigits(), absi()
 real	ggetr(), elogr(), aelogr(), glb_minorstep()
 
 begin
@@ -39,8 +40,9 @@ begin
 	# fields explicitly.  This is a bit tricky because we are implicitly
 	# setting fields that are not named, but it saves time and space.
 
-	call aclri (Memi[ax1], LEN_AX)
-	call aclri (Memi[ax2], LEN_AX)
+	sz_val = LEN_AX
+	call aclrp (Memp[ax1], sz_val)
+	call aclrp (Memp[ax2], sz_val)
 
 	# If ticks are not to be drawn or if there are fewer than 2 ticks then
 	# we are done.
@@ -158,7 +160,8 @@ begin
 
 	if (scaling == LINEAR) {
 	    minor_step = step / (nminor + 1)
-	    AX_INLEFT(ax1) = abs (int ((wctick - wcp1) / minor_step))
+	    ival = int ((wctick - wcp1) / minor_step)
+	    AX_INLEFT(ax1) = absi (ival)
 	} else {
 	    t1 = nint (tick1)
 	    t2 = nint (tick1 + step)
@@ -184,7 +187,7 @@ begin
 	    AX_IKSTEP(ax1) = 1.0
 	} else if (scaling == ELOG) {
 	    tval = p1
-	    if (abs (tval + step) > abs(t1))
+	    if (abs (tval + step) > abs(t1 * 1.0))
 		AX_IKSTEP(ax1) = -10.0
 	    else
 		AX_IKSTEP(ax1) = -0.1
