@@ -16,9 +16,10 @@ include	<gki.h>
 procedure gki_setwcs (fd, wcs, len_wcs)
 
 int	fd			# output file
-int	wcs[ARB]		# array of WCS structures
+pointer	wcs[ARB]		# array of WCS structures
 int	len_wcs			# number of ints (struct units) in array
 
+size_t	sz_val
 int	nshorts
 short	gki[GKI_SETWCS_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_SETWCS/
@@ -26,7 +27,7 @@ include	"gki.com"
 
 begin
 	if (IS_FILE(fd)) {
-	    nshorts = (len_wcs * SZ_INT) / SZ_SHORT
+	    nshorts = (len_wcs * SZ_POINTER) / SZ_SHORT
 	    gki[GKI_SETWCS_L] = GKI_SETWCS_LEN + nshorts
 	    gki[GKI_SETWCS_N] = nshorts
 
@@ -34,13 +35,21 @@ begin
 		# Send a copy of the WCS information to the PSIO control
 		# stream if the graphics output is a standard graphics stream.
 
-		call write (PSIOCTRL, fd, SZ_INT)
-		call write (PSIOCTRL, gki, GKI_SETWCS_LEN * SZ_SHORT)
-		call write (PSIOCTRL, wcs, nshorts * SZ_SHORT)
+		sz_val = SZ_INT
+		# arg2: incompatible pointer
+		call write (PSIOCTRL, fd, sz_val)
+		sz_val = GKI_SETWCS_LEN * SZ_SHORT
+		call write (PSIOCTRL, gki, sz_val)
+		sz_val = nshorts * SZ_SHORT
+		# arg2: incompatible pointer
+		call write (PSIOCTRL, wcs, sz_val)
 		call flush (PSIOCTRL)
 	    }
 
-	    call write (gk_fd[fd], gki, GKI_SETWCS_LEN * SZ_SHORT)
-	    call write (gk_fd[fd], wcs, nshorts * SZ_SHORT)
+	    sz_val = GKI_SETWCS_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = nshorts * SZ_SHORT
+	    # arg2: incompatible pointer
+	    call write (gk_fd[fd], wcs, sz_val)
 	}
 end

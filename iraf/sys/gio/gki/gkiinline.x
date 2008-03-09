@@ -15,9 +15,11 @@ procedure gki_inline_kernel (stream, dd)
 
 int	stream			# graphics stream to be redirected
 pointer	dd[ARB]			# device driver for the kernel
+size_t	sz_val
 include	"gki.com"
 
 begin
 	gk_type[stream] = TY_INLINE
-	call amovp (dd, gk_dd, LEN_GKIDD)
+	sz_val = LEN_GKIDD
+	call amovp (dd, gk_dd, sz_val)
 end

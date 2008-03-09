@@ -14,6 +14,8 @@ procedure gki_flush (fd)
 
 int	fd			# output file
 
+size_t	sz_val
+long	lval
 pointer	epa
 short	gki[GKI_FLUSH_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_FLUSH/, gki[3] /LEN_GKIHDR/
@@ -26,13 +28,15 @@ begin
 	    if (epa != 0)
 		call zcall1 (epa, 0)
 	} else {
-	    call write (gk_fd[fd], gki, GKI_FLUSH_LEN * SZ_SHORT)
+	    sz_val = GKI_FLUSH_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
 
 	    # If writing to a subkernel we must call PR_PSIO to give the
 	    # kernel a chance to read the spooled metacode.
 
 	    if (IS_SUBKERNEL(fd)) {
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 		call zcall3 (gk_prpsio, KERNEL_PID(fd), fd, FF_WRITE)
 	    } else
 		call flush (gk_fd[fd])

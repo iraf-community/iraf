@@ -18,6 +18,7 @@ int	fd			# output file
 short	m[ARB]			# cell array
 int	np			# number of pixels in cell array
 
+size_t	sz_val
 short	gki[GKI_CELLARRAY_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_CELLARRAY/
 
@@ -25,6 +26,8 @@ begin
 	gki[GKI_CELLARRAY_L] = GKI_CELLARRAY_LEN + np
 	gki[GKI_CELLARRAY_NP] = np
 
-	call write (fd, gki, GKI_CELLARRAY_LEN * SZ_SHORT)
-	call write (fd, m, np * SZ_SHORT)
+	sz_val = GKI_CELLARRAY_LEN * SZ_SHORT
+	call write (fd, gki, sz_val)
+	sz_val = np * SZ_SHORT
+	call write (fd, m, sz_val)
 end

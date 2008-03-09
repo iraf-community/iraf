@@ -18,7 +18,9 @@ int	fd			# output file
 char	device[ARB]		# device name
 int	mode			# access mode
 
-int	ip, n, nchars
+size_t	sz_val
+size_t	nchars
+int	ip, n
 pointer	epa
 pointer	sp, gki, op
 int	strlen()
@@ -28,7 +30,8 @@ begin
 	call smark (sp)
 
 	n = strlen (device)
-	call salloc (gki, GKI_OPENWS_LEN + n, TY_SHORT)
+	sz_val = GKI_OPENWS_LEN + n
+	call salloc (gki, sz_val, TY_SHORT)
 
 	# Pack the device name as a SHORT integer array.
 	op = gki + GKI_OPENWS_D - 1
@@ -55,7 +58,9 @@ begin
 
 	    nchars = (GKI_OPENWS_LEN + n) * SZ_SHORT
 	    if (IS_FILE(fd) && (fd >= STDGRAPH && fd <= STDPLOT)) {
-		call write (PSIOCTRL, fd, SZ_INT)
+		sz_val = SZ_INT
+		# arg2: incompatible pointer
+		call write (PSIOCTRL, fd, sz_val)
 		call write (PSIOCTRL, Mems[gki], nchars)
 		call flush (PSIOCTRL)
 	    }

@@ -14,6 +14,7 @@ procedure gki_write (fd, gki)
 int	fd			# graphics stream
 short	gki[ARB]		# encoded instruction
 int	length
+size_t	sz_val
 include	"gki.com"
 
 begin
@@ -21,6 +22,7 @@ begin
 	    call gki_execute (gki, gk_dd)
 	else {
 	    length = gki[GKI_HDR_LENGTH]
-	    call write (gk_fd[fd], gki, length * SZ_SHORT)
+	    sz_val = length * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
 	}
 end

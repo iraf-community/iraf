@@ -24,8 +24,11 @@ short	m[nx,ny]		# output array
 int	x1, y1			# lower left corner of window to be read
 int	x2, y2			# upper right corner of window to be read
 
+size_t	sz_val
+long	lval
 pointer	epa
-int	nchars, npts
+size_t	nchars
+int	npts
 short	ca[GKI_CELLARRAY_LEN]
 short	gki[GKI_GETCELLARRAY_LEN]
 long	read()
@@ -44,7 +47,8 @@ begin
 	    epa = gk_dd[GKI_GETCELLARRAY]
 	    if (epa != 0)
 		call zcall6 (epa, nx,ny, x1,y1, x2,y2)
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 
 	} else {
 	    # Write get cell array instruction to the kernel.
@@ -56,15 +60,18 @@ begin
 	    gki[GKI_GETCELLARRAY_NC]   = nx
 	    gki[GKI_GETCELLARRAY_NL]   = ny
 
-	    call write (gk_fd[fd], gki, GKI_GETCELLARRAY_LEN)
+	    sz_val = GKI_GETCELLARRAY_LEN
+	    call write (gk_fd[fd], gki, sz_val)
 
 	    # If the kernel is a subprocess we must call PR_PSIO to allow the
 	    # kernel to read the instruction and return the cell array value.
 
 	    if (IS_SUBKERNEL(fd)) {
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 		call zcall3 (gk_prpsio, KERNEL_PID(fd), fd, FF_READ)
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 	    } else
 		call flush (gk_fd[fd])
 	}

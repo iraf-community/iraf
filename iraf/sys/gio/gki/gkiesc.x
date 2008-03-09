@@ -19,6 +19,7 @@ int	fn			# function code
 short	instruction[ARB]	# instruction sequence of unknown format
 int	nwords			# number of shorts in instruction
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_ESCAPE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_ESCAPE/
@@ -34,7 +35,9 @@ begin
 	    gki[GKI_ESCAPE_N]  = nwords
 	    gki[GKI_ESCAPE_FN] = fn
 
-	    call write (gk_fd[fd], gki, GKI_ESCAPE_LEN * SZ_SHORT)
-	    call write (gk_fd[fd], instruction, nwords * SZ_SHORT)
+	    sz_val = GKI_ESCAPE_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = nwords * SZ_SHORT
+	    call write (gk_fd[fd], instruction, sz_val)
 	}
 end

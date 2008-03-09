@@ -17,6 +17,7 @@ int	fd			# output file
 short	points[ARB]		# polymarker
 int	npts			# number of (x,y) points in polymarker
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_POLYMARKER_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_POLYMARKER/
@@ -31,7 +32,9 @@ begin
 	    gki[GKI_POLYMARKER_L] = GKI_POLYMARKER_LEN + (npts * 2)
 	    gki[GKI_POLYMARKER_N] = npts
 
-	    call write (gk_fd[fd], gki, GKI_POLYMARKER_LEN * SZ_SHORT)
-	    call write (gk_fd[fd], points, (npts * 2) * SZ_SHORT)
+	    sz_val = GKI_POLYMARKER_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = (npts * 2) * SZ_SHORT
+	    call write (gk_fd[fd], points, sz_val)
 	}
 end

@@ -35,6 +35,7 @@ int	sx, sy			#I screen coordinates of cursor (GKI coords)
 int	raster			#I raster number
 int	rx, ry			#I raster coordinates of cursor (GKI coords)
 
+size_t	sz_val
 short	gki[GKI_CURSORVALUE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_CURSORVALUE/, gki[3] /GKI_CURSORVALUE_LEN/
 
@@ -47,5 +48,6 @@ begin
 	gki[GKI_CURSORVALUE_RX ] = rx
 	gki[GKI_CURSORVALUE_RY ] = ry
 
-	call write (fd, gki, GKI_CURSORVALUE_LEN * SZ_SHORT)
+	sz_val = GKI_CURSORVALUE_LEN * SZ_SHORT
+	call write (fd, gki, sz_val)
 end

@@ -49,8 +49,10 @@ int	sx, sy			#O screen coordinates of cursor
 int	raster			#O raster number
 int	rx, ry			#O raster coordinates of cursor
 
+size_t	sz_val
+long	lval
 pointer	epa
-int	nchars
+size_t	nchars
 long	read()
 short	gki[GKI_GETCURSOR_LEN]
 short	cur[GKI_CURSORVALUE_LEN]
@@ -69,20 +71,24 @@ begin
 	    epa = gk_dd[GKI_GETCURSOR]
 	    if (epa != 0)
 		call zcall1 (epa, cursor)
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 
 	} else {
 	    # Write cursor read instruction to the kernel.
 	    gki[GKI_GETCURSOR_CN] = cursor
-	    call write (gk_fd[fd], gki, GKI_GETCURSOR_LEN * SZ_SHORT)
+	    sz_val = GKI_GETCURSOR_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
 
 	    # If the kernel is a subprocess we must call PR_PSIO to allow the
 	    # kernel to read the instruction and return the cursor value.
 
 	    if (IS_SUBKERNEL(fd)) {
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 		call zcall3 (gk_prpsio, KERNEL_PID(fd), fd, FF_READ)
-		call seek (fd, BOFL)
+		lval = BOFL
+		call seek (fd, lval)
 	    } else
 		call flush (gk_fd[fd])
 	}

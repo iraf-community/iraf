@@ -17,6 +17,7 @@ int	fd			# output file
 int	x, y			# new cursor position
 int	cursor			# cursor to be set
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_SETCURSOR_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_SETCURSOR/, gki[3] /GKI_SETCURSOR_LEN/
@@ -32,6 +33,7 @@ begin
 	    gki[GKI_SETCURSOR_POS]   = x
 	    gki[GKI_SETCURSOR_POS+1] = y
 
-	    call write (gk_fd[fd], gki, GKI_SETCURSOR_LEN * SZ_SHORT)
+	    sz_val = GKI_SETCURSOR_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
 	}
 end

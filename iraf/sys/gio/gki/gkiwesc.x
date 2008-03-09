@@ -25,6 +25,7 @@ int	hdrlen		#I header length, shorts
 short	data[ARB]	#I escape instruction data
 int	datalen		#I data length, shorts
 
+size_t	sz_val
 pointer	sp, buf
 pointer	epa
 int	nwords
@@ -37,10 +38,13 @@ begin
 
 	if (IS_INLINE(fd)) {
 	    call smark (sp)
-	    call salloc (buf, nwords, TY_SHORT)
+	    sz_val = nwords
+	    call salloc (buf, sz_val, TY_SHORT)
 
-	    call amovs (hdr, Mems[buf], ARB)
-	    call amovs (data, Mems[buf+hdrlen], ARB)
+	    sz_val = ARB
+	    call amovs (hdr, Mems[buf], sz_val)
+	    sz_val = ARB
+	    call amovs (data, Mems[buf+hdrlen], sz_val)
 
 	    epa = gk_dd[GKI_ESCAPE]
 	    if (epa != 0)
@@ -53,8 +57,11 @@ begin
 	    gki[GKI_ESCAPE_N]  = nwords
 	    gki[GKI_ESCAPE_FN] = fn
 
-	    call write (gk_fd[fd], gki, GKI_ESCAPE_LEN * SZ_SHORT)
-	    call write (gk_fd[fd], hdr, hdrlen * SZ_SHORT)
-	    call write (gk_fd[fd], data, datalen * SZ_SHORT)
+	    sz_val = GKI_ESCAPE_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = hdrlen * SZ_SHORT
+	    call write (gk_fd[fd], hdr, sz_val)
+	    sz_val = datalen * SZ_SHORT
+	    call write (gk_fd[fd], data, sz_val)
 	}
 end

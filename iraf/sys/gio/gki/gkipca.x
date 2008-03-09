@@ -22,6 +22,7 @@ short	m[nx,ny]		# pixel array
 int	x1, y1			# lower left corner of window to be written
 int	x2, y2			# upper right corner of window to be written
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_PUTCELLARRAY_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_PUTCELLARRAY/
@@ -41,7 +42,9 @@ begin
 	    gki[GKI_PUTCELLARRAY_NC]   = nx
 	    gki[GKI_PUTCELLARRAY_NL]   = ny
 
-	    call write (gk_fd[fd], gki, GKI_PUTCELLARRAY_LEN)
-	    call write (gk_fd[fd], m, (nx * ny) * SZ_SHORT)
+	    sz_val = GKI_PUTCELLARRAY_LEN
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = (nx * ny) * SZ_SHORT
+	    call write (gk_fd[fd], m, sz_val)
 	}
 end

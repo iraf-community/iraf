@@ -24,7 +24,9 @@ int procedure gki_fetch_next_instruction (fd, instruction)
 int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
 
-int	len_ibuf, nchars
+size_t	sz_val
+int	len_ibuf
+size_t	nchars
 pointer	ibuf
 long	read()
 errchk	read, malloc, realloc
@@ -35,7 +37,8 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
+	    sz_val = LEN_DEFIBUF
+	    call malloc (ibuf, sz_val, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 
@@ -47,11 +50,13 @@ begin
 
 	repeat {
 	    repeat {
-		if (read (fd, I_BOI(ibuf), ONEWORD) == EOF)
+		sz_val = ONEWORD
+		if (read (fd, I_BOI(ibuf), sz_val) == EOF)
 		    return (EOF)
 	    } until (I_BOI(ibuf) == BOI)
 
-	    if (read (fd, I_OPCODE(ibuf), TWOWORDS) == EOF)
+	    sz_val = TWOWORDS
+	    if (read (fd, I_OPCODE(ibuf), sz_val) == EOF)
 		return (EOF)
 	    
 	    # Make instruction buffer large enough to hold instruction.
@@ -59,7 +64,8 @@ begin
 
 	    if (I_LENGTH(ibuf) > len_ibuf) {
 		len_ibuf = I_LENGTH(ibuf)
-		call realloc (ibuf, len_ibuf, TY_SHORT)
+		sz_val = len_ibuf
+		call realloc (ibuf, sz_val, TY_SHORT)
 	    }
 
 	    nchars = (I_LENGTH(ibuf) - LEN_GKIHDR) * SZ_SHORT

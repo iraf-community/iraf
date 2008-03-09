@@ -15,8 +15,9 @@ procedure gki_reactivatews (fd, flags)
 int	fd			# output file
 int	flags			# action modifier flags
 
+size_t	sz_val
+size_t	nchars
 pointer	epa
-int	nchars
 short	gki[GKI_REACTIVATEWS_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_REACTIVATEWS/, gki[3] /GKI_REACTIVATEWS_LEN/
 include	"gki.com"
@@ -32,7 +33,9 @@ begin
 	    gki[GKI_REACTIVATEWS_F] = flags
 	    nchars = GKI_REACTIVATEWS_LEN * SZ_SHORT
 	    if (IS_FILE(fd) && (fd >= STDGRAPH && fd <= STDPLOT)) {
-		call write (PSIOCTRL, fd, SZ_INT)
+		sz_val = SZ_INT
+		# arg2: incompatible pointer
+		call write (PSIOCTRL, fd, sz_val)
 		call write (PSIOCTRL, gki, nchars)
 		call flush (PSIOCTRL)
 	    }

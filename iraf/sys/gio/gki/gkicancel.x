@@ -13,6 +13,7 @@ procedure gki_cancel (fd)
 
 int	fd			# output file
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_CANCEL_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_CANCEL/, gki[3] /LEN_GKIHDR/
@@ -23,6 +24,8 @@ begin
 	    epa = gk_dd[GKI_CANCEL]
 	    if (epa != 0)
 		call zcall1 (epa, 0)
-	} else
-	    call write (gk_fd[fd], gki, GKI_CANCEL_LEN * SZ_SHORT)
+	} else {
+	    sz_val = GKI_CANCEL_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	}
 end

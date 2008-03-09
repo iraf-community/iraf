@@ -16,6 +16,7 @@ procedure gki_mftitle (fd, title)
 int	fd			# output file
 char	title[ARB]		# title string
 
+size_t	sz_val
 pointer	epa
 int	ip, n
 pointer	sp, gki, op
@@ -26,7 +27,8 @@ begin
 	call smark (sp)
 
 	n = strlen (title)
-	call salloc (gki, GKI_MFTITLE_LEN + n, TY_SHORT)
+	sz_val = GKI_MFTITLE_LEN + n
+	call salloc (gki, sz_val, TY_SHORT)
 
 	# Pack the title name as a SHORT integer array.
 	op = gki + GKI_MFTITLE_T - 1
@@ -44,7 +46,8 @@ begin
 	    Mems[gki+1] = GKI_MFTITLE
 	    Mems[gki+2] = GKI_MFTITLE_LEN + n
 	    Mems[gki+3] = n
-	    call write (gk_fd[fd], Mems[gki], (GKI_MFTITLE_LEN + n) * SZ_SHORT)
+	    sz_val = (GKI_MFTITLE_LEN + n) * SZ_SHORT
+	    call write (gk_fd[fd], Mems[gki], sz_val)
 	}
 
 	call sfree (sp)

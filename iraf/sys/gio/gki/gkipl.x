@@ -17,6 +17,7 @@ int	fd			# output file
 short	points[ARB]		# polyline
 int	npts			# number of (x,y) points in polyline
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_POLYLINE_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_POLYLINE/
@@ -31,7 +32,9 @@ begin
 	    gki[GKI_POLYLINE_L] = GKI_POLYLINE_LEN + (npts * 2)
 	    gki[GKI_POLYLINE_N] = npts
 
-	    call write (gk_fd[fd], gki, GKI_POLYLINE_LEN * SZ_SHORT)
-	    call write (gk_fd[fd], points, (npts * 2) * SZ_SHORT)
+	    sz_val = GKI_POLYLINE_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	    sz_val = (npts * 2) * SZ_SHORT
+	    call write (gk_fd[fd], points, sz_val)
 	}
 end

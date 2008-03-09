@@ -12,12 +12,14 @@ procedure gki_fflush (fd)
 
 int	fd			# output file
 
+long	lval
 errchk	seek
 include	"gki.com"
 
 begin
 	if (IS_SUBKERNEL(fd)) {
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 	    call zcall3 (gk_prpsio, KERNEL_PID(fd), fd, FF_WRITE)
 	} else if (!IS_INLINE(fd))
 	    call flush (gk_fd[fd])

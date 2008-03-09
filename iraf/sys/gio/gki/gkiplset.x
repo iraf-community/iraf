@@ -18,6 +18,7 @@ procedure gki_plset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to polyline attribute structure
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_PLSET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_PLSET/, gki[3] /GKI_PLSET_LEN/
@@ -32,6 +33,8 @@ begin
 	    epa = gk_dd[GKI_PLSET]
 	    if (epa != 0)
 		call zcall1 (epa, gki)
-	} else
-	    call write (gk_fd[fd], gki, GKI_PLSET_LEN * SZ_SHORT)
+	} else {
+	    sz_val = GKI_PLSET_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	}
 end

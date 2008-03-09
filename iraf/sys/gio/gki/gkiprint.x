@@ -158,6 +158,7 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 int	mode			# access mode
 
+size_t	sz_val
 int	junk
 pointer	sp, buf
 int	itoc()
@@ -166,9 +167,11 @@ common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, max (SZ_FNAME, n), TY_CHAR)
+	sz_val = max (SZ_FNAME, n)
+	call salloc (buf, sz_val, TY_CHAR)
 
-	call achtsc (devname, Memc[buf], n)
+	sz_val = n
+	call achtsc (devname, Memc[buf], sz_val)
 	Memc[buf+n] = EOS
 
 	call fprintf (fd, "open_workstation '%s', mode=%s\n")
@@ -192,15 +195,19 @@ procedure gkp_closews (devname, n)
 
 short	devname[ARB]		# device name
 int	n			# length of device name
+
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
+size_t	sz_val
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
-	call achtsc (devname, Memc[buf], n)
+	sz_val = n
+	call achtsc (devname, Memc[buf], sz_val)
 	Memc[buf+n] = EOS
 
 	call fprintf (fd, "close_workstation '%s'\n")
@@ -216,6 +223,7 @@ end
 procedure gkp_reactivatews (flags)
 
 int	flags			# action flags
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -230,6 +238,7 @@ end
 procedure gkp_deactivatews (flags)
 
 int	flags			# action flags
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -247,15 +256,19 @@ procedure gkp_mftitle (title, n)
 
 short	title[ARB]		# title string
 int	n			# length of title string
+
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
+size_t	sz_val
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
-	call achtsc (title, Memc[buf], n)
+	sz_val = n
+	call achtsc (title, Memc[buf], sz_val)
 	Memc[buf+n] = EOS
 
 	call fprintf (fd, "title '%s'\n")
@@ -270,6 +283,7 @@ end
 procedure gkp_clear (dummy)
 
 int	dummy			# not used at present
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -283,6 +297,7 @@ end
 procedure gkp_cancel (dummy)
 
 int	dummy			# not used at present
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -297,6 +312,7 @@ end
 procedure gkp_flush (dummy)
 
 int	dummy			# not used at present
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -312,6 +328,7 @@ procedure gkp_polyline (p, npts)
 
 short	p[ARB]			# points defining line
 int	npts			# number of points, i.e., (x,y) pairs
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -327,6 +344,7 @@ procedure gkp_polymarker (p, npts)
 
 short	p[ARB]			# points defining line
 int	npts			# number of points, i.e., (x,y) pairs
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -342,6 +360,7 @@ procedure gkp_fillarea (p, npts)
 
 short	p[ARB]			# points defining line
 int	npts			# number of points, i.e., (x,y) pairs
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -359,15 +378,18 @@ int	x, y			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 pointer	sp, buf
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (buf, n, TY_CHAR)
+	sz_val = n
+	call salloc (buf, sz_val, TY_CHAR)
 
-	call achtsc (text, Memc[buf], n)
+	sz_val = n
+	call achtsc (text, Memc[buf], sz_val)
 	Memc[buf+n] = EOS
 
 	if (gkiunits == YES) {
@@ -432,7 +454,9 @@ int	nx, ny			# number of pixels in X and Y
 int	x1, y1			# lower left corner of input window
 int	x2, y2			# lower left corner of input window
 
+size_t	sz_val
 pointer	sp, buf
+short	m_1
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -459,8 +483,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (buf, nx * ny, TY_SHORT)
-	call amovks (short(-1), Mems[buf], nx * ny)
+	sz_val = nx * ny
+	call salloc (buf, sz_val, TY_SHORT)
+	m_1 = -1
+	call amovks (m_1, Mems[buf], sz_val)
 
 	call flush (fd)
 	iferr {
@@ -479,6 +505,7 @@ procedure gkp_setcursor (x, y, cursor)
 
 int	x, y			# new position of cursor
 int	cursor			# cursor to be set
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -502,6 +529,7 @@ end
 procedure gkp_getcursor (cursor)
 
 int	cursor
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -525,6 +553,7 @@ end
 procedure gkp_plset (gki)
 
 short	gki[ARB]		# attribute structure
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -541,6 +570,7 @@ end
 procedure gkp_pmset (gki)
 
 short	gki[ARB]		# attribute structure
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -557,6 +587,7 @@ end
 procedure gkp_faset (gki)
 
 short	gki[ARB]		# attribute structure
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -572,6 +603,7 @@ end
 procedure gkp_txset (gki)
 
 short	gki[ARB]		# attribute structure
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -599,6 +631,7 @@ procedure gkp_escape (fn, instruction, nwords)
 int	fn			# function code
 short	instruction[ARB]	# instruction data words
 int	nwords			# length of instruction
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -620,6 +653,7 @@ procedure gkp_setwcs (wcs, nwords)
 short	wcs[ARB]		# WCS data
 int	nwords			# number of words of data
 
+size_t	sz_val
 int	i, nwcs
 pointer	sp, wcs_temp, w
 int	fd, stream, verbose, gkiunits
@@ -627,14 +661,17 @@ common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
 	call smark (sp)
-	call salloc (wcs_temp, LEN_WCSARRAY, TY_STRUCT)
+	sz_val = LEN_WCSARRAY
+	call salloc (wcs_temp, sz_val, TY_STRUCT)
 
 	call fprintf (fd, "set_wcs nwords=%d\n")
 	    call pargi (nwords)
 
 	nwcs = nwords * SZ_SHORT / SZ_STRUCT / LEN_WCS
 	if (verbose == YES && nwcs > 1) {
-	    call amovi (wcs, Memi[wcs_temp], nwcs * LEN_WCS)
+	    sz_val = (nwcs * LEN_WCS) * (SZ_POINTER / SZ_SHORT)
+	    # arg2: incompatible pointer
+	    call amovs (wcs, Memp[wcs_temp], sz_val)
 
 	    do i = 1, nwcs {
 		w = ((i - 1) * LEN_WCS) + wcs_temp
@@ -674,6 +711,7 @@ procedure gkp_getwcs (wcs, nwords)
 
 short	wcs[ARB]		# WCS data
 int	nwords			# number of words of data
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -689,6 +727,7 @@ end
 procedure gkp_unknown (gki)
 
 short	gki[ARB]		# the GKI instruction
+
 int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
@@ -712,6 +751,7 @@ int	gkiunits		# print coords in GKI rather than NDC units
 
 int	i
 real	x, y, xsum, xmin, xmax, ysum, ymin, ymax, scale
+int	modi()
 
 begin
 	if (gkiunits == YES)
@@ -780,7 +820,7 @@ begin
 
 	call fprintf (fd, "\t")
 	for (i=1;  i <= npts * 2;  i=i+2) {
-	    if (i > 1 && mod (i-1, 10) == 0)
+	    if (i > 1 && modi (i-1, 10) == 0)
 		call fprintf (fd, "\n\t")
 	    if (gkiunits == YES)
 		call fprintf (fd, "%5d %5d  ")
@@ -801,7 +841,9 @@ procedure gkp_dump (fd, data, nwords)
 int	fd			# output file
 short	data[ARB]		# metacode data
 int	nwords			# number of words of data
+
 int	i
+int	modi()
 
 begin
 	if (nwords <= 0)
@@ -810,7 +852,7 @@ begin
 	call fprintf (fd, "\t")
 
 	for (i=1;  i <= nwords;  i=i+1) {
-	    if (i > 1 && mod (i-1, 8) == 0)
+	    if (i > 1 && modi (i-1, 8) == 0)
 		call fprintf (fd, "\n\t")
 	    call fprintf (fd, "%7d")
 		call pargs (data[i])

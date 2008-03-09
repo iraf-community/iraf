@@ -165,10 +165,10 @@ begin
 		call zcall2 (kp, gki[GKI_SETWCS_WCS], n)
 	    }
 	case GKI_GETWCS:
-	    kp = dd[GKI_SETWCS]
+	    kp = dd[GKI_GETWCS]
 	    if (kp != NULL) {
-		n = gki[GKI_SETWCS_N]
-		call zcall2 (kp, gki[GKI_SETWCS_WCS], n)
+		n = gki[GKI_GETWCS_N]
+		call zcall2 (kp, gki[GKI_GETWCS_WCS], n)
 	    }
 	default:
 	    kp = dd[GKI_UNKNOWN]

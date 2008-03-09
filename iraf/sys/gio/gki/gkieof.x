@@ -13,11 +13,14 @@ procedure gki_eof (fd)
 
 int	fd			# output file
 
+size_t	sz_val
 short	gki[GKI_EOF_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_EOF/, gki[3] /LEN_GKIHDR/
 include	"gki.com"
 
 begin
-	if (!IS_INLINE(fd))
-	    call write (gk_fd[fd], gki, GKI_EOF_LEN * SZ_SHORT)
+	if (!IS_INLINE(fd)) {
+	    sz_val = GKI_EOF_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	}
 end

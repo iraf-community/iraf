@@ -16,8 +16,10 @@ procedure gki_closews (fd, device)
 int	fd			# output file
 char	device[ARB]		# device name
 
+size_t	sz_val
+size_t	nchars
 pointer	epa
-int	ip, nchars, n
+int	ip, n
 pointer	sp, gki, op
 int	strlen()
 include	"gki.com"
@@ -26,7 +28,8 @@ begin
 	call smark (sp)
 
 	n = strlen (device)
-	call salloc (gki, GKI_CLOSEWS_LEN + n, TY_SHORT)
+	sz_val = GKI_CLOSEWS_LEN + n
+	call salloc (gki, sz_val, TY_SHORT)
 
 	# Pack the device name as a SHORT integer array.
 	op = gki + GKI_CLOSEWS_D - 1
@@ -52,7 +55,9 @@ begin
 
 	    nchars = (GKI_CLOSEWS_LEN + n) * SZ_SHORT
 	    if (IS_FILE(fd) && (fd >= STDGRAPH && fd <= STDPLOT)) {
-		call write (PSIOCTRL, fd, SZ_INT)
+		sz_val = SZ_INT
+		# arg2: incompatible pointer
+		call write (PSIOCTRL, fd, sz_val)
 		call write (PSIOCTRL, Mems[gki], nchars)
 		call flush (PSIOCTRL)
 	    }

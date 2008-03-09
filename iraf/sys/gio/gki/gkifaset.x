@@ -17,6 +17,7 @@ procedure gki_faset (fd, ap)
 int	fd			# output file
 pointer	ap			# pointer to fillarea attribute structure
 
+size_t	sz_val
 pointer	epa
 short	gki[GKI_FASET_LEN]
 data	gki[1] /BOI/, gki[2] /GKI_FASET/, gki[3] /GKI_FASET_LEN/
@@ -30,6 +31,8 @@ begin
 	    epa = gk_dd[GKI_FASET]
 	    if (epa != 0)
 		call zcall1 (epa, gki)
-	} else
-	    call write (gk_fd[fd], gki, GKI_FASET_LEN * SZ_SHORT)
+	} else {
+	    sz_val = GKI_FASET_LEN * SZ_SHORT
+	    call write (gk_fd[fd], gki, sz_val)
+	}
 end
