@@ -18,7 +18,8 @@ int	width			#O raster width in pixels
 int	height			#O raster height in pixels
 int	depth			#O raster depth, bits per pixel
 
-int	nchars, nread
+size_t	nchars
+long	nread
 short	gim[GIM_QUERYRASTER_LEN]
 short	retval[GIM_RET_QRAS_LEN]
 long	read()

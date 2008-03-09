@@ -9,6 +9,9 @@ procedure gim_rasterinit (gp)
 
 pointer	gp			#I graphics descriptor
 
+short	c_0
+
 begin
-	call gescape (gp, GIM_RASTERINIT, 0, GIM_RASTERINIT_LEN)
+	c_0 = 0
+	call gescape (gp, GIM_RASTERINIT, c_0, GIM_RASTERINIT_LEN)
 end

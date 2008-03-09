@@ -14,7 +14,8 @@ int	iomap[ARB]		#o iomap data
 int	first			#I first iomap cell to be read
 int	nelem			#I number of elements to read
 
-int	nchars
+size_t	sz_val
+size_t	nchars
 pointer	sp, data
 short	gim[GIM_READIOMAP_LEN]
 short	retval[GIM_RET_RIOMAP_LEN]
@@ -43,13 +44,16 @@ begin
             call syserrs (SYS_FREAD, s_readiomap)
 
 	# Get the iomap data.
-	call salloc (data, nelem, TY_SHORT)
+	sz_val = nelem
+	call salloc (data, sz_val, TY_SHORT)
 	nchars = nelem * SZ_SHORT
         if (read (GP_FD(gp), Mems[data], nchars) != nchars) {
 	    call fseti (GP_FD(gp), F_CANCEL, OK)
             call syserrs (SYS_FREAD, s_readiomap)
-	} else
-	    call achtsi (Mems[data], iomap, nelem)
+	} else {
+	    sz_val = nelem
+	    call achtsi (Mems[data], iomap, sz_val)
+	}
 
 	call fseti (GP_FD(gp), F_CANCEL, OK)
 	call sfree (sp)

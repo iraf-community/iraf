@@ -17,7 +17,8 @@ int	nbits			#I nbits per raster pixel (1,8,16,32)
 int	x1, y1			#I first pixel to be written
 int	nx, ny			#I size of region to be written
 
-int	npix, nchars, nwords
+int	npix, nwords
+size_t	nchars
 short	gim[GIM_READPIXELS_LEN]
 short	retval[GIM_RET_RPIX_LEN]
 errchk	gpl_flush, gflush, read, syserrs
@@ -38,7 +39,8 @@ begin
 	gim[GIM_READPIXELS_NY] = ny
 	gim[GIM_READPIXELS_BP] = nbits
 
-	call gki_escape (gp, GIM_READPIXELS, gim, GIM_READPIXELS_LEN)
+	# 1st arg: incompatible pointer: replaced: gp -> GP_FD(gp) ??? OK ???
+	call gki_escape (GP_FD(gp), GIM_READPIXELS, gim, GIM_READPIXELS_LEN)
 	call flush (GP_FD(gp))
 
         # Get return value instruction header.

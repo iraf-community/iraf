@@ -16,6 +16,7 @@ int	iomap[ARB]		#I iomap data
 int	first			#I first iomap entry to be written
 int	nelem			#I number of elements to write
 
+size_t	sz_val
 pointer	sp, data
 short	gim[GIM_WRITEIOMAP_LEN]
 errchk	gpl_flush
@@ -24,12 +25,14 @@ begin
 	call gpl_flush()
 
 	call smark (sp)
-	call salloc (data, nelem, TY_SHORT)
+	sz_val = nelem
+	call salloc (data, sz_val, TY_SHORT)
 
 	gim[GIM_WRITEIOMAP_FC] = first
 	gim[GIM_WRITEIOMAP_NC] = nelem
 
-	call achtis (iomap, Mems[data], nelem)
+	sz_val = nelem
+	call achtis (iomap, Mems[data], sz_val)
 	call gki_wescape (GP_FD(gp), GIM_WRITEIOMAP,
 	    gim, GIM_WRITEIOMAP_LEN, Mems[data], nelem)
 

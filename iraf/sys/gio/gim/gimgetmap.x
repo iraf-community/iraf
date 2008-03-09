@@ -24,7 +24,8 @@ int     dst			#O destination raster
 int     dt			#O coordinate type for destination raster
 int     dx,dy,dw,dh		#O destination rect
 
-int	nchars, nread
+size_t	nchars
+long	nread
 short	gim[GIM_GETMAPPING_LEN]
 short	retval[GIM_RET_GMAP_LEN]
 errchk	gescape, flush, read, syserrs

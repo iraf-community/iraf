@@ -17,8 +17,10 @@ int	first			#I first colormap entry to be read
 int	maxelem			#I number of elements to read
 int	r[ARB],g[ARB],b[ARB]	#O RGB color values (0-255)
 
+size_t	sz_val
 pointer	sp, cm, ip
-int	ncells, nret, nchars, i
+int	ncells, nret, i
+size_t	nchars
 short	gim[GIM_READCMAP_LEN]
 short	retval[GIM_RET_RCMAP_LEN]
 long	read()
@@ -44,7 +46,8 @@ begin
 	}
 
         ncells = retval[GIM_RET_RCMAP_NC]
-	call salloc (cm, ncells * 3, TY_SHORT)
+	sz_val = ncells * 3
+	call salloc (cm, sz_val, TY_SHORT)
 	nret = min (ncells, maxelem)
 
 	# Get the colormap data.
