@@ -48,7 +48,7 @@ define	SZ_UIFNAME	199
 define	SZ_TICKFORMAT	9
 
 define	GP_FD		Memi[P2I($1)]		# graphics stream
-define	GP_TTY		Memi[P2I($1+1)]		# graphcap descriptor
+define	GP_TTY		Memp[$1+1]		# graphcap descriptor
 define	GP_GFLAGS	Memi[P2I($1+2)]		# GIO flag bits
 define	GP_ACMODE	Memi[P2I($1+3)]		# gopen access mode
 define	GP_WCS		Memi[P2I($1+4)]		# current WCS

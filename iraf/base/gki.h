@@ -186,3 +186,4 @@ define	GKI_GETWCS		27
 define	GKI_GETWCS_LEN		4
 define	GKI_GETWCS_L		3
 define	GKI_GETWCS_N		4
+define	GKI_GETWCS_WCS		5
