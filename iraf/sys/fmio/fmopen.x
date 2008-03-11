@@ -29,7 +29,7 @@ begin
 	# Setup lf address table
 	if ( initialized == 0 ) {
 	    initialized = 1
-	    lf_ptrs = NULL
+	    lf_ptrs0 = NULL
 	    num_lf = 0
 	}
 

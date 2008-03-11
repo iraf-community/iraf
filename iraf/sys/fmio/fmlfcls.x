@@ -33,15 +33,16 @@ begin
 	Memp[lf_ptrs+lf_chan] = NULL
 	i_max = -1
 	do i = 0, num_lf-1 {
-	    if ( Memp[lf_ptrs+i] != NULL ) i_max = i
+	    if ( Memp[lf_ptrs0+i] != NULL ) i_max = i
 	}
 	sz_val = i_max + 1
 	if ( sz_val == 0 ) {
-	    call mfree (lf_ptrs, TY_POINTER)
-	    lf_ptrs = NULL
+	    call mfree (lf_ptrs0, TY_POINTER)
+	    lf_ptrs0 = NULL
 	} else {
-	    call realloc (lf_ptrs, sz_val, TY_POINTER)
+	    call realloc (lf_ptrs0, sz_val, TY_POINTER)
 	}
+	lf_ptrs = lf_ptrs0 - 1
 	num_lf = sz_val
 	#
 

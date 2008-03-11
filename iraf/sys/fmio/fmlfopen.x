@@ -50,15 +50,16 @@ begin
 	# Setup lf address table
 	do i = 0, num_lf {
 	    if ( i == num_lf ) break
-	    if ( Memp[lf_ptrs+i] == NULL ) break
+	    if ( Memp[lf_ptrs0+i] == NULL ) break
 	}
 	if ( i == num_lf ) {
 	    sz_val = num_lf + 1
-	    call realloc (lf_ptrs, sz_val, TY_POINTER)
+	    call realloc (lf_ptrs0, sz_val, TY_POINTER)
 	    num_lf = sz_val
 	}
-	Memp[lf_ptrs+i] = lf
-	lf_chan = i
+	Memp[lf_ptrs0+i] = lf
+	lf_ptrs = lf_ptrs0 - 1
+	lf_chan = i + 1
 	#
 
 	# Activate the descriptor?
