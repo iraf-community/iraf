@@ -721,6 +721,12 @@ extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 #define	ABSL		absl_
 #define	ABSS		abss_
 #define	ABSP		absp_
+#define	NINT_RL		nintrl_
+#define	NINT_DL		nintdl_
+#define	NINT_RI		nintri_
+#define	NINT_DI		nintdi_
+#define	NINT_RS		nintrs_
+#define	NINT_DS		nintds_
 
 #define	ACLRC		aclrc_
 #define	ACLRD		aclrd_
@@ -1035,5 +1041,12 @@ extern XINT ABSI ( XINT * );
 extern XLONG ABSL ( XLONG * );
 extern XSHORT ABSS ( XSHORT * );
 extern XPOINTER ABSP ( XPOINTER * );
+
+extern XLONG NINT_RL ( XREAL * );
+extern XLONG NINT_DL ( XDOUBLE * );
+extern XINT NINT_RI ( XREAL * );
+extern XINT NINT_DI ( XDOUBLE * );
+extern XSHORT NINT_RS ( XREAL * );
+extern XSHORT NINT_DS ( XDOUBLE * );
 
 #endif	/* ! _IRAF_KNAMES_H */
