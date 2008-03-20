@@ -110,7 +110,7 @@ define	SZ_MAPFNAME	(240*SZ_STRUCT-1)
 
 define	M_CHECKSUM	Memi[P2I($1)]		# checksum of file when written
 define	M_CHAN		Memi[P2I($1+1)]		# OS channel of mapping file
-define	M_LOCKTIME	Meml[P2I($1+2)]		# clktime when lock set
+define	M_LOCKTIME	Meml[P2L($1+2)]		# clktime when lock set
 define	M_NFILES	Memi[P2I($1+3)]		# no. filename pairs in map
 define	M_LASTOP	Memi[P2I($1+4)]		# code for last op on database
 define	M_MODIFIED	Memi[P2I($1+5)]		# YES if database modified
