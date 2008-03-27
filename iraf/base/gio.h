@@ -56,7 +56,7 @@ define	GP_WCSSTATE	Memi[P2I($1+5)]		# unset, modifed, or fixed
 define	GP_WCSORD	Memi[P2I($1+6)]		# unique WCS ordinal
 define	GP_CURSOR	Memi[P2I($1+7)]		# current cursor number
 define	GP_DEVASPECT	Memr[P2R($1+8)]		# device aspect ratio
-define	GP_SZMARKER	Memr[P2R($1+9+$2-1)]		# standard marker sizes
+define	GP_SZMARKER	Memr[P2R($1+9)+$2-1]	# standard marker sizes
 			# (extra space)
 define	GP_PLAP		($1+20)			# polyline attributes
 define	GP_PMAP		($1+24)			# polymarker attributes

@@ -32,11 +32,11 @@ define	IM_ACMODE	Memi[P2I($1+2)]		# access mode (ro, rw, etc.)
 define	IM_VNBUFS	Memi[P2I($1+3)]		# number of in buffers
 define	IM_VCOMPRESS	Memi[P2I($1+4)]		# if YES, len[i] == physlen[i]
 define	IM_VADVICE	Memi[P2I($1+5)]		# expected type of access
-define	IM_VBUFSIZE	Memi[P2I($1+6)]		# recommended FIO buffer size
+define	IM_VBUFSIZE	Memz[P2Z($1+6)]		# recommended FIO buffer size
 define	IM_VBUFFRAC	Memi[P2I($1+7)]		# FIO buffer as image fraction
-define	IM_VBUFMAX	Memi[P2I($1+8)]		# max FIO buffer size
+define	IM_VBUFMAX	Memz[P2Z($1+8)]		# max FIO buffer size
 define	IM_VCLOSEFD	Memi[P2I($1+9)]		# set F_CLOSEFD on pixfile
-define	IM_VNBNDRYPIX	Memi[P2I($1+10)]		# npixels of boundary extension
+define	IM_VNBNDRYPIX	Meml[P2L($1+10)]		# npixels of boundary extension
 define	IM_VTYBNDRY	Memi[P2I($1+11)]		# type of boundary extension
 define	IM_VFLAGBADPIX	Memi[P2I($1+12)]		# flag bad pixels upon input
 define	IM_FLUSH	Memi[P2I($1+13)]		# flush outbuf?
@@ -64,10 +64,10 @@ define	IM_PL		Memp[$1+34]			# PL descriptor if mask image
 define	IM_PLREFIM	Memp[$1+35]			# PL reference image if any
 define	IM_PLFLAGS	Memi[P2I($1+36)]		# PL mask i/o flags
 			# (extra space)
-define	IM_SVLEN	Meml[P2L($1+$2+40-1)]	# save true axis lengths
-define	IM_VMAP		Memi[P2I($1+$2+47-1)]	# map section dimensions
-define	IM_VOFF		Meml[P2L($1+$2+54-1)]	# section offsets
-define	IM_VSTEP	Memi[P2I($1+$2+61-1)]	# section sample step size
+define	IM_SVLEN	Meml[P2L($1+40)+$2-1]	# save true axis lengths
+define	IM_VMAP		Memi[P2I($1+47)+$2-1]	# map section dimensions
+define	IM_VOFF		Meml[P2L($1+54)+$2-1]	# section offsets
+define	IM_VSTEP	Meml[P2L($1+61)+$2-1]	# section sample step size
 define	IM_NAME		Memc[P2C($1+68)]	# imagefile name
 			# (extra space)
 
@@ -84,10 +84,10 @@ define	PL_BOOL		8			# boolean mask
 
 define	LEN_BDES	19
 
-define	BD_BUFPTR	Memi[P2I($1)]		# buffer pointer
+define	BD_BUFPTR	Memp[$1]		# buffer pointer
 define	BD_DTYPE	Memi[P2I($1+1)]		# datatype of pixels
-define	BD_NPIX		Memi[P2I($1+2)]		# number of pixels in buf
+define	BD_NPIX		Memz[P2Z($1+2)]		# number of pixels in buf
 define	BD_NDIM		Memi[P2I($1+3)]		# dimensionality of section
-define	BD_BUFSIZE	Memi[P2I($1+4)]		# buffer size, chars
-define	BD_VS		Meml[P2L($1+$2+5-1)]		# section start vector
-define	BD_VE		Meml[P2L($1+$2+12-1)]	# section end vector
+define	BD_BUFSIZE	Memz[P2Z($1+4)]		# buffer size, chars
+define	BD_VS		Meml[P2L($1+5)+$2-1]		# section start vector
+define	BD_VE		Meml[P2L($1+12)+$2-1]	# section end vector

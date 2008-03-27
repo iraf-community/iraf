@@ -18,16 +18,18 @@ define	P_DEPTH		4		# mask pixel depth, bits (1=boolean)
 
 define	RL_FIRST	2		# first data range entry in list
 define	RL_LENELEM	3		# size of each element of list
-define	RL_MAXLEN	(Memi[P2I($1+3)]*3)	# maximum range list length (arg=pl)
+define	RL_LENMAX	(Memz[P2Z($1+3)]*3)	# maximum range list length (arg=pl)
 
 define	RL_LEN		$1[1,1]		# physical length of range list
 define	RL_AXLEN	$1[2,1]		# length of mask image line
 define	RLS_LEN		Mems[$1]	# RL_LEN for rl = ptr to int
 define	RLS_AXLEN	Mems[$1+1]	# RL_AXLEN  "     "     "
-define	RLI_LEN		Memi[P2I($1)]	# RL_LEN for rl = ptr to int
-define	RLI_AXLEN	Memi[P2I($1+1)]	# RL_AXLEN  "     "     "
-define	RLL_LEN		Meml[P2L($1)]	# RL_LEN for rl = ptr to int
-define	RLL_AXLEN	Meml[P2L($1+1)]	# RL_AXLEN  "     "     "
+define	RLI_LEN		Memi[$1]	# RL_LEN for rl = ptr to int
+define	RLI_AXLEN	Memi[$1+1]	# RL_AXLEN  "     "     "
+
+# Cannot suuport RLL_XXX, since PLIO does not have 64-bit support.
+# define	RLL_LEN		Meml[$1]	# RL_LEN for rl = ptr to int
+# define	RLL_AXLEN	Meml[$1+1]	# RL_AXLEN  "     "     "
 
 define	RL_X		$1[1,$2]	# fields of a range list entry ($2=rn)
 define	RL_N		$1[2,$2]	# direct array references

@@ -23,7 +23,7 @@ define	MEF_HSIZE        Memi[P2I($1+8)] 		# Header size
 define	MEF_HDRP         Memp[$1+9] 		# Header area pointer
 define	MEF_POFF         Meml[P2L($1+10)] 		# Offset to pixel area (chars)
 define	MEF_NDIM         Memi[P2I($1+11)] 		# Unit dimensionality
-define	MEF_NAXIS        Memi[P2I($1+$2+12-1)] 	# Upto 7 axis
+define	MEF_NAXIS        Memi[P2I($1+12)+$2-1]	# Upto 7 axis
 define	MEF_BITPIX     	 Memi[P2I($1+18)] 		# Unit datatype 
 define	MEF_DATATYPE     Memi[P2I($1+19)] 		# Unit datatype 
 define	MEF_SKDATA       Memi[P2I($1+20)] 		# Has data been skipped?

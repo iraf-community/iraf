@@ -23,14 +23,15 @@ define	IMU		(LEN_IMDES+LEN_IMHDR)	# offset to user fields
 define	IM_USERAREA	(P2C($1+IMU))		# user area (database)
 
 # Disk resident header.
-define	IM_MAGIC	Memi[P2I($1+IMD)]		# contains the string "imhdr"
+define	IM_IMHDR	Memp[$1+IMD]
+define	IM_MAGIC	Memc[P2C($1+IMD)]		# contains the string "imhdr"
 define	IM_HDRLEN	Memi[P2I($1+IMD+3)]		# length of image header
 define	IM_HDRVER	Memi[P2I($1+IMD+4)]		# image format version
 define	IM_PIXTYPE	Memi[P2I($1+IMD+5)]		# datatype of the pixels
 define	IM_SWAPPED	Memi[P2I($1+IMD+6)]		# pixels are byte swapped
 define	IM_NDIM		Memi[P2I($1+IMD+7)]		# number of dimensions
-define	IM_LEN		Meml[P2L($1+IMD+$2+8-1)]	# length of the dimensions
-define	IM_PHYSLEN	Meml[P2L($1+IMD+$2+15-1)]	# physical length (as stored)
+define	IM_LEN		Meml[P2L($1+IMD+8)+$2-1]	# length of the dimensions
+define	IM_PHYSLEN	Meml[P2L($1+IMD+15)+$2-1]	# physical length (as stored)
 define	IM_SSMTYPE	Meml[P2L($1+IMD+22)]		# type of subscript mapping
 define	IM_LUTOFF	Meml[P2L($1+IMD+23)]		# offset to subscript map luts
 define	IM_PIXOFF	Meml[P2L($1+IMD+24)]		# offset of the pixels
@@ -70,10 +71,10 @@ define	LEN_CTSTRUCT	50
 define	CT_VALID	Memi[P2I($1)]		# (y/n) is structure valid?
 define	CT_BSCALE	Memr[P2R($1+1)]		# pixval scale factor
 define	CT_BZERO	Memr[P2R($1+2)]		# pixval offset
-define	CT_CRVAL	Memr[P2R($1+$2+3-1)]		# value at pixel
-define	CT_CRPIX	Memr[P2R($1+$2+10-1)]	# index of pixel
-define	CT_CDELT	Memr[P2R($1+$2+17-1)]	# increment along axis
-define	CT_CROTA	Memr[P2R($1+$2+24-1)]	# rotation angle
+define	CT_CRVAL	Memr[P2R($1+3)+$2-1]	# value at pixel
+define	CT_CRPIX	Memr[P2R($1+10)+$2-1]	# index of pixel
+define	CT_CDELT	Memr[P2R($1+17)+$2-1]	# increment along axis
+define	CT_CROTA	Memr[P2R($1+24)+$2-1]	# rotation angle
 define	CT_BUNIT	Memc[P2C($1+31)]	# pixval ("brightness") units
 define	CT_CTYPE	Memc[P2C($1+36)]	# coord units string
 # next available field: ($1+41)

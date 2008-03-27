@@ -15,20 +15,20 @@ define	LEN_PLDES	28
 define	MLO		3		# must update PLSET.H too if changed
 
 define	PL_MAGIC	Memi[P2I($1)]	# magic / version no.
-define	PL_PRIVATE1	Memi[P2I($1+1)]	# private data for client
-define	PL_PRIVATE2	Memi[P2I($1+2)]	# more private data for client
-define	PL_MAXLINE	Memi[P2I($1+MLO)]	# max elements per [lr]list [PLSET.H]
+define	PL_PRIVATE1	Meml[P2L($1+1)]	# private data for client
+define	PL_PRIVATE2	Meml[P2L($1+2)]	# more private data for client
+define	PL_MAXLINE	Memz[P2Z($1+MLO)]	# max elements per [lr]list [PLSET.H]
 define	PL_MAXVAL	Memi[P2I($1+4)]	# max pixel value (2**N - 1)
 define	PL_NAXES	Memi[P2I($1+5)]	# dimensionality
-define	PL_AXLEN	Memi[P2I($1+6+$2-1)]	# length of each axis
-define	PL_PLANE	Memi[P2I($1+13+$2-1)] # active plane (pl_setplane)
-define	PL_LLBP		Memi[P2I($1+20)]	# line list bufptr
+define	PL_AXLEN	Meml[P2L($1+6)+$2-1]	# length of each axis
+define	PL_PLANE	Meml[P2L($1+13)+$2-1] # active plane (pl_setplane)
+define	PL_LLBP		Memp[$1+20]	# line list bufptr
 define	PL_LLOP		Memi[P2I($1+21)]	# next location in llbuf
 define	PL_LLLEN	Memi[P2I($1+22)]	# current llbuf length
 define	PL_LLFREE	Memi[P2I($1+23)]	# amount of free space in list
 define	PL_LLNUPDATES	Memi[P2I($1+24)]	# number of list modifications
 define	PL_LLINC	Memi[P2I($1+25)]	# current llbuf increment on overflow
-define	PL_NLP		Memi[P2I($1+26)]	# number of line pointers
+define	PL_NLP		Meml[P2L($1+26)]	# number of line pointers
 define	PL_LPP		Memp[$1+27]		# ptr to array of LL offsets
 
 define	PM_REFIM	PL_PRIVATE1($1)	# reference image
@@ -106,9 +106,9 @@ define	LL_BLENHI	$1[7]		# length of LL buffer
 # Handy line list macros.
 define	LL_NREF		(int(LL_NREFS($1)))
 define	LL_BLEN		((int(LL_BLENHI($1)))*32768+(int(LL_BLENLO($1))))
-define	LL_SETBLEN	LL_BLENLO($1)=mod($2,32768); LL_BLENHI($1)=($2)/32768
+define	LL_SETBLEN	LL_BLENLO($1)=modi($2,32768); LL_BLENHI($1)=($2)/32768
 define	LL_LEN		((int(LL_LENHI($1)))*32768+(int(LL_LENLO($1))))
-define	LL_SETLEN	LL_LENLO($1)=mod($2,32768); LL_LENHI($1)=($2)/32768
+define	LL_SETLEN	LL_LENLO($1)=modi($2,32768); LL_LENHI($1)=($2)/32768
 define	LL_FIRST	(LL_HDRLEN($1)+1)
 
 # Line list definitions (accessed as a short integer pointer).
@@ -123,9 +123,9 @@ define	LP_BLENHI	Mems[$1+6]	# length of LL buffer
 # Handy line list pointer macros.
 define	LP_NREF		(int(LP_NREFS($1)))
 define	LP_BLEN		(int(LP_BLENHI($1))*32768+int(LP_BLENLO($1)))
-define	LP_SETBLEN	LP_BLENLO($1)=mod($2,32768); LP_BLENHI($1)=($2)/32768
+define	LP_SETBLEN	LP_BLENLO($1)=modi($2,32768); LP_BLENHI($1)=($2)/32768
 define	LP_LEN		(int(LP_LENHI($1))*32768+int(LP_LENLO($1)))
-define	LP_SETLEN	LP_LENLO($1)=mod($2,32768); LP_LENHI($1)=($2)/32768
+define	LP_SETLEN	LP_LENLO($1)=modi($2,32768); LP_LENHI($1)=($2)/32768
 define	LP_FIRST	(($1)+LP_HDRLEN($1))
 
 
@@ -164,14 +164,14 @@ define	M_MOVE		40000B
 define	LEN_PLEXTERN	20
 define	PLE_MAGIC	Memi[P2I($1)]	# usual magic value
 define	PLE_NAXES	Memi[P2I($1+1)]	# number of axes 
-define	PLE_AXLEN	Memi[P2I($1+2+$2-1)]	# length of each axis
+define	PLE_AXLEN	Meml[P2L($1+2)+$2-1]	# length of each axis
 define	PLE_LLOP	Memi[P2I($1+9)]	# next location in llbuf
 define	PLE_LLLEN	Memi[P2I($1+10)]	# length of llbuf
-define	PLE_NLP		Memi[P2I($1+11)]	# number of line pointers
+define	PLE_NLP		Meml[P2L($1+11)]	# number of line pointers
 define	PLE_NLPX	Memi[P2I($1+12)]	# length of compressed LP array
 define	PLE_EXLEN	Memi[P2I($1+13)]	# length of full PLEXTERN structure
 define	PLE_FLAGS	Memi[P2I($1+14)]	# flags for type of encoding
-define	PLE_MAXLINE	Memi[P2I($1+15)]	# max elements per [lr]list
+define	PLE_MAXLINE	Memz[P2Z($1+15)]	# max elements per [lr]list
 define	PLE_MAXVAL	Memi[P2I($1+16)]	# max pixel value
 
 # PLIO mask savefile descriptor.
