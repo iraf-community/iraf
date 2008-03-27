@@ -136,6 +136,7 @@ pointer	imd_mapframe(), iw_open(), immap(), mw_sctran(), mw_openim()
 errchk	imd_mapframe, iw_open, immap, mw_sctran, mw_openim
 int	envfind(), clgeti()
 bool	streq()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
@@ -183,7 +184,7 @@ begin
 	    # We don't need the image once the WCS is loaded.
 	    call imunmap (im)
 	    if (mw != NULL)
-		call mw_seti (mw, MW_REFIM, NULL)
+		call mw_setp (mw, MW_REFIM, NULLPTR)
 	}
 
 	call sfree (sp)

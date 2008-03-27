@@ -29,8 +29,8 @@ pointer	pmim			#I the pixel mask imio descriptor
 pointer	sp, rg, oexpr, expr, obuf
 int	i, npix, nlines, depth, pmaxval, stat
 
-pointer	evvexpr(), locpr()
-int	imstati(), pm_stati()
+pointer	evvexpr(), locpr(), imstatp()
+int	pm_stati()
 int	imgnli(), impnli(), impnls(), impnll()
 extern	rg_getop(), rg_fcn()
 
@@ -71,7 +71,7 @@ begin
 
 	    # Determine the depth of the mask.
 	    if (IS_INDEFI(depth)) {
-	        depth = pm_stati (imstati (pmim, IM_PLDES), P_DEPTH)
+	        depth = pm_stati (imstatp (pmim, IM_PLDES), P_DEPTH)
 		if (depth > 0) {
 		    pmaxval = min (depth, PL_MAXDEPTH)
 		    pmaxval = 2 ** depth - 1

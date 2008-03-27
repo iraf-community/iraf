@@ -33,8 +33,8 @@ pointer	buf_out, buf_msk, buf_in, pbuf
 int	i, n, nimages, npix, npts, mval
 
 real	imgetr()
-pointer	mio_openo()
-int	impnlr(), impnli(), mio_glsegr(), imstati()
+pointer	mio_openo(), imstatp()
+int	impnlr(), impnli(), mio_glsegr()
 errchk	imgetr()
 
 begin
@@ -68,7 +68,7 @@ begin
 	        Memp[im+n] = imptrs[i]
 		iferr (Memr[norm+n] = imgetr (imptrs[i], skyscale))
 		    Memr[norm+n] = 1.0
-		Memp[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES),
+		Memp[mpim+n] = mio_openo (imstatp(mskptrs[i], IM_PLDES),
 		        imptrs[i])
 		n = n + 1
 	    }
@@ -136,7 +136,7 @@ begin
 	    Memp[im+n] = imptrs[i]
 	    iferr (Memr[norm+n] = imgetr (imptrs[i], skyscale))
 	        Memr[norm+n] = 1.0
-	    Memp[mpim+n] = mio_openo (imstati(mskptrs[i], IM_PLDES), imptrs[i])
+	    Memp[mpim+n] = mio_openo (imstatp(mskptrs[i], IM_PLDES), imptrs[i])
 	   n = n + 1
 	}
 
@@ -221,8 +221,8 @@ pointer	buf_out, buf_msk, buf_in, pbuf
 int	i, n, nimages, npix, npts, mval
 
 real	imgetr()
-pointer	immap(), mp_open(), mio_openo()
-int	imtrgetim(), impnlr(), impnli(), mio_glsegr(), imstati()
+pointer	immap(), mp_open(), mio_openo(), imstatp()
+int	imtrgetim(), impnlr(), impnli(), mio_glsegr()
 errchk	imgetr()
 
 begin
@@ -276,7 +276,7 @@ begin
                         Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
 			    SZ_FNAME)
                     }
-		    Memp[mpim+n] = mio_openo (imstati(Memp[mkim+n], IM_PLDES),
+		    Memp[mpim+n] = mio_openo (imstatp(Memp[mkim+n], IM_PLDES),
 		        Memp[im+n])
 		    n = n + 1
 		}
@@ -364,7 +364,7 @@ begin
                     Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
 		        SZ_FNAME)
                 }
-		Memp[mpim+n] = mio_openo (imstati(Memp[mkim+n], IM_PLDES),
+		Memp[mpim+n] = mio_openo (imstatp(Memp[mkim+n], IM_PLDES),
 		    Memp[im+n])
 	        n = n + 1
 	    }

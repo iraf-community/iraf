@@ -76,7 +76,7 @@ begin
 		ifnoerr (call imgstr (in[i], "BPM", Memc[fname], SZ_FNAME)) {
 		    pm = pm_open (NULL)
 		    call pm_loadf (pm, Memc[fname], Memc[title], SZ_FNAME)
-		    call pm_seti (pm, P_REFIM, in[i])
+		    call pm_setp (pm, P_REFIM, in[i])
 		    if (pm_empty (pm) && !invert)
 			call pm_close (pm)
 		    else {

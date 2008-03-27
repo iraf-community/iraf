@@ -120,7 +120,7 @@ begin
 		    # commands before clearing screen.  Put out accumulated
 		    # SETWCS instruction before reading cursor.
 
-cursor_loop_	    call gki_setwcs (out, Memi[wcs], LEN_WCSARRAY)
+cursor_loop_	    call gki_setwcs (out, Memp[wcs], LEN_WCSARRAY)
 
 		    if (interactive == YES) {
 		        call gki_flush (out)
@@ -610,6 +610,7 @@ short	gki[ARB]	# GKI_SETWCS instruction
 pointer	frame_wcs	# Pointer to accumulating SETWCS instruction
 int	nwcs_cnt	# Number of SETWCS instructions encountered
 
+size_t	sz_val
 int	nwords,	i, nwcs, temp, nwcs_in
 real	xy_pairs[NPAIRS * 2]
 pointer	sp, wcs_temp, w, ow
@@ -630,7 +631,9 @@ begin
 	nwcs = nwords * SZ_SHORT / SZ_STRUCT / LEN_WCS
 
 	if (nwcs > 1) {
-	    call amovi (gki[GKI_SETWCS_WCS], Memi[wcs_temp], nwcs * LEN_WCS)
+	    sz_val = (nwcs * LEN_WCS) * (SZ_POINTER / SZ_SHORT)
+	    # arg2 : incompatible pointer
+	    call amovs (gki[GKI_SETWCS_WCS], Memp[wcs_temp], sz_val)
 
 	    do i = 1, nwcs {
 		w = ((i - 1) * LEN_WCS) + wcs_temp

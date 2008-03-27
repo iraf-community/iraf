@@ -40,9 +40,9 @@ bool	verbose, append
 pointer	pl
 
 pointer	me_getexprdb(), immap(), me_expandtext(), pl_create(), imtopenp()
-pointer	clpopnu()
+pointer	clpopnu(), imstatp()
 int	clplen(), imtlen(), clgeti(), ctoi(), clgfil()
-int	imtgetim(), imaccess(), strmatch(), imstati(), fscan(), open()
+int	imtgetim(), imaccess(), strmatch(), fscan(), open()
 int	strdic(), stridx()
 bool	clgetb(), strne()
 data	lbrackett /'('/
@@ -176,11 +176,11 @@ begin
 		    call amovl (Meml[uaxlen], IM_LEN(pmim,1), undim)
 	        }
 		IM_PIXTYPE(pmim) = TY_INT
-		pl = imstati (pmim, IM_PLDES)
+		pl = imstatp (pmim, IM_PLDES)
 		call pl_close (pl)
 		#pl = pl_create (undim, Meml[uaxlen], depth)
 		pl = pl_create (IM_NDIM(pmim), IM_LEN(pmim,1), depth)
-		call imseti (pmim, IM_PLDES, pl)
+		call imsetp (pmim, IM_PLDES, pl)
 		call imunmap (pmim)
 		pmim = immap (Memc[mskname], READ_WRITE, 0) 
 	    }

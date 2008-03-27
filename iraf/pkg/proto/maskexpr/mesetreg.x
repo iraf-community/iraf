@@ -35,7 +35,8 @@ real	xc, yc, a, b, ratio, theta
 real	x1, y1, x2, y2, width
 pointer	sp, function, ufunction, pl, xver, yver, rangestr
 int	nfuncs, nver, nold
-int	strdic(), imstati(), nscan()
+int	strdic(), nscan()
+pointer	imstatp()
 
 begin
 	# Allocate working space. 
@@ -59,7 +60,7 @@ begin
 	    return
 	}
 
-	pl = imstati (pmim, IM_PLDES)
+	pl = imstatp (pmim, IM_PLDES)
 
 	switch (nfuncs) {
 

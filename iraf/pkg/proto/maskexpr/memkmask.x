@@ -36,7 +36,7 @@ int	depth			#I the pixel depth of the output mask
 pointer	sp, tmpname, pm, pmim, me, obuf, oexpr
 int	i, npix, nlines, pmaxval
 pointer pm_create(), im_pmmap(), evvexpr(), immap(), locpr()
-int	imstati()
+pointer	imstatp()
 int	imgnli(), imgnll(), imgnlr(), imgnld()
 int	impnli(), impnls(), impnll()
 extern	me_getop(), me_fcn()
@@ -72,10 +72,10 @@ begin
 	IM_PIXTYPE(pmim) = TY_INT
 
 	# Initialize the mask.
-	pm = imstati (pmim, IM_PLDES)
+	pm = imstatp (pmim, IM_PLDES)
 	call pl_close (pm)
 	pm = pm_create (IM_NDIM(pmim), IM_LEN(pmim,1), depth)
-	call imseti (pmim, IM_PLDES, pm)
+	call imsetp (pmim, IM_PLDES, pm)
 
 	# Determine the mask depth.
 	if (depth > 0) {

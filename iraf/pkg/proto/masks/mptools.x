@@ -293,11 +293,13 @@ pointer	pmout			#I the output mask descriptor
 
 pointer	sp, axlen, v, oldpm, newpm
 int	naxes, depth
-pointer	pl_create()
-int	imstati(), mp_samesize()
+pointer	pl_create(), imstatp()
+int	mp_samesize()
 
+int	mapstat
+pointer	refim
 int	pm_stati()
-int	refim, mapstat
+pointer	pm_statp()
 
 begin
 	call smark (sp)
@@ -305,17 +307,17 @@ begin
 	call salloc (v, IM_MAXDIM, TY_LONG)
 
 	# Create new mask.
-	oldpm = imstati (pmim, IM_PLDES)
+	oldpm = imstatp (pmim, IM_PLDES)
 	call pl_gsize (oldpm, naxes, Meml[axlen], depth)
 	newpm = pl_create (naxes, Meml[axlen], depth)
 
 	# Store old values of the input mask reference image and mapping
 	# descriptors here. Maybe ...
-	refim = pm_stati (oldpm, P_REFIM)
+	refim = pm_statp (oldpm, P_REFIM)
 	mapstat = pm_stati (oldpm, P_MAPXY)
 
 	# Set the input mask mapping parameters.
-	call pm_seti (oldpm, P_REFIM, im)
+	call pm_setp (oldpm, P_REFIM, im)
 	if (mp_samesize (im, pmim) == YES)
 	    call pm_seti (oldpm, P_MAPXY, NO)
 
@@ -326,7 +328,7 @@ begin
 	# here. Don't need to do this since this is the desired behavior.
 
 	# Set the input mask mapping parameters.
-	call pm_seti (newpm, P_REFIM, im)
+	call pm_setp (newpm, P_REFIM, im)
 	if (mp_samesize (im, pmim) == YES)
 	    call pm_seti (newpm, P_MAPXY, NO)
 
@@ -339,7 +341,7 @@ begin
 	call amovkl (long(1), Meml[v], IM_MAXDIM)
 	call pm_rop (oldpm, Meml[v], newpm, Meml[v], Meml[axlen], PIX_SRC)
 
-	call imseti (pmout, IM_PLDES, newpm)
+	call imsetp (pmout, IM_PLDES, newpm)
 	call sfree (sp)
 end
 
@@ -358,12 +360,12 @@ pointer	pmim			#I the input mask image descriptor
 
 pointer	pm, mp
 int	samesize
-pointer	mio_openo()
-int	imstati(), mp_samesize()
+pointer	mio_openo(), imstatp()
+int	mp_samesize()
 
 begin
 	# Open the pixel mask.
-	pm = imstati (pmim, IM_PLDES)
+	pm = imstatp (pmim, IM_PLDES)
 
 	# Open the mio descriptor which set the mapping status using
 	# the image descriptor, i.e. the mapping status is yes if the

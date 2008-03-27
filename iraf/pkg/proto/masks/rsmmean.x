@@ -25,8 +25,8 @@ pointer	hmask, imids, tmpim, tmpmsk, im, pmim, outim, hmim
 int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
 int	first, last, hstat
 size_t	old_size, new_size
-pointer	immap(), im_pmmap()
-int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
+pointer	immap(), im_pmmap(), imstatp()
+int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout()
 
 begin
 	call smark (sp)
@@ -236,7 +236,7 @@ begin
 		    hmim = NULL
 	        else {
 		    hmim = im_pmmap (Memc[hmask], NEW_IMAGE, 0)
-		    call pm_ssize (imstati(hmim, IM_PLDES), IM_NDIM(outim),
+		    call pm_ssize (imstatp(hmim, IM_PLDES), IM_NDIM(outim),
 		        IM_LEN(outim,1), 1)
 	        }
 
@@ -271,7 +271,7 @@ begin
 	        # Close up images.
 	        if (hmim != NULL) {
 		    if (hstat == YES) {
-		        call pm_savef (imstati (hmim, IM_PLDES), Memc[hmask],
+		        call pm_savef (imstatp (hmim, IM_PLDES), Memc[hmask],
 			    "", 0)
 			call imastr (outim, RS_KYHMASK(rs), Memc[hmask])
 		    }
@@ -325,8 +325,8 @@ pointer	tmpim, tmpmsk, im, pmim, outim, hmim
 int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
 int	first, last, hstat
 size_t	old_size, new_size
-pointer	immap(), im_pmmap(), mp_open()
-int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout(), imstati()
+pointer	immap(), im_pmmap(), mp_open(), imstatp()
+int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_prmout()
 
 begin
 	call smark (sp)
@@ -498,7 +498,7 @@ begin
 	    # Open the holes mask as a virtual mask.
 	    if (imtrgetim (hmsklist, imno, Memc[hmask], SZ_FNAME) != EOF) {
 		hmim = im_pmmap (Memc[hmask], NEW_IMAGE, 0)
-		call pm_ssize (imstati(hmim, IM_PLDES), IM_NDIM(outim),
+		call pm_ssize (imstatp(hmim, IM_PLDES), IM_NDIM(outim),
 		    IM_LEN(outim,1), 1)
 	    } else {
 	        hmim = NULL
@@ -559,7 +559,7 @@ begin
 	    # Close up images.
 	    if (hmim != NULL) {
 		if (hstat == YES) {
-		    call pm_savef (imstati (hmim, IM_PLDES), Memc[hmask], "", 0)
+		    call pm_savef (imstatp (hmim, IM_PLDES), Memc[hmask], "", 0)
 		    call imastr (outim, RS_KYHMASK(rs), Memc[hmask])
 		}
 	        call imunmap (hmim)
@@ -606,8 +606,8 @@ pointer	tmpim, tmpmsk, im, pmim, outim, hmim
 int	i, imno, nlo, nhi, ostart, ofinish, start, finish, nimages
 int	first, last, hstat
 size_t	new_size, old_size
-pointer	immap(), mp_open(), im_pmmap()
-int	imtlen(), imtrgetim(), btoi(), imaccess(), imstati(), rs_pmout()
+pointer	immap(), mp_open(), im_pmmap(), imstatp()
+int	imtlen(), imtrgetim(), btoi(), imaccess(), rs_pmout()
 
 begin
 	call smark (sp)
@@ -777,7 +777,7 @@ begin
 	    # Open the holes mask as a virtual mask.
 	    if (imtrgetim (hmsklist, imno, Memc[hmask], SZ_FNAME) != EOF) {
 		hmim = im_pmmap (Memc[hmask], NEW_IMAGE, 0)
-		call pm_ssize (imstati(hmim, IM_PLDES), IM_NDIM(outim),
+		call pm_ssize (imstatp(hmim, IM_PLDES), IM_NDIM(outim),
 		    IM_LEN(outim,1), 1)
 	    } else {
 	        hmim = NULL
@@ -829,7 +829,7 @@ begin
 	    # Close up images.
 	    if (hmim != NULL) {
 		if (hstat == YES)
-		    call pm_savef (imstati(hmim, IM_PLDES), Memc[hmask], "", 0)
+		    call pm_savef (imstatp(hmim, IM_PLDES), Memc[hmask], "", 0)
 	        call imunmap (hmim)
 	    }
 	    call imunmap (outim)
@@ -874,8 +874,8 @@ pointer	vout, mvout, vs, ve, vin
 pointer	str, obuf, ibuf, ombuf
 int	i, j, nin, npix, mval, npts
 real	imgetr()
-pointer	immap(), mp_open(), mio_openo()
-int	imtrgetim(), impnlr(), impnli(), mio_glsegr(), imstati()
+pointer	immap(), mp_open(), mio_openo(), imstatp()
+int	imtrgetim(), impnlr(), impnli(), mio_glsegr()
 errchk	imgetr()
 
 begin
@@ -917,7 +917,7 @@ begin
                 Memp[mkptrs+j-1] = mp_open ("", Memp[imptrs+j-1], Memc[imask],
 		    SZ_FNAME)
 	    }
-	    Memp[mpptrs+j-1] = mio_openo (imstati(Memp[mkptrs+j-1], IM_PLDES),
+	    Memp[mpptrs+j-1] = mio_openo (imstatp(Memp[mkptrs+j-1], IM_PLDES),
 	        Memp[imptrs+j-1])
 	    iferr (Memr[imnorm+j-1] = imgetr (Memp[imptrs+j-1], skyscale))
 		Memr[imnorm+j-1] = 1.0
@@ -1067,7 +1067,8 @@ pointer	sp, vin, vmin, vout, vtmp, vmtmp, vs, str
 pointer	obuf, ibuf, imbuf, tbuf, tmbuf, hbuf
 int	i, npix, npout, stat
 real	imgetr()
-int	impnlr(), imgnlr(), imgnli(), imstati()
+int	impnlr(), imgnlr(), imgnli()
+pointer	imstatp()
 errchk	imgetr()
 
 begin
@@ -1147,7 +1148,7 @@ begin
 	        }
 	        call asubr (Memr[ibuf], Memr[obuf], Memr[obuf], npix)
 
-	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
+	        call pm_plps (imstatp(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
 	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
 	    }
@@ -1182,8 +1183,8 @@ pointer	imask, str, mksub, mkadd, vs, ve, mpsub, mpadd, mvin, mvout
 pointer	ibuf, obuf, mibuf, mobuf, sbuf, abuf
 int	i, j, nsub, nadd, npix, doadd, dosub, npts, mval
 real	imgetr()
-pointer	immap(), mp_open(), mio_openo()
-int	imtrgetim(), impnlr(), imgnlr(), impnli(), imgnli(), imstati()
+pointer	immap(), mp_open(), mio_openo(), imstatp()
+int	imtrgetim(), impnlr(), imgnlr(), impnli(), imgnli()
 int	mio_glsegr()
 errchk	imgetr()
 
@@ -1239,7 +1240,7 @@ begin
                         Memp[mksub+j-1] = mp_open ("", Memp[imsub+j-1],
 			    Memc[imask], SZ_FNAME)
                     }
-                    Memp[mpsub+j-1] = mio_openo (imstati(Memp[mksub+j-1],
+                    Memp[mpsub+j-1] = mio_openo (imstatp(Memp[mksub+j-1],
 			IM_PLDES), Memp[imsub+j-1])
 	    	    iferr (Memr[norms+j-1] = imgetr (Memp[imsub+j-1], skyscale))
 			Memr[norms+j-1] = 1.0
@@ -1274,7 +1275,7 @@ begin
                         Memp[mkadd+j-1] = mp_open ("", Memp[imadd+j-1],
 			    Memc[imask], SZ_FNAME)
                     }
-                    Memp[mpadd+j-1] = mio_openo (imstati(Memp[mkadd+j-1],
+                    Memp[mpadd+j-1] = mio_openo (imstatp(Memp[mkadd+j-1],
 			IM_PLDES), Memp[imadd+j-1])
 	            iferr (Memr[norma+j-1] = imgetr (Memp[imadd+j-1], skyscale))
 			Memr[norma+j-1] = 1.0
@@ -1461,7 +1462,8 @@ char	skysub[ARB]		#I the sky subtraction keyword
 
 pointer	sp, vin, vout, vtmp, vmtmp, vs, str, obuf, ibuf, tbuf, tmbuf, hbuf
 int	i, npix, stat
-int	impnlr(), imgnlr(), imgnli(), imstati()
+int	impnlr(), imgnlr(), imgnli()
+pointer	imstatp()
 
 begin
 	call smark (sp)
@@ -1504,7 +1506,7 @@ begin
 	        }
 	        call asubr (Memr[ibuf], Memr[obuf], Memr[obuf], npix)
 
-	        call pm_plps (imstati(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
+	        call pm_plps (imstatp(hmim, IM_PLDES), Meml[vs], Mems[hbuf],
 		    1, npix, PIX_SRC)
 	        call amovl (Meml[vin], Meml[vs], IM_MAXDIM)
 	    }
