@@ -121,7 +121,7 @@ begin
 			    SZ_FNAME))
 			    call pm_loadim (pm, Memc[fname], Memc[title],
 				SZ_FNAME)
-			call pm_seti (pm, P_REFIM, in[i])
+			call pm_setp (pm, P_REFIM, in[i])
 			if (pm_empty (pm) && !invert)
 			    Memc[fname] = EOS
 			else {
@@ -306,7 +306,7 @@ begin
 		pm = pm_open (NULL)
 		iferr (call pm_loadf (pm, Memc[fname], title, 1))
 		    call pm_loadim (pm, Memc[fname], title, 1)
-		call pm_seti (pm, P_REFIM, in[i])
+		call pm_setp (pm, P_REFIM, in[i])
 		if (project)
 		    Memi[pms] = pm
 		else
@@ -417,7 +417,7 @@ begin
 	    pm = pm_open (NULL)
 	    iferr (call pm_loadf (pm, Memc[fname], title, 1))
 		call pm_loadim (pm, Memc[fname], title, 1)
-	    call pm_seti (pm, P_REFIM, in)
+	    call pm_setp (pm, P_REFIM, in)
 	    if (project)
 		Memi[pms] = pm
 	    else
