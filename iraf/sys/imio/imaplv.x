@@ -11,7 +11,8 @@ procedure imaplv (im, lv, pv, ndim)
 pointer	im
 long	lv[ndim], pv[IM_MAXDIM]
 int	ndim
-int	loff		# logical offset (subscript)
+
+long	loff		# logical offset (subscript)
 int	nldims		# number of logical dimensions
 int	i, j		# i = logical dim index, j = physical dim index
 

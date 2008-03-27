@@ -26,9 +26,11 @@ procedure oif_opix (im, status)
 pointer	im				# image descriptor
 int	status				# return status
 
-long	pixoff
+size_t	sz_val
+long	pixoff, lval
 pointer	sp, pixhdr, pixfile
-int	pfd, blklen
+int	pfd
+long	blklen
 
 int	open(), oif_rdhdr()
 long	fdevblk()
@@ -42,8 +44,10 @@ begin
 
 
 	call smark (sp)
-	call salloc (pixhdr, LEN_IMDES + LEN_PIXHDR, TY_STRUCT)
-	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_IMDES + LEN_PIXHDR
+	call salloc (pixhdr, sz_val, TY_STRUCT)
+	sz_val = SZ_PATHNAME
+	call salloc (pixfile, sz_val, TY_CHAR)
 
 	switch (IM_ACMODE(im)) {
 	case READ_ONLY, READ_WRITE, WRITE_ONLY, APPEND:
@@ -54,7 +58,8 @@ begin
 		SZ_PATHNAME)
 	    pfd = open (Memc[pixfile], IM_ACMODE(im), STATIC_FILE)
 
-	    call seek (pfd, BOFL)
+	    lval = BOFL
+	    call seek (pfd, lval)
 	    if (oif_rdhdr (pfd, pixhdr, 0, TY_PIXHDR) < 0)
 		call imerr (IM_NAME(im), SYS_IMRDPIXFILE)
 

@@ -9,7 +9,7 @@ include	"pllseg.h"
 procedure pll_nextseg (ll, ld)
 
 short	ll[ARB]			#I input line list
-int	ld[LEN_PLLDES]		#I list list i/o descriptor
+long	ld[LEN_PLLDES]		#I list list i/o descriptor
 
 int	ip
 int	opcode, data

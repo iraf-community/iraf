@@ -15,9 +15,12 @@ procedure qpio_sync (io)
 
 pointer	io			#I QPIO descriptor
 
+size_t	sz_val
 pointer	sp, eh
-int	szb_page, off, flen
-int	fstati()
+size_t	szb_page
+long	lstatus, flen, lval
+int	off
+long	fstatl()
 errchk	qpio_wbucket
 
 begin
@@ -33,7 +36,7 @@ begin
 
 	# Update the event list header (stored in a full datafile page).
 	call salloc (eh, szb_page / (SZ_STRUCT*SZB_CHAR), TY_STRUCT)
-	call aclri (Memi[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
+	call aclrp (Memp[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
 
 	EH_FBOFF(eh)		= szb_page + 1
 	EH_NEVENTS(eh)		= IO_NEVENTS(io)
@@ -57,22 +60,26 @@ begin
 
 	if (IO_MINEVL(io) != NULL) {
 	    off = LEN_EHDES
-	    call amovs (Mems[IO_MINEVL(io)], Memi[eh+off], IO_EVENTLEN(io))
+	    sz_val = IO_EVENTLEN(io)
+	    call amovs (Mems[IO_MINEVL(io)], Mems[P2S(eh+off)], sz_val)
 	    EH_MINEVLOFF(eh) = off
 	}
 
 	if (IO_MAXEVL(io) != NULL) {
 	    off = LEN_EHDES + (IO_EVENTLEN(io) * SZ_SHORT / SZ_STRUCT)
-	    call amovs (Mems[IO_MAXEVL(io)], Memi[eh+off], IO_EVENTLEN(io))
+	    sz_val = IO_EVENTLEN(io)
+	    call amovs (Mems[IO_MAXEVL(io)], Mems[P2S(eh+off)], sz_val)
 	    EH_MAXEVLOFF(eh) = off
 	}
 
 	# Write the header page to the lfile.
-	call fm_lfawrite (IO_CHAN(io), Memi[eh], szb_page, 1)
-	call fm_lfawait (IO_CHAN(io), szb_page)
-	flen = fstati (IO_FD(io), F_FILESIZE)
-	if (szb_page / SZB_CHAR > flen)
-	    call fseti (IO_FD(io), F_FILESIZE, szb_page / SZB_CHAR)
+	lval = 1
+	call fm_lfawrite (IO_CHAN(io), Memc[P2C(eh)], szb_page, lval)
+	call fm_lfawait (IO_CHAN(io), lstatus)
+	flen = fstatl (IO_FD(io), F_FILESIZE)
+	if (lstatus / SZB_CHAR > flen) {
+	    call fsetl (IO_FD(io), F_FILESIZE, lstatus / SZB_CHAR)
+	}
 
 	call sfree (sp)
 end

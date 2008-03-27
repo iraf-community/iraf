@@ -39,6 +39,7 @@ data	first_time /true/
 errchk	wf_fnload
 include	"mwcs.com"
 pointer	locpr()
+include	<nullptr.inc>
 
 begin
 	# Only do this once.
@@ -50,19 +51,19 @@ begin
 
 	# Load the function drivers.
 	call wf_fnload ("sampled", 0,
-	    locpr(wf_smp_init), NULL, locpr(wf_smp_tran), locpr(wf_smp_tran))
+	    locpr(wf_smp_init), NULLPTR, locpr(wf_smp_tran), locpr(wf_smp_tran))
 
 	# For compatibility reasons (FN index codes) new functions should
 	# be added at the end of the following list.
 
 	call wf_fnload ("tan", F_RADEC,
-	    locpr(wf_tan_init), NULL, locpr(wf_tan_fwd), locpr(wf_tan_inv))
+	    locpr(wf_tan_init), NULLPTR, locpr(wf_tan_fwd), locpr(wf_tan_inv))
 	call wf_fnload ("arc", F_RADEC,
-	    locpr(wf_arc_init), NULL, locpr(wf_arc_fwd), locpr(wf_arc_inv))
+	    locpr(wf_arc_init), NULLPTR, locpr(wf_arc_fwd), locpr(wf_arc_inv))
 	call wf_fnload ("gls", F_RADEC,
-	    locpr(wf_gls_init), NULL, locpr(wf_gls_fwd), locpr(wf_gls_inv))
+	    locpr(wf_gls_init), NULLPTR, locpr(wf_gls_fwd), locpr(wf_gls_inv))
 	call wf_fnload ("sin", F_RADEC,
-	    locpr(wf_sin_init), NULL, locpr(wf_sin_fwd), locpr(wf_sin_inv))
+	    locpr(wf_sin_init), NULLPTR, locpr(wf_sin_fwd), locpr(wf_sin_inv))
 
 	# Custom IRAF WCS for images containing multiple spectra.
 	call wf_fnload ("multispec", F_RADEC,
@@ -71,27 +72,27 @@ begin
 
 	# Most of the following are from G&C (also GLS above).
 	call wf_fnload ("ait", F_RADEC,
-	    locpr(wf_ait_init), NULL, locpr(wf_ait_fwd), locpr(wf_ait_inv))
+	    locpr(wf_ait_init), NULLPTR, locpr(wf_ait_fwd), locpr(wf_ait_inv))
 	call wf_fnload ("car", F_RADEC,
-	    locpr(wf_car_init), NULL, locpr(wf_car_fwd), locpr(wf_car_inv))
+	    locpr(wf_car_init), NULLPTR, locpr(wf_car_fwd), locpr(wf_car_inv))
 	call wf_fnload ("csc", F_RADEC,
-	    locpr(wf_csc_init), NULL, locpr(wf_csc_fwd), locpr(wf_csc_inv))
+	    locpr(wf_csc_init), NULLPTR, locpr(wf_csc_fwd), locpr(wf_csc_inv))
 	call wf_fnload ("mer", F_RADEC,
-	    locpr(wf_mer_init), NULL, locpr(wf_mer_fwd), locpr(wf_mer_inv))
+	    locpr(wf_mer_init), NULLPTR, locpr(wf_mer_fwd), locpr(wf_mer_inv))
 	call wf_fnload ("mol", F_RADEC,
-	    locpr(wf_mol_init), NULL, locpr(wf_mol_fwd), locpr(wf_mol_inv))
+	    locpr(wf_mol_init), NULLPTR, locpr(wf_mol_fwd), locpr(wf_mol_inv))
 	call wf_fnload ("par", F_RADEC,
-	    locpr(wf_par_init), NULL, locpr(wf_par_fwd), locpr(wf_par_inv))
+	    locpr(wf_par_init), NULLPTR, locpr(wf_par_fwd), locpr(wf_par_inv))
 	call wf_fnload ("pco", F_RADEC,
-	    locpr(wf_pco_init), NULL, locpr(wf_pco_fwd), locpr(wf_pco_inv))
+	    locpr(wf_pco_init), NULLPTR, locpr(wf_pco_fwd), locpr(wf_pco_inv))
 	call wf_fnload ("qsc", F_RADEC,
-	    locpr(wf_qsc_init), NULL, locpr(wf_qsc_fwd), locpr(wf_qsc_inv))
+	    locpr(wf_qsc_init), NULLPTR, locpr(wf_qsc_fwd), locpr(wf_qsc_inv))
 	call wf_fnload ("stg", F_RADEC,
-	    locpr(wf_stg_init), NULL, locpr(wf_stg_fwd), locpr(wf_stg_inv))
+	    locpr(wf_stg_init), NULLPTR, locpr(wf_stg_fwd), locpr(wf_stg_inv))
 	call wf_fnload ("tsc", F_RADEC,
-	    locpr(wf_tsc_init), NULL, locpr(wf_tsc_fwd), locpr(wf_tsc_inv))
+	    locpr(wf_tsc_init), NULLPTR, locpr(wf_tsc_fwd), locpr(wf_tsc_inv))
 	call wf_fnload ("zea", F_RADEC,
-	    locpr(wf_zea_init), NULL, locpr(wf_zea_fwd), locpr(wf_zea_inv))
+	    locpr(wf_zea_init), NULLPTR, locpr(wf_zea_fwd), locpr(wf_zea_inv))
 
 	# Experimental WCS for astrometric approximations.
 	call wf_fnload ("zpx", F_RADEC,

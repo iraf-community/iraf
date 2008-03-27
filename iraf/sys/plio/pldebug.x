@@ -21,9 +21,11 @@ int	fd			#I output file
 int	width			#I max width of formatted output, columns
 int	what			#I flags defining what to print
 
+size_t	sz_val
 pointer	sp, buf, rng, rl, pp
 int	line_1, line_2, nne, nv, v, lp, i
-int	naxes, axlen, nlp, firstcol, maxcol, col, rlen
+int	naxes, nlp, firstcol, maxcol, col, rlen
+long	axlen, lval
 errchk	pl_valid, fprintf, pl_debugout, pll_prints, plr_printi
 bool	pl_empty()
 int	pl_l2ri()
@@ -35,8 +37,10 @@ define	llout_ 94
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (rng, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (rng, sz_val, TY_CHAR)
 	call salloc (rl, RL_MAXLEN(pl), TY_INT)
 
 	call pl_valid (pl)
@@ -52,12 +56,13 @@ begin
 	    goto index_
 
 	# Line 1 of summary.
+	lval = pl
 	call fprintf (fd, "Mask %x naxes=%d [")
-	    call pargi (pl)
+	    call pargl (lval)
 	    call pargi (naxes)
 	do i = 1, naxes {
 	    call fprintf (fd, "%d%c")
-		call pargi (PL_AXLEN(pl,i))
+		call pargl (PL_AXLEN(pl,i))
 		if (i == naxes)
 		    call pargi (']')
 		else
@@ -68,7 +73,7 @@ begin
 	call fprintf (fd, " plane=[")
 	do i = 1, naxes {
 	    call fprintf (fd, "%d%c")
-		call pargi (PL_AXLEN(pl,i))
+		call pargl (PL_AXLEN(pl,i))
 		if (i == naxes)
 		    call pargi (']')
 		else
@@ -79,7 +84,7 @@ begin
 	# Line 2 of summary.
 	call fprintf (fd,
 	    "max buffered line size %d, max actual line size %d\n")
-	    call pargi (PL_MAXLINE(pl))
+	    call pargz (PL_MAXLINE(pl))
 	    v = 0
 	    nne = 0
 	    do i = 1, nlp {
@@ -102,8 +107,9 @@ begin
 	    call pargstr ("nonempty")
 
 	# Line 4 of summary.
+	lval = PL_LLBP(pl)
 	call fprintf (fd, "llbp=%x, len=%d, op=%d, free=%d, nupdates=%d\n")
-	    call pargi (PL_LLBP(pl))
+	    call pargl (lval)
 	    call pargi (PL_LLLEN(pl))
 	    call pargi (PL_LLOP(pl))
 	    call pargi (PL_LLFREE(pl))
@@ -116,15 +122,17 @@ index_
 	if (and (what, PD_INDEX) == 0)
 	    goto lines_
 
+	lval = PL_LPP(pl)
 	call fprintf (fd, "Index at %x containing %d lines:\n")
-	    call pargi (PL_LPP(pl))
+	    call pargl (lval)
 	    call pargi (nlp)
 	col = 1
 	firstcol = 1
 	do i = 1, nlp {
 	    lp = PL_LP(pl,i)
+	    lval = lp
 	    call sprintf (Memc[buf], SZ_LINE, "%6d")
-		call pargi (lp)
+		call pargl (lval)
 	    call pl_debugout (fd, Memc[buf], col, firstcol, maxcol)
 	}
 	call pl_debugout (fd, "", col, firstcol, maxcol)
@@ -176,10 +184,11 @@ llout_
 		}
 
 		if (and (what, PD_LHDR) != 0) {
+		    lval = lp
 		    call sprintf (Memc[buf], SZ_LINE,
 			"%s%12tlp=%5d, nref=%d, blen=%d, len=%d")
 			call pargstr (Memc[rng])
-			call pargi (lp)
+			call pargl (lval)
 			call pargi (LP_NREF(pp))
 			call pargi (LP_BLEN(pp))
 			call pargi (LP_LEN(pp))
@@ -193,7 +202,8 @@ llout_
 
 		# Output as a range list.
 		if (and (what, PD_RLOUT) != 0) {
-		    rlen = pl_l2ri (LL(pl,lp), 1, Memi[rl], axlen)
+		    lval = 1
+		    rlen = pl_l2ri (LL(pl,lp), lval, Memi[rl], axlen)
 		    call plr_printi (Memi[rl], fd, Memc[buf], firstcol, maxcol)
 		}
 

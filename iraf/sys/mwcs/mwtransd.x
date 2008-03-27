@@ -24,9 +24,11 @@ double	ltm[ndim,ndim]		#I linear transformation matrix
 double	ltv_2[ndim]		#I output translation vector
 int	ndim			#I dimensionality of transform
 
+size_t	sz_val
 double	v
 pointer	sp, o_ltm, o_ltv, n_ltm, n_ltv, ltv
-int	pdim, nelem, axis[MAX_DIM], i, j
+int	axis[MAX_DIM], i, j
+size_t	pdim, nelem
 errchk	syserrs
 define	err_ 91
 
@@ -35,7 +37,8 @@ begin
 	nelem = pdim * pdim
 
 	call smark (sp)
-	call salloc (ltv, ndim, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (ltv, sz_val, TY_DOUBLE)
 	call salloc (o_ltm, nelem, TY_DOUBLE)
 	call salloc (o_ltv, pdim, TY_DOUBLE)
 	call salloc (n_ltm, nelem, TY_DOUBLE)
@@ -85,7 +88,7 @@ double	o_ltm[pdim,pdim]	#I matrix to be transformed
 double	o_ltv[pdim]		#I vector to be transformed
 double	n_ltm[pdim,pdim]	#O transformed matrix
 double	n_ltv[pdim]		#O transformed vector
-int	pdim			#I dimension of these guys
+size_t	pdim			#I dimension of these guys
 double	ltm[ndim,ndim]		#I transform matrix
 double	ltv[ndim]		#I transform vector
 int	ax[ndim]		#I transform axis map: physax=axis[logax]

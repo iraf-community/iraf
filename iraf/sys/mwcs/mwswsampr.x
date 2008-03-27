@@ -11,10 +11,10 @@ pointer	mw			#I pointer to MWCS descriptor
 int	axis			#I axis which gets the wsamp vector
 real	pv[ARB]			#I physical coordinates of points
 real	wv[ARB]			#I world coordinates of points
-int	npts			#I number of data point in curve
+size_t	npts			#I number of data point in curve
 
 pointer	wp
-int	mw_allocd()
+long	mw_allocd()
 errchk	syserrs, mw_allocd
 
 begin

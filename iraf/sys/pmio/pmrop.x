@@ -24,8 +24,10 @@ long	vs_src[PM_MAXDIM]	#I start vector in source mask
 pointer	pm_dst			#I destination mask (required)
 long	vs_dst[PM_MAXDIM]	#I start vector in destination mask
 long	vn[PM_MAXDIM]		#I vector giving subregion size
-long	rop			#I rasterop
+int	rop			#I rasterop
 
+size_t	sz_val
+long	lval
 int	i
 include	"pmio.com"
 
@@ -39,21 +41,29 @@ begin
 	    call imaplv (PM_REFIM(pm_src), vs_src, v1, PM_MAXDIM)
 
 	    # Compute V3, the end vector in the source mask.
-	    call aaddl (vs_src, vn, v2, PM_MAXDIM)
-	    call asubkl (v2, 1, v2, PL_MAXDIM)
-	    call aminl (v2, IM_LEN(PM_REFIM(pm_src),1), v2, PM_MAXDIM)
+	    sz_val = PM_MAXDIM
+	    call aaddl (vs_src, vn, v2, sz_val)
+	    lval = 1
+	    sz_val = PL_MAXDIM
+	    call asubkl (v2, lval, v2, sz_val)
+	    sz_val = PM_MAXDIM
+	    call aminl (v2, IM_LEN(PM_REFIM(pm_src),1), v2, sz_val)
 	    call imaplv (PM_REFIM(pm_src), v2, v3, PM_MAXDIM)
 
 	    # Swap V1 and V3 if necessary.
-	    call aminl (v1, v3, v1, PM_MAXDIM)
+	    call aminl (v1, v3, v1, sz_val)
 
 	    # Compute V2, the start vector in the destination mask.
 	    call imaplv (PM_REFIM(pm_dst), vs_dst, v2, PM_MAXDIM)
 
 	    # Compute V4, the end vector in the destination mask.
-	    call aaddl (vs_dst, vn, v3, PM_MAXDIM)
-	    call asubkl (v3, 1, v3, PL_MAXDIM)
-	    call aminl (v3, IM_LEN(PM_REFIM(pm_dst),1), v3, PM_MAXDIM)
+	    sz_val = PM_MAXDIM
+	    call aaddl (vs_dst, vn, v3, sz_val)
+	    lval = 1
+	    sz_val = PL_MAXDIM
+	    call asubkl (v3, lval, v3, sz_val)
+	    sz_val = PM_MAXDIM
+	    call aminl (v3, IM_LEN(PM_REFIM(pm_dst),1), v3, sz_val)
 	    call imaplv (PM_REFIM(pm_dst), v3, v4, PM_MAXDIM)
 
 	    # Compute v3 = vn for rasterop.  Input: SRC=v1:v3, DST=v2:v4

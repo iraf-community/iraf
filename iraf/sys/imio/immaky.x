@@ -15,6 +15,8 @@ procedure im_make_newcopy (im, o_im)
 pointer	im				# new copy image
 pointer	o_im				# image being copied
 
+size_t	sz_val
+long	lval
 pointer	mw
 int	strlen()
 long	clktime()
@@ -22,7 +24,7 @@ pointer	mw_open()
 bool	strne(), envgetb()
 errchk	imerr, realloc, mw_open, mw_loadim, mw_saveim, mw_close
 
-include <nullptr.com>
+include <nullptr.inc>
 
 begin
 	if (strne (IM_MAGIC(o_im), "imhdr"))
@@ -44,9 +46,11 @@ begin
 	# Copy the header.
 	if (IM_LENHDRMEM(im) < IM_HDRLEN(o_im)) {
 	    IM_LENHDRMEM(im) = IM_HDRLEN(o_im) + (SZ_UAPAD / SZ_STRUCT)
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
-	call amovi (IM_MAGIC(o_im), IM_MAGIC(im), IM_HDRLEN(o_im) + 1)
+	sz_val = IM_HDRLEN(o_im) + 1
+	call amovp (IM_IMHDR(o_im), IM_IMHDR(im), sz_val)
 
 	# If the old image was opened with an image section, modify the
 	# WCS of the new image accordingly.  The section is applied to the
@@ -82,7 +86,8 @@ begin
 	IM_OHDR(im) = o_im
 	IM_PIXFILE(im) = EOS
 
-	IM_CTIME(im) = clktime (long(0))
+	lval = 0
+	IM_CTIME(im) = clktime (lval)
 	IM_MTIME(im) = IM_CTIME(im)
 
 	# Add a line to the history file (inherited from old image).

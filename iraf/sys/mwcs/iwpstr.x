@@ -15,8 +15,10 @@ int	ctype			#I card type
 char	fmt1[ARB], fmt2[ARB]	#I keyword name formats
 int	max_index		#I use fmt2 if index > max_index
 
+size_t	sz_val
 bool	update
-int	index, nchars
+int	index
+long	nchars
 pointer	sp, bigstr, im, cp
 char	kwname[SZ_KWNAME]
 
@@ -27,14 +29,16 @@ errchk	read, imaddf, impstr
 
 begin
 	call smark (sp)
-	call salloc (bigstr, SZ_BIGSTR, TY_CHAR)
+	sz_val = SZ_BIGSTR
+	call salloc (bigstr, sz_val, TY_CHAR)
 
 	index = 0
 	im = IW_IM(iw)
 
 	repeat {
 	    # Get enough data to fit on a FITS card.
-	    nchars = read (fd, Memc[bigstr], SZ_BIGSTR)
+	    sz_val = SZ_BIGSTR
+	    nchars = read (fd, Memc[bigstr], sz_val)
 	    if (nchars <= 0)
 		break
 

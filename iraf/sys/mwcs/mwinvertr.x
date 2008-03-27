@@ -9,14 +9,17 @@ real	o_ltm[ndim,ndim]	#I input matrix
 real	n_ltm[ndim,ndim]	#O output (inverted) matrix
 int	ndim			#I dimensionality of system
 
-int	nelem, i, j
+size_t	sz_val
+int	i, j
+size_t	nelem
 pointer	sp, ix, ltm, inv
 
 begin
 	call smark (sp)
 
 	nelem = ndim * ndim
-	call salloc (ix, ndim, TY_INT)
+	sz_val = ndim
+	call salloc (ix, sz_val, TY_INT)
 	call salloc (ltm, nelem, TY_DOUBLE)
 	call salloc (inv, nelem, TY_DOUBLE)
 

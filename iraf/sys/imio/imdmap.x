@@ -20,8 +20,9 @@ int	access_mode		# display access mode
 extern	imdopen()		# device FIO open procedure
 int	imdopen()
 
+size_t	sz_val
 int	pfd, pixel_mode
-pointer	sp, devinfo, devname, im, tty
+pointer	sp, devinfo, devname, im, tty, p_0
 
 bool	streq(), ttygetb()
 pointer	immap(), ttygdes()
@@ -29,9 +30,13 @@ int	ttygeti(), ttygets(), envgets(), btoi()
 errchk	imdopen, immap, syserrs
 
 begin
+	p_0 = 0
+
 	call smark (sp)
-	call salloc (devinfo, SZ_LINE,  TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (devinfo, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	# Determine the display access mode.  Write permission is always
 	# required, even to read from a display device.  Write only mode
@@ -51,7 +56,7 @@ begin
 	}
 
 	# Open an image header for the special device.
-	im = immap ("dev$null", NEW_IMAGE, 0)
+	im = immap ("dev$null", NEW_IMAGE, p_0)
 
 	# Read the graphcap entry for the device and fetch the device
 	# parameters.
@@ -89,8 +94,9 @@ begin
 	IM_BLIST(im)    = NULL
 	IM_NPHYSDIM(im) = 2
 
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   sz_val)
 
 	# Open the display device.
 	pfd = imdopen (Memc[devinfo], pixel_mode)

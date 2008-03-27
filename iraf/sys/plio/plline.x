@@ -9,24 +9,28 @@ include <plio.h>
 # dimensionality of the mask exceeds 2, the pl_setplane() procedure should be
 # called first to define the plane of the mask to be modified.
 
-procedure pl_line (pl, x1, y1, x2, y2, width, rop)
+procedure pl_line (pl, x1, y1, x2, y2, a_width, rop)
 
 pointer	pl			#I mask descriptor
-int	x1,y1			#I start point of line
-int	x2,y2			#I end point of line
-int	width			#I width of line to be drawn, pixels
+long	x1,y1			#I start point of line
+long	x2,y2			#I end point of line
+long	a_width			#I width of line to be drawn, pixels
 int	rop			#I rasterop defining operation
 
 int	npts
-int	x[4], y[4]
-real	theta, hwidth, dx, dy
+long	x[4], y[4]
+real	theta, hwidth, dx, dy, width
+
+long	nint_rl()
 
 begin
+	width = a_width
+
 	dx = x2 - x1
 	dy = y2 - y1
 
 	# Compute the line direction and halfwidth.
-	hwidth = max (1.0, real(width)) / 2.0 - 0.001
+	hwidth = max (1.0, width) / 2.0 - 0.001
 	if (abs(dx) < 0.0001) {
 	    if (dy > 0)
 		theta = HALFPI
@@ -47,17 +51,17 @@ begin
 	    npts = 2
 
 	} else {
-	    x[1] = x1 + nint (hwidth * cos(theta+HALFPI))
-	    y[1] = y1 + nint (hwidth * sin(theta+HALFPI))
+	    x[1] = x1 + nint_rl (hwidth * cos(theta+HALFPI))
+	    y[1] = y1 + nint_rl (hwidth * sin(theta+HALFPI))
 
-	    x[2] = x1 + nint (hwidth * cos(theta-HALFPI))
-	    y[2] = y1 + nint (hwidth * sin(theta-HALFPI))
+	    x[2] = x1 + nint_rl (hwidth * cos(theta-HALFPI))
+	    y[2] = y1 + nint_rl (hwidth * sin(theta-HALFPI))
 
-	    x[3] = x2 + nint (hwidth * cos(theta-HALFPI))
-	    y[3] = y2 + nint (hwidth * sin(theta-HALFPI))
+	    x[3] = x2 + nint_rl (hwidth * cos(theta-HALFPI))
+	    y[3] = y2 + nint_rl (hwidth * sin(theta-HALFPI))
 
-	    x[4] = x2 + nint (hwidth * cos(theta+HALFPI))
-	    y[4] = y2 + nint (hwidth * sin(theta+HALFPI))
+	    x[4] = x2 + nint_rl (hwidth * cos(theta+HALFPI))
+	    y[4] = y2 + nint_rl (hwidth * sin(theta+HALFPI))
 	    npts = 4
 	}
 

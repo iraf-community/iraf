@@ -5,9 +5,9 @@ include	<mwset.h>
 include	<mach.h>
 include	"mwcs.h"
 
-# MW_STATI -- Get the value of a MWCS interface parameter.
+# MW_STAT[ILP] -- Get the value of a MWCS interface parameter.
 
-int procedure mw_stati (mw, param)
+long procedure mw_statl (mw, param)
 
 pointer	mw			#I pointer to MWCS descriptor
 int	param			#I parameter code as defined in <mwset.h>
@@ -30,6 +30,33 @@ begin
 	case MW_SAVELEN:
 	    return (MI_LEN(mw) * SZ_STRUCT + MI_DBUFUSED(mw) * SZ_DOUBLE +
 		(MI_SBUFUSED(mw) + SZB_CHAR-1) / SZB_CHAR)
+	default:
+	    call syserr (SYS_MWSTAT)
+	}
+end
+
+
+int procedure mw_stati (mw, param)
+
+pointer	mw			#I pointer to MWCS descriptor
+int	param			#I parameter code as defined in <mwset.h>
+
+long	mw_statl()
+
+begin
+	return (mw_statl(mw,param))
+end
+
+
+pointer procedure mw_statp (mw, param)
+
+pointer	mw			#I pointer to MWCS descriptor
+int	param			#I parameter code as defined in <mwset.h>
+
+begin
+	switch (param) {
+	case MW_REFIM:
+	    return (MI_REFIM(mw))
 	default:
 	    call syserr (SYS_MWSTAT)
 	}

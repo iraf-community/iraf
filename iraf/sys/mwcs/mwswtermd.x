@@ -15,8 +15,9 @@ double	w[ndim]			#I world coordinates of reference point
 double	cd[ndim,ndim]		#I CD matrix
 int	ndim			#I dimension of Wterm
 
+size_t	sz_val
 pointer	wp
-int	mw_allocd()
+long	mw_allocd()
 errchk	mw_allocd, syserrs
 string	s_name "mw_swtermd"
 
@@ -33,15 +34,17 @@ begin
 	# Copy in the data.  Cobber the old data if the Wterm has been set,
 	# otherwise allocate space in the global data area.
 
+	sz_val = ndim
 	if (WCS_R(wp) == NULL)
-	    WCS_R(wp) = mw_allocd (mw, ndim)
-	call amovd (r, D(mw,WCS_R(wp)), ndim)
+	    WCS_R(wp) = mw_allocd (mw, sz_val)
+	call amovd (r, D(mw,WCS_R(wp)), sz_val)
 
 	if (WCS_W(wp) == NULL)
-	    WCS_W(wp) = mw_allocd (mw, ndim)
-	call amovd (w, D(mw,WCS_W(wp)), ndim)
+	    WCS_W(wp) = mw_allocd (mw, sz_val)
+	call amovd (w, D(mw,WCS_W(wp)), sz_val)
 
+	sz_val = ndim*ndim
 	if (WCS_CD(wp) == NULL)
-	    WCS_CD(wp) = mw_allocd (mw, ndim*ndim)
-	call amovd (cd, D(mw,WCS_CD(wp)), ndim*ndim)
+	    WCS_CD(wp) = mw_allocd (mw, sz_val)
+	call amovd (cd, D(mw,WCS_CD(wp)), sz_val)
 end

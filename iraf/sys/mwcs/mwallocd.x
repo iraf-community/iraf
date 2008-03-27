@@ -7,12 +7,12 @@ include	"mwcs.h"
 # buffer may cause it to move, hence all data items are referred to by their
 # offset in the buffer, rather than by an absolute pointer.
 
-int procedure mw_allocd (mw, nelem)
+long procedure mw_allocd (mw, nelem)
 
 pointer	mw		#I pointer to MWCS descriptor
-int	nelem		#I number of elements to alloc space for
+size_t	nelem		#I number of elements to alloc space for
 
-int	dbufused, dbuflen, offset
+size_t	dbufused, dbuflen, offset
 errchk	realloc
 
 begin

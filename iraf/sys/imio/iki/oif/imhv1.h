@@ -20,24 +20,24 @@ define	V1U		LEN_V1IMHDR		# offset to user fields
 define	IM_V1USERAREA	(P2C($1+V1U))		# user area (database)
 
 # Disk resident header.
-define	IM_V1MAGIC	Memi[P2I($1)]		# contains the string "imhdr"
+define	IM_V1MAGIC	Memc[P2C($1)]		# contains the string "imhdr"
 define	IM_V1HDRLEN	Memi[P2I($1+3)]		# length of image header
 define	IM_V1PIXTYPE	Memi[P2I($1+4)]		# datatype of the pixels
 define	IM_V1NDIM	Memi[P2I($1+5)]		# number of dimensions
-define	IM_V1LEN	Meml[P2L($1+$2+6-1)]		# length of the dimensions
-define	IM_V1PHYSLEN	Meml[P2L($1+$2+13-1)]	# physical length (as stored)
-define	IM_V1SSMTYPE	Meml[P2L($1+20)]		# type of subscript mapping
-define	IM_V1LUTOFF	Meml[P2L($1+21)]		# offset to subscript map luts
-define	IM_V1PIXOFF	Meml[P2L($1+22)]		# offset of the pixels
-define	IM_V1HGMOFF	Meml[P2L($1+23)]		# offset of hgm pixels
-define	IM_V1BLIST	Meml[P2L($1+24)]		# offset of bad pixel list
-define	IM_V1SZBLIST	Meml[P2L($1+25)]		# size of bad pixel list
-define	IM_V1NBPIX	Meml[P2L($1+26)]		# number of bad pixels
-define	IM_V1CTIME	Meml[P2L($1+27)]		# time of image creation
-define	IM_V1MTIME	Meml[P2L($1+28)]		# time of last modify
-define	IM_V1LIMTIME	Meml[P2L($1+29)]		# time min,max computed
-define	IM_V1MAX	Memr[P2R($1+30)]		# max pixel value
-define	IM_V1MIN	Memr[P2R($1+31)]		# min pixel value
+define	IM_V1LEN	Meml[P2L($1+6)+$2-1]	# length of the dimensions
+define	IM_V1PHYSLEN	Meml[P2L($1+13)+$2-1]	# physical length (as stored)
+define	IM_V1SSMTYPE	Meml[P2L($1+20)]	# type of subscript mapping
+define	IM_V1LUTOFF	Meml[P2L($1+21)]	# offset to subscript map luts
+define	IM_V1PIXOFF	Meml[P2L($1+22)]	# offset of the pixels
+define	IM_V1HGMOFF	Meml[P2L($1+23)]	# offset of hgm pixels
+define	IM_V1BLIST	Meml[P2L($1+24)]	# offset of bad pixel list
+define	IM_V1SZBLIST	Meml[P2L($1+25)]	# size of bad pixel list
+define	IM_V1NBPIX	Meml[P2L($1+26)]	# number of bad pixels
+define	IM_V1CTIME	Meml[P2L($1+27)]	# time of image creation
+define	IM_V1MTIME	Meml[P2L($1+28)]	# time of last modify
+define	IM_V1LIMTIME	Meml[P2L($1+29)]	# time min,max computed
+define	IM_V1MAX	Memr[P2R($1+30)]	# max pixel value
+define	IM_V1MIN	Memr[P2R($1+31)]	# min pixel value
 define	IM_V1HGM	($1+33)			# histogram descriptor
 define	IM_V1CTRAN	($1+52)			# coordinate transformations
 define	IM_V1PIXFILE	Memc[P2C($1+103)]	# name of pixel storage file
@@ -66,10 +66,10 @@ define	LEN_CTSTRUCT	50
 define	CT_VALID	Memi[P2I($1)]		# (y/n) is structure valid?
 define	CT_BSCALE	Memr[P2R($1+1)]		# pixval scale factor
 define	CT_BZERO	Memr[P2R($1+2)]		# pixval offset
-define	CT_CRVAL	Memr[P2R($1+$2+3-1)]		# value at pixel
-define	CT_CRPIX	Memr[P2R($1+$2+10-1)]	# index of pixel
-define	CT_CDELT	Memr[P2R($1+$2+17-1)]	# increment along axis
-define	CT_CROTA	Memr[P2R($1+$2+24-1)]	# rotation angle
+define	CT_CRVAL	Memr[P2R($1+3)+$2-1]		# value at pixel
+define	CT_CRPIX	Memr[P2R($1+10)+$2-1]	# index of pixel
+define	CT_CDELT	Memr[P2R($1+17)+$2-1]	# increment along axis
+define	CT_CROTA	Memr[P2R($1+24)+$2-1]	# rotation angle
 define	CT_BUNIT	Memc[P2C($1+31)]	# pixval ("brightness") units
 define	CT_CTYPE	Memc[P2C($1+36)]	# coord units string
 # next available field: ($1+41)

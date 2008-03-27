@@ -15,8 +15,9 @@ char	root[ARB]		#I root filename
 char	extn[ARB]		#I header file extension
 int	status			#O status value
 
+size_t	sz_val
 int	cindx
-pointer	sp, fname, im, tmp
+pointer	sp, fname, im, tmp, p_0
 pointer	immapz()
 bool    streq()
 
@@ -24,9 +25,12 @@ errchk  syserrs
 include "fxfcache.com"
 
 begin
+	p_0 = 0
+
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-        call salloc (tmp, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+        call salloc (tmp, sz_val, TY_CHAR)
 
 	call fxf_init()
 	status = OK
@@ -44,7 +48,7 @@ begin
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
 	call strcpy (Memc[fname], Memc[tmp], SZ_PATHNAME)
 	call strcat ("[0]", Memc[tmp], SZ_PATHNAME)
-	iferr (im = immapz (Memc[tmp], READ_ONLY, 0))
+	iferr (im = immapz (Memc[tmp], READ_ONLY, p_0))
 	    call syserrs (SYS_FXFDELMEF, Memc[fname])
 	else
 	    call imunmap (im)
@@ -59,8 +63,8 @@ begin
 	    if (streq (Memc[fname], rf_fname[1,cindx])) {
 		call mfree (rf_pextv[cindx], TY_INT)
 		call mfree (rf_pextn[cindx], TY_CHAR)
-		call mfree (rf_pixp[cindx], TY_INT)
-		call mfree (rf_hdrp[cindx], TY_INT)
+		call mfree (rf_pixp[cindx], TY_LONG)
+		call mfree (rf_hdrp[cindx], TY_LONG)
 		call mfree (rf_fit[cindx], TY_STRUCT)
 		call mfree (rf_hdr[cindx], TY_CHAR)
 		rf_fit[cindx] = NULL

@@ -7,7 +7,7 @@ include	<imhdr.h>
 pointer procedure imps3i (im, x1, x2, y1, y2, z1, z2)
 
 pointer	im
-int	x1, x2, y1, y2, z1, z2
+long	x1, x2, y1, y2, z1, z2
 long	vs[3], ve[3]
 pointer	impgsi(), impl3i()
 

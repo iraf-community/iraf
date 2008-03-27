@@ -7,8 +7,8 @@ include	<imio.h>
 bool procedure im_pmsne2 (im, x1, x2, y1, y2)
 
 pointer	im			#I image descriptor
-int	x1, x2			#I section to be tested
-int	y1, y2			#I section to be tested
+long	x1, x2			#I section to be tested
+long	y1, y2			#I section to be tested
 
 long	vs[2], ve[2]
 bool	pm_sectnotempty()

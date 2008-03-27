@@ -17,6 +17,7 @@ int	maxelem			#I max number of data elements to read
 int	first			#I first data element to read
 char	datatype[ARB]		#I datatype to be returned
 
+size_t	sz_val
 pointer	sp, fm, sym, tbuf, isym, osym
 int	fd, sz_itype, sz_otype, nelem, itype, otype
 
@@ -62,16 +63,22 @@ begin
 	    call seek (fd, S_OFFSET(sym) + (first - 1) * sz_itype)
 	    if (sz_itype <= sz_otype) {
 		# Read the data directly into the user's buffer.
-		nelem = read (fd, buf, nelem * sz_itype) / sz_itype
-		if (nelem > 0 && otype != itype)
-		    call acht (buf, buf, nelem, itype, otype)
+		sz_val = nelem * sz_itype
+		nelem = read (fd, buf, sz_val) / sz_itype
+		if (nelem > 0 && otype != itype) {
+		    sz_val = nelem
+		    call acht (buf, buf, sz_val, itype, otype)
+		}
 	    } else {
 		# Read the data into a temporary buffer.
 		call smark (sp)
-		call salloc (tbuf, nelem * sz_itype, TY_CHAR)
-		nelem = read (fd, Memc[tbuf], nelem * sz_itype) / sz_itype
-		if (nelem > 0)
-		    call acht (Memc[tbuf], buf, nelem, itype, otype)
+		sz_val = nelem * sz_itype
+		call salloc (tbuf, sz_val, TY_CHAR)
+		nelem = read (fd, Memc[tbuf], sz_val) / sz_itype
+		if (nelem > 0) {
+		    sz_val = nelem
+		    call acht (Memc[tbuf], buf, sz_val, itype, otype)
+		}
 		call sfree (sp)
 	    }
 	}

@@ -18,21 +18,25 @@ procedure fxf_opix (im, status)
 pointer	im			#I image descriptor
 int	status 			#O return status
 
+size_t	sz_val
+long	lval
 pointer sp, fn, fit
 char    pathname[SZ_PATHNAME]
-int	compress, blklen, pixoff, filesize
-int	i, hdr_size, sz_pixfile, sz_fitfile, junk, npix
+int	compress, i, junk
+long	blklen, pixoff, filesize
+long	hdr_size, sz_pixfile, sz_fitfile, npix
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
-int	strncmp(), fxf_header_size(), fxf_totpix(), sizeof()
-int     strlen(), fopnbf(), itoc()
-long	fstatl()
+int	strncmp(), sizeof()
+int     strlen(), fopnbf(), ltoc()
+long	fstatl(), fxf_header_size(), fxf_totpix()
 
 define  err_ 91
 define  endowr_ 92
 
 begin
 	call smark (sp)
-	call salloc (fn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fn, sz_val, TY_CHAR)
 
 	status = OK
 	fit = IM_KDES(im)
@@ -47,7 +51,8 @@ begin
         call strcpy (IM_HDRFILE(im), Memc[fn], SZ_PATHNAME)
 	call strcat ("_", Memc[fn], SZ_PATHNAME)
 	i = strlen (Memc[fn])
-	junk = itoc (fit, Memc[fn+i], SZ_PATHNAME) 
+	lval = fit
+	junk = ltoc (lval, Memc[fn+i], SZ_PATHNAME) 
         iferr (call fpathname (Memc[fn], pathname, SZ_PATHNAME))
 	    goto err_
 
@@ -101,7 +106,8 @@ begin
 	    FIT_PIXTYPE(fit) = IM_PIXTYPE(im)
 	    npix = fxf_totpix (im)
 	    FIT_NAXIS(fit) = IM_NDIM(im)
-	    call amovi (IM_LEN(im,1), FIT_LENAXIS(fit,1), IM_NDIM(im))
+	    sz_val = IM_NDIM(im)
+	    call amovl (IM_LEN(im,1), FIT_LENAXIS(fit,1), sz_val)
 
 	    call fxf_discard_keyw (im)
 	    FIT_TOTPIX(fit) = npix
@@ -196,12 +202,14 @@ end
 # FXF_HEADER_SIZE -- Function to calculate the header size that would go 
 # into the output file extension.
 
-int procedure fxf_header_size (im)
+long procedure fxf_header_size (im)
 
 pointer im 				#I Image descriptor
 
+size_t	sz_val
 bool	inherit
-int	merge, hdr_size
+int	merge
+long	hdr_size
 pointer op, fit, sp, tb, pb
 int	nheader_cards, ualen, ulines, clines
 int	strlen()
@@ -232,7 +240,8 @@ begin
 	    clines = FIT_CACHEHLEN(fit) / LEN_UACARD
 
 	    call smark (sp)
-	    call salloc (tb, ualen+1, TY_CHAR)
+	    sz_val = ualen+1
+	    call salloc (tb, sz_val, TY_CHAR)
 
 	    merge = NO
 	    pb = tb
@@ -297,25 +306,31 @@ end
 procedure fxf_write_blanks (fd, size)
 
 int	fd			#I File descriptor
-int	size			#I New size (chars) to allocate.
+long	size			#I New size (chars) to allocate.
 
 pointer sp, bf
-int	nblocks,i, fits_lenc
+long	nblocks, i, fits_lenc, lval
+size_t	sz_lenc
+char	c_0
 
 begin
 	call smark (sp)
 
 	# Length of a FITS block (2880) in chars.
 	fits_lenc = FITS_BLOCK_BYTES/SZB_CHAR
-	call salloc (bf, fits_lenc, TY_INT)
-	call amovki (0, Memi[bf], fits_lenc)
+	sz_lenc = fits_lenc
+	call salloc (bf, sz_lenc, TY_CHAR)
+	c_0 = 0
+	call amovkc (c_0, Memc[bf], sz_lenc)
 
 	size = FITS_LEN_CHAR(size)
 	nblocks = size / fits_lenc
 
-	call seek (fd, EOF)
-	do i = 1, nblocks 
-	    call write (fd, Memi[bf], fits_lenc)
+	lval = EOF
+	call seek (fd, lval)
+	do i = 1, nblocks {
+	    call write (fd, Memc[bf], sz_lenc)
+	}
 
 	call sfree (sp)
 end
@@ -340,7 +355,8 @@ pointer im			#I im structure
 int	nheader_cards		#O Number of mandatory cards in header.
 
 pointer ua
-int	ncards, rp, fit, acmode
+int	ncards, acmode
+pointer	rp, fit
 int	idb_findrecord()
 
 begin
@@ -403,7 +419,7 @@ begin
 	    # Keyword does not exist.
 	    acmode = IM_ACMODE(im)
 	    if ((acmode == NEW_IMAGE || acmode == NEW_COPY) && 
-		FKS_EXTVER(fit) != INDEFL )
+		FKS_EXTVER(fit) != INDEFI )
 	    ncards = ncards + 1
 	}
 
@@ -438,13 +454,17 @@ procedure fxf_overwrite_unit (fit, im)
 pointer	fit			#I Fits descriptor
 pointer	im			#I Image descriptor
 
+size_t	sz_val
 pointer sp, file, mii
-int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
-int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
+long	pixoff, blklen, sz_fitfile, filesize, lval
+int	compress, i, group
+int	junk, in_fd, out_fd
+long	nblocks, nk, hdr_size, sz_pixfile
+char	c_0
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
-int	fnroot(), open(), fxf_totpix(), strncmp(), itoc()
-int	strlen(), fopnbf(), sizeof(), fxf_header_size()
-long	read(), fstatl()
+int	fnroot(), open(), strncmp(), ltoc()
+int	strlen(), fopnbf(), sizeof()
+long	read(), fstatl(), fxf_header_size(), fxf_totpix()
 
 errchk	syserr, syserrs
 define  err_ 91
@@ -461,8 +481,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (file, SZ_FNAME, TY_CHAR)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (file, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_CHAR)
 	
 	junk = fnroot (IM_HDRFILE(im), Memc[file], SZ_FNAME)
 
@@ -477,17 +499,19 @@ begin
 	    # Copy from the old file up to hdr_off[group] into a temporary file.
 	    in_fd = open (IM_HDRFILE(im), READ_ONLY, BINARY_FILE)
 	    out_fd = open (IM_PIXFILE(im), NEW_FILE, BINARY_FILE)
-	    nblocks = Memi[FIT_HDRPTR(fit)+group]/ FITS_BLOCK_CHARS
+	    nblocks = Meml[FIT_HDRPTR(fit)+group]/ FITS_BLOCK_CHARS
 	    do nk = 1, nblocks {
-		junk = read (in_fd, Memi[mii], FITS_BLOCK_CHARS)
-		call write (out_fd, Memi[mii], FITS_BLOCK_CHARS)
+		sz_val = FITS_BLOCK_CHARS
+		junk = read (in_fd, Memc[mii], sz_val)
+		call write (out_fd, Memc[mii], sz_val)
 	    }
 	    call close (in_fd)
 	    call close (out_fd)
 	}
 
 	FIT_NAXIS(fit) = IM_NDIM(im)
-	call amovi (IM_LEN(im,1), FIT_LENAXIS(fit,1), IM_NDIM(im))
+	sz_val = IM_NDIM(im)
+	call amovl (IM_LEN(im,1), FIT_LENAXIS(fit,1), sz_val)
 	
 	FIT_TOTPIX(fit) = fxf_totpix(im)
 
@@ -515,7 +539,8 @@ begin
         call fpathname (IM_PIXFILE(im), Memc[file], SZ_PATHNAME)
 	call strcat("_", Memc[file], SZ_PATHNAME)
 	i = strlen(Memc[file])
-	junk = itoc (fit, Memc[file+i], SZ_PATHNAME) 
+	lval = fit
+	junk = ltoc (lval, Memc[file+i], SZ_PATHNAME) 
 
 	# The pixel file needs to be a multiple of 1440 chars.
 	sz_pixfile = fxf_totpix(im) * sizeof (IM_PIXTYPE(im))
@@ -537,13 +562,18 @@ begin
 	FIT_EOFSIZE(fit) = filesize + 1
 	# Now write a blank header.
 	if (group != 0) {
-	    call amovki (0, Memi[mii], FITS_BLOCK_CHARS)
+	    sz_val = FITS_BLOCK_CHARS
+	    c_0 = 0
+	    call amovkc (c_0, Memc[mii], sz_val)
 	    nblocks = hdr_size/FITS_BLOCK_CHARS
 	    FIT_HFD(fit) = -1
 
-	    call seek (IM_PFD(im), EOF)
-	    do nk = 1, nblocks 
-		call write (IM_PFD(im), Memi[mii], FITS_BLOCK_CHARS)
+	    lval = EOF
+	    call seek (IM_PFD(im), lval)
+	    do nk = 1, nblocks {
+		sz_val = FITS_BLOCK_CHARS
+		call write (IM_PFD(im), Memc[mii], sz_val)
+	    }
 	    
 	    pixoff = filesize + hdr_size + 1
 	    filesize = filesize + sz_fitfile
@@ -571,10 +601,11 @@ end
 
 # TOTPIX -- Calculate the total number of pixels in the image.
 
-int procedure fxf_totpix (im) 
+long procedure fxf_totpix (im) 
 
 pointer im			#I image descriptor
-int	i, pix, ndim
+int	i, ndim
+long	pix
 
 begin
 	ndim = IM_NDIM(im)
@@ -651,23 +682,30 @@ end
 procedure fxf_falloc (fname, size)
 
 char	fname[ARB]	#I filename
-int	size      	#I size to preallocate in chars
+long	size      	#I size to preallocate in chars
 
+size_t	sz_val
 pointer sp, cp
-int	nb,i, fd
-errchk  open, write
+long	nb, i
+int	fd
+char	ch
 int	open()
+errchk  open, write
 
 begin
 	call smark (sp)
-	call salloc (cp, FITS_BLOCK_CHARS, TY_CHAR)
-	
-        call amovkc (' ', Memc[cp], FITS_BLOCK_CHARS)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (cp, sz_val, TY_CHAR)
+	ch = 32
+        call amovkc (ch, Memc[cp], sz_val)
+
 	nb = size / FITS_BLOCK_CHARS
 	fd = open (fname, NEW_FILE, BINARY_FILE)
 
-	do i = 1, nb
-	    call write (fd, Memc[cp], FITS_BLOCK_CHARS)
+	do i = 1, nb {
+	    sz_val = FITS_BLOCK_CHARS
+	    call write (fd, Memc[cp], sz_val)
+	}
 
 	call flush (fd)
 	call close (fd)
@@ -707,7 +745,9 @@ procedure fxf_not_incache (im)
 
 pointer im                      #I image descriptor
 
-int     cindx, group, sfit[4]
+size_t	sz_val
+int     cindx, group
+long	sfit[4]
 pointer sp, hdrfile, fit
 bool    streq()
 
@@ -715,7 +755,8 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-        call salloc (hdrfile, SZ_PATHNAME, TY_CHAR) 
+        sz_val = SZ_PATHNAME
+        call salloc (hdrfile, sz_val, TY_CHAR) 
 
         call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
         fit = IM_KDES(im)

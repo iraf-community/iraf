@@ -17,7 +17,9 @@ pointer	qp			#I QPOE descriptor
 char	macro[ARB]		#I macro name
 pointer	textp			#O char pointer to macro text
 
-int	sz_textbuf, nchars, fd
+size_t	sz_val
+size_t	sz_textbuf
+int	nchars, fd, i_off
 pointer	st, sm, sym, textbuf
 data	textbuf /NULL/, sz_textbuf /NULL/
 
@@ -50,7 +52,8 @@ begin
 			fd = fm_getfd (QP_FM(qp), S_LFILE(sym), READ_ONLY, 0)
 
 			call seek (fd, S_OFFSET(sym))
-			nchars = max (0, read (fd, Memc[textbuf], S_NELEM(sym)))
+			sz_val = S_NELEM(sym)
+			nchars = max (0, read (fd, Memc[textbuf], sz_val))
 			Memc[textbuf+nchars] = EOS
 			textp = textbuf
 
@@ -58,7 +61,8 @@ begin
 
 		    } else {
 			# Macro value stored in symbol table.
-			textp = strefsbuf (st, S_OFFSET(sym))
+			i_off = S_OFFSET(sym)
+			textp = strefsbuf (st, i_off)
 		    }
 
 		    # Exit if a local symbol was found.
@@ -68,10 +72,12 @@ begin
 	# Next look in the global macro symbol table.
 	sym = stfind (sm, macro)
 	if (sym != NULL)
-	    if (and (S_FLAGS(sym), SF_DELETED) == 0)
-		textp = strefsbuf (sm, S_OFFSET(sym))
-	    else
+	    if (and (S_FLAGS(sym), SF_DELETED) == 0) {
+		i_off = S_OFFSET(sym)
+		textp = strefsbuf (sm, i_off)
+	    } else {
 		sym = NULL
+	    }
 
 	return (sym)
 end

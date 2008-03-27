@@ -7,7 +7,7 @@
 # identical to those in the MWCS runtime descriptor.
 
 define	MWSV_MAGIC	4D57X			# identifies MWSV descriptor
-define	MWSV_VERSION	1			# current MWSV version
+define	MWSV_VERSION	2			# current MWSV version
 define	MWSV_MAXWCS	8			# max wcs per mwcs
 define	MWSV_LENWCS0	282			# LENWCS for MWSV version 0
 
@@ -18,16 +18,16 @@ define	MWSV_LENWCS0	282			# LENWCS for MWSV version 0
 
 define	LEN_SVHDR	16
 define	SV_MAGIC	Memi[P2I($1)]		# magic marker
-define	SV_CWCSLEN	Memi[P2I($1+1)]		# length of compressed MWSV
-define	SV_MWSVLEN	Memi[P2I($1+2)]		# full length of MWSV descr.
-define	SV_MWSVOFF	Memi[P2I($1+3)]		# char offset of saved MWSV
-define	SV_DBUFLEN	Memi[P2I($1+4)]		# length of saved DBUF
-define	SV_DBUFOFF	Memi[P2I($1+5)]		# char offset of saved DBUF
-define	SV_SBUFLEN	Memi[P2I($1+6)]		# length of saved SBUF
-define	SV_SBUFOFF	Memi[P2I($1+7)]		# char offset of saved SBUF
+#define	SV_CWCSLEN	Memi[P2I($1+1)]		# length of compressed MWSV
+define	SV_MWSVLEN	Memz[P2Z($1+2)]		# full length of MWSV descr.
+define	SV_MWSVOFF	Meml[P2L($1+3)]		# char offset of saved MWSV
+define	SV_DBUFLEN	Memz[P2Z($1+4)]		# length of saved DBUF
+define	SV_DBUFOFF	Meml[P2L($1+5)]		# char offset of saved DBUF
+define	SV_SBUFLEN	Memz[P2Z($1+6)]		# length of saved SBUF
+define	SV_SBUFOFF	Meml[P2L($1+7)]		# char offset of saved SBUF
 define	SV_VERSION	Memi[P2I($1+8)]		# MWSV save file version number
 define	SV_NWCS		Memi[P2I($1+9)]		# number of saved WCS structs
-define	SV_LENWCS	Memi[P2I($1+10)]		# length of WCS substruct
+define	SV_LENWCS	Memi[P2I($1+10)]	# length of WCS substruct
 
 # MWSV descriptor.  This is very similar to the MWCS runtime descriptor
 # except that the size of a WCS sub-structure (LENWCS) can vary.  If the

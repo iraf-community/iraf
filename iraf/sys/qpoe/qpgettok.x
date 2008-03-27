@@ -73,7 +73,7 @@ define	SZ_ARGBUF	256		# argument list to a macro
 
 # The gettok descriptor.
 define	LEN_GTDES	45
-define	GT_QP		Memi[P2I($1)]	# backpointer to QPOE descriptor
+define	GT_QP		Memp[$1]	# backpointer to QPOE descriptor
 define	GT_FD		Memi[P2I($1+1)]	# current input stream
 define	GT_NEXTCH	Memi[P2I($1+2)]	# lookahead character
 define	GT_FTEMP	Memi[P2I($1+3)]	# file on stream is a temp file
@@ -92,13 +92,15 @@ pointer procedure qp_opentext (qp, text)
 pointer	qp			#I QPOE descriptor
 char	text[ARB]		#I input text to be scanned
 
+size_t	sz_val
 pointer	gt
 int	sz_pbbuf
 int	stropen(), strlen()
 errchk	stropen, calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_QP(gt) = qp
 	GT_FD(gt) = stropen (text, strlen(text), READ_ONLY)
@@ -126,7 +128,8 @@ char	tokbuf[maxch]		#O receives the text of the token
 int	maxch			#I max chars out
 
 pointer	sp, bp, qp, cmd, ibuf, obuf, argbuf, fname, sym, textp
-int	fd, token, level, nargs, nchars, i_fd, o_fd, ftemp
+int	fd, token, level, nargs, i_fd, o_fd, ftemp
+size_t	nchars
 
 bool	streq()
 pointer	qp_gmsym()
@@ -585,12 +588,14 @@ procedure qp_closetext (gt)
 
 pointer	gt			#I gettok descriptor
 
+size_t	sz_val
 int	level, fd
 pointer	sp, fname
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	for (level=GT_LEVEL(gt);  level >= 0;  level=level-1) {
 	    fd = GT_FD(gt)

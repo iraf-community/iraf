@@ -20,7 +20,7 @@ define	SZ_CODE		7
 # a low level FIO pseudodevice driver (QPF).  This is also true of any of the
 # routines called by this procedure, and of the related routine QPIO_READPIX.
 
-int procedure qpio_gvtevents (io, o_ev, maskval, maxev, o_nev)
+int procedure qpio_getevents (io, o_ev, maskval, maxev, o_nev)
 
 pointer	io			#I QPIO descriptor
 pointer	o_ev[maxev]		#O receives the event struct pointers
@@ -82,11 +82,13 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-int     x1, x2, y1, y2, xs, xe, ys, ye, x, y
+size_t	sz_val
+long	x, y, x1, x2, y1, y2, xs, xe, ys, ye
 pointer pl, rl, rp, bp, ex, ev, ev_p, bbmask, bb_bufp
 bool    useindex, lineio, bbused, rmused, nodata
-int     bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int     v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+long	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj, temp
+long	v[NDIM]
+int	szs_event, mval, nev, evidx, evtop, i
 int     ev_xoff, ev_yoff
 
 pointer	plr_open()
@@ -131,7 +133,8 @@ begin
 		    IO_VN(io,i) = -IO_VN(io,i)
 		}
 	    }
-	    call amovi (IO_VS(io,1), IO_V(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VS(io,1), IO_V(io,1), sz_val)
 
 	    # Determine if full lines are to be accessed, and if a bounding
 	    # box (subraster of the image) is defined.
@@ -194,7 +197,8 @@ begin
 		call plr_close (bbmask)
 
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		sz_val = 0
+		bbmask = plr_open (pl, v, sz_val)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,
@@ -462,11 +466,13 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-int     x1, x2, y1, y2, xs, xe, ys, ye, x, y
+size_t	sz_val
+long	x, y, x1, x2, y1, y2, xs, xe, ys, ye
 pointer pl, rl, rp, bp, ex, ev, ev_p, bbmask, bb_bufp
 bool    useindex, lineio, bbused, rmused, nodata
-int     bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int     v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+long	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj, temp
+long	v[NDIM]
+int	szs_event, mval, nev, evidx, evtop, i
 int     ev_xoff, ev_yoff
 
 pointer	plr_open()
@@ -511,7 +517,8 @@ begin
 		    IO_VN(io,i) = -IO_VN(io,i)
 		}
 	    }
-	    call amovi (IO_VS(io,1), IO_V(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VS(io,1), IO_V(io,1), sz_val)
 
 	    # Determine if full lines are to be accessed, and if a bounding
 	    # box (subraster of the image) is defined.
@@ -574,7 +581,8 @@ begin
 		call plr_close (bbmask)
 
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		sz_val = 0
+		bbmask = plr_open (pl, v, sz_val)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,
@@ -842,11 +850,13 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-int     x1, x2, y1, y2, xs, xe, ys, ye, x, y
+size_t	sz_val
+long	x, y, x1, x2, y1, y2, xs, xe, ys, ye
 pointer pl, rl, rp, bp, ex, ev, ev_p, bbmask, bb_bufp
 bool    useindex, lineio, bbused, rmused, nodata
-int     bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int     v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+long	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj, temp
+long	v[NDIM]
+int	szs_event, mval, nev, evidx, evtop, i
 int     ev_xoff, ev_yoff
 
 pointer	plr_open()
@@ -891,7 +901,8 @@ begin
 		    IO_VN(io,i) = -IO_VN(io,i)
 		}
 	    }
-	    call amovi (IO_VS(io,1), IO_V(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VS(io,1), IO_V(io,1), sz_val)
 
 	    # Determine if full lines are to be accessed, and if a bounding
 	    # box (subraster of the image) is defined.
@@ -954,7 +965,8 @@ begin
 		call plr_close (bbmask)
 
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		sz_val = 0
+		bbmask = plr_open (pl, v, sz_val)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,
@@ -1222,11 +1234,13 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-int     x1, x2, y1, y2, xs, xe, ys, ye, x, y
+size_t	sz_val
+long	x, y, x1, x2, y1, y2, xs, xe, ys, ye
 pointer pl, rl, rp, bp, ex, ev, ev_p, bbmask, bb_bufp
 bool    useindex, lineio, bbused, rmused, nodata
-int     bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int     v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+long	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj, temp
+long	v[NDIM]
+int	szs_event, mval, nev, evidx, evtop, i
 int     ev_xoff, ev_yoff
 
 pointer	plr_open()
@@ -1271,7 +1285,8 @@ begin
 		    IO_VN(io,i) = -IO_VN(io,i)
 		}
 	    }
-	    call amovi (IO_VS(io,1), IO_V(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VS(io,1), IO_V(io,1), sz_val)
 
 	    # Determine if full lines are to be accessed, and if a bounding
 	    # box (subraster of the image) is defined.
@@ -1334,7 +1349,8 @@ begin
 		call plr_close (bbmask)
 
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		sz_val = 0
+		bbmask = plr_open (pl, v, sz_val)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,
@@ -1602,11 +1618,13 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-int     x1, x2, y1, y2, xs, xe, ys, ye, x, y
+size_t	sz_val
+long	x, y, x1, x2, y1, y2, xs, xe, ys, ye
 pointer pl, rl, rp, bp, ex, ev, ev_p, bbmask, bb_bufp
 bool    useindex, lineio, bbused, rmused, nodata
-int     bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int     v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+long	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj, temp
+long	v[NDIM]
+int	szs_event, mval, nev, evidx, evtop, i
 int     ev_xoff, ev_yoff
 
 pointer	plr_open()
@@ -1651,7 +1669,8 @@ begin
 		    IO_VN(io,i) = -IO_VN(io,i)
 		}
 	    }
-	    call amovi (IO_VS(io,1), IO_V(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VS(io,1), IO_V(io,1), sz_val)
 
 	    # Determine if full lines are to be accessed, and if a bounding
 	    # box (subraster of the image) is defined.
@@ -1714,7 +1733,8 @@ begin
 		call plr_close (bbmask)
 
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		sz_val = 0
+		bbmask = plr_open (pl, v, sz_val)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,

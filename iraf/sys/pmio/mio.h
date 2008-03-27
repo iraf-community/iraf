@@ -39,18 +39,18 @@
 # masked region.
 
 define	LEN_MIODES	50
-define	M_IM		Memi[P2I($1)]		# image descriptor
-define	M_PM		Memi[P2I($1+1)]		# mask descriptor
+define	M_IM		Memp[$1]		# image descriptor
+define	M_PM		Memp[$1+1]		# mask descriptor
 define	M_PMCLOSE	Memi[P2I($1+2)]		# have mio_close close mask
 define	M_DEPTH		Memi[P2I($1+3)]		# have mio_close close mask
 define	M_ACTIVE	Memi[P2I($1+4)]		# set once i/o begins
-define	M_LBP		Memi[P2I($1+5)]		# line buffer pointer
-define	M_RLP		Memi[P2I($1+6)]		# range list pointer
+define	M_LBP		Memp[$1+5]		# line buffer pointer
+define	M_RLP		Memp[$1+6]		# range list pointer
 define	M_RLI		Memi[P2I($1+7)]		# range list index
 define	M_NDIM		Memi[P2I($1+8)]		# dimensionality of section
 define	M_LINEIO	Memi[P2I($1+9)]		# section is entire line
 define	M_REGCOORDS	Memi[P2I($1+10)]		# region relative coords
-define	M_V		Meml[P2L($1+11+$2-1)]	# current vector
-define	M_VS		Meml[P2L($1+20+$2-1)]	# start vector
-define	M_VE		Meml[P2L($1+30+$2-1)]	# end vector
-define	M_VN		Meml[P2L($1+40+$2-1)]	# size of section
+define	M_V		Meml[P2L($1+11)+$2-1]	# current vector
+define	M_VS		Meml[P2L($1+20)+$2-1]	# start vector
+define	M_VE		Meml[P2L($1+30)+$2-1]	# end vector
+define	M_VN		Memz[P2Z($1+40)+$2-1]	# size of section

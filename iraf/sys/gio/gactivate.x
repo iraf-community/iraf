@@ -19,7 +19,7 @@ int	junk, fd
 pointer	w, sp, devname
 
 extern	zardbf()
-int	fstati(), grdwcs(), and()
+int	grdwcs(), and()
 pointer	locpr()
 pointer	fstatp()
 errchk	gki_openws, gki_getwcs, gki_reactivatews

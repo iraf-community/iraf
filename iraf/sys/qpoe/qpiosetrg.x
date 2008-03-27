@@ -9,20 +9,22 @@ include	"qpio.h"
 procedure qpio_setrange (io, vs, ve, ndim)
 
 pointer	io			#I QPIO descriptor
-int	vs[ARB]			#I start vector (lower left corner)
-int	ve[ARB]			#I end vector (upper right corner)
+long	vs[ARB]			#I start vector (lower left corner)
+long	ve[ARB]			#I end vector (upper right corner)
 int	ndim			#I vector length (ndim=2 at present)
 
+size_t	sz_val
 int	i
-int	vlim[NDIM]
+long	vlim[NDIM]
 
 begin
 	vlim[1] = IO_NCOLS(io)
 	vlim[2] = IO_NLINES(io)
 
 	if (ndim <= 0) {
-	    call amovi (IO_VSDEF(io,1), IO_VS(io,1), NDIM)
-	    call amovi (IO_VEDEF(io,1), IO_VE(io,1), NDIM)
+	    sz_val = NDIM
+	    call amovl (IO_VSDEF(io,1), IO_VS(io,1), sz_val)
+	    call amovl (IO_VEDEF(io,1), IO_VE(io,1), sz_val)
 	} else {
 	    do i = 1, ndim {
 		IO_VS(io,i) = max(1, min(vlim[i], vs[i]))

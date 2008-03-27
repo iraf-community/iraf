@@ -10,15 +10,16 @@ include	<imio.h>
 # the leftmost subscript by one, until V equals IM_LEN, at which time EOF
 # is returned.
 
-int procedure imgnln (im, lineptr, v, dtype)
+long procedure imgnln (im, lineptr, v, dtype)
 
 pointer	im
 pointer	lineptr				# on output, points to the pixels
 long	v[IM_MAXDIM]			# loop counter
 int	dtype				# eventual datatype of pixels
 
-int	dim, ndim, junk, sz_pixel, fd, nchars, pixtype
-long	lineoff, line, band, offset
+int	dim, ndim, junk, sz_pixel, fd, pixtype
+size_t	nchars
+long	lineoff, line, band, offset, totpix
 long	vs[IM_MAXDIM], ve[IM_MAXDIM], unit_v[IM_MAXDIM], npix
 
 int	imloop()
@@ -87,7 +88,7 @@ misaligned_
 	    }
 	    
 	    # Get the line.
-	    lineptr = imggsc (im, vs, ve, ndim, dtype, junk)
+	    lineptr = imggsc (im, vs, ve, ndim, dtype, totpix)
 	}
 
 	# Increment loop vector (cannot use nested loops since the dimension

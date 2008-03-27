@@ -11,7 +11,7 @@ pointer	mw			#I pointer to MWCS descriptor
 int	axis			#I axis which gets the wsamp vector
 real	pv[ARB]			#O physical coordinates of points
 real	wv[ARB]			#O world coordinates of points
-int	npts			#I number of data point in curve
+size_t	npts			#I number of data point in curve
 
 pointer	wp
 errchk	syserrs

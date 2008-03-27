@@ -204,6 +204,7 @@ char	ksection[ARB]		#I Ksection
 int	ip			#I Current parsing pointer in ksection
 pointer	fit			#U Update the values in the FKS structure
 
+size_t	sz_val
 pointer sp, ln
 int     jp, token
 int	ctotok()
@@ -213,7 +214,8 @@ begin
 	jp = ip
 
 	call smark (sp)
-	call salloc (ln, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	# See if the parameter value is given as par=<value> or '+/-'
 	if (ctotok (ksection, jp, Memc[ln], LEN_CARD) == TOK_OPERATOR) {
@@ -435,7 +437,7 @@ begin
 	    if (acmode == APPEND)
 		call syserrs (SYS_FXFKSNOVR, "APPEND")
 	    if (group == -1 &&
-		    (FKS_EXTNAME(fit) == EOS && IS_INDEFL(FKS_EXTVER(fit))))
+		    (FKS_EXTNAME(fit) == EOS && IS_INDEFI(FKS_EXTVER(fit))))
 		call syserr (SYS_FXFKSOVR)
 	} else {
 	    switch (acmode) {
@@ -462,7 +464,7 @@ pointer	fit			#I fits kernel descriptor
 begin
 	FKS_EXTNAME(fit)   = EOS
 	FKS_SUBTYPE(fit)   = NO
-	FKS_EXTVER(fit)    = INDEFL
+	FKS_EXTVER(fit)    = INDEFI
 	FKS_APPEND(fit)    = NO
 	FKS_OVERWRITE(fit) = NO
 	FKS_DUPNAME(fit)   = NO

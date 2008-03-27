@@ -11,8 +11,10 @@ include	<imio.h>
 pointer procedure imgl1x (im)
 
 pointer	im
-int	fd, nchars
-long	offset
+
+int	fd
+size_t	nchars
+long	offset, lval
 pointer	bp, imggsx(), freadp()
 errchk	imopsf
 
@@ -30,6 +32,7 @@ begin
 		ifnoerr (bp = (freadp (fd, offset, nchars) - 1) / SZ_COMPLEX + 1)
 		    return (bp)
 	    }
-	    return (imggsx (im, long(1), IM_LEN(im,1), 1))
+	    lval = 1
+	    return (imggsx (im, lval, IM_LEN(im,1), 1))
 	}
 end

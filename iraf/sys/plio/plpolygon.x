@@ -5,15 +5,16 @@ include <plio.h>
 
 define	TOL		0.0001		# pixel units
 define	swapi		{tempi=$2;$2=$1;$1=tempi}
+define	swapl		{templ=$2;$2=$1;$1=templ}
 define	swapr		{tempr=$2;$2=$1;$1=tempr}
 define	equal		(abs($1-$2)<TOL)
 
 define	LEN_PGONDES	7
-define	P_PL		Memi[P2I($1)]	# pointer to X vector
-define	P_XP		Memi[P2I($1+1)]	# pointer to X vector
-define	P_YP		Memi[P2I($1+2)]	# pointer to Y vector
-define	P_OO		Memi[P2I($1+3)]	# pointer to previous range list
-define	P_OY		Memi[P2I($1+4)]	# y value of previous range list
+define	P_PL		Memp[$1]	# pointer to X vector
+define	P_XP		Memp[$1+1]	# pointer to X vector
+define	P_YP		Memp[$1+2]	# pointer to Y vector
+define	P_OO		Memp[$1+3]	# pointer to previous range list
+define	P_OY		Meml[P2L($1+4)]	# y value of previous range list
 define	P_NS		Memi[P2I($1+5)]	# number of line segments
 define	P_PV		Memi[P2I($1+6)]	# pixel value
 
@@ -26,14 +27,17 @@ define	P_PV		Memi[P2I($1+6)]	# pixel value
 procedure pl_polygon (pl, x, y, npts, rop)
 
 pointer	pl			#I mask descriptor
-int	x[npts]			#I polygon x-vertices
-int	y[npts]			#I polygon y-vertices
+long	x[npts]			#I polygon x-vertices
+long	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
-int	line_1, line_2, i
+size_t	sz_val
+long	line_1, line_2
+int	i
 pointer	sp, ufd, xp, yp, oo
 bool	pl_upolygon()
+long	absl()
 extern	pl_upolygon()
 errchk	plvalid
 
@@ -47,10 +51,13 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (ufd, LEN_PGONDES, TY_STRUCT)
-	call salloc (oo, RL_FIRST + (npts+1)*3, TY_INT)
-	call salloc (xp, npts + 1, TY_REAL)
-	call salloc (yp, npts + 1, TY_REAL)
+	sz_val = LEN_PGONDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = RL_FIRST + (npts+1)*3
+	call salloc (oo, sz_val, TY_INT)
+	sz_val = npts + 1
+	call salloc (xp, sz_val, TY_REAL)
+	call salloc (yp, sz_val, TY_REAL)
 
 	# Initialize the region descriptor.
 	P_PL(ufd) = pl
@@ -71,14 +78,15 @@ begin
 	}
 
 	if (npts > 2)
-	    if (abs(x[1]-x[npts]) > TOL || abs(y[1]-y[npts]) > TOL) {
+	    if (absl(x[1]-x[npts]) > TOL || absl(y[1]-y[npts]) > TOL) {
 		Memr[xp+npts] = x[1]
 		Memr[yp+npts] = y[1]
 		P_NS(ufd) = npts
 	    }
 
 	# Compute the range in Y in which the polygon should be drawn.
-	call alimi (y, npts, line_1, line_2)
+	sz_val = npts
+	call aliml (y, sz_val, line_1, line_2)
 
 	call pl_regionrop (pl, pl_upolygon, ufd, line_1, line_2, rop)
 	call sfree (sp)
@@ -91,19 +99,22 @@ end
 bool procedure pl_upolygon (ufd, line, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	line			#I mask line number
+long	line			#I mask line number
 int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O start of edit region in dst mask
-int	npix			#O number of pixels affected
+long	xs			#O start of edit region in dst mask
+size_t	npix			#O number of pixels affected
 
+size_t	sz_val
 pointer	xp, yp, pl
 bool	rl_new, cross
-int	nseg, np, low, rn, i1, i2, ii, i, j
-int	tempi, axlen, rl_len, p_prev, p_next
+long	templ, axlen, np, i1, i2, ii
+int	nseg, rn, i, iii, low, j
+int	tempi, rl_len, p_prev, p_next
 real	tempr, y, y1, y2, x1, x2, p1, p2, p_y, n_y
 
 int	btoi()
 bool	plr_equali()
+long	nint_rl()
 define	done_ 91
 
 begin
@@ -167,10 +178,10 @@ begin
 		    cross = (((p_y - y) * (n_y - y)) < 0)
 		}
 
-		i1 = max(1, min(axlen, nint(p1)))
-		i2 = max(1, min(axlen, nint(p2)))
+		i1 = max(1, min(axlen, nint_rl(p1)))
+		i2 = max(1, min(axlen, nint_rl(p2)))
 		if (i1 > i2)
-		    swapi (i1, i2)
+		    swapl (i1, i2)
 
 		np = i2 - i1 + 1
 		if (np > 0) {
@@ -241,40 +252,40 @@ begin
 	# segments.
 
 	rn = RL_FIRST
-	ii = RL_FIRST
+	iii = RL_FIRST
 
 	do j = RL_FIRST, rl_len {
-	    if (j <= ii && j < rl_len) {
+	    if (j <= iii && j < rl_len) {
 		next
 
-	    } else if (RL_V(rl_reg,ii) == YES) {
+	    } else if (RL_V(rl_reg,iii) == YES) {
 		# Skip a vertext that touches but does not cross.
 		if (RL_V(rl_reg,j) == NO && j < rl_len)
 		    next
 
 		# Draw a line between the two crossing points.
-		RL_X(rl_reg,rn) = RL_X(rl_reg,ii)
-		RL_N(rl_reg,rn) = max (RL_N(rl_reg,ii),
-		    RL_X(rl_reg,j) + RL_N(rl_reg,j) - RL_X(rl_reg,ii))
+		RL_X(rl_reg,rn) = RL_X(rl_reg,iii)
+		RL_N(rl_reg,rn) = max (RL_N(rl_reg,iii),
+		    RL_X(rl_reg,j) + RL_N(rl_reg,j) - RL_X(rl_reg,iii))
 		RL_V(rl_reg,rn) = P_PV(ufd)
 		rn = rn + 1
-		ii = j + 1
+		iii = j + 1
 
 	    } else {
 		# Plot only the first point.
-		RL_X(rl_reg,rn) = RL_X(rl_reg,ii)
-		RL_N(rl_reg,rn) = RL_N(rl_reg,ii)
+		RL_X(rl_reg,rn) = RL_X(rl_reg,iii)
+		RL_N(rl_reg,rn) = RL_N(rl_reg,iii)
 		RL_V(rl_reg,rn) = P_PV(ufd)
 		rn = rn + 1
 
-		if (j >= rl_len && j != ii) {
+		if (j >= rl_len && j != iii) {
 		    # Plot the second point, if and end of list.
 		    RL_X(rl_reg,rn) = RL_X(rl_reg,j)
 		    RL_N(rl_reg,rn) = RL_N(rl_reg,j)
 		    RL_V(rl_reg,rn) = P_PV(ufd)
 		    rn = rn + 1
 		} else
-		    ii = j
+		    iii = j
 	    }
 	}
 
@@ -296,7 +307,8 @@ done_
 	rl_new = true
 	if (P_OY(ufd) == line - 1)
 	    rl_new = !plr_equali (rl_reg, Memi[P_OO(ufd)])
-	call amovi (rl_reg, Memi[P_OO(ufd)], rn - 1)
+	sz_val = rn - 1
+	call amovi (rl_reg, Memi[P_OO(ufd)], sz_val)
 	P_OY(ufd) = line
 
 	return (rl_new)

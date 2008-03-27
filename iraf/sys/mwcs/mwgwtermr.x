@@ -15,6 +15,7 @@ real	w[ndim]			#O world coordinates of reference point
 real	cd[ndim,ndim]		#O CD matrix
 int	ndim			#I dimension of Wterm
 
+size_t	sz_val
 pointer	wp
 errchk	syserrs
 string	s_name "mw_gwtermr"
@@ -32,18 +33,21 @@ begin
 	# Copy out the data.  Return the unitary transformation of the
 	# Wterm has not been set.
 
+	sz_val = ndim
 	if (WCS_R(wp) == NULL)
-	    call aclrr (r, ndim)
+	    call aclrr (r, sz_val)
 	else
-	    call achtdr (D(mw,WCS_R(wp)), r, ndim)
+	    call achtdr (D(mw,WCS_R(wp)), r, sz_val)
 
 	if (WCS_W(wp) == NULL)
-	    call aclrr (w, ndim)
+	    call aclrr (w, sz_val)
 	else
-	    call achtdr (D(mw,WCS_W(wp)), w, ndim)
+	    call achtdr (D(mw,WCS_W(wp)), w, sz_val)
 
-	if (WCS_CD(wp) == NULL)
+	if (WCS_CD(wp) == NULL) {
 	    call mw_mkidmr (cd, ndim)
-	else
-	    call achtdr (D(mw,WCS_CD(wp)), cd, ndim*ndim)
+	} else {
+	    sz_val = ndim*ndim
+	    call achtdr (D(mw,WCS_CD(wp)), cd, sz_val)
+	}
 end

@@ -11,8 +11,10 @@ include	<imio.h>
 pointer procedure imgl1i (im)
 
 pointer	im
-int	fd, nchars
-long	offset
+
+int	fd
+size_t	nchars
+long	offset, lval
 pointer	bp, imggsi(), freadp()
 errchk	imopsf
 
@@ -30,6 +32,7 @@ begin
 		ifnoerr (bp = (freadp (fd, offset, nchars) - 1) / SZ_INT + 1)
 		    return (bp)
 	    }
-	    return (imggsi (im, long(1), IM_LEN(im,1), 1))
+	    lval = 1
+	    return (imggsi (im, lval, IM_LEN(im,1), 1))
 	}
 end

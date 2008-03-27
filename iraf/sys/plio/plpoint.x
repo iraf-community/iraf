@@ -11,12 +11,15 @@ include <plio.h>
 procedure pl_point (pl, x, y, rop)
 
 pointer	pl			#I mask descriptor
-int	x			#I pixel to be modified
-int	y			#I line to be modified
+long	x			#I pixel to be modified
+long	y			#I line to be modified
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
+long	lval
 long	v[PL_MAXDIM]
-int	npix, ll_len
+size_t	npix
+int	ll_len
 pointer	sp, ll_out, ll_reg, rl_out, ll_dst, op
 errchk	plvalid, pl_access, pl_linerop, pl_update
 pointer	pl_access()
@@ -24,13 +27,16 @@ int	pl_r2li()
 
 begin
 	call plvalid (pl)
-	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_PLANE(pl,1), v, sz_val)
 	v[2] = y
 
 	call smark (sp)
 	call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
-	call salloc (ll_reg, LL_CURHDRLEN + 6, TY_SHORT)
-	call salloc (rl_out, RL_FIRST * 3, TY_INT)
+	sz_val = LL_CURHDRLEN + 6
+	call salloc (ll_reg, sz_val, TY_SHORT)
+	sz_val = RL_FIRST * 3
+	call salloc (rl_out, sz_val, TY_INT)
 
 	# Access the destination line in the mask.
 	ll_dst = pl_access (pl, v)
@@ -45,11 +51,13 @@ begin
 	Memi[op+RL_NOFF] = npix
 	Memi[op+RL_VOFF] = 1
 
-	ll_len = pl_r2li (Memi[rl_out], 1, Mems[ll_reg], npix)
+	lval = 1
+	ll_len = pl_r2li (Memi[rl_out], lval, Mems[ll_reg], npix)
 
 	# Edit the affected line.
-	call pl_linerop (Mems[ll_reg], 1, 1, Mems[ll_dst], x, PL_MAXVAL(pl),
-	    Mems[ll_out], npix, rop)
+	lval = 1
+	call pl_linerop (Mems[ll_reg], lval, 1, Mems[ll_dst], x, PL_MAXVAL(pl),
+			 Mems[ll_out], npix, rop)
 
 	# Update the edited line in the mask.
 	call pl_update (pl, v, Mems[ll_out])

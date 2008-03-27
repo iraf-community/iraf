@@ -6,21 +6,22 @@ $checkin  libex.a lib$
 $exit
 
 tfiles:
+	$set GFLAGSI = "-k -t si -p tf/"
 	$set GFLAGS = "-k -t sil -p tf/"
-	$ifolder (tf/plglpi.x,  plglp.gx)  $generic $(GFLAGS) plglp.gx  $endif
-	$ifolder (tf/plglri.x,  plglr.gx)  $generic $(GFLAGS) plglr.gx  $endif
-	$ifolder (tf/pll2pi.x,  pll2p.gx)  $generic $(GFLAGS) pll2p.gx  $endif
-	$ifolder (tf/pll2ri.x,  pll2r.gx)  $generic $(GFLAGS) pll2r.gx  $endif
-	$ifolder (tf/plp2li.x,  plp2l.gx)  $generic $(GFLAGS) plp2l.gx  $endif
-	$ifolder (tf/plp2ri.x,  plp2r.gx)  $generic $(GFLAGS) plp2r.gx  $endif
-	$ifolder (tf/plplpi.x,  plplp.gx)  $generic $(GFLAGS) plplp.gx  $endif
-	$ifolder (tf/plplri.x,  plplr.gx)  $generic $(GFLAGS) plplr.gx  $endif
-	$ifolder (tf/plpropi.x, plprop.gx) $generic $(GFLAGS) plprop.gx $endif
-	$ifolder (tf/plr2li.x,  plr2l.gx)  $generic $(GFLAGS) plr2l.gx  $endif
-	$ifolder (tf/plr2pi.x,  plr2p.gx)  $generic $(GFLAGS) plr2p.gx  $endif
-	$ifolder (tf/plrropi.x, plrrop.gx) $generic $(GFLAGS) plrrop.gx $endif
-	$ifolder (tf/plrpri.x,  plrpr.gx)  $generic $(GFLAGS) plrpr.gx  $endif
+	$ifolder (tf/plglpi.x,  plglp.gx)  $generic $(GFLAGSI) plglp.gx  $endif
+	$ifolder (tf/plglri.x,  plglr.gx)  $generic $(GFLAGSI) plglr.gx  $endif
+	$ifolder (tf/pll2pi.x,  pll2p.gx)  $generic $(GFLAGSI) pll2p.gx  $endif
+	$ifolder (tf/pll2ri.x,  pll2r.gx)  $generic $(GFLAGSI) pll2r.gx  $endif
+	$ifolder (tf/plp2li.x,  plp2l.gx)  $generic $(GFLAGSI) plp2l.gx  $endif
+	$ifolder (tf/plp2ri.x,  plp2r.gx)  $generic $(GFLAGSI) plp2r.gx  $endif
+	$ifolder (tf/plplpi.x,  plplp.gx)  $generic $(GFLAGSI) plplp.gx  $endif
+	$ifolder (tf/plplri.x,  plplr.gx)  $generic $(GFLAGSI) plplr.gx  $endif
+	$ifolder (tf/plr2li.x,  plr2l.gx)  $generic $(GFLAGSI) plr2l.gx  $endif
+	$ifolder (tf/plr2pi.x,  plr2p.gx)  $generic $(GFLAGSI) plr2p.gx  $endif
 	$ifolder (tf/plreqi.x,  plreq.gx)  $generic $(GFLAGS) plreq.gx  $endif
+	$ifolder (tf/plrpri.x,  plrpr.gx)  $generic $(GFLAGS) plrpr.gx  $endif
+	$ifolder (tf/plpropi.x, plprop.gx) $generic $(GFLAGS) plprop.gx $endif
+	$ifolder (tf/plrropi.x, plrrop.gx) $generic $(GFLAGS) plrrop.gx $endif
 	;
 
 zzdebug:

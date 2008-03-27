@@ -6,39 +6,41 @@ include	<imset.h>
 include	<imio.h>
 include	<fset.h>
 
-# IMSETI -- Set an IMIO parameter of type integer (or pointer).  For
+# IMSET[ILP] -- Set an IMIO parameter of type integer (or pointer).  For
 # completeness this routine can be used to set real valued parameters, but
 # obviously since the input value is integer a fractional value cannot be
 # set.
 
-procedure imseti (im, param, value)
+procedure imsetl (im, param, lvalue)
 
 pointer	im			#I image descriptor
 int	param			#I parameter to be set
-int	value			#I integer value of parameter
+long	lvalue			#I long integer value of parameter
 
-int	i
+size_t	sz_val
+int	i, value
 pointer	ibdes
 errchk	calloc
 
 begin
+	value = lvalue
 	switch (param) {
 	case IM_ADVICE:
 	    IM_VADVICE(im) = value
 	case IM_BUFSIZE:
-	    IM_VBUFSIZE(im) = value
+	    IM_VBUFSIZE(im) = lvalue
 	case IM_BUFFRAC:
 	    IM_VBUFFRAC(im) = value
 	case IM_BUFMAX:
-	    IM_VBUFMAX(im) = value
+	    IM_VBUFMAX(im) = lvalue
 	case IM_COMPRESS:
 	    IM_VCOMPRESS(im) = value
 	case IM_NBNDRYPIX:
-	    IM_VNBNDRYPIX(im) = max (0, value)
+	    IM_VNBNDRYPIX(im) = max (0, lvalue)
 	case IM_TYBNDRY:
 	    IM_VTYBNDRY(im) = value
 	case IM_BNDRYPIXVAL:
-	    IM_OOBPIX(im) = real(value)
+	    IM_OOBPIX(im) = real(lvalue)
 	case IM_FLAGBADPIX:
 	    IM_VFLAGBADPIX(im) = value
 	case IM_PIXFD:
@@ -47,7 +49,7 @@ begin
 	    IM_UPDATE(im) = value
 
 	case IM_PLDES:
-	    IM_PL(im) = value
+	    IM_PL(im) = lvalue
 	case IM_RLIO:
 	    # Enable/disable range list i/o (for image masks).
 	    if (value == YES)
@@ -70,7 +72,8 @@ begin
 
 	    if (ibdes != NULL) {
 		call mfree (IM_IBDES(im), TY_STRUCT)
-		call calloc (IM_IBDES(im), LEN_BDES * IM_VNBUFS(im), TY_STRUCT)
+		sz_val = LEN_BDES * IM_VNBUFS(im)
+		call calloc (IM_IBDES(im), sz_val, TY_STRUCT)
 		IM_NGET(im) = 0
 	    }
 
@@ -88,3 +91,34 @@ begin
 	    call imerr (IM_NAME(im), SYS_IMSETUNKPAR)
 	}
 end
+
+
+procedure imseti (im, param, value)
+
+pointer	im			#I image descriptor
+int	param			#I parameter to be set
+int	value			#I integer value of parameter
+
+long	lvalue
+
+begin
+	lvalue = value
+	call imsetl (im, param, lvalue)
+end
+
+
+procedure imsetp (im, param, pvalue)
+
+pointer	im			#I image descriptor
+int	param			#I parameter to be set
+pointer	pvalue			#I pointer value of parameter
+
+begin
+	switch (param) {
+	case IM_PLDES:
+	    IM_PL(im) = pvalue
+	default:
+	    call imerr (IM_NAME(im), SYS_IMSETUNKPAR)
+	}
+end
+

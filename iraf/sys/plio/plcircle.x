@@ -4,7 +4,7 @@ include <plset.h>
 include <plio.h>
 
 define	LEN_CIRCLEDES	5
-define	C_PL		Memi[P2I($1)]	# reference mask
+define	C_PL		Memp[$1]	# reference mask
 define	C_XCEN		Memr[P2R($1+1)]	# X1 coord of circle
 define	C_YCEN		Memr[P2R($1+2)]	# Y1 coord of circle
 define	C_RADIUS	Memr[P2R($1+3)]	# X2 coord of circle
@@ -20,11 +20,12 @@ define	C_PV		Memi[P2I($1+4)]	# pixel value
 procedure pl_circle (pl, x, y, radius, rop)
 
 pointer	pl			#I mask descriptor
-int	x,y			#I center coords of circle
-int	radius			#I radius of circle
+long	x,y			#I center coords of circle
+long	radius			#I radius of circle
 int	rop			#I rasterop
 
-int	y1, y2
+size_t	sz_val
+long	y1, y2
 pointer	sp, ufd
 bool	pl_ucircle()
 extern	pl_ucircle()
@@ -32,7 +33,8 @@ extern	pl_ucircle()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	call salloc (ufd, LEN_CIRCLEDES, TY_STRUCT)
+	sz_val = LEN_CIRCLEDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
 	y1 = max ( 1, min (PL_AXLEN(pl,2), y - radius))
 	y2 = max (y1, min (PL_AXLEN(pl,2), y + radius))
@@ -55,14 +57,16 @@ end
 bool procedure pl_ucircle (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
+long	y			#I mask line number
 int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 pointer	pl
-real	radius, dx, dy
-int	rn, axlen, x1, x1_clipped, x2, x2_clipped
+long	lval
+real	radius, dx, dy, rval
+int	rn
+long	axlen, x1, x1_clipped, x2, x2_clipped
 
 begin
 	pl = C_PL(ufd)
@@ -70,11 +74,13 @@ begin
 	axlen = PL_AXLEN(pl,1)
 	radius = C_RADIUS(ufd)
 
-	dy = abs (C_YCEN(ufd) - y)
+	rval = y
+	dy = abs (C_YCEN(ufd) - rval)
 	if (dy <= radius) {
 	    dx = sqrt (radius**2 - dy**2)
-	    x1 = C_XCEN(ufd) - int(dx)
-	    x2 = C_XCEN(ufd) + int(dx)
+	    lval = dx
+	    x1 = C_XCEN(ufd) - lval
+	    x2 = C_XCEN(ufd) + lval
 	    x1_clipped = max(1, min(axlen, x1))
 	    x2_clipped = max(1, min(axlen, x2))
 

@@ -16,27 +16,29 @@ pointer	im			# image descriptor
 long	vs[ARB], ve[ARB]	# endpoints of section
 int	ndim			# dimensionality of section
 int	dtype			# datatype of pixels in section
-int	npix			# number of pixels in section (output)
+size_t	npix			# number of pixels in section (output)
 int	rwflag			# section is to be read or written
 
-int	step, i, sz_pixel, npix_per_line, extra_pix, buf_size
+long	step, npix_per_line, extra_pix, buf_size
+int	i, sz_pixel
+long	absl()
 include	<szdtype.inc>
 
 begin
 	sz_pixel = max (ty_size[IM_PIXTYPE(im)], ty_size[dtype])
 	
 	if (IM_VMAP(im,1) == 1)
-	    step = abs (IM_VSTEP(im,1))
+	    step = absl (IM_VSTEP(im,1))
 	else
 	    step = 1
 
 	# Compute the total number of pixels in the subraster.
 
-	npix_per_line = abs (ve[1] - vs[1]) + 1
+	npix_per_line = absl (ve[1] - vs[1]) + 1
 	npix = npix_per_line
 
 	for (i=2;  i <= ndim;  i=i+1)
-	    npix = npix * (abs (ve[i] - vs[i]) + 1)
+	    npix = npix * (absl (ve[i] - vs[i]) + 1)
 
 	# If the sample step size is greater than one, but less than
 	# IM_MAXSTEP, allow extra space for the final unsampled line.
@@ -59,7 +61,7 @@ begin
 	# exceeds the length of the line in which it must be stored.
 
 	if (and (IM_PLFLAGS(im), PL_RLIO) != 0)
-	    extra_pix = max (extra_pix, RL_MAXLEN(IM_PL(im)) - npix_per_line)
+	    extra_pix = max (extra_pix, RL_LENMAX(IM_PL(im)) - npix_per_line)
 
 	buf_size = (npix + extra_pix) * sz_pixel	# size buf, chars
 

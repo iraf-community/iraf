@@ -43,8 +43,12 @@ procedure imisec (imdes, section)
 
 pointer	imdes
 char	section[ARB]
+
+size_t	sz_val
+long	lval
 int	ip, i, dim, nsubscripts, nphysdim, nlogdim
-long	x1[IM_MAXDIM], x2[IM_MAXDIM], step[IM_MAXDIM], clktime()
+long	x1[IM_MAXDIM], x2[IM_MAXDIM], step[IM_MAXDIM]
+long	clktime()
 
 begin
 	# Set up null mapping (default).  Check for null section string,
@@ -52,8 +56,10 @@ begin
 
 	nphysdim = IM_NDIM(imdes)
 
-	call aclrl (IM_VOFF(imdes,1), nphysdim)
-	call amovkl (long(1), IM_VSTEP(imdes,1), nphysdim)
+	sz_val = nphysdim
+	call aclrl (IM_VOFF(imdes,1), sz_val)
+	lval = 1
+	call amovkl (lval, IM_VSTEP(imdes,1), sz_val)
 
 	do dim = 1, nphysdim
 	    IM_VMAP(imdes,dim) = dim
@@ -115,7 +121,8 @@ begin
 	}
 
 	IM_NDIM(imdes) = nlogdim
-	IM_MTIME(imdes) = clktime (long(0))
+	lval = 0
+	IM_MTIME(imdes) = clktime (lval)
 end
     
 

@@ -8,14 +8,18 @@ include	<imio.h>
 bool procedure im_pmlne3 (im, lineno, bandno)
 
 pointer	im			#I image descriptor
-int	lineno			#I line number
-int	bandno			#I band number
+long	lineno			#I line number
+long	bandno			#I band number
 
+size_t	sz_val
+long	lval
 long	v[IM_MAXDIM]
 bool	pm_linenotempty()
 
 begin
-	call amovkl (1, v, IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, v, sz_val)
 	v[2] = lineno
 	v[3] = bandno
 

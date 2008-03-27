@@ -21,7 +21,7 @@ begin
 
 	call fprintf (fd,
 	    "MWCS=%x, ndim=%d, nwcs=%d, curwcs=%d(%s), refim=%s\n")
-	    call pargi (mw)
+	    call pargp (mw)
 	    call pargi (ndim)
 	    call pargi (nwcs)
 
@@ -48,8 +48,8 @@ begin
 	call fprintf (fd, "sbuflen=%d, sbufused=%d, dbuflen=%d, dbufused=%d\n")
 	    call pargi (MI_SBUFLEN(mw))
 	    call pargi (MI_SBUFUSED(mw))
-	    call pargi (MI_DBUFLEN(mw))
-	    call pargi (MI_DBUFUSED(mw))
+	    call pargz (MI_DBUFLEN(mw))
+	    call pargz (MI_DBUFUSED(mw))
 
 	# Print the axis map.
 	call fprintf (fd, "useaxmap=%b, nlogdim=%d")

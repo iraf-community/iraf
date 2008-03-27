@@ -13,9 +13,10 @@ pointer procedure mw_open (bufptr, ndim)
 pointer	bufptr		#I pointer to encoded MWCS, or NULL
 int	ndim		#I dimension of system to be created
 
+size_t	sz_val
 int	i
 pointer	mw, wp
-int	mw_allocd()
+long	mw_allocd()
 errchk	calloc, mw_load, syserrs, mw_allocd
 string	s_physical "physical"
 
@@ -24,7 +25,8 @@ begin
 	call wf_init()
 
 	# Allocate the base descriptor.
-	call calloc (mw, LEN_MWCS, TY_STRUCT)
+	sz_val = LEN_MWCS
+	call calloc (mw, sz_val, TY_STRUCT)
 
 	# Load saved MWCS, if one was given.
 	if (bufptr != NULL) {
@@ -44,8 +46,10 @@ begin
 	MI_MAGIC(mw) = MWCS_MAGIC
 	MI_NDIM(mw) = ndim
 	MI_NLOGDIM(mw) = ndim
-	MI_LTV(mw) = mw_allocd (mw, ndim)
-	MI_LTM(mw) = mw_allocd (mw, ndim * ndim)
+	sz_val = ndim
+	MI_LTV(mw) = mw_allocd (mw, sz_val)
+	sz_val = ndim * ndim
+	MI_LTM(mw) = mw_allocd (mw, sz_val)
 	call mw_mkidmd (D(mw,MI_LTM(mw)), ndim)
 	do i = 1, ndim {
 	    MI_AXNO(mw,i) = i

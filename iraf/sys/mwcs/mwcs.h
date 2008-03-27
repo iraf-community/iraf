@@ -43,16 +43,16 @@ define	MI_SBUF		Memp[$1+5]		# string buffer pointer
 define	MI_SBUFLEN	Memi[P2I($1+6)]		# string buffer alloclen
 define	MI_SBUFUSED	Memi[P2I($1+7)]		# string buffer chars used
 define	MI_DBUF		Memp[$1+8]		# double buffer pointer
-define	MI_DBUFLEN	Memi[P2I($1+9)]		# double buffer alloclen
-define	MI_DBUFUSED	Memi[P2I($1+10)]		# double buffer doubles used
-define	MI_USEAXMAP	Memi[P2I($1+11)]		# enable axis mapping
-define	MI_NLOGDIM	Memi[P2I($1+12)]		# dimension of logical system
+define	MI_DBUFLEN	Memz[P2Z($1+9)]		# double buffer alloclen
+define	MI_DBUFUSED	Memz[P2Z($1+10)]	# double buffer doubles used
+define	MI_USEAXMAP	Memi[P2I($1+11)]	# enable axis mapping
+define	MI_NLOGDIM	Memi[P2I($1+12)]	# dimension of logical system
 	# (available)
-define	MI_LTV		Memi[P2I($1+18)]		# dbuf index of LT vector
-define	MI_LTM		Memi[P2I($1+19)]		# dbuf index of LT matrix
-define	MI_AXNO		Memi[P2I($1+20+($2)-1)]	# axis map, log[phys]
-define	MI_AXVAL	Memi[P2I($1+30+($2)-1)]	# axis value, if axno[i]=0
-define	MI_PHYSAX	Memi[P2I($1+40+($2)-1)]	# inverted map, phys[log]
+define	MI_LTV		Meml[P2L($1+18)]	# dbuf index of LT vector
+define	MI_LTM		Meml[P2L($1+19)]	# dbuf index of LT matrix
+define	MI_AXNO		Memi[P2I($1+20)+($2)-1]	# axis map, log[phys]
+define	MI_AXVAL	Memi[P2I($1+30)+($2)-1]	# axis value, if axno[i]=0
+define	MI_PHYSAX	Memi[P2I($1+40)+($2)-1]	# inverted map, phys[log]
 define	MI_CTRAN	Memp[$1+50+($2)-1]	# ctran descriptor pointers
 define	MI_WCSP		($1+70+(($2)-1)*LEN_WCS)
 
@@ -62,23 +62,23 @@ define	MI_WCSP		($1+70+(($2)-1)*LEN_WCS)
 
 define	WCS_NDIM	Memi[P2I($1)]		# dimension of world system
 define	WCS_SYSTEM	Memi[P2I($1+1)]		# sbuf index of system name
-define	WCS_AXCLASS	Memi[P2I($1+2+($2)-1)]	# axis type, 0 or FUNC index
-define	WCS_R		Memi[P2I($1+10)]		# dbuf index of R array
-define	WCS_W		Memi[P2I($1+11)]		# dbuf index of W array
-define	WCS_CD		Memi[P2I($1+12)]		# dbuf index of CD matrix
-define	WCS_NPTS	Memi[P2I($1+20+($2)-1)]	# number of points in wsampv
-define	WCS_PV		Memp[$1+30+($2)-1]	# wsamp physical vector
-define	WCS_WV		Memp[$1+40+($2)-1]	# wsamp world vector
-define	WCS_NFUNC	Memi[P2I($1+49)]		# number of functions
+define	WCS_AXCLASS	Memi[P2I($1+2)+($2)-1]	# axis type, 0 or FUNC index
+define	WCS_R		Meml[P2L($1+10)]	# dbuf index of R array
+define	WCS_W		Meml[P2L($1+11)]	# dbuf index of W array
+define	WCS_CD		Meml[P2L($1+12)]	# dbuf index of CD matrix
+define	WCS_NPTS	Memz[P2Z($1+20)+($2)-1]	# number of points in wsampv
+define	WCS_PV		Meml[P2L($1+30)+($2)-1]	# wsamp physical vector
+define	WCS_WV		Meml[P2L($1+40)+($2)-1]	# wsamp world vector
+define	WCS_NFUNC	Memi[P2I($1+49)]	# number of functions
 define	WCS_FUNC	($1+50+(($2)-1)*5)	# function descriptors
-define	WCS_NWATTR	Memi[P2I($1+89)]		# number of wcs attributes
+define	WCS_NWATTR	Memi[P2I($1+89)]	# number of wcs attributes
 define	WCS_WATTR	($1+90+(($2)-1)*3)	# pointer to wattr substruct
 
 # WCS function descriptor.
 define	LEN_WF		5
 define	WF_FN		Memi[P2I($1)]		# function code
 define	WF_NAXES	Memi[P2I($1+1)]		# number of axes 
-define	WF_AXIS		Memi[P2I($1+2+($2)-1)]	# axes function applies to
+define	WF_AXIS		Memi[P2I($1+2)+($2)-1]	# axes function applies to
 
 # Function type flags.
 define	FORWARD		0			# forward transform (P->W)
@@ -110,7 +110,7 @@ define	CT_LTM		Memp[$1+6]		# pointer to rot matrix
 define	CT_LTV		Memp[$1+7]		# pointer to translation vector
 define	CT_NCALLI	Memi[P2I($1+8)]		# number of function calls
 define	CT_NCALLO	Memi[P2I($1+9)]		# number of function calls
-define	CT_AXIS		Memi[P2I($1+10+($2)-1)]	# maps ctran axis to physax
+define	CT_AXIS		Memi[P2I($1+10)+($2)-1]	# maps ctran axis to physax
 define	CT_FCI		($1+20+(($2)-1)*LEN_FC)	# pointer to CALL descriptor
 define	CT_FCO		($1+188+(($2)-1)*LEN_FC)
 
@@ -129,7 +129,7 @@ define	FC_WCS		Memp[$1+1]		# WCS descriptor
 define	FC_WF		Memp[$1+2]		# WF descriptor
 define	FC_FCN		Memp[$1+3]		# epa of WCS function
 define	FC_NAXES	Memi[P2I($1+4)]		# number of axes in call
-define	FC_AXIS		Memi[P2I($1+5+($2)-1)]	# CTRAN axes used by FC (max 3)
+define	FC_AXIS		Memi[P2I($1+5)+($2)-1]	# CTRAN axes used by FC (max 3)
 define	FCU		8			# offset to first user field
 
 # WCS function driver (stored in common).

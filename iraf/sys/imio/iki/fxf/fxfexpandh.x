@@ -23,17 +23,20 @@ int	out_fd		#I output file descriptor
 int	nlines		#I minimum number of blank cards
 int	group		#I group that initiated the expansion
 int	nbks		#I numbers of blocks to expand group 'group'
-int	hdroff		#O new offset for beginning of 'group' 
-int	pixoff		#0 new offset for beginning of data
+long	hdroff		#O new offset for beginning of 'group' 
+long	pixoff		#0 new offset for beginning of data
 
+size_t	sz_val
 pointer hd, ip, op, buf
 char	line[80], endl[80]
-int	gn, newc, k, nchars, nbk, hsize
-int	bufsize, psize, rem, hoffset, poffset
+int	gn, newc, k, hsize
+size_t	bufsize, nchars, rem
+long	psize, lval, nbk, j
+long	hoffset, poffset
 
 int	fxf_xaddl()
-int	fstati()
-long	read(), note()
+int	modi()
+long	read(), note(), modl(), fstatl()
 errchk	malloc, read, write
 
 begin
@@ -41,16 +44,19 @@ begin
 	nlines = max (nlines, 10)
 
 	# Initialize a blank line.
-	call amovks (" ", line, LEN_CARD)
+	sz_val = LEN_CARD
+	call amovks (" ", line, sz_val)
 
 	# Initialize END card image.
-	call amovc ("END", endl, 3)
-	call amovks (" ", endl[4], LEN_CARD-3)
+	sz_val = 3
+	call amovc ("END", endl, sz_val)
+	sz_val = LEN_CARD-3
+	call amovks (" ", endl[4], sz_val)
 
 	call fseti (in_fd, F_ADVICE, SEQUENTIAL)
 	call fseti (out_fd, F_ADVICE, SEQUENTIAL)
 
-	bufsize = max (MIN_BUFSIZE, fstati (in_fd, F_BUFSIZE))
+	bufsize = max (MIN_BUFSIZE, fstatl (in_fd, F_BUFSIZE))
 	call malloc (buf, bufsize, TY_CHAR)
 
 	gn = 0
@@ -86,9 +92,10 @@ begin
 	        ip = ip - 80
 	    } else {
 	        # Write current buffer before writing blanks.
-		call miipak (Memc[op], Memc[op], FITS_BLOCK_BYTES, 
-		    TY_CHAR,MII_BYTE)
-		call write (out_fd, Memc[op], FITS_BLOCK_CHARS)
+		sz_val = FITS_BLOCK_BYTES
+		call miipak (Memc[op], Memc[op], sz_val, TY_CHAR, MII_BYTE)
+		sz_val = FITS_BLOCK_CHARS
+		call write (out_fd, Memc[op], sz_val)
 
 		# Use the same buffer space since we are using blanks
 		ip = ip - FITS_BLOCK_BYTES
@@ -97,12 +104,14 @@ begin
 
 	    # Write the blank cards.
 	    do k = 1, newc-1 {
-	        call amovc (line, Memc[ip], LEN_CARD)
+	        sz_val = LEN_CARD
+	        call amovc (line, Memc[ip], sz_val)
 	        ip = ip + LEN_CARD
-		if (mod (k,36) == 0) {
+		if (modi (k,36) == 0) {
 		    # We have more than one block of blanks.
 		    call miipak (Memc[op], Memc[op], nchars, TY_CHAR, MII_BYTE)
-		    call write (out_fd, Memc[op], FITS_BLOCK_CHARS)
+		    sz_val = FITS_BLOCK_CHARS
+		    call write (out_fd, Memc[op], sz_val)
 
 		    # Notice we used the same buffer space
 		    ip = ip - FITS_BLOCK_BYTES
@@ -111,7 +120,8 @@ begin
 	    }
 	    
 	    # Finally the END card.
-	    call amovc (endl, Memc[ip], LEN_CARD)
+	    sz_val = LEN_CARD
+	    call amovc (endl, Memc[ip], sz_val)
 	    nchars = 2880
 	    call miipak (Memc[op], Memc[op], nchars, TY_CHAR, MII_BYTE)
 	    call write (out_fd, Memc[op], nchars/2)
@@ -122,12 +132,13 @@ begin
 	    psize = (hoffset - poffset)
 
 	    nbk = psize / bufsize
-	    rem = mod(psize,bufsize)
+	    lval = bufsize
+	    rem = modl (psize,lval)
 
             if (group == gn)
 		pixoff = note(out_fd)
 
-	    do k = 1, nbk {
+	    do j = 1, nbk {
 		nchars = read (in_fd, Memc[buf], bufsize)
 		call write (out_fd, Memc[buf], bufsize)
 	    }
@@ -151,13 +162,16 @@ procedure fxf_xhrd (in, out, buf, bufsize, hoffset, poffset, hsize)
 int	in		#I Input file descriptor
 int	out		#I output file descriptor
 char	buf[ARB]	#I Working buffer
-int	bufsize		#I Workign buffer size
-int	hoffset		#O Header offset for next group
-int	poffset		#O Data offset for current group
+size_t	bufsize		#I Workign buffer size
+long	hoffset		#O Header offset for next group
+long	poffset		#O Data offset for current group
 int	hsize		#O Number of cards read in header
 
+size_t	sz_val
+size_t	sz_block_chars
 pointer	sp, hb
-int	nblks, totpix, i, j, ip, nchars
+int	nblks, i, j, ip
+long	totpix, nchars
 int	strncmp()
 long	read(), note()
 bool	end_card, fxf_xn_decode_blk1()
@@ -167,22 +181,27 @@ errchk  syserr, read, write
 
 begin
 	call smark (sp)
-	call salloc (hb, 1440, TY_CHAR)
+	sz_val = 1440
+	call salloc (hb, sz_val, TY_CHAR)
 
 	hoffset = note (in)
 
 	# Read first block of header.
-	nchars = read (in, Memc[hb], FITS_BLOCK_CHARS)
+	sz_val = FITS_BLOCK_CHARS
+	nchars = read (in, Memc[hb], sz_val)
 	if (nchars == EOF) {
 	    call sfree (sp)
 	    call syserr (SYS_FXFRFEOF)
 	}
 
-	call miiupk (Memc[hb], buf, FITS_BLOCK_BYTES, MII_BYTE,TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call miiupk (Memc[hb], buf, sz_val, MII_BYTE, TY_CHAR)
 	end_card = fxf_xn_decode_blk1 (buf, totpix)
 	if (!end_card) {
-	    call miipak (buf, Memc[hb], FITS_BLOCK_BYTES, TY_CHAR, MII_BYTE)
-	    call write (out, Memc[hb], FITS_BLOCK_CHARS)
+	    sz_val = FITS_BLOCK_BYTES
+	    call miipak (buf, Memc[hb], sz_val, TY_CHAR, MII_BYTE)
+	    sz_val = FITS_BLOCK_CHARS
+	    call write (out, Memc[hb], sz_val)
 	}
 	ip = FITS_BLOCK_BYTES + 1
 
@@ -191,9 +210,10 @@ begin
 	    # Continue reading header until the block with END
 	    # which is the last before the data block.
 
-	    while (read (in, Memc[hb], FITS_BLOCK_CHARS) != EOF) {
-	        call miiupk (Memc[hb], buf[ip], FITS_BLOCK_BYTES,
-		    MII_BYTE,TY_CHAR)
+	    sz_block_chars = FITS_BLOCK_CHARS
+	    while (read (in, Memc[hb], sz_block_chars) != EOF) {
+		sz_val = FITS_BLOCK_BYTES
+	        call miiupk (Memc[hb], buf[ip], sz_val, MII_BYTE, TY_CHAR)
 
 		# Look for the END card
 		do i = 0, 35 {
@@ -206,9 +226,9 @@ begin
 	        nblks = nblks + 1
 		if (end_card)
 		    break
-	        call miipak (buf[ip], Memc[hb], FITS_BLOCK_BYTES, 
-		    TY_CHAR, MII_BYTE)
-		call write (out, Memc[hb], FITS_BLOCK_CHARS)
+		sz_val = FITS_BLOCK_BYTES
+	        call miipak (buf[ip], Memc[hb], sz_val, TY_CHAR, MII_BYTE)
+		call write (out, Memc[hb], sz_block_chars)
 	        ip = ip + FITS_BLOCK_BYTES
 
 		# If the header is really big we can run out of
@@ -239,12 +259,13 @@ end
 bool procedure fxf_xn_decode_blk1 (buf, datalen)
 
 char	buf[ARB]		#I header data buffer
-int	datalen			#O length of data area in chars
+long	datalen			#O length of data area in chars
 
 char	card[LEN_CARD]
-int	totpix, nbytes, index, k, i, pcount, bitpix, naxis, ip
-int	len_axis[7]
-int	fxf_ctype()
+long	totpix, nbytes
+int	index, k, i, pcount, bitpix, naxis, ip
+long	len_axis[7]
+int	fxf_ctype(), absi()
 bool	end_card
 errchk	syserr, syserrs
 
@@ -272,7 +293,7 @@ begin
 		    if (naxis < 0 )
 			call syserr (SYS_FXFRFBNAXIS)
 	  	} else
-		    call fxf_geti (card, len_axis[index])
+		    call fxf_getl (card, len_axis[index])
 	    default:
 	        ;
 	    }
@@ -290,7 +311,7 @@ begin
 	    # Compute the size of the data area (pixel matrix plus PCOUNT)
 	    # in bytes.  Be careful not to overflow a 32 bit integer.
 
-	    nbytes = (totpix + pcount) * (abs(bitpix) / NBITS_BYTE)
+	    nbytes = (totpix + pcount) * (absi(bitpix) / NBITS_BYTE)
 
 	    # Round up to fill the final 2880 byte FITS logical block.
 	    nbytes = ((nbytes + 2880-1) / 2880) * 2880
@@ -316,8 +337,10 @@ pointer hd		#U header area pointer
 int	ncua		#I number of characters in the user area
 int	nlines		#I minimum number of header lines to be added 
 
-int	ip, nbc, k, ncards, nkeyw
-int	strncmp()
+size_t	sz_val
+pointer	ip
+int	nbc, k, ncards, nkeyw
+int	strncmp(), modi()
 
 begin
 	# Go to the end of buffer and get last line pointer
@@ -341,7 +364,8 @@ begin
 		if (strncmp ("END     ", Memc[ip], 8) == 0) {
 		    # Clear this card as it will be written at the 
 		    # end of the output header.
-		    call amovkc (" ", Memc[ip], LEN_CARD)
+		    sz_val = LEN_CARD
+		    call amovkc (" ", Memc[ip], sz_val)
 	    	    ip = ip - LEN_CARD
 		    next
 		} else
@@ -369,7 +393,7 @@ begin
 	    ncards = nlines - nbc
 
 	    # Adjust to a 36 cards boundary.
-	    ncards = 36 - mod (ncards, 36) + ncards
+	    ncards = 36 - modi (ncards, 36) + ncards
 	} else
 	    ncards = 0
 

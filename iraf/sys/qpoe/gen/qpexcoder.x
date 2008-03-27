@@ -20,10 +20,12 @@ char	expr[ARB]		#I expression to be compiled
 int	offset			#I typed offset of referenced attribute
 int	dtype			#I datatype of referenced attribute
 
+size_t	sz_val
 int	nbins, bin, xp
 pointer	lt, lut, lutx, pb
 real	x1, x2, xmin, xmax
-int	xlen, nranges, n_nranges, level, opcode, ip, i
+size_t	xlen
+int	nranges, n_nranges, level, opcode, ip, i
 pointer	pb_save, db_save, xs_buf, xe_buf, xs, xe, n_xs, n_xe, et, prev, p_zero
 
 real	sv_xs[MAX_LEVELS], sv_xe[MAX_LEVELS]
@@ -38,7 +40,7 @@ real	sv_xoffset[MAX_LEVELS], sv_xscale[MAX_LEVELS]
 bool	fp_equalr()
 
 
-int	qpex_parser()
+size_t	qpex_parser()
 int	stridxs(), btoi(), qpex_sublistr()
 pointer	qpex_dballoc(), qpex_dbpstr(), qpex_pbpos()
 errchk	qpex_r_pbpin_0, qpex_r_pbpin_1
@@ -239,7 +241,8 @@ null_		call eprintf ("%s: null range list\n")
 
 		# Allocate and initialize the lookup table descriptor.
 		lt = qpex_dballoc (ex, LEN_LTDES, TY_STRUCT)
-		call calloc (lut, nbins, TY_SHORT)
+		sz_val = nbins
+		call calloc (lut, sz_val, TY_SHORT)
 
 		LT_NEXT(lt)	= EX_LTHEAD(ex)
 		EX_LTHEAD(ex)	= lt

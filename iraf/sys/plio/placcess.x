@@ -29,8 +29,8 @@ int procedure pl_reference (pl, v)
 pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I coordinates of desired line
 
-int	index, i
-int	totlen, axlen
+int	i
+long	index, totlen, axlen
 define	oob_ 91
 
 begin

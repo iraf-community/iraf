@@ -25,19 +25,38 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
+size_t	sz_val
 int	n
 real	xblock, yblock, tol
 pointer	sp, qp, io, v, fname, qpf
+long	c_1
+int	initialized
 
 pointer	qp_open, qpio_open()
 real	qpio_statr(), qp_statr()
 int	qpio_getrange(), qp_geti(), qp_gstr(), qp_lenf()
+long	nint_rl()
 define	err_ 91
 
+include "qpf.com"
+include	<nullptr.inc>
+data initialized /0/
+
 begin
+	c_1 = 1
+
+	# Setup qpf address table
+	if ( initialized == 0 ) {
+	    initialized = 1
+	    qpf_ptrs0 = NULL
+	    num_qpf = 0
+	}
+
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (v, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (v, sz_val, TY_CHAR)
 
 	io = NULL
 	qp = NULL
@@ -48,11 +67,12 @@ begin
 	if (!(cl_index < 0 || cl_index == 1))
 	    goto err_
 
-	call malloc (qpf, LEN_QPFDES, TY_STRUCT)
+	sz_val = LEN_QPFDES
+	call malloc (qpf, sz_val, TY_STRUCT)
 
 	# Open the QPOE file.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
-	iferr (qp = qp_open (Memc[fname], READ_ONLY, 0)) {
+	iferr (qp = qp_open (Memc[fname], READ_ONLY, NULLPTR)) {
 	    qp = NULL
 	    goto err_
 	}
@@ -89,7 +109,7 @@ begin
 
 	if (n >= max(xblock,yblock)) {
 	    call sprintf (Memc[v+7], SZ_FNAME-7, "[%d]")
-		call pargi (nint((xblock+yblock)/2))
+		call pargl (nint_rl((xblock+yblock)/2.0))
 	    IM_MAX(im) = qp_geti (qp, Memc[v])
 	    Memc[v+5] = 'i';  Memc[v+6] = 'n'
 	    IM_MIN(im) = qp_geti (qp, Memc[v])
@@ -119,7 +139,7 @@ begin
 	    QPF_VS(qpf,1) = 1;	QPF_VE(qpf,1) = IM_LEN(im,1)
 	    QPF_VS(qpf,2) = 1;	QPF_VE(qpf,2) = IM_LEN(im,2)
 	}
-	call imioff (im, 1, YES, 1)
+	call imioff (im, c_1, YES, c_1)
 
 	iferr (n = qp_gstr (qp, "title", IM_TITLE(im), SZ_IMTITLE))
 	    IM_TITLE(im) = EOS

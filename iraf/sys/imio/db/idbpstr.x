@@ -22,6 +22,8 @@ double	dval
 bool	numeric
 int	ip, axis
 int	strncmp(), gstrcpy(), idb_kwlookup(), ctod(), strlen()
+int	nint_di()
+long	nint_dl()
 
 begin
 	# Determine if the given string value is numeric.  This is true if
@@ -47,7 +49,7 @@ begin
 	    if (IS_DIGIT(key[ip+5]) && key[ip+6] == EOS) {
 		axis = TO_INTEG(key[ip+5])
 		if (numeric && axis >= 1 && axis <= IM_NDIM(im)) {
-		    IM_LEN(im,axis) = nint(dval)
+		    IM_LEN(im,axis) = nint_dl(dval)
 		    return (OK)
 		} else
 		    call syserrs (SYS_IDBTYPE, key)
@@ -60,12 +62,12 @@ begin
 	switch (idb_kwlookup (key[ip])) {
 	case I_CTIME:
 	    if (numeric)
-		IM_CTIME(im) = nint(dval)
+		IM_CTIME(im) = nint_dl(dval)
 	case I_HISTORY:
 	    return (gstrcpy (strval, IM_HISTORY(im), SZ_IMHIST))
 	case I_LIMTIME:
 	    if (numeric)
-		IM_LIMTIME(im) = nint(dval)
+		IM_LIMTIME(im) = nint_dl(dval)
 	case I_MAXPIXVAL:
 	    if (numeric)
 		IM_MAX(im) = dval
@@ -74,15 +76,15 @@ begin
 		IM_MIN(im) = dval
 	case I_MTIME:
 	    if (numeric)
-		IM_MTIME(im) = nint(dval)
+		IM_MTIME(im) = nint_dl(dval)
 	case I_NAXIS:
 	    if (numeric)
-		IM_NDIM(im) = nint(dval)
+		IM_NDIM(im) = nint_di(dval)
 	case I_PIXFILE:
 	    return (gstrcpy (strval, IM_PIXFILE(im), SZ_IMPIXFILE))
 	case I_PIXTYPE:
 	    if (numeric)
-		IM_PIXTYPE(im) = nint(dval)
+		IM_PIXTYPE(im) = nint_di(dval)
 	case I_TITLE:
 	    return (gstrcpy (strval, IM_TITLE(im), SZ_IMTITLE))
 	default:

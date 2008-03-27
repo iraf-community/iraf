@@ -17,8 +17,10 @@ pointer	io			#I QPIO descriptor
 int	evi			#I evi of next bucket on exit
 
 pointer	min_ev[2], max_ev[2], ev, fp, mp, dd
-int	sz_event, offset, dtype, nb, flen, nchars, i, j, k
-int	fstati()
+size_t	sz_event, nb
+int	dtype, i, j, k
+long	offset, nchars, flen, lstatus
+long	fstatl()
 
 begin
 	dd = IO_DD(io)
@@ -61,7 +63,7 @@ begin
 			    if (Mems[fp] > Mems[mp])
 				Mems[mp] = Mems[fp]
 
-			case TY_INT, TY_LONG:
+			case TY_INT:
 			    fp = (ev - 1) / SZ_INT + 1 + offset
 			    mp = (min_ev[k] - 1) / SZ_INT + 1 + offset
 			    if (Memi[fp] < Memi[mp])
@@ -69,6 +71,15 @@ begin
 			    mp = (max_ev[k] - 1) / SZ_INT + 1 + offset
 			    if (Memi[fp] > Memi[mp])
 				Memi[mp] = Memi[fp]
+
+			case TY_LONG:
+			    fp = (ev - 1) / SZ_LONG + 1 + offset
+			    mp = (min_ev[k] - 1) / SZ_LONG + 1 + offset
+			    if (Meml[fp] < Meml[mp])
+				Meml[mp] = Meml[fp]
+			    mp = (max_ev[k] - 1) / SZ_LONG + 1 + offset
+			    if (Meml[fp] > Meml[mp])
+				Meml[mp] = Meml[fp]
 
 			case TY_REAL:
 			    fp = (ev - 1) / SZ_REAL + 1 + offset
@@ -104,13 +115,13 @@ begin
 	    nb = IO_SZBBUCKET(io)
 	    offset = (IO_BKNO(io) - 1) * nb + IO_FBOFF(io)
 	    call fm_lfawrite (IO_CHAN(io), Mems[IO_BP(io)], nb, offset)
-	    call fm_lfawait (IO_CHAN(io), nb)
+	    call fm_lfawait (IO_CHAN(io), lstatus)
 
 	    # Update the file size.
-	    flen = fstati (IO_FD(io), F_FILESIZE)
-	    nchars = (offset + nb) / SZB_CHAR
+	    flen = fstatl (IO_FD(io), F_FILESIZE)
+	    nchars = (offset + lstatus) / SZB_CHAR
 	    if (nchars > flen)
-		call fseti (IO_FD(io), F_FILESIZE, nchars)
+		call fsetl (IO_FD(io), F_FILESIZE, nchars)
 
 	    # Increment the total event count.
 	    IO_NEVENTS(io) = max (IO_NEVENTS(io), IO_EVI(io) - 1)

@@ -18,16 +18,18 @@ int	fd			# pixel storage file
 pointer	im			# image header pointer
 
 long	imsize, bufoff, blkoff
-int	maxlines, bufsize, szline, nlines, i
-int	opt_bufsize, max_bufsize, dev_blksize
-int	fstati(), sizeof()
+long	maxlines, bufsize, szline, nlines
+long	opt_bufsize, max_bufsize, dev_blksize, lval
+int	i
+long	fstatl(), modl()
+int	sizeof()
 
 begin
 	IM_FAST(im) = NO
 
-	max_bufsize = fstati (fd, F_MAXBUFSIZE)
-	opt_bufsize = fstati (fd, F_OPTBUFSIZE)
-	dev_blksize = max (1, fstati (fd, F_BLKSIZE))
+	max_bufsize = fstatl (fd, F_MAXBUFSIZE)
+	opt_bufsize = fstatl (fd, F_OPTBUFSIZE)
+	dev_blksize = max (1, fstatl (fd, F_BLKSIZE))
 
 	szline = IM_PHYSLEN(im,1) * sizeof (IM_PIXTYPE(im))
 	imsize = szline
@@ -88,7 +90,7 @@ begin
 
 	bufoff = (IM_PIXOFF(im) - 1) / dev_blksize * dev_blksize + 1
 	blkoff = IM_PIXOFF(im) - bufoff
-	call fseti (fd, F_FIRSTBUFOFF, bufoff)
+	call fsetl (fd, F_FIRSTBUFOFF, bufoff)
 
 	# An integral number of image lines fit inside the default size
 	# buffer.  Tell FIO the minimum size buffer to use.  FIO will actually
@@ -96,7 +98,7 @@ begin
 	# number of device blocks.
 
 	bufsize = blkoff + nlines * szline
-	call fseti (fd, F_BUFSIZE, bufsize)
+	call fsetl (fd, F_BUFSIZE, bufsize)
 
 	# If a FIO buffer will hold at least two image lines, if no image
 	# section was given, if there is only one input line buffer, if
@@ -106,9 +108,10 @@ begin
 	# or byte swapping is desired or required.  If all these criteria
 	# are true enable fast i/o.
 
+	lval = sizeof(IM_PIXTYPE(im))
 	if ((bufsize / szline >= 2 && IM_SECTUSED(im) == NO) &&
 	    (IM_VNBUFS(im) == 1 && IM_VNBNDRYPIX(im) == 0) &&
-	    (mod (IM_PIXOFF(im), sizeof(IM_PIXTYPE(im)))) == 1 &&
+	    (modl (IM_PIXOFF(im), lval)) == 1 &&
 	    IM_SWAP(im) == NO) {
 
 	    IM_FAST(im) = YES

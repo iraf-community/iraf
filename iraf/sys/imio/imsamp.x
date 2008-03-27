@@ -5,13 +5,22 @@
 procedure imsamp (a, b, npix, sz_pixel, step)
 
 char	a[ARB], b[ARB]
-int	npix, sz_pixel, step, i, j, in, out, delta_in
+size_t	npix
+int	sz_pixel
+long	step
+
+long	j, in, out, delta_in
+int	i
 
 begin
 	switch (sz_pixel) {
 	case SZ_SHORT:
 	    call imsmps (a, b, npix, step)
+	case SZ_INT:
+	    # arg1,2: incompatible pointer
+	    call imsmpi (a, b, npix, step)
 	case SZ_LONG:
+	    # arg1,2: incompatible pointer
 	    call imsmpl (a, b, npix, step)
 
 	default:				# flip odd sized elements

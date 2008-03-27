@@ -28,13 +28,15 @@ procedure fxf_rfitshdr (im, group, poff)
 
 pointer im		#I image descriptor
 int	group		#I Group number to read
-int	poff		#O char offset the the pixel area in the FITS image
+long	poff		#O char offset the the pixel area in the FITS image
 
+size_t	sz_val
 long	fi[LEN_FINFO]
-pointer hoff,totpix, extn, extv
-pointer sp, fit, o_fit, lbuf, hdrfile, hdr
-int	cindx, cfit, user, fitslen, offs_count
-int	in, spool, slot, i, nrec1440, acmode
+pointer hoff, extn, extv
+pointer sp, fit, o_fit, lbuf, hdrfile, hdr, cfit
+long	nrec1440, totpix, lval
+int	fitslen, cindx, user, offs_count
+int	in, spool, slot, i, acmode
 
 bool	initialized, reload, extname_or_ver, ext_append
 data	initialized /false/
@@ -52,8 +54,10 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	# Initialize the header file cache on the first call.  The kernel
 	# doesn't appear to work with the cache completely deactivated, so
@@ -113,8 +117,8 @@ begin
 
 		    FIT_EXTEND(o_fit) = FIT_EXTEND(cfit)
 
-		    call amovi (FIT_ACMODE(cfit), FIT_ACMODE(o_fit),
-			LEN_FITBASE)
+		    sz_val = LEN_FITBASE
+		    call amovi (FIT_ACMODE(cfit), FIT_ACMODE(o_fit), sz_val)
 		    hoff = rf_hdrp[cindx]
 		    poff = rf_pixp[cindx]
 		    extn = rf_pextn[cindx]
@@ -124,7 +128,7 @@ begin
 		    FIT_PIXPTR(o_fit) = poff
 
 		    extname_or_ver = (FKS_EXTNAME(o_fit) != EOS ||
-			!IS_INDEFL (FKS_EXTVER(o_fit)))
+			!IS_INDEFI (FKS_EXTVER(o_fit)))
 
 		    # If the group number or extname_or_ver has not been
 		    # specified we need to load the group number where there
@@ -197,8 +201,8 @@ begin
 	    if (rf_fit[slot] != NULL) {
 		call mfree (rf_pextv[slot], TY_INT)
 		call mfree (rf_pextn[slot], TY_CHAR)
-		call mfree (rf_pixp[slot], TY_INT)
-		call mfree (rf_hdrp[slot], TY_INT)
+		call mfree (rf_pixp[slot], TY_LONG)
+		call mfree (rf_hdrp[slot], TY_LONG)
 		call mfree (rf_fit[slot], TY_STRUCT)
 		call mfree (rf_hdr[slot], TY_CHAR)
 		rf_fit[slot] = NULL
@@ -210,16 +214,22 @@ begin
 	    spool = open ("spool", NEW_FILE, SPOOL_FILE)
 
 	    # Allocate cache version of FITS descriptor.
-	    call calloc (fit, LEN_FITBASE, TY_STRUCT)
-	    call calloc (hoff, MAX_OFFSETS, TY_INT) 
-	    call calloc (poff, MAX_OFFSETS, TY_INT) 
-	    call calloc (extn, MAX_OFFSETS*LEN_CARD, TY_CHAR) 
-	    call calloc (extv, MAX_OFFSETS, TY_INT) 
+	    sz_val = LEN_FITBASE
+	    call calloc (fit, sz_val, TY_STRUCT)
+	    sz_val = MAX_OFFSETS
+	    call calloc (hoff, sz_val, TY_LONG) 
+	    call calloc (poff, sz_val, TY_LONG) 
+	    sz_val = MAX_OFFSETS*LEN_CARD
+	    call calloc (extn, sz_val, TY_CHAR) 
+	    sz_val = MAX_OFFSETS
+	    call calloc (extv, sz_val, TY_INT) 
 
 	    # Initialize the entries.
-	    call amovki (INDEFL, Memi[extv], MAX_OFFSETS)
-	    call aclrc (Memc[extn], MAX_OFFSETS)
-	    call amovki (-1, Memi[poff], MAX_OFFSETS)
+	    sz_val = MAX_OFFSETS
+	    call amovki (INDEFI, Memi[extv], sz_val)
+	    call aclrc (Memc[extn], sz_val)
+	    lval = -1
+	    call amovkl (lval, Meml[poff], sz_val)
 
 	    FIT_GROUP(fit) = -1
 	    FIT_HDRPTR(fit) = hoff
@@ -230,7 +240,7 @@ begin
 	    FIT_BZERO(fit) = 0.0d0
 	    FIT_XTENSION(fit) = NO
 	    FIT_EXTNAME(fit) = EOS
-	    FIT_EXTVER(fit) = INDEFL
+	    FIT_EXTVER(fit) = INDEFI
 	    FIT_EXTEND(fit) = -3
 
 	    # Initialize the cache entry.
@@ -243,17 +253,22 @@ begin
 	    rf_lru[slot] = rf_refcount
 	    rf_mtime[slot] = FI_MTIME(fi)
 
-	    if (!reload)
-		rf_time[slot] = cputime (0)
+	    if (!reload) {
+		lval = 0
+		rf_time[slot] = cputime (lval)
+	    }
 
 	    reload = true
 
 	    in = IM_HFD(im)
-	    call seek (in, BOFL)
+	    lval = BOFL
+	    call seek (in, lval)
 	    
 	    # Read main FITS header and copy to spool fd.
 	    FIT_IM(fit) = im
-	    call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
+	    lval = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lval, FIT_LENAXIS(fit,1), sz_val)
 
 	    call fxf_load_header (in, fit, spool, nrec1440, totpix)
 
@@ -261,11 +276,13 @@ begin
 	    # Record group 0 (PHU) as having just been read.
 	    FIT_GROUP(fit) = 0
 
-	    call seek (spool, BOFL)
+	    lval = BOFL
+	    call seek (spool, lval)
 	    fitslen = fstatl (spool, F_FILESIZE)
 
 	    # Prepare cache area to store the FITS header.
-	    call malloc (hdr, fitslen, TY_CHAR)
+	    sz_val = fitslen
+	    call malloc (hdr, sz_val, TY_CHAR)
 	    user = stropen (Memc[hdr], fitslen, NEW_FILE)
 	    rf_hdr[slot] = hdr
 	    rf_fitslen[slot] = fitslen
@@ -280,12 +297,12 @@ begin
 	    call close (spool)
 	    
 	    # Group 0 (i.e. Main Fits unit)
-	    Memi[hoff] = 1	       # beginning of primary h.u.
-	    Memi[poff] = nrec1440 + 1  # first pixel data of main u.
+	    Meml[hoff] = 1	       # beginning of primary h.u.
+	    Meml[poff] = nrec1440 + 1  # first pixel data of main u.
 
 	    # Set group 1 offsets.
-	    Memi[hoff+1] = Memi[poff] + totpix
-	    Memi[poff+1] = -1
+	    Meml[hoff+1] = Meml[poff] + totpix
+	    Meml[poff+1] = -1
 	}
 
         call sfree (sp)
@@ -306,10 +323,12 @@ pointer poff			#I Pointer to pixel offsets array
 pointer extn			#I Pointer to extname's array
 pointer extv			#I Pointer to extver's array
 
+size_t	sz_val
 char	messg[SZ_LINE]
-pointer lfit, sp, po, ln
-int	spool, ig, acmode, i
-int	fitslen, xtn_hd, nrec1440, totpix, in, offset, group
+pointer lfit, sp, po, ln, i
+long	nrec1440, totpix, offset, lval
+int	fitslen, spool, ig, acmode
+int	xtn_hd, in, group
 int	strcmp(), getline()
 long	fstatl()
 int	open(), fxf_extnv_error()
@@ -337,14 +356,14 @@ begin
 	# See if we want to look at an extension given the EXT(NAME,VER)
 	# field in the ksection.
 
-	if (FKS_EXTNAME(lfit) != EOS || !IS_INDEFL (FKS_EXTVER(lfit))) {
+	if (FKS_EXTNAME(lfit) != EOS || !IS_INDEFI (FKS_EXTVER(lfit))) {
 	    ig = 1
 	    repeat {
 		call fseti (spool, F_CANCEL, YES)
 		xtn_hd = NO
 
 		# Has last extension header been read?
-		if (Memi[poff+ig] <= 0) { 
+		if (Meml[poff+ig] <= 0) { 
 		    iferr {
 			call fxf_skip_xtn (im,
 			    ig, cfit, hoff, poff, extn, extv, spool)
@@ -402,7 +421,7 @@ begin
 		xtn_hd = NO
 
 		# Has last extension header been read?
-		if (Memi[poff+ig] <= 0 ) {
+		if (Meml[poff+ig] <= 0 ) {
 		    call fseti (spool, F_CANCEL, YES)
 		    iferr {
 			call fxf_skip_xtn (im,
@@ -437,7 +456,7 @@ begin
 rxtn_
 	if (xtn_hd == NO) {
 	    in = IM_HFD(im)
-	    offset = Memi[hoff+group]
+	    offset = Meml[hoff+group]
 	    call seek (in, offset)
 	    FIT_IM(lfit) = im
 	    call fseti (spool, F_CANCEL, YES)
@@ -460,17 +479,21 @@ rxtn_
 	# Copy the spool array into a static array. We cannot reliable
 	# get the pointer from the spool file.
 	call smark (sp)
-	call salloc (ln, LEN_UACARD, TY_CHAR)
+	sz_val = LEN_UACARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	if (po != NULL)
 	    call mfree(po, TY_CHAR)
-	call malloc(po, fitslen+1, TY_CHAR)
+	sz_val = fitslen+1
+	call malloc(po, sz_val, TY_CHAR)
 
 	i = po
-	call seek (spool, BOFL)
+	lval = BOFL
+	call seek (spool, lval)
 	while (getline (spool, Memc[ln]) != EOF) {
 
-	    call amovc (Memc[ln], Memc[i], LEN_UACARD)
+	    sz_val = LEN_UACARD
+	    call amovc (Memc[ln], Memc[i], sz_val)
 	    i = i + LEN_UACARD
 	}
 	Memc[i] = EOS
@@ -478,13 +501,13 @@ rxtn_
 	# Make the user aware that they cannot use inheritance
 	# if the PDU contains a data array.
 
-	if (Memi[poff] != Memi[hoff+1]) {
+	if (Meml[poff] != Meml[hoff+1]) {
 	    if (FKS_INHERIT(lfit) == YES) {
 		call syserr (SYS_FXFBADINH)
 	    }
 	} else {
 	    # Disable inheritance if PHDU has a DU.
-	    if (Memi[poff+0] != Memi[hoff+1])
+	    if (Meml[poff+0] != Meml[hoff+1])
 		FIT_INHERIT(lfit) = NO
 	}
 
@@ -494,7 +517,8 @@ rxtn_
 
 	if (FIT_TFIELDS(lfit) > 0) {
 	    fitslen = fitslen + FIT_TFIELDS(lfit)*LEN_UACARD
-	    call realloc (po, fitslen, TY_CHAR)
+	    sz_val = fitslen
+	    call realloc (po, sz_val, TY_CHAR)
         }
 
 	call fxf_merge_w_ua (im, po, fitslen)
@@ -521,7 +545,7 @@ int	fxf_strcmp_lwr()
 
 begin
 	bxtn = (FKS_EXTNAME(fit) != EOS)
-	bxtv = (!IS_INDEFL (FKS_EXTVER(fit)))
+	bxtv = (!IS_INDEFI (FKS_EXTVER(fit)))
 
 	if (bxtn)
 	    bxtn_eq =
@@ -537,7 +561,7 @@ begin
 
 	} else if (bxtn && !bxtv) {
 	    # We have a duplicated in this case when extver in the image
-	    # header is INDEFL.
+	    # header is INDEFI.
 
 	    bval = bxtn_eq
 
@@ -571,9 +595,11 @@ pointer poff			#I extension data offset
 pointer extn			#I points to the array of extname
 pointer extv			#I points to the arrays of extver
 
+size_t	sz_val
 pointer sp, lfit, fit, hdrfile
 bool    streq()
-int	spool, in, nrec1440, totpix, offset, i, k, cindx
+int	spool, in, i, cindx
+long	nrec1440, totpix, offset, k, lval
 errchk	fxf_load_header
 int	strcmp()
 
@@ -581,23 +607,31 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (lfit, LEN_FITBASE, TY_STRUCT)
-        call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_FITBASE
+	call salloc (lfit, sz_val, TY_STRUCT)
+        sz_val = SZ_PATHNAME
+        call salloc (hdrfile, sz_val, TY_CHAR)
 
-	call seek (spool, BOFL)
+	lval = BOFL
+	call seek (spool, lval)
 	fit = IM_KDES(im)
 
 	# Allocate more memory for offsets in case we are pass MAX_OFFSETS.
 	if (group >= FIT_NUMOFFS(cfit)) {
 	    FIT_NUMOFFS(cfit) = FIT_NUMOFFS(cfit) + MAX_OFFSETS 
-	    call realloc (hoff, FIT_NUMOFFS(cfit), TY_INT)
-	    call realloc (poff, FIT_NUMOFFS(cfit), TY_INT)
-	    call realloc (extn, FIT_NUMOFFS(cfit)*LEN_CARD, TY_CHAR)
-	    call realloc (extv, FIT_NUMOFFS(cfit), TY_INT)
+	    sz_val = FIT_NUMOFFS(cfit)
+	    call realloc (hoff, sz_val, TY_LONG)
+	    call realloc (poff, sz_val, TY_LONG)
+	    sz_val = FIT_NUMOFFS(cfit)*LEN_CARD
+	    call realloc (extn, sz_val, TY_CHAR)
+	    sz_val = FIT_NUMOFFS(cfit)
+	    call realloc (extv, sz_val, TY_INT)
 
 	    offset = FIT_NUMOFFS(cfit) - MAX_OFFSETS
-	    call amovki (INDEFL, Memi[extv+offset], MAX_OFFSETS)
-	    call amovki (-1, Memi[poff+offset], MAX_OFFSETS)
+	    sz_val = MAX_OFFSETS
+	    call amovki (INDEFI, Memi[extv+offset], sz_val)
+	    lval = -1
+	    call amovkl (lval, Meml[poff+offset], sz_val)
 
 	    do i = 0,  MAX_OFFSETS-1  {
 		k = (offset+i)*LEN_CARD
@@ -622,7 +656,7 @@ begin
 	}
 		
 	in = IM_HFD(im)
-	offset = Memi[hoff+group]
+	offset = Meml[hoff+group]
 
 	call seek (in, offset)
 	lfit = IM_KDES(im)
@@ -636,12 +670,12 @@ begin
 		FIT_GROUP(cfit) = group
 	}
 
-	Memi[poff+group] = Memi[hoff+group] + nrec1440
+	Meml[poff+group] = Meml[hoff+group] + nrec1440
 	# The offset for the beginning of next group.
-	Memi[hoff+group+1] = Memi[poff+group] + totpix
+	Meml[hoff+group+1] = Meml[poff+group] + totpix
 
 	# Mark next group pixel offset in case we are at EOF.
-	Memi[poff+group+1] = -1
+	Meml[poff+group+1] = -1
 	call strcpy (FIT_EXTNAME(lfit), Memc[extn+LEN_CARD*group], LEN_CARD) 
 	Memi[extv+group] = FIT_EXTVER(lfit)
 
@@ -657,26 +691,31 @@ procedure fxf_load_header (in, fit, spool, nrec1440, datalen)
 int	in			#I input FITS header file descriptor
 pointer fit			#I FITS descriptor
 int	spool			#I spool output file descriptor
-int	nrec1440		#O number of 1440 char records output
-int	datalen			#O length of data area in chars
+long	nrec1440		#O number of 1440 char records output
+long	datalen			#O length of data area in chars
 
-int	ncols
+size_t	sz_val
+long	ncols
 pointer lbuf, sp, im, stime, fb, ttp
-int	totpix, nchars, nbytes, index, ncards, simple, i, pcount, junk
-int	fxf_read_card(), fxf_ctype(), ctoi(), strsearch()
+long	totpix, nbytes
+int	nchars, index, ncards, simple, i, pcount, junk
+int	fxf_read_card(), fxf_ctype(), ctoi(), strsearch(), absi()
 bool	fxf_fpl_equald()
 errchk	syserr, syserrs
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (stime, LEN_CARD, TY_CHAR)
-	call salloc (fb, FITS_BLOCK_BYTES, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (stime, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call salloc (fb, sz_val, TY_CHAR)
 
 	FIT_BSCALE(fit) = 1.0d0
 	FIT_BZERO(fit) = 0.0d0
 	FIT_EXTNAME(fit) = EOS
-	FIT_EXTVER(fit) = INDEFL
+	FIT_EXTVER(fit) = INDEFI
 	im = FIT_IM(fit)
 
 	# Read successive lines of the FITS header. 
@@ -739,7 +778,7 @@ begin
 		    if (FIT_NAXIS(fit) < 0 )
 			call syserr (SYS_FXFRFBNAXIS)
 	  	} else
-		    call fxf_geti (Memc[lbuf], FIT_LENAXIS(fit,index))
+		    call fxf_getl (Memc[lbuf], FIT_LENAXIS(fit,index))
 	    case KW_BSCALE:
 		call fxf_getd (Memc[lbuf], FIT_BSCALE(fit))
 		# If BSCALE is like 1.00000011 reset to 1.0.
@@ -760,14 +799,16 @@ begin
 		call putline (spool, Memc[lbuf])
 	    case KW_TFIELDS:
 		# Allocate space for TFORM and TTYPE keyword values
-		call fxf_geti (Memc[lbuf], ncols)
+		call fxf_getl (Memc[lbuf], ncols)
 		FIT_TFIELDS(fit) = ncols
 		if (FIT_TFORMP(fit) != NULL) {
 		    call mfree (FIT_TFORMP(fit), TY_CHAR)
 		    call mfree (FIT_TTYPEP(fit), TY_CHAR)
 	        }
-		call malloc (FIT_TFORMP(fit), ncols*LEN_FORMAT, TY_CHAR)
-		call malloc (FIT_TTYPEP(fit), ncols*LEN_OBJECT, TY_CHAR)
+		sz_val = ncols*LEN_FORMAT
+		call malloc (FIT_TFORMP(fit), sz_val, TY_CHAR)
+		sz_val = ncols*LEN_OBJECT
+		call malloc (FIT_TTYPEP(fit), sz_val, TY_CHAR)
 	    case KW_TFORM:
 		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
 		if (index == 1) {
@@ -819,7 +860,7 @@ begin
 	    # Compute the size of the data area (pixel matrix plus PCOUNT)
 	    # in bytes.  Be careful not to overflow a 32 bit integer.
 
-	    nbytes = (totpix + pcount) * (abs(FIT_BITPIX(fit)) / NBITS_BYTE)
+	    nbytes = (totpix + pcount) * (absi(FIT_BITPIX(fit)) / NBITS_BYTE)
 
 	    # Round up to fill the final 2880 byte FITS logical block.
 	    nbytes = ((nbytes + 2880-1) / 2880) * 2880
@@ -838,20 +879,23 @@ end
 procedure fxf_merge_w_ua (im, userh, fitslen) 
 
 pointer im		#I image descriptor
-int	userh		#I pointer to user area spool
+pointer	userh		#I pointer to user area spool
 int	fitslen		#I length in chars of the user area
 
+size_t	sz_val
 bool	inherit
-pointer sp, lbuf, ua, ln
-int	elen, elines, nbl, i, k
-int	sz_userarea, merge, len_hdrmem, fit, clines, ulines
+pointer sp, lbuf, ua, ln, k, fit
+int	i, nbl, clines, ulines, merge
+int	sz_userarea, len_hdrmem, elines, elen
 bool	fxf_is_blank()
 int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (ln, LEN_UACARD, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = LEN_UACARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 
@@ -877,7 +921,8 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 
@@ -915,7 +960,8 @@ begin
 		    # If there are blank cards, add them.
 		    if (nbl > 0)
 			call fxf_blank_lines (nbl, ua)
-		    call amovc (Memc[ln], Memc[ua], LEN_UACARD)
+		    sz_val = LEN_UACARD
+		    call amovc (Memc[ln], Memc[ua], sz_val)
 		    ua = ua + LEN_UACARD
 		}
 		k = k + LEN_UACARD
@@ -933,14 +979,16 @@ int procedure fxf_strcmp_lwr (s1, s2)
 
 char s1[ARB], s2[ARB]		#I strings to be compare for equality
 
+size_t	sz_val
 int	istat
 pointer sp, l1, l2
 int	strcmp()
 
 begin
 	call smark (sp)
-	call salloc (l1, LEN_CARD, TY_CHAR)
-	call salloc (l2, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (l1, sz_val, TY_CHAR)
+	call salloc (l2, sz_val, TY_CHAR)
 
 	call strcpy (s1, Memc[l1], LEN_CARD)
 	call strcpy (s2, Memc[l2], LEN_CARD)
@@ -1052,15 +1100,18 @@ int	slines		#I number of lines in str
 int	merge		#I flag to indicate merging or unmerge
 pointer po		#I matching pattern accumulation pointer
 
+size_t	sz_val
 char	line[LEN_UACARD]
-pointer sp, pt, tpt, tst, ps, pkp
-int	nbl, l, k, j, i, strncmp(), nbkw, nsb, cmplen
-int	stridxs()
+pointer sp, pt, tpt, tst, ps, pkp, i
+int	nbl, l, k, j, nbkw, nsb, cmplen
+int	stridxs(), strncmp()
 
 begin
 	call smark (sp)
-	call salloc (tpt, LEN_UACARD_100+1, TY_CHAR)
-	call salloc (tst, LEN_UACARD_5+1, TY_CHAR)
+	sz_val = LEN_UACARD_100+1
+	call salloc (tpt, sz_val, TY_CHAR)
+	sz_val = LEN_UACARD_5+1
+	call salloc (tst, sz_val, TY_CHAR)
 
 	Memc[tpt] = EOS
 	Memc[tst] = EOS
@@ -1143,7 +1194,8 @@ begin
 		        call fxf_blank_lines (nbl, po)
 		    i = tpt
 		    do l = 1, min(100, nbkw) {
-		        call amovc (Memc[i], Memc[po], LEN_UACARD)
+		        sz_val = LEN_UACARD
+		        call amovc (Memc[i], Memc[po], sz_val)
 		        i = i + LEN_UACARD
 		        po = po + LEN_UACARD
 		    }
@@ -1182,7 +1234,8 @@ begin
 		    if (nbl > 0)
 		        call fxf_blank_lines (nbl, po)
 
-		    call amovc (line, Memc[po], LEN_UACARD)
+		    sz_val = LEN_UACARD
+		    call amovc (line, Memc[po], sz_val)
 		    po = po + LEN_UACARD
 		    nbl = 0
 	        } 
@@ -1268,13 +1321,15 @@ procedure fxf_blank_lines (nbl, po)
 int	nbl			#U number of blank lines to write
 pointer po			#I output buffer pointer
 
+size_t	sz_val
 char	blk[1]
 int	i
 
 begin
 	blk[1] = ' '
 	do i = 1, nbl {
-	    call amovkc (blk[1], Memc[po], LEN_UACARD)
+	    sz_val = LEN_UACARD
+	    call amovkc (blk[1], Memc[po], sz_val)
 	    po = po +  LEN_UACARD
 	    Memc[po-1] = '\n'
 	}
@@ -1308,7 +1363,7 @@ pointer fit			#I fits descriptor
 char	messg[ARB]		#O string
 
 begin
-	if (!IS_INDEFL (FKS_EXTVER(fit))) {
+	if (!IS_INDEFI (FKS_EXTVER(fit))) {
 	    call sprintf (messg, LEN_CARD, "'%s,%d'")
 		call pargstr (FKS_EXTNAME(fit))
 		call pargi (FKS_EXTVER(fit)) 

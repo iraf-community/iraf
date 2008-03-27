@@ -21,6 +21,24 @@ begin
 end
 
 
+# STF_GETL -- Return the long integer value of a FITS encoded card.
+
+procedure stf_getl (card, lval)
+
+char	card[ARB]		# card to be decoded
+long	lval			# receives long integer value
+
+int	ip, ctol()
+char	sval[FITS_SZVALSTR]
+
+begin
+	call stf_gets (card, sval, FITS_SZVALSTR)
+	ip = 1
+	if (ctol (sval, ip, lval) <= 0)
+	    lval = 0
+end
+
+
 # STF_GETB -- Return the boolean/integer value of a FITS encoded card.
 
 procedure stf_getb (card, bval)

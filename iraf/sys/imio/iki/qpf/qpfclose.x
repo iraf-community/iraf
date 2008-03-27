@@ -11,7 +11,11 @@ procedure qpf_close (im, status)
 pointer	im			#I image descriptor
 int	status			#O output status
 
+size_t	sz_val
 pointer	qpf
+int	i, i_max
+
+include "qpf.com"
 
 begin
 	# Close the QPF virtual file driver.
@@ -24,6 +28,26 @@ begin
 	    call qpio_close (QPF_IO(qpf))
 	if (QPF_QP(qpf) != NULL)
 	    call qp_close (QPF_QP(qpf))
+
+	#
+	do i = 0, num_qpf-1 {
+	    if ( Memp[qpf_ptrs0+i] == qpf ) Memp[qpf_ptrs0+i] = NULL
+	}
+	# Setup qpf address table
+	i_max = -1
+	do i = 0, num_qpf-1 {
+	    if ( Memp[qpf_ptrs0+i] != NULL ) i_max = i
+	}
+	sz_val = i_max + 1
+	if ( sz_val == 0 ) {
+	    call mfree (qpf_ptrs0, TY_POINTER)
+	    qpf_ptrs0 = NULL
+	} else {
+	    call realloc (qpf_ptrs0, sz_val, TY_POINTER)
+	}
+	qpf_ptrs = qpf_ptrs0 - 1
+	num_qpf = sz_val
+	#
 
 	call mfree (qpf, TY_STRUCT)
 end

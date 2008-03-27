@@ -8,10 +8,17 @@ include	<imio.h>
 pointer procedure imgibf (im, vs, ve, ndim, dtype)
 
 pointer	im
-long	vs[ndim], ve[ndim]
-int	dtype, ndim, i
-long	nget, nchars, totpix, imcssz()
+long	vs[ndim]
+long	ve[ndim]
+int	ndim
+int	dtype
+
+size_t	sz_val
+int	i
+size_t	nchars
+long	nget, totpix, lval
 pointer	bdes
+long	imcssz(), modl()
 errchk	imopsf, calloc, realloc, mfree, malloc
 
 begin
@@ -20,14 +27,16 @@ begin
 
 	if (IM_IBDES(im) == NULL) {
 	    call imopsf (im)
-	    call calloc (IM_IBDES(im), LEN_BDES * IM_VNBUFS(im), TY_STRUCT)
+	    sz_val = LEN_BDES * IM_VNBUFS(im)
+	    call calloc (IM_IBDES(im), sz_val, TY_STRUCT)
 	}
 
 	# Compute pointer to the next input buffer descriptor.
 	# Increment NGET, the count of the number of GETPIX calls.
 
 	nget = IM_NGET(im)
-	bdes = IM_IBDES(im) + mod (nget, IM_VNBUFS(im)) * LEN_BDES
+	lval = IM_VNBUFS(im)
+	bdes = IM_IBDES(im) + modl (nget, lval) * LEN_BDES
 	IM_NGET(im) = nget + 1
 
 	# Compute the size of the buffer needed.  Check buffer

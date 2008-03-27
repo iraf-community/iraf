@@ -37,8 +37,6 @@ begin
 
 	case G_FD:
 	    GP_FD(gp) = nint(rval)
-	case G_TTY:
-	    GP_TTY(gp) = nint(rval)
 	case G_WCS:
 	    GP_WCS(gp) = nint(rval)
 	case G_CURSOR:

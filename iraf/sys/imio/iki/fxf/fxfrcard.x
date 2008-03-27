@@ -12,7 +12,9 @@ char	ibuf[ARB]		#I input buffer
 char    obuf[ARB]		#O Output buffer
 int	ncards			#I ncards read so far
 
+size_t	sz_val
 int	ip, nchars_read
+int	modi()
 long	read()
 errchk	read
 
@@ -20,15 +22,18 @@ begin
 	# We read one FITS block first, read card from it until 36
 	# cards have been processed, where we read again.
 
-	if (mod (ncards, 36) == 0) {
-	    nchars_read = read (fd, ibuf, FITS_BLOCK_CHARS)
+	if (modi (ncards, 36) == 0) {
+	    sz_val = FITS_BLOCK_CHARS
+	    nchars_read = read (fd, ibuf, sz_val)
 	    if (nchars_read ==  EOF)
 	        return (EOF)
-	    call miiupk (ibuf, ibuf, FITS_BLOCK_BYTES, MII_BYTE, TY_CHAR)
+	    sz_val = FITS_BLOCK_BYTES
+	    call miiupk (ibuf, ibuf, sz_val, MII_BYTE, TY_CHAR)
 	    ip = 1
 	}
 	
-	call amovc (ibuf[ip], obuf, LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (ibuf[ip], obuf, sz_val)
 	ip = ip + LEN_CARD
 
 	return (LEN_CARD)

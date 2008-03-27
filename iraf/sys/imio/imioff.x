@@ -14,11 +14,15 @@ procedure imioff (im, pixoff, compress, devblksz)
 pointer	im			# image descriptor
 long	pixoff			# file offset of first pixel
 int	compress		# if set, do not align image lines
-int	devblksz		# FIO device block size
+long	devblksz		# FIO device block size
 
-real	impkden, envgetr()
-long	offset, temp1, temp2, imnote()
-int	ndim, dim, sz_pixel, lblksize, pblksize, sizeof()
+size_t	sz_val
+real	impkden
+int	ndim, dim, sz_pixel
+long	offset, temp1, temp2, lblksize, pblksize
+real	envgetr()
+int	sizeof()
+long	imnote()
 errchk	imerr
 
 begin
@@ -37,8 +41,9 @@ begin
 	# image will be increased to fill an integral number of device blocks.
 
 	IM_PIXOFF(im) = pixoff
-	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), sz_val)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	ndim = IM_NDIM(im)
 
@@ -103,10 +108,15 @@ end
 procedure imalign (offset, blksize)
 
 long	offset
-int	blksize, diff
+long	blksize
+
+long	diff
+long	lval
+long	modl()
 
 begin
-	diff = mod (offset-1, max (1, blksize))
+	lval = max (1, blksize)
+	diff = modl (offset-1, lval)
 	if (diff != 0)
 	    offset = offset + (blksize - diff)
 end

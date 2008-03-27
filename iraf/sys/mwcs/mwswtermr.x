@@ -16,8 +16,8 @@ real	cd[ndim,ndim]		#I CD matrix
 int	ndim			#I dimension of Wterm
 
 pointer	wp
-int	nelem
-int	mw_allocd()
+size_t	nelem
+long	mw_allocd()
 errchk	mw_allocd, syserrs
 string	s_name "mw_swtermr"
 
@@ -34,13 +34,14 @@ begin
 	# Copy in the data.  Cobber the old data if the Wterm has been set,
 	# otherwise allocate space in the global data area.
 
+	nelem = ndim
 	if (WCS_R(wp) == NULL)
-	    WCS_R(wp) = mw_allocd (mw, ndim)
-	call achtrd (r, D(mw,WCS_R(wp)), ndim)
+	    WCS_R(wp) = mw_allocd (mw, nelem)
+	call achtrd (r, D(mw,WCS_R(wp)), nelem)
 
 	if (WCS_W(wp) == NULL)
-	    WCS_W(wp) = mw_allocd (mw, ndim)
-	call achtrd (w, D(mw,WCS_W(wp)), ndim)
+	    WCS_W(wp) = mw_allocd (mw, nelem)
+	call achtrd (w, D(mw,WCS_W(wp)), nelem)
 
 	nelem = ndim * ndim
 	if (WCS_CD(wp) == NULL)

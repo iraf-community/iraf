@@ -11,8 +11,10 @@ pointer	mw			#I pointer to MWCS descriptor
 real	scale[ARB]		#I scale factor for each axis in axbits
 int	axbits			#I bitflags defining axes
 
+size_t	sz_val
 pointer	sp, ltm, ltv_1, ltv_2
-int	axis[MAX_DIM], naxes, pdim, nelem, axmap, i, j
+int	axis[MAX_DIM], naxes, pdim, axmap, i, j
+size_t	nelem
 
 begin
 	# Convert axis bitflags to axis list.
@@ -27,13 +29,15 @@ begin
 
 	call smark (sp)
 	call salloc (ltm, nelem, TY_DOUBLE)
-	call salloc (ltv_1, pdim, TY_DOUBLE)
-	call salloc (ltv_2, pdim, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (ltv_1, sz_val, TY_DOUBLE)
+	call salloc (ltv_2, sz_val, TY_DOUBLE)
 
 	# Initialize the translation matrix and vectors.
 	call mw_mkidmd (Memd[ltm], pdim)
-	call aclrd (Memd[ltv_1], pdim)
-	call aclrd (Memd[ltv_2], pdim)
+	sz_val = pdim
+	call aclrd (Memd[ltv_1], sz_val)
+	call aclrd (Memd[ltv_2], sz_val)
 
 	# Enter the axis scale factors.
 	do i = 1, naxes {

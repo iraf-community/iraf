@@ -15,8 +15,8 @@ pointer rf_pextv[MAX_CACHE]		# EXTVER pointer
 int	rf_lru[MAX_CACHE]		# Lowest value is oldest slot
 long	rf_time[MAX_CACHE]		# Time when entry was cached
 long	rf_mtime[MAX_CACHE]		# Modify time of file in cache
-int	rf_hdr[MAX_CACHE]		# FITS Primary header data
-int	rf_fitslen[MAX_CACHE]		# Size Primary header data
+pointer	rf_hdr[MAX_CACHE]		# FITS Primary header data
+long	rf_fitslen[MAX_CACHE]		# Size Primary header data
 char	rf_fname[SZ_PATHNAME,MAX_CACHE] # Header file pathname
 
 common /fxfcachec/ rf_cachesize, rf_fit, rf_hdrp, rf_pixp, rf_pextn,

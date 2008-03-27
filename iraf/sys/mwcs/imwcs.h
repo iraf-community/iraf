@@ -18,25 +18,25 @@ define	SZ_BIGSTR	MAX_FITSCOLS	# max size FITS string (one card)
 
 # WCS FITS main descriptor.
 define	LEN_IMWCS	310
-define	IW_IM		Memi[P2I($1)]	# image descriptor
+define	IW_IM		Memp[$1]	# image descriptor
 define	IW_NDIM		Memi[P2I($1+1)]	# image dimension
 define	IW_NCARDS	Memi[P2I($1+2)]	# number of WCS cards
-define	IW_CBUF		Memi[P2I($1+3)]	# card descriptors
+define	IW_CBUF		Memp[$1+3]	# card descriptors
 define	IW_MAXCARDS	Memi[P2I($1+4)]	# CBUF allocated length, cards
-define	IW_SBUF		Memi[P2I($1+5)]	# string buffer
+define	IW_SBUF		Memp[$1+5]	# string buffer
 define	IW_SBUFLEN	Memi[P2I($1+6)]	# SBUF allocated length, chars
 define	IW_SBUFOP	Memi[P2I($1+7)]	# current offset in sbuf
 define	IW_CARD		(IW_CBUF($1)+(($2)-1)*LEN_CDES)
 	# (avail)
 define	IW_CROTA	Memr[P2R($1+9)]				# obsolete
-define	IW_CTYPE	Memi[P2I($1+10+($2)-1)]			# axtype (strp)
+define	IW_CTYPE	Memi[P2I($1+10)+($2)-1]			# axtype (strp)
 define	IW_CRPIX	Memd[P2D($1+20)+($2)-1]			# CRPIXi
 define	IW_CRVAL	Memd[P2D($1+40)+($2)-1]			# CRVALi
 define	IW_CDELT	Memd[P2D($1+60)+($2)-1]			# CDELTi
 define	IW_CD		Memd[P2D($1+80)+(($3)-1)*7+($2)-1]	# CDi_j
 define	IW_LTV		Memd[P2D($1+180)+($2)-1]		# LTVi
 define	IW_LTM		Memd[P2D($1+200)+(($3)-1)*7+($2)-1]	# LTMi_j
-define	IW_WSVLEN	Memi[P2I($1+300+($2)-1)]			# WSVi_LEN
+define	IW_WSVLEN	Memz[P2Z($1+300)+($2)-1]			# WSVi_LEN
 
 # WCS FITS card descriptor.
 define	LEN_CDES	6
@@ -45,7 +45,7 @@ define	C_AXIS		Memi[P2I($1+1)]	# wcs axis
 define	C_INDEX		Memi[P2I($1+2)]	# card number on axis
 define	C_CARDNO	Memi[P2I($1+3)]	# card number in header
 define	C_UPDATED	Memi[P2I($1+4)]	# card has been updated
-define	C_RP		Memi[P2I($1+5)]	# pointer to card
+define	C_RP		Memp[$1+5]	# pointer to card
 
 # Card types.
 define	TY_CTYPE	1

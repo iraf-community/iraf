@@ -28,15 +28,19 @@ procedure fxf_updhdr (im, status)
 pointer	im			#I image descriptor
 int	status			#O return status
 
+size_t	sz_val
 pointer	sp, fit, mii, poff
 pointer	outname, fits_file, tempfile
 bool    adjust_header, overwrite, append
-int	nchars_ua, hdr_fd, group, hdr_off, size
-int	npad, nlines, pixoff, grp_pix_off, nbks
-int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
-int	fxf_hdr_offset(), access(), strncmp()
+size_t	size, npad
+long	l_size, l_npad, hdr_off, in_off, pixoff, grp_pix_off, nchars_ua, lval
+int	nlines, nbks, diff, nchars, junk
+int	hdr_fd, in_fd, acmode, hdr_acmode, subtype, group
+char	c_0
+long	fxf_hdr_offset()
+int	access(), strncmp()
 int	open(), fnroot(), fnldir()
-long	read(), fstatl()
+long	read(), fstatl(), absl(), modl()
 bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
@@ -44,10 +48,14 @@ errchk  set_cache_time, syserr, syserrs, imerr
 long	clktime()
 begin
 	call smark (sp)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
-	call salloc (fits_file, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfile, max(SZ_PATHNAME,SZ_FNAME*2), TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fits_file, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (outname, sz_val, TY_CHAR)
+	sz_val = max(SZ_PATHNAME,SZ_FNAME*2)
+	call salloc (tempfile, sz_val, TY_CHAR)
 
 	acmode = IM_ACMODE(im)
 	fit = IM_KDES(im)
@@ -171,14 +179,14 @@ begin
 		# Reload PHU from file if necessary
 	        call fxf_not_incache(im)
 		poff = FIT_PIXPTR(fit)
-		Memi[poff+group] = pixoff
+		Meml[poff+group] = pixoff
 	    } else {
 		if (append)
 		    grp_pix_off = FIT_PIXOFF(fit)
 		else {
 		    # Reload PHU from file if necessary
 	            call fxf_not_incache(im)
-		    grp_pix_off = Memi[FIT_PIXPTR(fit)+group]
+		    grp_pix_off = Meml[FIT_PIXPTR(fit)+group]
 		}
 		call fxf_make_adj_copy (in_fd, hdr_fd,
 		    hdr_off, grp_pix_off, nchars_ua)
@@ -195,11 +203,13 @@ begin
 	    IM_HFD(im) = NULL
 	}
 
-	if (FIT_NEWIMAGE(fit) == YES)
-	    call seek (hdr_fd, BOF)
-	else if (hdr_off != 0)
+	if (FIT_NEWIMAGE(fit) == YES) {
+	    lval = BOF
+	    call seek (hdr_fd, lval)
+	} else if (hdr_off != 0) {
 	    call seek (hdr_fd, hdr_off)
-	   
+	}
+
 	if (acmode == NEW_COPY)
 	    call fxf_setbitpix (im, fit)
 
@@ -210,8 +220,9 @@ begin
 	# IRAF_TLM which could have just recently been modified, hence adding
 	# the 4 seconds.
 	
-        if (abs(FIT_MTIME(fit) - clktime(long(0))) > 60)
-	    FIT_MTIME(fit) = clktime(long(0))
+	lval = 0
+        if (absl(FIT_MTIME(fit) - clktime(lval)) > 60)
+	    FIT_MTIME(fit) = clktime(lval)
 
 	# We cannot use clktime() directly since the previuos value
 	# of FIT_MTIME might already have a 4 secs increment.
@@ -221,19 +232,23 @@ begin
 	# Now write default cards and im_userarea to disk.
 	call fxf_write_header (im, fit, hdr_fd, diff)
 
- 	size = fstatl (hdr_fd, F_FILESIZE)
-	npad = FITS_BLOCK_CHARS - mod(size,FITS_BLOCK_CHARS)
+ 	l_size = fstatl (hdr_fd, F_FILESIZE)
+	lval = FITS_BLOCK_CHARS
+	l_npad = FITS_BLOCK_CHARS - modl (l_size, lval)
+	npad = l_npad
 
 	# If we are appending a new extension, we need to write padding to
 	# 2880 bytes blocks at the end of the file.
 
-	if (mod(npad,FITS_BLOCK_CHARS) > 0 &&
-		(FIT_NEWIMAGE(fit) == YES || append)) {
-
-	    call amovki (0, Memi[mii], npad)
+	lval = FITS_BLOCK_CHARS
+	if ( modl (l_npad,lval) > 0 &&
+		(FIT_NEWIMAGE(fit) == YES || append) ) {
+	    c_0 = 0
+	    call amovkc (c_0, Memc[mii], npad)
 	    call flush (hdr_fd)
-	    call seek (hdr_fd, EOF)
-	    call write (hdr_fd, Memi[mii], npad)
+	    lval = EOF
+	    call seek (hdr_fd, lval)
+	    call write (hdr_fd, Memc[mii], npad)
 	}
 	call flush (hdr_fd)
 
@@ -251,13 +266,14 @@ begin
 	    in_fd = open (IM_HDRFILE(im), READ_ONLY, BINARY_FILE)
 	    group = FIT_GROUP(fit)
 	    call fxf_not_incache (im)
-	    in_off = Memi[FIT_HDRPTR(fit)+group+1]
-	    call seek (hdr_fd, EOF)
+	    in_off = Meml[FIT_HDRPTR(fit)+group+1]
+	    lval = EOF
+	    call seek (hdr_fd, lval)
 	    call seek (in_fd, in_off)
 	    size = FITS_BLOCK_CHARS
 
-	    while (read (in_fd, Memi[mii], size) != EOF) 
-		call write (hdr_fd, Memi[mii], size)
+	    while (read (in_fd, Memc[mii], size) != EOF) 
+		call write (hdr_fd, Memc[mii], size)
 
 	    call close (hdr_fd)
 	    call close (in_fd)
@@ -294,7 +310,8 @@ begin
 	   # from the cache entry. The FIT_MTIME value has already been
 	   # changed by adding 4 seconds. (See above).
 
-           call futime (IM_HDRFILE(im), NULL, FIT_MTIME(fit))
+	   lval = NULL
+           call futime (IM_HDRFILE(im), lval, FIT_MTIME(fit))
 #           call futime (IM_HDRFILE(im), NULL, clktime(long(0))+4)
 	}
 
@@ -314,14 +331,14 @@ end
 # FXF_HDR_OFFSET -- Function to calculate the header offset for group number
 # 'group'.
 
-int procedure fxf_hdr_offset (group, fit, pfd, acmode)
+long procedure fxf_hdr_offset (group, fit, pfd, acmode)
 
 int	group			#I extension number
 pointer	fit			#I fits descriptor
-pointer	pfd			#I pixel file descriptor
+int	pfd			#I pixel file descriptor
 int	acmode			#I image acmode
 
-int	hdr_off
+long	hdr_off
 
 begin
 	if (FIT_NEWIMAGE(fit) == YES)
@@ -333,7 +350,7 @@ begin
 	    hdr_off = FIT_EOFSIZE(fit)
 	} else {
 	    call fxf_not_incache (FIT_IM(fit))
-	    hdr_off = Memi[FIT_HDRPTR(fit)+group]
+	    hdr_off = Meml[FIT_HDRPTR(fit)+group]
         }
 	
 	# If pixel file descriptor is empty for a newcopy or newimage
@@ -354,16 +371,18 @@ procedure fxf_header_diff (im, group, acmode, hdr_off, diff, ualen)
 pointer	im			#I image descriptor
 int	group			#I extension number
 int	acmode			#I emage acmode
-int	hdr_off			#I header offset for group
+long	hdr_off			#I header offset for group
 int	diff			#O difference
-int	ualen			#O new header length
+long	ualen			#O new header length
 
+size_t	sz_val
 char	temp[LEN_CARD]
-pointer	hoff, poff, sp, pb, tb
-int	ua, fit, orig_hdr_size, pixoff, clines, ulines, len
-int     merge, usize, excess, nheader_cards, rp, inherit, kmax, kmin
-int     strlen(), imaccf(), imgeti(), strcmp(), idb_findrecord()
-int	btoi(), strncmp()
+pointer	hoff, poff, sp, pb, tb, fit, ua, rp
+long	orig_hdr_size, pixoff
+int	clines, ulines, len, usize, excess, nheader_cards, kmax, kmin, ival
+int	merge, inherit
+int	strlen(), imaccf(), imgeti(), strcmp(), idb_findrecord()
+int	btoi(), strncmp(), modi()
 bool    imgetb()
 
 errchk  open, fcopyo
@@ -420,7 +439,8 @@ begin
 	    clines = FIT_CACHEHLEN(fit) / LEN_UACARD
 
 	    call smark (sp)
-	    call salloc (tb, len+1, TY_CHAR)
+	    sz_val = len+1
+	    call salloc (tb, sz_val, TY_CHAR)
 
 	    # Now select those lines in UA that are not in fit_cache and
 	    # put them in 'pb'.
@@ -430,10 +450,11 @@ begin
 	    call fxf_match_str (ua, ulines,
 		FIT_CACHEHDR(fit), clines, merge, pb)
 	    Memc[pb] = EOS
-	    ualen = strlen (Memc[tb])
+	    ival = strlen (Memc[tb])
 
 	    # Now copy the buffer pointed by 'pb' to UA.
-	    call strcpy (Memc[tb], Memc[ua], ualen)
+	    call strcpy (Memc[tb], Memc[ua], ival)
+	    ualen = ival
 
 	    call sfree (sp)
 	}
@@ -535,7 +556,7 @@ begin
 		nheader_cards = nheader_cards + 1
 	    }
 	 
-	    if (IS_INDEFL(FIT_EXTVER(fit)) && !IS_INDEFL(FKS_EXTVER(fit)))
+	    if (IS_INDEFI(FIT_EXTVER(fit)) && !IS_INDEFI(FKS_EXTVER(fit)))
 		FIT_EXTVER(fit) = FKS_EXTVER(fit)
 	}
 
@@ -556,7 +577,7 @@ begin
 	    call fxf_not_incache(im)
 	    hoff = FIT_HDRPTR(fit)
 	    poff = FIT_PIXPTR(fit)
-	    orig_hdr_size = Memi[poff+group] - Memi[hoff+group]
+	    orig_hdr_size = Meml[poff+group] - Meml[hoff+group]
 	    diff = orig_hdr_size - ualen
 	} else if ((hdr_off == EOF || hdr_off == 0) && 
 	    (IM_NDIM(im) == 0 || FIT_NAXIS(fit) == 0)) {
@@ -579,7 +600,7 @@ begin
 	    # We need to reduce the size of the UA becuase we are not
 	    # going to expand the header.
 
-	    excess = mod (nheader_cards * 81 + usize, 1458)
+	    excess = modi (nheader_cards * 81 + usize, 1458)
 	    excess = excess + (((-diff-1400)/1440)*1458)
 	    Memc[ua+usize-excess] = EOS
 	}
@@ -595,12 +616,15 @@ pointer	 fit     		#I fits structure
 int	 hdr_fd  		#I FITS header file descriptor
 int	 diff			#I header size difference opix -> wrhdr time
 
+size_t	sz_val
 char	temp[SZ_FNAME] 
 bool	xtension, ext_append
-pointer	sp, spp, mii, rp, uap
+pointer	sp, spp, mii, rp, uap, np, poff
 char    card[LEN_CARD], blank, keyword[SZ_KEYWORD], datestr[SZ_DATESTR] 
-int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len, poff
-int     pos, group, pcount, depth, subtype, maxlen, ndim
+int	up, nbk, len, pcount, maxlen, ndim, i, n
+int	iso_cutover, group, acmode, depth, subtype
+size_t	sz_rec, nblanks
+long	pos, lval
 
 long	clktime()
 int	imaccf(), strlen(), fxf_ua_card(), envgeti()
@@ -611,15 +635,17 @@ errchk  write
 
 begin
 	call smark (sp)
-	call salloc (spp, FITS_BLOCK_CHARS*5, TY_CHAR)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	sz_val = FITS_BLOCK_CHARS*5
+	call salloc (spp, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_CHAR)
 
 	# Write out the standard, reserved header parameters.
-	n = spp
+	np = spp
 	blank = ' '
 	acmode = FIT_ACMODE(fit)
 	ext_append = ((acmode == NEW_IMAGE || acmode == NEW_COPY) &&
-	    (FKS_EXTNAME(fit) != EOS || !IS_INDEFL (FKS_EXTVER(fit))))
+	    (FKS_EXTNAME(fit) != EOS || !IS_INDEFI (FKS_EXTVER(fit))))
 
 	xtension = (FIT_XTENSION(fit) == YES)
 	if (FIT_NEWIMAGE(fit) == YES)
@@ -651,49 +677,49 @@ begin
 	    }
 
 	    ndim = IM_NDIM(im)
-	    call fxf_akwc ("XTENSION", "BINTABLE", 8, "Mask extension", n)
-	    call fxf_akwi ("BITPIX", 8, "Bits per pixel", n)
-	    call fxf_akwi ("NAXIS", ndim, "Number of axes", n)
-	    call fxf_akwi ("NAXIS1", 8, "Number of bytes per line", n)
+	    call fxf_akwc ("XTENSION", "BINTABLE", 8, "Mask extension", np)
+	    call fxf_akwi ("BITPIX", 8, "Bits per pixel", np)
+	    call fxf_akwi ("NAXIS", ndim, "Number of axes", np)
+	    call fxf_akwi ("NAXIS1", 8, "Number of bytes per line", np)
 	    do i = 2, ndim {
 		call fxf_encode_axis ("NAXIS", keyword, i)
-	        call fxf_akwi (keyword, IM_LEN(im,i), "axis length", n)
+	        call fxf_akwl (keyword, IM_LEN(im,i), "axis length", np)
 	    }
-	    call fxf_akwi ("PCOUNT", pcount, "Heap size in bytes", n)
-	    call fxf_akwi ("GCOUNT", 1, "Only one group", n)
+	    call fxf_akwi ("PCOUNT", pcount, "Heap size in bytes", np)
+	    call fxf_akwi ("GCOUNT", 1, "Only one group", np)
 
 	    if (imaccf (im, "TFIELDS") == NO)
-		call fxf_akwi ("TFIELDS", 1, "1 Column field", n)
+		call fxf_akwi ("TFIELDS", 1, "1 Column field", np)
 	    if (imaccf (im, "TTYPE1") == NO) {
 		call fxf_akwc ("TTYPE1", "COMPRESSED_DATA", 16,
-		    "Type of PLIO_1 data", n)
+		    "Type of PLIO_1 data", np)
 	    }
 	    call sprintf (card, LEN_CARD, "PI(%d)")
 		call pargi(maxlen) 
 	    call fxf_filter_keyw (im, "TFORM1")
 	    len = strlen (card)
-	    call fxf_akwc ("TFORM1", card, len, "Variable word array", n)
+	    call fxf_akwc ("TFORM1", card, len, "Variable word array", np)
 
 	} else {
 	    if (xtension)
-		call fxf_akwc ("XTENSION", "IMAGE", 5, "Image extension", n)
+		call fxf_akwc ("XTENSION", "IMAGE", 5, "Image extension", np)
 	    else
-		call fxf_akwb ("SIMPLE", YES, "Fits standard", n)
+		call fxf_akwb ("SIMPLE", YES, "Fits standard", np)
 
 	    if (FIT_NAXIS(fit) == 0 || FIT_BITPIX(fit) == 0) 
 		call fxf_setbitpix (im, fit)
 
-	    call fxf_akwi ("BITPIX", FIT_BITPIX(fit), "Bits per pixel", n)
-	    call fxf_akwi ("NAXIS", FIT_NAXIS(fit), "Number of axes", n)
+	    call fxf_akwi ("BITPIX", FIT_BITPIX(fit), "Bits per pixel", np)
+	    call fxf_akwi ("NAXIS", FIT_NAXIS(fit), "Number of axes", np)
 
 	    do i = 1, FIT_NAXIS(fit) {
 		call fxf_encode_axis ("NAXIS", keyword, i)
-		call fxf_akwi (keyword, FIT_LENAXIS(fit,i), "Axis length", n)
+		call fxf_akwl (keyword, FIT_LENAXIS(fit,i), "Axis length", np)
 	    }
 	
 	    if (xtension) {
-		call fxf_akwi ("PCOUNT", 0, "No 'random' parameters", n)
-		call fxf_akwi ("GCOUNT", 1, "Only one group", n)
+		call fxf_akwi ("PCOUNT", 0, "No 'random' parameters", np)
+		call fxf_akwi ("GCOUNT", 1, "Only one group", np)
 	    } else {
 		if (imaccf (im, "EXTEND") == NO)
 		    i = NO
@@ -706,7 +732,7 @@ begin
 		}
 		if (FIT_EXTEND(fit) == YES)
 		    i = YES
-		call fxf_akwb ("EXTEND", i, "File may contain extensions", n)
+		call fxf_akwb ("EXTEND", i, "File may contain extensions", np)
 		FIT_EXTEND(fit) = YES
 	    }
 	}
@@ -735,9 +761,9 @@ begin
 	if (IM_PIXTYPE(im) == TY_USHORT) {
 	    call fxf_filter_keyw (im, "BSCALE") 
 	    call fxf_akwd ("BSCALE", 1.0d0,
-		"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, n)
+		"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, np)
 	    call fxf_filter_keyw (im, "BZERO") 
-	    call fxf_akwd ("BZERO", 32768.0d0,  "", NDEC_REAL, n)
+	    call fxf_akwd ("BZERO", 32768.0d0,  "", NDEC_REAL, np)
 	} else if (FIT_PIXTYPE(fit) != TY_REAL &&
 	    FIT_PIXTYPE(fit) != TY_DOUBLE && IM_ACMODE(im) != NEW_COPY) {
 	    # Now we have TY_SHORT or TY_(INT,LONG).
@@ -748,13 +774,13 @@ begin
 	        if ((imaccf (im, "BSCALE") == NO) && 
 		     fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 4)) {
 		    call fxf_akwd ("BSCALE",  FIT_BSCALE(fit),
-			"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, n)
+			"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, np)
 	        }
 	    }
 	    if (!fxf_fpl_equald(0.0d0, FIT_BZERO(fit), 4) ) {
 	        if (imaccf (im, "BZERO") == NO &&
 		    fxf_fpl_equald (1.0d0, FIT_BZERO(fit), 4))
-		    call fxf_akwd ("BZERO", FIT_BZERO(fit),  "", NDEC_REAL, n)
+		    call fxf_akwd ("BZERO", FIT_BZERO(fit),  "", NDEC_REAL, np)
 	    }
 	}
 
@@ -763,13 +789,13 @@ begin
 	if (idb_findrecord (im, "ORIGIN", rp) == 0)  {
 	    call strcpy (FITS_ORIGIN, temp, LEN_CARD)
 	    call fxf_akwc ("ORIGIN",
-		temp, strlen(temp), "FITS file originator", n)
+		temp, strlen(temp), "FITS file originator", np)
 	} else if (rp - uap > 10*81) {
 	    # Out of place; do not change the value.
 	    call imgstr (im, "ORIGIN", temp, LEN_CARD)
 	    call fxf_filter_keyw (im, "ORIGIN")
 	    call fxf_akwc ("ORIGIN",
-		temp, strlen(temp), "FITS file originator", n)
+		temp, strlen(temp), "FITS file originator", np)
 	}
 
 	if (xtension) {
@@ -780,23 +806,23 @@ begin
 	    if (FIT_EXTNAME(fit) != EOS) {
 	        call strcpy (FIT_EXTNAME(fit), temp, LEN_CARD)
 	        call fxf_akwc ("EXTNAME",
-		    temp, strlen(temp), "Extension name", n)
+		    temp, strlen(temp), "Extension name", np)
 	    }
-	    if (!IS_INDEFL (FIT_EXTVER(fit))) {
+	    if (!IS_INDEFI (FIT_EXTVER(fit))) {
 	        call fxf_akwi ("EXTVER",
-		    FIT_EXTVER(fit), "Extension version", n)
+		    FIT_EXTVER(fit), "Extension version", np)
 	    }
             if (idb_findrecord (im, "INHERIT", rp) > 0) {
 		# See if keyword is at the begining of the UA
 		if (rp - uap > 11*81) {
 		    call fxf_filter_keyw (im, "INHERIT")
 		    call fxf_akwb ("INHERIT",
-			FIT_INHERIT(fit), "Inherits global header", n)
+			FIT_INHERIT(fit), "Inherits global header", np)
 		} else if (acmode != READ_WRITE)
 		    call imputb (im, "INHERIT", itob(FIT_INHERIT(fit)))
 	    } else {
 		call fxf_akwb ("INHERIT",
-		    FIT_INHERIT(fit), "Inherits global header", n)
+		    FIT_INHERIT(fit), "Inherits global header", np)
 	    }
 	}
 
@@ -805,14 +831,15 @@ begin
 	    iso_cutover = DEF_ISOCUTOVER
 
 	# Encode the "DATE" keyword (records create time of imagefile).
-	call fxf_encode_date (clktime(long(0)), datestr, SZ_DATESTR,
+	lval = 0
+	call fxf_encode_date (clktime(lval), datestr, SZ_DATESTR,
 	    "ISO", iso_cutover)
 	len = strlen (datestr)
 
 	if (idb_findrecord (im, "DATE", rp) == 0) {
 	    # Keyword is not in the UA, created with current time
 	    call fxf_akwc ("DATE",
-		datestr, len, "Date FITS file was generated", n)
+		datestr, len, "Date FITS file was generated", np)
 	} else { 
 	    if (acmode == READ_WRITE) {
 		# Keep the old DATE, change only the IRAF-TLM keyword value
@@ -823,7 +850,7 @@ begin
 		call fxf_filter_keyw (im, "DATE")
 
 		call fxf_akwc ("DATE",
-		    datestr, len, "Date FITS file was generated", n)
+		    datestr, len, "Date FITS file was generated", np)
 	    } else
 	        call impstr (im, "DATE", datestr) 
 	}
@@ -839,11 +866,11 @@ begin
 
 	if (idb_findrecord (im, "IRAF-TLM", rp) == 0) {
 	    call fxf_akwc ("IRAF-TLM",
-		datestr, len, "Time of last modification", n)
+		datestr, len, "Time of last modification", np)
 	} else if (rp - uap > 13*81) {  
 	    call fxf_filter_keyw (im, "IRAF-TLM")
 	    call fxf_akwc ("IRAF-TLM",
-		datestr, len, "Time of last modification", n)
+		datestr, len, "Time of last modification", np)
 	} else 
 	    call impstr (im, "IRAF-TLM", datestr) 
 
@@ -853,13 +880,13 @@ begin
 	if (IM_LIMTIME(im) >= IM_MTIME(im)) {
 	    if (idb_findrecord (im, "DATAMIN", rp) == 0) {
 		call fxf_akwr ("DATAMIN",
-		    IM_MIN(im), "Minimum data value", NDEC_REAL, n)
+		    IM_MIN(im), "Minimum data value", NDEC_REAL, np)
 	    } else
 		call imputr (im, "DATAMIN", IM_MIN(im))
 
 	    if (idb_findrecord (im, "DATAMAX", rp) == 0) {
 		call fxf_akwr ("DATAMAX",
-		    IM_MAX(im), "Maximum data value",NDEC_REAL, n)
+		    IM_MAX(im), "Maximum data value",NDEC_REAL, np)
 	    } else
 		call imputr (im, "DATAMAX", IM_MAX(im))
 	}
@@ -867,11 +894,11 @@ begin
 	if (FIT_OBJECT(fit) != EOS) {
 	    if (idb_findrecord (im, "OBJECT", rp) == 0) {
 	        call fxf_akwc ("OBJECT", FIT_OBJECT(fit), 
-		    strlen (FIT_OBJECT(fit)), "Name of the object observed", n)
+		    strlen (FIT_OBJECT(fit)), "Name of the object observed", np)
 	    } else if (rp - uap > 14*81) {  
 	        call fxf_filter_keyw (im, "OBJECT")
 	        call fxf_akwc ("OBJECT", FIT_OBJECT(fit),
-		    strlen (FIT_OBJECT(fit)), "Name of the object observed", n)
+		    strlen (FIT_OBJECT(fit)), "Name of the object observed", np)
 	   } else 
 	        call impstr (im, "OBJECT", FIT_OBJECT(fit))
 	}
@@ -879,45 +906,46 @@ begin
 	# Write Compression keywords for PLIO BINTABLE.
 #	if (subtype == FK_PLIO && IM_PFD(im) != NULL && ext_append) {
 	if (subtype == FK_PLIO) { 
-	    call fxf_akwb ("ZIMAGE", YES, "Is a compressed image", n)
-	    call fxf_akwc ("ZCMPTYPE", "PLIO_1", 6, "IRAF image masks", n) 
-	    call fxf_akwi ("ZBITPIX", 32, "BITPIX for uncompressed image",n)
+	    call fxf_akwb ("ZIMAGE", YES, "Is a compressed image", np)
+	    call fxf_akwc ("ZCMPTYPE", "PLIO_1", 6, "IRAF image masks", np) 
+	    call fxf_akwi ("ZBITPIX", 32, "BITPIX for uncompressed image",np)
 
 	    # We use IM_NDIM and IM_LEN here because FIT_NAXIS and _LENAXIS
 	    # are not available for NEW_IMAGE mode.
 
 	    ndim = IM_NDIM(im)
-	    call fxf_akwi ("ZNAXIS", ndim, "NAXIS for uncompressed image",n)
+	    call fxf_akwi ("ZNAXIS", ndim, "NAXIS for uncompressed image",np)
 	    do i = 1, ndim {
 	        call fxf_encode_axis ("ZNAXIS", keyword, i)
-	        call fxf_akwi (keyword, IM_LEN(im,i),  "Axis length", n)
+	        call fxf_akwl (keyword, IM_LEN(im,i),  "Axis length", np)
 	    }
 	    call fxf_encode_axis ("ZTILE", keyword, 1)
-	    call fxf_akwi (keyword, IM_LEN(im,1), "Axis length", n)
+	    call fxf_akwl (keyword, IM_LEN(im,1), "Axis length", np)
 	    do i = 2, ndim {
 		call fxf_encode_axis ("ZTILE", keyword, i)
-		call fxf_akwi (keyword, 1, "Axis length", n)
+		call fxf_akwi (keyword, 1, "Axis length", np)
 	    }
 	    call fxf_encode_axis ("ZNAME", keyword, 1)
-	    call fxf_akwc (keyword, "depth", 5, "PLIO mask depth", n)
+	    call fxf_akwc (keyword, "depth", 5, "PLIO mask depth", np)
 	    call fxf_encode_axis ("ZVAL", keyword, 1)
-	    call fxf_akwi (keyword, depth, "Parameter value", n)
+	    call fxf_akwi (keyword, depth, "Parameter value", np)
 	}
 
 	# Write the UA now.
 	up = 1
 	nbk = 0
-	n = n - spp 
+	n = np - spp 
 	sz_rec = 1440
 
 	while (fxf_ua_card (fit, im, up, card) == YES) {
-	    call amovc (card, Memc[spp+n], LEN_CARD)
+	    sz_val = LEN_CARD
+	    call amovc (card, Memc[spp+n], sz_val)
 	    n = n + LEN_CARD
 
 	    if (n == 2880) {
 		nbk = nbk + 1
-		call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
-		call write (hdr_fd, Memi[mii], sz_rec)
+		call miipak (Memc[spp], Memc[mii], sz_rec*2, TY_CHAR, MII_BYTE)
+		call write (hdr_fd, Memc[mii], sz_rec)
 		n = 0
 	    }
 	}
@@ -930,8 +958,8 @@ begin
 	# If there are blocks of trailing blanks, write them now.
 	if (diff > 0) {
 	    if (n > 0) {
-		call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
-		call write (hdr_fd, Memi[mii], sz_rec)
+		call miipak (Memc[spp], Memc[mii], sz_rec*2, TY_CHAR, MII_BYTE)
+		call write (hdr_fd, Memc[mii], sz_rec)
 	    }
 
 	    group = FIT_GROUP(fit)
@@ -944,21 +972,24 @@ begin
 		pos = note (hdr_fd)
 		call fxf_not_incache(im)
 		poff = FIT_PIXPTR(fit)
-		nbk = (Memi[poff+group] - pos)
+		nbk = (Meml[poff+group] - pos)
 		nbk = nbk / 1440
 	    }
-	    call amovkc (blank, Memc[spp], 2880)
-	    call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
+	    sz_val = 2880
+	    call amovkc (blank, Memc[spp], sz_val)
+	    call miipak (Memc[spp], Memc[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 	    do i = 1, nbk-1
-		call write (hdr_fd, Memi[mii], sz_rec)
+		call write (hdr_fd, Memc[mii], sz_rec)
 	   
-	    call amovkc (blank, Memc[spp], 2880)
+	    sz_val = 2880
+	    call amovkc (blank, Memc[spp], sz_val)
 	    rp = spp+2880-LEN_CARD
 	}
 
-	call amovc ("END", Memc[rp], 3)
-	call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
-	call write (hdr_fd, Memi[mii], sz_rec)
+	sz_val = 3
+	call amovc ("END", Memc[rp], sz_val)
+	call miipak (Memc[spp], Memc[mii], sz_rec*2, TY_CHAR, MII_BYTE)
+	call write (hdr_fd, Memc[mii], sz_rec)
 	# PLIO: write the mask data to the new extension.
 	if (subtype == FK_PLIO && IM_PFD(im) != NULL) {
 	    call fxf_plwrite (im, hdr_fd)
@@ -1028,6 +1059,7 @@ pointer	im			#I image descriptor
 pointer fit			#I fit descriptor
 
 int	datatype
+int	sizeof()
 errchk	syserr, syserrs
 
 begin
@@ -1036,8 +1068,14 @@ begin
 	switch (datatype) {
 	case TY_SHORT, TY_USHORT:
 	    FIT_BITPIX(fit) = FITS_SHORT
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    FIT_BITPIX(fit) = FITS_LONG
+	case TY_LONG:
+	    if ( sizeof(TY_LONG) == 2 ) {
+		FIT_BITPIX(fit) = FITS_LONG
+	    } else {
+		FIT_BITPIX(fit) = FITS_LONGLONG
+	    }
 	case TY_REAL:
 	    FIT_BITPIX(fit) = FITS_REAL
 	case TY_DOUBLE:
@@ -1056,27 +1094,32 @@ procedure fxf_make_adj_copy (in_fd, out_fd, hdr_off, pixoff, chars_ua)
 
 int	in_fd		#I input FITS descriptor
 int	out_fd		#I output FITS descriptor
-int	hdr_off		#I offset to be beginning of the ua to be resized
-int	pixoff		#I offset to be pixel area following hdroff
-int	chars_ua	#I size of the new UA (user area) in units of chars
+long	hdr_off		#I offset to be beginning of the ua to be resized
+long	pixoff		#I offset to be pixel area following hdroff
+long	chars_ua	#I size of the new UA (user area) in units of chars
 
+size_t	sz_val
 pointer	mii, sp
-int	nk, nblocks, junk, size_ua
+long	nk, nblocks, junk, size_ua, lval
+char	c_0
 long	read()
 errchk  read, write
 
 begin
 	call smark (sp)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_CHAR)
 
 	# Number of 1440 chars block up to the beginning of the UA to change.
 	nblocks = hdr_off / FITS_BLOCK_CHARS
 
 	# Copy  everything up to hdroff.
-	call seek (in_fd, BOF)
+	lval = BOF
+	call seek (in_fd, lval)
 	do nk = 1, nblocks {
-	    junk = read (in_fd, Memi[mii], FITS_BLOCK_CHARS)
-	    call write (out_fd, Memi[mii], FITS_BLOCK_CHARS)
+	    sz_val = FITS_BLOCK_CHARS
+	    junk = read (in_fd, Memc[mii], sz_val)
+	    call write (out_fd, Memc[mii], sz_val)
 	}
 
 	# Size of the new UA.
@@ -1084,9 +1127,13 @@ begin
 	nblocks = size_ua / FITS_BLOCK_CHARS
 	
 	# Put a blank new header in the meantime.
-	call amovki( 0, Memi[mii], FITS_BLOCK_CHARS)
-	do nk = 1, nblocks
-	    call write (out_fd, Memi[mii], FITS_BLOCK_CHARS)
+	sz_val = FITS_BLOCK_CHARS
+	c_0 = 0
+	call amovkc (c_0, Memc[mii], sz_val)
+	do nk = 1, nblocks {
+	    sz_val = FITS_BLOCK_CHARS
+	    call write (out_fd, Memc[mii], sz_val)
+	}
 
 	# Position after the current input header to continue 
 	# copying.
@@ -1107,9 +1154,11 @@ procedure fxf_set_cache_time (im, overwrite)
 pointer im			#I image descriptor
 bool    overwrite		#I invalidate entry if true
 
+size_t	sz_val
 pointer sp, hdrfile, fit
 long    fi[LEN_FINFO]
-int	finfo(), cindx
+int	cindx
+int	finfo()
 errchk	syserr, syserrs
 bool    streq()
 
@@ -1117,7 +1166,8 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 
@@ -1136,8 +1186,8 @@ begin
 		    # Invalidate entry.
 		    call mfree (rf_pextv[cindx], TY_INT)
 		    call mfree (rf_pextn[cindx], TY_CHAR)
-		    call mfree (rf_pixp[cindx], TY_INT)
-		    call mfree (rf_hdrp[cindx], TY_INT)
+		    call mfree (rf_pixp[cindx], TY_LONG)
+		    call mfree (rf_hdrp[cindx], TY_LONG)
 		    call mfree (rf_fit[cindx], TY_STRUCT)
 		    call mfree (rf_hdr[cindx], TY_CHAR)
 		    rf_fname[1,cindx] = EOS
@@ -1164,8 +1214,9 @@ procedure fxf_set_extnv (im)
 
 pointer im			#I image descriptor
 
-pointer fit, sp, hdrfile
-int	cindx, ig, extn, extv
+size_t	sz_val
+pointer fit, sp, hdrfile, extn, extv
+int	cindx, ig
 errchk	syserr, syserrs
 bool    bxtn, bxtv
 bool    streq()
@@ -1177,7 +1228,8 @@ begin
 	ig = FIT_GROUP(fit)
 
 	call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	# Search the header file cache for the named image.
 	do cindx = 1, rf_cachesize {
@@ -1186,7 +1238,7 @@ begin
 
 	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
 		bxtn = (FIT_EXTNAME(fit) != EOS)
-		bxtv = (!IS_INDEFL (FIT_EXTVER(fit)))
+		bxtv = (!IS_INDEFI (FIT_EXTVER(fit)))
 		# Reset cache
 		if (IM_ACMODE(im) == READ_WRITE) {
 		    if (bxtn) {
@@ -1216,7 +1268,8 @@ procedure fxf_ren_tmp (in, out)
 char 	in[ARB]			#I name of teh temporary file
 char    out[ARB]		#O new name
 
-int	junk, protect()
+int	junk
+int	protect()
 
 begin
 	if (protect (out, QUERY_PROTECTION) == YES) {
@@ -1239,14 +1292,16 @@ procedure fxf_over_delete (im)
 
 pointer im			#I image descriptor
 
+size_t	sz_val
 pointer fname, sp
-bool	streq()
 int	cindx
+bool	streq()
 include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[fname], SZ_PATHNAME)
 
@@ -1257,8 +1312,8 @@ begin
 	    if (streq (Memc[fname], rf_fname[1,cindx])) {
 		call mfree (rf_pextv[cindx], TY_INT)
 		call mfree (rf_pextn[cindx], TY_CHAR)
-		call mfree (rf_pixp[cindx], TY_INT)
-		call mfree (rf_hdrp[cindx], TY_INT)
+		call mfree (rf_pixp[cindx], TY_LONG)
+		call mfree (rf_hdrp[cindx], TY_LONG)
 		call mfree (rf_fit[cindx], TY_STRUCT)
 		call mfree (rf_hdr[cindx], TY_CHAR)
 		rf_fit[cindx] = NULL
@@ -1278,29 +1333,39 @@ procedure fxf_update_extend (im)
 
 pointer	im			#I image descriptor	
 
-pointer sp, hdrfile
-int	fd, fdout, i, nch, nc, cfit
+size_t	sz_val
+size_t	c_3, c_40, c_80, c_len_card
+long	lval
+pointer sp, hdrfile, cfit
+int	fd, fdout, i, nch, nc, naxis
 char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
 bool	streq()
-int	open(), naxis, strncmp(), fnroot()
+int	open(), strncmp(), fnroot(), modi()
 long	read(), note()
 
 include "fxfcache.com"
 define	cfit_ 91
 
 begin
+	c_3 = 3
+	c_40 = 40
+	c_80 = 80
+	c_len_card = LEN_CARD
+
 	fd = open (IM_HDRFILE(im), READ_WRITE, BINARY_FILE)
 
 	# Look for EXTEND keyword and change its value in place.
 	nc = 0
-	while (read (fd, line, 40) != EOF) {
+	while (read (fd, line, c_40) != EOF) {
 	    nc = nc + 1
-	    call achtbc (line, line, LEN_CARD)
+	    # arg1: incompatible pointer
+	    call achtbc (line, line, c_len_card)
 	    if (strncmp ("EXTEND  ", line, 8) == 0) {
 		line[30] = 'T'
 	        call seek (fd, note(fd)-40)
-		call achtcb (line, line, LEN_CARD)
-		call write (fd, line, 40)
+		# arg2: incompatible pointer
+		call achtcb (line, line, c_len_card)
+		call write (fd, line, c_40)
 		call close (fd)
 		goto cfit_
 	    } else if (strncmp ("END     ", line, 8) == 0) 
@@ -1314,11 +1379,13 @@ begin
 	call mktemp (tmp, tmp, SZ_FNAME)
 	fdout = open (tmp, NEW_FILE, BINARY_FILE)
 
-	call seek (fd, BOF)
+	lval = BOF
+	call seek (fd, lval)
 	do i = 0, nc-2 {
-	    nch = read (fd, line, 40)
-	    call write (fdout, line, 40)
-	    call achtbc(line, line, LEN_CARD)
+	    nch = read (fd, line, c_40)
+	    call write (fdout, line, c_40)
+	    # arg1: incompatible pointer
+	    call achtbc(line, line, c_len_card)
 	    if (strncmp ("NAXIS   ", line, 8) == 0) 
 	        call fxf_geti (line, naxis)
 	    else if (strncmp ("NAXIS", line, 5)  == 0){
@@ -1326,30 +1393,34 @@ begin
 		    # Now create the EXTEND card in the output file.
 		    call fxf_encodeb ("EXTEND", YES, line, 
 		        "File may contain extensions")
-		    call achtcb (line, line , LEN_CARD)
-		    call write (fdout, line, 40)
+		    # arg2: incompatible pointer
+		    call achtcb (line, line ,c_len_card)
+		    call write (fdout, line, c_40)
 	        }
 	    }
 	}
 
-	if (mod (nc, 36) == 0) {
+	if (modi (nc, 36) == 0) {
 	    # We have to write one END card and 35 blank card.
 	    blank = ' '
-	    call amovkc (blank, line, 80)
-	    call amovc ("END", line, 3)
-	    call achtcb (line, line , LEN_CARD)
-	    call write (fdout, line, 40)
-	    call amovkc (blank, line, 80)
-	    call achtcb (line, line , LEN_CARD)
-	    for (i=1;  i < 36;  i=i+1)
-		call write (fdout, line, 40)
+	    call amovkc (blank, line, c_80)
+	    call amovc ("END", line, c_3)
+	    # arg2: incompatible pointer
+	    call achtcb (line, line , c_len_card)
+	    call write (fdout, line, c_40)
+	    call amovkc (blank, line, c_80)
+	    # arg2: incompatible pointer
+	    call achtcb (line, line, c_len_card)
+	    for (i=1;  i < 36;  i=i+1) {
+		call write (fdout, line, c_40)
+	    }
 	} else {
-	    nch = read (fd, line, 40)
-	    call write (fdout, line, 40)
+	    nch = read (fd, line, c_40)
+	    call write (fdout, line, c_40)
 	}
 
 	# Read one more line to synchronize.
-	nch = read (fd, line, 40)
+	nch = read (fd, line, c_40)
 
 	# Copy the rest of the file. 
 	call fcopyo (fd, fdout)
@@ -1361,7 +1432,8 @@ begin
 cfit_
 	# Now reset the value in the cache
 	call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 

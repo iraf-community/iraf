@@ -16,9 +16,12 @@ int	fd			#I header file descriptor
 pointer	im			#I image descriptor
 int	htype			#I TY_IMHDR or TY_PIXHDR
 
+size_t	sz_val
+long	lval
+size_t	c_1
 pointer	sp, v1, fname
 int	status, hdrlen, len_userarea
-errchk	write, miiwritec, miiwritei, miiwritel, miiwriter
+errchk	write, miiwritec, miiwritei, miiwritel32, miiwriter
 int	strlen()
 
 define	v1done_  91
@@ -26,6 +29,7 @@ define	v2start_ 92
 define	v2done_  93
 
 begin
+	c_1 = 1
 	switch (IM_HDRVER(im)) {
 	case V1_VERSION:
 	    # Old V1 image header.
@@ -33,7 +37,8 @@ begin
 
 	    status = ERR
 	    call smark (sp)
-	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
+	    sz_val = LEN_V1IMHDR
+	    call salloc (v1, sz_val, TY_STRUCT)
 
 	    # Initialize the output image header.
 	    switch (htype) {
@@ -54,8 +59,9 @@ begin
 
 	    IM_V1PIXTYPE(v1) = IM_PIXTYPE(im)
 	    IM_V1NDIM(v1) = IM_NDIM(im)
-	    call amovl (IM_LEN(im,1), IM_V1LEN(v1,1), IM_MAXDIM)
-	    call amovl (IM_PHYSLEN(im,1), IM_V1PHYSLEN(v1,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (IM_LEN(im,1), IM_V1LEN(v1,1), sz_val)
+	    call amovl (IM_PHYSLEN(im,1), IM_V1PHYSLEN(v1,1), sz_val)
 
 	    IM_V1SSMTYPE(v1) = IM_SSMTYPE(im)
 	    IM_V1LUTOFF(v1) = IM_LUTOFF(im)
@@ -86,12 +92,16 @@ begin
 		    SZ_V1IMPIXFILE)
 
 	    # Write the file header.
-	    call seek (fd, BOFL)
-	    call write (fd, IM_V1MAGIC(v1), hdrlen * SZ_STRUCT)
+	    lval = BOFL
+	    call seek (fd, lval)
+	    sz_val = hdrlen * SZ_STRUCT
+	    call write (fd, IM_V1MAGIC(v1), sz_val)
 
 	    # Write the user area.
-	    if (htype == TY_IMHDR)
-		call write (fd, Memc[IM_USERAREA(im)], len_userarea)
+	    if (htype == TY_IMHDR) {
+		sz_val = len_userarea
+		call write (fd, Memc[IM_USERAREA(im)], sz_val)
+	    }
 
 	    status = OK
 v1done_
@@ -105,17 +115,21 @@ v1done_
 v2start_
 	    status = ERR
 	    call smark (sp)
-	    call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	    sz_val = SZ_PATHNAME
+	    call salloc (fname, sz_val, TY_CHAR)
 
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 
 	    # Initialize the output image header.
 	    switch (htype) {
 	    case TY_IMHDR:
-		call miiwritec (fd, V2_MAGIC, SZ_IMMAGIC)
+		sz_val = SZ_IMMAGIC
+		call miiwritec (fd, V2_MAGIC, sz_val)
 		hdrlen = LEN_V2IMHDR
 	    case TY_PIXHDR:
-		call miiwritec (fd, V2_PMAGIC, SZ_IMMAGIC)
+		sz_val = SZ_IMMAGIC
+		call miiwritec (fd, V2_PMAGIC, sz_val)
 		hdrlen = LEN_V2PIXHDR
 	    default:
 		goto v2done_
@@ -125,8 +139,8 @@ v2start_
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
 	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_STRUCT-1) / SZ_STRUCT
 
-	    call miiwritei (fd, hdrlen, 1)
-	    call miiwritei (fd, IM_PIXTYPE(im), 1)
+	    call miiwritei (fd, hdrlen, c_1)
+	    call miiwritei (fd, IM_PIXTYPE(im), c_1)
 
 	    # Record the byte swapping used for this image.  When writing a
 	    # new image we use the native data type of the host and don't
@@ -152,22 +166,23 @@ v2start_
 		# IM_SWAPPED should already be set in header.
 	    }
 
-	    call miiwritei (fd, IM_SWAPPED(im), 1)
-	    call miiwritei (fd, IM_NDIM(im), 1)
-	    call miiwritel (fd, IM_LEN(im,1), IM_MAXDIM)
-	    call miiwritel (fd, IM_PHYSLEN(im,1), IM_MAXDIM)
-	    call miiwritel (fd, IM_SSMTYPE(im), 1)
-	    call miiwritel (fd, IM_LUTOFF(im), 1)
-	    call miiwritel (fd, IM_PIXOFF(im), 1)
-	    call miiwritel (fd, IM_HGMOFF(im), 1)
-	    call miiwritel (fd, IM_BLIST(im), 1)
-	    call miiwritel (fd, IM_SZBLIST(im), 1)
-	    call miiwritel (fd, IM_NBPIX(im), 1)
-	    call miiwritel (fd, IM_CTIME(im), 1)
-	    call miiwritel (fd, IM_MTIME(im), 1)
-	    call miiwritel (fd, IM_LIMTIME(im), 1)
-	    call miiwriter (fd, IM_MAX(im), 1)
-	    call miiwriter (fd, IM_MIN(im), 1)
+	    call miiwritei (fd, IM_SWAPPED(im), c_1)
+	    call miiwritei (fd, IM_NDIM(im), c_1)
+	    sz_val = IM_MAXDIM
+	    call miiwritel32 (fd, IM_LEN(im,1), sz_val)
+	    call miiwritel32 (fd, IM_PHYSLEN(im,1), sz_val)
+	    call miiwritel32 (fd, IM_SSMTYPE(im), c_1)
+	    call miiwritel32 (fd, IM_LUTOFF(im), c_1)
+	    call miiwritel32 (fd, IM_PIXOFF(im), c_1)
+	    call miiwritel32 (fd, IM_HGMOFF(im), c_1)
+	    call miiwritel32 (fd, IM_BLIST(im), c_1)
+	    call miiwritel32 (fd, IM_SZBLIST(im), c_1)
+	    call miiwritel32 (fd, IM_NBPIX(im), c_1)
+	    call miiwritel32 (fd, IM_CTIME(im), c_1)
+	    call miiwritel32 (fd, IM_MTIME(im), c_1)
+	    call miiwritel32 (fd, IM_LIMTIME(im), c_1)
+	    call miiwriter (fd, IM_MAX(im), c_1)
+	    call miiwriter (fd, IM_MIN(im), c_1)
 
 	    if (strlen(IM_PIXFILE(im)) > SZ_V2IMPIXFILE)
 		goto v2done_
@@ -179,25 +194,33 @@ v2start_
 	    # file header.
 
 	    if (htype == TY_PIXHDR) {
-		call aclrc (Memc[fname], SZ_PATHNAME)
+		sz_val = SZ_PATHNAME
+		call aclrc (Memc[fname], sz_val)
 		call fpathname (IM_HDRFILE(im), Memc[fname], SZ_PATHNAME)
-		call miiwritec (fd, Memc[fname], SZ_V2IMPIXFILE)
+		sz_val = SZ_V2IMPIXFILE
+		call miiwritec (fd, Memc[fname], sz_val)
 		status = OK
 		goto v2done_
-	    } else
-		call miiwritec (fd, IM_PIXFILE(im), SZ_V2IMPIXFILE)
+	    } else {
+		sz_val = SZ_V2IMPIXFILE
+		call miiwritec (fd, IM_PIXFILE(im), sz_val)
+	    }
 
+	    sz_val = SZ_V2IMHDRFILE
 	    call oif_trim (IM_HDRFILE(im), SZ_V2IMHDRFILE)
-	    call miiwritec (fd, IM_HDRFILE(im), SZ_V2IMHDRFILE)
+	    call miiwritec (fd, IM_HDRFILE(im), sz_val)
 
+	    sz_val = SZ_V2IMTITLE
 	    call oif_trim (IM_TITLE(im), SZ_V2IMTITLE)
-	    call miiwritec (fd, IM_TITLE(im), SZ_V2IMTITLE)
+	    call miiwritec (fd, IM_TITLE(im), sz_val)
 
+	    sz_val = SZ_V2IMHIST
 	    call oif_trim (IM_HISTORY(im), SZ_V2IMHIST)
-	    call miiwritec (fd, IM_HISTORY(im), SZ_V2IMHIST)
+	    call miiwritec (fd, IM_HISTORY(im), sz_val)
 
 	    # Write the variable-length user area.
-	    call miiwritec (fd, Memc[IM_USERAREA(im)], len_userarea)
+	    sz_val = len_userarea
+	    call miiwritec (fd, Memc[IM_USERAREA(im)], sz_val)
 
 	    status = OK
 v2done_	
@@ -221,6 +244,7 @@ procedure oif_trim (s, nchars)
 char	s[ARB]
 int	nchars
 
+size_t	sz_val
 int	n, ntrim
 int	strlen()
 
@@ -228,6 +252,8 @@ begin
 	n = strlen(s) + 1
 	ntrim = nchars - n
 
-	if (ntrim > 0)
-	    call aclrc (s[n], ntrim)
+	if (ntrim > 0) {
+	    sz_val = ntrim
+	    call aclrc (s[n], sz_val)
+	}
 end

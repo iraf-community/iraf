@@ -670,8 +670,7 @@ begin
 	nwcs = nwords * SZ_SHORT / SZ_STRUCT / LEN_WCS
 	if (verbose == YES && nwcs > 1) {
 	    sz_val = (nwcs * LEN_WCS) * (SZ_POINTER / SZ_SHORT)
-	    # arg2: incompatible pointer
-	    call amovs (wcs, Memp[wcs_temp], sz_val)
+	    call amovs (wcs, Mems[P2S(wcs_temp)], sz_val)
 
 	    do i = 1, nwcs {
 		w = ((i - 1) * LEN_WCS) + wcs_temp

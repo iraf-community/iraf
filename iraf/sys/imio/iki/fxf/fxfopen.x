@@ -27,13 +27,16 @@ int	gc_arg			#I [NOT USED]
 int	acmode			#I access mode
 int	status			#O status flag to calling routine
 
+size_t	sz_val
+long	lval
 long	fi[LEN_FINFO]
 int	newimage, i, gn, ksinh, type, fmode
 pointer	sp, path, fit_extn, ua, o_fit, fit
 bool    pre_read, fks_extn_or_ver, dyh, fsec, plio
+int	initialized
 int	fxf_check_dup_extnv(), itoc(), strcmp(), strncmp()
-int     open(), access(), imgeti(), finfo(), fxf_header_size()
-long	fstatl()
+int     open(), access(), imgeti(), finfo()
+long	fstatl(), fxf_header_size()
 pointer pl_open()
 
 errchk	fmkcopy, calloc, open, fxf_rheader, fxf_prhdr, fxf_gaccess
@@ -42,10 +45,23 @@ errchk  fxf_check_group
 define	duperr_ 91
 define	err_ 92
 
+include "fxf.com"
+include <nullptr.inc>
+data initialized /0/
+
 begin
+	# Setup fit address table
+	if ( initialized == 0 ) {
+	    initialized = 1
+	    fit_ptrs0 = NULL
+	    num_fit = 0
+	}
+
 	call smark (sp)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
-	call salloc (fit_extn, FITS_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (path, sz_val, TY_CHAR)
+	sz_val = FITS_LENEXTN
+	call salloc (fit_extn, sz_val, TY_CHAR)
 	call fxf_init()
 	ua = IM_USERAREA(im)
 
@@ -57,7 +73,9 @@ begin
 	IM_KDES(im) = fit
 	IM_HFD(im) = NULL
 	FIT_IM(fit) = im
-	call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, FIT_LENAXIS(fit,1), sz_val)
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {
@@ -92,7 +110,7 @@ begin
 
 	call fxf_check_group (im, ksection, fmode, group, ksinh)
 
-	fks_extn_or_ver = FKS_EXTNAME(fit) != EOS || !IS_INDEFL(FKS_EXTVER(fit))
+	fks_extn_or_ver = FKS_EXTNAME(fit) != EOS || !IS_INDEFI(FKS_EXTVER(fit))
 
 	# Check if a file section is necessary.
 	fsec = (fks_extn_or_ver || group >= 0)
@@ -193,7 +211,7 @@ begin
 
 	    # Initialize a new copy of a PLIO image mask.
 	    if (type == FK_PLIO) 
-		IM_PL(im) = pl_open (NULL)
+		IM_PL(im) = pl_open (NULLPTR)
 
 	case NEW_COPY:
 	    # Completely new copy of an existing image. This could mean a
@@ -201,7 +219,7 @@ begin
 
 	    # Initialize a new copy of a PLIO image mask.
 	    if (type == FK_PLIO) {
-		IM_PL(im) = pl_open (NULL)
+		IM_PL(im) = pl_open (NULLPTR)
 	        if (IM_PL(o_im) != NULL)
 	            call fxf_plpf (im)
 	    }
@@ -244,7 +262,7 @@ begin
 		iferr (call imgstr (o_im,"EXTNAME",FIT_EXTNAME(fit),LEN_CARD))
 		    FIT_EXTNAME(fit) = EOS
 		iferr (FIT_EXTVER(fit) = imgeti (o_im, "EXTVER"))
-		    FIT_EXTVER(fit) = INDEFL
+		    FIT_EXTVER(fit) = INDEFI
 		call strcpy ("IMAGE", FIT_EXTTYPE(fit), SZ_EXTTYPE)
 	    }
 
@@ -270,7 +288,7 @@ begin
 		else
 		    call imastr (im, "EXTNAME", FKS_EXTNAME(fit))
     
-		if (IS_INDEFL(FKS_EXTVER(fit)))
+		if (IS_INDEFI(FKS_EXTVER(fit)))
 		    FKS_EXTVER(fit) =  FIT_EXTVER(fit) 
 		else
 		    call imaddi (im, "EXTVER", FKS_EXTVER(fit))
@@ -278,7 +296,7 @@ begin
 		# We need to pre_read extensions headers to check for
 		# duplicates with these extname and extver.
 
-		if (FKS_EXTNAME(fit) != EOS ||!IS_INDEFL(FKS_EXTVER(fit))) 
+		if (FKS_EXTNAME(fit) != EOS ||!IS_INDEFI(FKS_EXTVER(fit))) 
 		    pre_read = true
 	    }
 
@@ -293,7 +311,7 @@ begin
 
 		if (FKS_DUPNAME(fit) == NO && FKS_OVERWRITE(fit) == NO && 
 		    (fks_extn_or_ver || FIT_EXTNAME(fit) != EOS || 
-		    !IS_INDEFL(FIT_EXTVER(fit)))) {
+		    !IS_INDEFI(FIT_EXTVER(fit)))) {
 		    if (fxf_check_dup_extnv (im, group) == YES)
 		        goto duperr_
 		}
@@ -394,8 +412,11 @@ procedure fxf_alloc (fit)
 
 pointer fit	 		#I input fits descriptor
 
+size_t	sz_val
+
 begin
-	call calloc (fit, LEN_FITDES, TY_STRUCT)
+	sz_val = LEN_FITDES
+	call calloc (fit, sz_val, TY_STRUCT)
 
 	FIT_GROUP(fit) = -1
 	FIT_PIXTYPE(fit) = NULL
@@ -405,7 +426,7 @@ begin
 	FIT_INHERIT(fit) = NO
 	FIT_EOFSIZE(fit) = 0
 	FIT_EXTNAME(fit) = EOS
-	FIT_EXTVER(fit) = INDEFL
+	FIT_EXTVER(fit) = INDEFI
 end
 
 
@@ -443,18 +464,22 @@ procedure fxf_prhdr (im, group)
 pointer	im  	 		#I image descriptor
 int	group			#I maximum group number to read
 
-int	poff, extv
+size_t	sz_val
+long	poff
+int	extv
 pointer	fit, lim, lfit, sp, path
 errchk	fpathname, open, syserr, fxf_alloc, calloc
 int	open(), imgeti()
 
 begin
 	call smark (sp)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (path, sz_val, TY_CHAR)
 
 	# We will use a local temporary imio and fit structures.
 #	call calloc (lim, LEN_IMDES+LEN_IMHDR+MIN_LENUSERAREA, TY_STRUCT)
-	call calloc (lim, LEN_IMDES+IM_LENHDRMEM(im), TY_STRUCT)
+	sz_val = LEN_IMDES+IM_LENHDRMEM(im)
+	call calloc (lim, sz_val, TY_STRUCT)
 
 	call fxf_alloc (lfit)
 
@@ -467,7 +492,7 @@ begin
 	FKS_EXTVER(lfit) = FKS_EXTVER(fit)
 
 	iferr (extv = imgeti (im, "EXTVER"))
-	     extv = INDEFL
+	     extv = INDEFI
 
 	FKS_OVERWRITE(lfit) = FKS_OVERWRITE(fit)
 	FKS_DUPNAME(lfit) = FKS_DUPNAME(fit)
@@ -517,7 +542,7 @@ begin
 	    call mfree (lfit, TY_STRUCT)
 	    call mfree (lim, TY_STRUCT)
 
-  	    if (extv != INDEFL)
+  	    if (extv != INDEFI)
 	        call imaddi (im, "EXTVER", extv)
 	}
 end
@@ -532,18 +557,24 @@ procedure fxf_dummy_header (im, status)
 pointer im 			#I image descriptor
 int	status			#O status flag
 
+size_t	sz_val
+long	lval
 char    blank[1]	
 pointer sp, path, spp, mii, pn, n
-int	iso_cutover, fd, nblanks, size_rec
+int	iso_cutover, fd
+size_t	nblanks, size_rec
 
 int	strlen(), open(), envgeti()
 long	clktime()
 
 begin
 	call smark (sp)
-	call salloc (spp, FITS_BLOCK_BYTES, TY_CHAR)
-	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call salloc (spp, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_CHARS
+	call salloc (mii, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (path, sz_val, TY_CHAR)
 
 	status = OK
 
@@ -569,22 +600,25 @@ begin
 	    iso_cutover = DEF_ISOCUTOVER
 
 	# Encode the DATE keyword.
-        call fxf_encode_date (clktime(long(0)), Memc[path], LEN_CARD,
+	lval = 0
+        call fxf_encode_date (clktime(lval), Memc[path], LEN_CARD,
 	    "ISO", 2000)
 	call fxf_akwc ("DATE", Memc[path],
 	    strlen(Memc[path]), "Date FITS file was generated", pn)
 
 	blank[1] = ' '
-        call amovkc (blank[1], Memc[pn], LEN_CARD)
-	call amovc ("END", Memc[pn], 3)
+	sz_val = LEN_CARD
+        call amovkc (blank[1], Memc[pn], sz_val)
+	sz_val = 3
+	call amovc ("END", Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 
 	n = pn - spp
 	size_rec = FITS_BLOCK_CHARS
         nblanks = FITS_BLOCK_BYTES - n
 	call amovkc (blank[1], Memc[spp+n], nblanks)
-	call miipak (Memc[spp], Memi[mii], size_rec*2, TY_CHAR, MII_BYTE)
-	call write (fd, Memi[mii], size_rec)
+	call miipak (Memc[spp], Memc[mii], size_rec*2, TY_CHAR, MII_BYTE)
+	call write (fd, Memc[mii], size_rec)
 
 	call close (fd)
 
@@ -602,6 +636,7 @@ int procedure fxf_check_dup_extnv (im, group)
 pointer im			#I image descriptor
 int	group			#O extension number where there is a duplicate
 
+size_t	sz_val
 int	cindx
 pointer extn, extv, sp, hdrfile, fit, poff
 int	fxf_extnv_error()
@@ -611,7 +646,8 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 	fit = IM_KDES(im)
@@ -630,7 +666,7 @@ begin
 	        # the cache values of the NEW_COPY images.
 
 	        while (Memc[extn+LEN_CARD*group] != EOS || 
-		    !IS_INDEFL(Memi[extv+group]) || Memi[poff+group] != -1) {
+		    !IS_INDEFI(Memi[extv+group]) || Meml[poff+group] != -1) {
 		    if (fxf_extnv_error (fit, group, extn, extv) == YES) {
 		        call sfree (sp)
 		        if (FKS_OVERWRITE(fit) == YES)
@@ -655,6 +691,7 @@ procedure fxf_check_old_name (im)
 
 pointer im				#I image descriptor
 
+size_t	sz_val
 int	cindx
 pointer sp, hdrfile, fit
 bool    streq()
@@ -663,7 +700,8 @@ include "fxfcache.com"
 
 begin
         call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 
@@ -676,8 +714,8 @@ begin
 	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
                 call mfree (rf_pextv[cindx], TY_INT)
                 call mfree (rf_pextn[cindx], TY_CHAR)
-                call mfree (rf_pixp[cindx], TY_INT)
-                call mfree (rf_hdrp[cindx], TY_INT)
+                call mfree (rf_pixp[cindx], TY_LONG)
+                call mfree (rf_hdrp[cindx], TY_LONG)
                 call mfree (rf_fit[cindx], TY_STRUCT)
                 call mfree (rf_hdr[cindx], TY_CHAR)
 	        rf_fit[cindx] = NULL
@@ -698,6 +736,8 @@ procedure fxf_reblock (im)
 
 pointer	im				#I image descriptor
 
+size_t	sz_val
+long	lval
 pointer	sp, lbuf, op, ua
 int	fd, spool, nlines, nchars, sz_userarea, len_hdrmem
 errchk	stropen, open, getline, putline, realloc, seek, fcopyo
@@ -705,7 +745,8 @@ int	open(), stropen(), getline()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	ua = IM_USERAREA(im)
 	fd = stropen (Memc[ua], ARB, READ_ONLY)
@@ -736,13 +777,15 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 	# Move spooled data back to user area.
 	ua = IM_USERAREA(im)
 	fd = stropen (Memc[ua], sz_userarea, NEW_FILE)
-	call seek (spool, BOFL)
+	lval = BOFL
+	call seek (spool, lval)
 	call fcopyo (spool, fd)
 
 	IM_UABLOCKED(im) = YES
@@ -778,8 +821,8 @@ begin
 		if (rf_fit[cindx] != NULL) {
 		    call mfree (rf_pextv[cindx], TY_INT)
 		    call mfree (rf_pextn[cindx], TY_CHAR)
-		    call mfree (rf_pixp[cindx], TY_INT)
-		    call mfree (rf_hdrp[cindx], TY_INT)
+		    call mfree (rf_pixp[cindx], TY_LONG)
+		    call mfree (rf_hdrp[cindx], TY_LONG)
 		    call mfree (rf_fit[cindx], TY_STRUCT)
 		    call mfree (rf_hdr[cindx], TY_CHAR)
                     rf_fit[cindx] = NULL
@@ -798,7 +841,8 @@ pointer	im		#I image descriptor
 bool	fsec		#I true if extname,extver or group have values
 
 bool	mef
-int	acmode, fit, newimage, group
+int	acmode, newimage, group
+pointer	fit
 bool    envgetb(), fnullfile()
 errchk	syserr, syserrs, fxf_fclobber
 
@@ -865,6 +909,7 @@ int	acmode			#I fits unit extension mode
 int	group			#U extension number in the image section
 int	ksinh			#O INHERIT value from the filename ksection
 
+size_t	sz_val
 pointer sp, ks, fit
 bool    fks_extn_or_ver, inherit_override	
 int	igroup, kgroup, fgroup, tgroup, sv_inherit, newimage, append
@@ -875,7 +920,8 @@ errchk  syserrs, fxf_ks_error
 
 begin
 	call smark (sp)
-	call salloc (ks, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ks, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 	newimage = FIT_NEWIMAGE(fit)
@@ -935,7 +981,7 @@ begin
 	# EXTNAME or EXTVER has priority when defined over group.
 
 	fks_extn_or_ver =
-	    (FKS_EXTNAME(fit) != EOS || !IS_INDEFL(FKS_EXTVER(fit)))
+	    (FKS_EXTNAME(fit) != EOS || !IS_INDEFI(FKS_EXTVER(fit)))
 
 	tgroup = fgroup
 	if (fks_extn_or_ver) 

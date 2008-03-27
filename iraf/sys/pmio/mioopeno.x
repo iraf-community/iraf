@@ -11,19 +11,24 @@ pointer procedure mio_openo (pm, im)
 pointer	pm			#I mask descriptor
 pointer	im			#I image descriptor
 
+size_t	sz_val
+long	lval
 pointer	mp
 
 begin
-	call calloc (mp, LEN_MIODES, TY_STRUCT)
-	call malloc (M_RLP(mp), RL_MAXLEN(pm), TY_INT)
+	sz_val = LEN_MIODES
+	call calloc (mp, sz_val, TY_STRUCT)
+	call malloc (M_RLP(mp), RL_LENMAX(pm), TY_INT)
 	RLI_LEN(M_RLP(mp)) = 0
 
-	call amovkl (1, M_VS(mp,1), IM_MAXDIM)
-	call amovl (IM_LEN(im,1), M_VN(mp,1), IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, M_VS(mp,1), sz_val)
+	call amovl (IM_LEN(im,1), M_VN(mp,1), sz_val)
 
 	M_IM(mp) = im
 	M_PM(mp) = pm
-	call pm_seti (pm, P_REFIM, im)
+	call pm_setp (pm, P_REFIM, im)
 	call mio_setrange (mp, M_VS(mp,1), M_VN(mp,1), IM_NDIM(im))
 
 	return (mp)

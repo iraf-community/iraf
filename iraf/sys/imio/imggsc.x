@@ -24,10 +24,13 @@ bool	rlio
 pointer	sp, px, bp, line, rl_high
 long	v[IM_MAXDIM], vinc[IM_MAXDIM]
 long	pvs[IM_MAXDIM], pve[IM_MAXDIM]
-int	sz_pixel, inbounds, npix, xstep, n
+int	sz_pixel, inbounds, n
+size_t	npix
+long	xstep, lval
 
 pointer	imgibf()
-int	imsinb(), imloop(), pl_p2ri()
+int	imsinb(), imloop()
+int	pl_p2ri()
 errchk	imgibf, imrdpx, imrbpx
 include	<szdtype.inc>
 
@@ -71,15 +74,20 @@ begin
 	    # transformations are required (due to sections or OOB references).
 
 	    if (rlio) {
-		if (inbounds == YES)
-		    call imrdpx (im, Memi[px], npix, v, xstep) 
-		else
-		    call imrbpx (im, Memi[px], npix, v, xstep) 
+		if (inbounds == YES) {
+		    # arg2: incompatible pointer
+		    call imrdpx (im, Memi[px], npix, v, xstep)
+		} else {
+		    # arg2: incompatible pointer
+		    call imrbpx (im, Memi[px], npix, v, xstep)
+		}
 
-		if (rl_high >= line)
+		if (rl_high >= line) {
 		    call imerr (IM_NAME(im), SYS_IMRLOVFL)
-		else {
-		    n = pl_p2ri (Memi[px], 1, Memc[line], npix)
+		} else {
+		    lval = 1
+		    # arg3: incompatible pointer
+		    n = pl_p2ri (Memi[px], lval, Memc[line], npix)
 		    rl_high = line + (n * RL_LENELEM * sz_pixel) - 1
 		}
 

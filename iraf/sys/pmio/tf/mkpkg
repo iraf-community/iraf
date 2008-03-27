@@ -19,15 +19,15 @@ libex.a:
 	miopls.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
 	mioplx.x	../mio.h <imhdr.h> <plio.h> <pmset.h>
 	pmglpi.x	../pmio.com <plio.h> <pmset.h>
-	pmglpl.x	../pmio.com <plio.h> <pmset.h>
+#	pmglpl.x	../pmio.com <plio.h> <pmset.h>
 	pmglps.x	../pmio.com <plio.h> <pmset.h>
 	pmglri.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
-	pmglrl.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
+#	pmglrl.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
 	pmglrs.x	../pmio.com <imhdr.h> <plio.h> <pmset.h>
 	pmplpi.x	../pmio.com <plio.h> <pmset.h>
-	pmplpl.x	../pmio.com <plio.h> <pmset.h>
+#	pmplpl.x	../pmio.com <plio.h> <pmset.h>
 	pmplps.x	../pmio.com <plio.h> <pmset.h>
 	pmplri.x	../pmio.com <plio.h> <pmset.h>
-	pmplrl.x	../pmio.com <plio.h> <pmset.h>
+#	pmplrl.x	../pmio.com <plio.h> <pmset.h>
 	pmplrs.x	../pmio.com <plio.h> <pmset.h>
 	;

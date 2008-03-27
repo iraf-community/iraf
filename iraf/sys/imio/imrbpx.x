@@ -17,25 +17,30 @@ procedure imrbpx (im, obuf, totpix, v, vinc)
 
 pointer	im			# image descriptor
 char	obuf[ARB]		# typeless output buffer
-int	totpix			# total number of pixels to extract
+size_t	totpix			# total number of pixels to extract
 long	v[ARB]			# vector pointer to start of line segment
 long	vinc[ARB]		# step on each axis
 
 bool	oob
 char	pixval[8]
-int	npix, ndim, sz_pixel, btype, op, off, step, xstep, i, j, k
-long	xs[3], xe[3], x1, x2, p, v1[IM_MAXDIM], v2[IM_MAXDIM], linelen
+size_t	npix, c_1
+int	ndim, sz_pixel, btype, i, k
+long	op, off, step, xstep, j, x1, x2, p, linelen
+long	xs[3], xe[3], v1[IM_MAXDIM], v2[IM_MAXDIM]
+long	absl()
 errchk	imrdpx
 include	<szdtype.inc>
 
 begin
+	c_1 = 1
+
 	sz_pixel = ty_size[IM_PIXTYPE(im)]
 	ndim = IM_NPHYSDIM(im)
 
 	# Cache the left and right endpoints of the line segment and the
 	# image line length.
 
-	xstep = abs (IM_VSTEP(im,1))
+	xstep = absl (IM_VSTEP(im,1))
 	linelen = IM_SVLEN(im,1)
 	x1 = v[1]
 	x2 = x1 + (totpix * xstep) - 1
@@ -98,9 +103,9 @@ begin
 	    else {
 		# Use constant or value of nearest boundary pixel.
 		if (btype == BT_CONSTANT)
-		    call impakr (IM_OOBPIX(im), pixval, 1, IM_PIXTYPE(im))
+		    call impakr (IM_OOBPIX(im), pixval, c_1, IM_PIXTYPE(im))
 		else
-		    call imrdpx (im, pixval, 1, v1, step)
+		    call imrdpx (im, pixval, c_1, v1, step)
 
 		# Fill the output array.
 		off = op - 1

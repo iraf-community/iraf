@@ -12,9 +12,10 @@ include	<imio.h>
 pointer procedure impl2x (im, linenum)
 
 pointer	im			# image header pointer
-int	linenum			# line to be written
+long	linenum			# line to be written
 
-int	fd, nchars
+int	fd
+size_t	nchars
 long	vs[2], ve[2], offset
 pointer	bp, impgsx(), fwritep()
 errchk	imopsf, imerr

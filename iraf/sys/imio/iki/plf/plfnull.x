@@ -2,7 +2,10 @@
 
 # PLF_NULL -- Null driver entry point.
 
-procedure plf_null()
+procedure plf_null(im, status)
+
+pointer	im
+int	status
 
 begin
 	call error (1, "PLF image kernel abort - null driver entry point")

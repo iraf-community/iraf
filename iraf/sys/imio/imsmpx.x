@@ -6,7 +6,10 @@
 procedure imsmps (a, b, npix, step)
 
 short	a[ARB], b[npix]
-int	npix, step, ip, op
+size_t	npix
+long	step
+
+long	ip, op
 
 begin
 	ip = 1
@@ -22,7 +25,29 @@ end
 procedure imsmpl (a, b, npix, step)
 
 long	a[ARB], b[npix]
-int	npix, step, ip, op
+size_t	npix
+long	step
+
+long	ip, op
+
+begin
+	ip = 1
+	do op = 1, npix {
+	    b[op] = a[ip]
+	    ip = ip + step
+	}
+end
+
+
+# IMSMPI -- Sample an array of INT sized elements.
+
+procedure imsmpi (a, b, npix, step)
+
+int	a[ARB], b[npix]
+size_t	npix
+long	step
+
+long	ip, op
 
 begin
 	ip = 1

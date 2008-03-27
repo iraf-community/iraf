@@ -22,6 +22,7 @@ int	cl_size			#I NOT USED
 int	acmode			#I access mode
 int	status			#O return value
 
+size_t	sz_val
 pointer	sp, fname, pixfile
 int	hfd, nchars, mode, junk
 int	open(), oif_rdhdr(), access(), protect(), envgeti()
@@ -31,8 +32,9 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (pixfile, sz_val, TY_CHAR)
 
 	status = OK
 
@@ -103,7 +105,8 @@ begin
 	if (mode == NEW_FILE) {
 	    iferr (IM_HDRVER(im) = envgeti (ENV_OIFVER))
 		IM_HDRVER(im) = DEF_VERSION
-	    call aclrc (IM_HDRFILE(im), SZ_IMHDRFILE)
+	    sz_val = SZ_IMHDRFILE
+	    call aclrc (IM_HDRFILE(im), sz_val)
 	    call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
 	    iferr (call oif_updhdr (im, status))
 		;
@@ -113,7 +116,8 @@ begin
 		if (oif_rdhdr (hfd, im, nchars, TY_IMHDR) < 0)
 		    status = ERR
 		else {
-		    call aclrc (IM_HDRFILE(im), SZ_IMHDRFILE)
+		    sz_val = SZ_IMHDRFILE
+		    call aclrc (IM_HDRFILE(im), sz_val)
 		    call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
 		}
 	    } then

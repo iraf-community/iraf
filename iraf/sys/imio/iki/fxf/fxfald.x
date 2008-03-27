@@ -7,10 +7,10 @@ procedure fxf_altmd (a, b, npix, bscale, bzero)
 
 int	a[ARB]			#I input array
 double	b[ARB]			#O output array
-int	npix			#I number of pixels
+size_t	npix			#I number of pixels
 double	bscale, bzero		#I scaling parameters
 
-int	i
+long	i
 
 begin
 	### int and double are not the same size so if this operation is

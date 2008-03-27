@@ -17,8 +17,9 @@ real	ltm[ndim,ndim]		#I linear transformation matrix
 real	ltv[ndim]		#I translation vector
 int	ndim			#I dimensionality of system
 
-int	nelem
-int	mw_allocd()
+size_t	sz_val
+size_t	nelem
+long	mw_allocd()
 errchk	syserrs, mw_allocd
 
 begin
@@ -34,7 +35,8 @@ begin
 	    MI_LTM(mw) = mw_allocd (mw, nelem)
 	call achtrd (ltm, D(mw,MI_LTM(mw)), nelem)
 
+	sz_val = ndim
 	if (MI_LTV(mw) == NULL)
-	    MI_LTV(mw) = mw_allocd (mw, ndim)
-	call achtrd (ltv, D(mw,MI_LTV(mw)), ndim)
+	    MI_LTV(mw) = mw_allocd (mw, sz_val)
+	call achtrd (ltv, D(mw,MI_LTV(mw)), sz_val)
 end

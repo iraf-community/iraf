@@ -5,9 +5,9 @@ include	<imhdr.h>
 include	<imset.h>
 include	<imio.h>
 
-# IMSTATI -- Get an IMIO option of type integer.
+# IMSTAT[ILP] -- Get an IMIO option of type integer.
 
-int procedure imstati (im, option)
+long procedure imstatl (im, option)
 
 pointer	im			#I image descriptor
 int	option			#I imset option being queried
@@ -45,6 +45,33 @@ begin
 		return (YES)
 	    else
 		return (NO)
+	default:
+	    call imerr (IM_NAME(im), SYS_IMSTATUNKPAR)
+	}
+end
+
+
+int procedure imstati (im, option)
+
+pointer	im			#I image descriptor
+int	option			#I imset option being queried
+
+long	imstatl()
+
+begin
+	return (imstatl(im, option))
+end
+
+
+pointer procedure imstatp (im, option)
+
+pointer	im			#I image descriptor
+int	option			#I imset option being queried
+
+begin
+	switch (option) {
+	case IM_PLDES:
+	    return (IM_PL(im))
 	default:
 	    call imerr (IM_NAME(im), SYS_IMSTATUNKPAR)
 	}

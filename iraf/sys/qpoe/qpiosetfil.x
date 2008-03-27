@@ -16,7 +16,8 @@ procedure qpio_setfilter (io, expr)
 pointer	io			#I QPIO descriptor
 char	expr[ARB]		#I option setting expression
 
-int	sz_filter
+size_t	sz_val
+size_t	sz_filter
 pointer	sp, filter, mask
 errchk	qpio_parse, qpex_open, qpex_modfilter
 int	qpex_modfilter(), qpio_parse()
@@ -24,11 +25,12 @@ pointer	qpex_open()
 
 begin
 	call smark (sp)
-	call salloc (mask, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (mask, sz_val, TY_CHAR)
 
 	if (IO_DEBUG(io) > 0) {
 	    call eprintf ("qpio_setfilter (%xX, `%s')\n")
-		call pargi (io)
+		call pargp (io)
 		call pargstr (expr)
 	}
 

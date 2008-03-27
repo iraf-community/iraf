@@ -13,20 +13,25 @@ pointer procedure immapz (imspec, acmode, hdr_arg)
 
 char	imspec[ARB]		# image specification
 int	acmode			# image access mode
-int	hdr_arg			# length of user fields, or header pointer
+pointer	hdr_arg			# length of user fields, or header pointer
 
+size_t	sz_val
 pointer	sp, imname, root, cluster, ksection, section, im
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
+long	lval
 int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti()
+long	envgetl()
 errchk	im_make_newcopy, im_init_newimage, malloc
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_PATHNAME, TY_CHAR)
-	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
-	call salloc (ksection, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (cluster, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ksection, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	call salloc (root, sz_val, TY_CHAR)
 
 	# The user or system manager can specify the minimum user area size
 	# as an environment variable, if the IRAF default is too small.
@@ -52,12 +57,14 @@ begin
 	    len_imhdr = max (LEN_IMHDR + min_lenuserarea / SZ_STRUCT,
 		IM_HDRLEN(hdr_arg) + SZ_UAPAD / SZ_STRUCT)
 	} else {
-	    len_imhdr = LEN_IMHDR +
-		max (min_lenuserarea, int(hdr_arg)) / SZ_STRUCT
+	    val = hdr_arg
+	    len_imhdr = LEN_IMHDR + max (min_lenuserarea, val) / SZ_STRUCT
 	}
 
-	call malloc (im, LEN_IMDES + len_imhdr, TY_STRUCT)
-	call aclri (Memi[im], LEN_IMDES + min (len_imhdr, LEN_IMHDR + 1))
+	sz_val = LEN_IMDES + len_imhdr
+	call malloc (im, sz_val, TY_STRUCT)
+	sz_val = LEN_IMDES + min (len_imhdr, LEN_IMHDR + 1)
+	call aclrp (Memp[im], sz_val)
 	IM_LENHDRMEM(im) = len_imhdr
 
 	# Initialize the image descriptor structure.
@@ -77,14 +84,14 @@ begin
 	# an IMSET on the open descriptor will override either.
 
 	IM_VBUFSIZE(im) = DEF_FIOBUFSIZE
-	ifnoerr (val = envgeti (ENV_BUFSIZE))
-	    IM_VBUFSIZE(im) = val / SZB_CHAR
+	ifnoerr (lval = envgetl (ENV_BUFSIZE))
+	    IM_VBUFSIZE(im) = lval / SZB_CHAR
 	IM_VBUFFRAC(im) = DEF_FIOBUFFRAC
 	ifnoerr (val = envgeti (ENV_BUFFRAC))
 	    IM_VBUFFRAC(im) = val
 	IM_VBUFMAX(im) = DEF_MAXFIOBUFSIZE
-	ifnoerr (val = envgeti (ENV_BUFMAX))
-	    IM_VBUFMAX(im) = val
+	ifnoerr (lval = envgetl (ENV_BUFMAX))
+	    IM_VBUFMAX(im) = lval
 
 	# Set fast i/o flag to yes initially to force IMOPSF and hence IMSETBUF
 	# to be called when the first i/o operation occurs.
@@ -147,7 +154,8 @@ begin
 
 	IM_NPHYSDIM(im) = IM_NDIM(im)
 	IM_SVMTIME(im)  = IM_MTIME(im)
-	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1), sz_val)
 
 	# Process the image section if one was given, i.e., parse the section
 	# string and set up a transformation to be applied to logical input
@@ -163,7 +171,9 @@ begin
 	    IM_SECTUSED(im) = YES
 	} else {
 	    # IM_VOFF is already zero, because of the CALLOC.
-	    call amovkl (long(1), IM_VSTEP(im,1), IM_MAXDIM)
+	    lval = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (lval, IM_VSTEP(im,1), sz_val)
 	    do i = 1, IM_MAXDIM
 		IM_VMAP(im,i) = i
 	}

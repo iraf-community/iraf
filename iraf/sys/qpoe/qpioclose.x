@@ -12,7 +12,7 @@ pointer	io			#I QPIO descriptor
 begin
 	if (IO_DEBUG(io) > 1) {
 	    call eprintf ("qpio_close (%xX)\n")
-		call pargi (io)
+		call pargp (io)
 	}
 
 	call qpio_sync (io)

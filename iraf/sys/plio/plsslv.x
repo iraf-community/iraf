@@ -11,7 +11,7 @@ procedure plsslv (pl, vs, vn, v, ve)
 
 pointer	pl			#I mask descriptor
 long	vs[PL_MAXDIM]		#I vector coordinates of start of section
-long	vn[PL_MAXDIM]		#I vector size of section
+size_t	vn[PL_MAXDIM]		#I vector size of section
 long	v[PL_MAXDIM]		#O vector for i/o (vector loop index)
 long	ve[PL_MAXDIM]		#O vector coordinates of end of section
 

@@ -20,17 +20,18 @@ int procedure qpio_parse (io, expr, filter, sz_filter, mask, sz_mask)
 pointer	io			#I QPIO descriptor
 char	expr[ARB]		#I expression to be parsed
 pointer	filter			#U filter buffer
-int	sz_filter		#U allocated buffer size
+size_t	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
+size_t	sz_val
 real	rval
 pointer	qp, sp, keyword, vp, in
-int	assignop, byte_offset, sz_field
+int	assignop, byte_offset, sz_field, i_off
 int	level, zlevel, status, start, value, token, op, kw, tokno
 
 pointer	qp_opentext()
-int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctoi(), ctor()
+int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctol(), ctoi(), ctor()
 errchk	qp_opentext, malloc, realloc, qp_gettok, qp_ungettok, syserrs
 
 define	F Memc[filter+($1)-1]
@@ -40,7 +41,8 @@ define	badkey_ 93
 
 begin
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
 
 	qp = IO_QP(io)
 
@@ -154,13 +156,14 @@ begin
 
 	    kw = strdic (Memc[keyword], Memc[keyword], SZ_FNAME, KEYWORDS)
 	    vp = filter + value - 1
+	    i_off = 1
 
 	    switch (kw) {
 	    case KW_BLOCK:
 		# Set the XY blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctor (Memc, vp, rval) <= 0)
+		else if (ctor (Memc[vp], i_off, rval) <= 0)
 		    goto badval_
 		IO_XBLOCK(io) = rval
 		IO_YBLOCK(io) = rval
@@ -170,7 +173,7 @@ begin
 		# Set the X blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctor (Memc, vp, rval) <= 0)
+		else if (ctor (Memc[vp], i_off, rval) <= 0)
 		    goto badval_
 		IO_XBLOCK(io) = rval
 		op = start
@@ -179,7 +182,7 @@ begin
 		# Set the Y blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctor (Memc, vp, rval) <= 0)
+		else if (ctor (Memc[vp], i_off, rval) <= 0)
 		    goto badval_
 		IO_YBLOCK(io) = rval
 		op = start
@@ -188,10 +191,10 @@ begin
 		# Set the debug level, default 1 if no argument.
 		if (value == NULL)
 		    IO_DEBUG(io) = 1
-		else if (ctoi (Memc, vp, IO_DEBUG(io)) <= 0) {
+		else if (ctoi (Memc[vp], i_off, IO_DEBUG(io)) <= 0) {
 		    IO_DEBUG(io) = QP_DEBUG(qp)
 badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
-			call pargstr (Memc[vp])
+			call pargstr (Memc[vp + i_off - 1])
 		}
 		op = start
 
@@ -238,10 +241,12 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		}
 
 		vp = vp + 1
-		if (ctoi (Memc, vp, byte_offset) <= 0)
+		i_off = 1
+		if (ctoi (Memc[vp], i_off, byte_offset) <= 0)
 		    goto badkey_
 		else
 		    IO_EVXOFF(io) = byte_offset / (sz_field * SZB_CHAR)
+		vp = vp + i_off - 1
 
 		while (Memc[vp] == ' ' || Memc[vp] == ',')
 		    vp = vp + 1
@@ -268,7 +273,8 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		}
 
 		vp = vp + 1
-		if (ctoi (Memc, vp, byte_offset) <= 0) {
+		i_off = 1
+		if (ctoi (Memc[vp], i_off, byte_offset) <= 0) {
 badkey_			call eprintf ("QPIO: bad key value `%s'\n")
 			call pargstr (F(value))
 		    status = ERR
@@ -325,12 +331,16 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 		if (Memc[vp] == '*')
 		    vp = vp + 1
 		else {
-		    if (ctoi (Memc, vp, IO_VSDEF(io,1)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[vp], i_off, IO_VSDEF(io,1)) <= 0)
 			IO_VSDEF(io,1) = 1
+		    vp = vp + i_off - 1
 		    while (IS_WHITE(Memc[vp]) || Memc[vp] == ':')
 			vp = vp + 1
-		    if (ctoi (Memc, vp, IO_VEDEF(io,1)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[vp], i_off, IO_VEDEF(io,1)) <= 0)
 			IO_VEDEF(io,1) = IO_NCOLS(io)
+		    vp = vp + i_off - 1
 		}
 
 		while (IS_WHITE(Memc[vp]) || Memc[vp] == ',')
@@ -340,12 +350,16 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 		if (Memc[vp] == '*')
 		    vp = vp + 1
 		else {
-		    if (ctoi (Memc, vp, IO_VSDEF(io,2)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[vp], i_off, IO_VSDEF(io,2)) <= 0)
 			IO_VSDEF(io,2) = 1
+		    vp = vp + i_off - 1
 		    while (IS_WHITE(Memc[vp]) || Memc[vp] == ':')
 			vp = vp + 1
-		    if (ctoi (Memc, vp, IO_VEDEF(io,2)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[vp], i_off, IO_VEDEF(io,2)) <= 0)
 			IO_VEDEF(io,2) = IO_NLINES(io)
+		    vp = vp + i_off - 1
 		}
 
 		IO_BBUSED(io) = YES

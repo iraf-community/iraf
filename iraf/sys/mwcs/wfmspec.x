@@ -56,15 +56,15 @@ In addition the nonlinear dispersion functions use the following routines:
 
 # Driver specific fields of function call (FC) descriptor.
 define	FC_NAPS		Memi[P2I($1+FCU)]	# number of apertures
-define	FC_APS		Memi[P2I($1+FCU+1)]	# pointer to indep coords
-define	FC_DTYPE	Memi[P2I($1+FCU+2)]	# pointer to dispersion type
-define	FC_CRVAL	Memi[P2I($1+FCU+3)]	# pointer to linear origins
-define	FC_CDELT	Memi[P2I($1+FCU+4)]	# pointer to linear intervals
-define	FC_NPTS		Memi[P2I($1+FCU+5)]	# pointer to number of points
-define	FC_Z		Memi[P2I($1+FCU+6)]	# pointer to doppler corrections
-define	FC_COEFF	Memi[P2I($1+FCU+7)]	# pointer to nonlinear coeffs
-define	FC_X		Memi[P2I($1+FCU+8)]	# pointer to last phys. coord.
-define	FC_DYDX		Memi[P2I($1+FCU+9)]	# pointer to last deriv.
+define	FC_APS		Memp[$1+FCU+1]	# pointer to indep coords
+define	FC_DTYPE	Memp[$1+FCU+2]	# pointer to dispersion type
+define	FC_CRVAL	Memp[$1+FCU+3]	# pointer to linear origins
+define	FC_CDELT	Memp[$1+FCU+4]	# pointer to linear intervals
+define	FC_NPTS		Memp[$1+FCU+5]	# pointer to number of points
+define	FC_Z		Memp[$1+FCU+6]	# pointer to doppler corrections
+define	FC_COEFF	Memp[$1+FCU+7]	# pointer to nonlinear coeffs
+define	FC_X		Memp[$1+FCU+8]	# pointer to last phys. coord.
+define	FC_DYDX		Memp[$1+FCU+9]	# pointer to last deriv.
 define	FC_DIR		Memi[P2I($1+FCU+10)]	# direction of transform
 
 # Function types.
@@ -97,11 +97,13 @@ procedure wf_msp_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I type of transformation
 
+size_t	sz_val
 pointer	ct, mw
 int	sz_atval, naps, ip, i
-pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff
+pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff, dptr
 int	strlen(), ctoi(), ctod()
 double	x, dval, wf_msp_eval()
+int	modi()
 errchk	malloc, realloc
 
 begin
@@ -116,8 +118,10 @@ begin
 	# Get spectrum information.
 	call smark (sp)
 	sz_atval = DEF_SZATVAL
-	call malloc (atval, sz_atval, TY_CHAR)
-	call salloc (atkey, SZ_ATNAME, TY_CHAR)
+	sz_val = sz_atval
+	call malloc (atval, sz_val, TY_CHAR)
+	sz_val = SZ_ATNAME
+	call salloc (atkey, sz_val, TY_CHAR)
 
 	for (naps=0;  ;  naps=naps+1) {
 	    call sprintf (Memc[atkey], SZ_ATNAME, "spec%d")
@@ -127,26 +131,29 @@ begin
 
 	    while (strlen (Memc[atval]) == sz_atval) {
 		sz_atval = 2 * sz_atval
-		call realloc (atval, sz_atval, TY_CHAR)
+		sz_val = sz_atval
+		call realloc (atval, sz_val, TY_CHAR)
 		call mw_gwattrs (mw, 2, Memc[atkey], Memc[atval], sz_atval)
 	    }
 
 	    if (naps == 0) {
-		call malloc (aps, NALLOC, TY_INT) 
-		call malloc (dtype, NALLOC, TY_INT) 
-		call malloc (crval, NALLOC, TY_DOUBLE) 
-		call malloc (cdelt, NALLOC, TY_DOUBLE) 
-		call malloc (npts, NALLOC, TY_INT) 
-		call malloc (z, NALLOC, TY_DOUBLE) 
-		call malloc (coeff, NALLOC, TY_POINTER)
-	    } else if (mod (naps, NALLOC) == 0) {
-		call realloc (aps, naps+NALLOC, TY_INT) 
-		call realloc (dtype, naps+NALLOC, TY_INT) 
-		call realloc (crval, naps+NALLOC, TY_DOUBLE)
-		call realloc (cdelt, naps+NALLOC, TY_DOUBLE) 
-		call realloc (npts, naps+NALLOC, TY_INT) 
-		call realloc (z, naps+NALLOC, TY_DOUBLE) 
-		call realloc (coeff, naps+NALLOC, TY_POINTER) 
+		sz_val = NALLOC
+		call malloc (aps, sz_val, TY_INT) 
+		call malloc (dtype, sz_val, TY_INT) 
+		call malloc (crval, sz_val, TY_DOUBLE) 
+		call malloc (cdelt, sz_val, TY_DOUBLE) 
+		call malloc (npts, sz_val, TY_INT) 
+		call malloc (z, sz_val, TY_DOUBLE) 
+		call malloc (coeff, sz_val, TY_POINTER)
+	    } else if (modi (naps, NALLOC) == 0) {
+		sz_val = naps+NALLOC
+		call realloc (aps, sz_val, TY_INT) 
+		call realloc (dtype, sz_val, TY_INT) 
+		call realloc (crval, sz_val, TY_DOUBLE)
+		call realloc (cdelt, sz_val, TY_DOUBLE) 
+		call realloc (npts, sz_val, TY_INT) 
+		call realloc (z, sz_val, TY_DOUBLE) 
+		call realloc (coeff, sz_val, TY_POINTER) 
 	    }
 
 	    # Linear dispersion function.
@@ -173,20 +180,21 @@ begin
 
 	    # Set nonlinear dispersion function.
 	    if (Memi[dtype+naps] == NONLINEAR)
-		call wf_msp_coeff (Memc[atval+ip], Memi[coeff+naps],
+		call wf_msp_coeff (Memc[atval+ip], Memp[coeff+naps],
 		    double (0.5), double (Memi[npts+naps]+0.5))
 	}
 
 	if (naps <= 0)
 	    call error (2, "WFMSPEC: No aperture information")
 
-	call realloc (aps, naps, TY_INT) 
-	call realloc (dtype, naps, TY_INT) 
-	call realloc (crval, naps, TY_DOUBLE) 
-	call realloc (cdelt, naps, TY_DOUBLE) 
-	call realloc (npts, naps, TY_INT) 
-	call realloc (z, naps, TY_DOUBLE) 
-	call realloc (coeff, naps, TY_POINTER) 
+	sz_val = naps
+	call realloc (aps, sz_val, TY_INT) 
+	call realloc (dtype, sz_val, TY_INT) 
+	call realloc (crval, sz_val, TY_DOUBLE) 
+	call realloc (cdelt, sz_val, TY_DOUBLE) 
+	call realloc (npts, sz_val, TY_INT) 
+	call realloc (z, sz_val, TY_DOUBLE) 
+	call realloc (coeff, sz_val, TY_POINTER) 
 
 	FC_NAPS(fc) = naps
 	FC_APS(fc) = aps
@@ -203,17 +211,18 @@ begin
 	# when the inverse transformation is evaluated sequentially.
 
 	if (dir == INVERSE) {
-	   call malloc (crval, naps, TY_DOUBLE)
-	   call malloc (cdelt, naps, TY_DOUBLE)
+	   sz_val = naps
+	   call malloc (crval, sz_val, TY_DOUBLE)
+	   call malloc (cdelt, sz_val, TY_DOUBLE)
 	   do i = 0, naps-1 {
 		if (Memi[FC_NPTS(fc)+i] == 0)
 		    next
 		if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
-		    coeff = Memi[FC_COEFF(fc)+i]
+		    dptr = Memp[FC_COEFF(fc)+i]
 		    x = Memi[FC_NPTS(fc)+i]
 		    Memd[crval+i] = x
-		    Memd[cdelt+i] = wf_msp_eval (Memd[coeff], x) -
-			wf_msp_eval (Memd[coeff], x - 1)
+		    Memd[cdelt+i] = wf_msp_eval (Memd[dptr], x) -
+			wf_msp_eval (Memd[dptr], x - 1)
 		}
 	    }
 	    FC_X(fc) = crval
@@ -238,7 +247,7 @@ int	i
 begin
 	do i = 1, FC_NAPS(fc)
 	    if (Memi[FC_DTYPE(fc)+i-1] == NONLINEAR)
-		call mfree (Memi[FC_COEFF(fc)+i-1], TY_DOUBLE)
+		call mfree (Memp[FC_COEFF(fc)+i-1], TY_DOUBLE)
 
 	call mfree (FC_APS(fc), TY_INT)
 	call mfree (FC_DTYPE(fc), TY_INT)
@@ -272,7 +281,7 @@ begin
 	    call error (4, "WFMSPEC: No dispersion function")
 
 	if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
-	    coeff = Memi[FC_COEFF(fc)+i]
+	    coeff = Memp[FC_COEFF(fc)+i]
 	    out[2] = Memi[FC_APS(fc)+i]
 	    out[1] = wf_msp_eval (Memd[coeff], in[1])
 	} else {
@@ -319,7 +328,7 @@ begin
 
 	din = in[1] * Memd[FC_Z(fc)+i]
 	if (Memi[FC_DTYPE(fc)+i] == NONLINEAR) {
-	    coeff = Memi[FC_COEFF(fc)+i]
+	    coeff = Memp[FC_COEFF(fc)+i]
 	    out[1] = wf_msp_evali (Memd[coeff], din, Memd[FC_X(fc)+i],
 		Memd[FC_DYDX(fc)+i])
 	} else {
@@ -339,11 +348,12 @@ char	atval[ARB]		#I attribute string
 pointer	coeff			#O coefficient array
 double	xmin, xmax		#I x limits
 
+size_t	sz_val
 double	dval, temp
 int	ncoeff, type, order, ip, i
 errchk	malloc, realloc
 double	wf_msp_eval()
-int	ctod()
+int	ctod(), modi()
 
 begin
 	coeff = NULL
@@ -351,10 +361,13 @@ begin
 
 	ip = 1
 	while (ctod (atval, ip, dval) > 0) {
-	    if (coeff == NULL)
-		call malloc (coeff, NALLOC, TY_DOUBLE)
-	    else if (mod (ncoeff, NALLOC) == 0)
-		call realloc (coeff, ncoeff+NALLOC, TY_DOUBLE)
+	    if (coeff == NULL) {
+		sz_val = NALLOC
+		call malloc (coeff, sz_val, TY_DOUBLE)
+	    } else if (modi (ncoeff, NALLOC) == 0) {
+		sz_val = ncoeff+NALLOC
+		call realloc (coeff, sz_val, TY_DOUBLE)
+	    }
 	    Memd[coeff+ncoeff] = dval
 	    ncoeff = ncoeff + 1
 	}
@@ -362,7 +375,8 @@ begin
 	    return
 
 	# Convert range elements to a more efficient form.
-	call realloc (coeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call realloc (coeff, sz_val, TY_DOUBLE)
 	Memd[coeff] = ncoeff
 	i = 6
 	while (i < ncoeff) {

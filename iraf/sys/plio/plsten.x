@@ -16,9 +16,10 @@ pointer	pl_dst			#I destination mask (required)
 long	vs_dst[PL_MAXDIM]	#I start vector in destination mask
 pointer	pl_stn			#I stencil mask (required)
 long	vs_stn[PL_MAXDIM]	#I start vector in stencil mask
-long	vn[PL_MAXDIM]		#I vector giving subregion size
-long	rop			#I rasterop
+size_t	vn[PL_MAXDIM]		#I vector giving subregion size
+int	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src
 pointer	sp, ll_out, ll_src, ll_dst, ll_stn, ol_src, ol_dst, ol_stn
 long	v_src[PL_MAXDIM], v_dst[PL_MAXDIM], v_stn[PL_MAXDIM]
@@ -76,11 +77,16 @@ begin
 	    # If the end of the input mask or stencil is reached,
 	    # rewind it and go again.
 
-	    if (plloop (v_stn,vs_stn,ve_stn,PL_NAXES(pl_stn)) == LOOP_DONE)
-		call amovi (vs_stn, v_stn, PL_NAXES(pl_stn))
-	    if (need_src)
-		if (plloop (v_src,vs_src,ve_src,PL_NAXES(pl_src)) == LOOP_DONE)
-		    call amovi (vs_src, v_src, PL_NAXES(pl_src))
+	    if (plloop (v_stn,vs_stn,ve_stn,PL_NAXES(pl_stn)) == LOOP_DONE) {
+		sz_val = PL_NAXES(pl_stn)
+		call amovl (vs_stn, v_stn, sz_val)
+	    }
+	    if (need_src) {
+		if (plloop (v_src,vs_src,ve_src,PL_NAXES(pl_src)) == LOOP_DONE) {
+		    sz_val = PL_NAXES(pl_src)
+		    call amovl (vs_src, v_src, sz_val)
+		}
+	    }
 
 	} until (plloop (v_dst, vs_dst, ve_dst, PL_NAXES(pl_dst)) == LOOP_DONE)
 

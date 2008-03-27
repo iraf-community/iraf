@@ -14,6 +14,7 @@ procedure qpf_copyparams (im, qp)
 pointer	im			#I image descriptor
 pointer	qp			#I QPOE descriptor
 
+size_t	sz_val
 int	nelem, dtype, maxelem, flags
 pointer	sp, param, text, comment, datatype, fl, qpf, mw, io
 
@@ -24,22 +25,27 @@ errchk	qp_ofnlu, qp_gnfn, qp_queryf, imaddi, qp_geti, mw_saveim
 bool	qp_getb()
 short	qp_gets()
 int	qp_geti(), qp_gstr()
+long	qp_getl()
 real	qp_getr()
 double	qp_getd()
 
 begin
 	call smark (sp)
-	call salloc (text, SZ_LINE, TY_CHAR)
-	call salloc (param, SZ_FNAME, TY_CHAR)
-	call salloc (comment, SZ_COMMENT, TY_CHAR)
-	call salloc (datatype, SZ_DATATYPE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (text, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
+	sz_val = SZ_COMMENT
+	call salloc (comment, sz_val, TY_CHAR)
+	sz_val = SZ_DATATYPE
+	call salloc (datatype, sz_val, TY_CHAR)
 
 	qpf = IM_KDES(im)
 
 	# Copy QPOE special keywords.
 	call imaddi (im, "NAXES",  qp_geti(qp,"naxes"))
-	call imaddi (im, "AXLEN1", qp_geti(qp,"axlen[1]"))
-	call imaddi (im, "AXLEN2", qp_geti(qp,"axlen[2]"))
+	call imaddl (im, "AXLEN1", qp_getl(qp,"axlen[1]"))
+	call imaddl (im, "AXLEN2", qp_getl(qp,"axlen[2]"))
 	call imaddr (im, "XBLOCK", QPF_XBLOCK(qpf))
 	call imaddr (im, "YBLOCK", QPF_YBLOCK(qpf))
 
@@ -97,8 +103,10 @@ begin
 			call imastr (im, Memc[param], Memc[text])
 		case TY_SHORT:
 		    call imadds (im, Memc[param], qp_gets(qp,Memc[param]))
-		case TY_INT, TY_LONG:
+		case TY_INT:
 		    call imaddi (im, Memc[param], qp_geti(qp,Memc[param]))
+		case TY_LONG:
+		    call imaddl (im, Memc[param], qp_getl(qp,Memc[param]))
 		case TY_REAL:
 		    call imaddr (im, Memc[param], qp_getr(qp,Memc[param]))
 		case TY_DOUBLE:

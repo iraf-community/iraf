@@ -16,14 +16,16 @@ pointer procedure qpex_open (qp, expr)
 pointer	qp			#I QPOE descriptor
 char	expr[ARB]		#I selection expression (filter) 
 
+size_t	sz_val
 pointer	ex, pb, db
-int	pb_len, db_len
+size_t	pb_len, db_len
 int	qpex_modfilter()
 errchk	calloc
 
 begin
 	# Allocate the main QPEX descriptor.
-	call calloc (ex, LEN_EXDES, TY_STRUCT)
+	sz_val = LEN_EXDES
+	call calloc (ex, sz_val, TY_STRUCT)
 
 	# Allocate the program buffer.
 	pb_len = QP_EXPBLEN(qp)

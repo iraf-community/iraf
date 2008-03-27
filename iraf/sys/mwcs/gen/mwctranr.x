@@ -12,6 +12,7 @@ real	p1[ndim]		#I coordinates of point in input system
 real	p2[ndim]		#O coordinates of point in output system
 int	ndim			#I dimensionality of point
 
+size_t	sz_val
 int	naxes, i, j
 pointer	ct, fc, ltm, ltv, d_ct
 double	v1[MAX_DIM], v2[MAX_DIM], iv[MAX_DIM], ov[MAX_DIM]
@@ -48,7 +49,8 @@ begin
 	# Make zero or more WCS function calls for the different axes of the
 	# input system (inverse transform).
 
-	call achtrd (p1, iv, ndim)
+	sz_val = ndim
+	call achtrd (p1, iv, sz_val)
 	do j = 1, CT_NCALLI(ct) {
 	    # Get pointer to function call descriptor.
 	    fc = CT_FCI(ct,j)
@@ -77,7 +79,8 @@ begin
 	# Make zero or more WCS function calls for the different axes of the
 	# output system (forward transform to final world system).
 
-	call achtdr (ov, p2, ndim)
+	sz_val = ndim
+	call achtdr (ov, p2, sz_val)
 	do j = 1, CT_NCALLO(ct) {
 	    # Get pointer to function call descriptor.
 	    fc = CT_FCO(ct,j)

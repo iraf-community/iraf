@@ -9,12 +9,15 @@ include	<plio.h>
 int procedure pl_r2ls (rl_src, xs, ll_dst, npix)
 
 short	rl_src[3,ARB]		#I input range list
-int	xs			#I starting pixel index in range list
+long	xs			#I starting pixel index in range list
 short	ll_dst[ARB]		#O destination line list
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
 short	hi, pv
-int	last, xe, x1, x2, iz, op, np, nz, nr, dv, v, i
+int	op, nr, i, ival
+long	last, xe, x1, x2, iz, np, nz, dv, v
+int	modi()
+long	absl()
 define	done_ 91
 
 begin
@@ -80,8 +83,9 @@ begin
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (abs(dv) > I_DATAMAX) {
-			ll_dst[op] = M_SH + and (int(pv), I_DATAMAX)
+		    if (absl(dv) > I_DATAMAX) {
+			ival = pv
+			ll_dst[op] = M_SH + and (ival, I_DATAMAX)
 			op = op + 1
 			ll_dst[op] = pv / I_SHIFT
 			op = op + 1

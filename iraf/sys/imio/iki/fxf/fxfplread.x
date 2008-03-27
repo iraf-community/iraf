@@ -20,11 +20,15 @@ procedure fxf_plread (im)
 
 pointer	im			#I image descriptor
 
+size_t	sz_val
 char	kwname[SZ_KEYWORD]
+long	axlen[IM_MAXDIM], v[PL_MAXDIM]
 pointer sp, fk, pl, lp, ip, ix
-long	data_offset, data_len, heap_offset, llen, loff
-int	naxes, axlen[IM_MAXDIM], depth, maxlen
-int	fd, i, j, nelem, nlines, v[PL_MAXDIM], maxoff, nbytes
+long	data_offset, data_len, heap_offset, loff
+long	nelem, lval, i, j
+int	naxes, depth, maxlen
+int	fd, maxoff, nbytes, k
+size_t	nlines, llen
 
 long	note()
 bool	streq()
@@ -47,19 +51,22 @@ begin
 	    maxlen = DEF_PLMAXLEN
 
 	# Scratch buffer for encoded line lists.
-	call salloc (lp, maxlen, TY_SHORT)
+	sz_val = maxlen
+	call salloc (lp, sz_val, TY_SHORT)
 
 	# Get the dimensionality and size of the stored mask.
-	call amovki (1, axlen, IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, axlen, sz_val)
 	naxes = imgeti (im, "ZNAXIS")
 	call fxf_filter_keyw (im, "ZNAXIS")
-	do i = 1, naxes {
+	do k = 1, naxes {
 	    call sprintf (kwname, LEN_CARD, "ZNAXIS%d")
-		call pargi(i)
-	    axlen[i] = imgeti (im, kwname)
+		call pargi(k)
+	    axlen[k] = imgeti (im, kwname)
 	    call fxf_filter_keyw (im, kwname)
 	    call sprintf (kwname, LEN_CARD, "ZTILE%d")
-		call pargi(i)
+		call pargi(k)
 	    call fxf_filter_keyw (im, kwname)
 	}
 
@@ -152,8 +159,9 @@ begin
 	}
 
 	# Set up IMIO descriptor.
-	call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
-	call amovl (axlen, IM_PHYSLEN(im,1), IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (axlen, IM_LEN(im,1), sz_val)
+	call amovl (axlen, IM_PHYSLEN(im,1), sz_val)
         IM_NDIM(im) = naxes
 	IM_PIXTYPE(im) = TY_INT
 	IM_PL(im) = pl

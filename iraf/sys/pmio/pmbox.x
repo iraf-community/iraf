@@ -10,8 +10,8 @@ include	<plio.h>
 procedure pm_box (pl, x1,y1, x2,y2, rop)
 
 pointer	pl			#I mask descriptor
-int	x1,y1			#I lower left corner of box
-int	x2,y2			#I upper right corner of box
+long	x1,y1			#I lower left corner of box
+long	x2,y2			#I upper right corner of box
 int	rop			#I rasterop
 
 errchk	pl_getplane

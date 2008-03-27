@@ -34,11 +34,11 @@ define	LEN_IODES	82
 define	IO_QP		Memp[$1]	# backpointer to QPOE descriptor
 define	IO_MODE		Memi[P2I($1+1)]	# read_only or new_file
 define	IO_DEBUG	Memi[P2I($1+2)]	# debug level
-define	IO_NLINES	Memi[P2I($1+3)]	# number of image lines (physical)
-define	IO_NCOLS	Memi[P2I($1+4)]	# number of image columns (physical)
+define	IO_NLINES	Meml[P2L($1+3)]	# number of image lines (physical)
+define	IO_NCOLS	Meml[P2L($1+4)]	# number of image columns (physical)
 define	IO_XBLOCK	Memr[P2R($1+5)]	# blocking factor for qpio_readpix
 define	IO_YBLOCK	Memr[P2R($1+6)]	# blocking factor for qpio_readpix
-define	IO_OPTBUFSIZE	Memi[P2I($1+7)]	# optbufsize for FIO (qpio_readpix)
+define	IO_OPTBUFSIZE	Memz[P2Z($1+7)]	# optbufsize for FIO (qpio_readpix)
 define	IO_NOINDEX	Memi[P2I($1+8)]	# don't use indexed extraction
 define	IO_NODEFFILT	Memi[P2I($1+9)]	# disable use of default filter
 define	IO_NODEFMASK	Memi[P2I($1+10)]	# disable use of default mask
@@ -66,21 +66,21 @@ define	IO_MAXEVL	Memp[$1+29]	# pointer to max event for full list
 define	IO_SZBBUCKET	Memi[P2I($1+30)]	# event file bucket size, bytes
 define	IO_BUCKETLEN	Memi[P2I($1+31)]	# nevents per bucket (excl. min/max)
 define	IO_NEVENTS	Memi[P2I($1+32)]	# total data events in event list
-define	IO_FBOFF	Memi[P2I($1+33)]	# lfile offset of first bucket
+define	IO_FBOFF	Meml[P2L($1+33)]	# lfile offset of first bucket
 define	IO_EVMINOFF	Memi[P2I($1+34)]	# offset to the MIN event in a bucket
 define	IO_EVMAXOFF	Memi[P2I($1+35)]	# offset to the MAX event in a bucket
 # index
-define	IO_INDEXLEN	Memi[P2I($1+38)]	# length of index (same as nlines)
+define	IO_INDEXLEN	Memz[P2Z($1+38)]	# length of index (same as nlines)
 define	IO_IXXOFF	Memi[P2I($1+39)]	# offset of X field used in index
 define	IO_IXXTYPE	Memi[P2I($1+40)]	# datatype of X field used in index
 define	IO_IXYOFF	Memi[P2I($1+41)]	# offset of Y field used in index
 define	IO_IXYTYPE	Memi[P2I($1+42)]	# datatype of Y field used in index
 define	IO_YOFFVP	Memp[$1+43]	# pointer to Y-index array (len=nlines)
 define	IO_YLENVP	Memp[$1+44]	# pointer to Y-line length array
-define	IO_YOFFVOFF	Memi[P2I($1+45)]	# lfile offset of stored YOFFV
-define	IO_YOFFVLEN	Memi[P2I($1+46)]	# length, words, of compressed YOFFV
-define	IO_YLENVOFF	Memi[P2I($1+47)]	# lfile offset of stored YLENV
-define	IO_YLENVLEN	Memi[P2I($1+48)]	# length, words, of compressed YLENV
+define	IO_YOFFVOFF	Meml[P2L($1+45)]	# lfile offset of stored YOFFV
+define	IO_YOFFVLEN	Memz[P2Z($1+46)]	# length, words, of compressed YOFFV
+define	IO_YLENVOFF	Meml[P2L($1+47)]	# lfile offset of stored YLENV
+define	IO_YLENVLEN	Memz[P2Z($1+48)]	# length, words, of compressed YLENV
 # i/o
 define	IO_ACTIVE	Memi[P2I($1+50)]	# set once i/o begins
 define	IO_IOTYPE	Memi[P2I($1+51)]	# type of i/o selected for BB
@@ -98,12 +98,12 @@ define	IO_BKNO		Memi[P2I($1+62)]	# bucket number
 define	IO_BKFIRSTEV	Memi[P2I($1+63)]	# event index of first event in bucket
 define	IO_BKLASTEV	Memi[P2I($1+64)]	# event index of last event in bucket
 # (avail)
-define	IO_V		Meml[P2L($1+70+$2-1)]# current vector
-define	IO_VS		Meml[P2L($1+72+$2-1)]# start vector
-define	IO_VE		Meml[P2L($1+74+$2-1)]# end vector
-define	IO_VN		Meml[P2L($1+76+$2-1)]# size of section
-define	IO_VSDEF	Meml[P2L($1+78+$2-1)]# default start vector
-define	IO_VEDEF	Meml[P2L($1+80+$2-1)]# default end vector
+define	IO_V		Meml[P2L($1+70)+$2-1]# current vector
+define	IO_VS		Meml[P2L($1+72)+$2-1]# start vector
+define	IO_VE		Meml[P2L($1+74)+$2-1]# end vector
+define	IO_VN		Meml[P2L($1+76)+$2-1]# size of section
+define	IO_VSDEF	Meml[P2L($1+78)+$2-1]# default start vector
+define	IO_VEDEF	Meml[P2L($1+80)+$2-1]# default end vector
 
 # Handy macros.
 define	IO_MINEVB	(IO_BP($1)+IO_EVMINOFF($1))
@@ -124,16 +124,16 @@ define	EH_NEVENTS	Memi[P2I($1)]	# total data events in event list
 define	EH_EVENTLEN	Memi[P2I($1+1)]	# event length, shorts
 define	EH_SZBBUCKET	Memi[P2I($1+2)]	# event file bucket size, bytes
 define	EH_BUCKETLEN	Memi[P2I($1+3)]	# nevents per bucket (excl. min/max)
-define	EH_FBOFF	Memi[P2I($1+4)]	# lfile offset of first bucket
+define	EH_FBOFF	Meml[P2L($1+4)]	# lfile offset of first bucket
 define	EH_EVMINOFF	Memi[P2I($1+5)]	# offset to the MIN event in a bucket
 define	EH_EVMAXOFF	Memi[P2I($1+6)]	# offset to the MAX event in a bucket
 define	EH_MINEVLOFF	Memi[P2I($1+7)]	# offset of stored MINEVL
 define	EH_MAXEVLOFF	Memi[P2I($1+8)]	# offset of stored MAXEVL
-define	EH_INDEXLEN	Memi[P2I($1+9)]	# length of index (same as nlines)
-define	EH_YOFFVOFF	Memi[P2I($1+10)]	# lfile offset of stored YOFFV
-define	EH_YOFFVLEN	Memi[P2I($1+11)]	# length, words, of compressed YOFFV
-define	EH_YLENVOFF	Memi[P2I($1+12)]	# lfile offset of stored YLENV
-define	EH_YLENVLEN	Memi[P2I($1+13)]	# length, words, of compressed YLENV
+define	EH_INDEXLEN	Memz[P2Z($1+9)]	# length of index (same as nlines)
+define	EH_YOFFVOFF	Meml[P2L($1+10)]	# lfile offset of stored YOFFV
+define	EH_YOFFVLEN	Memz[P2Z($1+11)]	# length, words, of compressed YOFFV
+define	EH_YLENVOFF	Meml[P2L($1+12)]	# lfile offset of stored YLENV
+define	EH_YLENVLEN	Memz[P2Z($1+13)]	# length, words, of compressed YLENV
 define	EH_IXXOFF	Memi[P2I($1+14)]	# event offset of indexed X field
 define	EH_IXYOFF	Memi[P2I($1+15)]	# event offset of indexed Y field
 define	EH_IXXTYPE	Memi[P2I($1+16)]	# datatype of indexed X field

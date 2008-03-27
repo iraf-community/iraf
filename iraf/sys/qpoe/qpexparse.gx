@@ -100,17 +100,18 @@ define	SV	Memi[sv+($1)-1] 	# reference breakpoint step values
 # QPEX_PARSE -- Convert the given attribute value list into a binary
 # range list, returning the number of ranges as the function value.
 
-int procedure qpex_parse$t (expr, xs, xe, xlen)
+size_t procedure qpex_parse$t (expr, xs, xe, xlen)
 
 char	expr[ARB]		#I attribute value list to be parsed
 pointer xs			#U pointer to array of start-range values
 pointer xe			#U pointer to array of	 end-range values
-int	xlen			#U allocated length of XS, XE arrays
+size_t	xlen			#U allocated length of XS, XE arrays
 
 bool	range
 pointer xv, uv, sv
 PIXEL	xstart, xend, xmin, temp, x, n_xs, n_xe
-int	vlen, nrg, ip, op, ch, ip_start, i, j, jval, r1, r2, y, v, ov, dy
+size_t	vlen, op
+int	nrg, ip, ch, ip_start, i, j, jval, r1, r2, y, v, ov, dy
 int	token[MAX_NEST], tokval[MAX_NEST], lev, itemp, umin
 errchk	syserr, malloc, realloc
 define	pop_ 91

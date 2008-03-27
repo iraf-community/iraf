@@ -14,15 +14,19 @@ procedure pl_load (pl, bp)
 pointer	pl			#I mask descriptor
 pointer	bp			#I buffer pointer (to short)
 
+size_t	sz_val
+long	lval
 pointer	sp, index, ex, ip
-int	o_lllen, o_nlp, sz_index, flags, nlp, i
+int	o_lllen, flags, i
+size_t	sz_index, nlp, o_nlp
 errchk	malloc, realloc, syserr
-int	pl_l2pi()
+long	pl_l2pi()
 pointer	coerce()
 
 begin
 	call smark (sp)
-	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
+	sz_val = LEN_PLEXTERN
+	call salloc (ex, sz_val, TY_STRUCT)
 
 	o_lllen = PL_LLLEN(pl)
 	o_nlp = PL_NLP(pl)
@@ -30,12 +34,14 @@ begin
 	# Decode the external format header structure, a fixed size structure
 	# stored in 32 bit MII integer format.
 
-	call miiupk32 (Memi[coerce(bp,TY_SHORT,TY_INT)], Memi[ex],
-	    LEN_PLEXTERN, TY_STRUCT)
+	sz_val = LEN_PLEXTERN
+	call miiupk32 (Memi[coerce(bp,TY_SHORT,TY_INT)], Memp[ex], sz_val,
+		       TY_STRUCT)
 	if (PLE_MAGIC(ex) != PL_MAGICVAL)
 	    call syserr (SYS_PLBADSAVEF)
 
-	call amovi (PLE_AXLEN(ex,1), PL_AXLEN(pl,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PLE_AXLEN(ex,1), PL_AXLEN(pl,1), sz_val)
 	PL_MAGIC(pl)    = PLE_MAGIC(ex)
 	PL_NAXES(pl)	= PLE_NAXES(ex)
 	PL_LLOP(pl)	= PLE_LLOP(ex)
@@ -52,31 +58,39 @@ begin
 	nlp = 1
 	do i = 2, PL_NAXES(pl)
 	    nlp = nlp * PL_AXLEN(pl,i)
-	if (PL_LPP(pl) == NULL)
+	if (PL_LPP(pl) == NULL) {
 	    call malloc (PL_LPP(pl), nlp, TY_INT)
-	else if (nlp != o_nlp)
+	} else if (nlp != o_nlp) {
 	    call realloc (PL_LPP(pl), nlp, TY_INT)
+	}
 
 	call salloc (index, sz_index, TY_SHORT)
 	ip = bp + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
 	call miiupk16 (Mems[ip], Mems[index], sz_index, TY_SHORT)
-	PL_NLP(pl) = pl_l2pi (Mems[index], 1, PL_LP(pl,1), nlp)
+	lval = 1
+	PL_NLP(pl) = pl_l2pi (Mems[index], lval, PL_LP(pl,1), nlp)
 
 	# Allocate or resize the line list buffer.
-	if (PL_LLBP(pl) == NULL)
-	    call malloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
-	else if (PL_LLLEN(pl) != o_lllen)
-	    call realloc (PL_LLBP(pl), PL_LLLEN(pl), TY_SHORT)
+	if (PL_LLBP(pl) == NULL) {
+	    sz_val = PL_LLLEN(pl)
+	    call malloc (PL_LLBP(pl), sz_val, TY_SHORT)
+	} else if (PL_LLLEN(pl) != o_lllen) {
+	    sz_val = PL_LLLEN(pl)
+	    call realloc (PL_LLBP(pl), sz_val, TY_SHORT)
+	}
 
 	# Read the stored line list.
 	ip = ip + sz_index
-	call miiupk16 (Mems[ip], LL(pl,0), PL_LLLEN(pl), TY_SHORT)
+	sz_val = PL_LLLEN(pl)
+	call miiupk16 (Mems[ip], LL(pl,0), sz_val, TY_SHORT)
 
 	# Update the remaining fields of the mask descriptor.
 	PL_LLFREE(pl) = 0
 	PL_LLNUPDATES(pl) = 0
 	PL_LLINC(pl) = PL_STARTINC
-	call amovki (1, PL_PLANE(pl,1), PL_MAXDIM)
+	lval = 1
+	sz_val = PL_MAXDIM
+	call amovkl (lval, PL_PLANE(pl,1), sz_val)
 
 	call sfree (sp)
 end

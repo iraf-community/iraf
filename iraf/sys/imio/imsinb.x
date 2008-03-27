@@ -14,7 +14,7 @@ long	vs[ARB], ve[ARB]	# logical section
 int	ndim			# dimensionality of section
 
 int	i
-int	lo, hi, bwidth
+long	lo, hi, bwidth
 define	oob_ 91
 
 begin

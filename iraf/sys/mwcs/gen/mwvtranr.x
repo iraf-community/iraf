@@ -9,9 +9,9 @@ pointer	ct			#I pointer to CTRAN descriptor
 real	v1[ndim,npts]		#I points to be transformed
 real	v2[ndim,npts]		#O vector to get the transformed points
 int	ndim			#I dimensionality of each point
-int	npts			#I number of points
+size_t	npts			#I number of points
 
-int	i
+long	i
 errchk	mw_ctranr
 
 begin

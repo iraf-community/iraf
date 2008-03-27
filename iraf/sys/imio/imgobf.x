@@ -7,10 +7,18 @@ include	<imio.h>
 
 pointer procedure imgobf (im, vs, ve, ndim, dtype)
 
-pointer	im, bdes
-int	ndim, dtype, i
-long	vs[ndim], ve[ndim]
-long	nchars, totpix, imcssz(), clktime()
+pointer	im
+long	vs[ndim]
+long	ve[ndim]
+int	ndim
+int	dtype
+
+size_t	sz_val
+pointer	bdes
+int	i
+size_t	nchars
+long	totpix, lval
+long	imcssz(), clktime()
 errchk	imopsf, malloc, realloc, calloc
 include	<szdtype.inc>
 
@@ -21,8 +29,10 @@ begin
 
 	if (IM_OBDES(im) == NULL) {
 	    call imopsf (im)
-	    call calloc (IM_OBDES(im), LEN_BDES, TY_STRUCT)
-	    IM_MTIME(im) = clktime (long(0))
+	    sz_val = LEN_BDES
+	    call calloc (IM_OBDES(im), sz_val, TY_STRUCT)
+	    lval = 0
+	    IM_MTIME(im) = clktime (lval)
 	    IM_SVMTIME(im) = IM_MTIME(im)
 	}
 

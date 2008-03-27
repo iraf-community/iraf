@@ -11,9 +11,10 @@ pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I vector coords of line segment
 short	ll_src[ARB]		#I input line list
 int	ll_depth		#I line list depth, bits
-int	npix			#I number of pixels to be set
+size_t	npix			#I number of pixels to be set
 int	rop			#I rasterop
 
+long	lval
 pointer	sp, ll_out, ll_dst
 pointer	pl_access()
 errchk	pl_access
@@ -26,7 +27,8 @@ begin
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 
 	    ll_dst = pl_access (pl,v)
-	    call pl_linerop (ll_src, 1, PL_MAXVAL(pl), Mems[ll_dst], v[1],
+	    lval = 1
+	    call pl_linerop (ll_src, lval, PL_MAXVAL(pl), Mems[ll_dst], v[1],
 		MV(ll_depth), Mems[ll_out], npix, rop)
 	    call pl_update (pl, v, Mems[ll_out])
 

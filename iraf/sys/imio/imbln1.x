@@ -10,12 +10,14 @@ include	<imio.h>
 procedure imbln1 (imdes, nx)
 
 pointer	imdes
-int	nx
+long	nx
+
 pointer	bdes
+long	absl()
 
 begin
 	# Get pointer to most recently used buffer descriptor.
 	bdes = IM_LASTBDES(imdes)
 
-	nx = abs (BD_VE(bdes,1) - BD_VS(bdes,1)) + 1
+	nx = absl (BD_VE(bdes,1) - BD_VS(bdes,1)) + 1
 end

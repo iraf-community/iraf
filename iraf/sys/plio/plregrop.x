@@ -26,13 +26,16 @@ procedure pl_regionrop (pl, ufcn, ufd, y1, y2, rop)
 pointer	pl			#I mask descriptor
 extern	ufcn()			#I user supplied region tracing procedure
 pointer	ufd			#I user region descriptor
-int	y1			#I first mask line to be modified
-int	y2			#I last mask line to be modified
+long	y1			#I first mask line to be modified
+long	y2			#I last mask line to be modified
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
 bool	rl_new
 long	v[PL_MAXDIM]
-int	ll_len, xs, npix
+int	ll_len
+long	xs, lval
+size_t	npix
 pointer	sp, ll_out, ll_reg, ll_dst, ol_dst, rl_out
 pointer	pl_access()
 int	pl_r2li()
@@ -47,20 +50,24 @@ begin
 	call salloc (ll_reg, LL_MAXLEN(pl), TY_SHORT)
 	call salloc (rl_out, RL_MAXLEN(pl), TY_INT)
 
-	call amovl (PL_PLANE(pl,1), v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (PL_PLANE(pl,1), v, sz_val)
 	ol_dst = 1
 
 	for (v[2]=y1;  v[2] <= y2;  v[2]=v[2]+1) {
 	    ll_dst = pl_access (pl, v)
 	    rl_new = ufcn (ufd, v[2], Memi[rl_out], xs, npix)
-	    if (rl_new)
-		ll_len = pl_r2li (Memi[rl_out], 1, Mems[ll_reg], npix)
+	    if (rl_new) {
+		lval = 1
+		ll_len = pl_r2li (Memi[rl_out], lval, Mems[ll_reg], npix)
+	    }
 
 	    if (ll_dst != ol_dst || rl_new) {
-	    call pl_linestencil (Mems[ll_reg],  1, 1,
-				 Mems[ll_dst], xs, PL_MAXVAL(pl),
-				 Mems[ll_reg],  1,
-				 Mems[ll_out], npix, rop)
+		lval = 1
+		call pl_linestencil (Mems[ll_reg], lval, 1,
+				     Mems[ll_dst], xs, PL_MAXVAL(pl),
+				     Mems[ll_reg], lval,
+				     Mems[ll_out], npix, rop)
 		ol_dst = ll_dst
 	    }
 

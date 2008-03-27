@@ -28,10 +28,10 @@ define	INC_SZSBUF	1024		# increment to above
 
 # List descriptor.
 define	LEN_FL		3
-define	FL_LEN		Memi[P2I($1)]	# number of names in list
+define	FL_LEN		Memz[P2Z($1)]	# number of names in list
 define	FL_POS		Memi[P2I($1+1)]	# current position
-define	FL_SBUF		Memi[P2I($1+2)]	# pointer to string buffer
-define	FL_OFFV		Memi[P2I($1+3)]	# pointer to offset vector
+define	FL_SBUF		Memp[$1+2]	# pointer to string buffer
+define	FL_OFFV		Memp[$1+3]	# pointer to offset vector
 
 
 # QP_OFNLS -- Open a sorted field name list.
@@ -70,23 +70,29 @@ pointer	qp			#I QPOE descriptor
 char	template[ARB]		#I field name template
 bool	sort			#I sort list of matched names?
 
-pointer	sp, patbuf, pattern, sym, fl, st, offv, sbuf, ip, op
-int	len_offv, sz_sbuf, nsyms, nc, junk, nchars, i, nmatch
+size_t	sz_val
+pointer	sp, patbuf, pattern, sym, fl, st, offv, sbuf, ip, op, tmpp
+int	nc, junk, nchars, i, nmatch
+size_t	len_offv, sz_sbuf, nsyms
 
 pointer	sthead(), stnext(), stname()
 int	patmake(), patmatch(), strlen()
-define	swap {junk=$1;$1=$2;$2=junk}
+define	swapp {tmpp=$1;$1=$2;$2=tmpp}
 errchk	calloc, malloc, realloc
 
 begin
 	call smark (sp)
-	call salloc (pattern, SZ_LINE, TY_CHAR)
-	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (patbuf, sz_val, TY_CHAR)
 
 	# Allocate the list descriptor.
-	call calloc (fl, LEN_FL, TY_STRUCT)
-	call malloc (offv, DEF_LENOFFV, TY_INT)
-	call malloc (sbuf, DEF_SZSBUF, TY_CHAR)
+	sz_val = LEN_FL
+	call calloc (fl, sz_val, TY_STRUCT)
+	sz_val = DEF_LENOFFV
+	call malloc (offv, sz_val, TY_POINTER)
+	sz_val = DEF_SZSBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	len_offv = DEF_LENOFFV
 	sz_sbuf = DEF_SZSBUF
@@ -136,7 +142,7 @@ begin
 		# Make room in offset vector?
 		if (nsyms > len_offv) {
 		    len_offv = len_offv + INC_LENOFFV
-		    call realloc (offv, len_offv, TY_INT)
+		    call realloc (offv, len_offv, TY_POINTER)
 		}
 
 		# Make room in string buffer?
@@ -146,7 +152,7 @@ begin
 		}
 
 		# Add the symbol.
-		Memi[offv+nsyms-1] = nc + 1
+		Memp[offv+nsyms-1] = nc + 1
 		call strcpy (Memc[ip], Memc[sbuf+nc], nchars)
 		nc = nc + nchars + 1
 	    }
@@ -156,10 +162,11 @@ begin
 	# to get a time-ordered (FIFO) list.
 
 	if (sort)
-	    call strsrt (Memi[offv], Memc[sbuf], nsyms)
+	    call strsrt (Memp[offv], Memc[sbuf], nsyms)
 	else {
-	    do i = 1, nsyms / 2
-		swap (Memi[offv+i-1], Memi[offv+nsyms-i])
+	    do i = 1, nsyms / 2 {
+		swapp (Memp[offv+i-1], Memp[offv+nsyms-i])
+	    }
 	}
 
 	# Finish setting up the descriptor.
@@ -189,7 +196,7 @@ begin
 	if (pos >= FL_LEN(fl))
 	    return (EOF)
 
-	off = Memi[FL_OFFV(fl) + pos]
+	off = Memp[FL_OFFV(fl) + pos]
 	nchars = gstrcpy (Memc[FL_SBUF(fl)+off-1], outstr, maxch)
 
 	FL_POS(fl) = pos + 1
@@ -235,6 +242,6 @@ pointer	fl			#I list descriptor
 
 begin
 	call mfree (FL_SBUF(fl), TY_CHAR)
-	call mfree (FL_OFFV(fl), TY_INT)
+	call mfree (FL_OFFV(fl), TY_POINTER)
 	call mfree (fl, TY_STRUCT)
 end

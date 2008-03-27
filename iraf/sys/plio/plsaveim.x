@@ -17,26 +17,32 @@ char	imname[ARB]		#I image name or section
 char	title[ARB]		#I mask "title" string
 int	flags			#I bitflags
 
+size_t	sz_val
+long	lval
 bool	sampling
 pointer	im, px, im_pl, bp
-int	npix, naxes, depth, maxdim, mode, i, locstr, locmem
+size_t	npix
+int	naxes, depth, maxdim, mode, i
+pointer	locstr, locmem, p_0
 long	v_in[PL_MAXDIM], v_out[PL_MAXDIM], vn[PL_MAXDIM]
 long	vs_l[PL_MAXDIM], vs_p[PL_MAXDIM]
 long	ve_l[PL_MAXDIM], ve_p[PL_MAXDIM]
 
-pointer	immap()
-long	clktime()
-int	impnli(), imaccess(), imstati(), strlen()
+pointer	immap(), imstatp()
+long	clktime(), impnli()
+int	imaccess(), strlen()
 errchk	immap, syserrs, impnli
 
 begin
+	p_0 = 0
+
 	# Open the new output image.
 	mode = NEW_IMAGE
 	if (and (flags, PL_UPDATE) != 0)
 	    if (imaccess (imname, 0) == YES)
 		mode = READ_WRITE
 
-	im = immap (imname, mode, 0)
+	im = immap (imname, mode, p_0)
 
 	# Reload the image header from the "title" string, if any.
 	if (strlen(title) > 0) {
@@ -56,9 +62,11 @@ begin
 	if (mode == NEW_IMAGE) {
 	    IM_NDIM(im) = naxes
 	    IM_PIXTYPE(im) = TY_SHORT
-	    if (PL_MAXVAL(pl) > MAX_SHORT)
+	    if (PL_MAXVAL(pl) > MAX_SHORT) {
 		IM_PIXTYPE(im) = TY_INT
-	    call amovl (vn, IM_LEN(im,1), maxdim)
+	    }
+	    sz_val = maxdim
+	    call amovl (vn, IM_LEN(im,1), sz_val)
 	} else {
 	    if (naxes != IM_NDIM(im)) {
 		call imunmap (im)
@@ -75,12 +83,14 @@ begin
 	# subsampling, axis flipping, or axis mapping is in effect.
 	# If so we can't use PLIO to copy the mask section.
 
-	im_pl = imstati (im, IM_PLDES)
+	im_pl = imstatp (im, IM_PLDES)
 	sampling = false
 
 	if (im_pl != NULL) {
-	    call amovkl (long(1), vs_l, maxdim)
-	    call amovl (IM_LEN(im,1), ve_l, maxdim)
+	    lval = 1
+	    sz_val = maxdim
+	    call amovkl (lval, vs_l, sz_val)
+	    call amovl (IM_LEN(im,1), ve_l, sz_val)
 	    call imaplv (im, vs_l, vs_p, maxdim)
 	    call imaplv (im, ve_l, ve_p, maxdim)
 
@@ -104,19 +114,23 @@ begin
 
 	} else {
 	    # Copy image pixels.  Initialize the vector loop indices.
-	    call amovkl (long(1), v_in, maxdim)
-	    call amovkl (long(1), v_out, maxdim)
+	    lval = 1
+	    sz_val = maxdim
+	    call amovkl (lval, v_in, sz_val)
+	    call amovkl (lval, v_out, sz_val)
 
 	    # Copy the image.
 	    while (impnli (im, px, v_out) != EOF) {
 		call pl_glpi (pl, v_in, Memi[px], 0, npix, PIX_SRC)
-		call amovl (v_out, v_in, maxdim)
+		sz_val = maxdim
+		call amovl (v_out, v_in, sz_val)
 	    }
 	}
 
 	IM_MIN(im) = 0
 	IM_MAX(im) = PL_MAXVAL(pl)
-	IM_LIMTIME(im) = clktime(0)
+	lval = 0
+	IM_LIMTIME(im) = clktime(lval)
 
 	call imunmap (im)
 end

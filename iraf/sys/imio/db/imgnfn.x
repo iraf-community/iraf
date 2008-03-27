@@ -24,9 +24,9 @@ define	LEN_FNSTRUCT	(10+MAX_FIELDS)
 
 define	FN_NENTRIES	Memi[P2I($1)]	# number of field names in list
 define	FN_NEXT		Memi[P2I($1+1)]	# next string to be returned
-define	FN_SBUF		Memi[P2I($1+2)]	# pointer to string buffer
+define	FN_SBUF		Memp[$1+2]	# pointer to string buffer
 			# open
-define	FN_STRP		Memi[P2I($1+10+$2-1)]	# array of str ptrs
+define	FN_STRP		Memp[$1+10+$2-1]	# array of str ptrs
 define	FN_FIELDNAME	Memc[FN_STRP($1,$2)]	# reference a string
 
 
@@ -101,21 +101,27 @@ pointer	im			# image descriptor
 char	template[ARB]		# field name template
 int	sort			# sort flag
 
+size_t	sz_val
 bool	escape
-int	tp, nstr, ch, junk, first_string, nstrings, nmatch, i
+int	tp, nstr, ch, junk, first_string, nmatch, i
+size_t	nstrings
 pointer	sp, ip, op, fn, kwname, sbuf, pattern, patcode, nextch
 int	patmake(), patmatch(), strlen()
 errchk	syserr
 
 begin
 	call smark (sp)
-	call salloc (kwname, SZ_FNAME, TY_CHAR)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (patcode, SZ_LINE,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kwname, sz_val, TY_CHAR)
+	call salloc (pattern, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patcode, sz_val,  TY_CHAR)
 
 	# Allocate field list descriptor.
-	call calloc (fn, LEN_FNSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_SBUF, TY_CHAR)
+	sz_val = LEN_FNSTRUCT
+	call calloc (fn, sz_val, TY_STRUCT)
+	sz_val = SZ_SBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	FN_SBUF(fn) = sbuf
 	nextch = sbuf
@@ -253,6 +259,7 @@ int	nstr			# current number of strings
 pointer	nextch			# next available char in string buffer
 pointer	sbuf			# string buffer
 
+size_t	sz_val
 pointer	sp, op, key
 bool	validfield, match
 int	ip, index, nmatch
@@ -264,7 +271,8 @@ errchk	imfn_putkey
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	call strcpy ("i_", Memc[key], SZ_FNAME)
 	index = 1

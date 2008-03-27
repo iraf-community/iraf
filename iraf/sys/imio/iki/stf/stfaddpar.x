@@ -27,7 +27,7 @@ pointer	pp, stf
 
 bool	initparam
 int	ival, ip, junk
-int	ctoi(), ctor(), ctod(), imaccf()
+int	ctol(), ctoi(), ctor(), ctod(), imaccf(), sizeof()
 errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 begin
@@ -56,12 +56,22 @@ begin
 		sval = ival
 		call imadds (im, P_PTYPE(pp), sval)
 	    }
-	case TY_LONG:
+	case TY_INT:
 	    call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
-	    P_PSIZE(pp) = plen * SZ_LONG * SZB_CHAR * NBITS_BYTE
+	    P_PSIZE(pp) = plen * SZ_INT * SZB_CHAR * NBITS_BYTE
 	    if (initparam) {
 		junk = ctoi (pval, ip, ival)
-		lval = ival
+		call imaddi (im, P_PTYPE(pp), ival)
+	    }
+	case TY_LONG:
+	    if ( sizeof(TY_LONG) == 2 ) {
+		call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
+	    } else {
+		call strcpy ("INTEGER*8", P_PDTYPE(pp), SZ_PDTYPE)
+	    }
+	    P_PSIZE(pp) = plen * SZ_LONG * SZB_CHAR * NBITS_BYTE
+	    if (initparam) {
+		junk = ctol (pval, ip, lval)
 		call imaddl (im, P_PTYPE(pp), lval)
 	    }
 	case TY_REAL:

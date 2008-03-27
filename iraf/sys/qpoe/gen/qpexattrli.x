@@ -27,13 +27,15 @@ pointer	ex			#I QPEX descriptor
 char	attribute[ARB]		#I attribute name
 pointer	xs			#U pointer to array of start values
 pointer	xe			#U pointer to array of end values
-int	xlen			#U length of xs/xe arrays
+size_t	xlen			#U length of xs/xe arrays
 
+size_t	sz_val
 pointer	ps, pe, qs, qe
 pointer	sp, expr, ip, ep
-int	plen, qlen, np, nq, nx
+size_t	plen, qlen, nx, nq, np
 int	neterms, nchars, maxch
-int	qpex_getattribute(), qpex_parsei(), qp_rlmergei()
+int	qpex_getattribute(), qp_rlmergei()
+size_t	qpex_parsei()
 
 begin
 	call smark (sp)
@@ -47,7 +49,8 @@ begin
 
 	repeat {
 	    maxch = maxch * 2
-	    call salloc (expr, maxch, TY_CHAR)
+	    sz_val = maxch
+	    call salloc (expr, sz_val, TY_CHAR)
 	    nchars = qpex_getattribute (ex, attribute, Memc[expr], maxch)
 	    if (nchars <= 0)
 		break

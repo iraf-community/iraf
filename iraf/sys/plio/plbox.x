@@ -4,11 +4,11 @@ include <plset.h>
 include <plio.h>
 
 define	LEN_BOXDES	6
-define	B_PL		Memi[P2I($1)]	# reference mask
-define	B_X1		Memi[P2I($1+1)]	# X1 coord of box
-define	B_Y1		Memi[P2I($1+2)]	# Y1 coord of box
-define	B_X2		Memi[P2I($1+3)]	# X2 coord of box
-define	B_Y2		Memi[P2I($1+4)]	# Y2 coord of box
+define	B_PL		Memp[$1]	# reference mask
+define	B_X1		Meml[P2L($1+1)]	# X1 coord of box
+define	B_Y1		Meml[P2L($1+2)]	# Y1 coord of box
+define	B_X2		Meml[P2L($1+3)]	# X2 coord of box
+define	B_Y2		Meml[P2L($1+4)]	# Y2 coord of box
 define	B_PV		Memi[P2I($1+5)]	# pixel value
 
 # PL_BOX -- Rasterop between a box as source, and an existing mask as dest.
@@ -18,10 +18,11 @@ define	B_PV		Memi[P2I($1+5)]	# pixel value
 procedure pl_box (pl, x1,y1, x2,y2, rop)
 
 pointer	pl			#I mask descriptor
-int	x1,y1			#I lower left corner of box
-int	x2,y2			#I upper right corner of box
+long	x1,y1			#I lower left corner of box
+long	x2,y2			#I upper right corner of box
 int	rop			#I rasterop
 
+size_t	sz_val
 pointer	sp, ufd
 bool	pl_ubox()
 extern	pl_ubox()
@@ -29,7 +30,8 @@ extern	pl_ubox()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	call salloc (ufd, LEN_BOXDES, TY_STRUCT)
+	sz_val = LEN_BOXDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
 	B_PL(ufd) = pl
 	B_X1(ufd) = max(1, min(PL_AXLEN(pl,1), x1))
@@ -49,10 +51,10 @@ end
 bool procedure pl_ubox (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
+long	y			#I mask line number
 int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O start of edit region in dst mask
-int	npix			#O number of pixels affected
+long	xs			#O start of edit region in dst mask
+size_t	npix			#O number of pixels affected
 
 int	rn
 bool	rl_new

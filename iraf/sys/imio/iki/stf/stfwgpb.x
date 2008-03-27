@@ -19,15 +19,18 @@ pointer	im			# IMIO image descriptor
 int	group			# group to be accessed
 real	datamin, datamax	# new min, max pixel values
 
+size_t	sz_val
 long	offset
 pointer	sp, stf, gpb, lbuf, pp, op
-int	pfd, pn, sz_param, sz_gpb, i
+int	pfd, pn, sz_param, i
+size_t	sz_gpb, c_1
 
 int	open(), strlen()
 bool	bval, imgetb()
 # changed to short and long for short integers in gpb
 short	sval, imgets()
 long	lval, imgetl()
+int	ival, imgeti()
 #
 real	rval, imgetr()
 double	dval, imgetd()
@@ -38,8 +41,11 @@ string	writerr "cannot update group parameter block"
 string	badtype "illegal group data parameter datatype"
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -89,7 +95,9 @@ begin
 		    bval = false
 		}
 		# Memb[(op-1)/SZ_BOOL+1] = bval
-		call amovc (bval, Memc[op], SZ_BOOL)
+		sz_val = SZ_BOOL
+		# arg1: incompatible pointer
+		call amovc (bval, Memc[op], sz_val)
 
 	    # changed case for int to short and long 
 	    # to allow i*2 in gpb--dlb 11/3/87
@@ -98,14 +106,26 @@ begin
 		    call erract (EA_WARN)
 		    sval = 0
 		}
-		call amovc (sval, Memc[op], SZ_SHORT)
+		sz_val = SZ_SHORT
+		call amovc (sval, Memc[op], sz_val)
+
+	    case TY_INT:
+		iferr (ival = imgeti (im, P_PTYPE(pp))) {
+		    call erract (EA_WARN)
+		    ival = 0
+		}
+		sz_val = SZ_INT
+		# arg1: incompatible pointer
+		call amovc (ival, Memc[op], sz_val)
 
 	    case TY_LONG:
 		iferr (lval = imgetl (im, P_PTYPE(pp))) {
 		    call erract (EA_WARN)
 		    lval = 0
 		}
-		call amovc (lval, Memc[op], SZ_LONG)
+		sz_val = SZ_LONG
+		# arg1: incompatible pointer
+		call amovc (lval, Memc[op], sz_val)
 
 	    case TY_REAL:
 		iferr (rval = imgetr (im, P_PTYPE(pp))) {
@@ -119,7 +139,9 @@ begin
 		    rval = 0.0
 		}
 		# Memr[(op-1)/SZ_REAL+1] = rval
-		call amovc (rval, Memc[op], SZ_REAL)
+		sz_val = SZ_REAL
+		# arg1: incompatible pointer
+		call amovc (rval, Memc[op], sz_val)
 
 	    case TY_DOUBLE:
 		iferr (dval = imgetd (im, P_PTYPE(pp))) {
@@ -128,7 +150,9 @@ begin
 		    dval = 0.0D0
 		}
 		# Memd[(op-1)/SZ_DOUBLE+1] = dval
-		call amovc (dval, Memc[op], SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		# arg1: incompatible pointer
+		call amovc (dval, Memc[op], sz_val)
 
 	    case TY_CHAR:
 		# Blank fill the string buffer.
@@ -144,7 +168,8 @@ begin
 		Memc[lbuf+i] = ' '
 
 		# Pack the blank filled array into the GPB.
-		call chrpak (Memc[lbuf], 1, Memc[gpb+offset], 1, P_LEN(pp))
+		sz_val = P_LEN(pp)
+		call chrpak (Memc[lbuf], c_1, Memc[gpb+offset], c_1, sz_val)
 
 	    default:
 		call error (1, badtype)

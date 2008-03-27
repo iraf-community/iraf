@@ -10,6 +10,7 @@ procedure qp_bind (qp)
 
 pointer	qp			#I QPOE descriptor
 
+long	lval
 int	fd
 pointer	fm
 pointer	stopen()
@@ -25,9 +26,10 @@ begin
 		QP_STINDEXLEN(qp), QP_STSTABLEN(qp), QP_STSBUFSIZE(qp))
 
 	    # Fix the datafile parameters.
-	    call fm_seti (fm, FM_PAGESIZE, QP_FMPAGESIZE(qp))
+	    call fm_setl (fm, FM_PAGESIZE, QP_FMPAGESIZE(qp))
 	    call fm_seti (fm, FM_MAXLFILES, QP_FMMAXLFILES(qp))
-	    call fm_seti (fm, FM_MAXPTPAGES, QP_FMMAXPTPAGES(qp))
+	    lval = QP_FMMAXPTPAGES(qp)
+	    call fm_setl (fm, FM_MAXPTPAGES, lval)
 	    call fm_seti (fm, FM_FCACHESIZE, QP_FMCACHESIZE(qp))
 
 	    # Create the QPOE header and static storage lfiles.

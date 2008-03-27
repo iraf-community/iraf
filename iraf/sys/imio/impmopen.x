@@ -22,9 +22,11 @@ char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 pointer	ref_im			#I reference image
 
+size_t	sz_val
 pointer	sp, fname, pl, b_pl
 long	axlen[PL_MAXDIM], v[PL_MAXDIM]
 int	acmode, flags, naxes, depth
+long	c_1
 
 bool	streq()
 pointer	pl_open(), pl_create()
@@ -33,11 +35,14 @@ errchk	syserr, pl_open, pl_create, pl_loadf, pl_loadim
 string	s_empty	"EMPTY"		# the empty mask
 string	s_bpl	"BPM"		# the reference image bad pixel list
 
-include <nullptr.com>
+include <nullptr.inc>
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)
@@ -75,14 +80,16 @@ begin
 	    # Modify the mask according to the given flags, if any.
 	    if (flags != 0) {
 		call pl_gsize (pl, naxes, axlen, depth)
-		call amovkl (1, v, PL_MAXDIM)
+		sz_val = PL_MAXDIM
+		call amovkl (c_1, v, sz_val)
 
 		if (and (flags, BOOLEAN_MASK) != 0 && depth > 1) {
 		    b_pl = pl_create (naxes, axlen, 1)
 
 		    if (and (flags, INVERT_MASK) != 0) {
 		        call pl_rop (pl, v, b_pl, v, axlen, PIX_SRC)
-			call amovkl (1, v, PL_MAXDIM)
+			sz_val = PL_MAXDIM
+			call amovkl (c_1, v, sz_val)
 		        call pl_rop (b_pl, v, b_pl, v, axlen, PIX_NOT(PIX_SRC))
 		    } else {
 		        call pl_rop (pl, v, b_pl, v, axlen, PIX_SRC)

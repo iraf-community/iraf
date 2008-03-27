@@ -14,12 +14,19 @@ long	vs[ARB]			#I ll vector (only first two elements used)
 long	ve[ARB]			#I ur vector (only first two elements used)
 int	outfd			#I output file
 
+size_t	sz_val
 pointer	sp, pv, cv
-int	npix, ch, i
+size_t	npix
+long	i, c_10
+int	ch
 long	v[PL_MAXDIM]
+int	modi()
+long	modl()
 errchk	pl_valid
 
 begin
+	c_10 = 10
+
 	call pl_valid (pl)
 	npix = ve[1] - vs[1] + 1
 
@@ -28,13 +35,14 @@ begin
 	call salloc (cv, npix, TY_CHAR)
 
 	# Output mask.
-	call amovl (vs, v, PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (vs, v, sz_val)
 	v[2] = ve[2]
 
 	while (v[2] >= vs[2]) {
 	    call pl_glpi (pl, v, Memi[pv], 0, npix, PIX_SRC)
 	    do i = 1, npix {
-		ch = mod (Memi[pv+i-1], 128)
+		ch = modi (Memi[pv+i-1], 128)
 		if (ch < 32)
 		    ch = ch + 32
 		if (ch <= 32 || ch == 127)
@@ -42,7 +50,7 @@ begin
 		Memc[cv+i-1] = ch
 	    }
 	    call fprintf (outfd, "%3d ")
-		call pargi (v[2])
+		call pargl (v[2])
 	    call write (outfd, Memc[cv], npix)
 	    call putci (outfd, '\n')
 	    v[2] = v[2] - 1
@@ -50,16 +58,21 @@ begin
 
 	# Label the columns.
 	call fprintf (outfd, "%5t")
-	do i = 1, npix
-	    call putci (outfd, TO_DIGIT(mod (i,10)))
+	do i = 1, npix {
+	    ch = modl (i, c_10)
+	    call putci (outfd, TO_DIGIT(ch))
+	}
 	call fprintf (outfd, "\n")
 
 	call fprintf (outfd, "%5t")
-	do i = 1, npix
-	    if (mod (i, 10) == 0)
-		call putci (outfd, TO_DIGIT(i / 10))
-	    else
+	do i = 1, npix {
+	    if (modl (i, c_10) == 0) {
+		ch = i / 10
+		call putci (outfd, TO_DIGIT(ch))
+	    } else {
 		call putci (outfd, ' ')
+	    }
+	}
 	call fprintf (outfd, "\n")
 
 	call sfree (sp)

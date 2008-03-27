@@ -13,23 +13,27 @@ procedure imwrpx (im, buf, npix, v, xstep)
 
 pointer	im			# image descriptor
 char	buf[ARB]		# generic buffer containing data to be written
-int	npix			# number of pixels to be written
+size_t	npix			# number of pixels to be written
 long	v[ARB]			# physical coords of first pixel to be written
-int	xstep			# step size between output pixels
+long	xstep			# step size between output pixels
 
-bool	rlio
-long	offset
-pointer	pl, sp, ibuf
+size_t	sz_val
 long	o_v[IM_MAXDIM]
-int	sz_pixel, nbytes, nchars, ip, step
-long	imnote()
+pointer	pl, sp, ibuf
+bool	rlio
+int	sz_pixel
+long	offset, ip, step
+size_t	nbytes, nchars, c_1
+long	imnote(), absl()
 errchk	imerr, imwrite
 include	<szdtype.inc>
 
 begin
+	c_1 = 1
+
 	pl = IM_PL(im)
 	sz_pixel = ty_size[IM_PIXTYPE(im)]
-	step = abs (xstep)
+	step = absl (xstep)
 	if (v[1] < 1 || ((npix-1) * step) + v[1] > IM_SVLEN(im,1))
 	    call imerr (IM_NAME(im), SYS_IMREFOOB)
 
@@ -42,11 +46,11 @@ begin
 	    nbytes = npix * sz_pixel * SZB_CHAR
 	    switch (sz_pixel * SZB_CHAR) {
 	    case 2:
-		call bswap2 (buf, 1, buf, 1, nbytes)
+		call bswap2 (buf, c_1, buf, c_1, nbytes)
 	    case 4:
-		call bswap4 (buf, 1, buf, 1, nbytes)
+		call bswap4 (buf, c_1, buf, c_1, nbytes)
 	    case 8:
-		call bswap8 (buf, 1, buf, 1, nbytes)
+		call bswap8 (buf, c_1, buf, c_1, nbytes)
 	    }
 	}
 
@@ -54,29 +58,35 @@ begin
 	    # Write to a pixel list.
 
 	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
-	    call amovl (v, o_v, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (v, o_v, sz_val)
 	    nchars = npix * sz_pixel
 
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT:
-		if (rlio)
+		if (rlio) {
 		    call pl_plrs (pl, v, buf, 0, npix, PIX_SRC)
-		else if (step == 1)
+		} else if (step == 1) {
 		    call pl_plps (pl, v, buf, 0, npix, PIX_SRC)
-		else {
+		} else {
 		    do ip = 1, nchars, sz_pixel {
-			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			sz_val = 1
+			call pl_plps (pl, o_v, buf[ip], 0, sz_val, PIX_SRC)
 			o_v[1] = o_v[1] + step
 		    }
 		}
-	    case TY_INT, TY_LONG:
-		if (rlio)
+	    case TY_INT:
+		if (rlio) {
+		    # arg3: incompatible pointer
 		    call pl_plri (pl, v, buf, 0, npix, PIX_SRC)
-		else if (step == 1)
+		} else if (step == 1) {
+		    # arg3: incompatible pointer
 		    call pl_plpi (pl, v, buf, 0, npix, PIX_SRC)
-		else {
+		} else {
 		    do ip = 1, nchars, sz_pixel {
-			call pl_plpi (pl, o_v, buf[ip], 0, 1, PIX_SRC)
+			sz_val = 1
+			# arg3: incompatible pointer
+			call pl_plpi (pl, o_v, buf[ip], 0, sz_val, PIX_SRC)
 			o_v[1] = o_v[1] + step
 		    }
 		}
@@ -85,13 +95,14 @@ begin
 		call salloc (ibuf, npix, TY_INT)
 
 		call acht (buf, Memi[ibuf], npix, IM_PIXTYPE(im), TY_INT)
-		if (rlio)
+		if (rlio) {
 		    call pl_plri (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
-		else if (step == 1)
+		} else if (step == 1) {
 		    call pl_plpi (pl, v, Memi[ibuf], 0, npix, PIX_SRC)
-		else {
+		} else {
 		    do ip = 1, npix {
-			call pl_plpi (pl, o_v, Memi[ibuf+ip-1], 0, 1, PIX_SRC)
+			sz_val = 1
+			call pl_plpi (pl, o_v, Memi[ibuf+ip-1], 0, sz_val, PIX_SRC)
 			o_v[1] = o_v[1] + step
 		    }
 		}
@@ -120,7 +131,8 @@ begin
 	    } else {
 		nchars = npix * sz_pixel
 		for (ip=1;  ip <= nchars;  ip=ip+sz_pixel) {
-		    call imwrite (im, buf[ip], sz_pixel, offset)
+		    sz_val = sz_pixel
+		    call imwrite (im, buf[ip], sz_val, offset)
 		    offset = offset + (sz_pixel * step)
 		}
 	    }

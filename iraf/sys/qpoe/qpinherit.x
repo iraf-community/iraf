@@ -12,7 +12,8 @@ pointer	n_qp			#I QPOE descriptor of new datafile
 pointer	o_qp			#I QPOE descriptor of old datafile
 int	out			#I output stream for verbose messages, or NULL
 
-int	nsyms, i
+size_t	nsyms
+long	i
 pointer	sp, n_st, o_st, sym, op, pname, syms
 pointer	sthead(), stnext(), stname()
 int	qp_accessf()
@@ -36,13 +37,13 @@ begin
 	for (sym=sthead(o_st);  sym != NULL;  sym=stnext(o_st,sym))
 	    if (and (S_FLAGS(sym), SF_DELETED) == 0)
 		if (and (S_FLAGS(sym), SF_INHERIT) != 0) {
-		    Memi[op] = sym
+		    Memp[op] = sym
 		    op = op - 1
 		}
 
 	# Copy each symbol.
 	do i = 1, nsyms {
-	    pname = stname (o_st, Memi[syms+i-1])
+	    pname = stname (o_st, Memp[syms+i-1])
 	    if (qp_accessf (n_qp, Memc[pname]) == YES) {
 		if (out != NULL) {
 		    call fprintf (out,

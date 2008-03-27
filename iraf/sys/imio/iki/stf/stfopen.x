@@ -22,9 +22,11 @@ int	gc_arg			#I number of groups in STF image
 int	acmode			#I access mode
 int	status			#O return value
 
+size_t	sz_val
 bool	subimage
 pointer	sp, fname, stf, stf_extn, ua, o_stf
-int	group, gcount, newimage, gpb, hdr, o_stflen
+int	group, gcount, newimage, gpb, hdr
+size_t	o_stflen
 
 bool	fnullfile(), envgetb()
 int	open(), stropen(), access()
@@ -33,13 +35,16 @@ define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (stf_extn, MAX_LENEXTN, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = MAX_LENEXTN
+	call salloc (stf_extn, sz_val, TY_CHAR)
 
 	ua = IM_USERAREA(im)
 
 	# Allocate internal STF image descriptor.
-	call calloc (stf, LEN_STFDES, TY_STRUCT)
+	sz_val = LEN_STFDES
+	call calloc (stf, sz_val, TY_STRUCT)
 	IM_KDES(im) = stf
 
 	group  = max (1, gr_arg)
@@ -175,7 +180,7 @@ begin
 		if (IM_KDES(o_im) != NULL && IM_KERNEL(o_im) == IM_KERNEL(im)) {
 		    o_stf = IM_KDES(o_im)
 		    o_stflen = LEN_STFBASE + STF_PCOUNT(o_stf) * LEN_PDES
-		    call amovi (Memi[o_stf], Memi[stf], o_stflen)
+		    call amovp (Memp[o_stf], Memp[stf], o_stflen)
 		    STF_ACMODE(stf)   = acmode
 		    STF_GROUP(stf)    = group
 		    STF_GCOUNT(stf)   = gcount
@@ -210,9 +215,10 @@ begin
 	}
 
 	# Free any unneeded space in the STF descriptor.
-	if (STF_PCOUNT(stf) > 0)
-	    call realloc (stf,
-		LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
+	if (STF_PCOUNT(stf) > 0) {
+	    sz_val = LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES
+	    call realloc (stf, sz_val, TY_STRUCT)
+	}
 	IM_KDES(im) = stf
 	status = OK
 

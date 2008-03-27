@@ -11,8 +11,10 @@ include	<imio.h>
 pointer procedure impl1r (im)
 
 pointer	im			# image header pointer
-int	fd, nchars
-long	offset
+
+int	fd
+size_t	nchars
+long	offset, lval
 pointer	bp, impgsr(), fwritep()
 errchk	imopsf
 
@@ -29,6 +31,7 @@ begin
 		ifnoerr (bp = (fwritep (fd, offset, nchars) - 1) / SZ_REAL + 1)
 		    return (bp)
 	    }
-	    return (impgsr (im, long(1), IM_LEN(im,1), 1))
+	    lval = 1
+	    return (impgsr (im, lval, IM_LEN(im,1), 1))
 	}
 end

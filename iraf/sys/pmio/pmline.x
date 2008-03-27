@@ -11,9 +11,9 @@ include	<plio.h>
 procedure pm_line (pl, x1, y1, x2, y2, width, rop)
 
 pointer	pl			#I mask descriptor
-int	x1,y1			#I start point of line
-int	x2,y2			#I end point of line
-int	width			#I width of line to be drawn, pixels
+long	x1,y1			#I start point of line
+long	x2,y2			#I end point of line
+long	width			#I width of line to be drawn, pixels
 int	rop			#I rasterop defining operation
 
 errchk	pl_getplane

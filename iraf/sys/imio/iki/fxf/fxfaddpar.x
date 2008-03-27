@@ -21,7 +21,7 @@ double	dval
 short	sval
 long	lval
 int	ival, ip, junk
-int	ctoi(), ctor(), ctod()
+int	ctoi(), ctor(), ctod(), ctol()
 errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 begin
@@ -35,9 +35,11 @@ begin
 	    junk = ctoi (pval, ip, ival)
 	    sval = ival
 	    call imadds (im, pname, sval)
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    junk = ctoi (pval, ip, ival)
-	    lval = ival
+	    call imaddi (im, pname, ival)
+	case TY_LONG:
+	    junk = ctol (pval, ip, lval)
 	    call imaddl (im, pname, lval)
 	case TY_REAL:
 	    junk = ctor (pval, ip, rval)

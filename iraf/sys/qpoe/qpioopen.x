@@ -21,14 +21,17 @@ pointer	qp			#I QPOE descriptor
 char	paramex[ARB]		#I event-list parameter plus expression list
 int	mode			#I access mode
 
+size_t	sz_val
 bool	newlist
 pointer	sp, io, dd, eh, op, oo, flist, deffilt, defmask, maskname
 pointer	param, expr, filter, filter_text, mask, umask, psym, dsym, name
-int	sz_filter, szb_page, nwords, nchars, junk, fd, ip, i, j
+long	lval
+int	nchars, junk, fd, ip, i, j
+size_t	nwords, sz_filter, szb_page, nbytes
 
 pointer	qp_gpsym(), qpex_open(), stname(), strefstab()
-int	qp_popen(), qp_lenf(), pl_l2pi(), fstati()
-long	read()
+int	qp_popen(), qp_lenf(), fstati()
+long	read(), pl_l2pi()
 int	qp_geti(), qp_gstr(), qp_parsefl(), qpio_parse(), qpex_modfilter()
 
 errchk	qp_bind, qp_geti, qpio_parse, qp_gpsym, qp_addf, qp_gstr
@@ -40,10 +43,11 @@ define	done_ 91
 
 begin
 	call smark (sp)
-	call salloc (deffilt, SZ_FNAME, TY_CHAR)
-	call salloc (defmask, SZ_FNAME, TY_CHAR)
-	call salloc (maskname, SZ_FNAME, TY_CHAR)
-	call salloc (umask, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (deffilt, sz_val, TY_CHAR)
+	call salloc (defmask, sz_val, TY_CHAR)
+	call salloc (maskname, sz_val, TY_CHAR)
+	call salloc (umask, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -52,17 +56,20 @@ begin
 
 	if (QP_DEBUG(qp) > 0) {
 	    call eprintf ("qpio_open (%xX, `%s', %d)\n")
-		call pargi (qp)
+		call pargp (qp)
 		call pargstr (paramex)
 		call pargi (mode)
 	}
 
 	# Allocate and initialize the QPIO descriptor.
-	call calloc (io, LEN_IODES, TY_STRUCT)
+	sz_val = LEN_IODES
+	call calloc (io, sz_val, TY_STRUCT)
 
-	call calloc (IO_DD(io), LEN_DDDES, TY_STRUCT)
-	call calloc (IO_PARAM(io), SZ_FNAME, TY_CHAR)
-	call calloc (IO_MASK(io), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_DDDES
+	call calloc (IO_DD(io), sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call calloc (IO_PARAM(io), sz_val, TY_CHAR)
+	call calloc (IO_MASK(io), sz_val, TY_CHAR)
 
 	IO_QP(io) = qp
 	IO_MODE(io) = mode
@@ -142,7 +149,8 @@ iferr {
 	nchars = S_NELEM(dsym)
 	name = stname (QP_ST(qp), dsym)
 
-	call salloc (flist, nchars, TY_CHAR)
+	sz_val = nchars
+	call salloc (flist, sz_val, TY_CHAR)
 	if (qp_gstr (qp, Memc[name], Memc[flist], nchars) < nchars)
 	    call syserrs (SYS_QPBADVAL, Memc[name])
 
@@ -188,12 +196,12 @@ iferr {
 
 	fd = IO_FD(io)
 	szb_page = QP_FMPAGESIZE(qp)
-	nchars = szb_page / SZB_CHAR
+	nbytes = szb_page / SZB_CHAR
 	call salloc (eh, szb_page / (SZ_STRUCT*SZB_CHAR), TY_STRUCT)
-	call aclri (Memi[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
+	call aclrp (Memp[eh], szb_page / (SZ_STRUCT*SZB_CHAR))
 
 	# Read event list header.
-	if (read (fd, Memi[eh], nchars) < nchars)
+	if (read (fd, Memc[P2C(eh)], nbytes) < nbytes)
 	    call syserrs (SYS_QPNOEH, Memc[param])
 
 	IO_NEVENTS(io)	= EH_NEVENTS(eh)
@@ -216,13 +224,11 @@ iferr {
 	# Copy the MINEVL event struct into the QPIO descriptor.
 	nwords = IO_EVENTLEN(io)
 	call malloc (IO_MINEVL(io), nwords, TY_SHORT)
-	call amovs (Memi[eh+EH_MINEVLOFF(eh)], Mems[IO_MINEVL(io)],
-	    IO_EVENTLEN(io))
+	call amovs (Mems[P2S(eh+EH_MINEVLOFF(eh))], Mems[IO_MINEVL(io)], nwords)
 
 	# Copy the MAXEVL event struct into the QPIO descriptor.
 	call malloc (IO_MAXEVL(io), nwords, TY_SHORT)
-	call amovs (Memi[eh+EH_MAXEVLOFF(eh)], Mems[IO_MAXEVL(io)],
-	    IO_EVENTLEN(io))
+	call amovs (Mems[P2S(eh+EH_MAXEVLOFF(eh))], Mems[IO_MAXEVL(io)], nwords)
 
 	if (IO_DEBUG(io) > 0) {
 	    call eprintf ("%s: nev=%d, szbk=%d, bklen=%d+2, ixlen=%d\n")
@@ -230,7 +236,7 @@ iferr {
 		call pargi (IO_NEVENTS(io))
 		call pargi (IO_SZBBUCKET(io))
 		call pargi (IO_BUCKETLEN(io))
-		call pargi (IO_INDEXLEN(io))
+		call pargz (IO_INDEXLEN(io))
 	}
 
 	# Get compressed event list index, if any.
@@ -239,17 +245,19 @@ iferr {
 	    call malloc (IO_YOFFVP(io), IO_INDEXLEN(io), TY_INT)
 	    call malloc (IO_YLENVP(io), IO_INDEXLEN(io), TY_INT)
 
-	    nchars = IO_YOFFVLEN(io) * SZ_SHORT
+	    nbytes = IO_YOFFVLEN(io) * SZ_SHORT
 	    call seek (fd, IO_YOFFVOFF(io))
-	    if (read (fd, Mems[oo], nchars) < nchars)
+	    if (read (fd, Mems[oo], nbytes) < nbytes)
 		call syserrs (SYS_QPBADIX, Memc[param])
-	    junk = pl_l2pi (Mems[oo], 1, Memi[IO_YOFFVP(io)], IO_INDEXLEN(io))
+	    lval = 1
+	    junk = pl_l2pi (Mems[oo], lval, Memi[IO_YOFFVP(io)], IO_INDEXLEN(io))
 
-	    nchars = IO_YLENVLEN(io) * SZ_SHORT
+	    nbytes = IO_YLENVLEN(io) * SZ_SHORT
 	    call seek (fd, IO_YLENVOFF(io))
-	    if (read (fd, Mems[oo], nchars) < nchars)
+	    if (read (fd, Mems[oo], nbytes) < nbytes)
 		call syserrs (SYS_QPBADIX, Memc[param])
-	    junk = pl_l2pi (Mems[oo], 1, Memi[IO_YLENVP(io)], IO_INDEXLEN(io))
+	    lval = 1
+	    junk = pl_l2pi (Mems[oo], lval, Memi[IO_YLENVP(io)], IO_INDEXLEN(io))
 	}
 
 	# We won't need the file buffer any more, so free it.
@@ -272,7 +280,8 @@ iferr {
 
 	    # Open the default filter if one was found.
 	    if (nchars > 0) {
-		call salloc (filter_text, nchars, TY_CHAR)
+		sz_val = nchars
+		call salloc (filter_text, sz_val, TY_CHAR)
 		if (qp_gstr(qp,Memc[deffilt],Memc[filter_text],nchars) < nchars)
 		    call syserrs (SYS_QPBADVAL, Memc[deffilt])
 		IO_EX(io) = qpex_open (qp, Memc[filter_text])
@@ -324,13 +333,16 @@ iferr {
 	}
 
 	# Load user specified mask.
-	if (Memc[umask] != EOS)
+	if (Memc[umask] != EOS) {
 	    call qpio_loadmask (io, Memc[umask], YES)
-	else if (IO_INDEXLEN(io) > 0)
-	    call malloc (IO_RL(io), RL_LENELEM*2, TY_INT)
+	} else if (IO_INDEXLEN(io) > 0) {
+	    sz_val = RL_LENELEM*2
+	    call malloc (IO_RL(io), sz_val, TY_INT)
+	}
 
 	# Allocate the bucket buffer.
-	call malloc (IO_BP(io), IO_SZBBUCKET(io)/SZB_CHAR/SZ_SHORT, TY_SHORT)
+	sz_val = IO_SZBBUCKET(io)/SZB_CHAR/SZ_SHORT
+	call malloc (IO_BP(io), sz_val, TY_SHORT)
 done_
 	# If no default rect was specified, set default bounding box for
 	# reading to be the entire image.
@@ -341,8 +353,9 @@ done_
 	}
 
 	# Initialize the active BB to the default.
-	call amovi (IO_VSDEF(io,1), IO_VS(io,1), NDIM)
-	call amovi (IO_VEDEF(io,1), IO_VE(io,1), NDIM)
+	sz_val = NDIM
+	call amovl (IO_VSDEF(io,1), IO_VS(io,1), sz_val)
+	call amovl (IO_VEDEF(io,1), IO_VE(io,1), sz_val)
 
 } then {
 	# We branch here if any nasty errors occur above.  Cleanup and free

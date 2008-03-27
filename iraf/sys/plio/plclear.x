@@ -11,7 +11,8 @@ procedure pl_clear (pl)
 pointer	pl			#I mask descriptor
 
 pointer	lp
-int	n_len, i
+size_t	n_len
+int	i
 errchk	realloc
 
 begin

@@ -12,8 +12,10 @@ procedure pl_compress (pl)
 
 pointer	pl			#I mask descriptor
 
-pointer	n_bp, o_lp, n_lp, op
-int	nwords, r_len, b_len, i
+size_t	sz_val
+pointer	n_bp, o_lp, n_lp
+int	nwords, r_len, b_len, op, i
+int	modi()
 errchk	malloc, mfree, syserr
 
 begin
@@ -37,7 +39,8 @@ begin
 	    call eprintf ("Warning: PL_LLFREE inconsistent (recoverable)\n")
 
 	# Allocate a new buffer large enough to hold the compressed line list.
-	call malloc (n_bp, nwords, TY_SHORT)
+	sz_val = nwords
+	call malloc (n_bp, sz_val, TY_SHORT)
 
 	# Copy the active line lists to the new buffer; as each line is
 	# copied, overwrite a couple words of the old line list with the
@@ -56,12 +59,13 @@ begin
 
 		# The following should not be possible, barring a bug.
 		if (op + r_len > nwords)
-		    call fatal (pl, "pl_compress: llbuf overflow")
+		    call fatal (1, "pl_compress: llbuf overflow")
 
-		call amovs (Mems[o_lp], Mems[n_lp], r_len)
+		sz_val = r_len
+		call amovs (Mems[o_lp], Mems[n_lp], sz_val)
 
 		LP_NREFS(o_lp) = op / I_SHIFT
-		LP_SETBLEN(o_lp, mod (op, I_SHIFT))
+		LP_SETBLEN(o_lp, modi (op, I_SHIFT))
 		LP_SETBLEN(n_lp, r_len)
 		op = op + r_len
 	    }

@@ -17,6 +17,8 @@ int	nelem			#I number of data elements to write
 int	first			#I first data element to write to
 char	datatype[ARB]		#I datatype of input data
 
+size_t	sz_val
+size_t	nchars
 pointer	sp, fm, sym, tbuf, isym, osym
 int	fd, sz_itype, sz_otype, last, otype, itype
 errchk	qp_bind, qp_gpsym, fm_getfd, seek, syserrs
@@ -60,14 +62,16 @@ begin
 	call seek (fd, S_OFFSET(sym) + (first - 1) * sz_otype)
 
 	# Output the data.
+	nchars = nelem * sz_otype
 	if (otype != itype) {
 	    call smark (sp)
-	    call salloc (tbuf, nelem * sz_otype, TY_CHAR)
-	    call acht (buf, Memc[tbuf], nelem, itype, otype)
-	    call write (fd, Memc[tbuf], nelem * sz_otype)
+	    call salloc (tbuf, nchars, TY_CHAR)
+	    sz_val = nelem
+	    call acht (buf, Memc[tbuf], sz_val, itype, otype)
+	    call write (fd, Memc[tbuf], nchars)
 	    call sfree (sp)
 	} else
-	    call write (fd, buf, nelem * sz_otype)
+	    call write (fd, buf, nchars)
 
 	# Update the array size if it got bigger.
 	if (last > S_NELEM(sym)) {

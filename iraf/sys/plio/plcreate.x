@@ -14,8 +14,10 @@ pointer	pl
 pointer	pl_open()
 errchk	pl_open
 
+include	<nullptr.inc>
+
 begin
-	pl = pl_open (NULL)
+	pl = pl_open (NULLPTR)
 	call pl_ssize (pl, naxes, axlen, depth)
 
 	return (pl)

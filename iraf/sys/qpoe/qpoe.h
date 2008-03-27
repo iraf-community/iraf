@@ -52,18 +52,18 @@ define	QP_EXLSCALE	Memi[P2I($1+13)]	# QPEX scale nranges to LUT bins
 define	QP_SZPBBUF	Memi[P2I($1+14)]	# size of pushback buffer for macros
 define	QP_BUCKETLEN	Memi[P2I($1+15)]	# QPIO event file bucket size
 define	QP_FMMAXLFILES	Memi[P2I($1+16)]	# FMIO maxlfiles
-define	QP_FMMAXPTPAGES	Memi[P2I($1+17)]	# FMIO maxptpages
-define	QP_FMPAGESIZE	Memi[P2I($1+18)]	# FMIO pagesize
+define	QP_FMMAXPTPAGES	Memz[P2Z($1+17)]	# FMIO maxptpages
+define	QP_FMPAGESIZE	Meml[P2L($1+18)]	# FMIO pagesize
 define	QP_FMCACHESIZE	Memi[P2I($1+19)]	# FMIO buffer cache size
 define	QP_STINDEXLEN	Memi[P2I($1+20)]	# SYMTAB hash index length
 define	QP_STSTABLEN	Memi[P2I($1+21)]	# SYMTAB stab len (start)
 define	QP_STSBUFSIZE	Memi[P2I($1+22)]	# SYMTAB sbuf size (start)
-define	QP_STOFFSET	Memi[P2I($1+23)]	# lfile offset of stored symbol table
+define	QP_STOFFSET	Meml[P2L($1+23)]	# lfile offset of stored symbol table
 define	QP_MODIFIED	Memi[P2I($1+24)]	# QPOE descriptor has been modified
 define	QP_DEBUG	Memi[P2I($1+25)]	# global debug level (debug messages)
 define	QP_XBLOCK	Memr[P2R($1+26)]	# default X blocking factor for QPIO
 define	QP_YBLOCK	Memr[P2R($1+27)]	# default Y blocking factor for QPIO
-define	QP_OPTBUFSIZE	Memi[P2I($1+28)]	# optimum buffer size for IMIO/QPF/FIO
+define	QP_OPTBUFSIZE	Memz[P2Z($1+28)]	# optimum buffer size for IMIO/QPF/FIO
 define	QP_NODEFFILT	Memi[P2I($1+29)]	# disable use of default filter
 define	QP_NODEFMASK	Memi[P2I($1+30)]	# disable use of default mask
 define	QP_DFNAME	Memc[P2C($1+31)] # QPOE filename (for messages)
@@ -78,7 +78,7 @@ define	S_MAXELEM	Memi[P2I($1+4)]	# allocated length
 define	S_SZELEM	Memi[P2I($1+5)]	# elsize, chars (primary domains only)
 define	S_COMMENT	Memi[P2I($1+6)]	# pointer to comment string in sbuf
 define	S_LFILE 	Memi[P2I($1+7)]	# lfile where value is stored
-define	S_OFFSET	Memi[P2I($1+8)]	# char offset of value in lfile
+define	S_OFFSET	Meml[P2L($1+8)]	# char offset of value in lfile
 
 # Symbol flags.
 define	SF_DELETED	0001B		# symbol has been deleted
@@ -103,7 +103,7 @@ define	TOK_COLONEQUALS	(-94)
 define	LEN_QPH		32
 define	QPH_MAGIC	Memi[P2I($1)]
 define	QPH_VERSION	Memi[P2I($1+1)]
-define	QPH_STOFFSET	Memi[P2I($1+2)]
+define	QPH_STOFFSET	Meml[P2L($1+2)]
 
 # Domain descriptor structure.
 define	LEN_DDDES	110
@@ -111,5 +111,5 @@ define	DD_STRUCTLEN	Memi[P2I($1)]	# structure length, su
 define	DD_NFIELDS	Memi[P2I($1+1)]	# number of fields in user structure
 define	DD_XFIELD	Memi[P2I($1+2)]	# field assigned to coordinate "x"
 define	DD_YFIELD	Memi[P2I($1+3)]	# field assigned to coordinate "y"
-define	DD_FOFFSET	Memi[P2I($1+10+$2-1)]# array of field offsets
-define	DD_FTYPE	Memi[P2I($1+60+$2-1)]# array of field datatypes
+define	DD_FOFFSET	Memi[P2I($1+10)+$2-1]# array of field offsets
+define	DD_FTYPE	Memi[P2I($1+60)+$2-1]# array of field datatypes

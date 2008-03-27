@@ -17,8 +17,9 @@ pointer qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 pointer o_pp			#O pointer to parameter value
 
-int	loc_pval, loc_Mem, ip, ch, elem, sz_elem, fd
-pointer sp, key, fm, pp, op, sym
+size_t	sz_val
+int	ip, ch, elem, sz_elem, fd
+pointer sp, key, fm, pp, op, sym, loc_pval, loc_Mem
 double	pval[LEN_PVAL+1]
 data	pp /NULL/
 
@@ -29,7 +30,8 @@ errchk	qp_bind, qp_gpsym, syserrs, fm_getfd, seek, read
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -87,7 +89,8 @@ begin
 	    fd = fm_getfd (fm, S_LFILE(sym), READ_ONLY, 0)
 
 	    call seek (fd, S_OFFSET(sym) + (elem - 1) * sz_elem)
-	    if (read (fd, Memc[pp], sz_elem) < sz_elem)
+	    sz_val = sz_elem
+	    if (read (fd, Memc[pp], sz_val) < sz_elem)
 		o_pp = NULL
 	    else if (S_DTYPE(sym) == TY_USER)
 		o_pp = (pp - 1) / SZ_STRUCT + 1

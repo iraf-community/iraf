@@ -34,11 +34,12 @@ char	system1[ARB]		#I input coordinate system
 char	system2[ARB]		#I output coordinate system
 int	axbits			#I bitmap defining axes to be transformed
 
+size_t	sz_val, sz_val1
 bool	newfunc
-int	naxes, axis[MAX_DIM], wfno, fn, epa
-int	i, j, k , matlen, ndata, ctlen, pdim
+int	naxes, axis[MAX_DIM], wfno, fn
+int	i, j, k, ctlen, matlen, ndata, pdim
 pointer	i_ltm, i_ltv, o_ltm, o_ltv, t_ltm, t_ltv, ltm, ltv
-pointer	sp, w1, w2, ct, wf, fc, lp, ip, op, ct_r, sv_wcs
+pointer	sp, w1, w2, ct, wf, fc, lp, ip, op, ct_r, sv_wcs, epa
 
 pointer	coerce()
 errchk	syserr, syserrs, calloc, zcall2, mw_invertd, mw_ssystem
@@ -80,7 +81,8 @@ begin
 	matlen = naxes * naxes
 	ndata = matlen + naxes
 	ctlen = LEN_CTBASE + ndata * SZ_DOUBLE / SZ_STRUCT
-	call calloc (ct, ctlen*2, TY_STRUCT)
+	sz_val = ctlen*2
+	call calloc (ct, sz_val, TY_STRUCT)
 
 	# Save a pointer to the CTRAN descriptor in the main MWCS descriptor,
 	# to permit automatic deallocation at close time.
@@ -102,7 +104,8 @@ begin
 	CT_WCSO(ct) = w2
 	CT_NDIM(ct) = naxes
 	CT_R(ct) = ct + ctlen
-	call amovi (axis, CT_AXIS(ct,1), naxes)
+	sz_val = naxes
+	call amovi (axis, CT_AXIS(ct,1), sz_val)
 	CT_LTM(ct) = coerce (ct + LEN_CTBASE, TY_STRUCT, TY_DOUBLE)
 	CT_LTV(ct) = CT_LTM(ct) + matlen
 
@@ -113,13 +116,14 @@ begin
 	pdim = min (WCS_NDIM(w1), WCS_NDIM(w2))
 	pdim = min (MI_NDIM(mw), pdim)
 
-	i = pdim * pdim
-	call salloc (i_ltm, i, TY_DOUBLE)
-	call salloc (i_ltv, pdim, TY_DOUBLE)
-	call salloc (o_ltm, i, TY_DOUBLE)
-	call salloc (o_ltv, pdim, TY_DOUBLE)
-	call salloc (t_ltm, i, TY_DOUBLE)
-	call salloc (t_ltv, pdim, TY_DOUBLE)
+	sz_val = pdim
+	sz_val1 = pdim * pdim
+	call salloc (i_ltm, sz_val1, TY_DOUBLE)
+	call salloc (i_ltv, sz_val, TY_DOUBLE)
+	call salloc (o_ltm, sz_val1, TY_DOUBLE)
+	call salloc (o_ltv, sz_val, TY_DOUBLE)
+	call salloc (t_ltm, sz_val1, TY_DOUBLE)
+	call salloc (t_ltv, sz_val, TY_DOUBLE)
 
 	# Compute the transformation.  A transformation between any two
 	# world systems W1 and W2 consists of the transformation W1->P
@@ -212,7 +216,8 @@ begin
 
 	# If no function calls for an axis and W is set, LTV=(R-inv(CD)*W).
 	if (WCS_W(w1) != NULL) {
-	    call amovd (D(mw,WCS_W(w1)), Memd[i_ltv], pdim)
+	    sz_val = pdim
+	    call amovd (D(mw,WCS_W(w1)), Memd[i_ltv], sz_val)
 	    do i = 1, CT_NCALLI(ct) {
 		fc = CT_FCI(ct,i)
 		do j = 1, FC_NAXES(fc) {
@@ -223,17 +228,21 @@ begin
 	    call mw_vmuld (Memd[i_ltm], Memd[i_ltv], Memd[t_ltv], pdim)
 
 	    # Copy R to LTV.
-	    if (WCS_R(w1) == NULL)
-	        call anegd (Memd[t_ltv], Memd[i_ltv], pdim)
-	    else
-		call asubd (D(mw,WCS_R(w1)), Memd[t_ltv], Memd[i_ltv], pdim)
+	    sz_val = pdim
+	    if (WCS_R(w1) == NULL) {
+	        call anegd (Memd[t_ltv], Memd[i_ltv], sz_val)
+	    } else {
+		call asubd (D(mw,WCS_R(w1)), Memd[t_ltv], Memd[i_ltv], sz_val)
+	    }
 
 	} else {
 	    # Copy R to LTV.
-	    if (WCS_R(w1) == NULL)
-	        call aclrd (Memd[i_ltv], pdim)
-	    else
-	        call amovd (D(mw,WCS_R(w1)), Memd[i_ltv], pdim)
+	    sz_val = pdim
+	    if (WCS_R(w1) == NULL) {
+	        call aclrd (Memd[i_ltv], sz_val)
+	    } else {
+	        call amovd (D(mw,WCS_R(w1)), Memd[i_ltv], sz_val)
+	    }
 	}
 
 	# Now prepare the output side of the transformation, from P->W2.
@@ -302,24 +311,29 @@ begin
 	# I which already deals with the W[i].
 
 	# Copy CD matrix to LTM.
-	if (WCS_CD(w2) == NULL)
+	if (WCS_CD(w2) == NULL) {
 	    call mw_mkidmd (Memd[o_ltm], pdim)
-	else
-	    call amovd (D(mw,WCS_CD(w2)), Memd[o_ltm], pdim*pdim)
+	} else {
+	    sz_val = pdim*pdim
+	    call amovd (D(mw,WCS_CD(w2)), Memd[o_ltm], sz_val)
+	}
 
 	# Copy -R to t_ltv.
-	if (WCS_R(w2) == NULL)
-	    call aclrd (Memd[t_ltv], pdim)
-	else
-	    call amulkd (D(mw,WCS_R(w2)), -1.0D0, Memd[t_ltv], pdim)
+	sz_val = pdim
+	if (WCS_R(w2) == NULL) {
+	    call aclrd (Memd[t_ltv], sz_val)
+	} else {
+	    call amulkd (D(mw,WCS_R(w2)), -1.0D0, Memd[t_ltv], sz_val)
+	}
 
 	# Compute -CD*R in LTV.
 	call mw_vmuld (Memd[o_ltm], Memd[t_ltv], Memd[o_ltv], pdim)
 
 	# If no function calls for an axis and W is set, LTV=(W-CD*R).
 	if (WCS_W(w2) != NULL) {
-	    call amovd (D(mw,WCS_W(w2)), Memd[t_ltv], pdim)
-	    call aaddd (Memd[t_ltv], Memd[o_ltv], Memd[o_ltv], pdim)
+	    sz_val = pdim
+	    call amovd (D(mw,WCS_W(w2)), Memd[t_ltv], sz_val)
+	    call aaddd (Memd[t_ltv], Memd[o_ltv], Memd[o_ltv], sz_val)
 	    do i = 1, CT_NCALLO(ct) {
 		fc = CT_FCO(ct,i)
 		do j = 1, FC_NAXES(fc) {
@@ -335,7 +349,8 @@ begin
 
 	call mw_mmuld (Memd[o_ltm], Memd[i_ltm], Memd[t_ltm], pdim)
 	call mw_vmuld (Memd[o_ltm], Memd[i_ltv], Memd[t_ltv], pdim)
-	call    aaddd (Memd[o_ltv], Memd[t_ltv], Memd[t_ltv], pdim)
+	sz_val = pdim
+	call    aaddd (Memd[o_ltv], Memd[t_ltv], Memd[t_ltv], sz_val)
 
 	# Extract the rows of the full linear transformation which are used
 	# for the axes involved in the transformation we are compiling.
@@ -397,13 +412,16 @@ begin
 	}
 
 	# Prepare the single precision part of the transform.
-	call amovi (Memi[CT_D(ct)], Memi[CT_R(ct)], ctlen)
+	sz_val = ctlen
+	call amovp (Memp[CT_D(ct)], Memp[CT_R(ct)], sz_val)
 
 	ct_r = CT_R(ct)
 	CT_LTM(ct_r) = coerce (ct_r + LEN_CTBASE, TY_STRUCT, TY_REAL)
 	CT_LTV(ct_r) = CT_LTM(ct_r) + matlen
-	call achtdr (Memd[CT_LTM(ct)], Memr[CT_LTM(ct_r)], matlen)
-	call achtdr (Memd[CT_LTV(ct)], Memr[CT_LTV(ct_r)], naxes)
+	sz_val = matlen
+	call achtdr (Memd[CT_LTM(ct)], Memr[CT_LTM(ct_r)], sz_val)
+	sz_val = naxes
+	call achtdr (Memd[CT_LTV(ct)], Memr[CT_LTV(ct_r)], sz_val)
 
 	call sfree (sp)
 	return (ct)

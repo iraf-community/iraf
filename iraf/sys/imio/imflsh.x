@@ -21,7 +21,9 @@ int	ndim			# dimensionality of the section
 pointer	line
 long	pvs[IM_MAXDIM], pve[IM_MAXDIM]
 long	v[IM_MAXDIM], vinc[IM_MAXDIM]
-int	sz_pixel, inbounds, npix, xstep
+int	sz_pixel, inbounds
+size_t	npix
+long	xstep
 int	imsinb(), imloop()
 errchk	imwrpx, imwbpx
 include	<szdtype.inc>

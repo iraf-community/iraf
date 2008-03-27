@@ -15,19 +15,26 @@ int procedure imaccess (image, acmode)
 char	image[ARB]		# image name
 int	acmode			# access mode
 
+size_t	sz_val
 int	exists, cl_index, cl_size, mode, status
-pointer	sp, cluster, ksection, section, root, extn, im
+pointer	sp, cluster, ksection, section, root, extn, im, p_0
 int	iki_access()
 errchk	syserrs
 pointer	immap()
 
 begin
+	p_0 = 0
+
 	call smark (sp)
-	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
-	call salloc (ksection, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (root, SZ_PATHNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (cluster, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ksection, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (extn, sz_val, TY_CHAR)
 
 	call iki_init()
 
@@ -45,7 +52,7 @@ begin
 	    mode = acmode
 	    if (acmode == 0)
 		mode = READ_ONLY
-	    iferr (im = immap (image, mode, 0))
+	    iferr (im = immap (image, mode, p_0))
 		exists = NO
 	    else {
 		exists = YES

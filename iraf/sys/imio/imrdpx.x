@@ -16,20 +16,26 @@ procedure imrdpx (im, obuf, npix, v, xstep)
 
 pointer	im			# image descriptor
 char	obuf[ARB]		# output buffer
-int	npix			# number of pixels to extract
+size_t	npix			# number of pixels to extract
 long	v[IM_MAXDIM]		# physical coords of first pixel
-int	xstep			# step between pixels in X (neg for a flip)
+long	xstep			# step between pixels in X (neg for a flip)
 
+size_t	sz_val
 pointer	pl
 long	offset
-int	sz_pixel, nbytes, fd, op, step, nchars, n
+int	sz_pixel, fd
+long	op, step
+size_t	nbytes, nchars, n, c_1
 
 long	read(), imnote()
+long	absl()
 errchk	imerr, seek, read, pl_glpi, pl_glri
 include	<szdtype.inc>
 
 begin
-	step = abs (xstep)
+	c_1 = 1
+
+	step = absl (xstep)
 	if (v[1] < 1 || ((npix-1) * step) + v[1] > IM_SVLEN(im,1))
 	    call imerr (IM_NAME(im), SYS_IMREFOOB)
 
@@ -52,9 +58,11 @@ begin
 	    # and then convert back to a range list after the conversions.
 
 	    n = ((npix-1) * step + 1)
-	    if (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
+	    if (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO) {
+		# arg3: incompatible pointer
 		call pl_glri (pl, v, obuf, 0, n, PIX_SRC)
-	    else {
+	    } else {
+		# arg3: incompatible pointer
 		call pl_glpi (pl, v, obuf, 0, n, PIX_SRC)
 		if (step > 1)
 		    call imsamp (obuf, obuf, npix, sz_pixel, step)
@@ -78,7 +86,8 @@ begin
 
 	    for (op=1;  op <= nchars;  op=op+sz_pixel) {
 		call seek (fd, offset)
-		if (read (fd, obuf[op], sz_pixel) < sz_pixel)
+		sz_val = sz_pixel
+		if (read (fd, obuf[op], sz_val) < sz_pixel)
 		    call imerr (IM_NAME(im), SYS_IMNOPIX)
 		offset = offset + (sz_pixel * step)
 	    }
@@ -93,11 +102,11 @@ begin
 	    nbytes = npix * sz_pixel * SZB_CHAR
 	    switch (sz_pixel * SZB_CHAR) {
 	    case 2:
-		call bswap2 (obuf, 1, obuf, 1, nbytes)
+		call bswap2 (obuf, c_1, obuf, c_1, nbytes)
 	    case 4:
-		call bswap4 (obuf, 1, obuf, 1, nbytes)
+		call bswap4 (obuf, c_1, obuf, c_1, nbytes)
 	    case 8:
-		call bswap8 (obuf, 1, obuf, 1, nbytes)
+		call bswap8 (obuf, c_1, obuf, c_1, nbytes)
 	    }
 	}
 end

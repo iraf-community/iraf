@@ -15,20 +15,26 @@ char	imname[ARB]		#I image name or section
 char	title[ARB]		#O mask title
 int	maxch			#I max chars out
 
+size_t	sz_val
+long	lval
 bool	sampling
-pointer	im, px, im_pl, bp
+pointer	im, px, im_pl, bp, p_0
 long	vs_l[PL_MAXDIM], vs_p[PL_MAXDIM]
 long	ve_l[PL_MAXDIM], ve_p[PL_MAXDIM]
-int	npix, naxes, maxdim, maxval, depth, sz_buf, i
+int	naxes, maxdim, maxval, depth, sz_buf, i
+size_t	npix
 long	v_in[PL_MAXDIM], v_out[PL_MAXDIM], vn[PL_MAXDIM]
 
-pointer	immap()
-int	imgnli(), imstati(), im_pmsvhdr()
+pointer	immap(), imstatp()
+long	imgnli()
+int	im_pmsvhdr()
 errchk	immap, imgnli
 
 begin
+	p_0 = 0
+
 	# Open the input image.
-	im = immap (imname, READ_ONLY, 0)
+	im = immap (imname, READ_ONLY, p_0)
 
 	# Encode and output the image header.
 	bp = NULL;  i = im_pmsvhdr (im, bp, sz_buf)
@@ -49,19 +55,22 @@ begin
 	npix = IM_LEN(im,1)
 	naxes = IM_NDIM(im)
 	maxdim = min (IM_MAXDIM, PL_MAXDIM)
-	call amovl (IM_LEN(im,1), vn, maxdim)
+	sz_val = maxdim
+	call amovl (IM_LEN(im,1), vn, sz_val)
 	call pl_ssize (pl, naxes, vn, depth)
 
 	# If the image is already a mask internally, check whether any
 	# subsampling, axis flipping, or axis mapping is in effect.
 	# If so we can't use PLIO to copy the mask section.
 
-	im_pl = imstati (im, IM_PLDES)
+	im_pl = imstatp (im, IM_PLDES)
 	sampling = false
 
 	if (im_pl != NULL) {
-	    call amovkl (long(1), vs_l, maxdim)
-	    call amovl (IM_LEN(im,1), ve_l, maxdim)
+	    sz_val = maxdim
+	    lval = 1
+	    call amovkl (lval, vs_l, sz_val)
+	    call amovl (IM_LEN(im,1), ve_l, sz_val)
 	    call imaplv (im, vs_l, vs_p, maxdim)
 	    call imaplv (im, ve_l, ve_p, maxdim)
 
@@ -84,13 +93,16 @@ begin
 
 	} else {
 	    # Copy image pixels.  Initialize the vector loop indices.
-	    call amovkl (long(1), v_in, maxdim)
-	    call amovkl (long(1), v_out, maxdim)
+	    lval = 1
+	    sz_val = maxdim
+	    call amovkl (lval, v_in, sz_val)
+	    call amovkl (lval, v_out, sz_val)
 
 	    # Copy the image.
 	    while (imgnli (im, px, v_in) != EOF) {
 		call pl_plpi (pl, v_out, Memi[px], 0, npix, PIX_SRC)
-		call amovl (v_in, v_out, maxdim)
+		sz_val = maxdim
+		call amovl (v_in, v_out, sz_val)
 	    }
 	}
 

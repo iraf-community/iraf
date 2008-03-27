@@ -15,7 +15,8 @@ int	ndim
 
 pointer	lp
 int	ll_src, i
-long	v[PL_MAXDIM], vs[PL_MAXDIM], ve[PL_MAXDIM], vn[PL_MAXDIM]
+long	v[PL_MAXDIM], vs[PL_MAXDIM], ve[PL_MAXDIM]
+size_t	vn[PL_MAXDIM]
 
 bool	pll_empty()
 int	pl_reference(), plloop()
@@ -60,11 +61,12 @@ end
 bool procedure pll_empty (ll_src, xs, npix)
 
 short	ll_src[ARB]		#I input line list
-int	xs			#I first pixel to test
-int	npix			#I length of region to be tested
+long	xs			#I first pixel to test
+size_t	npix			#I length of region to be tested
 
-int	nleft, x1, np, v_src, i
-int	d_src[LEN_PLLDES]
+long	nleft, x1, np, i
+int	v_src
+long	d_src[LEN_PLLDES]
 
 begin
 	# Advance to the indicated position in the source list.

@@ -12,15 +12,19 @@ procedure imsslv (im, vs, ve, v, vinc, npix)
 
 pointer	im
 long	vs[IM_MAXDIM], ve[IM_MAXDIM]
-long	v[IM_MAXDIM], vinc[IM_MAXDIM], npix, step
+long	v[IM_MAXDIM], vinc[IM_MAXDIM]
+size_t	npix
+long	step
+
 int	i
+long	absl()
 
 begin
 	# Determine the direction in which each dimension is to be
 	# traversed.
 
 	do i = 1, IM_NPHYSDIM(im) {
-	    step = abs (IM_VSTEP(im,i))
+	    step = absl (IM_VSTEP(im,i))
 	    if (vs[i] <= ve[i])
 		vinc[i] = step
 	    else

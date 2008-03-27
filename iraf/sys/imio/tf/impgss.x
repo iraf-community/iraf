@@ -11,6 +11,7 @@ pointer	imdes
 long	vs[IM_MAXDIM], ve[IM_MAXDIM]
 pointer	bp, imgobf()
 int	ndim
+
 extern	imflss()
 errchk	imflush, imgobf
 

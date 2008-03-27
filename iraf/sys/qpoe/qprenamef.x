@@ -12,6 +12,7 @@ pointer	qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 char	newname[ARB]		#I new parameter name
 
+size_t	sz_val
 pointer	sym, nsym, st
 pointer	qp_gpsym(), stenter()
 errchk	qp_gpsym, syserrs, stenter
@@ -41,7 +42,8 @@ begin
 	nsym = stenter (st, newname, LEN_SYMBOL)
 	sym = qp_gpsym (qp, param)
 
-	call amovi (Memi[sym], Memi[nsym], LEN_SYMBOL)
+	sz_val = LEN_SYMBOL
+	call amovp (Memp[sym], Memp[nsym], sz_val)
 	S_FLAGS(sym) = or (S_FLAGS(sym), SF_DELETED)
 
 	QP_MODIFIED(qp) = YES

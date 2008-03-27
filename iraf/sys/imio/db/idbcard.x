@@ -26,9 +26,9 @@ this interface is internal to IMIO.
 
 define	LEN_IDB		6
 define	IDB_IM		Memi[P2I($1)]		# image descriptor
-define	IDB_UA		Memi[P2I($1+1)]		# pointer to user area
+define	IDB_UA		Memp[$1+1]		# pointer to user area
 define	IDB_UALEN	Memi[P2I($1+2)]		# length of user area
-define	IDB_RECPTR	Memi[P2I($1+3)]		# current record pointer
+define	IDB_RECPTR	Memp[$1+3]		# current record pointer
 define	IDB_RECNO	Memi[P2I($1+4)]		# current record number
 define	IDB_BLOCKED	Memi[P2I($1+5)]		# cards blank filled?
 
@@ -40,12 +40,14 @@ pointer procedure idb_open (im, ualen)
 pointer	im			#I image descriptor
 int	ualen			#O size of storage area
 
+size_t	sz_val
 int	n
 pointer	idb, ip
 errchk	malloc
 
 begin
-	call malloc (idb, LEN_IDB, TY_STRUCT)
+	sz_val = LEN_IDB
+	call malloc (idb, sz_val, TY_STRUCT)
 
 	IDB_IM(idb) = im
 	IDB_UA(idb) = IM_USERAREA(im)

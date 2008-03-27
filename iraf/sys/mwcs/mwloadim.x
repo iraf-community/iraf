@@ -17,29 +17,33 @@ procedure mw_loadim (mw, im)
 pointer	mw			#U pointer to MWCS descriptor
 pointer	im			#I pointer to image header
 
+size_t	sz_val
 bool	have_wcs
-int	ndim, i, j, ea_type
+int	ndim, i, j, ea_type, i_off
 int	axno[MAX_DIM], axval[MAX_DIM]
 double	maxval
-pointer	sp, sysname, iw, ct, wp, cp, bufp, ip
+pointer	sp, sysname, iw, ct, wp, cp, bufp
 
-int	mw_allocd(), mw_refstr(), ctoi(), envgeti()
+long	mw_allocd()
+int	mw_refstr(), ctoi(), envgeti()
 pointer	iw_rfits(), iw_findcard(), iw_gbigfits(), mw_open()
 errchk	iw_rfits, mw_allocd, mw_newsystem, mw_swtype, iw_enterwcs, mw_saxmap
 errchk	mw_open
 string	s_physical "physical"
 define	axerr_ 91
 define	axinit_ 92
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (sysname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sysname, sz_val, TY_CHAR)
 
 	# Read the FITS image header into an IMWCS descriptor.
 	iw = iw_rfits (mw, im, RF_REFERENCE)
 	if (mw == NULL) {
 	    ndim = max (IW_NDIM(iw), IM_NPHYSDIM(im))
-	    mw = mw_open (NULL, ndim)
+	    mw = mw_open (NULLPTR, ndim)
 	}
 	ndim = IW_NDIM(iw)
 
@@ -61,19 +65,23 @@ begin
 	    call mfree (MI_DBUF(mw), TY_DOUBLE)
 
 	# Initialize the new descriptor.
-	call aclri (Memi[mw], LEN_MWCS)
+	sz_val = LEN_MWCS
+	call aclrp (Memp[mw], sz_val)
 
 	MI_MAGIC(mw) = MWCS_MAGIC
 	MI_REFIM(mw) = im
 	MI_NDIM(mw) = ndim
-	MI_LTV(mw) = mw_allocd (mw, ndim)
-	MI_LTM(mw) = mw_allocd (mw, ndim * ndim)
+	sz_val = ndim
+	MI_LTV(mw) = mw_allocd (mw, sz_val)
+	sz_val = ndim * ndim
+	MI_LTM(mw) = mw_allocd (mw, sz_val)
 
 	# Set the Lterm.  Set axes with no LTM scales to unit scales.
 	# Issue a warning by default but use "wcs_matrix_err" to allow
 	# setting other error actions.
 
-	call amovd (IW_LTV(iw,1), D(mw,MI_LTV(mw)), ndim)
+	sz_val = ndim
+	call amovd (IW_LTV(iw,1), D(mw,MI_LTV(mw)), sz_val)
 	if (iw_findcard (iw, TY_LTM, ERR, 0) != NULL) {
 	    do i = 1, ndim {
 		maxval = 0D0
@@ -161,11 +169,11 @@ begin
 	if (iw_findcard (iw, TY_WAXMAP, ERR, 0) != NULL) {
 	    bufp = iw_gbigfits (iw, TY_WAXMAP, ERR)
 
-	    ip = bufp
+	    i_off = 1
 	    do i = 1, ndim {
-		if (ctoi (Memc, ip, axno[i]) <= 0)
+		if (ctoi (Memc[bufp], i_off, axno[i]) <= 0)
 		    goto axerr_
-		if (ctoi (Memc, ip, axval[i]) <= 0) {
+		if (ctoi (Memc[bufp], i_off, axval[i]) <= 0) {
 axerr_		    call eprintf ("Image %s: cannot decode WAXMAP\n")
 			call pargstr (IM_NAME(IW_IM(iw)))
 		    goto axinit_

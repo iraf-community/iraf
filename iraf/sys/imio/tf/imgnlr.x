@@ -8,12 +8,16 @@ include	<imhdr.h>
 # the leftmost subscript by one, until V equals IM_LEN, at which time EOF
 # is returned.
 
-int procedure imgnlr (imdes, lineptr, v)
+long procedure imgnlr (imdes, lineptr, v)
 
 pointer	imdes
 pointer	lineptr				# on output, points to the pixels
 long	v[IM_MAXDIM]			# loop counter
-int	npix, dtype, imgnln()
+
+size_t	sz_val
+long	npix
+int	dtype
+long	imgnln()
 errchk	imgnln
 
 begin
@@ -21,8 +25,10 @@ begin
 
 	if (npix != EOF) {
 	    dtype = IM_PIXTYPE(imdes)
-	    if (dtype != TY_REAL)
-		call imupkr (Memr[lineptr], Memr[lineptr], npix, dtype)
+	    if (dtype != TY_REAL) {
+		sz_val = npix
+		call imupkr (Memr[lineptr], Memr[lineptr], sz_val, dtype)
+	    }
 	}
 
 	return (npix)

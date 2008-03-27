@@ -19,13 +19,14 @@ pointer	im		# image descriptor
 int	group		# group to be accessed
 int	acmode		# access mode
 
+size_t	sz_val
 long	pixoff
 long	fi[LEN_FINFO]
 real	datamin, datamax
-pointer	sp, stf, lbuf, root, extn, op
-int	compress, devblksz, ival, ch, i , junk
-int	fits, fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
-long	totpix, mtime, ctime
+pointer	sp, stf, lbuf, root, extn, op, fits
+int	compress, ival, ch, i, junk
+int	fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
+long	totpix, devblksz, mtime, ctime
 
 real	imgetr()
 int	fnroot(), strlen(), sizeof(), finfo(), imaccf()
@@ -33,9 +34,11 @@ errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi, imgetr
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 
@@ -72,7 +75,7 @@ begin
 	    if (ch == 'R')
 		ival = TY_REAL
 	    else
-		ival = TY_LONG
+		ival = TY_INT
 	case 64:
 	    if (ch == 'R')
 		ival = TY_DOUBLE
@@ -140,7 +143,8 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 	# Append the saved FITS cards from the STF header to the user area.
@@ -149,7 +153,8 @@ begin
 	# we already output a FITS card for each GPB parameter above).
 
 	op = IM_USERAREA(im) + sz_gpbhdr
-	call amovc (Memc[fits], Memc[op], fitslen+1)
+	sz_val = fitslen+1
+	call amovc (Memc[fits], Memc[op], sz_val)
 
 	# Set the IMIO min/max fields.  If the GPB datamin >= datamax the
 	# values are invalidated by setting IM_LIMTIME to before the image

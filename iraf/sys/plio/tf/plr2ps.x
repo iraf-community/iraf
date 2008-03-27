@@ -9,12 +9,13 @@ include	<plio.h>
 int procedure pl_r2ps (rl_src, xs, px_dst, npix)
 
 short	rl_src[3,ARB]		#I input range list
-int	xs			#I starting pixel index in range list
+long	xs			#I starting pixel index in range list
 short	px_dst[ARB]		#O output pixel array
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
 short	hi, pv
-int	xe, x1, x2, iz, op, np, nz, nr, i, j
+int	nr, i
+long	xe, x1, x2, iz, op, np, nz, j
 define	done_ 91
 
 begin
@@ -67,8 +68,8 @@ done_
 	}
 
 	# Zero any remaining output range.
-	do i = op, npix
-	    px_dst[i] = 0
+	do j = op, npix
+	    px_dst[j] = 0
 
 	return (npix)
 end

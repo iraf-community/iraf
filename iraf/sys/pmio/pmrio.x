@@ -38,8 +38,8 @@ real work.
 .endhelp ----------------------------------------------------------------------
 
 # The following definitions must agree with those in plio$plrio.x.
-define	PMR_PL		Memi[P2I($1)]		# backpointer to PLIO descriptor
-define	PMR_PLANE	Memi[P2I($1+10)+($2)-1]	# defines 2D plane in ND mask
+define	PMR_PL		Memp[$1]		# backpointer to PLIO descriptor
+define	PMR_PLANE	Meml[P2L($1+10)+($2)-1]	# defines 2D plane in ND mask
 
 
 # PMR_OPEN -- Open a PMIO mask for random pixel access.  Provides efficient
@@ -49,8 +49,8 @@ define	PMR_PLANE	Memi[P2I($1+10)+($2)-1]	# defines 2D plane in ND mask
 pointer procedure pmr_open (pl, plane, buflimit)
 
 pointer	pl			#I PMIO/PLIO descriptor
-int	plane[ARB]		#I 2-dim plane to be accessed
-int	buflimit		#I approximate table size, or 0 if don't care
+long	plane[ARB]		#I 2-dim plane to be accessed
+size_t	buflimit		#I approximate table size, or 0 if don't care
 
 pointer	plr_open()
 include	"pmio.com"
@@ -71,7 +71,7 @@ end
 int procedure pmr_getpix (pmr, i, j)
 
 pointer	pmr			#I PMR descriptor
-int	i, j			#I plane-relative coordinates of pixel
+long	i, j			#I plane-relative coordinates of pixel
 
 pointer	pl
 int	plr_getpix()
@@ -94,20 +94,23 @@ end
 procedure pmr_setrect (pmr, x1,y1, x2,y2)
 
 pointer	pmr			#I PMR descriptor
-int	x1,y1			#I lower left corner of region
-int	x2,y2			#I upper right corner of region
+long	x1,y1			#I lower left corner of region
+long	x2,y2			#I upper right corner of region
 
+size_t	sz_val
 pointer	pl
 include	"pmio.com"
 
 begin
 	pl = PMR_PL(pmr)
         if (PM_MAPXY(pl) == YES) {
-	    call amovi (PMR_PLANE(pmr,1), v1, PM_MAXDIM)
+	    sz_val = PM_MAXDIM
+	    call amovl (PMR_PLANE(pmr,1), v1, sz_val)
             v1[1] = x1;  v1[2] = y1
             call imaplv (PM_REFIM(pl), v1, v2, PM_MAXDIM)
 
-	    call amovi (PMR_PLANE(pmr,1), v3, PM_MAXDIM)
+	    sz_val = PM_MAXDIM
+	    call amovl (PMR_PLANE(pmr,1), v3, sz_val)
             v3[1] = x2;  v3[2] = y2
             call imaplv (PM_REFIM(pl), v3, v4, PM_MAXDIM)
 

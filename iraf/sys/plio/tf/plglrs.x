@@ -12,10 +12,13 @@ pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I vector coords of line segment
 short	rl_dst[ARB]		#O output range list
 int	rl_depth		#I range list depth, bits
-int	npix			#I number of pixels desired
+size_t	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-int	mr, nr
+size_t	sz_val
+size_t	mr
+long	lval
+int	nr
 pointer	sp, rl_out, rl_src, ll_src
 pointer	pl_access()
 int	pl_l2rs()
@@ -32,12 +35,14 @@ begin
 	    call salloc (rl_out, mr, TY_SHORT)
 
 	    nr = pl_l2rs (Mems[ll_src], v[1], Mems[rl_src], npix)
-	    call pl_rangerops (Mems[rl_src], 1, PL_MAXVAL(pl),
-			              rl_dst,  1, MV(rl_depth),
+	    lval = 1
+	    call pl_rangerops (Mems[rl_src], lval, PL_MAXVAL(pl),
+			              rl_dst,  lval, MV(rl_depth),
 				      Mems[rl_out], npix, rop)
 
 	     # Copy out the edited range list.
-	     call amovs (Mems[rl_out], rl_dst, RLS_LEN(rl_out))
+	     sz_val = RLS_LEN(rl_out)
+	     call amovs (Mems[rl_out], rl_dst, sz_val)
 
 	    call sfree (sp)
 	}

@@ -19,13 +19,15 @@ int	maxelem			#I allocated length of parameter
 char	comment[ARB]		#I comment describing parameter
 int	flags			#I parameter flags
 
+size_t	sz_val
 bool	newtype
 pointer	sp, text, st, fm, sym, pval, dsym, dd
 int	fd, sz_elem, type, nchars, dtype, nfields, i
+size_t	nelems
 
 long	note()
 pointer	qp_gpsym(), stenter(), strefstab()
-int	stpstr(), qp_dtype(), qp_parsefl(), gstrcpy
+int	stpstr(), qp_dtype(), qp_parsefl(), gstrcpy()
 int	fm_nextlfile(), fm_getfd(), qp_elementsize(), fm_fopen()
 errchk	qp_bind, qp_gpsym, stenter, stpstr, fm_nextlfile, fm_fopen
 errchk	fm_getfd, note, write, syserrs
@@ -33,7 +35,8 @@ define	fixed_ 91
 
 begin
 	call smark (sp)
-	call salloc (text, SZ_TEXTBUF, TY_CHAR)
+	sz_val = SZ_TEXTBUF
+	call salloc (text, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -83,7 +86,8 @@ begin
 
 	if (newtype) {
 	    S_MAXELEM(sym) = nchars
-	    call salloc (dd, LEN_DDDES, TY_STRUCT)
+	    sz_val = LEN_DDDES
+	    call salloc (dd, sz_val, TY_STRUCT)
 	    iferr (nfields = qp_parsefl (qp, Memc[text], dd))
 		call erract (EA_WARN)
 	    else
@@ -139,19 +143,19 @@ fixed_
 	    S_NELEM(sym) = 0
 	    S_OFFSET(sym) = note (fd)
 	    S_LFILE(sym) = LF_STATICPARS
-	    nchars = S_MAXELEM(sym) * sz_elem
+	    nelems = S_MAXELEM(sym) * sz_elem
 
 	    # The param value is the field list (datatype parameter) for a
 	    # domain definition; otherwise we do not have a value yet, so we
 	    # merely allocate the storage and initialize to zero.
 
 	    if (newtype) {
-		call write (fd, Memc[text], nchars)
+		call write (fd, Memc[text], nelems)
 		S_NELEM(sym) = S_MAXELEM(sym)
 	    } else {
-		call salloc (pval, nchars, TY_CHAR)
-		call aclrc (Memc[pval], nchars)
-		call write (fd, Memc[pval], nchars)
+		call salloc (pval, nelems, TY_CHAR)
+		call aclrc (Memc[pval], nelems)
+		call write (fd, Memc[pval], nelems)
 	    }
 
 	    call fm_retfd (fm, S_LFILE(sym))
@@ -162,10 +166,10 @@ fixed_
 	    call eprintf ("%s: FLG=%oB TYP=%d DSY=%xX NEL=%d ")
 		call pargstr (param)
 		do i = 1, 4
-		    call pargi (Memi[sym+i-1])
+		    call pargi (Memi[P2I(sym+i-1)])
 	    call eprintf ("MEL=%d SZE=%d COM=%xX LFN=%d OFF=%d\n")
 		do i = 5, 9
-		    call pargi (Memi[sym+i-1])
+		    call pargi (Memi[P2I(sym+i-1)])
 	}
 
 	QP_MODIFIED(qp) = YES

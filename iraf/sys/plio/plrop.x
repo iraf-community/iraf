@@ -24,8 +24,9 @@ long	vs_src[PL_MAXDIM]	#I start vector in source mask
 pointer	pl_dst			#I destination mask (required)
 long	vs_dst[PL_MAXDIM]	#I start vector in destination mask
 long	vn[PL_MAXDIM]		#I vector giving subregion size
-long	rop			#I rasterop
+int	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src
 pointer	sp, ll_out, ll_src, ll_dst, ol_src, ol_dst
 long	v_src[PL_MAXDIM], v_dst[PL_MAXDIM]
@@ -79,9 +80,12 @@ begin
 	    call pl_update (pl_dst, v_dst, Mems[ll_out])
 
 	    # If the end of the input mask is reached, rewind it and go again.
-	    if (need_src)
-		if (plloop (v_src,vs_src,ve_src,PL_NAXES(pl_src)) == LOOP_DONE)
-		    call amovi (vs_src, v_src, PL_NAXES(pl_src))
+	    if (need_src) {
+		if (plloop (v_src,vs_src,ve_src,PL_NAXES(pl_src)) == LOOP_DONE) {
+		    sz_val = PL_NAXES(pl_src)
+		    call amovl (vs_src, v_src, sz_val)
+		}
+	    }
 
 	} until (plloop (v_dst, vs_dst, ve_dst, PL_NAXES(pl_dst)) == LOOP_DONE)
 

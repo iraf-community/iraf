@@ -13,9 +13,10 @@ procedure imwrite (imdes, buf, nchars, offset)
 
 pointer	imdes
 char	buf[ARB]
-int	nchars
+size_t	nchars
 long	offset
 
+size_t	sz_val
 int	fd
 char	zbuf[SZ_ZBUF]
 long	start, i
@@ -48,8 +49,10 @@ begin
 	    start = IM_FILESIZE(imdes) + 1
 
 	    call seek (fd, start)
-	    do i = start, offset, SZ_ZBUF
-		call write (fd, zbuf, min (SZ_ZBUF, offset-i))
+	    do i = start, offset, SZ_ZBUF {
+		sz_val = min (SZ_ZBUF, offset-i)
+		call write (fd, zbuf, sz_val)
+	    }
 
 	    call write (fd, buf, nchars)
 	    IM_FILESIZE(imdes) = fstatl (fd, F_FILESIZE)

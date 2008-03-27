@@ -32,6 +32,24 @@ begin
 end
 
 
+# FXF_GETL -- Return the long integer value of a FITS encoded card.
+
+procedure fxf_getl (card, lval)
+
+char	card[ARB]		# card to be decoded
+long	lval			# receives long integer value
+
+int	ip, ctol()
+char	sval[FITS_SZVALSTR]
+
+begin
+	call fxf_gstr (card, sval, FITS_SZVALSTR)
+	ip = 1
+	if (ctol (sval, ip, lval) <= 0)
+	    lval = 0
+end
+
+
 # FXF_GETR -- Return the real value of a FITS encoded card.
 
 procedure fxf_getr (card, rval)

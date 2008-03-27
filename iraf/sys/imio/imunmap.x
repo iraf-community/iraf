@@ -11,6 +11,7 @@ procedure imunmap (im)
 
 pointer	im
 
+size_t	sz_val
 int	acmode
 errchk	imflush, close, imerr, iki_updhdr
 
@@ -39,7 +40,8 @@ begin
 	    default:
 		IM_NDIM(im) = IM_NPHYSDIM(im)
 		IM_MTIME(im) = IM_SVMTIME(im)
-		call amovl (IM_SVLEN(im,1), IM_LEN(im,1), IM_NDIM(im))
+		sz_val = IM_NDIM(im)
+		call amovl (IM_SVLEN(im,1), IM_LEN(im,1), sz_val)
 	    }
 
 	    # Update the image header or mask storage file.

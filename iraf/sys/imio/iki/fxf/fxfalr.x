@@ -7,10 +7,10 @@ procedure fxf_altmr (a, b, npix, bscale, bzero)
 
 int	a[ARB]			#I input array
 real	b[ARB]			#O output array
-int	npix			#I number of pixels
+size_t	npix			#I number of pixels
 double	bscale, bzero		#I scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = 1, npix

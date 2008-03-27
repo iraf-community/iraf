@@ -16,6 +16,7 @@ char	nroot[ARB]		#I new image root name
 char	nextn[ARB]		#I old image extn
 int	status			#O status value
 
+size_t	sz_val
 pointer	sp
 int	cindx
 pointer	ohdr_fname, nhdr_fname
@@ -25,8 +26,9 @@ include "fxfcache.com"
 
 begin
 	call smark (sp)
-	call salloc (ohdr_fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (nhdr_fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (ohdr_fname, sz_val, TY_CHAR)
+	call salloc (nhdr_fname, sz_val, TY_CHAR)
 
 	call fxf_init()
 

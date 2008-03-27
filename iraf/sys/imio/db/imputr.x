@@ -9,11 +9,13 @@ procedure imputr (im, key, rval)
 pointer	im			# image descriptor
 char	key[ARB]		# parameter to be set
 real	rval			# parameter value
+size_t	sz_val
 pointer	sp, sval
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sval, sz_val, TY_CHAR)
 
 	call sprintf (Memc[sval], SZ_FNAME, "%0.*g")
 	    call pargi (NDIGITS_RP)

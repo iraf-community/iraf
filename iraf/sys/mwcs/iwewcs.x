@@ -20,12 +20,15 @@ pointer	mw			#I pointer to MWCS descriptor
 pointer	iw			#I pointer to IMWCS descriptor
 int	ndim			#I system dimension
 
+size_t	sz_val
 double	theta
 char	ctype[8]
 bool	have_ltm, have_ltv, have_wattr
-int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j, ea_type
+int	axes[2], axis, ch, ip, raax, decax, ax1, ax2, i, j, ea_type
+size_t	npts
+long	l
 double	maxval
-pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm, str
+pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm, str, pp
 
 bool	streq()
 pointer	iw_gbigfits(), iw_findcard()
@@ -35,13 +38,16 @@ define	samperr_ 91
 
 begin
 	call smark (sp)
-	call salloc (r, ndim, TY_DOUBLE)
-	call salloc (o_r, ndim, TY_DOUBLE)
-	call salloc (cd, ndim*ndim, TY_DOUBLE)
-	call salloc (ltm, ndim*ndim, TY_DOUBLE)
-	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (o_ltm, ndim*ndim, TY_DOUBLE)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = ndim
+	call salloc (r, sz_val, TY_DOUBLE)
+	call salloc (o_r, sz_val, TY_DOUBLE)
+	sz_val = ndim*ndim
+	call salloc (cd, sz_val, TY_DOUBLE)
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	call salloc (o_cd, sz_val, TY_DOUBLE)
+	call salloc (o_ltm, sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	raax = 1
 	decax = 2
@@ -79,17 +85,19 @@ begin
 		call malloc (pv, npts, TY_DOUBLE)
 		call malloc (wv, npts, TY_DOUBLE)
 
-		ip = 1
-		do i = 1, npts {
-		    if (ctod (Memc[bufp], ip, Memd[pv+i-1]) <= 0)
+		pp = bufp
+		do l = 1, npts {
+		    ip = 1
+		    if (ctod (Memc[pp], ip, Memd[pv+l-1]) <= 0)
 			goto samperr_
-		    if (ctod (Memc[bufp], ip, Memd[wv+i-1]) <= 0) {
+		    if (ctod (Memc[pp], ip, Memd[wv+l-1]) <= 0) {
 samperr_		call eprintf (
 			    "Image %s, axis %d: Cannot read sampled WCS\n")
 			    call pargstr (IM_NAME(IW_IM(iw)))
 			    call pargi (axis)
 			break
 		    }
+		    pp = pp + ip - 1
 		}
 
 		call mw_swtype (mw, axis, 1, "sampled", "")
@@ -292,21 +300,28 @@ samperr_		call eprintf (
 	have_ltv = (iw_findcard (iw, TY_LTV, ERR, 0) != NULL)
 
 	# Compute CD = CD' * LTM.
-	if (have_ltm)
+	if (have_ltm) {
 	    call mw_mmuld (Memd[o_cd], Memd[o_ltm], Memd[cd], ndim)
-	else
-	    call amovd (Memd[o_cd], Memd[cd], ndim*ndim)
+	} else {
+	    sz_val = ndim*ndim
+	    call amovd (Memd[o_cd], Memd[cd], sz_val)
+	}
 
 	# Compute R = inv(LTM) * (R' - LTV).
 	if (have_ltm || have_ltv) {
-	    call asubd (IW_CRPIX(iw,1), IW_LTV(iw,1), Memd[o_r], ndim)
+	    sz_val = ndim
+	    call asubd (IW_CRPIX(iw,1), IW_LTV(iw,1), Memd[o_r], sz_val)
 	    if (have_ltm) {
 		call mw_invertd (Memd[o_ltm], Memd[ltm], ndim)
 		call mw_vmuld (Memd[ltm], Memd[o_r], Memd[r], ndim)
-	    } else
-		call amovd (Memd[o_r], Memd[r], ndim)
-	} else
-	    call amovd (IW_CRPIX(iw,1), Memd[r], ndim)
+	    } else {
+		sz_val = ndim
+		call amovd (Memd[o_r], Memd[r], sz_val)
+	    }
+	} else {
+	    sz_val = ndim
+	    call amovd (IW_CRPIX(iw,1), Memd[r], sz_val)
+	}
 
 	# Set the Wterm.
 	call mw_swtermd (mw, Memd[r], IW_CRVAL(iw,1), Memd[cd], ndim)
@@ -316,8 +331,8 @@ samperr_		call eprintf (
 	do axis = 0, ndim {
 	    # Is there any attribute data for axis J?
 	    have_wattr = false
-	    do i = 1, IW_NCARDS(iw) {
-		cp = IW_CARD(iw,i)
+	    do l = 1, IW_NCARDS(iw) {
+		cp = IW_CARD(iw,l)
 		if (C_TYPE(cp) == TY_WATDATA && C_AXIS(cp) == axis) {
 		    have_wattr = true
 		    break

@@ -22,10 +22,10 @@ is monotonic.
 .endhelp --------------------------------------------------------------------
 
 # Driver specific fields of function call (FC) descriptor.
-define	FC_NPTS		Memi[P2I($1+FCU)]	# number of points in curve
-define	FC_LOC		Memi[P2I($1+FCU+1)]	# location in IN vector
-define	FC_V1		Memi[P2I($1+FCU+2)]	# pointer to IN vector
-define	FC_V2		Memi[P2I($1+FCU+3)]	# pointer to OUT vector
+define	FC_NPTS		Memz[P2Z($1+FCU)]	# number of points in curve
+define	FC_LOC		Meml[P2L($1+FCU+1)]	# location in IN vector
+define	FC_V1		Memp[$1+FCU+2]	# pointer to IN vector
+define	FC_V2		Memp[$1+FCU+3]	# pointer to OUT vector
 define	FC_W		Memd[P2D($1+FCU+4)]	# W value (CRVAL)
 define	FC_DIR		Memi[P2I($1+FCU+6)]	# direction of transform
 
@@ -38,7 +38,9 @@ procedure wf_smp_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I type of transformation
 
-int	axis, npts
+size_t	sz_val
+int	axis
+size_t	npts
 pointer	wp, mw, sp, emsg, pv, wv
 
 begin
@@ -63,7 +65,8 @@ begin
 	# Verify that we have a sampled WCS for this axis.
 	if (npts <= 0 || pv == NULL || wv == NULL) {
 	    call smark (sp)
-	    call salloc (emsg, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (emsg, sz_val, TY_CHAR)
 	    call sprintf (Memc[emsg], SZ_LINE,
 		"No sampled wcs entered for axis %d")
 		call pargi (axis)
@@ -101,10 +104,11 @@ pointer	fc			#I pointer to FC descriptor
 double	a_x			#I point to sample WCS at
 double	a_y			#O value of WCS at that point
 
-int	index, i, step
+long	index
+int	i, step
 double	frac, x, y
 pointer	ip, op, i1, i2
-int	wf_smp_binsearch()
+long	wf_smp_binsearch()
 define	sample_ 91
 define	oor_ 92
 
@@ -190,13 +194,13 @@ end
 # WF_SMP_BINSEARCH -- Perform a binary search of a sorted array for the
 # interval containing the given point.
 
-int procedure wf_smp_binsearch (x, v, npts)
+long procedure wf_smp_binsearch (x, v, npts)
 
 double	x				#I point we want interval for
 double	v[ARB]				#I array to be searched
-int	npts				#I number of points in array
+size_t	npts				#I number of points in array
 
-int	low, high, pos, i
+long	low, high, pos, i
 
 begin
 	low = 1

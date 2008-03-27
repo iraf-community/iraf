@@ -23,17 +23,23 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
+size_t	sz_val
 pointer	sp, fname, hp, pl
-int	naxes, axlen[IM_MAXDIM], depth
+int	naxes, depth
+long	axlen[IM_MAXDIM]
 bool	envgetb(), fnullfile()
 pointer	pl_open()
 int	access()
 errchk	imerr
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (hp, IM_LENHDRMEM(im), TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = IM_LENHDRMEM(im)
+	call salloc (hp, sz_val, TY_CHAR)
 
 	# The only valid cl_index for a PL image is -1 (none specified) or 1.
 	if (!(cl_index < 0 || cl_index == 1)) {
@@ -44,11 +50,12 @@ begin
 
 	# Get mask file name.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
-	call aclrc (IM_HDRFILE(im), SZ_IMHDRFILE)
+	sz_val = SZ_IMHDRFILE
+	call aclrc (IM_HDRFILE(im), sz_val)
 	call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
 
 	# Open an empty mask.
-	pl = pl_open (NULL)
+	pl = pl_open (NULLPTR)
 
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
 	    # Check that we will not be clobbering an existing mask.
@@ -73,8 +80,10 @@ begin
 	    call pl_gsize (pl, naxes, axlen, depth)
 
 	    IM_NDIM(im) = naxes
-	    call amovl (axlen, IM_LEN(im,1), IM_MAXDIM)
-	    call imioff (im, 1, YES, 1)
+	    sz_val = IM_MAXDIM
+	    call amovl (axlen, IM_LEN(im,1), sz_val)
+	    sz_val = 1
+	    call imioff (im, sz_val, YES, sz_val)
 
 	    # Restore the header cards.
 	    call im_pmldhdr (im, hp)

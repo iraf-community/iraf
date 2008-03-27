@@ -24,24 +24,45 @@ char	pkfn[ARB]		#I packed virtual filename from FIO
 int	mode			#I file access mode (ignored)
 int	status			#O output status - i/o channel if successful
 
-int	ip
+size_t	sz_val
+int	ip, i
 pointer	sp, fn, qpf
-int	ctoi()
+long	lval
+int	ctol()
+
+include "qpf.com"
 
 begin
 	call smark (sp)
-	call salloc (fn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fn, sz_val, TY_CHAR)
 
 	# The QPF descriptor is passed encoded in the pseudo filename as
 	# "QPFxxxx" (decimal).  Extract this and return it as the i/o
 	# channel for the driver.
 
 	ip = 4
-	call strupk (pkfn, Memc[fn], SZ_FNAME)
-	if (ctoi (Memc[fn], ip, qpf) <= 0)
+	sz_val = SZ_FNAME
+	call strupk (pkfn, Memc[fn], sz_val)
+	if (ctol (Memc[fn], ip, lval) <= 0)
 	    status = ERR
 	else
-	    status = qpf
+	    qpf = lval
+
+	# Setup qpf address table
+	do i = 0, num_qpf {
+	    if ( i == num_qpf ) break
+	    if ( Memp[qpf_ptrs0+i] == NULL ) break
+	}
+	if ( i == num_qpf ) {
+	    sz_val = num_qpf + 1
+	    call realloc (qpf_ptrs0, sz_val, TY_POINTER)
+	    num_qpf = sz_val
+	}
+	Memp[qpf_ptrs0+i] = qpf
+	qpf_ptrs = qpf_ptrs0 - 1
+	status = i + 1
+	#
 
 	QPF_IOSTAT(qpf) = 0
 	call sfree (sp)
@@ -55,7 +76,29 @@ procedure qpfzcl (chan, status)
 int	chan			#I QPF i/o channel
 int	status			#O output status
 
+size_t	sz_val
+int	i, i_max
+
+include "qpf.com"
+
 begin
+	# Setup qpf address table
+	Memp[qpf_ptrs+chan] = NULL
+	i_max = -1
+	do i = 0, num_qpf-1 {
+	    if ( Memp[qpf_ptrs0+i] != NULL ) i_max = i
+	}
+	sz_val = i_max + 1
+	if ( sz_val == 0 ) {
+	    call mfree (qpf_ptrs0, TY_POINTER)
+	    qpf_ptrs0 = NULL
+	} else {
+	    call realloc (qpf_ptrs0, sz_val, TY_POINTER)
+	}
+	qpf_ptrs = qpf_ptrs0 - 1
+	num_qpf = sz_val
+	#
+
 	status = OK
 end
 
@@ -68,17 +111,22 @@ procedure qpfzrd (chan, obuf, nbytes, boffset)
 
 int	chan			#I QPF i/o channel
 char	obuf[ARB]		#O output buffer
-int	nbytes			#I nbytes to be read
-int	boffset			#I file offset at which read commences
+size_t	nbytes			#I nbytes to be read
+long	boffset			#I file offset at which read commences
 
 pointer	qpf, im, io
-int	vs[2], ve[2]
+long	vs[2], ve[2]
 real	xblock, yblock
-int	szb_pixel, ncols, pixel, nev, xoff, yoff
+int	szb_pixel, nev
+long	xoff, yoff
+long	ncols, pixel
 int	sizeof(), qpio_readpixs(), qpio_readpixi()
+long	modl()
+
+include "qpf.com"
 
 begin
-	qpf = chan
+	qpf = Memp[qpf_ptrs+chan]
 	im  = QPF_IM(qpf)
 	io  = QPF_IO(qpf)
 
@@ -91,11 +139,11 @@ begin
 
 	# Convert boffset, nbytes to vs, ve.
 	pixel = (boffset - 1) / szb_pixel
-	vs[1] = (mod (pixel, ncols)) * xblock + xoff
+	vs[1] = (modl (pixel, ncols)) * xblock + xoff
 	vs[2] = (pixel / ncols) * yblock + yoff
 
 	pixel = (boffset-1 + nbytes - szb_pixel) / szb_pixel
-	ve[1] = (mod (pixel, ncols)) * xblock + (xblock-1) + xoff
+	ve[1] = (modl (pixel, ncols)) * xblock + (xblock-1) + xoff
 	ve[2] = (pixel / ncols) * yblock + (yblock-1) + yoff
 
 	# Call readpix to sample image into the output buffer.  Zero the buffer
@@ -107,6 +155,7 @@ begin
 	    case TY_SHORT:
 		nev = qpio_readpixs (io, obuf, vs, ve, 2, xblock, yblock)
 	    case TY_INT:
+		# arg2: incompatible pointer
 		nev = qpio_readpixi (io, obuf, vs, ve, 2, xblock, yblock)
 	    }
 	} then {
@@ -124,13 +173,15 @@ procedure qpfzwr (chan, ibuf, nbytes, boffset)
 
 int	chan			#I QPF i/o channel
 char	ibuf[ARB]		#O datg buffer
-int	nbytes			#I nbytes to be written
-int	boffset			#I file offset to write at
+size_t	nbytes			#I nbytes to be written
+long	boffset			#I file offset to write at
 
 pointer	qpf
 
+include "qpf.com"
+
 begin
-	qpf = chan
+	qpf = Memp[qpf_ptrs+chan]
 	QPF_IOSTAT(qpf) = nbytes
 end
 
@@ -141,12 +192,14 @@ end
 procedure qpfzwt (chan, status)
 
 int	chan			#I QPF i/o channel
-int	status			#O i/o channel status
+long	status			#O i/o channel status
 
 pointer	qpf
 
+include "qpf.com"
+
 begin
-	qpf = chan
+	qpf = Memp[qpf_ptrs+chan]
 	status = QPF_IOSTAT(qpf)
 end
 
@@ -157,14 +210,18 @@ procedure qpfzst (chan, param, value)
 
 int	chan			#I QPF i/o channel
 int	param			#I parameter to be returned
-int	value			#O parameter value
+long	value			#O parameter value
 
 pointer	qpf, im, io
-int	szb_pixel, npix
-int	qpio_stati(), sizeof()
+int	szb_pixel
+long	npix
+long	qpio_statl()
+int	sizeof()
+
+include "qpf.com"
 
 begin
-	qpf = chan
+	qpf = Memp[qpf_ptrs+chan]
 	im = QPF_IM(qpf)
 	io = QPF_IO(qpf)
 	npix = IM_PHYSLEN(im,1) * IM_PHYSLEN(im,2)
@@ -176,7 +233,7 @@ begin
 	case FSTT_FILSIZE:
 	    value = npix * szb_pixel
 	case FSTT_OPTBUFSIZE:
-	    value = min (npix*szb_pixel, qpio_stati(io,QPIO_OPTBUFSIZE))
+	    value = min (npix*szb_pixel, qpio_statl(io,QPIO_OPTBUFSIZE))
 	case FSTT_MAXBUFSIZE:
 	    value = npix * szb_pixel
 	default:

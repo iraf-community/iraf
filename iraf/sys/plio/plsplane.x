@@ -10,6 +10,9 @@ procedure pl_setplane (pl, v)
 pointer	pl			#I mask descriptor
 long	v[ARB]			#I vector defining plane
 
+size_t	sz_val
+
 begin
-	call amovl (v, PL_PLANE(pl,1), PL_MAXDIM)
+	sz_val = PL_MAXDIM
+	call amovl (v, PL_PLANE(pl,1), sz_val)
 end

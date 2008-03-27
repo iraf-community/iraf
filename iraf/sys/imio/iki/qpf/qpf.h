@@ -7,14 +7,14 @@ define	SZ_BIGSTR	64		# max length string per FITS card
 define	SZ_MAXFILTER	4096		# max size QPIO filter (for log only)
 
 define	LEN_QPFDES	10
-define	QPF_IM		Memi[P2I($1)]	# backpointer to image descriptor
-define	QPF_QP		Memi[P2I($1+1)]	# QPOE datafile descriptor
-define	QPF_IO		Memi[P2I($1+2)]	# QPIO descriptor
+define	QPF_IM		Memp[$1]	# backpointer to image descriptor
+define	QPF_QP		Memp[$1+1]	# QPOE datafile descriptor
+define	QPF_IO		Memp[$1+2]	# QPIO descriptor
 define	QPF_XBLOCK	Memr[P2R($1+3)]	# X block factor for sampling
 define	QPF_YBLOCK	Memr[P2R($1+4)]	# Y block factor for sampling
-define	QPF_VS		Memi[P2I($1+5+$2-1)]	# start vector of active rect
-define	QPF_VE		Memi[P2I($1+7+$2-1)]	# end vector of active rect
-define	QPF_IOSTAT	Memi[P2I($1+9)]	# i/o status (byte count)
+define	QPF_VS		Meml[P2L($1+5)+$2-1]	# start vector of active rect
+define	QPF_VE		Meml[P2L($1+7)+$2-1]	# end vector of active rect
+define	QPF_IOSTAT	Meml[P2L($1+9)]	# i/o status (byte count)
 
 # QPOE parameters to be omitted from the IMIO header user parameter list.
 define	OMIT "|naxes|axlen|datamin|datamax|cretime|modtime|limtime|"

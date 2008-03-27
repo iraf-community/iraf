@@ -49,10 +49,11 @@ int procedure qpex_modfilter (ex, exprlist)
 pointer ex                      #I qpex descriptor
 char    exprlist[ARB]           #I list of attribute=expr expressions
 
+size_t	sz_val
 bool	replace
-int	boffset, offset, max_offset, dtype
+int	boffset, offset, max_offset, dtype, i_off
 int	status, sz_expr, token, parenlevel, nchars, buflen
-pointer	sp, atname, assignop, tokbuf, expr, qp, ip, op, in, et_tail
+pointer	sp, atname, assignop, tokbuf, expr, qp, op, in, et_tail
 
 pointer	qp_opentext()
 int	qpex_codegeni(), qpex_codegenr(), qpex_codegend()
@@ -65,9 +66,10 @@ define	badatt_ 92
 
 begin
 	call smark (sp)
-	call salloc (atname, SZ_TOKBUF, TY_CHAR)
-	call salloc (assignop, SZ_TOKBUF, TY_CHAR)
-	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
+	sz_val = SZ_TOKBUF
+	call salloc (atname, sz_val, TY_CHAR)
+	call salloc (assignop, sz_val, TY_CHAR)
+	call salloc (tokbuf, sz_val, TY_CHAR)
 
 	status = OK
 	sz_expr = DEF_SZEXPRBUF
@@ -75,7 +77,8 @@ begin
 	qp = EX_QP(ex)
 
 	# Allocate a variable size expression buffer.
-	call malloc (expr, sz_expr, TY_CHAR)
+	sz_val = sz_expr
+	call malloc (expr, sz_val, TY_CHAR)
 
 	# Open the expression list for token input with macro expansion.
 	in = qp_opentext (qp, exprlist)
@@ -154,7 +157,8 @@ eatup_
 		buflen = op - expr
 		if (buflen + nchars > sz_expr) {
 		    sz_expr = sz_expr + INC_SZEXPRBUF
-		    call realloc (expr, sz_expr, TY_CHAR)
+		    sz_val = sz_expr
+		    call realloc (expr, sz_val, TY_CHAR)
 		    op = expr + buflen
 		}
 
@@ -172,8 +176,8 @@ eatup_
 	    # Parse the attribute name to determine the datatype and offset.
 
 	    # Get byte offset of field.
-	    ip = atname + 1
-	    if (ctoi (Memc, ip, boffset) <= 0)
+	    i_off = 1
+	    if (ctoi (Memc[atname + 1], i_off, boffset) <= 0)
 		goto badatt_
 
 	    # Get datatype and scaled offset; check field alignment.
@@ -187,6 +191,11 @@ eatup_
 		dtype = TY_INT
 		offset = boffset / (SZ_INT * SZB_CHAR)
 		if (offset * SZ_INT * SZB_CHAR != boffset)
+		    goto badatt_
+	    case 'L', 'l':
+		dtype = TY_LONG
+		offset = boffset / (SZ_LONG * SZB_CHAR)
+		if (offset * SZ_LONG * SZB_CHAR != boffset)
 		    goto badatt_
 	    case 'R', 'r':
 		dtype = TY_REAL

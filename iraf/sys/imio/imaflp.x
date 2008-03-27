@@ -6,15 +6,22 @@
 
 procedure imaflp (a, npix, sz_pixel)
 
-char	a[ARB], temp
-int	npix, sz_pixel
-int	i, left, right, pixel
+char	a[ARB]
+size_t	npix
+int	sz_pixel
+
+char	temp
+long	i, left, right, pixel
 
 begin
 	switch (sz_pixel) {
 	case SZ_SHORT:
 	    call imflps (a, npix)
+	case SZ_INT:
+	    # arg1: incompatible pointer
+	    call imflpi (a, npix)
 	case SZ_LONG:
+	    # arg1: incompatible pointer
 	    call imflpl (a, npix)
 
 	default:				# flip odd sized elements

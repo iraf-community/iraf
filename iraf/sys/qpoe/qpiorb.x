@@ -10,8 +10,9 @@ int procedure qpio_rbucket (io, evi)
 pointer	io			#I QPIO descriptor
 int	evi			#I bucket number desired
 
-int	ev1, ev2, nb
-int	offset, bkno, status
+int	ev1, ev2, bkno
+size_t	nb
+long	offset, status
 
 begin
 	# Event does not exist?

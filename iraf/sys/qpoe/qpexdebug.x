@@ -18,6 +18,7 @@ pointer	ex			#I QPEX descriptor
 int	out			#I output stream
 int	what			#I bitflags defining what to print
 
+size_t	sz_val
 char	binval[SZ_TEXT]
 pointer	sp, text, label, lutp, et, lt, pb, ip
 int	neterms, lutno, proglen, dest, nout, ch, i
@@ -36,23 +37,23 @@ begin
 	if (and (what, QPEXD_SUMMARY) != 0) {
 	    call fprintf (out,
 		"QPEX_DEBUG: ex=%xX, neterms=%d, proglen=%d/%d\n")
-		call pargi (ex)
+		call pargp (ex)
 		call pargi (neterms)
 		call pargi (proglen)
-		call pargi ((EX_PBTOP(ex) - EX_PB(ex)) / LEN_INSTRUCTION)
+		call pargp ((EX_PBTOP(ex) - EX_PB(ex)) / LEN_INSTRUCTION)
 
 	    call fprintf (out, "pb=%xX, pbtop=%xX, pbop=%xX, start=%xX\n")
-		call pargi (EX_PB(ex))
-		call pargi (EX_PBTOP(ex))
-		call pargi (EX_PBOP(ex))
-		call pargi (EX_START(ex))
+		call pargp (EX_PB(ex))
+		call pargp (EX_PBTOP(ex))
+		call pargp (EX_PBOP(ex))
+		call pargp (EX_START(ex))
 
 	    call fprintf (out, "db=%xX, dbtop=%xX, dbop=%xX, datalen=%d/%d\n")
-		call pargi (EX_DB(ex))
-		call pargi (EX_DBTOP(ex))
-		call pargi (EX_DBOP(ex))
-		call pargi (EX_DBOP(ex) - EX_DB(ex))
-		call pargi (EX_DBTOP(ex) - EX_DB(ex))
+		call pargp (EX_DB(ex))
+		call pargp (EX_DBTOP(ex))
+		call pargp (EX_DBOP(ex))
+		call pargp (EX_DBOP(ex) - EX_DB(ex))
+		call pargp (EX_DBTOP(ex) - EX_DB(ex))
 
 	    call fprintf (out, "max_frlutlen=%d, max_rrlutlen=%d, ")
 		call pargi (EX_MAXFRLUTLEN(ex))
@@ -62,14 +63,15 @@ begin
 		call pargi (EX_LUTMINRANGES(ex))
 
 	    call fprintf (out, "ethead=%xX, ettail=%xX, lthead=%xX\n")
-		call pargi (EX_ETHEAD(ex))
-		call pargi (EX_ETTAIL(ex))
-		call pargi (EX_LTHEAD(ex))
+		call pargp (EX_ETHEAD(ex))
+		call pargp (EX_ETTAIL(ex))
+		call pargp (EX_LTHEAD(ex))
 	}
 
 	# Regenerate and print the compiled expression.
 	if (and (what, QPEXD_SHOWEXPR) != 0) {
-	    call salloc (text, SZ_FILTERBUF, TY_CHAR)
+	    sz_val = SZ_FILTERBUF
+	    call salloc (text, sz_val, TY_CHAR)
 	    call fprintf (out,
 		"==================== expr ========================\n")
 	    if (qpex_getfilter (ex, Memc[text], SZ_FILTERBUF) > 0) {
@@ -82,8 +84,9 @@ begin
 	if (and (what, QPEXD_PROGRAM) != 0) {
 	    pb = EX_PB(ex)
 
-	    call salloc (label, proglen+1, TY_INT)
-	    call aclri (Memi[label], proglen+1)
+	    sz_val = proglen+1
+	    call salloc (label, sz_val, TY_INT)
+	    call aclri (Memi[label], sz_val)
 
 	    # Flag those instructions which are the destinations of branches.
 	    do i = 1, proglen {
@@ -93,10 +96,10 @@ begin
 		    dest = (IARG1(ip) - pb) / LEN_INSTRUCTION
 		    Memi[label+dest] = YES
 		case LUTXS, LUTXI, LUTXR, LUTXD:
-		    if (IARG3(ip) == NULL)
+		    if (PARG3(ip) == NULL)
 			dest = i
 		    else
-			dest = (IARG3(ip) - pb) / LEN_INSTRUCTION
+			dest = (PARG3(ip) - pb) / LEN_INSTRUCTION
 		    Memi[label+dest] = YES
 		}
 	    }
@@ -316,9 +319,9 @@ begin
 lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 			call pargi (ch)
 			call pargi (IARG1(ip))
-			call pargi (IARG2(ip))
-			if (IARG3(ip) != NULL)
-			    call pargi ((IARG3(ip) - pb) / LEN_INSTRUCTION + 1)
+			call pargp (PARG2(ip))
+			if (PARG3(ip) != NULL)
+			    call pargp ((PARG3(ip) - pb) / LEN_INSTRUCTION + 1)
 			else
 			    call pargi (i + 1)
 		}
@@ -342,7 +345,7 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 			call pargi (neterms)
 			call pargi (ET_ATTTYPE(et))
 			call pargi (ET_ATTOFF(et))
-			call pargi ((ET_PROGPTR(et) - pb) / LEN_INSTRUCTION + 1)
+			call pargp ((ET_PROGPTR(et) - pb) / LEN_INSTRUCTION + 1)
 			call pargi (ET_NINSTR(et))
 			call pargi (ET_DELETED(et))
 			call pargstr (Memc[ET_ATNAME(et)])
@@ -373,8 +376,8 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 		    lutno = lutno + 1
 		    call fprintf (out, "%2d %6x %6x %4d %5d  %d %d %*g  %g\n")
 			call pargi (lutno)
-			call pargi (lt)
-			call pargi (LT_LUTP(lt))
+			call pargp (lt)
+			call pargp (LT_LUTP(lt))
 			call pargi (LT_TYPE(lt))
 			call pargi (LT_NBINS(lt))
 			call pargi (LT_LEFT(lt))
@@ -406,7 +409,7 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 		    call fprintf (out,
 			"================== LUT %d (%x) ==================\n")
 			call pargi (lutno)
-			call pargi (lutp)
+			call pargp (lutp)
 		    nout = 0
 		    do i = 0, LT_NBINS(lt) - 1 {
 			if (i == 0 || nout >= NLUTPERLINE) {

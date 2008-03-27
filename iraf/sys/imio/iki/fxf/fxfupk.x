@@ -21,30 +21,43 @@ define	IOFF		1
 procedure fxf_unpack_data (cbuf, npix, pixtype, bscale, bzero)
 
 char	cbuf[ARB]		#U buffer with input,output data
-int	npix			#I number of pixels in buffer
+size_t	npix			#I number of pixels in buffer
 int	pixtype			#I input pixtype
 double	bscale			#I scale factor to applied to input data
 double	bzero			#I offset to applied to input data
 
-int	nchars, nbytes
+size_t	nchars, nbytes, c_1
 bool	fp_equald()
 int	sizeof()
 errchk	syserr
 
 begin
+	c_1 = 1
+
         nchars = npix * sizeof (pixtype)
 	nbytes = nchars * SZB_CHAR
 
 	switch (pixtype) {
 	case TY_SHORT, TY_USHORT:
 	    if (BYTE_SWAP2 == YES)
-		call bswap2 (cbuf, 1, cbuf, 1, nbytes)
+		call bswap2 (cbuf, c_1, cbuf, c_1, nbytes)
 	    if (pixtype == TY_USHORT)
 		call fxf_altmu (cbuf, cbuf, npix)
 
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    if (BYTE_SWAP4 == YES)
-		call bswap4 (cbuf, 1, cbuf, 1, nbytes)
+		call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
+
+	case TY_LONG:
+	    if ( sizeof(TY_LONG) == 2 ) {
+		if (BYTE_SWAP4 == YES) {
+		    call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
+		}
+	    } else {
+		if (BYTE_SWAP8 == YES) {
+		    call bswap8 (cbuf, c_1, cbuf, c_1, nbytes)
+		}
+	    }
 
 	case TY_REAL:
 	    ### Rather than perform this test redundantly a flag should be
@@ -54,19 +67,25 @@ begin
 
 	    if (!fp_equald(bscale,1.0d0) || !fp_equald(bzero,0.0d0)) {
 		if (BYTE_SWAP4 == YES)
-		    call bswap4 (cbuf, 1, cbuf, 1, nbytes)
+		    call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
+		# arg1,2: incompatible pointer
 		call fxf_altmr (cbuf, cbuf, npix, bscale, bzero)
-	    } else
+	    } else {
+		# arg1: incompatible pointer
 		call ieevupkr (cbuf, cbuf, npix)
+	    }
 	   
 	case TY_DOUBLE:
 	    ### Same as above.
 	    if (!fp_equald(bscale,1.0d0) || !fp_equald(bzero,0.0d0)) {
 		if (BYTE_SWAP4 == YES)
-		    call bswap4 (cbuf, 1, cbuf, 1, nbytes)
+		    call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
+		# arg1,2: incompatible pointer
 		call fxf_altmd (cbuf, cbuf, npix, bscale, bzero)
-	    } else
+	    } else {
+		# arg1: incompatible pointer
 		call ieevupkd (cbuf, cbuf, npix)
+	    }
 	   
 	default:
 	    call syserr (SYS_FXFUPKDTY)
@@ -80,9 +99,9 @@ procedure fxf_altmu (a, b, npix)
 
 short	 a[ARB]			 #I input array
 char	 b[ARB]			 #O output array
-int	 npix			 #I number of pixels
+size_t	 npix			 #I number of pixels
 
-int	i
+long	i
 pointer sp, ip
 
 begin
@@ -92,7 +111,7 @@ begin
 	do i = 1, npix
 	    Memi[ip+i] = a[i] + 32768
 
-	call achtlu (Memi[ip+1], b, npix)
+	call achtiu (Memi[ip+1], b, npix)
 	call sfree (sp)
 end
 
@@ -103,10 +122,10 @@ procedure fxf_astmr (a, b, npix, bscale, bzero)
 
 short	a[ARB]			#I input array
 real	b[ARB]			#O output array
-int	npix			#I number of pixels
+size_t	npix			#I number of pixels
 double	bscale, bzero		#I scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = npix, 1, -1

@@ -18,13 +18,13 @@ define	V2U		LEN_V2IMHDR		# offset to user fields
 define	IM_V2USERAREA	(P2C($1+V2U))		# user area (database)
 
 # Disk resident header.
-define	IM_V2MAGIC	Memi[P2I($1)]		# contains the string "imhdr"
+define	IM_V2MAGIC	Memc[P2C($1)]		# contains the string "imhdr"
 define	IM_V2HDRLEN	Memi[P2I($1+3)]		# length of image header
 define	IM_V2PIXTYPE	Memi[P2I($1+4)]		# datatype of the pixels
 define	IM_V2SWAPPED	Memi[P2I($1+5)]		# pixels are byte swapped
 define	IM_V2NDIM	Memi[P2I($1+6)]		# number of dimensions
-define	IM_V2LEN	Meml[P2L($1+$2+7-1)]		# length of the dimensions
-define	IM_V2PHYSLEN	Meml[P2L($1+$2+14-1)]	# physical length (as stored)
+define	IM_V2LEN	Meml[P2L($1+7)+$2-1]		# length of the dimensions
+define	IM_V2PHYSLEN	Meml[P2L($1+14)+$2-1]	# physical length (as stored)
 define	IM_V2SSMTYPE	Meml[P2L($1+21)]		# type of subscript mapping
 define	IM_V2LUTOFF	Meml[P2L($1+22)]		# offset to subscript map luts
 define	IM_V2PIXOFF	Meml[P2L($1+23)]		# offset of the pixels

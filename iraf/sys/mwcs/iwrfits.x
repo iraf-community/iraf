@@ -25,13 +25,15 @@ pointer	mw			#I pointer to MWCS descriptor
 pointer	im			#I pointer to image header
 int	mode			#I RF_REFERENCE or RF_COPY
 
+size_t	sz_val
+long	lval
 double	dval
 bool	omit, copy
 pointer	iw, idb, rp, cp, fp
 int	ndim, recno, ualen, type, axis, index, ip, temp, i
 
 pointer	idb_open()
-int	idb_nextcard(), iw_cardtype(), ctod(), ctoi()
+int	idb_nextcard(), iw_cardtype(), ctod(), ctoi(), ctol()
 errchk	calloc, realloc, syserrs
 
 begin
@@ -39,12 +41,15 @@ begin
 	copy = (mode == RF_COPY)
 
 	# Allocate and initialize the FITS-WCS descriptor.
-	call calloc (iw, LEN_IMWCS, TY_STRUCT)
-	call calloc (IW_CBUF(iw), LEN_CDES * DEF_MAXCARDS, TY_STRUCT)
+	sz_val = LEN_IMWCS
+	call calloc (iw, sz_val, TY_STRUCT)
+	sz_val = LEN_CDES * DEF_MAXCARDS
+	call calloc (IW_CBUF(iw), sz_val, TY_STRUCT)
 
 	# Allocate string buffer if we must keep a local copy of the data.
 	if (copy) {
-	    call calloc (IW_SBUF(iw), SZ_SBUF, TY_CHAR)
+	    sz_val = SZ_SBUF
+	    call calloc (IW_SBUF(iw), sz_val, TY_CHAR)
 	    IW_SBUFLEN(iw) = SZ_SBUF
 	    IW_SBUFOP(iw) = 0
 	}
@@ -91,11 +96,11 @@ begin
 	    IW_NCARDS(iw) = IW_NCARDS(iw) + 1
 	    if (IW_NCARDS(iw) > IW_MAXCARDS(iw)) {
 		IW_MAXCARDS(iw) = IW_MAXCARDS(iw) + INC_MAXCARDS
-		call realloc (IW_CBUF(iw),
-		    IW_MAXCARDS(iw) * LEN_CDES, TY_STRUCT)
+		sz_val = IW_MAXCARDS(iw) * LEN_CDES
+		call realloc (IW_CBUF(iw), sz_val, TY_STRUCT)
 		cp = IW_CARD(iw,IW_NCARDS(iw))
-		call aclri (Memi[cp],
-		    (IW_MAXCARDS(iw) - IW_NCARDS(iw) + 1) * LEN_CDES)
+		sz_val = (IW_MAXCARDS(iw) - IW_NCARDS(iw) + 1) * LEN_CDES
+		call aclrp (Memp[cp], sz_val)
 	    }
 	    cp = IW_CARD(iw,IW_NCARDS(iw))
 
@@ -150,8 +155,11 @@ begin
 		if (ctod (Memc[rp], ip, IW_LTM(iw,axis,index)) <= 0)
 		    IW_LTM(iw,axis,index) = 0.0
 	    case TY_WSVLEN:
-		if (ctoi (Memc[rp], ip, IW_WSVLEN(iw,axis)) <= 0)
+		if (ctol (Memc[rp], ip, lval) <= 0) {
 		    IW_WSVLEN(iw,axis) = 0
+		} else {
+		    IW_WSVLEN(iw,axis) = lval
+		}
 	    case TY_WCSDIM:
 		if (ctoi (Memc[rp], ip, temp) > 0)
 		    IW_NDIM(iw) = temp

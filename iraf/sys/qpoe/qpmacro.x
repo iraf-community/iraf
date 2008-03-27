@@ -96,7 +96,7 @@ define	QM_FLAGREDEFS	1B		# complain about redefined macros
 
 # The QM descriptor (fixed pointer, while QM_ST is allowed to change).
 define	LEN_QM		1
-define	QM_ST		Memi[P2I($1)]	# pointer to macro symbol table
+define	QM_ST		Memp[$1]	# pointer to macro symbol table
 
 # The parameter set descriptor (for SET statements).
 define	LEN_PSET	32		# allow some extra space
@@ -109,8 +109,8 @@ define	PS_EXLSCALE	Memi[P2I($1+5)]	# QPEX scale nranges to LUT bins
 define	PS_SZPBBUF	Memi[P2I($1+6)]	# size of pushback buffer for macros
 define	PS_BUCKETLEN	Memi[P2I($1+7)]	# QPIO event file bucket size
 define	PS_FMMAXLFILES	Memi[P2I($1+8)]	# FMIO maxlfiles
-define	PS_FMMAXPTPAGES	Memi[P2I($1+9)]	# FMIO maxptpages (page table pages)
-define	PS_FMPAGESIZE	Memi[P2I($1+10)]	# FMIO pagesize
+define	PS_FMMAXPTPAGES	Memz[P2Z($1+9)]	# FMIO maxptpages (page table pages)
+define	PS_FMPAGESIZE	Meml[P2L($1+10)]	# FMIO pagesize
 define	PS_FMCACHESIZE	Memi[P2I($1+11)]	# FMIO buffer cache size
 define	PS_STINDEXLEN	Memi[P2I($1+12)]	# SYMTAB hash index length
 define	PS_STSTABLEN	Memi[P2I($1+13)]	# SYMTAB stab len (start)
@@ -120,7 +120,7 @@ define	PS_NODEFMASK	Memi[P2I($1+16)]	# Disable use of default mask
 define	PS_XBLOCK	Memr[P2R($1+17)]	# QPIO blocking factor in X
 define	PS_YBLOCK	Memr[P2R($1+18)]	# QPIO blocking factor in Y
 define	PS_DEBUG	Memi[P2I($1+19)]	# debug level
-define	PS_OPTBUFSIZE	Memi[P2I($1+20)]	# QPIO/QPF FIO optimum buffer size 
+define	PS_OPTBUFSIZE	Memz[P2Z($1+20)]	# QPIO/QPF FIO optimum buffer size 
 
 # Handy macros.
 define	IS_PUNCT	(IS_WHITE($1)||($1)==','||($1)=='\n')
@@ -133,12 +133,14 @@ define	IS_PUNCT	(IS_WHITE($1)||($1)==','||($1)=='\n')
 
 pointer procedure qm_access()
 
-int	nfiles, fd, i
+int	nfiles, fd, i, st_start
 bool	save_file_exists
 pointer	file[QM_MAXFILES]
 long	fi[LEN_FINFO], date[QM_MAXFILES], stdate
-pointer sp, qmfiles, qmsave, cbuf, qm, st, st_start, start, sym, ps, ip, op
+pointer sp, qmfiles, qmsave, cbuf, qm, st, start, sym, ps, ip, op
 
+size_t	sz_val
+long	lval
 long	clktime()
 int	envfind(), finfo(), open()
 pointer stopen(), stenter(), stfind(), strestore()
@@ -149,22 +151,27 @@ data	qm /NULL/
 
 begin
 	call smark (sp)
-	call salloc (qmfiles, SZ_LINE, TY_CHAR)
-	call salloc (qmsave, SZ_PATHNAME, TY_CHAR)
-	call salloc (cbuf, QM_SZCBUF, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (qmfiles, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (qmsave, sz_val, TY_CHAR)
+	sz_val = QM_SZCBUF
+	call salloc (cbuf, sz_val, TY_CHAR)
 
 	# Open the QM descriptor only once (per process).
 	if (qm == NULL) {
 	    # Allocate descriptor.
-	    call malloc (qm, LEN_QM, TY_STRUCT)
+	    sz_val = LEN_QM
+	    call malloc (qm, sz_val, TY_STRUCT)
 
 	    # Initialize symbol table.
 	    st = stopen (QMSTNAME, DEF_LENINDEX, DEF_LENSTAB, DEF_SZSBUF)
-	    sym = stenter (st, sttimekw, SZ_LONG);  Meml[sym] = 0
+	    sym = stenter (st, sttimekw, SZ_LONG);  Meml[P2L(sym)] = 0
 
 	    # Initialize settable interface/datafile parameters.
 	    ps = stenter (st, PSETKW, LEN_PSET)
-	    call aclri (Memi[ps], LEN_PSET)
+	    sz_val = LEN_PSET
+	    call aclrp (Memp[ps], sz_val)
 
 	    # Free back to here when rebuilding symbol table.
 	    call stmark (st, st_start)
@@ -221,7 +228,7 @@ begin
 
 	sym = stfind (st, sttimekw)
 	if (nfiles > 0 && sym != NULL) {
-	    stdate = Meml[sym]
+	    stdate = Meml[P2L(sym)]
 	    for (i=1;  i <= nfiles;  i=i+1)
 		if (date[i] > stdate)
 		    break
@@ -268,7 +275,8 @@ begin
 		call erract (EA_WARN)
 
 	# Set the time of last update.
-	Meml[sym] = clktime (0)
+	lval = 0
+	Meml[P2L(sym)] = clktime (lval)
 
 	# Update the save file if we have any defined macros.
 	if (nfiles > 0) {
@@ -360,9 +368,11 @@ pointer qm			#I QM descriptor
 int	fd			#I input stream
 int	flags			#I scan flags
 
+size_t	sz_val
 int	ch
 bool	is_define, is_set
-int	symarg, junk, buflen, i
+int	symarg, junk, i
+size_t	buflen
 pointer	sp, mname, mvbuf, sym, st, op, otop
 
 bool	streq()
@@ -373,8 +383,10 @@ define	next_ 91
 
 begin
 	call smark (sp)
-	call salloc (mname, SZ_MNAME, TY_CHAR)
-	call malloc (mvbuf, SZ_MVBUF, TY_CHAR)
+	sz_val = SZ_MNAME
+	call salloc (mname, sz_val, TY_CHAR)
+	sz_val = SZ_MVBUF
+	call malloc (mvbuf, sz_val, TY_CHAR)
 
 	st = QM_ST(qm)
 	junk = qm_getc (NULL, ch)
@@ -525,8 +537,9 @@ char	valstr[ARB]		#I parameter value
 
 pointer	ps
 double	dval
-int	value, ip, pp
-int	qp_ctoi(), qp_ctod(), strncmp()
+long	value
+int	ip, pp
+int	qp_ctol(), qp_ctod(), strncmp()
 pointer	stfind()
 bool	streq()
 errchk	stfind
@@ -566,7 +579,7 @@ begin
 	    PS_YBLOCK(ps) = dval
 	    return
 	} else {
-	    if (qp_ctoi (valstr, ip, value) <= 0) {
+	    if (qp_ctol (valstr, ip, value) <= 0) {
 err_		call eprintf ("bad value `%s' for QPOE parameter `%s'\n")
 		    call pargstr (valstr)
 		    call pargstr (param)
@@ -636,8 +649,12 @@ pointer	qm			#I QM descriptor
 pointer	qp			#I QPOE descriptor
 
 pointer	ps
+long	lval
+size_t	zval
 pointer	stfind()
 int	qm_spari()
+long	qm_sparl()
+size_t	qm_sparz()
 real	qm_sparr()
 errchk	stfind
 
@@ -659,8 +676,10 @@ begin
 	# Datafile parameters.
 	QP_BUCKETLEN(qp) = qm_spari (PS_BUCKETLEN(ps), DEF_BUCKETLEN)
 	QP_FMMAXLFILES(qp) = qm_spari (PS_FMMAXLFILES(ps), DEF_FMMAXLFILES)
-	QP_FMMAXPTPAGES(qp) = qm_spari (PS_FMMAXPTPAGES(ps), DEF_FMMAXPTPAGES)
-	QP_FMPAGESIZE(qp) = qm_spari (PS_FMPAGESIZE(ps), DEF_FMPAGESIZE)
+	zval = DEF_FMMAXPTPAGES
+	QP_FMMAXPTPAGES(qp) = qm_sparz (PS_FMMAXPTPAGES(ps), zval)
+	lval = DEF_FMPAGESIZE
+	QP_FMPAGESIZE(qp) = qm_sparl (PS_FMPAGESIZE(ps), lval)
 	QP_STINDEXLEN(qp) = qm_spari (PS_STINDEXLEN(ps), DEF_STINDEXLEN)
 	QP_STSTABLEN(qp) = qm_spari (PS_STSTABLEN(ps), DEF_STSTABLEN)
 	QP_STSBUFSIZE(qp) = qm_spari (PS_STSBUFSIZE(ps), DEF_STSBUFSIZE)
@@ -670,7 +689,8 @@ begin
 	QP_NODEFMASK(qp) = qm_spari (PS_NODEFMASK(ps), NO)
 	QP_XBLOCK(qp) = qm_sparr (PS_XBLOCK(ps), DEF_BLOCKFACTOR)
 	QP_YBLOCK(qp) = qm_sparr (PS_YBLOCK(ps), DEF_BLOCKFACTOR)
-	QP_OPTBUFSIZE(qp) = qm_spari (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
+	zval = DEF_OPTBUFSIZE
+	QP_OPTBUFSIZE(qp) = qm_sparz (PS_OPTBUFSIZE(ps), zval)
 	QP_DEBUG(qp) = qm_spari (PS_DEBUG(ps), 0)
 end
 
@@ -696,6 +716,38 @@ int procedure qm_spari (userval, defval)
 
 int	userval			#I user specified value, or zero
 int	defval			#I interface default
+
+begin
+	if (userval != 0)
+	    return (userval)
+	else
+	    return (defval)
+end
+
+
+# QM_SPARL -- Return the given long int parameter value, if set in the user's
+# macro files, otherwise return the interface default.
+
+long procedure qm_sparl (userval, defval)
+
+long	userval			#I user specified value, or zero
+long	defval			#I interface default
+
+begin
+	if (userval != 0)
+	    return (userval)
+	else
+	    return (defval)
+end
+
+
+# QM_SPARZ -- Return the given size_t parameter value, if set in the user's
+# macro files, otherwise return the interface default.
+
+size_t procedure qm_sparz (userval, defval)
+
+size_t	userval			#I user specified value, or zero
+size_t	defval			#I interface default
 
 begin
 	if (userval != 0)

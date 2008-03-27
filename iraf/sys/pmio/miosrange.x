@@ -15,12 +15,13 @@ int	ndim			#I dimensionality of region
 
 int	i
 int	btoi()
+long	absl()
 
 begin
 	do i = 1, IM_MAXDIM
 	    if (i <= ndim) {
 		M_VS(mp,i) = min (vs[i], ve[i])
-		M_VN(mp,i) = abs (ve[i] - vs[i]) + 1
+		M_VN(mp,i) = absl (ve[i] - vs[i]) + 1
 	    } else {
 		M_VS(mp,i) = 1
 		M_VN(mp,i) = 1

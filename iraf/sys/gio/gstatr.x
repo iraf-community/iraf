@@ -34,8 +34,6 @@ begin
 
 	case G_FD:
 	    return (GP_FD(gp))
-	case G_TTY:
-	    return (GP_TTY(gp))
 	case G_WCS:
 	    return (GP_WCS(gp))
 	case G_CURSOR:

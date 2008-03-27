@@ -16,9 +16,10 @@ int	depth			#I mask depth, bits
 pointer	pl
 pointer	pl_open()
 errchk	pl_open
+include	<nullptr.inc>
 
 begin
-	pl = pl_open (NULL)
+	pl = pl_open (NULLPTR)
 	call pl_ssize (pl, IM_NDIM(ref_im), IM_SVLEN(ref_im,1), depth)
 
 	PM_REFIM(pl) = ref_im

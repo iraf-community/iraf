@@ -29,14 +29,14 @@ define	FITS_SZCOMMENT	50		# max chars in comment, incl. /
 # simply copied into the user area of the IMIO descriptor.
 
 define	LEN_STFDES	(LEN_STFBASE+MAX_PCOUNT*LEN_PDES)
-define	STF_CACHE	STF_BITPIX	# cache descriptor starting here
+define	STF_CACHE	Memp[$1+10]	# cache descriptor starting here
 define	STF_CACHELEN	(33+STF_PCOUNT($1)*LEN_PDES)
 define	LEN_STFBASE	43
 
 define	STF_ACMODE	Memi[P2I($1)]	# image access mode
 define	STF_NEWIMAGE	Memi[P2I($1+1)]	# creating entire new STF format image?
 define	STF_GROUP	Memi[P2I($1+2)]	# group to be accessed
-define	STF_SZGROUP	Memi[P2I($1+3)]	# size of image+hdr in pixfile, chars
+define	STF_SZGROUP	Meml[P2L($1+3)]	# size of image+hdr in pixfile, chars
 define	STF_PFD		Memi[P2I($1+4)]	# pixfile file descriptor
 define	STF_GRARG	Memi[P2I($1+5)]	# group index given in image name
 			# (extra space)
@@ -47,7 +47,7 @@ define	STF_GCOUNT	Memi[P2I($1+13)]	# number of groups in STF image
 define	STF_PSIZE	Memi[P2I($1+14)]	# size of GPB, bits
 define	STF_PCOUNT	Memi[P2I($1+15)]	# number of parameters in GPB
 define	STF_DATATYPE	Memc[P2C($1+16)]# datatype string
-define	STF_LENAXIS	Memi[P2I($1+35+$2-1)]# 35:41 = [7] max
+define	STF_LENAXIS	Meml[P2L($1+35)+$2-1]# 35:41 = [7] max
 define	STF_PDES	(($1)+43+((($2)-1)*LEN_PDES))
 
 # GPB Parameter descriptor.

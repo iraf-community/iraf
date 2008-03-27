@@ -14,18 +14,20 @@ procedure pl_rangeropi (rl_src, xs, src_maxval,
 			 rl_dst, ds, dst_maxval, rl_out, npix, rop)
 
 int	rl_src[3,ARB]		#I source range list
-int	xs			#I starting pixel index in src range list
+long	xs			#I starting pixel index in src range list
 int	src_maxval		#I max pixel value in src mask
 int	rl_dst[3,ARB]		#I destination range list
-int	ds			#I starting pixel index in dst range list
+long	ds			#I starting pixel index in dst range list
 int	dst_maxval		#I max pixel value in dst mask
 int	rl_out[3,ARB]		#O output list (edited version of rl_dst)
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src, need_dst, rop_enable
 int	data, src_value, v_src, v_dst, pv
-int	segsize, opcode, x, i, np, rn_o, p
+int	opcode, rn_o, p, ival
+long	segsize, x, i, np
 int	d_src[LEN_PLRDES], d_dst[LEN_PLRDES]
 
 begin
@@ -118,8 +120,10 @@ begin
 
 		    if (R_NOTSRC(rop)) {
 			v_src = not (v_src)
-			if (src_maxval != 0)
-			    v_src = and (int(v_src), src_maxval)
+			if (src_maxval != 0) {
+			    ival = v_src
+			    v_src = and (ival, src_maxval)
+			}
 		    }
 
 		    if (v_src != 0 && src_maxval == 1)
@@ -130,8 +134,10 @@ begin
 		if (need_dst) {
 		    if (R_NOTDST(rop)) {
 			v_dst = not (v_dst)
-			if (dst_maxval != 0)
-			    v_dst = and (int(v_dst), dst_maxval)
+			if (dst_maxval != 0) {
+			    ival = v_dst
+			    v_dst = and (ival, dst_maxval)
+			}
 		    }
 		}
 
@@ -162,10 +168,12 @@ begin
 		# Mask the high bits to prevent negative values, or map int
 		# to bool for the case of a boolean output mask.
 
-		if (dst_maxval == 1 && pv != 0)
+		if (dst_maxval == 1 && pv != 0) {
 		    pv = 1
-		else if (dst_maxval > 1)
-		    pv = and (int(pv), dst_maxval)
+		} else if (dst_maxval > 1) {
+		    ival = pv
+		    pv = and (ival, dst_maxval)
+		}
 
 	    } else
 		pv = v_dst
@@ -190,6 +198,7 @@ begin
 	}
 
 	# Update the range list header.
-	call amovi (rl_dst, rl_out, (RL_FIRST - 1) * 3)
+	sz_val = (RL_FIRST - 1) * 3
+	call amovi (rl_dst, rl_out, sz_val)
 	RL_LEN(rl_out) = rn_o - 1
 end

@@ -41,9 +41,11 @@ pointer	im				#I image descriptor
 pointer	fits				#O pointer to saved FITS cards
 int	fitslen				#O length of FITS save area
 
+size_t	sz_val
+long	lval
 long	fi[LEN_FINFO]
-pointer	sp, pp, stf, o_stf, lbuf, op, hdrfile
-int	in, index, nchars, spool, slot, user, i
+pointer	sp, pp, stf, o_stf, lbuf, hdrfile
+int	in, index, nchars, spool, slot, user, i, op
 
 bool	streq()
 long	clktime(), fstatl()
@@ -59,15 +61,17 @@ pointer	rf_stf[MAX_CACHE]		# STF descriptor
 int	rf_lru[MAX_CACHE]		# lowest value is oldest slot
 long	rf_time[MAX_CACHE]		# time when entry was cached
 long	rf_mtime[MAX_CACHE]		# modify time of file in cache
-int	rf_fits[MAX_CACHE]		# FITS data
+pointer	rf_fits[MAX_CACHE]		# FITS data
 int	rf_fitslen[MAX_CACHE]		# size of data area
 char	rf_fname[SZ_PATHNAME,MAX_CACHE]	# header file pathname
 data	initialized /false/
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (hdrfile, sz_val, TY_CHAR)
 
 	# Initialize the header file cache on the first call.
 	if (!initialized) {
@@ -127,8 +131,9 @@ begin
 		    } else {
 			# Return the cached header.
 			rf_lru[i] = rf_refcount
-			call amovi (STF_CACHE(rf_stf[i]), STF_CACHE(o_stf),
-			    STF_CACHELEN(rf_stf[i]))
+			sz_val = STF_CACHELEN(rf_stf[i])
+			call amovp (STF_CACHE(rf_stf[i]), STF_CACHE(o_stf),
+				    sz_val)
 			fits = rf_fits[i]
 			fitslen = rf_fitslen[i]
 
@@ -162,25 +167,29 @@ begin
 		in = open (Memc[hdrfile], READ_ONLY, TEXT_FILE)
 	    else {
 		in = IM_HFD(im)
-		call seek (in, BOFL)
+		lval = BOFL
+		call seek (in, lval)
 	    }
 
 	    # Allocate a spool file for the FITS data.
 	    call sprintf (rf_fname[1,slot], SZ_PATHNAME, "STFHC#%d")
 		call pargi (slot)
 	    spool = open (rf_fname[1,slot], READ_WRITE, SPOOL_FILE)
-	    call fseti (spool, F_BUFSIZE, FI_SIZE(fi))
+	    call fsetl (spool, F_BUFSIZE, FI_SIZE(fi))
 
 	    # Allocate cache version of STF descriptor.
-	    call calloc (stf, LEN_STFDES, TY_STRUCT)
+	    sz_val = LEN_STFDES
+	    call calloc (stf, sz_val, TY_STRUCT)
 
 	    # Initialize the cache entry.
 	    call strcpy (Memc[hdrfile], rf_fname[1,slot], SZ_PATHNAME)
 	    rf_stf[slot] = stf
 	    rf_lru[slot] = rf_refcount
 	    rf_mtime[slot] = FI_MTIME(fi)
-	    if (!reload)
-		rf_time[slot] = clktime (0)
+	    if (!reload) {
+		lval = 0
+		rf_time[slot] = clktime (lval)
+	    }
 	    reload = true
 
 	    # Read successive lines of the FITS header.  Process reserved
@@ -216,7 +225,7 @@ begin
 		case KW_NAXIS:
 		    call stf_geti (Memc[lbuf], STF_NAXIS(stf))
 		case KW_NAXISN:
-		    call stf_geti (Memc[lbuf], STF_LENAXIS(stf,index))
+		    call stf_getl (Memc[lbuf], STF_LENAXIS(stf,index))
 		case KW_PCOUNT:
 		    call stf_geti (Memc[lbuf], STF_PCOUNT(stf))
 		case KW_PDTYPE:
@@ -244,17 +253,19 @@ begin
 
 	    # Free any unneeded space in the STF descriptor.
 	    if (STF_PCOUNT(stf) > 0) {
-		call realloc (stf,
-		    LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
+		sz_val = LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES
+		call realloc (stf, sz_val, TY_STRUCT)
 		rf_stf[slot] = stf
 	    }
 
 	    # Filter the spooled FITS cards to delete any cards which redefine
 	    # GPB keywords.  Store the filtered FITS data in the cache.
 
-	    call seek (spool, BOFL)
+	    lval = BOFL
+	    call seek (spool, lval)
 	    nchars = fstatl (spool, F_FILESIZE)
-	    call malloc (fits, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call malloc (fits, sz_val, TY_CHAR)
 	    user = stropen (Memc[fits], nchars, NEW_FILE)
 	    call stf_copyfits (stf, spool, NULL, user)
 

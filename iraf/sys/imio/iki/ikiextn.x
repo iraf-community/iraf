@@ -36,6 +36,7 @@ char	def_imtype[ARB]			#I default imtype value string
 char	env_imextn[ARB]			#I imextn environment variable
 char	def_imextn[ARB]			#I default imextn value string
 
+size_t	sz_val
 int	kset[MAX_KERNELS]
 pointer	sp, ip, ip_save, imtype, imextn, strval
 int	op, delim, status, nchars, i, j, kernel
@@ -46,9 +47,12 @@ include	"iki.com"
 
 begin
 	call smark (sp)
-	call salloc (imtype, SZ_IMTYPE, TY_CHAR)
-	call salloc (imextn, SZ_IMEXTN, TY_CHAR)
-	call salloc (strval, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_IMTYPE
+	call salloc (imtype, sz_val, TY_CHAR)
+	sz_val = SZ_IMEXTN
+	call salloc (imextn, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (strval, sz_val, TY_CHAR)
 
 	status = OK
 
@@ -82,7 +86,8 @@ begin
 
 	k_nextn = 0
 	k_sbufused = 0
-	call aclri (kset, MAX_KERNELS)
+	sz_val = MAX_KERNELS
+	call aclri (kset, sz_val)
 
 	# Process the user extension string first followed by the builtin
 	# defaults.  Anything given in the user string takes precedence

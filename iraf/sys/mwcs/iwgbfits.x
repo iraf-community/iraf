@@ -18,6 +18,7 @@ pointer	iw			#I pointer to IMWCS descriptor
 int	ctype			#I card type
 int	axis			#I axis to which card refers
 
+size_t	sz_val
 int	ncards, i, j, ch
 pointer	cp, bp, ip, op, rp
 define	put_ 10
@@ -32,7 +33,8 @@ begin
 	}
 
 	# Allocate the space.
-	call calloc (bp, ncards * MAX_FITSCOLS, TY_CHAR)
+	sz_val = ncards * MAX_FITSCOLS
+	call calloc (bp, sz_val, TY_CHAR)
 
 	# For successive cards 1, 2, 3, etc...
 	op = bp

@@ -19,8 +19,8 @@ Driver routines:
 define	MAX_NITER	20
 
 # Driver specific fields of function call (FC) descriptor.
-define	FC_LNGCOR	Memi[P2I($1+FCU)]		# RA axis (1 or 2)
-define	FC_LATCOR	Memi[P2I($1+FCU+1)]		# DEC axis (1 or 2)
+define	FC_LNGCOR	Memp[$1+FCU]
+define	FC_LATCOR	Memp[$1+FCU+1]
 define	FC_IRA		Memi[P2I($1+FCU+2)]		# RA axis (1 or 2)
 define	FC_IDEC		Memi[P2I($1+FCU+3)]		# DEC axis (1 or 2)
 define	FC_LONGP	Memd[P2D($1+FCU+4)]		# LONGPOLE (rads)
@@ -54,6 +54,7 @@ procedure wf_tnx_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
+size_t	sz_val
 int	i, szatstr
 double	dec
 pointer	atvalue, ct, mw, wp, wv
@@ -63,7 +64,8 @@ errchk	wf_decaxis(), mw_gwattrs()
 
 begin
 	# Allocate space for the attribute string.
-	call malloc (atvalue, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (atvalue, sz_val, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)
@@ -158,7 +160,8 @@ begin
 		if (strlen (Memc[atvalue]) < szatstr)
 		    break
 		szatstr = szatstr + SZ_LINE 
-		call realloc (atvalue, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atvalue, sz_val, TY_CHAR)
 
 	    }
 	} then {
@@ -178,7 +181,8 @@ begin
 		if (strlen (Memc[atvalue]) < szatstr)
 		    break
 		szatstr = szatstr + SZ_LINE 
-		call realloc (atvalue, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atvalue, sz_val, TY_CHAR)
 	    }
 	} then {
 	    FC_LATCOR(fc) = NULL

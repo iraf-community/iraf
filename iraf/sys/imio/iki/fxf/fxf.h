@@ -37,6 +37,7 @@ define	ENV_ISOCUTOVER	"isodates"	# environment override for default
 define	FITS_BYTE	8	# Bits in a FITS byte
 define	FITS_SHORT	16	# Bits in a FITS short
 define	FITS_LONG	32	# Bits in a FITS long
+define	FITS_LONGLONG	64	# Bits in a FITS longlong
 define	FITS_REAL	-32	# 32 Bits FITS IEEE float representation
 define	FITS_DOUBLE	-64	# 64 Bits FITS IEEE double representation
 
@@ -64,33 +65,33 @@ define	LEN_FITBASE	400
 
 define	FIT_ACMODE	Memi[P2I($1)]	# image access mode
 define	FIT_PFD		Memi[P2I($1+1)]	# pixel file descriptor
-define	FIT_PIXOFF	Memi[P2I($1+2)]	# pixel offset
-define	FIT_TOTPIX	Memi[P2I($1+3)]	# size of image in pixfile, chars
+define	FIT_PIXOFF	Meml[P2L($1+2)]	# pixel offset
+define	FIT_TOTPIX	Meml[P2L($1+3)]	# size of image in pixfile, chars
 define	FIT_IO		Memi[P2I($1+4)]	# FITS I/O channel
 define	FIT_ZCNV	Memi[P2I($1+5)]	# set if on-the-fly conversion needed
 define	FIT_IOSTAT	Memi[P2I($1+6)]	# i/o status for zfio routines
-define  FIT_TFORMP      Memi[P2I($1+7)]      # TFORM keyword value pointer
-define  FIT_TTYPEP      Memi[P2I($1+8)]      # TTYPE keyword value pointer
-define  FIT_TFIELDS     Memi[P2I($1+9)]      # number of fields in binary table
+define  FIT_TFORMP      Memp[$1+7]      # TFORM keyword value pointer
+define  FIT_TTYPEP      Memp[$1+8]      # TTYPE keyword value pointer
+define  FIT_TFIELDS     Meml[P2L($1+9)]      # number of fields in binary table
 define  FIT_PCOUNT      Memi[P2I($1+10)]     # PCOUNT keyword value
 			# extra space
 define	FIT_BSCALE	Memd[P2D($1+16)]
 define	FIT_BZERO	Memd[P2D($1+18)]
 define	FIT_BITPIX	Memi[P2I($1+20)]	# bits per pixel
 define	FIT_NAXIS	Memi[P2I($1+21)]	# number of axes in image
-define	FIT_LENAXIS	Memi[P2I($1+22+$2-1)]# 35:41 = [7] max
+define	FIT_LENAXIS	Meml[P2L($1+22)+$2-1]# 35:41 = [7] max
 define	FIT_ZBYTES	Memi[P2I($1+30)]	# Status value for FIT_ZCNV mode
 define	FIT_HFD		Memi[P2I($1+31)]	# Header file descriptor
 define	FIT_PIXTYPE	Memi[P2I($1+32)]
-define	FIT_CACHEHDR	Memi[P2I($1+33)]	# Cached main header unit's address.
+define	FIT_CACHEHDR	Memp[$1+33]	# Cached main header unit's address.
 define	FIT_CACHEHLEN	Memi[P2I($1+34)]	# Lenght of the above.
-define	FIT_IM		Memi[P2I($1+35)]	# Has the 'im' descriptor value 
+define	FIT_IM		Memp[$1+35]	# Has the 'im' descriptor value 
 define	FIT_GROUP	Memi[P2I($1+36)]
 define	FIT_NEWIMAGE	Memi[P2I($1+37)]	# Newimage flag
-define	FIT_HDRPTR	Memi[P2I($1+38)]	# Header data Xtension pointer
-define	FIT_PIXPTR	Memi[P2I($1+39)]	# Pixel data Xtension pointer
+define	FIT_HDRPTR	Memp[$1+38]	# Header data Xtension pointer
+define	FIT_PIXPTR	Memp[$1+39]	# Pixel data Xtension pointer
 define	FIT_NUMOFFS	Memi[P2I($1+40)]	# Number of offsets in cache header.
-define	FIT_EOFSIZE	Memi[P2I($1+41)]	# Size in char of file before append.
+define	FIT_EOFSIZE	Meml[P2L($1+41)]	# Size in char of file before append.
 define	FIT_XTENSION	Memi[P2I($1+42)]	# Yes, if an Xtension has been read.
 define	FIT_INHERIT	Memi[P2I($1+43)]	# INHERIT header keyword value.
 define	FIT_EXTVER	Memi[P2I($1+44)]	# EXTVER value (integer only)

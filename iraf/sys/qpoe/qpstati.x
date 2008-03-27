@@ -3,9 +3,9 @@
 include	<qpset.h>
 include	"qpoe.h"
 
-# QP_STATI -- Get the value of an QPOE integer parameter.
+# QP_STAT[ILP] -- Get the value of an QPOE integer parameter.
 
-int procedure qp_stati (qp, param)
+long procedure qp_statl (qp, param)
 
 pointer	qp			#I QPOE descriptor
 int	param			#I parameter to be queried
@@ -36,7 +36,7 @@ begin
 	case QPOE_MAXLFILES:
 	    return (QP_FMMAXLFILES(qp))
 	case QPOE_MAXPTPAGES:
-	    return (QP_FMMAXPTPAGES(qp))
+	    return (QP_FMMAXPTPAGES(qp))	# size_t
 	case QPOE_MAXFRLUTLEN:
 	    return (QP_EXMAXFRLLEN(qp))
 	case QPOE_MAXRRLUTLEN:
@@ -52,9 +52,9 @@ begin
 	case QPOE_NODEFMASK:
 	    return (QP_NODEFMASK(qp))
 	case QPOE_OPTBUFSIZE:
-	    return (QP_OPTBUFSIZE(qp))
+	    return (QP_OPTBUFSIZE(qp))		# size_t
 	case QPOE_PAGESIZE:
-	    return (QP_FMPAGESIZE(qp))
+	    return (QP_FMPAGESIZE(qp))		# long
 	case QPOE_PROGBUFLEN:
 	    return (QP_EXPBLEN(qp))
 	case QPOE_SBUFSIZE:
@@ -63,13 +63,42 @@ begin
 	    return (QP_STSTABLEN(qp))
 
 	case QPOE_FM:				# read-only params
-	    return (QP_FM(qp))
+	    return (QP_FM(qp))		# pointer
 	case QPOE_MODE:
 	    return (QP_MODE(qp))
 	case QPOE_ST:
-	    return (QP_ST(qp))
+	    return (QP_ST(qp))		# pointer
 	case QPOE_VERSION:
 	    return (QP_VERSION(qp))
+	}
+
+	return (ERR)
+end
+
+
+int procedure qp_stati (qp, param)
+
+pointer	qp			#I QPOE descriptor
+int	param			#I parameter to be queried
+
+long	qp_statl()
+
+begin
+	return ( qp_statl(qp, param) )
+end
+
+
+pointer procedure qp_statp (qp, param)
+
+pointer	qp			#I QPOE descriptor
+int	param			#I parameter to be queried
+
+begin
+	switch (param) {
+	case QPOE_FM:
+	    return (QP_FM(qp))
+	case QPOE_ST:
+	    return (QP_ST(qp))
 	}
 
 	return (ERR)

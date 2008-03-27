@@ -8,12 +8,15 @@ include	"qpio.h"
 int procedure qpio_getrange (io, vs, ve, maxdim)
 
 pointer	io			#I QPIO descriptor
-int	vs[ARB]			#O start vector (lower left corner)
-int	ve[ARB]			#O end vector (upper right corner)
+long	vs[ARB]			#O start vector (lower left corner)
+long	ve[ARB]			#O end vector (upper right corner)
 int	maxdim			#I vector length (ndim=2 at present)
 
+size_t	sz_val
+
 begin
-	call amovi (IO_VS(io,1), vs, maxdim)
-	call amovi (IO_VE(io,1), ve, maxdim)
+	sz_val = maxdim
+	call amovl (IO_VS(io,1), vs, sz_val)
+	call amovl (IO_VE(io,1), ve, sz_val)
 	return (NDIM)
 end

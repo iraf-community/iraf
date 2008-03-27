@@ -8,12 +8,15 @@ include	<plio.h>
 int procedure pl_p2li (px_src, xs, ll_dst, npix)
 
 int	px_src[ARB]		#I input pixel array
-int	xs			#I starting index in pixbuf
+long	xs			#I starting index in pixbuf
 short	ll_dst[ARB]		#O destination line list
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
 int	hi, pv, nv, zero
-int	xe, x1, iz, ip, op, np, nz, dv, v
+long	xe, x1, iz, ip, np, nz, dv
+int	op, v, ival
+int	modi()
+long	absl()
 define	done_ 91
 
 begin
@@ -72,8 +75,9 @@ begin
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (abs(dv) > I_DATAMAX) {
-			ll_dst[op] = M_SH + and (int(pv), I_DATAMAX)
+		    if (absl(dv) > I_DATAMAX) {
+			ival = pv
+			ll_dst[op] = M_SH + and (ival, I_DATAMAX)
 			op = op + 1
 			ll_dst[op] = pv / I_SHIFT
 			op = op + 1

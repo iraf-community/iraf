@@ -25,11 +25,14 @@ procedure mw_saveim (mw, im)
 pointer	mw				#I pointer to MWCS descriptor
 pointer	im				#I pointer to image descriptor
 
+size_t	sz_val
+long	lval
 double	cdelt
 char	label[SZ_VALSTR]
 bool	update, output_cdelt
 char	kwname[SZ_KWNAME], ctype[SZ_KWNAME], axtype[4]
-int	ndim, axis, fn, ira, idec, i, j, pv, wv, npts, fd
+int	ndim, axis, fn, ira, idec, i, j, fd
+long	npts, pv, wv, l
 pointer	sp, iw, wp, wf, vp, cp, at, o_r, n_r, o_cd, n_cd, ltm
 int	op
 
@@ -57,11 +60,13 @@ begin
 	    C_UPDATED(cp) = YES
 
 	call smark (sp)
-	call salloc (o_r, ndim, TY_DOUBLE)
-	call salloc (n_r, ndim, TY_DOUBLE)
-	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (n_cd, ndim*ndim, TY_DOUBLE)
-	call salloc (ltm, ndim*ndim, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (o_r, sz_val, TY_DOUBLE)
+	call salloc (n_r, sz_val, TY_DOUBLE)
+	sz_val = ndim*ndim
+	call salloc (o_cd, sz_val, TY_DOUBLE)
+	call salloc (n_cd, sz_val, TY_DOUBLE)
+	call salloc (ltm, sz_val, TY_DOUBLE)
 
 	# Get pointer to the world system to be saved.  Currently only one
 	# such system can be saved since the image header is FITS based and
@@ -203,25 +208,31 @@ begin
 	# to specify the transformation from logical to world coordinates.
 
 	# Get the MWCS R vector.
-	if (WCS_R(wp) != NULL)
-	    call amovd (D(mw,WCS_R(wp)), Memd[o_r], ndim)
-	else
-	    call aclrd (Memd[o_r], ndim)
+	sz_val = ndim
+	if (WCS_R(wp) != NULL) {
+	    call amovd (D(mw,WCS_R(wp)), Memd[o_r], sz_val)
+	} else {
+	    call aclrd (Memd[o_r], sz_val)
+	}
 
 	# Get the MWCS CD matrix.
-	if (WCS_CD(wp) != NULL)
-	    call amovd (D(mw,WCS_CD(wp)), Memd[o_cd], ndim*ndim)
-	else
+	if (WCS_CD(wp) != NULL) {
+	    sz_val = ndim*ndim
+	    call amovd (D(mw,WCS_CD(wp)), Memd[o_cd], sz_val)
+	} else {
 	    call mw_mkidmd (Memd[o_cd], ndim)
+	}
 	    
 	# Output CRVAL (this is unaffected by the Lterm).
-	if (WCS_W(wp) != NULL)
+	if (WCS_W(wp) != NULL) {
 	    call iw_putarray (iw, D(mw,WCS_W(wp)), IW_CRVAL(iw,1), ndim,
 		"CRVAL%d", TY_CRVAL, 0)
+	}
 
 	# Output CRPIX = R' =  (LTM * R + LTV).
 	call mw_vmuld (D(mw,MI_LTM(mw)), Memd[o_r], Memd[n_r], ndim)
-	call aaddd (D(mw,MI_LTV(mw)), Memd[n_r], Memd[n_r], ndim)
+	sz_val = ndim
+	call aaddd (D(mw,MI_LTV(mw)), Memd[n_r], Memd[n_r], sz_val)
 	call iw_putarray (iw, Memd[n_r], IW_CRPIX(iw,1), ndim,
 	    "CRPIX%d", TY_CRPIX, 0)
 
@@ -297,7 +308,8 @@ ewcs_
 	    }
 
 	    # Output successive WAXMAPj FITS cards.
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 	    call iw_putstr (fd, iw, axis, TY_WAXMAP, "WAXMAP%02d", "", 0)
 	    call close (fd)
 	}
@@ -331,7 +343,8 @@ ewcs_
 	    }
 
 	    # Output successive WATi_jjj FITS cards.
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 	    if (npts > 0)
 		call iw_putstr (fd, iw, axis, TY_WATDATA, "WAT%d_%03d",
 		    "WAT%d%04d", 999)
@@ -350,8 +363,8 @@ ewcs_
 		call sprintf (kwname, SZ_KWNAME, "WSV%d_LEN")
 		    call pargi (axis)
 		if (cp == NULL)
-		    call imaddf (im, kwname, "i")
-		call imputi (im, kwname, npts)
+		    call imaddf (im, kwname, "f")
+		call imputl (im, kwname, npts)
 	    }
 	    if (cp != NULL)
 		C_UPDATED(cp) = YES
@@ -363,14 +376,15 @@ ewcs_
 	    # points [PV,WV].
 
 	    fd = open ("WSV", READ_WRITE, SPOOL_FILE)
-	    do i = 1, npts {
+	    do l = 1, npts {
 		call fprintf (fd, "%0.*g %0.*g ")
-		    call pargi (NDIGITS_DP);  call pargd (D(mw,pv+i-1))
-		    call pargi (NDIGITS_DP);  call pargd (D(mw,wv+i-1))
+		    call pargi (NDIGITS_DP);  call pargd (D(mw,pv+l-1))
+		    call pargi (NDIGITS_DP);  call pargd (D(mw,wv+l-1))
 	    }
 
 	    # Output successive WSVi_jjj FITS cards.
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 	    call iw_putstr (fd, iw, axis, TY_WSVDATA, "WSV%d_%03d",
 		"WSV%d%04d", 999)
 	    call close (fd)

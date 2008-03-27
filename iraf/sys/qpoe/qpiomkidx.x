@@ -23,9 +23,13 @@ procedure qpio_mkindex (io, key)
 pointer	io			#I QPIO descriptor
 char	key[ARB]		#I list of key fields
 
-pointer	sp, tokbuf, ip, in, ev, ev_p, ov, lv, oo, bp
-int	ox, line, nevents, szs_event, ncols, nlines, nout, x, y, i, ch
-int	token, offset, xoff, yoff, len_index, nev, fd, sv_evi, firstev
+size_t	sz_val
+long	lval
+pointer	sp, tokbuf, in, ev, ev_p, ov, lv, oo, bp
+int	ox, line, nevents, szs_event, nout, i, ch
+long	ncols, nlines, x, y
+int	token, offset, xoff, yoff, nev, fd, sv_evi, firstev, i_off
+size_t	len_index
 int	dtype, ntype
 
 long	note()
@@ -36,7 +40,8 @@ define	nosort_ 91
 
 begin
 	call smark (sp)
-	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
+	sz_val = SZ_TOKBUF
+	call salloc (tokbuf, sz_val, TY_CHAR)
 	call malloc (oo, IO_NLINES(io) * 3 + 32, TY_SHORT)
 
 	ncols  = IO_NCOLS(io)
@@ -86,8 +91,8 @@ begin
 	    else if (ntype != dtype)
 		call syserrs (SYS_QPINVEVT, key)
 
-	    ip = tokbuf + 1
-	    if (ctoi (Memc, ip, offset) <= 0)
+	    i_off = 1
+	    if (ctoi (Memc[tokbuf + 1], i_off, offset) <= 0)
 		call syserrs (SYS_QPBADKEY, key)
 	    else
 		offset = offset / (sizeof(dtype) * SZB_CHAR)
@@ -114,7 +119,7 @@ begin
 
 	if (IO_DEBUG(io) > 1) {
 	    call eprintf ("qpio_mkindex (%xX, `%s')\n")
-		call pargi (io)
+		call pargp (io)
 		call pargstr (key)
 	    call eprintf ("nevents=%d, evsize=%d, xkey=%c%d, ykey=%c%d\n")
 		call pargi (IO_NEVENTS(io))
@@ -178,8 +183,8 @@ begin
 		if (IO_DEBUG(io) > 4) {
 		    # Egads!  Dump every photon.
 		    call eprintf ("(%04d,%04d) ")
-			call pargi (x)
-			call pargi (y)
+			call pargl (x)
+			call pargl (y)
 		    nout = nout + 1
 		    if (nout >= 6) {
 			call eprintf ("\n")
@@ -240,15 +245,20 @@ begin
 	# Apply data compression to the index arrays and append to the event
 	# list lfile.
 
-	call fseti (fd, F_BUFSIZE, len_index * SZ_INT)
-	call seek (fd, EOF)
+	# ??? SZ_INT ???
+	lval = len_index * SZ_INT
+	call fsetl (fd, F_BUFSIZE, lval)
+	lval = EOF
+	call seek (fd, lval)
 
 	IO_YOFFVOFF(io) = note (fd)
-	IO_YOFFVLEN(io) = pl_p2li (Memi[ov], 1, Mems[oo], len_index)
+	lval = 1
+	IO_YOFFVLEN(io) = pl_p2li (Memi[ov], lval, Mems[oo], len_index)
 	call write (fd, Mems[oo], IO_YOFFVLEN(io) * SZ_SHORT)
 
 	IO_YLENVOFF(io) = note (fd)
-	IO_YLENVLEN(io) = pl_p2li (Memi[lv], 1, Mems[oo], len_index)
+	lval = 1
+	IO_YLENVLEN(io) = pl_p2li (Memi[lv], lval, Mems[oo], len_index)
 	call write (fd, Mems[oo], IO_YLENVLEN(io) * SZ_SHORT)
 
 	call flush (fd)
@@ -266,11 +276,11 @@ begin
 
 	if (IO_DEBUG(io) > 1) {
 	    call eprintf ("index.offv %d words at offset %d\n")
-		call pargi (IO_YOFFVLEN(io))
-		call pargi (IO_YOFFVOFF(io))
+		call pargl (IO_YOFFVLEN(io))
+		call pargl (IO_YOFFVOFF(io))
 	    call eprintf ("index.lenv %d words at offset %d\n")
-		call pargi (IO_YLENVLEN(io))
-		call pargi (IO_YLENVOFF(io))
+		call pargl (IO_YLENVLEN(io))
+		call pargl (IO_YLENVOFF(io))
 	}
 
 	# Update the event list header.

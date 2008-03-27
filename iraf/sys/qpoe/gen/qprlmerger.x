@@ -10,15 +10,16 @@ include "../qpex.h"
 int procedure qp_rlmerger (os,oe,olen, xs,xe,nx, ys,ye,ny)
 
 pointer	os, oe			#U output range list
-int	olen			#U allocated length of OS, OE arrays
+size_t	olen			#U allocated length of OS, OE arrays
 
 real	xs[ARB], xe[ARB]	#I range list to be merged with
-int	nx			#I number of ranges in X list
+size_t	nx			#I number of ranges in X list
 real	ys[ARB], ye[ARB]	#I range list to be merged with X
-int	ny			#I number of ranges in Y list
+size_t	ny			#I number of ranges in Y list
 
 real	o1, o2
-int	nx_out, xi, yi, i
+int	nx_out, i
+long	xi, yi
 real	qp_minvalr(), qp_maxvalr()
 bool	qp_lessthanr()
 errchk	realloc

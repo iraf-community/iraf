@@ -9,13 +9,14 @@ include	<imio.h>
 # the leftmost subscript by one, until V equals IM_LEN, at which time EOF
 # is returned.  Subsequent writes are ignored.
 
-int procedure impnlr (imdes, lineptr, v)
+long procedure impnlr (imdes, lineptr, v)
 
 pointer	imdes
 pointer	lineptr				# on output, points to the pixels
 long	v[IM_MAXDIM]			# loop counter
-int	npix
-int	impnln()
+
+long	npix
+long	impnln()
 extern	imflsr()
 errchk	impnln
 

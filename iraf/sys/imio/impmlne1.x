@@ -8,11 +8,16 @@ include	<imio.h>
 bool procedure im_pmlne1 (im)
 
 pointer	im			#I image descriptor
+
+size_t	sz_val
+long	lval
 long	v[IM_MAXDIM]
 
 bool	pm_linenotempty()
 
 begin
-	call amovkl (1, v, IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, v, sz_val)
 	return (pm_linenotempty (IM_PL(im), v))
 end

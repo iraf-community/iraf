@@ -17,8 +17,9 @@ char    text[ARB]               #I the history string to be added
 char	pkey[ARB]		#I 'key' will be inserted bef/after pkey
 int     baf			# I Insert BEFORE or AFTER
 
-pointer	rp, sp, keyname, ua, ip, instr
-int	max_lenuserarea, curlen, buflen, nchars, piv
+size_t	sz_val
+pointer	rp, sp, keyname, ua, ip, instr, piv
+int	max_lenuserarea, curlen, buflen, nchars
 int	idb_findrecord()
 bool    streq()
 int	strlen(), idb_filstr(), nowhite()
@@ -27,8 +28,10 @@ errchk	syserrs, sprintf, pargstr, pargi
 
 begin
 	call smark (sp)
-	call salloc (keyname, SZ_FNAME, TY_CHAR)
-	call salloc (instr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (instr, sz_val, TY_CHAR)
 
 	nchars = idb_filstr (key, Memc[keyname], IDB_SZFITSKEY)
 	nchars = nowhite (Memc[keyname], Memc[keyname], IDB_SZFITSKEY)
@@ -60,7 +63,8 @@ begin
 	    IM_HDRLEN(im)  = LEN_IMHDR  + 
 	            (curlen + 10*36*81 + SZ_STRUCT-1) / SZ_STRUCT
 	    IM_LENHDRMEM(im) = IM_HDRLEN(im)  + (SZ_UAPAD / SZ_STRUCT)
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	    buflen = LEN_IMDES + IM_LENHDRMEM(im)
 	    max_lenuserarea = (buflen - IMU) * SZ_STRUCT - 1
 call eprintf("REALLOC MORE SPACE in UA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
@@ -90,7 +94,8 @@ call eprintf("REALLOC MORE SPACE in UA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
             else
 	        piv = rp - IDB_RECLEN - 1
 	    for (ip= ua+curlen-IDB_RECLEN-1; ip>=piv; ip=ip-IDB_RECLEN-1) {
-	        call amovc (Memc[ip], Memc[ip+IDB_RECLEN+1], IDB_RECLEN)
+	        sz_val = IDB_RECLEN
+	        call amovc (Memc[ip], Memc[ip+IDB_RECLEN+1], sz_val)
             }
         }
         Memc[ua+curlen+IDB_RECLEN]='\n'
@@ -105,10 +110,13 @@ call eprintf("REALLOC MORE SPACE in UA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 	    call pargstr (Memc[instr])
 
         # Replace keyword at the position rp+81.
-	if (baf == AFTER)
-            call amovc (card, Memc[rp+IDB_RECLEN+1], IDB_RECLEN)
-        else
-            call amovc (card, Memc[rp], IDB_RECLEN)
+	if (baf == AFTER) {
+            sz_val = IDB_RECLEN
+            call amovc (card, Memc[rp+IDB_RECLEN+1], sz_val)
+        } else {
+            sz_val = IDB_RECLEN
+            call amovc (card, Memc[rp], sz_val)
+        }
 
 	call sfree (sp)
 end

@@ -39,12 +39,14 @@ pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I coordinates of line in the mask
 short	ll[ARB]			#I encoded line list
 
+size_t	sz_val
 pointer	o_pp, n_pp
-int	totlen, axlen, index, i
+long	totlen, axlen, index
+int	i
 int	o_lp, n_lp, o_len, n_len, b_len
 
 bool	pll_equal()
-int	pl_alloc()
+int	pl_alloc(), modi()
 errchk	pl_alloc
 define	update_ 91
 define	oob_ 92
@@ -110,7 +112,8 @@ begin
 	    # Overwrite existing line.
 
 	    o_len = LP_LEN(o_pp)
-	    call amovs (ll, LL(pl,o_lp), n_len)
+	    sz_val = n_len
+	    call amovs (ll, LL(pl,o_lp), sz_val)
 	    LP_NREFS(o_pp) = 1
 	    LP_SETBLEN(o_pp, b_len)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) + (o_len - LP_LEN(o_pp))
@@ -122,7 +125,8 @@ begin
 	    n_lp = pl_alloc (pl, n_len)
 	    o_pp = Ref (pl, o_lp)
 	    n_pp = Ref (pl, n_lp)
-	    call amovs (ll, LL(pl,n_lp), n_len)
+	    sz_val = n_len
+	    call amovs (ll, LL(pl,n_lp), sz_val)
 
 	    LP_NREFS(n_pp) = 0
 	    LP_SETBLEN(n_pp, n_len)

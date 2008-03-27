@@ -9,12 +9,13 @@ include	<plio.h>
 int procedure pl_p2ri (px_src, xs, rl, npix)
 
 int	px_src[ARB]		#I input pixel array
-int	xs			#I starting index in pixbuf
+long	xs			#I starting index in pixbuf
 int	rl[3,ARB]		#O destination range list
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
-int	hi, pv, zero
-int	xe, x1, np, rn, nv, ip
+int	hi, pv, nv, zero
+long	xe, x1, np, ip
+int	rn
 define	done_ 91
 
 begin

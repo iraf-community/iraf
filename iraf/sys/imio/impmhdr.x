@@ -48,6 +48,7 @@ pointer	im				#I image descriptor
 pointer	bp				#U buffer containing encoded header
 int	sz_buf				#U allocated size of buffer, chars
 
+size_t	sz_val
 int	nchars, ualen, ch, i
 pointer	sp, tbuf, ip, op, idb, rp
 errchk	malloc, realloc, idb_open
@@ -56,12 +57,14 @@ pointer	idb_open()
 
 begin
 	call smark (sp)
-	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
+	sz_val = SZ_IMTITLE
+	call salloc (tbuf, sz_val, TY_CHAR)
 
 	# Allocate text buffer if the user hasn't already done so.
 	if (bp == NULL || sz_buf <= 0) {
 	    sz_buf = DEF_SZBUF
-	    call malloc (bp, sz_buf, TY_CHAR)
+	    sz_val = sz_buf
+	    call malloc (bp, sz_val, TY_CHAR)
 	}
 
 	# Store title string in buffer.
@@ -120,7 +123,8 @@ begin
 	    nchars = op - bp
 	    if (sz_buf - nchars < IDB_RECLEN) {
 		sz_buf = sz_buf + INC_SZBUF
-		call realloc (bp, sz_buf, TY_CHAR)
+		sz_val = sz_buf
+		call realloc (bp, sz_val, TY_CHAR)
 		op = bp + nchars
 	    }
 
@@ -140,7 +144,8 @@ begin
 	# All done, terminate the string and return any extra space.
 	Memc[op] = EOS;  op = op + 1
 	nchars = op - bp
-	call realloc (bp, nchars, TY_CHAR)
+	sz_val = nchars
+	call realloc (bp, sz_val, TY_CHAR)
 
 	# Clean up.
 	call idb_close (idb)
@@ -159,14 +164,16 @@ procedure im_pmldhdr (im, bp)
 pointer	im			#I image descriptor
 pointer	bp			#I pointer to text buffer (header save buf)
 
-int	hdrlen, sz_ua, nchars, ch, i
+size_t	sz_val
+int	hdrlen, sz_ua, nchars, ch, i, i_off
 pointer	sp, tbuf, ip, op, rp, ua
 int	strncmp(), ctol(), ctor()
 errchk	realloc
 
 begin
 	call smark (sp)
-	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
+	sz_val = SZ_IMTITLE
+	call salloc (tbuf, sz_val, TY_CHAR)
 
 	# Get the image title string.
 	for (ip = bp;  Memc[ip] != EOS;) {
@@ -202,10 +209,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_CTIME, LEN_KWCTIME) == 0) {
 		    # Decode the create time.
 		    ip = ip + LEN_KWCTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, IM_CTIME(im)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[ip], i_off, IM_CTIME(im)) <= 0)
 			IM_CTIME(im) = 0
-		    ip = ip + rp - 1
+		    ip = ip + i_off - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -216,10 +223,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_MTIME, LEN_KWMTIME) == 0) {
 		    # Decode the modify time.
 		    ip = ip + LEN_KWMTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, IM_MTIME(im)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[ip], i_off, IM_MTIME(im)) <= 0)
 			IM_MTIME(im) = 0
-		    ip = ip + rp - 1
+		    ip = ip + i_off - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -230,10 +237,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_LIMTIME, LEN_KWLIMTIME) == 0) {
 		    # Decode the limits time.
 		    ip = ip + LEN_KWLIMTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, IM_LIMTIME(im)) <= 0)
+		    i_off = 1
+		    if (ctol (Memc[ip], i_off, IM_LIMTIME(im)) <= 0)
 			IM_LIMTIME(im) = 0
-		    ip = ip + rp - 1
+		    ip = ip + i_off - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -244,10 +251,10 @@ begin
 		} else if (strncmp(Memc[ip],KW_MINPIXVAL,LEN_KWMINPIXVAL)==0) {
 		    # Decode the minimum pixel value.
 		    ip = ip + LEN_KWMINPIXVAL
-		    rp = 1
-		    if (ctor (Memc[ip], rp, IM_MIN(im)) <= 0)
+		    i_off = 1
+		    if (ctor (Memc[ip], i_off, IM_MIN(im)) <= 0)
 			IM_MIN(im) = 0.0
-		    ip = ip + rp - 1
+		    ip = ip + i_off - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -258,10 +265,10 @@ begin
 		} else if (strncmp(Memc[ip],KW_MAXPIXVAL,LEN_KWMAXPIXVAL)==0) {
 		    # Decode the maximum pixel value.
 		    ip = ip + LEN_KWMAXPIXVAL
-		    rp = 1
-		    if (ctor (Memc[ip], rp, IM_MAX(im)) <= 0)
+		    i_off = 1
+		    if (ctor (Memc[ip], i_off, IM_MAX(im)) <= 0)
 			IM_MAX(im) = 0.0
-		    ip = ip + rp - 1
+		    ip = ip + i_off - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -297,7 +304,8 @@ begin
 	    if (nchars + IDB_RECLEN + 2 > sz_ua) {
 		hdrlen = hdrlen + INC_HDRMEM
 		IM_LENHDRMEM(im) = IM_LENHDRMEM(im) + INC_HDRMEM
-		call realloc (im, hdrlen, TY_STRUCT)
+		sz_val = hdrlen
+		call realloc (im, sz_val, TY_STRUCT)
 		sz_ua = (hdrlen - IMU) * SZ_STRUCT - 1
 		ua = IM_USERAREA(im)
 		op = ua + nchars

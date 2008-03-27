@@ -126,7 +126,7 @@ begin
 	# Open old mask.
 	old_pm = pm_open (NULL)
 	call pm_loadf (old_pm, mask, title, SZ_LINE)
-	call pm_seti (old_pm, P_REFIM, im)
+	call pm_seto (old_pm, P_REFIM, im)
 
 	# Create a new mask.
 	new_pm = pm_newmask (im, pm_stati(old_pm,P_DEPTH))
@@ -160,8 +160,9 @@ int	mval, npix, totpix
 
 real	asums()
 bool	clgetb()
-pointer	immap(), mio_open()
-int	clgeti(), mio_glsegs(), mio_stati(), clscan(), nscan()
+pointer	immap(), mio_open(), mio_statp()
+int	clgeti(), clscan(), nscan()
+long	mio_glsegs()
 
 begin
 	call clgstr ("image", image, SZ_FNAME)
@@ -185,7 +186,7 @@ begin
 	call mio_setrange (mp, vs, ve, 2)
 
 	if (debug) {
-	    pm = mio_stati (mp, P_PMDES)
+	    pm = mio_statp (mp, P_PMDES)
 	    call pm_debug (pm, STDERR, 80, PD_LLOUT)
 	}
 

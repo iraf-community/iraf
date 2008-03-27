@@ -16,18 +16,20 @@ pointer	im			#I image descriptor
 int	group			#I group number to read
 int	acmode			#I access mode
 
-long	pixoff,	mtime
+size_t	sz_val
+long	pixoff,	mtime, devblksz
 pointer	sp, fit, lbuf, poff
-int	compress, devblksz, i, impixtype
+int	compress, i, impixtype
 bool    bfloat, lscale, lzero
 bool    fxf_fpl_equald()
-int	strncmp()
+int	strncmp(), sizeof()
 
 errchk	fxf_rfitshdr, realloc, syserr, syserrs
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fit = IM_KDES(im)
 
@@ -104,6 +106,17 @@ begin
 		impixtype = TY_REAL
 	    else
 		impixtype = TY_INT
+	case 64:
+	    if ( sizeof(TY_LONG) == 2 ) {
+		impixtype = ERR
+	    } else {
+		FIT_PIXTYPE(fit) = TY_LONG
+		if (bfloat) {
+		    impixtype = TY_DOUBLE
+		} else {
+		    impixtype = TY_LONG
+		}
+	    }
 	case -32:
 	    FIT_PIXTYPE(fit) = TY_REAL
 	    impixtype = TY_REAL
@@ -131,7 +144,7 @@ begin
 	compress = YES		# do not align image lines on blocks
 	devblksz = 1		# disable all alignment
 
-	pixoff = Memi[poff+group]
+	pixoff = Meml[poff+group]
 	FIT_PIXOFF(fit) = pixoff
 	call imioff (im, pixoff, compress, devblksz)
 	

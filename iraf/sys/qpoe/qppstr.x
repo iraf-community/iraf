@@ -11,6 +11,7 @@ pointer qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 char	strval[ARB]		#I new string value
 
+size_t	sz_val
 pointer	fm, sym
 int	fd, nchars
 
@@ -39,7 +40,8 @@ begin
 	if (S_MAXELEM(sym) > 0)
 	    nchars = min (S_MAXELEM(sym), nchars)
 
-	call write (fd, strval, nchars)
+	sz_val = nchars
+	call write (fd, strval, sz_val)
 	S_NELEM(sym) = nchars
 	QP_MODIFIED(qp) = YES
 

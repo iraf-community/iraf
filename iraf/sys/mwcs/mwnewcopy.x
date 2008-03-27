@@ -10,17 +10,22 @@ pointer procedure mw_newcopy (o_mw)
 
 pointer	o_mw			#I pointer to old MWCS descriptor
 
-int	ndim, nelem, i, j
+size_t	ndim, nelem
+int	i
+long	j
 pointer	mw, wp, o_wp, at, o_at
 
+size_t	sz_val
 bool	streq()
-int	mw_copys(), mw_copyd()
+int	mw_copys()
+long	mw_copyd()
 errchk	calloc, mw_copys, mw_copyd
 
 begin
 	# Make a copy of the main descriptor.
-	call malloc (mw, LEN_MWCS, TY_STRUCT)
-	call amovi (Memi[o_mw], Memi[mw], LEN_MWCS)
+	sz_val = LEN_MWCS
+	call malloc (mw, sz_val, TY_STRUCT)
+	call amovp (Memp[o_mw], Memp[mw], sz_val)
 
 	# We have to allocate our own string and data buffers.
 	MI_SBUF(mw) = NULL
@@ -37,7 +42,8 @@ begin
 	MI_LTM(mw) = mw_copyd (mw, o_mw, MI_LTM(o_mw), nelem)
 
 	# We don't inherit open CTRAN descriptors.
-	call aclri (MI_CTRAN(mw,1), MAX_CTRAN)
+	sz_val = MAX_CTRAN
+	call aclrp (MI_CTRAN(mw,1), sz_val)
 
 	# Copy the WCS.
 	do i = 1, MI_NWCS(o_mw) {
@@ -82,15 +88,15 @@ end
 # If the buffer offset in the old system is NULL, there was no data, and
 # a null offset is output.
 
-int procedure mw_copyd (mw, o_mw, o_off, nelem)
+long procedure mw_copyd (mw, o_mw, o_off, nelem)
 
 pointer	mw			#I pointer to output MWCS
 pointer	o_mw			#I pointer to input (old) MWCS
-int	o_off			#I buffer offset in old MWCS
-int	nelem			#I number of type double data elements
+long	o_off			#I buffer offset in old MWCS
+size_t	nelem			#I number of type double data elements
 
-int	off
-int	mw_allocd()
+long	off
+long	mw_allocd()
 errchk	mw_allocd
 
 begin

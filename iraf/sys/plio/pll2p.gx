@@ -5,17 +5,17 @@ include	<plio.h>
 # PL_L2P -- Convert a line list to a pixel array.  The number of pixels output
 # (always npix) is returned as the function value.
 
-int procedure pl_l2p$t (ll_src, xs, px_dst, npix)
+long procedure pl_l2p$t (ll_src, xs, px_dst, npix)
 
 short	ll_src[ARB]		#I input line list
-int	xs			#I starting index in ll_src
+long	xs			#I starting index in ll_src
 PIXEL	px_dst[ARB]		#O output pixel array
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
 PIXEL	pv
 bool	skipword
-int	opcode, data, ll_len, ll_first
-int	x1, x2, i1, i2, xe, np, ip, op, otop, i
+int	opcode, data, ll_len, ll_first, ip
+long	x1, x2, i1, i2, xe, np, op, otop, i
 define	putpix_ 91
  
 begin

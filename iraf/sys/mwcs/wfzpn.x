@@ -22,8 +22,8 @@ Driver routines:
 define  MAX_NITER       20
 
 # Driver specific fields of function call (FC) descriptor.
-define  FC_LNGCOR       Memi[P2I($1+FCU)]		# RA axis correction
-define  FC_LATCOR       Memi[P2I($1+FCU+1)]		# DEC axis correction
+define  FC_LNGCOR       Memp[$1+FCU]			# RA axis correction
+define  FC_LATCOR       Memp[$1+FCU+1]			# DEC axis correction
 define	FC_IRA		Memi[P2I($1+FCU+2)]		# RA axis (1 or 2)
 define	FC_IDEC		Memi[P2I($1+FCU+3)]		# DEC axis (1 or 2)
 define	FC_NP		Memd[P2D($1+FCU+4)]		# poly order (0-9)
@@ -66,21 +66,24 @@ procedure wf_zpn_init (fc, dir)
 pointer	fc			#I pointer to FC descriptor
 int	dir			#I direction of transform
 
+size_t	sz_val
 int	i, j, np, szatstr, maxorder, ualen, index, ip
 double	dec, zd1, d1, zd2, d2, zd, d, r, tol, dval
 pointer	sp, atname, atvalue, ct, mw, wp, wv, im, idb, rp
 char    compare[4]
 bool    match
-int	ctod(), strlen(), idb_nextcard(), itoc()
-pointer	wf_gsopen(), idb_open()
+int	ctod(), idb_nextcard(), itoc()
+pointer	idb_open()
 data	tol/1.0d-13/
 errchk	wf_decaxis(), mw_gwattrs()
 
 begin
 	# Allocate space for the attribute string.
 	call smark (sp)
-	call salloc (atname, SZ_ATNAME, TY_CHAR)
-	call salloc (atvalue, SZ_LINE, TY_CHAR)
+	sz_val = SZ_ATNAME
+	call salloc (atname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (atvalue, sz_val, TY_CHAR)
 
 	# Get the required mwcs pointers.
 	ct = FC_CT(fc)

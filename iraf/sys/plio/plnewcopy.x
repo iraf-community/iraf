@@ -15,9 +15,10 @@ int	naxes, depth
 long	axlen[PL_MAXDIM]
 pointer	pl_open()
 errchk	pl_open
+include	<nullptr.inc>
 
 begin
-	new_pl = pl_open (NULL)
+	new_pl = pl_open (NULLPTR)
 
 	call pl_gsize (old_pl, naxes, axlen, depth)
 	call pl_ssize (new_pl, naxes, axlen, depth)

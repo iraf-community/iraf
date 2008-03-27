@@ -7,7 +7,9 @@ long procedure imgetl (im, key)
 pointer	im			# image descriptor
 char	key[ARB]		# parameter to be returned
 
-double	dval, imgetd()
+double	dval
+double	imgetd()
+long	nint_dl()
 errchk	imgetd
 
 begin
@@ -15,5 +17,5 @@ begin
 	if (IS_INDEFD(dval))
 	    return (INDEFL)
 	else
-	    return (nint (dval))
+	    return (nint_dl (dval))
 end

@@ -22,21 +22,30 @@ char	pkfn[ARB]		#I packed virtual filename from FIO
 int	mode			#I file access mode (ignored)
 int	status			#O output status - i/o channel if successful
 
+size_t	sz_val
+long	lval
 pointer im, fit
-int	ip, indx, channel, strldx(), ctoi()
-bool	lscale, lzero, bfloat, fxf_fpl_equald()
+int	ip, indx, channel, i
+bool	lscale, lzero
+#bool	bfloat
+int	strldx(), ctol()
+bool	fxf_fpl_equald()
 char    fname[SZ_PATHNAME]
+
+include "fxf.com"
 
 begin
 	# Separate the FIT descriptor from the file name.
-	call strupk (pkfn, fname, SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (pkfn, fname, sz_val)
 
         ip = strldx ("_", fname)
 	indx = ip + 1
-	if (ctoi (fname, indx, fit) <= 0) {
+	if (ctol (fname, indx, lval) <= 0) {
 	   status = ERR
 	   return
 	}
+	fit = lval
 
 	# Determine if we have a Fits Kernel non supported
 	# data format; i.e. Bitpix -32 or -64 and BSCALE and/or
@@ -63,7 +72,8 @@ begin
 	#}
 
 	fname[ip] = EOS
-	call strpak (fname, fname, SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strpak (fname, fname, sz_val)
 
 	# Open the file.
 	call zopnbf (fname, mode, channel)
@@ -72,7 +82,21 @@ begin
 	   return
 	}
 
-	status = fit
+	# Setup fit address table
+	do i = 0, num_fit {
+	    if ( i == num_fit ) break
+	    if ( Memp[fit_ptrs0+i] == NULL ) break
+	}
+	if ( i == num_fit ) {
+	    sz_val = num_fit + 1
+	    call realloc (fit_ptrs0, sz_val, TY_POINTER)
+	    num_fit = sz_val
+	}
+	Memp[fit_ptrs0+i] = fit
+	fit_ptrs = fit_ptrs0 - 1
+	status = i + 1
+	#
+
 	FIT_IO(fit) = channel
 end
 
@@ -84,11 +108,32 @@ procedure fxfzcl (chan, status)
 int	chan			#I FIT i/o channel
 int	status			#O output status
 
+size_t	sz_val
 pointer fit
+int	i, i_max
+
+include "fxf.com"
 
 begin
-	fit = chan
+	fit = Memp[fit_ptrs+chan]
 	call zclsbf (FIT_IO(fit), status)
+
+	# Setup fit address table
+	Memp[fit_ptrs+chan] = NULL
+	i_max = -1
+	do i = 0, num_fit-1 {
+	    if ( Memp[fit_ptrs0+i] != NULL ) i_max = i
+	}
+	sz_val = i_max + 1
+	if ( sz_val == 0 ) {
+	    call mfree (fit_ptrs0, TY_POINTER)
+	    fit_ptrs0 = NULL
+	} else {
+	    call realloc (fit_ptrs0, sz_val, TY_POINTER)
+	}
+	fit_ptrs = fit_ptrs0 - 1
+	num_fit = sz_val
+	#
 end
 
 
@@ -103,19 +148,22 @@ procedure fxfzrd (chan, obuf, nbytes, boffset)
 
 int	chan			#I FIT i/o channel
 char	obuf[ARB]		#O output buffer
-int	nbytes			#I nbytes to be read
-int	boffset			#I file offset at which read commences
+size_t	nbytes			#I nbytes to be read
+long	boffset			#I file offset at which read commences
 
 pointer fit, im
-int	ip, pixtype, nb
-int	status, totpix, npix
-int	datasizeb, pixoffb, nb_skipped, i
-double  dtemp
-real    rtemp, rscale, roffset
+int	pixtype, i
+long	ip, nb
+long	status, totpix, datasizeb, pixoffb, nb_skipped
+size_t	npix
+#double  dtemp
+#real    rtemp, rscale, roffset
 int	sizeof()
 
+include "fxf.com"
+
 begin
-	fit = chan
+	fit = Memp[fit_ptrs+chan]
 	im = FIT_IM(fit)
 	FIT_IOSTAT(fit) = OK
 
@@ -168,9 +216,11 @@ begin
 	if (FIT_ZCNV(fit) == YES) {
 	    if (FIT_PIXTYPE(fit) == TY_REAL) {
 		# This is for scaling -32 (should not be allowed)
+		# arg1: incompatible pointer
 		call fxf_zaltrr(obuf[ip], npix, FIT_BSCALE(fit), FIT_BZERO(fit))
             } else if (FIT_PIXTYPE(fit) == TY_DOUBLE) {
 	        # This is for scaling -64 data (should not be allowed)
+		# arg1: incompatible pointer
 		call fxf_zaltrd(obuf[ip], npix, FIT_BSCALE(fit), FIT_BZERO(fit))
             }	    
         } else {
@@ -181,11 +231,11 @@ end
 
 procedure fxf_zaltrr (data, npix, bscale, bzero)
 
-real data[ARB], rt
-int    npix
+real data[ARB]
+size_t	npix
 double bscale, bzero
 
-int i
+long	i
 
 begin
 	call ieevupkr (data, data, npix)
@@ -198,10 +248,10 @@ end
 procedure fxf_zaltrd (data, npix, bscale, bzero)
 
 double data[ARB]
-int    npix
+size_t	npix
 double bscale, bzero
 
-int i
+long	i
 
 begin
 	call ieevupkd (data, data, npix)
@@ -217,19 +267,24 @@ procedure fxfzwr (chan, ibuf, nbytes, boffset)
 
 int	chan			#I QPF i/o channel
 char	ibuf[ARB]		#O data buffer
-int	nbytes			#I nbytes to be written
-int	boffset			#I file offset
+size_t	nbytes			#I nbytes to be written
+long	boffset			#I file offset
 
+size_t	sz_val
 pointer fit, im, sp, obuf
 bool	noconvert, lscale, lzero, bfloat
-int	ip, op, pixtype, npix, totpix, nb, nchars, i
-int	datasizeb, pixoffb, nb_skipped, obufsize
+int	pixtype, i
+long	ip, op, totpix, nb, nchars
+long	datasizeb, pixoffb, nb_skipped
+size_t	obufsize, npix
 
 bool	fxf_fpl_equald()
 int	sizeof()
 
+include "fxf.com"
+
 begin
-	fit = chan
+	fit = Memp[fit_ptrs+chan]
 	im = FIT_IM(fit)
 	FIT_IOSTAT(fit) = OK
 
@@ -318,8 +373,9 @@ begin
 	# Preserve any leading non-pixel data.
 	op = 1
 	if (ip > 1) {
-	    nchars = min (obufsize, ip - 1) 
-	    call amovc (ibuf[1], Memc[obuf], nchars)
+	    nchars = min (obufsize, ip - 1)
+	    sz_val = nchars
+	    call amovc (ibuf[1], Memc[obuf], sz_val)
 	    op = op + nchars
 	}
 
@@ -329,8 +385,10 @@ begin
 
 	# Preserve any remaining non-pixel data.
 	nchars = obufsize - op + 1
-	if (nchars > 0)
-	    call amovc (ibuf[op], Memc[obuf+op-1], nchars)
+	if (nchars > 0) {
+	    sz_val = nchars
+	    call amovc (ibuf[op], Memc[obuf+op-1], sz_val)
+	}
 
 	# Write out the data.
 	call zawrbf (FIT_IO(fit), Memc[obuf], nbytes, boffset)
@@ -344,12 +402,14 @@ end
 procedure fxfzwt (chan, status)
 
 int	chan			#I QPF i/o channel
-int	status			#O i/o channel status
+long	status			#O i/o channel status
 
 pointer fit, im
 
+include "fxf.com"
+
 begin
-	fit = chan
+	fit = Memp[fit_ptrs+chan]
 	im = FIT_IM(fit)
 
 	# A file driver returns status for i/o only in the AWAIT routine;
@@ -381,14 +441,17 @@ procedure fxfzst (chan, param, value)
 
 int	chan			#I FIT i/o channel
 int	param			#I parameter to be returned
-int	value			#O parameter value
+long	value			#O parameter value
 
 pointer fit, im
-int	i, totpix, szb_pixel, szb_real
+long	totpix, lval
+int	i, szb_pixel, szb_real
 int	sizeof()
 
+include "fxf.com"
+
 begin
-	fit = chan
+	fit = Memp[fit_ptrs+chan]
 	im = FIT_IM(fit)
 
     	totpix = IM_PHYSLEN(im,1)
@@ -404,14 +467,17 @@ begin
 	    switch (FIT_PIXTYPE(fit)) {
 	    case TY_SHORT:
 		if (IM_PIXTYPE(im) == TY_REAL) {
-		    value = value + int ((totpix * SZ_SHORT * SZB_CHAR) /
-			2880. + .5) * 2880
+		    lval = (totpix * SZ_SHORT * SZB_CHAR) / 2880. + .5
+		    value = value + lval * 2880
 		}
 	    case TY_UBYTE:
-		if (IM_PIXTYPE(im) == TY_SHORT)
-		    value = value + int (totpix/2880. + 0.5)*2880
-	        else if (IM_PIXTYPE(im) == TY_REAL)
-		    value = value + int(totpix*(szb_real-1)/2880. + 0.5) * 2880
+		if (IM_PIXTYPE(im) == TY_SHORT) {
+		    lval = totpix/2880. + 0.5
+		    value = value + lval * 2880
+	        } else if (IM_PIXTYPE(im) == TY_REAL) {
+		    lval = totpix*(szb_real-1)/2880. + 0.5
+		    value = value + lval * 2880
+		}
             }
 	}
 end
@@ -425,20 +491,22 @@ end
 procedure fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
 
 pointer im			#I Image descriptor
-int	totpix			#I Total number of pixels		
+long	totpix			#I Total number of pixels		
 char    obuf[ARB]		#O Output data buffer
-int	nbytes			#I Size in bytes of the output buffer
-int	boffset			#I Byte offset into the virtual image
+size_t	nbytes			#I Size in bytes of the output buffer
+long	boffset			#I Byte offset into the virtual image
 
 pointer sp, buf, fit, op
 double	bscale, bzero
-int	ip, nelem, pfactor
-int	pixtype, nb, buf_size, bzoff, nboff
-int	status, offset, npix
-int	datasizeb, pixoffb, nb_skipped
+int	pfactor, pixtype
+long	ip, nelem, nb, bzoff, nboff
+long	status, offset, datasizeb, pixoffb, nb_skipped
+size_t	buf_size, npix, c_1
 int	sizeof()
 
 begin
+	c_1 = 1
+
 	fit = IM_KDES(im)
 	bscale = FIT_BSCALE(fit)
 	bzero  = FIT_BZERO(fit)
@@ -523,18 +591,23 @@ begin
 	switch (FIT_PIXTYPE(fit)) {
 	case TY_UBYTE:
 	    npix = max (0, nb)
-	    if (IM_PIXTYPE(im) == TY_SHORT)
+	    if (IM_PIXTYPE(im) == TY_SHORT) {
+		# arg1: incompatible pointer
 		call achtbs (Mems[buf+ip-1], obuf[ip], npix)
-	    else {
+	    } else {
 		# Scaled from byte to REAL.
-		call achtbl (Mems[buf+ip-1], obuf[ip], npix)
+		# arg1,2: incompatible pointer
+		call achtbi (Mems[buf+ip-1], obuf[ip], npix)
+		# arg1,2: incompatible pointer
 		call fxf_altmr (obuf[ip], obuf[ip], npix, bscale, bzero)
 	    }
 	case TY_SHORT:
 	    op = buf + ip - 1
 	    npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
-	    if (BYTE_SWAP2 == YES)
-		call bswap2 (Mems[op], 1, Mems[op], 1, npix*SZB_CHAR)
+	    if (BYTE_SWAP2 == YES) {
+		call bswap2 (Mems[op], c_1, Mems[op], c_1, npix*SZB_CHAR)
+	    }
+	    # arg2: incompatible pointer
 	    call fxf_astmr (Mems[op], obuf[ip], npix, bscale, bzero)
 	}
 

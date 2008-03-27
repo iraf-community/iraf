@@ -14,7 +14,9 @@ procedure qpf_opix (im, status)
 pointer	im			#I image descriptor
 int	status			#O return status
 
+size_t	sz_val
 pointer	sp, fname, qpf
+long	lval
 extern	qpfzop(), qpfzrd(), qpfzwr(), qpfzwt(), qpfzst(), qpfzcl()
 int	fopnbf()
 
@@ -33,13 +35,15 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Encode the QPF descriptor as a pseudo-filename to pass the descriptor
 	# through fopnbf to the QPF virtual binary file driver.
 
+	lval = IM_KDES(im)
 	call sprintf (Memc[fname], SZ_FNAME, "QPF%d")
-	    call pargi (IM_KDES(im))
+	    call pargl (lval)
 
 	# Open a file descriptor for the dummy QPOE file driver, used to access
 	# the event list as a virtual pixel array (sampled at runtime).

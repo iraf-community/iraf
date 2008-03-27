@@ -16,13 +16,16 @@ procedure imwbpx (im, ibuf, totpix, v, vinc)
 
 pointer	im			# image descriptor
 char	ibuf[ARB]		# typeless buffer containing the data
-int	totpix			# total number of pixels to write
+size_t	totpix			# total number of pixels to write
 long	v[ARB]			# vector pointer to start of line segment
 long	vinc[ARB]		# step on each axis
 
 bool	oob
-int	npix, ndim, sz_pixel, btype, ip, xstep, step, i
+size_t	npix
+int	ndim, sz_pixel, btype, i
+long	ip, xstep, step
 long	xs[3], xe[3], x1, x2, p, v1[IM_MAXDIM], v2[IM_MAXDIM], linelen
+long	absl()
 errchk	imwrpx
 include	<szdtype.inc>
 
@@ -37,7 +40,7 @@ begin
 	# Cache the left and right endpoints of the line segment and the
 	# image line length.
 
-	xstep = abs (IM_VSTEP(im,1))
+	xstep = absl (IM_VSTEP(im,1))
 	linelen = IM_SVLEN(im,1)
 	x1 = v[1]
 	x2 = x1 + (totpix * xstep) - 1

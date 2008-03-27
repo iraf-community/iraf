@@ -9,9 +9,9 @@ procedure mw_v1trand (a_ct, x1, x2, npts)
 pointer	a_ct			#I pointer to CTRAN descriptor
 double	x1[ARB]			#I coordinates in input system
 double	x2[ARB]			#O coordinates in output system
-int	npts
+size_t	npts
 
-int	i
+long	i
 pointer	ct
 double	scale, offset
 errchk	mw_ctrand

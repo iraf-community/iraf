@@ -9,8 +9,8 @@ bool procedure plr_equali (r1, r2)
 int	r1[3,ARB]			#I range list 1
 int	r2[3,ARB]			#I range list 2
 
-int	i
-int	len1, len2
+long	i
+long	len1, len2
 
 begin
 	len1 = RL_LEN(r1)

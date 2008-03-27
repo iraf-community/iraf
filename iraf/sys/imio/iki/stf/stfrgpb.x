@@ -21,13 +21,16 @@ int	group			# group to be accessed
 int	acmode			# image access mode
 real	datamin, datamax	# min,max pixel values from GPB
 
+size_t	sz_val
 real	rval
 double	dval
 short	sval
 long	lval, offset
+int	ival
 bool	bval, newgroup
 pointer	sp, stf, gpb, lbuf, pp
-int	pfd, pn, sz_param, sz_gpb
+int	pfd, pn, sz_param
+size_t	sz_gpb, c_1
 errchk	imaddb, imadds, imaddl, imaddr, imaddd, imastr
 errchk	imputd, impstr, open, read
 int	open(), imaccf()
@@ -40,8 +43,11 @@ string	nogroup "group index out of range"
 define	minmax_ 91
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -105,7 +111,7 @@ begin
 		if (sz_param == SZ_SHORT)
 		    P_SPPTYPE(pp) = TY_SHORT
 		else
-		    P_SPPTYPE(pp) = TY_LONG
+		    P_SPPTYPE(pp) = TY_INT
 		P_LEN(pp) = 1
 	    case 'R':
 		if (sz_param == SZ_REAL)
@@ -133,22 +139,37 @@ begin
 	    if (acmode != NEW_COPY || imaccf (im, P_PTYPE(pp)) == NO) {
 		switch (P_SPPTYPE(pp)) {
 		case TY_BOOL:
-		    call amovc (Memc[gpb+offset], bval, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    # arg2: incompatible pointer
+		    call amovc (Memc[gpb+offset], bval, sz_val)
 		    call imaddb (im, P_PTYPE(pp), bval)
 		case TY_SHORT:
-		    call amovc (Memc[gpb+offset], sval, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call amovc (Memc[gpb+offset], sval, sz_val)
 		    call imadds (im, P_PTYPE(pp), sval)
+		case TY_INT:
+		    sz_val = SZ_INT
+		    # arg2: incompatible pointer
+		    call amovc (Memc[gpb+offset], ival, sz_val)
+		    call imaddi (im, P_PTYPE(pp), ival)
 		case TY_LONG:
-		    call amovc (Memc[gpb+offset], lval, SZ_LONG)
+		    sz_val = SZ_LONG
+		    # arg2: incompatible pointer
+		    call amovc (Memc[gpb+offset], lval, sz_val)
 		    call imaddl (im, P_PTYPE(pp), lval)
 		case TY_REAL:
-		    call amovc (Memc[gpb+offset], rval, SZ_REAL)
+		    sz_val = SZ_REAL
+		    # arg2: incompatible pointer
+		    call amovc (Memc[gpb+offset], rval, sz_val)
 		    call imaddr (im, P_PTYPE(pp), rval)
 		case TY_DOUBLE:
-		    call amovc (Memc[gpb+offset], dval, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    # arg2: incompatible pointer
+		    call amovc (Memc[gpb+offset], dval, sz_val)
 		    call imaddd (im, P_PTYPE(pp), dval)
 		case TY_CHAR:
-		    call chrupk (Memc[gpb+offset], 1, Memc[lbuf], 1, P_LEN(pp))
+		    sz_val = P_LEN(pp)
+		    call chrupk (Memc[gpb+offset], c_1, Memc[lbuf], c_1, sz_val)
 		    Memc[lbuf+P_LEN(pp)] = EOS
 		    call imastr (im, P_PTYPE(pp), Memc[lbuf])
 		default:

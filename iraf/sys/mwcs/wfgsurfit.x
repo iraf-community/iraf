@@ -36,9 +36,9 @@ define  WF_XORDER       Memi[P2I($1+9)]      # Order of the fit in x
 define  WF_YORDER       Memi[P2I($1+10)]     # Order of the fit in y
 define  WF_XTERMS       Memi[P2I($1+11)]     # Cross terms for polynomials
 define  WF_NCOEFF       Memi[P2I($1+12)]     # Total number of coefficients
-define  WF_COEFF        Memi[P2I($1+13)]     # Pointer to coefficient vector
-define  WF_XBASIS       Memi[P2I($1+14)]     # Pointer to basis functions (all x)
-define  WF_YBASIS       Memi[P2I($1+15)]     # Pointer to basis functions (all y)
+define  WF_COEFF        Memp[$1+13]     # Pointer to coefficient vector
+define  WF_XBASIS       Memp[$1+14]     # Pointer to basis functions (all x)
+define  WF_YBASIS       Memp[$1+15]     # Pointer to basis functions (all y)
 
 # Define the structure elements for the wf_gsrestore task.
 define  WF_SAVETYPE     $1[1]
@@ -70,8 +70,10 @@ pointer procedure wf_gsopen (atstr)
 
 char    atstr[ARB]              #I the input mwcs attribute string
 
+size_t	sz_val
 double  dval
-int     ip, npar, szcoeff
+int     ip
+size_t	npar, szcoeff
 pointer gs, sp, par, coeff
 int     nscan(), ctod()
 errchk  wf_gsrestore()
@@ -81,7 +83,8 @@ begin
             return (NULL)
 
         call smark (sp)
-        call salloc (par, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+        call salloc (par, sz_val, TY_CHAR)
 
         gs = NULL
         npar = 0
@@ -228,10 +231,13 @@ pointer	sf		#I pointer to the surface fitting descriptor
 double	coeff[ARB]	#O the coefficients of the fit
 int	ncoeff		#O the number of coefficients
 
+size_t	sz_val
+
 begin
 	# Calculate the number of coefficients.
 	ncoeff = WF_NCOEFF(sf)
-	call amovd (Memd[WF_COEFF(sf)], coeff, ncoeff)
+	sz_val = ncoeff
+	call amovd (Memd[WF_COEFF(sf)], coeff, sz_val)
 end
 
 
@@ -245,6 +251,7 @@ double	x		#I x values
 double	y		#I y values
 int	nxd, nyd	#I order of the derivatives in x and y
 
+size_t	sz_val
 int	ncoeff, nxder, nyder, i, j, k
 int	order, maxorder1, maxorder2, nmove1, nmove2
 pointer	sf2, sp, coeff, ptr1, ptr2
@@ -264,7 +271,8 @@ begin
 	}
 
 	# Allocate space for new surface.
-	call calloc (sf2, LEN_WFGSSTRUCT, TY_STRUCT)
+	sz_val = LEN_WFGSSTRUCT
+	call calloc (sf2, sz_val, TY_STRUCT)
 
 	# check the order of the derivatives
 	nxder = min (nxd, WF_XORDER(sf1) - 1)
@@ -325,13 +333,17 @@ begin
 	}
 
 	# Allocate space for coefficients and basis functions.
-	call calloc (WF_COEFF(sf2), WF_NCOEFF(sf2), TY_DOUBLE)
-	call calloc (WF_XBASIS(sf2), WF_XORDER(sf2), TY_DOUBLE)
-	call calloc (WF_YBASIS(sf2), WF_YORDER(sf2), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf2)
+	call calloc (WF_COEFF(sf2), sz_val, TY_DOUBLE)
+	sz_val = WF_XORDER(sf2)
+	call calloc (WF_XBASIS(sf2), sz_val, TY_DOUBLE)
+	sz_val = WF_YORDER(sf2)
+	call calloc (WF_YBASIS(sf2), sz_val, TY_DOUBLE)
 
 	# Get coefficients.
 	call smark (sp)
-	call salloc (coeff, WF_NCOEFF(sf1), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf1)
+	call salloc (coeff, sz_val, TY_DOUBLE)
 	call wf_gscoeff (sf1, Memd[coeff], ncoeff)
 
 	# Compute the new coefficients.
@@ -340,14 +352,17 @@ begin
 	    ptr2 = WF_COEFF(sf2) + (WF_YORDER(sf2) - 1) * WF_XORDER(sf2)
 	    ptr1 = coeff + (WF_YORDER(sf1) - 1) * WF_XORDER(sf1)
 	    do i = WF_YORDER(sf1), nyder + 1, -1 {
-		do j = i, i - nyder + 1, -1
+		do j = i, i - nyder + 1, -1 {
+		    sz_val = WF_XORDER(sf2)
 		    call amulkd (Memd[ptr1+nxder], double (j - 1),
-		        Memd[ptr1+nxder], WF_XORDER(sf2))
+				 Memd[ptr1+nxder], sz_val)
+		}
 		do j = WF_XORDER(sf1), nxder + 1, - 1 {
 		    do k = j , j - nxder + 1, - 1
 			Memd[ptr1+j-1] = Memd[ptr1+j-1] * (k - 1)
 		}
-		call amovd (Memd[ptr1+nxder], Memd[ptr2], WF_XORDER(sf2))
+		sz_val = WF_XORDER(sf2)
+		call amovd (Memd[ptr1+nxder], Memd[ptr2], sz_val)
 		ptr2 = ptr2 - WF_XORDER(sf2)
 		ptr1 = ptr1 - WF_XORDER(sf1)
 	    }
@@ -362,14 +377,17 @@ begin
 		nmove2 = max (0, min (maxorder2 - i + nyder, WF_XORDER(sf2)))
 		ptr1 = ptr1 - nmove1
 		ptr2 = ptr2 - nmove2
-		do j = i, i - nyder + 1, -1
+		do j = i, i - nyder + 1, -1 {
+		    sz_val = nmove2
 		    call amulkd (Memd[ptr1+nxder], double (j - 1),
-		        Memd[ptr1+nxder], nmove2)
+				 Memd[ptr1+nxder], sz_val)
+		}
 		do j = nmove1, nxder + 1, - 1 {
 		    do k = j , j - nxder + 1, - 1
 			Memd[ptr1+j-1] = Memd[ptr1+j-1] * (k - 1)
 		}
-		call amovd (Memd[ptr1+nxder], Memd[ptr2], nmove2)
+		sz_val = nmove2
+		call amovd (Memd[ptr1+nxder], Memd[ptr2], sz_val)
 	    }
 
 	default:
@@ -394,7 +412,8 @@ begin
 			Memd[ptr1] = Memd[ptr1] * (j - 1)	
 		    ptr1 = ptr1 - 1
 		}
-		call amovd (Memd[ptr1+1], Memd[ptr2], WF_NCOEFF(sf2))
+		sz_val = WF_NCOEFF(sf2)
+		call amovd (Memd[ptr1+1], Memd[ptr2], sz_val)
 	    }
 	}
 
@@ -429,12 +448,14 @@ pointer	sf		#O surface descriptor
 double	fit[ARB]	#I array containing the surface parameters and
 			#I coefficients
 
+size_t	sz_val
 int	surface_type, xorder, yorder, order
 double	xmin, xmax, ymin, ymax	
 
 begin
 	# Allocate space for the surface descriptor.
-	call calloc (sf, LEN_WFGSSTRUCT, TY_STRUCT)
+	sz_val = LEN_WFGSSTRUCT
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	xorder = nint (WF_SAVEXORDER(fit))
 	if (xorder < 1)
@@ -481,12 +502,16 @@ begin
 	# Set remaining curve parameters.
 	WF_TYPE(sf) = surface_type
 
-	call malloc (WF_COEFF(sf), WF_NCOEFF(sf), TY_DOUBLE)
-	call malloc (WF_XBASIS(sf), WF_XORDER(sf), TY_DOUBLE)
-	call malloc (WF_YBASIS(sf), WF_YORDER(sf), TY_DOUBLE)
+	sz_val = WF_NCOEFF(sf)
+	call malloc (WF_COEFF(sf), sz_val, TY_DOUBLE)
+	sz_val = WF_XORDER(sf)
+	call malloc (WF_XBASIS(sf), sz_val, TY_DOUBLE)
+	sz_val = WF_YORDER(sf)
+	call malloc (WF_YBASIS(sf), sz_val, TY_DOUBLE)
 
 	# restore coefficient array
-	call amovd (fit[WF_SAVECOEFF+1], Memd[WF_COEFF(sf)], WF_NCOEFF(sf))
+	sz_val = WF_NCOEFF(sf)
+	call amovd (fit[WF_SAVECOEFF+1], Memd[WF_COEFF(sf)], sz_val)
 end
 
 

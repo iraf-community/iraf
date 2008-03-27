@@ -44,22 +44,22 @@ define	LEN_STACK	(4*32)			# max mask size = 2**LEN_STACK
 
 # If any of the following are changed check that pmio$pmrio.x is consistent.
 define	LEN_PLRDES	20
-define	PLR_PL		Memi[P2I($1)]		# main PLIO descriptor
-define	PLR_NCOLS	Memi[P2I($1+1)]		# table width
-define	PLR_NLINES	Memi[P2I($1+2)]		# table height
-define	PLR_XBLOCK	Memi[P2I($1+3)]		# table blocking factor, X
-define	PLR_YBLOCK	Memi[P2I($1+4)]		# table blocking factor, Y
-define	PLR_BUFP	Memi[P2I($1+5)]		# buffer pointer
-define	PLR_X1		Memi[P2I($1+6)]		# clipping rectangle
-define	PLR_Y1		Memi[P2I($1+7)]		# clipping rectangle
-define	PLR_X2		Memi[P2I($1+8)]		# clipping rectangle
-define	PLR_Y2		Memi[P2I($1+9)]		# clipping rectangle
-define	PLR_PLANE	Memi[P2I($1+10)+($2)-1]	# plane to be accessed
+define	PLR_PL		Memp[$1]		# main PLIO descriptor
+define	PLR_NCOLS	Meml[P2L($1+1)]		# table width
+define	PLR_NLINES	Meml[P2L($1+2)]		# table height
+define	PLR_XBLOCK	Meml[P2L($1+3)]		# table blocking factor, X
+define	PLR_YBLOCK	Meml[P2L($1+4)]		# table blocking factor, Y
+define	PLR_BUFP	Memp[$1+5]		# buffer pointer
+define	PLR_X1		Meml[P2L($1+6)]		# clipping rectangle
+define	PLR_Y1		Meml[P2L($1+7)]		# clipping rectangle
+define	PLR_X2		Meml[P2L($1+8)]		# clipping rectangle
+define	PLR_Y2		Meml[P2L($1+9)]		# clipping rectangle
+define	PLR_PLANE	Meml[P2L($1+10)+($2)-1]	# plane to be accessed
 
 define	COMPLEX		-1			# table bin -> compex region
 define	LEN_REGDES	4			# region descriptor
-define	V1		Memi[P2I($1)+($2)-1]
-define	V2		Memi[P2I($1+2)+($2)-1]
+define	V1		Meml[P2L($1)+($2)-1]
+define	V2		Meml[P2L($1+2)+($2)-1]
 
 
 # PLR_OPEN -- Open a PLIO mask for random pixel access.  Provides efficient
@@ -69,12 +69,15 @@ define	V2		Memi[P2I($1+2)+($2)-1]
 pointer procedure plr_open (pl, plane, buflimit)
 
 pointer	pl			#I PLIO descriptor
-int	plane[ARB]		#I 2-dim plane to be accessed
-int	buflimit		#I approximate table size, or 0 if don't care
+long	plane[ARB]		#I 2-dim plane to be accessed
+size_t	buflimit		#I approximate table size, or 0 if don't care
 
-int	v1[PL_MAXDIM], v2[PL_MAXDIM]
-int	maxpix, ndim, npix, mval, i, j
-int	msize[2], tsize[2], block[2], vm[2]
+size_t	sz_val
+long	v1[PL_MAXDIM], v2[PL_MAXDIM]
+int	ndim, mval
+long	maxpix, i, j
+size_t	npix
+long	msize[2], tsize[2], block[2], vm[2]
 pointer	sp, stack, plr, bufp, el, rp
 errchk	calloc, malloc, plvalid
 bool	pl_sectnotconst()
@@ -82,10 +85,12 @@ bool	pl_sectnotconst()
 begin
 	call plvalid (pl)
 	call smark (sp)
-	call salloc (stack, LEN_STACK * LEN_REGDES, TY_STRUCT)
+	sz_val = LEN_STACK * LEN_REGDES
+	call salloc (stack, sz_val, TY_STRUCT)
 
 	# Allocate the PLRIO descriptor.
-	call calloc (plr, LEN_PLRDES, TY_STRUCT)
+	sz_val = LEN_PLRDES
+	call calloc (plr, sz_val, TY_STRUCT)
 
 	# Set the plane to be accessed.
 	ndim = PL_NAXES(pl)
@@ -122,7 +127,8 @@ begin
 	    tsize[i]  = (msize[i] + block[i]-1) / block[i]
 
 	# Allocate the table space.
-	call malloc (bufp, tsize[1] * tsize[2], TY_INT)
+	sz_val = tsize[1] * tsize[2]
+	call malloc (bufp, sz_val, TY_INT)
 
 	# Compute the lookup table.  Since the lookup table can be large,
 	# e.g., a quarter million elements for a 512sq table, we don't want
@@ -249,12 +255,13 @@ end
 int procedure plr_getpix (plr, i, j)
 
 pointer	plr			#I PLR descriptor
-int	i, j			#I plane-relative coordinates of pixel
+long	i, j			#I plane-relative coordinates of pixel
 
 pointer	pl, ll_src
-int	ii, jj, mval, np
+long	ii, jj, lval
+int	mval, np
 pointer	pl_access()
-int	pl_l2pi()
+long	pl_l2pi()
 errchk	pl_access
 
 begin
@@ -276,7 +283,8 @@ begin
 	    pl = PLR_PL(plr)
 	    PLR_PLANE(plr,2) = j
 	    ll_src = pl_access (pl, PLR_PLANE(plr,1))
-	    np = pl_l2pi (Mems[ll_src], i, mval, 1)
+	    lval = 1
+	    np = pl_l2pi (Mems[ll_src], i, mval, lval)
 	}
 
 	return (mval)
@@ -297,8 +305,8 @@ procedure plr_getlut (plr, bufp, xsize,ysize, xblock,yblock)
 
 pointer	plr			#I PLR descriptor
 pointer	bufp			#O lookup table buffer pointer (int *)
-int	xsize,ysize		#O table size
-int	xblock,yblock		#O blocking factors
+long	xsize,ysize		#O table size
+long	xblock,yblock		#O blocking factors
 
 begin
 	bufp = PLR_BUFP(plr)
@@ -314,8 +322,8 @@ end
 procedure plr_setrect (plr, x1,y1, x2,y2)
 
 pointer	plr			#I PLR descriptor
-int	x1,y1			#I lower left corner of region
-int	x2,y2			#I upper right corner of region
+long	x1,y1			#I lower left corner of region
+long	x2,y2			#I upper right corner of region
 
 pointer	pl
 define	oob_ 91

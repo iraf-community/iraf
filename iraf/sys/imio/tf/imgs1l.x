@@ -7,12 +7,12 @@ include	<imhdr.h>
 pointer procedure imgs1l (im, x1, x2)
 
 pointer	im
-int	x1, x2
+long	x1, x2
 pointer	imggsl(), imgl1l()
 
 begin
 	if (x1 == 1 && x2 == IM_LEN(im,1))
 	    return (imgl1l (im))
 	else
-	    return (imggsl (im, long(x1), long(x2), 1))
+	    return (imggsl (im, x1, x2, 1))
 end

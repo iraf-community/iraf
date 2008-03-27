@@ -13,6 +13,7 @@ procedure iw_setaxmap (mw, im)
 pointer	mw			#I pointer to MWCS descriptor
 pointer	im			#I pointer to reference image
 
+size_t	sz_val
 double	v
 pointer	sp, ltv_1, ltv_2, ltm
 int	wcsdim, ndim, physax, i, j
@@ -28,9 +29,11 @@ begin
 	call smark (sp)
 
 	ndim = IM_NPHYSDIM(im)
-	call salloc (ltv_1, ndim, TY_DOUBLE)
-	call salloc (ltv_2, ndim, TY_DOUBLE)
-	call salloc (ltm, ndim*ndim, TY_DOUBLE)
+	sz_val = ndim
+	call salloc (ltv_1, sz_val, TY_DOUBLE)
+	call salloc (ltv_2, sz_val, TY_DOUBLE)
+	sz_val = ndim*ndim
+	call salloc (ltm, sz_val, TY_DOUBLE)
 
 	# The section transformation is  px = VSTEP * lx + VOFF, specifying
 	# the transformation from logical to physical image coordinates.
@@ -39,8 +42,10 @@ begin
 	# terms of IMIO units is given by  lx = (1/VSTEP) * px + (-VOFF/VSTEP).
 	# Since the section transform forbids rotation the axes are independent.
 
-	call aclrd (Memd[ltv_1], ndim)
-	call aclrd (Memd[ltm], ndim * ndim)
+	sz_val = ndim
+	call aclrd (Memd[ltv_1], sz_val)
+	sz_val = ndim * ndim
+	call aclrd (Memd[ltm], sz_val)
 
 	do i = 1, ndim {
 	    if (IM_VSTEP(im,i) == 0)

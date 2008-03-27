@@ -22,6 +22,8 @@ pointer	bp			#U buffer pointer (to short), or NULL
 int	buflen			#U buffer length, shorts
 int	flags			#I not used at present
 
+size_t	sz_val
+long	lval
 pointer	sp, index, ex, op
 int	sz_index, n_buflen
 int	pl_p2li()
@@ -30,8 +32,10 @@ errchk	malloc, realloc, pl_compress
 
 begin
 	call smark (sp)
-	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
-	call salloc (index, PL_NLP(pl) * 3 + LL_CURHDRLEN, TY_SHORT)
+	sz_val = LEN_PLEXTERN
+	call salloc (ex, sz_val, TY_STRUCT)
+	sz_val = PL_NLP(pl) * 3 + LL_CURHDRLEN
+	call salloc (index, sz_val, TY_SHORT)
 
 	# Eliminate any wasted space in the mask, and compute the amount
 	# of space needed to store the compressed mask.  Compress the index
@@ -39,21 +43,25 @@ begin
 	# for a sparse or empty mask.
 
 	call pl_compress (pl)
-	sz_index = pl_p2li (PL_LP(pl,1), 1, Mems[index], PL_NLP(pl))
+	lval = 1
+	sz_index = pl_p2li (PL_LP(pl,1), lval, Mems[index], PL_NLP(pl))
 	n_buflen = (LEN_PLEXTERN * SZ_STRUCT + PL_LLLEN(pl) * SZ_SHORT +
 	    sz_index * SZ_SHORT) / SZ_SHORT
 
 	# Allocate or resize the output buffer.
 	if (bp == NULL) {
-	    call malloc (bp, n_buflen, TY_SHORT)
+	    sz_val = n_buflen
+	    call malloc (bp, sz_val, TY_SHORT)
 	    buflen = n_buflen
 	} else if (n_buflen > buflen) {
-	    call realloc (bp, n_buflen, TY_SHORT)
+	    sz_val = n_buflen
+	    call realloc (bp, sz_val, TY_SHORT)
 	    buflen = n_buflen
 	}
 
 	# Encode and output the external format header structure.
-	call aclri (Memi[ex], LEN_PLEXTERN)
+	sz_val = LEN_PLEXTERN
+	call aclrp (Memp[ex], sz_val)
 
 	PLE_MAGIC(ex)	= PL_MAGIC(pl)
 	PLE_NAXES(ex)	= PL_NAXES(pl)
@@ -66,17 +74,21 @@ begin
 	PLE_EXLEN(ex)	= n_buflen
 
 	op = bp
-	call amovl (PL_AXLEN(pl,1), PLE_AXLEN(ex,1), PL_MAXDIM)
-	call miipak32 (Memi[ex], Memi[coerce(op,TY_SHORT,TY_INT)],
-	    LEN_PLEXTERN, TY_STRUCT)
+	sz_val = PL_MAXDIM
+	call amovl (PL_AXLEN(pl,1), PLE_AXLEN(ex,1), sz_val)
+	sz_val = LEN_PLEXTERN
+	call miipak32 (Memp[ex], Memi[coerce(op,TY_SHORT,TY_INT)], sz_val,
+		       TY_STRUCT)
 	op = op + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
 
 	# Append the compressed index...
-	call miipak16 (Mems[index], Mems[op], sz_index, TY_SHORT)
+	sz_val = sz_index
+	call miipak16 (Mems[index], Mems[op], sz_val, TY_SHORT)
 	op = op + sz_index
 
 	# and the line list buffer.
-	call miipak16 (LL(pl,0), Mems[op], PL_LLLEN(pl), TY_SHORT)
+	sz_val = PL_LLLEN(pl)
+	call miipak16 (LL(pl,0), Mems[op], sz_val, TY_SHORT)
 	op = op + PL_LLLEN(pl)
 
 	call sfree (sp)

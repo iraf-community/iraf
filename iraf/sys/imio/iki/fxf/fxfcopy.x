@@ -14,13 +14,15 @@ char	nroot[ARB]		#I new image root name
 char	nextn[ARB]		#I old image extn
 int	status
 
+size_t	sz_val
 pointer	sp
 pointer	ohdr_fname, nhdr_fname
 
 begin
 	call smark (sp)
-	call salloc (ohdr_fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (nhdr_fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (ohdr_fname, sz_val, TY_CHAR)
+	call salloc (nhdr_fname, sz_val, TY_CHAR)
 
 	# Generate filenames.
 	call iki_mkfname (oroot, oextn, Memc[ohdr_fname], SZ_PATHNAME)

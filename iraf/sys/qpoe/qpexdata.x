@@ -70,7 +70,7 @@ pointer	coerce()
 
 begin
 	# Free space in program buffer.
-	call aclri (Memi[pb_save], EX_PBTOP(ex) - pb_save)
+	call aclrp (Memp[pb_save], EX_PBTOP(ex) - pb_save)
 	EX_PBOP(ex) = pb_save
 
 	# Free space in the data buffer.  Prune the LUT and ETERM lists
@@ -319,14 +319,18 @@ int	nelem			#I amount of storage desired
 int	dtype			#I datatype of the storage element
 
 pointer	op, top
+long	lp, lval
 pointer	coerce()
 int	sizeof()
+long	modl()
 errchk	syserr
 
 begin
-	op = EX_DBOP(ex)
-	while (mod (op-1, SZ_DOUBLE) != 0)
-	    op = op + 1
+	lp = EX_DBOP(ex)
+	lval = SZ_DOUBLE
+	while (modl (lp-1, lval) != 0)
+	    lp = lp + 1
+	op = lp
 
 	top = op + nelem * sizeof(dtype)
 	if (top >= EX_DBTOP(ex))

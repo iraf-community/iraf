@@ -7,7 +7,7 @@ pointer procedure immap (imspec, acmode, hdr_arg)
 
 char	imspec[ARB]		#I image specification
 int	acmode			#I image access mode
-int	hdr_arg			#I length of user fields, or header pointer
+pointer	hdr_arg			#I length of user fields, or header pointer
 
 pointer	immapz()
 errchk	iki_init

@@ -12,12 +12,16 @@ pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I vector coords of line segment
 short	ll_raw[ARB]		#I input line list
 int	ll_depth		#I line list depth, bits
-int	npix			#I number of pixels affected
+size_t	npix			#I number of pixels affected
 int	rop			#I rasterop
 
-pointer	sp, ll_src, ll_dst, ll_stn, ll_out, px_src, im
-int	ll_len, step, xstep, temp, np, ip, i
-int	pl_l2pi(), pl_p2li()
+size_t	sz_val
+pointer	sp, ll_src, ll_dst, ll_stn, ll_out, px_src, im, ip
+int	ll_len
+long	step, xstep, temp, i, lval
+size_t	np
+long	pl_l2pi()
+int	pl_p2li()
 pointer	pl_access()
 include	"pmio.com"
 
@@ -32,7 +36,8 @@ begin
 	call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
 	# Determine physical coords of line segment.
-	call amovl (v, v3, PM_MAXDIM)
+	sz_val = PM_MAXDIM
+	call amovl (v, v3, sz_val)
 	call imaplv (im, v3, v1, PM_MAXDIM)
 	v3[1] = v3[1] + npix - 1
 	call imaplv (im, v3, v2, PM_MAXDIM)
@@ -56,12 +61,15 @@ begin
 
 	if (xstep < 0 || step > 1) {
 	    call salloc (px_src, np, TY_INT)
-	    i = pl_l2pi (ll_raw, 1, Memi[px_src], npix)
+	    lval = 1
+	    i = pl_l2pi (ll_raw, lval, Memi[px_src], npix)
 	    call aclri (Memi[px_src+i], np - i)
 
 	    # Flip data array.
-	    if (xstep < 0)
+	    if (xstep < 0) {
+		# arg1: incompatible pointer
 		call imaflp (Memi[px_src], npix, SZ_INT)
+	    }
 
 	    if (step > 1) {
 		# Resample data array.
@@ -76,15 +84,18 @@ begin
 		call aclri (Memi[px_src], np)
 		do i = 1, np, step
 		    Memi[px_src+i-1] = 1
-		ll_len = pl_p2li (Memi[px_src], 1, Mems[ll_stn], np)
+		lval = 1
+		ll_len = pl_p2li (Memi[px_src], lval, Mems[ll_stn], np)
 	    }
 
 	    # Convert flipped and resampled data back to line list.
-	    ll_len = pl_p2li (Memi[px_src], 1, Mems[ll_src], np)
+	    lval = 1
+	    ll_len = pl_p2li (Memi[px_src], lval, Mems[ll_src], np)
 
 	} else {
 	    ll_len = LL_LEN(ll_raw)
-	    call amovs (ll_raw, Mems[ll_src], ll_len)
+	    sz_val = ll_len
+	    call amovs (ll_raw, Mems[ll_src], sz_val)
 	}
 
 	# Copy to or combine with destination.
@@ -93,8 +104,9 @@ begin
 	else {
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	    ll_dst = pl_access (pl, v1)
-	    call pl_linestencil (Mems[ll_src],  1, MV(ll_depth),
-		Mems[ll_dst], v1, PL_MAXVAL(pl), Mems[ll_stn], 1,
+	    lval = 1
+	    call pl_linestencil (Mems[ll_src],  lval, MV(ll_depth),
+		Mems[ll_dst], v1, PL_MAXVAL(pl), Mems[ll_stn], lval,
 		Mems[ll_out], np, rop)
 	    call pl_update (pl, v1, Mems[ll_out])
 	}

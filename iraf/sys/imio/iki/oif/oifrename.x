@@ -17,7 +17,8 @@ char	new_root[ARB]		# new image root name
 char	new_extn[ARB]		# old image extn
 int	status
 
-pointer	sp, im
+size_t	sz_val
+pointer	sp, im, p_0
 bool	heq, peq
 pointer	old_hfn, new_hfn
 pointer	old_pfn, new_pfn
@@ -29,11 +30,14 @@ int	access(), strlen(), strncmp()
 errchk	immapz, rename
 
 begin
+	p_0 = 0
+
 	call smark (sp)
-	call salloc (old_hfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (old_hfn, sz_val, TY_CHAR)
+	call salloc (new_hfn, sz_val, TY_CHAR)
+	call salloc (old_pfn, sz_val, TY_CHAR)
+	call salloc (new_pfn, sz_val, TY_CHAR)
 
 	# Get filenames of old and new images.
 	call iki_mkfname (old_root, old_extn, Memc[old_hfn], SZ_PATHNAME)
@@ -48,7 +52,7 @@ begin
 	# and generate the new pixfile name.  The CURRENT value of IMDIR is
 	# used to generate the new pixfile name.
 
-	im = immapz (Memc[old_hfn], READ_WRITE, 0)
+	im = immapz (Memc[old_hfn], READ_WRITE, p_0)
 
 	if (IM_PIXFILE(im) != EOS) {
 	    # Get old pixel file filename.

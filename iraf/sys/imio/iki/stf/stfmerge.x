@@ -21,6 +21,7 @@ procedure stf_mergegpb (n_im, o_im)
 pointer	n_im		# new copy image
 pointer	o_im		# image being copied
 
+size_t	sz_val
 bool	match
 int	n_i, o_i, n, ip, axis
 int	up_psize
@@ -29,7 +30,8 @@ int	strncmp(), strlen(), patmake(), patmatch(), ctoi()
 
 begin
 	call smark (sp)
-	call salloc (cd_pat, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cd_pat, sz_val, TY_CHAR)
 
 	# Make a pattern to match the CDa_b parameter names.
 	if (patmake ("CD[0-9]_[0-9]", Memc[cd_pat], SZ_LINE) < 0)

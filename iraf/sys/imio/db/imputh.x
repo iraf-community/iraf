@@ -22,7 +22,8 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I name of the new parameter
 char	text[ARB]		#I the history string to be added
 
-pointer	sp, keyname, instr, outstr, ua
+size_t	sz_val
+pointer	sp, keyname, instr, outstr, ua, pp
 int	fd, max_lenuserarea, curlen, buflen, nchars
 int	ip, op, in_last_blank, out_last_blank
 
@@ -32,9 +33,12 @@ errchk	syserrs, stropen, fprintf
 
 begin
 	call smark (sp)
-	call salloc (instr, SZ_LINE, TY_CHAR)
-	call salloc (keyname, SZ_FNAME, TY_CHAR)
-	call salloc (outstr, LEN_HISTSTR, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (instr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyname, sz_val, TY_CHAR)
+	sz_val = LEN_HISTSTR
+	call salloc (outstr, sz_val, TY_CHAR)
 
 	# FITS format requires that the keyword name be upper case.
 	call strcpy (key, Memc[keyname], SZ_FNAME)
@@ -148,9 +152,9 @@ begin
 	    # writing an EOS.
 
 	    call close (fd)
-	    for (ip=ua+max_lenuserarea-1;  ip > ua;  ip=ip-1)
-		if (Memc[ip] == '\n') {
-		    Memc[ip+1] = EOS
+	    for (pp=ua+max_lenuserarea-1;  pp > ua;  pp=pp-1)
+		if (Memc[pp] == '\n') {
+		    Memc[pp+1] = EOS
 		    break
 		}
 	    call syserrs (SYS_IDBOVFL, key)

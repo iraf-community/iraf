@@ -7,8 +7,8 @@ include	<imhdr.h>
 pointer procedure imps1s (im, x1, x2)
 
 pointer	im		# image header pointer
-int	x1		# first column
-int	x2		# last column
+long	x1		# first column
+long	x2		# last column
 
 pointer	impgss(), impl1s()
 
@@ -16,5 +16,5 @@ begin
 	if (x1 == 1 && x2 == IM_LEN(im,1))
 	    return (impl1s (im))
 	else
-	    return (impgss (im, long(x1), long(x2), 1))
+	    return (impgss (im, x1, x2, 1))
 end

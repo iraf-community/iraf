@@ -11,11 +11,12 @@ include	<plio.h>
 procedure pm_polygon (pl, x, y, npts, rop)
 
 pointer	pl			#I mask descriptor
-int	x[npts]			#I polygon x-vertices
-int	y[npts]			#I polygon y-vertices
+long	x[npts]			#I polygon x-vertices
+long	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
 int	i
 pointer	sp, xp, yp
 errchk	pl_getplane
@@ -24,17 +25,18 @@ include	"pmio.com"
 begin
 	if (PM_MAPXY(pl) == YES) {
 	    call smark (sp)
-	    call salloc (xp, npts, TY_INT)
-	    call salloc (yp, npts, TY_INT)
+	    sz_val = npts
+	    call salloc (xp, sz_val, TY_LONG)
+	    call salloc (yp, sz_val, TY_LONG)
 
 	    call pl_getplane (pl, v1)
 	    do i = 1, npts {
 		v1[1] = x[i];  v1[2] = y[i]
 		call imaplv (PM_REFIM(pl), v1, v2, PM_MAXDIM)
-		Memi[xp+i-1] = v2[1];  Memi[yp+i-1] = v2[2]
+		Meml[xp+i-1] = v2[1];  Meml[yp+i-1] = v2[2]
 	    }
 
-	    call pl_polygon (pl, Memi[xp], Memi[yp], npts, rop)
+	    call pl_polygon (pl, Meml[xp], Meml[yp], npts, rop)
 	    call sfree (sp)
 
 	} else

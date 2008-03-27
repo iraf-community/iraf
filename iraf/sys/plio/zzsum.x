@@ -18,7 +18,7 @@ real    sum
 
 bool	clgetb()
 real    asumr()
-int     mio_glsegr()
+long	mio_glsegr()
 pointer immap(), mio_open()
 
 begin

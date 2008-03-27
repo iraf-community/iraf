@@ -18,22 +18,28 @@ pointer	im			#I image descriptor
 int	uchars			#I maxchars of user area data to read
 int	htype			#I TY_IMHDR or TY_PIXHDR
 
+size_t	sz_val
+long	lval
 pointer	sp, v1
 char	immagic[SZ_IMMAGIC]
-int	sulen_userarea, hdrlen, nchars, status
+int	sulen_userarea, hdrlen, status
+size_t	nchars, c_1
 
 bool	streq()
-long	miireadc(), miireadi(), miireadl(), miireadr()
+long	miireadc(), miireadi(), miireadl32(), miireadr()
 int	btoi()
 long	read()
 
-errchk	read, miireadc, miireadi, miireadl, miireadr
+errchk	read, miireadc, miireadi, miireadl32, miireadr
 define	readerr_ 91
 
 begin
+	c_1 = 1
 	# Determine the file type.
-	call seek (fd, BOFL)
-	if (read (fd, immagic, SZ_IMMAGIC) != SZ_IMMAGIC)
+	lval = BOFL
+	call seek (fd, lval)
+	sz_val = SZ_IMMAGIC
+	if (read (fd, immagic, sz_val) != SZ_IMMAGIC)
 	    return (ERR)
 
 	if (htype == TY_PIXHDR && streq (immagic, V1_PMAGIC)) {
@@ -44,9 +50,11 @@ begin
 	    # Old V1 image header.
 
 	    call smark (sp)
-	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
+	    sz_val = LEN_V1IMHDR
+	    call salloc (v1, sz_val, TY_STRUCT)
 
-	    call seek (fd, BOFL)
+	    lval = BOFL
+	    call seek (fd, lval)
 	    nchars = LEN_V1IMHDR * SZ_STRUCT
 	    if (read (fd, IM_V1MAGIC(v1), nchars) != nchars) {
 		call sfree (sp)
@@ -66,8 +74,9 @@ begin
 	    IM_PIXTYPE(im) = IM_V1PIXTYPE(v1)
 
 	    IM_NDIM(im) = IM_V1NDIM(v1)
-	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), IM_MAXDIM)
-	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (IM_V1LEN(v1,1), IM_LEN(im,1), sz_val)
+	    call amovl (IM_V1PHYSLEN(v1,1), IM_PHYSLEN(im,1), sz_val)
 
 	    IM_SSMTYPE(im) = IM_V1SSMTYPE(v1)
 	    IM_LUTOFF(im) = IM_V1LUTOFF(v1)
@@ -96,8 +105,10 @@ begin
 	}
 
 	# Check for a new format header.
-	call seek (fd, BOFL)
-	if (miireadc (fd, immagic, SZ_IMMAGIC) < 0)
+	lval = BOFL
+	call seek (fd, lval)
+	sz_val = SZ_IMMAGIC
+	if (miireadc (fd, immagic, sz_val) < 0)
 	    return (ERR)
 
 	if (htype == TY_PIXHDR && streq (immagic, V2_PMAGIC)) {
@@ -113,16 +124,16 @@ begin
 	    IM_HDRVER(im) = V2_VERSION
 
 	    # "sulen_userarea" is the length of the user area in SU.
-	    if (miireadi (fd, hdrlen, 1) != 1)
+	    if (miireadi (fd, hdrlen, c_1) != 1)
 		goto readerr_
 	    sulen_userarea = hdrlen - LEN_V2IMHDR
 	    IM_HDRLEN(im) = LEN_IMHDR + sulen_userarea
 
-	    if (miireadi (fd, IM_PIXTYPE(im), 1) != 1)
+	    if (miireadi (fd, IM_PIXTYPE(im), c_1) != 1)
 		goto readerr_
 
 	    # Determine whether to byte swap the pixels.
-	    if (miireadi (fd, IM_SWAPPED(im), 1) != 1)
+	    if (miireadi (fd, IM_SWAPPED(im), c_1) != 1)
 		goto readerr_
 
 	    IM_SWAP(im) = NO
@@ -140,45 +151,51 @@ begin
 	    }
 
 	    # Read the fixed-format fields of the header.
-	    if (miireadi (fd, IM_NDIM(im), 1) < 0)
+	    if (miireadi (fd, IM_NDIM(im), c_1) < 0)
 		goto readerr_
-	    if (miireadi (fd, IM_LEN(im,1), IM_MAXDIM) < 0)
+	    sz_val = IM_MAXDIM
+	    if (miireadl32 (fd, IM_LEN(im,1), sz_val) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_PHYSLEN(im,1), IM_MAXDIM) < 0)
+	    sz_val = IM_MAXDIM
+	    if (miireadl32 (fd, IM_PHYSLEN(im,1), sz_val) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_SSMTYPE(im), 1) < 0)
+	    if (miireadl32 (fd, IM_SSMTYPE(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_LUTOFF(im), 1) < 0)
+	    if (miireadl32 (fd, IM_LUTOFF(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_PIXOFF(im), 1) < 0)
+	    if (miireadl32 (fd, IM_PIXOFF(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_HGMOFF(im), 1) < 0)
+	    if (miireadl32 (fd, IM_HGMOFF(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_BLIST(im), 1) < 0)
+	    if (miireadl32 (fd, IM_BLIST(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_SZBLIST(im), 1) < 0)
+	    if (miireadl32 (fd, IM_SZBLIST(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_NBPIX(im), 1) < 0)
+	    if (miireadl32 (fd, IM_NBPIX(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_CTIME(im), 1) < 0)
+	    if (miireadl32 (fd, IM_CTIME(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_MTIME(im), 1) < 0)
+	    if (miireadl32 (fd, IM_MTIME(im), c_1) < 0)
 		goto readerr_
-	    if (miireadl (fd, IM_LIMTIME(im), 1) < 0)
-		goto readerr_
-
-	    if (miireadr (fd, IM_MAX(im), 1) < 0)
-		goto readerr_
-	    if (miireadr (fd, IM_MIN(im), 1) < 0)
+	    if (miireadl32 (fd, IM_LIMTIME(im), c_1) < 0)
 		goto readerr_
 
-	    if (miireadc (fd, IM_PIXFILE(im), SZ_V2IMPIXFILE) < 0)
+	    if (miireadr (fd, IM_MAX(im), c_1) < 0)
 		goto readerr_
-	    if (miireadc (fd, IM_HDRFILE(im), SZ_V2IMHDRFILE) < 0)
+	    if (miireadr (fd, IM_MIN(im), c_1) < 0)
 		goto readerr_
-	    if (miireadc (fd, IM_TITLE(im), SZ_V2IMTITLE) < 0)
+
+	    sz_val = SZ_V2IMPIXFILE
+	    if (miireadc (fd, IM_PIXFILE(im), sz_val) < 0)
 		goto readerr_
-	    if (miireadc (fd, IM_HISTORY(im), SZ_V2IMHIST) < 0)
+	    sz_val = SZ_V2IMHDRFILE
+	    if (miireadc (fd, IM_HDRFILE(im), sz_val) < 0)
+		goto readerr_
+	    sz_val = SZ_V2IMTITLE
+	    if (miireadc (fd, IM_TITLE(im), sz_val) < 0)
+		goto readerr_
+	    sz_val = SZ_V2IMHIST
+	    if (miireadc (fd, IM_HISTORY(im), sz_val) < 0)
 		goto readerr_
 
 	    # Read the variable-length user area.

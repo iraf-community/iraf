@@ -4,9 +4,9 @@ include	<syserr.h>
 include	<plset.h>
 include	<plio.h>
 
-# PL_STATI -- Stat a PLIO parameter.
+# PL_STAT[IL] -- Stat a PLIO parameter.
 
-int procedure pl_stati (pl, param)
+long procedure pl_statl (pl, param)
 
 pointer	pl			#I mask descriptor
 int	param			#I parameter code
@@ -28,4 +28,16 @@ begin
 	default:
 	    call syserr (SYS_PLINVPAR)
 	}
+end
+
+
+int procedure pl_stati (pl, param)
+
+pointer	pl			#I mask descriptor
+int	param			#I parameter code
+
+long	pl_statl()
+
+begin
+	return ( pl_statl (pl, param) )
 end

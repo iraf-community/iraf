@@ -12,9 +12,10 @@ include	<imio.h>
 pointer procedure imgl2i (im, linenum)
 
 pointer	im			# image header pointer
-int	linenum			# line to be read
+long	linenum			# line to be read
 
-int	fd, nchars
+int	fd
+size_t	nchars
 long	vs[2], ve[2], offset
 pointer	bp, imggsi(), freadp()
 errchk	imopsf, imerr

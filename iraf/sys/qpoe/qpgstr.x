@@ -12,6 +12,7 @@ char	param[ARB]		#I parameter name
 char	outstr[maxch]		#O receives string value
 int	maxch			#I max chars out
 
+size_t	sz_val
 pointer	sym, fm
 int	nchars, fd
 pointer	qp_gpsym()
@@ -35,7 +36,8 @@ begin
 	fd = fm_getfd (fm, S_LFILE(sym), READ_ONLY, 0)
 	call seek (fd, S_OFFSET(sym))
 
-	nchars = max (0, read (fd, outstr, min(S_NELEM(sym),maxch)))
+	sz_val = min(S_NELEM(sym),maxch)
+	nchars = max (0, read (fd, outstr, sz_val))
 	outstr[nchars+1] = EOS
 
 	call fm_retfd (fm, S_LFILE(sym))

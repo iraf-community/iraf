@@ -17,9 +17,10 @@ pointer	qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 pointer	o_pp			#O pointer to parameter value
 
+size_t	sz_val
 bool	first_time
-pointer	sp, key, fm, op
-int	loc_pval, loc_Mem, ip, ch, sz_elem
+pointer	sp, key, fm, op, loc_pval, loc_Mem
+int	ip, ch, sz_elem
 data	first_time /true/
 
 int	elem
@@ -34,7 +35,8 @@ errchk	qp_bind, syserrs
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
@@ -114,6 +116,7 @@ int	sz_elem, fd
 int	qp_sizeof(), fm_getfd()
 errchk	fm_getfd, seek, write
 
+size_t	sz_val
 int	elem
 pointer	pp, sym
 bool	put_value
@@ -122,11 +125,12 @@ common	/qppval/ pval, sym, elem, pp, put_value
 
 begin
 	if (put_value) {
-	    sz_elem = qp_sizeof (qp, S_DTYPE(sym), S_DSYM(sym), INSTANCEOF)
+	    sz_elem = qp_sizeof (qp, S_DTYPE(sym), sym, INSTANCEOF)
 	    fd = fm_getfd (QP_FM(qp), S_LFILE(sym), READ_WRITE, 0)
 
 	    call seek (fd, S_OFFSET(sym) + (elem - 1) * sz_elem)
-	    call write (fd, Memc[pp], sz_elem)
+	    sz_val = sz_elem
+	    call write (fd, Memc[pp], sz_val)
 	    S_NELEM(sym) = max (S_NELEM(sym), elem)
 	    QP_MODIFIED(qp) = YES
 

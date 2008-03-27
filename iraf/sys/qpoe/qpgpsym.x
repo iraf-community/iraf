@@ -15,7 +15,8 @@ pointer procedure qp_gpsym (qp, param)
 pointer	qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 
-int	n
+size_t	sz_val
+int	n, i_off
 pointer	sp, pname, sym, st, sm
 pointer	stfind(), strefsbuf(), qm_symtab()
 errchk	syserrs
@@ -27,7 +28,8 @@ errchk	syserrs
 
 begin
 	call smark (sp)
-	call salloc (pname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pname, sz_val, TY_CHAR)
 
 	st = QP_ST(qp)
 	sm = qm_symtab (QP_QM(qp))
@@ -38,7 +40,8 @@ begin
 	for (n=1;  sym != NULL;  n=n+1) {
 	    if (and (S_FLAGS(sym), SF_DELETED) != 0)
 		break
-	    call strcpy (strefsbuf(sm,S_OFFSET(sym)), Memc[pname], SZ_FNAME)
+	    i_off = S_OFFSET(sym)
+	    call strcpy (Memc[strefsbuf(sm,i_off)], Memc[pname], SZ_FNAME)
 	    sym = stfind (sm, Memc[pname])
 	    if (n > MAX_INDIR)
 		call syserrs (SYS_QPMRECUR, param)

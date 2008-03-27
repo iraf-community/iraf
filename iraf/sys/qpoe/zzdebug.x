@@ -50,7 +50,8 @@ pointer	xs, xe
 char	lbuf[SZ_LINE], left[SZ_TBUF], right[SZ_TBUF]
 int	nranges, xlen, i1, i2, i
 
-int	getline(), qpex_parsei()
+int	getline()
+size_t	qpex_parsei()
 bool	streq()
 
 begin
@@ -109,7 +110,8 @@ pointer	xs, xe
 char	lbuf[SZ_LINE]
 int	nranges, xlen, i
 
-int	getline(), qpex_parser()
+int	getline()
+size_t	qpex_parser()
 bool	streq()
 
 begin
@@ -486,6 +488,7 @@ char	datatype[SZ_DATATYPE], comment[SZ_COMMENT]
 int	offset, dtype, size, nelem, maxelem, flags, i, j
 pointer	qp_open(), qpio_open(), qpio_statp(), coerce()
 int	qpio_stati(), qp_queryf(), sizeof()
+long	qpio_statl()
 
 begin
 	call clgstr ("poefile", poefile, SZ_FNAME)
@@ -510,8 +513,8 @@ begin
 
 	call printf ("%s=%dx%d ")
 	    call pargstr ("blockfactor")
-	    call pargi (qpio_stati(io, QPIO_XBLOCKFACTOR))
-	    call pargi (qpio_stati(io, QPIO_YBLOCKFACTOR))
+	    call pargl (qpio_statl(io, QPIO_XBLOCKFACTOR))
+	    call pargl (qpio_statl(io, QPIO_YBLOCKFACTOR))
 	call printf ("%s=%d ")
 	    call pargstr ("bucketlen")
 	    call pargi (qpio_stati(io, QPIO_BUCKETLEN))
@@ -540,7 +543,7 @@ begin
 	    call pargi (qpio_stati(io, QPIO_NOINDEX))
 	call printf ("%s=%d ")
 	    call pargstr ("optbufsize")
-	    call pargi (qpio_stati(io, QPIO_OPTBUFSIZE))
+	    call pargl (qpio_statl(io, QPIO_OPTBUFSIZE))
 	call printf ("%s=%xX ")
 	    call pargstr ("pl")
 	    call pargl (qpio_statp(io, QPIO_PL))
@@ -770,7 +773,7 @@ bool	clgetb()
 double	mp_getd()
 pointer	qp_open(), qpio_open()
 int	open(), mp_geti(), clgeti()
-long	read(), clktime()
+long	read(), clktime(), clgetl()
 
 begin
 	call smark (sp)
@@ -791,7 +794,7 @@ begin
 	qp = qp_open (outfile, NEW_FILE, NULL)
 
 	# Set the datafile page size.
-	call qp_seti (qp, QPOE_PAGESIZE, clgeti("pagesize"))
+	call qp_setl (qp, QPOE_PAGESIZE, clgetl("pagesize"))
 
 	# Set the bucket length in units of number of events.
 	call qp_seti (qp, QPOE_BUCKETLEN, clgeti("bucketlen"))
@@ -1222,7 +1225,7 @@ bool	clgetb()
 int	qpio_getevents(), qpex_attrld(), open()
 pointer	qp_open(), qpio_open(), qpex_open()
 
-include <nullptr.com>
+include <nullptr.inc>
 
 begin
 	call smark (sp)
@@ -1414,6 +1417,7 @@ int	ncols, nlines, xblock, yblock, mval, nev, i
 pointer	sp, poefile, evlist, evl, xv, yv, qp, io, ev, gp
 pointer	qp_open(), gopen(), qpio_open
 int	clgeti(), qp_stati(), qp_geti(), qpio_getevents()
+long	clgetl(), qp_statl()
 
 begin
 	call smark (sp)
@@ -1427,11 +1431,11 @@ begin
 	qp = qp_open (Memc[poefile], READ_ONLY, NULL)
 
 	call qp_seti (qp, QPOE_DEBUGLEVEL, clgeti ("debug"))
-	call qp_seti (qp, QPOE_XBLOCKFACTOR, clgeti ("xblock"))
-	call qp_seti (qp, QPOE_YBLOCKFACTOR, clgeti ("yblock"))
+	call qp_setl (qp, QPOE_XBLOCKFACTOR, clgetl ("xblock"))
+	call qp_setl (qp, QPOE_YBLOCKFACTOR, clgetl ("yblock"))
 
-	xblock = qp_stati (qp, QPOE_XBLOCKFACTOR)
-	yblock = qp_stati (qp, QPOE_YBLOCKFACTOR)
+	xblock = qp_statl (qp, QPOE_XBLOCKFACTOR)
+	yblock = qp_statl (qp, QPOE_YBLOCKFACTOR)
 	ncols  = qp_geti (qp, "axlen[1]") / xblock
 	nlines = qp_geti (qp, "axlen[2]") / yblock
 
@@ -1570,7 +1574,8 @@ int	p1, p2
 char	list1[SZ_LINE], list2[SZ_LINE]
 pointer	sp, rl1, rl2, op, xs, xe, ys, ye, os, oe
 int	fd, ch, xlen, ylen, olen, nx, ny, nout, i
-int	open(), getci(), qpex_parsei(), qp_rlmergei()
+int	open(), getci(), qp_rlmergei()
+size_t	qpex_parsei()
 
 begin
 	call smark (sp)

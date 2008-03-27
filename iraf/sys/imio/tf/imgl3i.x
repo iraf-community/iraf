@@ -12,10 +12,11 @@ include	<imio.h>
 pointer procedure imgl3i (im, line, band)
 
 pointer	im		# image header pointer
-int	line		# line number within band
-int	band		# band number
+long	line		# line number within band
+long	band		# band number
 
-int	fd, nchars
+int	fd
+size_t	nchars
 long	vs[3], ve[3], offset
 pointer	bp, imggsi(), freadp()
 errchk	imopsf, imerr

@@ -13,7 +13,8 @@ double	ltm[ndim,ndim]		#I linear transformation matrix
 double	ltv[ndim]		#I translation vector
 int	ndim			#I dimensionality of system
 
-int	mw_allocd()
+size_t	sz_val
+long	mw_allocd()
 errchk	syserrs, mw_allocd
 
 begin
@@ -24,11 +25,13 @@ begin
 	# Copy in the data.  Cobber the old data if the Lterm has been set,
 	# otherwise allocate space in the global data area.
 
+	sz_val = ndim*ndim
 	if (MI_LTM(mw) == NULL)
-	    MI_LTM(mw) = mw_allocd (mw, ndim*ndim)
-	call amovd (ltm, D(mw,MI_LTM(mw)), ndim*ndim)
+	    MI_LTM(mw) = mw_allocd (mw, sz_val)
+	call amovd (ltm, D(mw,MI_LTM(mw)), sz_val)
 
+	sz_val = ndim
 	if (MI_LTV(mw) == NULL)
-	    MI_LTV(mw) = mw_allocd (mw, ndim)
-	call amovd (ltv, D(mw,MI_LTV(mw)), ndim)
+	    MI_LTV(mw) = mw_allocd (mw, sz_val)
+	call amovd (ltv, D(mw,MI_LTV(mw)), sz_val)
 end

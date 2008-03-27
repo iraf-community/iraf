@@ -7,7 +7,7 @@ include	<imhdr.h>
 pointer procedure imgs2x (im, x1, x2, y1, y2)
 
 pointer	im
-int	x1, x2, y1, y2
+long	x1, x2, y1, y2
 long	vs[2], ve[2]
 pointer	imggsx(), imgl2x()
 

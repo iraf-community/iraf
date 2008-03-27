@@ -15,7 +15,8 @@ pointer	io			#I QPIO descriptor
 int	param			#I parameter code
 long	lvalue			#I new parameter value
 
-int	naxes, axlen[PL_MAXDIM], sv_active, value
+int	naxes, sv_active, value
+long	axlen[PL_MAXDIM]
 errchk	pl_close, syserr, realloc
 
 begin
@@ -28,16 +29,16 @@ begin
 	# Set the named parameter.
 	switch (param) {
 	case QPIO_BLOCKFACTOR:
-	    IO_XBLOCK(io) = value
-	    IO_YBLOCK(io) = value
+	    IO_XBLOCK(io) = lvalue
+	    IO_YBLOCK(io) = lvalue
 	case QPIO_XBLOCKFACTOR:
-	    IO_XBLOCK(io) = value
+	    IO_XBLOCK(io) = lvalue
 	case QPIO_YBLOCKFACTOR:
-	    IO_YBLOCK(io) = value
+	    IO_YBLOCK(io) = lvalue
 	case QPIO_EVXOFF:
-	    IO_EVXOFF(io) = value
+	    IO_EVXOFF(io) = lvalue
 	case QPIO_EVYOFF:
-	    IO_EVYOFF(io) = value
+	    IO_EVYOFF(io) = lvalue
 	case QPIO_EVXTYPE:
 	    IO_EVXTYPE(io) = value
 	case QPIO_EVYTYPE:
@@ -49,12 +50,12 @@ begin
 	case QPIO_NODEFMASK:
 	    IO_NODEFMASK(io) = value
 	case QPIO_OPTBUFSIZE:
-	    IO_OPTBUFSIZE(io) = value
+	    IO_OPTBUFSIZE(io) = lvalue
 
 	case QPIO_BUCKETLEN:
 	    # Set the bucket length (new event lists only).
 	    if (IO_MODE(io) != READ_ONLY)
-		IO_BUCKETLEN(io) = value
+		IO_BUCKETLEN(io) = lvalue
 
 	case QPIO_DEBUG:
 	    # Set the debug level; don't modify IO_ACTIVE.
@@ -81,7 +82,7 @@ begin
 
 	    # Allocate a range list buffer if i/o is indexed.
 	    if (IO_INDEXLEN(io) > 0)
-		call realloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+		call realloc (IO_RL(io), RL_LENMAX(IO_PL(io)), TY_INT)
 
 	    # Update the mask name, such as it is...
 	    if (IO_MASK(io) != NULL) {
@@ -112,7 +113,8 @@ pointer	io			#I QPIO descriptor
 int	param			#I parameter code
 pointer	pvalue			#I new parameter value
 
-int	naxes, axlen[PL_MAXDIM], sv_active
+int	naxes, sv_active
+long	axlen[PL_MAXDIM]
 long	lvalue
 errchk	pl_close, syserr, realloc
 
@@ -145,7 +147,7 @@ begin
 
 	    # Allocate a range list buffer if i/o is indexed.
 	    if (IO_INDEXLEN(io) > 0)
-		call realloc (IO_RL(io), RL_MAXLEN(IO_PL(io)), TY_INT)
+		call realloc (IO_RL(io), RL_LENMAX(IO_PL(io)), TY_INT)
 
 	    # Update the mask name, such as it is...
 	    if (IO_MASK(io) != NULL) {

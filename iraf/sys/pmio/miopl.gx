@@ -18,15 +18,17 @@ include	"../mio.h"
 # the range should be set to the full image and a region mask used to mask
 # off the subregion to be accessed).
 
-int procedure mio_plseg$t (mp, ptr, mval, v, npix)
+long procedure mio_plseg$t (mp, ptr, mval, v, npix)
 
 pointer	mp			#I MIO descriptor
 pointer	ptr			#O pointer to a buffer containing the data
 int	mval			#O mask value for the output line segment
 long	v[IM_MAXDIM]		#U vector coordinates of first pixel
-int	npix			#O number of pixels in output line segment
+size_t	npix			#O number of pixels in output line segment
 
-int	x1, i
+size_t	sz_val
+long	x1
+int	i
 long	ve[IM_MAXDIM]
 pointer	pm, im, rl, rp, bp
 pointer	impl2$t(), impl3$t(), impgs$t()
@@ -53,7 +55,8 @@ begin
 		M_NDIM(mp)) == LOOP_DONE) {
 		return (EOF)
 	    } else {
-		call amovl (M_V(mp,1), ve, M_NDIM(mp))
+		sz_val = M_NDIM(mp)
+		call amovl (M_V(mp,1), ve, sz_val)
 		ve[1] = M_VE(mp,1)
 		if (pm_sectnotempty (pm, M_V(mp,1), ve, M_NDIM(mp))) {
 		    call pm_glri (pm,
@@ -65,7 +68,8 @@ begin
 
 	# Get a new image line?
 	if (M_RLI(mp) == RL_FIRST) {
-	    call amovl (M_V(mp,1), v, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (M_V(mp,1), v, sz_val)
 	    im = M_IM(mp)
 	
 	    if (M_LINEIO(mp) == YES && M_NDIM(mp) == 2)

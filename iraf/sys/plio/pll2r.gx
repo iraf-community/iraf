@@ -9,14 +9,16 @@ include	<plio.h>
 int procedure pl_l2r$t (ll_src, xs, rl, npix)
 
 short	ll_src[ARB]		#I input line list
-int	xs			#I starting index in ll_src
+long	xs			#I starting index in ll_src
 PIXEL	rl[3,ARB] 		#O output range list
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 
-int	pv, hi
+PIXEL	pv
+long	hi
 bool	skipword
 int	opcode, data, ll_len, ll_first
-int	x1, x2, i1, i2, xe, np, rn, ip
+long	x1, x2, i1, i2, xe, np
+int	rn, ip
 define	range_ 91
 define	putrange_ 92
  

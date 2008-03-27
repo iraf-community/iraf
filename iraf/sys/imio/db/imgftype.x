@@ -34,11 +34,11 @@ begin
 	case I_MTIME:
 	    return (TY_LONG)
 	case I_NAXIS:
-	    return (TY_LONG)
+	    return (TY_INT)
 	case I_PIXFILE:
 	    return (TY_CHAR)
 	case I_PIXTYPE:
-	    return (TY_LONG)
+	    return (TY_INT)
 	case I_TITLE:
 	    return (TY_CHAR)
 	}
@@ -64,7 +64,7 @@ begin
 		    return (TY_REAL)
 	    }
 	    
-	    return (TY_INT)
+	    return (TY_LONG)
 	}
 
 	call syserrs (SYS_IDBKEYNF, key)

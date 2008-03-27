@@ -17,13 +17,17 @@ long	vs_dst[PM_MAXDIM]	#I start vector in destination mask
 pointer	pm_stn			#I stencil mask (required)
 long	vs_stn[PM_MAXDIM]	#I start vector in stencil mask
 long	vn[PM_MAXDIM]		#I vector giving subregion size
-long	rop			#I rasterop
+int	rop			#I rasterop
 
+size_t	sz_pm_ndim
+long	lval
 int	i
 long	v5[PM_MAXDIM], v6[PM_MAXDIM]
 include	"pmio.com"
 
 begin
+	sz_pm_ndim = PM_MAXDIM
+
 	# If an image section is in use on any of the input mask operands,
 	# perform a coordination transformation into physical mask space
 	# before performing the stencil operation.
@@ -34,20 +38,22 @@ begin
 	    # Compute the geometry V1:V3 of the source mask.
 	    call imaplv (PM_REFIM(pm_src), vs_src, v1, PM_MAXDIM)
 
-	    call aaddl (vs_src, vn, v2, PM_MAXDIM)
-	    call asubkl (v2, 1, v2, PM_MAXDIM)
-	    call aminl (v2, IM_LEN(PM_REFIM(pm_src),1), v2, PM_MAXDIM)
+	    call aaddl (vs_src, vn, v2, sz_pm_ndim)
+	    lval = 1
+	    call asubkl (v2, lval, v2, sz_pm_ndim)
+	    call aminl (v2, IM_LEN(PM_REFIM(pm_src),1), v2, sz_pm_ndim)
 	    call imaplv (PM_REFIM(pm_src), v2, v3, PM_MAXDIM)
 
 	    # Swap V1 and V3 if necessary.
-	    call aminl (v1, v3, v1, PM_MAXDIM)
+	    call aminl (v1, v3, v1, sz_pm_ndim)
 
 	    # Compute the geometry V2:V4 of the destination mask.
 	    call imaplv (PM_REFIM(pm_dst), vs_dst, v2, PM_MAXDIM)
 
-	    call aaddl (vs_dst, vn, v3, PM_MAXDIM)
-	    call asubkl (v3, 1, v3, PM_MAXDIM)
-	    call aminl (v3, IM_LEN(PM_REFIM(pm_dst),1), v3, PM_MAXDIM)
+	    call aaddl (vs_dst, vn, v3, sz_pm_ndim)
+	    lval = 1
+	    call asubkl (v3, lval, v3, sz_pm_ndim)
+	    call aminl (v3, IM_LEN(PM_REFIM(pm_dst),1), v3, sz_pm_ndim)
 	    call imaplv (PM_REFIM(pm_dst), v3, v4, PM_MAXDIM)
 
 	    # Compute v3 = vn for rasterop.  Input: SRC=v1:v3, DST=v2:v4
@@ -62,11 +68,12 @@ begin
 
 	    # Compute the start vector V4 of the stencil mask.
 	    call imaplv (PM_REFIM(pm_stn), vs_stn, v4, PM_MAXDIM)
-	    call aaddl (vs_stn, vn, v5, PM_MAXDIM)
-	    call asubkl (v5, 1, v5, PM_MAXDIM)
-	    call aminl (v5, IM_LEN(PM_REFIM(pm_stn),1), v5, PM_MAXDIM)
+	    call aaddl (vs_stn, vn, v5, sz_pm_ndim)
+	    lval = 1
+	    call asubkl (v5, lval, v5, sz_pm_ndim)
+	    call aminl (v5, IM_LEN(PM_REFIM(pm_stn),1), v5, sz_pm_ndim)
 	    call imaplv (PM_REFIM(pm_stn), v5, v6, PM_MAXDIM)
-	    call aminl (v4, v6, v4, PM_MAXDIM)
+	    call aminl (v4, v6, v4, sz_pm_ndim)
 
 	    # Perform the rasterop operation.
 	    call pl_stencil (pm_src, v1, pm_dst, v2, pm_stn, v4, v3, rop)

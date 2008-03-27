@@ -18,10 +18,11 @@ char	key[ARB]		# parameter to be returned
 char	outstr[ARB]		# output string to receive parameter value
 int	maxch
 
+int	ival
 long	lval
 real	rval
 int	dtype, axis, ip
-int	gstrcpy(), idb_kwlookup(), strncmp(), ltoc(), strlen()
+int	gstrcpy(), idb_kwlookup(), strncmp(), itoc(), ltoc(), strlen()
 define	encode_ 91
 
 begin
@@ -60,13 +61,13 @@ begin
 	    dtype = TY_LONG
 	    lval = IM_MTIME(im)
 	case I_NAXIS:
-	    dtype = TY_LONG
-	    lval = IM_NDIM(im)
+	    dtype = TY_INT
+	    ival = IM_NDIM(im)
 	case I_PIXFILE:
 	    return (gstrcpy (IM_PIXFILE(im), outstr, maxch))
 	case I_PIXTYPE:
-	    dtype = TY_LONG
-	    lval = IM_PIXTYPE(im)
+	    dtype = TY_INT
+	    ival = IM_PIXTYPE(im)
 	case I_TITLE:
 	    return (gstrcpy (IM_TITLE(im), outstr, maxch))
 	default:
@@ -75,9 +76,11 @@ begin
 	}
 
 encode_
-	if (dtype == TY_LONG)
+	if (dtype == TY_INT) {
+	    return (itoc (ival, outstr, maxch))
+	} else if (dtype == TY_LONG) {
 	    return (ltoc (lval, outstr, maxch))
-	else {
+	} else {
 	    call sprintf (outstr, maxch, "%g")
 		call pargr (rval)
 	    return (strlen (outstr))

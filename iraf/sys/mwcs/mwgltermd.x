@@ -12,6 +12,7 @@ double	ltm[ndim,ndim]		#O linear transformation matrix
 double	ltv[ndim]		#O translation vector
 int	ndim			#I dimensionality of system
 
+size_t	sz_val
 int	i
 errchk	syserrs
 
@@ -23,15 +24,19 @@ begin
 	# Copy out the data.  Default to a unitary transformation if the
 	# Lterm has not been initialized.
 
+	sz_val = ndim*ndim
 	if (MI_LTM(mw) == NULL) {
-	    call aclrd (ltm, ndim*ndim)
+	    call aclrd (ltm, sz_val)
 	    do i = 1, ndim
 		ltm[i,i] = 1.0D0
-	} else
-	    call amovd (D(mw,MI_LTM(mw)), ltm, ndim*ndim)
+	} else {
+	    call amovd (D(mw,MI_LTM(mw)), ltm, sz_val)
+	}
 
-	if (MI_LTV(mw) == NULL)
-	    call aclrd (ltv, ndim)
-	else
-	    call amovd (D(mw,MI_LTV(mw)), ltv, ndim)
+	sz_val = ndim
+	if (MI_LTV(mw) == NULL) {
+	    call aclrd (ltv, sz_val)
+	} else {
+	    call amovd (D(mw,MI_LTV(mw)), ltv, sz_val)
+	}
 end

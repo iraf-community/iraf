@@ -15,17 +15,21 @@ char	mask[ARB]		#I mask file
 char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 
-int	fd, nchars
+size_t	sz_val
+int	fd
+long	nchars
 pointer	sp, bp, sv, text, fname, extn
 int	open(), fnextn()
-long	read(), miireadc(), miireadi()
+long	read(), miireadc(), miireadp()
 errchk	open, read, syserrs
 define	err_ 91
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (extn, sz_val, TY_CHAR)
 
 	# Get mask file name.
 	call strcpy (mask, Memc[fname], SZ_PATHNAME)
@@ -36,8 +40,9 @@ begin
 	fd = open (Memc[fname], READ_ONLY, BINARY_FILE)
 
 	# Get savefile header.
-	call salloc (sv, LEN_SVDES, TY_STRUCT)
-	if (miireadi (fd, Memi[sv], LEN_SVDES) != LEN_SVDES)
+	sz_val = LEN_SVDES
+	call salloc (sv, sz_val, TY_STRUCT)
+	if (miireadp (fd, Memp[sv], sz_val) != LEN_SVDES)
 	    goto err_
 
 	# Verify file type.
@@ -45,15 +50,18 @@ begin
 	    goto err_
 
 	# Get descriptive text.
-	call salloc (text, SV_TITLELEN(sv), TY_CHAR)
-	if (miireadc (fd, Memc[text], SV_TITLELEN(sv)) != SV_TITLELEN(sv))
+	sz_val = SV_TITLELEN(sv)
+	call salloc (text, sz_val, TY_CHAR)
+	if (miireadc (fd, Memc[text], sz_val) != SV_TITLELEN(sv))
 	    goto err_
 	else
 	    call strcpy (Memc[text], title, maxch)
 
 	# Get encoded mask.
-	call salloc (bp, SV_MASKLEN(sv), TY_SHORT)
-	iferr (nchars = read (fd, Mems[bp], SV_MASKLEN(sv) * SZ_SHORT))
+	sz_val = SV_MASKLEN(sv)
+	call salloc (bp, sz_val, TY_SHORT)
+	sz_val = SV_MASKLEN(sv) * SZ_SHORT
+	iferr (nchars = read (fd, Mems[bp], sz_val))
 	    goto err_
 	call close (fd)
 

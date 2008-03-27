@@ -13,22 +13,26 @@ procedure pl_linestencil (ll_src,xs,src_maxval, ll_dst,ds,dst_maxval,
 			  ll_stn,ss, ll_out, npix, rop)
 
 short	ll_src[ARB]		#I source line list
-int	xs			#I starting pixel index in src line list
+long	xs			#I starting pixel index in src line list
 int	src_maxval		#I maximum pixel value, source mask
 short	ll_dst[ARB]		#I destination line list
-int	ds			#I starting pixel index in dst line list
+long	ds			#I starting pixel index in dst line list
 int	dst_maxval		#I maximum pixel value, destination mask
 short	ll_stn[ARB]		#I stencil line list
-int	ss			#I starting pixel index in stn line list
+long	ss			#I starting pixel index in stn line list
 short	ll_out[ARB]		#O output list (edited version of ll_dst)
-int	npix			#I number of pixels to convert
+size_t	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
+size_t	sz_val
 bool	need_src, rop_enable
-int	o_op, o_iz, o_pv, o_np, o_hi
-int	segsize, v_src, v_dst, v_stn, pv, src_value
-int	opcode, data, x1, hi, dv, v, iz, nz, np, op, n, i
-int	d_src[LEN_PLLDES], d_dst[LEN_PLLDES], d_stn[LEN_PLLDES]
+int	op, o_op, pv, o_pv
+int	o_hi, hi, data, dv, v
+long	iz, o_iz, segsize, np, o_np, nz, x1, n
+int	v_src, v_dst, v_stn, src_value
+int	opcode, i
+long	d_src[LEN_PLLDES], d_dst[LEN_PLLDES], d_stn[LEN_PLLDES]
+int	modi(), absi()
 define	copyout_ 91
 define	done_ 92
 
@@ -233,7 +237,7 @@ copyout_	pv = v_dst
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (abs(dv) > I_DATAMAX) {
+		    if (absi(dv) > I_DATAMAX) {
 			ll_out[op] = M_SH + and (pv, I_DATAMAX)
 			op = op + 1
 			ll_out[op] = pv / I_SHIFT
@@ -284,6 +288,7 @@ done_
 	}
 
 	# Update the line list header.
-	call amovs (ll_dst, ll_out, LL_CURHDRLEN)
+	sz_val = LL_CURHDRLEN
+	call amovs (ll_dst, ll_out, sz_val)
 	LL_SETLEN(ll_out, op - 1)
 end

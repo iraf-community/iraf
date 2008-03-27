@@ -13,6 +13,7 @@ procedure stf_ordergpb (o_stf, n_stf)
 pointer	o_stf			# STF descriptor of old image
 pointer n_stf			# STF descriptor of new image
 
+size_t	sz_val
 pointer	sp, temp_pdes, pp, o_plist, n_plist
 int	o_pcount, n_pcount, otop, ntop, op, np, offset, sz_param, pn
 bool	streq()
@@ -24,7 +25,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (temp_pdes, LEN_PDES, TY_STRUCT)
+	sz_val = LEN_PDES
+	call salloc (temp_pdes, sz_val, TY_STRUCT)
 
 	o_plist = STF_PDES(o_stf,1)
 	n_plist = STF_PDES(n_stf,1)
@@ -41,12 +43,10 @@ begin
 		if (streq (P_PTYPE(o_plist+op), P_PTYPE(n_plist+np))) {
 		    if (op != np) {
 			# Swap parameters between old and new positions
-			call amovi (Memi[n_plist+op], Memi[temp_pdes],
-			    LEN_PDES)
-			call amovi (Memi[n_plist+np], Memi[n_plist+op],
-			    LEN_PDES)
-			call amovi (Memi[temp_pdes], Memi[n_plist+np],
-			    LEN_PDES)
+			sz_val = LEN_PDES
+			call amovp (Memp[n_plist+op], Memp[temp_pdes], sz_val)
+			call amovp (Memp[n_plist+np], Memp[n_plist+op], sz_val)
+			call amovp (Memp[temp_pdes], Memp[n_plist+np], sz_val)
 		    }
 		    break
 		}

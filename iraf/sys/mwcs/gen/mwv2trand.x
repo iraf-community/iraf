@@ -9,9 +9,9 @@ procedure mw_v2trand (a_ct, x1,y1, x2,y2, npts)
 pointer	a_ct			#I pointer to CTRAN descriptor
 double	x1[ARB],y1[ARB]		#I coordinates in input system
 double	x2[ARB],y2[ARB]		#O coordinates in output system
-int	npts
+size_t	npts
 
-int	i
+long	i
 pointer	ct, ltm, ltv
 double	p1[2], p2[2]
 errchk	mw_ctrand

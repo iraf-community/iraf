@@ -10,7 +10,7 @@ include	<imio.h>
 # the leftmost subscript by one, until V equals IM_LEN.  EOF is returned
 # when the last line in the image has been written.
 
-int procedure impnln (im, lineptr, v, dtype)
+long procedure impnln (im, lineptr, v, dtype)
 
 pointer	im
 pointer	lineptr				# on output, points to the pixels
@@ -18,7 +18,8 @@ long	v[IM_MAXDIM]			# loop counter
 int	dtype				# eventual datatype of pixels
 
 long	lineoff, line, band, offset
-int	dim, ndim, junk, sz_pixel, fd, nchars, pixtype
+int	dim, ndim, junk, sz_pixel, fd, pixtype
+size_t	nchars
 long	vs[IM_MAXDIM], ve[IM_MAXDIM], unit_v[IM_MAXDIM], npix
 
 int	imloop()

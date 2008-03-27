@@ -2,6 +2,7 @@
 
 include <syserr.h>
 include <fmset.h>
+include <mii.h>
 include "qpoe.h"
 include "qpio.h"
 
@@ -17,13 +18,15 @@ char	poefile[ARB]		#I QPOE file to be opened
 int	mode			#I file access mode
 pointer o_qp			#I reference file, if NEW_COPY
 
-int	fmmode, fd, n
+size_t	sz_val
+int	fmmode, fd
+size_t	n
 pointer sp, qph, qp, fname, fm
 
 real	qp_getr()
 pointer fm_open(), strestore(), qm_access()
-int	fm_fopen(), fm_stati(), qp_accessf()
-long	read()
+int	fm_fopen(), qp_accessf()
+long	read(), fm_statl()
 errchk	fm_open, strestore, fm_fopen, seek, read
 errchk	calloc, syserrs, qm_access
 
@@ -33,8 +36,10 @@ string	s_defyblock DEF_YBLOCK
 
 begin
 	call smark (sp)
-	call salloc (qph, LEN_QPH, TY_STRUCT)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_QPH
+	call salloc (qph, sz_val, TY_STRUCT)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Construct the filename (with extension .qp) of the poefile.
 	call qp_mkfname (poefile, QPOE_EXTN, Memc[fname], SZ_PATHNAME)
@@ -46,7 +51,8 @@ begin
 	fm = fm_open (Memc[fname], fmmode)
 
 	# Allocate the QPOE descriptor.
-	call calloc (qp, LEN_QPDES, TY_STRUCT)
+	sz_val = LEN_QPDES
+	call calloc (qp, sz_val, TY_STRUCT)
 	call strcpy (Memc[fname], QP_DFNAME(qp), SZ_QPDFNAME)
 
 	# Access the global macro database, and set the default values of
@@ -88,11 +94,13 @@ begin
 	    fd = fm_fopen (fm, LF_QPOE, READ_ONLY, BINARY_FILE)
 
 	    # Read the QPOE file header.
+	    sz_val = LEN_QPH
+	    call aclrp (Memp[qph], sz_val)
 	    n = LEN_QPH * SZ_STRUCT
-	    call aclri (Memi[qph], LEN_QPH)
-	    if (read (fd, Memi[qph], n) < n)
+	    if (read (fd, Memc[P2C(qph)], n) < n)
 		call syserrs (SYS_QPBADFILE, QP_DFNAME(qp))
-	    call miiupk32 (Memi[qph], Memi[qph], LEN_QPH, TY_STRUCT)
+	    sz_val = LEN_QPH
+	    call miiupkl (Memp[qph], Memp[qph], sz_val, TY_STRUCT)
 
 	    QP_MAGIC(qp)	= QPH_MAGIC(qph)
 	    QP_VERSION(qp)	= QPH_VERSION(qph)
@@ -106,7 +114,7 @@ begin
 	    QP_ST(qp) = strestore (fd)
 
 	    # Initialize any remaining QP descriptor parameters.
-	    QP_FMPAGESIZE(qp) = fm_stati (fm, FM_PAGESIZE)
+	    QP_FMPAGESIZE(qp) = fm_statl (fm, FM_PAGESIZE)
 	    call fm_seti (fm, FM_FCACHESIZE, DEF_FMCACHESIZE)
 	    QP_ACTIVE(qp) = YES
 

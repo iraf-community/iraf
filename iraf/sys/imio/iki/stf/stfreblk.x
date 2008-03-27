@@ -11,14 +11,17 @@ procedure stf_reblock (im)
 
 pointer	im			# image descriptor
 
-pointer	sp, lbuf, op, ua
-int	fd, spool, nlines, nchars, sz_userarea, len_hdrmem
+size_t	sz_val
+long	lval
+pointer	sp, lbuf, ua
+int	fd, spool, nlines, nchars, sz_userarea, len_hdrmem, op
 errchk	stropen, open, getline, putline, realloc, seek, fcopyo
 int	open(), stropen(), getline()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	ua = IM_USERAREA(im)
 	fd = stropen (Memc[ua], ARB, READ_ONLY)
@@ -50,13 +53,15 @@ begin
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
-	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	    call realloc (im, sz_val, TY_STRUCT)
 	}
 
 	# Move spooled data back to user area.
 	ua = IM_USERAREA(im)
 	fd = stropen (Memc[ua], sz_userarea, NEW_FILE)
-	call seek (spool, BOFL)
+	lval = BOFL
+	call seek (spool, lval)
 	call fcopyo (spool, fd)
 
 	call close (fd)

@@ -11,8 +11,8 @@ include	<plio.h>
 procedure pm_point (pl, x, y, rop)
 
 pointer	pl			#I mask descriptor
-int	x			#I pixel to be modified
-int	y			#I line to be modified
+long	x			#I pixel to be modified
+long	y			#I line to be modified
 int	rop			#I rasterop defining operation
 
 errchk	pl_getplane

@@ -12,9 +12,10 @@ pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I vector coords of line segment
 int	px_src[ARB]		#I input pixel array
 int	px_depth		#I pixel depth, bits
-int	npix			#I number of pixels affected
+size_t	npix			#I number of pixels affected
 int	rop			#I rasterop
 
+long	lval
 pointer	sp, ll_src
 int	ll_len, pl_p2li()
 include	"../pmio.com"
@@ -26,7 +27,8 @@ begin
 	    call smark (sp)
 	    call salloc (ll_src, LL_MAXLEN(pl), TY_SHORT)
 
-	    ll_len = pl_p2li (px_src, 1, Mems[ll_src], npix)
+	    lval = 1
+	    ll_len = pl_p2li (px_src, lval, Mems[ll_src], npix)
 	    call pm_plls (pl, v, Mems[ll_src], px_depth, npix, rop)
 
 	    call sfree (sp)
