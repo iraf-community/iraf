@@ -49,7 +49,7 @@ bool	streq()
 int	sgf_getchar(), fstati()
 include	"stdgraph.com"
 define	failed_ 91
-include <nullptr.com>
+include <nullptr.inc>
 
 begin
 	# Disable the filter if reading from the terminal in nonblocking
