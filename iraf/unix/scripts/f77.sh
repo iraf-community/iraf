@@ -189,6 +189,14 @@ do
 		    sed -e "s/$b\\.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
 		fi
 		#
+		# New linker does not accept "-Wl,--defsym,mem_=0", so memX
+		# definitions are replaced:
+		#      #define memi ((integer *)&mem_1)
+		#   -> #define memi ((integer *)(&mem_1 - &mem_1))
+		#
+		cat $b.c | sed -e 's/\(^#define mem[a-z] (([^()]*)\)\(\&mem_1)\)/\1(\&mem_1 - \&mem_1))/' > $b.t
+		mv $b.t $b.c
+		#
 		# erase "/* Subroutine */ " comments
 		#
 		cat $b.c | sed -e 's|/\* Subroutine \*/ ||' > $b.t

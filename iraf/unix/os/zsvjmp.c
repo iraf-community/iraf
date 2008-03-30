@@ -21,12 +21,18 @@
 
 #ifdef I386
 
-#if defined(MACOSX)
+/*
+asm("# Set the address of the MEM common to zero.");
 asm(".globl	mem_");
 asm("	mem_	=	0");
+*/
+
+/*
+#if defined(MACOSX)
 asm(".globl	_mem_");
 asm("	_mem_	=	0");
-#endif	/* MACOSX */
+#endif
+*/
 
 #if defined(LINUX)
 asm(".text");
@@ -61,6 +67,12 @@ asm("	jmp	_setjmp		# let setjmp do the rest");
 
 #ifdef X86_64
 
+/*
+asm("# Set the address of the MEM common to zero.");
+asm(".globl	mem_");
+asm("	mem_	=	0");
+*/
+
 #ifdef SPP_LP64
 /* LP64-SPP */
 asm(".text");
@@ -91,10 +103,11 @@ asm("	jmp	__sigsetjmp	# let sigsetjmp do the rest");
 #ifdef POWERPC
 
 #if defined(LINUX)
+/*
 asm("	# Set the address of the MEM common to zero.");
 asm("	.globl   mem_");
 asm("	mem_ = 0");
-asm("");
+*/
 asm(".text");
 asm("	# ZSVJMP -- SPP callable SETJMP.");
 asm("	.align	 2");
@@ -111,10 +124,11 @@ asm("	b	__sigsetjmp");
 #endif	/* LINUX */
 
 #if defined(MACOSX)
+/*
 asm("	# Set the address of the MEM common to zero.");
 asm("	.globl   _mem_");
 asm("	_mem_ = 0");
-asm("");
+*/
 asm(".text");
 asm("	# ZSVJMP -- SPP callable SETJMP.");
 asm("	.align	2");

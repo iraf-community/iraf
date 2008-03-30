@@ -1035,9 +1035,11 @@ passflag:		    mkobject = YES;
 #ifdef SOLARIS
 	addtolist ("-Wl,-t", &arglist, &nargs);
 #endif
+/*
 #ifdef LINUX
 	addtolist ("-Wl,--defsym,mem_=0", &arglist, &nargs);
 #endif
+*/
 #ifdef NEED_GCC_SPECS
 	{
 	    char gcc_specs[SZ_PATHNAME];
