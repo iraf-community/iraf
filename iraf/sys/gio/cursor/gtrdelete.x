@@ -13,7 +13,9 @@ pointer	tr			#I giotr descriptor
 pointer	gki			#I instruction to be deleted
 
 pointer	inext
-int	nwords, shift, ilen
+size_t	nwords
+long	shift
+int	ilen
 
 begin
 	ilen = Mems[gki+GKI_HDR_LENGTH-1]

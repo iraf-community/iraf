@@ -24,9 +24,11 @@ procedure gtr_wstran (gki)
 
 short	gki[ARB]		#I metacode instruction to be spooled
 
-long	x, y
+int	x, y
 pointer	sp, buf
-int	length, npts, data
+size_t	length
+int	data
+int	npts
 int	gtr_polyclip()
 bool	sge_wsenable()
 include	"gtr.com"
@@ -120,10 +122,11 @@ procedure gtr_ctran (mx, my, sx, sy)
 int	mx, my			# raw GKI coordinates
 int	sx, sy			# screen coordinates in GKI units
 include	"gtr.com"
+int	nint_ri()
 
 begin
-	sx = max(0, min(GKI_MAXNDC, nint ((mx - mx1) * xscale + xorigin)))
-	sy = max(0, min(GKI_MAXNDC, nint ((my - my1) * yscale + yorigin)))
+	sx = max(0, min(GKI_MAXNDC, nint_ri ((mx - mx1) * xscale + xorigin)))
+	sy = max(0, min(GKI_MAXNDC, nint_ri ((my - my1) * yscale + yorigin)))
 end
 
 
@@ -322,6 +325,7 @@ procedure gpt_clipl (pen, mx, my)
 int	pen			# move or draw
 long	mx, my			# point to be clipped
 long	new_my
+real	rval0, rval1, rval2
 int	newpen
 include	"gtr.com"
 
@@ -332,8 +336,10 @@ begin
 		newpen = MOVE
 	    else
 		newpen = pen
-	    new_my = real(my - ys[1]) * real(mx1 - mx) / real(mx - xs[1]) +
-		my + 0.5
+	    rval0 = my - ys[1]
+	    rval1 = mx1 - mx
+	    rval2 = mx - xs[1]
+	    new_my = rval0 * rval1 / rval2 + my + 0.5
 	    call gpt_clipr (newpen, mx1, new_my)
 	}
 
@@ -352,6 +358,7 @@ procedure gpt_clipr (pen, mx, my)
 int	pen			# move or draw
 long	mx, my			# point to be clipped
 long	new_my
+real	rval0, rval1, rval2
 int	newpen
 include	"gtr.com"
 
@@ -362,8 +369,10 @@ begin
 		newpen = MOVE
 	    else
 		newpen = pen
-	    new_my = real(my - ys[2]) * real(mx2 - mx) / real(mx - xs[2]) +
-		my + 0.5
+	    rval0 = my - ys[2]
+	    rval1 = mx2 - mx
+	    rval2 = mx - xs[2]
+	    new_my = rval0 * rval1 / rval2 + my + 0.5
 	    call gpt_clipb (newpen, mx2, new_my)
 	}
 
@@ -382,6 +391,7 @@ procedure gpt_clipb (pen, mx, my)
 int	pen			# move or draw
 long	mx, my			# point to be clipped
 long	new_mx
+real	rval0, rval1, rval2
 int	newpen
 include	"gtr.com"
 
@@ -392,8 +402,10 @@ begin
 		newpen = MOVE
 	    else
 		newpen = pen
-	    new_mx = real(mx - xs[3]) * real(my1 - my) / real(my - ys[3]) +
-		mx + 0.5
+	    rval0 = mx - xs[3]
+	    rval1 = my1 - my
+	    rval2 = my - ys[3]
+	    new_mx = rval0 * rval1 / rval2 + mx + 0.5
 	    call gpt_clipt (newpen, new_mx, my1)
 	}
 
@@ -415,6 +427,7 @@ procedure gpt_clipt (pen, mx, my)
 
 int	pen			# move or draw
 long	mx, my			# point to be clipped
+real	rval0, rval1, rval2
 include	"gtr.com"
 
 begin
@@ -422,8 +435,10 @@ begin
 	if ((my <= my2 && ys[4] > my2) || (my >= my2 && ys[4] < my2)) {
 	    if (my <= my2 || pen == MOVE)
 		call gpt_flush()
-	    pl[pl_op] = real(mx - xs[4]) * real(my2 - my) / real(my - ys[4]) +
-		mx + 0.5
+	    rval0 = mx - xs[4]
+	    rval1 = my2 - my
+	    rval2 = my - ys[4]
+	    pl[pl_op] = rval0 * rval1 / rval2 + mx + 0.5
 	    pl_op = pl_op + 1
 	    pl[pl_op] = my2
 	    pl_op = pl_op + 1
@@ -450,9 +465,11 @@ end
 
 procedure gpt_flush()
 
-int	npts, i
+int	npts
+int	i
 long	mx, my
 include	"gtr.com"
+long	nint_rl()
 
 begin
 	if (pl_op >= GKI_POLYLINE_P + 2) {
@@ -460,8 +477,8 @@ begin
 
 	    # Apply the workstation transformation.
 	    do i = GKI_POLYLINE_P, pl_op, 2 {
-		mx = nint ((pl[i]   - mx1) * xscale + xorigin)
-		my = nint ((pl[i+1] - my1) * yscale + yorigin)
+		mx = nint_rl ((pl[i]   - mx1) * xscale + xorigin)
+		my = nint_rl ((pl[i+1] - my1) * yscale + yorigin)
 		pl[i]   = max(0, min(GKI_MAXNDC, mx))
 		pl[i+1] = max(0, min(GKI_MAXNDC, my))
 	    }

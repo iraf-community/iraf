@@ -24,21 +24,25 @@ procedure giotr (stream)
 
 int	stream			# graphics stream
 
+size_t	sz_val
 pointer	tr, gki
 pointer	jmpbuf[LEN_JUMPBUF]
 int	fn, mode, status, nwords
+short	s_0
 pointer	xint, junk
 common	/gtrvex/ jmpbuf
 
 pointer	gtr_init(), coerce()
 extern	giotr_onint(), gtr_delete()
-int	gtr_fetch_next_instruction()
+long	gtr_fetch_next_instruction()
 pointer	locpr()
 errchk	gtr_init, gtr_fetch_next_instruction, gki_write
 data	status /OK/, xint /NULL/
 include	"gtr.com"
 
 begin
+	s_0 = 0
+
 	tr = gtr_init (stream)
 
 	# If an interrupt occurs while GIOTR is executing output is cancelled
@@ -74,7 +78,7 @@ begin
 			call gki_write (stream, Mems[gki])
 
 		    # gtr_control does not call gki_escape so always do this.
-		    call gki_escape (stream, GKI_OPENWS, 0, 0)
+		    call gki_escape (stream, GKI_OPENWS, s_0, 0)
 
 		    # Discard frame buffer contents up to and including the
 		    # openws instruction, so that it will only be executed
@@ -108,7 +112,7 @@ begin
 		}
 		# Execute the instruction.
 		call gki_write (stream, Mems[gki])
-		call gki_escape (stream, GKI_CLEAR, 0, 0)
+		call gki_escape (stream, GKI_CLEAR, s_0, 0)
 
 		# Discard frame buffer contents up to and including the clear.
 		call gtr_frame (tr, TR_IP(tr), stream)
@@ -116,9 +120,9 @@ begin
 	    case GKI_SETWCS:
 		call gki_write (stream, Mems[gki])
 		nwords = Mems[gki+GKI_SETWCS_N-1]
+		sz_val = min (nwords, LEN_WCS * MAX_WCS * SZ_STRUCT / SZ_SHORT)
 		call amovs (Mems[gki+GKI_SETWCS_WCS-1],
-		    Mems[coerce (TR_WCSPTR(tr,1), TY_STRUCT, TY_SHORT)],
-		    min (nwords, LEN_WCS * MAX_WCS * SZ_STRUCT / SZ_SHORT))
+		   Mems[coerce (TR_WCSPTR(tr,1), TY_STRUCT, TY_SHORT)], sz_val)
 
 	    case GKI_ESCAPE:
 		if (status == OK) {

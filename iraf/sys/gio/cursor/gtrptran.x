@@ -19,6 +19,7 @@ pointer	tr
 real	tol, min_width, dx, dy
 real	cx1, cx2, cy1, cy2
 include	"gtr.com"
+long	nint_rl()
 
 begin
 	tr = trdes[stream]
@@ -51,10 +52,10 @@ begin
 		cy2 = cy1 + min_width
 
 	    # Set clipping viewport in input GKI space.
-	    mx1 = nint (cx1 * GKI_MAXNDC)
-	    mx2 = nint (cx2 * GKI_MAXNDC)
-	    my1 = nint (cy1 * GKI_MAXNDC)
-	    my2 = nint (cy2 * GKI_MAXNDC)
+	    mx1 = nint_rl (cx1 * GKI_MAXNDC)
+	    mx2 = nint_rl (cx2 * GKI_MAXNDC)
+	    my1 = nint_rl (cy1 * GKI_MAXNDC)
+	    my2 = nint_rl (cy2 * GKI_MAXNDC)
 
 	    # Set transformation upon the clipped GKI coordinates.
 	    dx = max (min_width, (x2 - x1))

@@ -18,7 +18,7 @@ int procedure stg_readtty (fd, obuf, maxch)
 
 int	fd			#I input stream	[NOT USED]
 char	obuf[ARB]		#O output buffer
-size_t	maxch			#I max chars to read
+int	maxch			#I max chars to read
 
 int	nchars, op, ch
 long	read()

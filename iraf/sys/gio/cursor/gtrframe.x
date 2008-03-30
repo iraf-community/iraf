@@ -18,7 +18,8 @@ pointer	gki			# pointer to first word to be preserved
 int	stream			# graphics stream
 
 pointer	bp
-int	nwords, shift
+size_t	nwords
+long	shift
 
 begin
 	bp = TR_FRAMEBUF(tr)

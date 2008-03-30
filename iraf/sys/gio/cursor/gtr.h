@@ -21,31 +21,31 @@ define	LEN_TRSTRUCT	(564+187)
 define	TR_PID		Memi[P2I($1)]		# process id of kernel
 define	TR_IN		Memi[P2I($1+1)]		# input from process
 define	TR_OUT		Memi[P2I($1+2)]		# output to process
-define	TR_TTY		Memi[P2I($1+3)]		# graphcap descriptor
+define	TR_TTY		Memp[$1+3]		# graphcap descriptor
 define	TR_SPOOLDATA	Memi[P2I($1+4)]		# spool metacode instructions
-define	TR_FRAMEBUF	Memi[P2I($1+5)]		# pointer to frame buffer
-define	TR_LENFRAMEBUF	Memi[P2I($1+6)]		# length of the frame buffer
-define	TR_MAXLENFRAMEBUF Memi[P2I($1+7)]		# max length of the frame buffer
-define	TR_IP		Memi[P2I($1+8)]		# input pointer into frame buf
-define	TR_OP		Memi[P2I($1+9)]		# output pointer into frame buf
-define	TR_LASTOP	Memi[P2I($1+10)]		# last OP (for undo)
-define	TR_SCRATCHBUF	Memi[P2I($1+11)]		# for annotating plots
-define	TR_LENSCRATCHBUF Memi[P2I($1+12)]		# length of the scratch buffer
-define	TR_OPSB		Memi[P2I($1+13)]		# output pointer, scratch buf
-define	TR_NOPEN	Memi[P2I($1+14)]		# number of opens
-define	TR_REDIR	Memi[P2I($1+15)]		# redirection information
-define	TR_WCS		Memi[P2I($1+16)]		# WCS selected, 0 if none
-define	TR_PAGE		Memi[P2I($1+17)]		# clear screen for text
-define	TR_WAITPAGE	Memi[P2I($1+18)]		# grc_waitpage flag
-define	TR_WSOPEN	Memi[P2I($1+19)]		# workstation open count
-define	TR_SKIPOPEN	Memi[P2I($1+20)]		# skip wsopen in metacode
-define	TR_WSACTIVE	Memi[P2I($1+21)]		# workstation activated?
-define	TR_WSACTSAVE	Memi[P2I($1+22)]		# save old wsactive state
-define	TR_INTERACTIVE	Memi[P2I($1+23)]		# the user graphics terminal?
+define	TR_FRAMEBUF	Memp[$1+5]		# pointer to frame buffer
+define	TR_LENFRAMEBUF	Memz[P2Z($1+6)]		# length of the frame buffer
+define	TR_MAXLENFRAMEBUF Memz[P2Z($1+7)]	# max length of the frame buffer
+define	TR_IP		Memp[$1+8]		# input pointer into frame buf
+define	TR_OP		Memp[$1+9]		# output pointer into frame buf
+define	TR_LASTOP	Memp[$1+10]		# last OP (for undo)
+define	TR_SCRATCHBUF	Memp[$1+11]		# for annotating plots
+define	TR_LENSCRATCHBUF Memz[P2Z($1+12)]	# length of the scratch buffer
+define	TR_OPSB		Memp[$1+13]		# output pointer, scratch buf
+define	TR_NOPEN	Memi[P2I($1+14)]	# number of opens
+define	TR_REDIR	Memi[P2I($1+15)]	# redirection information
+define	TR_WCS		Memi[P2I($1+16)]	# WCS selected, 0 if none
+define	TR_PAGE		Memi[P2I($1+17)]	# clear screen for text
+define	TR_WAITPAGE	Memi[P2I($1+18)]	# grc_waitpage flag
+define	TR_WSOPEN	Memi[P2I($1+19)]	# workstation open count
+define	TR_SKIPOPEN	Memi[P2I($1+20)]	# skip wsopen in metacode
+define	TR_WSACTIVE	Memi[P2I($1+21)]	# workstation activated?
+define	TR_WSACTSAVE	Memi[P2I($1+22)]	# save old wsactive state
+define	TR_INTERACTIVE	Memi[P2I($1+23)]	# the user graphics terminal?
 			# (open)
 define	TR_TXAP		($1+30)			# text drawing attributes
 define	TR_PLAP		($1+40)			# text drawing attributes
 define	TR_DEVNAME	Memc[P2C($1+44)]	# device name
 define	TR_KERNFNAME	Memc[P2C($1+274)]	# name of kernel file (or "cl")
-define	TR_GTRCOM	Memi[P2I($1+534)]		# storage for the gtr common
+define	TR_GTRCOM	Memp[$1+534]		# storage for the gtr common
 define	TR_WCSPTR	(($1)+564+($2)*LEN_WCS)	# WCS storage (0=not used)

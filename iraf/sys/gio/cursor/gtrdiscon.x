@@ -17,8 +17,11 @@ int	pid			# process id of subprocess
 int	in, out			# command i/o streams of the subprocess
 int	stream			# graphics stream used by kernel
 
+size_t	sz_val
 pointer	sp, sp2, lbuf, buf
-int	pseudofile, nchars, junk
+int	pseudofile, junk
+size_t	nchars
+long	status
 bool	streq()
 int	getline(), strncmp(), psio_isxmit(), prclose(), pr_findproc()
 long	read()
@@ -26,7 +29,8 @@ errchk	getline, prclose, read, write
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	while (getline (in, Memc[lbuf]) != EOF) {
 	    if (streq (Memc[lbuf], "bye\n") ||
@@ -45,10 +49,13 @@ begin
 		switch (psio_isxmit (Memc[lbuf], pseudofile, nchars)) {
 		case XMIT:
 		    call salloc (buf, nchars, TY_CHAR)
-		    nchars = read (in, Memc[buf], nchars)
-		    if (nchars > 0)
-			if (pseudofile == STDOUT || pseudofile == STDERR)
+		    status = read (in, Memc[buf], nchars)
+		    if (status > 0) {
+			nchars = status
+			if (pseudofile == STDOUT || pseudofile == STDERR) {
 			    call write (pseudofile, Memc[buf], nchars)
+			}
+		    }
 
 		case XFER:
 		    call salloc (buf, nchars, TY_CHAR)

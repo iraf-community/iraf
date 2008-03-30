@@ -11,12 +11,12 @@ include	"gtr.h"
 # frame buffer is not yet complete.  EOF does not signify the end of the
 # metacode stream.
 
-int procedure gtr_fetch_next_instruction (tr, gki)
+long procedure gtr_fetch_next_instruction (tr, gki)
 
 pointer	tr			# pointer to giotr descriptor
 pointer	gki			# pointer to next instruction (output)
 
-int	nleft, length
+long	nleft, length
 pointer	ip, itop
 
 begin

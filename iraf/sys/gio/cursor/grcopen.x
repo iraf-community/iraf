@@ -16,6 +16,7 @@ int	mode			# desired access mode
 int	stream			# graphics stream
 pointer	rc			# rcursor descriptor
 
+size_t	sz_val
 pointer	sp, devname, envvar, tr
 int	envgets()
 bool	streq()
@@ -29,8 +30,9 @@ errchk	syserrs, gtr_openws, gki_openws, gtr_init
 
 begin
 	call smark (sp)
-	call salloc (envvar,  SZ_FNAME, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (envvar, sz_val, TY_CHAR)
+	call salloc (devname, sz_val, TY_CHAR)
 
 	tr = gtr_init (stream)
 

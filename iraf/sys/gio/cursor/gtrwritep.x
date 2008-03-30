@@ -21,10 +21,12 @@ include "gtr.h"
 pointer procedure gtr_writep (fd, nchars)
 
 int	fd			# graphics stream
-size_t	nchars			# nchars to reserve at end of buffer
+int	nchars			# nchars to reserve at end of buffer
 
 pointer	tr, bufp, top, segp
-int	blen, nwords, ip_offset, op_offset
+int	nwords
+size_t	blen
+long	ip_offset, op_offset
 errchk	syserr, realloc
 include	"gtr.com"
 

@@ -10,10 +10,12 @@ int procedure gtr_polyclip (pv, npts, x1, x2, y1, y2)
 
 short	pv[ARB]			#U polygon to be clipped
 int	npts			#U number of points in polygon
-int	x1,x2,y1,y2		#I clipping box
+long	x1,x2,y1,y2		#I clipping box
 
+size_t	sz_val
 pointer	sp, p1, p2, pt
 int	x1out, x2out, y1out, y2out, i
+real	rval
 int	gtr_cliptoplane()
 define	nopts_ 91
 
@@ -47,37 +49,44 @@ begin
 	# is crossed.
 
 	call smark (sp)
-	call salloc (p1, npts * 4, TY_REAL)
+	sz_val = npts * 4
+	call salloc (p1, sz_val, TY_REAL)
 	p2 = p1 + npts * 2
 
-	call achtsr (pv, Memr[p1], npts * 2)
+	sz_val = npts * 2
+	call achtsr (pv, Memr[p1], sz_val)
 
 	if (x1out > 0)
-	    if (gtr_cliptoplane (p1, p2, npts, 0, -1.0, real(x1)) == 0)
+	    rval = x1
+	    if (gtr_cliptoplane (p1, p2, npts, 0, -1.0, rval) == 0)
 		goto nopts_
 	    else {
 		pt = p1;  p1 = p2;  p2 = pt
 	    }
 	if (x2out > 0)
-	    if (gtr_cliptoplane (p1, p2, npts, 0,  1.0, real(x2)) == 0)
+	    rval = x2
+	    if (gtr_cliptoplane (p1, p2, npts, 0,  1.0, rval) == 0)
 		goto nopts_
 	    else {
 		pt = p1;  p1 = p2;  p2 = pt
 	    }
 	if (y1out > 0)
-	    if (gtr_cliptoplane (p1, p2, npts, 1, -1.0, real(y1)) == 0)
+	    rval = y1
+	    if (gtr_cliptoplane (p1, p2, npts, 1, -1.0, rval) == 0)
 		goto nopts_
 	    else {
 		pt = p1;  p1 = p2;  p2 = pt
 	    }
 	if (y2out > 0)
-	    if (gtr_cliptoplane (p1, p2, npts, 1,  1.0, real(y2)) == 0)
+	    rval = y2
+	    if (gtr_cliptoplane (p1, p2, npts, 1,  1.0, rval) == 0)
 		goto nopts_
 	    else {
 		pt = p1;  p1 = p2;  p2 = pt
 	    }
 
-	call achtrs (Memr[p1], pv, npts * 2)
+	sz_val = npts * 2
+	call achtrs (Memr[p1], pv, sz_val)
 	call sfree (sp)
 	return (npts)
 

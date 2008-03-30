@@ -13,6 +13,7 @@ include	"gtr.h"
 procedure gtr_gflush (stream)
 
 int	stream
+
 pointer	tr
 bool	streq()
 include	"gtr.com"

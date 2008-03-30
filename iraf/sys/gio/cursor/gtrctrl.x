@@ -21,24 +21,27 @@ int	stream			# graphics stream
 short	gki[ARB]		# encoded graphics control instruction
 int	source_pid		# pid of requesting process
 
+size_t	sz_val
 bool	redirected
 pointer	tr, sp, devname, gki_out
-int	flags, mode, nwords, fd, p_fd
-int	prstati(), pr_getredir()
+int	flags, mode, fd, p_fd
+size_t	nwords
+int	prstati(), pr_getredir(), absi()
 pointer	gtr_init(), coerce()
 errchk	gtr_init, gtr_openws, write, flush, gki_write
 include	"gtr.com"
 
 begin
 	call smark (sp)
-	call salloc (devname, SZ_TRDEVNAME, TY_CHAR)
+	sz_val = SZ_TRDEVNAME
+	call salloc (devname, sz_val, TY_CHAR)
 
 	nwords = gki[GKI_HDR_LENGTH]
 	call salloc (gki_out, nwords, TY_SHORT)
 	call amovs (gki, Mems[gki_out], nwords)
 
 	tr = gtr_init (stream)
-	p_fd = abs (pr_getredir (source_pid, stream))
+	p_fd = absi (pr_getredir (source_pid, stream))
 	redirected = (p_fd >= FIRST_FD && p_fd <= LAST_FD)
 
 	switch (gki[GKI_HDR_OPCODE]) {
@@ -72,7 +75,8 @@ begin
 	    # frame buffer.
 
 	    if (mode == NEW_FILE) {
-		call aclri (Memi[TR_WCSPTR(tr,1)], LEN_WCS * MAX_WCS)
+		sz_val = LEN_WCS * MAX_WCS
+		call aclrp (Memp[TR_WCSPTR(tr,1)], sz_val)
 		call gtr_frame (tr, TR_FRAMEBUF(tr), stream)
 	    }
 
@@ -99,15 +103,15 @@ begin
 
 	case GKI_SETWCS:
 	    nwords = gki[GKI_SETWCS_N]
+	    sz_val = min (nwords, LEN_WCS * MAX_WCS * SZ_STRUCT / SZ_SHORT)
 	    call amovs (gki[GKI_SETWCS_WCS],
-		Mems[coerce (TR_WCSPTR(tr,1), TY_STRUCT, TY_SHORT)],
-		min (nwords, LEN_WCS * MAX_WCS * SZ_STRUCT / SZ_SHORT))
+		Mems[coerce (TR_WCSPTR(tr,1), TY_STRUCT, TY_SHORT)], sz_val)
 
 	case GKI_GETWCS:
 	    nwords = gki[GKI_GETWCS_N]
 	    fd = prstati (source_pid, PR_OUTFD)
 
-	    call write (fd, Memi[TR_WCSPTR(tr,1)], nwords * SZ_SHORT)
+	    call write (fd, Memc[P2C(TR_WCSPTR(tr,1))], nwords * SZ_SHORT)
 	    call flush (fd)
 	}
 

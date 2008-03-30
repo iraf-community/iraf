@@ -26,7 +26,8 @@ real	rx, ry			#I raster coords of cursor
 
 char	tickformat[SZ_TICKFORMAT], ticklabel[SZ_TICKLABEL]
 pointer tr, w, ap, save_op
-int	xt, yt, nwords, nticks, wcs, lt_save
+int	xt, yt, nticks, wcs, lt_save
+size_t	nwords
 real	xb, xe, x1, dx, x, y, lw_save
 real	yb, ye, y1, dy, aspect_ratio, xticklen, yticklen
 
@@ -340,13 +341,16 @@ end
 procedure gax_start (wx, wy)
 
 real	wx, wy			# world or log-world coords to draw to
+
+size_t	sz_val
 pointer	polyline, op
 
 errchk	malloc
 common	/gaxdcm/ polyline, op
 
 begin
-	call malloc (polyline, LEN_POLYLINE, TY_REAL)
+	sz_val = LEN_POLYLINE
+	call malloc (polyline, sz_val, TY_REAL)
 	op = polyline
 	call gax_draw (wx, wy)
 end
@@ -357,11 +361,14 @@ end
 procedure gax_flush (stream)
 
 int	stream			# graphics stream
+
+int	npts
 pointer	polyline, op
 common	/gaxdcm/ polyline, op
 
 begin
-	call grc_polyline (stream, Memr[polyline], (op - polyline) / 2)
+	npts = (op - polyline) / 2
+	call grc_polyline (stream, Memr[polyline], npts)
 	call mfree (polyline, TY_REAL)
 end
 
@@ -377,15 +384,17 @@ char	text[ARB]		# text string to be drawn
 int	hjustify		# horizontal justification
 int	vjustify		# vertical justification
 
+size_t	sz_val
 pointer	tr, tx
-int	save_tx[LEN_TX]
+pointer	save_tx[LEN_TX]
 errchk	gtr_init
 pointer	gtr_init()
 
 begin
 	tr = gtr_init (stream)
 	tx = TR_TXAP(tr)
-	call amovi (Memi[tx], save_tx, LEN_TX)
+	sz_val = LEN_TX
+	call amovp (Memp[tx], save_tx, sz_val)
 
 	TX_UP(tx) = 90
 	TX_SIZE(tx) = 1.0
@@ -398,5 +407,6 @@ begin
 	TX_COLOR(tx) = 1
 
 	call grc_text (stream, sx, sy, text)
-	call amovi (save_tx, Memi[tx], LEN_TX)
+	sz_val = LEN_TX
+	call amovp (save_tx, Memp[tx], sz_val)
 end

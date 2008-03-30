@@ -14,17 +14,21 @@ pointer procedure gtr_init (stream)
 
 int	stream			# graphics stream
 
-int	i, len_fb, len_sb
+size_t	sz_val
+int	i
+size_t	len_fb, len_sb
 pointer	tr, tx, ap, w
 bool	first_time
 int	btoi(), envgeti()
 data	first_time /true/
 errchk	calloc, malloc
 include	"gtr.com"
+include	<nullptr.inc>
 
 begin
 	if (first_time) {
-	    call amovki (NULL, trdes, MAX_PSEUDOFILES)
+	    sz_val = MAX_PSEUDOFILES
+	    call amovkp (NULLPTR, trdes, sz_val)
 	    tr_stream = NULL
 	    first_time = false
 	}
@@ -35,7 +39,8 @@ begin
 	    # This is the first time the stream has been accessed.
 
 	    # Allocate descriptor.
-	    call calloc (tr, LEN_TRSTRUCT, TY_STRUCT)
+	    sz_val = LEN_TRSTRUCT
+	    call calloc (tr, sz_val, TY_STRUCT)
 
 	    # Don't need a frame buffer for STDPLOT, but make a dummy one
 	    # anyhow so that the stream looks like the interactive ones.
@@ -89,8 +94,9 @@ begin
 		# Save the workstation transformation parameters for the
 		# stream currently in the cache, if any.
 
-		call amovi (startcom, TR_GTRCOM(trdes[tr_stream]), LEN_GTRCOM)
-		call amovi (TR_GTRCOM(tr), startcom, LEN_GTRCOM)
+		sz_val = LEN_GTRCOM
+		call amovp (startcom, TR_GTRCOM(trdes[tr_stream]), sz_val)
+		call amovp (TR_GTRCOM(tr), startcom, sz_val)
 	    }
 
 	    # Initialize the transformation parameters for the new stream.
@@ -124,11 +130,14 @@ begin
 	    # If the cache is currently validated for some different stream
 	    # move the data for that stream out into its descriptor.
 
-	    if (tr_stream != NULL)
-		call amovi (startcom, TR_GTRCOM(trdes[tr_stream]), LEN_GTRCOM)
+	    if (tr_stream != NULL) {
+		sz_val = LEN_GTRCOM
+		call amovp (startcom, TR_GTRCOM(trdes[tr_stream]), sz_val)
+	    }
 
 	    # Load the data for the new stream into the cache.
-	    call amovi (TR_GTRCOM(tr), startcom, LEN_GTRCOM)
+	    sz_val = LEN_GTRCOM
+	    call amovp (TR_GTRCOM(tr), startcom, sz_val)
 	    tr_stream = stream
 	}
 

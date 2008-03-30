@@ -89,7 +89,7 @@ int	fn			#U escape sequence function opcode
 short	instruction[ARB]	#U escape instruction data
 pointer	bp			#I frame buffer pointer
 pointer	buftop			#I top+1 of buffered data
-int	delete_fcn		#I function called to delete an instruction
+pointer	delete_fcn		#I function called to delete an instruction
 
 bool	sgm_spoolesc()		# GIM (Gterm) imaging excapes
 

@@ -46,8 +46,9 @@ int	stream			# graphics stream to be described
 char	name[ARB]		# name of graphics stream
 
 pointer	tr, tx
-int	bufsize
-int	fstati()
+size_t	bufsize
+short	sarg
+long	fstatl()
 pointer	gtr_init()
 errchk	gtr_init
 
@@ -63,15 +64,15 @@ begin
 	    else
 		call pargstr ("disabled")
 
-	bufsize = fstati (stream, F_BUFSIZE)
+	bufsize = fstatl (stream, F_BUFSIZE)
 	call fprintf (fd,
 	    "\t\tmemory=%d (%dfb+%dsb+%dfio), frame=%d+%d words\n")
-	    call pargi (TR_LENFRAMEBUF(tr) + TR_LENSCRATCHBUF(tr) + bufsize)
-	    call pargi (TR_LENFRAMEBUF(tr))
-	    call pargi (TR_LENSCRATCHBUF(tr))
-	    call pargi (bufsize)
-	    call pargi (TR_OP(tr) - TR_FRAMEBUF(tr))
-	    call pargi (TR_OPSB(tr) - TR_SCRATCHBUF(tr))
+	    call pargz (TR_LENFRAMEBUF(tr) + TR_LENSCRATCHBUF(tr) + bufsize)
+	    call pargz (TR_LENFRAMEBUF(tr))
+	    call pargz (TR_LENSCRATCHBUF(tr))
+	    call pargz (bufsize)
+	    call pargp (TR_OP(tr) - TR_FRAMEBUF(tr))
+	    call pargp (TR_OPSB(tr) - TR_SCRATCHBUF(tr))
 
 	call fprintf (fd,
 	    "\t\tspool=%s, nopen=%d, pid=%d, in=%d, out=%d, redir=%d, wcs=%d\n")
@@ -91,9 +92,12 @@ begin
 	    "\t\ttext size=%g, up=%d, path=%s, hj=%s, vj=%s, color=%d\n")
 	    call pargr (TX_SIZE(tx))
 	    call pargi (TX_UP(tx))
-	    call gkp_txparg (TX_PATH(tx))
-	    call gkp_txparg (TX_HJUSTIFY(tx))
-	    call gkp_txparg (TX_VJUSTIFY(tx))
+	    sarg = TX_PATH(tx)
+	    call gkp_txparg (sarg)
+	    sarg = TX_HJUSTIFY(tx)
+	    call gkp_txparg (sarg)
+	    sarg = TX_VJUSTIFY(tx)
+	    call gkp_txparg (sarg)
 	    call pargi (TX_COLOR(tx))
 
 	call fprintf (fd, "\n")

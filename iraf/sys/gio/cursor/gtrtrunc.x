@@ -15,7 +15,7 @@ procedure gtr_truncate (tr, gki)
 pointer	tr			# giotr descriptor
 pointer	gki			# pointer to first word to be preserved
 pointer	top
-int	nwords
+size_t	nwords
 
 begin
 	# Find the first instruction preceding the soft upper limit on the

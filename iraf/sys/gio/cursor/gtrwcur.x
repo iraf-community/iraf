@@ -10,10 +10,11 @@ int	fd			# graphics stream
 real	x, y			# NDC coords of cursor
 
 int	mx, my
+int	nint_ri()
 
 begin
-	mx = max(0, min(GKI_MAXNDC, nint (x * GKI_MAXNDC)))
-	my = max(0, min(GKI_MAXNDC, nint (y * GKI_MAXNDC)))
+	mx = max(0, min(GKI_MAXNDC, nint_ri (x * GKI_MAXNDC)))
+	my = max(0, min(GKI_MAXNDC, nint_ri (y * GKI_MAXNDC)))
 
 	call gki_setcursor (fd, mx, my, 0)
 end

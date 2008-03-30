@@ -17,16 +17,19 @@ char	fname[ARB]		# file name
 bool	clobber			# clobber existing file
 bool	fullframe		# write full frame (no workstation transform)
 
+size_t	sz_val
 pointer	sp, lbuf
 long	size1, size2
-int	save1, save2, fd, nchars
+int	save1, save2, fd
+size_t	nchars
 long	fstatl()
 int	open()
 errchk	write, gtr_redraw
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Delete existing file if clobber requested.
 	if (clobber)
@@ -54,7 +57,7 @@ begin
 
 	size2 = fstatl (fd, F_FILESIZE)
 	call sprintf (Memc[lbuf], SZ_LINE, " - %d chars %s")
-	    call pargi (size2 - size1)
+	    call pargl (size2 - size1)
 	if (size1 > 0)
 	    call pargstr ("appended")
 	else

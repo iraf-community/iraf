@@ -32,7 +32,7 @@ procedure stg_writetty (fd, text, nchars)
 
 int	fd			#I output stream
 char	text[ARB]		#I text to be output
-size_t	nchars			#I nchars to be written
+int	nchars			#I nchars to be written
 
 int	ip, delim
 pointer	sp, lbuf, op
