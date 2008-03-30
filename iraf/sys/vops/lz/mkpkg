@@ -160,6 +160,7 @@ libvops.a:
 	amovkd.x	
 	amovki.x	
 	amovkl.x	
+	amovkp.x	
 	amovkr.x	
 	amovks.x	
 	amovkx.x	
