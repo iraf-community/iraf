@@ -50,6 +50,7 @@ int	rwflag			# type of transfer to wait for
 
 size_t	sz_val
 long	lval
+int	ival
 pointer	ip, op
 int	stack[LEN_STACK], stkp
 long	nleft
@@ -209,7 +210,8 @@ begin
 			# to the frame buffer for the stream and call GIOTR
 			# to process the metacode.
 
-			op = zfunc2 (epa_writep, destfd, nchars)
+			ival = nchars
+			op = zfunc2 (epa_writep, destfd, ival)
 			if (read (in, Memc[op], nchars) < nchars)
 			    call syserr (SYS_PRIPCSYNTAX)
 # call eprintf ("___giotr, %d chars\n")
@@ -256,8 +258,9 @@ begin
 			    if (ioctrl)
 				call fseti (STDIN, F_IOMODE, flags)
 			    else {
+				ival = nchars
 				call zcall3 (epa_writetty, destfd, Memc[ip],
-				    nchars)
+					     ival)
 			    }
 			} else {
 			    call write (destfd, Memc[ip], nchars)
@@ -396,8 +399,9 @@ begin
 #				call fseti (destfd, F_RAW, YES)
 
 			    if (destfd == STDIN) {
-				nchars = zfunc3 (epa_readtty,
-				    destfd, Memc[ip], nchars)
+				ival = nchars
+				nchars = zfunc3 (epa_readtty, destfd, Memc[ip],
+						 ival)
 			    } else
 				nchars = read (destfd, Memc[ip], nchars)
 			    if (nchars == EOF)
