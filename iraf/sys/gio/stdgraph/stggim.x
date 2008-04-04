@@ -106,6 +106,7 @@ short	gim[ARB]		#I escape instruction data
 real	rx1,ry1			#I NDC coords of display rect
 real	rx2,ry2			#I NDC coords of display rect
 
+size_t	sz_val
 real	scale
 pointer	sp, n_gim
 bool	status, xflip, yflip
@@ -144,7 +145,8 @@ begin
 
 	    if (dst == 0 && src != dst) {
 		call smark (sp)
-		call salloc (n_gim, GIM_SETMAPPING_LEN, TY_SHORT)
+		sz_val = GIM_SETMAPPING_LEN
+		call salloc (n_gim, sz_val, TY_SHORT)
 
 		xflip = false
 		yflip = false
@@ -196,7 +198,8 @@ begin
 
 		n_dnx = n_dx2 - n_dx1 + 1;  n_dny = n_dy2 - n_dy1 + 1
 		if (n_dnx <= 0 || n_dny <= 0) {
-		    call amovs (gim, Mems[n_gim], GIM_SETMAPPING_LEN)
+		    sz_val = GIM_SETMAPPING_LEN
+		    call amovs (gim, Mems[n_gim], sz_val)
 		    Mems[n_gim+GIM_SETMAPPING_SX-1] = 0
 		    Mems[n_gim+GIM_SETMAPPING_SW-1] = 0
 		    Mems[n_gim+GIM_SETMAPPING_SY-1] = 0
@@ -269,7 +272,8 @@ begin
 		}
 
 		# Construct the edited instruction.
-		call amovs (gim, Mems[n_gim], GIM_SETMAPPING_LEN)
+		sz_val = GIM_SETMAPPING_LEN
+		call amovs (gim, Mems[n_gim], sz_val)
 		Mems[n_gim+GIM_SETMAPPING_SX-1] = n_sx1
 		Mems[n_gim+GIM_SETMAPPING_SW-1] = n_sx2 - n_sx1 + 1
 		Mems[n_gim+GIM_SETMAPPING_SY-1] = n_sy1
@@ -429,13 +433,16 @@ end
 procedure sgm_queryraster (gim)
 
 short	gim[ARB]			#I encoded instruction
+
+size_t	sz_val
 short	retval[GIM_RET_QRAS_LEN]
 include	"stdgraph.com"
 
 begin
 	call sgm_query ("QR", gim, GIM_QUERYRASTER_LEN,
 	    "Qr", retval, GIM_RET_QRAS_LEN)
-	call write (g_stream, retval, GIM_RET_QRAS_LEN * SZ_SHORT)
+	sz_val = GIM_RET_QRAS_LEN * SZ_SHORT
+	call write (g_stream, retval, sz_val)
 	call flush (g_stream)
 end
 
@@ -448,7 +455,8 @@ short	gim[ARB]			#I encoded instruction
 
 char	bias
 pointer	sp, bp
-int	nx, ny, npix, i
+int	nx, ny
+size_t	npix, i
 include	"stdgraph.com"
 
 begin
@@ -465,6 +473,7 @@ begin
 	bias = 040B
 
 	# Send the pixel data encoded in printable ASCII.
+	# arg1: incompatible pointer
 	call achtbc (gim[GIM_WRITEPIXELS_DATA], Memc[bp], npix)
 	do i = 1, npix
 	    Memc[bp+i-1] = Memc[bp+i-1] + bias
@@ -482,9 +491,11 @@ procedure sgm_readpixels (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp
 int	sv_iomode, ch
-int	npix, nx, ny, i
+size_t	npix, i
+int	nx, ny
 short	retval[GIM_RET_RPIX_LEN]
 int	fstati(), getci()
 include	"stdgraph.com"
@@ -522,9 +533,11 @@ begin
 
 	# Send the RPIX header to the client.
 	retval[GIM_RET_RPIX_NP] = npix
-	call write (g_stream, retval, GIM_RET_RPIX_LEN * SZ_SHORT)
+	sz_val = GIM_RET_RPIX_LEN * SZ_SHORT
+	call write (g_stream, retval, sz_val)
 
 	# Return the data to the client.
+	# arg2: incompatible pointer
 	call achtcb (Memc[bp], Memc[bp], npix)
 	call write (g_stream, Memc[bp], (npix + SZB_CHAR-1) / SZB_CHAR)
 	call flush (g_stream)
@@ -543,7 +556,8 @@ short	gim[ARB]			#I encoded instruction
 
 short	mask
 pointer	sp, bp, op
-int	ncells, nchars, ip, i
+int	ncells, ip, i
+size_t	nchars
 include	"stdgraph.com"
 
 begin
@@ -580,8 +594,10 @@ procedure sgm_readcmap (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp, cm, ip
-int	sv_iomode, ncells, nchars, ch, i
+size_t	ncells, nchars, i
+int	sv_iomode, ch
 short	retval[GIM_RET_RCMAP_LEN]
 int	fstati(), getci()
 include	"stdgraph.com"
@@ -626,7 +642,8 @@ begin
 
 	# Send the read-cmap header to the client.
 	retval[GIM_RET_RCMAP_NC] = ncells
-	call write (g_stream, retval, GIM_RET_RCMAP_LEN * SZ_SHORT)
+	sz_val = GIM_RET_RCMAP_LEN * SZ_SHORT
+	call write (g_stream, retval, sz_val)
 
 	# Return the colormap data to the client.
 	call write (g_stream, Mems[cm], (ncells * 3) * SZ_SHORT)
@@ -646,7 +663,8 @@ short	gim[ARB]			#I encoded instruction
 
 short	mask
 pointer	sp, bp, op
-int	ncells, nchars, ip, i
+int	ncells, ip, i
+size_t	nchars
 include	"stdgraph.com"
 
 begin
@@ -685,8 +703,10 @@ procedure sgm_iomapread (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+size_t	sz_val
 pointer	sp, bp, data, ip
-int	sv_iomode, ncells, nchars, ch, i
+int	sv_iomode, ch
+size_t	ncells, nchars, i
 short	retval[GIM_RET_RIOMAP_LEN]
 int	fstati(), getci()
 include	"stdgraph.com"
@@ -731,7 +751,8 @@ begin
 
 	# Send the read-iomap header to the client.
 	retval[GIM_RET_RIOMAP_NC] = ncells
-	call write (g_stream, retval, GIM_RET_RIOMAP_LEN * SZ_SHORT)
+	sz_val = GIM_RET_RIOMAP_LEN * SZ_SHORT
+	call write (g_stream, retval, sz_val)
 
 	# Return the iomap data to the client.
 	call write (g_stream, Mems[data], ncells * SZ_SHORT)
@@ -748,13 +769,16 @@ end
 procedure sgm_getmapping (gim)
 
 short	gim[ARB]			#I encoded instruction
+
+size_t	sz_val
 short	retval[GIM_RET_GMAP_LEN]
 include	"stdgraph.com"
 
 begin
 	call sgm_query ("GM", gim, GIM_GETMAPPING_LEN,
 	    "Gm", retval, GIM_RET_GMAP_LEN)
-	call write (g_stream, retval, GIM_RET_GMAP_LEN * SZ_SHORT)
+	sz_val = GIM_RET_GMAP_LEN * SZ_SHORT
+	call write (g_stream, retval, sz_val)
 	call flush (g_stream)
 end
 
@@ -768,6 +792,7 @@ char	cap[ARB]			#I graphcap capability name
 short	gim[ARB]			#I instruction (array of int args)
 int	nargs				#I number of arguments
 
+size_t	sz_val
 int	ival, i
 pointer	sp, fmt, ctrl
 include	"stdgraph.com"
@@ -776,8 +801,9 @@ errchk	ttygets
 
 begin
 	call smark (sp)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
-	call salloc (ctrl, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (ctrl, sz_val, TY_CHAR)
 
 	if (ttygets (g_tty, cap, Memc[fmt], SZ_LINE) > 0) {
 	    call sprintf (Memc[ctrl], SZ_LINE, Memc[fmt])
@@ -807,6 +833,7 @@ char	retval_cap[ARB]			#I cap name for return value format
 short	retval[ARB]			#O decoded output arguments
 int	nout				#I number of output arguments
 
+size_t	sz_val
 int	index[MAX_ARGS]
 pointer	sp, ctrl, patbuf, pat, buf, ip, op
 int	sv_iomode, arg, ch, nchars, start, value, ival, i
@@ -818,12 +845,15 @@ errchk	ttygets
 
 begin
 	call smark (sp)
-	call salloc (ctrl, SZ_LINE, TY_CHAR)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (pat, SZ_LINE, TY_CHAR)
-	call salloc (patbuf, SZ_PATBUF, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ctrl, sz_val, TY_CHAR)
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (pat, sz_val, TY_CHAR)
+	sz_val = SZ_PATBUF
+	call salloc (patbuf, sz_val, TY_CHAR)
 
-	call aclrs (retval, nout)
+	sz_val = nout
+	call aclrs (retval, sz_val)
 
 	# Set raw mode i/o.
 	sv_iomode = fstati (g_in, F_IOMODE)
@@ -857,7 +887,8 @@ begin
         # the pattern strings "%[0-9]*", noting the index positions of the
         # pattern substrings for later decoding.
 
-	call aclri (index, MAX_ARGS)
+	sz_val = MAX_ARGS
+	call aclri (index, sz_val)
 	arg = 0
 
 	op = buf

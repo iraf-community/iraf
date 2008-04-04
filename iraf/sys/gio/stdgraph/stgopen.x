@@ -20,6 +20,7 @@ int	xres			# number of resolved pixels in X
 int	yres			# number of resolved pixels in Y
 int	hardchar		# use hardware character generator
 
+size_t	sz_val
 bool	first_time
 pointer	sp, devns
 int	len_devname
@@ -37,7 +38,8 @@ data	first_time /true/
 
 begin
 	call smark (sp)
-	call salloc (devns, SZ_FNAME, TY_SHORT)
+	sz_val = SZ_FNAME
+	call salloc (devns, sz_val, TY_SHORT)
 
 	if (first_time) {
 	    g_nopen = 0
@@ -96,7 +98,8 @@ begin
 
 	len_devname = strlen (devname)
 	if (len_devname > 0) {
-	    call achtcs (devname, Mems[devns], len_devname)
+	    sz_val = len_devname
+	    call achtcs (devname, Mems[devns], sz_val)
 	    call stg_openws (Mems[devns], len_devname, NEW_FILE)
 	}
 

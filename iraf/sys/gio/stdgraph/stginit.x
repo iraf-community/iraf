@@ -16,6 +16,7 @@ procedure stg_init (tty, devname)
 pointer	tty			# graphcap descriptor
 char	devname[ARB]		# device name
 
+size_t	sz_val
 pointer	nextch
 bool	first_time
 int	maxch, i, junk
@@ -43,8 +44,10 @@ begin
 	}
 
 	# Allocate the stdgraph descriptor and the string buffer.
-	call calloc (g_sg, LEN_SG, TY_STRUCT)
-	call malloc (SG_SBUF(g_sg), SZ_SBUF, TY_CHAR)
+	sz_val = LEN_SG
+	call calloc (g_sg, sz_val, TY_STRUCT)
+	sz_val = SZ_SBUF
+	call malloc (SG_SBUF(g_sg), sz_val, TY_CHAR)
 
 	# Init string buffer parameters.  The first char of the string buffer
 	# is reserved as a null string, used for graphcap control strings
@@ -64,7 +67,8 @@ begin
 	# Initialize the encoder.  The graphcap parameter LR contains encoder
 	# instructions to perform any device dependent initialization required.
 
-	call aclri (g_reg, NREGISTERS)
+	sz_val = NREGISTERS
+	call aclri (g_reg, sz_val)
 	nextch = SG_NEXTCH(g_sg)
 
 	g_reg[E_IOP] = 1

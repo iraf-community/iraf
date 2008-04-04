@@ -22,6 +22,7 @@ int	xc, yc			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 bool	hard
 real	x, y
 int	x1, x2, y1, y2, mx, my
@@ -34,7 +35,8 @@ include	"stdgraph.com"
 
 begin
 	call smark (sp)
-	call salloc (seg, n + 2, TY_CHAR)
+	sz_val = n + 2
+	call salloc (seg, sz_val, TY_CHAR)
 
 	if (g_enable == NO)
 	    call stg_genab()
@@ -169,8 +171,10 @@ begin
 		    g_reg[1] = xstart * g_dx + g_x1
 		    g_reg[2] = ystart * g_dy + g_y1
 		    g_reg[E_IOP] = 1
-		    if (stg_encode (Memc[SG_STARTTEXT(g_sg)],g_mem,g_reg) == OK)
-			call write (g_out, g_mem, g_reg[E_IOP] - 1)
+		    if (stg_encode (Memc[SG_STARTTEXT(g_sg)],g_mem,g_reg) == OK) {
+			sz_val = g_reg[E_IOP] - 1
+			call write (g_out, g_mem, sz_val)
+		    }
 		}
 
 		first = ip
@@ -199,8 +203,10 @@ begin
 
 		if (hard) {
 		    g_reg[E_IOP] = 1
-		    if (stg_encode (Memc[SG_ENDTEXT(g_sg)], g_mem, g_reg) == OK)
-			call write (g_out, g_mem, g_reg[E_IOP] - 1)
+		    if (stg_encode (Memc[SG_ENDTEXT(g_sg)], g_mem, g_reg) == OK) {
+			sz_val = g_reg[E_IOP] - 1
+			call write (g_out, g_mem, sz_val)
+		    }
 		}
 	    }
 	}
@@ -296,6 +302,7 @@ bool	hard
 int	up, path, hwsz, ch, cw, i
 real	dir, cosv, sinv, space
 real	xsize, ysize, xvlen, yvlen, xu, yu, xv, yv, p, q
+int	absi()
 include	"stdgraph.com"
 
 begin
@@ -468,7 +475,7 @@ begin
 	# Set the polytext flag.  Polytext output is possible only if chars
 	# are to be drawn to the right with no extra spacing between chars.
 
-	if (abs(dy) == 0 && dx == cw)
+	if (absi(dy) == 0 && dx == cw)
 	    polytext = YES
 	else
 	    polytext = NO

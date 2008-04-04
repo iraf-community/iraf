@@ -8,6 +8,8 @@ include	"stdgraph.h"
 procedure stg_draw (x, y)
 
 int	x, y			# destination
+
+size_t	sz_val
 int	stg_encode()
 include	"stdgraph.com"
 
@@ -20,8 +22,10 @@ begin
 	g_reg[1] = x * g_dx + g_x1
 	g_reg[2] = y * g_dy + g_y1
 	g_reg[E_IOP] = 1
-	if (stg_encode (Memc[g_xy], g_mem, g_reg) == OK)
-	    call write (g_out, g_mem, g_reg[E_IOP] - 1)
+	if (stg_encode (Memc[g_xy], g_mem, g_reg) == OK) {
+	    sz_val = g_reg[E_IOP] - 1
+	    call write (g_out, g_mem, sz_val)
+	}
 	
 	call ttyputs (g_out, g_tty, Memc[SG_ENDDRAW(g_sg)], 1)
 end

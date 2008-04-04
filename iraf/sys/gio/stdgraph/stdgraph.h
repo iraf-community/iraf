@@ -51,11 +51,11 @@ define	SG_FASTYLE	Memi[P2I($1+26)]		# last fill area style set
 define	SG_PLWIDTH	Memi[P2I($1+27)]		# last line width set
 define	SG_DEVNAME	Memp[$1+28]		# name of open device
 define	SG_UIFNAME	Memp[$1+29]		# user interface file name
-define	SG_UIFDATE	Memi[P2I($1+30)]		# UI file date
+define	SG_UIFDATE	Meml[P2L($1+30)]		# UI file date
 			# empty
-define	SG_CHARHEIGHT	Memi[P2I($1+40+$2-1)]	# character height
-define	SG_CHARWIDTH 	Memi[P2I($1+50+$2-1)]	# character width
-define	SG_CHARSIZE	Memr[P2R($1+60+$2-1)]	# text sizes permitted
+define	SG_CHARHEIGHT	Memi[P2I($1+40)+$2-1]	# character height
+define	SG_CHARWIDTH 	Memi[P2I($1+50)+$2-1]	# character width
+define	SG_CHARSIZE	Memr[P2R($1+60)+$2-1]	# text sizes permitted
 define	SG_PLAP		($1+70)			# polyline attributes
 define	SG_PMAP		($1+74)			# polymarker attributes
 define	SG_FAAP		($1+78)			# fill area attributes

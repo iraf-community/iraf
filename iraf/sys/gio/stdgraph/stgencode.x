@@ -203,7 +203,8 @@ int	registers[NREGISTERS]		# general purpose registers
 
 int	num, ch, a, b, neg, x, y
 int	stack[LEN_STACK]
-int	sp, pc, iop, top, incase, msec, npad, baud, envgeti(), btoi()
+int	sp, pc, iop, top, incase, msec, npad, baud
+int	envgeti(), btoi(), modi()
 common	/sgecom/ pc, sp, iop, top, incase, stack
 include	"stdgraph.com"
 errchk	envgeti
@@ -349,7 +350,7 @@ begin
 		# Modulus (similar to AND of low bits).
 		pop (b)
 		pop (a)
-		push (mod (a, b))
+		push (modi (a, b))
 
 	    case '+':
 		# Add (similar to OR).

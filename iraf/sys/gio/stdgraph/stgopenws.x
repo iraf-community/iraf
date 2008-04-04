@@ -18,9 +18,10 @@ short	devname[ARB]		#I device name (actually device[,uifname])
 int	n			#I length of device name
 int	mode			#I access mode
 
+size_t	sz_val
 bool	reinit
 long	fi[LEN_FINFO]
-int	dummy, init_file
+int	dummy, init_file, ival
 pointer	sp, ip, op, buf, device, uifname, fname
 
 pointer	ttygdes(), ttyodes()
@@ -33,8 +34,10 @@ define	ow_ 91
 
 begin
 	call smark (sp)
-	call salloc (buf, max (SZ_PATHNAME, n), TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = max (SZ_PATHNAME, n)
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Open a termcap descriptor for the terminal too, in case we need
 	# to talk to the terminal as a terminal.
@@ -64,7 +67,8 @@ begin
 	# then unpack the device name, passed as a short integer array.
 
 	if (g_device[1] == EOS) {
-	    call achtsc (devname, Memc[buf], n)
+	    sz_val = n
+	    call achtsc (devname, Memc[buf], sz_val)
 	    Memc[buf+n] = EOS
 	} else
 	    call strcpy (g_device, Memc[buf], SZ_FNAME)
@@ -146,9 +150,9 @@ begin
 
 	    if (envfind (GUIDIR, Memc[fname], SZ_PATHNAME) > 0) {
 		op = fname + strlen (Memc[fname])
-		op = op + fnroot (Memc[uifname], Memc[op],
-		    fname + SZ_PATHNAME - op)
-		op = op + gstrcpy (".gui", Memc[op], fname + SZ_PATHNAME - op)
+		ival = fname + SZ_PATHNAME - op
+		op = op + fnroot (Memc[uifname], Memc[op], ival)
+		op = op + gstrcpy (".gui", Memc[op], ival)
 		if (access (Memc[fname], 0, 0) == YES)
 		    uifname = fname
 	    }

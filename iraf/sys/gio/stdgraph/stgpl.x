@@ -12,6 +12,7 @@ procedure stg_polyline (p, npts)
 short	p[ARB]			# points defining line
 int	npts			# number of points, i.e., (x,y) pairs
 
+size_t	sz_val
 pointer	pl
 bool	tek_encoding
 int	lowres_x, lowres_y
@@ -108,7 +109,8 @@ begin
 
 		# Flush buffer if nearly full.
 		if (g_reg[E_IOP] > FLUSH_MEMORY) {
-		    call write (g_out, g_mem, g_reg[E_IOP] - 1)
+		    sz_val = g_reg[E_IOP] - 1
+		    call write (g_out, g_mem, sz_val)
 		    g_reg[E_IOP] = 1
 		}
 	    }
@@ -116,7 +118,8 @@ begin
 
 	    # Flush any output remaining in encoder memory.
 	    if (g_reg[E_IOP] > 1) {
-		call write (g_out, g_mem, g_reg[E_IOP] - 1)
+		sz_val = g_reg[E_IOP] - 1
+		call write (g_out, g_mem, sz_val)
 		g_reg[E_IOP] = 1
 	    }
 

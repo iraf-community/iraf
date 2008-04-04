@@ -62,6 +62,7 @@ int	sx, sy		#O screen coordinates of cursor in GKI units
 int	raster		#O raster number
 int	rx, ry		#O raster coordinates of cursor in GKI units
 
+size_t	sz_val
 short	texts[4]
 char	textc[4], ch
 pointer	sp, pbdevice, tx, o_tx
@@ -85,8 +86,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (pbdevice, SZ_GDEVICE, TY_CHAR)
-	call salloc (o_tx, LEN_TX, TY_STRUCT)
+	sz_val = SZ_GDEVICE
+	call salloc (pbdevice, sz_val, TY_CHAR)
+	sz_val = LEN_TX
+	call salloc (o_tx, sz_val, TY_STRUCT)
 
 	# The playback script may have been generated on a different graphics
 	# terminal than the one we are playing it back on.  Open the graphcap
@@ -146,11 +149,13 @@ begin
 	}
 
 	# Pack the string in a short array for the GKI operator.
-	call achtcs (textc, texts, nchars)
+	sz_val = nchars
+	call achtcs (textc, texts, sz_val)
 
 	# Set the text drawing attributes.
 	tx = SG_TXAP(g_sg)
-	call amovi (Memi[tx], Memi[o_tx], LEN_TX)
+	sz_val = LEN_TX
+	call amovp (Memp[tx], Memp[o_tx], sz_val)
 	TX_SIZE(tx) = KEYSIZE
 	TX_HJUSTIFY(tx) = GT_LEFT
 	TX_VJUSTIFY(tx) = GT_BOTTOM
@@ -198,7 +203,8 @@ begin
 	# Restore everything modified earlier.
 	call ttseti (STDIN, TT_PASSTHRU, NO)
 	call ttseti (STDIN, TT_PBDELAY, delay)
-	call amovi (Memi[o_tx], Memi[tx], LEN_TX)
+	sz_val = LEN_TX
+	call amovp (Memp[o_tx], Memp[tx], sz_val)
 
 	call sfree (sp)
 end
@@ -224,21 +230,24 @@ int	sx, sy		#O cursor screen position in GKI coords
 int	raster		#O raster number
 int	rx, ry		#O cursor raster position in GKI coords
 
-pointer	decodecur, delimcur, pattern, patbuf, sp, otop
+size_t	sz_val
+pointer	decodecur, delimcur, pattern, patbuf, sp, otop, pp
 int	len_pattern, len_curval, sv_iomode, nchars, ip, op, i1, i2, ch
 
 bool	ttygetb()
-int	getci(), stg_encode()
+int	getci(), stg_encode(), absi()
 int	ttygets(), ttygeti(), gstrcpy(), gpatmatch(), patmake(), fstati()
 include	"stdgraph.com"
 define	quit_ 91
 
 begin
 	call smark (sp)
-	call salloc (pattern, SZ_LINE, TY_CHAR)
-	call salloc (patbuf, SZ_LINE, TY_CHAR)
-	call salloc (decodecur, SZ_LINE, TY_CHAR)
-	call salloc (delimcur, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (decodecur, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (delimcur, sz_val, TY_CHAR)
 
 	key = EOF
 
@@ -315,7 +324,7 @@ begin
 		    # the case of a fixed length cursor value), or the entire
 		    # cursor string (which may then be variable length).
 
-		    if (op < abs(len_curval))
+		    if (op < absi(len_curval))
 			next
 		    else if (gpatmatch (g_mem[1], Memc[patbuf], i1,i2) > 0) {
 			if (len_curval > 0)
@@ -342,7 +351,7 @@ begin
 	    if (op > MAX_LENCUR)
 		op = -1
 
-	} until (op >= abs(len_curval) || len_curval == 0)
+	} until (op >= absi(len_curval) || len_curval == 0)
 
 	# Decode the cursor value string and return the position and key
 	# as output values.  Return the cursor position in GKI coordinates.
@@ -352,7 +361,8 @@ begin
 	# and still get a valid read.
 
 	g_reg[E_IOP] = ip
-	call aclri (g_reg, 7)
+	sz_val = 7
+	call aclri (g_reg, sz_val)
 	if (stg_encode (Memc[decodecur], g_mem, g_reg) != OK)
 	    call syserr (SYS_GGCUR)
 
@@ -386,21 +396,22 @@ begin
 	if (nchars > 0) {
 	    if (nchars > g_msgbuflen) {
 		g_msgbuflen = (nchars + SZ_MSGBUF - 1) / SZ_MSGBUF * SZ_MSGBUF
-		call realloc (g_msgbuf, g_msgbuflen, TY_CHAR)
+		sz_val = g_msgbuflen
+		call realloc (g_msgbuf, sz_val, TY_CHAR)
 	    }
 
 	    # We should encode this data transfer in a way that permits
 	    # detection and recovery from lost data.  For the moment, the
 	    # following assumes that nchars of data will actually be received.
 
-	    op = g_msgbuf
+	    pp = g_msgbuf
 	    otop = g_msgbuf + nchars
-	    while (op < otop && getci (g_in, ch) != EOF) {
-		Memc[op] = ch
-	        op = op + 1
+	    while (pp < otop && getci (g_in, ch) != EOF) {
+		Memc[pp] = ch
+	        pp = pp + 1
 	    }
-	    g_msglen = op - g_msgbuf
-	    Memc[op] = EOS
+	    g_msglen = pp - g_msgbuf
+	    Memc[pp] = EOS
 
 	} else
 	    g_msglen = 0

@@ -20,7 +20,9 @@ int	fd			#I input stream	[NOT USED]
 char	obuf[ARB]		#O output buffer
 int	maxch			#I max chars to read
 
-int	nchars, op, ch
+size_t	sz_val
+size_t	nchars
+int	op, ch
 long	read()
 int	getci(), fstati()
 include	"stdgraph.com"
@@ -33,7 +35,8 @@ begin
 
 	if (g_active == NO) {
 	    # Workstation in normal text mode; normal text input.
-	    return (read (STDIN, obuf, maxch))
+	    sz_val = maxch
+	    return (read (STDIN, obuf, sz_val))
 
 	} else if (g_msglen > 0) {
 	    # The message data has already been transmitted and resides in

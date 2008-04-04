@@ -41,6 +41,7 @@ char	buf[ARB]		#U input buffer
 size_t	maxch			#I max chars in buffer
 long	status			#U number of chars in buffer
 
+size_t	sz_val
 char	escape[MAXCH]
 char	svbuf[MAXCH+4]
 int	ip, op, sp, ch, iomode
@@ -123,7 +124,8 @@ failed_
 	# buffer and return all the data.
 
 	if (sp > 1) {
-	    call amovc (svbuf, buf[status+1], sp - 1)
+	    sz_val = sp - 1
+	    call amovc (svbuf, buf[status+1], sz_val)
 	    status = status + sp - 1
 	}
 end
@@ -140,11 +142,11 @@ char	svbuf[ARB]		#O save chars as they are read
 int	sp			#U pointer into save buffer
 char	buf[ARB]		#U input buffer
 int	ip			#I input index
-int	maxch			#I max chars in buffer
-int	nchars			#U number of chars in buffer
+size_t	maxch			#I max chars in buffer
+long	nchars			#U number of chars in buffer
 
 int	ch
-int	status
+long	status
 
 begin
 	if (ip > nchars) {

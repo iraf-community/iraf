@@ -12,6 +12,7 @@ char	program[ARB]		# encoder program defining encoding
 int	arg1			# argument to be placed in register 1
 int	arg2			# argument to be placed in register 2
 
+size_t	sz_val
 int	stg_encode()
 include	"stdgraph.com"
 
@@ -23,6 +24,8 @@ begin
 
 	# Encode the output string and write the encoded string to the output
 	# file.
-	if (stg_encode (g_xy, g_mem, g_reg) == OK)
-	    call write (fd, g_mem, g_reg[E_IOP] - 1)
+	if (stg_encode (Memc[g_xy], g_mem, g_reg) == OK) {
+	    sz_val = g_reg[E_IOP] - 1
+	    call write (fd, g_mem, sz_val)
+	}
 end

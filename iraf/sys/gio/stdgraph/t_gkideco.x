@@ -10,8 +10,9 @@ procedure t_gkidecode()
 
 int	fd, verbose, gkiunits
 pointer	list, gki, sp, fname
-int	dd[LEN_GKIDD]
+pointer	dd[LEN_GKIDD]
 
+size_t	sz_val
 bool	clgetb()
 int	clgfil(), clplen(), open(), btoi()
 int	gki_fetch_next_instruction()
@@ -19,7 +20,8 @@ pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Open list of metafiles to be decoded.
 	list = clpopni ("input")

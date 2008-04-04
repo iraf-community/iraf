@@ -16,8 +16,9 @@ char	cap[2]
 int	g_reg[NREGISTERS]
 char	g_mem[SZ_MEMORY]
 char	argstr[MAXARGSTR]
-int	arg1, arg2, arg3, op, len_prog, status, nchars
+int	arg1, arg2, arg3, op, len_prog, status, nchars, i_off
 pointer	tty, sp, prog, ip, cmd
+size_t	sz_val
 pointer	ttygdes(), ttycaps()
 int	stg_encode(), ctoi(), getline(), strncmp()
 int	ttygets(), ctowrd(), strlen()
@@ -26,8 +27,10 @@ define	getargs_ 91
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (prog, SZ_PROGRAM, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_PROGRAM
+	call salloc (prog, sz_val, TY_CHAR)
 
 	# Print instructions.
 	call printf ("cmd :  `set' device\n")
@@ -62,7 +65,9 @@ begin
 		next
 	    } else if (strncmp (Memc[ip], "set", 3) == 0) {
 		ip = ip + 3
-		len_prog = ctowrd (Memc, ip, Memc[prog], SZ_PROGRAM)
+		i_off = 1
+		len_prog = ctowrd (Memc[ip], i_off, Memc[prog], SZ_PROGRAM)
+		ip = ip + i_off - 1
 		if (tty != NULL)
 		    call ttycdes (tty)
 		tty = ttygdes (Memc[prog])
@@ -74,7 +79,9 @@ begin
 		    strlen (Memc[ttycaps(tty)]))
 		next
 	    } else if (!IS_ALPHA (Memc[ip])) {
-		len_prog = ctowrd (Memc, ip, Memc[prog], SZ_PROGRAM)
+		i_off = 1
+		len_prog = ctowrd (Memc[ip], i_off, Memc[prog], SZ_PROGRAM)
+		ip = ip + i_off - 1
 		cap[1] = EOS
 		goto getargs_
 	    } else if (strncmp (Memc[ip], "bye", 3) == 0)
@@ -93,7 +100,9 @@ begin
 getargs_
 	    # Argument type depends on whether encoding or decoding.
 	    if (streq ("SC", cap)) {
-		nchars = ctowrd (Memc, ip, argstr, MAXARGSTR)
+		i_off = 1
+		nchars = ctowrd (Memc[ip], i_off, argstr, MAXARGSTR)
+		ip = ip + i_off - 1
 		if (nchars == 0) {
 		    call printf ("SC must have 1 contiguous string argument\n")
 		    next
@@ -101,12 +110,14 @@ getargs_
 
 	    } else {
 		# Extract up to three arguments (optional).
-		if (ctoi (Memc, ip, arg1) <= 0)
+		i_off = 1
+		if (ctoi (Memc[ip], i_off, arg1) <= 0)
 		    arg1 = 0
-		if (ctoi (Memc, ip, arg2) <= 0)
+		if (ctoi (Memc[ip], i_off, arg2) <= 0)
 		    arg2 = 0
-		if (ctoi (Memc, ip, arg3) <= 0)
+		if (ctoi (Memc[ip], i_off, arg3) <= 0)
 		    arg3 = 0
+		ip = ip + i_off - 1
 	    }
 
 	    # Fetch the program from the graphcap file.  Zero is returned if
