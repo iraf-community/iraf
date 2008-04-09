@@ -12,11 +12,11 @@ pointer procedure xt_fp$t (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2$t(), xt_fps$t()
 

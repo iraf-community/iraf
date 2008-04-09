@@ -12,11 +12,11 @@ pointer procedure xt_fps (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2s(), xt_fpss()
 
@@ -265,11 +265,11 @@ pointer procedure xt_fpi (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2i(), xt_fpsi()
 
@@ -518,11 +518,11 @@ pointer procedure xt_fpl (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2l(), xt_fpsl()
 
@@ -771,11 +771,11 @@ pointer procedure xt_fpr (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2r(), xt_fpsr()
 
@@ -1024,11 +1024,11 @@ pointer procedure xt_fpd (fp, im, line, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
 pointer	imgl2d(), xt_fpsd()
 
