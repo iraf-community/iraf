@@ -13,9 +13,10 @@ pointer procedure maskcolor_map (colorstring)
 char	colorstring		#I Color specification string
 pointer	colors			#O Mask colormap object
 
+size_t	sz_val
 int	i, j, ip, ncolors, token, lasttoken, maskval1, maskval2, color, offset
-int	strdic(), ctoi(), nowhite()
 pointer	sp, str, op
+int	strdic(), ctoi(), nowhite(), modi()
 
 int	coltrans[9]
 data	coltrans/202,203,204,205,206,207,208,209,-1/
@@ -24,16 +25,19 @@ define	err_	10
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# If the colorstring is an expression just save the string
 	# and set the number of colors to 0.
 	i = nowhite (colorstring, Memc[str], SZ_LINE)
 	if (Memc[str] == '(') {
-	    call malloc (colors, SZ_LINE, TY_INT)
-	    call malloc (op, LEN_OPERAND, TY_STRUCT)
-	    Memi[colors] = 0
-	    Memi[colors+1] = op
+	    sz_val = SZ_LINE
+	    call malloc (colors, sz_val, TY_POINTER)
+	    sz_val = LEN_OPERAND
+	    call malloc (op, sz_val, TY_STRUCT)
+	    Memp[colors] = 0
+	    Memp[colors+1] = op
 	    call strcpy (colorstring, Memc[P2C(colors+2)], SZ_LINE)
 	    O_TYPE(op) = TY_INT
 	    O_VALP(op) = NULL
@@ -43,7 +47,8 @@ begin
 	}
 
 	# Allocate memory for the colormap object.
-	call malloc (colors, 4*10, TY_INT)
+	sz_val = 4*10
+	call malloc (colors, sz_val, TY_POINTER)
 
 	# Initialize
 	ncolors = 1
@@ -52,9 +57,9 @@ begin
 	color = DEFCOLOR
 	offset = NO
 
-	Memi[colors] = ncolors
-	Memi[colors+2] = color
-	Memi[colors+3] = offset
+	Memp[colors] = ncolors
+	Memp[colors+2] = color
+	Memp[colors+3] = offset
 
 	# Parse the color specification.
 	token = 0
@@ -115,23 +120,25 @@ begin
 		if (!IS_INDEFI(maskval1)) {
 		    do i = 2, ncolors {
 			j = 4 * i - 4
-			if (Memi[colors+j] == maskval1 &&
-			    Memi[colors+j+1] == maskval2)
+			if (Memp[colors+j] == maskval1 &&
+			    Memp[colors+j+1] == maskval2)
 			    break
 		    }
 		    if (i > ncolors) {
-			if (mod (ncolors, 10) == 0)
-			    call realloc (colors, 4*(ncolors+10), TY_INT)
+			if (modi (ncolors, 10) == 0) {
+			    sz_val = 4*(ncolors+10)
+			    call realloc (colors, sz_val, TY_POINTER)
+			}
 			ncolors = ncolors + 1
 		    }
 		    j = 4 * i - 4
-		    Memi[colors+j] = maskval1
-		    Memi[colors+j+1] = maskval2
-		    Memi[colors+j+2] = color
-		    Memi[colors+j+3] = offset
+		    Memp[colors+j] = maskval1
+		    Memp[colors+j+1] = maskval2
+		    Memp[colors+j+2] = color
+		    Memp[colors+j+3] = offset
 		} else {
-		    Memi[colors+2] = color
-		    Memi[colors+3] = offset
+		    Memp[colors+2] = color
+		    Memp[colors+3] = offset
 		}
 		if (token == TOK_EOS)
 		    break
@@ -143,12 +150,12 @@ begin
 	    }
 	}
 
-	Memi[colors] = ncolors
+	Memp[colors] = ncolors
 	call sfree (sp)
 	return (colors)
 
 err_
-	call mfree (colors, TY_INT)
+	call mfree (colors, TY_POINTER)
 	call sfree (sp)
 	call error (1, "Error in color specifications")
 end
@@ -161,9 +168,9 @@ procedure maskcolor_free (colors)
 pointer	colors			#I Mask colormap object
 
 begin
-	if (Memi[colors] == 0)
-	    call evvfree (Memi[colors+1])
-	call mfree (colors, TY_INT)
+	if (Memp[colors] == 0)
+	    call evvfree (Memp[colors+1])
+	call mfree (colors, TY_POINTER)
 end
 
 
@@ -179,16 +186,16 @@ int	i, j, offset
 
 begin
 	# If there is no color array return the mask value.
-	if (Memi[colors] == 0)
+	if (Memp[colors] == 0)
 	    return (maskval)
 
-	color = Memi[colors+2]
-	offset = Memi[colors+3]
-	do i = 2, Memi[colors] {
+	color = Memp[colors+2]
+	offset = Memp[colors+3]
+	do i = 2, Memp[colors] {
 	    j = 4 * i - 4
-	    if (maskval >= Memi[colors+j] && maskval <= Memi[colors+j+1]) {
-		color = Memi[colors+j+2]
-		offset = Memi[colors+j+3]
+	    if (maskval >= Memp[colors+j] && maskval <= Memp[colors+j+1]) {
+		color = Memp[colors+j+2]
+		offset = Memp[colors+j+3]
 		break
 	    }
 	}
@@ -203,25 +210,26 @@ procedure maskexprn (colors, maskvals, nmaskvals)
 
 pointer	colors			#I Mask colormap object
 pointer	maskvals		#O Pointer to mask values (TY_INT)
-int	nmaskvals		#I Number of mask values
+size_t	nmaskvals		#I Number of mask values
 
-int	i
+long	i
 pointer	op, o, evvexpr()
 errchk	evvexpr
 
 pointer	locpr()
 extern	maskoperand, maskfunc
+include	<nullptr.inc>
 
 begin
-	if (Memi[colors] > 0)
+	if (Memp[colors] > 0)
 	    return
 
-	op = Memi[colors+1]
+	op = Memp[colors+1]
 	O_LEN(op) = nmaskvals
 	O_VALP(op) = maskvals
 
 	o = evvexpr (Memc[P2C(colors+2)], locpr(maskoperand), op,
-	    locpr(maskfunc), NULL, O_FREEOP)
+	    locpr(maskfunc), NULLPTR, O_FREEOP)
 
 	#call amovi (Memi[O_VALP(o)], Memi[maskvals], nmaskvals)
 	switch (O_TYPE(o)) {
@@ -234,6 +242,11 @@ begin
 	    do i = 0, O_LEN(o) {
 	        if (Memi[maskvals+i] > 0)
 		    Memi[maskvals+i] = max (0, Memi[O_VALP(o)+i])
+	    }
+	case TY_LONG:
+	    do i = 0, O_LEN(o) {
+	        if (Memi[maskvals+i] > 0)
+		    Memi[maskvals+i] = max (0, Meml[O_VALP(o)+i])
 	    }
 	case TY_REAL:
 	    do i = 0, O_LEN(o) {
@@ -259,6 +272,7 @@ pointer	op			#I Input operand pointer
 char	operand[ARB]		#I Operand name
 pointer	o			#O Operand object
 
+size_t	sz_val
 char	str[10]
 int	i, coltrans[9], strdic()
 data	coltrans/202,203,204,205,206,207,208,209,-1/
@@ -274,7 +288,8 @@ begin
 	call strlwr (str)
 	i = strdic (str, str, 11, COLORS)
 	if (i > 0) {
-	    call xvv_initop (o, 0, TY_INT)
+	    sz_val = 0
+	    call xvv_initop (o, sz_val, TY_INT)
 	    O_VALI(o) = coltrans[i]
 	    return
 	}
@@ -299,12 +314,15 @@ int	nargs			#I number of arguments
 pointer	val			#O output operand (function value)
 
 char	str[12]
-int	i, j, c1, c2, c3
-int	iresult, optype, oplen, opcode, v_nargs
+int	i, c1, c2, c3
+long	j
+size_t	oplen
+pointer	iresult
+int	optype, opcode, v_nargs
 double	dresult
 
 bool	strne()
-int	strdic(), btoi(), andi()
+int	strdic(), btoi(), andi(), absi(), modi()
 errchk	malloc
 
 begin
@@ -327,9 +345,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xvv_error2 ("function `%s' requires %d arguments",
 		func, v_nargs)
-	else if (v_nargs < 0 && nargs < abs(v_nargs))
+	else if (v_nargs < 0 && nargs < absi(v_nargs))
 	    call xvv_error2 ("function `%s' requires at least %d arguments",
-		func, abs(v_nargs))
+		func, absi(v_nargs))
 
 	# Group some common operations.
 	switch (opcode) {
@@ -345,8 +363,9 @@ begin
 	    }
 	    optype = TY_INT
 	    oplen = O_LEN(args[1])
-	    if (oplen > 0)
+	    if (oplen > 0) {
 		call malloc (iresult, oplen, TY_INT)
+	    }
 	case F_COLORS:
 	    # Check types of arguments.
 	    do i = 1, nargs {
@@ -356,8 +375,9 @@ begin
 	    }
 	    optype = TY_INT
 	    oplen = O_LEN(args[1])
-	    if (oplen > 0)
+	    if (oplen > 0) {
 		call malloc (iresult, oplen, TY_INT)
+	    }
 	}
 
 	# Evaluate the function.
@@ -433,7 +453,7 @@ begin
 		if (i == 0)
 		    i = c1
 		else if (i > 0)
-		    i = c2 + mod (i-1, c3)
+		    i = c2 + modi (i-1, c3)
 		iresult = i
 	    } else {
 	        do j = 0, oplen-1 {
@@ -441,7 +461,7 @@ begin
 		    if (i == 0)
 			i = c1
 		    else if (i > 0)
-			i = c2 + mod (i-1, c3)
+			i = c2 + modi (i-1, c3)
 		    Memi[iresult+j] = i
 		}
 	    }
@@ -461,6 +481,8 @@ begin
 		O_VALP(val) = iresult
 	    case TY_INT:
 		O_VALI(val) = iresult
+	    case TY_LONG:
+		O_VALL(val) = iresult
 	    case TY_REAL:
 		O_VALR(val) = dresult
 	    case TY_DOUBLE:

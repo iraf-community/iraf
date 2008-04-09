@@ -12,6 +12,7 @@ procedure imd_setwcs (chan, wcstext)
 int	chan			#I display channel code (frame)
 char	wcstext[ARB]		#I wcs text
 
+size_t	sz_val
 pointer	sp, pkwcs
 int	status, count
 int	strlen(), iisflu()
@@ -21,8 +22,9 @@ begin
 	count = strlen (wcstext) + 1
 
 	call smark (sp)
-	call salloc (pkwcs, count, TY_CHAR)
-	call strpak (wcstext, Memc[pkwcs], count)
+	sz_val = count
+	call salloc (pkwcs, sz_val, TY_CHAR)
+	call strpak (wcstext, Memc[pkwcs], sz_val)
 
 	call iishdr (IWRITE+PACKED, count, WCS, iis_version, 0, iisflu(chan),
 	    max(0,iis_config-1))

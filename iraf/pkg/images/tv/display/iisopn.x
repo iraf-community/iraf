@@ -18,6 +18,7 @@ char	devinfo[ARB]		# device info for zopen (packed)
 int	mode			# access mode
 int	chan[ARB]		# receives IIS descriptor
 
+size_t	sz_val
 int	delim
 char	resource[SZ_FNAME]
 char	node[SZ_FNAME]
@@ -26,7 +27,7 @@ data	first_time /true/
 int	ki_gnode(), strncmp()
 include	"iis.com"
 include	"imd.com"
-define	quit_ 91
+#define	quit_ 91
 
 begin
 	if (first_time) {
@@ -56,7 +57,8 @@ begin
 	    # bandwidth is the limiting factor; do not bytepack if on local
 	    # node since cpu time is the limiting factor.
 
-	    call strupk (devinfo, resource, SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call strupk (devinfo, resource, sz_val)
 	    packit = (ki_gnode (resource, node, delim) != 0)
 	    if (!packit)
 		packit = (strncmp (resource[delim+1], "imt", 3) == 0)

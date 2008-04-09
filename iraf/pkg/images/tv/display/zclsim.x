@@ -9,6 +9,7 @@ procedure zclsim (chan, status)
 
 int	chan[ARB]
 int	status
+
 int	device
 
 begin

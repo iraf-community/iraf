@@ -12,7 +12,7 @@ procedure iiswr (chan, buf, nbytes, offset)
 
 int	chan[ARB]		# io channel
 short	buf[ARB]		# pixels
-int	nbytes			# length of pixel array in bytes
+size_t	nbytes			# length of pixel array in bytes
 long	offset			# pixel offset in image display
 
 long	off1, off2

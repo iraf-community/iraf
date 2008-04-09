@@ -9,6 +9,7 @@ include "zdisplay.h"
 
 int procedure imd_wcsver ()
 
+size_t	sz_val
 pointer	ds
 int     chan, status, frame, ip
 char	wcstext[SZ_OLD_WCSTEXT]
@@ -40,12 +41,14 @@ begin
 
 	frame = 1
         chan = iisflu (FRTOCHAN(frame))
-        call aclrc (wcstext, SZ_OLD_WCSTEXT)
+	sz_val = SZ_OLD_WCSTEXT
+        call aclrc (wcstext, sz_val)
         call iishdr (IREAD+PACKED, SZ_OLD_WCSTEXT, WCS, 1, 1, chan, 0)
         call iisio (wcstext, SZ_OLD_WCSTEXT, status)
-        if (status > 0)
-            call strupk (wcstext, wcstext, SZ_OLD_WCSTEXT)
-	else {
+        if (status > 0) {
+	    sz_val = SZ_OLD_WCSTEXT
+            call strupk (wcstext, wcstext, sz_val)
+	} else {
             iis_version = 0
 	    call imunmap (ds)
 	    return (iis_version)
@@ -55,8 +58,9 @@ begin
         if (strncmp (wcstext, "version=", 8) == 0) {
             ip = 9
             status = ctoi (wcstext, ip, iis_version)
-        } else
+        } else {
             iis_version = 0
+	}
 
 
 	if (ds != NULL)

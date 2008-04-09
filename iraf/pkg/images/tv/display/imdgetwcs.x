@@ -34,6 +34,7 @@ real	a, d			#O x, y scale factors
 real	b, c			#O cross terms (rotations)
 real	tx, ty			#O x, y offsets
 
+size_t	sz_val
 char	ch
 int	fd, chan, status, wcs_status, zt
 real	z1, z2
@@ -44,10 +45,13 @@ include "iis.com"
 
 begin
 	call smark (sp)
-	call salloc (dir, SZ_PATHNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dir, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = SZ_WCSTEXT
+	call salloc (wcstext, sz_val, TY_CHAR)
 
 	wcs_status = OK
 
@@ -64,8 +68,10 @@ begin
 		iis_valid = NO
 	        call iishdr (IREAD+PACKED, SZ_WCSTEXT, WCS, 1, 0, chan, 0)
 	        call iisio (Memc[wcstext], SZ_WCSTEXT, status)
-	        if (status > 0)
-		    call strupk (Memc[wcstext], Memc[wcstext], SZ_WCSTEXT)
+	        if (status > 0) {
+		    sz_val = SZ_WCSTEXT
+		    call strupk (Memc[wcstext], Memc[wcstext], sz_val)
+		}
 
 	        iferr (fd = stropen (Memc[wcstext], SZ_WCSTEXT, READ_ONLY))
 		    fd = NULL
@@ -73,8 +79,10 @@ begin
 	    } else {
 	        call iishdr (IREAD+PACKED, SZ_OLD_WCSTEXT, WCS, 0, 0, chan, 0)
 	        call iisio (Memc[wcstext], SZ_OLD_WCSTEXT, status)
-	        if (status > 0)
-		    call strupk (Memc[wcstext], Memc[wcstext], SZ_OLD_WCSTEXT)
+	        if (status > 0) {
+		    sz_val = SZ_OLD_WCSTEXT
+		    call strupk (Memc[wcstext], Memc[wcstext], sz_val)
+		}
 
 	        iferr (fd = stropen (Memc[wcstext], SZ_OLD_WCSTEXT, READ_ONLY))
 		    fd = NULL
@@ -148,12 +156,12 @@ begin
 		            call gargstr (iis_region, SZ_FNAME)
 		            call gargr (iis_sx)
 		            call gargr (iis_sy)
-		            call gargi (iis_snx)
-		            call gargi (iis_sny)
-		            call gargi (iis_dx)
-		            call gargi (iis_dy)
-		            call gargi (iis_dnx)
-		            call gargi (iis_dny)
+		            call gargl (iis_snx)
+		            call gargl (iis_sny)
+		            call gargl (iis_dx)
+		            call gargl (iis_dy)
+		            call gargl (iis_dnx)
+		            call gargl (iis_dny)
 			}
 		        if (nscan() == 9) {
 			    if (fscan (fd) != EOF)

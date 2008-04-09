@@ -34,17 +34,17 @@ define	SI_LEN		19
 define	SI_MAXDIM	2		# images of 2 dimensions supported
 define	SI_NBUFS	3		# nbuffers used by SIGL2
 
-define	SI_IM		Memi[P2I($1)]	# pointer to input image header
-define	SI_FP		Memi[P2I($1+1)]	# pointer to fixpix structure
-define	SI_GRID		Memi[P2I($1+2)+$2-1]	# pointer to array of X coords
-define	SI_NPIX		Memi[P2I($1+4)+$2-1]	# number of X coords
-define	SI_BAVG		Memi[P2I($1+6)+$2-1]	# X block averaging factor
+define	SI_IM		Memp[$1]		# pointer to input image header
+define	SI_FP		Memp[$1+1]		# pointer to fixpix structure
+define	SI_GRID		Memp[$1+2+$2-1]		# pointer to array of X coords
+define	SI_NPIX		Memz[P2Z($1+4)+$2-1]	# number of X coords
+define	SI_BAVG		Meml[P2L($1+6)+$2-1]	# X block averaging factor
 define	SI_INTERP	Memi[P2I($1+8)+$2-1]	# interpolate X axis
-define	SI_BUF		Memi[P2I($1+10)+$2-1]# line buffers
-define	SI_BUFY		Memi[P2I($1+13)+$2-1]# Y values of buffers
+define	SI_BUF		Memp[$1+10+$2-1]	# line buffers
+define	SI_BUFY		Meml[P2L($1+13)+$2-1]	# Y values of buffers
 define	SI_ORDER	Memi[P2I($1+15)]	# interpolator order
 define	SI_TYBUF	Memi[P2I($1+16)]	# buffer type
-define	SI_XOFF		Memi[P2I($1+17)]	# offset in input image to first X
+define	SI_XOFF		Meml[P2L($1+17)]	# offset in input image to first X
 define	SI_INIT		Memi[P2I($1+18)]	# YES until first i/o is done
 
 define	OUTBUF		SI_BUF($1,3)
@@ -52,6 +52,7 @@ define	OUTBUF		SI_BUF($1,3)
 define	SI_TOL		(1E-5)		# close to a pixel
 define	INTVAL		(abs ($1 - nint($1)) < SI_TOL)
 define	SWAPI		{tempi=$2;$2=$1;$1=tempi}
+define	SWAPL		{templ=$2;$2=$1;$1=templ}
 define	SWAPP		{tempp=$2;$2=$1;$1=tempp}
 define	NOTSET		(-9999)
 
@@ -65,24 +66,28 @@ pointer procedure sigm2_setup (im, pm, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
 pointer	im			# the input image
 pointer	pm			# pixel mask
 real	px1, px2		# range in X to be sampled on an even grid
-int	nx			# number of output pixels in X
-int	xblk			# blocking factor in x
+size_t	nx			# number of output pixels in X
+long	xblk			# blocking factor in x
 real	py1, py2		# range in Y to be sampled on an even grid
-int	ny			# number of output pixels in Y
-int	yblk			# blocking factor in y
+size_t	ny			# number of output pixels in Y
+long	yblk			# blocking factor in y
 int	order			# interpolator order (0=replicate, 1=linear)
 
-int	npix, noldpix, nbavpix, i, j
-int	npts[SI_MAXDIM]		# number of output points for axis
-int	blksize[SI_MAXDIM]	# block averaging factor (npix per block)
+size_t	sz_val
+size_t	npix, noldpix, nbavpix
+int	i
+long	j, lval
+size_t	npts[SI_MAXDIM]		# number of output points for axis
+long	blksize[SI_MAXDIM]	# block averaging factor (npix per block)
 real	tau[SI_MAXDIM]		# tau = p(i+1) - p(i) in fractional pixels
 real	p1[SI_MAXDIM]		# starting pixel coords in each axis
 real	p2[SI_MAXDIM]		# ending pixel coords in each axis
-real	scalar, start
+real	scalar, start, rval0, rval1
 pointer	si, gp, xt_fpinit()
 
 begin
-	iferr (call calloc (si, SI_LEN, TY_STRUCT))
+	sz_val = SI_LEN
+	iferr (call calloc (si, sz_val, TY_STRUCT))
 	    call erract (EA_FATAL)
 
 	SI_IM(si) = im
@@ -107,7 +112,7 @@ begin
 	# between the first and last point.
 
 	do i = 1, SI_MAXDIM {
-	    if ((blksize[i] >= 1) && !IS_INDEFI (blksize[i])) {
+	    if ((blksize[i] >= 1) && !IS_INDEFL (blksize[i])) {
 	        if (npts[i] == 1)
 		    tau[i] = 0.
 	        else
@@ -115,7 +120,7 @@ begin
 	    } else {
 		if (npts[i] == 1) {
 		    tau[i] = 0.
-		    blksize[i] = int (p2[i] - p1[i] + 1 + SI_TOL)
+		    blksize[i] = p2[i] - p1[i] + 1 + SI_TOL
 	        } else {
 	            tau[i] = (p2[i] - p1[i]) / (npts[i] - 1)
 	    	    if (tau[i] >= 2.0) {
@@ -126,11 +131,13 @@ begin
 			# block averaged pixels will be replicated as necessary
 			# to fill the last block out to this size.  
 
-			blksize[i] = int (tau[i] + SI_TOL)
+			blksize[i] = tau[i] + SI_TOL
 			npix = p2[i] - p1[i] + 1
 			noldpix = (npix+blksize[i]-1) / blksize[i] * blksize[i]
 			nbavpix = noldpix / blksize[i]
-			scalar = real (nbavpix - 1) / real (noldpix - 1)
+			rval0 = nbavpix - 1
+			rval1 = noldpix - 1
+			scalar = rval0 / rval1
 			p1[i] = (p1[i] - 1.0) * scalar + 1.0
 			p2[i] = (p2[i] - 1.0) * scalar + 1.0
 			tau[i] = (p2[i] - p1[i]) / (npts[i] - 1)
@@ -143,9 +150,9 @@ begin
 	SI_BAVG(si,1) = blksize[1]
 	SI_BAVG(si,2) = blksize[2]
 
-#	if (IS_INDEFI (xblk))
+#	if (IS_INDEFL (xblk))
 #	    xblk = blksize[1]
-#	if (IS_INDEFI (yblk))
+#	if (IS_INDEFL (yblk))
 #	    yblk = blksize[2]
 
 	# Allocate and initialize the grid arrays, specifying the X and Y
@@ -162,8 +169,8 @@ begin
 	    # given by XOFF.
 
 	    if (i == 1) {
-		SI_XOFF(si) = int (p1[i] + SI_TOL)
-		start = p1[1] - int (p1[i] + SI_TOL) + 1.0
+		SI_XOFF(si) = p1[i] + SI_TOL
+		start = p1[1] - SI_XOFF(si) + 1.0
 	    } else
 	    	start = p1[i]
 
@@ -178,8 +185,10 @@ begin
 		call erract (EA_FATAL)
 	    SI_GRID(si,i) = gp
 	    if (SI_ORDER(si) <= 0) {
-		do j = 0, npts[i]-1
-		    Memr[gp+j] = int (start + (j * tau[i]) + 0.5 + SI_TOL)
+		do j = 0, npts[i]-1 {
+		    lval = start + (j * tau[i]) + 0.5 + SI_TOL
+		    Memr[gp+j] = lval
+		}
 	    } else {
 		do j = 0, npts[i]-1
 		    Memr[gp+j] = start + (j * tau[i])
@@ -224,11 +233,13 @@ end
 pointer procedure sigm2s (si, lineno)
 
 pointer	si		# pointer to SI descriptor
-int	lineno
+long	lineno
 
+long	new_y[2]
 pointer	rawline, tempp, gp
-int	i, new_y[2], tempi, curbuf, altbuf
-int	nraw, npix, nblks_y, ybavg, x1, x2
+int	i, tempi, curbuf, altbuf
+size_t	nraw, npix
+long	nblks_y, ybavg, x1, x2, templ, lval
 real	x, y, weight_1, weight_2
 pointer	si_blmavgs()
 errchk	si_blmavgs
@@ -243,7 +254,8 @@ begin
 	gp = SI_GRID(si,1)
 	x1 = SI_XOFF(si)
 	x = Memr[gp+npix-1]
-	x2 = x1 + int(x)
+	lval = x
+	x2 = x1 + lval
 	if (INTVAL(x))
 	    x2 = x2 - 1
 	x2 = max (x1 + 1, x2)
@@ -255,9 +267,11 @@ begin
 	# not necessary to interpolate in either X or Y.  Block averaging is
 	# permitted.
 
-	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
-	    return (si_blmavgs (SI_IM(si), SI_FP(si), x1, x2, int(y),
+	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO) {
+	    lval = y
+	    return (si_blmavgs (SI_IM(si), SI_FP(si), x1, x2, lval,
 		SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si)))
+	}
 
 	# If we are interpolating in Y two buffers are required, one for each
 	# of the two input image lines required to interpolate in Y.  The lines
@@ -285,8 +299,9 @@ begin
 	# the X grid.  The X and Y values herein are in the coordinate system
 	# of the (possibly block averaged) input image.
 
-	new_y[1] = int(y)
-	new_y[2] = int(y) + 1
+	lval = y
+	new_y[1] = lval
+	new_y[2] = lval + 1
 
 	# Get the pair of lines whose integral Y values form an interval
 	# containing the fractional Y value of the output line.  Sometimes the
@@ -303,7 +318,7 @@ begin
 		;
 	    } else if (new_y[i] == SI_BUFY(si,altbuf)) {
 		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
-		SWAPI (SI_BUFY(si,1), SI_BUFY(si,2))
+		SWAPL (SI_BUFY(si,1), SI_BUFY(si,2))
 
 	    } else {
 		# Get line and interpolate onto output grid.  If interpolation
@@ -380,16 +395,18 @@ pointer procedure si_blmavgs (im, fp, x1, x2, y, xbavg, ybavg, order)
 
 pointer	im			# input image
 pointer	fp			# fixpix structure
-int	x1, x2			# range of x blocks to be read
-int	y			# y block to be read
-int	xbavg, ybavg		# X and Y block averaging factors
+long	x1, x2			# range of x blocks to be read
+long	y			# y block to be read
+long	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-real	sum
+real	sum, rval
 short	blkmax
 pointer	sp, a, b
-int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
-int	first_line, nlines_in_sum, npix, nfull_blks, count
+size_t	nblks_x, nblks_y, ncols, nlines
+long	xoff, i, j, first_line, count, lval
+pointer	blk1, blk2, k
+size_t	nlines_in_sum, npix, nfull_blks
 pointer	xt_fps()
 errchk	xt_fps
 
@@ -468,8 +485,10 @@ begin
 
 	    if (ybavg > 1) {
 		if (order == -1) {
-		    do j = 0, nblks_x-1
-			Meml[b+j] = max (Meml[b+j], long (Mems[a+j]))
+		    do j = 0, nblks_x-1 {
+			lval = Mems[a+j]
+			Meml[b+j] = max (Meml[b+j], lval)
+		    }
 		} else {
 		    do j = 0, nblks_x-1
 			Meml[b+j] = Meml[b+j] + Mems[a+j]
@@ -488,8 +507,10 @@ begin
 		do i = 0, nblks_x-1
 		    Mems[a+i] = Meml[b+i]
 	    } else {
-		do i = 0, nblks_x-1
-		    Mems[a+i] = Meml[b+i] / real(nlines_in_sum)
+		rval = nlines_in_sum
+		do i = 0, nblks_x-1 {
+		    Mems[a+i] = Meml[b+i] / rval
+		}
 	    }
 	}
 
@@ -503,16 +524,19 @@ end
 procedure si_maxs (a, na, x, b, nb)
 
 short	a[na]                   # input array
-int	na                      # input size
+size_t	na                      # input size
 real	x[nb]                   # sample grid
 short	b[nb]                   # output arrays
-int	nb                      # output size
+size_t	nb                      # output size
 
-int	i
+long	i
+size_t	zval
 
 begin
-	do i = 1, nb
-	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
+	do i = 1, nb {
+	    zval = x[i]
+	    b[i] = max (a[zval], a[min(na,zval+1)])
+	}
 end
 
 
@@ -524,11 +548,13 @@ end
 pointer procedure sigm2i (si, lineno)
 
 pointer	si		# pointer to SI descriptor
-int	lineno
+long	lineno
 
+long	new_y[2]
 pointer	rawline, tempp, gp
-int	i, new_y[2], tempi, curbuf, altbuf
-int	nraw, npix, nblks_y, ybavg, x1, x2
+int	i, tempi, curbuf, altbuf
+size_t	nraw, npix
+long	nblks_y, ybavg, x1, x2, templ, lval
 real	x, y, weight_1, weight_2
 pointer	si_blmavgi()
 errchk	si_blmavgi
@@ -543,7 +569,8 @@ begin
 	gp = SI_GRID(si,1)
 	x1 = SI_XOFF(si)
 	x = Memr[gp+npix-1]
-	x2 = x1 + int(x)
+	lval = x
+	x2 = x1 + lval
 	if (INTVAL(x))
 	    x2 = x2 - 1
 	x2 = max (x1 + 1, x2)
@@ -555,9 +582,11 @@ begin
 	# not necessary to interpolate in either X or Y.  Block averaging is
 	# permitted.
 
-	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
-	    return (si_blmavgi (SI_IM(si), SI_FP(si), x1, x2, int(y),
+	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO) {
+	    lval = y
+	    return (si_blmavgi (SI_IM(si), SI_FP(si), x1, x2, lval,
 		SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si)))
+	}
 
 	# If we are interpolating in Y two buffers are required, one for each
 	# of the two input image lines required to interpolate in Y.  The lines
@@ -585,8 +614,9 @@ begin
 	# the X grid.  The X and Y values herein are in the coordinate system
 	# of the (possibly block averaged) input image.
 
-	new_y[1] = int(y)
-	new_y[2] = int(y) + 1
+	lval = y
+	new_y[1] = lval
+	new_y[2] = lval + 1
 
 	# Get the pair of lines whose integral Y values form an interval
 	# containing the fractional Y value of the output line.  Sometimes the
@@ -603,7 +633,7 @@ begin
 		;
 	    } else if (new_y[i] == SI_BUFY(si,altbuf)) {
 		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
-		SWAPI (SI_BUFY(si,1), SI_BUFY(si,2))
+		SWAPL (SI_BUFY(si,1), SI_BUFY(si,2))
 
 	    } else {
 		# Get line and interpolate onto output grid.  If interpolation
@@ -680,16 +710,18 @@ pointer procedure si_blmavgi (im, fp, x1, x2, y, xbavg, ybavg, order)
 
 pointer	im			# input image
 pointer	fp			# fixpix structure
-int	x1, x2			# range of x blocks to be read
-int	y			# y block to be read
-int	xbavg, ybavg		# X and Y block averaging factors
+long	x1, x2			# range of x blocks to be read
+long	y			# y block to be read
+long	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-real	sum
+real	sum, rval
 int	blkmax
 pointer	sp, a, b
-int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
-int	first_line, nlines_in_sum, npix, nfull_blks, count
+size_t	nblks_x, nblks_y, ncols, nlines
+long	xoff, i, j, first_line, count, lval
+pointer	blk1, blk2, k
+size_t	nlines_in_sum, npix, nfull_blks
 pointer	xt_fpi()
 errchk	xt_fpi
 
@@ -768,8 +800,10 @@ begin
 
 	    if (ybavg > 1) {
 		if (order == -1) {
-		    do j = 0, nblks_x-1
-			Meml[b+j] = max (Meml[b+j], long (Memi[a+j]))
+		    do j = 0, nblks_x-1 {
+			lval = Memi[a+j]
+			Meml[b+j] = max (Meml[b+j], lval)
+		    }
 		} else {
 		    do j = 0, nblks_x-1
 			Meml[b+j] = Meml[b+j] + Memi[a+j]
@@ -785,11 +819,14 @@ begin
 
 	if (ybavg > 1) {
 	    if (order == -1) {
-		do i = 0, nblks_x-1
+		do i = 0, nblks_x-1 {
 		    Memi[a+i] = Meml[b+i]
+		}
 	    } else {
-		do i = 0, nblks_x-1
-		    Memi[a+i] = Meml[b+i] / real(nlines_in_sum)
+		rval = nlines_in_sum
+		do i = 0, nblks_x-1 {
+		    Memi[a+i] = Meml[b+i] / rval
+		}
 	    }
 	}
 
@@ -803,16 +840,19 @@ end
 procedure si_maxi (a, na, x, b, nb)
 
 int	a[na]                   # input array
-int	na                      # input size
+size_t	na                      # input size
 real	x[nb]                   # sample grid
 int	b[nb]                   # output arrays
-int	nb                      # output size
+size_t	nb                      # output size
 
-int	i
+long	i
+size_t	zval
 
 begin
-	do i = 1, nb
-	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
+	do i = 1, nb {
+	    zval = x[i]
+	    b[i] = max (a[zval], a[min(na,zval+1)])
+	}
 end
 
 
@@ -824,11 +864,13 @@ end
 pointer procedure sigm2r (si, lineno)
 
 pointer	si		# pointer to SI descriptor
-int	lineno
+long	lineno
 
+long	new_y[2]
 pointer	rawline, tempp, gp
-int	i, new_y[2], tempi, curbuf, altbuf
-int	nraw, npix, nblks_y, ybavg, x1, x2
+int	i, tempi, curbuf, altbuf
+size_t	nraw, npix, nblks_y
+long	ybavg, x1, x2, templ, lval
 real	x, y, weight_1, weight_2
 pointer	si_blmavgr()
 errchk	si_blmavgr
@@ -843,7 +885,8 @@ begin
 	gp = SI_GRID(si,1)
 	x1 = SI_XOFF(si)
 	x = Memr[gp+npix-1]
-	x2 = x1 + int(x)
+	lval = x
+	x2 = x1 + lval
 	if (INTVAL(x))
 	    x2 = x2 - 1
 	x2 = max (x1 + 1, x2)
@@ -855,9 +898,11 @@ begin
 	# not necessary to interpolate in either X or Y.  Block averaging is
 	# permitted.
 
-	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
-	    return (si_blmavgr (SI_IM(si), SI_FP(si), x1, x2, int(y),
+	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO) {
+	    lval = y
+	    return (si_blmavgr (SI_IM(si), SI_FP(si), x1, x2, lval,
 		SI_BAVG(si,1), SI_BAVG(si,2), SI_ORDER(si)))
+	}
 
 	# If we are interpolating in Y two buffers are required, one for each
 	# of the two input image lines required to interpolate in Y.  The lines
@@ -885,8 +930,9 @@ begin
 	# the X grid.  The X and Y values herein are in the coordinate system
 	# of the (possibly block averaged) input image.
 
-	new_y[1] = int(y)
-	new_y[2] = int(y) + 1
+	lval = y
+	new_y[1] = lval
+	new_y[2] = lval + 1
 
 	# Get the pair of lines whose integral Y values form an interval
 	# containing the fractional Y value of the output line.  Sometimes the
@@ -903,7 +949,7 @@ begin
 		;
 	    } else if (new_y[i] == SI_BUFY(si,altbuf)) {
 		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
-		SWAPI (SI_BUFY(si,1), SI_BUFY(si,2))
+		SWAPL (SI_BUFY(si,1), SI_BUFY(si,2))
 
 	    } else {
 		# Get line and interpolate onto output grid.  If interpolation
@@ -980,15 +1026,18 @@ pointer procedure si_blmavgr (im, fp, x1, x2, y, xbavg, ybavg, order)
 
 pointer	im			# input image
 pointer	fp			# fixpix structure
-int	x1, x2			# range of x blocks to be read
-int	y			# y block to be read
-int	xbavg, ybavg		# X and Y block averaging factors
+long	x1, x2			# range of x blocks to be read
+long	y			# y block to be read
+long	xbavg, ybavg		# X and Y block averaging factors
 int	order			# averaging option
 
-int	nblks_x, nblks_y, ncols, nlines, xoff, blk1, blk2, i, j, k
-int	first_line, nlines_in_sum, npix, nfull_blks, count
-real	sum, blkmax
+real	sum, rval
+real	blkmax
 pointer	sp, a, b
+size_t	nblks_x, nblks_y, ncols, nlines
+long	xoff, i, j, first_line, count
+pointer	blk1, blk2, k
+size_t	nlines_in_sum, npix, nfull_blks
 pointer	xt_fpr()
 errchk	xt_fpr
 
@@ -1081,10 +1130,12 @@ begin
 	# than an input line.
 
 	if (ybavg > 1) {
-	    if (order == -1)
+	    if (order == -1) {
 		call amovr (Memr[b], Memr[a], nblks_x)
-	    else
-		call adivkr (Memr[b], real(nlines_in_sum), Memr[a], nblks_x)
+	    } else {
+		rval = nlines_in_sum
+		call adivkr (Memr[b], rval, Memr[a], nblks_x)
+	    }
 	}
 
 	call sfree (sp)
@@ -1097,14 +1148,17 @@ end
 procedure si_maxr (a, na, x, b, nb)
 
 real	a[na]                   # input array
-int	na                      # input size
+size_t	na                      # input size
 real	x[nb]                   # sample grid
 real	b[nb]                   # output arrays
-int	nb                      # output size
+size_t	nb                      # output size
 
-int	i
+long	i
+size_t	zval
 
 begin
-	do i = 1, nb
-	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
+	do i = 1, nb {
+	    zval = x[i]
+	    b[i] = max (a[zval], a[min(na,zval+1)])
+	}
 end

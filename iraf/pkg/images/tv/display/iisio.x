@@ -13,31 +13,51 @@ short	buf[ARB]
 int	nbytes
 int	status
 
+size_t	sz_val
+size_t	c_1
+long	lval, lstatus
 int	xferid
 int	and()
 include	"iis.com"
 
 begin
-	call iiswt (iischan, status)
+	c_1 = 1
+
+	call iiswt (iischan, lstatus)
 	xferid = XFERID(hdr)
 
-	if (swap_bytes)
-	    call bswap2 (hdr, 1, hdr, 1, SZB_IISHDR)
-	call zawrgd (iischan, hdr, SZB_IISHDR, 0)
-	call iiswt (iischan, status)
+	if (swap_bytes) {
+	    sz_val = SZB_IISHDR
+	    call bswap2 (hdr, c_1, hdr, c_1, sz_val)
+	}
+	sz_val = SZB_IISHDR
+	lval = 0
+	call zawrgd (iischan, hdr, sz_val, lval)
+	call iiswt (iischan, lstatus)
 
 	if (and (xferid, IREAD) != 0) {
-	    call zardgd (iischan, buf, nbytes, 0) 
-	    call iiswt (iischan, status)
-	    if (swap_bytes && and(xferid,PACKED) == 0)
-		call bswap2 (buf, 1, buf, 1, nbytes)
+	    sz_val = nbytes
+	    lval = 0
+	    call zardgd (iischan, buf, sz_val, lval)
+	    call iiswt (iischan, lstatus)
+	    if (swap_bytes && and(xferid,PACKED) == 0) {
+		sz_val = nbytes
+		call bswap2 (buf, c_1, buf, c_1, sz_val)
+	    }
 	} else {
-	    if (swap_bytes && and(xferid,PACKED) == 0)
-		call bswap2 (buf, 1, buf, 1, nbytes)
-	    call zawrgd (iischan, buf, nbytes, 0)
-	    call iiswt (iischan, status)
+	    if (swap_bytes && and(xferid,PACKED) == 0) {
+		sz_val = nbytes
+		call bswap2 (buf, c_1, buf, c_1, sz_val)
+	    }
+	    sz_val = nbytes
+	    lval = 0
+	    call zawrgd (iischan, buf, sz_val, lval)
+	    call iiswt (iischan, lstatus)
 	}
 
-	if (status <= 0)
+	if (lstatus <= 0) {
 	    status = EOF
+	} else {
+	    status = lstatus
+	}
 end

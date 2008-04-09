@@ -23,6 +23,7 @@ int	mode            # I: the graphics stream mode
 pointer	device          # I: the name of the graphics device
 real	vl, vr, vb, vt  # I: the edges of the graphics viewport
 
+size_t	sz_val
 pointer	sp, title, gp, im, mw
 real	c1, c2, l1, l2
 bool	clgetb()
@@ -33,9 +34,11 @@ real	clgetr()
 begin
 	# Get memory.
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 
 	# Since all the MWCS information comes from an image open it.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -55,9 +58,9 @@ begin
 
 	    # Set the default input image column and line limits.
 	    c1 = 1.0
-	    c2 = real (IM_LEN(im,1))
+	    c2 = IM_LEN(im,1)
 	    l1 = 1.0
-	    l2 = real (IM_LEN(im,2))
+	    l2 = IM_LEN(im,2)
 
 	    # Open the WCS.
 	    mw = mw_openim (im)

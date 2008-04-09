@@ -25,6 +25,7 @@ char	image[SZ_FNAME]		# Image to display
 int	frame			# Display frame
 int	erase			# Erase frame?
 
+size_t	sz_val
 int	i
 pointer	sp, wdes, im, ds
 
@@ -33,11 +34,13 @@ int	clgeti(), btoi(), imd_wcsver(), imtlen(), imtgetim()
 pointer	immap(), imd_mapframe1(), imtopenp()
 errchk	immap, imd_mapframe1
 errchk	ds_getparams, ds_setwcs, ds_load_display, ds_erase_border
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (wdes, LEN_WDES, TY_STRUCT)
-	call aclri (Memi[wdes], LEN_WDES)
+	sz_val = LEN_WDES
+	call salloc (wdes, sz_val, TY_STRUCT)
+	call aclrp (Memp[wdes], sz_val)
 
 	# Open input imagefile.
 	im = imtopenp ("image")
@@ -46,7 +49,7 @@ begin
 	i = imtgetim (im, image, SZ_FNAME)
 	call imtclose (im)
 	#call clgstr ("image", image, SZ_FNAME)
-	im = immap (image, READ_ONLY, 0)
+	im = immap (image, READ_ONLY, NULLPTR)
 	if (IM_NDIM(im) <= 0)
 	    call error (1, "image has no pixels")
 
@@ -103,16 +106,19 @@ procedure ds_getparams (im, ds, wdes)
 
 pointer	im, ds, wdes		#I Image, display, and graphics descriptors
 
+size_t	sz_val
 bool	fill, zscale_flag, zrange_flag, zmap_flag
 real	xcenter, ycenter, xsize, ysize
 real	xmag, ymag, xscale, yscale, pxsize, pysize
 real	z1, z2, contrast
-int	nsample, ncols, nlines
+size_t	nsample
+long	ncols, nlines, lval
 pointer	wnwin, wdwin, wwwin, wipix, wdpix, zpm, bpm
 pointer	sp, str, ztrans, lutfile
 
 int	clgeti(), clgwrd(), nowhite()
 real	clgetr()
+long	clgetl()
 pointer	maskcolor_map(), ds_pmmap(), zsc_pmsection()
 pointer	ds_ulutalloc()
 bool	streq(), clgetb()
@@ -120,8 +126,10 @@ errchk	maskcolor_map, ds_pmmap, zsc_pmsection, mzscale
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (ztrans, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ztrans, sz_val, TY_CHAR)
 
 	# Get overlay mask and colors.
 	call clgstr ("overlay", W_OVRLY(wdes), W_SZSTRING)
@@ -234,10 +242,12 @@ begin
 	ycenter = (W_YE(wnwin) + W_YS(wnwin)) / 2.0 * IM_LEN(ds,2) + 0.5
 
 	#W_XS(wdpix) = max (1, nint (xcenter - (pxsize/2.0*xmag) + 0.5))
-	W_XS(wdpix) = max (1, int (xcenter - (pxsize/2.0*xmag) + 0.5))
+	lval = xcenter - (pxsize/2.0*xmag) + 0.5
+	W_XS(wdpix) = max (1, lval)
 	W_XE(wdpix) = min (IM_LEN(ds,1), nint (W_XS(wdpix)+pxsize*xmag - 1.01))
 	#W_YS(wdpix) = max (1, nint (ycenter - (pysize/2.0*ymag) + 0.5))
-	W_YS(wdpix) = max (1, int (ycenter - (pysize/2.0*ymag) + 0.5))
+	lval = ycenter - (pysize/2.0*ymag) + 0.5
+	W_YS(wdpix) = max (1, lval)
 	W_YE(wdpix) = min (IM_LEN(ds,2), nint (W_YS(wdpix)+pysize*ymag - 1.01))
 
 	# Now adjust the display window to be consistent with the image and
@@ -266,7 +276,8 @@ begin
 	    W_ZT(wdwin) = W_UNITARY
 	else if (streq (Memc[ztrans], "user")) {
 	    W_ZT(wdwin) = W_USER
-	    call salloc (lutfile, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (lutfile, sz_val, TY_CHAR)
 	    call clgstr ("lutfile", Memc[lutfile], SZ_FNAME)
 	    W_UPTR(wdwin) = ds_ulutalloc (Memc[lutfile], z1, z2)
 	} else {
@@ -297,7 +308,7 @@ begin
 
 	if (zscale_flag || (zrange_flag && IM_LIMTIME(im) < IM_MTIME(im))) {
 	    call clgstr ("zmask", W_ZPM(wdes), W_SZSTRING)
-	    nsample = max (100, clgeti ("nsample"))
+	    nsample = max (100, clgetl ("nsample"))
 	    if (nowhite (W_ZPM(wdes), W_ZPM(wdes), W_SZSTRING) > 0) {
 		if (W_ZPM(wdes) == '[')
 		    zpm = zsc_pmsection (W_ZPM(wdes), im)
@@ -356,7 +367,8 @@ begin
 	# structure in the image header, but for now we just make it equal
 	# to the pixel coordinate system.
 
-	call amovi (Memi[wdwin], Memi[wwwin], LEN_WC)
+	sz_val = LEN_WC
+	call amovp (Memp[wdwin], Memp[wwwin], sz_val)
 	W_UPTR(wwwin) = NULL		# should not copy pointers!!
 	call sfree (sp)
 end
@@ -378,10 +390,13 @@ pointer	im, ds, wdes		# image, display, and coordinate descriptors
 char	image[SZ_FNAME]		# image section name
 int	frame			# frame
 
+size_t	sz_val
 real	a, b, c, d, tx, ty
-int	ip, i, j, axis[2]
+pointer	ip
+int	i, j, axis[2]
 real	sx, sy
-int	dx, dy, snx, sny, dnx, dny
+long	dx, dy, lval
+size_t	snx, sny, dnx, dny
 pointer	sp, imname, title, wnwin, wdwin
 pointer	src, dest, region, objref
 long	lv[IM_MAXDIM], pv1[IM_MAXDIM], pv2[IM_MAXDIM]
@@ -390,10 +405,13 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (title,  SZ_LINE,  TY_CHAR)
-        call salloc (region, SZ_FNAME, TY_CHAR)
-        call salloc (objref, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val,  TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (region, sz_val, TY_CHAR)
+        call salloc (objref, sz_val, TY_CHAR)
 
 	# Compute the rotation matrix needed to transform screen pixel coords
 	# to image section coords.
@@ -423,11 +441,13 @@ begin
 	# and determining the axis reduction if any.  pv1 will be the
 	# offset and pv2-pv1 will be the scale.
 
-	call aclrl (pv1, IM_MAXDIM)
-	call aclrl (lv, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call aclrl (pv1, sz_val)
+	call aclrl (lv, sz_val)
 	call imaplv (im, lv, pv1, 2)
-	call amovkl (long(1), lv, IM_MAXDIM)
-	call aclrl (pv2, IM_MAXDIM)
+	lval = 1
+	call amovkl (lval, lv, sz_val)
+	call aclrl (pv2, sz_val)
 	call imaplv (im, lv, pv2, 2)
 
 	i = 1
@@ -503,25 +523,33 @@ char	input[ARB]		#I Input image name
 char	output[maxchar]		#O Output image name
 int	maxchar			#I Maximum characters in output name.
 
+size_t	sz_val
 int	i, fd
 pointer	sp, section, lv, pv1, pv2
+long	lval
 
 int	stropen(), strlen()
 bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (lv, IM_MAXDIM, TY_LONG)
-	call salloc (pv1, IM_MAXDIM, TY_LONG)
-	call salloc (pv2, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (lv, sz_val, TY_LONG)
+	call salloc (pv1, sz_val, TY_LONG)
+	call salloc (pv2, sz_val, TY_LONG)
 
 	# Get endpoint coordinates in original image.
-	call amovkl (long(1), Meml[lv], IM_MAXDIM)
-	call aclrl (Meml[pv1], IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, Meml[lv], sz_val)
+	call aclrl (Meml[pv1], sz_val)
 	call imaplv (im, Meml[lv], Meml[pv1], 2)
-	call amovl (IM_LEN(im,1), Meml[lv], IM_NDIM(im))
-	call aclrl (Meml[pv2], IM_MAXDIM)
+	sz_val = IM_NDIM(im)
+	call amovl (IM_LEN(im,1), Meml[lv], sz_val)
+	sz_val = IM_MAXDIM
+	call aclrl (Meml[pv2], sz_val)
 	call imaplv (im, Meml[lv], Meml[pv2], 2)
 
 	# Set image section.
@@ -532,7 +560,7 @@ begin
 		call fprintf (fd, "*")
 	    else if (Meml[pv1+i-1] != 0) {
 		call fprintf (fd, "%d")
-		call pargi (Meml[pv1+i-1])
+		call pargl (Meml[pv1+i-1])
 	    } else
 		break
 	    call fprintf (fd, ",")
@@ -574,19 +602,26 @@ pointer	im			# input image
 pointer	ds			# output image
 pointer	wdes			# graphics window descriptor
 
+size_t	sz_val
 real	z1, z2, dz1, dz2, px1, px2, py1, py2
-int	i, order, zt, wx1, wx2, wy1, wy2, wy, nx, ny, xblk, yblk, color
+long	wx1, wx2, wy1, wy2
+long	wy, i, xblk, yblk
+size_t	nx, ny
+int	order, zt, color
 pointer	wdwin, wipix, wdpix, ovrly, bpm, pm, uptr
 pointer	in, out, si, si_ovrly, si_bpovrly, ocolors, bpcolors, rtemp
 bool	unitary_greyscale_transformation
 short	lut1, lut2, dz1_s, dz2_s, z1_s, z2_s
 
 bool	fp_equalr()
-int	imstati(), maskcolor()
+pointer	imstatp()
+int	maskcolor()
 pointer	ds_pmmap(), imps2s(), imps2r()
 pointer	sigm2s(), sigm2i(), sigm2r(), sigm2_setup()
+long	nint_rl()
 errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2i, sigm2r, sigm2_setup
 errchk	maskexprn
+include	<nullptr.inc>
 
 begin
 	wdwin = W_WC(wdes,W_DWIN)
@@ -598,10 +633,10 @@ begin
 	px2 = nint (W_XE(wipix))
 	py1 = nint (W_YS(wipix))
 	py2 = nint (W_YE(wipix))
-	wx1 = nint (W_XS(wdpix))
-	wx2 = nint (W_XE(wdpix))
-	wy1 = nint (W_YS(wdpix))
-	wy2 = nint (W_YE(wdpix))
+	wx1 = nint_rl (W_XS(wdpix))
+	wx2 = nint_rl (W_XE(wdpix))
+	wy1 = nint_rl (W_YS(wdpix))
+	wy2 = nint_rl (W_YE(wdpix))
 
 	z1 = W_ZS(wdwin)
 	z2 = W_ZE(wdwin)
@@ -615,8 +650,8 @@ begin
 	si_bpovrly = NULL
 	nx = wx2 - wx1 + 1
 	ny = wy2 - wy1 + 1
-	xblk = INDEFI
-	yblk = INDEFI
+	xblk = INDEFL
+	yblk = INDEFL
 
 	ocolors = W_OCOLORS(wdes)
 	iferr (ovrly = ds_pmmap (W_OVRLY(wdes), im)) {
@@ -624,28 +659,28 @@ begin
 	    ovrly = NULL
 	}
 	if (ovrly != NULL) {
-	    xblk = INDEFI
-	    yblk = INDEFI
-	    si_ovrly = sigm2_setup (ovrly, NULL, px1,px2,nx,xblk,
+	    xblk = INDEFL
+	    yblk = INDEFL
+	    si_ovrly = sigm2_setup (ovrly, NULLPTR, px1,px2,nx,xblk,
 		py1,py2,ny,yblk, -1)
 	}
 
 	bpcolors = W_BPCOLORS(wdes)
 	switch (W_BPDISP(wdes)) {
 	case BPDNONE:
-	    si = sigm2_setup (im, NULL, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
+	    si = sigm2_setup (im, NULLPTR, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
 	case BPDOVRLY:
-	    si = sigm2_setup (im, NULL, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
+	    si = sigm2_setup (im, NULLPTR, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
 	    iferr (bpm = ds_pmmap (W_BPM(wdes), im))
 		bpm = NULL
 	    if (bpm != NULL)
-		si_bpovrly = sigm2_setup (bpm, NULL, px1,px2,nx,xblk,
+		si_bpovrly = sigm2_setup (bpm, NULLPTR, px1,px2,nx,xblk,
 		    py1,py2,ny,yblk, -1)
 	case BPDINTERP:
 	    iferr (bpm = ds_pmmap (W_BPM(wdes), im))
 		bpm = NULL
 	    if (bpm != NULL)
-		pm = imstati (bpm, IM_PMDES)
+		pm = imstatp (bpm, IM_PMDES)
 	    else
 		pm = NULL
 	    si = sigm2_setup (im, pm, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
@@ -667,7 +702,8 @@ begin
 	# intensity and greyscale are in range.
 
 	if (zt == W_USER) {
-	    call alims (Mems[uptr], U_MAXPTS, lut1, lut2)
+	    sz_val = U_MAXPTS
+	    call alims (Mems[uptr], sz_val, lut1, lut2)
 	    dz1_s = short (dz1)
 	    dz2_s = short (dz2)
 	    if (lut2 < dz1_s || lut1 > dz2_s)
@@ -842,10 +878,12 @@ pointer	im			# input image
 pointer	ds			# output image (display) 
 pointer	wdes			# window descriptor
 
-int	wx1,wx2,wy1,wy2		# section of display window filled by image data
-int	dx1,dx2,dy1,dy2		# coords of full display window in device pixels
-int	i, nx
+long	wx1,wx2,wy1,wy2		# section of display window filled by image data
+long	dx1,dx2,dy1,dy2		# coords of full display window in device pixels
+long	i
+size_t	nx
 pointer	wdwin, wdpix
+long	nint_rl()
 pointer	imps2s()
 errchk	imps2s
 
@@ -854,14 +892,14 @@ begin
 	wdpix = W_WC(wdes,W_DPIX)
 
 	# Set display pixels and display window pixels.
-	wx1 = nint (W_XS(wdpix))
-	wx2 = nint (W_XE(wdpix))
-	wy1 = nint (W_YS(wdpix))
-	wy2 = nint (W_YE(wdpix))
-	dx1 = max (1, nint (W_XS(wdwin)))
-	dx2 = min (IM_LEN(ds,1), nint (W_XE(wdwin) - 0.01))
-	dy1 = max (1, nint (W_YS(wdwin)))
-	dy2 = min (IM_LEN(ds,2), nint (W_YE(wdwin) - 0.01))
+	wx1 = nint_rl (W_XS(wdpix))
+	wx2 = nint_rl (W_XE(wdpix))
+	wy1 = nint_rl (W_YS(wdpix))
+	wy2 = nint_rl (W_YE(wdpix))
+	dx1 = max (1, nint_rl (W_XS(wdwin)))
+	dx2 = min (IM_LEN(ds,1), nint_rl (W_XE(wdwin) - 0.01))
+	dy1 = max (1, nint_rl (W_YS(wdwin)))
+	dy2 = min (IM_LEN(ds,2), nint_rl (W_YE(wdwin) - 0.01))
 	nx = dx2 - dx1 + 1
 
 	# Erase lower margin.

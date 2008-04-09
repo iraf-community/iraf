@@ -8,7 +8,8 @@ include	"iis.h"
 
 procedure zsttim (chan, what, lvalue)
 
-int	chan[ARB], what
+int	chan[ARB]
+int	what
 long	lvalue
 
 include	"iis.com"

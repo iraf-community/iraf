@@ -11,8 +11,8 @@ define	W_FRAME		Memi[P2I($1+1)]		# device frame number
 define	W_XRES		Memi[P2I($1+2)]		# device resolution, x
 define	W_YRES		Memi[P2I($1+3)]		# device resolution, y
 define	W_BPDISP	Memi[P2I($1+4)]		# bad pixel display option
-define	W_BPCOLORS	Memi[P2I($1+5)]		# overlay colors
-define	W_OCOLORS	Memi[P2I($1+6)]		# badpixel colors
+define	W_BPCOLORS	Memp[$1+5]		# overlay colors
+define	W_OCOLORS	Memp[$1+6]		# badpixel colors
 define	W_IMSECT	Memc[P2C($1+10)]	# image section
 define	W_OVRLY		Memc[P2C($1+60)]	# overlay mask
 define	W_BPM		Memc[P2C($1+110)]	# bad pixel mask
@@ -31,7 +31,7 @@ define	W_YT		Memi[P2I($1+5)]		# Y transformation type
 define	W_ZS		Memr[P2R($1+6)]		# starting Z value (greyscale)
 define	W_ZE		Memr[P2R($1+7)]		# ending Z value
 define	W_ZT		Memi[P2I($1+8)]		# Z transformation type
-define	W_UPTR		Memi[P2I($1+9)] 		# LUT when ZT=USER
+define	W_UPTR		Memp[$1+9] 		# LUT when ZT=USER
 
 # WC types.
 

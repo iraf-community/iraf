@@ -8,8 +8,9 @@ procedure zardim (chan, buf, nbytes, offset)
 
 int	chan[ARB]
 short	buf[ARB]
-int	nbytes
+size_t	nbytes
 long	offset
+
 int	device
 
 begin

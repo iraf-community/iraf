@@ -10,7 +10,7 @@ procedure iisrd (chan, buf, nbytes, offset)
 
 int	chan[ARB]
 short	buf[ARB]
-int	nbytes
+size_t	nbytes
 long	offset
 
 long	off1, off2

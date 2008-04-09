@@ -33,9 +33,9 @@ procedure imd_setmapping (reg, sx, sy, snx, sny, dx, dy, dnx, dny, objref)
 
 char	reg[SZ_FNAME]				#i region name
 real	sx, sy					#i source raster
-int	snx, sny
-int	dx, dy					#i destination raster
-int	dnx, dny
+long	snx, sny
+long	dx, dy					#i destination raster
+long	dnx, dny
 char	objref[SZ_FNAME]			#i object reference
 
 bool	streq()
@@ -69,9 +69,9 @@ int procedure imd_getmapping (reg, sx, sy, snx, sny, dx, dy, dnx, dny, objref)
 
 char	reg[SZ_FNAME]				#o region name
 real	sx, sy					#o source raster
-int	snx, sny
-int	dx, dy					#o destination raster
-int	dnx, dny
+long	snx, sny
+long	dx, dy					#o destination raster
+long	dnx, dny
 char	objref[SZ_FNAME]			#o object reference
 
 include "iis.com"
@@ -101,11 +101,12 @@ int procedure imd_query_map (wcs, reg, sx,sy,snx,sny, dx,dy,dnx,dny, objref)
 int	wcs					#i WCS number of request
 char	reg[SZ_FNAME]				#o region name
 real	sx, sy					#o source raster
-int	snx, sny
-int	dx, dy					#o destination raster
-int	dnx, dny
+long	snx, sny
+long	dx, dy					#o destination raster
+long	dnx, dny
 char	objref[SZ_FNAME]			#o object reference
 
+size_t	sz_val
 pointer	sp, wcstext, ip, ds
 int	fd, frame, chan, status, wcs_status, nl
 
@@ -117,8 +118,9 @@ define	done_	91
 
 begin
 	call smark (sp)
-	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
-	call aclrc (Memc[wcstext], SZ_WCSTEXT)
+	sz_val = SZ_WCSTEXT
+	call salloc (wcstext, sz_val, TY_CHAR)
+	call aclrc (Memc[wcstext], sz_val)
 
 	wcs_status = ERR
         iis_valid = NO
@@ -141,11 +143,12 @@ begin
 
             call iishdr (IREAD+PACKED, SZ_WCSTEXT, WCS, 1, 0, chan, wcs)
             call iisio (Memc[wcstext], SZ_WCSTEXT, status)
-            if (status > 0)
-                call strupk (Memc[wcstext], Memc[wcstext], SZ_WCSTEXT)
-            else
+            if (status > 0) {
+		sz_val = SZ_WCSTEXT
+                call strupk (Memc[wcstext], Memc[wcstext], sz_val)
+	    } else {
 		goto done_
-
+	    }
 
 	    # Skip the wcs part of the string, we only want the mapping.
 	    nl = 0
@@ -167,12 +170,12 @@ begin
                     call gargwrd (reg, SZ_FNAME)
                     call gargr (sx)
                     call gargr (sy)
-                    call gargi (snx)
-                    call gargi (sny)
-                    call gargi (dx)
-                    call gargi (dy)
-                    call gargi (dnx)
-                    call gargi (dny)
+                    call gargl (snx)
+                    call gargl (sny)
+                    call gargl (dx)
+                    call gargl (dy)
+                    call gargl (dnx)
+                    call gargl (dny)
 
                     if (fscan (fd) != EOF) {
                         call gargstr (objref, SZ_FNAME)

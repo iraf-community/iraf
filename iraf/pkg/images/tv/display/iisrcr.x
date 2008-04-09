@@ -13,6 +13,8 @@ procedure iisrcr (status, xcur, ycur)
 
 int	status, xcur, ycur
 short	cursor[LEN_CURSOR]
+int	ival
+int	modi()
 include	"iis.com"
 
 begin
@@ -27,6 +29,8 @@ begin
 	}
 
 	status = cursor[1]
-	xcur = MCXSCALE * mod (cursor[2] + 31, iis_xdim)
-	ycur = MCYSCALE * mod (cursor[3] + 31, iis_ydim)
+	ival = cursor[2] + 31
+	xcur = MCXSCALE * modi (ival, iis_xdim)
+	ival = cursor[3] + 31
+	ycur = MCYSCALE * modi (ival, iis_ydim)
 end

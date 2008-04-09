@@ -14,23 +14,25 @@ procedure findz (im, z1, z2, zfrac, maxcols, nsample_lines)
 
 pointer	im
 real	z1, z2, zfrac
-int	maxcols, nsample_lines
+size_t	maxcols
+size_t	nsample_lines
 
 real	rmin, rmax
 real	frac
-int	imin, imax, ncols, nlines
-int	i, n, step, sample_size, imlines
+long	imin, imax
+size_t	ncols, nlines
+long	i, n, step, sample_size, imlines
 
 pointer	sp, buf
 pointer	imgl2r()
 include	"iis.com"
 
 begin
-	call smark (sp)
-	call salloc (buf, ncols, TY_REAL)
-
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
+
+	call smark (sp)
+	call salloc (buf, ncols, TY_REAL)
 
 	# Try to include a constant number of pixels in the sample
 	# regardless of the image size.  The entire image is used if we

@@ -12,9 +12,10 @@ procedure maxmin (im, zmin, zmax, nsample_lines)
 
 pointer	im
 real	zmin, zmax		# min and max intensity values
-int	nsample_lines		# amount of image to sample
+size_t	nsample_lines		# amount of image to sample
 
-int	step, ncols, nlines, sample_size, imlines, i
+long	step, sample_size, imlines, i
+size_t	ncols, nlines
 real	minval, maxval
 pointer	imgl2r()
 include	"iis.com"

@@ -8,23 +8,28 @@ include	"iis.h"
 procedure iishdr (id, count, subunit, x, y, z, t)
 
 int	id, count, subunit, x, y, z, t
+
+size_t	sz_val
 int	i, sum
 include	"iis.com"
 
 begin
-	call achtiu (id, XFERID(hdr), 1)
-	call achtiu (count, THINGCT(hdr), 1) 
-	call achtiu (subunit, SUBUNIT(hdr), 1)
-	call achtiu (x, XREG(hdr), 1)
-	call achtiu (y, YREG(hdr), 1)
-	call achtiu (z, ZREG(hdr), 1)
-	call achtiu (t, TREG(hdr), 1)
+	sz_val = 1
+	call achtiu (id, XFERID(hdr), sz_val)
+	call achtiu (count, THINGCT(hdr), sz_val) 
+	call achtiu (subunit, SUBUNIT(hdr), sz_val)
+	call achtiu (x, XREG(hdr), sz_val)
+	call achtiu (y, YREG(hdr), sz_val)
+	call achtiu (z, ZREG(hdr), sz_val)
+	call achtiu (t, TREG(hdr), sz_val)
 	CHECKSUM(hdr) = 1
 	 
 	if (THINGCT(hdr) > 0)
 	    THINGCT(hdr) = -THINGCT(hdr)
 	sum = 0
-	for (i = 1; i <= LEN_IISHDR; i = i + 1)
+	for (i = 1; i <= LEN_IISHDR; i = i + 1) {
 	    sum = sum + hdr[i]
-	call achtiu (-sum, CHECKSUM(hdr), 1)
+	}
+	sz_val = 1
+	call achtiu (-sum, CHECKSUM(hdr), sz_val)
 end

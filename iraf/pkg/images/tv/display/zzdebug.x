@@ -16,21 +16,22 @@ define	TWOPI	6.23
 procedure t_mktest()
 
 char	imname[SZ_FNAME]
-int	nx, ny
-int	i, j
+long	nx, ny
+long	i, j
 real	period, xcen, ycen, radius
 pointer	im, line
 
-int	clgeti()
+long	clgetl()
 real	clgetr()
 pointer	immap(), impl2r()
+include	<nullptr.inc>
 
 begin
 	call clgstr ("imname", imname, SZ_FNAME)
-	im = immap (imname, NEW_IMAGE, 0)
+	im = immap (imname, NEW_IMAGE, NULLPTR)
 
-	nx = clgeti ("nx")
-	ny = clgeti ("ny")
+	nx = clgetl ("nx")
+	ny = clgetl ("ny")
 	period = clgetr ("period")
 
 	IM_LEN(im,1) = nx
@@ -57,19 +58,24 @@ procedure t_sigl2 ()
 
 char	imname[SZ_FNAME]
 pointer	im, si, buf
-int	i, nx, ny, xblk, yblk
+long	i, xblk, yblk
+size_t	nx, ny
+real	rval0, rval1
 pointer	sigl2_setup(), sigl2s(), immap()
+include	<nullptr.inc>
 
 begin
 	call clgstr ("imname", imname, SZ_FNAME)
-	im = immap (imname, READ_ONLY, 0)
+	im = immap (imname, READ_ONLY, NULLPTR)
 
 	nx = IM_LEN(im,1)
 	ny = IM_LEN(im,2)
 
-	xblk = INDEFI
-	yblk = INDEFI
-	si = sigl2_setup (im, 1.0,real(nx),nx,xblk, 1.0,real(ny),ny,yblk,0)
+	xblk = INDEFL
+	yblk = INDEFL
+	rval0 = nx
+	rval1 = ny
+	si = sigl2_setup (im, 1.0,rval0,nx,xblk, 1.0,rval1,ny,yblk,0)
 
 	do i = 1, ny
 	    buf = sigl2s (si, i)
@@ -84,24 +90,28 @@ end
 procedure t_wrimage ()
 
 char	imname[SZ_FNAME]
-int	i, ncols, nlines
+long	i, ncols, nlines, c_1
 pointer	im, buf
-int	clgeti()
+long	clgetl()
 pointer	immap(), imps2s()
+include	<nullptr.inc>
 
 begin
-	call clgstr ("imname", imname, SZ_FNAME)
-	im = immap (imname, NEW_IMAGE, 0)
+	c_1 = 1
 
-	ncols  = clgeti ("ncols")
-	nlines = clgeti ("nlines")
+	call clgstr ("imname", imname, SZ_FNAME)
+	im = immap (imname, NEW_IMAGE, NULLPTR)
+
+	ncols  = clgetl ("ncols")
+	nlines = clgetl ("nlines")
 
 	IM_LEN(im,1) = ncols
 	IM_LEN(im,2) = nlines
 	IM_PIXTYPE(im) = TY_SHORT
 
-	do i = 1, nlines
-	    buf = imps2s (im, 1, ncols, i, i)
+	do i = 1, nlines {
+	    buf = imps2s (im, c_1, ncols, i, i)
+	}
 
 	call imunmap (im)
 end
@@ -113,18 +123,19 @@ end
 procedure t_zscale()
 
 char	imname[SZ_FNAME]
-int	sample_size, len_stdline
+size_t	sample_size, len_stdline
 real	z1, z2, contrast
-int	clgeti()
+long	clgetl()
 real	clgetr()
 pointer	im, immap()
+include	<nullptr.inc>
 
 begin	
 	call clgstr ("imname", imname, SZ_FNAME)
-	im = immap (imname, READ_ONLY, 0)
+	im = immap (imname, READ_ONLY, NULLPTR)
 
-	sample_size = clgeti ("npix")
-	len_stdline = clgeti ("stdline")
+	sample_size = clgetl ("npix")
+	len_stdline = clgetl ("stdline")
 	contrast    = clgetr ("contrast")
 
 	call zscale (im, z1, z2, contrast, sample_size, len_stdline)

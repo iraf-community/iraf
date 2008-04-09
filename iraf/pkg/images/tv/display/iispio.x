@@ -12,20 +12,30 @@ procedure iispio (buf, nx, ny)
 short	buf[nx,ny]		# Cell array
 int	nx, ny			# length, number of image lines
 
+size_t	sz_val
+size_t	c_1
+long	c_0
 pointer	iobuf
 bool	first_time
-int	xferid, status, nbytes, szline, i
+int	xferid, i
+long	status
+size_t	nbytes, szline
 int	and()
 include	"iis.com"
 data	first_time /true/
 
 begin
+	c_0 = 0
+	c_1 = 1
+
 	if (first_time) {
-	    if (packit)
+	    if (packit) {
 		i = IIS_MAXBUFSIZE
-	    else
+	    } else {
 		i = IIS_MAXBUFSIZE * (SZ_SHORT * SZB_CHAR)
-	    call malloc (iobuf, i, TY_SHORT)
+	    }
+	    sz_val = i
+	    call malloc (iobuf, sz_val, TY_SHORT)
 	    first_time = false
 	}
 
@@ -42,9 +52,12 @@ begin
 	xferid = XFERID(hdr)
 
 	# Transmit the packet header.
-	if (swap_bytes)
-	    call bswap2 (hdr, 1, hdr, 1, SZB_IISHDR)
-	call zawrgd (iischan, hdr, SZB_IISHDR, 0)
+	if (swap_bytes) {
+	    sz_val = SZB_IISHDR
+	    call bswap2 (hdr, c_1, hdr, c_1, sz_val)
+	}
+	sz_val = SZB_IISHDR
+	call zawrgd (iischan, hdr, sz_val, c_0)
 	call iiswt  (iischan, status)
 	if (status == ERR) {
 	    call intr_enable()
@@ -66,16 +79,20 @@ begin
 	if (and (xferid, IREAD) != 0) {
 	    # Read from the IIS.
 
-	    call zardgd (iischan, Mems[iobuf], nbytes, 0)
+	    call zardgd (iischan, Mems[iobuf], nbytes, c_0)
 	    call iiswt  (iischan, status)
 
 	    # Unpack and line flip the packed data.
 	    if (packit) {
-		do i = 0, ny-1
-		    call achtbs (Mems[iobuf+i*szline], buf[1,ny-i], iis_xdim)
+		do i = 0, ny-1 {
+		    # arg1: incompatible pointer
+		    sz_val = iis_xdim
+		    call achtbs (Mems[iobuf+i*szline], buf[1,ny-i], sz_val)
+		}
 	    } else {
-		do i = 0, ny-1
+		do i = 0, ny-1 {
 		    call amovs  (Mems[iobuf+i*szline], buf[1,ny-i], szline)
+		}
 	    }
 
 	} else {
@@ -83,14 +100,18 @@ begin
 
 	    # Bytepack the image lines, doing a line flip in the process.
 	    if (packit) {
-		do i = 0, ny-1
-		    call achtsb (buf[1,ny-i], Mems[iobuf+i*szline], iis_xdim)
+		do i = 0, ny-1 {
+		    # arg2: incompatible pointer
+		    sz_val = iis_xdim
+		    call achtsb (buf[1,ny-i], Mems[iobuf+i*szline], sz_val)
+		}
 	    } else {
-		do i = 0, ny-1
+		do i = 0, ny-1 {
 		    call amovs  (buf[1,ny-i], Mems[iobuf+i*szline], szline)
+		}
 	    }
 
-	    call zawrgd (iischan, Mems[iobuf], nbytes, 0)
+	    call zawrgd (iischan, Mems[iobuf], nbytes, c_0)
 	}
 
 	call intr_enable()

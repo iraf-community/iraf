@@ -7,7 +7,9 @@ include	"zdisplay.h"
 
 procedure zawtim (chan, nbytes)
 
-int	chan[ARB], nbytes
+int	chan[ARB]
+long	nbytes
+
 int	device
 
 begin

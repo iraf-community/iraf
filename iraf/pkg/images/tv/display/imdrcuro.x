@@ -29,16 +29,17 @@ procedure imdrcuro (tty, outstr, maxch, wcs, pause)
 
 pointer	tty			#I graphcap descriptor for device
 char    outstr[maxch]           #O formatted output cursor value
-int     maxch                   #I max chars out
-int     wcs                     #I desired wcs: 0=framecoords, 1=imagecoords
-int     pause                   #I blocking cursor read? (YES|NO)
+int	maxch                   #I max chars out
+int	wcs                     #I desired wcs: 0=framecoords, 1=imagecoords
+int	pause                   #I blocking cursor read? (YES|NO)
 
+size_t	sz_val
 short	cursor[3]
 char	key, str[1]
 short	split[LEN_SPLIT]
 pointer	sp, strval, imcurval
 real	a, b, c, d, tx, ty, wx, wy
-int     status, frame, tid, z, n, keystat, sx, sy, ip, chan, i
+int	status, frame, tid, z, n, keystat, sx, sy, ip, chan, i
 
 bool	mark_cursor
 data	mark_cursor /false/
@@ -50,8 +51,10 @@ include "iis.com"
 
 begin
 	call smark (sp)
-	call salloc (strval, SZ_LINE, TY_CHAR)
-	call salloc (imcurval, SZB_IMCURVAL, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (strval, sz_val, TY_CHAR)
+	sz_val = SZB_IMCURVAL
+	call salloc (imcurval, sz_val, TY_CHAR)
 
 	if (ttygetb (tty, "LC")) {
 	    # Logical image cursor read; the display server supports the
@@ -67,10 +70,12 @@ begin
 	    call iishdr (tid, SZB_IMCURVAL, COMMAND+IMCURSOR, 0,0, wcs, 0)
 
 	    call iisio (Memc[imcurval], SZB_IMCURVAL, status)
-	    if (status <= 0)
+	    if (status <= 0) {
 		call strcpy ("EOF\n", outstr, maxch)
-	    else
-		call strupk (Memc[imcurval], outstr, maxch)
+	    } else {
+		sz_val = maxch
+		call strupk (Memc[imcurval], outstr, sz_val)
+	    }
 
 	} else {
 	    # IIS compatible cursor read.  Implement the logical cursor read
@@ -155,9 +160,12 @@ again_
 
 	    # Mark the cursor position by editing the frame buffer.
 	    if (mark_cursor && keystat > 1 && key != '\004' && key != '\032') {
-		do i = 1, 3
+		do i = 1, 3 {
 		    cursor[i] = 1
-		call achtsb (cursor, cursor, 3)
+		}
+		sz_val = 3
+		# arg2: incompatible pointer
+		call achtsb (cursor, cursor, sz_val)
 		
 		call iishdr (IWRITE+BYPASSIFM+PACKED+VRETRACE, 3, REFRESH,
 		    or(sx-1,ADVXONTC), or(sy-1,ADVYONXOV),

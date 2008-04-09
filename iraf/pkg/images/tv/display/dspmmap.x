@@ -24,6 +24,7 @@ int	nowhite(), errcode()
 bool	streq()
 pointer	im_pmmap(), ds_pmimmap()
 errchk	ds_pmimmap, ds_match
+include	<nullptr.inc>
 
 begin
 	if (nowhite (pmname, fname, SZ_FNAME) == 0)
@@ -38,7 +39,7 @@ begin
 		return (NULL)
 	}
 
-	iferr (im = im_pmmap (fname, READ_ONLY, NULL)) {
+	iferr (im = im_pmmap (fname, READ_ONLY, NULLPTR)) {
 	    switch (errcode()) {
 	    case SYS_FOPNNEXFIL, SYS_PLBADSAVEF:
 		im = ds_pmimmap (fname, refim)
@@ -62,23 +63,31 @@ pointer procedure ds_pmimmap (pmname, refim)
 char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 
-int	i, ndim, npix, val
+size_t	sz_val
+long	i, lval
+size_t	ndim, npix
+int	val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
-int	imstati(), imgnli()
+pointer	imstatp()
+int	imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	immap, mw_openim, im_pmmapo
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, Meml[v1], sz_val)
+	call amovkl (lval, Meml[v2], sz_val)
 
-	im_in = immap (pmname, READ_ONLY, 0)
-	pm = imstati (im_in, IM_PMDES)
+	im_in = immap (pmname, READ_ONLY, NULLPTR)
+	pm = imstatp (im_in, IM_PMDES)
 	if (pm != NULL)
 	    return (im_in)
 	pm = pm_newmask (im_in, 27)
@@ -121,15 +130,18 @@ procedure ds_match (im, refim)
 pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 
-int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
+long	i, j, k, l, i1, i2, j1, j2, lval
+int	val
+size_t	nc, nl, ncpm, nlpm, nx
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
 pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 
-int	imstati()
+pointer	imstatp()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
 errchk	pm_open, mw_openim, im_pmmapo
+include	<nullptr.inc>
 
 begin
 	if (im == NULL)
@@ -143,7 +155,7 @@ begin
 
 	# If the mask is empty and the sizes are the same then it does not
 	# matter if the two are actually matched in physical coordinates.
-	pm = imstati (im, IM_PMDES)
+	pm = imstatp (im, IM_PMDES)
 	if (pm_empty(pm) && nc == ncpm && nl == nlpm)
 	    return
 
@@ -164,8 +176,10 @@ begin
 	call mw_vmuld (lt, lt[5], lt[5], 2)
 	lt[5] = lt2[5] - lt[5]
 	lt[6] = lt2[6] - lt[6]
-	do i = 1, 6
-	    lt[i] = nint (1D6 * (lt[i]-int(lt[i]))) / 1D6 + int(lt[i])
+	do i = 1, 6 {
+	    lval = lt[i]
+	    lt[i] = nint (1D6 * (lt[i]-lval)) / 1D6 + lval
+	}
 
 	# Check for a rotation.  For now don't allow any rotation.
 	if (lt[2] != 0. || lt[3] != 0.)
@@ -184,9 +198,9 @@ begin
 
 	# Create a new pixel mask of the required size and offset.
 	# Do dummy image I/O to set the header.
-	pmnew = pm_open (NULL)
+	pmnew = pm_open (NULLPTR)
 	call pm_ssize (pmnew, 2, IM_LEN(refim,1), 27)
-	imnew = im_pmmapo (pmnew, NULL)
+	imnew = im_pmmapo (pmnew, NULLPTR)
 	bufref = imgl1i (imnew)
 
 	# Compute region of mask overlapping the reference image.
@@ -270,5 +284,5 @@ begin
 	call mw_close (mw)
 	call imunmap (im)
 	im = imnew
-	call imseti (im, IM_PMDES, pmnew)
+	call imsetp (im, IM_PMDES, pmnew)
 end

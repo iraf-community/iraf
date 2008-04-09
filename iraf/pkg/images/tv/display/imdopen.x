@@ -7,7 +7,9 @@ include <knet.h>
 int procedure imdopen (fname, access_mode) 
 
 char	fname[ARB]
-int	access_mode, fopnbf()
+int	access_mode
+
+int	fopnbf()
 extern	zopnim(), zclsim(), zardim(), zawrim(), zawtim(), zsttim()
 
 begin

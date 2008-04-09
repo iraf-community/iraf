@@ -13,6 +13,7 @@ begin
 	device = chan[1] / DEVCODE
 	switch (device) {
 	case IIS_CHAN:
+	    # ??? Where is this ???
 	    call iisclr (chan)
 	}
 end

@@ -14,9 +14,9 @@ int	iis_version		# WCS version
 int	iis_valid		# valid mapping info flag
 char	iis_region[SZ_FNAME]	# region name
 real	iis_sx,  iis_sy		# source raster offset
-int	iis_snx, iis_sny	# source raster size
-int	iis_dx,  iis_dy		# dest raster offset
-int	iis_dnx, iis_dny	# dest raster size
+long	iis_snx, iis_sny	# source raster size
+long	iis_dx,  iis_dy		# dest raster offset
+long	iis_dnx, iis_dny	# dest raster size
 char	iis_objref[SZ_FNAME]	# object reference
 
 common	/iiscom/ iischan, iisnopen, iisframe, iis_xdim, iis_ydim, iis_config,

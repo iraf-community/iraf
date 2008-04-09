@@ -11,12 +11,14 @@ procedure iisers (chan)
 int	chan[ARB]
 short	erase
 
+size_t	sz_val
 int	status, tid
 int	iisflu(), andi()
 include	"iis.com"
 
 begin
-	call achtiu (andi (ERASE, 0177777B), erase, 1)
+	sz_val = 1
+	call achtiu (andi (ERASE, 0177777B), erase, sz_val)
 
 	# IMTOOL special - IIS frame bufrer configuration code.
 	tid = IWRITE+BYPASSIFM+BLOCKXFER

@@ -22,16 +22,19 @@ procedure zscale (im, z1, z2, contrast, optimal_sample_size, len_stdline)
 pointer	im			# image to be sampled
 real	z1, z2			# output min and max greyscale values
 real	contrast		# adj. to slope of transfer function
-int	optimal_sample_size	# desired number of pixels in sample
-int	len_stdline		# optimal number of pixels per line
+size_t	optimal_sample_size	# desired number of pixels in sample
+size_t	len_stdline		# optimal number of pixels per line
 
-int	nc, nl
+size_t	sz_val
+long	nc, nl
 pointer	sp, section, zpm, zsc_pmsection()
 errchk	zsc_pmsection, mzscale
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Make the sample image section.
 	switch (IM_NDIM(im)) {
@@ -41,13 +44,13 @@ begin
 	    nc = max (1, min (IM_LEN(im,1), len_stdline))
 	    nl = max (1, min (IM_LEN(im,2), optimal_sample_size / nc))
 	    call sprintf (Memc[section], SZ_FNAME, "[*:%d,*:%d]")
-		call pargi (IM_LEN(im,1) / nc)
-		call pargi (IM_LEN(im,2) / nl)
+		call pargl (IM_LEN(im,1) / nc)
+		call pargl (IM_LEN(im,2) / nl)
 	}
 
 	# Make a mask and compute the greyscale limits.
 	zpm = zsc_pmsection (Memc[section], im)
-	call mzscale (im, zpm, NULL, contrast, optimal_sample_size, z1, z2)
+	call mzscale (im, zpm, NULLPTR, contrast, optimal_sample_size, z1, z2)
 	call imunmap (zpm)
 	call sfree (sp)
 end
@@ -65,21 +68,28 @@ pointer	im			#I image to be sampled
 pointer	zpm			#I pixel mask for sampling
 pointer	bpm			#I bad pixel mask
 real	contrast		#I contrast parameter
-int	maxpix			#I maximum number of pixels in sample
+size_t	maxpix			#I maximum number of pixels in sample
 real	z1, z2			#O output min and max greyscale values
 
-int	i, ndim, nc, nl, npix, nbp
+size_t	sz_val
+int	ndim
+long	i, lval
+size_t	nc, nl, npix, nbp
 pointer	sp, section, v, sample, zmask, bp, zim, pmz, pmb, buf
+real	rval
 
-int	imstati(), imgnlr()
+pointer	imstatp()
+int	imgnlr()
 pointer	zsc_pmsection()
 bool	pm_linenotempty()
 errchk	zsc_pmsection, zsc_zlimits
 
 begin
 	call smark (sp)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 	call salloc (sample, maxpix, TY_REAL)
 	zmask = NULL
 	bp = NULL
@@ -94,26 +104,29 @@ begin
 	    case 1:
 		call sprintf (Memc[section], SZ_FNAME, "[*]")
 	    default:
-		i = max (1., sqrt ((nc-1)*(nl-1) / real (maxpix)))
+		rval = maxpix
+		i = max (1., sqrt ((nc-1)*(nl-1) / rval))
 		call sprintf (Memc[section], SZ_FNAME, "[*:%d,*:%d]")
-		    call pargi (i)
-		    call pargi (i)
+		    call pargl (i)
+		    call pargl (i)
 	    }
 	    zim = zsc_pmsection (Memc[section], im)
-	    pmz = imstati (zim, IM_PMDES)
+	    pmz = imstatp (zim, IM_PMDES)
 	} else
-	    pmz = imstati (zpm, IM_PMDES)
+	    pmz = imstatp (zpm, IM_PMDES)
 
 	# Set bad pixel mask.
 	if (bpm != NULL)
-	    pmb = imstati (bpm, IM_PMDES)
+	    pmb = imstatp (bpm, IM_PMDES)
 	else
 	    pmb = NULL
 
 	# Get the sample up to maxpix pixels.
 	npix = 0
 	nbp = 0
-	call amovkl (long(1), Memi[v], IM_MAXDIM)
+	lval = 1
+	sz_val = IM_MAXDIM
+	call amovkl (lval, Meml[v], sz_val)
 	repeat {
 	    if (pm_linenotempty (pmz, Meml[v])) {
 		if (zmask == NULL)
@@ -173,15 +186,21 @@ pointer procedure zsc_pmsection (section, refim)
 char	section[ARB]		#I Image section
 pointer	refim			#I Reference image pointer
 
-int	i, j, ip, ndim, temp, a[2], b[2], c[2], rop, ctoi()
+long	c_1
+size_t	c_2
+int	ip, ndim, rop
+long	i, j, temp, a[2], b[2], c[2]
+int	ctol()
 pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 define  error_  99
 
 begin
         # Decode the section string.
-	call amovki (1, a, 2)
-	call amovki (1, b, 2)
-	call amovki (1, c, 2)
+	c_1 = 1
+	c_2 = 2
+	call amovkl (c_1, a, c_2)
+	call amovkl (c_1, b, c_2)
+	call amovkl (c_1, c, c_2)
 	ndim = min (2, IM_NDIM(refim))
 	do i = 1, ndim
 	    b[i] = IM_LEN(refim,i)
@@ -199,11 +218,11 @@ begin
 		# Get a:b:c.  Allow notation such as "-*:c"
 		# (or even "-:c") where the step is obviously negative.
 
-		if (ctoi (section, ip, temp) > 0) {                 # a
+		if (ctol (section, ip, temp) > 0) {                 # a
 		    a[i] = temp
 		    if (section[ip] == ':') {
 			ip = ip + 1
-			if (ctoi (section, ip, b[i]) == 0)             # a:b
+			if (ctol (section, ip, b[i]) == 0)             # a:b
 			    goto error_
 		    } else
 			b[i] = a[i]
@@ -218,7 +237,7 @@ begin
 		    ip = ip + 1
 		if (section[ip] == ':') {                           # ..:step
 		    ip = ip + 1
-		    if (ctoi (section, ip, c[i]) == 0)
+		    if (ctol (section, ip, c[i]) == 0)
 			goto error_
 		    else if (c[i] == 0)
 			goto error_
@@ -311,15 +330,20 @@ define	MAX_ITERATIONS	5		# maximum number of fitline iterations
 procedure zsc_zlimits (sample, npix, contrast, z1, z2)
 
 real	sample[ARB]	#I Sample of pixel values (possibly resorted)
-int	npix		#I Number of pixels
+size_t	npix		#I Number of pixels
 real	contrast	#I Contrast algorithm parameter
 real	z1, z2		#O Z transform limits
 
-int	center_pixel, minpix, ngoodpix, ngrow, zsc_fit_line()
+long	center_pixel, minpix, lval, c_2
+size_t	ngoodpix, ngrow
+size_t	zsc_fit_line()
+long	modl(), nint_rl()
 real	zmin, zmax, median
 real	zstart, zslope
 
 begin
+	c_2 = 2
+
 	# Check for a sufficient sample.
 	if (npix < MIN_NPIXELS)
 	    call error (1, "Insufficient sample pixels found")
@@ -339,10 +363,12 @@ begin
 	zmax = sample[npix]
 
 	center_pixel = (npix + 1) / 2
-	if (mod (npix, 2) == 1)
+	lval = npix
+	if (modl (lval, c_2) == 1) {
 	    median = sample[center_pixel]
-	else
+	} else {
 	    median = (sample[center_pixel] + sample[center_pixel+1]) / 2
+	}
 
 	# Fit a line to the sorted sample vector.  If more than half of the
 	# pixels in the sample are rejected give up and return the full range.
@@ -350,8 +376,9 @@ begin
 	# accordingly and compute Z1 and Z2, the y intercepts at indices 1 and
 	# npix.
 
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
-	ngrow = max (1, nint (npix * .01))
+	lval = npix * MAX_REJECT
+	minpix = max (MIN_NPIXELS, lval)
+	ngrow = max (1, nint_rl (npix * .01))
 	ngoodpix = zsc_fit_line (sample, npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 
@@ -374,21 +401,23 @@ end
 # there are no pixels left.  The number of pixels left after pixel rejection
 # is returned as the function value.
 
-int procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
+size_t procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
 
 real	data[npix]		# data to be fitted
-int	npix			# number of pixels before rejection
+size_t	npix			# number of pixels before rejection
 real	zstart			# Z-value of pixel data[1]	(output)
 real	zslope			# dz/pixel			(output)
 real	krej			# k-sigma pixel rejection factor
-int	ngrow			# number of pixels of growing
+size_t	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
-int	i, ngoodpix, last_ngoodpix, minpix, niter
+long	i, minpix, lval
+size_t	ngoodpix, last_ngoodpix
+int	niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
 pointer	sp, flat, badpix, normx
-int	zsc_reject_pixels(), zsc_compute_sigma()
+size_t	zsc_reject_pixels(), zsc_compute_sigma()
 
 begin
 	call smark (sp)
@@ -447,7 +476,8 @@ begin
 	# marking the pixel as rejected.
 
 	ngoodpix = npix
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
+	lval = npix * MAX_REJECT
+	minpix = max (MIN_NPIXELS, lval)
 
 	for (niter=1;  niter <= maxiter;  niter=niter+1) {
 	    last_ngoodpix = ngoodpix
@@ -500,28 +530,30 @@ procedure zsc_flatten_data (data, flat, x, npix, z0, dz)
 real	data[npix]		# raw data array
 real	flat[npix]		# flattened data  (output)
 real	x[npix]			# x value of each pixel
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 real	z0, dz			# z-intercept, dz/dx of fitted line
-int	i
+long	i
 
 begin
-	do i = 1, npix
+	do i = 1, npix {
 	    flat[i] = data[i] - (x[i] * dz + z0)
+	}
 end
 
 
 # ZSC_COMPUTE_SIGMA -- Compute the root mean square deviation from the
 # mean of a flattened array.  Ignore rejected pixels.
 
-int procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
+size_t procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
 
 real	a[npix]			# flattened data array
 short	badpix[npix]		# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 real	mean, sigma		# (output)
 
 real	pixval
-int	i, ngoodpix
+long	i
+size_t	ngoodpix
 double	sum, sumsq, temp
 
 begin
@@ -569,19 +601,20 @@ end
 # fact that bad pixels tend to be clumped.  The number of pixels left in the
 # fit is returned as the function value.
 
-int procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
-				 sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
+size_t procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
+				    sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
 
 real	data[npix]		# raw data array
 real	flat[npix]		# flattened data array
 real	normx[npix]		# normalized x values of pixels
 short	badpix[npix]		# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 double	sumxsqr,sumxz,sumx,sumz	# matrix sums
 real	threshold		# threshold for pixel rejection
-int	ngrow			# number of pixels of growing
+size_t	ngrow			# number of pixels of growing
 
-int	ngoodpix, i, j
+size_t	ngoodpix
+long	i, j
 real	residual, lcut, hcut
 double	x, z
 

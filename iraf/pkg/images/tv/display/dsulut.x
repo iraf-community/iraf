@@ -17,15 +17,18 @@ char	fname[SZ_FNAME]		# Name of file with intensity, greyscale values
 real	z1			# Intensity mapped to minimum gs value
 real	z2			# Intensity mapped to maximum gs value
 
+size_t	sz_val
 pointer	lut, sp, x, y
-int	nvalues, i, j, x1, x2, y1
+size_t	nvalues
+long	i, j, x1, x2, y1
 real	delta_gs, delta_xv, slope
 errchk	ds_ulutread, ds_ulutsort, malloc		
 
 begin
 	call smark (sp)
-	call salloc (x, U_MAXPTS, TY_REAL)	
-	call salloc (y, U_MAXPTS, TY_REAL)
+	sz_val = U_MAXPTS
+	call salloc (x, sz_val, TY_REAL)	
+	call salloc (y, sz_val, TY_REAL)
 
 	# Read intensities and greyscales from the user's input file.  The
 	# intensity range is then mapped into a standard range and the 
@@ -37,14 +40,15 @@ begin
 	call ds_ulutsort (Memr[x], Memr[y], nvalues)
 
 	# Fill lut in straight line segments - piecewise linear
-	call malloc (lut, U_MAXPTS, TY_SHORT)	
+	sz_val = U_MAXPTS
+	call malloc (lut, sz_val, TY_SHORT)
 	do i = 1, nvalues-1 {
 	    delta_gs = Memr[y+i] - Memr[y+i-1]
 	    delta_xv = Memr[x+i] - Memr[x+i-1]
 	    slope = delta_gs / delta_xv
-	    x1 = int (Memr[x+i-1]) 
-	    x2 = int (Memr[x+i])
-	    y1 = int (Memr[y+i-1])
+	    x1 = Memr[x+i-1]
+	    x2 = Memr[x+i]
+	    y1 = Memr[y+i-1]
 	    do j = x1, x2
 		Mems[lut+j] = y1 + slope * (j-x1)
 	}
@@ -73,9 +77,11 @@ procedure ds_ulutread (utab, x, y, nvalues)
 char	utab[SZ_FNAME]		# Name of list file
 real	x[U_MAXPTS]		# Array of x values, filled on return
 real	y[U_MAXPTS]		# Array of y values, filled on return
-int	nvalues			# Number of values in x, y vectors - returned
+size_t	nvalues			# Number of values in x, y vectors - returned
 
-int	n, fd
+size_t	sz_val
+size_t	n
+int	fd
 pointer	sp, lbuf, ip
 real	xval, yval
 int	getline(), open()
@@ -83,7 +89,8 @@ errchk	open, sscan, getline, salloc
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	iferr (fd = open (utab, READ_ONLY, TEXT_FILE))
 	    call error (1, "Error opening user lookup table")
@@ -124,9 +131,9 @@ procedure ds_ulutsort (xvals, yvals, nvals)
 
 real	xvals[nvals]		# Array of x values
 real	yvals[nvals]		# Array of y values
-int	nvals			# Number of values in each array
+size_t	nvals			# Number of values in each array
 
-int	i, j
+long	i, j
 real	temp
 define	swap	{temp=$1;$1=$2;$2=temp}
 

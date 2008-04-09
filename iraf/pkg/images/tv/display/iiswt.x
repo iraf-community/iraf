@@ -9,7 +9,9 @@ include "iis.h"
 
 procedure iiswt (chan, nbytes)
 
-int	chan[ARB], nbytes
+int	chan[ARB]
+long	nbytes
+
 include	"iis.com"
 
 begin

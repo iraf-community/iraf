@@ -10,5 +10,6 @@ procedure iisgop (frame, mode, chan)
 int	frame, mode, chan[ARB]
 
 begin
+	# ??? what is this: arg1 ???
 	call iisopn (frame + LEN_IISFRAMES, mode, chan)
 end
