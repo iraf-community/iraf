@@ -194,8 +194,19 @@ do
 		#      #define memi ((integer *)&mem_1)
 		#   -> #define memi ((integer *)(&mem_1 - &mem_1))
 		#
-		cat $b.c | sed -e 's/\(^#define mem[a-z] (([^()]*)\)\(\&mem_1)\)/\1(\&mem_1 - \&mem_1))/' > $b.t
+		cat $b.c | sed -e 's/\(^#define mem[bcdilpsrxz] (([^()]*)\)\(\&mem_1)\)/\1(\&mem_1 - \&mem_1))/' > $b.t
 		mv $b.t $b.c
+		#
+		# When 64-bit settings, test the size of argument of memx[].
+		# If its size is 32-bit, gcc outputs this warning:
+		# "comparison is always true due to limited range of data type"
+		#
+		if [ "$F2C_AUTO_INCLUDE" = "true" ]; then
+		  if [ "$SPP_DATA_MODEL" = "lp64" -o "$SPP_DATA_MODEL" = "ilp64" ]; then
+		    cat $b.c | sed -e 's/\(mem[bcdilpsrxz]\[\)\([^]\[]*\)\(\]\)/\1(\2) + ((\2) < 0x0100000000L ? 0 : 0)\3/g' > $b.t
+		    mv $b.t $b.c
+		  fi
+		fi
 		#
 		# erase "/* Subroutine */ " comments
 		#
