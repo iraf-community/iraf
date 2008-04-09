@@ -26,9 +26,9 @@ pointer	im, ims, pmim, pmout
 int	ip
 size_t	old_size
 real	imgetr()
-pointer	immap(), im_pmmap(), mp_open()
+pointer	immap(), im_pmmap(), mp_open(), imstatp()
 int	imtgetim(), imtlen(), imtrgetim(), ctor(), ctowrd(), btoi()
-int	fntgfnb(), imstati(), imaccess()
+int	fntgfnb(), imaccess()
 bool	strne(), streq()
 errchk	immap()
 
@@ -222,7 +222,7 @@ begin
 	    if (pmout != NULL) {
 		if (imaccess (Memc[omaskname], YES) == YES)
 		    call imdelete (Memc[omaskname])
-		call pm_savef (imstati (pmout, IM_PMDES), Memc[omaskname],
+		call pm_savef (imstatp (pmout, IM_PMDES), Memc[omaskname],
 		    "", 0)
 		call imunmap (pmout)
 		if (pmim != NULL)
@@ -258,8 +258,8 @@ real	low, up, hmin, hmax, hwidth
 pointer	sp, vs, ve, mst, pm, mp, buf, hgm, smsk
 int	i, mval, npts, npix, nbins, nbad
 
-pointer	mp_miopen()
-int	imstati(), mio_glsegr(), mst_ihist(), rs_umask()
+pointer	mp_miopen(), imstatp()
+int	mio_glsegr(), mst_ihist(), rs_umask()
 
 begin
 	call smark (sp)
@@ -346,14 +346,14 @@ begin
             call amovkl (long(1), Meml[vs], IM_NDIM(im))
             call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
-            pm = imstati (pmout, IM_PMDES)
+            pm = imstatp (pmout, IM_PMDES)
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) {
                 nbad = rs_umask (Memr[buf], Mems[smsk], npts, low, up)
                 if (nbad > 0)
                     call pm_plps (pm, Meml[vs], Mems[smsk], 1, npts, PIX_SRC)
             }
             call mp_invert (pm)
-            call imseti (pmout, IM_PMDES, pm)
+            call imsetp (pmout, IM_PMDES, pm)
             call mfree (smsk, TY_SHORT)
 	}
 

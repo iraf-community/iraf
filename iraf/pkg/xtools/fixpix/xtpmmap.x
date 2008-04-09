@@ -134,12 +134,13 @@ procedure xt_pmunmap (im)
 pointer	im			#I IMIO pointer for mask
 
 pointer	pm
-int	imstati()
+pointer	imstatp()
+include	<nullptr.inc>
 
 begin
-	pm = imstati (im, IM_PMDES)
+	pm = imstatp (im, IM_PMDES)
 	call pm_close (pm)
-	call imseti (im, IM_PMDES, NULL)
+	call imsetp (im, IM_PMDES, NULLPTR)
 	call imunmap (im)
 end
 
@@ -157,7 +158,8 @@ pointer	refim			#I Reference image for image or text
 int	flag			#I Mask flag
 int	match			#I Match by physical coordinates?
 
-int	imstati(),  errcode()
+pointer	imstatp()
+int	errcode()
 pointer	im, pm
 pointer	im_pmmap(), xt_pmimmap(), xt_pmtext(), xt_pmsection()
 bool	streq()
@@ -176,9 +178,9 @@ begin
 	    ifnoerr (im = im_pmmap (pmname, READ_ONLY, ref)) {
 		call xt_match (im, refim, match)
 		if (flag == INVERT_MASK) {
-		    pm = imstati (im, IM_PMDES)
+		    pm = imstatp (im, IM_PMDES)
 		    call xt_pminvert (pm)
-		    call imseti (im, IM_PMDES, pm)
+		    call imsetp (im, IM_PMDES, pm)
 		}
 	    } else {
 		switch (errcode()) {
@@ -215,7 +217,8 @@ int	flag			#I Mask flag
 int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
-int	imstati(), imgnli()
+pointer	imstatp()
+int	imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	immap, mw_openim, im_pmmapo
 
@@ -228,7 +231,7 @@ begin
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 
 	im_in = immap (pmname, READ_ONLY, 0)
-	pm = imstati (im_in, IM_PMDES)
+	pm = imstatp (im_in, IM_PMDES)
 	if (pm != NULL)
 	    return (im_in)
 	pm = pm_newmask (im_in, 16)
@@ -542,7 +545,7 @@ double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
 pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 
-int	imstati()
+pointer	imstatp()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
 errchk	pm_open, mw_openim, im_pmmapo
@@ -559,7 +562,7 @@ begin
 
 	# If the mask is empty and the sizes are the same then it does not
 	# matter if the two are actually matched in physical coordinates.
-	pm = imstati (im, IM_PMDES)
+	pm = imstatp (im, IM_PMDES)
 	if (pm_empty(pm) && nc == ncpm && nl == nlpm)
 	    return
 
@@ -689,5 +692,5 @@ begin
 	call mw_close (mw)
 	call xt_pmunmap (im)
 	im = imnew
-	call imseti (im, IM_PMDES, pmnew)
+	call imsetp (im, IM_PMDES, pmnew)
 end

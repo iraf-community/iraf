@@ -20,9 +20,9 @@ long	v[IM_MAXDIM]
 pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
 
 bool	clgetb(), pm_linenotempty()
-int	imtgetim(), imtlen(), clgeti(), imaccf(), imstati()
+int	imtgetim(), imtlen(), clgeti(), imaccf()
 long	clktime()
-pointer	imtopenp(), immap(), xt_pmmap(), xt_fpinit()
+pointer	imtopenp(), immap(), xt_pmmap(), xt_fpinit(), imstatp()
 pointer	xt_fps(), xt_fpi(), xt_fpl(), xt_fpr(), xt_fpd()
 pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
 errchk	immap, xt_pmmap, xt_fpinit
@@ -75,7 +75,7 @@ begin
 		im = tmp
 		tmp = xt_pmmap (Memc[pmname], im, Memc[pmname], SZ_FNAME);
 		pmim = tmp
-		pm = imstati (pmim, IM_PMDES)
+		pm = imstatp (pmim, IM_PMDES)
 
 		nc = IM_LEN(im,1)
 		nl = IM_LEN(im,2)

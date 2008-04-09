@@ -17,7 +17,7 @@ pointer	sp, fname, pm, buf
 
 int	nowhite(), andi()
 bool	pm_linenotempty()
-pointer	ods_pmmap(), imstati()
+pointer	ods_pmmap(), imstatp()
 
 begin
 	call smark (sp)
@@ -43,7 +43,7 @@ begin
 
 	nc = IM_LEN(ovr,1)
 	nl = IM_LEN(ovr,2)
-	pm = imstati (ovr, IM_PMDES)
+	pm = imstatp (ovr, IM_PMDES)
 
 	call salloc (buf, nc, TY_INT)
 

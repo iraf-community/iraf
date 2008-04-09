@@ -21,7 +21,7 @@ pointer	ccd			# CCD structure
 
 pointer	sp, image, str, im
 
-int	imstati()
+pointer	imstatp()
 bool	clgetb(), streq(), ccdflag()
 pointer	xt_pmmap(), xt_fpinit()
 errchk	xt_pmmap(), xt_fpinit()
@@ -56,7 +56,7 @@ begin
 	    call error (1, "No bad pixel mask found")
 	if (im != NULL)  {
 	    MASK_IM(ccd) = im
-	    MASK_PM(ccd) = imstati (im, IM_PMDES)
+	    MASK_PM(ccd) = imstatp (im, IM_PMDES)
 	    MASK_FP(ccd) = xt_fpinit (MASK_PM(ccd), 2, 3)
 
 	    CORS(ccd, FIXPIX) = YES

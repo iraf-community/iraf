@@ -49,8 +49,8 @@ int	sz_pmname			#I the maximum  pixel name length
 pointer	sp, fname, kfname
 pointer	pmim, pm
 int	ip, flags, invflag
-pointer	im_pmmap(), mp_pmmap()
-int	imaccess(), imstati()
+pointer	im_pmmap(), mp_pmmap(), imstatp()
+int	imaccess()
 bool	streq()
 errchk	im_pmmap(), mp_pmmap(), imgstr()
 
@@ -72,9 +72,9 @@ begin
 
 	    ifnoerr (pmim = im_pmmap ("EMPTY", READ_ONLY+BOOLEAN_MASK, refim)) {
 		call strcpy ("EMPTY", pmname, sz_pmname)
-		pm = imstati (pmim, IM_PMDES)
+		pm = imstatp (pmim, IM_PMDES)
 		call mp_invert (pm)
-		call imseti (pmim, IM_PMDES, pm)
+		call imsetp (pmim, IM_PMDES, pm)
 	    } else
 		pmim = NULL
 
@@ -156,8 +156,7 @@ int	invflag			#I invert mask flag, remove when pmio fixed
 
 pointer	sp, section, pmim, pm, tmp_refim
 int	use_section
-pointer	im_pmmap(), mp_immap()
-int	imstati()
+pointer	im_pmmap(), mp_immap(), imstatp()
 errchk	im_pmmap(), mp_immap()
 
 begin
@@ -179,18 +178,18 @@ begin
 	    if (use_section == YES)
 	        call mp_section (pmim)
 	    if (invflag == YES) {
-	        pm = imstati (pmim, IM_PMDES)
+	        pm = imstatp (pmim, IM_PMDES)
 	        call mp_invert (pm)
-		call imseti (pmim, IM_PMDES, pm)
+		call imsetp (pmim, IM_PMDES, pm)
 	    }
 
 	# Open the mask as an image file.
 	} else ifnoerr (pmim = mp_immap (pmname)) {
 
 	    if (invflag == YES) {
-	        pm = imstati (pmim, IM_PMDES)
+	        pm = imstatp (pmim, IM_PMDES)
 	        call mp_invert (pm)
-		call imseti (pmim, IM_PMDES, pm)
+		call imsetp (pmim, IM_PMDES, pm)
 	    }
 
 	} else {

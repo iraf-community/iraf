@@ -115,7 +115,7 @@ bool	unitary_greyscale_transformation
 short	lut1, lut2, dz1_s, dz2_s, z1_s, z2_s
 
 bool	fp_equalr()
-int	imstati()
+pointer	imstatp()
 pointer	ds_pmmap(), imps2s(), imps2r(), sigm2s(), sigm2r(), sigm2_setup()
 errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2r, sigm2_setup
 
@@ -176,7 +176,7 @@ begin
 	    iferr (bpm = ds_pmmap (W_BPM(wdes), im))
 		bpm = NULL
 	    if (bpm != NULL)
-		pm = imstati (bpm, IM_PMDES)
+		pm = imstatp (bpm, IM_PMDES)
 	    else
 		pm = NULL
 	    si = sigm2_setup (im, pm, px1,px2,nx,xblk, py1,py2,ny,yblk, order)
@@ -466,7 +466,7 @@ double	x1, x2, y1, y2
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
 pointer	mwref, mwpm, ctref, ctpm, pm, pmnew, imnew, bufref, bufpm
 
-int	imstati()
+pointer	imstatp()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
 errchk	pm_open, mw_openim
@@ -476,7 +476,7 @@ begin
 	    return
 
 	# Set sizes.
-	pm = imstati (im, IM_PMDES)
+	pm = imstatp (im, IM_PMDES)
 	nc = IM_LEN(refim,1)
 	nl = IM_LEN(refim,2)
 	ncpm = IM_LEN(im,1)
@@ -619,5 +619,5 @@ begin
 	# Update the IMIO descriptor.
 	call imunmap (im)
 	im = imnew
-	call imseti (im, IM_PMDES, pmnew)
+	call imsetp (im, IM_PMDES, pmnew)
 end

@@ -20,7 +20,8 @@ int	i, j, nc, nl
 long	v[2]
 pointer	data1, data2, pm, pmi
 
-int	imstati(), pm_newcopy()
+pointer	imstatp()
+int	pm_newcopy()
 pointer	yt_fpinit()
 errchk	malloc, yt_fpinit
 
@@ -32,7 +33,7 @@ begin
 	call malloc (data2, nc, TY_SHORT)
 
 	# Get the pixel mask from the image.
-	pm = imstati (im, IM_PMDES)
+	pm = imstatp (im, IM_PMDES)
 
 	# Extract the pixels to be interpolated.
 	pmi = pm_newcopy (pm)

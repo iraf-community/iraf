@@ -19,8 +19,8 @@ size_t	old_size
 real	clgetr()
 pointer	mp_open(), mp_miopen()
 int	imtlen(), imtgetim(), clgeti()
-pointer	imtopenp(), imtopen(), immap()
-int	mst_fields(), btoi(), mio_glsegr(), mst_ihist(), imstati()
+pointer	imtopenp(), imtopen(), immap(), imstatp()
+int	mst_fields(), btoi(), mio_glsegr(), mst_ihist()
 int	mst_umask(), strmatch()
 bool	clgetb()
 errchk	immap()
@@ -279,7 +279,7 @@ begin
                 call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
                 call amovkl (long(1), Meml[vs], IM_NDIM(im))
-		opm = imstati (pmout, IM_PMDES)
+		opm = imstatp (pmout, IM_PMDES)
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) { 
 		    nbad = mst_umask (Memr[buf], Mems[smsk], npts, low, up)
 		    if (nbad > 0)
@@ -287,7 +287,7 @@ begin
 			    PIX_SRC)
 		}
 		call mp_invert (opm)
-		call imseti (pmout, IM_PMDES, opm) 
+		call imsetp (pmout, IM_PMDES, opm) 
 	        call mfree (smsk, TY_SHORT)
 	    }
 

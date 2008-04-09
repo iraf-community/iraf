@@ -685,9 +685,9 @@ pointer	ptr, cat, om, omim, siglevmap, siglevels
 
 bool	strne()
 real	imgetr()
-int	ctor(), strdic(), fnextn(), imstati()
+int	ctor(), strdic(), fnextn()
 int	open(), access(), imaccess()
-pointer	immap(), xt_pmmap(), pm_open(), map_open()
+pointer	immap(), xt_pmmap(), pm_open(), map_open(), imstatp()
 
 errchk	open, immap, xt_pmmap, pm_newmask
 errchk	cnvparse, sky, detect, split, grow, evaluate, map_open
@@ -779,7 +779,7 @@ begin
 		if (objmask[1] == EOS)
 		    call catgets (cat, "mask", objmask, SZ_FNAME)
 		omim = xt_pmmap (objmask, im[1], objmask, SZ_FNAME)
-		om = imstati (omim, IM_PMDES)
+		om = imstatp (omim, IM_PMDES)
 	    } else {
 		# Check for existing catalog.  Check catalog definitions.
 		if (outcat[1] != EOS) {
