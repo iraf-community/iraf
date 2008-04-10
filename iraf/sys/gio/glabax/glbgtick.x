@@ -54,7 +54,8 @@ pointer	ax			# axis descriptor
 real	x, y			# coordinates of next tick (output)
 int	major_tick		# YES if next tick is a major tick
 
-int	i, axis, wcs, w, scaling, nminor, expon
+int	i, axis, wcs, scaling, nminor, expon
+pointer	w
 real	kstep, step, astep, ten, sx, sy, tolerance, pos, norm_pos
 bool	glb_eq()
 define	logscale_ 91
