@@ -4,7 +4,7 @@ include	<config.h>
 include	<fio.h>
 
 define	SWAPI		{tempi=$1;$1=$2;$2=tempi}
-define	SWAPL		{templ=$1;$1=$2;$2=templ}
+define	SWAPZ		{tempz=$1;$1=$2;$2=tempz}
 define	SWAPP		{tempp=$1;$1=$2;$2=tempp}
 
 # FSWAPFD -- Swap the file descriptors of two open files.  All i/o to file
@@ -22,12 +22,12 @@ procedure fswapfd (fd1, fd2)
 int	fd1, fd2		# file descriptors to be swapped.
 
 int	tempi
-long	templ
+size_t	tempz
 pointer	tempp
 include	<fio.com>
 
 begin
- 	SWAPL (boffset[fd1], boffset[fd2])
+ 	SWAPZ (boffset[fd1], boffset[fd2])
  	SWAPP (bufptr[fd1], bufptr[fd2])
  	SWAPP (buftop[fd1], buftop[fd2])
  	SWAPP (iop[fd1], iop[fd2])

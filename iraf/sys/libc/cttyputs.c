@@ -15,10 +15,10 @@
 /* tty      : tty descriptor           */
 /* cap      : two char capability name */
 /* afflncnt : number of lines affected */
-int c_ttyputs ( int fd, int tty, const char *cap, int afflncnt )
+int c_ttyputs ( int fd, void *tty, const char *cap, int afflncnt )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_afflncnt = afflncnt;
 
 	iferr (TTYPUTS (&x_fd, &x_tty, c_sppstr(cap), &x_afflncnt))

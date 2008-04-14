@@ -21,7 +21,7 @@
 
 static	XCHAR	*spf_buf;
 static	char	*spf_userbuf;
-static	int	spf_bufsize;
+static	size_t	spf_bufsize;
 
 /* SPF_OPEN -- Spoolfile open.  Open a string spoolfile to be written into as
  * a file, using ordinary file i/o.  Only one such file can be open at a time.

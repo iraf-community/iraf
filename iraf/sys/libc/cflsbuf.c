@@ -18,7 +18,7 @@ int c_flsbuf ( unsigned int ch, FILE *fp )
 {
 	int buf_not_full;
 	XINT fd = fileno(fp);
-	XINT nreserve = 1;
+	XLONG nreserve = 1;
 
 	/* If we were called due to flush on newline and there is space in
 	 * the buffer, put the ch in the buffer before flushing.

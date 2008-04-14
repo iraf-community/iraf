@@ -139,7 +139,7 @@ begin
 		    call pargp (otop[fd])
 		    call pargp (bufptr[fd])
 		    call pargp (buftop[fd])
-		    call pargl (boffset[fd])
+		    call pargz (boffset[fd])
 
 		call fprintf (out, "    Flags =")
 		if (and (FF_FLUSH, fflags[fd]) != 0)

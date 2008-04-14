@@ -20,10 +20,10 @@ static	XINT	szbuf = 128;
 /* cap     : two char capability name */
 /* outstr  : output string            */
 /* bufsize : buffer size of outstr    */
-ssize_t c_ttygets ( int tty, const char *cap, char *outstr, size_t bufsize )
+ssize_t c_ttygets ( void *tty, const char *cap, char *outstr, size_t bufsize )
 {
 	XINT nchars;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 
 	nchars = TTYGETS (&x_tty, c_sppstr(cap), buf, &szbuf);
 	c_strpak (buf, outstr, bufsize);

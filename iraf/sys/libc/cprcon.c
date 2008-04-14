@@ -173,7 +173,8 @@ int c_prchdir ( pid_t pid, const char *newdir )
 int c_prenvset ( pid_t pid, const char *envvar, const char *value )
 {
 	XCHAR	spp_value[SZ_LINE];
+	XINT	x_pid = pid;
 
 	c_strupk (value, spp_value, SZ_LINE);
-	return (PRENVSET (&pid, c_sppstr (envvar), spp_value));
+	return (PRENVSET (&x_pid, c_sppstr (envvar), spp_value));
 }

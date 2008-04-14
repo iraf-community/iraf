@@ -19,7 +19,7 @@
 #define SZ_NUMBUF	256		/* maximum numeric field len	*/
 #define SZ_UCC		128		/* maximum size user char class	*/
 #define HUGE		999
-#define ISHEX(c)	(c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')
+#define ISHEX(c)	((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
 
 struct _format {
 	int	f_type;			/* field type (doxscef[%)	*/
@@ -176,7 +176,7 @@ static int u_doscan ( struct _input *in, const char *format, va_list *argp )
 	int nscan = 0, match;
 	int eofflag = 0;
 
-	while (ch = *format++) {
+	while ( (ch = *format++) ) {
 	    if (ch == '%' && *format != '%') {
 		/* Parse format specification.
 		 */
@@ -329,7 +329,7 @@ static int u_scannum ( struct _input *in, va_list **argp,
 	    radix = 8;
 	else if (ch == 'x')
 	    radix = 16;
-	else if (floating = (ch == 'f' || ch == 'e' || ch == 'g')) {
+	else if ( (floating = (ch == 'f' || ch == 'e' || ch == 'g')) ) {
 	    radix = 10;
 	    dotseen = expseen = 0;
 	}

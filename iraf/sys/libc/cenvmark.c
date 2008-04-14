@@ -25,10 +25,10 @@ void c_envmark ( int *envp )
  */
 /* envp    : marker returned by envmark      */
 /* userfcn : epa of user function for redefs */
-int c_envfree ( int envp, int userfcn )
+int c_envfree ( int envp, PFU userfcn )
 {
 	XINT x_envp = envp;
-	XINT x_userfcn = userfcn;
+	XPOINTER x_userfcn = (XPOINTER)userfcn;
 	return (ENVFREE (&x_envp, &x_userfcn));
 }
 

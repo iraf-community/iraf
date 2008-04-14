@@ -27,10 +27,10 @@ int setbuffer ( FILE *fp, char *buf, size_t size )
 	int fd = fileno(fp);
 
 	if (buf == NULL)
-	    c_fseti (fd, F_BUFSIZE, 1);
+	    c_fsetl (fd, F_BUFSIZE, 1);
 	else {
-	    c_fseti (fd, F_BUFPTR, Memcptr(buf));
-	    c_fseti (fd, F_BUFSIZE, size);
+	    c_fsetp (fd, F_BUFPTR, Memcptr(buf));
+	    c_fsetl (fd, F_BUFSIZE, size);
 	}
 
 	return 0;
@@ -45,8 +45,8 @@ int setlinebuf ( FILE *fp )
 {
 	int fd = fileno(fp);
 
-	if (c_fstati (fd, F_BUFSIZE) < SZ_LINE)
-	    c_fseti (fd, F_BUFSIZE, SZ_LINE);
+	if (c_fstatl (fd, F_BUFSIZE) < SZ_LINE)
+	    c_fsetl (fd, F_BUFSIZE, SZ_LINE);
 	c_fseti (fd, F_FLUSHNL, YES);
 
 	return 0;

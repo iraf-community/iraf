@@ -62,7 +62,7 @@ extern void c_envreset ( const char *, char * );
 extern void c_envlist ( int, const char *, int );
 /* cenvmark.c */
 extern void c_envmark ( int * );
-extern int c_envfree ( int, int );
+extern int c_envfree ( int, PFU );
 extern int c_prenvfree ( int, int );
 /* cenvscan.c */
 extern int c_envscan ( const char * );
@@ -86,8 +86,12 @@ extern int c_fpathname ( const char *, char *, iraf_size_t );
 extern int c_fredir ( int, const char *, int, int );
 /* cfseti.c */
 extern void c_fseti ( int, int, int );
+extern void c_fsetl ( int, int, long );
+extern void c_fsetp ( int, int, void * );
 /* cfstati.c */
 extern int c_fstati ( int, int );
+extern long c_fstatl ( int, int );
+extern void *c_fstatp ( int, int );
 /* cgetpid.c */
 extern iraf_pid_t c_getpid( void );
 /* cgetuid.c */
@@ -114,15 +118,15 @@ extern int c_open ( const char *, iraf_mode_t, int );
 /* coscmd.c */
 extern int c_oscmd ( const char *, const char *, const char *, const char * );
 /* cpoll.c */
-extern int c_poll_open ( void );
-extern int c_poll ( int, int, int );
-extern void c_poll_close ( int );
-extern void c_poll_zero ( int );
-extern void c_poll_set ( int, int, int );
-extern void c_poll_clear ( int, int, int );
-extern int c_poll_test ( int, int, int );
-extern int c_poll_get_nfds ( int );
-extern void c_poll_print ( int );
+extern void *c_poll_open ( void  );
+extern int c_poll ( void *, int, int );
+extern void c_poll_close ( void * );
+extern void c_poll_zero ( void * );
+extern void c_poll_set ( void *, int, int );
+extern void c_poll_clear ( void *, int, int );
+extern int c_poll_test ( void *, int, int );
+extern int c_poll_get_nfds ( void * );
+extern void c_poll_print ( void * );
 /* cprcon.c */
 extern iraf_pid_t c_propen ( const char *, int *, int * );
 extern int c_prclose ( iraf_pid_t );
@@ -159,8 +163,8 @@ extern int c_rename ( const char *, const char * );
 extern int c_reopen ( int, iraf_mode_t );
 /* csalloc.c */
 extern char *c_salloc ( iraf_size_t );
-extern void c_smark ( long * );
-extern void c_sfree ( long );
+extern void c_smark ( void ** );
+extern void c_sfree ( void * );
 /* cseek.c */
 extern int c_seek ( int, long );
 /* ctsleep.c */
@@ -168,41 +172,45 @@ extern void c_tsleep ( int );
 /* cttset.c */
 extern void c_sttyco ( const char *, int, int, int );
 extern void c_ttseti ( int, int, int );
+extern void c_ttsetl ( int, int, long );
+extern void c_ttsetp ( int, int, void * );
 extern int c_ttstati ( int, int );
+extern long c_ttstatl ( int, int );
+extern void *c_ttstatp ( int, int );
 extern void c_ttsets ( int, int, const char * );
 extern iraf_ssize_t c_ttstats ( int, int, char *, iraf_size_t );
 /* cttycdes.c */
-extern void c_ttycdes ( int );
+extern void c_ttycdes ( void * );
 /* cttyclear.c */
-extern void c_ttyclear ( int, int );
+extern void c_ttyclear ( int, void * );
 /* cttyclln.c */
-extern void c_ttyclearln ( int, int );
+extern void c_ttyclearln ( int, void * );
 /* cttyctrl.c */
-extern int c_ttyctrl ( int, int, const char *, int );
+extern int c_ttyctrl ( int, void *, const char *, int );
 /* cttygetb.c */
-extern int c_ttygetb ( int, const char * );
+extern int c_ttygetb ( void *, const char * );
 /* cttygeti.c */
-extern int c_ttygeti ( int, const char * );
+extern int c_ttygeti ( void *, const char * );
 /* cttygetr.c */
-extern float c_ttygetr ( int, const char * );
+extern float c_ttygetr ( void *, const char * );
 /* cttygets.c */
-extern iraf_ssize_t c_ttygets ( int, const char *, char *, iraf_size_t );
+extern iraf_ssize_t c_ttygets ( void *, const char *, char *, iraf_size_t );
 /* cttygoto.c */
-extern void c_ttygoto ( int, int, int, int );
+extern void c_ttygoto ( int, void *, int, int );
 /* cttyinit.c */
-extern void c_ttyinit ( int, int );
+extern void c_ttyinit ( int, void * );
 /* cttyodes.c */
-extern int c_ttyodes ( const char * );
+extern void *c_ttyodes ( const char * );
 /* cttyputl.c */
-extern void c_ttyputline ( int, int, const char *, int );
+extern void c_ttyputline ( int, void *, const char *, int );
 /* cttyputs.c */
-extern int c_ttyputs ( int, int, const char *, int );
+extern int c_ttyputs ( int, void *, const char *, int );
 /* cttyseti.c */
-extern void c_ttyseti ( int, int, int );
+extern void c_ttyseti ( void *, int, int );
 /* cttyso.c */
-extern void c_ttyso ( int, int, int );
+extern void c_ttyso ( int, void *, int );
 /* cttystati.c */
-extern int c_ttystati ( int, int );
+extern int c_ttystati ( void *, int );
 /* cungetc.c */
 extern int c_ungetc ( int, int );
 /* cungetl.c */

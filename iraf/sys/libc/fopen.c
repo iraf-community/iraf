@@ -16,7 +16,7 @@
 FILE *fopen ( const char *fname, const char *modestr )
 {
 	XINT	filetype, filemode;
-	int	fd;
+	XINT	fd;
 
 	/* Get file type.
 	 */

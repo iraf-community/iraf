@@ -94,8 +94,9 @@ int u_doprnt ( const char *format, va_list *argp, FILE *fp )
 	int done, dotseen;		/* one when at end of a format	*/
 	int varprec, junk;		/* runtime precision is used	*/
 	int prec[MAX_PREC];		/* values of prec args		*/
+	int f_long;
 
-	while (ch = *format++) {
+	while ( (ch = *format++) ) {
 	    if (ch == '%') {
 		fsp = formspec;
 		maxfsp = formspec + SZ_FMTSPEC -1;
@@ -103,6 +104,7 @@ int u_doprnt ( const char *format, va_list *argp, FILE *fp )
 		varprec = 0;
 		dotseen = 0;
 		done = 0;
+		f_long = 0;
 
 		while (!done) {
 		    ch = *format++;
@@ -115,7 +117,7 @@ int u_doprnt ( const char *format, va_list *argp, FILE *fp )
 			break;
 
 		    case 'l':
-			/* arg size modifier; ignored for now */
+			f_long = 1;
 			fsp--;
 			break;
 
@@ -158,7 +160,10 @@ int u_doprnt ( const char *format, va_list *argp, FILE *fp )
 		    case 'x':
 		    case 'u':
 			*fsp = XEOS;
-			u_doarg (fp, formspec, &argp, prec, varprec, TY_INT);
+			if ( f_long == 0 )
+			  u_doarg(fp, formspec, &argp, prec, varprec, TY_INT);
+			else
+			  u_doarg(fp, formspec, &argp, prec, varprec, TY_LONG);
 			done++;
 			break;
 
@@ -243,6 +248,7 @@ int u_doarg ( FILE *fp, XCHAR *formspec, va_list **argp,
 	XCHAR sbuf[SZ_OBUF+1];
 	XINT fd = fileno (fp);
 	XINT ival;
+	XLONG lval;
 	XDOUBLE dval;
 	const char *cptr;
 
@@ -262,6 +268,10 @@ int u_doarg ( FILE *fp, XCHAR *formspec, va_list **argp,
 	case TY_INT:
 	    ival = va_arg ((**argp), int);
 	    PARGI (&ival);
+	    break;
+	case TY_LONG:
+	    lval = va_arg ((**argp), long);
+	    PARGL (&lval);
 	    break;
 	case TY_DOUBLE:
 	    dval = va_arg ((**argp), double);

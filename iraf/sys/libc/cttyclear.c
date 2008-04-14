@@ -10,10 +10,10 @@
  */
 /* fd  : output file    */
 /* tty : tty descriptor */
-void c_ttyclear ( int fd, int tty )
+void c_ttyclear ( int fd, void *tty )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 
 	TTYCLEAR (&x_fd, &x_tty);
 }

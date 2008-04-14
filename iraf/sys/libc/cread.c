@@ -49,7 +49,7 @@ ssize_t c_read ( int fd, char *buf, size_t maxbytes )
 		nchars_read = XEOF;
 
 	} else {
-	    XINT	maxchars = maxbytes / sizeof(XCHAR);
+	    XSIZE_T	maxchars = maxbytes / sizeof(XCHAR);
 	    XCHAR	*bp = (XCHAR *)buf;
 
 	    /* Verify that the pointer coercion char->XCHAR->char is legal,

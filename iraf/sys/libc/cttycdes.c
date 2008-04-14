@@ -9,8 +9,8 @@
 /* C_TTYCDES -- Close the TTY descriptor.
  */
 /* tty : SPP pointer to descriptor */
-void c_ttycdes ( int tty )
+void c_ttycdes ( void *tty )
 {
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	TTYCDES (&x_tty);
 }

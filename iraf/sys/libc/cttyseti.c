@@ -11,9 +11,9 @@
 /* tty   : tty descriptor          */
 /* param : code of param to be set */
 /* value : value to be set         */
-void c_ttyseti ( int tty, int param, int value )
+void c_ttyseti ( void *tty, int param, int value )
 {
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_param = param;
 	XINT x_value = value;
 

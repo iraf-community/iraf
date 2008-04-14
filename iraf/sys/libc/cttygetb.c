@@ -13,9 +13,9 @@
  */
 /* tty : tty descriptor           */
 /* cap : two char capability name */
-int c_ttygetb ( int tty, const char *cap )
+int c_ttygetb ( void *tty, const char *cap )
 {
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XBOOL x_ret;
 
 	x_ret = TTYGETB (&x_tty, c_sppstr(cap));

@@ -24,14 +24,14 @@
 
 /* C_POLL_OPEN -- Open a poll descriptor set.
  */
-int c_poll_open ( void )
+void *c_poll_open ( void )
 {
-	XINT	fds;
+	XPOINTER fds;
 
 	iferr ((fds = POLL_OPEN ()))
-	    return (0);
+	    return ((void *)0);
 	else 
-	    return (fds);
+	    return ((void *)fds);
 }
 
 
@@ -40,10 +40,10 @@ int c_poll_open ( void )
 /* fds     : descriptor set ptr */
 /* nfds    : no. descriptors    */
 /* timeout : poll timeout       */
-int c_poll ( int fds, int nfds, int timeout )
+int c_poll ( void *fds, int nfds, int timeout )
 {
 	XINT	npoll;
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	XINT x_nfds = nfds;
 	XINT x_timeout = timeout;
 
@@ -55,9 +55,9 @@ int c_poll ( int fds, int nfds, int timeout )
 /* C_POLL_CLOSE -- Close and free a poll descriptor set.
  */
 /* fds : descriptor set ptr */
-void c_poll_close ( int fds )
+void c_poll_close ( void *fds )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	POLL_CLOSE (&x_fds);
 }
 
@@ -65,9 +65,9 @@ void c_poll_close ( int fds )
 /* C_POLL_ZERO -- Zero the descriptor set.
  */
 /* fds : descriptor set ptr */
-void c_poll_zero ( int fds )
+void c_poll_zero ( void *fds )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	POLL_ZERO (&x_fds);
 }
 
@@ -78,9 +78,9 @@ void c_poll_zero ( int fds )
 /* fds  : descriptor set ptr */
 /* fd   : no. descriptors    */
 /* type : event type         */
-void c_poll_set ( int fds, int fd, int type )
+void c_poll_set ( void *fds, int fd, int type )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	XINT x_fd = fd;
 	XINT x_type = type;
 	POLL_SET (&x_fds, &x_fd, &x_type);
@@ -94,9 +94,9 @@ void c_poll_set ( int fds, int fd, int type )
 /* fds  : descriptor set ptr */
 /* fd   : no. descriptors    */
 /* type : event type         */
-void c_poll_clear ( int fds, int fd, int type )
+void c_poll_clear ( void *fds, int fd, int type )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	XINT x_fd = fd;
 	XINT x_type = type;
 	POLL_CLEAR (&x_fds, &x_fd, &x_type);
@@ -108,9 +108,9 @@ void c_poll_clear ( int fds, int fd, int type )
 /* fds  : descriptor set ptr */
 /* fd   : no. descriptors    */
 /* type : event type         */
-int c_poll_test ( int fds, int fd, int type )
+int c_poll_test ( void *fds, int fd, int type )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	XINT x_fd = fd;
 	XINT x_type = type;
 	return (POLL_TEST (&x_fds, &x_fd, &x_type));
@@ -120,18 +120,17 @@ int c_poll_test ( int fds, int fd, int type )
 /* C_POLL_GET_NFDS -- Return the size of the descriptor set.
  */
 /* fds : descriptor set ptr */
-int c_poll_get_nfds ( int fds )
+int c_poll_get_nfds ( void *fds )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	return (POLL_GET_NFDS (&x_fds));
 }
 
 
-
 /* C_POLL_PRINT --  Debug print utility.
  */
-void c_poll_print ( int fds )
+void c_poll_print ( void *fds )
 {
-	XPOINTER x_fds = fds;
+	XPOINTER x_fds = (XPOINTER)fds;
 	POLL_PRINT (&x_fds);
 }

@@ -41,7 +41,8 @@
 char *c_salloc ( size_t nbytes )
 {
 	XPOINTER buf;
-	XINT nchars, dtype = TY_CHAR;
+	XSIZE_T nchars;
+	XINT dtype = TY_CHAR;
 
 	nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	SALLOC (&buf, &nchars, &dtype);
@@ -52,11 +53,11 @@ char *c_salloc ( size_t nbytes )
 /* C_SMARK -- Mark the position of the stack pointer.
  */
 /* sp : stack pointer is saved here */
-void c_smark ( long *sp )
+void c_smark ( void **sp )
 {
-	XPOINTER x_sp = *sp;
+	XPOINTER x_sp = (XPOINTER)(*sp);
 	SMARK (&x_sp);
-	*sp = x_sp;
+	*sp = (void *)x_sp;
 }
 
 
@@ -64,8 +65,8 @@ void c_smark ( long *sp )
  * the sole argument was marked by C_SMARK.
  */
 /* sp : saved stack pointer */
-void c_sfree ( long sp )
+void c_sfree ( void *sp )
 {
-	XPOINTER x_sp = sp;
+	XPOINTER x_sp = (XPOINTER)sp;
 	SFREE (&x_sp);
 }

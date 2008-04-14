@@ -20,7 +20,7 @@ void c_sttyco ( const char *args, int ttin, int ttout, int outfd )
 }
 
 
-/* C_TTSETI -- FIO set integer terminal driver parameter.
+/* C_TTSET[ILP] -- FIO set integer terminal driver parameter.
  */
 /* fd    : FIO file descriptor */
 /* param : param to be set     */
@@ -34,8 +34,25 @@ void c_ttseti ( int fd, int param, int value )
 	TTSETI (&x_fd, &x_param, &x_value);
 }
 
+void c_ttsetl ( int fd, int param, long value )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	XLONG x_value = value;
 
-/* C_TTSTATI -- FIO stat integer terminal driver parameter.
+	TTSETL (&x_fd, &x_param, &x_value);
+}
+
+void c_ttsetp ( int fd, int param, void *value )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	XPOINTER x_value = (XPOINTER)value;
+
+	TTSETP (&x_fd, &x_param, &x_value);
+}
+
+/* C_TTSTAT[ILP] -- FIO stat integer terminal driver parameter.
  */
 /* fd    : FIO file descriptor */
 /* param : param to be set     */
@@ -45,6 +62,22 @@ int c_ttstati ( int fd, int param )
 	XINT x_param = param;
 
 	return (TTSTATI (&x_fd, &x_param));
+}
+
+long c_ttstatl ( int fd, int param )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+
+	return (TTSTATL (&x_fd, &x_param));
+}
+
+void *c_ttstatp ( int fd, int param )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+
+	return ((void *)(TTSTATP (&x_fd, &x_param)));
 }
 
 /* C_TTSETS -- FIO set string terminal driver parameter.

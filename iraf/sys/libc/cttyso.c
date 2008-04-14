@@ -12,10 +12,10 @@
 /* fd    : output file    */
 /* tty   : tty descriptor */
 /* onoff : 1=on, 0=off    */
-void c_ttyso ( int fd, int tty, int onoff )
+void c_ttyso ( int fd, void *tty, int onoff )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_onoff = onoff;
 
 	TTYSO (&x_fd, &x_tty, &x_onoff);

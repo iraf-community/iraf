@@ -14,7 +14,7 @@
 #define	FIOCOM		fiocom_		/* [MACHDEP] */
 
 #define	SZ_DEFIOBUF	1024
-#define	FIO_MAXFD	4096
+#define	FIO_MAXFD	4096	/* LAST_FD in config/config.h */
 #define	IRAF_FILE	struct _iobuf
 
 #define	IRAF_BUFSIZ	SZ_DEFIOBUF
@@ -38,17 +38,17 @@
  * See base/fio.com.
  */
 struct _iobuf {
-	XLONG    _boffset, _F1;		/* XCHAR file offset of buffer	*/
+	XSIZE_T _boffset, _F1;		/* XCHAR file offset of buffer	*/
 	XPOINTER _bufptr,  _F2;		/* buffer pointer		*/
 	XPOINTER _buftop,  _F3;		/* pointer to top of buffer + 1	*/
 	XPOINTER _iop,     _F4;		/* pointer to next XCHAR	*/
 	XPOINTER _itop,    _F5;		/* call filbuf when _iop >=	*/
 	XPOINTER _otop,    _F6;		/* call flsbuf when _iop >=	*/
 	XPOINTER _fiodes,  _F7;		/* FIO file descriptor		*/
-	XINT	_fflags;		/* bit flags			*/
+	XSIZE_T	_fflags;		/* bit flags			*/
 };
 
-extern	XLONG FIOCOM[];			/* the FIO common		*/
+extern	XSIZE_T FIOCOM[];		/* the FIO common		*/
 
 #define	_FFLUSHNL	01		/* flush buffer on newline	*/
 #define	_FREAD		02		/* read perm on file		*/
@@ -65,7 +65,7 @@ extern	XLONG FIOCOM[];			/* the FIO common		*/
 /* Convert FILE pointers to and from FIO integer file descriptors.
  */
 #define	FDTOFP(fd)	((IRAF_FILE *)(&FIOCOM[(fd)-1]))
-#define	FPTOFD(fp)	((XLONG *)(fp) - FIOCOM + 1)
+#define	FPTOFD(fp)	((XSIZE_T *)(fp) - FIOCOM + 1)
 
 #define	eprintf		u_eprintf
 

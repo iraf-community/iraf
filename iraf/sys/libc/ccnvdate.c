@@ -14,9 +14,10 @@
 /* outstr  : encoded time string      */
 char *c_cnvdate ( long clktime, char *outstr, size_t bufsize )
 {
+	XLONG	x_clktime = clktime;
 	XCHAR	buf[SZ_LINE+1];
 	XINT	x_maxch = SZ_LINE;
 
-	CNVDATE (&clktime, buf, &x_maxch);
+	CNVDATE (&x_clktime, buf, &x_maxch);
 	return (c_strpak (buf, outstr, bufsize));
 }

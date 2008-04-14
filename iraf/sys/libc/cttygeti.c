@@ -12,9 +12,9 @@
  */
 /* tty : tty descriptor           */
 /* cap : two char capability name */
-int c_ttygeti ( int tty, const char *cap )
+int c_ttygeti ( void *tty, const char *cap )
 {
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 
 	return (TTYGETI (&x_tty, c_sppstr(cap)));
 }

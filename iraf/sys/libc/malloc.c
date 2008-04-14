@@ -10,8 +10,9 @@
  */
 void *malloc ( size_t nbytes )
 {
-	XINT nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
-	XINT ptr, dtype = TY_CHAR;
+	XSIZE_T nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
+	XPOINTER ptr;
+	XINT dtype = TY_CHAR;
 
 	iferr (MALLOC (&ptr, &nchars, &dtype))
 	    return (NULL);

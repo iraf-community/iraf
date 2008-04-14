@@ -12,10 +12,10 @@
 /* tty  : tty descriptor */
 /* col  : x coordinate   */
 /* line : y coordinate   */
-void c_ttygoto ( int fd, int tty, int col, int line )
+void c_ttygoto ( int fd, void *tty, int col, int line )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_col = col;
 	XINT x_line = line;
 

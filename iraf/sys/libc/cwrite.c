@@ -31,7 +31,7 @@ ssize_t c_write ( int fd, const char *buf, size_t nbytes )
 		c_erract (EA_ERROR);
 
 	} else {
-	    XINT	nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
+	    XSIZE_T	nchars = (nbytes + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	    XCHAR	*bp = (XCHAR *)buf;
 
 	    /* Verify that the pointer coercion char->XCHAR->char is legal,

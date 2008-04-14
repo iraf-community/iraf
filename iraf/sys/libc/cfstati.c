@@ -16,3 +16,17 @@ int c_fstati ( int fd, int param )
 	XINT x_param = param;
 	return (FSTATI (&x_fd, &x_param));
 }
+
+long c_fstatl ( int fd, int param )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	return (FSTATL (&x_fd, &x_param));
+}
+
+void *c_fstatp ( int fd, int param )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	return ((void *)(FSTATP (&x_fd, &x_param)));
+}

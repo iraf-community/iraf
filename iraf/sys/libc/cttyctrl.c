@@ -16,10 +16,10 @@
 /* tty      : tty descriptor           */
 /* cap      : two char capability name */
 /* afflncnt : number of lines affected */
-int c_ttyctrl ( int fd, int tty, const char *cap, int afflncnt )
+int c_ttyctrl ( int fd, void *tty, const char *cap, int afflncnt )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_afflncnt = afflncnt;
 
 	return (TTYCTRL (&x_fd, &x_tty, c_sppstr(cap), &x_afflncnt));

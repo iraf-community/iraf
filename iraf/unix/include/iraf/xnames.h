@@ -78,6 +78,8 @@ extern int MFREE ( XPOINTER *, XINT * );
 extern int MALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 /* ../../../sys/memio/realloc.x */
 extern int REALLOC ( XPOINTER *, XSIZE_T *, XINT * );
+/* ../../../sys/memio/calloc.x */
+extern int CALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 
 
 #define	AREAD		aread_		/* other VOS names */
@@ -138,8 +140,11 @@ extern int REALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 #define	FPRINTF		fprinf_
 #define	FREDIR		fredir_
 #define	FSETI		fseti_
+#define	FSETL		fsetl_
+#define	FSETP		fsetp_
 #define	FSTATI		fstati_
 #define	FSTATL		fstatl_
+#define	FSTATP		fstatp_
 #define	FSTATS		fstats_
 #define	GETPID		xgtpid_
 #define	GCTOD		gctod_
@@ -226,8 +231,12 @@ extern int REALLOC ( XPOINTER *, XSIZE_T *, XINT * );
 #define	SYSRUK		sysruk_
 #define	TSLEEP		tsleep_
 #define	TTSETI		ttseti_
+#define	TTSETL		ttsetl_
+#define	TTSETP		ttsetp_
 #define	TTSETS		ttsets_
 #define	TTSTATI		ttstai_
+#define	TTSTATL		ttstal_
+#define	TTSTATP		ttstap_
 #define	TTSTATS		ttstas_
 #define	TTYCDES		ttycds_
 #define	TTYCLEAR	ttyclr_
@@ -312,7 +321,7 @@ extern int FCHDIR ( XCHAR * );
 /* ../../../sys/etc/prenvfree.x */
 extern XINT PRENVFREE ( XINT *, XINT * );
 /* ../../../sys/etc/prfilbuf.x */
-extern XINT PRFILBUF ( XINT * );
+extern XLONG PRFILBUF ( XINT * );
 /* ../../../sys/fio/filbuf.x */
 extern XLONG FILBUF ( XINT * );
 /* ../../../sys/fio/finfo.x */
@@ -335,8 +344,12 @@ extern int FPATHNAME ( XCHAR *, XCHAR *, XINT * );
 extern int FREDIR ( XINT *, XCHAR *, XINT *, XINT * );
 /* ../../../sys/fio/fseti.x */
 extern int FSETI ( XINT *, XINT *, XINT * );
+extern int FSETL ( XINT *, XINT *, XLONG * );
+extern int FSETP ( XINT *, XINT *, XPOINTER * );
 /* ../../../sys/fio/fstati.x */
 extern XINT FSTATI ( XINT *, XINT * );
+extern XLONG FSTATL ( XINT *, XINT * );
+extern XPOINTER FSTATP ( XINT *, XINT * );
 /* ../../../sys/etc/getpid.x */
 extern XINT GETPID ( void );
 /* ../../../sys/etc/getuid.x */
@@ -434,7 +447,11 @@ extern int TSLEEP ( XINT * );
 extern int STTYCO ( XCHAR *, XINT *, XINT *, XINT * );
 /* ../../../sys/etc/ttopen.x */
 extern int TTSETI ( XINT *, XINT *, XINT * );
+extern int TTSETL ( XINT *, XINT *, XLONG * );
+extern int TTSETP ( XINT *, XINT *, XPOINTER * );
 extern XINT TTSTATI ( XINT *, XINT * );
+extern XLONG TTSTATL ( XINT *, XINT * );
+extern XPOINTER TTSTATP ( XINT *, XINT * );
 extern int TTSETS ( XINT *, XINT *, XCHAR * );
 extern XINT TTSTATS ( XINT *, XINT *, XCHAR *, XINT * );
 /* ../../../sys/tty/ttycdes.x */

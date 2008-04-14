@@ -12,13 +12,13 @@
  */
 void *realloc ( void *buf, size_t newsize )
 {
-	XINT	nchars = (newsize + sizeof(XCHAR)-1) / sizeof(XCHAR);
-	XINT	dtype = TY_CHAR;
+	XSIZE_T	nchars = (newsize + sizeof(XCHAR)-1) / sizeof(XCHAR);
 	XPOINTER ptr;
+	XINT	dtype = TY_CHAR;
 
 	ptr = buf ? Memcptr(buf) : 0;
 	iferr (REALLOC (&ptr, &nchars, &dtype))
 	    return (NULL);
 	else
-	    return ((char *)&Memc[ptr]);
+	    return ((void *)&Memc[ptr]);
 }

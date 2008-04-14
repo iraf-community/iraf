@@ -42,7 +42,7 @@ define	pop		{$1=stack[stkp];stkp=stkp-1}
 # that the code is not completely general and assumes certain restrictions on
 # process configurations.
 
-int procedure pr_psio (pid, fd, rwflag)
+long procedure pr_psio (pid, fd, rwflag)
 
 int	pid			# process id number
 int	fd			# file for which request is desired

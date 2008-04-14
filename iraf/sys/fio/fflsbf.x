@@ -12,7 +12,7 @@ procedure fflsbf (fd, bp, maxchars, buffer_offset)
 int	fd
 pointer	bp
 size_t	maxchars
-long	buffer_offset
+size_t	buffer_offset
 
 errchk	fwatio
 include	<fio.com>

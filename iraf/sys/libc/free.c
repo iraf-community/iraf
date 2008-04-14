@@ -11,7 +11,8 @@
  */
 void free ( void *buf )
 {
-	XINT ptr, dtype = TY_CHAR;
+	XPOINTER ptr;
+	XINT dtype = TY_CHAR;
 
 	ptr = Memcptr (buf);
 	MFREE (&ptr, &dtype);

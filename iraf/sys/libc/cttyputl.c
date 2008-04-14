@@ -17,10 +17,10 @@
 /* tty    : tty descriptor         */
 /* line   : line to be output      */
 /* map_cc : map unknown ctrl chars */
-void c_ttyputline ( int fd, int tty, const char *line, int map_cc )
+void c_ttyputline ( int fd, void *tty, const char *line, int map_cc )
 {
 	XINT x_fd = fd;
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_map_cc = map_cc;
 
 	TTYPUTLINE (&x_fd, &x_tty, c_sppstr(line), &x_map_cc);

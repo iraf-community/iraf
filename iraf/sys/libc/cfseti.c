@@ -18,3 +18,19 @@ void c_fseti ( int fd, int param, int value )
 	XINT x_value = value;
 	FSETI (&x_fd, &x_param, &x_value);
 }
+
+void c_fsetl ( int fd, int param, long value )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	XLONG x_value = value;
+	FSETL (&x_fd, &x_param, &x_value);
+}
+
+void c_fsetp ( int fd, int param, void *value )
+{
+	XINT x_fd = fd;
+	XINT x_param = param;
+	XPOINTER x_value = (XPOINTER)value;
+	FSETP (&x_fd, &x_param, &x_value);
+}

@@ -15,7 +15,7 @@
 /* fd : FIO file descriptor */
 long c_note ( int fd )
 {
-	long xchar_offset;
+	XLONG xchar_offset;
 	XINT x_fd = fd;
 
 	xchar_offset = NOTE (&x_fd);

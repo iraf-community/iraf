@@ -1,13 +1,15 @@
 # FIO Common (prototype version with single local buffer)
+# Size of top 8 members (boffset, ... ,fflags) should be equal.
+# See include/iraf/stdio.h.
 
-long	boffset[LAST_FD]	# char file offset of buffer
+size_t	boffset[LAST_FD]	# char file offset of buffer
 pointer	bufptr[LAST_FD]		# pointer to file buffer, if any
 pointer	buftop[LAST_FD]		# pointer to top of file buffer
 pointer	iop[LAST_FD]		# or i/o pointer
 pointer	itop[LAST_FD]		# top of buffer for input
 pointer	otop[LAST_FD]		# top of buffer for output
 pointer	fiodes[LAST_FD]		# pointer to file descriptor
-int	fflags[LAST_FD]		# bit flags
+size_t	fflags[LAST_FD]		# bit flags
 int	redir_fd[LAST_FD]	# fd of redir file if i/o redirected locally
 pointer	zdev[LEN_DEVTBL]	# device table
 int	next_dev		# next slot in device table

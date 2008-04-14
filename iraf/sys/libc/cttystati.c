@@ -10,9 +10,9 @@
  */
 /* tty   : tty descriptor          */
 /* param : code of param to be set */
-int c_ttystati ( int tty, int param )
+int c_ttystati ( void *tty, int param )
 {
-	XPOINTER x_tty = tty;
+	XPOINTER x_tty = (XPOINTER)tty;
 	XINT x_param = param;
 
 	return (TTYSTATI (&x_tty, &x_param));

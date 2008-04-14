@@ -75,12 +75,12 @@
  * devices.
  */
 /* ttyname : termcap name of device */
-int c_ttyodes ( const char *ttyname )
+void *c_ttyodes ( const char *ttyname )
 {
 	XPOINTER tty;
 
 	iferr (tty = TTYODES (c_sppstr (ttyname)))
 	    return (ERR);
 	else
-	    return (tty);
+	    return ((void *)tty);
 }

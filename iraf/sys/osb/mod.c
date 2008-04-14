@@ -7,24 +7,20 @@
 
 XINT MODI ( XINT *a, XINT *b )
 {
-    XINT q = *a / *b;
-    return *a - *b * q;
+    return (*a) % (*b);
 }
 
 XLONG MODL ( XLONG *a, XLONG *b )
 {
-    XLONG q = *a / *b;
-    return *a - *b * q;
+    return (*a) % (*b);
 }
 
 XSHORT MODS ( XSHORT *a, XSHORT *b )
 {
-    XSHORT q = *a / *b;
-    return *a - *b * q;
+    return (*a) % (*b);
 }
 
 XPOINTER MODP ( XPOINTER *a, XPOINTER *b )
 {
-    XPOINTER q = *a / *b;
-    return *a - *b * q;
+    return (*a) % (*b);
 }

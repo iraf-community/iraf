@@ -13,6 +13,8 @@ include	<fio.h>
 long procedure note (fd)
 
 int	fd
+
+long	lval
 errchk	filerr
 include	<fio.com>
 
@@ -22,7 +24,9 @@ begin
 	    call filerr (FNAME(fp), SYS_FILENOTOPEN)
 
 	if (FTYPE(fp) == TEXT_FILE) {
-	    call zcall2 (ZNOTTX(fp), FCHAN(fp), boffset[fd])
+	    lval = boffset[fd]
+	    call zcall2 (ZNOTTX(fp), FCHAN(fp), lval)
+	    boffset[fd] = lval
 	    return (boffset[fd])
 	} else
 	    return (LNOTE(fd))

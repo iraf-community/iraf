@@ -50,9 +50,9 @@
 void c_xwhen ( int exception, XSIGFUNC new_handler, XSIGFUNC *old_handler )
 {
 	XINT x_exception = exception;
-	XINT epa_new_handler = (XINT)new_handler;
-	XINT epa_old_handler;
+	XPOINTER epa_new_handler = (XPOINTER)new_handler;
+	XPOINTER epa_old_handler;
 
 	XWHEN (&x_exception, &epa_new_handler, &epa_old_handler);
-	*old_handler = (PFV)epa_old_handler;
+	*old_handler = (XSIGFUNC)epa_old_handler;
 }

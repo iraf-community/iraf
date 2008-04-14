@@ -8,7 +8,7 @@ include	<fio.h>
 # write directives are intercepted and processed.  Hence, the reader sees a
 # stream of application specific commands need not know about pseudofile i/o.
 
-int procedure prfilbuf (fd)
+long procedure prfilbuf (fd)
 
 int	fd			# parent's input IPC from child process
 
