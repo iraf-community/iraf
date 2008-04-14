@@ -299,8 +299,8 @@ struct operand makeop ( const char *str, int type )
 	    while (*s == ' ' || *s == '\t')
 		s++;
 
-	if (type != OT_STRING && 
-		!strcmp (indefstr, s) || !strcmp (indeflc, s)) {
+	if ( (type != OT_STRING && !strcmp (indefstr, s)) ||
+	     !strcmp (indeflc, s) ) {
 	    setopindef (&o);
 	    return (o);
 	}
@@ -316,11 +316,11 @@ struct operand makeop ( const char *str, int type )
 	    lower_str[MAX_DIGITS-1] = EOS;
 	    makelower (lower_str);
 	    /* Accept either "y" or "yes", "n" or "no" */
-	    if ((lower_str[0] == truestr[0]) && (lower_str[1] == '\0') ||
-		(strcmp (lower_str, truestr) == 0))
+	    if ( ((lower_str[0] == truestr[0]) && (lower_str[1] == '\0')) ||
+		 (strcmp (lower_str, truestr) == 0))
 		o.o_val.v_i = YES;
-	    else if ((lower_str[0] == falsestr[0]) && (lower_str[1] == '\0') ||
-		(strcmp (lower_str, falsestr) == 0))
+	    else if ( ((lower_str[0] == falsestr[0]) && (lower_str[1] == '\0'))
+		      || (strcmp (lower_str, falsestr) == 0) )
 		o.o_val.v_i = NO;
 	    else
 		setopundef (&o);

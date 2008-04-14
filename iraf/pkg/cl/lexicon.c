@@ -615,7 +615,7 @@ deposit_:
 tokout_:
 	yytext[yyleng] = '\0';
 
-	if (isdigit (yytext[0]) || yytext[0] == '.' && isdigit (yytext[1])) {
+	if (isdigit (yytext[0]) || (yytext[0] == '.' && isdigit (yytext[1]))) {
 	    int	token, toklen;
 
 	    token = c_lexnum (yytext, &toklen);

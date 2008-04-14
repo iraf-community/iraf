@@ -300,8 +300,8 @@ void paramset ( struct param *pp, char field )
 	    break;
 
 	case FN_MAX:				 /* maximum */
-	    if (bastype == OT_BOOL || 
-		bastype == OT_STRING && !(pp->p_type & PT_FILNAM)) {
+	    if ( bastype == OT_BOOL || 
+		 (bastype == OT_STRING && !(pp->p_type & PT_FILNAM)) ) {
 		cl_error (E_UERR, e_nominmax);
 	    }
 
@@ -608,7 +608,7 @@ void paramget ( struct param *pp, char field )
 	    /* Check for indefinite values. */
 	    if (arrflag && (field == FN_VALUE || field == FN_NULL)) {
 		if ((result.o_type == OT_BOOL || result.o_type == OT_INT) &&
-		    result.o_val.v_i == INDEFL) {
+		    result.o_val.v_i == INDEFI) {
 
 		    setopindef (&result);
 
@@ -1136,7 +1136,7 @@ int printparam ( struct param *pp, FILE *fp )
 		    lcount = 0;
 		}
 		if (bastype == OT_BOOL) {
-		    if (*p_i != INDEFL) {
+		    if (*p_i != INDEFI) {
 			if (*p_i++)
 			    fprintf (fp, "yes");
 			else
@@ -1145,7 +1145,7 @@ int printparam ( struct param *pp, FILE *fp )
 			p_i++;
 
 		} else if (bastype == OT_INT) {
-		    if (*p_i == INDEFL)
+		    if (*p_i == INDEFI)
 			p_i++;
 		    else
 		        fprintf (fp, "%d", *p_i++);

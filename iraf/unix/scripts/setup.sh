@@ -59,6 +59,7 @@ set_irafenv() {
     ;;
   x86_64)
     F="$F -DX86_64"
+    #MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -/mcmodel=medium"
     ;;
   powerpc)
     F="$F -DPOWERPC"
@@ -510,6 +511,13 @@ EOF
       install_file $j
     done
   done
+  #
+  install_file iraf/unix/include/f2c.h
+  install_file iraf/unix/boot/spp/rpp/rppfor/entxkw.f
+  install_file iraf/unix/config/mkpkg.inc
+  install_file iraf/unix/config/iraf.h
+  install_file iraf/unix/config/mach.h
+  #
   mkdir -p -m 755 $DESTDIR/$PREFIX/iraf/iraf/config
   mkdir -p -m 777 $DESTDIR/$PREFIX/iraf/imdirs
   #
@@ -573,7 +581,7 @@ EOF
            iraf/base iraf/config iraf/dev \
            iraf/doc iraf/math iraf/sys \
            iraf/pkg iraf/tables iraf/noao ; do
-    L=`find $i -print | grep -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | grep -v -e '\.[aoe]$' | grep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | grep -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | grep -v -e '\.[aoe]$' | grep -v -e 'unix/config/mkpkg.inc$' -e 'unix/config/iraf.h$' -e 'unix/config/mach.h$' -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
@@ -583,7 +591,7 @@ EOF
            iraf/unix/gdev iraf/unix/include iraf/unix/mkpkg \
            iraf/unix/mkpkg.sh iraf/unix/os iraf/unix/portkit \
            iraf/unix/scripts iraf/unix/shlib iraf/unix/sun ; do
-    L=`find $i -print | grep -v -e 'unix/scripts/setup.sh$' -e '\.[aoe]$' | grep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | grep -v -e 'unix/scripts/setup.sh$' -e 'unix/include/f2c.h$' -e 'unix/boot/spp/rpp/rppfor/entxkw.f$' -e '\.[aoe]$' | grep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done

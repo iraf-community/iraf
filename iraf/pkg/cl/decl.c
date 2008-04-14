@@ -185,7 +185,7 @@ void do_arrayinit ( struct param *pp, int nval, int nindex )
 		case OT_BOOL:
 		    if (o->o_type != OT_BOOL  &&  o->o_type != OT_INT) {
 			eprintf ("Invalid type in array initialization.\n");
-			*(ar.a_i + i) = INDEFL;
+			*(ar.a_i + i) = INDEFI;
 		    } else
 			*(ar.a_i + i) = o->o_val.v_i;
 		    break;
@@ -193,7 +193,7 @@ void do_arrayinit ( struct param *pp, int nval, int nindex )
 		case OT_INT:
 		    if (o->o_type != OT_INT) {
 			eprintf ("Invalid type in array initialization.\n");
-			*(ar.a_i + i) = INDEFL;
+			*(ar.a_i + i) = INDEFI;
 		    } else
 			*(ar.a_i + i) = o->o_val.v_i;
 		    break;
@@ -257,7 +257,7 @@ void do_arrayinit ( struct param *pp, int nval, int nindex )
 		     switch (bastype) {
 			case OT_INT:
 			case OT_BOOL:
-			    ar.a_i[i] = INDEFL;
+			    ar.a_i[i] = INDEFI;
 			    break;
 			case OT_REAL:
 			    ar.a_r[i] = INDEFR;

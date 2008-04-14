@@ -64,7 +64,8 @@ static	int cmdline;			/* last line on screen		      */
 static	int maxcol;			/* last column on screen	      */
 static	int line, topline, botline;	/* current, top, bottom lines	      */
 static	int col, startcol, nextcol;	/* current, first, last columns	      */
-static	int tty_fd, tty;		/* define the terminal globally       */
+static	int tty_fd;			/* define the terminal globally       */
+static	void *tty;
 static	int botkeyline, nextline,	/* various global variables for       */
 	    keyid, numkeys, topkey,	/*   keeping track of lines and keys  */
 	    botkey, nextkey;
@@ -379,8 +380,8 @@ int e_makelist ( struct pfile *pfileptr )
 	if (cldebug) {
 	    int	i;
 	    for (i=1;  i <= numkeys;  i++) {
-	        snprintf (dbg, SZ_LINE, "parmlist: %d %d %d  ", 
-			(int)(parmlist[i]), keylines[i], firstelement[i]);
+	        snprintf (dbg, SZ_LINE, "parmlist: %ld %d %d  ", 
+			(long)(parmlist[i]), keylines[i], firstelement[i]);
 		E_DEBUG (dbg);
 	    }
             snprintf (dbg, SZ_LINE, " maxpage = %d  ", maxpage);
@@ -1534,7 +1535,7 @@ void e_ttyinit( void )
 {
 	/* Open the tty (termcap) descriptor for the terminal.
 	 */
-	if ((tty = c_ttyodes ("terminal")) == ERR)
+	if ((tty = c_ttyodes ("terminal")) == (void *)ERR)
 	    c_erract (EA_ERROR);
 
 	/* Set raw mode on the standard input.

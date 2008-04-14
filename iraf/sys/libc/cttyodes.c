@@ -80,7 +80,7 @@ void *c_ttyodes ( const char *ttyname )
 	XPOINTER tty;
 
 	iferr (tty = TTYODES (c_sppstr (ttyname)))
-	    return (ERR);
+	    return ((void *)ERR);
 	else
 	    return ((void *)tty);
 }

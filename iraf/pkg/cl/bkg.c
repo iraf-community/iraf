@@ -373,7 +373,7 @@ void bkg_close ( int job, int pmsg )
 	bk->b_exitcode = c_prcldpr (bk->b_jobno);
 	bk->b_flags &= ~(J_RUNNING|J_SERVICE);
 
-	if (pmsg > 1 || pmsg == 1 && !notify()) {
+	if ( pmsg > 1 || (pmsg == 1 && !notify()) ) {
 	    if (bk->b_exitcode != OK)
 		eprintf ("[%d] exit %d\n", job, bk->b_exitcode);
 	    else

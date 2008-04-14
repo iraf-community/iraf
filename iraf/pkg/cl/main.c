@@ -55,7 +55,7 @@ int	cltrace = 0;		/* trace instruction execution if > 0	*/
 
 memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 static	XSIGFUNC old_onipc;	/* X_IPC handler chained to onint()	*/
-static	XINT *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
+static	XPOINTER *jumpcom;	/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
@@ -75,7 +75,7 @@ static int ninterrupts;		/* number of onint() calls per task	*/
 static long cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 
 
-static void cl_amovi ( XINT *, XINT *, int );
+static void cl_amovp ( XPOINTER *, XPOINTER *, int );
 static void onerr( void );
 static void execute( int );
 static void login( const char * );
@@ -101,8 +101,8 @@ XINT c_main ( XINT *prtype, PKCHAR *bkgfile, PKCHAR *cmd )
 	 * not prepared to deal with errors occuring during shutdown.
 	 */
 	XMJBUF (&bp);
-	jumpcom = (XINT *)&Memc[bp];
-	cl_amovi (jumpcom, jmp_save, LEN_JUMPBUF);
+	jumpcom = (XPOINTER *)&Memc[bp];
+	cl_amovp (jumpcom, jmp_save, LEN_JUMPBUF);
 
 	/* Init clexit() in case we have to panic stop.  */
 	if (setjmp (jmp_clexit))
@@ -136,7 +136,7 @@ exit_:
 	 * This is ugly, but the real problem is the jump vectors.  There
 	 * seems to be no alternative to this sort of thing...
 	 */
-	cl_amovi (jmp_save, jumpcom, LEN_JUMPBUF);
+	cl_amovp (jmp_save, jumpcom, LEN_JUMPBUF);
 	return (PR_EXIT | (logout_status << 1));
 }
 
@@ -677,9 +677,9 @@ static void onerr( void )
 }
 
 
-/* CL_AMOVI -- Copy an integer sized block of memory.
+/* CL_AMOVP -- Copy an pointer sized block of memory.
  */
-static void cl_amovi ( XINT *ip, XINT *op, int len )
+static void cl_amovp ( XPOINTER *ip, XPOINTER *op, int len )
 {
 	while (--len)
 	    *op++ = *ip++;

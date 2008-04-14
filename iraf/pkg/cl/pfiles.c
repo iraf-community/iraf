@@ -1006,8 +1006,9 @@ void pfcopyback ( struct pfile *pff )
 	     * or if it was set in a query or on the command line, and we are
 	     * in learn mode, and the parameter is not hidden.
 	     */
-	    if (!((pfflags & P_SET) || (pfflags&(P_QUERY|P_CLSET)) && learn &&
-		!(pf->p_mode & M_HIDDEN)))
+	    if ( !( (pfflags & P_SET) || 
+		    ((pfflags&(P_QUERY|P_CLSET)) && learn &&
+		     !(pf->p_mode & M_HIDDEN)) ) )
 		continue;
 
 	    bastype = pt->p_type & OT_BASIC;
@@ -1500,7 +1501,7 @@ struct param *addparam ( struct pfile *pfp, const char *buf, FILE *fp )
 		int	*p;
 		p = pp->p_aval.a_i;
 		for (i=0;  i < size_arr;  i++)
-		    *p++ = INDEFL;
+		    *p++ = INDEFI;
 
 	    } else if (bastype == OT_REAL) {
 		double	*p;

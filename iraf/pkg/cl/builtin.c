@@ -1057,7 +1057,7 @@ argerr:		cl_error (E_UERR, "Too few arguments to print or fprint");
 	    /* If operand is a number, add a space after the number.
 	     */
 	    type = o.o_type & OT_BASIC;
-	    if (type == OT_INT || type == OT_REAL && nleft > 1) {
+	    if ( type == OT_INT || (type == OT_REAL && nleft > 1) ) {
 		if ( SZ_LINE-1 <= op )
 		    cl_error (E_UERR, "Output line too long in 'print'");
 		else {
@@ -1828,9 +1828,9 @@ void cltime( void )
  */
 void clclear( void )
 {
-	int	tty;
+	void *tty;
 
-	if ((tty = c_ttyodes ("terminal")) == ERR)
+	if ((tty = c_ttyodes ("terminal")) == (void *)ERR)
 	    c_erract (EA_ERROR);
 
 	c_ttyso (STDOUT, tty, NO);
