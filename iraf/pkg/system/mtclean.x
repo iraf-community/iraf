@@ -14,12 +14,13 @@ procedure t_mtclean()
 
 int	out
 bool	clgetb()
-int	clgeti(), btoi()
+long	clgetl()
+int	btoi()
 
 begin
 	out = NULL
 	if (clgetb ("verbose"))
 	    out = STDOUT
 
-	call mtclean (btoi(clgetb("all")), clgeti("stale"), out)
+	call mtclean (btoi(clgetb("all")), clgetl("stale"), out)
 end
