@@ -153,7 +153,7 @@ end
 # by a newline.  OS filenames are converted to virtual filenames and hidden
 # files are skipped if desired.  Raw mode is not supported.
 
-procedure fgtdir (chan, outline, maxch, status)
+procedure fgtdir (chan, outline, a_maxch, status)
 
 int	chan			# oschan index
 char	outline[a_maxch]	# buffer which receives the VFN
