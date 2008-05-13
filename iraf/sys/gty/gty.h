@@ -22,5 +22,5 @@ define	T_NCAPS		Memi[P2I($1+11)]	# number of capabilities
 define	T_CAPLEN	Memi[P2I($1+12)]	# length of caplist, chars
 			# (extra space)
 define	T_CAPCODE	Memi[P2I($1+15)]	# cap code array: c1*128+c2
-define	T_CAPINDEX	Memi[P2I($1+215)]	# cap index array
+define	T_CAPINDEX	Memi[P2I($1+215)+$2-1]	# cap index array
 define	T_CAPLIST	Memc[P2C($1+415)]	# termcap entry

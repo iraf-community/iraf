@@ -103,7 +103,7 @@ begin
 	if (capnum > 0) {
 	    # Add 2 to skip the two capname chars.
 	    ip = coerce (tty + T_OFFCAP, TY_STRUCT, TY_CHAR) +
-		T_CAPINDEX(tty+capnum-1) - 1 + 2
+		T_CAPINDEX(tty,capnum) - 1 + 2
 	    if (Memc[ip] != '@')
 		return (YES)
 	}

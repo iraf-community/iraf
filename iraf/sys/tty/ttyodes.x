@@ -100,7 +100,7 @@ begin
 	# Prepare index of fields in the descriptor, so that we can more
 	# efficiently search for fields later.
 
-	call tty_index_caps (tty, T_CAPCODE(tty), T_CAPINDEX(tty),
+	call tty_index_caps (tty, T_CAPCODE(tty), T_CAPINDEX(tty,1),
 	    T_NCAPS(tty))
 
 	# Determine whether or not the terminal can backspace with BS.
