@@ -526,16 +526,18 @@ EOF
   if [ ! $S = 0 ]; then
     exit $S
   fi
-  ( cd $DESTDIR/dev
-    echo "Creating /dev/imtli"
-    rm -f imtli ; mknod -m 777 imtli p
-    echo "Creating /dev/imtlo"
-    rm -f imt1o ; mknod -m 777 imt1o p
-    rm -f imt1 ; ln -s imt1o imt1
-  )
-  S=$?
-  if [ ! $S = 0 ]; then
-    exit $S
+  if [ "$DESTDIR" != "" -o "$USER" = "root" ]; then
+    ( cd $DESTDIR/dev
+      echo "Creating /dev/imtli"
+      rm -f imtli ; mknod -m 777 imtli p
+      echo "Creating /dev/imtlo"
+      rm -f imt1o ; mknod -m 777 imt1o p
+      rm -f imt1 ; ln -s imt1o imt1
+    )
+    S=$?
+    if [ ! $S = 0 ]; then
+      exit $S
+    fi
   fi
   #
   mkdir -p $DESTDIR/$BINDIR
