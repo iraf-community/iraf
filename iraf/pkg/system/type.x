@@ -44,12 +44,14 @@ int	map_cc
 
 int	in
 pointer	sp, buf
+size_t	sz_val
 int	open(), getline()
 errchk	salloc, open, getline, ttyputline
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	in = open (fname, READ_ONLY, TEXT_FILE)
 
