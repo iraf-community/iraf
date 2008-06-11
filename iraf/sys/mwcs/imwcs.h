@@ -29,7 +29,7 @@ define	IW_SBUFOP	Memi[P2I($1+7)]	# current offset in sbuf
 define	IW_CARD		(IW_CBUF($1)+(($2)-1)*LEN_CDES)
 	# (avail)
 define	IW_CROTA	Memr[P2R($1+9)]				# obsolete
-define	IW_CTYPE	Memi[P2I($1+10)+($2)-1]			# axtype (strp)
+define	IW_CTYPE	Memp[$1+10+($2)-1]			# axtype (strp)
 define	IW_CRPIX	Memd[P2D($1+20)+($2)-1]			# CRPIXi
 define	IW_CRVAL	Memd[P2D($1+40)+($2)-1]			# CRVALi
 define	IW_CDELT	Memd[P2D($1+60)+($2)-1]			# CDELTi
