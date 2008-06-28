@@ -17,6 +17,8 @@ char	ref_file[SZ_PATHNAME]
 char	at_str[SZ_TIME], mt_str[SZ_TIME]
 bool	create, atime, mtime, verbose
 
+size_t	sz_val
+long	lval
 long	ref[LEN_FINFO]
 long	t_atime, t_mtime, ltime
 
@@ -28,8 +30,10 @@ pointer	clpopni()
 
 begin
 	# Initialize.
-	call aclrc (time, SZ_FNAME)
-	call aclrc (ref_file, SZ_PATHNAME)
+	sz_val = SZ_FNAME
+	call aclrc (time, sz_val)
+	sz_val = SZ_PATHNAME
+	call aclrc (ref_file, sz_val)
 
 	# Process the parameters.
 	list = clpopni ("files")
@@ -54,7 +58,8 @@ begin
 	    call clgstr ("ref_file", ref_file, SZ_PATHNAME)
 	    if (ref_file[1] == EOS) {
 		# No 'ref_file' param, use the current system time.
-		t_atime = clktime (long(0))
+		lval = 0
+		t_atime = clktime (lval)
 		t_mtime = t_atime
 
 		if (verbose) {

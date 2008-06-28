@@ -16,8 +16,9 @@ char    topic[ARB]                           	#i help topic
 char    curpack[ARB]                           	#i current package
 char    opt[ARB]                           	#i help option
 
-pointer helpstr
-int	ip, fdi
+size_t	sz_val
+pointer helpstr, ip
+int	fdi
 long	fsize
 char	ch, fname[SZ_FNAME], err[SZ_LINE]
 
@@ -75,7 +76,8 @@ begin
 
 	# Now filter the file to escape the curly braces so they pass thru
 	# to the Tcl cleanly.  Put the result in the string sent to the GUI.
-	call calloc (helpstr, fsize + SZ_LINE, TY_CHAR)
+	sz_val = fsize + SZ_LINE
+	call calloc (helpstr, sz_val, TY_CHAR)
 	ip = helpstr
 	repeat {
 	    ch = getc (fdi, ch)
@@ -116,6 +118,8 @@ char	helpdb[ARB]				#i help database
 char	section[ARB]				#i section on which to get help
 char	opt[ARB]				#i type of help
 
+size_t	sz_val
+long	lval
 long	fi[LEN_FINFO], db_ctime
 pointer	list, sp, ctrl, optn, db, fname
 
@@ -131,15 +135,19 @@ define	forms_ 91
 
 begin
 	call smark (sp)
-	call salloc (ctrl, LEN_CTRLSTRUCT, TY_STRUCT)
-	call salloc (optn, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_CTRLSTRUCT
+	call salloc (ctrl, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (optn, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# If we were called without any arguments, do not query for the
 	# template, just set it to null and help will be given for the
 	# current package.
 
-	call aclri (Memi[ctrl], LEN_CTRLSTRUCT)
+	sz_val = LEN_CTRLSTRUCT
+	call aclrp (Memp[ctrl], sz_val)
 	if (topic[1] == EOS) {
 	    if (file[1] == EOS) {
 	        H_OPTION(ctrl) = O_MENU
@@ -178,7 +186,8 @@ begin
 	# Reopen the help database if in-core copy is out of date.
 	if (db == NULL) {
 	    db = hdb_open (helpdb)
-	    db_ctime = clktime (long(0))
+	    lval = 0
+	    db_ctime = clktime (lval)
 	}
 
 	# Fetch the value of the ALL switch.  This determines whether help

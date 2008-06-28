@@ -18,6 +18,7 @@ char	oname[ARB]				#i output filename
 char	format[ARB]				#i format
 int	overwrite				#i overwrite flag
 
+size_t	sz_val
 pointer	sp, buf
 char	extn[SZ_EXTN]
 
@@ -26,7 +27,8 @@ int	access(), fnextn(), strlen(), strcmp()
 begin
 	if (access (oname, 0, 0) == YES && overwrite == NO) {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	    call sprintf (Memc[buf], SZ_LINE,
 		"Operation would overwrite\nexisting file '%s'")
 		    call pargstr (oname)
@@ -37,16 +39,19 @@ begin
 	} else if (access (oname, 0, 0) == YES)
 	    call delete (oname)
 
-	call aclrc (extn, SZ_EXTN)
+	sz_val = SZ_EXTN
+	call aclrc (extn, sz_val)
 
 	# Strip off any braces around the arguments that were put
 	# in by the Tcl script.
 	if (iname[1] == '{') {
-	    call amovc (iname[2], iname, strlen(iname)-2)
+	    sz_val = strlen(iname)-2
+	    call amovc (iname[2], iname, sz_val)
 	    iname[strlen(iname)-1] = EOS
 	}
 	if (oname[1] == '{') {
-	    call amovc (oname[2], oname, strlen(oname)-2)
+	    sz_val = strlen(oname)-2
+	    call amovc (oname[2], oname, sz_val)
 	    oname[strlen(oname)-1] = EOS
 	}
 
@@ -129,20 +134,20 @@ begin
 		"all", "help")
 	} else {
 	    # Open the input file.
-	    iferr (fdout = open (out, NEW_FILE, TEXT_FILE)) {
-                call sprintf (err, SZ_LINE, "Cannot open output file `%s'.")
-                   call pargstr (out)
+	    iferr (fdin = open (in, READ_ONLY, TEXT_FILE)) {
+                call sprintf (err, SZ_LINE, "Cannot open input file `%s'.")
+                   call pargstr (in)
 	        call gmsg (XH_GP(xh), "alert", err)
 	        return
 	    }
 
-	    call fprintf (out, "<HTML><BODY>\n")
-	    call fprintf (out, "<TITLE>%s</TITLE>\n")
+	    call fprintf (fdout, "<HTML><BODY>\n")
+	    call fprintf (fdout, "<TITLE>%s</TITLE>\n")
 		call pargstr (in)
-	    call fprintf (out, "<PRE>\n")
-	    call fcopyo (in, out)
-	    call fprintf (out, "</PRE>\n")
-	    call fprintf (out, "</BODY></HTML>\n")
+	    call fprintf (fdout, "<PRE>\n")
+	    call fcopyo (fdin, fdout)
+	    call fprintf (fdout, "</PRE>\n")
+	    call fprintf (fdout, "</BODY></HTML>\n")
 
 	    call close (fdin)
 	}

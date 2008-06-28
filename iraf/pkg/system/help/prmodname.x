@@ -12,11 +12,13 @@ pointer	ctrl			# help control parameters
 char	pakname[ARB]		# package name
 char	modname[ARB]		# module name
 
+size_t	sz_val
 pointer	sp, lbuf
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	if (pakname[1] != EOS || modname[1] != EOS) {
 	    call houtput (ctrl, "\n")

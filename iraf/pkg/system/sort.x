@@ -18,10 +18,12 @@ define	swap		{temp=$1;$1=$2;$2=temp}
 procedure t_sort()
 
 pointer	linbuf, linptr, list
-int	infil[MERGEORDER], nlines
+int	infil[MERGEORDER]
+size_t	nlines
 char	name[SZ_FNAME], source_file[SZ_FNAME]
 int	high, lim, low, fd, outfil, t, junk
 
+size_t	sz_val
 bool	clgetb()
 int	ss_gtext(), ss_mkfile()
 int	open(), clplen(), clgfil(), clgeti(), btoi()
@@ -52,8 +54,10 @@ begin
 	    use_strsrt = YES
 
 	# Allocate buffer space.
-	call malloc (linbuf, SZ_LINBUF, TY_CHAR)
-	call malloc (linptr, MAXPTR, TY_INT)
+	sz_val = SZ_LINBUF
+	call malloc (linbuf, sz_val, TY_CHAR)
+	sz_val = MAXPTR
+	call malloc (linptr, sz_val, TY_POINTER)
 
 	# Perform the sort. 
 	junk = clgfil (list, source_file, SZ_FNAME)
@@ -62,15 +66,15 @@ begin
 	# Initial formation of runs.
 	high = 0
 	repeat {
-	    t = ss_gtext (fd, Memi[linptr], nlines, Memc[linbuf])
+	    t = ss_gtext (fd, Memp[linptr], nlines, Memc[linbuf])
 	    if (use_strsrt == YES)
-		call strsrt (Memi[linptr], Memc[linbuf], nlines)
+		call strsrt (Memp[linptr], Memc[linbuf], nlines)
 	    else
-		call ss_quick (Memi[linptr], Memc[linbuf], nlines)
+		call ss_quick (Memp[linptr], Memc[linbuf], nlines)
 
 	    high = high + 1
 	    outfil = ss_mkfile (high)
-	    call ss_ptext (outfil, Memi[linptr], nlines, Memc[linbuf])
+	    call ss_ptext (outfil, Memp[linptr], nlines, Memc[linbuf])
 	    call close (outfil)
 
 	} until (t == EOF)
@@ -87,7 +91,7 @@ begin
 	}
 
 	call mfree (linbuf, TY_CHAR)
-	call mfree (linptr, TY_INT)
+	call mfree (linptr, TY_POINTER)
 
 	call ss_gname (high, name)		# final cleanup
 	outfil = open (name, READ_ONLY, TEXT_FILE)
@@ -178,16 +182,21 @@ int	infil[ARB]		# input file numbers
 int	outfil			# output file number
 int	nfiles			# number of files to be merged
 
+size_t	sz_val
 pointer	sp, linbuf
-int	linptr[MERGEORDER]
-int	i, inf, lbp, lp1, nf
+pointer	linptr[MERGEORDER]
+int	i
+size_t	nf
+pointer	lbp, lp1, inf
+
 int	getline()
 errchk	getline, putline, ss_quick
 include	"sort.com"
 
 begin
 	call smark (sp)
-	call salloc (linbuf, MERGEORDER * SZ_LINE, TY_CHAR)
+	sz_val = MERGEORDER * SZ_LINE
+	call salloc (linbuf, sz_val, TY_CHAR)
 
 	lbp = 1
 	nf = 0
@@ -226,11 +235,12 @@ end
 
 procedure ss_reheap (linptr, linbuf, nf)
 
-int	linptr[ARB]
+pointer	linptr[ARB]
 char	linbuf[ARB]
-int	nf
+size_t	nf
 
-int	i, j, temp
+long	i, j
+pointer	temp
 int	ss_compare()
 
 begin
@@ -253,11 +263,12 @@ end
 
 procedure ss_quick (linptr, linbuf, nlines)
 
-int	linptr[ARB]		# indices of strings in buffer
+pointer	linptr[ARB]		# indices of strings in buffer
 char	linbuf[ARB]		# string buffer
-int	nlines			# number of strings
+size_t	nlines			# number of strings
 
-int	i, j, k, temp, lv[LOGPTR], p, pivlin, uv[LOGPTR]
+long	i, j, k, lv[LOGPTR], p, uv[LOGPTR]
+pointer	pivlin, temp
 int	ss_compare()
 
 begin
@@ -319,11 +330,12 @@ end
 
 int procedure ss_compare (lp1, lp2, linbuf)
 
-int	lp1, lp2		# pointers to substrings in linbuf
+pointer	lp1, lp2		# pointers to substrings in linbuf
 char	linbuf[ARB]		# text buffer
 
 double	num1, num2
-int	ip1, ip2, answer, len1, len2
+pointer	ip1, ip2
+int	answer, len1, len2, i_off
 int	strcmp(), ss_findcolumn(), gctod()
 include	"sort.com"
 
@@ -342,8 +354,12 @@ begin
 	}
 
 	if (numeric_sort == YES) {
-	    len1 = gctod (linbuf, ip1, num1)
-	    len2 = gctod (linbuf, ip2, num2)
+	    i_off = 1
+	    len1 = gctod (linbuf[ip1], i_off, num1)
+	    ip1 = ip1 + i_off - 1
+	    i_off = 1
+	    len2 = gctod (linbuf[ip2], i_off, num2)
+	    ip2 = ip2 + i_off - 1
 
 	    # If fields are nonnumeric, compare as strings.
 	    if (len1 == 0 || len2 == 0)
@@ -370,8 +386,11 @@ end
 int procedure ss_findcolumn (buf, start, column)
 
 char	buf[ARB]
-int	start, column
-int	ip, col
+pointer	start
+int	column
+
+pointer	ip
+int	col
 
 begin
 	for (ip=start;  IS_WHITE(buf[ip]);  ip=ip+1)
@@ -391,10 +410,13 @@ end
 
 int procedure ss_gtext (infile, linptr, nlines, linbuf)
 
-int	infile, linptr[ARB], nlines
+int	infile
+pointer	linptr[ARB]
+size_t	nlines
 char	linbuf[ARB]
 
-int	lbp, len, getline()
+long	lbp
+int	len, getline()
 errchk	getline
 
 begin
@@ -422,9 +444,12 @@ end
 
 procedure ss_ptext (outfil, linptr, nlines, linbuf)
 
-int	outfil, linptr[ARB], nlines
+int	outfil
+pointer	linptr[ARB]
+size_t	nlines
 char	linbuf[ARB]
-int	i, j
+
+long	i, j
 errchk	putline
 
 begin

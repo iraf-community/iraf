@@ -53,6 +53,7 @@ pointer procedure ml_open (hp, template)
 pointer	hp				# help directory
 char	template[ARB]			# "alpha", "*", etc.
 
+size_t	sz_val
 bool	metachars
 int	ip
 pointer	ml, sp, pat, op
@@ -60,9 +61,11 @@ int	patmake()
 
 begin
 	call smark (sp)
-	call salloc (pat, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (pat, sz_val, TY_CHAR)
 
-	iferr (call calloc (ml, LEN_MLSTRUCT, TY_STRUCT))
+	sz_val = LEN_MLSTRUCT
+	iferr (call calloc (ml, sz_val, TY_STRUCT))
 	    call erract (EA_FATAL)
 	ML_INDEX(ml) = 1
 	ML_HP(ml) = hp

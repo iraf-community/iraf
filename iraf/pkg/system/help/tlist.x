@@ -23,8 +23,8 @@ define	INC_SZTLSBUF	512		# increment if overflow
 define	SZ_CURPACK	31		# allocation for curpack name string
 
 define	LEN_TLSTRUCT	7
-define	TL_CTRL		Memi[P2I($1)]	# string buffer
-define	TL_SBUF		Memi[P2I($1+1)]	# string buffer
+define	TL_CTRL		Memp[$1]	# string buffer
+define	TL_SBUF		Memp[$1+1]	# string buffer
 define	TL_SZSBUF	Memi[P2I($1+2)]	# size of string buffer
 define	TL_NEXTCH	Memi[P2I($1+3)]	# index of next char in sbuf
 define	TL_LISTPTR	Memi[P2I($1+4)]	# for fetching list elements
@@ -46,6 +46,7 @@ pointer	hp			# system package directory
 char	tlist[ARB]		# template list string
 pointer	ctrl
 
+size_t	sz_val
 int	ip, junk
 pointer	sp, op, tl, sbuf, template, pakstr, modstr
 int	tl_fetchelem(), tl_matchpak(), tl_putstr(), tl_getcurpack()
@@ -54,12 +55,16 @@ define	paknotfound_	91
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
-	call salloc (pakstr, SZ_FNAME, TY_CHAR)
-	call salloc (modstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (template, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pakstr, sz_val, TY_CHAR)
+	call salloc (modstr, sz_val, TY_CHAR)
 
-	call calloc (tl, LEN_TLSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_TLSBUF, TY_CHAR)
+	sz_val = LEN_TLSTRUCT
+	call calloc (tl, sz_val, TY_STRUCT)
+	sz_val = SZ_TLSBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	TL_CTRL(tl)    = ctrl
 	TL_SBUF(tl)    = sbuf
@@ -113,7 +118,8 @@ paknotfound_
 	# Return unused space in string buffer.  Copy length of list to
 	# the main help structure.
 
-	call realloc (TL_SBUF(tl), TL_NEXTCH(tl), TY_CHAR)
+	sz_val = TL_NEXTCH(tl)
+	call realloc (TL_SBUF(tl), sz_val, TY_CHAR)
 	TL_SZSBUF(tl) = TL_NEXTCH(tl)
 	H_LENTL(ctrl) = TL_LISTLEN(tl)
 
@@ -167,6 +173,7 @@ pointer	hp
 char	package[ARB]
 char	module[ARB]
 
+size_t	sz_val
 int	paklen, junk, ngen, modnum
 pointer	sp, template, op, ml
 int	tl_putstr(), ml_read()
@@ -175,7 +182,8 @@ errchk	ml_open, ml_read, tl_putstr
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (template, sz_val, TY_CHAR)
 
 	ngen = 0
 	ml = ml_open (hp, package)
@@ -224,6 +232,7 @@ pointer	db			# database descriptor
 pointer	hp			# package directory
 char	module[ARB]		# module template
 
+size_t	sz_val
 int	paklen, junk, ip, pk
 pointer	sp, curpack, template, op
 bool	streq()
@@ -232,8 +241,10 @@ errchk	tl_putstr, tl_getcurpack, hd_getname
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
-	call salloc (curpack, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (template, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (curpack, sz_val, TY_CHAR)
 
 	# Output the template for the current package.  Save the name of
 	# the current package for later use.
@@ -241,7 +252,8 @@ begin
 	op = template + tl_getcurpack (tl, Memc[template], SZ_LINE)
 	call strcpy (Memc[template], Memc[curpack], SZ_FNAME)
 	Memc[op] = '.'
-	call strcpy (module, Memc[op+1], SZ_LINE-(op-template)-1)
+	ip = op-template
+	call strcpy (module, Memc[op+1], SZ_LINE-ip-1)
 	junk = tl_putstr (tl, Memc[template])
 
 	# Check for pattern matching metacharacters.  If present we match
@@ -383,6 +395,7 @@ int procedure tl_putstr (tl, str)
 
 pointer	tl
 char	str[ARB]
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -395,7 +408,8 @@ begin
 	nextch = TL_NEXTCH(tl)
 	if (nextch + nchars + 1 > TL_SZSBUF(tl)) {
 	    TL_SZSBUF(tl) = TL_SZSBUF(tl) + INC_SZTLSBUF
-	    call realloc (TL_SBUF(tl), TL_SZSBUF(tl), TY_CHAR)
+	    sz_val = TL_SZSBUF(tl)
+	    call realloc (TL_SBUF(tl), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[TL_SBUF(tl) + nextch], ARB)

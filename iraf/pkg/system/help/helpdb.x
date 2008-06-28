@@ -96,14 +96,17 @@ char	root_helpdir_file[ARB]	# name of root help directory file
 char	helpdb_file[ARB]	# name of new database file
 bool	verbose			# print informative messages
 
+size_t	sz_val
+long	lval
 pointer	db, index, p1, p2, ix
 bool	no_entries_interchanged
-int	fd, temp[LEN_HDBINDEX], i
+int	fd, i
+pointer	temp[LEN_HDBINDEX]
 
 int	open()
 bool	strgt(), streq()
 long	clktime(), note(), fstatl()
-errchk	open, note, seek, hdb_compile_rhd, mii_writec, mii_writei
+errchk	open, note, seek, hdb_compile_rhd, mii_writec, mii_writep
 
 begin
 	# Open the output database file.
@@ -114,19 +117,23 @@ begin
 	# as we go.  The index and db header are written out after all
 	# help directories have been processed.
 
-	call calloc (db, LEN_HDBHEADER, TY_STRUCT)
-	call calloc (index, MAX_ENTRIES * LEN_HDBINDEX, TY_STRUCT)
+	sz_val = LEN_HDBHEADER
+	call calloc (db, sz_val, TY_STRUCT)
+	sz_val = MAX_ENTRIES * LEN_HDBINDEX
+	call calloc (index, sz_val, TY_STRUCT)
 
 	HDB_MAGIC(db)      = HDB_MAGICVAL
 	HDB_MAXENTRIES(db) = MAX_ENTRIES
-	HDB_CRDATE(db)     = clktime (long(0))
+	lval = 0
+	HDB_CRDATE(db)     = clktime (lval)
 
 	# Write zeros into the header area of the file, so that the next
 	# sequential write will place the first data record at the offset
 	# DATA_OFFSET.  We assume that the empty index is larger than the
 	# header area.
 
-	call write (fd, Memi[index], DATA_OFFSET - 1)
+	sz_val = DATA_OFFSET - 1
+	call write (fd, Memc[P2C(index)], sz_val)
 	HDB_DATAOFFSET(db) = note (fd)
 
 	# Compile root directory followed by all subdirectories.
@@ -148,9 +155,10 @@ begin
 		    p1 = index + (i - 1) * LEN_HDBINDEX
 		    p2 = p1 + LEN_HDBINDEX
 		    if (strgt (DBI_KEY(p1), DBI_KEY(p2))) {
-			call amovi (Memi[p1], temp,     LEN_HDBINDEX)
-			call amovi (Memi[p2], Memi[p1], LEN_HDBINDEX)
-			call amovi (temp,     Memi[p2], LEN_HDBINDEX)
+			sz_val = LEN_HDBINDEX
+			call amovp (Memp[p1], temp,     sz_val)
+			call amovp (Memp[p2], Memp[p1], sz_val)
+			call amovp (temp,     Memp[p2], sz_val)
 			no_entries_interchanged = false
 		    }
 		}
@@ -176,13 +184,17 @@ begin
 	# Write the index structure to the database file.
 	do i = 1, HDB_NENTRIES(db) {
 	    ix = index + (i - 1) * LEN_HDBINDEX
-	    call mii_writec (fd, DBI_KEY(ix), SZ_DBIKEY + 1)
-	    call mii_writei (fd, DBI_OFFSET(ix), LEN_DBIDATA)
+	    sz_val = SZ_DBIKEY + 1
+	    call mii_writec (fd, DBI_KEY(ix), sz_val)
+	    sz_val = LEN_DBIDATA
+	    call mii_writep (fd, DBI_OFFSET(ix), sz_val)
 	}
 
 	# Update the database file header.
-	call seek (fd, BOFL)
-	call mii_writei (fd, Memi[db], LEN_HDBHEADER)
+	lval = BOFL
+	call seek (fd, lval)
+	sz_val = LEN_HDBHEADER
+	call mii_writep (fd, Memp[db], sz_val)
 
 	call printf ("\nTotal of %d help modules in %d packages, ")
 	    call pargi (HDB_NMODULES(db))
@@ -213,19 +225,22 @@ pointer	db			# database descriptor
 pointer	index			# database index
 bool	verbose			# print notes on structure of database
 
+size_t	sz_val
+long	lval
 bool	found_a_subpackage
 pointer	hp_stk[MAX_DEPTH]	# help directory pointer stack
 int	pk_stk[MAX_DEPTH]	# subpackage index stack
 char	fname[SZ_FNAME]		# helpdir filename
 
-int	sp, pk, len_index
+int	sp, pk
+size_t	len_index
 pointer	ix, hp, modname, data
 long	mtime, fi[LEN_FINFO], savepos
 
 long	note(), clktime()
 int	hd_getname(), finfo()
 pointer	hd_open(), hdb_make_rhd()
-errchk	finfo, seek, note, mii_writei, malloc
+errchk	finfo, seek, note, mii_writep, malloc
 errchk	hd_getname, hdb_make_rhd, hdb_getdata
 
 begin
@@ -283,8 +298,10 @@ begin
 	    # the buffer.
 
 	    HD_NEXTCH(hp) = HD_LENHD(hp)
-	    call mii_writei (fd, Memi[hp], HD_LENHD(hp))
-	    call mii_writec (fd, Memc[HD_SBUF(hp)], HD_SZSBUF(hp))
+	    sz_val = HD_LENHD(hp)
+	    call mii_writep (fd, Memp[hp], sz_val)
+	    sz_val = HD_SZSBUF(hp)
+	    call mii_writec (fd, Memc[HD_SBUF(hp)], sz_val)
 
 	    # Keep track of the amount of struct storage that will be
 	    # required later to hold the UNPACKED helpdir data.
@@ -377,13 +394,15 @@ begin
 
 			# Load the database into memory.
 			call seek (fd, HDB_DATAOFFSET(db))
-			call malloc (data, HDB_DATALEN(db), TY_STRUCT)
+			sz_val = HDB_DATALEN(db)
+			call malloc (data, sz_val, TY_STRUCT)
 			call hdb_getdata (fd, data, HDB_DATALEN(db))
 
 			hp = hdb_make_rhd (db, data, index)
 			pk = HD_NMODULES(hp) + 1
 			call strcpy ("_index", fname, SZ_FNAME)
-			mtime = clktime (long (0))
+			lval = 0
+			mtime = clktime (lval)
 			sp = -1
 
 			call mfree (data, TY_STRUCT)
@@ -428,7 +447,9 @@ pointer	db			#I database descriptor
 pointer	data			#I data buffer (compiled help directories)
 pointer	index			#I database index
 
-int	i, j, len_modlist, pos
+size_t	sz_val
+size_t	len_modlist
+int	i, j, pos
 pointer	hp, o_hp, mp, ix, sbuf, o_mp, c_modlist, hdfile
 
 bool	streq()
@@ -440,8 +461,10 @@ begin
 	# Allocate and initialize descriptor and string buffer.  Must init
 	# nextch to 1 because 0 is the null index.
 
-	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_SBUF, TY_CHAR)
+	sz_val = LEN_HDSTRUCT
+	call calloc (hp, sz_val, TY_STRUCT)
+	sz_val = SZ_SBUF
+	call malloc (sbuf, sz_val, TY_CHAR)
 
 	HD_SBUF(hp)   = sbuf
 	HD_DEFDIR(hp) = NULL
@@ -456,7 +479,8 @@ begin
 
 	HD_NMODULES(hp) = 1
 	mp = HD_MODULE(hp,1)
-	call aclri (Memi[mp], LEN_MODSTRUCT)
+	sz_val = LEN_MODSTRUCT
+	call aclrp (Memp[mp], sz_val)
 	M_NAME(mp) = hd_putstr (hp, "_root")
 	M_PKG(mp)  = hd_putstr (hp, DBI_KEY(index))
 
@@ -490,7 +514,7 @@ begin
 
 	len_modlist = HD_NMODULES(hp) * LEN_MODSTRUCT
 	call malloc (c_modlist, len_modlist, TY_STRUCT)
-	call amovi (Memi[HD_MODULE(hp,1)], Memi[c_modlist], len_modlist)
+	call amovp (Memp[HD_MODULE(hp,1)], Memp[c_modlist], len_modlist)
 
 	pos = 0
 	do j = 1, HDB_NENTRIES(db) {
@@ -508,8 +532,8 @@ begin
 		else if (streq (DBI_KEY(ix), Memc[hdfile])) {
 		    # Append entry to output helpdir.
 		    pos = pos + 1
-		    call amovi (Memi[o_mp], Memi[HD_MODULE(hp,pos)],
-			LEN_MODSTRUCT)
+		    sz_val = LEN_MODSTRUCT
+		    call amovp (Memp[o_mp], Memp[HD_MODULE(hp,pos)], sz_val)
 		}
 	    }
 	}
@@ -518,13 +542,15 @@ begin
 	HD_NMODULES(hp) = pos
 
 	# Return any unused space in string buffer.
-	call realloc (HD_SBUF(hp), HD_NEXTCH(hp), TY_CHAR)
+	sz_val = HD_NEXTCH(hp)
+	call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_SZSBUF(hp) = HD_NEXTCH(hp)
 
 	# Return any unused module descriptors.
         HD_LENHD(hp) = HD_LENHD(hp) -
 	    LEN_MODSTRUCT * (HD_MAXMODULES(hp) - HD_NMODULES(hp))
-	call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+	sz_val = HD_LENHD(hp)
+	call realloc (hp, sz_val, TY_STRUCT)
 	HD_MAXMODULES(hp) = HD_NMODULES(hp)
 
 	return (hp)
@@ -544,14 +570,18 @@ pointer procedure hdb_open (database)
 
 char	database[ARB]		#I name of database to be opened
 
+size_t	sz_val
+long	lval
 bool	no_entries_interchanged
 pointer	sp, fname, files, hp, db, d_op, i_op, ix, p1, p2, db_save, list
-int	nfiles, nints, fd, d_len, i_len, i, temp[LEN_HDBINDEX]
+int	nfiles, fd, d_len, i_len, i
+pointer	temp[LEN_HDBINDEX]
+size_t	nints
 
 long	clktime()
 bool	streq(), strgt()
 pointer	hd_open(), hdb_make_rhd(), fntopnb()
-int	open(), mii_readi(), mii_readc()
+int	open(), mii_readp(), mii_readc()
 int	envgets(), access(), fntgfnb()
 errchk	calloc, realloc, malloc, open, seek, syserrs
 errchk	hd_open, fntopnb, fntgfnb, hdb_make_rhd, hdb_getdata
@@ -560,13 +590,17 @@ define	readerr_  92
 
 begin
 	call smark (sp)
-	call salloc (files, SZ_HELPDB, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (hp, LEN_HDBHEADER, TY_STRUCT)
-	call salloc (db_save, LEN_HDBHEADER, TY_STRUCT)
+	sz_val = SZ_HELPDB
+	call salloc (files, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = LEN_HDBHEADER
+	call salloc (hp, sz_val, TY_STRUCT)
+	call salloc (db_save, sz_val, TY_STRUCT)
 
 	# Allocate database descriptor.
-	call calloc (db, LEN_HDBHEADER, TY_STRUCT)
+	sz_val = LEN_HDBHEADER
+	call calloc (db, sz_val, TY_STRUCT)
 
 	# If the database name is "helpdir", raw access is desired and the
 	# name of the root help directory file is given by the environment
@@ -603,7 +637,8 @@ begin
 
 	# Allocate and initialize empty database header and index structures.
 	HDB_MAGIC(db)	   = HDB_MAGICVAL
-	HDB_CRDATE(db)     = clktime (long(0))
+	lval = 0
+	HDB_CRDATE(db)     = clktime (lval)
 
 	HDB_NENTRIES(db)   = 0
 	HDB_MAXENTRIES(db) = MAX_ENTRIES
@@ -628,11 +663,12 @@ begin
 	    }
 
 	    # Save descriptor in case we cannot read this file.
-	    call amovi (Memi[db], Memi[db_save], LEN_HDBHEADER)
+	    sz_val = LEN_HDBHEADER
+	    call amovp (Memp[db], Memp[db_save], sz_val)
 
 	    # Read the database file header.
 	    nints = LEN_HDBHEADER
-	    if (mii_readi (fd, Memi[hp], nints) < nints) {
+	    if (mii_readp (fd, Memp[hp], nints) < nints) {
 		call eprintf ("Cannot read help database file header (%s)\n")
 		    call pargstr (Memc[fname])
 		goto rejectfile_
@@ -656,9 +692,11 @@ begin
 	    # Make room for the new data and index entries.
 	    iferr {
 		HDB_DATALEN(db) = HDB_DATALEN(db) + HDB_DATALEN(hp)
-		call realloc (HDB_DATAPTR(db), HDB_DATALEN(db), TY_STRUCT)
+		sz_val = HDB_DATALEN(db)
+		call realloc (HDB_DATAPTR(db), sz_val, TY_STRUCT)
 		HDB_INDEXLEN(db) = HDB_INDEXLEN(db) + HDB_INDEXLEN(hp)
-		call realloc (HDB_INDEXPTR(db), HDB_INDEXLEN(db), TY_STRUCT)
+		sz_val = HDB_INDEXLEN(db)
+		call realloc (HDB_INDEXPTR(db), sz_val, TY_STRUCT)
 	    } then
 		call erract (EA_WARN)
 
@@ -679,9 +717,11 @@ begin
 
 	    do i = 1, HDB_NENTRIES(hp) {
 		ix = i_op + (i - 1) * LEN_HDBINDEX
-		if (mii_readc (fd, DBI_KEY(ix), SZ_DBIKEY + 1) < SZ_DBIKEY + 1)
+		sz_val = SZ_DBIKEY + 1
+		if (mii_readc (fd, DBI_KEY(ix), sz_val) < SZ_DBIKEY + 1)
 		    goto readerr_
-		if (mii_readi (fd, DBI_OFFSET(ix), LEN_DBIDATA) < LEN_DBIDATA) {
+		sz_val = LEN_DBIDATA
+		if (mii_readp (fd, DBI_OFFSET(ix), sz_val) < LEN_DBIDATA) {
 readerr_	    call eprintf ("Cannot read database index (%s)\n")
 			call pargstr (Memc[fname])
 		    goto rejectfile_
@@ -707,7 +747,8 @@ rejectfile_
 	    # was in before we tried to read the file, to repair any damage.
 
 	    d_op = HDB_DATAPTR(db);  i_op = HDB_INDEXPTR(db)
-	    call amovi (Memi[db_save], Memi[db], LEN_HDBHEADER)
+	    sz_val = LEN_HDBHEADER
+	    call amovp (Memp[db_save], Memp[db], sz_val)
 	    HDB_DATAPTR(db) = d_op;  HDB_INDEXPTR(db) = i_op
 
 	    call close (fd)
@@ -732,12 +773,15 @@ rejectfile_
 	d_len = HDB_DATALEN(db)
 	nints = HD_LENHD(hp) + (HD_SZSBUF(hp) + SZ_STRUCT-1) / SZ_STRUCT
 	HDB_DATALEN(db) = HDB_DATALEN(db) + nints
-	call realloc (HDB_DATAPTR(db), HDB_DATALEN(db), TY_STRUCT)
+	sz_val = HDB_DATALEN(db)
+	call realloc (HDB_DATAPTR(db), sz_val, TY_STRUCT)
 	d_op = HDB_DATAPTR(db) + d_len
 
 	HD_NEXTCH(hp) = HD_LENHD(hp)
-	call amovi (Memi[hp], Memi[d_op], HD_LENHD(hp))
-	call amovc (Memc[HD_SBUF(hp)], Memi[d_op+HD_LENHD(hp)], HD_SZSBUF(hp))
+	sz_val = HD_LENHD(hp)
+	call amovp (Memp[hp], Memp[d_op], sz_val)
+	sz_val = HD_SZSBUF(hp)
+	call amovc (Memc[HD_SBUF(hp)], Memc[P2C(d_op+HD_LENHD(hp))], sz_val)
 
 	# Add an index entry for the _index helpdir.
 	if (HDB_NENTRIES(db) > HDB_MAXENTRIES(db)) {
@@ -749,7 +793,8 @@ rejectfile_
 
 	ix = HDB_INDEXPTR(db) + (HDB_NENTRIES(db) - 1) * LEN_HDBINDEX
 	call strcpy ("_index", DBI_KEY(ix), SZ_DBIKEY)
-	DBI_MTIME(ix)  = clktime (long(0))
+	lval = 0
+	DBI_MTIME(ix)  = clktime (lval)
 	DBI_OFFSET(ix) = d_op - HDB_DATAPTR(db)
 
 	# Free dedicated hp/sbuf, since descriptor is in data buffer now.
@@ -763,9 +808,10 @@ rejectfile_
 		    p1 = HDB_INDEXPTR(db) + (i - 1) * LEN_HDBINDEX
 		    p2 = p1 + LEN_HDBINDEX
 		    if (strgt (DBI_KEY(p1), DBI_KEY(p2))) {
-			call amovi (Memi[p1], temp,     LEN_HDBINDEX)
-			call amovi (Memi[p2], Memi[p1], LEN_HDBINDEX)
-			call amovi (temp,     Memi[p2], LEN_HDBINDEX)
+			sz_val = LEN_HDBINDEX
+			call amovp (Memp[p1], temp,     sz_val)
+			call amovp (Memp[p2], Memp[p1], sz_val)
+			call amovp (temp,     Memp[p2], sz_val)
 			no_entries_interchanged = false
 		    }
 		}
@@ -823,6 +869,7 @@ pointer procedure hdb_load (db, helpdir)
 pointer	db			# database descriptor
 char	helpdir[ARB]		# help directory to be accessed.
 
+size_t	sz_val
 bool	index
 pointer	hp, ix, sp, errmsg
 
@@ -833,7 +880,8 @@ errchk	hdb_open
 
 begin
 	call smark (sp)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	index = (streq (helpdir, "_index") || streq (helpdir, "_root"))
 
@@ -943,6 +991,7 @@ int	fd			# output file
 char	helpdb[ARB]		# filename of database to be examined
 bool	verbose			# print menus as well
 
+size_t	sz_val
 int	i
 long	fi[LEN_FINFO]
 pointer	list, sp, fname, date, db, ixoff, ix
@@ -954,8 +1003,10 @@ errchk	hdb_open, hdb_printpack, fntopnb, fntgfnb
 
 begin
 	call smark (sp)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	db = hdb_open (helpdb)
 	ixoff = HDB_INDEXPTR(db)
@@ -1003,7 +1054,9 @@ pointer	db			# database descriptor
 pointer	ix			# database index descriptor of package
 bool	verbose			# print menus
 
-int	m
+size_t	sz_val
+int	ival
+size_t	m
 pointer	sp, hp, paknames, date
 long	fi[LEN_FINFO]
 int	hd_getname(), envgeti(), finfo()
@@ -1012,8 +1065,10 @@ errchk	hd_getname
 
 begin
 	call smark (sp)
-	call salloc (paknames, MAX_MENUSIZE, TY_POINTER)
-	call salloc (date, SZ_DATE, TY_CHAR)
+	sz_val = MAX_MENUSIZE
+	call salloc (paknames, sz_val, TY_POINTER)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
 
 	iferr (hp = hdb_load (db, DBI_KEY(ix))) {
 	    call erract (EA_WARN)
@@ -1043,8 +1098,10 @@ begin
 	    # pointers in an array for the table print routine.
 
 	    for (m=0;  m < MAX_MENUSIZE;  m=m+1) {
-		call salloc (Memi[paknames+m], MAX_NAMELEN, TY_CHAR)
-		if (hd_getname (hp, m+1, TY_MODNAME, Memc[Memi[paknames+m]],
+		sz_val = MAX_NAMELEN
+		call salloc (Memp[paknames+m], sz_val, TY_CHAR)
+		ival = m+1
+		if (hd_getname (hp, ival, TY_MODNAME, Memc[Memp[paknames+m]],
 		    MAX_NAMELEN) <= 0)
 			break
 	    }
@@ -1053,7 +1110,7 @@ begin
 	    # because the "helpdir" code (which reads the help directory) has
 	    # already done so.
 
-	    call strtbl (fd, Memc, Memi[paknames], m, FIRST_COL,
+	    call strtbl (fd, Memc, Memp[paknames], m, FIRST_COL,
 		envgeti ("ttyncols"), MAX_NAMELEN, 0)
 	}
 
@@ -1073,6 +1130,7 @@ pointer	hp		# new help directory being extended
 pointer	o_hp		# old help directory
 int	pk		# module number in old directory
 
+size_t	sz_val
 int	firstch, m
 pointer	sp, fname, sbuf, o_sbuf, mp, o_mp, pakname
 int	hd_getname(), hd_putstr()
@@ -1080,7 +1138,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	sbuf    = HD_SBUF(hp)
 	o_sbuf  = HD_SBUF(o_hp)
@@ -1110,14 +1169,16 @@ begin
 	if (m > HD_NMODULES(hp)) {
 	    if (m > HD_MAXMODULES(hp)) {
 		HD_LENHD(hp) = HD_LENHD(hp) + (INC_MODULES * LEN_MODSTRUCT)
-		call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+		sz_val = HD_LENHD(hp)
+		call realloc (hp, sz_val, TY_STRUCT)
 		HD_MAXMODULES(hp) = HD_MAXMODULES(hp) + INC_MODULES
 	    }
 	    HD_NMODULES(hp) = m
 	}
 
 	mp = HD_MODULE(hp,m)
-	call aclri (Memi[mp], LEN_MODSTRUCT)
+	sz_val = LEN_MODSTRUCT
+	call aclrp (Memp[mp], sz_val)
 
 	# Put module name in string buffer and save index of string in module
 	# descriptor.
@@ -1155,11 +1216,12 @@ int	fd			#I input file
 pointer	obuf			#O receives unpacked helpdir data
 int	buflen			#O max su out
 
-int	nelem
+size_t	sz_val
+size_t	nelem
 pointer	op, hp
 int	mii_sz_struct
-int	mii_readi(), mii_readc()
-errchk	mii_readi, mii_readc
+int	mii_readp(), mii_readc()
+errchk	mii_readp, mii_readc
 define	readerr_ 91
 
 begin
@@ -1170,23 +1232,24 @@ begin
 	    hp = op
 
 	    # Get fixed size helpdir header.
-	    if (mii_readi (fd, Memi[op], LEN_BASEHD) < LEN_BASEHD)
+	    sz_val = LEN_BASEHD
+	    if (mii_readp (fd, Memp[op], sz_val) < LEN_BASEHD)
 		goto readerr_
 
 	    # Get module entries.
 	    op = op + LEN_BASEHD
 	    nelem = HD_LENHD(hp) - LEN_BASEHD
-	    if (mii_readi (fd, Memi[op], nelem) < nelem)
+	    if (mii_readp (fd, Memp[op], nelem) < nelem)
 		goto readerr_
 
 	    # Get string buffer.
 	    op = op + nelem
 	    nelem = HD_SZSBUF(hp)
-	    if (mii_readc (fd, Memi[op], nelem) < nelem)
+	    if (mii_readc (fd, Memc[P2C(op)], nelem) < nelem)
 		goto readerr_
 
-	    #op = op + ((nelem + SZ_STRUCT-1) / SZ_STRUCT)
-	    op = op + ((nelem + mii_sz_struct-1) / mii_sz_struct)
+	    op = op + ((nelem + SZ_STRUCT-1) / SZ_STRUCT)
+	    #op = op + ((nelem + mii_sz_struct-1) / mii_sz_struct)
 	}
 
 	return

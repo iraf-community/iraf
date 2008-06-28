@@ -39,13 +39,14 @@ program that reads lroff output.
 procedure lroff (in, in_arg, out, out_arg, plm, prm, soflag_val, foflag_val)
 
 extern	in()			# called to get lines of input text
-int	in_arg			# magic argument for in()
+pointer	in_arg			# magic argument for in()
 extern	out()			# called to output formatted lines of text
-int	out_arg			# magic argument for out()
+pointer	out_arg			# magic argument for out()
 int	plm, prm		# permanent left and right margins
 int	soflag_val		# output standout mode control chars?
 int	foflag_val		# output form control chars?
 
+size_t	sz_val
 char	ctrlstr[2]
 pointer	sp, ibuf
 int	ip, command, last_command
@@ -60,7 +61,8 @@ define	text_	98
 
 begin
 	call smark (sp)
-	call salloc (ibuf, SZ_IBUF, TY_CHAR)
+	sz_val = SZ_IBUF
+	call salloc (ibuf, sz_val, TY_CHAR)
 
 	if (plm > prm || plm < 1)
 	    call error (1, "Lroff called with invalid margins")
@@ -156,7 +158,8 @@ begin
 		    ip = ip + 1
 		while (!IS_WHITE(Memc[ibuf+ip]))	# skip <href>
 		    ip = ip + 1
-		call amovc (Memc[ibuf+ip+1], Memc[ibuf], SZ_IBUF)
+		sz_val = SZ_IBUF
+		call amovc (Memc[ibuf+ip+1], Memc[ibuf], sz_val)
 		ip = 0
 		goto text_
 

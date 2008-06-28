@@ -14,6 +14,7 @@ pointer	xh					#i task struct pointer
 int	exact_match				#i require an exact match?
 char	pattern[ARB]				#i search pattern
 
+size_t	sz_val
 pointer	sp, lfile, line, helpstr, item
 pointer	tp, lp, pat
 char	task[SZ_FNAME], pkg[SZ_FNAME], desc[SZ_FNAME]
@@ -26,10 +27,13 @@ errchk	open, xh_updt_quickref
 
 begin
 	call smark (sp)
-	call salloc (lfile, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (item, SZ_LINE, TY_CHAR)
-	call salloc (pat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lfile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (item, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pat, sz_val, TY_CHAR)
 
 	# Open the quick reference file.
 	iferr (fd = open (QUICKREF(xh), READ_ONLY, TEXT_FILE))
@@ -43,7 +47,8 @@ begin
 	fsize = fstatl (fd, F_FILESIZE)
 
 	# Check pattern for multi-word searches.
-	call aclrc (Memc[pat], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[pat], sz_val)
 	for (ip=1; IS_WHITE(pattern[ip]); ip=ip+1)
 	    ;
 	if (pattern[ip] == '{') {
@@ -80,7 +85,8 @@ begin
 	    call sfree (sp)
 	    return
 	}
-	call calloc (helpstr, 5*fsize, TY_CHAR)
+	sz_val = 5*fsize
+	call calloc (helpstr, sz_val, TY_CHAR)
 
 	# Read back the sorted list, separate the task name, package, and
 	# descriptions and format it for the GUI.

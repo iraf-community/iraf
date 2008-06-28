@@ -30,6 +30,7 @@ procedure xh_directory (xh, command)
 pointer	xh					#i task descriptor
 char	command[ARB]				#i command option
 
+size_t	sz_val
 pointer	sp, dir, file, pattern, path, fmt
 pointer task, pkg, opt, type
 int	ncmd, overwrite
@@ -38,25 +39,28 @@ int	strdic(), strcmp(), envgets()
 begin
 	# Allocate working space and clear it.
 	call smark (sp)
-	call salloc (dir, SZ_PATHNAME, TY_CHAR) 	
-	call salloc (path, SZ_PATHNAME, TY_CHAR) 	
-	call salloc (file, SZ_FNAME, TY_CHAR)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (fmt, SZ_FNAME, TY_CHAR)
-	call salloc (task, SZ_FNAME, TY_CHAR)
-	call salloc (pkg, SZ_FNAME, TY_CHAR)
-	call salloc (opt, SZ_FNAME, TY_CHAR)
-	call salloc (type, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dir, sz_val, TY_CHAR) 	
+	call salloc (path, sz_val, TY_CHAR) 	
+	sz_val = SZ_FNAME
+	call salloc (file, sz_val, TY_CHAR)
+	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (task, sz_val, TY_CHAR)
+	call salloc (pkg, sz_val, TY_CHAR)
+	call salloc (opt, sz_val, TY_CHAR)
+	call salloc (type, sz_val, TY_CHAR)
 
-	call aclrc (Memc[dir], SZ_FNAME)
-	call aclrc (Memc[path], SZ_FNAME)
-	call aclrc (Memc[file], SZ_FNAME)
-	call aclrc (Memc[fmt], SZ_FNAME)
-	call aclrc (Memc[pattern], SZ_FNAME)
-	call aclrc (Memc[task], SZ_FNAME)
-	call aclrc (Memc[pkg], SZ_FNAME)
-	call aclrc (Memc[opt], SZ_FNAME)
-	call aclrc (Memc[type], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[dir], sz_val)
+	call aclrc (Memc[path], sz_val)
+	call aclrc (Memc[file], sz_val)
+	call aclrc (Memc[fmt], sz_val)
+	call aclrc (Memc[pattern], sz_val)
+	call aclrc (Memc[task], sz_val)
+	call aclrc (Memc[pkg], sz_val)
+	call aclrc (Memc[opt], sz_val)
+	call aclrc (Memc[type], sz_val)
 
 	ncmd = strdic (command, command, SZ_LINE, DIR_CMDS)
 	switch (ncmd) {
@@ -128,6 +132,7 @@ pointer	xh					#i task descriptor
 char	directory[ARB]				#i directory to read
 char	pattern[ARB]				#i matching template
 
+size_t	sz_val
 pointer	sp, path, fname, patbuf
 pointer	dp, fp, ip, op, ep, sym
 bool	match_extension
@@ -140,11 +145,15 @@ int	patmake(), patmatch(), strlen(), getline()
 
 begin
 	call smark (sp)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (path, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patbuf, sz_val, TY_CHAR)
 
-	call aclrc (Memc[patbuf], SZ_LINE)
+	sz_val = SZ_LINE
+	call aclrc (Memc[patbuf], sz_val)
 
 	# If this isn't a directory just return silently.
 	if (xh_isdir (directory, Memc[path], SZ_PATHNAME) == 0) {
@@ -277,6 +286,7 @@ pointer	stp					#i symtab ptr for list
 char	param[ARB]				#i GUI param to notify
 char	arg[ARB]				#i GUI param arg
 
+size_t	sz_val
 pointer	sp, list, msg, sym, name, ip
 int	nchars
 
@@ -287,7 +297,8 @@ begin
 	# Return if there is no symtab information.
 	if (stp == NULL) {
 	    call smark (sp)
-	    call salloc (msg, SZ_FNAME , TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (msg, sz_val, TY_CHAR)
 	    call sprintf (Memc[msg], SZ_FNAME, "%s { }")
 	        call pargstr (arg)
 
@@ -301,8 +312,10 @@ begin
 	nchars =  stsize (stp) + 1
 
 	call smark (sp)
-	call salloc (list, nchars , TY_CHAR)
-	call aclrc (Memc[list], nchars)
+	sz_val = nchars
+	call salloc (list, sz_val, TY_CHAR)
+	sz_val = nchars
+	call aclrc (Memc[list], sz_val)
 	ip = list
 
 	# Build the list from the symtab.
@@ -320,8 +333,10 @@ begin
 	# Allocate space for the message buffer.  The "+ 6" is space for
 	# the brackets around the list in the message created below.
 	nchars = nchars + strlen (arg) + 6
-	call salloc (msg, nchars, TY_CHAR)
-	call aclrc (Memc[msg], nchars)
+	sz_val = nchars
+	call salloc (msg, sz_val, TY_CHAR)
+	sz_val = nchars
+	call aclrc (Memc[msg], sz_val)
 	ip = msg
 
 	# Begin the message by adding the arg and make a Tcl list of the
@@ -348,15 +363,17 @@ procedure xh_ldfile (xh, file)
 pointer	xh					#i task descriptor
 char	file[ARB]				#i requested file/dir
 
+size_t	sz_val
 pointer	sp, ip, dir, parent, path
 int	nchars
 int	access(), strlen(), xh_isdir()
 
 begin
 	call smark (sp)
-	call salloc (dir, SZ_PATHNAME, TY_CHAR)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
-	call salloc (parent, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dir, sz_val, TY_CHAR)
+	call salloc (path, sz_val, TY_CHAR)
+	call salloc (parent, sz_val, TY_CHAR)
 
 	# Expand the current directory to a host path.
 	call fdirname (file, Memc[dir], SZ_PATHNAME)
@@ -401,13 +418,15 @@ procedure xh_updir (xh)
 
 pointer	xh					#i task descriptor
 
+size_t	sz_val
 pointer	sp, ip, dir, parent
 int	nchars, strlen()
 
 begin
 	call smark (sp)
-	call salloc (dir, SZ_PATHNAME, TY_CHAR)
-	call salloc (parent, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dir, sz_val, TY_CHAR)
+	call salloc (parent, sz_val, TY_CHAR)
 
 	# Expand the current directory to a host path.
 	call fdirname (CURDIR(xh), Memc[dir], SZ_PATHNAME)
@@ -440,12 +459,14 @@ procedure xh_set_curdir (xh, dir)
 pointer	xh					#i task descriptor
 char	dir[ARB]				#i current directory
 
+size_t	sz_val
 pointer	sp, dirbuf
 int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (dirbuf, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (dirbuf, sz_val, TY_CHAR)
 
 	call strcpy (dir, CURDIR(xh), SZ_PATHNAME)
 	if (dir[strlen(dir)] != '/')
@@ -468,11 +489,13 @@ procedure xh_set_pattern (xh, pattern)
 pointer	xh					#i task descriptor
 char	pattern[ARB]				#i template pattern
 
+size_t	sz_val
 pointer	sp, patbuf
 
 begin
 	call smark (sp)
-	call salloc (patbuf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (patbuf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[patbuf], SZ_FNAME, "template %s")
 	    call pargstr (pattern)
@@ -492,11 +515,13 @@ procedure xh_selection (xh, selection)
 pointer	xh					#i task descriptor
 char	selection[ARB]				#i selection
 
+size_t	sz_val
 pointer	sp, buf
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	call sprintf (Memc[buf], SZ_FNAME, "selection %s")
 	    call pargstr (selection)
@@ -518,6 +543,7 @@ char	vfn[ARB]		# name to be tested
 char	pathname[ARB]		# receives path of directory
 int	maxch			# max chars out
 
+size_t	sz_val
 bool	isdir
 pointer	sp, fname, op
 int	ip, fd, nchars, ch
@@ -526,7 +552,8 @@ int	finfo(), diropen(), gstrcpy(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Copy the VFN string, minus any whitespace on either end.
 	op = fname

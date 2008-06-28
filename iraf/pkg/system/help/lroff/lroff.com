@@ -4,8 +4,8 @@ int	right_margin			# working margins
 int	left_margin
 int	perm_right_margin		# permanent margins
 int	perm_left_margin
-int	in_magic_arg			# magic args for in/out procedures
-int	out_magic_arg
+pointer	in_magic_arg			# magic args for in/out procedures
+pointer	out_magic_arg
 int	soflag				# if YES, output standout mode chars
 int	foflag				# if YES, output forms mode chars
 int	justify				# right justify text

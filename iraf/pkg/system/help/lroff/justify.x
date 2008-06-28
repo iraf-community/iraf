@@ -11,6 +11,8 @@ procedure right_justify (in, out, linebuf, ip)
 extern	in(), out()
 char	linebuf[ARB]
 int	ip
+
+size_t	sz_val
 pointer	sp, rjbuf
 int	in(), input()
 errchk	salloc, breakline, input, rjline
@@ -18,7 +20,8 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (rjbuf, SZ_IBUF, TY_CHAR)
+	sz_val = SZ_IBUF
+	call salloc (rjbuf, sz_val, TY_CHAR)
 
 	call breakline (out, NJ)
 	if (input (in, Memc[rjbuf]) != EOF)

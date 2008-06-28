@@ -15,6 +15,7 @@ char	modname[ARB]
 int	blktype
 pointer	ctrl
 
+size_t	sz_val
 bool	block_found, help_file, at_eof
 int	fd, lmarg, rmarg, soflag, foflag, i, nblocks
 pointer	sp, hb, block_name, ps
@@ -27,8 +28,10 @@ errchk	hb_getnextblk, pr_block_header
 
 begin
 	call smark (sp)
-	call salloc (hb, LEN_HBSTRUCT, TY_STRUCT)
-	call salloc (block_name, SZ_FNAME, TY_CHAR)
+	sz_val = LEN_HBSTRUCT
+	call salloc (hb, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (block_name, sz_val, TY_CHAR)
 
 	iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
 	    call sfree (sp)

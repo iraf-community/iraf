@@ -45,7 +45,7 @@ begin
 
 	    if (justify_flag == NJ || justify == NO || nwords <= 1) {
 		for (w=1;  w <= nwords;  w=w+1)
-		    call outstr (out, Memc[Memi[words+w-1]])
+		    call outstr (out, Memc[Memp[words+w-1]])
 
 	    } else {
 		# To justify the line, determine the number of extra spaces
@@ -76,7 +76,7 @@ begin
 		# the range hole1 to hole2 (at left or right).
 
 		do w = 1, nwords {
-		    call outstr (out, Memc[Memi[words+w-1]])
+		    call outstr (out, Memc[Memp[words+w-1]])
 		    do i = 1, n_per_hole
 			call outc (out, BLANK)
 		    if (w >= hole1 && w <= hole2)

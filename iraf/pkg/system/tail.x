@@ -45,21 +45,26 @@ char	fname[ARB]
 int	out, nlines
 bool	print_file_name
 
+size_t	sz_val
+long	lval
 pointer	sp, offsets, line
-int	in, linenum, index, noffsets, nlines_in_file
-int	open(), getline()
-long	note()
+int	in
+long	linenum, index, noffsets, nlines_in_file
+int	open(), getline(), absi()
+long	note(), modl()
 errchk	open, getline, putline, note
 
 begin
 	if (nlines == 0)
 	    return
 	else
-	    noffsets = abs (nlines) + 1
+	    noffsets = absi (nlines) + 1
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (offsets, noffsets, TY_LONG)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	sz_val = noffsets
+	call salloc (offsets, sz_val, TY_LONG)
 
 	# Open the file.
 	in = open (fname, READ_ONLY, TEXT_FILE)
@@ -79,7 +84,7 @@ begin
 	    if (nlines < 0 && linenum > -nlines)
 		break
 	    else if (nlines > 0) {
-		index = mod (linenum - 1, noffsets)
+		index = modl (linenum - 1, noffsets)
 		Meml[offsets+index] = note (in)
 	    }
 	} until (getline (in, Memc[line]) == EOF)
@@ -88,10 +93,11 @@ begin
 
 	# Seek back to offset of desired line, if not skipping head of file.
 	if (nlines > 0)
-	    if (nlines_in_file <= nlines)
-		call seek (in, BOFL)
-	    else {
-		index = mod (nlines_in_file - nlines, noffsets)
+	    if (nlines_in_file <= nlines) {
+		lval = BOFL
+		call seek (in, lval)
+	    } else {
+		index = modl (nlines_in_file - nlines, noffsets)
 		call seek (in, Meml[offsets+index])
 	    }
 

@@ -13,8 +13,11 @@ procedure xh_sort_list (list)
 
 char	list[ARB]					#u list to be sorted
 
+size_t	sz_val
 pointer	sp, index, buf, ip
-int	i, j, count, len
+long	i
+int	j, len
+size_t	count
 
 int	strlen()
 
@@ -22,28 +25,30 @@ begin
 	len = strlen (list)
 
 	call smark (sp)
-	call salloc (index, SZ_HELPLIST, TY_INT)
-	call salloc (buf, len+2, TY_CHAR)
+	sz_val = SZ_HELPLIST
+	call salloc (index, sz_val, TY_POINTER)
+	sz_val = len+2
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Build up the index array.
 	count = 1
-	Memi[index] = 1
+	Memp[index] = 1
 	for (i=2; i<len; i=i+1) {
 	    if (list[i] == ' ') {
 		list[i] = EOS
-		Memi[index+count] = i + 1
+		Memp[index+count] = i + 1
 		count = count + 1
 	    }
 	}
 
 	# Sort the list.
-	call strsrt (Memi[index], list, count)
+	call strsrt (Memp[index], list, count)
 
 	# Restore the list.
 	ip = buf
 	do i = 1, count {
-	    for (j=0; list[Memi[index+i-1]+j] != EOS; j=j+1) {
-	        Memc[ip] = list[Memi[index+i-1]+j]
+	    for (j=0; list[Memp[index+i-1]+j] != EOS; j=j+1) {
+	        Memc[ip] = list[Memp[index+i-1]+j]
 	        ip = ip + 1
 	    }
 	    Memc[ip] = ' '
@@ -61,13 +66,16 @@ procedure xh_file_sort (fname)
 
 char	fname[SZ_FNAME]				#i file to be sorted
 
+size_t	sz_val
 pointer	linbuf, linptr
 int	nlines, fd
 int	open()
 
 begin
-        call calloc (linptr, MAXPTR, TY_INT)
-        call calloc (linbuf, SZ_LINBUF, TY_CHAR)
+        sz_val = MAXPTR
+        call calloc (linptr, sz_val, TY_INT)
+        sz_val = SZ_LINBUF
+        call calloc (linbuf, sz_val, TY_CHAR)
 
 	# Sort the file then write it back out.
 	fd = open (fname, READ_ONLY, TEXT_FILE)

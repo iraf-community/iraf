@@ -26,9 +26,10 @@ pointer	psptr					#i PSIO pointer
 char	ls_block[ARB]				#i .ls block to search for
 char	section[ARB]				#i section to print
 
-pointer sp, ip, ps
+size_t	sz_val
+pointer sp, ps
 pointer ibuf, line, level
-int	lastline, font, indent, ls_level
+int	ip, lastline, font, indent, ls_level
 int	i, arg, nsec, cmd, last_cmd
 bool	format, quit_at_le, quit_at_ih, formatted
 
@@ -43,13 +44,17 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (ibuf, SZ_IBUF, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (level, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_IBUF
+	call salloc (ibuf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (level, sz_val, TY_CHAR)
 
-	call aclrc (Memc[ibuf], SZ_LINE)
-	call aclrc (Memc[line], SZ_LINE)
-	call aclrc (Memc[level], SZ_LINE)
+	sz_val = SZ_LINE
+	call aclrc (Memc[ibuf], sz_val)
+	call aclrc (Memc[line], sz_val)
+	call aclrc (Memc[level], sz_val)
 
 	# Initialize.
 	lastline  = TEXT
@@ -63,7 +68,8 @@ begin
         formatted  = false
 
 	# Initialize the section numbering.
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 
         # Determine whether or not the text is formatted.
         repeat {
@@ -320,8 +326,9 @@ text_		    if (format) {
 		}
 	    }
 
-	    call aclrc (Memc[ibuf], SZ_LINE)
-	    call aclrc (Memc[line], SZ_LINE)
+	    sz_val = SZ_LINE
+	    call aclrc (Memc[ibuf], sz_val)
+	    call aclrc (Memc[line], sz_val)
 	}
 
 	# Close the last section.
@@ -343,6 +350,7 @@ int	font					#u current font
 bool	format					#i formatting flag
 int	maxch					#i max length of string
 
+size_t	sz_val
 pointer	sp, ip, buf, keyword
 int	i, strmatch(), gstrcpy()
 bool	is_ls
@@ -351,10 +359,12 @@ define	copy_	90
 
 begin
 	call smark (sp)
-	call salloc (buf, maxch, TY_CHAR)
-	call salloc (keyword, maxch, TY_CHAR)
-	call aclrc (Memc[buf], maxch)
-	call aclrc (Memc[keyword], maxch)
+	sz_val = maxch
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (keyword, sz_val, TY_CHAR)
+	sz_val = maxch
+	call aclrc (Memc[buf], sz_val)
+	call aclrc (Memc[keyword], sz_val)
 
 	ip = buf
         is_ls = FALSE
@@ -423,7 +433,8 @@ copy_		Memc[ip] = str[i]
 	ip = ip + gstrcpy ("\n\0", Memc[ip], SZ_LINE)
 
 	# Move the string back.
-	call amovc (Memc[buf], str, maxch)
+	sz_val = maxch
+	call amovc (Memc[buf], str, sz_val)
 
 	call sfree (sp)
 end
@@ -436,7 +447,8 @@ procedure lp_strdetab (line, outline, maxch)
 char   line[ARB], outline[ARB]
 int    maxch
 
-int    ip, op
+int	ip, op
+int	modi()
 
 begin
         ip = 1
@@ -447,7 +459,7 @@ begin
                 repeat {
                     outline[op] = ' '
                     op = op + 1
-                } until (mod(op,8) == 0 || op > maxch)
+                } until (modi(op,8) == 0 || op > maxch)
                 ip = ip + 1
             } else {
                 outline[op] = line [ip]

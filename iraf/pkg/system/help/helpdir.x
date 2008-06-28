@@ -62,8 +62,9 @@ pointer procedure hd_open (helpdir_file)
 char	helpdir_file[ARB]
 bool	sort_modules
 pointer	sp, hp, ip, lbuf, defdir, word
-int	fd, junk
+int	fd, i_off, junk
 
+size_t	sz_val
 bool	streq()
 int	open(), getline(), fnroot(), fnldir(), ctowrd()
 int	hd_putstr()
@@ -72,9 +73,12 @@ errchk	hd_putldiry, hd_putmodule, hd_sort_modules
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (defdir, SZ_PATHNAME, TY_CHAR)
-	call salloc (word, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (defdir, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (word, sz_val, TY_CHAR)
 
 	# If helpdir file is not yet installed, print warning message
 	# and return the NULL pointer, indicating that the help directory
@@ -89,8 +93,10 @@ begin
 	# Allocate and initialize descriptor and string buffer.  Must init
 	# nextch to 1 because 0 is the null index.
 
-	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (HD_SBUF(hp), SZ_SBUF, TY_CHAR)
+	sz_val = LEN_HDSTRUCT
+	call calloc (hp, sz_val, TY_STRUCT)
+	sz_val = SZ_SBUF
+	call malloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_DEFDIR(hp) = NULL
 	HD_NEXTCH(hp) = 1
 	HD_SZSBUF(hp) = SZ_SBUF
@@ -133,7 +139,8 @@ begin
 		call hd_putldiry (hp, Memc[ip+1])
 	    } else if (Memc[ip] == '.') {
 		ip = ip + 1
-		if (ctowrd (Memc, ip, Memc[word], SZ_FNAME) <= 0)
+		i_off = 1
+		if (ctowrd (Memc[ip], i_off, Memc[word], SZ_FNAME) <= 0)
 		    next
 		# The directive ".nosort" disables sorting of the module list.
 		# There are no other such directives at present, but they are
@@ -157,14 +164,16 @@ begin
 	    call hd_sort_modules (hp)
 
 	# Return any unused space in string buffer.
-	call realloc (HD_SBUF(hp), HD_NEXTCH(hp), TY_CHAR)
+	sz_val = HD_NEXTCH(hp)
+	call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	HD_SZSBUF(hp) = HD_NEXTCH(hp)
 
 	# Return any unused module descriptors.
 	HD_LENHD(hp) = HD_LENHD(hp) -
 	    LEN_MODSTRUCT * (HD_MAXMODULES(hp) - HD_NMODULES(hp))
 	HD_MAXMODULES(hp) = HD_NMODULES(hp)
-	call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+	sz_val = HD_LENHD(hp)
+	call realloc (hp, sz_val, TY_STRUCT)
 
 	call sfree (sp)
 	return (hp)
@@ -196,6 +205,7 @@ procedure hd_putldiry (hp, decl)
 pointer	hp
 char	decl[ARB]
 
+size_t	sz_val
 int	ip, nldir, strp
 pointer	sp, buf, op
 char	hd_getc()
@@ -204,7 +214,8 @@ errchk	salloc, hd_getc, hd_putstr
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Do nothing if null declaration.
 	for (ip=1;  IS_WHITE(decl[ip]);  ip=ip+1)
@@ -251,6 +262,7 @@ pointer	hp
 int	fd
 char	lbuf[ARB]
 
+size_t	sz_val
 char	ch
 int	ip, junk, m, ftype, strp
 pointer	sp, buf, op, sbuf, mp
@@ -262,7 +274,8 @@ errchk	salloc, getline, hd_putstr, hd_getc
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 	sbuf = HD_SBUF(hp)
 
 	# Fetch module name.  Cannot be null or line is blank and we would
@@ -285,14 +298,16 @@ begin
 	    # structure size to allow more module descriptors.
 	    if (m > HD_MAXMODULES(hp)) {
 		HD_LENHD(hp) = HD_LENHD(hp) + (INC_MODULES * LEN_MODSTRUCT)
-		call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+		sz_val = HD_LENHD(hp)
+		call realloc (hp, sz_val, TY_STRUCT)
 		HD_MAXMODULES(hp) = HD_MAXMODULES(hp) + INC_MODULES
 	    }
 	    HD_NMODULES(hp) = m
 	}
 
 	mp = HD_MODULE(hp,m)
-	call aclri (Memi[mp], LEN_MODSTRUCT)
+	sz_val = LEN_MODSTRUCT
+	call aclrp (Memp[mp], sz_val)
 
 	# Put module name in string buffer and save index of string in descr.
 	M_NAME(mp) = hd_putstr (hp, Memc[buf])
@@ -441,6 +456,7 @@ int procedure hd_putstr (hp, str)
 
 pointer	hp
 char	str[ARB]
+size_t	sz_val
 int	nextch, nchars, strlen()
 errchk	realloc
 
@@ -453,7 +469,8 @@ begin
 	nextch = HD_NEXTCH(hp)
 	if (nextch + nchars + 1 > HD_SZSBUF(hp)) {
 	    HD_SZSBUF(hp) = HD_SZSBUF(hp) + INC_SZSBUF
-	    call realloc (HD_SBUF(hp), HD_SZSBUF(hp), TY_CHAR)
+	    sz_val = HD_SZSBUF(hp)
+	    call realloc (HD_SBUF(hp), sz_val, TY_CHAR)
 	}
 
 	call strcpy (str, Memc[HD_SBUF(hp) + nextch], ARB)
@@ -472,8 +489,8 @@ procedure hd_sort_modules (hp)
 pointer	hp
 
 bool	sorted
-int	nmodules, m, mlen, i, temp
-pointer	sbuf, mp1, mp2
+int	nmodules, m, mlen, i
+pointer	sbuf, mp1, mp2, temp
 bool	strgt()
 
 begin
@@ -490,9 +507,9 @@ begin
 		mp2 = mp1 + mlen
 		if (strgt (Memc[sbuf+M_NAME(mp1)], Memc[sbuf+M_NAME(mp2)])) {
 		    do i = 0, mlen-1 {
-			temp = Memi[mp1+i]
-			Memi[mp1+i] = Memi[mp2+i]
-			Memi[mp2+i] = temp
+			temp = Memp[mp1+i]
+			Memp[mp1+i] = Memp[mp2+i]
+			Memp[mp2+i] = temp
 		    }
 		    sorted = false
 		}
@@ -555,6 +572,7 @@ int	field				# field code
 char	outstr[ARB]
 int	maxch
 
+size_t	sz_val
 int	len_ldir, op
 pointer	mp, sp, ldir, sbuf, fname_ptr, ip, subdir
 int	strncmp(), gstrcpy(), hd_getldir(), fnldir()
@@ -562,8 +580,10 @@ errchk	salloc, hd_getldir
 
 begin
 	call smark (sp)
-	call salloc (ldir, SZ_PATHNAME, TY_CHAR)
-	call salloc (subdir, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (ldir, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (subdir, sz_val, TY_CHAR)
 
 	if (hp == NULL)
 	    call error (12, "hd_getname: bad helpdir descriptor")
@@ -648,6 +668,7 @@ char	ldir[ARB]
 char	outstr[ARB]
 int	maxch
 
+size_t	sz_val
 int	i
 pointer	sp, ip, op, sbuf, envvar, filvar
 bool	streq()
@@ -655,8 +676,9 @@ int	gstrcpy()
 
 begin
 	call smark (sp)
-	call salloc (envvar, SZ_FNAME, TY_CHAR)
-	call salloc (filvar, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (envvar, sz_val, TY_CHAR)
+	call salloc (filvar, sz_val, TY_CHAR)
 
 	sbuf = HD_SBUF(hp)
 
@@ -722,7 +744,7 @@ begin
 	    call pargi (HD_DEFDIR(hd))
 	    call pargstr (Memc[sbuf+HD_DEFDIR(hd)])
 	call fprintf (out, "sbuf=%x, szsbuf=%d, nextch=%d\n")
-	    call pargi (HD_SBUF(hd))
+	    call pargp (HD_SBUF(hd))
 	    call pargi (HD_SZSBUF(hd))
 	    call pargi (HD_NEXTCH(hd))
 

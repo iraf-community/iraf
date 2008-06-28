@@ -13,7 +13,7 @@ define	F_BOLD		3
 define	F_PREVIOUS	4
 define	F_TELETYPE	5			# HTML-specific font
 
-define	SPTR		Memi[P2I($1)+$2]
+define	SPTR		Memp[$1+$2]
 define	SECTION		Memc[SPTR($1,$2)]
 define	MAX_SECTIONS	256
 
@@ -34,9 +34,10 @@ char	center[ARB]				#I .help optional keyword 3
 char	ls_block[ARB]				#I .ls block to search for
 char	section[ARB]				#I section to print
 
-pointer sp, ip, sptr
+size_t	sz_val
+pointer sp, sptr
 pointer ibuf, unesc, name, level
-int	lastline, font, indented, ls_level
+int	ip, lastline, font, indented, ls_level
 int	i, arg, nsec, cmd
 bool	format, quit_at_le, quit_at_ih, formatted
 
@@ -50,16 +51,24 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (ibuf, SZ_IBUF, TY_CHAR)
-	call salloc (unesc, SZ_IBUF, TY_CHAR)
-	call salloc (name, SZ_LINE, TY_CHAR)
-	call salloc (level, SZ_FNAME, TY_CHAR)
-	call salloc (sptr, MAX_SECTIONS, TY_POINTER)
+	sz_val = SZ_IBUF
+	call salloc (ibuf, sz_val, TY_CHAR)
+	call salloc (unesc, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (name, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (level, sz_val, TY_CHAR)
+	sz_val = MAX_SECTIONS
+	call salloc (sptr, sz_val, TY_POINTER)
 
-	call aclrc (Memc[ibuf], SZ_IBUF)
-	call aclrc (Memc[name], SZ_LINE)
-	call aclrc (Memc[unesc], SZ_IBUF)
-	call aclrc (Memc[level], SZ_FNAME)
+	sz_val = SZ_IBUF
+	call aclrc (Memc[ibuf], sz_val)
+	sz_val = SZ_LINE
+	call aclrc (Memc[name], sz_val)
+	sz_val = SZ_IBUF
+	call aclrc (Memc[unesc], sz_val)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[level], sz_val)
 
 	# Initialize.
 	lastline  = TEXT
@@ -73,7 +82,8 @@ begin
         formatted  = false
 
 	# Initialize the section numbering.
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 
         # Determine whether or not the text is formatted.
         repeat {
@@ -297,8 +307,10 @@ begin
 		    # everything else gets written normally.
 
 		    # Save the section name.
-		    call salloc (SPTR(sptr,nsec), SZ_LINE, TY_CHAR)
-	    	    call aclrc (SECTION(sptr,nsec), SZ_LINE)
+		    sz_val = SZ_LINE
+		    call salloc (SPTR(sptr,nsec), sz_val, TY_CHAR)
+	    	    sz_val = SZ_LINE
+	    	    call aclrc (SECTION(sptr,nsec), sz_val)
 	    	    Memc[ibuf+strlen(Memc[ibuf])-1] = EOS
 		    call sprintf (SECTION(sptr,nsec), SZ_LINE, "\'%s\'")
 			call pargstr (Memc[ibuf])
@@ -343,9 +355,11 @@ text_	    	    call fprintf (out, "%s")
 		}
 	    }
 
-	    call aclrc (Memc[ibuf], SZ_IBUF)
-	    call aclrc (Memc[unesc], SZ_IBUF)
-	    call aclrc (Memc[name], SZ_LINE)
+	    sz_val = SZ_IBUF
+	    call aclrc (Memc[ibuf], sz_val)
+	    call aclrc (Memc[unesc], sz_val)
+	    sz_val = SZ_LINE
+	    call aclrc (Memc[name], sz_val)
 	}
 
 	# Close the last section.
@@ -435,6 +449,7 @@ bool	format					#I formatting flag
 int	special_only				#I escape only special chars?
 int	maxch					#I max length of string
 
+size_t	sz_val
 pointer	sp, ip, buf, keyword
 int	i, gstrcpy(), stridx()
 
@@ -442,10 +457,12 @@ define	copy_	90
 
 begin
 	call smark (sp)
-	call salloc (buf, maxch, TY_CHAR)
-	call salloc (keyword, maxch, TY_CHAR)
-	call aclrc (Memc[buf], maxch)
-	call aclrc (Memc[keyword], maxch)
+	sz_val = maxch
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (keyword, sz_val, TY_CHAR)
+	sz_val = maxch
+	call aclrc (Memc[buf], sz_val)
+	call aclrc (Memc[keyword], sz_val)
 
 	ip = buf
 	for (i=1; str[i] != EOS && i <= maxch; i = i + 1) {
@@ -548,7 +565,8 @@ copy_		Memc[ip] = str[i]
 	ip = ip + gstrcpy ("\n\0", Memc[ip], SZ_LINE)
 
 	# Move the string back.
-	call amovc (Memc[buf], str, maxch)
+	sz_val = maxch
+	call amovc (Memc[buf], str, sz_val)
 
 	call sfree (sp)
 end
@@ -561,6 +579,7 @@ procedure lh_set_level (n, level)
 int	n					#I level number
 char	level[ARB]				#U level string
 
+size_t	sz_val
 int	i, strlen()
 include	"lroff.com"
 
@@ -568,7 +587,8 @@ begin
         # Increment the desired section number; zero all higher
 	# numbered section counters.
         nh_level[n] = nh_level[n] + 1
-        call amovki (0, nh_level[n+1], MAX_NHLEVEL - n)
+	sz_val = MAX_NHLEVEL - n
+	call amovki (0, nh_level[n+1], sz_val)
 
         # Output the section number followed by a blank and then
 	# the section label.
@@ -594,6 +614,7 @@ int	fd
 bool	formatted
 char	param[ARB]
 
+size_t	sz_val
 bool	match_found
 pointer	sp, lbuf, pattern
 int	len
@@ -604,8 +625,10 @@ define	err_	90
 
 begin
 	call smark (sp)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pattern, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	match_found = false
 
@@ -657,6 +680,7 @@ int	fd			# input file
 bool	formatted		# is help block formatted
 char	sections[ARB]		# list of sections "a|b|c"
 
+size_t	sz_val
 bool	match_found
 int	npat, ip
 pointer	sp, patbuf, patoff[MAXPAT], op
@@ -670,7 +694,8 @@ define	err_	91
 
 begin
 	call smark (sp)
-	call salloc (patbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (patbuf, sz_val, TY_CHAR)
 
 	# Process the list of sections into patbuf and patoff, i.e., into a
 	# list of EOS delimited strings in the string buffer patbuf.  Each
@@ -737,13 +762,15 @@ char    lbuf[ARB]               # line of text
 pointer patoff[npat]            # pointers to pattern strings
 int     npat                    # number of patterns
 
+size_t	sz_val
 int     pat
 pointer sp, pattern
 int     strmatch()
 
 begin
         call smark (sp)
-        call salloc (pattern, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (pattern, sz_val, TY_CHAR)
 
         for (pat=1;  pat <= npat;  pat=pat+1) {
             call sprintf (Memc[pattern], SZ_FNAME, "^{%s}")

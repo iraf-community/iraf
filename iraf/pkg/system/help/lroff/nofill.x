@@ -13,6 +13,8 @@ int procedure nofill (in, out, linebuf)
 
 extern	in(), out()
 char	linebuf[ARB]
+
+size_t	sz_val
 int	ip, command
 pointer	sp, rjbuf
 int	in(), input(), nextcmd()
@@ -21,7 +23,8 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (rjbuf, SZ_IBUF, TY_CHAR)
+	sz_val = SZ_IBUF
+	call salloc (rjbuf, sz_val, TY_CHAR)
 
 	call breakline (out, NJ)
 

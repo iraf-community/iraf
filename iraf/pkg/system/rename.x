@@ -27,6 +27,7 @@ pointer	o_ldir, o_root, o_extn, n_ldir, n_root, n_extn
 pointer	pathname, newfile, junkstr, list
 int	len, modfield
 
+size_t	sz_val
 bool	streq()
 int	clgfil(), clplen(), stridxs()
 int	access(), fnldir(), fnroot(), fnextn(), isdirectory()
@@ -35,18 +36,21 @@ string	s_clobber "Warning: %s would overwrite existing file %s - skipping\n"
 
 begin
 	call smark (sp)
-	call salloc (oldfile, SZ_FNAME, TY_CHAR)
-	call salloc (newname, SZ_PATHNAME, TY_CHAR)
-	call salloc (pathname, SZ_PATHNAME, TY_CHAR)
-	call salloc (newfile, SZ_PATHNAME, TY_CHAR)
-	call salloc (junkstr, SZ_FNAME, TY_CHAR)
-	call salloc (field, SZ_FNAME, TY_CHAR)
-	call salloc (o_ldir, SZ_FNAME, TY_CHAR)
-	call salloc (n_ldir, SZ_FNAME, TY_CHAR)
-	call salloc (o_root, SZ_FNAME, TY_CHAR)
-	call salloc (n_root, SZ_FNAME, TY_CHAR)
-	call salloc (o_extn, SZ_FNAME, TY_CHAR)
-	call salloc (n_extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (oldfile, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (newname, sz_val, TY_CHAR)
+	call salloc (pathname, sz_val, TY_CHAR)
+	call salloc (newfile, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (junkstr, sz_val, TY_CHAR)
+	call salloc (field, sz_val, TY_CHAR)
+	call salloc (o_ldir, sz_val, TY_CHAR)
+	call salloc (n_ldir, sz_val, TY_CHAR)
+	call salloc (o_root, sz_val, TY_CHAR)
+	call salloc (n_root, sz_val, TY_CHAR)
+	call salloc (o_extn, sz_val, TY_CHAR)
+	call salloc (n_extn, sz_val, TY_CHAR)
 
 	# Open the list of files to be renamed.  This is done first so that
 	# the old file name is queried for before the new file name.
@@ -140,7 +144,8 @@ begin
 	        len = fnldir (Memc[oldfile], Memc[o_ldir], SZ_PATHNAME)
 
 		# Start by copying the ldir to the new name.
-		call aclrc (Memc[newname], SZ_PATHNAME)
+		sz_val = SZ_PATHNAME
+		call aclrc (Memc[newname], sz_val)
 		call strcpy (Memc[o_ldir], Memc[newname], SZ_PATHNAME)
 
 		# Build up the new file name.

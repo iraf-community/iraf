@@ -55,7 +55,8 @@ char	quickref[ARB]				#i quickref filename
 
 pointer	pkglist, pp
 int	fdi, fdo, fd_err
-int	sz_pbuf, npkgs
+size_t	sz_pbuf
+int	npkgs
 char	fname[SZ_FNAME], efname[SZ_FNAME]
 char	pkg[SZ_PKG], lastpkg[SZ_PKG], line[SZ_LINE]
 
@@ -171,6 +172,7 @@ procedure xh_make_pkglist (list)
 
 char	list[ARB]				#i package list
 
+size_t	sz_val
 pointer	sp, err, pkg
 pointer	stp, sym
 int	i, ip, fd
@@ -181,8 +183,10 @@ errchk	open
 
 begin
 	call smark (sp)
-	call salloc (err, SZ_LINE, TY_CHAR)
-	call salloc (pkg, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (err, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pkg, sz_val, TY_CHAR)
 
 	# Delete existing files.
 	if (access(PKGFILE,0,0) == YES)	

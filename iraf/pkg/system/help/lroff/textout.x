@@ -28,7 +28,8 @@ procedure set_wordbuf (max_words)
 
 int	max_words		#I output word buffer size
 
-int	word_buffer_size
+size_t	sz_val
+size_t	word_buffer_size
 errchk	malloc
 
 include	"lroff.com"
@@ -41,7 +42,8 @@ begin
 	    call mfree (words, TY_POINTER)
 	} else {
 	    call malloc (wbuf, word_buffer_size, TY_CHAR)
-	    call malloc (words, max_words, TY_POINTER)
+	    sz_val = max_words
+	    call malloc (words, sz_val, TY_POINTER)
 	    wp = wbuf
 	    nwords = 0
 	    wcols = 0
@@ -70,7 +72,7 @@ begin
 	    # Set up descriptors of new word.  Save the input pointer in case
 	    # the output line fills and we have to "put the word back".
 
-	    Memi[words+nwords] = wp			# word pointer 
+	    Memp[words+nwords] = wp			# word pointer 
 	    ip_save = ip
 	    wcols_save = wcols
 
@@ -108,7 +110,7 @@ begin
 	    if (wcols > (right_margin - left_margin + 1) && nwords > 0) {
 		ip = ip_save
 		wcols = wcols_save
-		wp = Memi[words+nwords]
+		wp = Memp[words+nwords]
 		call breakline (out, JU)
 	    } else
 		nwords = nwords + 1

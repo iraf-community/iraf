@@ -21,7 +21,7 @@ define	HD_NMODULES	Memi[P2I($1+5)]		# number of modules in package
 define	HD_MAXMODULES	Memi[P2I($1+6)]		# max no. of modules in package
 define	HD_LENHD	Memi[P2I($1+7)]		# length of this structure
 define	HD_PAKNAME	Memi[P2I($1+8)]		# offset of package name string
-define	HD_LDIR		Memi[P2I($1+10+$2-1)]	# indices of ldir strings
+define	HD_LDIR		Memi[P2I($1+10)+$2-1]	# indices of ldir strings
 define	HD_MODULE	($1+60+($2-1)*6)	# module descriptors
 
 # Module descriptor structure.

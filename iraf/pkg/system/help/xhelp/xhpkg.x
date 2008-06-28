@@ -18,6 +18,7 @@ char    topic[ARB]                	#i search key
 char    helpdb[ARB]             	#i filename of database to be examined
 char    pkglist[ARB]             	#o package list
 
+size_t	sz_val
 int     i, m
 pointer	sp, pknm, hp, pp, sym
 pointer db, ixoff, ix
@@ -29,7 +30,8 @@ errchk  hdb_open, hdb_printpack, hdb_load
 
 begin
         call smark (sp)
-        call salloc (pknm, MAX_MENUSIZE, TY_POINTER)
+        sz_val = MAX_MENUSIZE
+        call salloc (pknm, sz_val, TY_POINTER)
 
         db = hdb_open (helpdb)
         ixoff = HDB_INDEXPTR(db)
@@ -57,15 +59,16 @@ begin
 
 		pp = 1
 	        for (m=0;  m < MAX_MENUSIZE;  m=m+1) {
-	            call salloc (Memi[pknm+m], MAX_NAMELEN, TY_CHAR)
-	            if (hd_getname (hp, m+1, TY_MODNAME, Memc[Memi[pknm+m]],
+	            sz_val = MAX_NAMELEN
+	            call salloc (Memp[pknm+m], sz_val, TY_CHAR)
+	            if (hd_getname (hp, m+1, TY_MODNAME, Memc[Memp[pknm+m]],
 	                MAX_NAMELEN) <= 0)
                     	    break
 
 		    # Copy the names to the output array.
-		    pp = pp + gstrcpy (Memc[Memi[pknm+m]], pkglist[pp], ARB)
+		    pp = pp + gstrcpy (Memc[Memp[pknm+m]], pkglist[pp], ARB)
 		    if (XH_SHOWTYPE(xh) == YES && XH_STP(xh) != NULL) {
-		        sym = stfind (XH_STP(xh), Memc[Memi[pknm+m]])
+		        sym = stfind (XH_STP(xh), Memc[Memp[pknm+m]])
 		        if (sym != NULL)
 		            pp = pp + gstrcpy (".", pkglist[pp], ARB)
 		    }
@@ -95,15 +98,17 @@ char    topic[ARB]                           	#i help topic
 char    curpack[ARB]                           	#i help topic
 char    path[ARB]                           	#o package path
 
+size_t	sz_val
 pointer	sp, pkg, task, buf
 int	strncmp(), xh_pkgname()
 bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (pkg, SZ_FNAME, TY_CHAR)
-	call salloc (task, SZ_FNAME, TY_CHAR)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pkg, sz_val, TY_CHAR)
+	call salloc (task, sz_val, TY_CHAR)
+	call salloc (buf, sz_val, TY_CHAR)
 
 	if (curpack[1] == EOS || 
 	    streq (topic, curpack) ||
@@ -146,14 +151,16 @@ pointer xh                                      #i task struct pointer
 char    topic[ARB]                           	#i help topic
 char    pack[ARB]                           	#o package
 
+size_t	sz_val
 pointer sp, line, fname
 long	fsize, fstatl()
 int	fd, status, getline(), open(), stridxs()
 
 begin
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (fname, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
 
 	status = ERR
 

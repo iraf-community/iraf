@@ -67,24 +67,31 @@ end
 pointer procedure xh_open ()
 
 pointer	xh					# task descriptor
+size_t	sz_val
 errchk	calloc
 
 begin
-        iferr (call calloc (xh, SZ_XHELPSTRUCT, TY_STRUCT))
+	sz_val = SZ_XHELPSTRUCT
+	iferr (call calloc (xh, sz_val, TY_STRUCT))
             call error (0, "Error opening task structure.")
 
 	iferr {
-            call calloc (XH_LPTR(xh), SZ_HELPLIST, TY_CHAR)
-            call calloc (XH_TEMPLATE(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_OPTION(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_PRINTER(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURTASK(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURPACK(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_QUICKREF(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_HOMEPAGE(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_CURDIR(xh), SZ_PATHNAME, TY_CHAR)
-            call calloc (XH_PATTERN(xh), SZ_FNAME, TY_CHAR)
-            call calloc (XH_HELPDB(xh), SZ_HELPDB, TY_CHAR)
+            sz_val = SZ_HELPLIST
+            call calloc (XH_LPTR(xh), sz_val, TY_CHAR)
+            sz_val = SZ_FNAME
+            call calloc (XH_TEMPLATE(xh), sz_val, TY_CHAR)
+            call calloc (XH_OPTION(xh), sz_val, TY_CHAR)
+            call calloc (XH_PRINTER(xh), sz_val, TY_CHAR)
+            call calloc (XH_CURTASK(xh), sz_val, TY_CHAR)
+            call calloc (XH_CURPACK(xh), sz_val, TY_CHAR)
+            call calloc (XH_QUICKREF(xh), sz_val, TY_CHAR)
+            call calloc (XH_HOMEPAGE(xh), sz_val, TY_CHAR)
+            sz_val = SZ_PATHNAME
+            call calloc (XH_CURDIR(xh), sz_val, TY_CHAR)
+            sz_val = SZ_FNAME
+            call calloc (XH_PATTERN(xh), sz_val, TY_CHAR)
+            sz_val = SZ_HELPDB
+            call calloc (XH_HELPDB(xh), sz_val, TY_CHAR)
 	} then
 	    call error (0, "Error allocating structure pointers.")
 
@@ -124,6 +131,7 @@ procedure xh_ghelpdb (xh)
 
 pointer	xh					# task descriptor
 
+size_t	sz_val
 pointer	sp, hdb, hdbstr, name, list
 int	fntgfnb()
 int	access(), envgets()
@@ -132,14 +140,18 @@ pointer	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (name, SZ_FNAME, TY_CHAR)
-	call salloc (hdb, SZ_HELPDB, TY_CHAR)
-	call salloc (hdbstr, SZ_HELPDB, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (name, sz_val, TY_CHAR)
+	sz_val = SZ_HELPDB
+	call salloc (hdb, sz_val, TY_CHAR)
+	call salloc (hdbstr, sz_val, TY_CHAR)
 
 	# Clear the working memory.
-	call aclrc (Memc[name], SZ_FNAME)
-	call aclrc (Memc[hdb], SZ_HELPDB)
-	call aclrc (Memc[hdbstr], SZ_HELPDB)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[name], sz_val)
+	sz_val = SZ_HELPDB
+	call aclrc (Memc[hdb], sz_val)
+	call aclrc (Memc[hdbstr], sz_val)
 
 	# Get the parameter value.
         call clgstr ("helpdb", Memc[hdbstr], SZ_HELPDB)

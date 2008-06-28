@@ -16,6 +16,7 @@ char	filename[ARB]				# file to open
 int	check_for_help				# check file for help block?
 int	warn					# warn if not present?
 
+size_t	sz_val
 pointer	sp, ip, buf, out, text
 int	fdi, fdo
 long	fsize
@@ -30,8 +31,10 @@ define	err_	99
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (out, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (out, sz_val, TY_CHAR)
 
 	# Make sure the file exists.
         if (access (filename, 0, 0) == NO) {
@@ -73,8 +76,10 @@ begin
 	# Allocate an array the length of the file, if this isn't a help file
 	# we use this as the message buffer and send it to the GUI.
 	fsize = fstatl (fdi, F_FILESIZE)
-	call salloc (text, fsize+1, TY_CHAR)
-	call aclrc (Memc[text], fsize+1)
+	sz_val = fsize+1
+	call salloc (text, sz_val, TY_CHAR)
+	sz_val = fsize+1
+	call aclrc (Memc[text], sz_val)
 
 	# See whether this is a help file
 	has_help = FALSE
@@ -127,6 +132,7 @@ pointer	xh				# task descriptor
 char	parameter[ARB]			# GUI parameter to notify
 char	filename[ARB]			# file to display
 
+size_t	sz_val
 pointer	sp, ip, line, text
 int	fd, open(), getline(), gstrcpy()
 long	fsize, fstatl()
@@ -134,14 +140,17 @@ errchk	open
 
 begin
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Open the file and send it to the display.
 	fd = open (filename, READ_ONLY, TEXT_FILE)
 	if (fd != ERR) {
 	    fsize = fstatl (fd, F_FILESIZE)
-	    call salloc (text, fsize+1, TY_CHAR)
-	    call aclrc (Memc[text], fsize+1)
+	    sz_val = fsize+1
+	    call salloc (text, sz_val, TY_CHAR)
+	    sz_val = fsize+1
+	    call aclrc (Memc[text], sz_val)
 
 	    for (ip=text; getline (fd, Memc[line]) != EOF; )
 	        ip = ip + gstrcpy (Memc[line], Memc[ip], SZ_LINE)
@@ -164,13 +173,15 @@ procedure xh_text_msg (gp, param, msg)
 pointer gp
 char	param[ARB], msg[ARB]
 
+size_t	sz_val
 pointer	buf, ip
 int	i, nchars
 int	strlen()
 
 begin
 	nchars = strlen (msg)
-	call calloc (buf, nchars + SZ_LINE, TY_CHAR)
+	sz_val = nchars + SZ_LINE
+	call calloc (buf, sz_val, TY_CHAR)
 
 	ip = buf
 	for (i=1; i < nchars; i=i+1) {

@@ -33,6 +33,8 @@ long	fi[LEN_FINFO], db_ctime
 char	helpdb[SZ_HELPDB], device[SZ_FNAME]
 bool	output_is_not_redirected, file_template
 pointer	list, sp, ctrl, option, tempbuf, db, tty, fname, tempdev
+size_t	sz_val
+long	lval
 
 long	clktime()
 pointer	ttyodes(), hdb_open(), fntopnb()
@@ -46,17 +48,23 @@ define	forms_ 91
 
 begin
 	call smark (sp)
-	call salloc (ctrl, LEN_CTRLSTRUCT, TY_STRUCT)
-	call salloc (option, SZ_FNAME, TY_CHAR)
-	call salloc (tempbuf, SZ_TEMPBUF, TY_CHAR)
-	call salloc (tempdev, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	sz_val = LEN_CTRLSTRUCT
+	call salloc (ctrl, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (option, sz_val, TY_CHAR)
+	sz_val = SZ_TEMPBUF
+	call salloc (tempbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tempdev, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# If we were called without any arguments, do not query for the
 	# template, just set it to null and help will be given for the
 	# current package.
 
-	call aclri (Memi[ctrl], LEN_CTRLSTRUCT)
+	sz_val = LEN_CTRLSTRUCT
+	call aclrp (Memp[ctrl], sz_val)
 	if (clgeti ("$nargs") == 0) {
 	    H_OPTION(ctrl) = O_MENU
 	    H_TEMPLATE(ctrl) = EOS
@@ -69,7 +77,8 @@ begin
 	# the XHELP code to execute the GUI, otherwise process the device
 	# type once we set up the normal HELP task structure.
 
-	call aclrc (Memc[tempdev], SZ_TEMPBUF)
+	sz_val = SZ_TEMPBUF
+	call aclrc (Memc[tempdev], sz_val)
 	call clgstr ("device", Memc[tempdev], SZ_FNAME)
         out_device = strdic (Memc[tempdev], device, SZ_FNAME, HF_DEVICES)
 	if (out_device == HF_GUI) {
@@ -94,7 +103,8 @@ begin
 	# the name of the database to be used does not change, and provided
 	# a new help database is not created.
 
-	call aclrc (Memc[tempbuf], SZ_TEMPBUF)
+	sz_val = SZ_TEMPBUF
+	call aclrc (Memc[tempbuf], sz_val)
 	call clgstr (s_helpdb, Memc[tempbuf], SZ_TEMPBUF)
 	if (streq (Memc[tempbuf], s_helpdb))
 	    if (envgets (s_helpdb, Memc[tempbuf], SZ_TEMPBUF) <= 0)
@@ -125,7 +135,8 @@ begin
 	    if (db != NULL)
 		call hdb_close (db)
 	    db = hdb_open (helpdb)
-	    db_ctime = clktime (long(0))
+	    lval = 0
+	    db_ctime = clktime (lval)
 	}
 
 	# Fetch the value of the ALL switch.  This determines whether help

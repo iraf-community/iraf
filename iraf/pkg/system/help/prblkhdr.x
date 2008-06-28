@@ -15,6 +15,7 @@ pointer	hb		# encode help block header
 char	modname[ARB]	# module name
 pointer	ctrl		# help control block
 
+size_t	sz_val
 char	blank
 int	n, center, offset, lmargin, rmargin
 pointer	sp, lbuf, edge, op, hbuf
@@ -22,9 +23,10 @@ int	strlen(), gstrcpy()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (edge, SZ_LINE, TY_CHAR)
-	call salloc (hbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (edge, sz_val, TY_CHAR)
+	call salloc (hbuf, sz_val, TY_CHAR)
 
 	# Clear screen.
 	if (H_FORMAT(ctrl) == HF_TEXT) {
@@ -40,14 +42,16 @@ begin
 
 	# Initialize the output line to blanks.
 	blank = ' '
-	call amovkc (blank, Memc[lbuf], SZ_LINE)
+	sz_val = SZ_LINE
+	call amovkc (blank, Memc[lbuf], sz_val)
 
 	n = strlen (HB_TITLE(hb))
 	center = (lmargin + rmargin) / 2
 	offset = max (lmargin, center - n/2)
 
 	# Center help block title in output line.
-	call amovc (HB_TITLE(hb), Memc[lbuf+offset], min(n,rmargin-offset))
+	sz_val = min(n,rmargin-offset)
+	call amovc (HB_TITLE(hb), Memc[lbuf+offset], sz_val)
 
 	# Format the MODNAME (section) into the "edge" buffer.  MODNAME is the
 	# module name (one of the keys), transformed to upper case.
@@ -66,8 +70,9 @@ begin
 	}
 
 	n = strlen (Memc[edge])
-	call amovc (Memc[edge], Memc[lbuf+lmargin-1], n)
-	call amovc (Memc[edge], Memc[lbuf + rmargin - n], n)
+	sz_val = n
+	call amovc (Memc[edge], Memc[lbuf+lmargin-1], sz_val)
+	call amovc (Memc[edge], Memc[lbuf + rmargin - n], sz_val)
 
 	Memc[lbuf+rmargin] = '\n'
 	Memc[lbuf+rmargin+1] = EOS

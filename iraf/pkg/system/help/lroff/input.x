@@ -24,17 +24,19 @@ int procedure input (in, userbuf)
 extern	in()
 char	userbuf[ARB]
 
+size_t	sz_val
 bool	standout_mode_in_effect
 char	ch
 int	len_inputline, ocol
 pointer	sp, lbuf, ip, op
-int	stridx(), in()
+int	stridx(), in(), modi()
 errchk	salloc, in
 include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_IBUF, TY_CHAR)
+	sz_val = SZ_IBUF
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Get input line and deal with any tab characters therein.
 	if (in (in_magic_arg, Memc[lbuf]) == EOF) {
@@ -90,7 +92,7 @@ begin
 		    op = op + 1
 		    ocol = ocol + 1
 		    len_inputline = len_inputline + 1
-		} until (ocol > 1 && mod (ocol, TABSIZE) == 0)
+		} until (ocol > 1 && modi (ocol, TABSIZE) == 0)
 		ip = ip + 1
 		next
 

@@ -43,6 +43,7 @@ extern	in(), out()
 char	linebuf[ARB]
 int	ip
 
+size_t	sz_val
 int	i, n
 int	inbold(), in(), lgetarg(), strlen()
 errchk	skiplines, sprintf, pargi, outstr, outc, inbold, outline
@@ -61,7 +62,8 @@ begin
 	# section counters.
 
 	nh_level[n] = nh_level[n] + 1
-	call amovki (0, nh_level[n+1], MAX_NHLEVEL - n)
+	sz_val = MAX_NHLEVEL - n
+	call amovki (0, nh_level[n+1], sz_val)
 
 	# Output the section number followed by a blank and then the section
 	# label.
@@ -92,10 +94,12 @@ end
 
 procedure init_nh()
 
+size_t	sz_val
 include	"lroff.com"
 
 begin
-	call amovki (0, nh_level, MAX_NHLEVEL)
+	sz_val = MAX_NHLEVEL
+	call amovki (0, nh_level, sz_val)
 end
 
 
@@ -146,8 +150,11 @@ extern	in()
 int	in()
 char	user_linebuf[ARB]
 
+size_t	sz_val
+int	ival
 pointer	sp, ip, lbuf, first
-int	save_in_magic_arg, status
+pointer	save_in_magic_arg
+int	status
 int	stropen(), input()
 extern	getline()
 errchk	salloc, stropen, input
@@ -155,7 +162,8 @@ include	"lroff.com"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE + 3 + 3, TY_CHAR)
+	sz_val = SZ_LINE + 3 + 3
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Deposit escape sequence to turn bold on.
 	call strcpy ("\\fB", Memc[lbuf], ARB)
@@ -195,7 +203,8 @@ begin
 	save_in_magic_arg = in_magic_arg
 	in_magic_arg = stropen (Memc[first], ARB, READ_ONLY)
 	status = input (getline, user_linebuf)
-	call close (in_magic_arg)
+	ival = in_magic_arg
+	call close (ival)
 	in_magic_arg = save_in_magic_arg
 
 	call sfree (sp)
