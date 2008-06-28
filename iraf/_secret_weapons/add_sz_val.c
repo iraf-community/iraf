@@ -361,6 +361,20 @@ static int add_sz_val( const char *proc_name, int target_arg,
 			}
 			break;
 		    }
+		    else if ( is_valchar(*ip2) ) {	/* do loop */
+			const char *ip3;
+			ip3 = ip2;
+			while ( *ip3 != '\n' && *ip3 != '\0' ) {
+			    if ( *ip3 == '{' ) {
+				break;
+			    }
+			    ip3++;
+			}
+			if ( *ip3 != '{' ) {
+			    flags[j] |= FLG_IF_WITHOUT_BRACE;
+			}
+			break;
+		    }
 		    else {
 			if ( isalpha(*ip2) == 0 ) {
 			    fprintf(stderr,"[ERROR] file = %s  line = %d: Syntax error [1]\n",
