@@ -29,7 +29,8 @@ procedure t_mktags()
 char	fname[SZ_FNAME], lbuf[SZ_LBUF], tag[SZ_FNAME]
 bool	listing, mktags
 int	fd, ip, ip1, ip2, op, linenum, i, j, out
-pointer	list
+pointer	pp, list
+size_t	sz_val
 
 bool	clgetb()
 int	tg_compare()
@@ -38,12 +39,12 @@ int	clgfil()
 int	open(), tg_getlongline(), gstrmatch(), stridxs()
 pointer	clpopni(), tg_putstr()
 
-int	ntags
+size_t	ntags
 pointer	tg_op
 pointer	tg_sbuf
 pointer	tg_tag[MAX_TAGS]
 pointer	tg_file[MAX_TAGS]
-pointer	tg_lnum[MAX_TAGS]
+int	tg_lnum[MAX_TAGS]
 pointer	tg_lbuf[MAX_TAGS]
 int	tg_sort[MAX_TAGS]
 
@@ -51,7 +52,8 @@ common	/tagcom/ ntags, tg_op, tg_sbuf, tg_tag, tg_file, tg_lnum, tg_lbuf,
 	tg_sort
 
 begin
-	call malloc (tg_sbuf, SZ_SBUF, TY_CHAR)
+	sz_val = SZ_SBUF
+	call malloc (tg_sbuf, sz_val, TY_CHAR)
 	list  = clpopni ("files")
 	tg_op = tg_sbuf
 	ntags = 0
@@ -147,17 +149,17 @@ begin
 		# blank and skipping leading whitespace.
 			
 		op = 1
-		for (ip=tg_lbuf[j];  IS_WHITE (Memc[ip]);  ip=ip+1)
+		for (pp=tg_lbuf[j];  IS_WHITE (Memc[pp]);  pp=pp+1)
 		    ;
-		for (;  Memc[ip] != EOS;  ip=ip+1)
-		    if (IS_WHITE (Memc[ip])) {
+		for (;  Memc[pp] != EOS;  pp=pp+1)
+		    if (IS_WHITE (Memc[pp])) {
 			lbuf[op] = ' '
 			op = op + 1
-			while (IS_WHITE (Memc[ip]))
-			    ip = ip + 1
-			ip = ip - 1
+			while (IS_WHITE (Memc[pp]))
+			    pp = pp + 1
+			pp = pp - 1
 		    } else {
-			lbuf[op] = Memc[ip]
+			lbuf[op] = Memc[pp]
 			op = op + 1
 		    }
 		lbuf[op] = EOS
@@ -181,12 +183,12 @@ int procedure tg_compare (s1, s2)
 int	s1			# t_sort index of string 1
 int	s2			# t_sort index of string 2
 
-int	ntags
+size_t	ntags
 pointer	tg_op
 pointer	tg_sbuf
 pointer	tg_tag[MAX_TAGS]
 pointer	tg_file[MAX_TAGS]
-pointer	tg_lnum[MAX_TAGS]
+int	tg_lnum[MAX_TAGS]
 pointer	tg_lbuf[MAX_TAGS]
 int	tg_sort[MAX_TAGS]
 
@@ -211,12 +213,12 @@ int	nchars
 pointer	newstr
 int	strlen()
 
-int	ntags
+size_t	ntags
 pointer	tg_op
 pointer	tg_sbuf
 pointer	tg_tag[MAX_TAGS]
 pointer	tg_file[MAX_TAGS]
-pointer	tg_lnum[MAX_TAGS]
+int	tg_lnum[MAX_TAGS]
 pointer	tg_lbuf[MAX_TAGS]
 int	tg_sort[MAX_TAGS]
 

@@ -10,8 +10,9 @@ procedure t_memchk()
 
 int	fd, ip
 bool	passall, mark
-int	addr, retaddr, seqno, action, class
-int	old_addr, old_seqno, old_action
+long	addr, retaddr, old_addr
+int	seqno, action, class
+int	old_seqno, old_action
 char	lbuf[SZ_LINE], old_lbuf[SZ_LINE]
 char	descr[SZ_LINE], old_descr[SZ_LINE]
 char	tokbuf[SZ_FNAME], fname[SZ_FNAME]
