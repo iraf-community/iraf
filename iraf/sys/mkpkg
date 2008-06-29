@@ -42,7 +42,7 @@ sysgen:
 	$call stg
 	$ifeq (USE_LIBMAIN, yes)  $call libmain  $endif
 	$call libc
-	$call imfort
+#	$call imfort
 	$call gks
 	$call ncar
 	$call sgi
