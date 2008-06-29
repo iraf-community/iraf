@@ -491,6 +491,17 @@ EOF
 
 "make_install")
   #
+  # making helpdb
+  iraf="`pwd`/iraf/" host="${iraf}unix/" hconfig="${host}config/" TERM=vt100 `pwd`/iraf/bin/cl.e <<EOF
+
+softools
+mkhelpdb base\$root.hd base\$helpdb.mip
+mkhelpdb tables\$base/root.hd tables\$base/helpdb.mip
+mkhelpdb noao\$base/root.hd noao\$base/helpdb.mip
+logout
+EOF
+  rm -f clhistory.txt
+  #
   mkdir -p $DESTDIR/$PREFIX/iraf
   S=$?
   if [ ! $S = 0 ]; then
