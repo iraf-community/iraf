@@ -38,7 +38,7 @@ Entry points in this package include:
 define	LEN_MLSTRUCT	165		# module list structure
 define	SZ_PATBUF	159
 
-define	ML_HP		Memi[P2I($1)]	# help directory
+define	ML_HP		Memp[$1]	# help directory
 define	ML_INDEX	Memi[P2I($1+1)]	# index of next module in helpdir
 define	ML_SIMPAT	Memi[P2I($1+2)]	# pattern is simple (no metacharacters)
 define	ML_PATBUF	Memc[P2C($1+5)] # encoded pattern buffer
