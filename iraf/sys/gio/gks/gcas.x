@@ -14,6 +14,7 @@ int	dimx, dimy		# Dimensions of color index array
 int	ncs, nrs		# Starting column, row of color array
 short	colia[dimx, dimy]	# Colour index array
 
+size_t	sz_val
 int	i, j, off
 pointer	sp, pixels
 include	"gks.com"
@@ -28,12 +29,14 @@ begin
 	} else {
 	    # Cell array is subraster of a larger array
 	    call smark (sp)
-	    call salloc (pixels, dx * dy, TY_SHORT)
+	    sz_val = dx * dy
+	    call salloc (pixels, sz_val, TY_SHORT)
 
 	    # Extract subraster
 	    do j = 1, dy {
 		off = (j - 1) * dx
-		call amovs (colia[ncs,nrs+j-1], Mems[off], dx)
+		sz_val = dx
+		call amovs (colia[ncs,nrs+j-1], Mems[pixels+off], sz_val)
 	    }
 
 	    # Output color array to all active workstations.

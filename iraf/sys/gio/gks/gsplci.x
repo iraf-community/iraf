@@ -9,6 +9,9 @@ procedure gsplci (coli)
 
 int	coli		# Polyline colour index
 
+real	rval
+
 begin
-	call gsawr (G_PLWIDTH, real (coli))
+	rval = coli
+	call gsawr (G_PLWIDTH, rval)
 end

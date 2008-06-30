@@ -8,7 +8,7 @@ procedure gopwk (wkid, conid, wtype)
 
 int	wkid		# Workstation identifier
 int	conid		# Connection identifier, not used.
-int	wtype		# Workstation type 
+pointer	wtype		# Workstation type 
 
 include	"gks.com"
 

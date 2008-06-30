@@ -9,6 +9,9 @@ procedure gspmci (coli)
 
 int	coli		# Polymarker colour index.
 
+real	rval
+
 begin
-	call gsawr (G_PMCOLOR, real (coli))
+	rval = coli
+	call gsawr (G_PMCOLOR, rval)
 end

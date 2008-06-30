@@ -22,7 +22,7 @@ begin
 	    errind = 0
 
 	iferr {
-	    coli = int (gstatr (gp[gk_std], G_PLWIDTH))
+	    coli = gstatr (gp[gk_std], G_PLWIDTH)
 	} then {
 	    errind = 1
 	    coli = -1
