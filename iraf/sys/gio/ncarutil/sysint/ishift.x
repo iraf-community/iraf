@@ -8,20 +8,20 @@ int procedure ishift (in_word, n)
 
 int	in_word, n
 int	new_word, bit, index, i
-int	bitupk()
+int	bitupk(), absi(), modi()
 
 begin
 	if (n > NBITS_INT)
 	    call error (0, "n > NBITS_INT in ishift")
 	if (n < 0)
 	    # Right end-off shift
-	    new_word = bitupk (in_word, abs(n) + 1, NBITS_INT - abs(n))
+	    new_word = bitupk (in_word, absi(n) + 1, NBITS_INT - absi(n))
 	else {
 	    # Left circular shift (rotate)
 	    do i = 1, NBITS_INT {
 		index = n + i
 		if (index > NBITS_INT)
-		    index = mod ((n + i), NBITS_INT)
+		    index = modi ((n + i), NBITS_INT)
 		bit = bitupk (in_word, i, 1)
 		call bitpak (bit, new_word, index, 1)
 	    }

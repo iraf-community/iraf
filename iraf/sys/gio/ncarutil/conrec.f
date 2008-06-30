@@ -379,9 +379,11 @@ C
 C +NOAO
 C
 C     WRITE (IWORK(56:62),'(I6)') M
-      call encode (6, '(i6)', iwork(56:62), m)
+      rval = m
+      call encode (6, '(i6)', iwork(56:62), rval)
 C     WRITE (IWORK(73:79),'(I6)') N
-      call encode (6, '(i6)', iwork(73:79), n)
+      rval = n
+      call encode (6, '(i6)', iwork(73:79), rval)
 C -NOAO
 C
       CALL SETER( IWORK, 1, 1 )

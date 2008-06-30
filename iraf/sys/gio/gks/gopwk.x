@@ -12,7 +12,6 @@ pointer	wtype		# Workstation type
 
 include	"gks.com"
 
-
 begin
 	# This procedure sets "gp[wkid]" to be the "gp" of workstation "wkid".
 	# Procedure gopen has been called by the calling routine.  The wkid
@@ -20,4 +19,17 @@ begin
 	# workstations.  Parameter wtype is the gp returned from gopen.
 
 	gp[wkid] = wtype
+end
+
+
+procedure gopwk0 (wkid, conid, dummy_wtype)
+
+int	wkid		# Workstation identifier
+int	conid		# Connection identifier, not used.
+int	dummy_wtype		# Workstation type 
+
+include	"gks.com"
+
+begin
+	gp[wkid] = dummy_wtype
 end

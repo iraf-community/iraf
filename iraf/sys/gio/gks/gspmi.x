@@ -7,7 +7,7 @@ include	<gset.h>
 
 procedure gspmi (index)
 
-int	index		# Polymarker index. (whatever that is)
+real	index		# Polymarker index. (whatever that is)
 
 begin
 	;

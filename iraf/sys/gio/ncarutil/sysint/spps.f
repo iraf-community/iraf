@@ -747,7 +747,7 @@ C
 C Open GKS, define a workstation, and activate the workstation.
 C
 C     CALL GOPKS (6,ISZ)
-C     CALL GOPWK (IU(6),2,1)
+C     CALL GOPWK0 (IU(6),2,1)
 C     CALL GACWK (IU(6))
 C
 C     RETURN
@@ -1051,10 +1051,11 @@ C
       IF (F5.LT.F6.AND.F7.LT.F8.AND.LL.EQ.1.AND.IC.LE.0) THEN
         CALL GQASF (IE,LA)
         IF (LA(4).EQ.0) THEN
-          CALL GQPMI (IE,IN)
-          CALL GSPMI (MAX0(-IC,1))
+          CALL GQPMI (IE,RIN)
+          RMAX=MAX0(-IC,1)
+          CALL GSPMI (RMAX)
           CALL GPM (NP,PX,PY)
-          CALL GSPMI (IN)
+          CALL GSPMI (RIN)
         ELSE
           CALL GQMK (IE,IN)
           CALL GSMK (MAX0(-IC,1))
@@ -1075,8 +1076,9 @@ C
         IF (IC.LE.0) THEN
           CALL GQASF (IE,LA)
           IF (LA(4).EQ.0) THEN
-            CALL GQPMI (IE,IN)
-            CALL GSPMI (MAX0(-IC,1))
+            CALL GQPMI (IE,RIN)
+            RMAX=MAX0(-IC,1)
+            CALL GSPMI (RMAX)
           ELSE
             CALL GQMK (IE,IN)
             CALL GSMK (MAX0(-IC,1))
@@ -1127,7 +1129,7 @@ C back the way it was.
 C
         IF (IC.LE.0) THEN
           IF (LA(4).EQ.0) THEN
-            CALL GSPMI (IN)
+            CALL GSPMI (RIN)
           ELSE
             CALL GSMK (IN)
           END IF
@@ -1334,7 +1336,7 @@ C
         CALL GDAWK (IU(6))
         CALL GCLWK (IU(6))
         IU(6)=IV
-        CALL GOPWK (IU(6),2,1)
+        CALL GOPWK0 (IU(6),2,1)
         CALL GACWK (IU(6))
 C
 C If, in the future, it becomes possible to have more than one metacode
@@ -1349,7 +1351,7 @@ C           CALL GQOPWK (I,IE,NO,ID)
 C           IF (ID.EQ.IU(6)) GO TO 102
 C 101     CONTINUE
 C       END IF
-C       CALL GOPWK (IU(6),2,1)
+C       CALL GOPWK0 (IU(6),2,1)
 C 102   CALL GAWK (IU(6))
 C
 C Check for one of the variables setting color and intensity.

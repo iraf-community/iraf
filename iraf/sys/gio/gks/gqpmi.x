@@ -7,8 +7,9 @@ include	"gks.h"
 
 procedure gqpmi (errind, index)
 
-real	index                   # Polymarker index - returned value.
 int	errind			# Error indicator
+real	index                   # Polymarker index - returned value.
+
 include	"gks.com"
 
 begin
