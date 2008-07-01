@@ -9,9 +9,9 @@ define	DEF_MAXFRAMES	16			# maximum frames/metafile
 
 define	LEN_SGI		81
 
-define	SGI_SBUF	Memi[P2I($1)]		# string buffer
+define	SGI_SBUF	Memp[$1]		# string buffer
 define	SGI_SZSBUF	Memi[P2I($1+1)]		# size of string buffer
-define	SGI_NEXTCH	Memi[P2I($1+2)]		# next char pos in string buf
+define	SGI_NEXTCH	Memp[$1+2]		# next char pos in string buf
 define	SGI_NCHARSIZES	Memi[P2I($1+3)]		# number of character sizes
 define	SGI_POLYLINE	Memi[P2I($1+4)]		# device supports polyline
 define	SGI_POLYMARKER	Memi[P2I($1+5)]		# device supports polymarker
@@ -34,11 +34,11 @@ define	SGI_TXSIZE	Memi[P2I($1+22)]		# last text size set
 define	SGI_TXFONT	Memi[P2I($1+23)]		# last text font set
 define	SGI_TYPE	Memi[P2I($1+24)]		# last line type set
 define	SGI_WIDTH	Memi[P2I($1+25)]		# last line width set
-define	SGI_DEVNAME	Memi[P2I($1+26)]		# name of open device
+define	SGI_DEVNAME	Memp[$1+26]		# name of open device
 	# extra space
-define	SGI_CHARHEIGHT	Memi[P2I($1+30+$2-1)]	# character height
-define	SGI_CHARWIDTH 	Memi[P2I($1+40+$2-1)]	# character width
-define	SGI_CHARSIZE	Memr[P2R($1+50+$2-1)]	# text sizes permitted
+define	SGI_CHARHEIGHT	Memi[P2I($1+30)+$2-1]	# character height
+define	SGI_CHARWIDTH 	Memi[P2I($1+40)+$2-1]	# character width
+define	SGI_CHARSIZE	Memr[P2R($1+50)+$2-1]	# text sizes permitted
 define	SGI_PLAP	($1+60)			# polyline attributes
 define	SGI_PMAP	($1+64)			# polymarker attributes
 define	SGI_FAAP	($1+68)			# fill area attributes

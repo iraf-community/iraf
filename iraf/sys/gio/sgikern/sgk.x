@@ -146,8 +146,10 @@ int procedure sgk_open (device, tty)
 char	device[ARB]		# device name [NOT USED]
 pointer	tty			# pointer to graphcap descriptor
 
+size_t	sz_val
 char	cap[2]
-int	len_nodeprefix, byte, off, op, i, j
+int	len_nodeprefix, byte, i, j, i_off
+pointer	off, op, pp
 pointer	sp, raw_ddstr, ddstr, devname, spool, fname, tempfn, val, ip
 
 bool	ttygetb()
@@ -158,13 +160,17 @@ include	"sgk.com"
 
 begin
 	call smark (sp)
-	call salloc (raw_ddstr, SZ_DDSTR, TY_CHAR)
-	call salloc (ddstr, SZ_DDSTR, TY_CHAR)
-	call salloc (devname, SZ_FNAME, TY_CHAR)
-	call salloc (spool, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (val, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_DDSTR
+	call salloc (raw_ddstr, sz_val, TY_CHAR)
+	call salloc (ddstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (devname, sz_val, TY_CHAR)
+	call salloc (spool, sz_val, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (tempfn, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (val, sz_val, TY_CHAR)
 
 	# The DB flag may be set in the graphcap entry for an SGI device to
 	# print debug messages during execution.
@@ -246,7 +252,8 @@ begin
 	# Get OS pathname of spoofile.
 	call mktemp (Memc[spool], Memc[tempfn], SZ_PATHNAME)
 	call fmapfn (Memc[tempfn], mf_fname, SZ_PATHNAME)
-	call strupk (mf_fname, mf_fname, SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (mf_fname, mf_fname, sz_val)
 
 	# Get pathname of spoolfile on the remote node.  The call to
 	# ki_fmapfn() is currently necessary to translate the filename for
@@ -254,7 +261,8 @@ begin
 	# future version of the kernel interface.
 
 	call ki_fmapfn (Memc[tempfn], Memc[fname], SZ_PATHNAME)
-	call strupk (Memc[fname], Memc[fname], SZ_PATHNAME)
+	sz_val = SZ_PATHNAME
+	call strupk (Memc[fname], Memc[fname], sz_val)
 
 	if (mf_debug) {
 	    call eprintf ("sgk: open device %s, outfile = %s\n")
@@ -274,8 +282,8 @@ begin
 
 	    } else if (Memc[ip] == '$' && Memc[ip+1] == 'F') {
 		# Filename substitution.
-		for (i=fname;  Memc[i] != EOS;  i=i+1) {
-		    mf_dispose[op] = Memc[i]
+		for (pp=fname;  Memc[pp] != EOS;  pp=pp+1) {
+		    mf_dispose[op] = Memc[pp]
 		    op = op + 1
 		}
 		ip = ip + 1
@@ -365,8 +373,8 @@ begin
 	    if (ttygetb (tty, "BF")) {
 		do j = 1, (BPW/NBITS_BYTE)
 		    do i = 1, NBITS_BYTE {
-			off = (j - 1) * NBITS_BYTE
-			mf_bitmask[off+i] = shifti (1, off + NBITS_BYTE - i)
+			i_off = (j - 1) * NBITS_BYTE
+			mf_bitmask[i_off+i] = shifti (1, i_off + NBITS_BYTE - i)
 		    }
 	    } else {
 		do i = 1, BPW
@@ -411,6 +419,7 @@ procedure sgk_close (fd)
 
 int	fd			# output stream [NOT USED]
 
+size_t	sz_val
 int	i
 pointer	sp, fname
 int	oscmd()
@@ -419,7 +428,8 @@ include	"sgk.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	if (mf_debug)
 	    call eprintf ("close device\n")
@@ -473,11 +483,14 @@ procedure sgk_flush (fd)
 int	fd			# output stream [NOT USED]
 include	"sgk.com"
 
+size_t	sz_val
+
 begin
 	if (!mf_bitmap && mf_op > 1) {
 	    if (mf_debug)
 		call eprintf ("flush graphics output\n")
-	    call miiwrites (mf_fd, mf_obuf, mf_op-1)
+	    sz_val = mf_op-1
+	    call miiwrites (mf_fd, mf_obuf, sz_val)
 	    mf_op = 1
 	}
 
@@ -491,9 +504,14 @@ end
 procedure sgk_frame (fd)
 
 int	fd			# output stream [NOT USED]
+
+size_t	sz_val
+size_t	c_1
+
 include	"sgk.com"
 
 begin
+	c_1 = 1
 	# Ignore frame commands if frame is empty.
 	if (!mf_update)
 	    return
@@ -504,20 +522,24 @@ begin
 	if (mf_bitmap) {
 	    # Write the bitmap to the output raster-file.
 
-	    if (mf_swap2)
-		call bswap2 (mf_fbuf, 1, mf_fbuf, 1,
-		    mf_lenframe * SZ_INT * SZB_CHAR)
-	    if (mf_swap4)
-		call bswap4 (mf_fbuf, 1, mf_fbuf, 1,
-		    mf_lenframe * SZ_INT * SZB_CHAR)
+	    if (mf_swap2) {
+		sz_val = mf_lenframe * SZ_INT * SZB_CHAR
+		call bswap2 (mf_fbuf, c_1, mf_fbuf, c_1, sz_val)
+	    }
+	    if (mf_swap4) {
+		sz_val = mf_lenframe * SZ_INT * SZB_CHAR
+		call bswap4 (mf_fbuf, c_1, mf_fbuf, c_1, sz_val)
+	    }
 
-	    call write (mf_fd, mf_fbuf, mf_lenframe * SZ_INT)
+	    sz_val = mf_lenframe * SZ_INT
+	    call write (mf_fd, mf_fbuf, sz_val)
 
 	} else {
 	    # Write the SGI frame instruction to the output mcode-file.
 
 	    if (mf_op + SGK_LENMCI > LEN_OBUF) {
-		call miiwrites (mf_fd, mf_obuf, mf_op-1)
+		sz_val = mf_op-1
+		call miiwrites (mf_fd, mf_obuf, sz_val)
 		mf_op = 1
 	    }
 
@@ -538,6 +560,8 @@ procedure sgk_move (fd, x, y)
 
 int	fd			# output stream [NOT USED]
 int	x, y			# point to move to
+
+size_t	sz_val
 
 include	"sgk.com"
 
@@ -564,7 +588,8 @@ begin
 
 	} else {
 	    if (mf_op + SGK_LENMCI > LEN_OBUF) {
-		call miiwrites (mf_fd, mf_obuf, mf_op-1)
+		sz_val = mf_op-1
+		call miiwrites (mf_fd, mf_obuf, sz_val)
 		mf_op = 1
 	    }
 
@@ -590,10 +615,11 @@ procedure sgk_draw (fd, a_x, a_y)
 int	fd			# output stream [NOT USED]
 int	a_x, a_y		# point to draw to
 
+size_t	sz_val
 char	fname[SZ_FNAME]
 int	xshift, yshift, dx, dy
 int	new_x, new_y, x1, y1, x2, y2, n, i
-int	open()
+int	open(), absi()
 errchk	open, close
 include	"sgk.com"
 
@@ -617,8 +643,10 @@ begin
 	    # we are actually going to write into the frame.
 
 	    # Zero out all the bits in a bitmap.
-	    if (mf_bitmap)
-		call aclri (mf_fbuf, mf_lenframe)
+	    if (mf_bitmap) {
+		sz_val = mf_lenframe
+		call aclri (mf_fbuf, sz_val)
+	    }
 
 	    # Open a new frame file if the one frame per file flag is set.
 	    if (mf_oneperfile && mf_frame > 1) {
@@ -654,7 +682,7 @@ begin
 		xshift = 0
 		yshift = 0
 
-		if (abs (new_x - mf_cx) > abs (new_y - mf_cy)) {
+		if (absi(new_x - mf_cx) > absi(new_y - mf_cy)) {
 		    dx = 0
 		    dy = 1
 		} else {
@@ -690,7 +718,8 @@ begin
 	} else {
 	    # Output a metacode draw instruction.
 	    if (mf_op + SGK_LENMCI > LEN_OBUF) {
-		call miiwrites (mf_fd, mf_obuf, mf_op-1)
+		sz_val = mf_op-1
+		call miiwrites (mf_fd, mf_obuf, sz_val)
 		mf_op = 1
 	    }
 
@@ -713,6 +742,7 @@ int	a_x2, a_y2			# end point of line
 real	dydx, dxdy
 long	fbit, wbit, word
 int	wpln, mask, dx, dy, x, y, x1, y1, x2, y2, or()
+int	absi()
 include	"sgk.com"
 
 begin
@@ -722,7 +752,7 @@ begin
 	dx = x2 - x1
 	dy = y2 - y1
 
-	if (abs(dx) > abs(dy)) {
+	if (absi(dx) > absi(dy)) {
 	    if (x1 > x2) {
 		x1 = a_x2; x2 = a_x1; dx = -dx
 		y1 = a_y2; y2 = a_y1; dy = -dy
@@ -808,6 +838,7 @@ procedure sgk_linewidth (fd, width)
 int	fd			# output stream [NOT USED]
 int	width			# new line width
 
+size_t	sz_val
 int	gap
 include	"sgk.com"
 
@@ -825,7 +856,8 @@ begin
 
 	} else {
 	    if (mf_op + SGK_LENMCI > LEN_OBUF) {
-		call miiwrites (mf_fd, mf_obuf, mf_op-1)
+		sz_val = mf_op-1
+		call miiwrites (mf_fd, mf_obuf, sz_val)
 		mf_op = 1
 	    }
 
