@@ -508,28 +508,6 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 		ieee_flags (set, precision, "single", NULL);
 	}
 #else
-#ifdef mc68000
-	/* Enable the IEEE floating point exceptions, for old versions of
-	 * SunOS.  Pretty much obsolete now...
-	 */
-#	define	FP_INEXACT	0000010
-#	define	FP_DIVIDE	0000020
-#	define	FP_UNDERFLOW	0000040
-#	define	FP_OVERFLOW	0000100
-#	define	FP_INVALID	0000200
-#	define	FP_INEX1	0000400
-#	define	FP_INEX2	0001000
-#	define	FP_DZ		0002000
-#	define	FP_UNFL		0004000
-#	define	FP_OVFL		0010000
-#	define	FP_OPERR	0020000
-#	define	FP_SNAN		0040000
-#	define	FP_BSUN		0100000
-	{
-	    int mode = FP_BSUN|FP_SNAN|FP_OPERR|FP_DZ|FP_OVFL|FP_INVALID;
-	    fpmode_ (&mode);
-	}
-#endif
 #endif
 #endif
 

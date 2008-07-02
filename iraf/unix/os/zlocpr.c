@@ -41,12 +41,8 @@ int ZLOCPR ( PFU proc, XPOINTER *o_epa )
 	/* Disassemble the JMP instruction in the transfer vector to get the
 	 * address of the referenced procedure in the shared library. [MACHDEP]
 	 */
-#ifdef mc68000
-	*o_epa = (XPOINTER)(*((unsigned XPOINTER *)((char *)epa + 2)));
-#else
 #ifdef sparc
 	*o_epa = (XPOINTER)(((*epa & 0x3fffff) << 10) | (*((unsigned XPOINTER *)epa+1) & 0x3ff));
-#endif
 #endif
 
 #endif
