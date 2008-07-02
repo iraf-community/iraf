@@ -90,7 +90,7 @@ int m_getc ( struct context *cx )
 		    fflush (stdout);
 		    if (fgets (lbuf, SZ_CMD+1, stdin) == NULL)
 			safe_strcpy (lbuf, SZ_CMD+1, name);
-		    if (pp = index (lbuf, '\n'))
+		    if (pp = strchr (lbuf, '\n'))
 			*pp = EOS;
 		    val = lbuf;
 		}

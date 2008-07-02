@@ -158,7 +158,7 @@ addflag:		for (op=flags;  *op;  op++)
 		    }
 		}
 
-	    } else if (index (*argp, '=') != NULL) {
+	    } else if (strchr (*argp, '=') != NULL) {
 		/* Mark the position of a symbol definition argument.  Wait
 		 * to enter this into the symbol table until after the command
 		 * line has been processed and the mkpkg global include file

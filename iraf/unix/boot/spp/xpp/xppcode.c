@@ -1649,7 +1649,7 @@ static void traverse ( char delim )
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
 		    goto next;
-		} else if ((cp = index (esc_ch, *op)) != NULL) {
+		} else if ((cp = strchr (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
 		} else if (isdigit (*op)) {	/* '\0DD' octal constant */
 		    *op -= '0';
@@ -1755,7 +1755,7 @@ static int charcon ( char *string )
 	 */
 	if (ch == '\\') {
 	    const char *cc;
-	    if ((cc = index (esc_ch, *ip)) != NULL) {
+	    if ((cc = strchr (esc_ch, *ip)) != NULL) {
 		return (esc_val[cc-esc_ch]);
 	    } else if (isdigit (*ip)) {
 		nump = ip;

@@ -147,8 +147,8 @@ int main ( int argc, char *argv[] )
 
 		} else {
 
-		    for (ip=index(genfname,'$');  ip != NULL;
-			ip = index(ip,'$')) {
+		    for (ip=strchr(genfname,'$');  ip != NULL;
+			ip = strchr(ip,'$')) {
 
 			if (*(ip+1) == '$')
 			    ip += 2;
@@ -677,9 +677,9 @@ static int evaluate_expr( void )
 	    expr += 8;
 	    switch (relop()) {
 	    case EQ:
-		return (index(expr,type_char) != NULL);
+		return (strchr(expr,type_char) != NULL);
 	    case NE:
-		return (index(expr,type_char) == NULL);
+		return (strchr(expr,type_char) == NULL);
 	    default:
 		goto err;
 	    }
