@@ -3,13 +3,13 @@
 
 all:	libboot.a
 
-libboot.a:	_bytmov.o envinit.o index.o osaccess.o osamovb.o oschdir.o \
+libboot.a:	_bytmov.o envinit.o osaccess.o osamovb.o oschdir.o \
 		osclose.o oscmd.o oscreatedir.o oscrfile.o osdelete.o osdir.o \
 		osfcopy.o osfdate.o osfiletype.o osfn2vfn.o osfpathname.o \
 		osgetenv.o osgetowner.o osglobal.o osopen.o osputenv.o \
 		osread.o ossetfmode.o ossetowner.o ossettime.o osstrpak.o \
 		osstrupk.o ossubdir.o ossymlink.o ossysfile.o ostime.o \
-		oswrite.o rindex.o tape.o vfn2osfn.o
+		oswrite.o tape.o vfn2osfn.o
 	ar r libboot.a $^
 	$(RANLIB) libboot.a
 	cp -p libboot.a ../../lib/.
