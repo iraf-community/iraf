@@ -440,7 +440,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
 	 */
-#ifdef X86
+#ifdef I386
 	fpsetsticky (0x0);
 	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
 #else
