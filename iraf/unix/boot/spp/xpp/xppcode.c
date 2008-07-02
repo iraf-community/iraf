@@ -587,7 +587,7 @@ void do_include( void )
 	     * from the directory containing the source and include file.
 	     */
 	    if (!hbindefs) {
-	        if ((p = rindex (fname[istkptr-1], '/')) == NULL)
+	        if ((p = strrchr (fname[istkptr-1], '/')) == NULL)
 		    root_len = 0;
 	        else
 		    root_len = p - fname[istkptr-1] + 1;

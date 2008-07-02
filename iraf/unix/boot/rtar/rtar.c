@@ -341,7 +341,7 @@ int main ( int argc, char *argv[] )
 		}
 		else {
 		    if (ftype == DIRECTORY_FILE) {
-			char *pp = rindex (fh.name, '/');
+			char *pp = strrchr (fh.name, '/');
 			if (pp && *(pp+1) == EOS) *pp = EOS;
 		    }
 		}
@@ -631,7 +631,7 @@ static int newfile ( const char *fname, int mode, int uid, int gid, int type )
 	    return (ERR);
 
 	if (type == DIRECTORY_FILE) {
-	    cp = rindex (fname_p, '/');
+	    cp = strrchr (fname_p, '/');
 	    if (cp && *(cp+1) == EOS)
 		*cp = EOS;
 	    fd = os_createdir (fname_p, mode);
@@ -666,7 +666,7 @@ static int checkdir ( const char *path, int mode, int uid, int gid )
 
 	/* Quick check to see if the directory exists.
 	 */
-	if ((cp = rindex (path_tmp, '/')) == NULL)
+	if ((cp = strrchr (path_tmp, '/')) == NULL)
 	    return (OK);
 
 	*cp = EOS;

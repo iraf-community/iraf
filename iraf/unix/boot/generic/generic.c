@@ -123,7 +123,7 @@ int main ( int argc, char *argv[] )
 	     * normally a 'g', e.g., ".gx" or ".gc", but we want to generate
 	     * a ".x" or ".c" file, so lop off any leading g in the extension.
 	     */
-	    if ((op = rindex (input_file, '.')) != NULL) {
+	    if ((op = strrchr (input_file, '.')) != NULL) {
 		extension = op + 1;
 		*op = EOS;
 		if (*extension == 'g')
