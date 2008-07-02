@@ -31,10 +31,9 @@ set_irafenv() {
   #
   # basic settings
   #
-  HSI_CF="-O -Wall -I$hinclude -DPREFIX=\\\"$PREFIX\\\""
-  HSI_XF="-Inolibc -w -/Wunused"
+  HSI_CF="-Wall -I$hinclude -DPREFIX=\\\"$PREFIX\\\""
   HSI_XF="-Wall"
-  HSI_FF="-O -Wall"
+  HSI_FF="-Wall"
   HSI_LF=""
   HSI_F77LIBS=""
   HSI_LFLAGS=""
@@ -45,8 +44,10 @@ set_irafenv() {
   XC_CFLAGS="-Wall"
   XC_FFLAGS="-Wall"
   XC_LFLAGS=""
-  #XC_CFLAGS="-I$hinclude -Wall"
+  #XC_LFLAGS="-Wl,-Bstatic"
+  #XC_LFLAGS="-Wl,-Bdynamic"
   #XC_FFLAGS="-Ns1602 -Nx512"
+  XC_LIBS="-lf2c"
   #
   MKPKG_XC_LFLAGS=""
   #
@@ -88,24 +89,45 @@ set_irafenv() {
   #
   case "$OPERATING_SYSTEM" in
   linux)
-    HSI_CF="$HSI_CF -DLINUX -DPOSIX -DSYSV"
+    CF_DEFS="-DLINUX -DPOSIX -DSYSV"
+    HSI_CF="$HSI_CF -O $CF_DEFS"
+    XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
+    XC_FFLAGS="$XC_FFLAGS -O"
     MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LIBS="$XC_LIBS -lm"
     ;;
   freebsd)
-    HSI_CF="$HSI_CF -DBSD"
+    CF_DEFS="-DBSD"
+    HSI_CF="$HSI_CF -O $CF_DEFS"
+    XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
+    XC_FFLAGS="$XC_FFLAGS -O"
     MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -z -/static"
+    XC_LIBS="$XC_LIBS -lm -lcompat"
     ;;
   darwin)
-    HSI_CF="$HSI_CF -DMACOSX"
+    CF_DEFS="-DMACOSX"
+    # note: disabled "-O" option for MacOSX.
+    HSI_CF="$HSI_CF $CF_DEFS"
+    XC_CFLAGS="$XC_CFLAGS $CF_DEFS"
+    XC_FFLAGS="$XC_FFLAGS"
     MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LIBS="$XC_LIBS -lm"
     ;;
   sunos)
-    HSI_CF="$HSI_CF -DSOLARIS -DPOSIX -DSYSV"
+    CF_DEFS="-DSOLARIS -DPOSIX -DSYSV"
+    HSI_CF="$HSI_CF -O $CF_DEFS"
+    XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
+    XC_FFLAGS="$XC_FFLAGS -O"
     MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LIBS="$XC_LIBS -lm -lsocket -lnsl -lintl -ldl -lelf"
     ;;
   cygwin)
-    HSI_CF="$HSI_CF -DCYGWIN -DLINUX -DPOSIX -DSYSV"
+    CF_DEFS="-DCYGWIN -DLINUX -DPOSIX -DSYSV"
+    HSI_CF="$HSI_CF -O $CF_DEFS"
+    XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
+    XC_FFLAGS="$XC_FFLAGS -O"
     MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LIBS="$XC_LIBS -lm"
     ;;
   *)
     echo "[ERROR] Unknown operating system: $OPERATING_SYSTEM"
@@ -123,7 +145,7 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export mkzflags HSI_LIBS
-  export XC_CFLAGS XC_FFLAGS XC_LFLAGS
+  export XC_CFLAGS XC_FFLAGS XC_LFLAGS XC_LIBS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -137,7 +159,7 @@ set_irafenv() {
   #noaolib=${noao}lib/
   #export noao noaobin noaolib
 
-  cincludes="$hinclude"
+  cincludes="$hinclude ${iraf}tables/base/tbtables/cfitsio/"
   export cincludes
   #pkglibs=${noaobin},${noaolib},${tablesbin},${tableslib}
   #export pkglibs
