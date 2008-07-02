@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef i386
-#define PORTAR 1
-#endif
 #include <ar.h>
 #ifdef MACOSX
 #include <ranlib.h>

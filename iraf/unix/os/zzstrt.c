@@ -80,16 +80,6 @@ static	unsigned int vshlib[8];
 
 #define align(a)	((a)&(~pmask))
 
-#ifdef i386
-/* The following kludge is required due to a 386i linker error to prevent
- * a BSS size of 0 for small processes with a short BSS segment.  If BSS is
- * set to zero in the file header but some BSS storage is required, the image
- * will die on a segmentation violation during startup while trying to
- * initialize the value of "environ".
- */
-int	BSS_kludge[256];
-#endif
-
 int ready( void );
 
 
@@ -300,31 +290,6 @@ int ZZSTRT( void )
 		exit (1);
 	    }
 
-#ifdef i386
-	    /* Map the shared image on a Sun-386i (SysV COFF format).
-	     */
-	    pgsize = getpagesize();
-	    pmask  = pgsize - 1;
-
-	    /* Determine the file and memory offsets of each segment of the
-	     * shared image.
-	     */
-
-	    t_off = 0;				/* file offset */
-	    t_loc = v_base;			/* location in memory */
-	    t_len = v_etext - v_base;		/* segment length */
-
-	    d_off = align (v_etext) - v_base;	/* map file page twice */
-	    d_loc = align (v_etext);
-	    d_len = v_edata - d_loc;
-
-	    b_off = 0;				/* anywhere will do */
-	    b_loc = align (d_loc + d_len + pmask);
-	    b_len = v_end - b_loc;
-
-	    b_start = v_edata;
-	    b_bytes = v_end - v_edata;
-#else
 	    /* Map the shared image on a Sun-3 or Sun-4.
 	     */
 	    pgsize = PAGSIZ;
@@ -356,7 +321,6 @@ int ZZSTRT( void )
 
 	    b_start = v_edata;
 	    b_bytes = v_end - v_edata;
-#endif /* i386 */
 #endif /* SOLARIS */
 
 #ifdef DEBUG

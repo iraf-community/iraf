@@ -19,7 +19,6 @@
 
 #ifdef LINUX
 #  undef SYSV
-#  undef i386
 #  define GNUAR
 #else
 #  ifdef BSD
