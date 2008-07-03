@@ -511,10 +511,8 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 #endif
 #endif
 
-#ifdef SYSV
 	/* Initialize the time zone data structures. */
 	tzset();
-#endif
 
 	/* Place a query call to ZAWSET to set the process working set limit
 	 * to the IRAF default value, in case we did not inherit a working set

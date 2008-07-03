@@ -3,12 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-
-#ifdef POSIX
-extern char *getcwd( char *, size_t );
-#else
-extern char *getwd( char * );
-#endif
+#include <unistd.h>
 
 #define import_spp
 #define import_kernel

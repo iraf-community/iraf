@@ -2,16 +2,9 @@
  */
 
 #include <sys/types.h>
-#ifdef SYSV
 #include <time.h>
-#else
 #include <sys/time.h>
 #include <sys/timeb.h>
-#endif
-
-#ifdef MACOSX
-#include <time.h>
-#endif
 
 #define SECONDS_1970_TO_1980	315532800L
 static	long os_timezone( void );

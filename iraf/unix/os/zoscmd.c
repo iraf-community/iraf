@@ -10,7 +10,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#if (defined(LINUX) || defined(CYGWIN))
+#if defined(POSIX)
 #define USE_SIGACTION
 #endif
 

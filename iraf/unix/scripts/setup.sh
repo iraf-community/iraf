@@ -97,7 +97,7 @@ set_irafenv() {
     XC_LIBS="$XC_LIBS -lm"
     ;;
   freebsd)
-    CF_DEFS="-DBSD"
+    CF_DEFS="-DBSD -DPOSIX"
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
@@ -105,7 +105,7 @@ set_irafenv() {
     XC_LIBS="$XC_LIBS -lm -lcompat"
     ;;
   darwin)
-    CF_DEFS="-DMACOSX"
+    CF_DEFS="-DMACOSX -DPOSIX"
     # note: disabled "-O" option for MacOSX.
     HSI_CF="$HSI_CF $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS $CF_DEFS"

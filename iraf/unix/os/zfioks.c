@@ -138,7 +138,7 @@
 #define KS_NO_RETRY	"KS_NO_RETRY"	/* env to override rexec retry    */
 
 #define KSRSH		"KSRSH"		/* set in env to override RSH cmd */
-#if (defined(BSD) || defined(LINUX) || defined(CYGWIN))
+#if (defined(LINUX) || defined(CYGWIN))
 #define RSH		"rsh"		/* typical names are rsh, remsh   */
 #else
 #ifdef SYSV

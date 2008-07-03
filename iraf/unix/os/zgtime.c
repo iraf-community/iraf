@@ -3,12 +3,10 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#ifndef SYSV
-#include <sys/timeb.h>
-#endif
-#include <sys/times.h>
-#include <sys/time.h>
 #include <time.h>
+#include <sys/time.h>
+#include <sys/timeb.h>
+#include <sys/times.h>
 
 #define import_kernel
 #define import_knames

@@ -2,16 +2,9 @@
  */
 
 #include <sys/types.h>
-#ifdef SYSV
 #include <time.h>
-#else
 #include <sys/time.h>
 #include <sys/timeb.h>
-#endif
-
-#ifdef MACOSX
-#include <time.h>
-#endif
 
 #include "zos.h"
 

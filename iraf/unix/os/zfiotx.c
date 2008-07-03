@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#if (defined(LINUX) || defined(CYGWIN))
+#if defined(POSIX)
 #define USE_SIGACTION
 #endif
 
