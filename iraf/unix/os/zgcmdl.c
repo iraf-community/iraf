@@ -10,12 +10,12 @@
 
 extern	char *environ[];
 
-#if defined(LINUX) && defined(POWERPC)
+#if (defined(LINUX) && defined(POWERPC))
 #define xargc	f__xargc
 #define xargv	f__xargv
 #endif
 
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 extern	char **xargv;		/* defined in getarg(3f); requires libU77! */
 extern	int xargc;
 #else

@@ -19,19 +19,12 @@
 
 #include "zos.h"
 
-
-#ifndef MACOSX
-# ifdef OLD_MACOSX
-#  undef OLD_MACOSX
-# endif
-#endif
-
 /*
  * ZZEPRO.C -- Code which is executed at the end of every procedure.
  */
 
 /* NOTE: Following is also picked up by Mac/Intel. */
-#if defined(MACOSX) || defined(CYGWIN)
+#if (defined(MACOSX) || defined(CYGWIN))
 
 /* zfpuct.c */
 extern int macosx_sigmask;
@@ -46,7 +39,7 @@ int ZZEPRO( void )
 
 	fegetexceptflag (&flagp, macosx_sigmask);
 	if (flagp & macosx_sigmask) {
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 	    struct sigcontext scp;
 	    scp.sc_psw = (flagp & macosx_sigmask);
 	    ex_handler (SIGFPE, 0, &scp);

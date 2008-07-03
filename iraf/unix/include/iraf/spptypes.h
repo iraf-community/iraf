@@ -7,7 +7,7 @@
 #ifndef F2C_INCLUDE	/* for native C code */
 
 
-#if defined(SPP_LP64) || defined(SPP_ILP64)
+#if (defined(SPP_LP64) || defined(SPP_ILP64))
 
 #ifdef SPP_LP64
 #define	XINT		int
@@ -60,7 +60,7 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #else	/* For C code written by f2c */
 
 
-#if defined(SPP_LP64) || defined(SPP_ILP64)
+#if (defined(SPP_LP64) || defined(SPP_ILP64))
 
 #ifdef SPP_LP64
 #define	XINT		integer

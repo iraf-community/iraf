@@ -4,7 +4,7 @@
 #ifdef LINUX
 # include <endian.h>
 #endif
-#if defined(BSD) || defined(MACOSX)
+#if (defined(BSD) || defined(MACOSX))
 # include <machine/endian.h>
 #endif
 #ifdef CYGWIN

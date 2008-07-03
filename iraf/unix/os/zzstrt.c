@@ -405,7 +405,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	/* Dummy routine called to indicate that mapping is complete. */
 	ready();
 
-#if defined(MACOSX) || defined(CYGWIN)
+#if (defined(MACOSX) || defined(CYGWIN))
         /*  Clears the exception-occurred bits in the FP status register.
          */
         feclearexcept (FE_ALL_EXCEPT);

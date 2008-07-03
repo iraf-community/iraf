@@ -87,7 +87,7 @@ static long os_timezone( void )
 	extern	long _timezone;
 	return (_timezone);
 #else
-#if defined(SYSV) || defined(MACOSX)
+#if (defined(SYSV) || defined(MACOSX))
 	struct tm *tm;
 	time_t clock;
 	clock = time(NULL);

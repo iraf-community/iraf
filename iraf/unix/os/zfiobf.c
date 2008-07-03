@@ -379,7 +379,7 @@ int _u_fmode ( int mode )
  */
 #include <signal.h>
 
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 #define USE_SIGACTION
 #endif
 

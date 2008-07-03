@@ -16,7 +16,7 @@
 #include <signal.h>
 #include <setjmp.h>
 
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 #include <sys/time.h>
 #endif
 #ifdef MACOSX

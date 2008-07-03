@@ -1,14 +1,10 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
-#ifdef SYSV
-#define NORLIMIT
-#endif
-
-#ifndef CYGWIN
-#ifdef LINUX
-#undef NORLIMIT
-#endif
+#ifndef LINUX
+# ifdef SYSV
+#  define NORLIMIT
+# endif
 #endif
 
 #ifdef SOLARIS

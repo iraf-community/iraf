@@ -83,16 +83,11 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
-#ifndef MACOSX
-#ifdef OLD_MACOSX
-#undef OLD_MACOSX
-#endif
-#endif
 
 /* UNIX signal handlers */
 typedef void (*signal_handler_t)(int);
 
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 typedef void (*sa_handler_t) ( int, int, struct sigcontext * );
 #else
 typedef void (*sa_handler_t)(int);

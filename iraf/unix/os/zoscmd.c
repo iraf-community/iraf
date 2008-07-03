@@ -10,13 +10,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#ifndef MACOSX
-#ifdef OLD_MACOSX
-#undef OLD_MACOSX
-#endif
-#endif
-
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 #define USE_SIGACTION
 #endif
 
@@ -36,7 +30,7 @@
 
 #include "zos.h"
 
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 void pr_onint ( int, int, struct sigcontext * );
 #else
 void pr_onint ( int );
@@ -216,7 +210,7 @@ int ZOSCMD ( PKCHAR *oscmd, PKCHAR *stdin_file, PKCHAR *stdout_file,
  * interrupted, post a flag to indicate this to ZOSCMD when the pr_wait()
  * returns.
  */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 void pr_onint ( int usig, int code, struct sigcontext *scp )
 #else
 void pr_onint ( int usig )

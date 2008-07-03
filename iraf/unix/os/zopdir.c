@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 /* Necessary to get DIR.dd_fd on Linux systems. */
 #define DIRENT_ILLEGAL_ACCESS
 #endif
@@ -140,7 +140,7 @@ int ZOPDIR ( PKCHAR *fname, XINT *chan )
 	dp->entry = 0;
 	dp->dir = dir;
 
-#if defined(LINUX)
+#if (defined(LINUX) || defined(CYGWIN))
 	fd = dirfd(dir);
 #else
 	fd = dir->dd_fd;		/* MACHDEP */

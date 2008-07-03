@@ -122,7 +122,7 @@ set_irafenv() {
     XC_LIBS="$XC_LIBS -lm -lsocket -lnsl -lintl -ldl -lelf"
     ;;
   cygwin)
-    CF_DEFS="-DCYGWIN -DLINUX -DPOSIX -DSYSV"
+    CF_DEFS="-DCYGWIN -DPOSIX -DSYSV"
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
@@ -522,7 +522,7 @@ mkhelpdb tables\$base/root.hd tables\$base/helpdb.mip
 mkhelpdb noao\$base/root.hd noao\$base/helpdb.mip
 logout
 EOF
-  rm -f clhistory.txt
+  rm -f clhistory.txt uparmsosmkhelb.par
   #
   mkdir -p $DESTDIR/$PREFIX/iraf
   S=$?

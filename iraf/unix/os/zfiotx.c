@@ -11,13 +11,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#ifndef MACOSX
-#ifdef OLD_MACOSX
-#undef OLD_MACOSX
-#endif
-#endif
-
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 #define USE_SIGACTION
 #endif
 
@@ -108,7 +102,7 @@ static	void tty_rawon ( struct ttyport *, int );
 static	void tty_reset ( struct	ttyport * );
 static	void uio_bwrite ( FILE *, XCHAR *, XSIZE_T );
 
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 static void tty_onsig ( int , int, struct sigcontext * );
 static void tty_stop ( int , int, struct sigcontext * );
 static void tty_continue ( int , int, struct sigcontext * );
@@ -898,7 +892,7 @@ static void tty_reset ( struct ttyport *port )
 /* sig  : signal which was trapped */
 /* arg1 : not used                 */
 /* arg2 : not used                 */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 static void tty_onsig ( int sig, int arg1, struct sigcontext *arg2 )
 #else
 static void tty_onsig ( int sig )
@@ -914,7 +908,7 @@ static void tty_onsig ( int sig )
 /* sig  : signal which was trapped */
 /* arg1 : not used                 */
 /* arg2 : not used                 */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 static void tty_stop ( int sig, int arg1, struct sigcontext *arg2 )
 #else
 static void tty_stop ( int sig )
@@ -962,7 +956,7 @@ static void tty_stop ( int sig )
 /* sig  : signal which was trapped */
 /* arg1 : not used                 */
 /* arg2 : not used                 */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 static void tty_continue ( int sig, int arg1, struct sigcontext *arg2 )
 #else
 static void tty_continue ( int sig )

@@ -58,7 +58,7 @@ int ZPANIC ( XINT *errcode, PKCHAR *errmsg )
 	/* Terminate process with a core dump if the debug_sig flag is set.
 	 */
 	if (debug_sig) {
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 	    signal (SIGABRT, SIG_DFL);
 	    kill (getpid(), SIGABRT);
 #else

@@ -56,7 +56,7 @@ int h_scanlibrary ( const char *library )
 	struct ar_hdr arf;
 	long length, fdate;
 	int len_arfmag, nmodules, i;
-#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+#if (defined(AR_EFMT1) && !defined(__CYGWIN__))
 	int len;
 #endif
 	/* Get the library file name. */
@@ -122,7 +122,7 @@ int h_scanlibrary ( const char *library )
 #else
 	    if (modname[0] != EOS) {
 #endif
-#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+#if (defined(AR_EFMT1) && !defined(__CYGWIN__))
 	        /*
 	         * BSD 4.4 extended AR format: #1/<namelen>, with name as the
 	         * first <namelen> bytes of the file
@@ -154,7 +154,7 @@ int h_scanlibrary ( const char *library )
 	    if (sscanf (arf.ar_size, "%ld", &length) == 1) {
 		if (length & 1)				/* must be even */
 		    length++;
-#if defined(AR_EFMT1) && !defined(__CYGWIN__)
+#if (defined(AR_EFMT1) && !defined(__CYGWIN__))
 		fseek (fp, length-len, 1);
 #else
 		fseek (fp, length, 1);

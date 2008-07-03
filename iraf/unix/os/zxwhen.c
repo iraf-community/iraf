@@ -35,13 +35,11 @@
 #include "zos.h"
 
 
-#ifdef MACOSX
-
 /* The following are needed for OS X 10.1 for backward compatability.  The
  * signal sa_flags are set to use them to get signal handling working on
  * 10.2 and later systems.
  */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 # ifndef SA_NODEFER
 #  define SA_NODEFER	0x0010	/* don't mask the signal we're delivering */
 # endif
@@ -52,14 +50,6 @@
 #  define SA_SIGINFO	0x0040	/* signal handler with SA_SIGINFO args */
 # endif
 #endif	/* OLD_MACOSX */
-
-#else
-
-#ifdef OLD_MACOSX
-# undef OLD_MACOSX
-#endif
-
-#endif	/* MACOSX */
 
 
 /* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
@@ -75,7 +65,7 @@
  */
 int debug_sig = 0;
 
-#ifdef LINUX
+#if (defined(LINUX) || defined(CYGWIN))
 # define	fcancel(fp)
 #endif
 #ifdef BSD
@@ -92,7 +82,7 @@ static int ignore_sigint = 0;
 
 /* */
 
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 typedef sa_handler_t handler_type;
 #else
 typedef union {
@@ -104,7 +94,7 @@ typedef union {
 static int setsig ( int, handler_type );
 
 
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 void ex_handler ( int, int, struct sigcontext * );
 #else
 void ex_handler ( int, siginfo_t *, void * );
@@ -243,7 +233,7 @@ int ZXWHEN ( XINT *sig_code, XPOINTER *epa, XPOINTER *old_epa )
 	    
 	*old_epa = (XPOINTER)(handler_epa[vex]);
 	handler_epa[vex] = (XSIGFUNC)(*epa);
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 	vvector = &ex_handler;
 #else
 	vvector.sa__sigaction = &ex_handler;
@@ -252,7 +242,7 @@ int ZXWHEN ( XINT *sig_code, XPOINTER *epa, XPOINTER *old_epa )
 	 * of handler as old_epa as this could lead to recursion.
 	 */
 	if ( (XSIGFUNC)(*epa) == X_IGNORE ) {
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 	    vvector = SIG_IGN;
 #else
 	    vvector.sa__handler = SIG_IGN;
@@ -305,7 +295,7 @@ static int setsig ( int code, handler_type handler )
 	int status;
 
 	sigemptyset (&sig.sa_mask);
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 	sig.sa_handler = handler;
 	sig.sa_flags = SA_NODEFER;
 #else
@@ -331,7 +321,7 @@ static int setsig ( int code, handler_type handler )
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 void ex_handler ( int unix_signal, int code, struct sigcontext *scp )
 #else
 void ex_handler ( int unix_signal, siginfo_t *info, void *uap )
@@ -341,7 +331,7 @@ void ex_handler ( int unix_signal, siginfo_t *info, void *uap )
 	XINT x_vex, vex;
 
 	last_os_exception = unix_signal;
-#ifdef OLD_MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 	last_os_hwcode = scp->sc_psw;
 #else
 	last_os_hwcode = info ? info->si_code : 0;
@@ -353,7 +343,7 @@ void ex_handler ( int unix_signal, siginfo_t *info, void *uap )
 	/* Reenable/initialize the exception handler.
 	 */
 
-#if defined(MACOSX) || defined(CYGWIN)
+#if (defined(MACOSX) || defined(CYGWIN))
         /* Clear the exception bits (ppc and x86). */
         feclearexcept (FE_ALL_EXCEPT);
 #endif

@@ -17,13 +17,8 @@
 #include "../bootlib/bootlib.h"
 #include "mkpkg.h"
 
-#ifdef LINUX
-#  undef SYSV
-#  define GNUAR
-#else
-#  ifdef BSD
-#    undef SYSV
-#  endif
+#if (defined(LINUX) || defined(CYGWIN))
+# define GNUAR
 #endif
 
 /*
@@ -152,10 +147,10 @@ int h_updatelibrary ( const char *library, char *const flist[], int totfiles,
 	 * Update the library.
 	 * ---------------------
 	 */
-#if defined(LINUX) || defined(BSD) || defined(MACOSX)
-	snprintf (cmd, SZ_OS_CMD+1, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
-#else
+#if defined(SOLARIS)
 	snprintf (cmd, SZ_OS_CMD+1, "%s %s %s", LIBRARIAN, LIBFLAGS, libfname);
+#else
+	snprintf (cmd, SZ_OS_CMD+1, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
 #endif
 
 	/* Compute offset to the file list and initialize loop variables.
@@ -216,7 +211,7 @@ int h_updatelibrary ( const char *library, char *const flist[], int totfiles,
 /* library : filename of library	*/
 int h_rebuildlibrary ( const char *library )
 {
-#ifdef SYSV
+#ifdef SOLARIS
 	/* Skip the library rebuild if COFF format library. */
 	return (OK);
 #else

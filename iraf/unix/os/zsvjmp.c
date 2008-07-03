@@ -48,7 +48,7 @@ asm("	movl	$0, 8(%esp)	# change arg2 to zero");
 asm("	jmp	__sigsetjmp	# let sigsetjmp do the rest");
 #endif	/* LINUX */
 
-#if defined(CYGWIN) || defined(MACOSX)
+#if (defined(CYGWIN) || defined(MACOSX))
 asm(".text");
 asm(".globl	_zsvjmp_");
 asm("_zsvjmp_:");

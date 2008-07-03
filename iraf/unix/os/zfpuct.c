@@ -52,7 +52,7 @@ int SFPUCW ( XINT *xcw )
 
 #ifdef I386
 
-#if defined(CYGWIN) || defined(MACOSX)
+#if (defined(CYGWIN) || defined(MACOSX))
 asm(".text");
 asm(".globl	_gfpucw_");
 asm("_gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)");
@@ -179,7 +179,7 @@ asm("	blr");
 #endif	/* POWERPC */
 
 
-#if defined(MACOSX) || defined(CYGWIN)
+#if (defined(MACOSX) || defined(CYGWIN))
 
 int macosx_sigmask = (FE_DIVBYZERO|FE_OVERFLOW|FE_INVALID);
 
