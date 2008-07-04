@@ -230,6 +230,7 @@ int MXUMSK ( void );
 #define	ZSTTTY		zsttty_
 #define	ZSVJMP		zsvjmp_
 #define	ZTSLEE		ztslee_
+#define	ZTTYSZ		zttysz_
 #define	ZWMSEC		zwmsec_
 #define	ZXGMES		zxgmes_
 #define	ZXWHEN		zxwhen_
@@ -469,6 +470,7 @@ extern int ZSTTTX ( XINT *, XINT *, XLONG * );
 extern int ZSTTTY ( XINT *, XINT *, XLONG * );
 extern int ZSVJMP ( XPOINTER *, XINT * );
 /* ??? ZTSLEE ??? */
+extern int ZTTYSZ ( XINT *, XINT *, XINT * );
 extern int ZWMSEC ( XINT * );
 extern int ZXGMES ( XINT *, PKCHAR *, XINT * );
 extern int ZXWHEN ( XINT *, XPOINTER *, XPOINTER * );

@@ -18,7 +18,7 @@ libos.a:	gmttolst.o irafpath.o prwait.o \
 		zfiomt.o zfiotx.o zfpath.o zfunc.o zglobl.o zintpr.o \
 		zmfree.o zraloc.o zzexit.o zfacss.o zfinfo.o zfiond.o \
 		zfioty.o zfpoll.o zfutim.o zgmtco.o zlocpr.o zopdir.o \
-		zshlib.o zzpstr.o zsvjmp.o zfpuct.o
+		zshlib.o zzpstr.o zsvjmp.o zfpuct.o zttyio.o
 	ar r libos.a $^
 	$(RANLIB) libos.a
 	cp -p libos.a ../lib/.

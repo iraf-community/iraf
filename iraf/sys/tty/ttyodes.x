@@ -153,23 +153,27 @@ begin
 
 	istty = (streq (Memc[devname], terminal))
 
-	# Get nlines.
+	# Get nlines and ncols
 	if (istty)
 	    iferr (T_NLINES(tty) = envgeti ("ttynlines"))
 		T_NLINES(tty) = 0
-	if (T_NLINES(tty) <= 0)
-	    iferr (T_NLINES(tty) = ttygeti (tty, "li"))
-		T_NLINES(tty) = 0
-	if (T_NLINES(tty) <= 0)
-	    T_NLINES(tty) = DEF_TTYNLINES
-
-	# Get ncols.
 	if (istty)
 	    iferr (T_NCOLS(tty) = envgeti ("ttyncols"))
 		T_NCOLS(tty) = 0
+
+	if (T_NLINES(tty) <= 0 || T_NCOLS(tty) <= 0) {
+	    call zttysz (1,T_NCOLS(tty),T_NLINES(tty))
+	}
+
+	if (T_NLINES(tty) <= 0)
+	    iferr (T_NLINES(tty) = ttygeti (tty, "li"))
+		T_NLINES(tty) = 0
 	if (T_NCOLS(tty) <= 0)
 	    iferr (T_NCOLS(tty) = ttygeti (tty, "co"))
 		T_NCOLS(tty) = 0
+
+	if (T_NLINES(tty) <= 0)
+	    T_NLINES(tty) = DEF_TTYNLINES
 	if (T_NCOLS(tty) <= 0)
 	    T_NCOLS(tty) = DEF_TTYNCOLS
 
