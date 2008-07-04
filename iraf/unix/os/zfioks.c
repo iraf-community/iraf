@@ -12,20 +12,16 @@
 #include <setjmp.h>
 #include <string.h>
 #include <errno.h>
+#include <termios.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <pwd.h>
-
-#ifdef SYSV
-#include <termios.h>
-#else
-#include <sgtty.h>
-#endif
 
 #ifdef MACOSX
 #define USE_RCMD 1
@@ -1982,12 +1978,7 @@ static char *ks_getpass ( const char *user, const char *host )
 	static	char password[SZ_NAME];
 	char    prompt[80];
 	int	tty, n;
-#ifdef SYSV
 	struct  termios tc, tc_save;
-#else
-	struct  sgttyb ttystat;
-	int     sg_flags;
-#endif
 
 	if ((tty = open ("/dev/tty", 2)) == ERR)
 	    return (NULL);
@@ -1995,7 +1986,6 @@ static char *ks_getpass ( const char *user, const char *host )
 	snprintf (prompt, 80, "Password (%s@%s): ", user, host);
 	write (tty, prompt, strlen(prompt));
 
-#ifdef SYSV
 	tcgetattr (tty, &tc);
 	tc_save = tc;
 	 
@@ -2011,22 +2001,11 @@ static char *ks_getpass ( const char *user, const char *host )
 	tc.c_cc[VLNEXT] = 0;
 
 	tcsetattr (tty, TCSADRAIN, &tc);
-#else
-	ioctl (tty, TIOCGETP, &ttystat);
-	sg_flags = ttystat.sg_flags;
-	ttystat.sg_flags &= ~ECHO;
-	ioctl (tty, TIOCSETP, &ttystat);
-#endif
 
 	n = read (tty, password, SZ_NAME);
 	write (tty, "\n", 1);
 
-#ifdef SYSV
 	tcsetattr (tty, TCSADRAIN, &tc_save);
-#else
-	ttystat.sg_flags = sg_flags;
-	ioctl (tty, TIOCSETP, &ttystat);
-#endif
 
 	close (tty);
 

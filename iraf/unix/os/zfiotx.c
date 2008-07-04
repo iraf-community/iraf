@@ -3,9 +3,11 @@
 
 #include <string.h>
 #include <unistd.h>
+#include <termios.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <signal.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -13,12 +15,6 @@
 
 #if defined(POSIX)
 #define USE_SIGACTION
-#endif
-
-#ifdef SYSV
-#include <termios.h>
-#else
-#include <sgtty.h>
 #endif
 
 #ifndef O_NDELAY
@@ -75,13 +71,8 @@ struct ttyport {
 	unsigned int device;		/* tty device number		*/
 	int flags;			/* port flags			*/
 	char redraw;			/* redraw char, sent after susp	*/
-#ifdef SYSV
 	struct termios tc;		/* normal tty state		*/
 	struct termios save_tc;		/* saved rawmode tty state	*/
-#else
-	struct sgttyb tc;		/* normal tty state		*/
-	struct sgttyb save_tc;		/* saved rawmode tty state	*/
-#endif
 };
 
 
@@ -758,7 +749,6 @@ static void tty_rawon ( struct ttyport *port, int flags )
 	kfp = &zfd[fd];
 
 	if (!(port->flags & KF_CHARMODE)) {
-#ifdef SYSV
 	    struct  termios tc;
 
 	    tcgetattr (fd, &port->tc);
@@ -780,22 +770,7 @@ static void tty_rawon ( struct ttyport *port, int flags )
 	    tc.c_cc[VLNEXT] = 0;
 
 	    tcsetattr (fd, TCSADRAIN, &tc);
-#else
-	    struct  sgttyb tc;
 
-	    ioctl (fd, TIOCGETP, &tc);
-	    port->flags |= KF_CHARMODE;
-	    port->tc = tc;
-
-	    /* Set raw mode in the terminal driver. */
-	    if ((flags & KF_NDELAY) && !(kfp->flags & KF_NDELAY))
-		tc.sg_flags |= (RAW|TANDEM);
-	    else
-		tc.sg_flags |= CBREAK;
-	    tc.sg_flags &= ~(ECHO|CRMOD);
-
-	    ioctl (fd, TIOCSETN, &tc);
-#endif
 	    /* Set pointer to raw mode tty device. */
 	    lastdev = port;
 
@@ -840,12 +815,8 @@ static void tty_reset ( struct ttyport *port )
 {
 	struct fiodes *kfp;
 	int fd;
-#ifdef SYSV
 	/* struct termios tc; */
 	/* int i; */
-#else
-	struct	sgttyb tc;
-#endif
 
 	if (!port)
 	    return;
@@ -853,20 +824,10 @@ static void tty_reset ( struct ttyport *port )
 	fd = port->chan;
 	kfp = &zfd[fd];
 
-#ifdef SYSV
 	/* Restore saved port status. */
 	if (port->flags & KF_CHARMODE)
 	    tcsetattr (fd, TCSADRAIN, &port->tc);
-#else
-	if (ioctl (fd, TIOCGETP, &tc) == -1)
-	    return;
 
-	if (!(port->flags & KF_CHARMODE))
-	    port->tc = tc;
-
-	tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	ioctl (fd, TIOCSETN, &tc);
-#endif
 	port->flags &= ~KF_CHARMODE;
 	if (lastdev == port)
 	    lastdev = NULL;
@@ -917,16 +878,11 @@ static void tty_stop ( int sig )
 	struct ttyport *port = lastdev;
 	int fd = port ? port->chan : 0;
         /* struct fiodes *kfp = port ? &zfd[fd] : NULL; */
-#ifdef SYSV
 	struct termios tc;
-#else
-	struct sgttyb tc;
-#endif
 
 	if (!port)
 	    return;
 
-#ifdef SYSV
 	tcgetattr (fd, &port->save_tc);
 	tc = port->tc;
 
@@ -936,14 +892,6 @@ static void tty_stop ( int sig )
 	tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
 
 	tcsetattr (fd, TCSADRAIN, &tc);
-#else
-	if (ioctl (fd, TIOCGETP, &tc) != -1) {
-	    port->save_tc = tc;
-	    tc = port->tc;
-	    tc.sg_flags = (port->tc.sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
-	    ioctl (fd, TIOCSETN, &tc);
-	}
-#endif
 
 	kill (getpid(), SIGSTOP);
 }
@@ -967,11 +915,8 @@ static void tty_continue ( int sig )
 	if (!port)
 	    return;
 
-#ifdef SYSV
 	tcsetattr (port->chan, TCSADRAIN, &port->save_tc);
-#else
-	ioctl (port->chan, TIOCSETN, &port->save_tc);
-#endif
+
 	if (tty_getraw && port->redraw)
 	    longjmp (jmpbuf, port->redraw);
 }
