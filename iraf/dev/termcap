@@ -426,7 +426,7 @@ xtermjhs|vs100s|Joe Harrington xterm terminal emulator, Small:\
 	:gd=xtermjh:li#24:am@:tc=xtermr:
 
 # xtermr entries submitted by Rick McGonegal, CFHT.
-xtermr|:li#65:tc=xterms:
+xtermr|:li#24:tc=xterms:
 xterm34|xterm34r|:li#34:tc=xterms:
 xterm40|xterm40r|:li#40:tc=xterms:
 xterms|xterm24|xterm24r|Ultrix XWindows vt102-tek4010 emulator:\
