@@ -4,8 +4,8 @@
 all:	rmbin.e
 
 rmbin.e:	rmbin.o
-	$(CC) $(HSI_LF) -o rmbin.e $^ $(HSI_LIBS)
-	cp -p rmbin.e ../../bin/.
+	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS)
+	cp -p $@ ../../bin/.
 
 clean::
 	rm -f *.o rmbin.e ../../bin/rmbin.e

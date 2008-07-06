@@ -5,9 +5,9 @@ all:	libc.a
 
 libc.a:	cant.o close.o endst.o getarg.o getlin.o initst.o open.o \
 	putch.o putlin.o r4tocstr.o remark.o
-	ar r libc.a $^
-	$(RANLIB) libc.a
-	cp -p libc.a ../.
+	ar r $@ $?
+	$(RANLIB) $@
+	cp -p $@ ../.
 
 clean::
 	rm -f *.o libc.a ../libc.a

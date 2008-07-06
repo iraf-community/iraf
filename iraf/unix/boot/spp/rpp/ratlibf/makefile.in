@@ -14,9 +14,9 @@ libf.a:	addset.o addstr.o amatch.o catsub.o clower.o concat.o \
 	scopy.o sctabl.o sdrop.o skipbl.o slstr.o stake.o stclos.o \
 	stcopy.o stlu.o strcmp.o strim.o termin.o trmout.o type.o \
 	upper.o wkday.o
-	ar r libf.a $^
-	$(RANLIB) libf.a
-	cp -p libf.a ../.
+	ar r $@ $?
+	$(RANLIB) $@
+	cp -p $@ ../.
 
 clean::
 	rm -f *.o *.c libf.a ../libf.a

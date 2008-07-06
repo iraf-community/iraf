@@ -4,8 +4,8 @@
 all:	wtar.e
 
 wtar.e:	wtar.o
-	$(CC) $(HSI_LF) -o wtar.e $^ $(HSI_LIBS)
-	cp -p wtar.e ../../bin/.
+	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS)
+	cp -p $@ ../../bin/.
 
 clean::
 	rm -f *.o wtar.e ../../bin/wtar.e

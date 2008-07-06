@@ -4,9 +4,9 @@
 all:	alloc.e libos.a
 
 alloc.e:	alloc.o getproc.o
-	$(CC) $(HSI_LF) -o alloc.e $^
-	chmod 4755 alloc.e
-	cp -p alloc.e ../bin/.
+	$(CC) $(HSI_LF) -o $@ $?
+	chmod 4755 $@
+	cp -p $@ ../bin/.
 
 libos.a:	gmttolst.o irafpath.o prwait.o \
 		zalloc.o zfaloc.o zfiobf.o zfiopl.o zfmkcp.o zfprot.o \
@@ -19,9 +19,9 @@ libos.a:	gmttolst.o irafpath.o prwait.o \
 		zmfree.o zraloc.o zzexit.o zfacss.o zfinfo.o zfiond.o \
 		zfioty.o zfpoll.o zfutim.o zgmtco.o zlocpr.o zopdir.o \
 		zshlib.o zzpstr.o zsvjmp.o zfpuct.o zttyio.o
-	ar r libos.a $^
-	$(RANLIB) libos.a
-	cp -p libos.a ../lib/.
+	ar r $@ $?
+	$(RANLIB) $@
+	cp -p $@ ../lib/.
 
 clean::
 	rm -f *.o alloc.e libos.a ../bin/alloc.e ../lib/libos.a

@@ -4,8 +4,8 @@
 all:	xyacc.e
 
 xyacc.e:	y1.o y2.o y3.o y4.o
-	$(CC) $(HSI_LF) -o xyacc.e $^
-	cp -p xyacc.e ../../bin/.
+	$(CC) $(HSI_LF) -o $@ $?
+	cp -p $@ ../../bin/.
 
 clean::
 	rm -f *.o xyacc.e ../../bin/xyacc.e

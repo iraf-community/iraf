@@ -4,8 +4,8 @@
 all:	xc.e
 
 xc.e:	xc.o
-	$(CC) $(HSI_LF) -o xc.e $^ $(HSI_LIBS)
-	cp -p xc.e ../../bin/.
+	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS)
+	cp -p $@ ../../bin/.
 
 clean::
 	rm -f *.o xc.e ../../bin/xc.e

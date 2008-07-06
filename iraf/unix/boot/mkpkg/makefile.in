@@ -5,8 +5,8 @@ all:	mkpkg.e
 
 mkpkg.e:	main.o char.o fdcache.o fncache.o host.o pkg.o scanlib.o \
 		sflist.o tok.o
-	$(CC) $(HSI_LF) -o mkpkg.e $^ $(HSI_LIBS) 
-	cp -p mkpkg.e ../../bin/.
+	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS) 
+	cp -p $@ ../../bin/.
 
 clean::
 	rm -f *.o mkpkg.e ../../bin/mkpkg.e

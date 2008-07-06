@@ -18,9 +18,9 @@ librpp.a:	addchr.o allblk.o alldig.o baderr.o balpar.o beginc.o \
 		repcod.o retcod.o sdupl.o skpblk.o squash.o strdcl.o \
 		swcode.o swend.o swvar.o synerr.o thenco.o ulstal.o \
 		uniqid.o unstak.o untils.o whilec.o whiles.o
-	ar r librpp.a $^
-	$(RANLIB) librpp.a
-	cp -p librpp.a ../.
+	ar r $@ $?
+	$(RANLIB) $@
+	cp -p $@ ../.
 
 entxkw.f::
 	rm -f entxkw.f
