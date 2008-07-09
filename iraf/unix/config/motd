@@ -2,10 +2,10 @@
     A__A   IRAF64 pre-alpha based on NOAO/IRAFNET PC-IRAF Revision 2.14
    ( 'v`)  This is NOT the released version of IRAF64.
   -----------------------------------------------------------------------
-
-  This 64-bit version of IRAF is ported by the IRAF64 project hosted by
-  Chisato Yamauchi (ISAS/JAXA).
   Visit http://www.ir.isas.jaxa.jp/~cyamauch/iraf64/ to report problems.
+
+  This product includes results achieved by the IRAF64 project conducted
+  by Chisato Yamauchi (ISAS/JAXA).
 
   Welcome to IRAF.  To list the available commands, type ? or ??.  To get
   detailed information about a command, type `help <command>'.  To run  a

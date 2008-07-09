@@ -14,12 +14,58 @@
 # include <sys/isa_defs.h>
 #endif
 
-#ifndef __BYTE_ORDER
-# error "Cannot get __BYTE_ORDER macro symbol"
+/* */
+
+#ifndef __LITTLE_ENDIAN
+# ifdef _LITTLE_ENDIAN
+#  define __LITTLE_ENDIAN _LITTLE_ENDIAN
+# endif
 #endif
+
+#ifndef __BIG_ENDIAN
+# ifdef _BIG_ENDIAN
+#  define __BIG_ENDIAN _BIG_ENDIAN
+# endif
+#endif
+
+#if (!defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN))
+# error "Cannot get ENDIAN macro symbols"
+#endif
+
+#if (defined(__LITTLE_ENDIAN) && defined(__BIG_ENDIAN))
+# ifndef __BYTE_ORDER
+#  ifdef _BYTE_ORDER
+#   define __BYTE_ORDER _BYTE_ORDER
+#  else
+#   error "Cannot get __BYTE_ORDER macro symbol"
+#  endif
+# endif
+# ifndef __FLOAT_WORD_ORDER
+#  ifdef _FLOAT_WORD_ORDER
+#   define __FLOAT_WORD_ORDER _FLOAT_WORD_ORDER
+#  endif
+# endif
+#endif
+
+#if (defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN))
+# undef __LITTLE_ENDIAN
+# define __LITTLE_ENDIAN 1234
+# define __BIG_ENDIAN    4321
+# define __BYTE_ORDER __LITTLE_ENDIAN
+#endif
+
+#if (!defined(__LITTLE_ENDIAN) && defined(__BIG_ENDIAN))
+# undef __BIG_ENDIAN
+# define __LITTLE_ENDIAN 1234
+# define __BIG_ENDIAN    4321
+# define __BYTE_ORDER __BIG_ENDIAN
+#endif
+
 #ifndef __FLOAT_WORD_ORDER
-# error "Cannot get __FLOAT_WORD_ORDER macro symbol"
+# define __FLOAT_WORD_ORDER __BYTE_ORDER
 #endif
+
+/* */
 
 #include <iraf/spp.h>
 
