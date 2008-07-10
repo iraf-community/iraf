@@ -352,7 +352,7 @@ case "$COMMAND" in
   D="DEFS ="
   cat <<EOF | cpp -P $HSI_CF > $F 
 #include <iraf/endian.h>
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 X_MARK_X foo;
 #endif
 EOF
@@ -365,7 +365,7 @@ EOF
   fi
   cat <<EOF | cpp -P $HSI_CF > $F
 #include <iraf/endian.h>
-#if __FLOAT_WORD_ORDER == __LITTLE_ENDIAN
+#if FLOAT_WORD_ORDER == LITTLE_ENDIAN
 X_MARK_X foo;
 #endif
 EOF
