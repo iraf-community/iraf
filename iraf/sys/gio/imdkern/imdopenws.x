@@ -16,16 +16,18 @@ short	devname[ARB]		# device name
 int	n			# length of device name
 int	mode			# access mode
 
+size_t	sz_val
 pointer	sp, buf
 pointer	ttygdes()
 bool	streq()
-int	idk_open()
+pointer	idk_open()
 bool	need_open, same_dev
 include	"imd.com"
 
 begin
 	call smark (sp)
-	call salloc (buf, max (SZ_FNAME, n), TY_CHAR)
+	sz_val = max (SZ_FNAME, n)
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# If a device was named when the kernel was opened then output will
 	# always go to that device (g_device) regardless of the device named
@@ -33,7 +35,8 @@ begin
 	# then unpack the device name, passed as a short integer array.
 
 	if (g_device[1] == EOS) {
-	    call achtsc (devname, Memc[buf], n)
+	    sz_val = n
+	    call achtsc (devname, Memc[buf], sz_val)
 	    Memc[buf+n] = EOS
 	} else
 	    call strcpy (g_device, Memc[buf], SZ_FNAME)

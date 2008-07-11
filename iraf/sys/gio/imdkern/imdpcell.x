@@ -129,6 +129,7 @@ int	ax2, ay2		# upper right corner of output window
 real	dx, dy
 int	yres, my, i1, i2, v, i, j
 include	"imd.com"
+int	nint_ri()
 int	and()
 
 begin
@@ -145,7 +146,7 @@ begin
 	if (yres <= 0)
 	    yres = DEF_YRES
 	call idk_linewidth (g_out,
-	    max (1, nint (dy / (real(GKI_MAXNDC) / real(yres)))))
+	    max (1, nint_ri(dy / (real(GKI_MAXNDC) / real(yres)))))
 
 	# Process the cell array.  The outer loop runs over lines of the input
 	# cell array; each iteration writes only one line of the output raster,

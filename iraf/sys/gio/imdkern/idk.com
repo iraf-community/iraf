@@ -19,7 +19,7 @@ common	/idkboo/ mf_bitmap, mf_rotate, mf_yflip, mf_update, mf_delete, mf_debug,
 
 # Everything else goes here.
 
-int	mf_fd				# image descriptor of frame buffer
+pointer	mf_fd				# image descriptor of frame buffer
 int	mf_frame			# frame counter
 char	mf_fname[SZ_PATHNAME]		# metafile filename
 char	mf_dispose[SZ_OSCMD]		# host dispose command

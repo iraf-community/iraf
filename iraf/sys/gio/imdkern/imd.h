@@ -9,9 +9,9 @@ define	DEF_MAXFRAMES	16			# maximum frames/metafile
 
 define	LEN_IMD		81
 
-define	IMD_SBUF	Memi[P2I($1)]		# string buffer
+define	IMD_SBUF	Memp[$1]		# string buffer
 define	IMD_SZSBUF	Memi[P2I($1+1)]		# size of string buffer
-define	IMD_NEXTCH	Memi[P2I($1+2)]		# next char pos in string buf
+define	IMD_NEXTCH	Memp[$1+2]		# next char pos in string buf
 define	IMD_NCHARSIZES	Memi[P2I($1+3)]		# number of character sizes
 define	IMD_POLYLINE	Memi[P2I($1+4)]		# device supports polyline
 define	IMD_POLYMARKER	Memi[P2I($1+5)]		# device supports polymarker
@@ -34,12 +34,12 @@ define	IMD_TXSIZE	Memi[P2I($1+22)]		# last text size set
 define	IMD_TXFONT	Memi[P2I($1+23)]		# last text font set
 define	IMD_TYPE	Memi[P2I($1+24)]		# last line type set
 define	IMD_WIDTH	Memi[P2I($1+25)]		# last line width set
-define	IMD_DEVNAME	Memi[P2I($1+26)]		# name of open device
+define	IMD_DEVNAME	Memp[$1+26]		# name of open device
 define	IMD_FRAME	Memi[P2I($1+27)]		# frame buffer number
 	# extra space
-define	IMD_CHARHEIGHT	Memi[P2I($1+30+$2-1)]	# character height
-define	IMD_CHARWIDTH 	Memi[P2I($1+40+$2-1)]	# character width
-define	IMD_CHARSIZE	Memr[P2R($1+50+$2-1)]	# text sizes permitted
+define	IMD_CHARHEIGHT	Memi[P2I($1+30)+$2-1]	# character height
+define	IMD_CHARWIDTH 	Memi[P2I($1+40)+$2-1]	# character width
+define	IMD_CHARSIZE	Memr[P2R($1+50)+$2-1]	# text sizes permitted
 define	IMD_PLAP	($1+60)			# polyline attributes
 define	IMD_PMAP	($1+64)			# polymarker attributes
 define	IMD_FAAP	($1+68)			# fill area attributes

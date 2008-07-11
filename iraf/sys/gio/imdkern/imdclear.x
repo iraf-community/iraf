@@ -11,7 +11,7 @@ procedure imd_clear (dummy)
 
 int	dummy			# not used at present
 
-int	idk_open()
+pointer	idk_open()
 errchk	idk_open
 include	"imd.com"
 

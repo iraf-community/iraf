@@ -23,6 +23,7 @@ int	xc, yc			# where to draw text string
 short	text[ARB]		# text string
 int	n			# number of characters
 
+size_t	sz_val
 real	x, y, dx, dy, tsz
 int	x1, x2, y1, y2, orien
 int	x0, y0, gki_dx, gki_dy, ch, cw
@@ -30,6 +31,7 @@ int	xstart, ystart, newx, newy
 int	totlen, polytext, font, seglen 
 pointer	sp, seg, ip, op, tx, first
 int	stx_segment()
+int	nint_ri()
 include	"imd.com"
 
 real	g_dx, g_dy		# scale GKI to window coords
@@ -40,7 +42,8 @@ data	g_x1 /0/, g_y1 /0/, g_x2 /GKI_MAXNDC/, g_y2 / GKI_MAXNDC/
 
 begin
 	call smark (sp)
-	call salloc (seg, n + 2, TY_CHAR)
+	sz_val = n + 2
+	call salloc (seg, sz_val, TY_CHAR)
 
 	# Keep track of the number of drawing instructions since the last frame
 	# clear.
@@ -170,7 +173,7 @@ begin
 		y = ystart
 
 		while (seglen > 0 && (polytext == YES || ip == first)) {
-		    call imd_drawchar (Memc[ip], nint(x), nint(y), cw, ch,
+		    call imd_drawchar (Memc[ip], nint_ri(x), nint_ri(y), cw, ch,
 			orien, font)
 		    ip = ip + 1
 		    seglen = seglen - 1
@@ -274,6 +277,7 @@ pointer	tx
 int	up, path
 real	dir, sz, ch, cw, cosv, sinv, space
 real	xsize, ysize, xvlen, yvlen, xu, yu, xv, yv, p, q
+int	absi()
 include	"imd.com"
 
 begin
@@ -427,7 +431,7 @@ begin
 	# Set the polytext flag.  Polytext output is possible only if chars
 	# are to be drawn to the right with no extra spacing between chars.
 
-	if (abs(dy) == 0 && dx == cw)
+	if (absi(dy) == 0 && dx == cw)
 	    polytext = YES
 	else
 	    polytext = NO

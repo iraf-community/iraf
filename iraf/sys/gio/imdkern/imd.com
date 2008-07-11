@@ -9,7 +9,7 @@ pointer	g_tty				# graphcap descriptor
 int	g_nframes			# number of frames written
 int	g_maxframes			# max frames per device metafile
 int	g_ndraw				# no draw instr. in current frame
-int	g_in, g_out			# input, output files
+pointer	g_in, g_out			# input, output files
 int	g_xres, g_yres			# desired device resolution
 int	g_frame, g_color		# display frame and graphics color
 char	g_device[SZ_GDEVICE]		# force output to named device

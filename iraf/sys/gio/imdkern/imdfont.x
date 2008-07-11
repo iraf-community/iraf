@@ -15,6 +15,7 @@ procedure imd_font (font)
 int	font			# code for font to be set
 int	pk2, width
 include	"imd.com"
+int	nint_ri()
 
 begin
 	width = IMD_WIDTH(g_kt)
@@ -26,7 +27,7 @@ begin
 		width = pk2
 	    }
 	} else
-	    call idk_linewidth (g_out, nint (GKI_UNPACKREAL(width)))
+	    call idk_linewidth (g_out, nint_ri(GKI_UNPACKREAL(width)))
 
 	IMD_WIDTH(g_kt) = width
 end

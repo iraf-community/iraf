@@ -60,7 +60,7 @@ define	IOLINES		64		# image lines per i/o transfer
 # IDK_OPEN -- Open the metacode file.  Open the frame buffer as an image.
 # Initialize the bitmap based on the size of the frame.
 
-int procedure idk_open (a_frame, a_color, tty)
+pointer procedure idk_open (a_frame, a_color, tty)
 
 int	a_color			#I display device color index
 int	a_frame			#I display buffer frame number
@@ -181,7 +181,7 @@ end
 
 procedure idk_close (fd)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 
 errchk	idk_frame, imunmap
 include	"idk.com"
@@ -203,7 +203,7 @@ end
 
 procedure idk_flush (fd)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 include	"idk.com"
 
 begin
@@ -218,15 +218,15 @@ end
 
 procedure idk_frame (fd)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 
-int	x1, x2, y1, y2
-int	bmw			# Bitmap word offset
-int	npix			# Pixels in local I/O buffer
-int	fbp			# Frame buffer section offset
-int	fbp0
+long	x1, x2, y1, y2
+long	bmw			# Bitmap word offset
+size_t	npix			# Pixels in local I/O buffer
+long	fbp			# Frame buffer section offset
+long	fbp0
 int	i, j
-int	line
+long	line
 pointer	ob, ib
 
 pointer	imps2s(), imgs2s()
@@ -293,7 +293,7 @@ end
 
 procedure idk_move (fd, x, y)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 int	x, y			# point to move to
 
 include	"idk.com"
@@ -316,11 +316,13 @@ end
 
 procedure idk_draw (fd, a_x, a_y)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 int	a_x, a_y		# point to draw to
 
+size_t	sz_val
 int	xshift, yshift, dx, dy
 int	new_x, new_y, x1, y1, x2, y2, n, i
+int	absi()
 include	"idk.com"
 
 begin
@@ -332,7 +334,8 @@ begin
 	    # new frame.  We clear the bitmap.
 
 	    # Zero out all the bits in a bitmap.
-	    call aclri (mf_fbuf, mf_lenframe)
+	    sz_val = mf_lenframe
+	    call aclri (mf_fbuf, sz_val)
 
 	    mf_update = true
 	}
@@ -354,7 +357,7 @@ begin
 	    xshift = 0
 	    yshift = 0
 
-	    if (abs (new_x - mf_cx) > abs (new_y - mf_cy)) {
+	    if (absi(new_x - mf_cx) > absi(new_y - mf_cy)) {
 		dx = 0
 		dy = 1
 	    } else {
@@ -400,6 +403,7 @@ int	a_x2, a_y2			# end point of line
 real	dydx, dxdy
 long	fbit, wbit, word
 int	wpln, mask, dx, dy, x, y, x1, y1, x2, y2, or()
+int	absi()
 include	"idk.com"
 
 begin
@@ -409,7 +413,7 @@ begin
 	dx = x2 - x1
 	dy = y2 - y1
 
-	if (abs(dx) > abs(dy)) {
+	if (absi(dx) > absi(dy)) {
 	    if (x1 > x2) {
 		x1 = a_x2; x2 = a_x1; dx = -dx
 		y1 = a_y2; y2 = a_y1; dy = -dy
@@ -492,7 +496,7 @@ end
 
 procedure idk_linewidth (fd, width)
 
-int	fd			# output stream [NOT USED]
+pointer	fd			# output stream [NOT USED]
 int	width			# new line width
 
 int	gap
