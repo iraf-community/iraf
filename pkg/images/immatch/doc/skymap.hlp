@@ -234,7 +234,7 @@ like the following for an equatorial celestial coordinate system:
 
 The computed reference and input logical coordinates and the
 world coordinates are written to temporary coordinates file which is
-deleleted on task termination.
+deleted on task termination.
 The pixel and celestial coordinates are written using
 the \fIxformat\fR and \fIyformat\fR and the \fIrwxformat\fR, \fIrwyformat\fR,
 \fIwxformat\fR and \fIwxformat\fR
@@ -256,7 +256,7 @@ The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order \fIxxorder\fR and \fIxyorder\fR in x
 and \fIyxorder\fR and \fIyyorder\fR in y.
 
-Several polynomial cross terms options are avaible. Options "none",
+Several polynomial cross terms options are available. Options "none",
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 
@@ -298,7 +298,7 @@ parameter. Automatic pixel rejection may be enabled by setting the \fIreject\fR
 parameter to a positive number other than INDEF.
 
 The transformation computed by the "general" fitting geometry is arbitrary
-and does not necesarily correspond to a physically meaningful model.
+and does not necessarily correspond to a physically meaningful model.
 However the computed
 coefficients for the linear term can be given a simple geometrical geometric
 interpretation for all the fitting geometries as shown below.
@@ -565,7 +565,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink

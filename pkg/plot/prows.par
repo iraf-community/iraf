@@ -7,7 +7,7 @@ wx2,r,h,0.,,,right user x-coord if not autoscaling
 wy1,r,h,0.,,,lower user y-coord if not autoscaling
 wy2,r,h,0.,,,upper user y-coord if not autoscaling
 pointmode,b,h,no,,,plot points instead of lines
-marker,s,h,"box",,,point marker character 
+marker,s,h,"box",,,point marker or line mode
 szmarker,r,h,5E-3,,,marker size (0 for list input)
 logx,b,h,no,,,log scale x-axis
 logy,b,h,no,,,log scale y-axis

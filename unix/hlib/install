@@ -2090,7 +2090,7 @@ _no_pipes:
 
 if ($mach == "cygwin") then
  echo -n "Creating special graphcap file ...				"
- copy $iraf/dev/graphcap.inet $iraf/dev/graphcap
+ cp $iraf/dev/graphcap.inet $iraf/dev/graphcap
  DO_OK
 endif
 

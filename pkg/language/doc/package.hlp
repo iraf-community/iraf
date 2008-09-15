@@ -66,7 +66,7 @@ be searched for tasks.
 .ih
 BUGS
 All active packages must have unique names.  To eliminate the possibility
-of parameter file name collisions in UPARM, the three chararacter string
+of parameter file name collisions in UPARM, the three character string
 formed by concatenating the first two and final characters of the package
 name should be unique.
 .ih

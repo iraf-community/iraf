@@ -26,7 +26,7 @@ Delete the rasterfile after making the image?  This is useful for making
 automated (Unix or IRAF) scripts for producing photographic or other hardcopy.
 .le
 .ls verbose = yes
-Print informative information while the tranformation is occuring?
+Print informative information while the transformation is occurring?
 .le
 .ls listonly = no
 List the rasterfile header information instead?
@@ -37,7 +37,7 @@ vertical order from IRAF images.
 .le
 .ih
 DESCRIPTION
-\fBSuntoiraf\fR will convert Sun raster files into iraf images.  This is
+\fBSuntoiraf\fR will convert Sun raster files into IRAF images.  This is
 useful, for example, to make \fBsolitaire\fR photographic prints or
 other hardcopy from an \fBimtool\fR window (see IMTOOL HINTS, below).
 

@@ -50,7 +50,7 @@ Compute both the linear and distortion portions of the geometric correction.
 .ls xmin = INDEF, xmax = INDEF, ymin = INDEF, ymax = INDEF
 The minimum and maximum x and y reference values of the output image.
 If a database file has been defined xmin, xmax, ymin and ymax
-ymax default to the minimum and maximum values set by
+efault to the minimum and maximum values set by
 GEOMAP and may be less than but may not exceed those values.
 .le
 .ls xscale = 1.0, yscale = 1.0
@@ -62,12 +62,12 @@ then xscale and yscale should be 1.0 to preserve the scale of the reference
 image.
 If xscale and yscale are undefined (INDEF), xscale and yscale default to the
 range of the reference coordinates over the range in pixels.
-Xscale and yscale overide the values of ncols and nlines.
+Xscale and yscale override the values of ncols and nlines.
 .le
 .ls ncols = INDEF, nlines = INDEF
 The number of columns and lines in the output image. Ncols and nlines default
 to the size of the input image. If xscale or yscale are defined ncols or nlines
-are overidden.
+are overridden.
 .le
 .ls xsample = 1.0, ysample = 1.0
 The coordinate surface subsampling factor. The coordinate surfaces are
@@ -81,7 +81,7 @@ value is strongly recommended.
 The interpolant used for rebinning the image.
 The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -146,7 +146,7 @@ Preserve the total image flux. The output pixel values are multiplied by
 the Jacobian of the coordinate transformation.
 .le
 .ls xin = INDEF, yin = INDEF
-The x and y coodinates in pixel units in the input image which will map to
+The x and y coordinates in pixel units in the input image which will map to
 xout, yout in the output image. If the database file is undefined these
 numbers default to the center of the input image. 
 .le
@@ -157,7 +157,7 @@ yout default to the center of the output image reference coordinates.
 .le
 .ls xshift = INDEF, yshift = INDEF
 The shift of the input origin in pixels. If the database file is undefined
-then xshift and yshift determine tha shift of xin, yin.
+then xshift and yshift determine the shift of xin, yin.
 .le
 .ls xmag = INDEF, ymag = INDEF
 The scale factors of the coordinate transformation in units of input pixels
@@ -195,7 +195,7 @@ pixel in x and y.
 The transformed coordinates at intermediate pixel values are
 determined by bilinear interpolation in the coordinate surface. If
 \fIxsample\fR and \fIysample\fR = 1, the coordinate
-surface is evaluted at every pixel. Use of \fIxsample\fR and \fIysample\fR
+surface is evaluated at every pixel. Use of \fIxsample\fR and \fIysample\fR
 are strongly recommended for large images and high order coordinate
 surfaces in order to reduce the execution time.
 
@@ -232,10 +232,10 @@ by setting some or all of the parameters \fIxin\fR, \fIyin\fR, \fIxout\fR,
 Xin, yin, xshift, yshift, xout and yout can be used to redefine the shift.
 Xmag, and ymag can be used to reset the x and y scale of the transformation.
 Xrotation and yrotation can be used to reset the orientation of the
-tranformation.
+transformation.
 
 The output image is computed in \fInxblock\fR by \fInyblock\fR pixel sections.
-If possible users should set these number to values larger than the dimensions
+If possible users should set these numbers to values larger than the dimensions
 of the output image to minimize the number of disk reads and writes required
 to compute the output image.  If this is not feasible and the image rotation is
 small, users should set nxblock to be greater than the number of columns in

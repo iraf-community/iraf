@@ -26,7 +26,7 @@ special, application specific functions; e.g. airmass or arcsep
 
 This help topic covers the common features of expressions.  The
 individual task help descriptions may also include this material or
-just descripe the customization.
+just describe the customization.
 
 .sh
 Expressions
@@ -66,7 +66,7 @@ available in the CL.
         **                      exponentiation
         //                      string concatenation
         !  -                    boolean not, unary negation
-        <  <= >  >=             order comparision (works for strings)
+        <  <= >  >=             order comparison (works for strings)
         == != && ||             equals, not equals, and, or
         ?=                      string equals pattern
         ? :                     conditional expression (ternary operator)

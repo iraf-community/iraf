@@ -528,7 +528,8 @@ char	format[ARB]				#i format string
 pointer	fsym
 int	fd
 
-pointer	fdb_opendb(), fdb_get_rec()
+int	fdb_opendb()
+pointer	fdb_get_rec()
 bool	streq()
 
 begin

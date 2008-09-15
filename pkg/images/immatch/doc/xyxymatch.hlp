@@ -146,7 +146,7 @@ XYXYMATCH matches the x and y coordinates in the reference coordinate list
 coordinate list \fIinput\fR to within a user specified tolerance
 \fItolerance\fR, and writes the matched coordinates to the output
 file \fIoutput\fR.  The output file is suitable for input to the 
-GEOMAP task which computate the actual transformation required to
+GEOMAP task which computes the actual transformation required to
 register the corresponding reference and input images.
 
 XYXYMATCH matches the coordinate lists by: 1) computing an initial
@@ -160,7 +160,7 @@ or "triangles" algorithm, and 5) writing the matched list to the
 output file.
 
 The initial estimate of the linear transformation is computed in one of 
-hree ways.  If \fIinteractive\fR is "yes" the user displays the reference and
+three ways.  If \fIinteractive\fR is "yes" the user displays the reference and
 input images corresponding to the reference and input coordinate files
 on the image display, and marks up to three objects which the two
 images have in common with the image cursor. The coordinates of these
@@ -230,7 +230,7 @@ transformation. The major disadvantage is that the user must supply
 tie point information in all but the simplest case of small x and y
 shifts between the input and reference coordinate systems.
 
-If matching is "triangles" XYXYMATCH contructs a list of triangles
+If matching is "triangles" XYXYMATCH constructs a list of triangles
 using up to \fInmatch\fR reference coordinates and transformed input
 coordinates, and performs a pattern matching operation on the resulting
 triangle lists. If the number of coordinates
@@ -245,7 +245,7 @@ x and y scale differences and axis skews between the input and reference
 coordinate systems and can be computationally expensive.
 
 The matched x and y reference and input coordinate lists are written to
-columns 1 and 2, and 3 and 4 of the ouput file respectively, in a format
+columns 1 and 2, and 3 and 4 of the output file respectively, in a format
 specified by the \fIxformat\fR and \fIyformat\fR parameters.
 The respective line numbers in the original reference and input
 coordinate files are written to columns 5 and 6 respectively.
@@ -258,7 +258,7 @@ ALGORITHMS
 
 The "triangles" algorithm uses a sophisticated pattern matching
 technique which requires no tie point information from the user.
-It is expensive computionally and hence is restricted to a maximum
+It is expensive computationally and hence is restricted to a maximum
 of \fInmatch\fR objects from the reference and input coordinate lists.
 
 The "triangles" algorithm first generates a list
@@ -284,17 +284,17 @@ are eliminated.
 The rejection step can be repeated up to \fInreject\fR times or until
 no more rejections occur whichever comes first.
 The last step in the algorithm is a voting procedure in which each remaining
-matched triangle casts three votes, one for eached matched pair of vertices.
+matched triangle casts three votes, one for each matched pair of vertices.
 Points which have fewer than half the maximum number of
 votes are discarded. The final set of matches are written to the output file.
 
 The "triangles" algorithm functions well when the reference and
 input coordinate lists have a sufficient number of objects (~50%, 
 in some cases as low as 25%) of their objects in common, any distortions
-including x and y scale differences and skew between the two systems are small, and the random errors in the coordinates
-are small. Increasing the value of the \fItolerance\fR parameter will
-increase the ability to deal with distortions but will also produce more
-false matches.
+including x and y scale differences and skew between the two systems are small,
+and the random errors in the coordinates are small. Increasing the value of the
+\fItolerance\fR parameter will increase the ability to deal with distortions but
+will also produce more false matches.
 
 .ih
 FORMATS
@@ -385,7 +385,7 @@ Dimensional Coordinate Lists" by E.J. Groth, A.J. 91, 1244 (1986).
 EXAMPLES
 
 1. Match the coordinate list of an image to the coordinate list of a reference
-image using the trangles matching algorithm and a tolerance of 3 pixels.
+image using the triangles matching algorithm and a tolerance of 3 pixels.
 Use the resulting matched list to compute the transformation
 required to register the input image lpix to the reference image.
 For completeness this example demonstrates how the individual input
@@ -436,7 +436,7 @@ on the image display.
 .fi
 
 4. Repeat example 2 but run xyxymatch non-interactively
-inputing the appropriate linear transformation via a list of tie points
+inputting the appropriate linear transformation via a list of tie points
 rather than marking stars on the image display or creating a refpoints
 file.
 

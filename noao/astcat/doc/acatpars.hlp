@@ -210,7 +210,7 @@ Formats and units are treated in the same way as they for simple text files.
 
 The fundamental coordinate system of the astrometry file is set by
 the \fIcsystem\fR parameter. This is a global parameter applying to the
-entire atrometry file . Its value is overwritten if the "catsystem" standard
+entire astrometry file . Its value is overwritten if the "catsystem" standard
 field is defined, in which case the astrometry file may contain entries in
 many different fundamental coordinate systems.
 

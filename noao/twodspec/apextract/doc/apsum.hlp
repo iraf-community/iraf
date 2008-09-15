@@ -98,7 +98,7 @@ Review the extracted spectra?  The \fIinteractive\fR parameter must also be
 yes.
 .le
 
-.ls line = INDEF, nsum = 1
+.ls line = INDEF, nsum = 10
 The dispersion line (line or column perpendicular to the dispersion
 axis) and number of adjacent lines (half before and half after unless
 at the end of the image) used in finding, recentering, resizing,
@@ -172,7 +172,7 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .le
-.ls lsigma = 3., usigma = 3.
+.ls lsigma = 4., usigma = 4.
 Lower and upper rejection thresholds, given as a number of times the
 estimated sigma of a pixel, for cleaning.
 .le
@@ -365,7 +365,7 @@ EXAMPLES
 The positions of the slits are defined using either automatic finding
 or with the aperture editor.  The positions of the slits are traced if
 necessary and then the apertures are extracted to the image
-"multspec.ms".  The steps of defining the slit positions and tracing
+"multslit1.ms".  The steps of defining the slit positions and tracing
 can be done as part of this command or previously using the other tasks
 in the \fBapextract\fR package.
 .ih

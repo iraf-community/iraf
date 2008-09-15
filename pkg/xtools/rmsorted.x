@@ -3,14 +3,16 @@ include	<pkg/rmsorted.h>
 
 # RMSORTED -- Compute running median value.
 
-real procedure rmsorted (rm, index, data)
+real procedure rmsorted (rm, nclip, index, data)
 
 pointer	rm			#I Method pointer
+real	nclip			#I Clipping factor
 int	index			#I Index of new data
 real	data			#I Input data  value
 real	med			#R Return value
 
 int	i, i1, box, outnext, out
+real	clip
 
 begin
 	box = RMS_BOX(rm)
@@ -64,6 +66,21 @@ begin
 	    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
 	else
 	    med = DATA(rm,i1)
+
+	if (nclip > 0.) {
+	    clip = med + nclip * (med - DATA(rm,0))
+	    do i = box, 1, -1 {
+		if (DATA(rm,i-1) < clip)
+		    break
+	    }
+	    if (i < box) {
+		i1 = i / 2
+		if (mod (i, 2) == 0)
+		    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
+		else
+		    med = DATA(rm,i1)
+	    }
+	}
 
 	return (med)
 end

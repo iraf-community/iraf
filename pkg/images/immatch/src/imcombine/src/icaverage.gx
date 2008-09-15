@@ -1,18 +1,22 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<imhdr.h>
+include	<mach.h>
 include	"../icombine.h"
+include	"../icmask.h"
 
 $for (sird)
 # IC_AVERAGE -- Compute the average (or summed) image line.
 # Options include a weighted average/sum.
 
-procedure ic_average$t (d, m, n, wts, npts, doblank, doaverage, average)
+procedure ic_average$t (d, m, n, wts, nimages, npts, doblank, doaverage,
+	average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image ID pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image ID pointers
 int	n[npts]			# Number of points
-real	wts[ARB]		# Weights
+real	wts[nimages]		# Weights
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 int	doblank			# Set blank values?
 int	doaverage		# Do average?
@@ -22,7 +26,7 @@ $else
 PIXEL	average[npts]		# Average (returned)
 $endif
 
-int	i, j, k
+int	i, j, k, n1
 real	sumwt, wt
 $if (datatype == sil)
 real	sum
@@ -70,12 +74,13 @@ begin
 	} else {
 	    if (dowts) {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			wt = wts[Memi[m[1]+k]]
 			sum = Mem$t[d[1]+k] * wt
 			sumwt = wt
-			do j = 2, n[i] {
+			do j = 2, n1 {
 			    wt = wts[Memi[m[j]+k]]
 			    sum = sum + Mem$t[d[j]+k] * wt
 			    sumwt = sumwt + wt
@@ -85,9 +90,9 @@ begin
 				average[i] = sum / sumwt
 			    else {
 				sum = Mem$t[d[1]+k]
-				do j = 2, n[i]
+				do j = 2, n1
 				    sum = sum + Mem$t[d[j]+k]
-				average[i] = sum / n[i]
+				average[i] = sum / n1
 			    }
 			} else
 			    average[i] = sum
@@ -96,13 +101,14 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			sum = Mem$t[d[1]+k]
-			do j = 2, n[i]
+			do j = 2, n1
 			    sum = sum + Mem$t[d[j]+k]
 			if (doaverage == YES)
-			    average[i] = sum / n[i]
+			    average[i] = sum / n1
 			else
 			    average[i] = sum
 		    } else if (doblank == YES)

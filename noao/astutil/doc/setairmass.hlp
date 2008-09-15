@@ -33,7 +33,7 @@ airmass, or the airmass at the "beginning", "middle" or "end" of the
 observation.
 .le
 .ls ra = "ra"
-The name of the keyword that contains the right acsension. The right ascension
+The name of the keyword that contains the right ascension. The right ascension
 is assumed to be in hours unless ra is one of the standard CRVALn keywords in
 which case it is assumed to be in degrees.
 .le
@@ -94,7 +94,7 @@ calculated using the right ascension, declination, and equinox as well as the
 sidereal time, exposure time, UT date, and observatory from the image header.
 If the observatory is not available in the image header under the keyword
 OBSERVAT, the observatory is defined by the \fIobservatory\fR parameter. See
-help for \observatory\fR for further information.
+help for \fIobservatory\fR for further information.
 
 The right ascension and declination will be precessed from the given equinox to
 the date of observation. The name of the right ascension, declination, equinox,
@@ -136,7 +136,7 @@ Stetson, DAO preprint, September 1988.  This simple formula is:
 	    AM (eff) = [AM (beginning) + 4*AM (middle) + AM (end)] / 6
 .fi
 
-and is derived by using Simpson's 1/3 rule to approximate the imtegral
+and is derived by using Simpson's 1/3 rule to approximate the integral
 that represents the mean airmass.
 
 The beginning, middle and end airmasses are calculated using the
@@ -172,7 +172,7 @@ be precessed from this epoch to the date of the observation before being
 used.
 .le
 .ls \fIst\fR
-Siderial time in hours at the beginning, middle, or end of the observation.
+Sidereal time in hours at the beginning, middle, or end of the observation.
 .le
 .ls \fIut\fR
 Universal time in hours at the beginning, middle, or end of the observation.

@@ -50,7 +50,7 @@ The coordinate system of the input coordinates read from \fIphotfile\fR, of the
 psf model \fIpsfimage\fR, and of the output coordinates written to
 \fIgroupfile\fR. The image header coordinate system is used to transform from
 the input coordinate system to the "logical" system used internally, from the
-internal logicial system to the PSF model system, and from the internal
+internal logical system to the PSF model system, and from the internal
 "logical" pixel coordinate system to the output coordinate system. The input
 coordinate system options are "logical", tv", "physical", and "world". The PSF
 model and output coordinate system options are "logical", "tv", and "physical".
@@ -98,10 +98,9 @@ The wcsin, wcspsf, and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
-package parameter (the default), "yes", or "no". By default cacheing is
+package parameter (the default), "yes", or "no". By default caching is
 disabled.
 .le
 .ls verify = ")_.verify"
@@ -146,20 +145,20 @@ with coordinates in the parent image must use the "tv" or "physical"
 coordinate systems.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size
-are large enough, the input image pixels are cached in memory. If cacheing
+are large enough, the input image pixels are cached in memory. If caching
 is enabled and the first data access will appear to take a long time as the
 entire image must be read in before the measurement is actually made. All
 subsequent data requests will be very fast because GROUP is accessing memory
-not disk. The point of cacheing is to speed up random image access by making
+not disk. The point of caching is to speed up random image access by making
 the internal image i/o buffers the same size as the image itself. There is
-no point in turning cacheing on unless a lot of the input magnitudes are INDEF.
+no point in turning caching on unless a lot of the input magnitudes are INDEF.
 In that case GROUP must access the image to estimate a magnitude. Also at
-present there is no point in enabling cacheing for images that are less than
+present there is no point in enabling caching for images that are less than
 or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
 default image i/o buffer is exactly that size. However if the size of dev$ypix
 is doubled by converting it to a real image with the chpixtype task then the
-effect of cacheing in interactive is can be quite noticeable if measurements
-of objects in the top and bottom halfs of the image are alternated.
+effect of caching in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halves of the image are alternated.
 
 
 The algorithm works in the following manner. If two stars are within a

@@ -102,11 +102,11 @@ Print comment lines to the output file as the task executes.
 .ih
 DESCRIPTION
 
-WCSCTRAN transforms a list of coordinates, read from  the input file \fIinput\fR,
-from the coordinate system defined by \fIinwcs\fR to the coordinate
-system defined by \fIoutwcs\fR using world coordinate system information
-in the input image \fIimage\fR header and writes the results to the output file
-\fIoutput\fR.
+WCSCTRAN transforms a list of coordinates, read from  the input file
+\fIinput\fR, from the coordinate system defined by \fIinwcs\fR to the
+coordinate system defined by \fIoutwcs\fR using world coordinate system
+information in the input image \fIimage\fR header and writes the results
+to the output file \fIoutput\fR.
 
 The input coordinates are read from and written to the
 columns in the input / output file specified by the \fIcolumns\fR parameter. 
@@ -155,7 +155,7 @@ pixel coordinates of an object are invariant to successive linear
 transformations
 of the image. In this coordinate system, the pixel coordinates of an object
 in an image remain the same, regardless of any section copies, shifts,
-rotatations, etc on the image. For example, an object with the
+rotations, etc on the image. For example, an object with the
 physical coordinates (x,y) in an image would still have physical 
 coordinates (x, y) in an image which is a section of the original image.
 

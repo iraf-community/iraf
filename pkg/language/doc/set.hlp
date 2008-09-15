@@ -33,7 +33,7 @@ using the \fIshow\fR task or the \fIenvget\fR intrinsic function.
 A particular use for the environment variables is in the definition
 of IRAF logical names for directories.  If an environment variable is set to
 a string corresponding to a system-dependent directory name,
-then the enviroment variable may then be used within the CL to
+then the environment variable may then be used within the CL to
 refer to that directory.
 
 For example,

@@ -45,7 +45,7 @@ copied.  The data file consists of lines in FITS format with leading
 whitespace ignored.  A FITS card must begin with an uppercase/numeric
 keyword.  Lines not beginning with a FITS keyword such as comments or lower
 case are ignored.  The user keyword output of \fBimheader\fR is an
-acceptible data file.  See \fBmkheader\fR for further information.
+acceptable data file.  See \fBmkheader\fR for further information.
 .le
 .ls list = no
 List the grating/instrument parameters?
@@ -138,7 +138,7 @@ the grooves per mm, which is required in this case, and the other
 parameters.  In combination with the number of orders this defines the
 first and last orders.  The highest order is the central order plus
 the integer part of one half the number of orders.  However, the
-lowest order is constraned to be at least 1.  The
+lowest order is constrained to be at least 1.  The
 reference order is also used in the definitions of \fIxc\fR and \fIyc\fR.
 .le
 .ls corder = 1
@@ -180,7 +180,7 @@ Is the velocity parameter a radial velocity or a redshift?
 Continuum at the echelle blaze peak in the reference order.
 .le
 .ls temperature = 5700.
-Blackbody continuum temperture in Kelvin.  A value of 0 is used if
+Blackbody continuum temperature in Kelvin.  A value of 0 is used if
 no blackbody continuum is desired.  The intensity level is set by
 scaling to the continuum level at blaze peak reference point.
 .le
@@ -207,7 +207,7 @@ periodically.
 .le
 .ls peak = -0.5
 The maximum spectral line peak value when generating random lines or
-when the peak is missing fromthe spectral line file.
+when the peak is missing from the spectral line file.
 This value is relative to the continuum unless the continuum is zero.
 Negative values are absorption lines and positive values are emission lines.
 .le
@@ -293,7 +293,7 @@ intensity scale is set by defining the total, final, extracted intensity in
 a pixel at the blaze peak (rest) wavelength in the reference order; i.e. at
 the wavelength set by the \fIwavelength\fR parameter.  Note this means that
 the efficiency of the gratings at that wavelength is included.  The shape
-of the continuum may be either a blackbody if a positive temperture is
+of the continuum may be either a blackbody if a positive temperature is
 specified or constant.
 
 Spectral lines are modeled by gaussian profiles of specified wavelength,
@@ -416,7 +416,7 @@ simplifies to
 As discussed by Schroeder and Hilliard, the relative intensity at the blaze
 peak, I0, must be reduced by the fraction of light at the same wavelength
 as the blaze peak which is diffracted into other orders.  Furthermore at
-some differaction angles the light is reflected off the second face of the
+some diffraction angles the light is reflected off the second face of the
 grating giving a different effective diffraction angle to be used in (6).
 This computation is done by the task giving a variation in relative blaze
 response with order and reproducing the calculations of Schroeder and

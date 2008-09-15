@@ -18,7 +18,7 @@ define	FRAC		0.9	# Fraction of sorted sample for mean
 # RUNMED -- Apply running median to a list of images.
 
 procedure runmed (input, output, window, masks, inmaskkey, outmaskkey,
-	outtype, exclude, navg, scale, normscale, outscale, blank,
+	outtype, exclude, nclip, navg, scale, normscale, outscale, blank,
 	storetype, verbose)
 
 pointer	input			#I List of input images
@@ -29,6 +29,7 @@ char	inmaskkey[ARB]		#I Input mask keyword
 char	outmaskkey[ARB]		#I Output mask keyword
 char	outtype[ARB]		#I Output type
 bool	exclude			#I Exclude input image?
+real	nclip			#I Clipping factor
 int	navg			#I Number of values to average
 char	scale[ARB]		#I Scale specification
 bool	normscale		#I Normalize scales to first scale?
@@ -50,7 +51,8 @@ int	open(), fscan(), nscan(), nowhite(), strdic()
 int	imtlen(), imtrgetim()
 int	xt_sampler(), xt_samples(), imgnlr(), impnlr(), imgnls(), impnls()
 real	imgetr(), rm_med(), rm_gmed(), rm_gdata()
-pointer	immap(), rm_open()
+pointer	immap(), yt_mappm(), rm_open()
+errchk	immap, yt_mappm
 
 begin
 	call smark (sp)
@@ -144,7 +146,9 @@ begin
 	        ifnoerr (call imgstr (in, Memc[str], Memc[imname], SZ_FNAME)) {
 		    call printf ("  Reading mask %s ...\n")
 			call pargstr (Memc[imname])
-		    im = immap (Memc[imname], READ_ONLY, 0)
+		    #im = immap (Memc[imname], READ_ONLY, 0)
+		    im = yt_mappm (Memc[imname], in, "logical",
+			Memc[imname], SZ_FNAME)
 		}
 	    }
 	    
@@ -245,7 +249,7 @@ begin
 			stat = imgnls (in, idata, Meml[iline])  
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, 0, iindex,
+			    val = rm_med (rm, nclip, navg, blank, 0, iindex,
 				iscl*Mems[idata+i-1], Mems[imdata+i-1],
 				nused)
 			    call rm_pack (rm, i)
@@ -254,7 +258,7 @@ begin
 			stat = imgnlr (in, idata, Meml[iline])  
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, 0, iindex,
+			    val = rm_med (rm, nclip, navg, blank, 0, iindex,
 				iscl*Memr[idata+i-1], Mems[imdata+i-1],
 				nused)
 			    call rm_pack (rm, i)
@@ -327,16 +331,16 @@ begin
 		    case OT_FILTER:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    Memr[odata+i-1] = oscl * rm_med (rm, navg, blank,
-				eindex, iindex, iscl*Mems[idata+i-1],
+			    Memr[odata+i-1] = oscl * rm_med (rm, nclip, navg,
+			    	blank, eindex, iindex, iscl*Mems[idata+i-1],
 				Mems[imdata+i-1], Mems[omdata+i-1])
 			    call rm_pack (rm, i)
 			}
 		    case OT_DIFF:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, eindex, iindex,
-				iscl*Mems[idata+i-1], Mems[imdata+i-1],
+			    val = rm_med (rm, nclip, navg, blank, eindex,
+			        iindex, iscl*Mems[idata+i-1], Mems[imdata+i-1],
 				Mems[omdata+i-1])
 			    Memr[odata+i-1] =
 			        oscl * (rm_gdata (rm, oindex) - val)
@@ -345,8 +349,8 @@ begin
 		    case OT_RATIO:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, eindex, iindex,
-				iscl*Mems[idata+i-1], Mems[imdata+i-1],
+			    val = rm_med (rm, nclip, navg, blank, eindex,
+			        iindex, iscl*Mems[idata+i-1], Mems[imdata+i-1],
 				Mems[omdata+i-1])
 			    if (val != 0.)
 				Memr[odata+i-1] = rm_gdata (rm, oindex) / val
@@ -361,16 +365,16 @@ begin
 		    case OT_FILTER:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    Memr[odata+i-1] = oscl * rm_med (rm, navg, blank,
-				eindex, iindex, iscl*Memr[idata+i-1],
+			    Memr[odata+i-1] = oscl * rm_med (rm, nclip, navg,
+			        blank, eindex, iindex, iscl*Memr[idata+i-1],
 				Mems[imdata+i-1], Mems[omdata+i-1])
 			    call rm_pack (rm, i)
 			}
 		    case OT_DIFF:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, eindex, iindex,
-				iscl*Memr[idata+i-1], Mems[imdata+i-1],
+			    val = rm_med (rm, nclip, navg, blank, eindex,
+			        iindex, iscl*Memr[idata+i-1], Mems[imdata+i-1],
 				Mems[omdata+i-1])
 			    Memr[odata+i-1] =
 			        oscl * (rm_gdata (rm, oindex) - val)
@@ -379,8 +383,8 @@ begin
 		    case OT_RATIO:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_med (rm, navg, blank, eindex, iindex,
-				iscl*Memr[idata+i-1], Mems[imdata+i-1],
+			    val = rm_med (rm, nclip, navg, blank, eindex,
+			        iindex, iscl*Memr[idata+i-1], Mems[imdata+i-1],
 				Mems[omdata+i-1])
 			    if (val != 0.)
 				Memr[odata+i-1] = rm_gdata (rm, oindex) / val
@@ -402,7 +406,7 @@ begin
 
 	    # Do endpoints.
 	    while (oindex <= halfwin ||
-		(oindex >= nims - halfwin && oindex < nims)) {
+		(oindex >= nims - (window-1)/2 && oindex < nims)) {
 
 		oindex = oindex + 1
 		if (exclude)
@@ -453,14 +457,14 @@ begin
 		    case OT_FILTER:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    Memr[odata+i-1] = oscl * rm_gmed (rm, navg,
+			    Memr[odata+i-1] = oscl * rm_gmed (rm, nclip, navg,
 			        blank, eindex, Mems[omdata+i-1])
 			    call rm_pack (rm, i)
 			}
 		    case OT_DIFF:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_gmed (rm, navg, blank, eindex,
+			    val = rm_gmed (rm, nclip, navg, blank, eindex,
 			        Mems[omdata+i-1])
 			    Memr[odata+i-1] = oscl *
 			        (rm_gdata (rm, oindex) - val)
@@ -469,7 +473,7 @@ begin
 		    case OT_RATIO:
 			do i = 1, nc {
 			    call rm_unpack (rm, i)
-			    val = rm_gmed (rm, navg, blank, eindex,
+			    val = rm_gmed (rm, nclip, navg, blank, eindex,
 			        Mems[omdata+i-1])
 			    if (val != 0.)
 				Memr[odata+i-1] = rm_gdata (rm, oindex) / val

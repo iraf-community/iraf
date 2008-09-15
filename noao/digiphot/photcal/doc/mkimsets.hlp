@@ -282,10 +282,10 @@ internal blanks in the title would otherwise confuse the sorting routine.
 	    filter="f1pos" fields="ST,i_title" sort="ST"
 
 	   ... MKIMSETS constructs the image list and sorts on
-	       the column containing the siderial time
+	       the column containing the sidereal time
 
 	   ... MKIMSETS enters the editor and lists the first
-	       few lines of the temporary image list file, the siderial
+	       few lines of the temporary image list file, the sidereal
 	       time is in column 3 and the image title containing
 	       some blanks is in column 4
 

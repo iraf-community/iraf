@@ -103,7 +103,7 @@ derived by supplying the coordinates of tie points via the
 \fIrefpoints\fR file, or by setting the linear transformation parameters
 \fIxin\fR, \fIyin\fR, \fIxmag\fR, \fIymag\fR, \fIxrotation\fR,
 \fIyrotation\fR, \fIprojection\fR, \fIlngref\fR, and \fIlatref\fR. Assuming that
-a good initial estimate for the required linear transformaton is supplied,
+a good initial estimate for the required linear transformation is supplied,
 the tolerance algorithm functions well in the presence of shifts, axis
 flips, x and y scale changes, rotations, and axis skew between the two
 coordinate systems. The algorithm is sensitive to higher order distortion terms
@@ -174,7 +174,7 @@ CCXYMATCH matches the coordinate lists by: 1) projecting the celestial
 coordinates onto a plane using the sky projection geometry \fIprojection\fR
 and the reference point \fIlngref\fR and \fIlatref\fR,
 2) computing an initial guess for the linear transformation required to
-match the pixel coordinate system to the porjected celestial coordinate system,
+match the pixel coordinate system to the projected celestial coordinate system,
 3) applying the computed transformation to the pixel coordinates, 4) sorting
 the projected celestial and pixel coordinates lists, 5) removing points with a
 minimum separation specified by the parameters \fIseparation\fR and
@@ -275,7 +275,7 @@ skew between the celestial and pixel coordinate systems, and can be
 computationally expensive.
 
 The matched celestial and pixel coordinates are written to columns 1, 2, 3,
-and 4 of the ouput file, in the formats specified by the \fIlngformat\fR,
+and 4 of the output file, in the formats specified by the \fIlngformat\fR,
 \fIlatformat\fR, \fIxformat\fR and \fIyformat\fR parameters.  The original
 line numbers in the celestial and pixels coordinate files are written to
 columns 5 and 6.
@@ -315,7 +315,7 @@ are eliminated.
 The rejection step can be repeated up to \fInreject\fR times or until
 no more rejections occur, whichever comes first.
 The last step in the algorithm is a voting procedure in which each remaining
-matched triangle casts three votes, one for eached matched pair of vertices.
+matched triangle casts three votes, one for each matched pair of vertices.
 Points which have fewer than half the maximum number of
 votes are discarded. The final set of matches are written to the output file.
 
@@ -777,5 +777,5 @@ TIME REQUIREMENTS
 BUGS
 .ih
 SEE ALSO
-stsdas.gasp.regions, stsdas.gasp.skymap,tables.ttools.tprint,daophot.daofind,ccmap
+stsdas.gasp.regions,stsdas.gasp.skymap,tables.ttools.tprint,daophot.daofind,ccmap
 .endhelp

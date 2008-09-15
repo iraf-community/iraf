@@ -107,8 +107,8 @@ max (yxorder - 1, yyorder - 1) for the y fit.
 .le
 .ls full
 The individual polynomial terms contain powers of x and powers of y, whose
-maximum combined power is max (xxorder - 1 + xyorder - 1) for the x fit and
-max (yxorder - 1 + yyorder - 1) for the y fit.
+maximum combined power is max (xxorder - 1, xyorder - 1) for the x fit and
+max (yxorder - 1, yyorder - 1) for the y fit.
 .le
 
 The "shift", "xyscale", "rotation", "rscale", and "rxyscale" fitting
@@ -146,8 +146,8 @@ DESCRIPTION
 
 GEOMAP computes the transformation required to map the reference coordinate
 system to the input coordinate system.  The coordinates of points in common
-to the two systems are listed in the input text file(s) \fIinput\fR input
-one per line in the following format: "xref yref yin yin.
+to the two systems are listed in the input text file(s) \fIinput\fR
+one per line in the following format: "xref yref xin yin.
 
 The computed transforms are stored in the text database file \fIdatabase\fR
 in records with names specified by the parameter \fItransforms\fR. If the
@@ -167,14 +167,15 @@ image coordinate system.
 
 If on the other hand the user wishes to transform coordinates from the
 input image coordinate system to the reference coordinate system then he or she
-must reverse the roles of the reference and input coordinates as defined above, and compute the inverse transformation.
+must reverse the roles of the reference and input coordinates as defined above,
+and compute the inverse transformation.
 
 
 The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order \fIxxorder\fR and \fIxyorder\fR in x
 and \fIyxorder\fR and \fIyyorder\fR in y.
 
-Several polynomial cross terms options are avaible. Options "none",
+Several polynomial cross terms options are available. Options "none",
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 

@@ -310,7 +310,8 @@ char	messg[SZ_LINE]
 pointer lfit, sp, po, ln
 int	spool, ig, acmode, i
 int	fitslen, xtn_hd, nrec1440, totpix, in, offset, group
-int	strcmp(),  fstatl(), getline()
+int	strcmp(), getline()
+long	fstatl()
 int	open(), fxf_extnv_error()
 bool	ext_append, get_group
 

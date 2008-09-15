@@ -1,5 +1,4 @@
 include	<ctype.h>
-include <fio.h>
 include <gset.h>
 include <imhdr.h>
 include <error.h>

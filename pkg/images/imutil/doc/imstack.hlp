@@ -25,7 +25,7 @@ that of the first input image.
 DESCRIPTION
 
 The input \fIimages\fR are stacked to form an \fIoutput\fR image having one
-higer dimension than the input images, and a length of that dimension equal
+higher dimension than the input images, and a length of that dimension equal
 to the number of input images.  The input images must all be of the same
 dimension and size.
 

@@ -303,7 +303,7 @@ Measure equivalent width by marking two continuum points around the line
 to be measured.  The linear continuum is subtracted and the flux is
 determined by simply summing the pixels with partial pixels at the ends.
 Returned values are the line center, continuum at the region center,
-core intensity, flux above or below the continuum, and the equivalent width.
+flux above or below the continuum, and the equivalent width.
 .le
 .ls f
 Enter arithmetic function mode. This mode allows arithmetic functions to be

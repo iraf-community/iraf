@@ -32,7 +32,7 @@
 unalias	rm set find echo sleep tail sed cmp echo cat mail
 
 set	bugfile	= "${iraf}local/bugs.log"
-set	arcfile	= "/u1/ftp/iraf/v212/bugs.log"
+set	arcfile	= "/u1/ftp/iraf/v214/bugs.log"
 set	tmpfile	= "/tmp/bug."
 set	lokfile = "/tmp/bug.lok"
 
@@ -40,7 +40,7 @@ set	number	= 1
 set	module	= "$1"
 set	from	= "`whoami`"
 set	date	= "`date`"
-set	system	= "V2.12"
+set	system	= "V2.14"
 set	irafmail = "iraf@iraf.noao.edu"
 set	buglog   = "adass-iraf-buglog@iraf.noao.edu"
 
@@ -114,8 +114,8 @@ if ($status) then
     echo "" >> $arcfile;  cat $tmpfile >> $arcfile
     mail -s "buglog.$number"": module = $module, author = $from" $irafmail\
 	< $tmpfile
-    mail -s "buglog.$number"": module = $module, author = $from" $buglog\
-	< $tmpfile
+#    mail -s "buglog.$number"": module = $module, author = $from" $buglog\
+#	< $tmpfile
     rm -f $tmpfile $tmpfile.ORIG
 else
     echo "system bugfile not modified"

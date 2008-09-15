@@ -111,7 +111,7 @@ O[0,0] =  I[-1,0]/2          - I[0,0]*(2-sqrt(2)) + I[1,0]/2         +
 .ih
 EXAMPLES
 
-1. Convolve an image with the Laplacian filter xyall using nearest neighbour
+1. Convolve an image with the Laplacian filter xyall using nearest neighbor
 boundary extension.
 
     cl> laplace m83 m83.lap xyall

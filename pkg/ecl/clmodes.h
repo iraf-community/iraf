@@ -71,6 +71,7 @@ extern int	eh_standout,
 /* CL parameters for error recovery.
  */
 extern int	err_abort,
+		err_beep,
 		err_trace,
 		err_full,
 		err_clear,

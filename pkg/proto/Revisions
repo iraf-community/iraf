@@ -1,6 +1,47 @@
 .help revisions Jun88 proto
 .nf
 
+masks$t_mimstat.x
+    The clipping calculation was resetting the user supplied pixel limits.
+    Instead, any clipping limits need to remain bounded by the user
+    limits.
+    (7/15/08, Valdes)
+
+masks/t_mimstat.x
+    When creating an output mask the final mp_invert step doesn't work.  I'm
+    not sure if this ever worked right with the PIX_NOT(PIX_SRC) raster op.
+    Replaced this routine with yt_pminvert.  (3/14/08, Valdes)
+
+masks/t_mimstat.x
+doc/mimstat.hlp
+    The "pmmatch" facility now allows the masks to be matched in physical
+    and world coordinate systems.  (2/4/08, Valdes)
+
+t_bscale.x
+    Fixed a type declaration problem (1/21/08, MJF)
+
+t_fixpix.x
+    Changed from using xt_pmmap to yt_pmmap thus supporting world
+    coordinate pixel mask matching.  (1/16/08, Valdes)
+
+maskexpr/t_mskexpr.x
+    If both a reference image and a reference mask are specified the
+    reference mask will be matched to reference image using the features
+    of yt_mappm (see xtools$fixpix/ytpmmap.x).  The default is to match
+    in "logical" which basically trims or pads the mask.  The power of
+    this is that the user may set the environment variable "pmmatch" to
+    one of "physical", "world", or "offset".  The physical option is useful
+    for taking trims, subsections, or other linear changes into account.
+    The world option is useful for matching masks generated from transformed
+    images.  One application of this task is now to create the matched
+    mask as a file from the internal matching operation by using the
+    simple expression "m".
+    (1/10/08, Valdes)
+
+=====
+V2.14
+=====
+
 t_imext.x
     Removed supporting procedures which are now in the xtools library
     in the file xtextns.

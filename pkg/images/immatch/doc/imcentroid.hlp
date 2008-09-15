@@ -35,7 +35,7 @@ A text file containing the initial estimate for each image of the
 shift in each axis relative to the reference image.  These
 estimates are used to modify the coordinates of the registration
 objects prior to centering.  The format of the file is one image per
-line with the ractional x and y shifts in columns one and two
+line with the fractional x and y shifts in columns one and two
 respectively.  The sense of the shifts is such that:
 Xshift =Xref - Xin and shift= Yref - Yin. If shifts is undefined,
 a coarse centering pass will be made to attempt to determine

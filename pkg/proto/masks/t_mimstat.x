@@ -15,12 +15,12 @@ int	i, imlist, inlist, outlist, nclip, nfields, format, mval, npts, npix
 int	nbins, in_invert, nbad, cache, old_size
 
 real	clgetr()
-pointer	mp_open(), mp_miopen()
+pointer	yt_mappm(), mp_miopen()
 int	imtopenp(), imtopen(), imtlen(), imtgetim(), immap(), clgeti()
 int	mst_fields(), btoi(), mio_glsegr(), mst_ihist(), imstati()
 int	mst_umask(), strmatch()
 bool	clgetb()
-errchk	immap()
+errchk	immap(), yt_mappm(), yt_pminvert()
 
 begin
 	# Allocate working space.
@@ -48,13 +48,13 @@ begin
 	}
 
 	# Get the input mask specification
-	call clgstr ("imasks", Memc[inmasks], SZ_FNAME)
-	if (Memc[inmasks] == '^') {
+	call clgstr ("imasks", Memc[inmasks+1], SZ_FNAME)
+	if (Memc[inmasks+1] == '^') {
 	    in_invert = YES
-	    inlist = imtopen (Memc[inmasks+1])
+	    inlist = imtopen (Memc[inmasks+2])
 	} else {
 	    in_invert = NO
-	    inlist = imtopen (Memc[inmasks])
+	    inlist = imtopen (Memc[inmasks+1])
 	}
 	if (imtlen (inlist) > 1 && imtlen (inlist) != imtlen (imlist)) {
 	    call eprintf ("The input mask and image lists don't match\n")
@@ -122,16 +122,23 @@ begin
 
 	    # Open the input mask.
 	    if (imtgetim (inlist, Memc[str+1], SZ_FNAME) != EOF) {
-		if (in_invert == YES) {
-		    Memc[str] = '^'
-		    pmim = mp_open (Memc[str], im, Memc[imask], SZ_FNAME)
-		} else
-		    pmim = mp_open (Memc[str+1], im, Memc[imask], SZ_FNAME)
+		Memc[str] = '^'
+		if (in_invert == YES)
+		    pmim = yt_mappm (Memc[str+1], im, "logical",
+			Memc[imask], SZ_FNAME)
+		else
+		    pmim = yt_mappm (Memc[str], im, "logical",
+		        Memc[imask], SZ_FNAME)
 	    } else if (imtlen (inlist) == 1) {
-		pmim = mp_open (Memc[inmasks], im, Memc[imask], SZ_FNAME)
-	    } else {
-		pmim = mp_open ("", im, Memc[imask], SZ_FNAME)
-	    }
+		Memc[inmasks] = '^'
+		if (in_invert == YES)
+		    pmim = yt_mappm (Memc[inmasks+1], im, "logical",
+			Memc[imask], SZ_FNAME)
+		else
+		    pmim = yt_mappm (Memc[inmasks], im, "logical",
+			Memc[imask], SZ_FNAME)
+	    } else
+		pmim = yt_mappm ("^EMPTY", im, "logical", Memc[imask], SZ_FNAME)
 
 	    # Check the mask status and open an empty mask if there
 	    # was an error.
@@ -232,6 +239,10 @@ begin
 			up = MIS_MEAN(mst) + usigma * MIS_STDDEV(mst)
 		    else
 			up = MAX_REAL
+		    if (!IS_INDEFR(lower))
+		        low = max (low, lower)
+		    if (!IS_INDEFR(upper))
+		        up = min (up, upper)
 		    if (i > 0) {
 			if (MIS_NPIX(mst) == npix)
 			    break
@@ -283,7 +294,7 @@ begin
 	    		call pm_plps (opm, Meml[vs], Mems[smsk], 1, npts,
 			    PIX_SRC)
 		}
-		call mp_invert (opm)
+		call yt_pminvert (opm)
 		call imseti (pmout, IM_PMDES, opm) 
 	        call mfree (smsk, TY_SHORT)
 	    }

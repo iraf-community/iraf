@@ -62,7 +62,7 @@ The center pixel in the window is replaced by the median of the pixels in the
 window, where the median of a sequence of numbers is defined to be
 the value of the (n + 1) / 2 pixel of the ordered sequence.
 Out of bounds pixel references are handled by setting the parameter
-\fIboundary\fR. The principal function of the circular / ellptical filter
+\fIboundary\fR. The principal function of the circular / elliptical filter
 is to smooth and image using a circularly / elliptically symmetric filter.
 The principal function of the circular / elliptical ring filter is to
 remove objects from the image which have a scale length of rinner and

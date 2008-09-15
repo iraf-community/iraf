@@ -206,7 +206,7 @@ DAOPHOT tasks to insure that the PSF fitting weights, chis, and magnitude
 error estimates are computed correctly.
 
 The magnitudes computed by PHOT are normalized to an exposure time of 1 
-imeunit using the value of the exposure time in the image header parameter 
+timeunit using the value of the exposure time in the image header parameter 
 \fIexposure\fR or \fIitime\fR. If exposure is undefined or not present
 in the image header a warning message is issued and the value of itime
 is used. The itime units are arbitrary but must be consistent for images

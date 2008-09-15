@@ -1,6 +1,12 @@
 .help revisions Jun88 math
 .nf
 
+gsurfit/gs_deval.gx
+iminterp/mrider.x
+iminterp/mrieval.x
+	Fixed some procedure calls being closed with a ']' insted of
+	a ')'  (2/17/08, MJF)
+
 gsurfit/gs_chomat.gx
 	The test for singularity would fail with certain kinds of problems
 	because the test used EPSILON (should have been EPSILOND for the

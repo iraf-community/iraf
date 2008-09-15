@@ -132,6 +132,10 @@ begin
                         up = IST_MEAN(ist) + usigma * IST_STDDEV(ist)
                     else
                         up = MAX_REAL
+		    if (!IS_INDEFR(lower))
+		        low = max (low, lower)
+		    if (!IS_INDEFR(upper))
+		        up = min (up, upper)
                     if (i > 0) {
                         if (IST_NPIX(ist) == npix)
                             break

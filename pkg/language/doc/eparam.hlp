@@ -5,7 +5,6 @@ eparam -- edit a task's parameters
 .ih
 USAGE
 eparam task [task ...]
-.fi
 .ih
 PARAMETERS
 .ls task
@@ -95,7 +94,7 @@ should be used.
 .ls :r[!] [pset]
 Read in a new pset.  If the command is '\fB:r\fR', an error message is
 printed.  If the command is '\fB:r!\fR' the pset currently being edited
-is reread, cancelling any modifications made since the last update.
+is reread, canceling any modifications made since the last update.
 If a pset is specified the contents of the named pset are merged into the
 current pset, i.e., the named pset is loaded into the current pset,
 overwriting the contents of the current pset.

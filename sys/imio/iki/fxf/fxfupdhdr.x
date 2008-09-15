@@ -29,24 +29,27 @@ pointer	im			#I image descriptor
 int	status			#O return status
 
 pointer	sp, fit, mii, poff
-pointer	outname, fits_file, tempfile
+pointer	outname, fits_file, tmp1, tmp2
 bool    adjust_header, overwrite, append
-int	nchars_ua, hdr_fd, group, hdr_off, size
+int	i, nchars_ua, hdr_fd, group, hdr_off, size
 int	npad, nlines, pixoff, grp_pix_off, nbks
-int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
+int	acmode, in_fd, diff, hdr_acmode, in_off, nchars, subtype
 int	read(), fxf_hdr_offset(), access(), strncmp()
-int	open(), fnroot(), fstatl(), fnldir()
+int	open(), fstatl(), fnldir(), strlen(), stridxs()
 bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
-errchk  set_cache_time, syserr, syserrs, imerr
-int	clktime()
+errchk  fxf_set_cache_time, syserr, syserrs, imerr
+errchk  fxf_expandh, fxf_not_incache, fxf_ren_tmp, fxf_update_extend
+long	clktime()
+
 begin
 	call smark (sp)
 	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
 	call salloc (fits_file, SZ_FNAME, TY_CHAR)
 	call salloc (outname, SZ_PATHNAME, TY_CHAR)
-	call salloc (tempfile, max(SZ_PATHNAME,SZ_FNAME*2), TY_CHAR)
+	call salloc (tmp1, max(SZ_PATHNAME,SZ_FNAME*2), TY_CHAR)
+	call salloc (tmp2, max(SZ_PATHNAME,SZ_FNAME*2), TY_CHAR)
 
 	acmode = IM_ACMODE(im)
 	fit = IM_KDES(im)
@@ -142,17 +145,27 @@ begin
 	}
 
 	overwrite = (FKS_OVERWRITE(fit) == YES)
-
-	if (adjust_header || overwrite) { 
+	if (adjust_header || overwrite) {
 	    # We need to change the size of header portion in the middle of
 	    # the file. The best thing to do is to make a copy in the output
 	    # filename directory.
 
-	    nchars = fnldir (IM_PIXFILE(im), Memc[tempfile], SZ_FNAME)
-	    junk = fnroot (IM_PIXFILE(im), Memc[tempfile+nchars], SZ_FNAME)
-	    call mktemp (Memc[tempfile], Memc[outname], SZ_PATHNAME)
-	    call strcat (".fits", Memc[outname], SZ_PATHNAME)
+	    i = strlen (IM_PIXFILE(im))
+	    nchars = fnldir (IM_PIXFILE(im), Memc[outname], SZ_PATHNAME)
+	    if (nchars > 80 && i > 100) {
+		i = stridxs ("!", Memc[outname])
+	        call strcpy ("tmp$", Memc[outname+i], SZ_PATHNAME-i)
+	    }
+	    call strcpy (Memc[outname], Memc[tmp2], SZ_FNAME)
+            call mktemp ("fx", Memc[tmp1], SZ_PATHNAME)
+	    call strcat (".fits", Memc[tmp1], SZ_PATHNAME)
+	    call strcat ("A", Memc[outname], SZ_PATHNAME)
+	    call strcat (Memc[tmp1], Memc[outname], SZ_PATHNAME)
+	    call strcat ("B", Memc[tmp2], SZ_PATHNAME)
+	    call strcat (Memc[tmp1], Memc[tmp2], SZ_PATHNAME)
 	    in_fd = open (Memc[fits_file], READ_ONLY, BINARY_FILE)
+	    if (access (Memc[outname], 0, 0) == YES)
+		call delete (Memc[outname])
 	    hdr_fd = open (Memc[outname], NEW_FILE, BINARY_FILE)
 
             # Now expand the current group at least one block of 36 cards
@@ -167,6 +180,7 @@ begin
 		nbks = -diff/1440     # number of blocks to expand
 		call fxf_expandh (in_fd, hdr_fd, nlines, group, nbks,
 		    hdr_off, pixoff)
+		nchars_ua = pixoff - hdr_off
 		# Reload PHU from file if necessary
 	        call fxf_not_incache(im)
 		poff = FIT_PIXPTR(fit)
@@ -183,6 +197,7 @@ begin
 		    hdr_off, grp_pix_off, nchars_ua)
 	    }
 	    diff = 0
+	    group = -1
 
 	    # Reset the time so we can read a fresh header next time.
 	    call fxf_set_cache_time (im, overwrite)
@@ -218,7 +233,8 @@ begin
         FIT_MTIME(fit) = FIT_MTIME(fit) + 4
 
 	# Now write default cards and im_userarea to disk.
-	call fxf_write_header (im, fit, hdr_fd, diff)
+	nchars_ua = nchars_ua + diff
+	call fxf_write_header (im, fit, hdr_fd, nchars_ua, group)
 
  	size = fstatl (hdr_fd, F_FILESIZE)
 	npad = FITS_BLOCK_CHARS - mod(size,FITS_BLOCK_CHARS)
@@ -228,7 +244,6 @@ begin
 
 	if (mod(npad,FITS_BLOCK_CHARS) > 0 &&
 		(FIT_NEWIMAGE(fit) == YES || append)) {
-
 	    call amovki (0, Memi[mii], npad)
 	    call flush (hdr_fd)
 	    call seek (hdr_fd, EOF)
@@ -261,7 +276,7 @@ begin
 	    call close (hdr_fd)
 	    call close (in_fd)
 
-	    call fxf_ren_tmp (IM_PIXFILE(im),IM_HDRFILE(im))
+	    call fxf_ren_tmp (IM_PIXFILE(im), IM_HDRFILE(im), Memc[tmp2], 1, 1)
 
 	    # Change the acmode so we can change the modification and
 	    # this way reset the cache for this file.
@@ -274,11 +289,11 @@ begin
 	        call close (in_fd)
 	    call close (hdr_fd)
 
-	    if (adjust_header) {
-	        if (access (IM_PIXFILE(im), 0, 0) == YES)
-		    call delete (IM_PIXFILE(im))
-		call rename (Memc[outname], IM_PIXFILE(im))
-            }	
+            # If the header has been expanded then rename the temp file
+	    # to the original name.
+	    if (adjust_header)
+		call fxf_ren_tmp (Memc[outname], IM_PIXFILE(im),
+		    Memc[tmp2], 1, 1)
 	}
 
 	# Make sure we reset the modification time for the cached header
@@ -359,7 +374,7 @@ int	ualen			#O new header length
 
 char	temp[LEN_CARD]
 pointer	hoff, poff, sp, pb, tb
-int	ua, fit, orig_hdr_size, pixoff, clines, ulines, len
+int	ua, fit, hdr_size, pixoff, clines, ulines, len, padlines
 int     merge, usize, excess, nheader_cards, rp, inherit, kmax, kmin
 int     strlen(), imaccf(), imgeti(), strcmp(), idb_findrecord()
 int	btoi(), strncmp()
@@ -546,66 +561,75 @@ begin
 	if (strncmp ("PLIO_1", FIT_EXTSTYPE(fit), 6) == 0)
 	    nheader_cards = nheader_cards + 3 + 6 + IM_NDIM(im)*2
 
+	# Compute current header size rounded to a header block.
 	usize = strlen (Memc[ua]) 
-	ualen = (usize / LEN_UACARD + nheader_cards) * LEN_CARD
-	ualen = FITS_LEN_CHAR(ualen / 2)
+	len = (usize / LEN_UACARD + nheader_cards) * LEN_CARD 
+	len = FITS_LEN_CHAR(len / 2)
 
-	# Have we go over the FITS header area already allocated?
+	# Ask for more lines if the header can or needs to be expanded.
+	padlines = FKS_PADLINES(fit)
+
+	# Here we go over the FITS header area already allocated?
 	if (acmode == READ_WRITE || acmode == WRITE_ONLY) {
 	    call fxf_not_incache(im)
 	    hoff = FIT_HDRPTR(fit)
 	    poff = FIT_PIXPTR(fit)
-	    orig_hdr_size = Memi[poff+group] - Memi[hoff+group]
-	    diff = orig_hdr_size - ualen
+	    hdr_size = Memi[poff+group] - Memi[hoff+group]
+	    ualen = len
+	    diff = hdr_size - ualen
+	    # If the header needs to be expanded add on the pad lines.
+	    if (diff < 0) {
+		ualen = (usize/LEN_UACARD + nheader_cards + padlines) * LEN_CARD
+		ualen = FITS_LEN_CHAR(ualen / 2)
+	    }
+	    diff = hdr_size - ualen
 	} else if ((hdr_off == EOF || hdr_off == 0) && 
 	    (IM_NDIM(im) == 0 || FIT_NAXIS(fit) == 0)) {
-	    diff = 0
+	    hdr_size = len
+	    ualen = len
 	} else {
-	    diff = pixoff - ualen
-
-            # If we need to write more than one block of blanks, substract
-	    # one line corresponding to the END keyword, since this will be
-	    # written after the blanks.
-
-	    if (diff > 2880) {
-		ualen = (usize / LEN_UACARD + nheader_cards-1) * LEN_CARD
-		ualen = FITS_LEN_CHAR(ualen / 2)
-		diff = pixoff - ualen
-	    }
+	    hdr_size = pixoff
+	    # The header can expand so add on the pad lines.
+	    ualen = (usize / LEN_UACARD + nheader_cards + padlines) * LEN_CARD
+	    ualen = FITS_LEN_CHAR(ualen / 2)
+	    diff = hdr_size - ualen
         }
 
         if (diff < 0 && FIT_EXPAND(fit) == NO) {
 	    # We need to reduce the size of the UA becuase we are not
 	    # going to expand the header.
-
 	    excess = mod (nheader_cards * 81 + usize, 1458)
 	    excess = excess + (((-diff-1400)/1440)*1458)
 	    Memc[ua+usize-excess] = EOS
+	    usize = strlen (Memc[ua]) 
+	    ualen = (usize / LEN_UACARD + nheader_cards) * LEN_CARD 
+	    ualen = FITS_LEN_CHAR(ualen / 2)
 	}
 end
 
 
 # FXF_WRITE_HDR -- Procedure to write header unit onto the PHU or EHU.
 
-procedure fxf_write_header (im, fit, hdr_fd, diff)
+procedure fxf_write_header (im, fit, hdr_fd, nchars_ua, group)
 
 pointer	 im		  	#I image structure
 pointer	 fit     		#I fits structure
 int	 hdr_fd  		#I FITS header file descriptor
-int	 diff			#I header size difference opix -> wrhdr time
+int	 nchars_ua		#I header size
+int	group			#I group number
 
 char	temp[SZ_FNAME] 
 bool	xtension, ext_append
 pointer	sp, spp, mii, rp, uap
 char    card[LEN_CARD], blank, keyword[SZ_KEYWORD], datestr[SZ_DATESTR] 
-int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len, poff
-int     pos, group, pcount, depth, subtype, maxlen, ndim
+int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len, poff, diff
+int     pos, pcount, depth, subtype, maxlen, ndim
 
 long	clktime()
 int	imaccf(), strlen(), fxf_ua_card(), envgeti()
 int	idb_findrecord(), strncmp(), btoi()
 bool	fxf_fpl_equald(), imgetb(), itob()
-long	note()
+long    note()
 errchk  write 
 
 begin
@@ -908,7 +932,6 @@ begin
 	nbk = 0
 	n = n - spp 
 	sz_rec = 1440
-
 	while (fxf_ua_card (fit, im, up, card) == YES) {
 	    call amovc (card, Memc[spp+n], LEN_CARD)
 	    n = n + LEN_CARD
@@ -927,13 +950,15 @@ begin
 	rp = spp+n+nblanks-LEN_CARD
 
 	# If there are blocks of trailing blanks, write them now.
+	if (n > 0)
+	    nbk = nbk + 1
+	diff = nchars_ua - nbk * 1440
 	if (diff > 0) {
 	    if (n > 0) {
 		call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 		call write (hdr_fd, Memi[mii], sz_rec)
 	    }
 
-	    group = FIT_GROUP(fit)
 	    if (group < 0) {
 		# We are writing blocks of blanks on a new_copy
 		# image which has group=-1 here. Use diff.
@@ -1208,26 +1233,91 @@ begin
 end	
 
 
-# FXF_REN_TMP -- Rename a temporary file.
+# FXF_REN_TMP -- Rename input file to output file.
+#
+# The output file may already exists in which case it is replaced.
+# Because this operation is critical it is heavily error checked and
+# has retries to deal with networking cases.
 
-procedure fxf_ren_tmp (in, out)
+procedure fxf_ren_tmp (in, out, tmp, ntry, nsleep)
 
-char 	in[ARB]			#I name of teh temporary file
-char    out[ARB]		#O new name
+char 	in[ARB]			#I file to replace output
+char    out[ARB]		#O output file (replaced if it exists)
+char	tmp[ARB]		#I temporary name for in until rename succeeds
+int	ntry			#I number of retries for rename
+int	nsleep			#I Number of seconds to sleep before retry
 
-int	junk, protect()
+int	i, stat, err, access(), protect(), errget()
+bool	replace, prot
+pointer	errstr
+
+errchk	access, protect, rename, delete, salloc
 
 begin
-	if (protect (out, QUERY_PROTECTION) == YES) {
-	    iferr (junk = protect (out, REMOVE_PROTECTION))
-		call erract (EA_ERROR)
-	    iferr (junk = protect (in, SET_PROTECTION))
-		call erract (EA_ERROR)
-	}
+#call eprintf ("fxf_ren_tmp (%s, %s, %s, %d %d)\n")
+#call pargstr (in)
+#call pargstr (out)
+#call pargstr (tmp)
+#call pargi (ntry)
+#call pargi (nsleep)
+	err = 0; errstr = NULL
 
-	iferr (call delete (out))
-	    call erract (EA_ERROR)
-	iferr (call rename (in, out))
+	iferr {
+	    # Move original output out of the way.
+	    # Don't delete it in case of an error.
+	    replace = (access (out, 0, 0) == YES)
+	    prot = false
+	    if (replace) {
+	        prot = (protect (out, QUERY_PROTECTION) == YES)
+		if (prot)
+		    stat = protect (out, REMOVE_PROTECTION)
+		do i = 0, max(0,ntry) {
+#call eprintf ("rename (%s, %s)\n")
+#call pargstr (out)
+#call pargstr (tmp)
+		    ifnoerr (call rename (out, tmp)) {
+			err = 0
+		        break
+		    }
+		    if (errstr == NULL)
+		        call salloc (errstr, SZ_LINE, TY_CHAR)
+		    err = errget (Memc[errstr], SZ_LINE)
+		    if (err == 0)
+		        err = SYS_FMKCOPY
+		    call tsleep (nsleep)
+		}
+		if (err > 0)
+		    call error (err, Memc[errstr])
+	    }
+
+	    # Now rename the input to the output.
+	    do i = 0, max(0,ntry) {
+#call eprintf ("rename (%s, %s)\n")
+#call pargstr (in)
+#call pargstr (out)
+		ifnoerr (call rename (in, out)) {
+		    err = 0
+		    break
+		}
+		if (errstr == NULL)
+		    call salloc (errstr, SZ_LINE, TY_CHAR)
+		err = errget (Memc[errstr], SZ_LINE)
+		if (err == 0)
+		    err = SYS_FMKCOPY
+		call tsleep (nsleep)
+	    }
+	    if (err > 0)
+		call error (err, Memc[errstr])
+	    if (prot)
+		stat = protect (out, SET_PROTECTION)
+
+	    # If the rename has succeeded delete the original data.
+	    if (replace) {
+#call eprintf ("delete (%s)\n")
+#call pargstr (tmp)
+	        call delete (tmp)
+	    }
+	} then
 	    call erract (EA_ERROR)
 end
 
@@ -1277,16 +1367,21 @@ procedure fxf_update_extend (im)
 
 pointer	im			#I image descriptor	
 
-pointer sp, hdrfile
+pointer sp, hdrfile, tmp1, tmp2
 int	fd, fdout, i, nch, nc, cfit
-char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
+char	line[LEN_CARD], blank, cindx
 bool	streq()
-int	open(), naxis, read(), strncmp(), note(), fnroot()
+int	open(), naxis, read(), strncmp(), fnroot()
+long    note()
+errchk	open, fxf_ren_tmp
 
 include "fxfcache.com"
 define	cfit_ 91
 
 begin
+	call smark (sp)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+
 	fd = open (IM_HDRFILE(im), READ_WRITE, BINARY_FILE)
 
 	# Look for EXTEND keyword and change its value in place.
@@ -1308,9 +1403,11 @@ begin
 	# The EXTEND card is not in the header. Insert it after the
 	# last NAXISi in a temporary file, rename after this.
 	
-	i = fnroot (IM_HDRFILE(im), tmp, SZ_FNAME)
-	call mktemp (tmp, tmp, SZ_FNAME)
-	fdout = open (tmp, NEW_FILE, BINARY_FILE)
+	call salloc (tmp1, SZ_FNAME, TY_CHAR)
+	i = fnroot (IM_HDRFILE(im), Memc[tmp1], SZ_FNAME)
+	call mktemp (Memc[tmp1], Memc[tmp1], SZ_FNAME)
+
+	fdout = open (Memc[tmp1], NEW_FILE, BINARY_FILE)
 
 	call seek (fd, BOF)
 	do i = 0, nc-2 {
@@ -1354,13 +1451,14 @@ begin
 	
 	call close (fd)
 	call close (fdout)
-	call fxf_ren_tmp (tmp, IM_HDRFILE(im))
+
+	call salloc (tmp2, SZ_FNAME, TY_CHAR)
+	call strcpy (Memc[tmp1], Memc[tmp2], SZ_FNAME)
+	call strcat ("A", Memc[tmp2], SZ_FNAME)
+	call fxf_ren_tmp (Memc[tmp1], IM_HDRFILE(im), Memc[tmp2], 1, 1)
 
 cfit_
 	# Now reset the value in the cache
-	call smark (sp)
-	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
-
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 
 	# Search the header file cache for the named image.

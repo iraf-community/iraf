@@ -171,7 +171,7 @@ begin
 	yoff = noff * dpy
 
 	# Initialize the interpolator and the image data buffer.
-	call msiinit (msi, II_BILINEAR]
+	call msiinit (msi, II_BILINEAR)
 	buf = NULL
 
 	# Set the boundary.
@@ -287,7 +287,7 @@ begin
 	call salloc (yvals, width, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
-	call msiinit (msi, II_BILINEAR]
+	call msiinit (msi, II_BILINEAR)
 	buf = NULL
 
 	# Set the boundary.
@@ -396,7 +396,7 @@ begin
 	call salloc (yvals, nvals, TY_REAL)
 
 	# Initialize the interpolator and the image data buffer.
-	call msiinit (msi, II_BILINEAR]
+	call msiinit (msi, II_BILINEAR)
 	buf = NULL
 
 	# Set the boundary.

@@ -608,6 +608,8 @@ clerror()
 	    extern ErrCom errcom;
 
 	    iofinish (currentask);
+	    if (err_beep)
+		clbeep();
 	    if (err_flpr)
 	 	flpr_task (errcom.task);
 
@@ -630,6 +632,8 @@ clerror()
 	 * the error statement, provided it was not the first task.
 	 */
 	iofinish (currentask);
+	if (err_beep)
+	    clbeep();
 	if (err_flpr)
 	    flpr_task (errcom.task);
 	if (currentask != firstask)

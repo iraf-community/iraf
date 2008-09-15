@@ -44,7 +44,7 @@ Compute both the linear and distortion portions of the spatial transformation.
 .ls direction = "forward" (forward|backwards)
 The transformation direction may be "forward" or "backward".  The forward
 direction directly evaluates the database solution.  The backward
-direction iteratively dtermines the coordinate which evaluates to the
+direction iteratively determines the coordinate which evaluates to the
 specified coordinate.
 .le
 .ls xref = INDEF, yref = INDEF
@@ -225,7 +225,7 @@ is produced with \fBgeomap\fR to map "reference" coordinates to the
 image which is subsequently transformed.  Therefore, if you have coordinates
 in the image which has been transformed then you should use the "backward"
 transformation to get coordinates for the transformed image.  But if you
-have standard coodinates from the reference image being matched then you
+have standard coordinates from the reference image being matched then you
 would use the "forward" transformation.  If you are not sure then you can
 use \fBtvmark\fR to overlay the results to find which direction produces
 the desired coordinates.

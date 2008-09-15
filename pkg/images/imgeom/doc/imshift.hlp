@@ -114,7 +114,7 @@ EXAMPLES
 TIMINGS
 The time required to shift a 512 by 512 real image by fractional pixel
 amounts in x and y is approximately 10, 20, 70, 120, and 120 cpu seconds for the
-nearest neighbour, bilinear, bicubic, biquintic and bicubic spline
+nearest neighbor, bilinear, bicubic, biquintic and bicubic spline
 interpolants respectively (Vax 11/750 fpa).
 
 .ih

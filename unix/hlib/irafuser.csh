@@ -49,7 +49,7 @@ setenv	RANLIB	ranlib
 
 switch ($MACH)
 case freebsd:
-    setenv HSI_CF "-O -DBSD -w -Wunused"
+    setenv HSI_CF "-O -DBSD -DPOSIX -w -Wunused"
     setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused"
     setenv HSI_FF "-O"
     setenv HSI_LF "-static"

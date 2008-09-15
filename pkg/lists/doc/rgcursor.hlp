@@ -26,7 +26,7 @@ the cursor crosshairs are displayed, the terminal is said to be in
 e.g., to zoom in a feature to get a more accurate cursor position, without
 terminating the current cursor read.  To read the cursor position, enter
 any key not recognized as a cursor mode command, i.e., any lower case or
-nonalphanumeric character.  The actual character one should type depends
+non-alphanumeric character.  The actual character one should type depends
 upon the program for which the list is intended.  If the program will use
 only the X and Y coordinates of the cursor any character may be typed,
 e.g., tap the space bar.  If the program uses the key to determine what

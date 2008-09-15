@@ -12,7 +12,7 @@ The list of APPHOT/DAOPHOT table databases to be sorted in-place.
 All tables are sorted on the same column or columns.
 .le
 .ls columns
-The list of clumns to sort on.  A column template consists of a list of
+The list of columns to sort on.  A column template consists of a list of
 either column names, or column patterns containing the usual pattern matching
 metacharacters.  The names or patterns are separated by commas or white space.
 The list can be placed in a file and the name of the file preceeded by a
@@ -31,7 +31,7 @@ Otherwise, the sort is case insensitive.
 .le
 .ih
 DESCRIPTION
-TBSORT sorts an APPHOT/DAOPHOT STDAS table database.
+TBSORT sorts an APPHOT/DAOPHOT STSDAS table database.
 TBSORT operates in place so
 a copy of the unsorted table must be made with the TABLES
 package TCOPY task in order to preserve the original table.
@@ -42,7 +42,7 @@ commas.  The most significant column name is the first in the list. Subsequent
 columns are used to break ties.  There are two flags, \fIascend\fR
 and \fIcasesens\fR.  If \fIascend\fR is yes,
 the first row in the output table holds the smallest value if
-the sorted column is numeric or the first string in alpahabetic order if the
+the sorted column is numeric or the first string in alphabetic order if the
 sorted column is a character string.  If \fIcasesens\fR is yes,
 upper case characters
 precede lower case characters in sort order.  Otherwise, case is not significant

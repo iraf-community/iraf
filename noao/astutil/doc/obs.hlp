@@ -10,7 +10,7 @@ PARAMETERS
 .ls command = "list" (set|list|images)
 Command option which is one of "set", "list", or "images".  The set command
 sets the default observatory task parameters for the specified
-observatory.  The list command lists the observatory paramters for the
+observatory.  The list command lists the observatory parameters for the
 specified observatory but does not modify the task parameters.  The images
 command lists the observatory parameters for a list of images.  The list
 and images commands examine and verify the observatory parameters applied

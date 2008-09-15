@@ -148,7 +148,7 @@ the input image and the O[*,*] are elements of the output image.
 .ih
 EXAMPLES
 
-1. Calculate the gradient in the 180 degree direction using nearest neighbour
+1. Calculate the gradient in the 180 degree direction using nearest neighbor
    boundary extension.
 
 .nf

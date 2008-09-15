@@ -19,8 +19,8 @@ pointer	sp, cmd, imname, imlist, gp, ie, im
 int	curtype, key, redraw, mode, nframes, nargs
  
 bool	clgetb()
-pointer	gopen(), ie_gimage()
-int	imtopen(), imd_wcsver(), ie_gcur(), ie_getnframes()
+pointer	gopen(), ie_gimage(), imtopen()
+int	imd_wcsver(), ie_gcur(), ie_getnframes()
 int	btoi(), clgeti(), imtlen()
 
 begin

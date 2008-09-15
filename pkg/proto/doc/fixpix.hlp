@@ -54,7 +54,7 @@ to all input images.  The special mask name "BPM" may be used to
 select a mask name given in the input image header under the keyword
 "BPM".
 
-There are three types of masks which may be used.  The prefered type
+There are three types of masks which may be used.  The preferred type
 is a bad pixel mask given as a "pixel list" image.  Pixel list images
 have the extension ".pl" signifying a special compact file of integer
 values ideal for identifying sets of pixels.  For a bad pixel mask the
@@ -123,7 +123,7 @@ two flat fields of different exposure levels.
 EXAMPLES
 1.  A list of images have bad pixel masks defined in the image header.
 To replace the bad pixels by interpolation along the narrowest
-dimensionn:
+dimension:
 
 .nf
     cl> fixpix obj* BPM
@@ -182,7 +182,7 @@ REVISIONS
 .ls FIXPIX V2.11
 This task replaces the old task (now obsolete.ofixpix) and works with the
 more general pixel mask facilities.  It also provides greater flexibility
-in chosing the interpolation direction.
+in choosing the interpolation direction.
 .le
 .ih
 SEE ALSO

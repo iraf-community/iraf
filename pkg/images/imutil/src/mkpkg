@@ -45,10 +45,13 @@ libpkg.a:
 
 	@generic
 
+        getcmd.x        <error.h> <ctotok.h> <lexnum.h>
         gettok.x        <error.h> <ctype.h> <fset.h> gettok.h <syserr.h>
         hedit.x         <error.h> <evexpr.h> <imset.h> <ctype.h> <lexnum.h>
         imdelete.x      <imhdr.h> <error.h>
 	imexpr.x        <ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\
+			<fset.h> <lexnum.h> <evvexpr.h> gettok.h
+	iegsym.x        <ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\
 			<fset.h> <lexnum.h> <evvexpr.h> gettok.h
 	imfunction.x    <imhdr.h>
 	imgets.x	<imhdr.h> <error.h> <ctype.h>
@@ -58,6 +61,7 @@ libpkg.a:
         imminmax.x      <imhdr.h>
 	listpixels.x	<error.h> <imhdr.h> <mwset.h>
         minmax.x        <imhdr.h>
+        nhedit.x        <ctype.h> <error.h> <evexpr.h> <imset.h> <lexnum.h>
 	t_imstat.x	<mach.h> <imhdr.h> <imset.h> "imstat.h"
 	t_sections.x
 	hselect.x	<error.h> <evexpr.h> <ctype.h>

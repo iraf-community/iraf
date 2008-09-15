@@ -1,7 +1,7 @@
 .help asttimes May93 astutil
 .ih
 NAME
-asttimes -- Compute UT, Julian day, epoch, and siderial time
+asttimes -- Compute UT, Julian day, epoch, and sidereal time
 .ih
 USAGE
 asttimes
@@ -30,26 +30,26 @@ If no input files are specified then the date and time for which the
 astronomical date and time is computed are given by these parameters.
 If the year is less than 100 then the century is assumed to be 1900.
 The month is specified as an integer between 1 and 12, and the local
-time for the specified time zone is in hours (sexigesimal format is
+time for the specified time zone is in hours (sexagesimal format is
 acceptable).
 .le
 .ls ut, epoch, jd, lmst
 If no input files are specified then the universal time, J2000 Julian epoch,
-Julian day, and local mean sideral time (at the specified longitude)
+Julian day, and local mean sidereal time (at the specified longitude)
 are recorded in these parameters for possible reference as CL
 variables.  This is in addition to the usual printed output.
 .le
 .ih
 DESCRIPTION
 The astronomical quantities of universal time, J2000 Julian epoch, Julian day,
-and local mean sideral time at the specified observatory are computed and
+and local mean sidereal time at the specified observatory are computed and
 printed for the given dates and times.  To compute parameters for a
 location not specified in the observatory database use the observatory name
 "obspars" which will use the values defined by the parameters
 \fIobservatory.longitude\fR and \fIobservatory.timezone\fR.  The input
 dates and times may be taken from files containing the year, month (as an
-integer between 1 and 12), day, and local time (sexigesimal notation is
-acceptable) in the specifed time zone.  If no files are specified then task
+integer between 1 and 12), day, and local time (sexagesimal notation is
+acceptable) in the specified time zone.  If no files are specified then task
 parameters are used.  The output consists of a printed table with optional
 header and the input data and derived astronomical data.  In addition, if
 the input date and time is from the task parameters then the astronomical

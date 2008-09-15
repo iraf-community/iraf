@@ -43,7 +43,7 @@
        specplot - Scale, stack, and plot multiple spectra
       specshift - Shift spectral dispersion coordinate systems
           splot - Preliminary spectral plot/analysis
-       standard - Tabuluate standard star counts and fluxes
+       standard - Tabulate standard star counts and fluxes
        telluric - Remove telluric features from 1D spectra
       transform - Resample longslit spectra
 

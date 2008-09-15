@@ -98,7 +98,7 @@ factor specified for the device  by the "fb" parameter in the
 file dev$tapecap, or 1 if if the "fb" parameter is not present. For
 devices which support variable block sizes, e.g. 9-track tapes, exabytes
 and dats, "fb" is normally set to 10.
-The user may overrride this value by setting \fIblocking_factor\fR
+The user may override this value by setting \fIblocking_factor\fR
 >= 1 or <= 10. If the device does not support variable block sizes, e.g.
 various types of cartridge drives, blocks of the size defined for the
 device by the "bs" parameter in the dev$tapecap file are written

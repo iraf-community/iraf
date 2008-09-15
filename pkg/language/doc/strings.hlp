@@ -30,11 +30,11 @@ larger than \fIfirst\fR, in which case the returned string is reversed.
 The first character in the string is at index 1.
 .le
 .ls stridx (test, str)
-Finds the position of the first occurence of any character found in \fItest\fR
+Finds the position of the first occurrence of any character found in \fItest\fR
 in the string \fIstr\fR, returning 0 if the match fails.
 .le
 .ls strldx (test, str)
-Finds the position of the last occurence of any character found in \fItest\fR
+Finds the position of the last occurrence of any character found in \fItest\fR
 in the string \fIstr\fR, returning 0 if the match fails.
 .le
 .ls strlen (str)
@@ -48,11 +48,11 @@ Converts \fIstr\fR to all lower-case characters, returns a string value.
 Converts \fIstr\fR to all upper-case characters, returns a string value.
 .le
 .ls strstr (str1, str1)
-Finds the position of the first occurence of \fIstr1\fR in \fIstr2\fR (an
+Finds the position of the first occurrence of \fIstr1\fR in \fIstr2\fR (an
 exact match is required), or 0 if the match fails.
 .le
 .ls strlstr (str1, str1)
-Finds the position of the last occurence of \fIstr1\fR in \fIstr2\fR (an
+Finds the position of the last occurrence of \fIstr1\fR in \fIstr2\fR (an
 exact match is required), or 0 if the match fails.
 .le
 .ih

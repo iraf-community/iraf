@@ -40,3 +40,4 @@ up the editor to edit the new file.
 .ih
 SEE ALSO
 mkhelpdb, help, lroff
+.endhelp

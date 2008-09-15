@@ -28,7 +28,7 @@ real	ratio
 bool	clgetb()
 int	clpopnu(), clplen(), clgeti(), clgfil(), open(), clgwrd()
 int	rg_getreftie(), rg_lincoeff(), fstati(), rg_rdxyi(), rg_sort()
-int	rg_intersect(), rg_factorial(), rg_triangle(), rg_match()
+int	rg_intersection(), rg_factorial(), rg_triangle(), rg_match()
 int	rg_mlincoeff()
 real	clgetr()
 
@@ -266,7 +266,7 @@ begin
 	    	    intrirat = NULL
 		    nintri = nliststars
 		    call rg_pxycolumns (ofd)
-		    ninter = rg_intersect (ofd, Memr[xref], Memr[yref],
+		    ninter = rg_intersection (ofd, Memr[xref], Memr[yref],
 		        Memi[rsindex], Memi[rlineno], nrefstars, Memr[xlist],
 		        Memr[ylist], Memr[xtrans], Memr[ytrans],
 			Memi[listindex], Memi[ilineno], nliststars, tolerance,
@@ -319,7 +319,7 @@ begin
 	    		call rg_wmlincoeff (ofd, "xref", "yref", Memr[coeff],
 			    MAX_NCOEFF)
 		        call rg_pxycolumns (ofd)
-		        ninter = rg_intersect (ofd, Memr[xref], Memr[yref],
+		        ninter = rg_intersection (ofd, Memr[xref], Memr[yref],
 		            Memi[rsindex], Memi[rlineno], nrefstars,
 			    Memr[xlist], Memr[ylist], Memr[xtrans],
 			    Memr[ytrans], Memi[listindex], Memi[ilineno],

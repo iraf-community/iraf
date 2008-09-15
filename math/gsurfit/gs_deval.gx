@@ -112,12 +112,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts]
+		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts]
+		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts)
 		    else
-		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts]
+		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
 		} else {
 	            call amul$t (Mem$t[xnorm], Mem$t[fptr-npts], Mem$t[fptr],
 		        npts)
@@ -204,12 +204,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts]
+		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts]
+		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts)
 		    else
-		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts]
+		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
 		} else {
 		    ri = k
 		    ri1 = (PIXEL(2.0) * ri - PIXEL(3.0)) / (ri - PIXEL(1.0))

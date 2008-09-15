@@ -69,7 +69,7 @@ begin
 
 	xblk = INDEFI
 	yblk = INDEFI
-	si = sigl2_setup (im, 1.0,real(nx),nx,xblk, 1.0,real(ny),ny,yblk)
+	si = sigl2_setup (im, 1.0,real(nx),nx,xblk, 1.0,real(ny),ny,yblk,0)
 
 	do i = 1, ny
 	    buf = sigl2s (si, i)

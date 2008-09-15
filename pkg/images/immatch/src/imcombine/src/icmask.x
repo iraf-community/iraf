@@ -28,9 +28,9 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 pointer	names			# Pointer to array of string pointers
 
-int	i, j, k, nin, nout, npix, npms, nowhite(), strdic(), ctor()
+int	i, j, k, nin, nout, npix, npms, nscan(), strdic(), ctor()
 real	rval
-pointer	sp, key, fname, title, image, pm, pm_open()
+pointer	sp, str, key, fname, title, image, pm, pm_open()
 bool	invert, pm_empty()
 errchk	calloc, pm_open, ic_pmload
 
@@ -42,6 +42,7 @@ begin
 	    return
 
 	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (key, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (title, SZ_FNAME, TY_CHAR)
@@ -53,20 +54,27 @@ begin
 	# and don't need to be set on a line-by-line basis.
 
 	mtype = M_NONE
-	call clgstr ("masktype", Memc[key], SZ_FNAME)
-	if (nowhite (Memc[key], Memc[key], SZ_FNAME) > 0) {
-	    if (Memc[key] == '!') {
-		mtype = M_GOODVAL
-		call strcpy (Memc[key+1], Memc[key], SZ_FNAME)
+	call clgstr ("masktype", Memc[str], SZ_LINE)
+	call sscan (Memc[str])
+	call gargwrd (Memc[title], SZ_FNAME)
+	call gargwrd (Memc[key], SZ_FNAME)
+	i = nscan()
+	if (i > 0) {
+	    if (Memc[title] == '!') {
+		if (i == 1)
+		    mtype = M_GOODVAL
+		else
+		    mtype = strdic (Memc[key], Memc[key], SZ_FNAME, MASKTYPES)
+		call strcpy (Memc[title+1], Memc[key], SZ_FNAME)
 	    } else {
-		mtype = strdic (Memc[key], Memc[title], SZ_FNAME, MASKTYPES)
-		if (mtype == 0) {
-		    call sprintf (Memc[title], SZ_FNAME,
-			"Invalid or ambiguous masktype (%s)")
-			call pargstr (Memc[key])
-		    call error (1, Memc[title])
-		}
+		mtype = strdic (Memc[title], Memc[title], SZ_FNAME, MASKTYPES)
 		call strcpy ("BPM", Memc[key], SZ_FNAME)
+	    }
+	    if (mtype == 0) {
+		call sprintf (Memc[title], SZ_FNAME,
+		    "Invalid or ambiguous masktype (%s)")
+		    call pargstr (Memc[str])
+		call error (1, Memc[title])
 	    }
 	}
 	npix = IM_LEN(out[1],1)
@@ -97,16 +105,19 @@ begin
 	}
 	if (ctor (Memc[title], i, rval) == 0)
 	    call error (1, "Bad mask value")
-	if (rval < 0)
-	    call error (1, "Bad mask value")
 	mvalue = rval
+	if (mvalue < 0)
+	    call error (1, "Bad mask value")
+	else if (mvalue == 0 && mtype == M_NOVAL)
+	    call error (1, "maskvalue cannot be 0 for masktype of 'novalue'")
+
 	if (mtype == 0)
 	    mtype = M_NONE
-	if (mtype == M_BADBITS && mvalue == 0) 
+	else if (mtype == M_BADBITS && mvalue == 0) 
 	    mtype = M_NONE
-	if (mvalue == 0 && (mtype == M_GOODVAL || mtype == M_GOODBITS))
+	else if (mvalue == 0 && (mtype == M_GOODVAL || mtype == M_GOODBITS))
 	    mtype = M_BOOLEAN
-	if ((mtype == M_BADVAL && mvalue == 0) ||
+	else if ((mtype == M_BADVAL && mvalue == 0) ||
 	    (mtype == M_GOODVAL && mvalue != 0) ||
 	    (mtype == M_GOODBITS && mvalue == 0))
 	    invert = true 
@@ -183,18 +194,28 @@ pointer	pm			#O Mask pointer to be returned
 char	fname[ARB]		#U Mask name
 int	maxchar			#I Max size of mask name
 
-pointer	sp, str, imname
-int	i, fnldir(), stridxs()
+bool	match
+pointer	sp, str, imname, yt_pmload()
+int	i, fnldir(), stridxs(), envfind()
 
 begin
 	call smark (sp)
 	call salloc (str, SZ_PATHNAME, TY_CHAR)
 
 	# First check if the specified file can be loaded.
-	ifnoerr (call pm_loadf (pm, fname, Memc[str], SZ_PATHNAME))
-	    return
-	ifnoerr (call pm_loadim (pm, fname, Memc[str], SZ_PATHNAME))
-	    return
+	match = (envfind ("pmatch", Memc[str], SZ_PATHNAME) > 0)
+	if (match) {
+	    call pm_close (pm)
+	    iferr (pm = yt_pmload (fname,im,"logical",Memc[str],SZ_PATHNAME))
+		pm = NULL
+	    if (pm != NULL)
+		return
+	} else {
+	    ifnoerr (call pm_loadf (pm, fname, Memc[str], SZ_PATHNAME))
+		return
+	    ifnoerr (call pm_loadim (pm, fname, Memc[str], SZ_PATHNAME))
+		return
+	}
 
 	# Check if the file has a path in which case we return an error.
 	# Must deal with possible [] which is a VMS directory delimiter.
@@ -221,13 +242,19 @@ begin
 
 	# Try using the image path for the mask file.
 	call strcat (fname, Memc[str], SZ_PATHNAME)
-	ifnoerr (call pm_loadf (pm, Memc[str], Memc[imname], SZ_PATHNAME)) {
-	    call strcpy (Memc[str], fname, maxchar)
-	    return
-	}
-	ifnoerr (call pm_loadim (pm, Memc[str], Memc[imname], SZ_PATHNAME)) {
-	    call strcpy (Memc[str], fname, maxchar)
-	    return
+	if (match) {
+	    iferr (pm = yt_pmload (Memc[imname], im, "logical",
+	        Memc[str], SZ_PATHNAME))
+		pm = NULL
+	    if (pm != NULL) {
+		call strcpy (Memc[str], fname, maxchar)
+		return
+	    }
+	} else {
+	    ifnoerr (call pm_loadf (pm, Memc[str], Memc[imname], SZ_PATHNAME)) {
+		call strcpy (Memc[str], fname, maxchar)
+		return
+	    }
 	}
 
 	# No mask found.
@@ -277,7 +304,7 @@ end
 # This converts the mask format to an array where zero is good and nonzero
 # is bad.  This has special cases for optimization.
 
-procedure ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
+procedure ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 
 pointer	in[nimages]		# Input image pointers
 pointer	out[ARB]		# Output image pointer
@@ -294,10 +321,10 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 
 char	title[1]
-int	i, j, k, ndim, nin, nout, npix
-pointer	buf, pm, names, fname, pm_open()
-bool	pm_linenotempty()
-errchk	pm_glpi, pm_open, pm_loadf, pm_loadim
+int	i, j, k, l, ndim, nin, nout, npix, envfind()
+pointer	buf, pm, names, fname, pm_open(), yt_pmload()
+bool	match, pm_linenotempty()
+errchk	pm_glpi, pm_open, pm_loadf, pm_loadim, yt_pmload
 
 include	"icombine.com"
 
@@ -307,6 +334,7 @@ begin
 	# be set.
 
 	dflag = D_ALL
+	mtype = M_NONE
 	if (icm == NULL)
 	    return
 	if (ICM_TYPE(icm) == M_NONE && aligned && !dothresh)
@@ -317,6 +345,7 @@ begin
 	bufs = ICM_BUFS(icm)
 	pms = ICM_PMS(icm)
 	names = ICM_NAMES(icm)
+	match = (envfind ("pmmatch", title, 1) > 0)
 
 	# Set the mask pointers and line flags and apply offsets if needed.
 
@@ -347,9 +376,9 @@ begin
 
 	    if (lflag[i] != D_NONE) {
 		v2[1] = 1 + j - offsets[i,1]
-		do j = 2, ndim {
-		    v2[j] = v1[j] - offsets[i,j]
-		    if (v2[j] < 1 || v2[j] > IM_LEN(in[i],j)) {
+		do l = 2, ndim {
+		    v2[l] = v1[l] - offsets[i,l]
+		    if (v2[l] < 1 || v2[l] > IM_LEN(in[i],l)) {
 			lflag[i] = D_NONE
 			break
 		    }
@@ -363,7 +392,13 @@ begin
 		    call pm_close (pm)
 		    Memi[pms+i-1] = NULL
 		}
+		call amovki (1, Memi[m[i]], nout)
 		next
+	    } else if (lflag[i] == D_MIX) {
+		if (j > 0)
+		    call amovki (1, Memi[m[i]], j)
+		if (nout-k > 0)
+		    call amovki (1, Memi[m[i]+k], nout-k)
 	    }
 
 	    if (fname == NULL) {
@@ -378,10 +413,15 @@ begin
 	    # expected usage.
 
 	    if (pm == NULL) {
-		pm = pm_open (NULL)
-		iferr (call pm_loadf (pm, Memc[fname], title, 1))
-		    call pm_loadim (pm, Memc[fname], title, 1)
-		call pm_seti (pm, P_REFIM, in[i])
+		if (match) {
+		   pm = yt_pmload (Memc[fname], in[i], "logical",
+		       Memc[fname], SZ_FNAME)
+		} else {
+		    pm = pm_open (NULL)
+		    iferr (call pm_loadf (pm, Memc[fname], title, 1))
+			call pm_loadim (pm, Memc[fname], title, 1)
+		    call pm_seti (pm, P_REFIM, in[i])
+		}
 		if (project)
 		    Memi[pms] = pm
 		else
@@ -397,7 +437,16 @@ begin
 		    call aandki (Memi[buf], mvalue, Memi[buf], npix)
 		else if (mtype == M_BADVAL)
 		    call abeqki (Memi[buf], mvalue, Memi[buf], npix)
-		else if (mtype == M_GOODBITS) {
+		else if (mtype == M_NOVAL) {
+		    do j = 0, npix-1 {
+		        if (Memi[buf+j] == 0)
+			    next
+			if (Memi[buf+j] == mvalue)
+			    Memi[buf+j] = 1
+			else
+			    Memi[buf+j] = 2
+		    }
+		} else if (mtype == M_GOODBITS) {
 		    call aandki (Memi[buf], mvalue, Memi[buf], npix)
 		    call abeqki (Memi[buf], 0, Memi[buf], npix)
 		} else if (mtype == M_GOODVAL)
@@ -409,7 +458,7 @@ begin
 
 		lflag[i] = D_NONE
 		do j = 1, npix
-		    if (Memi[buf+j-1] == 0) {
+		    if (Memi[buf+j-1] != 1) {
 			lflag[i] = D_MIX
 			break
 		    }
@@ -417,6 +466,7 @@ begin
 		if (mtype == M_BOOLEAN || mtype == M_BADBITS) {
 		    call aclri (Memi[buf], npix)
 		} else if ((mtype == M_BADVAL && mvalue != 0) ||
+		    (mtype == M_NOVAL && mvalue != 0) ||
 		    (mtype == M_GOODVAL && mvalue == 0)) {
 		    call aclri (Memi[buf], npix)
 		} else if (mtype == M_LTVAL && mvalue > 0) {
@@ -459,10 +509,10 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 
 char	title[1]
-int	i, npix
-pointer	buf, pm, names, fname, pm_open()
+int	i, npix, envfind()
+pointer	buf, pm, names, fname, pm_open(), yt_pmload()
 bool	pm_linenotempty()
-errchk	pm_glpi, pm_open, pm_loadf, pm_loadim
+errchk	pm_glpi, pm_open, pm_loadf, pm_loadim, yt_pmload
 
 include	"icombine.com"
 
@@ -495,10 +545,15 @@ begin
 	    return
 
 	if (pm == NULL) {
-	    pm = pm_open (NULL)
-	    iferr (call pm_loadf (pm, Memc[fname], title, 1))
-		call pm_loadim (pm, Memc[fname], title, 1)
-	    call pm_seti (pm, P_REFIM, in)
+	    if (envfind ("pmmatch", title, 1) > 0) {
+	        pm = yt_pmload (Memc[fname], in, "logical", Memc[fname],
+		    SZ_FNAME)
+	    } else {
+		pm = pm_open (NULL)
+		iferr (call pm_loadf (pm, Memc[fname], title, 1))
+		    call pm_loadim (pm, Memc[fname], title, 1)
+		call pm_seti (pm, P_REFIM, in)
+	    }
 	    if (project)
 		Memi[pms] = pm
 	    else
@@ -518,7 +573,16 @@ begin
 		call aandki (Memi[buf], mvalue, Memi[buf], npix)
 	    else if (mtype == M_BADVAL)
 		call abeqki (Memi[buf], mvalue, Memi[buf], npix)
-	    else if (mtype == M_GOODBITS) {
+	    else if (mtype == M_NOVAL) {
+		do i = 0, npix-1 {
+		    if (Memi[buf+i] == 0)
+			next
+		    if (Memi[buf+i] == mvalue)
+			Memi[buf+i] = 1
+		    else
+			Memi[buf+i] = 2
+		}
+	    } else if (mtype == M_GOODBITS) {
 		call aandki (Memi[buf], mvalue, Memi[buf], npix)
 		call abeqki (Memi[buf], 0, Memi[buf], npix)
 	    } else if (mtype == M_GOODVAL)
@@ -530,7 +594,7 @@ begin
 
 	    dflag = D_NONE
 	    do i = 1, npix
-		if (Memi[buf+i-1] == 0) {
+		if (Memi[buf+i-1] != 1) {
 		    dflag = D_MIX
 		    break
 		}
@@ -538,6 +602,7 @@ begin
 	    if (mtype == M_BOOLEAN || mtype == M_BADBITS) {
 		;
 	    } else if ((mtype == M_BADVAL && mvalue != 0) ||
+	        (mtype == M_NOVAL && mvalue != 0) ||
 		(mtype == M_GOODVAL && mvalue == 0)) {
 		;
 	    } else if (mtype == M_LTVAL && mvalue > 0) {
@@ -583,4 +648,31 @@ begin
 	    Memi[pms] = NULL
 	else
 	    Memi[pms+image-1] = NULL
+end
+
+
+# YT_PMLOAD -- This is like yt_mappm except it returns the mask pointer.
+
+pointer procedure yt_pmload (pmname, refim, match, mname, sz_mname)
+
+char    pmname[ARB]             #I Pixel mask name
+pointer refim                   #I Reference image pointer
+char    match[ARB]              #I Match by physical coordinates?
+char    mname[ARB]              #O Expanded mask name
+int     sz_mname                #O Size of expanded mask name
+pointer	pm			#R Pixel mask pointer
+
+int	imstati()
+pointer	im, yt_mappm()
+errchk	yt_mappm
+
+begin
+	im = yt_mappm (pmname, refim, match, mname, sz_mname)
+	if (im != NULL) {
+	    pm = imstati (im, IM_PMDES)
+	    call imseti (im, IM_PMDES, NULL)
+	    call imunmap (im)
+	} else
+	    pm = NULL
+	return (pm)
 end

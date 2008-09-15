@@ -49,7 +49,7 @@ modules, update them in the system libraries, and relink all executables.
 
 Enter the following values for the \fItermcap_file\fR and \fIoutput_file\fR
 parameters to build the termcap and graphcap cache files.  Note that for
-cacheing to work the value of \fItermcap_file\fR must match that of
+caching to work the value of \fItermcap_file\fR must match that of
 the \fItermcap\fR or \fIgraphcap\fR environment variable, hence do not
 enter "graphcap" rather than "dev$graphcap", just because you happen to
 be in the dev directory.
@@ -75,7 +75,7 @@ architectures, each architecture must be restored and relinked separately.
 Note that systems configured for multiple architecture support are
 shipped configured "generic", and you must restore an architecture before
 relinking or the entire IRAF system will be recompiled (which is time
-consuming, and inadvisable due to the possibilty of system or compiler
+consuming, and inadvisable due to the possibility of system or compiler
 differences introducing bugs into IRAF).
 
 After this finishes, log out and back in and you should notice the
@@ -107,3 +107,4 @@ If the limit is exceeded the affected TTY modules will fail to compile.
 .ih
 SEE ALSO
 showcap, IRAF Site Manager's Guide
+.endhelp

@@ -112,12 +112,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovkd (double(0.0), Memd[fptr], npts]
+		    call amovkd (double(0.0), Memd[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovkd (double(1.0), Memd[fptr], npts]
+		        call amovkd (double(1.0), Memd[fptr], npts)
 		    else
-		        call amovkd (double(0.0), Memd[fptr], npts]
+		        call amovkd (double(0.0), Memd[fptr], npts)
 		} else {
 	            call amuld (Memd[xnorm], Memd[fptr-npts], Memd[fptr],
 		        npts)
@@ -204,12 +204,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovkd (double(0.0), Memd[fptr], npts]
+		    call amovkd (double(0.0), Memd[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovkd (double(1.0), Memd[fptr], npts]
+		        call amovkd (double(1.0), Memd[fptr], npts)
 		    else
-		        call amovkd (double(0.0), Memd[fptr], npts]
+		        call amovkd (double(0.0), Memd[fptr], npts)
 		} else {
 		    ri = k
 		    ri1 = (double(2.0) * ri - double(3.0)) / (ri - double(1.0))

@@ -2,6 +2,17 @@
 .help revisions Nov93 nmisc
 .nf
 
+display/t_display.x
+    The change of 8/16/07 results in the ocolors parameter being used
+    in place of the bpcolors parameter.
+    (8/26/08, Valdes)
+
+display/dspmmap.x
+    This was originally a copy of the code from xtools.  This is now a
+    simple interface calling yt_mappm.  This supports the new WCS
+    pixel mask matching.
+    (1/9/08, Valdes)
+
 =============
 V2.12.4-V2.14
 =============

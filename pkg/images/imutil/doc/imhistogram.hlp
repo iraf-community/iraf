@@ -54,7 +54,7 @@ The output graphics device.
 DESCRIPTION
 \fIimhistogram\fR calculates the histogram of the IRAF image
 \fIimage\fR using the parameters \fInbins\fR, \fIz1\fR and \fIz2\fR.
-If either \fIz1\fR or \fIz2\fR is undefined the image mininum or
+If either \fIz1\fR or \fIz2\fR is undefined the image minimum or
 maximum is used.  If \fIlistout\fR = no, the histogram is plotted on
 the graphics device \fIdevice\fR in the vector mode specified by
 \fIplot_type\fR.  The plot may be log scaled if \fIlogy\fR = yes (the

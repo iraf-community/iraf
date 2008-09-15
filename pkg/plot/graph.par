@@ -7,7 +7,7 @@ wcs,s,h,"logical",,,Coordinate system for images
 axis,i,h,1,1,7,axis along which projection is to be taken
 transpose,b,h,no,,,transpose the x and y axes of the plot
 pointmode,b,h,no,,,plot points instead of lines?
-marker,s,h,"box",,,point marker character?
+marker,s,h,"box",,,point marker or line mode?
 szmarker,r,h,5E-3,,,marker size (0 for list input)
 ltypes,s,h,"",,,List of line types (1-4)
 colors,s,h,"",,,List of colors (1-9)

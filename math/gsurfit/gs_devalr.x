@@ -112,12 +112,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovkr (real(0.0), Memr[fptr], npts]
+		    call amovkr (real(0.0), Memr[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovkr (real(1.0), Memr[fptr], npts]
+		        call amovkr (real(1.0), Memr[fptr], npts)
 		    else
-		        call amovkr (real(0.0), Memr[fptr], npts]
+		        call amovkr (real(0.0), Memr[fptr], npts)
 		} else {
 	            call amulr (Memr[xnorm], Memr[fptr-npts], Memr[fptr],
 		        npts)
@@ -204,12 +204,12 @@ begin
 	    fptr = dfn
 	    do k = 1, order + nder {
 		if (k == 1)
-		    call amovkr (real(0.0), Memr[fptr], npts]
+		    call amovkr (real(0.0), Memr[fptr], npts)
 		else if (k == 2) {
 		    if (i == 1)
-		        call amovkr (real(1.0), Memr[fptr], npts]
+		        call amovkr (real(1.0), Memr[fptr], npts)
 		    else
-		        call amovkr (real(0.0), Memr[fptr], npts]
+		        call amovkr (real(0.0), Memr[fptr], npts)
 		} else {
 		    ri = k
 		    ri1 = (real(2.0) * ri - real(3.0)) / (ri - real(1.0))

@@ -24,7 +24,7 @@ Blink rate in seconds per frame.  May be any fraction of a second.
 .le
 .ih
 DESCRIPTION
-Two or more frames are alternatedly displayed on the image display monitor
+Two or more frames are alternately displayed on the image display monitor
 ("stdimage") at a specified rate per frame.
 .ih
 EXAMPLES

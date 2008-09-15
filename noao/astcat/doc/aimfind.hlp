@@ -2,7 +2,7 @@
 .ih
 NAME
 aimfind -- Select images containing catalog data and predict pixel coordinates
-	   for the catalog objects
+for the catalog objects
 .ih
 USAGE
 aimfind images output imfile
@@ -68,11 +68,11 @@ DESCRIPTION
 Aimfind selects those images from the input image list \fIimages\fR
 which contain one or more  catalog \fIcatalogs\fR objects and writes
 the resulting catalog records along with predicted pixel coordinates to
-\fIoutput\fR and the selected image name to \fimfile\fR. The input images
+\fIoutput\fR and the selected image name to \fIimfile\fR. The input images
 must contain a valid FITs wcs.
 
 For each input image aimfind determines the region of the sky covered 
-byt the image, formats the appropriate catalog query, makes a local or remote
+by the image, formats the appropriate catalog query, makes a local or remote
 connection to the catalog server using the catalog description in the
 catalog configuration file \fIcatdb\fR, and captures the results.
 Catalog names must be of the form catalog@site, e.g. lan92@noao.
@@ -88,7 +88,7 @@ and format of the catalog coordinates by setting the \fIfosystem\fR,
 \fIforaunits\fR, \fIfodecunits\fR, \fIforaformat\fR, and \fIfodecformat\fR
 parameters. At present the names, data types, units, and format of the
 predicted pixel coordinates computed by aimfind are fixed at "xp,yp",
-"d,d", "pixels,pixels", and "%10.3f,%10.3f" respectivley. A more detailed
+"d,d", "pixels,pixels", and "%10.3f,%10.3f" respectively. A more detailed
 description of the region filtering parameters can be obtained by typing
 "help afiltpars".
 

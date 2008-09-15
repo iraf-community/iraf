@@ -111,7 +111,7 @@ those concerned with locating stars in the image and computing accurate
 pixel centers \fIedatamin\fR, \fIedatamax\fR, \fIegain\fR, and \fIerdnoise\fR,
 and those required for transforming mean place coordinates to observed
 plate coordinates,
-\fIobservat\fR, \Iesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
+\fIobservat\fR, \fIesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
 \fIemjdobs\fR, \fIewavlen\fR, \fIetemp\fR, and \fIepress\fR. New keyword
 values are only added to the header if keywords of the same name do not
 already exist, and if appropriate values for the keywords exists, i.e.

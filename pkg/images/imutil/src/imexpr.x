@@ -981,9 +981,19 @@ begin
 
 	while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
 	    line = line + 1
-	    ip = lbuf
+
+	    # Replace single quotes by double quotes because things
+	    # should behave like the command line but this routine
+	    # uses ctotok which treats single quotes as character
+	    # constants.
+
+	    for (ip=lbuf; Memc[ip]!=EOS; ip=ip+1) {
+	        if (Memc[ip] == '\'')
+		    Memc[ip] = '"'
+	    }
 
 	    # Skip comments and blank lines.
+	    ip = lbuf
 	    while (IS_WHITE(Memc[ip]))
 		ip = ip + 1
 	    if (Memc[ip] == '\n' || Memc[ip] == '#')
@@ -1042,11 +1052,19 @@ skip_		while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
 	    
 	    repeat {
 		repeat {
-		    token = ctotok (Memc, ip, Memc[tokbuf], SZ_COMMAND)
+		    token = ctotok (Memc, ip, Memc[tokbuf+1], SZ_COMMAND)
 		    if (Memc[tokbuf] == '#')
 			break
-		    else if (token != TOK_EOS && token != TOK_NEWLINE)
-			call ie_puttok (a_st, text, op, buflen, Memc[tokbuf])
+		    else if (token != TOK_EOS && token != TOK_NEWLINE) {
+			if (token == TOK_STRING) {
+			    Memc[tokbuf] = '"'
+			    call strcat ("""", Memc[tokbuf], SZ_COMMAND)
+			    call ie_puttok (a_st, text, op, buflen,
+				Memc[tokbuf])
+			} else
+			    call ie_puttok (a_st, text, op, buflen,
+				Memc[tokbuf+1])
+		    }
 		} until (token == TOK_EOS)
 
 		if (getlline (fd, Memc[lbuf], SZ_COMMAND) == EOF)
@@ -1241,25 +1259,4 @@ begin
 
 	call sfree (sp)
 	return (noperands)
-end
-
-
-# IE_GSYM -- Get symbol routine for the gettok package.
-
-pointer procedure ie_gsym (st, symname, nargs)
-
-pointer	st			#I symbol table
-char	symname[ARB]		#I symbol to be looked up
-int	nargs			#O number of macro arguments
-
-pointer	sym
-pointer	strefsbuf(), stfind()
-
-begin
-	sym = stfind (st, symname)
-	if (sym == NULL)
-	    return (NULL)
-
-	nargs = SYM_NARGS(sym)
-	return (strefsbuf (st, SYM_TEXT(sym)))
 end

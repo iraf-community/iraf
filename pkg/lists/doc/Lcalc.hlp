@@ -94,7 +94,7 @@ Calling Sequence
 the program to be executed.  An additional set of positional arguments
 may be given; these are passed on to the program and are not used by
 \fBlcalc\fR itself.  A number of hidden parameters are available to
-modify the behaviour of the program.
+modify the behavior of the program.
 
 	lcalc (list, program [, p1,...,p9])
 
@@ -122,7 +122,7 @@ record.  The default field delimiters are blank and tab (denoted \t).
 .le
 .ls record_delim = "$"
 The \fIpattern\fR which delimits input records.  All of the usual pattern
-matching metacharacters are recognized.  The default is "$", meaning that
+matching meta-characters are recognized.  The default is "$", meaning that
 end of line delimits input records (each record is a line of the input list).
 Special record delimiters may be used to process multiline records.
 .le

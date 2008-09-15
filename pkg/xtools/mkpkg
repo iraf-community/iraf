@@ -50,6 +50,7 @@ libxtools.a:
 	isdir.x		<ctype.h> <finfo.h>
 	peaks.x	
 	ranges.x	<ctype.h> <mach.h>
+	rmmed.x		<pkg/rmsorted.h> <mach.h>
 	rmsorted.x	<pkg/rmsorted.h>
 	rmturlach.x	<mach.h>
 	rngranges.x	<ctype.h> <mach.h>
@@ -60,6 +61,7 @@ libxtools.a:
 	xt21imsum.x	<imhdr.h>
 	xtanswer.x	<pkg/xtanswer.h>
 	xtargs.x	<ctotok.h>
+	xtbitarray.x	<mach.h>
 	xtextns.x       <ctype.h> <error.h> <mach.h> <pkg/mef.h>
 	xtgids.x	<ctotok.h>
 	xtimleneq.x	<imhdr.h>

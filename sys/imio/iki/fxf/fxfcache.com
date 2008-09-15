@@ -19,5 +19,6 @@ int	rf_hdr[MAX_CACHE]		# FITS Primary header data
 int	rf_fitslen[MAX_CACHE]		# Size Primary header data
 char	rf_fname[SZ_PATHNAME,MAX_CACHE] # Header file pathname
 
+common /fxflcachec/ rf_time, rf_mtime
 common /fxfcachec/ rf_cachesize, rf_fit, rf_hdrp, rf_pixp, rf_pextn,
-       rf_pextv, rf_lru,rf_time, rf_mtime, rf_hdr, rf_fitslen, rf_fname
+       rf_pextv, rf_lru, rf_hdr, rf_fitslen, rf_fname

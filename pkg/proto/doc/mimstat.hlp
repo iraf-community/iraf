@@ -64,7 +64,7 @@ The statistical quantities specified by the parameter \fIfields\fR are
 computed and printed for each image in the list specified by \fIimages\fR.
 The results are printed in tabular form with the fields listed in the order
 they are specified in the fields parameter. The available fields are the
-following.
+following:
 
 .nf
 	 image - the image name
@@ -161,7 +161,7 @@ distribution.
 Note that the first two examples are equivalent so there is no need to
 specify the input mask section in the second case.
 
-4. Compute the image statistics using interative rejection and save the
+4. Compute the image statistics using interactive rejection and save the
 rejected pixel mask.
 
 .nf

@@ -52,9 +52,15 @@ labels is used.
 .ls pointmode = no
 Plot individual points instead of a continuous line?
 .le
-.ls marker="box"
-If \fBpointmode\fR = yes, the marker drawn at each point is set with this
-parameter.  Acceptable choices are "point", "box", "plus", "cross" and "circle".
+.ls marker = "box"
+Marker or line type to be drawn.  If \fBpointmode\fR = yes the markers are
+"point", "box", "cross", "plus", "circle", "hebar", "vebar", "hline",
+"vline" or "diamond".  Any other value defaults to "box".  If drawing lines,
+\fBpointmode\fR = no, the values are "line", "lhist", "bhist".  Any other
+value defaults to "line".  "bhist" (box histogram) draws lines to the
+bottom of the graph while "lhist" does not.  In both cases the
+horizontal histogram lines run between the half way points (reflected
+at the ends).
 .le
 .ls szmarker = 0.005
 The size of the marker drawn when \fBpointmode\fR = yes.

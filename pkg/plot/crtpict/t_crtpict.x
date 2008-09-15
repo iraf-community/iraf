@@ -116,7 +116,7 @@ begin
 		if (!streq (Memc[word], "plot")) {
 		    # Pixel window has been stored as WCS 2
 		    call gseti (gp, G_WCS, 2)
-		    call gscan (Memc[command])
+		    call gscan (gp, Memc[command])
 		    next
 		} else 
 		    call gargwrd (Memc[image], SZ_FNAME)

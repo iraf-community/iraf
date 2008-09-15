@@ -4,7 +4,11 @@ $call	relink				# make ecl.e in current directory
 $exit
 
 update:					# make ecl.e and install in bin$
-	$call	libs@readline
+        $ifeq (MACH, sparc) then
+        $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
+        $else
+        $call   libs@readline
+        $endif
 	$call	relink
 	$call	install
 	;

@@ -27,6 +27,14 @@ The optional list of reference masks. If the reference mask list is defined
 there must be one reference mask for every output mask. The reference mask
 operand name is "m" and the associated reference image keywords are
 referred to as "m.<keyword>".
+
+If both a reference image and reference mask are defined the reference mask will
+be matched to reference image as described by the help topic \fBpmmatch\fR.
+The application default is a match in "logical" coordinates which is
+effectively a trim or pad operation to match the size of the reference image.
+However, by use of the "pmmatch" environment variable one may match in
+"physcial" or "world" coordinates.  Note that the simple expression
+"m" may be used to create an output mask file from the internal matching.
 .le
 .ls dims = "512,512"
 The default output mask dimensions. The value of dims is a comma delimited
@@ -63,6 +71,35 @@ Evaluation of the mask expression is carried out one line at a time. This
 is efficient and permits operations on masks with large reference images
 to be carried out efficiently without using excessive memory. The entire
 expression is evaluated once per line of the output mask.
+
+\fBReference Images and Masks\fR
+
+In most cases one wants to make output masks to associate with images.
+The reference image list provides a reference image which is used to
+define the size and some of the header for the output mask.  Note that
+a reference mask may be used for this purpose if no reference image
+is specified.
+
+Sometimes one may want to merge previous mask information into the output
+mask.  The reference mask can be used for this purpose using the operand
+"m" in the expressions.
+
+When both a reference image and a reference mask are specified another
+useful feature is provided.  This consists of matching the reference
+mask to the reference image even when the two are of different sizes or
+are related not "pixel-by-pixel" but through various transformations.
+The matching feature is described in the help topic \fBpmmatch\fR.
+(Note that the default for matching in world coordinates results in
+boolean mask values so if the actual mask values are needed the pmmatch
+setting must be set appropriately.)  The application default is a match
+in "logical" coordinates which is effectively a trim or pad operation to
+match the size of the reference image.  However, by use of the "pmmatch"
+environment variable one may match in "physcial" or "world" coordinates.
+
+This task is one way to create a matched mask for tasks that do not
+do the matching.  The simple expression "m" when both a reference image
+and reference mask are specified will output a mask from for the reference
+image that is match in logical pixel space.
 
 \fBOperands\fR
 
@@ -395,6 +432,16 @@ cmpie (256., 256., 50., 0., 30.) ? 1 : 0
 cl> mskexpr @expr.dat mask.pl "" exprdb=myexpr.db
 .fi
 
+6.  A set of dithered images have been transformed to a common world
+coordinate system, stacked, and a mask created for the sources.  To
+create a boolean mask for one of the images from the deep source mask:
+
+.nf
+cl> set pmmatch="world"
+cl> mskexpr "m" mask1.pl exp1 refmask=stackmask
+.fi
+
+
 .ih
 TIME REQUIREMENTS
 
@@ -403,5 +450,5 @@ BUGS
 
 .ih
 SEE ALSO
-imexpr, mskregions
+imexpr, mskregions, pmmatch
 .endhelp

@@ -52,7 +52,7 @@ begin
 	# Review parameters if desired.
 	if (review) {
 	    eparam ("quadred")
-	    eparam ("ccdproc")
+	    eparam ("qccdproc")
 	    eparam ("quadproc")
 	}
 end

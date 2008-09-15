@@ -34,7 +34,7 @@ is given in the configuration file section.
 .le
 .ls parameters
 The name of the output database file.
-Parameters is a text database file to which the error anaysis of the fit
+Parameters is a text database file to which the error analysis of the fit
 and the parameter values and errors for each transformation equation are
 written. 
 The output of fitparams is appended to parameters as a set of new records,
@@ -183,7 +183,7 @@ object id which can be
 used to match the observational data with the corresponding catalog data.
 All other columns may contain any quantity which can be
 expressed as an integer or real number.  Sexagesimal format numbers
-(hh:mmm:ss) are interpreted internally as real numbers. The constant
+(hh:mm:ss) are interpreted internally as real numbers. The constant
 INDEF can be used to represent data that is missing or undefined.
 Double precision and complex data are
 not supported. Lines beginning with "#" are treated as comment lines.
@@ -194,7 +194,7 @@ or non-interactively depending on the value of \fIinteractive\fR,
 and writes the solution in the output file \fIparameters\fR for later
 use by the evaluation routines EVALFIT or INVERTFIT.
 Selected results can also be written to \fIlogfile\fR if
-any of the switchs \fIlog_unmatched\fR, \fIlog_fit\fR, or \fIlog_results\fR
+any of the switches \fIlog_unmatched\fR, \fIlog_fit\fR, or \fIlog_results\fR
 are enabled.
 In interactive mode the user can use all the interactive capabilities
 of the interactive non-linear least squares package INLFIT.
@@ -334,7 +334,7 @@ DESCRIPTION
 
 INLFIT fits an n-dimensional function to a set data
 points, iterating until the reduced chi-squared changes
-by less than \fItolerance\fR percent between sucessive iterations, or
+by less than \fItolerance\fR percent between successive iterations, or
 machine precision is reached and the fit converges, or until the maximum number
 of iterations \fImaxiter\fR is reached.  If the maximum number
 of iterations is reached before convergence a status flag
@@ -375,7 +375,7 @@ be found in the following two references.
 CURSOR COMMANDS
 
 The following interactive cursor keystroke commands are available from
-with the INLFIT paclage.
+with the INLFIT package.
 .ls ?
 The terminal is cleared and a menu of cursor keystroke and colon commands
 is printed.
@@ -398,7 +398,7 @@ Redefine the graph keys "h-l" from their defaults. A prompt is issued for the
 graph key to be redefined. Another prompt is issued for the data to be
 plotted at which point the user must enter the x and y axis data to plot,
 delimited by a comma. The data types are the following (they can be
-abreviated to up to three characters).
+abbreviated to up to three characters).
 .nf
 
     function    Dependent variable or function
@@ -419,7 +419,7 @@ to know the variable order in this case). The ":variables" command will
 list the currently defined variables by name and number.
 The application program may
 define any number of plot equations aside from the defaults provided. In this 
-case the user may refence them by "user n", where "n" is the plot function 
+case the user may reference them by "user n", where "n" is the plot function 
 number (the user must know the equation order in this case). 
 .le
 .ls h, i, j, k, l

@@ -9,7 +9,7 @@ wcscopy images refimages
 PARAMETERS
 .ls images
 The list of input images which will inherit the wcs of the reference image.
-If the image does not exists a datal-less image header is created.
+If the image does not exists a dataless image header is created.
 .le
 .ls reference
 The list of reference images containing the reference wcs. The number of

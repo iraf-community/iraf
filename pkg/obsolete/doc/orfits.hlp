@@ -95,7 +95,7 @@ to hold all the FITS parameter cards being read in by ORFITS.
 Since the default user area is 8000
 characters and a single card image is 81 characters long, the normal
 user area will hold 98 complete card images. ORFITS will not permit
-partial cards to be written. The user can overide the default user area
+partial cards to be written. The user can override the default user area
 length by setting the environment variable min_lenuserarea (see example
 below).
 .ih

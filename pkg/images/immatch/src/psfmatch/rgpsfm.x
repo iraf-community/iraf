@@ -121,8 +121,8 @@ pointer	sp, str, coeff, dim, rbuf, ibuf, rsum, isum, border
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope, reffft, imfft, fft
 real	rwtsum, iwtsum, rscale, iscale, rnscale, inscale
 bool	fp_equalr()
-int	rg_pstati(), rg_pgdata(), rg_border(), rg_szfft()
-pointer	rg_pstatp()
+int	rg_pstati(), rg_border(), rg_szfft()
+pointer	rg_pstatp(), rg_pgdata()
 real	rg_pstatr(), rg_pnsum(), rg_pg1norm(), rg_pg2norm()
 real	rg_pg10f(), rg_pg20f()
 

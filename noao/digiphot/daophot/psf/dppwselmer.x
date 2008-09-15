@@ -67,7 +67,7 @@ begin
 
 	# Add the image name nad maxnpsf parameters.
 	call dp_imroot (image, Memc[str], SZ_FNAME)
-	call dp_sparam (tp, "IMAGE", Memc[str], "name", "")
+	call dp_sparam (tp, "IMAGE", Memc[str], "imagename", "")
 	call dp_iparam (tp, "MAXNPSF", maxnpsf, "number", "")
 	call dp_rparam (tp, "NEWSCALE", scale, "units", "")
 	call dp_rparam (tp, "PSFRAD", psfrad, "scaleunit", "")

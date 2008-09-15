@@ -54,13 +54,13 @@ begin
 	    DP_DATA (allstar) = subim
 
 	    # The scratch image.
-	    call mktemp ("subt", Memc[temp], SZ_FNAME]
+	    call mktemp ("subt", Memc[temp], SZ_FNAME)
 	    DP_SUBT (allstar) = immap (Memc[temp], NEW_COPY, im)
 	    IM_NDIM(DP_SUBT(allstar)) = 2
 	    IM_PIXTYPE(DP_SUBT(allstar)) = TY_REAL
 
 	    # The weights image.
-	    call mktemp ("wt", Memc[temp], SZ_FNAME]
+	    call mktemp ("wt", Memc[temp], SZ_FNAME)
 	    DP_WEIGHTS (allstar) = immap (Memc[temp], NEW_COPY, im)
 	    IM_NDIM(DP_WEIGHTS(allstar)) = 2
 	    IM_PIXTYPE(DP_WEIGHTS(allstar)) = TY_REAL

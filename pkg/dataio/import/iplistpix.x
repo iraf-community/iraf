@@ -115,7 +115,7 @@ begin
 	    	do j = 1, ndim {	        # X, Y, Z, etc.
 	    	    call printf (Memc[fmtptrs[j]])
 	    	    if (laxno[j] == 0)
-	    	        call pargd[double(vcoords[j])]
+	    	        call pargd (double(vcoords[j]))
 	    	    else
 	    	        call pargd (outcoords[laxno[j]])
 	    	}

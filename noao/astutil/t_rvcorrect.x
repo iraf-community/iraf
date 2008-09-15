@@ -214,6 +214,8 @@ begin
 	        call imgstr (im, Memc[datop], Memc[date], SZ_LINE)
 		if (dtm_decode (Memc[date], year, month, day, hjd, flags)==ERR)
 		    call error (1, "Error parsing DATE-OBS keyword")
+		if (!IS_INDEFD(hjd))
+		    ut = hjd
 
 	        ra = imgetd (im, Memc[rap])
 	        dec = imgetd (im, Memc[decp])

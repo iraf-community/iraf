@@ -58,7 +58,7 @@ Print task status messages ?
 DESCRIPTION
 
 Mskregions reads a list of region specifications from the input files
-\fIregions\fR and writes tthe results to the output masks \fImasks\fR image.
+\fIregions\fR and writes the results to the output masks \fImasks\fR image.
 The number of regions files must be on or equal to the number of output
 masks. The size of the output mask is determined by the reference image
 \fIrefimages\fR if any \fIrefmasks\fR if any or the values in the
@@ -128,7 +128,7 @@ set of operators:
 .fi
 
 
-\fBFunctions Used in Region Expressons\fR
+\fBFunctions Used in Region Expressions\fR
 
 Mskexpr supports a group of boolean region functions which can be used to set
 values inside or outside of certain geometric shapes. The routines may be

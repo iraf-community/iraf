@@ -32,7 +32,7 @@ output is selected and the list length exceeds 255 characters (the
 size of a CL string) the task will abort with an error.
 .le
 .ls index = "1-"
-Extension index range list.  The range list syntax is specifed under the
+Extension index range list.  The range list syntax is specified under the
 help topic \fBranges\fR.  Note that the range list may be specified that
 includes 0 to select the primary image header in FITS files.
 .le

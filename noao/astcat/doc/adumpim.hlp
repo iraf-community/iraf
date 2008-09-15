@@ -14,7 +14,7 @@ stored in a record called imsurvey in the image survey configuration file.
 .le
 .ls output
 The name of the output query results file. The query results are written
-to the output file without modification, but at present they are implictly
+to the output file without modification, but at present they are implicitly
 assumed to be in fits format. Users should append a ".fits" extension to
 the output file name if they wish the output file to be visible to IRAF
 as a FITS image.

@@ -1,6 +1,10 @@
 .help revisions Sep01 noao.astcat
 .nf
 
+astcat$src/attools/atcathdr.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
 =======
 V2.13
 =======

@@ -25,7 +25,7 @@ real	datamin, datamax, back
 bool	clgetb()
 double	clgetd(), imgetd()
 int	clpopnu(), clplen(), imtopenp(), imtlen(), clgeti(), clgwrd(), strlen()
-int	sk_decwcs(), open(), clgfil(), imtgetim(), strncmp(), ctod()
+int	sk_decwcs(), sk_decim(), open(), clgfil(), imtgetim(), strncmp(), ctod()
 int	cc_listran(), strdic(), cc_rdproj()
 real	clgetr()
 pointer	immap(), cc_mkwcs()
@@ -212,7 +212,7 @@ begin
 
 		# Read the image wcs, skipping to the next image if the wcs
 		# is unreadable.
-	        refstat = sk_decwcs (Memc[image], mw, refcoo, NULL) 
+	        refstat = sk_decim (im, Memc[image], mw, refcoo)
 	        if (refstat == ERR || mw == NULL) {
 		    if (verbose && out != STDOUT)
 	                call printf (

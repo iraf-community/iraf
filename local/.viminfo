@@ -7,11 +7,118 @@
 
 # hlsearch on (H) or off (h):
 ~H
+# Last Search Pattern:
+~MSle0~/len, 
+
+# Last Substitute Search Pattern:
+~MSle0&^
+
+# Last Substitute String:
+$pkg\/
+
 # Command Line History (newest to oldest):
-:n
+:wq
+:w /tmp/zfioks.c
+:w!
+:1
 :w
+:q!
+:n
+:.,$d
+:q
+:set ai
+:set wm=10
+:e#
+:'a,.ya a
+:e ../images/Revisions
+:set sw=4
+:w! pnd.tcl
+:e reidentify.hlp
+:e apsum.hlp
+:'a,'bmo.
+:r /tmp/t
+:rew
+:f
+:set ic
+:.,.+7!fmt
+:.,.+5!fmt
+:!}fmt
+:e rmmed.x
+:q1
+:r /tmp/_j
+:189
+:139
+:844
+:728
+:620
+:397
+:288
+:204
+:$
+:.,.+11!fmt
+:'a,.d
+:.,$s/^/pkg\//g
+:r /tmp/_d
+:w /tmp/_u
+:w foo
+:e masks/mptools.x
+:e mptool.x
+:e mptools.x
+:sw=4
+:e!#
+:1,$s/mii/i_mii/g
 
 # Search String History (newest to oldest):
+?len, 
+?version
+?shh
+?comparision
+?commnt
+?commitin
+?bafkeyw
+?appropia
+?commen
+?boolen
+?he_
+?he_edit
+?he_initf
+?he_addf
+?he_cpstr
+?he_del
+?he_deletef
+?he_gval
+?he_setpar
+?he_pargstrc
+?he_updatef
+?setpar
+?setdef
+?he_doit
+?med
+?imcmb
+?IMCMB
+?eprint
+?vtyp
+?mii
+?more
+?answer
+?shift
+?step
+?the a
+?the the
+?Cheb
+?nsum
+?multislit1
+?lsig
+?weights
+?backg
+?skybo
+?nfind
+?nusm
+?extr
+?recent
+?usni
+?Efficent
+?standar 
 
 # Expression History (newest to oldest):
 
@@ -20,65 +127,245 @@
 # Input Line History (newest to oldest):
 
 # Registers:
+"0	LINE	0
+	imred$src/fibers/skysub.cl
+"1	LINE	0
+	    hb.rhux.tar.gz    V2.14.1	   PC-IRAF Redhat Linux HSI binaries
+"2	LINE	0
+	    README		           This file
+"3	LINE	0
+	    README		           This file
+"4	LINE	0
+	    hb.ssol.x86.gz
+"5	LINE	0
+	hs.ssol.gen.Z
+"6	LINE	0
+	hs.pcix.gen.gz
+"7	LINE	0
+	    README		     This file
+"8	LINE	0
+		hs.pcix.gen   V2.14.1	PC-IRAF sources (Linux/MacOSX/Cygwin)
+"9	LINE	0
+		$call	libs@readline
+"a	LINE	0
+	
+	images$imutil/src/t_imstat.x
+	    The clipping calculation was resetting the user supplied pixel limits.
+	    Instead, any clipping limits need to remain bounded by the user
+	    limits.
+	    (7/15/08, Valdes)
 ""-	CHAR	0
-		
+	Cygwin
 
 # File marks:
-'0  16  29  /u3/iraf/iraf.v214/iraf/unix/hlib/mkpkg.inc
-'1  38  29  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
-'2  23  28  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
+'0  20  50  /d1/v214/PORT/README
+'1  23  14  /d1/v214/PORT/README
+'2  19  19  /d1/v214/PORT/CHECKSUMS
+'3  13  12  /u1/ftp/iraf/v214/zzsums
+'4  18  0  /u1/ftp/iraf/v214/zzsums
+'5  1  50  /u3/iraf/iraf.v214/iraf/unix/hlib/motd
+'6  1  0  /d1/v214/PORT/README
+'7  7  0  /d1/v214/PORT/CHECKSUMS
+'8  13  16  /d1/v214/PORT/z
+'9  8  19  ~/login.cl
 
 # Jumplist (newest first):
--'  16  29  /u3/iraf/iraf.v214/iraf/unix/hlib/mkpkg.inc
--'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/mkpkg.inc
--'  38  29  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
+-'  20  50  /d1/v214/PORT/README
+-'  23  4  /d1/v214/PORT/README
+-'  1  0  /d1/v214/PORT/README
+-'  19  19  /d1/v214/PORT/CHECKSUMS
+-'  32  28  /d1/v214/PORT/CHECKSUMS
+-'  4  10  /d1/v214/PORT/CHECKSUMS
+-'  5  7  /d1/v214/PORT/CHECKSUMS
+-'  7  0  /d1/v214/PORT/CHECKSUMS
+-'  13  12  /u1/ftp/iraf/v214/zzsums
+-'  18  0  /u1/ftp/iraf/v214/zzsums
+-'  1  0  /u1/ftp/iraf/v214/zzsums
+-'  1  50  /u3/iraf/iraf.v214/iraf/unix/hlib/motd
+-'  2  4  /u3/iraf/iraf.v214/iraf/unix/hlib/motd
+-'  47  0  /d1/v214/PORT/README
+-'  1  0  /d1/v214/PORT/CHECKSUMS
+-'  13  16  /d1/v214/PORT/z
+-'  1  0  /d1/v214/PORT/z
+-'  8  19  ~/login.cl
+-'  7  13  ~/login.cl
+-'  14  0  ~/login.cl
+-'  5  4  /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
+-'  18  8  ~/login.cl
+-'  1  0  ~/login.cl
+-'  620  44  ~/notes.v214
+-'  619  0  ~/notes.v214
+-'  7  8  /u3/iraf/iraf.v214/iraf/pkg/ecl/mkpkg
+-'  1  0  /u3/iraf/iraf.v214/iraf/pkg/ecl/mkpkg
+-'  615  0  ~/notes.v214
+-'  15  0  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  261  26  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  198  26  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  159  12  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  137  10  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  60  9  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  1  0  /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+-'  600  0  ~/notes.v214
+-'  606  0  ~/notes.v214
+-'  26  18  /u3/iraf/iraf.v214/zzmake
+-'  36  0  /u3/iraf/iraf.v214/zzmake
+-'  602  0  /tmp/_p
+-'  1  0  /tmp/_p
+-'  9  12  ~/notes.v214
+-'  76  13  ~/notes.v214
+-'  27  9  ~/notes.v214
+-'  605  0  ~/notes.v214
+-'  595  4  ~/notes.v214
+-'  39  0  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
 -'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
--'  5  29  /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
--'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
--'  23  28  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  23  23  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  23  28  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  23  23  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  38  29  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
--'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
--'  5  29  /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
--'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
--'  23  28  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  23  23  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  23  28  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
--'  23  23  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
--'  1  0  /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
+-'  1  0  /u3/iraf/iraf.v214/zzmake
+-'  288  39  /u3/iraf/iraf.v214/iraf/pkg/xtools/xtextns.x
+-'  1  0  /u3/iraf/iraf.v214/iraf/pkg/xtools/xtextns.x
+-'  592  4  ~/notes.v214
+-'  573  36  ~/notes.v214
+-'  582  0  ~/notes.v214
+-'  15  96  /u3/iraf/iraf.v214/iraf/unix/hlib/libc/stdarg.h
+-'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/libc/stdarg.h
+-'  569  0  ~/notes.v214
+-'  131  0  /u3/iraf/iraf.v214/iraf/unix/os/zfioks.c
+-'  1  0  /u3/iraf/iraf.v214/iraf/unix/os/zfioks.c
+-'  131  0  /u3/iraf/iraf.v212DEV/iraf/unix/os/zfioks.c
+-'  1  0  /u3/iraf/iraf.v212DEV/iraf/unix/os/zfioks.c
+-'  52  35  /u3/iraf/iraf.v214/iraf/unix/hlib/irafuser.csh
+-'  53  4  /u3/iraf/iraf.v214/iraf/unix/hlib/irafuser.csh
+-'  1  0  /u3/iraf/iraf.v214/iraf/unix/hlib/irafuser.csh
+-'  31  0  /u3/iraf/iraf.v214/iraf/unix/os/zgtime.c
+-'  1  0  /u3/iraf/iraf.v214/iraf/unix/os/zgtime.c
+-'  477  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  280  28  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  478  29  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  154  37  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  431  11  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  213  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  469  13  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  153  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  119  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/doc/nhedit.hlp
+-'  510  0  ~/notes.v214
+-'  10  16  /u3/iraf/iraf.v214/iraf/pkg/images/Revisions
+-'  11  0  /u3/iraf/iraf.v214/iraf/pkg/images/Revisions
+-'  5  13  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/nhedit.par
+-'  1  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/nhedit.par
+-'  591  32  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  562  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  528  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  524  10  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  485  32  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  456  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  353  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  347  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  333  10  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  332  33  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  326  0  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  302  32  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  300  7  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  260  11  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  246  10  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  128  3  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  574  15  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  283  12  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
+-'  433  4  /u3/iraf/iraf.v214/iraf/pkg/images/imutil/src/nhedit.x
 
 # History of marks within files (newest to oldest):
 
-> /u3/iraf/iraf.v214/iraf/unix/hlib/mkpkg.inc
-	"	16	29
-	^	16	28
-	.	16	29
+> /d1/v214/PORT/README
+	"	20	50
+	^	20	51
+	.	20	50
+
+> /d1/v214/PORT/CHECKSUMS
+	"	19	19
+	^	32	29
+	.	19	19
+
+> /u1/ftp/iraf/v214/zzsums
+	"	13	12
+	^	13	13
+	.	13	12
+
+> /u3/iraf/iraf.v214/iraf/unix/hlib/motd
+	"	1	50
+	^	1	51
+	.	1	50
+
+> /d1/v214/PORT/z
+	"	13	16
+	^	13	17
+	.	13	16
+
+> ~/login.cl
+	"	8	19
+	^	8	20
+	.	8	19
 
 > /u3/iraf/iraf.v214/iraf/unix/hlib/login.cl
-	"	5	29
-	^	5	30
-	.	5	29
+	"	5	4
+	^	5	41
+	.	5	40
 
-> /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
-	"	38	29
-	^	38	37
-	.	38	36
+> ~/notes.v214
+	"	620	44
+	^	620	45
+	.	620	44
 
-> /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
-	"	23	23
-	^	23	31
-	.	23	23
+> /u3/iraf/iraf.v214/iraf/pkg/ecl/mkpkg
+	"	7	8
+	.	7	0
+
+> /u3/iraf/iraf.v214/iraf/unix/boot/mkpkg/scanlib.c
+	"	15	0
+	^	59	10
+	.	59	9
+
+> /u3/iraf/iraf.v214/zzmake
+	"	26	18
+	^	26	19
+	.	26	18
+
+> /tmp/_p
+	"	602	0
+	.	29	0
 
 > /u3/iraf/iraf.v214/iraf/pkg/ecl/cl.par
-	"	23	28
-	^	23	29
-	.	23	28
+	"	23	34
+	^	23	35
+	.	23	33
+
+> /u3/iraf/iraf.v214/iraf/pkg/cl/cl.par
+	"	23	33
+	^	23	34
+	.	23	33
+
+> /u3/iraf/iraf.v214/iraf/unix/hlib/zzsetenv.def
+	"	39	0
+	^	38	33
+	.	38	31
+
+> /u3/iraf/iraf.v214/iraf/pkg/xtools/xtextns.x
+	"	288	39
+	^	288	40
+	.	288	39
+
+> /u3/iraf/iraf.v214/iraf/unix/hlib/libc/stdarg.h
+	"	15	96
+	^	15	97
+	.	15	96
+
+> /u3/iraf/iraf.v214/iraf/unix/os/zfioks.c
+	"	131	0
+	^	131	0
+	.	130	6
+
+> /u3/iraf/iraf.v212DEV/iraf/unix/os/zfioks.c
+	"	131	0
+	^	131	0
+	.	130	6
+
+> /u3/iraf/iraf.v214/iraf/unix/hlib/irafuser.csh
+	"	52	35
+	^	52	36
+	.	52	35

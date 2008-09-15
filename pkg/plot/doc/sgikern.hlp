@@ -58,7 +58,7 @@ SGK metacode instructions, i.e.:
 All coordinates are specified in GKI NDC units in the range 0-32767.  Note that
 all metacode instructions are the same length.  All text generation, line type
 emulation, mark drawing, etc., is done in the higher level IRAF software.
-The metacode file is a standard IRAF random access (non record sructured)
+The metacode file is a standard IRAF random access (non record structured)
 binary file.
 
 The \fBbitmap format\fR written by the SGK is even simpler than the metacode

@@ -9,6 +9,7 @@ update task [task ...]
 PARAMETERS
 .ls task
 An IRAF task name.
+.le
 .ih
 DESCRIPTION
 Normally when a task terminates the values of the task parameters used

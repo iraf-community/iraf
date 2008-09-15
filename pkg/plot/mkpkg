@@ -44,6 +44,7 @@ libpkg.a:
 
 	gdevices.x
 	getdata.x	<imhdr.h>
+	hgpline.x	<gset.h>
 	improject.x	<imhdr.h>
 	impprofile.x	<gset.h> <math/iminterp.h>
 	impstatus.x

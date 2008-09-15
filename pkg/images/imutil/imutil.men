@@ -1,5 +1,6 @@
       chpixtype - Change the pixel type of a list of images
           hedit - Header editor
+         nhedit - Edit image header using a command file
         hselect - Select a subset of images satisfying a boolean expression
 	imarith - Simple image arithmetic
          imcopy - Copy an image

@@ -57,7 +57,7 @@ The coordinate system of the input coordinates read from \fIphotfile\fR, of the
 psf model \fIpsfimage\fR, and of the output coordinates written to
 the standard output if \fIverbose\fR = "yes". The image header coordinate
 system is used to transform from the input coordinate system to the "logical"
-pixel coordinate system used internally, from the internal logicial system to
+pixel coordinate system used internally, from the internal logical system to
 the PSF model system, and from the internal "logical" pixel coordinate system
 to the output coordinate system. The input coordinate system options are
 "logical", tv", "physical", and "world". The PSF model and output coordinate
@@ -106,10 +106,9 @@ The wcsin, wcspsf, and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
-package parameter (the default), "yes", or "no". By default cacheing is
+package parameter (the default), "yes", or "no". By default caching is
 disabled.
 .le
 .ls verify = ")_.verify"
@@ -137,9 +136,9 @@ The input photometry list can be the output from of the PEAK, NSTAR or ALLSTAR
 tasks or even the PHOT task although most people would not want to use the PHOT
 output for this purpose.
 
-Selected stars may be ommitted from the subtraction by supplying their ids in
+Selected stars may be omitted from the subtraction by supplying their ids in
 the file \fIexfile\fR. \fIExfile\fR is normally the output the PSTSELECT task
-and is used to tell SUBSTAR to subtract the PSF star neighbours, but not the
+and is used to tell SUBSTAR to subtract the PSF star neighbors, but not the
 PSF stars themselves.
 
 The coordinates read from \fIphotfile\fR are assumed to be in coordinate
@@ -165,26 +164,26 @@ mosaic pieces with coordinates in the parent image must use the "tv" or
 
 If \fIcache\fR is yes and the host machine physical memory and working set size
 are large enough the input and output image pixels are cached in memory. If
-cacheing is enabled and SUBSTAR is run interactively the first subtraction
+caching is enabled and SUBSTAR is run interactively the first subtraction
 will appear to take a long time as the entire image must be read in before
 the measurement is actually made. All subsequent measurements will be very
-fast because SUBSTAR is accessing memory not disk. The point of cacheing is
+fast because SUBSTAR is accessing memory not disk. The point of caching is
 to speed up random image access by making the internal image i/o buffers the
 same size as the image itself. However if the input object lists are sorted
-in row order which SUBSTAR does internally  and are sparse cacheing may
+in row order which SUBSTAR does internally  and are sparse caching may
 actually worsen not improve the execution time. Also at present there is no
-point in enabling cacheing for images that are less than or equal to 524288
+point in enabling caching for images that are less than or equal to 524288
 bytes, i.e. the size of the test image dev$ypix, as the default image i/o
 buffer is exactly that size. However if the size of dev$ypix is doubled by
 converting it to a real image with the chpixtype task then the effect of
-cacheing in interactive is can be quite noticeable if measurements
-of objects in the top and bottom halfs of the image are alternated.
+caching in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halves of the image are alternated.
 
 
 The SUBSTAR task is most commonly used to check on the quality of the PSF
 fitting produced by PEAK and NSTAR, to search for non-stellar objects and close
 binary stars, to generate an improved PSF in crowded fields, and to remove
-neighbours from bright stars which are to be used to determine aperture
+neighbors from bright stars which are to be used to determine aperture
 corrections.
 
 .ih

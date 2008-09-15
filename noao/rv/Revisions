@@ -1,6 +1,12 @@
 .help revisions May92 noao.rv
 .nf
 
+rvrvcor.x
+	Changed the rv_parse_timed() procedure to permit DATE-OBS strings.
+	This is used to parse the time from UT/UTMIDDLE keywords, the change
+	allows these to be in DATE-OBS format rather than restrict them
+	to being sexigesimal strings.  (7/25/08)
+
 filtpars.x
 	Fixed an error in the filtpars code where missing braces meant
 	that a command such as ":cutoff" would not work when filtering

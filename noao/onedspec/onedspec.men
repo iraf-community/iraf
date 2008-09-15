@@ -27,7 +27,7 @@
      setairmass - Compute effective airmass and middle UT for an exposure
           setjd - Compute and set Julian dates in images
            sfit - Fit spectra and output fit, ratio, or difference
-          sflip - Flip data ano/or dispersion coordinates in spectra
+          sflip - Flip data and/or dispersion coordinates in spectra
         sinterp - Interpolate a table of x,y pairs to create a spectrum
        skytweak - Sky subtract 1D spectra after tweaking sky spectra
           slist - List spectrum header parameters

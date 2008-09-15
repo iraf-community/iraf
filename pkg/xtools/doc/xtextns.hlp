@@ -107,7 +107,7 @@ stripped and then appended on the output.  For example, name[1:10,1:10]
 might expand to name[im1][1:10,1:10], name[im2][1:10,1:10], etc.
 
 \fIerr\fR may be used to print error messages when a particular image
-index fails to be openned.  Typically this would be to find nonexistant
+index fails to be opened.  Typically this would be to find nonexistant
 or read-protected images and files.
 .ih
 SEE ALSO

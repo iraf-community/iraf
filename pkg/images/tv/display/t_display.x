@@ -729,10 +729,10 @@ begin
 		}
 		if (si_bpovrly != NULL) {
 		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
-		    call maskexprn (ocolors, in, nx)
+		    call maskexprn (bpcolors, in, nx)
 		    do i = 0, nx-1 {
 			if (Memi[in+i] != 0) {
-			    color = maskcolor (ocolors, Memi[in+i])
+			    color = maskcolor (bpcolors, Memi[in+i])
 			    if (color >= 0)
 				Mems[out+i] = color
 			}
@@ -765,10 +765,10 @@ begin
 		}
 		if (si_bpovrly != NULL) {
 		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
-		    call maskexprn (ocolors, in, nx)
+		    call maskexprn (bpcolors, in, nx)
 		    do i = 0, nx-1 {
 			if (Memi[in+i] != 0) {
-			    color = maskcolor (ocolors, Memi[in+i])
+			    color = maskcolor (bpcolors, Memi[in+i])
 			    if (color >= 0)
 				Mems[out+i] = color
 			}
@@ -806,10 +806,10 @@ begin
 		}
 		if (si_bpovrly != NULL) {
 		    in = sigm2i (si_bpovrly, wy - wy1 + 1)
-		    call maskexprn (ocolors, in, nx)
+		    call maskexprn (bpcolors, in, nx)
 		    do i = 0, nx-1 {
 			if (Memi[in+i] != 0) {
-			    color = maskcolor (ocolors, Memi[in+i])
+			    color = maskcolor (bpcolors, Memi[in+i])
 			    if (color >= 0)
 				Memr[out+i] = color
 			}

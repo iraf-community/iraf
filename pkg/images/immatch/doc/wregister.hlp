@@ -60,9 +60,9 @@ match the coordinates of a 2D sky projection and a 2D spectral wcs.
 .le
 .le
 .ls transpose = no
-Force a tranpose of the reference image world coordinates before evaluating
+Force a transpose of the reference image world coordinates before evaluating
 the world to logical coordinate transformation for the input image ? This
-option is useful if there is not enoough information in the reference and
+option is useful if there is not enough information in the reference and
 input image headers to tell whether or not the images are transposed with
 respect to each other.
 .le
@@ -187,7 +187,7 @@ value is recommended.
 .ls interpolant = "linear"
 The interpolant used for rebinning the image.  The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -325,7 +325,7 @@ The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order
 \fIxxorder\fR and \fIxyorder\fR in x and \fIyxorder\fR and \fIyyorder\fR in y.
 
-Several polynomial cross terms options are avaible. Options "none",
+Several polynomial cross terms options are available. Options "none",
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 
@@ -464,7 +464,7 @@ y and are assumed to be positive.
 
 
 \fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the region of
-validity of the tranformation as well as the limits of the grid
+validity of the transformation as well as the limits of the grid
 in the reference coordinate system.
 
 Each computed transformation is written to a temporary output text database
@@ -503,7 +503,7 @@ fIysample\fR pixels in x and y.
 The transformed coordinates at intermediate pixel values are
 determined by bilinear interpolation in the coordinate surface. If
 \fIxsample\fR and \fIysample\fR = 1, the coordinate
-surface is evaluted at every pixel. Use of \fIxsample\fR and \fIysample\fR
+surface is evaluated at every pixel. Use of \fIxsample\fR and \fIysample\fR
 are strongly recommended for large images and high order coordinate
 surfaces in order to reduce the time required to compute the output image.
 
@@ -721,7 +721,7 @@ residuals.
 		image
 .fi
 
-3. Mosaic a set of 9 images convering a ~ 1 degree field into a single image
+3. Mosaic a set of 9 images covering a ~ 1 degree field into a single image
 centered at  12:32:53.1 +43:13:03. Set the output image scale to 0.5
 arc-seconds / pixel which is close the detector scale of 0.51 arc-seconds
 per pixel. Set the orientation to be north up and east to the left.

@@ -1,6 +1,70 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+xtextns.x
+    1.  The wrong ranges package was used for the extension versions.  Calling		the correct one requires extension versions to be positive integers.
+    2.  The extension version was not being matched correctly.  This may
+    	have happened when switching to using the mef library.
+    (8/25/08, Valdes)
+
+fixpix/ytpmmap.x
+    The inefficiencies in evaluating the WCS were addressed.
+    (3/18/08, Valdes)
+
+fixpix/ytpmmap.x
+    Fixed a couple of bugs that could result in a floating point exception.
+    (3/17/08, Valdes)
+
+rmsorted.x
+    This routine was modified, including adding and argument, to
+    support the clipping of bright values.
+    (2/29/08, Valdes)
+
+rmmed.x
+    This general package of running median routines was moved from
+    images$imfilter/src.  It was enhanced by allowing clipping of
+    bright sources.  This means a new argument, nclip, is required.
+    (2/29/08, Valdes)
+
+fixpix/ytpmmap.x
+    1.	Any number of '^' characters can be in the name at any point to
+	invert or uninvert a mask.  This is needed if an application wants
+	to invert the mask specified by the user which may also include '^'.
+	This also allows strings like !^foo or ^!foo.
+    2.	The pmmatch variable may not be "world N" where N is the maximum
+	input mask value to be preserved in the output mask.  This value
+	is used to optimize the internal bit array to the smallest it
+	can be consistent with the desired value.  A value of "world"
+	is equivalent to "world 1".
+    (2/5/08, Valdes)
+
+xtbitarray.x
+    Generalized to support different number of bits per element.  The
+    value is now set by specifying a maximum value.  All values greater
+    than the maximum are set to the maximum.  (2/5/08, valdes)
+
+inlfit/innlinit.gx
+    Removed an extra argument from the nlfree$t() call (1/16/08, MJF)
+
+fixpix/ytpmmap.x
+    1.  A feature to match masks in world coordinates, but only as a
+	boolean mask, was added.
+    2.  The way the pixel mask matching is selected was generalized.
+	The matching type is specified as a string with values
+	"logical", "physical", "world", or "offset".  An application
+	may also specify an environment variable which the user may
+	use to specify the type.  If the application specifies one of
+	the types then the environment variable "pmmatch" may be used
+	to override the application.
+    (1/9/08, Valdes)
+
+xtbitarray.x	+
+mkpkg
+    This provides a package for creating an in-memory 2D bit array.
+    This can be used for large boolean masks with random access.  It
+    is being added for use with pixel mask matching in world coordinates.
+    (1/9/08, Valdes)
+
 =====
 V2.14
 =====

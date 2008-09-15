@@ -19,7 +19,7 @@ begin
 
 	# Free old NLFIT structure if any.
 	if (nl != NULL)
-	    call nlfree$t (nl, TY_STRUCT)
+	    call nlfree$t (nl)
 
 	# Initialize new NLFIT structure.
 	call nlinit$t (nl, IN_FUNC (in), IN_DFUNC (in), Mem$t[IN_PARAM (in)],

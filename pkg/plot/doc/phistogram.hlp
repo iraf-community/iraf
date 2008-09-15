@@ -104,7 +104,7 @@ DESCRIPTION
 of values in the text file specified by
 \fIinput\fR, using the parameters \fIbinwidth\fR, \fInbins\fR,
 \fIz1\fR and \fIz2\fR.
-If either \fIz1\fR or \fIz2\fR is undefined the data mininum or
+If either \fIz1\fR or \fIz2\fR is undefined the data minimum or
 maximum values define the histogram limits.
 If \fIbinwidth\fR is undefined, \fInbins\fR
 determines the resolution of the histogram. If \fIlistout\fR = no,

@@ -119,14 +119,14 @@ begin
 
 	# Allocate the subarrays.
 	call malloc (WL_AXIS_TITLE_PTR(wd), SZ_LINE * N_DIM, TY_CHAR)
-	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), N_SIDES * N_DIM, TY_BOOL)
+	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), N_SIDES * N_DIM, TY_INT)
 	call malloc (WL_BEGIN_PTR(wd), N_DIM, TY_DOUBLE)
 	call malloc (WL_END_PTR(wd), N_DIM, TY_DOUBLE)
 	call malloc (WL_LABEL_ANGLE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
 	call malloc (WL_LABEL_AXIS_PTR(wd), MAX_LABEL_POINTS, TY_INT)
 	call malloc (WL_LABEL_POSITION_PTR(wd), N_DIM * MAX_LABEL_POINTS,
 	    TY_DOUBLE)
-	call malloc (WL_LABEL_SIDE_PTR(wd), N_DIM * N_SIDES, TY_BOOL)
+	call malloc (WL_LABEL_SIDE_PTR(wd), N_DIM * N_SIDES, TY_INT)
 	call malloc (WL_LABEL_VALUE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
 	call malloc (WL_LOGICAL_CENTER_PTR(wd), N_DIM, TY_DOUBLE)
 	call malloc (WL_MAJ_I_PTR(wd), N_DIM, TY_DOUBLE)

@@ -43,9 +43,9 @@ These is described in the OVERLAY COLOR section.
 .ls overlay = ""
 Overlay mask to be displayed.  The overlay mask may be a pixel list image
 (.pl extension) or a regular image.  Overlay pixels are identified by
-values greater than zero.  The overlay values are displayed with a mapping given by
-the \fIocolors\fR parameter.  If the overlay cannot be found a warning is
-given and the overlay is not displayed.
+values greater than zero.  The overlay values are displayed with a mapping
+given by the \fIocolors\fR parameter.  If the overlay cannot be found a
+warning is given and the overlay is not displayed.
 .le
 .ls ocolors = "green"
 The mapping between bad pixel values and display colors or intensity values
@@ -90,8 +90,8 @@ the image header.
 Pixel mask selecting the sample pixels for the automatic or range intensity
 mapping algorithm.  The pixel mask may be a pixel list image (.pl
 extension), a regular image, or an image section.  The sample pixels are
-identified by values greater than zero in the masks and by the region specified in
-an image section.  If no mask specification is given then a uniform sample
+identified by values greater than zero in the masks and by the region specified
+in an image section.  If no mask specification is given then a uniform sample
 of approximately \fInsample\fR good pixels will be used.  The \fInsample\fR
 parameter also limits the number of sample pixels used from a mask.  Note that
 pixels identified by the bad pixel mask will be excluded from the sample.

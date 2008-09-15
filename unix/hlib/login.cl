@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.14EXPORT November 2007"
+    logver = "IRAF V2.14.1 September 2008"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -29,7 +29,7 @@ stty U_TERM
 #set	cmbuflen	= 512000
 #set	min_lenuserarea	= 64000
 #set	imtype		= "imh"
-#set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+set	imextn		= "oif:imh fxf:fits,fit fxb:fxb plf:pl qpf:qp stf:hhh,??h"
 
 
 # XIMTOOL/DISPLAY stuff.  Set node to the name of your workstation to

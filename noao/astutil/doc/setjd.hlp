@@ -50,7 +50,7 @@ the exposure time keyword name begins with a minus sign, for example
 .ls ra = "ra", dec = "dec", epoch = "epoch"
 If the heliocentric Julian date is requested the right ascension (in hours)
 and declination (in degrees) of the observation is determined from these
-keywords.  The values may be in either decimal or sexigesimal notation.
+keywords.  The values may be in either decimal or sexagesimal notation.
 An epoch keyword is optional and if given is used to precess
 the coordinates from the specified epoch to the observation epoch.
 If an epoch keyword is given but is not found in the header or can't

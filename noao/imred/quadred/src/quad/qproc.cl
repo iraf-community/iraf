@@ -11,7 +11,7 @@ begin
 	    imtype = substr (imtype, 1, i-1)
 	i = strlen (imtype)
 
-	cache ("quadsplit", "quadjoin", "ccdproc", "quadproc")
+	cache ("quadsplit", "quadjoin", "qccdproc", "quadproc")
 
 
 	# Validate fixfile
@@ -25,7 +25,7 @@ begin
 	}
 
 	# Initialise interactive query
-	if (ccdproc.interactive) {
+	if (qccdproc.interactive) {
 	    answer.p_value = "yes"
 	    answr = "yes"
 	} else {
@@ -57,9 +57,9 @@ begin
 
 	    # Overscan correct and trim
 	    if (answr == "yes" || answr == "YES") {
-		ccdproc.interactive = yes
+		qccdproc.interactive = yes
 
-		print ("YES") | ccdproc (image//".??"//imtype, fixpix=fixpix,
+		print ("YES") | qccdproc (image//".??"//imtype, fixpix=fixpix,
 		overscan=overscan, trim=trim, readaxis=readaxis,
 		fixfile=fixfile, biassec="image", trimsec="image",
 		ccdtype="", max_cache=0, noproc=no, zerocor=no, darkcor=no,
@@ -72,22 +72,22 @@ begin
                 # the ccdproc values which may have been adjusted interactively.
 		# We do this on every pass in case there is a later interupt
 		# of task execution. 
-		quadproc.function.p_value    = ccdproc.function
-		quadproc.order.p_value       = ccdproc.order
-		quadproc.sample.p_value      = ccdproc.sample
-		quadproc.naverage.p_value    = ccdproc.naverage
-		quadproc.niterate.p_value    = ccdproc.niterate
-		quadproc.low_reject.p_value  = ccdproc.low_reject
-		quadproc.high_reject.p_value = ccdproc.high_reject
-		quadproc.grow.p_value        = ccdproc.grow
+		quadproc.function.p_value    = qccdproc.function
+		quadproc.order.p_value       = qccdproc.order
+		quadproc.sample.p_value      = qccdproc.sample
+		quadproc.naverage.p_value    = qccdproc.naverage
+		quadproc.niterate.p_value    = qccdproc.niterate
+		quadproc.low_reject.p_value  = qccdproc.low_reject
+		quadproc.high_reject.p_value = qccdproc.high_reject
+		quadproc.grow.p_value        = qccdproc.grow
 
 		# Force the parameter update
 		update ("quadproc")
 
 	    } else {
-		ccdproc.interactive = no
+		qccdproc.interactive = no
 
-		ccdproc (image//".??"//imtype, fixpix=fixpix,
+		qccdproc (image//".??"//imtype, fixpix=fixpix,
 		overscan=overscan, trim=trim, readaxis=readaxis,
 		fixfile=fixfile, biassec="image", trimsec="image",
 		ccdtype="", max_cache=0, noproc=no, zerocor=no, darkcor=no,
@@ -104,6 +104,6 @@ begin
 
 	# Reset interactive flag if we haven't recieved a definative NO
 	if (answr == "no") {
-	    ccdproc.interactive = yes
+	    qccdproc.interactive = yes
 	}
 end

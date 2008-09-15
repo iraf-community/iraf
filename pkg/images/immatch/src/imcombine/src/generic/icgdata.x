@@ -28,16 +28,20 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnls()
+short	temp
+int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, mtype, xt_imgnls()
 real	a, b
 pointer	buf, dp, ip, mp
 errchk	xt_cpix, xt_imgnls
+
+short	max_pixel
+data	max_pixel/MAX_SHORT/
 
 include	"../icombine.com"
 
 begin
 	# Get masks and return if there is no data
-	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
+	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 	if (dflag == D_NONE) {
 	    call aclri (n, npts)
 	    return
@@ -99,6 +103,23 @@ begin
 	    }
 	}
 
+	# Set values to max_pixel if needed.
+	if (mtype == M_NOVAL) {
+	    do i = 1, nimages {
+		dp = d[i]; mp = m[i]
+		if (lflag[i] == D_NONE || dp == NULL)
+		    next
+		else if (lflag[i] == D_MIX) {
+		    do j = 1, npts {
+		        if (Memi[mp] == 1)
+			    Mems[dp] = max_pixel
+			dp = dp + 1
+			mp = mp + 1
+		    }
+		}
+	    }
+	}
+
 	# Apply threshold if needed
 	if (dothresh) {
 	    do i = 1, nimages {
@@ -107,7 +128,11 @@ begin
 		    do j = 1, npts {
 			a = Mems[dp]
 			if (a < lthresh || a > hthresh) {
-			    Memi[m[i]+j-1] = 1
+			    if (mtype == M_NOVAL)
+				Memi[m[i]+j-1] = 2
+			    else
+				Memi[m[i]+j-1] = 1
+
 			    lflag[i] = D_MIX
 			    dflag = D_MIX
 			}
@@ -136,10 +161,13 @@ begin
 		    dp = d[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
-			if (Memi[mp] == 0) {
+			if (Memi[mp] != 1) {
 			    a = Mems[dp]
 			    if (a < lthresh || a > hthresh) {
-				Memi[m[i]+j-1] = 1
+				if (mtype == M_NOVAL)
+				    Memi[m[i]+j-1] = 2
+				else
+				    Memi[m[i]+j-1] = 1
 				dflag = D_MIX
 			    }
 			}
@@ -193,7 +221,7 @@ begin
 			dp = d[i] + n1 - 1
 			mp = m[i] + n1 - 1
 			do j = n1, n2 {
-			    if (Memi[mp] == 0)
+			    if (Memi[mp] != 1)
 				Mems[dp] = Mems[dp] / a + b
 			    dp = dp + 1
 			    mp = mp + 1
@@ -210,13 +238,16 @@ begin
 	    nused = nimages
 	else {
 	    nused = 0
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		if (lflag[i] != D_NONE) {
 		    nused = nused + 1
 		    d[nused] = d[i]
 		    m[nused] = m[i]
 		    lflag[nused] = i
 		}
+	    }
+	    do i = nused+1, nimages
+	        d[i] = NULL
 	    if (nused == 0)
 		dflag = D_NONE
 	}
@@ -252,6 +283,11 @@ begin
 			    k = n[j]
 			    if (k < i) {
 				Mems[d[k]+j-1] = Mems[dp]
+				temp = Mems[d[k]+j-1]
+				Mems[d[k]+j-1] = Mems[dp]
+				Mems[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
 				Memi[id[k]+j-1] = l
 			    } else
 				Memi[ip] = l
@@ -263,7 +299,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nimages
+			do i = n[j]+1, nused
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -282,8 +318,13 @@ begin
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
-			    if (k < i)
+			    if (k < i) {
+				temp = Mems[d[k]+j-1]
 				Mems[d[k]+j-1] = Mems[dp]
+				Mems[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
+			    }
 			}
 			dp = dp + 1
 			mp = mp + 1
@@ -294,14 +335,33 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_SHORT)
+	    call malloc (dp, nused, TY_SHORT)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		call malloc (ip, nused, TY_INT)
 		call ic_2sorts (d, Mems[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
 		call ic_sorts (d, Mems[dp], n, npts)
 	    call mfree (dp, TY_SHORT)
+	}
+
+	# If no good pixels set the number of usable values as -n and
+	# shift them to lower values.
+	if (mtype == M_NOVAL) {
+	    do j = 1, npts {
+	        if (n[j] > 0)
+		    next
+		n[j] = 0
+		do i = 1, nused {
+		    dp = d[i] + j - 1
+		    if (Mems[dp] < max_pixel) {
+		        n[j] = n[j] - 1
+			k = -n[j]
+			if (k < i)
+			    Mems[d[k]+j-1] = Mems[dp]
+		    }
+		}
+	    }
 	}
 end
 
@@ -328,16 +388,20 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnli()
+int	temp
+int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, mtype, xt_imgnli()
 real	a, b
 pointer	buf, dp, ip, mp
 errchk	xt_cpix, xt_imgnli
+
+int	max_pixel
+data	max_pixel/MAX_INT/
 
 include	"../icombine.com"
 
 begin
 	# Get masks and return if there is no data
-	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
+	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 	if (dflag == D_NONE) {
 	    call aclri (n, npts)
 	    return
@@ -399,6 +463,23 @@ begin
 	    }
 	}
 
+	# Set values to max_pixel if needed.
+	if (mtype == M_NOVAL) {
+	    do i = 1, nimages {
+		dp = d[i]; mp = m[i]
+		if (lflag[i] == D_NONE || dp == NULL)
+		    next
+		else if (lflag[i] == D_MIX) {
+		    do j = 1, npts {
+		        if (Memi[mp] == 1)
+			    Memi[dp] = max_pixel
+			dp = dp + 1
+			mp = mp + 1
+		    }
+		}
+	    }
+	}
+
 	# Apply threshold if needed
 	if (dothresh) {
 	    do i = 1, nimages {
@@ -407,7 +488,11 @@ begin
 		    do j = 1, npts {
 			a = Memi[dp]
 			if (a < lthresh || a > hthresh) {
-			    Memi[m[i]+j-1] = 1
+			    if (mtype == M_NOVAL)
+				Memi[m[i]+j-1] = 2
+			    else
+				Memi[m[i]+j-1] = 1
+
 			    lflag[i] = D_MIX
 			    dflag = D_MIX
 			}
@@ -436,10 +521,13 @@ begin
 		    dp = d[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
-			if (Memi[mp] == 0) {
+			if (Memi[mp] != 1) {
 			    a = Memi[dp]
 			    if (a < lthresh || a > hthresh) {
-				Memi[m[i]+j-1] = 1
+				if (mtype == M_NOVAL)
+				    Memi[m[i]+j-1] = 2
+				else
+				    Memi[m[i]+j-1] = 1
 				dflag = D_MIX
 			    }
 			}
@@ -493,7 +581,7 @@ begin
 			dp = d[i] + n1 - 1
 			mp = m[i] + n1 - 1
 			do j = n1, n2 {
-			    if (Memi[mp] == 0)
+			    if (Memi[mp] != 1)
 				Memi[dp] = Memi[dp] / a + b
 			    dp = dp + 1
 			    mp = mp + 1
@@ -510,13 +598,16 @@ begin
 	    nused = nimages
 	else {
 	    nused = 0
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		if (lflag[i] != D_NONE) {
 		    nused = nused + 1
 		    d[nused] = d[i]
 		    m[nused] = m[i]
 		    lflag[nused] = i
 		}
+	    }
+	    do i = nused+1, nimages
+	        d[i] = NULL
 	    if (nused == 0)
 		dflag = D_NONE
 	}
@@ -552,6 +643,11 @@ begin
 			    k = n[j]
 			    if (k < i) {
 				Memi[d[k]+j-1] = Memi[dp]
+				temp = Memi[d[k]+j-1]
+				Memi[d[k]+j-1] = Memi[dp]
+				Memi[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
 				Memi[id[k]+j-1] = l
 			    } else
 				Memi[ip] = l
@@ -563,7 +659,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nimages
+			do i = n[j]+1, nused
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -582,8 +678,13 @@ begin
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
-			    if (k < i)
+			    if (k < i) {
+				temp = Memi[d[k]+j-1]
 				Memi[d[k]+j-1] = Memi[dp]
+				Memi[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
+			    }
 			}
 			dp = dp + 1
 			mp = mp + 1
@@ -594,14 +695,33 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_INT)
+	    call malloc (dp, nused, TY_INT)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		call malloc (ip, nused, TY_INT)
 		call ic_2sorti (d, Memi[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
 		call ic_sorti (d, Memi[dp], n, npts)
 	    call mfree (dp, TY_INT)
+	}
+
+	# If no good pixels set the number of usable values as -n and
+	# shift them to lower values.
+	if (mtype == M_NOVAL) {
+	    do j = 1, npts {
+	        if (n[j] > 0)
+		    next
+		n[j] = 0
+		do i = 1, nused {
+		    dp = d[i] + j - 1
+		    if (Memi[dp] < max_pixel) {
+		        n[j] = n[j] - 1
+			k = -n[j]
+			if (k < i)
+			    Memi[d[k]+j-1] = Memi[dp]
+		    }
+		}
+	    }
 	}
 end
 
@@ -628,16 +748,20 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnlr()
+real	temp
+int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, mtype, xt_imgnlr()
 real	a, b
 pointer	buf, dp, ip, mp
 errchk	xt_cpix, xt_imgnlr
+
+real	max_pixel
+data	max_pixel/MAX_REAL/
 
 include	"../icombine.com"
 
 begin
 	# Get masks and return if there is no data
-	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
+	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 	if (dflag == D_NONE) {
 	    call aclri (n, npts)
 	    return
@@ -699,6 +823,23 @@ begin
 	    }
 	}
 
+	# Set values to max_pixel if needed.
+	if (mtype == M_NOVAL) {
+	    do i = 1, nimages {
+		dp = d[i]; mp = m[i]
+		if (lflag[i] == D_NONE || dp == NULL)
+		    next
+		else if (lflag[i] == D_MIX) {
+		    do j = 1, npts {
+		        if (Memi[mp] == 1)
+			    Memr[dp] = max_pixel
+			dp = dp + 1
+			mp = mp + 1
+		    }
+		}
+	    }
+	}
+
 	# Apply threshold if needed
 	if (dothresh) {
 	    do i = 1, nimages {
@@ -707,7 +848,11 @@ begin
 		    do j = 1, npts {
 			a = Memr[dp]
 			if (a < lthresh || a > hthresh) {
-			    Memi[m[i]+j-1] = 1
+			    if (mtype == M_NOVAL)
+				Memi[m[i]+j-1] = 2
+			    else
+				Memi[m[i]+j-1] = 1
+
 			    lflag[i] = D_MIX
 			    dflag = D_MIX
 			}
@@ -736,10 +881,13 @@ begin
 		    dp = d[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
-			if (Memi[mp] == 0) {
+			if (Memi[mp] != 1) {
 			    a = Memr[dp]
 			    if (a < lthresh || a > hthresh) {
-				Memi[m[i]+j-1] = 1
+				if (mtype == M_NOVAL)
+				    Memi[m[i]+j-1] = 2
+				else
+				    Memi[m[i]+j-1] = 1
 				dflag = D_MIX
 			    }
 			}
@@ -793,7 +941,7 @@ begin
 			dp = d[i] + n1 - 1
 			mp = m[i] + n1 - 1
 			do j = n1, n2 {
-			    if (Memi[mp] == 0)
+			    if (Memi[mp] != 1)
 				Memr[dp] = Memr[dp] / a + b
 			    dp = dp + 1
 			    mp = mp + 1
@@ -810,13 +958,16 @@ begin
 	    nused = nimages
 	else {
 	    nused = 0
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		if (lflag[i] != D_NONE) {
 		    nused = nused + 1
 		    d[nused] = d[i]
 		    m[nused] = m[i]
 		    lflag[nused] = i
 		}
+	    }
+	    do i = nused+1, nimages
+	        d[i] = NULL
 	    if (nused == 0)
 		dflag = D_NONE
 	}
@@ -852,6 +1003,11 @@ begin
 			    k = n[j]
 			    if (k < i) {
 				Memr[d[k]+j-1] = Memr[dp]
+				temp = Memr[d[k]+j-1]
+				Memr[d[k]+j-1] = Memr[dp]
+				Memr[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
 				Memi[id[k]+j-1] = l
 			    } else
 				Memi[ip] = l
@@ -863,7 +1019,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nimages
+			do i = n[j]+1, nused
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -882,8 +1038,13 @@ begin
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
-			    if (k < i)
+			    if (k < i) {
+				temp = Memr[d[k]+j-1]
 				Memr[d[k]+j-1] = Memr[dp]
+				Memr[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
+			    }
 			}
 			dp = dp + 1
 			mp = mp + 1
@@ -894,14 +1055,33 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_REAL)
+	    call malloc (dp, nused, TY_REAL)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		call malloc (ip, nused, TY_INT)
 		call ic_2sortr (d, Memr[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
 		call ic_sortr (d, Memr[dp], n, npts)
 	    call mfree (dp, TY_REAL)
+	}
+
+	# If no good pixels set the number of usable values as -n and
+	# shift them to lower values.
+	if (mtype == M_NOVAL) {
+	    do j = 1, npts {
+	        if (n[j] > 0)
+		    next
+		n[j] = 0
+		do i = 1, nused {
+		    dp = d[i] + j - 1
+		    if (Memr[dp] < max_pixel) {
+		        n[j] = n[j] - 1
+			k = -n[j]
+			if (k < i)
+			    Memr[d[k]+j-1] = Memr[dp]
+		    }
+		}
+	    }
 	}
 end
 
@@ -928,16 +1108,20 @@ int	nimages			# Number of input images
 int	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
-int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, xt_imgnld()
+double	temp
+int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, mtype, xt_imgnld()
 real	a, b
 pointer	buf, dp, ip, mp
 errchk	xt_cpix, xt_imgnld
+
+double	max_pixel
+data	max_pixel/MAX_DOUBLE/
 
 include	"../icombine.com"
 
 begin
 	# Get masks and return if there is no data
-	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
+	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 	if (dflag == D_NONE) {
 	    call aclri (n, npts)
 	    return
@@ -999,6 +1183,23 @@ begin
 	    }
 	}
 
+	# Set values to max_pixel if needed.
+	if (mtype == M_NOVAL) {
+	    do i = 1, nimages {
+		dp = d[i]; mp = m[i]
+		if (lflag[i] == D_NONE || dp == NULL)
+		    next
+		else if (lflag[i] == D_MIX) {
+		    do j = 1, npts {
+		        if (Memi[mp] == 1)
+			    Memd[dp] = max_pixel
+			dp = dp + 1
+			mp = mp + 1
+		    }
+		}
+	    }
+	}
+
 	# Apply threshold if needed
 	if (dothresh) {
 	    do i = 1, nimages {
@@ -1007,7 +1208,11 @@ begin
 		    do j = 1, npts {
 			a = Memd[dp]
 			if (a < lthresh || a > hthresh) {
-			    Memi[m[i]+j-1] = 1
+			    if (mtype == M_NOVAL)
+				Memi[m[i]+j-1] = 2
+			    else
+				Memi[m[i]+j-1] = 1
+
 			    lflag[i] = D_MIX
 			    dflag = D_MIX
 			}
@@ -1036,10 +1241,13 @@ begin
 		    dp = d[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
-			if (Memi[mp] == 0) {
+			if (Memi[mp] != 1) {
 			    a = Memd[dp]
 			    if (a < lthresh || a > hthresh) {
-				Memi[m[i]+j-1] = 1
+				if (mtype == M_NOVAL)
+				    Memi[m[i]+j-1] = 2
+				else
+				    Memi[m[i]+j-1] = 1
 				dflag = D_MIX
 			    }
 			}
@@ -1093,7 +1301,7 @@ begin
 			dp = d[i] + n1 - 1
 			mp = m[i] + n1 - 1
 			do j = n1, n2 {
-			    if (Memi[mp] == 0)
+			    if (Memi[mp] != 1)
 				Memd[dp] = Memd[dp] / a + b
 			    dp = dp + 1
 			    mp = mp + 1
@@ -1110,13 +1318,16 @@ begin
 	    nused = nimages
 	else {
 	    nused = 0
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		if (lflag[i] != D_NONE) {
 		    nused = nused + 1
 		    d[nused] = d[i]
 		    m[nused] = m[i]
 		    lflag[nused] = i
 		}
+	    }
+	    do i = nused+1, nimages
+	        d[i] = NULL
 	    if (nused == 0)
 		dflag = D_NONE
 	}
@@ -1152,6 +1363,11 @@ begin
 			    k = n[j]
 			    if (k < i) {
 				Memd[d[k]+j-1] = Memd[dp]
+				temp = Memd[d[k]+j-1]
+				Memd[d[k]+j-1] = Memd[dp]
+				Memd[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
 				Memi[id[k]+j-1] = l
 			    } else
 				Memi[ip] = l
@@ -1163,7 +1379,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nimages
+			do i = n[j]+1, nused
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -1182,8 +1398,13 @@ begin
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
-			    if (k < i)
+			    if (k < i) {
+				temp = Memd[d[k]+j-1]
 				Memd[d[k]+j-1] = Memd[dp]
+				Memd[dp] = temp
+				Memi[mp] = Memi[m[k]+j-1]
+				Memi[m[k]+j-1] = 0
+			    }
 			}
 			dp = dp + 1
 			mp = mp + 1
@@ -1194,14 +1415,33 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nimages, TY_DOUBLE)
+	    call malloc (dp, nused, TY_DOUBLE)
 	    if (keepids) {
-		call malloc (ip, nimages, TY_INT)
+		call malloc (ip, nused, TY_INT)
 		call ic_2sortd (d, Memd[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else
 		call ic_sortd (d, Memd[dp], n, npts)
 	    call mfree (dp, TY_DOUBLE)
+	}
+
+	# If no good pixels set the number of usable values as -n and
+	# shift them to lower values.
+	if (mtype == M_NOVAL) {
+	    do j = 1, npts {
+	        if (n[j] > 0)
+		    next
+		n[j] = 0
+		do i = 1, nused {
+		    dp = d[i] + j - 1
+		    if (Memd[dp] < max_pixel) {
+		        n[j] = n[j] - 1
+			k = -n[j]
+			if (k < i)
+			    Memd[d[k]+j-1] = Memd[dp]
+		    }
+		}
+	    }
 	}
 end
 

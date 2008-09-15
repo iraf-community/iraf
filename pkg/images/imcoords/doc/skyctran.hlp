@@ -48,7 +48,7 @@ equatorial (FK4, FK4-NO-E, FK5, ICRS, or GAPPT), ecliptic, galactic, or
 supergalactic.
 .le
 .ls icrs [equinox] [epoch]
-The Internaltion Celestial Refernce System where equinox is
+The International Celestial Reverence System where equinox is
 a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
 Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
 The default value of equinox is J2000.0.
@@ -167,7 +167,7 @@ y/dec/latitude coordinates. Lngcolumn and latcolumn are always 1 and
 .le
 .ls plngcolumn = INDEF, platcolumn = INDEF
 The columns in the input file containing the ra and dec proper motions
-in " / year. If plngcolumn amd platcolumn are INDEF the proper motions
+in " / year. If plngcolumn and platcolumn are INDEF the proper motions
 are assumed to be undefined. Proper motions
 are used only if the input coordinate system is equatorial fk4, noefk4,
 fk5, or icrs.  Plngcolumn and platcolumn are always 3 and 4 if the input is from
@@ -175,7 +175,7 @@ the unredirected standard input.
 .le
 .ls pxcolumn = INDEF, rvcolumn = INDEF
 The columns in the input file containing the parallax and radial velocity in
-in " and km / sec respectively. If pxcolumn amd rvcolumn are INDEF, the 
+in " and km / sec respectively. If pxcolumn and rvcolumn are INDEF, the 
 parallax and radial velocities are assumed to be 0.0 and 0.0.
 Parallaxes and radial velocities are only used if proper motions are
 defined. Pxcolumn and rvcolumn are always 5 and 6 if the input is from the
@@ -286,7 +286,7 @@ in the input files and if \fItransform\fR = yes, the converted coordinates are
 written to the same columns in the output files. If \fItransform\fR = "no",
 the converted coordinates are appended to the input line creating two
 additional columns in the output file. If the input file is the
-unredirected standard input then tranpose is always "no". Comment lines, blanks
+unredirected standard input then transpose is always "no". Comment lines, blanks
 lines, and lines for which the input coordinates could not be successfully
 decoded are passed on to the output file without modification.
 
@@ -369,7 +369,7 @@ EQUATORIAL SYSTEM (CTYPE (ra axis) = "RA--XXXX" CTYPE (dec axis) = "DEC-XXXX")
 WHERE XXXX IS THE PROJECTION TYPE, EVEN THOUGH THE SKYCTRAN TASK 
 SUPPORTS GALACTIC, ECLIPTIC, AND SUPERGALACTIC COORDINATES.
 
-USERS SHOULD ALSO REALIZE THAT IMAGE WORLD COORDINATE SYSTEM REPRESENTATIION
+USERS SHOULD ALSO REALIZE THAT IMAGE WORLD COORDINATE SYSTEM REPRESENTATION
 IN FITS IS STILL IN THE DRAFT STAGE. ALTHOUGH SKYCTRAN TRIES TO CONFORM TO
 THE CURRENT DRAFT PROPOSAL WHERE NO ADOPTED STANDARDS CURRENTLY EXIST, THE
 FINAL FITS STANDARD MAY DIFFER FROM THE ONE ADOPTED HERE.
@@ -644,7 +644,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink

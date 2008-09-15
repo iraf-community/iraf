@@ -5,6 +5,7 @@ $src		= "images$imutil/src/"
 
 chpixtype       hlp=doc$chpix.hlp,      	src=src$t_chpix.x
 hedit           hlp=doc$hedit.hlp,      	src=src$hedit.x
+nhedit          hlp=doc$nhedit.hlp,      	src=src$nhedit.x
 hselect		hlp=doc$hselect.hlp,		src=src$hselect.x
 imarith         hlp=doc$imarith.hlp, 	        src=src$t_imarith.x
 imcopy          hlp=doc$imcopy.hlp,     	src=src$t_imcopy.x

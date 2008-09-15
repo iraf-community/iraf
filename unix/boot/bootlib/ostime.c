@@ -94,11 +94,12 @@ os_timezone()
 	extern	long _timezone;
 	return (_timezone);
 #else
-#ifdef SYSV
-	extern	long time_zone;
-	return (time_zone);
+#if defined(SOLARIS) && defined(X86)
+	extern	long timezone;
+	return (timezone);
+
 #else
-#ifdef MACOSX
+#if defined(SYSV) || defined(MACOSX)
 	struct tm *tm;
 	time_t clock;
 	clock = time(NULL);

@@ -364,7 +364,7 @@ strange.
 
 The amplitude and epoch calculation might be improved by fitting a parabola
 to the phase curve near the minimum and near the maximum and using points
-on these paraboli for the min and max points instead of actual data points.
+on these parabolas for the min and max points instead of actual data points.
 
 .ih
 SEE ALSO

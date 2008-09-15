@@ -10,7 +10,7 @@ PARAMETERS
 .ls wcsname
 Image to be created or modified.  If a new (non-existant) image is specified
 then a data-less image (NDIM=0) is created.
-.ls 
+.le 
 .ls wcsref = ""
 Image whose WCS is first inherited and then updated.
 .le

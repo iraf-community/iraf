@@ -46,7 +46,7 @@ This only applies to new images.   The data file consists of lines
 in FITS format with leading whitespace ignored.  A FITS card must begin
 with an uppercase/numeric keyword.  Lines not beginning with a FITS
 keyword such as comments or lower case are ignored.  The user keyword
-output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+output of \fBimheader\fR is an acceptable data file.  See \fBmkheader\fR
 for further information.
 .le
 .ls wstart = 4000., wend = 8000.
@@ -59,7 +59,7 @@ CONTINUUM PARAMETERS
 Continuum of the starting wavelength at rest and the slope of the continuum.
 .le
 .ls temperature = 5700.
-Blackbody continuum temperture in Kelvin.  A value of 0 is used if
+Blackbody continuum temperature in Kelvin.  A value of 0 is used if
 no blackbody continuum is desired.  The intensity level is set by
 scaling to the continuum level of the starting wavelength at rest.
 .le
@@ -103,7 +103,7 @@ spectral line file.  The profile types are:
 .le
 .ls peak = -0.5
 The maximum spectral line peak value when generating random lines or
-when the peak is missing fromthe spectral line file.
+when the peak is missing from the spectral line file.
 This value is relative to the continuum unless the continuum is zero.
 Negative values are absorption lines and positive values are emission lines.
 .le
@@ -115,7 +115,7 @@ from the spectral line file.
 .ls seed = 1
 Random number seed.  If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 .ls comments = yes
@@ -164,10 +164,10 @@ When an image line is selected if it has a defined dispersion function that
 is used otherwise the task wavelength parameters are used.
 
 A continuum is defined by the value at the starting wavelength at rest, a
-slope, and a blackbody function of a given temperture.  The blackbody
+slope, and a blackbody function of a given temperature.  The blackbody
 function is scaled to have the specified continuum value at the starting
 wavelength at rest.  The blackbody flux units are per unit wavelength
-(F-lambda).  A zero continuum value or a zero temperture will not produce a
+(F-lambda).  A zero continuum value or a zero temperature will not produce a
 blackbody continuum.
 
 Spectral lines are modeled by gaussian, lorentzian, or voigt profiles of

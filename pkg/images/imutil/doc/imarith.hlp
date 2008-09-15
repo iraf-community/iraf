@@ -199,7 +199,7 @@ image:
 
 	cl> imarith im2d - im1d diff
 
-9. To subtract a one dimensional image from the columns of a two dimensionl
+9. To subtract a one dimensional image from the columns of a two dimensional
 image:
 
 .nf

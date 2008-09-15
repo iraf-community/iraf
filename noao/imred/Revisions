@@ -1,5 +1,18 @@
 .help revisions Jun88 noao.imred
 .nf
+imred$src/fibers/skysub.cl
+imred$src/fibers/skysub.par
+    Added sum as an enumerated "combine" choice.  (8/11/08, Valdes)
+
+=======
+V2.14.1
+=======
+
+imred$irs/dispcor.par
+imred$iids/dispcor.par
+    Changed "Conserve flux" to "Conserve total flux" per user request.
+    (6/13/08)
+
 =====
 V2.12
 =====

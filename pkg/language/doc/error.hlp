@@ -13,6 +13,7 @@ error handlers are not supported).
 .le
 .ls errmsg
 A string describing the error.
+.le
 .ih
 DESCRIPTION
 \fIError\fR may be used to force an error exit from a script.

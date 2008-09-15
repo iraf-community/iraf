@@ -13,7 +13,7 @@ include	"icombine.h"
 # buffer sizes and memory requirements for maximum efficiency.
 
 procedure icombine (list, output, headers, bmask, rmask, nrmask, emask,
-	sigma, logfile, scales, zeros, wts, stack, delete)
+	sigma, logfile, scales, zeros, wts, stack, delete, listonly)
 
 int	list				#I List of input images
 char	output[ARB]			#I Output image
@@ -29,6 +29,7 @@ real	zeros[ARB]			#I Offset factors
 real	wts[ARB]			#I Weights
 int	stack				#I Stack input images?
 int	delete				#I Delete input images?
+int	listonly			#I List images to combine?
 
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
@@ -48,6 +49,32 @@ define	retry_	98
 define	err_	99
 
 begin
+	if (listonly == YES) {
+	    # Write the output list.
+	    if (output[1] == EOS) {
+		call imtrew (list)
+		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
+		    call printf ("%s\n")
+			call pargstr (input)
+		}
+	    } else {
+		call sprintf (errstr, SZ_LINE, "%s.list")
+		    call pargstr (output)
+		iferr (logfd = open (errstr, APPEND, TEXT_FILE))
+		    call erract (EA_WARN)
+		call imtrew (list)
+		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
+		    call printf ("%s -> %s\n")
+			call pargstr (input)
+			call pargstr (errstr)
+		    call fprintf (logfd, "%s\n")
+			call pargstr (input)
+		}
+		call close (logfd)
+	    }
+	    return
+	}
+
 	nimages = imtlen (list)
 	if (nimages == 0)
 	    call error (1, "No images to combine")

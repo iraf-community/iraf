@@ -148,6 +148,7 @@ char *opt_flags[] = { "-O",			/*  0  */
 		    0};				/* EOF */
 int  nopt_flags	   = 1;				/* No. optimizer flags */
 
+#else
 #ifdef CYGWIN
 char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
@@ -744,7 +745,7 @@ passflag:		    mkobject = YES;
 	 */
 	if (!floatoption[0] && (irafarch = os_getenv("IRAFARCH")))
 	    if (irafarch[0] == 'f')
-		sprintf (floatoption, "-%s", rafarch);
+		sprintf (floatoption, "-%s", irafarch);
 #endif
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,
@@ -1190,6 +1191,9 @@ passflag:		    mkobject = YES;
 		status = sys (command);
 	    } else
 		link (tempfile, outfile);
+
+	    /* Force the mode of the file. */
+	    chmod (outfile, 0755);
 
 	    unlink (tempfile);
 	}

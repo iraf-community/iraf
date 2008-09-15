@@ -34,7 +34,7 @@ as the coordinate file to create a separate output.
 
 .ls function = "polynomial" (chebyshev|legendre|polynomial)
 Surface function type to fit.  The choices are a chebyshev, legendre,
-or simple power series bidimensional polynomial.
+or simple power series bi-dimensional polynomial.
 .le
 .ls xorder = 2, yorder = 2
 The polynomial orders in x and y.
@@ -111,14 +111,14 @@ extrapolate outside the range of the input data these limits must
 be specified explicitly.
 
 The functions which may be fit are legendre, chebyshev, or simple
-power series bidimensional polynomials.  The user selects the
+power series bi-dimensional polynomials.  The user selects the
 function type, the order in x and y, and whether to include
 cross terms.  The orders are the number of coefficients which
 is the highest polynomial power plus 1.  For example the default
 values of 2 in each coordinate define a linear sloped plane.
 All computations are done in double precision.
 
-Several polynomial cross terms options are avaible. Options "none",
+Several polynomial cross terms options are available. Options "none",
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 

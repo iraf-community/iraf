@@ -193,7 +193,7 @@ in the current directory and below.
 Equivalent to a "!show users".
 .le
 .ls wtar
-The UNIX write tarfile utiltity.  Used to save a directory tree in a portable
+The UNIX write tarfile utility.  Used to save a directory tree in a portable
 a UNIX "tar" format binary file.  Use this with the "-o" (omit binaries) flag
 to move sources back to UNIX.  For example,
 
@@ -241,7 +241,7 @@ defines a new task VLL which uses the VMS library to list the contents of a
 library, then uses the new task to list the contents of the system library
 LIBOS, saving the output in the file "_lib".  Note the use of the string
 valued intrinsic function OSFN to generate a VMS filename for the foreign
-task.  To discard a foreign task definition (or any task defintion), exit the
+task.  To discard a foreign task definition (or any task definition), exit the
 package in which it was defined, or type "cl" before defining the task,
 followed by "bye" at some later time to discard everything back to the "cl".
 
@@ -569,3 +569,4 @@ UNIX on virtually all machines, the facilities provided by UNIX for software
 development, etc.) it is best to do software development and other timesharing
 activities on UNIX, reserving VMS for production use, i.e., data processing.
 This is of course our current policy at NOAO.
+.endhelp

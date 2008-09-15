@@ -62,7 +62,7 @@ The coordinate system of the input coordinates read from \fIgroupfile\fR, of the
 psf model \fIpsfimage\fR, and of the output coordinates written to
 \fInstarfile\fR and \fIrejfile\fR respectively. The image header coordinate
 system is used to transform from the input coordinate system to the "logical"
-pixel coordinate system used internally, from the internal logicial system to
+pixel coordinate system used internally, from the internal logical system to
 the PSF model system, and from the internal "logical" pixel coordinate system
 to the output coordinate system. The input coordinate system options are
 "logical", tv", "physical", and "world". The PSF model and output coordinate
@@ -111,10 +111,9 @@ The wcsin, wcspsf, and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
-package parameter (the default), "yes", or "no". By default cacheing is
+package parameter (the default), "yes", or "no". By default caching is
 disabled.
 .le
 .ls verify = ")_.verify"
@@ -140,7 +139,7 @@ task but may also be the output of the PSF and NSTAR tasks. The computed
 centers and magnitudes are written to \fInstarfile\fR along with the sky
 values, the number of iterations it took to fit the star, the goodness of fit
 statistic chi and the image sharpness statistic sharp. If \fIrejfile\fR is
-undefine, only stars that are successfully fit are written to \fInstarfile\fR,
+undefined, only stars that are successfully fit are written to \fInstarfile\fR,
 and the remainder are written to \fIrejfile\fR. Otherwise all the stars are
 written to \fInstarfile\fR.  \fINstarfile\fR and \fIrejfile\fR are text
 databases if the DAOPHOT package parameter \fItext\fR is "yes", an STSDAS table
@@ -170,20 +169,20 @@ coordinates in the parent image must use the "tv" or "physical" coordinate
 systems.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size
-are large enough, the input image pixels are cached in memory. If cacheing
+are large enough, the input image pixels are cached in memory. If caching
 is enabled and NSTAR is run interactively the first measurement will appear
 to take a long time as the entire image must be read in before the measurement
 is actually made. All subsequent measurements will be very fast because NSTAR
-is accessing memory not disk. The point of cacheing is to speed up random
+is accessing memory not disk. The point of caching is to speed up random
 image access by making the internal image i/o buffers the same size as the
 image itself. However if the input object lists are sorted close to row order
-and sparse cacheing may actually worsen not improve the execution time. Also at
-present there is no point in enabling cacheing for images that are less than
+and sparse caching may actually worsen not improve the execution time. Also at
+present there is no point in enabling caching for images that are less than
 or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
 default image i/o buffer is exactly that size. However if the size of dev$ypix
 is doubled by converting it to a real image with the chpixtype task then the
-effect of cacheing in interactive is can be quite noticeable if measurements
-of objects in the top and bottom halfs of the image are alternated.
+effect of caching in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halves of the image are alternated.
 
 By default NSTAR computes new centers for all the stars in \fIgroupfile\fR.
 However if the DAOPARS parameter \fIrecenter\fR is "no", NSTAR assumes that the

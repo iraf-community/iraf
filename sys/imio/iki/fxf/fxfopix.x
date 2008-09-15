@@ -250,20 +250,15 @@ begin
 	    ualen = strlen (Memc[op])
 	}
 
-	ulines = ualen / LEN_UACARD + nheader_cards
+	ulines = ualen / LEN_UACARD + nheader_cards + FKS_PADLINES(fit)
 
 	##### Note: PHULINES is not currently used, should be implemented
 	##### Not clear to me if this code here is used for the PHU since
 	##### it is in opix!
 
 	# See if the application has set a minumum number of card for the UA.
-	# or set additional lines to the existing header.
 
-	# ulines = max (ulines, FKS_EHULINES(fit))
-	if (ulines > FKS_EHULINES(fit))
-	    ulines = ulines + FKS_PADLINES(fit)
-	else
-	    ulines = FKS_EHULINES(fit)
+	ulines = max (ulines, FKS_EHULINES(fit))
 
 	# The user area contains new_lines (81 chars, LEN_UACARD).  Scale to
 	# 80 chars (LEN_CARD).  Ualen is in bytes.

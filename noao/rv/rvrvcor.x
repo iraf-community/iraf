@@ -407,6 +407,11 @@ char 	param[SZ_LINE]			#I Image parameter to read
 double	dval				#O Output answer
 
 pointer	sp, buf
+int	res, flag, idx
+int     yr, mon, day, hr, min
+double  sec
+
+int     dtm_decode_hms(), stridx()
 errchk  imgstr
 
 begin
@@ -414,6 +419,7 @@ begin
 	call salloc (buf, SZ_LINE, TY_CHAR)
 
 	dval = INDEFD
+
 
         iferr (call imgstr(im, param, Memc[buf], SZ_FNAME)) {
 	    if (is_obj == YES) { 
@@ -428,9 +434,36 @@ begin
 	    return (ERR_RVCOR)
 	}
 
-	# Now do the read.  Let gargd() decode the sexigesimal field.
-	call sscan (Memc[buf])
-	    call gargd (dval)
+
+	# If this is a DATE-OBS type of string, look for the time delimiter.
+	idx = stridx('T', Memc[buf])
+
+	# Allow only sexigesimal or decimal values.
+    	if (stridx(':', Memc[buf]) == 0 && stridx ('.', Memc[buf]) == 0) {
+	    if (is_obj == YES) { 
+	        call rv_err_comment (rv,
+	    	    "ERROR: Invalid time string '%s' from object header.",param)
+	    } else {
+	        call rv_err_comment (rv,
+	    	    "ERROR: Invalid time string '%s' from temp header.", param)
+	    }
+	    call sfree (sp)
+	    call flush (STDERR)
+	    return (ERR_RVCOR)
+	}
+
+
+	if (idx > 0) {
+	    # Decode the date-obs string for the time.
+            res = dtm_decode_hms (Memc[buf], yr, mon, day, hr, min, sec, flag)
+            dval = hr + double(min) / 60.0 + sec / 3600.0
+
+        } else {
+	    # Let gargd() decode the sexigesimal field.
+	    call sscan (Memc[buf])
+	        call gargd (dval)
+        }
+
 
 	call sfree (sp)
 	return (OK)

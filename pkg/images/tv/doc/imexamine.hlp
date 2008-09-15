@@ -16,7 +16,7 @@ images currently loaded into the image display are examined.
 Rootname for output images created with the 't' key.  If no name is specified
 then the name of the input image is used.  A three digit number is appended
 to the rootname, such as ".001", starting with 1 until no image is found with
-that name.  Thus, succesive output images with the same rootname will be
+that name.  Thus, successive output images with the same rootname will be
 numbered sequentially.
 .le
 .ls ncoutput = 101, nloutput = 101
@@ -24,7 +24,7 @@ Size of the output image created with the 't' key which is centered on the
 position of the cursor.
 .le
 .ls frame = 1
-During program execution, a query parameter specifiying the frame to be loaded.
+During program execution, a query parameter specifying the frame to be loaded.
 May also be specified on the command line when \fIimexamine\fR is used as a
 task to display a new image, to specify the frame to be loaded.
 .le
@@ -159,7 +159,7 @@ The same  parameters dealing with graph formats occur in many of the parameter
 sets while some are specific only to one parameter set.  In the
 summary below those common to more than one parameter set are shown
 only once.  The characters in parenthesis are the graph key prefixes
-for the paraemter sets in which the parameter occurs.
+for the parameter sets in which the parameter occurs.
 
 .ls angh = -33., angv = 25.		(s)
 Horizontal and vertical viewing angles (degrees) for surface plots.
@@ -383,7 +383,7 @@ changed from the standard image display to text or file input.
 
 The 'd' command displays an image using the template CL command given
 by parameter \fIdisplay\fR.  Usually this is the standard
-IRAF \fBtv.display\fR command though in some cirmcumstances other commands
+IRAF \fBtv.display\fR command though in some circumstances other commands
 like \fBplot.contour\fR may be used.  This command may be used to
 display an image even if \fIuse_display\fR is no.
 
@@ -501,7 +501,7 @@ positive a magnitude is computed as
 
 where the magnitude zero point is a user defined parameter.
 
-In addition to the flux, the second intensity momemnts are used to compute
+In addition to the flux, the second intensity moments are used to compute
 an ellipticity and position angle.  The equations defining the moments and
 related parameters are:
 
@@ -518,7 +518,7 @@ fit to the radius and flux values of the background subtracted pixels to
 determine a peak intensity and FWHM.  The profile type is set by the
 \fIfittype\fR parameter.  The choices are "gaussian" and "moffat".  If the
 profile type is "moffat" there is an additional parameter "beta".  This
-value may be specifed to fix it or given as INDEF to also be determined.
+value may be specified to fix it or given as INDEF to also be determined.
 The profile equations are:
 
 .nf
@@ -592,7 +592,7 @@ final radius used for the photometry and fitting, magnitude, flux, mean
 background, peak value of the profile fit, e, pa (in degrees between -90
 and +90 with 0 along the x axis), the Moffat beta value if a Moffat profile
 is fit, and three measures of the FWHM.  The coordinates are those
-specified by the \fIwcs\fR and formated by the format parameters.  For the
+specified by the \fIwcs\fR and formatted by the format parameters.  For the
 logical wcs the coordinates will be the same as the column and line
 values.  If a value is numerically undefined then INDEF is printed.  The
 FWHM values are, in order, the profile fit to the enclosed flux, the
@@ -618,7 +618,7 @@ used if precise results are are desired.
 .le
 .ls b
 The integer pixel coordinates defining a region of the image are printed.
-Two cursor positions are used to select sthe range of columns and lines.
+Two cursor positions are used to select the range of columns and lines.
 The output format consists of the starting and ending column
 coordinates and the starting and ending line coordinates.  This format is
 used as input by some tasks and can be used to generate image sections if
@@ -745,7 +745,7 @@ plot as well as from the image display.
 Toggle output to the logfile.  If no logfile is specified this has no
 effect except to print a message.  If the logfile is specified a message
 is printed indicating that the logfile has been opened or closed.
-Everytime the logfile is opened the current image name and title is
+Every time the logfile is opened the current image name and title is
 entered as well as when the image is changed.  The logfile name may
 be set or changed by a colon command.
 .le
@@ -762,7 +762,7 @@ described below.
 .le
 .ls :c<#>, :l<#>
 Special colon commands to plot specific columns or lines, symbolically
-shown as <#>, rather than use a cusor position.
+shown as <#>, rather than use a cursor position.
 .le
 .ls :<column> <line> <key>
 Special colon command syntax to explicitly give image coordinates for
@@ -895,7 +895,7 @@ box         cehjklruv   Draw box around graph?
 buffer      r           Buffer distance for background subtraction
 ceiling     es          Data ceiling for contour and surface plots
 center      jkr         Find center for radial plot and photometry?
-constant    uv          Constant value for boundry extension in vector plots
+constant    uv          Constant value for boundary extension in vector plots
 dashpat     e           Dash pattern for contour plot
 eparam      cehjklrsuv  Edit parameters
 fill        e           Fill viewport vs enforce unity aspect ratio?
@@ -906,8 +906,8 @@ interval    e           Contour interval (0 for default)
 iterations  ar          Iterations on fitting radius
 label       e           Draw axis labels for contour plot?
 logfile                 Log file name
-logx        chjklruv    Plot x axis logrithmically?
-logy        chjklruv    Plot y axis logrithmically?
+logx        chjklruv    Plot x axis logarithmically?
+logy        chjklruv    Plot y axis logarithmically?
 magzero     r           Magnitude zero for photometry
 majrx       cehjklruv   Number of major tick marks on x axis
 majry       cehjklruv   Number of major tick marks on y axis
@@ -926,7 +926,7 @@ nloutput                Number of lines in output image
 nlstat                  Number of lines in statistics box
 output			Output image root name
 pointmode   chjkluv     Plot points instead of lines?
-radius      r           Radius of object aperture for radial plot and photmetry
+radius      r           Radius of object aperture for radial plot and photometry
 round       cehjklruv   Round axes to nice values?
 rplot       jkr         Radius to plot in 1D and radial profile plots
 select                  Select image or display frame
@@ -1019,7 +1019,7 @@ REVISIONS
 Gaussian and a Moffat profile.  The Moffat profile exponent parameter,
 beta, may be fixed or left free to be fit.
 
-('a' and 'r'): New estimates fo the FWHM were added to the 'a' and 'r'
+('a' and 'r'): New estimates of the FWHM were added to the 'a' and 'r'
 keys.  These include the Moffat profile fit noted above, a direct
 measurement of the FWHM from the radially binned profile, and a Gaussian or
 Moffat fit to the radial enclosed flux profile.  The output from these keys

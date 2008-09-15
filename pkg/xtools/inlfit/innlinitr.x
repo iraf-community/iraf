@@ -19,7 +19,7 @@ begin
 
 	# Free old NLFIT structure if any.
 	if (nl != NULL)
-	    call nlfreer (nl, TY_STRUCT)
+	    call nlfreer (nl)
 
 	# Initialize new NLFIT structure.
 	call nlinitr (nl, IN_FUNC (in), IN_DFUNC (in), Memr[IN_PARAM (in)],

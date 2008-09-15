@@ -107,7 +107,7 @@ WLPARS PARAMETERS
 Draw a grid instead of tick marks at the position of the major
 axes intervals?  If yes, lines of constant axis 1 and axis 2 values
 are drawn.  If no, tick marks are drawn instead.  Major grid
-lines / tick marks are labeled with the appropropriate axis values.
+lines / tick marks are labeled with the appropriate axis values.
 .le
 .ls minor_grid = no
 Draw a grid instead of tick marks at the position of the
@@ -380,7 +380,7 @@ the two systems, where positive rotations are counter-clockwise.
 The ra/dec transformation is a special case.  Since by convention ra
 increases "to the left", opposite of standard convention, the first axis
 transformation needs to be multiplied by -1.  This results in the
-following formulae: 
+following formulas: 
 
 .nf
 
@@ -454,11 +454,11 @@ GRAPH APPEARANCE
 
 WCSLAB supports three types of graph: normal, polar, and near_polar.
 
-A normal graph is the usual cartesian graph where lines of constant
+A normal graph is the usual Cartesian graph where lines of constant
 axis 1 or 2 values cross at least two different sides of the graph.
 WCSLAB will by default plot a normal type graph for any image 1)
 which has no defined WCS 2) which has a linear WCS 3) where the sky
-projection WCS approximates a cartesian system.
+projection WCS approximates a Cartesian system.
 
 A polar graph is one in which the north or south pole of the
 coordinate system actually appears on the graph.
@@ -484,16 +484,16 @@ The parameter \fIgraph_type\fR can be used to force WCSLAB
 to plot a graph of the type specified, although in this case it
 may be necessary to modify the values of other WLPARS parameters to
 obtain pleasing results. For example trying to plot a polar graph as
-cartesian may producing a strange appearing graph.
+Cartesian may producing a strange appearing graph.
 
 .ih
 GRAPH LABELING
 
-Due to the variety of graph types that can ber plotted (see above), and
+Due to the variety of graph types that can be plotted (see above), and
 the arbitrary rotation that any WCS can have, the task of labeling
 the major grid lines in a coherent and pleasing manner is not trivial.
 
-The basic model used is the cartesian or normal graph.  Labels
+The basic model used is the Cartesian or normal graph.  Labels
 normally appear on the left and bottom edges of the graph with a side
 devoted solely to one of the WCS coordinate axis.  For example, right
 ascension might be labeled only along the bottom edge of the graph

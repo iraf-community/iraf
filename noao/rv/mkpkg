@@ -58,7 +58,7 @@ libpkg.a:
 	rvfuncs.x	<mach.h> <math.h>
 	rvgetim.x	<smw.h> <units.h> rvflags.h rvkeywords.h \
 			rvpackage.h rvsample.h
-	rvimutil.x	rvflags.h rvkeywords.h rvpackage.h <fio.h> <imhdr.h>
+	rvimutil.x	rvflags.h rvkeywords.h rvpackage.h <imhdr.h>
 	rvinit.x	rvsinc.com rvcont.h rvflags.h rvpackage.h \
 			rvsample.h <error.h> <pkg/gtools.h>
 	rvlinefit.x	<error.h> <gset.h> <mach.h> rvflags.h rvpackage.h
@@ -80,7 +80,7 @@ libpkg.a:
 	specmode.x	rvcomdef.h rvflags.h rvpackage.h rvsample.h <gset.h>
 	splitplot.x	<gset.h> rvflags.h rvpackage.h rvplots.h rvsample.h
 	t_fxcor.x	<ctype.h> rvcomdef.h rvflags.h rvpackage.h rvsample.h \
-			<error.h> <fio.h> <gset.h> <imhdr.h>
+			<error.h> <gset.h> <imhdr.h>
 	titles.x	<gset.h> rvflags.h rvpackage.h
 	wrtccf.x	rvcont.h rvfilter.h rvflags.h rvpackage.h <imhdr.h>
 	zzdebug.x	rvcomdef.h rvflags.h rvpackage.h \

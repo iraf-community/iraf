@@ -52,7 +52,7 @@ Choose a root directory for IRAF
     The root directory for IRAF should be a subdirectory of an LDU.  This
 is done for two reasons.  First, the shortest pathname to the root
 directory will speed up pathname resolution.  Second, this will avoid
-the maxmimum directory depth limit of AOSVS with IRAF's deeply
+the maximum directory depth limit of AOSVS with IRAF's deeply
 nested directory tree.  So, create a CPD called IRAF, with a 100MB limit.
 .ks
 .nf
@@ -128,7 +128,7 @@ according to your wishes.  An ACL of +,WARE will allow non-IRAF users
 to use the magtapes without allocation.  A null ACL will require non-IRAF
 users to use the macros ?MT, AMT, and DMT to access the tape drives.
 You should edit
-:iraf:aosvs:os:util:?mt.cli to reflect you own tape drive configuation.
+:iraf:aosvs:os:util:?mt.cli to reflect you own tape drive configuration.
 If you use the /noremop switch, the IRAF magtape allocation facility
 will not be setup.
 
@@ -220,7 +220,7 @@ will not work in CPU time limited batch streams.
 System Maintenance
 
     Extensive system maintenance should not be necessary at other sites.  The
-following is included just in case.  The procedures are similiar to those for
+following is included just in case.  The procedures are similar to those for
 UNIX.  See the UNIX installation manual for further reference.
 .nh 2
 Bootstrapping
@@ -381,3 +381,4 @@ uucp::5:1::/usr/spool/uucp:/usr/lib/uucp/uucico
 
 .fi
 .ke
+.endhelp

@@ -82,7 +82,7 @@ Rejection will be terminated if the number of rejected pixels is zero
 or the number of iterations equals \fIniter\fR.
 .le
 .ls regions = "all"
-The available options (with minimum match abreviation) are:
+The available options (with minimum match abbreviation) are:
 .ls all
 All points in the image are fit.
 .le
@@ -90,7 +90,7 @@ All points in the image are fit.
 The fit is performed on the image rows specified by \fIrows\fR.
 .le
 .ls columns
-The fit is perfomed on the image columns specified by \fIcolumns\fR.
+The fit is performed on the image columns specified by \fIcolumns\fR.
 .le
 .ls border
 The fit is performed on a border around the image whose width is specified
@@ -183,7 +183,7 @@ EXAMPLES
 	cl> imsurfit m74 m74smooth 5 10 function=spline3
 .fi
 
-2. To create a smooted version of an image using median processing:
+2. To create a smoothed version of an image using median processing:
 
 .nf
 	cl> imsurfit m74 m74med 5 10 function=spline3 \

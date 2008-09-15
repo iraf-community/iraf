@@ -18,7 +18,7 @@ The number of lines to be printed.
 DESCRIPTION
 \fIHead\fR prints, on the standard output, the first \fInlines\fR of each
 file that matches the given file list.  If the file list has more than one
-name in it, a short header preceeds each listing.
+name in it, a short header precedes each listing.
 .ih
 EXAMPLES
 

@@ -61,7 +61,7 @@ begin
 	else {
 	    call salloc (px_out, npix, TY_LONG)
 	    call pl_pixropl (Meml[px_src], 1, PL_MAXVAL(pl), px_dst, 1,
-		MV(px_depth), Meml[px_out], npix, rop)
+		MV(px_depth), npix, rop)
 	    call amovl (Meml[px_out], px_dst, npix)
 	}
 

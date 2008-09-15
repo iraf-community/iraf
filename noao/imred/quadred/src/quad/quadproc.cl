@@ -20,15 +20,15 @@ begin
 	# Set initial values for the ccdproc parameters used for fitting the
 	# overscan. These parameters may be modified during the interactive
 	# fitting process, the new values being used for all subsequent fits.
-	ccdproc.function    = function
-	ccdproc.order       = order
-	ccdproc.sample	    = sample
-	ccdproc.naverage    = naverage
-	ccdproc.niterate    = niterate
-	ccdproc.low_reject  = low_reject
-	ccdproc.high_reject = high_reject
-	ccdproc.grow        = grow
-	ccdproc.interactive = interactive
+	qccdproc.function    = function
+	qccdproc.order       = order
+	qccdproc.sample	     = sample
+	qccdproc.naverage    = naverage
+	qccdproc.niterate    = niterate
+	qccdproc.low_reject  = low_reject
+	qccdproc.high_reject = high_reject
+	qccdproc.grow        = grow
+	qccdproc.interactive = interactive
 
 	if (overscan || trim || fixpix) {
 	    # Only those images which must be treated specialy are processed
@@ -107,7 +107,7 @@ begin
 
 	    if (zerocor || darkcor || flatcor || illumcor || fringecor ||
 	    readcor || scancor) {
-		ccdproc ("@"//qp_list, noproc=yes, 
+		qccdproc ("@"//qp_list, noproc=yes, 
 		fixpix=no, overscan=no, trim=no, zerocor=zerocor,
 		darkcor=darkcor, flatcor=flatcor, illumcor=illumcor,
 		fringecor=fringecor, readcor=readcor, scancor=scancor, 
@@ -123,7 +123,7 @@ begin
 	    # ..... and those that won't
 	    qpselect (ims, ccdtype=ccdtype, stop=yes, >> qp_list) 
 
-	    ccdproc ("@"//qp_list, noproc=yes, 
+	    qccdproc ("@"//qp_list, noproc=yes, 
 	    fixpix=fixpix, overscan=overscan, trim=trim, zerocor=zerocor,
 	    darkcor=darkcor, flatcor=flatcor, illumcor=illumcor,
 	    fringecor=fringecor, readcor=readcor, scancor=scancor, 
@@ -146,7 +146,7 @@ begin
 		}
 	    }
 
-	    ccdproc (ims, ccdtype=ccdtype, max_cache=max_cache, noproc=no,
+	    qccdproc (ims, ccdtype=ccdtype, max_cache=max_cache, noproc=no,
 	    fixpix=fixpix, overscan=overscan, trim=trim, zerocor=zerocor,
 	    darkcor=darkcor, flatcor=flatcor, illumcor=illumcor, 
 	    fringecor=fringecor, readcor=readcor, scancor=scancor, 
@@ -158,14 +158,14 @@ begin
 
 	    # Set task parameters used for overscan fitting to the ccdproc
 	    # values which may have been adjusted interactively
-	    function.p_value    = ccdproc.function
-	    order.p_value       = ccdproc.order
-	    sample.p_value      = ccdproc.sample
-	    naverage.p_value    = ccdproc.naverage
-	    niterate.p_value    = ccdproc.niterate
-	    low_reject.p_value  = ccdproc.low_reject
-	    high_reject.p_value = ccdproc.high_reject
-	    grow.p_value        = ccdproc.grow
+	    function.p_value    = qccdproc.function
+	    order.p_value       = qccdproc.order
+	    sample.p_value      = qccdproc.sample
+	    naverage.p_value    = qccdproc.naverage
+	    niterate.p_value    = qccdproc.niterate
+	    low_reject.p_value  = qccdproc.low_reject
+	    high_reject.p_value = qccdproc.high_reject
+	    grow.p_value        = qccdproc.grow
 
 	}
 

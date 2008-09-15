@@ -13,7 +13,7 @@ The list of input images to be converted.
 .ls scale_fact = 1.0
 A multiplicative scale factor to be applied to each pixel during the
 conversion process.  This parameter provides the means to minimize loss
-of precision when converting from the dynamic range of the iraf image
+of precision when converting from the dynamic range of the IRAF image
 pixels to the dynamic range of the output 16-bit signed integer,
 -32768 to 32767.
 .le
@@ -49,7 +49,7 @@ The output binary file assumes the name of the input image with an appended
 .ih
 EXAMPLES
 
-Convert the iraf image irafimage to the binary file irafimage.b.
+Convert the IRAF image irafimage to the binary file irafimage.b.
 
 .nj
 .nf

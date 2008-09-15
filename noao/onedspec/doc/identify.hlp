@@ -628,7 +628,7 @@ The polynomial can be expressed as the sum
 	y = sum from i=1 to order {c_i * z_i}
 .fi
 
-where the the c_i are the coefficients and the z_i are defined
+where the c_i are the coefficients and the z_i are defined
 interactively as:
 
 .nf
@@ -645,7 +645,7 @@ The polynomial can be expressed as the sum
 	y = sum from i=1 to order {c_i * z_i}
 .fi
 
-where the the c_i are the coefficients and the z_i are defined
+where the c_i are the coefficients and the z_i are defined
 interactively as:
 
 .nf
@@ -710,7 +710,7 @@ spectrum by reading the object image and deleting all the features.
 Deleting the features does not delete the coordinate function.
 .le
 .ls o
-For determining a two or three dimensional coordinate transformation the a
+For determining a two or three dimensional coordinate transformation a
 dispersion solution is determined at one slit position in a long slit arc
 spectrum or one spatial position in a Fabry-Perot spectrum as in the
 previous example.  The features are then traced to other positions with the

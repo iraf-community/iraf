@@ -48,7 +48,7 @@ extension is optional and set by the \fIboundary\fR parameter.
 .ih
 EXAMPLES
 
-1. Smooth an image using a 3 by 3 smoothing box and nearest neighbour boundary
+1. Smooth an image using a 3 by 3 smoothing box and nearest neighbor boundary
    extension.
 
 .nf

@@ -18,7 +18,7 @@ Angle of rotation of points on the image axes in degrees.
 Positive angles rotate in a counter-clockwise sense around the x axis.
 For a normal coordinate axes rotation xrotation and yrotation should
 be the same. A simple y axis flip can be introduced by make yrotation
-equal to xrotation plus 180 degrees. An axis skew can be intoduced by
+equal to xrotation plus 180 degrees. An axis skew can be introduced by
 making the angle between xrotation and yrotation other than a
 multiple of 90 degrees.
 .le
@@ -45,7 +45,7 @@ of any origin shift.
 .ls interpolant = "linear"
 The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -116,7 +116,7 @@ is computed in blocks of nxblock by nxblock pixels.
 .ih
 DESCRIPTION
 
-IMLINTRAN linearly transforms a the list of images in input using rotatiion
+IMLINTRAN linearly transforms a the list of images in input using rotation
 angles and magnification factors supplied by the user and writes the output
 images into output. The coordinate transformation from input to output
 image is described below.

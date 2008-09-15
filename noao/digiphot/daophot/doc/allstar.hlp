@@ -68,7 +68,7 @@ The coordinate system of the input coordinates read from \fIphotfile\fR, of the
 psf model \fIpsfimage\fR, and of the output coordinates written to
 \fIallstarfile\fR and \fIrejfile\fR respectively. The image header coordinate
 system is used to transform from the input coordinate system to the "logical"
-pixel coordinate system used internally, from the internal logicial system to
+pixel coordinate system used internally, from the internal logical system to
 the PSF model system, and from the internal "logical" pixel coordinate system
 to the output coordinate system. The input coordinate system options are
 "logical", tv", "physical", and "world". The PSF model and output coordinate
@@ -116,7 +116,6 @@ degrees and degrees for celestial coordinate systems.
 The wcsin, wcspsf, and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
-.le
 .le
 .ls cache = yes
 Cache all the data in memory ? If \fIcache\fR is "yes", then ALLSTAR attempts
@@ -503,7 +502,7 @@ Turn off verify and verbose.
 .fi
 
 
-4. Run ALLSTAR exactly as in example 3 but turn cacheing off.
+4. Run ALLSTAR exactly as in example 3 but turn caching off.
 
 .nf
     da> allstar m92 m92.grp.1 m92.psf.1 default "" default verb+ veri- \

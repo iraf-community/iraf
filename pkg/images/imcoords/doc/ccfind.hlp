@@ -17,7 +17,7 @@ by typing <EOF> (usually <ctrl/d> or <ctrl/z>).
 The list of output matched coordinate files. The computed pixel values
 are appended to the input coordinate file line and written to output. The number
 of output files must equal the number of input files. Results may be
-printed on the terminal by setting ouput to "STDOUT".
+printed on the terminal by setting output to "STDOUT".
 .le
 .ls image
 The list of input images associated with the input coordinate files. The number
@@ -59,7 +59,7 @@ equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls icrs [equinox] [epoch]
-The Internaltion Celestial Refernce System (ICRS) where equinox is
+The International Celestial Reference System (ICRS) where equinox is
 a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
 Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
 The default value of equinox is J2000.0.
@@ -201,7 +201,7 @@ the celestial coordinate system of the reference point defaults to the
 celestial coordinate system of the input coordinates \fIinsystem\fR.
 .le
 .ls projection = "tan"
-The sky projection geometry. The most comnonly used projections in
+The sky projection geometry. The most commonly used projections in
 astronomy are "tan", "arc", "sin", and "lin". Other supported projections
 are "ait", "car", "csc", "gls", "mer", "mol", "par", "pco", "qsc", "stg",
 "tsc", and "zea".
@@ -342,7 +342,7 @@ undefined then the centroiding algorithm sets the background value to
 the mean of the good data values inside the centering box.
 The centroiding algorithm iterates until the maximum number of
 iterations \fImaxiter\fR limit is reached, or until the tolerance
-critera \fItolerance\fR is achieved.
+criteria \fItolerance\fR is achieved.
 
 Only objects whose coordinates are successfully located in the 
 input image are written to the output coordinate file. The computed

@@ -67,6 +67,16 @@ corrected for a finite population, of the input pixel values (excluding
 rejected pixels) about the output combined pixel values.
 .le
 
+.ls imcmb = "$I" (optional)
+A keyword in the input images that is copied
+to one of the IMCMBnnn keywords in the output image.  A null string
+does not set the IMCMBnnn keywords nor deletes any existing keywords.
+Any other value will delete existing keywords before creating new ones.
+The special value "$I" specifies the basename of the input image name.
+If a keyword is specified that does not exist in the input image(s) then
+no ICMB keyword will be produced; it is not a error for the keyword to
+not exist.
+.le
 .ls logfile = "STDOUT" (optional)
 Optional output log file.  If no file is specified then no log information is
 produced.  The special filename "STDOUT" prints log information to the
@@ -154,21 +164,46 @@ of one line per image with the offsets in each dimension forming the
 columns.
 .le
 .le
-.ls masktype = "none" (none|goodvalue|badvalue|goodbits|badbits|!<keyword>)
-Type of pixel masking to use.  If "none" or "" then no pixel masking is done
-even if an image has an associated  pixel mask.  The other choices
-are to select the value in the pixel mask to be treated as good
-(goodvalue) or bad (badvalue) or the bits (specified as a value)
-to be treated as good (goodbits) or bad (badbits).  In these cases
-the pixel mask
-file name comes from the image header keyword BPM.  If the parameter is
-given as "!<keyword>" where <keyword> is a header keyword, the mask file
-comes from the value of that keyword and the mask value interpretation
-is the same as "goodvalue".  \fBNote\fR, if the
-number of input images becomes too large (currently about 4090 .imh 
-or 2045 .hhh images) then the images are temporarly stacked and combined by
-projection.  This means all the images must have the same size and
-dimensionality.
+.ls masktype = "none"
+Type of pixel masking to use.  The choices are
+
+.nf
+         none - No pixel masking
+    goodvalue - good pixels defined by maskvalue parameter
+     badvalue - bad pixels defined by maskvalue parameter
+      novalue - pixels with no value defined by maskvalue parameter
+     goodbits - good pixels defined by maskvalue parameter
+      badbits - bad pixels defined by maskvalue parameter
+.fi
+
+Except for "none", these choices use the mask specified by the header
+keyword BPM.  To use a different keyword to specify the mask the syntax
+is
+
+.nf
+  !<keyword> [goodvalue|badvalue|novalue|goodbits|badbits]
+.fi
+
+where if the optional second word is missing the default is "goodvalue".
+
+If "none" (or "") no pixel masking is done
+even if an image has an associated  pixel mask.  The masking defines
+pixels to be used (good) and not used (bad).  The types use the
+"maskvalue" parameter to define a single value (either as a number or
+set of bits) for good or bad and all other values are treated as the
+opposite; i.e. bad or good respectively.
+
+The "novalue" choice uses 0 as the good value and all other values are
+bad.  However, the "maskvalue" parameter defines a mask value for pixels
+with no value such as occurs from rebinning at the edges or stacking where
+there is no overlap at all.  The distinction pixels is that when a final pixel
+has no overlapping data because all input pixels have a "no value" flag
+the blank value is output while if there is no good data then pixels which
+are have other than the "no value" flag are combined as if they were good
+to produce a representative output value.  An output mask will have a
+value of 0 for pixels where at least one good input value was present,
+a value of 1 when there was no overlapping data, and a value of 2 when
+bad data was used.
 .le
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
@@ -177,7 +212,8 @@ for decimal, octal, or hexidecimal; i.e 12, 14b, 0cx to select bits 3
 and 4.
 .le
 .ls blank = 0.
-Output value to be used when there are no pixels.
+Output value to be used when there are no pixels for combining after any
+rejection.
 .le
 
 .ls scale = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
@@ -236,7 +272,7 @@ The number of low and high pixels to be rejected by the "minmax" algorithm.
 These numbers are converted to fractions of the total number of input images
 so that if no rejections have taken place the specified number of pixels
 are rejected while if pixels have been rejected by masking, thresholding,
-or nonoverlap, then the fraction of the remaining pixels, truncated
+or non-overlap, then the fraction of the remaining pixels, truncated
 to an integer, is used.
 .le
 .ls nkeep = 1
@@ -358,9 +394,13 @@ Variables" in the PARAMETERS section.
 
 The output image header is a copy of the first image in the combined set.
 In addition, the number of  images combined is recorded under the keyword
-NCOMBINE.  The input image names which are combined are also recorded under
-the indexed keywords IMCMBnnn provided there are fewer than 100 images.  If
-a bad pixel mask is created, the name of the mask will be included in the
+NCOMBINE.  The value of a keyword in the input images, where the
+keyword is specified by the parameter \fIimcmb\fR, is written to an
+indexed keyword IMCMBnnn.  The purpose of the ICMBnnn keywords is to
+identify the contributors to the output image.  One common choice is
+the input image name though other identifiers may be used.
+
+If a bad pixel mask is created, the name of the mask will be included in the
 output image header under the keyword BPM.  The output pixel type is set by
 the parameter \fIouttype\fR.  If left blank then the input datatype of
 highest precision is used.  If there is a mixture of short and unsigned
@@ -435,7 +475,7 @@ image would then be 1020x1020.
 Suppose that the only input pixels not used are pixels (1,1) in each input
 image.  Because of the offsets the first 10 rows and columns of the output
 will be based on just a single pixel except for (1,1) which has no input
-pixels.  The next 10 rows and colums of the output will be a combination
+pixels.  The next 10 rows and columns of the output will be a combination
 of 2 input pixels except (11,11) which is just based on pixel (11,11)
 in the first input image.  Finally all other pixels except (21,21) will be
 a combination of 3 values.
@@ -514,7 +554,7 @@ The overlap of the images is determined by a set of integer pixel offsets
 with an offset for each dimension of each input image.  For example
 offsets of 0, 10, and 20 in the first dimension of three images will
 result in combining the three images with only the first image in the
-first 10 colums, the first two images in the next 10 columns and
+first 10 columns, the first two images in the next 10 columns and
 all three images starting in the 21st column.  At the 21st output column
 the 21st column of the first image will be combined with the 11th column
 of the second image and the 1st column of the third image.
@@ -555,7 +595,7 @@ dimension i.  For example "grid 5 100 5 100" specifies a 5x5 grid with
 origins offset by 100 pixels.  Note that one must insure that the input
 images are specified in the correct order.  This may best be accomplished
 using a "@" list.  One useful application of the grid is to make a
-nonoverlapping mosaic of a number of images for display purposes.  Suppose
+non-overlapping mosaic of a number of images for display purposes.  Suppose
 there are 16 images which are 100x100.  The offset string "grid 4 101 4
 101" will produce a mosaic with a one pixel border having the value set
 by \fIblank\fR parameter between the images.
@@ -579,7 +619,7 @@ where we assume the second dimension has zero offsets.
 
 The offsets need not have zero for one of the images.  The offsets may
 include negative values or refer to some arbitrary common point.
-When the offsets are read by the program it will find the mininum
+When the offsets are read by the program it will find the minimum
 value in each dimension and subtract it from all the other offsets
 in that dimension.  The above example could also be specified as:
 
@@ -589,7 +629,7 @@ in that dimension.  The above example could also be specified as:
 	245 15
 .fi
 
-There may be cases where one doesn't want the mininum offsets reset
+There may be cases where one doesn't want the minimum offsets reset
 to zero.  If all the offsets are positive and the comment "# Absolute"
 appears in the offset file then the images will be combined with
 blank values between the first output pixel and the first overlapping
@@ -644,7 +684,7 @@ images which are each 500x1000.  The offsets between each image are 50
 pixels along the first dimension and 900 pixels along the second dimension,
 give or take a few pixels due to telescope pointing errors.  Thus this
 survey consists of strips of exposures.  Within a strip the images over by
-about 450 pixels.  Betweein strips the overlap is 100 pixels.  So the
+about 450 pixels.  Between strips the overlap is 100 pixels.  So the
 strips consist 400 exposures and there are 20 strips.
 
 The full size of this survey is then about 20450x18900.  At any point in a
@@ -661,7 +701,7 @@ into blocks for ease of display and manipulation.
 The method for combining this example survey is then to combine the data in
 four groups along the first dimension to produce subimages each 5200 pixels
 wide which have no overlap.  The reason for wanting to create
-nonoverlapping subregions is to simplify creation of the related masks,
+non-overlapping subregions is to simplify creation of the related masks,
 most importantly, the exposure masks.  The \fIoutlimits\fR parameter would
 have the values "1 5200", "5201 10400", 10401 15600", and "15601 20800".
 The second pair of limits is not specified to obtain the full size along
@@ -672,7 +712,7 @@ In each combining step all the images must be specified for the input in
 order to compute the full output size but then only those images needed to
 produce an output line will be accessed at the same time.  By design this
 is roughly 240 images for lines where the strips overlap.  The
-nonoverlapping blocks can be mosaiced together with this task as a final
+non-overlapping blocks can be mosaiced together with this task as a final
 step if desired.
 
 
@@ -867,20 +907,35 @@ If a pixel mask is associated with an image the mask is used when the
 \fImasktype\fR parameter is set to a value other than "none" or "".  Note that
 when it is set to "none", mask information is not used even if it exists for
 the image.  The values of \fImasktype\fR which apply masks are "goodvalue",
-"badvalue", "goodbits", "badbits", and "!<keyword>.  The last choice
+"badvalue", "novalue", "goodbits", "badbits", and "!<keyword>.  The last choice
 allows specifying the keyword whose value is the mask to be used otherwise
 the keyword "BPM" is used.
 
-The \fImasktype\fR choices are used in conjunction with
-the \fImaskvalue\fR parameter.  When the mask type is "goodvalue" or
-an explicit keyword is specified, the
-pixels with mask values matching the specified value are included in
-combining and all others are rejected.  For a mask type of
-"badvalue" the pixels with mask values matching the specified value are
-rejected and all others are accepted.  The bit types are useful for
-selecting a combination of attributes in a mask consisting of bit flags.
-The mask value is still an integer but is interpreted by bitwise comparison
-with the values in the mask file.
+The \fImasktype\fR choices are used in conjunction with the
+\fImaskvalue\fR parameter.  When the mask type is "goodvalue" or an
+explicit keyword is specified without a mask type, the pixels with mask
+values matching the specified value are included in combining and all
+others are rejected.  For a mask type of "badvalue" the pixels with
+mask values matching the specified value are rejected and all others
+are accepted.  The bit types are useful for selecting a combination of
+attributes in a mask consisting of bit flags.  The mask value is still
+an integer but is interpreted by bitwise comparison with the values in
+the mask file.
+
+The "novalue" option differs from the others in that there are three
+classes of mask values and any output pixel mask will have the three
+values 0 for good, 1 for no data, and 2 for bad.  The purpose of this
+option is to produce output values from the input values when there are
+no good pixels.  This happens when the input images have pixel values
+which have been identified as bad (such as saturated) but whose values
+can be used, possibly after being replaced or interpolated from nearby
+pixels, to produce a value that is either cosmetically reasonable or even
+marginally scientifically useful.  Again, this only happens if there
+are no good pixels to combine and then the output mask will identify
+these pixels with a mask value of 2.  If there is even one good pixel
+then only the good data will contribute to the output.  An exposure mask
+may be useful in this case when most but not all image pixels have been
+eliminated due to things like saturation.
 
 If a mask operation is specified and an image has no mask image associated
 with it (the BPM or specified keyword is absent), the mask values are taken
@@ -960,7 +1015,7 @@ and ** is the exponentiation operator.  Often the sensitivity noise,
 due to uncertainties in the pixel sensitivities (for example from the
 flat field), is not known in which case a value of zero can be used.
 See the task \fBstsdas.wfpc.noisemodel\fR for a way to determine
-these vaues (though that task expresses the read out noise in data
+these values (though that task expresses the read out noise in data
 numbers and the sensitivity noise parameter as a percentage).
 
 The read out noise is specified by the \fIrdnoise\fR parameter.  The value
@@ -1124,7 +1179,7 @@ median as the center of the distribution except that, instead of computing
 the sigma of the pixels from the CCD noise parameters or from the data
 values, the width of the distribution is characterized by the difference
 between the median value and a specified "percentile" pixel value.  This
-width is then multipled by the scale factors \fIlsigma\fR and \fIhsigma\fR
+width is then multiplied by the scale factors \fIlsigma\fR and \fIhsigma\fR
 to define the clipping thresholds above and below the median.  The clipping
 is not iterated.
 
@@ -1285,8 +1340,15 @@ Integer offsets may be determined from the image world coordinate system.
 
 A combination of ushort and short images now defaults to integer.
 .le
+.ls IMCOMBINE V2.14
+The "masktype" parameter has been generalized to allow both using a
+different keyword for the input mask and choosing the mask method.
+The "novalue" masktype is new and is useful for maintaining a distinction
+between no data and possibly marginally useful or cosmetically useful
+data.
+.le
 .ls IMCOMBINE V2.10.3
-The input scalings from an @file or header keyword are now truely
+The input scalings from an @file or header keyword are now truly
 mulitplicative or additive and they are not normalized.  The output
 pixel types now include unsigned short integer.
 .le

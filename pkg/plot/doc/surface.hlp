@@ -52,7 +52,7 @@ DESCRIPTION
 \fBSurface\fR draws a pseudo-three dimensional perspective of an image
 section.  Hidden lines are removed.  The surface may be viewed from any
 angle.  Subsampling or block averaging is used to achieve the resolution
-specified.  A labelled perimeter is optionally drawn around the plot.
+specified.  A labeled perimeter is optionally drawn around the plot.
 
 To speed up the plot, the resolution of the image can be decreased to
 \fBxres\fR by \fByres\fR.  When \fBpreserve\fR = yes, \fBsurface\fR 
@@ -84,7 +84,7 @@ image section notation, no block averaging or subsampling will be done.
 TIME REQUIREMENTS
 The time required by \fIsurface\fR depends on image size and resolution.
 A surface plot of a
-512 square image block averaged to 64 square requires 30 cp seconds.  The
+512 square image block averaged to 64 square requires 30 cpu seconds.  The
 same image subsampled would take 23 seconds to plot.  
 .ih
 BUGS

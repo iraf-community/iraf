@@ -46,30 +46,42 @@ begin
 		    } else
 			median[i] = Mems[d[j1]+k]
 		}
+		return
 	    } else {
+	        # Check for negative n values.  If found then there are
+		# pixels with no good values but with values we want to
+		# use as a substitute median.  In this case ignore that
+		# the good pixels have been sorted.
 		do i = 1, npts {
-		    k = i - 1
-		    n1 = n[i]
-		    if (n1 > 0) {
-			j1 = n1 / 2 + 1
-			if (mod (n1, 2) == 0) {
-			    j2 = n1 / 2
-			    val1 = Mems[d[j1]+k]
-			    val2 = Mems[d[j2]+k]
-			    median[i] = (val1 + val2) / 2.
-			} else
-			    median[i] = Mems[d[j1]+k]
-		    } else if (doblank == YES)
-			median[i] = blank
+		    if (n[i] < 0)
+		        break
+		}
+
+		if (n[i] >= 0) {
+		    do i = 1, npts {
+			k = i - 1
+			n1 = n[i]
+			if (n1 > 0) {
+			    j1 = n1 / 2 + 1
+			    if (mod (n1, 2) == 0) {
+				j2 = n1 / 2
+				val1 = Mems[d[j1]+k]
+				val2 = Mems[d[j2]+k]
+				median[i] = (val1 + val2) / 2.
+			    } else
+				median[i] = Mems[d[j1]+k]
+			} else if (doblank == YES)
+			    median[i] = blank
+		    }
+		    return
 		}
 	    }
-	    return
 	}
 
 	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = abs(n[i])
 
 	    # If there are more than 3 points use Wirth algorithm.  This
 	    # is the same as vops$amed.gx except for an even number of
@@ -218,30 +230,42 @@ begin
 		    } else
 			median[i] = Memi[d[j1]+k]
 		}
+		return
 	    } else {
+	        # Check for negative n values.  If found then there are
+		# pixels with no good values but with values we want to
+		# use as a substitute median.  In this case ignore that
+		# the good pixels have been sorted.
 		do i = 1, npts {
-		    k = i - 1
-		    n1 = n[i]
-		    if (n1 > 0) {
-			j1 = n1 / 2 + 1
-			if (mod (n1, 2) == 0) {
-			    j2 = n1 / 2
-			    val1 = Memi[d[j1]+k]
-			    val2 = Memi[d[j2]+k]
-			    median[i] = (val1 + val2) / 2.
-			} else
-			    median[i] = Memi[d[j1]+k]
-		    } else if (doblank == YES)
-			median[i] = blank
+		    if (n[i] < 0)
+		        break
+		}
+
+		if (n[i] >= 0) {
+		    do i = 1, npts {
+			k = i - 1
+			n1 = n[i]
+			if (n1 > 0) {
+			    j1 = n1 / 2 + 1
+			    if (mod (n1, 2) == 0) {
+				j2 = n1 / 2
+				val1 = Memi[d[j1]+k]
+				val2 = Memi[d[j2]+k]
+				median[i] = (val1 + val2) / 2.
+			    } else
+				median[i] = Memi[d[j1]+k]
+			} else if (doblank == YES)
+			    median[i] = blank
+		    }
+		    return
 		}
 	    }
-	    return
 	}
 
 	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = abs(n[i])
 
 	    # If there are more than 3 points use Wirth algorithm.  This
 	    # is the same as vops$amed.gx except for an even number of
@@ -390,30 +414,42 @@ begin
 		    } else
 			median[i] = Memr[d[j1]+k]
 		}
+		return
 	    } else {
+	        # Check for negative n values.  If found then there are
+		# pixels with no good values but with values we want to
+		# use as a substitute median.  In this case ignore that
+		# the good pixels have been sorted.
 		do i = 1, npts {
-		    k = i - 1
-		    n1 = n[i]
-		    if (n1 > 0) {
-			j1 = n1 / 2 + 1
-			if (mod (n1, 2) == 0) {
-			    j2 = n1 / 2
-			    val1 = Memr[d[j1]+k]
-			    val2 = Memr[d[j2]+k]
-			    median[i] = (val1 + val2) / 2.
-			} else
-			    median[i] = Memr[d[j1]+k]
-		    } else if (doblank == YES)
-			median[i] = blank
+		    if (n[i] < 0)
+		        break
+		}
+
+		if (n[i] >= 0) {
+		    do i = 1, npts {
+			k = i - 1
+			n1 = n[i]
+			if (n1 > 0) {
+			    j1 = n1 / 2 + 1
+			    if (mod (n1, 2) == 0) {
+				j2 = n1 / 2
+				val1 = Memr[d[j1]+k]
+				val2 = Memr[d[j2]+k]
+				median[i] = (val1 + val2) / 2.
+			    } else
+				median[i] = Memr[d[j1]+k]
+			} else if (doblank == YES)
+			    median[i] = blank
+		    }
+		    return
 		}
 	    }
-	    return
 	}
 
 	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = abs(n[i])
 
 	    # If there are more than 3 points use Wirth algorithm.  This
 	    # is the same as vops$amed.gx except for an even number of
@@ -562,30 +598,42 @@ begin
 		    } else
 			median[i] = Memd[d[j1]+k]
 		}
+		return
 	    } else {
+	        # Check for negative n values.  If found then there are
+		# pixels with no good values but with values we want to
+		# use as a substitute median.  In this case ignore that
+		# the good pixels have been sorted.
 		do i = 1, npts {
-		    k = i - 1
-		    n1 = n[i]
-		    if (n1 > 0) {
-			j1 = n1 / 2 + 1
-			if (mod (n1, 2) == 0) {
-			    j2 = n1 / 2
-			    val1 = Memd[d[j1]+k]
-			    val2 = Memd[d[j2]+k]
-			    median[i] = (val1 + val2) / 2.
-			} else
-			    median[i] = Memd[d[j1]+k]
-		    } else if (doblank == YES)
-			median[i] = blank
+		    if (n[i] < 0)
+		        break
+		}
+
+		if (n[i] >= 0) {
+		    do i = 1, npts {
+			k = i - 1
+			n1 = n[i]
+			if (n1 > 0) {
+			    j1 = n1 / 2 + 1
+			    if (mod (n1, 2) == 0) {
+				j2 = n1 / 2
+				val1 = Memd[d[j1]+k]
+				val2 = Memd[d[j2]+k]
+				median[i] = (val1 + val2) / 2.
+			    } else
+				median[i] = Memd[d[j1]+k]
+			} else if (doblank == YES)
+			    median[i] = blank
+		    }
+		    return
 		}
 	    }
-	    return
 	}
 
 	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = abs(n[i])
 
 	    # If there are more than 3 points use Wirth algorithm.  This
 	    # is the same as vops$amed.gx except for an even number of
@@ -690,3 +738,4 @@ begin
 		median[i] = blank
 	}
 end
+

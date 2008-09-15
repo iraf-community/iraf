@@ -102,6 +102,7 @@ struct arr_desc {
 #define OP_STRLDX	19	/* last occurrence of a char in str	*/
 #define OP_STRSTR	20	/* first occurrence of str1 in str2	*/
 #define OP_STRLSTR	21	/* last occurrence of str1 in str2	*/
+#define OP_STRDIC	22	/* index of string in a dictionary	*/
 
 
 /* binary logical expressions, handled by binexp();

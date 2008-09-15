@@ -205,7 +205,7 @@ begin
 			    call pargstr (Memc[fname])
 			    call pargstr (Memc[fval])
 			    call pargi (fsize)
-			    call pargc (cdtype]
+			    call pargc (cdtype)
 			    call pargstr (Memc[funits])
 			    call pargstr (Memc[fmts])
 			nlines = nlines + 1

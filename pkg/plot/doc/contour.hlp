@@ -55,7 +55,7 @@ The resolution specified by \fBxres\fR, \fByres\fR is achieved by block
 averaging unless \fBsubsample = yes\fR.
 .le
 .ls perimeter = yes
-A \fIcrtpict\fR perimeter is drawn around the contour plot with labelled
+A \fIcrtpict\fR perimeter is drawn around the contour plot with labeled
 tickmarks.
 .le
 .ls label= yes
@@ -105,13 +105,13 @@ images are represented as square plots regardless of the device aspect ratio.
 On devices with non square full device viewports (e.g., the vt640), a 
 square image will appear extended when \fBfill\fR = yes.  To completely
 fill the device viewport with contour lines, disable perimeter drawing
-and enable fill, and nothing but the coutour map will be drawn.
+and enable fill, and nothing but the contour map will be drawn.
 
-Contour plots may be overlayed on a displayed image by setting the output
+Contour plots may be overlaid on a displayed image by setting the output
 \fBdevice\fR to "imd" for image display and the contouring parameters
 \fBfill\fR and \fBperimeter\fR to "yes" and "no" respectively. By default
 green contours will be drawn on the image display. Other choices for
-\fBdevice\fR are "imdr", "imb", "imdy", "imdw" amd "imdg" for red, blue,
+\fBdevice\fR are "imdr", "imb", "imdy", "imdw" and "imdg" for red, blue,
 yellow, white and green output contours respectively.
 
 .ih
@@ -143,10 +143,10 @@ same way.
 .fi
 .ih
 TIME REQUIREMENTS
-The time required for \fIcontour\fR depends on the number of coutours
+The time required for \fIcontour\fR depends on the number of contours
 being drawn - that is, the size and smoothness of the intensity array.
 A 512 square image of "average" smoothness, with x and y resolution equal to
-64, requires about 22 cp seconds with block averaging.  Using subsampling
+64, requires about 22 cpu seconds with block averaging.  Using subsampling
 rather than block averaging, \fIcontour\fR takes 16 seconds.  A noisy
 picture will be plotted more quickly if block averaged rather than
 subsampled.

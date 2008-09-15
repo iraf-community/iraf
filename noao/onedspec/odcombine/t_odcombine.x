@@ -1049,7 +1049,7 @@ begin
 	call salloc (scales, 3*n, TY_REAL)
 	zeros = scales + n
 	wts = scales + 2 * n
-	call amovkr (INDEFR, Memr[scales], 3*n]
+	call amovkr (INDEFR, Memr[scales], 3*n)
 
 	# Combine.
 	iferr (call icombine (slist, output, headers, bmask, rmask,

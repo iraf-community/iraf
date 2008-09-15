@@ -6,5 +6,5 @@
           ecarc - Echelle thorium-argon spectrum (uncalibrated)
         ecarcdc - Echelle thorium-argon spectrum (calibrated)
 
-       spectrum - Aborption spectrum (calibrated)
+       spectrum - Absorption spectrum (calibrated)
         echelle - Echelle absorption spectrum (calibrated)

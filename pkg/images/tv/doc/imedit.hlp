@@ -72,7 +72,7 @@ pixel (with either aperture type).
 Search radius for adjusting the position of the region to be edited.
 This applies to both aperture regions and rectangular regions.  The
 center pixel of the region is searched within this radius for the
-maximum or minium pixel value.  If the value is zero then no searching
+maximum or minimum pixel value.  If the value is zero then no searching
 is done and the specified region is used directly.  If the value is
 positive then the specified region is adjusted to be centered on a
 relative maximum.  A relative minimum may be found if the value is
@@ -123,7 +123,7 @@ provide a zoom feature.  See the examples for another possible command.
 .le
 .ls graphics = "stdgraph"
 Graphics device used for surface plots.  Normally this is the standard
-graphics device "stdgraph" though other possiblities are "stdplot"
+graphics device "stdgraph" though other possibilities are "stdplot"
 and "stdvdm".  Note the the standard graphics output may also be
 redirected to a file with ">G file" where "file" is any file name.
 .le
@@ -147,7 +147,7 @@ of the region and the default key is ignored.
 .ih
 DESCRIPTION
 Regions of images are examined and edited.  This may be done interactively
-using an image display and cursor or noninteractively using a list of
+using an image display and cursor or non-interactively using a list of
 positions and commands.  There are a variety of display and editing
 options.  A list of input images and a matching list of output images
 are specified.  The output images are only created if the input image
@@ -306,7 +306,7 @@ plotting) then the undo is lost.
 .le
 .ls =, <, >
 The all pixels with a value equal to that of the pixel at the cursor
-position are replaced by the specified constant value.  This is intented
+position are replaced by the specified constant value.  This is intended
 for editing detection masks where detected objects have specific mask
 values.
 .le
@@ -366,7 +366,7 @@ mechanism which will eventually be replaced by a more sophisticated
 image display interface.
  
 .nf
-	E	Exapnd image display
+	E	Expand image display
 	P	Pan image display
 	R	Redraw image display
 	Z	Zoom image display
@@ -396,7 +396,7 @@ input [image]		New input image to edit (output name = input)
 output [image]		New output image name
 radius [value]		Aperture radius
 search [value]		Search radius
-sigma [value]		Noise sigma (INDEF for histrogram replacement)
+sigma [value]		Noise sigma (INDEF for histogram replacement)
 value [value]		Constant substitution value
 minvalue [value]	Minimum value for modification (INDEF=minimum)
 maxvalue [value]	Maximum value for modification (INDEF=maximum)
@@ -414,7 +414,7 @@ EXAMPLES
  
 	cl> imedit raw002 ed002
  
-2.  Edit pixels noninteractively from an x-y list.  Replace the original images
+2.  Edit pixels non-interactively from an x-y list.  Replace the original images
     by the edited images.
  
 .nf
@@ -426,7 +426,7 @@ EXAMPLES
 .fi
  
 3.  It is possible to use a contour plot for image display.  This is really
-    not very satisfactory but can be used in desparation.
+    not very satisfactory but can be used in desperation.
  
 .nf
 	cl> reset stdimcur=stdgraph

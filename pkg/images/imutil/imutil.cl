@@ -26,9 +26,10 @@ task	chpixtype,
 	imstack,
 	imsum,
 	imtile,
-	minmax,
 	imstatistics,
 	listpixels,
+	minmax,
+	nhedit,
 	sections	= "imutil$x_images.e"
 
 clbye()

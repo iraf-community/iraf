@@ -146,7 +146,7 @@ expressions. By default all the
 input fields are output. By setting \fIfields\fR appropriately the user
 can select a subset of the input fields for output, rearrange the order
 of the input fields, and compute new fields. For example setting
-fileds to "f[2-5]" selects fields 2 to 5 for output; setting fields
+fields to "f[2-5]" selects fields 2 to 5 for output; setting fields
 to "f[2-3],f5,f4" select fields 2 to 5 but reverses the order of fields
 4 and 5; setting fields to "f[2-5],f5-f4" selects fields 2 to 5 and
 adds a new field which is the difference between fields 5 and 4.
@@ -165,7 +165,7 @@ filtering code expects the input coordinates to be located in fields
 called "ra" and "dec". If these fields do not have valid names then
 generic field names of the form "f#" can be substituted.
 
-The names and format of amy newly computed pixel coordinate fields may
+The names and format of any newly computed pixel coordinate fields may
 be specified by setting one or more of the \fIfixp\fR, \fIfiyp\fR,
 \fIfixc\fR, \fIfiyc\fR, \fIfoxformat\fR, or \fIfoyformat\fR parameters.
 By default the filtering code expects the pixel coordinates to be located

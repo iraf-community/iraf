@@ -1,5 +1,31 @@
 .help revisions Jun88 noao.onedspec
 .nf
+doc/splot.hlp
+    The description of the 'e' key incorrectly said a core flux is
+    output.  (8/22/08, Valdes)
+
+dispcor.par
+    Changed "Conserve flux" to "Conserve total flux" per user request.
+    (6/13/08)
+
+rspectext.cl
+    Added "addonly" values to all hedit commands.  (4/1/08, Valdes)
+
+odcombine/t_odcombine.x
+    Fixed some procedure calls being closed with a ']' instead of a ')'
+    (2/17/08, MJF)
+
+ecidentify/eclinelist.x
+    A check is made that the second closest match has a match distance
+    more that 25% greater than the nearest match.  (12/10/07, Valdes)
+
+t_dopcor.x
+    For clarity when the velocity applied is in km/s this is used in the
+    log and in DOPCORn keywords.  (12/10/07, Valdes)
+
+=====
+V2.14
+=====
 
 doc/standard.hlp
     Clarified the equations and formating.  There was an inconsistency

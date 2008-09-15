@@ -122,7 +122,7 @@ measured shifts and then trim the \fIimages\fR to consistent borders.
 The task is meant to address the class of two dimensional image
 registration problems in which the images have the same pixel scale,
 are shifted relative to each other by simple translations and contain
-enough high signal/noise, pointlike sources in common to form good
+enough high signal/noise, point-like sources in common to form good
 average positions.  The basic operation of the task is to find centers
 for the list of registration objects or features in the coordinate
 frame of each image and then to subtract the corresponding centers
@@ -154,7 +154,7 @@ first source listed in \fIcoords\fR for each image.  This coarse
 centering pass requires that the first source be detached from other
 sources and from the border of each image by a distance that is at
 least the maximum shift between the \fIreference\fR and an image.  This
-source should be pointlike and have a high signal to noise ratio.  The
+source should be point-like and have a high signal to noise ratio.  The
 value of the \fIbigbox\fR parameter should be chosen to include the
 location of the source in each of the images to be aligned while
 excluding other sources.  Large values of \fIbigbox\fR should be held

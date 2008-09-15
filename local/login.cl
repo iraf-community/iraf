@@ -2,28 +2,25 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.2 January 2004"
+    logver = "IRAF V2.14.1 September 2008"
 
 set	home		= "iraf$local/"
-set	imdir		= "HDR$"
+set	imdir		= "HDR$/"
 set	uparm		= "home$uparm/"
 set	userid		= "iraf"
 
-# Set the terminal type.
-if (envget("TERM") == "xterm") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xgterm..."
-    stty xgterm
-} else {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xgterm..."
-    stty xgterm
-}
+# Set the terminal type.  We assume the user has defined this correctly 
+# when issuing the MKIRAF and no longer key off the unix TERM to set a
+# default.
+if (access (".hushiraf") == no)
+    print "setting terminal type to xgterm..."
+stty xgterm
+
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
 #set	printer		= lp
-#set    pspage          = "letter"
+#set	pspage		= "letter"
 #set	stdimage	= imt800
 #set	stdimcur	= stdimage
 #set	stdplot		= lw
@@ -32,27 +29,34 @@ if (envget("TERM") == "xterm") {
 #set	cmbuflen	= 512000
 #set	min_lenuserarea	= 64000
 #set	imtype		= "imh"
-#set    imextn          = "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+set	imextn		= "oif:imh fxf:fits,fit fxb:fxb plf:pl qpf:qp stf:hhh,??h"
 
-# IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
-# enable remote image display.
-#set	node		= ""
+
+# XIMTOOL/DISPLAY stuff.  Set node to the name of your workstation to
+# enable remote image display.  The trailing "!" is required.
+#set	node		= "my_workstation!"
 
 # CL parameters you mighth want to change.
 #ehinit   = "nostandout eol noverify"
 #epinit   = "standout showall"
 showtype = yes
 
+
+# Load the default CL package.  Doing so here allows us to override package
+# paths and load personalized packages from our loginuser.cl. 
+clpackage
+
+
 # Default USER package; extend or modify as you wish.  Note that this can
 # be used to call FORTRAN programs from IRAF.
 
 package user
 
-task	$adb $bc $cal $cat $comm $cp $csh $date $df $diff	= "$foreign"
-task	$du $find $finger $ftp $grep $lpq $ls $mail $make	= "$foreign"
+task	$adb $bc $cal $cat $comm $cp $csh $date $dbx $df $diff	= "$foreign"
+task	$du $find $finger $ftp $grep $lpq $lprm $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
 task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
-task	$vi $emacs $w $wc $less $rusers $sync $pwd		= "$foreign"
+task	$vi $emacs $w $wc $less $rusers $sync $pwd $gdb		= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
@@ -61,14 +65,15 @@ task	$fc = ("$" // envget("iraf") // "unix/hlib/fc.csh" //
 task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 task	$cls = "$clear;ls"
-task    $clw = "$clear;w"
-task    $pg = ("$(less -Cqm $*)")
+task	$clw = "$clear;w"
+task	$pg = ("$(less -Cqm $*)")
 
 if (access ("home$loginuser.cl"))
     cl < "home$loginuser.cl"
 ;
 
-keep;   clpackage
+keep
+
 
 prcache directory
 cache   directory page type help

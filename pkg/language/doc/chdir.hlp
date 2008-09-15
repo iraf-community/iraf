@@ -11,6 +11,7 @@ PARAMETERS
 The new working directory.
 The special name "." refers to the current directory; ".." refers to the next
 higher directory.
+.le
 .ih
 DESCRIPTION
 \fIChdir\fR is used to change the current working directory.

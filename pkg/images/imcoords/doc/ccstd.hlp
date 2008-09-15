@@ -53,7 +53,7 @@ forward is "no" then the plate solution is inverted and standard coordinates
 are transformed to pixel and celestial coordinates.
 .le
 .ls polar = no
-Convert to and from polar standard coordinates instead of cartesion standard
+Convert to and from polar standard coordinates instead of Cartesian standard
 coordinates?
 .le
 .ls xref = INDEF, yref = INDEF
@@ -227,7 +227,7 @@ of the coordinates not the rotation of the coordinate axes.
 .fi
 
 Linear plate solutions are evaluated in the forward and reverse sense
-using the appropriate iraf mwcs system routines. Higher order plate
+using the appropriate IRAF mwcs system routines. Higher order plate
 solutions are evaluated in the forward sense using straight-forward
 evaluation of the polynomial terms, in the reverse sense by applying
 Newton's method to the plate solution.

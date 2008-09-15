@@ -64,13 +64,13 @@ or other help modules in the help database.
 	cl> page (ref.quickref)
 .ih
 TIME REQUIREMENTS
-If a quick-reference file is used seaching takes seconds, otherwise it
+If a quick-reference file is used searching takes seconds, otherwise it
 might take a minute or so for the typical large help database containing
 all help modules for the core system and several external, layered packages.
 .ih
 BUGS
 Only the one-liner (NAME) field describing each help module is used for
-the searches.  With a litle work searching could be made much more
+the searches.  With a little work searching could be made much more
 comprehensive as well as faster.
 .ih
 SEE ALSO

@@ -342,7 +342,7 @@ derivative (label, parameter) = expression
 A \fIdelta\fR declaration begins with the \fIdelta\fR keyword, 
 followed by a list of parameter value associations, where each value
 is the region over which the derivative with respect to that parameter
-will be computed emprically. All the delta values must be greater than zero.
+will be computed empirically. All the delta values must be greater than zero.
 
 A \fIderivative\fR equation begins with the keyword \fIderivative\fR,
 followed by 
@@ -396,7 +396,7 @@ weight (label) = expression
 The \fIweight\fR equation begins with the \fIweight\fR keyword, followed by 
 the label of the equation in parentheses, followed by an equal sign,
 followed by the weight expression.  Optionally,
-the weight expression can be immeditiatly followed by the \fImin\fR and
+the weight expression can be immediately followed by the \fImin\fR and
 \fImax\fR keywords
 each of which may be followed by an expression.
 The expressions may contain any names declared in the catalog or
@@ -425,7 +425,7 @@ The plot equation is used to specify the default expressions for the x and y
 axes respectively, to be plotted when the transformation equations are fit
 interactively. The plot
 defined by the plot equation will be in the graphics window
-after the initial fit, instead of the default resdiduals versus function plot.
+after the initial fit, instead of the default residuals versus function plot.
 
 .ls
 .nf
@@ -534,7 +534,7 @@ A \fIlabel\fR is an identifier which is assigned to an equation. It is used
 to tell the parser which transformation equation, the optional derivative,
 weight, error or plot equations are associated with. 
 
-A \fIfunction\fR is a builtin mathematical function that can be
+A \fIfunction\fR is a built-in mathematical function that can be
 used in expressions.
 
 The following identifiers are reserved by the program to name
@@ -562,7 +562,7 @@ Keywords may be abbreviated to up to three characters but names, labels,
 and functions may not be abbreviated.
 
 The following arithmetic \fIoperators\fR are recognized by PHOTCAL:
-"+" (addition), "-" (substraction), "*" (multiplication), "/" (division),
+"+" (addition), "-" (subtraction), "*" (multiplication), "/" (division),
 "**" (exponentiation), "-" (minus sign), and "+" (plus sign).
 The arithmetic operators follow normal FORTRAN rules of precedence
 

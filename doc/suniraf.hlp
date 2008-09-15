@@ -196,3 +196,4 @@ and some run-time problems.  If you compile with different floating-point
 switches you may encounter new bugs at compile-time (easy to detect) or
 run-time (harder).  Feel free to contact us for advice if you have any
 difficulties.  Contacts are listed in the IRAF Newsletter.
+.endhelp

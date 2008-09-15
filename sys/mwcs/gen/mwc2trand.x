@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	"../mwcs.h"
 
 # MW_C2TRAN -- Optimized 2D coordinate transformation.
@@ -24,8 +26,9 @@ begin
 	    y2 = Memd[ltm+3] * y1 + Memd[ltv+1]
 	} else if (CT_TYPE(ct) == LRO) {
 	    # Linear, rotated transformation.
-	    x2 = Memd[ltm  ] * x1 + Memd[ltm+1] * y1 + Memd[ltv  ]
-	    y2 = Memd[ltm+2] * x1 + Memd[ltm+3] * y1 + Memd[ltv+1]
+	    p1[1] = x1;  p1[2] = y1
+	    x2 = Memd[ltm  ] * p1[1] + Memd[ltm+1] * p1[2] + Memd[ltv  ]
+	    y2 = Memd[ltm+2] * p1[1] + Memd[ltm+3] * p1[2] + Memd[ltv+1]
 	} else {
 	    # General case involving one or more functional terms.
 	    p1[1] = x1;  p1[2] = y1

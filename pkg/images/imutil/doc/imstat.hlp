@@ -8,7 +8,8 @@ imstatistics images
 .ih
 PARAMETERS
 .ls images
-The input images or image sections for which pixel statistics are to be computed.
+The input images or image sections for which pixel statistics are to be
+computed.
 .le
 .ls fields = "image,npix,mean,stddev,min,max"
 The statistical quantities to be computed and printed.

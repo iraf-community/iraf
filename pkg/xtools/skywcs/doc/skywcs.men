@@ -1,4 +1,4 @@
-    skdecwcs - Open a sky coordinate descriptor usning an image or system name
+    skdecwcs - Open a sky coordinate descriptor using an image or system name
    skdecwstr - Open a sky coordinate descriptor using a system name
      skdecim - Open a sky coordinate descriptor using an image descriptor
      skenwcs - Encode a system name using a sky coordinate descriptor

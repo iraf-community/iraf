@@ -13,7 +13,7 @@ termination; parameter retrieval and updating; and error handling.
 In addition the CL has certain `builtin' utility functions which enable
 monitoring and changing of the IRAF environment, control flow features
 roughly modeled after C and Ratfor as well as fairly sophisticated
-capabilities for performing mathmatical calculations and string manipulation.
+capabilities for performing mathematical calculations and string manipulation.
 The CL environment may easily be extended by the user.
 
 
@@ -61,7 +61,7 @@ link, and the CL replies in the same fashion.  When the process terminates
 it informs the CL and then hibernates.  Normally the executable's
 process is not terminated, but is maintained in a process cache
 so that the executable may be used again without the overhead of
-reinitiating the process.  The process finally terminates when the CL
+re-initiating the process.  The process finally terminates when the CL
 finishes, when the space in the cache is needed by a new executable
 image, or when the user explicitly clears the cache using the flprcache
 command.  The size of the process cache is small, usually only

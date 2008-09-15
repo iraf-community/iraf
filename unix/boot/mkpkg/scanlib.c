@@ -56,7 +56,7 @@ char	*library;
 	char	lbuf[SZ_LINE];
 	struct	ar_hdr arf;
 	long	length, fdate;
-	int	len, len_arfmag, nmodules;
+	int	len=0, len_arfmag, nmodules;
 	FILE	*fp;
 
 	/* Get the library file name. */

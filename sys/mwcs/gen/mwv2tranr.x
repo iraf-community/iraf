@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	"../mwcs.h"
 
 # MW_V2TRAN -- Optimized 2D coordinate transformation for an array of points.
@@ -30,9 +32,10 @@ begin
 	} else if (CT_TYPE(ct) == LRO) {
 	    # Linear, rotated transformation.
 	    do i = 1, npts {
-		x2[i] = Memr[ltm  ] * x1[i] + Memr[ltm+1] * y1[i] +
+		p1[1] = x1[i];  p1[2] = y1[i]
+		x2[i] = Memr[ltm  ] * p1[1] + Memr[ltm+1] * p2[1] +
 		    Memr[ltv  ]
-		y2[i] = Memr[ltm+2] * x1[i] + Memr[ltm+3] * y1[i] +
+		y2[i] = Memr[ltm+2] * p1[1] + Memr[ltm+3] * p2[1] +
 		    Memr[ltv+1]
 	    }
 	} else {

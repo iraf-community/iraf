@@ -17,7 +17,7 @@
       awcspars - Default image wcs parameters
 
 help ccsystems - Describe the supported celestial coordinate systems 
- help catalogs - Describe the astrometric catalog configuation file
-  help surveys - Describe the image surveys configuation file
+ help catalogs - Describe the astrometric catalog configuration file
+  help surveys - Describe the image surveys configuration file
    help afiles - Describe the standard astrometry file format
 

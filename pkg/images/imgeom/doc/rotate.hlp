@@ -35,7 +35,7 @@ any origin shifts.
 .ls interpolant = "linear"
 The interpolant. The options are the following:
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -127,13 +127,13 @@ EXAMPLES
    cl> rotate m51 m51r45 45.0
 
 2. Rotate an image by 45 degrees around (100., 100.) and
-   shift the orgin to (150., 150.0) using bicubic interpolation.
+   shift the origin to (150., 150.0) using bicubic interpolation.
 
    cl> rotate m92 m92r45 45.0 xin=100. yin=100. xout=150. yout=150.\
    >>> interp=poly3
 
 3. Rotate an image 90 degrees counter-clockwise and clockwise around its
-   center. Note the use of intranspose and image section notation.
+   center. Note the use of imtranspose and image section notation.
 
    cl> imtranspose m92[*,-*] m92d90
 
@@ -157,7 +157,7 @@ type of the pixels is set equal to the input type. This can lead to truncation
 problems for integer images.
 
 Simple 90, 180, 270 etc degree rotations are best performed using the
-intranspose task and/or image section notation.
+imtranspose task and/or image section notation.
 .ih
 SEE ALSO
 imtranspose, imshift, magnify, lintran, geotran, geomap

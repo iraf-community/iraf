@@ -1,0 +1,200 @@
+#+1220933400
+cd /iraf/iraf/unix/boot/mkpkg
+#+1220933403
+vi scanlib.c
+#+1220933449
+vi ~/notes.v214
+#+1220933506
+pwd
+#+1220933509
+cd /iraf/iraf
+#+1220933515
+mkpkg redhat
+#+1220933522
+pwd
+#+1220933523
+cd unix
+#+1220933525
+ls
+#+1220933527
+env
+#+1220933535
+source hlib/irafuser.csh
+#+1220933536
+ls
+#+1220933537
+env
+#+1220933538
+ls
+#+1220933544
+./reboot | & tee spool
+#+1220933569
+grep -i error spool
+#+1220933573
+cd ..
+#+1220933577
+mkpkg generic
+#+1220933581
+cd unix/bin.redhat
+#+1220933592
+tar czvf /tmp/hb.rhux.tar.gz .
+#+1220933606
+scp /tmp/hb.rhux.tar.gz irafnet@iraf.net:z/
+#+1220934774
+pwd
+#+1220934778
+cd ../bin.macintel
+#+1220934789
+scp irafnet@iraf.net:z/hb.macx.x86.gz .
+#+1220934800
+ls
+#+1220934808
+tar zxvf hb.macx.x86.gz ; del hb.macx.x86.gz
+#+1220934813
+cd ../bin.freebsd
+#+1220934814
+ls
+#+1220934837
+scp irafnet@iraf.net:z/hb.fbsd.x86.gz .
+#+1220934851
+ls -l
+#+1220934857
+tar zxvf hb.fbsd.x86.gz
+#+1220934860
+del hb.fbsd.x86.gz
+#+1220934861
+ls -l
+#+1220934865
+cd ..
+#+1220934866
+ls
+#+1220934879
+ssh 140.252.16.223
+#+1220934888
+ssh 140.252.26.223
+#+1220934905
+ssh 140.252.26.223 -l fitz
+#+1220935010
+pwd
+#+1220935013
+cd bin.linux
+#+1220935026
+scp irafnet@iraf.net:z/hb.lnux.x86.gz .
+#+1220935048
+tar zxvf hb.lnux.x86.gz ; del hb.lnux.x86.gz
+#+1220935050
+ls -l
+#+1220935072
+pwd
+#+1220935075
+cd ../..
+#+1220935075
+ls
+#+1220935077
+ls ..
+#+1220935078
+ls
+#+1220935082
+ls -l bin
+#+1220935088
+tar czf ../as.pcix.gen.gz .
+#+1220940005
+cd /iraf/iraf/unix/bin.macosx
+#+1220940036
+scp irafnet@iraf.net:z/hb.macx.ppc.gz . ; tar zxvf hb.macx.ppc.gz ; del hb*
+#+1220940046
+ls
+#+1220940047
+ls -l
+#+1220940050
+pwd
+#+1220940187
+pwd
+#+1220940188
+ls
+#+1220940233
+pwd
+#+1220940237
+ls -l
+#+1220940248
+cd ..
+#+1220940250
+ls
+#+1220940252
+du bin*
+#+1220940319
+pwd
+#+1220940319
+ls
+#+1220940354
+tz
+#+1220940506
+cd /iraf/irafbin
+#+1220940509
+cd /iraf
+#+1220940510
+ls
+#+1220940515
+cd iraf.v214/irafbin
+#+1220940516
+ls
+#+1220940795
+pwd
+#+1220940796
+ls
+#+1221059881
+cd /iraf/iraf
+#+1221059904
+mkpkg redhat ; cd noao ; mkpkg -p noao redhat
+#+1221060073
+cd /tmp/xpp
+#+1221060076
+sh mkpkg.sh
+#+1221060081
+exit
+#+1221060132
+env
+#+1221060133
+cd
+#+1221060134
+cl
+#+1221060142
+pwd
+#+1221060146
+cd ../unix
+#+1221060146
+ls
+#+1221060147
+ls -l
+#+1221060155
+m spool
+#+1221060158
+env
+#+1221060162
+./reboot
+#+1221060179
+pwd
+#+1221060180
+cd ..
+#+1221060182
+mkpkg
+#+1221060229
+exit
+#+1221453749
+pwd
+#+1221453756
+cd /d1/v214
+#+1221453757
+ls
+#+1221453763
+scp -rp irafnet@iraf.net:z/ .
+#+1221517193
+cd
+#+1221517194
+ls
+#+1221517195
+vi login.cl
+#+1221586731
+.
+#+1221586732
+exit

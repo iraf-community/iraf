@@ -188,7 +188,8 @@ begin
 		szmarker = clgetr ("szmarker")
 		rdmarks = (szmarker <= 0)
 	    }
-	}
+	} else
+	    call clgstr ("marker", marker, SZ_FNAME)
 
 	# Read all the curves specified by the operands in input into memory.
 	# Get the first image title and coordinate label.
@@ -389,7 +390,7 @@ begin
 		    }
 		}
 	    } else
-		call gpline (gd, Memr[x[i]], Memr[y[i]], npix[i])
+		call hgpline (gd, Memr[x[i]], Memr[y[i]], npix[i], marker)
 	}
 
 	call gclose (gd)

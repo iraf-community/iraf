@@ -44,7 +44,7 @@ RM = rm -f
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 
-BUILD_DIR = /iraf/iraf.v214/iraf/pkg/ecl/readline
+BUILD_DIR = /u3/iraf/iraf.v214/iraf/pkg/ecl/readline
 TEXINPUTDIR = $(srcdir)
 
 MAKEINFO    = LANGUAGE= makeinfo

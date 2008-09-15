@@ -11,7 +11,7 @@ available is therefore minimal at this point.  Most of the documentation
 currently available is either design documentation or programmer documentation.
 We have collected all of the documentation that we thought might be
 interesting together in one place, accessible from both the terminal and
-from UUCP, so that people would have easy access to the docs.  This bibilography
+from UUCP, so that people would have easy access to the docs.  This bibliography
 introduces each document.  The source directory is "~uucp/IRAF" or
 equivalently, "/usr/spool/uucppublic/IRAF".
 
@@ -236,7 +236,7 @@ will most likely evolve.
     Requirements, technical specifications, and algorithms for the Apphot
 digital aperture photometry package.  Apphot will be capable of
 performing background fitting and fractional pixel aperture integration,
-interactively or noninteractively, in uncrowded or moderately crowded
+interactively or non-interactively, in uncrowded or moderately crowded
 fields.  Used primarily for digital stellar photometry.
 
 
@@ -272,7 +272,7 @@ incomplete.
 -rw-r--r-- 1 iraf     116531 Feb 25 15:47 FIspec.doc
 .fi
 
-    Requction equations and technical specifications for the Filter
+    Reduction equations and technical specifications for the Filter
 Photometry package, used to correct photometric data for extinction,
 transform to a standard system, etc.  This package will not be built
 in the form specified in the FIspec document (the specs did not pass
@@ -341,3 +341,4 @@ of the terminal, and so on.  Uses the UNIX termcap database.
 
     Technical specifications for the database interface, used for image
 headers, output datafiles, general database applications, and so on.
+.endhelp

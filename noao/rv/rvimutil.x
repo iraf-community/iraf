@@ -1,5 +1,4 @@
 include <imhdr.h>
-include <fio.h>
 include "rvpackage.h"
 include "rvflags.h"
 include "rvkeywords.h"

@@ -1,7 +1,7 @@
 .help news Mar90 system
 .ih
 NAME
-news -- print the revisions summary for the current iraf version
+news -- print the revisions summary for the current IRAF version
 .ih
 USAGE
 news

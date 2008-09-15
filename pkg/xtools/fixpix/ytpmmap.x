@@ -6,10 +6,14 @@ include	<imset.h>
 include	<pmset.h>
 include	<mwset.h>
 include	<syserr.h>
+include	<math/iminterp.h>
 
-define	NOMATCH		0		# Assume logical match
-define	PMATCH		1		# Match by physical
-define	WMATCH		2		# Match by physical with WCS offset
+# Pixel mask matching options.
+define	PM_MATCH	"|logical|physical|world|offset|"
+define	PM_LOGICAL	1		# Match in logical coordinates
+define	PM_PHYSICAL	2		# Match in physical coordinates
+define	PM_WORLD	3		# Match in world coordinates
+define	PM_OFFSET	4		# Match in physical with WCS offset
 
 
 # XT_PMMAP/XT_MAPPM -- Open a pixel mask READ_ONLY.
@@ -34,18 +38,18 @@ pointer	yt_mappm()
 errchk	yt_mappm
 
 begin
-	return (yt_mappm (pmname, refim, PMATCH, mname, sz_mname))
+	return (yt_mappm (pmname, refim, "physical", mname, sz_mname))
 end
 
 pointer procedure yt_mappm (pmname, refim, match, mname, sz_mname)
 
 char	pmname[ARB]		#I Pixel mask name
 pointer	refim			#I Reference image pointer
-int	match			#I Match by physical coordinates?
+char	match[ARB]		#I Match by physical coordinates?
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
-int	i, flag, nowhite()
+int	i, j, flag, nowhite()
 pointer	sp, fname, extname, im, ref, yt_pmmap1()
 bool	streq()
 errchk	yt_pmmap1
@@ -57,29 +61,40 @@ begin
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
+
+	# Process invert flags.  These occur more than once.
+	j = 0; flag = 0
+	for (i=0; Memc[fname+i]!=EOS; i=i+1) {
+	    if (Memc[fname+i] == '^')
+	        flag = flag + 1
+	    else {
+	        Memc[fname+j] = Memc[fname+i]
+		j = j + 1
+	    }
+	}
+	Memc[fname+j] = EOS
+	if (mod (flag, 2) == 0)
+	    flag = 0
+	else
+	    flag = INVERT_MASK
+
+
+	# Resolve keyword references.
 	if (Memc[fname] == '!') {
 	    iferr (call imgstr (refim, Memc[fname+1], Memc[fname], SZ_FNAME))
 		Memc[fname] = EOS
 	} else if (streq (Memc[fname], "BPM")) {
 	    iferr (call imgstr (refim, "BPM", Memc[fname], SZ_FNAME))
 		Memc[fname] = EOS
-	} else if (streq (Memc[fname], "^BPM")) {
-	    flag = INVERT_MASK
-	    iferr (call imgstr (refim, "BPM", Memc[fname+1], SZ_FNAME))
-		Memc[fname] = EOS
 	}
 
-	if (Memc[fname] == '^') {
-	    flag = INVERT_MASK
-	    call strcpy (Memc[fname+1], Memc[fname], SZ_FNAME)
-	} else
-	    flag = NO
-
+	# Resolve other special names.
 	if (streq (Memc[fname], "EMPTY"))
 	    ref = refim
 	else
 	    ref = NULL
 
+	# Create the mask.
 	if (Memc[fname] != EOS) {
 	    iferr (im = yt_pmmap1 (Memc[fname], ref, refim, flag, match)) {
 	        ifnoerr (call imgstr (refim, "extname", Memc[extname],
@@ -128,7 +143,7 @@ char	pmname[ARB]		#I Pixel mask name
 pointer	ref			#I Reference image for pixel mask
 pointer	refim			#I Reference image for image or text
 int	flag			#I Mask flag
-int	match			#I Match by physical coordinates?
+char	match[ARB]		#I Match by physical coordinates?
 
 int	imstati(),  errcode()
 pointer	im, pm
@@ -508,17 +523,18 @@ procedure yt_match (im, refim, match)
 
 pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
-int	match			#I Match by physical coordinates?
+char	match[ARB]		#I Match by physical coordinates?
 
 int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
+int	pmmatch, maxmaskval
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
-pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
+pointer	str, pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 
-int	imstati()
+int	imstati(), strdic(), envfind(), nscan()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
-errchk	pm_open, mw_openim, im_pmmapo
+errchk	yt_match_world, pm_open, mw_openim, im_pmmapo
 
 begin
 	if (im == NULL)
@@ -536,12 +552,46 @@ begin
 	if (pm_empty(pm) && nc == ncpm && nl == nlpm)
 	    return
 
+	# Set match type.
+	call malloc (str, SZ_FNAME, TY_CHAR)
+	call sscan (match)
+	call gargwrd (Memc[str], SZ_FNAME); call gargi (maxmaskval)
+	if (nscan() == 1)
+	    maxmaskval = 1
+	pmmatch = strdic (Memc[str], Memc[str], SZ_FNAME, PM_MATCH)
+	if (pmmatch == 0 && match[1] != EOS) {
+	    if (envfind (match, Memc[str], SZ_FNAME) > 0) {
+		call sscan (Memc[str])
+		call gargwrd (Memc[str], SZ_FNAME); call gargi (maxmaskval)
+		if (nscan() == 1)
+		    maxmaskval = 1
+		pmmatch = strdic (Memc[str], Memc[str], SZ_FNAME, PM_MATCH)
+	    } else
+	        pmmatch = PM_LOGICAL
+	} else {
+	    if (envfind ("pmmatch", Memc[str], SZ_FNAME) > 0) {
+		call sscan (Memc[str])
+		call gargwrd (Memc[str], SZ_FNAME); call gargi (maxmaskval)
+		if (nscan() == 1)
+		    maxmaskval = 1
+		pmmatch = strdic (Memc[str], Memc[str], SZ_FNAME, PM_MATCH)
+	    }
+	}
+	call mfree (str, TY_CHAR)
+	if (pmmatch == 0)
+	    call error (1, "Unknown or invalid pixel mask matching option")
+
+	if (pmmatch == PM_WORLD) {
+	    call yt_match_world (im, refim, maxmaskval)
+	    return
+	}
+
 	# Compute transformation between reference (logical) coordinates
 	# and mask (physical) coordinates.  Apply a world coordinate
 	# offset if desired.
 
 	mw = mw_openim (im)
-	if (match == WMATCH) {
+	if (pmmatch == PM_OFFSET) {
 	    call mw_gwtermd (mw, lt[5], lt1, lt, 2)
 	    ctx = mw_sctran (mw, "world", "physical", 0)
 	    call mw_ctrand (ctx, lt1, lt1[5], 2)
@@ -550,11 +600,11 @@ begin
 	call mw_gltermd (mw, lt, lt[5], 2)
 	call mw_close (mw)
 
-	if (match == NOMATCH)
+	if (pmmatch == PM_LOGICAL)
 	    call amovd (lt, lt2, 6)
 	else {
 	    mw = mw_openim (refim)
-	    if (match == WMATCH) {
+	    if (pmmatch == PM_OFFSET) {
 		ctx = mw_sctran (mw, "world", "physical", 0)
 		call mw_ctrand (ctx, lt1, lt1[3], 2)
 		lt1[5] = nint (lt1[5] - lt1[3])
@@ -679,4 +729,204 @@ begin
 	call yt_pmunmap (im)
 	im = imnew
 	call imseti (im, IM_PMDES, pmnew)
+end
+
+
+# XT_MATCH_WORLD -- Set the pixel mask to match the reference image in
+# world coordinates.  The algorithm can fail in various ways, especially
+# when higher order WCS are used.  This ideally works with images and masks
+# that are not greatly skewed in RA/DEC space.
+
+procedure yt_match_world (im, refim, maxmaskval)
+
+pointer	im			#U Pixel mask image pointer
+pointer	refim			#I Reference image pointer
+int	maxmaskval		#I Maximum mask value
+
+int	i, j, k, l, nc, nl, ncpm, nlpm, step, nxmsi, nymsi
+int	c_im, l_im, c_ref, l_ref, c1_ref, c2_ref, l1_ref, l2_ref
+int	xmin, xmax, ymin, ymax
+double	pix_im[2], pix_ref[2], pix_tmp[2], ra[2], dec[2]
+real	x, y, istep, d[2], der[2,2]
+long	v[2]
+pointer	sp, bits, rl
+pointer	ba, mw_im, mw_ref, ct1, ct2, pm, xmsi, ymsi, xvec, yvec, ptr
+
+int	imstati()
+real	msieval()
+pointer	xt_baopen(), pm_open(), im_pmmapo(), imgl1i()
+pointer	mw_openim(), mw_sctran()
+bool	pm_empty()
+errchk	xt_baopen, pm_open, mw_openim, im_pmmapo, msiinit, msifit
+
+begin
+	if (im == NULL)
+	    return
+
+	# Set sizes.
+	ncpm = IM_LEN(im,1)
+	nlpm = IM_LEN(im,2)
+	nc = IM_LEN(refim,1)
+	nl = IM_LEN(refim,2)
+
+	# If the mask is empty and the sizes are the same then it does not
+	# matter if the two are actually matched in world coordinates.
+	pm = imstati (im, IM_PMDES)
+	if (pm_empty(pm) && nc == ncpm && nl == nlpm)
+	    return
+
+	# Allocate working lines.
+	call smark (sp)
+	call salloc (bits, nc, TY_INT)
+	call salloc (rl, 3+3*ncpm, TY_INT)
+
+	# Use a bit array to hold the output in memory compactly.
+	ba = xt_baopen (nc, nl, maxmaskval)
+
+	# Set logical to logical transformation through the world coordinate
+	# systems.  Use a surface fit to speed up the WCS calculations.
+
+	mw_im = mw_openim (im)
+	mw_ref = mw_openim (refim)
+
+	# First bound the reference image in world coordinates.
+
+	ct1 = mw_sctran (mw_ref, "logical", "world", 3)
+	ra[1] = 370.; ra[2]=-10; dec[1]=100; dec[2]=-100
+	for (pix_im[2]=0.5; pix_im[2]<=nl+0.5; pix_im[2]=pix_im[2]+nl/20.) {
+	    for (pix_im[1]=0.5; pix_im[1]<=nc+0.5; pix_im[1]=pix_im[1]+nc/20.) {
+		call mw_ctrand (ct1, pix_im, pix_ref, 2)
+		ra[1] = min (ra[1], pix_ref[1])
+		ra[2] = max (ra[2], pix_ref[1])
+		dec[1] = min (dec[1], pix_ref[2])
+		dec[2] = max (dec[2], pix_ref[2])
+	    }
+	}
+	call mw_ctfree (ct1)
+	        
+	# Set up look up surfaces for the transformation.
+
+	ct1 = mw_sctran (mw_im, "logical", "world", 3)
+	ct2 = mw_sctran (mw_ref, "world", "logical", 3)
+
+	call msiinit (xmsi, II_BILINEAR)
+	call msiinit (ymsi, II_BILINEAR)
+	step = 20; istep = 1. / step
+	nxmsi = (ncpm + step - 1) / step + 1
+	nymsi = (nlpm + step - 1) / step + 1
+	call malloc (xvec, nxmsi*nymsi, TY_REAL)
+	call malloc (yvec, nxmsi*nymsi, TY_REAL)
+	xmin=ncpm+1; xmax=0; ymin=nlpm+1; ymax=0
+	k = -1
+	do j = 0, nymsi-1 {
+	    pix_im[2] = j  / istep + 1
+	    do i = 0, nxmsi-1 {
+		k = k + 1
+		pix_im[1] = i / istep + 1
+		call mw_ctrand (ct1, pix_im, pix_tmp, 2)
+		if (pix_tmp[1] < ra[1] || pix_tmp[1] > ra[2] ||
+		    pix_tmp[2] < dec[1] || pix_tmp[2] > dec[2]) {
+		    Memr[xvec+k] = 0
+		    Memr[yvec+k] = 0
+		    next
+		}
+
+		call mw_ctrand (ct2, pix_tmp, pix_ref, 2)
+		x = max (0D0, min (double(nc+1), pix_ref[1]))
+		y = max (0D0, min (double(nl+1), pix_ref[2]))
+		if (x > 0.5 && x < nc+0.5 && y > 0.5 && y < nl+0.5) {
+		    l = max (1, min (ncpm, nint (pix_im[1])))
+		    xmin = min (xmin, l)
+		    xmax = max (xmax, l)
+		    l = max (1, min (nlpm, nint (pix_im[2])))
+		    ymin = min (ymin, l)
+		    ymax = max (ymax, l)
+		}
+		Memr[xvec+k] = x
+		Memr[yvec+k] = y
+	    }
+	}
+	call msifit (xmsi, Memr[xvec], nxmsi, nymsi, nxmsi) 
+	call msifit (ymsi, Memr[yvec], nxmsi, nymsi, nxmsi) 
+	call mfree (xvec, TY_REAL)
+	call mfree (yvec, TY_REAL)
+	call mw_close (mw_im)
+	call mw_close (mw_ref)
+
+	# Determine size of mask pixel in reference system.
+	# This is approximate because we don't take into account the
+	# shape of the transformed square mask pixels.
+
+	x = (xmax+xmin)/2; y = (ymax+ymin)/2
+	x = (x - 1) * istep + 1; y = (y - 1) * istep + 1
+	call msider (xmsi, x, y, der, 2, 2, 2)
+	d[1] = max (abs(der[2,1]), abs(der[1,2])) * istep
+	call msider (ymsi, x, y, der, 2, 2, 2)
+	d[2] = max (abs(der[2,1]), abs(der[1,2])) * istep
+
+	# Go through each mask pixel and add to the new mask.
+	# This uses range lists to quickly skip good pixels.
+
+	v[1] = 1
+	do l_im = ymin, ymax {
+	    v[2] = l_im
+	    call plglri (pm, v, Memi[rl], 0, ncpm, PIX_SRC)
+	    y = (l_im - 1) * istep + 1
+	    ptr = rl
+	    do k = RL_FIRST, RLI_LEN(rl) {
+		ptr = ptr + RL_LENELEM
+		c_im = Memi[ptr+RL_XOFF]
+		if (c_im > xmax)
+		    next
+		if (c_im+Memi[ptr+RL_NOFF]-1 < xmin)
+		    next
+		x = (c_im - 1) * istep + 1 - istep
+		do c_im = 1, Memi[ptr+RL_NOFF] {
+		    x = x + istep
+		    pix_ref[1] = msieval (xmsi, x, y)
+		    pix_ref[2] = msieval (ymsi, x, y)
+		    pix_tmp[1] = max (1D0, pix_ref[1] - 0.45 * d[1])
+		    pix_tmp[2] = min (double(nc), pix_ref[1] + 0.45 * d[1])
+		    if (pix_tmp[2] < 1 || pix_tmp[1] > nc)
+		        next
+		    c1_ref = nint (pix_tmp[1])
+		    c2_ref = nint (pix_tmp[2])
+		    pix_tmp[1] = max (1D0, pix_ref[2] - 0.45 * d[2])
+		    pix_tmp[2] = min (double(nl), pix_ref[2] + 0.45 * d[2])
+		    if (pix_tmp[2] < 1 || pix_tmp[1] > nl)
+		        next
+		    l1_ref = nint (pix_tmp[1])
+		    l2_ref = nint (pix_tmp[2])
+		    do l_ref = l1_ref, l2_ref {
+			do c_ref = c1_ref, c2_ref {
+			    call xt_bapi (ba, c_ref, l_ref,
+			        Memi[ptr+RL_VOFF], 1)
+			}
+		    }
+		}
+	    }
+	}
+
+	call msifree (xmsi)
+	call msifree (ymsi)
+	call yt_pmunmap (im)
+
+	# Create a new pixel mask of the required size and populate.
+	# Do dummy image I/O to set the header.
+
+	pm = pm_open (NULL)
+	call pm_ssize (pm, 2, IM_LEN(refim,1), 27)
+	im = im_pmmapo (pm, NULL)
+	ptr = imgl1i (im)
+
+	do j = 1, nl {
+	    call xt_bagi (ba, 1, j, Memi[bits], nc)
+	    v[2] = j
+	    call pmplpi (pm, v, Memi[bits], 0, nc, PIX_SRC)
+	}
+
+	call imseti (im, IM_PMDES, pm)
+
+	call xt_baclose (ba)
+	call sfree (sp)
 end

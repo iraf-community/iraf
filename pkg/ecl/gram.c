@@ -806,7 +806,7 @@ int	nargs;
 	    "errtask",   "asin",      "acos",      "hypot", 	"rad",
 	    "deg", 	 "sign",      "dsin",      "dcos",      "dtan",
 	    "dasin",     "dacos",     "trim",      "triml",     "trimr",
-	    "fp_equal",  "datan2",
+	    "fp_equal",  "datan2",    "strdic",
 	    NULL
 	};
 	static int optbl[] = {
@@ -825,7 +825,7 @@ int	nargs;
 	BINOP|OP_HYPOT,    UNOP|OP_RAD,       UNOP|OP_DEG,      UNOP|OP_SIGN,
 	 UNOP|OP_DSIN,     UNOP|OP_DCOS,      UNOP|OP_DTAN,     UNOP|OP_DASIN,
 	 UNOP|OP_DACOS,  MULTOP|OP_TRIM,    MULTOP|OP_TRIML,  MULTOP|OP_TRIMR,
-	BINOP|OP_FPEQUAL, BINOP|OP_DATAN2
+	BINOP|OP_FPEQUAL, BINOP|OP_DATAN2,   BINOP|OP_STRDIC
 	};
 
 

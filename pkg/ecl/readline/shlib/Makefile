@@ -31,13 +31,13 @@ RL_LIBRARY_NAME = readline
 srcdir = .
 VPATH = .:..
 topdir = ..
-BUILD_DIR = /iraf/iraf.v214/iraf/pkg/ecl/readline
+BUILD_DIR = /u3/iraf/iraf.v214/iraf/pkg/ecl/readline
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA = ${INSTALL} -m 644
 
-CC = cc
+CC = gcc
 RANLIB = ranlib
 AR = ar
 ARFLAGS = cr
@@ -48,7 +48,7 @@ LN = ln
 
 SHELL = /bin/sh
 
-host_os = darwin8.11.1
+host_os = linux-gnu
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -74,19 +74,19 @@ LOCAL_DEFS =
 # dynamic loading of shared objects, please update the script and send the
 # changes to bash-maintainers@gnu.org.
 #
-SHOBJ_CC = cc
-SHOBJ_CFLAGS = -fno-common
+SHOBJ_CC = gcc
+SHOBJ_CFLAGS = -fPIC
 SHOBJ_LD = ${CC}
 
-SHOBJ_LDFLAGS = -dynamic
+SHOBJ_LDFLAGS = -shared -Wl,-soname,$@
 SHOBJ_XLDFLAGS = 
 SHOBJ_LIBS = 
 
-SHLIB_XLDFLAGS =  -arch_only `/usr/bin/arch` -install_name $(libdir)/$@ -current_version $(SHLIB_MAJOR)$(SHLIB_MINOR) -compatibility_version $(SHLIB_MAJOR) -v
-SHLIB_LIBS = -lncurses
-SHLIB_LIBSUFF = dylib
+SHLIB_XLDFLAGS =  -Wl,-rpath,$(libdir) -Wl,-soname,`basename $@ $(SHLIB_MINOR)`
+SHLIB_LIBS = 
+SHLIB_LIBSUFF = so
 
-SHLIB_LIBVERSION = $(SHLIB_MAJOR)$(SHLIB_MINOR).$(SHLIB_LIBSUFF)
+SHLIB_LIBVERSION = $(SHLIB_LIBSUFF).$(SHLIB_MAJOR)$(SHLIB_MINOR)
 
 SHLIB_STATUS = supported
 

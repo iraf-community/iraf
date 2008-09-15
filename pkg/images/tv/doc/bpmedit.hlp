@@ -33,6 +33,7 @@ In the string the following changes are made:
     $frame -- substitute the value of the frame parameter
     $erase -- substituted by imedit
 .fi
+.le
 
 .ls display = yes
 Use the task interactively with the display?  This sets the behavior
@@ -58,7 +59,7 @@ be set initially.  This value may be changed interactively in \fBimedit\fR.
 .ih
 DESCRIPTION
 \fBBpmedit\fR is a variant of \fBimedit\fR.  It displays the input images
-with the masks overlayed.  The mask is defined
+with the masks overlaid.  The mask is defined
 by the value of the keyword keywords specified by the \fIbpmkey\fR
 parameter.  The editing commands apply to the mask overlay and not the
 image pixels.  In this application the edited values should be integer mask
@@ -72,7 +73,7 @@ useful cursor and colon commands.  This list is also shown below.
 
 Because it is common to want to see the image pixels to which the
 mask values apply this task loads two image display frames.  In one the
-mask is overlayed and changes to the mask are updated with the
+mask is overlaid and changes to the mask are updated with the
 redisplay options of imedit (note the options to turn on and off
 automatic redisplay).  In the second the image without the mask is
 displayed.  The editing commands may be given in either frame but the

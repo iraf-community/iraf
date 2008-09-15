@@ -13,7 +13,7 @@ $set	LFLAGS		= "-z -/static"	# default XC link flags
 $else $ifeq (MACH, linux) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-Nz -/static"# default XC link flags
+$set	LFLAGS		= "-Nz"		# default XC link flags
 $else $ifeq (MACH, redhat) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags

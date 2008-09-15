@@ -124,7 +124,7 @@ edit time and may depend on the values of other fields in the image header.
 Editing may be performed in either batch or interactive mode.  An audit trail
 may be maintained (via the \fIshow\fR switch and i/o redirection), permitting
 restoration of the database in the event of an error.  Trial runs may be made
-with updating disabled, before commiting to an actual edit which modifies the
+with updating disabled, before committing to an actual edit which modifies the
 database.
 
 The major editing functions of the \fIhedit\fR task are the following:
@@ -231,7 +231,7 @@ to that available in the CL and SPP languages.
 	**			exponentiation
 	//			string concatenation
 	!  -			boolean not, unary negation
-	<  <= >  >=		order comparision (works for strings)
+	<  <= >  >=		order comparison (works for strings)
 	== != && ||		equals, not equals, and, or
 	?=			string equals pattern
 	? :			conditional expression
@@ -272,7 +272,7 @@ or as
 If the parenthesis are omitted the latter interpretation is assumed.
 
 The operator @ must be used to dereference variables that have names with
-funny (nonalphanumeric) characters in them, forcing the variable name to
+funny (non-alphanumeric) characters in them, forcing the variable name to
 be given as a string constant.  For example, the value of the expression
 
 	@"co-flag"

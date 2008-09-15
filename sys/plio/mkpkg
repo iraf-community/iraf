@@ -41,8 +41,10 @@ libex.a:
 	placcess.x	<plio.h> <plset.h>
 	plalloc.x	<plio.h>
 	plascii.x	<ctype.h> <plset.h>
-	plbox.x		<plio.h> <plset.h>
-	plcircle.x	<plio.h> <plset.h>
+	plbox.x		<plio.h> <plset.h> plbox.h
+	plubox.x	<plio.h> <plset.h> plbox.h
+	plcircle.x	<plio.h> <plset.h> plcircle.h
+	plucircle.x	<plio.h> <plset.h> plcircle.h
 	plclear.x	<plio.h>
 	plclose.x	<plio.h>
 	plcmpress.x	<plio.h>
@@ -71,7 +73,8 @@ libex.a:
 	plopen.x	<plio.h> <plset.h>
 	plplls.x	<plio.h>
 	plpoint.x	<plio.h> <plset.h>
-	plpolygon.x	<plio.h> <plset.h>
+	plpolygon.x	<plio.h> <plset.h> plpolygon.h
+	plupolygon.x	<plio.h> <plset.h> plpolygon.h
 	plregrop.x	<plio.h> <plset.h>
 	plrio.x		<plio.h>
 	plrop.x		<plio.h> <plset.h>

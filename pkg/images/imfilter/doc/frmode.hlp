@@ -102,7 +102,7 @@ If \fIzmin\fR = \fIhmin\fR and \fIzmax\fR = \fIhmax\fR,
 FRMODE converts the image pixels directly to integers.
 This operation may result in truncation of the pixel values of the
 input image is not an integer image.
-Otherwise the input mage values from zmin to zmax are linearly mapped to
+Otherwise the input image values from zmin to zmax are linearly mapped to
 integer values from hmin to hmax.
 The histogram, median, and number of pixels less
 than the median are computed for the first window position. These

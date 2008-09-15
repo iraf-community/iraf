@@ -245,13 +245,14 @@ begin
             call clgstr ("marker", Memc[marker], SZ_FNAME)
             szm= clgetr ("szmarker")
             call init_marker (Memc[marker], imark)
-        }
+        } else
+	    call clgstr ("marker", Memc[marker], SZ_FNAME)
 
         # Now to actually draw the plot.
         if (pointmode)
             call gpmark (gp, x_vec, y_vec, nzvals, imark, szm, szm)
         else
-            call gpline (gp, x_vec, y_vec, nzvals)
+            call hgpline (gp, x_vec, y_vec, nzvals, Memc[marker])
        
         # Close up graphics and image.
         call gclose (gp)

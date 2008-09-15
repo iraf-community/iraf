@@ -9,7 +9,7 @@ window
 DESCRIPTION
 The lookup table between the display frame values and the values sent
 to the display monitor is adjusted interactively to enhance the display.
-The mapping is linear with two adustable parameters; the intercept
+The mapping is linear with two adjustable parameters; the intercept
 and the slope.  The two values are set with the image display cursor
 in the two dimensional plane of the display.  The horizontal position
 of the cursor sets the intercept or zero point of the transformation.

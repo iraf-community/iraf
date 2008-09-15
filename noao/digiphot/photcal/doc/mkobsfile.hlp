@@ -25,9 +25,10 @@ EVALFIT/INVERTFIT.
 .ls wrap = yes
 Format the output observations file for easy reading ? If wrap = yes then
 the observations for each filter are written on a separate line and the
-* character in column 1 is interpreted as a continutation character.
+* character in column 1 is interpreted as a continuation character.
 Otherwise all the data for each object is written to a single line
 where the maximum size of a line is the current value of SZ_LINE.
+.le
 .ls imsets = "STDIN"
 The input/output image set file which lists the observations of each field,
 assigns a name to each field, and tells MKOBSFILE which images belong to the
@@ -61,7 +62,7 @@ entries in \fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
 .le
 .ls obscolumns = "2 3 4 5"
 The list of numbers separated by commas or whitespace specifying which columns
-in \fIobsparams\fR contain the correct filter ids, expsoure times, 
+in \fIobsparams\fR contain the correct filter ids, exposure times, 
 airmasses, and times ob observation respectively.
 The number 0 may be used as a place holder in
 the \fIobscolumns\fR string. For example, to correct only the \fIphotfiles\fR
@@ -119,7 +120,7 @@ matched in order of occurrence with missing objects being assigned
 INDEF values.
 .le
 .ls allfilters = no
-Output only objects which are sucessfully matched in all the filters
+Output only objects which are successfully matched in all the filters
 specified by \fIidfilters\fR?
 .le
 .ls verify = no
@@ -188,7 +189,7 @@ If \fIobsparams\fR is the standard input "STDIN" then MKOBSFILE will
 prompt the user for the filter ids, exposure times, airmasses, and times of
 observation for each image in each image set.
 
-MKOBSFILE matchs the objects in different images within the same observation
+MKOBSFILE matches the objects in different images within the same observation
 either
 by order of occurrence if \fItolerance\fR is less than or equal to 0.0,
 or by x-y position. Matching by position is done by identifying which objects

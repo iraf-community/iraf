@@ -81,10 +81,10 @@ file \fItemplate\fR into \fIconfig\fR.
 
 If \fItemplate\fR  is "", MKCONFIG prompts the user for:
 1) the source of the standard star catalog format description
-\fIcatalog\fR, which asigns names to the columns of the standard star
+\fIcatalog\fR, which assigns names to the columns of the standard star
 catalog,
 2) the source of the observations file format description
-\fIobservations\fR, which asigns names to the columns of the observations file,
+\fIobservations\fR, which assigns names to the columns of the observations file,
 3) and the source of the transformation equations \fItransform\fR, which
 defines the form of the transformation equations from the
 instrumental to the standard system.
@@ -185,7 +185,7 @@ and to assign initial values to all the parameters.
 Any number of transformation equations may be defined in
 the transformation section.
 
-The tranformation section may also be used to, OPTIONALLY,
+The transformation section may also be used to, OPTIONALLY,
 define temporary variables (the set equations), define explicitly
 the derivatives of the transformation equations to be fit with respect
 to the parameters (derivative equations
@@ -309,7 +309,7 @@ EXAMPLES
 1. Type in from scratch a new configuration file to reduce some UBV
 photoelectric photometry. The catalog and observations file are simple
 text files written with the user's own data acquisition software, whose
-fromat is known by the user.
+format is known by the user.
 
 .nf
     ph> mkconfig ubv.cfg

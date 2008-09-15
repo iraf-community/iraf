@@ -1,4 +1,3 @@
-
 .help packages Aug83 "IRAF Package Structure"
 .sh
 1. Introduction
@@ -65,7 +64,7 @@ LISTS and SYSTEM packages.
     The ARTDATA package shall provide routines for the generation of
 artificial data.  The principal use of artificial data is for testing
 reduction and analysis software, making objective comparison of algorithms
-and packages possible, and quantifying the nonsystematic errors of such
+and packages possible, and quantifying the non-systematic errors of such
 software.  The package shall meet the following requirements:
 .ls 4
 .ls (1)
@@ -93,7 +92,7 @@ ellipses, and legendre surfaces), stepwedge, stairstep, ramps, and so on.
 It shall be possible to generate artificial starfields, optionally including
 scaled galaxy images randomly selected from an digital library, wherein
 the noise function, luminosity function, point spread function, spatial
-distribution, and nonlinearity are all modeled.
+distribution, and non-linearity are all modeled.
 .le
 .ls (7)
 It shall be possible to generate artificial one and two dimensional spectra,
@@ -674,12 +673,12 @@ Specify whether or not a box with ticks is to be drawn to define the
 plotting window.
 .le
 .ls o
-Specify whether the axes are to be labelled in pixel or user coordinates
+Specify whether the axes are to be labeled in pixel or user coordinates
 (user coordinates might be right ascension and declination, wavelength
 versus flux, or whatever).
 .le
 .ls o
-Select linear or log scaling in either axis (with appropriately labelled
+Select linear or log scaling in either axis (with appropriately labeled
 ticks).
 .le
 .ls o
@@ -928,7 +927,7 @@ the same grid points in the output image.  The distortion routine shall
 compute the mapping for non-grid points by interpolation.
 Note that this operator may be used to implement rotations or translations,
 to register images, to remove or induce geometric distortions,
-to convert from cartesian to polar representation and vice versa, and so on.
+to convert from Cartesian to polar representation and vice versa, and so on.
 .le
 .ls o
 Distortion table generation.  Given the coordinates of a set of grid points in
@@ -1091,7 +1090,7 @@ optionally with automatic pixel rejection and region growing.
 .le
 .ls o
 Fit a polynomial to the resulting set of points, where the order of the
-polynomial is greater than or equal to zero and is specifed by the user.
+polynomial is greater than or equal to zero and is specified by the user.
 .le
 .ls o
 Evaluate the fitted polynomial to produce the output line.
@@ -1108,7 +1107,7 @@ optionally with automatic pixel rejection and region growing.
 .ls o
 Fit a two dimensional polynomial to the resulting set of points,
 where the order of the polynomial in each dimension is greater than
-or equal to zero and is specifed by the user.
+or equal to zero and is specified by the user.
 .le
 .ls o
 Evaluate the fitted surface to produce the output image.
@@ -1555,7 +1554,7 @@ gradients, migration of the major axis, and so on.
 .ls (8)
 Output from the main analysis routine shall be in the form of a
 table printed on the standard output, permitting use of the standard
-list processing utilties for general analysis, and of the card image
+list processing utilities for general analysis, and of the card image
 utilities for data export.
 .le
 .le
@@ -1814,7 +1813,7 @@ calibrated by ONEDSPEC.
 .le
 .ls o
 Use the calibrated dummy spectrum to flux calibrate one or more two dimensional
-specra.
+spectra.
 .le
 
 The two-to-one conversion routine may also be used if one dimensional output
@@ -1984,3 +1983,4 @@ system is provided by the IRAF package structure outlined above.
 	XV.A.2	DECOMP			onedspec, maybe
         XIV.B	(analysis)		onedspec
 .fi
+.endhelp

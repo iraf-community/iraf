@@ -40,7 +40,7 @@ DESCRIPTION
 A polynomial weighted fit of specified order is fit to the X,Y, SIGMAY data
 triples
 read from the input file, files, or STDIN. The resulting coefficients
-of the polynomial are printed on the first line of the standard ouput.
+of the polynomial are printed on the first line of the standard output.
 The uncertainty in each coefficient is printed on the next line.
 These are listed as:
 

@@ -17,7 +17,7 @@ int	htype			#I TY_IMHDR or TY_PIXHDR
 
 pointer	sp, v1, fname
 int	status, hdrlen, len_userarea
-int	bfseek(), bfwseq(), miiwrc(), miiwri(), miiwrl(), miiwrr()
+int	bfseek(), bfwseq(), i_miiwrc(), i_miiwri(), i_miiwrl(), i_miiwrr()
 int	strlen()
 
 define	v1done_  91
@@ -113,11 +113,11 @@ v2start_
 	    # Initialize the output image header.
 	    switch (htype) {
 	    case TY_IMHDR:
-		if (miiwrc (fp, V2_MAGIC, SZ_IMMAGIC) == ERR)
+		if (i_miiwrc (fp, V2_MAGIC, SZ_IMMAGIC) == ERR)
 		    goto v2done_
 		hdrlen = LEN_V2IMHDR
 	    case TY_PIXHDR:
-		if (miiwrc (fp, V2_PMAGIC, SZ_IMMAGIC) == ERR)
+		if (i_miiwrc (fp, V2_PMAGIC, SZ_IMMAGIC) == ERR)
 		    goto v2done_
 		hdrlen = LEN_V2PIXHDR
 	    default:
@@ -128,9 +128,9 @@ v2start_
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
 	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_STRUCT-1) / SZ_STRUCT
 
-	    if (miiwri (fp, hdrlen, 1) == ERR)
+	    if (i_miiwri (fp, hdrlen, 1) == ERR)
 		goto v2done_
-	    if (miiwri (fp, IM_PIXTYPE(im), 1) == ERR)
+	    if (i_miiwri (fp, IM_PIXTYPE(im), 1) == ERR)
 		goto v2done_
 
 	    # Record the byte swapping used for this image.  When writing a
@@ -157,37 +157,37 @@ v2start_
 		# IM_SWAPPED should already be set in header.
 	    }
 
-	    if (miiwri (fp, IM_SWAPPED(im), 1) == ERR)
+	    if (i_miiwri (fp, IM_SWAPPED(im), 1) == ERR)
 		goto v2done_
-	    if (miiwri (fp, IM_NDIM(im), 1) == ERR)
+	    if (i_miiwri (fp, IM_NDIM(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_LEN(im,1), IM_MAXDIM) == ERR)
+	    if (i_miiwrl (fp, IM_LEN(im,1), IM_MAXDIM) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_PHYSLEN(im,1), IM_MAXDIM) == ERR)
+	    if (i_miiwrl (fp, IM_PHYSLEN(im,1), IM_MAXDIM) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_SSMTYPE(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_SSMTYPE(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_LUTOFF(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_LUTOFF(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_PIXOFF(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_PIXOFF(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_HGMOFF(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_HGMOFF(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_BLIST(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_BLIST(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_SZBLIST(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_SZBLIST(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_NBPIX(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_NBPIX(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_CTIME(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_CTIME(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_MTIME(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_MTIME(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrl (fp, IM_LIMTIME(im), 1) == ERR)
+	    if (i_miiwrl (fp, IM_LIMTIME(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrr (fp, IM_MAX(im), 1) == ERR)
+	    if (i_miiwrr (fp, IM_MAX(im), 1) == ERR)
 		goto v2done_
-	    if (miiwrr (fp, IM_MIN(im), 1) == ERR)
+	    if (i_miiwrr (fp, IM_MIN(im), 1) == ERR)
 		goto v2done_
 
 	    if (strlen(IM_PIXFILE(im)) > SZ_V2IMPIXFILE)
@@ -202,27 +202,27 @@ v2start_
 	    if (htype == TY_PIXHDR) {
 		call aclrc (Memc[fname], SZ_PATHNAME)
 		call fpathname (IM_HDRFILE(im), Memc[fname], SZ_PATHNAME)
-		if (miiwrc (fp, Memc[fname], SZ_V2IMPIXFILE) == ERR)
+		if (i_miiwrc (fp, Memc[fname], SZ_V2IMPIXFILE) == ERR)
 		    goto v2done_
 		status = OK
 		goto v2done_
-	    } else if (miiwrc (fp, IM_PIXFILE(im), SZ_V2IMPIXFILE) == ERR)
+	    } else if (i_miiwrc (fp, IM_PIXFILE(im), SZ_V2IMPIXFILE) == ERR)
 		goto v2done_
 
 	    call oif_trim (IM_HDRFILE(im), SZ_V2IMHDRFILE)
-	    if (miiwrc (fp, IM_HDRFILE(im), SZ_V2IMHDRFILE) == ERR)
+	    if (i_miiwrc (fp, IM_HDRFILE(im), SZ_V2IMHDRFILE) == ERR)
 		goto v2done_
 
 	    call oif_trim (IM_TITLE(im), SZ_V2IMTITLE)
-	    if (miiwrc (fp, IM_TITLE(im), SZ_V2IMTITLE) == ERR)
+	    if (i_miiwrc (fp, IM_TITLE(im), SZ_V2IMTITLE) == ERR)
 		goto v2done_
 
 	    call oif_trim (IM_HISTORY(im), SZ_V2IMHIST)
-	    if (miiwrc (fp, IM_HISTORY(im), SZ_V2IMHIST) == ERR)
+	    if (i_miiwrc (fp, IM_HISTORY(im), SZ_V2IMHIST) == ERR)
 		goto v2done_
 
 	    # Write the variable-length user area.
-	    if (miiwrc (fp, Memc[IM_USERAREA(im)], len_userarea) == ERR)
+	    if (i_miiwrc (fp, Memc[IM_USERAREA(im)], len_userarea) == ERR)
 		goto v2done_
 
 	    status = OK

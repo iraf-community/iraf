@@ -17,7 +17,7 @@ The graphics cursor or graphics cursor commands file.
 .le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
-package parameter (the default), "yes", or "no". By default cacheing is
+package parameter (the default), "yes", or "no". By default caching is
 disabled.
 .le
 .ls graphics = ")_.graphics"
@@ -35,23 +35,23 @@ FINDPARS, CENTERPARS, FITSKYPARS, PHOTPARS, and DAOPARS. These five parameter
 sets can be be listed, edited, and/or unlearned as a group from within DAOEDIT
 using the IRAF LPAR, EPAR and UNLEARN utilities.  Any parameter in each of
 these five parameter sets can be examined or edited individual using a simple 
-ommand.  Parameters which are defined in terms of radial distance from the
+command.  Parameters which are defined in terms of radial distance from the
 center of a star or in terms of image counts can be examined and edited
 interactively using radial profile plots and the graphics cursor.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size
-are large enough, the input image pixels are cached in memory. If cacheing
+are large enough, the input image pixels are cached in memory. If caching
 is enabled the first data measurement will appear to take a long time as the
 entire image must be read in before the measurement is actually made. All
 subsequent measurements will be very fast because DAOEDIT is accessing memory
-not disk.  The point of cacheing is to speed up random image access by making
+not disk.  The point of caching is to speed up random image access by making
 the internal image i/o buffers the same size as the image itself. At present
-there is no point in enabling cacheing for images that are less than or equal
+there is no point in enabling caching for images that are less than or equal
 to 524288 bytes, i.e. the size of the test image dev$ypix, as the default image
  i/o buffer is exactly that size. However if the size of dev$ypix is doubled by
  converting it to a real image with the chpixtype task then the effect of
-cacheing in interactive is can be quite noticeable if measurements of objects
-in the top and bottom halfs of the image are alternated.
+caching in interactive is can be quite noticeable if measurements of objects
+in the top and bottom halves of the image are alternated.
 
 .ih
 CURSOR COMMANDS
@@ -81,7 +81,7 @@ datapars	The data dependent parameters
 findpars	The daofind task object detection parameters
 centerpars	The phot task centering algorithm parameters
 fitskypars	The phot task sky fitting algorithm parameters
-photpars	The phot task photometry algroithm parameters
+photpars	The phot task photometry algorithm parameters
 daopars		The psf fitting algorithm parameters
 
 

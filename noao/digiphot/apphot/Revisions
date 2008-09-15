@@ -1,6 +1,22 @@
 .HELP revisions Jun88 noao.digiphot.apphot
 .nf
 
+aplib/apwparam1.x
+     The CLEAN parameter was being printed with UN_CSCALEUNIT units instead
+     of UN_CSWITCH (7/8/08, MJF)
+
+aplib/apwparam1.x
+     The format string had 'yyy' instead of 'yyyy'.
+      (5/27/08, Valdes)
+
+apphot/fitpsf/apsffit.x
+apphot/phot/apmag.x
+apphot/phot/apremag.x
+apphot/wphot/apwmag.x
+apphot/wphot/apwremag.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
 =======
 V2.12.3
 =======

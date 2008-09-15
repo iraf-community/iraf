@@ -433,7 +433,7 @@ occur automatically.  Users can overwrite existing files by selecting the
 
 .ih
 HARDCOPY OUTPUT AND SAVING DISK FILES.
-Help pages may be output to any configured iraf printer by selecting the
+Help pages may be output to any configured IRAF printer by selecting the
 main menubar \fBPrint\fR button to bring up the print panel.  Task help pages
 will be converted to formatted PostScript and may be sent to either a
 printer or saved to disk depending on the selection made in the printer 
@@ -512,6 +512,7 @@ or
 .fi
 
 2. Print the help text on the line printer:
+.nf
 
 	cl> help delete | lprint
 .fi
@@ -595,4 +596,4 @@ SEE ALSO
 ,
 .hr system.lroff lroff
 , the online task help documents.
-
+.endhelp

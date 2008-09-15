@@ -507,7 +507,8 @@ int	latrefunits		#I the input reference dec / latitude units
 double	idlngref, idlatref, idepoch
 pointer	sp, str, tcoo, mw
 double	imgetd()
-pointer	sk_copy(), sk_decwcs()
+pointer	sk_copy()
+int	sk_decwcs()
 
 begin
 	call smark (sp)

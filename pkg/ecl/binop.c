@@ -124,6 +124,7 @@ int	opcode;
 	    case OP_STRLDX:
 	    case OP_STRSTR:
 	    case OP_STRLSTR:
+	    case OP_STRDIC:
 	    case OP_BAND:
 	    case OP_BOR:
 	    case OP_BXOR:
@@ -171,6 +172,11 @@ int	opcode;
 	case OP_STRLSTR:
 	    if (typ1 != OT_STRING || typ2 != OT_STRING)
 		cl_error (E_UERR, "strlstr: both args must be of type string");
+	    typecode = OT_INT;
+	    break;
+	case OP_STRDIC:
+	    if (typ1 != OT_STRING || typ2 != OT_STRING)
+		cl_error (E_UERR, "strdic: both args must be of type string");
 	    typecode = OT_INT;
 	    break;
 	case OP_SUB:
@@ -361,7 +367,7 @@ int	opcode;
 		 * or ZERO if none found.
 		 */
 		{
-		    char    *ip, *cp, *fp, first_char, ch;
+		    char    *ip, *cp, *fp, *tp, first_char, ch;
 
 		    first_char = o1.o_val.v_s[0];
 		    
@@ -380,8 +386,9 @@ int	opcode;
 			if (ch == first_char) {
 			    fp = ip;
 			    cp = o1.o_val.v_s;  
-			    while (*cp != EOS && *cp == *ip) {
-				cp++; ip++;
+			    tp = ip;
+			    while (*cp != EOS && *cp == *tp) {
+				cp++; tp++;
 			    }
 			    if (*cp == EOS) {
 				iresult = (fp - o2.o_val.v_s + 1);
@@ -439,6 +446,50 @@ int	opcode;
 		result.o_val.v_i = iresult;
 		result.o_type = OT_INT;
 		goto pushresult;
+
+            case OP_STRDIC:
+                /* index = strdic (str, dicstr); "str" must be a string,
+                 * 'dicstr' is a dictionary string where the first character
+                 * is used as a delimiter.  Return a 1-based index of
+                 * occurence of any of the "str" in "dicstr", or ZERO if not
+                 * found.
+                 */
+                {
+                    char    *ip, *cp, *fp, ch, delim, first_char;
+                    short    len, index;
+
+                    iresult = 0;
+                    index = 0;
+                    len = strlen (o2.o_val.v_s);
+
+                    delim = o2.o_val.v_s[0];
+                    first_char = o1.o_val.v_s[0];
+
+                    /* Search s2 for first_char, if found check for complete
+                     * match of s1, else move on.
+                     */
+                    for (ip=o2.o_val.v_s; !iresult && (ch = *ip) != EOS; ip++) {
+                        if (ch == delim) {
+                            index++;
+                        } else if (ch == first_char) {
+                            fp = ip;
+                            cp = o1.o_val.v_s;
+                            while (*cp != EOS && *cp == *ip && *cp != delim ) {
+                                cp++; ip++;
+                            }
+                            if (*cp == EOS || *cp == delim) {
+                                iresult = index;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                result.o_val.v_i = iresult;
+                result.o_type = OT_INT;
+                goto pushresult;
+                break;
+
 	    }
 
 	    /* Cannot "goto pushresult" because would lose res core */

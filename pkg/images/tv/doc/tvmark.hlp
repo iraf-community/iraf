@@ -22,22 +22,22 @@ are logged. If \fIlogfile\fR = "" no commands are logged.
 If automatic logging is enabled, all cursor commands
 are logged, otherwise the user must use the interactive keep keystroke
 command to select specific cursor commands for logging.
-Commands are not logged in noninteractive mode.
+Commands are not logged in non-interactive mode.
 .le
 .ls autolog = no
 Automatically log all cursor commands in interactive mode.
 .le
 .ls outimage = ""
 The name of the output snapshot image.
-If tvmark is run in noninteractive mode and no command file is specified,
+If tvmark is run in non-interactive mode and no command file is specified,
 a copy of the frame buffer
-is automatically written to the iraf image \fIoutimage\fR after tvmark
+is automatically written to the IRAF image \fIoutimage\fR after tvmark
 terminates execution.
 If \fIoutimage\fR = "" no output image is written.
-In interactive mode or in noninteractive mode if a command file
+In interactive mode or in non-interactive mode if a command file
 is specified, the user can make snapshots of the frame buffer
 with the interactive colon  write command.  In this case the name of the output
-snapped image will be in order of priority, the name specifed
+snapped image will be in order of priority, the name specified
 by the user in the colon write ommand,  "outimage.snap.version",  or,
 "imagename.snap.version".
 .le
@@ -53,11 +53,11 @@ deletions file will be called "nite1.del".
 .ls commands = ""
 The text file containing the marking commands.
 In interactive mode if \fIcommands\fR = "", 
-\fIcommands\fR is the image cursor.  In noninteractive mode
+\fIcommands\fR is the image cursor.  In non-interactive mode
 cursor commands may be read from a text file, by setting \fIcommands\fR =
 "textfile".  This file may be a user
 created command file, or the \fIlogfile\fR from a previous run of tvmark.
-If \fIcommands\fR = "" in noninteractive mode, the default mark is drawn
+If \fIcommands\fR = "" in non-interactive mode, the default mark is drawn
 on the display at the positions of all the objects in \fIcoords\fR.
 .le
 .ls mark = "point"
@@ -145,7 +145,7 @@ TVMARK marks objects on the display by writing directly into
 the frame buffer specified by \fIframe\fR.  TVMARK can draw on
 any devices supported by the IRAF \fIdisplay\fR program.
 After marking, the
-contents of the frame buffer may be written out to the iraf image
+contents of the frame buffer may be written out to the IRAF image
 \fIoutimage\fR.  The output image is equal in size and intensity
 to the contents of the frame buffer displayed at the time of writing.
 
@@ -186,7 +186,7 @@ with the \fInxoffset\fR and \fInyoffset\fR parameters.
 
 In interactive mode tvmark maintains a scratch buffer.  The user opens
 the scratch buffer by issuing a save command which saves the current
-contents of the frame buffer in a temporary iraf image.
+contents of the frame buffer in a temporary IRAF image.
 The user can continue marking and if unsatisfied with the results
 restore the last saved copy of the frame buffer with the restore
 command. Subsections of the saved frame buffer can be restored to the
@@ -332,7 +332,7 @@ and append new objects to the coordinate file.
 
 5. Make a finder chart of a region containing 10 stars by drawing
 a box around the field, marking each of the 10 stars with a dot,
-labeling each with an id and finally labelling the whole field.
+labeling each with an id and finally labeling the whole field.
 Save all the keystroke commands in a log file.
 
 .nf
@@ -384,7 +384,7 @@ The command file contains the following 3 lines
 .ih
 BUGS
 Tvmark is a prototype task which can be expected to undergo considerable
-modification and enhancment in the future. The current version of this
+modification and enhancement in the future. The current version of this
 task does not produce publication quality graphics.
 In particular aliasing is easily visible in the code which draws circles
 and lines.

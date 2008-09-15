@@ -8,10 +8,11 @@ files template
 .ih
 PARAMETERS
 .ls template
-A file name template specifiying the set of files to be listed.
+A file name template specifying the set of files to be listed.
 .le
 .ls sort = "yes"
 Sort the file list.
+.le
 .ih
 DESCRIPTION
 \fIFiles\fR lists all files matching the given template.  The existence of

@@ -27,12 +27,12 @@ int	i, ip, op, msklist, imlist, rmsklist, len_exprbuf, fd, nchars, ch
 int	undim, npix, depth
 bool	verbose
 
-pointer	me_getexprdb(), me_expandtext(), immap(), me_mkmask()
+pointer	me_getexprdb(), me_expandtext(), immap(), yt_mappm(), me_mkmask()
 long	fstatl()
 int	imtopenp(), imtlen(), open(), getci(), imtgetim(), ctoi()
 int	clgeti(), strmatch(), imaccess()
 bool	clgetb(), strne()
-errchk	immap()
+errchk	immap(), yt_pmmap()
 
 begin
 	# Get the expression parameter.
@@ -176,8 +176,15 @@ begin
 	    # Open the reference mask.
 	    if (imtlen (rmsklist) > 0) {
 		if (imtgetim (rmsklist, Memc[refname], SZ_FNAME) != EOF) {
-		    iferr (refmsk = immap (Memc[refname], READ_ONLY, 0)) {
-			refmsk = NULL
+		    if (refim != NULL) {
+		        iferr (refmsk = yt_mappm (Memc[refname], refim,
+			    "logical", Memc[refname], SZ_FNAME))
+			    refmsk = NULL
+		    } else {
+			iferr (refmsk = immap (Memc[refname], READ_ONLY, 0))
+			    refmsk = NULL
+		    }
+		    if (refmsk == NULL) {
 		        call printf (
 			    "Cannot open reference mask %s for mask %s\n")
 			    call pargstr (Memc[refname])

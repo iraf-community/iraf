@@ -48,7 +48,7 @@ iterations reaches \fInreject\fR or no more points are rejected.
 CURSOR COMMANDS
 
 The following interactive cursor keystroke commands are available from
-with the INLFIT paclage.
+within the INLFIT package.
 .ls ?
 The terminal is cleared and a menu of cursor keystroke and colon commands
 is printed.
@@ -71,7 +71,7 @@ Redefine the graph keys "h-l" from their defaults. A prompt is issued for the
 graph key to be redefined. Another prompt is issued for the data to be
 plotted at which point the user must enter the x and y axis data to plot,
 delimited by a comma. The data types are the following (they can be
-abreviated to up to three characters).
+abbreviated to up to three characters).
 .nf
 
     function    Dependent variable or function
@@ -92,7 +92,7 @@ to know the variable order in this case). The ":variables" command will
 list the currently defined variables by name and number.
 The application program may
 define any number of plot equations aside from the defaults provided. In this 
-case the user may refence them by "user n", where "n" is the plot function 
+case the user may reference them by "user n", where "n" is the plot function 
 number (the user must know the equation order in this case). 
 .le
 .ls h, i, j, k, l

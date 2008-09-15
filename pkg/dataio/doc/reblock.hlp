@@ -15,7 +15,7 @@ The input file list or device name, e.g. "mta1600[2]" or "mta800", "file1",
 The list of output files or device name, e.g. "gemini!mtb", "out1",
 "out1,out2", or "@outfiles".
 If multiple file output to disk is requested,  and the specified number
-of output files is 1, the ouput file names will be generated
+of output files is 1, the output file names will be generated
 by concatenating the tape file number (the input files are on tape) or
 a sequence number (the input files are on disk) onto the output file
 name.

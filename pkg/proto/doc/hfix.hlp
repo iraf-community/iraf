@@ -16,7 +16,7 @@ Command to be applied to a file containing the image header.  The command
 may be any CL command which includes escapes to host commands.  The file
 containing the header in text form is specified by the special string
 "$fname".  The command should modify this file to the desired form.  The
-default is to invoke a text editor but there are many other possiblities.
+default is to invoke a text editor but there are many other possibilities.
 The image name may also be specified with "$image".  See the EXAMPLES
 section for some ideas.
 .le
@@ -35,7 +35,7 @@ the \fIupdate\fR switch must be set.  You must have write permission
 to update the image headers.
 
 A common command, which is the default, is to use a text editor.
-Other possiblities are to save the file, use a noninteractive host
+Other possibilities are to save the file, use a non-interactive host
 command such as \fBsed\fR in UNIX, or write your own program or
 script.
 

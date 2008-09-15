@@ -31,8 +31,8 @@ int	clpopnu(), clgfil(), clplen(), clgeti(), clgwrd(), open()
 int	imtopenp(), imtlen(), imtgetim()
 bool	clgetb()
 real	clgetr()
-pointer	immap(), mw_openim(), xt_mappm()
-errchk	tr_gsf, tr_setup, open, mw_openim, xt_mappm
+pointer	immap(), mw_openim(), yt_mappm()
+errchk	tr_gsf, tr_setup, open, mw_openim, yt_mappm
 
 data	itypes /II_BINEAREST, II_BILINEAR, II_BIPOLY3, II_BIPOLY5,
 	II_BISPLINE3, II_SINC, II_LSINC, II_DRIZZLE/
@@ -121,7 +121,8 @@ begin
 	    # Map masks.
 	    pmin = NULL; pmout = NULL
 	    if (Memc[minname] != EOS)
-	        pmin = xt_mappm (Memc[minname], in, NO, Memc[mname], SZ_FNAME)
+	        pmin = yt_mappm (Memc[minname], in, "logical", Memc[mname],
+		    SZ_FNAME)
 	    if (Memc[moutname] != EOS) {
 	        call xt_maskname (Memc[moutname], "", NEW_IMAGE,
 		    Memc[moutname], SZ_FNAME)

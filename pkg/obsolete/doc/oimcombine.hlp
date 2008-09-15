@@ -119,7 +119,7 @@ file name comes from the image header keyword BPM.  Note that when
 combining images by projection of the highest dimension only one
 pixel mask is applied to all the images.  \fBNote\fR, if the number of
 input images becomes too large (currently about 250 .imh or 125 .hhh
-images) then the images are temporarly stacked and combined by projection
+images) then the images are temporarily stacked and combined by projection
 which also means the bad pixel mask from the first image will be used
 for all images.
 .le
@@ -346,7 +346,7 @@ The overlap of the images is determined by a set of integer pixel offsets
 with an offset for each dimension of each input image.  For example
 offsets of 0, 10, and 20 in the first dimension of three images will
 result in combining the three images with only the first image in the
-first 10 colums, the first two images in the next 10 columns and
+first 10 columns, the first two images in the next 10 columns and
 all three images starting in the 21st column.  At the 21st output column
 the 21st column of the first image will be combined with the 11th column
 of the second image and the 1st column of the third image.
@@ -408,7 +408,7 @@ where we assume the second dimension has zero offsets.
 
 The offsets need not have zero for one of the images.  The offsets may
 include negative values or refer to some arbitrary common point.
-When the offsets are read by the program it will find the mininum
+When the offsets are read by the program it will find the minimum
 value in each dimension and subtract it from all the other offsets
 in that dimension.  The above example could also be specified as:
 
@@ -418,7 +418,7 @@ in that dimension.  The above example could also be specified as:
 	245 15
 .fi
 
-There may be cases where one doesn't want the mininum offsets reset
+There may be cases where one doesn't want the minimum offsets reset
 to zero.  If all the offsets are positive and the comment "# Absolute"
 appears in the offset file then the images will be combined with
 blank values between the first output pixel and the first overlapping
@@ -515,7 +515,7 @@ The image statistics and scale factors are recorded in the log file
 unless they are all equal, which is equivalent to no scaling.  The
 intensity scale factors are normalized to a unit mean and the zero
 point shifts are adjust to a zero mean.  When scale factors or
-zero point shifts are specifed by the user in an @file or
+zero point shifts are specified by the user in an @file or
 by an image header keyword no normalization is done.
 
 Scaling affects not only the mean values between images but also the
@@ -675,7 +675,7 @@ MINMAX
 A specified fraction of the highest and lowest pixels are rejected.
 The fraction is specified as the number of high and low pixels, the
 \fInhigh\fR and \fInlow\fR parameters, when data from all the input images
-are used.  If pixels have been rejected by offseting, masking, or
+are used.  If pixels have been rejected by offsetting, masking, or
 thresholding then a matching fraction of the remaining pixels, truncated
 to an integer, are used.  Thus,
 
@@ -684,7 +684,7 @@ to an integer, are used.  Thus,
 	nh = n * nhigh/nimages + 0.001 
 .fi
 
-where n is the number of pixels surviving offseting, masking, and
+where n is the number of pixels surviving offsetting, masking, and
 thresholding, nimages is the number of input images, nlow and nhigh
 are task parameters and nl and nh are the final number of low and
 high pixels rejected by the algorithm.  The factor of 0.001 is to
@@ -720,7 +720,7 @@ and ** is the exponentiation operator.  Often the sensitivity noise,
 due to uncertainties in the pixel sensitivities (for example from the
 flat field), is not known in which case a value of zero can be used.
 See the task \fBstsdas.wfpc.noisemodel\fR for a way to determine
-these vaues (though that task expresses the read out noise in data
+these values (though that task expresses the read out noise in data
 numbers and the sensitivity noise parameter as a percentage).
 
 The read out noise is specified by the \fIrdnoise\fR parameter.  The value
@@ -884,7 +884,7 @@ median as the center of the distribution except that, instead of computing
 the sigma of the pixels from the CCD noise parameters or from the data
 values, the width of the distribution is characterized by the difference
 between the median value and a specified "percentile" pixel value.  This
-width is then multipled by the scale factors \fIlsigma\fR and \fIhsigma\fR
+width is then multiplied by the scale factors \fIlsigma\fR and \fIhsigma\fR
 to define the clipping thresholds above and below the median.  The clipping
 is not iterated.
 
@@ -902,7 +902,7 @@ the appropriate number of pixels for the number of input images.  A minimum
 of one pixel and a maximum corresponding to the extreme pixels from the
 median are enforced.  The value used is reported in the log output.  Note
 that the same percentile pixel is used even if pixels have been rejected by
-offseting, masking, or thresholding; for example, if the 3nd pixel below
+offsetting, masking, or thresholding; for example, if the 3rd pixel below
 the median is specified then the 3rd pixel will be used whether there are
 10 pixels or 5 pixels remaining after the preliminary steps.
 

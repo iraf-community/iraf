@@ -250,7 +250,7 @@ the termcap database is appended in case you need it.
 
 .ls 4 [IRAF.DEV]GRAPHCAP
 There must be entries in this file for all graphics terminals, batch plotters,
-and image displays accessed by IRAF programs.  Wierd graphics terminals will
+and image displays accessed by IRAF programs.  Weird graphics terminals will
 need a new entry.  The IRAF file "sys$gio/doc/gio.hlp" contains docs for
 graphcap.  A printed copy of this document is available upon request, however
 once IRAF is up you may find it easier to generate your own copy using HELP,
@@ -308,7 +308,7 @@ or part of the system.  If you requested a "you relink" version of the system,
 read on, otherwise you can probably skip to the next section.
 
 There are two different sets of executables in the system, the so-called
-"bootstrap utilites", and the regular system executables.  The bootstrap
+"bootstrap utilities", and the regular system executables.  The bootstrap
 utilities are required to relink the system and hence must be linked first.
 If you received a "you relink" distribution you can skip this step, since the
 bootstrap utilities are included on these tapes as well.  Even if you did
@@ -320,7 +320,7 @@ system yourself, or upgrade to a more recent version of VMS.
 
 The bootstrap utilities are written in C, and the DEC C compiler is required
 to compile or link these utilities.  The C compiler is NOT required to run
-the prelinked binaries.  To recompile and link the bootstrap utilties, i.e.,
+the prelinked binaries.  To recompile and link the bootstrap utilities, i.e.,
 to "bootstrap" IRAF, enter the following commands.
 
 .nf
@@ -342,7 +342,7 @@ much longer than a relink.
 Once the system has been bootstrapped all system maintenance is done with
 the MKPKG utility.  Documentation for this and the other SOFTOOLS utilities
 may be found in the IRAF User's Guide, and is also available in the online
-system via HELP.  The bootstrap utilites differ from most IRAF software in
+system via HELP.  The bootstrap utilities differ from most IRAF software in
 that they can be run either from DCL or from the IRAF CL.  The following DCL
 commands may be entered to relink (or recompile and relink) the main IRAF
 system.  Note that in this case MKPKG is a DCL foreign task, not a .COM file,
@@ -426,7 +426,7 @@ The current recommendations are summarized below.
 Please note that these are MINIMUM values.  Larger values for PGFLQUOTA and
 WSEXTENT may be desirable, depending upon expected usage and system resources.
 
-In addition to sufficent per user authorized quota, the system tuning
+In addition to sufficient per user authorized quota, the system tuning
 parameters must be set to provide enough dynamically allocatable global
 pages and global sections to handle the expected load.  If these parameters
 are set too small, process connects will fail intermittently, usually when
@@ -619,7 +619,7 @@ be supported by NOAO, too.
 We cannot do much to help sites with other image displays until the new
 IRAF display interface is completed.  This is scheduled to be worked on
 this spring, and should be available this summer.  The new interface and
-associated TV package software will be a great improvment over what is
+associated TV package software will be a great improvement over what is
 currently available; the current interface is very minimal, and does not
 even support cursor readback, although it is fine for image display.
 
@@ -635,7 +635,7 @@ showing how to link are given in the same directory.
 The IRAF Directory Structure
 
     The current IRAF directory structure (new directories are constantly
-being added) is documented in the Appendix.  The main brances of the tree
+being added) is documented in the Appendix.  The main branches of the tree
 are the following.
 
 .nf
@@ -647,7 +647,7 @@ are the following.
 	math	- sources for the mathematical libraries
 	pkg	- the IRAF applications packages
 	sys	- the virtual operating system (VOS)
-	vms	- the VMS system interface (kernel + bootstrap utiltiies)
+	vms	- the VMS system interface (kernel + bootstrap utilities)
 .fi
 
 If you will be working with the system much at the system level, it will be
@@ -678,3 +678,4 @@ system more difficult.  It will be necessary to delete or replace the installed
 executables in BIN before the revised ones can be used.  The directory name
 in the TASK declaration for the package in HLIB$CLPACKAGE.CL is all one must
 modify to use the local version of the package rather than the standard one.
+.endhelp

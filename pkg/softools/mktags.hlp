@@ -28,7 +28,7 @@ output are provided:
 .ls
 .ls [1]
 A summary of all procedures defined in the given set of files may be printed
-on the standard output.  This output may be used as a printed index to manualy
+on the standard output.  This output may be used as a printed index to manually
 find procedures in the given file set.
 .le
 .ls [2]

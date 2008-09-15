@@ -259,24 +259,3 @@ begin
 
 	return (buf)
 end
-
-
-# ME_GSYM -- Get symbol routine for the gettok package.
-
-pointer procedure me_gsym (st, symname, nargs)
-
-pointer	st			#I symbol table
-char	symname[ARB]		#I symbol to be looked up
-int	nargs			#O number of macro arguments
-
-pointer	sym
-pointer	strefsbuf(), stfind()
-
-begin
-	sym = stfind (st, symname)
-	if (sym == NULL)
-	    return (NULL)
-
-	nargs = SYM_NARGS(sym)
-	return (strefsbuf (st, SYM_TEXT(sym)))
-end

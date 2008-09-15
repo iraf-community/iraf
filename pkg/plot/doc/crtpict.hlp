@@ -164,7 +164,7 @@ Where file `mylut' contains this information:
 TIMING
 For a 512 x 512 real image, \fBcrtpict\fR takes about 40 cpu seconds with
 \fBauto_fill\fR and \fBreplicate\fR = yes.  When \fBauto_fill\fR = yes
-but \fBreplicate\fR = no, \fBcrtpict\fR requires almost 400 cp seconds.
+but \fBreplicate\fR = no, \fBcrtpict\fR requires almost 400 cpu seconds.
 .ih
 SEE ALSO
 display, showcap

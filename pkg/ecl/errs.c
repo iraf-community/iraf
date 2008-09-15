@@ -99,6 +99,7 @@ int	errlog    = NO;
 /* These variables are the various 'erract' options.
  */
 int	err_abort      = YES;	/* abort on error		*/
+int	err_beep       = YES;	/* beep on error		*/
 int	err_trace      = YES;	/* print calling traceback	*/
 int	err_flpr       = YES;	/* flush process cache		*/
 int	err_clear      = YES;	/* clear CL status params	*/
@@ -303,8 +304,8 @@ va_dcl
 	 * properly trap without rewriting the calling code.
 	 */
 	if (cltrace) {
-	    eprintf ("cl_error: abort=%d  trace=%d  flpr=%d\n", 
-	        err_abort, err_trace, err_flpr);
+	    eprintf ("cl_error: abort=%d  beep=%d  trace=%d  flpr=%d\n", 
+	        err_abort, err_beep, err_trace, err_flpr);
 	    eprintf ("cl_error: code=%d do_err=%d errtype=%d/%d task='%s'\n", 
 	        errcom.errcode, do_error, errtype, errtype&E_UERR, 
 	        currentask->t_ltp->lt_lname);
@@ -373,6 +374,10 @@ erract_init ()
                     err_abort = YES;
                 else if (strncmp (act, "noabort", 3) == 0)
                     err_abort = NO;
+                else if (strncmp (act, "beep", 3) == 0)
+                    err_beep = YES;
+                else if (strncmp (act, "nobeep", 3) == 0)
+                    err_beep = NO;
                 else if (strncmp (act, "trace", 3) == 0)
                     err_trace = YES;
                 else if (strncmp (act, "notrace", 3) == 0)
@@ -400,6 +405,7 @@ erract_init ()
 	 */
 	sprintf (opt, "%s %s %s %s %s",
 	    (err_abort      ? "abort"      : "noabort"),
+	    (err_beep       ? "beep"      : "nobeep"),
 	    (err_trace      ? "trace"      : "notrace"),
 	    (err_flpr       ? "flpr"       : "noflpr"),
 	    (err_clear      ? "clear"      : "noclear"),

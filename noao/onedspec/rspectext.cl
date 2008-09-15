@@ -64,49 +64,49 @@ begin
 
 	if (!header) {
 	    hedit (specout, "title", title,
-		add+, del-, update+, verify-, show-)
+		add+, addonly-, del-, update+, verify-, show-)
 	    if (dtype == "linear") {
 		hedit (specout, "dc-flag", 0,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "crpix1", 1.,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "crval1", crval1,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "cdelt1", cdelt1,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 	    } else if (dtype == "log") {
 		hedit (specout, "dc-flag", 1,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "crpix1", 1.,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "crval1", crval1,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "cdelt1", cdelt1,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 	    } else if (dtype == "nonlinear") {
 		hedit (specout, "refspec1", temp3,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		dispcor (specout, "", linearize=no, database="tmp$",
 		    table="", w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF, log=log,
 		    flux=no, samedisp=no, global=no, ignoreaps=no, confirm=no,
 		    listonly=no, verbose=no, logfile="")
 		hedit (specout, "dclog1",
-		    add-, del+, update+, verify-, show-)
+		    add-, addonly-, del+, update+, verify-, show-)
 	    } else if (dtype == "interp") {
 		hedit (specout, "refspec1", temp3,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		dispcor (specout, "", linearize=yes, database="tmp$",
 		    table="", w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF, log=log,
 		    flux=no, samedisp=no, global=no, ignoreaps=no, confirm=no,
 		    listonly=no, verbose=no, logfile="")
 		hedit (specout, "dclog1",
-		    add-, del+, update+, verify-, show-)
+		    add-, addonly-, del+, update+, verify-, show-)
 	    }
 	    if (flux) {
 		hedit (specout, "ca-flag", 0,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 		hedit (specout, "ex-flag", 0,
-		    add+, del-, update+, verify-, show-)
+		    add+, addonly-, del-, update+, verify-, show-)
 	    }
 	}
 	delete (temp2, verify-)

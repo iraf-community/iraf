@@ -33,7 +33,7 @@ image tile around the y axis before adding it to the mosaic, then
 .ls missing_input = ""
 The list of missing image tiles. For example if image tiles 3 to 5 and
 10 from a sequence of image tiles are missing then \fImissing_input\fR =
-"3-5,10". This parameter uses the iraf ranges syntax. The number of missing
+"3-5,10". This parameter uses the IRAF ranges syntax. The number of missing
 image tiles plus the number of input image tiles must equal \fInctile\fR *
 \fInltile\fR.
 .le
@@ -129,7 +129,7 @@ between each subraster.
         start_tile="ur" row-
 .fi
 
-2. Mosaic a list of 62 iimages onto an 8 by 8 grid in column order
+2. Mosaic a list of 62 images onto an 8 by 8 grid in column order
 starting in the upper right hand corner. Allow one blank column and row
 between each subraster. Subrasters 3 and 9 in the sequence do not exist
 and are to be replaced in the output image with an unknown value of -1.0.
