@@ -4,7 +4,7 @@
 all:	xyacc.e
 
 xyacc.e:	y1.o y2.o y3.o y4.o
-	$(CC) $(HSI_LF) -o $@ $?
+	$(CC) $(HSI_LF) -o $@ y1.o y2.o y3.o y4.o
 	cp -p $@ ../../bin/.
 
 clean::

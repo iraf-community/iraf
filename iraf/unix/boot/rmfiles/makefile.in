@@ -4,7 +4,7 @@
 all:	rmfiles.e
 
 rmfiles.e:	rmfiles.o
-	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS)
+	$(CC) $(HSI_LF) -o $@ rmfiles.o $(HSI_LIBS)
 	cp -p $@ ../../bin/.
 
 clean::

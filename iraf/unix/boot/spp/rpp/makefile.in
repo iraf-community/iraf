@@ -13,7 +13,7 @@ libc.a::
 	make -C ratlibc
 
 rpp.e:	rpp.o librpp.a libf.a libc.a
-	$(CC) $(HSI_LF) $? $(HSI_F77LIBS) -o $@
+	$(CC) $(HSI_LF) rpp.o librpp.a libf.a libc.a $(HSI_F77LIBS) -o $@
 	cp -p $@ ../../../bin/.
 
 clean::

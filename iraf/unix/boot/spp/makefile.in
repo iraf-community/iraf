@@ -4,7 +4,7 @@
 all:	xc.e
 
 xc.e:	xc.o
-	$(CC) $(HSI_LF) -o $@ $? $(HSI_LIBS)
+	$(CC) $(HSI_LF) -o $@ xc.o $(HSI_LIBS)
 	cp -p $@ ../../bin/.
 
 clean::

@@ -4,7 +4,7 @@
 all:	generic.e
 
 generic.e:	lexyy.o chario.o generic.o yywrap.o
-	$(CC) $(HSI_LF) -o $@ $?
+	$(CC) $(HSI_LF) -o $@ lexyy.o chario.o generic.o yywrap.o
 	cp -p $@ ../../bin/.
 
 clean::
