@@ -58,6 +58,7 @@ define	SZ_REAL		2
 define	SZ_DOUBLE	4
 define	SZ_COMPLEX	4
 define	SZ_POINTER	4
+define	SZ_SIZE_T	4
 define	SZ_STRUCT	4
 define	SZ_USHORT	1
 #else	/* ILP64 */
@@ -70,6 +71,7 @@ define	SZ_REAL		2
 define	SZ_DOUBLE	4
 define	SZ_COMPLEX	4
 define	SZ_POINTER	4
+define	SZ_SIZE_T	4
 define	SZ_STRUCT	4
 define	SZ_USHORT	1
 #endif
@@ -83,6 +85,7 @@ define	SZ_REAL		2
 define	SZ_DOUBLE	4
 define	SZ_COMPLEX	4
 define	SZ_POINTER	2
+define	SZ_SIZE_T	2
 define	SZ_STRUCT	2
 define	SZ_USHORT	1
 #endif
@@ -101,6 +104,7 @@ define	TY_REAL		6
 define	TY_DOUBLE	7
 define	TY_COMPLEX	8
 define	TY_POINTER	9
+define	TY_SIZE_T	9
 define	TY_STRUCT	10		; last (regular) type code
 define	TY_USHORT	11		; for image i/o
 define	TY_UBYTE	12		; (special) for image i/o
