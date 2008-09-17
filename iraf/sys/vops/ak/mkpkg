@@ -17,6 +17,7 @@ libvops.a:
 	aaddkd.x	
 	aaddki.x	
 	aaddkl.x	
+	aaddkp.x	
 	aaddkr.x	
 	aaddks.x	
 	aaddkx.x	
