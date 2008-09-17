@@ -136,6 +136,7 @@ libvops.a:
 	aminkd.x	
 	aminki.x	
 	aminkl.x	
+	aminkp.x	
 	aminkr.x	
 	aminks.x	
 	aminkx.x	
