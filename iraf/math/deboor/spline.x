@@ -62,9 +62,10 @@ real	x[n], y[n]
 int	n, k, ier
 real	q[ARB], bspln[ARB]		#q[(2*k-1)*n], bspln[2*n+30]
 int	m, i, knot
+int	modi()
 
 begin
-	if (k < 2 || mod (k, 2) != 0) {
+	if (k < 2 || modi (k, 2) != 0) {
 	    ier = 1
 	    return
 	}
