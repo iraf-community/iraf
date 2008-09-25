@@ -14,7 +14,7 @@ define	CV_TYPE		Memi[P2I($1+12)]	# Type of curve to be fitted
 define	CV_ORDER	Memi[P2I($1+13)]	# Order of the fit
 define	CV_NPIECES	Memi[P2I($1+14)]	# Number of polynomial pieces - 1
 define	CV_NCOEFF	Memi[P2I($1+15)]	# Number of coefficients
-define	CV_NPTS		Memi[P2I($1+16)]	# Number of data points
+define	CV_NPTS		Memz[P2Z($1+16)]	# Number of data points
 
 define	CV_XBASIS	Memp[$1+17]	# Pointer to non zero basis for single x
 define	CV_MATRIX	Memp[$1+18]	# Pointer to original matrix
@@ -35,7 +35,7 @@ define	CHOFAC		Memd[$1]	# Element of CHOFAC
 define	VECTOR		Memd[$1]	# Element of VECTOR
 define	COEFF		Memd[$1]	# Element of COEFF
 define	BASIS		Memd[$1]	# Element of BASIS
-define	LEFT		Memi[$1]	# Element of LEFT
+define	LEFT		Memz[$1]	# Element of LEFT
 
 # structure definitions for restore
 

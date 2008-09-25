@@ -12,7 +12,7 @@ procedure cvvector (cv, x, yfit, npts)
 pointer	cv		# curve descriptor
 real	x[npts]		# data x values
 real	yfit[npts]	# the fitted y values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 begin
 	switch (CV_TYPE(cv)) {

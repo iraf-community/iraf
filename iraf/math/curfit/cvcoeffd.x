@@ -10,9 +10,12 @@ pointer	cv		# curve descriptor
 double	coeff[ARB]	# the coefficients of the fit
 int	ncoeff		# the number of coefficients
 
+size_t	sz_val
+
 begin
 	ncoeff = CV_NCOEFF(cv)
 
 	# fetch coefficients
-	call amovd (COEFF(CV_COEFF(cv)), coeff, ncoeff)
+	sz_val = ncoeff
+	call amovd (COEFF(CV_COEFF(cv)), coeff, sz_val)
 end

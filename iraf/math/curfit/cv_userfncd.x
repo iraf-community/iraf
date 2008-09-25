@@ -29,9 +29,10 @@ procedure dcv_buser (cv, x, npts)
 
 pointer	cv
 double   x[ARB]
-int	npts
+size_t	npts
 
-int	i, j
+long	i
+int	j
 
 begin
 	do i = 1, npts {
@@ -49,16 +50,18 @@ procedure dcv_evuser (cv, x, yfit, npts)
 
 pointer	cv
 double	x[ARB],  yfit[ARB]
-int	npts
+size_t	npts
 
-int	i
+size_t	sz_val
+long	i
 double	adotd
 
 begin
 	do i = 1, npts {
 	    call dcv_b1user (cv, x[i])
+	    sz_val = CV_ORDER(cv)
 	    yfit[i] = adotd ( XBASIS(CV_XBASIS(cv)), COEFF(CV_COEFF(cv)),
-				CV_ORDER(cv))
+			       sz_val )
 	}
 end
 

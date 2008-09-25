@@ -33,9 +33,10 @@ procedure $tcv_buser (cv, x, npts)
 
 pointer	cv
 PIXEL   x[ARB]
-int	npts
+size_t	npts
 
-int	i, j
+long	i
+int	j
 
 begin
 	do i = 1, npts {
@@ -53,16 +54,18 @@ procedure $tcv_evuser (cv, x, yfit, npts)
 
 pointer	cv
 PIXEL	x[ARB],  yfit[ARB]
-int	npts
+size_t	npts
 
-int	i
+size_t	sz_val
+long	i
 PIXEL	adot$t
 
 begin
 	do i = 1, npts {
 	    call $tcv_b1user (cv, x[i])
+	    sz_val = CV_ORDER(cv)
 	    yfit[i] = adot$t ( XBASIS(CV_XBASIS(cv)), COEFF(CV_COEFF(cv)),
-				CV_ORDER(cv))
+			       sz_val )
 	}
 end
 

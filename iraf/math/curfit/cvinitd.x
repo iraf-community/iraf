@@ -16,6 +16,8 @@ int	order		# order of curve to be fitted, or in the case of the
 double	xmin		# minimum value of x
 double	xmax		# maximum value of x
 
+size_t	sz_val
+
 errchk	malloc, calloc
 
 begin
@@ -28,7 +30,8 @@ begin
 	    call error (0, "CVINIT: xmax <= xmin.")
 
 	# allocate space for the curve descriptor
-	call calloc (cv, LEN_CVSTRUCT, TY_STRUCT)
+	sz_val = LEN_CVSTRUCT
+	call calloc (cv, sz_val, TY_STRUCT)
 
 	# specify the curve-type dependent parameters
 	switch (curve_type) {
@@ -68,11 +71,16 @@ begin
 	CV_XMAX(cv) = xmax
 
 	# allocate space for the matrix and vectors
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_DOUBLE)
-	call calloc (CV_MATRIX(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_CHOFAC(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_DOUBLE)
+	sz_val = CV_ORDER(cv)
+	call calloc (CV_XBASIS(cv), sz_val, TY_DOUBLE)
+	sz_val = CV_ORDER(cv)*CV_NCOEFF(cv)
+	call calloc (CV_MATRIX(cv), sz_val, TY_DOUBLE)
+	sz_val = CV_ORDER(cv)*CV_NCOEFF(cv)
+	call calloc (CV_CHOFAC(cv), sz_val, TY_DOUBLE)
+	sz_val = CV_NCOEFF(cv)
+	call calloc (CV_VECTOR(cv), sz_val, TY_DOUBLE)
+	sz_val = CV_NCOEFF(cv)
+	call calloc (CV_COEFF(cv), sz_val, TY_DOUBLE)
 
 	# initialize pointer to basis functions to null
 	CV_BASIS(cv) = NULL

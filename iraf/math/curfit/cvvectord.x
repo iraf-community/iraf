@@ -12,7 +12,7 @@ procedure dcvvector (cv, x, yfit, npts)
 pointer	cv		# curve descriptor
 double	x[npts]		# data x values
 double	yfit[npts]	# the fitted y values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 begin
 	switch (CV_TYPE(cv)) {

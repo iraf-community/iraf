@@ -24,7 +24,7 @@ begin
 	if (CV_BASIS(cv) != NULL)
 	    call mfree (CV_BASIS(cv), TY_REAL)
 	if (CV_LEFT(cv) != NULL)
-	    call mfree (CV_LEFT(cv), TY_INT)
+	    call mfree (CV_LEFT(cv), TY_SIZE_T)
 	if (CV_WY(cv) != NULL)
 	    call mfree (CV_WY(cv), TY_REAL)
 

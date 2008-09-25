@@ -30,14 +30,14 @@ define	CV_RANGE	Memr[]		# Xmax minus xmin
 define	CV_MAXMIN	Memr[]		# Xmax plus xmin
 define	CV_SPACING	Memr[]		# Knot spacing for splines
 define	CV_YNORM	Memr[]		# Norm of the Y vector
-define	CV_NPTS		Memi[]		# Number of data points
+define	CV_NPTS		Memz[]		# Number of data points
 
-define	CV_MATRIX	Memi[]		# Pointer to original matrix
-define	CV_CHOFAC	Memi[]		# Pointer to Cholesky factorization
-define	CV_BASIS	Memi[]		# Pointer to basis functions
-define	CV_VECTOR	Memi[]		# Pointer to  vector
-define	CV_COEFF	Memi[]		# Pointer to coefficient vector
-define	CV_LEFT		Memi[]		#
+define	CV_MATRIX	Memp[]		# Pointer to original matrix
+define	CV_CHOFAC	Memp[]		# Pointer to Cholesky factorization
+define	CV_BASIS	Memp[]		# Pointer to basis functions
+define	CV_VECTOR	Memp[]		# Pointer to  vector
+define	CV_COEFF	Memp[]		# Pointer to coefficient vector
+define	CV_LEFT		Memp[]		#
 
 }
 
@@ -47,7 +47,7 @@ define	MATRIX		Memr[$1+($2-1)*NCOEFF(cv)]	# Matrix element
 define	CHOFAC		Memr[$1+($2-1)*NCOEFF(cv)]	# Triangular matrix
 define	VECTOR		Memr[$1+$2]			# Right side
 define	COEFF		Memr[$1+$2]			# Coefficient vector
-define	LEFT		Memi[$1+$2]
+define	LEFT		Memz[$1+$2]
 
 # matrix and vector definitions
 
@@ -408,7 +408,7 @@ procedure cvvector (cv, x, npts, yfit)
 
 pointer	cv		# pointer to the curve descriptor structure
 real	x[npts]		# data x values
-int	npts		# number of data points
+size_t	npts		# number of data points
 real	yfit[npts]	# the fitted y values
 
 begin

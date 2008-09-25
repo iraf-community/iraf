@@ -22,10 +22,12 @@ pointer	cv		# curve descriptor
 real	x[npts]		# array of abcissa
 real	y[npts]		# array of ordinates
 real	w[npts]		# array of weights
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	wtflag		# type of weighting
 
-int	i, ii, j, k
+long	i
+int	ii, j, k
+size_t	order
 pointer	sp
 pointer	vzptr, vindex, mzptr, mindex, bptr, bbptr
 pointer	bw, rows
@@ -45,7 +47,7 @@ begin
 	    CV_WY(cv) = NULL
 
 	    if (CV_LEFT(cv) != NULL) {
-	        call mfree (CV_LEFT(cv), TY_INT)
+	        call mfree (CV_LEFT(cv), TY_SIZE_T)
 	        CV_LEFT(cv) = NULL
 	    }
 	}
@@ -95,12 +97,12 @@ begin
 	    call rcv_bcheb (x, npts, CV_ORDER(cv), CV_MAXMIN(cv),
 	    		  CV_RANGE(cv), BASIS(CV_BASIS(cv)))
 	case SPLINE3:
-	    call salloc (CV_LEFT(cv), npts, TY_INT)
+	    call salloc (CV_LEFT(cv), npts, TY_SIZE_T)
 	    call rcv_bspline3 (x, npts, CV_NPIECES(cv), -CV_XMIN(cv),
 			      CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 			      LEFT(CV_LEFT(cv)))
 	case SPLINE1:
-	    call salloc (CV_LEFT(cv), npts, TY_INT)
+	    call salloc (CV_LEFT(cv), npts, TY_SIZE_T)
 	    call rcv_bspline1 (x, npts, CV_NPIECES(cv), -CV_XMIN(cv),
 			      CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 			      LEFT(CV_LEFT(cv)))
@@ -111,7 +113,7 @@ begin
 
 	# allocate temporary storage space for matrix accumulation
 	call salloc (bw, npts, TY_REAL)
-	call salloc (rows, npts, TY_INT)
+	call salloc (rows, npts, TY_POINTER)
 
 	# one index the pointers
 	vzptr = CV_VECTOR(cv) - 1
@@ -144,9 +146,10 @@ begin
 
 	case SPLINE1,SPLINE3:
 
-	    call amulki (LEFT(CV_LEFT(cv)), CV_ORDER(cv), Memi[rows], npts)
-	    call aaddki (Memi[rows], CV_MATRIX(cv), Memi[rows], npts)
-	    call aaddki (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)), npts) 
+	    order = CV_ORDER(cv)
+	    call amulkp (LEFT(CV_LEFT(cv)), order, Memp[rows], npts)
+	    call aaddkp (Memp[rows], CV_MATRIX(cv), Memp[rows], npts)
+	    call aaddkp (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)), npts) 
 
 	    # accumulate the new right side of the matrix equation
 	    do k = 1, CV_ORDER(cv) {
@@ -159,7 +162,7 @@ begin
 	        ii = 0
 	        do j = k, CV_ORDER(cv) {
 		    do i = 1, npts {
-			mindex = Memi[rows+i-1] + ii
+			mindex = Memp[rows+i-1] + ii
 		        MATRIX(mindex) = MATRIX(mindex) + Memr[bw+i-1] *
 			    BASIS(bbptr+i-1)
 		    }
@@ -167,7 +170,8 @@ begin
 		    bbptr = bbptr + npts
 		}
 	        bptr = bptr + npts
-	        call aaddki (Memi[rows], CV_ORDER(cv), Memi[rows], npts)
+		order = CV_ORDER(cv)
+	        call aaddkp (Memp[rows], order, Memp[rows], npts)
 	    }
 	}
 

@@ -34,7 +34,7 @@ pointer	cv		# curve descriptor
 PIXEL	x[npts]		# array of abcissa
 PIXEL	y[npts]		# array of ordinates
 PIXEL	w[npts]		# array of weights
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	wtflag		# type of weighting
 int	ier		# error code
 

@@ -8,7 +8,7 @@ procedure dcv_evcheb (coeff, x, yfit, npts, order, k1, k2)
 double	coeff[ARB]		# 1D array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	yfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
@@ -67,7 +67,7 @@ procedure dcv_evleg (coeff, x, yfit, npts, order, k1, k2)
 double	coeff[ARB]		# 1D array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	yfit[npts]		# the fitted points
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
@@ -129,11 +129,11 @@ procedure dcv_evspline1 (coeff, x, yfit, npts, npieces, k1, k2)
 double	coeff[ARB]		# array of coefficients
 double	x[npts]			# array of x values
 double	yfit[npts]		# array of fitted values
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	npieces			# number of fitted points minus 1
 double	k1, k2			# normalizing constants
 
-int	j
+long	j
 pointer sx, tx, azindex, aindex, index
 pointer	sp
 
@@ -179,11 +179,12 @@ procedure dcv_evspline3 (coeff, x, yfit, npts, npieces, k1, k2)
 double	coeff[ARB]	# array of coeffcients
 double	x[npts]		# array of x values
 double	yfit[npts]	# array of fitted values
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	npieces		# number of polynomial pieces
 double	k1, k2		# normalizing constants
 
-int	i, j
+int	i
+long	j
 pointer	sx, tx, temp, index, sp
 
 begin

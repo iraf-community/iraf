@@ -29,9 +29,10 @@ procedure rcv_buser (cv, x, npts)
 
 pointer	cv
 real   x[ARB]
-int	npts
+size_t	npts
 
-int	i, j
+long	i
+int	j
 
 begin
 	do i = 1, npts {
@@ -49,16 +50,18 @@ procedure rcv_evuser (cv, x, yfit, npts)
 
 pointer	cv
 real	x[ARB],  yfit[ARB]
-int	npts
+size_t	npts
 
-int	i
+size_t	sz_val
+long	i
 real	adotr
 
 begin
 	do i = 1, npts {
 	    call rcv_b1user (cv, x[i])
+	    sz_val = CV_ORDER(cv)
 	    yfit[i] = adotr ( XBASIS(CV_XBASIS(cv)), COEFF(CV_COEFF(cv)),
-				CV_ORDER(cv))
+			       sz_val )
 	}
 end
 

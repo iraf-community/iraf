@@ -12,13 +12,17 @@ procedure cvzero (cv)
 
 pointer	cv	# pointer to curve descriptor
 
+size_t	sz_val
+
 errchk	mfree
 
 begin
 	# zero the accumulators
 	CV_NPTS(cv) = 0
-	call aclrr (MATRIX(CV_MATRIX(cv)), CV_ORDER(cv)*CV_NCOEFF(cv))
-	call aclrr (VECTOR(CV_VECTOR(cv)), CV_NCOEFF(cv))
+	sz_val = CV_ORDER(cv)*CV_NCOEFF(cv)
+	call aclrr (MATRIX(CV_MATRIX(cv)), sz_val)
+	sz_val = CV_NCOEFF(cv)
+	call aclrr (VECTOR(CV_VECTOR(cv)), sz_val)
 
 	# free the basis functions defined from previous calls to cvrefit
 	if (CV_BASIS(cv) != NULL) {
@@ -27,7 +31,7 @@ begin
 	    CV_BASIS(cv) = NULL
 	    CV_WY(cv) = NULL
 	    if (CV_LEFT(cv) != NULL) {
-		call mfree (CV_LEFT(cv), TY_INT)
+		call mfree (CV_LEFT(cv), TY_SIZE_T)
 		CV_LEFT(cv) = NULL
 	    }
 	}

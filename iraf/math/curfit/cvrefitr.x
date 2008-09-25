@@ -20,14 +20,17 @@ real	y[ARB]		# y array
 real	w[ARB]		# weight array
 int	ier		# error code
 
-int	i, k
+size_t	sz_val
+long	i
+int	k
 pointer	bzptr
 pointer	vzptr, vindex
 
 
 begin
 	# zero the right side of the matrix equation
-	call aclrr (VECTOR(CV_VECTOR(cv)), CV_NCOEFF(cv))
+	sz_val = CV_NCOEFF(cv)
+	call aclrr (VECTOR(CV_VECTOR(cv)), sz_val)
 	vzptr = CV_VECTOR(cv) - 1
 
 	# if first call to cvrefit then calculate and store the basis
@@ -48,18 +51,18 @@ begin
 		call rcv_bcheb (x, CV_NPTS(cv), CV_ORDER(cv), CV_MAXMIN(cv),
 			    CV_RANGE(cv), BASIS(CV_BASIS(cv)))
 	    case SPLINE3:
-	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_INT)
+	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_SIZE_T)
 		call rcv_bspline3 (x, CV_NPTS(cv), CV_NPIECES(cv),
 		    -CV_XMIN(cv), CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 		    LEFT(CV_LEFT(cv)))
-		call aaddki (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)),
+		call aaddkp (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)),
 		    CV_NPTS(cv))
 	    case SPLINE1:
-	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_INT)
+	        call malloc (CV_LEFT(cv), CV_NPTS(cv), TY_SIZE_T)
 		call rcv_bspline1 (x, CV_NPTS(cv), CV_NPIECES(cv),
 		    -CV_XMIN(cv), CV_SPACING(cv), BASIS(CV_BASIS(cv)),
 		    LEFT(CV_LEFT(cv)))
-		call aaddki (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)),
+		call aaddkp (LEFT(CV_LEFT(cv)), vzptr, LEFT(CV_LEFT(cv)),
 		    CV_NPTS(cv))
 	    case USERFNC:
 		call rcv_buser (cv, x, CV_NPTS(cv))

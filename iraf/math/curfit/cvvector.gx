@@ -20,7 +20,7 @@ $endif
 pointer	cv		# curve descriptor
 PIXEL	x[npts]		# data x values
 PIXEL	yfit[npts]	# the fitted y values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 begin
 	switch (CV_TYPE(cv)) {

@@ -13,6 +13,7 @@ pointer	cv				# Pointer to curfit structure
 double	ps_coeff[ncoeff]		# Power series coefficients (output)
 int	ncoeff				# Number of coefficients in fit
 
+size_t	sz_val
 pointer	sp, cf_coeff, elm
 int	function
 int	dcvstati()
@@ -23,15 +24,19 @@ begin
 
 	if (function != LEGENDRE && function != CHEBYSHEV) {
 	    call eprintf ("Cannot convert coefficients - wrong function type\n")
-	    call amovkd (INDEFD, ps_coeff, ncoeff)
+	    sz_val = ncoeff
+	    call amovkd (INDEFD, ps_coeff, sz_val)
 	    return
 	}
 
 	call smark (sp)
-	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
-	call salloc (cf_coeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff ** 2
+	call salloc (elm, sz_val, TY_DOUBLE)
+	sz_val = ncoeff
+	call salloc (cf_coeff, sz_val, TY_DOUBLE)
 
-	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
+	sz_val = ncoeff ** 2
+	call amovkd (0.0d0, Memd[elm], sz_val)
 
 	# Get existing coefficients
 	call dcvcoeff (cv, Memd[cf_coeff], ncoeff)
@@ -65,11 +70,13 @@ pointer	cv		# curve descriptor
 double	y[ARB]		# data points
 double	yfit[ARB]	# fitted data points
 double	w[ARB]		# array of weights
-int	npts		# number of points
+size_t	npts		# number of points
 double	chisqr		# reduced chi-squared of fit
 double	perrors[ARB]	# errors in coefficients
 
-int	i, j, n, nfree, function, ncoeff
+size_t	sz_val
+long	i, n, nfree
+int	j, function, ncoeff
 double	variance, chisq, hold
 pointer	sp, covar, elm
 int	dcvstati()
@@ -82,7 +89,8 @@ begin
 	# Check the function type.
 	if (function != LEGENDRE && function != CHEBYSHEV) {
 	    call eprintf ("Cannot convert errors - wrong function type\n")
-	    call amovkd (INDEFD, perrors, ncoeff)
+	    sz_val = ncoeff
+	    call amovkd (INDEFD, perrors, sz_val)
 	    return
 	}
 
@@ -120,21 +128,25 @@ begin
 
 	# Allocate space for the covariance and conversion matrices.
 	call smark (sp)
-	call salloc (covar, ncoeff * ncoeff, TY_DOUBLE)
-	call salloc (elm, ncoeff * ncoeff, TY_DOUBLE)
+	sz_val = ncoeff * ncoeff
+	call salloc (covar, sz_val, TY_DOUBLE)
+	call salloc (elm, sz_val, TY_DOUBLE)
 
 	# Compute the covariance matrix.
 	do j = 1, ncoeff {
-	    call aclrd (perrors, ncoeff)
+	    sz_val = ncoeff
+	    call aclrd (perrors, sz_val)
 	    perrors[j] = double(1.0)
 	    call dcvchoslv (CHOFAC(CV_CHOFAC(cv)), CV_ORDER(cv),
 	        CV_NCOEFF(cv), perrors, perrors)
-	    call amulkd (perrors, double(variance), perrors, ncoeff)
-	    call achtdd (perrors, Memd[covar+(j-1)*ncoeff], ncoeff)
+	    sz_val = ncoeff
+	    call amulkd (perrors, double(variance), perrors, sz_val)
+	    call achtdd (perrors, Memd[covar+(j-1)*ncoeff], sz_val)
 	}
 
 	# Compute the conversion matrix.
-	call amovkd (0.0d0, Memd[elm], ncoeff * ncoeff)
+	sz_val = ncoeff * ncoeff
+	call amovkd (0.0d0, Memd[elm], sz_val)
 	switch (function) {
 	case LEGENDRE:
 	    call dcv_mlegen (Memd[elm], ncoeff)
@@ -170,12 +182,13 @@ double	matrix[ncoeff, ncoeff]
 int	ncoeff
 
 int	s, n, r
+int	modi()
 double	dcv_legcoeff()
 
 begin
 	# Calculate matrix elements.
 	do s = 0, ncoeff - 1 {
-	    if (mod (s, 2) == 0) 
+	    if (modi (s, 2) == 0) 
 	        r = s / 2
 	    else 
 	        r = (s - 1) / 2
@@ -270,6 +283,7 @@ double	matrix[ncoeff, ncoeff]		# Work array for matrix elements
 int	ncoeff				# Number of coefficients
 
 int	s, n, m
+int	modi()
 double	dcv_chebcoeff()
 
 begin
@@ -278,7 +292,7 @@ begin
 
 	# Calculate remaining matrix elements.
 	do s = 1, ncoeff - 1 {
-	    if (mod (s, 2) == 0)
+	    if (modi (s, 2) == 0)
 	        n = s / 2
 	    else 
 	        n = (s - 1) / 2
@@ -343,6 +357,7 @@ pointer	cv			# Pointer to curfit structure
 int	ncoeff			# Number of coefficients in fit
 double	ps_coeff[ncoeff]	# Power series coefficients
 
+size_t	sz_val
 pointer	sp, elm, index
 int	n, i, k
 double	k1, k2, bc, sum
@@ -352,13 +367,15 @@ double	dcv_bcoeff()
 begin
 	# Need space for ncoeff**2 matrix elements
 	call smark (sp)
-	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+	sz_val = ncoeff ** 2
+	call salloc (elm, sz_val, TY_DOUBLE)
 
 	k1 = CV_RANGE(cv)
 	k2 = k1 * CV_MAXMIN(cv)
 
 	# Fill matrix, after zeroing it. 
-	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
+	sz_val = ncoeff ** 2
+	call amovkd (0.0d0, Memd[elm], sz_val)
 	do n = 1, ncoeff {
 	    k = n - 1
 	    do i = 0, k {
@@ -391,6 +408,7 @@ pointer	cv			# Pointer to curfit structure
 double	elm[ncoeff,ncoeff]	# Input transformed matrix
 int	ncoeff			# Number of coefficients in fit
 
+size_t	sz_val
 pointer	sp, norm, onorm, index
 int	n, i, k
 double	k1, k2, bc
@@ -400,14 +418,16 @@ double	dcv_bcoeff()
 begin
 	# Need space for ncoeff**2 matrix elements
 	call smark (sp)
-	call salloc (norm, ncoeff ** 2, TY_DOUBLE)
-	call salloc (onorm, ncoeff ** 2, TY_DOUBLE)
+	sz_val = ncoeff ** 2
+	call salloc (norm, sz_val, TY_DOUBLE)
+	call salloc (onorm, sz_val, TY_DOUBLE)
 
 	k1 = CV_RANGE(cv)
 	k2 = k1 * CV_MAXMIN(cv)
 
 	# Fill normalization matrix after zeroing it. 
-	call amovkd (0.0d0, Memd[norm], ncoeff ** 2)
+	sz_val = ncoeff ** 2
+	call amovkd (0.0d0, Memd[norm], sz_val)
 	do n = 1, ncoeff {
 	    k = n - 1
 	    do i = 0, k {
@@ -420,7 +440,8 @@ begin
 	# Multiply the input transformation matrix by the normalization
 	# matrix.
 	call cv_mmuld (Memd[norm], elm, Memd[onorm], ncoeff)
-	call amovd (Memd[onorm], elm, ncoeff ** 2)
+	sz_val = ncoeff ** 2
+	call amovd (Memd[onorm], elm, sz_val)
 
 	call sfree (sp)
 end

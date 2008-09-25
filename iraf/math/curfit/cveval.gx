@@ -20,6 +20,7 @@ $endif
 pointer	cv		# curve descriptor
 PIXEL	x		# x value
 
+size_t	sz_val
 int	left
 pointer	cptr, xptr
 PIXEL	yfit
@@ -53,7 +54,8 @@ begin
 	# accumulate the fitted value
 	cptr = CV_COEFF(cv) + left
 	xptr = CV_XBASIS(cv)
-	yfit = adot$t (XBASIS(xptr), COEFF(cptr), CV_ORDER(cv))
+	sz_val = CV_ORDER(cv)
+	yfit = adot$t (XBASIS(xptr), COEFF(cptr), sz_val)
 
 	return (yfit)
 end

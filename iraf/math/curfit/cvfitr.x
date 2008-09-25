@@ -26,7 +26,7 @@ pointer	cv		# curve descriptor
 real	x[npts]		# array of abcissa
 real	y[npts]		# array of ordinates
 real	w[npts]		# array of weights
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	wtflag		# type of weighting
 int	ier		# error code
 

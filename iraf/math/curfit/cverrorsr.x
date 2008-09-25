@@ -19,18 +19,20 @@ pointer	cv		# curve descriptor
 real	y[ARB]		# data points
 real	yfit[ARB]	# fitted data points
 real	w[ARB]		# array of weights
-int	npts		# number of points
+size_t	npts		# number of points
 real	chisqr		# reduced chi-squared of fit
 real	errors[ARB]	# errors in coefficients
 
-int	i, n, nfree
+size_t	sz_val
+long	i, n, nfree
 real   variance, chisq, hold
 pointer	sp, covptr
 
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, CV_NCOEFF(cv), TY_REAL)
+	sz_val = CV_NCOEFF(cv)
+	call salloc (covptr, sz_val, TY_REAL)
 
 	# estimate the variance and chi-squared of the fit
 	n = 0
@@ -68,7 +70,8 @@ begin
 	# the error of the j-th coefficient is the j-th element of the
 	# j-th column of the inverse matrix
 	do i = 1, CV_NCOEFF(cv) {
-	    call aclrr (COV(covptr), CV_NCOEFF(cv))
+	    sz_val = CV_NCOEFF(cv)
+	    call aclrr (COV(covptr), sz_val)
 	    COV(covptr+i-1) = 1.
 	    call rcvchoslv (CHOFAC(CV_CHOFAC(cv)), CV_ORDER(cv), CV_NCOEFF(cv),
 	    	    COV(covptr), COV(covptr))

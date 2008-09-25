@@ -30,7 +30,7 @@ int	ier		# ier = OK, everything OK
 			# ier = SINGULAR, matrix is singular, 1 or more
 			# coefficients are 0.
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
-int	nfree
+long	nfree
 
 begin
 	ier = OK

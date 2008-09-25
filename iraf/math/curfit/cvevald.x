@@ -12,6 +12,7 @@ double procedure dcveval (cv, x)
 pointer	cv		# curve descriptor
 double	x		# x value
 
+size_t	sz_val
 int	left
 pointer	cptr, xptr
 double	yfit
@@ -45,7 +46,8 @@ begin
 	# accumulate the fitted value
 	cptr = CV_COEFF(cv) + left
 	xptr = CV_XBASIS(cv)
-	yfit = adotd (XBASIS(xptr), COEFF(cptr), CV_ORDER(cv))
+	sz_val = CV_ORDER(cv)
+	yfit = adotd (XBASIS(xptr), COEFF(cptr), sz_val)
 
 	return (yfit)
 end
