@@ -21,14 +21,16 @@ double	zfit[ARB]	# fitted data points
 double	chisqr		# reduced chi-squared of fit
 double	errors[ARB]	# errors in coefficients
 
-int	i, nfree
+size_t	sz_val
+long	i, nfree
 double	variance, chisq, hold
 pointer	sp, covptr
 
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, GS_NCOEFF(sf), TY_DOUBLE)
+	sz_val = GS_NCOEFF(sf)
+	call salloc (covptr, sz_val, TY_DOUBLE)
 
 	# estimate the variance and chi-squared of the fit
 	variance = 0.
@@ -64,7 +66,8 @@ begin
 	# j-th column of the inverse matrix
 
 	do i = 1, GS_NCOEFF(sf) {
-	    call aclrd (COV(covptr), GS_NCOEFF(sf))
+	    sz_val = GS_NCOEFF(sf)
+	    call aclrd (COV(covptr), sz_val)
 	    COV(covptr+i-1) = 1.
 	    call dgschoslv (CHOFAC(GS_CHOFAC(sf)), GS_NCOEFF(sf),
 	        GS_NCOEFF(sf), COV(covptr), COV(covptr))

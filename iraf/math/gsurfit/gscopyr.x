@@ -10,6 +10,8 @@ procedure gscopy (sf1, sf2)
 pointer	sf1		# pointer to original surface
 pointer	sf2		# pointer to the new surface
 
+size_t	sz_val
+
 begin
 	if (sf1 == NULL) {
 	    sf2 = NULL
@@ -17,7 +19,8 @@ begin
 	}
 
 	# allocate space for new surface descriptor
-	call calloc (sf2, LEN_GSSTRUCT, TY_STRUCT)
+	sz_val = LEN_GSSTRUCT
+	call calloc (sf2, sz_val, TY_STRUCT)
 
 	# copy surface independent parameters 
 	GS_TYPE(sf2) = GS_TYPE(sf1)
@@ -52,6 +55,8 @@ begin
 	GS_WZ(sf2) = NULL
 
 	# restore coefficient array
-	call calloc (GS_COEFF(sf2), GS_NCOEFF(sf2), TY_REAL)
-	call amovr (COEFF(GS_COEFF(sf1)), COEFF(GS_COEFF(sf2)), GS_NCOEFF(sf2))
+	sz_val = GS_NCOEFF(sf2)
+	call calloc (GS_COEFF(sf2), sz_val, TY_REAL)
+	sz_val = GS_NCOEFF(sf2)
+	call amovr (COEFF(GS_COEFF(sf1)), COEFF(GS_COEFF(sf2)), sz_val)
 end

@@ -5,13 +5,14 @@
 procedure dgs_dpol (x, npts, order, nder, k1, k2, basis)
 
 double	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of new polynomial, order = 1, constant
 int	nder		# order of derivative, order = 0, no derivative
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# basis functions
 
-int	bptr, k, kk
+long	bptr
+int	k, kk
 double	fac
 
 begin
@@ -64,7 +65,7 @@ end
 procedure dgs_dcheb (x, npts, order, nder, k1, k2, basis)
 
 double	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 int	nder		# order of derivative, order = 0, no derivative
 double	k1, k2		# normalizing constants
@@ -153,7 +154,7 @@ end
 procedure dgs_dleg (x, npts, order, nder, k1, k2, basis)
 
 double	x[npts]		# number of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of new polynomial, 1 is a constant
 int	nder		# order of derivate, 0 is no derivative
 double	k1, k2		# normalizing constants

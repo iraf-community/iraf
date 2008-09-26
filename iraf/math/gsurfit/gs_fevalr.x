@@ -11,13 +11,14 @@ real	coeff[ARB]		# 1D array of coefficients
 real	x[npts]			# x values of points to be evaluated
 real	y[npts]
 real	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
 real	k1y, k2y
 
-int	i, k, cptr, maxorder, xincr
+long	i
+int	k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
@@ -105,7 +106,7 @@ real	coeff[ARB]		# 1D array of coefficients
 real	x[npts]			# x values of points to be evaluated
 real	y[npts]
 real	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
@@ -185,7 +186,7 @@ real	coeff[ARB]		# 1D array of coefficients
 real	x[npts]			# x values of points to be evaluated
 real	y[npts]
 real	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 real	k1x, k2x		# normalizing constants
@@ -261,9 +262,9 @@ real	a[ARB]		# first input vector
 real	b[ARB]		# second input vector
 real	c[ARB]		# third vector
 real	d[ARB]		# output vector
-int	npts		# number of points
+size_t	npts		# number of points
 
-int	i
+long	i
 
 begin
 	do i = 1, npts

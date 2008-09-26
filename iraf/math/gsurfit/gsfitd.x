@@ -21,7 +21,7 @@ double	x[npts]		# array of x values
 double	y[npts]		# array of y values
 double	z[npts]		# data array
 double	w[npts]		# array of weights
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	wtflag		# type of weighting
 int	ier		# ier = OK, everything OK
 			# ier = SINGULAR, matrix is singular, 1 or more

@@ -19,15 +19,17 @@ double	x[npts]		# array of x values
 double	y[npts]		# array of y values
 double	z[npts]		# data array
 double	w[npts]		# array of weights
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	wtflag		# type of weighting
 
-int	i, ii, j, jj, k, l, ll
+long	i
+int	ii, j, jj, k, l, ll
 int	maxorder, xorder, xxorder, ntimes
 pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
 pointer	byw, bw
 
 double	adotd()
+int	modi()
 
 begin
 	# increment the number of points
@@ -138,7 +140,7 @@ begin
 		        do i = 1, npts
 		            MATRIX(mindex) = MATRIX(mindex) + Memd[bw+i-1] *
 				XBASIS(bbxptr+i-1) * YBASIS(bbyptr+i-1)	
-			if (mod (jj, xxorder) == 0) {
+			if (modi (jj, xxorder) == 0) {
 			    jj = 1
 			    ll = ll + 1
 			    bbxptr = GS_XBASIS(sf)

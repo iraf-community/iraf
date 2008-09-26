@@ -21,14 +21,16 @@ real	zfit[ARB]	# fitted data points
 real	chisqr		# reduced chi-squared of fit
 real	errors[ARB]	# errors in coefficients
 
-int	i, nfree
+size_t	sz_val
+long	i, nfree
 real	variance, chisq, hold
 pointer	sp, covptr
 
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	call salloc (covptr, GS_NCOEFF(sf), TY_REAL)
+	sz_val = GS_NCOEFF(sf)
+	call salloc (covptr, sz_val, TY_REAL)
 
 	# estimate the variance and chi-squared of the fit
 	variance = 0.
@@ -64,7 +66,8 @@ begin
 	# j-th column of the inverse matrix
 
 	do i = 1, GS_NCOEFF(sf) {
-	    call aclrr (COV(covptr), GS_NCOEFF(sf))
+	    sz_val = GS_NCOEFF(sf)
+	    call aclrr (COV(covptr), sz_val)
 	    COV(covptr+i-1) = 1.
 	    call rgschoslv (CHOFAC(GS_CHOFAC(sf)), GS_NCOEFF(sf),
 	        GS_NCOEFF(sf), COV(covptr), COV(covptr))

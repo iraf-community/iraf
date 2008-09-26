@@ -20,8 +20,10 @@ int	ier		# ier = OK, everything OK
 			# coefficients are 0.
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
 
+size_t	sz_val
 int	k, l
-int	xorder, nfree, maxorder
+int	xorder, maxorder
+long	nfree
 pointer	sp, vzptr, vindex, bxptr, byptr, bwz
 
 real	adotr()
@@ -30,7 +32,8 @@ errchk	smark, salloc, sfree
 
 begin
 	# clear accumulator
-	call aclrr (VECTOR(GS_VECTOR(sf)), GS_NCOEFF(sf))
+	sz_val = GS_NCOEFF(sf)
+	call aclrr (VECTOR(GS_VECTOR(sf)), sz_val)
 
 	# if first call to gsefit calculate basis functions
 	if (GS_XBASIS(sf) == NULL || GS_YBASIS(sf) == NULL) {

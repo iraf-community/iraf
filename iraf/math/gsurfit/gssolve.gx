@@ -29,7 +29,7 @@ int	ier		# ier = OK, everything OK
 			# coefficients are 0.
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
 
-int	nfree
+long	nfree
 
 begin
 	# test for number of degrees of freedom

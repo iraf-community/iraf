@@ -6,12 +6,13 @@
 procedure $tgs_bpol (x, npts, order, k1, k2, basis)
 
 PIXEL	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 PIXEL	k1, k2		# normalizing constants
 PIXEL	basis[ARB]	# basis functions
 
-int	bptr, k
+int	k
+long	bptr
 
 begin
 	bptr = 1
@@ -39,12 +40,13 @@ end
 procedure $tgs_bcheb (x, npts, order, k1, k2, basis)
 
 PIXEL	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 PIXEL	k1, k2		# normalizing constants
 PIXEL	basis[ARB]	# basis functions
 
-int	k, bptr
+int	k
+long	bptr
 
 begin
 	bptr = 1
@@ -80,12 +82,13 @@ end
 procedure $tgs_bleg (x, npts, order, k1, k2, basis)
 
 PIXEL	x[npts]		# number of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, 1 is a constant
 PIXEL	k1, k2		# normalizing constants
 PIXEL	basis[ARB]	# array of basis functions
 
-int	k, bptr
+int	k
+long	bptr
 PIXEL	ri, ri1, ri2
 
 begin

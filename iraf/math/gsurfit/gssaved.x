@@ -15,6 +15,8 @@ procedure dgssave (sf, fit)
 pointer	sf		# pointer to the surface descriptor
 double	fit[ARB]	# array for storing fit
 
+size_t	sz_val
+
 begin
 	# get the surface parameters
 	if (sf == NULL)
@@ -38,5 +40,6 @@ begin
 	GS_SAVEXTERMS(fit) = GS_XTERMS(sf)
 
 	# save the coefficients
-	call amovd (COEFF(GS_COEFF(sf)), fit[GS_SAVECOEFF+1], GS_NCOEFF(sf))
+	sz_val = GS_NCOEFF(sf)
+	call amovd (COEFF(GS_COEFF(sf)), fit[GS_SAVECOEFF+1], sz_val)
 end

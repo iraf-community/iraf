@@ -19,15 +19,15 @@ define	GS_XTERMS	Memi[P2I($1+19)]	# Cross terms for polynomials
 define	GS_NXCOEFF	Memi[P2I($1+20)]	# Number of x coefficients
 define	GS_NYCOEFF	Memi[P2I($1+21)]	# Number of y coefficients
 define	GS_NCOEFF	Memi[P2I($1+22)]	# Total number of coefficients
-define	GS_NPTS		Memi[P2I($1+23)]	# Number of data points
+define	GS_NPTS		Memz[P2Z($1+23)]	# Number of data points
 
-define	GS_MATRIX	Memi[P2I($1+24)]	# Pointer to original matrix
-define	GS_CHOFAC	Memi[P2I($1+25)]	# Pointer to Cholesky factorization
-define	GS_VECTOR	Memi[P2I($1+26)]	# Pointer to  vector
-define	GS_COEFF	Memi[P2I($1+27)]	# Pointer to coefficient vector
-define	GS_XBASIS	Memi[P2I($1+28)]	# Pointer to basis functions (all x)
-define	GS_YBASIS	Memi[P2I($1+29)]	# Pointer to basis functions (all y)
-define	GS_WZ		Memi[P2I($1+30)]	# Pointer to w * z (gsrefit)
+define	GS_MATRIX	Memp[$1+24]	# Pointer to original matrix
+define	GS_CHOFAC	Memp[$1+25]	# Pointer to Cholesky factorization
+define	GS_VECTOR	Memp[$1+26]	# Pointer to  vector
+define	GS_COEFF	Memp[$1+27]	# Pointer to coefficient vector
+define	GS_XBASIS	Memp[$1+28]	# Pointer to basis functions (all x)
+define	GS_YBASIS	Memp[$1+29]	# Pointer to basis functions (all y)
+define	GS_WZ		Memp[$1+30]	# Pointer to w * z (gsrefit)
 
 # matrix and vector element definitions
 

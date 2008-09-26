@@ -11,7 +11,7 @@ double	coeff[ARB]		# 1D array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	y[npts]
 double	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 int	nxder,nyder		# order of the derivatives in x and y
@@ -87,7 +87,7 @@ double	coeff[ARB]		# 1D array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	y[npts]
 double	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 int	nxder,nyder		# order of the derivatives in x and y
@@ -164,7 +164,7 @@ double	coeff[ARB]		# 1D array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	y[npts]
 double	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 int	nxder,nyder		# order of the derivatives in x and y

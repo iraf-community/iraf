@@ -13,6 +13,7 @@ include "dgsurfitdef.h"
 procedure dgszero (sf)
 
 pointer	sf	# pointer to surface descriptor
+size_t	sz_val
 errchk	mfree
 
 begin
@@ -21,8 +22,10 @@ begin
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 
 	    GS_NPTS(sf) = 0
-	    call aclrd (VECTOR(GS_VECTOR(sf)), GS_NCOEFF(sf))
-	    call aclrd (MATRIX(GS_MATRIX(sf)), GS_NCOEFF(sf) ** 2)
+	    sz_val = GS_NCOEFF(sf)
+	    call aclrd (VECTOR(GS_VECTOR(sf)), sz_val)
+	    sz_val = GS_NCOEFF(sf) ** 2
+	    call aclrd (MATRIX(GS_MATRIX(sf)), sz_val)
 
 	    # free the basis functions defined from previous calls to sfrefit
 	    if (GS_XBASIS(sf) != NULL)

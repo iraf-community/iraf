@@ -16,8 +16,11 @@ pointer	sf		# pointer to the surface fitting descriptor
 double	coeff[ARB]	# the coefficients of the fit
 int	ncoeff		# the number of coefficients
 
+size_t	sz_val
+
 begin
 	# calculate the number of coefficients
 	ncoeff = GS_NCOEFF(sf)
-	call amovd (COEFF(GS_COEFF(sf)), coeff, ncoeff)
+	sz_val = ncoeff
+	call amovd (COEFF(GS_COEFF(sf)), coeff, sz_val)
 end

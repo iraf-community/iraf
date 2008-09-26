@@ -11,13 +11,14 @@ PIXEL	coeff[ARB]		# 1D array of coefficients
 PIXEL	x[npts]			# x values of points to be evaluated
 PIXEL	y[npts]
 PIXEL	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 PIXEL	k1x, k2x		# normalizing constants
 PIXEL	k1y, k2y
 
-int	i, k, cptr, maxorder, xincr
+long	i
+int	k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
@@ -125,7 +126,7 @@ PIXEL	coeff[ARB]		# 1D array of coefficients
 PIXEL	x[npts]			# x values of points to be evaluated
 PIXEL	y[npts]
 PIXEL	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 PIXEL	k1x, k2x		# normalizing constants
@@ -226,7 +227,7 @@ PIXEL	coeff[ARB]		# 1D array of coefficients
 PIXEL	x[npts]			# x values of points to be evaluated
 PIXEL	y[npts]
 PIXEL	zfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	xterms			# cross terms ?
 int	xorder,yorder		# order of the polynomials in x and y
 PIXEL	k1x, k2x		# normalizing constants
@@ -322,9 +323,9 @@ PIXEL	a[ARB]		# first input vector
 PIXEL	b[ARB]		# second input vector
 PIXEL	c[ARB]		# third vector
 PIXEL	d[ARB]		# output vector
-int	npts		# number of points
+size_t	npts		# number of points
 
-int	i
+long	i
 
 begin
 	do i = 1, npts

@@ -18,6 +18,7 @@ real	xmax		# maximum value of x
 real	ymin		# minimum value of y
 real	ymax		# maximum value of y
 
+size_t	sz_val
 int	order
 errchk	malloc, calloc
 
@@ -31,7 +32,8 @@ begin
 	    call error (0, "GSINIT: ymax <= ymin.")
 
 	# allocate space for the gsurve descriptor
-	call malloc (sf, LEN_GSSTRUCT, TY_STRUCT)
+	sz_val = LEN_GSSTRUCT
+	call malloc (sf, sz_val, TY_STRUCT)
 
 	# specify the surface-type dependent parameters
 	switch (surface_type) {
@@ -87,10 +89,12 @@ begin
 	# allocate space for the matrix and vectors
 	switch (surface_type ) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
-	    call calloc (GS_MATRIX(sf), GS_NCOEFF(sf) ** 2, TY_REAL)
-	    call calloc (GS_CHOFAC(sf), GS_NCOEFF(sf) ** 2, TY_REAL)
-	    call calloc (GS_VECTOR(sf), GS_NCOEFF(sf), TY_REAL)
-	    call calloc (GS_COEFF(sf), GS_NCOEFF(sf), TY_REAL)
+	    sz_val = GS_NCOEFF(sf) ** 2
+	    call calloc (GS_MATRIX(sf), sz_val, TY_REAL)
+	    call calloc (GS_CHOFAC(sf), sz_val, TY_REAL)
+	    sz_val = GS_NCOEFF(sf)
+	    call calloc (GS_VECTOR(sf), sz_val, TY_REAL)
+	    call calloc (GS_COEFF(sf), sz_val, TY_REAL)
 	default:
 	    call error (0, "GSINIT: Unknown surface type.")
 	}

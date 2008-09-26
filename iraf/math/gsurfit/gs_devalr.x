@@ -5,13 +5,14 @@
 procedure rgs_dpol (x, npts, order, nder, k1, k2, basis)
 
 real	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of new polynomial, order = 1, constant
 int	nder		# order of derivative, order = 0, no derivative
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
 
-int	bptr, k, kk
+long	bptr
+int	k, kk
 real	fac
 
 begin
@@ -64,7 +65,7 @@ end
 procedure rgs_dcheb (x, npts, order, nder, k1, k2, basis)
 
 real	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 int	nder		# order of derivative, order = 0, no derivative
 real	k1, k2		# normalizing constants
@@ -153,7 +154,7 @@ end
 procedure rgs_dleg (x, npts, order, nder, k1, k2, basis)
 
 real	x[npts]		# number of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of new polynomial, 1 is a constant
 int	nder		# order of derivate, 0 is no derivative
 real	k1, k2		# normalizing constants

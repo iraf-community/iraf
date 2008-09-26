@@ -6,12 +6,13 @@
 procedure dgs_bpol (x, npts, order, k1, k2, basis)
 
 double	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# basis functions
 
-int	bptr, k
+int	k
+long	bptr
 
 begin
 	bptr = 1
@@ -35,12 +36,13 @@ end
 procedure dgs_bcheb (x, npts, order, k1, k2, basis)
 
 double	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# basis functions
 
-int	k, bptr
+int	k
+long	bptr
 
 begin
 	bptr = 1
@@ -68,12 +70,13 @@ end
 procedure dgs_bleg (x, npts, order, k1, k2, basis)
 
 double	x[npts]		# number of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, 1 is a constant
 double	k1, k2		# normalizing constants
 double	basis[ARB]	# array of basis functions
 
-int	k, bptr
+int	k
+long	bptr
 double	ri, ri1, ri2
 
 begin

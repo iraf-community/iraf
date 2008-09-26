@@ -7,7 +7,7 @@ procedure dgs_1devpoly (coeff, x, yfit, npts, order, k1, k2)
 double	coeff[ARB]		# EV array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	yfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
@@ -47,7 +47,7 @@ procedure dgs_1devcheb (coeff, x, yfit, npts, order, k1, k2)
 double	coeff[ARB]		# EV array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	yfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 
@@ -106,7 +106,7 @@ procedure dgs_1devleg (coeff, x, yfit, npts, order, k1, k2)
 double	coeff[ARB]		# EV array of coefficients
 double	x[npts]			# x values of points to be evaluated
 double	yfit[npts]		# the fitted points
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 double	k1, k2			# normalizing constants
 

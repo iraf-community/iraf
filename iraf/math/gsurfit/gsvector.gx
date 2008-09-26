@@ -21,7 +21,7 @@ pointer	sf		# pointer to surface descriptor structure
 PIXEL	x[ARB]		# x value
 PIXEL	y[ARB]		# y value
 PIXEL	zfit[ARB]	# fits surface values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 begin
 	# evaluate the surface along the vector

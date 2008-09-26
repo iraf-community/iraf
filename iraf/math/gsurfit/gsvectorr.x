@@ -13,7 +13,7 @@ pointer	sf		# pointer to surface descriptor structure
 real	x[ARB]		# x value
 real	y[ARB]		# y value
 real	zfit[ARB]	# fits surface values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 begin
 	# evaluate the surface along the vector

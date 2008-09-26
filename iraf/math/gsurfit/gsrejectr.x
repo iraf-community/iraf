@@ -21,10 +21,12 @@ real	z		# z value
 real	w		# weight
 int	wtflag		# type of weighting
 
+size_t	sz_val
 int	ii, j, k, l
 int	maxorder, xorder, xxorder, xindex, yindex, ntimes
 pointer	sp, vzptr, mzptr, xbptr, ybptr
 real	byw, bw
+int	modi()
 
 begin
 	# increment the number of points
@@ -60,22 +62,28 @@ begin
 	# calculate the non-zero basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    call rgs_b1leg (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call rgs_b1leg (y, GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_CHEBYSHEV:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    call rgs_b1cheb (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call rgs_b1cheb (y, GS_YORDER(sf), GS_YMAXMIN(sf),
 	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_POLYNOMIAL:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_REAL)
+	    sz_val = GS_XORDER(sf)
+	    call salloc (GS_XBASIS(sf), sz_val, TY_REAL)
+	    sz_val = GS_YORDER(sf)
+	    call salloc (GS_YBASIS(sf), sz_val, TY_REAL)
 	    call rgs_b1pol (x, GS_XORDER(sf), GS_XMAXMIN(sf),
 	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
 	    call rgs_b1pol (y, GS_YORDER(sf), GS_YMAXMIN(sf),
@@ -110,7 +118,7 @@ begin
 		    do j = k + ntimes, GS_NCOEFF(sf) {
 		        MATRIX(mzptr+ii) = MATRIX(mzptr+ii) - bw *
 			    XBASIS(xbptr+xindex) * YBASIS(ybptr+yindex)	
-			if (mod (xindex, xxorder) == 0) {
+			if (modi (xindex, xxorder) == 0) {
 			    xindex = 1
 			    yindex = yindex + 1
 			    switch (GS_XTERMS(sf)) {

@@ -13,8 +13,9 @@ pointer	sf1		# pointer to the first surface
 pointer	sf2		# pointer to the second surface
 pointer	sf3		# pointer to the output surface
 
-int	i, ncoeff, order, maxorder1, maxorder2, maxorder3
-int	nmove1, nmove2, nmove3
+size_t	sz_val
+int	i, order, maxorder1, maxorder2, maxorder3
+size_t	ncoeff, nmove1, nmove2, nmove3
 pointer	sp, coeff, ptr1, ptr2, ptr3
 
 bool	fpequald()
@@ -29,9 +30,9 @@ begin
 	    ncoeff = dgsgeti (sf2, GSNSAVE)
 	    call smark (sp)
 	    call salloc (coeff, ncoeff, TY_DOUBLE)
-	    call gssave (sf2, Memd[coeff])
+	    call dgssave (sf2, Memd[coeff])
 	    call amulkd (Memd[coeff], -1.0d0, Memd[coeff], ncoeff)
-	    call gsrestore (sf3, Memd[coeff])
+	    call dgsrestore (sf3, Memd[coeff])
 	    call sfree (sp)
 	    return
 	} else if (sf2 == NULL) {
@@ -54,7 +55,8 @@ begin
 	    call error (0, "GSADD: Y ranges not identical.")
 
 	# allocate space for the pointer
-	call calloc (sf3, LEN_GSSTRUCT, TY_STRUCT)
+	sz_val = LEN_GSSTRUCT
+	call calloc (sf3, sz_val, TY_STRUCT)
 
 	# copy parameters
 	GS_TYPE(sf3) = GS_TYPE(sf1)
@@ -103,7 +105,8 @@ begin
 	GS_WZ(sf3) = NULL
 
 	# calculate the coefficients
-	call calloc (GS_COEFF(sf3), GS_NCOEFF(sf3), TY_DOUBLE)
+	sz_val = GS_NCOEFF(sf3)
+	call calloc (GS_COEFF(sf3), sz_val, TY_DOUBLE)
 
 	# set up the line counters.
         maxorder1 = max (GS_XORDER(sf1) + 1, GS_YORDER(sf1) + 1)

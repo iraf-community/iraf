@@ -19,15 +19,15 @@ define	GS_XRANGE	Memr[P2R($1+11)]	# 2. / (xmax - xmin), polynomials
 define	GS_XMAXMIN	Memr[P2R($1+12)]	# - (xmax + xmin) / 2., polynomials
 define	GS_YRANGE	Memr[P2R($1+13)]	# 2. / (ymax - ymin), polynomials
 define	GS_YMAXMIN	Memr[P2R($1+14)]	# - (ymax + ymin) / 2., polynomials
-define	GS_NPTS		Memi[P2I($1+15)]	# Number of data points
+define	GS_NPTS		Memz[P2Z($1+15)]	# Number of data points
 
-define	GS_MATRIX	Memi[P2I($1+16)]	# Pointer to original matrix
-define	GS_CHOFAC	Memi[P2I($1+17)]	# Pointer to Cholesky factorization
-define	GS_VECTOR	Memi[P2I($1+18)]	# Pointer to  vector
-define	GS_COEFF	Memi[P2I($1+19)]	# Pointer to coefficient vector
-define	GS_XBASIS	Memi[P2I($1+20)]	# Pointer to basis functions (all x)
-define	GS_YBASIS	Memi[P2I($1+21)]	# Pointer to basis functions (all y)
-define	GS_WZ		Memi[P2I($1+22)]	# Pointer to w * z (gsrefit)
+define	GS_MATRIX	Memp[$1+16]	# Pointer to original matrix
+define	GS_CHOFAC	Memp[$1+17]	# Pointer to Cholesky factorization
+define	GS_VECTOR	Memp[$1+18]	# Pointer to  vector
+define	GS_COEFF	Memp[$1+19]	# Pointer to coefficient vector
+define	GS_XBASIS	Memp[$1+20]	# Pointer to basis functions (all x)
+define	GS_YBASIS	Memp[$1+21]	# Pointer to basis functions (all y)
+define	GS_WZ		Memp[$1+22]	# Pointer to w * z (gsrefit)
 
 # matrix and vector element definitions
 
