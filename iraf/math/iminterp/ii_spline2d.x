@@ -15,11 +15,12 @@ procedure ii_spline2d (data, coeff, nxpix, nvectors, len_data, len_coeff)
 
 real	data[len_data,ARB]	# input data array
 real	coeff[len_coeff,ARB]	# output array of univariate coefficients in x
-int	nxpix			# number of x data points
-int	nvectors		# number of univariate splines to calculate
+size_t	nxpix			# number of x data points
+size_t	nvectors		# number of univariate splines to calculate
 int	len_data		# row dimension of data
 int	len_coeff		# row dimension of coeff
 
+size_t	sz_val
 int	i, j
 pointer	diag
 
@@ -27,7 +28,8 @@ errchk	malloc, mfree
 
 begin
 	# allocate space for off-diagonal elements
-	call malloc (diag, nxpix+1, TY_REAL)
+	sz_val = nxpix+1
+	call malloc (diag, sz_val, TY_REAL)
 
 	# calculate off-diagonal elements by Gaussian elimination
 	Memr[diag] = -2.

@@ -15,11 +15,13 @@ procedure msifit (msi, datain, nxpix, nypix, len_datain)
 
 pointer	msi			# pointer to interpolant descriptor structure
 real	datain[len_datain,ARB]	# data array
-int	nxpix			# number of points in the x dimension
-int	nypix			# number of points in the y dimension
-int	len_datain			# row length of datain
+size_t	nxpix			# number of points in the x dimension
+size_t	nypix			# number of points in the y dimension
+size_t	len_datain			# row length of datain
 
-int	i, j
+size_t	sz_val
+int	i
+int	j
 pointer	fptr, nptr, rptr
 pointer	tmp
 pointer	rptrf[FNROWS]
@@ -50,7 +52,8 @@ begin
 		MSI_FSTPNT(msi) = 0
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi), nxpix * nypix, TY_REAL)
+		sz_val = nxpix * nypix
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BILINEAR, II_BIDRIZZLE:
@@ -64,8 +67,8 @@ begin
 		MSI_FSTPNT(msi) = 0
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BIPOLY3:
@@ -79,8 +82,8 @@ begin
 		MSI_FSTPNT(msi) = MSI_NXCOEFF(msi) + 1
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BIPOLY5:
@@ -94,8 +97,8 @@ begin
 		MSI_FSTPNT(msi) = 2 * MSI_NXCOEFF(msi) + 2
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call malloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call malloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BISPLINE3:
@@ -109,8 +112,8 @@ begin
 		MSI_FSTPNT(msi) = MSI_NXCOEFF(msi) + 1
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call calloc (MSI_COEFF(msi),
-			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+		sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+		call calloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	case II_BISINC, II_BILSINC:
@@ -124,7 +127,8 @@ begin
 		MSI_FSTPNT(msi) = 0
 		if (MSI_COEFF(msi) != NULL)
 		    call mfree (MSI_COEFF(msi), TY_REAL)
-		call calloc (MSI_COEFF(msi), nxpix * nypix, TY_REAL)
+		sz_val = nxpix * nypix
+		call calloc (MSI_COEFF(msi), sz_val, TY_REAL)
 	    }
 
 	}
@@ -136,7 +140,8 @@ begin
 	# load data into coefficient array
 	rptr = fptr
 	do j = 1, nypix {
-	    call amovr (datain[1,j], COEFF(rptr+1), nxpix)
+	    sz_val = nxpix
+	    call amovr (datain[1,j], COEFF(rptr+1), sz_val)
 	    rptr = rptr + MSI_NXCOEFF(msi)
 	}
 
@@ -165,8 +170,9 @@ begin
 		rptrl[i] = rptrl[i-1] - MSI_NXCOEFF(msi)
 
 	    # define the last row by extending the columns
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[2]), COEFF(rptrl[3]), COEFF(rptrl[1]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	case II_BIPOLY3:
 
@@ -187,8 +193,9 @@ begin
 		rptrf[i] = rptrf[i-1] + MSI_NXCOEFF(msi)
 
 	    # extend the columns, first row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrf[2]), COEFF(rptrf[3]), COEFF(rptrf[1]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	    # define the pointers to the last to fifth last rows
 	    rptrl[1] = MSI_COEFF(msi) + (MSI_NYCOEFF(msi) - 1) *
@@ -197,12 +204,14 @@ begin
 		rptrl[i] = rptrl[i-1] - MSI_NXCOEFF(msi)
 
 	    # extend the columns, define 2nd last row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[3]), COEFF(rptrl[4]), COEFF(rptrl[2]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	    # extend the columns, define last row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[3]), COEFF(rptrl[5]), COEFF(rptrl[1]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	case II_BIPOLY5:
 
@@ -225,12 +234,14 @@ begin
 		rptrf[i] = rptrf[i-1] + MSI_NXCOEFF(msi)
 
 	    # extend the columns, define first row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrf[3]), COEFF(rptrf[5]), COEFF(rptrf[1]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	    # extend the columns, define second row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrf[3]), COEFF(rptrf[4]), COEFF(rptrf[2]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 	    
 	    # define pointers last seven rows
 	    rptrl[1] = MSI_COEFF(msi) + (MSI_NYCOEFF(msi) - 1) *
@@ -239,35 +250,41 @@ begin
 		rptrl[i] = rptrl[i-1] - MSI_NXCOEFF(msi) 
 
 	    # extend the columns, last row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[4]), COEFF(rptrl[7]), COEFF(rptrl[1]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 
 	    # extend the columns, 2nd last row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[4]), COEFF(rptrl[6]), COEFF(rptrl[2]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 
 	    # extend the columns, 3rd last row
+	    sz_val = MSI_NXCOEFF(msi)
 	    call awsur (COEFF(rptrl[4]), COEFF(rptrl[5]), COEFF(rptrl[3]),
-	    		MSI_NXCOEFF(msi), 2., -1.)
+	    		sz_val, 2., -1.)
 
 	case II_BISPLINE3:
 		
 	    # allocate space for a temporary work arrays
-	    call calloc (tmp, MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
+	    sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+	    call calloc (tmp, sz_val, TY_REAL)
 
 	    # the B-spline coefficients are calculated using the
 	    # natural end conditions, end coefficents are set to
 	    # zero
 
 	    # calculate the univariate B_spline coefficients in x
+	    sz_val = MSI_NYCOEFF(msi)
 	    call ii_spline2d (COEFF(MSI_COEFF(msi)), TEMP(tmp),
-	    	nxpix, MSI_NYCOEFF(msi), MSI_NXCOEFF(msi), MSI_NYCOEFF(msi))
+	    	nxpix, sz_val, MSI_NXCOEFF(msi), MSI_NYCOEFF(msi))
 
 
 	    # calculate the univariate B-spline coefficients in y to
 	    # results of x interpolation
+	    sz_val = MSI_NXCOEFF(msi)
 	    call ii_spline2d (TEMP(tmp), COEFF(MSI_COEFF(msi)),
-	        nypix, MSI_NXCOEFF(msi), MSI_NYCOEFF(msi), MSI_NXCOEFF(msi))
+	        nypix, sz_val, MSI_NYCOEFF(msi), MSI_NXCOEFF(msi))
 
 	    # deallocate storage for temporary arrays
 	    call mfree (tmp, TY_REAL)

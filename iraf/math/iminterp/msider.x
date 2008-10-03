@@ -18,8 +18,11 @@ int	nxder			# number of x derivatives
 int	nyder			# number of y derivatives
 int	len_der			# row length of der, len_der >= nxder
 
+size_t	c_1
+size_t	sz_val0, sz_val1
 int	first_point, len_coeff
-int	nxterms, nyterms, nx, ny, nyd, nxd
+int	nx, ny
+int	nxterms, nyterms, nyd, nxd
 int	i, j, ii, jj
 real	sx, sy, tx, ty, xmin, xmax, ymin, ymax
 real	pcoeff[MAX_NTERMS,MAX_NTERMS], pctemp[MAX_NTERMS,MAX_NTERMS]
@@ -27,6 +30,8 @@ real	sum[MAX_NTERMS], accum, deltax, deltay, tmpx[4], tmpy[4]
 pointer	index, ptr
 
 begin
+	c_1 = 1
+
 	if (nxder < 1 || nyder < 1)
 	    return
 
@@ -57,10 +62,11 @@ begin
 
 	case II_BISINC, II_BILSINC:
 
+	    sz_val0 = MSI_NXCOEFF(msi)
+	    sz_val1 = MSI_NYCOEFF(msi)
 	    call ii_bisincder (x[1], y[1], der, nxder, nyder, len_der,
-	        COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi), MSI_NXCOEFF(msi),
-		MSI_NYCOEFF(msi), MSI_NSINC(msi), DX, DY)
-
+			       COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
+			       sz_val0, sz_val1, MSI_NSINC(msi), DX, DY)
 	    return
 
 	case II_BILINEAR:
@@ -94,16 +100,18 @@ begin
 	    return
 
 	case II_BIDRIZZLE:
-            if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
+            if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+		sz_val0 = MSI_NXCOEFF(msi)
                 call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                    MSI_NXCOEFF(msi), x, y, der[1,1], 1, MSI_BADVAL(msi))
-            #else if (MSI_XPIXFRAC(msi) <= 0.0 && MSI_YPIXFRAC(msi) <= 0.0)
+				 sz_val0, x, y, der[1,1], c_1, MSI_BADVAL(msi))
+            #} else if (MSI_XPIXFRAC(msi) <= 0.0 && MSI_YPIXFRAC(msi) <= 0.0) {
                 #call ii_bidriz0 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                    #MSI_NXCOEFF(msi), x, y, der[1,1], 1, MSI_BADVAL(msi))
-            else
+                    #MSI_NXCOEFF(msi), x, y, der[1,1], c_1, MSI_BADVAL(msi))
+            } else {
                 call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                    MSI_NXCOEFF(msi), x, y, der[1,1], 1, MSI_XPIXFRAC(msi),
+                    MSI_NXCOEFF(msi), x, y, der[1,1], c_1, MSI_XPIXFRAC(msi),
                     MSI_YPIXFRAC(msi), MSI_BADVAL(msi))
+	    }
 
 	    if (nxder > 1) {
 		xmax = max (x[1], x[2], x[3], x[4])
@@ -118,38 +126,42 @@ begin
 		    tmpx[2] = (xmax - xmin) / 2.0; tmpy[2] = ymin
 		    tmpx[3] = (xmax - xmin) / 2.0; tmpy[3] = ymax
 		    tmpx[4] = xmin; tmpy[4] = ymax
-            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
-                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, 1,
-			    MSI_BADVAL(msi))
-            	    #else if (MSI_XPIXFRAC(msi) <= 0.0 &&
-		        #MSI_YPIXFRAC(msi) <= 0.0)
+            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+			sz_val0 = MSI_NXCOEFF(msi)
+                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)),
+					 MSI_FSTPNT(msi), sz_val0, tmpx, tmpy,
+					 accum, c_1, MSI_BADVAL(msi))
+            	    #} else if (MSI_XPIXFRAC(msi) <= 0.0 &&
+		        #MSI_YPIXFRAC(msi) <= 0.0) {
                         #call ii_bidriz0 (COEFF(MSI_COEFF(msi)),
 			    #MSI_FSTPNT(msi), MSI_NXCOEFF(msi), tmpx, tmpy,
-			    #accum, 1, MSI_BADVAL(msi))
-            	    else
+			    #accum, c_1, MSI_BADVAL(msi))
+		    } else {
                         call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, 1,
+                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, c_1,
 			    MSI_XPIXFRAC(msi), MSI_YPIXFRAC(msi),
 			    MSI_BADVAL(msi))
+		    }
 		    tmpx[1] = (xmax - xmin) / 2.0; tmpy[1] = ymin
 		    tmpx[2] = xmax; tmpy[2] = ymin
 		    tmpx[3] = xmax; tmpy[3] = ymax
 		    tmpx[4] = (xmax - xmin) / 2.0; tmpy[4] = ymax
-            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
-                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, der[2,1], 1,
-			    MSI_BADVAL(msi))
-            	    #else if (MSI_XPIXFRAC(msi) <= 0.0 &&
-		        #MSI_YPIXFRAC(msi) <= 0.0)
+            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+			sz_val0 = MSI_NXCOEFF(msi)
+                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)),
+					 MSI_FSTPNT(msi), sz_val0, tmpx, tmpy,
+					 der[2,1], c_1, MSI_BADVAL(msi))
+            	    #} else if (MSI_XPIXFRAC(msi) <= 0.0 &&
+		        #MSI_YPIXFRAC(msi) <= 0.0) {
                         #call ii_bidriz0 (COEFF(MSI_COEFF(msi)),
 			    #MSI_FSTPNT(msi), MSI_NXCOEFF(msi), tmpx, tmpy,
-			    #der[2,1], 1, MSI_BADVAL(msi))
-            	    else
+			    #der[2,1], c_1, MSI_BADVAL(msi))
+            	    } else {
                         call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, der[2,1], 1,
+                            MSI_NXCOEFF(msi), tmpx, tmpy, der[2,1], c_1,
 			    MSI_XPIXFRAC(msi), MSI_YPIXFRAC(msi),
 			    MSI_BADVAL(msi))
+		    }
 		    der[2,1] = 2.0 * (der[2,1] - accum) / deltax
 		}
 	    }
@@ -162,38 +174,42 @@ begin
 		    tmpx[2] = xmax; tmpy[2] = ymin
 		    tmpx[3] = xmax; tmpy[3] = (ymax - ymin) / 2.0
 		    tmpx[4] = xmin; tmpy[4] = (ymax - ymin) / 2.0
-            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
-                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, 1,
-			    MSI_BADVAL(msi))
-            	    #else if (MSI_XPIXFRAC(msi) <= 0.0 &&
-		        #MSI_YPIXFRAC(msi) <= 0.0)
+            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+			sz_val0 = MSI_NXCOEFF(msi)
+                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)),
+					 MSI_FSTPNT(msi), sz_val0, tmpx, tmpy,
+					 accum, c_1, MSI_BADVAL(msi))
+            	    #} else if (MSI_XPIXFRAC(msi) <= 0.0 &&
+		        #MSI_YPIXFRAC(msi) <= 0.0) {
                         #call ii_bidriz0 (COEFF(MSI_COEFF(msi)),
 			    #MSI_FSTPNT(msi), MSI_NXCOEFF(msi), tmpx, tmpy,
-			    #accum, 1, MSI_BADVAL(msi))
-            	    else
+			    #accum, c_1, MSI_BADVAL(msi))
+            	    } else {
                         call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, 1,
+                            MSI_NXCOEFF(msi), tmpx, tmpy, accum, c_1,
 			    MSI_XPIXFRAC(msi), MSI_YPIXFRAC(msi),
 			    MSI_BADVAL(msi))
+		    }
 		    tmpx[1] = xmin; tmpy[1] = (ymax - ymin) /  2.0
 		    tmpx[2] = xmax; tmpy[2] = (ymax - ymin) / 2.0
 		    tmpx[3] = xmax; tmpy[3] = ymax
 		    tmpx[4] = xmin; tmpy[4] = ymax
-            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
-                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, der[1,2], 1,
-			    MSI_BADVAL(msi))
-            	    #else if (MSI_XPIXFRAC(msi) <= 0.0 &&
-		        #MSI_YPIXFRAC(msi) <= 0.0)
+            	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+			sz_val0 = MSI_NXCOEFF(msi)
+                        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), 
+					 MSI_FSTPNT(msi), sz_val0, tmpx, tmpy,
+					 der[1,2], c_1, MSI_BADVAL(msi))
+            	    #} else if (MSI_XPIXFRAC(msi) <= 0.0 &&
+		        #MSI_YPIXFRAC(msi) <= 0.0) {
                         #call ii_bidriz0 (COEFF(MSI_COEFF(msi)),
 			    #MSI_FSTPNT(msi), MSI_NXCOEFF(msi), tmpx, tmpy,
-			    #der[1,2], 1, MSI_BADVAL(msi))
-            	    else
+			    #der[1,2], c_1, MSI_BADVAL(msi))
+            	    } else {
                         call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-                            MSI_NXCOEFF(msi), tmpx, tmpy, der[1,2], 1,
+                            MSI_NXCOEFF(msi), tmpx, tmpy, der[1,2], c_1,
 			    MSI_XPIXFRAC(msi), MSI_YPIXFRAC(msi),
 			    MSI_BADVAL(msi))
+		    }
 		    der[1,2] = 2.0 * (der[1,2] - accum) / deltay
 		}
 	    }

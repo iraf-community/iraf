@@ -12,6 +12,7 @@ pointer	asi		# interpolant descriptor
 real	a		# lower limit for integral
 real	b		# upper limit for integral
 
+size_t	sz_val
 int	neara, nearb, i, j, nterms, index
 real	deltaxa, deltaxb, accum, xa, xb, pcoeff[MAX_NDERIVS]
 pointer	c0ptr, n0ptr
@@ -126,8 +127,10 @@ begin
 
 	# SINC
 	case II_SINC, II_LSINC:
-	    call ii_sincigrl (xa, xb, accum, COEFF(ASI_COEFF(asi) +
-	        ASI_OFFSET(asi)), ASI_NCOEFF(asi), ASI_NSINC(asi), DX)
+	    sz_val = ASI_NCOEFF(asi)
+	    call ii_sincigrl (xa, xb, accum, 
+			      COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), sz_val,
+			      ASI_NSINC(asi), DX)
 
 	# DRIZZLE
 	case II_DRIZZLE:

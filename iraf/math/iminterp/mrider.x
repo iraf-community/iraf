@@ -15,18 +15,22 @@ procedure mrider (x, y, datain, nxpix, nypix, len_datain, der, nxder, nyder,
 real	x[ARB]				# x value
 real	y[ARB]				# y value
 real	datain[len_datain,ARB]		# data array
-int	nxpix				# number of x data points
-int	nypix				# number of y data points
-int	len_datain			# row length of datain
+size_t	nxpix				# number of x data points
+size_t	nypix				# number of y data points
+size_t	len_datain			# row length of datain
 real	der[len_der, ARB]		# array of derivatives
 int	nxder				# number of derivatives in x
 int	nyder				# number of derivatives in y
 int	len_der				# row length of der, len_der >= nxder
 int	interp_type			# interpolant type
 
-int	nx, ny, nxterms, nyterms, row_length
-int	index, xindex, yindex, first_row, last_row
-int	i, j, ii, jj, kx, ky
+size_t	sz_val
+size_t	c_1
+int	nx, ny, li, lj, xindex, yindex
+int	nxterms, nyterms, row_length
+int	index, first_row, last_row
+int	i, j, ii, jj
+size_t	kx, ky
 pointer	tmp
 real	coeff[SPLPTS+3,SPLPTS+3], pcoeff[MAX_NTERMS,MAX_NTERMS]
 real	pctemp[MAX_NTERMS,MAX_NTERMS], sum[MAX_NTERMS]
@@ -36,6 +40,8 @@ real	xmin, xmax, ymin, ymax, sx, sy, tx, ty
 errchk	malloc, calloc, mfree
 
 begin
+	c_1 = 1
+
 	if (nxder < 1 || nyder < 1)
 	    return
 
@@ -105,7 +111,7 @@ begin
 	    return
 
 	case II_BIDRIZZLE:
-            call ii_bidriz1 (datain, 0, len_datain, x, y, der[1,1], 1, BADVAL)
+            call ii_bidriz1 (datain, 0, len_datain, x, y, der[1,1], c_1, BADVAL)
             if (nxder > 1) {
                 xmax = max (x[1], x[2], x[3], x[4])
                 xmin = min (x[1], x[2], x[3], x[4])
@@ -120,13 +126,13 @@ begin
                     tmpx[3] = (xmax - xmin) / 2.0; tmpy[3] = ymax
                     tmpx[4] = xmin; tmpy[4] = ymax
                     call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
-			accum, 1, BADVAL)
+			accum, c_1, BADVAL)
                     tmpx[1] = (xmax - xmin) / 2.0; tmpy[1] = ymin
                     tmpx[2] = xmax; tmpy[2] = ymin
                     tmpx[3] = xmax; tmpy[3] = ymax
                     tmpx[4] = (xmax - xmin) / 2.0; tmpy[4] = ymax
                     call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
-			der[2,1], 1, BADVAL)
+			der[2,1], c_1, BADVAL)
                     der[2,1] = 2.0 * (der[2,1] - accum) / deltax
                 }
 	    }
@@ -140,13 +146,13 @@ begin
                     tmpx[3] = xmax; tmpy[3] = (ymax - ymin) / 2.0
                     tmpx[4] = xmin; tmpy[4] = (ymax - ymin) / 2.0
                     call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
-		        accum, 1, BADVAL)
+		        accum, c_1, BADVAL)
                     tmpx[1] = xmin; tmpy[1] = (ymax - ymin) /  2.0
                     tmpx[2] = xmax; tmpy[2] = (ymax - ymin) / 2.0
                     tmpx[3] = xmax; tmpy[3] = ymax
                     tmpx[4] = xmin; tmpy[4] = ymax
                     call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
-			der[1,2], 1, BADVAL)
+			der[1,2], c_1, BADVAL)
                     der[1,2] = 2.0 * (der[1,2] - accum) / deltay
                 }
             }
@@ -168,37 +174,37 @@ begin
 
 	    # use boundary projection to extend the data rows
 	    yindex = 1
-	    for (j = ny - 1; j <= ny + 2; j = j + 1) {
+	    for (lj = ny - 1; lj <= ny + 2; lj = lj + 1) {
 
 		# check that the data row is defined
-		if (j >= 1 && j <= nypix) {
+		if (lj >= 1 && lj <= nypix) {
 
 		    # extend the rows
 		    xindex = 1
-		    for (i = nx - 1; i <= nx + 2; i = i + 1) {
-			if (i < 1)
-			    coeff[xindex,yindex] = 2. * datain[1,j] -
-			    			  datain[2-i,j]
-			else if (i > nxpix)
-			    coeff[xindex,yindex] = 2. * datain[nxpix,j] -
-					   	  datain[2*nxpix-i,j] 
+		    for (li = nx - 1; li <= nx + 2; li = li + 1) {
+			if (li < 1)
+			    coeff[xindex,yindex] = 2. * datain[1,lj] -
+			    			  datain[2-li,lj]
+			else if (li > nxpix)
+			    coeff[xindex,yindex] = 2. * datain[nxpix,lj] -
+					   	  datain[2*nxpix-li,lj] 
 			else
-			    coeff[xindex,yindex] = datain[i,j]
+			    coeff[xindex,yindex] = datain[li,lj]
 			xindex = xindex + 1
 		    }
-		} else if (j == (nypix + 2)) {
+		} else if (lj == (nypix + 2)) {
 
 		    # allow for the final row
 		    xindex = 1
-		    for (i = nx - 1; i <= nx + 2; i = i + 1) {
-			if (i < 1)
+		    for (li = nx - 1; li <= nx + 2; li = li + 1) {
+			if (li < 1)
 			    coeff[xindex,nyterms] = 2. * datain[1,nypix-2] -
-			    			  datain[2-i,nypix-2]
-			else if (i > nxpix)
+			    			  datain[2-li,nypix-2]
+			else if (li > nxpix)
 			    coeff[xindex,nyterms] = 2. * datain[nxpix,nypix-2] -
-					   	  datain[2*nxpix-i,nypix-2] 
+					   	  datain[2*nxpix-li,nypix-2] 
 			else
-			    coeff[xindex,nyterms] = datain[i,nypix-2]
+			    coeff[xindex,nyterms] = datain[li,nypix-2]
 			xindex = xindex + 1
 		    }
 
@@ -211,22 +217,29 @@ begin
 	    # project columns
 	    first_row = max (1, 3 - ny)
 	    if (first_row > 1) {
-	        for (j = 1; j < first_row; j = j + 1)
+	        for (j = 1; j < first_row; j = j + 1) {
+		    sz_val = nxterms
 		    call awsur (coeff[1, first_row], coeff[1, 2*first_row-j],
-		    coeff[1,j], nxterms, 2., -1.)
+		    coeff[1,j], sz_val, 2., -1.)
+		}
 	    }
 
 	    last_row = min (nxterms, nypix - ny + 2)
 	    if (last_row < nxterms) {
-	        for (j = last_row + 1; j <= nxterms - 1; j = j + 1)
+	        for (j = last_row + 1; j <= nxterms - 1; j = j + 1) {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-j],
-		    	        coeff[1,j], nxterms, 2., -1.)
-		if (last_row == 2)
+		    	        coeff[1,j], sz_val, 2., -1.)
+		}
+		if (last_row == 2) {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,4], coeff[1,4],
-				nxterms, 2., -1.)
-		else
+				sz_val, 2., -1.)
+		} else {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-4],
-				coeff[1,4], nxterms, 2., -1.)
+				coeff[1,4], sz_val, 2., -1.)
+		}
 	    }
 
 	    # calculate the coefficients of the bicubic polynomial
@@ -246,38 +259,38 @@ begin
 
 	    # extend rows of data
 	    yindex = 1
-	    for (j = ny - 2; j <= ny + 3; j = j + 1) {
+	    for (lj = ny - 2; lj <= ny + 3; lj = lj + 1) {
 
 		# select the  rows containing data
-		if (j >= 1 && j <= nypix) {
+		if (lj >= 1 && lj <= nypix) {
 
 		    # extend the rows
 		    xindex = 1
-		    for (i = nx - 2; i <= nx + 3; i = i + 1) {
-			if (i < 1)
-			    coeff[xindex,yindex] = 2. * datain[1,j] -
-			    			  datain[2-i,j]
-			else if (i > nxpix)
-			    coeff[xindex,yindex] = 2. * datain[nxpix,j] -
-					   	  datain[2*nxpix-i,j] 
+		    for (li = nx - 2; li <= nx + 3; li = li + 1) {
+			if (li < 1)
+			    coeff[xindex,yindex] = 2. * datain[1,lj] -
+			    			  datain[2-li,lj]
+			else if (li > nxpix)
+			    coeff[xindex,yindex] = 2. * datain[nxpix,lj] -
+					   	  datain[2*nxpix-li,lj] 
 			else
-			    coeff[xindex,yindex] = datain[i,j]
+			    coeff[xindex,yindex] = datain[li,lj]
 			xindex = xindex + 1
 		    }
 
-		} else if (j == (ny + 3)) {
+		} else if (lj == (ny + 3)) {
 
 		    # extend the rows
 		    xindex = 1
-		    for (i = nx - 2; i <= nx + 3; i = i + 1) {
-			if (i < 1)
+		    for (li = nx - 2; li <= nx + 3; li = li + 1) {
+			if (li < 1)
 			    coeff[xindex,yindex] = 2. * datain[1,nypix-3] -
-			    			  datain[2-i,nypix-3]
-			else if (i > nxpix)
+			    			  datain[2-li,nypix-3]
+			else if (li > nxpix)
 			    coeff[xindex,yindex] = 2. * datain[nxpix,nypix-3] -
-					   	  datain[2*nxpix-i,nypix-3] 
+					   	  datain[2*nxpix-li,nypix-3] 
 			else
-			    coeff[xindex,yindex] = datain[i,nypix-3]
+			    coeff[xindex,yindex] = datain[li,nypix-3]
 			xindex = xindex + 1
 		    }
 
@@ -290,22 +303,29 @@ begin
 
 	    first_row = max (1, 4 - ny)
 	    if (first_row > 1) {
-	        for (j = 1; j < first_row; j = j + 1)
+	        for (j = 1; j < first_row; j = j + 1) {
+		    sz_val = nxterms
 		    call awsur (coeff[1,first_row], coeff[1,2*first_row-j],
-		    		coeff[1,j], nxterms, 2., -1.)
+		    		coeff[1,j], sz_val, 2., -1.)
+		}
 	    }
 
 	    last_row = min (nxterms, nypix - ny + 3) 
 	    if (last_row < nxterms) {
-	        for (j = last_row + 1; j <= nxterms - 1; j = j + 1)
+	        for (j = last_row + 1; j <= nxterms - 1; j = j + 1) {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-j],
-		    		coeff[1,j], nxterms, 2., -1.)
-		if (last_row == 3)
+		    		coeff[1,j], sz_val, 2., -1.)
+		}
+		if (last_row == 3) {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,6], coeff[1,6],
-				nxterms, 2., -1.)
-		else
+				sz_val, 2., -1.)
+		} else {
+		    sz_val = nxterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-6],
-				coeff[1,6], nxterms, 2., -1.)
+				coeff[1,6], sz_val, 2., -1.)
+		}
 	    }
 
 	    # caculate the polynomial coeffcients
@@ -325,28 +345,29 @@ begin
 	    sy = y[1] - ny
 
 	    # allocate space for temporary array and 0 file
-	    call calloc (tmp, row_length * row_length, TY_REAL)
+	    sz_val = row_length * row_length
+	    call calloc (tmp, sz_val, TY_REAL)
 
 	    ky = 0
 	    # maximum number of points used in each direction is SPLPTS
-	    for (j = ny - SPLPTS/2 + 1; j <= ny + SPLPTS/2; j = j + 1) {
+	    for (lj = ny - SPLPTS/2 + 1; lj <= ny + SPLPTS/2; lj = lj + 1) {
 
-		if (j < 1 || j > nypix)
+		if (lj < 1 || lj > nypix)
 		    ;
 		else {
 		    ky = ky + 1
 		    if (ky == 1)
-			yindex = ny - j + 1
+			yindex = ny - lj + 1
 
 	    	    kx = 0
-		    for (i = nx - SPLPTS/2 + 1; i <= nx + SPLPTS/2; i = i + 1) {
-			if (i < 1 || i > nxpix)
+		    for (li = nx - SPLPTS/2 + 1; li <= nx + SPLPTS/2; li = li + 1) {
+			if (li < 1 || li > nxpix)
 			    ;
 			else {
 			    kx = kx + 1
 			    if (kx == 1)
-				xindex = nx - i + 1
-			    coeff[kx+1,ky+1] = datain[i,j]
+				xindex = nx - li + 1
+			    coeff[kx+1,ky+1] = datain[li,lj]
 			}
 		    }
 
@@ -358,9 +379,10 @@ begin
 	    }
 
 	    # zero out 1st and last 2 rows
-	    call amovkr (0., coeff[1,1], kx+3)
-	    call amovkr (0., coeff[1,ky+2], kx+3)
-	    call amovkr (0., coeff[1,ky+3],kx+3)
+	    sz_val = kx+3
+	    call amovkr (0., coeff[1,1], sz_val)
+	    call amovkr (0., coeff[1,ky+2], sz_val)
+	    call amovkr (0., coeff[1,ky+3], sz_val)
 
 	    # calculate the spline coefficients
 	    call ii_spline2d (coeff, Memr[tmp], kx, ky+2, row_length,

@@ -14,11 +14,11 @@ procedure arbpix (datain, dataout, npts, interp_type, boundary_type)
 
 real	datain[ARB]		# input data array
 real	dataout[ARB]		# output data array - cannot be same as datain
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	interp_type		# interpolator type
 int	boundary_type		# boundary type, at present must be BOUNDARY_EXT
 
-int	i, badnc, k, ka, kb
+long	i, badnc, k, ka, kb
 real	ii_badpix()
 
 begin
@@ -87,11 +87,12 @@ end
 real procedure ii_badpix (datain, npix, index, interp_type)
 
 real	datain[ARB]	# datain array, y[1] and y[n] guaranteed to be good
-int	npix		# length of y array
-int	index		# index of bad point to replace
+size_t	npix		# length of y array
+long	index		# index of bad point to replace
 int	interp_type	# interpolator type
 
-int	j, jj, pdown, pup, npts, ngood
+long	j, jj, pdown, pup, ngood
+size_t	npts
 real	tempdata[SPLPTS], tempx[SPLPTS]
 real	ii_newpix()
 
@@ -165,11 +166,12 @@ real procedure ii_newpix (x, xarray, data, npts, index, interp_type)
 real	x		# point to interpolate
 real	xarray[ARB]	# x values
 real	data[ARB]	# data values
-int 	npts		# size of data array
-int	index		# index such that xarray[index] < x < xarray[index+1]
-int 	interp_type	# interpolator type
+size_t 	npts		# size of data array
+long	index		# index such that xarray[index] < x < xarray[index+1]
+int	interp_type	# interpolator type
 
-int	i, left, right
+int	i_val
+long	i, left, right
 real	cc[SPLINE3_ORDER, SPLPTS], h
 real	ii_polterp()
 
@@ -196,7 +198,8 @@ begin
 	     # Use spline routine from C. de Boor's book "A Practical Guide
 	     # to Splines
 
-	     call iicbsp (xarray, cc, npts, 2, 2)
+	     i_val = npts
+	     call iicbsp (xarray, cc, i_val, 2, 2)
 	     h = x - xarray[index]
 
 	     return (cc[1,index] + h * (cc[2,index] + h *
@@ -233,11 +236,12 @@ procedure ii_badsinc (datain, dataout, npts, nsinc, min_bdx)
 
 real	datain[ARB]	# input data including bad pixels with INDEF values
 real	dataout[ARB]	# output data 
-int	npts		# number of data values
+size_t	npts		# number of data values
 int	nsinc		# sinc truncation length
 real	min_bdx		# minimum  distance from interpolation point
 
-int	i, j, k, xc
+int	j
+long	i, lj, k, xc
 real	sconst, a2, a4, dx, dx2, dx4
 real	w, d, z, w1, u1, v1
 
@@ -314,8 +318,8 @@ begin
 	    if (v1 != 0.) {
 		dataout[i] = u1 / v1
 	    } else {
-		do j = 1, npts {
-		    k = xc - j
+		do lj = 1, npts {
+		    k = xc - lj
 		    if (k >= 1)
 			d = datain[k]
 		    else
@@ -324,7 +328,7 @@ begin
 			dataout[i] = d
 			break
 		    }
-		    k = xc + j
+		    k = xc + lj
 		    if (k <= npts)
 			d = datain[k]
 		    else

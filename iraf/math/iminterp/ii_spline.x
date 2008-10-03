@@ -23,9 +23,9 @@ procedure ii_spline (bcoeff, diag, npts)
 
 real	bcoeff[ARB]	# data in and also bspline coefficients out
 real	diag[ARB]	# needed for offdiagnol matrix elements
-int	npts		# number of data points
+size_t	npts		# number of data points
 
-int	i
+long	i
 
 begin
         diag[1] = -2.

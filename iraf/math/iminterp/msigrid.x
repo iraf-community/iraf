@@ -14,9 +14,9 @@ pointer	msi 			# pointer to interpolant descriptor structure
 real	x[ARB]			# array of x values
 real	y[ARB]			# array of y values
 real	zfit[len_zfit,ARB]	# array of fitted values
-int	nx			# number of x points
-int	ny			# number of y points
-int	len_zfit		# row length of zfit
+size_t	nx			# number of x points
+size_t	ny			# number of y points
+size_t	len_zfit		# row length of zfit
 
 errchk	ii_grnearest, ii_grlinear, ii_grpoly3, ii_grpoly5, ii_grspline3
 errchk	ii_grsinc, ii_grlsinc, ii_grdirz

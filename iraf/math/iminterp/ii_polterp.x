@@ -14,10 +14,10 @@ real procedure ii_polterp (x, y, n, x0)
 
 real	x[ARB],y[ARB]	# x and y array
 real	x0		# desired x
-int	n		# number of points in x and y = number of
+size_t	n		# number of points in x and y = number of
 			# terms in polynomial = order + 1
 
-int	k,i
+long	k, i
 real	d[MAX_NDERIVS]
 
 begin

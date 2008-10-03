@@ -19,12 +19,14 @@ real procedure msigrl (msi, x, y, npts)
 pointer	msi		# pointer to the interpolant descriptor structure
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
-int	npts		# number of points which describe the boundary
+size_t	npts		# number of points which describe the boundary
 
+size_t	sz_val
 int	i, interp_type, nylmin, nylmax, offset
 pointer	x1lim, x2lim, xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
 real	ii_1dinteg()
+int	modi()
 
 begin
 	# set up 1D interpolant type
@@ -48,12 +50,15 @@ begin
 	}
 
 	# set up temporary storage for x limits and the x integrals
-	call calloc (x1lim, MSI_NYCOEFF(msi), TY_REAL)
-	call calloc (x2lim, MSI_NYCOEFF(msi), TY_REAL)
-	call calloc (xintegrl, MSI_NYCOEFF(msi), TY_REAL)
+	sz_val = MSI_NYCOEFF(msi)
+	call calloc (x1lim, sz_val, TY_REAL)
+	sz_val = MSI_NYCOEFF(msi)
+	call calloc (x2lim, sz_val, TY_REAL)
+	sz_val = MSI_NYCOEFF(msi)
+	call calloc (xintegrl, sz_val, TY_REAL)
 
 	# offset of first data point from edge of coefficient array
-	offset = mod (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
+	offset = modi (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
 
 	# convert the (x,y) points which describe the polygon into
 	# two arrays of x limits x1lim and x2lim and two y limits ymin and ymax
@@ -74,7 +79,8 @@ begin
 
 	# integrate in y
 	if (interp_type == II_SPLINE3) {
-	    call amulkr (Memr[xintegrl], 6.0, Memr[xintegrl], MSI_NYCOEFF(msi))
+	    sz_val = MSI_NYCOEFF(msi)
+	    call amulkr (Memr[xintegrl], 6.0, Memr[xintegrl], sz_val)
 	    accum = ii_1dinteg (Memr[xintegrl+offset], MSI_NYCOEFF(msi), ymin,
 	        ymax, II_NEAREST, MSI_NSINC(msi), DY, MSI_YPIXFRAC(msi))
 	} else {
@@ -99,7 +105,7 @@ ymin, ymax, nylmin, nylmax)
 
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	xboff, xeoff	# boundary extension limits
 int	max_nylines	# max number of lines to integrate
 real	x1lim[ARB]	# array of x1 limits
@@ -109,10 +115,11 @@ real	ymax		# maximum y value for integration
 int	nylmin		# minimum line number for x integration
 int	nylmax		# maximum line number for x integration
 
-int	i, ninter
+int	i
+long	ninter
 pointer	sp, xintr, yintr
 real	xmin, xmax, lx, ld
-int	ii_pyclip()
+long	ii_pyclip()
 
 begin
 	call smark (sp)
@@ -156,16 +163,16 @@ end
 # II_YCLIP -- Procedure to determine the intersection points of a
 # horizontal image line with an arbitrary polygon.
 
-int procedure ii_pyclip (xver, yver, xintr, yintr, nver, lx, ld)
+long procedure ii_pyclip (xver, yver, xintr, yintr, nver, lx, ld)
 
 real	xver[ARB]		# x vertex coords
 real	yver[ARB]		# y vertex coords
 real	xintr[ARB]		# x intersection coords
 real	yintr[ARB]		# y intersection coords
-int	nver			# number of vertices
+size_t	nver			# number of vertices
 real	lx, ld 			# equation of image line
 
-int	i, nintr
+long	i, nintr
 real	u1, u2, u1u2, dx, dy, dd, xa, ya, wa
 
 begin

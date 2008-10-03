@@ -11,53 +11,58 @@ real procedure asieval (asi, x)
 pointer	asi		# interpolator descriptor
 real x[ARB]		# x value
 
+size_t	sz_val
+size_t	c_1
 real value
 
 begin
+	c_1 = 1
+
 	switch (ASI_TYPE(asi))	{	# switch on interpolator type
 	
 	case II_NEAREST:
-	    call ii_nearest (x, value, 1,
+	    call ii_nearest (x, value, c_1,
 	    		    COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
 
 	case II_LINEAR:
-	    call ii_linear (x, value, 1,
+	    call ii_linear (x, value, c_1,
 	    		   COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
 
 	case II_POLY3:
-	    call ii_poly3 (x, value, 1, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
+	    call ii_poly3 (x, value, c_1, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
 
 	case II_POLY5:
-	    call ii_poly5 (x, value, 1, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
+	    call ii_poly5 (x, value, c_1, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
 
 	case II_SPLINE3:
-	    call ii_spline3 (x, value, 1,
+	    call ii_spline3 (x, value, c_1,
 	    		    COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
 
 	case II_SINC:
-	    call ii_sinc (x, value, 1,
-		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		ASI_NSINC(asi), DX)
+	    sz_val = ASI_NCOEFF(asi)
+	    call ii_sinc (x, value, c_1, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)),
+			  sz_val, ASI_NSINC(asi), DX)
 	    return (value)
 	
 	case II_LSINC:
-	    call ii_lsinc (x, value, 1,
-		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		LTABLE(ASI_LTABLE(asi)), 2 * ASI_NSINC(asi) + 1,
-		ASI_NINCR(asi), DX)
+	    sz_val = ASI_NCOEFF(asi)
+	    call ii_lsinc (x, value, c_1,
+			   COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), sz_val,
+			   LTABLE(ASI_LTABLE(asi)), 2 * ASI_NSINC(asi) + 1,
+			   ASI_NINCR(asi), DX)
 	    return (value)
 
 	case II_DRIZZLE:
 	    if (ASI_PIXFRAC(asi) >= 1.0)
-	        call ii_driz1 (x, value, 1, COEFF(ASI_COEFF(asi) +
+	        call ii_driz1 (x, value, c_1, COEFF(ASI_COEFF(asi) +
 		    ASI_OFFSET(asi)), ASI_BADVAL(asi))
 	    else
-	        call ii_driz (x, value, 1, COEFF(ASI_COEFF(asi) +
+	        call ii_driz (x, value, c_1, COEFF(ASI_COEFF(asi) +
 		    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
 	    return (value)
 

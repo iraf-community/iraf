@@ -14,7 +14,9 @@ pointer	msi		# pointer to the interpolant descriptor structure
 real	x[ARB]		# array of x values
 real	y[ARB]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
+
+size_t	sz_val0, sz_val1
 
 begin
 	switch (MSI_TYPE(msi)) {
@@ -40,9 +42,11 @@ begin
 	        MSI_NXCOEFF(msi), x, y, zfit, npts)
 
 	case II_BISINC:
+	    sz_val0 = MSI_NXCOEFF(msi)
+	    sz_val1 = MSI_NYCOEFF(msi)
 	    call ii_bisinc (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-	        MSI_NXCOEFF(msi), MSI_NYCOEFF(msi), x, y, zfit, npts,
-		MSI_NSINC(msi), DX, DY)
+			    sz_val0, sz_val1, x, y, zfit, npts,
+			    MSI_NSINC(msi), DX, DY)
 
 	case II_BILSINC:
 	    call ii_bilsinc (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
@@ -51,15 +55,17 @@ begin
 		MSI_NXINCR(msi), MSI_NYINCR(msi), DX, DY)
 
 	case II_BIDRIZZLE:
-	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0)
+	    if (MSI_XPIXFRAC(msi) >= 1.0 && MSI_YPIXFRAC(msi) >= 1.0) {
+		sz_val0 = MSI_NXCOEFF(msi)
 	        call ii_bidriz1 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
-	            MSI_NXCOEFF(msi), x, y, zfit, npts, MSI_BADVAL(msi))
-	    #else if (MSI_XPIXFRAC(msi) <= 0.0 && MSI_YPIXFRAC(msi) <= 0.0)
+				 sz_val0, x, y, zfit, npts, MSI_BADVAL(msi))
+	    #} else if (MSI_XPIXFRAC(msi) <= 0.0 && MSI_YPIXFRAC(msi) <= 0.0) {
 	        #call ii_bidriz0 (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
 	            #MSI_NXCOEFF(msi), x, y, zfit, npts, MSI_BADVAL(msi))
-	    else
+	    } else {
 	        call ii_bidriz (COEFF(MSI_COEFF(msi)), MSI_FSTPNT(msi),
 	            MSI_NXCOEFF(msi), x, y, zfit, npts, MSI_XPIXFRAC(msi),
 		    MSI_YPIXFRAC(msi), MSI_BADVAL(msi))
+	    }
 	}
 end

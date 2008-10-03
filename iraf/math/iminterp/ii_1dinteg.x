@@ -21,6 +21,7 @@ int	nsinc		# width of sinc function
 real	dx		# sinc precision
 real	pixfrac		# drizzle pixel fraction
 
+size_t	sz_val
 int	neara, nearb, i, j, nterms
 real	deltaxa, deltaxb, accum, xa, xb, pcoeff[MAX_NDERIVS]
 
@@ -136,7 +137,8 @@ begin
 	# SINC -- Note that to get ncoeff, nsinc, and dx,  an interface change
 	# was required. 
 	case II_SINC, II_LSINC:
-	    call ii_sincigrl (xa, xb, accum, coeff, len_coeff, nsinc, dx)
+	    sz_val = len_coeff
+	    call ii_sincigrl (xa, xb, accum, coeff, sz_val, nsinc, dx)
 
 	# A higher order interpolant.
 	default:
@@ -251,22 +253,26 @@ procedure ii_sincigrl (a, b, sum, data, npix, nsinc, mindx)
 real	a, b			# integral limits
 real	sum			# output integral value
 real	data[npix]		# input data array
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	nsinc			# sinc truncation length
 real	mindx			# interpolation minimum
 
+size_t	c_1
 int	n
 real	x, y, dx, x1, x2
+int	nint_ri()
 
 begin
+	c_1 = 1
+
 	x1 = min (a, b)
 	x2 = max (a, b)
-	n = max (1, nint (x2 - x1))
+	n = max (1, nint_ri (x2 - x1))
 	dx = (x2 - x1) / n
 
 	sum = 0.
 	for (x = x1 + dx / 2; x < x2; x = x + dx) {
-	    call ii_sinc (x, y, 1, data, npix, nsinc, mindx)
+	    call ii_sinc (x, y, c_1, data, npix, nsinc, mindx)
 	    sum = sum + y * dx
 	}
 end

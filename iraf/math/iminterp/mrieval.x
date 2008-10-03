@@ -14,15 +14,19 @@ real procedure mrieval (x, y, datain, nxpix, nypix, len_datain, interp_type)
 real	x[ARB]				# x value
 real	y[ARB]				# y value
 real	datain[len_datain,ARB]		# data array
-int	nxpix				# number of x data points
-int	nypix				# number of y data points
-int	len_datain			# row length of datain
+size_t	nxpix				# number of x data points
+size_t	nypix				# number of y data points
+size_t	len_datain			# row length of datain
 int	interp_type			# interpolant type
 
-int	nx, ny, nterms, row_length
-int	xindex, yindex, first_row, last_row
-int	kx, ky
-int	i, j
+size_t	sz_val
+size_t	c_1
+int	nx, ny, xindex, yindex
+int	nterms, row_length
+int	first_row, last_row
+size_t	kx, ky
+long	i, j
+int	jj
 pointer	tmp
 real	coeff[SPLPTS+3,SPLPTS+3]
 real	hold21, hold12, hold22
@@ -31,6 +35,8 @@ real	xval, yval, value
 errchk	malloc, calloc, mfree
 
 begin
+	c_1 = 1
+
 	switch (interp_type) {
 
 	case II_BINEAREST:
@@ -71,7 +77,7 @@ begin
 	    return (value)
 
 	case II_BIDRIZZLE:
-	    call ii_bidriz1 (datain, 0, len_datain, x, y, value, 1, BADVAL)
+	    call ii_bidriz1 (datain, 0, len_datain, x, y, value, c_1, BADVAL)
 
 	    return (value)
 
@@ -130,29 +136,36 @@ begin
 
 	    first_row = max (1, 3 - ny)
 	    if (first_row > 1) {
-	        for (j = 1; j < first_row; j = j + 1)
-		    call awsur (coeff[1, first_row], coeff[1, 2*first_row-j],
-		    coeff[1,j], nterms, 2., -1.)
+	        for (jj = 1; jj < first_row; jj = jj + 1) {
+		    sz_val = nterms
+		    call awsur (coeff[1, first_row], coeff[1, 2*first_row-jj],
+				coeff[1,jj], sz_val, 2., -1.)
+		}
 	    }
 
 	    last_row = min (nterms, nypix - ny + 2)
 	    if (last_row < nterms) {
-	        for (j = last_row + 1; j <= nterms - 1; j = j + 1)
-		    call awsur (coeff[1,last_row], coeff[1,2*last_row-j],
-		    	        coeff[1,j], nterms, 2., -1.)
-		if (last_row == 2)
+	        for (jj = last_row + 1; jj <= nterms - 1; jj = jj + 1) {
+		    sz_val = nterms
+		    call awsur (coeff[1,last_row], coeff[1,2*last_row-jj],
+		    	        coeff[1,jj], sz_val, 2., -1.)
+		}
+		if (last_row == 2) {
+		    sz_val = nterms
 		    call awsur (coeff[1,last_row], coeff[1,4], coeff[1,4],
-				nterms, 2., -1.)
-		else
+				sz_val, 2., -1.)
+		} else {
+		    sz_val = nterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-4],
-				coeff[1,4], nterms, 2., -1.)
+				coeff[1,4], sz_val, 2., -1.)
+		}
 	    }
 
 
 	    # center the x value and call evaluation routine
 	    xval = 2 + (x[1] - nx)
 	    yval = 2 + (y[1] - ny)
-	    call ii_bipoly3 (coeff, 0, row_length, xval, yval, value, 1)
+	    call ii_bipoly3 (coeff, 0, row_length, xval, yval, value, c_1)
 
 	    return (value)
 
@@ -210,28 +223,35 @@ begin
 
 	    first_row = max (1, 4 - ny)
 	    if (first_row > 1) {
-	        for (j = 1; j < first_row; j = j + 1)
-		    call awsur (coeff[1,first_row], coeff[1,2*first_row-j],
-		    		coeff[1,j], nterms, 2., -1.)
+	        for (jj = 1; jj < first_row; jj = jj + 1) {
+		    sz_val = nterms
+		    call awsur (coeff[1,first_row], coeff[1,2*first_row-jj],
+		    		coeff[1,jj], sz_val, 2., -1.)
+		}
 	    }
 
 	    last_row = min (nterms, nypix - ny + 3) 
 	    if (last_row < nterms) {
-	        for (j = last_row + 1; j <= nterms - 1; j = j + 1)
-		    call awsur (coeff[1,last_row], coeff[1,2*last_row-j],
-		    		coeff[1,j], nterms, 2., -1.)
-		if (last_row == 3)
+	        for (jj = last_row + 1; jj <= nterms - 1; jj = jj + 1) {
+		    sz_val = nterms
+		    call awsur (coeff[1,last_row], coeff[1,2*last_row-jj],
+		    		coeff[1,jj], sz_val, 2., -1.)
+		}
+		if (last_row == 3) {
+		    sz_val = nterms
 		    call awsur (coeff[1,last_row], coeff[1,6], coeff[1,6],
-				nterms, 2., -1.)
-		else
+				sz_val, 2., -1.)
+		} else {
+		    sz_val = nterms
 		    call awsur (coeff[1,last_row], coeff[1,2*last_row-6],
-				coeff[1,6], nterms, 2., -1.)
+				coeff[1,6], sz_val, 2., -1.)
+		}
 	    }
 
 	    # call evaluation routine
 	    xval = 3 + (x[1] - nx)
 	    yval = 3 + (y[1] - ny)
-	    call ii_bipoly5 (coeff, 0, row_length, xval, yval, value, 1)
+	    call ii_bipoly5 (coeff, 0, row_length, xval, yval, value, c_1)
 
 	    return (value)
 
@@ -241,7 +261,8 @@ begin
 	    ny = y[1]
 
 	    # allocate space for temporary array and 0 file
-	    call calloc (tmp, row_length * row_length, TY_REAL)
+	    sz_val = row_length * row_length
+	    call calloc (tmp, sz_val, TY_REAL)
 
 	    ky = 0
 	    # maximum number of points used in each direction is SPLPTS
@@ -274,9 +295,10 @@ begin
 	    }
 
 	    # zero out 1st and last 2 rows
-	    call amovkr (0., coeff[1,1], kx+3)
-	    call amovkr (0., coeff[1,ky+2], kx+3)
-	    call amovkr (0., coeff[1,ky+3],kx+3)
+	    sz_val = kx+3
+	    call amovkr (0., coeff[1,1], sz_val)
+	    call amovkr (0., coeff[1,ky+2], sz_val)
+	    call amovkr (0., coeff[1,ky+3], sz_val)
 
 	    # calculate the spline coefficients
 	    call ii_spline2d (coeff, Memr[tmp], kx, ky+2, row_length,
@@ -287,7 +309,7 @@ begin
 	    # evaluate spline
 	    xval = xindex + 1 + (x[1] - nx)
 	    yval = yindex + 1 + (y[1] - ny)
-	    call ii_bispline3 (coeff, 0, row_length, xval, yval, value, 1)
+	    call ii_bispline3 (coeff, 0, row_length, xval, yval, value, c_1)
 
 	    # free space
 	    call mfree (tmp, TY_REAL)
@@ -295,7 +317,7 @@ begin
 	    return (value)
 
 	case II_BISINC, II_BILSINC:
-	    call ii_bisinc (datain, 0, len_datain, nypix, x, y, value, 1,
+	    call ii_bisinc (datain, 0, len_datain, nypix, x, y, value, c_1,
 	        NSINC, DX, DY)
 
 	    return (value)

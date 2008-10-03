@@ -12,9 +12,9 @@ define	MSI_XPIXFRAC	Memr[P2R($1+6)]	# x pixel fraction for drizzle
 define	MSI_YPIXFRAC	Memr[P2R($1+7)]	# y pixel fraction for drizzle
 define	MSI_NXCOEFF	Memi[P2I($1+8)]	# x dimension of coefficient array
 define	MSI_NYCOEFF	Memi[P2I($1+9)]	# y dimension of coefficient array
-define	MSI_COEFF	Memi[P2I($1+10)]	# pointer to coefficient array
+define	MSI_COEFF	Memp[$1+10]	# pointer to coefficient array
 define	MSI_FSTPNT	Memi[P2I($1+11)]	# offset to first data point in coeff
-define	MSI_LTABLE	Memi[P2I($1+12)]	# offset to first data point in coeff
+define	MSI_LTABLE	Memp[$1+12]	# ltable pointer
 define	MSI_BADVAL	Memr[P2R($1+13)]	# undefined pixel value for drizzle
 
 # Definitions for msisave and msirestore

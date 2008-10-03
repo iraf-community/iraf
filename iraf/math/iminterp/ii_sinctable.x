@@ -12,6 +12,7 @@ real	xshift				#I the shift of the look up table
 
 int	i, j, nsinc
 real	sconst, a2, a4, fsign, xsign, sum, dx, dx2, x, f
+int	modi()
 
 begin
 	# Set up some constants.
@@ -19,7 +20,7 @@ begin
 	sconst = (HALFPI / nsinc) ** 2
 	a2 = -0.49670
 	a4 = 0.03705
-	if (mod (nsinc, 2) == 0)
+	if (modi (nsinc, 2) == 0)
 	    fsign = 1.0
         else
 	    fsign = -1.0
@@ -88,14 +89,16 @@ int	nconv				 #I the sinc truncation length
 int	nxincr, nyincr			 #I the number of look-up tables
 real	xshift, yshift			 #I the shift of the look up table
 
+size_t	sz_val
 int	j, ii, jj
 pointer	sp, fx, fy
 
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (fx, nconv * nxincr, TY_REAL)
-	call salloc (fy, nconv * nyincr, TY_REAL)
+	sz_val = nconv * nxincr
+	call salloc (fx, sz_val, TY_REAL)
+	call salloc (fy, sz_val, TY_REAL)
 
 	# Create a one entry look-up table.
 	if (! IS_INDEFR(xshift) && ! IS_INDEFR(yshift)) {
@@ -103,7 +106,8 @@ begin
 	    call ii_sinctable (Memr[fx], nconv, 1, xshift)
 	    call ii_sinctable (Memr[fy], nconv, 1, yshift)
 	    do j = 1, nconv {
-		call amulkr (Memr[fx], Memr[fy+j-1], table[1,j,1,1], nconv)
+		sz_val = nconv
+		call amulkr (Memr[fx], Memr[fy+j-1], table[1,j,1,1], sz_val)
 	    }
 
 	} else {
@@ -112,9 +116,11 @@ begin
 	    call ii_sinctable (Memr[fy], nconv, nyincr, yshift)
 	    do jj = 1, nyincr {
 		do ii = 1, nxincr {
-		    do j = 1, nconv
+		    do j = 1, nconv {
+			sz_val = nconv
 			call amulkr (Memr[fx+(ii-1)*nconv],
-			    Memr[fy+(jj-1)*nconv+j-1], table[1,j,ii,jj], nconv)
+			   Memr[fy+(jj-1)*nconv+j-1], table[1,j,ii,jj], sz_val)
+		    }
 		}
 	    }
 	}

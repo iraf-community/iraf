@@ -11,7 +11,8 @@ procedure msisave (msi, interpolant)
 pointer	msi			# interpolant descriptor
 real	interpolant[ARB]	# array containing the interpolant
 
-int	npix
+size_t	sz_val
+size_t	npix
 
 begin
 	# save interpolant type, number of coefficients and position of
@@ -30,8 +31,8 @@ begin
 	MSI_SAVEBADVAL(interpolant) = MSI_BADVAL(msi)
 
 	# save coefficients
-	call amovr (COEFF(MSI_COEFF(msi)), interpolant[MSI_SAVECOEFF+1],
-	    MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi))
+	sz_val = MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi)
+	call amovr (COEFF(MSI_COEFF(msi)), interpolant[MSI_SAVECOEFF+1], sz_val)
 
 	# save look-up table
 	if (MSI_NXINCR(msi) > 0 && MSI_NYINCR(msi) > 0) {

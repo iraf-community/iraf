@@ -13,10 +13,12 @@ pointer	msi		# pointer to the interpolant descriptor structure
 real	x1, x2		# x integration limits
 real	y1, y2		# y integration limits
 
+size_t	sz_val
 int	i, interp_type, nylmin, nylmax, offset 
 pointer	xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
 real	ii_1dinteg()
+int	modi()
 
 begin
 	# set up 1D interpolant type to match 2-D interpolant
@@ -40,7 +42,8 @@ begin
 	}
 
 	# set up temporary storage for x integrals
-	call calloc (xintegrl, MSI_NYCOEFF(msi), TY_REAL)
+	sz_val = MSI_NYCOEFF(msi)
+	call calloc (xintegrl, sz_val, TY_REAL)
 
 	# switch order of x integration at the end
 	xmin = x1
@@ -59,7 +62,7 @@ begin
 	}
 
 	# find the appropriate range in y in the coeff array
-	offset = mod (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
+	offset = modi (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
 	nylmin = max (1, min (MSI_NYCOEFF(msi), int (ymin + 0.5))) 
 	nylmax = min (MSI_NYCOEFF(msi), max (1, int (ymax + 0.5)))
 	nylmin = nylmin + offset
@@ -77,8 +80,8 @@ begin
 
 	# integrate in y
 	if (interp_type == II_SPLINE3) {
-	    call amulkr (Memr[xintegrl], 6.0, Memr[xintegrl],
-	        MSI_NYCOEFF(msi))
+	    sz_val = MSI_NYCOEFF(msi)
+	    call amulkr (Memr[xintegrl], 6.0, Memr[xintegrl], sz_val)
 	    accum = ii_1dinteg (Memr[xintegrl+offset], MSI_NYCOEFF(msi),
 	        ymin, ymax, II_NEAREST, MSI_NSINC(msi), DY, MSI_YPIXFRAC(msi))
 	} else

@@ -9,10 +9,10 @@ procedure ii_nearest (x, y, npts, data)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated
 
-int	i
+long	i
 
 begin
 	do i = 1, npts
@@ -26,10 +26,11 @@ procedure ii_linear (x, y, npts, data)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated
 
-int	i, nx
+long	i
+int	nx
 
 begin
 	do i = 1, npts {
@@ -45,10 +46,11 @@ procedure ii_poly3 (x, y, npts, data)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated from a[0] to a[npts+2]
 
-int	i, nx, nxold
+long	i
+int	nx, nxold
 real	deltax, deltay, cd20, cd21
 
 begin
@@ -77,10 +79,11 @@ procedure ii_poly5 (x, y, npts, data)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated - from a[-1] to a[npts+3]
 
-int	i, nx, nxold
+long	i
+int	nx, nxold
 real	deltax, deltay, cd20, cd21, cd40, cd41
 
 begin
@@ -115,10 +118,11 @@ procedure ii_spline3 (x, y, npts, bcoeff)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	bcoeff[ARB]	# basis spline coefficients - from a[0] to a[npts+1]
 
-int	i, nx, nxold
+long	i
+int	nx, nxold
 real	deltax, c0, c1, c2, c3
 
 begin
@@ -153,15 +157,18 @@ procedure ii_sinc (x, y, npts, data, npix, nsinc, mindx)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated
-int	npix		# number of data pixels
+size_t	npix		# number of data pixels
 int	nsinc		# sinc truncation length
 real	mindx		# interpolation minimum
 
-int	i, j, xc, minj, maxj, offj
+size_t	sz_val
+long	i
+int	xc, j, minj, maxj, offj
 pointer	sp, taper
 real	dx, dxn, dx2, w1, sconst, a2, a4, sum, sumw
+int	modi(), nint_ri()
 
 begin
 	# Compute the constants for the cosine bell taper. 
@@ -172,8 +179,9 @@ begin
 	# Pre-compute the taper array. Incorporate the sign change portion
 	# of the sinc interpolator into the taper array.
 	call smark (sp)
-	call salloc (taper, 2 * nsinc + 1, TY_REAL)
-	if (mod (nsinc, 2) == 0)
+	sz_val = 2 * nsinc + 1
+	call salloc (taper, sz_val, TY_REAL)
+	if (modi (nsinc, 2) == 0)
 	    w1 = 1.0
 	else
 	    w1 = -1.0
@@ -186,7 +194,7 @@ begin
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint (x[i])
+	    xc = nint_ri (x[i])
 	    if (xc < 1 || xc > npix) {
 		y[i] = 0.
 		next
@@ -244,23 +252,26 @@ procedure ii_lsinc (x, y, npts, data, npix, ltable, nconv, nincr, mindx)
 
 real	x[ARB]			# x values, must be within [1,npix]
 real	y[ARB]			# interpolated values returned to user
-int	npts			# number of x values
+size_t	npts			# number of x values
 real	data[ARB]		# data to be interpolated
-int	npix			# number of data pixels
+size_t	npix			# number of data pixels
 real	ltable[nconv,nincr]	# the sinc look-up table
 int	nconv			# sinc truncation length
 int	nincr			# the number of look-up table entries
 real	mindx			# interpolation minimum (don't use)
 
-int	i, j, nsinc, xc, lut, minj, maxj, offj
+int	nsinc
+long	i
+int	j, xc, lut, minj, maxj, offj
 real	dx, sum
+int	nint_ri()
 
 begin
 	nsinc = (nconv - 1) / 2
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint (x[i])
+	    xc = nint_ri (x[i])
 	    if (xc < 1 || xc > npix) {
 		y[i] = 0.
 		next
@@ -277,7 +288,7 @@ begin
 	    if (nincr == 1)
 		lut = 1
 	    else 
-		lut = nint ((-dx + 0.5) * (nincr - 1)) + 1
+		lut = nint_ri ((-dx + 0.5) * (nincr - 1)) + 1
 		#lut = int ((-dx + 0.5) * (nincr - 1) + 0.5) + 1
 
 	    # Compute the convolution limits.
@@ -306,12 +317,13 @@ procedure ii_driz (x, y, npts, data, pixfrac, badval)
 
 real	x[ARB]		# x start and stop values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated
 real	pixfrac		# the drizzle pixel fraction
 real	badval		# value for undefined pixels
 
-int	i, j, neara, nearb
+long	i
+int	j, neara, nearb
 real	hpixfrac, xa, xb, dx, accum, waccum
 
 begin
@@ -376,11 +388,12 @@ procedure ii_driz1 (x, y, npts, data, badval)
 
 real	x[ARB]		# x start and stop values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
-int	npts		# number of x values
+size_t	npts		# number of x values
 real	data[ARB]	# data to be interpolated
 real	badval		# undefined pixel value
 
-int	i, j, neara, nearb
+long	i
+int	j, neara, nearb
 real	xa, xb, deltaxa, deltaxb, dx, accum, waccum
 
 begin

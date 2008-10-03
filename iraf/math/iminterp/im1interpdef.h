@@ -11,8 +11,8 @@ define	ASI_SHIFT	Memr[P2R($1+3)]	# sinc interpolator shift
 define	ASI_PIXFRAC	Memr[P2R($1+4)]	# pixel fraction for drizzle
 define	ASI_NCOEFF	Memi[P2I($1+5)]	# number of coefficients
 define	ASI_OFFSET	Memi[P2I($1+6)]	# offset of first data point
-define	ASI_COEFF	Memi[P2I($1+7)]	# pointer to coefficient array
-define	ASI_LTABLE	Memi[P2I($1+8)]	# pointer to sinc look-up table array
+define	ASI_COEFF	Memp[$1+7]	# pointer to coefficient array
+define	ASI_LTABLE	Memp[$1+8]	# pointer to sinc look-up table array
 define	ASI_BADVAL	Memr[P2R($1+9)]	# bad value for drizzle
 
 # define element of the coefficient array

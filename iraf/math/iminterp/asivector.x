@@ -11,7 +11,9 @@ procedure asivector (asi, x, y, npix)
 pointer	asi		# interpolator descriptor
 real	x[ARB]		# ordered x array
 real	y[ARB]		# interpolated values
-int	npix		# number of points in x
+size_t	npix		# number of points in x
+
+size_t	sz_val
 
 begin
 	switch (ASI_TYPE(asi))	{
@@ -34,21 +36,25 @@ begin
 	        ASI_OFFSET(asi)))
 
 	case II_SINC:
+	    sz_val = ASI_NCOEFF(asi)
 	    call ii_sinc (x, y, npix, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)),
-	        ASI_NCOEFF(asi), ASI_NSINC(asi), DX)
+			  sz_val, ASI_NSINC(asi), DX)
 
 	case II_LSINC:
+	    sz_val = ASI_NCOEFF(asi)
 	    call ii_lsinc (x, y, npix, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)),
-	        ASI_NCOEFF(asi), LTABLE(ASI_LTABLE(asi)),
-		2 * ASI_NSINC(asi) + 1, ASI_NINCR(asi), DX)
+			   sz_val, LTABLE(ASI_LTABLE(asi)),
+			   2 * ASI_NSINC(asi) + 1, ASI_NINCR(asi), DX)
 
 	case II_DRIZZLE:
-	    if (ASI_PIXFRAC(asi) >= 1.0)
-	        call ii_driz1 (x, y, npix, COEFF(ASI_COEFF(asi) +
+	    sz_val = npix
+	    if (ASI_PIXFRAC(asi) >= 1.0) {
+	        call ii_driz1 (x, y, sz_val, COEFF(ASI_COEFF(asi) +
 		    ASI_OFFSET(asi)), ASI_BADVAL(asi))
-	    else
-	        call ii_driz (x, y, npix, COEFF(ASI_COEFF(asi) +
+	    } else {
+	        call ii_driz (x, y, sz_val, COEFF(ASI_COEFF(asi) +
 		    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
+	    }
 
 	default:
 	    call error (0, "ASIVECTOR: Unknown interpolator type.")

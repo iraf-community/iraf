@@ -185,19 +185,25 @@ int	nxder, nyder		# the number of derivatives to compute
 int	len_der			# the width of the derivatives array
 real	coeff[ARB]		# the coefficient array
 int	first_point		# offset of first data point into the array
-int	nxpix, nypix		# size of the coefficient array
+size_t	nxpix, nypix		# size of the coefficient array
 int	nsinc			# the sinc truncation length
 real	mindx, mindy		# the precision of the sinc interpolant
 
+size_t	sz_val
+size_t	c_1
 double	sumx, normx[3], normy[3], norm[3,3], sum[3,3]
-int	i, j, k, jj, kk, xc, yc, nconv, index
-int	minj, maxj, offj, mink, maxk, offk, last_point
-pointer	sp, ac, ar
+int	i, jj, kk, nconv, index, last_point
+int	j, k, xc, yc
+int	minj, maxj, mink, maxk
+pointer	sp, ac, ar, offk, offj
 real	sconst, a2, a4, dx, dy, dxn, dyn, dx2, taper, sdx, ax, ay, ctanx, ctany
 real	zx, zy
 real	px[3], py[3]
+int	modi(), nint_ri()
 
 begin
+	c_1 = 1
+
 	# Return if no derivatives ar to be computed.
 	if (nxder == 0 || nyder == 0)
 	    return
@@ -209,15 +215,15 @@ begin
 	}
 
 	# Return if the data is outside range.
-	xc = nint (x)
-	yc = nint (y)
+	xc = nint_ri (x)
+	yc = nint_ri (y)
 	if (xc < 1 || xc > nxpix || yc < 1 || yc > nypix)
 	    return
 
 	# Call ii_bsinc if only the function value is requested.
 	if (nxder == 1 && nyder == 1) {
 	    call ii_bisinc (coeff, first_point, nxpix, nypix, x, y, der[1,1],
-		1, nsinc, mindx, mindy)
+			    c_1, nsinc, mindx, mindy)
 	    return
 	}
 
@@ -229,10 +235,11 @@ begin
 	# Allocate some working space.
 	nconv = 2 * nsinc + 1
 	call smark (sp)
-	call salloc (ac, 3 * nconv, TY_REAL)
-	call salloc (ar, 3 * nconv, TY_REAL)
-	call aclrr (Memr[ac], 3 * nconv)
-	call aclrr (Memr[ar], 3 * nconv)
+	sz_val = 3 * nconv
+	call salloc (ac, sz_val, TY_REAL)
+	call salloc (ar, sz_val, TY_REAL)
+	call aclrr (Memr[ac], sz_val)
+	call aclrr (Memr[ar], sz_val)
 
 	# Initialize.
 	dx = x - xc
@@ -248,7 +255,7 @@ begin
 	index = - 1 - nsinc
 	dxn = -1 - nsinc - dx
 	dyn = -1 - nsinc - dy
-	if (mod (nsinc, 2) == 0)
+	if (modi (nsinc, 2) == 0)
 	    sdx = 1.0
 	else
 	    sdx = -1.0

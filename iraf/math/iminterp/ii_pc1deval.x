@@ -9,42 +9,43 @@ procedure ia_pcpoly3 (x, datain, npts, pcoeff)
 
 real	x		# x value
 real	datain[ARB]	# array of input data
-int	npts		# number of data points
+size_t	npts		# number of data points
 real	pcoeff[ARB]	# array of polynomial coefficients
 
-int 	i, k, nearx, nterms
+int 	i, j, nearx
+int	k, l, nterms
 real	temp[POLY3_ORDER]
 
 begin
 	nearx = x
 
 	# Check for edge problems.
-	k = 0
+	j = 0
 	for(i = nearx - 1; i <= nearx + 2; i = i + 1) {
-	    k = k + 1
+	    j = j + 1
 
 	    # project data points into temporary array
 	    if (i < 1)
-		temp[k] = 2. * datain[1] - datain[2-i]
+		temp[j] = 2. * datain[1] - datain[2-i]
 	    else if (i > npts)
-		temp[k] = 2. * datain[npts] - datain[2*npts-i]
+		temp[j] = 2. * datain[npts] - datain[2*npts-i]
 	    else
-		temp[k] = datain[i]
+		temp[j] = datain[i]
 	}
 
 	nterms = 4
 
 	# Generate the difference table for Newton's form.
 	do k = 1, nterms - 1
-	    do i = 1, nterms - k
-		temp[i] = (temp[i+1] - temp[i]) / k
+	    do l = 1, nterms - k
+		temp[l] = (temp[l+1] - temp[l]) / k
 	
 	# Shift to generate polynomial coefficients.
 	do k = nterms, 2, -1
-	    do i = 2, k
-		temp[i] = temp[i] + temp[i-1] * (k- i - nterms/2)
-	do i = 1, nterms
-	    pcoeff[i] = temp[nterms+1-i]
+	    do l = 2, k
+		temp[l] = temp[l] + temp[l-1] * (k- l - nterms/2)
+	do l = 1, nterms
+	    pcoeff[l] = temp[nterms+1-l]
 end
 
 
@@ -54,41 +55,42 @@ procedure ia_pcpoly5 (x, datain, npts, pcoeff)
 
 real	x		# x value
 real	datain[ARB]	# array of input data
-int	npts		# number of data points
+size_t	npts		# number of data points
 real	pcoeff[ARB]	# array of polynomial coefficients
 
-int 	i, k, nearx, nterms
+int 	i, j, nearx
+int	k, l, nterms
 real	temp[POLY5_ORDER]
 
 begin
 	nearx = x
 
 	# Check for edge effects.
-	k = 0
+	j = 0
 	for (i = nearx - 2; i <= nearx + 3; i = i + 1) {
-	    k = k + 1
+	    j = j + 1
 	    # project data points into temporary array
 	    if (i < 1)
-		temp[k] = 2. * datain[1] - datain[2-i]
+		temp[j] = 2. * datain[1] - datain[2-i]
 	    else if (i > npts)
-		temp[k] = 2. * datain[npts] - datain[2*npts-i]
+		temp[j] = 2. * datain[npts] - datain[2*npts-i]
 	    else
-		temp[k] = datain[i]
+		temp[j] = datain[i]
 	}
 
 	nterms = 6
 
 	# Generate difference table for Newton's form.
 	do k = 1, nterms - 1
-	    do i = 1, nterms - k
-		temp[i] = (temp[i+1] - temp[i]) / k
+	    do l = 1, nterms - k
+		temp[l] = (temp[l+1] - temp[l]) / k
 	
 	# Shift to generate polynomial coefficients.
 	do k = nterms, 2, -1
-	    do i = 2, k
-		temp[i] = temp[i] + temp[i-1] * (k - i - nterms/2)
-	do i = 1, nterms
-	    pcoeff[i] = temp[nterms+1-i]
+	    do l = 2, k
+		temp[l] = temp[l] + temp[l-1] * (k - l - nterms/2)
+	do l = 1, nterms
+	    pcoeff[l] = temp[nterms+1-l]
 end
 
 
@@ -98,10 +100,11 @@ procedure ia_pcspline3 (x, datain, npts, pcoeff)
 
 real	x		# x value
 real	datain[ARB]	# data array
-int	npts		# number of data points
+size_t	npts		# number of data points
 real	pcoeff[ARB]	# array of polynomial coefficients
 
-int 	i, k, nearx, px
+int 	i, nearx, px
+size_t	k
 real	temp[SPLPTS+3], bcoeff[SPLPTS+3]
 
 begin
@@ -151,15 +154,19 @@ real	x		# x value
 real	der[ARB]	# derivatives to return
 int	nder		# number of derivatives
 real	data[npix]	# data to be interpolated
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 int	nsinc		# sinc truncation length
 real	mindx		# interpolation minimum
 
+size_t	c_1
 int	i, j, xc
 real	dx, w, a, d, z, sconst, a2, a4, dx2, taper
 real	w1, w2, w3, u1, u2, u3, v1, v2, v3
+int	nint_ri()
 
 begin
+	c_1 = 1
+
 	# Return if no derivatives.
 	if (nder == 0)
 	    return
@@ -169,13 +176,13 @@ begin
 	    der[i] = 0.
 
 	# Return if outside data range.
-	xc = nint (x)
+	xc = nint_ri (x)
 	if (xc < 1 || xc > npix)
 	    return
 
 	# Call ii_sinc if only the function value is needed.
 	if (nder == 1) {
-	    call ii_sinc (x, der, 1, data, npix, nsinc, mindx)
+	    call ii_sinc (x, der, c_1, data, npix, nsinc, mindx)
 	    return
 	}
 

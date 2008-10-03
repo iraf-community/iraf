@@ -11,13 +11,16 @@ int	nsinc				# the sinc interpolation width
 int	nincr				# the sinc interpolation lut resolution
 real	shift				# the predefined shift / pixfrac
 
+size_t	sz_val
 int	ip
 pointer	sp, str
 int	strdic(), strncmp(), ctoi(), ctor()
+int	nint_ri()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	interp_type = strdic (interpstr, Memc[str], SZ_FNAME, II_BFUNCTIONS)
 
 	# Use the default interpolant parameters.
@@ -60,7 +63,7 @@ begin
 		} else if (shift >= -0.5 && shift < 0.5) {
 		    nincr = 1
 		} else {
-		    nincr = nint (shift)
+		    nincr = nint_ri (shift)
 		    shift = INDEFR
 		}
 	    }

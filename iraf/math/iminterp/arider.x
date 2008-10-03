@@ -14,15 +14,19 @@ procedure arider (x, datain, npix, derivs, nder, interp_type)
 
 real	x[ARB]		# need 1 <= x <= n
 real	datain[ARB]	# data values
-int	npix		# number of data values
+size_t	npix		# number of data values
 real	derivs[ARB]	# derivatives out -- derivs[1] is function value
 int	nder		# total number of values returned in derivs
 int	interp_type	# type of interpolator
 
-int	i, j, k, nterms, nd, nearx
+size_t	c_1
+int	i, j, k, nterms, nd
+int	nearx
 real	pcoeff[MAX_NDERIVS], accum, deltax, temp, tmpx[2]
 
 begin
+	c_1 = 1
+
 	if (nder <= 0)
 	    return
 
@@ -53,7 +57,7 @@ begin
 	    return
 
 	case II_DRIZZLE:
-	    call ii_driz1 (x, derivs[1], 1, datain, BADVAL)
+	    call ii_driz1 (x, derivs[1], c_1, datain, BADVAL)
 	    if (nder > 1) {
 		deltax = x[2] - x[1]
 		if (deltax == 0.0)
@@ -61,10 +65,10 @@ begin
 		else {
 		    tmpx[1] = x[1]
 		    tmpx[2] = (x[1] + x[2]) / 2.0
-	    	    call ii_driz1 (x, temp, 1, datain, BADVAL)
+	    	    call ii_driz1 (x, temp, c_1, datain, BADVAL)
 		    tmpx[1] = tmpx[2]
 		    tmpx[2] = x[2]
-	    	    call ii_driz1 (x, derivs[2], 1, datain, BADVAL)
+	    	    call ii_driz1 (x, derivs[2], c_1, datain, BADVAL)
 		    derivs[2] = 2.0 * (derivs[2] - temp) / deltax
 		}
 	    }

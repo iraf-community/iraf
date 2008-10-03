@@ -15,11 +15,11 @@ int	len_coeff	# row length of coeff
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 
 int	nx, ny
 int	index
-int	i
+long	i
 
 begin
 	do i = 1, npts {
@@ -49,11 +49,11 @@ int	len_coeff	# row length of coeff
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of data points
+size_t	npts		# number of data points
 
 int	nx, ny
 int	index
-int	i
+long	i
 real	sx, sy, tx, ty
 
 begin
@@ -91,11 +91,11 @@ int	len_coeff	# row length of the coefficient array
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of fitted values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 
 int	nxold, nyold, nx, ny
-int	first_row, index
-int	i, j
+int	first_row, index, j
+long	i
 real	sx, tx, sx2m1, tx2m1, sy, ty
 real	cd20[4], cd21[4], ztemp[4], cd20y, cd21y
 
@@ -172,11 +172,11 @@ int	len_coeff	# row length of coeff
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of fitted values
-int	npts		# number of points
+size_t	npts		# number of points
 
 int	nxold, nyold, nx, ny
-int	first_row, index
-int	i, j
+int	first_row, index, j
+long	i
 real	sx, sx2, sx2m1, sx2m4, tx, tx2, tx2m1, tx2m4, sy, sy2, ty, ty2
 real	cd20[6], cd21[6], cd40[6], cd41[6], ztemp[6]
 real	cd20y, cd21y, cd40y, cd41y
@@ -266,11 +266,11 @@ int	len_coeff	# row length of coeff
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 
 int	nx, ny
-int	first_row, index
-int	i, j
+int	first_row, index, j
+long	i
 real	sx, tx, sy, ty
 real	bx[4], by[4], accum, sum
 
@@ -330,21 +330,23 @@ procedure ii_bisinc (coeff, first_point, len_coeff, len_array, x, y, zfit,
 
 real	coeff[ARB]	# 1D array of coefficients
 int	first_point	# offset to first data point
-int	len_coeff	# row length of coeff
-int	len_array	# column length of coeff
+size_t	len_coeff	# row length of coeff
+size_t	len_array	# column length of coeff
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# the number of input points.
+size_t	npts		# the number of input points.
 int	nsinc		# sinc truncation length
 real	mindx		# interpolation mininmum in x
 real	mindy		# interpolation mininmum in y
 
-int	i, j, k, nconv, nx, ny, index, mink, maxk, offk, minj, maxj, offj
-int	last_point
-pointer	sp, taper, ac, ar
+size_t	sz_val
+long	i
+int	j, k, jj, nconv, nx, ny, index, mink, maxk, minj, maxj, last_point
+pointer	sp, taper, ac, ar, offk, offj
 real	sconst, a2, a4, sdx, dx, dy, dxn, dyn, ax, ay, px, py, sumx, sumy, sum
 real	dx2
+int	nint_ri(), modi()
 
 begin
 	# Compute the length of the convolution.
@@ -352,9 +354,10 @@ begin
 
 	# Allocate working array space.
 	call smark (sp)
-	call salloc (taper, nconv, TY_REAL)
-	call salloc (ac, nconv, TY_REAL)
-	call salloc (ar, nconv, TY_REAL)
+	sz_val = nconv
+	call salloc (taper, sz_val, TY_REAL)
+	call salloc (ac, sz_val, TY_REAL)
+	call salloc (ar, sz_val, TY_REAL)
 
 	# Compute the constants for the cosine bell taper.
         sconst = (HALFPI / nsinc) ** 2
@@ -363,21 +366,21 @@ begin
 
 	# Precompute the taper array. Incorporate the sign change portion
 	# of the sinc interpolator into the taper array.
-	if (mod (nsinc, 2) == 0)
+	if (modi (nsinc, 2) == 0)
 	    sdx = 1.0
 	else
 	    sdx = -1.0
-        do j = -nsinc,  nsinc {
-	    dx2 = sconst * j * j
-            Memr[taper+j+nsinc] = sdx * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
+        do jj = -nsinc,  nsinc {
+	    dx2 = sconst * jj * jj
+            Memr[taper+jj+nsinc] = sdx * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
             sdx = -sdx
         }
 
 	do i = 1, npts {
 
 	    # define the fractional pixel interpolation.
-	    nx = nint (x[i])
-	    ny = nint (y[i])
+	    nx = nint_ri (x[i])
+	    ny = nint_ri (y[i])
 	    if (nx < 1 || nx > len_coeff || ny < 1 || ny > len_array) {
 		zfit[i] = 0.0
 		next
@@ -401,27 +404,27 @@ begin
 	    # Compute the x and y sinc arrays using a cosbell taper.
 	    sumx = 0.0
 	    sumy = 0.0
-	    do j = 1, nconv {
+	    do jj = 1, nconv {
 
-		#ax = j + dxn
-		#ay = j + dyn
-		ax = dxn - j
-		ay = dyn - j
+		#ax = jj + dxn
+		#ay = jj + dyn
+		ax = dxn - jj
+		ay = dyn - jj
 		if (ax == 0.0)
 		    px = 1.0
 		else if (dx == 0.0)
 		    px = 0.0
 		else
-		    px = Memr[taper+j-1] / ax 
+		    px = Memr[taper+jj-1] / ax 
 		if (ay == 0.0)
 		    py = 1.0
 		else if (dy == 0.0)
 		    py = 0.0
 		else
-		    py = Memr[taper+j-1] / ay 
+		    py = Memr[taper+jj-1] / ay 
 
-		Memr[ac+j-1] = px
-		Memr[ar+j-1] = py
+		Memr[ac+jj-1] = px
+		Memr[ar+jj-1] = py
 		sumx = sumx + px
 		sumy = sumy + py
 	    }
@@ -503,7 +506,7 @@ int	len_array			   # column length of coeff
 real	x[npts]				   # array of x values
 real	y[npts]				   # array of y values
 real	zfit[npts]			   # array of interpolated values
-int	npts				   # the number of input points.
+size_t	npts				   # the number of input points.
 real	ltable[nconv,nconv,nxincr,nyincr]  # the pre-computed look-up table
 int	nconv				   # the sinc truncation full width
 int	nxincr				   # the interpolation resolution in x
@@ -511,17 +514,20 @@ int	nyincr				   # the interpolation resolution in y
 real	mindx				   # interpolation mininmum in x
 real	mindy				   # interpolation mininmum in y
 
-int	i, j, k, nsinc, xc, yc, lutx, luty, minj, maxj, offj, mink, maxk, offk
+long	i
+int	nsinc
+int	j, k, xc, yc, lutx, luty, minj, maxj, offj, mink, maxk, offk
 int	index, last_point
 real	dx, dy, sum
+int	nint_ri()
 
 begin
 	nsinc = (nconv - 1) / 2
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint (x[i])
-	    yc = nint (y[i])
+	    xc = nint_ri (x[i])
+	    yc = nint_ri (y[i])
 	    if (xc < 1 || xc > len_coeff || yc < 1 || yc > len_array) {
 		zfit[i] = 0.0
 		next
@@ -538,12 +544,12 @@ begin
 	    if (nxincr == 1)
 		lutx = 1
 	    else 
-		lutx = nint ((-dx + 0.5) * (nxincr - 1)) + 1
+		lutx = nint_ri ((-dx + 0.5) * (nxincr - 1)) + 1
 		#lutx = int ((-dx + 0.5) * (nxincr - 1) + 0.5) + 1
 	    if (nyincr == 1)
 		luty = 1
 	    else
-		luty = nint ((-dy + 0.5) * (nyincr - 1)) + 1
+		luty = nint_ri ((-dy + 0.5) * (nyincr - 1)) + 1
 		#luty = int ((-dy + 0.5) * (nyincr - 1) + 0.5) + 1
 
 	    # Compute the convolution limits.
@@ -623,14 +629,16 @@ int	len_coeff	# row length of coeff
 real	x[ARB]		# array of x values
 real	y[ARB]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 real	xfrac, yfrac	# the x and y drizzle pixel fractions
 real	badval		# undefined pixel value
 
-int	i, ii, jj, kk, index, nearax, nearbx, nearay, nearby
+long	i
+int	ii, jj, kk, index, nearax, nearbx, nearay, nearby
 real	px[5], py[5], dx, xmin, xmax, m, c, ymin, ymax, xtop
 real	ovlap, accum, waccum, dxfrac, dyfrac, hxfrac, hyfrac, dhxfrac, dhyfrac
 bool	negdx
+int	nint_ri()
 
 begin
 	dxfrac = max (0.0, min (1.0, 1.0 - xfrac))
@@ -643,10 +651,10 @@ begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -798,26 +806,28 @@ procedure ii_bidriz1 (coeff, first_point, len_coeff, x, y, zfit, npts, badval)
 
 real	coeff[ARB]	# 1D coefficient array
 int	first_point	# offset of first data point
-int	len_coeff	# row length of coeff
+size_t	len_coeff	# row length of coeff
 real	x[ARB]		# array of x values
 real	y[ARB]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 real	badval		# undefined pixel value
 
-int	i, ii, jj, kk, index, nearax, nearbx, nearay, nearby
+long	i
+int	ii, jj, kk, index, nearax, nearbx, nearay, nearby
 real	px[5], py[5], dx, xmin, xmax, m, c, ymin, ymax, xtop
 real	ovlap, accum, waccum
 bool	negdx
+int	nint_ri()
 
 begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -970,22 +980,25 @@ int	len_coeff	# row length of coeff
 real	x[ARB]		# array of x values
 real	y[ARB]		# array of y values
 real	zfit[npts]	# array of interpolated values
-int	npts		# number of points to be evaluated
+size_t	npts		# number of points to be evaluated
 real	badval		# the undefined pixel value
 
+size_t	sz_val
 bool	boundary, vertex
-int	i, jj, ii, kk, nearax, nearbx, nearay, nearby, ninter
+long	i
+int	jj, ii, kk, nearax, nearbx, nearay, nearby, ninter
 real	accum, waccum, px[5], py[5], lx, ld, u1, u2, u1u2, dx, dy, dd
 real	xi, ovlap, xmin, xmax
+int	nint_ri(), modi()
 
 begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -1013,7 +1026,8 @@ begin
 
 		    # Define a line segment which begins at the point x = 0.5
 		    # y = 0.5 and runs parallel to the y axis.
-		    call alimr (px, 5, xmin, xmax)
+		    sz_val = 5
+		    call alimr (px, sz_val, xmin, xmax)
 		    lx = xmax - xmin
 		    ld = 0.5 * lx
 		    u1 = -lx * py[1] + ld
@@ -1061,7 +1075,7 @@ begin
 			ovlap = 0.25
 		    else if (boundary)
 			ovlap = 0.5
-		    else if (mod (ninter, 2) == 0)
+		    else if (modi (ninter, 2) == 0)
 			ovlap = 0.0
 		    else
 		        ovlap = 1.0

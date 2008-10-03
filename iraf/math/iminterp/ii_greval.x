@@ -19,13 +19,13 @@ int	len_coeff		# row length of coeff
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolatedvalues
-int	nxpts			# number of x values
-int	nypts			# number of y values
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x values
+size_t	nypts			# number of y values
+size_t	len_zfit		# row length of zfit
 
 int	ny
 int	index
-int	i, j
+long	i, j
 pointer	sp, nx
 
 errchk	smark, salloc, sfree
@@ -70,13 +70,13 @@ int	len_coeff		# row length of coeff
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolated values
-int	nxpts			# number of x values
-int	nypts			# number of y values
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x values
+size_t	nypts			# number of y values
+size_t	len_zfit		# row length of zfit
 
-int	i, j, ny
+int	jj, row_index, xindex, ny
 int	nymin, nymax, nylines
-int	row_index, xindex
+long	i, j
 pointer	sp, nx, sx, tx, work, lbuf1, lbuf2
 real	sy, ty
 
@@ -104,10 +104,10 @@ begin
 
 	# for each value of y interpolate in x and store in work array
 	lbuf1 = work
-	do j = 1, nylines {
+	do jj = 1, nylines {
 
 	    # define pointer to appropriate row
-	    row_index = first_point + (j + nymin - 2) * len_coeff
+	    row_index = first_point + (jj + nymin - 2) * len_coeff
 
 	    # interpolate in x at each y
 	    do i = 1, nxpts {
@@ -156,14 +156,14 @@ int	len_coeff		# length of row of coeffcient
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolatedvalues
-int	nxpts			# number of x points
-int	nypts			# number of y points
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x points
+size_t	nypts			# number of y points
+size_t	len_zfit		# row length of zfit
 
 int	nymin, nymax, nylines
 int	nxold, nyold
-int	row_index, xindex
-int	i, j, ny
+int	jj, ny, row_index, xindex
+long	i, j
 pointer	sp, nx, sx, sx2m1, tx, tx2m1, work
 pointer	lbuf, lbufp1, lbufp2, lbufm1
 real	cd20x, cd21x, cd20y, cd21y
@@ -197,10 +197,10 @@ begin
 
 	# for each value of y interpolate in x
 	lbuf = work
-	do j = 1, nylines {
+	do jj = 1, nylines {
 
 	    # calculate pointer to a row
-	    row_index = first_point + (j + nymin - 2) * len_coeff
+	    row_index = first_point + (jj + nymin - 2) * len_coeff
 
 	    # interpolate in x at each y
 	    nxold = -1
@@ -290,13 +290,13 @@ int	len_coeff		# row length of coeff
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of fitted values
-int	nxpts			# number of x points
-int	nypts			# number of y points
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x points
+size_t	nypts			# number of y points
+size_t	len_zfit		# row length of zfit
 
 int	nymax, nymin, nylines, nxold, nyold
-int	row_index, xindex
-int	i, j, ny
+int	jj, ny, row_index, xindex
+long	i, j
 pointer	sp, nx, sx, tx, sx2m1, sx2m4, tx2m1, tx2m4, work
 pointer	lbuf, lbufp1, lbufp2, lbufp3, lbufm1, lbufm2
 real	cd20x, cd21x, cd40x, cd41x
@@ -336,10 +336,10 @@ begin
 
 	# for each value of y interpolate in x
 	lbuf = work
-	do j = 1, nylines {
+	do jj = 1, nylines {
 
 	    # calculate pointer to a row
-	    row_index = first_point + (j + nymin - 2) * len_coeff
+	    row_index = first_point + (jj + nymin - 2) * len_coeff
 
 	    # interpolate in x at each y
 	    nxold = -1
@@ -462,13 +462,13 @@ int	len_coeff		# row length of coeff
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolated values
-int	nxpts			# number of x values
-int	nypts			# number of y values
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x values
+size_t	nypts			# number of y values
+size_t	len_zfit		# row length of zfit
 
 int	ny, nymin, nymax, nylines
-int	row_index, xindex
-int	i, j
+int	ii, row_index, xindex
+long	i, j
 pointer	sp, nx, sx, tx, sx3, tx3, work, lbuf, lbufp1, lbufp2, lbufm1
 real	sy, ty, ty3, sy3
 
@@ -506,10 +506,10 @@ begin
 
 	# interpolate in x for each y
 	lbuf = work
-	do i = 1, nylines {
+	do ii = 1, nylines {
 
 	    # find appropriate row
-	    row_index = first_point + (i + nymin - 2) * len_coeff
+	    row_index = first_point + (ii + nymin - 2) * len_coeff
 
 	    # x interpolation
 	    do j = 1, nxpts {
@@ -569,30 +569,35 @@ int	len_array		# column length of coeff
 real	x[nxpts]		# array of x values
 real	y[nypts]		# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolatedvalues
-int	nxpts			# number of x values
-int	nypts			# number of y values
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x values
+size_t	nypts			# number of y values
+size_t	len_zfit		# row length of zfit
 int	nsinc			# sinc interpolant truncation length
 real	mindx, mindy		# the precision of the interpolant.
 
-int	i, j, k, nconv, nymin, nymax, nylines
+size_t	sz_val
+int	j, ii, jj, kk, nconv, nymin, nymax, nylines
 int	ixy, index, minj, maxj, offj
+long	i, k
 pointer	sp, taper, ac, ixn, work, pac, pwork, ppwork
 real	sconst, a2, a4, dxy, dxyn, dx2, axy, pxy, sumxy, fdxy
+int	modi(), nint_ri()
 
 begin
 	# Compute the limits of the convolution in y.
 	nconv = 2 * nsinc + 1
-	nymin = max (1, nint (y[1]) - nsinc)
+	nymin = max (1, nint_ri (y[1]) - nsinc)
 	#nymin = max (1, int (y[1]) - nsinc)
-	nymax = min (len_array, nint (y[nypts]) + nsinc)
+	nymax = min (len_array, nint_ri (y[nypts]) + nsinc)
 	#nymax = min (len_array, int (y[nypts]) + nsinc)
 	nylines = nymax - nymin + 1
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (taper, nconv, TY_REAL)
-	call salloc (ac, nconv * max (nxpts, nypts), TY_REAL)
+	sz_val = nconv
+	call salloc (taper, sz_val, TY_REAL)
+	sz_val = nconv * max (nxpts, nypts)
+	call salloc (ac, sz_val, TY_REAL)
 	call salloc (ixn, max (nxpts, nypts), TY_INT)
 	call salloc (work, nxpts * nylines, TY_REAL)
 
@@ -600,45 +605,46 @@ begin
 	sconst = (HALFPI / nsinc) ** 2
 	a2 = -0.49670
 	a4 = 0.03705
-	if (mod (nsinc, 2) == 0)
+	if (modi (nsinc, 2) == 0)
 	    fdxy = 1.0
 	else
 	    fdxy = -1.0
-	do i = -nsinc, nsinc {
-	    dx2 = sconst * i * i
-	    Memr[taper+i+nsinc] = fdxy * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
+	do ii = -nsinc, nsinc {
+	    dx2 = sconst * ii * ii
+	    Memr[taper+ii+nsinc] = fdxy * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
 	    fdxy = -fdxy
 	}
 
 	# Compute the x interpolants for each shift in x.
 	pac = ac
 	do i = 1, nxpts {
-	    ixy = nint (x[i])
+	    ixy = nint_ri (x[i])
 	    Memi[ixn+i-1] = ixy
 	    dxy = x[i] - ixy
 	    #dxyn = -1 - nsinc - dxy
 	    dxyn = 1 + nsinc + dxy
 	    sumxy = 0.0
-	    do j = 1, nconv {
-		#axy = j + dxyn
-		axy = dxyn - j
+	    do jj = 1, nconv {
+		#axy = jj + dxyn
+		axy = dxyn - jj
 		if (axy == 0.0)
 		    pxy = 1.0
 		else if (dxy == 0.0)
 		    pxy = 0.0
 		else
-		    pxy = Memr[taper+j-1] / axy 
-		Memr[pac+j-1] = pxy
+		    pxy = Memr[taper+jj-1] / axy 
+		Memr[pac+jj-1] = pxy
 		sumxy = sumxy + pxy
 	    }
-	    call adivkr (Memr[pac], sumxy, Memr[pac], nconv)
+	    sz_val = nconv
+	    call adivkr (Memr[pac], sumxy, Memr[pac], sz_val)
 	    pac = pac + nconv
 	}
 
 	# Do the convolutions in the x direction.
 	pwork = work
-	do k = nymin, nymax {
-	    index = first_point + (k - 1) * len_coeff
+	do kk = nymin, nymax {
+	    index = first_point + (kk - 1) * len_coeff
 	    pac = ac
 	    do i = 1, nxpts {
 		sumxy = 0.0
@@ -661,25 +667,26 @@ begin
 	# Compute the y interpolants for each shift in y.
 	pac = ac
 	do i = 1, nypts {
-	    ixy = nint (y[i])
+	    ixy = nint_ri (y[i])
 	    dxy = y[i] - ixy
 	    Memi[ixn+i-1] = ixy - nsinc - nymin + 1
 	    #dxyn = -1 - nsinc - dxy
 	    dxyn = 1 + nsinc + dxy
 	    sumxy = 0.0
-	    do j = 1, nconv {
-		#axy = j + dxyn
-		axy = dxyn - j
+	    do jj = 1, nconv {
+		#axy = jj + dxyn
+		axy = dxyn - jj
 		if (axy == 0.0)
 		    pxy = 1.0
 		else if (dxy == 0.0)
 		    pxy = 0.0
 		else
-		    pxy = Memr[taper+j-1] / axy 
-		Memr[pac+j-1] = pxy
+		    pxy = Memr[taper+jj-1] / axy 
+		Memr[pac+jj-1] = pxy
 		sumxy = sumxy + pxy
 	    }
-	    call adivkr (Memr[pac], sumxy, Memr[pac], nconv)
+	    sz_val = nconv
+	    call adivkr (Memr[pac], sumxy, Memr[pac], sz_val)
 	    pac = pac + nconv
 	}
 
@@ -691,8 +698,8 @@ begin
 		ixy = min (nylines, max (1, Memi[ixn+i-1]))
 		ppwork = pwork + (ixy - 1) * nxpts
 		sumxy = 0.0
-		do j = 1, nconv {
-		    sumxy = sumxy + Memr[pac+j-1] * Memr[ppwork]
+		do jj = 1, nconv {
+		    sumxy = sumxy + Memr[pac+jj-1] * Memr[ppwork]
 		    ppwork = ppwork + nxpts
 		}
 		pac = pac + nconv
@@ -726,15 +733,15 @@ int	len_array				# column length of coeff
 real	x[nxpts]				# array of x values
 real	y[nypts]				# array of y values
 real	zfit[len_zfit,ARB]			# array of interpolated values
-int	nxpts					# number of x values
-int	nypts					# number of y values
-int	len_zfit				# row length of zfit
+size_t	nxpts					# number of x values
+size_t	nypts					# number of y values
+size_t	len_zfit				# row length of zfit
 real	ltable[nconv,nconv,nxincr,nyincr]	# pre-computed sinc lut
 int	nconv					# sinc trunction full-width
 int	nxincr, nyincr				# resolution of look-up table
 real	mindx, mindy				# the precision of interpolant
 
-int	j
+long	j
 pointer	sp, ytmp
 
 begin
@@ -767,14 +774,15 @@ int	len_array		# column length of coeff
 real	x[ARB]			# array of x values
 real	y[ARB]			# array of y values
 real	zfit[len_zfit,ARB]	# array of interpolatedvalues
-int	nxpts			# number of x values
-int	nypts			# number of y values
-int	len_zfit		# row length of zfit
+size_t	nxpts			# number of x values
+size_t	nypts			# number of y values
+size_t	len_zfit		# row length of zfit
 real	xfrac, yfrac		# the x and y pixel fractions
 real	badval			# bad value
 
-int	i, j, jj, nylmin, nylmax, nylines
+int	jj, nylmin, nylmax, nylines
 int	cindex, neara, nearb
+long	i, j
 pointer	sp, work, xindex
 real	ymin, ymax, dy, accum, waccum, hyfrac
 
@@ -791,7 +799,7 @@ begin
 	# For each in range y integrate in x.
 	cindex = 1 + first_point + (nylmin - 1) * len_coeff
 	xindex = work
-	do j = nylmin, nylmax {
+	do jj = nylmin, nylmax {
 	    if (xfrac >= 1.0)
 	        call ii_driz1 (x, Memr[xindex], nxpts, coeff[cindex], badval)
 	    else

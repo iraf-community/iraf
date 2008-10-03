@@ -18,14 +18,18 @@ real procedure arieval (x, datain, npts, interp_type)
 
 real	x		# x value, 1 <= x <= n
 real	datain[ARB]	# array of data values
-int	npts		# number of data values
+size_t	npts		# number of data values
 int	interp_type	# interpolant type
 
+size_t	c_1
+size_t	sz_val
 int 	i, k, nearx, pindex
 real	a[MAX_NDERIVS], cd20, cd21, cd40, cd41, deltax, deltay, hold
 real	bcoeff[SPLPTS+3], temp[SPLPTS+3], pcoeff[SPLINE3_ORDER]
 
 begin
+	c_1 = 1
+
 	switch (interp_type) {
 
 	case II_NEAREST:
@@ -119,7 +123,8 @@ begin
 	    bcoeff[k+2] = 0.
 
 	    # Compute coefficients.
-	    call ii_spline (bcoeff, temp, k)
+	    sz_val = k
+	    call ii_spline (bcoeff, temp, sz_val)
 
 	    pindex = pindex + 1
 	    bcoeff[k+3] = 0.
@@ -136,11 +141,11 @@ begin
 	    	   (pcoeff[3] + deltax * pcoeff[4])))
 
 	case II_SINC, II_LSINC:
-	    call ii_sinc (x, hold, 1, datain, npts, NSINC, DX)
+	    call ii_sinc (x, hold, c_1, datain, npts, NSINC, DX)
 	    return (hold)
 
 	case II_DRIZZLE:
-	    call ii_driz1 (x, hold, 1, datain, BADVAL)
+	    call ii_driz1 (x, hold, c_1, datain, BADVAL)
 	    return (hold)
 
 	}

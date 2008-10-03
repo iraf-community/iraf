@@ -13,11 +13,16 @@ real	x[ARB]		# x value
 real	der[ARB]	# derivatives, der[1] is value der[2] is f prime 
 int	nder		# number items returned = 1 + number of derivatives
 
-int	nearx, i, j, k, nterms, nd
+size_t	sz_val
+size_t	c_1
+int	nearx
+int	i, j, k, nterms, nd
 pointer	c0ptr, n0
 real	deltax, accum, tmpx[2], pcoeff[MAX_NDERIVS], diff[MAX_NDERIVS]
 
 begin
+	c_1 = 1
+
 	# Return zero for derivatives that are zero.
 	do i = 1, nder
 	    der[i] = 0.
@@ -43,17 +48,18 @@ begin
 	    return
 
 	case II_SINC, II_LSINC:
-	    call ii_sincder (x[1], der, nder,
-		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		ASI_NSINC(asi), DX)
+	    sz_val = ASI_NCOEFF(asi)
+	    call ii_sincder (x[1], der, nder, 
+			     COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), sz_val,
+			     ASI_NSINC(asi), DX)
 	    return
 
 	case II_DRIZZLE:
 	    if (ASI_PIXFRAC(asi) >= 1.0)
-	        call ii_driz1 (x, der[1], 1, COEFF(ASI_COEFF(asi) +
+	        call ii_driz1 (x, der[1], c_1, COEFF(ASI_COEFF(asi) +
 	            ASI_OFFSET(asi)), ASI_BADVAL(asi))
 	    else
-	        call ii_driz (x, der[1], 1, COEFF(ASI_COEFF(asi) +
+	        call ii_driz (x, der[1], c_1, COEFF(ASI_COEFF(asi) +
 	            ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
 	    if (nder > 1) {
 		deltax = x[2] - x[1]
@@ -63,18 +69,18 @@ begin
 		    tmpx[1] = x[1]
 		    tmpx[2] = (x[1] + x[2]) / 2.0
 	    	    if (ASI_PIXFRAC(asi) >= 1.0)
-	                call ii_driz1 (tmpx, accum, 1, COEFF(ASI_COEFF(asi) +
+	                call ii_driz1 (tmpx, accum, c_1, COEFF(ASI_COEFF(asi) +
 	                    ASI_OFFSET(asi)), ASI_BADVAL(asi))
 		    else
-	                call ii_driz (tmpx, accum, 1, COEFF(ASI_COEFF(asi) +
+	                call ii_driz (tmpx, accum, c_1, COEFF(ASI_COEFF(asi) +
 	                    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
 		    tmpx[1] = tmpx[2]
 		    tmpx[2] = x[2]
 	    	    if (ASI_PIXFRAC(asi) >= 1.0)
-	                call ii_driz1 (tmpx, der[2], 1, COEFF(ASI_COEFF(asi) +
+	                call ii_driz1 (tmpx, der[2], c_1, COEFF(ASI_COEFF(asi) +
 	                    ASI_OFFSET(asi)), ASI_BADVAL(asi))
 		    else
-	                call ii_driz (tmpx, der[2], 1, COEFF(ASI_COEFF(asi) +
+	                call ii_driz (tmpx, der[2], c_1, COEFF(ASI_COEFF(asi) +
 	                    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
 		    der[2] = 2.0 * (der[2] - accum) / deltax
 		}
