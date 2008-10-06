@@ -29,9 +29,9 @@ procedure iif_spline(b,d,n)
 
 real b[ARB]	# data in and also bspline coefficients out
 real d[ARB]     # needed for offdiagnol matrix elements
-int n           # number of data points
+size_t n        # number of data points
 
-int i
+long i
 
 begin
     

@@ -13,10 +13,10 @@ procedure iievne(x,y,n,a)   # nearest neighbor
 
 real	x[ARB]	# x values, must be within [1,n]
 real	y[ARB]	# interpolated values returned to user
-int	n	# number of x values
+size_t	n	# number of x values
 real	a[ARB]	# data to be interpolated
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -28,10 +28,11 @@ procedure iievli(x,y,n,a)   # linear
 
 real	x[ARB]	# x values, must be within [1,n]
 real	y[ARB]	# interpolated values returned to user
-int	n	# number of x values
+size_t	n	# number of x values
 real	a[ARB]	# data to be interpolated
 
-int	i,nx
+long	i
+int	nx
 
 begin
 	
@@ -46,10 +47,11 @@ procedure iievp3(x,y,n,a)   # interior third order polynomial
 
 real	x[ARB]	# x values, must be within [1,n]
 real	y[ARB]	# interpolated values returned to user
-int	n	# number of x values
+size_t	n	# number of x values
 real	a[ARB]	# data to be interpolated from a[0] to a[n+2]
 
-int	i,nx,nxold
+long	i
+int	nx,nxold
 real	s,t,cd20,cd21
 
 begin
@@ -76,10 +78,11 @@ procedure iievp5(x,y,n,a)   # interior fifth order polynomial
 
 real	x[ARB]	# x values, must be within [1,n]
 real	y[ARB]	# interpolated values returned to user
-int	n	# number of x values
+size_t	n	# number of x values
 real	a[ARB]	# data to be interpolated - from a[-1] to a[n+3]
 
-int	i,nx,nxold
+long	i
+int	nx,nxold
 real	s,t,cd20,cd21,cd40,cd41
 
 begin
@@ -111,10 +114,11 @@ procedure iievs3(x,y,n,a)   # cubic spline evaluator
 
 real	x[ARB]	# x values, must be within [1,n]
 real	y[ARB]	# interpolated values returned to user
-int	n	# number of x values
+size_t	n	# number of x values
 real	a[ARB]	# basis spline coefficients - from a[0] to a[n+1]
 
-int	i,nx,nxold
+long	i
+int	nx,nxold
 real	s,c0,c1,c2,c3
 
 begin

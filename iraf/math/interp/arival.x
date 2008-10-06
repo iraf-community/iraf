@@ -14,10 +14,11 @@ include "interpdef.h"
 
 real	x		# need 1 <= x <= n
 real	datain[ARB]	# data values
-int	n		# number of data values
+size_t	n		# number of data values
 int	interptype
 
-int 	i, k, nx, px
+int 	i, nx, px
+size_t	k
 real	a[6], cd20, cd21, cd40, cd41, s, t, h
 real	bcoeff[SPLPTS+2], temp[SPLPTS+2], pc[4]
 

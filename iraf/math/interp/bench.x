@@ -17,12 +17,14 @@ procedure interp()
 real	data[MAX_PIXELS], x[MAX_PIXELS], y[MAX_PIXELS]
 real	coeff[2 * MAX_PIXELS + SZ_ASI]
 char	interp_name[SZ_NAME]
-int	i, j, npix, nlines, interpolant
+int	j, nlines, interpolant
+long	i
+size_t	npix
 bool	streq()
-int	clgeti()
+long	clgetl()
 
 begin
-	npix = min (MAX_PIXELS, clgeti ("npix"))
+	npix = min (MAX_PIXELS, clgetl ("npix"))
 	nlines = npix				# square image
 	call clgstr ("interpolant", interp_name, SZ_NAME)
 

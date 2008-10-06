@@ -8,7 +8,7 @@ include "interpdef.h"
 include "asidef.h"
 
 real x[ARB]			# ordered x array
-int n				# no. of points in x
+size_t n			# no. of points in x
 real coeff[ARB]
 
 real y[ARB]			# interpolated values

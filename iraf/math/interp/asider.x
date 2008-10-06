@@ -31,6 +31,7 @@ real der[ARB]		# der[1] is value der[2] is f prime etc.
 
 int nx,n0,i,j,k,nt,nd
 real s,ac,pc[6],d[6]
+int	nint_ri()
 
 begin
 	do i = 1, nder   # return zero for derivatives that are zero
@@ -41,7 +42,7 @@ begin
 	switch (ITYPEI)	{	# switch on interpolator type
 	
 	case IT_NEAREST :
-	    der[1] = (coeff[COFF + nint(x)])
+	    der[1] = (coeff[COFF + nint_ri(x)])
 	    return
 
 	case IT_LINEAR :

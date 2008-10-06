@@ -21,12 +21,13 @@ include "interpdef.h"
 include "asidef.h"
 
 real datain[ARB]		# data in array
-int n				# no. of data points
+size_t n			# no. of data points
 real dataout[ARB]		# data out array - cannot be same as data in
 int terptype			# interpolator type - see interpdef.h
 
-int i, badnc 
-int k, ka, kb
+long i, badnc 
+long k, ka, kb
+size_t	nn
 
 real iirbfval()
 
@@ -61,11 +62,14 @@ begin
 
 	# load the other points interpolating the bad points as needed
 	do k = ka, kb {
-	    if (!IS_INDEFR (datain[k]))		# good point
+	    if (!IS_INDEFR (datain[k])) {
+		# good point
 		dataout[k] = datain[k]
-
-	    else 		# bad point -- generate interpolated value
-		dataout[k] = iirbfval(datain[ka],kb-ka+1,k-ka+1,terptype)
+	    } else {
+ 		# bad point -- generate interpolated value
+		nn = kb-ka+1
+		dataout[k] = iirbfval(datain[ka],nn,k-ka+1,terptype)
+	    }
 	}
 
 end
@@ -76,11 +80,12 @@ end
 real procedure iirbfval(y, n, k, terptype)
 
 real y[ARB]	# data_in array, y[1] and y[n] guaranteed to be good.
-int n		# length of data_in array.
-int k		# index of bad point to replace.
+size_t n	# length of data_in array.
+long k		# index of bad point to replace.
 int terptype
 
-int  j, jj,  pd, pu, tk, pns
+long  j, jj,  pd, pu, pns
+size_t	tk
 real td[SPLPTS], tx[SPLPTS]	# temporary arrays for interpolation
 
 real iirbint()
@@ -149,11 +154,13 @@ real procedure iirbint (x, tx, td, tk, pd, terptype)
 real	x		# point to interpolate
 real	tx[ARB]		# xvalues
 real	td[ARB]		# data values
-int 	tk		# size of data array
-int	pd		# index such that tx[pd] < x < tx[pd+1]
+size_t 	tk		# size of data array
+long	pd		# index such that tx[pd] < x < tx[pd+1]
 int 	terptype
 
-int  i, ks, tpol
+int	i_val
+long  i, ks
+size_t	tpol
 real cc[4,SPLPTS]
 real h
 
@@ -180,7 +187,8 @@ begin
 
 	     # use spline routine from C. de Boor's book
 	     # A Practical Guide to Splines
-	     call cubspl(tx,cc,tk,2,2)
+	     i_val = tk
+	     call cubspl(tx,cc,i_val,2,2)
 	     h = x - tx[pd]
 	     return(cc[1,pd] + h * (cc[2,pd] + h *
 			       (cc[3,pd] + h * cc[4,pd]/3.)/2.))

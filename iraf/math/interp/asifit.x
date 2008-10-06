@@ -13,10 +13,10 @@ include "interpdef.h"
 include "asidef.h"
 
 real datain[ARB]	# data array
-int n			# no. of data points
+size_t n		# no. of data points
 real coeff[ARB]
 
-int i
+long i
 
 begin
 	NPTS = n

@@ -15,7 +15,7 @@ include "interpdef.h"
 
 real	x		# need 1 <= x <= n
 real	datain[ARB]	# data values
-int	n		# number of data values
+size_t	n		# number of data values
 real	derivs[ARB]	# derivatives out -- beware derivs[1] is 
 			#		function value
 int	nderiv		# total number of values returned in derivs
@@ -78,7 +78,7 @@ procedure iidr_poly3(x, datain, n, pc)
 
 real	x
 real	datain[ARB]
-int	n
+size_t	n
 real	pc[ARB]
 
 int 	i, k, nx, nt
@@ -125,7 +125,7 @@ procedure iidr_poly5(x, datain, n, pc)
 
 real	x
 real	datain[ARB]
-int	n
+size_t	n
 real	pc[ARB]
 
 int 	i, k, nx, nt
@@ -172,10 +172,11 @@ procedure iidr_spline3(x, datain, n, pc)
 
 real	x
 real	datain[ARB]
-int	n
+size_t	n
 real	pc[ARB]
 
-int 	i, k, nx, px
+int 	i, nx, px
+size_t	k
 real	temp[SPLPTS+2], bcoeff[SPLPTS+2],  h
 
 begin

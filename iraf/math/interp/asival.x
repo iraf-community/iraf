@@ -20,29 +20,32 @@ include "asidef.h"
 real x
 real coeff[ARB]
 
+size_t	c_1
 real t
 
 begin
+	c_1 = 1
+
 	switch (ITYPEI)	{	# switch on interpolator type
 	
 	case IT_NEAREST :
-	    call iievne(x,t,1,coeff[COFF+1])
+	    call iievne(x,t,c_1,coeff[COFF+1])
 	    return(t)
 
 	case IT_LINEAR :
-	    call iievli(x,t,1,coeff[COFF+1])
+	    call iievli(x,t,c_1,coeff[COFF+1])
 	    return(t)
 
 	case IT_POLY3 :
-	    call iievp3(x,t,1,coeff[COFF+1])
+	    call iievp3(x,t,c_1,coeff[COFF+1])
 	    return(t)
 
 	case IT_POLY5 :
-	    call iievp5(x,t,1,coeff[COFF+1])
+	    call iievp5(x,t,c_1,coeff[COFF+1])
 	    return(t)
 
 	case IT_SPLINE3 :
-	    call iievs3(x,t,1,coeff[COFF+1])
+	    call iievs3(x,t,c_1,coeff[COFF+1])
 	    return(t)
 
 	}
