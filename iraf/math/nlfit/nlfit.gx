@@ -15,12 +15,13 @@ pointer	nl		# pointer to nlfit structure
 PIXEL	x[ARB]		# independent variables (npts * nvars)
 PIXEL	z[ARB]		# function values (npts)
 PIXEL	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 int	wtflag		# weighting type
 int	stat		# error code
 
-int	i, miniter, ier
+long	i
+int	miniter, ier
 PIXEL	scatter, dscatter
 PIXEL	nlscatter$t()
 
@@ -138,18 +139,21 @@ pointer	nl		# Pointer to nl fitting structure
 PIXEL	x[ARB]		# independent variables (npts * nvars)
 PIXEL	z[ARB]		# function values (npts)
 PIXEL	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
+size_t	sz_val
 pointer	sp, zfit, errors
 PIXEL	scatter, variance, chisqr
-int	nlstati()
+long	nlstatl()
 
 begin
 	# Allocate working memory.
 	call smark (sp)
+
 	call salloc (zfit, npts, TY_PIXEL)
-	call salloc (errors, nlstati (nl, NLNPARAMS), TY_PIXEL)
+	sz_val = nlstatl (nl, NLNPARAMS)
+	call salloc (errors, sz_val, TY_PIXEL)
 
 	# Initialize
 	scatter = PIXEL (0.0)

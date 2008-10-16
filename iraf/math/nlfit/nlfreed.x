@@ -20,7 +20,7 @@ begin
 	if (NL_DELPARAM(nl) != NULL)
 	    call mfree (NL_DELPARAM(nl), TY_DOUBLE)
 	if (NL_PLIST(nl) != NULL)
-	    call mfree (NL_PLIST(nl), TY_INT)
+	    call mfree (NL_PLIST(nl), TY_LONG)
 	if (NL_ALPHA(nl) != NULL)
 	    call mfree (NL_ALPHA(nl), TY_DOUBLE)
 	if (NL_CHOFAC(nl) != NULL)

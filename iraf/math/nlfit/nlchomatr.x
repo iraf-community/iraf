@@ -11,12 +11,12 @@ include "nlfitdefr.h"
 procedure nl_chfacr (matrix, nbands, nrows, matfac, ier)
 
 real   matrix[nbands, nrows]	# data matrix
-int	nbands			# number of bands
-int	nrows			# number of rows
+size_t	nbands			# number of bands
+size_t	nrows			# number of rows
 real   matfac[nbands, nrows]	# Cholesky factorization
 int	ier			# error code
 
-int	i, n, j, imax, jmax
+long	i, n, j, imax, jmax
 real   ratio
 
 begin
@@ -69,12 +69,12 @@ end
 procedure nl_chslvr (matfac, nbands, nrows, vector, coeff)
 
 real	matfac[nbands,nrows] 		# Cholesky factorization
-int	nbands				# number of bands
-int	nrows				# number of rows
+size_t	nbands				# number of bands
+size_t	nrows				# number of rows
 real	vector[nrows]			# right side of matrix equation
 real	coeff[nrows]			# coefficients
 
-int	i, n, j, jmax, nbndm1
+long	i, n, j, jmax, nbndm1
 
 begin
 	# Test for a single element matrix.
@@ -116,9 +116,9 @@ procedure nl_dampr (inmatrix, outmatrix, constant, nbands, nrows)
 real	inmatrix[nbands,ARB]		# input matrix
 real	outmatrix[nbands,ARB]		# output matrix
 real	constant			# damping constant
-int	nbands, nrows			# dimensions of matrix
+size_t	nbands, nrows			# dimensions of matrix
 
-int	i
+long	i
 
 begin
 	do i = 1, nrows

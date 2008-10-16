@@ -3,11 +3,11 @@
 
 procedure nl_list (list, nlist, nfit)
 
-int	list[ARB]		# list
-int	nlist			# number of elements in the list
-int	nfit			# number of active list elments
+long	list[ARB]		# list
+size_t	nlist			# number of elements in the list
+size_t	nfit			# number of active list elments
 
-int	i, j, nfitp1, ifound
+long	i, j, nfitp1, ifound
 
 begin
 	nfitp1 = nfit + 1

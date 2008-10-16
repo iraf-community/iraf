@@ -7,7 +7,7 @@ procedure nl_dumpr (fd, nl)
 int	fd		# file descriptor
 pointer	nl		# NLFIT descriptor
 
-int	i, npars, nfpars
+long	i, npars, nfpars
 
 begin
 	# Test NLFIT pointer
@@ -20,23 +20,23 @@ begin
 	# File and NLFIT descriptors
 	call fprintf (fd, "\n****** nl_dump: (fd=%d), (nl=%d)\n")
 	    call pargi (fd)
-	    call pargi (nl)
+	    call pargp (nl)
 	call flush (fd)
 
 	# Dump function and derivative addresses
 	call fprintf (fd, "Fitting function pointer    = %d\n")
-	    call pargi (NL_FUNC (nl))
+	    call pargp (NL_FUNC (nl))
 	call fprintf (fd, "Derivative function pointer = %d\n")
-	    call pargi (NL_DFUNC (nl))
+	    call pargp (NL_DFUNC (nl))
 	call flush (fd)
 
 	# Number of parameters
 	npars = NL_NPARAMS (nl)
 	nfpars = NL_NFPARAMS (nl)
 	call fprintf (fd, "Number of parameters        = %d\n")
-	    call pargi (npars)
+	    call pargl (npars)
 	call fprintf (fd, "Number of fitted parameters = %d\n")
-	    call pargi (nfpars)
+	    call pargl (nfpars)
 	call flush (fd)
 
 	# Fit parameters
@@ -59,16 +59,16 @@ begin
 	call fprintf (fd, "Iteration counter       = %d\n")
 	    call pargi (NL_ITER (nl))
 	call fprintf (fd, "Number of points in fit = %d\n")
-	    call pargi (NL_NPTS (nl))
+	    call pargz (NL_NPTS (nl))
 	call flush (fd)
 
 	# Parameter values
 	call fprintf (fd, "Parameter values (%d):\n")
-	    call pargi (NL_PARAM (nl))
+	    call pargp (NL_PARAM (nl))
 	if (NL_PARAM (nl) != NULL) {
 	    do i = 1, npars {
 		call fprintf (fd, "%d -> %g\n")
-		    call pargi (i)
+		    call pargl (i)
 		    call pargr (Memr[NL_PARAM (nl) + i - 1])
 	    }
 	} else
@@ -77,11 +77,11 @@ begin
 
 	# Parameter errors
 	call fprintf (fd, "Parameter errors (%d):\n")
-	    call pargi (NL_DPARAM (nl))
+	    call pargp (NL_DPARAM (nl))
 	if (NL_DPARAM (nl) != NULL) {
 	    do i = 1, npars {
 		call fprintf (fd, "%d -> %g\n")
-		    call pargi (i)
+		    call pargl (i)
 		    call pargr (Memr[NL_DPARAM (nl) + i - 1])
 	    }
 	} else
@@ -90,12 +90,12 @@ begin
 
 	# Parameter list
 	call fprintf (fd, "Parameter list (%d):\n")
-	    call pargi (NL_PLIST (nl))
+	    call pargp (NL_PLIST (nl))
 	if (NL_PLIST (nl) != NULL) {
 	    do i = 1, npars {
 		call fprintf (fd, "%d -> %d\n")
-		    call pargi (i)
-		    call pargi (Memi[NL_PLIST (nl) + i - 1])
+		    call pargl (i)
+		    call pargl (Meml[NL_PLIST (nl) + i - 1])
 	    }
 	} else
 	    call fprintf (fd, "	Null pointer\n")
@@ -103,7 +103,7 @@ begin
 
 	# Alpha matrix
 	call fprintf (fd, "Alpha matrix (%d):\n")
-	    call pargi (NL_ALPHA (nl))
+	    call pargp (NL_ALPHA (nl))
 	if (NL_ALPHA (nl) != NULL)
 	    call nl_adumpr (fd, Memr[NL_ALPHA (nl)], nfpars, nfpars)
 	else
@@ -112,16 +112,17 @@ begin
 
 	# Beta matrix
 	call fprintf (fd, "Beta matrix (%d):\n")
-	    call pargi (NL_BETA (nl))
+	    call pargp (NL_BETA (nl))
+	i = 1
 	if (NL_BETA (nl) != NULL)
-	    call nl_adumpr (fd, Memr[NL_BETA (nl)], nfpars, 1)
+	    call nl_adumpr (fd, Memr[NL_BETA (nl)], nfpars, i)
 	else
 	    call fprintf (fd, "	Null pointer\n")
 	call flush (fd)
 
 	# Covariance matrix
 	call fprintf (fd, "Covariance matrix (%d):\n")
-	    call pargi (NL_COVAR (nl))
+	    call pargp (NL_COVAR (nl))
 	if (NL_COVAR (nl) != NULL)
 	    call nl_adumpr (fd, Memr[NL_COVAR (nl)], nfpars, nfpars)
 	else
@@ -130,7 +131,7 @@ begin
 
 	# Cholesky factorization
 	call fprintf (fd, "Cholesky factorization matrix (%d):\n")
-	    call pargi (NL_CHOFAC (nl))
+	    call pargp (NL_CHOFAC (nl))
 	if (NL_CHOFAC (nl) != NULL)
 	    call nl_adumpr (fd, Memr[NL_CHOFAC (nl)], nfpars, nfpars)
 	else
@@ -145,9 +146,9 @@ procedure nl_adumpr (fd, a, nrows, ncols)
 
 int	fd			# file descriptor
 real	a[nrows, ncols]		# array
-int	nrows, ncols		# dimension
+long	nrows, ncols		# dimension
 
-int	i, j
+long	i, j
 
 begin
 	do i = 1, nrows {

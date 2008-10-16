@@ -18,19 +18,21 @@ pointer	nl		# curve descriptor
 real	z[ARB]		# data points
 real	zfit[ARB]	# fitted data points
 real	w[ARB]		# array of weights
-int	npts		# number of points
+size_t	npts		# number of points
 real	variance	# variance of the fit
 real	chisqr		# reduced chi-squared of fit (output)
 real	errors[ARB]	# errors in coefficients (output)
 
-int	i, n, nfree
+size_t	sz_val
+long	i, n, nfree
 pointer	sp, covptr
 real   factor
 
 begin
 	# Allocate space for covariance vector.
 	call smark (sp)
-	call salloc (covptr, NL_NPARAMS(nl), TY_REAL)
+	sz_val = NL_NPARAMS(nl)
+	call salloc (covptr, sz_val, TY_REAL)
 
 	# Estimate the variance and reduce chi-squared of the fit.
 	n = 0
@@ -68,7 +70,8 @@ begin
 	    factor = 1.
 
 	# Calculate the  errors in the coefficients.
-	call aclrr (errors, NL_NPARAMS(nl))
+	sz_val = NL_NPARAMS(nl)
+	call aclrr (errors, sz_val)
 	call nlinvertr (ALPHA(NL_ALPHA(nl)), CHOFAC(NL_CHOFAC(nl)),
 	    COV(covptr), errors, PLIST(NL_PLIST(nl)), NL_NFPARAMS(nl), factor)
 
@@ -84,11 +87,13 @@ real	alpha[nfit,ARB]		# data matrix
 real	chofac[nfit, ARB]	# cholesky factorization
 real	cov[ARB]		# covariance vector
 real	errors[ARB]		# computed errors
-int	list[ARB]		# list of active parameters
-int	nfit			# number of fitted parameters
+long	list[ARB]		# list of active parameters
+size_t	nfit			# number of fitted parameters
 real	variance		# variance of the fit
 
-int	i, ier
+size_t	sz_val
+long	i
+int	ier
 
 begin
 	# Factorize the data matrix to determine the errors.
@@ -96,7 +101,8 @@ begin
 
 	# Estimate the errors.
 	do i = 1, nfit {
-	    call aclrr (cov, nfit)
+	    sz_val = nfit
+	    call aclrr (cov, sz_val)
 	    cov[i] = real (1.0)
 	    call nl_chslvr (chofac, nfit, nfit, cov, cov)
 	    if (cov[i] >= real (0.0))

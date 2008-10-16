@@ -12,13 +12,15 @@ procedure nlsolve$t (nl, ier)
 pointer	nl	# pointer to the nlfit structure
 int	ier	# error code
 
-int	nfree
+long	nfree
+size_t	sz_val
 
 begin
 	# Make temporary arrays.
-	call amov$t (ALPHA(NL_ALPHA(nl)), COVAR(NL_COVAR(nl)),
-	    NL_NFPARAMS(nl) ** 2)
-	call amov$t (BETA(NL_BETA(nl)), DPARAM(NL_DPARAM(nl)), NL_NFPARAMS(nl))
+	sz_val = NL_NFPARAMS(nl) ** 2
+	call amov$t (ALPHA(NL_ALPHA(nl)), COVAR(NL_COVAR(nl)), sz_val)
+	sz_val = NL_NFPARAMS(nl)
+	call amov$t (BETA(NL_BETA(nl)), DPARAM(NL_DPARAM(nl)), sz_val)
 
 	# Add the lambda damping factor.
 	call nl_damp$t (COVAR(NL_COVAR(nl)), COVAR(NL_COVAR(nl)),

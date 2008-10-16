@@ -8,8 +8,8 @@ procedure nlzerod (nl)
 
 pointer	nl		# pointer to nl fitting structure
 
-int	nparams		# number of parameters
-int	nfparams	# number of fitted parameters
+size_t	nparams		# number of parameters
+size_t	nfparams	# number of fitted parameters
 
 begin
 	# Get number of parameters and fitting parameters.

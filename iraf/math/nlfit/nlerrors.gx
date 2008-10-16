@@ -22,19 +22,21 @@ pointer	nl		# curve descriptor
 PIXEL	z[ARB]		# data points
 PIXEL	zfit[ARB]	# fitted data points
 PIXEL	w[ARB]		# array of weights
-int	npts		# number of points
+size_t	npts		# number of points
 PIXEL	variance	# variance of the fit
 PIXEL	chisqr		# reduced chi-squared of fit (output)
 PIXEL	errors[ARB]	# errors in coefficients (output)
 
-int	i, n, nfree
+size_t	sz_val
+long	i, n, nfree
 pointer	sp, covptr
 PIXEL   factor
 
 begin
 	# Allocate space for covariance vector.
 	call smark (sp)
-	call salloc (covptr, NL_NPARAMS(nl), TY_PIXEL)
+	sz_val = NL_NPARAMS(nl)
+	call salloc (covptr, sz_val, TY_PIXEL)
 
 	# Estimate the variance and reduce chi-squared of the fit.
 	n = 0
@@ -72,7 +74,8 @@ begin
 	    factor = 1.
 
 	# Calculate the  errors in the coefficients.
-	call aclr$t (errors, NL_NPARAMS(nl))
+	sz_val = NL_NPARAMS(nl)
+	call aclr$t (errors, sz_val)
 	call nlinvert$t (ALPHA(NL_ALPHA(nl)), CHOFAC(NL_CHOFAC(nl)),
 	    COV(covptr), errors, PLIST(NL_PLIST(nl)), NL_NFPARAMS(nl), factor)
 
@@ -88,11 +91,13 @@ PIXEL	alpha[nfit,ARB]		# data matrix
 PIXEL	chofac[nfit, ARB]	# cholesky factorization
 PIXEL	cov[ARB]		# covariance vector
 PIXEL	errors[ARB]		# computed errors
-int	list[ARB]		# list of active parameters
-int	nfit			# number of fitted parameters
+long	list[ARB]		# list of active parameters
+size_t	nfit			# number of fitted parameters
 PIXEL	variance		# variance of the fit
 
-int	i, ier
+size_t	sz_val
+long	i
+int	ier
 
 begin
 	# Factorize the data matrix to determine the errors.
@@ -100,7 +105,8 @@ begin
 
 	# Estimate the errors.
 	do i = 1, nfit {
-	    call aclr$t (cov, nfit)
+	    sz_val = nfit
+	    call aclr$t (cov, sz_val)
 	    cov[i] = PIXEL (1.0)
 	    call nl_chslv$t (chofac, nfit, nfit, cov, cov)
 	    if (cov[i] >= PIXEL (0.0))

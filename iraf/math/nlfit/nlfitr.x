@@ -11,12 +11,13 @@ pointer	nl		# pointer to nlfit structure
 real	x[ARB]		# independent variables (npts * nvars)
 real	z[ARB]		# function values (npts)
 real	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 int	wtflag		# weighting type
 int	stat		# error code
 
-int	i, miniter, ier
+long	i
+int	miniter, ier
 real	scatter, dscatter
 real	nlscatterr()
 
@@ -134,18 +135,21 @@ pointer	nl		# Pointer to nl fitting structure
 real	x[ARB]		# independent variables (npts * nvars)
 real	z[ARB]		# function values (npts)
 real	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
+size_t	sz_val
 pointer	sp, zfit, errors
 real	scatter, variance, chisqr
-int	nlstati()
+long	nlstatl()
 
 begin
 	# Allocate working memory.
 	call smark (sp)
+
 	call salloc (zfit, npts, TY_REAL)
-	call salloc (errors, nlstati (nl, NLNPARAMS), TY_REAL)
+	sz_val = nlstatl (nl, NLNPARAMS)
+	call salloc (errors, sz_val, TY_REAL)
 
 	# Initialize
 	scatter = real (0.0)

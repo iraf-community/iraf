@@ -6,48 +6,55 @@ procedure nlinitr (nl, fnc, dfnc, params, dparams, nparams, plist, nfparams,
 		    tol, itmax)
 
 pointer	nl		# pointer to nl fitting structure
-int	fnc		# fitting function address
-int	dfnc		# derivative function address
+pointer	fnc		# fitting function address
+pointer	dfnc		# derivative function address
 real	params[ARB]	# initial values for the parameters
 real	dparams[ARB]	# initial guess at uncertainties in parameters
-int	nparams		# number of parameters
-int	plist[ARB]	# list of active parameters
-int	nfparams	# number of fitted parameters
+size_t	nparams		# number of parameters
+long	plist[ARB]	# list of active parameters
+size_t	nfparams	# number of fitted parameters
 real	tol		# fitting tolerance
 int	itmax		# maximum number of iterations
 
+size_t	sz_val
 errchk	malloc, calloc, nl_list
 
 begin
 	# Allocate space for the non-linear package structure.
-	call malloc (nl, LEN_NLSTRUCT, TY_STRUCT)
+	sz_val = LEN_NLSTRUCT
+	call malloc (nl, sz_val, TY_STRUCT)
 
 	# Store the addresses of the non-linear functions.
 	NL_FUNC(nl) = fnc
 	NL_DFUNC(nl) = dfnc
 
 	# Allocate temporary space for arrays.
-	call calloc (NL_ALPHA(nl), nfparams * nfparams, TY_REAL)
-	call calloc (NL_COVAR(nl), nfparams * nfparams, TY_REAL)
-	call calloc (NL_CHOFAC(nl), nfparams * nfparams, TY_REAL)
-	call calloc (NL_BETA(nl), nfparams, TY_REAL)
+	sz_val = nfparams * nfparams
+	call calloc (NL_ALPHA(nl), sz_val, TY_REAL)
+	call calloc (NL_COVAR(nl), sz_val, TY_REAL)
+	call calloc (NL_CHOFAC(nl), sz_val, TY_REAL)
+	sz_val = nfparams
+	call calloc (NL_BETA(nl), sz_val, TY_REAL)
 
 	# Allocate space for parameter and trial parameter vectors.
-	call calloc (NL_DERIV(nl), nparams, TY_REAL)
-	call calloc (NL_PARAM(nl), nparams, TY_REAL)
-	call calloc (NL_OPARAM(nl), nparams, TY_REAL)
-	call calloc (NL_TRY(nl), nparams, TY_REAL)
-	call calloc (NL_DPARAM(nl), nparams, TY_REAL)
-	call calloc (NL_DELPARAM(nl), nparams, TY_REAL)
-	call calloc (NL_PLIST(nl), nparams, TY_INT)
+	sz_val = nparams
+	call calloc (NL_DERIV(nl), sz_val, TY_REAL)
+	call calloc (NL_PARAM(nl), sz_val, TY_REAL)
+	call calloc (NL_OPARAM(nl), sz_val, TY_REAL)
+	call calloc (NL_TRY(nl), sz_val, TY_REAL)
+	call calloc (NL_DPARAM(nl), sz_val, TY_REAL)
+	call calloc (NL_DELPARAM(nl), sz_val, TY_REAL)
+	call calloc (NL_PLIST(nl), sz_val, TY_LONG)
 
 	# Initialize the parameters.
 	NL_NPARAMS(nl) = nparams
 	NL_NFPARAMS(nl) = nfparams
-	call amovr (params, PARAM(NL_PARAM(nl)), nparams)
-	call amovr (params, PARAM(NL_OPARAM(nl)), nparams)
-	call amovr (dparams, DPARAM(NL_DELPARAM(nl)), nparams)
-	call amovi (plist, PLIST(NL_PLIST(nl)), nfparams)
+	sz_val = nparams
+	call amovr (params, PARAM(NL_PARAM(nl)), sz_val)
+	call amovr (params, PARAM(NL_OPARAM(nl)), sz_val)
+	call amovr (dparams, DPARAM(NL_DELPARAM(nl)), sz_val)
+	sz_val = nfparams
+	call amovl (plist, PLIST(NL_PLIST(nl)), sz_val)
 	NL_TOL(nl) = tol
 	NL_ITMAX(nl) = itmax
 	NL_SCATTER(nl) = real(0.0)

@@ -10,11 +10,12 @@ pointer	nl		# pointer to nl fitting structure
 real	x[ARB]		# independent variables (npts * nvars)
 real	z[ARB]		# function values (npts)
 real	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 int	ier		# error code
 
-int	i, index
+size_t	sz_val
+long	i, index
 real	nlacptsr(), nlresidr()
 
 begin
@@ -22,7 +23,8 @@ begin
    	NL_OLDSQ(nl) = nlacptsr (nl, x, z, w, npts, nvars)
 
 	# Set up temporary parameter array.
-	call amovr (PARAM(NL_PARAM(nl)), TRY(NL_TRY(nl)), NL_NPARAMS(nl))
+	sz_val = NL_NPARAMS(nl)
+	call amovr (PARAM(NL_PARAM(nl)), TRY(NL_TRY(nl)), sz_val)
 
 	repeat {
 
@@ -42,8 +44,8 @@ begin
 	    NL_SUMSQ(nl) = nlresidr (nl, x, z, w, npts, nvars)
 	    #if (NL_OLDSQ(nl) > (NL_SUMSQ(nl) + NL_TOL(nl) * NL_SUMSQ(nl))) {
 	    if (NL_OLDSQ(nl) >= NL_SUMSQ(nl)) {
-		call amovr (TRY(NL_TRY(nl)), PARAM(NL_PARAM(nl)),
-		    NL_NPARAMS(nl))
+		sz_val = NL_NPARAMS(nl)
+		call amovr (TRY(NL_TRY(nl)), PARAM(NL_PARAM(nl)), sz_val)
 		NL_LAMBDA(nl) = real (0.10) * NL_LAMBDA(nl)
 		break
 	    } else

@@ -11,16 +11,19 @@ pointer	nl		# pointer to nl fitting structure
 real	x[ARB]		# independent variables (npts * nvars)
 real	z[ARB]		# function values (npts)
 real	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
-int	i, nfree
+size_t	sz_val
+long	i, nfree
 real	sum, z0, dz
 
 begin
 	# Zero the accumulators.
-	call aclrr (ALPHA(NL_ALPHA(nl)), NL_NFPARAMS(nl) ** 2)
-	call aclrr (BETA(NL_BETA(nl)), NL_NFPARAMS(nl))
+	sz_val = NL_NFPARAMS(nl) ** 2
+	call aclrr (ALPHA(NL_ALPHA(nl)), sz_val)
+	sz_val = NL_NFPARAMS(nl)
+	call aclrr (BETA(NL_BETA(nl)), sz_val)
 
 	# Accumulate the points into the fit.
 	NL_NPTS (nl) = npts
@@ -53,10 +56,10 @@ pointer	nl		# pointer to nl fitting structure
 real	x[ARB]		# independent variables (npts * nvars)
 real	z[ARB]		# function values (npts)
 real	w[ARB]		# weights (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
-int	i, nfree
+long	i, nfree
 real	sum, z0, dz
 
 begin
@@ -84,14 +87,14 @@ end
 procedure nl_accumr (deriv, list, w, dz, nfit, alpha, beta)
 
 real	deriv[ARB]	# derivatives
-int	list[ARB]	# list of active parameters
+long	list[ARB]	# list of active parameters
 real	w		# weight
 real	dz		# difference between data and model
-int	nfit		# number of fitted parameters
+size_t	nfit		# number of fitted parameters
 real	alpha[nfit,ARB]	# alpha matrix
 real	beta[nfit]	# beta matrix
 
-int	i, j, k
+long	i, j, k
 real	wt
 
 begin

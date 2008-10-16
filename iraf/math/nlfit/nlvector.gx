@@ -14,10 +14,10 @@ procedure nlvector$t (nl, x, zfit, npts, nvars)
 pointer	nl		# pointer to nl fitting structure
 PIXEL	x[ARB]		# independent variables (npts * nvars)
 PIXEL	zfit[ARB]	# function values (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
-int	i
+long	i
 
 begin
 	# Compute the fitted function.

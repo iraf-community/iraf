@@ -15,12 +15,12 @@ $endif
 procedure nl_chfac$t (matrix, nbands, nrows, matfac, ier)
 
 PIXEL   matrix[nbands, nrows]	# data matrix
-int	nbands			# number of bands
-int	nrows			# number of rows
+size_t	nbands			# number of bands
+size_t	nrows			# number of rows
 PIXEL   matfac[nbands, nrows]	# Cholesky factorization
 int	ier			# error code
 
-int	i, n, j, imax, jmax
+long	i, n, j, imax, jmax
 PIXEL   ratio
 
 begin
@@ -73,12 +73,12 @@ end
 procedure nl_chslv$t (matfac, nbands, nrows, vector, coeff)
 
 PIXEL	matfac[nbands,nrows] 		# Cholesky factorization
-int	nbands				# number of bands
-int	nrows				# number of rows
+size_t	nbands				# number of bands
+size_t	nrows				# number of rows
 PIXEL	vector[nrows]			# right side of matrix equation
 PIXEL	coeff[nrows]			# coefficients
 
-int	i, n, j, jmax, nbndm1
+long	i, n, j, jmax, nbndm1
 
 begin
 	# Test for a single element matrix.
@@ -120,9 +120,9 @@ procedure nl_damp$t (inmatrix, outmatrix, constant, nbands, nrows)
 PIXEL	inmatrix[nbands,ARB]		# input matrix
 PIXEL	outmatrix[nbands,ARB]		# output matrix
 PIXEL	constant			# damping constant
-int	nbands, nrows			# dimensions of matrix
+size_t	nbands, nrows			# dimensions of matrix
 
-int	i
+long	i
 
 begin
 	do i = 1, nrows

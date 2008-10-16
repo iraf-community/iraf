@@ -10,10 +10,10 @@ procedure nlvectord (nl, x, zfit, npts, nvars)
 pointer	nl		# pointer to nl fitting structure
 double	x[ARB]		# independent variables (npts * nvars)
 double	zfit[ARB]	# function values (npts)
-int	npts		# number of points
+size_t	npts		# number of points
 int	nvars		# number of independent variables
 
-int	i
+long	i
 
 begin
 	# Compute the fitted function.
