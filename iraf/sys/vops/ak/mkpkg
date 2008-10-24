@@ -22,6 +22,7 @@ libvops.a:
 	aaddks.x	
 	aaddkx.x	
 	aaddl.x	
+	aaddp.x	
 	aaddr.x	
 	aadds.x	
 	aaddx.x	
