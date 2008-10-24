@@ -17,7 +17,7 @@ include "surfitdef.h"
 procedure islsolve (sf, lineno, ier)
 
 pointer	sf 		# pointer to the surface descriptor structure
-int	lineno		# line being fitted in x
+long	lineno		# line being fitted in x
 int	ier		# ier = 0, everything OK
 			# ier = 1, matrix is singular
 			# ier = 2, no degree of freedom

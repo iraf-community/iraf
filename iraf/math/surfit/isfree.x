@@ -16,11 +16,11 @@ begin
 	if (SF_XBASIS(sf) != NULL)
 	    call mfree (SF_XBASIS(sf), MEM_TYPE)
 	if (SF_XLEFT(sf) != NULL)
-	    call mfree (SF_XLEFT(sf), TY_INT)
+	    call mfree (SF_XLEFT(sf), TY_POINTER)
 	if (SF_YBASIS(sf) != NULL)
 	    call mfree (SF_YBASIS(sf), MEM_TYPE)
 	if (SF_YLEFT(sf) != NULL)
-	    call mfree (SF_YLEFT(sf), TY_INT)
+	    call mfree (SF_YLEFT(sf), TY_POINTER)
 
 	# next the x and y matrices
 	if (SF_XMATRIX(sf) != NULL)
@@ -37,7 +37,7 @@ begin
 	if (SF_WZ(sf) != NULL)
 	    call mfree (SF_WZ(sf), MEM_TYPE)
 	if (SF_TLEFT(sf) != NULL)
-	    call mfree (SF_TLEFT(sf), TY_INT)
+	    call mfree (SF_TLEFT(sf), TY_POINTER)
 
 	# free surface descriptor
 	if (sf != NULL)

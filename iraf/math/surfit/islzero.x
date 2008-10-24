@@ -7,19 +7,22 @@ include "surfitdef.h"
 procedure islzero (sf, lineno)
 
 pointer	sf	# pointer to the surface descriptor
-int	lineno	# line number
+long	lineno	# line number
+
+size_t	sz_val
 pointer	xcptr
 
 begin
 	SF_NXPTS(sf) = 0
 
-	call aclrr (XMATRIX(SF_XMATRIX(sf)),
-		     SF_XORDER(sf) * SF_NXCOEFF(sf))
+	sz_val = SF_XORDER(sf) * SF_NXCOEFF(sf)
+	call aclrr (XMATRIX(SF_XMATRIX(sf)), sz_val)
 	xcptr = SF_XCOEFF(sf) + (lineno - 1) * SF_NXCOEFF(sf)
-	call aclrr (XCOEFF(xcptr), SF_NXCOEFF(sf))
+	sz_val = SF_NXCOEFF(sf)
+	call aclrr (XCOEFF(xcptr), sz_val)
 
 	if (SF_WZ(sf) != NULL)
 	    call mfree (SF_WZ(sf), MEM_TYPE)
 	if (SF_TLEFT(sf) != NULL)
-	    call mfree (SF_TLEFT(sf), TY_INT)
+	    call mfree (SF_TLEFT(sf), TY_POINTER)
 end

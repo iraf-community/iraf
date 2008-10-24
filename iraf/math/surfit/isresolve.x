@@ -18,16 +18,19 @@ include "surfitdef.h"
 procedure isresolve (sf, lines, ier)
 
 pointer	sf		# pointer to the surface descriptor structure
-int	lines[ARB]	# line numbers included in the fit
+long	lines[ARB]	# line numbers included in the fit
 int	ier		# error code
 
-int	i, j, k, nxcoeff
+size_t	sz_val
+int	i, k, nxcoeff
+long	j
 pointer	ybzptr
 pointer	ylzptr
 pointer	xczptr, xcptr, xcindex
 pointer	czptr, cptr
 pointer	left, tleft
 pointer	sp
+pointer	p_val
 
 begin
 	# define pointers
@@ -36,7 +39,8 @@ begin
 	czptr = SF_COEFF(sf) - 1
 
 	# zero out coefficient matrix
-	call aclrr (COEFF(SF_COEFF(sf)), SF_NXCOEFF(sf) * SF_NYCOEFF(sf))
+	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
+	call aclrr (COEFF(SF_COEFF(sf)), sz_val)
 
 	switch (SF_TYPE(sf)) {
 	case SF_LEGENDRE, SF_CHEBYSHEV:
@@ -65,27 +69,28 @@ begin
 
 	case SF_SPLINE3, SF_SPLINE1:
 	    call smark (sp)
-	    call salloc (left, SF_NYPTS(sf), TY_INT)
-	    call salloc (tleft, SF_NYPTS(sf), TY_INT)
+	    call salloc (left, SF_NYPTS(sf), TY_POINTER)
+	    call salloc (tleft, SF_NYPTS(sf), TY_POINTER)
 
 	    ylzptr = SF_YLEFT(sf) - 1
 	    do j = 1, SF_NYPTS(sf)
-		Memi[left+j-1] = YLEFT(ylzptr+lines[j])
-	    call aaddki (Memi[left], czptr, Memi[left], SF_NYPTS(sf))
+		Memp[left+j-1] = YLEFT(ylzptr+lines[j])
+	    call aaddkp (Memp[left], czptr, Memp[left], SF_NYPTS(sf))
 
 	    nxcoeff = SF_NXCOEFF(sf)
 	    do i = 1, SF_YORDER(sf) {
-		call aaddki (Memi[left], i, Memi[tleft], SF_NYPTS(sf))
+		p_val = i
+		call aaddkp (Memp[left], p_val, Memp[tleft], SF_NYPTS(sf))
 		do k = 1, nxcoeff {
 		    xcptr = xczptr + k
 		    do j = 1, SF_NYPTS(sf) {
-			cptr = Memi[tleft+j-1]
+			cptr = Memp[tleft+j-1]
 			xcindex = xcptr + lines[j] * SF_NXCOEFF(sf)
 			COEFF(cptr) = COEFF(cptr) + YBASIS(ybzptr+lines[j]) *
 			    XCOEFF(xcindex)
 		    }
-		    call aaddki (Memi[tleft], SF_NYCOEFF(sf), Memi[tleft],
-			SF_NYPTS(sf))
+		    p_val = SF_NYCOEFF(sf)
+		    call aaddkp (Memp[tleft], p_val, Memp[tleft], SF_NYPTS(sf))
 		}
 
 		ybzptr = ybzptr + SF_NYPTS(sf)

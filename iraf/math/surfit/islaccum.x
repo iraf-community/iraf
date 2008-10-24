@@ -18,19 +18,21 @@ procedure islaccum (sf, cols, lineno, z, w, ncols, wtflag)
 
 pointer	sf		# pointer to surface descriptor
 int	cols[ncols]	# column values
-int	lineno		# lineno of data being accumulated
+long	lineno		# lineno of data being accumulated
 real	z[ncols]	# surface values on lineno at cols
 real	w[ncols]	# weight of the data points
-int	ncols		# number of data points
+size_t	ncols		# number of data points
 int	wtflag		# type of weighting desired
 
-int	i, ii, j, k
+int	i, k
+long	j, ii
 pointer	xbzptr, xbptr
 pointer	xlzptr
 pointer	xmzptr, xmindex
 pointer	xczptr, xcindex
 pointer	bw, rows, left
 pointer sp
+pointer	p_val
 
 begin
 	# count the number of points
@@ -49,8 +51,8 @@ begin
 	# set up temporary storage
 	call smark (sp)
 	call salloc (bw, ncols, TY_REAL)
-	call salloc (left, ncols, TY_INT)
-	call salloc (rows, ncols, TY_INT)
+	call salloc (left, ncols, TY_POINTER)
+	call salloc (rows, ncols, TY_POINTER)
 
 	# set up the pointers
 	xbzptr = SF_XBASIS(sf) - 1
@@ -85,22 +87,24 @@ begin
 
 	    xlzptr = SF_XLEFT(sf) - 1
 	    do j = 1, ncols
-	        Memi[left+j-1] = XLEFT(xlzptr+cols[j])
-	    call amulki (Memi[left], SF_XORDER(sf), Memi[rows], ncols)
-	    call aaddki (Memi[rows], SF_XMATRIX(sf), Memi[rows], ncols)
-	    call aaddki (Memi[left], xczptr, Memi[left], ncols) 
+	        Memp[left+j-1] = XLEFT(xlzptr+cols[j])
+	    p_val = SF_XORDER(sf)
+	    call amulkp (Memp[left], p_val, Memp[rows], ncols)
+	    p_val = SF_XMATRIX(sf)
+	    call aaddkp (Memp[rows], p_val, Memp[rows], ncols)
+	    call aaddkp (Memp[left], xczptr, Memp[left], ncols) 
 
 	    do i = 1, SF_XORDER(sf) {
 		do j = 1, ncols {
 		    Memr[bw+j-1] = w[j] * XBASIS(xbzptr+cols[j])
-		    xcindex = Memi[left+j-1] + i
+		    xcindex = Memp[left+j-1] + i
 		    XCOEFF(xcindex) = XCOEFF(xcindex) + Memr[bw+j-1] * z[j]
 		}
 		xbptr = xbzptr
 		ii = 0
 		do k = i, SF_XORDER(sf) {
 		    do j = 1, ncols {
-			xmindex = Memi[rows+j-1] + ii
+			xmindex = Memp[rows+j-1] + ii
 			XMATRIX(xmindex) = XMATRIX(xmindex) + Memr[bw+j-1] *
 			    XBASIS(xbptr+cols[j])
 		    }
@@ -108,7 +112,8 @@ begin
 		    xbptr = xbptr + SF_NCOLS(sf)
 		}
 		xbzptr = xbzptr + SF_NCOLS(sf)
-		call aaddki (Memi[rows], SF_XORDER(sf), Memi[rows], ncols)
+		p_val = SF_XORDER(sf)
+		call aaddkp (Memp[rows], p_val, Memp[rows], ncols)
 	    }
 	}
 

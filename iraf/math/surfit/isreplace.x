@@ -19,11 +19,15 @@ pointer	sf		# surface descriptor
 real	fit[ARB]	# array containing the surface parameters and
 			# coefficients
 
-int	surface_type, xorder, yorder, ncols, nlines
+size_t	sz_val
+int	surface_type, xorder, yorder
+size_t	ncols, nlines
+long	nint_rl()
 
 begin
 	# allocate space for the surface descriptor
-	call calloc (sf, LEN_SFSTRUCT, TY_STRUCT)
+	sz_val = LEN_SFSTRUCT
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	xorder = nint (SF_SAVEXORDER(fit))
 	if (xorder < 1)
@@ -32,10 +36,10 @@ begin
 	if (yorder < 1)
 	    call error (0, "SFRESTORE: Illegal y order.")
 
-	ncols = nint (SF_SAVENCOLS(fit))
+	ncols = nint_rl (SF_SAVENCOLS(fit))
 	if (ncols < 1)
 	    call error (0, "SFRESTORE: Illegal x range.")
-	nlines = nint (SF_SAVENLINES(fit))
+	nlines = nint_rl (SF_SAVENLINES(fit))
 	if (nlines < 1)
 	    call error (0, "SFRESTORE: Illegal y range.")
 
@@ -106,9 +110,10 @@ begin
 	SF_WZ(sf) = NULL
 	SF_TLEFT(sf) = NULL
 
-	call calloc (SF_COEFF(sf), SF_NXCOEFF(sf) * SF_NYCOEFF(sf), MEM_TYPE)
+	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
+	call calloc (SF_COEFF(sf), sz_val, MEM_TYPE)
 
 	# restore coefficient array
-	call amovr (fit[SF_SAVECOEFF+1], COEFF(SF_COEFF(sf)), SF_NYCOEFF(sf) *
-	    SF_NXCOEFF(sf))
+	sz_val = SF_NYCOEFF(sf) * SF_NXCOEFF(sf)
+	call amovr (fit[SF_SAVECOEFF+1], COEFF(SF_COEFF(sf)), sz_val)
 end

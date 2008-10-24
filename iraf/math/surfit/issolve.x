@@ -22,11 +22,13 @@ include "surfitdef.h"
 procedure issolve (sf, lines, nlines, ier)
 
 pointer	sf		# pointer to the curve descriptor structure
-int	lines[ARB]	# line numbers included in the fit
-int	nlines		# number of lines fit
+long	lines[ARB]	# line numbers included in the fit
+size_t	nlines		# number of lines fit
 int	ier		# error code
 
-int	i, ii, j, k, nxcoeff
+size_t	sz_val
+int	i, k, nxcoeff
+long	ii, j
 pointer	ybzptr, ybptr
 pointer	ylzptr
 pointer	ymzptr, ymindex
@@ -34,6 +36,7 @@ pointer	xczptr, xcptr, xcindex
 pointer	czptr, cptr
 pointer	left, tleft, rows
 pointer	sp
+pointer	p_val
 
 begin
 	# define pointers
@@ -43,8 +46,10 @@ begin
 	czptr = SF_COEFF(sf) - 1
 
 	# zero out coefficient matrix and the y coefficient matrix
-	call aclrr (YMATRIX(SF_YMATRIX(sf)), SF_YORDER(sf) * SF_NYCOEFF(sf))
-	call aclrr (COEFF(SF_COEFF(sf)), SF_NXCOEFF(sf) * SF_NYCOEFF(sf))
+	sz_val = SF_YORDER(sf) * SF_NYCOEFF(sf)
+	call aclrr (YMATRIX(SF_YMATRIX(sf)), sz_val)
+	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
+	call aclrr (COEFF(SF_COEFF(sf)), sz_val)
 
 	# increment the number of points
 	SF_NYPTS(sf) =  nlines
@@ -87,37 +92,40 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 
 	    call smark (sp)
-	    call salloc (left, nlines, TY_INT)
-	    call salloc (tleft, nlines, TY_INT)
-	    call salloc (rows, nlines, TY_INT)
+	    call salloc (left, nlines, TY_POINTER)
+	    call salloc (tleft, nlines, TY_POINTER)
+	    call salloc (rows, nlines, TY_POINTER)
 
 	    ylzptr = SF_YLEFT(sf) - 1
 	    do j = 1, nlines
-		Memi[left+j-1] = YLEFT(ylzptr+lines[j])
-	    call amulki (Memi[left], SF_YORDER(sf), Memi[rows], nlines)
-	    call aaddki (Memi[rows], SF_YMATRIX(sf), Memi[rows], nlines)
-	    call aaddki (Memi[left], czptr, Memi[left], nlines)
+		Memp[left+j-1] = YLEFT(ylzptr+lines[j])
+	    p_val = SF_YORDER(sf)
+	    call amulkp (Memp[left], p_val, Memp[rows], nlines)
+	    p_val = SF_YMATRIX(sf)
+	    call aaddkp (Memp[rows], p_val, Memp[rows], nlines)
+	    call aaddkp (Memp[left], czptr, Memp[left], nlines)
 
 	    # accumulate the y value in the y matrix 
 	    nxcoeff = SF_NXCOEFF(sf)
 	    do i = 1, SF_YORDER(sf) {
-		call aaddki (Memi[left], i, Memi[tleft], nlines)
+		p_val = i
+		call aaddkp (Memp[left], p_val, Memp[tleft], nlines)
 		do k = 1, nxcoeff {
 		    xcptr = xczptr + k
 		    do j = 1, nlines {
-			cptr = Memi[tleft+j-1]
+			cptr = Memp[tleft+j-1]
 			xcindex = xcptr + lines[j] * SF_NXCOEFF(sf)
 		        COEFF(cptr) = COEFF(cptr) + YBASIS(ybzptr+lines[j]) *
 			    XCOEFF(xcindex)
 		    }
-		    call aaddki (Memi[tleft], SF_NYCOEFF(sf), Memi[tleft],
-		        nlines)
+		    p_val = SF_NYCOEFF(sf)
+		    call aaddkp (Memp[tleft], p_val, Memp[tleft], nlines)
 		}
 		ii = 0
 		ybptr = ybzptr
 		do k = i, SF_YORDER(sf) {
 		    do j = 1, nlines {  
-		        ymindex = Memi[rows+j-1] + ii
+		        ymindex = Memp[rows+j-1] + ii
 		        YMATRIX(ymindex) = YMATRIX(ymindex) +
 				     YBASIS(ybzptr+lines[j]) *
 				     YBASIS(ybptr+lines[j])
@@ -127,7 +135,8 @@ begin
 		}
 
 		ybzptr = ybzptr + SF_NLINES(sf)
-		call aaddki (Memi[rows], SF_YORDER(sf), Memi[rows], nlines)
+		p_val = SF_YORDER(sf)
+		call aaddkp (Memp[rows], p_val, Memp[rows], nlines)
 	    }
 
 	    call sfree (sp)

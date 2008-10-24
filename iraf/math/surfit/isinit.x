@@ -14,17 +14,19 @@ int	xorder		# x order of surface to be fit, or in the case of the
 int	yorder		# y order of surface to be fit, or in the case of the
 			# spline the number of polynomial pieces in y to be fit
 int	xterms		# cross terms for polynomials?
-int	ncols		# number of columns in the surface
-int	nlines		# number of lines in the surface
+size_t	ncols		# number of columns in the surface
+size_t	nlines		# number of lines in the surface
 
-int	i
+size_t	sz_val
+long	i
 pointer	x, y
 pointer	sp
 errchk	malloc, calloc
 
 begin
 	# allocate space for the surface descriptor
-	call malloc (sf, LEN_SFSTRUCT, TY_STRUCT)
+	sz_val = LEN_SFSTRUCT
+	call malloc (sf, sz_val, TY_STRUCT)
 
 	if (xorder < 1 || yorder < 1)
 	    call error (0, "SFLINIT: Illegal order.")
@@ -90,19 +92,25 @@ begin
 	SF_NCOLS(sf) = ncols
 
 	# allocate space for the matrix and vectors
-	call calloc (SF_XBASIS(sf), SF_XORDER(sf) * SF_NCOLS(sf),
-		    MEM_TYPE)
-	call calloc (SF_YBASIS(sf), SF_YORDER(sf) * SF_NLINES(sf),
-		    MEM_TYPE)
-	call calloc (SF_XMATRIX(sf), SF_XORDER(sf) * SF_NXCOEFF(sf), MEM_TYPE)
-	call calloc (SF_XCOEFF(sf), SF_NLINES(sf) * SF_NXCOEFF(sf), MEM_TYPE)
-	call calloc (SF_YMATRIX(sf), SF_YORDER(sf) * SF_NYCOEFF(sf), MEM_TYPE)
-	call calloc (SF_COEFF(sf), SF_NXCOEFF(sf) * SF_NYCOEFF(sf), MEM_TYPE)
+	sz_val = SF_XORDER(sf) * SF_NCOLS(sf)
+	call calloc (SF_XBASIS(sf), sz_val, MEM_TYPE)
+	sz_val = SF_YORDER(sf) * SF_NLINES(sf)
+	call calloc (SF_YBASIS(sf), sz_val, MEM_TYPE)
+	sz_val = SF_XORDER(sf) * SF_NXCOEFF(sf)
+	call calloc (SF_XMATRIX(sf), sz_val, MEM_TYPE)
+	sz_val = SF_NLINES(sf) * SF_NXCOEFF(sf)
+	call calloc (SF_XCOEFF(sf), sz_val, MEM_TYPE)
+	sz_val = SF_YORDER(sf) * SF_NYCOEFF(sf)
+	call calloc (SF_YMATRIX(sf), sz_val, MEM_TYPE)
+	sz_val = SF_NXCOEFF(sf) * SF_NYCOEFF(sf)
+	call calloc (SF_COEFF(sf), sz_val, MEM_TYPE)
 
 	# allocate temporary space
 	call smark (sp)
-	call salloc (x, SF_NCOLS(sf), MEM_TYPE)
-	call salloc (y, SF_NLINES(sf), MEM_TYPE)
+	sz_val = SF_NCOLS(sf)
+	call salloc (x, sz_val, MEM_TYPE)
+	sz_val = SF_NLINES(sf)
+	call salloc (y, sz_val, MEM_TYPE)
 
 	# calculate all possible x basis functions and store
 	do i = 1, SF_NCOLS(sf)
@@ -120,13 +128,15 @@ begin
 		SF_XRANGE(sf), XBASIS(SF_XBASIS(sf)))
 
 	case SF_SPLINE3:
-	    call calloc (SF_XLEFT(sf), SF_NCOLS(sf), TY_INT)
+	    sz_val = SF_NCOLS(sf)
+	    call calloc (SF_XLEFT(sf), sz_val, TY_POINTER)
 	    call sf_bspline3 (Memr[x], SF_NCOLS(sf), SF_NXPIECES(sf),
 	        -SF_XMIN(sf), SF_XSPACING(sf), XBASIS(SF_XBASIS(sf)),
 	        XLEFT(SF_XLEFT(sf)))
 
 	case SF_SPLINE1:
-	    call calloc (SF_XLEFT(sf), SF_NCOLS(sf), TY_INT)
+	    sz_val = SF_NCOLS(sf)
+	    call calloc (SF_XLEFT(sf), sz_val, TY_POINTER)
 	    call sf_bspline1 (Memr[x], SF_NCOLS(sf), SF_NXPIECES(sf),
 	        -SF_XMIN(sf), SF_XSPACING(sf), XBASIS(SF_XBASIS(sf)),
 	        XLEFT(SF_XLEFT(sf)))
@@ -148,13 +158,15 @@ begin
 	        SF_YMAXMIN(sf), SF_YRANGE(sf), YBASIS(SF_YBASIS(sf)))
 
 	case SF_SPLINE3:
-	    call calloc (SF_YLEFT(sf), SF_NLINES(sf), TY_INT)
+	    sz_val = SF_NLINES(sf)
+	    call calloc (SF_YLEFT(sf), sz_val, TY_POINTER)
 	    call sf_bspline3 (Memr[y], SF_NLINES(sf), SF_NYPIECES(sf),
 	        -SF_YMIN(sf), SF_YSPACING(sf), YBASIS(SF_YBASIS(sf)),
 	        YLEFT(SF_YLEFT(sf)))
 
 	case SF_SPLINE1:
-	    call calloc (SF_YLEFT(sf), SF_NLINES(sf), TY_INT)
+	    sz_val = SF_NLINES(sf)
+	    call calloc (SF_YLEFT(sf), sz_val, TY_POINTER)
 	    call sf_bspline1 (Memr[y], SF_NLINES(sf), SF_NYPIECES(sf),
 	        -SF_YMIN(sf), SF_YSPACING(sf), YBASIS(SF_YBASIS(sf)),
 	        YLEFT(SF_YLEFT(sf)))

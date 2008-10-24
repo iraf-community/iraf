@@ -6,12 +6,13 @@
 procedure sf_bcheb (x, npts, order, k1, k2, basis)
 
 real	x[npts]		# array of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, order = 1, constant
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
 
-int	k, bptr
+int	k
+long	bptr
 
 begin
 	bptr = 1
@@ -39,12 +40,13 @@ end
 procedure sf_bleg (x, npts, order, k1, k2, basis)
 
 real	x[npts]		# number of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	order		# order of polynomial, 1 is a constant
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# array of basis functions
 
-int	k, bptr
+int	k
+long	bptr
 real	ri, ri1, ri2
 
 begin
@@ -76,18 +78,20 @@ end
 procedure sf_bspline1 (x, npts, npieces, k1, k2, basis, left)
 
 real	x[npts]		# set of data points
-int	npts		# number of points
+size_t	npts		# number of points
 int	npieces		# number of polynomial pieces minus 1
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# basis functions
-int	left[ARB]	# indices of the appropriate spline functions
+pointer	left[ARB]	# indices of the appropriate spline functions
 
-int	k
+long	k
+pointer	p_val
 
 begin
 	call altar (x, basis[1+npts], npts, k1, k2)
-	call achtri (basis[1+npts], left, npts)
-	call aminki (left, npieces, left, npts)
+	call achtrp (basis[1+npts], left, npts)
+	p_val = npieces
+	call aminkp (left, p_val, left, npts)
 
 	do k = 1, npts {
 	    basis[npts+k] = basis[npts+k] - left[k]
@@ -102,14 +106,15 @@ end
 procedure sf_bspline3 (x, npts, npieces, k1, k2, basis, left)
 
 real	x[npts]		# array of data points
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	npieces		# number of polynomial pieces minus 1
 real	k1, k2		# normalizing constants
 real	basis[ARB]	# array of basis functions
-int	left[ARB]	# array of indices for first non-zero spline
+pointer	left[ARB]	# array of indices for first non-zero spline
 
-int	i
+long	i
 pointer	sp, sx, tx
+pointer	p_val
 
 begin
 	# allocate space
@@ -119,8 +124,9 @@ begin
 
 	# calculate the index of the first non-zero coeff
 	call altar (x, Memr[sx], npts, k1, k2)
-	call achtri (Memr[sx], left, npts)
-	call aminki (left, npieces, left, npts)
+	call achtrp (Memr[sx], left, npts)
+	p_val = npieces
+	call aminkp (left, p_val, left, npts)
 
 	# normalize x to 0 to 1
 	do i = 1, npts {

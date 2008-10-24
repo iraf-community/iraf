@@ -19,20 +19,23 @@ procedure islfit (sf, cols, lineno, z, w, ncols, wtflag, ier)
 
 pointer	sf		# pointer to the surface descriptor
 int	cols[ncols]	# array of columns
-int	lineno    	# lineno
+long	lineno    	# lineno
 real	z[ncols]	# the surface values
 real	w[ncols]	# array of weights
-int	ncols		# the number of columns
+size_t	ncols		# the number of columns
 int	wtflag		# type of weighting
 int	ier		# error codes
 
-int	i, ii, j, k
+size_t	sz_val
+int	i, k
+long	j, ii
 pointer	xbzptr, xbptr
 pointer	xmzptr, xmindex
 pointer	xczptr, xcindex
 pointer	xlzptr
 pointer	left, rows, bw
 pointer	sp
+pointer	p_val
 real	adotr()
 
 begin
@@ -42,14 +45,16 @@ begin
 	xczptr = SF_XCOEFF(sf) + (lineno - 1) * SF_NXCOEFF(sf) - 1
 
 	# zero the accumulators
-	call aclrr (XMATRIX(SF_XMATRIX(sf)), SF_NXCOEFF(sf) * SF_XORDER(sf))
-	call aclrr (XCOEFF(xczptr + 1), SF_NXCOEFF(sf))
+	sz_val = SF_NXCOEFF(sf) * SF_XORDER(sf)
+	call aclrr (XMATRIX(SF_XMATRIX(sf)), sz_val)
+	sz_val = SF_NXCOEFF(sf)
+	call aclrr (XCOEFF(xczptr + 1), sz_val)
 
 	# free space used by previous islrefit calls
 	if (SF_WZ(sf) != NULL)
 	    call mfree (SF_WZ(sf), MEM_TYPE)
 	if (SF_TLEFT(sf) != NULL)
-	    call mfree (SF_TLEFT(sf), TY_INT)
+	    call mfree (SF_TLEFT(sf), TY_POINTER)
 
 	# reset number of points
 	SF_NXPTS(sf) = ncols
@@ -96,19 +101,21 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 	    xlzptr = SF_XLEFT(sf) - 1
 
-	    call salloc (left, ncols, TY_INT)
-	    call salloc (rows, ncols, TY_INT)
+	    call salloc (left, ncols, TY_POINTER)
+	    call salloc (rows, ncols, TY_POINTER)
 
 	    do j = 1, ncols
-		Memi[left+j-1] = XLEFT(xlzptr+cols[j])
-	    call amulki (Memi[left], SF_XORDER(sf), Memi[rows], ncols)
-	    call aaddki (Memi[rows], SF_XMATRIX(sf), Memi[rows], ncols)
-	    call aaddki (Memi[left], xczptr, Memi[left], ncols)
+		Memp[left+j-1] = XLEFT(xlzptr+cols[j])
+	    p_val = SF_XORDER(sf)
+	    call amulkp (Memp[left], p_val, Memp[rows], ncols)
+	    p_val = SF_XMATRIX(sf)
+	    call aaddkp (Memp[rows], p_val, Memp[rows], ncols)
+	    call aaddkp (Memp[left], xczptr, Memp[left], ncols)
 
 	    do i = 1, SF_XORDER(sf) {
 		do j = 1, ncols {
 		    Memr[bw+j-1] = w[j] * XBASIS(xbzptr+cols[j])
-		    xcindex = Memi[left+j-1] + i
+		    xcindex = Memp[left+j-1] + i
 		    XCOEFF(xcindex) = XCOEFF(xcindex) + Memr[bw+j-1] * z[j]
 		}
 
@@ -116,7 +123,7 @@ begin
 		ii = 0
 		do k = i, SF_XORDER(sf) {
 		    do j = 1, ncols {
-			xmindex = Memi[rows+j-1] + ii
+			xmindex = Memp[rows+j-1] + ii
 			XMATRIX(xmindex) = XMATRIX(xmindex) + Memr[bw+j-1] *
 			    XBASIS(xbptr+cols[j])
 		    }
@@ -125,7 +132,8 @@ begin
 		}
 
 		xbzptr = xbzptr + SF_NCOLS(sf)
-		call aaddki (Memi[rows], SF_XORDER(sf), Memi[rows], ncols)
+		p_val = SF_XORDER(sf)
+		call aaddkp (Memp[rows], p_val, Memp[rows], ncols)
 	    }
 	}
 

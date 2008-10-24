@@ -6,23 +6,23 @@ define	SF_TYPE		Memi[P2I($1)]	# Type of curve to be fitted
 define	SF_NXCOEFF	Memi[P2I($1+1)]	# Number of coefficients
 define	SF_XORDER	Memi[P2I($1+2)]	# Order of the fit in x
 define	SF_NXPIECES	Memi[P2I($1+3)]	# Number of x polynomial pieces - 1
-define	SF_NCOLS	Memi[P2I($1+4)]	# Maximum x value
-define	SF_NXPTS	Memi[P2I($1+5)]	# Number of points in x
+define	SF_NCOLS	Memz[P2Z($1+4)]	# Maximum x value
+define	SF_NXPTS	Memz[P2Z($1+5)]	# Number of points in x
 define	SF_NYCOEFF	Memi[P2I($1+6)]	# Number of y coefficients
 define	SF_YORDER	Memi[P2I($1+7)]	# Order of the fit in y
 define	SF_NYPIECES	Memi[P2I($1+8)]	# Number of y polynomial pieces - 1
-define	SF_NLINES	Memi[P2I($1+9)]	# Minimum x value
-define	SF_NYPTS	Memi[P2I($1+10)]	# Number of y points
+define	SF_NLINES	Memz[P2Z($1+9)]	# Minimum x value
+define	SF_NYPTS	Memz[P2Z($1+10)]	# Number of y points
 define	SF_XTERMS	Memi[P2I($1+11)]	# cross terms?
 
-define	SF_XBASIS	Memi[P2I($1+12)]	# Pointer to the x basis functions
-define	SF_XLEFT	Memi[P2I($1+13)]	# Indices to x basis functions, spline
-define	SF_YBASIS	Memi[P2I($1+14)]	# Pointer to the y basis functions
-define	SF_YLEFT	Memi[P2I($1+15)]	# Indices to y basis functions, spline
-define	SF_XMATRIX	Memi[P2I($1+16)]	# Pointer to x data matrix
-define	SF_YMATRIX	Memi[P2I($1+17)]	# Pointer to y data matrix
-define	SF_XCOEFF	Memi[P2I($1+18)]	# X coefficient matrix
-define	SF_COEFF	Memi[P2I($1+19)]	# Pointer to coefficient vector
+define	SF_XBASIS	Memp[$1+12]	# Pointer to the x basis functions
+define	SF_XLEFT	Memp[$1+13]	# Indices to x basis functions, spline
+define	SF_YBASIS	Memp[$1+14]	# Pointer to the y basis functions
+define	SF_YLEFT	Memp[$1+15]	# Indices to y basis functions, spline
+define	SF_XMATRIX	Memp[$1+16]	# Pointer to x data matrix
+define	SF_YMATRIX	Memp[$1+17]	# Pointer to y data matrix
+define	SF_XCOEFF	Memp[$1+18]	# X coefficient matrix
+define	SF_COEFF	Memp[$1+19]	# Pointer to coefficient vector
 
 define	SF_XMIN		Memr[P2R($1+20)]	# Min x value
 define	SF_XMAX		Memr[P2R($1+21)]	# Max x value
@@ -35,8 +35,8 @@ define	SF_YRANGE	Memr[P2R($1+27)]	# 2. / (ymax - ymin), polynomials
 define	SF_YMAXMIN	Memr[P2R($1+28)]	# - (ymax + ymin) / 2., polynomials
 define	SF_YSPACING	Memr[P2R($1+29)]	# order / (ymax - ymin), splines
 
-define	SF_WZ		Memi[P2I($1+30)]
-define	SF_TLEFT	Memi[P2I($1+31)]
+define	SF_WZ		Memp[$1+30]
+define	SF_TLEFT	Memp[$1+31]
 
 # matrix and vector element definitions
 
@@ -49,8 +49,8 @@ define	XCHOFAC		Memr[$1]	#
 define	YMATRIX		Memr[$1]	#
 define	XCOEFF		Memr[$1]	#
 define	COEFF		Memr[$1]	#
-define	XLEFT		Memi[$1]	#
-define	YLEFT		Memi[$1]	#
+define	XLEFT		Memp[$1]	#
+define	YLEFT		Memp[$1]	#
 
 # structure definitions for the save restore functions
 

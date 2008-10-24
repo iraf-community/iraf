@@ -16,11 +16,12 @@ procedure islrefit (sf, cols, lineno, z, w)
 
 pointer	sf		# pointer to surface descriptor
 int	cols[ARB]	# columns to be fit 
-int	lineno		# line number
+long	lineno		# line number
 real	z[ARB]		# surface values
 real	w[ARB]		# weight values
 
-int	i, j
+size_t	sz_val
+long	i, j
 pointer	xbzptr, xczptr, xcindex, xlzptr
 
 begin
@@ -30,7 +31,8 @@ begin
 	xlzptr = SF_XLEFT(sf) - 1
 
 	# reset lineno-th row of the x coefficient matrix
-	call aclrr (XCOEFF(xczptr+1), SF_NXCOEFF(sf))
+	sz_val = SF_NXCOEFF(sf)
+	call aclrr (XCOEFF(xczptr+1), sz_val)
 
 	if (SF_WZ(sf) == NULL)
 	    call malloc (SF_WZ(sf), SF_NXPTS(sf), MEM_TYPE)
@@ -52,14 +54,14 @@ begin
 	case SF_SPLINE3, SF_SPLINE1:
 
 	    if (SF_TLEFT(sf) == NULL)
-	        call malloc (SF_TLEFT(sf), SF_NXPTS(sf), TY_INT)
+	        call malloc (SF_TLEFT(sf), SF_NXPTS(sf), TY_POINTER)
 
 	    do i = 1, SF_NXPTS(sf)
-		Memi[SF_TLEFT(sf)+i-1] = XLEFT(xlzptr+cols[i]) + xczptr
+		Memp[SF_TLEFT(sf)+i-1] = XLEFT(xlzptr+cols[i]) + xczptr
 
 	    do i = 1, SF_XORDER(sf) {
 		do j = 1, SF_NXPTS(sf) {
-		    xcindex = Memi[SF_TLEFT(sf)+j-1] + i
+		    xcindex = Memp[SF_TLEFT(sf)+j-1] + i
 		    XCOEFF(xcindex) = XCOEFF(xcindex) + Memr[SF_WZ(sf)+j-1] *
 			XBASIS(xbzptr+cols[j])
 		}

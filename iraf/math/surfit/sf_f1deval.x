@@ -8,7 +8,7 @@ procedure cv_evcheb (coeff, x, yfit, npts, order, k1, k2)
 real	coeff[ARB]		# EV array of coefficients
 real	x[npts]			# x values of points to be evaluated
 real	yfit[npts]		# the fitted points
-int	npts			# number of points to be evaluated
+size_t	npts			# number of points to be evaluated
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
@@ -67,7 +67,7 @@ procedure cv_evleg (coeff, x, yfit, npts, order, k1, k2)
 real	coeff[ARB]		# EV array of coefficients
 real	x[npts]			# x values of points to be evaluated
 real	yfit[npts]		# the fitted points
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	order			# order of the polynomial, 1 = constant
 real	k1, k2			# normalizing constants
 
@@ -128,11 +128,11 @@ procedure cv_evspline1 (coeff, x, yfit, npts, npieces, k1, k2)
 real	coeff[ARB]		# array of coefficients
 real	x[npts]			# array of x values
 real	yfit[npts]		# array of fitted values
-int	npts			# number of data points
+size_t	npts			# number of data points
 int	npieces			# number of fitted points minus 1
 real	k1, k2			# normalizing constants
 
-int	j
+long	j
 pointer sx, tx, index
 pointer	sp
 
@@ -175,11 +175,12 @@ procedure cv_evspline3 (coeff, x, yfit, npts, npieces, k1, k2)
 real	coeff[ARB]	# array of coeffcients
 real	x[npts]		# array of x values
 real	yfit[npts]	# array of fitted values
-int	npts		# number of data points
+size_t	npts		# number of data points
 int	npieces		# number of polynomial pieces
 real	k1, k2		# normalizing constants
 
-int	i, j
+int	i
+long	j
 pointer	sx, tx, temp, index, sp
 
 begin
