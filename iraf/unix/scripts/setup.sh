@@ -559,7 +559,7 @@ EOF
   if [ ! $S = 0 ]; then
     exit $S
   fi
-  if [ "$DESTDIR" != "" -o "$USER" = "root" ]; then
+  if [ $UID = 0 ]; then
     ( cd $DESTDIR/dev
       echo "Creating /dev/imtli"
       rm -f imtli ; mknod -m 777 imtli p
@@ -581,10 +581,14 @@ EOF
   #
   cat iraf/unix/scripts/mkiraf.sh | \
       sed -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/mkiraf
-  chmod 755 $DESTDIR/$BINDIR/mkiraf
   cat iraf/unix/scripts/cl.sh | \
       sed -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/cl
+  chmod 755 $DESTDIR/$BINDIR/mkiraf
   chmod 755 $DESTDIR/$BINDIR/cl
+  if [ $UID = 0 ]; then
+    chown root:root $DESTDIR/$BINDIR/mkiraf
+    chown root:root $DESTDIR/$BINDIR/cl
+  fi
   for i in sgidispatch ; do
     F=$DESTDIR/$BINDIR/$i
     echo '#!/bin/sh' > $F
@@ -592,10 +596,16 @@ EOF
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
+    if [ $UID = 0 ]; then
+      chown root:root $F
+    fi
   done
   #
-  if [ "$USER" = "root" ]; then
-    chown -R root:root $DESTDIR/*
+  if [ $UID = 0 ]; then
+    chown -R root:root $DESTDIR/$PREFIX/iraf/iraf
+    chown root:root $DESTDIR/$PREFIX/iraf/COPYRIGHTS
+    chown root:root $DESTDIR/$PREFIX/iraf/imdirs
+    chown root:root $DESTDIR/$PREFIX/iraf
     S=$?
     if [ ! $S = 0 ]; then
       exit $S
@@ -656,10 +666,16 @@ EOF
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
+    if [ $UID = 0 ]; then
+      chown root:root $F
+    fi
   done
   #
-  if [ "$USER" = "root" ]; then
-    chown -R root:root $DESTDIR/*
+  if [ $UID = 0 ]; then
+    chown -R root:root $DESTDIR/$PREFIX/iraf/iraf
+    chown root:root $DESTDIR/$PREFIX/iraf/COPYRIGHTS
+    chown root:root $DESTDIR/$PREFIX/iraf/imdirs
+    chown root:root $DESTDIR/$PREFIX/iraf
     S=$?
     if [ ! $S = 0 ]; then
       exit $S
