@@ -12,7 +12,8 @@ char	outstr[maxch]			# String to receive the ranges
 int	maxch				# Maximum length of the string
 
 char	tmpstr[SZ_LINE]
-int	i, outlen
+long	i
+int	outlen
 
 int	strlen()
 
@@ -26,11 +27,11 @@ begin
 	do i = 1, RG_NRGS(rg) {
 	    if (RG_X1(rg, i) != RG_X2(rg, i)) {
 		call sprintf (tmpstr, maxch, "%d:%d,")
-		    call pargi (RG_X1(rg, i))
-		    call pargi (RG_X2(rg, i))
+		    call pargl (RG_X1(rg, i))
+		    call pargl (RG_X2(rg, i))
 	    } else {
 		call sprintf (tmpstr, maxch, "%d,")
-		    call pargi (RG_X1(rg, i))
+		    call pargl (RG_X1(rg, i))
 	    }
 
 	    outlen = outlen + strlen (tmpstr)

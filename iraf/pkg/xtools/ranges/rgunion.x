@@ -11,7 +11,8 @@ pointer	rg2				# Second set of ranges
 
 pointer	rg3				# Pointer to union
 
-int	i, j
+size_t	sz_val
+long	i, j
 
 begin
 	# Error check the range pointers.
@@ -22,7 +23,8 @@ begin
 	# Allocate the range points array.
 
 	i = RG_NRGS(rg1) + RG_NRGS(rg2)
-	call malloc (rg3, LEN_RG + 2 * max (1, i), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, i)
+	call malloc (rg3, sz_val, TY_STRUCT)
 
 	# Set the ranges.
 

@@ -14,7 +14,8 @@ pointer	rg					# Ranges
 double	packed[ARB]				# Packed array
 double	unpacked[ARB]				# Unpacked array
 
-int	i, j, x1, x2, nx
+long	i, j, x1, x2
+size_t	nx
 
 begin
 	if (rg == NULL)

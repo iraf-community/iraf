@@ -9,19 +9,19 @@ procedure rg_dump (rg)
 
 pointer	rg		# Ranges
 
-int	i
+long	i
 
 begin
 	if (rg == NULL)
 	    call printf ("RG_DUMP: The range pointer is NULL\n")
 	else {
 	    call printf ("RG_DUMP: NPTS = %d, NRGS = %d\n")
-		call pargi (RG_NPTS(rg))
-		call pargi (RG_NRGS(rg))
+		call pargz (RG_NPTS(rg))
+		call pargz (RG_NRGS(rg))
 	    do i = 1, RG_NRGS(rg) {
 		call printf ("  %4d - %4d\n")
-		    call pargi (RG_X1(rg, i))
-		    call pargi (RG_X2(rg, i))
+		    call pargl (RG_X1(rg, i))
+		    call pargl (RG_X2(rg, i))
 	    }
 	}
 	call flush (STDOUT)

@@ -11,18 +11,21 @@ define	NRGS	10		# Allocation size
 pointer procedure rg_ranges (rstr, rmin, rmax)
 
 char	rstr[ARB]		# Range string
-int	rmin			# Minimum value
-int	rmax			# Maximum value
+long	rmin			# Minimum value
+long	rmax			# Maximum value
 pointer	rg			# Range pointer
 
+size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 pointer	sp, str, ptr
 errchk	open, rg_add
 
 begin
 	call smark (sp)
-	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
-	call calloc (rg, LEN_RG, TY_STRUCT)
+	sz_val = max (strlen (rstr), SZ_LINE)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = LEN_RG
+	call calloc (rg, sz_val, TY_STRUCT)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -68,16 +71,19 @@ procedure rg_add (rg, rstr, rmin, rmax)
 
 pointer	rg			# Range descriptor
 char	rstr[ARB]		# Range string
-int	rmin			# Minimum value
-int	rmax			# Maximum value
+long	rmin			# Minimum value
+long	rmax			# Maximum value
 
-int	i, j, nrgs, strlen(), ctoi()
-int	rval1, rval2
+size_t	sz_val
+int	i, jj, strlen()
+long	rval1, rval2, j, nrgs, l_val
 pointer	sp, str, ptr
+long	absl(), modl(), ctol()
 
 begin
 	call smark (sp)
-	call salloc (str, strlen (rstr), TY_CHAR)
+	sz_val = strlen (rstr)
+	call salloc (str, sz_val, TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -108,10 +114,10 @@ begin
 		rval2 = rmax
 	    } else {
 		# Get range
-		j = 1
-		if (ctoi (Memc[str], j, rval1) == 0)
+		jj = 1
+		if (ctol (Memc[str], jj, rval1) == 0)
 		    call error (1, "Range syntax error")
-		if (ctoi (Memc[str], j, rval2) == 0)
+		if (ctol (Memc[str], jj, rval2) == 0)
 		    rval2 = rval1
 	    }
 
@@ -121,14 +127,17 @@ begin
 	    rval2 = max (j, rval2)
 	    if (rval2 >= rmin && rval1 <= rmax) {
 		nrgs = RG_NRGS(rg)
-		if (mod (nrgs, NRGS) == 0)
-		    call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
+		l_val = NRGS
+		if (modl (nrgs, l_val) == 0) {
+		    sz_val = LEN_RG+2*(nrgs+NRGS)
+		    call realloc (rg, sz_val, TY_STRUCT)
+		}
 		nrgs = nrgs + 1
 		RG_NRGS(rg) = nrgs
 		RG_X1(rg, nrgs) = max (rmin, rval1)
 		RG_X2(rg, nrgs) = min (rmax, rval2)
 		RG_NPTS(rg) = RG_NPTS(rg) +
-		    abs (RG_X1(rg, nrgs) - RG_X2(rg, nrgs)) + 1
+		    absl (RG_X1(rg, nrgs) - RG_X2(rg, nrgs)) + 1
 	    }
 	}
 

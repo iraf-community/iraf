@@ -8,10 +8,11 @@ procedure rg_indices (rg, indices, npts, type)
 
 pointer	rg				# Ranges
 pointer	indices				# Indices
-int	npts				# Number of indices
+size_t	npts				# Number of indices
 int	type				# Data type of points
 
-int	i, j, k, step
+long	i, j, step
+pointer	k
 
 begin
 	# Error check the range pointer.

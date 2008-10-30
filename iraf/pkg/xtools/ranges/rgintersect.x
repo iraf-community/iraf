@@ -11,7 +11,8 @@ pointer	rg2				# Second set of ranges
 
 pointer	rg3				# Pointer to intersection
 
-int	i, j, k
+size_t	sz_val
+long	i, j, k
 
 begin
 	# Error check the range pointers.
@@ -22,7 +23,8 @@ begin
 	# Allocate the range points array.
 
 	k = RG_NRGS(rg1) + RG_NRGS(rg2) - 1
-	call malloc (rg3, LEN_RG + 2 * max (1, k), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, k)
+	call malloc (rg3, sz_val, TY_STRUCT)
 
 	# Set the ranges.
 
@@ -47,7 +49,8 @@ begin
 	    }
 	}
 
-	call realloc (rg3, LEN_RG + 2 * max (1, k), TY_STRUCT)
+	sz_val = LEN_RG + 2 * max (1, k)
+	call realloc (rg3, sz_val, TY_STRUCT)
 
 	RG_NRGS(rg3) = k
 	RG_NPTS(rg3) = 0

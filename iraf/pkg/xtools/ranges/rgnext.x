@@ -10,9 +10,9 @@ include	<pkg/rg.h>
 int procedure rg_next (rg, number)
 
 pointer	rg			# RANGES pointer
-int	number			# Both input and output parameter
+long	number			# Both input and output parameter
 
-int	next_number, i
+long	next_number, i
 
 begin
 	next_number = number + 1

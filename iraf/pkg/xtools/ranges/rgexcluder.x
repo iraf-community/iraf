@@ -11,11 +11,12 @@ procedure rg_excluder (rg, a, nin, b, nout)
 
 pointer	rg					# Ranges
 real	a[nin]					# Input array
-int	nin					# Number of input points
+size_t	nin					# Number of input points
 real	b[ARB]					# Output array
-int	nout					# Number of output points
+size_t	nout					# Number of output points
 
-int	i, j, k, n, ntemp
+long	i, j, k
+size_t	n, ntemp
 
 begin
 	# Error check the range pointer.

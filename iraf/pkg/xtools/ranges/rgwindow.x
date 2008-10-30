@@ -7,11 +7,12 @@ include	<pkg/rg.h>
 pointer procedure rg_window (rg, rmin, rmax)
 
 pointer	rg				# Ranges
-int	rmin, rmax			# Window
+long	rmin, rmax			# Window
 
 pointer	rgout				# Pointer to windowed ranges
 
-int	i, j
+long	i, j
+long	absl()
 
 begin
 	if (rg == NULL)
@@ -37,7 +38,7 @@ begin
 	RG_NPTS(rgout) = 0
 	do i = 1, RG_NRGS(rgout)
 	    RG_NPTS(rgout) = RG_NPTS(rgout) +
-		abs (RG_X1(rgout, i) - RG_X2(rgout, i)) + 1
+		absl (RG_X1(rgout, i) - RG_X2(rgout, i)) + 1
 
 	return (rgout)
 end

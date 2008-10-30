@@ -14,7 +14,8 @@ pointer	rg					# Ranges
 PIXEL	packed[ARB]				# Packed array
 PIXEL	unpacked[ARB]				# Unpacked array
 
-int	i, j, x1, x2, nx
+long	i, j, x1, x2
+size_t	nx
 
 begin
 	if (rg == NULL)

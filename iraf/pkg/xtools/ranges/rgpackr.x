@@ -13,7 +13,8 @@ pointer	rg					# Ranges
 real	a[ARB]					# Input array
 real	b[ARB]					# Output array
 
-int	i, j, k, n
+long	i, j, k
+size_t	n
 
 begin
 	# Error check the range pointer.

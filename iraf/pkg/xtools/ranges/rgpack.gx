@@ -13,7 +13,8 @@ pointer	rg					# Ranges
 PIXEL	a[ARB]					# Input array
 PIXEL	b[ARB]					# Output array
 
-int	i, j, k, n
+long	i, j, k
+size_t	n
 
 begin
 	# Error check the range pointer.

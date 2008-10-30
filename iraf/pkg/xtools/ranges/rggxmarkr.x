@@ -10,11 +10,12 @@ procedure rg_gxmarkr (gp, rstr, x, npts, pltype)
 pointer	gp				# GIO pointer
 char	rstr[ARB]			# Range string
 real	x[npts]				# Ordinates of graph
-int	npts				# Number of data points
+size_t	npts				# Number of data points
 int	pltype				# Plot line type
 
 pointer	rg
-int	i, pltype1
+long	i
+int	pltype1
 real	xl, xr, yb, yt, dy
 real	x1, x2, y1, y2, y3
 

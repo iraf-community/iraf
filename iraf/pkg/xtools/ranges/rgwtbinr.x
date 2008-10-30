@@ -14,17 +14,19 @@ include	<pkg/rg.h>
 procedure rg_wtbinr (rg, nbin, in, wtin, nin, out, wtout, nout)
 
 pointer	rg				# Ranges
-int	nbin				# Maximum points in average or median
+long	nbin				# Maximum points in average or median
 real	in[nin]				# Input array
 real	wtin[nin]			# Input weights
-int	nin				# Number of input points
+size_t	nin				# Number of input points
 real	out[ARB]			# Output array
 real	wtout[ARB]			# Output weights
-int	nout				# Number of output points
+size_t	nout				# Number of output points
 
-int	i, j, k, l, n, npts, ntemp, nsample
+long	i, j, k, l
+size_t	n, npts, ntemp, nsample
 
 real	asumr(), amedr()
+long	absl()
 
 errchk	rg_packr
 
@@ -37,7 +39,7 @@ begin
 	# If the bin size is exactly one then move the selected input points
 	# to the output array.
 
-	if (abs (nbin) < 2) {
+	if (absl (nbin) < 2) {
 	    call rg_packr (rg, in, out)
 	    call rg_packr (rg, wtin, wtout)
 	    nout = RG_NPTS(rg)
@@ -46,7 +48,7 @@ begin
 
 	# Determine the subranges and take the median or average.
 
-	npts = abs (nbin)
+	npts = absl (nbin)
 	ntemp = 0
 
 	do i = 1, RG_NRGS(rg) {

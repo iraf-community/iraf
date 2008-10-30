@@ -7,10 +7,10 @@ include	<pkg/rg.h>
 procedure rg_inverse (rg, rmin, rmax)
 
 pointer	rg			# RANGES pointer
-int	rmin			# Minimum value of window
-int	rmax			# Maximum value of window
+long	rmin			# Minimum value of window
+long	rmax			# Maximum value of window
 
-int	i
+long	i
 pointer rgtmp
 
 pointer	rg_window()

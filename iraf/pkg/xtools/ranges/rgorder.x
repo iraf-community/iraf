@@ -8,7 +8,7 @@ procedure rg_order (rg)
 
 pointer	rg				# Ranges
 
-int	i, j, temp
+long	i, j, temp
 
 begin
 	# Error check the range pointer.

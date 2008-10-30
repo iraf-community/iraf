@@ -13,9 +13,10 @@ pointer procedure rg_xrangesd (rstr, rvals, npts)
 
 char	rstr[ARB]		# Range string
 double	rvals[npts]		# Range values (sorted)
-int	npts			# Number of range values
+size_t	npts			# Number of range values
 pointer	rg			# Range pointer
 
+size_t	sz_val
 int	i, fd, strlen(), open(), getline()
 pointer	sp, str, ptr
 errchk	open, rg_xaddd
@@ -26,8 +27,10 @@ begin
 	    call error (0, "No data points for range determination")
 
 	call smark (sp)
-	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
-	call calloc (rg, LEN_RG, TY_STRUCT)
+	sz_val = max (strlen (rstr), SZ_LINE)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = LEN_RG
+	call calloc (rg, sz_val, TY_STRUCT)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -74,15 +77,19 @@ procedure rg_xaddd (rg, rstr, rvals, npts)
 pointer	rg			# Range descriptor
 char	rstr[ARB]		# Range string
 double	rvals[npts]		# Range values (sorted)
-int	npts			# Number of range values
+size_t	npts			# Number of range values
 
-int	i, j, k, nrgs, strlen(), ctod()
+size_t	sz_val
+int	i, jj, strlen(), ctod()
+long	j, k, nrgs, l_val
 double	rval1, rval2, a1, b1, a2, b2
 pointer	sp, str, ptr
+long	modl()
 
 begin
 	call smark (sp)
-	call salloc (str, strlen (rstr), TY_CHAR)
+	sz_val = strlen (rstr)
+	call salloc (str, sz_val, TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -113,11 +120,11 @@ begin
 		rval2 = rvals[npts]
 	    } else {
 		# Get range
-		j = 1
-		if (ctod (Memc[str], j, rval1) == 0)
+		jj = 1
+		if (ctod (Memc[str], jj, rval1) == 0)
 		    call error (1, "Range syntax error")
 		rval2 = rval1
-		if (ctod (Memc[str], j, rval2) == 0)
+		if (ctod (Memc[str], jj, rval2) == 0)
 		    ;
 	    }
 
@@ -146,8 +153,11 @@ begin
 		# Add range
 		if (k <= j) {
 		    nrgs = RG_NRGS(rg)
-		    if (mod (nrgs, NRGS) == 0)
-			call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
+		    l_val = NRGS
+		    if (modl (nrgs, l_val) == 0) {
+			sz_val = LEN_RG+2*(nrgs+NRGS)
+			call realloc (rg, sz_val, TY_STRUCT)
+		    }
 		    nrgs = nrgs + 1
 		    RG_NRGS(rg) = nrgs
 		    RG_X1(rg, nrgs) = k

@@ -7,9 +7,9 @@ include	<pkg/rg.h>
 int procedure rg_inrange (rg, rval)
 
 pointer	rg				# Ranges
-int	rval				# Range value to test
+long	rval				# Range value to test
 
-int	i
+long	i
 
 begin
 	# Error check the range pointer.
