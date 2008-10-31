@@ -8,6 +8,7 @@ procedure gt_copy (gt1, gt2)
 
 pointer	gt1, gt2
 
+size_t	sz_val
 int	len, strlen()
 pointer	gt_init()
 
@@ -30,56 +31,67 @@ begin
 	    call mfree (GT_YFORMAT(gt2), TY_CHAR)
 	}
 
-	call amovi (Memi[gt1], Memi[gt2], LEN_GT)
+	sz_val = LEN_GT
+	call amovp (Memp[gt1], Memp[gt2], sz_val)
 
 	if (GT_PARAMS(gt1) != NULL) {
 	    len = strlen (Memc[GT_PARAMS(gt1)])
-	    call malloc (GT_PARAMS(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_PARAMS(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_PARAMS(gt1)], Memc[GT_PARAMS(gt2)], len)
 	}
 	if (GT_TITLE(gt1) != NULL) {
 	    len = strlen (Memc[GT_TITLE(gt1)])
-	    call malloc (GT_TITLE(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_TITLE(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_TITLE(gt1)], Memc[GT_TITLE(gt2)], len)
 	}
 	if (GT_SUBTITLE(gt1) != NULL) {
 	    len = strlen (Memc[GT_SUBTITLE(gt1)])
-	    call malloc (GT_SUBTITLE(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_SUBTITLE(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_SUBTITLE(gt1)], Memc[GT_SUBTITLE(gt2)], len)
 	}
 	if (GT_COMMENTS(gt1) != NULL) {
 	    len = strlen (Memc[GT_COMMENTS(gt1)])
-	    call malloc (GT_COMMENTS(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_COMMENTS(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_COMMENTS(gt1)], Memc[GT_COMMENTS(gt2)], len)
 	}
 	if (GT_XLABEL(gt1) != NULL) {
 	    len = strlen (Memc[GT_XLABEL(gt1)])
-	    call malloc (GT_XLABEL(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_XLABEL(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_XLABEL(gt1)], Memc[GT_XLABEL(gt2)], len)
 	}
 	if (GT_YLABEL(gt1) != NULL) {
 	    len = strlen (Memc[GT_YLABEL(gt1)])
-	    call malloc (GT_YLABEL(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_YLABEL(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_YLABEL(gt1)], Memc[GT_YLABEL(gt2)], len)
 	}
 	if (GT_XUNITS(gt1) != NULL) {
 	    len = strlen (Memc[GT_XUNITS(gt1)])
-	    call malloc (GT_XUNITS(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_XUNITS(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_XUNITS(gt1)], Memc[GT_XUNITS(gt2)], len)
 	}
 	if (GT_YUNITS(gt1) != NULL) {
 	    len = strlen (Memc[GT_YUNITS(gt1)])
-	    call malloc (GT_YUNITS(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_YUNITS(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_YUNITS(gt1)], Memc[GT_YUNITS(gt2)], len)
 	}
 	if (GT_XFORMAT(gt1) != NULL) {
 	    len = strlen (Memc[GT_XFORMAT(gt1)])
-	    call malloc (GT_XFORMAT(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_XFORMAT(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_XFORMAT(gt1)], Memc[GT_XFORMAT(gt2)], len)
 	}
 	if (GT_YFORMAT(gt1) != NULL) {
 	    len = strlen (Memc[GT_YFORMAT(gt1)])
-	    call malloc (GT_YFORMAT(gt2), len, TY_CHAR)
+	    sz_val = len
+	    call malloc (GT_YFORMAT(gt2), sz_val, TY_CHAR)
 	    call strcpy (Memc[GT_YFORMAT(gt1)], Memc[GT_YFORMAT(gt2)], len)
 	}
 end

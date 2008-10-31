@@ -518,6 +518,7 @@ pointer	gp				# GIO pointer
 pointer	gt				# GTOOLS pointer
 int	newgraph			# Update graph?
 
+size_t	sz_val
 bool	bval
 real	rval[12]
 pointer	sp, cmd
@@ -530,7 +531,8 @@ begin
 
 	# Parse the command string matched against a dictionary.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr[2])
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -568,112 +570,112 @@ begin
 	# Switch on the command and parse the arguments.
 	switch (ncmd) {
 	case TXUP:
-	    Memi[gt+GT_TXUP] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXUP)] = nint (rval[1])
 	case TXSIZE:
-	    Memr[gt+GT_TXSIZE] = rval[1]
+	    Memr[P2R(gt+GT_TXSIZE)] = rval[1]
 	case TXPATH:
-	    Memi[gt+GT_TXPATH] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXPATH)] = nint (rval[1])
 	case TXSPACING:
-	    Memr[gt+GT_TXSPACING] = rval[1]
+	    Memr[P2R(gt+GT_TXSPACING)] = rval[1]
 	case TXHJUSTIFY:
-	    Memi[gt+GT_TXHJUSTIFY] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXHJUSTIFY)] = nint (rval[1])
 	case TXVJUSTIFY:
-	    Memi[gt+GT_TXVJUSTIFY] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXVJUSTIFY)] = nint (rval[1])
 	case TXFONT:
-	    Memi[gt+GT_TXFONT] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXFONT)] = nint (rval[1])
 	case TXQUALITY:
-	    Memi[gt+GT_TXQUALITY] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXQUALITY)] = nint (rval[1])
 	case TXCOLOR:
-	    Memi[gt+GT_TXCOLOR] = nint (rval[1])
+	    Memi[P2I(gt+GT_TXCOLOR)] = nint (rval[1])
 
 	case DRAWTITLE:
-	    Memi[gt+GT_DRAWTITLE] = nint (rval[1])
+	    Memi[P2I(gt+GT_DRAWTITLE)] = nint (rval[1])
 	case TITLESIZE:
-	    Memr[gt+GT_TITLESIZE] = rval[1]
+	    Memr[P2R(gt+GT_TITLESIZE)] = rval[1]
 	case TITLEJUST:
-	    Memi[gt+GT_TITLEJUST] = nint (rval[1])
+	    Memi[P2I(gt+GT_TITLEJUST)] = nint (rval[1])
 	case NTITLELINES:
-	    Memi[gt+GT_NTITLELINES] = nint (rval[1])
+	    Memi[P2I(gt+GT_NTITLELINES)] = nint (rval[1])
 	case ASPECT:
-	    Memr[gt+GT_ASPECT] = rval[1]
+	    Memr[P2R(gt+GT_ASPECT)] = rval[1]
 	case CHARSIZE:
-	    Memr[gt+GT_CHARSIZE] = rval[1]
+	    Memr[P2R(gt+GT_CHARSIZE)] = rval[1]
 	case TITLECOLOR:
-	    Memi[gt+GT_TITLECOLOR] = nint (rval[1])
+	    Memi[P2I(gt+GT_TITLECOLOR)] = nint (rval[1])
 	case FRAMECOLOR:
-	    Memi[gt+GT_FRAMECOLOR] = nint (rval[1])
+	    Memi[P2I(gt+GT_FRAMECOLOR)] = nint (rval[1])
 
 	case DRAWAXES:
 	    if (rval[1] > 0)
-		Memi[gt+GT_XDRAWAXES] = nint (rval[1]) - 1
+		Memi[P2I(gt+GT_XDRAWAXES)] = nint (rval[1]) - 1
 	    if (rval[2] > 0)
-		Memi[gt+GT_YDRAWAXES] = nint (rval[2]) - 1
+		Memi[P2I(gt+GT_YDRAWAXES)] = nint (rval[2]) - 1
 	case SETAXISPOS:
-	    Memi[gt+GT_XSETAXISPOS] = nint (rval[1])
-	    Memi[gt+GT_YSETAXISPOS] = nint (rval[2])
+	    Memi[P2I(gt+GT_XSETAXISPOS)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YSETAXISPOS)] = nint (rval[2])
 	case AXISPOS1:
-	    Memr[gt+GT_XAXISPOS1] = rval[1]
-	    Memr[gt+GT_YAXISPOS1] = rval[2]
+	    Memr[P2R(gt+GT_XAXISPOS1)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISPOS1)] = rval[2]
 	case AXISPOS2:
-	    Memr[gt+GT_XAXISPOS2] = rval[1]
-	    Memr[gt+GT_YAXISPOS2] = rval[2]
+	    Memr[P2R(gt+GT_XAXISPOS2)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISPOS2)] = rval[2]
 	case DRAWGRID:
-	    Memi[gt+GT_XDRAWGRID] = nint (rval[1])
-	    Memi[gt+GT_YDRAWGRID] = nint (rval[2])
+	    Memi[P2I(gt+GT_XDRAWGRID)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YDRAWGRID)] = nint (rval[2])
 	case ROUND:
-	    Memi[gt+GT_XROUND] = nint (rval[1])
-	    Memi[gt+GT_YROUND] = nint (rval[2])
+	    Memi[P2I(gt+GT_XROUND)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YROUND)] = nint (rval[2])
 	case LABELAXIS:
-	    Memi[gt+GT_XLABELAXIS] = nint (rval[1])
-	    Memi[gt+GT_YLABELAXIS] = nint (rval[2])
+	    Memi[P2I(gt+GT_XLABELAXIS)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YLABELAXIS)] = nint (rval[2])
 	case AXISLABELSIZE:
-	    Memr[gt+GT_XAXISLABELSIZE] = rval[1]
-	    Memr[gt+GT_YAXISLABELSIZE] = rval[2]
+	    Memr[P2R(gt+GT_XAXISLABELSIZE)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISLABELSIZE)] = rval[2]
 	case DRAWTICKS:
-	    Memi[gt+GT_XDRAWTICKS] = nint (rval[1])
-	    Memi[gt+GT_YDRAWTICKS] = nint (rval[2])
+	    Memi[P2I(gt+GT_XDRAWTICKS)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YDRAWTICKS)] = nint (rval[2])
 	case LABELTICKS:
-	    Memi[gt+GT_XLABELTICKS] = nint (rval[1])
-	    Memi[gt+GT_YLABELTICKS] = nint (rval[2])
+	    Memi[P2I(gt+GT_XLABELTICKS)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YLABELTICKS)] = nint (rval[2])
 	case NMAJOR:
-	    Memi[gt+GT_XNMAJOR] = nint (rval[1])
-	    Memi[gt+GT_YNMAJOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XNMAJOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YNMAJOR)] = nint (rval[2])
 	case NMINOR:
-	    Memi[gt+GT_XNMINOR] = nint (rval[1])
-	    Memi[gt+GT_YNMINOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XNMINOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YNMINOR)] = nint (rval[2])
 	case MAJORLENGTH:
-	    Memr[gt+GT_XMAJORLENGTH] = rval[1]
-	    Memr[gt+GT_YMAJORLENGTH] = rval[2]
+	    Memr[P2R(gt+GT_XMAJORLENGTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMAJORLENGTH)] = rval[2]
 	case MINORLENGTH:
-	    Memr[gt+GT_XMINORLENGTH] = rval[1]
-	    Memr[gt+GT_YMINORLENGTH] = rval[2]
+	    Memr[P2R(gt+GT_XMINORLENGTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMINORLENGTH)] = rval[2]
 	case MAJORWIDTH:
-	    Memr[gt+GT_XMAJORWIDTH] = rval[1]
-	    Memr[gt+GT_YMAJORWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XMAJORWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMAJORWIDTH)] = rval[2]
 	case MINORWIDTH:
-	    Memr[gt+GT_XMINORWIDTH] = rval[1]
-	    Memr[gt+GT_YMINORWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XMINORWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMINORWIDTH)] = rval[2]
 	case AXISWIDTH:
-	    Memr[gt+GT_XAXISWIDTH] = rval[1]
-	    Memr[gt+GT_YAXISWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XAXISWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISWIDTH)] = rval[2]
 	case TICKLABELSIZE:
-	    Memr[gt+GT_XTICKLABELSIZE] = rval[1]
-	    Memr[gt+GT_YTICKLABELSIZE] = rval[2]
+	    Memr[P2R(gt+GT_XTICKLABELSIZE)] = rval[1]
+	    Memr[P2R(gt+GT_YTICKLABELSIZE)] = rval[2]
 	case GRIDCOLOR:
-	    Memi[gt+GT_XGRIDCOLOR] = nint (rval[1])
-	    Memi[gt+GT_YGRIDCOLOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XGRIDCOLOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YGRIDCOLOR)] = nint (rval[2])
 	case AXISLABELCOLOR:
-	    Memi[gt+GT_XAXISLABELCOLOR] = nint (rval[1])
-	    Memi[gt+GT_YAXISLABELCOLOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XAXISLABELCOLOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YAXISLABELCOLOR)] = nint (rval[2])
 	case AXISCOLOR:
-	    Memi[gt+GT_XAXISCOLOR] = nint (rval[1])
-	    Memi[gt+GT_YAXISCOLOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XAXISCOLOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YAXISCOLOR)] = nint (rval[2])
 	case TICKLABELCOLOR:
-	    Memi[gt+GT_XTICKLABELCOLOR] = nint (rval[1])
-	    Memi[gt+GT_YTICKLABELCOLOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XTICKLABELCOLOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YTICKLABELCOLOR)] = nint (rval[2])
 	case TICKCOLOR:
-	    Memi[gt+GT_XTICKCOLOR] = nint (rval[1])
-	    Memi[gt+GT_YTICKCOLOR] = nint (rval[2])
+	    Memi[P2I(gt+GT_XTICKCOLOR)] = nint (rval[1])
+	    Memi[P2I(gt+GT_YTICKCOLOR)] = nint (rval[2])
 
 	case AXES:
 	    call gargwrd (Memc[cmd], SZ_LINE)
@@ -687,16 +689,16 @@ begin
 	    call gargb (bval)
 	    rval[6] = btoi (bval)
 	    if (nscan() == 7) {
-		Memi[gt+GT_XDRAWAXES] = nint (rval[1])
-		Memr[gt+GT_XAXISWIDTH] = rval[2]
-		Memr[gt+GT_XMAJORWIDTH] = rval[2]
-		Memr[gt+GT_XMINORWIDTH] = rval[2]
-		Memi[gt+GT_XDRAWGRID] = nint (rval[3])
-		Memi[gt+GT_YDRAWAXES] = nint (rval[4])
-		Memr[gt+GT_YAXISWIDTH] = rval[5]
-		Memr[gt+GT_YMAJORWIDTH] = rval[5]
-		Memr[gt+GT_YMINORWIDTH] = rval[5]
-		Memi[gt+GT_YDRAWGRID] = nint (rval[6])
+		Memi[P2I(gt+GT_XDRAWAXES)] = nint (rval[1])
+		Memr[P2R(gt+GT_XAXISWIDTH)] = rval[2]
+		Memr[P2R(gt+GT_XMAJORWIDTH)] = rval[2]
+		Memr[P2R(gt+GT_XMINORWIDTH)] = rval[2]
+		Memi[P2I(gt+GT_XDRAWGRID)] = nint (rval[3])
+		Memi[P2I(gt+GT_YDRAWAXES)] = nint (rval[4])
+		Memr[P2R(gt+GT_YAXISWIDTH)] = rval[5]
+		Memr[P2R(gt+GT_YMAJORWIDTH)] = rval[5]
+		Memr[P2R(gt+GT_YMINORWIDTH)] = rval[5]
+		Memi[P2I(gt+GT_YDRAWGRID)] = nint (rval[6])
 	    }
 	case TICKS:
 	    call gargb (bval)
@@ -712,14 +714,14 @@ begin
 	    call gargr (rval[7])
 	    call gargr (rval[8])
 	    if (nscan() == 9) {
-		Memi[gt+GT_XDRAWTICKS] = nint (rval[1])
-		Memi[gt+GT_XLABELTICKS] = nint (rval[2])
-		Memi[gt+GT_XNMAJOR] = nint (rval[3])
-		Memi[gt+GT_XNMINOR] = nint (rval[4])
-		Memi[gt+GT_YDRAWTICKS] = nint (rval[5])
-		Memi[gt+GT_YLABELTICKS] = nint (rval[6])
-		Memi[gt+GT_YNMAJOR] = nint (rval[7])
-		Memi[gt+GT_YNMINOR] = nint (rval[8])
+		Memi[P2I(gt+GT_XDRAWTICKS)] = nint (rval[1])
+		Memi[P2I(gt+GT_XLABELTICKS)] = nint (rval[2])
+		Memi[P2I(gt+GT_XNMAJOR)] = nint (rval[3])
+		Memi[P2I(gt+GT_XNMINOR)] = nint (rval[4])
+		Memi[P2I(gt+GT_YDRAWTICKS)] = nint (rval[5])
+		Memi[P2I(gt+GT_YLABELTICKS)] = nint (rval[6])
+		Memi[P2I(gt+GT_YNMAJOR)] = nint (rval[7])
+		Memi[P2I(gt+GT_YNMINOR)] = nint (rval[8])
 	    }
 	case COLORS:
 	    call gargr (rval[1])
@@ -735,18 +737,18 @@ begin
 	    call gargr (rval[11])
 	    call gargr (rval[12])
 	    if (nscan() == 13) {
-		Memi[gt+GT_FRAMECOLOR] = nint (rval[1])
-		Memi[gt+GT_TITLECOLOR] = nint (rval[2])
-		Memi[gt+GT_XGRIDCOLOR] = nint (rval[3])
-		Memi[gt+GT_XAXISLABELCOLOR] = nint (rval[4])
-		Memi[gt+GT_XAXISCOLOR] = nint (rval[5])
-		Memi[gt+GT_XTICKLABELCOLOR] = nint (rval[6])
-		Memi[gt+GT_XTICKCOLOR] = nint (rval[7])
-		Memi[gt+GT_YGRIDCOLOR] = nint (rval[8])
-		Memi[gt+GT_YAXISLABELCOLOR] = nint (rval[9])
-		Memi[gt+GT_YAXISCOLOR] = nint (rval[10])
-		Memi[gt+GT_YTICKLABELCOLOR] = nint (rval[11])
-		Memi[gt+GT_YTICKCOLOR] = nint (rval[12])
+		Memi[P2I(gt+GT_FRAMECOLOR)] = nint (rval[1])
+		Memi[P2I(gt+GT_TITLECOLOR)] = nint (rval[2])
+		Memi[P2I(gt+GT_XGRIDCOLOR)] = nint (rval[3])
+		Memi[P2I(gt+GT_XAXISLABELCOLOR)] = nint (rval[4])
+		Memi[P2I(gt+GT_XAXISCOLOR)] = nint (rval[5])
+		Memi[P2I(gt+GT_XTICKLABELCOLOR)] = nint (rval[6])
+		Memi[P2I(gt+GT_XTICKCOLOR)] = nint (rval[7])
+		Memi[P2I(gt+GT_YGRIDCOLOR)] = nint (rval[8])
+		Memi[P2I(gt+GT_YAXISLABELCOLOR)] = nint (rval[9])
+		Memi[P2I(gt+GT_YAXISCOLOR)] = nint (rval[10])
+		Memi[P2I(gt+GT_YTICKLABELCOLOR)] = nint (rval[11])
+		Memi[P2I(gt+GT_YTICKCOLOR)] = nint (rval[12])
 	    }
 	}
 

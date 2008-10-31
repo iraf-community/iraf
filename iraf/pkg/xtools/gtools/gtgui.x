@@ -10,6 +10,7 @@ procedure gt_uivalues (gp, gt)
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 
+size_t	sz_val
 int	fd, stropen()
 pointer	sp, msg, str1, str2
 
@@ -18,9 +19,11 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (msg, 20 * SZ_LINE, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = 20 * SZ_LINE
+	call salloc (msg, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	fd = stropen (Memc[msg], 20 * SZ_LINE, WRITE_ONLY)
 
@@ -91,7 +94,7 @@ begin
 	call gt_gets (gt, GTXTRAN, Memc[str1], SZ_LINE)
 	call gt_gets (gt, GTYTRAN, Memc[str2], SZ_LINE)
 	call fprintf (fd, "%s %s %g %g %s %s %b %b ")
-	    switch (Memi[gt+GT_XDRAWAXES]) {
+	    switch (Memi[P2I(gt+GT_XDRAWAXES)]) {
 	    case 0:
 		call pargstr ("none")
 	    case 1:
@@ -101,7 +104,7 @@ begin
 	    case 3:
 		call pargstr ("both")
 	    }
-	    switch (Memi[gt+GT_YDRAWAXES]) {
+	    switch (Memi[P2I(gt+GT_YDRAWAXES)]) {
 	    case 0:
 		call pargstr ("none")
 	    case 1:
@@ -111,23 +114,23 @@ begin
 	    case 3:
 		call pargstr ("both")
 	    }
-	    call pargr (Memr[gt+GT_XAXISWIDTH])
-	    call pargr (Memr[gt+GT_YAXISWIDTH])
+	    call pargr (Memr[P2R(gt+GT_XAXISWIDTH)])
+	    call pargr (Memr[P2R(gt+GT_YAXISWIDTH)])
 	    call pargstr (Memc[str1])
 	    call pargstr (Memc[str2])
-	    call pargi (Memi[gt+GT_XDRAWGRID])
-	    call pargi (Memi[gt+GT_YDRAWGRID])
+	    call pargi (Memi[P2I(gt+GT_XDRAWGRID)])
+	    call pargi (Memi[P2I(gt+GT_YDRAWGRID)])
 
 	# Ticks
 	call fprintf (fd, "%b %b %d %d %d %d %b %b \"%s\" \"%s\" ")
-	    call pargi (Memi[gt+GT_XDRAWTICKS])
-	    call pargi (Memi[gt+GT_YDRAWTICKS])
-	    call pargi (Memi[gt+GT_XNMAJOR])
-	    call pargi (Memi[gt+GT_YNMAJOR])
-	    call pargi (Memi[gt+GT_XNMINOR])
-	    call pargi (Memi[gt+GT_YNMINOR])
-	    call pargi (Memi[gt+GT_XLABELTICKS])
-	    call pargi (Memi[gt+GT_YLABELTICKS])
+	    call pargi (Memi[P2I(gt+GT_XDRAWTICKS)])
+	    call pargi (Memi[P2I(gt+GT_YDRAWTICKS)])
+	    call pargi (Memi[P2I(gt+GT_XNMAJOR)])
+	    call pargi (Memi[P2I(gt+GT_YNMAJOR)])
+	    call pargi (Memi[P2I(gt+GT_XNMINOR)])
+	    call pargi (Memi[P2I(gt+GT_YNMINOR)])
+	    call pargi (Memi[P2I(gt+GT_XLABELTICKS)])
+	    call pargi (Memi[P2I(gt+GT_YLABELTICKS)])
 	    if (GT_XFORMAT(gt) == NULL)
 	       call pargstr ("")
 	    else
@@ -139,19 +142,19 @@ begin
 
 	# Colors
 	call fprintf (fd, "%d %d %d %d %d %d %d %d %d %d %d %d %d")
-	    call pargi (Memi[gt+GT_FRAMECOLOR])
-	    call pargi (Memi[gt+GT_TITLECOLOR])
-	    call pargi (Memi[gt+GT_XGRIDCOLOR])
-	    call pargi (Memi[gt+GT_YGRIDCOLOR])
-	    call pargi (Memi[gt+GT_XAXISLABELCOLOR])
-	    call pargi (Memi[gt+GT_YAXISLABELCOLOR])
-	    call pargi (Memi[gt+GT_XAXISCOLOR])
-	    call pargi (Memi[gt+GT_YAXISCOLOR])
-	    call pargi (Memi[gt+GT_XTICKLABELCOLOR])
-	    call pargi (Memi[gt+GT_YTICKLABELCOLOR])
-	    call pargi (Memi[gt+GT_XTICKCOLOR])
-	    call pargi (Memi[gt+GT_YTICKCOLOR])
-	    call pargi (Memi[gt+GT_TXCOLOR])
+	    call pargi (Memi[P2I(gt+GT_FRAMECOLOR)])
+	    call pargi (Memi[P2I(gt+GT_TITLECOLOR)])
+	    call pargi (Memi[P2I(gt+GT_XGRIDCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_YGRIDCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_XAXISLABELCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_YAXISLABELCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_XAXISCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_YAXISCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_XTICKLABELCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_YTICKLABELCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_XTICKCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_YTICKCOLOR)])
+	    call pargi (Memi[P2I(gt+GT_TXCOLOR)])
 
 	call strclose (fd)
 	call gmsg (gp, "gtvalues", Memc[msg])
