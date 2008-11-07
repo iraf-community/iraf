@@ -7,7 +7,7 @@
 procedure gplotv (v, npts, x1, x2, title)
 
 real	v[ARB]			# data vector
-int	npts			# number of data points
+size_t	npts			# number of data points
 real	x1, x2			# range of X in data vector
 char	title[ARB]		# plot title
 

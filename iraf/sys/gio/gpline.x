@@ -8,8 +8,8 @@ procedure gpline (gp, x, y, npts)
 
 pointer	gp			# graphics descriptor
 real	x[ARB], y[ARB]		# points defining the polyline
-int	npts
-int	i
+size_t	npts
+long	i
 
 begin
 	call gamove (gp, x[1], y[1])

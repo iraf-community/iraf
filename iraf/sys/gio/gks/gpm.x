@@ -11,6 +11,7 @@ procedure gpm (n, px, py)
 int	n		# Number of points
 real	px[n], py[n]	# Coordinates of points in world coordinates
 
+size_t	sz_val
 int	i
 real	size
 include	"gks.com"
@@ -18,8 +19,9 @@ include	"gks.com"
 begin
 	# Marker size is a constant.
 	size = 2.0
+	sz_val = n
 	do i = 1, NDEV {
 	    if (gk_status[i] == ACTIVE)
-    	        call gpmark (gp[i], px, py, n, gk_marker, size, size)
+    	        call gpmark (gp[i], px, py, sz_val, gk_marker, size, size)
 	}
 end

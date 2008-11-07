@@ -12,12 +12,12 @@ procedure gvmark (gp, v, npts, x1, x2, marktype, xsize, ysize)
 
 pointer	gp			# graphics descriptor
 real	v[ARB]			# Y[i] polygon
-int	npts			# number of points
+size_t	npts			# number of points
 real	x1, x2			# range of X[i]
 int	marktype		# marker type
 real	xsize, ysize		# marker size
 
-int	i
+long	i
 real	dx
 
 begin

@@ -9,7 +9,7 @@ procedure gfill (gp, x, y, npts, style)
 
 pointer gp			# graphics descriptor
 real	x[ARB], y[ARB]		# polygon
-int	npts			# npts in polygon
+size_t	npts			# npts in polygon
 int	style			# style for area fill
 
 pointer	ap

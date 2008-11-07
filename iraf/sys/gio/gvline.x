@@ -7,10 +7,10 @@ procedure gvline (gp, v, npts, x1, x2)
 
 pointer	gp			# graphics descriptor
 real	v[ARB]			# Y coordinates of the polyline
-int	npts			# number of polyline points
+size_t	npts			# number of polyline points
 real	x1, x2			# range of X coordinates of the polyline
 
-int	i
+long	i
 real	dx
 
 begin

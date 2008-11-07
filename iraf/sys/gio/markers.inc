@@ -2,7 +2,7 @@
 
 real	mpx[86], mpy[86]	# marker polyline points
 int	moff[9]	 		# offsets of the markers in mpx and mpy
-int	mnpts[9]		# number of points in each polyline
+size_t	mnpts[9]		# number of points in each polyline
 int	k			# implied do-loop dummy index
 
 # Box.

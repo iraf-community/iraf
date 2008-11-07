@@ -86,14 +86,16 @@ begin
 	    xv[3] = 1.0;  yv[3] = 1.0
 	    xv[4] = 0.0;  yv[4] = 1.0
 	    call gseti (gp, G_FACOLOR, GP_FRAMECOLOR(gp))
-	    call gfill (gp, xv, yv, 4, GF_SOLID)
+	    sz_val = 4
+	    call gfill (gp, xv, yv, sz_val, GF_SOLID)
 
 	    xv[1] = x1;  yv[1] = y1
 	    xv[2] = x2;  yv[2] = y1
 	    xv[3] = x2;  yv[3] = y2
 	    xv[4] = x1;  yv[4] = y2
 	    call gseti (gp, G_FACOLOR, 0)
-	    call gfill (gp, xv, yv, 4, GF_SOLID)
+	    sz_val = 4
+	    call gfill (gp, xv, yv, sz_val, GF_SOLID)
 
 	    call gseti (gp, G_CLIP, save_clip)
 	    call gseti (gp, G_WCS, wcs)

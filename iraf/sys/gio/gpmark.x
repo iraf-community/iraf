@@ -11,10 +11,10 @@ procedure gpmark (gp, x, y, npts, marktype, xsize, ysize)
 
 pointer	gp			# graphics descriptor
 real	x[ARB], y[ARB]		# vertices of polygon
-int	npts			# number of points
+size_t	npts			# number of points
 int	marktype		# marker type
 real	xsize, ysize		# marker size
-int	i
+long	i
 
 begin
 	if (marktype == GM_POINT) {

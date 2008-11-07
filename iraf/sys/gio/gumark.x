@@ -14,14 +14,15 @@ procedure gumark (gp, x, y, npts, xcen, ycen, xsize, ysize, fill)
 pointer	gp			# graphics descriptor
 real	x[ARB]			# X coordinates of marker polygon (unit square)
 real	y[ARB]			# Y coordinates of marker polygon (unit square)
-int	npts			# number of points in marker polygon
+size_t	npts			# number of points in marker polygon
 real	xcen, ycen		# world coordinates of center of marker
 real	xsize, ysize		# marker size in X and Y
 int	fill			# draw marker using area fill
 
 pointer	plap, pmap
 bool	scale_unset
-int	save_linetype, index, i
+int	save_linetype, index
+long	i
 real	x1, y1, xs, ys, dx, dy
 real	size[2], ndc_size[2], wcs_size[2]
 

@@ -12,10 +12,10 @@ procedure gascale (gp, v, npts, axis)
 
 pointer	gp			# graphics descriptor
 real	v[ARB]			# data vector
-int	npts			# length of data vector
+size_t	npts			# length of data vector
 int	axis			# asis to be scaled (1=X, 2=Y)
 
-int	start, i
+long	start, i
 real	minval, maxval, pixval
 pointer	w
 
