@@ -78,7 +78,8 @@ size_t	sz_val
 int	i, jj, strlen()
 long	rval1, rval2, j, nrgs, l_val
 pointer	sp, str, ptr
-long	absl(), modl(), ctol()
+long	absl(), modl()
+int	ctol()
 
 begin
 	call smark (sp)
