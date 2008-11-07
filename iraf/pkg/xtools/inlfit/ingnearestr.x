@@ -5,7 +5,7 @@ include	<pkg/gtools.h>
 # ING_NEAREST -- Find the nearest point to the cursor and return the index.
 # The cursor is moved to the nearest point selected.
 
-int procedure ing_nearestr (in, gp, gt, nl, x, y, npts, nvars, wx, wy)
+long procedure ing_nearestr (in, gp, gt, nl, x, y, npts, nvars, wx, wy)
 
 pointer	in				# INLFIT pointer
 pointer	gp				# GIO pointer
@@ -13,14 +13,15 @@ pointer	gt				# GTOOLS pointer
 pointer	nl				# NLFIT pointer
 real	x[ARB]				# Independent variables (npts * nvars)
 real	y[npts]				# Dependent variables
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 real	wx, wy				# Cursor position
 
-int	pt
+long	pt
 pointer	sp, xout, yout
 
-int	ing_nr(), gt_geti()
+long	ing_nr()
+int	gt_geti()
 
 begin
 	# Allocate memory for axes data
@@ -46,14 +47,14 @@ end
 
 # ING_N -- Find position and move the cursor.
 
-int procedure ing_nr (gp, x, y, npts, wx, wy)
+long procedure ing_nr (gp, x, y, npts, wx, wy)
 
 pointer	gp					# GIO pointer
 real	x[npts], y[npts]			# Data points
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Cursor position
 
-int	i, j
+long	i, j
 real	xc, yc, x0, y0, r2, r2min
 
 begin

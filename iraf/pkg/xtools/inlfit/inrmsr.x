@@ -5,9 +5,9 @@ real procedure in_rmsr (y, fit, wts, npts)
 real	y[npts]		# function
 real	fit[npts]	# fit
 real	wts[npts]	# weights
-int	npts		# number of points
+size_t	npts		# number of points
 
-int	i, ndata
+long	i, ndata
 real	resid, rms
 
 begin

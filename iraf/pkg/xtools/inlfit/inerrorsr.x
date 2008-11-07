@@ -14,7 +14,7 @@ pointer	nl			# NLFIT pointer
 real	x[ARB]			# Ordinates (npts * nvars)
 real	y[npts]			# Data to be fit
 real	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 int	nvars			# Number of variables
 real	variance		# variance of the fit (output)
 real	chisqr			# reduced chi-squared of fit (output)
@@ -22,11 +22,11 @@ real	scatter			# additional scatter in equation
 real	rms			# RMS of the fit (output)
 real	errors[ARB]		# errors in coefficients (output)
 
-int	i
+long	i
 real	in_rmsr(), nlstatr
 pointer	sp, fit, wts1, rejpts
 
-int	in_geti()
+long	in_getl()
 pointer	in_getp()
 
 begin
@@ -44,7 +44,7 @@ begin
 
 	# Set zero weight for rejeceted points.
 	call amovr (wts, Memr[wts1], npts)
-	if (in_geti (in, INLNREJPTS) > 0) {
+	if (in_getl (in, INLNREJPTS) > 0) {
 	    rejpts = in_getp (in, INLREJPTS)
 	    do i = 1, npts {
 		if (Memi[rejpts+i-1] == YES)

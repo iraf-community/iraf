@@ -11,13 +11,15 @@ real	x[ARB]			# Ordinates (npts * nvars)
 real	y[ARB]			# Abscissas
 real	wts[ARB]		# Weights
 char	names[ARB]		# Object names
-int	npts		        # Number of data points
+size_t	npts		        # Number of data points
 int	nvars		        # Number of variables
 int	len_name		# Length of a name
 
-int	i, fd, rejected
+long	i, rejected
+int	fd
 pointer	sp, fit, wts1, rejpts
-int	open(), in_geti()
+int	open()
+long	in_getl()
 pointer	in_getp()
 errchk	open
 
@@ -42,7 +44,7 @@ begin
 	call nlvectorr (nl, x, Memr[fit], npts, nvars)
 
 	# Assign a zero weight to the rejected points.
-	rejected = in_geti (in, INLNREJPTS)
+	rejected = in_getl (in, INLNREJPTS)
 	rejpts = in_getp (in, INLREJPTS)
 	call amovr (wts, Memr[wts1], npts)
 	if (rejected > 0) {

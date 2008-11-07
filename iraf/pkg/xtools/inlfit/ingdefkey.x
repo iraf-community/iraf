@@ -13,26 +13,30 @@ pointer	in			# INLFIT descriptor
 int	nvars			# number of variables
 int	newgraph		# update graph ?
 
+size_t	sz_val
 char	ch
 int	key			# graph key
 int	axis			# axis number
 int	type[2], num[2]		# key types and numbers
 int	n, ip
+long	idx
 pointer	line, word, vlabels, str, sp
 
 int	scan()
 int	ctoi()
 int	strdic(), strlen()
-int	inlstrext(), inlstrwrd()
+int	inlstrext()
+long	inlstrwrd()
 int	in_geti()
 
 begin
 	# Allocate string space.
 	call smark  (sp)
-	call salloc (line,    SZ_LINE + 1, TY_CHAR)
-	call salloc (word,    SZ_LINE + 1, TY_CHAR)
-	call salloc (vlabels, SZ_LINE + 1, TY_CHAR)
-	call salloc (str,     SZ_LINE + 1, TY_CHAR)
+	sz_val = SZ_LINE + 1
+	call salloc (line,    sz_val, TY_CHAR)
+	call salloc (word,    sz_val, TY_CHAR)
+	call salloc (vlabels, sz_val, TY_CHAR)
+	call salloc (str,     sz_val, TY_CHAR)
 
 	# Get graph key to define.
 	call printf ("Graph key to be defined: ")
@@ -86,7 +90,8 @@ begin
 		    call pargi (num[axis])
 		call printf (Memc[str])
 	    case KEY_VARIABLE:
-		if (inlstrwrd (num[axis], Memc[str], SZ_LINE,
+		idx = num[axis]
+		if (inlstrwrd (idx, Memc[str], SZ_LINE,
 		    Memc[vlabels]) != 0)
 		    call printf (Memc[str])
 		else {

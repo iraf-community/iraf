@@ -13,10 +13,12 @@ int	axis				# Output axis
 real	x[ARB]				# Independent variables (npts * nvars)
 real	y[npts]				# Dependent variable
 real	z[npts]				# Output values
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 
-int	i, j
+size_t	sz_val
+int	i
+long	j
 int	axistype, axisnum
 int	gtlabel[2], gtunits[2]
 real 	a, b, xmin, xmax
@@ -36,8 +38,9 @@ pointer	in_getp()
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (label, SZ_LINE, TY_CHAR)
-	call salloc (units, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (label, sz_val, TY_CHAR)
+	call salloc (units, sz_val, TY_CHAR)
 
 	# Get the appropiate axis type and variable number.
 	call in_gkey (in, in_geti (in, INLGKEY), axis, axistype, axisnum)
@@ -51,8 +54,8 @@ begin
 	# Branch on axis type.
 	switch (axistype) {
 	case KEY_VARIABLE:	# Independent variable
-	    do i = 1, npts
-		z[i] = x[(i-1)*nvars+axisnum]
+	    do j = 1, npts
+		z[j] = x[(j-1)*nvars+axisnum]
 	case KEY_FUNCTION:	# Function variable
 	    call amovr (y, z, npts)
 	case KEY_FIT:		# Fitted values
@@ -80,8 +83,8 @@ begin
 	    }
 	case KEY_UAXIS:	# User axes plots.
 	    if (axis == 1) {
-	        do i = 1, npts
-		    z[i] = x[(i-1)*nvars+axisnum]
+	        do j = 1, npts
+		    z[j] = x[(j-1)*nvars+axisnum]
 	    } else
 	        call amovr (y, z, npts)
 	    call ing_uaxesr (axisnum, in, nl, x, y, z, npts, nvars)

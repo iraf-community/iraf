@@ -12,27 +12,29 @@ pointer	nl				# NLFIT pointer
 real	x[ARB]				# Independent variable
 real	y[npts]				# Dependent variable
 real	z[npts]				# Output values
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 
-int	npars				# number of parameters
-int	uaxes				# user defined procedure
+size_t	sz_val
+size_t	npars				# number of parameters
+pointer	uaxes				# user defined procedure
 pointer	params				# parameter values
 pointer	sp
 
-int	nlstati()
-int	in_geti()
+long	nlstatl()
+pointer	in_getp()
 
 begin
 	# Check if equation is defined
-	uaxes = in_geti (in, INLUAXES)
-	if (!IS_INDEFI (uaxes)) {
+	uaxes = in_getp (in, INLUAXES)
+	if ( uaxes != NULL ) {
 
 	    # Get number of parameters, allocate space
 	    # for parameter values, and get parameter values
-	    npars = nlstati (nl, NLNPARAMS)
+	    npars = nlstatl (nl, NLNPARAMS)
 	    call smark (sp)
-	    call salloc (params, npars, TY_REAL)
+	    sz_val = npars
+	    call salloc (params, sz_val, TY_REAL)
 	    call nlpgetr (nl, Memr[params], npars)
 
 	    # Call user plot functions

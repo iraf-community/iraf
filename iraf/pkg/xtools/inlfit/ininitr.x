@@ -24,13 +24,17 @@ include "inlfitdef.h"
 procedure in_initr (in, func, dfunc, param, dparam, nparams, plist, nfparams)
 
 pointer	in			# INLFIT pointer
-int	func			# fitting function address
-int	dfunc			# derivative function address
+pointer	func			# fitting function address
+pointer	dfunc			# derivative function address
 real	param[nparams]		# parameter values
 real	dparam[nparams]		# initial guess at uncertenties in parameters
-int	nparams			# number of parameters
-int	plist[nparams]		# list of active parameters
-int	nfparams		# number of fitting paramters
+size_t	nparams			# number of parameters
+long	plist[nparams]		# list of active parameters
+size_t	nfparams		# number of fitting paramters
+
+size_t	sz_val
+long	l_val
+include <nullptr.inc>
 
 begin
 #	# Debug.
@@ -43,40 +47,49 @@ begin
 #	    call pargi (nfparams)
 
 	# Allocate the structure memory.
-	call malloc (in, LEN_INLSTRUCT, TY_STRUCT)
+	sz_val = LEN_INLSTRUCT
+	call malloc (in, sz_val, TY_STRUCT)
 
 	# Allocate memory for parameter values, changes, and list.
-	call malloc (IN_PARAM  (in), nparams, TY_REAL)
-	call malloc (IN_DPARAM (in), nparams, TY_REAL)
-	call malloc (IN_PLIST  (in), nparams, TY_INT)
+	sz_val = nparams
+	call malloc (IN_PARAM  (in), sz_val, TY_REAL)
+	call malloc (IN_DPARAM (in), sz_val, TY_REAL)
+	call malloc (IN_PLIST  (in), sz_val, TY_LONG)
 
 	# Allocate space for strings. All strings are limited
 	# to SZ_LINE or SZ_FNAME.
-	call malloc (IN_LABELS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_UNITS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_FLABELS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_FUNITS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_PLABELS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_PUNITS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_VLABELS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_VUNITS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_USERLABELS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_USERUNITS(in), SZ_LINE, TY_CHAR)
-	call malloc (IN_HELP(in), SZ_FNAME, TY_CHAR)
-	call malloc (IN_PROMPT(in), SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (IN_LABELS(in), sz_val, TY_CHAR)
+	call malloc (IN_UNITS(in), sz_val, TY_CHAR)
+	call malloc (IN_FLABELS(in), sz_val, TY_CHAR)
+	call malloc (IN_FUNITS(in), sz_val, TY_CHAR)
+	call malloc (IN_PLABELS(in), sz_val, TY_CHAR)
+	call malloc (IN_PUNITS(in), sz_val, TY_CHAR)
+	call malloc (IN_VLABELS(in), sz_val, TY_CHAR)
+	call malloc (IN_VUNITS(in), sz_val, TY_CHAR)
+	call malloc (IN_USERLABELS(in), sz_val, TY_CHAR)
+	call malloc (IN_USERUNITS(in), sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call malloc (IN_HELP(in), sz_val, TY_CHAR)
+	call malloc (IN_PROMPT(in), sz_val, TY_CHAR)
 
 	# Allocate space for floating point and graph substructures.
-	call malloc (IN_SFLOAT (in), LEN_INLFLOAT, TY_REAL)
-	call malloc (IN_SGAXES (in), INLNGKEYS * LEN_INLGRAPH, TY_INT)
+	sz_val = LEN_INLFLOAT
+	call malloc (IN_SFLOAT (in), sz_val, TY_REAL)
+	sz_val = INLNGKEYS * LEN_INLGRAPH
+	call malloc (IN_SGAXES (in), sz_val, TY_INT)
 
 	# Enter procedure parameters into the structure.
-	call in_puti (in, INLFUNCTION, func)
-	call in_puti (in, INLDERIVATIVE, dfunc)
-	call in_puti (in, INLNPARAMS, nparams)
-	call in_puti (in, INLNFPARAMS, nfparams)
-	call amovr  (param, Memr[IN_PARAM(in)], nparams)
-	call amovr  (dparam, Memr[IN_DPARAM(in)], nparams)
-	call amovi   (plist, Memi[IN_PLIST(in)], nparams)
+	call in_putp (in, INLFUNCTION, func)
+	call in_putp (in, INLDERIVATIVE, dfunc)
+	l_val = nparams
+	call in_putl (in, INLNPARAMS, l_val)
+	l_val = nfparams
+	call in_putl (in, INLNFPARAMS, l_val)
+	sz_val = nparams
+	call amovr  (param, Memr[IN_PARAM(in)], sz_val)
+	call amovr  (dparam, Memr[IN_DPARAM(in)], sz_val)
+	call amovl   (plist, Meml[IN_PLIST(in)], sz_val)
 
 	# Set defaults, just in case.
 	call in_putr (in, INLTOLERANCE, real (0.01))
@@ -101,7 +114,7 @@ begin
 	call in_pstr (in, INLPROMPT, IN_DEFPROMPT)
 
 	# Initialize user defined functions.
-	call in_puti (in, INLUAXES,  INDEFI)
+	call in_putp (in, INLUAXES,  NULLPTR)
 	call in_puti (in, INLUCOLON, INDEFI)
 	call in_puti (in, INLUFIT,   INDEFI)
 
@@ -126,9 +139,9 @@ begin
 	call in_puti (in, INLNPTS, 0)
 
 	# Initialize pointers.
-	call in_putp (in, INLREJPTS, NULL)
-	call in_putp (in, INLXMIN,   NULL)
-	call in_putp (in, INLXMAX,   NULL)
+	call in_putp (in, INLREJPTS, NULLPTR)
+	call in_putp (in, INLXMIN,   NULLPTR)
+	call in_putp (in, INLXMAX,   NULLPTR)
 end
 
 
@@ -140,10 +153,12 @@ end
 procedure in_bfinitr (in, npts, nvars)
 
 pointer	in			# INLFIT descriptor
-int	npts			# number of points
+size_t	npts			# number of points
 int	nvars			# number of variables
 
+size_t	sz_val
 int	in_geti()
+long	in_getl()
 
 begin
 #	# Debug.
@@ -156,8 +171,8 @@ begin
 	call in_puti (in, INLNREJPTS, 0)
 
 	# Reallocate space for rejected point list and initialize it.
-	if (in_geti (in, INLNPTS) != npts) {
-	    call in_puti (in, INLNPTS, npts)
+	if (in_getl (in, INLNPTS) != npts) {
+	    call in_putl (in, INLNPTS, npts)
 	    call realloc (IN_REJPTS (in), npts, TY_INT)
 	}
 	call amovki  (NO, Memi[IN_REJPTS(in)], npts)
@@ -166,7 +181,8 @@ begin
 	# Initialization is made afterwards.
 	if (in_geti (in, INLNVARS) != nvars) {
 	    call in_puti (in, INLNVARS, nvars)
-	    call realloc (IN_XMIN (in), nvars, TY_REAL)
-	    call realloc (IN_XMAX (in), nvars, TY_REAL)
+	    sz_val = nvars
+	    call realloc (IN_XMIN (in), sz_val, TY_REAL)
+	    call realloc (IN_XMAX (in), sz_val, TY_REAL)
 	}
 end

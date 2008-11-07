@@ -13,7 +13,7 @@ double	x[ARB]			# Ordinates (npts * nvars)
 double	y[ARB]			# Abscissas
 double	wts[ARB]		# Weights
 char	names[ARB]		# Object ids
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 int	nvars			# Number of variables
 int	len_name		# Length of id name
 pointer	gt			# Graphics tools pointer

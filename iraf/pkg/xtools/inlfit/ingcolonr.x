@@ -38,11 +38,12 @@ real	x[ARB]				# Independent variabels (npts * nvars)
 real	y[npts]				# dependent variables
 real	wts[npts]			# Weights
 char	names[ARB]			# Object names
-int	npts				# Number of data points
+size_t	npts				# Number of data points
 int	nvars				# Number of variables
 int	len_name			# Length of object name
 int	newgraph			# New graph ?
 
+size_t	sz_val
 int	ncmd, ival
 real	fval
 pointer	sp, cmd
@@ -54,7 +55,8 @@ real	in_getr()
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Use formated scan to parse the command string.
 	# The first word is the command and it may be minimum match
@@ -241,26 +243,29 @@ procedure ing_changer (in, type)
 pointer	in			# INLFIT descriptor
 int	type			# parameter type (fit, constant)
 
+size_t	sz_val
 bool	isfit
-int	ip, pos, number, npars
+int	iip
+long	ip, pos, number, npars
 real	rval
 pointer	param, value, pname
 pointer	pvalues, plist, plabels
 pointer	sp
 
 bool	streq()
-int	ctoi(), ctor()
+int	ctol(), ctor()
 int	strdic()
-int	in_geti()
+long	in_getl()
 pointer	in_getp()
 
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (param,   SZ_LINE, TY_CHAR)
-	call salloc (value,   SZ_LINE, TY_CHAR)
-	call salloc (pname,   SZ_LINE, TY_CHAR)
-	call salloc (plabels, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (param,   sz_val, TY_CHAR)
+	call salloc (value,   sz_val, TY_CHAR)
+	call salloc (pname,   sz_val, TY_CHAR)
+	call salloc (plabels, sz_val, TY_CHAR)
 
 	# Get parameter name.
 	Memc[param] = EOS
@@ -278,8 +283,8 @@ begin
 	# Try to find the parameter by number if it was not found
 	# by name in the dictionary.
 	if (number == 0) {
-	    ip = 1
-	    if (ctoi (Memc[param], ip, number) == 0) {
+	    iip = 1
+	    if (ctol (Memc[param], iip, number) == 0) {
 		call eprintf ("Parameter not found (%s)\n")
 		    call pargstr (Memc[param])
 	        call sfree (sp)
@@ -288,10 +293,10 @@ begin
 	}
 
 	# Test parameter number.
-	npars = in_geti (in, INLNPARAMS)
+	npars = in_getl (in, INLNPARAMS)
 	if (number < 1 || number > npars) {
 	    call eprintf ("Parameter out of range (%d)\n")
-		call pargi (number)
+		call pargl (number)
 	    call sfree (sp)
 	    return
 	}
@@ -307,8 +312,8 @@ begin
 	if (streq (Memc[value], ""))
 	    rval = Memr[pvalues + number - 1]
 	else {
-	    ip = 1
-	    if (ctor (Memc[value], ip, rval) == 0) {
+	    iip = 1
+	    if (ctor (Memc[value], iip, rval) == 0) {
 	        call eprintf ("Bad parameter value (%s)\n")
 		    call pargstr (Memc[value])
 	        call sfree (sp)
@@ -321,8 +326,8 @@ begin
 
 	# Find the parameter position in the parameter list.
 	do pos = 1, npars {
-	    if (Memi[plist + pos - 1] >= number ||
-		Memi[plist + pos - 1] == 0)
+	    if (Meml[plist + pos - 1] >= number ||
+		Meml[plist + pos - 1] == 0)
 	        break
 	}
 
@@ -331,19 +336,19 @@ begin
 	# The list is not changed if it's not necesary to do so.
 
 	if (type == FIT) {
-	    if (Memi[plist + pos - 1] != number) {
+	    if (Meml[plist + pos - 1] != number) {
 		do ip = npars, pos + 1, -1
-		    Memi[plist + ip - 1] = Memi[plist + ip - 2]
-		Memi[plist + pos - 1] = number
-		call in_puti (in, INLNFPARAMS, in_geti (in, INLNFPARAMS) + 1)
+		    Meml[plist + ip - 1] = Meml[plist + ip - 2]
+		Meml[plist + pos - 1] = number
+		call in_putl (in, INLNFPARAMS, in_getl (in, INLNFPARAMS) + 1)
 	    }
 	    isfit = true
 	} else {
-	    if (Memi[plist + pos - 1] == number) {
+	    if (Meml[plist + pos - 1] == number) {
 		do ip = pos, npars - 1
-		    Memi[plist + ip - 1] = Memi[plist + ip]
-		Memi[plist + npars - 1] = 0
-		call in_puti (in, INLNFPARAMS, in_geti (in, INLNFPARAMS) - 1)
+		    Meml[plist + ip - 1] = Meml[plist + ip]
+		Meml[plist + npars - 1] = 0
+		call in_putl (in, INLNFPARAMS, in_getl (in, INLNFPARAMS) - 1)
 	    }
 	    isfit = false
 	}

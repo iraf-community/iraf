@@ -10,14 +10,16 @@ pointer	in			# INLFIT pointer
 char	file[ARB]		# Output file name
 real	x[ARB]			# Ordinates (npts * nvars)
 char	names[ARB]		# Object names
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 int	nvars			# Number of variables
 int	len_name		# Length of the name
 
-int	i, j, fd
+size_t	sz_val
+long	i, idx
+int	j, fd
 pointer	sp, vnames, name
-int	open()
-int	inlstrwrd()
+int	open(), modi()
+long	inlstrwrd()
 errchk	open()
 
 begin
@@ -34,22 +36,24 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (vnames, SZ_LINE, TY_CHAR)
-	call salloc (name, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (vnames, sz_val, TY_CHAR)
+	call salloc (name, sz_val, TY_CHAR)
 
 	# Get the variable names.
 	call in_gstr (in, INLVLABELS, Memc[vnames], SZ_LINE)
 
 	# Print title.
 	do j = 1, nvars + 1 {
-	    if (mod (j, NPERLINE) == 1) {
+	    idx = j-1
+	    if (modi(j, NPERLINE) == 1) {
 		call fprintf (fd, "\n")
 		call fprintf (fd, "#")
 	    }
 	    if (j == 1) {
 		call fprintf (fd, "%14.14s ")
 		    call pargstr ("objectid")
-	    } else if (inlstrwrd (j-1, Memc[name], SZ_LINE, Memc[vnames]) !=
+	    } else if (inlstrwrd (idx, Memc[name], SZ_LINE, Memc[vnames]) !=
 	        0) {
 		call fprintf (fd, "%14.14s ")
 		    call pargstr (Memc[name])
@@ -68,7 +72,7 @@ begin
 		    call fprintf (fd, "\n")
 	            call fprintf (fd, "%15.15s")
 			call pargstr (names[(i-1)*len_name+1])
-	        } else if (mod (j, NPERLINE) == 1) {
+	        } else if (modi(j, NPERLINE) == 1) {
 		    call fprintf (fd, "\n")
 	            call fprintf (fd, "*%14.7g")
 		        call pargr (x[(i-1)*nvars+j-1])

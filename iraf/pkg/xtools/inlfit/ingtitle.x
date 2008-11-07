@@ -8,7 +8,9 @@ pointer	in		# pointer to the inlfit structure (not used yet)
 char	file[ARB]	# arbitrary file name
 pointer	gt		# pointer to the gtools structure
 
+size_t	sz_val
 int	fd, sfd
+long	l_val
 pointer	sp, str
 int	open(), stropen(), fscan()
 long	clktime()
@@ -19,10 +21,12 @@ begin
 	fd = open (file, APPEND, TEXT_FILE)
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Put time stamp in.
-	call cnvtime (clktime(0), Memc[str], SZ_LINE)
+	l_val = 0
+	call cnvtime (clktime(l_val), Memc[str], SZ_LINE)
 	call fprintf (fd, "\n#%s\n")
 	    call pargstr (Memc[str])
 

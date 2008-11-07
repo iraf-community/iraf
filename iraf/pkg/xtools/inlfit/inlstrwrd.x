@@ -5,14 +5,15 @@
 # string.  The index of the string found is returned as the function value.
 # Otherwise, if there is no string for that index, a zero is returned.
 
-int procedure inlstrwrd (index, outstr, maxch, dict)
+long procedure inlstrwrd (index, outstr, maxch, dict)
 
-int	index			# String index
+long	index			# String index
 char	outstr[ARB]		# Output string as found in dictionary
 int	maxch			# Maximum length of output string
 char	dict[ARB]		# Dictionary string
 
-int	i, len, start, count
+int	i, len, start
+long	count
 
 int	strlen()
 

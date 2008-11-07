@@ -14,14 +14,14 @@ double	x[ARB]				# Input ordinates (npts * nvars)
 double	y[npts]				# Input data values
 double	w[npts]				# Weights
 int	rejpts[npts]			# Points rejected
-int	npts				# Number of input points
+size_t	npts				# Number of input points
 int	nvars				# Number of input variables
 double	low_reject, high_reject		# Rejection thresholds
 double	grow				# Rejection radius
-int	nreject				# Number of points rejected (output)
-int	newreject			# Number of new points rej. (output)
+size_t	nreject				# Number of points rejected (output)
+size_t	newreject			# Number of new points rej. (output)
 
-int	i, j, i_min, i_max, ilast
+long	i, j, i_min, i_max, ilast
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
 

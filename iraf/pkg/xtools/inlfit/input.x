@@ -19,42 +19,50 @@ pointer	in			# INLFIT pointer
 int	param			# parameter to put
 int	ival			# integer value
 
+long	lval
+
+begin
+	lval = ival
+	call in_putl (in,param,lval)
+end
+
+
+procedure in_putl (in, param, lval)
+
+pointer	in			# INLFIT pointer
+int	param			# parameter to put
+long	lval			# long value
+
 begin
 	switch (param) {
-	case INLFUNCTION:
-	    IN_FUNC (in) = ival
-	case INLDERIVATIVE:
-	    IN_DFUNC (in) = ival
 	case INLNPARAMS:
-	    IN_NPARAMS (in) = ival
+	    IN_NPARAMS (in) = lval
 	case INLNFPARAMS:
-	    IN_NFPARAMS (in) = ival
+	    IN_NFPARAMS (in) = lval
 	case INLNVARS:
-	    IN_NVARS (in) = ival
+	    IN_NVARS (in) = lval
 	case INLNPTS:
-	    IN_NPTS (in) = ival
+	    IN_NPTS (in) = lval
 	case INLMAXITER:
-	    IN_MAXITER (in) = ival
+	    IN_MAXITER (in) = lval
 	case INLNREJECT:
-	    IN_NREJECT (in) = ival
+	    IN_NREJECT (in) = lval
 	case INLNREJPTS:
-	    IN_NREJPTS (in) = ival
-	case INLUAXES:
-	    IN_UAXES (in) = ival
+	    IN_NREJPTS (in) = lval
 	case INLUCOLON:
-	    IN_UCOLON (in) = ival
+	    IN_UCOLON (in) = lval
 	case INLUFIT:
-	    IN_UFIT (in) = ival
+	    IN_UFIT (in) = lval
 	case INLOVERPLOT:
-	    IN_OVERPLOT (in) = ival
+	    IN_OVERPLOT (in) = lval
 	case INLPLOTFIT:
-	    IN_PLOTFIT (in) = ival
+	    IN_PLOTFIT (in) = lval
 	case INLFITERROR:
-	    IN_FITERROR (in) = ival
+	    IN_FITERROR (in) = lval
 	case INLGKEY:
-	    if (ival < 1 || ival > INLNGKEYS)
+	    if (lval < 1 || lval > INLNGKEYS)
 		call error (0, "INLFIT, in_puti: Bad key number (INLGKEY)")
-	    IN_GKEY (in) = ival
+	    IN_GKEY (in) = lval
 	default:
 	    call error (0, "INLFIT, in_puti: Unknown parameter")
 	}
@@ -120,6 +128,12 @@ pointer	pval			# pointer value
 
 begin
 	switch (param) {
+	case INLFUNCTION:
+	    IN_FUNC (in) = pval
+	case INLDERIVATIVE:
+	    IN_DFUNC (in) = pval
+	case INLUAXES:
+	    IN_UAXES (in) = pval
 	case INLPARAM:
 	    IN_PARAM (in) = pval
 	case INLDPARAM:

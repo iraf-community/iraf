@@ -9,7 +9,7 @@ pointer	nl			# NLFIT pointer
 double	x[ARB]			# Independent variables
 double	y[npts]			# Dependent variables
 double	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 int	nvars			# Number of variables
 int	newgraph		# New graph ? (output)
 

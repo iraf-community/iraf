@@ -14,7 +14,7 @@ pointer	nl			# NLFIT pointer
 PIXEL	x[ARB]			# Ordinates (npts * nvars)
 PIXEL	y[npts]			# Data to be fit
 PIXEL	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 int	nvars			# Number of variables
 PIXEL	variance		# variance of the fit (output)
 PIXEL	chisqr			# reduced chi-squared of fit (output)
@@ -22,11 +22,11 @@ PIXEL	scatter			# additional scatter in equation
 PIXEL	rms			# RMS of the fit (output)
 PIXEL	errors[ARB]		# errors in coefficients (output)
 
-int	i
+long	i
 PIXEL	in_rms$t(), nlstat$t
 pointer	sp, fit, wts1, rejpts
 
-int	in_geti()
+long	in_getl()
 pointer	in_getp()
 
 begin
@@ -44,7 +44,7 @@ begin
 
 	# Set zero weight for rejeceted points.
 	call amov$t (wts, Mem$t[wts1], npts)
-	if (in_geti (in, INLNREJPTS) > 0) {
+	if (in_getl (in, INLNREJPTS) > 0) {
 	    rejpts = in_getp (in, INLREJPTS)
 	    do i = 1, npts {
 		if (Memi[rejpts+i-1] == YES)

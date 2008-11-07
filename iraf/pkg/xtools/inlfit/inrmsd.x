@@ -5,9 +5,9 @@ double procedure in_rmsd (y, fit, wts, npts)
 double	y[npts]		# function
 double	fit[npts]	# fit
 double	wts[npts]	# weights
-int	npts		# number of points
+size_t	npts		# number of points
 
-int	i, ndata
+long	i, ndata
 double	resid, rms
 
 begin

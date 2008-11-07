@@ -22,25 +22,29 @@ PIXEL	x[ARB]			# independent variables (npts * nvars)
 PIXEL	y[ARB]			# dependent variables
 PIXEL	wts[ARB]		# weigths
 char	names[ARB]		# star ids
-int	npts			# number of points
+size_t	npts			# number of points
 int	nvars			# number of variables
 int	len_name		# length of an object name
 int	wtflag			# type of weighting
 int	stat			# Error code (output)
 
-int	i, wcs, key, gkey, newgraph
+size_t	sz_val
+long	i
+int	wcs, key, gkey, newgraph
 int	xtype, xvar, ytype, yvar, xt, xv, yt, yv
 PIXEL	fit
 pointer	sp, cmd, oldwts, help, prompt
 real	wx, wy
 
-int	gt_gcur1(), ing_nearest$t(), in_geti()
+int	gt_gcur1(), in_geti()
+long	ing_nearest$t()
 PIXEL	nleval$t()
 
 begin
 	# Allocate string space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate and initialize a copy of the weights. A new copy
 	# of the weights is used because it is necessary to have the
@@ -51,8 +55,9 @@ begin
 	call amov$t (wts, Mem$t[oldwts], npts)
 
 	# Allocate space for help page and prompt, and get them.
-	call salloc (help, SZ_LINE, TY_CHAR)
-	call salloc (prompt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (help, sz_val, TY_CHAR)
+	call salloc (prompt, sz_val, TY_CHAR)
 	call in_gstr (in, INLHELP, Memc[help], SZ_LINE)
 	call in_gstr (in, INLPROMPT, Memc[prompt], SZ_LINE)
 
@@ -90,7 +95,7 @@ begin
 		    fit = nleval$t (nl, x[(i-1)*nvars+1], nvars)
 		    call printf (
 		        "%d %s x=%g y=%g func=%g fit=%g, resid=%g\n")
-			call pargi (i)
+			call pargl (i)
 			call pargstr (names[(i-1)*len_name+1])
 			call pargr (wx)
 			call pargr (wy)

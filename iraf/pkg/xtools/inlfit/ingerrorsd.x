@@ -13,16 +13,21 @@ pointer	nl		# NLFIT pointer
 double	x[ARB]		# Ordinates (npts * nvars)
 double	y[ARB]		# Abscissas
 double	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 int	nvars		# Number of variables
 
+size_t	sz_val
 bool	isfit
-int	i, j, deleted, rejected, nparams, fd
+long	i, j
+size_t	nparams
+int	fd
+long	k, deleted, rejected
 double	chisqr, variance, rms
 pointer	sp, fit, wts1, params, errors, rejpts, plist
 pointer	name, pvnames, labels
 
-int	open(), nlstati(), inlstrwrd(), in_geti()
+int	open(), nlstati(), in_geti()
+long	in_getl(), nlstatl(), inlstrwrd()
 pointer	in_getp()
 double	in_rmsd(), nlstatd()
 errchk	open()
@@ -34,37 +39,40 @@ begin
 	fd = open (file, APPEND, TEXT_FILE)
 
 	# Determine the number of coefficients.
-	nparams = nlstati (nl, NLNPARAMS)
+	nparams = nlstatl (nl, NLNPARAMS)
 
 	# Allocate memory for parameters, errors, and parameter list.
 	call smark (sp)
-	call salloc (params, nparams, TY_DOUBLE)
-	call salloc (errors, nparams, TY_DOUBLE)
-	call salloc (labels, SZ_LINE + 1, TY_CHAR)
+	sz_val = nparams
+	call salloc (params, sz_val, TY_DOUBLE)
+	call salloc (errors, sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE + 1
+	call salloc (labels, sz_val, TY_CHAR)
 
 	# Allocate memory for the fit and strings.
 	call salloc (fit, npts, TY_DOUBLE)
 	call salloc (wts1, npts, TY_DOUBLE)
-	call salloc (name, SZ_LINE + 1, TY_CHAR)
-	call salloc (pvnames, SZ_LINE + 1, TY_CHAR)
+	sz_val = SZ_LINE + 1
+	call salloc (name, sz_val, TY_CHAR)
+	call salloc (pvnames, sz_val, TY_CHAR)
 
 	# Get number of rejected points and rejected point list.
-	rejected = in_geti (in, INLNREJPTS)
+	rejected = in_getl (in, INLNREJPTS)
 	rejpts   = in_getp (in, INLREJPTS)
 
 	# Count deleted points.
 	deleted = 0
-	do i = 1, npts {
-	    if (wts[i] == double (0.0))
+	do k = 1, npts {
+	    if (wts[k] == double (0.0))
 		deleted = deleted + 1
 	}
 
 	# Assign a zero weight to rejected points.
 	call amovd (wts, Memd[wts1], npts)
 	if (rejected > 0) {
-	    do i = 1, npts {
-		if (Memi[rejpts+i-1] == YES)
-		    Memd[wts1+i-1] = double (0.0)
+	    do k = 1, npts {
+		if (Memi[rejpts+k-1] == YES)
+		    Memd[wts1+k-1] = double (0.0)
 	    }
 	}
 
@@ -81,11 +89,11 @@ begin
 	call fprintf (fd, "\nniterations        %d\n")
 	    call pargi (nlstati (nl, NLITER))
 	call fprintf (fd, "total_points       %d\n")
-	    call pargi (npts)
+	    call pargz (npts)
 	call fprintf (fd, "rejected           %d\n")
-	    call pargi (in_geti (in, INLNREJPTS))
+	    call pargl (in_getl (in, INLNREJPTS))
 	call fprintf (fd, "deleted            %d\n")
-	    call pargi (deleted)
+	    call pargl (deleted)
 	call fprintf (fd, "standard deviation %10.7g\n")
 	    call pargd (sqrt (variance))
 	call fprintf (fd, "reduced chi        %10.7g\n")
@@ -114,14 +122,14 @@ begin
 		    call pargstr (Memc[name])
 	    } else {
 	        call fprintf (fd, "%-10.2d  ")
-		    call pargi (i)
+		    call pargl (i)
 	    }
 	    call fprintf (fd, "%14.7f  %14.7f    (%s)\n")
 		call pargd (Memd[params+i-1])
 		call pargd (Memd[errors+i-1])
 	    isfit = false
 	    do j = 1, nparams {
-		if (Memi[plist+j-1] == i) {
+		if (Meml[plist+j-1] == i) {
 		    isfit = true
 		    break
 		}

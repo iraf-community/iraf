@@ -14,11 +14,13 @@ pointer	nl				# NLFIT decriptor
 real	x[ARB]				# Input ordinates (npts * nvars)
 real	y[npts]				# Input data values
 real	w[npts]				# Weights
-int	npts				# Number of input points
+size_t	npts				# Number of input points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 
-int	i, nreject, newreject, niter
+int	i, niter
+long	l_val
+size_t	nreject, newreject
 real	low, high, grow
 pointer	sp, wts1, rejpts
 
@@ -66,7 +68,8 @@ begin
 	}
 
 	# Update number of rejected points.
-	call in_puti (in, INLNREJPTS, nreject + newreject)
+	l_val = nreject + newreject
+	call in_putl (in, INLNREJPTS, l_val)
 
 	call sfree (sp)
 end

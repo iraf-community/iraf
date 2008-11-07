@@ -22,10 +22,10 @@ define	LEN_INLSTRUCT	37
 # is stored here as well.
 
 #define	IN_TYPE		Memi[P2I($1+0)]	# calculation type (TY_REAL, TY_DOUBLE)
-define	IN_FUNC		Memi[P2I($1+1)]	# fitting function
-define	IN_DFUNC	Memi[P2I($1+2)]	# derivative function
-define	IN_NPARAMS	Memi[P2I($1+3)]	# number of parameters
-define	IN_NFPARAMS	Memi[P2I($1+4)]	# number of fitted parameters
+define	IN_FUNC		Memp[$1+1]	# fitting function
+define	IN_DFUNC	Memp[$1+2]	# derivative function
+define	IN_NPARAMS	Memz[P2Z($1+3)]	# number of parameters
+define	IN_NFPARAMS	Memz[P2Z($1+4)]	# number of fitted parameters
 define	IN_PARAM	Memp[$1+5]	# pointer to parameter vector
 define	IN_DPARAM	Memp[$1+6]	# pointer to par. change vector
 define	IN_PLIST	Memp[$1+7]	# parameter list
@@ -36,7 +36,7 @@ define	IN_MAXITER	Memi[P2I($1+8)]	# max number of iterations
 # reallocation.
 
 define	IN_NVARS	Memi[P2I($1+9)]	# number of variables
-define	IN_NPTS		Memi[P2I($1+10)]	# number of points
+define	IN_NPTS		Memz[P2Z($1+10)]	# number of points
 
 # INLFIT floating point substructure. This substructure is used to
 # store a pointer to a separate buffer, containing floating point
@@ -52,13 +52,13 @@ define	IN_NREJECT	Memi[P2I($1+12)]	# number of rejection iteration
 # INLFIT parameters used to store the rejected point counter, and a
 # pointer to the rejected point list.
 
-define	IN_NREJPTS	Memi[P2I($1+13)]	# number of rejected points
+define	IN_NREJPTS	Memz[P2Z($1+13)]	# number of rejected points
 define	IN_REJPTS	Memp[$1+14]	# pointer to buffer with rejected pts.
 
 # INLFIT parameters used to store user defined procedures addresses.
 # These parameters are used by the zcall*() procedures.
 
-define	IN_UAXES	Memi[P2I($1+15)]	# plot function
+define	IN_UAXES	Memp[$1+15]	# plot function
 define	IN_UCOLON	Memi[P2I($1+16)]	# default colon command
 define	IN_UFIT		Memi[P2I($1+17)]	# default interactive fit command
 

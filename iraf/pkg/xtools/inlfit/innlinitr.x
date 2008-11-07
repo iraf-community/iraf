@@ -23,6 +23,6 @@ begin
 
 	# Initialize new NLFIT structure.
 	call nlinitr (nl, IN_FUNC (in), IN_DFUNC (in), Memr[IN_PARAM (in)],
-	    Memr[IN_DPARAM (in)], IN_NPARAMS (in), Memi[IN_PLIST (in)],
+	    Memr[IN_DPARAM (in)], IN_NPARAMS (in), Meml[IN_PLIST (in)],
 	    IN_NFPARAMS (in), IN_TOLR (in), IN_MAXITER (in))
 end

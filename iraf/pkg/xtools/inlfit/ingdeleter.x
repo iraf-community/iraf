@@ -17,7 +17,7 @@ pointer	nl				# NLFIT pointer
 real	x[ARB]				# Independent variables (npts * nvars)
 real	y[npts]				# Dependent variables
 real	wts[npts]			# Weight array
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 real	wx, wy				# Position to be nearest
 
@@ -53,10 +53,10 @@ pointer	in					# ICFIT pointer
 pointer	gp					# GIO pointer
 real	x[npts], y[npts]			# Data points
 real	wts[npts]				# Weight array
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
-int	i, j
+long	i, j
 real	x0, y0, r2, r2min
 
 begin

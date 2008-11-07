@@ -9,9 +9,12 @@ pointer	in			# pointer to the inlfit structure
 char	file[ARB]		# output file name
 int	nvars			# number of variables
 
+size_t	sz_val
 int	i, fd
+long	l_val
 pointer	sp, labels, pvnames, name, minptr, maxptr
-int	open(), inlstrwrd()
+int	open()
+long	inlstrwrd()
 pointer	in_getp()
 
 begin
@@ -20,9 +23,10 @@ begin
 	fd = open (file, APPEND, TEXT_FILE)
 
 	call smark (sp)
-	call salloc (labels, SZ_LINE, TY_CHAR)
-	call salloc (pvnames, SZ_LINE, TY_CHAR)
-	call salloc (name, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (labels, sz_val, TY_CHAR)
+	call salloc (pvnames, sz_val, TY_CHAR)
+	call salloc (name, sz_val, TY_CHAR)
 	call in_gstr (in, INLVLABELS, Memc[labels], SZ_LINE)
 	call strcpy (Memc[labels], Memc[pvnames], SZ_LINE)
 
@@ -37,7 +41,8 @@ begin
 	minptr = in_getp (in, INLXMIN)
 	maxptr = in_getp (in, INLXMAX)
 	do i = 1, nvars {
-	    if (inlstrwrd (i, Memc[name], SZ_LINE, Memc[pvnames]) == 0) {
+	    l_val = i
+	    if (inlstrwrd (l_val, Memc[name], SZ_LINE, Memc[pvnames]) == 0) {
 		call sprintf (Memc[name], SZ_LINE, "var %d")
 		    call pargi (i)
 	    }

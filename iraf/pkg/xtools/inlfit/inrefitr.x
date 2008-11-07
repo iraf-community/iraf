@@ -14,14 +14,15 @@ pointer	nl				# NLFIT pointer
 real	x[ARB]				# Ordinates
 real	y[npts]				# Data to be fit
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 
-int	i, ndeleted, ier
+long	i, ndeleted
+int	ier
 pointer	rejpts
 pointer	in_getp()
-int	in_geti()
+long	in_getl()
 
 begin
 #	# Debug
@@ -54,7 +55,7 @@ begin
 	    if (wts[i] <= real(0.0))
 		ndeleted = ndeleted + 1
 	}
-	if ((npts - ndeleted) < in_geti(in, INLNFPARAMS)) {
+	if ((npts - ndeleted) < in_getl(in, INLNFPARAMS)) {
 	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
 	    return
 	}

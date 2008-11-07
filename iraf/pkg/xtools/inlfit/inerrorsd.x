@@ -14,7 +14,7 @@ pointer	nl			# NLFIT pointer
 double	x[ARB]			# Ordinates (npts * nvars)
 double	y[npts]			# Data to be fit
 double	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 int	nvars			# Number of variables
 double	variance		# variance of the fit (output)
 double	chisqr			# reduced chi-squared of fit (output)
@@ -22,11 +22,11 @@ double	scatter			# additional scatter in equation
 double	rms			# RMS of the fit (output)
 double	errors[ARB]		# errors in coefficients (output)
 
-int	i
+long	i
 double	in_rmsd(), nlstatd
 pointer	sp, fit, wts1, rejpts
 
-int	in_geti()
+long	in_getl()
 pointer	in_getp()
 
 begin
@@ -44,7 +44,7 @@ begin
 
 	# Set zero weight for rejeceted points.
 	call amovd (wts, Memd[wts1], npts)
-	if (in_geti (in, INLNREJPTS) > 0) {
+	if (in_getl (in, INLNREJPTS) > 0) {
 	    rejpts = in_getp (in, INLREJPTS)
 	    do i = 1, npts {
 		if (Memi[rejpts+i-1] == YES)

@@ -20,7 +20,7 @@ begin
 	    # Free parameter values, changes, and list.
 	    call mfree (IN_PARAM  (in), TY_DOUBLE)
 	    call mfree (IN_DPARAM (in), TY_DOUBLE)
-	    call mfree (IN_PLIST  (in), TY_INT)
+	    call mfree (IN_PLIST  (in), TY_LONG)
 
 	    # Free string space.
 	    call mfree (IN_LABELS     (in), TY_CHAR)

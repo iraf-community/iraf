@@ -12,14 +12,16 @@ pointer	nl				# NLFIT pointer
 real	x[ARB]				# Ordinates (npts * nvars)
 real	y[npts]				# Data to be fit
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 int	stat				# Error code (output)
 
-int	i, ndeleted
+size_t	sz_val
+long	i, ndeleted
 pointer	sp, wts1, str
 int	in_geti()
+long	in_getl()
 real	in_getr
 
 begin
@@ -36,7 +38,8 @@ begin
 	# calling NLFIT.
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call salloc (wts1, npts, TY_REAL)
 	call amovr (wts, Memr[wts1], npts)
 
@@ -65,7 +68,7 @@ begin
 	    if (wts[i] <= real(0.0))
 		ndeleted = ndeleted + 1
 	}
-	if ((npts - ndeleted) < in_geti (in, INLNFPARAMS)) {
+	if ((npts - ndeleted) < in_getl (in, INLNFPARAMS)) {
 	    stat = NO_DEG_FREEDOM
 	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
 	    call sfree (sp)
@@ -84,7 +87,7 @@ begin
 	if (in_getr (in, INLLOW)  > real (0.0) ||
 	    in_getr (in, INLHIGH) > real (0.0)) {
 	    call in_rejectr (in, nl, x, y, Memr[wts1], npts, nvars, wtflag)
-	    if (in_geti (in, INLNREJPTS) > 0) {
+	    if (in_getl (in, INLNREJPTS) > 0) {
 		do i = 1, npts {
 		    if (Memr[wts1+i-1] > real(0.0))
 			wts[i] = Memr[wts1+i-1]

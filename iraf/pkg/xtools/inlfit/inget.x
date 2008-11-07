@@ -17,12 +17,20 @@ int procedure in_geti (in, param)
 pointer	in			# INLFIT pointer
 int	param			# parameter to get
 
+long	in_getl()
+
+begin
+	return (in_getl(in,param))
+end
+
+
+long procedure in_getl (in, param)
+
+pointer	in			# INLFIT pointer
+int	param			# parameter to get
+
 begin
 	switch (param) {
-	case INLFUNCTION:
-	    return (IN_FUNC (in))
-	case INLDERIVATIVE:
-	    return (IN_DFUNC (in))
 	case INLNPARAMS:
 	    return (IN_NPARAMS (in))
 	case INLNFPARAMS:
@@ -37,8 +45,6 @@ begin
 	    return (IN_NREJECT(in))
 	case INLNREJPTS:
 	    return (IN_NREJPTS (in))
-	case INLUAXES:
-	    return (IN_UAXES (in))
 	case INLUCOLON:
 	    return (IN_UCOLON (in))
 	case INLUFIT:
@@ -113,6 +119,12 @@ int	param			# parameter to get
 
 begin
 	switch (param) {
+	case INLFUNCTION:
+	    return (IN_FUNC (in))
+	case INLDERIVATIVE:
+	    return (IN_DFUNC (in))
+	case INLUAXES:
+	    return (IN_UAXES (in))
 	case INLPARAM:
 	    return (IN_PARAM (in))
 	case INLDPARAM:

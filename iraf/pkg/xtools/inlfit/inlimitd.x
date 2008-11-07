@@ -8,17 +8,18 @@ procedure in_limitd (in, x, npts, nvars)
 
 pointer	in			# INLFIT descriptor
 double	x[ARB]			# Independent values (npts * nvars)
-int	npts			# number of points
+size_t	npts			# number of points
 int	nvars			# number of variables
 
-int	i, j
+int	i
+long	j
 double	aux, xmin, xmax
 pointer	minptr, maxptr
 
 pointer	in_getp()
 
 begin
-#	# Debug
+	#	# Debug
 #	call eprintf ("in_limit: in=%d, npts=%d, nvars=%d\n")
 #	    call pargi (in)
 #	    call pargi (npts)

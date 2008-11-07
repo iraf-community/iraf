@@ -12,14 +12,16 @@ pointer	nl				# NLFIT pointer
 PIXEL	x[ARB]				# Ordinates (npts * nvars)
 PIXEL	y[npts]				# Data to be fit
 PIXEL	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 int	stat				# Error code (output)
 
-int	i, ndeleted
+size_t	sz_val
+long	i, ndeleted
 pointer	sp, wts1, str
 int	in_geti()
+long	in_getl()
 PIXEL	in_get$t
 
 begin
@@ -36,7 +38,8 @@ begin
 	# calling NLFIT.
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call salloc (wts1, npts, TY_PIXEL)
 	call amov$t (wts, Mem$t[wts1], npts)
 
@@ -65,7 +68,7 @@ begin
 	    if (wts[i] <= PIXEL(0.0))
 		ndeleted = ndeleted + 1
 	}
-	if ((npts - ndeleted) < in_geti (in, INLNFPARAMS)) {
+	if ((npts - ndeleted) < in_getl (in, INLNFPARAMS)) {
 	    stat = NO_DEG_FREEDOM
 	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
 	    call sfree (sp)
@@ -84,7 +87,7 @@ begin
 	if (in_get$t (in, INLLOW)  > PIXEL (0.0) ||
 	    in_get$t (in, INLHIGH) > PIXEL (0.0)) {
 	    call in_reject$t (in, nl, x, y, Mem$t[wts1], npts, nvars, wtflag)
-	    if (in_geti (in, INLNREJPTS) > 0) {
+	    if (in_getl (in, INLNREJPTS) > 0) {
 		do i = 1, npts {
 		    if (Mem$t[wts1+i-1] > PIXEL(0.0))
 			wts[i] = Mem$t[wts1+i-1]

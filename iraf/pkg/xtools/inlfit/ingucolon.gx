@@ -9,7 +9,7 @@ pointer	nl			# NLFIT pointer
 PIXEL	x[ARB]			# Independent variables
 PIXEL	y[npts]			# Dependent variables
 PIXEL	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 int	nvars			# Number of variables
 int	newgraph		# New graph ? (output)
 

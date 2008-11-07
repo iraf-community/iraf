@@ -23,6 +23,6 @@ begin
 
 	# Initialize new NLFIT structure.
 	call nlinitd (nl, IN_FUNC (in), IN_DFUNC (in), Memd[IN_PARAM (in)],
-	    Memd[IN_DPARAM (in)], IN_NPARAMS (in), Memi[IN_PLIST (in)],
+	    Memd[IN_DPARAM (in)], IN_NPARAMS (in), Meml[IN_PLIST (in)],
 	    IN_NFPARAMS (in), IN_TOLD (in), IN_MAXITER (in))
 end

@@ -19,7 +19,7 @@ pointer	nl				# NLFIT pointer
 real	x[ARB]				# Independent variables (npts * nvars)
 real	y[npts]				# Dependent variables
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	nvars				# Number of variables
 
 pointer	xout, yout
@@ -62,9 +62,10 @@ pointer	gt				# GTOOLS pointer
 real	x[npts]				# Ordinates
 real	y[npts]				# Abscissas
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
 int	in_geti()
@@ -74,8 +75,9 @@ begin
 	call smark (sp)
 	call salloc (xr, npts, TY_REAL)
 	call salloc (yr, npts, TY_REAL)
-	call salloc (xr1, 2, TY_REAL)
-	call salloc (yr1, 2, TY_REAL)
+	sz_val = 2
+	call salloc (xr1, sz_val, TY_REAL)
+	call salloc (yr1, sz_val, TY_REAL)
 
 	# Change type to real for plotting.
 	call achtrr (x, Memr[xr], npts)
@@ -100,15 +102,18 @@ begin
 	Memr[yr1] = Memr[yr]
 	do i = 1, npts {
 	    if (wts[i] == real (0.0)) {
-		call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], 1) 
+		sz_val = 1
+		call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], sz_val)
 	    } else {
 #		Memr[xr1+1] = Memr[xr+i-1]
 #		Memr[yr1+1] = Memr[yr+i-1]
-#		call gt_plot (gp, gt, Memr[xr1], Memr[yr1], 2)
+#		sz_val = 2
+#		call gt_plot (gp, gt, Memr[xr1], Memr[yr1], sz_val)
 #		Memr[xr1] = Memr[xr1+1]
 #		Memr[yr1] = Memr[yr1+1]
 
-		call gt_plot (gp, gt, Memr[xr+i-1], Memr[yr+i-1], 1)
+		sz_val = 1
+		call gt_plot (gp, gt, Memr[xr+i-1], Memr[yr+i-1], sz_val)
 	    }
 	}
 
@@ -129,18 +134,19 @@ pointer	in			# INLFIT pointer
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 real	x[npts], y[npts]	# Data points
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, xr, yr, gt1
 pointer	rejpts
 
-int	in_geti()
+long	in_getl()
 pointer	in_getp()
 
 begin
 	# Don't plot if there are no rejected points
-	if (in_geti (in, INLNREJPTS) == 0)
+	if (in_getl (in, INLNREJPTS) == 0)
 	    return
 
 	# Allocate axes memory.
@@ -162,9 +168,12 @@ begin
 
 	# Plot rejected points if there are any.
 	rejpts = in_getp (in, INLREJPTS)
+	sz_val = 1
 	do i = 1, npts {
-	    if (Memi[rejpts + i - 1] == YES)
-		call gt_plot (gp, gt1, Memr[xr + i - 1], Memr[yr + i - 1], 1)
+	    if (Memi[rejpts + i - 1] == YES) {
+		call gt_plot (gp, gt1, 
+			      Memr[xr + i - 1], Memr[yr + i - 1], sz_val)
+	    }
 	}
 
 	# Free memory and auxiliary GTOOLS descriptor.
@@ -183,10 +192,11 @@ pointer	gt			# GTOOL pointer
 pointer	nl			# NLFIT pointer
 real	xin[ARB]		# Independent variables
 real	wts[npts]		# weights
-int	npts			# Number of points to plot
+size_t	npts			# Number of points to plot
 int	nvars			# Number of variables
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, xr, yr, x, y, xo, yo, gt1
 
 int	in_geti()
@@ -229,9 +239,11 @@ begin
 	call gt_sets (gt1, GTMARK, "box")
 	call gt_setr (gt1, GTXSIZE, MSIZE)
 	call gt_setr (gt1, GTXSIZE, MSIZE)
+	sz_val = 1
 	do i = 1, npts {
-	    if (wts[i] != real (0.0))
-		call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], 1) 
+	    if (wts[i] != real (0.0)) {
+		call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], sz_val)
+	    }
 	}
 	call gt_free (gt1)
 
