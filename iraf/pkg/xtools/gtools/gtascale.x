@@ -12,9 +12,9 @@ procedure gt_ascale (gp, gt, x, y, npts)
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 real	x[npts], y[npts]	# Data to scale
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 
-int	i, j, k
+long	i, j, k
 size_t	n
 real	xmin, xmax, ymin, ymax, x1, x2, y1, y2, temp
 pointer	buf

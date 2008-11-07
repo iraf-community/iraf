@@ -10,10 +10,11 @@ procedure gt_vplot (gp, gt, v, npts, x1, x2)
 pointer	gp		# GIO pointer
 pointer	gt		# GTOOLS pointer
 real	v[npts]		# Abscissas
-int	npts		# Number of points
+size_t	npts		# Number of points
 real	x1, x2		# Vector range
 
-int	i, pltype, color, gstati()
+long	i
+int	pltype, color, gstati()
 real	x, dx
 
 begin

@@ -11,9 +11,10 @@ pointer	gp		# GIO pointer
 pointer	gt		# GTOOLS pointer
 real	x[npts]		# Abscissas
 real	y[npts]		# Ordinates
-int	npts		# Number of points
+size_t	npts		# Number of points
 
-int	i, color, pltype, gstati()
+long	i
+int	color, pltype, gstati()
 real	x1, x2
 
 begin
