@@ -10,7 +10,7 @@ procedure nlpget$t (nl, params, nparams)
 
 pointer	nl			# pointer to the nlfit structure
 PIXEL	params[ARB]		# parameter array
-int	nparams			# the number of the parameters
+size_t	nparams			# the number of the parameters
 
 size_t	sz_val
 

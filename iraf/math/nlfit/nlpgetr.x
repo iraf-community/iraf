@@ -6,7 +6,7 @@ procedure nlpgetr (nl, params, nparams)
 
 pointer	nl			# pointer to the nlfit structure
 real	params[ARB]		# parameter array
-int	nparams			# the number of the parameters
+size_t	nparams			# the number of the parameters
 
 size_t	sz_val
 
