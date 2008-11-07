@@ -18,13 +18,14 @@ PIXEL	x[npts]				# Input ordinates
 PIXEL	y[npts]				# Input data values
 PIXEL	w[npts]				# Weights
 int	rejpts[npts]			# Points rejected
-int	npts				# Number of input points
+size_t	npts				# Number of input points
 real	low_reject, high_reject		# Rejection threshold
 int	niterate			# Number of rejection iterations
 real	grow				# Rejection radius
-int	nreject				# Number of points rejected
+size_t	nreject				# Number of points rejected
 
-int	i, ierr, nit, newreject
+int	i, ierr, nit
+size_t	newreject
 errchk	ic_deviant$t
 
 begin

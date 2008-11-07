@@ -9,7 +9,7 @@ pointer	cv				# CURFIT pointer
 PIXEL	x[npts]				# Independent variable
 PIXEL	y[npts]				# Dependent variable
 PIXEL	z[npts]				# Output values
-int	npts				# Number of points
+size_t	npts				# Number of points
 char	label[maxchars]			# Axis label
 char	units[maxchars]			# Axis units
 int	maxchars			# Maximum chars in label

@@ -8,20 +8,21 @@ include "icfit.h"
 # The nearest point to the cursor in NDC coordinates is determined.
 # The cursor is moved to the nearest point selected.
 
-int procedure icg_nearestr (ic, gp, gt, cv, x, y, npts, wx, wy)
+long procedure icg_nearestr (ic, gp, gt, cv, x, y, npts, wx, wy)
 
 pointer	ic					# ICFIT pointer
 pointer	gp					# GIO pointer
 pointer	gt					# GTOOLS pointer
 pointer	cv					# CURFIT pointer
 real	x[npts], y[npts]			# Data points
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Cursor position
 
-int	pt
+long	pt
 pointer	sp, xout, yout
 
-int	icg_nr(), gt_geti()
+long	icg_nr()
+int	gt_geti()
 
 begin
 	call smark (sp)
@@ -38,14 +39,14 @@ begin
 	return (pt)
 end
 
-int procedure icg_nr (gp, x, y, npts, wx, wy)
+long procedure icg_nr (gp, x, y, npts, wx, wy)
 
 pointer	gp					# GIO pointer
 real	x[npts], y[npts]			# Data points
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Cursor position
 
-int	i, j
+long	i, j
 real	x0, y0, r2, r2min
 
 begin

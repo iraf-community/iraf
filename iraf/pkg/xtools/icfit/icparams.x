@@ -8,17 +8,22 @@ define	FUNCTIONS	"|chebyshev|legendre|spline3|spline1|user|"
 
 procedure ic_open (ic)
 
+size_t	sz_val
 pointer	ic		# ICFIT pointer
 
 begin
 	# Allocate memory for the package parameter structure.
-	call malloc (ic, IC_LENSTRUCT, TY_STRUCT)
-	call malloc (IC_SAMPLE(ic), IC_SZSAMPLE, TY_CHAR)
-	call malloc (IC_LABELS(ic,1), SZ_LINE, TY_CHAR)
-	call malloc (IC_LABELS(ic,2), SZ_LINE, TY_CHAR)
-	call malloc (IC_UNITS(ic,1), SZ_LINE, TY_CHAR)
-	call malloc (IC_UNITS(ic,2), SZ_LINE, TY_CHAR)
-	call malloc (IC_HELP(ic), SZ_FNAME, TY_CHAR)
+	sz_val = IC_LENSTRUCT
+	call malloc (ic, sz_val, TY_STRUCT)
+	sz_val = IC_SZSAMPLE
+	call malloc (IC_SAMPLE(ic), sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (IC_LABELS(ic,1), sz_val, TY_CHAR)
+	call malloc (IC_LABELS(ic,2), sz_val, TY_CHAR)
+	call malloc (IC_UNITS(ic,1), sz_val, TY_CHAR)
+	call malloc (IC_UNITS(ic,2), sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call malloc (IC_HELP(ic), sz_val, TY_CHAR)
 
 	# Initialize parameters
 	IC_OVERPLOT(ic) = NO
@@ -63,6 +68,8 @@ procedure ic_copy (icin, icout)
 pointer	icin		# Input ICFIT pointer to copy
 pointer	icout		# Ouput ICFIT pointer
 
+size_t	sz_val
+
 begin
 	IC_FUNCTION(icout) = IC_FUNCTION(icin)
 	IC_ORDER(icout) = IC_ORDER(icin)
@@ -84,7 +91,8 @@ begin
 	call strcpy (Memc[IC_UNITS(icin,2)], Memc[IC_UNITS(icout,2)], SZ_LINE)
 	call strcpy (Memc[IC_HELP(icin)], Memc[IC_HELP(icout)], SZ_LINE)
 
-	call amovi (IC_AXES(icin,1,1), IC_AXES(icout,1,1), 10)
+	sz_val = 10
+	call amovi (IC_AXES(icin,1,1), IC_AXES(icout,1,1), sz_val)
 
 	IC_RG(icout) = NULL
 	IC_XFIT(icout) = NULL
@@ -152,6 +160,7 @@ pointer	ic			# ICFIT pointer
 char	param[ARB]		# Parameter to be put
 char	str[ARB]		# String value
 
+size_t	sz_val
 int	i
 pointer	ptr
 
@@ -162,7 +171,8 @@ begin
 	if (streq (param, "sample"))
 	    call strcpy (str, Memc[IC_SAMPLE(ic)], IC_SZSAMPLE)
 	else if (streq (param, "function")) {
-	    call malloc (ptr, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (ptr, sz_val, TY_CHAR)
 	    i = strdic (str, Memc[ptr], SZ_LINE, FUNCTIONS)
 	    if (i > 0)
 		IC_FUNCTION(ic) = i

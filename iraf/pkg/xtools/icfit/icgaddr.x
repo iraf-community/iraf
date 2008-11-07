@@ -16,9 +16,9 @@ real	x[npts]				# Independent variable
 real	y[npts]				# Dependent variable
 real	w1[npts]			# Current weights
 real	w2[npts]			# Initial weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i, j
+long	i, j
 
 begin
 	# Find the place to insert the new point.

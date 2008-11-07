@@ -12,7 +12,7 @@ pointer	cv		# Curfit pointer
 PIXEL	x[ARB]		# Ordinates
 PIXEL	y[ARB]		# Abscissas
 PIXEL	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 pointer	gt		# Graphics tools pointer
 
 int	fd, open()
@@ -36,7 +36,7 @@ pointer	cv			# Pointer to curfit structure
 PIXEL	x[npts]			# Array of x data values
 PIXEL	y[npts]			# Array of y data values
 PIXEL	w[npts]			# Array of weight data values
-int	npts			# Number of data values
+size_t	npts			# Number of data values
 
 int	fd, open()
 errchk	open, ic_fxyshow$t

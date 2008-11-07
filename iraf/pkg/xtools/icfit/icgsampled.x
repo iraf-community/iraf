@@ -14,15 +14,16 @@ pointer	ic				# ICFIT pointer
 pointer	gp				# GIO pointer
 pointer	gt				# GTOOLS pointer
 double	x[npts]				# Ordinates of graph
-int	npts				# Number of data points
+size_t	npts				# Number of data points
 int	pltype				# Plot line type
 
 pointer	rg
-int	i, axis, pltype1
+long	i
+int	axis, pltype1
 real	xl, xr, yb, yt, dy
 real	x1, x2, y1, y2, y3
 
-int	gstati(), stridxs(), gt_geti()
+int	gstati(), stridxs(), gt_geti(), modi()
 pointer	rg_xrangesd()
 
 begin
@@ -38,7 +39,7 @@ begin
 	    return
 
 	if (gt_geti (gt, GTTRANSPOSE) == YES)
-	    axis = mod (axis, 2) + 1
+	    axis = modi(axis, 2) + 1
 
 	pltype1 = gstati (gp, G_PLTYPE)
 	call gseti (gp, G_PLTYPE, pltype)
@@ -95,15 +96,17 @@ pointer	ic				# ICFIT pointer
 pointer	gp				# GIO pointer
 pointer	gt				# GTOOLS pointer
 double	x[npts]				# Ordinates of graph
-int	npts				# Number of data points
+size_t	npts				# Number of data points
 
+size_t	sz_val
 pointer	sp, str, rg
-int	i,  j, axis, pltype1
+long	i,  j
+int	axis, pltype1
 real	w, diff
 real	xl, xr, yb, yt, dy
 real	x1, x2, y1, y2, y3
 
-int	gstati(), stridxs(), gt_geti()
+int	gstati(), stridxs(), gt_geti(), modi()
 pointer	rg_xrangesd()
 
 begin
@@ -119,7 +122,7 @@ begin
 	    return
 
 	if (gt_geti (gt, GTTRANSPOSE) == YES)
-	    axis = mod (axis, 2) + 1
+	    axis = modi(axis, 2) + 1
 
 	# Initialize
 	pltype1 = gstati (gp, G_PLTYPE)
@@ -127,7 +130,8 @@ begin
 	rg = rg_xrangesd (Memc[IC_SAMPLE(ic)], x, npts)
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	Memc[IC_SAMPLE(ic)] = EOS
 
 	# Find nearest sample region

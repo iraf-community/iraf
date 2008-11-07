@@ -13,12 +13,15 @@ pointer	cv				# Curfit pointer
 real	x[npts]				# Ordinates
 real	y[npts]				# Abscissas
 real	w[npts]				# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i, nclean, newreject
+size_t	newreject
+long	i
+size_t	nclean
 pointer	sp, xclean, yclean, wclean
 
 real	rcveval()
+long	absl()
 
 begin
 	if ((IC_LOW(ic) == 0.) && (IC_HIGH(ic) == 0.))
@@ -38,7 +41,7 @@ begin
 	# If there has been no sample averaging then the rejpts array already
 	# contains indices into the subsampled array.
 
-	} else if (abs(IC_NAVERAGE(ic)) < 2) {
+	} else if (absl(IC_NAVERAGE(ic)) < 2) {
 	    if (IC_NREJECT(ic) > 0) {
 	        do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)

@@ -41,8 +41,9 @@ pointer	gp				# GIO pointer
 pointer	gt				# GTOOLS pointer
 pointer	cv				# CURFIT pointer for error listing
 double	x[npts], y[npts], wts[npts]	# Data arrays for error listing
-int	npts				# Number of data points
+size_t	npts				# Number of data points
 
+size_t	sz_val
 double	val, dcveval()
 char	key, xtype, ytype
 bool	bval
@@ -66,7 +67,8 @@ begin
 	# abbreviated with the list of commands.
 
 	call smark (sp)
-	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
+	sz_val = IC_SZSAMPLE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], IC_SZSAMPLE)
@@ -113,7 +115,7 @@ begin
 	    call gargi (ival)
 	    if (nscan() == 1) {
 		call printf ("naverage = %d\n")
-		    call pargi (IC_NAVERAGE(ic))
+		    call pargl (IC_NAVERAGE(ic))
 	    } else {
 		call ic_puti (ic, "naverage", ival)
 		IC_NEWX(ic) = YES

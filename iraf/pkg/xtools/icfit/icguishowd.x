@@ -24,8 +24,9 @@ pointer	ic				#I ICFIT pointer
 char	cmd[ARB]			#I Command
 pointer cv                              #I CURFIT pointer for error listing
 double   x[npts], y[npts], wts[npts]     #I Data arrays
-int     npts                            #I Number of data points
+size_t	npts                            #I Number of data points
 
+size_t	sz_val
 int	ncmd, deact, fd
 pointer	sp, str, msg
 int	strdic(), nscan(), stropen(), open()
@@ -33,7 +34,8 @@ errchk	stropen, open, ic_fshow, ic_fvshowd, ic_fxyshowd, ic_ferrorsd
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Scan the command.
 	call sscan (cmd)
@@ -48,7 +50,8 @@ begin
 
 	    if (nscan() == 1) {
 		if (GP_UIFNAME(IC_GP(ic)) != EOS) {
-		    call malloc (msg, 100000, TY_CHAR)
+		    sz_val = 100000
+		    call malloc (msg, sz_val, TY_CHAR)
 		    fd = stropen (Memc[msg], 100000, WRITE_ONLY)
 		} else {
 		    fd = open ("STDOUT", APPEND, TEXT_FILE)

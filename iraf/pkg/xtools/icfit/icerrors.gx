@@ -12,7 +12,7 @@ pointer	cv		# Curfit pointer
 PIXEL	x[ARB]		# Ordinates
 PIXEL	y[ARB]		# Abscissas
 PIXEL	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 
 int	fd, open()
 errchk	open, ic_ferrors$t

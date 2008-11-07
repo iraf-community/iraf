@@ -13,10 +13,12 @@ pointer	cv		# Curfit pointer
 PIXEL	x[ARB]		# Ordinates
 PIXEL	y[ARB]		# Abscissas
 PIXEL	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 pointer	gt		# GTOOLS pointer
 
-int	i, n, deleted
+size_t	sz_val
+long	i
+size_t	n, deleted
 PIXEL	rms
 pointer	sp, fit, wts1, str, params
 
@@ -90,8 +92,10 @@ begin
 
 	# Print the parameters and errors.
 
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (params, 2*SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = 2*SZ_LINE
+	call salloc (params, sz_val, TY_CHAR)
 
 	call sprintf (Memc[str], SZ_LINE,
 	    "func=%s, order=%d, low_rej=%r, high_rej=%r, niterate=%d, grow=%r")
@@ -105,10 +109,10 @@ begin
 	call sprintf (Memc[params], 2*SZ_LINE,
 	    "%s\ntotal=%d, sample=%d, rejected=%d, deleted=%d, RMS=%7.4g")
 	    call pargstr (Memc[str])
-	    call pargi (npts)
-	    call pargi (n)
-	    call pargi (IC_NREJECT(ic))
-	    call pargi (deleted)
+	    call pargz (npts)
+	    call pargz (n)
+	    call pargz (IC_NREJECT(ic))
+	    call pargz (deleted)
 	    call parg$t (rms)
 	call gt_sets (gt, GTPARAMS, Memc[params])
 

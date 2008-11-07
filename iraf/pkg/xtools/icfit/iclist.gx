@@ -12,10 +12,11 @@ pointer	cv		# Curfit pointer
 PIXEL	x[ARB]		# Ordinates
 PIXEL	y[ARB]		# Abscissas
 PIXEL	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 char	file[ARB]	# Output file
 
-int	i, fd, open()
+long	i
+int	fd, open()
 PIXEL	$tcveval()
 errchk	open()
 

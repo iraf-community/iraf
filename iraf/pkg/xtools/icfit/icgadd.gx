@@ -16,9 +16,9 @@ PIXEL	x[npts]				# Independent variable
 PIXEL	y[npts]				# Dependent variable
 PIXEL	w1[npts]			# Current weights
 PIXEL	w2[npts]			# Initial weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i, j
+long	i, j
 
 begin
 	# Find the place to insert the new point.

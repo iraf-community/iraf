@@ -19,14 +19,15 @@ double	x[npts]				# Input ordinates
 double	y[npts]				# Input data values
 double	w[npts]				# Weights
 int	rejpts[npts]			# Points rejected
-int	npts				# Number of input points
+size_t	npts				# Number of input points
 real	low_reject, high_reject		# Rejection thresholds
 real	grow				# Rejection radius
 int	refit				# Refit the curve?
-int	nreject				# Number of points rejected
-int	newreject			# Number of new points rejected
+size_t	nreject				# Number of points rejected
+size_t	newreject			# Number of new points rejected
 
-int	i, j, i_min, i_max, ilast
+int	ii
+long	i, j, i_min, i_max, ilast, l_val
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
 
@@ -87,8 +88,10 @@ begin
 
 	    residual = Memd[residuals + i - 1]
 	    if ((residual > high_cut) || (residual < low_cut)) {
-		i_min = max (1, int (i - grow))
-		i_max = min (npts, int (i + grow))
+		l_val = i - grow
+		i_min = max (1, l_val)
+		l_val = i + grow
+		i_max = min (npts, l_val)
 
 		# Reject points from the fit and flag them.
 		do j = i_min, i_max {
@@ -109,8 +112,8 @@ begin
 	call sfree (sp)
 
 	if ((refit == YES) && (newreject > 0)) {
-	    call dcvsolve (cv, i)
-	    switch (i) {
+	    call dcvsolve (cv, ii)
+	    switch (ii) {
 	    case SINGULAR:
 		call error (1, "ic_reject: Singular solution")
 	    case NO_DEG_FREEDOM:

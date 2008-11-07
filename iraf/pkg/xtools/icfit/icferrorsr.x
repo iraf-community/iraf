@@ -13,10 +13,13 @@ pointer	cv		# Curfit pointer
 real	x[ARB]		# Ordinates
 real	y[ARB]		# Abscissas
 real	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 int	fd		# Output file descriptor
 
-int	i, n, deleted, ncoeffs
+size_t	sz_val
+long	i
+size_t	n, deleted
+int	ncoeffs
 real	chisqr, rms
 pointer	sp, fit, wts1, coeffs, errors
 
@@ -28,8 +31,9 @@ begin
 
 	ncoeffs = rcvstati (cv, CVNCOEFF)
 	call smark (sp)
-	call salloc (coeffs, ncoeffs, TY_REAL)
-	call salloc (errors, ncoeffs, TY_REAL)
+	sz_val = ncoeffs
+	call salloc (coeffs, sz_val, TY_REAL)
+	call salloc (errors, sz_val, TY_REAL)
 
 	if (npts == IC_NFIT(ic)) {
 	    # Allocate memory for the fit.
@@ -95,11 +99,11 @@ begin
 	# Print the error analysis.
 
 	call fprintf (fd, "# total points = %d\nsample points = %d\n")
-	    call pargi (npts)
-	    call pargi (n)
+	    call pargz (npts)
+	    call pargz (n)
 	call fprintf (fd, "# nrejected = %d\ndeleted = %d\n")
-	    call pargi (IC_NREJECT(ic))
-	    call pargi (deleted)
+	    call pargz (IC_NREJECT(ic))
+	    call pargz (deleted)
 	call fprintf (fd, "# RMS = %7.4g\n")
 	    call pargr (rms)
 	call fprintf (fd, "# square root of reduced chi square = %7.4g\n")
@@ -118,9 +122,9 @@ real	x[ARB]		# Ordinates
 real	y[ARB]		# Abscissas
 real	fit[ARB]	# Fit
 real	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 
-int	i, n
+long	i, n
 real	resid, rms
 
 begin

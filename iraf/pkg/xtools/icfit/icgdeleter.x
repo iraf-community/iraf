@@ -18,7 +18,7 @@ pointer	gt					# GTOOLS pointer
 pointer	cv					# CURFIT pointer
 real	x[npts], y[npts]			# Data points
 real	wts[npts], userwts[npts]		# Weight arrays
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
 int	gt_geti()
@@ -51,10 +51,10 @@ pointer	ic					# ICFIT pointer
 pointer	gp					# GIO pointer
 real	x[npts], y[npts]			# Data points
 real	wts[npts], userwts[npts]		# Weight arrays
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
-int	i, j
+long	i, j
 real	x0, y0, r2, r2min
 
 begin

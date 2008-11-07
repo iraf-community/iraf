@@ -17,7 +17,7 @@ pointer	cv				# Curfit pointer
 double	x[npts]				# Ordinates
 double	y[npts]				# Data to be fit
 double	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	newx				# New x points?
 int	newy				# New y points?
 int	newwts				# New weights?

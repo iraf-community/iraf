@@ -16,9 +16,9 @@ double	x[npts]				# Independent variable
 double	y[npts]				# Dependent variable
 double	w1[npts]			# Current weights
 double	w2[npts]			# Initial weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i, j
+long	i, j
 
 begin
 	# Find the place to insert the new point.

@@ -12,7 +12,7 @@ pointer	cv		# Curfit pointer
 double	x[ARB]		# Ordinates
 double	y[ARB]		# Abscissas
 double	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 pointer	gt		# Graphics tools pointer
 
 int	fd, open()
@@ -36,7 +36,7 @@ pointer	cv			# Pointer to curfit structure
 double	x[npts]			# Array of x data values
 double	y[npts]			# Array of y data values
 double	w[npts]			# Array of weight data values
-int	npts			# Number of data values
+size_t	npts			# Number of data values
 
 int	fd, open()
 errchk	open, ic_fxyshowd

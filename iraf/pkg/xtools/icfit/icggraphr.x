@@ -19,10 +19,11 @@ pointer	cv				# Curfit pointer
 real	x[npts]				# Independent variable
 real	y[npts]				# Dependent variable
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
 pointer	xout, yout
 real	size
+long	absl()
 
 begin
 	call malloc (xout, npts, TY_REAL)
@@ -38,7 +39,7 @@ begin
  	       float(npts))
  
 	if (npts != IC_NFIT(ic)) {
-	    if ((abs (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
+	    if ((absl (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
 	        call realloc (xout, IC_NFIT(ic), TY_REAL)
 		call realloc (yout, IC_NFIT(ic), TY_REAL)
 		call icg_axesr (ic, gt, cv, 1, Memr[IC_XFIT(ic)],
@@ -73,17 +74,19 @@ pointer	gt				# GTOOLS pointer
 real	x[npts]				# Ordinates
 real	y[npts]				# Abscissas
 real	wts[npts]			# Weights
-int	npts				# Number of points
+size_t	npts				# Number of points
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, xr, yr, xr1, yr1, gt1
 
 begin
 	call smark (sp)
 	call salloc (xr, npts, TY_REAL)
 	call salloc (yr, npts, TY_REAL)
-	call salloc (xr1, 2, TY_REAL)
-	call salloc (yr1, 2, TY_REAL)
+	sz_val = 2
+	call salloc (xr1, sz_val, TY_REAL)
+	call salloc (yr1, sz_val, TY_REAL)
 	call achtrr (x, Memr[xr], npts)
 	call achtrr (y, Memr[yr], npts)
 
@@ -109,11 +112,13 @@ begin
 	    Memr[yr1] = Memr[yr]
 	    do i = 1, npts {
 		if (wts[i] == 0.) {
-		    call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], 1) 
+		    sz_val = 1
+		    call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], sz_val)
 		} else {
 		    Memr[xr1+1] = Memr[xr+i-1]
 		    Memr[yr1+1] = Memr[yr+i-1]
-		    call gt_plot (gp, gt, Memr[xr1], Memr[yr1], 2)
+		    sz_val = 2
+		    call gt_plot (gp, gt, Memr[xr1], Memr[yr1], sz_val)
 		    Memr[xr1] = Memr[xr1+1]
 		    Memr[yr1] = Memr[yr1+1]
 		}
@@ -134,11 +139,13 @@ pointer	ic			# ICFIT pointer
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 real	x[npts], y[npts]	# Data points
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 real	size			# Symbol size
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, xr, yr, gt1
+long	absl()
 
 begin
 	call smark (sp)
@@ -152,7 +159,7 @@ begin
 
 	# Mark the sample points.
 
-	if (abs (IC_NAVERAGE(ic)) > 1) {
+	if (absl (IC_NAVERAGE(ic)) > 1) {
 	    call gt_sets (gt1, GTMARK, "plus")
  	    call gt_setr (gt1, GTXSIZE, -size)
 	    call gt_setr (gt1, GTYSIZE, 1.)
@@ -166,8 +173,10 @@ begin
 	    call gt_setr (gt1, GTXSIZE, MSIZE)
 	    call gt_setr (gt1, GTYSIZE, MSIZE)
 	    do i = 1, npts {
-		if (Memi[IC_REJPTS(ic)+i-1] == YES)
-	            call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], 1)
+		if (Memi[IC_REJPTS(ic)+i-1] == YES) {
+		    sz_val = 1
+	            call gt_plot (gp, gt1, Memr[xr+i-1], Memr[yr+i-1], sz_val)
+		}
 	    }
 	}
 
@@ -181,10 +190,10 @@ pointer	ic			# ICFIT pointer
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOL pointer
 pointer	cv			# CURFIT pointer
-int	npts			# Number of points to plot
+size_t	npts			# Number of points to plot
 
 pointer	sp, xr, yr, x, y, xo, yo, gt1
-int	i
+long	i
 real	dx
 
 begin

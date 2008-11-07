@@ -18,7 +18,7 @@ pointer	gt					# GTOOLS pointer
 pointer	cv					# CURFIT pointer
 PIXEL	x[npts], y[npts]			# Data points
 PIXEL	wts[npts], userwts[npts]		# Weight arrays
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
 pointer	sp, xout, yout
@@ -52,10 +52,10 @@ pointer	ic					# ICFIT pointer
 pointer	gp					# GIO pointer
 PIXEL	x[npts], y[npts]			# Data points
 PIXEL	wts[npts], userwts[npts]		# Weight arrays
-int	npts					# Number of points
+size_t	npts					# Number of points
 real	wx, wy					# Position to be nearest
 
-int	i, j
+long	i, j
 real	x0, y0, r2, r2min
 
 begin

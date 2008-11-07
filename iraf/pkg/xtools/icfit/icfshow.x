@@ -10,13 +10,17 @@ procedure ic_fshow (ic, fd)
 pointer	ic			# ICFIT pointer
 int	fd			# Output file
 
+size_t	sz_val
 pointer	str, ptr
+long	l_val
 long	clktime()
 
 begin
-	call malloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (str, sz_val, TY_CHAR)
 
-	call cnvtime (clktime(0), Memc[str], SZ_LINE)
+	l_val = 0
+	call cnvtime (clktime(l_val), Memc[str], SZ_LINE)
 	call fprintf (fd, "\n# %s\n")
 	    call pargstr (Memc[str])
 
@@ -46,7 +50,7 @@ begin
 	call fprintf (fd, "# grow = %g\n")
 	    call pargr (IC_GROW(ic))
 	call fprintf (fd, "# naverage = %d\n")
-	    call pargi (IC_NAVERAGE(ic))
+	    call pargl (IC_NAVERAGE(ic))
 	call fprintf (fd, "# order = %d\n")
 	    call pargi (IC_ORDER(ic))
 	call fprintf (fd, "# low_reject = %g\n")

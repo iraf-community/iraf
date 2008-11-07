@@ -13,10 +13,13 @@ pointer	cv		# Curfit pointer
 double	x[ARB]		# Ordinates
 double	y[ARB]		# Abscissas
 double	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 int	fd		# Output descriptor
 
-int	i, n, deleted, ncoeffs
+size_t	sz_val
+size_t	n, deleted
+long	i
+int	ii, ncoeffs
 double	chisqr, rms
 pointer	sp, fit, wts1, coeffs, errors
 
@@ -36,8 +39,9 @@ begin
 
 	ncoeffs = dcvstati (cv, CVNCOEFF)
 	call smark (sp)
-	call salloc (coeffs, ncoeffs, TY_DOUBLE)
-	call salloc (errors, ncoeffs, TY_DOUBLE)
+	sz_val = ncoeffs
+	call salloc (coeffs, sz_val, TY_DOUBLE)
+	call salloc (errors, sz_val, TY_DOUBLE)
 
 	if (npts == IC_NFIT(ic)) {
 	    # Allocate memory for the fit.
@@ -103,21 +107,21 @@ begin
 	# Print the error analysis.
 
 	call fprintf (fd, "# total points = %d\n# sample points = %d\n")
-	    call pargi (npts)
-	    call pargi (n)
+	    call pargz (npts)
+	    call pargz (n)
 	call fprintf (fd, "# nrejected = %d\n# deleted = %d\n")
-	    call pargi (IC_NREJECT(ic))
-	    call pargi (deleted)
+	    call pargz (IC_NREJECT(ic))
+	    call pargz (deleted)
 	call fprintf (fd, "# RMS = %10.7g\n")
 	    call pargd (rms)
 	call fprintf (fd, "# square root of reduced chi square = %10.7g\n")
 	    call pargd (sqrt (chisqr))
 
 	call fprintf (fd, "# \t  coefficent\t  error\n")
-	do i = 1, ncoeffs {
+	do ii = 1, ncoeffs {
 	    call fprintf (fd, "# \t%14.7e\t%14.7e\n")
-		call pargd (Memd[coeffs+i-1])
-	 	call pargd (Memd[errors+i-1])
+		call pargd (Memd[coeffs+ii-1])
+	 	call pargd (Memd[errors+ii-1])
 	}
 
 	# Free allocated memory.
@@ -135,10 +139,10 @@ pointer	cv			# Pointer to curfit structure
 double	x[npts]			# Array of x data values
 double	y[npts]			# Array of y data values
 double	w[npts]			# Array of weight data values
-int	npts			# Number of data values
+size_t	npts			# Number of data values
 int	fd			# Output file descriptor
 
-int	i
+long	i
 double	dcveval()
 
 begin

@@ -13,15 +13,16 @@ pointer	ic				# ICFIT pointer
 pointer	cv				# Curfit pointer
 real	x[npts]				# Ordinates of data
 real	wts[npts]			# Weights
-int	npts				# Number of points in data
+size_t	npts				# Number of points in data
 int	newx				# New x points?
 int	newwts				# New weights?
 int	newfunction			# New function?
 int	refit				# Use cvrefit?
 
-int	ord
+int	ord, ord1
 real	xmin, xmax
 
+long	absl()
 pointer	rg_xrangesr()
 #extern	hd_power$t()
 errchk	rg_xrangesr
@@ -50,7 +51,7 @@ begin
 	    IC_RG(ic) = rg_xrangesr (Memc[IC_SAMPLE(ic)], x, npts)
 	    call rg_order (IC_RG(ic))
 	    call rg_merge (IC_RG(ic))
-	    call rg_wtbinr (IC_RG(ic), max (1, abs (IC_NAVERAGE(ic))), x, wts,
+	    call rg_wtbinr (IC_RG(ic), max (1, absl(IC_NAVERAGE(ic))), x, wts,
 		npts, Memr[IC_XFIT(ic)], Memr[IC_WTSFIT(ic)], IC_NFIT(ic))
 
 	    if (IC_NFIT(ic) == 0)
@@ -93,20 +94,24 @@ begin
 		    real (xmax))
 	    case SPLINE1:
 		ord = min (IC_ORDER(ic), IC_NFIT(ic) - 1)
-		if (ord > 0)
+		if (ord > 0) {
 	            call rcvinit (cv, SPLINE1, ord, real (IC_XMIN(ic)),
 			real (IC_XMAX(ic)))
-		else
-	            call rcvinit (cv, LEGENDRE, IC_NFIT(ic),
+		} else {
+		    ord1 = IC_NFIT(ic)
+	            call rcvinit (cv, LEGENDRE, ord1,
 			real (IC_XMIN(ic)), real (IC_XMAX(ic)))
+		}
 	    case SPLINE3:
 		ord = min (IC_ORDER(ic), IC_NFIT(ic) - 3)
-		if (ord > 0)
+		if (ord > 0) {
 	            call rcvinit (cv, SPLINE3, ord, real (IC_XMIN(ic)),
 			real (IC_XMAX(ic)))
-		else
-	            call rcvinit (cv, LEGENDRE, IC_NFIT(ic),
+		} else {
+		    ord1 = IC_NFIT(ic)
+	            call rcvinit (cv, LEGENDRE, ord1,
 			real (IC_XMIN(ic)), real (IC_XMAX(ic)))
+		}
 #	    case USERFNC:
 #		ord = min (IC_ORDER(ic), IC_NFIT(ic))
 #		call $tcvinit (cv, USERFNC, ord, PIXEL (IC_XMIN(ic)),

@@ -12,7 +12,7 @@ pointer	cv		# Curfit pointer
 real	x[ARB]		# Ordinates
 real	y[ARB]		# Abscissas
 real	wts[ARB]	# Weights
-int	npts		# Number of data points
+size_t	npts		# Number of data points
 
 int	fd, open()
 errchk	open, ic_ferrorsr

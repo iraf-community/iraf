@@ -18,24 +18,27 @@ pointer	cv			# CURFIT pointer
 double	x[npts]			# Ordinates
 double	y[npts]			# Abscissas
 double	wts[npts]		# Weights
-int	npts			# Number of points
+size_t	npts			# Number of points
 
 real	wx, wy
 int	wcs, key
 
-int	i, j, newgraph, axes[2], xtype
+size_t	sz_val
+long	i, j
+int	newgraph, axes[2], xtype
 double	px1
 real	rx1, rx2, ry1, ry2
 pointer	sp, cmd, userwts, x1, y1, w1, n
 
 int	gt_gcur1(), stridxs(), scan(), nscan()
-int	icg_nearestd()
+long	icg_nearestd()
 double	dcveval()
 errchk	ic_fitd()
 
 begin
 	call smark (sp)
-	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
+	sz_val = IC_SZSAMPLE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate memory for the fit and a copy of the weights.
 	# The weights are copied because they are changed when points are
