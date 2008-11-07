@@ -1,9 +1,5 @@
 # The NLFIT data structure.
 
-# Pointer conversion for reals. This definition is needed to use the
-# generic preprocessor with this file.
-define	P2R		($1)
-
 
 # Structure length
 define	LEN_NLSTRUCT	35
