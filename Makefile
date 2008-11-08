@@ -64,8 +64,14 @@ check_iraf::
 tables::
 	$(SETUP) make_tables $(MACH)
 
+check_tables::
+	$(SETUP) make_check_tables $(MACH)
+
 noao::
 	$(SETUP) make_noao $(MACH)
+
+check_noao::
+	$(SETUP) make_check_noao $(MACH)
 
 clean::	clean_tmp_bin clean_f2c clean_unix clean_iraf clean_tables clean_noao
 	find iraf -name 'f2c_proto.h' -exec rm -f {} \;
