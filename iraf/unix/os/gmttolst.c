@@ -23,8 +23,12 @@ time_t gmt_to_lst ( time_t gmt )
 
 	/* Correct for daylight savings time, if in effect */
 	gmtl = (long)gmt;
+
+#ifndef MACOSX
+	/* Mac systems already include the DST offset in the GMT offset */
 	if (localtime(&gmtl)->tm_isdst)
 	    time_var += 60L * 60L;
+#endif
 
 	return (time_var - SECONDS_1970_TO_1980);
 }

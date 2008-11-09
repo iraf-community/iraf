@@ -8096,3 +8096,111 @@ BUG:	When using log resampling (xlog=yes or ylog=yes) it is possible to
 	range limits on data passed to the interpolator.
 
 STATUS:	Fixed for the next release.
+
+
+NUMBER:	560
+MODULE:	CCFIND
+SYSTEM:	V2.14
+DATE:	Wed Jan 23 15:56:04 MST 2008
+FROM:	fitz
+
+BUG:	For an image with a ZPN projection, the transform code in mwcs tries 
+	to reference the parent image to get the PV matrix keywords. This task
+    	called sk_decwcs() to open the WCS, but this routine then unmaps
+    	the image.  When the task later uses the saved 'mw' pointer to 
+	transform coords the ZPN reference to the parent image is invalid 
+	and results in a segfault.  Changed the code to call sk_decim() 
+	directly and operate on the currently open image instead.
+
+	There is no workaround other than to not set the 'usewcs' parameter
+	and to set the WCS using the other parameters.  Contact iraf.net for 
+	a new binary if needed.
+
+STATUS:	Fixed for the next release.  
+
+
+
+NUMBER:	561
+MODULE:	imstatistics, mimstat
+SYSTEM:	V2.14
+DATE:	Tue Jul 15 11:03:18 MST 2008
+FROM:	valdes
+
+BUG:	The user supplied upper and lower data limits may be exceeded if
+        clipping is used.  For instance, if the limits exclude all pixels
+        the clipping with behave as if no pixels are excluded.  If not
+        all pixels are excluded and the clipping thresholds computed
+        (number of sigma * standard deviation) exceed the limit then
+        the clipping threshold is used.  The only workaround is to not
+        use clipping if the limit values are supplied or check first
+        with no clipping to see if all pixels are excluded.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	562
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.8
+DATE:	Tue Aug 12 12:19:30 MST 2008
+FROM:	valdes
+
+BUG:	The fix for bug number 546 was not fully correct.  It works for
+	binned data but results in an error for data which is flipped
+	(e.g. when CCDSEC/DETSEC have a starting column greater than
+	the ending column as in '[2048:1025,1:2048]'.  The error
+	is that the resulting CCDSEC in the processed image will
+	be off by one.  This can result is losing a column when
+	merging multiple amps.
+
+STATUS:	Fixed for mscred V4.9.
+
+NUMBER:	563
+MODULE:	imexpr
+SYSTEM:	-V2.14
+DATE:	Tue Aug 12 15:12:04 MST 2008
+FROM:	valdes
+
+BUG:	Literal (quoted) strings cannot be used in expressions stored in the
+	expression database.  The quotes are stripped and then the error is
+	that an operand by that name is not found.  As a warning, single
+	quotes in the database are not interchangable with double quotes as
+	they are on the command line.  They are interpreted as character
+	constants and something like 'abc' will be expanded to 'a bc'.
+
+STATUS:	Double quoted strings allowed in next release.
+
+NUMBER:	564
+MODULE:	ccdmask
+SYSTEM:	-V2.14.1
+DATE:	Fri Aug 22 09:27:06 MST 2008
+FROM:	valdes
+
+BUG:	The output mask from ccdmask is incorrect if the task has been run
+	previously without starting the executable fresh.  The workaround
+	is to type "flpr ccdmask" before executing this task to force a
+	fresh executable.
+
+STATUS:	Undiagnosed at present.  Only the workaround has been defined.
+
+
+NUMBER:	565
+MODULE:	imextensions
+SYSTEM:	V2.13-V2.14
+DATE:	Mon Aug 25 16:24:33 MST 2008
+FROM:	valdes
+
+BUG:	Specifying an extension version or range of versions results in an
+	integer divide by zero.  This is a bug for which there is no
+	around.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	566
+MODULE:	display
+SYSTEM:	V2.12.4/V2.14
+DATE:	Tue Aug 26 17:10:07 MST 2008
+FROM:	valdes
+
+BUG:	The "ocolors" parameter was being used in place of the "bpcolors"
+	parameter.  There is no workaround.
+
+STATUS:	Fixed for the next release.

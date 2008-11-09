@@ -57,7 +57,7 @@ int h_scanlibrary ( const char *library )
 	long length, fdate;
 	int len_arfmag, nmodules, i;
 #if (defined(AR_EFMT1) && !defined(__CYGWIN__))
-	int len;
+	int len = 0;
 #endif
 	/* Get the library file name. */
 	h_getlibname (library, libfname, SZ_PATHNAME+1);

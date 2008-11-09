@@ -1,0 +1,622 @@
+System Notes File for IRAF Version 2.14.
+Begun with V2.14 code freeze 03 Dec 2007.
+-------------------------------------------
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+    Changed version to V2.14DEV Dec2007  (12/07/07 MJF)
+
+
+pkg/images/immatch/src/geometry/t_geomap.gx
+    Changed the output precision of the rotation angles from 3 to 5
+    decimal places.  (1/14/08, MJF)
+
+unix/os/gmttolst.c
+    On MacOSX systems the GMT offset includes the DST if it is in effect
+    and so added an ifdef so it wasn't added an extra time.  This was causing
+    the time in Chile to be off by an hour as of this fix (i.e. DST in effect
+    in Chile)  (1/14/08, MJF)
+
+sys/imio/imloop.x
+    Earlier changes to this routine were only partially correct and
+    fail for the case of a 1-D image section by truncating the last two
+    pixels of the section.  This caused "black stripes" in e.g. XREGISTER
+    or otherwise bogus pixel values that lead in some cases to FPE errors.
+    This version is the latest one believed to be correct, note that because
+    of the scope of the problem a new set of binaries needed to be released
+    for V2.14.  (1/14/08, MJF)
+
+pkg/xtools/inlfit/innlinit.gx
+    Removed an extra argument from the nlfree$t() call (1/16/08, MJF)
+
+images/lib/rgtransform.x
+image/immatch/src/listmatch/t_xyxymatch.x
+    Changed the name of the rg_intersect() function to rg_intersection()
+    to avoid a possible conflict with an xtools procedure of the same
+    name.  (1/16/08, MJF)
+
+images/tv/display/zzdebug.x
+    Added missing argument to sigl2_setup() call (1/16/08, MJF)
+
+images/tv/wcslab/wcslab.x
+    Pointer arrays were being allocated with TY_BOOL, changed to TY_INT
+    (1/16/08, MJF)
+
+sys/pmio/pmglp.gx
+    Removed extra argument from pl_pixrop$t() call (1/16/08, MJF)
+
+sys/fmtio/evexpr.y
+    Removed extra arguments to aclrc() calls (1/16/08, MJF)
+
+pkg/plot/crtpict/t_crtpict.x
+    Added missing argument to gscan() call (1/17/08, MJF)
+
+pkg/data/import/t_import.x
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/immatch/src/psfmatch/rgpsfm.x
+pkg/images/imutil/src/t_imtile.x
+pkg/images/tv/imexamine/t_imexam.x
+pkg/proto/t_bscale.x
+pkg/system/help/helpdir.x
+sys/plio/placcess.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+    Fixed various procedure type declaration problems (1/21/08, MJF)
+
+sys/imio/iki/fxf/fxfcache.com
+    Moved the rf_time/rf_mtime arrays to a separate common to avoid alignment
+    problems on 64-bit compilers  (1/21/08, MJF)
+
+sys/imfort/mii.x
+sys/imfort/imrdhdr.x
+sys/imfort/imwrhdr.x
+    Prefixed the MII procedures with a 'i_' to avoid a potential clash with
+    the etc$ version of the procedures.  (1/21/08, MJF)
+
+unix/boot/spp/xc.c
+    Fixed a typo in a variable name used for Sun (1/23/08, MJF)
+
+pkg/images/imcoords/src/t_ccfind.x
+    When using a ZPN projection, the transform code in mwcs tries to
+    reference the parent image to get the PV matrix keywords.  This task
+    called sk_decwcs() to open the WCS, but for an image it then unmapped
+    the image.  When the task later uses the 'mw' pointer to transform coords
+    the ZPN reference to the parent image is invalid and results in a
+    segfault.  Changed the code to call sk_decim() directly and operate on
+    the currently open image instead.  (1/23/08, MJF)
+
+pkg/dataio/doc/export.hlp
+pkg/dataio/doc/import.hlp
+pkg/dataio/doc/rcardimage.hlp
+pkg/dataio/doc/reblock.hlp
+pkg/dataio/doc/rtextimage.hlp
+pkg/dataio/doc/t2d.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/dataio/doc/export.hlp
+pkg/dataio/doc/import.hlp
+pkg/dataio/doc/rcardimage.hlp
+pkg/dataio/doc/reblock.hlp
+pkg/dataio/doc/rtextimage.hlp
+pkg/dataio/doc/t2d.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/language/doc/chdir.hlp
+pkg/language/doc/cursors.hlp
+pkg/language/doc/eparam.hlp
+pkg/language/doc/error.hlp
+pkg/language/doc/flprcache.hlp
+pkg/language/doc/for.hlp
+pkg/language/doc/intro.hlp
+pkg/language/doc/next.hlp
+pkg/language/doc/package.hlp
+pkg/language/doc/prcache.hlp
+pkg/language/doc/proc.hlp
+pkg/language/doc/scan.hlp
+pkg/language/doc/set.hlp
+pkg/language/doc/strings.hlp
+pkg/language/doc/stty.hlp
+pkg/language/doc/switch.hlp
+pkg/language/doc/unlearn.hlp
+pkg/language/doc/update.hlp
+pkg/language/doc/which.hlp
+pkg/lists/doc/Lcalc.hlp
+pkg/lists/doc/raverage.hlp
+pkg/lists/doc/rgcursor.hlp
+pkg/lists/doc/unique.hlp
+pkg/plot/doc/contour.hlp
+pkg/plot/doc/crtpict.hlp
+pkg/plot/doc/gkidecode.hlp
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/hafton.hlp
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/phistogram.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pvector.hlp
+pkg/plot/doc/sgidecode.hlp
+pkg/plot/doc/sgikern.hlp
+pkg/plot/doc/showcap.hlp
+pkg/plot/doc/surface.hlp
+pkg/proto/doc/binfil.hlp
+pkg/proto/doc/bscale.hlp
+pkg/proto/doc/epix.hlp
+pkg/proto/doc/fixpix.hlp
+pkg/proto/doc/hfix.hlp
+pkg/proto/doc/imalign.hlp
+pkg/proto/doc/imcentroid.hlp
+pkg/proto/doc/imextensions.hlp
+pkg/proto/doc/imfunction.hlp
+pkg/proto/doc/imreplace.hlp
+pkg/proto/doc/mimstat.hlp
+pkg/proto/doc/mskregions.hlp
+pkg/proto/doc/rskysub.hlp
+pkg/proto/doc/suntoiraf.hlp
+pkg/proto/doc/wcsedit.hlp
+pkg/proto/doc/wcsreset.hlp
+    Checked in numerous spelling corrections found by Jason Quinn using
+    automated tools (2/5/08, MJF)
+
+sys/mwcs/mwc2tran.gx
+sys/mwcs/mwltran.gx
+sys/mwcs/mwv2tran.gx
+    Allow the input and output vectors to be the same for a linear rotated
+    tranformation.  Since other transformations allow this and it was
+    not clear what should be allowed this change is put in for protection.
+    In fact at least one bug is attributed to this mistake so this change
+    is to catch cases which may be undiagnosed in other applications.
+    (2/12/08, Valdes)
+
+math/gsurfit/gs_deval.gx
+math/iminterp/mrider.x
+math/iminterp/mrieval.x
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/tv/imexamine/ievimexam.x
+pkg/plot/t_pvector.x
+pkg/dataio/import/iplistpix.x
+pkg/images/imutil/src/listpixels.x
+noao/astcat/src/attools/atcathdr.x
+noao/digiphot/apphot/fitpsf/apsffit.x
+noao/digiphot/apphot/phot/apmag.x
+noao/digiphot/apphot/phot/apremag.x
+noao/digiphot/apphot/wphot/apwmag.x
+noao/digiphot/apphot/wphot/apwremag.x
+noao/digiphot/daophot/allstar/dpcache.x
+noao/onedspec/odcombine/t_odcombine.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
+pkg/images/imutil/doc/imstack.hlp
+pkg/images/imutil/doc/imheader.hlp
+pkg/images/imutil/doc/sections.hlp
+pkg/images/imutil/doc/imrename.hlp
+pkg/images/imutil/doc/hselect.hlp
+pkg/images/imutil/doc/imtile.hlp
+pkg/images/imutil/doc/imexpr.hlp
+pkg/images/imutil/doc/imsum.hlp
+pkg/images/imutil/doc/imhistogram.hlp
+pkg/images/imutil/doc/imfunction.hlp
+pkg/images/imutil/doc/hedit.hlp
+pkg/images/imutil/doc/imarith.hlp
+pkg/images/imutil/doc/imstat.hlp
+pkg/images/tv/doc/display.hlp
+pkg/images/tv/doc/Tv.hlp
+pkg/images/tv/doc/imexamine.hlp
+pkg/images/tv/doc/tvmark.hlp
+pkg/images/tv/doc/wcslab.hlp
+pkg/images/tv/doc/imedit.hlp
+pkg/images/tv/iis/doc/window.hlp
+pkg/images/tv/iis/doc/blink.hlp
+pkg/images/tv/iis/doc/ids/doc/Imdis.hlp
+pkg/images/tv/iis/doc/cvl.hlp
+pkg/images/tv/doc/bpmedit.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/xyxymatch.hlp
+pkg/images/immatch/doc/psfmatch.hlp
+pkg/images/immatch/doc/gregister.hlp
+pkg/images/immatch/doc/skymap.hlp
+pkg/images/immatch/doc/imcentroid.hlp
+pkg/images/immatch/doc/geotran.hlp
+pkg/images/immatch/doc/wcsxymatch.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/doc/imcombine.hlp
+pkg/images/immatch/doc/skyxymatch.hlp
+pkg/images/immatch/doc/linmatch.hlp
+pkg/images/immatch/doc/wcscopy.hlp
+pkg/images/immatch/doc/sregister.hlp
+pkg/images/immatch/doc/geoxytran.hlp
+pkg/images/immatch/doc/xregister.hlp
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/imfit/doc/fit1d.hlp
+pkg/images/imfit/doc/imsurfit.hlp
+pkg/images/imcoords/doc/wcsedit.hlp
+pkg/images/imcoords/doc/ccget.hlp
+pkg/images/imcoords/doc/mkcwwcs.hlp
+pkg/images/imcoords/doc/skyctran.hlp
+pkg/images/imcoords/doc/ccxymatch.hlp
+pkg/images/imcoords/doc/imcctran.hlp
+pkg/images/imcoords/doc/ccsetwcs.hlp
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/doc/wcsreset.hlp
+pkg/images/imcoords/doc/starfind.hlp
+pkg/images/imcoords/doc/ccstd.hlp
+pkg/images/imcoords/doc/wcsctran.hlp
+pkg/images/imcoords/doc/ccfind.hlp
+pkg/images/imcoords/doc/cctran.hlp
+pkg/images/imcoords/doc/mkcwcs.hlp
+pkg/images/imfilter/doc/rmedian.hlp
+pkg/images/imfilter/doc/rmode.hlp
+pkg/images/imfilter/doc/gradient.hlp
+pkg/images/imfilter/doc/boxcar.hlp
+pkg/images/imfilter/doc/fmode.hlp
+pkg/images/imfilter/doc/convolve.hlp
+pkg/images/imfilter/doc/laplace.hlp
+pkg/images/imfilter/doc/gauss.hlp
+pkg/images/imfilter/doc/frmode.hlp
+pkg/images/imfilter/doc/runmed.hlp
+pkg/images/imgeom/doc/imshift.hlp
+pkg/images/imgeom/doc/magnify.hlp
+pkg/images/imgeom/doc/imlintran.hlp
+pkg/images/imgeom/doc/rotate.hlp
+pkg/obsolete/doc/orfits.hlp
+pkg/obsolete/doc/oimcombine.hlp
+pkg/obsolete/doc/owfits.hlp
+pkg/softools/doc/mkttydata.hlp
+pkg/softools/doc/mkmanpage.hlp
+pkg/softools/doc/mktags.hlp
+pkg/system/doc/head.hlp
+pkg/system/doc/type.hlp
+pkg/system/doc/diskspace.hlp
+pkg/system/doc/gripes.hlp
+pkg/system/doc/devstatus.hlp
+pkg/system/doc/Sys.hlp
+pkg/system/doc/files.hlp
+pkg/system/doc/Sys_intro.hlp
+pkg/system/doc/help.hlp
+pkg/system/doc/news.hlp
+pkg/system/doc/lprint.hlp
+pkg/system/doc/references.hlp
+pkg/utilities/doc/surfit.hlp
+pkg/utilities/doc/urand.hlp
+pkg/utilities/doc/split.hlp
+pkg/utilities/doc/polyfit.hlp
+pkg/xtools/doc/xtpmmap.hlp
+pkg/xtools/doc/inlfit.hlp
+pkg/xtools/doc/center1d.hlp
+pkg/xtools/doc/ranges.hlp
+pkg/xtools/doc/xtextns.hlp
+$iraf/doc/doc/expressions.hlp
+$iraf/doc/doc/spp83.hlp
+$iraf/doc/doc/pkg84.hlp
+$iraf/doc/doc/news.v28.hlp
+$iraf/doc/doc/biblio84.hlp
+$iraf/doc/doc/crib83.hlp
+$iraf/doc/packages.hlp
+$iraf/doc/news.v29.hlp
+$iraf/doc/vmsprog.hlp
+$iraf/doc/vmsiraf.hlp
+$iraf/doc/aosvsiraf.hlp
+$iraf/doc/news.old.hlp
+$iraf/doc/v211revs.hlp
+$iraf/doc/suniraf.hlp
+$iraf/doc/unixiraf.hlp
+$iraf/doc/pac_toc.hlp
+$iraf/doc/v212revs.hlp
+$iraf/doc/spp_toc.hlp
+    Another batch of documentation fixes from Jason Quinn.  The
+    IMCOMBINE help was modified more recently and merged by hand.
+    (2/18/08 MJF)
+
+unix/os/mkpkg.sh
+    The architecture test was being done with '==' instead of '=' (4/16/08, MJF)
+
+unix/boot/bootlib/ostime.c
+    Modified to support timezones on Solaris x86.  (2/19/08, MJF)
+
+unix/boot/spp/xc.c
+    Fixed a missing '#else' to compile for Solaris x86 (2/19/08, MJF)
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-solaris.h		+
+    Changes needed for Solaris x86 (2/19/08, MJF)
+
+sys/plio/mkpkg
+sys/plio/plbox.x
+sys/plio/plbox.h			+
+sys/plio/plubox.x			+
+sys/plio/plcircle.x
+sys/plio/plcircle.h			+
+sys/plio/plucircle.x			+
+sys/plio/plpolygon.x
+sys/plio/plpolygon.h			+
+sys/plio/plupolygon.x			+
+sys/tty/mkpkg
+sys/tty/ttygdes.x
+sys/tty/gttyload.x			+
+pkg/images/imutil/src/mkpkg
+pkg/images/imutil/src/imexpr.x
+pkg/images/imutil/src/iegsym.x		+
+pkg/proto/maskexpr/mkpkg
+pkg/proto/maskexpr/peregfuncs.x
+pkg/proto/maskexpr/peregfuncs.h		+
+pkg/proto/maskexpr/peregufcn.x		+
+pkg/proto/maskexpr/mskexpand.x
+pkg/proto/maskexpr/megsym.x		+
+pkg/softools/mkpkg
+pkg/softools/mktags.x
+pkg/softools/tgutil.x			+
+    Broke out functions used as extern to separate files.  GCC 3.4.3 cannot 
+    compile these files because of a bug that see 'extern int func()' and 
+    'int func()' as different types.  (2/20/08, MJF)
+
+unix/bin.sunos/f2c.h
+    In the end the above changes weren't strictly required.  A workaround
+    is to equivalence the 'int' and 'integer' types in the f2c.h file as
+    was done (but never documented) for the Cygwin port.  For things like
+    the fmtio$evexpr.y file it wasn't possible to break out the gettok()
+    to a new file since it returned values generated by macros written 
+    during the xyacc stage.  (2/20/08, MJF)
+
+unix/hlib/install
+    Fixed a typo where 'copy' command should be 'cp' (2/20/08, MJF)
+
+pkg/ecl/gram.c
+pkg/ecl/operand.h
+pkg/ecl/binop.c
+    Implemented a new strdic(str,dicstr) builtin function.  The first character
+    of 'dicstr' will be used as a delimiter to define a dictionary string, i.e.
+    a set of string values like "|foo|bar|rab|oof|".  The function returns
+    the index of the 'str' that occurs in the dictionary, or zero if not
+    found.  'str' may be a substring of the dictionary string for a match
+    to be made.  For example
+
+	cl> =strdic ("bar", "|foo|bar|rab|oof|")
+	2
+	cl> s1 = "FOO"
+	cl> =strdic (strlwr(s1), "|foo|bar|rab|oof|")
+	1
+
+    The second example shows how to do a case-insensitive match against
+    the dictionary.  (3/12/08, MJF)
+
+pkg/ecl/binop.c
+    Fixed a bug in strstr() where a call like  strstr("th","testthis")
+    would fail to find the string.  Pointer was being incremented incorrectly.
+    (4/3/08, MJF)
+
+
+sys/imfort/mii.x
+    An earlier change to this file to clarify procedure names inadvertantly
+    added the prefix the MII routines in the osb$ directory, leading to 
+    unresolved references when actually linking a program (4/16/08, MJF)
+
+unix/hlib/clpackage.men
+sys/fmtio/doc/fmtio.men
+pkg/obsolete/obsolete.men
+pkg/xtools/skywcs/doc/skywcs.men
+pkg/xtools/doc/xtools.men
+pkg/lists/lists.men
+pkg/language/language.men
+pkg/images/immatch/immatch.men
+noao/artdata/mkexamples/onedspec.men
+noao/onedspec/onedspec.men
+noao/imred/argus/demos/demos.men
+noao/imred/ctioslit/demos/demos.men
+noao/imred/echelle/demos/demos.men
+noao/imred/hydra/demos/demos.men
+noao/imred/kpnocoude/demos/demos.men
+noao/imred/kpnoslit/demos/demos.men
+noao/twodspec/longslit/demos/demos.men
+noao/imred/quadred/quadred.men
+noao/imred/iids/iids.men
+noao/imred/iids/irs.men
+noao/imred/irs/irs.men
+noao/artdata/mkexamples/onedspec.men
+noao/onedspec/onedspec.men
+noao/digiphot/photcal/photcal.men
+noao/astutil/astutil.men
+noao/astcat/astcat.men
+noao/imred/specred/specred.men
+    Fixed some typos in help menus found by Jason Quinn (4/20/08, MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Added some additional errchks (5/12/08, NZ/MJF)
+
+sys/ki/ki.com
+    Increased the size of SZ_SBUF from 255 to 1023 to permit more string
+    storage in instructions using long pathnames.  (5/13/08, MJF)
+
+sys/ki/ki.com
+    Backed out of the change.  (5/14/08, MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Modified to use a shorter temp file name as a workaround to some pipeline
+    problems caused by long KI pathnames. (5/14/08, NZ/MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+    Fixed a problem affecting the number of pad lines corrupting images.
+    (5/23/08, NZ/MJF)
+
+pkg/cl/param.c
+pkg/ecl/param.c
+    Fixed a bug in detecting ambiguous parameters (7/8/08, MJF)
+
+unix/boot/spp/xc.c
+    Forced the mode of a binary to be 0755 to avoid the problem on some
+    linux systems where binaries aren't group/world readable by default 
+    (7/31/08, MJF)
+
+pkg/plot/hgpline.x              +
+pkg/plot/t_prows.x
+pkg/plot/t_pcols.x
+pkg/plot/t_graph.x
+pkg/plot/t_pvector.x
+pkg/plot/initmarker.x
+pkg/plot/mkpkg
+pkg/plot/graph.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pvector.par
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/pvector.hlp
+    Added a feature where marker types of "lhist" or "bhist" draw line
+    or box histograms when not in point mode.  In point mode these
+    values default to box and when not in point mode any other value
+    defaults to connected lines.  (8/13/08, Valdes)
+
+sys/imio/iki/fxfopix.x
+sys/imio/iki/fxfupdhdr.x
+    Changes to the header updates of temporary files.  Related to earlier
+    fixes made for padlines problems and long KI filenames (8/13/08, Valdes)
+
+pkg/bench/bench.hlp
+images/immatch/doc/geomap.hlp
+images/immatch/doc/geotran.hlp
+noao/digiphot/apphot/doc/center.hlp
+noao/digiphot/apphot/doc/centerpars.hlp
+noao/digiphot/apphot/doc/daofind.hlp
+noao/digiphot/apphot/doc/datapars.hlp
+noao/digiphot/apphot/doc/fitpsf.hlp
+noao/digiphot/apphot/doc/fitsky.hlp
+noao/digiphot/apphot/doc/fitskypars.hlp
+noao/digiphot/apphot/doc/pexamine.hlp
+noao/digiphot/apphot/doc/phot.hlp
+noao/digiphot/apphot/doc/polymark.hlp
+noao/digiphot/apphot/doc/polyphot.hlp
+noao/digiphot/apphot/doc/qphot.hlp
+noao/digiphot/apphot/doc/radprof.hlp
+noao/digiphot/apphot/doc/ucache.hlp
+noao/digiphot/apphot/doc/wphot.hlp
+noao/digiphot/daophot/doc/addstar.hlp
+noao/digiphot/daophot/doc/allstar.hlp
+noao/digiphot/daophot/doc/centerpars.hlp
+noao/digiphot/daophot/doc/daoedit.hlp
+noao/digiphot/daophot/doc/daofind.hlp
+noao/digiphot/daophot/doc/daopars.hlp
+noao/digiphot/daophot/doc/daotest.hlp
+noao/digiphot/daophot/doc/datapars.hlp
+noao/digiphot/daophot/doc/group.hlp
+noao/digiphot/daophot/doc/grpselect.hlp
+noao/digiphot/daophot/doc/nstar.hlp
+noao/digiphot/daophot/doc/peak.hlp
+noao/digiphot/daophot/doc/pexamine.hlp
+noao/digiphot/daophot/doc/phot.hlp
+noao/digiphot/daophot/doc/psf.hlp
+noao/digiphot/daophot/doc/pstselect.hlp
+noao/digiphot/daophot/doc/substar.hlp
+noao/digiphot/photcal/doc/apfile.hlp
+noao/digiphot/photcal/doc/config.hlp
+noao/digiphot/photcal/doc/evalfit.hlp
+noao/digiphot/photcal/doc/fitparams.hlp
+noao/digiphot/photcal/doc/inlfit.hlp
+noao/digiphot/photcal/doc/invertfit.hlp
+noao/digiphot/photcal/doc/mkapfile.hlp
+noao/digiphot/photcal/doc/mkcatalog.hlp
+noao/digiphot/photcal/doc/mkconfig.hlp
+noao/digiphot/photcal/doc/mkimsets.hlp
+noao/digiphot/photcal/doc/mknobsfile.hlp
+noao/digiphot/photcal/doc/mkobsfile.hlp
+noao/digiphot/photcal/doc/mkphotcors.hlp
+noao/digiphot/photcal/doc/obsfile.hlp
+noao/digiphot/photcal/doc/pcintro.hlp
+noao/digiphot/ptools/doc/pconvert.hlp
+noao/digiphot/ptools/doc/pdump.hlp
+noao/digiphot/ptools/doc/pexamine.hlp
+noao/digiphot/ptools/doc/pselect.hlp
+noao/digiphot/ptools/doc/pttest.hlp
+noao/digiphot/ptools/doc/tbselect.hlp
+noao/digiphot/ptools/doc/tbsort.hlp
+noao/digiphot/ptools/doc/txselect.hlp
+noao/artdata/doc/gallist.hlp
+noao/artdata/doc/mk1dspec.hlp
+noao/artdata/doc/mk2dspec.hlp
+noao/artdata/doc/mkechelle.hlp
+noao/artdata/doc/mkexamples.hlp
+noao/artdata/doc/mknoise.hlp
+noao/artdata/doc/mkobjects.hlp
+noao/artdata/doc/mkpattern.hlp
+noao/artdata/doc/starlist.hlp
+noao/astcat/doc/aslist.hlp
+noao/astcat/doc/aimfind.hlp
+noao/astcat/doc/ahedit.hlp
+noao/astcat/doc/agetim.hlp
+noao/astcat/doc/agetcat.hlp
+noao/astcat/doc/afiltpars.hlp
+noao/astcat/doc/adumpim.hlp
+noao/astcat/doc/acatpars.hlp
+noao/astutil/doc/astcalc.hlp
+noao/astutil/doc/asthedit.hlp
+noao/astutil/doc/asttimes.hlp
+noao/astutil/doc/ccdtime.hlp
+noao/astutil/doc/galactic.hlp
+noao/astutil/doc/gratings.hlp
+noao/astutil/doc/keywpars.hlp
+noao/astutil/doc/obs.hlp
+noao/astutil/doc/pdm.hlp
+noao/astutil/doc/rvcorrect.hlp
+noao/astutil/doc/setairmass.hlp
+noao/astutil/doc/setjd.hlp
+    More documentation typo corrections from Jason Quinn (8/18/08, MJF)
+
+pkg/images/x_images.x
+pkg/images/imutil/imutil.cl
+pkg/images/imutil/imutil.hd
+pkg/images/imutil/imutil.men
+pkg/images/imutil/nhedit.par        	+
+pkg/images/imutil/doc/nhedit.hlp    	+
+pkg/images/imutil/src/nhedit.x      	+
+pkg/images/imutil/src/getcmd.x      	+
+pkg/images/imutil/src/mkpkg
+    Installed the NHEDIT task (HEDIT with comments) (8/19/08, MJF)
+
+unix/hlib/irafuser.csh
+    Added a -DPOSIX to HSI_CF for freebsd systems (8/19/08, MJF)
+
+unix/os/zgtime.c
+    Had to ifdef the type declaration of time() to be compatible w/ 
+    FreeBSD 6.3 (8/19/08, MJF)
+
+unix/os/zfioks.c
+    FreeBSD doesn't define IPPORT_USERRESERVED  (8/19/08, MJF)
+
+unix/hlib/libc/stdarg.h
+unix/hlib/libc/stdarg-freebsd.h		+
+    Usual varargs fun for the FreeBSD build (8/19/08, MJF)
+
+local/notes.v212
+    Moved the the $iraf/doc directory (8/19/08, MJF)
+
+unix/hlib/buglog.csh
+    Fixed the script to once again worl (8/22/08, MJF)
+
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+unix/hlib/login.cl
+pkg/cl/cl.par
+pkg/ecl/cl.par
+    Changed version to V2.14.1 (9/8/08)
+
+pkg/ecl/errs.c
+pkg/ecl/builtin.c
+pkg/ecl/clmodes.h
+    Added a 'beep' capability to the 'erract' variable (9/8/08, MJF)
+
+unix/boot/mkpkg/scanlib.c
+    Initialized a variable to fix a problem on FreeBSD systems where 
+    garbage was causing library files to be read incorrectly. (9/8/09, MJF)
+
+pkg/ecl/mkpkg
+    Fixed a problem for 'sparc' systems in doing a 'mkpkg update) (9/15/08, MJF)
+
+------------------------------------------------------
+System Frozen for V2.14.1 Patch         (9/15/08)
+------------------------------------------------------
+

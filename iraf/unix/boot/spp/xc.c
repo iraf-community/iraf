@@ -795,6 +795,9 @@ passflag:		    mkobject = YES;
 	    } else
 		link (tempfile, outfile);
 
+	    /* Force the mode of the file. */
+	    chmod (outfile, 0755);
+
 	    unlink (tempfile);
 	}
 	errflag += status;

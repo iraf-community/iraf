@@ -61,7 +61,7 @@ export CC F77 F2C RANLIB XC_CFLAGS
 
 case "$MACH" in
 freebsd)
-    HSI_CF="-I$hinclude -O -DBSD -Wall"
+    HSI_CF="-I$hinclude -O -DBSD -DPOSIX -Wall"
     HSI_XF="-Inolibc -/DBSD -w -/Wunused"
     HSI_FF="-O"
     HSI_LF="-static"

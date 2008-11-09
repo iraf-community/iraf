@@ -53,7 +53,7 @@ setenv	XC_CFLAGS "-I$hinclude"
 
 switch ($MACH)
 case freebsd:
-    setenv HSI_CF "-I$hinclude -O -DBSD -Wall"
+    setenv HSI_CF "-I$hinclude -O -DBSD -DPOSIX -Wall"
     setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused"
     setenv HSI_FF "-O"
     setenv HSI_LF "-static"

@@ -35,7 +35,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.14EXPORT"
+set	version		= "NOAO/IRAF V2.14.1"
 
 # System directories.
 

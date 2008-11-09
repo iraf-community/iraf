@@ -80,6 +80,10 @@ static long os_timezone( void )
 	extern	long _timezone;
 	return (_timezone);
 #else
+#if defined(SOLARIS) && defined(I386)
+	extern	long timezone;
+	return (timezone);
+#else
 #if (defined(SYSV) || defined(MACOSX))
 	struct tm *tm;
 	time_t clock;
@@ -90,6 +94,7 @@ static long os_timezone( void )
 	struct	timeb time_info;
 	ftime (&time_info);
 	return (time_info.timezone * 60);
+#endif
 #endif
 #endif
 }

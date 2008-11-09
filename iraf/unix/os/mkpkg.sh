@@ -2,12 +2,12 @@
 
 echo		"--------------------- OS ----------------------"
 
-if test "$IRAFARCH" == "macosx"; then
+if test "$IRAFARCH" = "macosx"; then
     export larch="-arch ppc"
-elif test "$IRAFARCH" == "macintel"; then
+elif test "$IRAFARCH" = "macintel"; then
     export larch="-arch i386"
 else
-    export larch=""
+    set larch=""
 fi
 
 $CC -c $HSI_CF $larch alloc.c getproc.c
