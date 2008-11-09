@@ -22,6 +22,7 @@ size_t	nreject				# Number of points rejected (output)
 size_t	newreject			# Number of new points rej. (output)
 
 long	i, j, i_min, i_max, ilast
+long	l_val
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
 
@@ -100,8 +101,10 @@ begin
 	    if ((residual > high_cut) || (residual < low_cut)) {
 
 		# Determine region to reject.
-		i_min = max (1, int (i - grow))
-		i_max = min (npts, int (i + grow))
+		l_val = i - grow
+		i_min = max (1, l_val)
+		l_val = i + grow
+		i_max = min (npts, l_val)
 
 		# Reject points from the fit and flag them.
 		do j = i_min, i_max {
