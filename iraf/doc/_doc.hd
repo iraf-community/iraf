@@ -1,5 +1,7 @@
 # Root help directory for the DOC branch of the help database.
 
+$docdir = "./doc/"
+
 doc		sys = README,
-		hlp = ./doc/doc.men,
-		pkg = ./doc/doc.hd
+		hlp = docdir$doc.men,
+		pkg = docdir$doc.hd

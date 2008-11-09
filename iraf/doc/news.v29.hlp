@@ -77,14 +77,15 @@ and general nonlinear WCS such as the tangent plane or gnomonic projection.
 If a FITS image is read into the system which has WCS information in the
 header, the WCS will be retained in the IRAF image header and can be used
 in coordinate transformations.  The IMAGES tasks which move pixels around
-have been modified to edit the WCS to reflect the transformation (section 3.1.2).
-The image i/o system will automatically propagate the WCS of an image to a
-new copy of the image, and will edit the WCS as necessary if an image
-section is copied (this applies to all IRAF tasks which operate upon images).
-The task RIMCURSOR in the LISTS package has been rewritten to add support
-for coordinate transformations (section 3.1.3), and can be used, e.g., to read
-out the RA and DEC of objects on the image display using the image cursor,
-if the image has the necessary WCS information in the image header.
+have been modified to edit the WCS to reflect the transformation (section
+3.1.2). The image i/o system will automatically propagate the WCS of an
+image to a new copy of the image, and will edit the WCS as necessary if an
+image section is copied (this applies to all IRAF tasks which operate upon
+images). The task RIMCURSOR in the LISTS package has been rewritten to add
+support for coordinate transformations (section 3.1.3), and can be used,
+e.g., to read out the RA and DEC of objects on the image display using the
+image cursor, if the image has the necessary WCS information in the image
+header.
 
 Full integration of the new world coordinate facilities into all the IRAF
 applications, e.g., the graphics tasks and the spectral reduction packages,
@@ -507,7 +508,7 @@ The ASTUTIL package
 .le
 .ls 4 o
 The task SETAIRMASS in the ASTUTIL package was modified so that it now
-precesses the coordinates to the epoch of the observation.
+processes the coordinates to the epoch of the observation.
 .NH 4
 The DIGIPHOT.APPHOT package
 .le
@@ -523,7 +524,7 @@ and from the non-linear least square fits in FITPSF and RADPROF.
 .le
 .ls 4 o
 An "update" parameter was added to all of the APPHOT tasks.  If the
-"verify" parameter is set to "yes" and the task is run in noninteractive
+"verify" parameter is set to "yes" and the task is run in non-interactive
 mode \fIupdate=yes\fR will update the critical parameters in their
 respective parameter sets.
 .le

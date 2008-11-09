@@ -502,7 +502,7 @@ General changes
      The old code computed the diagonal (scale) terms correctly but the
      rotation terms were evidently incorrect.  The old code was based on
      the 1988 Hanisch and Wells WCS paper and the new code is based on a
-     more recent paper by Mark Calabretta et al, which supercedes the
+     more recent paper by Mark Calabretta et al, which supersedes the
      1988 representation.  The affect of this change should be limited
      as it only affects rotated images for which CDELT is given but no
      CD matrix is defined. (V2.10.4p2)
@@ -761,7 +761,7 @@ release.
     FIXPIX
         This  task  replaces  the  old  task  (now obsolete.ofixpix) and
         works with the more general  pixel  mask  facilities.   It  also
-        provides   greater  flexibility  in  chosing  the  interpolation
+        provides   greater  flexibility  in  choosing  the  interpolation
         direction.
 
 \fBICFIT\fR used in various tasks:

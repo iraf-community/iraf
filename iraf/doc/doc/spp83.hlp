@@ -333,7 +333,7 @@ referencing the same common must declare the common in the same way.
 
 	common /common_name/ object [, object [, ... ]]
 
-To avoid the possiblity of two procedures declaring the same common area
+To avoid the possibility of two procedures declaring the same common area
 differently in separate procedures, the COMMON declaration should be placed
 in a INCLUDE file (include files are discussed in a later section).
 
@@ -634,7 +634,7 @@ closing files, deleting temporary files, and aborting the program.
 
 
 Language support includes the IFERR and IFNOERR statements and the ERRCHK
-declaration.  The IFERR and IFNOERR statements are gramatically equivalent
+declaration.  The IFERR and IFNOERR statements are grammatically equivalent
 to the IF statement.  The meaning of the IFERR statement is "if an an error
 occurs during the processing of the enclosed code,...".  IFNOERR is equivalent,
 except that the sense of the test is reversed.  Note that the condition to
@@ -719,7 +719,7 @@ posting an exception handler with XWHEN.
     An assortment of repetitive constructs are provided for convenience.
 The simplest constructs are WHILE, which tests at the top of the loop,
 and REPEAT UNTIL, which tests at the bottom.  The DO construct is
-convienent for simple sequential operations on arrays.  The most general
+convenient for simple sequential operations on arrays.  The most general
 repetitive construct is the FOR statement.
 
 
@@ -760,7 +760,7 @@ statement.
 
 The FOR construct is very general, because of the lack of restrictions on
 the type of initialization and loop control statements chosen.  Any or all
-of the three parts of the FOR may be ommitted, but the semicolon delimiters
+of the three parts of the FOR may be omitted, but the semicolon delimiters
 must be present.
 
 
@@ -1342,7 +1342,7 @@ Example 5: Matrix Inversion
 gaussian elimination with partial pivoting is shown below.  The help
 text is shown with text formatter commands inserted.  The restriction
 of this procedure to matrices of a fixed size is unfortunate, but
-we have kept it that way to conform to Bevingtons original code.
+we have kept it that way to conform to Bevington's original code.
 .nf
 
 
@@ -1688,7 +1688,7 @@ end
 
 
 The Fortran output for the DELETE_FILES procedure is shown below.
-Note the implemention of the "template" string, the mapping of long
+Note the implementation of the "template" string, the mapping of long
 identifiers into 6 character Fortran identifiers, and the implementation
 of the while statement using GOTO.
 
@@ -1719,3 +1719,4 @@ c     filene  filename
 c     clpops  clpopns
 .fi
 .ke
+.endhelp

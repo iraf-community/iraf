@@ -610,7 +610,7 @@ General Task Changes
       the add and delete switches.
 
   \fBIMUTIL.IMSTATISTICS\fR
-      An interative rejection capability has been added to the imstatistics
+      An interactive rejection capability has been added to the imstatistics
       task. The new parameters nclip, lsigma, and usigma define the rejection
       parameters. A memory cacheing option was also added to imstatistics in
       order to optionally speed up performance if iterative rejection is en-
@@ -619,7 +619,7 @@ General Task Changes
   \fBIMUTIL.IMEXPR\fR
       Support for the bitwise operators or (|), and (&), exclusive or (^), and
       not (~) has been added to the imexpr task. The logical operators or (||)
-      and and (&&) have ben made truly logical i.e. they return 0's or 1's,
+      and and (&&) have been made truly logical i.e. they return 0's or 1's,
       rather than results of a bitwise or and and.
 
 
@@ -746,7 +746,7 @@ following codes followed by task name and the description of the change.
 
   c utilities.surfit 	    Added support for the half cross-terms option to
 			    the surfit task.  This involved changing the type
-			    of the xterms parameter from boolen (yes/no) to
+			    of the xterms parameter from boolean (yes/no) to
 			    string (none,half,full).
 
 \fBNOAO\fR
@@ -964,7 +964,7 @@ the main systems revisions file iraf$local/notes.v211.
     cached; use direct i/o to access the file), or 1 (file cached in VM;
     use normal VM-buffered i/o to access the file).  Even if a file is
     not cached the daemon keeps track of all accesses.  Files which are
-    frequently accessed will have a higher prority and are more likely
+    frequently accessed will have a higher priority and are more likely
     to be cached in memory.
 
     The VMcache daemon is a separate system-level program outside of

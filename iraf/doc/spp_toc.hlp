@@ -1,4 +1,3 @@
-
 .help spp Jan83 "IRAF Subset Preprocessor Language"
 .ce
 Contents
@@ -117,3 +116,4 @@ Example 5: Matrix Inversion
 Example 6: Pattern Matching
 .rj 31
 Example 7: Error Handling
+.endhelp

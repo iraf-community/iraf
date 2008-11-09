@@ -4,7 +4,7 @@
 -------------------------------------------------------------------------------
 
     The new IMIO interface, used by all IRAF tasks to access bulk image data
-on disk, is now capabable of operating upon both the old IRAF format (OIF)
+on disk, is now capable of operating upon both the old IRAF format (OIF)
 images as well as STScI SDAS/GEIS format images.  The default image type is
 the OIF format.  Any existing OIF format images are readable by the new system
 without change.  Although IRAF can read either OIF or STF format images,
@@ -81,7 +81,7 @@ subscript to the image name, e.g.,
 or
 	cl> imstat pix.aah[3][*,100]	# line 100 of group 3
 
-A new group format image can be created in a similar fashion, specifing the
+A new group format image can be created in a similar fashion, specifying the
 number of groups to preallocate space for, e.g.,
 
 	cl> imcopy dev$pix testimage[1/10]
@@ -164,7 +164,7 @@ turned up some of the same problems, but the failure rate was considerably
 lower, probably because the kernel and i/o system are so much simpler.
 
 Interrupting a process at the wrong time can cause many problems, e.g.,
-[1] subprocess memory can be corrupted, resulting in unpredictable behaviour
+[1] subprocess memory can be corrupted, resulting in unpredictable behavior
 and possibly deadlock when the CL later tries to talk the the process,
 [2] a VMS forced exit of the process can occur, e.g., when trying to deliver
 an AST to an invalid address, [3] corruption of the CL/subprocess communications
@@ -190,9 +190,10 @@ subprocess becomes hung it may be necessary to restart the CL itself.
 20 Feb 85	Process connect failure during ":.snap" in cursor mode
 ----------------------------------------------------------------------------
 
-    We are still ocasionally having problems when trying to spawn a graphics
+    We are still occasionally having problems when trying to spawn a graphics
 subkernel in response to a ":.snap" command in cursor mode.  This happens
 infrequently (which is why it is so hard to find the bug), and will usually
 go away after exiting and reentering cursor mode and trying again.  It might
 also help to do a ":.gflush" while in cursor mode.
+.fi
 .endhelp

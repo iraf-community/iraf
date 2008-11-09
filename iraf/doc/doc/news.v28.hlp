@@ -153,7 +153,7 @@ one must now specify the name of the layered package in order to pick up the
 package environment definitions.  For example, to update the MTLOCAL package
 in NOAO, one would type "\fRmkpkg -p noao update\fR" in the \fRmtlocal\fR
 directory.  If this is not done compilation errors may result, or the
-exectable may not be successfully installed in the package BIN directory.
+executable may not be successfully installed in the package BIN directory.
 .NH 3
 Multiple architecture support
 
@@ -317,7 +317,7 @@ wasted space).
 
 For finer control over the packing density, the user can now specify the
 optional environment variable \fRimpkden\fR, the numeric value being the
-mininum packing density.  For example,
+minimum packing density.  For example,
 .sp
 .nf
     \fRcl> set impkden = 1.0\fR
@@ -406,8 +406,8 @@ using the following routines:
 .fi
 .sp
 where \fIdir\fR is a Fortran character variable.  The value should
-be either "HDR$" (the default) or a concatenatable host directory
-pathname (i.e., trailing / required for unix).  Once set, the
+be either "HDR$" (the default) or a concatenable host directory
+pathname (i.e., trailing / required for UNIX).  Once set, the
 pixel directory will be used for all subsequent image create or
 rename operations by the calling process.
 
@@ -571,8 +571,8 @@ the interface.
 .NH 3
 IMIO changes
 
-    IMIO is the image i/o interface, the standard IRAF VOS interface for managing
-all varieties of image data.
+    IMIO is the image i/o interface, the standard IRAF VOS interface for
+managing all varieties of image data.
 .NH 4
 Mask image support
 
@@ -643,12 +643,12 @@ a function value equal to zero will fail if the named variable is not defined.
 .NH 3
 Environment substitution in filenames
 
-    The VOS filename mapping code has been modified to add support a powerful new
-environment substitution syntax.  Previously the only environment substitution
-mechanism available was the logical directory facility, which could only be
-used to parameterize the directory field.  The new facility may be used to
-perform environment substitution anywhere in a filename.  This is used in
-IRAF version 2.8 to implement multiple architecture support, e.g.,
+    The VOS filename mapping code has been modified to add support a powerful
+new environment substitution syntax.  Previously the only environment
+substitution mechanism available was the logical directory facility, which
+could only be used to parameterize the directory field.  The new facility may
+be used to perform environment substitution anywhere in a filename. This is
+used in IRAF version 2.8 to implement multiple architecture support, e.g.,
 .sp
 .nf
     \fRcl> set bin = "iraf$bin(arch)/"\fR
@@ -669,10 +669,11 @@ in \fRmkpkg\fR.
 .NH 3
 Nonblocking raw terminal i/o
 
-    The VOS file i/o interfaces have been modified to add support for nonblocking
-terminal i/o.  This facility makes it possible to, in effect, "poll" the
-terminal to see if there is any input waiting to be read, to allow interaction
-without having a program block if the user has not typed anything.
+    The VOS file i/o interfaces have been modified to add support for
+nonblocking terminal i/o.  This facility makes it possible to, in effect,
+"poll" the terminal to see if there is any input waiting to be read, to
+allow interaction without having a program block if the user has not typed
+anything.
 
 The immediate application of this in version 2.8 was the modification
 of the \fRstty\fR (set-terminal) facility to implement a time out for
@@ -749,10 +750,10 @@ doing this is documented in the system notes file.
 .NH 3
 IMTOOL enhancements
 
-    A number of enhancements and bug fixes have been made for V2.8 to the SunView
-based IMTOOL image display server.  The most notable changes are summarized
-here; refer to the IMTOOL manual page for a more complete description of the
-new features.
+    A number of enhancements and bug fixes have been made for V2.8 to the
+SunView based IMTOOL image display server.  The most notable changes are
+summarized here; refer to the IMTOOL manual page for a more complete
+description of the new features.
 .NH 4
 Software ZOOM added
 
@@ -858,8 +859,8 @@ deinstall any old versions of the executables before installing the new ones.
 .NH 3
 VMS 4.7/5.0
 
-    Testing of the standard V2.8 VMS/IRAF release, which was prepared on VMS 4.7,
-on a VMS 5.0 system has thus far not revealed any problems (NOAO is still
+    Testing of the standard V2.8 VMS/IRAF release, which was prepared on VMS
+4.7, on a VMS 5.0 system has thus far not revealed any problems (NOAO is still
 running VMS 4.7 as our standard system).  Hence it appears that the standard
 V2.8 VMS/IRAF will \fIrun\fR under VMS 5.  It is likely, however, that any
 attempt to \fIrecompile\fR VMS/IRAF under VMS 5 would cause problems,
@@ -1127,7 +1128,7 @@ mark objects on the image display.  IMEDIT allows the user to interactively
 edit an image.
 .le
 .ls 4 o
-The APEXTRACT package in the TWODSPEC package has ungone several rounds
+The APEXTRACT package in the TWODSPEC package has had several rounds
 of modifications, as discussed in the IRAF Newsletters, No. 3 and 4.
 These changes included improved techniques and additional options
 for the extraction of data.

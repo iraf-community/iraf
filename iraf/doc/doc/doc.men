@@ -1,6 +1,7 @@
 	    DOC - General IRAF Documentation
 
     expressions - Standard expression syntax in IRAF tasks
+        pmmatch - Pixel mask matching
 
        -- Old Historical Documents --
        biblio84 - Summary of IRAF documentation (circa 1984)

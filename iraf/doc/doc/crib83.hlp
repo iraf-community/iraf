@@ -118,7 +118,7 @@ File types:
 
 .ks
 .nf
-Asychronous block i/o primitives (binary files only):
+Asynchronous block i/o primitives (binary files only):
 
 **	      aread (fd, buffer, maxchars, char_offset)	[also areadb ]
 **	     awrite (fd, buffer, nchars, char_offset)	[also awriteb]
@@ -651,7 +651,7 @@ to describe the type of terminal in use:
 .ke
 
 
-For example, the sequence "envgeti ("ttyncols")" will conviently return
+For example, the sequence "envgeti ("ttyncols")" will conveniently return
 the ncols parameter for use in applications programs which format long
 output lines.  These variables are initialized upon startup to default
 values but will need to be changed by the user if an unusual terminal or
@@ -929,7 +929,7 @@ or to cause a particular error action to be taken.  ERRCODE returns either
 OK or the integer code of the posted error.
 
 Language support includes the IFERR and IFNOERR statements and the ERRCHK
-declaration.  The IFERR statement is gramatically equivalent to the IF
+declaration.  The IFERR statement is grammatically equivalent to the IF
 statement.  Note that the condition to be tested in an IFERR statement may
 be a procedure call or assignment statement, while the IF statement tests
 a boolean expression.
@@ -1214,3 +1214,4 @@ vector operators to an array processor.  A transportable version of
 each operator will always exist.  Use the standard vector operators
 whenever possible to gain maximum efficiency without compromising the
 machine/device independence (transportability) of your program.
+.endhelp

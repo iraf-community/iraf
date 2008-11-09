@@ -269,7 +269,7 @@ Configure the IRAF Environment
 login directory $iraf/local.  The \fBsetenv iraf\fR definition must be
 changed to reflect the new IRAF root directory; everything else is optional
 and may be personalized if desired.  Note that IRAF assumes that all host
-directory pathnames may be concatentated with a filename to produce the
+directory pathnames may be concatenated with a filename to produce the
 pathname of the file, hence the directory pathname MUST end with a slash,
 contrary to normal UNIX convention.
 
@@ -598,7 +598,7 @@ into the IRAF file; both systems use the same termcap database format.
 
 .ls 4 \fB$iraf/dev/graphcap\fR
 There must be entries in this file for all graphics terminals, batch plotters,
-and image displays accessed by IRAF programs.  Wierd graphics terminals will
+and image displays accessed by IRAF programs.  Weird graphics terminals will
 need a new entry.  The IRAF file "sys$gio/doc/gio.hlp" contains docs for
 graphcap.  A printed copy of this document is available upon request, however
 once IRAF is up you may find it easier to generate your own copy using HELP,
@@ -617,6 +617,7 @@ back to us so that we may include them in the master graphcap file for other
 sites to use.
 .le
 
+.ls
 The DEV directory also contains a number of files (HOSTS, HOSTLOGIN, and UHOSTS)
 used by the IRAF network software.  We depend upon the networking capabilities
 of IRAF heavily at NOAO to access image displays, printers, files, etc. resident
@@ -794,7 +795,7 @@ We cannot do much to help sites with other image displays until the new
 IRAF display interface (which will be based on the IDI standard) is completed.
 Work is scheduled to begin on this in the spring, hence the software should
 become available this summer or fall.  The new interface and associated TV
-package software will be a great improvment over what is currently available;
+package software will be a great improvement over what is currently available;
 the current interface is a prototype and is quite minimal, e.g., it does
 not support image cursor readback, although it is fine for image display.
 
@@ -822,10 +823,11 @@ are the following.
 	math	- sources for the mathematical libraries
 	pkg	- the IRAF applications packages
 	sys	- the virtual operating system (VOS)
-	unix	- the UNIX system interface (kernel + bootstrap utiltiies)
-	vms	- the VMS system interface (kernel + bootstrap utiltiies)
+	unix	- the UNIX system interface (kernel + bootstrap utilities)
+	vms	- the VMS system interface (kernel + bootstrap utilities)
 .fi
 
 If you will be working with the system much at the system level, it will be
 well worthwhile to spend some time exploring these directories and gaining
 familiarity with the system.
+.endhelp

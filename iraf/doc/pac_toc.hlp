@@ -1,4 +1,3 @@
-
 .help packages Sep83 "IRAF Package Structure"
 .ce
 Contents
@@ -82,3 +81,4 @@ Contents
 
 .rj 32
 4. Correspondence of existing KPNO software to IRAF Packages
+.endhelp

@@ -80,7 +80,7 @@ CLPACKAGE
        onedspec - One dimensional spectral red & analysis package
 	   plot - Plot package						[up]
        softools - Software tools package (for programming)		[up]
-         system - System utilties package				[up]
+         system - System utilities package				[up]
        twodspec - Two dimensional spectral red & analysis package
       utilities - Miscellaneous utilities package			[up]
 .fi
@@ -279,3 +279,4 @@ UTILITIES
 	  urand - Uniform random number generator
 .fi
 .ke
+.endhelp
