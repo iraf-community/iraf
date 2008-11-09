@@ -191,7 +191,7 @@ int	i, ndim, npix, rop, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
 pointer	imstatp()
-int	imgnli()
+long	imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	immap, mw_openim, im_pmmapo
 

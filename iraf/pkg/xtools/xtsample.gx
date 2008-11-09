@@ -31,9 +31,9 @@ int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
 
-int	imgnls()
+long	imgnls()
 $if (datatype != s)
-int	imgnl$t()
+long	imgnl$t()
 $endif
 
 begin

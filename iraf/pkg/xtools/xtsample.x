@@ -31,7 +31,7 @@ int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
 
-int	imgnls()
+long	imgnls()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -116,8 +116,8 @@ int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
 
-int	imgnls()
-int	imgnli()
+long	imgnls()
+long	imgnli()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -202,8 +202,8 @@ int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
 
-int	imgnls()
-int	imgnlr()
+long	imgnls()
+long	imgnlr()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -288,8 +288,8 @@ int	i, ip, n, ndim, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
 
-int	imgnls()
-int	imgnld()
+long	imgnls()
+long	imgnld()
 
 begin
 	# Determine the number of pixels in the data, the number
