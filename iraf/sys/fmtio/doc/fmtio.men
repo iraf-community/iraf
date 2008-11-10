@@ -38,7 +38,7 @@
 	  scanc - Get the next character from a scan
 	sprintf - Formatted print to a string buffer
 	  sscan - Scan a string buffer
-	 strcat - String concatentation
+	 strcat - String concatenation
 	 strcpy - String copy
 	 strdic - Look a string up in a dictionary
 	  streq - Compare strings for equality
