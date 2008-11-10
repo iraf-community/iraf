@@ -198,7 +198,8 @@ begin
 
 		call icombine (input, Memc[output], Memc[headers], Memc[bmask],
 		    Memc[rmask], Memc[nrmask], Memc[emask], Memc[sigma],
-		    Memc[logfile], Memr[scales], Memr[zeros], Memr[wts], NO, NO)
+		    Memc[logfile], Memr[scales], Memr[zeros], Memr[wts],
+		    NO, NO, NO)
 
 	    } then
 		call erract (EA_WARN)

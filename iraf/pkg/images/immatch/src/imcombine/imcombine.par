@@ -8,6 +8,7 @@ rejmasks,s,h,"",,,List of rejection masks (optional)
 nrejmasks,s,h,"",,,List of number rejected masks (optional)
 expmasks,s,h,"",,,List of exposure masks (optional)
 sigmas,s,h,"",,,List of sigma images (optional)
+imcmb,s,h,"$I",,,Keyword for IMCMB keywords
 logfile,s,h,"STDOUT",,,"Log file
 "
 combine,s,h,"average","average|median|sum",,Type of combine operation

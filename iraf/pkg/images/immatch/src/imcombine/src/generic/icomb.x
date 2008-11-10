@@ -340,13 +340,13 @@ begin
 		if (docombine) {
 		    switch (combine) {
 		    case AVERAGE:
-			call ic_averages (d, id, n, wts, npts, YES, YES,
-			    Memr[outdata])
+			call ic_averages (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
 		    case MEDIAN:
 			call ic_medians (d, n, npts, YES, Memr[outdata])
 		    case SUM:
-			call ic_averages (d, id, n, wts, npts, YES, NO,
-			    Memr[outdata])
+			call ic_averages (d, id, n, wts, nimages, npts,
+			    YES, NO, Memr[outdata])
 		    }
 		}
 	    }
@@ -360,10 +360,12 @@ begin
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 1
 		    }
 		}
 
@@ -449,23 +451,26 @@ begin
 
 		switch (combine) {
 		case AVERAGE:
-		    call ic_averages (d, id, n, wts, npts, NO, YES,
-			Memr[outdata])
+		    call ic_averages (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
 		case MEDIAN:
 		    call ic_medians (d, n, npts, NO, Memr[outdata])
 		case SUM:
-		    call ic_averages (d, id, n, wts, npts, NO, NO,
-			Memr[outdata])
+		    call ic_averages (d, id, n, wts, nimages, npts,
+		        NO, NO, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
+			buf = buf + 1
 		    }
 		}
 			
@@ -814,13 +819,13 @@ begin
 		if (docombine) {
 		    switch (combine) {
 		    case AVERAGE:
-			call ic_averagei (d, id, n, wts, npts, YES, YES,
-			    Memr[outdata])
+			call ic_averagei (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
 		    case MEDIAN:
 			call ic_mediani (d, n, npts, YES, Memr[outdata])
 		    case SUM:
-			call ic_averagei (d, id, n, wts, npts, YES, NO,
-			    Memr[outdata])
+			call ic_averagei (d, id, n, wts, nimages, npts,
+			    YES, NO, Memr[outdata])
 		    }
 		}
 	    }
@@ -834,10 +839,12 @@ begin
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 1
 		    }
 		}
 
@@ -923,23 +930,26 @@ begin
 
 		switch (combine) {
 		case AVERAGE:
-		    call ic_averagei (d, id, n, wts, npts, NO, YES,
-			Memr[outdata])
+		    call ic_averagei (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
 		case MEDIAN:
 		    call ic_mediani (d, n, npts, NO, Memr[outdata])
 		case SUM:
-		    call ic_averagei (d, id, n, wts, npts, NO, NO,
-			Memr[outdata])
+		    call ic_averagei (d, id, n, wts, nimages, npts,
+		        NO, NO, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
+			buf = buf + 1
 		    }
 		}
 			
@@ -1288,13 +1298,13 @@ begin
 		if (docombine) {
 		    switch (combine) {
 		    case AVERAGE:
-			call ic_averager (d, id, n, wts, npts, YES, YES,
-			    Memr[outdata])
+			call ic_averager (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
 		    case MEDIAN:
 			call ic_medianr (d, n, npts, YES, Memr[outdata])
 		    case SUM:
-			call ic_averager (d, id, n, wts, npts, YES, NO,
-			    Memr[outdata])
+			call ic_averager (d, id, n, wts, nimages, npts,
+			    YES, NO, Memr[outdata])
 		    }
 		}
 	    }
@@ -1308,10 +1318,12 @@ begin
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
 			buf = buf + 1
 		    }
 		}
@@ -1398,23 +1410,26 @@ begin
 
 		switch (combine) {
 		case AVERAGE:
-		    call ic_averager (d, id, n, wts, npts, NO, YES,
-			Memr[outdata])
+		    call ic_averager (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
 		case MEDIAN:
 		    call ic_medianr (d, n, npts, NO, Memr[outdata])
 		case SUM:
-		    call ic_averager (d, id, n, wts, npts, NO, NO,
-			Memr[outdata])
+		    call ic_averager (d, id, n, wts, nimages, npts,
+		        NO, NO, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
+			buf = buf + 1
 		    }
 		}
 			
@@ -1763,13 +1778,13 @@ begin
 		if (docombine) {
 		    switch (combine) {
 		    case AVERAGE:
-			call ic_averaged (d, id, n, wts, npts, YES, YES,
-			    Memd[outdata])
+			call ic_averaged (d, id, n, wts, nimages, npts,
+			    YES, YES, Memd[outdata])
 		    case MEDIAN:
 			call ic_mediand (d, n, npts, YES, Memd[outdata])
 		    case SUM:
-			call ic_averaged (d, id, n, wts, npts, YES, NO,
-			    Memd[outdata])
+			call ic_averaged (d, id, n, wts, nimages, npts,
+			    YES, NO, Memd[outdata])
 		    }
 		}
 	    }
@@ -1783,10 +1798,12 @@ begin
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
 			buf = buf + 1
 		    }
 		}
@@ -1873,23 +1890,26 @@ begin
 
 		switch (combine) {
 		case AVERAGE:
-		    call ic_averaged (d, id, n, wts, npts, NO, YES,
-			Memd[outdata])
+		    call ic_averaged (d, id, n, wts, nimages, npts,
+		        NO, YES, Memd[outdata])
 		case MEDIAN:
 		    call ic_mediand (d, n, npts, NO, Memd[outdata])
 		case SUM:
-		    call ic_averaged (d, id, n, wts, npts, NO, NO,
-			Memd[outdata])
+		    call ic_averaged (d, id, n, wts, nimages, npts,
+		        NO, NO, Memd[outdata])
 		}
 
 		if (out[2] != NULL) {
 		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
 		    i = impnli (out[2], buf, Meml[v1])
 		    do i = 1, npts {
-			if (n[i] == 0)
+			if (n[i] > 0)
+			    Memi[buf] = 0
+			else if (n[i] == 0)
 			    Memi[buf] = 1
 			else
-			    Memi[buf] = 0
+			    Memi[buf] = 2
+			buf = buf + 1
 		    }
 		}
 			

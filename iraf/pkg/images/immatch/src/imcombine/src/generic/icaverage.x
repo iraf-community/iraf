@@ -1,24 +1,28 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<imhdr.h>
+include	<mach.h>
 include	"../icombine.h"
+include	"../icmask.h"
 
 
 # IC_AVERAGE -- Compute the average (or summed) image line.
 # Options include a weighted average/sum.
 
-procedure ic_averages (d, m, n, wts, npts, doblank, doaverage, average)
+procedure ic_averages (d, m, n, wts, nimages, npts, doblank, doaverage,
+	average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image ID pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image ID pointers
 int	n[npts]			# Number of points
-real	wts[ARB]		# Weights
+real	wts[nimages]		# Weights
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 int	doblank			# Set blank values?
 int	doaverage		# Do average?
 real	average[npts]		# Average (returned)
 
-int	i, j, k
+int	i, j, k, n1
 real	sumwt, wt
 real	sum
 
@@ -62,12 +66,13 @@ begin
 	} else {
 	    if (dowts) {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			wt = wts[Memi[m[1]+k]]
 			sum = Mems[d[1]+k] * wt
 			sumwt = wt
-			do j = 2, n[i] {
+			do j = 2, n1 {
 			    wt = wts[Memi[m[j]+k]]
 			    sum = sum + Mems[d[j]+k] * wt
 			    sumwt = sumwt + wt
@@ -77,9 +82,9 @@ begin
 				average[i] = sum / sumwt
 			    else {
 				sum = Mems[d[1]+k]
-				do j = 2, n[i]
+				do j = 2, n1
 				    sum = sum + Mems[d[j]+k]
-				average[i] = sum / n[i]
+				average[i] = sum / n1
 			    }
 			} else
 			    average[i] = sum
@@ -88,13 +93,14 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			sum = Mems[d[1]+k]
-			do j = 2, n[i]
+			do j = 2, n1
 			    sum = sum + Mems[d[j]+k]
 			if (doaverage == YES)
-			    average[i] = sum / n[i]
+			    average[i] = sum / n1
 			else
 			    average[i] = sum
 		    } else if (doblank == YES)
@@ -107,18 +113,20 @@ end
 # IC_AVERAGE -- Compute the average (or summed) image line.
 # Options include a weighted average/sum.
 
-procedure ic_averagei (d, m, n, wts, npts, doblank, doaverage, average)
+procedure ic_averagei (d, m, n, wts, nimages, npts, doblank, doaverage,
+	average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image ID pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image ID pointers
 int	n[npts]			# Number of points
-real	wts[ARB]		# Weights
+real	wts[nimages]		# Weights
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 int	doblank			# Set blank values?
 int	doaverage		# Do average?
 real	average[npts]		# Average (returned)
 
-int	i, j, k
+int	i, j, k, n1
 real	sumwt, wt
 real	sum
 
@@ -162,12 +170,13 @@ begin
 	} else {
 	    if (dowts) {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			wt = wts[Memi[m[1]+k]]
 			sum = Memi[d[1]+k] * wt
 			sumwt = wt
-			do j = 2, n[i] {
+			do j = 2, n1 {
 			    wt = wts[Memi[m[j]+k]]
 			    sum = sum + Memi[d[j]+k] * wt
 			    sumwt = sumwt + wt
@@ -177,9 +186,9 @@ begin
 				average[i] = sum / sumwt
 			    else {
 				sum = Memi[d[1]+k]
-				do j = 2, n[i]
+				do j = 2, n1
 				    sum = sum + Memi[d[j]+k]
-				average[i] = sum / n[i]
+				average[i] = sum / n1
 			    }
 			} else
 			    average[i] = sum
@@ -188,13 +197,14 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			sum = Memi[d[1]+k]
-			do j = 2, n[i]
+			do j = 2, n1
 			    sum = sum + Memi[d[j]+k]
 			if (doaverage == YES)
-			    average[i] = sum / n[i]
+			    average[i] = sum / n1
 			else
 			    average[i] = sum
 		    } else if (doblank == YES)
@@ -207,18 +217,20 @@ end
 # IC_AVERAGE -- Compute the average (or summed) image line.
 # Options include a weighted average/sum.
 
-procedure ic_averager (d, m, n, wts, npts, doblank, doaverage, average)
+procedure ic_averager (d, m, n, wts, nimages, npts, doblank, doaverage,
+	average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image ID pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image ID pointers
 int	n[npts]			# Number of points
-real	wts[ARB]		# Weights
+real	wts[nimages]		# Weights
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 int	doblank			# Set blank values?
 int	doaverage		# Do average?
 real	average[npts]		# Average (returned)
 
-int	i, j, k
+int	i, j, k, n1
 real	sumwt, wt
 real	sum
 
@@ -262,12 +274,13 @@ begin
 	} else {
 	    if (dowts) {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			wt = wts[Memi[m[1]+k]]
 			sum = Memr[d[1]+k] * wt
 			sumwt = wt
-			do j = 2, n[i] {
+			do j = 2, n1 {
 			    wt = wts[Memi[m[j]+k]]
 			    sum = sum + Memr[d[j]+k] * wt
 			    sumwt = sumwt + wt
@@ -277,9 +290,9 @@ begin
 				average[i] = sum / sumwt
 			    else {
 				sum = Memr[d[1]+k]
-				do j = 2, n[i]
+				do j = 2, n1
 				    sum = sum + Memr[d[j]+k]
-				average[i] = sum / n[i]
+				average[i] = sum / n1
 			    }
 			} else
 			    average[i] = sum
@@ -288,13 +301,14 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			sum = Memr[d[1]+k]
-			do j = 2, n[i]
+			do j = 2, n1
 			    sum = sum + Memr[d[j]+k]
 			if (doaverage == YES)
-			    average[i] = sum / n[i]
+			    average[i] = sum / n1
 			else
 			    average[i] = sum
 		    } else if (doblank == YES)
@@ -307,18 +321,20 @@ end
 # IC_AVERAGE -- Compute the average (or summed) image line.
 # Options include a weighted average/sum.
 
-procedure ic_averaged (d, m, n, wts, npts, doblank, doaverage, average)
+procedure ic_averaged (d, m, n, wts, nimages, npts, doblank, doaverage,
+	average)
 
-pointer	d[ARB]			# Data pointers
-pointer	m[ARB]			# Image ID pointers
+pointer	d[nimages]		# Data pointers
+pointer	m[nimages]		# Image ID pointers
 int	n[npts]			# Number of points
-real	wts[ARB]		# Weights
+real	wts[nimages]		# Weights
+int	nimages			# Number of images
 int	npts			# Number of output points per line
 int	doblank			# Set blank values?
 int	doaverage		# Do average?
 double	average[npts]		# Average (returned)
 
-int	i, j, k
+int	i, j, k, n1
 real	sumwt, wt
 double	sum
 
@@ -362,12 +378,13 @@ begin
 	} else {
 	    if (dowts) {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			wt = wts[Memi[m[1]+k]]
 			sum = Memd[d[1]+k] * wt
 			sumwt = wt
-			do j = 2, n[i] {
+			do j = 2, n1 {
 			    wt = wts[Memi[m[j]+k]]
 			    sum = sum + Memd[d[j]+k] * wt
 			    sumwt = sumwt + wt
@@ -377,9 +394,9 @@ begin
 				average[i] = sum / sumwt
 			    else {
 				sum = Memd[d[1]+k]
-				do j = 2, n[i]
+				do j = 2, n1
 				    sum = sum + Memd[d[j]+k]
-				average[i] = sum / n[i]
+				average[i] = sum / n1
 			    }
 			} else
 			    average[i] = sum
@@ -388,13 +405,14 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (n[i] > 0) {
+		    n1 = abs(n[i])
+		    if (n1 > 0) {
 			k = i - 1
 			sum = Memd[d[1]+k]
-			do j = 2, n[i]
+			do j = 2, n1
 			    sum = sum + Memd[d[j]+k]
 			if (doaverage == YES)
-			    average[i] = sum / n[i]
+			    average[i] = sum / n1
 			else
 			    average[i] = sum
 		    } else if (doblank == YES)

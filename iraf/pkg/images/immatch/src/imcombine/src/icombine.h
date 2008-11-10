@@ -37,14 +37,15 @@ define	S_OUTPUT	2
 define	S_OVERLAP	3
 
 # Mask options
-define	MASKTYPES	"|none|goodvalue|badvalue|goodbits|badbits|"
+define	MASKTYPES	"|none|goodvalue|badvalue|goodbits|badbits|novalue|"
 define	M_NONE		1	# Don't use mask images
 define	M_GOODVAL	2	# Value selecting good pixels
 define	M_BADVAL	3	# Value selecting bad pixels
 define	M_GOODBITS	4	# Bits selecting good pixels
 define	M_BADBITS	5	# Bits selecting bad pixels
-define	M_LTVAL		6	# Values less than specified are good
-define	M_GTVAL		7	# Values greater than specified are good
+define	M_NOVAL		6	# Value selecting no value (good = 0)
+define	M_LTVAL		7	# Values less than specified are good
+define	M_GTVAL		8	# Values greater than specified are good
 define	M_BOOLEAN	-1	# Ignore mask values
 
 # Data flag

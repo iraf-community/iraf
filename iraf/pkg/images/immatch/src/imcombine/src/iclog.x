@@ -156,6 +156,9 @@ begin
 	    case M_BADVAL:
 		call fprintf (logfd, "  masktype = badval, maskval = %d\n")
 		    call pargi (ICM_VALUE(icm))
+	    case M_NOVAL:
+		call fprintf (logfd, "  masktype = noval, maskval = %d\n")
+		    call pargi (ICM_VALUE(icm))
 	    case M_GOODBITS:
 		call fprintf (logfd, "  masktype = goodbits, maskval = %d\n")
 		    call pargi (ICM_VALUE(icm))

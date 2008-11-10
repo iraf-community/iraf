@@ -1,5 +1,5 @@
  	 geomap - Compute geometric transforms using matched coordinate lists
-        geotran - Transform 1-D or 2-D images using various mappinng transforms
+        geotran - Transform 1-D or 2-D images using various mapping transforms
       geoxytran - Transform coordinate lists using the geomap transforms
       gregister - Register 1-D or 2-D images using the geomap transforms
         imalign - Align and register 2-D images using a reference pixel list
