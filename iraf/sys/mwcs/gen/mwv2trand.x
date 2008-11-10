@@ -32,9 +32,10 @@ begin
 	} else if (CT_TYPE(ct) == LRO) {
 	    # Linear, rotated transformation.
 	    do i = 1, npts {
-		x2[i] = Memd[ltm  ] * x1[i] + Memd[ltm+1] * y1[i] +
+		p1[1] = x1[i];  p1[2] = y1[i]
+		x2[i] = Memd[ltm  ] * p1[1] + Memd[ltm+1] * p2[1] +
 		    Memd[ltv  ]
-		y2[i] = Memd[ltm+2] * x1[i] + Memd[ltm+3] * y1[i] +
+		y2[i] = Memd[ltm+2] * p1[1] + Memd[ltm+3] * p2[1] +
 		    Memd[ltv+1]
 	    }
 	} else {
