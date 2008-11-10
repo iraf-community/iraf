@@ -5,7 +5,7 @@
   oimstatistics - IMSTATISTICS from V2.11.3
 	 orfits - Convert a FITS image into an IRAF image (dataio V2.10.4)
 	 owfits - Convert an IRAF image into a FITS image (dataio V2.10.4)
-         radplt - PLot the radial profile of an object (noao.proto V2.9)
+         radplt - Plot the radial profile of an object (noao.proto V2.9)
 
 
        The previous package and release is listed in parenthesis

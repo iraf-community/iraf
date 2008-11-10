@@ -1,5 +1,29 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg/plot/hgpline.x		+
+pkg/plot/t_prows.x
+pkg/plot/t_pcols.x
+pkg/plot/t_graph.x
+pkg/plot/t_pvector.x
+pkg/plot/initmarker.x
+pkg/plot/mkpkg
+pkg/plot/graph.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pvector.par
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/pvector.hlp
+    Added a feature where marker types of "lhist" or "bhist" draw line
+    or box histograms when not in point mode.  In point mode these
+    values default to box and when not in point mode any other value
+    defaults to connected lines.  (8/13/08, Valdes)
+
 =======
 V2.13
 =======

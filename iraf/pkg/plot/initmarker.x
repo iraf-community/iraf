@@ -33,8 +33,14 @@ begin
 	else if (streq (marker, "diamond"))
 	    imark = GM_DIAMOND
 	else {
-	    call eprintf ("Unrecognized marker type, using 'box'\n")
-	    imark = GM_BOX
+	    if (streq (marker, "line") ||
+	        streq (marker, "lhist") ||
+		streq (marker, "bhist"))
+		imark = GM_BOX
+	    else {
+		call eprintf ("Unrecognized marker type, using 'box'\n")
+		imark = GM_BOX
+	    }
 	}
 end
 
