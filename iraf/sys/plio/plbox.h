@@ -6,5 +6,5 @@ define	B_X1		Meml[P2L($1+1)]	# X1 coord of box
 define	B_Y1		Meml[P2L($1+2)]	# Y1 coord of box
 define	B_X2		Meml[P2L($1+3)]	# X2 coord of box
 define	B_Y2		Meml[P2L($1+4)]	# Y2 coord of box
-define	B_PV		Meml[P2L($1+5)]	# pixel value
+define	B_PV		Memi[P2I($1+5)]	# pixel value
 
