@@ -132,7 +132,7 @@ profile and is defined mathematically as follows.
 EXAMPLES
 
 1. Convolve an image with a circular Gaussian function of sigma 2.0, and
-size 4.0 sigma using nearest neighbour boundary extension and the bilinear
+size 4.0 sigma using nearest neighbor boundary extension and the bilinear
 kernel.
 
     cl> gauss m83 m83.gau 2.0

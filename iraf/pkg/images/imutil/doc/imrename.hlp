@@ -8,7 +8,7 @@ imrename oldnames newnames
 .ih
 PARAMETERS
 .ls oldnames
-An image template specifing the names of the images to be renamed.
+An image template specifying the names of the images to be renamed.
 .le
 .ls newnames
 Either an image template specifying the new names for the images,

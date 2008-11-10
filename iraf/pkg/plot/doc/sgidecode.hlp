@@ -11,7 +11,7 @@ PARAMETERS
 The input SGI metacode files.
 .le
 .ls generic = no
-Ignore remaining paramters?
+Ignore remaining parameters?
 .le
 .ls verbose = no
 Print metacode in a verbose format?

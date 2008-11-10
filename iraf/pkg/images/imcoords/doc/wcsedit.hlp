@@ -183,7 +183,7 @@ FITS CD matrix notation supersedes the FITS CDELT/CROTA notation if both are
 present on input, and is used by preference on output.  The FITS parameter
 CTYPE cannot be edited directly by WCSEDIT but is correctly updated on
 output using the current values of the WCS parameters wtype and axtype
-parameters, if there was a prexisting FITS header in the image.  On input
+parameters, if there was a pre-existing FITS header in the image.  On input
 IRAF currently recognizes the following values of the FITS parameter CTYPE:
 RA---TAN and DEC--TAN (the tangent plane sky projection), RA---SIN and
 DEC--SIN (the sin sky projection), RA---ARC and DEC--ARC (the arc sky
@@ -209,7 +209,7 @@ recognizes the following values for "wtype": "linear", "tan", "sin",
 be decoded by the WCS code "linear" is assumed.
 Axtype should be "ra" or "dec" if wtype is one of the sky projections
 "tan", "sin" or "arc", otherwise it should be undefined.
-WCSEDIT will combine the values of "wtype" amd "axtype" on output to
+WCSEDIT will combine the values of "wtype" and "axtype" on output to
 produce the correct value of the FITS keyword CTYPE.
 The "label" and "units" parameter may be set to any string constant.
 Format must be set to a legal IRAF format as described in the section
@@ -354,7 +354,7 @@ This removes any rotation/skew from the WCS definition.
 
 6. Create a totally new WCS for an image, deleting the previous WCS
 and set the diagonal elements of the cd matrix to 0.68. 0.68 is the
-scale of the 36 inch telescope at kpno.
+scale of the 36 inch telescope at KPNO.
 
 .nf
 	cl> wcsedit image cd 1.5 1-2 wcs="kpno9m"
@@ -365,7 +365,7 @@ scale of the 36 inch telescope at kpno.
 .nf
 	cl> wcsedit image interactive+
 
-	    ... summary of current WCS is printed on terminl
+	    ... summary of current WCS is printed on terminal
 
 	    wcsedit: ?
 

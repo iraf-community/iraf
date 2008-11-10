@@ -50,7 +50,7 @@ via the cursor interface.
 
 A cursor read is not instantaneous.  A cursor read is initiated by reading a
 cursor type parameter, and terminated by typing any lower case or
-nonalphanumeric character on the keyboard.  The keyboard is used to
+non-alphanumeric character on the keyboard.  The keyboard is used to
 terminate cursor reads from the image display as well as from a graphics
 terminal.  While the cursor read is in progress, i.e., while the CL is
 waiting for a key to be typed on the terminal, the CL is said to be in
@@ -130,7 +130,7 @@ redrawing axes after a zoom, and prompting for text annotation.
 Second, cursor mode options and more complicated commands may be entered
 after a ":.", for example sending a screen snapshot to a hardcopy plotter
 and changing text quality and orientation.  Third, all other commands,
-namely the lower case letters and most nonalphanumeric characters,
+namely the lower case letters and most non-alphanumeric characters,
 are interpreted by the controlling task and will terminate a cursor read.
 Thus, if any keystroke is entered that is not shown below or handled by
 the governing application program, cursor mode exits and the keystroke and
@@ -279,7 +279,7 @@ in on a feature may bring out additional detail (the maximum resolution
 is 32768 points in either axis).  Increasing the magnification will
 increase the precision of a cursor read by the same factor.
 
-If the graphics frame is a typical vector plot with drawn and labelled
+If the graphics frame is a typical vector plot with drawn and labeled
 axes, magnifying a portion of the plot may cause the axes to be lost.
 If this is not what is desired a keystroke ("A") is provided to draw and label
 the axes of the displayed window.  The axes will be overplotted on the
@@ -294,7 +294,7 @@ By default the cursor mode keystrokes are all upper case letters, reserving
 lower case for applications programs.  The terminal shift lock key may be
 used to simplify typing in lengthy interactive cursor mode sessions.
 Most of the upper-case commands involve moving the graphics cursor
-and/or redisplaying a different part of the plot.  Special keystrokes
+and/or re-displaying a different part of the plot.  Special keystrokes
 are provided for stepwise cursor motions to increase the speed of cursor
 setting on terminals that do not have fast cursor motions (e.g., the
 Retro-Graphics enhanced VT100).  These keystrokes will only work if the terminal
@@ -352,7 +352,7 @@ returning the cursor position to the calling program.  This is useful
 when marking the positions of a large number of objects, to keep track
 of the objects already marked.  The cursor position will not be marked until
 cursor mode exits, i.e., no cursor mode command will cause the mark to be
-drawn.  The mark cursor option remains in effect until you explitictly turn
+drawn.  The mark cursor option remains in effect until you explicitly turn
 it off with ":.markcur-" or by typing \fIgflush\fR.  The marks are drawn
 in the frame buffer, hence they will survive zoom and roam or screen reset
 (they can be erased with repeated B commands if desired).
@@ -505,8 +505,8 @@ metacode file to a plotter with one of the graphics kernels:
 .nh 2
 Alternate Cursor Input
 
-    Any program which uses cursor input may be run noninteractively as well
-as in batch mode.  For example, suppost the task has a cursor type parameter
+    Any program which uses cursor input may be run non-interactively as well
+as in batch mode.  For example, suppose the task has a cursor type parameter
 called "coords".  In normal interactive use a hardware cursor read will
 occur every time the program reads the value of the "coords" parameter.
 To run the program in batch mode we must first prepare a list of cursor
@@ -559,7 +559,7 @@ be the pixel coordinates of the image section being displayed.
 .fi
 
 Redirecting cursor input to the terminal is useful when working from a
-nongraphics workstation and when debugging programs.  ASCII cursor queries
+non-graphics workstation and when debugging programs.  ASCII cursor queries
 are the only type supported when running an IRAF program outside the CL.
 Cursor input may also be taken from a list file by assigning a filename
 to a cursor parameter, i.e., by assigning a list file to a list structured

@@ -25,6 +25,7 @@ the script file should have the same name.
 A required (query mode) parameter for the procedure.
 Hidden parameters must be declared in the declarations section but do
 not appear in the argument list.
+.le
 .ih
 DESCRIPTION
 The \fIprocedure\fR statement is used to declare a new CL procedure.
@@ -32,7 +33,7 @@ In the current CL, procedures are permitted only in ".cl" script files,
 and there may be only one procedure per file.  The \fIprocedure\fR statement
 must be the first non-comment statement in the script file.  Any parameters
 which appear in the procedure argument list must be declared in the parameter
-declarations section as well and will default to mode "auto".  Paremeters not
+declarations section as well and will default to mode "auto".  Parameters not
 in the required parameter list will default to mode "hidden".
 The order of positional parameters is the order in which the parameters
 appear in the argument list.

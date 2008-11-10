@@ -114,7 +114,7 @@ EXAMPLES
 	    print (sqrt (x**2 + y**2))
 .fi
 
-2. Use a formatted scan of the scandard input.
+2. Use a formatted scan of the standard input.
 
 .nf
      cl> print ("1.234 5 7.34abc") | scanf ("%g %d %f %s", x, i, y, s1)

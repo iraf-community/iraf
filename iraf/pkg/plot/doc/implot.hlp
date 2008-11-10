@@ -63,7 +63,7 @@ The following single character keystrokes are recognized by Implot.  Note that
 numerous additional keystrokes are provided by "cursor mode" itself, i.e.,
 by the graphics system.  These additional keystrokes provide such standard
 facilities as stepwise cursor motion, plot expansion, movies, disposal to a
-batch plotter or metafile, and plot annotation facilties.  Cursor mode is
+batch plotter or metafile, and plot annotation facilities.  Cursor mode is
 documented elsewhere.
 
 

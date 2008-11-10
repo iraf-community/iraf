@@ -453,7 +453,7 @@ and unpack records, text i/o tends to be cpu bound.
 Network I/O [NWBIN,NRBIN,NWNULL,NWTEXT,NRTEXT]
 
     These benchmarks are equivalent to the binary and text file benchmarks
-just discussed, except that the binary and text files are acccessed on a
+just discussed, except that the binary and text files are accessed on a
 remote node via the IRAF network interface.  The calling sequences are
 identical except that an IRAF network filename is given instead of referencing
 a file in the current directory.  For example, the following commands would
@@ -614,7 +614,7 @@ special features or problems of the host system which may have affected the
 results.  In general we did not bother to record things like system tuning
 parameters, working set, page faults, etc., unless these were considered an
 important factor in the benchmarks.  In particular, few IRAF programs page
-fault other than during process startup, hence this is rarely a signficant
+fault other than during process startup, hence this is rarely a significant
 factor when running these benchmarks (except possibly in IMTRAN).
 
 Detailed results for each configuration of each host system are presented on

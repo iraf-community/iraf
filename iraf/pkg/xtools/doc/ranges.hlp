@@ -96,7 +96,7 @@ be in a loop of the form:
 bool procedure is_in_range (ranges, number)
 
 int	ranges[ARB]		# Ranges array
-int	number			# Number to check againts ranges
+int	number			# Number to check against ranges
 .fi
 
 A boolean value is returned indicating whether number is covered by

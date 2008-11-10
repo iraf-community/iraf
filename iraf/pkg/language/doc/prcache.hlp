@@ -9,6 +9,7 @@ prcache task [task ...]
 PARAMETERS
 .ls task
 The name of a compiled IRAF task (not the filename of an executable file).
+.le
 .ih
 DESCRIPTION
 The CL maintains a small cache to store executable images.  When the

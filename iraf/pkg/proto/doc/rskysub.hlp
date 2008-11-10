@@ -81,7 +81,7 @@ The image header keyword containing the computed scaling factor.
 .le
 
 .ls statsec = ""
-The input image section used to compute the indivual image scaling factors.
+The input image section used to compute the individual image scaling factors.
 Statsec is independent of of the input image section if any.
 .le
 .ls lower = INDEF, upper = INDEF
@@ -138,7 +138,7 @@ Print messages about the progress of the task ?
 DESCRIPTION
 
 RSKYSUB computes the average sky image for each image in the input image
-list \fIinlist\fR using a runnining mean or median technique and subtracts
+list \fIinlist\fR using a running mean or median technique and subtracts
 it from the input image to create the output sky subtracted images
 \fIoutlist\fR. The input image list is assumed to be ordered by time of
 observation. If the input image masks list \fIimasks\fR is defined then the

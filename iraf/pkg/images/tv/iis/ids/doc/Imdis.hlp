@@ -504,7 +504,7 @@ routine will, therefore, always return a non-zero (positive) integer.
 .le
 .ls cv_rcur (cnum, x, y)
 Reads the cursor "cnum" returning the NDC coordinates in x and y.  The
-mapping of cursor number to frame is described in the preceeding
+mapping of cursor number to frame is described in the preceding
 section: for cursors with numbers below IDS_CSET (128), the cursor
 refers to the frame (cnum equal 5 means frame 5).
 .le
@@ -529,8 +529,8 @@ planes instead if "device" equals IDS_DISPLAY_G.
 .le
 .ls cvmatch (type, refframe, refcolor, frames, color)
 Copies the reference frame and reference color into the given frames
-and color.  For the IIS, "type" is either IDS_FRAME_LUT, refering to the
-look-up tables associated with each frame, or IDS_OUTPUT_LUT, refering
+and color.  For the IIS, "type" is either IDS_FRAME_LUT, referring to the
+look-up tables associated with each frame, or IDS_OUTPUT_LUT, referring
 to the global Output Function Memory tables.
 .le
 .ls cvoffset (color, data)

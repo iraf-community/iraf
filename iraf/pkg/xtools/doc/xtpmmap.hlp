@@ -125,7 +125,7 @@ ALTERNATIVE MASK DESCRIPTIONS
 This interface accepts alternate mask descriptions that are internally
 converted to the same mask structure for transparent use by the application.
 The preferred input mask description is a pixel mask in either pixel list
-format (.pl extension) or a FITS pixel mask (a binary table representaion).
+format (.pl extension) or a FITS pixel mask (a binary table representation).
 The alternate representations are a regular image and a text description.
 
 The pixels values in a regular image are truncated (towards zero) to integers.
@@ -135,7 +135,7 @@ A text description consists of lines in a text file with either two or
 four values.  The values are truncated to integers if needed.  Two values
 define a mask value of 2 at the (x,y) coordinate.  Four values define a
 region, given as (x1,x2,y1,y2) of mask values.  The mask values are 2 if
-the wdith of the region is narrower or equal to the heigth.  Otherwise the
+the width of the region is narrower or equal to the height.  Otherwise the
 value is 3.  This is a convention used by task which then interpolate
 across bad pixel regions.
 

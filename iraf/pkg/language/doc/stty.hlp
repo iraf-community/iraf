@@ -231,7 +231,7 @@ but of actually executing an arbitrary sequence of commands formerly entered
 by the user.  This is different from executing a sequence of commands entered
 into, for example, a CL script, because \fIall\fR input is recorded,
 including not only the commands, but also all responses to parameter queries,
-all rawmode keystroke input, and all graphics cursor input occuring
+all rawmode keystroke input, and all graphics cursor input occurring
 interactively during execution of the recorded commands.
 These \fBplayback scripts\fR are useful for preparing automated demos or
 tutorials of complex software, and for preparing scripts to be used to
@@ -382,7 +382,7 @@ Raw Mode Playback
 When a program is executing which reads from the terminal in raw mode,
 each character is read from the terminal as soon as it is typed, and
 input characters are not echoed to the terminal unless the application
-explicly does the echoing.  Examples of programs which use raw mode input are
+explicitly does the echoing.  Examples of programs which use raw mode input are
 \fIeparam\fR and \fIpage\fR, which are keystroke driven, and any program
 which reads the \fBgraphics cursor\fR, since a graphics cursor read uses raw
 mode input.
@@ -421,7 +421,7 @@ from this example.
 The single character per line format of a cursor read reflects the fact that
 each input record is a single character when reading from the terminal in
 raw mode.  For the purposes of playback, however, such a sequence may be
-reformatted on a single line if desired, to improve the readibility of a
+reformatted on a single line if desired, to improve the readability of a
 script (the extra whitespace in the second example is ignored, since if a
 space were data it would appear as \s).
 

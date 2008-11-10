@@ -24,7 +24,7 @@ DESCRIPTION
 \fIType\fR copies the named files (or the files selected by
 the file template) to the standard output.
 If there is more than one file in the input list, a header naming the file
-to be printed will preceed each output file.
+to be printed will precede each output file.
 .ih
 EXAMPLES
 

@@ -14,7 +14,7 @@ Input images.
 Output image.
 .le
 .ls title = ""
-Image title for the outpu image.  If null ("") then the title of the
+Image title for the output image.  If null ("") then the title of the
 first image is used.
 .le
 .ls hparams = ""
@@ -59,19 +59,18 @@ DESCRIPTION
 The input images are summed, averaged, or medianed pixel by pixel and the
 result recorded in the output image.  All input images must be the same
 size but not necessarily of the same pixel datatype.  For the sum or average
-option a selected fraction or number of pixels may be
-rejected.  The output option "average" divides the sum by
-the number of pixels in the sum.  The pixel datatype of the output image
-may be selected or defaulted to the calculation datatype.
-The calculation type may be selected or defaulted
-to the highest precedence datatype of the input images.  Note that
-a mixture of "short" and "ushort" images has a highest precedence
-datatype of "int".  If all the 
-image pixel datatypes are the same and agree with the calculation type then
-this operation is maximally efficient.  However, beware of integer overflows
-with images of datatype short or ushort.  A log of the task name, the input image names,
-the output image name, the output pixel datatype, the output option, and
-the pixel rejection parameters is printed when the verbose parameter is yes.
+option a selected fraction or number of pixels may be rejected.  The output
+option "average" divides the sum by the number of pixels in the sum.  The
+pixel datatype of the output image may be selected or defaulted to the
+calculation datatype. The calculation type may be selected or defaulted
+to the highest precedence datatype of the input images.  Note that a
+mixture of "short" and "ushort" images has a highest precedence datatype
+of "int".  If all the image pixel datatypes are the same and agree with the
+calculation type then this operation is maximally efficient.  However,
+beware of integer overflows with images of datatype short or ushort.  A log
+of the task name, the input image names, the output image name, the output
+pixel datatype, the output option, and the pixel rejection parameters is
+printed when the verbose parameter is yes.
 
 In addition to summing the pixels the specified image header parameters may
 be summed or averaged.  This is primarily used for summing image exposure
@@ -118,7 +117,7 @@ images which may be open at one time.  If the number of images
 (of dimension >= 2) exceeds this maximum and median or pixel rejection is
 used then the performance of this task will suffer due to the need to
 repeatedly open and close the excess images.  The maximum number is a
-configurable paramenter in the include file "imsum.h".
+configurable parameter in the include file "imsum.h".
 
 This task has been largely replaced by the task \fBimcombine\fR.  It is
 still available but may be removed in the future.  \fBImcombine\fR is

@@ -134,3 +134,4 @@ The file wait option is controlled by the "file_wait" variable in the
 environment.  If file waiting is enabled, and a process finds that it
 has to wait to access a file, a warning message will be printed on the
 standard error output before the affected process goes to sleep.
+.endhelp

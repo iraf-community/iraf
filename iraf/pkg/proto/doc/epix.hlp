@@ -22,7 +22,7 @@ the rejection mean and the median will be computed.
 .le
 .ls ksigma = 0.0
 The pixel rejection threshold for the iterative rejection algorithm used
-to compute the mean.  If zero, a rejection thresold will be computed based
+to compute the mean.  If zero, a rejection threshold will be computed based
 on the size of the sample using Chauvenet's relation.
 .le
 .ls edit_image = yes

@@ -26,6 +26,7 @@ Integer valued constants used to match expression.
 .ls statements
 Simple or compound statements to be executed when the appropriate case or
 default block is selected.
+.le
 .ih
 DESCRIPTION
 The \fIswitch\fR statement provides a multiway branch capability.

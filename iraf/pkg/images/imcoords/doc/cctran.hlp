@@ -124,13 +124,13 @@ and "%13.7g" for coordinates in radians. All the remaining fields in the
 input file are copied to the output file without modification. Blank lines
 and comment lines are also passed to the output file unaltered.
 
-The plate solution is either be read from record \fIsolutions\fR
+The plate solution is either read from record \fIsolutions\fR
 in the database file \fIdatabase\fR written by CCMAP, or specified
 by the user via the \fIxref\fR, \fIyref\fR, \fIxmag\fR, \fIymag\fR,
 \fIxrotation\fR, \fIyrotation\fR, \fIlngref\fR, \fIlatref\fR, 
-and \fIprojection\fR parameters. \fILngunits\fR and \fIlatunits\fR
-are undefined they default to to the values in the database or to
-the quantitiels "hours" and "degrees" respectively.
+and \fIprojection\fR parameters. If \fILngunits\fR and \fIlatunits\fR
+are undefined they default to the values in the database or to
+the quantities "hours" and "degrees" respectively.
 If the \fIforward\fR
 parameter is "yes", the input coordinates are assumed to be pixel coordinates
 and are transformed to celestial coordinates. If \fIforward\fR is "no", then
@@ -194,7 +194,7 @@ of the coordinates not the rotation of the coordinate axes.
 .fi
 
 Linear plate solutions are evaluated in the forward and reverse sense
-using the appropriate iraf mwcs system routines. Higher order plate
+using the appropriate IRAF mwcs system routines. Higher order plate
 solutions are evaluated in the forward sense using straight-forward
 evaluation of the polynomial terms, in the reverse sense by applying
 Newton's method to the plate solution.

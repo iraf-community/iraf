@@ -146,7 +146,7 @@ The algorithm used to compute the cross-correlation function. The options
 are:
 .ls discrete
 The cross-correlation function is calculated by computing the discrete
-convolution of the reference and imput image regions over the x and y 
+convolution of the reference and input image regions over the x and y 
 window of interest.  This technique is most efficient method for small
 cross-correlation function x and y search windows.
 .le

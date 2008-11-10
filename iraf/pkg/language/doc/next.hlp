@@ -8,7 +8,7 @@ next
 .ih
 DESCRIPTION
 The \fInext\fR statement begins the next iteration of the loop construct
-in which it is enclosed, whithout executing any of the statements remaining
+in which it is enclosed, without executing any of the statements remaining
 before the end of the loop.
 .ih
 EXAMPLES

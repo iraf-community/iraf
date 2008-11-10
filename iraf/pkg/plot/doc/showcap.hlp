@@ -26,7 +26,7 @@ prompts with an asterisk.
 	    |  cc [arg1 [arg2 [arg3]]]
 	    ;
 	
-	cc  :   a two chararacter capcode (e.g., 'cm')
+	cc  :   a two character capcode (e.g., 'cm')
 	    |   an encoder program (non alpha first char)
 	    ;
 	*

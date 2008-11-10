@@ -192,7 +192,7 @@ expression are output in the order in which they appear in exprs.
 .ls formats = ""
 An optional list of column formats separated by commas. Column formats must
 be placeholders, e.g. the letter f for existing columns which are not
-reformated (with the possible exception of the coordinate columns).
+reformatted (with the possible exception of the coordinate columns).
 Column expression formats may be any regular formatting expression.
 For example if \fIexprs\fR is "c[1-3],c4+c5,c5+c7", then formats might be
 "f,%7.3f,%7.3f".

@@ -45,7 +45,7 @@ override the magnification factors.
 The interpolant used for rebinning the image.
 The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.

@@ -51,7 +51,7 @@ files are printed in sort order, followed by the ".com" files.
 
 2. Print the output of the \fIimstat\fR task on the versatec printer,
 paginating the output with the given label on each page.  Note that the
-command may be broken after the "pipe" chararacter without need for
+command may be broken after the "pipe" character without need for
 explicit backslash continuation.
 
 .nf

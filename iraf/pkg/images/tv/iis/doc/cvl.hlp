@@ -66,7 +66,7 @@ maximum display levels.
 .le
 .ls "log"
 Map the minimum and maximum image intensities linearly to the range 1 to 1000,
-take the logrithm (base 10), and then map the logrithms to the display
+take the logarithm (base 10), and then map the logarithms to the display
 range.
 .le
 .ls "none"
@@ -111,7 +111,7 @@ the parameters of this task are related to these two transformations.
 
 A display window is defined in terms of the full frame.  The lower left
 corner of the frame is (0, 0) and the upper right corner is (1, 1) as viewed on
-the monitor.  The display window is specifed by a center (defaulted to the
+the monitor.  The display window is specified by a center (defaulted to the
 center of the frame (0.5, 0.5)) and a size (defaulted to the full size of
 the frame, 1 by 1).  The image is loaded only within the display window and
 does not affect data outside the window; though, of course, an initial
@@ -141,9 +141,9 @@ effect for images with a range exceeding the display range.  This is
 sometimes desirable because it produces a contoured image which is not
 saturated at the brightest or weakest points.  This transformation is
 also the fastest.  Another transformation, "linear", maps the selected
-image range linearly to the full display range.  The logrithmic
+image range linearly to the full display range.  The logarithmic
 transformation, "log", maps the image range linearly between 1 and 1000
-and then maps the logrithm (base 10) linearly to the full display
+and then maps the logarithm (base 10) linearly to the full display
 range.  In the latter transformations pixel values greater than
 selected maximum display intensity are set to the maximum display value
 and pixel values less than the minimum intensity are set to the minimum
@@ -151,7 +151,7 @@ display value.
 
 Methods for setting of the range of image pixel values, \fIz1\fR and
 \fIz2\fR, to be mapped to the full display range are arranged in a
-heirarchy from an automatic mapping which gives generally good result
+hierarchy from an automatic mapping which gives generally good result
 for typical astronomical images to those requiring the user to specify
 the mapping in detail.  The automatic mapping is selected with the
 parameter \fIzscale\fR.  The automatic mapping algorithm is described

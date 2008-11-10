@@ -70,7 +70,7 @@ is short, integer, or long, overflow or truncation may occur.
 
 When one of the scaling parameters is the image mean, median,
 or mode, then the image mean, median, and mode are calculated. The statistics
-compuation can be restricted to a section of the input image by setting
+computation can be restricted to a section of the input image by setting
 the parameter
 \fIsection\fR. Otherwise the parameter \fIstep\fR is used to
 define a default image section.

@@ -34,7 +34,7 @@ to be the same length as all the other records on the tape.
 .le
 .ih
 DESCRIPTION
-T2d reads files from tape and puts them into disk files.  No formating is
+T2d reads files from tape and puts them into disk files.  No formatting is
 performed so the bits and bytes are in the same order on disk as they were
 on tape.  The program uses double buffering and asynchronous i/o to speed
 things up as much as possible.

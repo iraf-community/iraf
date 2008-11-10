@@ -49,7 +49,7 @@ array element I.
 .ih
 BUGS
 A simple assignment of the form i++ will not work.
-Only one assigment statement is permitted in the first and third fields.
+Only one assignment statement is permitted in the first and third fields.
 .ih
 SEE ALSO
 while, case, break, next

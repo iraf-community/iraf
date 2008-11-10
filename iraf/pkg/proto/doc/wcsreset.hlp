@@ -19,7 +19,7 @@ Reset the physical coordinate system to the logical coordinate system, but
 leave the default world coordinate system unchanged.  This operation removes
 the history of past image operations such as imcopy, imshift, magnify, etc
 from the definition of the physical coordinate system, but not from the
-definition of the world coordinate sytem.
+definition of the world coordinate system.
 .le
 .ls world
 Reset the default world coordinate system to the logical coordinate system.
@@ -66,7 +66,7 @@ Resetting the physical coordinate system to the logical coordinate system,
 does not alter the default world coordinate system. If for example the input
 image is a spectrum, with a defined dispersion solution, resetting the
 physical coordinate system will not alter the dispersion solution.
-Similarly if the input image is a direct ccd image with a defined sky
+Similarly if the input image is a direct CCD image with a defined sky
 projection world coordinate system, resetting the physical coordinate system
 will not alter the sky projection.
 
@@ -164,7 +164,7 @@ LTV1 keyword is not defined and is therefore 0. The user runs
 implot with wcs = "physical" as before and sees a plot which extends
 from 30 to 50 as expected.
 
-2. Reset the physical coordinate system of the direct ccd image skypix
+2. Reset the physical coordinate system of the direct CCD image skypix
 which has a defined sky projection system. Skypix was created by
 copying the central [129:384,129:384] of a 512 square image into a 256
 square image.

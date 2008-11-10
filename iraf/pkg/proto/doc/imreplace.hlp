@@ -14,7 +14,7 @@ Images in which the pixels are to be replaced.
 Replacement value for pixels in the window.
 .le
 .ls imaginary = 0.
-Replacement value for pixels in the windoe for the imaginary part of
+Replacement value for pixels in the window for the imaginary part of
 complex data.
 .le
 .ls lower = INDEF
@@ -39,7 +39,7 @@ possible pixel values, respectively.
 For complex images the replacement value is specified as separate
 real and imaginary and the thresholds are the magnitude.  For
 integer images the thresholds are used as inclusive limits
-so that, for example, the range 5.1-9.9 affets pixels 6-9.
+so that, for example, the range 5.1-9.9 affects pixels 6-9.
 .ih
 EXAMPLES
 1. In a flat field calibration which has been scaled to unit mean replace

@@ -1,10 +1,12 @@
-.help hedit Apr01 images.imutil
+.help nhedit Aug08 images.imutil
 .ih
 NAME
-hedit - edit or view an image header or headers
+nhedit - edit or view an image header interactively or using a command file
 .ih
 USAGE
-hedit images fields value
+.nf
+nhedit images fields value comment
+.fi
 .ih
 PARAMETERS
 .ls images
@@ -13,13 +15,36 @@ Template specifying the images to be edited.
 .ls fields
 Template specifying the fields to be edited in each image.  The template is
 expanded independently for each image against the set of all fields in the
-image header.
+image header. Special values for fields includes 'default_pars' that works only
+with a command file; 'add_blank' to add a blank field value with a string as 
+value; 'add_textf' to add a text file content to the header. See description
+for more details.
 .le
 .ls value
 Either a string constant or a general expression (if the first character is
 a left parenthesis) to be evaluated to compute the new value of each field.
 A single expression is used for all fields.  The special value "." causes the
 value of each field to be printed rather than edited.
+.le
+.ls comment
+String constant for the comment section of the header card. This value will 
+replace the existing comment of a header or clear it if is empty ("").
+The special value "." causes the field to be printed rather than edited.
+.le
+.ls comfile = ""
+Alternate command file. If specified, the \fIfields\fR, \fIvalue\fR, and 
+\fIcomment\fR parameters are ignored and commands are taken from the named
+file.  See below for a detailed discussion and examples.
+.le
+.ls after = ""
+Insert the new field after the named "pivot keyword".   If this keyword
+does not exist in the header, the new keyword is added to the end of the 
+image header.
+.le
+.ls before = ""
+Insert the new field before the named "pivot keyword". If this keyword 
+does not exist in the header, the new keyword is added to the end of the 
+image header.
 .le
 .ls add = no
 Change the operation of the editor from update to add new field. If the
@@ -64,16 +89,17 @@ DESCRIPTION
 inspection of the fields of an image header.  Both the "standard" and
 "user" fields may be edited in the same fashion, although not all standard
 fields are writable.  For example, to change the value of the standard field
-"title" of the image "m74" to "sky flat" we would enter the following command.
+"title" of the image "m74" to "sky flat" and enter a comment  field we
+would enter the following command.
 
-	cl> hedit m74 title "sky flat"
+	cl> nhedit m74 title "sky flat" "comment field"
 
 If \fIverify\fR mode is selected the editor will print the old value of the
 field and query with the new value, allowing some other value to be entered
 instead, e.g.:
 
 .nf
-	cl> hedit m74 title "sky flat"
+	cl> nhedit m74 title "sky flat" "comment field"
 	m74,i_title ("old title" -> "sky flat"):
 .fi
 
@@ -89,26 +115,27 @@ the header is modified on disk.  If you respond negatively the image header
 will not be updated, and editing will continue with the next image.
 If the response is "q" the editor will exit entirely.
 
-To conveniently print the value of the field "title" without modifying the
-image header, we repeat the command with the special value ".".
+To conveniently print the value of the field "title" without modifying 
+the image header, we repeat the command with the special value "." and "." 
+for the comment portion.
 
-	cl> hedit m74 title .
+	cl> nhedit m74 title . .
 
 To print (or edit) the values of all header fields a field template may be
 given.
 
-	cl> hedit m74 * .
+	cl> nhedit m74 * . . 
 
 To print (or edit) the values of only a few fields the field template may
 be given as a list.
 
-	cl> hedit m74 w0,wpc .
+	cl> nhedit m74 w0,wpc . .
 
 To print the value of one or more fields in a set of images, an image template
 may be given.  Both image templates and field templates may be given if
 desired.
 
-	cl> hedit n1.* exp .
+	cl> nhedit n1.* exp . .
 
 Abbreviations are not permitted for field names, i.e., the given template
 must match the full field name.  Currently, field name matches are case
@@ -127,7 +154,7 @@ restoration of the database in the event of an error.  Trial runs may be made
 with updating disabled, before committing to an actual edit which modifies the
 database.
 
-The major editing functions of the \fIhedit\fR task are the following:
+The major editing functions of the \fInhedit\fR task are the following:
 
 .nf
 	update		modify the value of a field or fields
@@ -136,11 +163,30 @@ The major editing functions of the \fIhedit\fR task are the following:
 	delete		delete a set of fields
 .fi
 
-In addition, \fIhedit\fR may be used merely to inspect the values of the header
+In addition, \fInhedit\fR may be used merely to inspect the values of the header
 fields, without modification of the image database.
 
+2.1 Special header fields
 
-2.1 Standard header fields
+.ks
+.nf
+    add_blank		Add blank keyword field with optional comment
+             ex: nhedit add_blank "    this is a comment with no kw"
+    add_textf		Add the content of a text file into the header
+             ex: nhedit add_textf "my_text.txt" add+
+.fi
+.ke
+
+All keyword addition can be inserted after or before an existent keyword; use
+the 'after' and 'before' parameter.
+
+2.2 Input commands from a command file.
+
+All header editing command can be put together in a text file and run it as:
+
+nhedit file*.fits comfile=command_file.txt
+
+2.3 Standard header fields
 
     The header editor may be used to access both the standard image header
 fields and any user or application defined fields.  The standard header fields
@@ -171,7 +217,7 @@ of parameters in templates.  The prefix may be omitted provided the simple
 name is unique.
 
 
-2.2 Field name template
+2.4 Field name template
 
     The form of the field name list or template parameter \fIfields\fR is
 equivalent to that of a filename template except that "@listfile" is not
@@ -182,7 +228,7 @@ due to the present internal storage format for the user parameters (FITS),
 which also limits the length of a user field name to 8 characters.
 
 
-2.3 Value expression
+2.5 Value expression
 
     The \fIvalue\fR parameter is a string type parameter.  If the first
 character in the string is a left parenthesis the string is interpreted as
@@ -196,12 +242,12 @@ interpretation by the CL rather than by the header editor.
 
 For example, the command
 
-	cl> hedit m74 title "title // ';ss'"
+	cl> nhedit m74 title "title // ';ss'" "."
 
 would change the title to the literal string constant "title // ';ss'",
 whereas the command
 
-	cl> hedit m74 title "(title // ';ss')"
+	cl> nhedit m74 title "(title // ';ss')" "."
 
 would concatenate the string ";ss" to the old title string.  We require
 parenthesis for expression evaluation to avoid the need to doubly quote
@@ -210,16 +256,16 @@ user than using parenthesis.  For example, if expressions did not have to
 be parenthesized, the first example in the basic usage section would have
 to be entered as shown below.
 
-	cl> hedit m74 title '"sky flat"'	# invalid command
+	cl> nhedit m74 title '"sky flat"'	# invalid command
 
-Expression evaluation for \fIhedit\fR, \fIhselect\fR, and similar tasks
+Expression evaluation for \fInhedit\fR, \fIhselect\fR, and similar tasks
 is carried out internally by the FMTIO library routine \fBevexpr\fR.
 For completeness minimal documentation is given here, but the documentation
 for \fIevexpr\fR itself should be consulted if additional detail is required
 or if problems occur.
 
 
-2.3.1 operators
+2.5.1 operators
 
     The following operators are recognized in value expressions.  With the
 exception of the operators "?", "?=", and "@", the operator set is equivalent
@@ -272,7 +318,7 @@ or as
 If the parenthesis are omitted the latter interpretation is assumed.
 
 The operator @ must be used to dereference variables that have names with
-funny (non-alphanumeric) characters in them, forcing the variable name to
+funny (nonalphanumeric) characters in them, forcing the variable name to
 be given as a string constant.  For example, the value of the expression
 
 	@"co-flag"
@@ -290,7 +336,7 @@ coercions from boolean or string to other datatypes are illegal.  The boolean
 constants "yes" and "no" are predefined and may be used within expressions.
 
 
-2.3.2 intrinsic functions
+2.5.2 intrinsic functions
 
     A number of standard intrinsic functions are recognized within expressions.
 The set of functions currently supported is shown below.
@@ -321,7 +367,7 @@ The second permits the generation of function names by string valued
 expressions and might be useful on rare occasions.
 
 
-2.3.3 special operands
+2.5.3 special operands
 
     As noted earlier, expression operands may be constants, variables (header
 fields), function calls, or references to any of the special variables.
@@ -343,33 +389,101 @@ by 100 by assigning it the the value "$ + 100".
 
 .ih
 EXAMPLES
+
 1. Globally edit the database "n1", setting the value of the string parameter
 "obs" to "sky" if "s-flag" is 1, to "obj" otherwise.
 
-    cl> hedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")'
+    cl> nhedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")' "Observation value"
 
 2. Globally edit the same database, replacing the value of the parameter
 "variance" by the square root of the original value.
 
-    cl> hedit n1.* var '(sqrt(var))'
+    cl> nhedit n1.* var '(sqrt(var))' "Variance value"
 
 3. Replace the values of the fields A and B by the absolute value of the
 original value:
 
-    cl> hedit n1.* a,b '(abs($))'
+    cl> nhedit n1.* a,b '(abs($))' 'Absolute value'
 
-.ih
-BUGS
-The internal storage format is currently FITS card image, hence field names
-are limited to 8 characters with no case sensitivity.  String values are
-limited to 63 characters.  There is an upper limit on the number of fields
-in a header but it is quite large - assume it is 1024 or so.  Global operations
-on databases are currently quite slow because the individual records (image
-headers) are stored in separate files.
+4. Add a blank field with a comment after a given field (K5DX).
 
-A task is needed which would take the audit trail produced by the \fIshow\fR
-option and use it to undo an edit.
+    cl> nhedit file.fits add_blank "INSTRUMENT DESCRIPTION " after=k5dx add+
+  
+    Notice the use of the special field value 'add_blank' which will be 
+replaced by a blank keyword in the header.
+
+5. Add HISTORY card before a given keyword
+
+.nf
+   cl> nhedit file.fits history \
+       "History text from column 9 to 80, no quotes" before=wcsdim add+
+
+.fi
+6. Run a command file through the first 50 extensions
+.nf
+
+    cl>  for(i=1;i<51;i=i+1) {
+          nhedit("mymef["//i//"]",comfile="home$hh.in")
+       }
+
+.fi
+7. Add a text file to the header. This will be put as HISTORY lines with 
+text appropriately split when long lines are encountered. Start putting the
+text after the keyword KEYWN.
+.nf
+
+   cl> nhedit add_textf "mytext_file.tx" after=KEYWN add+
+
+
+.fi
+8. Run nhedit through all the extensions in a MEF file. Assuming it is 6, then:
+.nf
+
+   cl> for(i=1;i<7;i=i+1)
+          nhedit("mymef.fits["//i//"]",comfi="home$myheader.txt")
+
+.fi
+9. Run several fits files with the same set of header commands from the file
+"hdrc.txt".
+
+   cl> nhedit file*.fits commfile=hdrc.txt
+
+As an example the 'hdrc.txt' content can be: (Notice the 'default_pars' command)
+
+.nf
+# 
+# Sample command file for nhedit task.
+#
+# Establish the default parameters for the rest of the commands.
+
+default_pars upda+ add+ show- veri-
+
+# Notice the use of commas if you desire.
+"DETECTOR" 'Newfirm', "comment string"
+ONELE 'A' "commment to A"
+# 
+# Now delete a keyword
+ONELE1 del+ show+
+add_blank  "    /blank keyw"
+
+# add a boolean value T
+ONELE1 '(1==1)', "commment to A"
+
+   "DETSIZE", '[1:2048,1:2048]'
+   "ENVTEM", 1.5600000000000E+01
+
+# Add a field with string value 'T'
+ONELEi2 'T'
+
+bafkeyw1 123.456 "comment to key1" before="WCSDIM" addonly+  show-
+add_blank    "COMMENT FOR A BLANK"  after="FR-SCALE" add+  show-
+history "this is a hist to append"  add+ show-
+history "this is a hist 22 after trim pkey"  after="TRIM" add+ show-
+comment "this is a comment" after="FR-SCALE" add+ show-
+# END OF HDRC.TXT FILE
+
+.fi
 .ih
 SEE ALSO
-hselect, imgets, imheader
+hselect, hedit, mkheader, imgets, imheader
 .endhelp

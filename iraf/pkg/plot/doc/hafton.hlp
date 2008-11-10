@@ -24,12 +24,12 @@ The default is linear mapping between \fBz1\fR and \fBz2\fR.  For other
 choices, see the description section below.
 .le
 .ls contrast = 0.25
-Positive or negative contrast.  Negative constrast is indicated by setting
+Positive or negative contrast.  Negative contrast is indicated by setting
 \fBcontrast\fR to a negative number.  The magnitude of \fBcontrast\fR is
 not important unless \fBmapping_function = crtpict\fR.
 .le
 .ls perimeter = yes
-Should a \fBcrtpict\fR perimeter with labelled tickmarks be drawn around 
+Should a \fBcrtpict\fR perimeter with labeled tickmarks be drawn around 
 the plot?
 .le
 .ls device="stdgraph"
@@ -115,7 +115,7 @@ in negative contrast.
 TIME REQUIREMENTS
 To produce a \fIhafton\fR plot on the terminal takes just under 9 cpu
 minutes.  If the output device is the imagen or versatec (or another
-nspp device) the total cp time is about an hour.  
+nspp device) the total cpu time is about an hour.  
 .ih
 BUGS
 A large number of plotter instructions ( > 100,000 polylines) is generated 

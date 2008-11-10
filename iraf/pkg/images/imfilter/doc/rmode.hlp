@@ -69,7 +69,7 @@ distribution where mode is defined below.
 The median is defined as the value of the (n + 1) / 2 number in an ordered
 sequence of numbers.
 Out of bounds pixel references are handled by setting the parameter
-\fIboundary\fR. The principal function of the circular / ellptical filter
+\fIboundary\fR. The principal function of the circular / elliptical filter
 is to smooth and image using a circularly / elliptically symmetric filter.
 The principal function of the circular / elliptical ring filter is to
 remove objects from the image which have a scale length of rinner and

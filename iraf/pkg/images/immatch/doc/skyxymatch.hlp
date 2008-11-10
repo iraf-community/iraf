@@ -354,7 +354,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink

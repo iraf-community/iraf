@@ -237,12 +237,12 @@ image.  When applied to an image of dimension two or greater, these
 functions are evaluated separately for every line of the multidimensional
 image.
 
-Standard Instrinsic Functions
+Standard Intrinsic Functions
 
 .nf
 	abs (a)				absolute value
 	max (a, b, ...)			maximum value
-	min (a, b, ...)			mininum value
+	min (a, b, ...)			minimum value
 	mod (a, b)			modulus
        sqrt (a)				square root
 .fi

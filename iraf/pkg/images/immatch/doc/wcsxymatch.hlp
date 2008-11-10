@@ -76,9 +76,9 @@ match the coordinates of a 2D sky projection and a 2D spectral wcs.
 .le
 .le
 .ls transpose = no
-Force a tranpose of the reference image world coordinates before evaluating
+Force a transpose of the reference image world coordinates before evaluating
 the world to logical coordinate transformation for the input image ? This
-option is useful if there is not enoough information in the reference and
+option is useful if there is not enough information in the reference and
 input image headers to tell whether or not the images are transposed with
 respect to each other.
 .le
@@ -161,7 +161,7 @@ If the world coordinate system information cannot be read from either
 the reference or input image header, the requested transformations
 from the world <-> logical coordinate systems cannot be compiled for either
 or both images, or the world coordinate systems of the reference and input
-images are fundamentally imcompatible in some way, the output logical
+images are fundamentally incompatible in some way, the output logical
 reference and input image coordinates are both set to a grid of points
 spanning the logical pixel space of the input, not the reference image,
 and defining an identify transformation, is written to the output file.

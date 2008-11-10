@@ -47,12 +47,12 @@ then xscale and yscale should be 1.0 to preserve the scale of the reference
 image. The default is set for pixel coordinates.
 If xscale and yscale are undefined (INDEF), xscale and yscale default to the
 range of the reference coordinates over the range in pixels.
-Xscale and yscale overide the values of ncols and nlines.
+Xscale and yscale override the values of ncols and nlines.
 .le
 .ls ncols = INDEF, nlines = INDEF
 The number of columns and lines in the output image. Ncols and nlines default
 to the size of the input image. If xscale or yscale are defined ncols or nlines
-are overidden.
+are overridden.
 .le
 .ls xsample = 1.0, ysample = 1.0
 The coordinate surface subsampling factor. The coordinate surfaces are
@@ -63,7 +63,7 @@ bilinear interpolation in the coordinate surfaces.
 .ls interpolant = "linear"
 The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -147,7 +147,7 @@ pixel in x and y.
 The transformed coordinates at intermediate pixel values are
 determined by bilinear interpolation in the coordinate surface. If
 \fIxsample\fR and \fIysample\fR = 1, the coordinate
-surface is evaluted at every pixel. Use of \fIxsample\fR and \fIysample\fR
+surface is evaluated at every pixel. Use of \fIxsample\fR and \fIysample\fR
 are strongly recommended for large images and high order coordinate
 surfaces in order to reduce the execution time.
 

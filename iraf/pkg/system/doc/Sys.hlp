@@ -346,3 +346,4 @@ Remove delete protection from the named files.  It is not considered
 an error to attempt to remove protection from a file which is not protected.
 .le
 .ke
+.endhelp

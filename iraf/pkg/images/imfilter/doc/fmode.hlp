@@ -94,7 +94,7 @@ The histogram, median, and number of pixels less
 than the median, are computed for the first window position. These
 quantities are then updated as the median filter moves one position and
 the mode is recomputed. The \fIunmap\fR parameter is normally set so as to
-restore the output pixel values to th range defined by zmin and zmax,
+restore the output pixel values to the range defined by zmin and zmax,
 but may be turned off if the user wishes to examine the quantized pixels.
 The precision of the mode in integer space and pixel space is 1.0
 and (zmax - zmin) / (hmax - hmin) respectively.

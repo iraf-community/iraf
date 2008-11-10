@@ -25,7 +25,7 @@ By default, coordinates are printed in NDC rather than GKI units.
 DESCRIPTION
 Task \fBgkidecode\fR is a debugging tool used to decode GKI metacode
 files.  The plotting instructions are decoded and printed in readable 
-form on the standard ouput.  The input metacode can be read from one
+form on the standard output.  The input metacode can be read from one
 or more files or redirected from the standard input.
 
 If \fBverbose\fR = yes, elements of polyline and cell array calls are

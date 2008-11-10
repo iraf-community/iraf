@@ -98,7 +98,7 @@ equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls icrs [equinox] [epoch]
-The Internaltion Celestial Refernce System where equinox is
+The International Celestial Reference System where equinox is
 a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
 Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
 The default value of equinox is J2000.0.
@@ -347,7 +347,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink

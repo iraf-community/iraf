@@ -12,7 +12,7 @@ Image template or list of images.  There is no check that the names are
 images and any name may be used.  The thing which distinguishes an image
 template from a file template is that the special characters '[' and
 ']' are interpreted as image sections rather than a character class
-wildcard unless preceded by the escape character '!'.  To explictly
+wildcard unless preceded by the escape character '!'.  To explicitly
 limit a wildcard template to images one should use an appropriate
 extension such as ".imh".
 .le
@@ -49,7 +49,7 @@ To verify that an image template is expanded as the user desires.
 To create a file of image names which include image sections.
 .le
 .ls (3)
-To create a file of new image names using the concatention feature of the
+To create a file of new image names using the concatenation feature of the
 image templates.
 .le
 .ls (4)
@@ -61,7 +61,7 @@ There is no check that the names are images and any name may be used.
 The thing which distinguishes an \fIimage template\fR from a \fIfile
 template\fR is that the special characters '[' and ']' are interpreted
 as image sections rather than a character class wildcard unless
-preceded by the escape character '!'.  To explictly limit a wildcard
+preceded by the escape character '!'.  To explicitly limit a wildcard
 template to images one should use an appropriate extension such as ".imh".
 .ih
 EXAMPLES

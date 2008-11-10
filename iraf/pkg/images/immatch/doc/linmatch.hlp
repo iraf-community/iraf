@@ -21,7 +21,7 @@ images.
 .ls regions
 The list of image regions used to compute the intensity 
 matching function if \fIscaling\fR is one of the "mean", "median", "mode",
-or "fit" algorithms, or a list of the input photomtry files if
+or "fit" algorithms, or a list of the input photometry files if
 \fIscaling\fR specifies the "photometry" algorithm. In the former
 case \fIregions\fR may be: 1) a string of the form "grid nx ny" defining
 a grid of nx by ny equally spaced and sized image regions spanning the
@@ -526,7 +526,7 @@ The error ellipses  are
 where S is the quantity to be minimized. Initial values of a and b are
 estimated by  fitting the data to a straight line assuming uniform
 weighting.  The best fit values of a and b are then
-determined by iterating on the relationshift
+determined by iterating on the relationship
 
 .nf
 	dy = x' * da + db

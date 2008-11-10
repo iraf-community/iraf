@@ -53,7 +53,7 @@ about the formats supported by this task.
 .le
 .ls outbands = ""
 Output image band expressions to write.  This is a comma-delimited list of 
-expressions or an @-file containing the expressions.  Evaluated xpressions 
+expressions or an @-file containing the expressions.  Evaluated expressions 
 do not all need to be the same length since the output image will be padded
 to the maximum size.  See below for more information.
 .le
@@ -187,7 +187,7 @@ the each image in the input list, the b1, b2, etc names are also recognized.
 For more complex or 
 lengthy expressions the \fIoutbands\fR parameter may alternatively be an
 @-file containing the expressions.  Within this @-file whitespace and
-newline characters are ignored to allow exression to be indented in a 
+newline characters are ignored to allow expressions to be indented in a 
 readable manner.
 
 	The image operands determine which input images in the list are
@@ -420,7 +420,7 @@ values that would otherwise perturb the result.  Typical usages might be
 	zscalem (i1, i1>0&&i1<10000)
 .fi
 where i1 are the image pixels and i2 would be pixels from the second
-input argrument which defines a mask.  Note that you can't just say i2
+input argument which defines a mask.  Note that you can't just say i2
 for a mask but must use it in an expression resulting in a true or false
 value.  Also note that the result is always in the range 0 to 255.
 .le
@@ -944,7 +944,7 @@ and apply a linear transformation to scale the pixel values:
     cl> export dev$pix dpix eps \
     >>>    outbands="psscale(bscale(i1,0.,0.32), 0.5)"
 
-Convert three images repreresenting RGB to an 8-bit GIF color image with
+Convert three images representing RGB to an 8-bit GIF color image with
 a computed colormap:
 
   cl> export rim,gim,bim rgb gif outbands="cmap(i1,i2,i3)"

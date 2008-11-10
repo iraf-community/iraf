@@ -143,7 +143,7 @@ Display Control Software
 
     A single executable process contains all display control functions.
 A separate process (executable image) is provided for each display device.
-All display control prcesses behave identically at the CL level.  The STDIMAGE
+All display control processes behave identically at the CL level.  The STDIMAGE
 environment variable is used to select the particular display control process
 to be run.
 
@@ -249,7 +249,7 @@ to be displayed for various lengths of time.
 .ls \fBcontour\fR ([frame])
 The operation of this routine is very similar to that of \fBwindow\fR.
 A cursor device is interactively used to control the spacing and width
-of black coutour lines, written with equal spacing into the image
+of black contour lines, written with equal spacing into the image
 lookup table.  The window transfer function is not changed, other than
 to black out the regions where the contour bands fall.  Since only the
 image frame lookup table is affected, this routine may be used with any

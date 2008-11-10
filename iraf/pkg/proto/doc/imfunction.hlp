@@ -19,7 +19,7 @@ the input images are overwritten.
 Function to be applied to the input pixels. The options are:
 .ls log10
 Take the logarithm to base 10 of an image. Negative and zero-valued
-pixels will be asigned the value -MAX_EXPONENT.
+pixels will be assigned the value -MAX_EXPONENT.
 .le
 .ls alog10
 Taken the antilogarithm to base 10 of the image. Positive out-of-bounds
@@ -80,7 +80,7 @@ Take the hyperbolic cosine of an image. Positive or negative
 out-of-bounds pixels will be assigned the value MAX_REAL.
 .le
 .ls hsin
-Take the hyberbolic sine of an image. Positive and negative out-of-bounds
+Take the hyperbolic sine of an image. Positive and negative out-of-bounds
 pixel values will be assigned the values MAX_REAL and -MAX_REAL respectively.
 .le
 .ls htan

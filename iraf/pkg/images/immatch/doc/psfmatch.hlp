@@ -298,12 +298,10 @@ high frequency components of the psf
 matching function it is to replace them with a reasonable guess. If the
 matching function is approximately gaussian then its fourier transform is also
 approximately gaussian and the low frequency components can be modeled
-reliably with
-an elliptical gaussian function. The model derived from the low frequency components
-of the matching can then be used to replace the high
+reliably with an elliptical gaussian function. The model derived from the low
+frequency components of the matching can then be used to replace the high
 frequency components.
-If \fIfilter\fR
-is set to "replace", those high frequency components
+If \fIfilter\fR is set to "replace", those high frequency components
 of the matching function  which have less than a fraction
 \fIthreshold\fR of their total power in the equivalent high frequency
 components of the divisor or input image transform,
@@ -450,11 +448,11 @@ frequency component of the computed psf matching function aK as shown below.
 If the background was not removed from the image or psf data before the
 psf matching function was computed the previous expression is not valid.
 The computed aK[0,0] will include an offset and a must be estimated
-in some other manner. The approach taken by PSFMATCH in this
-circumstance is to fit a gaussian
-model to the absolute value of 1st and 2nd frequencies of R and I along the x and y axes
-independently, average the fitted x and y amplitudes, and
-set aK[0,0] to the ratio of the resulting fitted amplitudes as shown below.
+in some other manner. The approach taken by PSFMATCH in this circumstance
+is to fit a gaussian model to the absolute value of 1st and 2nd frequencies
+of R and I along the x and y axes independently, average the fitted x and y
+amplitudes, and set aK[0,0] to the ratio of the resulting fitted amplitudes
+as shown below.
 
 .nf
 	      a = amplitude (R) / amplitude (I)

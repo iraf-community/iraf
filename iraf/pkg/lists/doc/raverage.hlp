@@ -1,7 +1,7 @@
 .help raverage May07 lists
 .ih
 NAME
-raverage -- running average, standar deviation, and envelope
+raverage -- running average, standard deviation, and envelope
 .ih
 USAGE
 raverage input nwin

@@ -22,7 +22,7 @@ Factor by which the numbers are to be scaled (multiplied).
 .ls seed = 1
 Seed for the random number generator.  If the value is "INDEF" then
 the clock time (integer seconds since 1980) is used as the seed
-value giving different randome numbers for different executions.
+value giving different random numbers for different executions.
 .le
 .ih
 DESCRIPTION

@@ -9,6 +9,7 @@ unlearn name [name ...]
 PARAMETERS
 .ls name
 An IRAF task or package name.
+.le
 .ih
 DESCRIPTION
 Normally when a task terminates the values of the query mode task parameters

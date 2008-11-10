@@ -87,7 +87,7 @@ kernel is the the \fIfirst\fR row of the text file.
 
 The parameters \fIbilinear\fR and \fIradsym\fR can be used to greatly
 speed up the convolution task for convolution kernels which have
-the appropriate mathemetical form. Bilinear convolution kernels
+the appropriate mathematical form. Bilinear convolution kernels
 are those which define a function which is mathematically separable in
 the x and y dimension. In this case convolving each line of the input
 image with \fIxkernel\fR and then convolving each column of this intermediate
@@ -114,7 +114,7 @@ around boundary extension.
 .fi
 
 2. Type the contents of the kernel file fdy on the terminal. Convolve an image
-with the kernel in fdy using nearest neighbour boundary extension.
+with the kernel in fdy using nearest neighbor boundary extension.
 
 .nf
     cl> type fdy

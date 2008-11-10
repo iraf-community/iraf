@@ -33,7 +33,7 @@ DESCRIPTION
 The \fIsplit\fR task is used to break large files up into smaller segments,
 e.g., when it is necessary to deal with an unmanageably large file.
 Lacking any knowledge of the file structure, the segments are broken on
-arbitrarly located but equally spaced boundaries.  The segments may
+arbitrarily located but equally spaced boundaries.  The segments may
 subsequently be reassembled into larger segments of the original file with
 \fIconcatenate\fR or \fIcopy\fR (with output redirection), or \fIsplit\fR may
 be applied again to break a large segment up into smaller segments without

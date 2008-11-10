@@ -5,7 +5,6 @@ flprcache -- flush the process cache
 .ih
 USAGE
 flprcache process
-.fi
 .ih
 PARAMETERS
 .ls process
@@ -54,7 +53,7 @@ process cache is running when this is not the case.  The CL will
 not attempt to communicate with a running process, and will be
 unable to kill the process.  If this happens the CL will hang up
 during logout and will have to be interrupted, causing a panic abort
-(this is harmess since the CL is then restarted).
+(this is harmless since the CL is then restarted).
 The user may eventually be required to kill the sub-process using
 operating system facilities.
 .ih

@@ -1,7 +1,8 @@
 .help ccmap Jan01 images.imcoords
 .ih
 NAME
-ccmap -- compute plate solutions using matched pixel and celestial coordinate lists
+ccmap -- compute plate solutions using matched pixel and celestial coordinate
+lists
 .ih
 USAGE
 ccmap input database
@@ -84,7 +85,7 @@ equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls icrs [equinox] [epoch]
-The Internaltion Celestial Refernce System where equinox is
+The International Celestial Reference System where equinox is
 a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
 Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
 The default value of equinox is J2000.0.
@@ -324,7 +325,7 @@ are set by the \fIprojection\fR and \fIinsystem\fR parameters. As there
 is currently no standard mechanism for storing the higher order plate solution
 terms if any in the image header wcs, these terms are currently ignored
 unless the projection function is the experimental function "tnx". The "tnx"
-function is not FITS compatable and can only be understood by IRAF. Any existing
+function is not FITS compatible and can only be understood by IRAF. Any existing
 image wcs represented by the above keywords is overwritten during the update.
 .le
 .ls pixsystem = "logical"
@@ -410,7 +411,7 @@ function "tnx" combines the "tan" projection with a polynomial fit
 to the residuals can be used to represent more complicated distortion
 functions.
 
-Several polynomial cross terms options are avaible. Options "none", 
+Several polynomial cross terms options are available. Options "none", 
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 
@@ -477,7 +478,7 @@ double precision. Automatic pixel rejection may be enabled by setting
 in the range 2.5-5.0.
 
 CCMAP may be run interactively by setting \fIinteractive\fR to "yes" and
-inputing commands by the use of simple keystrokes. In interactive mode the
+inputting commands by the use of simple keystrokes. In interactive mode the
 user has the option of changing the fitting parameters and displaying the
 data and fit graphically until a satisfactory fit has been achieved. The
 keystroke commands are listed below.
@@ -673,7 +674,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink

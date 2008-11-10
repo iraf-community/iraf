@@ -43,6 +43,12 @@ and filter value (input/filter).
 .ls exclude = no
 Exclude the input image from the filter.
 .le
+.ls nclip = 0.
+This parameter allows clipping high values from the median calculation.
+The value multiples the difference between the median and the lowest value
+and rejects values that exceed the median by this amount.  The is done
+after scaling, mask rejections, and image exclusion.
+.le
 .ls navg = 1
 Number of central values to average.  A value of 1 is used to compute
 the median.
@@ -53,7 +59,7 @@ Scale the images with the specified method.  The choices are
 "!<keyword>" to find the value to multiple the image from the specified
 keyword in the header, and "@<file>" to get the values to multiple the
 images from the specified file.  The scales are normalized by the scale
-for the first image to make the scalng relative to the first image.
+for the first image to make the scaling relative to the first image.
 The values in a file must be in the same order as the input images.
 .le
 .ls normscale = yes
@@ -92,21 +98,35 @@ input images which was not also applied to the mask images.  A non-zero
 mask value identifies pixels to be excluded from the computation of the
 filter value or the mode of the image.
 
-The input images may be scaled (\fIscale\fR) as they are read.  The scale
-factors may be normalized relative to the first image in the list
-(\fInormscale\fR).  The scale factors may be given explicitly in a
+The input images may be scaled (\fIscale\fR) as they are read.
+The scale factors may be normalized relative to the first image in the
+list (\fInormscale\fR).  The scale factors may be given explicitly in a
 file or keyword or computed from an estimate of the mode of the image.
 The mode computation excludes pixels identified by non-zero values in
-the associated input mask.  On output the computed filter value based on
-the set of scaled pixel values maybe scaled back to match that of the
-input image (\fIoutscale\fR).
+the associated input mask.  On output the computed filter value based
+on the set of scaled pixel values maybe scaled back to match that of
+the input image (\fIoutscale\fR).
 
 The running filter operates independently on the sequence of pixel
-values across the list of input images at each pixel position.  The filter
-sorts the sequence of values in a running window (\fIwindow\fR) and then
-conputes the average of the central values.  Note that an average of one
-is a median.  Pixels may be excluded based on a mask (\fIinmaskkey\fR)
-and from the central image of the window (\fIexclude\fR).
+values across the list of input images at each pixel position.  If an
+input mask is specified then non-zero mask values identify pixel values
+to exclude from the calculations.  The \fIexclude\fR parameter may be
+used to exclude the central image of the window.  This is useful to
+avoid unnatural histograms with a spike at for the output image.
+The filter sorts the sequence of unrejected values in a running window
+(\fIwindow\fR).
+
+The median is the central value when the number of unrejected values is
+odd and the average of the two central values.  This median may be used
+with the \fInclip\fR parameter to exclude high outliers in the sorted
+values at each point.  The clipping computes the difference between
+the median and the lowest value, multiplies by the clipping factor,
+and rejects values more than this threshold above the median.  This is
+only done when \fInclip\fR is greater than zero and there are at least
+3 unrejected values prior to this clipping step.
+
+After the clipping the average, as set by \fInavg\fR, of the central values
+is computed.  Note that an average of one is a median.
 
 The number of central values averaged will be even when the number of
 pixels is even and odd when it is odd.  What is done is that high
@@ -177,7 +197,7 @@ will fail to run requiring the user to make adjustments.  The simplest
 method would be to break the images into smaller pieces and run this task
 on each piece.  Note that input image sections can be used to reduce the
 size of the input images being processed and \fBimtile\fR
-can be use to piece the output back togehter.
+can be use to piece the output back together.
 .ih
 EXAMPLES
 .ih

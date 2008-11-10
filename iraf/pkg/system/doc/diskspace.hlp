@@ -1,7 +1,7 @@
 .help diskspace Feb85 system
 .ih
 NAME
-diskspace -- summarize disk space utilitization
+diskspace -- summarize disk space utilization
 .ih
 USAGE
 diskspace

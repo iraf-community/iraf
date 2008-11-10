@@ -41,7 +41,7 @@ equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls icrs [equinox] [epoch]
-The Internaltion Celestial Refernce System where equinox is
+The International Celestial Reference System where equinox is
 a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
 Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
 The default value of equinox is J2000.0.
@@ -180,7 +180,7 @@ The second four characters of the values of the ra / longitude and dec /
 latitude axis CTYPE keywords specify the sky projection geometry. IRAF
 currently supports the AIT, ARC, CAR, CSC, GLS, MER, PAR, PCO, QSC,
 SIN,  STG, TAN, TSC, and ZEA geometries as well as two internal projection
-geomemtries TNX, and ZPX. Consequently the currently permitted values of
+geometries TNX, and ZPX. Consequently the currently permitted values of
 CTYPE[5:8] are -AIT, -ARC, -CAR, -CSC, -GLS, -MER, -PAR, -PCO, -QSC,
 -SIN, -STG, -TAN, -TSC, -ZEA as well as -ZPX and -TNX. 
 
@@ -227,13 +227,13 @@ systems, an error message is printed on the standard output (if \fIverbose\fR
 is "yes"), and the input image left unmodified.
 
 If the input projection is one of the zenithal projections TAN, SIN, STG,
-ARC, or ZEA, then the header coordinate tranformation can be preformed by
+ARC, or ZEA, then the header coordinate transformation can be preformed by
 transforming the CRVAL parameters and rotating the CD matrix as described in 
 detail below. Otherwise the CRVAL values are transformed, the CD matrix is
 left unmodified, and the LONGPOLE and LATPOLE parameters required to perform
 the rotation are computed. If \fIlongpole\fR is yes then the zenithal
 coordinate systems will also be transformed using LONGPOLE and LATPOLE. At
-present IRAF looks for longpole and latpole parameters in the approriate
+present IRAF looks for longpole and latpole parameters in the appropriate
 WATN_* keywords. If these are undefined the appropriate default values for
 each projection are assumed and new values are written to the WATN_* keywords.
 
@@ -324,7 +324,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink
@@ -589,7 +589,7 @@ a 2D image. If these are not present then default values are assumed.
 The new values are computed and added to the WAT1_* and WAT2_* keywords.
 
 At present the experimental TNX and ZPX projections cannot be transformed
-with precision. Users should use the SKYCTRAN task to transfrom individual
+with precision. Users should use the SKYCTRAN task to transform individual
 coordinate pairs.
 
 .ih

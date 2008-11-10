@@ -187,7 +187,7 @@ value is recommended.
 .ls interpolant = "linear"
 The interpolant used for rebinning the image.  The choices are the following.
 .ls nearest
-Nearest neighbour.
+Nearest neighbor.
 .le
 .ls linear
 Bilinear interpolation in x and y.
@@ -331,7 +331,7 @@ The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order
 \fIxxorder\fR and \fIxyorder\fR in x and \fIyxorder\fR and \fIyyorder\fR in y.
 
-Several polynomial cross terms options are avaible. Options "none",
+Several polynomial cross terms options are available. Options "none",
 "half", and "full" are illustrated below for a quadratic polynomial in
 x and y.
 
@@ -682,7 +682,7 @@ Details of the FITS header world coordinate system interface can
 be found in the draft paper "World Coordinate Systems Representations Within the
 FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
 archive and the draft paper which supersedes it "Representations of Celestial
-Coordinates in FITS" by Greisen and Calabretta available from the nrao
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
 anonymous ftp archives.
 
 The spherical astronomy routines employed here are derived from the Starlink
@@ -739,7 +739,7 @@ residuals.
 .fi
 
 
-3. Mosaic a set of 9 images convering a ~ 1 degree field into a single image
+3. Mosaic a set of 9 images covering a ~ 1 degree field into a single image
 centered at  12:32:53.1 +43:13:03. Set the output image scale to 0.5
 arc-seconds / pixel which is close the detector scale of 0.51 arc-seconds
 per pixel. Set the orientation to be north up and east to the left.

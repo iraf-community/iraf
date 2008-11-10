@@ -13,6 +13,7 @@ The device for which status information is requested.
 .ls verbose = no
 Print additional system dependent device information (may not be implemented
 on all systems).
+.le
 .ih
 DESCRIPTION
 \fBDevstatus\fR tells whether the named device has been allocated.

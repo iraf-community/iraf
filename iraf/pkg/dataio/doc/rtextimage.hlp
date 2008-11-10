@@ -72,7 +72,7 @@ crab001, crab002, crab003, etc.
     cl> rcard mta[5] | rtext out=spect.1 head- nskip=5 dim=1024
 .ih
 TIME REQUIREMENTS
-Task \fIrtextimage\fR requires about 145 cp seconds to write a 512 square
+Task \fIrtextimage\fR requires about 145 cpu seconds to write a 512 square
 image (integer or real) from a text file.  
 .ih
 BUGS

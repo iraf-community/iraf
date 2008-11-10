@@ -108,7 +108,7 @@ The fitting parameters (\fIsample, naverage, function, order, low_reject,
 high_reject, niterate, grow\fR)
 may be adjusted interactively if the parameter \fIinteractive\fR is yes.
 Lines or columns from the image are selected to be fit with the \fBicfit\fR
-package.  A single column or line may be chosed or a blank-separated range
+package.  A single column or line may be chosen or a blank-separated range
 may be averaged.  Note that the averaging applies only to the graphed
 data used to set the fitting parameters.  The actual image lines and columns
 are fit individually.  The interactive cursor mode commands for this package

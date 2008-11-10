@@ -71,7 +71,7 @@ images in a database.
 
 
 3. Produce an image name list for use to drive another task.  The selection
-criterium is all images for which the value of the parameter "q-flag"
+criterion is all images for which the value of the parameter "q-flag"
 has the value 1.  Note carefully the use of quotes.  If the @ operator
 is unfamiliar read the manual page for \fIhedit\fR.
 

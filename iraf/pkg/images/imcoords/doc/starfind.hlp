@@ -181,8 +181,8 @@ the maximum density enhancement, and whose values are within the good data
 limits defined by \fIdatamin\fR and \fIdatamax\fR, and which are above the local
 background estimate (Sky).
 
-Objects whose magnitude, roundess, and sharpness characteristics are outside the
-values defined by \fImaglo\fR, \fImaghi\fR, \fIroundlo\fR, \fIroundhi\fR,
+Objects whose magnitude, roundness, and sharpness characteristics are outside
+the values defined by \fImaglo\fR, \fImaghi\fR, \fIroundlo\fR, \fIroundhi\fR,
 \fIsharplo\fR, and \fIsharphi\fR and whose total areas is less than
 \fInpixmin\fR pixels are rejected from the list.
 

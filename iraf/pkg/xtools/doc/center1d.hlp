@@ -28,7 +28,7 @@ Number of points in the data vector.
 .le
 .ls width
 Width used to define the convolution function.  If the width is 1 or less
-then the nearest minimum or maximum is returned.  If the width is greateer
+then the nearest minimum or maximum is returned.  If the width is greater
 than 1 then a minimum with of 3 is used in the algorithm.
 .le
 .ls type
@@ -125,7 +125,7 @@ it should be set to a value near the actual width of the emission or absorption
 feature.  If the width is too wide then the center will be affected by blending
 from nearby lines while if it is too narrow the accuracy of the centering is
 decreased.  The parameter \fBradius\fR determines how far from the initial
-estimate for XC the interative solution of (1) may go.
+estimate for XC the interactive solution of (1) may go.
 Equation (1) is solved iteratively starting with the initial position.
 When successive positions agree within 0.1% of a pixel the position is
 returned.  If the position wanders further than \fIradius\fR from the

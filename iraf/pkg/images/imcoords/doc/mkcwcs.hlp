@@ -8,7 +8,7 @@ mkcwcs wcsname
 .ih
 PARAMETERS
 .ls wcsname
-Image to be created or modified.  If a new (non-existant) image is specified
+Image to be created or modified.  If a new (non-existent) image is specified
 then a data-less image (NDIM=0) is created.
 .le
 .ls wcsref = ""
