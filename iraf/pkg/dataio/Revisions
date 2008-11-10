@@ -1,5 +1,9 @@
 .help revisions Jun88 pkg.dataio
 .nf
+
+dataio$import/t_import.x
+    Fixed a type declaration (1/21/08, MJF)
+
 dataio$export/exraster.gx
     Fixed a bug in computing the number of output pixels (1/5/04, MJF)
 

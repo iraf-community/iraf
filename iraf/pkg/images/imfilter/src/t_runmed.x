@@ -10,6 +10,7 @@ pointer	inmaskkey		# Input mask keyword
 pointer	outmaskkey		# Output mask keyword
 pointer	outtype			# Output type
 bool	exclude			# Exclude input image?
+real	nclip			# Clipping factor
 int	navg			# Number of values to average
 pointer	scale			# Scale specification
 bool	normscale		# Normalize the scales to the first input?
@@ -41,6 +42,7 @@ begin
 	call clgstr ("outmaskkey", Memc[outmaskkey], SZ_FNAME)
 	call clgstr ("outtype", Memc[outtype], SZ_FNAME)
 	exclude = clgetb ("exclude")
+	nclip = clgetr ("nclip")
 	navg = clgeti ("navg")
 	call clgstr ("scale", Memc[scale], SZ_FNAME)
 	blank = clgetr ("blank")
@@ -50,7 +52,7 @@ begin
 	verbose = clgetb ("verbose")
 
 	call runmed (input, output, window, masks, Memc[inmaskkey],
-	    Memc[outmaskkey], Memc[outtype], exclude, navg, Memc[scale],
+	    Memc[outmaskkey], Memc[outtype], exclude, nclip, navg, Memc[scale],
 	    normscale, outscale, blank, Memc[storetype], verbose)
 
 	call imtclose (masks)

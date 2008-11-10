@@ -6,6 +6,7 @@ inmaskkey,s,h,"",,,Keyword for input masks
 outmaskkey,s,h,"HOLES",,,Keyword for output masks
 outtype,s,h,"filter","filter|difference|ratio",,Type of output values
 exclude,b,h,no,,,Exclude input image from filter value?
+nclip,r,h,0.,0.,,Clipping factor
 navg,i,h,1,1,,Number of central values to average
 scale,s,h,"none",,,Scaling option
 normscale,b,h,yes,,,Normalize scales to first image?

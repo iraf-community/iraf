@@ -866,7 +866,7 @@ struct param *lookup_param ( const char *pkname, const char *ltname,
 		    } else if (!strcmp (pp->p_name, pname)) {
 			ambig = 0;
 			break;			/* exact match */
-		    } else if (candidate != NULL) {
+                    } else if (candidate != NULL && candidate != pp) {
 			ambig++;
 		    } else {
 			candidate = pp;

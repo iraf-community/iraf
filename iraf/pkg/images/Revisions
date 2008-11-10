@@ -1,5 +1,129 @@
 .help revisions Jan97 images
 .nf
+images/x_images.x
+images/imutil/imutil.cl
+images/imutil/imutil.hd
+images/imutil/imutil.men
+images/imutil/nhedit.par	+
+images/imutil/doc/nhedit.hlp	+
+images/imutil/src/nhedit.x	+
+images/imutil/src/getcmd.x	+
+images/imutil/src/mkpkg
+    Installed the NHEDIT task (HEDIT with comments) (8/19/08, MJF)
+
+images/immatch/doc/geomap.hlp
+images/immatch/doc/geotran.hlp
+    Fixed some typos in the doc.  (8/13/08, MJF)
+
+images$imutil/src/imexpr.gx
+    Quoted strings in the expression database were not being handle
+    correction.  Specifically, the quotes were stripped and single
+    quotes were being parsed as character constants.
+    (8/12/08, Valdes)
+
+images$immatch/src/imcombine/src/ichdr.x
+    The PROCID keywords have not proven to be very meaningful.  In the
+    interests of backwards compatibility, if imcmb=$I these keywords are
+    still written but otherwise they are not.
+    (7/23/08, Valdes)
+
+images$immatch/src/imcombine/src/ichdr.x
+images$immatch/src/imcombine/imcombine.par
+images$immatch/imcombine.par
+images$immatch/doc/imcombine.hlp
+    A new parameter "imcmb" was added to control the value written to the
+    IMCMBnnn keywords in the output image.  The value is a keyword in the
+    input images to be copied to the output IMCMBnnn keywords.  The default
+    parameter value, "$I", is the basename input image name as before.
+    (7/22/08, Valdes)
+
+images$imutil/src/t_imstat.x
+    The clipping calculation was resetting the user supplied pixel limits.
+    Instead, any clipping limits need to remain bounded by the user
+    limits.
+    (7/15/08, Valdes)
+
+images$imfilter/runmed.par
+images$imfilter/doc/runmed
+images$imfilter/src/t_runmed.x
+images$imfilter/src/runmed.x
+images$imfilter/src/rmmed.x -
+    1.  rmmed.x was moved to xtools.
+    2.	A new parameter, nclip, was added to allow clipping of high values
+    	from the running median.
+    (2/29/08, Valdes)
+
+images$immatch/src/imcombine/t_imcombine.x
+images$tv/imexamine/ievimexam.x
+    Fixed some procedure calls closed with a ']' instead of ')' (02/17/08, MJF)
+
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/icgdata.gx
+images$immatch/src/imcombine/src/icaverage.gx
+images$immatch/src/imcombine/src/iclog.x
+images$immatch/src/imcombine/src/icmedian.gx
+images$immatch/src/imcombine/src/icomb.gx
+images$immatch/src/imcombine/src/icombine.h
+    1.  Added a new "masktype" option called "novalue".  This uses 0 for
+	good pixels, "maskvalue" for pixels with no data, and any other value
+	for bad pixels.  When there is no overlapping good data the blank
+	value is used if all the pixels are no data and otherwise the
+	image pixel values are combined as if good.  The output mask will
+	have 0 for good, 1 for no data, and 2 for data based on bad data.
+    2.	The "masktype" option can now be "!<keyword> <type>" to specify
+    	both a keyword for the mask and any mask type method.
+    (2/11/08, Valdes)
+
+images$imcoords/src/t_ccfind.x
+    When using a ZPN projection, the transform code in mwcs tries to 
+    reference the parent image to get the PV matrix keywords.  This task
+    called sk_decwcs() to open the WCS, but for an image it then unmapped
+    the image.  When the task later uses the 'mw' pointer to transform coords
+    the ZPN reference to the parent image is invalid and results in a 
+    segfault.  Changed the code to call sk_decim() directly and operate on
+    the currently open image instead.  (1/23/08, MJF)
+
+images$imcoords/src/t_ccmap.x
+images$immatch/src/psfmatch/rgpsfm.x
+images$imutil/src/t_imtile.x
+images$tv/imexamine/t_imexam.x
+    Fixed various type declaration problems (1/21/08, MJF)
+
+images$immatch/src/imcombine/icmask.x
+    Changes to support the pmmap features of mask matching.  (1/21/08, Valdes)
+
+images$immatch/src/imcombine/src/ichdr.x
+    When recording the images combined only the basename is now used.
+    (1/21/08, Valdes)
+
+images$immatch/src/imcombine/src/icombine.x
+images$immatch/src/imcombine/t_imcombine.x
+     Added a listonly argument.  This is not currently used by IMCOMBINE but
+     is used in other packages sharing this library.  (1/21/08, Valdes)
+
+images/lib/rgtransform.x
+image/immatch/src/listmatch/t_xyxymatch.x
+     Changed the name of the rg_intersect() function to rg_intersection()
+     to avoid a possible conflict with an xtools procedure of the same
+     name.  (1/16/08, MJF)
+
+images$tv/imed.par
+     Added entries for missing minvalue/maxvalue params (1/14/08, MJF)
+
+images$immatch/src/geometry/t_geomap.gx
+     Changed the output precision of the rotation angles from 3 to 5
+     decimal places.  (1/14/08, MJF)
+
+images$imfilter/src/runmed.x
+     Modified to use yt_mappm for the input mask.  The default is still to
+     work in logical coordinates but now the user can set "pmmatch=world"
+     to match masks in world coordinates to efficiently implement the
+     dimsum approach to second pass sky subtraction.
+     (1/9/08, Valdes)
+
+=====
+V2.14
+=====
 images$imfilter/src/rmmed.x
      A data structure was allocated with a wrong length (too short) resulting
      in the possiblity of a segmentation violation.  (1/18/07, Valdes)
