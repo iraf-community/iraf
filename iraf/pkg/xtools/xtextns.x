@@ -140,7 +140,7 @@ int	i, fd
 pointer	sp, temp, fname, rindex, rextver, ikp, str
 pointer	imtopen()
 int	imtgetim()
-int	ix_decode_ranges(), nowhite(), open()
+int	ix_decode_ranges(), decode_ranges(), nowhite(), open()
 errchk	open, xt_extn, delete
 
 begin
@@ -159,7 +159,7 @@ begin
 	rextver = NULL
 	if (nowhite (extver, Memc[str], SZ_LINE) > 0) {
 	    call salloc (rextver, 3*SZ_RANGE, TY_INT)
-	    if (ix_decode_ranges (Memc[str], Memi[rextver], SZ_RANGE, i)==ERR)
+	    if (decode_ranges (Memc[str], Memi[rextver], SZ_RANGE, i)==ERR)
 		call error (1, "Bad extension version range list")
 	}
 	i = nowhite (ikparams, Memc[ikp], SZ_LINE)
@@ -287,7 +287,9 @@ begin
 
 	    # Check the extension version.
 	    if (extver != NULL) {
-		if (!is_in_range (Memi[extver], ver))
+	        if (IS_INDEFI(MEF_EXTVER(mef)))
+		    next
+		if (!is_in_range (Memi[extver], MEF_EXTVER(mef)))
 		    next
 	    }
 

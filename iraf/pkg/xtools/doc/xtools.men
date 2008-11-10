@@ -1,7 +1,7 @@
        catquery - Catalog query package
          clgsec - Get and decode an image section
       clginterp - Get integer code for interpolator type
-         cogetr - Efficent image column access
+         cogetr - Efficient image column access
           comap - Map for column access procedure
         counmap - Unmap for column access procedure
 	extrema - Find extrema in x and y data points
