@@ -11,7 +11,7 @@ update:
 relink:
 	$update	libpkg.a
 	$omake	x_proto.x
-	$link	x_proto.o libpkg.a -lxtools -o xx_proto.e
+	$link	x_proto.o libpkg.a -lxtools -liminterp -o xx_proto.e
 	;
 
 install:

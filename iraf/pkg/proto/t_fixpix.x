@@ -22,10 +22,10 @@ pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
 bool	clgetb(), pm_linenotempty()
 int	imtgetim(), imtlen(), clgeti(), imaccf()
 long	clktime()
-pointer	imtopenp(), immap(), xt_pmmap(), xt_fpinit(), imstatp()
+pointer	imtopenp(), immap(), yt_pmmap(), xt_fpinit(), imstatp()
 pointer	xt_fps(), xt_fpi(), xt_fpl(), xt_fpr(), xt_fpd()
 pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
-errchk	immap, xt_pmmap, xt_fpinit
+errchk	immap, yt_pmmap, xt_fpinit
 
 begin
 	call smark (sp)
@@ -73,7 +73,7 @@ begin
 		fp = NULL
 	        tmp = immap (Memc[imname], READ_WRITE, 0)
 		im = tmp
-		tmp = xt_pmmap (Memc[pmname], im, Memc[pmname], SZ_FNAME);
+		tmp = yt_pmmap (Memc[pmname], im, Memc[pmname], SZ_FNAME);
 		pmim = tmp
 		pm = imstatp (pmim, IM_PMDES)
 

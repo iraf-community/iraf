@@ -11,16 +11,13 @@ procedure t_mimstatistics()
 real	lower, upper, lsigma, usigma, binwidth, low, up, hwidth, hmin, hmax
 pointer	sp, inmasks, fieldstr, fields, image, imask, omask, masktemp, str, str2
 pointer	mst, vs, ve, im, pmim, pmout, opm, mp, buf, hgm, smsk
-pointer	imlist, inlist, outlist
-int	i, nclip, nfields, format, mval, npts, npix
-int	nbins, in_invert, nbad, cache
-size_t	old_size
+int	i, imlist, inlist, outlist, nclip, nfields, format, mval, npts, npix
+int	nbins, in_invert, nbad, cache, old_size
 
 real	clgetr()
 pointer	yt_mappm(), mp_miopen()
-int	imtlen(), imtgetim(), clgeti()
-pointer	imtopenp(), imtopen(), immap(), imstatp()
-int	mst_fields(), btoi(), mio_glsegr(), mst_ihist()
+int	imtopenp(), imtopen(), imtlen(), imtgetim(), immap(), clgeti()
+int	mst_fields(), btoi(), mio_glsegr(), mst_ihist(), imstati()
 int	mst_umask(), strmatch()
 bool	clgetb()
 errchk	immap(), yt_mappm(), yt_pminvert()
@@ -51,13 +48,13 @@ begin
 	}
 
 	# Get the input mask specification
-	call clgstr ("imasks", Memc[inmasks+1], SZ_FNAME)
-	if (Memc[inmasks+1] == '^') {
+	call clgstr ("imasks", Memc[inmasks], SZ_FNAME)
+	if (Memc[inmasks] == '^') {
 	    in_invert = YES
-	    inlist = imtopen (Memc[inmasks+2])
+	    inlist = imtopen (Memc[inmasks+1])
 	} else {
 	    in_invert = NO
-	    inlist = imtopen (Memc[inmasks+1])
+	    inlist = imtopen (Memc[inmasks])
 	}
 	if (imtlen (inlist) > 1 && imtlen (inlist) != imtlen (imlist)) {
 	    call eprintf ("The input mask and image lists don't match\n")
@@ -125,23 +122,23 @@ begin
 
 	    # Open the input mask.
 	    if (imtgetim (inlist, Memc[str+1], SZ_FNAME) != EOF) {
-		Memc[str] = '^'
-		if (in_invert == YES)
-		    pmim = yt_mappm (Memc[str+1], im, "logical",
-			Memc[imask], SZ_FNAME)
-		else
+		if (in_invert == YES) {
+		    Memc[str] = '^'
+		    #pmim = mp_open (Memc[str], im, Memc[imask], SZ_FNAME)
 		    pmim = yt_mappm (Memc[str], im, "logical",
+			Memc[imask], SZ_FNAME)
+		} else
+		    #pmim = mp_open (Memc[str+1], im, Memc[imask], SZ_FNAME)
+		    pmim = yt_mappm (Memc[str+1], im, "logical",
 		        Memc[imask], SZ_FNAME)
 	    } else if (imtlen (inlist) == 1) {
-		Memc[inmasks] = '^'
-		if (in_invert == YES)
-		    pmim = yt_mappm (Memc[inmasks+1], im, "logical",
-			Memc[imask], SZ_FNAME)
-		else
-		    pmim = yt_mappm (Memc[inmasks], im, "logical",
-			Memc[imask], SZ_FNAME)
-	    } else
-		pmim = yt_mappm ("^EMPTY", im, "logical", Memc[imask], SZ_FNAME)
+		#pmim = mp_open (Memc[inmasks], im, Memc[imask], SZ_FNAME)
+		pmim = yt_mappm (Memc[inmasks], im, "logical",
+		    Memc[imask], SZ_FNAME)
+	    } else {
+		#pmim = mp_open ("", im, Memc[imask], SZ_FNAME)
+		pmim = yt_mappm ("EMPTY", im, "logical", Memc[imask], SZ_FNAME)
+	    }
 
 	    # Check the mask status and open an empty mask if there
 	    # was an error.
@@ -150,6 +147,13 @@ begin
 		    call pargstr (Memc[image])
 		call imunmap (im)
 		next
+	    }
+
+	    # Invert the mask.
+	    if (pmim != NULL) {
+	        opm = imstati (pmim, IM_PMDES)
+		call yt_pminvert (opm)
+		call imseti (pmim, IM_PMDES, opm)
 	    }
 
 	    # Get the output mask name if any and open a VIRTUAL output
@@ -242,10 +246,6 @@ begin
 			up = MIS_MEAN(mst) + usigma * MIS_STDDEV(mst)
 		    else
 			up = MAX_REAL
-		    if (!IS_INDEFR(lower))
-		        low = max (low, lower)
-		    if (!IS_INDEFR(upper))
-		        up = min (up, upper)
 		    if (i > 0) {
 			if (MIS_NPIX(mst) == npix)
 			    break
@@ -290,15 +290,15 @@ begin
                 call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
                 call amovkl (long(1), Meml[vs], IM_NDIM(im))
-		opm = imstatp (pmout, IM_PMDES)
+		opm = imstati (pmout, IM_PMDES)
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) { 
 		    nbad = mst_umask (Memr[buf], Mems[smsk], npts, low, up)
 		    if (nbad > 0)
 	    		call pm_plps (opm, Meml[vs], Mems[smsk], 1, npts,
 			    PIX_SRC)
 		}
-		call yt_pminvert (opm)
-		call imsetp (pmout, IM_PMDES, opm) 
+		call mp_invert (opm)
+		call imseti (pmout, IM_PMDES, opm) 
 	        call mfree (smsk, TY_SHORT)
 	    }
 
