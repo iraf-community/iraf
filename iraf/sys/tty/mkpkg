@@ -20,6 +20,7 @@ install:
 	;
 
 libsys.a:
+	gttyload.x
 	ttycaps.x	tty.h
 	ttycdes.x	
 	ttyclear.x	tty.h <chars.h>
