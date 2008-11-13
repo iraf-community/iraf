@@ -1,6 +1,23 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
 
+doc/ccdproc.hlp
+    Removed the statements that calibration images are not reprocessed
+    if they have CCDPROC even if they lack the keywords for specific
+    operations.  I looked at the code and did not see much dependence
+    on CCDPROC though there could be something I'm missing.  For now,
+    since a user reported this, I will assume the behavior reported by
+    the user is correct and the documentation is wrong for some historical
+    reason.  (5/27/08, Valdes)
+
+x_ccdred.x
+    Added the alias qccdproc for use in the quadred.quadproc task.
+    (3/12/08, Valdes)
+
+=====
+V2.14
+=====
+
 =======
 V2.12.2
 =======

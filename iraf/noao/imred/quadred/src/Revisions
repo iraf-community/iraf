@@ -1,6 +1,23 @@
 .help revisions Jun88 noao.imred.quadred
 .nf
 
+quad/qproc.cl
+quad/quad.cl
+quad/quadjoin.x
+quad/quadproc.cl
+quad/setinstrument.cl
+quad/qccdproc.par	+
+../quadred.cl
+../quadred.men
+    When using quadproc the latest CCDPROC is used with the alias QCCDPROC.
+    This is to allow using the line-by-line overscan function.  Other features
+    in CCDPROC would also be available.  It was too hard to update the
+    quad version of CCDPROC.  (3/12/08, Valdes)
+
+=====
+V2.14
+=====
+
 =======
 V2.12.1
 =======

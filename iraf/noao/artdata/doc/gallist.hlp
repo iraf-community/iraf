@@ -10,7 +10,7 @@ PARAMETERS
 .ls gallist
 The name of the output text file for the x and y coordinates,
 magnitudes, profile types, half-flux radii, axial ratios, and position
-angles of the artifical galaxies.  Output will be appended to this
+angles of the artificial galaxies.  Output will be appended to this
 file if it exists.
 .le
 .ls ngals = 100
@@ -57,7 +57,7 @@ The initial value supplied to the random number generator used to
 generate the output x and y coordinates.
 If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 			MAGNITUDE DISTRIBUTION
@@ -98,11 +98,11 @@ The default value is that determined by Schecter from nearby galaxies.
 The characteristic magnitude of the Schecter luminosity function.
 .le
 .ls lseed = 2
-The intial value supplied to the random number generator used to
+The initial value supplied to the random number generator used to
 generate the output magnitudes.
 If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 			MORPHOLOGY DISTRIBUTION
@@ -142,7 +142,7 @@ according to (1+z)**2 / z.
 .ls sfile = ""
 The name of the input text file containing the sampled spatial radial
 density
-function, one sample point per line, with the radius and relative probablity
+function, one sample point per line, with the radius and relative probability
 in columns one and two respectively. The sample points need not be
 uniformly spaced or normalized.
 .le
@@ -160,7 +160,7 @@ density function.
 .ls lfile = ""
 The name of the input text file containing the sampled luminosity
 function, one sample point per line, with the magnitude and relative
-probablity in columns one and two respectively. The sample points need
+probability in columns one and two respectively. The sample points need
 not be uniformly spaced or normalized.
 .le
 .ls nlsample = 100
@@ -256,7 +256,7 @@ M(user), P(user) supplied by the user in the text file \fIlfile\fR.
 .fi
 
 The uniform distribution is not very physical but may be useful for
-testing.  The power law distribution is that expected for a homogenous
+testing.  The power law distribution is that expected for a homogeneous
 and isotropic distribution of galaxies.  The default value of 0.6 is
 that which can be calculated simply from Euclidean geometry.  Observations
 of faint galaxies generally show a smaller value.  The Schecter
@@ -278,7 +278,7 @@ The magnitudes are computed by randomly sampling the integrated
 probability function until \fIngals\fR objects which satisfy the
 magnitude limits \fIminmag\fR and \fImaxmag\fR are generated.
 
-The artifical galaxies have one of two morphological types,
+The artificial galaxies have one of two morphological types,
 "ellipticals" with a de Vaucouleurs surface brightness law and
 "spirals" with an exponential surface brightness law. The fraction
 of elliptical galaxies is set by the parameter \fIegalmix\fR.  The
@@ -347,7 +347,7 @@ obeys the following relation.
 .fi
 
 This relation gives the size decreasing slightly less rapidly than that
-giving a constant surface brightess.  This relation is taken from
+giving a constant surface brightness.  This relation is taken from
 Holmberg (Galaxies and the Universe).
 
 A uniform random factor of 50% is added to the sizes computed for

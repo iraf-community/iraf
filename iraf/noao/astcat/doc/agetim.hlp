@@ -48,7 +48,7 @@ value of the package parameter imsurveys.
 .le
 .ls wcsedit = no
 Convert a DSS WCS to a FITS WCS or add an approximate FITS style WCS to the
-output image headers if they don't already posess one ?  The WCS status
+output image headers if they don't already possess one ?  The WCS status
 of the survey images  plus approximate coordinate, scale, orientation, and
 projection information is stored in the image surveys configuration
 file \fIimdb\fR.
@@ -150,7 +150,7 @@ those concerned with locating stars in the image and computing accurate
 pixel centers: \fIedatamin\fR, \fIedatamax\fR, \fIegain\fR, and \fIerdnoise\fR,
 and those required for transforming mean place coordinates to observed
 plate coordinates as may be required to compute very accurate image scales,
-\fIobservat\fR, \Iesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
+\fIobservat\fR, \fIesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
 \fIemjdobs\fR, \fIewavlen\fR, \fIetemp\fR, and \fIepress\fR. New keyword
 values are only added to the header if keywords of the same name do not
 already exist and if appropriate values for the keywords exists, i.e.
@@ -233,7 +233,7 @@ TIME REQUIREMENTS
 .ih
 BUGS
 If output file is not a fits file, as may be the case if an error occurred
-in the network transfer, and heasder editing is enabled agetim will
+in the network transfer, and header editing is enabled agetim will
 crash with a file seek error. The bug is due to missing error check 
 statements in the FITS kernel and will be fixed for the next release.
 .ih

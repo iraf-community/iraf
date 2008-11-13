@@ -110,7 +110,7 @@ image set file \fIimsets\fR. If \fIimsets\fR is "", MKPHOTCORS prompts
 the user for input but does not save the results.
 
 \fIObsparams\fR is the name of the input/output text file listing the
-observng parameters filter id, exposure time, airmass, and time of observation,
+observing parameters filter id, exposure time, airmass, and time of observation,
 for the images in
 \fIimsets\fR. \fIObsparams\fR is used to correct missing or incorrect
 filter ids, exposure times, airmasses, and times of observation in the photometry files, and

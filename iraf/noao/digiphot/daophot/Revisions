@@ -1,6 +1,26 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
 
+=======
+V2.14.1
+=======
+
+daophot/psf/dppwselmer.x
+    PSTSELECT was showing the IMAGE param as 'name' instead of 'imagename'
+    (7/8/08)
+
+daophot/daophot.hd
+    The source directories for pstselect and allstar were wrong.
+    (5/27/08, Valdes)
+
+=======
+V2.14
+=======
+
+daophot/allstar/dpcache.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
 daophot/psf.par
     Fixed a type in the 'pstfile' prompt (11/24/07)
 

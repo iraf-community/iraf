@@ -17,7 +17,7 @@ string	objbeams = ""		{prompt="Object beam numbers"}
 string	skybeams = ""		{prompt="Sky beam numbers"}
 bool	skyedit	= yes		{prompt="Edit the sky spectra?"}
 string	combine = "average"	{prompt="Combining option",
-				 enum="average|median"}
+				 enum="average|median|sum"}
 string	reject	= "avsigclip"	{prompt="Sky rejection option",
 				 enum="none|minmax|avsigclip"}
 string	scale = "none"		{prompt="Sky scaling option",

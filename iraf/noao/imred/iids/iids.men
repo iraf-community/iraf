@@ -3,7 +3,7 @@
           bplot - Batch plots of spectra
 	bswitch - Beam-switch strings of spectra to make obj-sky pairs
       calibrate - Apply sensitivity correction to spectra
-          coefs - Extract mtn reduced ceofficients from henear scans
+          coefs - Extract mtn reduced coefficients from henear scans
 	coincor - Correct spectra for detector count rates
       continuum - Fit the continuum in spectra
        deredden - Apply interstellar extinction corrections
@@ -33,5 +33,5 @@
       specshift - Shift spectral dispersion coordinate systems
 	  splot - Preliminary spectral plot/analysis
        standard - Identify standard stars to be used in sensitivity calc
-	subsets - Substract pairs in strings of spectra
+	subsets - Subtract pairs in strings of spectra
            sums - Generate sums of object and sky spectra by aperture

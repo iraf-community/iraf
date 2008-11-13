@@ -39,7 +39,7 @@ OUTPUT KEYWORDS
 Heliocentric Julian date keyword. (Value in Days).
 .le
 .ls mjd_obs = "MJD-OBS"
-Modified Julian Data keyword.  The MJD is defined as the julian date of
+Modified Julian Data keyword.  The MJD is defined as the Julian date of
 the mid-point of the observation - 2440000.5.  (Value in Days).
 .le
 .ls vobs = "VOBS"

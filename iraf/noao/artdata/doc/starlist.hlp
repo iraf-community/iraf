@@ -9,7 +9,7 @@ starlist starlist nstars
 PARAMETERS
 .ls starlist
 The name of the output text file for the x and y coordinates
-and magnitudes of the artifical stars.  Output will be appended to this
+and magnitudes of the artificial stars.  Output will be appended to this
 file is it exists.
 .le
 .ls nstars = 5000
@@ -56,7 +56,7 @@ The initial value supplied to the random number generator used to
 generate the output x and y coordinates.
 If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 			MAGNITUDE DISTRIBUTION
@@ -99,24 +99,24 @@ absolute magnitude range of -3 to +4.
 .ls power = 0.6
 Coefficient for the power law magnitude distribution.
 The default value of 0.6 is the value for a homogeneous
-and istropic distribution with no cutoff in distance.
+and isotropic distribution with no cutoff in distance.
 .le
 .ls alpha = 0.74, beta = 0.04, delta = 0.294, mstar = 1.28
 The parameters of the Bahcall and Soneira luminosity function.
 .le
 .ls lseed = 1
-The intial value supplied to the random number generator used to
+The initial value supplied to the random number generator used to
 generate the output magnitudes.
 If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 			USER FUNCTIONS
 .ls sfile
 The name of the input text file containing the sampled spatial radial
 density
-function, one sample point per line, with the radius and relative probablity
+function, one sample point per line, with the radius and relative probability
 in columns one and two respectively. The sample points need not be
 uniformly spaced or normalized.
 .le
@@ -133,7 +133,7 @@ density function.
 .le
 .ls lfile
 The name of the input text file containing the sampled luminosity
-function, one sample point per line, with the magnitude and relative probablity
+function, one sample point per line, with the magnitude and relative probability
 in columns one and two respectively. The sample points need not be
 uniformly spaced or normalized.
 .le
@@ -194,7 +194,7 @@ density function R(user), P(user) supplied by the user in the text file
 The Hubble and user file spatial density function are sampled at
 \fInssample\fR equally spaced points, and integrated to give the
 spatial density probability function at each sampled point. The
-integrated probablity function is normalized and approximated by a
+integrated probability function is normalized and approximated by a
 cubic spline of order \fIsorder\fR.  The x and y coordinates are
 computed by randomly sampling the integrated probability function until
 \fInstars\fR stars which satisfy the x and y coordinate limits

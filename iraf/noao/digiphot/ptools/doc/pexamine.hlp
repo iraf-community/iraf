@@ -238,7 +238,7 @@ Label the tick marks?
 Include z2 in the top histogram bin?  Each bin of the histogram is a
 subinterval that is half open at the top.  \fITop_closed\fR decides whether
 those pixels with values equal to z2 are to be counted in the histogram.  If
-\fBtop_closed\fR is yes, the top bin will be larger than the other bins.
+\fItop_closed\fR is yes, the top bin will be larger than the other bins.
 .le
 .ls x1 = INDEF, x2 = INDEF, y1 = INDEF, y2 = INDEF	(hrx)
 Range of graph along each axis.  If INDEF the range is determined from
@@ -251,7 +251,7 @@ of the floor and ceiling parameters.
 .le
 .ls z1 = INDEF, z2 = INDEF		(h)
 Range of pixel values to be used in histogram.  INDEF values default to
-the range in the region being histogramed.
+the range in the region being histogrammed.
 .le
 
 .ih
@@ -333,7 +333,7 @@ cursor position.
 Input to PEXAMINE is through single keystroke commands or colon
 commands. Keystroke commands are simple commands that may
 optionally use the cursor position but otherwise require no arguments.
-The PEXAMINE keystroke commands fall into three catagories, basic
+The PEXAMINE keystroke commands fall into three categories, basic
 commands, data examining commands and data editing commands, all
 described in detail in the following sections. Colon commands
 take an optional argument and function differently depending on
@@ -387,7 +387,7 @@ examining command is given below.
 .ls l
 Print out the name, datatype, and units for all the columns in the input
 catalog. The list command can be used to check the contents of the input
-catalog and/or determine why a particualar column was not loaded.
+catalog and/or determine why a particular column was not loaded.
 .le
 .ls o
 Print out the names and values of the stored columns of the object
@@ -411,7 +411,7 @@ disabled if \fIhcolumn\fR is undefined.
 .le
 .ls r
 Plot the radial profile of the object nearest the cursor including
-only pixels within a distance of \fIrinner\fR and \fRrouter\R of
+only pixels within a distance of \fIrinner\fR and \fIrouter\fR of
 the object center. Radial profile plotting is disabled if \fIimage\fR
 or \fIxposcolumn\fR or \fIyposcolumn\fR is undefined.
 .le
@@ -740,7 +740,7 @@ image display.
     pt> pexamine m92.als.1 m92.als.ed use_display-
 
 	... a plot of magnitude error versus magnitude appears on the
-	    screean and the graphics cursor comes up ready to accept
+	    screen and the graphics cursor comes up ready to accept
 	    commands
 
 	... after looking at the plot the user decides that what they
@@ -764,7 +764,7 @@ image display.
 	    the good data in m92.als.ed
 .fi
 
-2. Examine and edit a DAOPHOT allstar catalog using the subracted image, the
+2. Examine and edit a DAOPHOT allstar catalog using the subtracted image, the
 original image and the image display.
 
 .nf
@@ -787,7 +787,7 @@ original image and the image display.
 	    the 'o' key
 
 	... a list of the values of the loaded columns including chi
-	    appears in the text window , the program switchs to graphics
+	    appears in the text window , the program switches to graphics
 	    mode and places the graphics cursor on the corresponding
 	    point in the X-Y plot
 

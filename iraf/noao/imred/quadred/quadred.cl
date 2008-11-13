@@ -9,6 +9,7 @@ package quadred
 set	quadsrc		= "quadred$src/ccdproc/"
 
 task	ccdproc		= quadsrc$x_quadred.e
+task	qccdproc	= quad$x_ccdred.e
 
 # Task from the CTIO QUAD package.
 
@@ -36,7 +37,7 @@ task	qhistogram		= "quad$qhistogram.cl"
 task	setinstrument		= "quad$setinstrument.cl"
 
 hidetask ccdgetparam, ccddelete, ccdprcselect, ccdssselect, ccdsection
-hidetask qpcalimage, qpselect, qproc, qnoproc
+hidetask qpcalimage, qpselect, qproc, qnoproc, qccdproc
 
 # Special versions which run quadproc rather than ccdproc
 task	qdarkcombine	= quad$qdarkcombine.cl

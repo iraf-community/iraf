@@ -101,7 +101,7 @@ which 100. <= XCENTER <= 200. and 300. <= YCENTER <= 400.
 
 2. Select the records from the output of the APPHOT PHOT task for which
 the first magnitude is not equal to INDEF. In the case of the
-an STDSDAS table database it may be necessary to escape the
+an STSDAS table database it may be necessary to escape the
 leading square bracket.
 
 .nf

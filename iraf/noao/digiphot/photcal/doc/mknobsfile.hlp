@@ -110,7 +110,7 @@ matched in order of occurrence with missing objects being assigned
 INDEF values.
 .le
 .ls allfilters = no
-Output only objects which are sucessfully matched in all the filters
+Output only objects which are successfully matched in all the filters
 specified by \fIidfilters\fR.
 .le
 .ls verify = no
@@ -140,7 +140,7 @@ airmass, time of observation, magnitude and error from
 exposure time, and airmass in \fIphotfiles\fR,  3) associates each 
 field with 1 or more sets of images of that
 field taken through different filters 4) matches individual objects within
-a given observation by order of occurence or x-y position,
+a given observation by order of occurrence or x-y position,
 5) assigns a unique name to each object in each field.
 
 The image set file \fIimsets\fR assigns a name to each star field.
@@ -169,7 +169,7 @@ can be corrected by reading values listed in the columns \fIobscolumns\fR
 in the file \fIobsparams\fR. The format of \fIobsparams\fR is described
 in detail below.
 
-MKNOBSFILE matchs the objects in different images within the same observation
+MKNOBSFILE matches the objects in different images within the same observation
 either
 by order of occurrence if \fItolerance\fR is less than or equal to 0.0,
 or by x-y position. Matching by position is done by identifying which objects
@@ -378,7 +378,7 @@ file, and so are not included in \fIobservations\fR.
 	  *            2       .       .        .     .     .     .
 	  *            3       .       .        .     .     .     .
 	  .............................................................
-	  STDfIELD7    INDEF   INDEF   INDEF    INDEF INDEF INDEF INDEF
+	  STDFIELD7    INDEF   INDEF   INDEF    INDEF INDEF INDEF INDEF
 	  *            2       .       .        .     .     .     .
 	  *            3       .       .        .     .     .     .
 	  .............................................................
@@ -476,7 +476,7 @@ y shifts between frames are less than 5 pixels.
 		star catalog
 .fi
 
-3. Prepare an observatons file from a set of standard star observations
+3. Prepare an observations file from a set of standard star observations
 computed by the APPHOT PHOT task, for input to FITPARAMS.
 The single PHOT output file contains UBV
 measurements of 18 standard stars in the M92 field. No position matching is

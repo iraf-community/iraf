@@ -82,7 +82,7 @@ the \fIkeywpars\fR named pset.
 If no input files or images are specified the following parameters are
 set by the task.
 .ls hjd
-Helocentric Julian date.  The date of observation is corrected for
+Heliocentric Julian date.  The date of observation is corrected for
 light travel difference to the sun.
 .le
 .ls vhelio
@@ -144,14 +144,14 @@ the parameter file.  This mechanism allows the task to be used easily
 in a script and to obtain greater precision.  If the observation
 parameters are taken from the image headers and the \fIimupdate\fR
 parameter is set, then the heliocentric
-Julian day is recorded as HJD, the helocentric velocity as VHELIO,
+Julian day is recorded as HJD, the heliocentric velocity as VHELIO,
 the LSR velocity as VLSR, and the velocity, ra and dec, and epoch
 of the solar motion used in VLSR is recorded as VSUN.
 
 The printed output may include the input data if desired.  This produces two
 lines per observation, one for the input data and one for the output
-velocities.  The calculated data consists of the helocentric Julian
-date, the observed velocity, the observed helocentric velocity, and
+velocities.  The calculated data consists of the heliocentric Julian
+date, the observed velocity, the observed heliocentric velocity, and
 the observed local standard of rest velocity.  Following this are
 component corrections for the diurnal, lunar, annual, and solar
 velocities.
@@ -179,7 +179,7 @@ in km/s is given by
 
 	v = TWOPI * (r / 1000.)  / (23.934469591229 * 3600.)
 
-where 23.934469591229 is the siderial day in hours for 1986 and TWOPI is the
+where 23.934469591229 is the sidereal day in hours for 1986 and TWOPI is the
 ratio of the circumference to the radius of a circle.  The projection of
 this velocity along the line of sight is
 
@@ -256,7 +256,7 @@ interpolation formulas
 where t is the time from the Julian day 2415020 (~J1900) in Julian centuries,
 manom is the mean anomaly (degrees), oblq is the mean obliquity of the ecliptic
 (degrees), lperi is the mean longitude of perihelion (degrees), and
-eccen is the eccentricy of the orbit.  The true anomaly (radians) is 
+eccen is the eccentricity of the orbit.  The true anomaly (radians) is 
 obtained from the mean anomaly (radians) by
 
 .nf
@@ -363,7 +363,7 @@ Y2K update: The date keyword can be in the full format with full
 year and time.  The time takes precedence over a time keyword.
 .le
 .ih
-ACKNOWLEDGEMENTS
+ACKNOWLEDGMENTS
 Some of the formulas used were obtained by inspection of the code
 for the subroutine DOP in the program DOPSET written by R. N. Manchester
 and M. A. Gordon of NRAO dated January 1970.

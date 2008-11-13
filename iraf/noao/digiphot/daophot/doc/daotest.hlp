@@ -15,12 +15,12 @@ DAOTEST will exit with a warning message.
 .ls daologfile = ""
 The name of the output log file. By default all the output image header
 listings and photometry file output is logged in a file
-called \fIimname.log"\fR. If the log file already exists DAOTEST will
+called \fI"imname.log"\fR. If the log file already exists DAOTEST will
 exit with a warning message.
 .le
 .ls daoplotfile = ""
 The name of the output plot file. By default all the graphics output is
-logged in a file called \fIimname.plot"\fR. If the plot file already exists
+logged in a file called \fI"imname.plot"\fR. If the plot file already exists
 DAOTEST will exit with a warning message.
 .le
 .ih
@@ -72,7 +72,7 @@ EXAMPLES
 	da> display testim.sub.1 1
 
 	... display the image with all the stars fitted by ALLSTAR
-	    substracted out
+	    subtracted out
 
 	da> display testim.add.1 1
 

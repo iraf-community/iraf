@@ -24,7 +24,7 @@ If \fIexpr\fR = yes, a copy is made of the input file.
 .ih
 DESCRIPTION
 TXSELECT selects a subset of the records
-from a setof  APPHOT/DAOPHOT text databases
+from a set of  APPHOT/DAOPHOT text databases
 and writes the new records out to another set of text databases.
 
 The output records are selected on the basis of an input boolean

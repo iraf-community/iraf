@@ -39,7 +39,7 @@ metacode file \fIptplotfile\fR.
 Some of PTOOLS tasks which PTTEST attempts to test are in the STSDAS TABLES
 package. If this package is not available a warning message will appear 
 on the screen and this part of the PTTEST script will be skipped.
-The TABLES external addon package is availble from ST. 
+The TABLES external addon package is available from ST. 
 
 .ih
 EXAMPLES

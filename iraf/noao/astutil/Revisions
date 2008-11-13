@@ -1,6 +1,27 @@
 .help revisions Jun88 noao.astutil
 .nf
 
+asttools/refrac.x
+    A development routine for refraction correction from apparent to
+    observed place.  As noted in the comments, this seems to be correct
+    to first order but I don't have complete confidence that I've done
+    this correctly.  It would be useful to have an independent test.
+    (7/2/08, Valdes)
+
+t_rvcorrect.x
+    If a UT time is part of the date keyword it is used in preference to
+    the UT keyword.  This makes use of UTMIDDLE, with the previous change,
+    consistent.  (12/10/07, Valdes)
+
+t_setairmass.x
+    The UTMIDDLE keyword will now always be in date format.  This fixes
+    a problem with changes of the date and insures other tasks which
+    use UTMIDDLE in place of DATE-OBS will used the correct time.
+    (12/10/07, Valdes)
+
+=====
+V2.14
+=====
 
 =======
 V2.12.2

@@ -1,9 +1,12 @@
      SPECIAL VERSION OF CCDRED PACKAGE FOR MULTI-AMPLIFIER CCD IMAGES
 
-The package has a special version of CCDPROC that processes multi-amplifier
-CCD images in a particular format.  See help topic "quadformat" for a
-description of the format.  The task QUADPROC is obsoleted by CCDPROC but
-may be used by those familar with the ARED.QUAD package.
+The package has a special quad version of CCDPROC that processes
+multi-amplifier CCD images in a particular format.  See help topic
+"quadformat" for a description of the format.  The task QUADPROC is
+largely obsoleted by the quad version of CCDPROC but may be used by
+those familiar with the ARED.QUAD package or to use features in the
+standard CCDPROC that are not in the quad version.  Those features
+include line-by-line overscan functions.
 
 
 	     		STANDARD CCDRED TASKS
@@ -33,8 +36,8 @@ may be used by those familar with the ARED.QUAD package.
     qstatistics - Calculate image statistics for multi-amplifier CCD images
    quadsections - Produce image section list for sections of quadformat images
      qhistogram - Make histogram of multi-amplifier CCD image
-      quadsplit - Split quadformat data into individual single amplifer images
-       quadjoin - Rejoin single amplifer images produced by quadsplit
+      quadsplit - Split quadformat data into individual single amplifier images
+       quadjoin - Rejoin single amplifier images produced by quadsplit
 
 		ALTERNATIVE TASKS
 

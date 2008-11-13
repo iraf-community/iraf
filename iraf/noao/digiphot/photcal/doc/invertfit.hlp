@@ -105,7 +105,7 @@ and standard star catalog directory.
 .ih
 DESCRIPTION
 
-INVERTFIT computes magnitudes and colours for the standard or
+INVERTFIT computes magnitudes and colors for the standard or
 program stars in \fIobservations\fR by inverting the system of
 transformation equations defined in \fIconfig\fR, using the
 parameter values in the file \fIparameters\fR produced by the FITPARAMS
@@ -115,7 +115,7 @@ If \fIappend\fR is "yes" output may be appended to an existing file.
 INVERTFIT computes the values of the catalog variables for the program
 stars by inverting the system of transformation equations defined in
 \fIconfig\fR. IT IS THE RESPONSIBILITY OF THE USER TO ENSURE THAT
-THE SYSTEM OF EQUATIONS IS ACTUALLY INVERTABLE.
+THE SYSTEM OF EQUATIONS IS ACTUALLY INVERTIBLE.
 Two minimum conditions must be met. First, the number of
 transformation equations must be greater than or equal to the number of
 catalog variables to be fit, and second, all the catalog variables must
@@ -127,7 +127,7 @@ Below are two sets of transformation equations.
 The first set
 can be inverted by INVERTFIT, the second set cannot and must be
 evaluated by EVALFIT. In both cases the catalog variables to be fit
-are V and BV, and the observated quantities are mv, mb, Xv, and Xb.
+are V and BV, and the observed quantities are mv, mb, Xv, and Xb.
 
 .nf
     System 1:    mv = v0 + V + v1 * Xv + v2 * BV
@@ -153,7 +153,7 @@ that the output file \fIcalib\fR will contain V and BV only.
 		 mb = b0 + B + b1 * Xb + b2 * BV
 .fi
 
-Some systems of equations are invertable but do not have a UNIQUE solution.
+Some systems of equations are invertible but do not have a UNIQUE solution.
 A sample of such a system is shown below.
 There are quadratic terms in BV, implying that this set of
 equations probably has two solutions, both of which may be
@@ -186,7 +186,7 @@ object id which can be
 used to match the observational data with the catalog data.
 All other columns may contain any quantity which can be
 expressed as an integer or real number.  Sexagesimal format numbers
-(hh:mmm:ss) are interpreted internally as real numbers. The constant
+(hh:mm:ss) are interpreted internally as real numbers. The constant
 INDEF can be used to represent data that is missing or undefined.
 Double precision and complex data are
 not supported. Lines beginning with "#" are treated as comment lines.
@@ -294,3 +294,4 @@ id, V, error(V), resid(V), BV, error(BV), and resid(BV).
 .ih
 SEE ALSO
 mkconfig,chkconfig,fitparams,evalfit
+.endhelp

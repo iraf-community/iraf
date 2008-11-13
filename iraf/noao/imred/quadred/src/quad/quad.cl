@@ -52,7 +52,7 @@ task	badpiximage,
 task	setinstrument	= quad$setinstrument.cl
 
 # Different default parameters
-task	ccdproc		= quad$x_ccdred.e
+task	qccdproc	= quad$x_ccdred.e
 
 # Special versions which run quadproc rather than ccdproc
 task	darkcombine	= quad$darkcombine.cl

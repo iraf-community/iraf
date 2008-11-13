@@ -30,7 +30,7 @@ user are listed. Valid image survey names have the form imsurvey@site, e.g.
 keyword information is listed after the image survey name.
 
 The image survey names, addresses, query formats, output formats, wcs formats,
-amd keyword formats, are specified in the image survey configuration file
+and keyword formats, are specified in the image survey configuration file
 \fIimdb\fR. By default the image survey configuration file names defaults to
 the value of the imdb package parameters. The default image survey
 configuration file is "astcat$lib/imdb.dat".  Users can add records

@@ -103,7 +103,7 @@ no coordinate matching is done, and objects are matched in order of occurrence
 with missing objects being assigned INDEF values.
 .le
 .ls allfilters = no
-Output only objects which are sucessfully matched in all the filters specified
+Output only objects which are successfully matched in all the filters specified
 by \fIidfilters\fR?
 .le
 .ls verify = no
@@ -133,7 +133,7 @@ time of observation, magnitude, and magnitude error from
 exposure time, airmass, or time of observation in \fIphotfiles\fR,  3) associates each 
 field with one or more sets of images of that
 field taken through different filters 4) matches individual objects within
-a given observation by order of occurence or x-y position, and
+a given observation by order of occurrence or x-y position, and
 5) assigns a unique name to each object in each field.
 
 The parameter \fIincolumns\fR describes the format of \fIphotfiles\fR.
@@ -194,7 +194,7 @@ can be corrected by reading values listed in the columns \fIobscolumns\fR
 in the file \fIobsparams\fR. The format of \fIobsparams\fR is described
 in detail below.
 
-OBSFILE matchs the objects in different images within the same observation
+OBSFILE matches the objects in different images within the same observation
 either
 by order of occurrence if \fItolerance\fR is less than or equal to 0.0,
 or by x-y position. Matching by position is done by identifying which objects
@@ -357,7 +357,7 @@ zero except for "STD14".
 
 .ih
 OUTPUT
-For the previous set of UBV obervations the output file
+For the previous set of UBV observations the output file
 \fIobservations\fR produced by OBSFILE will look like the following.
 The filter ids for the U,B,V filters are assumed to be 1,2,3.
 Note that the exposure times are assumed to have been normalized either

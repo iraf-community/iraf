@@ -66,7 +66,7 @@ centering algorithms is larger than maxshift, the computed center is returned
 with an error flag.
 .le
 .ls clean = no
-Symmetry-clean the centering subrater before centering? DAOPHOT users should
+Symmetry-clean the centering subraster before centering? DAOPHOT users should
 leave clean set to "no".
 .le
 .ls rclean = 1.0  (scale units)
@@ -120,7 +120,7 @@ sky background. DAOPHOT users should leave clean set to "no".
 
 
 
-New cnters are computed using the centering algorithm specified by
+New centers are computed using the centering algorithm specified by
 \fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and pixels
 that are some threshold above (below) an estimate of the local minimum
 (maximum). \fICthreshold\fR values of 0.0, a positive number, and INDEF

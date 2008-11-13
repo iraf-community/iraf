@@ -166,7 +166,7 @@ error computed from the readout noise, gain and value of the PSF. The critical
 signal-to-noise ratio parameter is used to group stars. In general if a small
 value such as 0.1 divides all the stars in an image into groups less than
 \fImaxgroup\fR, then the expected random errors will determine the accuracy
-of the photometry. On the other hand if a value of crtitcal overlap much
+of the photometry. On the other hand if a value of critical overlap much
 greater than one is required to divide up the stars, crowding errors will
 dominate random errors. If a value of 1 is sufficient then crowding and
 random errors are roughly equivalent.
@@ -210,7 +210,7 @@ Any given set of DAOPARS parameters may stored in a text file along with
 the data being reduced by typing the :w command from within the EPAR task. If
 the user then sets the value of the \fIdaopars\fR parameter to the name of
 the file containing the stored parameter set, the stored parameters will be
-used instead of the default set in thes uparm directory.
+used instead of the default set in the uparm directory.
 
 .ih
 ALGORITHMS

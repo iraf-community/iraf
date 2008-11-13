@@ -49,7 +49,7 @@ Blaze wavelength in Angstroms.  If specified as INDEF it will be computed
 from the other parameters.
 .le
 .ls dispersion = INDEF
-Blaze disprsion in Angstroms per millimeter.  If specified as INDEF it
+Blaze dispersion in Angstroms per millimeter.  If specified as INDEF it
 will be computed from the focal length, which is required in this case,
 and the other parameters.
 .le
@@ -79,7 +79,7 @@ parameter is not specified then the dispersion is adjusted if it is not the
 dispersion the wavelength is adjusted if it is the dispersion.
 
 When the order is not specified, the nearest integer order is computed from
-the other noninteger parameters and then the wavelength and dispersion are
+the other non-integer parameters and then the wavelength and dispersion are
 recomputed based on the integer order.
 
 The basic grating equation used is

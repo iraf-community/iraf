@@ -17,7 +17,7 @@ $seepsf		= "daophot$seepsf/"
 $substar	= "daophot$substar/"
 
 addstar		hlp=doc$addstar.hlp,		src=addstar$t_addstar.x
-allstar		hlp=doc$allstar.hlp,		src=addstar$t_allstar.x
+allstar		hlp=doc$allstar.hlp,		src=allstar$t_allstar.x
 centerpars	hlp=doc$centerpars.hlp,		src=daophot$centerpars.par
 daoedit		hlp=doc$daoedit.hlp,		src=daoedit$t_daoedit.x
 daofind		hlp=doc$daofind.hlp,		src=daofind$t_daofind.x
@@ -35,7 +35,7 @@ phot		hlp=doc$phot.hlp,		src=phot$t_phot.x
 photpars	hlp=doc$photpars.hlp,		src=daophot$photpars.par
 pfmerge		hlp=doc$pfmerge.hlp,		src=select$t_pfmerge.x
 psf		hlp=doc$psf.hlp,		src=psf$t_psf.x
-pstselect	hlp=doc$pstselect.hlp,		src=select$t_pstselect.x
+pstselect	hlp=doc$pstselect.hlp,		src=psf$t_pstselect.x
 seepsf		hlp=doc$seepsf.hlp,		src=seepsf$t_seepsf.x
 setimpars	hlp=doc$setimpars.hlp,		src=daophot$setimpars.cl
 substar		hlp=doc$substar.hlp,		src=substar$t_substar.x

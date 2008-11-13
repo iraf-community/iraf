@@ -301,19 +301,8 @@ is required it checks for the image from the task parameter and then
 for a calibration image of the proper type in the input list.
 
 Having
-selected a calibration image it checks if it has been processed by
-looking for the image header flag CCDPROC.  If it is not present then
-the calibration image is processed.  When any image has been processed
-the CCDPROC flag is added.  For images processed directly by \fBccdproc\fR
-the individual processing flags are checked even if the CCDPROC flag is
-present.  However, the automatic processing of the calibration images is
-only done if the CCDPROC flag is absent!  This is to make the task more
-efficient by not having to check every flag for every calibration image
-for every input image.  Thus, if additional processing
-steps are added after images have been partially reduced then input images
-will be processed for the new steps but calibration images will not be
-processed automatically.
-
+selected a calibration image it checks if it has been processed for
+all the operations selected by the CCDPROC parameters.
 After the calibration images have been identified, and processed if
 necessary, the images may be cached in memory.  This is done when there
 are more than two input images (it is actually less efficient to

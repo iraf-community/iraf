@@ -20,7 +20,7 @@ multiple entries. An individual entry can be referenced by specifying an
 array index, e.g. "MAG[2]" or several values can be selected by
 specifying a range of elements, e.g. "MAG[1-3]".
 In the case of STSDAS table APPHOT/DAOPHOT databases the fields are the
-column names. Names must be spelt in full but upper or lower case is allowed.
+column names. Names must be spelled in full but upper or lower case is allowed.
 In the case of STSDAS table databases, it may be necessary to escape the
 leading square bracket so that field "MAG[2]" would be referred to as
 "MAG\[2]".  The fields are output in
@@ -67,7 +67,7 @@ PDUMP is a simple CL script which calls TXDUMP if the APPHOT/DAOPHOT
 database was a text file and TBDUMP if it was an STSDAS table.
 Although the parameters of TBDUMP and TXDUMP have been tailored to
 make the two tasks appear as similar as possible each task
-offers some capabilites that the other does not. In some
+offers some capabilities that the other does not. In some
 situations users may wish to use the individual tasks instead of the
 generic script.
 

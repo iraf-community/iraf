@@ -31,7 +31,7 @@ This only applies to new images.   The data file consists of lines
 in FITS format with leading whitespace ignored.  A FITS card must begin
 with an uppercase/numeric keyword.  Lines not beginning with a FITS
 keyword such as comments or lower case are ignored.  The user keyword
-output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+output of \fBimheader\fR is an acceptable data file.  See \fBmkheader\fR
 for further information.
 .le
 .ls background = 1000.
@@ -67,14 +67,14 @@ sought.  If found the center of the template image is assumed to be the
 center of the star/psf and the image template is scaled so that the
 radius of the template along the first axis is given by the \fIradius\fR
 parameter.  The axial ratio and position angle define an
-ellipical sampling of the template.
+elliptical sampling of the template.
 .le
 .ls <profile file>
 If not one of the above, a text file is sought giving either an intensity
 per unit area profile or a cumulative flux profile from the center to the
 edge.  The two are differentiated by whether the first profile point is 0
 for a cumulative profile or nonzero for an intensity profile.  An intensity
-profile is recommended.  If found the profile defines an ellipical star/psf
+profile is recommended.  If found the profile defines an elliptical star/psf
 with the major axis radius to the last profile point given by the parameter
 \fIradius\fR, axial ratio given by the parameter \fIar\fR, and position
 angle given by the parameter \fIpa\fR.
@@ -135,7 +135,7 @@ computing the new value and then subtracted again.
 .ls seed = 1
 Random number seed.  If a value of "INDEF" is given then the clock
 time (integer seconds since 1980) is used as the seed yielding
-different random numbers for each excution.
+different random numbers for each execution.
 .le
 
 .ls comments = yes
@@ -261,7 +261,7 @@ analytic functions or a user defined profile given as an equally spaced
 set of values in a text file.  The first point is zero at the center
 for a cumulative profile
 and increases monotonically to the edge.  Note that intensity profiles
-are to be prefered to avoid artifacts in the convertion from cumulative
+are to be preferred to avoid artifacts in the conversion from cumulative
 flux.  In particular, cumulative flux profiles may give a spike at the
 center.  In either case, the profile should be specified fairly finely,
 many points, to avoid interpolation effects.
@@ -294,8 +294,8 @@ example), convolved with seeing (loss of detail), and noise (degraded
 signal-to-noise).  This also allows for more complex point spread
 functions.
 
-The radial profiles are mapped into two dimensional objects by an ellipical
-transformation.  The image templates are also mapped by an ellipical
+The radial profiles are mapped into two dimensional objects by an elliptical
+transformation.  The image templates are also mapped by an elliptical
 transformation to rotate and stretch them.  If the output image
 coordinates are given by (x, y), and the specified object center
 coordinates are given by (xc, yc) then the transformation is defined
@@ -464,7 +464,7 @@ requested.
 .ls model:
 The types of galaxy models are as follows:
 .ls 4 expdisk
-An exponetial disk model defined as
+An exponential disk model defined as
 
 	I = exp (-1.6783 * R/radius)
 
@@ -526,7 +526,7 @@ and stars as background/foreground.
 
 Making the image takes about 5 minutes (2.5 min cpu) on a SPARCstation 1.
 
-2. Create a uniform artifical starfield of 5000 stars for a 512 square image.
+2. Create a uniform artificial starfield of 5000 stars for a 512 square image.
 
 .nf
     ar> starlist starfield.dat 5000

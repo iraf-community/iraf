@@ -118,7 +118,7 @@ MKCATALOG will complain if the user tries to enter an illegal column name.
 Column names are case sensitive. Column "BV" is not the same as 
 column "bv".
 
-Whitesapce  is not permitted in either the object ids or in the column
+Whitespace  is not permitted in either the object ids or in the column
 values. MKCATALOG will truncate any id or column value at the first
 whitespace encountered. The column widths entered by the user are used
 solely to determine

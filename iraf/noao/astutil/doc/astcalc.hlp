@@ -11,7 +11,7 @@ PARAMETERS
 A file of commands using the simple syntax given in the DESCRIPTION.  If no
 file name is given then the commands are read interactively from the
 standard input with a prompt given by the \fIprompt\fR parameter.  The
-comand input ends with either EOF or "quit".  If a list of images and/or a
+command input ends with either EOF or "quit".  If a list of images and/or a
 table is specified the commands are repeated for each image or until the
 end of the table is reached.  Comments beginning with '#', blank lines, and
 escaped newlines are allowed.
@@ -87,7 +87,7 @@ There are a few special predefined variables: "$D" contains the current
 local date (in old FITS DD/MM/YY format), "$T" contains the current local
 time, "$GMD" contains the current Greenwich meridian date (in FITS
 YYYY-MM-DD format), "$GMT" contains the current Greenwich meridian time,
-and "$GMDT" containts the current date and time in FITS YYYY-MM-DDTHH:MM:SS
+and "$GMDT" contains the current date and time in FITS YYYY-MM-DDTHH:MM:SS
 format.
 
 The expression syntax is described below.  Expressions may use previously
@@ -138,7 +138,7 @@ Variables may formally be defined as:
 .fi
 
 where [] indicate optional, {} indicates a class, - indicates an
-ascii range of characters, and * indicates zero or more occurances.
+ASCII range of characters, and * indicates zero or more occurrences.
 Stated in words, a variable must begin with an alphabetic character (ignoring
 an option leading $) and may be followed by any combinations of
 alphabetic, digit, or '.', '_', and '$' characters.
@@ -149,7 +149,7 @@ expressions.
 .nf
         $I      The name of the current image (if used)
         $D      The current date in the DD/MM/YY format
-        $T      The current (local) time as a sexigesimal string
+        $T      The current (local) time as a sexagesimal string
 .fi
 
 The date and time are set once at the beginning of execution.
@@ -168,7 +168,7 @@ string.  The expression syntax is equivalent to that used in the CL and SPP
 languages.
 
 Additional information may be found in the help for \fBhedit\fR except that
-all unqoted nonnumeric strings are considered to be variables and so the
+all unquoted nonnumeric strings are considered to be variables and so the
 '(', ')' operators are not used.  The "field" references are not needed so
 the references "." and  "$" are not used and are not legal variable
 names in this task.
@@ -185,7 +185,7 @@ available in the CL and SPP languages.
         **                      exponentiation
         //                      string concatenation
         !  -                    boolean not, unary negation
-        <  <= >  >=             order comparision (works for strings)
+        <  <= >  >=             order comparison (works for strings)
         == != && ||             equals, not equals, and, or
         ?=                      string equals pattern
         ? :                     conditional expression
@@ -242,12 +242,12 @@ astronomical functions.  More will be added in time.  These are:
      sexstr - convert a number to a sexagesimal string (xx:mm:ss.ss)
       epoch - compute an epoch given a date and time
      julday - compute a Julian day given a date and time
-        mst - compute a mean siderial time w/ date, time, and longitude
+        mst - compute a mean sidereal time w/ date, time, and longitude
  ra_precess - precess ra from one epoch to another
 dec_precess - precess dec from one epoch to another
-    airmass - compute airmass w/ ra, dec, siderial time, and latitude
+    airmass - compute airmass w/ ra, dec, sidereal time, and latitude
    eairmass - compute effective airmass given
-                ra, dec, siderial time, exposure time, and latitude
+                ra, dec, sidereal time, exposure time, and latitude
       obsdb - get parameters from the observatory database
 .fi
 
@@ -270,7 +270,7 @@ Compute a Julian day given a date and time.  The date and time are
 specified as described previously.
 .le
 .ls mst (date[, ut], longitude)
-Compute a mean siderial time given a date, time, and longitude in degrees.  The
+Compute a mean sidereal time given a date, time, and longitude in degrees.  The
 date and (optional) time are specified as described previously.  The longitude
 may be given as a constant or using the observatory database function
 as shown in the examples.  The returned value is a sexagesimal
@@ -279,7 +279,7 @@ string with two decimals in the seconds.
 .ls precess (ra, dec, epoch1, epoch2)
 Precess coordinates from one epoch to another.  The ra is the
 right ascension in hours, the dec in the declination in degrees,
-and the epochs are in years.  This function returns a formated string with
+and the epochs are in years.  This function returns a formatted string with
 the precessed right ascension, declination, and epoch.  Numerical
 values for the right ascension and declination are obtained with the
 functions ra_precess and dec_precess.
@@ -306,13 +306,13 @@ latitude, etc.).  The computed value is returned in seconds of arc.
 .le
 .ls airmass (ra, dec, st, latitude)
 Compute an airmass given right ascension in hours, declination in
-degrees, sideral time in hours, and latitude in degrees.  The latitude
+degrees, sidereal time in hours, and latitude in degrees.  The latitude
 is often specified using the observatory database function as shown
 in the examples.
 .le
 .ls eairmass (ra, dec, st, exptime, latitude)
 Compute an "effective" airmass given right ascension in hours, declination
-in degrees, beginning sideral time in hours, exposure time in seconds, and
+in degrees, beginning sidereal time in hours, exposure time in seconds, and
 latitude in degrees.  The The latitude is often specified using the
 observatory database function as shown in the examples.  The effective
 airmass is based on a Simpson's rule weighting of the beginning, middle,
@@ -335,7 +335,7 @@ possible parameters.
 
 input/output functions:
 
-There are special functions for formating, printing, error aborts,
+There are special functions for formatting, printing, error aborts,
 reading, writing, and deleting image header keywords, reading a text file,
 and reading and writing CL parameters.
 
@@ -397,7 +397,7 @@ Get the value of an image header keyword from the current image.  The
 argument must be a string.  The function value is the value of the keyword.
 .le
 .ls imput (parameter, value)
-Put a value into an image header keyowrd for the current image.  The
+Put a value into an image header keyword for the current image.  The
 parameter argument must be a string and the value can be anything.  If the
 keyword exists it will be modified and if it does not exist it will be
 added.  The function returns a string of the form "imput: parameter =
@@ -543,7 +543,7 @@ read from a file.
     print (dec_precess (ra, dec, epoch, 1950))
     print (airmass (ra, dec, mst, obsdb (observatory, "latitude")))
 
-    # Formated print with arguments.  Note newline.
+    # Formatted print with arguments.  Note newline.
     printf ("Hello World: %s\n", precess (ra, dec, epoch, 1950))
     cl> astcalc commands=example2.dat
     -1

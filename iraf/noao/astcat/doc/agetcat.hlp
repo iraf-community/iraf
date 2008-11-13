@@ -177,7 +177,7 @@ cl> agetcat pars default filter+ fsort=mag1
 cl> page reg001.cat.2
 .fi
 
-3. Repeat example 2 but butoutput only those records for which mag <= 16.0.
+3. Repeat example 2 but output only those records for which mag <= 16.0.
 
 .nf
 cl> agetcat pars default filter+ fsort=mag1 fexpr="mag1 <= 16.0"

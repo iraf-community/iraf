@@ -152,7 +152,7 @@ object id which can be
 used to match the observational data with the corresponding catalog data.
 All other columns may contain any quantity which can be
 expressed as an integer or real number.  Sexagesimal format numbers
-(hh:mmm:ss) are interpreted internally as real numbers. The constant
+(hh:mm:ss) are interpreted internally as real numbers. The constant
 INDEF can be used to represent data that is missing or undefined.
 Double precision and complex data are
 not supported. Lines beginning with "#" are treated as comment lines.
@@ -264,3 +264,4 @@ xu, yu, fit value and fit error respectively.
 .ih
 SEE ALSO
 mkconfig,chkconfig,fitparams,invertfit
+.endhelp

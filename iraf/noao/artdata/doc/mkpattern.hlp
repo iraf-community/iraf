@@ -86,7 +86,7 @@ This only applies to new images.   The data file consists of lines
 in FITS format with leading whitespace ignored.  A FITS card must begin
 with an uppercase/numeric keyword.  Lines not beginning with a FITS
 keyword such as comments or lower case are ignored.  The user keyword
-output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+output of \fBimheader\fR is an acceptable data file.  See \fBmkheader\fR
 for further information.
 .le
 .ih
@@ -107,7 +107,7 @@ characters are ignored.
 This task is the simplest one for creating empty images to be used for
 mosaicing with \fBimcopy\fR and making patterns for testing display and
 image operators.  The replace option is generally used with image sections
-to place constant values in regions.  The multipy option is useful
+to place constant values in regions.  The multiply option is useful
 for making masks of the given pattern when the values are 0 and 1.
 
 Though the patterns make sense extending to higher dimensions they

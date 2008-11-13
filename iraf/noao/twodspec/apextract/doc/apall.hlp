@@ -71,10 +71,10 @@ Find the spectra and define apertures automatically?  In order for
 spectra to be found automatically there must be no apertures for the
 input image or reference image defined in the database.
 .le
-.ls recenter = no
+.ls recenter = yes
 Recenter the apertures?
 .le
-.ls resize = no
+.ls resize = yes
 Resize the apertures?
 .le
 .ls edit = yes
@@ -90,7 +90,7 @@ parameter must also be yes.
 .ls extract = yes
 Extract the one dimensional aperture sums?
 .le
-.ls extras = no
+.ls extras = yes
 Extract the raw spectrum (if variance weighting is used), the sky spectrum
 (if background subtraction is used), and sigma spectrum (if variance
 weighting is used)?  This information is extracted to the third dimension
@@ -101,7 +101,7 @@ Review the extracted spectra?  The \fIinteractive\fR parameter must also be
 yes.
 .le
 
-.ls line = INDEF, nsum = 1
+.ls line = INDEF, nsum = 10
 The dispersion line (line or column perpendicular to the dispersion
 axis) and number of adjacent lines (half before and half after unless
 at the end of the image) used in finding, recentering, resizing,
@@ -184,7 +184,7 @@ near the initial centering position must exceed this threshold.
 
 .ce
 AUTOMATIC FINDING AND ORDERING PARAMETERS
-.ls nfind = 1
+.ls nfind
 Maximum number of apertures to be defined.  This is a query parameter
 so the user is queried for a value except when given explicitly on
 the command line.
@@ -320,6 +320,14 @@ the "average" option does not do any medianing or bad pixel checking,
 something which is recommended.  The fitting option is slower than the
 other options and requires additional fitting parameter.
 .le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
 .ls weights = "none" (none|variance)
 Type of extraction weighting.  Note that if the \fIclean\fR parameter is
 set then the weights used are "variance" regardless of the weights
@@ -346,14 +354,6 @@ function, "fit2d", described by Marsh (see \fBapprofile\fR).
 .ls clean = no
 Detect and replace deviant pixels?
 .le
-.ls skybox = 1
-Box car smoothing length for sky background when using background
-subtraction.  Since the background noise is often the limiting factor
-for good extraction one may box car smooth the sky to improve the
-statistics in smooth background regions at the expense of distorting
-the subtraction near spectral features.  This is most appropriate when
-the sky regions are limited due to a small slit length.
-.le
 .ls saturation = INDEF
 Saturation or nonlinearity level in data units.  During variance weighted
 extractions wavelength points having any pixels above this value are
@@ -373,7 +373,7 @@ data values.  It is specified as the number of photons per data value.
 A image header keyword (case insensitive) may be specified to get the value
 from the image.
 .le
-.ls lsigma = 3., usigma = 3.
+.ls lsigma = 4., usigma = 4.
 Lower and upper rejection thresholds, given as a number of times the
 estimated sigma of a pixel, for cleaning.
 .le

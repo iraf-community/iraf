@@ -379,7 +379,7 @@ and \fIlargeap\fR to produce the aperture correction for each image.
 
 Because the error in the observed magnitudes grows rapidly toward
 larger radii, while the error in the aperture correction grows
-radidly toward smaller radii, the combined error for the star will
+rapidly toward smaller radii, the combined error for the star will
 have some minimum value, usually at an intermediate aperture. If
 \fImagfile\fR is not "", the magnitudes corrected to \fIlargeap\fR
 using the observed magnitude and correction where the  error

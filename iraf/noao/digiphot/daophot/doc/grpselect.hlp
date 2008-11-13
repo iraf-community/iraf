@@ -9,7 +9,7 @@ grpselect ingroupfile outgroupfile min_group max_group
 PARAMETERS
 .ls ingroupfile
 The list of input group files. Ingroupfile must have been written by the
-DAOPHOT PSF, GROUP, or NSTAR tasks. IngroupfileR may be an APPHOT/DAOPHOT text
+DAOPHOT PSF, GROUP, or NSTAR tasks. Ingroupfile may be an APPHOT/DAOPHOT text
 database or an STSDAS table.
 .le
 .ls outgroupfile
@@ -33,7 +33,7 @@ the input GROUP file \fIingroupfile\fR within a range of group sizes specified
 by \fImin_group\fR and \fImax_group\fR. If \fIingroupfile\fR is a DAOPHOT text
 database, \fIoutgroupfile\fR is a text database. Conversely if \fIingroupfile\fR
 is a DAOPHOT STSDAS table database, \fIoutgroupfile\fR is an STSDAS table 
-atabase.
+database.
 
 A typical use for GRPSELECT is to create a new database containing only groups
 which are less than the value of the \fImaxgroup\fR parameter in the DAOPARS

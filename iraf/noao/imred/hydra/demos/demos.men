@@ -9,5 +9,5 @@
    mkdonessie - Make Nessie test data (12 fibers, 100x256)
      donessie - Quick Nessie test (small images, no comments, no delays)
 
-        mkbig - Make large nubmer of fiber test data (300 fibers, 1500x256)
+        mkbig - Make large number of fiber test data (300 fibers, 1500x256)
           big - Test with a large number of fibers

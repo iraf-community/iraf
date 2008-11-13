@@ -22,7 +22,7 @@ will be listed on the output file.
 .ih
 DESCRIPTION
 Program \fBgalactic\fR is used to convert between equatorial and
-galactic oordinates.  It converts in either direction based on the
+galactic coordinates.  It converts in either direction based on the
 specified input coordinates.  Coordinates are read from the input file
 as RA and DEC or galactic longitude and latitude pairs, one pair per
 input line.  Each coordinate pair may optionally be followed by the

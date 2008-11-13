@@ -7,16 +7,16 @@ for computing the transformation from the instrumental system to the standard
 photometric system, and applying the computed transformations to 
 the observational data. 
 
-PHOTCAL distinguishes between two types of objects: \fBstandard stars\fR, 
-and \fBprogram stars\fR. Standard stars have known instrumental and standard 
+PHOTCAL distinguishes between two types of objects: \fIstandard stars\fR, 
+and \fIprogram stars\fR. Standard stars have known instrumental and standard 
 photometric indices. Program stars have known instrumental photometric 
 indices, but unknown standard photometric indices. 
 
 The standard indices of standard stars are contained in standard star
-catalogs known as \fBcatalog files\fR. Each standard star catalog
+catalogs known as \fIcatalog files\fR. Each standard star catalog
 contains only a single entry for a given standard star. The 
 instrumental indices of both standard and program stars are 
-contained in observations catalogs, known as \fBobservations files\fR.
+contained in observations catalogs, known as \fIobservations files\fR.
 There may be any number of observations per star in an observations
 file. 
 
@@ -86,12 +86,12 @@ Several preprocessors are provided to convert data coming from other
 IRAF packages, such as APPHOT and DAOPHOT, into a format suitable for PHOTCAL.
 If a preprocessor for a specific type of data does 
 not exist, then the user will have to use other IRAF facilities to convert it 
-to into the appropiate format, or write their own. 
+to into the appropriate format, or write their own. 
 
 .ih
 III. PREPARE A STANDARD STAR CATALOG FILE
 
-A standard star catalog sutitable for input to PHOTCAL may be prepared in
+A standard star catalog suitable for input to PHOTCAL may be prepared in
 one of the following ways. The advantages and disadvantages of each
 method are briefly discussed.
 
@@ -110,7 +110,7 @@ PHOTCAL, in preparation for id matching,  loads the entire standard
 star catalog into memory, even though the the number of observed
 standard stars may have been only a few dozen. For typical standard
 star catalogs containing a few hundred objects this is not a problem,
-but ver large standard star catalogs should be avoided.
+but very large standard star catalogs should be avoided.
 .le
 .ls [2]
 Prepare a standard star catalog with the MKCATALOG task. MKCATALOG
@@ -212,7 +212,7 @@ If the standard star magnitudes in one or more colors were computed with
 APPHOT or DAOPHOT and all the standard stars are in one stellar field,
 use the MKOBSFILE task to create an observations file.
 For each observations file created, MKOBSFILE
-creates an associated format descriptin file defining the format of
+creates an associated format description file defining the format of
 the new observations file, and suitable for input to
 MKCONFIG. MKOBSFILE prompts the user for all
 the required input. Type "help mkobsfile" for details.
@@ -481,7 +481,7 @@ catalog against the list of ids in the standard star catalog.
 The fitting process can be either interactive or non-interactive. Interactive
 fitting is the default. In interactive mode, the user 
 is presented with plots of the data and the fit, can reject points
-automatically using a k-sigma rejection algrotihm, delete points interactively
+automatically using a k-sigma rejection algorithm, delete points interactively
 with the cursor, change which parameters are to be fit and which are to be
 held constant, and so on. A detailed description of
 all the interactive options and colon commands can be obtained by typing
@@ -619,7 +619,7 @@ the right-hand side of the transformation equations
 then the user must use INVERTFIT. The transformation equations
 for reducing CCD photometry are usually written in this manner.
 
-The full ouput of INVERTFIT for the partial catalog and observations
+The full output of INVERTFIT for the partial catalog and observations
 files listed in section III and IV and the configuration file
 shown in section V are listed below.
 Only observations which were successively matched
@@ -689,7 +689,7 @@ IX. APPLYING THE TRANSFORMATIONS TO THE PROGRAM STARS
 The transformation equations are applied to the program stars in the same
 way they are applied to the standard stars ad described in section VII.
 
-The ouput of INVERTFIT for the partial catalog and observations
+The output of INVERTFIT for the partial catalog and observations
 files listed in section III and IV and the configuration file
 shown in section V are listed below. Only observations
 which were not successfully matched
@@ -724,3 +724,4 @@ STD2-4  11.710  0.034  0.479  0.061  0.660   0.113
 STD6-3  10.589  0.006  0.619  0.016  -0.069  0.022
 STD7-5  11.852  0.059  0.406  0.069  0.981   0.129
 .fi
+.endhelp

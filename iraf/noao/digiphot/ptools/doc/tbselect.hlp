@@ -33,7 +33,7 @@ to yes, that row is included in the output table.
 
 The supported
 operators and functions are briefly described below. A detailed description
-of the boolean expression evaluater and its syntax can be found
+of the boolean expression evaluator and its syntax can be found
 in the manual page for the IMAGES package HEDIT task.
 
 The following logical operators can be used in the expression. 

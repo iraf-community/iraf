@@ -62,7 +62,7 @@ The coordinate system of the input coordinates read from \fIphotfile\fR, of the
 psf model \fIpsfimage\fR, and of the output coordinates written to
 \fIpeakfile\fR and \fIrejfile\fR respectively. The image header coordinate
 system is used to transform from the input coordinate system to the "logical"
-pixel coordinate system used internally, from the internal logicial system to
+pixel coordinate system used internally, from the internal logical system to
 the PSF model system, and from the internal "logical" pixel coordinate system
 to the output coordinate system. The input coordinate system options are
 "logical", tv", "physical", and "world". The PSF model and output coordinate
@@ -111,10 +111,9 @@ The wcsin, wcspsf, and wcsout parameters default to the values of the package
 parameters of the same name. The default values of the package parameters
 wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
 .le
-.le
 .ls cache = ")_.cache"
 Cache the image pixels in memory. Cache may be set to the value of the apphot
-package parameter (the default), "yes", or "no". By default cacheing is
+package parameter (the default), "yes", or "no". By default caching is
 disabled.
 .le
 .ls verify = ")_.verify"
@@ -168,20 +167,20 @@ mosaic pieces with coordinates in the parent image must use the "tv" or
 "physical" coordinate systems.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size
-are large enough, the input image pixels are cached in memory. If cacheing
+are large enough, the input image pixels are cached in memory. If caching
 is enabled and the first measurement will appear to take a long time as the
 entire image must be read in before the measurement is actually made. All
 subsequent measurements will be very fast because PEAK is accessing memory not
-disk. The point of cacheing is to speed up random image access by making the
+disk. The point of caching is to speed up random image access by making the
 internal image i/o buffers the same size as the image itself. However if the
-input object lists are sorted in row order and sparse cacheing may actually
+input object lists are sorted in row order and sparse caching may actually
 worsen not improve the execution time. Also at present there is no point in
-enabling cacheing for images that are less than or equal to 524288 bytes, i.e.
+enabling caching for images that are less than or equal to 524288 bytes, i.e.
 the size of the test image dev$ypix, as the default image i/o buffer is exactly
 that size. However if the size of dev$ypix is doubled by converting it to a
-real image with the chpixtype task then the effect of cacheing in interactive
+real image with the chpixtype task then the effect of caching in interactive
 is can be quite noticeable if measurements of objects in the top and bottom
-halfs of the image are alternated.
+halves of the image are alternated.
 
 By default PEAK computes new centers for all the stars in \fIphotfile\fR.
 However if the DAOPARS parameter \fIrecenter\fR is "no", PEAK assumes that the
