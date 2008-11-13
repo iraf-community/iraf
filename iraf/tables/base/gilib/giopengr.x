@@ -15,6 +15,10 @@ include "gi.h"
 # BS Aug 1996: Update the image size to fix a nasty image write bug
 # BS Jun 1997: Replace IM_KERNEL check with call to gi_geis
 # BS Jul 1997: Add new procedure that bypasses geis file check
+# PEH July 2007:  In gi_newgrp, add a call to imsetbuf if the pixel file
+#              is open.  This was done because under some circumstances
+#              (e.g. looping from the last group to the first) a call to
+#              imgl1r returned incorrect values.
 	    
 procedure gi_opengr (im, gn, datamin, datamax, imt)
 
@@ -100,7 +104,7 @@ begin
 	    } else {
 	       call imioff (im, pixoff, compress, blklen)
 	    }
-	      
+
 	case NEW_IMAGE:
 	    # Flush any data from buffer
 	    call imflush (im)
@@ -162,6 +166,7 @@ begin
 	} else {
 	    fd = IM_PFD(im)
 	    IM_FILESIZE(im) = fstatl (fd, F_FILESIZE)
+	    call imsetbuf (fd, im)
 	}
 
 	if (mod(pixoff, sizeof(IM_PIXTYPE(im))) != 1)

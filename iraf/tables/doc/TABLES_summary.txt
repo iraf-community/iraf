@@ -1,0 +1,39 @@
+ 
+
+
+                    TABLES v3.1 RELEASE SUMMARY
+
+
+This release of TABLES incorporates relatively minor updates to
+applications and libraries. The full details can be found in the
+full release notes.
+
+The Science Software Group is engaged in an effort to move to having
+most of its software development done in Python. This release of
+STSDAS/TABLES (v3.1) has tasks that require our command language
+for IRAF called PyRAF (see pyraf.stsci.edu).
+
+PyRAF 1.1 is being released at the same time as STSDAS/TABLES v3.1.
+Only STSDAS has Python-based tasks in this release. No tasks in
+TABLES are Python-based tasks, though this may not be true in
+future releases.
+
+Packages or tasks that have had minor enhancements or bug fixes include:
+
+
+ttools..thedit
+
+Changes to libraries:
+
+
+gflib
+tbtables
+
+Parameter files that have changed (new parameters or new default values,
+excluding parameters indicating version number changes):
+
+fitsio/strfits.par           - 'oldirafname' default changed (to yes)
+
+
+
+ 

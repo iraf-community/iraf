@@ -1,0 +1,47 @@
+TABLES v3.1 Full Release Notes
+
+CHANGES TO APPLICATIONS
+
+- THEDIT
+
+  There was an incorrect calling sequence in the section for deleting
+  keywords.  This resulting in an error when more than one keyword
+  was to be deleted.
+
+SYSTEM LIBRARY CHANGES
+
+- GFLIB
+
+  Fixed a bug related to multiple ROOTNAME keywords (they appear in both 
+  the primary and extension headers of multi-extension FITS files of HST 
+  data sets).
+  
+- TBTABLES
+
+  The is_image() function was unnecessarily complicated.  It has been
+  simplified so that it now just calls tbtacc() to see if the file is
+  a table; if tbtacc() returns NO, then is_image() calls imaccess() to
+  see if the file is an image.
+
+  When reading a numerical value from a string using sscan, if the
+  string is "INDEF" then nscan() is 1, rather than 0 as previously
+  assumed.  The code was changed to check the value explicitly, rather
+  than relying on nscan().  Also, strsearch() is used instead of streq()
+  to check for INDEF in a string.
+
+  Many of the ttools tasks set the type of the output table to be the
+  same as the type of the input table.  This has roots in the 
+  row-ordered vs column-ordered STSDAS table format.  It is not 
+  necessary with FITS tables (the type is implied by the filename 
+  extension).  If the output is redirected or explicitly set to STDOUT, 
+  some tasks actually failed after changing the table type of the 
+  standard output (which is regarded as a text table).  tbpset() was 
+  modified to prevent this; it now ignores any request to change the 
+  table type of STDOUT or STDERR.
+
+  The print format for table entries has had the option to pad integer 
+  values with zeros on the left.  When the user specifies the format in 
+  Fortran style, zero padding was supported for I format but not for Z 
+  (hexadecimal) format.  The routine that converts from Fortran format 
+  to SPP now checks for this and supports zero padding of hexadecimal 
+  numbers.
